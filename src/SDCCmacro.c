@@ -116,7 +116,24 @@ mvsprintf(hTab *pvals, const char *pformat, va_list ap)
   /* Recursivly evaluate all the macros in the string */
   _evalMacros(ainto, pvals, pformat, MAX_STRING_LENGTH);
   /* Evaluate all the arguments */
-  vsprintf(atmp, ainto, ap);
+#if defined(HAVE_VSNPRINTF)
+    if (vsnprintf(atmp, MAX_STRING_LENGTH, ainto, ap) >= MAX_STRING_LENGTH)
+    {
+	fprintf(stderr, "Internal error: mvsprintf output truncated.\n");
+    }
+#else    
+    {	
+	int wlen; 
+	
+	wlen = vsprintf(atmp, ainto, ap);
+	
+	if (wlen < 0 || wlen >= MAX_STRING_LENGTH)
+	{
+	    wassertl(0, "mvsprintf overflowed.");
+	}
+    }
+#endif    
+    
   /* Recursivly evaluate any macros that were used as arguments */
   _evalMacros(ainto, pvals, atmp, MAX_STRING_LENGTH);
 

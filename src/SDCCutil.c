@@ -382,6 +382,7 @@ size_t SDCCsnprintf(char *dst, size_t n, const char *fmt, ...)
     {
 	fprintf(stderr, "internal error: sprintf truncated.\n");
     }
+    
     return len;
 }
 

@@ -695,7 +695,10 @@ tryHandleUnsupportedOpt(char **argv, int *pi)
                         (longOpt && unsupportedOptTable[i].longOpt && !strcmp(unsupportedOptTable[i].longOpt, longOpt))) {
                         // Found an unsupported opt.
                         char buffer[100];
-                        sprintf(buffer, "%s%c%c", longOpt ? longOpt : "", shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
+                        SNPRINTF(buffer, sizeof(buffer), 
+				 "%s%c%c", 
+				 longOpt ? longOpt : "", 
+				 shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
                         werror (W_UNSUPP_OPTION, buffer, unsupportedOptTable[i].message);
                         return 1;
                     }
@@ -1135,7 +1138,7 @@ parseCmdLine (int argc, char **argv)
 		if (sOpt == 'Y')
 		  sOpt = 'I';
 
-		sprintf (buffer, "-%c%s", sOpt, rest);
+		SNPRINTF (buffer, sizeof(buffer), "-%c%s", sOpt, rest);
 		addToList (preArgv, buffer);
 	      }
 	      break;
@@ -1238,7 +1241,8 @@ parseCmdLine (int argc, char **argv)
   /* if debug option is set the open the cdbFile */
   if (options.debug && fullSrcFileName)
     {
-      sprintf (scratchFileName, "%s.adb", dstFileName); //JCF: Nov 30, 2002
+      SNPRINTF (scratchFileName, sizeof(scratchFileName), 
+		"%s.adb", dstFileName); //JCF: Nov 30, 2002
       if ((cdbFile = fopen (scratchFileName, "w")) == NULL)
 	werror (E_FILE_OPEN_ERR, scratchFileName);
       else
@@ -1261,7 +1265,8 @@ linkEdit (char **envp)
   int i, system_ret;
 
   /* first we need to create the <filename>.lnk file */
-  sprintf (scratchFileName, "%s.lnk", dstFileName);
+  SNPRINTF (scratchFileName, sizeof(scratchFileName), 
+	    "%s.lnk", dstFileName);
   if (!(lnkfile = fopen (scratchFileName, "w")))
     {
       werror (E_FILE_OPEN_ERR, scratchFileName);
@@ -1393,22 +1398,24 @@ linkEdit (char **envp)
   /* -o option overrides default name? */
   if (fullDstFileName)
     {
-      strncpyz (scratchFileName, fullDstFileName, PATH_MAX);
+      strncpyz (scratchFileName, fullDstFileName, sizeof(scratchFileName));
     }
   else
     {
       /* the linked file gets the name of the first modul */
       if (fullSrcFileName)
         {
-          strncpyz (scratchFileName, dstFileName, PATH_MAX);
+          strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
         }
       else
         {
-          strncpyz (scratchFileName, relFiles[0], PATH_MAX);
+          strncpyz (scratchFileName, relFiles[0], sizeof(scratchFileName));
           /* strip ".rel" extension */
           *strrchr (scratchFileName, '.') = '\0';
         }
-      strncatz (scratchFileName, options.out_fmt ? ".S19" : ".ihx", PATH_MAX);
+      strncatz (scratchFileName, 
+		options.out_fmt ? ".S19" : ".ihx",
+		sizeof(scratchFileName));
     }
 
   if (port->linker.cmd)
@@ -1431,12 +1438,12 @@ linkEdit (char **envp)
       /* the linked file gets the name of the first modul */
       if (fullSrcFileName)
         {
-          strncpyz (scratchFileName, dstFileName, PATH_MAX);
+          strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
           p = strlen (scratchFileName) + scratchFileName;
         }
       else
         {
-          strncpyz (scratchFileName, relFiles[0], PATH_MAX);
+          strncpyz (scratchFileName, relFiles[0], sizeof(scratchFileName));
           /* strip "rel" extension */
           p = strrchr (scratchFileName, '.');
 	  if (p)
@@ -1446,7 +1453,9 @@ linkEdit (char **envp)
 	    }
 	    
         }
-      strncatz (scratchFileName, options.out_fmt ? "S19" : "ihx", PATH_MAX);
+      strncatz (scratchFileName,
+		options.out_fmt ? "S19" : "ihx",
+		sizeof(scratchFileName));
       rename (scratchFileName, fullDstFileName);
 
       q = strrchr (fullDstFileName, '.');
@@ -1463,14 +1472,14 @@ linkEdit (char **envp)
         }
        	
       *p = 0;	
-      strncatz (scratchFileName, "map", PATH_MAX);
+      strncatz (scratchFileName, "map", sizeof(scratchFileName));
       *q = 0;
-      strncatz(fullDstFileName, "map", PATH_MAX);
+      strncatz(fullDstFileName, "map", fullDstFileNameLen);
       rename (scratchFileName, fullDstFileName);
       *p = 0;	
-      strncatz (scratchFileName, "mem", PATH_MAX);
+      strncatz (scratchFileName, "mem", sizeof(scratchFileName));
       *q = 0;
-      strncatz(fullDstFileName, "mem", PATH_MAX);	
+      strncatz(fullDstFileName, "mem", fullDstFileNameLen);	
       rename (scratchFileName, fullDstFileName);
     }
   if (system_ret)
@@ -1489,7 +1498,7 @@ assemble (char **envp)
 
     /* -o option overrides default name? */
     if (options.cc_only && fullDstFileName) {
-        strncpyz (scratchFileName, fullDstFileName, PATH_MAX);
+        strncpyz (scratchFileName, fullDstFileName, sizeof(scratchFileName));
     } else {
         /* the assembled file gets the name of the first modul */
         strncpyz (scratchFileName, dstFileName, PATH_MAX);
@@ -1504,7 +1513,7 @@ assemble (char **envp)
 		      options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
 		      asmOptions);
     } else {
-	buildCmdLine2 (buffer, port->assembler.mcmd, PATH_MAX);
+	buildCmdLine2 (buffer, port->assembler.mcmd, sizeof(buffer));
     }
 
     if (my_system (buffer)) {
@@ -1516,8 +1525,10 @@ assemble (char **envp)
     /* TODO: most assembler don't have a -o parameter */
     /* -o option overrides default name? */
     if (options.cc_only && fullDstFileName) {
-        strncpyz (scratchFileName, dstFileName, PATH_MAX);
-        strncatz (scratchFileName, port->linker.rel_ext, PATH_MAX);
+        strncpyz (scratchFileName, dstFileName, sizeof(scratchFileName));
+        strncatz (scratchFileName, 
+		  port->linker.rel_ext,
+		  sizeof(scratchFileName));
         rename (scratchFileName, fullDstFileName);
     }
 }
@@ -1635,8 +1646,8 @@ _setPaths (const char *pprefix)
       where expected.  If so, set.
   */
   getPathDifference (buffer, PREFIX, SDCC_INCLUDE_DIR);
-  strncpyz (scratchFileName, pprefix, PATH_MAX);
-  strncatz (scratchFileName, buffer, PATH_MAX);
+  strncpyz (scratchFileName, pprefix, sizeof(scratchFileName));
+  strncatz (scratchFileName, buffer, sizeof(scratchFileName));
 
   if (pathExists (scratchFileName))
     {
@@ -1648,8 +1659,8 @@ _setPaths (const char *pprefix)
     }
 
   getPathDifference (buffer, PREFIX, SDCC_LIB_DIR);
-  strncpyz (scratchFileName, pprefix, PATH_MAX);
-  strncatz (scratchFileName, buffer, PATH_MAX);
+  strncpyz (scratchFileName, pprefix, sizeof(scratchFileName));
+  strncatz (scratchFileName, buffer, sizeof(scratchFileName));
 
   if (pathExists (scratchFileName))
     {
@@ -1693,7 +1704,7 @@ _discoverPaths (const char *argv0)
    */
   if (strchr (argv0, DIR_SEPARATOR_CHAR))
     {
-      strncpyz (scratchFileName, argv0, PATH_MAX);
+      strncpyz (scratchFileName, argv0, sizeof(scratchFileName));
       *strrchr (scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
       setMainValue ("bindir", scratchFileName);
       ExePathList[0] = Safe_strdup (scratchFileName);
@@ -1701,7 +1712,7 @@ _discoverPaths (const char *argv0)
   else if (getenv (SDCCDIR_NAME) != NULL)
     {
       getPathDifference (buffer, PREFIX, BINDIR);
-      strncpyz (scratchFileName, getenv (SDCCDIR_NAME), PATH_MAX);
+      strncpyz (scratchFileName, getenv (SDCCDIR_NAME), sizeof(scratchFileName));
       strncatz (scratchFileName, buffer, PATH_MAX);
       setMainValue ("bindir", scratchFileName);
       ExePathList[0] = Safe_strdup (scratchFileName);

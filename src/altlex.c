@@ -234,12 +234,12 @@ check_token (const char *sz)
   /* check if it is in the typedef table */
   if (findSym (TypedefTab, NULL, sz))
     {
-      strcpy (yylval.yychar, sz);
+      strncpyz (yylval.yychar, sz, sizeof(yylval.yychar));
       return TYPE_NAME;
     }
   else
     {
-      strcpy (yylval.yychar, sz);
+      strncpyz (yylval.yychar, sz, sizeof(yylval.yychar));
       return IDENTIFIER;
     }
 }
@@ -916,7 +916,7 @@ int
 altlex_testparse (const char *input)
 {
   /* Fiddle with the read-ahead buffer to insert ourselves */
-  strcpy (linebuf, input);
+  strncpyz (linebuf, input, sizeof(linebuf));
   linelen = strlen (linebuf) + 1;
   linepos = 0;
 

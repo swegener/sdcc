@@ -253,8 +253,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  // create a new "XINIT (CODE)" symbol, that will be emitted later
 	  newSym=copySymbol (sym);
 	  SPEC_OCLS(newSym->etype)=xinit;
-	  sprintf (newSym->name, "__xinit_%s", sym->name);
-	  sprintf (newSym->rname,"__xinit_%s", sym->rname);
+	  SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
+	  SNPRINTF (newSym->rname, sizeof(newSym->rname), "__xinit_%s", sym->rname);
 	  SPEC_CONST(newSym->etype)=1;
 	  SPEC_STAT(newSym->etype)=1;
 	  resolveIvalSym(newSym->ival);

@@ -138,7 +138,7 @@ addSym (bucket ** stab,
   bp->sym = sym;		/* update the symbol pointer  */
   bp->level = level;		/* update the nest level      */
   bp->block = block;
-  strcpy (bp->name, sname);	/* copy the name into place */
+  strncpyz (bp->name, sname, sizeof(bp->name));	/* copy the name into place */
 
   /* if this is the first entry */
   if (stab[i] == NULL)
@@ -287,7 +287,7 @@ newSymbol (char *name, int scope)
 
   sym = Safe_alloc ( sizeof (symbol));
 
-  strcpy (sym->name, name);	/* copy the name    */
+  strncpyz (sym->name, name, sizeof(sym->name));	/* copy the name */
   sym->level = scope;		/* set the level    */
   sym->block = currBlockno;
   sym->lineDef = yylineno;	/* set the line number */
@@ -317,7 +317,7 @@ newStruct (char *tag)
 
   s = Safe_alloc ( sizeof (structdef));
 
-  strcpy (s->tag, tag);		/* copy the tag            */
+  strncpyz (s->tag, tag, sizeof(s->tag));		/* copy the tag */
   return s;
 }
 
@@ -671,7 +671,7 @@ genSymName (int level)
   static int gCount = 0;
   static char gname[SDCC_NAME_MAX + 1];
 
-  sprintf (gname, "__%04d%04d", level, gCount++);
+  SNPRINTF (gname, sizeof(gname), "__%04d%04d", level, gCount++);
   return gname;
 }
 
@@ -1086,7 +1086,7 @@ compStructSize (int su, structdef * sdef)
     while (loop) {
 
 	/* create the internal name for this variable */
-	sprintf (loop->rname, "_%s", loop->name);
+	SNPRINTF (loop->rname, sizeof(loop->rname), "_%s", loop->name);
 	loop->offset = (su == UNION ? sum = 0 : sum);
 	SPEC_VOLATILE (loop->etype) |= (su == UNION ? 1 : 0);
 
@@ -1708,13 +1708,13 @@ checkFunction (symbol * sym, symbol *csym)
       // this can happen for reentrant functions
       werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
       // the show must go on: synthesize a name and symbol
-      sprintf (acargs->name, "_%s_PARM_%d", sym->name, argCnt);
+      SNPRINTF (acargs->name, sizeof(acargs->name), "_%s_PARM_%d", sym->name, argCnt);
       acargs->sym = newSymbol (acargs->name, 1);
       SPEC_OCLS (acargs->etype) = istack;
       acargs->sym->type = copyLinkChain (acargs->type);
       acargs->sym->etype = getSpec (acargs->sym->type);
       acargs->sym->_isparm = 1;
-      strcpy (acargs->sym->rname, acargs->name);
+      strncpyz (acargs->sym->rname, acargs->name, sizeof(acargs->sym->rname));
     } else if (strcmp(acargs->sym->name, acargs->sym->rname)==0) { 
       // synthesized name
       werror(E_PARAM_NAME_OMITTED, sym->name, argCnt);
@@ -1897,13 +1897,14 @@ processFuncArgs (symbol * func)
       /* synthesize a variable name */
       if (!val->sym)
 	{
-	  sprintf (val->name, "_%s_PARM_%d", func->name, pNum++);
+	  SNPRINTF (val->name, sizeof(val->name), 
+		    "_%s_PARM_%d", func->name, pNum++);
 	  val->sym = newSymbol (val->name, 1);
 	  SPEC_OCLS (val->etype) = port->mem.default_local_map;
 	  val->sym->type = copyLinkChain (val->type);
 	  val->sym->etype = getSpec (val->sym->type);
 	  val->sym->_isparm = 1;
-	  strcpy (val->sym->rname, val->name);
+	  strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
 	  SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
 	    SPEC_STAT (func->etype);
 	  addSymChain (val->sym);
@@ -1912,8 +1913,8 @@ processFuncArgs (symbol * func)
       else			/* symbol name given create synth name */
 	{
 
-	  sprintf (val->name, "_%s_PARM_%d", func->name, pNum++);
-	  strcpy (val->sym->rname, val->name);
+	  SNPRINTF (val->name, sizeof(val->name), "_%s_PARM_%d", func->name, pNum++);
+	  strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
 	  val->sym->_isparm = 1;
 	  SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
 	    (options.model != MODEL_SMALL ? xdata : data);
@@ -2551,12 +2552,12 @@ initCSupport ()
 	    {
 	      if (tofrom)
 		{
-		  sprintf (buffer, "__fs2%s%s", ssu[su], sbwd[bwd]);
+		  SNPRINTF (buffer, sizeof(buffer), "__fs2%s%s", ssu[su], sbwd[bwd]);
 		  __conv[tofrom][bwd][su] = funcOfType (buffer, __multypes[bwd][su], floatType, 1, options.float_rent);
 		}
 	      else
 		{
-		  sprintf (buffer, "__%s%s2fs", ssu[su], sbwd[bwd]);
+		  SNPRINTF (buffer, sizeof(buffer), "__%s%s2fs", ssu[su], sbwd[bwd]);
 		  __conv[tofrom][bwd][su] = funcOfType (buffer, floatType, __multypes[bwd][su], 1, options.float_rent);
 		}
 	    }
@@ -2569,7 +2570,8 @@ initCSupport ()
 	{
 	  for (su = 0; su < 2; su++)
 	    {
-	      sprintf (buffer, "_%s%s%s",
+	      SNPRINTF (buffer, sizeof(buffer), 
+			"_%s%s%s",
 		       smuldivmod[muldivmod],
 		       ssu[su],
 		       sbwd[bwd]);
@@ -2585,7 +2587,8 @@ initCSupport ()
 	{
 	  for (su = 0; su < 2; su++)
 	    {
-	      sprintf (buffer, "_%s%s%s",
+	      SNPRINTF (buffer, sizeof(buffer), 
+			"_%s%s%s",
 		       srlrr[rlrr],
 		       ssu[su],
 		       sbwd[bwd]);

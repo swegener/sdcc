@@ -34,6 +34,7 @@
 #include "port.h"
 #include "newalloc.h"
 #include "SDCCerr.h"
+#include "SDCCutil.h"
 
 extern int yyerror (char *);
 extern FILE	*yyin;
@@ -868,11 +869,13 @@ opt_assign_expr
                            }                           
    |                       {                              
                               if (cenum)  {
-                                 sprintf(lbuff,"%d",(int) floatFromVal(cenum)+1);
+                                 SNPRINTF(lbuff, sizeof(lbuff), 
+				 	  "%d",(int) floatFromVal(cenum)+1);
                                  $$ = cenum = constVal(lbuff);
                               }
                               else {
-                                 sprintf(lbuff,"%d",0);
+                                 SNPRINTF(lbuff, sizeof(lbuff), 
+				          "%d",0);
                                  $$ = cenum = constVal(lbuff);
                               }   
                            }
@@ -1292,7 +1295,8 @@ selection_statement
                               ex->values.switchVals.swNum = swLabel ;
                                  
                               /* now create the label */
-                              sprintf(lbuff,"_swBrk_%d",swLabel++);
+                              SNPRINTF(lbuff, sizeof(lbuff), 
+			      	       "_swBrk_%d",swLabel++);
                               $<sym>$  =  newSymbol(lbuff,NestLevel);
                               /* put label in the break stack  */
                               STACK_PUSH(breakStack,$<sym>$);   
@@ -1308,13 +1312,13 @@ selection_statement
 while : WHILE  {  /* create and push the continue , break & body labels */
                   static int Lblnum = 0 ;
 		  /* continue */
-                  sprintf (lbuff,"_whilecontinue_%d",Lblnum);
+                  SNPRINTF (lbuff, sizeof(lbuff), "_whilecontinue_%d",Lblnum);
 		  STACK_PUSH(continueStack,newSymbol(lbuff,NestLevel));
 		  /* break */
-		  sprintf (lbuff,"_whilebreak_%d",Lblnum);
+		  SNPRINTF (lbuff, sizeof(lbuff), "_whilebreak_%d",Lblnum);
 		  STACK_PUSH(breakStack,newSymbol(lbuff,NestLevel));
 		  /* body */
-		  sprintf (lbuff,"_whilebody_%d",Lblnum++);
+		  SNPRINTF (lbuff, sizeof(lbuff), "_whilebody_%d",Lblnum++);
 		  $$ = newSymbol(lbuff,NestLevel);
                }
    ;
@@ -1323,13 +1327,13 @@ do : DO {  /* create and push the continue , break & body Labels */
            static int Lblnum = 0 ;
 
 	   /* continue */
-	   sprintf(lbuff,"_docontinue_%d",Lblnum);
+	   SNPRINTF(lbuff, sizeof(lbuff), "_docontinue_%d",Lblnum);
 	   STACK_PUSH(continueStack,newSymbol(lbuff,NestLevel));
 	   /* break */
-	   sprintf (lbuff,"_dobreak_%d",Lblnum);
+	   SNPRINTF(lbuff, sizeof(lbuff), "_dobreak_%d",Lblnum);
 	   STACK_PUSH(breakStack,newSymbol(lbuff,NestLevel));
 	   /* do body */
-	   sprintf (lbuff,"_dobody_%d",Lblnum++);
+	   SNPRINTF(lbuff, sizeof(lbuff), "_dobody_%d",Lblnum++);
 	   $$ = newSymbol (lbuff,NestLevel);	   
         }
    ;
@@ -1338,16 +1342,16 @@ for : FOR { /* create & push continue, break & body labels */
             static int Lblnum = 0 ;
          
             /* continue */
-	    sprintf (lbuff,"_forcontinue_%d",Lblnum);
+	    SNPRINTF(lbuff, sizeof(lbuff), "_forcontinue_%d",Lblnum);
 	    STACK_PUSH(continueStack,newSymbol(lbuff,NestLevel));
 	    /* break    */
-	    sprintf (lbuff,"_forbreak_%d",Lblnum);
+	    SNPRINTF(lbuff, sizeof(lbuff), "_forbreak_%d",Lblnum);
 	    STACK_PUSH(breakStack,newSymbol(lbuff,NestLevel));
 	    /* body */
-	    sprintf (lbuff,"_forbody_%d",Lblnum);
+	    SNPRINTF(lbuff, sizeof(lbuff), "_forbody_%d",Lblnum);
 	    $$ = newSymbol(lbuff,NestLevel);
 	    /* condition */
-	    sprintf (lbuff,"_forcond_%d",Lblnum++);
+	    SNPRINTF(lbuff, sizeof(lbuff), "_forcond_%d",Lblnum++);
 	    STACK_PUSH(forStack,newSymbol(lbuff,NestLevel));
           }
    ;

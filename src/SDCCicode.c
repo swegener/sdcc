@@ -200,7 +200,7 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg,
 
 #if 0 // temporary disabled, leaving the warning as a reminder
   if (warnings) {
-    sprintf (message, "for %s %s in %s", 
+    SNPRINTF (message, sizeof(message), "for %s %s in %s", 
 	     SPEC_USIGN(ltype) ? "unsigned" : "signed",
 	     nounName(ltype), msg);
     werror (W_CONST_RANGE, message);
@@ -613,9 +613,14 @@ newiTemp (char *s)
   symbol *itmp;
 
   if (s)
-    sprintf (buffer, "%s", s);
+  {
+      SNPRINTF (buffer, sizeof(buffer), "%s", s);
+  }
   else
-    sprintf (buffer, "iTemp%d", iTempNum++);
+  {
+      SNPRINTF (buffer, sizeof(buffer), "iTemp%d", iTempNum++);
+  }
+    
   itmp = newSymbol (buffer, 1);
   strncpyz (itmp->rname, itmp->name, SDCC_NAME_MAX);
   itmp->isitmp = 1;
@@ -636,10 +641,12 @@ newiTempLabel (char *s)
     return itmplbl;
 
   if (s)
-    itmplbl = newSymbol (s, 1);
+    {
+	itmplbl = newSymbol (s, 1);
+    }
   else
     {
-      sprintf (buffer, "iTempLbl%d", iTempLblNum++);
+      SNPRINTF (buffer, sizeof(buffer), "iTempLbl%d", iTempLblNum++);
       itmplbl = newSymbol (buffer, 1);
     }
 
@@ -658,7 +665,7 @@ newiTempPreheaderLabel ()
 {
   symbol *itmplbl;
 
-  sprintf (buffer, "preHeaderLbl%d", iTempLblNum++);
+  SNPRINTF (buffer, sizeof(buffer), "preHeaderLbl%d", iTempLblNum++);
   itmplbl = newSymbol (buffer, 1);
 
   itmplbl->isitmp = 1;
@@ -3148,7 +3155,8 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* all integer numbers between the maximum & minimum must */
   /* be present , the maximum value should not exceed 255 */
   min = max = (int) floatFromVal (vch = caseVals);
-  sprintf (buffer, "_case_%d_%d",
+  SNPRINTF (buffer, sizeof(buffer), 
+	    "_case_%d_%d",
 	   tree->values.switchVals.swNum,
 	   min);
   addSet (&labels, newiTempLabel (buffer));
@@ -3161,7 +3169,8 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
     {
       if (((t = (int) floatFromVal (vch)) - max) != 1)
 	return 0;
-      sprintf (buffer, "_case_%d_%d",
+      SNPRINTF (buffer, sizeof(buffer), 
+		"_case_%d_%d",
 	       tree->values.switchVals.swNum,
 	       t);
       addSet (&labels, newiTempLabel (buffer));
@@ -3177,9 +3186,14 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
     return 0;
 
   if (tree->values.switchVals.swDefault)
-    sprintf (buffer, "_default_%d", tree->values.switchVals.swNum);
+    {
+	SNPRINTF (buffer, sizeof(buffer), "_default_%d", tree->values.switchVals.swNum);
+    }
   else
-    sprintf (buffer, "_swBrk_%d", tree->values.switchVals.swNum);
+    {
+	SNPRINTF (buffer, sizeof(buffer), "_swBrk_%d", tree->values.switchVals.swNum);
+    }
+    
 
   falseLabel = newiTempLabel (buffer);
 
@@ -3242,7 +3256,7 @@ geniCodeSwitch (ast * tree,int lvl)
 					operandFromValue (caseVals),
 					EQ_OP);
 
-      sprintf (buffer, "_case_%d_%d",
+      SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d",
 	       tree->values.switchVals.swNum,
 	       (int) floatFromVal (caseVals));
       trueLabel = newiTempLabel (buffer);
@@ -3256,9 +3270,13 @@ geniCodeSwitch (ast * tree,int lvl)
 
   /* if default is present then goto break else break */
   if (tree->values.switchVals.swDefault)
-    sprintf (buffer, "_default_%d", tree->values.switchVals.swNum);
+    {
+	SNPRINTF (buffer, sizeof(buffer), "_default_%d", tree->values.switchVals.swNum);
+    }
   else
-    sprintf (buffer, "_swBrk_%d", tree->values.switchVals.swNum);
+    {
+	SNPRINTF (buffer, sizeof(buffer), "_swBrk_%d", tree->values.switchVals.swNum);
+    }
 
   falseLabel = newiTempLabel (buffer);
   geniCodeGoto (falseLabel);

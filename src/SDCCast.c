@@ -1167,7 +1167,7 @@ stringToSymbol (value * val)
     }
   }
 
-  sprintf (name, "_str_%d", charLbl++);
+  SNPRINTF (name, sizeof(name), "_str_%d", charLbl++);
   sym = newSymbol (name, 0);	/* make it @ level 0 */
   strncpyz (sym->rname, name, SDCC_NAME_MAX);
 
@@ -2960,7 +2960,7 @@ decorateType (ast * tree)
     case SIZEOF:		/* evaluate wihout code generation */
       /* change the type to a integer */
       tree->type = EX_VALUE;
-      sprintf (buffer, "%d", (getSize (tree->right->ftype)));
+      SNPRINTF(buffer, sizeof(buffer), "%d", (getSize (tree->right->ftype)));
       tree->opval.val = constVal (buffer);
       tree->right = tree->left = NULL;
       TETYPE (tree) = getSpec (TTYPE (tree) =
@@ -3033,7 +3033,7 @@ decorateType (ast * tree)
 		    break;
 		}
 	    }
-	    sprintf (buffer, "%d", typeofv);
+	    SNPRINTF (buffer, sizeof(buffer), "%d", typeofv);
 	    tree->opval.val = constVal (buffer);
 	    tree->right = tree->left = NULL;
 	    TETYPE (tree) = getSpec (TTYPE (tree) =
@@ -3413,7 +3413,7 @@ sizeofOp (sym_link * type)
   checkTypeSanity(type, "(sizeof)");
 
   /* get the size and convert it to character  */
-  sprintf (buff, "%d", getSize (type));
+  SNPRINTF (buff, sizeof(buff), "%d", getSize (type));
 
   /* now convert into value  */
   return constVal (buff);
@@ -3447,7 +3447,7 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
       static int localLbl = 0;
       symbol *localLabel;
 
-      sprintf (buffer, "_and_%d", localLbl++);
+      SNPRINTF(buffer, sizeof(buffer), "_and_%d", localLbl++);
       localLabel = newSymbol (buffer, NestLevel);
 
       tree->left = backPatchLabels (tree->left, localLabel, falseLabel);
@@ -3473,7 +3473,7 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
       static int localLbl = 0;
       symbol *localLabel;
 
-      sprintf (buffer, "_or_%d", localLbl++);
+      SNPRINTF(buffer, sizeof(buffer), "_or_%d", localLbl++);
       localLabel = newSymbol (buffer, NestLevel);
 
       tree->left = backPatchLabels (tree->left, trueLabel, localLabel);
@@ -3565,7 +3565,7 @@ createLabel (symbol * label, ast * stmnt)
     label = newSymbol (label->name, label->level);
 
   /* change the name before putting it in add _ */
-  sprintf (name, "%s", label->name);
+  SNPRINTF(name, sizeof(name), "%s", label->name);
 
   /* put the label in the LabelSymbol table    */
   /* but first check if a label of the same    */
@@ -3653,7 +3653,8 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
     }
 
   /* create the case label   */
-  sprintf (caseLbl, "_case_%d_%d",
+  SNPRINTF(caseLbl, sizeof(caseLbl), 
+	   "_case_%d_%d",
 	   swStat->values.switchVals.swNum,
 	   (int) floatFromVal (caseVal->opval.val));
 
@@ -3682,7 +3683,8 @@ createDefault (ast * swStat, ast * stmnt)
   swStat->values.switchVals.swDefault = 1;
 
   /* create the label  */
-  sprintf (defLbl, "_default_%d", swStat->values.switchVals.swNum);
+  SNPRINTF (defLbl, sizeof(defLbl),
+	    "_default_%d", swStat->values.switchVals.swNum);
   return createLabel (newSymbol (defLbl, 0), stmnt);
 }
 
@@ -3705,18 +3707,18 @@ createIf (ast * condAst, ast * ifBody, ast * elseBody)
   }
 
   /* create the labels */
-  sprintf (buffer, "_iffalse_%d", Lblnum);
+  SNPRINTF (buffer, sizeof(buffer), "_iffalse_%d", Lblnum);
   ifFalse = newSymbol (buffer, NestLevel);
   /* if no else body then end == false */
   if (!elseBody)
     ifEnd = ifFalse;
   else
     {
-      sprintf (buffer, "_ifend_%d", Lblnum);
+      SNPRINTF(buffer, sizeof(buffer), "_ifend_%d", Lblnum);
       ifEnd = newSymbol (buffer, NestLevel);
     }
 
-  sprintf (buffer, "_iftrue_%d", Lblnum);
+  SNPRINTF (buffer, sizeof(buffer), "_iftrue_%d", Lblnum);
   ifTrue = newSymbol (buffer, NestLevel);
 
   Lblnum++;
@@ -4348,7 +4350,7 @@ createFunction (symbol * name, ast * body)
     name->stack = SPEC_STAK (fetype) = stack;
 
   /* name needs to be mangled */
-  sprintf (name->rname, "%s%s", port->fun_prefix, name->name);
+  SNPRINTF (name->rname, sizeof(name->rname), "%s%s", port->fun_prefix, name->name);
 
   body = resolveSymbols (body);	/* resolve the symbols */
   body = decorateType (body);	/* propagateType & do semantic checks */

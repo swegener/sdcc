@@ -304,10 +304,13 @@ symbolVal (symbol * sym)
     }
 
   if (*sym->rname)
-    sprintf (val->name, "%s", sym->rname);
+    {
+	SNPRINTF (val->name, sizeof(val->name), "%s", sym->rname);
+    }
   else
-    sprintf (val->name, "_%s", sym->name);
-
+    {
+	SNPRINTF (val->name, sizeof(val->name), "_%s", sym->name);
+    }
 
   return val;
 }
@@ -377,11 +380,11 @@ valueFromLit (double lit)
 
   if ((((long) lit) - lit) == 0)
     {
-      sprintf (buffer, "%ld", (long) lit);
+      SNPRINTF (buffer, sizeof(buffer), "%ld", (long) lit);
       return constVal (buffer);
     }
 
-  sprintf (buffer, "%f", lit);
+  SNPRINTF (buffer, sizeof(buffer), "%f", lit);
   return constFloatVal (buffer);
 }
 
@@ -1528,11 +1531,15 @@ valForArray (ast * arrExpr)
 
   val = newValue ();
   if (!lval)
-    sprintf (buffer, "%s", AST_SYMBOL (arrExpr->left)->rname);
+    {
+	SNPRINTF (buffer, sizeof(buffer), "%s", AST_SYMBOL (arrExpr->left)->rname);
+    }
   else
-    sprintf (buffer, "%s", lval->name);
+    {
+	SNPRINTF (buffer, sizeof(buffer), "%s", lval->name);
+    }
 
-  sprintf (val->name, "(%s + %d)", buffer,
+  SNPRINTF (val->name, sizeof(val->name), "(%s + %d)", buffer,
 	   (int) AST_LIT_VALUE (arrExpr->right) * size);
 
   val->type = newLink ();
@@ -1595,11 +1602,15 @@ valForStructElem (ast * structT, ast * elemT)
 
   val = newValue ();
   if (!lval)
-    sprintf (buffer, "%s", AST_SYMBOL (structT)->rname);
+    {
+	SNPRINTF(buffer, sizeof(buffer), "%s", AST_SYMBOL (structT)->rname);
+    }
   else
-    sprintf (buffer, "%s", lval->name);
+    {
+	SNPRINTF (buffer, sizeof(buffer), "%s", lval->name);
+    }
 
-  sprintf (val->name, "(%s + %d)", buffer,
+  SNPRINTF (val->name, sizeof(val->name), "(%s + %d)", buffer,
 	   (int) sym->offset);
 
   val->type = newLink ();
@@ -1639,7 +1650,7 @@ valForCastAggr (ast * aexpr, sym_link * type, ast * cnst, int op)
 
   val = newValue ();
 
-  sprintf (val->name, "(%s %c %d)",
+  SNPRINTF (val->name, sizeof(val->name), "(%s %c %d)",
 	   AST_SYMBOL (aexpr)->rname, op,
 	   getSize (type->next) * (int) AST_LIT_VALUE (cnst));
 
@@ -1662,7 +1673,7 @@ valForCastArr (ast * aexpr, sym_link * type)
 
   val = newValue ();
 
-  sprintf (val->name, "(%s)",
+  SNPRINTF (val->name, sizeof(val->name), "(%s)",
 	   AST_SYMBOL (aexpr)->rname);
 
   val->type = type;

@@ -226,7 +226,7 @@ iCode2eBBlock (iCode * ic)
     ebb->entryLabel = ic->argLabel.label;
   else
     {
-      sprintf (buffer, "_eBBlock%d", eBBNum++);
+      SNPRINTF (buffer, sizeof(buffer), "_eBBlock%d", eBBNum++);
       ebb->entryLabel = newSymbol (buffer, 1);
       ebb->entryLabel->key = labelKey++;
     }

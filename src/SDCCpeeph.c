@@ -66,7 +66,7 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
   char buff[MAX_PATTERN_LEN];
   int dist = 0;
 
-  sprintf (buff, "%s:", lbl);
+  SNPRINTF (buff, sizeof(buff), "%s:", lbl);
   while (pl)
     {
 
@@ -815,8 +815,7 @@ bindVar (int key, char **s, hTab ** vtab)
   *s = vvx;
   *vv = '\0';
   /* got value */
-  vvx = traceAlloc (&_G.values, Safe_alloc(strlen (vval) + 1));
-  strcpy (vvx, vval);
+  vvx = traceAlloc (&_G.values, Safe_strdup(vval));
 
   hTabAddItem (vtab, key, vvx);
 }
@@ -1310,7 +1309,7 @@ readFileIntoBuffer (char *fname)
 	  if (rs)
 	    {
 	      rs = Safe_realloc (rs, strlen (rs) + strlen (lb) + 1);
-	      strcat (rs, lb);
+	      strncatz (rs, lb,  strlen (rs) + strlen (lb) + 1);
 	    }
 	  else
 	    {
@@ -1328,7 +1327,7 @@ readFileIntoBuffer (char *fname)
       if (rs)
 	{
 	  rs = Safe_realloc (rs, strlen (rs) + strlen (lb) + 1);
-	  strcat (rs, lb);
+	  strncatz (rs, lb, strlen (rs) + strlen (lb) + 1);
 	}
       else
 	{

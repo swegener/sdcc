@@ -484,7 +484,8 @@ createStackSpil (symbol * sym)
      we need to allocate this on the stack : this is really a
      hack!! but cannot think of anything better at this time */
 
-  if (sprintf (slocBuffer, "sloc%d", _G.slocNum++) >= sizeof (slocBuffer))
+  if (SNPRINTF (slocBuffer, sizeof(slocBuffer), 
+		"sloc%d", _G.slocNum++) >= sizeof (slocBuffer))
     {
       fprintf (stderr, "***Internal error: slocBuffer overflowed: %s:%d\n",
 	       __FILE__, __LINE__);
@@ -643,9 +644,10 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
   if ((selectS = liveRangesWith (lrcs, directSpilLoc, ebp, ic)))
     {
       sym = leastUsedLR (selectS);
-      strcpy (sym->rname, (sym->usl.spillLoc->rname[0] ?
-			   sym->usl.spillLoc->rname :
-			   sym->usl.spillLoc->name));
+      strncpyz (sym->rname,
+		sym->usl.spillLoc->rname[0] ?
+		   sym->usl.spillLoc->rname : sym->usl.spillLoc->name,
+		sizeof(sym->rname));
       sym->spildir = 1;
       /* mark it as allocation required */
       sym->usl.spillLoc->allocreq++;
@@ -1683,14 +1685,17 @@ rematStr (symbol * sym)
   char *s = buffer;
   iCode *ic = sym->rematiCode;
 
+  *s = 0;
+    
   while (1)
     {
 
       /* if plus or minus print the right hand side */
       if (ic->op == '+' || ic->op == '-')
 	{
-	  sprintf (s, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)),
-		   ic->op);
+	  SNPRINTF (s, sizeof(buffer) - strlen(buffer), 
+		    "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)),
+		    ic->op);
 	  s += strlen (s);
 	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
 	  continue;
@@ -1701,7 +1706,8 @@ rematStr (symbol * sym)
 	  continue;
       }
       /* we reached the end */
-      sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
+      SNPRINTF (s, sizeof(buffer) - strlen(buffer), 
+		"%s", OP_SYMBOL (IC_LEFT (ic))->rname);
       break;
     }
 
@@ -1764,7 +1770,7 @@ regTypeNum ()
 		  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
 		  psym->type = sym->type;
 		  psym->etype = sym->etype;
-		  strcpy (psym->rname, psym->name);
+		  strncpyz (psym->rname, psym->name, sizeof(psym->rname));
 		  sym->isspilt = 1;
 		  sym->usl.spillLoc = psym;
 		  continue;

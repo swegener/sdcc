@@ -303,7 +303,8 @@ allocGlobal (symbol * sym)
 
   /* symbol name is internal name  */
   if (!sym->level)		/* local statics can come here */
-    sprintf (sym->rname, "%s%s", port->fun_prefix, sym->name);
+    SNPRINTF (sym->rname, sizeof(sym->rname), 
+	      "%s%s", port->fun_prefix, sym->name);
 
   /* add it to the operandKey reset */
   addSet (&operKeyReset, sym);
@@ -518,7 +519,8 @@ allocParms (value * val)
       else
 	{ /* allocate them in the automatic space */
 	  /* generate a unique name  */
-	  sprintf (lval->sym->rname, "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
+	  SNPRINTF (lval->sym->rname, sizeof(lval->sym->rname),
+		    "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
 	  strncpyz (lval->name, lval->sym->rname, sizeof(lval->name));
 	  
 	  /* if declared in external storage */
@@ -600,9 +602,10 @@ allocLocal (symbol * sym)
 {
 
   /* generate an unique name */
-  sprintf (sym->rname, "%s%s_%s_%d_%d",
-	   port->fun_prefix,
-	   currFunc->name, sym->name, sym->level, sym->block);
+  SNPRINTF (sym->rname, sizeof(sym->rname), 
+	    "%s%s_%s_%d_%d",
+	    port->fun_prefix,
+	    currFunc->name, sym->name, sym->level, sym->block);
 
   sym->islocal = 1;
   sym->localof = currFunc;

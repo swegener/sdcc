@@ -1590,14 +1590,14 @@ operand *geniCodeMultiply (operand *left, operand *right,bool ptrSizeCalculation
 
     /* if the right is a literal & power of 2 */
     /* then make it a left shift              */
-	/*If we are computing  ptr size then normal multiplication*/
-	/*code generated for 1 byte * 1 byte literal = 2 bytes result is more efficient in most cases*/
-	/*than 2 bytes result = 2 bytes << literal if port as 1 byte muldiv*/
+    /*If we are computing  ptr size then normal multiplication*/
+    /*code generated for 1 byte * 1 byte literal = 2 bytes result is more efficient in most cases*/
+    /*than 2 bytes result = 2 bytes << literal if port as 1 byte muldiv*/
     if	(IS_LITERAL(retype) && !IS_FLOAT(letype) &&
-		!((ptrSizeCalculation)&&(getSize(resType)!=getSize(ltype))&&(1==port->muldiv.native_below))&&
-		(p2 = powof2 ((unsigned long)floatFromVal(right->operand.valOperand))))
+        !((ptrSizeCalculation)&&(getSize(resType)!=getSize(ltype))&&(1==port->muldiv.native_below))&&
+        (p2 = powof2 ((unsigned long)floatFromVal(right->operand.valOperand))))
 	{
-		if((ptrSizeCalculation)&&(getSize(resType)!=getSize(ltype))){
+        if((ptrSizeCalculation)&&(getSize(resType)!=getSize(ltype))){
 			/* LEFT_OP need same size for left and result, */
 			left = geniCodeCast(resType,left,TRUE);
 			ltype = operandType(left);
@@ -2277,11 +2277,6 @@ operand *geniCodeLeftShift (operand *left, operand *right)
 {
     iCode *ic;
 
-    /* Operands must be promoted to int, according to ISO. */    
-    if (getSize(operandType(right)) < INTSIZE) 
-    {
-	right = geniCodeCast(INTTYPE,right,TRUE);	    
-    }    
 
     /* Note that we don't use the usual binary conversions for the
      * shift operations, in accordance with our ANSI friends.
@@ -2305,11 +2300,6 @@ operand *geniCodeRightShift (operand *left, operand *right)
 {
     iCode *ic;
 
-    /* Operands must be promoted to int, according to ISO. */    
-    if (getSize(operandType(right)) < INTSIZE) 
-    {
-	right = geniCodeCast(INTTYPE,right,TRUE);	    
-    }    
 
     /* Note that we don't use the usual binary conversions for the
      * shift operations, in accordance with our ANSI friends.

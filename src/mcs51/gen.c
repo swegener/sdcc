@@ -3152,8 +3152,9 @@ genMultbits (operand * left,
 
 
 /*-----------------------------------------------------------------*/
-/* genMultOneByte : 8 bit multiplication & division                */
+/* genMultOneByte : 8*8=8/16 bit multiplication                    */
 /*-----------------------------------------------------------------*/
+#if 0 // REMOVE ME
 static void
 genMultOneByte (operand * left,
 		operand * right,
@@ -3244,6 +3245,106 @@ genMultOneByte (operand * left,
 	  aopPut (AOP (result), "a", offset++);
     }
 }
+#else
+static void
+genMultOneByte (operand * left,
+		operand * right,
+		operand * result)
+{
+  sym_link *opetype = operandType (result);
+  symbol *lbl;
+  int size=AOP_SIZE(result);
+
+  //emitcode (";",__FUNCTION__);
+  if (size<1 || size>=2) {
+    // this should never happen
+      fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", 
+	       AOP_SIZE(result), __FUNCTION__, lineno);
+      exit (1);
+  }
+
+  /* (if two literals: the value is computed before) */
+  /* if one literal, literal on the right */
+  if (AOP_TYPE (left) == AOP_LIT)
+    {
+      operand *t = right;
+      right = left;
+      left = t;
+      //emitcode (";", "swapped left and right");
+    }
+
+  if (SPEC_USIGN(opetype)
+      // ignore the sign of left and right, what else can we do?
+      || (SPEC_USIGN(operandType(left)) && 
+	  SPEC_USIGN(operandType(right)))) {
+    // just an unsigned 8*8=8/16 multiply
+    //emitcode (";","unsigned");
+    emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
+    MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+    emitcode ("mul", "ab");
+    aopPut (AOP (result), "a", 0);
+    if (size==2) {
+      aopPut (AOP (result), "b", 1);
+    }
+    return;
+  }
+
+  // we have to do a signed multiply
+
+  //emitcode (";", "signed");
+  emitcode ("clr", "F0"); // reset sign flag
+  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
+  MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+
+  lbl=newiTempLabel(NULL);
+  emitcode ("jnb", "acc.7,%05d$",  lbl->key+100);
+  // left side is negative, 8-bit two's complement, this fails for -128
+  emitcode ("setb", "F0"); // set sign flag
+  emitcode ("cpl", "a");
+  emitcode ("inc", "a");
+
+  emitcode ("", "%05d$:", lbl->key+100);
+  emitcode ("xch", "a,b");
+
+  /* if literal */
+  if (AOP_TYPE(right)==AOP_LIT) {
+    /* AND literal negative */
+    if ((int) floatFromVal (AOP (right)->aopu.aop_lit) < 0) {
+      // two's complement for literal<0
+      emitcode ("xrl", "PSW,#0x20"); // xrl sign flag
+      emitcode ("cpl", "a");
+      emitcode ("inc", "a");
+    }
+  } else {
+    lbl=newiTempLabel(NULL);
+    emitcode ("jnb", "acc.7,%05d$", lbl->key+100);
+    // right side is negative, 8-bit two's complement
+    emitcode ("xrl", "PSW,#0x20"); // xrl sign flag
+    emitcode ("cpl", "a");
+    emitcode ("inc", "a");
+    emitcode ("", "%05d$:", lbl->key+100);
+  }
+  emitcode ("mul", "ab");
+    
+  lbl=newiTempLabel(NULL);
+  emitcode ("jnb", "F0,%05d$", lbl->key+100);
+  // only ONE op was negative, we have to do a 8/16-bit two's complement
+  emitcode ("cpl", "a"); // lsb
+  emitcode ("inc", "a");
+  if (size==2) {
+    emitcode ("xch", "a,b");
+    emitcode ("cpl", "a"); // msb
+    emitcode ("addc", "a,#0");
+    emitcode ("xch", "a,b");
+  }
+
+  emitcode ("", "%05d$:", lbl->key+100);
+  aopPut (AOP (result), "a", 0);
+  if (size==2) {
+    aopPut (AOP (result), "b", 1);
+  }
+}
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genMult - generates code for multiplication                     */
@@ -5440,7 +5541,7 @@ AccAXLsh (char *x, int shCount)
 		SRMask[shCount]);	// 000000BB:CCCCCCDD
       emitcode ("mov", "c,acc.0");	// c = B
       emitcode ("xch", "a,%s", x);	// CCCCCCDD:000000BB
-#if 0
+#if 0 // REMOVE ME
       AccAXRrl1 (x);		// BCCCCCCD:D000000B
       AccAXRrl1 (x);		// BBCCCCCC:DD000000
 #else

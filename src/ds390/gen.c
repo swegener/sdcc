@@ -3684,12 +3684,8 @@ genMultbits (operand * left,
 
 
 /*-----------------------------------------------------------------*/
-/* genMultOneByte : 8*8=16 bit multiplication                      */
+/* genMultOneByte : 8*8=8/16 bit multiplication                    */
 /*-----------------------------------------------------------------*/
-void catchMe() {
-  emitcode(";catch","me");
-}
-
 static void
 genMultOneByte (operand * left,
 		operand * right,
@@ -3697,29 +3693,15 @@ genMultOneByte (operand * left,
 {
   sym_link *opetype = operandType (result);
   symbol *lbl;
+  int size=AOP_SIZE(result);
 
-  if (AOP_SIZE (result)!=2) {
+  emitcode (";",__FUNCTION__);
+  if (size<1 || size>=2) {
     // this should never happen
-      fprintf (stderr, "size!=2 in geniCodeMultOneByte\n");
+      fprintf (stderr, "size!=1||2 (%d) in %s at line:%d \n", 
+	       AOP_SIZE(result), __FUNCTION__, lineno);
+      exit (1);
   }
-
-  if (SPEC_USIGN(opetype) || 
-      // ignore the sign of left and right, what else can we do?
-      (SPEC_USIGN(operandType(left)) && 
-       SPEC_USIGN(operandType(right)))) {
-    // just an unsigned 8*8=16 multiply
-    emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
-    MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
-    emitcode ("mul", "ab");
-    aopPut (AOP (result), "a", 0);
-    aopPut (AOP (result), "b", 1);
-    return;
-  }
-
-  // we have to do a signed multiply
-
-#if 0
-  // literals ignored for now
 
   /* (if two literals: the value is computed before) */
   /* if one literal, literal on the right */
@@ -3728,49 +3710,79 @@ genMultOneByte (operand * left,
       operand *t = right;
       right = left;
       left = t;
+      emitcode (";", "swapped left and right");
     }
-#endif
 
-  emitcode ("mov", "ap,#0"); // can't we use some flag bit here?
-  MOVA (aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
+  if (SPEC_USIGN(opetype)
+      // ignore the sign of left and right, what else can we do?
+      || (SPEC_USIGN(operandType(left)) && 
+	  SPEC_USIGN(operandType(right)))) {
+    // just an unsigned 8*8=8/16 multiply
+    //emitcode (";","unsigned");
+    emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
+    MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
+    emitcode ("mul", "ab");
+    aopPut (AOP (result), "a", 0);
+    if (size==2) {
+      aopPut (AOP (result), "b", 1);
+    }
+    return;
+  }
+
+  // we have to do a signed multiply
+
+  emitcode (";", "signed");
+  emitcode ("clr", "F0"); // reset sign flag
+  emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
+  MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
+
   lbl=newiTempLabel(NULL);
   emitcode ("jnb", "acc.7,%05d$",  lbl->key+100);
-  // right side is negative, should test for litteral too
-  emitcode ("inc", "ap"); // opRight is negative
-  emitcode ("cpl", "a"); // 8-bit two's complement, this fails for -128
+  // left side is negative, 8-bit two's complement, this fails for -128
+  emitcode ("setb", "F0"); // set sign flag
+  emitcode ("cpl", "a");
   emitcode ("inc", "a");
-  emitcode ("", "%05d$:", lbl->key+100);
-  emitcode ("mov", "b,a");
 
-  MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
-  lbl=newiTempLabel(NULL);
-  emitcode ("jnb", "acc.7,%05d$", lbl->key+100);
-  // left side is negative
-  emitcode ("inc", "ap"); // opLeft is negative
-  emitcode ("cpl", "a"); // 8-bit two's complement, this fails for -128
-  emitcode ("inc", "a");
   emitcode ("", "%05d$:", lbl->key+100);
+  emitcode ("xch", "a,b");
+
+  /* if literal */
+  if (AOP_TYPE(right)==AOP_LIT) {
+    /* AND literal negative */
+    if ((int) floatFromVal (AOP (right)->aopu.aop_lit) < 0) {
+      // two's complement for literal<0
+      emitcode ("xrl", "PSW,#0x20"); // xrl sign flag
+      emitcode ("cpl", "a");
+      emitcode ("inc", "a");
+    }
+  } else {
+    lbl=newiTempLabel(NULL);
+    emitcode ("jnb", "acc.7,%05d$", lbl->key+100);
+    // right side is negative, 8-bit two's complement
+    emitcode ("xrl", "PSW,#0x20"); // xrl sign flag
+    emitcode ("cpl", "a");
+    emitcode ("inc", "a");
+    emitcode ("", "%05d$:", lbl->key+100);
+  }
   emitcode ("mul", "ab");
     
   lbl=newiTempLabel(NULL);
-  emitcode ("xch", "a,ap");
-  emitcode ("rrc", "a");
-  emitcode ("xch", "a,ap");
-  emitcode ("jnc", "%05d$", lbl->key+100);
-  // only ONE op was negative, we have to do a 16-bit two's complement
-  emitcode ("setb", "c");
-  emitcode ("cpl", "a");
-  emitcode ("addc", "a,#0");
-  emitcode ("push", "acc"); // lsb
-  emitcode ("mov", "a,b");
-  emitcode ("cpl", "a");
-  emitcode ("addc", "a,#0");
-  emitcode ("mov", "b,a"); // msb
-  emitcode ("pop", "acc"); // lsb
+  emitcode ("jnb", "F0,%05d$", lbl->key+100);
+  // only ONE op was negative, we have to do a 8/16-bit two's complement
+  emitcode ("cpl", "a"); // lsb
+  emitcode ("inc", "a");
+  if (size==2) {
+    emitcode ("xch", "a,b");
+    emitcode ("cpl", "a"); // msb
+    emitcode ("addc", "a,#0");
+    emitcode ("xch", "a,b");
+  }
 
   emitcode ("", "%05d$:", lbl->key+100);
   aopPut (AOP (result), "a", 0);
-  aopPut (AOP (result), "b", 1);
+  if (size==2) {
+    aopPut (AOP (result), "b", 1);
+  }
 }
 
 /*-----------------------------------------------------------------*/

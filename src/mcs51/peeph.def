@@ -1315,6 +1315,30 @@ replace {
 }
 
 replace {
+        cjne @%1,%2,%3
+        inc  %1
+        cjne @%1,%6,%3
+        inc  %1
+        cjne @%1,%11,%3
+       	inc  %1
+        cjne @%1,%14,%3
+        sjmp %7
+%3:
+        sjmp %8
+} by {
+        ; Peephole 193.a   optimized misc jump sequence
+        cjne @%1,%2,%8
+        inc  %1
+        cjne @%1,%6,%8
+        inc  %1
+        cjne @%1,%11,%8
+        inc  %1
+        cjne @%1,%14,%8
+        sjmp %7
+%3:
+}
+
+replace {
         cjne %1,%2,%3
         cjne %5,%6,%3
         cjne %10,%11,%3
@@ -1373,6 +1397,26 @@ replace {
 }
 
 replace {
+        cjne @%1,%2,%3
+        inc  %1
+        cjne @%1,%6,%3
+        inc  %1
+        cjne @%1,%11,%3
+        sjmp %7
+%3:
+        sjmp %8
+} by {
+        ; Peephole 195.a   optimized misc jump sequence
+        cjne @%1,%2,%8
+        inc  %1
+        cjne @%1,%6,%8
+        inc  %1
+        cjne @%1,%11,%8
+        sjmp %7
+%3:
+}
+
+replace {
         cjne %1,%2,%3
         cjne %5,%6,%3
         cjne %10,%11,%3
@@ -1416,6 +1460,22 @@ replace {
         cjne %1,%2,%8
         mov  a,%4
         cjne %5,%6,%8
+        sjmp %7
+%3:
+}
+
+replace {
+        cjne @%1,%2,%3
+        inc  %1
+        cjne @%1,%6,%3
+        sjmp %7
+%3:
+        sjmp %8
+} by {
+        ; Peephole 197.a   optimized misc jump sequence
+        cjne @%1,%2,%8
+        inc   %1
+        cjne @%1,%6,%8
         sjmp %7
 %3:
 }

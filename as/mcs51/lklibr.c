@@ -661,6 +661,7 @@ int fndsym( char *name )
 	
 	/* Iterate through all library object files */
 	ThisLibr = libr.next;
+    FirstFound = libr.next; /*So gcc stops whining*/
 	while (ThisLibr)
     {
 		/* Iterate through all symbols in an object file */

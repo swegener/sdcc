@@ -741,13 +741,13 @@ dealloc:
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* aopGet - for fetching value of the aop                          */
-/* 
- * Set canClobberACC if you are aure it is OK to clobber the value 
- * in the accumulator. Set it FALSE otherwise; FALSE is always safe,
- * just less efficient.
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
+/* aopGet - for fetching value of the aop                           */
+/* 								    */
+/* Set canClobberACC if you are aure it is OK to clobber the value  */
+/* in the accumulator. Set it FALSE otherwise; FALSE is always safe,*/
+/* just less efficient.						    */
+/*------------------------------------------------------------------*/
 
 static char *aopGet (asmop *aop, 
 		     int offset, 
@@ -2594,14 +2594,14 @@ static bool genPlusIncr (iCode *ic)
         int labelRange;
 
 	/* If the next instruction is a goto and the goto target
-	 * is < 10 instructions previous to this, we can generate
+	 * is <= 5 instructions previous to this, we can generate
 	 * jumps straight to that target.
 	 */
         if (ic->next && ic->next->op == GOTO
             && (labelRange = findLabelBackwards(ic, IC_LABEL(ic->next)->key)) != 0
-            && labelRange <= 10 )
+            && labelRange <= 5 )
         {
-           emitcode(";", "tail increment optimized");
+           emitcode(";", "tail increment optimized (range %d)", labelRange);
            tlbl = IC_LABEL(ic->next);
            emitTlbl = 0;
         }
@@ -2929,14 +2929,14 @@ static bool genMinusDec (iCode *ic)
             int labelRange;
 
 	    /* If the next instruction is a goto and the goto target
-	     * is <= 10 instructions previous to this, we can generate
+         * is <= 5 instructions previous to this, we can generate
 	     * jumps straight to that target.
 	     */
             if (ic->next && ic->next->op == GOTO
                 && (labelRange = findLabelBackwards(ic, IC_LABEL(ic->next)->key)) != 0
-                && labelRange <= 10 )
+                && labelRange <= 5 )
             {        
-               emitcode(";", "tail decrement optimized");
+               emitcode(";", "tail decrement optimized (range %d)", labelRange);
                tlbl = IC_LABEL(ic->next);
                emitTlbl = 0;
             }

@@ -61,10 +61,9 @@ typedef struct regs
   short type;  /* can have value 
                 * REG_GPR, REG_PTR or REG_CND 
                 * This like the "meta-type" */
-  short pc_type;              /* pcode type */
-  short rIdx;  /* index into register table */
-  //  short otype;        
-  char *name;  /* name */
+  short pc_type; /* pcode type */
+  short rIdx;    /* index into register table */
+  char *name;    /* name */
 
   unsigned isFree:1;          /* is currently unassigned  */
   unsigned wasUsed:1;         /* becomes true if register has been used */

@@ -3122,19 +3122,18 @@ static void genericPrint(FILE *of, pCode *pc)
 	case PC_OPCODE:
 		// If the opcode has a label, print that first
 		{
-			pBranch *pbl = PCI(pc)->label;
+			char str[256];
+			pCodeInstruction *pci = PCI(pc);
+			pBranch *pbl = pci->label;
 			while(pbl && pbl->pc) {
 				if(pbl->pc->type == PC_LABEL)
 					pCodePrintLabel(of, pbl->pc);
 				pbl = pbl->next;
 			}
-		}
 		
-		if(PCI(pc)->cline) 
-			genericPrint(of,PCODE(PCI(pc)->cline));
+			if(pci->cline) 
+				genericPrint(of,PCODE(pci->cline));
 		
-		{
-			char str[256];
 			
 			pCode2str(str, 256, pc);
 			
@@ -3142,9 +3141,12 @@ static void genericPrint(FILE *of, pCode *pc)
 			
 			/* Debug */
 			if(debug_verbose) {
+				pCodeOpReg *pcor = PCOR(pci->pcop);
 				fprintf(of, "\t;id=%u,key=%03x",pc->id,pc->seq);
-				if(PCI(pc)->pcflow)
-					fprintf(of,",flow seq=%03x",PCI(pc)->pcflow->pc.seq);
+				if(pci->pcflow)
+					fprintf(of,",flow seq=%03x",pci->pcflow->pc.seq);
+				if (pcor && pcor->pcop.type==PO_GPR_TEMP && !pcor->r->isFixed)
+					fprintf(of,",rIdx=r0x%X",pcor->rIdx);
 			}
 		}
 #if 0
@@ -5433,8 +5435,10 @@ void AnalyzeBanking(void)
 /*-----------------------------------------------------------------*/
 DEFSETFUNC (resetrIdx)
 {
-	if (!((regs *)item)->isFixed)
-		((regs *)item)->rIdx = 0;
+	regs *r = (regs *)item;
+	if (!r->isFixed) {
+		r->rIdx = 0;
+	}
 	
 	return 0;
 }

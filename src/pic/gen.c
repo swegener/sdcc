@@ -1342,16 +1342,6 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 		pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 		pcop->type = PO_DIR;
 		
-		/*
-		if (offset)
-		sprintf(s,"(%s + %d)",
-		aop->aopu.aop_dir,
-		offset);
-		else
-		sprintf(s,"%s",aop->aopu.aop_dir);
-		pcop->name = Safe_calloc(1,strlen(s)+1);
-		strcpy(pcop->name,s);	
-		*/
 		pcop->name = Safe_calloc(1,strlen(aop->aopu.aop_dir)+1);
 		strcpy(pcop->name,aop->aopu.aop_dir);	
 		PCOR(pcop)->r = dirregWithName(aop->aopu.aop_dir);
@@ -1380,7 +1370,7 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 			PCOR(pcop)->instance = offset;
 			pcop->type = PCOR(pcop)->r->pc_type;
 			//rs = aop->aopu.aop_reg[offset]->name;
-			DEBUGpic14_emitcode(";","%d regiser idx = %d ",__LINE__,rIdx);
+			DEBUGpic14_emitcode(";","%d rIdx = r0x%X ",__LINE__,rIdx);
 			return pcop;
 		}
 		

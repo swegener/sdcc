@@ -32,10 +32,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 // GUI START
-COMMAND(cl_gui_start_cmd);
+COMMAND_ON(uc,cl_gui_start_cmd);
 
 // GUI STOP
-COMMAND(cl_gui_stop_cmd);
+COMMAND_ON(uc,cl_gui_stop_cmd);
 
 
 #endif

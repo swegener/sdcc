@@ -42,9 +42,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *----------------------------------------------------------------------------
  */
 
-int
-cl_show_copying_cmd::do_work(class cl_sim *sim,
-			     class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_show_copying_cmd::do_work(class cl_sim *sim,
+//			     class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK(cl_show_copying_cmd)
 {
   con->printf("%s\n", copying);
   return(DD_FALSE);;
@@ -56,9 +57,10 @@ cl_show_copying_cmd::do_work(class cl_sim *sim,
  *----------------------------------------------------------------------------
  */
 
-int
-cl_show_warranty_cmd::do_work(class cl_sim *sim,
-			      class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_show_warranty_cmd::do_work(class cl_sim *sim,
+//			      class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK(cl_show_warranty_cmd)
 {
   con->printf("%s\n", warranty);
   return(DD_FALSE);;

@@ -32,16 +32,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 // SET MEMORY
-COMMAND(cl_set_mem_cmd);
+COMMAND_ON(uc,cl_set_mem_cmd);
 
 // SET BIT
-COMMAND(cl_set_bit_cmd);
+COMMAND_ON(uc,cl_set_bit_cmd);
 
 // SET PORT
-COMMAND(cl_set_port_cmd);
+COMMAND_ON(uc,cl_set_port_cmd);
 
 // SET OPTION
-COMMAND(cl_set_option_cmd);
+COMMAND_ON(uc,cl_set_option_cmd);
 
 
 #endif

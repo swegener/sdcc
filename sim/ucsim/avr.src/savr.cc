@@ -41,8 +41,8 @@ main(int argc, char *argv[])
   class cl_sim *sim;
   
   app= new cl_app();
-  app->init();
-  sim= new cl_simavr(app, argc, argv);
+  app->init(argc, argv);
+  sim= new cl_simavr(app);
   sim->init();
   app->set_simulator(sim);
   sim->main();

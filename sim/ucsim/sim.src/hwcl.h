@@ -51,11 +51,20 @@ public:
   cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, char *aid_string);
   ~cl_hw(void);
 
-  virtual ulong read(class cl_mem *mem, long addr);
-  virtual void write(class cl_mem *mem, long addr, ulong *val);
+  virtual void adding(class cl_hw *new_hw) {}
+  virtual void added(class cl_hw *new_hw) {}
+  virtual t_mem read(class cl_mem *mem, t_addr addr);
+  virtual void write(class cl_mem *mem, t_addr addr, t_mem *val);
 
   virtual int tick(int cycles);
   virtual void print_info(class cl_console *con);
+};
+
+class cl_hws: public cl_list
+{
+public:
+  cl_hws(void): cl_list(2, 2) {}
+  virtual t_index add(void *item);
 };
 
 

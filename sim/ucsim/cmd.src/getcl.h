@@ -32,7 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 // GET SFR
-class cl_get_sfr_cmd: public cl_cmd
+/*class cl_get_sfr_cmd: public cl_cmd
 {
 public:
   cl_get_sfr_cmd(//class cl_sim *asim,
@@ -43,10 +43,11 @@ public:
     cl_cmd(aname, can_rep, short_hlp, long_hlp) {}
   virtual int do_work(class cl_sim *sim,
 		      class cl_cmdline *cmdline, class cl_console *con);
-};
+};*/
+COMMAND_ON(uc,cl_get_sfr_cmd);
 
 // GET OPTION
-class cl_get_option_cmd: public cl_cmd
+/*class cl_get_option_cmd: public cl_cmd
 {
 public:
   cl_get_option_cmd(//class cl_sim *asim,
@@ -57,8 +58,8 @@ public:
     cl_cmd(aname, can_rep, short_hlp, long_hlp) {}
   virtual int do_work(class cl_sim *sim,
 		      class cl_cmdline *cmdline, class cl_console *con);
-};
-
+};*/
+COMMAND_ON(uc,cl_get_option_cmd);
 
 #endif
 

@@ -33,9 +33,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include "i_string.h"
 
+// prj
 #include "globals.h"
 #include "utils.h"
 
+// cmd.src
+#include "newcmdcl.h"
+#include "cmduccl.h"
+#include "bpcl.h"
+#include "getcl.h"
+#include "setcl.h"
+#include "infocl.h"
+#include "timercl.h"
+
+// local, sim.src
 #include "uccl.h"
 #include "hwcl.h"
 #include "memcl.h"
@@ -102,7 +113,7 @@ cl_uc::cl_uc(class cl_sim *asim):
   int i;
   sim = asim;
   mems= new cl_list(MEM_TYPES, 1);
-  hws = new cl_list(2, 1);
+  hws = new cl_hws();
   options= new cl_list(2, 2);
   for (i= MEM_ROM; i < MEM_TYPES; i++)
     mems->add(0);
@@ -140,14 +151,14 @@ cl_uc::~cl_uc(void)
 int
 cl_uc::init(void)
 {
-  int mc;
+  int mc, i;
 
   cl_base::init();
-  if (!(sim->arg_avail('X')) ||
-      sim->get_farg('X', 0) == 0)
+  if (!(sim->app->args->arg_avail('X')) ||
+      sim->app->args->get_farg('X', 0) == 0)
     xtal= 11059200;
   else
-    xtal= sim->get_farg('X', 0);
+    xtal= sim->app->args->get_farg('X', 0);
   for (mc= MEM_ROM; mc < MEM_TYPES; mc++)
     {
       class cl_mem *m= mk_mem((enum mem_class)mc,
@@ -160,6 +171,19 @@ cl_uc::init(void)
   brk_counter= 0;
   mk_hw_elements();
   reset();
+  class cl_cmdset *cs= sim->app->get_commander()->cmdset;
+  build_cmdset(cs);
+
+  for (i= 0; i < sim->app->in_files->count; i++)
+    {
+      char *fname= (char *)(sim->app->in_files->at(i));
+      long l;
+      if ((l= read_hex_file(fname)) >= 0)
+	{
+	  sim->app->get_commander()->all_printf("%ld words read from %s\n",
+						l, fname);
+	}
+    }
   return(0);
 }
 
@@ -236,6 +260,201 @@ cl_uc::get_mem_width(enum mem_class type)
 void
 cl_uc::mk_hw_elements(void)
 {
+}
+
+void
+cl_uc::build_cmdset(class cl_cmdset *cmdset)
+{
+  class cl_cmd *cmd;
+  class cl_cmdset *cset;
+
+  cmdset->add(cmd= new cl_state_cmd("state", 0,
+"state              State of microcontroller",
+"long help of state"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_file_cmd("file", 0,
+"file \"FILE\"        Load FILE into ROM",
+"long help of file"));
+  cmd->init();
+  cmd->add_name("load");
+
+  cmdset->add(cmd= new cl_dl_cmd("download", 0,
+"download,dl          Load (intel.hex) data",
+"long help of download"));
+  cmd->init();
+  cmd->add_name("dl");
+
+  cmdset->add(cmd= new cl_pc_cmd("pc", 0,
+"pc [addr]          Set/get PC",
+"long help of pc"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_reset_cmd("reset", 0,
+"reset              Reset",
+"long help of reset"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_dump_cmd("dump", 0,
+"dump memory_type [start [stop [bytes_per_line]]]\n"
+"                   Dump memory of specified type\n"
+"dump bit...        Dump bits",
+"long help of dump"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_di_cmd("di", 0,
+"di [start [stop]]  Dump Internal RAM",
+"long help of di"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_dx_cmd("dx", 0,
+"dx [start [stop]]  Dump External RAM",
+"long help of dx"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_ds_cmd("ds", 0,
+"ds [start [stop]]  Dump SFR",
+"long help of ds"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_dch_cmd("dch", 0,
+"dch [start [stop]] Dump code in hex form",
+"long help of dch"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_dc_cmd("dc", 0,
+"dc [start [stop]]  Dump code in disass form",
+"long help of dc"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_disassemble_cmd("disassemble", 0,
+"disassemble [start [offset [lines]]]\n"
+"                   Disassemble code",
+"long help of disassemble"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_fill_cmd("fill", 0,
+"fill memory_type start end data\n"
+"                   Fill memory region with data",
+"long help of fill"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_where_cmd("where", 0,
+"where memory_type data...\n"
+"                   Case unsensitive search for data",
+"long help of where"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_Where_cmd("Where", 0,
+"Where memory_type data...\n"
+"                   Case sensitive search for data",
+"long help of Where"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_break_cmd("break", 0,
+"break addr [hit]   Set fix breakpoint\n"
+"break mem_type r|w addr [hit]\n"
+"                   Set fix event breakpoint",
+"long help of break"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_tbreak_cmd("tbreak", 0,
+"tbreak addr [hit]  Set temporary breakpoint\n"
+"tbreak mem_type r|w addr [hit]\n"
+"                   Set temporary event breakpoint",
+"long help of tbreak"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_clear_cmd("clear", 0,
+"clear [addr...]    Clear fix breakpoint",
+"long help of clear"));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_delete_cmd("delete", 0,
+"delete [nr...]     Delete breakpoint(s)",
+"long help of clear"));
+  cmd->init();
+
+  {
+    cset= new cl_cmdset();
+    cset->init();
+    cset->add(cmd= new cl_get_sfr_cmd("sfr", 0,
+"get sfr address...\n"
+"                   Get value of addressed SFRs",
+"long help of get sfr"));
+    cmd->init();
+    cset->add(cmd= new cl_get_option_cmd("option", 0,
+"get option name\n"
+"                   Get value of an option",
+"long help of get option"));
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("get", 0,
+"get subcommand     Get, see `get' command for more help",
+"long help of get", cset));
+  cmd->init();
+
+  {
+    cset= new cl_cmdset();
+    cset->init();
+    cset->add(cmd= new cl_set_mem_cmd("memory", 0,
+"set memory memory_type address data...\n"
+"                   Place list of data into memory",
+"long help of set memory"));
+    cmd->init();
+    cset->add(cmd= new cl_set_bit_cmd("bit", 0,
+"set bit addr 0|1   Set specified bit to 0 or 1",
+"long help of set bit"));
+    cmd->init();
+    cset->add(cmd= new cl_set_port_cmd("port", 0,
+"set port hw data   Set data connected to port",
+"long help of set port"));
+    cmd->init();
+    cset->add(cmd= new cl_set_option_cmd("option", 0,
+"set option name value\n"
+"                   Set value of an option",
+"long help of set option"));
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("set", 0,
+"set subcommand     Set, see `set' command for more help",
+"long help of set", cset));
+  cmd->init();
+
+  {
+    cset= new cl_cmdset();
+    cset->init();
+    cset->add(cmd= new cl_info_bp_cmd("breakpoints", 0, 
+"info breakpoints   Status of user-settable breakpoints",
+"long help of info breakpoints"));
+    cmd->add_name("bp");
+    cmd->init();
+    cset->add(cmd= new cl_info_reg_cmd("registers", 0, 
+"info registers     List of integer registers and their contents",
+"long help of info registers"));
+    cmd->init();
+    cset->add(cmd= new cl_info_hw_cmd("hardware", 0, 
+"info hardware cathegory\n"
+"                   Status of hardware elements of the CPU",
+"long help of info hardware"));
+    cmd->add_name("h	w");
+    cmd->init();
+  }
+  cmdset->add(cmd= new cl_super_cmd("info", 0,
+"info subcommand    Information, see `info' command for more help",
+"long help of info", cset));
+  cmd->init();
+
+  cmdset->add(cmd= new cl_timer_cmd("timer", 0,
+"timer a|d|g|r|s|v id [direction|value]\n"
+"                   Timer add|del|get|run|stop|value",
+"timer add|create|make id [direction] -- create a new timer\n"
+"timer del id -- delete a timer\n"
+"timer get id -- list timers\n"
+"timer run id -- turn a timer ON\n"
+"timer stop id -- turn a timer OFF\n"
+"timer value id val -- set value of a timer to `val'"));
+  cmd->init();
 }
 
 
@@ -407,7 +626,8 @@ cl_uc::read_hex_file(const char *name)
 
   if (!name)
     {
-      sim->cmd->printf("cl_uc::read_hex_file File name not specified\n");
+      sim->app->get_commander()->
+	printf("cl_uc::read_hex_file File name not specified\n");
       return(-1);
     }
   else
@@ -477,19 +697,21 @@ cl_uc::read_hex_file(const char *name)
 			}
 		    }
 		  else
-		    if (sim->get_iarg('V', 0) &&
+		    if (sim->app->args->get_iarg('V', 0) &&
 			rtyp != 1)
-		      sim->cmd->printf("Unknown record type %d(0x%x)\n",
-				       rtyp, rtyp);
+		      sim->app->get_commander()->
+			printf("Unknown record type %d(0x%x)\n", rtyp, rtyp);
 		}
 	      else
-		if (sim->get_iarg('V', 0))
-		  sim->cmd->printf("Checksum error (%x instead of %x) in "
-				   "record %ld.\n", chk, sum, recnum);
+		if (sim->app->args->get_iarg('V', 0))
+		  sim->app->get_commander()->
+		    printf("Checksum error (%x instead of %x) in "
+			   "record %ld.\n", chk, sum, recnum);
 	    }
 	  else
-	    if (sim->get_iarg('V', 0))
-	      sim->cmd->printf("Read error in record %ld.\n", recnum);
+	    if (sim->app->args->get_iarg('V', 0))
+	      sim->app->get_commander()->
+		printf("Read error in record %ld.\n", recnum);
 	}
     }
   if (get_mem_width(MEM_ROM) > 8 &&
@@ -498,8 +720,8 @@ cl_uc::read_hex_file(const char *name)
 
   if (name)
     fclose(f);
-  if (sim->get_iarg('V', 0))
-    sim->cmd->printf("%ld records have been read\n", recnum);
+  if (sim->app->args->get_iarg('V', 0))
+    sim->app->get_commander()->printf("%ld records have been read\n", recnum);
   analyze(0);
   return(written);
 }

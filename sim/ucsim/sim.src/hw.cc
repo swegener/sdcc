@@ -58,15 +58,15 @@ cl_hw::~cl_hw(void)
  * Callback functions for changing memory locations
  */
 
-ulong
-cl_hw::read(class cl_mem *mem, long addr)
+t_mem
+cl_hw::read(class cl_mem *mem, t_addr addr)
 {
   // Simply return the value
   return(mem->get(addr));
 }
 
 void
-cl_hw::write(class cl_mem *mem, long addr, ulong *val)
+cl_hw::write(class cl_mem *mem, t_addr addr, t_mem *val)
 {
   // Do not change *val by default
 }
@@ -86,6 +86,30 @@ void
 cl_hw::print_info(class cl_console *con)
 {
   con->printf("%s[%d]\n", id_string, id);
+}
+
+
+t_index
+cl_hws::add(void *item)
+{
+  int i;
+  t_index res;
+
+  // pre-add
+  for (i= 0; i < count; i++)
+    {
+      class cl_hw *hw= (class cl_hw *)(at(i));
+      hw->adding((class cl_hw *)item);
+    }
+  // add
+  res= cl_list::add(item);
+  // post-add
+  for (i= 0; i < count; i++)
+    {
+      class cl_hw *hw= (class cl_hw *)(at(i));
+      hw->added((class cl_hw *)item);
+    }
+  return(res);
 }
 
 

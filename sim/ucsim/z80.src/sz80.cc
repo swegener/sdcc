@@ -39,11 +39,11 @@ main(int argc, char *argv[])
   class cl_sim *sim;
 
   app= new cl_app();
-  app->init();
-  sim= new cl_simz80(app, 0, argc, argv);
+  app->init(argc, argv);
+  sim= new cl_simz80(app);
   sim->init();
   app->set_simulator(sim);
-  sim->main();
+  app->run();
   delete app;
   return(0);
 }

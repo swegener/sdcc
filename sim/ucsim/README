@@ -9,7 +9,8 @@ What is uCsim?
 
 uCsim is a micro-controller simulator. It is extensible to support
 different micro-controller families. Currently it supports Intel MCS51
-family and Atmel AVR is under development.
+family. Atmel AVR core is working now and Z80 support is under
+development.
 
 
 How to get uCsim?
@@ -18,13 +19,13 @@ How to get uCsim?
 uCsim is distributed in source code under GPL. It can be downloaded
 from its home site:
 
-http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/ucsim
+http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/ucsim/
 
 uCsim is included in sdcc, free C compiler of Sandeep Dutta. It is a
 complete development package with debugger (see belove). It can be
 downloaded from its home site (or from its mirrors):
 
-http://www.geocities.com/ResearchTriangle/Forum/1353
+http://sdcc.sourceforge.net/
 
 
 Mailing list
@@ -32,7 +33,7 @@ Mailing list
 
 There is no mailing list which is specifically opened for
 uCsim. Announcements are sent to sdcc's mailing list. See sdcc's main
-page at above URL for subscribing infromation and the archive. Ideas,
+page at above URL for subscribing information and the archive. Ideas,
 bug reports or fixes should be sent to sdcc's list too.
 
 
@@ -87,7 +88,7 @@ SerialView
 sdcdb
 
     Debugger of the free C compiler, called sdcc written by Sandeep
-    Dutta <dutta@comm.mot.com>. It is a usual debugger with command
+    Dutta <sandeep.dutta@usa.net>. It is a usual debugger with command
     line interface which uses uCsim in background to run the
     code. "Standard" interface of the sdcdb makes it possible to use
     any debugger GUI such as ddd to make it comfortable.

@@ -43,9 +43,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * BREAK command
  */
 
-int
-cl_break_cmd::do_work(class cl_sim *sim,
-		      class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_break_cmd::do_work(class cl_sim *sim,
+//		      class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_break_cmd)
 {
   t_addr addr= 0;
   int hit= 1;
@@ -56,29 +57,29 @@ cl_break_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(2),
 				 cmdline->param(3) };
 
-  if (cmdline->syntax_match(sim, ADDRESS)) {
+  if (cmdline->syntax_match(uc, ADDRESS)) {
     addr= params[0]->value.address;
     hit= 1;
-    do_fetch(sim, addr, hit, con);
+    do_fetch(uc, addr, hit, con);
   }
-  else if (cmdline->syntax_match(sim, ADDRESS NUMBER)) {
+  else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
     addr= params[0]->value.address;
     hit= params[1]->value.number;
-    do_fetch(sim, addr, hit, con);
+    do_fetch(uc, addr, hit, con);
   }
-  else if (cmdline->syntax_match(sim, MEMORY STRING ADDRESS)) {
+  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS)) {
     mem= params[0]->value.memory;
     op= *(params[1]->get_svalue());
     addr= params[2]->value.address;
     hit= 1;
-    do_event(sim, mem, op, addr, hit, con);
+    do_event(uc, mem, op, addr, hit, con);
   }
-  else if (cmdline->syntax_match(sim, MEMORY STRING ADDRESS NUMBER)) {
+  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER)) {
     mem= params[0]->value.memory;
     op= *(params[1]->get_svalue());
     addr= params[2]->value.address;
     hit= params[3]->value.number;
-    do_event(sim, mem, op, addr, hit, con);
+    do_event(uc, mem, op, addr, hit, con);
   }
   else
     {
@@ -89,7 +90,7 @@ cl_break_cmd::do_work(class cl_sim *sim,
 }
 
 void
-cl_break_cmd::do_fetch(class cl_sim *sim,
+cl_break_cmd::do_fetch(class cl_uc *uc,
 		       t_addr addr, int hit, class cl_console *con)
 {
   if (hit > 99999)
@@ -97,30 +98,30 @@ cl_break_cmd::do_fetch(class cl_sim *sim,
       con->printf("Hit value %d is too big.\n", hit);
       return;
     }
-  if (sim->uc->fbrk->bp_at(addr))
+  if (uc->fbrk->bp_at(addr))
     con->printf("Breakpoint at 0x%06x is already set.\n", addr);
   else
     {
-      class cl_brk *b= new cl_fetch_brk(sim->uc->make_new_brknr(),
+      class cl_brk *b= new cl_fetch_brk(uc->make_new_brknr(),
 					addr, perm, hit);
       b->init();
-      sim->uc->fbrk->add_bp(b);
-      char *s= sim->uc->disass(addr, NULL);
+      uc->fbrk->add_bp(b);
+      char *s= uc->disass(addr, NULL);
       con->printf("Breakpoint %d at 0x%06x: %s\n", b->nr, addr, s);
       free(s);
     }
 }
 
 void
-cl_break_cmd::do_event(class cl_sim *sim,
+cl_break_cmd::do_event(class cl_uc *uc,
 		       class cl_mem *mem, char op, t_addr addr, int hit,
 		       class cl_console *con)
 {
   class cl_ev_brk *b= NULL;
 
-  b= sim->uc->mk_ebrk(perm, mem, op, addr, hit);
+  b= uc->mk_ebrk(perm, mem, op, addr, hit);
   if (b)
-    sim->uc->ebrk->add_bp(b);
+    uc->ebrk->add_bp(b);
   else
     con->printf("Couldn't make event breakpoint\n");
 }
@@ -130,12 +131,13 @@ cl_break_cmd::do_event(class cl_sim *sim,
  * CLEAR address
  */
 
-int
-cl_clear_cmd::do_work(class cl_sim *sim,
-		      class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_clear_cmd::do_work(class cl_sim *sim,
+//		      class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_clear_cmd)
 {
   int idx;
-  class cl_brk *brk= sim->uc->fbrk->get_bp(sim->uc->PC, &idx);
+  class cl_brk *brk= uc->fbrk->get_bp(uc->PC, &idx);
 
   if (cmdline->param(0) == 0)
     {
@@ -144,7 +146,7 @@ cl_clear_cmd::do_work(class cl_sim *sim,
 	  con->printf("No breakpoint at this address.\n");
 	  return(0);
 	}
-      sim->uc->fbrk->del_bp(sim->uc->PC);
+      uc->fbrk->del_bp(uc->PC);
       return(0);
     }
 
@@ -153,13 +155,13 @@ cl_clear_cmd::do_work(class cl_sim *sim,
   while ((param= cmdline->param(i++)))
     {
       t_addr addr;
-      if (!param->as_address())
+      if (!param->as_address(uc))
 	return(DD_FALSE);
       addr= param->value.address;
-      if (sim->uc->fbrk->bp_at(addr) == 0)
-	sim->cmd->printf("No breakpoint at 0x%06x\n", addr);
+      if (uc->fbrk->bp_at(addr) == 0)
+	con->printf("No breakpoint at 0x%06x\n", addr);
       else
-	sim->uc->fbrk->del_bp(addr);
+	uc->fbrk->del_bp(addr);
     }
 
   return(DD_FALSE);
@@ -170,14 +172,15 @@ cl_clear_cmd::do_work(class cl_sim *sim,
  * DELETE nr nr ...
  */
 
-int
-cl_delete_cmd::do_work(class cl_sim *sim,
-		       class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_delete_cmd::do_work(class cl_sim *sim,
+//		       class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_delete_cmd)
 {
   if (cmdline->param(0) == 0)
     {
       // delete all
-      sim->uc->remove_all_breaks();
+      uc->remove_all_breaks();
     }
   else
     {
@@ -187,7 +190,7 @@ cl_delete_cmd::do_work(class cl_sim *sim,
 	{
 	  long num;
 	  if (param->get_ivalue(&num))
-	    sim->uc->rm_brk(num);
+	    uc->rm_brk(num);
 	}
     }
   return(DD_FALSE);

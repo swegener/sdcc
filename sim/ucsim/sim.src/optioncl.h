@@ -71,9 +71,9 @@ public:
 class cl_cons_debug_opt: public cl_option
 {
 public:
-  class cl_sim *sim;
+  class cl_app *app;
 public:
-  cl_cons_debug_opt(class cl_sim *Asim, char *Iid, char *Ihelp);
+  cl_cons_debug_opt(class cl_app *the_app, char *Iid, char *Ihelp);
 
   virtual void print(class cl_console *con);
 

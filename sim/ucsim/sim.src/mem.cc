@@ -130,17 +130,154 @@ cl_memloc_coll::get_loc(t_addr address)
 /*
  */
 
-cl_cell::cl_cell(void):
+cl_cell::cl_cell(int awidth):
   cl_base()
 {
   data= 0;
+  mask= 1;
+  for (; awidth; awidth--)
+    {
+      mask<<= 1;
+      mask|= 1;
+    }
 }
 
-cl_cell::cl_cell(t_mem idata):
-  cl_base()
+/*t_mem
+cl_cell::read(void)
 {
-  data= idata;
+  return(data);
+}*/
+
+/*t_mem
+cl_cell::get(void)
+{
+  return(data);
+}*/
+
+/*void
+cl_cell::write(t_mem *val)
+{
+  data= *val= (*val & mask);
+}*/
+
+/*void
+cl_cell::set(t_mem val)
+{
+  data= val & mask;
+}*/
+
+
+cl_registered_cell::cl_registered_cell(int awidth):
+  cl_cell(awidth)
+{
+  hws= new cl_list(1, 1);
+  hardwares= 0;
+  nuof_hws= 0;
 }
+
+cl_registered_cell::~cl_registered_cell(void)
+{
+  hws->disconn_all();
+  delete hws;
+}
+
+t_mem
+cl_registered_cell::read(void)
+{
+  int i;
+
+  /*if (hws->count)
+    for (i= 0; i < hws->count; i++)
+      {
+	class cl_hw *hw= (class cl_hw *)(hws->at(i));
+	;
+	}*/
+  if (nuof_hws)
+    for (i= 0; i < nuof_hws; i++)
+      {
+	//hardwares[i];
+	;
+      }
+  return(data);
+}
+
+void
+cl_registered_cell::write(t_mem *val)
+{
+  int i;
+
+  /*if (hws->count)
+    for (i= 0; i < hws->count; i++)
+      {
+	class cl_hw *hw= (class cl_hw *)(hws->at(i));
+	;
+	}*/
+  if (nuof_hws)
+    for (i= 0; i < nuof_hws; i++)
+      {
+	//hardwares[i];
+	;
+      }
+  data= *val= (*val & mask);
+}
+
+
+/* 
+ */
+
+cl_m::cl_m(t_addr asize, int awidth):
+  cl_mem(MEM_SFR, "sfr", 0, awidth)
+{
+  t_addr a;
+
+  size= asize;
+  width= awidth;
+  array= (class cl_cell **)malloc(size * sizeof(class cl_cell *));
+  for (a= 0; a < size; a++)
+    array[a]= new cl_registered_cell(width);
+}
+
+cl_m::~cl_m(void)
+{
+  t_addr a;
+
+  for (a= 0; a < size; a++)
+    delete array[a];
+  free(array);
+}
+
+t_mem
+cl_m::read(t_addr addr)
+{
+  if (addr >= size)
+    return(0);
+  return(array[addr]->read());
+}
+
+t_mem
+cl_m::get(t_addr addr)
+{
+  if (addr >= size)
+    return(0);
+  return(array[addr]->get());
+}
+
+void
+cl_m::write(t_addr addr, t_mem *val)
+{
+  if (addr >= size)
+    return;
+  array[addr]->write(val);
+}
+
+void
+cl_m::set(t_addr addr, t_mem val)
+{
+  if (addr >= size)
+    return;
+  array[addr]->set(val);
+}
+
 
 /*
  * Memory

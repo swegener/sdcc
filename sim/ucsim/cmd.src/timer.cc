@@ -34,8 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "simcl.h"
 
 // local
-#include "cmdsetcl.h"
-#include "newcmdcl.h"
+#include "timercl.h"
 
 
 /*
@@ -43,9 +42,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *----------------------------------------------------------------------------
  */
 
-int
-cl_timer_cmd::do_work(class cl_sim *sim,
-		      class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_timer_cmd::do_work(class cl_sim *sim,
+//		      class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_timer_cmd)
 {
   char *s;
 
@@ -64,21 +64,21 @@ cl_timer_cmd::do_work(class cl_sim *sim,
 	  con->printf("Timer number is missing\n");
 	  return(0);
 	}
-      set_ticker(sim, cmdline->param(1));
+      set_ticker(uc, cmdline->param(1));
       if (strstr(s, "c") == s ||
 	  strstr(s, "m") == s ||
 	  strstr(s, "a") == s)
-	return(add(sim, cmdline, con));
+	return(add(uc, cmdline, con));
       else if (strstr(s, "d") == s)
-	return(del(sim, cmdline, con));
+	return(del(uc, cmdline, con));
       else if (strstr(s, "g") == s)
-	return(get(sim, cmdline, con));
+	return(get(uc, cmdline, con));
       else if (strstr(s, "r") == s)
-	return(run(sim, cmdline, con));
+	return(run(uc, cmdline, con));
       else if (strstr(s, "s") == s)
-	return(stop(sim, cmdline, con));
+	return(stop(uc, cmdline, con));
       else if (strstr(s, "v") == s)
-	return(val(sim, cmdline, con));
+	return(val(uc, cmdline, con));
       else
 	con->printf("Undefined timer command: \"%s\". Try \"help timer\"\n",
 		    s);
@@ -87,14 +87,14 @@ cl_timer_cmd::do_work(class cl_sim *sim,
 }
 
 void
-cl_timer_cmd::set_ticker(class cl_sim *sim,
+cl_timer_cmd::set_ticker(class cl_uc *uc,
 			 class cl_cmd_arg *param)
 {
   if ((name= param->get_svalue()))
-    ticker= sim->uc->get_counter(name);
+    ticker= uc->get_counter(name);
   else
     if (param->get_ivalue(&what))
-      ticker= sim->uc->get_counter(what);
+      ticker= uc->get_counter(what);
 }
 
 /*
@@ -102,7 +102,7 @@ cl_timer_cmd::set_ticker(class cl_sim *sim,
  */
 
 int
-cl_timer_cmd::add(class cl_sim *sim,
+cl_timer_cmd::add(class cl_uc *uc,
 		  class cl_cmdline *cmdline, class cl_console *con)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -141,12 +141,12 @@ cl_timer_cmd::add(class cl_sim *sim,
   if (name)
     {
       ticker= new cl_ticker(dir, in_isr, name);
-      sim->uc->add_counter(ticker, name);
+      uc->add_counter(ticker, name);
     }
   else
     {
       ticker= new cl_ticker(dir, in_isr, 0);
-      sim->uc->add_counter(ticker, what);
+      uc->add_counter(ticker, what);
     }
 
   return(DD_FALSE);
@@ -157,7 +157,7 @@ cl_timer_cmd::add(class cl_sim *sim,
  */
 
 int
-cl_timer_cmd::del(class cl_sim *sim,
+cl_timer_cmd::del(class cl_uc *uc,
 		  class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!ticker)
@@ -169,9 +169,9 @@ cl_timer_cmd::del(class cl_sim *sim,
       return(0);
     }
   if (name)
-    sim->uc->del_counter(name);
+    uc->del_counter(name);
   else
-    sim->uc->del_counter(what);
+    uc->del_counter(what);
 
   return(0);
 }
@@ -181,21 +181,21 @@ cl_timer_cmd::del(class cl_sim *sim,
  */
 
 int
-cl_timer_cmd::get(class cl_sim *sim,
+cl_timer_cmd::get(class cl_uc *uc,
 		  class cl_cmdline *cmdline, class cl_console *con)
 {
   if (ticker)
-    ticker->dump(what, sim->uc->xtal, con);
+    ticker->dump(what, uc->xtal, con);
   else
     {
-      sim->uc->ticks->dump(0, sim->uc->xtal, con);
-      sim->uc->isr_ticks->dump(0, sim->uc->xtal, con);
-      sim->uc->idle_ticks->dump(0, sim->uc->xtal, con);
-      for (what= 0; what < sim->uc->counters->count; what++)
+      uc->ticks->dump(0, uc->xtal, con);
+      uc->isr_ticks->dump(0, uc->xtal, con);
+      uc->idle_ticks->dump(0, uc->xtal, con);
+      for (what= 0; what < uc->counters->count; what++)
 	{
-	  ticker= sim->uc->get_counter(what);
+	  ticker= uc->get_counter(what);
 	  if (ticker)
-	    ticker->dump(what, sim->uc->xtal, con);
+	    ticker->dump(what, uc->xtal, con);
 	}
     }
 
@@ -207,7 +207,7 @@ cl_timer_cmd::get(class cl_sim *sim,
  */
 
 int
-cl_timer_cmd::run(class cl_sim *sim,
+cl_timer_cmd::run(class cl_uc *uc,
 		  class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!ticker)
@@ -228,7 +228,7 @@ cl_timer_cmd::run(class cl_sim *sim,
  */
 
 int
-cl_timer_cmd::stop(class cl_sim *sim,
+cl_timer_cmd::stop(class cl_uc *uc,
 		   class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!ticker)
@@ -250,7 +250,7 @@ cl_timer_cmd::stop(class cl_sim *sim,
  */
 
 int
-cl_timer_cmd::val(class cl_sim *sim,
+cl_timer_cmd::val(class cl_uc *uc,
 		  class cl_cmdline *cmdline, class cl_console *con)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),

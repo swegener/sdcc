@@ -46,48 +46,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_sim: public cl_base
 {
-protected:
-  class cl_app *app;
 public:
+  class cl_app *app;
   int state; // See SIM_XXXX
   int argc; char **argv;
 
-  class cl_commander *cmd;
+  //class cl_commander *cmd;
   class cl_uc *uc;
   class cl_gui *gui;
 
-  char *accept_args;
-  class cl_ustrings *in_files;
-  class cl_list *arguments;
+  //char *accept_args;
+  //class cl_list *arguments;
   
 public:
-  cl_sim(class cl_app *the_app, char *more_args, int iargc, char *iargv[]);
+  cl_sim(class cl_app *the_app);
   ~cl_sim(void);
   virtual int init(void);
   
-  virtual int proc_arguments(int argc, char *argv[]);
-  virtual int proc_arg(char arg, char *optarg);
-
   virtual class cl_uc *mk_controller(void);
-  virtual void build_cmd_set(class cl_cmdset *cmdset);
-  virtual class cl_cmd_arg *mk_cmd_int_arg(long long i);
-  virtual class cl_cmd_arg *mk_cmd_sym_arg(char *s);
-  virtual class cl_cmd_arg *mk_cmd_str_arg(char *s);
-  virtual class cl_cmd_arg *mk_cmd_bit_arg(class cl_cmd_arg *sfr,
-					   class cl_cmd_arg *bit);
-  virtual class cl_cmd_arg *mk_cmd_array_arg(class cl_cmd_arg *aname,
-					     class cl_cmd_arg *aindex);
-
-  int arg_avail(char name);
-  int arg_avail(char *name);
-  virtual long long get_iarg(char sname, char *lname);
-  virtual char *get_sarg(char sname, char *lname);
-  virtual double get_farg(char sname, char *lname);
-  virtual void *get_parg(char sname, char *lname);
+  virtual void build_cmdset(class cl_cmdset *cmdset);
 
   virtual int main(void);
   virtual void start(class cl_console *con);
   virtual void stop(int reason);
+  virtual int step(void);
 };
 
 

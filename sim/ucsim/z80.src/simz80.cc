@@ -31,9 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "z80cl.h"
 
 
-cl_simz80::cl_simz80(class cl_app *the_app,
-		     char *more_args, int iargc, char *iargv[]):
-  cl_sim(the_app, more_args, iargc, iargv)
+cl_simz80::cl_simz80(class cl_app *the_app):
+  cl_sim(the_app)
 {}
 
 class cl_uc *

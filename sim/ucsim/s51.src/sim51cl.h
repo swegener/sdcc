@@ -34,8 +34,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_sim51: public cl_sim
 {
 public:
-  cl_sim51(class cl_app *the_app, int iargc, char *iargv[]);
-  virtual int proc_arg(char optopt, char *optarg);
+  cl_sim51(class cl_app *the_app);
+  //virtual int proc_arg(char optopt, char *optarg);
   virtual class cl_uc *mk_controller(void);
 };
 

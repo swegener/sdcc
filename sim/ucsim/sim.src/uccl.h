@@ -83,7 +83,7 @@ public:
   class brk_coll *ebrk;		// Collection of EVENT breakpoints
   class cl_sim *sim;
   class cl_list *mems;
-  class cl_list *hws;
+  class cl_hws *hws;
 
   class cl_list *it_sources;	// Sources of interrupts
   class cl_list *it_levels;	// Follow interrupt services
@@ -104,6 +104,7 @@ public:
   virtual t_addr get_mem_size(enum mem_class type);
   virtual int get_mem_width(enum mem_class type);
   virtual void mk_hw_elements(void);
+  virtual void build_cmdset(class cl_cmdset *cmdset);
 
   // manipulating memories
   virtual ulong read_mem(enum mem_class type, t_addr addr);

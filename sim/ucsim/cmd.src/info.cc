@@ -39,27 +39,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * INFO BREAKPOINTS command
  */
 
-int
-cl_info_bp_cmd::do_work(class cl_sim *sim,
-			class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_info_bp_cmd::do_work(class cl_sim *sim,
+//			class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 {
   int i;
   char *s;
 
   con->printf("Num Type       Disp Hit   Cnt   Address  What\n");
-  for (i= 0; i < sim->uc->fbrk->count; i++)
+  for (i= 0; i < uc->fbrk->count; i++)
     {
-      class cl_brk *fb= (class cl_brk *)(sim->uc->fbrk->at(i));
-      s= sim->uc->disass(fb->addr, NULL);
+      class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
+      s= uc->disass(fb->addr, NULL);
       con->printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", fb->nr,
 		  "fetch", (fb->perm==brkFIX)?"keep":"del ",
 		  fb->hit, fb->cnt,
 		  fb->addr, s);
       free(s);
     }
-  for (i= 0; i < sim->uc->ebrk->count; i++)
+  for (i= 0; i < uc->ebrk->count; i++)
     {
-      class cl_ev_brk *eb= (class cl_ev_brk *)(sim->uc->ebrk->at(i));
+      class cl_ev_brk *eb= (class cl_ev_brk *)(uc->ebrk->at(i));
       con->printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", eb->nr,
 		  "event", (eb->perm==brkFIX)?"keep":"del ",
 		  eb->hit, eb->cnt,
@@ -80,11 +81,12 @@ cl_info_bp_cmd::do_work(class cl_sim *sim,
  * INFO REGISTERS command
  */
 
-int
-cl_info_reg_cmd::do_work(class cl_sim *sim,
-			 class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_info_reg_cmd::do_work(class cl_sim *sim,
+//			 class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_info_reg_cmd)
 {
-  sim->uc->print_regs(con);
+  uc->print_regs(con);
   return(0);
 }
 
@@ -93,9 +95,10 @@ cl_info_reg_cmd::do_work(class cl_sim *sim,
  * INFO HW command
  */
 
-int
-cl_info_hw_cmd::do_work(class cl_sim *sim,
-			class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_info_hw_cmd::do_work(class cl_sim *sim,
+//			class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_info_hw_cmd)
 {
   class cl_hw *hw;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -103,7 +106,7 @@ cl_info_hw_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(2),
 				 cmdline->param(3) };
 
-  if (cmdline->syntax_match(sim, HW)) {
+  if (cmdline->syntax_match(uc, HW)) {
     hw= params[0]->value.hw;
     hw->print_info(con);
   }

@@ -41,25 +41,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *----------------------------------------------------------------------------
  */
 
-int
-cl_conf_cmd::do_work(class cl_sim *sim,
-		     class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_conf_cmd::do_work(class cl_sim *sim,
+//		     class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_conf_cmd)
 {
   int i;
 
   con->printf("ucsim version %s\n", VERSIONSTR);
-  con->printf("Type of microcontroller: %s\n", sim->uc->id_string());
+  con->printf("Type of microcontroller: %s\n", uc->id_string());
   con->printf("Controller has %d hardware element(s).\n",
-	      sim->uc->hws->count);
-  for (i= 0; i < sim->uc->hws->count; i++)
+	      uc->hws->count);
+  for (i= 0; i < uc->hws->count; i++)
     {
-      class cl_hw *hw= (class cl_hw *)(sim->uc->hws->at(i));
+      class cl_hw *hw= (class cl_hw *)(uc->hws->at(i));
       con->printf("  %s[%d]\n", hw->id_string, hw->id);
     }
   con->printf("Memories:\n");
   for (i= MEM_ROM; i < MEM_TYPES; i++)
     {
-      class cl_mem *mem= (class cl_mem *)(sim->uc->mems->at(i));
+      class cl_mem *mem= (class cl_mem *)(uc->mems->at(i));
       if (mem)
 	con->printf("  %s size= 0x%06x %6d width= %2d class= \"%s\"\n",
 		    mem->id_string(), mem->size, mem->size, mem->width,
@@ -73,9 +74,10 @@ cl_conf_cmd::do_work(class cl_sim *sim,
  *----------------------------------------------------------------------------
  */
 
-int
-cl_conf_addmem_cmd::do_work(class cl_sim *sim,
-			    class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_conf_addmem_cmd::do_work(class cl_sim *sim,
+//			    class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_conf_addmem_cmd)
 {
   class cl_mem *mem= 0;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -84,17 +86,17 @@ cl_conf_addmem_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(3) };
   char *mem_class;
 
-  if (cmdline->syntax_match(sim, STRING)) {
+  if (cmdline->syntax_match(uc, STRING)) {
     mem_class= params[0]->value.string.string;
     enum mem_class type;
     type= (enum mem_class)get_string_id(mem_classes, mem_class, -1);
-    mem= sim->uc->mk_mem(type, mem_class);
+    mem= uc->mk_mem(type, mem_class);
     if (mem)
       {
-	class cl_mem *m= sim->uc->mem(type);
+	class cl_mem *m= uc->mem(type);
 	if (m)
 	  delete m;
-	sim->uc->mems->put_at(type, mem);
+	uc->mems->put_at(type, mem);
       }
     else
       con->printf("Can not make memory \"%s\"\n", mem_class);

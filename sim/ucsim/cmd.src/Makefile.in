@@ -35,7 +35,8 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 
 OBJECTS		= cmdset.o newcmd.o cmdutil.o syntax.o \
-		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o
+		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o \
+		  cmduc.o
 
 
 # Compiling entire program or any subproject

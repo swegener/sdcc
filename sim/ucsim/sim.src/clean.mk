@@ -1,7 +1,7 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
-	rm -f *core *[%~] *.[oa]
+	rm -f *core *[%~] *.[oa] test_mem_speed
 	rm -f .[a-z]*~
 
 

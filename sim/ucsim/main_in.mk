@@ -23,7 +23,9 @@ CFLAGS          = @CFLAGS@ -I$(PRJDIR) -Wall
 CXXFLAGS        = @CXXFLAGS@ -I$(PRJDIR) -Wall
 M_OR_MM         = @M_OR_MM@
 
-UCSIM_LIBS	= -lsim -lcmd -lutil
+LIB_LIST	= sim cmd sim util
+UCSIM_LIBS	= $(patsubst %,-l%,$(LIB_LIST))
+UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -103,7 +105,8 @@ libutil.a: $(OBJECTS)
 
 ucsim_app: libs ucsim
 
-ucsim: $(UCSIM_OBJECTS) $()
+ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
+	echo $(UCSIM_LIB_FILES)
 	$(CXX) $(CXXFLAGS) -o $@ $< -L$(PRJDIR) $(UCSIM_LIBS)
 
 .cc.o:

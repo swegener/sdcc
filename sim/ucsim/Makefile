@@ -173,6 +173,7 @@ echo_freshconf:
 	@echo "FRESHCONF"
 
 checkconf:
+	@echo "CHECKCONF"
 	@if [ -f devel ]; then $(MAKE) freshconf; fi
 
 # End of Makefile

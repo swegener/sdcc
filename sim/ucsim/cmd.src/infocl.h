@@ -32,13 +32,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 // INFO BP
-COMMAND(cl_info_bp_cmd);
+COMMAND_ON(uc,cl_info_bp_cmd);
 
 // INFO REG
-COMMAND(cl_info_reg_cmd);
+COMMAND_ON(uc,cl_info_reg_cmd);
 
 // INFO HW
-COMMAND(cl_info_hw_cmd);
+COMMAND_ON(uc,cl_info_hw_cmd);
 
 
 #endif

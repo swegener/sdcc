@@ -35,10 +35,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 COMMAND_HEAD(cl_break_cmd)
 public:
   enum brk_perm perm;
-COMMAND_METHODS(cl_break_cmd)
-  virtual void do_fetch(class cl_sim *sim,
+COMMAND_METHODS_ON(uc,cl_break_cmd)
+  virtual void do_fetch(class cl_uc *uc,
 			t_addr addr, int hit, class cl_console *con);
-  virtual void do_event(class cl_sim *sim,
+  virtual void do_event(class cl_uc *uc,
 			class cl_mem *mem, char op, t_addr addr, int hit,
 			class cl_console *con);
 COMMAND_TAIL;
@@ -55,10 +55,10 @@ public:
 };
 
 // CLEAR
-COMMAND(cl_clear_cmd);
+COMMAND_ON(uc,cl_clear_cmd);
 
 // DELETE
-COMMAND(cl_delete_cmd);
+COMMAND_ON(uc,cl_delete_cmd);
 
 
 #endif

@@ -46,12 +46,12 @@ main(int argc, char *argv[])
   class cl_sim *sim;
   
   app= new cl_app();
-  app->init();
-  sim= new cl_sim51(app, argc, argv);
+  app->init(argc, argv);
+  sim= new cl_sim51(app);
   if (sim->init())
     return(1);
   app->set_simulator(sim);
-  retval= sim->main();
+  retval= /*sim->main()*/app->run();
   delete app;
   
   return(retval);

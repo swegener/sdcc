@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /*@1@*/
 
 
-#include <ctype.h>
+//#include <ctype.h>
 
 // sim.src
 #include "appcl.h"
@@ -36,73 +36,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "avrcl.h"
 
 
-cl_simavr::cl_simavr(class cl_app *the_app, int iargc, char *iargv[]):
-  cl_sim(the_app, "h", iargc, iargv)
+cl_simavr::cl_simavr(class cl_app *the_app):
+  cl_sim(the_app)
 {}
-
-
-static void
-print_help(char *name)
-{
-  printf("%s: %s\n", name, VERSIONSTR);
-  printf("Usage: %s [-hHVvP] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
-	 "       [-c file] [-s file] [-S optionlist]"
-#ifdef SOCKET_AVAIL
-	 " [-Z portnum]"
-#endif
-	 "\n"
-	 "       [files...]\n", name);
-  printf
-    (
-     "Options:\n"
-     "  -t CPU       Type of CPU: etc.\n"
-     "  -X freq[k|M] XTAL frequency\n"
-     "  -c file      Open command console on `file'\n"
-#ifdef SOCKET_AVAIL
-     "  -Z portnum   Use localhost:portnumber for command console\n"
-#endif
-     "  -s file      Connect serial interface to `file'\n"
-     "  -S options   `options' is a comma separated list of options\n"
-     "               according to serial interface. Know options are:\n"
-     "                  in=file   serial input will be read from file named `file'\n"
-     "                  out=file  serial output will be written to `file'\n"
-     "  -p prompt    Specify string for prompt\n"
-     "  -P           Prompt is a null ('\\0') character\n"
-     "  -V           Verbose mode\n"
-     "  -v           Print out version number\n"
-     "  -H           Print out types of known CPUs\n"
-     "  -h           Print out this help\n"
-     );
-}
-
-
-int
-cl_simavr::proc_arg(char optopt, char *optarg)
-{
-  switch (optopt)
-    {
-    
-    case 'h':
-      
-      print_help("savr");
-      exit(0);
-      break;
-    
-    case '?':
-
-      if (isprint(optopt))
-	fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-      else
-	fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-      return(1);
-      break;
-      
-    default:
-      // should never happen...
-      abort();
-    }
-}
-
 
 class cl_uc *
 cl_simavr::mk_controller(void)

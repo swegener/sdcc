@@ -34,7 +34,7 @@ main(int argc, char *argv[])
   int ret;
 
   app= new cl_app();
-  app->init();
+  app->init(argc, argv);
   ret= app->run();
   app->done();
   return(ret);

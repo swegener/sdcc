@@ -42,9 +42,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *----------------------------------------------------------------------------
  */
 
-int
-cl_gui_start_cmd::do_work(class cl_sim *sim,
-			  class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_gui_start_cmd::do_work(class cl_sim *sim,
+//			  class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_gui_start_cmd)
 {
   class cl_hw *hw;
   class cl_mem *mem;
@@ -54,10 +55,10 @@ cl_gui_start_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(2),
 				 cmdline->param(3) };
 
-  if (cmdline->syntax_match(sim, HW)) {
+  if (cmdline->syntax_match(uc, HW)) {
     hw= params[0]->value.hw;
   }
-  else if (cmdline->syntax_match(sim, MEMORY ADDRESS ADDRESS)) {
+  else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
     mem= params[0]->value.memory;
     start= params[1]->value.address;
     end= params[2]->value.address;
@@ -77,9 +78,10 @@ cl_gui_start_cmd::do_work(class cl_sim *sim,
  *----------------------------------------------------------------------------
  */
 
-int
-cl_gui_stop_cmd::do_work(class cl_sim *sim,
-			 class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_gui_stop_cmd::do_work(class cl_sim *sim,
+//			 class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_gui_stop_cmd)
 {
   return(DD_FALSE);;
 }

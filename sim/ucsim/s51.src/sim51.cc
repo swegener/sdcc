@@ -36,9 +36,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "globals.h"
 #include "utils.h"
 #include "cmdutil.h"
-#ifdef SOCKET_AVAIL
-#include <sys/socket.h>
-#endif
 
 #include "sim51cl.h"
 //#include "cmd51cl.h"
@@ -50,227 +47,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 
 
-cl_sim51::cl_sim51(class cl_app *the_app, int iargc, char *iargv[]):
-  cl_sim(the_app, "t:s:S:hHk:", iargc, iargv)
+cl_sim51::cl_sim51(class cl_app *the_app):
+  cl_sim(the_app)
 {}
-
-static void
-print_help(char *name)
-{
-  printf("%s: %s\n", name, VERSIONSTR);
-  printf("Usage: %s [-hHVvP] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
-	 "       [-c file] [-s file] [-S optionlist]"
-#ifdef SOCKET_AVAIL
-	 " [-Z portnum] [-k portnum]"
-#endif
-	 "\n"
-	 "       [files...]\n", name);
-  printf
-    (
-     "Options:\n"
-     "  -t CPU       Type of CPU: 51, C52, 251, etc.\n"
-     "  -X freq[k|M] XTAL frequency\n"
-     "  -c file      Open command console on `file'\n"
-#ifdef SOCKET_AVAIL
-     "  -Z portnum   Use localhost:portnumber for command console\n"
-     "  -k portnum   Use localhost:portnum for serial I/O\n"
-#endif
-     "  -s file      Connect serial interface to `file'\n"
-     "  -S options   `options' is a comma separated list of options\n"
-     "               according to serial interface. Know options are:\n"
-     "                  in=file   serial input will be read from file named `file'\n"
-     "                  out=file  serial output will be written to `file'\n"
-     "  -p prompt    Specify string for prompt\n"
-     "  -P           Prompt is a null ('\\0') character\n"
-     "  -V           Verbose mode\n"
-     "  -v           Print out version number\n"
-     "  -H           Print out types of known CPUs\n"
-     "  -h           Print out this help\n"
-     );
-}
-
-enum {
-  SOPT_IN= 0,
-  SOPT_OUT
-};
-
-static const char *S_opts[]= {
-  /*[SOPT_IN]=*/ "in",
-  /*[SOPT_OUT]=*/ "out",
-  NULL
-};
-
-int
-cl_sim51::proc_arg(char optopt, char *optarg)
-{
-  char *cpu_type= NULL, *cp;
-  int i;
-  char *subopts, *value;
-
-  switch (optopt)
-    {
-
-    case 't':
-
-      if (cpu_type)
-	free(cpu_type);
-      cpu_type= strdup(optarg);
-      for (cp= cpu_type; *cp; *cp= toupper(*cp), cp++);
-      arguments->add(new cl_prg_arg('t', 0, cpu_type));
-      break;
-
-    case 's':
-      {
-	FILE *Ser_in, *Ser_out;
-	if (arg_avail('s'))
-	  {
-	    fprintf(stderr, "-s option can not be used more than once.\n");
-	    break;
-	  }
-	arguments->add(new cl_prg_arg('s', 0, (long)1));
-	if ((Ser_in= fopen(optarg, "r")) == NULL)
-	  {
-	    fprintf(stderr,
-		    "Can't open `%s': %s\n", optarg, strerror(errno));
-	    return(4);
-	  }
-	arguments->add(new cl_prg_arg(0, "Ser_in", Ser_in));
-	if ((Ser_out= fopen(optarg, "w")) == NULL)
-	  {
-	    fprintf(stderr,
-		    "Can't open `%s': %s\n", optarg, strerror(errno));
-	    return(4);
-	  }
-	arguments->add(new cl_prg_arg(0, "Ser_out", Ser_out));
-	break;
-      }
-
-#ifdef SOCKET_AVAIL
-      // socket serial I/O by Alexandre Frey <Alexandre.Frey@trusted-logic.fr>
-    case 'k':
-      {
-        FILE *Ser_in, *Ser_out;
-        int  sock;
-        unsigned short serverport;
-        int client_sock;
-
-        if (arg_avail("Ser_in")) {
-          fprintf(stderr, "Serial input specified more than once.\n");
-        }
-        if (arg_avail("Ser_out")) {
-          fprintf(stderr, "Serial output specified more than once.\n");
-        }
-
-        serverport = atoi(optarg);
-        sock = make_server_socket(serverport);
-        if (listen(sock, 1) < 0) {
-          fprintf(stderr, "Listen on port %d: %s\n", serverport,
-		  strerror(errno));
-          return (4);
-        }
-        fprintf(stderr, "Listening on port %d for a serial connection.\n",
-		serverport);
-        if ((client_sock = accept(sock, NULL, NULL)) < 0) {
-          fprintf(stderr, "accept: %s\n", strerror(errno));
-        }
-        fprintf(stderr, "Serial connection established.\n");
-
-        if ((Ser_in = fdopen(client_sock, "r")) == NULL) {
-          fprintf(stderr, "Can't create input stream: %s\n", strerror(errno));
-          return (4);
-        }
-        arguments->add(new cl_prg_arg(0, "Ser_in", Ser_in));
-        if ((Ser_out = fdopen(client_sock, "w")) == NULL) {
-          fprintf(stderr, "Can't create output stream: %s\n", strerror(errno));
-          return (4);
-        }
-        arguments->add(new cl_prg_arg(0, "Ser_out", Ser_out));
-        break;
-      }
-#endif
-      
-    case 'S':
-
-      subopts= optarg;
-      while (*subopts != '\0')
-	switch (get_sub_opt(&subopts, S_opts, &value))
-	  {
-	    FILE *Ser_in, *Ser_out;
-	  case SOPT_IN:
-	    if (value == NULL) {
-	      fprintf(stderr, "No value for -S in\n");
-	      exit(1);
-	    }
-	    if (arg_avail("Ser_in"))
-	      {
-		fprintf(stderr, "Serial input specified more than once.\n");
-		break;
-	      }
-	    if ((Ser_in= fopen(value, "r")) == NULL)
-	      {
-		fprintf(stderr,
-			"Can't open `%s': %s\n", value, strerror(errno));
-		exit(4);
-	      }
-	    arguments->add(new cl_prg_arg(0, "Ser_in", Ser_in));
-	    break;
-	  case SOPT_OUT:
-	    if (value == NULL) {
-	      fprintf(stderr, "No value for -S out\n");
-	      exit(1);
-	    }
-	    if (arg_avail("Ser_out"))
-	      {
-		fprintf(stderr, "Serial output specified more than once.\n");
-		break;
-	      }
-	    if ((Ser_out= fopen(value, "w")) == NULL)
-	      {
-		fprintf(stderr,
-			"Can't open `%s': %s\n", value, strerror(errno));
-		exit(4);
-	      }
-	    arguments->add(new cl_prg_arg(0, "Ser_out", Ser_out));
-	    break;
-	  default:
-	    /* Unknown suboption. */
-	    fprintf(stderr, "Unknown suboption `%s' for -S\n", value);
-	    exit(1);
-	    break;
-	  }
-      break;
-
-    case 'h':
-
-      print_help("s51");
-      exit(0);
-      break;
-      
-    case 'H':
-      i= 0;
-      while (cpus_51[i].type_str != NULL)
-	{
-	  printf("%s\n", cpus_51[i].type_str);
-	  i++;
-	}
-      exit(0);
-      break;
-      
-    case '?':
-
-      if (isprint(optopt))
-	fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-      else
-	fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-      return(1);
-      break;
-      
-    default:
-      // should never happen...
-      abort();
-    }
-  return(0);
-}
 
 
 class cl_uc *
@@ -279,10 +58,10 @@ cl_sim51::mk_controller(void)
   int i;
 
   i= 0;
-  if (get_sarg('t', 0) == NULL)
-    arguments->add(new cl_prg_arg('t', 0, "C51"));
+  if (app->args->get_sarg('t', 0) == NULL)
+    app->args->add(new cl_prg_arg('t', 0, "C51"));
   while ((cpus_51[i].type_str != NULL) &&
-	 (strcmp(get_sarg('t', 0), cpus_51[i].type_str) != 0))
+	 (strcmp(app->args->get_sarg('t', 0), cpus_51[i].type_str) != 0))
     i++;
   if (cpus_51[i].type_str == NULL)
     {

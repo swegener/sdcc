@@ -100,8 +100,11 @@ cmd_do_print(FILE *f, char *format, va_list ap)
  *____________________________________________________________________________
  */
 
-cl_cmdline::cl_cmdline(char *acmd, class cl_console *acon)
+cl_cmdline::cl_cmdline(class cl_app *the_app,
+		       char *acmd, class cl_console *acon):
+  cl_base()
 {
+  app= the_app;
   cmd= strdup(acmd);
   params= new cl_list(2, 2);
   tokens= new cl_ustrings(2, 2);
@@ -139,9 +142,12 @@ cl_cmdline::skip_delims(char *start)
 int
 cl_cmdline::split(void)
 {
+  //class cl_sim *sim;
   char *start= cmd;
   int i;
+  class cl_cmd_arg *arg;
 
+  //sim= app->get_sim();
   name= 0;
   if (!cmd ||
       !*cmd)
@@ -194,7 +200,8 @@ cl_cmdline::split(void)
 	  strncpy(param_str, start, 1+end-start);
 	  param_str[1+end-start]= '\0';
 	  tokens->add(strdup(param_str));
-	  params->add(con->sim->mk_cmd_str_arg(param_str));
+	  params->add(arg= new cl_cmd_str_arg(param_str));
+	  arg->init();
 	  free(param_str);
 	  if (*end)
 	    end++;
@@ -217,10 +224,15 @@ cl_cmdline::split(void)
 	      *dot= '\0';
 	      dot++;
 	      if (strchr("0123456789", *param_str) != NULL)
-		sfr= con->sim->mk_cmd_int_arg((long long)
-					       strtol(param_str, 0, 0));
+		{
+		  sfr= new cl_cmd_int_arg((long)strtol(param_str, 0, 0));
+		  sfr->init();
+		}
 	      else
-		sfr= con->sim->mk_cmd_sym_arg(param_str);
+		{
+		  sfr= new cl_cmd_sym_arg(param_str);
+		  sfr->init();
+		}
 	      if (*dot == '\0')
 		{
 		  bit= 0;
@@ -230,11 +242,17 @@ cl_cmdline::split(void)
 	      else
 		{
 		  if (strchr("0123456789", *dot) != NULL)
-		    bit= con->sim->mk_cmd_int_arg((long long)
-						   strtol(dot, 0, 0));
+		    {
+		      bit= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
+		      bit->init();
+		    }
 		  else
-		    bit= con->sim->mk_cmd_sym_arg(dot);
-		  params->add(con->sim->mk_cmd_bit_arg(sfr, bit));
+		    {
+		      bit= new cl_cmd_sym_arg(dot);
+		      bit->init();
+		    }
+		  params->add(arg= new cl_cmd_bit_arg(sfr, bit));
+		  arg->init();
 		}
 	    }
 	  else if ((dot= strchr(param_str, '[')) != NULL)
@@ -244,10 +262,15 @@ cl_cmdline::split(void)
 	      *dot= '\0';
 	      dot++;
 	      if (strchr("0123456789", *param_str) != NULL)
-		aname= con->sim->mk_cmd_int_arg((long long)
-						 strtol(param_str, 0, 0));
+		{
+		  aname= new cl_cmd_int_arg((long)strtol(param_str, 0, 0));
+		  aname->init();
+		}
 	      else
-		aname= con->sim->mk_cmd_sym_arg(param_str);
+		{
+		  aname= new cl_cmd_sym_arg(param_str);
+		  aname->init();
+		}
 	      if (*dot == '\0')
 		{
 		  aname= 0;
@@ -273,24 +296,32 @@ cl_cmdline::split(void)
 		  else    
 		    {
 		      if (strchr("0123456789", *dot) != NULL)
-			aindex= con->sim->mk_cmd_int_arg((long long)
-							  strtol(dot, 0, 0));
+			{
+			  aindex= new cl_cmd_int_arg((long)strtol(dot, 0, 0));
+			  aindex->init();
+			}
 		      else
-			aindex= con->sim->mk_cmd_sym_arg(dot);
-		      params->add(con->sim->mk_cmd_array_arg(aname, aindex));
+			{
+			  aindex= new cl_cmd_sym_arg(dot);
+			  aindex->init();
+			}
+		      params->add(arg= new cl_cmd_array_arg(aname, aindex));
+		      arg->init();
 		    }
 		}
 	    }
 	  else if (strchr("0123456789", *param_str) != NULL)
 	    {
 	      // number
-	      params->add(con->sim->mk_cmd_int_arg((long long)
-						    strtol(param_str, 0, 0)));
+	      params->add(arg= new cl_cmd_int_arg((long)
+						  strtol(param_str, 0, 0)));
+	      arg->init();
 	    }
 	  else
 	    {
 	      // symbol
-	      params->add(con->sim->mk_cmd_sym_arg(param_str));
+	      params->add(arg= new cl_cmd_sym_arg(param_str));
+	      arg->init();
 	    }
 	  free(param_str);
 	}
@@ -348,7 +379,7 @@ cl_cmdline::insert_param(int pos, class cl_cmd_arg *param)
 }
 
 bool
-cl_cmdline::syntax_match(class cl_sim *sim, char *syntax)
+cl_cmdline::syntax_match(class cl_uc *uc, char *syntax)
 {
   if (!syntax)
     return(DD_FALSE);
@@ -371,7 +402,7 @@ cl_cmdline::syntax_match(class cl_sim *sim, char *syntax)
       switch (*p)
 	{
 	case SY_ADDR:
-	  if (!parm->as_address())
+	  if (!parm->as_address(uc))
 	    return(DD_FALSE);
 	  //printf("ADDRESS match %lx\n",parm->value.address);
 	  break;
@@ -384,12 +415,12 @@ cl_cmdline::syntax_match(class cl_sim *sim, char *syntax)
 	    return(DD_FALSE);
 	  break;
 	case SY_MEMORY:
-	  if (!parm->as_memory())
+	  if (!parm->as_memory(uc))
 	    return(DD_FALSE);
 	  //printf("MEMORY match %s\n",parm->value.memory->class_name);
 	  break;
 	case SY_HW:
-	  if (!parm->as_hw(sim->uc))
+	  if (!parm->as_hw(uc))
 	    return(DD_FALSE);
 	  break;
 	case SY_STRING:
@@ -401,7 +432,7 @@ cl_cmdline::syntax_match(class cl_sim *sim, char *syntax)
 	    return(DD_FALSE);
 	  break;
 	case SY_BIT:
-	  if (!parm->as_bit(sim->uc))
+	  if (!parm->as_bit(uc))
 	    return(DD_FALSE);
 	  break;
 	default:
@@ -483,14 +514,14 @@ cl_cmdline::set_data_list(class cl_cmd_arg *parm, int *iparm)
  *____________________________________________________________________________
  */
 
-cl_cmd::cl_cmd(//class cl_sim *asim,
+cl_cmd::cl_cmd(enum cmd_operate_on op_on,
 	       char *aname,
 	       int can_rep,
 	       char *short_hlp,
 	       char *long_hlp):
   cl_base()
 {
-  //sim= asim;
+  operate_on= op_on;
   names= new cl_strings(1, 1);
   names->add(aname?strdup(aname):strdup("unknown"));
   can_repeat= can_rep;
@@ -566,19 +597,75 @@ cl_cmd::syntax_ok(class cl_cmdline *cmdline)
 }
 
 int
-cl_cmd::work(class cl_sim *sim,
+cl_cmd::work(class cl_app *app,
 	     class cl_cmdline *cmdline, class cl_console *con)
 {
   if (!syntax_ok(cmdline))
     return(0);
-  return(do_work(sim, cmdline, con));
+  class cl_sim *sim= app->get_sim();
+  class cl_uc *uc= 0;
+  if (sim)
+    uc= sim->uc;
+  switch (operate_on)
+    {
+    case operate_on_app:
+      if (!app)
+	{
+	  con->printf("There is no application to work on!\n");
+	  return(DD_TRUE);
+	}
+      return(do_work(app, cmdline, con));
+    case operate_on_sim:
+      if (!sim)
+	{
+	  con->printf("There is no simulator to work on!\n");
+	  return(DD_TRUE);
+	}
+      return(do_work(sim, cmdline, con));
+    case operate_on_uc:
+      if (!sim)
+	{
+	  con->printf("There is no microcontroller to work on!\n");
+	  return(DD_TRUE);
+	}
+      return(do_work(uc, cmdline, con));
+    default:
+      return(do_work(cmdline, con));
+    }
+}
+
+int
+cl_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
+{
+  con->printf("Command \"%s\" does nothing.\n",
+	      (char*)(names->at(0)));
+  return(0);
+}
+
+int
+cl_cmd::do_work(class cl_app *app,
+		class cl_cmdline *cmdline, class cl_console *con)
+{
+  con->printf("Command \"%s\" does nothing on application.\n",
+	      (char*)(names->at(0)));
+  return(0);
 }
 
 int
 cl_cmd::do_work(class cl_sim *sim,
 		class cl_cmdline *cmdline, class cl_console *con)
 {
-  con->printf("Command \"%s\" does nothing.\n", (char*)(names->at(0)));
+  con->printf("Command \"%s\" does nothing on simulator.\n",
+	      (char*)(names->at(0)));
+  return(0);
+}
+
+int
+cl_cmd::do_work(class cl_uc *uc,
+		class cl_cmdline *cmdline, class cl_console *con)
+{
+  con->printf("Command \"%s\" does nothing on microcontroller.\n",
+	      (char*)(names->at(0)));
   return(0);
 }
 
@@ -588,12 +675,19 @@ cl_cmd::do_work(class cl_sim *sim,
  *____________________________________________________________________________
  */
 
-cl_cmdset::cl_cmdset(class cl_sim *asim):
+cl_cmdset::cl_cmdset(void):
+  cl_list(5, 5)
+{
+  //sim= 0;
+  last_command= 0;
+}
+
+/*cl_cmdset::cl_cmdset(class cl_sim *asim):
   cl_list(5, 5)
 {
   sim= asim;
   last_command= 0;
-}
+}*/
 
 class cl_cmd *
 cl_cmdset::get_cmd(class cl_cmdline *cmdline)
@@ -684,13 +778,12 @@ cl_cmdset::replace(char *name, class cl_cmd *cmd)
  *____________________________________________________________________________
  */
 
-cl_super_cmd::cl_super_cmd(//class cl_sim *asim,
-			   char *aname,
+cl_super_cmd::cl_super_cmd(char *aname,
 			   int  can_rep,
 			   char *short_hlp,
 			   char *long_hlp,
 			   class cl_cmdset *acommands):
-  cl_cmd(aname, can_rep, short_hlp, long_hlp)
+  cl_cmd(operate_on_none, aname, can_rep, short_hlp, long_hlp)
 {
   commands= acommands;
 }
@@ -702,7 +795,7 @@ cl_super_cmd::~cl_super_cmd(void)
 }
 
 int
-cl_super_cmd::work(class cl_sim *sim,
+cl_super_cmd::work(class cl_app *app,
 		   class cl_cmdline *cmdline, class cl_console *con)
 {
   class cl_cmd *cmd= 0;
@@ -713,7 +806,7 @@ cl_super_cmd::work(class cl_sim *sim,
   if (!cmdline->shift())
     {
       if ((cmd= commands->get_cmd("_no_parameters_")) != 0)
-	return(cmd->work(sim, cmdline, con));
+	return(cmd->work(app, cmdline, con));
       int i;
       con->printf("\"%s\" must be followed by the name of a subcommand\n"
 		  "List of subcommands:\n", (char*)(names->at(0)));
@@ -730,7 +823,7 @@ cl_super_cmd::work(class cl_sim *sim,
 		  cmdline->name, (char*)(names->at(0)));
       return(0);
     }
-  return(cmd->work(sim, cmdline, con));
+  return(cmd->work(app, cmdline, con));
 }
 
 
@@ -739,13 +832,13 @@ cl_super_cmd::work(class cl_sim *sim,
  *____________________________________________________________________________
  */
 
-cl_console::cl_console(char *fin, char *fout, class cl_sim *asim):
+cl_console::cl_console(char *fin, char *fout, class cl_app *the_app):
   cl_base()
 {
   FILE *f;
 
   last_command= NULL;
-  sim= asim;
+  app= the_app;
   in= 0;
   if (fin)
     if (f= fopen(fin, "r+"), in= f, !f)
@@ -763,11 +856,11 @@ cl_console::cl_console(char *fin, char *fout, class cl_sim *asim):
     printf("Warning: non-interactive console\n");
 }
 
-cl_console::cl_console(FILE *fin, FILE *fout, class cl_sim *asim):
+cl_console::cl_console(FILE *fin, FILE *fout, class cl_app *the_app):
   cl_base()
 {
   last_command= NULL;
-  sim= asim;
+  app= the_app;
   in = fin;
   out= fout;
   prompt= 0;
@@ -802,12 +895,12 @@ connect_to_port(int portnum)
   return sock;
 }
 
-cl_console::cl_console(int portnumber, class cl_sim *asim)
+cl_console::cl_console(int portnumber, class cl_app *the_app)
 {
   int sock= connect_to_port(portnumber);
 
   last_command= NULL;
-  sim= asim;
+  app= the_app;
   if (!(in= fdopen(sock, "r+")))
     fprintf(stderr, "cannot open port for input\n");
   if (!(out= fdopen(sock, "w+")))
@@ -855,8 +948,8 @@ cl_console::welcome(void)
 {
   if (!out)
     return;
-  fprintf(out, "ucsim %s, Copyright (C) 1997 Daniel Drotos, Talker Bt.\n"
-	  "ucsim comes with ABSOLUTELY NO WARRANTY; for details type "
+  fprintf(out, "uCsim %s, Copyright (C) 1997 Daniel Drotos, Talker Bt.\n"
+	  "uCsim comes with ABSOLUTELY NO WARRANTY; for details type "
 	  "`show w'.\n"
 	  "This is free software, and you are welcome to redistribute it\n"
 	  "under certain conditions; type `show c' for details.\n",
@@ -874,11 +967,11 @@ cl_console::print_prompt(void)
   flags|= CONS_PROMPT;
   if (!out)
     return;
-  if (sim->arg_avail('P'))
+  if (app->args->arg_avail('P'))
     putc('\0', out);
   else
     fprintf(out, "%s", (prompt && prompt[0])?prompt:
-	    ((p= sim->get_sarg(0, "prompt"))?p:"> "));
+	    ((p= app->args->get_sarg(0, "prompt"))?p:"> "));
   fflush(out);
 }
 
@@ -985,7 +1078,7 @@ cl_console::read_line(void)
 }
 
 int
-cl_console::proc_input(class cl_app *app, class cl_cmdset *cmdset)
+cl_console::proc_input(class cl_cmdset *cmdset)
 {
   int retval= 0;
 
@@ -999,7 +1092,7 @@ cl_console::proc_input(class cl_app *app, class cl_cmdset *cmdset)
     return(1);
   if (flags & CONS_FROZEN)
     {
-      sim->stop(resUSER);
+      app->get_sim()->stop(resUSER);
       flags&= ~CONS_FROZEN;
       retval= 0;
     }
@@ -1007,16 +1100,11 @@ cl_console::proc_input(class cl_app *app, class cl_cmdset *cmdset)
     {
       class cl_cmdline *cmdline;
       class cl_cmd *cm;
-      cmdline= new cl_cmdline(cmdstr, this);
+      cmdline= new cl_cmdline(app, cmdstr, this);
       cmdline->init();
-      cm= 0;
-      if (app)
-	cm= app->get_cmd(cmdline);
-      if (cm == 0 &&
-	  cmdset)
-	cm= cmdset->get_cmd(cmdline);
+      cm= cmdset->get_cmd(cmdline);
       if (cm)
-	retval= cm->work(sim, cmdline, this);
+	retval= cm->work(app, cmdline, this);
       delete cmdline;
       if (!cm)
 	retval= interpret(cmdstr);
@@ -1036,7 +1124,7 @@ cl_console::proc_input(class cl_app *app, class cl_cmdset *cmdset)
 int
 cl_console::interpret(char *cmd)
 {
-  fprintf(out, "New interpreter does not known this command\n");
+  fprintf(out, "Unknown command\n");
   return(0);
 }
 
@@ -1046,10 +1134,10 @@ cl_console::interpret(char *cmd)
  */
 #ifdef SOCKET_AVAIL
 
-cl_listen_console::cl_listen_console(int serverport, class cl_sim *asim)
+cl_listen_console::cl_listen_console(int serverport, class cl_app *the_app)
 {
   last_command= NULL;
-  sim= asim;
+  app= the_app;
   if ((sock= make_server_socket(serverport)) >= 0)
     {
       if (listen(sock, 10) < 0)
@@ -1077,7 +1165,9 @@ cl_listen_console::proc_input(class cl_cmdset *cmdset)
   int newsock;
   ACCEPT_SOCKLEN_T size;
   struct sockaddr_in sock_addr;
+  class cl_commander *cmd;
 
+  cmd= app->get_commander();
   size= sizeof(struct sockaddr); 
   newsock= accept(sock, (struct sockaddr*)&sock_addr, &size);
   if (newsock < 0)
@@ -1089,10 +1179,9 @@ cl_listen_console::proc_input(class cl_cmdset *cmdset)
     fprintf(stderr, "cannot open port for input\n");
   if (!(out= fdopen(newsock, "w+")))
     fprintf(stderr, "cannot open port for output\n");
-  class cl_console *c= sim->cmd->mk_console(in, out, sim);
+  class cl_console *c= cmd->mk_console(in, out);
   c->flags|= CONS_INTERACTIVE;
-  c->init();
-  sim->cmd->add_console(c);
+  cmd->add_console(c);
   in= out= 0;
   return(0);
 }
@@ -1105,34 +1194,39 @@ cl_listen_console::proc_input(class cl_cmdset *cmdset)
  *____________________________________________________________________________
  */
 
-cl_commander::cl_commander(class cl_app *the_app,
-			   class cl_cmdset *acmdset, class cl_sim *asim):
+cl_commander::cl_commander(class cl_app *the_app, class cl_cmdset *acmdset
+			   /*, class cl_sim *asim*/):
   cl_base()
 {
   app= the_app;
   cons= new cl_list(1, 1); 
   actual_console= frozen_console= 0;
   cmdset= acmdset;
-  sim= asim;
 }
 
 int
 cl_commander::init(void)
 {
   cl_base::init();
-  if (!sim)
-    return(1);
-  if (sim->arg_avail('c'))
-    add_console(mk_console(sim->get_sarg('c', 0),
-			   sim->get_sarg('c', 0), sim));
+
+  char *Config= app->args->get_sarg(0, "Config");
+  if (Config)
+    {
+      class cl_console *con= mk_console(0/*"/dev/tty"*/);
+      add_console(con);
+    }
+
+  if (app->args->arg_avail('c'))
+    add_console(mk_console(app->args->get_sarg('c', 0),
+			   app->args->get_sarg('c', 0)));
 #ifdef SOCKET_AVAIL
-  if (sim->arg_avail('Z'))
-    add_console(mk_console(sim->get_iarg(0, "Zport"), sim));
-  if (sim->arg_avail('r'))
-    add_console(mk_console(sim->get_iarg('r', 0), sim));
+  if (app->args->arg_avail('Z'))
+    add_console(mk_console(app->args->get_iarg(0, "Zport")));
+  if (app->args->arg_avail('r'))
+    add_console(mk_console(app->args->get_iarg('r', 0)));
 #endif
   if (cons->get_count() == 0)
-    add_console(mk_console(stdin, stdout, sim));
+    add_console(mk_console(stdin, stdout));
   return(0);
 }
 
@@ -1143,22 +1237,22 @@ cl_commander::~cl_commander(void)
 }
 
 class cl_console *
-cl_commander::mk_console(char *fin, char *fout, class cl_sim *asim)
+cl_commander::mk_console(char *fin, char *fout)
 {
-  return(new cl_console(fin, fout, asim));
+  return(new cl_console(fin, fout, app));
 }
 
 class cl_console *
-cl_commander::mk_console(FILE *fin, FILE *fout, class cl_sim *asim)
+cl_commander::mk_console(FILE *fin, FILE *fout)
 {
-  return(new cl_console(fin, fout, asim));
+  return(new cl_console(fin, fout, app));
 }
 
 #ifdef SOCKET_AVAIL
 class cl_console *
-cl_commander::mk_console(int portnumber, class cl_sim *asim)
+cl_commander::mk_console(int portnumber)
 {
-  return(new cl_listen_console(portnumber, asim));
+  return(new cl_listen_console(portnumber, app));
 }
 #endif
 
@@ -1361,7 +1455,7 @@ cl_commander::proc_input(void)
 	    if (c->match(i))
 	      {
 		actual_console= c;
-		int retval= c->proc_input(app, cmdset);
+		int retval= c->proc_input(cmdset);
 		if (retval)
 		  {
 		    del_console(c);

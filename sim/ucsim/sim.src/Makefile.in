@@ -40,10 +40,10 @@ OBJECTS         = app.o sim.o itsrc.o brk.o option.o arg.o stack.o \
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf sim_lib test_mem_speed
+all: checkconf sim_lib
 
-test_mem_speed: test_mem_speed.o
-	$(CC) -o $@ $< -L$(PRJDIR) -lsim -lutil
+test_mem_speed: $(PRJDIR)/libsim.a $(PRJDIR)/libutil.a test_mem_speed.o
+	$(CC) -o $@ test_mem_speed.o -L$(PRJDIR) -lsim -lutil
 
 sim.src: all
 
@@ -72,6 +72,8 @@ installcheck:
 # ---------------------------------
 installdirs:
 
+
+test: test_mem_speed
 
 # Creating dependencies
 # ---------------------

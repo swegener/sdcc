@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include <ctype.h>
+#include "i_string.h"
 
 // sim
 #include "simcl.h"
@@ -44,11 +45,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *----------------------------------------------------------------------------
  */
 
-int
-cl_get_sfr_cmd::do_work(class cl_sim *sim,
-			class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_get_sfr_cmd::do_work(class cl_sim *sim,
+//			class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 {
-  class cl_mem *mem= sim->uc->mem(MEM_SFR);
+  class cl_mem *mem= uc->mem(MEM_SFR);
   class cl_cmd_arg *parm;
   int i;
 
@@ -61,7 +63,7 @@ cl_get_sfr_cmd::do_work(class cl_sim *sim,
        parm;
        i++, parm= cmdline->param(i))
     {
-      if (!parm->as_address())
+      if (!parm->as_address(uc))
 	con->printf("Warning: Invalid address %s\n",
 		    (char*)cmdline->tokens->at(i+1));
       else
@@ -77,25 +79,26 @@ cl_get_sfr_cmd::do_work(class cl_sim *sim,
  *----------------------------------------------------------------------------
  */
 
-int
-cl_get_option_cmd::do_work(class cl_sim *sim,
-			   class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_get_option_cmd::do_work(class cl_sim *sim,
+//			   class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_get_option_cmd)
 {
   class cl_cmd_arg *parm= cmdline->param(0);
   char *s= 0;
 
   if (!parm)
     ;
-  else if (cmdline->syntax_match(sim, STRING)) {
+  else if (cmdline->syntax_match(uc, STRING)) {
     s= parm->value.string.string;
   }
   else
     con->printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   int i;
-  for (i= 0; i < sim->uc->options->count; i++)
+  for (i= 0; i < uc->options->count; i++)
     {
-      class cl_option *o= (class cl_option *)(sim->uc->options->at(i));
+      class cl_option *o= (class cl_option *)(uc->options->at(i));
       if (!s ||
 	  !strcmp(s, o->id))
 	{

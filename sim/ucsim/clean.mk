@@ -1,7 +1,7 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
-	rm -f *core *[%~] *.[oa] *.so
+	rm -f *core *[%~] *.[oa] *.so ucsim
 	rm -f .[a-z]*~
 
 

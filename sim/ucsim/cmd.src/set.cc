@@ -43,9 +43,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *----------------------------------------------------------------------------
  */
 
-int
-cl_set_mem_cmd::do_work(class cl_sim *sim,
-			class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_set_mem_cmd::do_work(class cl_sim *sim,
+//			class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_set_mem_cmd)
 {
   class cl_mem *mem= 0;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -53,7 +54,7 @@ cl_set_mem_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(2),
 				 cmdline->param(3) };
 
-  if (cmdline->syntax_match(sim, MEMORY ADDRESS DATALIST)) {
+  if (cmdline->syntax_match(uc, MEMORY ADDRESS DATALIST)) {
     mem= params[0]->value.memory;
     t_addr start= params[1]->value.address;
     t_mem *array= params[2]->value.data_list.array;
@@ -84,9 +85,10 @@ cl_set_mem_cmd::do_work(class cl_sim *sim,
  *----------------------------------------------------------------------------
  */
 
-int
-cl_set_bit_cmd::do_work(class cl_sim *sim,
-			class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_set_bit_cmd::do_work(class cl_sim *sim,
+//			class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_set_bit_cmd)
 {
   class cl_mem *mem;
   t_addr mem_addr= 0;
@@ -96,7 +98,7 @@ cl_set_bit_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(2),
 				 cmdline->param(3) };
   
-  if (cmdline->syntax_match(sim, BIT NUMBER)) {
+  if (cmdline->syntax_match(uc, BIT NUMBER)) {
     mem= params[0]->value.bit.mem;
     mem_addr= params[0]->value.bit.mem_address;
     bit_mask= params[0]->value.bit.mask;
@@ -118,9 +120,10 @@ cl_set_bit_cmd::do_work(class cl_sim *sim,
  *----------------------------------------------------------------------------
  */
 
-int
-cl_set_port_cmd::do_work(class cl_sim *sim,
-			 class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_set_port_cmd::do_work(class cl_sim *sim,
+//			 class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_set_port_cmd)
 {
   class cl_hw *hw;
   long l= 0, pn= -1;
@@ -129,12 +132,12 @@ cl_set_port_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(2),
 				 cmdline->param(3) };
   
-  if (cmdline->syntax_match(sim, HW NUMBER)) {
+  if (cmdline->syntax_match(uc, HW NUMBER)) {
     hw= params[0]->value.hw;
     pn= hw->id;
     l= params[1]->value.number;
   }
-  else if (cmdline->syntax_match(sim, NUMBER NUMBER)) {
+  else if (cmdline->syntax_match(uc, NUMBER NUMBER)) {
     pn= params[0]->value.number;
     l= params[1]->value.number;
   }
@@ -144,7 +147,7 @@ cl_set_port_cmd::do_work(class cl_sim *sim,
       pn > 3)
     con->printf("Error: wrong port\n");
   else
-    sim->uc->port_pins[pn]= l;
+    uc->port_pins[pn]= l;
   return(DD_FALSE);;
 }
 
@@ -154,9 +157,10 @@ cl_set_port_cmd::do_work(class cl_sim *sim,
  *----------------------------------------------------------------------------
  */
 
-int
-cl_set_option_cmd::do_work(class cl_sim *sim,
-			   class cl_cmdline *cmdline, class cl_console *con)
+//int
+//cl_set_option_cmd::do_work(class cl_sim *sim,
+//			   class cl_cmdline *cmdline, class cl_console *con)
+COMMAND_DO_WORK_UC(cl_set_option_cmd)
 {
   char *id= 0, *s= 0;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
@@ -164,7 +168,7 @@ cl_set_option_cmd::do_work(class cl_sim *sim,
 				 cmdline->param(2),
 				 cmdline->param(3) };
   
-  if (cmdline->syntax_match(sim, STRING STRING)) {
+  if (cmdline->syntax_match(uc, STRING STRING)) {
     id= params[0]->value.string.string;
     s= params[1]->value.string.string;
   }
@@ -178,9 +182,9 @@ cl_set_option_cmd::do_work(class cl_sim *sim,
     }
 
   int i;
-  for (i= 0; i < sim->uc->options->count; i++)
+  for (i= 0; i < uc->options->count; i++)
     {
-      class cl_option *o= (class cl_option *)(sim->uc->options->at(i));
+      class cl_option *o= (class cl_option *)(uc->options->at(i));
       if (!strcmp(id, o->id))
 	{
 	  o->set_value(s);

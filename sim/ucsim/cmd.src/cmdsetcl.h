@@ -31,56 +31,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 // STATE
-COMMAND(cl_state_cmd);
-COMMAND(cl_file_cmd);
-COMMAND(cl_dl_cmd);
-COMMAND(cl_run_cmd);
-COMMAND(cl_stop_cmd);
-COMMAND(cl_step_cmd);
-COMMAND(cl_next_cmd);
-COMMAND(cl_pc_cmd);
-COMMAND(cl_reset_cmd);
-COMMAND(cl_dump_cmd);
-COMMAND_ANCESTOR(cl_di_cmd,cl_dump_cmd);
-COMMAND_ANCESTOR(cl_dx_cmd,cl_dump_cmd);
-COMMAND_ANCESTOR(cl_dch_cmd,cl_dump_cmd);
-COMMAND_ANCESTOR(cl_ds_cmd,cl_dump_cmd);
-COMMAND_DATA(cl_dc_cmd, t_addr last);
-COMMAND_DATA(cl_disassemble_cmd,int last);
-COMMAND_DATA(cl_fill_cmd,int last);
-COMMAND_HEAD(cl_where_cmd)
-  public: int last;
-COMMAND_METHODS(cl_where_cmd)
-  virtual int do_real_work(class cl_sim *sim,
-			   class cl_cmdline *cmdline, class cl_console *con,
-			   bool case_sensitive);
-COMMAND_TAIL;
-COMMAND_DATA_ANCESTOR(cl_Where_cmd,cl_where_cmd,int last);
-COMMAND(cl_help_cmd);
+COMMAND_ON(sim,cl_run_cmd);
+COMMAND_ON(sim,cl_stop_cmd);
+COMMAND_ON(uc,cl_step_cmd);
+COMMAND_ON(sim,cl_next_cmd);
+COMMAND_ON(app,cl_help_cmd);
 COMMAND(cl_quit_cmd);
-COMMAND(cl_kill_cmd);
-
-COMMAND_HEAD(cl_timer_cmd)
-public:
-  class cl_ticker *ticker;
-  long what;
-  char *name;
-COMMAND_METHODS(cl_timer_cmd)
-  void set_ticker(class cl_sim *sim,
-		  class cl_cmd_arg *param);
-  virtual int add(class cl_sim *sim,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int del(class cl_sim *sim,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int get(class cl_sim *sim,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int run(class cl_sim *sim,
-		  class cl_cmdline *cmdline, class cl_console *con);
-  virtual int stop(class cl_sim *sim,
-		   class cl_cmdline *cmdline, class cl_console *con);
-  virtual int val(class cl_sim *sim,
-		  class cl_cmdline *cmdline, class cl_console *con);
-COMMAND_TAIL;
+COMMAND_ON(app,cl_kill_cmd);
 
 
 #endif

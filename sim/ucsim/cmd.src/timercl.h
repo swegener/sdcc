@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (cmd.src/cmdconfcl.h)
+ * Simulator of microcontrollers (cmd.src/timercl.h)
  *
  * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
  * 
@@ -25,19 +25,35 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef CMD_CMDCONF_HEADER
-#define CMD_CMDCONF_HEADER
+#ifndef CMD_TIMERCL_HEADER
+#define CMD_TIMERCL_HEADER
 
 #include "newcmdcl.h"
 
 
-// CONF
-COMMAND_ON(uc,cl_conf_cmd);
-
-// CONF ADDMEM
-COMMAND_ON(uc,cl_conf_addmem_cmd);
+COMMAND_HEAD(cl_timer_cmd)
+public:
+  class cl_ticker *ticker;
+  long what;
+  char *name;
+COMMAND_METHODS_ON(uc,cl_timer_cmd)
+  void set_ticker(class cl_uc *uc,
+		  class cl_cmd_arg *param);
+  virtual int add(class cl_uc *uc,
+		  class cl_cmdline *cmdline, class cl_console *con);
+  virtual int del(class cl_uc *uc,
+		  class cl_cmdline *cmdline, class cl_console *con);
+  virtual int get(class cl_uc *uc,
+		  class cl_cmdline *cmdline, class cl_console *con);
+  virtual int run(class cl_uc *uc,
+		  class cl_cmdline *cmdline, class cl_console *con);
+  virtual int stop(class cl_uc *uc,
+		   class cl_cmdline *cmdline, class cl_console *con);
+  virtual int val(class cl_uc *uc,
+		  class cl_cmdline *cmdline, class cl_console *con);
+COMMAND_TAIL;
 
 
 #endif
 
-/* End of cmd.src/cmdconfcl.h */
+/* End of cmd.src/timercl.h */

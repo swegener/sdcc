@@ -63,17 +63,6 @@ public:
   class cl_memloc *get_loc(t_addr address);
 };
 
-
-class cl_cell: public cl_base
-{
-public:
-  t_mem data;
-  
-public:
-  cl_cell(void);
-  cl_cell(t_mem idata);
-};
-
 /* Memory */
 
 class cl_mem: public cl_guiobj
@@ -136,6 +125,53 @@ public:
 public:
   cl_rom(t_addr asize, int awidth);
   ~cl_rom(void);
+};
+
+/* New type */
+
+class cl_cell: public cl_base
+{
+public:
+  t_mem data;
+protected:
+  t_mem mask;
+
+public:
+  cl_cell(int awidth);
+  virtual t_mem read(void) { return(data); }
+  virtual t_mem get(void)  { return(data); }
+  virtual void write(t_mem *val) { data= *val= (*val & mask); }
+  virtual void set(t_mem val)    { data= val & mask; }
+};
+
+class cl_registered_cell: public cl_cell
+{
+protected:
+  class cl_list *hws;
+  class cl_hw *hardwares;
+  int nuof_hws;
+public:
+  cl_registered_cell(int awidth);
+  ~cl_registered_cell(void);
+  virtual t_mem read(void);
+  virtual void write(t_mem *val);
+};
+
+class cl_m: public cl_mem
+{
+protected:
+  class cl_cell **array;
+public:
+  t_addr size;
+  int width;
+
+public:
+  cl_m(t_addr asize, int awidth);
+  ~cl_m(void);
+  virtual t_mem read(t_addr addr);
+  virtual t_mem get(t_addr addr);
+  virtual void write(t_addr addr, t_mem *val);
+  virtual void set(t_addr addr, t_mem val);
 };
 
 

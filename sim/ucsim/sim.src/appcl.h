@@ -30,7 +30,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+// prj
 #include "pobjcl.h"
+
+// local, sim.src
+#include "argcl.h"
 
 
 /* Options */
@@ -72,20 +76,28 @@ public:
 class cl_app: public cl_base
 {
 protected:
-  //class cl_options *options;
+  class cl_commander *commander;
+public:
   class cl_sim *sim;
-  class cl_cmdset *cmdset;
+  class cl_ustrings *in_files;
+  class cl_arguments *args;
+  int going;
 
 public:
   cl_app(void);
   ~cl_app(void);
 
 public:
-  virtual int init(void);
+  virtual int init(int argc , char *argv[]);
   virtual int run(void);
   virtual void done(void);
 
+protected:
+  virtual int proc_arguments(int argc, char *argv[]);
+
 public:
+  class cl_sim *get_sim(void) { return(sim); }
+  class cl_commander *get_commander(void) { return(commander); }
   virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
 
 public:

@@ -110,9 +110,9 @@ t_uc51r::proc_write(uchar *addr)
 	  (*addr == 0xe1))
 	{
 	  WDT= 0;
-	  sim->cmd->debug("%g sec (%d tick): Watchdog timer enabled/reset"
-			  " PC= 0x%06x\n",
-			  get_rtime(), ticks->ticks, PC);
+	  sim->app->get_commander()->
+	    debug("%g sec (%d tick): Watchdog timer enabled/reset PC= 0x%06x"
+		  "\n", get_rtime(), ticks->ticks, PC);
 	}
       wdtrst= *addr;
     }
@@ -370,12 +370,11 @@ t_uc51r::do_wdt(int cycles)
   if (WDT >= 0)
     {
       WDT+= cycles;
-fprintf(stderr,"WDT=%d\n",WDT);
       if (WDT & ~(0x3fff))
 	{
-	  sim->cmd->debug("%g sec (%d ticks): "
-			  "Watchdog timer resets the CPU, PC= 0x%06x\n",
-			  get_rtime(), ticks->ticks, PC);
+	  sim->app->get_commander()->
+	    debug("%g sec (%d ticks): Watchdog timer resets the CPU, "
+		  "PC= 0x%06x\n", get_rtime(), ticks->ticks, PC);
 	  reset();
 	  return(resWDTRESET);
 	}

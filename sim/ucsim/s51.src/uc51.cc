@@ -68,16 +68,16 @@ t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
   type= Itype;
   technology= Itech;
 
-  debug= asim->get_iarg('V', 0);
+  debug= asim->app->args->get_iarg('V', 0);
   stop_at_it= DD_FALSE;
   options->add(new cl_bool_opt(&debug, "verbose", "Verbose flag."));
   options->add(new cl_bool_opt(&stop_at_it, "stopit",
 			       "Stop if interrupt accepted."));
-  options->add(new cl_cons_debug_opt(asim, "debug",
+  options->add(new cl_cons_debug_opt(asim->app, "debug",
 				     "Debug messages appears on this console."));
 
-  serial_in = (FILE*)asim->get_parg(0, "Ser_in");
-  serial_out= (FILE*)asim->get_parg(0, "Ser_out");
+  serial_in = (FILE*)asim->app->args->get_parg(0, "Ser_in");
+  serial_out= (FILE*)asim->app->args->get_parg(0, "Ser_out");
   if (serial_in)
     {
       // making `serial' unbuffered
@@ -927,12 +927,12 @@ t_uc51::do_inst(int step)
       if ((step < 0) &&
 	  ((ticks->ticks % 100000) < 50))
 	{
-	  if (sim->cmd->input_avail_on_frozen())
+	  if (sim->app->get_commander()->input_avail_on_frozen())
 	    {
 	      result= resUSER;
 	    }
 	  else
-	    if (sim->cmd->input_avail())
+	    if (sim->app->get_commander()->input_avail())
 	      break;
 	}
       if (((result == resINTERRUPT) &&
@@ -946,7 +946,7 @@ t_uc51::do_inst(int step)
   if (state == stPD)
     {
       //FIXME: tick outsiders eg. watchdog
-      if (sim->cmd->input_avail_on_frozen())
+      if (sim->app->get_commander()->input_avail_on_frozen())
 	{
 	  //fprintf(stderr,"uc: inp avail in PD mode, user stop\n");
           result= resUSER;
@@ -975,8 +975,8 @@ t_uc51::post_inst(void)
 	  !(p3 & port_pins[3] & bm_INT0))
 	// falling edge on INT0
 	{
-	  sim->cmd->debug("%g sec (%d clks): "
-			  "Falling edge detected on INT0 (P3.2)\n",
+	  sim->app->get_commander()->
+	    debug("%g sec (%d clks): Falling edge detected on INT0 (P3.2)\n",
 			  get_rtime(), ticks->ticks);
 	  sfr->set_bit1(TCON, bmIE0);
 	}
@@ -1438,8 +1438,8 @@ t_uc51::do_interrupt(void)
 	    }
 	  if (is->clr_bit)
 	    sfr->set_bit0(is->src_reg, is->src_mask);
-	  sim->cmd->debug("%g sec (%d clks): "
-			  "Accepting interrupt `%s' PC= 0x%06x\n",
+	  sim->app->get_commander()->
+	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
 			  get_rtime(), ticks->ticks, is->name, PC);
 	  IL= new it_level(pr, is->addr, PC, is);
 	  return(accept_it(IL));
@@ -1490,15 +1490,17 @@ t_uc51::idle_pd(void)
   if (pcon & bmIDL)
     {
       if (state != stIDLE)
-	sim->cmd->debug("%g sec (%d clks): CPU in Idle mode\n",
-			get_rtime(), ticks->ticks);
+	sim->app->get_commander()->
+	  debug("%g sec (%d clks): CPU in Idle mode\n",
+		get_rtime(), ticks->ticks);
       state= stIDLE;
       //was_reti= 1;
     }
   if (pcon & bmPD)
     {
       if (state != stPD)
-	sim->cmd->debug("%g sec (%d clks): CPU in PowerDown mode\n",
+	sim->app->get_commander()->
+	  debug("%g sec (%d clks): CPU in PowerDown mode\n",
 			get_rtime(), ticks->ticks);
       state= stPD;
     }
@@ -1540,7 +1542,8 @@ t_uc51::inst_unknown(uchar code)
 {
   PC--;
   if (1)//debug)// && sim->cmd_out())
-    sim->cmd->debug("Unknown instruction %02x at %06x\n", code, PC);
+    sim->app->get_commander()->
+      debug("Unknown instruction %02x at %06x\n", code, PC);
   return(resHALT);
 }
 

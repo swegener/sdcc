@@ -140,8 +140,8 @@ static int checkCurrFile(char *s);
 "_overlay"     { count(); TKEYWORD(OVERLAY); }
 {L}({L}|{D})*  { count(); return(check_type()); }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
-0{D}+{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }
-{D}+{IS}?      { count(); yylval.val = constVal(yytext); return(CONSTANT); }
+0[0-7]*{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }
+[1-9]{D}*{IS}?      { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 '(\\.|[^\\'])+' { count();yylval.val = charVal (yytext); return(CONSTANT); /* ' make syntax highliter happy */ }
 {D}+{E}{FS}?   { count(); yylval.val = constFloatVal(yytext);return(CONSTANT); }
 {D}*"."{D}+({E})?{FS}?  { count(); yylval.val = constFloatVal(yytext);return(CONSTANT); }

@@ -1,5 +1,9 @@
 2004-09-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCC.lex: fixed bug #1030549
+
+2004-09-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCcse.h (struct cseDef),
 	* src/SDCCcse.c (cseBBlock, newCseDef, ifFromAddrTaken): purge CSEs
 	over a function call if the CSE is derived from a symbol whose

@@ -2226,7 +2226,7 @@ isBitwiseOptimizable (iCode * ic)
 /* isCommutativeOp - tests whether this op cares what order its    */
 /*                   operands are in                               */
 /*-----------------------------------------------------------------*/
-bool isCommutativeOp(char op)
+bool isCommutativeOp(unsigned int op)
 {
   if (op == '+' || op == '*' || op == EQ_OP ||
       op == '^' || op == '|' || op == BITWISEAND)

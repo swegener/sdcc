@@ -96,7 +96,7 @@
 #include "SDCCglue.h"
 #include "newalloc.h"
 
-/* this is the down and dirty file with all kinds of kludgy & hacky
+/* This is the down and dirty file with all kinds of kludgy & hacky
    stuff. This is what it is all about CODE GENERATION for a specific MCU.
    Some of the routines may be reusable, will have to see */
 
@@ -108,7 +108,7 @@
    PENDING: What if the parameter is a long?
    Everything is caller saves. i.e. the caller must save any registers
    that it wants to preserve over the call.
-   The return value is returned in DEHL.  DE is normally used as a
+   GB: The return value is returned in DEHL.  DE is normally used as a
    working register pair.  Caller saves allows it to be used for a
    return value.
    va args functions do not use register parameters.  All arguments
@@ -117,8 +117,10 @@
    area.  ix-0 is the top most local variable.
 */
 
-enum {
-  DISABLE_DEBUG = 0
+enum 
+{
+  /* Set to enable debugging trace statements in the output assembly code. */
+  DISABLE_DEBUG = 1
 };
 
 static char *_z80_return[] =
@@ -133,6 +135,8 @@ static char **_fTmp;
 
 extern FILE *codeOutFile;
 
+/** Enum covering all the possible register pairs.
+ */
 typedef enum
   {
     PAIR_INVALID,
@@ -175,8 +179,13 @@ enum
     MSB32
   };
 
+/** Code generator persistent data.
+ */
 static struct 
 {
+  /** Used to optimised setting up of a pair by remebering what it
+      contains and adjusting instead of reloading where possible.
+  */
   struct 
   {
     AOP_TYPE last_type;
@@ -235,23 +244,6 @@ _getTempPairName(void)
 {
   return _pairs[_getTempPairId()].name;
 }
-
-#if 0
-static const char *
-_getTempPairPart(int idx)
-{
-  wassertl (idx == LSB || idx == MSB16, "Invalid pair offset");
-  
-  if (idx == LSB)
-    {
-      return _pairs[_getTempPairId()].l;
-    }
-  else
-    {
-      return _pairs[_getTempPairId()].h;
-    }
-}
-#endif
 
 static void
 _tidyUp (char *buf)
@@ -1475,8 +1467,7 @@ aopPut (asmop * aop, const char *s, int offset)
 	break;
       if (offset > 0)
 	{
-
-	  emitDebug ("; Error aopPut AOP_ACC");
+          wassertl (0, "Tried to access past the end of A");
 	}
       else
 	{
@@ -1542,7 +1533,7 @@ static void
 movLeft2Result (operand * left, int offl,
 		operand * result, int offr, int sign)
 {
-    const char *l;
+  const char *l;
   if (!sameRegs (AOP (left), AOP (result)) || (offl != offr))
     {
       l = aopGet (AOP (left), offl, FALSE);
@@ -1553,7 +1544,11 @@ movLeft2Result (operand * left, int offl,
 	}
       else
 	{
-	  wassert (0);
+          if (getDataSize (left) == offl + 1)
+            {
+              emit2 ("ld a,%s", l);
+              aopPut (AOP (result), "a", offr);
+            }
 	}
     }
 }
@@ -1587,7 +1582,6 @@ outBitCLong (operand * result, bool swap_sense)
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      emitDebug ("; Note: outBitC form 1");
       aopPut (AOP (result), "blah", 0);
     }
   else
@@ -1841,10 +1835,6 @@ assignResultValue (operand * oper)
   wassert (size <= 4);
   topInA = requiresHL (AOP (oper));
 
-#if 0
-  if (!IS_GB)
-    wassert (size <= 2);
-#endif
   if (IS_GB && size == 4 && requiresHL (AOP (oper)))
     {
       /* We do it the hard way here. */
@@ -1894,19 +1884,7 @@ _saveRegsForCall(iCode *ic, int sendSetSize)
     bool bcInRet = FALSE, deInRet = FALSE;
     bitVect *rInUse;
 
-#if 1
     rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
-#else
-    if (IC_RESULT(ic))
-      {
-        rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), z80_rUmaskForOp (IC_RESULT(ic)));
-      }
-    else 
-      {
-        /* Has no result, so in use is all of in use */
-        rInUse = ic->rMask;
-      }
-#endif
 
     deInUse = bitVectBitValue (rInUse, D_IDX) || bitVectBitValue(rInUse, E_IDX);
     bcInUse = bitVectBitValue (rInUse, B_IDX) || bitVectBitValue(rInUse, C_IDX);
@@ -2223,7 +2201,6 @@ emitCall (iCode * ic, bool ispcall)
 
       if (isLitWord (AOP (IC_LEFT (ic))))
 	{
-	  emitDebug ("; Special case where the pCall is to a constant");
 	  emit2 ("call %s", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
 	}
       else
@@ -2424,14 +2401,6 @@ genFunction (iCode * ic)
      else.
   */
   _G.receiveOffset = 0;
-
-#if 0
-  /* PENDING: hack */
-  if (!IS_STATIC (sym->etype))
-    {
-      addSetIfnotP (&publics, sym);
-    }
-#endif
 
   /* Record the last function name for debugging. */
   _G.lastFunctionName = sym->rname;
@@ -3354,49 +3323,6 @@ genCmp (operand * left, operand * right,
         }
       else
 	{
-#if 0
-          // PENDING: Doesn't work around zero
-
-	  /* Special cases:
-	     On the GB:
-	     If the left or the right is a lit:
-	     Load -lit into HL, add to right via, check sense.
-	   */
-	  if (IS_GB && size == 2 && (AOP_TYPE (right) == AOP_LIT || AOP_TYPE (left) == AOP_LIT))
-	    {
-	      PAIR_ID id = PAIR_DE;
-	      asmop *lit = AOP (right);
-	      asmop *op = AOP (left);
-	      swap_sense = TRUE;
-
-	      if (AOP_TYPE (left) == AOP_LIT)
-		{
-		  swap_sense = FALSE;
-		  lit = AOP (left);
-		  op = AOP (right);
-		}
-	      if (sign)
-		{
-		  emit2 ("ld e,%s", aopGet (op, 0, 0));
-		  emit2 ("ld a,%s", aopGet (op, 1, 0));
-		  emit2 ("xor a,!immedbyte", 0x80);
-		  emit2 ("ld d,a");
-		}
-	      else
-		{
-		  id = getPairId (op);
-		  if (id == PAIR_INVALID)
-		    {
-		      fetchPair (PAIR_DE, op);
-		      id = PAIR_DE;
-		    }
-		}
-	      spillPair (PAIR_HL);
-	      emit2 ("ld hl,%s", fetchLitSpecial (lit, TRUE, sign));
-	      emit2 ("add hl,%s", _getPairIdName (id));
-	      goto release;
-	    }
-#endif
 	  if (AOP_TYPE (right) == AOP_LIT)
 	    {
 	      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
@@ -3910,15 +3836,6 @@ genAnd (iCode * ic, iCode * ifx)
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
   aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
 
-#ifdef DEBUG_TYPE
-  emitDebug ("; Type res[%d] = l[%d]&r[%d]",
-	    AOP_TYPE (result),
-	    AOP_TYPE (left), AOP_TYPE (right));
-  emitDebug ("; Size res[%d] = l[%d]&r[%d]",
-	    AOP_SIZE (result),
-	    AOP_SIZE (left), AOP_SIZE (right));
-#endif
-
   /* if left is a literal & right is not then exchange them */
   if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
       AOP_NEEDSACC (left))
@@ -4141,15 +4058,6 @@ genOr (iCode * ic, iCode * ifx)
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
   aopOp ((result = IC_RESULT (ic)), ic, TRUE, FALSE);
-
-#if 1
-  emitDebug ("; Type res[%d] = l[%d]&r[%d]",
-	    AOP_TYPE (result),
-	    AOP_TYPE (left), AOP_TYPE (right));
-  emitDebug ("; Size res[%d] = l[%d]&r[%d]",
-	    AOP_SIZE (result),
-	    AOP_SIZE (left), AOP_SIZE (right));
-#endif
 
   /* if left is a literal & right is not then exchange them */
   if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
@@ -4734,7 +4642,7 @@ genlshTwo (operand * result, operand * left, int shCount)
 	    {
 	      movLeft2Result (left, LSB, result, MSB16, 0);
 	      aopPut (AOP (result), "!zero", 0);
-	      shiftL1Left2Result (left, MSB16, result, MSB16, shCount);
+	      shiftL1Left2Result (left, LSB, result, MSB16, shCount);
 	    }
 	  else
 	    {
@@ -4788,11 +4696,6 @@ genLeftShiftLiteral (operand * left,
   aopOp (result, ic, FALSE, FALSE);
 
   size = getSize (operandType (result));
-
-#if VIEW_SIZE
-  emitDebug ("; shift left  result %d, left %d", size,
-	    AOP_SIZE (left));
-#endif
 
   /* I suppose that the left size >= result size */
   if (shCount == 0)
@@ -4865,7 +4768,7 @@ genLeftShift (iCode * ic)
 
   /* now move the left to the result if they are not the
      same */
-#if 1
+
   if (!sameRegs (AOP (left), AOP (result)))
     {
 
@@ -4878,17 +4781,6 @@ genLeftShift (iCode * ic)
 	  offset++;
 	}
     }
-#else
-  size = AOP_SIZE (result);
-  offset = 0;
-  while (size--)
-    {
-      l = aopGet (AOP (left), offset, FALSE);
-      aopPut (AOP (result), l, offset);
-      offset++;
-    }
-#endif
-
 
   tlbl = newiTempLabel (NULL);
   size = AOP_SIZE (result);
@@ -4989,7 +4881,10 @@ shiftR1Left2Result (operand * left, int offl,
   _moveA (aopGet (AOP (left), offl, FALSE));
   if (sign)
     {
-      wassert (0);
+      while (shCount--)
+	{
+	  emit2 ("%s a", sign ? "sra" : "srl");
+	}
     }
   else
     {
@@ -5046,9 +4941,6 @@ genRightShiftLiteral (operand * left,
   aopOp (result, ic, FALSE, FALSE);
 
   size = getSize (operandType (result));
-
-  emitDebug ("; shift right  result %d, left %d", size,
-	    AOP_SIZE (left));
 
   /* I suppose that the left size >= result size */
   if (shCount == 0)
@@ -5480,14 +5372,12 @@ genAssign (iCode * ic)
   result = IC_RESULT (ic);
   right = IC_RIGHT (ic);
 
-#if 1
   /* Dont bother assigning if they are the same */
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
     {
       emitDebug ("; (operands are equal %u)", operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)));
       return;
     }
-#endif
 
   aopOp (right, ic, FALSE, FALSE);
   aopOp (result, ic, TRUE, FALSE);
@@ -5682,16 +5572,7 @@ genCast (iCode * ic)
       goto release;
     }
 
-  /* PENDING: should be OK. */
-#if 0
-  /* if the result is of type pointer */
-  if (IS_PTR (ctype))
-    {
-      wassert (0);
-    }
-#endif
-
-  /* so we now know that the size of destination is greater
+  /* So we now know that the size of destination is greater
      than the size of the source */
   /* we move to result for the size of source */
   size = AOP_SIZE (right);
@@ -5718,7 +5599,6 @@ genCast (iCode * ic)
         const char *l = aopGet (AOP (right), AOP_SIZE (right) - 1,
 			FALSE);
       _moveA (l);
-      emitDebug ("; genCast: sign extend untested.");
       emit2 ("rla ");
       emit2 ("sbc a,a");
       while (size--)
@@ -6271,13 +6151,11 @@ genZ80Code (iCode * lic)
 	  break;
 
 	case ARRAYINIT:
-	    genArrayInit(ic);
-	    break;
+          genArrayInit(ic);
+          break;
 	    
 	default:
 	  ic = ic;
-	  /*      piCode(ic,stdout); */
-
 	}
     }
 

@@ -1,3 +1,18 @@
+2001-09-08  Michael Hope  <michaelh@juju.net.nz>
+
+	* support/regression/tests/fetchoverlap.c: Added new test case.
+
+	* support/regression/tests/bp.c: Added new test case.
+
+	* support/regression/tests/bug-448984.c: Added new test case.
+
+	* support/regression/tests/pow2shifts.c: Added new test case.
+
+	* src/z80/gen.c: Turned off the noise it normally generates for the release.
+	(genlshTwo): Fixed right shift for count > 8.
+
+	* src/z80/ralloc.c: Disabled most of the ACC packing rules as they weren't getting hit and weren't at all safe.
+
 2001-09-08    <johan@FRIJA>
 
 	* src/SDCCicode.c (geniCodeCall): a CPOINTER can be used as a function

@@ -45,15 +45,18 @@
 
 #include "z80.h"
 
+/* Flags to turn off optimisations.
+ */
 enum
   {
     DISABLE_PACK_ACC = 0,
     DISABLE_PACK_ASSIGN = 0,
     DISABLE_PACK_ONE_USE = 0,
     DISABLE_PACK_HL = 0,
-    LIMITED_PACK_ACC = 1,
   };
 
+/* Flags to turn on debugging code.
+ */
 enum
   {
     D_ALLOC = 0,
@@ -2046,16 +2049,10 @@ opPreservesA (iCode * ic, iCode * uic)
 {
   if (uic->op == IFX)
     {
+      /* If we've gotten this far then the thing to compare must be
+         small enough and must be in A.
+      */
       return TRUE;
-
-      if (getSize (operandType (IC_COND (uic))) == 1 &&
-          IS_OP_LITERAL (IC_COND (uic)))
-        {
-          return TRUE;
-        }
-
-      D (D_ACCUSE2, ("  + Dropping as operation is an IFX\n"));
-      return FALSE;
     }
 
   if (uic->op == JUMPTABLE)
@@ -2086,50 +2083,10 @@ opPreservesA (iCode * ic, iCode * uic)
       return FALSE;
     }
 
-  /*
-     Bad:
-     !IS_ARITHMETIC_OP(uic) (sub requires A)
+
+  /* Disabled all of the old rules as they weren't verified and have
+     caused at least one problem.
    */
-  if (
-       uic->op != '+' &&
-       !IS_BITWISE_OP (uic) &&
-       uic->op != '=' &&
-       uic->op != EQ_OP &&
-       !POINTER_GET (uic) &&
-  /*
-     uic->op != LEFT_OP &&
-     uic->op != RIGHT_OP && */
-       1
-    )
-    {
-      D (D_ACCUSE2, ("  + Dropping as 'its a bad op'\n"));
-      return FALSE;
-    }
-
-  /* PENDING */
-  if (!IC_LEFT (uic) || !IC_RESULT (ic))
-    {
-      D (D_ACCUSE2, ("  + Dropping for some reason #1\n"));
-      return FALSE;
-    }
-
-/** This is confusing :)  Guess for now */
-  if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
-      (IS_ITEMP (IC_RIGHT (uic)) ||
-       (IS_TRUE_SYMOP (IC_RIGHT (uic)))))
-    {
-      return TRUE;
-    }
-
-  if (IC_RIGHT (uic)->key == IC_RESULT (ic)->key &&
-      (IS_ITEMP (IC_LEFT (uic)) ||
-       (IS_TRUE_SYMOP (IC_LEFT (uic)))))
-    {
-      return TRUE;
-    }
-
-  D (D_ACCUSE2, ("  + Dropping as hit default case\n"));
-
   return FALSE;
 }
 
@@ -2243,21 +2200,6 @@ packRegsForAccUse2 (iCode * ic)
       D (D_ACCUSE2, ("  + Dropping as it's a big + or -\n"));
       return;
     }
-
-  /* if shift operation make sure right side is not a literal.
-     MLH: depends.
-   */
-#if 0
-  if (ic->op == RIGHT_OP &&
-      (isOperandLiteral (IC_RIGHT (ic)) ||
-       getSize (operandType (IC_RESULT (ic))) > 1))
-    return;
-
-  if (ic->op == LEFT_OP &&
-      (isOperandLiteral (IC_RIGHT (ic)) ||
-       getSize (operandType (IC_RESULT (ic))) > 1))
-    return;
-#endif
 
   /* has only one definition */
   if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)

@@ -1,7 +1,7 @@
 # Simple Makefile for dhrystone and sdcc
 TOPDIR = ../../..
 
-PROC = gbz80
+PROC = z80
 
 CC = $(TOPDIR)/bin/sdcc
 
@@ -27,4 +27,4 @@ native:
 	gcc -g -O2 -DREG= -DNOSTRUCTASSIGN -DNOENUM -o dhry dhry.c
 
 clean:
-	rm -f *~ dhry *.o *.gb *.ihx *.rel
+	rm -f *~ dhry *.o *.gb *.ihx *.rel *.dump* *.lst *.sym *.map *.asm *.bin *.gb

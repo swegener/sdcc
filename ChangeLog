@@ -1,3 +1,25 @@
+2001-11-07  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* sdcc/sim/ucsim/s51.src/glob.cc: Minor fix.
+
+	* sdcc/sim/ucsim/s51.src/regs51.h: Minor fix.
+
+	* sdcc/support/regression/Makefile: Add port ds390.
+
+	* sdcc/support/regression/ports/mcs51/spec.mk: Minor change.
+
+	* sdcc/support/regression/ports/z80/spec.mk: Minor change.
+
+	* sdcc/support/regression/ports/ds390/spec.mk: Added.
+
+	* sdcc/support/regression/ports/ds390/support.c: Added.
+
+	* sdcc/support/regression/ports/ds390/uCsim.cmd: Added.
+
+	* sdcc/support/regression/ports/mcs51/timeout.c: Cut.
+
+	* sdcc/support/regression/fwk/lib/timeout.c: Paste.
+
 2001-11-04  Michael Hope  <michaelh@juju.net.nz>
 
 	* device/include/malloc.h: Added z80 and gbz80 support.

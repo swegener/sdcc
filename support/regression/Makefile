@@ -61,10 +61,10 @@ GENERATE_CASES = generate-cases.py
 # The port name must be the same as the one used in the SDCC '-mxxx' argument.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out CVS mcs51 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out CVS mcs51 ds390 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
-CLEAN_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))                                                                 
+CLEAN_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 all: test-ports
 
@@ -84,7 +84,11 @@ test-gbz80:
 test-mcs51:
 	$(MAKE) inter-port-clean test-port PORT=mcs51
 
-# Helper rule for testing the host cc only
+	# Helper rule for testing the ds390 port only
+test-ds390:
+	$(MAKE) inter-port-clean test-port PORT=ds390
+
+### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) inter-port-clean test-port PORT=host
 
@@ -115,7 +119,7 @@ OBJEXT = .o
 # Extension of files that can be run in the emulator
 EXEEXT = .bin
 # Currently unused.  Extension to append to intermediate directories.
-DIREXT = 
+DIREXT =
 
 # Only include if we're in a per-port call.
 ifdef PORT
@@ -183,9 +187,9 @@ $(RESULTS): $(SUB_RESULTS)
 # BeginGeneric rules
 
 clean: inter-port-clean
-	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
+	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc fwk/lib/timeout fwk/lib/timeout.exe
 	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORT=$$i; done
 
 inter-port-clean:
 	rm -f  fwk/lib/*.o fwk/lib/*.asm fwk/lib/*.rst fwk/lib/*.lst fwk/lib/*.rel \
-               fwk/lib/*.ihx fwk/lib/*.map fwk/lib/*.sym                                                                                 
+               fwk/lib/*.ihx fwk/lib/*.map fwk/lib/*.sym

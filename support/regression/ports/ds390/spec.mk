@@ -1,11 +1,9 @@
-# Port specification for the mcs51 port running with uCsim
-#
-# model small
+# Port specification for the ds390 port running with uCsim
 
 # path to uCsim
 S51 = ../../sim/ucsim/s51.src/s51
 
-SDCCFLAGS +=--lesspedantic -DREENTRANT=reentrant --stack-after-data
+SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant --stack-after-data
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -24,8 +22,8 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 # run simulator with 5 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
-	-fwk/lib/timeout 6 $(S51) -t32 -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/mcs51/uCsim.cmd >/dev/null \
-	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:.ihx=.c)"\n"--- Summary: 1/1/1: timeout >> $@
+	-fwk/lib/timeout 5 $(S51) -tds390f -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd >/dev/null || \
+          echo -e --- FAIL: \"timeout, simulation killed\" in $(<:.ihx=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
 
 fwk/lib/timeout: fwk/lib/timeout.c

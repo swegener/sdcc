@@ -29,6 +29,7 @@
 # define NULL (void *)0
 #endif
 
+extern float atof (char *);
 extern int atoi (char *);
 extern long atol (char *);
 

@@ -1015,6 +1015,7 @@ pointer
 		 default:
 		   // this could be just "constant" 
 		   // werror(W_PTR_TYPE_INVALID);
+		     ;
 		 }
 	     }
 	     else 
@@ -1171,6 +1172,7 @@ abstract_declarator2
        $1->next=p;
      }
    }
+   ;
 
 initializer
    : assignment_expr                { $$ = newiList(INIT_NODE,$1); }
@@ -1312,6 +1314,7 @@ while : WHILE  {  /* create and push the continue , break & body labels */
 		  sprintf (lbuff,"_whilebody_%d",Lblnum++);
 		  $$ = newSymbol(lbuff,NestLevel);
                }
+   ;
 
 do : DO {  /* create and push the continue , break & body Labels */
            static int Lblnum = 0 ;
@@ -1326,6 +1329,8 @@ do : DO {  /* create and push the continue , break & body Labels */
 	   sprintf (lbuff,"_dobody_%d",Lblnum++);
 	   $$ = newSymbol (lbuff,NestLevel);	   
         }
+   ;
+
 for : FOR { /* create & push continue, break & body labels */
             static int Lblnum = 0 ;
          
@@ -1342,6 +1347,7 @@ for : FOR { /* create & push continue, break & body labels */
 	    sprintf (lbuff,"_forcond_%d",Lblnum++);
 	    STACK_PUSH(forStack,newSymbol(lbuff,NestLevel));
           }
+   ;
 
 iteration_statement  
    : while '(' expr ')'  statement 

@@ -27,6 +27,21 @@
 #include <stdlib.h>
 #include "aslink.h"
 
+#ifdef	OTHERSYSTEM
+#ifdef SDK
+#ifdef UNIX
+    #define LKDIRSEP '/'
+    #define LKDIRSEPSTR "/"
+#else /* UNIX */
+	#define LKDIRSEP '\\'
+	#define LKDIRSEPSTR "\\"
+#endif /* UNIX */
+#else /* SDK */
+	#define LKDIRSEP '\\'
+	#define LKDIRSEPSTR "\\"
+#endif /* SDK */
+#endif
+
 #ifdef __CYGWIN__
 void ToCygWin(char * filspc)
 {
@@ -140,6 +155,7 @@ addpath()
  *	global variables:
  *		lbpath	*lbphead	The pointer to the first
  *				 	path structure
+ *      ip a pointer to the library name
  *
  *	 functions called:
  *		VOID	addfile()	lklibr.c
@@ -155,6 +171,7 @@ VOID
 addlib()
 {
 	struct lbpath *lbph;
+    int foundcount=0;
 
 	unget(getnb());
 
@@ -163,11 +180,15 @@ addlib()
 		return;
 	}	
 	for (lbph=lbphead; lbph; lbph=lbph->next) {
-		addfile(lbph->path,ip);
+		foundcount+=addfile(lbph->path,ip);
 	}
+    if(foundcount==0)
+    {
+        printf("?ASlink-Warning-Couldn't find library '%s'\n", ip);
+    }
 }
 
-/*)Function	VOID	addfile(path,libfil)
+/*)Function	int	addfile(path,libfil)
  *
  *		char	*path		library path specification
  *		char	*libfil		library file specification
@@ -199,72 +220,108 @@ addlib()
  *
  *	side effects:
  *		An lbname structure may be created.
+ *
+ *  return:
+ *      1: the library was found
+ *      0: the library was not found
  */
 
-VOID
-addfile(path,libfil)
-char *path;
-char *libfil;
+int addfile(char * path, char * libfil)
 {
 	FILE *fp;
 	char *str;
 	struct lbname *lbnh, *lbn;
+    int libfilinc=0;
 
-	if ((path != NULL) && (strchr(libfil,':') == NULL)){
+	if (path != NULL)
+    {
 		str = (char *) new (strlen(path) + strlen(libfil) + 6);
-		strcpy(str,path);
-#ifdef	OTHERSYSTEM
-#ifdef SDK
-#ifdef UNIX
-		if (str[strlen(str)-1] != '/') {
-			strcat(str,"/");
-#else /* UNIX */
-		if (str[strlen(str)-1] != '\\') {
-			strcat(str,"\\");
-#endif /* UNIX */
-#else /* SDK */
-		if (str[strlen(str)-1] != '\\') {
-			strcat(str,"\\");
-#endif /* SDK */
+		strcpy(str, path);
+
+        if (str[strlen(str)-1] != LKDIRSEP)
+        {
+			strcat(str, LKDIRSEPSTR);
 		}
-#endif
-	} else {
+	}
+    else
+    {
 		str = (char *) new (strlen(libfil) + 5);
 	}
-#ifdef	OTHERSYSTEM
-#ifdef SDK
-#ifdef UNIX
-	if (libfil[0] == '/') { libfil++; }
-#else /* UNIX */
-	if (libfil[0] == '\\') { libfil++; }
-#endif /* UNIX */
-#else /* SDK */
-	if (libfil[0] == '\\') { libfil++; }
-#endif /* SDK */
-#endif
-	strcat(str,libfil);
-	if(strchr(libfil,FSEPX) == NULL) {
+
+	if (libfil[0] == LKDIRSEP)
+    {
+        libfil++;
+        libfilinc=1;
+    }
+	
+    strcat(str, libfil);
+
+	if(strchr(libfil, FSEPX) == NULL)
+    {
 		sprintf(&str[strlen(str)], "%clib", FSEPX);
 	}
-	if ((fp = fopen(str, "r")) != NULL) {
+
+    fp=fopen(str, "r");
+    if(fp == NULL)
+    {
+        /*Ok, that didn't work.  Try with the 'libfil' name only*/
+        if(libfilinc) libfil--;
+        fp=fopen(libfil, "r");
+        if(fp != NULL) 
+        {
+            /*Bingo!  'libfil' is the absolute path of the library*/
+            strcpy(str, libfil);
+            path=NULL;/*This way 'libfil' and 'path' will be rebuilt from 'str'*/
+        }
+    }
+
+    if(path==NULL)
+    {
+        /*'path' can not be null since it is needed to find the '.o' files associated with
+        the library.  So, get 'path' from 'str' and then chop it off and recreate 'libfil'.
+        That way putting 'path' and 'libfil' together will result into the original filepath
+        as contained in 'str'.*/
+        int j;
+        path = (char *) new (strlen(str));
+        strcpy(path, str);
+        for(j=strlen(path)-1; j>=0; j--)
+        {
+            if((path[j]=='\\')||(path[j]=='/'))
+            {
+                strcpy(libfil, &path[j+1]);
+                path[j+1]=0;
+                break;
+            }
+        }
+        if(j<=0) path[0]=0;
+    }
+
+	if (fp != NULL)
+    {
 		fclose(fp);
 		lbnh = (struct lbname *) new (sizeof(struct lbname));
-		if (lbnhead == NULL) {
+		if (lbnhead == NULL)
+        {
 			lbnhead = lbnh;
-		} else {
+		}
+        else
+        {
 			lbn = lbnhead;
 			while (lbn->next)
 				lbn = lbn->next;
 			lbn->next = lbnh;
 		}
-		if ((path != NULL) && (strchr(libfil,':') == NULL)){
-			lbnh->path = path;
-		}
+
+		lbnh->path = path;
 		lbnh->libfil = (char *) new (strlen(libfil) + 1);
-		strcpy(lbnh->libfil,libfil);
+		strcpy(lbnh->libfil, libfil);
 		lbnh->libspc = str;
-	} else {
+        return 1;
+	}
+    else
+    {
 		free(str);
+        return 0;
 	}
 }
 

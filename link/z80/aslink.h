@@ -711,7 +711,7 @@ extern	VOID		erpdmp();
 extern	VOID		prntval();
 
 /* lklibr.c */
-extern	VOID		addfile();
+extern	int		addfile();
 extern	VOID		addlib();
 extern	VOID		addpath();
 extern	int		fndsym();

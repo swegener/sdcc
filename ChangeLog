@@ -1,3 +1,8 @@
+2003-07-28  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    *link/z80/aslink.h, link/z80/lklibr.c, as/mcs51/aslink.h,
+    as/mcs51/lklibr.c: Generate a warning when a library is not found.
+
 2003-07-28  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/z80/mappings.i: fix _mul[us][int,long] entries

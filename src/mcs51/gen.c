@@ -4317,6 +4317,8 @@ hasInc (operand *op, iCode *ic)
     if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
       return NULL;
     }
+    /* if GOTO or IFX */
+    if (lic->op == IFX || lic->op == GOTO) break;
     lic = lic->next;
   }
   return NULL;

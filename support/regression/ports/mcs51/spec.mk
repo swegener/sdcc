@@ -30,6 +30,6 @@ ports/$(PORT)/timeout: ports/$(PORT)/timeout.c
 	gcc -o $@ $<
 
 _clean:
-	rm -f ports/$(PORT)/timeout ports/$(PORT)/*.rel ports/$(PORT)/*.rst ports/$(PORT)/*.lst \
-	   ports/$(PORT)/*.sym ports/$(PORT)/*.asm temp.lnk
+	rm -f ports/$(PORT)/timeout ports/$(PORT)/timeout.exe ports/$(PORT)/*.rel ports/$(PORT)/*.rst \
+	      ports/$(PORT)/*.lst ports/$(PORT)/*.sym ports/$(PORT)/*.asm temp.lnk
 

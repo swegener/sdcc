@@ -1787,15 +1787,16 @@ setDataPaths(const char *argv0)
     SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR, p);
     p = buf;
   }
-  else {
 #ifdef _WIN32
+  else {
     /* this should never happen... */
     wassertl(0, "Can't get binary path");
     p = ".";
-#else /* *nix paltform */
+  }
+#else
+  if (!pathExists(p))
     p = DATADIR; /* last resort */
 #endif
-  }
 
   if (options.printSearchDirs)
     printf("datadir: %s\n", p);
@@ -1931,16 +1932,13 @@ main (int argc, char **argv, char **envp)
   setBinPaths(argv[0]);
   setDataPaths(argv[0]);
 
-  /* if print search dirs then exit */
-  if (options.printSearchDirs)
-    exit(0);
-
   /* if no input then printUsage & exit */
-  if (!options.c1mode && !fullSrcFileName && !nrelFiles)
-    {
-      printUsage ();
-      exit (0);
-    }
+  if (!options.c1mode && !fullSrcFileName && !nrelFiles) {
+    if (!options.printSearchDirs)
+      printUsage();
+
+    exit(0);
+  }
 
   /* initMem() is expensive, but
      initMem() must called before port->finaliseOptions ().

@@ -887,10 +887,10 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 			      iCode *newic = newiCode ('=', NULL,
 					operandFromOperand (IC_RIGHT (ic)));
 			      IC_RESULT (newic) = operandFromOperand (IC_RESULT (ic));
-			      OP_DEFS (IC_RESULT (newic)) =
-				bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
-			      OP_USES (IC_RIGHT (newic)) =
-				bitVectSetBit (OP_USES (IC_RIGHT (newic)), newic->key);
+			      OP_DEFS_SET ((IC_RESULT (newic)),
+				bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key));
+			      OP_USES_SET ((IC_RIGHT (newic)),
+				bitVectSetBit (OP_USES (IC_RIGHT (newic)), newic->key));
 			      /* and add it */
 			      if (eblock->sch && eblock->sch->op == LABEL)
 				addiCodeToeBBlock (eblock, newic, eblock->sch->next);

@@ -276,8 +276,15 @@ iCodeTable;
 #define SET_RESULT_RIGHT(ic) {SET_ISADDR(IC_RIGHT(ic),0); SET_ISADDR(IC_RESULT(ic),0);}
 #define IS_ASSIGN_ICODE(ic) (ASSIGNMENT(ic) && !POINTER_SET(ic))
 
-#define OP_DEFS(op) op->operand.symOperand->defs
-#define OP_USES(op) op->operand.symOperand->uses
+#if 0 // this causes too much, extremely difficult to find, bugs
+  #define OP_DEFS(op) op->operand.symOperand->defs
+  #define OP_USES(op) op->operand.symOperand->uses
+#else
+  struct bitVect *OP_DEFS(struct operand *);
+  struct bitVect *OP_DEFS_SET(struct operand *, struct bitVect *);
+  struct bitVect *OP_USES(struct operand *);
+  struct bitVect *OP_USES_SET(struct operand *, struct bitVect *);
+#endif
 /*-----------------------------------------------------------------*/
 /* forward references for functions                                */
 /*-----------------------------------------------------------------*/

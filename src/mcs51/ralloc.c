@@ -1854,7 +1854,7 @@ pack:
   remiCodeFromeBBlock (ebp, ic);
   bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
   hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
-  OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
+  OP_DEFS_SET ((IC_RESULT (dic)), bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key));
   return 1;
 
 }
@@ -2678,7 +2678,7 @@ packRegisters (eBBlock * ebp)
 		      remiCodeFromeBBlock (ebp, ic);
 		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
 		      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
-		      OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
+		      OP_DEFS_SET ((IC_RESULT (dic)), bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key));
 		      ic = ic->prev;
 		    }
 		  else
@@ -2701,7 +2701,7 @@ packRegisters (eBBlock * ebp)
 		      remiCodeFromeBBlock (ebp, ic);
 		      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
 		      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
-		      OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
+		      OP_DEFS_SET ((IC_RESULT (dic)), bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key));
 		      ic = ic->prev;
 		    }
 		}

@@ -102,7 +102,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 	    {
 
 	      bitVectUnSetBit (OP_USES (from), lic->key);
-	      OP_USES (to) = bitVectSetBit (OP_USES (to), lic->key);
+	      OP_USES_SET ((to), bitVectSetBit (OP_USES (to), lic->key));
 	      siaddr = IC_COND (lic)->isaddr;
 	      IC_COND (lic) = operandFromOperand (to);
 	      IC_COND (lic)->isaddr = siaddr;
@@ -118,7 +118,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 	    {
 
 	      bitVectUnSetBit (OP_USES (from), lic->key);
-	      OP_USES (to) = bitVectSetBit (OP_USES (to), lic->key);
+	      OP_USES_SET ((to), bitVectSetBit (OP_USES (to), lic->key));
 	      siaddr = IC_COND (lic)->isaddr;
 	      IC_JTCOND (lic) = operandFromOperand (to);
 	      IC_JTCOND (lic)->isaddr = siaddr;
@@ -133,7 +133,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 	  if (POINTER_SET (lic))
 	    {
 	      bitVectUnSetBit (OP_USES (from), lic->key);
-	      OP_USES (to) = bitVectSetBit (OP_USES (to), lic->key);
+	      OP_USES_SET ((to), bitVectSetBit (OP_USES (to), lic->key));
 
 	      /* also check if the "from" was in the non-dominating
 	         pointer sets and replace it with "to" in the bitVector */
@@ -147,7 +147,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 	  else
 	    {
 	      bitVectUnSetBit (OP_DEFS (from), lic->key);
-	      OP_DEFS (to) = bitVectSetBit (OP_DEFS (to), lic->key);
+	      OP_DEFS_SET ((to), bitVectSetBit (OP_DEFS (to), lic->key));
 	    }
 	  siaddr = IC_RESULT (lic)->isaddr;
 	  IC_RESULT (lic) = operandFromOperand (to);
@@ -158,7 +158,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 	  IC_RIGHT (lic) && IC_RIGHT (lic)->key == from->key)
 	{
 	  bitVectUnSetBit (OP_USES (from), lic->key);
-	  OP_USES (to) = bitVectSetBit (OP_USES (to), lic->key);
+	  OP_USES_SET ((to), bitVectSetBit (OP_USES (to), lic->key));
 	  siaddr = IC_RIGHT (lic)->isaddr;
 	  IC_RIGHT (lic) = operandFromOperand (to);
 	  IC_RIGHT (lic)->isaddr = siaddr;
@@ -168,7 +168,7 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 	  IC_LEFT (lic) && IC_LEFT (lic)->key == from->key)
 	{
 	  bitVectUnSetBit (OP_USES (from), lic->key);
-	  OP_USES (to) = bitVectSetBit (OP_USES (to), lic->key);
+	  OP_USES_SET ((to), bitVectSetBit (OP_USES (to), lic->key));
 	  siaddr = IC_LEFT (lic)->isaddr;
 	  IC_LEFT (lic) = operandFromOperand (to);
 	  IC_LEFT (lic)->isaddr = siaddr;
@@ -1081,7 +1081,7 @@ ifxOptimize (iCode * ic, set * cseSet,
 
 
   /* if it remains an IFX the update the use Set */
-  OP_USES (IC_COND (ic)) = bitVectSetBit (OP_USES (IC_COND (ic)), ic->key);
+  OP_USES_SET ((IC_COND (ic)), bitVectSetBit (OP_USES (IC_COND (ic)), ic->key));
   setUsesDefs (IC_COND (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
   return;
 }
@@ -1399,8 +1399,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       if (ic->op == PCALL || ic->op == CALL || ic->op == RECEIVE)
 	{
 	  /* add to defSet of the symbol */
-	  OP_DEFS (IC_RESULT (ic)) =
-	    bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+	  OP_DEFS_SET ((IC_RESULT (ic)),
+	    bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key));
 	  /* add to the definition set of this block */
 	  ebb->defSet = bitVectSetBit (ebb->defSet, ic->key);
 	  ebb->ldefs = bitVectSetBit (ebb->ldefs, ic->key);
@@ -1438,8 +1438,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  /* the lookup could have changed it */
 	  if (IS_SYMOP (IC_LEFT (ic)))
 	    {
-	      OP_USES (IC_LEFT (ic)) =
-		bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+	      OP_USES_SET ((IC_LEFT (ic)),
+		bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key));
 	      setUsesDefs (IC_LEFT (ic), ebb->defSet,
 			   ebb->outDefs, &ebb->usesDefs);
 	    }
@@ -1463,8 +1463,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* if jumptable then mark the usage */
       if (ic->op == JUMPTABLE)
 	{
-	  OP_USES (IC_JTCOND (ic)) =
-	    bitVectSetBit (OP_USES (IC_JTCOND (ic)), ic->key);
+	  OP_USES_SET ((IC_JTCOND (ic)),
+	    bitVectSetBit (OP_USES (IC_JTCOND (ic)), ic->key));
 	  setUsesDefs (IC_JTCOND (ic), ebb->defSet,
 		       ebb->outDefs, &ebb->usesDefs);
 	  continue;
@@ -1684,16 +1684,16 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* add the left & right to the defUse set */
       if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)))
 	{
-	  OP_USES (IC_LEFT (ic)) =
-	    bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+	  OP_USES_SET ((IC_LEFT (ic)),
+	    bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key));
 	  setUsesDefs (IC_LEFT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
 
 	}
 
       if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)))
 	{
-	  OP_USES (IC_RIGHT (ic)) =
-	    bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+	  OP_USES_SET ((IC_RIGHT (ic)),
+	    bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key));
 	  setUsesDefs (IC_RIGHT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
 
 	}
@@ -1702,8 +1702,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       /* in the defuseSet if it a pointer or array access  */
       if (POINTER_SET (defic))
 	{
-	  OP_USES (IC_RESULT (ic)) =
-	    bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+	  OP_USES_SET ((IC_RESULT (ic)),
+	    bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key));
 	  setUsesDefs (IC_RESULT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
 	  deleteItemIf (&cseSet, ifPointerGet, IC_RESULT (ic));
 	  ebb->ptrsSet = bitVectSetBit (ebb->ptrsSet, IC_RESULT (ic)->key);
@@ -1721,8 +1721,8 @@ cseBBlock (eBBlock * ebb, int computeOnly,
       else
 	/* add the result to defintion set */ if (IC_RESULT (ic))
 	{
-	  OP_DEFS (IC_RESULT (ic)) =
-	    bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+	  OP_DEFS_SET ((IC_RESULT (ic)),
+	    bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key));
 	  ebb->defSet = bitVectSetBit (ebb->defSet, ic->key);
 	  ebb->outDefs = bitVectCplAnd (ebb->outDefs, OP_DEFS (IC_RESULT (ic)));
 	  ebb->ldefs = bitVectSetBit (ebb->ldefs, ic->key);

@@ -562,7 +562,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 	    {
 	      bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
 	      IC_COND (ic) = operandFromOperand (dest);
-	      OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
+	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
 	      continue;
 	    }
 
@@ -571,7 +571,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 	      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
 	      IC_RIGHT (ic) = operandFromOperand (dest);
 	      IC_RIGHT (ic)->isaddr = 0;
-	      OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
+	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
 	    }
 
 	  if (isOperandEqual (IC_LEFT (ic), src))
@@ -587,7 +587,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 		  IC_LEFT (ic) = operandFromOperand (dest);
 		  IC_LEFT (ic)->isaddr = 0;
 		}
-	      OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
+	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
 	    }
 
 	  /* special case for pointer sets */
@@ -597,7 +597,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 	      bitVectUnSetBit (OP_USES (IC_RESULT (ic)), ic->key);
 	      IC_RESULT (ic) = operandFromOperand (dest);
 	      IC_RESULT (ic)->isaddr = 1;
-	      OP_USES (dest) = bitVectSetBit (OP_USES (dest), ic->key);
+	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
 	    }
 	}
     }

@@ -458,6 +458,14 @@ static int _yylex(void)
 	    *p++ = c;
 	    c = GETC();
 	}
+	if (c == 'U' || c == 'u' || c == 'L' || c == 'l') {
+	    *p++ = c;
+	    c = GETC();
+	}
+	if (c == 'U' || c == 'u' || c == 'L' || c == 'l') {
+	    *p++ = c;
+	    c = GETC();
+	}
 	*p = '\0';
 	UNGETC(c);
 	yylval.val = constVal(line);

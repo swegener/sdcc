@@ -107,6 +107,10 @@ typedef struct {
 	    mul/div operation the processor can do nativley 
 	    Eg if the processor has an 8 bit mul, nativebelow is 2 */
 	int native_below;
+	/** The mul/div/mod functions will be made to use regparams
+	    for sizeof(param) < log2(force_reg)
+	    i.e. Use 2 for WORD and BYTE, 0 for none. */
+	int force_reg_param_below;
     } muldiv;
 
     /** Prefix to add to a C function (eg "_") */

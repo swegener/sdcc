@@ -183,7 +183,7 @@ PORT avr_port = {
     },
     /* avr has an 8 bit mul */
     {
-	1
+	1, 0
     },
     "_",
     _avr_init,

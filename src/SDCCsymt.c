@@ -23,8 +23,6 @@
 
 #include "common.h"
 
-#define ENABLE_MICHAELH_REGPARM_HACK	0
-
 bucket   *SymbolTab [256]  ;  /* the symbol    table  */
 bucket   *StructTab [256]  ;  /* the structure table  */
 bucket   *TypedefTab[256]  ;  /* the typedef   table  */
@@ -1429,20 +1427,6 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 	    (*port->reg_parm)(val->type)) {
 	    SPEC_REGPARM(val->etype) = 1;
 	}
-
-#if ENABLE_MICHAELH_REGPARM_HACK
-	/* HACK: pull out later */
-	if (
-	    (
-	     !strcmp(func->name, "memcpy") ||
-	     !strcmp(func->name, "strcpy") ||
-	     !strcmp(func->name, "strcmp") ||
-	     0
-	     ) &&
-	    port->reg_parm(val->type)) {
-	    SPEC_REGPARM(val->etype) = 1;
-	}
-#endif						
 	
 	if ( IS_AGGREGATE(val->type)) {
 	    /* if this is a structure */
@@ -1896,7 +1880,6 @@ symbol *__conv[2][3][2];
 
 link *floatType;
 
-#if ENABLE_MICHAELH_REGPARM_HACK
 static void _makeRegParam(symbol *sym)
 {
     value *val ;
@@ -1911,7 +1894,6 @@ static void _makeRegParam(symbol *sym)
 	val = val->next ;
     }
 }
-#endif
 
 /*-----------------------------------------------------------------*/ 
 /* initCSupport - create functions for C support routines          */
@@ -1987,10 +1969,8 @@ void initCSupport ()
 			sbwd[bwd]);
 		__muldiv[muldivmod][bwd][su] = funcOfType(buffer, __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
 		SPEC_NONBANKED(__muldiv[muldivmod][bwd][su]->etype) = 1;
-#if ENABLE_MICHAELH_REGPARM_HACK
-		if (bwd < 2) 
+		if (bwd < port->muldiv.force_reg_param_below) 
 		    _makeRegParam(__muldiv[muldivmod][bwd][su]);
-#endif
 	    }
 	}
     }

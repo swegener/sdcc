@@ -17,6 +17,7 @@
   Better reg packing, first peephole		20038	163	1873
   With assign packing				19281	165	1849
   5/3/00					17741	185	17B6
+  With reg params for mul and div		16234	202	162D
 
   Michael Hope <michaelh@earthling.net>	2000
   Based on the mcs51 generator - 
@@ -1035,7 +1036,9 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	    tsprintf(s, "!*hl");
 	}
 	else {
-	    tsprintf(s,"!*ixx", aop->aopu.aop_stk+offset);
+	    if (aop->aopu.aop_stk >= 0)
+		offset += _G.stack.param_offset;
+	    tsprintf(s,"!*ixx ; x", aop->aopu.aop_stk+offset);
 	}
 	ALLOC_ATOMIC(rs,strlen(s)+1);
 	strcpy(rs,s);   
@@ -1171,6 +1174,8 @@ static void aopPut (asmop *aop, const char *s, int offset)
 		emit2("ld !*hl,%s", s);
 	}
 	else {
+	    if (aop->aopu.aop_stk >= 0)
+		offset += _G.stack.param_offset;
 	    if (!canAssignToPtr(s)) {
 		emit2("ld a,%s", s);
 		emit2("ld !*ixx,a", aop->aopu.aop_stk+offset);
@@ -2625,7 +2630,7 @@ static void genIfxJump (iCode *ic, char *jval)
     ic->generated = 1;
 }
 
-const char *getPairIdName(PAIR_ID id)
+static const char *_getPairIdName(PAIR_ID id)
 {
     return _pairs[id].name;
 }
@@ -2668,9 +2673,11 @@ static void genCmp (operand *left,operand *right,
 		  	Load -lit into HL, add to right via, check sense.
 	    */
 	    if (size == 2 && (AOP_TYPE(right) == AOP_LIT || AOP_TYPE(left) == AOP_LIT)) {
+		PAIR_ID id = PAIR_DE;
 		asmop *lit = AOP(right);
 		asmop *op = AOP(left);
 		swap_sense = TRUE;
+
 		if (AOP_TYPE(left) == AOP_LIT) {
 		    swap_sense = FALSE;
 		    lit = AOP(left);
@@ -2682,8 +2689,16 @@ static void genCmp (operand *left,operand *right,
 		    emit2("xor a,!immedbyte", 0x80);
 		    emit2("ld d,a");
 		}
+		else {
+		    id = getPairId(op);
+		    if (id == PAIR_INVALID) {
+			fetchPair(PAIR_DE, op);
+			id = PAIR_DE;
+		    }
+		}
+		spillPair(PAIR_HL);
 		emit2("ld hl,%s", fetchLitSpecial(lit, TRUE, sign));
-		emit2("add hl,de");
+		emit2("add hl,%s", _getPairIdName(id));
 		goto release;
 	    }
             if(AOP_TYPE(right) == AOP_LIT) {
@@ -4404,7 +4419,10 @@ static void genAddrOf (iCode *ic)
 	spillCached();
 	if (sym->onStack) {
 	    /* if it has an offset  then we need to compute it */
-	    emitcode("ld", "hl,#%d+%d+%d", sym->stack, _G.stack.pushed, _G.stack.offset);
+	    if (sym->stack > 0) 
+		emitcode("ld", "hl,#%d+%d+%d+%d", sym->stack, _G.stack.pushed, _G.stack.offset, _G.stack.param_offset);
+	    else
+		emitcode("ld", "hl,#%d+%d+%d", sym->stack, _G.stack.pushed, _G.stack.offset);
 	    emitcode("add", "hl,sp");
 	}
 	else {

@@ -1,3 +1,7 @@
+2003-08-03  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCast.c (constExprTree): fix bug #781827 by Carl Worth <cworth@isi.edu>
+
 2003-08-01  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* support\librarian\clean.mk: Do not remove Makefile.

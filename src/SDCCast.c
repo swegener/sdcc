@@ -1279,11 +1279,12 @@ bool constExprTree (ast *cexpr) {
       if (constExprTree(cexpr->left) && constExprTree(cexpr->right)) {
 	return TRUE;
       }
+      return FALSE;
     case EX_OPERAND:
       return IS_CONSTANT(operandType(cexpr->opval.oprnd));
     }
   return FALSE;
-}  
+}
     
 /*-----------------------------------------------------------------*/
 /* constExprValue - returns the value of a constant expression     */

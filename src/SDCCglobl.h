@@ -284,6 +284,7 @@ extern int currBlockno;		/* sequentail block number */
 extern struct optimize optimize;
 extern struct options options;
 extern unsigned maxInterrupts;
+extern int ignoreTypedefType;
 
 /* Visible from SDCCmain.c */
 extern set *preArgvSet;

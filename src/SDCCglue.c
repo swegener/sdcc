@@ -333,7 +333,7 @@ initPointer (initList * ilist, sym_link *toType)
 	if (IS_AST_OP(expr) && expr->opval.op==CAST &&
 	    IS_AST_OP(expr->right) && expr->right->opval.op=='&') {
 	  if (compareType(toType, expr->left->ftype)!=1) {
-	    werror (W_INIT_WRONG);
+	    werror (E_INIT_WRONG);
 	    printFromToType(expr->left->ftype, toType);
 	  }
 	  // skip the cast ???
@@ -427,7 +427,7 @@ initPointer (initList * ilist, sym_link *toType)
 		return val;
 	}
  wrong:
-	werror (W_INIT_WRONG);
+	werror (E_INIT_WRONG);
 	return NULL;
 
 }
@@ -737,7 +737,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   /* by a string                      */
   if (IS_CHAR (type->next)) {
     if (!IS_LITERAL(list2val(ilist)->etype)) {
-      werror (W_INIT_WRONG);
+      werror (E_CONST_EXPECTED);
       return;
     }
     if (printIvalChar (type,
@@ -971,7 +971,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 
   /* check the type      */
   if (compareType (type, val->type) == 0) {
-    werror (W_INIT_WRONG);
+    werror (E_INIT_WRONG);
     printFromToType (val->type, type);
   }
 

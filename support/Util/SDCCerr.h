@@ -33,7 +33,7 @@ SDCCERR - SDCC Standard error handler
 #define  W_INIT_IGNORED    15        /* initialiser ignored  */
 #define  E_AUTO_ASSUMED    16        /* sclass auto assumed  */
 #define  E_AUTO_ABSA       17        /* abs addr for auto var*/
-#define  W_INIT_WRONG      18        /* initializer type !=  */
+#define  E_INIT_WRONG      18        /* initializer type !=  */
 #define  E_FUNC_REDEF      19        /* func name redefined  */
 #define  E_ID_UNDEF        20        /* identifer undefined  */
 #define  W_STACK_OVERFLOW  21        /* stack overflow       */

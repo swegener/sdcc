@@ -1468,7 +1468,7 @@ getNelements (sym_link * type, initList * ilist)
       value *v = (iast->type == EX_VALUE ? iast->opval.val : NULL);
       if (!v)
 	{
-	  werror (W_INIT_WRONG);
+	  werror (E_CONST_EXPECTED);
 	  return 0;
 	}
 

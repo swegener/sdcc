@@ -13,6 +13,7 @@ clean:
 	make -C ds390 clean
 	make -C z80 clean
 	make -C gbz80 clean
+	make -C hc08 clean
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

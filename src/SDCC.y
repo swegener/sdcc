@@ -976,16 +976,20 @@ declarator2
             sym_link   *p ;
 			value *tval;
 			
-            p = (tval = constExprValue($3,TRUE))->etype;
+            tval = constExprValue($3,TRUE);
             /* if it is not a constant then Error  */
-            if ( SPEC_SCLS(p) != S_LITERAL)
+            p = newLink (DECLARATOR);
+            DCL_TYPE(p) = ARRAY ;
+            if ( !tval || (SPEC_SCLS(tval->etype) != S_LITERAL)) {
                werror(E_CONST_EXPECTED) ;
+               /* Assume a single item array to limit the cascade */
+               /* of additional errors. */
+               DCL_ELEM(p) = 1;
+            }
             else {
-               p = newLink (DECLARATOR);
-               DCL_TYPE(p) = ARRAY ;
                DCL_ELEM(p) = (int) floatFromVal(tval) ;
-               addDecl($1,0,p);
             }		                
+            addDecl($1,0,p);
          }
    | declarator2 '('  ')'	{  addDecl ($1,FUNCTION,NULL) ;   }
    | declarator2 '(' { NestLevel++ ; currBlockno++; } parameter_type_list ')'

@@ -6491,7 +6491,7 @@ genPointerGet (iCode * ic, iCode *pi)
     }
 
   /* special case when cast remat */
-  if (p_type == GPOINTER && OP_SYMBOL(left)->remat &&
+  if (p_type == GPOINTER && IS_SYMOP(left) && OP_SYMBOL(left)->remat &&
       IS_CAST_ICODE(OP_SYMBOL(left)->rematiCode)) {
 	  left = IC_RIGHT(OP_SYMBOL(left)->rematiCode);
 	  type = operandType (left);

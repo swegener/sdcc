@@ -1,3 +1,12 @@
+2003-11-07 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCC.y: fixed bug #837365
+	* support/regression/tests/bitopcse.c
+	* src/hc08/gen.c (genPointerGet): Don't assume pointer operand is
+	a symbol (might be valop instead)
+	* device/lib/Makefile.in: added errno.c to HC08SOURCES
+	* device/lib/clean.mk: added hc08 to the cleaning list
+
 2003-11-04  Borut Razem <borut.razem@siol.net>
 
 	* configure, configure.in, sdcc_vc_in.h, sdcconf_in.h: reverted changes,

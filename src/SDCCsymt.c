@@ -1320,6 +1320,16 @@ void aggregateArgToPointer(value *val)
 		DCL_TYPE(val->type) = PPOINTER;
 		break;
 	    case S_FIXED:
+	    	if (IS_DS390_PORT)
+	    	{
+	    	    /* The AUTO and REGISTER classes should probably
+	    	     * also become generic pointers, but I haven't yet
+	    	     * devised a test case for that.
+	    	     */
+	    	    DCL_TYPE(val->type) = GPOINTER;
+	    	    break;
+	    	}
+	    	/* fall through! */
 	    case S_AUTO:
 	    case S_DATA:
 	    case S_REGISTER:

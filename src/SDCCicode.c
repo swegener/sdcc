@@ -1276,7 +1276,6 @@ operandFromSymbol (symbol * sym)
       sym->level &&		/* is a local variable */
       !sym->addrtaken &&	/* whose address has not been taken */
       !sym->reqv &&		/* does not already have a reg equivalence */
-      !sym->onStack &&          /* jwk: not on stack */
       !IS_VOLATILE (sym->etype) &&	/* not declared as volatile */
       !IS_STATIC (sym->etype) &&	/* and not declared static  */
       !sym->islbl &&		/* not a label */
@@ -1292,6 +1291,7 @@ operandFromSymbol (symbol * sym)
       OP_SYMBOL (sym->reqv)->key = sym->key;
       OP_SYMBOL (sym->reqv)->isreqv = 1;
       OP_SYMBOL (sym->reqv)->islocal = 1;
+      OP_SYMBOL (sym->reqv)->onStack = sym->onStack;
       SPIL_LOC (sym->reqv) = sym;
     }
 

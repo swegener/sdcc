@@ -17,15 +17,15 @@ SLIB		= $(PRJDIR)/support/Util
 
 srcdir		= @srcdir@
 prefix		= @prefix@
-exec_prefix     = ${prefix}
-bindir          = ${exec_prefix}/bin
-libdir          = ${exec_prefix}/lib
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
 datadir         = @datadir@
-includedir      = ${prefix}/include
-mandir          = ${prefix}/man
+includedir      = @includedir@
+mandir          = @mandir@
 man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
-infodir         = ${prefix}/info
+infodir         = @infodir@
 
 STD_INC		= @sdcc_include_dir@
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/support -I$(SLIB)
@@ -64,7 +64,6 @@ uninstall:
 	rm -f $(bindir)/sdcdb
 	rm -f $(bindir)/sdcdb.el
 	rm -f $(bindir)/sdcdbsrc.el
-
 
 # Performing self-test
 # --------------------

@@ -62,6 +62,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define AUXR1	0xa2 /* Secondary Aux Register */
 
 #define DPXL	0x84 /* */
+#define DPL1	0x84 /* 2nd Data Pointer Low byte */
+#define DPH1	0x85 /* 2nd Data Pointer High byte */
+#define DPS	0x86 /* DPS 1H=DPTR is DPL1/DPH1,... */
 #define WDTRST	0xa6 /* */
 #define IE0	0xa8 /* */
 #define SADDR	0xa9 /* */

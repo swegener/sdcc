@@ -44,6 +44,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc51rcl.h"
 #include "uc89c51rcl.h"
 #include "uc251cl.h"
+#include "uc390cl.h"
 #include "glob.h"
 
 
@@ -81,6 +82,8 @@ cl_sim51::mk_controller(void)
       return(new t_uc89c51r(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_251:
       return(new t_uc251(cpus_51[i].type, cpus_51[i].technology, this));
+    case CPU_DS390:
+      return(new t_uc390(cpus_51[i].type, cpus_51[i].technology, this));
     }
   return(NULL);
 }

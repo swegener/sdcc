@@ -423,7 +423,7 @@ rlivePoint (eBBlock ** ebbs, int count)
 		      iCode *lic;
 		      for (lic = ic; lic; lic = lic->next)
 		        {
-			  if (lic->op == CALL)
+			  if (lic->op == CALL || lic->op == PCALL)
 			    {
 			      markAlive (ic, lic->prev, IC_LEFT (ic)->key);
 			      break;

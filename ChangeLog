@@ -1,3 +1,8 @@
+2004-02-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClrange.c (rlivePoint): live range of SEND operand should
+	extend to the next CALL or PCALL, not just to the next CALL.
+
 2004-02-16 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (genInline): fixed bug #896482 with inline assembly

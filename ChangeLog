@@ -1,3 +1,8 @@
+2004-02-10 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* ralloc.h: missing declarations from previous patch,
+	seems that patch for ralloc.h was never applied, fixed
+	
 2004-02-10 Hans-Juergen Dorn <hans.dorn AT apl-landau.de>
 	   patch committed by Vangelis Rokas <vrokas AT otenet.gr>
 

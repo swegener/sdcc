@@ -120,26 +120,40 @@ regs *pic16_allocDirReg (operand *op );
 regs *pic16_allocRegByName (char *name, int size );
 
 /* Define register address that are constant across PIC16 family */
-#define IDX_INDF0   0xfef
 #define IDX_TMR0    0xfd6
 #define IDX_PCL     0xff9
 #define IDX_STATUS  0xfd8
-#define IDX_FSR0    0xfe9
 #define IDX_PORTA   0xf80
 #define IDX_PORTB   0xf81
 #define IDX_PCLATH  0xffa
 #define IDX_INTCON  0xff2
 #define IDX_WREG    0xfe8
 
+#define IDX_FSR0    0xfe9
+#define IDX_FSR0L   0xfe9
+#define IDX_FSR0H   0xfea
 #define IDX_FSR1L	0xfe1
 #define IDX_FSR1H	0xfe2
 #define IDX_FSR2L	0xfd9
 #define IDX_FSR2H	0xfda
+
+#define IDX_INDF0		0xfef
+#define IDX_POSTINC0	0xfee
+#define IDX_POSTDEC0	0xfed
+#define IDX_PREINC0		0xfec
+#define IDX_PLUSW0		0xfeb
+
+#define IDX_INDF1		0xfe7
 #define IDX_POSTINC1	0xfe6
 #define IDX_POSTDEC1	0xfe5
-#define IDX_PREINC1	0xfe4
-#define IDX_PREINC2	0xfdc
-#define IDX_PLUSW2	0xfdb
+#define IDX_PREINC1		0xfe4
+#define IDX_PLUSW1		0xfe3
+
+#define IDX_INDF2		0xfdf
+#define IDX_POSTINC2	0xfde
+#define IDX_POSTDEC2	0xfdd
+#define IDX_PREINC2		0xfdc
+#define IDX_PLUSW2		0xfdb
 
 #define IDX_KZ      0x7fff   /* Known zero - actually just a general purpose reg. */
 #define IDX_WSAVE   0x7ffe

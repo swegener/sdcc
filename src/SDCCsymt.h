@@ -210,7 +210,6 @@ typedef struct symbol
     unsigned isinvariant:1;	/* is a loop invariant  */
     unsigned isstrlit:1;	/* is a string literal  */
     unsigned cdef:1;		/* compiler defined symbol */
-    unsigned allocreq:1;	/* allocation is required for this variable */
     unsigned addrtaken:1;	/* address of the symbol was taken */
     unsigned isreqv:1;		/* is the register quivalent of a symbol */
     unsigned udChked:1;		/* use def checking has been already done */
@@ -220,6 +219,7 @@ typedef struct symbol
        if a better scheme for backend is thought of */
     unsigned isLiveFcall:1;	/* is live at or across a function call */
     unsigned isspilt:1;		/* has to be spilt */
+    unsigned spillA:1;		/* spilt be register allocator */
     unsigned remat:1;		/* can be remateriazed */
     unsigned isptr:1;		/* is a pointer */
     unsigned uptr:1;		/* used as a pointer */
@@ -240,6 +240,7 @@ typedef struct symbol
 				   is quite similar.
 				 */
 
+    int allocreq ;		/* allocation is required for this variable */
     int stack;			/* offset on stack      */
     int xstack;			/* offset on xternal stack */
     short nRegs;		/* number of registers required */

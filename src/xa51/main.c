@@ -89,6 +89,7 @@ _xa51_parseOptions (int *pargc, char **argv, int *i)
 static void
 _xa51_finaliseOptions (void)
 {
+  fprintf (stderr, "*** WARNING *** The XA51 port isn't yet complete\n");
   port->mem.default_local_map = istack;
   port->mem.default_globl_map = xdata;
   if (options.model!=MODEL_PAGE0) {

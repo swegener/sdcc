@@ -3288,7 +3288,8 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   if (min)
     {
       cond = geniCodeSubtract (cond, operandFromLit (min));
-      setOperandType (cond, UCHARTYPE);
+      if (!IS_LITERAL(getSpec(operandType(cond))))
+        setOperandType (cond, UCHARTYPE);
     }
 
   /* now create the jumptable */
@@ -3309,6 +3310,29 @@ geniCodeSwitch (ast * tree,int lvl)
   operand *cond = geniCodeRValue (ast2iCode (tree->left,lvl+1), FALSE);
   value *caseVals = tree->values.switchVals.swVals;
   symbol *trueLabel, *falseLabel;
+      
+  /* If the condition is a literal, then just jump to the */
+  /* appropriate case label. */
+  if (IS_LITERAL(getSpec(operandType(cond))))
+    {
+      int switchVal, caseVal;
+      
+      switchVal = (int) floatFromVal (cond->operand.valOperand);
+      while (caseVals)
+        {
+          caseVal = (int) floatFromVal (caseVals);
+          if (caseVal == switchVal)
+            {
+              SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d",
+	                tree->values.switchVals.swNum, caseVal);
+              trueLabel = newiTempLabel (buffer);
+              geniCodeGoto (trueLabel);
+              goto jumpTable;
+            }
+          caseVals = caseVals->next;
+        }
+      goto defaultOrBreak;
+    }
 
   /* if we can make this a jump table */
   if (geniCodeJumpTable (cond, caseVals, tree))
@@ -3333,7 +3357,7 @@ geniCodeSwitch (ast * tree,int lvl)
     }
 
 
-
+defaultOrBreak:
   /* if default is present then goto break else break */
   if (tree->values.switchVals.swDefault)
     {

@@ -1,3 +1,8 @@
+2003-10-01  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodeJumpTable, geniCodeSwitch): fixed
+	the other part of bug #814548
+
 2003-09-30  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCcse.c: fixed part of bug #814548

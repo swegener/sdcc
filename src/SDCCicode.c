@@ -549,7 +549,7 @@ newiCodeCondition (operand * condition,
 {
   iCode *ic;
 
-  if (IS_VOID(OP_SYMBOL(condition)->type)) {
+  if (IS_VOID(operandType(condition))) {
     werror(E_VOID_VALUE_USED);
   }
 

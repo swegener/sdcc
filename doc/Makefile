@@ -81,4 +81,13 @@ $(CDB).html/index.html: $(CDB).tex
 	# the glossary, not implemented yet
 	# makeindex -s l2hglo.ist -o $@ $<
 
+archive: all
+	rm -rf sdcc-doc sdcc-doc.tar.bz2
+	mkdir sdcc-doc
+	rsync -rC avr z80 *.pdf *.txt sdcc-doc
+	for doc in $(MANUAL) $(TSS) $(CDB); do \
+	  rsync -R $$doc.html/*.html $$doc.html/*.png $$doc.html/*.css sdcc-doc/; \
+	done
+	tar -c sdcc-doc | bzip2 -9 > sdcc-doc.tar.bz2
+
 include clean.mk

@@ -5,6 +5,7 @@ clean:
 	rm -rf $(MANUAL).txt $(TSS).txt $(CDB).txt \
 		*.pdf *.tex *.aux *.dvi *.idx *.ilg *.out\
 		*.ind *.log *.toc *~ \#* *.ps */*.css */*.pl *.gif core *.glo
+	rm -rf sdcc-doc sdcc-doc.tar.bz2
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

@@ -1,3 +1,9 @@
+2004-09-12 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* doc/Makefile,
+	* doc/clean.mk: added support for easy creation of sdcc-doc.tar.bz2
+	* doc/sdccman.lyx: updated sdcc version to 2.4.4
+
 2004-09-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* doc/sdccman.lyx: fixed a problem with my new index entries (thanks

@@ -37,6 +37,7 @@ int printIvalCharPtr (symbol *, sym_link *, value *, FILE *);
 extern symbol *interrupts[];
 extern set *publics;
 extern set *tmpfileSet;
+extern set *pipeSet;
 extern set *tmpfileNameSet;
 
 void rm_tmpfiles (void);

@@ -46,8 +46,25 @@ unsigned maxInterrupts = 6;
 int allocInfo = 1;
 symbol *mainf;
 extern char *VersionString;
+set *pipeSet = NULL;            /* set of pipes */
 set *tmpfileSet = NULL;		/* set of tmp file created by the compiler */
 set *tmpfileNameSet = NULL;	/* All are unlinked at close. */
+
+/*-----------------------------------------------------------------*/
+/* closePipes - closes all pipes created by the compiler           */
+/*-----------------------------------------------------------------*/
+DEFSETFUNC (closePipes)
+{
+  FILE *pfile = item;
+  int ret;
+
+  if (pfile) {
+    ret = pclose (pfile);
+    assert(ret != -1);
+  }
+
+  return 0;
+}
 
 /*-----------------------------------------------------------------*/
 /* closeTmpFiles - closes all tmp files created by the compiler    */
@@ -56,9 +73,12 @@ set *tmpfileNameSet = NULL;	/* All are unlinked at close. */
 DEFSETFUNC (closeTmpFiles)
 {
   FILE *tfile = item;
+  int ret;
 
-  if (tfile)
-    fclose (tfile);
+  if (tfile) {
+    ret = fclose (tfile);
+    assert(ret == 0);
+  }
 
   return 0;
 }
@@ -70,12 +90,14 @@ DEFSETFUNC (closeTmpFiles)
 DEFSETFUNC (rmTmpFiles)
 {
   char *name = item;
+  int ret;
 
-  if (name)
-    {
-      unlink (name);
+  if (name) {
+      ret = unlink (name);
+      assert(ret == 0);
       Safe_free (name);
-    }
+  }
+
   return 0;
 }
 
@@ -86,6 +108,10 @@ void
 rm_tmpfiles (void)
 {
   /* close temporary files */
+  applyToSet (pipeSet, closePipes);
+  /* close temporary files */
+  deleteSet (&pipeSet);
+
   applyToSet (tmpfileSet, closeTmpFiles);
   /* remove temporary files */
   applyToSet (tmpfileNameSet, rmTmpFiles);
@@ -1837,7 +1863,7 @@ tempfile(void)
   char fnamebuf[PATH_MAX];
 
   if ((fd = tempfileandname(fnamebuf, sizeof fnamebuf)) == -1) {
-    fprintf(stderr, "Can't create temporary file name!");
+    fprintf(stderr, "Can't create temporary file!");
     exit(1);
   }
 
@@ -1846,7 +1872,7 @@ tempfile(void)
     addSetHead(&tmpfileNameSet, tmp);
 
   if ((fp = fdopen(fd, "w+b")) == NULL) {
-      perror("Can't create temporary file name!");
+      perror("Can't create temporary file!");
       exit(1);
   }
 

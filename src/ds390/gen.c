@@ -31,6 +31,7 @@
 #include <ctype.h>
 
 #include "common.h"
+#include "main.h"
 #include "ralloc.h"
 #include "gen.h"
 #include "SDCCglobl.h"

@@ -1,5 +1,6 @@
 /*-------------------------------------------------------------------------
-  genarith.c - source file for code generation - arithmetic 
+
+ genarith.c - source file for code generation - arithmetic 
   
   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
          and -  Jean-Louis VERN.jlvern@writeme.com (1999)

@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-  SDCCralloc.h - header file register allocation
+  ralloc.h - header file register allocation
 
 	Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 	PIC port   - T. Scott Dattalo scott@dattalo.com (2000)

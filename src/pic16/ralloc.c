@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------
 
-  SDCCralloc.c - source file for register allocation. (8051) specific
+  ralloc.c - source file for register allocation. PIC16 specific
 
                 Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 		Added Pic Port T.scott Dattalo scott@dattalo.com (2000)

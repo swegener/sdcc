@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  SDCCgen51.h - header file for code generation for 8051
+  gen.h - header file for code generation for PIC16
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 	     PIC port   - T. Scott Dattalo scott@dattalo.com (2000)
@@ -24,8 +24,8 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#ifndef SDCCGENPIC14_H
-#define SDCCGENPIC14_H
+#ifndef SDCCGENPIC16_H
+#define SDCCGENPIC16_H
 
 struct pCodeOp;
 

@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-   pcoderegs.c - post code generation register optimizations
+  pcoderegs.c - post code generation register optimizations
 
    Written By -  Scott Dattalo scott@dattalo.com
    Ported To PIC16 By -  m.dubuc@rogers.com

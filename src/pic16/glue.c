@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-  SDCCglue.c - glues everything we have done together into one file.
+  glue.c - glues everything we have done together into one file.
                 Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
    This program is free software; you can redistribute it and/or modify it

@@ -1,6 +1,7 @@
 /*-------------------------------------------------------------------------
 
-   device.c - Accomodates subtle variations in PIC16 devices
+  device.c - Accomodates subtle variations in PIC16 devices
+
    Written By -  Scott Dattalo scott@dattalo.com
 
    This program is free software; you can redistribute it and/or modify it

@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  gen.c - source file for code generation for pic16
+ gen.c - source file for code generation for pic16
 
   Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
          and -  Jean-Louis VERN.jlvern@writeme.com (1999)

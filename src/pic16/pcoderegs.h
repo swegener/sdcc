@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-   pcoderegs.h - post code generation register optimizations
+  pcoderegs.h - post code generation register optimizations
 
    Written By -  Scott Dattalo scott@dattalo.com
 

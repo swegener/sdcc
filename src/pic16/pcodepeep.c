@@ -1,6 +1,7 @@
 /*-------------------------------------------------------------------------
 
-   pcodepeep.c - post code generation
+  pcodepeep.c - post code generation
+
    Written By -  Scott Dattalo scott@dattalo.com
    Ported to PIC16 By - Martin Dubuc m.dubuc@rogers.com
 

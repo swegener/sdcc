@@ -1,6 +1,7 @@
 /*-------------------------------------------------------------------------
 
-   pcode.h - post code generation
+  pcode.h - post code generation
+
    Written By -  Scott Dattalo scott@dattalo.com
    PIC16 port -  Martin Dubuc m.dubuc@rogers.com
 

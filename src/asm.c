@@ -203,6 +203,42 @@ asm_addTree (const ASM_MAPPINGS * pMappings)
   }
 }
 
+/*-----------------------------------------------------------------*/
+/* printCLine - try to find the c-code for this lineno             */
+/*-----------------------------------------------------------------*/
+static FILE *inFile=NULL;
+static char inLineString[1024];
+static int inLineNo=0;
+int rewinds=0;
+
+char *printCLine (char *srcFile, int lineno) {
+  char *ilsP=inLineString;
+  if (!inFile) {
+    inFile=fopen(srcFile, "r");
+    if (!inFile) {
+      perror ("printCLine");
+      exit (1);
+    }
+  }
+  if (lineno<inLineNo) {
+    fseek (inFile, 0, SEEK_SET);
+    inLineNo=0;
+    rewinds++;
+  }
+  while (fgets (inLineString, 1024, inFile)) {
+    inLineNo++;
+    if (inLineNo==lineno) {
+      // remove the trailing NL
+      inLineString[strlen(inLineString)-1]='\0';
+      break;
+    }
+  }
+  while (isspace ((int)*ilsP))
+    ilsP++;
+
+  return ilsP;
+}
+
 static const ASM_MAPPING _asxxxx_mapping[] =
 {
   {"labeldef", "%s::"},

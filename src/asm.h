@@ -34,4 +34,5 @@ void asm_addTree (const ASM_MAPPINGS * pMappings);
 
 char *FileBaseName (char *fileFullName);
 
+char *printCLine (char *srcFile, int lineno);
 #endif

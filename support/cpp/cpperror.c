@@ -69,7 +69,7 @@ cpp_print_containing_files (
 	    fprintf (stderr, ",\n                ");
 	}
 
-      fprintf (stderr, " from %s:%d", ip->nominal_fname, line);
+      fprintf (stderr, " from %s:%ld", ip->nominal_fname, line);
     }
   if (! first)
     fprintf (stderr, ":\n");

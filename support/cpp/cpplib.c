@@ -87,6 +87,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <stdlib.h>
 #endif
 
+
 // PENDING: Straighten this out into configure
 #ifdef __MINGW32__
 #include <time.h>
@@ -279,30 +280,21 @@ struct cpp_pending {
 
 static void add_import ();
 static void append_include_chain ();
-static void make_undef ();
 static void make_assertion ();
 static void path_include ();
 static void initialize_builtins ();
 static void initialize_char_syntax ();
-static void dump_arg_n ();
-static void dump_defn_1 ();
 extern void delete_macro ();
-static void trigraph_pcp ();
 static int finclude ();
 static void validate_else ();
 static int comp_def_part ();
 extern void fancy_abort ();
-static void pipe_closed ();
-static void print_containing_files ();
 static int lookup_import ();
 static int redundant_include_p ();
-static is_system_include ();
+static int is_system_include (cpp_reader *, char *);
 static struct file_name_map *read_name_map ();
 static char *read_filename_string ();
 static int open_include_file ();
-static int check_preconditions ();
-static void pcfinclude ();
-static void pcstring_used ();
 static int check_macro_name ();
 static int compare_defs ();
 static int compare_token_lists ();
@@ -874,40 +866,6 @@ file_cleanup (
   return 0;
 }
 
-static void
-newline_fix (
-     cpp_reader *pfile)
-{
-#if 1
-  NEWLINE_FIX;
-#else
-  register U_CHAR *p = bp;
-
-  /* First count the backslash-newline pairs here.  */
-
-  while (p[0] == '\\' && p[1] == '\n')
-    p += 2;
-
-  /* What follows the backslash-newlines is not embarrassing.  */
-
-  if (*p != '/' && *p != '*')
-    return;
-
-  /* Copy all potentially embarrassing characters
-     that follow the backslash-newline pairs
-     down to where the pairs originally started.  */
-
-  while (*p == '*' || *p == '/')
-    *bp++ = *p++;
-
-  /* Now write the same number of pairs after the embarrassing chars.  */
-  while (bp < p) {
-    *bp++ = '\\';
-    *bp++ = '\n';
-  }
-#endif
-}
-
 /* Assuming we have read '/'.
    If this is the start of a comment (followed by '*' or '/'),
    skip to the end of the comment, and return ' '.
@@ -1080,7 +1038,7 @@ handle_directive (
 { int c;
   register struct directive *kt;
   int ident_length;
-  long after_ident;
+  long after_ident = 0;
   U_CHAR *ident, *line_end;
   long old_written = CPP_WRITTEN (pfile);
 
@@ -2188,7 +2146,7 @@ output_line_command (
     CPP_PUTS_Q (pfile, sharp_line, sizeof(sharp_line)-1);
   }
 
-  sprintf (CPP_PWRITTEN (pfile), "%d ", line+2);
+  sprintf (CPP_PWRITTEN (pfile), "%ld ", line+2);
   CPP_ADJUST_WRITTEN (pfile, strlen (CPP_PWRITTEN (pfile)));
 
 // modification for SDC51
@@ -2228,8 +2186,8 @@ macarg (
      int rest_args)
 {
   int paren = 0;
-  enum cpp_token token;
-  long arg_start = CPP_WRITTEN (pfile);
+  enum cpp_token token = CPP_EOF;
+  /* long arg_start = CPP_WRITTEN (pfile); */
   char save_put_out_comments = CPP_OPTIONS (pfile)->put_out_comments;
   CPP_OPTIONS (pfile)->put_out_comments = 0;
 
@@ -2449,7 +2407,7 @@ special_symbol (
   adjust_position (CPP_LINE_BASE (ip), ip->cur, &line, &col);
 
   buf = (char *) alloca (10);
-  sprintf (buf, "%d", line);
+  sprintf (buf, "%ld", line);
       }
       break;
 
@@ -2478,7 +2436,7 @@ special_symbol (
 
       if (!is_idstart[*ip->cur])
   goto oops;
-      if (hp = cpp_lookup (pfile, ip->cur, -1, -1))
+      if ((hp = cpp_lookup (pfile, ip->cur, -1, -1)) != 0)
   {
 #if 0
     if (pcp_outfile && pcp_inside_if
@@ -2710,7 +2668,7 @@ macroexpand (
 
   if (nargs >= 0)
     {
-      enum cpp_token token;
+      enum cpp_token token = CPP_EOF;
 
       args = (struct argdata *) alloca ((nargs + 1) * sizeof (struct argdata));
 
@@ -3175,10 +3133,8 @@ do_include (
 
   int f;      /* file number */
 
-  int retried = 0;    /* Have already tried macro
-           expanding the include line*/
   int angle_brackets = 0; /* 0 for "...", 1 for <...> */
-  int pcf = -1;
+  /* int pcf = -1;  */
   char *pcfbuf;
 /*  char *pcfbuflimit;*/
   int pcfnum;
@@ -4336,7 +4292,6 @@ skip_if_group (
      int any)
 {
   int c;
-  int at_beg_of_line = 1;
   struct directive *kt;
   IF_STACK_FRAME *save_if_stack = pfile->if_stack; /* don't pop past here */
 #if 0
@@ -4634,7 +4589,7 @@ cpp_get_token (
      cpp_reader *pfile)
 {
   register int c, c2, c3;
-  long old_written;
+  long old_written = 0;
   long start_line, start_column;
   enum cpp_token token;
   struct cpp_options *opts = CPP_OPTIONS (pfile);
@@ -5635,7 +5590,7 @@ finclude (
   long i;
   int length;
   cpp_buffer *fp;     /* For input stack frame */
-  int missing_newline = 0;
+  /* int missing_newline = 0; # KILL */
 
   if (file_size_and_mode (f, &st_mode, &st_size) < 0)
     {
@@ -6636,11 +6591,17 @@ cpp_handle_options (
               char *p;
 
               if (argv[i][2] != 0)
+              {
                 p = argv[i] + 2;
-              else if (i + 1 == argc)
-                fatal ("Assertion missing after -A option");
-              else
-                p = argv[++i];
+              }
+              else 
+              {
+              	if (++i == argc)
+              	{
+                    fatal ("Assertion missing after -A option");
+                }
+                p = argv[i];
+              }
 
               if (!strcmp (p, "-")) {
                 struct cpp_pending **ptr;
@@ -7118,7 +7079,7 @@ read_token_list (
     {
       struct arglist *temp;
       long name_written = CPP_WRITTEN (pfile);
-      int eofp = 0;  int c;
+      int c;
 
       cpp_skip_hspace (pfile);
 

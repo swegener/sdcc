@@ -649,7 +649,7 @@ extern cpp_hashnode* cpp_lookup PARAMS ((cpp_reader*, const U_CHAR*,
 /* Define the MS VC6 stuff - Some of these should also be defined for
 the other hosts but they are here until declared safe for all */
 
-#if defined(_MSC_VER)
+#if 1 // defined(_MSC_VER)
 
 void init_parse_file (cpp_reader *pfile) ;
 

@@ -32,8 +32,8 @@ Written by Per Bothner 1994. */
 //extern char *xmalloc PARAMS ((unsigned));
 //extern char *xrealloc PARAMS ((char *, unsigned));
 
-#ifdef MULTIBYTE_CHARS
 #include <stdlib.h>
+#ifdef MULTIBYTE_CHARS
 #include <locale.h>
 #endif
 
@@ -335,7 +335,7 @@ cpp_reader *pfile)
 	 It is mostly copied from c-lex.c.  */
       {
         register int result = 0;
-	register num_chars = 0;
+	register int num_chars = 0;
 	unsigned width = MAX_CHAR_TYPE_SIZE;
 	int wide_flag = 0;
 	int max_chars;
@@ -672,7 +672,7 @@ cpp_parse_expr (
   struct operation *stack = init_stack;
   struct operation *limit = stack + INIT_STACK_SIZE;
   register struct operation *top = stack;
-  int lprio, rprio;
+  int lprio, rprio = 0;
 
   top->rprio = 0;
   top->flags = 0;

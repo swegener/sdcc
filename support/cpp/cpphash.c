@@ -28,10 +28,8 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "newalloc.h"
 
-#if defined(_MSC_VER)
 #include <string.h>
 #include <stdlib.h>
-#endif
 
 /* Define a generic NULL if one hasn't already been defined.  */
 
@@ -43,6 +41,8 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define const
 #define volatile
 #endif
+
+static HASHNODE *hashtab[HASHSIZE];
 
 /*
  * return hash function on name.  must be compatible with the one

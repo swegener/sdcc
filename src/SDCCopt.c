@@ -892,7 +892,7 @@ eBBlockFromiCode (iCode * ic)
   if (!options.lessPedantic) {
     // this is a good place to check missing return values
     if (currFunc) {
-      if (!IS_VOID(currFunc->type->next)) {
+      if (!IS_VOID(currFunc->etype)) {
 	eBBlock *bp;
 	// make sure all predecessors of the last block end in a return
 	for (bp=setFirstItem(ebbs[saveCount-1]->predList); 

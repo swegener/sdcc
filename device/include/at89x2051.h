@@ -29,6 +29,8 @@
 #ifndef AT892051_H
 #define AT892051_H
 
+#warning This file is obsolete, use #define <at89x051.h>
+
 /* BYTE addressable registers */
 sfr at 0x81 SP          ;
 sfr at 0x82 DPL         ;

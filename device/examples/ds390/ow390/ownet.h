@@ -1,29 +1,29 @@
 //---------------------------------------------------------------------------
 // Copyright (C) 2000 Dallas Semiconductor Corporation, All Rights Reserved.
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a 
-// copy of this software and associated documentation files (the "Software"), 
-// to deal in the Software without restriction, including without limitation 
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included 
+//
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-// MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-// IN NO EVENT SHALL DALLAS SEMICONDUCTOR BE LIABLE FOR ANY CLAIM, DAMAGES 
-// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
-// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL DALLAS SEMICONDUCTOR BE LIABLE FOR ANY CLAIM, DAMAGES
+// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-// 
-// Except as contained in this notice, the name of Dallas Semiconductor 
-// shall not be used except as stated in the Dallas Semiconductor 
-// Branding Policy. 
+//
+// Except as contained in this notice, the name of Dallas Semiconductor
+// shall not be used except as stated in the Dallas Semiconductor
+// Branding Policy.
 //---------------------------------------------------------------------------
-// 
+//
 // ownet.h - Include file for 1-Wire Net library
 //
 // Version: 2.00
@@ -40,19 +40,19 @@
    typedef unsigned long ulong;
 #endif
 
-// general defines 
+// general defines
 #define WRITE_FUNCTION 1
-#define READ_FUNCTION  0   
+#define READ_FUNCTION  0
 
 // error codes
 #define READ_ERROR    -1
-#define INVALID_DIR   -2       
-#define NO_FILE       -3    
-#define WRITE_ERROR   -4   
+#define INVALID_DIR   -2
+#define NO_FILE       -3
+#define WRITE_ERROR   -4
 #define WRONG_TYPE    -5
 #define FILE_TOO_BIG  -6
 
-// Misc 
+// Misc
 #define FALSE          0
 #define TRUE           1
 #define MAX_PORTNUM    16
@@ -102,7 +102,7 @@ extern uchar SerialNum[MAX_PORTNUM][8];
 // owtrnu.c
 extern int owBlock(int,int,uchar *,int);
 extern int owReadPacketStd(int,int,int,uchar *);
-extern int owWritePacketStd(int,int,uchar *,int,int,int);   
+extern int owWritePacketStd(int,int,uchar *,int,int,int);
 extern int owProgramByte(int,int,int,int,int,int);
 
 // crcutil.c
@@ -139,7 +139,7 @@ extern void owRelease(int, char *);
 //extern void owRelease(int);
 
 // findtype.c
-extern int FindDevices(int, uchar FamilySN[][8], int, int); 
+extern int FindDevices(int, uchar FamilySN[][8], int, int);
 
 // offile.c
 int owReadFile(int,uchar *,uchar *);

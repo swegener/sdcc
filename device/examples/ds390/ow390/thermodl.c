@@ -1,43 +1,43 @@
 //---------------------------------------------------------------------------
 // Copyright (C) 2000 Dallas Semiconductor Corporation, All Rights Reserved.
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a 
-// copy of this software and associated documentation files (the "Software"), 
-// to deal in the Software without restriction, including without limitation 
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included 
+//
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-// MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-// IN NO EVENT SHALL DALLAS SEMICONDUCTOR BE LIABLE FOR ANY CLAIM, DAMAGES 
-// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
-// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY,  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL DALLAS SEMICONDUCTOR BE LIABLE FOR ANY CLAIM, DAMAGES
+// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-// 
-// Except as contained in this notice, the name of Dallas Semiconductor 
-// shall not be used except as stated in the Dallas Semiconductor 
-// Branding Policy. 
+//
+// Except as contained in this notice, the name of Dallas Semiconductor
+// shall not be used except as stated in the Dallas Semiconductor
+// Branding Policy.
 //---------------------------------------------------------------------------
 //
 //  thermodl.c - This utility uses to download the results of the
 //               current mission of a DS1921 Thermochron iButton.
 //
 //  Version: 2.00
-//    
+//
 //    History:
-//           1.03 -> 2.00  Reorganization of Public Domain Kit 
+//           1.03 -> 2.00  Reorganization of Public Domain Kit
 //                         Y2K update, display all histogram bins, debug
 //                         dump.  Supports multiple thermochons.
 //
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "ownet.h"   
+#include "ownet.h"
 #include "thermo21.h"
 
 // defines
@@ -84,7 +84,7 @@ int main() //short argc, char **argv)
    //----------------------------------------
    // Introduction
    printf("\n/----------------------------------------------\n");
-   printf("  Find and download DS1921 Thermochron iButton(s)\n" 
+   printf("  Find and download DS1921 Thermochron iButton(s)\n"
           "  Version 2.00\n\n");
 
    // check arguments for temperature conversion and filename
@@ -98,21 +98,21 @@ int main() //short argc, char **argv)
          Fahrenheit = TRUE;
 
       if (argc == 4)
-      {    
+      {
          if (argv[3][0] != '/')
             filenum = 3;
          else if ((argv[3][1] == 'F') || (argv[3][1] == 'f'))
             Fahrenheit = TRUE;
-      }   
+      }
    }
 
-   // open the output file  
+   // open the output file
    fp = NULL;
    if (filenum > 0)
    {
      fp = fopen(argv[filenum],"w+");
      if(fp == NULL)
-       {    
+       {
          printf("ERROR, Could not open output file!\n");
          exit(1);
        }
@@ -121,12 +121,12 @@ int main() //short argc, char **argv)
 	      argv[filenum]);
    }
 
-   // get list of Thermochron's 
+   // get list of Thermochron's
    num = FindDevices(portnum, &ThermoSN[0],THERMO_FAM, MAXDEVICES);
 
    // check if not present or more then 1 present
    if (num == 0)
-      ExitProg("Thermochron not present on 1-Wire\n",1);   
+      ExitProg("Thermochron not present on 1-Wire\n",1);
 
    // loop to download each Thermochron
    for (i = 0; i < num; i++)
@@ -189,15 +189,15 @@ void PrintResults(ThermoStateType *ThermoState, FILE *fp, int ConvertToF)
 
 #if 0
    // get big block to use as a buffer
-   str = malloc(80000);   
+   str = malloc(80000);
    if (str == NULL)
    {
-      printf("Insufficient memory available to print!\n"); 
+      printf("Insufficient memory available to print!\n");
       return;
    }
 #endif
 
-   // mission status 
+   // mission status
    MissionStatusToString(&ThermoState->MissStat, ConvertToF, &str[0]);
    fprintf(fp,"\n%s\n",str);
 
@@ -214,8 +214,8 @@ void PrintResults(ThermoStateType *ThermoState, FILE *fp, int ConvertToF)
    fprintf(fp,"%s\n",str);
 
    // debug raw data
-   DebugToString(&ThermoState->MissStat, &ThermoState->AlarmData, 
-      &ThermoState->HistData, &ThermoState->LogData, &str[0]); 
+   DebugToString(&ThermoState->MissStat, &ThermoState->AlarmData,
+      &ThermoState->HistData, &ThermoState->LogData, &str[0]);
    fprintf(fp,"%s\n",str);
 
 #if 0

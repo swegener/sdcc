@@ -14,7 +14,7 @@
 #define ASCII_XOFF      0x13
 
 
-HANDLE SerialInit(char*, int); 
+HANDLE SerialInit(char*, int);
 
 char SerialGetc(HANDLE*);
 

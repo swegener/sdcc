@@ -1,3 +1,24 @@
+2004-11-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/examples/ds390/ow390/ad26.h,
+	* device/examples/ds390/ow390/cnt1d.h,
+	* device/examples/ds390/ow390/crcutil.c,
+	* device/examples/ds390/ow390/ownet.h,
+	* device/examples/ds390/ow390/owsesu.c,
+	* device/examples/ds390/ow390/swt12.h,
+	* device/examples/ds390/ow390/swtoper.c,
+	* device/examples/ds390/ow390/temp10.h,
+	* device/examples/ds390/ow390/thermodl.c,
+	* device/examples/ds390/tinitalk/tinitalk.dsp,
+	* device/examples/ds390/tinitalk/tinitalk.dsw,
+	* device/examples/mcs51/clock/hw.h,
+	* device/examples/mcs51/simple2/go.bat,
+	* device/examples/serialcomm/windows/serial.h,
+	* device/examples/xa51/dummy.c,
+	* device/examples/xa51/hello.c,
+	* device/include/80c51xa.h,
+	* device/include/at89x051.h: corrected cvs line endings
+
 2004-11-04 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/main.c (options): added command line --gstack, to trace
@@ -79,9 +100,9 @@
 2004-10-22 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/ser_ir_cts_rts.c: integer promotion caused a call to the
-	non-reentrant function __modsint in the interrupt function (thus 
+	non-reentrant function __modsint in the interrupt function (thus
 	corrupting math operations during serial I/O)
-	* device/lib/ser_ir.c: as above, changed buffersize 
+	* device/lib/ser_ir.c: as above, changed buffersize
 	* src/mcs51/peeph.def: added 259.a,b for removing redundant ret,
 	256.c,d for zeroing
 	* doc/Makefile: added option -t for rsync

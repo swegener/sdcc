@@ -1107,15 +1107,15 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	/* of all instructions do */
 	for (ic = ebbs[i]->sch; ic; ic = ic->next) {
-#if 0
-	    int i;
+#if 1
+	    int reg;
 
 	    // update the registers in use at the start of this icode
-	    for (i=0; i<8; i++) {
-	      if (regs8051[i].isFree) {
-		ic->riu &= ~(1<<regs8051[i].offset);
+	    for (reg=0; reg<mcs51_nRegs; reg++) {
+	      if (regs8051[reg].isFree) {
+		ic->riu &= ~(1<<regs8051[reg].offset);
 	      } else {
-		ic->riu |= (1<<regs8051[i].offset);
+		ic->riu |= (1<<regs8051[reg].offset);
 	      }
 	    }
 #endif
@@ -2847,7 +2847,9 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   createRegMask (ebbs, count);
 
   /* redo that offsets for stacked automatic variables */
-  redoStackOffsets ();
+  if (currFunc) {
+    redoStackOffsets ();
+  }
 
   if (options.dump_rassgn)
     {

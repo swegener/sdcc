@@ -11134,8 +11134,10 @@ void genpic16Code (iCode *lic)
 	}
 	
 	if(options.iCodeInAsm) {
+		char *l;
 		/* insert here code to print iCode as comment */
-		pic16_emitpcomment("ic:%d: %s", ic->seq, printILine(ic));
+		l = Safe_strdup(printILine(ic));
+		pic16_emitpcomment("ic:%d: %s", ic->seq, l);
 	}
 	
 	/* if the result is marked as

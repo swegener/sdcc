@@ -1,3 +1,8 @@
+2004-03-06 Hans Dorn <hjdorn AT users.sourceforge.net>
+
+	* src/pic16/gen.c: (genpic16Code) use copy of printILine's output
+	for writing icode into asm output.
+
 2004-03-05 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.c: added some debug lines enabled

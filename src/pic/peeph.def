@@ -112,7 +112,7 @@ replace restart {
 	%4
 %3:	%5
 } by {
-	;peep 1 - test/jump to test/skip
+	;     peep 1 - test/jump to test/skip
         %1
 	_INVERTBITSKIP_	%2
 	%4
@@ -126,7 +126,7 @@ replace restart {
 %4:	%5
 %3:	%6
 } by {
-	;peep 1b - test/jump to test/skip
+	;     peep 1b - test/jump to test/skip
         %1
 	_INVERTBITSKIP_	%2
 %4:	%5
@@ -156,7 +156,7 @@ replace restart {
 	movwf	%1
 	movf	%1,w
 } by {
-	; peep 2 - Removed redundant move
+	;     peep 2 - Removed redundant move
 	movwf	%1
 } if NZ
 
@@ -167,7 +167,7 @@ replace restart {
 	btfss	_STATUS,z
 	goto	%2
 } by {
-	; peep 3 - decf/mov/skpz to decfsz
+	;     peep 3 - decf/mov/skpz to decfsz
 	decfsz	%1,f
 	 goto	%2
 }
@@ -177,7 +177,7 @@ replace restart {
 	movf	%1,w
 	movf	%1,w
 } by {
-	; peep 4 - Removed redundant move
+	;     peep 4 - Removed redundant move
 	movf	%1,w
 }
 
@@ -187,7 +187,7 @@ replace restart {
 	movwf	%2
 	movlw	%1
 } by {
-	; peep 5 - Removed redundant move
+	;     peep 5 - Removed redundant move
 	movlw	%1
 	movwf	%2
 }
@@ -196,7 +196,7 @@ replace restart {
 	movwf	%1
 	movwf	%1
 } by {
-	; peep 6 - Removed redundant move
+	;     peep 6 - Removed redundant move
 	movwf	%1
 }
 
@@ -204,7 +204,7 @@ replace restart {
 	movlw	0
 	iorwf	%1,w
 } by {
-	; peep 7 - Removed redundant move
+	;     peep 7 - Removed redundant move
 	movf	%1,w
 }
 
@@ -213,7 +213,7 @@ replace restart {
 	movwf	%2
 	decf	%2,f
 } by {
-	; peep 8 - Removed redundant move
+	;     peep 8 - Removed redundant move
 	decf	%1,w
 	movwf	%2
 }
@@ -223,7 +223,7 @@ replace restart {
 	movf	%2,w
 	xorwf	%1,w
 } by {
-	; peep 9a - Removed redundant move
+	;     peep 9a - Removed redundant move
 	movwf	%1
 	xorwf	%2,w
 }
@@ -233,7 +233,7 @@ replace restart {
 	movf	%2,w
 	iorwf	%1,w
 } by {
-	; peep 9b - Removed redundant move
+	;     peep 9b - Removed redundant move
 	movwf	%1
 	iorwf	%2,w
 }
@@ -243,7 +243,7 @@ replace restart {
 	movwf	%2
 	movf	%2,w
 } by {
-	; peep 9c - Removed redundant move
+	;     peep 9c - Removed redundant move
 	movf	%1,w
 	movwf	%2
 }
@@ -253,27 +253,17 @@ replace restart {
 	movf	%1,w
 	movwf	%2
 } by {
-	; peep 9d - Removed redundant move
+	;     peep 9d - Removed redundant move
 	movwf	%1
 	movwf	%2
 } if NZ
-
-//replace restart {
-//	movwf	%1
-//	iorlw	0
-//	movf	%1,w
-//} by {
-//	; peep 10 - Removed unnecessary iorlw
-//	movwf	%1
-//	movf	%1
-//} 
 
 // From: Frieder Ferlemann
 
 replace restart {
         iorlw   0
 } by {
-        ; peep 10a - Removed unnecessary iorlw
+        ;     peep 10a - Removed unnecessary iorlw
 } if NZ
 
 // From: Frieder Ferlemann
@@ -281,7 +271,7 @@ replace restart {
 replace restart {
         xorlw   0
 } by {
-        ; peep 10b - Removed unnecessary xorlw
+        ;     peep 10b - Removed unnecessary xorlw
 } if NZ
 
 // From: Frieder Ferlemann
@@ -290,6 +280,6 @@ replace restart {
         movf    %1,w
         movwf   %1
 } by {
-        ; peep 11 - Removed redundant move
+        ;     peep 11 - Removed redundant move
         movf    %1,w
 }

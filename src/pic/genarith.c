@@ -1557,6 +1557,7 @@ void genUMult8XLit_16 (operand *left,
   unsigned int lit;
   unsigned int i,have_first_bit;
   int same;
+  pCodeOp *temp;
 
   if (AOP_TYPE(right) != AOP_LIT){
     fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
@@ -1592,6 +1593,98 @@ void genUMult8XLit_16 (operand *left,
       emitpcode(POC_MOVFW, popGet(AOP(left),0));
       emitpcode(POC_ADDWF, popGet(AOP(left),0));
       emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 5:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 2*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 3*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 5*F
+      return;
+    case 6:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 7:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 2*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 3*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 5*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 7*F
+      return;
+    case 8:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 2*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 3*F
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 5*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 8*F
+      return;
+    case 9:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 10:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 2*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 3*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 5*F
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 11:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 2*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 3*F
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 5*F
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 8*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 11*F
+      return;
+    case 12:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));
+      return;
+    case 13:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 2*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 3*F
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 5*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 8*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 13*F
+      return;
+    case 14:
+      emitpcode(POC_MOVFW, popGet(AOP(left),0));
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 2*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 3*F
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 5*F
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 8*F
+      emitpcode(POC_ADDFW, popGet(AOP(left),0));  // W = 11*F
+      emitpcode(POC_ADDWF, popGet(AOP(left),0));  // F = 14*F
+      return;
+    case 15:
+      temp = popGetTempReg();
+      if(!temp) {
+	fprintf(stderr,"ERROR: unable to allocate register. %s:%d\n",__FUNCTION__,__LINE__);
+	exit(1);
+      }
+      emitpcode(POC_SWAPFW, popGet(AOP(left),0));
+      emitpcode(POC_MOVWF,  temp);
+      emitpcode(POC_ANDLW,  popGetLit(0xf0));
+      emitpcode(POC_MOVWF,  popGet(AOP(left),0));
+      emitpcode(POC_SWAPFW, temp);
+      emitpcode(POC_SUBWF,  popGet(AOP(left),0));
+      popReleaseTempReg(temp);
       return;
     case 16:
       emitpcode(POC_SWAPFW, popGet(AOP(left),0));
@@ -1602,6 +1695,24 @@ void genUMult8XLit_16 (operand *left,
       emitpcode(POC_SWAPFW, popGet(AOP(left),0));
       emitpcode(POC_ANDLW,  popGetLit(0xf0));
       emitpcode(POC_ADDWF,  popGet(AOP(left),0));
+      return;
+    case 32:
+      emitpcode(POC_SWAPF,  popGet(AOP(left),0));
+      emitpcode(POC_RLFW,   popGet(AOP(left),0));
+      emitpcode(POC_ANDLW,  popGetLit(0xe0));
+      emitpcode(POC_MOVWF,  popGet(AOP(left),0));
+      return;
+    case 64:
+      emitpcode(POC_SWAPF,  popGet(AOP(left),0));
+      emitpcode(POC_RLF,    popGet(AOP(left),0));
+      emitpcode(POC_RLFW,   popGet(AOP(left),0));
+      emitpcode(POC_ANDLW,  popGetLit(0xc0));
+      emitpcode(POC_MOVWF,  popGet(AOP(left),0));
+      return;
+    case 128:
+      emitpcode(POC_RRFW,   popGet(AOP(left),0));
+      emitpcode(POC_CLRF,   popGet(AOP(left),0));
+      emitpcode(POC_RRF,    popGet(AOP(left),0));
       return;
 
     }

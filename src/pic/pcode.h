@@ -734,6 +734,7 @@ typedef struct peepCommand {
 #define PCL(x)    ((pCodeLabel *)(x))
 #define PCF(x)    ((pCodeFunction *)(x))
 #define PCFL(x)   ((pCodeFlow *)(x))
+#define PCFLINK(x)((pCodeFlowLink *)(x))
 #define PCW(x)    ((pCodeWild *)(x))
 #define PCCS(x)   ((pCodeCSource *)(x))
 

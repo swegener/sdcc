@@ -75,7 +75,7 @@ static pBlock *pb_dead_pcodes = NULL;
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
-int debug_verbose = 0;                /* Set true to inundate .asm file */
+int debug_verbose = 1;                /* Set true to inundate .asm file */
 
 static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
@@ -2707,8 +2707,13 @@ static void genericPrint(FILE *of, pCode *pc)
     break;
 
   case PC_FLOW:
-    if(debug_verbose)
-      fprintf(of,";<>Start of new flow, seq=%d\n",pc->seq);
+    if(debug_verbose) {
+      fprintf(of,";<>Start of new flow, seq=0x%x",pc->seq);
+      if(PCFL(pc)->ancestor)
+	fprintf(of," ancestor = 0x%x", PCODE(PCFL(pc)->ancestor)->seq);
+      fprintf(of,"\n");
+
+    }
     break;
 
   case PC_CSOURCE:
@@ -3368,14 +3373,22 @@ void BuildFlow(pBlock *pb)
       InsertpFlow(pc, &pflow);
       seq = 0;
 
-    } else if (checkLabel(pc)) { //(PCI_HAS_LABEL(pc)) {
+    } else if (checkLabel(pc)) { 
 
       /* This instruction marks the beginning of a
        * new flow segment */
 
       pc->seq = 0;
-      seq = 1; 
-      InsertpFlow(findPrevInstruction(pc->prev), &pflow);
+      seq = 1;
+
+      /* If the previous pCode is not a flow object, then 
+       * insert a new flow object. (This check prevents 
+       * two consecutive flow objects from being insert in
+       * the case where a skip instruction preceeds an
+       * instruction containing a label.) */
+
+      if(last_pci && (PCI(last_pci)->pcflow == PCFL(pflow)))
+	InsertpFlow(findPrevInstruction(pc->prev), &pflow);
 
       PCI(pc)->pcflow = PCFL(pflow);
       
@@ -4677,11 +4690,10 @@ void AnalyzeFlow(int level)
    * In this phase, the individual flow blocks are examined
    * to determine their order of excution.
    */
-  /*
+
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     BuildFlowTree(pb);
 
-  */
 
   /* Phase x - Flow Analysis - Used Banks
    *

@@ -122,6 +122,8 @@ char DefaultExePath[128];
 #define OPTION_SHORT_IS_8BITS 	"--short-is-8bits"
 #define OPTION_TINI_LIBID 	"--tini-libid"
 #define OPTION_NO_XINIT_OPT     "--no-xinit-opt"
+#define OPTION_XRAM_SIZE	"--xram-size"
+#define OPTION_CODE_SIZE	"--code-size"
 
 static const OPTION 
 optionsTable[] = {
@@ -164,9 +166,11 @@ optionsTable[] = {
     { 0,    "--dumptree",           &options.dump_tree, "dump front-end AST before generating iCode" },
     { 0,    OPTION_DUMP_ALL,        NULL, "Dump the internal structure at all stages" },
     { 0,    OPTION_XRAM_LOC,        NULL, "<nnnn> External Ram start location" },
+    { 0,    OPTION_XRAM_SIZE,       NULL, "<nnnn> External Ram size" },
     { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },
     { 0,    OPTION_XSTACK_LOC,      NULL, "<nnnn> External Ram start location" },
     { 0,    OPTION_CODE_LOC,        NULL, "<nnnn> Code Segment Location" },
+    { 0,    OPTION_CODE_SIZE,       NULL, "<nnnn> Code Segment size" },
     { 0,    OPTION_STACK_LOC,       NULL, "<nnnn> Stack pointer initial value" },
     { 0,    OPTION_DATA_LOC,        NULL, "<nnnn> Direct data start location" },
     { 0,    OPTION_IDATA_LOC,       NULL, NULL },
@@ -903,6 +907,18 @@ parseCmdLine (int argc, char **argv)
                 continue;
 	    }
 
+	  if (strcmp (argv[i], OPTION_XRAM_SIZE) == 0)
+	    {
+                options.xram_size = getIntArg(OPTION_IRAM_SIZE, argv, &i, argc);
+                continue;
+	    }
+
+	  if (strcmp (argv[i], OPTION_CODE_SIZE) == 0)
+	    {
+                options.code_size = getIntArg(OPTION_IRAM_SIZE, argv, &i, argc);
+                continue;
+	    }
+
 	  if (strcmp (argv[i], OPTION_DATA_LOC) == 0)
 	    {
                 options.data_loc = getIntArg(OPTION_DATA_LOC, argv, &i, argc);
@@ -1210,6 +1226,14 @@ linkEdit (char **envp)
   /* if iram size specified */
   if (options.iram_size)
     fprintf (lnkfile, "-a 0x%04x\n", options.iram_size);
+
+  /* if xram size specified */
+  if (options.xram_size)
+    fprintf (lnkfile, "-v 0x%04x\n", options.xram_size);
+
+  /* if code size specified */
+  if (options.code_size)
+    fprintf (lnkfile, "-w 0x%04x\n", options.code_size);
 
   if (options.debug)
     fprintf (lnkfile, "-z\n");

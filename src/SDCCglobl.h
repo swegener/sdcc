@@ -250,6 +250,8 @@ struct options
     int idata_loc;		/* indirect address space        */
     int code_loc;		/* code location start           */
     int iram_size;		/* internal ram size (used only for error checking) */    
+    int xram_size;		/* external ram size (used only for error checking) */    
+    int code_size;		/* code size (used only for error checking) */    
   };
 
 /* forward definition for variables accessed globally */

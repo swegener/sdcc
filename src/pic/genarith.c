@@ -113,6 +113,60 @@ const char *AopType(short type)
 
   return "BAD TYPE";
 }
+
+const char *pCodeOpType(  pCodeOp *pcop)
+{
+
+  if(pcop) {
+
+    switch(pcop->type) {
+
+    case  PO_NONE:
+      return "PO_NONE";
+    case  PO_W:
+      return  "PO_W";
+    case  PO_STATUS:
+      return  "PO_STATUS";
+    case  PO_FSR:
+      return  "PO_FSR";
+    case  PO_INDF:
+      return  "PO_INDF";
+    case  PO_INTCON:
+      return  "PO_INTCON";
+    case  PO_GPR_REGISTER:
+      return  "PO_GPR_REGISTER";
+    case  PO_GPR_BIT:
+      return  "PO_GPR_BIT";
+    case  PO_GPR_TEMP:
+      return  "PO_GPR_TEMP";
+    case  PO_SFR_REGISTER:
+      return  "PO_SFR_REGISTER";
+    case  PO_PCL:
+      return  "PO_PCL";
+    case  PO_PCLATH:
+      return  "PO_PCLATH";
+    case  PO_LITERAL:
+      return  "PO_LITERAL";
+    case  PO_IMMEDIATE:
+      return  "PO_IMMEDIATE";
+    case  PO_DIR:
+      return  "PO_DIR";
+    case  PO_CRY:
+      return  "PO_CRY";
+    case  PO_BIT:
+      return  "PO_BIT";
+    case  PO_STR:
+      return  "PO_STR";
+    case  PO_LABEL:
+      return  "PO_LABEL";
+    case  PO_WILD:
+      return  "PO_WILD";
+    }
+  }
+
+  return "BAD PO_TYPE";
+}
+
 /*-----------------------------------------------------------------*/
 /* genPlusIncr :- does addition with increment if possible         */
 /*-----------------------------------------------------------------*/

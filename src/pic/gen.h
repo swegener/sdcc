@@ -163,7 +163,7 @@ pCodeOp *popCopyReg(pCodeOpReg *pc);
 pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *popGetLit(unsigned int lit);
 pCodeOp *popGetWithString(char *str);
-pCodeOp *popRegFromString(char *str);
+pCodeOp *popRegFromString(char *str, int size, int offset);
 pCodeOp *popGet (asmop *aop, int offset);//, bool bit16, bool dname);
 pCodeOp *popGetTempReg(void);
 void popReleaseTempReg(pCodeOp *pcop);
@@ -175,6 +175,8 @@ void aopOp (operand *op, iCode *ic, bool result);
 void pic14_outBitC(operand *result);
 void pic14_toBoolean(operand *oper);
 void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
+void mov2w (asmop *aop, int offset);
+const char *pCodeOpType(  pCodeOp *pcop);
 
 
 

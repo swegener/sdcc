@@ -70,7 +70,11 @@ static hTab *pic14pCodePeepCommandsHash = NULL;
 
 
 static pFile *the_pFile = NULL;
-static int peepOptimizing = 1;
+
+/* Hardcoded flags to change the behavior of the PIC port */
+static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
+static int functionInlining = 1;      /* inline functions if nonzero */
+
 static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
 
@@ -5176,6 +5180,8 @@ void InlinepCode(void)
   if(!the_pFile)
     return;
 
+  if(!functionInlining)
+    return;
 
   /* Loop through all of the function definitions and count the
    * number of times each one is called */
@@ -5202,7 +5208,7 @@ void InlinepCode(void)
 
   /* Now, Loop through the function definitions again, but this
    * time inline those functions that have only been called once. */
-
+  
   InlineFunction(the_pFile->pbHead);
   //fprintf(stderr,"inlining %d\n",__LINE__);
 

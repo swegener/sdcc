@@ -1267,20 +1267,6 @@ sfr at 0xA3 C0C         ; // DS80C390 specific
 #define ERIE    0x80
 #endif
 
-#ifdef C0C
-#undef C0C
-sfr at 0xA3 C0C         ; // DS80C390 specific
-// Not directly accessible bits
-#define SWINT   0x01
-#define ERCS    0x02
-#define AUTOB   0x04
-#define CRST    0x08
-#define SIESTA  0x10
-#define PDE     0x20
-#define STIE    0x40
-#define ERIE    0x80
-#endif
-
 #ifdef C0IR
 #undef C0IR
 sfr at 0xA5 C0IR        ; // DS80C390 specific
@@ -1454,11 +1440,6 @@ sfr at 0xE5 C1IR         ; // DS80C390 specific
 #ifdef C1IRE
 #undef C1IRE
 sfr at 0xE7 C1RE         ; // DS80C390 specific
-#endif
-
-#ifdef C1M1C
-#undef C1M1C
-sfr at 0xEB C1M1C        ; // DS80C390 specific
 #endif
 
 #ifdef C1M1C

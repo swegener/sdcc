@@ -8501,14 +8501,9 @@ void gen51AggregateAssign(iCode *ic) {
 	     ic->filename, ic->lineno);
     exit (821);
   }
-  
-  // memcpy from cseg to xseg
-  // this could be greatly improved here for multiple instances
-  // e.g.:
-  //  mov dptr,#fromName
-  //  mov r0:r1,#toName
-  //  mov r2:r3,#count
-  //  lcall _native_memcpy_cseg_to_xseg
+
+#if 1
+  // use the generic memcpy() for now
   emitcode (";", "initialize %s", OP_SYMBOL(IC_LEFT(ic))->name);
   emitcode ("mov", "dptr,#_memcpy_PARM_2");
   emitcode ("mov", "a,#%s", fromName);
@@ -8528,6 +8523,16 @@ void gen51AggregateAssign(iCode *ic) {
   emitcode ("mov", "dptr,#%s", toName);
   emitcode ("mov", "b,#%02x;	only to xseg for now", 1);
   emitcode ("lcall", "_memcpy");
+#else
+  // more efficient, but will require the native_memcpy_cs2xs
+  emitcode ("mov", "r0,#%s", fromName);
+  emitcode ("mov", "r1,#(%s>>8)", fromName);
+  emitcode ("mov", "r2,#%s", toName);
+  emitcode ("mov", "r3,#(%s>>8)", toName);
+  emitcode ("mov", "r4,#%d", count);
+  emitcode ("mov", "r5,#(%d>>8)", count);
+  emitcode ("lcall", "_native_memcpy_cs2xs");
+#endif
 }
 
 /*-----------------------------------------------------------------*/

@@ -241,7 +241,8 @@ static asmop *newAsmop (short type)
     return aop;
 }
 
-/* #define LAZY_DPS_OPT */ /* turn this on after some more testing. */
+/* Turn this off if the world goes to hell. */
+#define LAZY_DPS_OPT
 
 static int _currentDPS;	  /* Current processor DPS. */
 static int _desiredDPS;	  /* DPS value compiler thinks we should be using. */
@@ -7887,7 +7888,7 @@ static void genAssign (iCode *ic)
 #ifdef LAZY_DPS_OPT
 	D(emitcode(";", "Kevin's better literal load code"););
 	_startLazyDPSEvaluation();
-	while (size && ((unsigned int)((lit >> (offset*8)) & 0xff) != 0))
+    while (size && ((unsigned int)(lit >> (offset*8)) != 0))
 	{
 	    aopPut(AOP(result),
 	       	   aopGet(AOP(right),offset,FALSE,FALSE,TRUE),

@@ -300,6 +300,17 @@ operandLUse (operand * op, eBBlock ** ebbs,
       (OP_LIVETO (op) && OP_LIVETO (op) < ic->seq))
     {
       int torange = ic->seq;
+
+      /* if this is a SEND then the toRange should be extended
+	 to the call */
+      if (ic->op == SEND) {
+	  iCode *lic ;
+	  for (lic = ic->next ; lic ; lic = lic->next) {
+	      if (lic->op == CALL || lic->op == PCALL) break;
+	  }
+	  /* found it : mark */
+	  if (lic) torange = lic->seq;
+      }
       /* if this is the last use then if this block belongs 
          to a  loop &  some definition  comes into the loop 
          then extend the live range to  the end of the loop */
@@ -308,6 +319,7 @@ operandLUse (operand * op, eBBlock ** ebbs,
 	{
 	  torange = findLoopEndSeq (ebp->partOfLoop);
 	}
+      
       op = operandFromOperand (op);
       setToRange (op, torange, FALSE);
     }
@@ -624,15 +636,16 @@ static void computeClash ()
 	    /* so they overlap : set both their clashes */
 	    inner->clashes = bitVectSetBit(inner->clashes,outer->key);
 	    outer->clashes = bitVectSetBit(outer->clashes,inner->key);
-#if 0	    
+
 	    /* check if they share the same spillocation */
-	    if (SYM_SPIL_LOC(inner) && SYM_SPIL_LOC(outer)) {
+	    if (SYM_SPIL_LOC(inner) && SYM_SPIL_LOC(outer) && 
+		SYM_SPIL_LOC(inner) == SYM_SPIL_LOC(outer)) {
 		if (inner->reqv && !outer->reqv) SYM_SPIL_LOC(outer)=NULL;
 		else if (outer->reqv && !inner->reqv) SYM_SPIL_LOC(inner)=NULL;
 		else if (inner->used > outer->used) SYM_SPIL_LOC(outer)=NULL;
 		else SYM_SPIL_LOC(inner)=NULL;
 	    }
-#endif
+
 	}
     }
 }

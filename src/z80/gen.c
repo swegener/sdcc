@@ -220,6 +220,7 @@ static struct
   bool flushStatics;
   bool in_home;
   const char *lastFunctionName;
+  iCode *current_iCode;
 
   set *sendSet;
 
@@ -407,6 +408,7 @@ _vemit2 (const char *szFormat, va_list ap)
 	      (_G.lines.head = _newLineNode (buffer)));
 
   _G.lines.current->isInline = _G.lines.isInline;
+  _G.lines.current->ic = _G.current_iCode;
 }
 
 static void
@@ -466,6 +468,7 @@ _emit2 (const char *inst, const char *fmt,...)
                   (_G.lines.head = _newLineNode (lb)));
     }
   _G.lines.current->isInline = _G.lines.isInline;
+  _G.lines.current->ic = _G.current_iCode;
   va_end (ap);
 }
 
@@ -2422,7 +2425,8 @@ _saveRegsForCall(iCode *ic, int sendSetSize)
     bool bcInRet = FALSE, deInRet = FALSE;
     bitVect *rInUse;
 
-    rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
+    rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), 
+                            z80_rUmaskForOp (IC_RESULT(ic)));
 
     deInUse = bitVectBitValue (rInUse, D_IDX) || bitVectBitValue(rInUse, E_IDX);
     bcInUse = bitVectBitValue (rInUse, B_IDX) || bitVectBitValue(rInUse, C_IDX);
@@ -2657,6 +2661,7 @@ _opUsesPair (operand * op, iCode * ic, PAIR_ID pairId)
 static void
 emitCall (iCode * ic, bool ispcall)
 {
+  bool bInRet, cInRet, dInRet, eInRet;
   sym_link *dtype = operandType (IC_LEFT (ic));
 
   /* if caller saves & we have not saved then */
@@ -2825,12 +2830,24 @@ emitCall (iCode * ic, bool ispcall)
     }
 
   spillCached ();
+  if (IC_RESULT (ic))
+    {
+      bitVect *result = z80_rUmaskForOp (IC_RESULT (ic));
+      bInRet = bitVectBitValue(result, B_IDX);
+      cInRet = bitVectBitValue(result, C_IDX);
+      dInRet = bitVectBitValue(result, D_IDX);
+      eInRet = bitVectBitValue(result, E_IDX);
+    }
+  else
+    {
+      bInRet = FALSE;
+      cInRet = FALSE;
+      dInRet = FALSE;
+      eInRet = FALSE;
+    }
 
   if (_G.stack.pushedDE) 
     {
-      bool dInRet = bitVectBitValue(ic->rUsed, D_IDX);
-      bool eInRet = bitVectBitValue(ic->rUsed, E_IDX);
-
       if (dInRet && eInRet)
         {
           wassertl (0, "Shouldn't push DE if it's wiped out by the return");
@@ -2857,9 +2874,6 @@ emitCall (iCode * ic, bool ispcall)
   
   if (_G.stack.pushedBC) 
     {
-      bool bInRet = bitVectBitValue(ic->rUsed, B_IDX);
-      bool cInRet = bitVectBitValue(ic->rUsed, C_IDX);
-
       if (bInRet && cInRet)
         {
           wassertl (0, "Shouldn't push BC if it's wiped out by the return");
@@ -3144,6 +3158,9 @@ genRet (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   size = AOP_SIZE (IC_LEFT (ic));
 
+  aopDump("IC_LEFT", AOP(IC_LEFT(ic)));
+
+  #if 0  
   if ((size == 2) && ((l = aopGetWord (AOP (IC_LEFT (ic)), 0))))
     {
       if (IS_GB)
@@ -3154,6 +3171,11 @@ genRet (iCode * ic)
 	{
 	  emit2 ("ld hl,%s", l);
 	}
+    }
+  #endif
+  if (size==2)
+    {
+      fetchPair(IS_GB ? PAIR_DE : PAIR_HL, AOP (IC_LEFT (ic)));
     }
   else
     {
@@ -3169,7 +3191,8 @@ genRet (iCode * ic)
 	      l = aopGet (AOP (IC_LEFT (ic)), offset,
 			  FALSE);
 	      if (strcmp (_fReturn[offset], l))
-		emit2 ("ld %s,%s", _fReturn[offset++], l);
+		emit2 ("ld %s,%s", _fReturn[offset], l);
+              offset++;
 	    }
 	}
     }
@@ -7019,7 +7042,7 @@ genCast (iCode * ic)
   /* now depending on the sign of the destination */
   size = AOP_SIZE (result) - AOP_SIZE (right);
   /* Unsigned or not an integral type - right fill with zeros */
-  if (SPEC_USIGN (rtype) || !IS_SPEC (rtype) || AOP_TYPE(right)==AOP_CRY)
+  if (!IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE(right)==AOP_CRY)
     {
       while (size--)
 	aopPut (AOP (result), "!zero", offset++);
@@ -7620,6 +7643,7 @@ genZ80Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
+      _G.current_iCode = ic;
 
       if (cln != ic->lineno)
 	{

@@ -1,3 +1,14 @@
+2003-10-02  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/z80/gen.c (genRet): fixed bug #524753
+	* src/z80/gen.c (genCast): fixed internal error on cast from
+	pointer to long
+	* src/z80/gen.c (_saveRegsForCall, emitCall): adapted Johan's
+	fix for bug #477835 to the z80
+	* src/z80/gen.c (genZ80code, _vemit2, _emit2): added support
+	for tracking iCodes in the peephole optimizer for z80
+
+
 2003-10-01  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeJumpTable, geniCodeSwitch): fixed

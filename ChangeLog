@@ -1,3 +1,8 @@
+2004-01-15 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* device/include/mc68hc908jb8.h: Register defs for another member
+	of the hc08 family. Contributed by Bjorn Bringert - thanks!
+
 2004-01-14 Vangelis Rokas <vrokas@otenet.gr>
 
 	Documenting changes from previous commits.

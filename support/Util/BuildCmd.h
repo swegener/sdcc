@@ -22,13 +22,12 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#if !defined(__BUILDCMD_H)
-
+#ifndef __BUILDCMD_H
 #define __BUILDCMD_H
 
 void
 buildCmdLine (char *into, const char **cmds,
 	      const char *p1, const char *p2,
-	      const char *p3, const char * const *list) ;
+	      const char *p3, set *list);
 
 #endif

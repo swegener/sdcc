@@ -27,64 +27,94 @@
 
 #include <string.h>
 #include <assert.h>
+#include "SDCCset.h"
+#include "BuildCmd.h"
 
 void
 buildCmdLine (char *into, const char **cmds,
 	      const char *p1, const char *p2,
-	      const char *p3, const char * const *list)
+	      const char *p3, set *list)
 {
-  const char *p, *from;
+  int first = 1;
+
+  assert(cmds != NULL);
+  assert(into != NULL);
 
   *into = '\0';
 
-  while (*cmds)
-    {
-      from = *cmds;
-      cmds++;
+  while (*cmds) {
+    const char *p, *from, *par;
+    int sep = 1;
 
-      /* See if it has a '$' anywhere - if not, just copy */
-      if ((p = strchr (from, '$')))
-	{
-	  strncat (into, from, p - from);
-	  /* seperate it */
-	  strcat (into, " ");
-	  from = p + 2;
-	  p++;
-	  switch (*p)
-	    {
-	    case '1':
-	      if (p1)
-		strcat (into, p1);
-	      break;
-	    case '2':
-	      if (p2)
-		strcat (into, p2);
-	      break;
-	    case '3':
-	      if (p3)
-		strcat (into, p3);
-	      break;
-	    case 'l':
-	      {
-		const char *const *tmp = list;
-		if (tmp)
-		  {
-		    while (*tmp)
-		      {
-			strcat (into, *tmp);
-			strcat (into, " ");
-			tmp++;
-		      }
-		  }
-		break;
-	      }
-	    default:
-	      assert (0);
-	    }
-	}
-      strcat (into, from);	// this includes the ".asm" from "$1.asm"
+    from = *cmds;
+    cmds++;
 
-      strcat (into, " ");
+    /* See if it has a '$' anywhere - if not, just copy */
+    if ((p = strchr (from, '$'))) {
+      /* include first part of cmd */
+      if (p != from) {
+        if (!first && sep)
+          strcat(into, " ");
+        strncat(into, from, p - from);
+        sep = 0;
+      }
+      from = p + 2;
+
+      /* include parameter */
+      p++;
+      switch (*p) {
+      case '1':
+        par = p1;
+	break;
+
+      case '2':
+        par = p2;
+	break;
+
+      case '3':
+        par = p3;
+	break;
+
+      case 'l':
+        {
+          const char *tmp;
+          par = NULL;
+
+          if (list != NULL && (tmp = (const char *)setFirstItem(list)) != NULL) {
+            do
+            {
+              if (*tmp != '\0') {
+                if (sep)
+		  strcat(into, " ");  /* seperate it */
+                strcat(into, tmp);
+                tmp++;
+                sep = 1;
+              }
+            } while ((tmp = (const char *)setNextItem(list)) != NULL);
+          }
+        }
+	break;
+
+      default:
+	assert(0);
+      }
+
+      if (par && *par != '\0') {
+        if (!first && sep)
+          strcat(into, " ");   /* seperate it */
+        strcat(into, par);
+        sep = 0;
+      }
     }
-}
 
+    /* include the rest of cmd, e.g. ".asm" from "$1.asm" */
+    if (*from != '\0') {
+      if (!first && sep)
+        strcat(into, " ");   /* seperate it */
+      strcat(into, from);
+      sep = 0;
+    }
+
+    first = 0;
+  }
+}

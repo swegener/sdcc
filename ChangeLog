@@ -1,3 +1,8 @@
+2003-11-08 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* src/mcs51/main.c: fixed bug #838385. Thanks to Josef Pavlik for finding and fixing
+	* doc/sdccman.lyx: changed from 'article' to 'book'
+
 2003-11-08 Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/include/stdlib.h: include malloc.h to comply with ANSI

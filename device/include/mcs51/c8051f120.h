@@ -250,6 +250,16 @@ sbit at 0x8F CP1EN   ;  /* COMPARATOR 1 ENABLE                           */
 /*  FLSTAT  0x88 */
 sbit at 0x88 FLHBUSY ;  /* FLASH BUSY                                    */
 
+/*  P1  0x90 */
+sbit at 0x90 P1_0    ;
+sbit at 0x91 P1_1    ;
+sbit at 0x92 P1_2    ;
+sbit at 0x93 P1_3    ;
+sbit at 0x94 P1_4    ;
+sbit at 0x95 P1_5    ;
+sbit at 0x96 P1_6    ;
+sbit at 0x97 P1_7    ;
+
 /*  SCON0  0x98 */
 sbit at 0x98 RI0     ;  /* UART 0 RX INTERRUPT FLAG                      */
 sbit at 0x98 RI      ;  /* UART 0 RX INTERRUPT FLAG                      */
@@ -272,6 +282,16 @@ sbit at 0x9C REN1    ;  /* UART 1 RX ENABLE                              */
 sbit at 0x9D MCE1    ;  /* UART 1 MCE                                    */
 sbit at 0x9F S1MODE  ;  /* UART 1 MODE                                   */
 
+/*  P2  0xA0 */
+sbit at 0xA0 P2_0    ;
+sbit at 0xA1 P2_1    ;
+sbit at 0xA2 P2_2    ;
+sbit at 0xA3 P2_3    ;
+sbit at 0xA4 P2_4    ;
+sbit at 0xA5 P2_5    ;
+sbit at 0xA6 P2_6    ;
+sbit at 0xA7 P2_7    ;
+
 /*  IE  0xA8 */
 sbit at 0xA8 EX0     ;  /* EXTERNAL INTERRUPT 0 ENABLE                   */
 sbit at 0xA9 ET0     ;  /* TIMER 0 INTERRUPT ENABLE                      */
@@ -281,6 +301,16 @@ sbit at 0xAC ES0     ;  /* UART0 INTERRUPT ENABLE                        */
 sbit at 0xAC ES      ;  /* UART0 INTERRUPT ENABLE                        */
 sbit at 0xAD ET2     ;  /* TIMER 2 INTERRUPT ENABLE                      */
 sbit at 0xAF EA      ;  /* GLOBAL INTERRUPT ENABLE                       */
+
+/*  P3  0xB0 */
+sbit at 0xB0 P3_0    ;
+sbit at 0xB1 P3_1    ;
+sbit at 0xB2 P3_2    ;
+sbit at 0xB3 P3_3    ;
+sbit at 0xB4 P3_4    ;
+sbit at 0xB5 P3_5    ;
+sbit at 0xB6 P3_6    ;
+sbit at 0xB7 P3_7    ;
 
 /*  IP  0xB8 */
 sbit at 0xB8 PX0     ;  /* EXTERNAL INTERRUPT 0 PRIORITY                 */

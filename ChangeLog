@@ -1,3 +1,7 @@
+2004-02-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/c8051f120.h: added decalrations for sbit port 2,3&4
+
 2005-02-02 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCast.c (processParms): disabled W_NONRENT_ARGS for pic16 port

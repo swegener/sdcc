@@ -1874,6 +1874,7 @@ regTypeNum ()
 	      (ic = hTabItemWithKey (iCodehTab,
 				     bitVectFirstBit (sym->defs))) &&
 	      POINTER_GET (ic) &&
+	      !sym->noSpilLoc &&
 	      !IS_BITVAR (sym->etype))
 	    {
 

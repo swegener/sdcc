@@ -18,7 +18,7 @@ _asm
     push dph
     push dpl
     
-    mov  dps, #1        ; Alternate DPTR.
+    mov  dps, #0x1        ; Alternate DPTR.
     
     ; count  is in _memcpyx_PARM_3
     mov  dptr, #_memcpyx_PARM_3
@@ -42,9 +42,9 @@ _asm
     pop  dpl1
 
 #ifdef AUTO_TOGGLE
-    mov	dps, #21	; Current DPTR is alt DPTR, toggle after each op.
+    mov	dps, #0x21	; Current DPTR is alt DPTR, toggle after each op.
 #else
-    mov dps, #0		; Current DPTR is normal DPTR, no toggle.
+    mov dps, #0x0	; Current DPTR is normal DPTR, no toggle.
 #endif    
     
     ; src is in alt DPTR, dst is in normal DPTR, count is in r2/r3.
@@ -56,7 +56,7 @@ _asm
 
     ; increment r3 if r2 != 0 (makes djnz end-of-loop sequence possible).
     inc r3
-    cjne r2, #0, _memcpyx_loopTop
+    cjne r2, #0x0, _memcpyx_loopTop
     dec r3
 
 _memcpyx_loopTop:
@@ -81,7 +81,7 @@ _memcpyx_loopTop:
 _memcpy_done:
 
 #ifdef AUTO_TOGGLE
-    mov dps, #0
+    mov dps, #0x0
 #endif    
 
     pop dpl

@@ -1,3 +1,7 @@
+2003-11-11 Bernhard Held <bernhard@bernhardheld.de>
+
+        * src/SDCCmain.c (linkEdit): "fix" #834252
+
 2003-11-11 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (removePostIncDecOps, removePreIncDecOps),

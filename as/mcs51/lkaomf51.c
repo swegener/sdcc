@@ -702,6 +702,7 @@ void CollectInfoFromCDB(void)
 					symbol[numsym].UsageType=0x00;/*A procedure name symbol*/
 					symbol[numsym].Procedure=-1; /*Global symbol*/
 					symbol[numsym].Address=-1;/*Collected later*/
+					symbol[numsym].Static=-1; // o_gloom
 					numsym++;
 				}
 			break;

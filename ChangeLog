@@ -4,6 +4,7 @@
 	as/mcs51/lkmem.c, src/SDCCglob.h, src/SDCCmain.c: added options --stack-size and
 	--pack-iram.
 	* doc/sdccman.lyx: described options --stack-size and --pack-iram.
+	* as/mcs51/lkaomf51.c: fixed bug #895763
 
 2004-02-17 Bernhard Held <bernhard AT bernhardheld.de>
 

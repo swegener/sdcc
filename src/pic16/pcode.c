@@ -114,7 +114,7 @@ static void pCodePrintLabel(FILE *of, pCode *pc);
 static void pCodePrintFunction(FILE *of, pCode *pc);
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop);
 static char *pic16_get_op_from_instruction( pCodeInstruction *pcc);
-char *pic16_get_op( pCodeOp *pcop,char *buff,int buf_size);
+char *pic16_get_op( pCodeOp *pcop,char *buff,size_t buf_size);
 int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pic16_pCodePeepMatchRule(pCode *pc);
 static void pBlockStats(FILE *of, pBlock *pb);
@@ -3549,7 +3549,7 @@ static void pBlockRegs(FILE *of, pBlock *pb)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-char *pic16_get_op(pCodeOp *pcop,char *buffer, int size)
+char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
   regs *r;
   static char b[50];

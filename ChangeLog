@@ -1,6 +1,7 @@
 2003-05-19  Bernhard Held <bernhard@bernhardheld.de>
 
 	* doc/sdccman.lyx: fixed bug 739745
+	* src/pic16/pcode.c (pic16_get_op): fixed warning on alpha
 
 2003-05-18  Bernhard Held <bernhard@bernhardheld.de>
 

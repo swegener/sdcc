@@ -493,18 +493,18 @@ _mullong_dummy (void) _naked
 #else // _MULLONG_ASM
 
 struct some_struct {
-	int a ;
+	short a ;
 	char b;
 	long c ;};
 union bil {
         struct {unsigned char b0,b1,b2,b3 ;} b;
-        struct {unsigned int lo,hi ;} i;
+        struct {unsigned short lo,hi ;} i;
         unsigned long l;
-        struct { unsigned char b0; unsigned int i12; unsigned char b3;} bi;
+        struct { unsigned char b0; unsigned short i12; unsigned char b3;} bi;
 } ;
 #if defined(SDCC_USE_XSTACK)
 #  define bcast(x) ((union bil pdata *)&(x))
-#elif (defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390)) && !defined(SDCC_STACK_AUTO)
+#elif (defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390) || defined (SDCC_ds400)) && !defined(SDCC_STACK_AUTO)
 #  define bcast(x) ((union bil xdata *)&(x))
 #elif defined(__z80) || defined(__gbz80)
 #  define bcast(x) ((union bil *)&(x))

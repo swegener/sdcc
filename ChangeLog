@@ -1,3 +1,7 @@
+2004-12-02 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* device/include/pic/pic16f877.h : added an include file for the PIC16F877 device.
+
 2004-11-28 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	Adding support for replacing ljmps with sjmps in jumptables

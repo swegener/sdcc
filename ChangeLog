@@ -1,3 +1,11 @@
+2004-06-05 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: minor changes, mentioned beta vendor support
+	for ds80c400
+	* src/mcs51/peeph.def: ran unexpand -a over peeph.def
+	* src/mcs51/peeph.def: removed obsolete peephole 100.a,
+	added peephole 254 (left shift), 255 (jump table)
+
 2004-06-04 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/Makefile.in: removed comment line with model-pic16,

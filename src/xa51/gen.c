@@ -1698,7 +1698,12 @@ static void genCast (iCode * ic) {
       if (size==2)
 	return;
       // fall through: case 0x41
-      emitcode("sext", AOP_NAME(result)[1]);
+      if (signedness) {
+	emitcode("sext", "r1");
+      } else {
+	emitcode("mov", "r1,#0");
+      }
+      emitcode("mov", "%s,r1", AOP_NAME(result)[1]);
       return;
     case 0x14:
     case 0x12:

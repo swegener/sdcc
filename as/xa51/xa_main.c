@@ -200,19 +200,36 @@ int mk_reg(char *thename)
         exit(1);
 }
 
-
+int mk_global(char *thename)
+{
+  struct symbol *p;
+  
+  p = sym_list;
+  while (p != NULL) {
+    if (!(strcasecmp(thename, p->name))) {
+      p->global = 1;
+      return (0);
+    }
+    p = p->next;
+  }
+  fprintf(stderr, "Internal Error!  Couldn't find symbol\n");
+  exit(1);
+}
 
 int get_value(char *thename)
 {
-	struct symbol *p;
-	p = sym_list;
-	while (p != NULL) {
-		if (!(strcasecmp(thename, p->name)))
-			return (p->value);
-		p = p->next;
-	}
-	fprintf(stderr, "Internal Error!  Couldn't find symbol value\n");
-	exit(1);
+  struct symbol *p;
+  p = sym_list;
+  while (p != NULL) {
+    if (!(strcasecmp(thename, p->name))) {
+      if (p->mode=='=')
+	return 0;
+      return (p->value);
+    }
+    p = p->next;
+  }
+  fprintf(stderr, "Internal Error!  Couldn't find symbol value\n");
+  exit(1);
 }
 		
 
@@ -269,6 +286,8 @@ void print_symbol_table()
       fprintf (sym_fp, "%-5s", "SFR");
     } else if (p->isbit && !p->area) {
       fprintf (sym_fp, "%-5s", "SBIT");
+    } else if (p->mode=='=') {
+      fprintf (sym_fp,"ABS");
     } else if (!p->isdef) {
       fprintf (sym_fp,"EXTRN");
     } else {
@@ -388,10 +407,14 @@ void out(int *byte_list, int num) {
 	       area[current_area].size);
       if  (!area[current_area].defsEmitted) {
 	for (p=sym_list; p; p=p->next) {
-	  if (p->isdef && p->area==current_area) {
+	  if (p->global && p->isdef && p->area==current_area) {
 	    // skip temp labels
 	    if (p->name[strlen(p->name)-1]!='$') {
-	      fprintf (frel, "S %s Def%04x\n", p->name, p->value);
+	      if (p->mode=='=') {
+		fprintf (frel, "S %s Abs%04x\n", p->name, p->value);
+	      } else {
+		fprintf (frel, "S %s Def%04x\n", p->name, p->value);
+	      }
 	    }
 	  }
 	}
@@ -405,8 +428,10 @@ void out(int *byte_list, int num) {
       current_area==AREA_GSFINAL ||
       current_area==AREA_XINIT) {
     if (num) {
-      fprintf (frel, "T %04x", MEM_POS);
       for (i=0; i<num; i++) {
+	if ((i%16)==0) {
+	  fprintf (frel, "%sT %04x", i ? "\n" : "", MEM_POS);
+	}
 	fprintf (frel, " %02x", byte_list[i]);
       }
       fprintf (frel, "\n");
@@ -520,7 +545,7 @@ void relPrelude() {
   struct symbol *p;
 
   fprintf (frel, "SDCCXA rel, version %1.1f\n", version);
-  for (i=0; i<NUM_AREAS; i++) {
+  for (i=1; i<NUM_AREAS; i++) {
     if ((area[i].size=area[i].alloc_position-area[i].start)) {
       areas++;
     }
@@ -588,13 +613,13 @@ void process_args(int argc, char **argv)
 
   strcpy(infilename, argv[i]);
 
-  if (strncasecmp(infilename+strlen(infilename)-3, ".xa", 3)) {
+  if (strncasecmp(infilename+strlen(infilename)-4, ".asm", 3)) {
     fprintf (stderr, "unrecognized input file: \"%s\"\n", argv[i]);
     print_usage(1);
   }
 
   strcpy(modulename, infilename);
-  modulename[strlen(modulename)-3] = '\0';
+  modulename[strlen(modulename)-4] = '\0';
   sprintf (outfilename, "%s.rel", modulename);
   sprintf (listfilename, "%s.lst", modulename);
   if (createSymbolFile) {

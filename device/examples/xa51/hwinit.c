@@ -42,7 +42,9 @@ void putchar(char c) {
   _endasm;
 }
 
-#define getchar(x)
+char getchar() {
+  return 0;
+}
 
 void exit_simulator(void) {
   _asm

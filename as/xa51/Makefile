@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -ggdb -O2 -Wall
+CFLAGS = -ggdb -Wall
 YACC = bison -y -d
 LEX = flex -i
 LEXLIB = 

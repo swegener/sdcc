@@ -34,6 +34,7 @@ struct symbol {
         int isbit;      /* 1 if a bit address, 0 otherwise */
         int issfr;
 	int isreg;	/* 1 if a register, 0 otehrwise */
+        int global ;    /* is defined as global */
         char mode;      /* Absolute, Relative, Tmplabel, eXternal */
         short lk_index; /* symbol index for the linker */
         int area;       /* the area that this symbol is in */
@@ -99,6 +100,7 @@ extern char expr_var[2][MAX_SYMBOL];
 extern void error(char*);
 int mk_bit(char*, int);
 int mk_sfr(char*);
+int mk_global(char*);
 struct target * build_target_list(char *thename);
 struct symbol * build_sym_list(char *);
 int find_size_reg(int op1spec);

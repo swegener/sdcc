@@ -43,99 +43,95 @@ extern char * disasm(int byte, int memory_location);
 void error(char *s);
 
 
-void RELOC_FF(unsigned pc, unsigned short offset, short rl) {
+void RELOC_FF(unsigned where, unsigned pc, short rl) {
+  // pc = PC of the next instruction
   struct symbol *sym;
   if ((sym=findSymbol(yytext))) {
     if (sym->mode=='X') {
-      sprintf (rel_line[rl], "R %d REL_FF 0x%04x %s", offset, pc,
-	       sym->name);
+      sprintf (rel_line[rl], "R %04x REL_FF %s %04x", 
+	       where, sym->name, pc);
     }
   }
 }
  
-void RELOC_FFFF(unsigned pc, unsigned short offset, short rl) {
+void RELOC_FFFF(unsigned where, unsigned pc, short rl) {
   struct symbol *sym;
   if ((sym=findSymbol(yytext))) {
     if (sym->mode=='X') {
-      sprintf (rel_line[rl], "R %d REL_FFFF 0x%04x %s", offset, pc,
-	       sym->name);
+      sprintf (rel_line[rl], "R %04x REL_FFFF %s %04x", 
+	       where, sym->name, pc);
     }
   }
 }
  
-void RELOC_ABS_0F(unsigned short offset, int expr) {
+void RELOC_ABS_0F(unsigned where, int expr) {
   struct symbol *sym;
   if ((sym=findSymbol(expr_var[expr]))) {
     if (sym->mode=='X') {
-      sprintf (rel_line[expr], "R %d ABS_0F %s", offset, sym->name);
+      sprintf (rel_line[expr], "R %04x ABS_0F %s 0", where, sym->name);
     }
   }
 }
 
-void RELOC_ABS_FF(unsigned short offset, int expr) {
+void RELOC_ABS_FF(unsigned where, int expr) {
   struct symbol *sym;
   if ((sym=findSymbol(expr_var[expr]))) {
     if (sym->mode=='X') {
-      sprintf (rel_line[expr], "R %d ABS_FF %s", offset, sym->name);
+      sprintf (rel_line[expr], "R %04x ABS_FF %s 0", where, sym->name);
     }
   }
 }
 
-void RELOC_ABS_03FF(unsigned short offset, int expr) {
+void RELOC_ABS_03FF(unsigned where, int expr) {
   struct symbol *sym;
   if (expr_var[0]) {
     if ((sym=findSymbol(expr_var[expr]))) {
       if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %d ABS_03FF %s", offset, sym->name);
+	sprintf (rel_line[expr], "R %04x ABS_03FF %s 0", where, sym->name);
       }
     }
   }
 }
 
-void RELOC_ABS_07ff(unsigned short offset, int expr) {
+void RELOC_ABS_07ff(unsigned where, int expr) {
   struct symbol *sym;
   if (expr_var[0]) {
     if ((sym=findSymbol(expr_var[expr]))) {
       if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %d ABS_07ff %s", offset, sym->name);
+	sprintf (rel_line[expr], "R %04x ABS_07ff %s 0", where, sym->name);
       }
     }
   }
 }
 
-void RELOC_ABS_F0FF(unsigned short offset, int expr) {
+void RELOC_ABS_F0FF(unsigned where, int expr) {
   struct symbol *sym;
   if (expr_var[0]) {
     if ((sym=findSymbol(expr_var[expr]))) {
       if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %d ABS_F0FF %s", offset, sym->name);
+	sprintf (rel_line[expr], "R %04x ABS_F0FF %s", where, sym->name);
       }
     }
   }
 }
  
-void RELOC_ABS_FFFF(unsigned short offset, int expr) {
+void RELOC_ABS_FFFF(unsigned where, int expr) {
   struct symbol *sym;
   if (expr_var[0]) {
     if ((sym=findSymbol(expr_var[expr]))) {
       if (sym->mode=='X') {
-#if 1
-	sprintf (rel_line[expr], "R %d ABS_FFFF %s", offset, sym->name);
-#else
-	sprintf (rel_line[expr], "R 0 0 00 %02x 02 %02x %02x", current_area, 
-		 (sym->lk_index>>8)&0xff, sym->lk_index&&0xff);
-#endif
+	sprintf (rel_line[expr], "R %04x ABS_FFFF %s 0", where, sym->name);
       }
     }
   }
 }
  
-void RELOC_ABS_0F00FF(unsigned short offset, int expr) {
+void RELOC_ABS_0F00FF(unsigned where, int expr) {
   struct symbol *sym;
   if (expr_var[0]) {
     if ((sym=findSymbol(expr_var[expr]))) {
       if (sym->mode=='X') {
-	sprintf (rel_line[expr], "R %d ABS_0F00FF %s", offset, sym->name);
+	sprintf (rel_line[expr], "R %04x ABS_0F00FF %s", where, sym->name);
       }
     }
   }
@@ -209,9 +205,9 @@ directive:     '.' ORG expr {
 			if (p1 || p2) assign_value(symbol_name, $5, '?');
 			$$ = 0;
 		}
-             | normal_or_bit_symbol '=' expr {
+             | symbol '=' expr {
 	                if (p1) build_sym_list(symbol_name);
-			if (p1 || p2) assign_value(symbol_name, $3, '?');
+			if (p1 || p2) assign_value(symbol_name, $3, '=');
 	        }
 	     | symbol SFR expr {
 	                if (p1) build_sym_list(symbol_name);
@@ -279,12 +275,13 @@ directive:     '.' ORG expr {
 			$$ = 0;
 		}
 	     | '.' GLOBL WORD {
+	                mk_global(lex_sym_name);
 			/* ignore global symbol declaration */
 			$$ = 0;
 		}
 	     | '.' GLOBL bit {
 			/* ignore bit symbol declaration */
-			$$ = 0;
+ 			$$ = 0;
 		}
 	     | '.' DS expr {
 			/* todo: if CSEG, emit some filler bytes */
@@ -465,14 +462,14 @@ instruction:
 		op[0] = arith_opcode * 16 + size * 8 + 4;
 		op[1] = reg($2) * 16 + reg_indirect($5);
 		op[2] = ($7 >= 0) ? $7 : 256 + $7;
-		RELOC_ABS_FF(2,0);
+		RELOC_ABS_FF(MEM_POS+2,0);
 	} else {
 		$$ = 4;
 		op[0] = arith_opcode * 16 + size * 8 + 5;
 		op[1] = reg($2) * 16 + reg_indirect($5);
 		op[2] = ($7 >= 0) ? msb($7) : msb(65536 + $7);
 		op[3] = ($7 >= 0) ? lsb($7) : lsb(65536 + $7);
-		RELOC_ABS_FFFF(2,0);
+		RELOC_ABS_FFFF(MEM_POS+2,0);
 	}
   }
 | arith_inst '[' REG '+' expr ']' ',' REG {
@@ -482,14 +479,14 @@ instruction:
 		op[0] = arith_opcode * 16 + size * 8 + 4;
 		op[1] = reg($8) * 16 + 8 + reg_indirect($3);
 		op[2] = ($5 >= 0) ? $5 : 256 + $5;
-		RELOC_ABS_FF(2,0);
+		RELOC_ABS_FF(MEM_POS+2,0);
 	} else {
 		$$ = 4;
 		op[0] = arith_opcode * 16 + size * 8 + 5;
 		op[1] = reg($8) * 16 + 8 + reg_indirect($3);
 		op[2] = ($5 >= 0) ? msb($5) : msb(65536 + $5);
 		op[3] = ($5 >= 0) ? lsb($5) : lsb(65536 + $5);
-		RELOC_ABS_FFFF(2,0);
+		RELOC_ABS_FFFF(MEM_POS+2,0);
 	}
   }
 | arith_inst REG ',' '[' REG '+' ']' {
@@ -510,7 +507,7 @@ instruction:
 	op[0] = arith_opcode * 16 + size * 8 + 6;
 	op[1] = reg($4) * 16 + 8 + msb(direct_addr($2));
 	op[2] = lsb(direct_addr($2));
-	RELOC_ABS_07ff(1, 0);
+	RELOC_ABS_07ff(MEM_POS+1, 0);
   }
 | arith_inst REG ',' WORD {
 	$$ = 3;
@@ -518,7 +515,7 @@ instruction:
 	op[0] = arith_opcode * 16 + size * 8 + 6;
 	op[1] = reg($2) * 16 + msb(direct_addr($4));
 	op[2] = lsb(direct_addr($4));
-	RELOC_ABS_07ff(1, 0);
+	RELOC_ABS_07ff(MEM_POS+1, 0);
   }
 | arith_inst REG ',' '#' expr {
 	size = find_size1(inst_size, $2);
@@ -527,14 +524,14 @@ instruction:
 		op[0] = 0x91;
 		op[1] = reg($2) * 16 + arith_opcode;
 		op[2] = imm_data8($5);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 	} else {
 		$$ = 4;
 		op[0] = 0x99;
 		op[1] = reg($2) * 16 + arith_opcode;
 		op[2] = msb(imm_data16($5));
 		op[3] = lsb(imm_data16($5));
-		RELOC_ABS_FFFF (2, 0);
+		RELOC_ABS_FFFF (MEM_POS+2, 0);
 	}
   }
 | arith_inst '[' REG ']' ',' '#' expr {
@@ -544,14 +541,14 @@ instruction:
 		op[0] = 0x92;
 		op[1] = reg_indirect($3) * 16 + arith_opcode;
 		op[2] = imm_data8($7);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 	} else {
 		$$ = 4;
 		op[0] = 0x9A;
 		op[1] = reg_indirect($3) * 16 + arith_opcode;
 		op[2] = msb(imm_data16($7));
 		op[3] = lsb(imm_data16($7));
-		RELOC_ABS_FFFF (2, 0);
+		RELOC_ABS_FFFF (MEM_POS+2, 0);
 	}
   }
 | arith_inst '[' REG '+' ']' ',' '#' expr {
@@ -561,14 +558,14 @@ instruction:
 		op[0] = 0x93;
 		op[1] = reg_indirect($3) * 16 + arith_opcode;
 		op[2] = imm_data8($8);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 	} else {
 		$$ = 4;
 		op[0] = 0x9B;
 		op[1] = reg_indirect($3) * 16 + arith_opcode;
 		op[2] = msb(imm_data16($8));
 		op[3] = lsb(imm_data16($8));
-		RELOC_ABS_FFFF (2, 0);
+		RELOC_ABS_FFFF (MEM_POS+2, 0);
 	}
   }
 | arith_inst '[' REG '+' expr ']' ',' '#' expr {
@@ -580,8 +577,8 @@ instruction:
 			op[1] = reg_indirect($3) * 16 + arith_opcode;
 			op[2] = ($5 >= 0) ? $5 : 256 + $5;
 			op[3] = imm_data8($9);
-			RELOC_ABS_FF(2, 0);
-			RELOC_ABS_FF(3, 1);
+			RELOC_ABS_FF(MEM_POS+2, 0);
+			RELOC_ABS_FF(MEM_POS+3, 1);
 		} else {
 			$$ = 5;
 			op[0] = 0x9C;
@@ -589,8 +586,8 @@ instruction:
 			op[2] = ($5 >= 0) ? $5 : 256 + $5;
 			op[3] = msb(imm_data16($9));
 			op[4] = lsb(imm_data16($9));
-			RELOC_ABS_FF(2, 0);
-			RELOC_ABS_FFFF(3, 1);
+			RELOC_ABS_FF(MEM_POS+2, 0);
+			RELOC_ABS_FFFF(MEM_POS+3, 1);
 		}
 	} else {
 		if (size == SIZE8) {
@@ -600,8 +597,8 @@ instruction:
 			op[2] = ($5 >= 0) ? msb($5) : msb(65536 + $5);
 			op[3] = ($5 >= 0) ? lsb($5) : lsb(65536 + $5);
 			op[4] = imm_data8($9);
-			RELOC_ABS_FFFF(2,0);
-			RELOC_ABS_FF(4,1);
+			RELOC_ABS_FFFF(MEM_POS+2,0);
+			RELOC_ABS_FF(MEM_POS+4,1);
 		} else {
 			$$ = 6;
 			op[0] = 0x9D;
@@ -610,8 +607,8 @@ instruction:
 			op[3] = ($5 >= 0) ? lsb($5) : lsb(65536 + $5);
 			op[4] = msb(imm_data16($9));
 			op[5] = lsb(imm_data16($9));
-			RELOC_ABS_FFFF(2, 0);
-			RELOC_ABS_FFFF(4, 1);
+			RELOC_ABS_FFFF(MEM_POS+2, 0);
+			RELOC_ABS_FFFF(MEM_POS+4, 1);
 		}
 	}
   }
@@ -623,8 +620,8 @@ instruction:
 		op[1] = msb(direct_addr($2)) * 16 + arith_opcode;
 		op[2] = lsb(direct_addr($2));
 		op[3] = imm_data8($5);
-		RELOC_ABS_F0FF(1,0);
-		RELOC_ABS_FF(3,1);
+		RELOC_ABS_F0FF(MEM_POS+1,0);
+		RELOC_ABS_FF(MEM_POS+3,1);
 	} else {
 		$$ = 5;
 		op[0] = 0x9E;
@@ -632,8 +629,8 @@ instruction:
 		op[2] = lsb(direct_addr($2));
 		op[3] = msb(imm_data16($5));
 		op[4] = lsb(imm_data16($5));
-		RELOC_ABS_F0FF(1,0);
-		RELOC_ABS_FFFF (3,1);
+		RELOC_ABS_F0FF(MEM_POS+1,0);
+		RELOC_ABS_FFFF (MEM_POS+3,1);
 	}
   }
 
@@ -658,7 +655,7 @@ instruction:
 	op[0] = 0xA0 + size * 8;
 	op[1] = 128 + reg_indirect($5) * 16 + msb(direct_addr($2));
 	op[2] = lsb(direct_addr($2));
-	RELOC_ABS_07ff(1, 0);
+	RELOC_ABS_07ff(MEM_POS+1, 0);
   }
 | arith_inst '[' REG ']' ',' WORD {
 	/* this addr mode is only valid for MOV */
@@ -668,7 +665,7 @@ instruction:
 	op[0] = 0xA0 + size * 8;
 	op[1] = reg_indirect($3) * 16 + msb(direct_addr($6));
 	op[2] = lsb(direct_addr($6));
-	RELOC_ABS_07ff(1, 0);
+	RELOC_ABS_07ff(MEM_POS+1, 0);
   }
 | arith_inst WORD ',' WORD {
 	/* this addr mode is only valid for MOV */
@@ -679,8 +676,8 @@ instruction:
 	op[1] = msb(direct_addr($2)) * 16 + msb(direct_addr($4));
 	op[2] = lsb(direct_addr($2));
 	op[3] = lsb(direct_addr($4));
-	RELOC_ABS_F0FF(1, 0);
-	RELOC_ABS_0F00FF(1, 1);
+	RELOC_ABS_F0FF(MEM_POS+1, 0);
+	RELOC_ABS_0F00FF(MEM_POS+1, 1);
   }
 | arith_inst REG ',' USP {
 	/* this addr mode is only valid for MOV */
@@ -703,7 +700,7 @@ instruction:
 	op[0] = 0x08;
 	op[1] = 0x20 + msb(bit_addr($4));
 	op[2] = lsb(bit_addr($4));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 | arith_inst bit ',' C {
 	/* this addr mode is only valid for MOV */
@@ -712,7 +709,7 @@ instruction:
 	op[0] = 0x08;
 	op[1] = 0x30 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 
 | MOVC REG ',' '[' REG '+' ']' {
@@ -761,28 +758,28 @@ instruction:
 	op[0] = 0xA0 + size * 8;
 	op[1] = reg($2) * 16 + msb(direct_addr($4));
         op[2] = lsb(direct_addr($4));
-	RELOC_ABS_07ff(1, 0);
+	RELOC_ABS_07ff(MEM_POS+1, 0);
   }
 | short_data_inst REG ',' '#' expr {
 	$$ = 2;
 	size = find_size1(inst_size, $2);
 	op[0] = short_opcode + size * 8 + 1;
 	op[1] = reg($2) * 16 + imm_data4_signed($5);
-	RELOC_ABS_0F(1, 0);
+	RELOC_ABS_0F(MEM_POS+1, 0);
   }
 | short_data_inst '[' REG ']' ',' '#' expr {
 	$$ = 2;
 	size = find_size0(inst_size);
 	op[0] = short_opcode + size * 8 + 2;
 	op[1] = reg_indirect($3) * 16 + imm_data4_signed($7);
-	RELOC_ABS_0F(1, 0);
+	RELOC_ABS_0F(MEM_POS+1, 0);
   }
 | short_data_inst '[' REG '+' ']' ',' '#' expr {
 	$$ = 2;
 	size = find_size0(inst_size);
 	op[0] = short_opcode + size * 8 + 3;
 	op[1] = reg_indirect($3) * 16 + imm_data4_signed($8);
-	RELOC_ABS_0F(1, 0);
+	RELOC_ABS_0F(MEM_POS+1, 0);
   }
 | short_data_inst '[' REG '+' expr ']' ',' '#' expr {
 	size = find_size0(inst_size);
@@ -791,16 +788,16 @@ instruction:
 		op[0] = short_opcode + size * 8 + 4;
 		op[1] = reg_indirect($3) * 16 + imm_data4_signed($9);
 		op[2] = op[2] = ($5 >= 0) ? $5 : 256 + $5;
-		RELOC_ABS_0F(1, 1);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_0F(MEM_POS+1, 1);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 	} else {
 		$$ = 4;
 		op[0] = short_opcode + size * 8 + 5;
 		op[1] = reg_indirect($3) * 16 + imm_data4_signed($9);
 		op[2] = ($5 >= 0) ? msb($5) : msb(65536 + $5);
 		op[3] = ($5 >= 0) ? lsb($5) : lsb(65536 + $5);
-		RELOC_ABS_0F(1, 1);
-		RELOC_ABS_FFFF(2, 0);
+		RELOC_ABS_0F(MEM_POS+1, 1);
+		RELOC_ABS_FFFF(MEM_POS+2, 0);
 	}
   }
 | short_data_inst expr ',' '#' expr {
@@ -809,21 +806,21 @@ instruction:
 	op[0] = short_opcode + size * 8 + 6;
 	op[1] = msb(direct_addr($2)) * 16 + imm_data4_signed($5);
 	op[2] = lsb(direct_addr($2));
-	RELOC_ABS_0F(1, 0);
+	RELOC_ABS_0F(MEM_POS+1, 0);
   }
 | ANL C ',' bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = 0x40 + msb(bit_addr($4));
 	op[2] = lsb(bit_addr($4));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 | ANL C ',' '/' bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = 0x50 + msb(bit_addr($5));
 	op[2] = lsb(bit_addr($5));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 
 | ORL C ',' bit {
@@ -831,28 +828,28 @@ instruction:
 	op[0] = 0x08;
 	op[1] = 0x60 + msb(bit_addr($4));
 	op[2] = lsb(bit_addr($4));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 | ORL C ',' '/' bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = 0x70 + msb(bit_addr($5));
 	op[2] = lsb(bit_addr($5));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 | CLR bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 | SETB bit {
 	$$ = 3;
 	op[0] = 0x08;
 	op[1] = 0x10 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
-	RELOC_ABS_03FF(1, 0);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
   }
 | logical_shift_inst REG ',' REG {
 	size = find_size1(inst_size, $2);
@@ -937,13 +934,13 @@ instruction:
 		op[0] = 0x40;
 		op[1] = reg($2) * 16 + reg_indirect($4);
 		op[2] = ($6 >= 0) ? $6 : 256 + $6;
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 	} else {
 		op[0] = 0x48;
 		op[1] = reg($2) * 16 + reg_indirect($4);
 		op[2] = ($6 >= 0) ? msb($6) : msb(65536 + $6);
 		op[3] = ($6 >= 0) ? lsb($6) : lsb(65536 + $6);
-		RELOC_ABS_FFFF(2, 0);
+		RELOC_ABS_FFFF(MEM_POS+2, 0);
 	}
   }
 | stack_inst WORD {
@@ -952,7 +949,7 @@ instruction:
 	op[0] = msb(stack_addr_opcode) + size * 8;
 	op[1] = lsb(stack_addr_opcode) + msb(direct_addr($2));
 	op[2] = lsb(direct_addr($2));
-	RELOC_ABS_07ff(1, 0);
+	RELOC_ABS_07ff(MEM_POS+1, 0);
   }
 | stack_inst rlist {
 	$$ = 2;
@@ -987,7 +984,7 @@ instruction:
 	op[1] = reg($2) + 8;
 	op[2] = msb(imm_data16($5));
 	op[3] = lsb(imm_data16($5));
-	RELOC_ABS_FFFF(2, 0);
+	RELOC_ABS_FFFF(MEM_POS+2, 0);
   }
 | MULU REG ',' '#' expr {
 	size = find_size2(inst_size, $2, $4);
@@ -996,14 +993,14 @@ instruction:
 		op[0] = 0xE8;
 		op[1] = reg($2) * 16;
 		op[2] = imm_data8($5);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 	} else {
 		$$ = 4;
 		op[0] = 0xE9;
 		op[1] = reg($2) * 16;
 		op[2] = msb(imm_data16($5));
 		op[3] = lsb(imm_data16($5));
-		RELOC_ABS_FFFF(2, 0);
+		RELOC_ABS_FFFF(MEM_POS+2, 0);
 	}
   }
 | DIV REG ',' REG {
@@ -1050,7 +1047,7 @@ instruction:
 		op[0] = 0xE8;
 		op[1] = reg($2) * 16 + 11;
 		op[2] = imm_data8($5);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 		break;
 	case SIZE32:
 		$$ = 4;
@@ -1058,7 +1055,7 @@ instruction:
 		op[1] = (reg($2) / 2) * 32 + 9;
 		op[2] = msb(imm_data16($5));
 		op[3] = lsb(imm_data16($5));
-		RELOC_ABS_FFFF(2, 0);
+		RELOC_ABS_FFFF(MEM_POS+2, 0);
 		break;
 	}
   }
@@ -1070,14 +1067,14 @@ instruction:
 		op[0] = 0xE8;
 		op[1] = reg($2) * 16 + 1;
 		op[2] = imm_data8($5);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 		break;
 	case SIZE16:
 		$$ = 3;
 		op[0] = 0xE8;
 		op[1] = reg($2) * 16 + 3;
 		op[2] = imm_data8($5);
-		RELOC_ABS_FF(2, 0);
+		RELOC_ABS_FF(MEM_POS+2, 0);
 		break;
 	case SIZE32:
 		$$ = 4;
@@ -1085,7 +1082,7 @@ instruction:
 		op[1] = (reg($2) / 2) * 32 + 1;
 		op[2] = msb(imm_data16($5));
 		op[3] = lsb(imm_data16($5));
-		RELOC_ABS_FFFF(2, 0);
+		RELOC_ABS_FFFF(MEM_POS+2, 0);
 		break;
 	}
   }
@@ -1129,7 +1126,7 @@ instruction:
 	op[0] = 0xD5;
 	op[1] = msb(rel16(MEM_POS + $$, $2));
 	op[2] = lsb(rel16(MEM_POS + $$, $2));
-	RELOC_FFFF(MEM_POS+$$,1,0);
+	RELOC_FFFF(MEM_POS+1,MEM_POS+$$,0);
   }
 
 | CALL jmpaddr {
@@ -1137,13 +1134,13 @@ instruction:
         op[0] = 0xC5;
         op[1] = msb(rel16(MEM_POS + $$, $2));
         op[2] = lsb(rel16(MEM_POS + $$, $2));
-	RELOC_FFFF(MEM_POS+$$,1,0);
+	RELOC_FFFF(MEM_POS+1, MEM_POS+$$, 0);
   }
 | branch_inst jmpaddr {
 	$$ = 2;
 	op[0] = branch_opcode;
 	op[1] = rel8(MEM_POS + $$, $2);
-	RELOC_FF(MEM_POS + $$, 1,0);
+	RELOC_FF(MEM_POS+1,MEM_POS + $$, 0);
   }
 | CJNE REG ',' expr ',' jmpaddr {
         $$ = 4;
@@ -1152,8 +1149,8 @@ instruction:
 	op[1] = reg($2) * 16 + msb(direct_addr($4));
 	op[2] = lsb(direct_addr($4));
 	op[3] = rel8(MEM_POS + $$, $6);
-	RELOC_ABS_07ff(1, 0);
-	RELOC_FF(MEM_POS + $$, 3,1);
+	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 | CJNE REG ',' '#' expr ',' jmpaddr {
 	size  = find_size1(inst_size, $2);
@@ -1163,7 +1160,7 @@ instruction:
 		op[1] = reg($2) * 16;
 		op[2] = rel8(MEM_POS + $$, $7);
 		op[3] = imm_data8($5);
-		RELOC_ABS_FF(3, 0);
+		RELOC_ABS_FF(MEM_POS+3, 0);
 	} else {
 		$$ = 5;
 		op[0] = 0xEB;
@@ -1171,7 +1168,7 @@ instruction:
 		op[2] = rel8(MEM_POS + $$, $7);
 		op[3] = msb(imm_data16($5));
 		op[4] = lsb(imm_data16($5));
-		RELOC_ABS_FFFF(3, 0);
+		RELOC_ABS_FFFF(MEM_POS+3, 0);
 	}
   }
 | CJNE '[' REG ']' ',' '#' expr ',' jmpaddr {
@@ -1182,7 +1179,7 @@ instruction:
 		op[1] = reg_indirect($3) * 16 + 8;
 		op[2] = rel8(MEM_POS + $$, $9);
 		op[3] = imm_data8($7);
-		RELOC_ABS_FF(3, 0);
+		RELOC_ABS_FF(MEM_POS+3, 0);
 	} else {
 		$$ = 5;
 		op[0] = 0xEB;
@@ -1190,7 +1187,7 @@ instruction:
 		op[2] = rel8(MEM_POS + $$, $9);
 		op[3] = msb(imm_data16($7));
 		op[4] = lsb(imm_data16($7));
-		RELOC_ABS_FFFF(3, 0);
+		RELOC_ABS_FFFF(MEM_POS+3, 0);
 	}
   }
 | DJNZ REG ',' jmpaddr {
@@ -1199,7 +1196,7 @@ instruction:
 	op[0] = 0x87 + size * 8;
 	op[1] = reg($2) * 16 + 8;
 	op[2] = rel8(MEM_POS + $$, $4);
-	RELOC_FF(MEM_POS+$$, 2, 0);
+	RELOC_FF(MEM_POS+2, MEM_POS+$$, 0);
   }
 
 
@@ -1210,8 +1207,8 @@ instruction:
 	op[1] = msb(direct_addr($2)) + 8;
 	op[2] = lsb(direct_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_07ff(1, 0);
-	RELOC_FF(MEM_POS + $$, 3, 1)
+	RELOC_ABS_07ff(MEM_POS+1, 0);
+	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1)
   }
 
 | JB bit ',' jmpaddr {
@@ -1220,8 +1217,8 @@ instruction:
 	op[1] = 0x80 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_03FF(1, 0);
-	RELOC_FF(MEM_POS + $$, 3, 1);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 
 | JBC bit ',' jmpaddr {
@@ -1230,8 +1227,8 @@ instruction:
 	op[1] = 0xC0 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_03FF(1, 0);
-	RELOC_FF(MEM_POS + $$, 3, 1);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 
 | JNB bit ',' jmpaddr {
@@ -1240,8 +1237,8 @@ instruction:
 	op[1] = 0xA0 + msb(bit_addr($2));
 	op[2] = lsb(bit_addr($2));
 	op[3] = rel8(MEM_POS + $$, $4);
-	RELOC_ABS_03FF(1, 0);
-	RELOC_FF(MEM_POS + $$, 3, 1);
+	RELOC_ABS_03FF(MEM_POS+1, 0);
+	RELOC_FF(MEM_POS+3, MEM_POS + $$, 1);
   }
 
 

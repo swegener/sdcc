@@ -9,9 +9,12 @@ extern bit be;
 extern code ce;
 extern data de;
 extern xdata xe;
+xdata at 0x1234 abs;
+extern xdata xee;
 
 void main(void) {
   xe=getchar();
+  abs=1;
   putchar('1');
   putchar('2');
   putchar('3');

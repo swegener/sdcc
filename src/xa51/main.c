@@ -198,7 +198,7 @@ static const char *_linkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "xa_rasm", "$l", "$3", "$1.xa", NULL
+  "xa_rasm", "$l", "$3", "$1.asm", NULL
 };
 
 /* Globals */
@@ -218,7 +218,7 @@ PORT xa51_port =
     "",				/* Options with debug */
     "",				/* Options without debug */
     0,
-    ".xa",
+    ".asm",
     NULL			/* no do_assemble function */
   },
   {

@@ -8,7 +8,7 @@ SXA = $(shell if [ -f $(SXA_A) ]; then echo $(SXA_A); else echo $(SXA_B); fi)
 
 SDCCFLAGS +=-mxa51 --lesspedantic -DREENTRANT=
 
-OBJEXT = .xa
+OBJEXT = .rel
 EXEEXT = .hex
 
 EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)

@@ -49,13 +49,22 @@
    function of the registers.
    Dallas DS89C420 definitions added by B. Torok / bela.torok@kssg.ch
 
+   Version 1.0.5 (Dec 15, 2000)
+   Definitions added: #ifdef MCS51REG_EXTERNAL_ROM
+                      #ifdef MCS51REG_EXTERNAL_RAM
+                      #ifdef MCS51REG_DISABLE_WARNINGS
+
+   Version 1.0.6 (Dec 15, 2000)
+   Correction, if External Memory (RAM or ROM) ist used P2 is used for the
+   upper 8 Adressbits instead of P3
+
    Adding support for additional microcontrollers:
    -----------------------------------------------
 
    1. Don't modify this file!!!
 
    2. Insert your code in a separate file e.g.: mcs51reg_update.h and include
-      this after the #define HEADER_MCS51REG statement
+      this after the #define HEADER_MCS51REG statement in this file
 
    3. The mcs51reg_update.h file should contain following definitions:
 
@@ -64,7 +73,7 @@
 
           b. If necessary add entry(s) in for registers not defined in this file
 
-          c. Define the tnterrupt vectors
+          c. Define interrupt vectors
 
    4. Send me the file mcs51reg_update.h ( bela.torok@kssg.ch ).
       I'm going to verify/merge new definitions to this file.
@@ -74,7 +83,7 @@
 
    Use one of the following options:
 
-   1. use #include <mcs51reg.h> in your program & define REG_XXXXXX in your makefile.
+   1. use #include <mcs51reg.h> in your program & define MICROCONTROLLER_XXXX in your makefile.
 
    2. use following definitions prior the
       #include <mcs51reg.h> line in your program:
@@ -102,6 +111,18 @@
    MICROCONTROLLER_SAB80515A    Infineon / Siemens SAB80515A
    MICROCONTROLLER_SAB80517     Infineon / Siemens SAB80517
 
+   Additional definitions (use them prior the #include mcs51reg.h statement):
+
+   Ports P0 & P2 are not available for the programmer if external ROM used.
+   Use statement "#define MCS51REG_EXTERNAL_RAM" to undefine P0 & P2.
+
+   Ports P0, P2, P3_6, WR, P3_7 & RD are not available for the programmer if
+   external RAM is used.
+   Use statement "#define MCS51REG_EXTERNAL_RAM" to undefine P0, P2,
+   P3_6, WR, P3_7 & RD.
+
+   #define MCS51REG_DISABLE_WARNINGS -> disables warnings
+
 -----------------------------------------------------------------------*/
 
 
@@ -127,7 +148,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: 8051
+#endif
 #define P0
 #define SP
 #define DPL
@@ -161,7 +184,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: 8052
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -203,7 +228,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: Atmel AT89Cx051
+#endif
 // 8051 register set without P0 & P2
 #define SP
 #define DPL
@@ -237,7 +264,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: AT89S53
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -287,7 +316,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: AT89C52 or AT89LV52
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -331,7 +362,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: AT89C55 or AT89LV55
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -375,7 +408,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: Dallas DS80C320 or DS80C323
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -435,7 +470,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: Dallas DS89C420
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -502,7 +539,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: Dallas DS87C520 or DS85C520
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -566,7 +605,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: Infineon / Siemens SAB80515 & SAB80535
+#endif
 // 8051 register set without IP
 #define P0
 #define SP
@@ -622,7 +663,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: Infineon / Siemens SAB80515A
+#endif
 // 8051 register set without IP
 #define P0
 #define SP
@@ -685,7 +728,9 @@
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
 #endif
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning Selected HW: Infineon / Siemens SAB80517
+#endif
 // 8051 register set without IP, SCON & SBUF
 #define P0
 #define SP
@@ -791,6 +836,7 @@
 // use default if no microcontroller specified
 #ifndef MICROCONTROLLER_DEFINED
 #define MICROCONTROLLER_DEFINED
+#ifndef MCS51REG_DISABLE_WARNINGS
 #warning //////////////////////////////////
 #warning // No microcontroller defined!  //
 #warning //////////////////////////////////
@@ -803,6 +849,7 @@
 #warning If you use a non supported
 #warning microcontroller, mcs51reg.h can be
 #warning easily extended to support your HW.
+#endif
 // 8051 register set
 #define P0
 #define SP
@@ -829,8 +876,34 @@
 // end of definitions for the default microcontroller
 
 
-  #ifdef MCS51REG_ERROR
+#ifdef MCS51REG_ERROR
 #error Two or more microcontrollers defined!
+#endif
+
+#ifdef MCS51REG_EXTERNAL_ROM
+#ifndef MCS51REG_UNDEFINE_P0
+#define MCS51REG_UNDEFINE_P0
+#endif
+#ifndef MCS51REG_UNDEFINE_P2
+#define MCS51REG_UNDEFINE_P2
+#endif
+#endif
+
+#ifdef MCS51REG_EXTERNAL_RAM
+#ifndef MCS51REG_UNDEFINE_P0
+#define MCS51REG_UNDEFINE_P0
+#endif
+#ifndef MCS51REG_UNDEFINE_P2
+#define MCS51REG_UNDEFINE_P2
+#endif
+#endif
+
+#ifdef MCS51REG_UNDEFINE_P0
+#undef P0
+#endif
+
+#ifdef MCS51REG_UNDEFINE_P2
+#undef P2
 #endif
 
 ////////////////////////////////
@@ -1562,8 +1635,10 @@ sbit at 0xB2 P3_2 ;
 sbit at 0xB3 P3_3 ;
 sbit at 0xB4 P3_4 ;
 sbit at 0xB5 P3_5 ;
+#ifndef MCS51REG_EXTERNAL_RAM
 sbit at 0xB6 P3_6 ;
 sbit at 0xB7 P3_7 ;
+#endif
 // alternate names
 sbit at 0xB0 RXD  ;
 sbit at 0xB1 TXD  ;
@@ -1571,8 +1646,10 @@ sbit at 0xB2 INT0 ;
 sbit at 0xB3 INT1 ;
 sbit at 0xB4 T0   ;
 sbit at 0xB5 T1   ;
+#ifndef MCS51REG_EXTERNAL_RAM
 sbit at 0xB6 WR   ;
 sbit at 0xB7 RD   ;
+#endif
 #endif
 
 #ifdef P4_AT_0XE8
@@ -1635,7 +1712,7 @@ sfr at 0x87 PCON ;
 sfr at 0x87 PCON ;
 // Not directly accessible PCON bits
 #define IDL             0x01
-#define PD              0x02 
+#define PD              0x02
 #define GF0             0x04
 #define GF1             0x08
 #define SMOD            0x80

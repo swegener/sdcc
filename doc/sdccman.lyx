@@ -81,7 +81,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.3.7
+SDCC 2.3.8
 \size footnotesize 
 
 \newline 
@@ -490,7 +490,7 @@ code banking
 \newline 
 
 \family default 
-If you can think of some more, please see the chapter 
+If you can think of some more, please see the section 
 \begin_inset LatexCommand \ref{sub:Requesting-Features}
 
 \end_inset 
@@ -3395,7 +3395,7 @@ Adjust your environment variable PATH to include the location of the bin
 Building the Documentation
 \layout Standard
 
-If the necessary tools (LyX, LaTeX, latex2html) are installed it is as easy
+If the necessary tools (LyX, LaTeX, LaTeX2HTML) are installed it is as easy
  as changing into the doc directory and typing 
 \family sans 
 \series bold 
@@ -3411,7 +3411,8 @@ make
 \family default 
 \series default 
  there.
- You're invited to make changes and additions to this manual.
+ You're invited to make changes and additions to this manual (sdcc/doc/sdccman.ly
+x).
  Using LyX 
 \begin_inset LatexCommand \url{www.lyx.org}
 
@@ -3438,7 +3439,22 @@ Reading the Documentation
 
 Currently reading the document in pdf format is recommended, as for unknown
  reason the hyperlinks are working there whereas in the html version they
- are not.
+ are not
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+If you should know why please drop us a note
+\end_inset 
+
+.
+ You'll find the pdf version at 
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/doc/sdccman.pdf}
+
+\end_inset 
+
+.
 \newline 
 This documentation is in some aspects different from a commercial documentation:
  
@@ -4794,6 +4810,11 @@ Preprocessor Options
 \end_inset 
 
 
+\begin_inset LatexCommand \index{sdcpp (preprocessor)}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4988,7 +5009,24 @@ preprocessorOption[,preprocessorOption]
 \end_inset 
 
 ...
- Pass the preprocessorOption to the preprocessor.
+ Pass the preprocessorOption to the preprocessor 
+\family typewriter 
+sdcpp
+\family default 
+
+\begin_inset LatexCommand \index{sdcpp (preprocessor)}
+
+\end_inset 
+
+.
+ SDCC uses an adapted version of the preprocessor cpp of the GNU Compiler
+ Collection (gcc), if you need more dedicated options please refer to the
+ documentation at 
+\begin_inset LatexCommand \htmlurl{http://www.gnu.org/software/gcc/onlinedocs/}
+
+\end_inset 
+
+.
 \layout Subsection
 
 Linker Options
@@ -5888,7 +5926,12 @@ status Collapsed
 
 
 \series default 
- enable the generation of banksel assembler directives in the PIC16 port.
+ enable the generation of banksel assembler directives in the PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port.
 \layout Subsection
 
 Z80 Options
@@ -7752,7 +7795,7 @@ Paged xdata access is currently not as straightforward as using the other
 \end_inset 
 
 (or in case of some 8051 variants by a separate Special Function Register,
- see section
+ see section 
 \begin_inset LatexCommand \ref{sub:MCS51-variants}
 
 \end_inset 
@@ -8521,7 +8564,12 @@ banked
 
 
 \family typewriter 
-sfr banked at 0x123 IoPort; 
+sfr banked at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x123 IoPort; 
 \layout Standard
 
 Writing 0x01 to this variable generates the assembly code:
@@ -8700,12 +8748,28 @@ volatile
 \layout Standard
 
 For some architectures (mcs51) array accesses are more efficient if an (xdata/fa
-r) array starts at a block (256 byte) boundary
+r) array
+\family typewriter 
+\size footnotesize 
+
+\begin_inset LatexCommand \index{Aligned array}
+
+\end_inset 
+
+
+\family default 
+\size default 
+ starts at a block (256 byte) boundary
 \begin_inset LatexCommand \index{block boundary}
 
 \end_inset 
 
-.
+ (section 
+\begin_inset LatexCommand \ref{sub:A-Step-by Assembler Introduction}
+
+\end_inset 
+
+ has an example).
 \newline 
 Absolute addresses can be specified for variables in all storage classes,
  e.g.:
@@ -9051,7 +9115,12 @@ bit bvar;
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-data at 0x31 unsigned char j;
+data at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x31 unsigned char j;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -9567,7 +9636,7 @@ If the interrupt service routine is defined to be using a specific register
 \emph on 
 a, b, dptr
 \emph default 
- & psw are save and restored, if such an interrupt service routine calls
+ & psw are saved and restored, if such an interrupt service routine calls
  another function (using another register bank) then the entire register
  bank of the called function will be saved on the stack.
  This scheme is recommended for larger interrupt service routines.
@@ -9768,7 +9837,8 @@ Enabling and Disabling Interrupts
 Critical Functions and Critical Statements
 \layout Standard
 
-A special keyword may be associated with a function declaring it as 
+A special keyword may be associated with a block or a function declaring
+ it as 
 \emph on 
 critical
 \emph default 
@@ -10325,6 +10395,11 @@ Inline Assembler Code
 \layout Subsection
 
 A Step by Step Introduction
+\begin_inset LatexCommand \label{sub:A-Step-by Assembler Introduction}
+
+\end_inset 
+
+
 \layout Standard
 
 Starting from a small snippet of c-code this example shows for the MCS51
@@ -10337,7 +10412,22 @@ Starting from a small snippet of c-code this example shows for the MCS51
 
 \family typewriter 
 \size footnotesize 
-unsigned char xdata at 0x7f00 buf[0x100];
+unsigned char far
+\begin_inset LatexCommand \index{far (storage class)}
+
+\end_inset 
+
+ at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x7f00 buf[0x100];
+\begin_inset LatexCommand \index{Aligned array}
+
+\end_inset 
+
+
 \newline 
 unsigned char head,tail;
 \newline 
@@ -10466,9 +10556,20 @@ a,_head
 \SpecialChar ~
 cjne a,ar3,00106$ 
 \newline 
-ret 00106$: 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ret
 \newline 
-;buffer.c buf[ head++ ] = c; 
+00106$: 
+\newline 
+;buffer.c buf[ head++ ] = c; /* access to a 256 byte aligned array */
+\begin_inset LatexCommand \index{Aligned array}
+
+\end_inset 
+
+
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -10492,15 +10593,7 @@ _head
 \SpecialChar ~
 mov\SpecialChar ~
 \SpecialChar ~
-a,r3 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-add\SpecialChar ~
-\SpecialChar ~
-a,#_buf 
+dpl,r3 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -10508,30 +10601,7 @@ a,#_buf
 \SpecialChar ~
 mov\SpecialChar ~
 \SpecialChar ~
-dpl,a 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-clr\SpecialChar ~
-\SpecialChar ~
-a 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-addc\SpecialChar ~
-a,#(_buf >> 8) 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov\SpecialChar ~
-\SpecialChar ~
-dph,a 
+dph,#(_buf >> 8) 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -10567,21 +10637,23 @@ _endasm;
 The new file buffer.c should compile with only one warning about the unreferenced
  function argument 'c'.
  Now we hand-optimize the assembly code and insert an #define USE_ASSEMBLY
- and finally have:
+ (1) and finally have:
 \layout Verse
 
 
 \family typewriter 
 \size footnotesize 
-unsigned char xdata at 0x7f00 buf[0x100];
+unsigned char far at 0x7f00 buf[0x100];
 \newline 
 unsigned char head,tail;
 \newline 
-#define USE_ASSEMBLY
+#define USE_ASSEMBLY (1)
 \newline 
 
 \newline 
-#ifndef USE_ASSEMBLY
+#if USE_ASSEMBLY
+\newline 
+
 \newline 
 void to_buffer( unsigned char c )
 \newline 
@@ -12890,7 +12962,12 @@ instead
 \family typewriter 
 printf_fast()
 \family default 
- which should fit the requirements of many embedded systems.
+ which should fit the requirements of many embedded systems (by unsetting
+ #defines it can be customized to 
+\emph on 
+not
+\emph default 
+ support long variables and field widths).
 \layout Subsection
 
 Math functions (sin, pow, sqrt etc.)
@@ -13095,7 +13172,12 @@ The compiler outputs the higher order address byte of the external ram segment
 
 \end_inset 
 
-, therefore when using the External Stack option, this port 
+ (see also section 
+\begin_inset LatexCommand \ref{sub:MCS51-variants}
+
+\end_inset 
+
+), therefore when using the External Stack option, this port 
 \emph on 
 may not
 \emph default 
@@ -16486,8 +16568,13 @@ Specify the exact command you use to run SDCC, or attach your Makefile.
  
 \layout Enumerate
 
-Specify the SDCC version (type "sdcc -v"), your platform, and operating
- system.
+Specify the SDCC version (type "
+\family sans 
+\series bold 
+sdcc -v
+\family default 
+\series default 
+"), your platform, and operating system.
  
 \layout Enumerate
 
@@ -16543,6 +16630,62 @@ Like bug reports feature requests are forwarded to the developer mailing
 \end_inset 
 
 .
+\layout Section
+
+Submitting patches
+\layout Standard
+
+Like bug reports contributed patches are forwarded to the developer mailing
+ list.
+ This is the link for submitting patches
+\begin_inset LatexCommand \index{Patch submission}
+
+\end_inset 
+
+: 
+\begin_inset LatexCommand \url{http://sourceforge.net/tracker/?group_id=599&atid=300599}
+
+\end_inset 
+
+.
+\layout Standard
+
+You need to specify some parameters to the 
+\family typewriter 
+diff
+\family default 
+ command for the patches to be useful.
+ If you modified more than one file a patch created f.e.
+ with 
+\family sans 
+\series bold 
+
+\begin_inset Quotes sld
+\end_inset 
+
+diff -Naur unmodified_directory modified_directory >my_changes.patch
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family default 
+\series default 
+ will be fine, otherwise 
+\family sans 
+\series bold 
+
+\begin_inset Quotes sld
+\end_inset 
+
+diff -u sourcefile.c.orig sourcefile.c >my_changes.patch
+\begin_inset Quotes srd
+\end_inset 
+
+
+\series default 
+ 
+\family default 
+will do.
 \layout Section
 
 Getting Help
@@ -16607,16 +16750,16 @@ Release policy
 
 Historically there often were long delays between official releases and
  the sourceforge download area tends to get not updated at all.
- Current excuses might refer to problems with live range analysis, but if
- this is fixed, the next problem rising is that another excuse will have
- to be found.
+ Excuses in the past might have referred to problems with live range analysis,
+ but as this was fixed a while ago, the current problem is that another
+ excuse has to be found.
  Kidding aside, we have to get better there! On the other hand there are
  daily snapshots available at 
 \begin_inset LatexCommand \htmlurl[snap]{http://sdcc.sourceforge.net/snap.php}
 
 \end_inset 
 
-, and you can always built the very last version (hopefully with many bugs
+, and you can always build the very last version (hopefully with many bugs
  fixed, and features added) from the source code available at 
 \begin_inset LatexCommand \htmlurl[Source]{http://sdcc.sourceforge.net/snap.php#Source}
 
@@ -16712,8 +16855,18 @@ make
  in this directory (or f.e.
  
 \family sans 
+\series bold 
+
+\begin_inset Quotes sld
+\end_inset 
+
 make test-mcs51
+\begin_inset Quotes srd
+\end_inset 
+
+
 \family default 
+\series default 
  if you don't want to run the complete tests).
  The test code might also be interesting if you want to look for examples
 \begin_inset LatexCommand \index{Examples}
@@ -18853,15 +19006,30 @@ The port to the Motorola HC08
 The PIC14 port
 \layout Standard
 
-The 14bit PIC port still requires a major effort from the development community.
+The 14bit PIC
+\begin_inset LatexCommand \index{PIC14}
+
+\end_inset 
+
+ port still requires a major effort from the development community.
  However it can work for very simple code.
 \newline 
 
 \newline 
 
 \bar under 
-C code and 14bit PIC code page and RAM banks
+C code and 14bit PIC code page
+\begin_inset LatexCommand \index{code page (pic14)}
+
+\end_inset 
+
+ and RAM banks
 \bar default 
+
+\begin_inset LatexCommand \index{RAM bank (pic14)}
+
+\end_inset 
+
 
 \newline 
 The linker organizes allocation for the code page and RAM banks.
@@ -18905,7 +19073,7 @@ Creating a device include file
 \bar default 
 
 \newline 
-For generating a device include file use the support pearl script inc2h.pl
+For generating a device include file use the support perl script inc2h.pl
  kept in directory support/script.
 \newline 
 
@@ -18916,9 +19084,13 @@ Interrupt code
 \bar default 
 
 \newline 
-For the interrupt function, use the keyword 'interrupt' with level number
- of 0 (PIC14 only has 1 interrupt so this number is only there to avoid
- a syntax error - it ought to be fixed).
+For the interrupt function, use the keyword 'interrupt'
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ with level number of 0 (PIC14 only has 1 interrupt so this number is only
+ there to avoid a syntax error - it ought to be fixed).
  E.g.:
 \layout Verse
 
@@ -18948,7 +19120,11 @@ For assembling you can use either GPUTILS' gpasm.exe or MPLAB's mpasmwin.exe.
 \newline 
 
 \newline 
-Here is a makefile using GPUTILS:
+Here is a 
+\family typewriter 
+Makefile
+\family default 
+ using GPUTILS:
 \layout Verse
 
 
@@ -18990,7 +19166,11 @@ $(PRJ).hex: $(OBJS)
 gplink -m -s $(PRJ).lkr -o $(PRJ).hex $(OBJS)
 \layout Standard
 
-Here is a makefile using MPLAB:
+Here is a 
+\family typewriter 
+Makefile
+\family default 
+ using MPLAB:
 \layout Verse
 
 
@@ -19032,7 +19212,12 @@ $(PRJ).hex: $(OBJS)
 mplink /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS)
 \layout Subsection
 
-The PIC16 port
+The PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port
 \layout Standard
 
 You'll find some additional notes about this port in the file src/pic16/NOTES.

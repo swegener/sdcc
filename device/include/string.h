@@ -30,6 +30,10 @@
 #define reentrant
 #endif
 
+#ifndef NULL
+# define NULL (void *)0
+#endif
+
 #define memmove memcpy
 
 #ifdef SDCC_STACK_AUTO

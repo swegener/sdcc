@@ -22,7 +22,6 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 #include "string.h" 
-#define NULL (void *)0
 
 #if defined(SDCC_MODEL_LARGE) || defined (SDCC_MODEL_FLAT24)
 #pragma NOINDUCTION

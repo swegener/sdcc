@@ -26,8 +26,6 @@
 
 #if !_SDCC_PORT_PROVIDES_MEMCPY
 
-#define NULL (void *)0
-
 void * memcpy (
 	void * dst,
 	void * src,

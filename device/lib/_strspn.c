@@ -22,7 +22,6 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 #include "string.h" 
-#define NULL (void *)0
 
 int strspn (
 	char * string,

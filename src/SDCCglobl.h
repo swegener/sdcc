@@ -226,7 +226,7 @@ struct options
     int lessPedantic;           /* disable some warnings */
     int profile;                /* Turn on extra profiling information */
     int ommitFramePtr;		/* Turn off the frame pointer. */
-
+    int useAccelerator;		/* use ds390 Arithmetic Accelerator */
     char *calleeSaves[128];	/* list of functions using callee save */
     char *excludeRegs[32];	/* registers excluded from saving */
 

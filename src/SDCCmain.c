@@ -171,7 +171,7 @@ optionsTable[] = {
     { 0,    "--dumpliverange",      &options.dump_range, NULL },
     { 0,    "--dumpregpack",        &options.dump_pack, NULL },
     { 0,    "--dumpregassign",      &options.dump_rassgn, NULL },
-    { 0,    "--dumptree",           &options.dump_tree, NULL },
+    { 0,    "--dumptree",           &options.dump_tree, "dump front-end AST before generating iCode" },
     { 0,    OPTION_DUMP_ALL,        NULL, "Dump the internal structure at all stages" },
     { 0,    OPTION_XRAM_LOC,        NULL, "<nnnn> External Ram start location" },
     { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },
@@ -205,7 +205,8 @@ optionsTable[] = {
     { 0,    OPTION_LESS_PEDANTIC,   NULL, "Disable some of the more pedantic warnings" },
     { 0,    OPTION_SHORT_IS_8BITS,   NULL, "Make short 8bits (for old times sake)" },
     { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" },
-    { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." }
+    { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." },
+    { 0,    "--use-accelerator",    &options.useAccelerator,"generate code for  DS390 Arithmetic Accelerator"}
 };
 
 /** Table of all unsupported options and help text to display when one

@@ -1032,6 +1032,15 @@ replace {
 	mov	%3,%4
 } if notVolatile %1 %2
 
+// applies to f.e. bug-607243.c
+replace {
+	mov	r%1,%2
+	mov	ar%1,%3
+} by {
+	;	peephole 177.e	removed redundant move
+	mov	ar%1,%3
+}
+
 replace {
 	mov	a,%1
 	mov	b,a

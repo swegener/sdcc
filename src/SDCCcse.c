@@ -1590,7 +1590,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* if after all this it becomes a assignment to self
          then delete it and continue */
-      if (ASSIGNMENT_TO_SELF (ic))
+      if (ASSIGNMENT_TO_SELF (ic) && !OTHERS_PARM(OP_SYMBOL(IC_RESULT(ic))))
 	{
 	  remiCodeFromeBBlock (ebb, ic);
 	  continue;

@@ -86,14 +86,14 @@
  *	in the standard Intel Hex format.
  *
  *	local variables:
- *		addr_t	chksum		byte checksum
+ *		Addr_T	chksum		byte checksum
  *
  *	global variables:
  *		int	hilo		byte order
  *		FILE *	ofp		output file handle
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
- *		addr_t	rtval[]		relocated data
+ *		Addr_T	rtval[]		relocated data
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -105,7 +105,7 @@
 VOID
 ihx(i)
 {
-	register addr_t chksum;
+	register Addr_T chksum;
 
 	if (i) {
 		if (hilo == 0) {

@@ -1070,7 +1070,7 @@ bassav()
  *		int	lkerr		error flag
  *
  *	 functions called:
- *		addr_t	expr()		lkeval.c
+ *		Addr_T	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		char	getnb()		lklex.c
@@ -1180,7 +1180,7 @@ gblsav()
  *		int	lkerr		error flag
  *
  *	 functions called:
- *		addr_t	expr()		lkeval.c
+ *		Addr_T	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		char	getnb()		lklex.c

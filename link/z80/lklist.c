@@ -132,9 +132,9 @@ FILE *fp;
  *		int	j		bubble sort update status
  *		char *	ptr		pointer to an id string
  *		int	nmsym		number of symbols in area
- *		addr_t	a0		temporary
- *		addr_t	ai		temporary
- *		addr_t	aj		temporary
+ *		Addr_T	a0		temporary
+ *		Addr_T	ai		temporary
+ *		Addr_T	aj		temporary
  *		sym *	sp		pointer to a symbol structure
  *		sym **	p		pointer to an array of
  *					pointers to symbol structures
@@ -166,7 +166,7 @@ struct area *xp;
 	register c, i, j;
 	register char *ptr;
 	int nmsym;
-	addr_t a0, ai, aj;
+	Addr_T a0, ai, aj;
 	struct sym *sp;
 	struct sym **p;
 
@@ -337,7 +337,7 @@ VOID lstarea(struct area *xp)
 	register struct areax *oxp;
 	register int i, j;
 	int nmsym;
-	addr_t a0, ai, aj;
+	Addr_T a0, ai, aj;
 	struct sym *sp;
 	struct sym **p;
 
@@ -480,9 +480,9 @@ VOID lstarea(struct area *xp)
  *		int	j		bubble sort update status
  *		char *	ptr		pointer to an id string
  *		int	nmsym		number of symbols in area
- *		addr_t	a0		temporary
- *		addr_t	ai		temporary
- *		addr_t	aj		temporary
+ *		Addr_T	a0		temporary
+ *		Addr_T	ai		temporary
+ *		Addr_T	aj		temporary
  *		sym *	sp		pointer to a symbol structure
  *		sym **	p		pointer to an array of
  *					pointers to symbol structures
@@ -512,7 +512,7 @@ struct area *xp;
 	register c, i, j;
 	register char *ptr;
 	int nmsym;
-	addr_t a0, ai, aj;
+	Addr_T a0, ai, aj;
 	struct sym *sp;
 	struct sym **p;
 
@@ -678,7 +678,7 @@ VOID lstareatosym(struct area *xp)
 	register struct areax *oxp;
 	register int i, j;
 	int nmsym;
-	addr_t a0, ai;
+	Addr_T a0, ai;
 	struct sym *sp;
 	struct sym **p;
 
@@ -787,7 +787,7 @@ VOID lstareatosym(struct area *xp)
  *	output file.
  *
  *	local variables:
- *		addr_t	pc		current program counter address
+ *		Addr_T	pc		current program counter address
  *
  *	global variables:
  *		int	hilo		byte order
@@ -798,7 +798,7 @@ VOID lstareatosym(struct area *xp)
  *					output RST file
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
- *		addr_t	rtval[]		relocated data
+ *		Addr_T	rtval[]		relocated data
  *		FILE	*tfp		The file handle to the current
  *					LST file being scanned
  *
@@ -818,7 +818,7 @@ VOID
 lkulist(i)
 int i;
 {
-	addr_t pc;
+	Addr_T pc;
 
 	/*
 	 * Exit if listing file is not open
@@ -919,7 +919,7 @@ int i;
 
 VOID
 lkalist(pc)
-addr_t pc;
+Addr_T pc;
 {
 	char str[8];
 	int i;
@@ -1046,7 +1046,7 @@ loop:	if (tfp == NULL)
 
 VOID
 lkglist(pc,v)
-addr_t pc;
+Addr_T pc;
 int v;
 {
 	char str[8];

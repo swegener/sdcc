@@ -28,7 +28,7 @@
  *		int	symeq()
  *		VOID	syminit()
  *		VOID	symmod()
- *		addr_t	symval()
+ *		Addr_T	symval()
  *
  *	lksym.c contains no local/static variables.
  */
@@ -96,7 +96,7 @@ syminit()
  *		int	lkerr		error flag
  *
  *	functions called:
- *		addr_t	eval()		lkeval.c
+ *		Addr_T	eval()		lkeval.c
  *		VOID	exit()		c_library
  *		int	fprintf()	c_library
  *		char	get()		lklex.c
@@ -233,7 +233,7 @@ char *id;
 	return (sp);
 }
 
-/*)Function	addr_t	symval(tsp)
+/*)Function	Addr_T	symval(tsp)
  *
  *		sym *	tsp		pointer to a symbol structure
  *
@@ -242,7 +242,7 @@ char *id;
  *	value to the areax base address.
  *
  *	local variables:
- *		addr_t	val		relocated address value
+ *		Addr_T	val		relocated address value
  *
  *	global variables:
  *		none
@@ -254,11 +254,11 @@ char *id;
  *		none
  */
 
-addr_t
+Addr_T
 symval(tsp)
 register struct sym *tsp;
 {
-	register addr_t val;
+	register Addr_T val;
 
 	val = tsp->s_addr;
 	if (tsp->s_axp) {

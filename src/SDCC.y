@@ -822,6 +822,8 @@ enum_specifier
 
 enumerator_list
    : enumerator
+   | enumerator_list ',' {
+                         }
    | enumerator_list ',' enumerator {
                                        $3->next = $1 ;
                                        $$ = $3  ;

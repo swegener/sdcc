@@ -311,8 +311,8 @@ t_uc51::disass(t_addr addr, char *sep)
 	      break;
 	    case '8': // addr8 (direct address) at 3rd byte
  	      if (!get_name(get_mem(MEM_ROM, addr+2), sfr_tbl(), temp))
-		sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+1));
-	      sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
+		sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
+	      //sprintf(temp, "%02"_M_"x", get_mem(MEM_ROM, addr+2));
 	      break;
 	    case 'b': // bitaddr at 2nd byte
 	      {

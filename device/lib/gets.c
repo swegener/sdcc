@@ -24,6 +24,7 @@ char * gets(char *s) {
       return s;
     default:
       *s++=c;
+      count++;
       putchar(c);
       break;
     }

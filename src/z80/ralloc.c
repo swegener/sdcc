@@ -2463,7 +2463,7 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
     packRegisters (ebbs[i]);
 
   if (options.dump_pack)
-    dumpEbbsToFileExt (".dumppack", ebbs, count);
+    dumpEbbsToFileExt (DUMP_PACK, ebbs, count);
 
   /* first determine for each live range the number of 
      registers & the type of registers required for each */
@@ -2488,7 +2488,7 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
     }
 
   if (options.dump_rassgn)
-    dumpEbbsToFileExt (".dumprassgn", ebbs, count);
+    dumpEbbsToFileExt (DUMP_RASSGN, ebbs, count);
 
   /* after that create the register mask
      for each of the instruction */

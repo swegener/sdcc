@@ -654,6 +654,7 @@ extern	char		getnb();
 extern	int		more();
 extern	VOID		skip();
 extern	VOID		unget();
+extern	VOID		chop_crlf();
 
 /* lkarea.c */
 extern	VOID		lkparea();

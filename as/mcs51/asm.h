@@ -575,6 +575,7 @@ extern	char		getnb();
 extern	VOID		getst();
 extern	int		more();
 extern	VOID		unget();
+extern	VOID		chop_crlf();
 
 /* assym.c */
 extern	struct	area *	alookup();

@@ -381,7 +381,7 @@ char *name;
 
 /*2*/		while (fgets(relfil, NINPUT, libfp) != NULL) {
 		    relfil[NINPUT+1] = '\0';
-		    relfil[strlen(relfil) - 1] = '\0';
+		    chop_crlf(relfil);
 		    if (path != NULL) {
 			str = (char *) new (strlen(path)+strlen(relfil)+6);
 			strcpy(str,path);
@@ -414,7 +414,7 @@ char *name;
 /*4*/			while (fgets(buf, NINPUT, fp) != NULL) {
 
 			buf[NINPUT+1] = '\0';
-			buf[strlen(buf) - 1] = '\0';
+			chop_crlf(buf);
 
 			/*
 			 * Skip everything that's not a symbol record.
@@ -537,14 +537,11 @@ char *filspc;
 {
 	FILE *fp;
 	char str[NINPUT+2];
-	int i;
 
 	if ((fp = fopen(filspc,"r")) != NULL) {
 		while (fgets(str, NINPUT, fp) != NULL) {
 			str[NINPUT+1] = '\0';
-			i = strlen(str) - 1;
-			if (str[i] == '\n')
-				str[i] = '\0';
+			chop_crlf(str);
 			ip = str;
 			link_main();
 		}

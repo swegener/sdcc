@@ -402,8 +402,6 @@ getmap(d)
 int
 getline()
 {
-register int i;
-
 loop:	if (incfil >= 0) {
 		if (fgets(ib, sizeof ib, ifp[incfil]) == NULL) {
 			fclose(ifp[incfil--]);
@@ -423,9 +421,7 @@ loop:	if (incfil >= 0) {
 			++srcline[cfile];
 		}
 	}
-	i = strlen(ib) - 1;
-	if (ib[i] == '\n')
-		ib[i] = 0;
+	chop_crlf(ib);
 	return (1);
 }
 
@@ -491,4 +487,35 @@ endline()
 
 	c = getnb();
 	return( (c == '\0' || c == ';') ? 0 : c );
+}
+
+/*)Function	VOID	chop_crlf(str)
+ *
+ *		char	*str		string to chop
+ *
+ *	The function chop_crlf() removes trailing LF or CR/LF from
+ *	str, if present.
+ *
+ *	local variables:
+ *		int	i		string length
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ */
+
+VOID
+chop_crlf(str)
+char *str;
+{
+	register int i;
+
+	i = strlen(str);
+	if (i >= 1 && str[i-1] == '\n') str[i-1] = 0;
+	if (i >= 2 && str[i-2] == '\r') str[i-2] = 0;
 }

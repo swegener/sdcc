@@ -432,6 +432,8 @@ loop:	if (incfil >= 0) {
 	i = strlen(ib) - 1;
 	if (ib[i] == '\n')
 		ib[i] = 0;
+	if (i >= 1 && ib[i-1] == '\r')
+		ib[i-1] = 0;
 	return (1);
 }
 

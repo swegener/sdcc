@@ -62,7 +62,7 @@ _divlong_dummy (void) _naked
 		#define reste2	r6
 		#define reste3	r7
 
-#if defined(SDCC_NOOVERLAY)		// BUG SDCC_NOOVERLAY is not set by -no-overlay
+#if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
 #else
 		.area OSEG    (OVR,DATA)

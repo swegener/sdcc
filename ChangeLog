@@ -1,3 +1,19 @@
+2001-10-08  Bernhar Held  <bernhard@bernhardheld.de>
+
+	* src/SDCCmain.c (preProcess): added define SDCC_NOOVERLAY
+
+	* src/device/lib/_mulint.c  : removed hint: nooverlay bug
+
+	* src/device/lib/_mullong.c : removed hint: nooverlay bug
+
+	* src/device/lib/_divuint.c : removed hint: nooverlay bug
+
+	* src/device/lib/_divulong.c: removed hint: nooverlay bug
+
+	* src/device/lib/_moduint.c : removed hint: nooverlay bug
+
+	* src/device/lib/_modulong.c: removed hint: nooverlay bug
+
 2001-10-07  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/z80/gen.c (setupPair): Added 'extended stack' support for the z80.  Can now have local variables or parameters of more than 127 bytes in size.  Increadibly slow, but it will work.  Currently anything involving the carry flag.

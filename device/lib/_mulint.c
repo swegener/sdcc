@@ -121,7 +121,7 @@ _mulint_dummy (void) _naked
 
 #if !defined(SDCC_STACK_AUTO)
 
-#if defined(SDCC_NOOVERLAY)		// BUG SDCC_NOOVERLAY is not set by -no-overlay
+#if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
 #else
 		.area OSEG    (OVR,DATA)

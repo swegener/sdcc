@@ -1233,6 +1233,10 @@ preProcess (char **envp)
       if (options.stack10bit)
 	addToList (preArgv, "-DSDCC_STACK_TENBIT");
 
+      /* set the macro for no overlay  */
+      if (options.noOverlay)
+        addToList (preArgv, "-DSDCC_NOOVERLAY");
+
       /* set the macro for large model  */
       switch (options.model)
 	{

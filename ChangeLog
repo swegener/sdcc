@@ -1,3 +1,7 @@
+2003-03-22    <johan@balder>
+
+	* src/SDCCicode.c (geniCodeDerefPtr): fixed bug #698231
+
 2003-03-21  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/scripts/sdcc_mingw32: adapted to configure from autoconf 2.54
@@ -8,6 +12,14 @@
 2003-03-20  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/mcs51/peeph.def: fix bug #705773
+
+2003-03-20    <johan@balder>
+
+	An sfr/sbit can have an "at #" AND an initializer
+	* src/SDCCsymt.c (checkSClass): 
+	* src/SDCCmem.c (allocGlobal): 
+	* src/SDCCmem.c (allocLocal): 
+	* src/SDCCast.c (createBlock): 
 
 2003-03-17  Bernhard Held <bernhard@bernhardheld.de>
 

@@ -1,3 +1,7 @@
+2004-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (processFuncArgs): fixed bug #896796
+
 2004-02-14 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: minor changes, minor changed
@@ -13,7 +17,7 @@
 
 	* src/hc08/gen.h,
 	* src/hc08/gen.c (storeRegToAop, aopOp, aopAdrStr, accopWithAop,
-	rmwWithAop): Ported my 2004-10-02 fix for bug #663539 to the hc08,
+	rmwWithAop): Ported my 2003-10-02 fix for bug #663539 to the hc08,
 	thus fixing bug #895406
 
 2004-02-11 Bernhard Held <bernhard AT bernhardheld.de>

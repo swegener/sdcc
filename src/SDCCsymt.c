@@ -2161,10 +2161,9 @@ processFuncArgs (symbol * func)
   if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "SDCCsymt.c:processFuncArgs(%s)\n", func->name);
 
-  // if this is a pointer to a function
-  if (IS_PTR(funcType)) {
+  /* find the function declaration within the type */
+  while (funcType && !IS_FUNC(funcType))
     funcType=funcType->next;
-  }
 
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */

@@ -4748,7 +4748,9 @@ static int genChkZeroes(operand *op, int lit,  int size)
 }
 #endif
 
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #define DEBUGpc(fmt,...)  DEBUGpic16_emitcode("; =:=", "%s:%s:%d: " fmt, __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#endif
 #define isAOP_LIT(x)      (AOP_TYPE(x) == AOP_LIT)
 #define isAOP_REGlike(x)  (AOP_TYPE(x) == AOP_REG || AOP_TYPE(x) == AOP_DIR || AOP_TYPE(x) == AOP_PCODE || AOP_TYPE(x) == AOP_STA)
 
@@ -4831,7 +4833,9 @@ static void genCmp (operand *left,operand *right,
    * make sure that left is register (or the like) *
    *************************************************/
   if (!isAOP_REGlike(left)) {
+    #if !defined(__BORLANDC__) && !defined(_MSC_VER)
     DEBUGpc ("swapping arguments (AOP_TYPEs %d/%d)", AOP_TYPE(left), AOP_TYPE(right));
+    #endif
     assert (isAOP_LIT(left));
     assert (isAOP_REGlike(right));
     // swap left and right
@@ -4867,7 +4871,9 @@ static void genCmp (operand *left,operand *right,
   if (isAOP_LIT(right)) {
     if (!sign) {
       // unsigned comparison to a literal
+      #if !defined(__BORLANDC__) && !defined(_MSC_VER)
       DEBUGpc ("unsigned compare: left %s lit(0x%X=%lu), size=%d", performedLt ? "<" : ">=", lit, lit, size+1);
+      #endif
       if (lit == 0) {
 	// unsigned left < 0? always false
 	if (performedLt) emitCLRC; else emitSETC;
@@ -4875,7 +4881,9 @@ static void genCmp (operand *left,operand *right,
       }
     } else {
       // signed comparison to a literal
+      #if !defined(__BORLANDC__) && !defined(_MSC_VER)
       DEBUGpc ("signed compare: left %s lit(0x%X=%ld), size=%d, mask=%x", performedLt ? "<" : ">=", lit, lit, size+1, mask);
+      #endif
       if ((lit & mask) == ((0x80 << (size*8)) & mask)) {
 	// signed left < 0x80000000? always false
 	if (performedLt) emitCLRC; else emitSETC;

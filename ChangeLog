@@ -1,3 +1,7 @@
+2004-08-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* src/pic16/gen.c (DEBUGpc): MSVC 6 does not support macro variable arguments
+
 2005-01-08 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/device.c (pic16_dump_usection) changed naming scheme for

@@ -1,3 +1,20 @@
+# Test suite Makefile
+# Part of SDCC - http://sdcc.sourceforge.net/
+# Michael Hope <michaelh@juju.net.nz> 2001
+#
+# This Makefile builds and runs the test suites under tests/ for each
+# one of the supported ports located under ports/.  The test suite
+# results are summarised and individual test failures are logged.  The
+# expected result is a single line per port summarising the number of
+# failures, test points, and test cases.  The philosophy is that
+# checked in code should always pass the suite with no failures, as
+# then if there are failures then it is in the current developers code.
+#
+# Only the required suites are run.  Changing sdcc causes all to be
+# re-run.  Changing one suite causes just that to be run.  Changing
+# one of the library files should cause all to re-run
+
+# Old nores:
 # Starting at the bottom
 # Set of source test suites
 # Each source suite is processesd producing multiple device specific test suites.
@@ -6,43 +23,70 @@
 # The output from each device specific test suite derrived from a source
 # test suite are collated.
 
+# Uncomment this to show only errors and the summary.
+# Comment this out for debugging.
 .SILENT:
 
-CASES_DIR = cases
-RESULTS_DIR = results
+# All original tests live in TESTS_DIR and below
 TESTS_DIR = tests
+# All suite results go in RESULTS_DIR
+RESULTS_DIR = results
+# All data relating to supported ports live in their own directory
+# under PORTS_DIR.
 PORTS_DIR = ports
-SUBRESULTS_DIR = subresults
 
+# Itermediate data directories
+# Directory that generated cases and the related object code go.
+CASES_DIR = gen
+
+# Script that takes a source test suite and generates the iterations
 GENERATE_CASES = generate-cases.py
 
+# Magically generate the list of configured ports to test.
+# Each directory under ports/ is used as a port name.  Each port is tested.
+# The port name must be the same as the one used in the SDCC '-mxxx' argument.
+# Each port must have a spec.mk which describes how to build the object
+# files and how to run the emulator.
 ALL_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
+# Test all of the ports
 test-ports:
 	for i in $(ALL_PORTS); do $(MAKE) inter-port-clean test-port PORT=$$i; done
 
+# Begin per-port rules
+# List of all of the known source test suites.
 ALL_TESTS = $(shell find $(TESTS_DIR) -name "*.c")
 
+# Intermediate directory
 PORT_CASES_DIR = $(CASES_DIR)/$(PORT)
 PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
-PORT_SUBRESULTS_DIR = $(SUBRESULTS_DIR)/$(PORT)
+# Each test generates a result log file
 PORT_RESULTS = $(ALL_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out)
 
-# Defaults
+# Defaults.  Override in spec.mk if required.
+# Path to SDCC
 SDCC = ../../bin/sdcc
+# Base flags.
 SDCCFLAGS = -m$(PORT)
+# Extension of object intermediate files
 OBJEXT = .o
+# Extension of files that can be run in the emulator
 EXEEXT = .bin
+# Currently unused.  Extension to append to intermediate directories.
 DIREXT = 
 
+# Only include if we're in a per-port call.
 ifdef PORT
 include $(PORTS_DIR)/$(PORT)/spec.mk
 endif
 
-.PRECIOUS: $(PORT_CASES_DIR)/% %$(OBJEXT) %$(EXEEXT) %.dir
-
 SDCCFLAGS += -Ifwk/include
 
+# List of intermediate files to keep.  Pretty much keep everything as
+# disk space is free.
+.PRECIOUS: $(PORT_CASES_DIR)/% %$(OBJEXT) %$(EXEEXT)
+
+# Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%$(DIREXT): $(TESTS_DIR)/%.c $(GENERATE_CASES)
 	rm -rf $(CASES_DIR)/tests
 	mkdir -p $(CASES_DIR)/tests
@@ -51,34 +95,52 @@ $(PORT_CASES_DIR)/%$(DIREXT): $(TESTS_DIR)/%.c $(GENERATE_CASES)
 	cp $(CASES_DIR)/tests/*.c $@
 	touch $@
 
+# Rule linking the combined results log to all of the files in the
+# iteration directory.
 $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%$(DIREXT)
 	$(MAKE) iterations PORT=$(PORT) CASES=$<
 
+# Rule to summaries the results for one port after all of the tests
+# have been run.
 port-results: port-dirs $(PORT_RESULTS)
 	echo Summary for \'$(PORT)\': `cat $(PORT_RESULTS) | python collate-results.py`
 
 port-dirs:
-	mkdir -p $(PORT_CASES_DIR) $(PORT_RESULTS_DIR) $(PORT_SUBRESULTS_DIR)
+	mkdir -p $(PORT_CASES_DIR) $(PORT_RESULTS_DIR)
 
 test-port: port-results
 
+# Begin rules that process each iteration generated from the source
+# test
+
+# List of all of the generated iteration source files.
 SUB_CASES = $(wildcard $(CASES)/*.c)
-SUB_RESULTS = $(SUB_CASES:$(PORT_CASES_DIR)/%.c=$(PORT_SUBRESULTS_DIR)/%.out)
+# List of all the sub result logs generated from the iterations.
+SUB_RESULTS = $(SUB_CASES:%.c=%.out)
+# Overall target.  Concatenation of all of the sub results.
 RESULTS = $(CASES:$(CASES_DIR)/%$(DIREXT)=$(RESULTS_DIR)/%.out)
 
 iterations: $(RESULTS)
 
+# Rule to generate the overall target from the sub results.
 $(RESULTS): $(SUB_RESULTS)
 	cat $(SUB_RESULTS) > $@
 
-#$(PORT_CASES_DIR)/%.bin: $(PORT_CASES_DIR)/%.c
+# The remainder of the rules are in $PORT/spec.mak.  The port needs to
+# be able to turn an iterated test suite into a sub result, normally
+# by:
+#    1. Compile the required library files
+#    2. Compile this test suite.
+#    3. Link 1, 2, and any required stdlib into an executable.
+#    4. Run the executable inside an emulator, and capture the text
+#    output into %.out.
+#
+# The emulator must exit when main() returns.
 
-#$(PORT_CASES_DIR)/%.o: $(PORT_CASES_DIR)/%.c
+# BeginGeneric rules
 
 clean:
-	rm -rf $(CASES_DIR) $(RESULTS_DIR) $(SUBRESULTS_DIR)
+	rm -rf $(CASES_DIR) $(RESULTS_DIR)
 
 inter-port-clean:
 	rm -f  fwk/lib/*.o
-
-

@@ -1,11 +1,13 @@
+# Port specification for compiling on the host machines version of gcc
 SDCC = gcc
 SDCCFLAGS = -Wall
 
 EXEEXT = .bin
 
+# Required extras
 EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
-$(PORT_SUBRESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%$(EXEEXT)
+%.out: %$(EXEEXT)
 	mkdir -p `dirname $@`
 	-$< > $@
 	if grep -q FAIL $@; then echo FAILURES in $@; fi

@@ -1,9 +1,11 @@
 from HTMLgen import TemplateDocument
 import sys, re, tempfile, os
 
+"""See InstanceGenerator for a description of this file"""
+
 # Globals
 # Directory that the generated files should be placed into
-outdir = 'cases'
+outdir = 'gen'
 
 # Start of the test function table definition
 testfuntableheader = """

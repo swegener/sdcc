@@ -1,4 +1,5 @@
 	;; ****************************************
+        ;; Minimal crt0 and support functions for the sdcc test suite.
 	;; Beginning of module
 	.title	"Test runtime"
 	.module	Runtime
@@ -24,7 +25,8 @@ __putchar::
         ld      a,l
         out     (0xff),a
         ret
-        
+
+        ;; Segment order
         .org    0x200
 	.area _HOME
         .area _CODE

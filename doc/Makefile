@@ -84,14 +84,14 @@ $(CDB).html/index.html: $(CDB).tex
 archive: all
 	rm -rf sdcc-doc sdcc-doc.tar.bz2
 	mkdir sdcc-doc
-	rsync -rC avr z80 *.pdf *.txt sdcc-doc
+	rsync -rCt avr z80 *.pdf *.txt sdcc-doc
 
 	for doc in $(MANUAL) $(TSS) $(CDB); do \
-	  rsync -R $$doc.html/*.html $$doc.html/*.png $$doc.html/*.css sdcc-doc/; \
+	  rsync -Rt $$doc.html/*.html $$doc.html/*.png $$doc.html/*.css sdcc-doc/; \
 	done
 
 	mkdir sdcc-doc/as
-	rsync -rC ../as/doc/* sdcc-doc/as/
+	rsync -rCt ../as/doc/* sdcc-doc/as/
 
 	mkdir sdcc-doc/ucsim
 	cd ../sim/ucsim/doc; rsync *.html *.jpg *.gif *.fig ../../../doc/sdcc-doc/ucsim/

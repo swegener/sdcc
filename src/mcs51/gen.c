@@ -126,13 +126,13 @@ emitcode (char *inst, const char *fmt,...)
   if (inst && *inst)
     {
       if (fmt && *fmt)
-        sprintf (lb, "%s\t", inst);
+        SNPRINTF (lb, sizeof(lb), "%s\t", inst);
       else
-        sprintf (lb, "%s", inst);
-      vsprintf (lb + (strlen (lb)), fmt, ap);
+        SNPRINTF (lb, sizeof(lb), "%s", inst);
+      tvsprintf (lb + strlen(lb), sizeof(lb) - strlen(lb), fmt, ap);
     }
   else
-    vsprintf (lb, fmt, ap);
+    tvsprintf (lb, sizeof(lb), fmt, ap);
 
   while (isspace (*lbp))
     lbp++;

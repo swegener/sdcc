@@ -15288,6 +15288,221 @@ The PIC16
 
 (TM) microcontrollers with 16 bit core.
  Currently this family of microcontrollers contains the PIC18Fxxx and PIC18Fxxxx.
+ Currently supported devices are:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="4" columns="6">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F242
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F248
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F252
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F258
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F442
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F448
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F452
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F458
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F1220
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F2220
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F2550
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F4331
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F4455
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F6520
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F6620
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F6680
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F6720
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F8520
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F8620
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F8680
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+18F8720
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
 \layout Subsection
 
 Global Options
@@ -15484,7 +15699,8 @@ status Collapsed
 \layout Subsubsection
 
 Optimization Options
-\layout Standard
+\layout List
+\labelwidthstring 00.00.0000
 
 -
 \begin_inset ERT
@@ -15510,6 +15726,20 @@ status Collapsed
 /
 \end_inset 
 
+-optimize-cmp Try to optimize some compares.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
 -obanksel=nn Set optimization level for inserting BANKSELs.
 \newline 
 
@@ -15517,7 +15747,7 @@ status Collapsed
 \layout List
 \labelwidthstring 00.00.0000
 
-0 is no optimization
+0 no optimization
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15528,8 +15758,12 @@ status Collapsed
 
 2 tries to check the location of (even different) symbols and removes BANKSELs
  if they are in the same bank.
- Important: This will only work properly if the linker script does not have
- sections across bank borders!
+ 
+\newline 
+
+\emph on 
+Important: There might be problems if the linker script has data sections
+ across bank borders!
 \end_deeper 
 \layout Subsubsection
 
@@ -15561,7 +15795,7 @@ status Collapsed
 /
 \end_inset 
 
--use-crt= Use a custom run-time module instead of the defaults.
+-no-crt Don't link the default run-time modules
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15575,7 +15809,7 @@ status Collapsed
 /
 \end_inset 
 
--no-crt Don't link the default run-time modules
+-use-crt= Use a custom run-time module instead of the defaults.
 \layout Subsubsection
 
 Debugging Options
@@ -15686,6 +15920,38 @@ status Collapsed
 -call-tree dump call tree in .calltree file
 \layout Subsection
 
+Enviromental Variables
+\layout Standard
+
+There is a number of enviromental variables that can be used when running
+ SDCC to enable certain optimizations or force a specific program behaviour.
+ these variables are primarily for debugging purposes so they can be enabled/dis
+abled at will.
+\layout Standard
+
+Currently there is only two such variables available:
+\layout List
+\labelwidthstring 00.00.0000
+
+OPTIMIZE_BITFIELD_POINTER_GET when this variable exists reading of structure
+ bitfields is optimized by directly loading FSR0 with the address of the
+ bitfield structure.
+ Normally SDCC will cast the bitfield structure to a bitfield pointer and
+ then load FSR0.
+ This step saves data ram and code space for functions that perform heavy
+ use of bitfields.
+ (ie.
+ 80 bytes of code space are saved when compiling malloc.c with this option).
+ 
+\layout List
+\labelwidthstring 00.00.0000
+
+NO_REG_OPT do not perform pCode registers optimization.
+ This should be used for debugging purposes.
+ In some where bugs in the pcode optimizer are found, users can benefit
+ from temporarily disabling the optimizer until the bug is fixed.
+\layout Subsection
+
 Preprocessor Macros
 \layout Standard
 
@@ -15695,7 +15961,7 @@ PIC16 port defines the following preprocessor macros while translating a
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="2" columns="2">
+<lyxtabular version="3" rows="6" columns="2">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
@@ -15717,7 +15983,53 @@ Description
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SDCC_pic16
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Port identification
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+_pic16
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Port identification (same as above)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -15738,6 +16050,147 @@ xxxx
 \emph default 
  is the microcontrol identification number, i.e.
  452, 6620, etc
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+_
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+_18Fxxxx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MCU Identification (same as above)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+STACK_MODEL_nnn
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+nnn = SMALL or LARGE respectively according to the stack model used
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+In addition the following macros are defined when calling assembler:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Macro
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+__18Fxxxx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MCU Identification.
+ 
+\emph on 
+xxxx
+\emph default 
+ is the microcontrol identification number, i.e.
+ 452, 6620, etc
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SDCC_MODEL_nnn
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+nnn = SMALL or LARGE respectively according to the memory model used for
+ SDCC
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+STACK_MODEL_nnn
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+nnn = SMALL or LARGE respectively according to the stack model used
 \end_inset 
 </cell>
 </row>
@@ -15895,6 +16348,20 @@ stack pragma stack forces the code generator to initialize the stack & frame
 \newline 
 The stack pragma should be used only once in a project.
  Multiple pragmas may result in indeterminate behaviour of the program.
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+The old format (ie.
+ #pragma stack 0x5ff) is deprecated and will cause the stack pointer to
+ cross page boundaries (or even exceed the available data RAM) and crash
+ the program.
+ Make sure that stack does not cross page boundaries when using the SMALL
+ stack model.
+\end_inset 
+
+
 \newline 
 The format is as follows:
 \layout LyX-Code
@@ -15919,61 +16386,23 @@ Example:
 \layout LyX-Code
 
 #pragma stack 0x200 100
+\layout Standard
+
+If the stack_size field is omitted then a stack is created with the default
+ size of 64.
+ This size might be enough for most programs, but its not enough for operations
+ with deep function nesting or excessive stack usage.
 \layout List
 \labelwidthstring 00.00.0000
 
-wparam use the WREG to pass one byte of the first function argument.
- This improves speed but you may not use this for functions with arguments
- that are called via function pointers, otherwise one byte of the first
- parameter will get lost.
- This pragma should be placed in the header file to propagate the calling
- convention to all callers.
-\layout LyX-Code
-
-#pragma wparam function1[, function2, ...]
-\layout LyX-Code
-
-\layout LyX-Code
-
-Example:
-\layout LyX-Code
-
-\layout LyX-Code
-
-/* pass one byte via stack and one byte via WREG */
-\layout LyX-Code
-
-#pragma wparam foo
-\layout LyX-Code
-
-void foo(int x);
-\layout Standard
-
-The same effect with 
+wparam 
 \emph on 
-wparam pragma
+This pragma is deprecated.
+ Its use will cause a warning message to be issued.
 \emph default 
- can be achieved with the function attribute 
-\emph on 
-wparam
-\emph default 
-.
- Usage:
-\layout LyX-Code
 
-void func_wparam(int a) wparam
-\layout LyX-Code
+\newline 
 
-{
-\layout LyX-Code
-
-...
-\layout LyX-Code
-
-}
-\layout Standard
-
-Limitations of wparam pragma apply for wparam function attribute, too.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -16380,7 +16809,7 @@ Libraries are created with gplib which is part of the gputils package
 \end_inset 
 
 .
-\layout Subsubsection
+\layout Subsubsection*
 
 Building the libraries
 \layout Standard
@@ -16412,7 +16841,7 @@ make model-pic16
 su -c 'make install'     # install the libraries, you need the root password
 \layout Standard
 
-If you need to install the headers to, do:
+If you need to install the headers too, do:
 \layout LyX-Code
 
 cd device/include
@@ -16429,8 +16858,11 @@ every
 \emph default 
  supported device.
  This way building will take quite a lot of time.
- Users are advised to edit the device/lib/pic16/pics.build file and then
- execute:
+ Users are advised to edit the 
+\series bold 
+device/lib/pic16/pics.build
+\series default 
+ file and then execute:
 \layout LyX-Code
 
 make lib-io
@@ -16731,6 +17163,78 @@ Stack sections should no cross physical bank limits (i.e.
 These limitations are caused by the fact that only FSRxL is modified when
  using SMALL stack model, so no more than 256 bytes of stack can be used.
  This problem will disappear after LARGE model is fully implemented.
+\layout Subsection
+
+Functions
+\layout Standard
+
+In addition to the standard SDCC function keywords, PIC16 port makes available
+ two more:
+\layout List
+\labelwidthstring 00.00.0000
+
+wparam Use the WREG to pass one byte of the first function argument.
+ This improves speed but you may not use this for functions with arguments
+ that are called via function pointers, otherwise the first byte of the
+ first parameter will get lost.
+ Usage:
+\layout LyX-Code
+
+void func_wparam(int a) wparam
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+    /* WREG hold the lower part of a */
+\layout LyX-Code
+
+    /* the high part of a is stored in FSR2+2 (or +3 for large stack model)
+ */
+\layout LyX-Code
+
+...
+\layout LyX-Code
+
+}
+\layout Standard
+
+This keyword replaces the deprecated wparam pragma.
+\layout List
+\labelwidthstring 00.00.0000
+
+shadowregs When entering/exiting an ISR, it is possible to take advantage
+ of the PIC18F hardware shadow registers which hold the values of WREG,
+ STATUS and BSR registers.
+ This can be done by adding the keyword 
+\emph on 
+shadowregs
+\emph default 
+ before the 
+\emph on 
+interrupt
+\emph default 
+ keyword in the function's header.
+\layout LyX-Code
+
+void isr_shadow(void) shadowregs interrupt 1
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+...
+\layout LyX-Code
+
+}
+\layout Standard
+
+
+\emph on 
+shadowregs
+\emph default 
+ instructs the code generator not to store/restore WREG, STATUS, BSR when
+ entering/exiting the ISR.
 \layout Subsection
 
 Function return values
@@ -17040,6 +17544,44 @@ instruction at the
 Interrupt Vector Address
 \emph default 
  which points at the genetated ISR.
+ This single GOTO instruction is part of an automatically generated 
+\emph on 
+interrupt entry point
+\emph default 
+ function.
+ The actuall ISR code is placed as normally would in the code space.
+ Upon interrupt request, the GOTO instruction is executed which jumps to
+ the ISR code.
+ When declaring interrupt functions as _naked this GOTO instruction is 
+\series bold 
+not
+\series default 
+ generated.
+ The whole interrupt functions is therefore placed at the Interrupt Vector
+ Address of the specific interrupt.
+ This is not a problem for the LOW priority interrupts, but it is a problem
+ for the RESET and the HIGH priority interrupts because code may be written
+ at the next interrupt´s vector address and cause undeterminate program
+ behaviour if that interrupt is raised.
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+This is not a problem when
+\layout Enumerate
+
+this is a HIGH interrupt ISR and LOW interrupts are 
+\emph on 
+disabled
+\emph default 
+ or not used.
+\layout Enumerate
+
+when the ISR is small enough not to reach the next interrupt´s vector address.
+\end_inset 
+
+
 \layout Standard
 
 
@@ -17075,45 +17617,6 @@ FSR0 (FSR0L and FSR0H)
 \layout Standard
 
 These registers are restored upon return from the interrupt routine.
-\layout Subsubsection
-
-Using Shadow Registers
-\layout Standard
-
-When entering/exiting an ISR, it is possible to take advantage of the PIC18F
- core shadow registers which hold the values of WREG, STATUS and BSR registers.
- This can be done by adding the keyword 
-\emph on 
-shadowregs
-\emph default 
- before the 
-\emph on 
-interrupt
-\emph default 
- keyword in the function's header.
-\layout LyX-Code
-
-void isr_shadow(void) shadowregs interrupt 1
-\layout LyX-Code
-
-{
-\layout LyX-Code
-
-...
-\layout LyX-Code
-
-}
-\layout Standard
-
-
-\emph on 
-shadowregs
-\emph default 
- instructs the code generator not to store/restore WREG, STATUS, BSR when
- entering/exiting the ISR.
-\layout Standard
-
-
 \begin_inset Foot
 collapsed false
 
@@ -17123,7 +17626,1302 @@ NOTE that when the _naked attribute is specified for an interrupt routine,
  then NO registers are stored or restored.
 \end_inset 
 
-.
+
+\layout Subsection
+
+Generic Pointers
+\layout Standard
+
+Generic pointers are implemented in PIC16 port as 3-byte (24-bit) types.
+ There are 3 types of generic pointers currently implemented data, code
+ and eeprom pointers.
+ They are differentiated by the value of the 7th and 6th bits of the upper
+ byte:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="5" columns="5">
+<features>
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="left" valignment="top" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+pointer type
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+7th bit
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+6th bit
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+rest of the pointer
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+descrption
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+data 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+\shape slanted 
+\emph on 
+uuuuuu uuuuxxxx xxxxxxxx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+a 12-bit data pointer in data RAM memory
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+code
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+\shape slanted 
+\emph on 
+uxxxxx xxxxxxxx xxxxxxxx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+a 21-bit code pointer in FLASH memory
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+eeprom
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+\shape slanted 
+\emph on 
+uuuuuu uuuuuuxx xxxxxxxx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+a 10-bit eeprom pointer in EEPROM memory
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+(unimplemented)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+\shape slanted 
+\emph on 
+xxxxxx xxxxxxxx xxxxxxxx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+unimplemented pointer type
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+Generic pointer are read and written with a set of library functions which
+ read/write 1, 2, 3, 4 bytes.
+\layout Subsection
+
+PIC16 C Libraries
+\layout Subsubsection
+
+Standard I/O Streams
+\layout Standard
+
+In the 
+\emph on 
+stdio.h
+\emph default 
+ the type FILE is defined as:
+\layout LyX-Code
+
+typedef char * FILE;
+\layout Standard
+
+This type is the stream type implemented I/O in the PIC18F devices.
+ Also the standard input and output streams are declared in stdio.h:
+\layout LyX-Code
+
+extern FILE * stdin;
+\layout LyX-Code
+
+extern FILE * stdout;
+\layout Standard
+
+The FILE type is actually a generic pointer which defines one more type
+ of generic pointers, the 
+\emph on 
+stream 
+\emph default 
+pointer.
+ This new type has the format:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="2" columns="7">
+<features>
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="left" valignment="top" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+pointer type
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+<7:6>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+<5>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+<4>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+<3:0>
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+rest of the pointer
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+descrption
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+stream
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+00
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+nnnn
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+\shape slanted 
+\emph on 
+uuuuuuuu uuuuuuuu
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+upper byte high nubble is 0x2n, the rest are zeroes
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+Currently implemented there are 3 types of streams defined:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="4" columns="4">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+stream type
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+value
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+module
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+description
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+STREAM_USART
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+0x200000UL
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+USART
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Writes/Reads characters via the USART peripheral
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+STREAM_MSSP
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+0x210000UL
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MSSP
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Writes/Reads characters via the MSSP peripheral
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+STREAM_USER
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+0x2f0000UL
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+(none)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Writes/Reads characters via used defined functions
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+The stream identifiers are declared as macros in the stdio.h header.
+\layout Standard
+
+In the libc library there exist the functions that are used to write to
+ each of the above streams.
+ These are
+\layout List
+\labelwidthstring 00.00.0000
+
+_
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+_stream_usart_putchar writes a character at the USART stream
+\layout List
+\labelwidthstring 00.00.0000
+
+_
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+_stream_mssp_putchar writes a character at the MSSP stream
+\layout List
+\labelwidthstring 00.00.0000
+
+putchar dummy function.
+ This writes a character to a user specified manner.
+\layout Standard
+
+In order to increase performance 
+\emph on 
+putchar 
+\emph default 
+is declared in stdio.h as having its parameter in WREG (it has the wparam
+ keyword).
+ In stdio.h exists the macro PUTCHAR(arg) that defines the putchar function
+ in a user-friendly way.
+ 
+\emph on 
+arg
+\emph default 
+ is the name of the variable that holds the character to print.
+ An example follows:
+\layout LyX-Code
+
+#include <pic18fregs.h>
+\newline 
+#include <stdio.h>
+\newline 
+
+\newline 
+PUTCHAR( c )
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+    PORTA = c;    /* dump character c to PORTA */
+\layout LyX-Code
+
+} 
+\newline 
+
+\newline 
+void main(void)
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+    stdout = STREAM_USER;    /* this is not necessery, since stdout points
+\layout LyX-Code
+
+                              * by default to STREAM_USER */
+\layout LyX-Code
+
+    printf (¨This is a printf test
+\backslash 
+n¨);
+\layout LyX-Code
+
+}
+\layout LyX-Code
+
+\layout Subsubsection
+
+Printing functions
+\layout Standard
+
+PIC16 contains an implementation of the printf-family of functions.
+ There exist the following functions:
+\layout LyX-Code
+
+extern unsigned int sprintf(char *buf, char *fmt, ...);
+\layout LyX-Code
+
+extern unsigned int vsprintf(char *buf, char *fmt, va_list ap);
+\layout LyX-Code
+
+\layout LyX-Code
+
+extern unsigned int printf(char *fmt, ...);
+\layout LyX-Code
+
+extern unsigned int vprintf(char *fmt, va_lista ap);
+\layout LyX-Code
+
+\layout LyX-Code
+
+extern unsigned int fprintf(FILE *fp, char *fmt, ...);
+\layout LyX-Code
+
+extern unsigned int vfprintf(FILE *fp, char *fmt, va_list ap);
+\layout Standard
+
+For sprintf and vsprintf 
+\emph on 
+buf 
+\emph default 
+should normally be a data pointer where the resulting string will be placed.
+ No range checking is done so the user should allocate the necessery buffer.
+ For fprintf and vfprintf 
+\emph on 
+fp
+\emph default 
+ should be a stream pointer (i.e.
+ stdout, STREAM_MSSP, etc...).
+\layout Subsubsection
+
+Signals
+\layout Standard
+
+The PIC18F family of microcontrollers supports a number of interrupt sources.
+ A list of these interrupts is shown in the following table:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="11" columns="4">
+<features>
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+signal name
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+description
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+signal name
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+descritpion
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_RB
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+PORTB change interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_EE
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+EEPROM/FLASH write complete interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_INT0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+INT0 external interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_BCOL
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Bus collision interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_INT1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+INT1 external interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_LVD
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Low voltage detect interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_INT2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+INT2 external interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_PSP
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Parallel slave port interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_CCP1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+CCP1 module interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_AD
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+AD convertion complete interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_CCP2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+CCP2 module interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_RC
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+USART receive interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_TMR0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+TMR0 overflow interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_TX
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+USART transmit interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_TMR1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+TMR1 overflow interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_MSSP
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SSP receive/transmit interrupt
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_TMR2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+TMR2 matches PR2 interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SIG_TMR3
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+TMR3 overflow interrupt
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+The prototypes for these names are defined in the header file 
+\emph on 
+signal.h
+\emph default 
+ .
+\layout Standard
+
+In order to simplify signal handling, a number of macros is provided:
+\layout List
+\labelwidthstring 00.00.0000
+
+DEF_INTHIGH(name) begin the definition of the interrupt dispatch table for
+ high priority interrupts.
+ 
+\emph on 
+name
+\emph default 
+ is the function name to use.
+\layout List
+\labelwidthstring 00.00.0000
+
+DEF_INTLOW(name) begin the definition of the interrupt dispatch table fo
+ low priority interrupt.
+ 
+\emph on 
+name
+\emph default 
+ is the function name to use.
+\layout List
+\labelwidthstring 00.00.0000
+
+DEF_HANDLER(sig,handler) define a handler for signal 
+\emph on 
+sig.
+\layout List
+\labelwidthstring 00.00.0000
+
+END_DEF end the declaration of the dispatch table.
+\layout Standard
+
+Additionally there are two more macros to simplify the declaration of the
+ signal handler:
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series medium 
+SIGHANDLER(handler) 
+\series default 
+this declares the function prototype for the 
+\emph on 
+handler
+\emph default 
+ function.
+\layout List
+\labelwidthstring 00.00.0000
+
+SIGHANDLERNAKED(handler) same as SIGHANDLER() but declares a naked function.
+\layout Standard
+
+An example of using the macros above is shown below:
+\layout LyX-Code
+
+#include <pic18fregs.h>
+\layout LyX-Code
+
+#include <signal.h>
+\newline 
+
+\newline 
+DEF_INTHIGH(high_int)
+\layout LyX-Code
+
+DEF_HANDLER(SIG_TMR0, _tmr0_handler)
+\layout LyX-Code
+
+DEF_HANDLER(SIG_BCOL, _bcol_handler)
+\layout LyX-Code
+
+END_DEF
+\newline 
+
+\newline 
+SIGHANDLER(_tmr0_handler)
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+  /* action to be taken when timer 0 overflows */
+\layout LyX-Code
+
+}
+\newline 
+
+\newline 
+SIGHANDLERNAKED(_bcol_handler)
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+  _asm
+\layout LyX-Code
+
+    /* action to be taken when bus collision occurs */
+\layout LyX-Code
+
+    retfie
+\layout LyX-Code
+
+ _endasm;
+\layout LyX-Code
+
+}
+\layout Standard
+
+
+\series bold 
+NOTES:
+\series default 
+ Special care should be taken when using the above scheme:
+\layout Itemize
+
+do not place a colon (;) at the end of the DEF_* and END_DEF macros.
+\layout Itemize
+
+when declaring SIGHANDLERNAKED handler never forget to use 
+\emph on 
+retfie
+\emph default 
+ for proper returning.
+\layout Subsection
+
+PIC16 Port -- Tips
+\layout Standard
+
+Here you can find some general tips for compiling programs with SDCC/pic16.
+\layout Subsubsection
+
+Stack size
+\layout Standard
+
+The default stack size (that is 64 bytes) probably is enough for many programs.
+ One must take care that when there are many levels of function nesting,
+ or there is excessive usage of stack, its size should be extended.
+ An example of such a case is the printf/sprintf family of functions.
+ If you encounter problems like not being able to print integers, then you
+ need to set the stack size around the maximum (256 for small stack model).
+ The following diagram shows what happens when calling printf to print an
+ integer:
+\layout LyX-Code
+
+printf () --> ltoa () --> ultoa () --> divschar ()
+\layout Standard
+
+It is should be understood that stack is easily consumed when calling complicate
+d functions.
+ Using command line arguments like -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-fommit-frame-pointer might reduce stack usage by not creating unnecessery
+ stack frames.
+ Other ways to reduce stack usage may exist.
 \layout Chapter
 
 Debugging with SDCDB

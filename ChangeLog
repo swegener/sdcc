@@ -4,9 +4,8 @@
 
 2003-06-18  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
-	* src/SDCCglobl.h, src/SDCCmain.c:
+	* src/SDCCglobl.h, src/SDCCmain.c, doc/sdccman.lyx:
 	option --use-stdout sends errors to stdout instead of stderr.
-	(changes to sdccman.lyx comming soon)
 
 2003-06-18  Bernhard Held <bernhard@bernhardheld.de>
 
@@ -14,7 +13,7 @@
 
 2003-06-15  Borut Razem <borut.razem@siol.net>
 
-	* support/cpp2/sdcc.h: HAVE_DOS_BASED_FILE_SYSTEM defined for _WIN23
+	* support/cpp2/sdcc.h: HAVE_DOS_BASED_FILE_SYSTEM defined for _WIN32
 	* src/SDCC.lex: cloneXxx and copyAndFreeXxx functions for options and optimize stack handling
 	* src/SDCCglobl.h, src/SDCCmain.c, src/ds390/main.c, src/mcs51/main.c, src/z80/main.c:
 	fixed width array of pointers replaced with sets;

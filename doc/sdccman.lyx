@@ -6249,8 +6249,31 @@ status Collapsed
 
 
 \series default 
- Display the errors and warnings using MSVC style, so you can use SDCC with
+ Display errors and warnings using MSVC style, so you can use SDCC with
  visual studio
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-use-stderr
+\begin_inset LatexCommand \index{-\/-use-stdout}
+
+\end_inset 
+
+
+\series default 
+ Send errors and warnings to stdout instead of stderr
 \layout Subsubsection
 
 Intermediate Dump Options
@@ -9959,7 +9982,7 @@ when
 Redirecting output on Windows Shells
 \layout Standard
 
-SDCC writes it's error messages to 
+By default SDCC writes it's error messages to 
 \begin_inset Quotes sld
 \end_inset 
 
@@ -9968,83 +9991,43 @@ standard error
 \end_inset 
 
 .
- The windows 95/98/me shell (command or cmd) can't redirect it to a file.
- The solution is to use a reasonable shell or a helper program like redir.exe:
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://www.cygwin.com/ml/cygwin/1999-02/msg00603.html}
-
-\end_inset 
-
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/misc/redir.zip}
-
-\end_inset 
-
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/misc/README.redir}
-
-\end_inset 
-
-
-\newline 
-
-\newline 
-If you are using a windows NT/2K/XP shell, you can redirect the 
+ To force all messages to 
 \begin_inset Quotes sld
 \end_inset 
 
-standard error
+standard output
 \begin_inset Quotes srd
 \end_inset 
 
- output to a file using 
-\begin_inset Quotes sld
+ use 
+\series bold 
+-
+\series default 
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
 \end_inset 
 
-2>
-\begin_inset Quotes srd
-\end_inset 
-
-.
- For example:
-\newline 
 
 \series bold 
-
-\newline 
-sdcc -c foo.c 2> foo.err
-\newline 
-
-\newline 
-
+\emph default 
+-
 \series default 
-To append the 
-\begin_inset Quotes sld
-\end_inset 
+use-stdout
+\begin_inset LatexCommand \index{-\/-use-stdout}
 
-standard error
-\begin_inset Quotes srd
-\end_inset 
-
- output of SDCC to a file you can use 
-\begin_inset Quotes sld
-\end_inset 
-
-2>>
-\begin_inset Quotes srd
 \end_inset 
 
 .
- I you happen to have visual studio installed in your windows machine, you
- can use it to compile your sources using a custom build and the SDCC -
+ Aditionaly, if you happen to have visual studio installed in your windows
+ machine, you can use it to compile your sources using a custom build and
+ the SDCC -
 \emph on 
 
 \begin_inset ERT

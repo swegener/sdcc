@@ -97,6 +97,10 @@ SOURCE=.\genarith.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\genutils.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\glue.c
 # End Source File
 # Begin Source File

@@ -192,7 +192,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	   (sym->_isparm && !IS_REGPARM (sym->etype))) &&
 	  addPublics &&
 	  !IS_STATIC (sym->etype) &&
-	  (sym->used || sym->fbody))
+          (IS_FUNC(sym->type) ? (sym->used || sym->fbody) : 1))
 	{
 	  addSetHead (&publics, sym);
 	}

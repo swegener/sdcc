@@ -1444,15 +1444,9 @@ genUminusFloat (operand * op, operand * result)
 
   D(emitcode (";     genUminusFloat",""));
 
-  /* for this we just need to flip the
-     first it then copy the rest in place */
+  /* for this we just copy and then flip the bit */
+
   size = AOP_SIZE (op) - 1;
-  l = aopGet (AOP (op), 3, FALSE, FALSE);
-
-  MOVA (l);
-
-  emitcode ("cpl", "acc.7");
-  aopPut (AOP (result), "a", 3);
 
   while (size--)
     {
@@ -1461,6 +1455,13 @@ genUminusFloat (operand * op, operand * result)
 	      offset);
       offset++;
     }
+
+  l = aopGet (AOP (op), offset, FALSE, FALSE);
+
+  MOVA (l);
+
+  emitcode ("cpl", "acc.7");
+  aopPut (AOP (result), "a", offset);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6519,7 +6520,7 @@ genLeftShift (iCode * ic)
   char *l;
   symbol *tlbl, *tlbl1;
 
-  D(emitcode (";    genLeftShift",""));
+  D(emitcode (";     genLeftShift",""));
 
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);

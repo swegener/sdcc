@@ -2106,17 +2106,6 @@ static void genFunction (iCode *ic)
     if (IS_RENT(sym->etype) || options.stackAuto) {
 
 	if (options.useXstack) {
-		/* set up the PAGE for the xternal stack */
-		if (sym->args) {
-			emitcode("push","dph");
-			emitcode("push","acc");
-		}
-		emitcode("mov","dph,__page_no__");
-		emitcode("movx","a,@dptr");
-		if (sym->args) {
-			emitcode("pop","acc");
-			emitcode("pop","dph");
-		}		
 	    emitcode("mov","r0,%s",spname);
 	    emitcode("mov","a,_bp");
 	    emitcode("movx","@r0,a");
@@ -5871,9 +5860,10 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
     int rlen = 0 ;
     link *etype;
     int offset = 0 ;
+    int rsize ;
 
     etype = getSpec(operandType(result));
-
+    rsize = getSize(operandType(result));
     /* read the first byte  */
     switch (ptype) {
 
@@ -5900,6 +5890,8 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 	break;
     }
 
+    rlen = SPEC_BLEN(etype) ;
+    
     /* if we have bitdisplacement then it fits   */
     /* into this byte completely or if length is */
     /* less than a byte                          */
@@ -5911,12 +5903,11 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 
         emitcode("anl","a,#0x%02x",
                  ((unsigned char) -1)>>(8 - SPEC_BLEN(etype)));
-        aopPut(AOP(result),"a",offset);
-        return ;
+        aopPut(AOP(result),"a",offset++);
+        goto finish;
     }
 
     /* bit field did not fit in a byte  */
-    rlen = SPEC_BLEN(etype) - 8;
     aopPut(AOP(result),"a",offset++);
 
     while (1)  {
@@ -5952,7 +5943,7 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 
 	rlen -= 8;            
 	/* if we are done */
-	if ( rlen <= 0 )
+	if ( rlen < 8 )
 	    break ;
 	
 	aopPut(AOP(result),"a",offset++);
@@ -5960,10 +5951,16 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
     }
     
     if (rlen) {
-	emitcode("anl","a,#0x%02x",((unsigned char)-1)>>(-rlen));
-	aopPut(AOP(result),"a",offset);	       
+	    //	emitcode("anl","a,#0x%02x",((unsigned char)-1)>>(rlen));
+	AccLsh(8-rlen);
+	aopPut(AOP(result),"a",offset++);
     }
     
+ finish:
+    if (offset < rsize) {
+	    rsize -= offset;
+	    while (rsize--) aopPut(AOP(result),zero,offset++);
+    }
     return ;
 }
 
@@ -6472,7 +6469,7 @@ static void genPackBits (link    *etype ,
         l = aopGet(AOP(right),offset++,FALSE,TRUE);
 
         rLen -= 8 ;
-        if (rLen <= 0 )
+        if (rLen < 8 )
             break ;
 
         switch (p_type) {
@@ -6521,7 +6518,7 @@ static void genPackBits (link    *etype ,
                 break;
         }
 
-        emitcode ("anl","a,#0x%02x",((unsigned char)-1 << -rLen) );
+        emitcode ("anl","a,#0x%02x",(((unsigned char)-1 << rLen) & 0xff) );
         emitcode ("orl","a,b");
     }
 
@@ -6580,18 +6577,19 @@ static void genNearPointerSet (operand *right,
     asmop *aop = NULL;
     regs *preg = NULL ;
     char *rname , *l;
-    link *retype;
+    link *retype, *letype;
     link *ptype = operandType(result);
     
     retype= getSpec(operandType(right));
-
+    letype= getSpec(ptype);
     aopOp(result,ic,FALSE);
     
     /* if the result is rematerializable &
        in data space & not a bit variable */
     if (AOP_TYPE(result) == AOP_IMMD &&
 	DCL_TYPE(ptype) == POINTER   &&
-	!IS_BITVAR(retype)) {
+	!IS_BITVAR(retype) &&
+	!IS_BITVAR(letype)) {
 	genDataPointerSet (right,result,ic);
 	return;
     }
@@ -6613,8 +6611,8 @@ static void genNearPointerSet (operand *right,
     aopOp (right,ic,FALSE);
 
     /* if bitfield then unpack the bits */
-    if (IS_BITVAR(retype)) 
-        genPackBits (retype,right,rname,POINTER);
+    if (IS_BITVAR(retype) || IS_BITVAR(letype)) 
+        genPackBits ((IS_BITVAR(retype) ? retype : letype),right,rname,POINTER);
     else {
         /* we have can just get the values */
         int size = AOP_SIZE(right);
@@ -6669,9 +6667,10 @@ static void genPagedPointerSet (operand *right,
     asmop *aop = NULL;
     regs *preg = NULL ;
     char *rname , *l;
-    link *retype;
+    link *retype, *letype;
        
     retype= getSpec(operandType(right));
+    letype= getSpec(operandType(result));
     
     aopOp(result,ic,FALSE);
     
@@ -6692,8 +6691,8 @@ static void genPagedPointerSet (operand *right,
     aopOp (right,ic,FALSE);
 
     /* if bitfield then unpack the bits */
-    if (IS_BITVAR(retype)) 
-	genPackBits (retype,right,rname,PPOINTER);
+    if (IS_BITVAR(retype) || IS_BITVAR(letype)) 
+	genPackBits ((IS_BITVAR(retype) ? retype : letype),right,rname,PPOINTER);
     else {
 	/* we have can just get the values */
 	int size = AOP_SIZE(right);
@@ -6746,7 +6745,7 @@ static void genFarPointerSet (operand *right,
 {
     int size, offset ;
     link *retype = getSpec(operandType(right));
-
+    link *letype = getSpec(operandType(result));
     aopOp(result,ic,FALSE);
 
     /* if the operand is already in dptr 
@@ -6769,8 +6768,8 @@ static void genFarPointerSet (operand *right,
     aopOp(right,ic,FALSE);
 
     /* if bit then unpack */
-    if (IS_BITVAR(retype)) 
-        genPackBits(retype,right,"dptr",FPOINTER);
+    if (IS_BITVAR(retype) || IS_BITVAR(letype)) 
+        genPackBits((IS_BITVAR(retype) ? retype : letype),right,"dptr",FPOINTER);
     else {
         size = AOP_SIZE(right);
         offset = 0 ;
@@ -6795,6 +6794,7 @@ static void genGenPointerSet (operand *right,
 {
     int size, offset ;
     link *retype = getSpec(operandType(right));
+    link *letype = getSpec(operandType(result));
 
     aopOp(result,ic,FALSE);
 
@@ -6825,8 +6825,8 @@ static void genGenPointerSet (operand *right,
     aopOp(right,ic,FALSE);
 
     /* if bit then unpack */
-    if (IS_BITVAR(retype)) 
-        genPackBits(retype,right,"dptr",GPOINTER);
+    if (IS_BITVAR(retype) || IS_BITVAR(letype)) 
+        genPackBits((IS_BITVAR(retype) ? retype : letype),right,"dptr",GPOINTER);
     else {
         size = AOP_SIZE(right);
         offset = 0 ;
@@ -6866,21 +6866,6 @@ static void genPointerSet (iCode *ic)
     else {
 	/* we have to go by the storage class */
 	p_type = PTR_TYPE(SPEC_OCLS(etype));
-
-/* 	if (SPEC_OCLS(etype)->codesp ) { */
-/* 	    p_type = CPOINTER ;	 */
-/* 	} */
-/* 	else */
-/* 	    if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
-/* 		p_type = FPOINTER ; */
-/* 	    else */
-/* 		if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
-/* 		    p_type = PPOINTER ; */
-/* 		else */
-/* 		    if (SPEC_OCLS(etype) == idata ) */
-/* 			p_type = IPOINTER ; */
-/* 		    else */
-/* 			p_type = POINTER ; */
     }
 
     /* now that we have the pointer type we assign

@@ -1460,11 +1460,13 @@ static iCode *farSpacePackable (iCode *ic)
 /*-----------------------------------------------------------------*/
 static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 {
-    iCode *dic, *sic;
-    
+	iCode *dic, *sic;
+	link *etype = operandType(IC_RIGHT(ic));
+	
     if (!IS_ITEMP(IC_RIGHT(ic))       ||	
 	OP_SYMBOL(IC_RIGHT(ic))->isind ||
-	OP_LIVETO(IC_RIGHT(ic)) > ic->seq) {
+	OP_LIVETO(IC_RIGHT(ic)) > ic->seq ||
+	IS_BITFIELD(etype)) {
 	return 0;
     }
 	
@@ -1531,7 +1533,12 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
     
     if (!dic)
 	return 0 ; /* did not find */
-	    
+	
+    /* if assignment then check that right is not a bit */
+    if (ASSIGNMENT(dic) && !POINTER_SET(dic)) {
+	    link *etype = operandType(IC_RIGHT(dic));
+	    if (IS_BITFIELD(etype)) return 0;
+    }
     /* if the result is on stack or iaccess then it must be
        the same atleast one of the operands */
     if (OP_SYMBOL(IC_RESULT(ic))->onStack  || 
@@ -1548,7 +1555,7 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	      (IC_RIGHT(dic) &&
 	       IC_RESULT(ic)->key == IC_RIGHT(dic)->key)))
 	    return 0;	    	     
-    }
+    }    
 pack:
     /* found the definition */
     /* replace the result with the result of */

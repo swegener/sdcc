@@ -15,16 +15,18 @@ uninstall:
 
 
 $(MANUAL).html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
+	mkdir -p $@
 	latex2html -split 5 -show_section_numbers -dir $(MANUAL).html $(MANUAL)
 
 $(TSS).html: $(TSS).tex
+	mkdir -p $@
 	latex2html -split 0 -dir $(TSS).html $(TSS)
 
 %.txt: %.lyx
 	lyx -e text $<
 
 %.pdf: %.dvi
-	pdflatex $*
+	which pdflatex > /dev/null && pdflatex $* || dvipdf $*
 
 %.dvi: %.tex
 	latex $<
@@ -39,4 +41,22 @@ $(TSS).html: $(TSS).tex
 	# the glossary, not implemented yet
 	# makeindex -s l2hglo.ist -o $@ $<
 
-include clean.mk
+# Deleting all files created by building the program
+# --------------------------------------------------
+clean:
+	rm -rf $(MANUAL).html $(TSS).html
+	rm -f $(MANUAL).txt $(TSS).txt *.pdf *.dvi *.tex *.ind *.glo *.aux *.idx *.ilg *.log *.toc
+
+# Deleting all files created by configuring or building the program
+# -----------------------------------------------------------------
+distclean: clean
+
+# Like clean but some files may still exist
+# -----------------------------------------
+mostlyclean: clean
+
+# Deleting everything that can reconstructed by this Makefile. It deletes
+# everything deleted by distclean plus files created by bison, etc.
+# -----------------------------------------------------------------------
+realclean: distclean
+

@@ -38,7 +38,7 @@ all:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(CP) *.h $(sdcc_datadir)/include/
+	$(CP) -r asm *.h $(sdcc_datadir)/include/
 
 
 # Deleting all the installed files

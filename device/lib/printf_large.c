@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-int printf (const char *format, ...) reentrant
+int printf (const char *format, ...) _REENTRANT
 {
   va_list arg;
   int done;
@@ -37,7 +37,7 @@ int printf (const char *format, ...) reentrant
   return done;
 }
 
-int sprintf (const char *buf, const char *format, ...) reentrant
+int sprintf (const char *buf, const char *format, ...) _REENTRANT
 {
   va_list arg;
   int done;

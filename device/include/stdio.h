@@ -31,10 +31,12 @@
 #include <tinibios.h>
 #endif
 
-extern void printf_small (char *,...) reentrant;
-extern int printf (const char *,...) reentrant;
+#include <sdcc-lib.h>
+
+extern void printf_small (char *,...) _REENTRANT;
+extern int printf (const char *,...) _REENTRANT;
 extern int vprintf (const char *, va_list);
-extern int sprintf (const char *, const char *, ...) reentrant;
+extern int sprintf (const char *, const char *, ...) _REENTRANT;
 extern int vsprintf (const char *, const char *, va_list);
 extern int puts(const char *);
 extern char *gets(char *);

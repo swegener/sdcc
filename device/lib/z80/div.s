@@ -1,82 +1,54 @@
 	;; Originally from GBDK by Pascal Felber.
 	.area	_CODE
 
-__divschar::	
-	push	de
-	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
-	call	.div8
+__divschar::
+        push    bc
+        ld      c,l
+        
+        call    .div8
 
 	ld	l,c
-	
-	pop	ix
+        ld      h,b
+        	
 	pop	bc
-	pop	de
 	ret
 	
 __modschar::
-	push	de
-	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
+        push    bc
+        ld      c,l
 
-	ld	c,8(ix)
-	ld	e,9(ix)
-	call	.div8
+       	call	.div8
 
 	ld	l,e
-	
-	pop	ix
+        ld      h,d
+        	
 	pop	bc
-	pop	de
 	ret
 
 __divsint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
+	ld	b,h
+	ld	c,l
 
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
 	call	.div16
 
 	ld	l,c
 	ld	h,b
 	
-	pop	ix
 	pop	bc
-	pop	de
 	ret
 	
 __modsint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
+	ld	b,h
+	ld	c,l
 
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
 	call	.div16
 
 	ld	l,e
 	ld	h,d
 	
-	pop	ix
 	pop	bc
-	pop	de
 	ret
 
 	;; Unsigned
@@ -92,7 +64,8 @@ __divuchar::
 	call	.divu8
 
 	ld	l,c
-	
+        ld      h,b
+        	
 	pop	ix
 	pop	bc
 	pop	de
@@ -110,52 +83,36 @@ __moduchar::
 	call	.divu8
 
 	ld	l,e
-	
+        ld      h,d
+        	
 	pop	ix
 	pop	bc
 	pop	de
 	ret
 
 __divuint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
+	ld	b,h
+	ld	c,l
 	call	.divu16
 
 	ld	l,c
 	ld	h,b
 	
-	pop	ix
 	pop	bc
-	pop	de
 	ret
 	
 __moduint::
-	push	de
 	push	bc
-	push	ix
-	ld	ix,#0
-	add	ix,sp
+	ld	b,h
+	ld	c,l
 
-	ld	c,8(ix)
-	ld	b,9(ix)
-	ld	e,10(ix)
-	ld	d,11(ix)
 	call	.divu16
 
 	ld	l,e
 	ld	h,d
 	
-	pop	ix
 	pop	bc
-	pop	de
 	ret
 	
 .div8::
@@ -196,7 +153,7 @@ __moduint::
 	LD	(.squot),A	; Save sign of quotient
 	;; Take absolute value of divisor
 	BIT	7,D
-	JR	Z,.chkde	; Jump if divisor is positive
+	jp	Z,.chkde	; Jump if divisor is positive
 	SUB	A		; Substract divisor from 0
 	SUB	E
 	LD	E,A
@@ -206,7 +163,7 @@ __moduint::
 	;; Take absolute value of dividend
 .chkde:
 	BIT	7,B
-	JR	Z,.dodiv	; Jump if dividend is positive
+	jp	Z,.dodiv	; Jump if dividend is positive
 	SUB	A		; Substract dividend from 0
 	SUB	C
 	LD	C,A
@@ -220,7 +177,7 @@ __moduint::
 	;; Negate quotient if it is negative
 	LD	A,(.squot)
 	AND	#0x80
-	JR	Z,.dorem	; Jump if quotient is positive
+	jp	Z,.dorem	; Jump if quotient is positive
 	SUB	A		; Substract quotient from 0
 	SUB	C
 	LD	C,A
@@ -251,17 +208,19 @@ __moduint::
 	;; Check for division by zero
 	LD	A,E
 	OR	D
-	JR	NZ,.divide	; Branch if divisor is non-zero
+	jp	NZ,.divide	; Branch if divisor is non-zero
 	LD	BC,#0x00	; Divide by zero error
 	LD	D,B
 	LD	E,C
 	SCF			; Set carry, invalid result
 	RET
 .divide:
-	LD	L,C		; L = low byte of dividend/quotient
-	LD	H,B		; H = high byte of dividend/quotient
-	LD	BC,#0x00	; BC = remainder
+	ld	hl,#0
+;	LD	L,C		; L = low byte of dividend/quotient
+;	LD	H,B		; H = high byte of dividend/quotient
+;	LD	BC,#0x00	; BC = remainder
 	OR	A		; Clear carry to start
+	ex	af,af
 	LD	A,#16		; 16 bits in dividend
 .dvloop:
 	;; Shift next bit of quotient into bit 0 of dividend
@@ -271,40 +230,42 @@ __moduint::
 	;; HL holds remainder
 	;; Do a 32-bit left shift, shifting carry to L, L to H,
 	;;  H to C, C to B
-	LD	(.dcnt),A
-	RL	L		; Carry (next bit of quotient) to bit 0
-	RL	H		; Shift remaining bytes
-	RL	C
+	ex	af,af'
+	RL	C		; Carry (next bit of quotient) to bit 0
 	RL	B		; Clears carry since BC was 0
+	adc	hl,hl		
+
 	;; If remainder is >= divisor, next bit of quotient is 1. This
 	;;  bit goes to carry
-	PUSH	BC		; Save current remainder
-	LD	A,C		; Substract divisor from remainder
-	SBC	E
-	LD	C,A
-	LD	A,B
-	SBC	D
-	LD	B,A
+	PUSH	HL		; Save current remainder
+	sbc	hl,de
+;	LD	A,C		; Substract divisor from remainder
+;	SBC	E
+;	LD	C,A
+;	LD	A,B
+;	SBC	D
+;	LD	B,A
 	CCF			; Complement borrow so 1 indicates a
 				;  successful substraction (this is the
 				;  next bit of quotient)
-	JR	C,.drop		; Jump if remainder is >= dividend
-	POP	BC		; Otherwise, restore remainder
-	JR	.nodrop
+	jp	C,.drop		; Jump if remainder is >= dividend
+	POP	HL		; Otherwise, restore remainder
+	jp	.nodrop
 .drop:
 	INC	SP
 	INC	SP
 .nodrop:
-	LD	A,(.dcnt)
+	ex	af,af'
 	DEC	A		; DEC does not affect carry flag
-	JR	NZ,.dvloop
+	jp	NZ,.dvloop
+	ex	af,af'
 	;; Shift last carry bit into quotient
-	LD	D,B		; DE = remainder
-	LD	E,C
-	RL	L		; Carry to L
-	LD	C,L		; C = low byte of quotient
-	RL	H
-	LD	B,H		; B = high byte of quotient
+	LD	D,H		; DE = remainder
+	LD	E,L
+	RL	C		; Carry to L
+;	LD	C,L		; C = low byte of quotient
+	RL	B
+;	LD	B,H		; B = high byte of quotient
 	OR	A		; Clear carry, valid result
 	RET
 

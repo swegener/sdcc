@@ -5,7 +5,7 @@
 #ifndef __SDC51_STDARG_H
 #define __SDC51_STDARG_H 1
 
-#if defined(__ds390)
+#if defined(__ds390) || defined(__z80) || defined(__gbz80)
 
 typedef	unsigned char * va_list ;
 #define va_arg(marker,type) *((type *)(marker -= sizeof(type)))

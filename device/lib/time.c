@@ -58,12 +58,12 @@ time_t time(time_t *timeptr) {
   return t;
 }
 
-static code char monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
+static _CODE char monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
 
-static code char *month[]={"Jan","Feb","Mar","Apr","May","Jun",
+static _CODE char *month[]={"Jan","Feb","Mar","Apr","May","Jun",
 		 "Jul","Aug","Sep","Oct","Nov","Dec"};
 
-static code char *day[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+static _CODE char *day[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
 static char ascTimeBuffer[32];
 

@@ -1,14 +1,7 @@
 	.area _CODE
 _putchar::
-	push	ix
-	ld	ix,#0
-	add	ix,sp
+	ld	a,#1
+        rst     0x08
 
-	ld	l,4(ix)
-	ld	a,#0
-	out	(0xff),a
-
-	pop	ix
-	ret
-	
+        ret
 			

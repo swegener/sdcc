@@ -32,67 +32,95 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 
 CPPFLAGS        = -I$(INCDIR)
-CFLAGS		= 
+CFLAGS		= $(MODELFLAGS)
 
-OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _schar2fs.rel \
-		  _decdptr.rel _divsint.rel _divslong.rel _divuint.rel \
-		  _divulong.rel _fs2schar.rel _fs2sint.rel _fs2slong.rel \
-		  _fs2uchar.rel _fs2uint.rel _fs2ulong.rel _fsadd.rel \
-		  _fsdiv.rel _fseq.rel _fsgt.rel _fslt.rel _fsmul.rel \
-		  _fsneq.rel _fssub.rel _gptrget.rel _gptrput.rel \
-		  _sint2fs.rel _iscntrl.rel _isdigit.rel _isgraph.rel \
-		  _islower.rel _isprint.rel _ispunct.rel _isspace.rel \
-		  _isupper.rel _isxdigit.rel _slong2fs.rel _memcmp.rel \
-		  _memcpy.rel _memset.rel _modsint.rel _modslong.rel \
-		  _moduint.rel _modulong.rel _mulsint.rel _muluint.rel \
-		  _mululong.rel _mulslong.rel _ser.rel _setjmp.rel \
-		  _spx.rel _startup.rel _strchr.rel _strcmp.rel _strcpy.rel \
-		  _strcspn.rel _strlen.rel _strncat.rel _strncmp.rel \
-		  _strncpy.rel _strpbrk.rel _strrchr.rel _strspn.rel \
-		  _strstr.rel _strtok.rel _uchar2fs.rel _uint2fs.rel \
-		  _ulong2fs.rel malloc.rel serial.rel ser_ir.rel printfl.rel \
-		  printf_large.rel vprintf.rel puts.rel gets.rel \
-		  assert.rel _strcat.rel time.rel
-SOURCES		= $(patsubst %.rel,%.c,$(OBJECTS))
+BUILDDIR        = build
+# Default
+PORT            = z80
+PORTDIR         = $(BUILDDIR)/$(PORT)
+
+SOURCES		= _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
+		  _decdptr.c _divsint.c _divslong.c _divuint.c \
+		  _divulong.c _fs2schar.c _fs2sint.c _fs2slong.c \
+		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
+		  _fsdiv.c _fseq.c _fsgt.c _fslt.c _fsmul.c \
+		  _fsneq.c _fssub.c _gptrget.c _gptrput.c \
+		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
+		  _islower.c _isprint.c _ispunct.c _isspace.c \
+		  _isupper.c _isxdigit.c _slong2fs.c _memcmp.c \
+		  _memcpy.c _memset.c _modsint.c _modslong.c \
+		  _moduint.c _modulong.c _mulsint.c _muluint.c \
+		  _mululong.c _mulslong.c _ser.c _setjmp.c \
+		  _spx.c _startup.c _strchr.c _strcmp.c _strcpy.c \
+		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
+		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
+		  _ulong2fs.c malloc.c serial.c ser_ir.c printfl.c \
+		  printf_large.c vprintf.c puts.c gets.c \
+		  assert.c _strcat.c time.c
+
+OBJECTS		= $(patsubst %.c,$(PORTDIR)/%.rel,$(SOURCES))
+
+Z80SOURCES      = _atoi.c \
+		  _iscntrl.c _isdigit.c _isgraph.c \
+		  _islower.c _isprint.c _ispunct.c _isspace.c \
+		  _isupper.c _isxdigit.c _memcmp.c \
+		  _memcpy.c _memset.c \
+		  _startup.c _strchr.c _strcmp.c _strcpy.c \
+		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
+		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+		  _strstr.c _strtok.c \
+		  puts.c gets.c \
+		  assert.c _strcat.c
+
+Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)
+
+OEXT            = .rel
 
 include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models modelDS390
+all: checkconf models model-ds390 model-z80 model-gbz80
 
-objects: $(OBJECTS)
+objects: build-dir $(OBJECTS) port-specific-objects
 
 models:
 	for model in $(MODELS); do \
-	  test -d $$model || mkdir $$model; \
-	  $(MAKE) CFLAGS="$(CFLAGS) --model-$$model" objects; \
-	  mv *.rel $$model; \
-	  mv *.asm $$model; \
+	  $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model objects; \
 	done
 
-modelDS390:
+model-ds390:
 	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
-		test -d ds390 || mkdir ds390; \
-		rm -f ds390/*.lib; \
-		$(MAKE) CFLAGS="$(CFLAGS) -mds390" objects; \
-		cd ds390; $(MAKE); cd ..; \
-		cp *.lib ds390; \
-		mv *.rel *.asm ds390; \
+	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 objects; \
+	fi
+
+model-z80:
+	$(MAKE) MODELFLAGS="-mz80" PORT=z80 objects-z80 OEXT=.o
+
+model-gbz80:
+	$(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o
+
+objects-z80: build-dir $(Z80OBJECTS) port-specific-objects
+	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
+
+build-dir: $(PORTDIR)
+
+$(PORTDIR):
+	mkdir -p $(PORTDIR)
+
+port-specific-objects:
+	if [ -d $(PORT) ]; then \
+	  $(MAKE) -C $(PORT); \
+	  cp -f $(PORT)/*.lib $(PORT)/*$(OEXT) $(PORTDIR); \
 	fi
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: installDS390
-	$(CP) *.c $(sdcc_datadir)/lib/
-	for model in $(MODELS); do \
-	 [ -d $$model ] || $(MAKE) all; \
-	 $(CP) $$model/*.rel *.lib $(sdcc_datadir)/lib/$$model/; \
-	 $(CP) $$model/*.asm $(sdcc_datadir)/lib/$$model/; \
-	done
-
-installDS390: installdirs
-	$(CP) ds390/*.lib ds390/*.rel ds390/*.asm $(sdcc_datadir)/lib/ds390
+install: all installdirs
+	cp -r $(BUILDDIR)/* $(sdcc_datadir)/lib
+	cp -r ds390 gbz80 z80 *.c $(sdcc_datadir)/lib/src
+	rm `find $(sdcc_datadir)/lib/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm'`
 
 # Deleting all the installed files
 # --------------------------------
@@ -124,6 +152,7 @@ installdirs:
 	 mkdir -p $(sdcc_datadir)/lib/$$model; \
 	done
 	[ -d $(sdcc_datadir)/lib/ds390 ] || mkdir -p $(sdcc_datadir)/lib/ds390
+	mkdir -p $(sdcc_datadir)/lib/src
 
 # Creating dependencies
 # ---------------------
@@ -143,11 +172,12 @@ include clean.mk
 # My rules
 # --------
 
-.SUFFIXES: .rel
+.SUFFIXES: .rel .o
 
-.c.rel:
+$(PORTDIR)/%$(OEXT): %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
-
+	mv -f `basename $@` $@
+	mv -f `basename $@ $(OEXT)`.asm $(PORTDIR)
 
 # Remaking configuration
 # ----------------------

@@ -32,18 +32,20 @@
 #ifndef __SDC51_CTYPE_H
 #define __SDC51_CTYPE_H 1
 
+#include <sdcc-lib.h>
+
 #ifdef SDCC_STACK_AUTO
 #warning Make sure you recompile _is*.c files as 'reentrant'
 
-extern char  iscntrl   (unsigned char ) reentrant ;
-extern char  isdigit   (unsigned char ) reentrant ;
-extern char  isgraph   (unsigned char ) reentrant ;
-extern char  islower   (unsigned char ) reentrant ;
-extern char  isupper   (unsigned char ) reentrant ;
-extern char  isprint   (unsigned char ) reentrant ;
-extern char  ispunct   (unsigned char ) reentrant ;
-extern char  isspace   (unsigned char ) reentrant ;
-extern char  isxdigit  (unsigned char ) reentrant ;
+extern char  iscntrl   (unsigned char ) _REENTRANT ;
+extern char  isdigit   (unsigned char ) _REENTRANT ;
+extern char  isgraph   (unsigned char ) _REENTRANT ;
+extern char  islower   (unsigned char ) _REENTRANT ;
+extern char  isupper   (unsigned char ) _REENTRANT ;
+extern char  isprint   (unsigned char ) _REENTRANT ;
+extern char  ispunct   (unsigned char ) _REENTRANT ;
+extern char  isspace   (unsigned char ) _REENTRANT ;
+extern char  isxdigit  (unsigned char ) _REENTRANT ;
 
 #else
 

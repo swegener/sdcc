@@ -6,11 +6,13 @@ clean:
 	rm -f *core *[%~] *.[oa] *.rel *.lst *.sym *.asm *.ihx *.dump* *.cdb
 	rm -f .[a-z]*~
 	rm -f *.dump*
+	rm -r build
 	for model in $(MODELS); do \
 	  rm -rf $$model; \
 	done
-	cd ds390; make clean
-
+	make -C ds390 clean
+	make -C z80 clean
+	make -C gbz80 clean
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

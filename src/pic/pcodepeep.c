@@ -44,7 +44,7 @@ int getpCode(char *mnem,int dest);
 int getpCodePeepCommand(char *cmd);
 void pBlockMergeLabels(pBlock *pb);
 char *pCode2str(char *str, int size, pCode *pc);
-char *get_op( pCodeOp *pcop);
+char *get_op( pCodeOp *pcop,char *buf,int buf_size);
 
 extern pCodeInstruction *pic14Mnemonics[];
 
@@ -1366,6 +1366,8 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond)
       return 0;
 
     if(pc->type == PC_OPCODE) {
+      //fprintf(stderr," checking conditions of: ");
+      //pc->print(stderr,pc);
       if(PCI(pc)->inCond & cond)
 	return 1;
       if(PCI(pc)->outCond & cond)
@@ -1385,24 +1387,29 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond)
  *-----------------------------------------------------------------*/
 int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 {
+  char b[50], *n2;
 
   if(!pcops || !pcopd)
     return 0;
-  /*
+/*
   fprintf(stderr," Comparing operands %s",
-	  get_op( pcops));
+	  get_op( pcops,NULL,0));
 
   fprintf(stderr," to %s\n",
-	  get_op( pcopd));
-  */
+	  get_op( pcopd,NULL,0));
+*/
 
   if(pcops->type != pcopd->type) {
     //fprintf(stderr,"  - fail - diff types\n");
     return 0;  // different types
   }
 
-  if(!pcops->name ||  !pcopd->name || strcmp(pcops->name,pcopd->name)) {
-    //fprintf(stderr,"  - fail - diff names\n");
+  b[0]=0;
+  get_op(pcops,b,sizeof(b));
+  n2 = get_op(pcopd,NULL,0);
+
+  if( !n2 || strcmp(b,n2)) {
+    //fprintf(stderr,"  - fail - diff names: %s, len=%d,  %s, len=%d\n",b,strlen(b), n2, strlen(n2) );
     return 0;  // different names
   }
 
@@ -1417,7 +1424,7 @@ int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
     break;
   }
 
-  //fprintf(stderr,"  - pass\n");
+  //  fprintf(stderr,"  - pass\n");
 
   return 1;
 }
@@ -1915,8 +1922,10 @@ int pCodePeepMatchRule(pCode *pc)
       pct = pct->next;
       //debug:
       //DFPRINTF((stderr,"    matched\n"));
+
       if(!pcin && pct) {
 	DFPRINTF((stderr," partial match... no more code\n"));
+	fprintf(stderr," partial match... no more code\n");
 	matched = 0; 
       }
       if(!pct) {
@@ -1926,6 +1935,9 @@ int pCodePeepMatchRule(pCode *pc)
 
     if(matched) {
 
+      //pCode *pcr = peepBlock->replace.pb->pcHead;
+      //if(pcr) pcr->print(stderr,pcr);
+      
       /* So far we matched the rule up to the point of the conditions .
        * In other words, all of the opcodes match. Now we need to see
        * if the post conditions are satisfied.
@@ -1938,6 +1950,8 @@ int pCodePeepMatchRule(pCode *pc)
       if (pcin && peepBlock->postFalseCond && 
 	  (pCodeSearchCondition(pcin,peepBlock->postFalseCond) > 0) )
 	matched = 0;
+
+      if(!matched) fprintf(stderr,"failed on conditions\n");
     }
 
     if(matched) {
@@ -1967,7 +1981,7 @@ int pCodePeepMatchRule(pCode *pc)
 	pcin->prev = pc->prev;
 
 
-#if 0
+      //#if 0
       {
 	/*     DEBUG    */
 	/* Converted the deleted pCodes into comments */
@@ -1999,7 +2013,7 @@ int pCodePeepMatchRule(pCode *pc)
 	if(pc_cline2)
 	  pc_cline2->pc.next = NULL;
       }
-#endif
+      //#endif
 
       if(pcin)
 	pCodeDeleteChain(pc,pcin);

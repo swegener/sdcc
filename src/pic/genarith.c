@@ -961,7 +961,9 @@ void genPlus (iCode *ic)
 	else {
 	  PIC_OPCODE poc = POC_ADDFW;
 
-	  if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL)
+	  if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && (
+	      (AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL) || 
+	      (AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE)))
 	    poc = POC_ADDLW;
 	  emitpcode(poc, popGet(AOP(IC_LEFT(ic)),0));
 	  if ( AOP_TYPE(IC_RESULT(ic)) != AOP_ACC)

@@ -112,7 +112,7 @@ static void pCodePrintLabel(FILE *of, pCode *pc);
 static void pCodePrintFunction(FILE *of, pCode *pc);
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop);
 static char *get_op_from_instruction( pCodeInstruction *pcc);
-char *get_op( pCodeOp *pcop);
+char *get_op( pCodeOp *pcop,char *buff,int buf_size);
 int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd);
 int pCodePeepMatchRule(pCode *pc);
 void pBlockStats(FILE *of, pBlock *pb);
@@ -1161,6 +1161,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
   len = strlen(*str);
   if(len > *size) {
     fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
+    fprintf(stderr,"len = %d is > str size %d\n",len,*size);
   }
 
   *str += len;
@@ -1189,6 +1190,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
   len = strlen(buffer);
   if(len > *size) {
     fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
+    fprintf(stderr,"len = %d is > str size %d\n",len,*size);
   }
 
   strcpy(*str, buffer);
@@ -2364,13 +2366,17 @@ void pBlockRegs(FILE *of, pBlock *pb)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-char *get_op(pCodeOp *pcop)
+char *get_op(pCodeOp *pcop,char *buffer, int size)
 {
   regs *r;
-  static char buffer[50];
+  static char b[50];
   char *s;
-  int size;
+  //  int size;
 
+  if(!buffer) {
+    buffer = b;
+    size = sizeof(b);
+  } 
 
   if(pcop) {
     switch(pcop->type) {
@@ -2390,7 +2396,7 @@ char *get_op(pCodeOp *pcop)
       //      return PCOR(pcc->pcop)->r)->name;
     case PO_IMMEDIATE:
       s = buffer;
-      size = sizeof(buffer);
+      //size = sizeof(buffer);
       //fprintf(stderr,"PO_IMMEDIATE name = %s  offset = %d\n",pcc->pcop->name,PCOI(pcc->pcop)->offset);
       if(PCOI(pcop)->_const) {
 
@@ -2415,7 +2421,7 @@ char *get_op(pCodeOp *pcop)
 
     case PO_DIR:
       s = buffer;
-      size = sizeof(buffer);
+      //size = sizeof(buffer);
       if( PCOR(pcop)->instance) {
 	SAFE_snprintf(&s,&size,"(%s + %d)",
 		      pcop->name,
@@ -2442,7 +2448,7 @@ static char *get_op_from_instruction( pCodeInstruction *pcc)
 {
 
   if(pcc )
-    return get_op(pcc->pcop);
+    return get_op(pcc->pcop,NULL,0);
   
   return ("ERROR Null: "__FUNCTION__);
 

@@ -4,11 +4,12 @@
    of inst.cc with FUNC1 and FUNC2 defined as
    various operations to implement ADD, ADDC, ...
  *
- * Written by Karl Bongers karl@turbobit.com
- *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999,2002 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * Other contributors include:
+ *   Karl Bongers karl@turbobit.com,
+ *   Johan Knol 
  *
  */
 

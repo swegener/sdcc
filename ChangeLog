@@ -1,3 +1,8 @@
+2003-11-28 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* device/lib/_gptrget.c,
+	* device/lib/_gptrput.c: P2 not used any more (related to #850747, #785979)
+
 2003-11-27 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCClrange.c (findNextUseSym, rlivePoint): fixed bug #849795

@@ -1,3 +1,8 @@
+2003-06-02  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* doc/sdccman.lyx: cvs revision keywords, passing pdf information in latex preamble,
+          additions to the "related tools/documentation" section
+
 2003-06-02  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCglue.c (tempfileandname): added check for missing TMP/TEMP/TMPDIR variable

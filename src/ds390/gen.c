@@ -1268,23 +1268,22 @@ aopPut (asmop * aop, char *s, int offset)
 }
 
 
-/*-----------------------------------------------------------------*/
-/* reAdjustPreg - points a register back to where it should        */
-/*-----------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
+/* reAdjustPreg - points a register back to where it should (coff==0) */
+/*--------------------------------------------------------------------*/
 static void
 reAdjustPreg (asmop * aop)
 {
-  int size;
-
-  aop->coff = 0;
-  if ((size = aop->size) <= 1)
+  emitcode (";jwk","reAdjustPreg: %d", aop->coff);
+  if ((aop->coff==0) || (aop->size <= 1)) {
     return;
-  size--;
+  }
+
   switch (aop->type)
     {
     case AOP_R0:
     case AOP_R1:
-      while (size--)
+      while (aop->coff--)
 	emitcode ("dec", "%s", aop->aopu.aop_ptr->name);
       break;
     case AOP_DPTR:
@@ -1294,7 +1293,7 @@ reAdjustPreg (asmop * aop)
 	  genSetDPTR (1);
 	  _flushLazyDPS ();
 	}
-      while (size--)
+      while (aop->coff--)
 	{
 	  emitcode ("lcall", "__decdptr");
 	}
@@ -1306,7 +1305,7 @@ reAdjustPreg (asmop * aop)
       break;
 
     }
-
+  aop->coff=0;
 }
 
 #define AOP(op) op->aop

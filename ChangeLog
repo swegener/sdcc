@@ -3,6 +3,10 @@
 	* sdcc/as/mcs51/lklex.c: make getfid() more robust and fixed gcc warning:
 	  lklex.c: In function `getfid':
 	  lklex.c:203: warning: array subscript has type `char'
+	* src/SDCCglobl.h: small change in stack handling macros, to avoid crash when compiled
+	  with MSVC with global optimization enabled (probably an cl compiler bug ;-)
+	* support/Util/SDCCerr.c, support/Util/SDCCerr.h: added function fatal(), called from
+	  stack handling macros
 
 2003-04-19  Borut Razem <borut.razem@siol.net>
 

@@ -1185,8 +1185,10 @@ emitStaticSeg (memmap * map, FILE * out)
 	      resolveIvalSym (sym->ival);
 	      printIval (sym, sym->type, sym->ival, out);
 	      noAlloc--;
-	      // if sym->ival is a string, WE don't need it anymore
-	      if (IS_AST_SYM_VALUE(list2expr(sym->ival)) &&
+	      /* if sym is a simple string and sym->ival is a string, 
+		 WE don't need it anymore */
+	      if (IS_ARRAY(sym->type) && IS_CHAR(sym->type->next) &&
+		  IS_AST_SYM_VALUE(list2expr(sym->ival)) &&
 		  list2val(sym->ival)->sym->isstrlit) {
 		freeStringSymbol(list2val(sym->ival)->sym);
 	      }

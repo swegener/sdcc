@@ -1,3 +1,7 @@
+2004-10-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (reverseParms): fixed bug #1040577 (part 2)
+
 2004-10-22 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/ser_ir_cts_rts.c: integer promotion caused a call to the
@@ -11,7 +15,7 @@
 2004-10-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.h (struct ast),
-	* src/SDCCast.c (reverseParms, copyAst): fixed bug #1040577
+	* src/SDCCast.c (reverseParms, copyAst): fixed bug #1040577 (part 1)
 
 2004-10-20 Borut Razem <borut.razem AT siol.net>
 

@@ -633,6 +633,19 @@ reverseParms (ast * ptree)
   /* top down if we find a nonParm tree then quit */
   if (ptree->type == EX_OP && ptree->opval.op == PARAM && !ptree->reversed)
     {
+      /* The various functions expect the parameter tree to be right heavy. */
+      /* Rotate the tree to be left heavy so that after reversal it is */
+      /* right heavy again. */
+      while ((ttree = ptree->right) && ttree->type == EX_OP &&
+             ttree->opval.op == PARAM)
+        {
+          ptree->right = ttree->right;
+          ttree->right = ttree->left;
+          ttree->left = ptree->left;
+          ptree->left = ttree;
+        }
+    
+      /* Now reverse */
       ttree = ptree->left;
       ptree->left = ptree->right;
       ptree->right = ttree;

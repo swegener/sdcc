@@ -1,5 +1,10 @@
 2004-06-28 Vangelis Rokas <vrokas AT otenet.gr>
 
+	* src/pic16/glue.c (pic16createInterruptVect): function now emits
+	correctly the IVT even if it is relocated to some other location
+
+2004-06-28 Vangelis Rokas <vrokas AT otenet.gr>
+
 	* device/include/pic16/pic18fregs.h: added case for pic18f2220.h
 	* device/include/pic16/pic18f2220.h: NEW,
 	* device/lib/pic16/libdev/pic18f2220.c: NEW,

@@ -1284,7 +1284,7 @@ pic16createInterruptVect (FILE * vFile)
 
 	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
 		fprintf (vFile, ";\t.area\t%s\n", CODE_NAME);
-		fprintf(vFile, ".intvecs\tcode\t0x0000\n");
+		fprintf(vFile, ".intvecs\tcode\t0x%06x\n", pic16_options.ivt_loc);
 		fprintf (vFile, "__interrupt_vect:\n");
 
 		/* this is an overkill since WE are the port,

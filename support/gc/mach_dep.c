@@ -224,7 +224,20 @@ void GC_push_regs()
 	  asm("pushl %ebx");  asm("call GC_push_one"); asm("addl $4,%esp");
 #	endif
 
-#       if defined(I386) && defined(MSWIN32) && !defined(USE_GENERIC)
+#       if defined(I386) && defined(__MINGW32__)
+	/* I386 code, generic code does not appear to work */
+	/* It does appear to work under OS2, and asms dont */
+	/* This is used for some 38g UNIX variants and for CYGWIN32 */
+	  asm("pushl %eax");  asm("call _GC_push_one"); asm("addl $4,%esp");
+	  asm("pushl %ecx");  asm("call _GC_push_one"); asm("addl $4,%esp");
+	  asm("pushl %edx");  asm("call _GC_push_one"); asm("addl $4,%esp");
+	  asm("pushl %ebp");  asm("call _GC_push_one"); asm("addl $4,%esp");
+	  asm("pushl %esi");  asm("call _GC_push_one"); asm("addl $4,%esp");
+	  asm("pushl %edi");  asm("call _GC_push_one"); asm("addl $4,%esp");
+	  asm("pushl %ebx");  asm("call _GC_push_one"); asm("addl $4,%esp");
+#       endif
+
+#       if defined(I386) && defined(MSWIN32) && !defined(USE_GENERIC) && !defined(__MINGW32__)
 	/* I386 code, Microsoft variant		*/
 	  __asm  push eax
 	  __asm  call GC_push_one

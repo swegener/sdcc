@@ -25,7 +25,7 @@
 #include "common.h"
 #include <ctype.h>
 
-#ifdef __BORLANDC__
+#if NATIVE_WIN32
 #include <process.h>
 #else
 #include "spawn.h"
@@ -994,9 +994,6 @@ char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
 int my_system (const char *cmd, char **cmd_argv)
 {    
     char *dir, *got= NULL; int i= 0;
-    #ifdef __BORLANDC__
-    char *r;
-    #endif
 
     while (!got && try_dir[i])
     {
@@ -1005,21 +1002,24 @@ int my_system (const char *cmd, char **cmd_argv)
         strcat(dir, "/");
         strcat(dir, cmd);
 
-        #ifdef __BORLANDC__
+#if NATIVE_WIN32
         strcat(dir, ".exe");
 
         /* Mung slashes into backslashes to keep WIndoze happy. */
-	r = dir;
-
-        while (*r)
-        {
-            if (*r == '/')
-            {
-                *r = '\\';
-            }
-            r++;
-        }
-        #endif
+	{
+	    char *r;
+	    r = dir;
+	    
+	    while (*r)
+		{
+		    if (*r == '/')
+			{
+			    *r = '\\';
+			}
+		    r++;
+		}
+	}
+#endif
 
         if (access(dir, X_OK) == 0)
         {

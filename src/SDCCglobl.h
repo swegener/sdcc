@@ -9,6 +9,13 @@
 #include "sdccconf.h"
 #include "SDCCerr.h"
 
+#ifdef __BORLANDC__
+#define NATIVE_WIN32 		1
+#endif
+#ifdef __MINGW32__
+#define NATIVE_WIN32		1
+#endif
+
 #ifdef _NO_GC
 
 #define GC_malloc malloc

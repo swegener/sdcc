@@ -78,6 +78,9 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <stdlib.h>
 #endif
 
+#ifdef __MINGW32__
+#include <time.h>
+#else
 #ifdef __BORLANDC__
 #include <time.h>
 #else
@@ -92,6 +95,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <fcntl.h>
 #endif /* USG */
 #endif /* not VMS */
+#endif
 #endif
 
 /* This defines "errno" properly for VMS, and gives us EACCES. */

@@ -32,7 +32,7 @@ CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
 
-OBJECTS		= cppalloc.o cpperror.o cppexp.o cpphash.o cpplib.o cppmain.o 
+OBJECTS		= cppalloc.o cpperror.o cppexp.o cpphash.o cpplib.o cppmain.o support.o
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/bin/sdcpp

@@ -3642,8 +3642,16 @@ genMultOneByte (operand * left,
     // just an unsigned 8*8=8/16 multiply
     //emitcode (";","unsigned");
     // TODO: check for accumulator clash between left & right aops?
-    emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
-    MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+  
+    if( AOP_TYPE(right)==AOP_LIT ){
+      // moving to accumulator first helps peepholes 
+      MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+      emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
+    } else {
+      emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
+      MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
+    }
+    
     emitcode ("mul", "ab");
     aopPut (AOP (result), "a", 0, isOperandVolatile (result, FALSE));
     if (size==2) {

@@ -2463,9 +2463,9 @@ sdcc_datadir=${datadir}/sdcc
 # separate from the substituted sdcc_datadir because we want the
 # latter for makefiles.
 if test "${datadir}" = "\${prefix}/share"; then
-    sdcc_datadir_tmp=${prefix}/share
+    sdcc_datadir_tmp=${prefix}/share/sdcc
 else
-    sdcc_datadir_tmp=${datadir}
+    sdcc_datadir_tmp=${datadir}/sdcc
 fi
 
 

@@ -120,7 +120,8 @@ iCodeTable codeTable[] =
   {ARRAYINIT, "arrayInit", picGenericOne, NULL},
   {DUMMY_READ_VOLATILE, "dummy = (volatile)", picDummyRead, NULL},
   {CRITICAL, "critical_start", picCritical, NULL},
-  {ENDCRITICAL, "critical_end", picEndCritical, NULL}
+  {ENDCRITICAL, "critical_end", picEndCritical, NULL},
+  {SWAP, "swap", picGenericOne, NULL}
 };
 
 /*-----------------------------------------------------------------*/

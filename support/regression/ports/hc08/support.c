@@ -2,6 +2,7 @@
 void
 _putchar(unsigned char c)
 {
+  c;
   _asm
     .db 0x9e, 0xed
   _endasm;

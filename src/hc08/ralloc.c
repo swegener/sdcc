@@ -2501,168 +2501,164 @@ bool operandUsesAcc2(operand *op)
 }
 
 /*-----------------------------------------------------------------*/
+/* canUseAccOperand - return 1 if the iCode can gemerate a result  */
+/*                    in A or XA                                   */
+/*-----------------------------------------------------------------*/
+static int
+canDefAccResult (iCode * ic)
+{
+  int size;
+  
+  if (ic->op == IFX || ic->op == JUMPTABLE)	/* these iCodes have no result */
+    return 0;
+
+  if (POINTER_SET (ic))
+    return 0;
+
+  if (!IC_RESULT (ic))
+    return 0;
+
+  if (!IS_ITEMP (IC_RESULT (ic)))
+    return 0;
+  
+  /* I don't think an iTemp can be an aggregate, but just in case */
+  if (IS_AGGREGATE(operandType(IC_RESULT(ic))))
+    return 0;
+
+  size = getSize (operandType (IC_RESULT (ic)));
+
+  if (size == 1)
+    {
+      /* All 1 byte operations should safely generate an accumulator result */
+      return 1;
+    }
+  else if (size == 2)
+    {
+      switch (ic->op)
+        {
+        case LEFT_OP:
+        case RIGHT_OP:
+          return isOperandLiteral (IC_RIGHT (ic));
+        case CALL:
+        case PCALL:
+        case '*':
+        case RECEIVE:
+        case '=': /* assignment, since POINTER_SET is already ruled out */
+          return 1;
+
+        default:
+          return 0;
+        }
+    }
+  
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* canUseAccOperand - return 1 if the iCode can use the operand    */
+/*                    when passed in A or XA                       */
+/*-----------------------------------------------------------------*/
+static int
+canUseAccOperand (iCode * ic, operand * op)
+{
+  int size;
+  operand * otherOp;
+  
+  if (ic->op == IFX)
+    {
+      if (isOperandEqual (op, IC_COND (ic)))
+        return 1;
+      else
+        return 0;
+    }
+  
+  if (ic->op == JUMPTABLE)
+    {
+      if (isOperandEqual (op, IC_JTCOND (ic)))
+        return 1;
+      else
+        return 0;
+    }
+
+  if (POINTER_SET (ic) && isOperandEqual (op, IC_RESULT (ic)))
+    return 1;
+
+  if (isOperandEqual (op, IC_LEFT (ic)))
+    otherOp = IC_RIGHT (ic);
+  else if (isOperandEqual (op, IC_RIGHT (ic)))
+    otherOp = IC_LEFT (ic);
+  else
+    return 0;
+
+  /* Generation of SEND is deferred until CALL; not safe */
+  /* if there are intermediate iCodes */
+  if (ic->op == SEND && ic->next && ic->next != CALL)
+    return 0;
+        
+  size = getSize (operandType (op));
+  if (size == 1)
+    {
+      /* All 1 byte operations should safely use an accumulator operand */
+      return 1;
+    }
+  else if (size == 2)
+    {
+      switch (ic->op)
+        {
+        case LEFT_OP:
+        case RIGHT_OP:
+          return isOperandLiteral (IC_RIGHT (ic));
+        case SEND:
+          return 1;
+        default:
+          return 0;
+        }
+    }
+  
+  return 0;
+}
+
+
+/*-----------------------------------------------------------------*/
 /* packRegsForAccUse - pack registers for acc use                  */
 /*-----------------------------------------------------------------*/
-static void
+static int
 packRegsForAccUse (iCode * ic)
 {
-  iCode *uic;
+  iCode * uic;
+  operand * op;
 
-  /* if this is an aggregate, e.g. a one byte char array */
-  if (IS_AGGREGATE(operandType(IC_RESULT(ic)))) {
-    return;
-  }
-
-  /* if we are calling a reentrant function that has stack parameters */
-  #if 0
-  if (ic->op == CALL &&
-       IFFUNC_ISREENT(operandType(IC_LEFT(ic))) &&
-       FUNC_HASSTACKPARM(operandType(IC_LEFT(ic))))
-      return;
-
-  if (ic->op == PCALL &&
-       IFFUNC_ISREENT(operandType(IC_LEFT(ic))->next) &&
-       FUNC_HASSTACKPARM(operandType(IC_LEFT(ic))->next))
-      return;
-  #endif
-
-  /* if + or - then it has to be one byte result */
-  if ((ic->op == '+' || ic->op == '-')
-      && getSize (operandType (IC_RESULT (ic))) > 1)
-    return;
-
-
-  /* if shift operation make sure right side is a literal */
-  if (ic->op == RIGHT_OP &&
-      (!isOperandLiteral (IC_RIGHT (ic)) ||
-       (getSize (operandType (IC_RESULT (ic) )) > 1)))
-    return;
-
-  if (ic->op == LEFT_OP &&
-      (!isOperandLiteral (IC_RIGHT (ic)) ||
-       (getSize (operandType (IC_RESULT (ic) )) > 1)))
-    return;
-
-  if (IS_BITWISE_OP (ic) &&
-      getSize (operandType (IC_RESULT (ic))) > 1)
-    return;
-
-
+  if (!canDefAccResult (ic))
+    return 0;
+  
+  op = IC_RESULT (ic);
+    
   /* has only one definition */
-  if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)
-    return;
+  if (bitVectnBitsOn (OP_DEFS (op)) > 1)
+    return 0;
 
   /* has only one use */
-  if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) > 1)
-    return;
+  if (bitVectnBitsOn (OP_USES (op)) > 1)
+    return 0;
 
-  /* and the usage immediately follows this iCode */
-  if (!(uic = hTabItemWithKey (iCodehTab,
-			       bitVectFirstBit (OP_USES (IC_RESULT (ic))))))
-    return;
-
-  if (ic->next != uic)
-    return;
-
-  /* if it is a conditional branch then we definitely can */
-  if (uic->op == IFX)
-    goto accuse;
-
-  if (uic->op == JUMPTABLE)
-    return;
-
-#if 0
-  if (POINTER_SET (uic) &&
-      getSize (aggrToPtr (operandType (IC_RESULT (uic)), FALSE)) > 1)
-    return;
-#endif
-
-  /* if the usage is not is an assignment
-     or an arithmetic / bitwise / shift operation then not */
-  if (uic->op != '=' &&
-      !IS_ARITHMETIC_OP (uic) &&
-      !IS_BITWISE_OP (uic) &&
-      (uic->op != LEFT_OP) &&
-      (uic->op != RIGHT_OP) &&
-      (uic->op != GETHBIT) &&
-      (uic->op != RETURN) &&
-      (uic->op != '~') &&
-      (uic->op != '!'))
-    return;
-
-#if 0
-  /* if used in ^ operation then make sure right is not a 
-     literal (WIML: Why is this?) */
-  if (uic->op == '^' && isOperandLiteral (IC_RIGHT (uic)))
-    return;
-
-  /* if shift operation make sure right side is not a literal */
-  /* WIML: Why is this? */
-  if (uic->op == RIGHT_OP &&
-      (isOperandLiteral (IC_RIGHT (uic)) ||
-       getSize (operandType (IC_RESULT (uic))) > 1))
-    return;
-  if (uic->op == LEFT_OP &&
-      (isOperandLiteral (IC_RIGHT (uic)) ||
-       getSize (operandType (IC_RESULT (uic))) > 1))
-    return;
-#endif
-
-  /* make sure that the result of this icode is not on the
-     stack, since acc is used to compute stack offset */
-#if 0
-  if (IS_TRUE_SYMOP (IC_RESULT (uic)) &&
-      OP_SYMBOL (IC_RESULT (uic))->onStack)
-    return;
-#else
-//  if (isOperandOnStack(IC_RESULT(uic)))
-//    return;
-#endif
-
-  /* if the usage has only one operand then we can */
-  if (IC_LEFT (uic) == NULL ||
-      IC_RIGHT (uic) == NULL)
-    goto accuse;
-
-#if 0
-  /* if the other operand uses the accumulator then we cannot */
-  if ( (IC_LEFT(uic)->key == IC_RESULT(ic)->key &&
-	operandUsesAcc2(IC_RIGHT(uic))) ||
-       (IC_RIGHT(uic)->key == IC_RESULT(ic)->key &&
-	operandUsesAcc2(IC_LEFT(uic))) ) 
-    return;
-
-  /* make sure this is on the left side if not commutative */
-  /* except for '-', which has been written to be able to
-     handle reversed operands */
-  if (!(isCommutativeOp2(ic->op) || ic->op == '-') &&
-       IC_LEFT (uic)->key != IC_RESULT (ic)->key)
-    return;
-#endif
-
-#if 0
-  // this is too dangerous and need further restrictions
-  // see bug #447547
-
-  /* if one of them is a literal then we can */
-  if ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
-      (IC_RIGHT (uic) && IS_OP_LITERAL (IC_RIGHT (uic))))
-    {
-      OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
-      return;
-    }
-#endif
-
-accuse:
-
+  uic = ic->next;
+  if (!uic)
+    return 0;
+  
+  if (!canUseAccOperand (uic, op))
+    return 0;
+    
+  #if 0
   if ((POINTER_GET(uic))
       || (ic->op == ADDRESS_OF && uic->op == '+' && IS_OP_LITERAL (IC_RIGHT (uic))))
     {
       OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_HX;
       return;
     }
+  #endif
   
   OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_XA;
+  return 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2892,6 +2888,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	  continue;
 	}
 
+      #if 0
       /* if the condition of an if instruction
          is defined in the previous GET_POINTER instruction and
 	 this is the only usage then
@@ -2905,7 +2902,43 @@ packRegisters (eBBlock ** ebpp, int blockno)
           OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
           continue;
         }
-
+      
+      if (ic->op != IFX && ic->op !=JUMPTABLE && !POINTER_SET (ic)
+          && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic))
+          && getSize (operandType (IC_RESULT (ic))) == 1
+          && bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1
+          && ic->next
+          && OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
+        {
+          int accuse = 0;
+          
+          if (ic->next->op == IFX)
+            {
+              if (isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)))
+                accuse = 1;
+            }
+          else if (ic->next->op == JUMPTABLE)
+            {
+               if (isOperandEqual (IC_RESULT (ic), IC_JTCOND (ic->next)))
+                 accuse = 1;
+            }
+          else
+            {
+               if (isOperandEqual (IC_RESULT (ic), IC_LEFT (ic->next)))
+                 accuse = 1;
+               if (isOperandEqual (IC_RESULT (ic), IC_RIGHT (ic->next)))
+                 accuse = 1;
+            }
+          
+          if (accuse)
+            {
+              OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
+              continue;
+            }
+          
+        }
+      #endif
+        
       /* reduce for support function calls */
       if (ic->supportRtn || (ic->op != IFX && ic->op != JUMPTABLE))
 	packRegsForSupport (ic, ebp);
@@ -3005,33 +3038,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 	  packForPush (ic, ebpp, blockno);
 	}
 
-
-      #if 1
-      /* pack registers for accumulator use, when the
-         result of an arithmetic or bit wise operation
-         has only one use, that use is immediately following
-         the defintion and the using iCode has only one
-         operand or has two operands but one is literal &
-         the result of that operation is not on stack then
-         we can leave the result of this operation in x:a
-         combination */
-      if ((IS_ARITHMETIC_OP (ic)
-	   || IS_CONDITIONAL(ic)
-	   || IS_BITWISE_OP (ic)
-	   || ic->op == '='
-           || ic->op == '!'
-           || ic->op == '~'
-	   || ic->op == GETHBIT
-	   || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
-	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))
-           || ic->op == RECEIVE
-           || POINTER_GET (ic)
-	  ) &&
-	  IS_ITEMP (IC_RESULT (ic)) &&
-	  getSize (operandType (IC_RESULT (ic))) <= 1)
-
-	packRegsForAccUse (ic);
-      #endif
+      packRegsForAccUse (ic);
     }
 }
 

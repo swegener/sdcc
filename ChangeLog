@@ -1,3 +1,12 @@
+2004-09-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc.c (canDefAccResult, canUseAccOperand,
+	packRegsForAccUse, packRegisters): new accumulator register
+	packing algorithm
+	* support/regression/ports/hc08/support.c (_putchar): suppress
+	warning of unused variable
+	* src/SDCCicode.c: added SWAP entry to codeTable
+
 2004-09-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/sprintf.c: forgot to add this file before previous commit

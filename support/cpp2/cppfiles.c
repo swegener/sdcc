@@ -380,7 +380,9 @@ read_include_file (pfile, inc)
 	 does not bite us.  */
       if (inc->st.st_size > INTTYPE_MAXIMUM (ssize_t))
 	{
-	  cpp_error (pfile, "%s is too large", inc->name);
+	  cpp_error (pfile, "%s is too large (%lu > %lu)", inc->name, 
+		     (unsigned long)inc->st.st_size,
+		     INTTYPE_MAXIMUM(ssize_t));
 	  goto fail;
 	}
       size = inc->st.st_size;

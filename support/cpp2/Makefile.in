@@ -209,7 +209,7 @@ libcpp.a: $(LIBCPP_OBJS)
 	$(AR) $(AR_FLAGS) libcpp.a $(LIBCPP_OBJS)
 	-$(RANLIB) libcpp.a
 
-MY_LIBIBERTY_BITS = intl.o safe-ctype.o obstack.o splay-tree.o \
+MY_LIBIBERTY_BITS = safe-ctype.o obstack.o splay-tree.o \
 		    lbasename.o
 
 $(TARGET): cppmain.o intl.o $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS) 

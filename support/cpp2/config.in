@@ -1,5 +1,10 @@
 /* config.in.  Generated automatically from configure.in by autoheader.  */
 
+#ifdef __BORLANDC__
+
+#include "borland.h"
+
+#else
 /* Define to empty if the keyword does not work.  */
 #undef const
 
@@ -384,3 +389,4 @@
 #define const
 #endif
 #endif
+#endif /* !__BORLANDC__ */

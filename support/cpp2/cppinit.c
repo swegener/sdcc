@@ -1553,12 +1553,12 @@ cpp_handle_option (pfile, argc, argv)
 		}
  	    }
  	  else
-	    append_include_chain (pfile, xstrdup (arg), BRACKET, 0);
+	    append_include_chain (pfile, (char *)xstrdup(arg), BRACKET, 0);
 	  break;
 	case OPT_isystem:
 	  /* Add directory to beginning of system include path, as a system
 	     include directory.  */
-	  append_include_chain (pfile, xstrdup (arg), SYSTEM, 0);
+	  append_include_chain (pfile, (char *)xstrdup(arg), SYSTEM, 0);
 	  break;
 	case OPT_include:
 	  {
@@ -1618,7 +1618,7 @@ cpp_handle_option (pfile, argc, argv)
 	  break;
 	case OPT_idirafter:
 	  /* Add directory to end of path for includes.  */
-	  append_include_chain (pfile, xstrdup (arg), AFTER, 0);
+	  append_include_chain (pfile, (char *)xstrdup (arg), AFTER, 0);
 	  break;
 	case OPT_W:
 	  /* Silently ignore unrecognised options.  */

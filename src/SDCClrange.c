@@ -219,7 +219,8 @@ findNextUseSym (eBBlock *ebp, iCode *ic, symbol * sym)
   if (ebp->visited)
     return 0;
 
-  ebp->visited = 1;
+  if (ic == ebp->sch)
+    ebp->visited = 1;
 
   /* for all remaining instructions in current block */
   for (uic = ic; uic; uic = uic->next)

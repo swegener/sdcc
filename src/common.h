@@ -4,6 +4,12 @@
 #include <string.h>
 #include <assert.h>
 
+#if defined(__APPLE__) && (__MACH__)
+#ifdef _G
+#undef _G
+#endif
+#endif
+
 #include "SDCCglobl.h"
 #include "SDCCmem.h"
 #include "SDCCast.h"

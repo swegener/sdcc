@@ -307,8 +307,12 @@ extern void abort PARAMS ((void));
 
 /* 1 if we have C99 designated initializers.  */
 #if !defined(HAVE_DESIGNATED_INITIALIZERS)
+#if defined(__APPLE__) && (__MACH__)
+#define HAVE_DESIGNATED_INITIALIZERS 0
+#else
 #define HAVE_DESIGNATED_INITIALIZERS \
   ((GCC_VERSION >= 2007) || (__STDC_VERSION__ >= 199901L))
+#endif
 #endif
 
 #if HAVE_SYS_STAT_H

@@ -38,12 +38,16 @@
 #ifdef HAVE_SYS_ISA_DEFS_H
 #include <sys/isa_defs.h>
 #else
+#ifdef HAVE_MACHINE_ENDIAN_H
+#include <machine/endian.h>
+#else
 #ifdef HAVE_ENDIAN_H
 #include <endian.h>
 #else
 #if !defined(__BORLANDC__) && !defined(_MSC_VER) && !defined(__MINGW32__) && !defined(__CYGWIN__)
 #warning "Cannot determine ENDIANESS of this machine assuming LITTLE_ENDIAN"
 #warning "If you running sdcc on an INTEL 80x86 Platform you are okay"
+#endif
 #endif
 #endif
 #endif

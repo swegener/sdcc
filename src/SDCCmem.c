@@ -546,14 +546,13 @@ deallocParms (value * val)
 
       /* unmark is myparm */
       lval->sym->ismyparm = 0;
-      /* if on stack then depending on which stack */
 
       /* delete it from the symbol table  */
       deleteSym (SymbolTab, lval->sym, lval->sym->name);
 
       if (!lval->sym->isref)
 	{
-	  lval->sym->allocreq = 1;
+	  lval->sym->allocreq = 0;
 	  werror (W_NO_REFERENCE, currFunc->name,
 		  "function argument", lval->sym->name);
 	}
@@ -724,7 +723,7 @@ deallocLocal (symbol * csym)
 
   for (sym = csym; sym; sym = sym->next)
     {
-      if (sym->_isparm)
+      if (sym->_isparm) 
 	continue;
 
       /* if it is on the stack */

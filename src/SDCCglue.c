@@ -262,15 +262,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  }
 	  codeOutFile = statsg->oFile;
 
-#if 0
-	  if (ival) {
-	    // set ival's lineno to where the symbol was defined
-	    lineno=ival->lineno=sym->lineDef;
-	    allocInfo = 0;
-	    eBBlockFromiCode (iCodeFromAst (ival));
-	    allocInfo = 1;
-	  }
-#else
 	  if (ival) {
 	    // set ival's lineno to where the symbol was defined
 	    setAstLineno (ival, lineno=sym->lineDef);
@@ -283,7 +274,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    eBBlockFromiCode (iCodeFromAst (ival));
 	    allocInfo = 1;
 	  }
-#endif
 	}	  
 
 	/* if the ival is a symbol assigned to an aggregate,
@@ -1313,15 +1303,6 @@ emitOverlay (FILE * afile)
 
       if (elementsInSet (ovrset))
 	{
-#if 0
-	  /* this dummy area is used to fool the assembler
-	     otherwise the assembler will append each of these
-	     declarations into one chunk and will not overlay
-	     sad but true */
-	  fprintf (afile, "\t.area _DUMMY\n");
-#else
-	  /* not anymore since asmain.c:1.13 */
-#endif
 	  /* output the area informtion */
 	  fprintf (afile, "\t.area\t%s\n", port->mem.overlay_name);	/* MOF */
 	}
@@ -1329,8 +1310,7 @@ emitOverlay (FILE * afile)
       for (sym = setFirstItem (ovrset); sym;
 	   sym = setNextItem (ovrset))
 	{
-
-	  /* if extern then add it to the publics tabledo nothing */
+	  /* if extern then it is in the publics table: do nothing */
 	  if (IS_EXTERN (sym->etype))
 	    continue;
 

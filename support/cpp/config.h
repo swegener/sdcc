@@ -15,9 +15,9 @@
 #include "i386/i386.h"
 #include "i386/xm-linux.h"
 
-#ifndef __BORLANDC__
 #define alloca(x) Safe_calloc(1,(x))
-#else
+
+#ifdef __BORLANDC__
 #include <string.h>
 #include <stdlib.h>
 #define bcopy(s, d, n)  memcpy(d, s, n)

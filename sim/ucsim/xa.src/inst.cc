@@ -6,7 +6,7 @@
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  * Other contributors include:
  *   Karl Bongers karl@turbobit.com,
- *   Johan Knol 
+ *   Johan Knol johan.knol@iduna.nl
  *
  */
 
@@ -45,7 +45,7 @@ void cl_xa::store1(t_addr addr, unsigned char val)
   }
 }
 
-void cl_xa::store2(t_addr addr, unsigned char val)
+void cl_xa::store2(t_addr addr, unsigned short val)
 {
   if (addr < 0x2000) {
     set_idata2(addr, val);
@@ -689,8 +689,8 @@ int cl_xa::inst_POP(uint code, int operands)
     case RLIST:
     {
       unsigned char rlist = fetch();
-      if (code & 0x08) { // word op
-	if (code & 0x40) { // R8-R15
+      if (code & 0x0800) { // word op
+	if (code & 0x4000) { // R8-R15
 	  if (rlist&0x01) { set_reg2(8, get2(sp)); sp+=2; }
 	  if (rlist&0x02) { set_reg2(9, get2(sp)); sp+=2; }
 	  if (rlist&0x04) { set_reg2(10, get2(sp)); sp+=2; }
@@ -710,7 +710,7 @@ int cl_xa::inst_POP(uint code, int operands)
 	  if (rlist&0x80) { set_reg2(7, get2(sp)); sp+=2; }
 	}
       } else { // byte op
-	if (code & 0x40) { // R4l-R7h
+	if (code & 0x4000) { // R4l-R7h
 	  if (rlist&0x01) { set_reg1(8, get1(sp)); sp+=2; }
 	  if (rlist&0x02) { set_reg1(9, get1(sp)); sp+=2; }
 	  if (rlist&0x04) { set_reg1(10, get1(sp)); sp+=2; }
@@ -758,8 +758,8 @@ int cl_xa::inst_PUSH(uint code, int operands)
     {
       unsigned short sp=get_sp();
       unsigned char rlist = fetch();
-      if (code & 0x08) { // word op
-	if (code & 0x40) { // R15-R8
+      if (code & 0x0800) { // word op
+	if (code & 0x4000) { // R15-R8
 	  if (rlist&0x80) { sp-=2; store2(sp, reg2(15)); }
 	  if (rlist&0x40) { sp-=2; store2(sp, reg2(14)); }
 	  if (rlist&0x20) { sp-=2; store2(sp, reg2(13)); }
@@ -779,24 +779,24 @@ int cl_xa::inst_PUSH(uint code, int operands)
 	  if (rlist&0x01) { sp-=2; store2(sp, reg2(0)); }
 	}
       } else { // byte op
-	if (code & 0x40) { // R7h-R4l
-	  if (rlist&0x80) { sp-=2; store2(sp, reg2(15)); }
-	  if (rlist&0x40) { sp-=2; store2(sp, reg2(14)); }
-	  if (rlist&0x20) { sp-=2; store2(sp, reg2(13)); }
-	  if (rlist&0x10) { sp-=2; store2(sp, reg2(12)); }
-	  if (rlist&0x08) { sp-=2; store2(sp, reg2(11)); }
-	  if (rlist&0x04) { sp-=2; store2(sp, reg2(10)); }
-	  if (rlist&0x02) { sp-=2; store2(sp, reg2(9)); }
-	  if (rlist&0x01) { sp-=2; store2(sp, reg2(8)); }
+	if (code & 0x4000) { // R7h-R4l
+	  if (rlist&0x80) { sp-=2; store2(sp, reg1(15)); }
+	  if (rlist&0x40) { sp-=2; store2(sp, reg1(14)); }
+	  if (rlist&0x20) { sp-=2; store2(sp, reg1(13)); }
+	  if (rlist&0x10) { sp-=2; store2(sp, reg1(12)); }
+	  if (rlist&0x08) { sp-=2; store2(sp, reg1(11)); }
+	  if (rlist&0x04) { sp-=2; store2(sp, reg1(10)); }
+	  if (rlist&0x02) { sp-=2; store2(sp, reg1(9)); }
+	  if (rlist&0x01) { sp-=2; store2(sp, reg1(8)); }
 	} else { // R3h-R0l
-	  if (rlist&0x80) { sp-=2; store2(sp, reg2(7)); }
-	  if (rlist&0x40) { sp-=2; store2(sp, reg2(6)); }
-	  if (rlist&0x20) { sp-=2; store2(sp, reg2(5)); }
-	  if (rlist&0x10) { sp-=2; store2(sp, reg2(4)); }
-	  if (rlist&0x08) { sp-=2; store2(sp, reg2(3)); }
-	  if (rlist&0x04) { sp-=2; store2(sp, reg2(2)); }
-	  if (rlist&0x02) { sp-=2; store2(sp, reg2(1)); }
-	  if (rlist&0x01) { sp-=2; store2(sp, reg2(0)); }
+	  if (rlist&0x80) { sp-=2; store2(sp, reg1(7)); }
+	  if (rlist&0x40) { sp-=2; store2(sp, reg1(6)); }
+	  if (rlist&0x20) { sp-=2; store2(sp, reg1(5)); }
+	  if (rlist&0x10) { sp-=2; store2(sp, reg1(4)); }
+	  if (rlist&0x08) { sp-=2; store2(sp, reg1(3)); }
+	  if (rlist&0x04) { sp-=2; store2(sp, reg1(2)); }
+	  if (rlist&0x02) { sp-=2; store2(sp, reg1(1)); }
+	  if (rlist&0x01) { sp-=2; store2(sp, reg1(0)); }
 	}
       }
       set_sp(sp);
@@ -897,10 +897,26 @@ int cl_xa::inst_SUBB(uint code, int operands)
 #include "inst_gen.cc"
   return(resGO);
 }
+
 int cl_xa::inst_TRAP(uint code, int operands)
 {
+  // steal a few opcodes for simulator only putchar() and exit()
+  // functions.  Used in SDCC regression testing.
+  switch (code & 0x0f) {
+    case 0xe:
+      // implement a simulator putchar() routine
+      //printf("PUTCHAR-----> %xH\n", reg1(0));
+      putchar(reg1(0));
+      fflush(stdout);
+    break;
+
+    case 0xf:
+      ::exit(0);
+    break;
+  }
   return(resGO);
 }
+
 int cl_xa::inst_XCH(uint code, int operands)
 {
   return(resGO);

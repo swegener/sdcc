@@ -478,6 +478,9 @@ cl_xa::disass(t_addr addr, char *sep)
     case REG_DATA4 :
       strcpy(parm_str, "REG_DATA4");
     break;
+    case REG_DATA5 :
+      strcpy(parm_str, "REG_DATA5");
+    break;
     case IREG_DATA4 :
       strcpy(parm_str, "IREG_DATA4");
     break;

@@ -6,7 +6,7 @@
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  * Other contributors include:
  *   Karl Bongers karl@turbobit.com,
- *   Johan Knol 
+ *   Johan Knol johan.knol@iduna.nl
  */
 
 /* This file is part of microcontroller simulator: ucsim.
@@ -202,12 +202,14 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x9605,0xff8f,' ',4, AND,DIRECT_DATA8    },  // AND direct, #data8         1 0 0 1 0 1 1 0  0 b b b 0 1 0 1 
  {0,0x9e05,0xff8f,' ',5, AND,DIRECT_DATA16   },  // AND direct, #data16        1 0 0 1 0 1 1 0  1 b b b 0 1 0 1 
 
- {0,0x0840,0xfffc,' ',3,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
- {0,0x0850,0xfffc,' ',3,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
- {0,0xc150,0xf300,' ',3,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
- /* 2 more ASL cases */
- {0,0xc250,0xf300,' ',3,ASR, REG_REG         }, //  ASR Rd, Rs                 1 1 0 0 S S 1 0  d d d d s s s s
- /* 2 more ASR cases */
+ {0,0x0840,0xfffc,' ',2,ANL, C_BIT           }, //  ANL C, bit                 0 0 0 0 1 0 0 0  0 1 0 0 0 0 b b
+ {0,0x0850,0xfffc,' ',2,ANL, C_NOTBIT        }, //  ANL C, /bit                0 0 0 0 1 0 0 0  0 1 0 1 0 0 b b
+ {0,0xc150,0xf300,' ',2,ASL, REG_REG         }, //  ASL Rd, Rs                 1 1 0 0 S S 0 1  d d d d s s s s
+ {0,0xdd00,0xff00,' ',2,ASL, REG_DATA5       }, //  ASL Rd, #data5 (dword)     1 1 0 1 1 1 0 1  d d d #data5
+ {0,0xd100,0xf300,' ',2,ASL, REG_DATA4       }, //  ASL Rd, #data4             1 1 0 1 S S 0 1  d d d d #data4
+ {0,0xc250,0xf300,' ',2,ASR, REG_REG         }, //  ASR Rd, Rs                 1 1 0 0 S S 1 0  d d d d s s s s
+ {0,0xde00,0xff00,' ',2,ASR, REG_DATA5       }, //  ASR Rd, #data5 (dword)     1 1 0 1 1 1 1 0  d d d #data5
+ {0,0xd200,0xf300,' ',2,ASR, REG_DATA4       }, //  ASR Rd, #data4             1 1 0 1 S S 1 0  d d d d #data4
  {1,0xf000,0xff00,' ',2,BCC, REL8            }, //  BCC rel8                   1 1 1 1 0 0 0 0  rel8
  {1,0xf100,0xff00,' ',2,BCS, REL8            }, //  BCS rel8                   1 1 1 1 0 0 0 1  rel8
  {1,0xf300,0xff00,' ',2,BEQ, REL8            }, //  BEQ rel8                   1 1 1 1 0 0 1 1  rel8
@@ -281,11 +283,12 @@ struct xa_dis_entry disass_xa[]= {
 
  {0,0x9780,0xfffc,' ',4, JB,    BIT_REL8     }, //  JB bit,rel8                1 0 0 1 0 1 1 1  1 0 0 0 0 0 b b
  {0,0x97c0,0xfffc,' ',4, JBC,   BIT_REL8     }, //  JBC bit,rel8               1 0 0 1 0 1 1 1  1 1 0 0 0 0 b b
- {1,0xd500,0xff00,' ',3, JMP,   REL16        }, //  JMP rel16                  1 1 0 1 0 1 0 1
+ {1,0xd500,0xff00,' ',3, JMP,   REL16        }, //  JMP rel16                  1 1 0 1 0 1 0 1  rel16
  {0,0xd670,0xfff8,' ',2, JMP,   IREG         }, //  JMP [Rs]                   1 1 0 1 0 1 1 0  0 1 1 1 0 s s s
  /* JMP(2) */
  {0,0x97a0,0xfffc,' ',4, JNB,   BIT_REL8     }, //  JNB bit,rel8               1 0 0 1 0 1 1 1  1 0 1 0 0 0 b b
- /* JNZ, JZ */
+ {1,0xee00,0xff00,' ',2, JNZ,   REL8         }, //  JNZ rel8                   1 1 1 0 1 1 1 0  rel8
+ {1,0xec00,0xff00,' ',2, JZ,    REL8         }, //  JZ rel8                    1 1 1 0 1 1 0 0  rel8
  {0,0x4000,0xff88,' ',3, LEA,   REG_REGOFF8  }, //  LEA Rd,Rs+offset8          0 1 0 0 0 0 0 0  0 d d d 0 s s s
  {0,0x4800,0xff88,' ',3, LEA,   REG_REGOFF16 }, //  LEA Rd,Rs+offset16         0 1 0 0 0 0 0 0  0 d d d 0 s s s
  /* LSR(3?)  */
@@ -317,10 +320,11 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x8000,0xf308,' ',2,MOVC, REG_IREGINC    },  // MOVC Rd,[Rs+]              1 0 0 0 S 0 0 0  d d d d 0 s s s
  {0,0x904e,0xffff,' ',2,MOVC, A_APLUSDPTR    },  // MOVC A,[A+DPTR]            1 0 0 1 0 0 0 0  0 1 0 0 1 1 1 0
  {0,0x904c,0xffff,' ',2,MOVC, A_APLUSPC      },  // MOVC A,[A+PC]              1 0 0 1 0 0 0 0  0 1 0 0 1 1 0 0
-   /* MOVS(6), MOVX(2), MUL.x(6), NEG */
+   /* MOVS(6), MOVX(2), MUL.x(6) */
 
+ {0,0x900b,0xf70f,' ',2,NEG, REG             }, //  NEG Rd                     1 0 0 1 S 0 0 0  d d d d 1 0 1 1
  {1,0x0000,0xff00,' ',1,NOP, NO_OPERANDS     }, //  NOP                        0 0 0 0 0 0 0 0
-   /* NORM */
+ {0,0xc300,0xff00,' ',2,NORM, REG_REG        }, //  NORM Rd,Rs                 1 1 0 0 S S 1 1  d d d d s s s s
  {0,0x6100,0xf700,' ',2, OR, REG_REG         },  //  OR Rd, Rs                 0 1 1 0 S 0 0 1  d d d d s s s s
  {0,0x6200,0xf708,' ',2, OR, REG_IREG        },  //  OR Rd, [Rs]               0 1 1 0 S 0 1 0  d d d d 0 s s s
  {0,0x6208,0xf708,' ',2, OR, IREG_REG        },  //  OR [Rd], Rs               0 1 1 0 S 0 1 0  s s s s 1 d d d
@@ -424,7 +428,7 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x7600,0xf708,' ',3,XOR, REG_DIRECT      },  // XOR Rd, direct             0 1 1 1 S 1 1 0  d d d d 0 x x x
  {0,0x9107,0xff0f,' ',3,XOR, REG_DATA8       },  // XOR Rd, #data8             1 0 0 1 0 0 0 1  d d d d 0 1 1 1
  {0,0x9907,0xff0f,' ',4,XOR, REG_DATA16      },  // XOR Rd, #data16            1 0 0 1 1 0 0 1  d d d d 0 1 1 1
- {0,0x9207,0xff8f,' ',3,XOR, IREG_DATA8      },   // XOR [Rd], #data8           1 0 0 1 0 0 1 0  0 d d d 0 1 1 1
+ {0,0x9207,0xff8f,' ',3,XOR, IREG_DATA8      },  // XOR [Rd], #data8           1 0 0 1 0 0 1 0  0 d d d 0 1 1 1
  {0,0x9a07,0xff8f,' ',4,XOR, IREG_DATA16     },  // XOR [Rd], #data16          1 0 0 1 1 0 1 0  0 d d d 0 1 1 1
  {0,0x9307,0xff8f,' ',3,XOR, IREGINC_DATA8   },  // XOR [Rd+], #data8          1 0 0 1 0 0 1 1  0 d d d 0 1 1 1
  {0,0x9b07,0xff8f,' ',4,XOR, IREGINC_DATA16  },  // XOR [Rd+], #data16         1 0 0 1 1 0 1 1  0 d d d 0 1 1 1

@@ -89,19 +89,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     case IREGOFF16_REG :
     {
       int offset;
-      if (operands == REG_IREGOFF8) {
+      if (operands == IREGOFF8_REG) {
         offset = (int)((char) fetch());
       } else {
         offset = (int)((short)fetch2());
       }
       if (code & 0x0800) {  /* word op */
-        t_mem addr = reg2(RI_70) + offset;
+        t_mem addr = reg2(RI_07) + offset;
         unsigned short wtmp, wtotal;
         wtmp = get2(addr);
         wtotal = FUNC2( wtmp, reg2(RI_F0) );
         store2(addr, wtotal);
       } else {
-        t_mem addr = reg2(RI_70) + ((short) fetch2());
+        t_mem addr = reg2(RI_07) + ((short) fetch2());
         unsigned char total;
         total = FUNC1( get1(addr), reg1(RI_F0) );
         store1(addr, total);

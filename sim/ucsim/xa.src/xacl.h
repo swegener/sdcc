@@ -3,9 +3,10 @@
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  *
- * Written by Karl Bongers karl@turbobit.com
- * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * Other contributors include:
+ *   Karl Bongers karl@turbobit.com,
+ *   Johan Knol johan.knol@iduna.nl
  *
  */
 
@@ -87,7 +88,7 @@ public:
   virtual int get_reg(int word_flag, unsigned int index);
 
   virtual void store1(t_addr addr, unsigned char val);
-  virtual void store2(t_addr addr, unsigned char val);
+  virtual void store2(t_addr addr, unsigned short val);
   virtual unsigned char get1(t_addr addr);
   virtual unsigned short get2(t_addr addr);
 

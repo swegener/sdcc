@@ -6,7 +6,7 @@
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  * Other contributors include:
  *   Karl Bongers karl@turbobit.com,
- *   Johan Knol 
+ *   Johan Knol johan.knol@iduna.nl
  *
  */
 
@@ -151,6 +151,7 @@ enum op_operands {
   C_NOTBIT,
   DATA4,
   REG_DATA4,
+  REG_DATA5,
   IREG_DATA4,
   IREGINC_DATA4,
   IREGOFF8_DATA4,

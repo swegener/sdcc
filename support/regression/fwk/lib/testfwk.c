@@ -3,6 +3,10 @@
 #include <testfwk.h>
 #include <stdarg.h>
 
+#ifdef __ds390
+#include <tinibios.h> /* main() must see the ISR declarations */
+#endif
+
 /** Define this if the port's div or mod functions are broken.
     A slow loop based method will be substituded.
 */

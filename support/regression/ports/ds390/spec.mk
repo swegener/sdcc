@@ -1,9 +1,9 @@
 # Port specification for the ds390 port running with uCsim
 
 # path to uCsim
-S51 = ../../sim/ucsim/s51.src/s51
+S51 = $(SDCC_DIR)/sim/ucsim/s51.src/s51
 
-SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant --stack-after-data
+SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant --stack-after-data --debug
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -27,7 +27,6 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 	-grep -n FAIL $@ /dev/null || true
 
 fwk/lib/timeout: fwk/lib/timeout.c
-	gcc -o $@ $<
 
 _clean:
 	rm -f fwk/lib/timeout fwk/lib/timeout.exe $(PORTS_DIR)/$(PORT)/*.rel $(PORTS_DIR)/$(PORT)/*.rst \

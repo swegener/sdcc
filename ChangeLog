@@ -1,4 +1,26 @@
-2001-11-23  Michael Hope  <michaelh@juju.net.nz>
+2001-11-25  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* sim/ucsim/s51.src/glob.cc: DS390 SFRs and bits added.
+
+	* sim/ucsim/s51.src/port.cc: Port 4 and 5 added.
+
+	* sim/ucsim/s51.src/regs51.h: DS390 SFRs added.
+
+	* sim/ucsim/s51.src/uc390.cc: Some details improved, CKRDY works for tinibios.
+
+	* sim/ucsim/s51.src/uc390cl.h: Work in progress.
+
+	* sim/ucsim/sim.src/uccl.h: 6 ports for DS390.
+
+	* support/regression/fwk/lib/testfwk.c: Run with tinibios.
+
+	* support/regression/ports/mcs51/spec.mk: Fine tuninig.
+
+	* support/regression/ports/ds390/support.c: Use tinibios.
+
+	* support/regression/ports/ds390/spec.mk: Fine tuning, use tinibios.
+
+2001-11-23  Michael Hope  <michaelh@juju.net.nz>support/regression/tests/bug-460010.c
 
 	* src/z80/ralloc.c (packRegsForHLUse3): Changed to not pack into HL if anything is in direct space.
 	(packRegsForHLUse3): Added packing support for send, cast, and return value from a call.

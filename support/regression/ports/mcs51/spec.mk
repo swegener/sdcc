@@ -3,7 +3,7 @@
 # model small
 
 # path to uCsim
-S51 = ../../sim/ucsim/s51.src/s51
+S51 = $(SDCC_DIR)/sim/ucsim/s51.src/s51
 
 SDCCFLAGS +=--lesspedantic -DREENTRANT=reentrant --stack-after-data
 
@@ -29,7 +29,6 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 	-grep -n FAIL $@ /dev/null || true
 
 fwk/lib/timeout: fwk/lib/timeout.c
-	gcc -o $@ $<
 
 _clean:
 	rm -f fwk/lib/timeout fwk/lib/timeout.exe $(PORTS_DIR)/$(PORT)/*.rel $(PORTS_DIR)/$(PORT)/*.rst \

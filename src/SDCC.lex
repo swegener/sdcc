@@ -416,6 +416,10 @@ char *stringLiteral () {
       while ((ch = input()) && (isspace(ch) || ch=='\\')) {
 	switch (ch) {
 	case '\\':
+	  if ((ch=input())!='\n') {
+	    werror (W_STRAY_BACKSLASH, column);
+	    unput(ch);
+	  }
 	  break;
 	case '\n':
 	  yylineno++;

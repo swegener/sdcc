@@ -1,3 +1,7 @@
+2004-12-29 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/genarith.c : Fixed problem with subtraction where the result would not be updated when borrowing.
+
 2004-12-28 Paul Stoffregen <paul AT pjrc.com>
 
 	* device/lib/printf_fast.c: only build on supported arch.

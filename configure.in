@@ -617,12 +617,6 @@ AC_ARG_ENABLE(packihx,
 OPT_ENABLE_PACKIHX=$enable_packihx
 AC_SUBST(OPT_ENABLE_PACKIHX)
 
-AC_ARG_ENABLE(librarian,
-              AC_HELP_STRING([--disable-librarian],
-                             [Disables building librarian]))
-OPT_ENABLE_LIBRARIAN=$enable_librarian
-AC_SUBST(OPT_ENABLE_LIBRARIAN)
-
 AC_ARG_ENABLE(libgc,
               AC_HELP_STRING([--enable-libgc],
                              [Use the Bohem memory allocator. Lower runtime footprint.]))
@@ -643,7 +637,6 @@ mv ports ports.build
 # Generating output files
 # ===========================================================================
 AC_CONFIG_SUBDIRS(support/cpp2)
-AC_CONFIG_SUBDIRS(support/librarian)
 AC_CONFIG_SUBDIRS(packihx)
 AC_CONFIG_SUBDIRS(sim/ucsim)
 AC_CONFIG_FILES([main.mk:main_in.mk

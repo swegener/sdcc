@@ -327,8 +327,8 @@ DEFSETFUNC (findCheaperOp)
 	}
 
       if ((*opp)->type==VALUE && 
-	  IS_SYMOP(cop) && 
-	  !IS_SPEC(OP_SYMBOL(cop)->type)) {
+	  IS_SYMOP(cop) && IS_GENPTR(OP_SYMBOL(cop)->type)) {
+	      //	  !IS_SPEC(OP_SYMBOL(cop)->type)) {
 	// this could be a pointer to some space, so we can not
 	*opp=NULL;
 	return 0;

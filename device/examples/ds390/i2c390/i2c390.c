@@ -7,7 +7,7 @@
 void main (void) {
 
   while(1) {
-    printf ("% 5.2f %03bu %03bu %03bu %03bu\n\r", 
+    printf ("% 5.2f %03u %03u %03u %03u\n\r", 
 	    ReadDS1621(2),
 	    ReadPCF8591(0,0), 
 	    ReadPCF8591(0,1), 

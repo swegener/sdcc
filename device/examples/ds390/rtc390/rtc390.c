@@ -58,7 +58,7 @@ char GetTime(struct RTCDate *rtcDate) {
 }
 
 void PrintTime(struct RTCDate *rtcDate) {
-  printf ("%04d-%02bd-%02bd %02bd:%02bd:%02bd.%02bd\n", 
+  printf ("%04d-%02d-%02d %02d:%02d:%02d.%02d\n", 
 	  rtcDate->year, rtcDate->month, rtcDate->day,
 	  rtcDate->hour, rtcDate->minute, rtcDate->second,
 	  rtcDate->hundredth);
@@ -84,9 +84,9 @@ void main (void) {
 #endif    
 
 #ifdef USE_LCD
-    LcdLPrintf (2,"%04d-%02bd-%02bd",
+    LcdLPrintf (2,"%04d-%02d-%02d",
 		rtcDate.year, rtcDate.month, rtcDate.day);
-    LcdLPrintf (3, "%02bd:%02bd:%02bd.%02bd", 
+    LcdLPrintf (3, "%02d:%02d:%02d.%02d", 
 		rtcDate.hour, rtcDate.minute, rtcDate.second,
 		rtcDate.hundredth);
 #endif

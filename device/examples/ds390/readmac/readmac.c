@@ -40,7 +40,7 @@ void main(void)
        	    owSerialNum(serial, 1);
        
 	    #ifdef NOISY
-       	    printf("found 1-wire device: %02bx%02bx%02bx%02bx%02bx%02bx%02bx%02bx\n",
+       	    printf("found 1-wire device: %02x%02x%02x%02x%02x%02x%02x%02x\n",
        	    	   serial[0], serial[1], serial[2], serial[3],
        	    	   serial[4], serial[5], serial[6], serial[7]);
 	    #endif
@@ -57,7 +57,7 @@ void main(void)
     
    if (!rc)
    {
-       	printf("DS2502 located (ID %02bx%02bx%02bx%02bx%02bx%02bx%02bx%02bx).\n",
+       	printf("DS2502 located (ID %02x%02x%02x%02x%02x%02x%02x%02x).\n",
        	    	   serial[0], serial[1], serial[2], serial[3],
        	    	   serial[4], serial[5], serial[6], serial[7]);       
         /* Build command packet. */
@@ -74,7 +74,7 @@ void main(void)
         myCRC = docrc8(myCRC, serial[3]);
 	if (myCRC != serial[4])
 	{
-	    printf("read failed: bogus CRC: %bx != %bx\n", myCRC, serial[4]);
+	    printf("read failed: bogus CRC: %x != %x\n", myCRC, serial[4]);
 	    rc = 1;
 	}
     }
@@ -91,7 +91,7 @@ void main(void)
 	printf("DS2502 memory: ");
 	for (i = 0; i < 32; i++)
         {
-	    printf("%02bx ", serial[i]);
+	    printf("%02x ", serial[i]);
         }       
         printf("\n");
 	#endif
@@ -105,7 +105,7 @@ void main(void)
 	    }
 	}
 	
-	printf("MAC address: %02bx%02bx%02bx%02bx%02bx%02bx\n",
+	printf("MAC address: %02x%02x%02x%02x%02x%02x\n",
 	        mac[0], mac[1], mac[2],
 	        mac[3], mac[4], mac[5]);
 	owTouchReset();

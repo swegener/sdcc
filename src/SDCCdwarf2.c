@@ -2866,12 +2866,15 @@ int dwWriteType(structdef *sdef, int block, int inStruct, char *tag)
 int dwWriteModule(char *name)
 {
   dwtag * tp;
+  char verid[125];
   
   dwModuleName = Safe_strdup (name);
+  
+  sprintf(verid, "SDCC version %s #%s", SDCC_VERSION_STR, getBuildNumber());
     
   tp = dwNewTag (DW_TAG_compile_unit);
-  dwAddTagAttr (tp, dwNewAttrString (DW_AT_producer, "SDCC version "
-					     SDCC_VERSION_STR));
+  dwAddTagAttr (tp, dwNewAttrString (DW_AT_producer, verid));
+
   dwAddTagAttr (tp, dwNewAttrConst (DW_AT_language, DW_LANG_C89));
 
   dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, fullSrcFileName));

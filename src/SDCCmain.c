@@ -400,6 +400,7 @@ _findProcessor (int argc, char **argv)
   /* no error if processor was not specified. */
 }
 
+
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info        */
 /*-----------------------------------------------------------------*/
@@ -417,7 +418,7 @@ printVersionInfo (void)
 #ifdef SDCC_SUB_VERSION_STR
 	   "/" SDCC_SUB_VERSION_STR
 #endif
-           " (" __DATE__ ")"
+           " #%s (" __DATE__ ")"
 #ifdef __CYGWIN__
 	   " (CYGWIN)\n"
 #elif defined __MINGW32__
@@ -431,7 +432,7 @@ printVersionInfo (void)
 #else
 	   " (UNIX) \n"
 #endif
-    );
+    , getBuildNumber() );
 }
 
 static void

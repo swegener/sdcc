@@ -85,6 +85,9 @@ char *strncpyz(char *dest, const char *src, size_t n);
  */
 char *strncatz(char *dest, const char *src, size_t n);
 
+/* return SDCC build number */
+const char *getBuildNumber(void);
+
 /* snprintf, by hook or by crook. */
 size_t SDCCsnprintf(char *, size_t, const char *, ...);
 

@@ -44,7 +44,7 @@ TARGET		= $(PRJDIR)/bin/sdcc$(EXEEXT)
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf $(TARGET)
+all: checkconf version.h $(TARGET)
 
 $(PORT_LIBS): FORCE 
 	$(MAKE) -C `dirname $@`
@@ -116,6 +116,9 @@ SDCCy.c: SDCC.y
 
 SDCClex.c: SDCC.lex SDCCy.h
 	$(LEX) -t $< >$@
+
+version.h: ../ChangeLog
+	$(AWK) -f version.awk $< > $@
 
 .y.c:
 	rm -f $*.cc $*.h

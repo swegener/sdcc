@@ -36,6 +36,8 @@
 #include "findme.h"
 #endif
 
+#include "version.h"
+
 /** Given an array of name, value string pairs creates a new hash
     containing all of the pairs.
 */
@@ -284,6 +286,16 @@ char *strncatz(char *dest, const char *src, size_t n)
     dest[n - 1] = 0;
     return dest;
 }
+
+
+/*-----------------------------------------------------------------*/
+/* getBuildNumber - return build number                            */
+/*-----------------------------------------------------------------*/
+const char *getBuildNumber(void)
+{
+  return (SDCC_BUILD_NUMBER);
+}
+
 
 
 #if defined(HAVE_VSNPRINTF) || defined(HAVE_VSPRINTF)

@@ -1393,7 +1393,7 @@ void
 ifxOptimize (iCode * ic, set * cseSet,
              int computeOnly,
              eBBlock * ebb, int *change,
-             eBBlock ** ebbs, int count)
+             ebbIndex * ebbi)
 {
   operand *pdop;
   symbol *label;
@@ -1445,7 +1445,7 @@ ifxOptimize (iCode * ic, set * cseSet,
       /* this is very expensive but it does not happen */
       /* too often, if it does happen then the user pays */
       /* the price */
-      computeControlFlow (ebbs, count, 1);
+      computeControlFlow (ebbi);
       if (!options.lessPedantic) {
         werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
       }
@@ -1457,7 +1457,7 @@ ifxOptimize (iCode * ic, set * cseSet,
      we can remove this conditional statement */
   label = (IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic));
   if (elementsInSet (ebb->succList) == 1 &&
-      isinSet (ebb->succList, eBBWithEntryLabel (ebbs, label, count)))
+      isinSet (ebb->succList, eBBWithEntryLabel (ebbi, label)))
     {
 
       if (!options.lessPedantic) {
@@ -1473,7 +1473,7 @@ ifxOptimize (iCode * ic, set * cseSet,
       else
         {
           remiCodeFromeBBlock (ebb, ic);
-          computeControlFlow (ebbs, count, 1);
+          computeControlFlow (ebbi);
           return;
         }
     }
@@ -1768,8 +1768,10 @@ dumpCseSet(set *cseSet)
 /*-----------------------------------------------------------------*/
 int
 cseBBlock (eBBlock * ebb, int computeOnly,
-           eBBlock ** ebbs, int count)
+           ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
   set *cseSet;
   iCode *ic;
   int change = 0;
@@ -1957,7 +1959,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
         {
           ifxOptimize (ic, cseSet, computeOnly,
                        ebb, &change,
-                       ebbs, count);
+                       ebbi);
           continue;
         }
 
@@ -2225,15 +2227,17 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 /* cseAllBlocks - will sequentially go thru & do cse for all blocks */
 /*-----------------------------------------------------------------*/
 int
-cseAllBlocks (eBBlock ** ebbs, int count, int computeOnly)
+cseAllBlocks (ebbIndex * ebbi, int computeOnly)
 {
+  eBBlock ** ebbs = ebbi->dfOrder;
+  int count = ebbi->count;
   int i;
   int change = 0;
 
   /* if optimization turned off */
 
   for (i = 0; i < count; i++)
-    change += cseBBlock (ebbs[i], computeOnly, ebbs, count);
+    change += cseBBlock (ebbs[i], computeOnly, ebbi);
 
   return change;
 }

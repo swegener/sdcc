@@ -49,9 +49,9 @@ typedef struct eBBlock
 
     /* control flow analysis */
     set *succList;		/* list eBBlocks which are successors  */
-    bitVect *succVect;		/* bitVector of successors             */
+    bitVect *succVect;		/* bitVector of successors (index is bbnum) */
     set *predList;		/* predecessors of this basic block    */
-    bitVect *domVect;		/* list of nodes this is dominated by  */
+    bitVect *domVect;		/* list of nodes this is dominated by (index is bbnum) */
 
     /* data flow analysis */
     set *inExprs;		/* in coming common expressions    */
@@ -71,6 +71,14 @@ typedef struct eBBlock
   }
 eBBlock;
 
+typedef struct ebbIndex
+  {
+    int count;			/* number of blocks in the index */
+    eBBlock **bbOrder;		/* blocks in bbnum order */
+    eBBlock **dfOrder;		/* blocks in dfnum (depth first) order */
+  }
+ebbIndex;
+
 typedef struct edge
   {
 
@@ -79,6 +87,7 @@ typedef struct edge
   }
 edge;
 
+
 extern int eBBNum;
 extern set *graphEdges;
 
@@ -86,17 +95,17 @@ extern set *graphEdges;
 DEFSETFUNC (printEntryLabel);
 eBBlock *neweBBlock ();
 edge *newEdge (eBBlock *, eBBlock *);
-eBBlock *eBBWithEntryLabel (eBBlock **, symbol *, int);
+eBBlock *eBBWithEntryLabel (ebbIndex *, symbol *);
 DEFSETFUNC (ifFromIs);
 set *edgesTo (eBBlock *);
 void remiCodeFromeBBlock (eBBlock *, iCode *);
 void addiCodeToeBBlock (eBBlock *, iCode *, iCode *);
-eBBlock **iCodeBreakDown (iCode *, int *);
+ebbIndex *iCodeBreakDown (iCode *);
 void replaceSymBySym (set *, operand *, operand *);
 iCode *iCodeFromeBBlock (eBBlock **, int);
 int otherPathsPresent (eBBlock **, eBBlock *);
 void replaceLabel (eBBlock *, symbol *, symbol *);
-void dumpEbbsToFileExt (int, eBBlock **, int);
+void dumpEbbsToFileExt (int, ebbIndex *);
 void dumpLiveRanges (int, hTab * liveRanges);
 void closeDumpFiles();
 

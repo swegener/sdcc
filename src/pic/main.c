@@ -49,7 +49,7 @@ static char *_pic14_keywords[] =
 
 void  pCodeInitRegisters(void);
 
-void pic14_assignRegisters (eBBlock ** ebbs, int count);
+void pic14_assignRegisters (ebbIndex *);
 
 /* Also defined in gen.h, but the #include is commented out */
 /* for an unknowned reason. - EEP */

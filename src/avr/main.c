@@ -69,7 +69,7 @@ _avr_regparm (sym_link * l)
 	return 0;
 }
 
-void avr_assignRegisters (eBBlock ** ebbs, int count);
+void avr_assignRegisters (ebbIndex *);
 
 static bool
 _avr_parseOptions (int *pargc, char **argv, int *i)

@@ -51,7 +51,7 @@ static char *_hc08_keywords[] =
 };
 
 
-void hc08_assignRegisters (eBBlock ** ebbs, int count);
+void hc08_assignRegisters (ebbIndex *);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
 

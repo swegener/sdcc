@@ -25,11 +25,13 @@
 
 #include "common.h"
 
+static void computeDFOrdering (eBBlock *, int *);
+
 /*-----------------------------------------------------------------*/
 /* domSetFromVect - creates a domset from the vector               */
 /*-----------------------------------------------------------------*/
-set *
-domSetFromVect (eBBlock ** ebbs, bitVect * domVect)
+static set *
+domSetFromVect (ebbIndex *ebbi, bitVect * domVect)
 {
   int i = 0;
   set *domSet = NULL;
@@ -39,7 +41,7 @@ domSetFromVect (eBBlock ** ebbs, bitVect * domVect)
 
   for (i = 0; i < domVect->size; i++)
     if (bitVectBitValue (domVect, i))
-      addSet (&domSet, ebbs[i]);
+      addSet (&domSet, ebbi->bbOrder[i]);
   return domSet;
 }
 
@@ -48,7 +50,7 @@ domSetFromVect (eBBlock ** ebbs, bitVect * domVect)
 /* addSuccessor - will add bb to succ also add it to the pred of   */
 /*                the next one :                                   */
 /*-----------------------------------------------------------------*/
-void 
+static void 
 addSuccessor (eBBlock * thisBlock, eBBlock * succ)
 {
   /* check for boundary conditions */
@@ -68,9 +70,11 @@ addSuccessor (eBBlock * thisBlock, eBBlock * succ)
 /*-----------------------------------------------------------------*/
 /* eBBPredecessors - find the predecessors for each block          */
 /*-----------------------------------------------------------------*/
-void 
-eBBPredecessors (eBBlock ** ebbs, int count)
+static void 
+eBBPredecessors (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
   int i = 0, j;
 
   /* for each block do */
@@ -96,9 +100,11 @@ eBBPredecessors (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* eBBSuccessors- find out the successors of all the nodes         */
 /*-----------------------------------------------------------------*/
-void 
-eBBSuccessors (eBBlock ** ebbs, int count)
+static void 
+eBBSuccessors (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
   int i = 0;
 
   /* for all the blocks do */
@@ -156,7 +162,7 @@ eBBSuccessors (eBBlock ** ebbs, int count)
 	      for (lbl = setFirstItem (IC_JTLABELS (ic)); lbl;
 		   lbl = setNextItem (IC_JTLABELS (ic)))
 		addSuccessor (ebbs[i],
-			      eBBWithEntryLabel (ebbs, lbl, count));
+			      eBBWithEntryLabel (ebbi, lbl));
 	    }
 	  else
 	    {
@@ -166,19 +172,19 @@ eBBSuccessors (eBBlock ** ebbs, int count)
 	      switch (ic->op)
 		{
 		case GOTO:	/* goto has edge to label */
-		  succ = eBBWithEntryLabel (ebbs, ic->label, count);
+		  succ = eBBWithEntryLabel (ebbi, ic->label);
 		  break;
 
 		case IFX:	/* conditional jump */
 		  /* if true label is present */
 		  if (IC_TRUE (ic))
-		    succ = eBBWithEntryLabel (ebbs, IC_TRUE (ic), count);
+		    succ = eBBWithEntryLabel (ebbi, IC_TRUE (ic));
 		  else
-		    succ = eBBWithEntryLabel (ebbs, IC_FALSE (ic), count);
+		    succ = eBBWithEntryLabel (ebbi, IC_FALSE (ic));
 		  break;
 
 		case RETURN:	/* block with return */
-		  succ = eBBWithEntryLabel (ebbs, returnLabel, count);
+		  succ = eBBWithEntryLabel (ebbi, returnLabel);
 		  break;
 		}
 
@@ -195,9 +201,11 @@ eBBSuccessors (eBBlock ** ebbs, int count)
 /* computeDominance - computes the dominance graph                 */
 /* for algorithm look at Dragon book section 10.10, algo 10.16     */
 /*-----------------------------------------------------------------*/
-void 
-computeDominance (eBBlock ** ebbs, int count)
+static void 
+computeDominance (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
   int i, j;
 
   /* now do the initialisation */
@@ -259,16 +267,17 @@ computeDominance (eBBlock ** ebbs, int count)
       if (!change)
 	break;
     }
+  
 }
 
 /*-----------------------------------------------------------------*/
 /* immedDom - returns the immediate dominator of a block           */
 /*-----------------------------------------------------------------*/
 eBBlock *
-immedDom (eBBlock ** ebbs, eBBlock * ebp)
+immedDom (ebbIndex * ebbi, eBBlock * ebp)
 {
   /* first delete self from the list */
-  set *iset = domSetFromVect (ebbs, ebp->domVect);
+  set *iset = domSetFromVect (ebbi, ebp->domVect);
   eBBlock *loop;
   eBBlock *idom = NULL;
 
@@ -306,7 +315,7 @@ DEFSETFUNC (DFOrdering)
 /* computeDFOrdering - computes the depth first ordering of the    */
 /*                     flowgraph                                   */
 /*-----------------------------------------------------------------*/
-void 
+static void 
 computeDFOrdering (eBBlock * ebbp, int *count)
 {
 
@@ -323,21 +332,22 @@ computeDFOrdering (eBBlock * ebbp, int *count)
 /* disconBBlock - removes all control flow links for a block       */
 /*-----------------------------------------------------------------*/
 void 
-disconBBlock (eBBlock * ebp, eBBlock ** ebbs, int count)
+disconBBlock (eBBlock * ebp, ebbIndex * ebbi)
 {
   /* mark this block as noPath & recompute control flow */
   ebp->noPath = 1;
-  computeControlFlow (ebbs, count, TRUE);
+  computeControlFlow (ebbi);
 }
 
 /*-----------------------------------------------------------------*/
 /* markNoPath - marks those blocks which cannot be reached from top */
 /*-----------------------------------------------------------------*/
-void 
-markNoPath (eBBlock ** ebbs, int count)
+static void 
+markNoPath (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
   int i;
-
 
   /* for all blocks if the visited flag is not set : then there */
   /* is no path from _entry to this block push them down in the */
@@ -346,55 +356,20 @@ markNoPath (eBBlock ** ebbs, int count)
     if (!ebbs[i]->visited)
       ebbs[i]->noPath = 1;
 }
-/*-----------------------------------------------------------------*/
-/* dfNumCompare - used by qsort to sort by dfNumber                */
-/*-----------------------------------------------------------------*/
-int 
-dfNumCompare (const void *a, const void *b)
-{
-  const eBBlock *const *i = a;
-  const eBBlock *const *j = b;
-
-  if ((*i)->dfnum > (*j)->dfnum)
-    return 1;
-
-  if ((*i)->dfnum < (*j)->dfnum)
-    return -1;
-
-  return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* bbNumCompare - used by qsort to sort by bbNumber                */
-/*-----------------------------------------------------------------*/
-int 
-bbNumCompare (const void *a, const void *b)
-{
-  const eBBlock *const *i = a;
-  const eBBlock *const *j = b;
-
-  if ((*i)->bbnum > (*j)->bbnum)
-    return 1;
-
-  if ((*i)->bbnum < (*j)->bbnum)
-    return -1;
-
-  return 0;
-}
-
 
 /*-----------------------------------------------------------------*/
 /* computeControlFlow - does the control flow computation          */
 /*-----------------------------------------------------------------*/
 void 
-computeControlFlow (eBBlock ** ebbs, int count, int reSort)
+computeControlFlow (ebbIndex * ebbi)
 {
-  int saveCount = count;
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int dfCount = ebbi->count;
   int i;
 
   /* initialise some things */
 
-  for (i = 0; i < count; i++)
+  for (i = 0; i < ebbi->count; i++)
     {
       setToNull ((void *) &ebbs[i]->predList);
       setToNull ((void *) &ebbs[i]->domVect);
@@ -404,30 +379,33 @@ computeControlFlow (eBBlock ** ebbs, int count, int reSort)
       ebbs[i]->dfnum = 0;
     }
 
-  if (reSort)
-    /* sort it back by block number */
-    qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
-
   setToNull ((void *) &graphEdges);
   /* this will put in the  */
   /* successor information for each blk */
-  eBBSuccessors (ebbs, count);
+  eBBSuccessors (ebbi);
 
   /* compute the depth first ordering */
-  computeDFOrdering (ebbs[0], &count);
+  computeDFOrdering (ebbi->bbOrder[0], &dfCount);
 
   /* mark blocks with no paths to them */
-  markNoPath (ebbs, saveCount);
+  markNoPath (ebbi);
 
   /* with the depth first info in place */
   /* add the predecessors for the blocks */
-  eBBPredecessors (ebbs, saveCount);
+  eBBPredecessors (ebbi);
 
   /* compute the dominance graph */
-  computeDominance (ebbs, saveCount);
+  computeDominance (ebbi);
 
   /* sort it by dfnumber */
-  qsort (ebbs, saveCount, sizeof (eBBlock *), dfNumCompare);
+  if (!ebbi->dfOrder)
+    ebbi->dfOrder = Safe_alloc ((ebbi->count+1) * sizeof (eBBlock *));
+  for (i = 0; i < (ebbi->count+1); i++)
+    {
+      ebbi->dfOrder[i] = ebbi->bbOrder[i];
+    }
+      
+  qsort (ebbi->dfOrder, ebbi->count, sizeof (eBBlock *), dfNumCompare);
 
 }
 

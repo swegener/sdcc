@@ -44,6 +44,8 @@ typedef struct builtins
     char *parm_types[MAX_BUILTIN_ARGS]; /* each parm type as string : see typeFromStr */
 } builtins ;
 
+struct ebbIndex;
+
 /* Processor specific names */
 typedef struct
   {
@@ -246,7 +248,7 @@ typedef struct
 	options are parsed. */
     void (*setDefaultOptions) (void);
 /** Does the dirty work. */
-    void (*assignRegisters) (struct eBBlock **, int);
+    void (*assignRegisters) (struct ebbIndex *);
 
     /** Returns the register name of a symbol.
 	Used so that 'regs' can be an incomplete type. */

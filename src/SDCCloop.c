@@ -302,11 +302,10 @@ DEFSETFUNC (addDefInExprs)
 {
   eBBlock *ebp = item;
   V_ARG (cseDef *, cdp);
-  V_ARG (eBBlock **, ebbs);
-  V_ARG (int, count);
+  V_ARG (ebbIndex *, ebbi);
 
   addSetHead (&ebp->inExprs, cdp);
-  cseBBlock (ebp, optimize.global_cse, ebbs, count);
+  cseBBlock (ebp, optimize.global_cse, ebbi);
   return 0;
 }
 
@@ -417,8 +416,10 @@ DEFSETFUNC (hasNonPtrUse)
 /* loopInvariants - takes loop invariants out of region            */
 /*-----------------------------------------------------------------*/
 int
-loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
+loopInvariants (region * theLoop, ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->dfOrder;
+  int count = ebbi->count;
   eBBlock *lBlock;
   set *lInvars = NULL;
 
@@ -616,7 +617,7 @@ loopInvariants (region * theLoop, eBBlock ** ebbs, int count)
 	      bitVectUnSetBit (lBlock->defSet, ic->key);
 	      bitVectUnSetBit (lBlock->ldefs, ic->key);
 	      ivar = newCseDef (IC_RESULT (ic), ic);
-	      applyToSet (theLoop->regBlocks, addDefInExprs, ivar, ebbs, count);
+	      applyToSet (theLoop->regBlocks, addDefInExprs, ivar, ebbi);
 	      addSet (&lInvars, ivar);
 	    }
 	}
@@ -984,8 +985,10 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 /* loopInduction - remove induction variables from a loop          */
 /*-----------------------------------------------------------------*/
 int
-loopInduction (region * loopReg, eBBlock ** ebbs, int count)
+loopInduction (region * loopReg, ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->dfOrder;
+  int count = ebbi->count;
   int change = 0;
   eBBlock *lBlock, *owner, *lastBlock = NULL;
   set *indVars = NULL;
@@ -1231,7 +1234,7 @@ DEFSETFUNC (mergeInnerLoops)
 /* createLoopRegions - will detect and create a set of natural loops */
 /*-----------------------------------------------------------------*/
 hTab *
-createLoopRegions (eBBlock ** ebbs, int count)
+createLoopRegions (ebbIndex * ebbi)
 {
   set *allRegion = NULL;	/* set of all loops */
   hTab *orderedLoops = NULL;
@@ -1279,7 +1282,7 @@ createLoopRegions (eBBlock ** ebbs, int count)
 /* loopOptimizations - identify region & remove invariants & ind   */
 /*-----------------------------------------------------------------*/
 int
-loopOptimizations (hTab * orderedLoops, eBBlock ** ebbs, int count)
+loopOptimizations (hTab * orderedLoops, ebbIndex * ebbi)
 {
   region *lp;
   int change = 0;
@@ -1299,10 +1302,10 @@ loopOptimizations (hTab * orderedLoops, eBBlock ** ebbs, int count)
     {
 
       if (optimize.loopInvariant)
-	change += loopInvariants (lp, ebbs, count);
+	change += loopInvariants (lp, ebbi);
 
       if (optimize.loopInduction)
-	change += loopInduction (lp, ebbs, count);
+	change += loopInduction (lp, ebbi);
     }
 
   return change;

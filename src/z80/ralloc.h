@@ -74,7 +74,7 @@ extern regs *regsZ80;
 void assignRegisters (eBBlock **, int);
 regs *regWithIdx (int);
 
-void z80_assignRegisters (eBBlock ** ebbs, int count);
+void z80_assignRegisters (ebbIndex *);
 bitVect *z80_rUmaskForOp (operand * op);
 
 #endif

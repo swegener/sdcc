@@ -47,7 +47,7 @@ static char *_mcs51_keywords[] =
 
 
 
-void mcs51_assignRegisters (eBBlock ** ebbs, int count);
+void mcs51_assignRegisters (ebbIndex *);
 
 static int regParmFlg = 0;      /* determine if we can register a parameter */
 

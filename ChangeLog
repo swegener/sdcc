@@ -1,3 +1,36 @@
+2005-03-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/port.h (struct PORT),
+	* src/avr/ralloc.c (avr_assignRegisters),
+	* src/avr/main.c,
+	* src/ds390/ralloc.c (ds390_assignRegisters),
+	* src/ds390/main.c,
+	* src/hc08/ralloc.c (hc08_assignRegisters),
+	* src/hc08/main.c,
+	* src/mcs51/ralloc.c (mcs51_assignRegisters),
+	* src/mcs51/main.c,
+	* src/pic/ralloc.c (pic14_assignRegisters),
+	* src/pic/main.c,
+	* src/pic16/ralloc.c (pic16_assignRegisters),
+	* src/pic16/main.c,
+	* src/xa51/ralloc.c (xa51_assignRegisters),
+	* src/xa51/main.c,
+	* src/z80/ralloc.c (z80_assignRegisters),
+	* src/z80/ralloc.h,
+	* src/SDCCopt.c (eBBlockFromiCode, replaceRegEqv, killDeadCode),
+	* src/SDCCcse.c (ifxOptimize, cseBBlock, cseAllBlocks),
+	* src/SDCCcse.h,
+	* src/SDCCdflow.c (computeDataFlow),
+	* src/SDCCdflow.h,
+	* src/SDCCloop.c (addDefInExprs, loopInvariants, loopOptimizations),
+	* src/SDCCloop.h,
+	* src/SDCCcflow.c (*),
+	* src/SDCCcflow.h,
+	* src/SDCCBBlock.c (iCodeBreakDown, dumpEbbsToFileExt, eBBWithEntryLabel),
+	* src/SDCCBBlock.h (struct ebbIndex): new struct that keeps two copies
+	of the eBBlock list, sorted by both bbnum and dfnum. (fixes bug with
+	immedDom() returning wrong block; probably fixes bug #1160833)
+
 2005-03-20 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/inc2h.pl: WIN32 port

@@ -80,7 +80,7 @@ extern char *pic16_processor_base_name(void);
 
 void  pic16_pCodeInitRegisters(void);
 
-void pic16_assignRegisters (eBBlock ** ebbs, int count);
+void pic16_assignRegisters (ebbIndex *);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
 

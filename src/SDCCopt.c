@@ -645,15 +645,17 @@ isLocalWithoutDef (symbol * sym)
 /* replaceRegEqv - replace all local variables with their reqv     */
 /*-----------------------------------------------------------------*/
 static void 
-replaceRegEqv (eBBlock ** ebbs, int count)
+replaceRegEqv (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
   int i;
 
   /* Update the symbols' def bitvector so we know if there is   */
   /* a defining iCode or not. Only replace a local variable     */
   /* with its register equivalent if there is a defining iCode; */
   /* otherwise, the port's register allocater may choke.        */
-  cseAllBlocks (ebbs, count, TRUE);
+  cseAllBlocks (ebbi, TRUE);
 
   for (i = 0; i < count; i++)
     {
@@ -828,8 +830,10 @@ findReqv (symbol * prereqv, eBBlock ** ebbs, int count)
 /* killDeadCode - eliminates dead assignments                      */
 /*-----------------------------------------------------------------*/
 int 
-killDeadCode (eBBlock ** ebbs, int count)
+killDeadCode (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->dfOrder;
+  int count = ebbi->count;
   int change = 1;
   int gchange = 0;
   int i = 0;
@@ -936,6 +940,11 @@ killDeadCode (eBBlock ** ebbs, int count)
 		  /* a dead address-of operation should die, even if volatile */
 		  if (ic->op == ADDRESS_OF)
 		    volLeft = FALSE;
+              
+		  //if (ic->op == CAST && isOperandVolatile (IC_LEFT (ic), FALSE))
+		  //  {
+		  //    volRight = IS_SYMOP (IC_RIGHT (ic));
+		  //  }
 
 		  if (ic->next && ic->seqPoint == ic->next->seqPoint
 		      && (ic->next->op == '+' || ic->next->op == '-'))
@@ -957,7 +966,7 @@ killDeadCode (eBBlock ** ebbs, int count)
 			}
 		      continue;
 		    }
-		  
+		                  
 		  change = 1;
 		  gchange++;
 		  
@@ -1023,7 +1032,7 @@ killDeadCode (eBBlock ** ebbs, int count)
 	    }			/* end of all instructions */
 
 	  if (!ebbs[i]->sch && !ebbs[i]->noPath)
-	    disconBBlock (ebbs[i], ebbs, count);
+	    disconBBlock (ebbs[i], ebbi);
 
 	}			/* end of for all blocks */
 
@@ -1160,9 +1169,10 @@ optimizeCastCast (eBBlock ** ebbs, int count)
 eBBlock **
 eBBlockFromiCode (iCode * ic)
 {
-  eBBlock **ebbs = NULL;
-  int count = 0;
-  int saveCount = 0;
+  ebbIndex *ebbi = NULL;
+  //eBBlock **ebbs = NULL;
+  //int count = 0;
+  //int saveCount = 0;
   int change = 1;
   int lchange = 0;
   int kchange = 0;
@@ -1172,7 +1182,7 @@ eBBlockFromiCode (iCode * ic)
   if (!ic)
     return NULL;
 
-  count = 0;
+  //count = 0;
   eBBNum = 0;
 
   /* optimize the chain for labels & gotos 
@@ -1181,73 +1191,72 @@ eBBlockFromiCode (iCode * ic)
   ic = iCodeLabelOptimize (ic);
 
   /* break it down into basic blocks */
-  ebbs = iCodeBreakDown (ic, &count);
-  saveCount = count;
-
+  ebbi = iCodeBreakDown (ic);
+  
   /* hash the iCode keys so that we can quickly index */
   /* them in the rest of the optimization steps */
   setToNull ((void *) &iCodehTab);
   iCodehTab = newHashTable (iCodeKey);
-  hashiCodeKeys (ebbs, count);
+  hashiCodeKeys (ebbi->bbOrder, ebbi->count);
   
   /* compute the control flow */
-  computeControlFlow (ebbs, count, 0);
+  computeControlFlow (ebbi);
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (DUMP_RAW0, ebbs, count);
+    dumpEbbsToFileExt (DUMP_RAW0, ebbi);
 
   /* replace the local variables with their
      register equivalents : the liveRange computation
      along with the register allocation will determine
      if it finally stays in the registers */
-  replaceRegEqv (ebbs, count);
+  replaceRegEqv (ebbi);
 
   /* create loop regions */
-  loops = createLoopRegions (ebbs, count);
+  loops = createLoopRegions (ebbi);
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (DUMP_RAW1, ebbs, count);
+    dumpEbbsToFileExt (DUMP_RAW1, ebbi);
 
-  optimizeCastCast (ebbs, saveCount);
+  optimizeCastCast (ebbi->bbOrder, ebbi->count);
     
   /* do common subexpression elimination for each block */
-  change = cseAllBlocks (ebbs, saveCount, FALSE);
+  change = cseAllBlocks (ebbi, FALSE);
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (DUMP_CSE, ebbs, count);
+    dumpEbbsToFileExt (DUMP_CSE, ebbi);
 
   /* compute the data flow */
-  computeDataFlow (ebbs, saveCount);
+  computeDataFlow (ebbi);
 
   /* dumpraw if asked for */
   if (options.dump_raw)
-    dumpEbbsToFileExt (DUMP_DFLOW, ebbs, count);
+    dumpEbbsToFileExt (DUMP_DFLOW, ebbi);
 
   /* global common subexpression elimination  */
   if (optimize.global_cse)
     {
-      change += cseAllBlocks (ebbs, saveCount, FALSE);
+      change += cseAllBlocks (ebbi, FALSE);
       if (options.dump_gcse)
-	dumpEbbsToFileExt (DUMP_GCSE, ebbs, saveCount);
+	dumpEbbsToFileExt (DUMP_GCSE, ebbi);
     }
   else
     {
       // compute the dataflow only
-      assert(cseAllBlocks (ebbs, saveCount, TRUE)==0);
+      assert(cseAllBlocks (ebbi, TRUE)==0);
     }
   /* kill dead code */
-  kchange = killDeadCode (ebbs, saveCount);
+  kchange = killDeadCode (ebbi);
 
   if (options.dump_kill)
-    dumpEbbsToFileExt (DUMP_DEADCODE, ebbs, count);
+    dumpEbbsToFileExt (DUMP_DEADCODE, ebbi);
 
   /* do loop optimizations */
-  change += (lchange = loopOptimizations (loops, ebbs, count));
+  change += (lchange = loopOptimizations (loops, ebbi));
   if (options.dump_loop)
-    dumpEbbsToFileExt (DUMP_LOOP, ebbs, count);
+    dumpEbbsToFileExt (DUMP_LOOP, ebbi);
 
   /* recompute the data flow and apply global cse again 
      if loops optimizations or dead code caused a change:
@@ -1258,24 +1267,24 @@ eBBlockFromiCode (iCode * ic)
      subexpression once more */
   if (lchange || kchange)
     {
-      computeDataFlow (ebbs, saveCount);
-      change += cseAllBlocks (ebbs, saveCount, FALSE);
+      computeDataFlow (ebbi);
+      change += cseAllBlocks (ebbi, FALSE);
       if (options.dump_loop)
-	dumpEbbsToFileExt (DUMP_LOOPG, ebbs, count);
+	dumpEbbsToFileExt (DUMP_LOOPG, ebbi);
 
       /* if loop optimizations caused a change then do
          dead code elimination once more : this will
          get rid of the extra assignments to the induction
          variables created during loop optimizations */
-      killDeadCode (ebbs, saveCount);
+      killDeadCode (ebbi);
 
       if (options.dump_loop)
-	dumpEbbsToFileExt (DUMP_LOOPD, ebbs, count);
+	dumpEbbsToFileExt (DUMP_LOOPD, ebbi);
 
     }
 
   /* sort it back by block number */
-  qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
+  //qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
 
   if (!options.lessPedantic) {
     // this is a good place to check missing return values
@@ -1285,9 +1294,9 @@ eBBlockFromiCode (iCode * ic)
        && !FUNC_ISNAKED(currFunc->type)) {
 	eBBlock *bp;
 	// make sure all predecessors of the last block end in a return
-	for (bp=setFirstItem(ebbs[saveCount-1]->predList); 
+	for (bp=setFirstItem(ebbi->bbOrder[ebbi->count-1]->predList); 
 	     bp; 
-	     bp=setNextItem(ebbs[saveCount-1]->predList)) {
+	     bp=setNextItem(ebbi->bbOrder[ebbi->count-1]->predList)) {
 	  if (bp->ech->op != RETURN) {
 	    werrorfl (bp->ech->filename, bp->ech->lineno,
 		      W_VOID_FUNC, currFunc->name);
@@ -1299,31 +1308,30 @@ eBBlockFromiCode (iCode * ic)
 
   /* if cyclomatic info requested then print it */
   if (options.cyclomatic)
-    printCyclomatic (ebbs, saveCount);
+    printCyclomatic (ebbi->bbOrder, ebbi->count);
 
   /* convert operations with support routines
      written in C to function calls : Iam doing
      this at this point since I want all the
      operations to be as they are for optimzations */
-  convertToFcall (ebbs, count);
+  convertToFcall (ebbi->bbOrder, ebbi->count);
 
   /* compute the live ranges */
-  computeLiveRanges (ebbs, count);
+  computeLiveRanges (ebbi->bbOrder, ebbi->count);
 
   if (options.dump_range)
-    dumpEbbsToFileExt (DUMP_RANGE, ebbs, count);
+    dumpEbbsToFileExt (DUMP_RANGE, ebbi);
 
   /* Now that we have the live ranges, discard parameter
    * receives for unused parameters.
    */
-  discardDeadParamReceives (ebbs, count);
+  discardDeadParamReceives (ebbi->bbOrder, ebbi->count);
 
   /* allocate registers & generate code */
-  port->assignRegisters (ebbs, count);
+  port->assignRegisters (ebbi);
 
   /* throw away blocks */
   setToNull ((void *) &graphEdges);
-  ebbs = NULL;
   
   return NULL;
 }

@@ -2059,8 +2059,10 @@ static void packRegisters (eBBlock * ebp) {
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
 void
-xa51_assignRegisters (eBBlock ** ebbs, int count)
+xa51_assignRegisters (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->bbOrder;
+  int count = ebbi->count;
   iCode *ic;
   int i;
   
@@ -2078,7 +2080,7 @@ xa51_assignRegisters (eBBlock ** ebbs, int count)
   recomputeLiveRanges (ebbs, count);
 
   if (options.dump_pack)
-    dumpEbbsToFileExt (DUMP_PACK, ebbs, count);
+    dumpEbbsToFileExt (DUMP_PACK, ebbi);
   
   /* first determine for each live range the number of 
      registers & the type of registers required for each */
@@ -2106,7 +2108,7 @@ xa51_assignRegisters (eBBlock ** ebbs, int count)
   
   if (options.dump_rassgn)
     {
-      dumpEbbsToFileExt (DUMP_RASSGN, ebbs, count);
+      dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
     }
   

@@ -31,7 +31,7 @@
 
 DEFSETFUNC (mergeInExprs);
 DEFSETFUNC (ifKilledInBlock);
-void computeDataFlow (eBBlock **, int);
+void computeDataFlow (ebbIndex *);
 DEFSETFUNC (mergeInDefs);
 DEFSETFUNC (isDefAlive);
 iCode *usedInRemaining (operand *, iCode *);

@@ -123,6 +123,9 @@ DEFSETFUNC (mergeInExprs)
     }
   else
     {
+      //if (dest != ebp)
+      //  dest->inExprs = intersectSets (dest->inExprs, ebp->outExprs, THROW_DEST);
+        
       /* delete only if killed in this block*/
       deleteItemIf (&dest->inExprs, ifKilledInBlock, ebp);
       /* union the ndompset with pointers set in this block */
@@ -162,8 +165,10 @@ DEFSETFUNC (mergeInDefs)
 /* computeDataFlow - does computations for data flow accross blocks */
 /*-----------------------------------------------------------------*/
 void 
-computeDataFlow (eBBlock ** ebbs, int count)
+computeDataFlow (ebbIndex * ebbi)
 {
+  eBBlock ** ebbs = ebbi->dfOrder;
+  int count = ebbi->count;
   int i;
   int change = 1;
   
@@ -222,7 +227,7 @@ computeDataFlow (eBBlock ** ebbs, int count)
 	  /* get the immediate dominator and put it there */
 	  if (!pBlock)
 	    {
-	      eBBlock *idom = immedDom (ebbs, ebbs[i]);
+	      eBBlock *idom = immedDom (ebbi, ebbs[i]);
 	      if (idom)
 		addSetHead (&pred, idom);
 	    }
@@ -239,7 +244,7 @@ computeDataFlow (eBBlock ** ebbs, int count)
 
 	  /* do cse with computeOnly flag set to TRUE */
 	  /* this by far the quickest way of computing */
-	  cseBBlock (ebbs[i], TRUE, ebbs, count);
+	  cseBBlock (ebbs[i], TRUE, ebbi);
 
 	  /* if it change we will need to iterate */
 	  if (optimize.global_cse)

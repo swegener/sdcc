@@ -54,12 +54,11 @@ induction;
 DEFSETFUNC (backEdges);
 DEFSETFUNC (pregion);
 DEFSETFUNC (pinduction);
-int loopOptimizations (hTab *, eBBlock **, int);
+int loopOptimizations (hTab *, ebbIndex *);
 int addressTaken (set *, operand *);
-hTab *createLoopRegions (eBBlock **, int);
+hTab *createLoopRegions (ebbIndex *);
 iCode *findDefInRegion (set *, operand *, eBBlock **);
 int hasIncomingDefs (region *, operand *);
 int findLoopEndSeq (region *);
-void addLoopBlocks (eBBlock ** ebbs, int count);
 
 #endif

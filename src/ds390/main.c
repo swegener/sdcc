@@ -59,7 +59,7 @@ static builtins __ds390_builtins[] = {
     { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
     { NULL , NULL,0, {NULL}} 			   /* mark end of table */
 };
-void ds390_assignRegisters (eBBlock ** ebbs, int count);
+void ds390_assignRegisters (ebbIndex * ebbi);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
 

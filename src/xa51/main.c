@@ -53,7 +53,7 @@ void   _xa51_genAssemblerEnd (FILE * of)
   //rewinds==1 ? '\0' : 's');
 }
 
-void xa51_assignRegisters (eBBlock ** ebbs, int count);
+void xa51_assignRegisters (ebbIndex *);
 
 static int regParmFlg = 0;	/* determine if we can register a parameter */
 

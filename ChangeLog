@@ -1,3 +1,12 @@
+2003-08-22  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	Z80 and MCS51 linkers complaint if a public symbol is defined
+	in more than one library module:
+
+	* as/mcs51/lklib.c
+	* link/z80/lklib.c
+	* as/mcs51/Makefile.in
+
 2003-08-22  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	A few small changes that speed up the peephole optimizer.

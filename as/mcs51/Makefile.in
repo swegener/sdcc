@@ -30,7 +30,7 @@ infodir         = @info@
 EXEEXT          = @EXEEXT@
 
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR)
-CFLAGS		= @CFLAGS@ -Wall
+CFLAGS		= @CFLAGS@ -Wall -DINDEXLIB
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
 

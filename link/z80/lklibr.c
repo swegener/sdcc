@@ -518,26 +518,35 @@ int fndsym( char *name )
 	pmlibraryfile ThisLibr;
 	pmlibrarysymbol ThisSym = NULL;
 
+    pmlibraryfile FirstFound;
+    int numfound=0;
+
 	/* Build the index if this is the first call to fndsym */
 	if (libr.next==NULL)
 		buildlibraryindex();
 	
 	/* Iterate through all library object files */
 	ThisLibr = libr.next;
-	while (ThisLibr) {
-
+	while (ThisLibr)
+    {
 		/* Iterate through all symbols in an object file */
 		ThisSym = ThisLibr->symbols->next;
 
-		while (ThisSym) {
+		while (ThisSym)
+        {
             //printf("ThisSym->name=%s\n", ThisSym->name);
-			if (!strcmp(ThisSym->name, name)) {
-				if (!ThisLibr->loaded) {
+			if (!strcmp(ThisSym->name, name))
+            {
+				if ((!ThisLibr->loaded) && (numfound==0))
+                {
 					/* Object file is not loaded - add it to the list */
 					lbfh = (struct lbfile *) new (sizeof(struct lbfile));
-					if (lbfhead == NULL) {
+					if (lbfhead == NULL)
+                    {
 						lbfhead = lbfh;
-					} else {
+					}
+                    else
+                    {
 						lbf = lbfhead;
 						while (lbf->next)
 						lbf = lbf->next;
@@ -559,13 +568,35 @@ int fndsym( char *name )
                     }
 					ThisLibr->loaded=1;
 				}
-				return (1);	/* Found the symbol, return */
+
+                if(numfound==0)
+                {
+                    numfound++;
+                    FirstFound=ThisLibr;
+                }
+                else
+                {
+                    if( !( EQ(FirstFound->libspc, ThisLibr->libspc) && 
+                           EQ(FirstFound->relfil, ThisLibr->relfil) ) )
+                    {
+                        if(numfound==1)
+                        {
+                            printf("?Aslink-Warning-Definition of public symbol '%s'"
+                                   " found more than once:\n", name);
+                            printf("   Library: '%s', Module: '%s'\n",
+                                    FirstFound->libspc, FirstFound->relfil);
+                        }
+                        printf("   Library: '%s', Module: '%s'\n",
+                                ThisLibr->libspc, ThisLibr->relfil);
+                        numfound++;
+                    }
+                }
 			}
 			ThisSym=ThisSym->next;  /* Next sym in library */
 		}
 		ThisLibr=ThisLibr->next; /* Next library in list */
 	}
-	return 0;	/* Failure - symbol not found in any library */
+	return numfound;
 }
 
 pmlibraryfile buildlibraryindex_SdccLib(char * PathLib, FILE * libfp, char * DirLib, pmlibraryfile This)

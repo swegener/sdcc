@@ -1,3 +1,6 @@
+2002-12-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+        * as/mcs51/Makefile.bcc: fixed typo lkomf51.o -> lkaomf51.o
+
 2002-12-28  Bernhard Held <bernhard@bernhardheld.de>
 	* src/mcs51/peeph.def: added rules 234 and 235 from Frieder Ferlemann <frieder.ferlemann@web.de>
 	* support/regression/tests/bug-524697.c: fit mem usage into 8032

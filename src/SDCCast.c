@@ -561,7 +561,7 @@ int processParms (ast *func, value *defParm,
 		  int *parmNumber)
 {
     sym_link *fetype = func->etype;
-    
+
     /* if none of them exist */
     if ( !defParm && !actParm)
 	return 0;
@@ -583,13 +583,13 @@ int processParms (ast *func, value *defParm,
 	return 1;
     }
     
-    /* if defined parameters present and actual paramters ended */
+    /* if defined parameters present but no actual parameters */
     if ( defParm && ! actParm) {
-	werror(E_TO_FEW_PARMS);
-	return 1;
+      werror(E_TO_FEW_PARMS);
+      return 1;
     }
         
-    /* If this is a varagrs function... */ 
+    /* If this is a varargs function... */ 
     if (!defParm && actParm && func->hasVargs )
     {
         ast *newType = NULL;
@@ -648,9 +648,13 @@ int processParms (ast *func, value *defParm,
     resolveSymbols(actParm);
     /* if this is a PARAM node then match left & right */
     if ( actParm->type == EX_OP && actParm->opval.op == PARAM) {
-        
-	return (processParms (func,defParm,actParm->left,parmNumber) ||
-		processParms (func,defParm->next, actParm->right,parmNumber) );
+      return (processParms (func,defParm->next, actParm->right,parmNumber) );
+    } else {
+      /* if more defined parameters present but no more actual parameters */
+      if (defParm->next) {
+	werror(E_TO_FEW_PARMS);
+	return 1;
+      }
     }
        
     /* the parameter type must be atleast castable */
@@ -2756,7 +2760,6 @@ ast *decorateType (ast *tree)
 	/*----------------------------*/        
     case CALL   :
 	parmNumber = 1;
-
 
 	if (processParms (tree->left,
 			  tree->left->args,

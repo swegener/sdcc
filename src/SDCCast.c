@@ -605,8 +605,8 @@ int
 processParms (ast * func,
 	      value * defParm,
 	      ast * actParm,
-	      int *parmNumber,
-	      bool rightmost)
+	      int *parmNumber, // unused, although updated
+	      bool rightmost) // double checked?
 {
   sym_link *fetype = func->etype;
 
@@ -616,7 +616,7 @@ processParms (ast * func,
 
   if (defParm) {
     if (getenv("DEBUG_SANITY")) {
-      fprintf (stderr, "addSym: %s ", defParm->name);
+      fprintf (stderr, "processParms: %s ", defParm->name);
     }
     /* make sure the type is complete and sane */
     checkTypeSanity(defParm->etype, defParm->name);
@@ -740,7 +740,6 @@ processParms (ast * func,
 	  return 1;
 	}
     }
-
 
   /* the parameter type must be at least castable */
   if (compareType (defParm->type, actParm->ftype) == 0) {

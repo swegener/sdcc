@@ -1001,7 +1001,20 @@ unqualified_pointer
 
 type_specifier_list
    : type_specifier
-   | type_specifier_list type_specifier         {  $$ = mergeSpec ($1,$2, "type_specifier_list"); }
+   //| type_specifier_list type_specifier         {  $$ = mergeSpec ($1,$2, "type_specifier_list"); }
+   | type_specifier_list type_specifier {
+     /* if the decl $2 is not a specifier */
+     /* find the spec and replace it      */
+     if ( !IS_SPEC($2)) {
+       sym_link *lnk = $2 ;
+       while (lnk && !IS_SPEC(lnk->next))
+	 lnk = lnk->next;
+       lnk->next = mergeSpec($1,lnk->next, "type_specifier_list");
+       $$ = $2 ;
+     }
+     else
+       $$ = mergeSpec($1,$2, "type_specifier_list");
+   }
    ;
 
 parameter_identifier_list

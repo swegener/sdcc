@@ -136,9 +136,17 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg, int pedantic) {
   max = pow ((double)2.0, (double)bitsForType(ltype));
 
   if (SPEC_LONG(val->type)) {
-    v=SPEC_CVAL(val->type).v_long;
+    if (SPEC_USIGN(val->type)) {
+      v=SPEC_CVAL(val->type).v_ulong;
+    } else {
+      v=SPEC_CVAL(val->type).v_long;
+    }
   } else {
-    v=SPEC_CVAL(val->type).v_int;
+    if (SPEC_USIGN(val->type)) {
+      v=SPEC_CVAL(val->type).v_uint;
+    } else {
+      v=SPEC_CVAL(val->type).v_int;
+    }
   }
 
 

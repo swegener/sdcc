@@ -1,11 +1,12 @@
 /*
  * Simulator of microcontrollers (regsxa.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999,2002 Drotos Daniel, Talker Bt.
  *
- * Written by Karl Bongers karl@turbobit.com
- * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * Other contributors include:
+ *   Karl Bongers karl@turbobit.com,
+ *   Johan Knol 
  *
  */
 
@@ -128,7 +129,7 @@ a: R5h,R5l
 8: R4h,R4l
 below are the banked registers which mirror(B0..B3) depending on
 PSW.(RS0,RS1)
-6: R3h,R3l
+6: R3h,R3l                  
 4: R2h,R2l
 2: R1h,R1l
 0: R0h,R0l

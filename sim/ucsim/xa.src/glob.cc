@@ -1,12 +1,12 @@
 /*
  * Simulator of microcontrollers (glob.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
- * Written by Karl Bongers karl@turbobit.com
+ * Copyright (C) 1999,2002 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
- *
+ * Other contributors include:
+ *   Karl Bongers karl@turbobit.com,
+ *   Johan Knol 
  */
 
 /* This file is part of microcontroller simulator: ucsim.
@@ -226,7 +226,13 @@ struct xa_dis_entry disass_xa[]= {
 
  {0xc500,0xff00,' ',3,CALL, REL16          }, //  CALL rel16                 1 1 0 0 0 1 0 1  rel16
  {0xc600,0xfff8,' ',2,CALL, IREG_ALONE     }, //  CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
-/* CJNE(5), JNE */
+
+ {0xe200,0xf708,' ',4,CJNE, REG_DIRECT_REL8}, //  CJNE Rd, direct, rel8      1 1 1 0 S 0 1 0  d d d d 0 x x x
+ {0xe300,0xff0f,' ',4,CJNE, REG_DATA8_REL8},  //  CJNE Rd, data8, rel8       1 1 1 0 0 0 1 1  d d d d 0 0 0 0
+ {0xeb00,0xff0f,' ',5,CJNE, REG_DATA16_REL8}, //  CJNE Rd, data16, rel8      1 1 1 0 1 0 1 1  d d d d 0 0 0 0
+ {0xe308,0xff8f,' ',4,CJNE, IREG_DATA8_REL8}, //  CJNE [Rd], data8, rel8     1 1 1 0 0 0 1 1  0 d d d 1 0 0 0
+ {0xeb08,0xff8f,' ',5,CJNE, IREG_DATA16_REL8},//  CJNE [Rd], data16, rel8    1 1 1 0 1 0 1 1  0 d d d 1 0 0 0
+
  {0x0800,0xfffc,' ',3,CLR, BIT_ALONE      },   // CLR bit                    0 0 0 0 1 0 0 0  0 0 0 0 0 0 b b 
  {0x4100,0xf700,' ',2,CMP, REG_REG         },  // CMP Rd, Rs                 0 1 0 0 S 0 0 1  d d d d s s s s
  {0x4200,0xf708,' ',2,CMP, REG_IREG        },  // CMP Rd, [Rs]               0 1 0 0 S 0 1 0  d d d d 0 s s s

@@ -1,11 +1,12 @@
 /*
  * Simulator of microcontrollers (inst.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999,2002 Drotos Daniel, Talker Bt.
  *
- * Written by Karl Bongers karl@turbobit.com
- * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * Other contributors include:
+ *   Karl Bongers karl@turbobit.com,
+ *   Johan Knol 
  *
  */
 
@@ -453,6 +454,10 @@ cl_xa::inst_Bcc(uint code, int operands)
 int
 cl_xa::inst_JB(uint code, int operands)
 {
+  short saddr = (fetch1() * 2);
+  if (get_psw() & BIT_Z) {
+      PC += saddr;
+  }
   return(resGO);
 }
 int
@@ -463,16 +468,112 @@ cl_xa::inst_JNB(uint code, int operands)
 int
 cl_xa::inst_CJNE(uint code, int operands)
 {
+  switch(operands) {
+    case REG_DIRECT_REL8:
+    {
+       // update C,N,Z
+       if (code & 0x800) {  // word op
+         int result;
+         int src = get_word_direct( ((code & 0x7)<<4) | fetch1());
+         int addr = (fetch1() * 2);
+         int dst = reg2(RI_F0);
+         unsigned char flags;
+         flags = get_psw();
+         flags &= ~BIT_ALL; /* clear these bits */
+         result = dst - src;
+         if (result == 0) flags |= BIT_Z;
+         if (result > 0xffff) flags |= BIT_C;
+         if (dst < src) flags |= BIT_N;
+         set_psw(flags);
+         if (flags & BIT_Z)
+           PC += addr;
+       } else {
+         int result;
+         int src = get_byte_direct( ((code & 0x7)<<4) | fetch1());
+         int addr = (fetch1() * 2);
+         int dst = reg1(RI_F0);
+         unsigned char flags;
+         flags = get_psw();
+         flags &= ~BIT_ALL; /* clear these bits */
+         result = dst - src;
+         if (result == 0) flags |= BIT_Z;
+         if (result > 0xff) flags |= BIT_C;
+         if (dst < src) flags |= BIT_N;
+         set_psw(flags);
+         if (flags & BIT_Z)
+           PC += addr;
+       }
+    }
+    break;
+
+    case DIRECT_REL8:
+    {
+       int daddr = ((code & 0x7) << 8) | fetch();
+       int addr = fetch() * 2;
+
+       if (code & 0x800) {  // word op
+         unsigned short tmp = get_word_direct(daddr)-1;
+         set_word_direct(daddr, tmp);
+         if (tmp != 0)
+           PC += addr;
+       } else {
+         unsigned char tmp = get_word_direct(daddr)-1;
+         set_byte_direct(daddr, tmp);
+         if (tmp != 0)
+           PC += addr;
+       }
+    }
+    break;
+  }
   return(resGO);
 }
 int
 cl_xa::inst_DJNZ(uint code, int operands)
 {
+  switch(operands) {
+    case REG_REL8:
+    {
+       int addr = (fetch1() * 2);
+       if (code & 0x800) {  // word op
+         unsigned short tmp = mov2(0, reg2(RI_F0)-1);
+         set_reg2(RI_F0, tmp);
+         if (tmp != 0)
+           PC += addr;
+       } else {
+         unsigned char tmp = mov1(0, reg1(RI_F0)-1);
+         set_reg1(RI_F0, tmp);
+         if (tmp != 0)
+           PC += addr;
+       }
+    }
+    break;
+
+    case DIRECT_REL8:
+    {
+       int daddr = ((code & 0x7) << 8) | fetch();
+       int addr = fetch() * 2;
+
+       if (code & 0x800) {  // word op
+         unsigned short tmp = get_word_direct(daddr)-1;
+         set_word_direct(daddr, tmp);
+         if (tmp != 0)
+           PC += addr;
+       } else {
+         unsigned char tmp = get_word_direct(daddr)-1;
+         set_byte_direct(daddr, tmp);
+         if (tmp != 0)
+           PC += addr;
+       }
+    }
+    break;
+  }
+
   return(resGO);
 }
 int
 cl_xa::inst_JZ(uint code, int operands)
 {
+  /* reg1(8) = R4.b, is ACC for MCS51 compatiblility */
   short saddr = (fetch1() * 2);
   if (reg1(8)==0) {
       PC += saddr;
@@ -483,6 +584,7 @@ int
 cl_xa::inst_JNZ(uint code, int operands)
 {
   short saddr = (fetch1() * 2);
+  /* reg1(8) = R4.b, is ACC for MCS51 compatiblility */
   if (reg1(8)!=0) {
     PC = (PC + saddr) & 0xfffffe;
   }

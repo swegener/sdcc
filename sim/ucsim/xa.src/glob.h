@@ -3,9 +3,10 @@
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  *
- * Written by Karl Bongers karl@turbobit.com
- * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ * Other contributors include:
+ *   Karl Bongers karl@turbobit.com,
+ *   Johan Knol 
  *
  */
 
@@ -165,7 +166,14 @@ enum op_operands {
   DIRECT_REL8,
 
   REL8,
-  REL16
+  REL16,
+
+  REG_DIRECT_REL8,
+  REG_DATA8_REL8,
+  REG_DATA16_REL8,
+  IREG_DATA8_REL8,
+  IREG_DATA16_REL8
+
 };
 
 // table of dissassembled instructions

@@ -1,12 +1,12 @@
 /*
  * Simulator of microcontrollers (xa.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1999,2002 Drotos Daniel, Talker Bt.
  *
- * Written by Karl Bongers karl@turbobit.com
- * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
- *
+ * Other contributors include:
+ *   Karl Bongers karl@turbobit.com,
+ *   Johan Knol 
  */
 
 /* This file is part of microcontroller simulator: ucsim.
@@ -487,6 +487,39 @@ cl_xa::disass(t_addr addr, char *sep)
 
     case RLIST :
       strcpy(parm_str, "RLIST");
+    break;
+
+    case REG_DIRECT_REL8 :
+      sprintf(parm_str, "%s,0x%02x,0x%02x",
+              reg_strs[((code >> 4) & 0xf)],
+              ((code & 0x7) << 8) + get_mem(MEM_ROM, addr+immed_offset),
+              (get_mem(MEM_ROM, addr+immed_offset+1) * 2) & 0xfffe );
+    break;
+    case REG_DATA8_REL8 :
+      sprintf(parm_str, "%s,#0x%04x,0x%02x",
+              reg_strs[((code >> 4) & 0xf)],
+              get_mem(MEM_ROM, addr+immed_offset),
+              (get_mem(MEM_ROM, addr+immed_offset+1) * 2) & 0xfffe );
+    break;
+    case REG_DATA16_REL8 :
+      sprintf(parm_str, "%s,#0x%02x,0x%02x",
+              w_reg_strs[((code >> 4) & 0x7)*2],
+              get_mem(MEM_ROM, addr+immed_offset+1) +
+                 (get_mem(MEM_ROM, addr+immed_offset+0)<<8),
+              (get_mem(MEM_ROM, addr+immed_offset+2) * 2) & 0xfffe );
+    break;
+    case IREG_DATA8_REL8 :
+      sprintf(parm_str, "[%s],#0x%04x,0x%02x",
+              reg_strs[((code >> 4) & 0x7)],
+              get_mem(MEM_ROM, addr+immed_offset),
+              (get_mem(MEM_ROM, addr+immed_offset+1) * 2) & 0xfffe );
+    break;
+    case IREG_DATA16_REL8 :
+      sprintf(parm_str, "[%s],#0x%02x,0x%02x",
+              w_reg_strs[((code >> 4) & 0x7)*2],
+              get_mem(MEM_ROM, addr+immed_offset+1) +
+                 (get_mem(MEM_ROM, addr+immed_offset+0)<<8),
+              (get_mem(MEM_ROM, addr+immed_offset+2) * 2) & 0xfffe );
     break;
 
     default:

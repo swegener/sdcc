@@ -1,3 +1,23 @@
+2004-01-19 Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/valdiag/tests/overflow.c: added shift tests
+	* src/pic/device.c,
+	* src/pic/gen.c,
+	* src/pic/gen.h,
+	* src/pic/glue.c,
+	* src/pic/main.c,
+	* src/pic/pcode.c,
+	* src/pic/pcode.h,
+	* src/pic/pcodepeep.c,
+	* src/pic/pcoderegs.c,
+	* src/pic/ralloc.c,
+	* src/pic/ralloc.h: applied patch from Slade Rich;
+	added support for multiple code pages and multiple RAM banks on the
+	PIC 14 port. The ASM files now no longer simply assume all the
+	code / RAM are in the same page / bank. This means the linker can
+	safely allocate code/RAM of separate ASM files to different pages/banks.
+	* doc/sdccman.lyx: added Slade's tips
+
 2004-01-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c (rematStr): fixed bug #879282

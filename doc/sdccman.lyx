@@ -18850,6 +18850,188 @@ The port to the Motorola HC08
  family has been added in October 2003, thank you Erik!
 \layout Subsection
 
+The PIC14 port
+\layout Standard
+
+The 14bit PIC port still requires a major effort from the development community.
+ However it can work for very simple code.
+\newline 
+
+\newline 
+
+\bar under 
+C code and 14bit PIC code page and RAM banks
+\bar default 
+
+\newline 
+The linker organizes allocation for the code page and RAM banks.
+ It does not have intimate knowledge of the code flow.
+ It will put all the code section of a single asm file into a single code
+ page.
+ In order to make use of multiple code pages, separate asm files must be
+ used.
+ The compiler treats all functions of a single C file as being in the same
+ code page unless it is non static.
+ The compiler treats all local variables of a single C file as being in
+ the same RAM bank unless it is an extern.
+\newline 
+
+\newline 
+To get the best follow these guide lines:
+\layout Enumerate
+
+make local functions static, as non static functions require code page selection
+ overhead.
+\layout Enumerate
+
+Make local variables static as extern variables require RAM bank selection
+ overhead.
+\layout Enumerate
+
+For devices that have multiple code pages it is more efficient to use the
+ same number of files as pages, i.e.
+ for the 16F877 use 4 separate files and i.e.
+ for the 16F874 use 2 separate files.
+ This way the linker can put the code for each file into different code
+ pages and the compiler can allocate reusable variables more efficiently
+ and there's less page selection overhead.
+ And as for any 8 bit micro (especially for PIC 14 as they have a very simple
+ instruction set) use 'unsigned char' whereever possible instead of 'int'.
+\layout Standard
+
+
+\bar under 
+Creating a device include file 
+\bar default 
+
+\newline 
+For generating a device include file use the support pearl script inc2h.pl
+ kept in directory support/script.
+\newline 
+
+\newline 
+
+\bar under 
+Interrupt code
+\bar default 
+
+\newline 
+For the interrupt function, use the keyword 'interrupt' with level number
+ of 0 (PIC14 only has 1 interrupt so this number is only there to avoid
+ a syntax error - it ought to be fixed).
+ E.g.:
+\layout Verse
+
+
+\family typewriter 
+void Intr(void) interrupt 0
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+T0IF = 0; /* Clear timer interrupt */
+\newline 
+}
+\layout Standard
+
+
+\bar under 
+Linking and assembling
+\bar default 
+
+\newline 
+For assembling you can use either GPUTILS' gpasm.exe or MPLAB's mpasmwin.exe.
+ For linking you can use either GPUTIL's gplink or MPLAB's mplink.exe.
+ If you use MPLAB and an interrupt function then the linker script file
+ vectors section will need to be enlarged to link with mplink.
+\newline 
+
+\newline 
+Here is a makefile using GPUTILS:
+\layout Verse
+
+
+\family typewriter 
+.c.o:
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+sdcc -S -V -mpic14 -p16F877 $< 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+gpasm -c $*.asm
+\newline 
+
+\newline 
+$(PRJ).hex: $(OBJS) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+gplink -m -s $(PRJ).lkr -o $(PRJ).hex $(OBJS)
+\layout Standard
+
+Here is a makefile using MPLAB:
+\layout Verse
+
+
+\family typewriter 
+.c.o: 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+sdcc -S -V -mpic14 -p16F877 $< 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mpasmwin /q /o $*.asm
+\newline 
+
+\newline 
+$(PRJ).hex: $(OBJS) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mplink /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS)
+\layout Subsection
+
 The PIC16 port
 \layout Standard
 

@@ -83,7 +83,7 @@ include incl.mk
 # ------------------------------------------
 all: checkconf models model-ds390 model-z80 model-gbz80
 
-objects: build-dir $(OBJECTS) port-specific-objects
+objects: build-dir $(OBJECTS) port-specific-objects lib-files
 
 models:
 	for model in $(MODELS); do \
@@ -114,6 +114,9 @@ port-specific-objects:
 	  $(MAKE) -C $(PORT); \
 	  cp -f $(PORT)/*.lib $(PORT)/*$(OEXT) $(PORTDIR); \
 	fi
+
+lib-files:
+	cp *.lib $(PORTDIR)
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

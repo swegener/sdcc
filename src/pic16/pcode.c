@@ -3655,6 +3655,10 @@ pCode *pic16_newpCodeLabel(char *name, int key)
   if(s)
     pcl->label = Safe_strdup(s);
 
+//  if(pic16_pcode_verbose)
+//  	fprintf(stderr, "%s:%d label name: %s\n", __FILE__, __LINE__, pcl->label);
+
+
   return ( (pCode *)pcl);
 
 }
@@ -5751,7 +5755,8 @@ static void LinkFlow(pBlock *pb)
       else
 	fprintf(stderr, "ERROR: %s, couldn't find label. key=%d,lab=%s\n",
 		__FUNCTION__,pcol->key,((PCOP(pcol)->name)?PCOP(pcol)->name:"-"));
-  //fprintf(stderr,"pic16_newpCodeOpLabel: key=%d, name=%s\n",key,((s)?s:""));
+
+//	fprintf(stderr,"pic16_newpCodeOpLabel: key=%d, name=%s\n",pcol->key,(PCOP(pcol)->name)?(PCOP(pcol)->name):"<unknown>");
 
       continue;
     }
@@ -6085,8 +6090,8 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
     if(pbr && pbr->next) {
       pCode *pcd = pb->pcHead;
 
-      //fprintf(stderr, "multiple labels\n");
-      //pc->print(stderr,pc);
+//	fprintf(stderr, "multiple labels\n");
+//	pc->print(stderr,pc);
 
       pbr = pbr->next;
       while(pbr) {
@@ -6112,7 +6117,7 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
       pcl = PCL(PCI(pc)->label->pc);
     else continue;
 
-	//fprintf(stderr," found  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
+//	fprintf(stderr," found  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
 
     /* This pCode is a label, so search the pBlock to see if anyone
      * refers to it */
@@ -6122,7 +6127,7 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
       /* Couldn't find an instruction that refers to this label
        * So, unlink the pCode label from it's pCode chain
        * and destroy the label */
-      //fprintf(stderr," removed  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
+//	fprintf(stderr," removed  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
 
       DFPRINTF((stderr," !!! REMOVED A LABEL !!! key = %d, %s\n", pcl->key,pcl->label));
       if(pc->type == PC_LABEL) {

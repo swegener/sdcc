@@ -509,8 +509,10 @@ allocReg (short type)
 		reg->isLocal = 1;	/* this is a local frame register */
 	}
 	
-	if (currFunc)
+	if (currFunc) {
+//		fprintf(stderr, "%s:%d adding %s into function %s regsUsed\n", __FUNCTION__, __LINE__, reg->name, currFunc->name);
 		currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, reg->rIdx);
+	}
  
   return (reg);		// addSet(&pic16_dynAllocRegs,reg);
 
@@ -656,11 +658,26 @@ pic16_allocDirReg (operand *op )
 		if(!IS_CONFIG_ADDRESS(address)) {
 //			fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
-			if(SPEC_SCLS(OP_SYM_ETYPE(op)))regtype = REG_SFR;
-	
+			/* this is an error, why added? -- VR */
+//			if(SPEC_SCLS(OP_SYM_ETYPE(op)))regtype = REG_SFR;
+
+			if(OP_SYMBOL(op)->onStack) {
+//				fprintf(stderr, "%s:%d onStack %s\n", __FILE__, __LINE__, OP_SYMBOL(op)->name);
+				OP_SYMBOL(op)->onStack = 0;
+				SPEC_OCLS(OP_SYM_ETYPE(op)) = data;
+				regtype = REG_GPR;
+			}
+
 			if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {						// patch 13
 				if(pic16_debug_verbose)									//
 				{											//
+					fprintf(stderr, "dispace:%d farspace:%d codespace:%d regspace:%d stack:%d\n",
+						IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+						IN_FARSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+						IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+						IN_REGSP( SPEC_OCLS( OP_SYM_ETYPE(op))),
+						IN_STACK( OP_SYM_ETYPE(op)));
+
 					fprintf(stderr, "%s:%d symbol %s NOT in dirspace\n", __FILE__, __LINE__,	//
 				    		OP_SYMBOL(op)->name);							//
 				}											//
@@ -683,6 +700,7 @@ pic16_allocDirReg (operand *op )
 				reg->isBitField = 1;
 			} else {
 //				fprintf(stderr, "%s:%d adding %s in direct registers\n", __FILE__, __LINE__, reg->name);
+//				addSet(&pic16_dynDirectRegs, reg);
 				checkAddReg(&pic16_dynDirectRegs, reg);
 			}
 	
@@ -699,8 +717,8 @@ pic16_allocDirReg (operand *op )
 		reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
 
 		/* work around for user defined registers in access bank */
-		if((reg->address < 0x80)
-			|| (reg->address >= 0xf80))
+		if((reg->address>= 0x00 && reg->address < 0x80)
+			|| (reg->address >= 0xf80 && reg->address <= 0xfff))
 			reg->accessBank = 1;
 		
 		debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
@@ -2973,6 +2991,13 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       OP_SYMBOL (IC_RESULT (ic))->iaccess)
     {
 
+#if 0
+	/* clear the onStack flag, the port doesn't support it yet! FIXME */
+	if(OP_SYMBOL(IC_RESULT(ic))->onStack)
+		OP_SYMBOL(IC_RESULT(ic))->onStack = 0;
+#endif
+	
+
       /* the operation has only one symbol
          operator then we can pack */
       if ((IC_LEFT (dic) && !IS_SYMOP (IC_LEFT (dic))) ||
@@ -3069,6 +3094,11 @@ findAssignToSym (operand * op, iCode * ic)
 	  if ((ic->op == '+' || ic->op == '-') &&
 	      OP_SYMBOL (IC_RIGHT (dic))->onStack)
 	    {
+
+#if 0
+		if(OP_SYMBOL(IC_RESULT(ic))->onStack)
+			OP_SYMBOL(IC_RESULT(ic))->onStack = 0;
+#endif
 
 	      if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key &&
 		  IC_LEFT (ic)->key != IC_RIGHT (dic)->key &&

@@ -421,7 +421,9 @@ _pic16_finaliseOptions (void)
 	port->mem.default_globl_map = data;
 
 	options.all_callee_saves = 1;		// always callee saves
-
+	options.float_rent = 1;
+	options.intlong_rent = 1;
+	
 	setMainValue("mcu", pic16->name[2] );
 	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
 
@@ -614,14 +616,26 @@ _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   return TRUE;
 }
 
-static bool
-_hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
+/* return True if the port can handle the type,
+ * False to convert it to function call */
+static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
   //  sym_link *test = NULL;
   //  value *val;
 
 //  fprintf(stderr,"checking for native mult\n");
 
+	/* support mul for char/int */
+	if((getSize(OP_SYMBOL(IC_RESULT(ic))->type ) <= 2)
+		&& (ic->op == '*'))return TRUE;
+	
+	/* support div for char */
+	if((getSize(OP_SYMBOL(IC_RESULT(ic))->type ) < 2)
+		&& (ic->op == '/'))return TRUE;
+	
+  return FALSE;
+
+#if 0
   if ( ic->op != '*')
     {
       return FALSE;
@@ -656,6 +670,8 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 
   return FALSE;
 */
+#endif
+
 }
 
 /* Indicate which extended bit operations this port supports */

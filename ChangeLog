@@ -1,3 +1,32 @@
+2004-03-05 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/device.c: added some debug lines enabled
+	with macro DEBUG_CHECK,
+	* src/pic16/genarith.c: more debug in genPlus,
+	* (pic16_genUMult8XLit_16, pic16_genUMult8X8_16): removed,
+	* (pic16_genUMult16X16_16, pic16_genUMult16XLit_16): NEW,
+	* src/pic16/gen.c: added prototypes for pic16_genMult16X16_16,
+	* (aopForSym): onStack symbols are re-placed in data memspace,
+	and onStack flag is cleared,
+	* (pic16_popGetTempReg, pic16_popReleaseTempReg): modified to
+	copy temporary pcodeop,
+	* (genPcall): added warning for not updating PCLATU,
+	* (genFunction): removed test with IFFUNC_CALLEESAVES, its
+	always true for pic16 port,
+	* (genMultOneWord): NEW, supports integer multiplication,
+	* (genMult): modified to call genMultOneWord,
+	* (ifxForOp): added warning when return NULL,
+	* src/pic16/glue.c (pic16emitRegularMap): symbol implicit
+	flag is set before call to operandFromSymbol for implicit
+	added structures,
+	* src/pic16/main.c (_pic16_finaliseOptions): options.float_rent,
+	options.intlong_rent are set by default,
+	* (_hasNativeMulFor): modified to allow port generation of integer
+	multiplication,
+	* src/pic16/ralloc.c (pic16_allocDirReg): commented out line which
+	set regtype to REG_SFR for all registers, restricting seting the
+	accessBank flag for registers 0<= r < 0x80 and 0xf80<=r<=0xfff,
+
 2004-03-05 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peephole.def: added 251.b and 253.x. 253.x are applied

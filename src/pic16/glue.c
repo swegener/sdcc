@@ -30,6 +30,7 @@
 #include "gen.h"
 #include "device.h"
 #include "main.h"
+#include <string.h>
 
 
 #ifdef WORDS_BIGENDIAN
@@ -121,17 +122,16 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 		/* print the area name */
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
+
 #if 0
-		fprintf(stderr, "\t%s: sym: %s\tused: %d\textern: %d\n",
-			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype));
+		fprintf(stderr, "\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\n",
+			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype));
 		printTypeChain( sym->type, stderr );
-		printf("\n");
+		fprintf(stderr, "\n");
 #endif
 		/* if extern then add to externs */
 		if (IS_EXTERN (sym->etype)) {
-//			if(sym->used)				// fixme
-				checkAddSym(&externs, sym);
-//				addSetHead(&externs, sym);
+			checkAddSym(&externs, sym);
 			continue;
 		}
 		
@@ -153,14 +153,9 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			(sym->_isparm && !IS_REGPARM (sym->etype))) &&
 			addPublics &&
 			!IS_STATIC (sym->etype) && !IS_FUNC(sym->type)) {
-//		  regs *reg;
 		  
 			checkAddSym(&publics, sym);
 //			addSetHead(&publics, sym);
-
-//			reg = pic16_allocRegByName(sym->name, sym->size);	//( operandFromSymbol( sym ));
-//			checkAddReg(&pic16_rel_udata, reg);
-
 		} else
 			if(IS_STATIC(sym->etype)) {
 			  regs *reg;
@@ -170,6 +165,13 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					sym->name, sym->rname, sym->remat);
 					
 						//, OP_SYMBOL(operandFromSymbol(sym))->name);
+#define SET_IMPLICIT	1
+
+#if SET_IMPLICIT
+				if(IS_STRUCT(sym->type))
+					sym->implicit = 1;
+#endif
+
 				reg = pic16_allocDirReg( operandFromSymbol( sym ));
 				checkAddReg(&pic16_rel_udata, reg);
 			}
@@ -220,19 +222,24 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			/* emit only if it is global */
 			if(sym->level == 0) {
 			  regs *reg;
-			  operand *op;
 
 				reg = pic16_dirregWithName( sym->name );
 				if(!reg) {
+					/* here */
 //					fprintf(stderr, "%s:%d: implicit add of symbol = %s\n",
 //							__FUNCTION__, __LINE__, sym->name);
 
-					op = operandFromSymbol( sym );
-					reg = pic16_allocDirReg( op );
+					/* if IS_STRUCT is omitted the following
+					 * fixes structures but break char/int etc */
+#if SET_IMPLICIT
+					if(IS_STRUCT(sym->type))
+						sym->implicit = 1;		// mark as implicit
+#endif
+					reg = pic16_allocDirReg( operandFromSymbol(sym) );
 					if(reg) {
 						if(checkAddReg(&pic16_fix_udata, reg)) {
 							/* and add to globals list if not exist */
-							addSetHead(&publics, sym);
+							addSet(&publics, sym);
 						}
 					}
 				}
@@ -245,6 +252,11 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 				 * level 0, so we must declare it fine as global */
 				
 //				fprintf(stderr, "EXTRA symbol declaration sym= %s\n", sym->name);
+
+#if SET_IMPLICIT
+				if(IS_STRUCT(sym->type))
+					sym->implicit = 1;		// mark as implicit
+#endif
 				reg = pic16_allocDirReg( operandFromSymbol( sym ) );
 				if(checkAddReg(&pic16_rel_udata, reg)) {
 					addSetHead(&publics, sym);
@@ -544,7 +556,7 @@ pic16emitStaticSeg (memmap * map)
        sym = setNextItem (map->syms))
     {
 
-#if 1
+#if 0
 	fprintf(stderr, "\t%s: sym: %s\tused: %d\n", map->sname, sym->name, sym->used);
 	printTypeChain( sym->type, stderr );
 	printf("\n");

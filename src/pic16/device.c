@@ -604,6 +604,7 @@ char *pic16_processor_base_name(void)
   return pic16->name[0];
 }
 
+#define DEBUG_CHECK	0
 
 /*
  * return 1 if register wasn't found and added, 0 otherwise
@@ -612,6 +613,9 @@ int checkAddReg(set **set, regs *reg)
 {
   regs *tmp;
 
+#if DEBUG_CHECK
+	fprintf(stderr, "%s: about to insert REGister: %s ... ", __FUNCTION__, reg->name);
+#endif
 
 	for(tmp = setFirstItem(*set); tmp; tmp = setNextItem(*set)) {
 		if(!strcmp(tmp->name, reg->name))break;
@@ -619,9 +623,15 @@ int checkAddReg(set **set, regs *reg)
 	
 	if(!tmp) {
 		addSet(set, reg);
+#if DEBUG_CHECK
+		fprintf(stderr, "added\n");
+#endif
 		return 1;
 	}
 
+#if DEBUG_CHECK
+	fprintf(stderr, "already added\n");
+#endif
   return 0;
 }
 
@@ -629,14 +639,25 @@ int checkAddSym(set **set, symbol *sym)
 {
   symbol *tmp;
 
+#if DEBUG_CHECK
+	fprintf(stderr, "%s: about to add SYMbol: %s ... ", __FUNCTION__, sym->name);
+#endif
+
 	for(tmp = setFirstItem( *set ); tmp; tmp = setNextItem(*set)) {
 		if(!strcmp(tmp->name, sym->name))break;
 	}
 	
 	if(!tmp) {
 		addSet(set, sym);
+#if DEBUG_CHECK
+		fprintf(stderr, "added\n");
+#endif
 		return 1;
 	}
+
+#if DEBUG_CHECK
+	fprintf(stderr, "already added\n");
+#endif
 
   return 0;
 }
@@ -651,10 +672,14 @@ void pic16_groupRegistersInSection(set *regset)
   regs *reg;
 
 	for(reg=setFirstItem(regset); reg; reg = setNextItem(regset)) {
+
+//		fprintf(stderr, "%s:%d group registers in section, reg: %s\n", __FILE__, __LINE__, reg->name);
+
 		if(reg->wasUsed
 			&& !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop)))) {
 
-//			fprintf(stderr, "%s:%d register %s\n", __FILE__, __LINE__, reg->name);
+//			fprintf(stderr, "%s:%d register %s alias:%d fix:%d\n",
+//				__FILE__, __LINE__, reg->name, reg->alias, reg->isFixed);
 
 			if(reg->alias) {
 				checkAddReg(&pic16_equ_data, reg);

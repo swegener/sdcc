@@ -9,7 +9,7 @@
 //----------------------------------------------------------------------------
 
 //This module contains definition of I8051 registers
-#include "8051.h"
+#include "8052.h"
 
 
 static unsigned char xdata stx_index_in, srx_index_in, stx_index_out, srx_index_out;

@@ -8,7 +8,7 @@ clean:
 	rm -f *.dump*
 	rm -rf build
 	for model in $(MODELS); do \
-	  rm -rf $$model; \
+	  find $$model -maxdepth 1 -type f ! -name Makefile -exec rm {} \; ; \
 	done
 	make -C ds390 clean
 	make -C z80 clean

@@ -7,9 +7,11 @@
 	defining the environment variable LRKLAUS
 	* src/SDCCBBlock.h
 	* src/SDCCloop.c
-	* src/SDCCloop.h
 	* src/SDCClrange.c
 	* src/ds390/ralloc.c (spillThis): applied Klaus' patch
+	* clean.mk: fixed removal of files in bin/CVS/
+	* device/lib/clean.mk: fixed removal of directories small and large
+	* support/Util/SDCCerr.c: changed W_INT_OVL to ERROR_LEVEL_PEDANTIC
 
 2003-10-05  Borut Razem <borut.razem@siol.net>
 

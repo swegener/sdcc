@@ -385,7 +385,7 @@ struct
     "duplicate %s member '%s'" },
 { E_STACK_VIOLATION, ERROR_LEVEL_ERROR,
     "'%s' internal stack %s" },
-{ W_INT_OVL, ERROR_LEVEL_WARNING,
+{ W_INT_OVL, ERROR_LEVEL_PEDANTIC,
     "integer overflow in expression" },
 { W_USELESS_DECL, ERROR_LEVEL_WARNING,
     "useless declaration (possible use of keyword as variable name)" },

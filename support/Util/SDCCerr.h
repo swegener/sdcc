@@ -74,7 +74,7 @@ SDCCERR - SDCC Standard error handler
 #define  E_DUPLICATE_LABEL 56        /* duplicate label name   */
 #define  E_LABEL_UNDEF     57        /* undefined label used   */
 #define  E_FUNC_VOID       58        /* void func ret value    */
-#define  E_VOID_FUNC       59        /* func must return value */
+#define  W_VOID_FUNC       59        /* func must return value */
 #define  W_RETURN_MISMATCH 60        /* return value mismatch  */
 #define  E_CASE_CONTEXT    61        /* case stmnt without switch */
 #define  E_CASE_CONSTANT   62        /* case expression ! const*/

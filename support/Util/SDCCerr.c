@@ -169,7 +169,7 @@ struct
    "Label undefined '%s'" },
 { E_FUNC_VOID, ERROR_LEVEL_ERROR,
    "void function returning value" },
-{ E_VOID_FUNC, ERROR_LEVEL_ERROR,
+{ W_VOID_FUNC, ERROR_LEVEL_WARNING,
    "function '%s' must return value" },
 { W_RETURN_MISMATCH, ERROR_LEVEL_WARNING,
    "function return value mismatch" },

@@ -3330,7 +3330,7 @@ decorateType (ast * tree)
 
       if (!IS_VOID (currFunc->type->next) && tree->right == NULL)
 	{
-	  werror (E_VOID_FUNC, currFunc->name);
+	  werror (W_VOID_FUNC, currFunc->name);
 	  goto errorTreeReturn;
 	}
 

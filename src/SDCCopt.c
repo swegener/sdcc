@@ -895,7 +895,7 @@ eBBlockFromiCode (iCode * ic)
 	   bp; 
 	   bp=setNextItem(ebbs[saveCount-1]->predList)) {
 	if (bp->ech->op != RETURN) {
-	  werror (E_VOID_FUNC, currFunc->name);
+	  werror (W_VOID_FUNC, currFunc->name);
 	}
       }
     }

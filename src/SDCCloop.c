@@ -1175,7 +1175,7 @@ DEFSETFUNC (mergeRegions)
       if (lp->entry == theLoop->entry)
 	{
 	  theLoop->regBlocks = unionSets (theLoop->regBlocks,
-					  lp->regBlocks, THROW_BOTH);
+					  lp->regBlocks, THROW_DEST);
 	  lp->merged = 1;
 	}
     }

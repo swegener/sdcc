@@ -1,3 +1,7 @@
+2003-03-11  Bernhard Held <bernhard@bernhardheld.de>
+
+        * src/SDCCloop.c (mergeRegions): an evil beast is dead
+
 2003-03-10  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCCmain.c: pipe preprocessor's output

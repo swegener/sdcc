@@ -3675,3 +3675,476 @@ replace {
 //	;	Peephole 259.b	removed redundant label %2 and ret
 //	;
 //} if labelRefCount %2 0
+
+// optimizing jumptables
+// Please note: to enable peephole 260.x you currently have to set 
+// the environment variable SDCC_SJMP_JUMPTABLE
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+%3:
+} by {
+	;	Peephole 260.a	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+%3:
+} by {
+	;	Peephole 260.b	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+%3:
+} by {
+	;	Peephole 260.c	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+%3:
+} by {
+	;	Peephole 260.d	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+%3:
+} by {
+	;	Peephole 260.e	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+%3:
+} by {
+	;	Peephole 260.f	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+	ljmp	%14
+%3:
+} by {
+	;	Peephole 260.g	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+	sjmp	%14
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+	ljmp	%14
+	ljmp	%15
+%3:
+} by {
+	;	Peephole 260.h	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+	sjmp	%14
+	sjmp	%15
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+	ljmp	%14
+	ljmp	%15
+	ljmp	%16
+%3:
+} by {
+	;	Peephole 260.i	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+	sjmp	%14
+	sjmp	%15
+	sjmp	%16
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+	ljmp	%14
+	ljmp	%15
+	ljmp	%16
+	ljmp	%17
+%3:
+} by {
+	;	Peephole 260.j	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+	sjmp	%14
+	sjmp	%15
+	sjmp	%16
+	sjmp	%17
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+	ljmp	%14
+	ljmp	%15
+	ljmp	%16
+	ljmp	%17
+	ljmp	%18
+%3:
+} by {
+	;	Peephole 260.k	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+	sjmp	%14
+	sjmp	%15
+	sjmp	%16
+	sjmp	%17
+	sjmp	%18
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+	ljmp	%14
+	ljmp	%15
+	ljmp	%16
+	ljmp	%17
+	ljmp	%18
+	ljmp	%19
+%3:
+} by {
+	;	Peephole 260.l	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+	sjmp	%14
+	sjmp	%15
+	sjmp	%16
+	sjmp	%17
+	sjmp	%18
+	sjmp	%19
+%3:
+} if labelJTInRange
+
+// optimizing jumptables
+replace {
+	add	a,%1
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	ljmp	%5
+	ljmp	%6
+	ljmp	%7
+	ljmp	%8
+	ljmp	%9
+	ljmp	%10
+	ljmp	%11
+	ljmp	%12
+
+	ljmp	%13
+	ljmp	%14
+	ljmp	%15
+	ljmp	%16
+	ljmp	%17
+	ljmp	%18
+	ljmp	%19
+	ljmp	%20
+%3:
+} by {
+	;	Peephole 260.m	used sjmp in jumptable
+	mov	dptr,#%2
+	jmp	@a+dptr
+%2:
+	sjmp	%5
+	sjmp	%6
+	sjmp	%7
+	sjmp	%8
+	sjmp	%9
+	sjmp	%10
+	sjmp	%11
+	sjmp	%12
+
+	sjmp	%13
+	sjmp	%14
+	sjmp	%15
+	sjmp	%16
+	sjmp	%17
+	sjmp	%18
+	sjmp	%19
+	sjmp	%20
+%3:
+} if labelJTInRange

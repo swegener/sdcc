@@ -178,6 +178,51 @@ FBYNAME (labelInRange)
   return TRUE;
 }
 
+
+/*-----------------------------------------------------------------*/
+/* labelJTInRange - will check to see if label %5 and up are       */
+/* within range.                                                   */
+/* Specifically meant to optimize long (3-byte) jumps to short     */
+/* (2-byte) jumps in jumptables                                    */
+/*-----------------------------------------------------------------*/
+FBYNAME (labelJTInRange)
+{
+  char *lbl;
+  int dist, count, i;
+
+  if (!getenv("SDCC_SJMP_JUMPTABLE"))
+    return FALSE;
+  
+  /* Only optimize within a jump table */
+  if (currPl->ic && currPl->ic->op != JUMPTABLE)
+    return FALSE;
+  
+  count = elementsInSet( IC_JTLABELS (currPl->ic) );
+  
+  /* check all labels (this is needed if the case statements are unsorted) */
+  for (i=0; i<count; i++)
+    {
+      /* assumes that the %5 pattern variable has the first ljmp label */
+      lbl = hTabItemWithKey (vars, 5+i);
+      if (!lbl)
+        return FALSE;
+    
+      dist = pcDistance (currPl, lbl, FALSE);
+
+      /* three terms used to calculate allowable distance */
+// printf("\nlabel %s %i dist %i cdist 0x%02x 0x%02x\n", lbl, i, dist, dist -(count-i-1)-(7+3*i), 127+(count-i-1)+(7+3*i) - dist);
+      if (!dist ||
+          dist > 127+           /* range of sjmp */
+                 (7+3*i)+       /* offset between this jump and currPl, 
+                                   should use pcDistance instead? */
+                 (count-i-1)    /* if peephole applies distance is shortened */
+         )
+        return FALSE;
+    }
+  return TRUE;
+}
+
+
 /*-----------------------------------------------------------------*/
 /* labelIsReturnOnly - Check if label %5 is followed by RET        */
 /*-----------------------------------------------------------------*/
@@ -733,6 +778,10 @@ callFuncByName (char *fname,
   {
     {
       "labelInRange", labelInRange
+    }
+    ,
+    {
+      "labelJTInRange", labelJTInRange
     }
     ,
     {

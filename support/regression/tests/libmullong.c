@@ -35,24 +35,24 @@ struct
   short i;
   char c2;
 } pack_test;
-	
-long
-mullong_wrapper (long a, long b)
+
+TYPE_DWORD
+mullong_wrapper (TYPE_DWORD a, TYPE_DWORD b)
 {
   if (sizeof(pack_test) == 4)
     /* length of struct ok: use SDCC library */
     return _mullong (a, b);
   else
-  {
+    {
       /* buggy gcc: use generic multiplication */
       return a * b;
-  }
+    }
 }
 
 #else
 
-long
-mullong_wrapper (long a, long b)
+TYPE_DWORD
+mullong_wrapper (TYPE_DWORD a, TYPE_DWORD b)
 {
     return a * b;
 }

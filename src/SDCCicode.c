@@ -1080,7 +1080,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RIGHT_OP: {
       double lval = operandLitValue(left), rval = operandLitValue(right);
-      double res;
+      double res=0;
       switch ((SPEC_USIGN(let) ? 2 : 0) + (SPEC_USIGN(ret) ? 1 : 0)) 
 	{
 	case 0: // left=unsigned right=unsigned

@@ -245,6 +245,7 @@ char *argv[];
 	
 	if (dflag){
 	    //dfp = afile("temp", "cdb", 1);
+		SaveLinkedFilePath(linkp->f_idp); //Must be the first one... 
 		dfp = afile(linkp->f_idp,"cdb",1); //JCF: Nov 30, 2002
 	    if (dfp == NULL) 
 		lkexit(1);

@@ -462,6 +462,7 @@ char *name;
 			if (dflag && dfp) {
 			    FILE *xfp = afile(str,"adb",0); //JCF: Nov 30, 2002
 			    if (xfp) {
+				SaveLinkedFilePath(str);
 				copyfile(dfp,xfp);
 				fclose(xfp);
 			    }

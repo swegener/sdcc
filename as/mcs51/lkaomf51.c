@@ -25,6 +25,7 @@
 
 #define EQ(A,B) !strcmp((A),(B))
 #define MEMSIZE 0x10000
+//#define DODUMP 1
 
 typedef struct
 {
@@ -122,7 +123,7 @@ void GetName(char * filepath, char * name)
 void SaveLinkedFilePath(char * filepath) 
 {
 	int j;
-	
+
 	if(dflag)
 	{
 		infn=realloc(infn, sizeof(_infn)*(numin+1));
@@ -143,7 +144,12 @@ void SaveLinkedFilePath(char * filepath)
 		GetName(infn[numin].PathName, infn[numin].ModuleName);
 		//printf("%s, %s\n", infn[numin].PathName, infn[numin].ModuleName);
 		
-		numin++;
+		/*Check if this filename is already in*/
+		for(j=0; j<numin; j++)
+		{
+			if(EQ(infn[numin].PathName, infn[j].PathName)) break;
+		}
+		if(j==numin) numin++;
 	}
 }
 
@@ -210,6 +216,7 @@ void OutputChkSum(void)
 	GlobalChkSum=0;
 }
 
+#ifdef DODUMP
 void DumpForDebug (void)
 {
 	char DumpFileName[PATH_MAX];
@@ -260,6 +267,7 @@ void DumpForDebug (void)
 
 	fclose(DumpFile);
 }
+#endif
 
 void OutputAOEMF51(void)
 {
@@ -536,6 +544,7 @@ void CollectInfoFromCDB(void)
 	if(CDBin==NULL)
 	{
 		printf("Couldn't open file '%s'\n", SourceName);
+		lkexit(1);
 	}
 
 	CurrentModule=0; /*Set the active module as the first one*/
@@ -725,6 +734,17 @@ void CollectInfoFromCDB(void)
 								break;
 							}
 						}
+						
+						/*It could be also a static function*/
+						for(j=0; j<numproc; j++)
+						{
+							if(EQ(procedure[j].name, name))
+							{
+								if( (procedure[j].BeginAdd==-1) ) procedure[j].BeginAdd=Address;
+								break;
+							}
+						}
+
 					break;
 					
 					case 'L': /*Example L:Lmain$j$1$1:29*/
@@ -925,7 +945,9 @@ void CreateAOMF51(void)
 	if(dflag)
 	{
 		CollectInfoFromCDB();
-		//DumpForDebug();
+		#ifdef DODUMP
+		DumpForDebug();
+		#endif
 		HexSize=ReadHexFile(&HexBegin)+1;
 		OutputAOEMF51();
 		FreeAll();

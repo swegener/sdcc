@@ -3660,7 +3660,7 @@ replace {
 // helps f.e. writing data on a 3-wire (SPI) bus
 replace {
 	mov	a,%1
-	mov	c,acc.7
+	rlc	a
 	mov	%2,c
 	mov	a,%1
 	add	a,%1
@@ -3676,7 +3676,7 @@ replace {
 // out_bit=out_byte&0x01; out_byte>>=1;
 replace {
 	mov	a,%1
-	mov	c,acc.0
+	rrc	a
 	mov	%2,c
 	mov	a,%1
 	clr	c

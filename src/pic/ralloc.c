@@ -58,32 +58,355 @@ int pic14_ptrRegReq; /* one byte pointer register required */
 regs regspic14[] = 
 {
 
-  {PIC_INDF, 0, "INDF", "INDR", "0", 0, 1},
-  {PIC_GPR,  0, "r0x0C", "r0x0C", "0x0C", 0x0C, 1},
-  {PIC_GPR,  0, "r0x0D", "r0x0C", "0x0D", 0x0D, 1},
-  {PIC_GPR,  0, "r0x0E", "r0x0C", "0x0E", 0x0E, 1},
-  {PIC_GPR,  0, "r0x0F", "r0x0C", "0x0F", 0x0F, 1},
-  {PIC_GPR,  0, "r0x10", "r0x10", "0x10", 0x10, 1},
-  {PIC_GPR,  0, "r0x11", "r0x11", "0x11", 0x11, 1},
-  {PIC_GPR,  0, "r0x12", "r0x12", "0x12", 0x12, 1},
-  {PIC_GPR,  0, "r0x13", "r0x13", "0x13", 0x13, 1},
-  {PIC_GPR,  0, "r0x14", "r0x14", "0x14", 0x14, 1},
-  {PIC_GPR,  0, "r0x15", "r0x15", "0x15", 0x15, 1},
-  {PIC_GPR,  0, "r0x16", "r0x16", "0x16", 0x16, 1},
-  {PIC_GPR,  0, "r0x17", "r0x17", "0x17", 0x17, 1},
-  {PIC_GPR,  0, "r0x18", "r0x18", "0x18", 0x18, 1},
-  {PIC_GPR,  0, "r0x19", "r0x19", "0x19", 0x19, 1},
-  {PIC_GPR,  0, "r0x1A", "r0x1A", "0x1A", 0x1A, 1},
-  {PIC_GPR,  0, "r0x1B", "r0x1B", "0x1B", 0x1B, 1},
-  {PIC_GPR,  0, "r0x1C", "r0x1C", "0x1C", 0x1C, 1},
-  {PIC_GPR,  0, "r0x1D", "r0x1D", "0x1D", 0x1D, 1},
-  {PIC_GPR,  0, "r0x1E", "r0x1E", "0x1E", 0x1E, 1},
-  {PIC_GPR,  0, "r0x1F", "r0x1F", "0x1F", 0x1F, 1},
+  {REG_GPR,  0x0C, "r0x0C", "r0x0C", 0x0C, 1, 0},
+  {REG_GPR,  0x0D, "r0x0D", "r0x0C", 0x0D, 1, 0},
+  {REG_GPR,  0x0E, "r0x0E", "r0x0C", 0x0E, 1, 0},
+  {REG_GPR,  0x0F, "r0x0F", "r0x0C", 0x0F, 1, 0},
+  {REG_GPR,  0x10, "r0x10", "r0x10", 0x10, 1, 0},
+  {REG_GPR,  0x11, "r0x11", "r0x11", 0x11, 1, 0},
+  {REG_GPR,  0x12, "r0x12", "r0x12", 0x12, 1, 0},
+  {REG_GPR,  0x13, "r0x13", "r0x13", 0x13, 1, 0},
+  {REG_GPR,  0x14, "r0x14", "r0x14", 0x14, 1, 0},
+  {REG_GPR,  0x15, "r0x15", "r0x15", 0x15, 1, 0},
+  {REG_GPR,  0x16, "r0x16", "r0x16", 0x16, 1, 0},
+  {REG_GPR,  0x17, "r0x17", "r0x17", 0x17, 1, 0},
+  {REG_GPR,  0x18, "r0x18", "r0x18", 0x18, 1, 0},
+  {REG_GPR,  0x19, "r0x19", "r0x19", 0x19, 1, 0},
+  {REG_GPR,  0x1A, "r0x1A", "r0x1A", 0x1A, 1, 0},
+  {REG_GPR,  0x1B, "r0x1B", "r0x1B", 0x1B, 1, 0},
+  {REG_GPR,  0x1C, "r0x1C", "r0x1C", 0x1C, 1, 0},
+  {REG_GPR,  0x1D, "r0x1D", "r0x1D", 0x1D, 1, 0},
+  {REG_GPR,  0x1E, "r0x1E", "r0x1E", 0x1E, 1, 0},
+  {REG_GPR,  0x1F, "r0x1F", "r0x1F", 0x1F, 1, 0},
+  {REG_PTR,  4, "FSR", "FSR", 4, 1,0},
 
 };
 
 int pic14_nRegs = sizeof(regspic14) / sizeof(regs);
 static void spillThis (symbol *);
+static int debug=1;
+static FILE *debugF=NULL;
+/*-----------------------------------------------------------------*/
+/* debugLog - open a file for debugging information                */
+/*-----------------------------------------------------------------*/
+//static void debugLog(char *inst,char *fmt, ...)
+static void debugLog(char *fmt, ...)
+{
+  static int append = 0;   // First time through, open the file without append.
+  char buffer[256];
+  //char *bufferP=buffer;
+  va_list ap;
+
+  if(!debug)
+    return;
+
+
+  if (!debugF) {
+    /* create the file name */
+    strcpy(buffer,srcFileName);
+    strcat(buffer,".d");
+
+    if( !(debugF = fopen(buffer, (append ? "a+" : "w") ))) {
+      werror(E_FILE_OPEN_ERR,buffer);
+      exit(1);
+    }
+    append = 1;  // Next time debubLog is called, we'll append the debug info
+  }
+
+  va_start(ap,fmt);   
+
+  vsprintf(buffer,fmt,ap);
+
+  fprintf(debugF,"%s",buffer);
+/*
+  while (isspace(*bufferP)) bufferP++;
+
+  if (bufferP && *bufferP) 
+    lineCurr = (lineCurr ?
+		connectLine(lineCurr,newLineNode(lb)) :
+		(lineHead = newLineNode(lb)));
+  lineCurr->isInline = _G.inLine;
+  lineCurr->isDebug  = _G.debugLine;
+*/
+  va_end(ap);
+
+}
+
+static void debugNewLine(void)
+{
+  if(debugF)
+    fputc('\n',debugF);
+}
+/*-----------------------------------------------------------------*/
+/* debugLogClose - closes the debug log file (if opened)           */
+/*-----------------------------------------------------------------*/
+static void debugLogClose(void)
+{
+  if(debugF) {
+    fclose(debugF);
+    debugF = NULL;
+  }
+}
+#define AOP(op) op->aop
+
+static char *debugAopGet(char *str,operand *op)
+{
+  if(str)
+    debugLog(str);
+
+  printOperand(op,debugF);debugNewLine();
+
+  return NULL;
+
+}
+
+static char * decodeOp(unsigned int op)
+{
+
+  if(op<128 && op>' ') {
+    buffer[0] = (op & 0xff);
+    buffer[1] = 0;
+    return buffer;
+  }
+
+  switch(op) {
+  case IDENTIFIER:
+    return "IDENTIFIER";
+  case TYPE_NAME:
+    return "TYPE_NAME";
+  case CONSTANT:
+    return "CONSTANT";
+  case STRING_LITERAL:
+    return "STRING_LITERAL";
+  case SIZEOF:
+    return "SIZEOF";
+  case PTR_OP:
+    return "PTR_OP";
+  case INC_OP:
+    return "INC_OP";
+  case DEC_OP:
+    return "DEC_OP";
+  case LEFT_OP:
+    return "LEFT_OP";
+  case RIGHT_OP:
+    return "RIGHT_OP";
+  case LE_OP:
+    return "LE_OP";
+  case GE_OP:
+    return "GE_OP";
+  case EQ_OP:
+    return "EQ_OP";
+  case NE_OP:
+    return "NE_OP";
+  case AND_OP:
+    return "AND_OP";
+  case OR_OP:
+    return "OR_OP";
+  case MUL_ASSIGN:
+    return "MUL_ASSIGN";
+  case DIV_ASSIGN:
+    return "DIV_ASSIGN";
+  case MOD_ASSIGN:
+    return "MOD_ASSIGN";
+  case ADD_ASSIGN:
+    return "ADD_ASSIGN";
+  case SUB_ASSIGN:
+    return "SUB_ASSIGN";
+  case LEFT_ASSIGN:
+    return "LEFT_ASSIGN";
+  case RIGHT_ASSIGN:
+    return "RIGHT_ASSIGN";
+  case AND_ASSIGN:
+    return "AND_ASSIGN";
+  case XOR_ASSIGN:
+    return "XOR_ASSIGN";
+  case OR_ASSIGN:
+    return "OR_ASSIGN";
+  case TYPEDEF:
+    return "TYPEDEF";
+  case EXTERN:
+    return "EXTERN";
+  case STATIC:
+    return "STATIC";
+  case AUTO:
+    return "AUTO";
+  case REGISTER:
+    return "REGISTER";
+  case CODE:
+    return "CODE";
+  case EEPROM:
+    return "EEPROM";
+  case INTERRUPT:
+    return "INTERRUPT";
+  case SFR:
+    return "SFR";
+  case AT:
+    return "AT";
+  case SBIT:
+    return "SBIT";
+  case REENTRANT:
+    return "REENTRANT";
+  case USING:
+    return "USING";
+  case XDATA:
+    return "XDATA";
+  case DATA:
+    return "DATA";
+  case IDATA:
+    return "IDATA";
+  case PDATA:
+    return "PDATA";
+  case VAR_ARGS:
+    return "VAR_ARGS";
+  case CRITICAL:
+    return "CRITICAL";
+  case NONBANKED:
+    return "NONBANKED";
+  case BANKED:
+    return "BANKED";
+  case CHAR:
+    return "CHAR";
+  case SHORT:
+    return "SHORT";
+  case INT:
+    return "INT";
+  case LONG:
+    return "LONG";
+  case SIGNED:
+    return "SIGNED";
+  case UNSIGNED:
+    return "UNSIGNED";
+  case FLOAT:
+    return "FLOAT";
+  case DOUBLE:
+    return "DOUBLE";
+  case CONST:
+    return "CONST";
+  case VOLATILE:
+    return "VOLATILE";
+  case VOID:
+    return "VOID";
+  case BIT:
+    return "BIT";
+  case STRUCT:
+    return "STRUCT";
+  case UNION:
+    return "UNION";
+  case ENUM:
+    return "ENUM";
+  case ELIPSIS:
+    return "ELIPSIS";
+  case RANGE:
+    return "RANGE";
+  case FAR:
+    return "FAR";
+  case _XDATA:
+    return "_XDATA";
+  case _CODE:
+    return "_CODE";
+  case _GENERIC:
+    return "_GENERIC";
+  case _NEAR:
+    return "_NEAR";
+  case _PDATA:
+    return "_PDATA";
+  case _IDATA:
+    return "_IDATA";
+  case _EEPROM:
+    return "_EEPROM";
+  case CASE:
+    return "CASE";
+  case DEFAULT:
+    return "DEFAULT";
+  case IF:
+    return "IF";
+  case ELSE:
+    return "ELSE";
+  case SWITCH:
+    return "SWITCH";
+  case WHILE:
+    return "WHILE";
+  case DO:
+    return "DO";
+  case FOR:
+    return "FOR";
+  case GOTO:
+    return "GOTO";
+  case CONTINUE:
+    return "CONTINUE";
+  case BREAK:
+    return "BREAK";
+  case RETURN:
+    return "RETURN";
+  case INLINEASM:
+    return "INLINEASM";
+  case IFX:
+    return "IFX";
+  case ADDRESS_OF:
+    return "ADDRESS_OF";
+  case GET_VALUE_AT_ADDRESS:
+    return "GET_VALUE_AT_ADDRESS";
+  case SPIL:
+    return "SPIL";
+  case UNSPIL:
+    return "UNSPIL";
+  case GETHBIT:
+    return "GETHBIT";
+  case BITWISEAND:
+    return "BITWISEAND";
+  case UNARYMINUS:
+    return "UNARYMINUS";
+  case IPUSH:
+    return "IPUSH";
+  case IPOP:
+    return "IPOP";
+  case PCALL:
+    return "PCALL";
+  case ENDFUNCTION:
+    return "ENDFUNCTION";
+  case JUMPTABLE:
+    return "JUMPTABLE";
+  case RRC:
+    return "RRC";
+  case RLC:
+    return "RLC";
+  case CAST:
+    return "CAST";
+  case CALL:
+    return "CALL";
+  case PARAM:
+    return "PARAM  ";
+  case NULLOP:
+    return "NULLOP";
+  case BLOCK:
+    return "BLOCK";
+  case LABEL:
+    return "LABEL";
+  case RECEIVE:
+    return "RECEIVE";
+  case SEND:
+    return "SEND";
+  }
+  sprintf(buffer,"unkown op %d %c",op, op&0xff);
+  return buffer;
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static char * debugLogRegType(short type)
+{
+
+  switch(type) {
+  case REG_GPR:
+    return "REG_GPR";
+  case REG_PTR:
+    return "REG_PTR";
+  case REG_CND:
+    return "REG_CND";
+  }
+
+  sprintf(buffer,"unkown reg type %d",type);
+  return buffer;
+}
 
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
@@ -92,6 +415,8 @@ static regs *allocReg (short type)
 {
     int i;
 
+    debugLog("%s of type %s\n",__FUNCTION__,debugLogRegType(type));
+
     for ( i = 0 ; i < pic14_nRegs ; i++ ) {
 
 	/* if type is given as 0 then any
@@ -99,9 +424,11 @@ static regs *allocReg (short type)
 	if (!type &&
 	    regspic14[i].isFree ) {
 	    regspic14[i].isFree = 0;
+	    regspic14[i].wasUsed = 1;
 	    if (currFunc)
 		currFunc->regsUsed = 
 		    bitVectSetBit(currFunc->regsUsed,i);
+	    debugLog("  returning %s\n",regspic14[i].name);
 	    return &regspic14[i];
 	}
 	/* other wise look for specific type
@@ -109,9 +436,11 @@ static regs *allocReg (short type)
 	if (regspic14[i].isFree && 
 	    regspic14[i].type == type) {
 	    regspic14[i].isFree = 0;
+	    regspic14[i].wasUsed = 1;
 	    if (currFunc)
 		currFunc->regsUsed = 
 		    bitVectSetBit(currFunc->regsUsed,i);
+	    debugLog("  returning %s\n",regspic14[i].name);
 	    return &regspic14[i];
 	}
     }
@@ -125,7 +454,7 @@ regs *pic14_regWithIdx (int idx)
 {
     int i ;
     
-    printf("%s - idx=%d\n",__FUNCTION__,idx);
+    debugLog("%s\n",__FUNCTION__);
 
     for (i=0;i < pic14_nRegs;i++)
 	if (regspic14[i].rIdx == idx)
@@ -143,6 +472,7 @@ regs *pic14_regWithIdx (int idx)
 /*-----------------------------------------------------------------*/
 static void freeReg (regs *reg)
 {
+    debugLog("%s\n",__FUNCTION__);
     reg->isFree = 1;
 }
 
@@ -155,6 +485,7 @@ static int nFreeRegs (int type)
     int i;
     int nfr=0;
     
+    debugLog("%s\n",__FUNCTION__);
     for (i = 0 ; i < pic14_nRegs; i++ )
 	if (regspic14[i].isFree && regspic14[i].type == type)
 	    nfr++;
@@ -167,6 +498,7 @@ static int nFreeRegs (int type)
 static int nfreeRegsType (int type)
 {
     int nfr ;
+    debugLog("%s\n",__FUNCTION__);
     if (type == REG_PTR) {
 	if ((nfr = nFreeRegs(type)) == 0)
 	    return nFreeRegs(REG_GPR);
@@ -183,6 +515,7 @@ static bool allDefsOutOfRange (bitVect *defs,int fseq, int toseq)
 {
     int i ;
 
+    debugLog("%s\n",__FUNCTION__);
     if (!defs)
 	return TRUE ;
 
@@ -207,6 +540,7 @@ static bitVect *computeSpillable (iCode *ic)
 {
     bitVect *spillable ;
 
+    debugLog("%s\n",__FUNCTION__);
     /* spillable live ranges are those that are live at this 
        point . the following categories need to be subtracted
        from this set. 
@@ -230,6 +564,7 @@ static bitVect *computeSpillable (iCode *ic)
 /*-----------------------------------------------------------------*/
 static int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
 {
+    debugLog("%s\n",__FUNCTION__);
     return (sym->usl.spillLoc ? 0 : 1);
 }
 
@@ -238,6 +573,7 @@ static int noSpilLoc (symbol *sym, eBBlock *ebp,iCode *ic)
 /*-----------------------------------------------------------------*/
 static int hasSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 {
+    debugLog("%s\n",__FUNCTION__);
     return (sym->usl.spillLoc ? 1 : 0);
 }
 
@@ -246,6 +582,7 @@ static int hasSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 static int directSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 {
+    debugLog("%s\n",__FUNCTION__);
     if ( sym->usl.spillLoc &&
 	 (IN_DIRSPACE(SPEC_OCLS(sym->usl.spillLoc->etype))))
 	return 1;
@@ -259,6 +596,7 @@ static int directSpilLoc (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 static int hasSpilLocnoUptr (symbol *sym, eBBlock *ebp, iCode *ic)
 {
+    debugLog("%s\n",__FUNCTION__);
     return ((sym->usl.spillLoc && !sym->uptr) ? 1 : 0);
 }
 
@@ -267,6 +605,7 @@ static int hasSpilLocnoUptr (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 static int rematable (symbol *sym, eBBlock *ebp, iCode *ic)
 {
+    debugLog("%s\n",__FUNCTION__);
     return sym->remat;
 }
 
@@ -275,6 +614,7 @@ static int rematable (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 static int notUsedInBlock (symbol *sym, eBBlock *ebp, iCode *ic)
 {   
+    debugLog("%s\n",__FUNCTION__);
     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs) &&
 	    allDefsOutOfRange (sym->defs,ebp->fSeq,ebp->lSeq));
 /*     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs)); */
@@ -285,6 +625,7 @@ static int notUsedInBlock (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 static int notUsedInRemaining (symbol *sym, eBBlock *ebp, iCode *ic)
 {
+    debugLog("%s\n",__FUNCTION__);
     return ((usedInRemaining (operandFromSymbol(sym),ic) ? 0 : 1) &&
 	    allDefsOutOfRange (sym->defs,ebp->fSeq,ebp->lSeq));
 }
@@ -294,6 +635,7 @@ static int notUsedInRemaining (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 static int allLRs (symbol *sym, eBBlock *ebp, iCode *ic)
 {
+    debugLog("%s\n",__FUNCTION__);
     return 1;
 }
 
@@ -306,6 +648,7 @@ static set *liveRangesWith (bitVect *lrs, int (func)(symbol *,eBBlock *, iCode *
     set *rset = NULL;
     int i;
 
+    debugLog("%s\n",__FUNCTION__);
     if (!lrs || !lrs->size)
 	return NULL;
 
@@ -337,6 +680,7 @@ static symbol *leastUsedLR (set *sset)
 {
     symbol *sym = NULL, *lsym = NULL ;
     
+    debugLog("%s\n",__FUNCTION__);
     sym = lsym = setFirstItem(sset);
 
     if (!lsym)
@@ -367,6 +711,7 @@ static symbol *leastUsedLR (set *sset)
 static int noOverLap (set *itmpStack, symbol *fsym)
 {
     symbol *sym;
+    debugLog("%s\n",__FUNCTION__);
    
 
     for (sym = setFirstItem(itmpStack); sym;
@@ -388,6 +733,7 @@ static DEFSETFUNC(isFree)
     V_ARG(symbol **,sloc);
     V_ARG(symbol *,fsym);
 
+    debugLog("%s\n",__FUNCTION__);
     /* if already found */
     if (*sloc)
 	return 0;
@@ -415,6 +761,7 @@ static void spillLRWithPtrReg (symbol *forSym)
     regs *r0,*r1;
     int k;
 
+    debugLog("%s\n",__FUNCTION__);
     if (!_G.regAssigned ||
 	bitVectIsZero(_G.regAssigned))
 	return;
@@ -457,6 +804,7 @@ static symbol *createStackSpil (symbol *sym)
     int useXstack, model, noOverlay;
 
     char slocBuffer[30];
+    debugLog("%s\n",__FUNCTION__);
 
     /* first go try and find a free one that is already 
        existing on the stack */
@@ -475,7 +823,7 @@ static symbol *createStackSpil (symbol *sym)
 	
     if (sprintf(slocBuffer,"sloc%d",_G.slocNum++) >= sizeof(slocBuffer))
     {
-	fprintf(stderr, "***Internal error: slocBuffer overflowed: %s:%d\n",
+	fprintf(stderr, "kkkInternal error: slocBuffer overflowed: %s:%d\n",
 		__FILE__, __LINE__);
 	exit(1);	
     }
@@ -534,6 +882,7 @@ static bool isSpiltOnStack (symbol *sym)
 {
     sym_link *etype;
 
+    debugLog("%s\n",__FUNCTION__);
     if (!sym)
 	return FALSE ;
     
@@ -559,6 +908,8 @@ static bool isSpiltOnStack (symbol *sym)
 static void spillThis (symbol *sym)
 {
     int i;
+    debugLog("%s : %s\n",__FUNCTION__, sym->rname);
+
     /* if this is rematerializable or has a spillLocation
        we are okay, else we need to create a spillLocation
        for it */
@@ -601,6 +952,7 @@ static symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
     set *selectS ;
     symbol *sym;
 
+    debugLog("%s\n",__FUNCTION__);
     /* get the spillable live ranges */
     lrcs = computeSpillable (ic);
 
@@ -693,6 +1045,7 @@ static bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
     symbol *ssym;
     int i ;
 
+    debugLog("%s\n",__FUNCTION__);
     /* get something we can spil */
     ssym = selectSpil(ic,ebp,forSym);
     
@@ -755,6 +1108,7 @@ static regs *getRegPtr (iCode *ic, eBBlock *ebp, symbol *sym)
 {
     regs *reg;
 
+    debugLog("%s\n",__FUNCTION__);
  tryAgain:
     /* try for a ptr type */
     if ((reg = allocReg(REG_PTR))) 
@@ -780,6 +1134,7 @@ static regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
 {
     regs *reg;
 
+    debugLog("%s\n",__FUNCTION__);
  tryAgain:
     /* try for gpr type */
     if ((reg = allocReg(REG_GPR)))        
@@ -805,6 +1160,7 @@ static bool symHasReg(symbol *sym,regs *reg)
 {
     int i;
 
+    debugLog("%s\n",__FUNCTION__);
     for ( i = 0 ; i < sym->nRegs ; i++)
 	if (sym->regs[i] == reg)
 	    return TRUE;
@@ -822,6 +1178,7 @@ static void deassignLRs (iCode *ic, eBBlock *ebp)
     int k;
     symbol *result;
 
+    debugLog("%s\n",__FUNCTION__);
     for (sym = hTabFirstItem(liveRanges,&k); sym;
 	 sym = hTabNextItem(liveRanges,&k)) {
 	
@@ -914,6 +1271,7 @@ static void reassignLR (operand *op)
     symbol *sym = OP_SYMBOL(op);
     int i;
 
+    debugLog("%s\n",__FUNCTION__);
     /* not spilt any more */     
     sym->isspilt = sym->blockSpil  = sym->remainSpil = 0;
     bitVectUnSetBit(_G.spiltSet,sym->key);
@@ -931,6 +1289,7 @@ static void reassignLR (operand *op)
 /*-----------------------------------------------------------------*/
 static int willCauseSpill ( int nr, int rt)
 {
+    debugLog("%s\n",__FUNCTION__);
     /* first check if there are any avlb registers
        of te type required */
     if (rt == REG_PTR) {
@@ -952,6 +1311,7 @@ static int willCauseSpill ( int nr, int rt)
 	}
     }
 
+    debugLog(" ... yep it will (cause a spill)\n");
     /* it will cause a spil */
     return 1;
 }
@@ -966,6 +1326,7 @@ static void positionRegs (symbol *result, symbol *opsym, int lineno)
 	int count = min(result->nRegs,opsym->nRegs);
 	int i , j = 0, shared = 0;
 
+    debugLog("%s\n",__FUNCTION__);
 	/* if the result has been spilt then cannot share */
 	if (opsym->isspilt)
 		return ;
@@ -996,6 +1357,7 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 {
     int i;
 
+    debugLog("%s\n",__FUNCTION__);
     /* for all blocks */
     for (i = 0; i < count ; i++ ) {
 	
@@ -1009,6 +1371,8 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 	/* of all instructions do */
 	for (ic = ebbs[i]->sch ; ic ; ic = ic->next) {
 	 
+	  debugLog("  op: %s\n", decodeOp(ic->op));
+
 	    /* if this is an ipop that means some live
 	       range will have to be assigned again */
 	    if (ic->op == IPOP)
@@ -1087,6 +1451,9 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 		    }
 		}		
 		
+		if(ic->op == RECEIVE)
+		  debugLog("When I get clever, I'll optimize the receive logic\n");
+
 		/* if we need ptr regs for the right side
 		   then mark it */
 		if (POINTER_GET(ic) && getSize(OP_SYMBOL(IC_LEFT(ic))->type) 
@@ -1097,6 +1464,8 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 		}
 		/* else we assign registers to it */		
 		_G.regAssigned = bitVectSetBit(_G.regAssigned,sym->key);
+
+	  debugLog("  %d - \n",__LINE__);
 
 		for (j = 0 ; j < sym->nRegs ;j++ ) {
 		    if (sym->regType == REG_PTR)
@@ -1109,6 +1478,8 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 		    if (!sym->regs[j])
 			break;
 		}
+	  debugLog("  %d - \n",__LINE__);
+
 		/* if it shares registers with operands make sure
 		   that they are in the same position */
 		if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) &&
@@ -1121,7 +1492,9 @@ static void serialRegAssign (eBBlock **ebbs, int count)
 			positionRegs(OP_SYMBOL(IC_RESULT(ic)),
 				     OP_SYMBOL(IC_RIGHT(ic)),ic->lineno);
 		
+	  debugLog("  %d - \n",__LINE__);
 		if (ptrRegSet) {
+	  debugLog("  %d - \n",__LINE__);
 		    pic14_ptrRegReq--;
 		    ptrRegSet = 0;
 		}
@@ -1140,6 +1513,7 @@ static bitVect *rUmaskForOp (operand *op)
     symbol *sym;
     int j;
     
+    debugLog("%s\n",__FUNCTION__);
     /* only temporaries are assigned registers */
     if (!IS_ITEMP(op)) 
 	return NULL;
@@ -1168,6 +1542,7 @@ static bitVect *regsUsedIniCode (iCode *ic)
 {
     bitVect *rmask = newBitVect(pic14_nRegs);
 
+    debugLog("%s\n",__FUNCTION__);
     /* do the special cases first */
     if (ic->op == IFX ) {
 	rmask = bitVectUnion(rmask,
@@ -1208,6 +1583,7 @@ static void createRegMask (eBBlock **ebbs, int count)
 {
     int i;
 
+    debugLog("%s\n",__FUNCTION__);
     /* for all blocks */
     for (i = 0; i < count ; i++ ) {
 	iCode *ic ;
@@ -1273,6 +1649,7 @@ static char *rematStr (symbol *sym)
     char *s = buffer;   
     iCode *ic = sym->rematiCode;    
 
+    debugLog("%s\n",__FUNCTION__);
     while (1) {
 
 	printf("%s\n",s);
@@ -1300,7 +1677,7 @@ static char *rematStr (symbol *sym)
         }
 
         /* we reached the end */
-        sprintf(s,"%s",OP_SYMBOL(IC_LEFT(ic))->rname);
+        sprintf(s,"%s\n",OP_SYMBOL(IC_LEFT(ic))->rname);
         break;
     }
 
@@ -1317,9 +1694,12 @@ static void regTypeNum ()
     int k;
     iCode *ic;
 
+    debugLog("%s\n",__FUNCTION__);
     /* for each live range do */
     for ( sym = hTabFirstItem(liveRanges,&k); sym ;
 	  sym = hTabNextItem(liveRanges,&k)) {
+
+	  debugLog("  %d - %s\n",__LINE__ , sym->rname);
 
 	/* if used zero times then no registers needed */
 	if ((sym->liveTo - sym->liveFrom) == 0)
@@ -1328,6 +1708,8 @@ static void regTypeNum ()
 
 	/* if the live range is a temporary */
 	if (sym->isitmp) {
+
+	  debugLog("  %d - \n",__LINE__);
 
 	    /* if the type is marked as a conditional */
 	    if (sym->regType == REG_CND)
@@ -1338,6 +1720,8 @@ static void regTypeNum ()
 	    if (sym->ruonly || sym->accuse) {
 		if (IS_AGGREGATE(sym->type) || sym->isptr)
 		    sym->type = aggrToPtr(sym->type,FALSE);
+	  debugLog("  %d - \n",__LINE__);
+
 		continue ;
 	    }
 	    
@@ -1352,6 +1736,7 @@ static void regTypeNum ()
 		POINTER_GET(ic) && 
 		!IS_BITVAR(sym->etype)) {
 		
+	  debugLog("  %d - \n",__LINE__);
 				
 		/* if remat in data space */
 		if (OP_SYMBOL(IC_LEFT(ic))->remat &&
@@ -1382,6 +1767,8 @@ static void regTypeNum ()
 		printTypeChain(sym->type,stderr);fprintf(stderr,"\n");
             }
 	    
+	  debugLog("  %d - \n",__LINE__);
+
 	    /* determine the type of register required */
 	    if (sym->nRegs == 1   && 
 		IS_PTR(sym->type) && 
@@ -1389,7 +1776,8 @@ static void regTypeNum ()
  		sym->regType = REG_PTR ; 	    
  	    else 
 		sym->regType = REG_GPR ;
-	    
+	    debugLog("  reg type %s\n",debugLogRegType(sym->regType));
+
 	} else 
 	    /* for the first run we don't provide */
 	    /* registers for true symbols we will */
@@ -1406,6 +1794,7 @@ static void freeAllRegs()
 {
     int i;
 
+    debugLog("%s\n",__FUNCTION__);
     for (i=0;i< pic14_nRegs;i++ )
 	regspic14[i].isFree = 1;
 }
@@ -1417,6 +1806,7 @@ static DEFSETFUNC(deallocStackSpil)
 {
     symbol *sym = item;
 
+    debugLog("%s\n",__FUNCTION__);
     deallocLocal(sym);
     return 0;
 }
@@ -1428,6 +1818,7 @@ static iCode *farSpacePackable (iCode *ic)
 {
     iCode *dic ;
 
+    debugLog("%s\n",__FUNCTION__);
     /* go thru till we find a definition for the
        symbol on the right */
     for ( dic = ic->prev ; dic ; dic = dic->prev) {
@@ -1492,6 +1883,12 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 
     iCode *dic, *sic;
     
+    debugLog("%s\n",__FUNCTION__);
+
+    debugAopGet("  result:",IC_RESULT(ic));
+    debugAopGet("  left:",IC_LEFT(ic));
+    debugAopGet("  right:",IC_RIGHT(ic));
+
     if (!IS_ITEMP(IC_RIGHT(ic))       ||	
 	OP_SYMBOL(IC_RIGHT(ic))->isind ||
 	OP_LIVETO(IC_RIGHT(ic)) > ic->seq) {
@@ -1508,8 +1905,8 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	
     }
     /* find the definition of iTempNN scanning backwards if we find a 
-       a use of the true symbol in before we find the definition then 
-       we cannot */	
+       a use of the true symbol before we find the definition then 
+       we cannot pack */	
     for ( dic = ic->prev ; dic ; dic = dic->prev) {
 
 	/* if there is a function call and this is
@@ -1517,6 +1914,7 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	if ( (dic->op == CALL || dic->op == PCALL) &&
 	     (OP_SYMBOL(IC_RESULT(ic))->_isparm &&
 	      !OP_SYMBOL(IC_RESULT(ic))->ismyparm)) {
+	  debugLog("  %d - \n",__LINE__);
 	    dic = NULL;
 	    break;
 	}
@@ -1526,12 +1924,14 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 
 	if (IS_TRUE_SYMOP(IC_RESULT(dic)) &&
 	    IS_OP_VOLATILE(IC_RESULT(dic))) {
+	  debugLog("  %d - \n",__LINE__);
 		dic = NULL;
 		break;
 	}
 
 	if (IS_SYMOP(IC_RESULT(dic)) &&
 	    IC_RESULT(dic)->key == IC_RIGHT(ic)->key) {
+	  debugLog("  %d - dic key == ic key -- pointer set=%c\n",__LINE__,((POINTER_SET(dic)) ? 'Y' :'N') );
 	    if (POINTER_SET(dic))
 		dic = NULL;
 
@@ -1541,6 +1941,7 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	if (IS_SYMOP(IC_RIGHT(dic)) && 
 	    (IC_RIGHT(dic)->key == IC_RESULT(ic)->key ||
 	     IC_RIGHT(dic)->key == IC_RIGHT(ic)->key)) {
+	  debugLog("  %d - \n",__LINE__);
 	    dic = NULL;
 	    break;
 	}
@@ -1548,12 +1949,14 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	if (IS_SYMOP(IC_LEFT(dic)) && 
 	    (IC_LEFT(dic)->key == IC_RESULT(ic)->key ||
 	     IC_LEFT(dic)->key == IC_RIGHT(ic)->key)) {
+	  debugLog("  %d - \n",__LINE__);
 	    dic = NULL;
 	    break;
 	}
 
 	if (POINTER_SET(dic) && 
 	    IC_RESULT(dic)->key == IC_RESULT(ic)->key ) {
+	  debugLog("  %d - \n",__LINE__);
 	    dic = NULL ;
 	    break;
 	}
@@ -1580,6 +1983,7 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 	    return 0;	    	     
     }
 pack:
+    debugLog("  packing. removing %s\n",OP_SYMBOL(IC_RIGHT(ic))->rname);
     /* found the definition */
     /* replace the result with the result of */
     /* this assignment and remove this assignment */
@@ -1612,6 +2016,7 @@ static iCode *findAssignToSym (operand *op,iCode *ic)
 {
     iCode *dic;
 
+    debugLog("%s\n",__FUNCTION__);
     for (dic = ic->prev ; dic ; dic = dic->prev) {
 	
 	/* if definition by assignment */
@@ -1683,6 +2088,8 @@ static iCode *findAssignToSym (operand *op,iCode *ic)
 static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 {
     int change = 0 ;
+
+    debugLog("%s\n",__FUNCTION__);
     /* for the left & right operand :- look to see if the
        left was assigned a true symbol in far space in that
        case replace them */
@@ -1693,6 +2100,8 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 
 	if (!dic)
 	    goto right ;
+
+	debugAopGet("removing left:",IC_LEFT(ic));
 
 	/* found it we need to remove it from the
 	   block */
@@ -1725,6 +2134,9 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 	    if (IN_FARSPACE(SPEC_OCLS(etype)))
 		return change ;
 	}
+
+	debugAopGet("removing right:",IC_RIGHT(ic));
+
 	/* found it we need to remove it from the
 	   block */
 	for ( sic = dic; sic != ic ; sic = sic->next )
@@ -1753,6 +2165,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     bitVect *uses ;
     iCode *dic, *sic;
 
+    debugLog("%s\n",__FUNCTION__);
     /* if returning a literal then do nothing */
     if (!IS_SYMOP(op))
 	return NULL;
@@ -1765,9 +2178,9 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 	return NULL;
 
     /* this routine will mark the a symbol as used in one 
-       instruction use only && if the defintion is local 
+       instruction use only && if the definition is local 
        (ie. within the basic block) && has only one definition &&
-       that definiion is either a return value from a 
+       that definition is either a return value from a 
        function or does not contain any variables in
        far space */
     uses = bitVectCopy(OP_USES(op));
@@ -1779,7 +2192,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     if (bitVectnBitsOn(OP_DEFS(op)) > 1)
 	return NULL ; /* has more than one definition */
 
-    /* get the that definition */
+    /* get that definition */
     if (!(dic = 
 	  hTabItemWithKey(iCodehTab,
 			  bitVectFirstBit(OP_DEFS(op)))))
@@ -1839,7 +2252,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
 	    !IS_DATA_PTR(aggrToPtr(operandType(IC_LEFT(dic)),FALSE)))
 	    return NULL ;
 
-	/* if address of & the result is remat the okay */
+	/* if address of & the result is remat then okay */
 	if (dic->op == ADDRESS_OF &&
 	    OP_SYMBOL(IC_RESULT(dic))->remat)
 	    continue ;
@@ -1875,6 +2288,7 @@ static bool isBitwiseOptimizable (iCode *ic)
     sym_link *ltype = getSpec(operandType(IC_LEFT(ic)));
     sym_link *rtype = getSpec(operandType(IC_RIGHT(ic)));
 
+    debugLog("%s\n",__FUNCTION__);
     /* bitwise operations are considered optimizable
        under the following conditions (Jean-Louis VERN) 
        
@@ -1902,6 +2316,7 @@ static void packRegsForAccUse (iCode *ic)
 {
     iCode *uic;
     
+    debugLog("%s\n",__FUNCTION__);
     /* if + or - then it has to be one byte result */
     if ((ic->op == '+' || ic->op == '-')
 	&& getSize(operandType(IC_RESULT(ic))) > 1)
@@ -2030,10 +2445,46 @@ static void packRegsForAccUse (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* packForPush - hueristics to reduce iCode for pushing            */
 /*-----------------------------------------------------------------*/
+static void packForReceive(iCode *ic, eBBlock *ebp)
+{
+  iCode *dic;
+  bool can_remove=1;    // assume that we can remove temporary
+
+  debugLog("%s\n",__FUNCTION__);
+  debugAopGet("  result:",IC_RESULT(ic));
+  debugAopGet("  left:",IC_LEFT(ic));
+  debugAopGet("  right:",IC_RIGHT(ic));
+
+  if(!ic->next)
+    return;
+
+  for ( dic = ic->next ; dic ; dic = dic->next ) {
+
+
+
+    if(IC_LEFT(dic) && (IC_RESULT(ic)->key == IC_LEFT(dic)->key) )
+      debugLog("    used on left\n");
+    if(IC_RIGHT(dic) && IC_RESULT(ic)->key == IC_RIGHT(dic)->key) 
+      debugLog("    used on right\n");
+    if(IC_RESULT(dic) && IC_RESULT(ic)->key == IC_RESULT(dic)->key) 
+      debugLog("    used on result\n");
+
+    if( (IC_LEFT(dic) && (IC_RESULT(ic)->key == IC_LEFT(dic)->key) ) ||
+	(IC_RESULT(dic) && IC_RESULT(ic)->key == IC_RESULT(dic)->key) )
+      return;
+
+  }
+
+  debugLog("  hey we can remove this unnecessary assign\n");
+}
+/*-----------------------------------------------------------------*/
+/* packForPush - hueristics to reduce iCode for pushing            */
+/*-----------------------------------------------------------------*/
 static void packForPush(iCode *ic, eBBlock *ebp)
 {
     iCode *dic;
 
+    debugLog("%s\n",__FUNCTION__);
     if (ic->op != IPUSH || !IS_ITEMP(IC_LEFT(ic)))
 	return ;
 
@@ -2067,6 +2518,8 @@ static void packRegisters (eBBlock *ebp)
     iCode *ic ;
     int change = 0 ;
     
+    debugLog("%s\n",__FUNCTION__);
+
     while (1) {
 
 	change = 0;
@@ -2077,10 +2530,18 @@ static void packRegisters (eBBlock *ebp)
 	/* TrueSym := iTempNN:1             */
 	for ( ic = ebp->sch ; ic ; ic = ic->next ) {
 	    
-	    
 	    /* find assignment of the form TrueSym := iTempNN:1 */
 	    if (ic->op == '=' && !POINTER_SET(ic))
 		change += packRegsForAssign(ic,ebp);
+	    /* debug stuff */
+	    if (ic->op == '=') {
+	      if(POINTER_SET(ic))
+		debugLog("pointer is set\n");
+	      debugAopGet("  result:",IC_RESULT(ic));
+	      debugAopGet("  left:",IC_LEFT(ic));
+	      debugAopGet("  right:",IC_RIGHT(ic));
+	    }
+
 	}
 
 	if (!change)
@@ -2134,12 +2595,15 @@ static void packRegisters (eBBlock *ebp)
 	}
 
 	/* mark the pointer usages */
-	if (POINTER_SET(ic))
+	if (POINTER_SET(ic)) {
 	    OP_SYMBOL(IC_RESULT(ic))->uptr = 1;
-
-	if (POINTER_GET(ic))
+	    debugLog("  marking as a pointer (set)\n");
+	}
+	if (POINTER_GET(ic)) {
 	    OP_SYMBOL(IC_LEFT(ic))->uptr = 1;
-	
+	    debugLog("  marking as a pointer (get)\n");
+	}
+
 	if (!SKIP_IC2(ic)) {
 	    /* if we are using a symbol on the stack
 	       then we should say pic14_ptrRegReq */
@@ -2182,7 +2646,12 @@ static void packRegisters (eBBlock *ebp)
 	/* reduce for support function calls */
 	if (ic->supportRtn || ic->op == '+' || ic->op == '-' )
 	    packRegsForSupport (ic,ebp);	
-	
+
+	/* if a parameter is passed, it's in W, so we may not
+	   need to place a copy in a register */
+	if(ic->op == RECEIVE)
+	  packForReceive(ic,ebp);
+
 	/* some cases the redundant moves can
 	   can be eliminated for return statements */
 	if ((ic->op == RETURN || ic->op == SEND) &&
@@ -2284,7 +2753,48 @@ static void packRegisters (eBBlock *ebp)
 
     }
 }
-  
+
+static void dumpEbbsToDebug(eBBlock **ebbs, int count)
+{
+  int i;
+
+  if(!debug || !debugF)
+    return;
+
+  for (i=0; i < count ; i++ ) {
+    fprintf(debugF,"\n----------------------------------------------------------------\n");
+    fprintf(debugF,"Basic Block %s : loop Depth = %d noPath = %d , lastinLoop = %d\n",
+	    ebbs[i]->entryLabel->name, 
+	    ebbs[i]->depth,
+	    ebbs[i]->noPath,
+	    ebbs[i]->isLastInLoop);
+    fprintf(debugF,"depth 1st num %d : bbnum = %d 1st iCode = %d , last iCode = %d\n",
+	    ebbs[i]->dfnum, 
+	    ebbs[i]->bbnum,
+	    ebbs[i]->fSeq,
+	    ebbs[i]->lSeq);
+    fprintf(debugF,"visited %d : hasFcall = %d\n",
+	    ebbs[i]->visited, 
+	    ebbs[i]->hasFcall);
+
+    fprintf(debugF,"\ndefines bitVector :");
+    bitVectDebugOn(ebbs[i]->defSet,debugF);
+    fprintf(debugF,"\nlocal defines bitVector :");
+    bitVectDebugOn(ebbs[i]->ldefs,debugF);
+    fprintf(debugF,"\npointers Set bitvector :");
+    bitVectDebugOn(ebbs[i]->ptrsSet,debugF);
+    fprintf(debugF,"\nin pointers Set bitvector :");
+    bitVectDebugOn(ebbs[i]->inPtrsSet,debugF);
+    fprintf(debugF,"\ninDefs Set bitvector :");
+    bitVectDebugOn(ebbs[i]->inDefs,debugF);
+    fprintf(debugF,"\noutDefs Set bitvector :");
+    bitVectDebugOn(ebbs[i]->outDefs,debugF);
+    fprintf(debugF,"\nusesDefs Set bitvector :");
+    bitVectDebugOn(ebbs[i]->usesDefs,debugF);
+    fprintf(debugF,"\n----------------------------------------------------------------\n");
+    printiCChain(ebbs[i]->sch,debugF);
+  }
+}
 /*-----------------------------------------------------------------*/
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
@@ -2293,7 +2803,9 @@ void pic14_assignRegisters (eBBlock **ebbs, int count)
     iCode *ic;
     int i ;
 
-    fprintf(stderr,"%s:%s",__FILE__,__FUNCTION__);
+    debugLog("<><><><><><><><><><><><><><><><><>\nstarting\t%s:%s",__FILE__,__FUNCTION__);
+    debugLog("ebbs before optimizing:\n");
+    dumpEbbsToDebug(ebbs,count);
 
     setToNull((void *)&_G.funcrUsed);
     pic14_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
@@ -2340,6 +2852,9 @@ void pic14_assignRegisters (eBBlock **ebbs, int count)
     /* now get back the chain */
     ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs,count));
 
+    debugLog("ebbs after optimizing:\n");
+    dumpEbbsToDebug(ebbs,count);
+
 
     genpic14Code(ic);
 
@@ -2351,5 +2866,7 @@ void pic14_assignRegisters (eBBlock **ebbs, int count)
     /* mark all registers as free */
     freeAllRegs();
 
+    debugLog("leaving\n<><><><><><><><><><><><><><><><><>\n");
+    debugLogClose();
     return ;
 }

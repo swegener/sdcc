@@ -1,6 +1,6 @@
 // peep 1
 replace restart {
-	__movf	%1,w
+	movf	%1,w
 	movwf	%2
 	movf	%2,w
 } by {
@@ -96,3 +96,30 @@ replace restart {
 	; peep 8 - Removed redundant move
 	movf	%1,w
 }
+
+replace restart {
+	movwf	%1
+	movf	%1,w
+} by {
+	; peep 9 - Removed redundant move
+	movwf	%1
+}
+
+replace restart {
+	movlw	%1
+	movwf	%2
+	movlw	%1
+} by {
+	; peep 10 - Removed redundant move
+	movlw	%1
+	movwf	%2
+}
+
+replace restart {
+	movwf	%1
+	movwf	%1
+} by {
+	; peep 11 - Removed redundant move
+	movwf	%1
+}
+

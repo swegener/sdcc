@@ -24,7 +24,7 @@
 
 #include "../common.h"
 #include <time.h>
-
+#include "ralloc.h"
 
 extern symbol *interrupts[256];
 void printIval (symbol *, sym_link *, initList *, FILE *);
@@ -912,7 +912,8 @@ void pic14glue ()
     FILE *vFile;
     FILE *asmFile;
     FILE *ovrFile = tempfile();
-    
+    int i;
+
     addSetHead(&tmpfileSet,ovrFile);
     /* print the global struct definitions */
     if (options.debug)
@@ -973,6 +974,13 @@ void pic14glue ()
 
     /* Put all variables into a cblock */
     fprintf (asmFile, "\n\n\tcblock  0x13\n\n");
+
+    for(i=0; i<pic14_nRegs; i++) {
+      if(regspic14[i].wasUsed && (regspic14[i].offset>=0x0c) )
+	fprintf (asmFile, "\t%s\n",regspic14[i].name);
+    }
+    //fprintf (asmFile, "\tr0x0C\n");
+    //fprintf (asmFile, "\tr0x0D\n");
 
     /* For now, create a "dpl" and a "dph" in the register space */
     /* of the pic so that we can use the same calling mechanism */

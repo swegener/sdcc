@@ -47,11 +47,13 @@ typedef struct regs
   //    short otype;        
     char *name ;         /* name */
     char *dname;         /* name when direct access needed */
-    char *base ;         /* base address */
+  //  char *base ;         /* base address */
     short offset;        /* offset from the base */
-    unsigned isFree :1;  /* is currently unassigned  */    
+    unsigned isFree :1;  /* is currently unassigned  */
+  unsigned wasUsed :1;   /* becomes true if register has been used */
 } regs;
 extern regs regspic14[];
+extern int pic14_nRegs;
 
 regs  *pic14_regWithIdx (int);
 

@@ -500,7 +500,7 @@ printiCChain (iCode * icChain, FILE * of)
     {
       if ((icTab = getTableEntry (loop->op)))
 	{
-	  fprintf (of, "%s(%d:%d:%d:%d:%d)\t",
+	  fprintf (of, "%s(l%d:s%d:k%d:d%d:s%d)\t",
 		   loop->filename, loop->lineno,
 		   loop->seq, loop->key, loop->depth, loop->supportRtn);
 

@@ -177,6 +177,7 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
 {
   FILE *of;
   int i;
+  eBBlock *bb;
 
   if (id) {
     of=createDumpFile(id);
@@ -193,6 +194,35 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
 	       ebbs[i]->depth,
 	       ebbs[i]->noPath,
 	       ebbs[i]->isLastInLoop);
+
+      if (!optimize.label4) { 
+	// this only makes sense with --nolabelopt
+	fprintf (of, "\nsuccessors: ");
+	for (bb=setFirstItem(ebbs[i]->succList); 
+	     bb; 
+	     bb=setNextItem(ebbs[i]->succList)) {
+	  fprintf (of, "%s ", bb->entryLabel->name);
+	}
+	fprintf (of, "\npredecessors: ");
+	for (bb=setFirstItem(ebbs[i]->predList); 
+	     bb; 
+	     bb=setNextItem(ebbs[i]->predList)) {
+	  fprintf (of, "%s ", bb->entryLabel->name);
+	}
+#if 0 // jwk: TODO: this can't be true
+	{
+	  int d;
+	  fprintf (of, "\ndominators ???: ");
+	  for (d=0; d<ebbs[i]->domVect->size; d++) {
+	    if (bitVectBitValue(ebbs[d]->domVect, d)) {
+	      fprintf (of, "%s ", ebbs[d]->entryLabel->name);
+	    }
+	  }
+	}
+#endif
+	fprintf (of, "\n");
+      }
+  
       fprintf (of, "\ndefines bitVector :");
       bitVectDebugOn (ebbs[i]->defSet, of);
       fprintf (of, "\nlocal defines bitVector :");

@@ -96,4 +96,4 @@ void Serial1IrqHandler (void) interrupt 7;
 void ClockInit();
 void ClockIrqHandler (void) interrupt 1 _naked;
 
-#endif TINIBIOS_H
+#endif /* TINIBIOS_H */

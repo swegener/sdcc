@@ -41,10 +41,4 @@ extern char *gets(char *);
 extern char getchar(void);
 extern void putchar(char);
 
-#endif __SDC51_STDIO_H
-
-
-
-
-
-
+#endif /* __SDC51_STDIO_H */

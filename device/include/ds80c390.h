@@ -179,4 +179,4 @@ sfr at 0xf8 EIP; // extended interrupt priority
   sbit at 0xfe C0IP;
   sbit at 0xff CANBIP;
 
-#endif DS80C390_H
+#endif /* DS80C390_H */

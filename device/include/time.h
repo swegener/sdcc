@@ -40,4 +40,4 @@ time_t mktime(struct tm *timeptr);
 char *asctime(struct tm *timeptr);
 char *ctime(time_t *timep);
 
-#endif TIME_H
+#endif /* TIME_H */

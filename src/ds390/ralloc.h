@@ -31,10 +31,10 @@ enum
   {
     R2_IDX = 0, R3_IDX, R4_IDX,
     R5_IDX, R6_IDX, R7_IDX,
-    R0_IDX, R1_IDX, X8_IDX,
+    R0_IDX, R1_IDX, DPL_IDX, 
+    DPH_IDX, DPX_IDX, B_IDX, X8_IDX,
     X9_IDX, X10_IDX, X11_IDX,
-    X12_IDX, CND_IDX, DPL_IDX, 
-    DPH_IDX, DPX_IDX, B_IDX
+    X12_IDX, CND_IDX 
   };
 
 

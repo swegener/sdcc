@@ -2160,7 +2160,7 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
       }
     }
 
-  for (i = (ds390_nRegs - 1); i >= 0; i--)
+  for (i = 7; i >= 0; i--) /* only R7-R0 needs to be popped */
     {
       if (options.useXstack)
 	{
@@ -2211,7 +2211,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
         emitcode ("mov", "%s,_spx", r->name);    
     }
 
-  for (i = 0; i < ds390_nRegs; i++)
+  for (i = 0; i < 8 ; i++) /* only R0-R7 needs saving */
     {
       if (options.useXstack)
 	{

@@ -68,16 +68,16 @@ regs regs390[] =
   {REG_GPR, R7_IDX, REG_GPR, "r7", "ar7", "0", 7, 1, 1},
   {REG_PTR, R0_IDX, REG_PTR, "r0", "ar0", "0", 0, 1, 1},
   {REG_PTR, R1_IDX, REG_PTR, "r1", "ar1", "0", 1, 1, 1},
+  {REG_GPR, DPL_IDX, REG_GPR, "dpl", "dpl", "dpl", 0, 0, 0},
+  {REG_GPR, DPH_IDX, REG_GPR, "dph", "dph", "dph", 0, 0, 0},
+  {REG_GPR, DPX_IDX, REG_GPR, "dpx", "dpx", "dpx", 0, 0, 0},
+  {REG_GPR, B_IDX, REG_GPR, "b", "b", "b", 0, 0, 0},
   {REG_GPR, X8_IDX, REG_GPR, "x8", "x8", "xreg", 0, 0, 0},
   {REG_GPR, X9_IDX, REG_GPR, "x9", "x9", "xreg", 1, 0, 0},
   {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 0, 0},
   {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 0, 0},
   {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 0, 0},
   {REG_CND, CND_IDX, REG_GPR, "C", "C", "xreg", 0, 0, 0},
-  {REG_GPR, DPL_IDX, REG_GPR, "dpl", "dpl", "dpl", 0, 0, 0},
-  {REG_GPR, DPH_IDX, REG_GPR, "dph", "dph", "dph", 0, 0, 0},
-  {REG_GPR, DPX_IDX, REG_GPR, "dpx", "dpx", "dpx", 0, 0, 0},
-  {REG_GPR, B_IDX, REG_GPR, "b", "b", "b", 0, 0, 0},
 };
 int ds390_nRegs = 13;
 static void spillThis (symbol *);
@@ -2702,7 +2702,7 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void *) &_G.totRegAssigned);  
   setToNull ((void *) &_G.funcrUsed);  
   ds390_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
-  ds390_nRegs = 18;
+  ds390_nRegs = 12;
   if (options.model != MODEL_FLAT24) options.stack10bit = 0;
   /* change assignments this will remove some
      live ranges reducing some register pressure */
@@ -2722,7 +2722,7 @@ ds390_assignRegisters (eBBlock ** ebbs, int count)
   ds390_nRegs = 8;
   freeAllRegs ();
   fillGaps();
-  ds390_nRegs = 18;
+  ds390_nRegs = 12;
 
   /* if stack was extended then tell the user */
   if (_G.stackExtend)

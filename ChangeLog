@@ -1,3 +1,6 @@
+2003-05-26  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+	* doc/sdccman.lyx: Manual has an index now
+
 2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/lkaomf51.c: Address space 'z' was missing.

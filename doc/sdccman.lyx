@@ -44,7 +44,7 @@ SDCC Compiler User Guide
 
 
 \layout Section
-
+\pagebreak_top 
 Introduction
 \layout Subsection
 
@@ -176,8 +176,18 @@ freeware
  This documentation is maintained using a freeware word processor (LyX).
 \newline 
 This program is free software; you can redistribute it and/or modify it
- under the terms of the GNU General Public License as published by the Free
- Software Foundation; either version 2, or (at your option) any later version.
+ under the terms of the GNU General Public License
+\begin_inset LatexCommand \index{GNU General Public License}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{GPL}
+
+\end_inset 
+
+ as published by the Free Software Foundation; either version 2, or (at
+ your option) any later version.
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.
@@ -319,21 +329,22 @@ char KernelFunction3(char p) at 0x340;
 If you can think of some more, please send them to the list.
 \newline 
 
-\newline 
-
-\emph on 
-<pending: And then of course a proper index-table
-\begin_inset LatexCommand \index{index}
-
-\end_inset 
-
->
 \layout Section
 
 Installation
+\begin_inset LatexCommand \index{Installation}
+
+\end_inset 
+
+
 \layout Subsection
 
 Configure Options
+\begin_inset LatexCommand \index{Configure Options}
+
+\end_inset 
+
+
 \layout Standard
 
 The install paths, search paths and other options are defined when running
@@ -1208,6 +1219,11 @@ lib
 \layout Subsection
 
 Install paths
+\begin_inset LatexCommand \index{Install paths}
+
+\end_inset 
+
+
 \layout Standard
 
 1.
@@ -1535,6 +1551,11 @@ Of course this doesn't change the search paths compiled into the binaries.
 \layout Subsection
 
 Search Paths
+\begin_inset LatexCommand \index{Search Paths}
+
+\end_inset 
+
+
 \layout Standard
 
 Some search paths or parts of them are determined by configure variables
@@ -2277,6 +2298,11 @@ The option ---nostdlib disables the last two search paths.
 \layout Subsection
 
 Building SDCC
+\begin_inset LatexCommand \index{Building SDCC}
+
+\end_inset 
+
+
 \layout Subsubsection
 
 Building SDCC on Linux
@@ -2628,7 +2654,12 @@ In order to build SDCC with Visual C++ 6.0/NET you need win32 executables
 \newline 
 
 \newline 
-Download the file UnxUtils.zip.
+Download the file UnxUtils
+\begin_inset LatexCommand \index{UnxUtils}
+
+\end_inset 
+
+.zip.
  Now you have to install the utilities and setup Visual C++ so it can locate
  the required programs.
  Here there are two alternatives (choose one!):
@@ -2814,6 +2845,11 @@ The first thing you should do after installing your SDCC compiler is to
 \family sans 
 \series bold 
 "sdcc ---version"
+\begin_inset LatexCommand \index{version}
+
+\end_inset 
+
+
 \family default 
 \series default 
  at the prompt, and the program should run and tell you the version.
@@ -2986,6 +3022,11 @@ Compile this by typing
 \layout Subsection
 
 Install Trouble-shooting
+\begin_inset LatexCommand \index{Install Trouble-shooting}
+
+\end_inset 
+
+
 \layout Subsubsection
 
 SDCC does not build correctly.
@@ -3197,6 +3238,11 @@ This is retargettable assembler & linkage editor, it was developed by Alan
 \layout Subsubsection
 
 s51 - The Simulator
+\begin_inset LatexCommand \index{s51 - The Simulator}
+
+\end_inset 
+
+
 \layout Standard
 
 S51 is a freeware, opensource simulator developed by Daniel Drotos (
@@ -3256,35 +3302,94 @@ For single source file 8051 projects the process is very simple.
 \newline 
 
 \newline 
-sourcefile.asm - Assembler source file created by the compiler
+sourcefile.asm
+\begin_inset LatexCommand \index{.asm}
+
+\end_inset 
+
+ - Assembler source file created by the compiler
 \newline 
-sourcefile.lst - Assembler listing file created by the Assembler
+sourcefile.lst
+\begin_inset LatexCommand \index{.lst}
+
+\end_inset 
+
+ - Assembler listing file created by the Assembler
 \newline 
-sourcefile.rst - Assembler listing file updated with linkedit information,
- created by linkage editor
+sourcefile.rst
+\begin_inset LatexCommand \index{.rst}
+
+\end_inset 
+
+ - Assembler listing file updated with linkedit information, created by
+ linkage editor
 \newline 
-sourcefile.sym - symbol listing for the sourcefile, created by the assembler
+sourcefile.sym
+\begin_inset LatexCommand \index{.sym}
+
+\end_inset 
+
+ - symbol listing for the sourcefile, created by the assembler
 \newline 
-sourcefile.rel - Object file created by the assembler, input to Linkage editor
+sourcefile.rel
+\begin_inset LatexCommand \index{.rel}
+
+\end_inset 
+
+ - Object file created by the assembler, input to Linkage editor
 \newline 
-sourcefile.map - The memory map for the load module, created by the Linker
+sourcefile.map
+\begin_inset LatexCommand \index{.map}
+
+\end_inset 
+
+ - The memory map for the load module, created by the Linker
 \newline 
-sourcefile.mem - A file with a summary of the memory ussage
+sourcefile.mem
+\begin_inset LatexCommand \index{.mem}
+
+\end_inset 
+
+ - A file with a summary of the memory ussage
 \newline 
-sourcefile.ihx - The load module in Intel hex format (you can select the
- Motorola S19 format with ---out-fmt-s19)
+sourcefile.ihx
+\begin_inset LatexCommand \index{.ihx}
+
+\end_inset 
+
+ - The load module in Intel hex format (you can select the Motorola S19
+ format with ---out-fmt-s19)
 \newline 
-sourcefile.adb - An intermediate file containing debug information needed
- to create the .cdb file (with ---debug) 
+sourcefile.adb
+\begin_inset LatexCommand \index{.adb}
+
+\end_inset 
+
+ - An intermediate file containing debug information needed to create the
+ .cdb file (with ---debug) 
 \newline 
-sourcefile.cdb - An optional file (with ---debug) containing debug information
+sourcefile.cdb
+\begin_inset LatexCommand \index{.cdb}
+
+\end_inset 
+
+ - An optional file (with ---debug) containing debug information
 \newline 
 sourcefile.
- - (no extension) An optional AOMF51 file containing debug information (with
- ---debug)
+ - (no extension)
+\begin_inset LatexCommand \index{. (no extension)}
+
+\end_inset 
+
+ An optional AOMF51 file containing debug information (with ---debug)
 \newline 
-sourcefile.dump* - Dump file to debug the compiler it self (with ---dumpall)
- (see section 
+sourcefile.dump*
+\begin_inset LatexCommand \index{.dump*}
+
+\end_inset 
+
+ - Dump file to debug the compiler it self (with ---dumpall) (see section
+ 
 \begin_inset Quotes sld
 \end_inset 
 
@@ -3411,6 +3516,11 @@ first
 \layout Subsubsection
 
 Projects with Additional Libraries
+\begin_inset LatexCommand \index{Libraries}
+
+\end_inset 
+
+
 \layout Standard
 
 Some reusable routines may be compiled into a library, see the documentation
@@ -3418,6 +3528,11 @@ Some reusable routines may be compiled into a library, see the documentation
  for how to create a 
 \emph on 
 .lib
+\begin_inset LatexCommand \index{.lib}
+
+\end_inset 
+
+
 \emph default 
  library file.
  Libraries created in this manner can be included in the command line.
@@ -3468,15 +3583,30 @@ libsdcc.lib
 \layout Subsection
 
 Command Line Options
+\begin_inset LatexCommand \index{Command Line Options}
+
+\end_inset 
+
+
 \layout Subsubsection
 
 Processor Selection Options
+\begin_inset LatexCommand \index{Processor Selection Options}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 -mmcs51
+\begin_inset LatexCommand \index{-mmcs51}
+
+\end_inset 
+
+
 \series default 
  Generate code for the MCS51 (8051) family of processors.
  This is the default processor target.
@@ -3486,6 +3616,11 @@ Processor Selection Options
 
 \series bold 
 -mds390
+\begin_inset LatexCommand \index{-mds390}
+
+\end_inset 
+
+
 \series default 
  Generate code for the DS80C390 processor.
 \layout List
@@ -3494,6 +3629,11 @@ Processor Selection Options
 
 \series bold 
 -mz80
+\begin_inset LatexCommand \index{-mz80}
+
+\end_inset 
+
+
 \series default 
  Generate code for the Z80 family of processors.
 \layout List
@@ -3502,6 +3642,11 @@ Processor Selection Options
 
 \series bold 
 -mgbz80
+\begin_inset LatexCommand \index{-mgbz80}
+
+\end_inset 
+
+
 \series default 
  Generate code for the GameBoy Z80 processor.
 \layout List
@@ -3510,6 +3655,11 @@ Processor Selection Options
 
 \series bold 
 -mavr
+\begin_inset LatexCommand \index{-mavr}
+
+\end_inset 
+
+
 \series default 
  Generate code for the Atmel AVR processor (In development, not complete).
 \layout List
@@ -3518,6 +3668,11 @@ Processor Selection Options
 
 \series bold 
 -mpic14
+\begin_inset LatexCommand \index{-mpic14}
+
+\end_inset 
+
+
 \series default 
  Generate code for the PIC 14-bit processors (In development, not complete).
 \layout List
@@ -3535,17 +3690,37 @@ Processor Selection Options
 
 \series bold 
 -mxa51
+\begin_inset LatexCommand \index{-mxa51}
+
+\end_inset 
+
+
 \series default 
  Generate code for the Philips XA51 processor (In development, not complete).
 \layout Subsubsection
 
 Preprocessor Options
+\begin_inset LatexCommand \index{Options Preprocessor}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Preprocessor Options}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 -I<path>
+\begin_inset LatexCommand \index{-I<path>}
+
+\end_inset 
+
+
 \series default 
  The additional location where the pre processor will look for <..h> or 
 \begin_inset Quotes eld
@@ -3562,6 +3737,11 @@ Preprocessor Options
 
 \series bold 
 -D<macro[=value]>
+\begin_inset LatexCommand \index{-D<macro[=value]>}
+
+\end_inset 
+
+
 \series default 
  Command line definition of macros.
  Passed to the pre processor.
@@ -3571,6 +3751,11 @@ Preprocessor Options
 
 \series bold 
 -M
+\begin_inset LatexCommand \index{-M}
+
+\end_inset 
+
+
 \series default 
  Tell the preprocessor to output a rule suitable for make describing the
  dependencies of each object file.
@@ -3589,6 +3774,11 @@ Preprocessor Options
 
 \series bold 
 -C
+\begin_inset LatexCommand \index{-C}
+
+\end_inset 
+
+
 \series default 
  Tell the preprocessor not to discard comments.
  Used with the `-E' option.
@@ -3598,6 +3788,11 @@ Preprocessor Options
 
 \series bold 
 -MM
+\begin_inset LatexCommand \index{-MM}
+
+\end_inset 
+
+
 \size large 
 \bar under 
  
@@ -3617,6 +3812,11 @@ file"'.
 
 \series bold 
 -Aquestion(answer)
+\begin_inset LatexCommand \index{-Aquestion(answer)}
+
+\end_inset 
+
+
 \series default 
  Assert the answer answer for question, in case it is tested with a preprocessor
  conditional such as `#if #question(answer)'.
@@ -3639,6 +3839,11 @@ file"'.
 
 \series bold 
 -Umacro
+\begin_inset LatexCommand \index{-Umacro}
+
+\end_inset 
+
+
 \series default 
  Undefine macro macro.
  `-U' options are evaluated after all `-D' options, but before any `-include'
@@ -3649,6 +3854,11 @@ file"'.
 
 \series bold 
 -dM
+\begin_inset LatexCommand \index{-dM}
+
+\end_inset 
+
+
 \series default 
  Tell the preprocessor to output only a list of the macro definitions that
  are in effect at the end of preprocessing.
@@ -3659,6 +3869,11 @@ file"'.
 
 \series bold 
 -dD
+\begin_inset LatexCommand \index{-dD}
+
+\end_inset 
+
+
 \series default 
  Tell the preprocessor to pass all macro definitions into the output, in
  their proper sequence in the rest of the output.
@@ -3668,6 +3883,11 @@ file"'.
 
 \series bold 
 -dN
+\begin_inset LatexCommand \index{-dN}
+
+\end_inset 
+
+
 \size large 
 \bar under 
  
@@ -3679,6 +3899,16 @@ Like `-dD' except that the macro arguments and contents are omitted.
 \layout Subsubsection
 
 Linker Options
+\begin_inset LatexCommand \index{Options Linker}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Linker Options}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -3686,6 +3916,11 @@ Linker Options
 \series bold 
 -L\SpecialChar ~
 ---lib-path
+\begin_inset LatexCommand \index{-L ---lib-path}
+
+\end_inset 
+
+
 \bar under 
  
 \series default 
@@ -3702,6 +3937,11 @@ Linker Options
 \series bold 
 ---xram-loc
 \series default 
+
+\begin_inset LatexCommand \index{---xram-loc}
+
+\end_inset 
+
 <Value> The start location of the external ram, default value is 0.
  The value entered can be in Hexadecimal or Decimal format, e.g.: ---xram-loc
  0x8000 or ---xram-loc 32768.
@@ -3712,6 +3952,11 @@ Linker Options
 \series bold 
 ---code-loc
 \series default 
+
+\begin_inset LatexCommand \index{---code-loc}
+
+\end_inset 
+
 <Value> The start location of the code segment, default value 0.
  Note when this option is used the interrupt vector table is also relocated
  to the given address.
@@ -3724,6 +3969,11 @@ Linker Options
 \series bold 
 ---stack-loc
 \series default 
+
+\begin_inset LatexCommand \index{---stack-loc}
+
+\end_inset 
+
 <Value> By default the stack is placed after the data segment.
  Using this option the stack can be placed anywhere in the internal memory
  space of the 8051.
@@ -3741,6 +3991,11 @@ Linker Options
 \series bold 
 ---data-loc
 \series default 
+
+\begin_inset LatexCommand \index{---data-loc}
+
+\end_inset 
+
 <Value> The start location of the internal ram data segment.
  The value entered can be in Hexadecimal or Decimal format, eg.
  ---data-loc 0x20 or ---data-loc 32.
@@ -3756,6 +4011,11 @@ Linker Options
 \series bold 
 ---idata-loc
 \series default 
+
+\begin_inset LatexCommand \index{---idata-loc}
+
+\end_inset 
+
 <Value> The start location of the indirectly addressable internal ram, default
  value is 0x80.
  The value entered can be in Hexadecimal or Decimal format, eg.
@@ -3766,6 +4026,11 @@ Linker Options
 
 \series bold 
 ---out-fmt-ihx
+\begin_inset LatexCommand \index{---out-fmt-ihx}
+
+\end_inset 
+
+
 \bar under 
  
 \series default 
@@ -3778,6 +4043,11 @@ The linker output (final object code) is in Intel Hex format.
 
 \series bold 
 ---out-fmt-s19
+\begin_inset LatexCommand \index{---out-fmt-s19}
+
+\end_inset 
+
+
 \bar under 
  
 \series default 
@@ -3786,12 +4056,27 @@ The linker output (final object code) is in Motorola S19 format.
 \layout Subsubsection
 
 MCS51 Options
+\begin_inset LatexCommand \index{Options MCS51}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{MCS51 Options}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---model-large
+\begin_inset LatexCommand \index{---model-large}
+
+\end_inset 
+
+
 \series default 
  Generate code for Large model programs see section Memory Models for more
  details.
@@ -3805,6 +4090,11 @@ MCS51 Options
 
 \series bold 
 ---model-small
+\begin_inset LatexCommand \index{---model-small}
+
+\end_inset 
+
+
 \series default 
 \size large 
 \emph on 
@@ -3817,6 +4107,16 @@ Generate code for Small Model programs see section Memory Models for more
 \layout Subsubsection
 
 DS390 Options
+\begin_inset LatexCommand \index{Options DS390}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{DS390 Options}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -3824,6 +4124,12 @@ DS390 Options
 \series bold 
 ---model-flat24
 \series default 
+
+\begin_inset LatexCommand \index{---model-flat24}
+
+\end_inset 
+
+
 \size large 
 \emph on 
  
@@ -3844,6 +4150,11 @@ Generate 24-bit flat mode code.
 \series bold 
 ---stack-10bit
 \series default 
+
+\begin_inset LatexCommand \index{--stack-10bit}
+
+\end_inset 
+
  Generate code for the 10 bit stack mode of the Dallas DS80C390 part.
  This is the one and only that the ds390 code generator supports right now
  and is default when using 
@@ -3882,12 +4193,27 @@ Generate 24-bit flat mode code.
 \layout Subsubsection
 
 Optimization Options
+\begin_inset LatexCommand \index{Options Optimization}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Optimization Options}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---nogcse
+\begin_inset LatexCommand \index{---nogcse}
+
+\end_inset 
+
+
 \series default 
  Will not do global subexpression elimination, this option may be used when
  the compiler creates undesirably large stack/data spaces to store compiler
@@ -3903,6 +4229,11 @@ NOGCSE can be used
 
 \series bold 
 ---noinvariant
+\begin_inset LatexCommand \index{---noinvariant}
+
+\end_inset 
+
+
 \series default 
  Will not do loop invariant optimizations, this may be turned off for reasons
  explained for the previous option.
@@ -3916,6 +4247,11 @@ NOINVARIANT can be used
 
 \series bold 
 ---noinduction
+\begin_inset LatexCommand \index{---noinduction}
+
+\end_inset 
+
+
 \series default 
  Will not do loop induction optimizations, see section strength reduction
  for more details.It is recommended that this option is NOT used, #pragma\SpecialChar ~
@@ -3928,6 +4264,11 @@ ION can be used to turn off induction optimizations for a given function
 
 \series bold 
 ---nojtbound
+\begin_inset LatexCommand \index{---nojtbound}
+
+\end_inset 
+
+
 \size large 
 \bar under 
  
@@ -3947,6 +4288,11 @@ NOJTBOUND can be
 
 \series bold 
 ---noloopreverse
+\begin_inset LatexCommand \index{---noloopreverse}
+
+\end_inset 
+
+
 \series default 
 \size large 
  
@@ -3959,19 +4305,39 @@ Will not do loop reversal optimization.
 \series bold 
 nolabelopt
 \series default 
- Will not optimize labels (makes the dumpfiles more readable).
+ 
+\begin_inset LatexCommand \index{---nolabelopt }
+
+\end_inset 
+
+Will not optimize labels (makes the dumpfiles more readable).
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---no-xinit-opt
+\begin_inset LatexCommand \index{---no-xinit-opt}
+
+\end_inset 
+
+
 \series default 
  Will not memcpy initialized data in far space from code space.
  This saves a few bytes in code space if you don't have initialized data.
 \layout Subsubsection
 
 Other Options
+\begin_inset LatexCommand \index{Options other}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Other Options}
+
+\end_inset 
+
+
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -3979,6 +4345,16 @@ Other Options
 \series bold 
 -c\SpecialChar ~
 ---compile-only
+\begin_inset LatexCommand \index{---compile-only}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{-c ---compile-only}
+
+\end_inset 
+
+
 \series default 
  will compile and assemble the source, but will not call the linkage editor.
 \layout List
@@ -3987,6 +4363,11 @@ Other Options
 
 \series bold 
 --c1mode
+\begin_inset LatexCommand \index{--c1mode}
+
+\end_inset 
+
+
 \series default 
  reads the preprocessed source from standard input and compiles it.
  The file name for the assembler output must be specified using the -o option.
@@ -3996,6 +4377,11 @@ Other Options
 
 \series bold 
 -E
+\begin_inset LatexCommand \index{-E}
+
+\end_inset 
+
+
 \series default 
  Run only the C preprocessor.
  Preprocess all the C source files specified and output the results to standard
@@ -4006,7 +4392,12 @@ Other Options
 
 \series bold 
 -o\SpecialChar ~
-<path/file> 
+<path/file>
+\begin_inset LatexCommand \index{-o <path/file>}
+
+\end_inset 
+
+ 
 \series default 
 The output path resp.
  file where everything will be placed.
@@ -4019,6 +4410,11 @@ The output path resp.
 
 \series bold 
 ---stack-auto
+\begin_inset LatexCommand \index{---stack-auto}
+
+\end_inset 
+
+
 \series default 
 \size large 
 \emph on 
@@ -4041,6 +4437,11 @@ reentrant
 
 \series bold 
 ---xstack
+\begin_inset LatexCommand \index{---xstack}
+
+\end_inset 
+
+
 \series default 
  Uses a pseudo stack in the first 256 bytes in the external ram for allocating
  variables and passing parameters.
@@ -4050,7 +4451,12 @@ reentrant
 
 
 \series bold 
----callee-saves function1[,function2][,function3]....
+---callee-saves
+\begin_inset LatexCommand \index{---callee-saves}
+
+\end_inset 
+
+ function1[,function2][,function3]....
 
 \series default 
  The compiler by default uses a caller saves convention for register saving
@@ -4070,13 +4476,23 @@ reentrant
  If the project consists of multiple source files then all the source file
  should be compiled with the same ---callee-saves option string.
  Also see #pragma\SpecialChar ~
-CALLEE-SAVES.
+CALLEE-SAVES
+\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
+
+\end_inset 
+
+.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---debug
+\begin_inset LatexCommand \index{---debug}
+
+\end_inset 
+
+
 \bar under 
  
 \series default 
@@ -4092,6 +4508,11 @@ When this option is used the compiler will generate debug information, that
 \series bold 
 ---peep-file
 \series default 
+
+\begin_inset LatexCommand \index{---peep-file}
+
+\end_inset 
+
 <filename> This option can be used to use additional rules to be used by
  the peep hole optimizer.
  See section Peep Hole optimizations for details on how to write these rules.
@@ -4101,6 +4522,11 @@ When this option is used the compiler will generate debug information, that
 
 \series bold 
 -S
+\begin_inset LatexCommand \index{-S}
+
+\end_inset 
+
+
 \size large 
 \bar under 
  
@@ -4116,6 +4542,11 @@ Stop after the stage of compilation proper; do not assemble.
 \series bold 
 -Wa_asmOption[,asmOption]
 \series default 
+
+\begin_inset LatexCommand \index{-Wa\_asmOption[,asmOption]}
+
+\end_inset 
+
 ...
  Pass the asmOption to the assembler.
 \layout List
@@ -4125,6 +4556,11 @@ Stop after the stage of compilation proper; do not assemble.
 \series bold 
 -Wl_linkOption[,linkOption]
 \series default 
+
+\begin_inset LatexCommand \index{-Wl\_linkOption[,linkOption]}
+
+\end_inset 
+
 ...
  Pass the linkOption to the linker.
 \layout List
@@ -4133,10 +4569,12 @@ Stop after the stage of compilation proper; do not assemble.
 
 \series bold 
 ---int-long-reent
+\begin_inset LatexCommand \index{---int-long-reent}
+
+\end_inset 
+
+
 \series default 
-\size large 
- 
-\size default 
  Integer (16 bit) and long (32 bit) libraries have been compiled as reentrant.
  Note by default these libraries are compiled as non-reentrant.
  See section Installation for more details.
@@ -4146,6 +4584,11 @@ Stop after the stage of compilation proper; do not assemble.
 
 \series bold 
 ---cyclomatic
+\begin_inset LatexCommand \index{---cyclomatic}
+
+\end_inset 
+
+
 \bar under 
  
 \series default 
@@ -4161,6 +4604,11 @@ important
  graph of the function, and most importantly the 
 \emph on 
 cyclomatic complexity
+\begin_inset LatexCommand \index{cyclomatic complexity}
+
+\end_inset 
+
+
 \emph default 
  see section on Cyclomatic Complexity for more details.
 \layout List
@@ -4169,18 +4617,32 @@ cyclomatic complexity
 
 \series bold 
 ---float-reent
+\begin_inset LatexCommand \index{---float-reent}
+
+\end_inset 
+
+
 \bar under 
  
 \series default 
 \bar default 
- Floating point library is compiled as reentrant.See section Installation
- for more details.
+ Floating point library is compiled as reentrant
+\begin_inset LatexCommand \index{ reentrant}
+
+\end_inset 
+
+.See section Installation for more details.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---nooverlay
+\begin_inset LatexCommand \index{---nooverlay}
+
+\end_inset 
+
+
 \series default 
   The compiler will not overlay parameters and local variables of any function,
  see section Parameters and local variables for more details.
@@ -4190,10 +4652,20 @@ cyclomatic complexity
 
 \series bold 
 ---main-return
+\begin_inset LatexCommand \index{---main-return}
+
+\end_inset 
+
+
 \series default 
  This option can be used when the code generated is called by a monitor
  program.
- The compiler will generate a 'ret' upon return from the 'main' function.
+ The compiler will generate a 'ret' upon return from the 'main'
+\begin_inset LatexCommand \index{main return}
+
+\end_inset 
+
+ function.
  The default option is to lock up i.e.
  generate a 'ljmp '.
 \layout List
@@ -4202,6 +4674,11 @@ cyclomatic complexity
 
 \series bold 
 ---no-peep
+\begin_inset LatexCommand \index{---no-peep}
+
+\end_inset 
+
+
 \series default 
   Disable peep-hole optimization.
 \layout List
@@ -4210,11 +4687,21 @@ cyclomatic complexity
 
 \series bold 
 ---peep-asm
+\begin_inset LatexCommand \index{---peep-asm}
+
+\end_inset 
+
+
 \series default 
   Pass the inline assembler code through the peep hole optimizer.
  This can cause unexpected changes to inline assembler code, please go through
- the peephole optimizer rules defined in the source file tree '<target>/peeph.def
-' before using this option.
+ the peephole optimizer
+\begin_inset LatexCommand \index{Peephole optimizer}
+
+\end_inset 
+
+ rules defined in the source file tree '<target>/peeph.def' before using
+ this option.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4222,8 +4709,13 @@ cyclomatic complexity
 \series bold 
 ---iram-size
 \series default 
-<Value> Causes the linker to check if the internal ram usage is within limits
- of the given value.
+<Value>
+\begin_inset LatexCommand \index{---iram-size<Value>}
+
+\end_inset 
+
+ Causes the linker to check if the internal ram usage is within limits of
+ the given value.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4231,8 +4723,13 @@ cyclomatic complexity
 \series bold 
 ---xram-size
 \series default 
-<Value> Causes the linker to check if the external ram usage is within limits
- of the given value.
+<Value>
+\begin_inset LatexCommand \index{---xram-size<Value>}
+
+\end_inset 
+
+ Causes the linker to check if the external ram usage is within limits of
+ the given value.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4240,14 +4737,24 @@ cyclomatic complexity
 \series bold 
 ---code-size
 \series default 
-<Value> Causes the linker to check if the code usage is within limits of
- the given value.
+<Value>
+\begin_inset LatexCommand \index{---code-size<Value>}
+
+\end_inset 
+
+ Causes the linker to check if the code usage is within limits of the given
+ value.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---nostdincl
+\begin_inset LatexCommand \index{---nostdincl}
+
+\end_inset 
+
+
 \series default 
  This will prevent the compiler from passing on the default include path
  to the preprocessor.
@@ -4257,6 +4764,11 @@ cyclomatic complexity
 
 \series bold 
 ---nostdlib
+\begin_inset LatexCommand \index{---nostdlib}
+
+\end_inset 
+
+
 \series default 
  This will prevent the compiler from passing on the default library path
  to the linker.
@@ -4266,6 +4778,11 @@ cyclomatic complexity
 
 \series bold 
 ---verbose
+\begin_inset LatexCommand \index{---verbose}
+
+\end_inset 
+
+
 \series default 
  Shows the various actions the compiler is performing.
 \layout List
@@ -4274,6 +4791,11 @@ cyclomatic complexity
 
 \series bold 
 -V
+\begin_inset LatexCommand \index{-V}
+
+\end_inset 
+
+
 \series default 
  Shows the actual commands the compiler is executing.
 \layout List
@@ -4282,6 +4804,11 @@ cyclomatic complexity
 
 \series bold 
 ---no-c-code-in-asm
+\begin_inset LatexCommand \index{---no-c-code-in-asm}
+
+\end_inset 
+
+
 \series default 
  Hides your ugly and inefficient c-code from the asm file, so you can always
  blame the compiler :).
@@ -4291,6 +4818,11 @@ cyclomatic complexity
 
 \series bold 
 ---i-code-in-asm
+\begin_inset LatexCommand \index{---i-code-in-asm}
+
+\end_inset 
+
+
 \series default 
  Include i-codes in the asm file.
  Sounds like noise but is most helpfull for debugging the compiler itself.
@@ -4300,6 +4832,11 @@ cyclomatic complexity
 
 \series bold 
 ---less-pedantic
+\begin_inset LatexCommand \index{---less-pedantic}
+
+\end_inset 
+
+
 \series default 
  Disable some of the more pedantic warnings (jwk burps: please be more specific
  here, please!)
@@ -4309,18 +4846,37 @@ cyclomatic complexity
 
 \series bold 
 ---print-search-dirs
+\begin_inset LatexCommand \index{---print-search-dirs}
+
+\end_inset 
+
+
 \series default 
  Display the directories in the compiler's search path
 \layout Subsubsection
 
 Intermediate Dump Options
+\begin_inset LatexCommand \index{Options Intermediate Dump}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Intermediate Dump Options}
+
+\end_inset 
+
+
 \layout Standard
 
 The following options are provided for the purpose of retargetting and debugging
  the compiler.
- These provided a means to dump the intermediate code (iCode) generated
- by the compiler in human readable form at various stages of the compilation
- process.
+ These provided a means to dump the intermediate code (iCode
+\begin_inset LatexCommand \index{iCode}
+
+\end_inset 
+
+) generated by the compiler in human readable form at various stages of
+ the compilation process.
  
 \layout List
 \labelwidthstring 00.00.0000
@@ -4328,6 +4884,11 @@ The following options are provided for the purpose of retargetting and debugging
 
 \series bold 
 ---dumpraw
+\begin_inset LatexCommand \index{---dumpraw}
+
+\end_inset 
+
+
 \series default 
  This option will cause the compiler to dump the intermediate code into
  a file of named 
@@ -4336,17 +4897,31 @@ The following options are provided for the purpose of retargetting and debugging
 \emph default 
  just after the intermediate code has been generated for a function, i.e.
  before any optimizations are done.
- The basic blocks at this stage ordered in the depth first number, so they
- may not be in sequence of execution.
+ The basic blocks
+\begin_inset LatexCommand \index{basic blocks}
+
+\end_inset 
+
+ at this stage ordered in the depth first number, so they may not be in
+ sequence of execution.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---dumpgcse
+\begin_inset LatexCommand \index{---dumpgcse}
+
+\end_inset 
+
+
 \series default 
- Will create a dump of iCode's, after global subexpression elimination,
- into a file named 
+ Will create a dump of iCode's, after global subexpression elimination
+\begin_inset LatexCommand \index{global subexpression elimination}
+
+\end_inset 
+
+, into a file named 
 \emph on 
 <source filename>.dumpgcse.
 \layout List
@@ -4355,9 +4930,18 @@ The following options are provided for the purpose of retargetting and debugging
 
 \series bold 
 ---dumpdeadcode
+\begin_inset LatexCommand \index{---dumpdeadcode}
+
+\end_inset 
+
+
 \series default 
- Will create a dump of iCode's, after deadcode elimination, into a file
- named 
+ Will create a dump of iCode's, after deadcode elimination
+\begin_inset LatexCommand \index{deadcode elimination}
+
+\end_inset 
+
+, into a file named 
 \emph on 
 <source filename>.dumpdeadcode.
 \layout List
@@ -4366,12 +4950,21 @@ The following options are provided for the purpose of retargetting and debugging
 
 \series bold 
 ---dumploop
+\begin_inset LatexCommand \index{---dumploop}
+
+\end_inset 
+
+
 \series default 
 \size large 
  
 \size default 
-Will create a dump of iCode's, after loop optimizations, into a file named
- 
+Will create a dump of iCode's, after loop optimizations
+\begin_inset LatexCommand \index{loop optimizations}
+
+\end_inset 
+
+, into a file named 
 \emph on 
 <source filename>.dumploop.
 \layout List
@@ -4380,12 +4973,21 @@ Will create a dump of iCode's, after loop optimizations, into a file named
 
 \series bold 
 ---dumprange
+\begin_inset LatexCommand \index{---dumprange}
+
+\end_inset 
+
+
 \series default 
 \size large 
  
 \size default 
-Will create a dump of iCode's, after live range analysis, into a file named
- 
+Will create a dump of iCode's, after live range analysis
+\begin_inset LatexCommand \index{live range analysis}
+
+\end_inset 
+
+, into a file named 
 \emph on 
 <source filename>.dumprange.
 \layout List
@@ -4394,20 +4996,39 @@ Will create a dump of iCode's, after live range analysis, into a file named
 
 \series bold 
 ---dumlrange
+\begin_inset LatexCommand \index{---dumlrange}
+
+\end_inset 
+
+
 \series default 
- Will dump the life ranges for all symbols.
+ Will dump the life ranges
+\begin_inset LatexCommand \index{life ranges}
+
+\end_inset 
+
+ for all symbols.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
 ---dumpregassign
+\begin_inset LatexCommand \index{---dumpregassign}
+
+\end_inset 
+
+
 \bar under 
  
 \series default 
 \bar default 
-Will create a dump of iCode's, after register assignment, into a file named
- 
+Will create a dump of iCode's, after register assignment
+\begin_inset LatexCommand \index{register assignment}
+
+\end_inset 
+
+, into a file named 
 \emph on 
 <source filename>.dumprassgn.
 \layout List
@@ -4416,6 +5037,11 @@ Will create a dump of iCode's, after register assignment, into a file named
 
 \series bold 
 ---dumplrange
+\begin_inset LatexCommand \index{---dumplrange}
+
+\end_inset 
+
+
 \series default 
  Will create a dump of the live ranges of iTemp's
 \layout List
@@ -4424,6 +5050,11 @@ Will create a dump of iCode's, after register assignment, into a file named
 
 \series bold 
 ---dumpall
+\begin_inset LatexCommand \index{---dumpall}
+
+\end_inset 
+
+
 \size large 
 \bar under 
  
@@ -4434,6 +5065,11 @@ Will cause all the above mentioned dumps to be created.
 \layout Subsection
 
 Environment variables
+\begin_inset LatexCommand \index{Environment variables}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC recognizes the following environment variables:
@@ -4443,9 +5079,18 @@ SDCC recognizes the following environment variables:
 
 \series bold 
 SDCC_LEAVE_SIGNALS
+\begin_inset LatexCommand \index{SDCC\_LEAVE\_SIGNALS}
+
+\end_inset 
+
+
 \series default 
- SDCC installs a signal handler to be able to delete temporary files after
- an user break (^C) or an exception.
+ SDCC installs a signal handler
+\begin_inset LatexCommand \index{ signal handler}
+
+\end_inset 
+
+ to be able to delete temporary files after an user break (^C) or an exception.
  If this environment variable is set, SDCC won't install the signal handler
  in order to be able to debug SDCC.
 \layout List
@@ -4453,9 +5098,24 @@ SDCC_LEAVE_SIGNALS
 
 
 \series bold 
-TMP,\SpecialChar ~
-TEMP,\SpecialChar ~
+TMP
+\begin_inset LatexCommand \index{TMP}
+
+\end_inset 
+
+,\SpecialChar ~
+TEMP
+\begin_inset LatexCommand \index{TEMP}
+
+\end_inset 
+
+,\SpecialChar ~
 TMPDIR
+\begin_inset LatexCommand \index{TMPDIR}
+
+\end_inset 
+
+
 \series default 
  Path, where temporary files will be created.
  The order of the variables is the search order.
@@ -4468,6 +5128,11 @@ TMPDIR
 
 \series bold 
 SDCC_HOME
+\begin_inset LatexCommand \index{SDCC\_HOME}
+
+\end_inset 
+
+
 \series default 
  Path, see 
 \begin_inset Quotes sld
@@ -4484,6 +5149,11 @@ SDCC_HOME
 
 \series bold 
 SDCC_INCLUDE
+\begin_inset LatexCommand \index{SDCC\_INCLUDE}
+
+\end_inset 
+
+
 \series default 
  Path, see 
 \begin_inset Quotes sld
@@ -4500,6 +5170,11 @@ SDCC_INCLUDE
 
 \series bold 
 SDCC_LIB
+\begin_inset LatexCommand \index{SDCC\_LIB}
+
+\end_inset 
+
+
 \series default 
  Path, see 
 \begin_inset Quotes sld
@@ -4517,7 +5192,12 @@ There are some more environment variables recognized by SDCC, but these
  They can change or disappear very quickly, and will never be documentated.
 \layout Subsection
 
-MCS51/DS390 Storage Class Language Extensions
+MCS51/DS390 Storage Class
+\begin_inset LatexCommand \index{Storage Class}
+
+\end_inset 
+
+ Language Extensions
 \layout Standard
 
 In addition to the ANSI storage classes SDCC allows the following MCS51
@@ -4525,6 +5205,11 @@ In addition to the ANSI storage classes SDCC allows the following MCS51
 \layout Subsubsection
 
 xdata
+\begin_inset LatexCommand \index{xdata}
+
+\end_inset 
+
+
 \layout Standard
 
 Variables declared with this storage class will be placed in the extern
@@ -4543,6 +5228,11 @@ xdata unsigned char xduc;
 \layout Subsubsection
 
 data
+\begin_inset LatexCommand \index{data}
+
+\end_inset 
+
+
 \layout Standard
 
 This is the 
@@ -4561,6 +5251,11 @@ data int iramdata;
 \layout Subsubsection
 
 idata
+\begin_inset LatexCommand \index{idata}
+
+\end_inset 
+
+
 \layout Standard
 
 Variables declared with this storage class will be allocated into the indirectly
@@ -4574,6 +5269,11 @@ idata int idi;
 \layout Subsubsection
 
 bit
+\begin_inset LatexCommand \index{bit}
+
+\end_inset 
+
+
 \layout Standard
 
 This is a data-type and a storage class specifier.
@@ -4587,7 +5287,17 @@ This is a data-type and a storage class specifier.
 bit iFlag;
 \layout Subsubsection
 
-sfr / sbit
+sfr
+\begin_inset LatexCommand \index{sfr}
+
+\end_inset 
+
+ / sbit
+\begin_inset LatexCommand \index{sbit}
+
+\end_inset 
+
+
 \layout Standard
 
 Like the bit keyword, 
@@ -4603,14 +5313,29 @@ signifies both a data-type and storage class, they are used to describe
 \family typewriter 
 sfr at 0x80 P0; /* special function register P0 at location 0x80 */
 \newline 
-sbit at 0xd7 CY; /* CY (Carry Flag) */
+sbit at 0xd7 CY; /* CY (Carry Flag
+\begin_inset LatexCommand \index{Carry flag}
+
+\end_inset 
+
+) */
 \layout Subsection
 
 Pointers
+\begin_inset LatexCommand \index{Pointers}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC allows (via language extensions) pointers to explicitly point to any
- of the memory spaces of the 8051.
+ of the memory spaces
+\begin_inset LatexCommand \index{memory spaces}
+
+\end_inset 
+
+ of the 8051.
  In addition to the explicit pointers, the compiler uses (by default) generic
  pointers which can be used to point to any of the memory spaces.
 \newline 
@@ -4689,7 +5414,17 @@ generic
  code.
 \layout Subsection
 
-Parameters & Local Variables
+Parameters
+\begin_inset LatexCommand \index{Parameters}
+
+\end_inset 
+
+ & Local Variables
+\begin_inset LatexCommand \index{Local Variables}
+
+\end_inset 
+
+
 \layout Standard
 
 Automatic (local) variables and parameters to functions can either be placed
@@ -4699,18 +5434,43 @@ Automatic (local) variables and parameters to functions can either be placed
  This in fact makes them 
 \emph on 
 static
+\begin_inset LatexCommand \index{static}
+
+\end_inset 
+
+
 \emph default 
- so by default functions are non-reentrant.
+ so by default functions are non-reentrant
+\begin_inset LatexCommand \index{non-reentrant}
+
+\end_inset 
+
+.
 \newline 
 
 \newline 
-They can be placed on the stack either by using the
+They can be placed on the stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ either by using the
 \emph on 
  ---stack-auto
+\begin_inset LatexCommand \index{--stack-auto}
+
+\end_inset 
+
+
 \emph default 
  option or by using the 
 \emph on 
 reentrant
+\begin_inset LatexCommand \index{reentrant}
+
+\end_inset 
+
+
 \emph default 
  keyword in the function declaration, e.g.:
 \newline 
@@ -4752,8 +5512,12 @@ does not
 \newline 
 
 \newline 
-Local variables can be assigned storage classes and absolute addresses,
- e.g.: 
+Local variables can be assigned storage classes and absolute
+\begin_inset LatexCommand \index{absolute}
+
+\end_inset 
+
+ addresses, e.g.: 
 \newline 
 
 \newline 
@@ -4822,6 +5586,11 @@ Parameters however are not allowed any storage class, (storage classes for
 \layout Subsection
 
 Overlaying
+\begin_inset LatexCommand \index{Overlaying}
+
+\end_inset 
+
+
 \layout Standard
 
 For non-reentrant functions SDCC will try to reduce internal ram space usage
@@ -4830,7 +5599,12 @@ For non-reentrant functions SDCC will try to reduce internal ram space usage
 e segment if the function has 
 \emph on 
 no other function calls and the function is non-reentrant and the memory
- model is small.
+ model
+\begin_inset LatexCommand \index{memory model}
+
+\end_inset 
+
+ is small.
 
 \emph default 
  If an explicit storage class is specified for a local variable, it will
@@ -4841,20 +5615,39 @@ Note that the compiler (not the linkage editor) makes the decision for overlayin
 g the data items.
  Functions that are called from an interrupt service routine should be preceded
  by a #pragma\SpecialChar ~
-NOOVERLAY if they are not reentrant.
+NOOVERLAY
+\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+
+\end_inset 
+
+ if they are not reentrant.
 \layout Standard
 
-Also note that the compiler does not do any processing of inline assembler
- code, so the compiler might incorrectly assign local variables and parameters
- of a function into the overlay segment if the inline assembler code calls
- other c-functions that might use the overlay.
+Also note that the compiler does not do any processing of inline
+\begin_inset LatexCommand \index{inline}
+
+\end_inset 
+
+ assembler code, so the compiler might incorrectly assign local variables
+ and parameters of a function into the overlay segment if the inline assembler
+ code calls other c-functions that might use the overlay.
  In that case the #pragma\SpecialChar ~
 NOOVERLAY should be used.
 \layout Standard
 
 Parameters and Local variables of functions that contain 16 or 32 bit multiplica
-tion or division will NOT be overlayed since these are implemented using
- external functions, e.g.:
+tion
+\begin_inset LatexCommand \index{multiplication}
+
+\end_inset 
+
+ or division
+\begin_inset LatexCommand \index{division}
+
+\end_inset 
+
+ will NOT be overlayed since these are implemented using external functions,
+ e.g.:
 \newline 
 
 \newline 
@@ -4862,7 +5655,12 @@ tion or division will NOT be overlayed since these are implemented using
 \family typewriter 
 #pragma SAVE 
 \newline 
-#pragma NOOVERLAY 
+#pragma NOOVERLAY
+\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+
+\end_inset 
+
+ 
 \newline 
 void set_error(unsigned char errcd) 
 \newline 
@@ -4880,7 +5678,17 @@ P3 = errcd;
 \newline 
 
 \newline 
-void some_isr () interrupt 2 using 1 
+void some_isr () interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ 2 using
+\begin_inset LatexCommand \index{using}
+
+\end_inset 
+
+ 1 
 \newline 
 {
 \newline 
@@ -4927,6 +5735,11 @@ NOOVERLAY ensures that the parameters and local variables for
 \layout Subsection
 
 Interrupt Service Routines
+\begin_inset LatexCommand \index{Interrupt Service Routines}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC allows interrupt service routines to be coded in C, with some extended
@@ -4952,6 +5765,11 @@ void timer_isr (void) interrupt 2 using 1
 The number following the 
 \emph on 
 interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+
 \emph default 
  keyword is the interrupt number this routine will service.
  The compiler will insert a call to this routine in the interrupt vector
@@ -4964,7 +5782,12 @@ using
  (8051 specific) when generating code for this function.
  Note that when some function is called from an interrupt service routine
  it should be preceded by a #pragma\SpecialChar ~
-NOOVERLAY if it is not reentrant.
+NOOVERLAY
+\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+
+\end_inset 
+
+ if it is not reentrant.
  A special note here, int (16 bit) and long (32 bit) integer division, multiplic
 ation & modulus operations are implemented using external support routines
  developed in ANSI-C, if an interrupt service routine needs to do any of
@@ -4972,12 +5795,22 @@ ation & modulus operations are implemented using external support routines
  section) will have to be recompiled using the
 \emph on 
  ---stack-auto
+\begin_inset LatexCommand \index{---stack-auto}
+
+\end_inset 
+
+
 \emph default 
  option and the source file will need to be compiled using the 
 \emph on 
 ---int-long-ren
 \emph default 
-t compiler option.
+t
+\begin_inset LatexCommand \index{---int-long-rent}
+
+\end_inset 
+
+ compiler option.
 \layout Standard
 
 If you have multiple source files in your project, interrupt service routines
@@ -4991,8 +5824,12 @@ main
 
 Interrupt Numbers and the corresponding address & descriptions for the Standard
  8051 are listed below.
- SDCC will automatically adjust the interrupt vector table to the maximum
- interrupt number specified.
+ SDCC will automatically adjust the interrupt vector table
+\begin_inset LatexCommand \index{ interrupt vector table}
+
+\end_inset 
+
+ to the maximum interrupt number specified.
 \newline 
 
 \layout Standard
@@ -5171,6 +6008,11 @@ Serial
 If the interrupt service routine is defined without 
 \emph on 
 using
+\begin_inset LatexCommand \index{using}
+
+\end_inset 
+
+
 \emph default 
  a register bank or with register bank 0 (using 0), the compiler will save
  the registers used by itself on the stack upon entry and restore them at
@@ -5248,11 +6090,21 @@ reentrant.
 \layout Subsection
 
 Naked Functions
+\begin_inset LatexCommand \index{Naked Functions}
+
+\end_inset 
+
+
 \layout Standard
 
 A special keyword may be associated with a function declaring it as 
 \emph on 
-_naked.
+_naked
+\begin_inset LatexCommand \index{\_naked}
+
+\end_inset 
+
+.
  
 \emph default 
 The 
@@ -5260,7 +6112,16 @@ The
 _naked
 \emph default 
  function modifier attribute prevents the compiler from generating prologue
- and epilogue code for that function.
+\begin_inset LatexCommand \index{function prologue}
+
+\end_inset 
+
+ and epilogue
+\begin_inset LatexCommand \index{function epilogue}
+
+\end_inset 
+
+ code for that function.
  This means that the user is entirely responsible for such things as saving
  any registers that may need to be preserved, selecting the proper register
  bank, generating the 
@@ -5280,7 +6141,12 @@ return
 \family typewriter 
 data unsigned char counter;
 \newline 
-void simpleInterrupt(void) interrupt 1
+void simpleInterrupt(void) interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ 1
 \newline 
 {
 \newline 
@@ -5523,16 +6389,31 @@ While there is nothing preventing you from writing C code inside a _naked
 \layout Subsection
 
 Functions using private banks
+\begin_inset LatexCommand \index{banks}
+
+\end_inset 
+
+
 \layout Standard
 
 The 
 \emph on 
 using
+\begin_inset LatexCommand \index{using}
+
+\end_inset 
+
+
 \emph default 
  attribute (which tells the compiler to use a register bank other than the
  default bank zero) should only be applied to 
 \emph on 
 interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+
 \emph default 
  functions (see note 1 below).
  This will in most circumstances make the generated ISR code more efficient
@@ -5575,8 +6456,13 @@ interrupt
 \emph default 
  function using a non-zero bank will assume that it can trash that register
  bank, and will not save it.
- Since high-priority interrupts can interrupt low-priority ones on the 8051
- and friends, this means that if a high-priority ISR 
+ Since high-priority interrupts
+\begin_inset LatexCommand \index{interrupt priority}
+
+\end_inset 
+
+ can interrupt low-priority ones on the 8051 and friends, this means that
+ if a high-priority ISR 
 \emph on 
 using
 \emph default 
@@ -5607,11 +6493,21 @@ It is most efficient if your ISR calls no other functions.
 \layout Subsection
 
 Absolute Addressing
+\begin_inset LatexCommand \index{Absolute Addressing}
+
+\end_inset 
+
+
 \layout Standard
 
 Data items can be assigned an absolute address with the 
 \emph on 
-at <address>
+at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ <address>
 \emph default 
  keyword, in addition to a storage class, e.g.:
 \newline 
@@ -5619,7 +6515,17 @@ at <address>
 \newline 
 
 \family typewriter 
-xdata at 0x8000 unsigned char PORTA_8255 ;
+xdata
+\begin_inset LatexCommand \index{xdata}
+
+\end_inset 
+
+ at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x8000 unsigned char PORTA_8255 ;
 \newline 
 
 \family default 
@@ -5636,8 +6542,22 @@ memory mapped
  in this way (they are implemented with an equate in the assembler).
  Thus it is left to the programmer to make sure there are no overlaps with
  other variables that are declared without the absolute address.
- The assembler listing file (.lst) and the linker output files (.rst) and
- (.map) are a good places to look for such overlaps.
+ The assembler listing file (.lst
+\begin_inset LatexCommand \index{.lst}
+
+\end_inset 
+
+) and the linker output files (.rst
+\begin_inset LatexCommand \index{.rst}
+
+\end_inset 
+
+) and (.map
+\begin_inset LatexCommand \index{.map}
+
+\end_inset 
+
+) are a good places to look for such overlaps.
 \newline 
 
 \newline 
@@ -5648,7 +6568,17 @@ Absolute address can be specified for variables in all storage classes,
 \newline 
 
 \family typewriter 
-bit at 0x02 bvar;
+bit
+\begin_inset LatexCommand \index{bit}
+
+\end_inset 
+
+ at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x02 bvar;
 \newline 
 
 \newline 
@@ -5661,11 +6591,21 @@ le space.
 \layout Subsection
 
 Startup Code
+\begin_inset LatexCommand \index{Startup Code}
+
+\end_inset 
+
+
 \layout Standard
 
 The compiler inserts a call to the C routine 
 \emph on 
 _sdcc_external_startup()
+\begin_inset LatexCommand \index{\_sdcc\_external\_startup()}
+
+\end_inset 
+
+
 \series bold 
 \emph default 
  
@@ -5686,6 +6626,11 @@ _sdcc_external_startup()
 \layout Subsection
 
 Inline Assembler Code
+\begin_inset LatexCommand \index{Inline Assembler Code}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC allows the use of in-line assembler with a few restriction as regards
@@ -5712,9 +6657,19 @@ per function
  When the 
 \emph on 
 ---peep-asm
+\begin_inset LatexCommand \index{--peep-asm}
+
+\end_inset 
+
+
 \emph default 
  command line option is used, the inline assembler code will be passed through
- the peephole optimizer.
+ the peephole optimizer
+\begin_inset LatexCommand \index{Peephole optimizer}
+
+\end_inset 
+
+.
  This might cause some unexpected changes in the inline assembler code.
  Please go throught the peephole optimizer rules defined in file 
 \emph on 
@@ -5726,7 +6681,12 @@ SDCCpeeph.def
 \newline 
 
 \family typewriter 
-_asm 
+_asm
+\begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+ 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -5751,7 +6711,12 @@ djnz\SpecialChar ~
 \SpecialChar ~
 b,00001$ 
 \newline 
-_endasm ;
+_endasm
+\begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+ ;
 \family default 
 \size small 
 
@@ -5773,7 +6738,12 @@ _asm ...
 
 \newline 
 Inline assembler code cannot reference any C-Labels, however it can reference
- labels defined by the inline assembler, e.g.:
+ labels
+\begin_inset LatexCommand \index{Labels}
+
+\end_inset 
+
+ defined by the inline assembler, e.g.:
 \newline 
 
 \newline 
@@ -5864,7 +6834,17 @@ The same goes the other way, ie.
  labels defines in inline assembly CANNOT be accessed by C statements.
 \layout Subsection
 
-int (16 bit) and long (32 bit) Support
+int (16 bit)
+\begin_inset LatexCommand \index{int (16 bit)}
+
+\end_inset 
+
+ and long (32 bit)
+\begin_inset LatexCommand \index{long (32 bit)}
+
+\end_inset 
+
+ Support
 \layout Standard
 
 For signed & unsigned int (16 bit) and long (32 bit) variables, division,
@@ -5918,20 +6898,50 @@ Since they are compiled as
 \emph on 
 non-reentrant
 \emph default 
-, interrupt service routines should not do any of the above operations.
+
+\begin_inset LatexCommand \index{reentrant}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{non-reentrant}
+
+\end_inset 
+
+, interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ service routines should not do any of the above operations.
  If this is unavoidable then the above routines will need to be compiled
  with the 
 \emph on 
 ---stack-auto
+\begin_inset LatexCommand \index{---stack-auto}
+
+\end_inset 
+
+
 \emph default 
  option, after which the source program will have to be compiled with 
 \emph on 
 ---int-long-rent
+\begin_inset LatexCommand \index{---int-long-rent}
+
+\end_inset 
+
+
 \emph default 
  option.
 \layout Subsection
 
 Floating Point Support
+\begin_inset LatexCommand \index{Floating Point Support}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC supports IEEE (single precision 4bytes) floating point numbers.The floating
@@ -5993,6 +7003,16 @@ Note if all these routines are used simultaneously the data space might
 \layout Subsection
 
 MCS51 Memory Models
+\begin_inset LatexCommand \index{Memory Models}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{MCS51 Memory Models}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC allows two memory models for MCS51 code, small and large.
@@ -6015,18 +7035,37 @@ When the large model is used all variables declared without a storage class
  in the internal ram.
 \layout Standard
 
-Judicious usage of the processor specific storage classes and the 'reentrant'
- function type will yield much more efficient code, than using the large
- model.
+Judicious usage of the processor specific storage classes
+\begin_inset LatexCommand \index{storage classes}
+
+\end_inset 
+
+ and the 'reentrant' function type will yield much more efficient code,
+ than using the large model.
  Several optimizations are disabled when the program is compiled using the
  large model, it is therefore strongly recommdended that the small model
  be used unless absolutely required.
 \layout Subsection
 
 DS390 Memory Models
+\begin_inset LatexCommand \index{Memory Models}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{DS390 Memory Models}
+
+\end_inset 
+
+
 \layout Standard
 
-The only model supported is Flat 24.
+The only model supported is Flat 24
+\begin_inset LatexCommand \index{Flat 24}
+
+\end_inset 
+
+.
  This generates code for the 24 bit contiguous addressing mode of the Dallas
  DS80C390 part.
  In this mode, up to four meg of external RAM or code space can be directly
@@ -6060,6 +7099,11 @@ tinibios
 \emph on 
 tinibios
 \emph default 
+
+\begin_inset LatexCommand \index{tinibios}
+
+\end_inset 
+
 , the boot loader or similar code must ensure that the processor is in 24
  bit contiguous addressing mode before calling the SDCC startup code.
 \newline 
@@ -6088,58 +7132,132 @@ Segments may be placed anywhere in the 4 meg address space using the usual
 \layout Subsection
 
 Defines Created by the Compiler
+\begin_inset LatexCommand \index{Defines Created by the Compiler}
+
+\end_inset 
+
+
 \layout Standard
 
-The compiler creates the following #defines.
+The compiler creates the following #defines
+\begin_inset LatexCommand \index{\#defines}
+
+\end_inset 
+
+.
 \layout Itemize
 
-SDCC - this Symbol is always defined.
+SDCC
+\begin_inset LatexCommand \index{SDCC}
+
+\end_inset 
+
+ - this Symbol is always defined.
 \layout Itemize
 
-SDCC_mcs51 or SDCC_ds390 or SDCC_z80, etc - depending on the model used
- (e.g.: -mds390)
+SDCC_mcs51
+\begin_inset LatexCommand \index{SDCC\_mcs51}
+
+\end_inset 
+
+ or SDCC_ds390
+\begin_inset LatexCommand \index{SDCC\_ds390}
+
+\end_inset 
+
+ or SDCC_z80
+\begin_inset LatexCommand \index{SDCC\_z80}
+
+\end_inset 
+
+, etc - depending on the model used (e.g.: -mds390)
 \layout Itemize
 
-__mcs51 or __ds390 or __z80, etc - depending on the model used (e.g.
+__mcs51
+\begin_inset LatexCommand \index{\_\_mcs51}
+
+\end_inset 
+
+ or __ds390
+\begin_inset LatexCommand \index{\_\_ds390}
+
+\end_inset 
+
+ or __z80
+\begin_inset LatexCommand \index{\_\_z80}
+
+\end_inset 
+
+, etc - depending on the model used (e.g.
  -mz80)
 \layout Itemize
 
-SDCC_STACK_AUTO - this symbol is defined when 
+SDCC_STACK_AUTO
+\begin_inset LatexCommand \index{SDCC\_STACK\_AUTO}
+
+\end_inset 
+
+ - this symbol is defined when 
 \emph on 
 ---stack-auto
 \emph default 
  option is used.
 \layout Itemize
 
-SDCC_MODEL_SMALL - when 
+SDCC_MODEL_SMALL
+\begin_inset LatexCommand \index{SDCC\_MODEL\_SMALL}
+
+\end_inset 
+
+ - when 
 \emph on 
 ---model-small
 \emph default 
  is used.
 \layout Itemize
 
-SDCC_MODEL_LARGE - when 
+SDCC_MODEL_LARGE
+\begin_inset LatexCommand \index{SDCC\_MODEL\_LARGE}
+
+\end_inset 
+
+ - when 
 \emph on 
 ---model-large
 \emph default 
  is used.
 \layout Itemize
 
-SDCC_USE_XSTACK - when 
+SDCC_USE_XSTACK
+\begin_inset LatexCommand \index{SDCC\_USE\_XSTACK}
+
+\end_inset 
+
+ - when 
 \emph on 
 ---xstack
 \emph default 
  option is used.
 \layout Itemize
 
-SDCC_STACK_TENBIT - when 
+SDCC_STACK_TENBIT
+\begin_inset LatexCommand \index{SDCC\_STACK\_TENBIT}
+
+\end_inset 
+
+ - when 
 \emph on 
 -mds390
 \emph default 
  is used
 \layout Itemize
 
-SDCC_MODEL_FLAT24 - when 
+SDCC_MODEL_FLAT24
+\begin_inset LatexCommand \index{SDCC\_MODEL\_FLAT24}
+
+\end_inset 
+
+ - when 
 \emph on 
 -mds390
 \emph default 
@@ -6150,6 +7268,11 @@ SDCC Technical Data
 \layout Subsection
 
 Optimizations
+\begin_inset LatexCommand \index{Optimizations}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC performs a host of standard optimizations in addition to some MCU specific
@@ -6158,6 +7281,11 @@ SDCC performs a host of standard optimizations in addition to some MCU specific
 \layout Subsubsection
 
 Sub-expression Elimination
+\begin_inset LatexCommand \index{Sub-expression Elimination}
+
+\end_inset 
+
+
 \layout Standard
 
 The compiler does local and global common subexpression elimination, e.g.:
@@ -6226,6 +7354,11 @@ The compiler will try to keep these temporary variables in registers.
 \layout Subsubsection
 
 Dead-Code Elimination
+\begin_inset LatexCommand \index{Dead-Code Elimination}
+
+\end_inset 
+
+
 \layout Standard
 
 
@@ -6289,6 +7422,11 @@ return;
 \layout Subsubsection
 
 Copy-Propagation
+\begin_inset LatexCommand \index{Copy-Propagation}
+
+\end_inset 
+
+
 \layout Standard
 
 
@@ -6352,6 +7490,11 @@ Note: the dead stores created by this copy propagation will be eliminated
 \layout Subsubsection
 
 Loop Optimizations
+\begin_inset LatexCommand \index{Loop Optimizations}
+
+\end_inset 
+
+
 \layout Standard
 
 Two types of loop optimizations are done by SDCC loop invariant lifting
@@ -6359,15 +7502,29 @@ Two types of loop optimizations are done by SDCC loop invariant lifting
  In addition to the strength reduction the optimizer marks the induction
  variables and the register allocator tries to keep the induction variables
  in registers for the duration of the loop.
- Because of this preference of the register allocator, loop induction optimizati
-on causes an increase in register pressure, which may cause unwanted spilling
- of other temporary variables into the stack / data space.
+ Because of this preference of the register allocator
+\begin_inset LatexCommand \index{Register allocator}
+
+\end_inset 
+
+, loop induction optimization causes an increase in register pressure, which
+ may cause unwanted spilling of other temporary variables into the stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ / data space.
  The compiler will generate a warning message when it is forced to allocate
  extra space either on the stack or data space.
  If this extra space allocation is undesirable then induction optimization
  can be eliminated either for the entire source file (with ---noinduction
  option) or for a given function only using #pragma\SpecialChar ~
-NOINDUCTION.
+NOINDUCTION
+\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+
+\end_inset 
+
+.
 \newline 
 
 \newline 
@@ -6410,8 +7567,12 @@ As mentioned previously some loop invariants are not as apparent, all static
 \newline 
 
 \newline 
-Strength Reduction, this optimization substitutes an expression by a cheaper
- expression:
+Strength Reduction
+\begin_inset LatexCommand \index{Strength Reduction}
+
+\end_inset 
+
+, this optimization substitutes an expression by a cheaper expression:
 \newline 
 
 \newline 
@@ -6457,10 +7618,20 @@ itemp2 += 3;
 \newline 
 
 \newline 
-The more expensive multiplication is changed to a less expensive addition.
+The more expensive multiplication
+\begin_inset LatexCommand \index{multiplication}
+
+\end_inset 
+
+ is changed to a less expensive addition.
 \layout Subsubsection
 
 Loop Reversing
+\begin_inset LatexCommand \index{Loop Reversing}
+
+\end_inset 
+
+
 \layout Standard
 
 This optimization is done to reduce the overhead of checking loop boundaries
@@ -6548,15 +7719,29 @@ i = j / 1 ; /* changed to */ i = j;
 \newline 
 
 \newline 
-Note the subexpressions given above are generally introduced by macro expansions
- or as a result of copy/constant propagation.
+Note the subexpressions
+\begin_inset LatexCommand \index{subexpressions}
+
+\end_inset 
+
+ given above are generally introduced by macro expansions or as a result
+ of copy/constant propagation.
 \layout Subsubsection
 
 'switch' Statements
+\begin_inset LatexCommand \index{switch Statements}
+
+\end_inset 
+
+
 \layout Standard
 
-SDCC changes switch statements to jump tables when the following conditions
- are true.
+SDCC changes switch statements to jump tables
+\begin_inset LatexCommand \index{jump tables}
+
+\end_inset 
+
+ when the following conditions are true.
  
 \layout Itemize
 
@@ -6784,7 +7969,12 @@ then both the switch statements will be implemented using jump-tables whereas
  the unmodified switch statement will not be.
 \layout Subsubsection
 
-Bit-shifting Operations.
+Bit-shifting Operations
+\begin_inset LatexCommand \index{Bit-shifting Operations}
+
+\end_inset 
+
+.
 \layout Standard
 
 Bit shifting is one of the most frequently used operation in embedded programmin
@@ -6872,6 +8062,11 @@ Note that SDCC stores numbers in little-endian format (i.e.
 \layout Subsubsection
 
 Bit-rotation
+\begin_inset LatexCommand \index{Bit-rotation}
+
+\end_inset 
+
+
 \layout Standard
 
 A special case of the bit-shift operation is bit rotation, SDCC recognizes
@@ -6921,6 +8116,11 @@ i = ((i >> 7) | (i << 1)); /* left-bit rotation */
 \layout Subsubsection
 
 Highest Order Bit
+\begin_inset LatexCommand \index{Highest Order Bit}
+
+\end_inset 
+
+
 \layout Standard
 
 It is frequently required to obtain the highest order bit of an integral
@@ -7173,7 +8373,12 @@ xyz = gint + ((gint >> 15) & 1);
 will still be recognized.
 \layout Subsubsection
 
-Peep-hole Optimizer
+Peephole Optimizer
+\begin_inset LatexCommand \index{Peephole optimizer}
+
+\end_inset 
+
+
 \layout Standard
 
 The compiler uses a rule based, pattern matching and re-writing mechanism
@@ -7187,7 +8392,12 @@ copt
  A default set of rules are compiled into the compiler, additional rules
  may be added with the 
 \emph on 
----peep-file <filename>
+---peep-file
+\begin_inset LatexCommand \index{---peep-file}
+
+\end_inset 
+
+ <filename>
 \emph default 
  option.
  The rule language is best illustrated with examples.
@@ -7578,45 +8788,95 @@ g the variable bindings is passed as a parameter).
 \layout Subsection
 
 Pragmas
+\begin_inset LatexCommand \index{Pragmas}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC supports the following #pragma directives.
 \layout Itemize
 
-SAVE - this will save all current options to the SAVE/RESTORE stack.
+SAVE
+\begin_inset LatexCommand \index{\#pragma SAVE}
+
+\end_inset 
+
+ - this will save all current options to the SAVE/RESTORE stack.
  See RESTORE.
 \layout Itemize
 
-RESTORE - will restore saved options from the last save.
+RESTORE
+\begin_inset LatexCommand \index{\#pragma RESTORE}
+
+\end_inset 
+
+ - will restore saved options from the last save.
  SAVEs & RESTOREs can be nested.
  SDCC uses a SAVE/RESTORE stack: SAVE pushes current options to the stack,
  RESTORE pulls current options from the stack.
  See SAVE.
 \layout Itemize
 
-NOGCSE - will stop global subexpression elimination.
+NOGCSE
+\begin_inset LatexCommand \index{\#pragma NOGCSE}
+
+\end_inset 
+
+ - will stop global subexpression elimination.
 \layout Itemize
 
-NOINDUCTION - will stop loop induction optimizations.
+NOINDUCTION
+\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+
+\end_inset 
+
+ - will stop loop induction optimizations.
 \layout Itemize
 
-NOJTBOUND - will not generate code for boundary value checking, when switch
- statements are turned into jump-tables.
+NOJTBOUND
+\begin_inset LatexCommand \index{\#pragma NOJTBOUND}
+
+\end_inset 
+
+ - will not generate code for boundary value checking, when switch statements
+ are turned into jump-tables.
 \layout Itemize
 
-NOOVERLAY - the compiler will not overlay the parameters and local variables
- of a function.
+NOOVERLAY
+\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+
+\end_inset 
+
+ - the compiler will not overlay the parameters and local variables of a
+ function.
 \layout Itemize
 
-LESS_PEDANTIC - the compiler will not warn you anymore for obvious mistakes,
- you'r on your own now ;-(
+LESS_PEDANTIC
+\begin_inset LatexCommand \index{\#pragma LESS\_PEDANTIC}
+
+\end_inset 
+
+ - the compiler will not warn you anymore for obvious mistakes, you'r on
+ your own now ;-(
 \layout Itemize
 
-NOLOOPREVERSE - Will not do loop reversal optimization
+NOLOOPREVERSE
+\begin_inset LatexCommand \index{\#pragma NOLOOPREVERSE}
+
+\end_inset 
+
+ - Will not do loop reversal optimization
 \layout Itemize
 
-EXCLUDE NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation
- of pair of push/pop instruction in ISR function (using interrupt keyword).
+EXCLUDE
+\begin_inset LatexCommand \index{\#pragma EXCLUDE}
+
+\end_inset 
+
+ NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation of
+ pair of push/pop instruction in ISR function (using interrupt keyword).
  The directive should be placed immediately before the ISR function definition
  and it affects ALL ISR functions following it.
  To enable the normal register saving for ISR functions use #pragma\SpecialChar ~
@@ -7624,7 +8884,12 @@ EXCLUDE\SpecialChar ~
 none.
 \layout Itemize
 
-NOIV - Do not generate interrupt vector table entries for all ISR functions
+NOIV
+\begin_inset LatexCommand \index{\#pragma NOIV}
+
+\end_inset 
+
+ - Do not generate interrupt vector table entries for all ISR functions
  defined after the pragma.
  This is useful in cases where the interrupt vector table must be defined
  manually, or when there is a secondary, manually defined interrupt vector
@@ -7632,10 +8897,15 @@ NOIV - Do not generate interrupt vector table entries for all ISR functions
  for the autovector feature of the Cypress EZ-USB FX2).
 \layout Itemize
 
-CALLEE-SAVES function1[,function2[,function3...]] - The compiler by default
- uses a caller saves convention for register saving across function calls,
- however this can cause unneccessary register pushing & popping when calling
- small functions from larger functions.
+CALLEE-SAVES
+\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
+
+\end_inset 
+
+ function1[,function2[,function3...]] - The compiler by default uses a caller
+ saves convention for register saving across function calls, however this
+ can cause unneccessary register pushing & popping when calling small functions
+ from larger functions.
  This option can be used to switch off the register saving convention for
  the function names specified.
  The compiler will not save registers when calling these functions, extra
@@ -7663,11 +8933,26 @@ The pragma's are intended to be used to turn-off certain optimizations which
 \newline 
 
 \family typewriter 
-#pragma SAVE /* save the current settings */ 
+#pragma SAVE
+\begin_inset LatexCommand \index{\#pragma SAVE}
+
+\end_inset 
+
+ /* save the current settings */ 
 \newline 
-#pragma NOGCSE /* turnoff global subexpression elimination */ 
+#pragma NOGCSE
+\begin_inset LatexCommand \index{\#pragma NOGCSE}
+
+\end_inset 
+
+ /* turnoff global subexpression elimination */ 
 \newline 
-#pragma NOINDUCTION /* turn off induction optimizations */ 
+#pragma NOINDUCTION
+\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+
+\end_inset 
+
+ /* turn off induction optimizations */ 
 \newline 
 int foo () 
 \newline 
@@ -7689,7 +8974,12 @@ int foo ()
 \newline 
 } 
 \newline 
-#pragma RESTORE /* turn the optimizations back on */
+#pragma RESTORE
+\begin_inset LatexCommand \index{\#pragma RESTORE}
+
+\end_inset 
+
+ /* turn the optimizations back on */
 \family default 
 
 \newline 
@@ -7717,18 +9007,53 @@ Math functions (sin, pow, sqrt etc)
 \layout Subsection
 
 Interfacing with Assembly Routines
+\begin_inset LatexCommand \index{Assembly Routines}
+
+\end_inset 
+
+
 \layout Subsubsection
 
 Global Registers used for Parameter Passing
+\begin_inset LatexCommand \index{Parameter Passing}
+
+\end_inset 
+
+
 \layout Standard
 
 The compiler always uses the global registers 
 \emph on 
-DPL,DPH,B 
+DPL
+\begin_inset LatexCommand \index{DPL}
+
+\end_inset 
+
+,DPH
+\begin_inset LatexCommand \index{DPH}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{DPTR}
+
+\end_inset 
+
+,B
+\begin_inset LatexCommand \index{B}
+
+\end_inset 
+
+ 
 \emph default 
 and
 \emph on 
  ACC
+\begin_inset LatexCommand \index{ACC}
+
+\end_inset 
+
+
 \emph default 
  to pass the first parameter to a routine.
  The second parameter onwards is either allocated on the stack (for reentrant
@@ -7738,6 +9063,11 @@ and
 \layout Subsubsection
 
 Assembler Routine(non-reentrant)
+\begin_inset LatexCommand \index{Assembler Routine(non-reentrant)}
+
+\end_inset 
+
+
 \layout Standard
 
 In the following example the function cfunc calls an assembler routine asm_func,
@@ -7958,6 +9288,11 @@ sdcc cfunc.c asmfunc.rel
 \layout Subsubsection
 
 Assembler Routine(reentrant)
+\begin_inset LatexCommand \index{Assembler Routine(reentrant)}
+
+\end_inset 
+
+
 \layout Standard
 
 In this case the second parameter onwards will be passed on the stack, the
@@ -8023,7 +9358,7 @@ push  _bp
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-mov  _bp,sp 
+mov _bp,sp 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -8120,6 +9455,11 @@ The compiling and linking procedure remains the same, however note the extra
 \layout Subsection
 
 External Stack
+\begin_inset LatexCommand \index{External Stack}
+
+\end_inset 
+
+
 \layout Standard
 
 The external stack is located at the start of the external ram segment,
@@ -8138,6 +9478,11 @@ The compiler outputs the higher order address byte of the external ram segment
 \layout Subsection
 
 ANSI-Compliance
+\begin_inset LatexCommand \index{ANSI-Compliance}
+
+\end_inset 
+
+
 \layout Standard
 
 Deviations from the compliancy.
@@ -8260,6 +9605,11 @@ int (*foo)();
 \layout Subsection
 
 Cyclomatic Complexity
+\begin_inset LatexCommand \index{Cyclomatic Complexity}
+
+\end_inset 
+
+
 \layout Standard
 
 Cyclomatic complexity of a function is defined as the number of independent
@@ -8378,7 +9728,12 @@ It would substantially reduce the code generated (future versions of the
  compiler will be smart enough to detect such optimization oppurtunities).
 \layout Subsection
 
-Notes on MCS51 memory layout
+Notes on MCS51 memory
+\begin_inset LatexCommand \index{MCS51 memory}
+
+\end_inset 
+
+ layout
 \layout Standard
 
 The 8051 family of micro controller have a minimum of 128 bytes of internal
@@ -8395,16 +9750,29 @@ The 8051 family of micro controller have a minimum of 128 bytes of internal
 \newline 
 
 \newline 
-Normally the SDCC compiler will only utilise the first bank of registers,
- but it is possible to specify that other banks of registers should be used
- in interrupt routines.
+Normally the SDCC compiler will only utilise the first bank
+\begin_inset LatexCommand \index{bank}
+
+\end_inset 
+
+ of registers, but it is possible to specify that other banks of registers
+ should be used in interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ routines.
  By default, the compiler will place the stack after the last bank of used
  registers, i.e.
  if the first 2 banks of registers are used, it will position the base of
  the internal stack at address 16 (0X10).
- This implies that as the stack grows, it will use up the remaining register
- banks, and the 16 bytes used by the 128 bit variables, and 60 bytes for
- general purpose use.
+ This implies that as the stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ grows, it will use up the remaining register banks, and the 16 bytes used
+ by the 128 bit variables, and 60 bytes for general purpose use.
 \layout Standard
 
 By default, the compiler uses the 60 general purpose bytes to hold "near
@@ -8421,9 +9789,13 @@ If any of the 128 bit variables are used, or near data is being used then
 \layout Standard
 
 The amount of stack being used is affected by the use of the "internal stack"
- to save registers before a subroutine call is made (---stack-auto will
- declare parameters and local variables on the stack) and the number of
- nested subroutines.
+ to save registers before a subroutine call is made (---stack-auto
+\begin_inset LatexCommand \index{---stack-auto}
+
+\end_inset 
+
+ will declare parameters and local variables on the stack) and the number
+ of nested subroutines.
 \layout Standard
 
 If you detect that the stack is over writing you data, then the following
@@ -8434,19 +9806,34 @@ If you detect that the stack is over writing you data, then the following
  
 \layout Standard
 
----stack-loc will allow you specify the start of the stack, i.e.
+---stack-loc
+\begin_inset LatexCommand \index{---stack-loc}
+
+\end_inset 
+
+ will allow you specify the start of the stack, i.e.
  you could start it after any data in the general purpose area.
  However this may waste the memory not used by the register banks and if
  the size of the "near data" increases, it may creep into the bottom of
  the stack.
 \layout Standard
 
----stack-after-data, similar to the ---stack-loc, but it automatically places
- the stack after the end of the "near data".
+---stack-after-data
+\begin_inset LatexCommand \index{---stack-after-data}
+
+\end_inset 
+
+, similar to the ---stack-loc, but it automatically places the stack after
+ the end of the "near data".
  Again this could waste any spare register space.
 \layout Standard
 
----data-loc allows you to specify the start address of the near data.
+---data-loc
+\begin_inset LatexCommand \index{---data-loc}
+
+\end_inset 
+
+ allows you to specify the start address of the near data.
  This could be used to move the "near data" further away from the stack
  giving it more room to grow.
  This will only work if no bit variables are being used and the stack can
@@ -8550,8 +9937,18 @@ The Code generation phase is (unhappily), entirely MCU dependent and very
 As mentioned in the optimization section the peep-hole optimizer is rule
  based system, which can reprogrammed for other MCUs.
 \layout Section
+\pagebreak_top 
+SDCDB
+\begin_inset LatexCommand \index{SDCDB}
 
-SDCDB - Source Level Debugger
+\end_inset 
+
+ - Source Level Debugger
+\begin_inset LatexCommand \index{Debugger}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC is distributed with a source level debugger.
@@ -8804,7 +10201,17 @@ quit.
  My name is Bobby Brown"
 \layout Subsection
 
-Interfacing with XEmacs.
+Interfacing with XEmacs
+\begin_inset LatexCommand \index{XEmacs}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Emacs}
+
+\end_inset 
+
+.
 \layout Standard
 
 Two files (in emacs lisp) are provided for the interfacing with XEmacs,
@@ -9604,7 +11011,7 @@ Toggle Sdcdbsrc mode
 \newline 
 
 \layout Section
-
+\pagebreak_top 
 Other Processors
 \layout Subsection
 
@@ -9628,6 +11035,11 @@ As always, the code is the authoritave reference - see z80/ralloc.c and z80/gen.
 \layout Section
 
 Support
+\begin_inset LatexCommand \index{Support}
+
+\end_inset 
+
+
 \layout Standard
 
 SDCC has grown to be a large project.
@@ -9645,6 +11057,16 @@ SDCC has grown to be a large project.
 \layout Subsection
 
 Reporting Bugs
+\begin_inset LatexCommand \index{Bugs}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Reporting Bugs}
+
+\end_inset 
+
+
 \layout Standard
 
 Send an email to the mailing list at 'user-sdcc@sdcc.sourceforge.net' or 'devel-sd
@@ -9657,7 +11079,7 @@ cc@sdcc.sourceforge.net'.
  Compiling your program with the ---dumpall option can sometimes be useful
  in locating optimization problems.
 \layout Section
-
+\pagebreak_top 
 Compiler internals
 \layout Subsection
 
@@ -9681,10 +11103,20 @@ The current version of SDCC can generate code for Intel 8051 and Z80 MCU.
  
 \layout Paragraph*
 
-Parsing 
+Parsing
+\begin_inset LatexCommand \index{Parsing}
+
+\end_inset 
+
+ 
 \layout Standard
 
-Parsing the input source file and creating an AST (Annotated Syntax Tree).
+Parsing the input source file and creating an AST (Annotated Syntax Tree
+\begin_inset LatexCommand \index{Annotated Syntax Tree}
+
+\end_inset 
+
+).
  This phase also involves propagating types (annotating each node of the
  parse tree with type information) and semantic analysis.
  There are some MCU specific parsing rules.
@@ -9698,6 +11130,11 @@ Parsing the input source file and creating an AST (Annotated Syntax Tree).
 \layout Paragraph*
 
 Generating iCode
+\begin_inset LatexCommand \index{iCode}
+
+\end_inset 
+
+
 \layout Standard
 
 Intermediate code generation.
@@ -9708,7 +11145,12 @@ Intermediate code generation.
  C source functions.
 \layout Paragraph*
 
-Optimizations.
+Optimizations
+\begin_inset LatexCommand \index{Optimizations}
+
+\end_inset 
+
+.
 \layout Standard
 
 Bulk of the target independent optimizations is performed in this phase.
@@ -9718,6 +11160,11 @@ on, loop invariant code movement, strength reduction of loop induction variables
 \layout Paragraph*
 
 Live range analysis
+\begin_inset LatexCommand \index{Live range analysis}
+
+\end_inset 
+
+
 \layout Standard
 
 During intermediate code generation phase, the compiler assumes the target
@@ -9736,6 +11183,11 @@ nerated temporaries.
 \layout Paragraph*
 
 Register Allocation
+\begin_inset LatexCommand \index{Register Allocation}
+
+\end_inset 
+
+
 \layout Standard
 
 The register allocation determines the type and number of registers needed
@@ -9783,6 +11235,11 @@ Figure II gives a table of iCode operations supported by the compiler.
 \layout Paragraph*
 
 ICode Example
+\begin_inset LatexCommand \index{ICode Example}
+
+\end_inset 
+
+
 \layout Standard
 
 This section shows some details of iCode.
@@ -10991,6 +12448,13 @@ This document was initially written by Sandeep Dutta
 All product names mentioned herein may be trademarks of their respective
  companies.
  
+\layout Section
+
+Alphabetical index
+\layout Standard
+
+To avoid confusion, the installation and building options for sdcc itself
+ (chapter 2) are not part of the index.
 \layout Standard
 
 

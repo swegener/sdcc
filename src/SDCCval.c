@@ -1311,7 +1311,7 @@ getNelements (sym_link * type, initList * ilist)
     ilist = ilist->init.deep;
 
   /* if type is a character array and there is only one
-     initialiser then get the length of the string */
+     (string) initialiser then get the length of the string */
   if (IS_ARRAY (type) && IS_CHAR (etype) && !ilist->next)
     {
       ast *iast = ilist->init.node;
@@ -1321,12 +1321,12 @@ getNelements (sym_link * type, initList * ilist)
 	  werror (E_INIT_WRONG);
 	  return 0;
 	}
-      if (!IS_ARRAY (v->type) || !IS_CHAR (v->etype))
+
+      if (IS_ARRAY (v->type) && IS_CHAR (v->etype))
+	// yep, it's a string
 	{
-	  werror (E_INIT_WRONG);
-	  return 0;
+	  return DCL_ELEM (v->type);
 	}
-      return DCL_ELEM (v->type);
     }
 
   i = 0;

@@ -2058,12 +2058,6 @@ geniCodeAdd (operand * left, operand * right, int lvl)
   int isarray = 0;
   LRTYPE;
 
-#if 0
-  /* if left is an array then array access */
-  if (IS_ARRAY (ltype))
-    return geniCodeArray (left, right,lvl);
-#endif
-
   /* if the right side is LITERAL zero */
   /* return the left side              */
   if (IS_LITERAL (retype) && right->isLiteral && !floatFromVal (valFromType (retype)))
@@ -2540,16 +2534,10 @@ geniCodeDerefPtr (operand * op,int lvl)
   // just in case someone screws up
   wassert (IS_PTR (optype));
 
-  /* if this is a pointer then generate the rvalue */
-  if (IS_PTR (optype))
+  if (IS_TRUE_SYMOP (op))
     {
-      if (IS_TRUE_SYMOP (op))
-	{
-	  op->isaddr = 1;
-	  op = geniCodeRValue (op, TRUE);
-	}
-      else
-	op = geniCodeRValue (op, TRUE);
+      op->isaddr = 1;
+      op = geniCodeRValue (op, TRUE);
     }
 
   /* now get rid of the pointer part */
@@ -2562,9 +2550,8 @@ geniCodeDerefPtr (operand * op,int lvl)
       retype = getSpec (rtype = copyLinkChain (optype->next));
     }
 
-  /* if this is a pointer then outputclass needs 2b updated */
-  if (IS_PTR (optype))
-    setOClass (optype, retype);
+  /* outputclass needs 2b updated */
+  setOClass (optype, retype);
 
   op->isGptr = IS_GENPTR (optype);
 

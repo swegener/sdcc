@@ -5,8 +5,6 @@
 
 
 #include <stdio.h>
-#include <serial390.h>
-#include <ds80c390.h>
 
 #include "ow.h"
 #include "crcutil.h"

@@ -42,7 +42,7 @@
 #define stdout ((void *)0)
 #define stderr ((void *)0)
 int fprintf (FILE *fp, xdata char *format, ...) reentrant;
-int fopen (char *, char *);
+FILE *fopen (char *, char *);
 int fclose (FILE *);
 
 // defines

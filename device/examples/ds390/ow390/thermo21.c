@@ -48,9 +48,9 @@ int fprintf (FILE *fp, xdata char *format, ...) reentrant {
   va_end(arg);
 }
 
-int fopen(char * path, char *mode) {
+FILE * fopen(char * path, char *mode) {
   path, mode; //hush the compiler
-  return 0;
+  return (FILE *)0;
 }
 
 int fclose(FILE *fp) {

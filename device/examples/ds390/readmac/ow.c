@@ -31,9 +31,7 @@
 //
 // Kevin Vigor, 11/20/2000
  
-#include <ds80c390.h>
 #include <stdio.h>
-#include <serial390.h>
 
 #include "ow.h"
 #include "crcutil.h"

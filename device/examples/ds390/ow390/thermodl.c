@@ -57,8 +57,8 @@ char *argv[]={__FILE__, "exow"};
 int main() //short argc, char **argv)
 {
    int Fahrenheit=FALSE,filenum,num,i,j;
-   FILE *fp;
    char return_msg[128];
+   FILE *fp;
    ThermoStateType ThermoState;
    uchar ThermoSN[MAXDEVICES][8]; //the serial numbers for the devices
    int portnum=0;
@@ -110,26 +110,25 @@ int main() //short argc, char **argv)
    fp = NULL;
    if (filenum > 0)
    {
-      fp = fopen(argv[filenum],"w+");
-      if(fp == NULL)
-      {    
+     fp = fopen(argv[filenum],"w+");
+     if(fp == NULL)
+       {    
          printf("ERROR, Could not open output file!\n");
          exit(1);
-      }
-      else
-         printf("File '%s' opened to write mission results.\n",
-                 argv[filenum]);
+       }
+     else
+       printf("File '%s' opened to write mission results.\n",
+	      argv[filenum]);
    }
 
    // get list of Thermochron's 
-	num = FindDevices(portnum, &ThermoSN[0],THERMO_FAM, MAXDEVICES);
+   num = FindDevices(portnum, &ThermoSN[0],THERMO_FAM, MAXDEVICES);
 
    // check if not present or more then 1 present
    if (num == 0)
       ExitProg("Thermochron not present on 1-Wire\n",1);   
 
    // loop to download each Thermochron
-
    for (i = 0; i < num; i++)
    {
       // set the serial number portion in the thermo state
@@ -140,18 +139,17 @@ int main() //short argc, char **argv)
          printf("%02X",ThermoSN[i][j]);
       }
       printf("\n");
-
       // download the Thermochron found
       if (DownloadThermo(portnum,&ThermoSN[i][0],&ThermoState,stdout))
       {
-         // interpret the results of the download
-         InterpretStatus(&ThermoState.MissStat);
-         InterpretAlarms(&ThermoState.AlarmData, &ThermoState.MissStat);
-         InterpretHistogram(&ThermoState.HistData);
-         InterpretLog(&ThermoState.LogData, &ThermoState.MissStat);
+	// interpret the results of the download
+	InterpretStatus(&ThermoState.MissStat);
+	InterpretAlarms(&ThermoState.AlarmData, &ThermoState.MissStat);
+	InterpretHistogram(&ThermoState.HistData);
+	InterpretLog(&ThermoState.LogData, &ThermoState.MissStat);
 
          // print the output
-         PrintResults(&ThermoState,fp,Fahrenheit);
+	PrintResults(&ThermoState,fp,Fahrenheit);
       }
       else
       {
@@ -171,7 +169,7 @@ int main() //short argc, char **argv)
    }
 
    // release the 1-Wire Net
-   owRelease(portnum,return_msg);
+   //owRelease(portnum,return_msg);
    printf("\n%s",return_msg);
    ExitProg("End program normally\n",0);
    return 0;

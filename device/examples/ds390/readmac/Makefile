@@ -1,6 +1,6 @@
 CC = sdcc
 
-MFLAGS = -mds390 --model-flat24 --stack-10bit
+MFLAGS = -mds390
 LFLAGS = --xram-loc 0x180080 --code-loc 0x10000 -Wl-r
 
 OBJECTS = readmac.rel ow.rel crcutil.rel
@@ -8,7 +8,7 @@ OBJECTS = readmac.rel ow.rel crcutil.rel
 all: readmac.hex
 
 clean:
-	rm -f *~ \#* *.asm *.cdb *.rel *.hex *.ihx *.lst *.map *.rst *.sym *.lnk
+	rm -f *~ \#* *.asm *.cdb *.rel *.hex *.ihx *.lst *.map *.rst *.sym *.lnk core *.dump*
 
 readmac.hex: readmac.ihx
 	packihx readmac.ihx >readmac.hex

@@ -30,7 +30,7 @@ sensors.lib: $(SENSOR_OBJECTS)
 
 clean:
 	rm -f core *~ \#* *.asm *.cdb *.rel *.hex *.ihx *.lst *.map \
-		*.rst *.sym *.lnk *.lib
+		*.rst *.sym *.lnk *.lib *.dump*
 
 %.hex: ow.lib sensors.lib $(TINI_TEST_OBJECTS) %.rel
 	$(CC) $(MFLAGS) $(LFLAGS) $*.rel $(TINI_TEST_OBJECTS) \

@@ -451,10 +451,6 @@ callFuncByName (char *fname,
     }
     ,
     {
-      "operandsNotSame", operandsNotSame
-    }
-    ,
-    {
       "operandsNotSame3", operandsNotSame3
     }
     ,
@@ -478,6 +474,10 @@ callFuncByName (char *fname,
       "operandsNotSame8", operandsNotSame8
     }
     ,
+    {
+      "operandsNotSame", operandsNotSame
+    }
+    ,	  
     {
       "24bitMode", flat24bitMode
     }

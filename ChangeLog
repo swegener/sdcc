@@ -1,5 +1,11 @@
 2003-03-11 Kevin Vigor <kevin@vigor.nu>
 
+	* src/SDCCpeeph.c: fix so that operandsNotEqualX functions are
+	actually called (operandsNotEqual() was called for all 
+	operandsNotEqualX tests).
+
+2003-03-11 Kevin Vigor <kevin@vigor.nu>
+
 	* src/SDCCcse.c: fix findCheaperOp to prevent replacing int types
 	with shorter literals. Fixes bug 700121.
 

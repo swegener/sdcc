@@ -1,5 +1,5 @@
 /* Fast printf routine for use with sdcc/mcs51
- * Copyright (c) 2001, Paul Stoffregen, paul@pjrc.com
+ * Copyright (c) 2004, Paul Stoffregen, paul@pjrc.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
@@ -16,12 +16,74 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+/******************************************************************/
+/**                                                              **/
+/**    Major features.  These determine what capabilities your   **/
+/**    comiled printf_fast will have.                            **/
+/**                                                              **/
+/******************************************************************/
 
-// include support for 32 bit base 10 integers (%ld and %lu)
-#define LONG_INT
+// Include support for 32 bit base 10 integers (%ld and %lu).  Without
+// this, you won't be able to print 32 bit integers as base 10.  They
+// will appear in hexidecimal.
+#define LONG
 
-// include support for minimum field widths (%8d, %20s)
+// Include support for floating point numbers (%f).  Don't forget to
+// enable LONG above, if you want to print floats greater than
+// 65535.997.  You can have 6 good digits after the decimal point,
+// or an 8th if a small error is ok.  +/- 2^32 to 1/10^8 isn't the
+// full dynamic range of 32 bit floats, but it covers the most
+// commonly used range.  Adds about 500-600 bytes of code.
+//#define FLOAT
+
+// Include support for minimum field widths (%8d, %20s, %12.5f)
 #define FIELD_WIDTH
+
+// Include fast integer conversion.  Without this, a compact but slower
+// algorithm is used to convert integers (%d, %u, int part of %f).
+// Even the slow algorithm is much faster than a typical C implementation
+// based on repetitive division by 10.  If you enable this, you get an
+// extremely fast version (only 8 table lookups and 8 adds to convert a
+// 32 bit integer), but it costs extra code space for larger lookup
+// tables and optimized non-looping code.
+#define FAST_INTEGER
+
+
+/******************************************************************/
+/**                                                              **/
+/**    Minor tweaks.  These provide small code savings, with     **/
+/**    a partial loss of functionality.                          **/
+/**                                                              **/
+/******************************************************************/
+
+
+// If you enabled FLOAT, enabling this replaces the normal %f float
+// output with a very compact version that always prints 4 fractional
+// digits and does not have round off.  Zero will print as "0.0000",
+// and 1.999997 will print as "1.9999" (not rounded up to 2).  The
+// 4th digit is not accurate (+/- 2).  This simpler version also
+// avoids using 5 bytes of internal data memory.  Code size is about
+// 240 bytes less.
+//#define FLOAT_FIXED4
+
+// If you used FLOAT (not FLOAT_FIXED4), this will remove the smart
+// default number of digits code.  When you use "%f" without a field
+// width, normally the smart default width code chooses a good number
+// of digits based on size of the number.  If you enabled FIELD_WIDTH
+// and use a number, like "%.5f", this smart default code is never
+// used anyway.  Saves about 40 bytes of code.
+//#define FLOAT_DEFAULT_FRAC_DIGITS 6
+
+// If you used FLOAT (not FLOAT_FIXED4) and you do not specify a
+// field width, normally trailing zeros are trimmed.  Using this
+// removes that feature (saves only a few bytes).
+//#define DO_NOT_TRIM_TRAILING_ZEROS
+
+// Omit saving and restoring registers when calling putchar().  If you
+// are desparate for a little more code space, this will give you a
+// small savings.  You MUST define putchar() with #pragma callee_saves,
+// or implement it in assembly and avoid changing the registers.
+//#define PUTCHAR_CALLEE_SAVES
 
 
 /* extern void putchar(char ); */
@@ -31,9 +93,25 @@ static bit long_flag, short_flag, print_zero_flag, negative_flag;
 
 #ifdef FIELD_WIDTH
 static bit field_width_flag;
-static bit leading_zero_flag;
 static data unsigned char field_width;
 #endif
+
+#ifdef FLOAT
+#include <float.h>
+static bit continue_float;
+#ifndef FLOAT_FIXED4
+static data unsigned char frac_field_width;
+static data unsigned char float_frac_bcd[4];
+// TODO: can float_frac_bcd be overlaid with temps used by trig functions
+#endif
+#endif
+
+#ifndef FAST_INTEGER
+#ifdef LONG
+static data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp space
+#endif
+#endif
+
 
 
 void printf_fast(code char *fmt, ...) reentrant
@@ -51,6 +129,7 @@ printf_begin:
 	mov	dpl, @r0	// dptr has address of fmt
 	dec	r0
 
+
 printf_main_loop:
 	clr	a
 	movc	a, @a+dptr	// get next byte of fmt string
@@ -65,8 +144,11 @@ printf_format:
 	clr	_negative_flag
 #ifdef FIELD_WIDTH
 	clr	_field_width_flag
-	clr	_leading_zero_flag
-	mov	_field_width, #0
+	mov	r1, #_field_width
+	mov	@r1, #0
+#endif
+#ifdef FLOAT
+	clr	_continue_float
 #endif
 
 printf_format_loop:
@@ -82,17 +164,13 @@ printf_format_loop:
 	jnc	printf_nondigit2
 #ifdef FIELD_WIDTH
 printf_digit:
-	jnz	printf_digit_2
-	cjne	a, _field_width, printf_digit_2
-	setb	_leading_zero_flag
-printf_digit_2:
 	setb	_field_width_flag
-	mov	r1, a
-	mov	a, _field_width
+	mov	r2, a
+	mov	a, @r1
 	mov	b, #10
 	mul	ab
-	add	a, r1
-	mov	_field_width, a
+	add	a, r2
+	mov	@r1, a
 #endif
 	sjmp	printf_format_loop
 printf_nondigit1:
@@ -138,18 +216,40 @@ printf_format_c:
 	sjmp	printf_char
 
 printf_format_x:
-	//cjne	a, #'x', printf_normal
-	cjne	a, #120, printf_normal
+	//cjne	a, #'x', printf_format_f
+	cjne	a, #120, printf_format_f
 	ljmp	printf_hex
+
+printf_format_f:
+#ifdef FLOAT
+	//cjne	a, #'f', printf_format_dot
+	cjne	a, #102, printf_format_dot
+	ljmp	print_float
+#endif
+
+printf_format_dot:
+	//cjne	a, #'.', printf_normal
+	cjne	a, #46, printf_normal
+#ifdef FLOAT
+#ifdef FLOAT_FIXED4
+	mov	r1, #ar3	// parse frac field, but discard if FIXED4
+#else
+	mov	r1, #_frac_field_width
+	mov	@r1, #0
+#endif
+#endif
+	sjmp	printf_format_loop
 
 printf_normal:
 	jz	printf_eot
 printf_char:
 	lcall	printf_putchar
-	sjmp	printf_main_loop
+	ljmp	printf_main_loop
 
 printf_eot:
 	ljmp	printf_end
+
+
 
 
 
@@ -169,7 +269,6 @@ printf_string:
 
 #ifdef FIELD_WIDTH
 	jnb	_field_width_flag, printf_str_loop
-	clr	_leading_zero_flag	// never leading zeros for strings
 	push	dpl
 	push	dph
 printf_str_fw_loop:
@@ -223,7 +322,7 @@ printf_hex8:
 	ljmp	printf_phex_lsn
 
 
-#ifndef LONG_INT
+#ifndef LONG
 printf_ld_in_hex:
 	//mov	a, #'0'
 	mov	a, #48
@@ -248,7 +347,7 @@ printf_int:
 	setb	_negative_flag
 	mov	a, r1			/* invert integer */
 	cpl	a
-	addc	a, #1
+	add	a, #1
 	mov	r1, a
 	jb	_short_flag, printf_uint
 	mov	a, r2
@@ -278,15 +377,15 @@ printf_uint:
 printf_uint_ck32:
 	/* it's a 32 bit int... but if the upper 16 bits are zero */
 	/* we can treat it like a 16 bit integer and convert much faster */
-#ifdef LONG_INT
+#ifdef LONG
 	mov	a, r3
 	jnz	printf_uint_begin
 	mov	a, r4
 	jnz	printf_uint_begin
 #else
 	mov	a, r3
-	jnz	printf_ld_in_hex	;print long integer as hex
-	mov	a, r4			;rather than just the low 16 bits
+	jnz	printf_ld_in_hex	// print long integer as hex
+	mov	a, r4			// rather than just the low 16 bits
 	jnz	printf_ld_in_hex
 #endif
 	clr	_long_flag
@@ -303,6 +402,8 @@ printf_uint_ck8:
 	jnz	printf_uint_begin
 #ifdef FIELD_WIDTH
 	jnb	_field_width_flag, printf_uint_zero
+	mov	a, _field_width
+	jz	printf_uint_zero
 	dec	_field_width
 	lcall	printf_space
 #endif
@@ -310,17 +411,24 @@ printf_uint_zero:
 	//mov	a, #'0'
 	mov	a, #48
 	lcall	printf_putchar
+#ifdef FLOAT
+	jnb	_continue_float, 0001$
+	ret
+0001$:
+#endif
 	ljmp	printf_main_loop
+
 
 
 printf_uint_begin:
 	push	dpl
 	push	dph
 	lcall	printf_int2bcd		// bcd number in r3/r2/r7/r6/r5
+printf_uint_2:
 
 #ifdef FIELD_WIDTH
 	jnb	_field_width_flag, printf_uifw_end
-#ifdef LONG_INT
+#ifdef LONG
 printf_uifw_32:
 	mov	r1, #10
 	jnb	_long_flag, printf_uifw_16
@@ -343,7 +451,7 @@ printf_uifw_32:
 	mov	a, r7
 	anl	a, #0xF0
 	jnz	printf_uifw_sub
-#endif
+#endif // LONG
 printf_uifw_16:
 	mov	r1, #5
 	jb	_short_flag, printf_uifw_8
@@ -372,33 +480,60 @@ printf_uifw_sub:
 	jc	printf_uifw_end
 	mov	_field_width, a
 
-#ifdef LONG_INT
+#ifndef PUTCHAR_CALLEE_SAVES
+#ifdef LONG
 	push	ar3
 	push	ar2
 #endif
 	push	ar7
 	push	ar6
 	push	ar5
+#endif
 	lcall	printf_space
+#ifndef PUTCHAR_CALLEE_SAVES
 	pop	ar5
 	pop	ar6
 	pop	ar7
-#ifdef LONG_INT
+#ifdef LONG
 	pop	ar2
 	pop	ar3
 #endif
-printf_uifw_end:
 #endif
+
+
+printf_uifw_end:
+#endif // FIELD_WIDTH
 
 
 printf_uint_doit:
 	jnb	_negative_flag, printf_uint_pos
-	//mov	a, #"-"
+#ifdef PUTCHAR_CALLEE_SAVES
+	//mov	a, #'-'
 	mov	a, #45
 	lcall	printf_putchar
+#else
+#ifdef LONG
+	push	ar3
+	push	ar2
+#endif
+	push	ar7
+	push	ar6
+	push	ar5
+	//mov	a, #'-'
+	mov	a, #45
+	lcall	printf_putchar
+	pop	ar5
+	pop	ar6
+	pop	ar7
+#ifdef LONG
+	pop	ar2
+	pop	ar3
+#endif
+#endif // PUTCHAR_CALLEE_SAVES
+
 printf_uint_pos:
 	jb	_short_flag, printf_uint8
-#ifdef LONG_INT
+#ifdef LONG
 	jnb	_long_flag, printf_uint16
 printf_uint32:
 	push	ar5
@@ -421,7 +556,7 @@ printf_uint32:
 	pop	dph
 	pop	dpl
 	sjmp	printf_uint16a
-#endif
+#endif // LONG
 
 printf_uint16:
 	mov	dpl, r5
@@ -446,7 +581,468 @@ printf_uint8a:
 	lcall	printf_zero
 	pop	dph
 	pop	dpl
+#ifdef FLOAT
+	jnb	_continue_float, 0002$
+	ret
+0002$:
+#endif
 	ljmp	printf_main_loop
+
+
+
+
+
+
+
+
+#ifdef FLOAT
+#ifdef FLOAT_FIXED4
+	// Print a float the easy way.  First, extract the integer part and
+	// use the integer printing code.  Then extract the fractional part,
+	// convert each bit to 4 digit BCD, and print the BCD sum.  Absolutely
+	// no field width control, always 4 digits printed past the decimal
+	// point.  No round off.  1.9999987 prints as 1.9999, not 2.0000.
+print_float:
+#ifdef FIELD_WIDTH
+	jnb	_field_width_flag, print_float_begin
+	mov	a, _field_width
+	add	a, #251
+	mov	_field_width, a
+	jc	print_float_begin
+	mov	_field_width, #0
+#endif
+print_float_begin:
+	mov	exp_b, r0		// keep r0 safe, will need it again
+	lcall	printf_get_float
+	clr	c
+	mov	a, #158			// check for large float we can't print
+	subb	a, exp_a
+	jnc	print_float_size_ok
+printf_float_too_big:
+	// TODO: should print some sort of overflow error??
+	ljmp	printf_format_loop
+print_float_size_ok:
+	lcall	__fs_rshift_a
+	setb	_continue_float
+#ifndef LONG
+	mov	a, r3
+	orl	a, r4
+	jnz	printf_float_too_big
+#endif
+	lcall	printf_uint		// print the integer portion
+	//mov	a, #'.'
+	mov	a, #0x2E
+	lcall	printf_putchar
+	// now that the integer part is printed, we need to refetch the
+	// float from the va_args and extract the fractional part
+	mov	r0, exp_b
+	lcall	printf_get_float
+	push	ar0
+	mov	a, exp_a
+	cjne	a, #126, print_float_frac_lshift
+	sjmp	print_float_frac // input between 0.5 to 0.9999
+print_float_frac_lshift:
+	jc	print_float_frac_rshift
+	//Acc (exponent) is greater than 126 (input >= 1.0)
+	add	a, #130
+	mov	r5, a
+print_float_lshift_loop:
+	clr	c
+	mov	a, r2
+	rlc	a
+	mov	r2, a
+	mov	a, r3
+	rlc	a
+	mov	r3, a
+	mov	a, r4
+	rlc	a
+	mov	r4, a
+	djnz	r5, print_float_lshift_loop
+	sjmp	print_float_frac
+print_float_frac_rshift:
+	//Acc (exponent) is less than 126 (input < 0.5)
+	cpl	a
+	add	a, #127
+	lcall	__fs_rshift_a
+print_float_frac:
+	// now we've got the fractional part, so now is the time to
+	// convert to BCD... just convert each bit to BCD using a
+	// lookup table and BCD sum them together
+	mov	r7, #14
+	clr	a
+	mov	r6, a
+	mov	r5, a
+	push	dpl
+	push	dph
+	mov	dptr, #_frac2bcd	// FLOAT_FIXED4 version (14 entries)
+print_float_frac_loop:
+	mov	a, r3
+	rlc	a
+	mov	r3, a
+	mov	a, r4
+	rlc	a
+	mov	r4, a
+	jnc	print_float_frac_skip
+	clr	a
+	movc	a, @a+dptr
+	add	a, r5
+	da	a
+	mov	r5, a
+	mov	a, #1
+	movc	a, @a+dptr
+	addc	a, r6
+	da	a
+	mov	r6, a
+print_float_frac_skip:
+	inc	dptr
+	inc	dptr
+	djnz	r7, print_float_frac_loop
+	// the BCD sum is in dptr, so all we've got to do is output
+	// all 4 digits.  No trailing zero suppression, no nice round
+	// off (impossible to change the integer part since we already
+	// printed it).
+	mov	dph, r6
+	mov	dpl, r5
+	setb	_print_zero_flag
+	mov	a, dph
+	lcall	printf_phex_msn
+	mov	a, dph
+	lcall	printf_phex_lsn
+	mov	a, dpl
+	lcall	printf_phex_msn
+	mov	a, dpl
+	lcall	printf_phex_lsn
+	pop	dph
+	pop	dpl
+	pop	ar0
+	ljmp	printf_main_loop
+
+#else // not FLOAT_FIXED4
+
+
+
+
+print_float:
+	// Print a float the not-as-easy way, with a configurable number of
+	// fractional digits (up to 8) and proper round-off (up to 7 digits).
+	// First, extract the fractional part, convert to BCD, and then add
+	// the scaled round-off.  Store the rounded fractional digits and
+	// their carry.  Then extract the integer portion, increment it if
+	// the rounding caused a carry.  Use the integer printing to output
+	// the integer, and then output the stored fractional digits.  This
+	// approach requires 5 bytes of internal RAM to store the 8 fractional
+	// digits and the number of them we'll actually print.  This code is
+	// a couple hundred bytes larger and a bit slower than the FIXED4
+	// version, but it gives very nice results.
+print_float_1:
+#ifdef FIELD_WIDTH
+	jnb	_field_width_flag, print_float_default_width
+	// The caller specified exact field width, so use it.  Need to
+	// convert the whole float digits into the integer portion only.
+	mov	a, _field_width
+	setb	c
+	subb	a, _frac_field_width
+	mov	_field_width, a
+	jnc	print_float_begin
+	mov	_field_width, #0
+	sjmp	print_float_begin
+#endif
+print_float_default_width:
+	// The caller didn't specify field width (or FIELD_WIDTH is
+	// not defined so it's ignored).  We've still got to know
+	// how many fractional digits are going to print, so we can
+	// round off properly.
+#ifdef FLOAT_DEFAULT_FRAC_DIGITS
+	mov	_frac_field_width, #FLOAT_DEFAULT_FRAC_DIGITS
+#else
+	// default fractional field width (between 0 to 7)
+	// attempt to scale the default number of fractional digits
+	// based on the magnitude of the float
+	mov	ar1, r0		// r0 points to first byte of float
+	dec	r1		// r1 points to second byte of float
+	mov	r6, dpl
+	mov	r7, dph
+	mov	dptr, #_float_range_table
+	mov	r5, #7
+print_float_default_loop:
+	clr	a
+	movc	a, @a+dptr
+	add	a, @r1
+	inc	dptr
+	clr	a
+	movc	a, @a+dptr
+	addc	a, @r0
+	jnc	print_float_default_done
+	inc	dptr
+	djnz	r5, print_float_default_loop
+print_float_default_done:
+	mov	_frac_field_width, r5
+	mov	dpl, r6
+	mov	dph, r7
+#endif // not FLOAT_DEFAULT_FRAC_DIGITS
+
+print_float_begin:
+	push	ar0			// keep r0 safe, will need it again
+	lcall	printf_get_float
+	mov	a, exp_a
+	cjne	a, #126, print_float_frac_lshift
+	sjmp	print_float_frac	// input between 0.5 to 0.9999
+
+print_float_frac_lshift:
+	jc	print_float_frac_rshift
+	//Acc (exponent) is greater than 126 (input >= 1.0)
+	add	a, #130
+	mov	r5, a
+print_float_lshift_loop:
+	clr	c
+	mov	a, r2
+	rlc	a
+	mov	r2, a
+	mov	a, r3
+	rlc	a
+	mov	r3, a
+	mov	a, r4
+	rlc	a
+	mov	r4, a
+	djnz	r5, print_float_lshift_loop
+	sjmp	print_float_frac
+print_float_frac_rshift:
+	//Acc (exponent) is less than 126 (input < 0.5)
+	cpl	a
+	add	a, #127
+	lcall	__fs_rshift_a
+print_float_frac:
+	// Convert the fraction in r4/r3/r2/r1 into 8 BCD digits in exb_b/r7/r6/r5
+	mov	b, #27
+	clr	a
+	mov	exp_b, a
+	mov	r7, a
+	mov	r6, a
+	mov	r5, a
+	push	dpl
+	push	dph
+	mov	dptr, #_frac2bcd	// FLOAT version (27 entries)
+print_float_frac_loop:
+	mov	a, r1
+	rlc	a
+	mov	r1, a
+	mov	a, r2
+	rlc	a
+	mov	r2, a
+	mov	a, r3
+	rlc	a
+	mov	r3, a
+	mov	a, r4
+	rlc	a
+	mov	r4, a
+	jnc	print_float_frac_skip
+	clr	a
+	movc	a, @a+dptr
+	add	a, r5
+	da	a
+	mov	r5, a
+	mov	a, #1
+	movc	a, @a+dptr
+	addc	a, r6
+	da	a
+	mov	r6, a
+	mov	a, #2
+	movc	a, @a+dptr
+	addc	a, r7
+	da	a
+	mov	r7, a
+	mov	a, #3
+	movc	a, @a+dptr
+	addc	a, exp_b
+	da	a
+	mov	exp_b, a
+print_float_frac_skip:
+	inc	dptr
+	inc	dptr
+	inc	dptr
+	inc	dptr
+	djnz	b, print_float_frac_loop
+	pop	dph
+	pop	dpl
+print_float_frac_roundoff:
+	// Now it's time to round-off the BCD digits to the desired precision.
+	clr	a
+	mov	r4, #0x50		// r4/r3/r2/r1 = 0.5 (bcd rounding)
+	mov	r3, a
+	mov	r2, a
+	mov	r1, a
+	mov	a, _frac_field_width
+	rl	a
+	rl	a
+	anl	a, #0xFC
+	lcall	__fs_rshift_a		// divide r4/r3/r2/r1 by 10^frac_field_width
+	mov	a, r5
+	add	a, r1			// add rounding to fractional part
+	da	a
+	mov	_float_frac_bcd+3, a	// and store it for later use
+	mov	a, r6
+	addc	a, r2
+	da	a
+	mov	_float_frac_bcd+2, a
+	mov	a, r7
+	addc	a, r3
+	da	a
+	mov	_float_frac_bcd+1, a
+	mov	a, exp_b
+	addc	a, r4
+	da	a
+	mov	_float_frac_bcd+0, a
+	mov	sign_b, c		// keep fractional carry in sign_b
+print_float_int:
+	// Time to work on the integer portion... fetch the float again, check
+	// size (exponent), scale to integer, add the fraction's carry, and
+	// let the integer printing code do all the work.
+	pop	ar0
+	lcall	printf_get_float
+	push	ar0
+	clr	c
+	mov	a, #158			// check for large float we can't print
+	subb	a, exp_a
+	jnc	print_float_size_ok
+printf_float_too_big:
+	// TODO: should print some sort of overflow error??
+	ljmp	printf_format_loop
+print_float_size_ok:
+	lcall	__fs_rshift_a
+	jnb	sign_b, print_float_do_int
+	// if we get here, the fractional round off caused the
+	// integer part to increment.  Add 1 for a proper result
+	mov	a, r1
+	add	a, #1
+	mov	r1, a
+	clr	a
+	addc	a, r2
+	mov	r2, a
+#ifdef LONG
+	clr	a
+	addc	a, r3
+	mov	r3, a
+	clr	a
+	addc	a, r4
+	mov	r4, a
+#endif
+	jc	printf_float_too_big
+print_float_do_int:
+#ifndef LONG
+	mov	a, r3
+	orl	a, r4
+	jnz	printf_float_too_big
+#endif
+	setb	_continue_float
+	lcall	printf_uint		// print the integer portion
+
+
+print_float_frac_width:
+	// Now all we have to do is output the fractional digits that
+	// were previous computed and stored in memory.
+#ifdef FIELD_WIDTH
+	jb	_field_width_flag, print_float_do_frac
+#endif
+#ifndef DO_NOT_TRIM_TRAILING_ZEROS 
+	// if the user did not explicitly set a
+	// field width, trim off trailing zeros
+print_float_frac_trim:
+	mov	a, _frac_field_width
+	jz	print_float_do_frac
+	lcall	get_float_frac_digit
+	jnz	print_float_do_frac
+	djnz	_frac_field_width, print_float_frac_trim
+#endif
+
+print_float_do_frac:
+	mov	a, _frac_field_width
+	jz	print_float_done
+	//mov	a, #'.'
+	mov	a, #0x2E
+	lcall	printf_putchar
+	mov	r0, #0
+	setb	_print_zero_flag
+print_float_do_frac_loop:
+	inc	r0
+	mov	a, r0
+	lcall	get_float_frac_digit
+	lcall	printf_phex_lsn
+	mov	a, r0
+	cjne	a, _frac_field_width, print_float_do_frac_loop
+
+print_float_done:
+	pop	ar0
+	ljmp	printf_main_loop
+
+
+
+	// acc=1 for tenths, acc=2 for hundredths, etc
+get_float_frac_digit:
+	dec	a
+	clr	c
+	rrc	a
+	mov	psw.5, c
+	add	a, #_float_frac_bcd
+	mov	r1, a
+	mov	a, @r1
+	jb	psw.5, get_float_frac_digit_done
+	swap	a
+get_float_frac_digit_done:
+	anl	a, #15
+	ret
+
+
+
+
+#endif // end of normal FLOAT code (not FLOAT_FIXED4)
+
+
+// These helper functions are used, regardless of which type of
+// FLOAT code is used.
+
+#if 0
+pm2_print_float:
+	 mov	a, exp_a
+	 lcall	pm2_entry_phex
+	 mov	a, #0x20
+	 lcall	pm2_entry_cout
+	 lcall	_print_r4321
+	 mov	a, #0x20
+	 lcall	pm2_entry_cout
+	 ret
+#endif
+
+	// Fetch a float from the va_args and put it into
+	// exp_a/r4/r3/r2 and also clear r1 and preset
+	// the flags
+printf_get_float:
+	mov	a, @r0
+	dec	r0
+	mov	r1, a
+	mov	a, @r0
+	dec	r0
+	mov	r4, a
+	rlc	a
+	mov	a, r1
+	rlc	a
+	mov	_negative_flag, c
+	mov	exp_a, a
+	jz	printf_get_float_2
+	orl	ar4, #0x80
+printf_get_float_2:
+	mov	a, @r0
+	dec	r0
+	mov	r3, a
+	mov	a, @r0
+	dec	r0
+	mov	r2, a
+	mov	r1, #0
+	clr	_short_flag
+	setb	_long_flag
+	ret
+#endif // FLOAT
+
+
 
 
 
@@ -485,7 +1081,7 @@ printf_get_done:
 
 
 
-
+#ifdef FAST_INTEGER
 
 	/* convert binary number in r4/r3/r2/r1 into bcd packed number
 	 * in r3/r2/r7/r6/r5.  The input number is destroyed in the
@@ -496,26 +1092,15 @@ printf_get_done:
 
 printf_int2bcd:
 	mov	a, r1
-	anl	a, #0x0F
-	mov	dptr, #_int2bcd_0
-	movc	a, @a+dptr
-	mov	r5, a
-
-	mov	a, r1
-	swap	a
-	anl	a, #0x0F
-	mov	r1, a			// recycle r1 for holding nibble
-	mov	dptr, #_int2bcd_1
-	movc	a, @a+dptr
-	add	a, r5
-	da	a
-	mov	r5, a
-	mov	a, r1
-	orl	a, #16
-	movc	a, @a+dptr
-	addc	a, #0
-	da	a
+	mov	b, #100
+	div	ab
 	mov	r6, a
+	mov	a, #10
+	xch	a, b
+	div	ab
+	swap	a
+	orl	a, b
+	mov	r5, a
 
 	jnb	_short_flag, printf_i2bcd_16	// if 8 bit int, we're done
 	ret
@@ -563,7 +1148,7 @@ printf_i2bcd_16:
 
 printf_i2bcd_32:
 
-#ifdef LONG_INT
+#ifdef LONG
 	mov	a, r3
 	anl	a, #0x0F
 	mov	r1, a
@@ -657,8 +1242,142 @@ printf_bcd_add10:
 	addc	a, r3
 	da	a
 	mov	r3, a
-#endif
+#endif // LONG
 	ret
+
+
+#else // not FAST_INTEGER
+
+	/* convert binary number in r4/r3/r2/r1 into bcd packed number
+	 * in r3/r2/r7/r6/r5.  The input number is destroyed in the
+	 * process, to avoid needing extra memory for the result (and
+	 * r1 gets used for temporary storage).  dptr is overwritten,
+	 * but r0 is not changed.
+	 */
+
+#ifdef LONG
+
+printf_int2bcd:
+	mov	a, #8
+	jb	_short_flag, printf_int2bcd_begin
+	mov	a, #16
+	jnb	_long_flag, printf_int2bcd_begin
+	mov	a, #32
+printf_int2bcd_begin:
+	mov	b, a
+	clr	a
+	mov	r5, a
+	mov	r6, a
+	mov	r7, a
+	mov	(_i2bcd_tmp + 0), a
+	mov	(_i2bcd_tmp + 1), a
+	mov	dptr, #_int2bcd
+printf_i2bcd_loop:
+	mov	a, r4
+	rrc	a
+	mov	r4, a
+	mov	a, r3
+	rrc	a
+	mov	r3, a
+	mov	a, r2
+	rrc	a
+	mov	r2, a
+	mov	a, r1
+	rrc	a
+	mov	r1, a
+	jnc	print_i2bcd_skip
+	clr	a
+	movc	a, @a+dptr
+	add	a, r5
+	da	a
+	mov	r5, a
+	mov	a, #1
+	movc	a, @a+dptr
+	addc	a, r6
+	da	a
+	mov	r6, a
+	mov	a, #2
+	movc	a, @a+dptr
+	addc	a, r7
+	da	a
+	mov	r7, a
+	mov	a, #3
+	movc	a, @a+dptr
+	addc	a, (_i2bcd_tmp + 0)
+	da	a
+	mov	(_i2bcd_tmp + 0), a
+	mov	a, #4
+	movc	a, @a+dptr
+	addc	a, (_i2bcd_tmp + 1)
+	da	a
+	mov	(_i2bcd_tmp + 1), a
+print_i2bcd_skip:
+	inc	dptr
+	inc	dptr
+	inc	dptr
+	inc	dptr
+	inc	dptr
+	djnz	b, printf_i2bcd_loop
+	mov	r2, (_i2bcd_tmp + 0)
+	mov	r3, (_i2bcd_tmp + 1)
+	ret
+
+#else //  not LONG
+
+printf_int2bcd:
+	mov	a, #8
+	jb	_short_flag, printf_int2bcd_begin
+	mov	a, #16
+printf_int2bcd_begin:
+	mov	b, a
+	clr	a
+	mov	r5, a
+	mov	r6, a
+	mov	r7, a
+	mov	dptr, #_int2bcd
+printf_i2bcd_loop:
+	mov	a, r2
+	rrc	a
+	mov	r2, a
+	mov	a, r1
+	rrc	a
+	mov	r1, a
+	jnc	printf_i2bcd_add_skip
+	clr	a
+	movc	a, @a+dptr
+	add	a, r5
+	da	a
+	mov	r5, a
+	mov	a, #1
+	movc	a, @a+dptr
+	addc	a, r6
+	da	a
+	mov	r6, a
+	mov	a, #2
+	movc	a, @a+dptr
+	addc	a, r7
+	da	a
+	mov	r7, a
+printf_i2bcd_add_skip:
+	inc	dptr
+	inc	dptr
+	inc	dptr
+	djnz	b, printf_i2bcd_loop
+	ret
+
+#endif // not LONG
+
+
+#endif // not FAST_INTEGER
+
+
+
+
+
+
+
+
+
 
 
 
@@ -667,10 +1386,6 @@ printf_bcd_add10:
 printf_space_loop:
 	//mov	a, #' '
 	mov	a, #32
-	jnb	_leading_zero_flag, printf_space_output
-	//mov	a, #'0'
-	mov	a, #48
-printf_space_output:
 	lcall	printf_putchar
 	dec	_field_width
 printf_space:
@@ -698,6 +1413,14 @@ printf_phex_ok:
 	addc    a, #0x40
 	da	a
 printf_putchar:
+#ifdef PUTCHAR_CALLEE_SAVES
+	push	dph
+	push	dpl
+	mov	dpl, a
+	lcall	_putchar
+	pop	dpl
+	pop	dph
+#else
 	push	dph
 	push	dpl
 	push	ar0
@@ -706,6 +1429,7 @@ printf_putchar:
 	pop	ar0
 	pop	dpl
 	pop	dph
+#endif
 printf_ret:
 	ret
 
@@ -723,6 +1447,7 @@ printf_end:
 }
 
 
+#ifdef FAST_INTEGER
 /*
  * #! /usr/bin/perl
  * for ($d=0; $d < 8; $d++) {
@@ -740,7 +1465,7 @@ printf_end:
  * }
  */
 
-
+#if 0
 code unsigned char int2bcd_0[] = {
 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15};
@@ -750,6 +1475,7 @@ code unsigned char int2bcd_1[] = {
 0x28, 0x44, 0x60, 0x76, 0x92, 0x08, 0x24, 0x40,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02};
+#endif
 
 code unsigned char int2bcd_2[] = {
 0x00, 0x56, 0x12, 0x68, 0x24, 0x80, 0x36, 0x92,
@@ -765,7 +1491,7 @@ code unsigned char int2bcd_3[] = {
 0x00, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x02,
 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06};
 
-#ifdef LONG_INT
+#ifdef LONG
 code unsigned char int2bcd_4[] = {
 0x00, 0x36, 0x72, 0x08, 0x44, 0x80, 0x16, 0x52,
 0x88, 0x24, 0x60, 0x96, 0x32, 0x68, 0x04, 0x40,
@@ -807,6 +1533,196 @@ code unsigned char int2bcd_7[] = {
 0x47, 0x15, 0x84, 0x52, 0x21, 0x89, 0x58, 0x26,
 0x00, 0x02, 0x05, 0x08, 0x10, 0x13, 0x16, 0x18,
 0x21, 0x24, 0x26, 0x29, 0x32, 0x34, 0x37, 0x40};
+#endif // LONG
+
+#else // not FAST_INTEGER
+
+/*
+ * #! /usr/bin/perl
+ * print "code unsigned char int2bcd[] = {\n";
+ * for ($i=0, $n=1; $i<32; $i++, $n*=2) {
+ * 	$r = sprintf "%010u", $n;
+ * 	$r =~ /([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])/;
+ * 	printf "0x%02d, 0x%02d, 0x%02d, 0x%02d, 0x%02d", $5, $4, $3, $2, $1;
+ * 	print ',' if $i < 31;
+ * 	printf "\t\t// %10u\n", $n;
+ * }
+ * print "}\ncode unsigned char int2bcd[] = {\n";
+ * for ($i=0, $n=1; $i<16; $i++, $n*=2) {
+ * 	$r = sprintf "%06u", $n;
+ * 	$r =~ /([0-9][0-9])([0-9][0-9])([0-9][0-9])/;
+ * 	printf "0x%02d, 0x%02d, 0x%02d", $3, $2, $1;
+ * 	print ',' if $i < 15;
+ * 	printf "\t\t// %10u\n", $n;
+ * }
+ * print "};\n";
+*/
+
+#ifdef LONG
+code unsigned char int2bcd[] = {
+0x01, 0x00, 0x00, 0x00, 0x00,		//          1
+0x02, 0x00, 0x00, 0x00, 0x00,		//          2
+0x04, 0x00, 0x00, 0x00, 0x00,		//          4
+0x08, 0x00, 0x00, 0x00, 0x00,		//          8
+0x16, 0x00, 0x00, 0x00, 0x00,		//         16
+0x32, 0x00, 0x00, 0x00, 0x00,		//         32
+0x64, 0x00, 0x00, 0x00, 0x00,		//         64
+0x28, 0x01, 0x00, 0x00, 0x00,		//        128
+0x56, 0x02, 0x00, 0x00, 0x00,		//        256
+0x12, 0x05, 0x00, 0x00, 0x00,		//        512
+0x24, 0x10, 0x00, 0x00, 0x00,		//       1024
+0x48, 0x20, 0x00, 0x00, 0x00,		//       2048
+0x96, 0x40, 0x00, 0x00, 0x00,		//       4096
+0x92, 0x81, 0x00, 0x00, 0x00,		//       8192
+0x84, 0x63, 0x01, 0x00, 0x00,		//      16384
+0x68, 0x27, 0x03, 0x00, 0x00,		//      32768
+0x36, 0x55, 0x06, 0x00, 0x00,		//      65536
+0x72, 0x10, 0x13, 0x00, 0x00,		//     131072
+0x44, 0x21, 0x26, 0x00, 0x00,		//     262144
+0x88, 0x42, 0x52, 0x00, 0x00,		//     524288
+0x76, 0x85, 0x04, 0x01, 0x00,		//    1048576
+0x52, 0x71, 0x09, 0x02, 0x00,		//    2097152
+0x04, 0x43, 0x19, 0x04, 0x00,		//    4194304
+0x08, 0x86, 0x38, 0x08, 0x00,		//    8388608
+0x16, 0x72, 0x77, 0x16, 0x00,		//   16777216
+0x32, 0x44, 0x55, 0x33, 0x00,		//   33554432
+0x64, 0x88, 0x10, 0x67, 0x00,		//   67108864
+0x28, 0x77, 0x21, 0x34, 0x01,		//  134217728
+0x56, 0x54, 0x43, 0x68, 0x02,		//  268435456
+0x12, 0x09, 0x87, 0x36, 0x05,		//  536870912
+0x24, 0x18, 0x74, 0x73, 0x10,		// 1073741824
+0x48, 0x36, 0x48, 0x47, 0x21		// 2147483648
+};
+#else // not LONG
+code unsigned char int2bcd[] = {
+0x01, 0x00, 0x00,		//          1
+0x02, 0x00, 0x00,		//          2
+0x04, 0x00, 0x00,		//          4
+0x08, 0x00, 0x00,		//          8
+0x16, 0x00, 0x00,		//         16
+0x32, 0x00, 0x00,		//         32
+0x64, 0x00, 0x00,		//         64
+0x28, 0x01, 0x00,		//        128
+0x56, 0x02, 0x00,		//        256
+0x12, 0x05, 0x00,		//        512
+0x24, 0x10, 0x00,		//       1024
+0x48, 0x20, 0x00,		//       2048
+0x96, 0x40, 0x00,		//       4096
+0x92, 0x81, 0x00,		//       8192
+0x84, 0x63, 0x01,		//      16384
+0x68, 0x27, 0x03		//      32768
+};
+#endif // not LONG
+
+#endif // not FAST_INTEGER
+
+
+
+
+#ifdef FLOAT
+#ifndef FLOAT_FIXED4
+
+/*
+ * #! /usr/bin/perl
+ * for ($i=0, $f=0.5; $i<24; $i++) {
+ * 	$r = sprintf "%.8f", $f;
+ * 	$r =~ /0\.([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])/;
+ * 	printf "0x%02d, 0x%02d, 0x%02d, 0x%02d", $4, $3, $2, $1;
+ * 	print ',' if $i < 23;
+ * 	$sum += $r;
+ * 	printf "\t\t// %.15f  %.8f\n", $f, $sum;
+ * 	$f /= 2;
+ * }
+ */
+
+code unsigned char frac2bcd[] = {
+0x00, 0x00, 0x00, 0x50,		// 0.500000000000000  0.50000000
+0x00, 0x00, 0x00, 0x25,		// 0.250000000000000  0.75000000
+0x00, 0x00, 0x50, 0x12,		// 0.125000000000000  0.87500000
+0x00, 0x00, 0x25, 0x06,		// 0.062500000000000  0.93750000
+0x00, 0x50, 0x12, 0x03,		// 0.031250000000000  0.96875000
+0x00, 0x25, 0x56, 0x01,		// 0.015625000000000  0.98437500
+0x50, 0x12, 0x78, 0x00,		// 0.007812500000000  0.99218750
+0x25, 0x06, 0x39, 0x00,		// 0.003906250000000  0.99609375
+0x12, 0x53, 0x19, 0x00,		// 0.001953125000000  0.99804687
+0x56, 0x76, 0x09, 0x00,		// 0.000976562500000  0.99902343
+0x28, 0x88, 0x04, 0x00,		// 0.000488281250000  0.99951171
+0x14, 0x44, 0x02, 0x00,		// 0.000244140625000  0.99975585
+0x07, 0x22, 0x01, 0x00,		// 0.000122070312500  0.99987792
+0x04, 0x61, 0x00, 0x00,		// 0.000061035156250  0.99993896
+0x52, 0x30, 0x00, 0x00,		// 0.000030517578125  0.99996948
+0x26, 0x15, 0x00, 0x00,		// 0.000015258789062  0.99998474
+0x63, 0x07, 0x00, 0x00,		// 0.000007629394531  0.99999237
+0x81, 0x03, 0x00, 0x00,		// 0.000003814697266  0.99999618
+0x91, 0x01, 0x00, 0x00,		// 0.000001907348633  0.99999809
+0x95, 0x00, 0x00, 0x00,		// 0.000000953674316  0.99999904
+0x48, 0x00, 0x00, 0x00,		// 0.000000476837158  0.99999952
+0x24, 0x00, 0x00, 0x00,		// 0.000000238418579  0.99999976
+0x12, 0x00, 0x00, 0x00,		// 0.000000119209290  0.99999988
+0x06, 0x00, 0x00, 0x00,		// 0.000000059604645  0.99999994
+0x03, 0x00, 0x00, 0x00,		// 0.000000029802322  0.99999997
+0x01, 0x00, 0x00, 0x00,		// 0.000000014901161  0.99999998
+0x01, 0x00, 0x00, 0x00		// 0.000000007450581  0.99999999
+};
+
+#ifndef FLOAT_DEFAULT_FRAC_DIGITS
+// TODO: Perhaps these should be tweaked a bit to take round up
+// effects into account... or maybe give more default digits??
+// Range		#digits
+// 0.0001 - 0.0009999	7
+// 0.001 - 0.009999	6	0.001 = 0x3A83126F  3A83
+// 0.01 - 0.09999	5	0.01  = 0x3C23D70A  3C23
+// 0.1 - 9.9999		4	0.1   = 0x3DCCCCCD, 3DCC
+// 10.0 - 99.99		3	10.0  = 0x41200000  4120
+// 100.0 - 999.99	2	100.0 = 0x42C80000  42C8
+// 1000 - 9999.9	1	1000  = 0x447A0000  447A
+// 10000+		0	10000 = 0x461C4000  461C
+code unsigned int float_range_table[] = {
+65536 - 0x3A83,
+65536 - 0x3C23,
+65536 - 0x3DCC,
+65536 - 0x4120,
+65536 - 0x42C8,
+65536 - 0x447A,
+65536 - 0x461C
+};
 #endif
+
+#else // using FLOAT_FIXED4
+
+/*
+* #! /usr/bin/perl
+*     for ($i=0, $f=0.5; $i<14; $i++) {
+*     $r = sprintf "%.4f", $f;
+*     $r =~ /0\.([0-9][0-9])([0-9][0-9])/;
+*     printf "0x%02d, 0x%02d", $2, $1;
+*     print ',' if $i < 13;
+*     $sum += $r;
+*     printf "\t\t// %.15f  %.4f\n", $f, $sum;
+*     $f /= 2;
+* }
+*/
+
+code unsigned char frac2bcd[] = {
+0x00, 0x50,             // 0.500000000000000  0.5000
+0x00, 0x25,             // 0.250000000000000  0.7500
+0x50, 0x12,             // 0.125000000000000  0.8750
+0x25, 0x06,             // 0.062500000000000  0.9375
+0x12, 0x03,             // 0.031250000000000  0.9687
+0x56, 0x01,             // 0.015625000000000  0.9843
+0x78, 0x00,             // 0.007812500000000  0.9921
+0x39, 0x00,             // 0.003906250000000  0.9960
+0x20, 0x00,             // 0.001953125000000  0.9980
+0x10, 0x00,             // 0.000976562500000  0.9990
+0x05, 0x00,             // 0.000488281250000  0.9995
+0x02, 0x00,             // 0.000244140625000  0.9997
+0x01, 0x00,             // 0.000122070312500  0.9998
+0x01, 0x00              // 0.000061035156250  0.9999
+};
+
+#endif // FLOAT_FIXED4
+#endif // FLOAT
+
+
 
 

@@ -13,8 +13,8 @@ TARGET		= $(PRJDIR)/bin/packihx
 all: $(TARGET)
 
 install: all installdirs
-	$(INSTALL) -s $(TARGET) $(bindir)/packihx
-
+	$(INSTALL) $(TARGET) `echo $(bindir)/packihx|sed '$(transform)'`
+	$(STRIP) -s `echo $(bindir)/packihx|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------

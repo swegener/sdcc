@@ -52,7 +52,7 @@ $(LKZ80): $(SLIBOBJS) $(LKOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s $(LKZ80) $(bindir)/link-z80
+	$(INSTALL) $(LKZ80) $(bindir)/link-z80
 
 # Deleting all the installed files
 # --------------------------------

@@ -47,7 +47,7 @@ $(ASXZ80): $(ASOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s $(ASXZ80) $(bindir)/as-z80
+	$(INSTALL) $(ASXZ80) $(bindir)/as-z80
 
 # Deleting all the installed files
 # --------------------------------

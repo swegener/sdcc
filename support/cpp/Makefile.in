@@ -11,6 +11,7 @@ SHELL		= /bin/sh
 CC		= @CC@
 CPP		= @CPP@
 INSTALL		= @INSTALL@
+STRIP           = @STRIP@
 
 # Source library
 
@@ -43,6 +44,7 @@ SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/bin/sdcpp
 
+transform       = @program_transform_name@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -54,8 +56,8 @@ $(TARGET): $(SLIBOBJS) $(OBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s $(TARGET) $(bindir)/sdcpp
-
+	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp|sed '$(transform)'`
+	$(STRIP) -s `echo $(bindir)/sdcpp|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------

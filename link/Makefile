@@ -10,5 +10,10 @@ all:
 clean:
 	$(MAKE) -C z80 clean
 
-# dummy install target to prevent warnings
 install:
+	$(INSTALL) $(PRJDIR)/bin/link-z80 `echo $(bindir)/link-z80|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/link-z80|sed '$(transform)'`
+	$(INSTALL) $(PRJDIR)/bin/link-gbz80 `echo $(bindir)/link-gbz80|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/link-gbz80|sed '$(transform)'`
+
+

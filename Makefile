@@ -16,8 +16,8 @@ SDCC_LIBS	= support/cpp
 SDCC_ASLINK	= as/mcs51 as link
 SDCC_PACKIHX	= packihx
 
-PKGS		= $(SDCC_MISC) $(SDCC_LIBS) $(SDCC_ASLINK) \
-		  src device/include device/lib $(SDCC_PACKIHX)
+PKGS		= src $(SDCC_ASLINK) $(SDCC_PACKIHX) $(SDCC_MISC) \
+		  $(SDCC_LIBS) device/include device/lib
 PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
 		  src device/include $(SDCC_PACKIHX)
 PORTS		= $(shell cat ports.build)

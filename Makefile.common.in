@@ -20,7 +20,7 @@ INSTALL		= @INSTALL@
 YACC            = @YACC@ 
 LEX             = @LEX@ 
 AWK             = @AWK@
-
+STRIP           = @STRIP@
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
@@ -34,6 +34,8 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 
 SLIB			= $(PRJDIR)/support/Util
+
+transform       = @program_transform_name@
 
 # Flags
 

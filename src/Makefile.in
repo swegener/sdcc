@@ -19,7 +19,7 @@ LIBS		= -lm @LIBS@
 ifdef SDCC_SUB_VERSION
 CFLAGS		+= -DSDCC_SUB_VERSION_STR=\"$(SDCC_SUB_VERSION)\"
 endif
- 
+
 SLIBOBJS	= SDCCerr.o NewAlloc.o MySystem.o BuildCmd.o
 
 OBJECTS 	= SDCCy.o SDCChasht.o SDCCmain.o \
@@ -39,7 +39,7 @@ endif
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
-TARGET		= $(PRJDIR)/bin/sdcc
+TARGET		= $(PRJDIR)/bin/sdcc$(EXEEXT)
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -54,14 +54,14 @@ $(PRJDIR)/support/gc/libgc.a:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s $(TARGET) $(bindir)/sdcc
+	$(INSTALL) $(TARGET) `echo $(bindir)/sdcc|sed '$(transform)'`
+	$(STRIP) -s `echo $(bindir)/sdcc|sed '$(transform)'`
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
 	rm -f $(bindir)/sdcc
-	rm -f $(bindir)/packihx
 
 # Performing self-test
 # --------------------

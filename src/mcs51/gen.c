@@ -319,7 +319,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         sym->aop = aop = newAsmop(AOP_IMMD);    
         ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(sym->rname)+1);
         strcpy(aop->aopu.aop_immd,sym->rname);
-        aop->size = 2;
+        aop->size = FPTRSIZE; 
         return aop;
     }
 
@@ -1741,11 +1741,17 @@ static void genPcall (iCode *ic)
     emitcode("push","acc");    
     emitcode("mov","a,#(%05d$ >> 8)",(rlbl->key+100));
     emitcode("push","acc");
+    
+    if (options.model == MODEL_FLAT24)
+    {
+    	emitcode("mov","a,#(%05d$ >> 16)",(rlbl->key+100));
+    	emitcode("push","acc");    
+    }
 
     /* now push the calling address */
     aopOp(IC_LEFT(ic),ic,FALSE);
 
-    pushSide(IC_LEFT(ic), 2);
+    pushSide(IC_LEFT(ic), FPTRSIZE);
 
     freeAsmop(IC_LEFT(ic),NULL,ic,TRUE); 
 

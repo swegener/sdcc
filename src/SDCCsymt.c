@@ -1211,7 +1211,11 @@ int checkType ( link *dest, link *src )
 	    else
 		return 0;
     }
-    
+
+    /* if one is a specifier and the other is not */
+    if ((IS_SPEC(src) && !IS_SPEC(dest)) ||
+	(IS_SPEC(dest) && !IS_SPEC(src))) return 0;
+
     /* if one of them is a void then ok */
     if (SPEC_NOUN(dest) == V_VOID    &&
 	SPEC_NOUN(src)  != V_VOID    )
@@ -1237,8 +1241,8 @@ int checkType ( link *dest, link *src )
     if (IS_BITFIELD(dest) && IS_BITFIELD(src) &&
 	(SPEC_BLEN(dest) != SPEC_BLEN(src) ||
 	 SPEC_BSTR(dest) != SPEC_BSTR(src)))
-	return -1;
-
+	    return -1;
+    
     /* it is a specifier */
     if (SPEC_NOUN(dest) != SPEC_NOUN(src))      {
 	if (SPEC_USIGN(dest) == SPEC_USIGN(src) &&

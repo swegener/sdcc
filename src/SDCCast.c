@@ -466,6 +466,7 @@ resolveSymbols (ast * tree)
 	      tree->opval.val->etype = tree->opval.val->etype;
 	      tree->opval.val->type = tree->opval.val->sym->type;
 	      werror (W_IMPLICIT_FUNC, tree->opval.val->sym->name);
+	      allocVariables (tree->opval.val->sym);
 	    }
 	  else
 	    {

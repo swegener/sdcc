@@ -1,3 +1,7 @@
+2004-07-02 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/pcode.c: removed buggy double colon
+
 2004-07-01 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added include/pic16 to setup

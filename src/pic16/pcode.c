@@ -5998,12 +5998,12 @@ static void insertBankSwitch(int position, pCode *pc)
 			break;
 
 		case 2: {
+			  symbol *tlbl;
+			  pCode *pcnext, *pcprev, *npci;
+			  PIC_OPCODE ipci;
 			/* just like 0, but previous was a skip instruction,
 			 * so some care should be taken */
-			  symbol *tlbl;
-			  pCode *pcnext, *pcprev, *npci;;
-			  PIC_OPCODE ipci;
-			  
+   			  
 			  	pic16_labelOffset += 10000;
 			  	tlbl = newiTempLabel(NULL);
 			  	

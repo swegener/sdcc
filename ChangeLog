@@ -1,3 +1,11 @@
+2005-02-02 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCast.c (processParms): disabled W_NONRENT_ARGS for pic16 port
+	* src/pic16/gen.c (aopForSym): reenabled special case for function pointers
+	* (pic16_storeForReturn): fixed to allow returning function pointers
+	* (genPackBits): improved accessing full bytes, implemented for GPOINTERs
+	* device/include/pic16/{stddef.h,stdbool.h}: added
+
 2004-02-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/c8051f040.h: added define CPT2_PAGE

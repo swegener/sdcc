@@ -693,11 +693,15 @@ processParms (ast *func,
   /* if the function is being called via a pointer &   */
   /* it has not been defined a reentrant then we cannot */
   /* have parameters                                   */
-  if (func->type != EX_VALUE && !IFFUNC_ISREENT (functype) && !options.stackAuto)
+  /* PIC16 port can... */
+  if (!TARGET_IS_PIC16)
     {
-      werror (W_NONRENT_ARGS);
-      fatalError++;
-      return 1;
+      if (func->type != EX_VALUE && !IFFUNC_ISREENT (functype) && !options.stackAuto)
+        {
+          werror (W_NONRENT_ARGS);
+          fatalError++;
+          return 1;
+        }
     }
 
   /* if defined parameters ended but actual parameters */

@@ -797,7 +797,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
     }
 #endif
 
-#if 0
+#if 1
     /* special case for a function */
     if (IS_FUNC(sym->type)) {   
         sym->aop = aop = newAsmop(AOP_PCODE);
@@ -869,8 +869,8 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 		aop->size = PTRSIZE;
 	else if(IN_CODESPACE( space ) || IN_FARSPACE( space ))
 		aop->size = FPTRSIZE;
-	else if(IC_LEFT(ic)) aop->size = AOP_SIZE( IC_LEFT(ic) );
-	else if(IC_RIGHT(ic)) aop->size = AOP_SIZE( IC_RIGHT(ic) );
+	else if(IC_LEFT(ic) && AOP(IC_LEFT(ic))) aop->size = AOP_SIZE( IC_LEFT(ic) );
+	else if(IC_RIGHT(ic) && AOP(IC_RIGHT(ic))) aop->size = AOP_SIZE( IC_RIGHT(ic) );
 	else if(sym->onStack) {
 	        aop->size = PTRSIZE;
         } else {
@@ -3897,8 +3897,25 @@ static void genEndFunction (iCode *ic)
 
 void pic16_storeForReturn(operand *op, int offset, pCodeOp *dest)
 {
-  if(is_LitOp(op)) {
-    unsigned long lit = (unsigned long)floatFromVal(AOP(op)->aopu.aop_lit);
+  unsigned long lit=1;
+ 
+  // this fails for is_LitOp(op) (if op is an AOP_PCODE)
+  if(AOP_TYPE(op) == AOP_LIT) {
+    if(!IS_FLOAT(operandType( op ))) {
+      lit = (unsigned long)floatFromVal(AOP(op)->aopu.aop_lit);
+    } else {
+      union {
+        unsigned long lit_int;
+        float lit_float;
+      } info;
+	
+      /* take care if literal is a float */
+      info.lit_float = floatFromVal(AOP(op)->aopu.aop_lit);
+      lit = info.lit_int;
+    }
+  }
+
+  if (is_LitOp(op)) {
       if(lit == 0) {
         pic16_emitpcode(POC_CLRF, dest);
       } else {
@@ -11800,39 +11817,106 @@ static void genPackBits (sym_link    *etype , operand *result,
         } else
           pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right), offset++));
 
-	/* if the bit lenth is less than or    */
+	/* if the bit length is less than or   */
 	/* it exactly fits a byte then         */
 	if((shCnt=SPEC_BSTR(etype))
 		|| SPEC_BLEN(etype) <= 8 )  {
+		int fsr0_setup = 0;
 
-		pic16_emitpcode(POC_ANDLW, pic16_popGetLit((1U << blen)-1));
+		if (blen != 8 || bstr != 0) {
+		  // we need to combine the value with the old value
+		  pic16_emitpcode(POC_ANDLW, pic16_popGetLit((1U << blen)-1));
 
-		/* shift left acc */
-		AccLsh(shCnt);
+		  /* shift left acc */
+		  AccLsh(shCnt);
 
-		/* using PRODL as a temporary register here */
-		pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodl));
+		  /* using PRODH as a temporary register here */
+		  pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodh));
 
-		switch (p_type) {
+		  /* get old value */
+		  switch (p_type) {
 			case FPOINTER:
 			case POINTER:
 			        pic16_loadFSR0( result );
+				fsr0_setup = 1;
 				pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
 //				pic16_emitcode ("mov","b,a");
 //				pic16_emitcode("mov","a,@%s",rname);
 				break;
 
 			case GPOINTER:
-                                werror(W_POSSBUG2, __FILE__, __LINE__);
+				if (AOP(result)->aopu.aop_reg[2]) {
+				  // prepare call to __gptrget1, this is actually genGenPointerGet(result, WREG, ?ic?)
+				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
+				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),1), pic16_popCopyReg(&pic16_pc_prodl)));
+				  pic16_emitpcode (POC_MOVFW, pic16_popGet(AOP(result),2));
+				  pic16_emitpcode (POC_CALL, pic16_popGetWithString ("__gptrget1"));
+				  {
+				    symbol *sym;
+				    sym = newSymbol( "__gptrget1", 0 );
+				    strcpy(sym->rname, "__gptrget1");
+				    checkAddSym(&externs, sym);
+				  }
+				} else {
+				  // data pointer (just 2 byte given)
+			          pic16_loadFSR0( result );
+				  fsr0_setup = 1;
+				  pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
+				}
+				
+				// warnings will be emitted below
+				//pic16_emitpcomment ("; =?= genPackBits, GPOINTER...");
+                                //werror(W_POSSBUG2, __FILE__, __LINE__);
 			        break;
 
-		}
+			default:
+				assert (0 && "invalid pointer type specified");
+				break;
+		  }
 #if 1
-		pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
+		  pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
 			(unsigned char)((unsigned char)(0xff << (blen+bstr)) |
 					(unsigned char)(0xff >> (8-bstr))) ));
-		pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodl));
-		pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_indf0));
+		  pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodh));
+		} // if (blen != 8 || bstr != 0)
+
+		/* write new value back */
+		switch (p_type) {
+			case FPOINTER:
+			case POINTER:
+				if (!fsr0_setup) pic16_loadFSR0( result );
+				pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_indf0));
+				break;
+
+			case GPOINTER:
+				if (AOP(result)->aopu.aop_reg[2]) {
+				  // prepare call to __gptrset1, this is actually genGenPointerSet(WREG, result, ?ic?)
+				  pic16_emitpcode (POC_MOVWF, pic16_popCopyReg (pic16_stack_postdec/*pic16_pc_postdec1*/));
+				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
+				  pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result),1), pic16_popCopyReg(&pic16_pc_prodl)));
+				  pic16_emitpcode (POC_MOVFW, pic16_popGet(AOP(result),2));
+				  pic16_emitpcode (POC_CALL, pic16_popGetWithString ("__gptrput1"));
+				  {
+				    symbol *sym;
+				    sym = newSymbol( "__gptrput1", 0 );
+				    strcpy(sym->rname, "__gptrput1");
+				    checkAddSym(&externs, sym);
+				  }
+				} else {
+				  // data pointer (just 2 byte given)
+				  if (!fsr0_setup) pic16_loadFSR0( result );
+				  pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_indf0));
+				}
+				
+				// this should work in all cases (as soon as gptrget/gptrput work on EEPROM and PROGRAM MEMORY)
+				//pic16_emitpcomment ("; =?= genPackBits, GPOINTER access");
+                                werror(W_POSSBUG2, __FILE__, __LINE__);
+				break;
+
+			default:
+				assert (0 && "invalid pointer type specified");
+				break;
+		}
 #endif
 
 	  return;

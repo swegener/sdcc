@@ -1487,7 +1487,7 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
     }
 pack:
     /* if in far space & tru symbol then don't */
-    if ((IS_TRUE_SYM(IC_RESULT(ic))) && isOperandInFarSpace(IC_RESULT(ic)))
+    if ((IS_TRUE_SYMOP(IC_RESULT(ic))) && isOperandInFarSpace(IC_RESULT(ic)))
 	return 0;
     /* found the definition */
     /* replace the result with the result of */

@@ -512,7 +512,7 @@ static void _tininative_genAssemblerEnd (FILE * of)
     fputs("\tend\n",of);
 }
 /* tininative assembler , calls "macro", if it succeeds calls "a390" */
-static void _tininative_do_assemble (const char * const *asmOptions)
+static void _tininative_do_assemble (set *asmOptions)
 {
     static const char *macroCmd[] = {
 	"macro","$1.a51",NULL

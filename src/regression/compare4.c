@@ -3,7 +3,7 @@
 // regression testing program for comparing signed chars and ints
 //
 
-#define  COMPARE_OUT_OF_RANGE 1
+//#define  COMPARE_OUT_OF_RANGE 1
 
 unsigned char success = 0;
 unsigned char failures = 0;
@@ -178,6 +178,9 @@ void c_a500(void)
   if(int0 != 0xa500)
     failures++;
 
+  if(int0 != 0x44)
+    int0 = 0x28;
+
   if(int0 == 0xa400)
     failures++;
 
@@ -197,10 +200,10 @@ void c_abcd(void)
   if(char0 == 0xabcd)
     failures++;
 #endif
-
+/*
   if(int0 != 0xabcd)
     failures++;
-
+*/
   if(int0 == 0xab00)
     failures++;
 

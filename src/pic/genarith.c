@@ -63,6 +63,9 @@
 #include "pcode.h"
 #include "gen.h"
 
+
+#define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0xff)
+
 const char *AopType(short type)
 {
   switch(type) {
@@ -378,6 +381,7 @@ static void genAddLit (operand *result,operand *left, int lit)
 {
 
   int size,same;
+  int lo;
 
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   size = pic14_getDataSize(result);
@@ -392,7 +396,7 @@ static void genAddLit (operand *result,operand *left, int lit)
      
     else if(size == 2) {
       int hi = 0xff & (lit >> 8);
-      int lo = lit & 0xff;
+      lo = lit & 0xff;
 
       switch(hi) {
       case 0: 
@@ -502,6 +506,102 @@ static void genAddLit (operand *result,operand *left, int lit)
 	}
 
       }
+    } else {
+      int carry_info = 0;
+      int offset = 0;
+      /* size > 2 */
+      DEBUGpic14_emitcode (";  add lit to long","%s  %d",__FUNCTION__,__LINE__);
+
+      while(size--) {
+	lo = BYTEofLONG(lit,0);
+
+	if(carry_info) {
+	  switch(lo) {
+	  case 0:
+	    switch(carry_info) {
+	    case 1:
+	      emitSKPNZ;
+	      emitpcode(POC_INCF, popGet(AOP(result),offset,FALSE,FALSE));
+	      break;
+	    case 2:
+	      emitpcode(POC_RLFW, popGet(AOP(result),offset,FALSE,FALSE));
+	      emitpcode(POC_ANDLW,popGetLit(1));
+	      emitpcode(POC_ADDWF, popGet(AOP(result),offset,FALSE,FALSE));
+	      break;
+	    default: /* carry_info = 3  */
+	      emitSKPNC;
+	      emitpcode(POC_INCF, popGet(AOP(result),offset,FALSE,FALSE));
+	      carry_info = 1;
+	      break;
+	    }
+	    break;
+	  case 0xff:
+	    emitpcode(POC_MOVLW,popGetLit(lo));
+	    if(carry_info==1) 
+	      emitSKPZ;
+	    else
+	      emitSKPC;
+	    emitpcode(POC_ADDWF, popGet(AOP(result),offset,FALSE,FALSE));
+	    break;
+	  default:
+	    emitpcode(POC_MOVLW,popGetLit(lo));
+	    if(carry_info==1) 
+	      emitSKPNZ;
+	    else
+	      emitSKPNC;
+	    emitpcode(POC_MOVLW,popGetLit(lo+1));
+	    emitpcode(POC_ADDWF, popGet(AOP(result),offset,FALSE,FALSE));
+	    carry_info=2;
+	    break;
+	  }
+	}else {
+	  /* no carry info from previous step */
+	  /* this means this is the first time to add */
+	  switch(lo) {
+	  case 0:
+	    break;
+	  case 1:
+	    emitpcode(POC_INCF, popGet(AOP(result),offset,FALSE,FALSE));
+	    carry_info=1;
+	    break;
+	  default:
+	    emitpcode(POC_MOVLW,popGetLit(lo));
+	    emitpcode(POC_ADDWF, popGet(AOP(result),offset,FALSE,FALSE));
+	    if(lit <0x100) 
+	      carry_info = 3;  /* Were adding only one byte and propogating the carry */
+	    else
+	      carry_info = 2;
+	    break;
+	  }
+	}
+	offset++;
+	lit >>= 8;
+      }
+    
+/*
+      lo = BYTEofLONG(lit,0);
+
+      if(lit < 0x100) {
+	if(lo) {
+	  if(lo == 1) {
+	    emitpcode(POC_INCF, popGet(AOP(result),0,FALSE,FALSE));
+	    emitSKPNZ;
+	  } else {
+	    emitpcode(POC_MOVLW,popGetLit(lo));
+	    emitpcode(POC_ADDWF, popGet(AOP(result),0,FALSE,FALSE));
+	    emitSKPNC;
+	  }
+	  emitpcode(POC_INCF, popGet(AOP(result),1,FALSE,FALSE));
+	  emitSKPNZ;
+	  emitpcode(POC_INCF, popGet(AOP(result),2,FALSE,FALSE));
+	  emitSKPNZ;
+	  emitpcode(POC_INCF, popGet(AOP(result),3,FALSE,FALSE));
+
+	} 
+      } 
+    }
+
+*/
     }
   } else {
     int offset = 1;
@@ -527,6 +627,8 @@ static void genAddLit (operand *result,operand *left, int lit)
 	emitpcode(POC_ADDFW, popGet(AOP(left),0,FALSE,FALSE));
 	emitpcode(POC_MOVWF, popGet(AOP(result),0,FALSE,FALSE));
       }
+
+
     } else {
 
       if(lit & 0xff) {

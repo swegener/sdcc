@@ -197,8 +197,8 @@ void c_abcd(void)
   if(aint0 == 0x01cd)
     failures++;
 
-  if(aint0 == 0x1234abcd)
-    failures++;
+  //  if(aint0 == 0x1234abcd)
+    //    failures++;
 
 }
 

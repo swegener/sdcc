@@ -64,6 +64,8 @@ SRC = b.c \
 	compare2.c \
 	compare3.c \
 	compare4.c \
+	compare5.c \
+	compare6.c \
 	for.c \
 	rotate1.c \
 	rotate2.c \

@@ -18,7 +18,8 @@ OBJECTS         = SDCCy.obj SDCClex.obj SDCCerr.obj SDCChasht.obj SDCCmain.obj \
                   SDCCsymt.obj SDCCopt.obj SDCCast.obj SDCCmem.obj SDCCval.obj \
                   SDCCicode.obj SDCCbitv.obj SDCCset.obj SDCClabel.obj \
                   SDCCBBlock.obj SDCCloop.obj SDCCcse.obj SDCCcflow.obj SDCCdflow.obj \
-                  SDCClrange.obj SDCCptropt.obj SDCCpeeph.obj SDCCglue.obj
+                  SDCClrange.obj SDCCptropt.obj SDCCpeeph.obj SDCCglue.obj \
+                  asm.obj
 
 TARGET          = $(PRJDIR)/bin/sdcc.exe
 

@@ -1583,7 +1583,7 @@ static int
 packRegsForAssign (iCode * ic, eBBlock * ebp)
 {
   iCode *dic, *sic;
-  sym_link *etype = operandType (IC_RIGHT (ic));
+  //sym_link *etype = operandType (IC_RIGHT (ic));
 
   if (!IS_ITEMP (IC_RIGHT (ic)) ||
       OP_SYMBOL (IC_RIGHT (ic))->isind ||
@@ -1595,43 +1595,21 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   /* if the true symbol is defined in far space or on stack
      then we should not since this will increase register pressure */
-#if 0
-  if (isOperandInFarSpace (IC_RESULT (ic)))
-    {
-      if ((dic = farSpacePackable (ic)))
-	goto pack;
-      else
-	return 0;
-    }
-#else
   if (isOperandInFarSpace(IC_RESULT(ic)) && !farSpacePackable(ic)) {
     return 0;
   }
-#endif
 
   /* find the definition of iTempNN scanning backwards if we find a 
      a use of the true symbol in before we find the definition then 
      we cannot */
   for (dic = ic->prev; dic; dic = dic->prev)
     {
-#if 0 // jwk 20010410
-      /* if there is a function call and this is
-         a parameter & not my parameter then don't pack it */
-      if ((dic->op == CALL || dic->op == PCALL) &&
-	  (OP_SYMBOL (IC_RESULT (ic))->_isparm &&
-	   !OP_SYMBOL (IC_RESULT (ic))->ismyparm))
-	{
-	  dic = NULL;
-	  break;
-	}
-#else
       /* if there is a function call then don't pack it */
       if ((dic->op == CALL || dic->op == PCALL))
 	{
 	  dic = NULL;
 	  break;
 	}
-#endif
 
       if (SKIP_IC2 (dic))
 	continue;
@@ -2340,20 +2318,6 @@ packRegisters (eBBlock * ebp)
 	    }
 	}
 
-#if 0
-      /* if the condition of an if instruction
-         is defined in the previous instruction then
-         mark the itemp as a conditional */
-      if ((IS_CONDITIONAL (ic) ||
-	   (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic))) &&
-	  ic->next && ic->next->op == IFX &&
-	  isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
-	  OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
-	{
-	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
-	  continue;
-	}
-#else
       /* if the condition of an if instruction
          is defined in the previous instruction and
 	 this is the only usage then
@@ -2368,7 +2332,6 @@ packRegisters (eBBlock * ebp)
 	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
 	  continue;
 	}
-#endif
 
       /* reduce for support function calls */
       if (ic->supportRtn || ic->op == '+' || ic->op == '-')

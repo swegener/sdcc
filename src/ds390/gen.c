@@ -5353,9 +5353,15 @@ genAnd (iCode * ic, iCode * ifx)
 		emitcode ("anl", "a,%s",
 			  aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
 	      } else {
-		MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-		emitcode ("anl", "a,%s",
-			  aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+		if (AOP_TYPE(left)==AOP_ACC) {
+		  emitcode("mov", "b,a");
+		  MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
+		  emitcode("anl", "a,b");
+		}else {
+		  MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
+		  emitcode ("anl", "a,%s",
+			    aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+		}
 	      }
 	      emitcode ("jnz", "%05d$", tlbl->key + 100);
 	      offset++;

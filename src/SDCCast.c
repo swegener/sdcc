@@ -1146,6 +1146,44 @@ processBlockVars (ast * tree, int *stack, int action)
   return tree;
 }
 
+/*-------------------------------------------------------------*/
+/* constExprTree - returns TRUE if this tree is a constant     */
+/*                 expression                                  */
+/*-------------------------------------------------------------*/
+bool constExprTree (ast *cexpr) {
+
+  if (!cexpr) {
+    return TRUE;
+  }
+
+  cexpr = decorateType (resolveSymbols (cexpr));
+  
+  switch (cexpr->type) 
+    {
+    case EX_VALUE:
+      return (IS_AST_LIT_VALUE(cexpr));
+    case EX_LINK:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	      "unexpected link in expression tree\n");
+      return FALSE;
+    case EX_OP:
+      if (cexpr->opval.op==CAST) {
+	// jwk: cast ignored, maybe we should throw a warning here
+	return constExprTree(cexpr->right);
+      }
+      if (cexpr->opval.op=='&') { 
+	return TRUE;
+      }
+      if (cexpr->opval.op==CALL || cexpr->opval.op==PCALL) {
+	return FALSE;
+      }
+      if (constExprTree(cexpr->left) && constExprTree(cexpr->right)) {
+	return TRUE;
+      }
+    }
+  return FALSE;
+}  
+    
 /*-----------------------------------------------------------------*/
 /* constExprValue - returns the value of a constant expression     */
 /*                  or NULL if it is not a constant expression     */

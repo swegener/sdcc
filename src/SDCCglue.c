@@ -259,12 +259,20 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			    decorateType (resolveSymbols (list2expr (sym->ival))));
 	  }
 	  codeOutFile = statsg->oFile;
-	  allocInfo = 0;
-	  
-	  // set ival's lineno to where the symbol was defined
-	  if (ival) ival->lineno=sym->lineDef;
-	  eBBlockFromiCode (iCodeFromAst (ival));
-	  allocInfo = 1;
+
+	  if (ival) {
+	    // set ival's lineno to where the symbol was defined
+	    lineno=ival->lineno=sym->lineDef;
+	    
+	    // check if this is a constant expression
+	    if (constExprTree(ival->right)) {
+	      allocInfo = 0;
+	      eBBlockFromiCode (iCodeFromAst (ival));
+	      allocInfo = 1;
+	    } else {
+	      werror (E_CONST_EXPECTED, "found expression");
+	    }
+	  }
 	}	  
 
 	/* if the ival is a symbol assigned to an aggregate,
@@ -559,7 +567,11 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 	  werror (W_EXCESS_INITIALIZERS, "scalar", sym->name, sym->lineDef);
 	}
 
-	val = list2val (ilist);
+	if (!(val = list2val (ilist))) {
+	  // assuming a warning has been thrown
+	  val=constVal("0");
+	}
+
 	if (val->type != type) {
 	  val = valCastLiteral(type, floatFromVal(val));
 	}

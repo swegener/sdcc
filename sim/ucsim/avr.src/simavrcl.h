@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_simavr: public cl_sim
 {
 public:
-  cl_simavr(int iargc, char *iargv[]);
+  cl_simavr(class cl_app *the_app, int iargc, char *iargv[]);
   virtual int proc_arg(char optopt, char *optarg);
 
   virtual class cl_uc *mk_controller(void);

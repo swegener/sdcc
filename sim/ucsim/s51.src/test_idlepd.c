@@ -1,4 +1,4 @@
-#include <8051.h>
+#include <reg51.h>
 
 sfr at 0xa6 WDTRST;
 

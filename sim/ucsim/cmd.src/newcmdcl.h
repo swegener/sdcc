@@ -240,7 +240,7 @@ public:
   virtual int  get_in_fd(void);
   virtual int  input_avail(void);
   virtual char *read_line(void);
-  virtual int  proc_input(class cl_cmdset *cmdset);
+  virtual int  proc_input(class cl_app *app, class cl_cmdset *cmdset);
   virtual bool interpret(char *cmd);
 };
 
@@ -269,6 +269,7 @@ public:
 class cl_commander: public cl_base
 {
 public:
+  class cl_app *app;
   class cl_list *cons;
   fd_set read_set, active_set;
   int fd_num;
@@ -277,7 +278,8 @@ public:
   class cl_cmdset *cmdset;
 
 public:
-  cl_commander(class cl_cmdset *acmdset, class cl_sim *asim);
+  cl_commander(class cl_app *the_app,
+	       class cl_cmdset *acmdset, class cl_sim *asim);
   ~cl_commander(void);
   virtual int init(void);
 

@@ -44,7 +44,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define OPT_Z80		0x0040
 #define OPT_TARGET	(OPT_51|OPT_AVR|OPT_Z80)
 
-class cl_option: public cl_base
+/*class cl_option: public cl_base
 {
 public:
   int type;	// See OPT_XXX
@@ -64,19 +64,36 @@ class cl_options: public cl_list
 {
 public:
   cl_options(void);
-};
+};*/
 
 
 /* Application */
 
 class cl_app: public cl_base
 {
-public:
-  class cl_options *options;
+protected:
+  //class cl_options *options;
+  class cl_sim *sim;
+  class cl_cmdset *cmdset;
 
 public:
   cl_app(void);
   ~cl_app(void);
+
+public:
+  virtual int init(void);
+  virtual int run(void);
+  virtual void done(void);
+
+public:
+  virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
+
+public:
+  virtual void set_simulator(class cl_sim *simulator);
+  virtual void remove_simulator(void);
+
+protected:
+  virtual void build_cmdset(class cl_cmdset *cs);
 };
 
 

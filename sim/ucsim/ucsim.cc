@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (sim51cl.h)
+ * Simulator of microcontrollers (ucsim.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,21 +25,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef SIM51CL_HEADER
-#define SIM51CL_HEADER
+#include "appcl.h"
 
-#include "simcl.h"
-
-
-class cl_sim51: public cl_sim
+int
+main(int argc, char *argv[])
 {
-public:
-  cl_sim51(class cl_app *the_app, int iargc, char *iargv[]);
-  virtual int proc_arg(char optopt, char *optarg);
-  virtual class cl_uc *mk_controller(void);
-};
+  class cl_app *app;
+  int ret;
 
+  app= new cl_app();
+  app->init();
+  ret= app->run();
+  app->done();
+  return(ret);
+}
 
-#endif
-
-/* End of s51.src/sim51cl.h */
+/* End of sim.src/ucsim.cc */

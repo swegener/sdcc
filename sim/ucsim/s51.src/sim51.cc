@@ -50,8 +50,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 
 
-cl_sim51::cl_sim51(int iargc, char *iargv[]):
-  cl_sim("t:s:S:hHk:", iargc, iargv)
+cl_sim51::cl_sim51(class cl_app *the_app, int iargc, char *iargv[]):
+  cl_sim(the_app, "t:s:S:hHk:", iargc, iargv)
 {}
 
 static void

@@ -128,6 +128,21 @@ cl_memloc_coll::get_loc(t_addr address)
 
 
 /*
+ */
+
+cl_cell::cl_cell(void):
+  cl_base()
+{
+  data= 0;
+}
+
+cl_cell::cl_cell(t_mem idata):
+  cl_base()
+{
+  data= idata;
+}
+
+/*
  * Memory
  ******************************************************************************
  */

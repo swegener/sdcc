@@ -21,6 +21,7 @@ all: checkconf
 	@for pkg in $(PKGS); do\
 	  cd $$pkg && $(MAKE) $$pkg ; cd ..;\
 	done
+	$(MAKE) -f main.mk main_app
 
 libs: main.mk
 	$(MAKE) -f main.mk libs

@@ -28,12 +28,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ctype.h>
 
+// sim.src
+#include "appcl.h"
+
+// local
 #include "simavrcl.h"
 #include "avrcl.h"
 
 
-cl_simavr::cl_simavr(int iargc, char *iargv[]):
-  cl_sim("h", iargc, iargv)
+cl_simavr::cl_simavr(class cl_app *the_app, int iargc, char *iargv[]):
+  cl_sim(the_app, "h", iargc, iargv)
 {}
 
 

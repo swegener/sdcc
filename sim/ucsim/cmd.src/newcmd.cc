@@ -51,6 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // sim
 #include "simcl.h"
 #include "argcl.h"
+#include "appcl.h"
 
 // local
 #include "newcmdcl.h"
@@ -984,7 +985,7 @@ cl_console::read_line(void)
 }
 
 int
-cl_console::proc_input(class cl_cmdset *cmdset)
+cl_console::proc_input(class cl_app *app, class cl_cmdset *cmdset)
 {
   int retval= 0;
 
@@ -1008,7 +1009,12 @@ cl_console::proc_input(class cl_cmdset *cmdset)
       class cl_cmd *cm;
       cmdline= new cl_cmdline(cmdstr, this);
       cmdline->init();
-      cm= cmdset->get_cmd(cmdline);
+      cm= 0;
+      if (app)
+	cm= app->get_cmd(cmdline);
+      if (cm == 0 &&
+	  cmdset)
+	cm= cmdset->get_cmd(cmdline);
       if (cm)
 	retval= cm->work(sim, cmdline, this);
       delete cmdline;
@@ -1099,9 +1105,11 @@ cl_listen_console::proc_input(class cl_cmdset *cmdset)
  *____________________________________________________________________________
  */
 
-cl_commander::cl_commander(class cl_cmdset *acmdset, class cl_sim *asim):
+cl_commander::cl_commander(class cl_app *the_app,
+			   class cl_cmdset *acmdset, class cl_sim *asim):
   cl_base()
 {
+  app= the_app;
   cons= new cl_list(1, 1); 
   actual_console= frozen_console= 0;
   cmdset= acmdset;
@@ -1353,7 +1361,7 @@ cl_commander::proc_input(void)
 	    if (c->match(i))
 	      {
 		actual_console= c;
-		int retval= c->proc_input(cmdset);
+		int retval= c->proc_input(app, cmdset);
 		if (retval)
 		  {
 		    del_console(c);

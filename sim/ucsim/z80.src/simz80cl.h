@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_simz80: public cl_sim
 {
 public:
-  cl_simz80(char *more_args, int iargc, char *iargv[]);
+  cl_simz80(class cl_app *the_app, char *more_args, int iargc, char *iargv[]);
 
   virtual class cl_uc *mk_controller(void);
 };

@@ -64,6 +64,16 @@ public:
 };
 
 
+class cl_cell: public cl_base
+{
+public:
+  t_mem data;
+  
+public:
+  cl_cell(void);
+  cl_cell(t_mem idata);
+};
+
 /* Memory */
 
 class cl_mem: public cl_guiobj

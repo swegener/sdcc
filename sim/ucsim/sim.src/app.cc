@@ -31,6 +31,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // prj
 #include "i_string.h"
 
+// sim.src
+#include "simcl.h"
+
 // local
 #include "appcl.h"
 
@@ -39,7 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Program options
  */
 
-cl_option::cl_option(int atype, char sn, char *ln)
+/*cl_option::cl_option(int atype, char sn, char *ln)
 {
   type= atype;
   short_name= sn;
@@ -70,14 +73,14 @@ cl_option::get_value(int index)
   if (index > values->count - 1)
     return(0);
   return((char*)(values->at(index)));
-}
+}*/
 
 /* List of options */
 
-cl_options::cl_options(void):
+/*cl_options::cl_options(void):
   cl_list(2, 2)
 {
-}
+}*/
 
 
 /*
@@ -87,12 +90,71 @@ cl_options::cl_options(void):
 
 cl_app::cl_app(void)
 {
-  options= new cl_options();
+  //options= new cl_options();
+  sim= 0;
 }
 
 cl_app::~cl_app(void)
 {
-  delete options;
+  //delete options;
+  remove_simulator();
+}
+
+int
+cl_app::init(void)
+{
+  cl_base::init();
+
+  return(0);
+}
+
+/* Main cycle */
+
+int
+cl_app::run(void)
+{
+  return(0);
+}
+
+void
+cl_app::done(void)
+{
+}
+
+
+/* Command handling */
+
+class cl_cmd *
+cl_app::get_cmd(class cl_cmdline *cmdline)
+{
+  return(0);
+}
+
+
+/* Adding and removing comonents */
+
+void
+cl_app::set_simulator(class cl_sim *simulator)
+{
+  if (sim)
+    remove_simulator();
+  sim= simulator;
+  
+}
+
+void
+cl_app::remove_simulator(void)
+{
+  if (!sim)
+    return;
+  delete sim;
+  sim= 0;
+}
+
+void
+cl_app::build_cmdset(class cl_cmdset *cs)
+{
+  
 }
 
 

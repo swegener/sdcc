@@ -58,9 +58,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Simulator
  */
 
-cl_sim::cl_sim(char *more_args, int iargc, char *iargv[]):
+cl_sim::cl_sim(class cl_app *the_app,
+	       char *more_args, int iargc, char *iargv[]):
   cl_base()
 {
+  app= the_app;
   argc= iargc; argv= iargv;
   uc= 0;
   cmd= 0;
@@ -83,7 +85,7 @@ cl_sim::init(void)
   if (!(uc= mk_controller()))
     return(1);
   uc->init();
-  cmd= new cl_commander(cmdset, this);
+  cmd= new cl_commander(app, cmdset, this);
   cmd->init();
   char *Config= get_sarg(0, "Config");
   if (Config)

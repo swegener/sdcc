@@ -46,6 +46,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_sim: public cl_base
 {
+protected:
+  class cl_app *app;
 public:
   int state; // See SIM_XXXX
   int argc; char **argv;
@@ -59,7 +61,7 @@ public:
   class cl_list *arguments;
   
 public:
-  cl_sim(char *more_args, int iargc, char *iargv[]);
+  cl_sim(class cl_app *the_app, char *more_args, int iargc, char *iargv[]);
   ~cl_sim(void);
   virtual int init(void);
   

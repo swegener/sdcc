@@ -1219,9 +1219,10 @@ t_uc51::do_timer0(int cycles)
 		  // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
 		  //(MEM(MEM_SFR)[TL0])++;
 		  sfr->add(TL0, 1);
-		  if (sfr->get(TL0) > 0x1f)
+		  if ((sfr->get(TL0) & 0x1f) == 0)
 		    {
-		      sfr->set_bit0(TL0, ~0x1f);
+		      //sfr->set_bit0(TL0, ~0x1f);
+		      sfr->set(TL0, 0);
 		      if (!/*++(MEM(MEM_SFR)[TH0])*/sfr->add(TH0, 1))
 			{
 			  sfr->set_bit1(TCON, bmTF0);
@@ -1333,9 +1334,10 @@ t_uc51::do_timer1(int cycles)
 	      while (cycles--)
 		{
 		  // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
-		  if (/*++(MEM(MEM_SFR)[TL1])*/sfr->add(TL1, 1) > 0x1f)
+		  if (/*++(MEM(MEM_SFR)[TL1])*/(sfr->add(TL1, 1) & 0x1f) == 0)
 		    {
-		      sfr->set_bit0(TL1, ~0x1f);
+		      //sfr->set_bit0(TL1, ~0x1f);
+		      sfr->set(TL1, 0);
 		      if (!/*++(MEM(MEM_SFR)[TH1])*/sfr->add(TH1, 1))
 			{
 			  sfr->set_bit1(TCON, bmTF1);

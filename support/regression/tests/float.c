@@ -58,7 +58,9 @@ char compare (float is, float should) {
   }
 }
 
-void testFloatMath(void) {
+void
+testFloatMath(void)
+{
   int i;
   int t = sizeof(cases)/sizeof(cases[0]);
   float result;

@@ -29,10 +29,11 @@
 ** $Id$
 */
 
-/* write address is expected to be in WREG:FSR0H:FSR0L while
- * write value is in TBLPTRL:TBLPTRH:PRODH:PRODL */
+/* write address is expected to be in WREG:PRODL:FSR0L while
+ * write value is in TBLPTRL:TBLPTRH:PRODH:[stack] */
  
 extern POSTINC0;
+extern PREINC1;
 extern INDF0;
 extern FSR0L;
 extern FSR0H;
@@ -54,11 +55,13 @@ void _gptrput1(void) _naked
      * 11 -> unimplemented
      */
     btfss	_WREG, 7
-    goto	_lab_01_
+    bra		_lab_01_
     
     /* data pointer  */
     /* data are already in FSR0 */
-    movff	_PRODL, _POSTINC0
+    movff	_PRODL, _FSR0H
+    
+    movff	_PREINC1, _POSTINC0
     
     return
     

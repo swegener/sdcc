@@ -20,11 +20,17 @@ SRCS	=	gptrget1 \
 		gptrput2 \
 		gptrput3 \
 		gptrput4
-		
+
 
 include ../Makefile.rules
 
+#OFILES	+= gptrcommon.o
+
+
 all: build-library
+
+#gptrcommon.o: gptrcommon.S
+#	$(AS) -c $< -o $@
 
 build-library: $(OFILES)
 #	@$(CP) -v $(OFILES) ../../bin

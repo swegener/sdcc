@@ -29,10 +29,12 @@
 */
 
 /* the return value is expected to be in WREG, therefore we choose return
- * type void here. Generic pointer is expected to be in WREG:FSR0H:FSR0L,
+ * type void here. Generic pointer is expected to be in WREG:PRODL:FSR0L,
  * so function arguments are void, too */
 
 extern POSTINC0;
+extern POSTINC1;
+extern PREINC1;
 extern INDF0;
 extern FSR0L;
 extern FSR0H;
@@ -42,6 +44,7 @@ extern TBLPTRH;
 extern TBLPTRU;
 extern TABLAT;
 extern PRODL;
+
 
 void _gptrget1(void) _naked
 {
@@ -53,38 +56,38 @@ void _gptrget1(void) _naked
      * 11 -> unimplemented
      */
     btfss	_WREG, 7
-    goto	_lab_01_
+    bra		_lab_01_
     
-    /* data pointer  */
-    /* data are already in FSR0 */
+    ; data pointer
+    ; data are already in FSR0
+    movff	_PRODL, _FSR0H    
 
-    /* debug info */
     movf	_POSTINC0, w
 
     return
     
 
 _lab_01_:
-    /* code or eeprom */
+    ; code or eeprom
     btfsc	_WREG, 6
-    goto	_lab_02_
+    bra		_lab_02_
     
     ; code pointer
+    movff	_FSR0L, _TBLPTRL
+    movff	_PRODL, _TBLPTRH
     movwf	_TBLPTRU
-    movff	_FSR0L, _TBLPTRL    
-    movff	_FSR0H, _TBLPTRH
     
-    TBLRD*
+    tblrd*+
     
-    /* result in TBLAT */
+    ; result in WREG
     movf	_TABLAT, w
     
     return 
   
 _lab_02_:
-    /* EEPROM pointer */
+    ; EEPROM pointer
 
-    /* unimplemented yet */
+    ; unimplemented yet
 
 _end_:
 

@@ -175,7 +175,7 @@ struct options  save_options  ;
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0{D}+{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 {D}+{IS}?      { count(); yylval.val = constVal(yytext); return(CONSTANT); }
-'(\\.|[^\\'])+' { count();yylval.val = charVal (yytext); return(CONSTANT); }
+'(\\.|[^\\'])+' { count();yylval.val = charVal (yytext); return(CONSTANT); /* ' make syntax highliter happy */}
 {D}+{E}{FS}?   { count(); yylval.val = constFloatVal(yytext);return(CONSTANT); }
 {D}*"."{D}+({E})?{FS}?  { count(); yylval.val = constFloatVal(yytext);return(CONSTANT); }
 {D}+"."{D}*({E})?{FS}?	{ count(); yylval.val = constFloatVal(yytext);return(CONSTANT); }
@@ -243,7 +243,7 @@ struct options  save_options  ;
 }
 .			   { count()	; }
 %%
-   
+
 int checkCurrFile ( char *s)
 {
     char lineNum[10]			;

@@ -760,6 +760,8 @@ processParms (ast * func,
       actParm->right = pTree;
       actParm->etype = defParm->etype;
       actParm->ftype = defParm->type;
+      actParm->decorated=0; /* force typechecking */
+      decorateType (actParm);
     }
 
   /* make a copy and change the regparm type to the defined parm */
@@ -2719,6 +2721,12 @@ decorateType (ast * tree)
 	      LRVAL (tree) = 1;
       }
 #else
+      /* if pointer to struct then check names */
+      if (IS_PTR(LTYPE(tree)) && IS_STRUCT(LTYPE(tree)->next) &&
+	  IS_PTR(RTYPE(tree)) && IS_STRUCT(RTYPE(tree)->next) &&
+	  strcmp(SPEC_STRUCT(LETYPE(tree))->tag,SPEC_STRUCT(RETYPE(tree))->tag)) {
+	      werror(W_CAST_STRUCT_PTR,SPEC_STRUCT(RETYPE(tree))->tag,SPEC_STRUCT(LETYPE(tree))->tag);
+      }
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree)) && !IS_PTR (LTYPE (tree))) {
 	tree->type = EX_VALUE;
@@ -2733,8 +2741,7 @@ decorateType (ast * tree)
 	TTYPE (tree) = LTYPE (tree);
 	LRVAL (tree) = 1;
       }
-#endif
-
+#endif      
       TETYPE (tree) = getSpec (TTYPE (tree));
 
       return tree;

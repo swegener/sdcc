@@ -1582,10 +1582,7 @@ aggregateToPointer (value * val)
 	  DCL_TYPE (val->type) = PPOINTER;
 	  break;
 	case S_FIXED:
-	  if (SPEC_OCLS(val->etype)) {
 	    DCL_TYPE(val->type)=PTR_TYPE(SPEC_OCLS(val->etype));
-	    break;
-	  }
 
 	  if (TARGET_IS_DS390)
 	    {
@@ -1600,7 +1597,7 @@ aggregateToPointer (value * val)
 	    DCL_TYPE (val->type) = FPOINTER;
 	    break;
 	  }
-	  /* fall through! */
+	  break;
 	case S_AUTO:
 	case S_DATA:
 	case S_REGISTER:

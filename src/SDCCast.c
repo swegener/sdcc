@@ -610,6 +610,7 @@ processParms (ast * func,
 	      int *parmNumber,
 	      bool rightmost)
 {
+  int castError=0;
   sym_link *fetype = func->etype;
 
   /* if none of them exist */
@@ -629,7 +630,7 @@ processParms (ast * func,
   /* have parameters                                   */
   if (func->type != EX_VALUE && !IS_RENT (fetype) && !options.stackAuto)
     {
-      werror (E_NONRENT_ARGS);
+      werror (W_NONRENT_ARGS);
       return 1;
     }
 
@@ -746,14 +747,38 @@ processParms (ast * func,
   /* the parameter type must be at least castable */
   if (compareType (defParm->type, actParm->ftype) == 0)
     {
-      werror (E_TYPE_MISMATCH_PARM, *parmNumber);
-      werror (E_CONTINUE, "defined type ");
-      printTypeChain (defParm->type, stderr);
-      fprintf (stderr, "\n");
-      werror (E_CONTINUE, "actual type ");
-      printTypeChain (actParm->ftype, stderr);
-      fprintf (stderr, "\n");
+      castError++;
     }
+
+  if (!IS_SPEC(defParm->type) && !IS_SPEC(actParm->ftype)) {
+    // now we have two pointers, check if they point to the same
+    sym_link *dtype=defParm->type->next, *atype=actParm->ftype->next;
+    do {
+      if (
+	  (dtype->next && !atype->next) ||
+	  (!dtype->next && atype->next) ||
+	  compareType (dtype, atype)!=1) {
+	castError++;
+      }
+    } while (dtype->next && atype->next);
+    if (IS_SPEC(dtype) && IS_SPEC(atype)) {
+      // ok so far, we have two etypes, they must have the same SCLASS
+      if (SPEC_SCLS(dtype)!=SPEC_SCLS(atype)) {
+	castError++;
+      }
+    }
+  }
+  if (castError) {
+    werror (W_INCOMPAT_CAST);
+    fprintf (stderr, "type --> '");
+    printTypeChain (actParm->ftype, stderr);
+    fprintf (stderr, "' ");
+    fprintf (stderr, "assigned to type --> '");
+    printTypeChain (defParm->type, stderr);
+    fprintf (stderr, "'\n");
+  }
+
+    
 
   /* if the parameter is castable then add the cast */
   if (compareType (defParm->type, actParm->ftype) < 0)
@@ -2104,7 +2129,7 @@ decorateType (ast * tree)
 	  if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
 	    {
 	      werror (E_BITWISE_OP);
-	      werror (E_CONTINUE, "left & right types are ");
+	      werror (W_CONTINUE, "left & right types are ");
 	      printTypeChain (LTYPE (tree), stderr);
 	      fprintf (stderr, ",");
 	      printTypeChain (RTYPE (tree), stderr);
@@ -2250,7 +2275,7 @@ decorateType (ast * tree)
       if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
 	{
 	  werror (E_BITWISE_OP);
-	  werror (E_CONTINUE, "left & right types are ");
+	  werror (W_CONTINUE, "left & right types are ");
 	  printTypeChain (LTYPE (tree), stderr);
 	  fprintf (stderr, ",");
 	  printTypeChain (RTYPE (tree), stderr);
@@ -2312,7 +2337,7 @@ decorateType (ast * tree)
       if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
 	{
 	  werror (E_BITWISE_OP);
-	  werror (E_CONTINUE, "left & right types are ");
+	  werror (W_CONTINUE, "left & right types are ");
 	  printTypeChain (LTYPE (tree), stderr);
 	  fprintf (stderr, ",");
 	  printTypeChain (RTYPE (tree), stderr);
@@ -2671,7 +2696,7 @@ decorateType (ast * tree)
       if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (tree->left->etype))
 	{
 	  werror (E_SHIFT_OP_INVALID);
-	  werror (E_CONTINUE, "left & right types are ");
+	  werror (W_CONTINUE, "left & right types are ");
 	  printTypeChain (LTYPE (tree), stderr);
 	  fprintf (stderr, ",");
 	  printTypeChain (RTYPE (tree), stderr);
@@ -3145,7 +3170,7 @@ decorateType (ast * tree)
 
       if (compareType (currFunc->type->next, RTYPE (tree)) == 0)
 	{
-	  werror (E_RETURN_MISMATCH);
+	  werror (W_RETURN_MISMATCH);
 	  goto errorTreeReturn;
 	}
 

@@ -47,14 +47,24 @@
 #include <string.h>
 /** For printf */
 #include <stdio.h>
+
+#ifdef SDCC_ds390
+#include "clock.h"
+#include <serial390.h>
+#undef PRINT_T_STATES
+#else
 /** For clock() */
 #include <time.h>
 #include <types.h>
+#define PRINT_T_STATES
+#endif
 
 /** Print the number of t-states this program has been executing for.
     Optional :)
 */
+#ifdef PRINT_T_STATES
 void _printTStates(void);
+#endif
 
 /** Set to one to print more messages about expected values etc. 
  */
@@ -104,8 +114,12 @@ int main(void)
     Str_30          Str_2_Loc;
     REG   int             Run_Index;
     REG   int             Number_Of_Runs;
-    unsigned runTime;
+    unsigned  long runTime;
 
+#ifdef SDCC_ds390
+    startTimer();
+#endif
+    
     printf("[dhry]\n");
 
     Next_Ptr_Glob = &_r[0];
@@ -128,7 +142,11 @@ int main(void)
     /* overflow may occur for this array element.                   */
 
     /* 32766 is the highest value for a 16 bitter */
+#if DEBUG
+    Number_Of_Runs = 3;
+#else
     Number_Of_Runs = 10000;
+#endif    
 
     runTime = clock();
 
@@ -202,7 +220,9 @@ int main(void)
 	DPRINTF(("Looping.\n"));
     } /* loop "for Run_Index" */
 
+#ifdef PRINT_T_STATES    
     _printTStates();
+#endif    
 
     printf("Run_Index = %d\n", Run_Index);
 
@@ -266,10 +286,12 @@ int main(void)
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
 #endif
-    printf("Dhrystones/s = %u\n", Number_Of_Runs / (runTime/CLOCKS_PER_SEC));
+    printf("Dhrystones/s = %lu\n", (unsigned long)Number_Of_Runs / (runTime/CLOCKS_PER_SEC));
     printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
+#ifdef PRINT_T_STATES    
     _printTStates();
-    printf("Time: %u ticks\n", runTime);
+#endif    
+    printf("Time: %lu ticks\n", runTime);
 }
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)
@@ -541,3 +563,4 @@ Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref)
 	    }
 	} /* if Ch_Loc */
 } /* Func_2 */
+

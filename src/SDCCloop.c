@@ -292,10 +292,13 @@ DEFSETFUNC (createLoop)
   /* all blocks that have dfnumbers between dfMin & dfMax are also
      part of loop */
   for (i = 0 ; i < count ; i++) {
-      if (ebbs[i]->dfnum > dfMin && ebbs[i]->dfnum < dfMax) {
-	      loopInsert(&aloop->regBlocks,ebbs[i]);
+      if (ebbs[i]->dfnum > dfMin && 
+	  ebbs[i]->dfnum < dfMax &&
+	  !isinSet(aloop->regBlocks,ebbs[i])) {
+	  if (!ebbs[i]->partOfLoop) ebbs[i]->partOfLoop = aloop;
       }
   }
+
   /* now add it to the set */
   addSetHead (allRegion, aloop);
   return 0;

@@ -29,11 +29,16 @@
 #include "ralloc.h"
 
 
+pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
+
+
 pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype);
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);
 pCode * findNextInstruction(pCode *pc);
 char *Safe_strdup(char *str);
-int getpCode(char *mnem);
+int getpCode(char *mnem,int dest);
+extern pCodeInstruction *pic14Mnemonics[];
+
 
 /****************************************************************/
 /*
@@ -163,6 +168,7 @@ pcPattern pcpArr[] = {
 typedef enum {
   ALT_LABEL=1,
   ALT_MNEM0,
+  ALT_MNEM0A,
   ALT_MNEM1,
   ALT_MNEM1A,
   ALT_MNEM1B,
@@ -172,6 +178,7 @@ typedef enum {
 
 static char alt_label[]     = { PCP_LABEL, 0};
 static char alt_mnem0[]     = { PCP_STR, 0};
+static char alt_mnem0a[]    = { PCP_WILDVAR, 0};
 static char alt_mnem1[]     = { PCP_STR, PCP_STR, 0};
 static char alt_mnem1a[]    = { PCP_STR, PCP_WILDVAR, 0};
 static char alt_mnem1b[]    = { PCP_STR, PCP_NUMBER, 0};
@@ -180,6 +187,7 @@ static char alt_mnem2a[]    = { PCP_STR, PCP_WILDVAR, PCP_COMMA, PCP_STR, 0};
 
 static void * cvt_altpat_label(void *pp);
 static void * cvt_altpat_mnem0(void *pp);
+static void * cvt_altpat_mnem0a(void *pp);
 static void * cvt_altpat_mnem1(void *pp);
 static void * cvt_altpat_mnem1a(void *pp);
 static void * cvt_altpat_mnem1b(void *pp);
@@ -193,11 +201,72 @@ pcPattern altArr[] = {
   {ALT_MNEM1B,       alt_mnem1b, cvt_altpat_mnem1b},
   {ALT_MNEM1A,       alt_mnem1a, cvt_altpat_mnem1a},
   {ALT_MNEM1,        alt_mnem1,  cvt_altpat_mnem1},
+  {ALT_MNEM0A,       alt_mnem0a, cvt_altpat_mnem0a},
   {ALT_MNEM0,        alt_mnem0,  cvt_altpat_mnem0},
 
 };
 
 #define ALTPATTERNS (sizeof(altArr)/sizeof(pcPattern))
+
+// forward declarations
+static void * DLL_append(_DLL *list, _DLL *next);
+
+/*-----------------------------------------------------------------*/
+/* cvt_extract_destination - helper function extracts the register */
+/*                           destination from a parsedPattern.     */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+static int cvt_extract_destination(parsedPattern *pp)
+{
+
+  if(pp->pct[0].tt == PCT_STRING) {
+
+    // just check first letter for now
+
+    if(toupper(*pp->pct[0].tok.s) == 'F')
+      return 1;
+
+  } else if (pp->pct[0].tt == PCT_NUMBER) {
+
+    if(pp->pct[0].tok.n)
+      return 1;
+  }
+
+  return 0;
+
+}
+
+/*-----------------------------------------------------------------*/
+/*  pCodeOp *cvt_extract_status(char *reg, char *bit)              */
+/*     if *reg is the "status" register and *bit is one of the     */
+/*     status bits, then this function will create a new pCode op  */
+/*     containing the status register.                             */
+/*-----------------------------------------------------------------*/
+
+static pCodeOp *cvt_extract_status(char *reg, char *bit)
+{
+  int len;
+
+  if(strcasecmp(reg, pc_status.pcop.name))
+    return NULL;
+
+  len = strlen(bit);
+
+  if(len == 1) {
+    // check C,Z
+    if(toupper(*bit) == 'C')
+      return PCOP(popCopyGPR2Bit(&pc_status,PIC_C_BIT));
+    if(toupper(*bit) == 'Z')
+      return PCOP(popCopyGPR2Bit(&pc_status,PIC_Z_BIT));
+  }
+
+  // Check DC
+  if(len ==2 && toupper(bit[0]) == 'D' && toupper(bit[1]) == 'C')
+    return PCOP(popCopyGPR2Bit(&pc_status,PIC_DC_BIT));
+
+  return NULL;
+
+}
 
 /*-----------------------------------------------------------------*/
 /* cvt_altpat_label - convert assembly line type to a pCode label  */
@@ -222,16 +291,83 @@ static void * cvt_altpat_label(void *pp)
 /*-----------------------------------------------------------------*/
 static void * cvt_altpat_mnem0(void *pp)
 {
-  fprintf(stderr,"altpat_mnem0\n");
-  return NULL;
+  parsedPattern *p = pp;
+  int opcode;
+
+  pCodeInstruction *pci=NULL;
+
+  fprintf(stderr,"altpat_mnem0 %s\n",  p->pct[0].tok.s);
+
+  opcode = getpCode(p->pct[0].tok.s,0);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+  pci = PCI(newpCode(opcode, NULL));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+
+  return pci;
 }
 
 /*-----------------------------------------------------------------*/
+/* cvt_altpat_mem0a - convert assembly line type to a wild pCode   */
+/*                    instruction                                  */
+/*                                                                 */
+/*  pp[0] - wild var                                               */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem0a(void *pp)
+{
+  parsedPattern *p = pp;
+
+  fprintf(stderr,"altpat_mnem0a wild mnem # %d\n",  p[0].pct[1].tok.n);
+
+  return newpCodeWild(p[0].pct[1].tok.n,NULL,NULL);
+
+}
+
+/*-----------------------------------------------------------------*/
+/* cvt_altpat_mem1 - convert assembly line type to a pCode         */
+/*                   instruction with 1 operand.                   */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - Operand                                                */
+/*                                                                 */
 /*-----------------------------------------------------------------*/
 static void * cvt_altpat_mnem1(void *pp)
 {
-  fprintf(stderr,"altpat_mnem1\n");
-  return NULL;
+
+  parsedPattern *p = pp;
+  int opcode;
+
+  pCodeInstruction *pci=NULL;
+  pCodeOp *pcosubtype;
+
+  fprintf(stderr,"altpat_mnem1 %s var %s\n",  p->pct[0].tok.s,p[1].pct[0].tok.s);
+
+  opcode = getpCode(p->pct[0].tok.s,0);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+  if(pic14Mnemonics[opcode]->bit_inst)
+    pcosubtype = newpCodeOp(p[1].pct[0].tok.s,PO_BIT);
+  else
+    pcosubtype = newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
+
+
+  pci = PCI(newpCode(opcode, pcosubtype));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+
+  return pci;
 }
 
 /*-----------------------------------------------------------------*/
@@ -245,22 +381,31 @@ static void * cvt_altpat_mnem1(void *pp)
 static void * cvt_altpat_mnem1a(void *pp)
 {
   parsedPattern *p = pp;
+  int opcode;
 
   pCodeInstruction *pci=NULL;
-
-  //    pCodeOp *pcw;
-
-  //  pcw = newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER));
+  pCodeOp *pcosubtype;
 
   fprintf(stderr,"altpat_mnem1a %s var %d\n",  p->pct[0].tok.s,p[1].pct[1].tok.n);
 
-/*
-  pci = PCI(newpCode(getpCode(p->pct[0].tok.s),
-		     newpCodeOpWild(p[1].pct[1].tok.n, curPeep, NULL)));
+  opcode = getpCode(p->pct[0].tok.s,0);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+  if(pic14Mnemonics[opcode]->bit_inst)
+    pcosubtype = newpCodeOp(NULL,PO_BIT);
+  else
+    pcosubtype = newpCodeOp(NULL,PO_GPR_REGISTER);
+
+
+  pci = PCI(newpCode(opcode,
+		     newpCodeOpWild(p[1].pct[1].tok.n, curPeep, pcosubtype)));
 
   if(!pci)
     fprintf(stderr,"couldn't find mnemonic\n");
-*/
+
 
   return pci;
 }
@@ -269,63 +414,124 @@ static void * cvt_altpat_mnem1a(void *pp)
 /*-----------------------------------------------------------------*/
 static void * cvt_altpat_mnem1b(void *pp)
 {
-  fprintf(stderr,"altpat_mnem1b\n");
-  return NULL;
+  parsedPattern *p = pp;
+  int opcode;
+
+  pCodeInstruction *pci=NULL;
+
+  fprintf(stderr,"altpat_mnem1b %s var %d\n",  p->pct[0].tok.s,p[1].pct[0].tok.n);
+
+  opcode = getpCode(p->pct[0].tok.s,0);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+  pci = PCI(newpCode(opcode, newpCodeOpLit(p[1].pct[0].tok.n) ));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+
+  return pci;
 }
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void * cvt_altpat_mnem2(void *pp)
 {
-  fprintf(stderr,"altpat_mnem2\n");
-  return NULL;
+  parsedPattern *p = pp;
+  int opcode;
+  int dest;
+
+  pCodeInstruction *pci=NULL;
+  pCodeOp *pcosubtype;
+
+  dest = cvt_extract_destination(&p[3]);
+
+  fprintf(stderr,"altpat_mnem2 %s var %s destination %s(%d)\n",
+	  p->pct[0].tok.s,
+	  p[1].pct[0].tok.s,
+	  p[3].pct[0].tok.s,
+	  dest);
+
+
+  opcode = getpCode(p->pct[0].tok.s,dest);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+  if(pic14Mnemonics[opcode]->bit_inst) {
+    pcosubtype = cvt_extract_status(p[1].pct[0].tok.s, p[3].pct[0].tok.s);
+    if(pcosubtype == NULL) {
+      fprintf(stderr, "bad operand?\n");
+      return NULL;
+    }
+      
+  } else
+    pcosubtype = newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
+
+
+  pci = PCI(newpCode(opcode,pcosubtype));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+  return pci;
+
 }
 
 /*-----------------------------------------------------------------*/
+/* cvt_altpat_mem2a - convert assembly line type to a pCode        */
+/*                    instruction with 1 wild operand and a        */
+/*                    destination operand (e.g. w or f)            */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - wild var                                               */
+/*  pp[2] - comma                                                  */
+/*  pp[3] - destination                                            */
+/*                                                                 */
 /*-----------------------------------------------------------------*/
 static void * cvt_altpat_mnem2a(void *pp)
 {
-  fprintf(stderr,"altpat_mnem2a\n");
-  return NULL;
+  parsedPattern *p = pp;
+  int opcode;
+  int dest;
+
+  pCodeInstruction *pci=NULL;
+  pCodeOp *pcosubtype;
+
+  dest = cvt_extract_destination(&p[3]);
+
+  fprintf(stderr,"altpat_mnem2a %s var %d destination %s(%d)\n",
+	  p->pct[0].tok.s,
+	  p[1].pct[1].tok.n,
+	  p[3].pct[0].tok.s,
+	  dest);
+
+
+  opcode = getpCode(p->pct[0].tok.s,dest);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+  if(pic14Mnemonics[opcode]->bit_inst)
+    pcosubtype = newpCodeOp(NULL,PO_BIT);
+  else
+    pcosubtype = newpCodeOp(NULL,PO_GPR_REGISTER);
+
+
+  pci = PCI(newpCode(opcode,
+		     newpCodeOpWild(p[1].pct[1].tok.n, curPeep, pcosubtype)));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+  return pci;
+
 }
-
-
-
-
-#if 0
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-static pCode * cvt_pcpat_wildMnem(parsedPattern *pp)
-{
-  fprintf(stderr,"pcpat_wildMnem\n");
-  return NULL;
-}
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-static pCode * cvt_pcpat_Mnem(parsedPattern *pp)
-{
-  fprintf(stderr,"pcpat_Mnem\n");
-  return NULL;
-}
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-static pCode * cvt_pcpat_wildVar(parsedPattern *pp)
-{
-  fprintf(stderr,"pcpat_wildVar\n");
-  return NULL;
-}
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-static pCode * cvt_pcpat_var(parsedPattern *pp)
-{
-  fprintf(stderr,"pcpat_var\n");
-  return NULL;
-}
-#endif
-
-
-
-
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
@@ -351,7 +557,7 @@ static void parseLineNode(char *ln)
     if(isdigit(*ln)) {
 
       tokArr[tokIdx].tt = PCT_NUMBER;
-      tokArr[tokIdx++].tok.n = strtol(ln, &ln, 10);
+      tokArr[tokIdx++].tok.n = strtol(ln, &ln, 0);
 
       continue;
 
@@ -540,7 +746,8 @@ void dumpTokens(void)
     int lpcpIdx;
     int ltokIdx =0;
     int matching = 0;
-    int j,k;
+    int j=0;
+    int k=0;
 
     char * cPmnem  = NULL;     // Pointer to non-wild mnemonic (if any)
     char * cP1stop = NULL;
@@ -568,7 +775,7 @@ void dumpTokens(void)
       matching = 0;
       //fprintf(stderr,"ltokIdx = %d\n",ltokIdx);
 
-      if(  ((tokArr[ltokIdx].tt == PCT_SPACE) )//|| (tokArr[ltokIdx].tt == PCT_COMMA))
+      if(  ((tokArr[ltokIdx].tt == PCT_SPACE) )
 	   && (advTokIdx(&ltokIdx, 1)) ) // eat space
 	break;
 
@@ -690,14 +897,14 @@ void dumpTokens(void)
     j=k=0;
     do {
       int c;
-      //fprintf(stderr,"comparing alt pattern %d (first token %d)\n",k,altArr[k].tokens[0]);
+
       if( (c=altComparePattern( altArr[k].tokens, &parsedPatArr[j],10) ) ) {
-	//fprintf(stderr," found a valid assembly line!!!\n");
+
 	if( altArr[k].f) {
 	  pc = altArr[k].f(&parsedPatArr[j]);
 	  if(pc && pc->print)
 	    pc->print(stderr,pc);
-	  if(pc && pc->destruct) pc->destruct(pc);
+	  //if(pc && pc->destruct) pc->destruct(pc); dumps core?
 	}
 	j += c;
       }
@@ -705,7 +912,7 @@ void dumpTokens(void)
     }
     while(j<=lparsedPatIdx && k<ALTPATTERNS);
 
-
+/*
     fprintf(stderr,"\nConverting parsed line to pCode:\n\n");
 
     j = 0;
@@ -716,7 +923,7 @@ void dumpTokens(void)
       j++;
     }
     while(j<lparsedPatIdx);
-
+*/
     fprintf(stderr,"\n");
 
   }
@@ -748,9 +955,14 @@ void  peepRules2pCode(peepRule *rules)
 
     pcps = Safe_calloc(1,sizeof(pCodePeepSnippets));
     curPeep = pcps->peep  = Safe_calloc(1,sizeof(pCodePeep));
-    //peepSnippets = DLL_append((_DLL*)peepSnippets,(_DLL*)pcps);
+    //curPeep->target = curPeep->replace = NULL;
+    curPeep->vars = NULL; curPeep->wildpCodes = NULL;
+    peepSnippets = DLL_append((_DLL*)peepSnippets,(_DLL*)pcps);
+
+    curPeep->target = curBlock = newpCodeChain(NULL, 'W', NULL);
 
     for(ln = pr->match; ln; ln = ln->next) {
+
       fprintf(stderr,"%s\n",ln->line);
 
       parseLineNode(ln->line);
@@ -759,12 +971,16 @@ void  peepRules2pCode(peepRule *rules)
     }
 
     fprintf(stderr,"\nReplaced by:\n");
+
+    curPeep->replace = curBlock = newpCodeChain(NULL, 'W', NULL);
+
     for(ln = pr->replace; ln; ln = ln->next)
       fprintf(stderr,"%s\n",ln->line);
 
     if(pr->cond)
       fprintf(stderr,"\nCondition:  %s\n",pr->cond);
 
+    return;
   }
 
 }
@@ -899,6 +1115,7 @@ pBlock *pBlockAppend(pBlock *pb1, pBlock *pb2)
 
 void pCodePeepInit(void)
 {
+#if 0
   pBlock *pb;
   //  pCode *pc;
   pCodePeep *pcp;
@@ -1035,7 +1252,7 @@ void pCodePeepInit(void)
 
 
 
-
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -1196,6 +1413,8 @@ void pCodePeepClrVars(pCodePeep *pcp)
 {
 
   int i;
+  if(!pcp)
+    return;
 
   for(i=0;i<pcp->nvars; i++)
     pcp->vars[i] = NULL;
@@ -1325,6 +1544,9 @@ int pCodePeepMatchRule(pCode *pc)
 
   while(peeprules) {
     peepBlock = ((pCodePeepSnippets*)peeprules)->peep;
+    if(!peepBlock || !peepBlock->target || !peepBlock->target->pcHead)
+      goto next_rule;
+
     pCodePeepClrVars(peepBlock);
 
     pcin = pc;
@@ -1407,7 +1629,7 @@ int pCodePeepMatchRule(pCode *pc)
 
       return 1;
     }
-
+  next_rule:
     peeprules = peeprules->next;
   }
 

@@ -2,11 +2,16 @@
 replace restart {
 	movf	%1,w	;comment at end
 %4:	movf	%1,w
-	%2	%3,w
+	RETURN
+	clrf	INDF
+	movlw	0xa5
+	movf	fsr,w
+	incf	indf,f
+	%2
 } by {
 	; peep test remove redundant move
 %4:	movf	%1,w	;another comment
-	%2	%3,w
+	%2
 } if AYBABTU %3
 
 

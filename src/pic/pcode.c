@@ -552,7 +552,7 @@ pCodeInstruction pciRETURN = {
    AnalyzeRETURN,
    genericDestruct,
    genericPrint},
-  POC_RETLW,
+  POC_RETURN,
   "RETURN",
   NULL, // operand
   0,    // num ops
@@ -777,7 +777,7 @@ void pic14initMnemonics(void)
   mnemonics_initialized = 1;
 }
 
-int getpCode(char *mnem)
+int getpCode(char *mnem,int dest)
 {
 
   pCodeInstruction *pci;
@@ -790,8 +790,11 @@ int getpCode(char *mnem)
 
   while(pci) {
 
-    if(strcasecmp(pci->mnemonic, mnem) == 0)
-      return(pci->op);
+    if(strcasecmp(pci->mnemonic, mnem) == 0) {
+      if((pci->num_ops <= 1) || (pci->dest == dest))
+	return(pci->op);
+    }
+
     pci = hTabNextItemWK (pic14MnemonicsHash);
   
   }
@@ -983,6 +986,10 @@ pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
 /* line (of assembly code) is declared matched. Note that the      */
 /* operand may be wild too.                                        */
 /*                                                                 */
+/*   Note, a wild instruction is specified just like a wild var:   */
+/*      %4     ; A wild instruction,                               */
+/*  See the peeph.def file for additional examples                 */
+/*                                                                 */
 /*-----------------------------------------------------------------*/
 
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label)
@@ -1001,7 +1008,7 @@ pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_la
   pcw->pc.destruct = genericDestruct;
   pcw->pc.print = genericPrint;
 
-  pcw->id = pCodeID;
+  pcw->id = pCodeID;              // this is the 'n' in %n
   pcw->operand = optional_operand;
   pcw->label   = optional_label;
 
@@ -1083,6 +1090,7 @@ static void pCodeLabelDestruct(pCode *pc)
     free(PCL(pc)->label);
 
   free(pc);
+
 }
 
 pCode *newpCodeLabel(int key)
@@ -1130,7 +1138,7 @@ pBlock *newpBlock(void)
 
   pBlock *PpB;
 
-  _ALLOC(PpB,sizeof(pBlock));
+  PpB = Safe_calloc(1,sizeof(pBlock) );
   PpB->next = PpB->prev = NULL;
 
   PpB->function_entries = PpB->function_exits = PpB->function_calls = NULL;
@@ -1160,20 +1168,6 @@ pBlock *newpCodeChain(memmap *cm,char c, pCode *pc)
   pB->dbName  = c;
 
   return pB;
-}
-
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-
-pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
-{
-  pCodeOp *pcop;
-
-  pcop = Safe_calloc(1,sizeof(pCodeOp) );
-  pcop->type = type;
-  pcop->name = Safe_strdup(name);   
-
-  return pcop;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1208,11 +1202,14 @@ pCodeOp *newpCodeOpLit(int lit)
   pCodeOp *pcop;
 
 
-  _ALLOC(pcop,sizeof(pCodeOpLit) );
+  pcop = Safe_calloc(1,sizeof(pCodeOpLit) );
   pcop->type = PO_LITERAL;
-  sprintf(s,"0x%02x",lit);
-  _ALLOC_ATOMIC(pcop->name,strlen(s)+1);
-  strcpy(pcop->name,s);
+  if(lit>=0) {
+    sprintf(s,"0x%02x",lit);
+    pcop->name = Safe_strdup(s);
+  } else
+    pcop->name = NULL;
+
   ((pCodeOpLit *)pcop)->lit = lit;
 
   return pcop;
@@ -1246,14 +1243,44 @@ pCodeOp *newpCodeOpBit(char *s, int bit)
 {
   pCodeOp *pcop;
 
-  _ALLOC(pcop,sizeof(pCodeOpBit) );
+  pcop = Safe_calloc(1,sizeof(pCodeOpBit) );
   pcop->type = PO_BIT;
   pcop->name = Safe_strdup(s);   
+
   PCOB(pcop)->bit = bit;
   if(bit>=0)
     PCOB(pcop)->inBitSpace = 1;
   else
     PCOB(pcop)->inBitSpace = 0;
+
+  return pcop;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
+pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
+{
+  pCodeOp *pcop;
+
+  switch(type) {
+  case PO_BIT:
+    pcop = newpCodeOpBit(name, -1);
+    break;
+
+  case PO_LITERAL:
+    pcop = newpCodeOpLit(-1);
+    break;
+
+  case PO_LABEL:
+    pcop = newpCodeOpLabel(-1);
+    break;
+
+  default:
+    pcop = Safe_calloc(1,sizeof(pCodeOp) );
+    pcop->type = type;
+    pcop->name = Safe_strdup(name);   
+  }
 
   return pcop;
 }
@@ -1344,10 +1371,12 @@ static void unlinkPC(pCode *pc)
 }
 static void genericDestruct(pCode *pc)
 {
+  fprintf(stderr,"warning, calling default pCode destructor\n");
+
   unlinkPC(pc);
 
-  fprintf(stderr,"warning, calling default pCode destructor\n");
   free(pc);
+
 }
 
 

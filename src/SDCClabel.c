@@ -28,7 +28,7 @@ hTab *labelRef = NULL;
 hTab *labelDef = NULL;
 
 /*-----------------------------------------------------------------*/
-/* buildLabelRefTable - creates an hashTable of label referneces   */
+/* buildLabelRefTable - creates an hashTable of label references   */
 /*-----------------------------------------------------------------*/
 void 
 buildLabelRefTable (iCode * ic)
@@ -83,7 +83,7 @@ labelGotoNext (iCode * ic)
       if (loop->op == GOTO &&	/* if this is a goto */
 	  loop->next &&		/* and we have a next one */
 	  loop->next->op == LABEL &&	/* next one is a label */
-	  loop->next->argLabel.label->key == loop->argLabel.label->key)		/* same label */
+	  loop->next->label->key == loop->label->key)	/* same label */
 	{
 	  loop->prev->next = loop->next;	/* get this out of the chain */
 	  loop->next->prev = loop->prev;
@@ -286,7 +286,7 @@ labelGotoGoto (iCode * ic)
 	  stat->next != loop)
 	{
 
-	  symbol *repLabel = stat->next->argLabel.label;	/* replace with label */
+	  symbol *repLabel = stat->next->label;	/* replace with label */
 
 	  /* if they are the same then continue */
 	  if (repLabel->key == sLabel->key)
@@ -299,7 +299,7 @@ labelGotoGoto (iCode * ic)
 	    case GOTO:		/* for a goto statement */
 
 	      hTabDeleteItem (&labelRef, (IC_LABEL (loop))->key, loop, DELETE_ITEM, NULL);
-	      loop->argLabel.label = repLabel;
+	      loop->label = repLabel;
 	      hTabAddItem (&labelRef, repLabel->key, loop);
 	      break;
 
@@ -327,7 +327,7 @@ labelGotoGoto (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* labelUnrefLabel - remove unreferneced labels                    */
+/* labelUnrefLabel - remove unreferenced labels                    */
 /*-----------------------------------------------------------------*/
 int 
 labelUnrefLabel (iCode * ic)
@@ -341,9 +341,6 @@ labelUnrefLabel (iCode * ic)
       /* if this is a label */
       if (loop->op == LABEL)
 	{
-	  set *refs;
-
-	  refs = NULL;
 	  if (((IC_LABEL (loop))->key == returnLabel->key) ||
 	      ((IC_LABEL (loop))->key == entryLabel->key))
 	    continue;

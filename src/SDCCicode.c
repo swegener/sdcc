@@ -115,26 +115,6 @@ iCodeTable codeTable[] =
   {ARRAYINIT, "arrayInit", picGenericOne, NULL},
 };
 
-// this makes it more easy to catch bugs
-struct bitVect *OP_DEFS(struct operand *op) {
-  wassert (IS_SYMOP(op));
-  return OP_SYMBOL(op)->defs;
-}
-struct bitVect *OP_DEFS_SET(struct operand *op, struct bitVect *bv) {
-  wassert (IS_SYMOP(op));
-  OP_SYMBOL(op)->defs=bv;
-  return bv;
-}
-struct bitVect *OP_USES(struct operand *op) {
-  wassert (IS_SYMOP(op));
-  return OP_SYMBOL(op)->uses;
-}
-struct bitVect *OP_USES_SET(struct operand *op, struct bitVect *bv) {
-  wassert (IS_SYMOP(op));
-  OP_SYMBOL(op)->uses=bv;
-  return bv;
-}
-
 /*-----------------------------------------------------------------*/
 /* checkConstantRange: check a constant against the type           */
 /*-----------------------------------------------------------------*/
@@ -597,7 +577,7 @@ newiCodeLabelGoto (int op, symbol * label)
 
   ic = newiCode (op, NULL, NULL);
   ic->op = op;
-  ic->argLabel.label = label;
+  ic->label = label;
   IC_LEFT (ic) = NULL;
   IC_RIGHT (ic) = NULL;
   IC_RESULT (ic) = NULL;
@@ -2899,7 +2879,7 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
 	  /* assign */
 	  operand *top = operandFromSymbol (argVals->sym);
 	  /* clear useDef and other bitVectors */
-	  OP_USES_SET ((top), OP_DEFS_SET ((top), OP_SYMBOL(top)->clashes = NULL));
+	  OP_USES(top)=OP_DEFS(top)=OP_SYMBOL(top)->clashes = NULL;
 	  geniCodeAssign (top, pval, 1);
 	}
       else

@@ -337,10 +337,28 @@ DEFSETFUNC (createLoop)
     if (ebbs[i]->dfnum > dfMin && 
 	   ebbs[i]->dfnum < dfMax &&
 	  !isinSet(aloop->regBlocks,ebbs[i])) {
-	  if (!ebbs[i]->partOfLoop) ebbs[i]->partOfLoop = aloop;
+	  if (!ebbs[i]->partOfLoop) {
+#if !defined(LIVERANGEHUNT)
+	    ebbs[i]->partOfLoop = aloop;
+#else
+	    loopInsert(&aloop->regBlocks,ebbs[i]);
+#endif
+	  }
       }
-    LRH(printf("****** %d %d %d %x %s\n", ebbs[i]->dfnum, dfMin, dfMax, ebbs[i]->partOfLoop, ebbs[i]->entryLabel->name));
   }
+
+#ifdef LIVERANGEHUNT
+  printf ("================\n");
+  printf (" loop with entry -- > ");
+  printEntryLabel (aloop->entry, ap);
+  printf ("\n");
+  printf (" loop body --> ");
+  applyToSet (aloop->regBlocks, printEntryLabel);
+  printf ("\n");
+  printf (" loop exits --> ");
+  applyToSet (aloop->exits, printEntryLabel);
+  printf ("\n");
+#endif
 
   /* and if this is a conditional block, the other side of the IFX 
      (if any, that could have a greater dfnum) is too */
@@ -434,6 +452,9 @@ isOperandInvariant (operand * op, region * theLoop, set * lInvars)
 	       !IS_OP_VOLATILE (op) &&
 	       assignmentsToSym (theLoop->regBlocks, op) == 0)
 	opin = 1;
+      LRH(if (opin && IS_SYMOP(op)) {
+	printf("isOperandInvariant: %s\n", OP_SYMBOL(op)->name);
+      });
     }
   else
     opin++;
@@ -937,10 +958,10 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 			      iCode *newic = newiCode ('=', NULL,
 					operandFromOperand (IC_RIGHT (ic)));
 			      IC_RESULT (newic) = operandFromOperand (IC_RESULT (ic));
-			      OP_DEFS_SET ((IC_RESULT (newic)),
-				bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key));
-			      OP_USES_SET ((IC_RIGHT (newic)),
-				bitVectSetBit (OP_USES (IC_RIGHT (newic)), newic->key));
+			      OP_DEFS(IC_RESULT (newic))=
+				bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
+			      OP_USES(IC_RIGHT (newic))=
+				bitVectSetBit (OP_USES (IC_RIGHT (newic)), newic->key);
 			      /* and add it */
 			      if (eblock->sch && eblock->sch->op == LABEL)
 				addiCodeToeBBlock (eblock, newic, eblock->sch->next);
@@ -1217,7 +1238,7 @@ createLoopRegions (eBBlock ** ebbs, int count)
   int maxDepth = 0;
   region *lp;
 
-  LRH(printf ("createLoopRegions: %x\n", ebbs));
+  LRH(printf ("createLoopRegions: %p\n", ebbs));
   /* get all the back edges in the graph */
   if (!applyToSet (graphEdges, backEdges, &bEdges))
     return 0;			/* found no loops */

@@ -84,9 +84,9 @@ newEdge (eBBlock * from, eBBlock * to)
 }
 
 /*-----------------------------------------------------------------*/
-/* appendDumpFile - if not already created, create the dump file   */
+/* createDumpFile - create the dump file                           */
 /*-----------------------------------------------------------------*/
-FILE *appendDumpFile (int id) {
+FILE *createDumpFile (int id) {
   struct _dumpFiles *dumpFilesPtr=dumpFiles;
 
   while (dumpFilesPtr->id) {
@@ -96,7 +96,7 @@ FILE *appendDumpFile (int id) {
   }
 
   if (!dumpFilesPtr->id) {
-    fprintf (stdout, "internal error: appendDumpFile: unknown dump file.\n");
+    fprintf (stdout, "internal error: createDumpFile: unknown dump file.\n");
     exit (1);
   }
 
@@ -121,7 +121,6 @@ void closeDumpFiles() {
   for (dumpFilesPtr=dumpFiles; dumpFilesPtr->id; dumpFilesPtr++) {
     if (dumpFilesPtr->filePtr) {
       fclose (dumpFilesPtr->filePtr);
-      //dprintf ("closed %s\n", dumpFilesPtr->ext);
     }
   }
 }
@@ -137,7 +136,7 @@ dumpLiveRanges (int id, hTab * liveRanges)
   int k;
 
   if (id) {
-    file=appendDumpFile(id);
+    file=createDumpFile(id);
   } else {
     file = stdout;
   }
@@ -180,7 +179,7 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
   int i;
 
   if (id) {
-    of=appendDumpFile(id);
+    of=createDumpFile(id);
   } else {
     of = stdout;
   }
@@ -188,11 +187,10 @@ dumpEbbsToFileExt (int id, eBBlock ** ebbs, int count)
   for (i = 0; i < count; i++)
     {
       fprintf (of, "\n----------------------------------------------------------------\n");
-      fprintf (of, "Basic Block %s : loop Depth(lSeq) = %d(%d) noPath = %d , lastinLoop = %d\n",
+      fprintf (of, "Basic Block %d %s : loop Depth = %d noPath = %d lastinLoop = %d\n",
+	       ebbs[i]->dfnum,
 	       ebbs[i]->entryLabel->name,
 	       ebbs[i]->depth,
-	       (0 /* for now */ &
-		ebbs[i]->depth) ? findLoopEndSeq(ebbs[i]->partOfLoop) : 0,
 	       ebbs[i]->noPath,
 	       ebbs[i]->isLastInLoop);
       fprintf (of, "\ndefines bitVector :");
@@ -218,14 +216,14 @@ eBBlock *
 iCode2eBBlock (iCode * ic)
 {
   iCode *loop;
-  eBBlock *ebb = neweBBlock ();	/* a llocate an entry */
+  eBBlock *ebb = neweBBlock ();	/* allocate an entry */
 
   /* put the first one unconditionally */
   ebb->sch = ic;
 
   /* if this is a label then */
   if (ic->op == LABEL)
-    ebb->entryLabel = ic->argLabel.label;
+    ebb->entryLabel = ic->label;
   else
     {
       SNPRINTF (buffer, sizeof(buffer), "_eBBlock%d", eBBNum++);
@@ -565,7 +563,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 	    {
 	      bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
 	      IC_COND (ic) = operandFromOperand (dest);
-	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
+	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
 	      continue;
 	    }
 
@@ -574,7 +572,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 	      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
 	      IC_RIGHT (ic) = operandFromOperand (dest);
 	      IC_RIGHT (ic)->isaddr = 0;
-	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
+	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
 	    }
 
 	  if (isOperandEqual (IC_LEFT (ic), src))
@@ -590,7 +588,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 		  IC_LEFT (ic) = operandFromOperand (dest);
 		  IC_LEFT (ic)->isaddr = 0;
 		}
-	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
+	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
 	    }
 
 	  /* special case for pointer sets */
@@ -600,7 +598,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 	      bitVectUnSetBit (OP_USES (IC_RESULT (ic)), ic->key);
 	      IC_RESULT (ic) = operandFromOperand (dest);
 	      IC_RESULT (ic)->isaddr = 1;
-	      OP_USES_SET ((dest), bitVectSetBit (OP_USES (dest), ic->key));
+	      OP_USES(dest)=bitVectSetBit (OP_USES (dest), ic->key);
 	    }
 	}
     }

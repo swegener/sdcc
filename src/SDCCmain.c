@@ -115,6 +115,7 @@ char DefaultExePath[128];
 #define OPTION_DATA_LOC		"--data-loc"
 #define OPTION_CODE_LOC		"--code-loc"
 #define OPTION_IDATA_LOC	"--idata-loc"
+#define OPTION_NO_LABEL_OPT     "--nolabelopt"
 #define OPTION_NO_LOOP_INV 	"--noinvariant"
 #define OPTION_NO_LOOP_IND	"--noinduction"
 #define OPTION_LESS_PEDANTIC	"--lesspedantic"
@@ -152,6 +153,7 @@ optionsTable[] = {
     { 0,    "--stack-10bit",        &options.stack10bit, "use the 10bit stack for ds390 (default)" },
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
     { 0,    OPTION_NO_GCSE,         NULL, "Disable the GCSE optimisation" },
+    { 0,    OPTION_NO_LABEL_OPT,    NULL, "Disable label optimisation" },
     { 0,    OPTION_NO_LOOP_INV,     NULL, "Disable optimisation of invariants" },
     { 0,    OPTION_NO_LOOP_IND,     NULL, NULL },
     { 0,    "--nojtbound",          &optimize.noJTabBoundary, "Don't generate boundary check for jump tables" },
@@ -952,6 +954,12 @@ parseCmdLine (int argc, char **argv)
 	  if (strcmp (argv[i], OPTION_NO_LOOP_INV) == 0)
 	    {
 	      optimize.loopInvariant = 0;
+	      continue;
+	    }
+
+	  if (strcmp (argv[i], OPTION_NO_LABEL_OPT) == 0)
+	    {
+	      optimize.label4 = 0;
 	      continue;
 	    }
 

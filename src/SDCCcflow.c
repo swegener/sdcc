@@ -160,7 +160,7 @@ eBBSuccessors (eBBlock ** ebbs, int count)
 	      switch (ic->op)
 		{
 		case GOTO:	/* goto has edge to label */
-		  succ = eBBWithEntryLabel (ebbs, ic->argLabel.label, count);
+		  succ = eBBWithEntryLabel (ebbs, ic->label, count);
 		  break;
 
 		case IFX:	/* conditional jump */

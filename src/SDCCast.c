@@ -3454,7 +3454,7 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
       static int localLbl = 0;
       symbol *localLabel;
 
-      SNPRINTF(buffer, sizeof(buffer), "_and_%d", localLbl++);
+      SNPRINTF(buffer, sizeof(buffer), "_andif_%d", localLbl++);
       localLabel = newSymbol (buffer, NestLevel);
 
       tree->left = backPatchLabels (tree->left, localLabel, falseLabel);
@@ -3480,7 +3480,7 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
       static int localLbl = 0;
       symbol *localLabel;
 
-      SNPRINTF(buffer, sizeof(buffer), "_or_%d", localLbl++);
+      SNPRINTF(buffer, sizeof(buffer), "_orif_%d", localLbl++);
       localLabel = newSymbol (buffer, NestLevel);
 
       tree->left = backPatchLabels (tree->left, trueLabel, localLabel);

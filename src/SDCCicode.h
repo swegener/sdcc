@@ -119,8 +119,7 @@ extern operand *validateOpType(operand 		*op,
 #define IC_COND(x)   (x)->ulrrcnd.cnd.condition
 #define IC_TRUE(x)   (x)->ulrrcnd.cnd.trueLabel
 #define IC_FALSE(x)  (x)->ulrrcnd.cnd.falseLabel
-#define IC_LABEL(x)  (x)->argLabel.label
-// jwk #define IC_ARGS(x)   (x)->argLabel.args
+#define IC_LABEL(x)  (x)->label
 #define IC_JTCOND(x) (x)->ulrrcnd.jmpTab.condition
 #define IC_JTLABELS(x) (x)->ulrrcnd.jmpTab.labels
 #define IC_INLINE(x) (x)->inlineAsm
@@ -178,12 +177,7 @@ typedef struct iCode
       }
     ulrrcnd;
 
-    union
-      {
-	symbol *label;		/* for a goto statement     */
-	// jwk value *args;            /* for a function */
-      }
-    argLabel;
+    symbol *label;		/* for a goto statement     */
 
     char *inlineAsm;		/* pointer to inline assembler code */
     literalList *arrayInitList; /* point to array initializer list. */
@@ -284,15 +278,8 @@ iCodeTable;
 #define SET_RESULT_RIGHT(ic) {SET_ISADDR(IC_RIGHT(ic),0); SET_ISADDR(IC_RESULT(ic),0);}
 #define IS_ASSIGN_ICODE(ic) (ASSIGNMENT(ic) && !POINTER_SET(ic))
 
-#if 0 // this causes too much, extremely difficult to find, bugs
-  #define OP_DEFS(op) op->operand.symOperand->defs
-  #define OP_USES(op) op->operand.symOperand->uses
-#else
-  struct bitVect *OP_DEFS(struct operand *);
-  struct bitVect *OP_DEFS_SET(struct operand *, struct bitVect *);
-  struct bitVect *OP_USES(struct operand *);
-  struct bitVect *OP_USES_SET(struct operand *, struct bitVect *);
-#endif
+#define OP_DEFS(op) validateOpType(op, "OP_DEFS", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->defs
+#define OP_USES(op) validateOpType(op, "OP_USES", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->uses
 /*-----------------------------------------------------------------*/
 /* forward references for functions                                */
 /*-----------------------------------------------------------------*/

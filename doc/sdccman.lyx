@@ -2009,6 +2009,15 @@ Other Options
 
 
 \series bold 
+--c1mode
+\series default 
+ reads the preprocessed source from standard input and compiles it.
+ The file name for the assembler output must be specified using the -o option.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
 -E
 \series default 
  Run only the C preprocessor.

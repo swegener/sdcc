@@ -51,7 +51,7 @@ extern int yyparse ();
 FILE *srcFile;			/* source file          */
 FILE *cdbFile = NULL;		/* debugger information output file */
 char *fullSrcFileName;		/* full name for the source file; */
-				/* can be NULL while linking without compiling */
+				/* can be NULL while c1mode or linking without compiling */
 char *fullDstFileName;		/* full name for the output file; */
 				/* only given by -o, otherwise NULL */
 char *dstFileName;		/* destination file name without extension */
@@ -75,8 +75,7 @@ char *libPaths[128];
 int nlibPaths = 0;
 char *relFiles[128];
 int nrelFiles = 0;
-bool verboseExec = FALSE;
-char *preOutName;
+static char *preOutName;
 
 /* uncomment JAMIN_DS390 to always override and use ds390 port
   for mcs51 work.  This is temporary, for compatibility testing. */
@@ -127,7 +126,7 @@ char DefaultExePath[128];
 #define OPTION_NO_CCODE_IN_ASM	"--no-c-code-in-asm"
 #define OPTION_ICODE_IN_ASM	"--i-code-in-asm"
 
-static const OPTION 
+static const OPTION
 optionsTable[] = {
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
     { 'p',  NULL,                   NULL, "Select port specific processor e.g. -mpic14 -p16f84" },
@@ -138,7 +137,7 @@ optionsTable[] = {
     { 'U',  NULL,                   NULL, NULL },
     { 'C',  NULL,                   NULL, "Preprocessor option" },
     { 'M',  NULL,                   NULL, "Preprocessor option" },
-    { 'V',  NULL,                   &verboseExec, "Execute verbosely.  Show sub commands as they are run" },
+    { 'V',  NULL,                   &options.verboseExec, "Execute verbosely.  Show sub commands as they are run" },
     { 'S',  NULL,                   &noAssemble, "Compile only; do not assemble or link" },
     { 'W',  NULL,                   NULL, "Pass through options to the pre-processor (p), assembler (a) or linker (l)" },
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
@@ -192,7 +191,7 @@ optionsTable[] = {
     { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
     { 'v',  OPTION_VERSION,         NULL, "Display sdcc's version" },
     { 'E',  "--preprocessonly",     &preProcOnly, "Preprocess only, do not compile" },
-    { 0,    "--c1mode",             &options.c1mode, "Act in c1 mode.  The input is preprocessed code, the output is assembly code." },
+    { 0,    "--c1mode",             &options.c1mode, "Act in c1 mode.  The standard input is preprocessed code, the output is assembly code." },
     { 0,    "--help",               NULL, "Display this help" },
     { 0,    OPTION_CALLEE_SAVES,    NULL, "<func[,func,...]> Cause the called function to save registers insted of the caller" },
     { 0,    "--nostdlib",           &options.nostdlib, "Do not include the standard library directory in the search path" },
@@ -434,7 +433,7 @@ printUsage ()
              "Usage : sdcc [options] filename\n"
              "Options :-\n"
              );
-    
+
     printOptions(optionsTable);
 
     for (i = 0; i < NUM_PORTS; i++)
@@ -541,7 +540,7 @@ processFile (char *s)
     }
 
   /* otherwise depending on the file type */
-  if (strcmp (fext, ".c") == 0 || strcmp (fext, ".C") == 0 || options.c1mode)
+  if (strcmp (fext, ".c") == 0 || strcmp (fext, ".C") == 0)
     {
       /* source file name : not if we already have a
          source file */
@@ -1148,11 +1147,49 @@ parseCmdLine (int argc, char **argv)
 
       if (!port->parseOption (&argc, argv, &i))
 	{
-	  /* no option must be a filename */
-	   processFile (argv[i]);
+	   /* no option must be a filename */
+	   if (options.c1mode)
+	     {
+		werror (W_NO_FILE_ARG_IN_C1, argv[i]);
+	     }
+	 else
+	     {
+		processFile (argv[i]);
+	     }
 	}
     }
 
+  /* some sanity checks in c1 mode */
+  if (options.c1mode)
+    {
+      int i;
+
+      if (fullSrcFileName)
+	{
+	  fclose (srcFile);
+	  werror (W_NO_FILE_ARG_IN_C1, fullSrcFileName);
+	}
+      fullSrcFileName = NULL;
+      for (i = 0; i < nrelFiles; ++i)
+	{
+	  werror (W_NO_FILE_ARG_IN_C1, relFiles[i]);
+	}
+      for (i = 0; i < nlibFiles; ++i)
+	{
+	  werror (W_NO_FILE_ARG_IN_C1, libFiles[i]);
+	}
+      nrelFiles = nlibFiles = 0;
+      if (options.cc_only || noAssemble || preProcOnly)
+	{
+	  werror (W_ILLEGAL_OPT_COMBINATION);
+	}
+      options.cc_only = noAssemble = preProcOnly = 0;
+      if (!dstFileName)
+	{
+	  werror (E_NEED_OPT_O_IN_C1);
+	  exit (1);
+	}
+    }
   /* if no dstFileName given with -o, we've to find one: */
   if (!dstFileName)
     {
@@ -1473,9 +1510,11 @@ assemble (char **envp)
 static int
 preProcess (char **envp)
 {
-  preOutName = NULL;
-
-  if (!options.c1mode)
+  if (options.c1mode)
+    {
+      yyin = stdin;
+    }
+  else
     {
       /* if using external stack define the macro */
       if (options.useXstack)
@@ -1533,13 +1572,16 @@ preProcess (char **envp)
       if (preProcOnly)
         {
           if (fullDstFileName)
+	    {
               preOutName = Safe_strdup (fullDstFileName);
+	    }
         }
       else
           preOutName = Safe_strdup (tempfilename ());
 
       /* Have to set cppoutfilename to something, even if just pre-processing. */
       setMainValue ("cppoutfilename", preOutName ? preOutName : "");
+      addSetHead (&tmpfileNameSet, preOutName);
 
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
@@ -1548,31 +1590,19 @@ preProcess (char **envp)
 
       if (my_system (buffer))
 	{
-          // @FIX: Dario Vecchio 03-05-2001
-          if (preOutName)
-            {
-              unlink (preOutName);
-              Safe_free (preOutName);
-            }
-          // EndFix
 	  exit (1);
 	}
-
       if (preProcOnly)
-      {
-	exit (0);
-      }
-    }
-  else
-    {
-      preOutName = fullSrcFileName;
-    }
-
-  yyin = fopen (preOutName, "r");
-  if (yyin == NULL)
-    {
-      perror ("Preproc file not found\n");
-      exit (1);
+        {
+	  exit (0);
+        }
+      yyin = fopen (preOutName, "r");
+      if (yyin == NULL)
+        {
+          perror ("Preproc file not found\n");
+          exit (1);
+        }
+      addSetHead (&tmpfileSet, yyin);
     }
 
   return 0;
@@ -1664,7 +1694,7 @@ _discoverPaths (const char *argv0)
       ExePathList[0] = BINDIR;
     }
 
-  do 
+  do
     {
       /* Case 1 */
       if (getenv (SDCCDIR_NAME) != NULL)
@@ -1717,7 +1747,7 @@ initValues (void)
 
   setMainValue ("dstfilename", dstFileName);
   setMainValue ("fullsrcfilename", fullSrcFileName ? fullSrcFileName : "fullsrcfilename");
-  
+
   if (options.cc_only && fullDstFileName)
     /* compile + assemble and -o given: -o specifies name of object file */
     {
@@ -1832,8 +1862,7 @@ main (int argc, char **argv, char **envp)
   parseCmdLine (argc, argv);
 
   /* if no input then printUsage & exit */
-  if ((!options.c1mode && !fullSrcFileName && !nrelFiles) ||
-      (options.c1mode && !fullSrcFileName))
+  if (!options.c1mode && !fullSrcFileName && !nrelFiles)
     {
       printUsage ();
       exit (0);
@@ -1849,7 +1878,7 @@ main (int argc, char **argv, char **envp)
   initMem ();
   port->finaliseOptions ();
 
-  if (fullSrcFileName)
+  if (fullSrcFileName || options.c1mode)
     {
       preProcess (envp);
 
@@ -1863,17 +1892,8 @@ main (int argc, char **argv, char **envp)
 	printf ("sdcc: Generating code...\n");
 
       yyparse ();
-
       if (fatalError) {
-        // @FIX: Dario Vecchio 03-05-2001
-        if (preOutName) {
-          if (yyin && yyin != stdin)
-            fclose (yyin);
-          unlink (preOutName);
-          Safe_free (preOutName);
-        }
-        // EndFix
-        return 1;
+        exit (1);
       }
 
       if (TARGET_IS_PIC) {
@@ -1897,20 +1917,10 @@ main (int argc, char **argv, char **envp)
           assemble (envp);
         }
     }
-
   closeDumpFiles();
 
   if (cdbFile)
     fclose (cdbFile);
-
-  if (yyin && yyin != stdin)
-    fclose (yyin);
-
-  if (preOutName && !options.c1mode)
-    {
-      unlink (preOutName);
-      Safe_free (preOutName);
-    }
 
   if (!options.cc_only &&
       !fatalError &&

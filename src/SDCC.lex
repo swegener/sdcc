@@ -41,7 +41,6 @@ char *currFname;
 
 extern int lineno, column;
 extern char *filename ;
-extern char *fullSrcFileName ;
 int   yylineno = 1               ;
 void count()                     ;
 int process_pragma(char *);
@@ -286,7 +285,9 @@ int checkCurrFile ( char *s)
     /* get the currentfile name info    */
     s++ ;
 
-    if ( strncmp(s,fullSrcFileName,strlen(fullSrcFileName)) == 0) {
+    /* in c1mode fullSrcFileName is NULL */
+    if ( fullSrcFileName &&
+         strncmp(s,fullSrcFileName,strlen(fullSrcFileName)) == 0) {
       lineno = yylineno = lNum;					
       currFname = fullSrcFileName ;
     }  else {

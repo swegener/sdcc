@@ -1,3 +1,13 @@
+2003-02-15  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCglue.h: make tmpfileNameSet available for preOutName
+	* src/SDCCmain.c (preProcess): make sure, that preOutName will be deleted;
+	make -V work again; --c1mode reads now from stdin
+	* doc/sdccman.lyx: added --c1mode
+	* support/Util/SDCCerr.c: new messages for c1 mode
+	* support/Util/SDCCerr.h: new messages for c1 mode
+	* src/SDCC.lex (checkCurrFile): test if fullSrcFileName is NULL for c1mode
+
 2003-02-15    <johan@balder>
 
 	* src/asm.c: new options: --no-c-code-in-asm and --i-code-in-asm

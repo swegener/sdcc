@@ -175,6 +175,9 @@ SDCCERR - SDCC Standard error handler
 #define W_CAST_STRUCT_PTR 157 /* pointer to different structure types */
 #define W_IF_ALWAYS_TRUE 158
 #define E_PARAM_NAME_OMITTED 159
+#define W_NO_FILE_ARG_IN_C1 160
+#define E_NEED_OPT_O_IN_C1 161
+#define W_ILLEGAL_OPT_COMBINATION 162
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

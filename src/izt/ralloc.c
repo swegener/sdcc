@@ -23,7 +23,7 @@ static struct {
 
 static REG *_findRegById(REG_ID id)
 {
-    REG *r = port_data.regs;
+    REG *r = izt_port->regs;
     
     while (r->size) {
 	if (r->id == id)
@@ -58,7 +58,7 @@ static REG *_getSubReg(REG *r, int size, int offset)
 
 static int _numRegsAvailable(int size)
 {
-    REG *r = port_data.regs;
+    REG *r = izt_port->regs;
     int ret = 0;
 
     while (r->size) {
@@ -99,7 +99,7 @@ static void _markAsFree(REG_ID id)
 
 static REG *_allocateReg(int size)
 {
-    REG *r = port_data.regs;
+    REG *r = izt_port->regs;
     
     while (r->size) {
 	if (r->size == size && r->used == 0) {
@@ -155,7 +155,7 @@ static void _freeReg(REG *r)
 
 static void _freeAllRegs(viod)
 {
-    REG *r = port_data.regs;
+    REG *r = izt_port->regs;
 
     while (r->size) {
 	r->used = 0;
@@ -165,7 +165,7 @@ static void _freeAllRegs(viod)
 
 static void _dumpRegs(void)
 {
-    REG *r = port_data.regs;
+    REG *r = izt_port->regs;
 
     while (r->size) {
 	printf("%u\t%u\t%s\t%u\n", r->size, r->id, r->name, r->used);
@@ -173,10 +173,11 @@ static void _dumpRegs(void)
     }
 }
 
-void izt_init(REG *regs)
+void izt_init(IZT_PORT *port)
 {
-    wassert(regs);
-    port_data.regs = regs;
+    wassert(port && port->regs);
+    izt_port = port;
+    izt_initEmitters();
 }
 
 /// Lower register pressure by packing iTemps where possible.
@@ -639,11 +640,6 @@ static void _serialRegAssign(eBBlock **ebbs, int count)
 	    sym->regs[0] = _allocateReg(sym->nRegs);
 	}
     }
-}
-
-static void izt_gen(iCode *ic)
-{
-    printf("izt_gen\n");    
 }
 
 static DEFSETFUNC(_deallocStackSpil)

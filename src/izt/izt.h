@@ -1,4 +1,5 @@
 #include <common.h>
+#include "gen.h"
 
 typedef enum {
     REG_ID_NONE,
@@ -54,9 +55,10 @@ typedef struct regs {
 
 typedef struct {
     REG *regs;
-} PORT_DATA;
+} IZT_PORT;
 
-PORT_DATA port_data;
+IZT_PORT *izt_port;
 
-void izt_init(REG *regs);
+void izt_init(IZT_PORT *port);
 void izt_assignRegisters (eBBlock **ebbs, int count);
+void izt_gen(iCode *ic);

@@ -13,6 +13,10 @@ static REG _i186_regs[] = {
     { 0, REG_ID_NONE,"??",  0, { REG_ID_NONE, REG_ID_NONE, REG_ID_NONE } }
 };
 
+static IZT_PORT _i186_port = {
+    _i186_regs
+};
+
 static char _defaultRules[] =
 {
     //#include "peeph.rul"
@@ -23,10 +27,67 @@ static char *_i186_keywords[] =     {
     NULL
 };
 
+// PENDING: A default set of mappings to make asm.c happy.
+static const ASM_MAPPING _asxxxx_z80_mapping[] = {
+    /* We want to prepend the _ */
+    { "area", ".area _%s" },
+    { "areacode", ".area _%s" },
+    { "areadata", ".area _%s" },
+    { "areahome", ".area _%s" },
+    { "*ixx", "%d(ix)" },
+    { "*iyx", "%d(iy)" },
+    { "*hl", "(hl)" },
+    { "di", "di" },
+    { "ldahli", 
+		"ld a,(hl)\n"
+		"\tinc\thl" },
+    { "ldahlsp", 
+		"ld hl,#%d\n"
+		"\tadd\thl,sp" },
+    { "ldaspsp", 
+		"ld hl,#%d\n"
+		"\tadd\thl,sp\n"
+		"\tld\tsp,hl" },
+    { "*pair", "(%s)" },
+    { "shortjp", "jp" },
+    { "enter", 
+		"push\tix\n"
+		"\tld\tix,#0\n"
+		"\tadd\tix,sp" },
+    { "enterx", 
+		"push\tix\n"
+		"\tld\tix,#0\n"
+		"\tadd\tix,sp\n"
+		"\tld\thl,#-%d\n"
+		"\tadd\thl,sp\n"
+		"\tld\tsp,hl" },
+    { "leave", 
+		"pop\tix\n"
+    },
+    { "leavex", 
+		"ld sp,ix\n"
+		"\tpop\tix\n"
+    },
+    { "pusha", 
+      		"push af\n"
+      		"\tpush\tbc\n"
+      		"\tpush\tde\n"
+      		"\tpush\thl"
+    },
+    { "adjustsp", "lda sp,-%d(sp)" },
+    { NULL, NULL }
+};
+
+static const ASM_MAPPINGS _asxxxx_z80 = {
+    &asm_asxxxx_mapping,
+    _asxxxx_z80_mapping
+};
+
 static void _i186_init(void)
 {
     asm_addTree(&asm_asxxxx_mapping);
-    izt_init(_i186_regs);
+    asm_addTree(&_asxxxx_z80);
+    izt_init(&_i186_port);
 }
 
 static void _i186_reset_regparm()

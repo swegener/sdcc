@@ -1586,10 +1586,10 @@ glue (void)
         case MODEL_PAGE0:   fprintf (asmFile, " --model-page0");   break;
         default: break;
     }
-    if(options.stackAuto)      fprintf (asmFile, " --stack-auto");
+    /*if(options.stackAuto)      fprintf (asmFile, " --stack-auto");*/
     if(options.useXstack)      fprintf (asmFile, " --xstack");
-    if(options.intlong_rent)   fprintf (asmFile, " --int-long-rent");
-    if(options.float_rent)     fprintf (asmFile, " --float-rent");
+    /*if(options.intlong_rent)   fprintf (asmFile, " --int-long-rent");*/
+    /*if(options.float_rent)     fprintf (asmFile, " --float-rent");*/
     if(options.noRegParams)    fprintf (asmFile, " --no-reg-params");
     if(options.parms_in_bank1) fprintf (asmFile, " --parms-in-bank1");
     fprintf (asmFile, "\n");

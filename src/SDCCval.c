@@ -309,31 +309,32 @@ constVal (char *s)
   else
     sval = atol (s);
 
-
+  // check if we have to promote to long
   if (SPEC_LONG (val->type) || 
       (SPEC_USIGN(val->type) && sval>0xffff) ||
-      (!SPEC_USIGN(val->type) && ((long)sval>32767 || (long)sval<-32768)) {
+      (!SPEC_USIGN(val->type) && ((long)sval>32767 || (long)sval<-32768))) {
       if (SPEC_USIGN (val->type))
 	SPEC_CVAL (val->type).v_ulong = sval;
       else
 	SPEC_CVAL (val->type).v_long = sval;
       SPEC_LONG (val->type) = 1;
+      return val;
     }
+  
+  if (SPEC_USIGN (val->type))
+    SPEC_CVAL (val->type).v_uint = sval;
   else
-    {
-      if (SPEC_USIGN (val->type))
-	SPEC_CVAL (val->type).v_uint = sval;
-      else
-	SPEC_CVAL (val->type).v_int = sval;
-    }
-
-  // check the size and make it a char if possible
-  if (sval < 256)
+    SPEC_CVAL (val->type).v_int = sval;
+  
+  
+  // check if we can make it a char
+  if ((SPEC_USIGN(val->type) && sval < 256) ||
+      (!SPEC_USIGN(val->type) && ((long)sval<127 && (long)sval>-128))) {
     SPEC_NOUN (val->etype) = V_CHAR;
-
+  }
   return val;
-
 }
+
 /*! /fn char hexEscape(char **src)
 
     /param src Pointer to 'x' from start of hex character value

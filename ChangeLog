@@ -1,5 +1,11 @@
 2003-08-22  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	A few small changes that speed up the peephole optimizer.
+
+	* src/SDCCpeeph.c
+
+2003-08-22  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	Try to make the peephole optimizer smarter by maintaining
 	an association between the assembly source code and the
 	iCodes that originated them. Put this information to use

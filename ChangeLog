@@ -1,3 +1,12 @@
+2003-04-02  Bernhard Held <bernhard@bernhardheld.de>
+
+	* Makefile.common.in: unused PORT, SCC and SAS removed, fixed docdir
+	* configure.in: big cleanup, updated to autoconf 2.5x
+	* configure: rebuilt from configure.in
+	* sdccconf_in.h: new RETSIGTYPE, and other PATHs
+	* sdcc_vc_in.h: reflect changes from sdccconf.h
+	* doc/Makefile: fixed a flaw in "make install"
+
 2003-04-02    <johan@balder>
 
 	* src/ds390/gen.c (genCmp): no comments

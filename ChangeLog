@@ -1,5 +1,12 @@
 2003-12-18 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* src/SDCCast.c (createIvalCharPtr),
+	* src/SDCCglue.c (printChar): fixed bug #862241 (an error in my fix for
+	bug #753752)
+	* support/regression/tests/nullstring.c: tests for these two bugs
+
+2003-12-18 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* support/Util/SDCCerr.h,
 	* support/Util/SDCCerr.c (E_NOT_ALLOWED),
 	* src/SDCC.y (struct_declaration, struct_or_union_specifier): complain

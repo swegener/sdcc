@@ -546,6 +546,11 @@ printChar (FILE * ofile, char *s, int plen)
       else
 	len = 0;
     }
+  while (pplen < plen)
+    {
+      tfprintf (ofile, "\t!db !constbyte\n", 0);
+      pplen++;
+    }
 }
 
 /*-----------------------------------------------------------------*/

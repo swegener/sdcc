@@ -994,6 +994,15 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       char *s = SPEC_CVAL (iexpr->etype).v_char;
       int i = 0;
       int size = getSize (iexpr->ftype);
+      int symsize = getSize (type);
+      
+      if (size>symsize)
+        {
+	  if (size>(symsize+1))
+	    werrorfl (iexpr->filename, iexpr->lineno, W_EXCESS_INITIALIZERS,
+		      "string", sym->opval.val->sym->name);
+	  size = symsize;
+	}
 
       for (i=0;i<size;i++)
 	{

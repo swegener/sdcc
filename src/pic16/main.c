@@ -187,7 +187,7 @@ _process_pragma(const char *sz)
 
 		if(stackLen < 1) {
 			stackLen = 64;
-			fprintf(stderr, "%s:%d setting stack to default size 0x%x\n", __FILE__, __LINE__, stackLen);
+			fprintf(stderr, "%s:%d setting stack to default size %d\n", __FILE__, __LINE__, stackLen);
 		}
 
 //	  	fprintf(stderr, "Initializing stack pointer at 0x%x len 0x%x\n", stackPos, stackLen);

@@ -1970,6 +1970,13 @@ deassignLRs (iCode * ic, eBBlock * ebp)
       if (!bitVectBitValue (_G.regAssigned, sym->key))
 	continue;
 
+      /* special case for shifting: there is a case where shift count
+       * can be allocated in the same register as the result, so do not
+       * free right registers if same as result registers, cause genShiftLeft
+       * will fail -- VR */
+       if(ic->op == LEFT_OP)
+         continue;
+
       /* special case check if this is an IFX &
          the privious one was a pop and the 
          previous one was not spilt then keep track

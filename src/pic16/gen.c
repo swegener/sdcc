@@ -58,6 +58,7 @@ static asmop *newAsmop (short type);
 static pCodeOp *pic16_popRegFromString(char *str, int size, int offset, operand *op);
 extern pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...);
 static void mov2w (asmop *aop, int offset);
+static void mov2f(asmop *dsr, asmop *src, int offset);
 //static int aopIdx (asmop *aop, int offset);
 
 int pic16_labelOffset=0;
@@ -983,9 +984,11 @@ bool pic16_sameRegs (asmop *aop1, asmop *aop2 )
 
     if(aop1->type == AOP_ACC && aop2->type == AOP_ACC)return TRUE;
 
+#if 0
     if (aop1->type != AOP_REG ||
         aop2->type != AOP_REG )
         return FALSE ;
+#endif
 
     if (aop1->size != aop2->size )
         return FALSE ;
@@ -2049,6 +2052,17 @@ static void mov2w (asmop *aop, int offset)
 	else
 		pic16_emitpcode(POC_MOVFW,pic16_popGet(aop,offset));
 
+}
+
+static void mov2f(asmop *dst, asmop *src, int offset)
+{
+  if(is_LitAOp(src)) {
+          pic16_emitpcode(POC_MOVLW, pic16_popGet(src, offset));
+          pic16_emitpcode(POC_MOVWF, pic16_popGet(dst, offset));
+        } else {
+          pic16_emitpcode(POC_MOVFF, pic16_popGet2p( pic16_popGet(src, offset),
+                                    pic16_popGet(dst, offset)));
+        }
 }
 
 
@@ -7603,12 +7617,10 @@ static void AccRsh (int shCount, int andmask)
 			return; break;
 		case 1 :
 			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-//			andmask = 0;	/* no need */
 			break;
 		case 2 :
 			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
 			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
-//			andmask = 0;	/* no need */
 			break;
 		case 3 :
 			pic16_emitpcode(POC_SWAPFW,pic16_popCopyReg(&pic16_pc_wreg));
@@ -8557,7 +8569,7 @@ static void genLeftShift (iCode *ic)
 {
   operand *left,*right, *result;
   int size, offset;
-  char *l;
+//  char *l;
   symbol *tlbl , *tlbl1;
   pCodeOp *pctemp;
 
@@ -8576,33 +8588,38 @@ static void genLeftShift (iCode *ic)
     return ;
   }
 
-  /* shift count is unknown then we have to form 
-     a loop get the loop count in B : Note: we take
-     only the lower order byte since shifting
-     more that 32 bits make no sense anyway, ( the
-     largest size of an object can be only 32 bits ) */  
-
-    
+  /* shift count is unknown then we have to form
+   * a loop. Get the loop count in WREG : Note: we take
+   * only the lower order byte since shifting
+   * more than 32 bits make no sense anyway, ( the
+   * largest size of an object can be only 32 bits ) */
+  
   pic16_aopOp(left,ic,FALSE);
   pic16_aopOp(result,ic,FALSE);
 
   /* now move the left to the result if they are not the
-     same */
-  if (!pic16_sameRegs(AOP(left),AOP(result)) && 
-      AOP_SIZE(result) > 1) {
+   * same, and if size > 1,
+   * and if right is not same to result (!!!) -- VR */
+  if (!pic16_sameRegs(AOP(left),AOP(result))
+      && (AOP_SIZE(result) > 1)) {
+
+    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
     size = AOP_SIZE(result);
     offset=0;
     while (size--) {
+
+#if 0
       l = pic16_aopGet(AOP(left),offset,FALSE,TRUE);
       if (*l == '@' && (IS_AOP_PREG(result))) {
 
-	pic16_emitcode("mov","a,%s",l);
-	pic16_aopPut(AOP(result),"a",offset);
-      } else {
-	pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),offset));
-	pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),offset));
-	//pic16_aopPut(AOP(result),l,offset);
+          pic16_emitcode("mov","a,%s",l);
+          pic16_aopPut(AOP(result),"a",offset);
+      } else
+#endif
+      {
+        /* we don't know if left is a literal or a register, take care -- VR */
+        mov2f(AOP(result), AOP(left), offset);
       }
       offset++;
     }
@@ -8627,11 +8644,16 @@ static void genLeftShift (iCode *ic)
       pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(result),0));
     } else {
 
+      DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
       tlbl = newiTempLabel(NULL);
+
+#if 1
+      /* this is already done, why change it? */
       if (!pic16_sameRegs(AOP(left),AOP(result))) {
-		pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),0));
-		pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),0));
+                mov2f(AOP(result), AOP(left), 0);
       }
+#endif
 
       pic16_emitpcode(POC_COMFW,  pic16_popGet(AOP(right),0));
       pic16_emitpcode(POC_RRCF,    pic16_popGet(AOP(result),0));
@@ -8646,6 +8668,8 @@ static void genLeftShift (iCode *ic)
     
   if (pic16_sameRegs(AOP(left),AOP(result))) {
 
+    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    
     tlbl = newiTempLabel(NULL);
     pic16_emitpcode(POC_COMFW,  pic16_popGet(AOP(right),0));
     genMultiAsm(POC_RRCF, result, size,1);
@@ -8719,6 +8743,189 @@ static void genLeftShift (iCode *ic)
   pic16_freeAsmop(left,NULL,ic,TRUE);
   pic16_freeAsmop(result,NULL,ic,TRUE);
 }
+
+
+
+#if 0
+#error old code (left here for reference)
+/*-----------------------------------------------------------------*/
+/* genLeftShift - generates code for left shifting                 */
+/*-----------------------------------------------------------------*/
+static void genLeftShift (iCode *ic)
+{
+  operand *left,*right, *result;
+  int size, offset;
+  char *l;
+  symbol *tlbl , *tlbl1;
+  pCodeOp *pctemp;
+
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+  right = IC_RIGHT(ic);
+  left  = IC_LEFT(ic);
+  result = IC_RESULT(ic);
+
+  pic16_aopOp(right,ic,FALSE);
+
+  /* if the shift count is known then do it 
+     as efficiently as possible */
+  if (AOP_TYPE(right) == AOP_LIT) {
+    genLeftShiftLiteral (left,right,result,ic);
+    return ;
+  }
+
+  /* shift count is unknown then we have to form 
+     a loop get the loop count in B : Note: we take
+     only the lower order byte since shifting
+     more that 32 bits make no sense anyway, ( the
+     largest size of an object can be only 32 bits ) */  
+
+    
+  pic16_aopOp(left,ic,FALSE);
+  pic16_aopOp(result,ic,FALSE);
+
+  /* now move the left to the result if they are not the
+     same */
+  if (!pic16_sameRegs(AOP(left),AOP(result)) && 
+      AOP_SIZE(result) > 1) {
+
+    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+    size = AOP_SIZE(result);
+    offset=0;
+    while (size--) {
+      l = pic16_aopGet(AOP(left),offset,FALSE,TRUE);
+      if (*l == '@' && (IS_AOP_PREG(result))) {
+
+	pic16_emitcode("mov","a,%s",l);
+	pic16_aopPut(AOP(result),"a",offset);
+      } else {
+
+        /* we don't know if left is a literal or a register, take care -- VR */
+        mov2f(AOP(result), AOP(left), offset);
+      }
+      offset++;
+    }
+  }
+
+  size = AOP_SIZE(result);
+
+  /* if it is only one byte then */
+  if (size == 1) {
+    if(optimized_for_speed) {
+      pic16_emitpcode(POC_SWAPFW, pic16_popGet(AOP(left),0));
+      pic16_emitpcode(POC_ANDLW,  pic16_popGetLit(0xf0));
+      pic16_emitpcode(POC_BTFSS,  pic16_newpCodeOpBit(pic16_aopGet(AOP(right),0,FALSE,FALSE),2,0, PO_GPR_REGISTER));
+      pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),0));
+      pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),0));
+      pic16_emitpcode(POC_BTFSS,  pic16_newpCodeOpBit(pic16_aopGet(AOP(right),0,FALSE,FALSE),0,0, PO_GPR_REGISTER));
+      pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(result),0));
+      pic16_emitpcode(POC_RLCFW,   pic16_popGet(AOP(result),0));
+      pic16_emitpcode(POC_ANDLW,  pic16_popGetLit(0xfe));
+      pic16_emitpcode(POC_ADDFW,  pic16_popGet(AOP(result),0));
+      pic16_emitpcode(POC_BTFSC,  pic16_newpCodeOpBit(pic16_aopGet(AOP(right),0,FALSE,FALSE),1,0, PO_GPR_REGISTER));
+      pic16_emitpcode(POC_ADDWF,  pic16_popGet(AOP(result),0));
+    } else {
+
+      DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+      tlbl = newiTempLabel(NULL);
+      if (!pic16_sameRegs(AOP(left),AOP(result))) {
+                mov2f(AOP(result), AOP(left), 0);
+                
+//		pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),0));
+//		pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),0));
+      }
+
+      pic16_emitpcode(POC_COMFW,  pic16_popGet(AOP(right),0));
+      pic16_emitpcode(POC_RRCF,    pic16_popGet(AOP(result),0));
+      pic16_emitpLabel(tlbl->key);
+      pic16_emitpcode(POC_RLCF,    pic16_popGet(AOP(result),0));
+      pic16_emitpcode(POC_ADDLW,  pic16_popGetLit(1));
+      emitSKPC;
+      pic16_emitpcode(POC_GOTO,pic16_popGetLabel(tlbl->key));
+    }
+    goto release ;
+  }
+    
+  if (pic16_sameRegs(AOP(left),AOP(result))) {
+
+    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+    
+    tlbl = newiTempLabel(NULL);
+    pic16_emitpcode(POC_COMFW,  pic16_popGet(AOP(right),0));
+    genMultiAsm(POC_RRCF, result, size,1);
+    pic16_emitpLabel(tlbl->key);
+    genMultiAsm(POC_RLCF, result, size,0);
+    pic16_emitpcode(POC_ADDLW,  pic16_popGetLit(1));
+    emitSKPC;
+    pic16_emitpcode(POC_GOTO,pic16_popGetLabel(tlbl->key));
+    goto release;
+  }
+
+  //tlbl = newiTempLabel(NULL);
+  //offset = 0 ;   
+  //tlbl1 = newiTempLabel(NULL);
+
+  //reAdjustPreg(AOP(result));    
+    
+  //pic16_emitcode("sjmp","%05d_DS_",tlbl1->key+100); 
+  //pic16_emitcode("","%05d_DS_:",tlbl->key+100);    
+  //l = pic16_aopGet(AOP(result),offset,FALSE,FALSE);
+  //MOVA(l);
+  //pic16_emitcode("add","a,acc");         
+  //pic16_aopPut(AOP(result),"a",offset++);
+  //while (--size) {
+  //  l = pic16_aopGet(AOP(result),offset,FALSE,FALSE);
+  //  MOVA(l);
+  //  pic16_emitcode("rlc","a");         
+  //  pic16_aopPut(AOP(result),"a",offset++);
+  //}
+  //reAdjustPreg(AOP(result));
+
+  //pic16_emitcode("","%05d_DS_:",tlbl1->key+100);
+  //pic16_emitcode("djnz","b,%05d_DS_",tlbl->key+100);
+
+
+  tlbl = newiTempLabel(NULL);
+  tlbl1= newiTempLabel(NULL);
+
+  size = AOP_SIZE(result);
+  offset = 1;
+
+  pctemp = pic16_popGetTempReg();  /* grab a temporary working register. */
+
+  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),0));
+
+  /* offset should be 0, 1 or 3 */
+  
+  pic16_emitpcode(POC_ANDLW, pic16_popGetLit((size<<3)-1));
+  emitSKPNZ;
+  pic16_emitpcode(POC_GOTO,  pic16_popGetLabel(tlbl1->key));
+
+  pic16_emitpcode(POC_MOVWF, pctemp);
+
+
+  pic16_emitpLabel(tlbl->key);
+
+  emitCLRC;
+  pic16_emitpcode(POC_RLCF,  pic16_popGet(AOP(result),0));
+  while(--size)
+    pic16_emitpcode(POC_RLCF,   pic16_popGet(AOP(result),offset++));
+
+  pic16_emitpcode(POC_DECFSZ,  pctemp);
+  pic16_emitpcode(POC_GOTO,pic16_popGetLabel(tlbl->key));
+  pic16_emitpLabel(tlbl1->key);
+
+  pic16_popReleaseTempReg(pctemp);
+
+
+ release:
+  pic16_freeAsmop (right,NULL,ic,TRUE);
+  pic16_freeAsmop(left,NULL,ic,TRUE);
+  pic16_freeAsmop(result,NULL,ic,TRUE);
+}
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genrshOne - right shift a one byte quantity by known count      */

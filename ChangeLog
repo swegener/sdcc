@@ -1,3 +1,21 @@
+2004-09-17 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (mov2f): New function to move an operand to
+	another without considering if it is a literal or a register,
+	* (pic16_sameRegs): don't check if they are both AOP_REG,
+	* (AccRsh): removed andmask=0 lines,
+	* (genLeftShift): duplicated to be improved in future versions,
+	* src/pic16/main.c (_process_pragma): emit stack default size in hex,
+	* src/pic16/pcode.c: added POC_INFSNZW, updated inverted_op fields
+	in POC_INCFSZ, POC_INCFSZW, POC_INFSNZ,
+	* (pic16initMnemonics): added initialization for POC_INFSNZW,
+	* (insertBankSwitch): fixed inserting banksel directives algorithm
+	for instructions that follow a skip instruction, this fixes a report
+	for broken subtraction code generation,
+	* src/pic16/ralloc.c (deassignLRs): do not free register if current
+	iCode is a left op, just in case result and right share the same
+	registers
+
 2004-09-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/main.c,

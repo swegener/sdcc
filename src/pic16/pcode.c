@@ -1274,7 +1274,7 @@ pCodeInstruction pic16_pciINCFSZ = {
   0,    // fast call/return mode select bit
   0,	// second memory operand
   0,	// second literal operand
-  POC_NOP,
+  POC_INFSNZ,
   PCC_REGISTER,   // inCond
   PCC_REGISTER   , // outCond
   PCI_MAGIC
@@ -1301,7 +1301,7 @@ pCodeInstruction pic16_pciINCFSZW = {
   0,    // fast call/return mode select bit
   0,	// second memory operand
   0,	// second literal operand
-  POC_NOP,
+  POC_INFSNZW,
   PCC_REGISTER,   // inCond
   PCC_W          , // outCond
   PCI_MAGIC
@@ -1313,7 +1313,7 @@ pCodeInstruction pic16_pciINFSNZ = { // mdubuc - New
    genericDestruct,
    genericPrint},
   POC_INFSNZ,
-  "INCFSNZ",
+  "INFSNZ",
   NULL, // from branch
   NULL, // to branch
   NULL, // label
@@ -1328,9 +1328,36 @@ pCodeInstruction pic16_pciINFSNZ = { // mdubuc - New
   0,    // fast call/return mode select bit
   0,	// second memory operand
   0,	// second literal operand
-  POC_NOP,
+  POC_INCFSZ,
   PCC_REGISTER,   // inCond
   PCC_REGISTER   , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciINFSNZW = { // vrokas - New
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   //   AnalyzeSKIP,
+   genericDestruct,
+   genericPrint},
+  POC_INFSNZW,
+  "INFSNZ",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  3,    // num ops
+  0,0,  // dest, bit instruction
+  1,1,  // branch, skip
+  0,    // literal operand
+  1,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_INCFSZW,
+  PCC_REGISTER,   // inCond
+  PCC_W          , // outCond
   PCI_MAGIC
 };
 
@@ -3003,6 +3030,7 @@ void pic16initMnemonics(void)
   pic16Mnemonics[POC_INCFSZ] = &pic16_pciINCFSZ;
   pic16Mnemonics[POC_INCFSZW] = &pic16_pciINCFSZW;
   pic16Mnemonics[POC_INFSNZ] = &pic16_pciINFSNZ;
+  pic16Mnemonics[POC_INFSNZW] = &pic16_pciINFSNZW;
   pic16Mnemonics[POC_IORWF] = &pic16_pciIORWF;
   pic16Mnemonics[POC_IORFW] = &pic16_pciIORFW;
   pic16Mnemonics[POC_IORLW] = &pic16_pciIORLW;
@@ -6022,7 +6050,7 @@ int pic16_isPCinFlow(pCode *pc, pCode *pcflow)
 pCodeOp *pic16_popGetLabel(unsigned int key);
 extern int pic16_labelOffset;
 
-static void insertBankSwitch(int position, pCode *pc)
+static void insertBankSwitch(unsigned char position, pCode *pc)
 {
   pCode *new_pc;
 
@@ -6037,7 +6065,7 @@ static void insertBankSwitch(int position, pCode *pc)
 //	position = 0;		// position is always before (sanity check!)
 
 #if 0
-	fprintf(stderr, "%s:%d: inserting bank switch\n", __FUNCTION__, __LINE__);
+	fprintf(stderr, "%s:%d: inserting bank switch (pos: %d)\n", __FUNCTION__, __LINE__, position);
 	pc->print(stderr, pc);
 #endif
 
@@ -6057,8 +6085,10 @@ static void insertBankSwitch(int position, pCode *pc)
 
 		case 2: {
 			  symbol *tlbl;
-			  pCode *pcnext, *pcprev, *npci;
+			  pCode *pcnext, *pcprev, *npci, *ppc;
 			  PIC_OPCODE ipci;
+			  int ofs1=0, ofs2=0, len=0;
+			  
 			/* just like 0, but previous was a skip instruction,
 			 * so some care should be taken */
    			  
@@ -6070,23 +6100,23 @@ static void insertBankSwitch(int position, pCode *pc)
 				ipci = PCI(pcprev)->inverted_op;
 				npci = pic16_newpCode(ipci, PCI(pcprev)->pcop);
 
-#if 1
-				PCI(npci)->from = PCI(pcprev)->from;
-				PCI(npci)->to = PCI(pcprev)->to;
-				PCI(npci)->label = PCI(pcprev)->label;
-				PCI(npci)->pcflow = PCI(pcprev)->pcflow;
-				PCI(npci)->cline = PCI(pcprev)->cline;
-#endif
+//				fprintf(stderr, "%s:%d old OP: %d\tnew OP: %d\n", __FILE__, __LINE__, PCI(pcprev)->op, ipci);
 
-//				memmove(PCI(pcprev), PCI(npci), sizeof(pCode) + sizeof(PIC_OPCODE) + sizeof(char const * const));
-
-#if 1
-				pic16_pCodeInsertAfter(pcprev->prev, npci);
-				/* unlink the pCode */
-				pcprev->prev->next = pcprev->next;
-				pcprev->next->prev = pcprev->prev;
-#endif
+				/* copy info from old pCode */
+				ofs1 = ofs2 = sizeof( pCode ) + sizeof(PIC_OPCODE);
+				len = sizeof(pCodeInstruction) - ofs1 - sizeof( char const * const *);
+				ofs1 += strlen( PCI(pcprev)->mnemonic) + 1;
+				ofs2 += strlen( PCI(npci)->mnemonic) + 1;
+				memcpy(&PCI(npci)->from, &PCI(pcprev)->from, (unsigned int)(&(PCI(npci)->pci_magic)) - (unsigned int)(&(PCI(npci)->from)));
+				PCI(npci)->op = PCI(pcprev)->inverted_op;
 				
+				/* unlink old pCode */
+				ppc = pcprev->prev;
+				ppc->next = pcprev->next;
+				pcprev->next->prev = ppc;
+				pic16_pCodeInsertAfter(ppc, npci);
+				
+				/* extra instructions to handle invertion */
 				pcnext = pic16_newpCode(POC_GOTO, pic16_popGetLabel(tlbl->key));
 			  	pic16_pCodeInsertAfter(pc->prev, pcnext);
 			  	pic16_pCodeInsertAfter(pc->prev, new_pc);
@@ -6534,7 +6564,7 @@ static void pic16_FixRegisterBanking(pBlock *pb)
   pCode *pc=NULL;
   pCode *pcprev=NULL;
   regs *reg, *prevreg;
-  int flag=0;
+  unsigned char flag=0;
   
 	if(!pb)
 		return;
@@ -6591,9 +6621,10 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 		 * not a skip type instruction */
 		pcprev = findPrevpCode(pc->prev, PC_OPCODE);
 
-		/* FIXME: if previous is SKIP pCode, we should move the BANKSEL
-		 * before SKIP, but we have to check if the SKIP uses BANKSEL, etc... */
-		flag = 0;
+		flag = 0;		/* add before this instruction */
+		
+		/* if previous instruction is a skip one, then set flag
+		 * to 2 and call insertBankSwitch */
 		if(pcprev && isPCI_SKIP(pcprev))flag=2;	//goto loop;
 		 
 		prevreg = reg;

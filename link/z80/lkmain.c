@@ -18,6 +18,13 @@
 #include <alloc.h>
 #include "aslink.h"
 
+#ifndef SDK_VERSION_STRING
+#define SDK_VERSION_STRING 	"3.0.0"
+#endif
+#ifdef TARGET_STRING
+#define TARGET_STRING		"gbz80"
+#endif
+
 /*)Module	lkmain.c
  *
  *	The module lkmain.c contains the functions which

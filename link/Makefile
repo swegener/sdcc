@@ -2,18 +2,17 @@ PRJDIR = ..
 
 include $(PRJDIR)/Makefile.common
 
-PORTS = _z80 _gbz80
+PORTS = z80 gbz80
 
 all: 
-	for i in $(PORTS); do make $$i; done
+	for i in $(PORTS); do make _link THIS=$$i; done
 
-_z80: clean
-	make -C z80
-	cp z80/link$(E) $(PRJDIR)/bin/link-z80$(E)
-
-_gbz80: clean
-	make -C z80 "OPTS=-DGAMEBOY"
-	cp z80/link$(E) $(PRJDIR)/bin/link-gbz80$(E)
+_link: clean
+ifeq ($(THIS), gbz80)
+	make -C z80 BUILDDIR=../../bin EXT=-$(THIS) OPTS=-DGAMEBOY
+else
+	make -C z80 BUILDDIR=../../bin EXT=-$(THIS)
+endif
 
 clean:
 	make -C z80 clean

@@ -557,7 +557,7 @@ struct mne *mp;
 		outab(op);
 		if (e2.e_base.e_ap == NULL || e2.e_base.e_ap == dot.s_area) {
 			v2 = e2.e_addr - dot.s_addr - 1;
-			if ((v2 < -128) || (v2 > 127))
+			if (pass == 2 && ((v2 < -128) || (v2 > 127)))
 				aerr();
 			outab(v2);
 		} else {

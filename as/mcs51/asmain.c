@@ -317,7 +317,7 @@ char *argv[];
 	if (lflag) {
 		lstsym(lfp);
 	}
-	asexit(aserr);
+	asexit(aserr != 0);
 	return 0;
 }
 

@@ -1289,6 +1289,16 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    continue;		      
 		}
 
+		/* If the live range preceeds the point of definition 
+		   then ideally we must take into account registers that 
+		   have been allocated after sym->liveFrom but freed
+		   before ic->seq. This is complicated, so spill this
+		   symbol instead and let fillGaps handle the allocation. */
+		if (sym->liveFrom < ic->seq) {
+		    spillThis (sym);
+		    continue;		      
+		}
+
 		/* if it has a spillocation & is used less than
 		   all other live ranges then spill this */
 		if (willCS) {

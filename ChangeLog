@@ -1,5 +1,16 @@
 2004-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/avr/ralloc.c (serialRegAssign),
+	* src/xa51/ralloc.c (serialRegAssign),
+	* src/pic/ralloc.c (serialRegAssign),
+	* src/pic16/ralloc.c (serialRegAssign),
+	* src/hc08/ralloc.c (serialRegAssign),
+	* src/z80/ralloc.c (serialRegAssign),
+	* src/ds390/ralloc.c (serialRegAssign),
+	* src/mcs51/ralloc.c (serialRegAssign): fixed bug #964479
+	
+2004-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCicode.c (geniCodeJumpTable): fixed bug #967601
 	* src/SDCCpeeph.c (labelIsReturnOnly): fixed bug #966505
 

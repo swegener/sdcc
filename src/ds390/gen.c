@@ -4674,8 +4674,8 @@ static void genModTwoByte (operand *left, operand *right,
 			if (val < 0) {
 				val = -val;
 			} 
-			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);
 			emitcode ("mov","mb,#0x%02x",val & 0xff);
+			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);		    
 		} else {
 			lbl = newiTempLabel(NULL);
 			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));

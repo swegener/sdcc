@@ -1959,9 +1959,13 @@ decorateType (ast * tree)
     if (dtr != tree->right)
       tree->right = dtr;
 
-    /* special case for left shift operation : cast up right->left if type of left
+    /* special case for some operations: cast up right->left if type of left
        has greater size than right */
-    if (tree->left && tree->right && tree->right->opval.op == LEFT_OP) {
+    if (tree->left && tree->right && IS_AST_OP(tree->right) &&
+	(tree->right->opval.op == LEFT_OP ||
+	 tree->right->opval.op == '*' || // for int -> long only
+	 tree->right->opval.op == '+' ||
+	 tree->right->opval.op == '-')) {
 	int lsize = getSize(LTYPE(tree));
 	int rsize = getSize(RTYPE(tree));
 
@@ -2392,17 +2396,13 @@ decorateType (ast * tree)
 	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
+      TETYPE (tree) = getSpec (TTYPE (tree) =
+			       computeType (LTYPE (tree),
+					    RTYPE (tree)));
       /* promote result to int if left & right are char
 	 this will facilitate hardware multiplies 8bit x 8bit = 16bit */
       if (IS_CHAR(LETYPE(tree)) && IS_CHAR(RETYPE(tree))) {
-	TETYPE (tree) = getSpec (TTYPE (tree) =
-				 computeType (LTYPE (tree),
-					      RTYPE (tree)));
 	SPEC_NOUN(TETYPE(tree)) = V_INT;
-      } else {
-	TETYPE (tree) = getSpec (TTYPE (tree) =
-				 computeType (LTYPE (tree),
-					      RTYPE (tree)));
       }
       return tree;
 

@@ -1991,6 +1991,14 @@ void setOClass (link *ptr, link *spec)
     case PPOINTER:
 	SPEC_OCLS(spec) = xstack;
 	break;
+
+    case EEPPOINTER:
+	SPEC_OCLS(spec) = eeprom;
+	break;
+
+    default:
+	break;
+
     }
 }
 

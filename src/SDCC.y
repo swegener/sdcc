@@ -922,6 +922,8 @@ pointer
 		 case S_EEPROM:
 		     DCL_TYPE($3) = EEPPOINTER;
 		     break;
+		 default:
+		     werror(W_PTR_TYPE_INVALID);
 		 }
 	     }
 	     else 

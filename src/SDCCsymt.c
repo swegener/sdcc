@@ -1625,6 +1625,9 @@ void printTypeChain (link *type, FILE *of)
 	    case V_BIT:
 		fprintf(of,"bit {%d,%d}",SPEC_BSTR(type),SPEC_BLEN(type));
 		break;
+		
+	    default:
+		break;
 	    }
 	}
 	type = type->next;
@@ -1669,6 +1672,8 @@ void cdbTypeInfo (link *type,FILE *of)
 	    case ARRAY :
 		fprintf (of,"DA%d,",DCL_ELEM(type));
 		break;
+	    default:
+		break;
 	    }
 	} else { 
 	    switch (SPEC_NOUN(type)) {
@@ -1704,6 +1709,9 @@ void cdbTypeInfo (link *type,FILE *of)
 
 	    case V_BIT:
 		fprintf(of,"SB%d$%d",SPEC_BSTR(type),SPEC_BLEN(type));
+		break;
+
+	    default:
 		break;
 	    }
 	    fputs(":",of);

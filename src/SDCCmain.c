@@ -1310,7 +1310,9 @@ int main ( int argc, char **argv , char **envp)
 	    glue();
 	    if (!options.c1mode)
 		assemble(envp);
-	}
+	} else {
+	    exit(-1);
+        }
 	
     }
     

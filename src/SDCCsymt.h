@@ -183,6 +183,7 @@ typedef struct symbol {
     unsigned isreqv     :1      ;  /* is the register quivalent of a symbol */
     unsigned hasFcall   :1      ;  /* for functions does it call other functions */
     unsigned calleeSave :1      ;  /* for functions uses callee save paradigm */
+    unsigned udChked    :1      ;  /* use def checking has been already done */
 
     /* following flags are used by the backend
        for code generation and can be changed

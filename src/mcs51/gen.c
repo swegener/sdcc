@@ -251,25 +251,9 @@ static void genSetDPTR(int n)
 /*-----------------------------------------------------------------*/
 static int pointerCode (link *etype)
 {
-    int p_type;
 
     return PTR_TYPE(SPEC_OCLS(etype));
 
-/*     if (SPEC_OCLS(etype)->codesp ) { */
-/* 	p_type = CPOINTER ;	 */
-/*     } */
-/*     else */
-/* 	if (SPEC_OCLS(etype)->fmap && !SPEC_OCLS(etype)->paged) */
-/* 	    p_type = FPOINTER ; */
-/* 	else */
-/* 	    if (SPEC_OCLS(etype)->fmap && SPEC_OCLS(etype)->paged) */
-/* 		p_type = PPOINTER; */
-/* 	    else */
-/* 		if (SPEC_OCLS(etype) == idata ) */
-/* 		    p_type = IPOINTER; */
-/* 		else */
-/* 		    p_type = POINTER ; */
-/*     return p_type; */
 }
 
 /*-----------------------------------------------------------------*/
@@ -2284,7 +2268,6 @@ static void genEndFunction (iCode *ic)
 	}
 
 	/* if debug then send end of function */
-/* 	if (options.debug && currFunc) { */
 	if (currFunc) {
 	    _G.debugLine = 1;
 	    emitcode("","C$%s$%d$%d$%d ==.",
@@ -2397,8 +2380,6 @@ static int findLabelBackwards(iCode *ic, int key)
             return count;
         }
     }
-    
-    /* printf("findLabelBackwards: not found.\n"); */
     
     return 0;
 }

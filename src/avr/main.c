@@ -1,7 +1,7 @@
 /** @file main.c
-    mcs51 specific general functions.
+    avr specific general functions.
 
-    Note that mlh prepended _mcs51_ on the static functions.  Makes
+    Note that mlh prepended _avr_ on the static functions.  Makes
     it easier to set a breakpoint using the debugger.
 */
 #include "common.h"
@@ -15,36 +15,26 @@ static char _defaultRules[] =
 };
 
 /* list of key words used by msc51 */
-static char *_mcs51_keywords[] =     {
+static char *_avr_keywords[] =     {
     "at",
-    "bit",
     "code",
     "critical",
-    "data",
-    "far",
-    "idata",
+    "eeprom"
     "interrupt",
-    "near",
-    "pdata",
-    "reentrant",
     "sfr",
     "sbit",
-    "using",
     "xdata",
-    "_data",
     "_code",
+    "_eeprom"
     "_generic",
-    "_near",
     "_xdata",
-    "_pdata",
-    "_idata",
     NULL
 };
 
 
-void mcs51_assignRegisters (eBBlock **ebbs, int count);
+void avr_assignRegisters (eBBlock **ebbs, int count);
 
-static bool _mcs51_parseOptions(int *pargc, char **argv, int *i)
+static bool _avr_parseOptions(int *pargc, char **argv, int *i)
 {
     /* TODO: allow port-specific command line options to specify
      * segment names here.
@@ -52,75 +42,31 @@ static bool _mcs51_parseOptions(int *pargc, char **argv, int *i)
     return FALSE;
 }
 
-static void _mcs51_finaliseOptions(void)
+static void _avr_finaliseOptions(void)
 {
-    /* Hack-o-matic: if we are using the flat24 model,
-     * adjust pointer sizes.
-     */
-    if (options.model == MODEL_FLAT24)
-    {
-        port->s.fptr_size = 3;
-        port->s.gptr_size = 4;
-        port->stack.isr_overhead++;   /* Will save dpx on ISR entry. */
-        #if 1
-        port->stack.call_overhead++; 	   /* This acounts for the extra byte 
-        				    * of return addres on the stack.
-        				    * but is ugly. There must be a 
-        				    * better way.
-        				    */
-	#endif
-        fReturn = fReturn390;
-        fReturnSize = 5;
-    } 
+    port->default_local_map =
+	port->default_globl_map = xdata;
 }
 
-static void _mcs51_setDefaultOptions(void)
+static void _avr_setDefaultOptions(void)
 {
 }
 
-static const char *_mcs51_getRegName(struct regs *reg)
+static const char *_avr_getRegName(struct regs *reg)
 {
     if (reg)
 	return reg->name;
     return "err";
 }
 
-static void _mcs51_genAssemblerPreamble(FILE *of)
+static void _avr_genAssemblerPreamble(FILE *of)
 {
-   if (options.model == MODEL_FLAT24)
-   {
-       fputs(".flat24 on\t\t; 24 bit flat addressing\n", of);
-       fputs("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
 
-   }
 }
 
 /* Generate interrupt vector table. */
-static int _mcs51_genIVT(FILE *of, symbol **interrupts, int maxInterrupts)
+static int _avr_genIVT(FILE *of, symbol **interrupts, int maxInterrupts)
 {
-    int i;
-    
-    if (options.model != MODEL_FLAT24)
-    {
-        /* Let the default code handle it. */
-    	return FALSE;
-    }
-    
-    fprintf (of, "\tajmp\t__sdcc_gsinit_startup\n");
-    
-    /* now for the other interrupts */
-    for (i = 0; i < maxInterrupts; i++) 
-    {
-	if (interrupts[i])
-	{
-	    fprintf(of, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
-	}
-	else
-	{
-	    fprintf(of, "\treti\n\t.ds\t7\n");
-	}
-    }
-    
     return TRUE;
 }
 
@@ -139,9 +85,9 @@ static const char *_asmCmd[] = {
 };
 
 /* Globals */
-PORT mcs51_port = {
-    "mcs51",
-    "MCU 8051",			/* Target name */
+PORT avr_port = {
+    "avr",
+    "ATMEL AVR",		/* Target name */
     {
 	TRUE,			/* Emit glue around main */
     },
@@ -171,23 +117,25 @@ PORT mcs51_port = {
 	"RSEG    (DATA)",
 	"GSINIT  (CODE)",
 	"OSEG    (OVR,DATA)",
-	"GSFINAL (CODE)"
+	"GSFINAL (CODE)",
+	NULL,
+	NULL,
     },
     { 
 	+1, 1, 4, 1, 1
     },
-    /* mcs51 has an 8 bit mul */
+    /* avr has an 8 bit mul */
     {
 	1
     },
     NULL,
-    _mcs51_parseOptions,
-    _mcs51_finaliseOptions,
-    _mcs51_setDefaultOptions,
-    mcs51_assignRegisters,
-    _mcs51_getRegName ,
-    _mcs51_keywords,
-    _mcs51_genAssemblerPreamble,
-    _mcs51_genIVT
+    _avr_parseOptions,
+    _avr_finaliseOptions,
+    _avr_setDefaultOptions,
+    avr_assignRegisters,
+    _avr_getRegName ,
+    _avr_keywords,
+    _avr_genAssemblerPreamble,
+    _avr_genIVT
 };
 

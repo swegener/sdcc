@@ -1139,7 +1139,7 @@ static bitVect *rUmaskForOp (operand *op)
 
     rumask = newBitVect(mcs51_nRegs);
 
-    for (j = 0; j < sym->nRegs; j++) {
+    for (j = 0; j < sym->nRegs; j++) {	
 	rumask = bitVectSetBit(rumask,
 			       sym->regs[j]->rIdx);
     }

@@ -24,6 +24,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "limits.h"
 
 int iCodeSeq = 0 ;
 hTab *liveRanges = NULL;
@@ -185,6 +186,85 @@ void setToRange (operand *op,int to, bool check)
 	OP_LIVETO(op) = to;
 }
 
+/*-----------------------------------------------------------------*/
+/* firstDeOf - finds the first definition in seq for op            */
+/*-----------------------------------------------------------------*/
+static iCode *firstDefOf (operand *op)
+{
+    int i;
+    iCode *ric=NULL,*lic=NULL;
+    int fSeq = INT_MAX;
+
+    if (!OP_DEFS(op))
+	return NULL;
+
+    for (i=0; i < OP_DEFS(op)->size ;i++) {
+	if (bitVectBitValue(OP_DEFS(op),i) &&
+	    (lic = hTabItemWithKey(iCodehTab,i)) &&
+	    lic->seq < fSeq) {
+
+	    fSeq = lic->seq ;
+	    ric = lic;
+	}
+    }
+    return ric;
+}
+/*-----------------------------------------------------------------*/
+/* useDefLoopCheck - check for uses before init inside loops       */
+/*-----------------------------------------------------------------*/
+static void useDefLoopCheck(operand *op,iCode *ic)
+{
+    /* this is for situations like the following
+       int a,b;
+
+       while (...) {
+            a = ... ;
+            ...
+            _some_usage_of_b_;
+	    ...
+	    b = ... ;
+	    } 
+       in this case the definition of 'b' will flow to the usages
+       but register allocator cannot handle these situations.so
+       will mark as spilt */
+
+    int i =0, fdSeq ;
+    int er=0;
+    iCode *tic ;
+    
+    /* get the first definition */
+    if (!(tic = firstDefOf(op)))
+	return ;
+    
+    fdSeq = tic->seq;
+    /* now go thru the usages & make sure they follow
+       the first definition */
+    for (i=0; i <= OP_USES(op)->size;i++ ) {
+	if (bitVectBitValue(OP_USES(op),i) &&
+	    (tic = hTabItemWithKey(iCodehTab,i)) &&
+	    tic->seq < fdSeq){
+	    er = 1;
+	    break;
+	}
+    }
+
+    /* found a usage without definition */
+    if (er) {
+	if (OP_SYMBOL(op)->isreqv && SPIL_LOC(op) ) {
+	    
+	    werror(W_LOCAL_NOINIT,			    
+		   SPIL_LOC(op)->name,			   
+		   ic->filename,ic->lineno);
+	} else {
+	    
+	    werror(W_LOCAL_NOINIT,			   
+		   OP_SYMBOL(op)->name,			  
+		   ic->filename,ic->lineno); 
+	}
+	OP_SYMBOL(op)->isspilt = 1;
+    }
+}
+
 
 /*-----------------------------------------------------------------*/
 /* operandLUse - check and set the last use for a given operand    */
@@ -213,10 +293,12 @@ operand *operandLUse (operand *op, eBBlock **ebbs,
     }  
     ic->uses = bitVectSetBit(ic->uses,op->key);
     
+    if (!OP_SYMBOL(op)->udChked)
     {
 	link *type = operandType(op);
 	link *etype = getSpec(type);
-
+	
+	OP_SYMBOL(op)->udChked = 1;
 	/* good place to check if unintialised */
 	if ((IS_TRUE_SYMOP(op)  || OP_SYMBOL(op)->isreqv) &&
 	    OP_SYMBOL(op)->islocal    &&
@@ -240,54 +322,16 @@ operand *operandLUse (operand *op, eBBlock **ebbs,
 			   OP_SYMBOL(op)->name,			  
 			   ic->filename,ic->lineno); 
 		}
- 	    } 
-	}
+ 	    } else {
+		if (ebp->depth && op->usesDefs && 
+		    !OP_SYMBOL(op)->_isparm) {
+		    /* check non-inits inside loops */
+		    useDefLoopCheck(op,ic);
+		}
+	    }
+	}       
     }
     return op;
-}
-
-/*-----------------------------------------------------------------*/
-/* compLastUse - computes the last usage with certainty            */
-/*-----------------------------------------------------------------*/
-void compLastUse ()
-{
-    symbol *sym;
-    int key;
-    /* the strategy here is to look for live ranges that are not
-       induction variables, and find out the usage icode with the
-       highest sequence number then set the to range to that icode
-       sequence */
-    /* once fully tested we can use only this routine to mark the
-       to range that will reduce a lot of computations in the 
-       markLiveRanges routine */
-    for (sym = hTabFirstItem(liveRanges,&key) ; sym;
-	 sym = hTabNextItem(liveRanges,&key)) {
-
-	int i ;
-	int maxKey = 0 ;
-
-	if (sym->isind)
-	    continue ;
-
-	if (!sym->uses)
-	    continue ;
-
-	/* go thru all the usages of this live range and find out
-	   the maximum sequence number of the icode that used it */
-	for (i = 0 ; i < sym->uses->size ; i++ ) {
-	    iCode *uic ;
-
-	    if (!bitVectBitValue(sym->uses,i))
-		continue ;
-	    
-	    if ((uic = hTabItemWithKey(iCodehTab,i)))
-		maxKey = ( uic->seq > maxKey ? uic->seq : maxKey );	    
-	}
-
-	/* got it */
-	if (maxKey)
-	    sym->liveTo = maxKey;
-    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -499,7 +543,6 @@ void computeLiveRanges (eBBlock **ebbs, int count )
     for ( i = 0 ; i < count; i++ ) 
 	markLiveRanges (ebbs[i],ebbs,count);
     
-/*     compLastUse(); */
     /* mark the ranges live for each point */
     rlivePoint (ebbs,count);
 }

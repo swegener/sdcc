@@ -1,3 +1,7 @@
+2002-03-28  Johan Knol  <johan@balder>
+
+	* src/SDCCval.c: fixed bug #532436
+
 2002-03-14  Scott Dattalo <scott@dattalo.com>
 	* /src/port.h:
 	Added "char *Processor" field to the port structure.

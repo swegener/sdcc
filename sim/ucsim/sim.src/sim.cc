@@ -171,6 +171,7 @@ cl_sim::stop(int reason)
 	  break;
 	case resBREAKPOINT:
 	  cmd->frozen_console->dd_printf("Breakpoint\n");
+	  uc->print_regs(cmd->frozen_console);
 	  break;
 	case resINTERRUPT:
 	  cmd->frozen_console->dd_printf("Interrupt\n");

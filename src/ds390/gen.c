@@ -3812,11 +3812,21 @@ bool aopOp3(iCode * ic)
 //	       AOP_IS_DPTRn(IC_LEFT(ic)) ? "true" : "false",
 //	       AOP_IS_DPTRn(IC_RIGHT(ic)) ? "true" : "false",
 //	       AOP_IS_DPTRn(IC_RESULT(ic)) ? "true" : "false");
-//      );      
-
+//      );
     
-    // Right uses DPTR unless left or result is an AOP_STR.
-    aopOp (IC_RIGHT(ic),ic,FALSE, AOP_IS_STR(IC_LEFT(ic)) || AOP_IS_STR(IC_RESULT(ic)));
+    // Right uses DPTR unless left or result is an AOP_STR; however,
+    // if right is an AOP_STR, it must use DPTR regardless.
+    if ((AOP_IS_STR(IC_LEFT(ic)) || AOP_IS_STR(IC_RESULT(ic)))
+     && !AOP_IS_STR(IC_RIGHT(ic)))
+    {
+	useDp2 = TRUE;
+    }
+    else
+    {
+	useDp2 = FALSE;
+    }
+	
+    aopOp (IC_RIGHT(ic),ic,FALSE, useDp2);
     
     // if the right used DPTR, left MUST use DPTR2.
     // if the right used DPTR2, left MUST use DPTR.

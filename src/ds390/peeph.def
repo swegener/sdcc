@@ -1576,6 +1576,13 @@ replace {
 }
 
 replace {
+        push  acc
+        pop   acc
+} by {
+        ; Peephole 202b   removed redundant push pop
+}
+
+replace {
         mov  r%1,_spx
         lcall %2
         mov  r%1,_spx

@@ -1,3 +1,7 @@
+2004-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genFunction): fixed bug #1112752
+
 2004-01-30 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: adapted peephole 258.x to changed gen.c (genAnd)

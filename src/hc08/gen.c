@@ -2881,7 +2881,7 @@ genFunction (iCode * ic)
   sym_link *ftype;
   iCode *ric = (ic->next && ic->next->op == RECEIVE) ? ic->next : NULL;
   int stackAdjust = sym->stack;
-  int accIsFree = sym->recvSize != 0;
+  int accIsFree = sym->recvSize == 0;
 
   _G.nRegsSaved = 0;
   _G.stackPushes = 0;

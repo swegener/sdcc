@@ -52,8 +52,12 @@ static bool matchLine (char *, char *, hTab **);
 #define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
 	lineNode *head, const char *cmdLine)
 
-#if !OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
-void  peepRules2pCode(peepRule *);
+#if !OPT_DISABLE_PIC
+void peepRules2pCode(peepRule *);
+#endif
+
+#if !OPT_DISABLE_PIC16
+void pic16_peepRules2pCode(peepRule *);
 #endif
 
 /*-----------------------------------------------------------------*/
@@ -1574,13 +1578,22 @@ initPeepHole ()
     }
 
 
-#if !OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
+#if !OPT_DISABLE_PIC
   /* Convert the peep rules into pcode.
      NOTE: this is only support in the PIC port (at the moment)
   */
-  if (TARGET_IS_PIC || TARGET_IS_PIC16) {
-    peepRules2pCode(rootRules);
-  }
+	if (TARGET_IS_PIC)
+		peepRules2pCode(rootRules);
+#endif
+
+#if !OPT_DISABLE_PIC16
+  /* Convert the peep rules into pcode.
+     NOTE: this is only support in the PIC port (at the moment)
+       and the PIC16 port (VR 030601)
+  */
+	if (TARGET_IS_PIC16)
+		pic16_peepRules2pCode(rootRules);
+
 #endif
 
 }

@@ -1,3 +1,7 @@
+2003-06-03  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCpeeph.c: separate peepRules2pCode() for pic16 by "Vangelis Rokas" <vrokas@otenet.gr>
+
 2003-06-02  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* doc/sdccman.lyx: cvs revision keywords, passing pdf information in latex preamble,

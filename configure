@@ -2441,6 +2441,9 @@ cat >> confdefs.h <<EOF
 #define STD_FP_LIB "libfloat"
 EOF
 
+cat >> confdefs.h <<EOF
+#define STD_DS390_LIB "libds390"
+EOF
 
 cat >> confdefs.h <<EOF
 #define PREFIX "${prefix}"

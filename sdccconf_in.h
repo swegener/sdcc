@@ -21,6 +21,7 @@
 #undef STD_INT_LIB
 #undef STD_LONG_LIB
 #undef STD_FP_LIB
+#undef STD_DS390_LIB
 #undef HAVE_SYS_SOCKET_H
 #undef HAVE_SYS_ISA_DEFS_H
 #undef HAVE_ENDIAN_H

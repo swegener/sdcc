@@ -22,7 +22,12 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#ifdef _WIN32
 #include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <signal.h>
 #include "common.h"
 #include <ctype.h>

@@ -58,7 +58,7 @@ endif
 	done
 
 a: a.o
-	$(CXX) $(LDFLAGS) $(LIBS) a.o -o $@
+	$(CXX) $(LDFLAGS) a.o -o $@ $(LIBS)
 
 
 # Compiling and installing everything and runing test

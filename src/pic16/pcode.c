@@ -5822,7 +5822,7 @@ static void insertBankSwitch(int position, pCode *pc, int bsr)
  * bank at linking time
  */
 
-	if(!pic16_options.gen_banksel || bsr != -1) {
+	if(pic16_options.no_banksel || bsr != -1) {
 //		new_pc = pic16_newpCode(POC_MOVLB, pic16_newpCodeOpLit(bsr));
 		return;
 	} else {
@@ -6337,7 +6337,7 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 			 * before SKIP, but we have to check if the SKIP uses BANKSEL, etc... */
 			if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
 				prevreg = reg;
-				insertBankSwitch(0, pc, (pic16_options.gen_banksel)?-1:0);
+				insertBankSwitch(0, pc, (pic16_options.no_banksel)?0:-1);
 			}
 		}
 
@@ -6692,6 +6692,11 @@ static void buildCallTree(void    )
     }
   }
 
+
+#if 0
+  /* This is not needed because currently all register used
+   * by a function are stored in stack -- VR */
+   
   /* Re-allocate the registers so that there are no collisions
    * between local variables when one function call another */
 
@@ -6702,6 +6707,7 @@ static void buildCallTree(void    )
     if(!pb->visited)
       register_usage(pb);
   }
+#endif
 
 }
 

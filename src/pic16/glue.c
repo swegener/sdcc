@@ -32,6 +32,8 @@
 #include "main.h"
 #include <string.h>
 
+#include <string.h>
+
 
 #ifdef WORDS_BIGENDIAN
   #define _ENDIAN(x)  (3-x)
@@ -105,6 +107,11 @@ int pic16aopLiteral (value *val, int offset)
 #endif
 
 }
+
+iCode *tic;
+symbol *nsym;
+char tbuffer[512], *tbuf=tbuffer;;
+
 
 /*-----------------------------------------------------------------*/
 /* emitRegularMap - emit code for maps with no special cases       */
@@ -299,14 +306,62 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			if (IS_AGGREGATE (sym->type))
 				ival = initAggregates (sym, sym->ival, NULL);
 			else {
-				addSet(&idataSymSet, copySymbol(sym));
-				ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
-					decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
+#if 0
+				tic = iCodeFromAst(decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
+
+				if(IS_PTR(sym->type)
+					&& !IS_CODEPTR(sym->type)
+					&& IS_AGGREGATE(OP_SYMBOL(IC_LEFT(tic))->type)) {
+					
+						fprintf(stderr, "symbol %s is a non-code pointer with aggregate initialiser\n", sym->name);
+
+						nsym = copySymbol( sym );
+						sprintf(tbuffer, "_tempbuf_%s", sym->name);
+						strcpy(nsym->name, tbuffer);
+						
+//						nsym->name = Safe_strdup( tbuf );
+						
+						codeOutFile = statsg->oFile;
+						GcurMemmap = statsg;
+						/* assignment of temporary buffer initialiser */
+						ival = initAggregates(nsym, nsym->ival, NULL);
+
+/*
+						ival = newNode ('=', newAst_VALUE(symbolVal (nsym)),
+							decorateType (resolveSymbols (list2expr (nsym->ival)), RESULT_CHECK));
+*/
+
+						fprintf(stderr, "%s:%d: iCode: %s\n", __FILE__, __LINE__,
+							strdup( printILine(iCodeFromAst(ival) )));
+
+						eBBlockFromiCode(iCodeFromAst(ival));
+						
+						/* assignment of symbol to temporary buffer */
+						ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
+							newAst_VALUE(symbolVal(nsym)));
+
+						fprintf(stderr, "%s:%d: iCode: %s\n", __FILE__, __LINE__,
+							strdup( printILine(iCodeFromAst(ival) )));
+
+
+						eBBlockFromiCode(iCodeFromAst(ival));
+						
+						sym->ival = NULL;
+						ival = NULL;
+				} else {
+#endif
+					addSet(&idataSymSet, copySymbol(sym));
+					ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
+						decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
+//				}
 			}
-			codeOutFile = statsg->oFile;
-			GcurMemmap = statsg;
-			eBBlockFromiCode (iCodeFromAst (ival));
-			sym->ival = NULL;
+
+			if(ival) {
+				codeOutFile = statsg->oFile;
+				GcurMemmap = statsg;
+				eBBlockFromiCode (iCodeFromAst (ival));
+				sym->ival = NULL;
+			}
 		}
 #endif
 	}
@@ -1095,7 +1150,8 @@ pic16glue ()
 
 
 	if(mainf && IFFUNC_HASBODY(mainf->type)) {
-		fprintf (asmFile,"__sdcc_gsinit_startup:\t\t;VRokas\n");
+		fprintf(asmFile, "\tcode\n");
+		fprintf(asmFile,"__sdcc_gsinit_startup:\n");
 
 #if 0
 		/* FIXME 8051 legacy (?!) - VR 20-Jun-2003 */

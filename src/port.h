@@ -226,6 +226,8 @@ typedef struct
 /** Optional list of automatically parsed options.  Should be
     implemented to at least show the help text correctly. */
     OPTION *poptions;
+/** Initialise port spectific paths */
+    void (*initPaths)(void);
 /** Called after all the options have been parsed. */
     void (*finaliseOptions) (void);
     /** Called after the port has been selected but before any

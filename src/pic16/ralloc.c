@@ -361,8 +361,6 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 
 	dReg->isFree = 0;
 	dReg->wasUsed = 1;
-
-//	dReg->isMapped = 0;
 	dReg->isEmitted = 0;
 
 	if(type == REG_SFR) {
@@ -470,10 +468,10 @@ pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 
 //  fprintf(stderr,"%s:%d: %s	%s addr =0x%x\n",__FILE__, __LINE__, __FUNCTION__, name, rIdx);
 
-  if(reg) {
-    reg->wasUsed = 0;
-    return addSet(&pic16_dynInternalRegs,reg);
-  }
+    if(reg) {
+      reg->wasUsed = 0;
+      return addSet(&pic16_dynInternalRegs,reg);
+    }
 
   return NULL;
 }
@@ -493,10 +491,17 @@ allocReg (short type)
 	/* try to reuse some unused registers */
 	reg = regFindFree( pic16_dynAllocRegs );
 
+	if(reg) {
+//		fprintf(stderr, "%s: found FREE register %s\n", __FILE__, reg->name);
+	}
+
 	if(!reg) {
 		reg = newReg(REG_GPR, PO_GPR_TEMP, dynrIdx++, NULL, 1, 0, NULL);
-		addSet(&pic16_dynAllocRegs, reg);
+//		addSet(&pic16_dynAllocRegs, reg);
 	}
+
+	addSet(&pic16_dynAllocRegs, reg);
+
 	reg->isFree=0;
 
 //	debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
@@ -649,8 +654,8 @@ pic16_allocDirReg (operand *op )
 		 * dynDirectRegNames set */
 		if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
 			if(pic16_debug_verbose)
-			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
-			    		OP_SYMBOL(op)->name);
+//			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
+//			    		OP_SYMBOL(op)->name);
 			debugLog("%s:%d sym: %s in codespace\n", __FUNCTION__, __LINE__, OP_SYMBOL(op)->name);
 	    	  return NULL;
 		}
@@ -753,7 +758,7 @@ pic16_allocRegByName (char *name, int size)
     reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0, NULL);
 
     debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
-    //fprintf(stderr, "  -- added %s to hash, size = %d\n", name,reg->size);
+	//fprintf(stderr, "  -- added %s to hash, size = %d\n", name,reg->size);
 
     //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);	/* initially commented out */
     addSet(&pic16_dynDirectRegs, reg);

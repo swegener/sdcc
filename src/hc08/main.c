@@ -466,6 +466,7 @@ PORT hc08_port =
   _hc08_init,
   _hc08_parseOptions,
   _hc08_options,
+  NULL,
   _hc08_finaliseOptions,
   _hc08_setDefaultOptions,
   hc08_assignRegisters,

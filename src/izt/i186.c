@@ -194,6 +194,7 @@ PORT i186_port = {
     "_",
     _i186_init,
     _i186_parseOptions,
+    NULL,
     _i186_finaliseOptions,
     _i186_setDefaultOptions,
     izt_assignRegisters,

@@ -719,6 +719,7 @@ PORT mcs51_port =
   _mcs51_init,
   _mcs51_parseOptions,
   NULL,
+  NULL,
   _mcs51_finaliseOptions,
   _mcs51_setDefaultOptions,
   mcs51_assignRegisters,

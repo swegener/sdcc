@@ -193,6 +193,7 @@ PORT tlcs900h_port =
   "_",
   _tlcs900h_init,
   _tlcs900h_parseOptions,
+  NULL,
   _tlcs900h_finaliseOptions,
   _tlcs900h_setDefaultOptions,
   tlcs900h_assignRegisters,

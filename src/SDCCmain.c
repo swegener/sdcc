@@ -1900,10 +1900,12 @@ setBinPaths(const char *argv0)
     addSetHead(&binPathSet, Safe_strdup(buf));
   }
 
+#if 0
   if (options.printSearchDirs) {
     printf("programs:\n");
     fputStrSet(stdout, binPathSet);
   }
+#endif
 }
 
 /* Set system include path */
@@ -1926,10 +1928,12 @@ setIncludePath(void)
   if ((p = getenv(SDCC_INCLUDE_NAME)) != NULL)
     addSetHead(&includeDirsSet, p);
 
+#if 0
   if (options.printSearchDirs) {
     printf("includedir:\n");
     fputStrSet(stdout, includeDirsSet);
   }
+#endif
 }
 
 /* Set system lib path */
@@ -1952,10 +1956,12 @@ setLibPath(void)
   if ((p = getenv(SDCC_LIB_NAME)) != NULL)
     addSetHead(&libDirsSet, p);
 
+#if 0
   if (options.printSearchDirs) {
     printf("libdir:\n");
     fputStrSet(stdout, libDirsSet);
   }
+#endif
 }
 
 /* Set data path */
@@ -1992,10 +1998,12 @@ setDataPaths(const char *argv0)
   addSet(&dataDirsSet, Safe_strdup(DATADIR));
 #endif
 
+#if 0
   if (options.printSearchDirs) {
     printf("datadir:\n");
     fputStrSet(stdout, dataDirsSet);
   }
+#endif
 
   setIncludePath();
   setLibPath();
@@ -2032,6 +2040,22 @@ initValues (void)
     }
 
 }
+
+static void doPrintSearchDirs(void)
+{
+    printf("programs:\n");
+    fputStrSet(stdout, binPathSet);
+
+    printf("datadir:\n");
+    fputStrSet(stdout, dataDirsSet);
+
+    printf("includedir:\n");
+    fputStrSet(stdout, includeDirsSet);
+
+    printf("libdir:\n");
+    fputStrSet(stdout, libDirsSet);
+}
+
 
 static void
 sig_handler (int signal)
@@ -2125,6 +2149,12 @@ main (int argc, char **argv, char **envp)
   initValues ();
   setBinPaths(argv[0]);
   setDataPaths(argv[0]);
+
+  if(port->initPaths)
+  	port->initPaths();
+  
+  if(options.printSearchDirs)
+  	doPrintSearchDirs();
 
   /* if no input then printUsage & exit */
   if (!options.c1mode && !fullSrcFileName && peekSet(relFilesSet) == NULL) {

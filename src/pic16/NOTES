@@ -18,6 +18,19 @@ Scott Dattalo	<scott AT dattalo.com>
 
 ======================================================================
 ======================================================================
+2004-May-23 Vangelis Rokas
+
+1. The improvement of the port has been stalled a bit. But, struct/union
+SFR headers are ready for the PIC18F[45][45][28] chips along with their
+respective sources.
+
+2. The genCmp function should be rewritten from scratch.
+
+3. The internal helper functions for char/int/long/float arithmetic
+now compile and will be placed in the appropriate directory under device/
+
+
+
 2004-Feb-20 Vangelis Rokas
 Major update with many bugfixes.
 

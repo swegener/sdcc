@@ -56,7 +56,7 @@ typedef struct PIC16_device {
 
 
 typedef struct {
-	int gen_banksel;
+	int no_banksel;
 	int opt_banksel;
 	int omit_configw;
 	int omit_ivt;

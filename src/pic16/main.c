@@ -82,24 +82,62 @@ static int regParmFlg = 0;	/* determine if we can register a parameter */
 
 pic16_options_t pic16_options;
 
+extern set *includeDirsSet;
+extern set *dataDirsSet;
+extern set *libFilesSet;
+
 /* Also defined in gen.h, but the #include is commented out */
 /* for an unknowned reason. - EEP */
 void pic16_emitDebuggerSymbol (char *);
+ 
 
 static void
 _pic16_init (void)
 {
+#if 0
+  char pic16incDir[512];
+  char pic16libDir[512];
+  set *pic16incDirsSet;
+  set *pic16libDirsSet;
+  char devlib[512];
+#endif
+
 	asm_addTree (&asm_asxxxx_mapping);
 	pic16_pCodeInitRegisters();
 	maxInterrupts = 2;
 
 	/* set pic16 port options to defaults */
-	pic16_options.gen_banksel = 0;
+	pic16_options.no_banksel = 0;
 	pic16_options.opt_banksel = 0;
 	pic16_options.omit_configw = 0;
 	pic16_options.omit_ivt = 0;
 	pic16_options.leave_reset = 0;
 	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
+
+
+#if 0
+ 	setMainValue("mcu", pic16->name[2] );
+	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+
+	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
+	sprintf(pic16libDir, "%s/pic16", LIB_DIR_SUFFIX);
+
+	if(!options.nostdinc) {
+		/* setup pic16 include directory */
+		pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
+		mergeSets(&includeDirsSet, pic16incDirsSet);
+	}
+	
+	if(!options.nostdlib) {
+		/* setup pic16 library directory */
+		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
+		mergeSets(&libDirsSet, pic16libDirsSet);
+	
+		/* now add the library for the device */
+		sprintf(devlib, "%s.lib", pic16->name[2]);
+		addSet(&libFilesSet, Safe_strdup(devlib));
+	}
+#endif
 }
 
 static void
@@ -184,23 +222,6 @@ _process_pragma(const char *sz)
 }
 
 #define REP_UDATA	"--preplace-udata-with="
-#define REP_UDATAACS	"--preplace-udata-acs-with="
-#define REP_UDATAOVR	"--preplace-udata-ovr-with="
-#define REP_UDATASHR	"--preplace-udata-sht-with="
-
-#define NAME_CODE	"--psection-code-name="
-#define NAME_IDATA	"--psection-idata-name="
-#define NAME_UDATA	"--psection-udata-name="
-#define NAME_UDATAACS	"--psection-udata-acs-name="
-#define NAME_UDATAOVR	"--psection-udata-ovr-name="
-#define NAME_UDATASHR	"--psection-udata-shr-name="
-
-#define ADDR_CODE	"--psection-code-addr="
-#define ADDR_IDATA	"--psection-idata-addr="
-#define ADDR_UDATA	"--psection-udata-addr="
-#define ADDR_UDATAACS	"--psection-udata-acs-addr="
-#define ADDR_UDATAOVR	"--psection-udata-ovr-addr="
-#define ADDR_UDATASHR	"--psection-udata-shr-addr="
 
 #define STACK_MODEL	"--pstack-model="
 #define OPT_BANKSEL	"--obanksel="
@@ -211,7 +232,7 @@ extern int pic16_ralloc_debug;
 extern int pic16_pcode_verbose;
 
 OPTION pic16_optionsTable[]= {
-	{ 0,	"--pgen-banksel",	&pic16_options.gen_banksel,	"generate BANKSEL assembler directives"},
+	{ 0,	"--pno-banksel",	&pic16_options.no_banksel,	"do not generate BANKSEL assembler directives"},
 	{ 0,	OPT_BANKSEL,		NULL,				"set banksel optimization level (default=0 no)"},
 	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
 	{ 0,	"--pomit-ivt",		&pic16_options.omit_ivt,	"omit the generation of the Interrupt Vector Table"},
@@ -223,30 +244,6 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--pcode-verbose",	&pic16_pcode_verbose,	"dump pcode related info"},
 		
 	{ 0,	REP_UDATA,	NULL,	"Place udata variables at another section: udata_acs, udata_ovr, udata_shr"},
-
-#if 0
-	/* these may not be in any use -- VR */
-	{ 0,	AT_UDATAACS,	NULL,	"Emit udata_acs variables at another section"},
-	{ 0,	AT_UDATAOVR,	NULL,	"Emit udata_ovr variables at another section"},
-	{ 0,	AT_UDATASHR,	NULL,	"Emit udata_shr variables at another section"},
-#endif
-
-#if 0
-	/* commented out for the time being -- VR */
-	{ 0,	NAME_CODE,	NULL,	"Set code section name[,address]"},
-	{ 0,	NAME_IDATA,	NULL,	"Set idata section name[,address]"},
-	{ 0,	NAME_UDATA,	NULL,	"Set udata section name[,address]"},
-	{ 0,	NAME_UDATAACS,	NULL,	"Set udata_acs section name[,address]"},
-	{ 0,	NAME_UDATAOVR,	NULL,	"Set udata_ovr section name[,address]"},
-	{ 0,	NAME_UDATASHR,	NULL,	"Set udata_shr section name[,address]"},
-	
-	{ 0,	ADDR_CODE,	NULL,	"Set code section address"},
-	{ 0,	ADDR_IDATA,	NULL,	"Set idata section address"},
-	{ 0,	ADDR_UDATA,	NULL,	"Set udata section address"},
-	{ 0,	ADDR_UDATAACS,	NULL,	"Set udata_acs section address"},
-	{ 0,	ADDR_UDATAOVR,	NULL,	"Set udata_ovr section address"},
-	{ 0,	ADDR_UDATASHR,	NULL,	"Set udata_shr section address"},
-#endif
 
 	{ 0,	NULL,		NULL,	NULL}
 	};
@@ -261,7 +258,6 @@ static bool
 _pic16_parseOptions (int *pargc, char **argv, int *i)
 {
   int j=0;
-//  set *tset;
   char *stkmodel;
   
   /* TODO: allow port-specific command line options to specify
@@ -298,137 +294,21 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 		return TRUE;
 	}
 	
-/*
-	if(ISOPT(AT_UDATAACS)) {
-		pic16_sectioninfo.at_udataacs = Safe_strdup( getStringArg(AT_UDATAACS, argv, i, *pargc));
-		return TRUE;
-	}
-
-	if(ISOPT(AT_UDATAOVR)) {
-		pic16_sectioninfo.at_udataovr = Safe_strdup( getStringArg(AT_UDATAOVR, argv, i, *pargc));
-		return TRUE;
-	}
-	
-	if(ISOPT(AT_UDATASHR)) {
-		pic16_sectioninfo.at_udatashr = Safe_strdup( getStringArg(AT_UDATASHR, argv, i, *pargc));
-		return TRUE;
-	}
-*/
-
-#if 0
-	if(ISOPT(ADDR_CODE)) {
-		pic16_sectioninfo.addr_code = getIntArg(ADDR_CODE, argv, i, *pargc);
-		return TRUE;
-	}
-	
-	if(ISOPT(ADDR_IDATA)) {
-		pic16_sectioninfo.addr_idata = getIntArg(ADDR_IDATA, argv, i, *pargc);
-		return TRUE;
-	}
-	
-	if(ISOPT(ADDR_UDATA)) {
-		pic16_sectioninfo.addr_udata = getIntArg(ADDR_UDATA, argv, i, *pargc);
-		return TRUE;
-	}
-	
-	if(ISOPT(ADDR_UDATAACS)) {
-		pic16_sectioninfo.addr_udataacs = getIntArg(ADDR_UDATAACS, argv, i, *pargc);
-		return TRUE;
-	}
-	
-	if(ISOPT(ADDR_UDATAOVR)) {
-		pic16_sectioninfo.addr_udataovr = getIntArg(ADDR_UDATAOVR, argv, i, *pargc);
-		return TRUE;
-	}
-	
-	if(ISOPT(ADDR_UDATASHR)) {
-		pic16_sectioninfo.addr_udatashr = getIntArg(ADDR_UDATASHR, argv, i, *pargc);
-		return TRUE;
-	}
-
-	tset = newSet();
-	
-	if(ISOPT(NAME_CODE)) {
-		setParseWithComma(&tset, getStringArg(NAME_CODE, argv, i, *pargc));
-		if(elementsInSet(tset) > 0)
-			pic16_sectioninfo.name_code = Safe_strdup( (char *)indexSet(tset, 0));
-		if(elementsInSet(tset) > 1)
-			pic16_sectioninfo.addr_code = atoi( (char *)indexSet(tset, 1));
-		return TRUE;
-	}
-
-	if(ISOPT(NAME_IDATA)) {
-		setParseWithComma(&tset, getStringArg(NAME_IDATA, argv, i, *pargc));
-		if(elementsInSet(tset) > 0)
-			pic16_sectioninfo.name_idata = Safe_strdup( (char *)indexSet(tset, 0));
-		if(elementsInSet(tset) > 1)
-			pic16_sectioninfo.addr_idata = atoi( (char *)indexSet(tset, 1));
-		return TRUE;
-	}
-
-	if(ISOPT(NAME_UDATA)) {
-		setParseWithComma(&tset, getStringArg(NAME_UDATA, argv, i, *pargc));
-		if(elementsInSet(tset) > 0)
-			pic16_sectioninfo.name_udata = Safe_strdup( (char *)indexSet(tset, 0));
-		if(elementsInSet(tset) > 1)
-			pic16_sectioninfo.addr_udata = atoi( (char *)indexSet(tset, 1));
-		return TRUE;
-	}
-
-	if(ISOPT(NAME_UDATAACS)) {
-		setParseWithComma(&tset, getStringArg(NAME_UDATAACS, argv, i, *pargc));
-		if(elementsInSet(tset) > 0)
-			pic16_sectioninfo.name_udataacs = Safe_strdup( (char *)indexSet(tset, 0));
-		if(elementsInSet(tset) > 1)
-			pic16_sectioninfo.addr_udataacs = atoi( (char *)indexSet(tset, 1));
-		return TRUE;
-	}
-
-	if(ISOPT(NAME_UDATAOVR)) {
-		setParseWithComma(&tset, getStringArg(NAME_UDATAOVR, argv, i, *pargc));
-		if(elementsInSet(tset) > 0)
-			pic16_sectioninfo.name_udataovr = Safe_strdup( (char *)indexSet(tset, 0));
-		if(elementsInSet(tset) > 1)
-			pic16_sectioninfo.addr_udataovr = atoi( (char *)indexSet(tset, 1));
-		return TRUE;
-	}
-
-	if(ISOPT(NAME_UDATASHR)) {
-		setParseWithComma(&tset, getStringArg(NAME_UDATASHR, argv, i, *pargc));
-		if(elementsInSet(tset) > 0)
-			pic16_sectioninfo.name_udatashr = Safe_strdup( (char *)indexSet(tset, 0));
-		if(elementsInSet(tset) > 1)
-			pic16_sectioninfo.addr_udatashr = atoi( (char *)indexSet(tset, 1));
-		return TRUE;
-	}
-
-	deleteSet( &tset );
-#endif
-
   return FALSE;
 }
 
-extern set *includeDirsSet;
-extern set *dataDirsSet;
-extern set *libFilesSet;
-
-static void
-_pic16_finaliseOptions (void)
+static void _pic16_initPaths(void)
 {
+#if 1
   char pic16incDir[512];
   char pic16libDir[512];
   set *pic16incDirsSet;
   set *pic16libDirsSet;
   char devlib[512];
+#endif
 
-	port->mem.default_local_map = data;
-	port->mem.default_globl_map = data;
-
-	options.all_callee_saves = 1;		// always callee saves
-	options.float_rent = 1;
-	options.intlong_rent = 1;
-	
-	setMainValue("mcu", pic16->name[2] );
+#if 1
+ 	setMainValue("mcu", pic16->name[2] );
 	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
 
 	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
@@ -449,6 +329,50 @@ _pic16_finaliseOptions (void)
 		sprintf(devlib, "%s.lib", pic16->name[2]);
 		addSet(&libFilesSet, Safe_strdup(devlib));
 	}
+#endif
+}
+
+
+static void
+_pic16_finaliseOptions (void)
+{
+#if 0
+  char pic16incDir[512];
+  char pic16libDir[512];
+  set *pic16incDirsSet;
+  set *pic16libDirsSet;
+  char devlib[512];
+#endif
+	port->mem.default_local_map = data;
+	port->mem.default_globl_map = data;
+
+	options.all_callee_saves = 1;		// always callee saves
+//	options.float_rent = 1;
+//	options.intlong_rent = 1;
+	
+#if 0
+ 	setMainValue("mcu", pic16->name[2] );
+	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
+
+	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
+	sprintf(pic16libDir, "%s/pic16", LIB_DIR_SUFFIX);
+
+	if(!options.nostdinc) {
+		/* setup pic16 include directory */
+		pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
+		mergeSets(&includeDirsSet, pic16incDirsSet);
+	}
+	
+	if(!options.nostdlib) {
+		/* setup pic16 library directory */
+		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
+		mergeSets(&libDirsSet, pic16libDirsSet);
+	
+		/* now add the library for the device */
+		sprintf(devlib, "%s.lib", pic16->name[2]);
+		addSet(&libFilesSet, Safe_strdup(devlib));
+	}
+#endif
 }
 
 
@@ -534,6 +458,16 @@ _pic16_setDefaultOptions (void)
 	pic16_sectioninfo.addr_udataacs =
 	pic16_sectioninfo.addr_udataovr =
 	pic16_sectioninfo.addr_udatashr = -1;
+
+
+
+	/* set pic16 port options to defaults */
+	pic16_options.no_banksel = 0;
+	pic16_options.opt_banksel = 0;
+	pic16_options.omit_configw = 0;
+	pic16_options.omit_ivt = 0;
+	pic16_options.leave_reset = 0;
+	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
 }
 
 static const char *
@@ -588,6 +522,7 @@ _pic16_genAssemblerPreamble (FILE * of)
 static int
 _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
+#if 1
 	/* PIC18F family has only two interrupts, the high and the low
 	 * priority interrupts, which reside at 0x0008 and 0x0018 respectively - VR */
 
@@ -616,7 +551,7 @@ _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 			fprintf(of, "\tretfie\n");
 		}
 	}
-
+#endif
   return TRUE;
 }
 
@@ -624,59 +559,58 @@ _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
  * False to convert it to function call */
 static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
-  //  sym_link *test = NULL;
-  //  value *val;
+//	fprintf(stderr,"checking for native mult for %c (size: %d)\n", ic->op, getSize(OP_SYMBOL(IC_RESULT(ic))->type));
 
-//  fprintf(stderr,"checking for native mult\n");
-
-	/* support mul for char/int */
-	if((getSize(OP_SYMBOL(IC_RESULT(ic))->type ) <= 2)
+	/* support mul for char/int {/long} */
+	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 2)
 		&& (ic->op == '*'))return TRUE;
 	
-	/* support div for char */
-	if((getSize(OP_SYMBOL(IC_RESULT(ic))->type ) < 2)
+	/* support div for char/int/long */
+	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 0)
 		&& (ic->op == '/'))return TRUE;
 	
   return FALSE;
+}
+
 
 #if 0
-  if ( ic->op != '*')
-    {
-      return FALSE;
-    }
+/* Do CSE estimation */
+static bool cseCostEstimation (iCode *ic, iCode *pdic)
+{
+//    operand *result = IC_RESULT(ic);
+//    sym_link *result_type = operandType(result);
 
-  return TRUE;
-/*
-  if ( IS_LITERAL (left))
-    {
-      fprintf(stderr,"left is lit\n");
-      test = left;
-      val = OP_VALUE (IC_LEFT (ic));
-    }
-  else if ( IS_LITERAL (right))
-    {
-      fprintf(stderr,"right is lit\n");
-      test = left;
-      val = OP_VALUE (IC_RIGHT (ic));
-    }
-  else
-    {
-      fprintf(stderr,"oops, neither is lit so no\n");
-      return FALSE;
-    }
 
-  if ( getSize (test) <= 2)
-    {
-      fprintf(stderr,"yep\n");
-      return TRUE;
-    }
-  fprintf(stderr,"nope\n");
+	/* VR -- this is an adhoc. Put here after conversation
+	 * with Erik Epetrich */
 
-  return FALSE;
-*/
+	if(ic->op == '<'
+		|| ic->op == '>'
+		|| ic->op == EQ_OP) {
+
+		fprintf(stderr, "%d %s\n", __LINE__, __FUNCTION__);
+	  return 0;
+	}
+
+#if 0
+    /* if it is a pointer then return ok for now */
+    if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;
+
+    /* if bitwise | add & subtract then no since mcs51 is pretty good at it
+       so we will cse only if they are local (i.e. both ic & pdic belong to
+       the same basic block */
+    if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
+        /* then if they are the same Basic block then ok */
+        if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
+        else return 0;
+    }
 #endif
 
+    /* for others it is cheaper to do the cse */
+    return 1;
 }
+#endif
+
 
 /* Indicate which extended bit operations this port supports */
 static bool
@@ -808,7 +742,7 @@ PORT pic16_port =
   },
     /* pic16 has an 8 bit mul */
   {
-    1, -1
+     0, -1
   },
   {
     pic16_emitDebuggerSymbol
@@ -817,6 +751,7 @@ PORT pic16_port =
   _pic16_init,
   _pic16_parseOptions,
   pic16_optionsTable,
+  _pic16_initPaths,
   _pic16_finaliseOptions,
   _pic16_setDefaultOptions,
   pic16_assignRegisters,
@@ -843,7 +778,7 @@ PORT pic16_port =
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
   FALSE,                        /* No array initializer support. */
-  0,                            /* no CSE cost estimation yet */
+  0,	//cseCostEstimation,            /* !!!no CSE cost estimation yet */
   NULL, 			/* no builtin functions */
   GPOINTER,			/* treat unqualified pointers as "generic" pointers */
   1,				/* reset labelKey to 1 */

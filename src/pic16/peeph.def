@@ -286,7 +286,7 @@ replace restart {
 }
 
 
-// From: Vangelis Rokas (vrokas@otenet.gr)
+// From: Vangelis Rokas (vrokas AT otenet dot gr)
 // movff peeps are disabled for the moment
 // until support is added in the pcodepeeph.c
 

@@ -979,10 +979,16 @@ void pic16_genPlus (iCode *ic)
 		DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);    
 
 		size = min( AOP_SIZE(result), AOP_SIZE(right) );
+		size = min( size, AOP_SIZE(left) );
 		offset = 0;
 
-		if(pic16_debug_verbose)
-			fprintf(stderr, "%s:%d size of operands: %d\n", __FILE__, __LINE__, size);
+		if(pic16_debug_verbose) {
+//			fprintf(stderr, "%s:%d result: %d\tleft: %d\tright: %d\n", __FILE__, __LINE__,
+//				AOP_SIZE(result), AOP_SIZE(left), AOP_SIZE(right));
+//			fprintf(stderr, "%s:%d size of operands: %d\n", __FILE__, __LINE__, size);
+		}
+
+
 
 		if ((AOP_TYPE(left) == AOP_PCODE) && (
 				(AOP(left)->aopu.pcop->type == PO_LITERAL) || 
@@ -1068,15 +1074,20 @@ void pic16_genPlus (iCode *ic)
 			} else {
 				// right is signed
 				for(i=size; i< AOP_SIZE(result); i++) {
-					pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-					pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),size-1,FALSE,FALSE),7,0));
-					pic16_emitpcode(POC_COMFW, pic16_popCopyReg(&pic16_pc_wreg));
-					if (pic16_sameRegs(AOP(left), AOP(result)))
-					{
-						pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(left),i));
-					} else { // not same
-						pic16_emitpcode(POC_ADDFWC, pic16_popGet(AOP(left),i));
-						pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
+					if(size < AOP_SIZE(left)) {
+						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
+						pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),size-1,FALSE,FALSE),7,0));
+						pic16_emitpcode(POC_COMFW, pic16_popCopyReg(&pic16_pc_wreg));
+						if (pic16_sameRegs(AOP(left), AOP(result)))
+						{
+							pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(left),i));
+						} else { // not same
+							pic16_emitpcode(POC_ADDFWC, pic16_popGet(AOP(left),i));
+							pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
+						}
+					} else {
+						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
+						pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result), i));
 					}
 				}
 			}
@@ -1858,6 +1869,17 @@ void pic16_genUMult8X8_8 (operand *left,
 	if(AOP_TYPE(result) != AOP_ACC) {
 		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
 			pic16_popGet(AOP(result), 0)));
+
+
+		if(AOP_SIZE(result)>1) {
+		  int i;
+
+			pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh),
+			pic16_popGet(AOP(result), 1)));
+			
+			for(i=2;i<AOP_SIZE(result);i++)
+				pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result), i));
+		}
 	} else {
 		pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_prodl));
 	}

@@ -265,7 +265,11 @@ int regCompare(const void *a, const void *b)
 	/* and secondarily by size */
 	if( (*i)->size > (*j)->size)return 1;
 	if( (*i)->size < (*j)->size)return -1;
-
+	
+	/* register size sorting may have strange results use with care */
+	
+	/* finally if in same address and same size sort by name */
+	return (strcmp( (*i)->name, (*j)->name));
 
   return 0;
 }
@@ -299,19 +303,30 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 		}
 	} else {
 	  int j=0;
-		  
+	  regs *r1;
+	  
 		rprev = NULL;
 		init_addr = rlist[j]->address;
 		fprintf(of, "\n\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
 	
 		for(j=0;j<i;j++) {
 			r = rlist[j];
+			if(j < i-1)r1 = rlist[j+1]; else r1 = NULL;
+			
 			init_addr = r->address;
-			if(rprev && (init_addr != (rprev->address + rprev->size))) {
+
+			if(rprev && (init_addr != (rprev->address + rprev->size))
+				&& !(r1 && (init_addr != r1->address))) {
 				fprintf(of, "\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
 			}
 
-			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+
+			if(r1 && (init_addr == r1->address)) {
+				fprintf(of, "%s\tres\t0\n\n", r->name);
+			} else {
+				fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+			}
+			
 			rprev = r;
 		}
 	}

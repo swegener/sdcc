@@ -259,6 +259,8 @@ extern int nrelFiles;
 extern char *relFiles[128];
 extern char *libFiles[128];
 extern int nlibFiles;
+extern int nlibPaths;
+extern char *libPaths[128];
 extern bool verboseExec ;
 
 void parseWithComma (char **, char *);

@@ -77,7 +77,6 @@ static char *one  = "#0x01";
 static char *spname = "sp";
 
 char *fReturnpic14[] = {"temp1","temp2","temp3","temp4" };
-//char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
 unsigned fReturnSizePic = 4; /* shared with ralloc.c */
 static char **fReturn = fReturnpic14;
 
@@ -720,7 +719,7 @@ static bool operandsEqu ( operand *op1, operand *op2)
 }
 
 /*-----------------------------------------------------------------*/
-/* pic14_sameRegs - two asmops have the same registers					 */
+/* pic14_sameRegs - two asmops have the same registers             */
 /*-----------------------------------------------------------------*/
 bool pic14_sameRegs (asmop *aop1, asmop *aop2 )
 {
@@ -745,7 +744,7 @@ bool pic14_sameRegs (asmop *aop1, asmop *aop2 )
 }
 
 /*-----------------------------------------------------------------*/
-/* aopOp - allocates an asmop for an operand  : 				   */
+/* aopOp - allocates an asmop for an operand  :                    */
 /*-----------------------------------------------------------------*/
 void aopOp (operand *op, iCode *ic, bool result)
 {
@@ -756,7 +755,6 @@ void aopOp (operand *op, iCode *ic, bool result)
 	if (!op)
 		return ;
 	
-	//	DEBUGpic14_emitcode(";","%d",__LINE__);
 	/* if this a literal */
 	if (IS_OP_LITERAL(op)) {
 		op->aop = aop = newAsmop(AOP_LIT);
@@ -5314,7 +5312,6 @@ static void genAnd (iCode *ic, iCode *ifx)
 				switch(lit & 0xff) {
 				case 0x00:
 					/*  and'ing with 0 has clears the result */
-					pic14_emitcode("clrf","%s",aopGet(AOP(result),offset,FALSE,FALSE));
 					emitpcode(POC_CLRF,popGet(AOP(result),offset));
 					break;
 				case 0xff:
@@ -5326,12 +5323,9 @@ static void genAnd (iCode *ic, iCode *ifx)
 						int p = my_powof2( (~lit) & 0xff );
 						if(p>=0) {
 							/* only one bit is set in the literal, so use a bcf instruction */
-							pic14_emitcode("bcf","%s,%d",aopGet(AOP(left),offset,FALSE,TRUE),p);
 							emitpcode(POC_BCF,newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),p,0));
 							
 						} else {
-							pic14_emitcode("movlw","0x%x", (lit & 0xff));
-							pic14_emitcode("andwf","%s,f",aopGet(AOP(left),offset,FALSE,TRUE));
 							if(know_W != (int)(lit&0xff))
 								emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
 							know_W = lit &0xff;
@@ -5381,16 +5375,10 @@ static void genAnd (iCode *ic, iCode *ifx)
 					int t = (lit >> (offset*8)) & 0x0FFL;
 					switch(t) { 
 					case 0x00:
-						pic14_emitcode("clrf","%s",
-							aopGet(AOP(result),offset,FALSE,FALSE));
 						emitpcode(POC_CLRF,popGet(AOP(result),offset));
 						break;
 					case 0xff:
 						if(AOP_TYPE(left) != AOP_ACC) {
-							pic14_emitcode("movf","%s,w",
-								aopGet(AOP(left),offset,FALSE,FALSE));
-							pic14_emitcode("movwf","%s",
-								aopGet(AOP(result),offset,FALSE,FALSE));
 							emitpcode(POC_MOVFW,popGet(AOP(left),offset));
 						}
 						emitpcode(POC_MOVWF,popGet(AOP(result),offset));
@@ -5399,12 +5387,6 @@ static void genAnd (iCode *ic, iCode *ifx)
 						if(AOP_TYPE(left) == AOP_ACC) {
 							emitpcode(POC_ANDLW, popGetLit(t));
 						} else {
-							pic14_emitcode("movlw","0x%x",t);
-							pic14_emitcode("andwf","%s,w",
-								aopGet(AOP(left),offset,FALSE,FALSE));
-							pic14_emitcode("movwf","%s",
-								aopGet(AOP(result),offset,FALSE,FALSE));
-							
 							emitpcode(POC_MOVLW, popGetLit(t));
 							emitpcode(POC_ANDFW,popGet(AOP(left),offset));
 						}
@@ -5414,16 +5396,11 @@ static void genAnd (iCode *ic, iCode *ifx)
 				}
 				
 				if (AOP_TYPE(left) == AOP_ACC) {
-					pic14_emitcode("andwf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
 					emitpcode(POC_ANDFW,popGet(AOP(right),offset));
 				} else {
-					pic14_emitcode("movf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
-					pic14_emitcode("andwf","%s,w",
-						aopGet(AOP(left),offset,FALSE,FALSE));
 					emitpcode(POC_MOVFW,popGet(AOP(right),offset));
 					emitpcode(POC_ANDFW,popGet(AOP(left),offset));
 				}
-				pic14_emitcode("movwf","%s",aopGet(AOP(result),offset,FALSE,FALSE));
 				emitpcode(POC_MOVWF,popGet(AOP(result),offset));
 			}
 		}

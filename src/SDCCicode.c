@@ -1078,14 +1078,27 @@ operandOperation (operand * left, operand * right,
 				  (unsigned long) operandLitValue (right) :
 				  (long) operandLitValue (right)));
       break;
-    case RIGHT_OP:
-      retval = operandFromLit ((SPEC_USIGN(let) ? 
-				  (unsigned long) operandLitValue (left) :
-				  (long) operandLitValue (left)) >>
-				 (SPEC_USIGN(ret) ? 
-				  (unsigned long) operandLitValue (right) :
-				  (long) operandLitValue (right)));
+    case RIGHT_OP: {
+      double lval = operandLitValue(left), rval = operandLitValue(right);
+      double res;
+      switch ((SPEC_USIGN(let) ? 2 : 0) + (SPEC_USIGN(ret) ? 1 : 0)) 
+	{
+	case 0: // left=unsigned right=unsigned
+	  res=(unsigned long)lval >> (unsigned long)rval;
+	  break;
+	case 1: // left=unsigned right=signed
+	  res=(unsigned long)lval >> (signed long)rval;
+	  break;
+	case 2: // left=signed right=unsigned
+	  res=(signed long)lval >> (unsigned long)rval;
+	  break;
+	case 3: // left=signed right=signed
+	  res=(signed long)lval >> (signed long)rval;
+	  break;
+	}
+      retval = operandFromLit (res);
       break;
+    }
     case EQ_OP:
       retval = operandFromLit (operandLitValue (left) ==
 			       operandLitValue (right));

@@ -914,8 +914,10 @@ void pic16_printCallTree(FILE *of);
 void pCodePeepInit(void);
 void pic16_pBlockConvert2ISR(pBlock *pb);
 void pic16_pBlockConvert2Absolute(pBlock *pb);
-void pic16_emitDB(pBlock *pb, char c);		  // Add DB directives to a pBlock
-void pic16_flushDB(pBlock *pb);			  // Add pending DB data to a pBlock
+void pic16_initDB(void);
+void pic16_emitDB(char c, char ptype, void *p);		  // Add DB directives to a pBlock
+void pic16_emitDS(char *s, char ptype, void *p);
+void pic16_flushDB(char ptype, void *p);			  // Add pending DB data to a pBlock
 
 pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...); 
 

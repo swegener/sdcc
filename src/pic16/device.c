@@ -511,7 +511,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 
 
 /* forward declaration */
-void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist);
+void pic16_printIval(symbol * sym, sym_link * type, initList * ilist, char ptype, void *p);
 
 void pic16_dump_isection(FILE *of, set *section, int fix)
 {
@@ -535,10 +535,14 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 	/* sort symbols according to their address */
 	qsort(slist, i, sizeof(symbol *), symCompare);
 	
+	pic16_initDB();
+
 	if(!fix) {
 		fprintf(of, "\n\n\tidata\n");
 		for(s = setFirstItem(section); s; s = setNextItem(section)) {
-			print_idata(of, s, s->type, s->ival);
+			fprintf(of, "%s", s->rname);
+			pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
+			pic16_flushDB('f', (void *)of);
 		}
 	} else {
 	  int j=0;
@@ -558,16 +562,10 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 				fprintf(of, "\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
 			}
 
-			print_idata(of, s, s->type, s->ival);
-			
-#if 0
-			if(r1 && (init_addr == r1->address)) {
-				fprintf(of, "%s\tres\t0\n\n", r->name);
-			} else {
-				fprintf(of, "%s\tres\t%d\n", r->name, r->size);
-			}
-#endif
-			
+			fprintf(of, "%s", s->rname);
+			pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
+			pic16_flushDB('f', (void *)of);
+
 			sprev = s;
 		}
 	}
@@ -613,250 +611,6 @@ void pic16_dump_int_registers(FILE *of, set *section)
 #endif
 
 #define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
-
-
-
-/*-----------------------------------------------------------------*/
-/* printIvalType - generates ival for int/char                     */
-/*-----------------------------------------------------------------*/
-void print_idataType (FILE *of, symbol *sym, sym_link * type, initList * ilist)
-{
-  value *val;
-  unsigned long ulval;
-
-  //fprintf(stderr, "%s\n",__FUNCTION__);
-
-  /* if initList is deep */
-  if (ilist->type == INIT_DEEP)
-    ilist = ilist->init.deep;
-
-  if (!IS_AGGREGATE(sym->type) && getNelements(type, ilist)>1) {
-    werror (W_EXCESS_INITIALIZERS, "scalar", sym->name, sym->lineDef);
-  }
-
-  if (!(val = list2val (ilist))) {
-    // assuming a warning has been thrown
-    val=constVal("0");
-  }
-
-  if (val->type != type) {
-    val = valCastLiteral(type, floatFromVal(val));
-  }
-
-  if(val) 
-    ulval = (unsigned long) floatFromVal (val);
-  else
-    ulval =0;
-
-  switch (getSize (type)) {
-    case 1:
-	if(isprint(BYTE_IN_LONG(ulval, 0)))
-		fprintf(of, "%s\tdata\t\"%c\"\n", sym->rname, (unsigned char)BYTE_IN_LONG(ulval, 0));
-	else
-		fprintf(of, "%s\tdata\t0x%02x\n", sym->rname, (unsigned char)BYTE_IN_LONG(ulval, 0));
-//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
-	break;
-
-    case 2:
-	fprintf(of, "%s\tdw\t0x%02x, 0x%02x\n", sym->rname, (unsigned int)(BYTE_IN_LONG(ulval, 0)),
-					(unsigned int)(BYTE_IN_LONG(ulval, 1)));
-//	fprintf(of, "%s\tdata\t0x%04x\n", sym->rname, (unsigned int)BYTE_IN_LONG(ulval, 0) +
-//					(unsigned int)(BYTE_IN_LONG(ulval, 1) << 8));
-	break;
-
-    case 4:
-	fprintf(of, "%s\tdw\t0x%04x,0x%04x\n", sym->rname, (unsigned int)(BYTE_IN_LONG(ulval, 0)
-					+ (BYTE_IN_LONG(ulval, 1) << 8)),
-					(unsigned)(BYTE_IN_LONG(ulval, 2)
-					+ (BYTE_IN_LONG(ulval, 3) << 8)));
-//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
-//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
-//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,2))));
-//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,3))));
-	break;
-  }
-}
-
-
-/*-----------------------------------------------------------------*/
-/* print_idataChar - generates initital value for character array    */
-/*-----------------------------------------------------------------*/
-static int 
-print_idataChar (FILE *of, symbol *sym, sym_link * type, initList * ilist, char *s)
-{
-  value *val;
-  int remain;
-  char old_ch=0, *vchar;
-
-  // fprintf(stderr, "%s\n",__FUNCTION__);
-  if (!s)
-    {
-
-      val = list2val (ilist);
-      /* if the value is a character string  */
-      if (IS_ARRAY (val->type) && IS_CHAR (val->etype))
-	{
-	  if (!DCL_ELEM (type))
-	    DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
-
-
-	  fprintf(of, "%s\tdata\t", sym->rname);
-	  vchar = SPEC_CVAL(val->etype).v_char;
-	  for(remain=0; remain<DCL_ELEM(type); remain++) {
-		if(!isprint(old_ch)) {
-			if(isprint(vchar[remain]))fprintf(of, "%s\"%c", (remain?", ":""), vchar[remain]);
-			else fprintf(of, "0x%02x", vchar[remain]);
-		} else
-			if(!isprint(vchar[remain]))fprintf(of, "\", 0x%02x", vchar[remain]);
-			else fprintf(of, "%c", vchar[remain]);
-		old_ch = vchar[ remain ];
-	  }
-//	     fprintf(of, "0x%02x%s", SPEC_CVAL(val->etype).v_char[ remain ], (remain==DCL_ELEM(type)-1?"":","));
-			
-
-	  if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0)
-            {
-	      while (remain--)
-                {
-		  fprintf(of, "0x%02x%s", 0x00 /*SPEC_CVAL(val->etype).v_char[ remain ]*/ , (remain==DCL_ELEM(type)-1?"":","));
-                }
-            }
-		fprintf(of, "\n");
-	  return 1;
-	}
-      else
-	return 0;
-    }
-  else {
-    fprintf(of, "%s\tdata\t", sym->rname);
-    vchar = s; old_ch = 0;
-    for(remain=0; remain<strlen(s); remain++) 
-      {
-	if(!isprint(old_ch)) {
-		if(isprint(vchar[remain]))fprintf(of, "%s\"%c", (remain?", ":""), vchar[remain]);
-		else fprintf(of, "0x%02x", vchar[remain]);
-	} else
-		if(!isprint(vchar[remain]))fprintf(of, "\", 0x%02x", vchar[remain]);
-		else fprintf(of, "%c", vchar[remain]);
-	old_ch = vchar[ remain ];
-//	fprintf(of, "0x%02x%s", s[ remain ], (remain==strlen(s)-1?"":","));
-      }
-  }
-  return 1;
-}
-
-/*-----------------------------------------------------------------*/
-/* print_idataArray - generates code for array initialization        */
-/*-----------------------------------------------------------------*/
-static void 
-print_idataArray (FILE *of, symbol * sym, sym_link * type, initList * ilist)
-{
-  initList *iloop;
-  int lcnt = 0, size = 0;
-
-  /* take care of the special   case  */
-  /* array of characters can be init  */
-  /* by a string                      */
-  if (IS_CHAR (type->next)) {
-//    fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
-    if (!IS_LITERAL(list2val(ilist)->etype)) {
-      werror (W_INIT_WRONG);
-      return;
-    }
-    if (print_idataChar (of, sym, type,
-		       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
-		       SPEC_CVAL (sym->etype).v_char))
-      return;
-  }
-  /* not the special case             */
-  if (ilist->type != INIT_DEEP)
-    {
-      werror (E_INIT_STRUCT, sym->name);
-      return;
-    }
-
-  iloop = ilist->init.deep;
-  lcnt = DCL_ELEM (type);
-
-  for (;;)
-    {
-      //fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
-      size++;
-      print_idata (of, sym, type->next, iloop);
-      iloop = (iloop ? iloop->next : NULL);
-
-
-      /* if not array limits given & we */
-      /* are out of initialisers then   */
-      if (!DCL_ELEM (type) && !iloop)
-	break;
-
-      /* no of elements given and we    */
-      /* have generated for all of them */
-      if (!--lcnt) {
-	/* if initializers left */
-	if (iloop) {
-	  werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
-	}
-	break;
-      }
-    }
-
-  /* if we have not been given a size  */
-  if (!DCL_ELEM (type))
-    DCL_ELEM (type) = size;
-
-  return;
-}
-
-/*-----------------------------------------------------------------*/
-/* print_idata - generates code for initial value                    */
-/*-----------------------------------------------------------------*/
-void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist)
-{
-  if (!ilist)
-    return;
-
-  /* if structure then    */
-  if (IS_STRUCT (type))
-    {
-      //fprintf(stderr,"%s struct\n",__FUNCTION__);
-      //printIvalStruct (sym, type, ilist, oFile);
-      fprintf(stderr, "%s:%d: PIC16 port error: structure initialisation is not implemented yet.\n",
-      	__FILE__, __LINE__);
-      abort();
-      return;
-    }
-
-  /* if this is a pointer */
-  if (IS_PTR (type))
-    {
-      //fprintf(stderr,"%s pointer\n",__FUNCTION__);
-      //printIvalPtr (sym, type, ilist, oFile);
-      fprintf(stderr, "%s:%d: PIC16 port error: pointer initialisation is not immplemented yet.\n",
-      	__FILE__, __LINE__);
-      abort();
-      return;
-    }
-
-  /* if this is an array   */
-  if (IS_ARRAY (type))
-    {
-      //fprintf(stderr,"%s array\n",__FUNCTION__);
-      print_idataArray (of, sym, type, ilist);
-      return;
-    }
-
-  /* if type is SPECIFIER */
-  if (IS_SPEC (type))
-    {
-//	fprintf(stderr,"%s spec\n",__FUNCTION__);
-      print_idataType(of, sym, type, ilist);
-      return;
-    }
-}
-
-
 
 
 /*-----------------------------------------------------------------*

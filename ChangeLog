@@ -1,3 +1,20 @@
+2004-06-07 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* .version: increased version number to 2.4.2,
+
+	Cumulative patch for pic16 port
+	* src/pic16/device.c: changed scheme to dump initial values for
+	variables in idata segment, all print_idata* functions were removed,
+	now the pic16_printIval* will be called,
+	* src/pic16/glue.c: (pic16_initPointer, pic16_pointerTypeToGPByte,
+	* _pic16_printPointerType, pic16_printPointerType,
+	* pic16_printGPointerType, pic16_printIvalArray, pic16_printIvalStruct,
+	* pic16_printIvalBitFields, pic16_printIvalFuncPtr, pic16_printIvalPtr:
+	NEW, similar to the respective functions in SDCCglue.c,
+	* src/pic16/pcode.c (pic16_emitDB, pic16_flushDB): reverted to old
+	way, emitting hex bytes,
+	* (pic16_emitDS): NEW, emits a string for pointer initialisation,
+
 2004-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/avr/ralloc.c (serialRegAssign),

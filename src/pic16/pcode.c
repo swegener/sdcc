@@ -4034,18 +4034,46 @@ typedef struct DBdata
 
 struct DBdata DBd;
 static int DBd_init = -1;
-static int DB_prev = -1;
+
+/*-----------------------------------------------------------------*/
+/*    Initialiase "DB" data buffer                                 */
+/*-----------------------------------------------------------------*/
+void pic16_initDB(void)
+{
+	DBd_init = -1;
+}
+
+
+/*-----------------------------------------------------------------*/
+/*    Flush pending "DB" data to a pBlock                          */
+/*                                                                 */
+/* ptype - type of p pointer, 'f' file pointer, 'p' pBlock pointer */
+/*-----------------------------------------------------------------*/
+void pic16_flushDB(char ptype, void *p)
+{
+	if (DBd.count>0) {
+		if(ptype == 'p')
+			pic16_addpCode2pBlock(((pBlock *)p),pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
+		else
+		if(ptype == 'f')
+                	fprintf(((FILE *)p), "\tdb\t%s\n", DBd.buffer);
+                else {
+                	/* sanity check */
+                	fprintf(stderr, "PIC16 port error: could not emit initial value data\n");
+                }
+
+		DBd.count = 0;
+		DBd.buffer[0] = '\0';
+	}
+}
+
 
 /*-----------------------------------------------------------------*/
 /*    Add "DB" directives to a pBlock                              */
 /*-----------------------------------------------------------------*/
-void pic16_emitDB(pBlock *pb, char c)
+void pic16_emitDB(char c, char ptype, void *p)
 {
   int l;
-  char *frm, tbuf[8];
-  char frm_alnum[]="%c";
-  char frm_other[]="0x%02x";
-
 
 	if (DBd_init<0) {
 	 // we need to initialize
@@ -4055,54 +4083,32 @@ void pic16_emitDB(pBlock *pb, char c)
 	}
 
 	l = strlen(DBd.buffer);
-
-	if(isprint( c ))frm = frm_alnum;
-	else frm = frm_other;
-	sprintf(tbuf, frm, c & 0xff);
-	
-	if(!isprint(DB_prev)) {
-		if(isprint(c))
-			if(DBd.count)strcat(DBd.buffer, ", \"");
-			else strcat(DBd.buffer, "\"");
-		else if(DBd.count) strcat(DBd.buffer, ", ");
-	} else
-		if(!isprint(c))strcat(DBd.buffer, "\", ");
-	
-	strcat(DBd.buffer, tbuf);
-
-#if 0		
-	if (DBd.count>0) {
-		sprintf(DBd.buffer+l,", 0x%02x", c & 0xff);
-	} else {
-		sprintf(DBd.buffer,"0x%02x", c & 0xff);
-	}
-#endif
+	sprintf(DBd.buffer+l,"%s0x%02x", (DBd.count>0?", ":""), c & 0xff);
 
 	DBd.count++;
-	DB_prev = c;
-	
-	if (DBd.count>=16) {
-		if(isprint(c))strcat(DBd.buffer, "\"");
-		pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
-		DBd.count = 0;
-		DBd.buffer[0] = '\0';
-		DB_prev = 0;
-	}
+	if (DBd.count>=16)
+		pic16_flushDB(ptype, p);
 }
 
-/*-----------------------------------------------------------------*/
-/*    Flush pending "DB" data to a pBlock                          */
-/*-----------------------------------------------------------------*/
-void pic16_flushDB(pBlock *pb)
+void pic16_emitDS(char *s, char ptype, void *p)
 {
-  if (DBd.count>0)
-    {
-       if(isprint(DB_prev))strcat(DBd.buffer, "\"");
-       pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
-       DBd.count = 0;
-       DBd.buffer[0] = '\0';
-    }
+  int l;
+
+	if (DBd_init<0) {
+	 // we need to initialize
+		DBd_init = 0;
+		DBd.count = 0;
+		DBd.buffer[0] = '\0';
+	}
+
+	l = strlen(DBd.buffer);
+	sprintf(DBd.buffer+l,"%s%s", (DBd.count>0?", ":""), s);
+
+	DBd.count++;	//=strlen(s);
+	if (DBd.count>=16)
+		pic16_flushDB(ptype, p);
 }
+
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
@@ -4125,9 +4131,9 @@ void pic16_pCodeConstString(char *name, char *value)
   pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(name,-1));
 
   do {
-        pic16_emitDB(pb, *value);
+        pic16_emitDB(*value, 'p', (void *)pb);
   }while (*value++);
-  pic16_flushDB(pb);
+  pic16_flushDB('p', (void *)pb);
 }
 
 /*-----------------------------------------------------------------*/

@@ -121,9 +121,9 @@ _mulsint (int a, int b)		// obsolete
 
 #elif defined _MULINT_ASM_SMALL || defined _MULINT_ASM_SMALL_AUTO
 
-/* the return value is (unsigned) int, but to hush the compiler
- * we choose void here: */
-void
+#pragma SAVE
+#pragma LESS_PEDANTIC
+unsigned int
 _mulint_dummy (void) _naked
 {
 	_asm
@@ -218,6 +218,7 @@ _mulint_dummy (void) _naked
 
 	_endasm ;
 }
+#pragma RESTORE
 
 #else
 

@@ -540,6 +540,20 @@ replace {
         mov  %1,a
         mov  dpl,%2
         mov  dph,%3
+	mov  dpx,%4
+        mov  a,%1
+} by {
+        ; Peephole 136a   removed redundant moves
+        mov  %1,a
+        mov  dpl,%2
+        mov  dph,%3
+	mov  dpx,%4
+} if 24bitMode
+
+replace {
+        mov  %1,a
+        mov  dpl,%2
+        mov  dph,%3
         mov  a,%1
 } by {
         ; Peephole 136   removed redundant moves
@@ -1019,6 +1033,15 @@ replace {
         clr  a
 }
 
+replace {
+        mov  dpl,#0x00
+        mov  dph,#0x00
+ 	mov  dpx,#0x00
+} by {
+        ; Peephole 181a   used 24 bit load of dptr
+        mov  dptr,#0x0000
+} if 24bitMode
+
 // saving 3 byte, 2 cycles, return(NULL) profits here
 replace {
         mov  dpl,#0x00
@@ -1027,6 +1050,16 @@ replace {
         ; Peephole 181   used 16 bit load of dptr
         mov  dptr,#0x0000
 }
+
+// saves 2 bytes, ?? cycles.
+replace {
+        mov  dpl,#%1
+        mov  dph,#(%1 >> 8)
+	mov  dpx,#(%1 >> 16)
+} by {
+        ; Peephole 182a   used 24 bit load of dptr
+        mov  dptr,#%1
+} if 24bitMode
 
 // saving 3 byte, 2 cycles, return(float_constant) profits here
 replace {
@@ -1508,6 +1541,13 @@ replace {
 }
 
 replace {
+        mov  dptr,#((((%1 >> 16)) <<16) + (((%1 >> 8)) <<8) + %1)
+} by {
+        ; Peephole 210a   simplified expression
+        mov  dptr,#%1
+} if 24bitMode
+
+replace {
         mov  dptr,#((((%1 >> 8)) <<8) + %1)
 } by {
         ; Peephole 210   simplified expression
@@ -1626,4 +1666,36 @@ replace {
 	mov   @r%1,a
 	inc   r%1
 	mov   @r%1,a
+}
+
+replace {
+	clr   a
+	movx  @dptr,a
+	mov   dptr,%1
+	clr   a
+	movx  @dptr,a
+} by {
+	; Peephole 219 removed redundant clear
+	clr   a
+	movx  @dptr,a
+	mov   dptr,%1
+	movx  @dptr,a
+}
+
+replace {
+	clr   a
+	movx  @dptr,a
+	mov   dptr,%1
+	movx  @dptr,a
+	mov   dptr,%2
+	clr   a
+	movx  @dptr,a
+} by {
+	; Peephole 219a removed redundant clear
+	clr   a
+	movx  @dptr,a
+	mov   dptr,%1
+	movx  @dptr,a
+	mov   dptr,%2
+	movx  @dptr,a
 }

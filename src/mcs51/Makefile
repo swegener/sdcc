@@ -10,6 +10,8 @@ CFLAGS += -I.. -I. -I../..
 
 all: $(LIB)
 
+main.o: main.c peeph.rul
+
 $(LIB): peeph.rul $(OBJ)
 	rm -f $(LIB)
 	ar r $(LIB) $(OBJ)

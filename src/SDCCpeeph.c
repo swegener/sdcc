@@ -65,6 +65,14 @@ int pcDistance (lineNode *cpos, char *lbl, bool back)
 }
 
 /*-----------------------------------------------------------------*/
+/* flat24bitMode - will check to see if we are in flat24 mode	   */
+/*-----------------------------------------------------------------*/
+FBYNAME(flat24bitMode)
+{
+    return (options.model == MODEL_FLAT24);
+}
+
+/*-----------------------------------------------------------------*/
 /* labelInRange - will check to see if label %5 is within range    */
 /*-----------------------------------------------------------------*/
 FBYNAME(labelInRange)
@@ -125,7 +133,8 @@ int callFuncByName ( char *fname,
 	int (*func)(hTab *,lineNode *,lineNode *) ; 
     }  ftab[] = { 
 	{"labelInRange",   labelInRange },
-	{"operandsNotSame", operandsNotSame }
+	{"operandsNotSame", operandsNotSame },
+	{"24bitMode", flat24bitMode },
     };
     int i;
 

@@ -60,7 +60,11 @@ char *aopLiteral (value *val, int offset);
 static char *zero = "#0x00";
 static char *one  = "#0x01";
 static char *spname ;
-static char *fReturn[] = {"dpl","dph","b","a" };
+
+static char *fReturn8051[] = {"dpl","dph","b","a" };
+static char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
+static unsigned fReturnSize = 4;
+static char **fReturn = fReturn8051;
 static char *accUse[] = {"a","b"};
 
 static short rbank = -1;
@@ -551,7 +555,7 @@ static void aopOp (operand *op, iCode *ic, bool result)
             int i;
             aop = op->aop = sym->aop = newAsmop(AOP_STR);
             aop->size = getSize(sym->type);
-            for ( i = 0 ; i < 4 ; i++ )
+            for ( i = 0 ; i < fReturnSize ; i++ )
                 aop->aopu.aop_str[i] = fReturn[i];
             return;
         }
@@ -7170,10 +7174,10 @@ static void genReceive (iCode *ic)
 	  IS_TRUE_SYMOP(IC_RESULT(ic))) ) {
 
 	int size = getSize(operandType(IC_RESULT(ic)));
-	int offset =  4 - size;
+	int offset =  fReturnSize - size;
 	while (size--) {
-	    emitcode ("push","%s", (strcmp(fReturn[3 - offset],"a") ?
-				    fReturn[3 - offset] : "acc"));
+	    emitcode ("push","%s", (strcmp(fReturn[fReturnSize - offset - 1],"a") ?
+				    fReturn[fReturnSize - offset - 1] : "acc"));
 	    offset++;
 	}
 	aopOp(IC_RESULT(ic),ic,FALSE);  
@@ -7201,6 +7205,13 @@ void gen51Code (iCode *lic)
 {
     iCode *ic;
     int cln = 0;
+
+    /* Hack-o-matic: change fReturn based on model. */
+    if (options.model == MODEL_FLAT24)
+    {
+        fReturn = fReturn390;
+        fReturnSize = 5;
+    }
 
     lineHead = lineCurr = NULL;
 

@@ -1386,7 +1386,11 @@ rematStr (symbol * sym)
 	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
 	  continue;
 	}
-
+      /* cast then continue */
+      if (IS_CAST_ICODE(ic)) {
+	  ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+	  continue;
+      }
       /* we reached the end */
       sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
       break;
@@ -1448,7 +1452,7 @@ regTypeNum ()
 
 	      /* if remat in data space */
 	      if (OP_SYMBOL (IC_LEFT (ic))->remat &&
-	      // sym->type &&
+		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
 		  DCL_TYPE (aggrToPtr (sym->type, FALSE)) == POINTER)
 		{
 
@@ -2300,6 +2304,7 @@ packRegisters (eBBlock * ebp)
 	  !POINTER_SET (ic) &&
 	  IS_SYMOP (IC_RIGHT (ic)) &&
 	  OP_SYMBOL (IC_RIGHT (ic))->remat &&
+	  !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode) &&
 	  bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
 	{
 
@@ -2308,6 +2313,20 @@ packRegisters (eBBlock * ebp)
 	  OP_SYMBOL (IC_RESULT (ic))->rematiCode =
 	    OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
 	}
+      
+      /* if cast to a generic pointer & the pointer being
+	 cast is remat, then we can remat this cast as well */
+      if (ic->op == CAST && 
+	  IS_SYMOP(IC_RIGHT(ic)) &&
+	  OP_SYMBOL(IC_RIGHT(ic))->remat ) {
+	      sym_link *to_type = operandType(IC_LEFT(ic));
+	      sym_link *from_type = operandType(IC_RIGHT(ic));
+	      if (IS_GENPTR(to_type) && IS_PTR(from_type)) {		      
+		      OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+		      OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+		      OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+	      }
+      }
 
       /* if this is a +/- operation with a rematerizable 
          then mark this as rematerializable as well */
@@ -2315,6 +2334,7 @@ packRegisters (eBBlock * ebp)
 	  (IS_SYMOP (IC_LEFT (ic)) &&
 	   IS_ITEMP (IC_RESULT (ic)) &&
 	   OP_SYMBOL (IC_LEFT (ic))->remat &&
+	   !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
 	   bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
 	   IS_OP_LITERAL (IC_RIGHT (ic))))
 	{

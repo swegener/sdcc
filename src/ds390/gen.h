@@ -65,7 +65,11 @@ typedef struct asmop
 	regs *aop_reg[4];	/* array of registers */
 	char *aop_dir;		/* if direct  */
 	regs *aop_ptr;		/* either -> to r0 or r1 */
-	char *aop_immd;		/* if immediate others are implied */
+	struct {
+		int  from_cast_remat;   /* cast remat created this : immd2 field used for highest order*/
+		char *aop_immd1;	/* if immediate others are implied */
+		char *aop_immd2;	/* cast remat will generate this   */
+	} aop_immd;
 	int aop_stk;		/* stack offset when AOP_STK */
 	char *aop_str[4];	/* just a string array containing the location */
       }

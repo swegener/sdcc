@@ -70,6 +70,17 @@
 #undef OPT_DISABLE_PIC
 #undef OPT_DISABLE_XA51
 
+#ifndef _DEBUG
+/*disable warning C4018: signed/unsigned mismatch*/
+#pragma warning( disable : 4018 )
+/*disable warning C4761: integral: size mismatch in argument; conversion supplied*/
+#pragma warning( disable : 4761 )
+/*disable warning C4146: unary minus operator applied to unsigned type, result still unsigned*/
+#pragma warning( disable : 4146 )
+/*disable warning C4244: 'initializing' : conversion from 'double ' to 'char ', possible loss of data*/
+#pragma warning( disable : 4244 )
+#endif
+
 #endif  /* SDCC_VC_HEADER */
 
 /* End of sdcc_vc.h */

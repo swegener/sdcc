@@ -1512,7 +1512,7 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 	    strcpy (val->sym->rname,val->name);
 	    val->sym->_isparm = 1;
 	    SPEC_OCLS(val->etype) = SPEC_OCLS(val->sym->etype) = 
-		(options.model ? xdata : data);
+		(options.model != MODEL_SMALL ? xdata : data);
 	    SPEC_STAT(val->etype) = SPEC_STAT(val->sym->etype) = 
 		SPEC_STAT(func->etype);
 	}

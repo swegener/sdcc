@@ -457,7 +457,8 @@ void *findSym (bucket **, void *, const char *);
 void *findSymWithLevel (bucket **, struct symbol *);
 void *findSymWithBlock (bucket **, struct symbol *, int);
 void changePointer (symbol * sym);
-
-#include "SDCCmem.h"
+void checkTypeSanity(sym_link *, char *);
+/* noun strings */
+extern char *nounName(sym_link *);
 
 #endif

@@ -565,6 +565,7 @@ type_specifier2
    | SHORT  {
                $$=newLink();
                $$->class = SPECIFIER   ;
+               SPEC_NOUN($$) = V_INT   ;
 	       SPEC_SHORT($$) = 1      ;
             }
    | INT    {
@@ -575,6 +576,7 @@ type_specifier2
    | LONG   {
                $$=newLink();
                $$->class = SPECIFIER   ;
+               SPEC_NOUN($$) = V_INT   ;
 	       SPEC_LONG($$) = 1       ;
             }
    | SIGNED {
@@ -921,7 +923,7 @@ declarator2
          {	   
 	   werror(E_OLD_STYLE,$1->name) ;	  
 	   
-	   /* assume it returns an it */
+	   /* assume it returns an int */
 	   $1->type = $1->etype = newIntLink();
 	   $$ = $1 ;
          }

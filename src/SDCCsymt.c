@@ -24,6 +24,27 @@
 #include "common.h"
 #include "newalloc.h"
 
+/* noun strings */
+char *nounName(sym_link *sl) {
+  switch (SPEC_NOUN(sl)) 
+    {
+    case V_INT: {
+      if (SPEC_LONG(sl)) return "long";
+      if (SPEC_SHORT(sl)) return "short";
+      return "int";
+    }
+    case V_FLOAT: return "float";
+    case V_CHAR: return "char";
+    case V_VOID: return "void";
+    case V_STRUCT: return "struct";
+    case V_LABEL: return "label";
+    case V_BIT: return "bit";
+    case V_SBIT: return "sbit";
+    case V_DOUBLE: return "double";
+    }
+  return "unknown";
+};
+
 bucket *SymbolTab[256];		/* the symbol    table  */
 bucket *StructTab[256];		/* the structure table  */
 bucket *TypedefTab[256];	/* the typedef   table  */
@@ -81,6 +102,8 @@ addSym (bucket ** stab,
 {
   int i;			/* index into the hash Table */
   bucket *bp;			/* temp bucket    *         */
+
+  checkTypeSanity(((symbol *)sym)->etype, sname);
 
   /* the symbols are always added at the head of the list  */
   i = hashKey (sname);
@@ -428,41 +451,42 @@ addDecl (symbol * sym, int type, sym_link * p)
   checkTypeSanity: prevent the user from doing e.g.:
   unsigned float uf;
   ------------------------------------------------------------------*/
-void checkTypeSanity(sym_link *dest) {
+void checkTypeSanity(sym_link *dest, char *name) {
   char *noun;
-  switch (SPEC_NOUN(dest)) 
-    {
-    case V_CHAR: noun="char"; break;
-    case V_INT: noun="int"; break;
-    case V_FLOAT: noun="float"; break;
-    case V_DOUBLE: noun="double"; break;
-    case V_VOID: noun="void"; break;
-    default: noun="unknown type"; break;
-    }
-  
+
+  if (!dest) {
+    //printf ("sanity check skipped for %s\n", name);
+    return;
+  }
+
+  noun=nounName(dest);
+
+  //printf ("checking sanity for %s\n", name);
+
   if ((SPEC_NOUN(dest)==V_CHAR || 
        SPEC_NOUN(dest)==V_FLOAT || 
        SPEC_NOUN(dest)==V_DOUBLE || 
        SPEC_NOUN(dest)==V_VOID) &&
       (SPEC_SHORT(dest) || SPEC_LONG(dest))) {
     // long or short for char float double or void
-    werror (E_LONG_OR_SHORT_INVALID, noun, yylval.yychar);
+    werror (E_LONG_OR_SHORT_INVALID, noun, name);
   }
   if ((SPEC_NOUN(dest)==V_FLOAT || 
        SPEC_NOUN(dest)==V_DOUBLE || 
        SPEC_NOUN(dest)==V_VOID) && 
       (SPEC_SIGNED(dest) || SPEC_USIGN(dest))) {
     // signed or unsigned for float double or void
-    werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, yylval.yychar);
+    werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
   }
   if (SPEC_SIGNED(dest) && SPEC_USIGN(dest)) {
     // signed AND unsigned 
-    werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, yylval.yychar);
+    werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, name);
   }
   if (SPEC_SHORT(dest) && SPEC_LONG(dest)) {
     // short AND long
-    werror (E_LONG_AND_SHORT_INVALID, noun, yylval.yychar);
+    werror (E_LONG_AND_SHORT_INVALID, noun, name);
   }
+
 }
 
 /*------------------------------------------------------------------*/
@@ -473,7 +497,8 @@ mergeSpec (sym_link * dest, sym_link * src)
 {
 
   /* we shouldn't redeclare the type */
-  if (SPEC_NOUN (dest) && SPEC_NOUN (src)) {
+  if ((SPEC_NOUN (dest) && SPEC_NOUN (src)) && 
+      (SPEC_NOUN(dest) != SPEC_NOUN(src))) {
     werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
   }
 
@@ -510,8 +535,6 @@ mergeSpec (sym_link * dest, sym_link * src)
 
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
-
-  checkTypeSanity(dest);
 
   return dest;
 }
@@ -562,7 +585,7 @@ getSpec (sym_link * p)
 }
 
 /*------------------------------------------------------------------*/
-/* newCharLink() - creates an char type                              */
+/* newCharLink() - creates an char type                             */
 /*------------------------------------------------------------------*/
 sym_link *
 newCharLink ()
@@ -839,9 +862,11 @@ addSymChain (symbol * symHead)
   symbol *sym = symHead;
   symbol *csym = NULL;
 
+
   for (; sym != NULL; sym = sym->next)
     {
       changePointer(sym);
+
       /* if already exists in the symbol table then check if
          the previous was an extern definition if yes then
          then check if the type match, if the types match then
@@ -851,7 +876,7 @@ addSymChain (symbol * symHead)
 	{
 
 	  /* previous definition extern ? */
-	  if (IS_EXTERN (csym->etype))
+	  if (1 || IS_EXTERN (csym->etype))
 	    {
 	      /* do types match ? */
 	      if (checkType (csym->type, sym->type) != 1)
@@ -879,7 +904,6 @@ addSymChain (symbol * symHead)
 		werror (W_EXTERN_MISMATCH, csym->name);
 	    }
 	}
-
       addSym (SymbolTab, sym, sym->name, sym->level, sym->block);
     }
 }
@@ -1567,7 +1591,7 @@ checkFunction (symbol * sym)
   if (checkType (csym->type, sym->type) <= 0)
     {
       werror (E_PREV_DEF_CONFLICT, csym->name, "type");
-      werror (E_CONTINUE, "previous defintion type ");
+      werror (E_CONTINUE, "previous definition type ");
       printTypeChain (csym->type, stderr);
       fprintf (stderr, "\n");
       werror (E_CONTINUE, "current definition type ");
@@ -1849,10 +1873,9 @@ printTypeChain (sym_link * type, FILE * of)
 	    case V_INT:
 	      if (IS_LONG (type))
 		fprintf (of, "long ");
-	      else if (IS_SHORT (type))
+	      if (IS_SHORT (type))
 		fprintf (of, "short ");
-	      else
-		fprintf (of, "int ");
+	      fprintf (of, "int ");
 	      break;
 
 	    case V_CHAR:
@@ -1879,7 +1902,12 @@ printTypeChain (sym_link * type, FILE * of)
 	      fprintf (of, "bit {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
 	      break;
 
+	    case V_DOUBLE:
+	      fprintf (of, "double ");
+	      break;
+
 	    default:
+	      fprintf (of, "unknown type ");
 	      break;
 	    }
 	}

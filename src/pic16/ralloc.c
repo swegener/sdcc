@@ -1304,7 +1304,7 @@ leastUsedLR (set * sset)
 
     }
 
-  setToNull ((void **) &sset);
+  setToNull ((void *) &sset);
   sym->blockSpil = 0;
   return sym;
 }
@@ -3889,8 +3889,8 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   /* free up any _G.stackSpil locations allocated */
   applyToSet (_G.stackSpil, deallocStackSpil);
   _G.slocNum = 0;
-  setToNull ((void **) &_G.stackSpil);
-  setToNull ((void **) &_G.spiltSet);
+  setToNull ((void *) &_G.stackSpil);
+  setToNull ((void *) &_G.spiltSet);
   /* mark all registers as free */
   //pic16_freeAllRegs ();
 

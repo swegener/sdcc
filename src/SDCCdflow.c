@@ -68,11 +68,11 @@ DEFSETFUNC (ifKilledInBlock)
 		   cdp->diCode->key);
   if (bitVectBitsInCommon (outs, OP_DEFS (cdp->sym)))
     {
-      setToNull ((void **) &outs);
+      setToNull ((void *) &outs);
       return 1;
     }
 
-  setToNull ((void **) &outs);
+  setToNull ((void *) &outs);
 
   /* if the operands of this one was changed in the block */
   /* then delete it */
@@ -190,7 +190,7 @@ computeDataFlow (eBBlock ** ebbs, int count)
 	    oldOutExprs = setFromSet (ebbs[i]->outExprs);
 	  else
 	    oldOutDefs = bitVectCopy (ebbs[i]->outDefs);
-	  setToNull ((void **) &ebbs[i]->inDefs);
+	  setToNull ((void *) &ebbs[i]->inDefs);
 
 	  /* indefitions are easy just merge them by union */
 	  /* these are the definitions that can possibly   */
@@ -218,13 +218,13 @@ computeDataFlow (eBBlock ** ebbs, int count)
 
 	  /* figure out the incoming expressions */
 	  /* this is a little more complex       */
-	  setToNull ((void **) &ebbs[i]->inExprs);
+	  setToNull ((void *) &ebbs[i]->inExprs);
 	  if (optimize.global_cse)
 	    {
 	      firstTime = 1;
 	      applyToSet (pred, mergeInExprs, ebbs[i], &firstTime);
 	    }
-	  setToNull ((void **) &pred);
+	  setToNull ((void *) &pred);
 
 	  /* do cse with computeOnly flag set to TRUE */
 	  /* this by far the quickest way of computing */

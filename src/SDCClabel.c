@@ -35,8 +35,8 @@ buildLabelRefTable (iCode * ic)
 {
   iCode *lic;
 
-  setToNull ((void **) &labelRef);
-  setToNull ((void **) &labelDef);
+  setToNull ((void *) &labelRef);
+  setToNull ((void *) &labelDef);
   labelRef = newHashTable (labelKey + 1);
   labelDef = newHashTable (labelKey + 1);
 

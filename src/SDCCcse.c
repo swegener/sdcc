@@ -1633,12 +1633,12 @@ cseBBlock (eBBlock * ebb, int computeOnly,
   cseSet = setFromSet (ebb->inExprs);
 
   /* these will be computed by this routine */
-  setToNull ((void **) &ebb->outDefs);
-  setToNull ((void **) &ebb->defSet);
-  setToNull ((void **) &ebb->usesDefs);
-  setToNull ((void **) &ebb->ptrsSet);
-  setToNull ((void **) &ebb->addrOf);
-  setToNull ((void **) &ebb->ldefs);
+  setToNull ((void *) &ebb->outDefs);
+  setToNull ((void *) &ebb->defSet);
+  setToNull ((void *) &ebb->usesDefs);
+  setToNull ((void *) &ebb->ptrsSet);
+  setToNull ((void *) &ebb->addrOf);
+  setToNull ((void *) &ebb->ldefs);
 
   ebb->outDefs = bitVectCopy (ebb->inDefs);
   bitVectDefault = iCodeKey;
@@ -2018,7 +2018,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	}
     }
 
-  setToNull ((void **) &ebb->outExprs);
+  setToNull ((void *) &ebb->outExprs);
   ebb->outExprs = cseSet;
   ebb->outDefs = bitVectUnion (ebb->outDefs, ebb->defSet);
   ebb->ptrsSet = bitVectUnion (ebb->ptrsSet, ebb->inPtrsSet);

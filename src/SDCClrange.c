@@ -742,9 +742,9 @@ computeLiveRanges (eBBlock ** ebbs, int count)
      in terms of this sequence additionally the
      routine will also create a hashtable of instructions */
   iCodeSeq = 0;
-  setToNull ((void **) &iCodehTab);
+  setToNull ((void *) &iCodehTab);
   iCodehTab = newHashTable (iCodeKey);
-  setToNull ((void **) &iCodeSeqhTab);
+  setToNull ((void *) &iCodeSeqhTab);
   iCodeSeqhTab = newHashTable (iCodeKey);
   sequenceiCode (ebbs, count);
 
@@ -756,7 +756,7 @@ computeLiveRanges (eBBlock ** ebbs, int count)
 
   /* call routine to mark the from & to live ranges for
      variables used */
-  setToNull ((void **) &liveRanges);
+  setToNull ((void *) &liveRanges);
   for (i = 0; i < count; i++)
     markLiveRanges (ebbs[i], ebbs, count);
 

@@ -311,14 +311,14 @@ unionSets (set * list1, set * list2, int throw)
   switch (throw)
     {
     case THROW_SRC:
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list2);
       break;
     case THROW_DEST:
-      setToNull ((void **) &list1);
+      setToNull ((void *) &list1);
       break;
     case THROW_BOTH:
-      setToNull ((void **) &list1);
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list1);
+      setToNull ((void *) &list2);
     }
 
   return un;
@@ -346,14 +346,14 @@ unionSetsWith (set * list1, set * list2, int (*cFunc) (), int throw)
   switch (throw)
     {
     case THROW_SRC:
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list2);
       break;
     case THROW_DEST:
-      setToNull ((void **) &list1);
+      setToNull ((void *) &list1);
       break;
     case THROW_BOTH:
-      setToNull ((void **) &list1);
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list1);
+      setToNull ((void *) &list2);
     }
 
   return un;
@@ -376,14 +376,14 @@ intersectSets (set * list1, set * list2, int throw)
   switch (throw)
     {
     case THROW_SRC:
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list2);
       break;
     case THROW_DEST:
-      setToNull ((void **) &list1);
+      setToNull ((void *) &list1);
       break;
     case THROW_BOTH:
-      setToNull ((void **) &list1);
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list1);
+      setToNull ((void *) &list2);
     }
 
   return in;
@@ -408,14 +408,14 @@ intersectSetsWith (set * list1, set * list2,
   switch (throw)
     {
     case THROW_SRC:
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list2);
       break;
     case THROW_DEST:
-      setToNull ((void **) &list1);
+      setToNull ((void *) &list1);
       break;
     case THROW_BOTH:
-      setToNull ((void **) &list1);
-      setToNull ((void **) &list2);
+      setToNull ((void *) &list1);
+      setToNull ((void *) &list2);
     }
 
   return in;
@@ -495,14 +495,14 @@ subtractFromSet (set * left, set * right, int throw)
   switch (throw)
     {
     case THROW_SRC:
-      setToNull ((void **) &right);
+      setToNull ((void *) &right);
       break;
     case THROW_DEST:
-      setToNull ((void **) &left);
+      setToNull ((void *) &left);
       break;
     case THROW_BOTH:
-      setToNull ((void **) &left);
-      setToNull ((void **) &right);
+      setToNull ((void *) &left);
+      setToNull ((void *) &right);
       break;
     }
 

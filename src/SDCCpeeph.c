@@ -1368,7 +1368,7 @@ matchRule (lineNode * pl,
   lineNode *spl;		/* source pl */
   lineNode *rpl;		/* rule peep line */
 
-/*     setToNull((void **) &pr->vars);    */
+/*     setToNull((void *) &pr->vars);    */
 /*     pr->vars = newHashTable(100); */
 
   /* for all the lines defined in the rule */
@@ -2012,7 +2012,7 @@ initPeepHole ()
   if (options.peep_file)
     {
       readRules (s = readFileIntoBuffer (options.peep_file));
-      setToNull ((void **) &s);
+      setToNull ((void *) &s);
     }
 
 

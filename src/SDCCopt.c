@@ -978,7 +978,7 @@ eBBlockFromiCode (iCode * ic)
   port->assignRegisters (ebbs, count);
 
   /* throw away blocks */
-  setToNull ((void **) &graphEdges);
+  setToNull ((void *) &graphEdges);
   ebbs = NULL;
   
   return NULL;

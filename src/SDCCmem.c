@@ -766,7 +766,7 @@ overlay2data ()
       allocIntoSeg (sym);
     }
 
-  setToNull ((void **) &overlay->syms);
+  setToNull ((void *) &overlay->syms);
 
 }
 
@@ -787,7 +787,7 @@ overlay2Set ()
       addSet (&oset, sym);
     }
 
-  setToNull ((void **) &overlay->syms);
+  setToNull ((void *) &overlay->syms);
   addSet (&ovrSetSets, oset);
 
 }

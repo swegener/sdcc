@@ -7132,7 +7132,6 @@ genDummyRead (iCode * ic)
       offset++;
     }
 
-release:
   freeAsmop (right, NULL, ic);
 }
 

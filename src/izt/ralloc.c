@@ -549,7 +549,7 @@ _leastUsedLR (set * sset)
       walk = setNextItem (sset);
     }
 
-  setToNull ((void **) &sset);
+  setToNull ((void *) &sset);
   sym->blockSpil = 0;
 
   return sym;
@@ -915,8 +915,8 @@ izt_assignRegisters (eBBlock ** ebbs, int count)
   applyToSet (_G.spill.set, _deallocStackSpil);
 
   _G.spill.loc = 0;
-  setToNull ((void **) &_G.spill.set);
-  setToNull ((void **) &_G.spill.vect);
+  setToNull ((void *) &_G.spill.set);
+  setToNull ((void *) &_G.spill.vect);
 
   // And free all registers.
   _freeAllRegs ();

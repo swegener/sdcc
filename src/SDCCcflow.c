@@ -281,7 +281,7 @@ immedDom (eBBlock ** ebbs, eBBlock * ebp)
     if (loop->dfnum > idom->dfnum)
       idom = loop;
 
-  setToNull ((void **) &iset);
+  setToNull ((void *) &iset);
   return idom;
 
 }
@@ -396,10 +396,10 @@ computeControlFlow (eBBlock ** ebbs, int count, int reSort)
 
   for (i = 0; i < count; i++)
     {
-      setToNull ((void **) &ebbs[i]->predList);
-      setToNull ((void **) &ebbs[i]->domVect);
-      setToNull ((void **) &ebbs[i]->succList);
-      setToNull ((void **) &ebbs[i]->succVect);
+      setToNull ((void *) &ebbs[i]->predList);
+      setToNull ((void *) &ebbs[i]->domVect);
+      setToNull ((void *) &ebbs[i]->succList);
+      setToNull ((void *) &ebbs[i]->succVect);
       ebbs[i]->visited = 0;
       ebbs[i]->dfnum = 0;
     }
@@ -408,7 +408,7 @@ computeControlFlow (eBBlock ** ebbs, int count, int reSort)
     /* sort it back by block number */
     qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
 
-  setToNull ((void **) &graphEdges);
+  setToNull ((void *) &graphEdges);
   /* this will put in the  */
   /* successor information for each blk */
   eBBSuccessors (ebbs, count);

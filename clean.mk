@@ -11,7 +11,7 @@ clean:
 distclean: clean
 	rm -f config.cache config.log config.status Makefile.common
 	rm -f sdccconf.h main.mk *.dep
-
+	rm ports.all ports.build
 
 # Like clean but some files may still exist
 # -----------------------------------------

@@ -20,8 +20,8 @@ PKGS		= $(SDCC_MISC) $(SDCC_LIBS) $(SDCC_ASLINK) \
 		  src device/include device/lib $(SDCC_PACKIHX)
 PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
 		  src device/include $(SDCC_PACKIHX)
-PORTS		= mcs51 z80
-
+PORTS		= $(shell cat ports.build)
+ALLPORTS	= $(shell cat ports.all)
 
 # Compiling entire program or any subproject
 # ------------------------------------------

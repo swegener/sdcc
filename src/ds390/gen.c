@@ -2219,8 +2219,6 @@ genCall (iCode * ic)
 	  int size = getSize (operandType (IC_RESULT (ic)));
 
 	  /* Special case for 1 or 2 byte return in far space. */
-	  emitcode (";", "Kevin function call abuse #1");
-
 	  MOVA (fReturn[0]);
 	  if (size > 1)
 	    {
@@ -6485,7 +6483,6 @@ _loadLeftIntoAx(char 	**lsb,
   {
        char *leftByte;
        
-       D(emitcode(";", "watch me do the hambone!"););
        _startLazyDPSEvaluation();
        if (AOP_TYPE(left) == AOP_DPTR2)
        {
@@ -8964,12 +8961,44 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
       /* This is a net loss for size == 1, but a big gain
        * otherwise.
        */
-      D (emitcode (";", "genFarFarAssign (improved)");
-	);
 
+// #define BETTER_FAR_FAR_ASSIGN
+#ifdef BETTER_FAR_FAR_ASSIGN
+      if ((IS_SYMOP(result) && OP_SYMBOL(result) && OP_SYMBOL(result)->rname)
+       && (IS_TRUE_SYMOP(result) 
+        || (IS_ITEMP(result) && OP_SYMBOL(result)->isspilt && OP_SYMBOL(result)->usl.spillLoc->rname))) 
+      {
+          D(emitcode(";","genFarFarAssign ('390 auto-toggle fun)"););
+          emitcode("mov", "dps, #21"); 	/* Select DPTR2 & auto-toggle. */
+          if (IS_TRUE_SYMOP(result))
+          {
+          	emitcode ("mov", "dptr,#%s", OP_SYMBOL(result)->rname); 
+          }
+          else
+          {
+                emitcode ("mov", "dptr,#%s", OP_SYMBOL(result)->usl.spillLoc->rname);
+          }
+          /* DP2 = result, DP1 = right, DP1 is current. */
+          while (size)
+          {
+              emitcode("movx", "a,@dptr");
+              emitcode("movx", "@dptr,a");
+              if (--size)
+              {
+              	   emitcode("inc", "dptr");
+              	   emitcode("inc", "dptr");
+              }
+          }
+          emitcode("mov", "dps, #0");
+      }
+      else
+#endif      
+      {
+      D (emitcode (";", "genFarFarAssign (improved)"););
       aopOp (result, ic, TRUE, TRUE);
 
       _startLazyDPSEvaluation ();
+      
       while (size--)
 	{
 	  aopPut (AOP (result),
@@ -8978,12 +9007,12 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
 	}
       _endLazyDPSEvaluation ();
       freeAsmop (result, NULL, ic, FALSE);
+      }
       freeAsmop (right, NULL, ic, FALSE);
     }
   else
     {
-      D (emitcode (";", "genFarFarAssign ");
-	);
+      D (emitcode (";", "genFarFarAssign "););
 
       /* first push the right side on to the stack */
       _startLazyDPSEvaluation ();
@@ -9091,8 +9120,6 @@ genAssign (iCode * ic)
       (AOP_TYPE (right) == AOP_LIT) &&
       !IS_FLOAT (operandType (right)))
     {
-      D (emitcode (";", "Kevin's better literal load code");
-	);
       _startLazyDPSEvaluation ();
       while (size && ((unsigned int) (lit >> (offset * 8)) != 0))
 	{

@@ -1,5 +1,10 @@
 2003-11-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* device/lib/hc08/Makefile: need to clean .rel not .o files
+	* src/hc08/gen.c (genDjnz): can't use djnz with extended addressing mode        
+
+2003-11-06 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/port.h,
 	* src/hc08/main.c,
 	* src/mcs51/main.c,

@@ -7220,6 +7220,10 @@ genDjnz (iCode * ic, iCode * ifx)
   if (operandLitValue (IC_RIGHT (ic)) != 1)
     return 0;
 
+  /* dbnz doesn't support extended mode */
+  if (isOperandInFarSpace (IC_RESULT (ic)))
+    return 0;
+
   /* if the size of this greater than one then no
      saving */
 //  if (getSize (operandType (IC_RESULT (ic))) > 1)

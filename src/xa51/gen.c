@@ -1115,6 +1115,14 @@ static void genCmp (iCode * ic, char *trueInstr, char *falseInstr) {
     instr="cmp.w";
   }
 
+  if (IC_TRUE(ifx)) {
+    isTrue=TRUE;
+    jlbl=IC_TRUE(ifx)->key+100;
+  } else {
+    isTrue=FALSE;
+    jlbl=IC_FALSE(ifx)->key+100;
+  }
+  
   if (!ifx) {
     aopOp(IC_RESULT(ic), !aopIsPtr(left), TRUE);
     jlbl=newiTempLabel(NULL)->key+100;
@@ -1125,16 +1133,7 @@ static void genCmp (iCode * ic, char *trueInstr, char *falseInstr) {
     emitcode("", "%05d$:", jlbl);
   } else {
     emitcode(instr, "%s,%s", AOP_NAME(left)[0], AOP_NAME(right)[0]);
-    if (IC_TRUE(ifx)) {
-      isTrue=TRUE;
-      jlbl=IC_TRUE(ifx)->key+100;
-    } else {
-      isTrue=FALSE;
-      jlbl=IC_FALSE(ifx)->key+100;
-    }
-    
     emitcode(isTrue ? trueInstr : falseInstr, "%05d$", jlbl);
-
     ifx->generated=1;
   }
 

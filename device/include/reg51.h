@@ -25,6 +25,8 @@
 #ifndef REG51_H
 #define REG51_H
 
+#warning This file is obsolete, use #define <8051.h>, or #define <8052.h>
+
 /*  BYTE Register  */
 sfr at 0x80 P0   ;
 sfr at 0x90 P1   ;

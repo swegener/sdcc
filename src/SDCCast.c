@@ -477,8 +477,7 @@ resolveChildren:
 /*-----------------------------------------------------------------*/
 /* setAstLineno - walks a ast tree & sets the line number          */
 /*-----------------------------------------------------------------*/
-int 
-setAstLineno (ast * tree, int lineno)
+int setAstLineno (ast * tree, int lineno)
 {
   if (!tree)
     return 0;
@@ -1520,8 +1519,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
   /* if we reach the end or a leaf then true */
   if (!pbody || IS_AST_LINK (pbody) || IS_AST_VALUE (pbody))
     return TRUE;
-
-
+  
   /* if anything else is "volatile" */
   if (IS_VOLATILE (TETYPE (pbody)))
     return FALSE;
@@ -1532,6 +1530,10 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     {
 /*------------------------------------------------------------------*/
     case '[':
+      // if the loopvar is used as an index
+      if (astHasSymbol(pbody->right, sym)) {
+	return FALSE;
+      }
       return isConformingBody (pbody->right, sym, body);
 
 /*------------------------------------------------------------------*/
@@ -1800,14 +1802,15 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
   rloop = newNode (NULLOP,
 		   createIf (newAst_VALUE (symbolVal (sym)),
 			     newNode (GOTO,
-		   newAst_VALUE (symbolVal (AST_FOR (loop, continueLabel))),
+				      newAst_VALUE (symbolVal (AST_FOR (loop, continueLabel))),
 				      NULL), NULL),
 		   newNode ('=',
 			    newAst_VALUE (symbolVal (sym)),
 			    end));
-
+  
   replLoopSym (loop->left, sym);
-
+  setAstLineno (rloop, init->lineno);
+  
   rloop = newNode (NULLOP,
 		   newNode ('=',
 			    newAst_VALUE (symbolVal (sym)),
@@ -1817,12 +1820,13 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 					 loop->left,
 					 newNode (NULLOP,
 						  newNode (SUB_ASSIGN,
-					     newAst_VALUE (symbolVal (sym)),
-					     newAst_VALUE (constVal ("1"))),
+							   newAst_VALUE (symbolVal (sym)),
+							   newAst_VALUE (constVal ("1"))),
 						  rloop))));
-
+  
+  rloop->lineno=init->lineno;
   return decorateType (rloop);
-
+  
 }
 
 /*-----------------------------------------------------------------*/

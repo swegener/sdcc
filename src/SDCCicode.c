@@ -2991,7 +2991,7 @@ geniCodeFunctionBody (ast * tree,int lvl)
 
   /* create a proc icode */
   ic = newiCode (FUNCTION, func, NULL);
-  ic->lineno = OP_SYMBOL (func)->lineDef;
+  lineno=ic->lineno = OP_SYMBOL (func)->lineDef;
 
   ADDTOCHAIN (ic);
 
@@ -3331,6 +3331,7 @@ ast2iCode (ast * tree,int lvl)
   operand *right = NULL;
   if (!tree)
     return NULL;
+
   /* set the global variables for filename & line number */
   if (tree->filename)
     filename = tree->filename;

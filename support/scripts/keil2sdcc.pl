@@ -5,10 +5,14 @@
 # 22 June 2003
 
 
-# usage:
-#    perl keilconv.pl < keil_header.h > sdcc_header.h
+# usage (UNIX):
+#    perl keil2sdcc.pl < keil_header.h > sdcc_header.h
 # or
-#    perl keilconv.pl keil_header.h > sdcc_header.h
+#    perl keil2sdcc.pl keil_header.h > sdcc_header.h
+#
+# usage (Windows):
+#    perl keil2sdcc.pl keil_header.h > sdcc_header.h
+#
 #
 # keil_header.h and sdcc_header.h must not be the same file since
 # most shells overwrite the output file before opening the input file.

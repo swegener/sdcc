@@ -69,8 +69,8 @@ int _nRegs;
 #define DEBUG_FAKE_EXTRA_REGS	0
 
 static regs _gbz80_regs[] = {
-    { REG_GPR, C_IDX , "b", 1 },
-    { REG_GPR, B_IDX , "c", 1 },
+    { REG_GPR, C_IDX , "c", 1 },
+    { REG_GPR, B_IDX , "b", 1 },
     { REG_CND, CND_IDX, "c", 1}
 };
 

@@ -487,7 +487,7 @@ static void aopOp (operand *op, iCode *ic, bool result)
             aop = op->aop = sym->aop = newAsmop(AOP_STR);
             aop->size = getSize(sym->type);
             for ( i = 0 ; i < 4 ; i++ )
-                aop->aopu.aop_str[i] = "xx"; /*_fReturn[i];*/
+                aop->aopu.aop_str[i] = _fReturn[i];
             return;
         }
 
@@ -1165,6 +1165,8 @@ static void genIpop (iCode *ic)
  */
 static void emitCall (iCode *ic, bool ispcall)
 {
+    int isPrintf = 0;
+
     /* if caller saves & we have not saved then */
     if (!ic->regsSaved) {
 	/* PENDING */
@@ -1173,7 +1175,6 @@ static void emitCall (iCode *ic, bool ispcall)
     /* if send set is not empty then assign */
     if (sendSet) {
 	iCode *sic ;
-
 	for (sic = setFirstItem(sendSet) ; sic ; 
 	     sic = setNextItem(sendSet)) {
 	    int size, offset = 0;
@@ -1209,9 +1210,13 @@ static void emitCall (iCode *ic, bool ispcall)
     }
     else {
 	/* make the call */
-	emitcode("call", "%s", (OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
-				OP_SYMBOL(IC_LEFT(ic))->rname :
-				OP_SYMBOL(IC_LEFT(ic))->name));
+	char *name = OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
+	    OP_SYMBOL(IC_LEFT(ic))->rname :
+	    OP_SYMBOL(IC_LEFT(ic))->name;
+	emitcode("call", "%s", name);
+	if (!strcmp(name, "__printf"))
+	    isPrintf = 1;
+
     }
 
     /* if we need assign a result value */
@@ -1232,6 +1237,9 @@ static void emitCall (iCode *ic, bool ispcall)
     /* adjust the stack for parameters if required */
     if (IC_LEFT(ic)->parmBytes) {
 	int i = IC_LEFT(ic)->parmBytes;
+	emitcode("", ";parmBytes = %u\n", i);
+	if (isPrintf)
+	    i+=2;
 	_pushed -= i;
 	if (i>6) {
 	    emitcode("ld", "hl,#%d", i);
@@ -1366,10 +1374,18 @@ static void genEndFunction (iCode *ic)
 	    emitcode("pop", "ix");
 	    emitcode("pop", "de");
 	}
+	else {
+	    if (_spoffset) {
+		emitcode("ld", "hl,#%d", _spoffset);
+		emitcode("add", "hl,sp");
+		emitcode("ld", "sp,hl");
+	    }
+	}
 	emitcode("pop", "bc");
 	emitcode("ret", "");
     }
-
+    _pushed = 0;
+    _spoffset = 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3485,7 +3501,7 @@ static void genAddrOf (iCode *ic)
     if (sym->onStack) {
         /* if it has an offset  then we need to compute it */
 	if (IS_GB) {
-	    emitcode("lda", "hl,%d(sp)", sym->stack);
+	    emitcode("lda", "hl,%d+%d(sp)", sym->stack, _spoffset);
 	    emitcode("ld", "d,h");
 	    emitcode("ld", "e,l");
 	    aopPut(AOP(IC_RESULT(ic)), "e", 0);

@@ -753,6 +753,7 @@ processParms (ast * func,
   /* make a copy and change the regparm type to the defined parm */
   actParm->etype = getSpec (actParm->ftype = copyLinkChain (actParm->ftype));
   SPEC_REGPARM (actParm->etype) = SPEC_REGPARM (defParm->etype);
+  SPEC_ARGREG  (actParm->etype) = SPEC_ARGREG (defParm->etype);
   (*parmNumber)++;
   return 0;
 }

@@ -91,6 +91,7 @@ typedef struct ast
 	unsigned literalFromCast;	/* true if this is an EX_VALUE of LITERAL 
 					 * type resulting from a typecast.
 					 */
+	int argreg;                     /* argreg number when operand type == EX_OPERAND */
       }
     values;
 
@@ -142,6 +143,8 @@ ast;
 #define AST_VALUE(x)            (x->opval.val)
 #define AST_VALUES(x,y)	(x->values.y)
 #define AST_FOR(x,y) x->values.forVals.y
+#define AST_ARGREG(x) x->values.argreg
+
 #define  IS_AST_PARAM(x)	(IS_AST_OP(x) && x->opval.op == PARAM)
 
 #define  CAN_EVAL(x)	(     x	==  '[' || x == '.' || x == PTR_OP ||	\

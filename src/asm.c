@@ -9,9 +9,12 @@
 #include "common.h"
 #include "asm.h"
 
-#if !defined(__BORLANDC__) && !defined(_MSC_VER)
-// for pipe and close
-#include <unistd.h>
+#if defined __MINGW32__
+   // for O_BINARY in _pipe()
+#  include <fcntl.h>
+#elif !defined(__BORLANDC__) && !defined(_MSC_VER)
+   // for pipe and close
+#  include <unistd.h>
 #endif
 
 /* A 'token' is like !blah or %24f and is under the programmers
@@ -220,7 +223,11 @@ char *printILine (iCode *ic) {
   FILE *pipeStream;
   iCodeTable *icTab=getTableEntry(ic->op);
   
+#if defined __MINGW32__
+  assert(_pipe(filedes, 256, O_BINARY)!=-1); // forget it
+#else
   assert(pipe(filedes)!=-1); // forget it
+#endif
 
   // stuff the pipe with the readable icode
   pipeStream=fdopen(filedes[1],"w");

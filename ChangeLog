@@ -1,3 +1,8 @@
+2003-02-16  Bernhard Held <bernhard@bernhardheld.de>
+
+	* sim/ucsim/mkecho: inserted #!/bin/sh for Cygwin, so that it's executable
+	* src/asm.c: fix pipe() for Mingw32
+
 2003-02-15  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCglue.h: make tmpfileNameSet available for preOutName

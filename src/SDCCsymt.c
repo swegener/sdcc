@@ -318,9 +318,19 @@ pointerTypes (sym_link * ptr, sym_link * type)
     ptr = ptr->next;
 
   /* could not find it */
+#if 0
   if (!ptr || IS_SPEC (ptr) ||
       DCL_TYPE(ptr)!=UPOINTER)
     return;
+#else
+  if (!ptr || IS_SPEC (ptr))
+    return;
+  
+  if (IS_PTR(ptr) && DCL_TYPE(ptr)!=UPOINTER) {
+    pointerTypes (ptr->next, type);
+    return;
+  }
+#endif
 
   /* change the pointer type depending on the
      storage class of the type */
@@ -441,6 +451,8 @@ addDecl (symbol * sym, int type, sym_link * p)
       DCL_TYPE (p) == UPOINTER &&
       DCL_TSPEC (p))
     {
+      fprintf (stderr, "This has to go!\n");
+      exit (43);
       if (!IS_SPEC (sym->etype))
 	{
 	  sym->etype = sym->etype->next = newLink ();

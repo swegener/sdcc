@@ -35,8 +35,14 @@ testShiftRight(void)
     {attr} {storage} {type} i, result;
 
     i = -120;
+    ASSERT(i>>1 == -60);
     ASSERT(i>>2 == -30);
-
+    ASSERT(i>>3 == -15);
+    ASSERT(i>>4 == -8);
+    ASSERT(i>>5 == -4);
+    ASSERT(i>>6 == -2);
+    ASSERT(i>>7 == -1);
+    ASSERT(i>>8 == -1);
     result = i;
     result >>= 3;
     ASSERT(result == -15); 

@@ -1,6 +1,8 @@
-2001-01-04  Bernhard Held  <bernhard@bernhardheld.de>
+2001-01-08  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (processFile): fix processing of ../../src.c
+	* support/regression/Makefile: new target test-mcs51-stack-auto
+	* support/regression/ports/mcs51-stack-auto/spec.mk: added
 
 2001-01-04  Bernhard Held  <bernhard@bernhardheld.de>
 

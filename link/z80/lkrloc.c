@@ -15,7 +15,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 //#include <alloc.h>
+#include <ctype.h>
 #include "aslink.h"
 
 /*)Module	lkrloc.c
@@ -251,7 +253,7 @@ relr()
 	register int mode;
 	register Addr_T reli, relv;
 	int aindex, rindex, rtp, error;
-	Addr_T r, rtbase, rtofst, paga, pags, pc;
+	Addr_T r, rtbase, rtofst, paga = 0, pags = 0, pc;
 	struct areax **a;
 	struct sym **s;
 

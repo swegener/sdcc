@@ -175,7 +175,9 @@ newsym()
 	}
 	fprintf(stderr, "Header symbol list overflow\n");
 	lkexit(1);
+
 	/* Never reached */
+        return 0;
 }
 
 /*)Function	sym *	lkpsym(id,f)
@@ -401,7 +403,7 @@ register char *p1, *p2;
 		if (*p1++ != *p2++)
 			return (0);
 #else
-		if (ccase[*p1++] != ccase[*p2++])
+		if (ccase[(unsigned char)(*p1++)] != ccase[(unsigned char)(*p2++)])
 			return (0);
 #endif
 
@@ -445,7 +447,7 @@ register char *p;
 #if	CASE_SENSITIVE
 		h += *p++;
 #else
-		h += ccase[*p++];
+		h += ccase[(unsigned char)(*p++)];
 #endif
 
 	} while (--n);

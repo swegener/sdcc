@@ -37,7 +37,7 @@ int
 addr(esp)
 register struct expr *esp;
 {
-	register int c, mode, indx;
+	register int c, mode = 0, indx;
 
 	if ((c = getnb()) == '#') {
 		expr(esp, 0);
@@ -62,7 +62,7 @@ register struct expr *esp;
 			esp->e_mode = S_INDM;
 		}
 		if (indx) {
-			esp->e_mode = mode + indx&0xFF;
+			esp->e_mode = (mode + indx)&0xFF;
 			esp->e_base.e_ap = NULL;
 		}
 		if ((c = getnb()) != RTIND)
@@ -159,12 +159,12 @@ register char *str;
 	}
 #else
 	while (*ptr && *str) {
-		if (ccase[*ptr] != ccase[*str])
+		if (ccase[(unsigned char)(*ptr)] != ccase[(unsigned char)(*str)])
 			break;
 		ptr++;
 		str++;
 	}
-	if (ccase[*ptr] == ccase[*str]) {
+	if (ccase[(unsigned char)(*ptr)] == ccase[(unsigned char)(*str)]) {
 		ip = ptr;
 		return(1);
 	}

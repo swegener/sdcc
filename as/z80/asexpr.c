@@ -273,7 +273,7 @@ register struct expr *esp;
         char id[NCPS];
         struct sym  *sp;
         struct tsym *tp;
-        int r, v;
+        int r = 0, v;
 
         c = getnb();
 	/*
@@ -347,7 +347,7 @@ register struct expr *esp;
         if (ctype[c] & DIGIT) {
                 esp->e_mode = S_USER;
                 jp = ip;
-                 while (ctype[*jp] & RAD10) {
+                 while (ctype[(unsigned char)(*jp)] & RAD10) {
                         jp++;
                 }
                 if (*jp == '$') {

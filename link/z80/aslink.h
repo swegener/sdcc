@@ -150,6 +150,7 @@
 /*
  * File types
  */
+#define F_INV	0		/* invalid */
 #define	F_STD	1		/* stdin */
 #define	F_LNK	2		/* File.lnk */
 #define	F_REL	3		/* File.rel */
@@ -712,3 +713,8 @@ extern	VOID		s19();
 
 /* lkihx.c */
 extern	VOID		ihx();
+
+/* lkgb.h */
+VOID gb(int in);
+VOID gg(int in);
+

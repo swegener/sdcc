@@ -16,6 +16,7 @@
 #include <string.h>
 //#include <alloc.h>
 #include "aslink.h"
+#include <stdlib.h>
 
 #ifndef SDK_VERSION_STRING
 #define SDK_VERSION_STRING 	"3.0.0"
@@ -243,7 +244,7 @@ char *argv[];
 			}
 		}
 	}
-	if (startp->f_type == NULL)
+	if (startp->f_type == F_INV)
 		usage();
 	if (startp->f_type == F_LNK && startp->f_idp == NULL)
 		usage();
@@ -261,7 +262,7 @@ char *argv[];
 			break;
 		if (pflag && sfp != stdin)
 			fprintf(stdout, "%s\n", ip);
-		if (*ip == NULL || parse())
+		if (*ip == '\0' || parse())
 			break;
 	}
 	if (sfp)
@@ -376,6 +377,9 @@ char *argv[];
 		}
 	}
 	lkexit(lkerr);
+
+        /* Never get here. */
+        return 0;
 }
 
 /*)Function	VOID	lkexit(i)
@@ -771,6 +775,9 @@ VOID map()
 #endif /* MLH_MAP */
 
 #ifdef SDK
+/* PENDING */
+VOID lstareatosym(struct area *xp);
+
 VOID sym()
 {
 	/*
@@ -886,8 +893,6 @@ parse()
 							while(get() != '"')
 								;
 					} else if(c == 'P' || c == 'p') {
-						unsigned int addr;
-						unsigned char value;
 						patch *p = patches;
 
 						patches = (patch *)malloc(sizeof(patch));

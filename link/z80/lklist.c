@@ -337,7 +337,7 @@ VOID lstarea(struct area *xp)
 	register struct areax *oxp;
 	register int i, j;
 	int nmsym;
-	Addr_T a0, ai, aj;
+	Addr_T a0, ai = 0, aj = 0;
 	struct sym *sp;
 	struct sym **p;
 
@@ -1263,7 +1263,7 @@ char *str;
 	int i;
 
 	for (i=0; i<n; i++) {
-		if ((ctype[*str++] & rdx) == 0)
+		if ((ctype[(unsigned char)(*str++)] & rdx) == 0)
 			return(0);
 	}
 	return(1);

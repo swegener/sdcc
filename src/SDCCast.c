@@ -2025,6 +2025,33 @@ decorateType (ast * tree)
 				     (tree->right->type == EX_VALUE ?
 			       tree->right->opval.val : NULL));
       TETYPE (tree) = getSpec (TTYPE (tree));
+
+      /* adjust the storage class */
+      switch (DCL_TYPE(tree->left->ftype)) {
+      case POINTER:
+      	break;
+      case FPOINTER:
+       	SPEC_SCLS(TETYPE(tree)) = S_XDATA; 
+      	break;
+      case CPOINTER:
+       	SPEC_SCLS(TETYPE(tree)) = S_CODE; 
+      	break;
+      case GPOINTER:
+      	break;
+      case PPOINTER:
+       	SPEC_SCLS(TETYPE(tree)) = S_XSTACK; 
+      	break;
+      case IPOINTER:
+       	SPEC_SCLS(TETYPE(tree)) = S_IDATA;
+      	break;
+      case EEPPOINTER:
+       	SPEC_SCLS(TETYPE(tree)) = S_EEPROM;
+      	break;
+      case UPOINTER:
+      case ARRAY:
+      case FUNCTION:
+      }
+
       return tree;
 
 /*------------------------------------------------------------------*/

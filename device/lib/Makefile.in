@@ -223,7 +223,7 @@ port-specific-objects:
 port-specific-objects-pic16:
 	if [ -d $(PORT) ]; then \
 	  $(MAKE) -C $(PORT); \
-	  cp -f $(PORT)/*.lib $(PORT)/*$(OEXT) $(PORTDIR); \
+	  cp -f $(PORT)/*.lib $(PORTDIR); \
 	fi
 
 lib-files:

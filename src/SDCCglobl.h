@@ -7,25 +7,43 @@
 #include <setjmp.h>
 #include <stdio.h>
 
-#if defined(_MSC_VER)
-#	include "sdcc_vc.h"
-#else
-#	include "sdccconf.h"
+/*
+ * Define host port dependant constants etc.
+ */
+
+# define DOS_DIR_SEPARATOR_CHAR	    '\\'
+# define DOS_DIR_SEPARATOR_STRING   "\\"
+# define UNIX_DIR_SEPARATOR_CHAR    '/'
+# define UNIX_DIR_SEPARATOR_STRING  "/"
+
+#if defined(__BORLANDC__)	/* Borland Turbo C/Win32 Host */
+
+# define NATIVE_WIN32 		1
+# define DIR_SEPARATOR_CHAR	    DOS_DIR_SEPARATOR_CHAR
+# define DIR_SEPARATOR_STRING	    DOS_DIR_SEPARATOR_STRING
+
+#elif defined(_MSC_VER)		/* Miscosoft VC6/Win32 Host */
+
+# define NATIVE_WIN32 		1
+# include "sdcc_vc.h"
+# define DIR_SEPARATOR_CHAR	    DOS_DIR_SEPARATOR_CHAR
+# define DIR_SEPARATOR_STRING	    DOS_DIR_SEPARATOR_STRING
+
+#elif defined(__MINGW32__)	/* MINGW32 DOS Host */
+
+# define NATIVE_WIN32		1
+# define DIR_SEPARATOR_CHAR	    DOS_DIR_SEPARATOR_CHAR
+# define DIR_SEPARATOR_STRING	    DOS_DIR_SEPARATOR_STRING
+
+#else				/* Assume Un*x style system */
+
+# include "sdccconf.h"
+# define DIR_SEPARATOR_CHAR	    UNIX_DIR_SEPARATOR_CHAR
+# define DIR_SEPARATOR_STRING	    UNIX_DIR_SEPARATOR_STRING
+
 #endif	// _MSC_VER
 
 #include "SDCCerr.h"
-
-#if defined(_MSC_VER)
-#	define NATIVE_WIN32 		1
-#endif
-
-#ifdef __BORLANDC__
-#define NATIVE_WIN32 		1
-#endif
-
-#ifdef __MINGW32__
-#define NATIVE_WIN32		1
-#endif
 
 #define SPACE ' '
 #define ZERO  0

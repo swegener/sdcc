@@ -363,7 +363,11 @@ printVersionInfo ()
 #ifdef __DJGPP__
 	   " (DJGPP) \n"
 #else
+#if defined(_MSC_VER)
+	   " (WIN32) \n"
+#else
 	   " (UNIX) \n"
+#endif
 #endif
 #endif
 
@@ -1260,18 +1264,13 @@ parseCmdLine (int argc, char **argv)
 /* my_system - will call a program with arguments                  */
 /*-----------------------------------------------------------------*/
 
-#if defined(_MSC_VER)
 
-char *try_dir[] =
-{DefaultExePath, NULL};		// TODO : Fill in some default search list
 
-#else
 
 //char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
 char *try_dir[] =
 {NULL, NULL}; /* First entry may be overwritten, so use two. */
 
-#endif
 
 #ifdef USE_SYSTEM_SYSTEM_CALLS
 int 
@@ -1285,13 +1284,16 @@ my_system (const char *cmd)
   // try to find the command in predefined path's
   while (try_dir[i])
     {
-      cmdLine = (char *) malloc (strlen (try_dir[i]) + strlen (cmd) + 10);
+      cmdLine = (char *) Safe_malloc (strlen (try_dir[i]) + strlen (cmd) + 10);
       strcpy (cmdLine, try_dir[i]);	// the path
 
-      strcat (cmdLine, "/");
+      strcat (cmdLine, DIR_SEPARATOR_STRING);
       strncat (cmdLine, cmd, argsStart);	// the command
+
 #if NATIVE_WIN32
       strcat (cmdLine, ".exe");
+
+#if 0
       /* Mung slashes into backslashes to keep WIndoze happy. */
       {
 	char *r = cmdLine;
@@ -1305,6 +1307,8 @@ my_system (const char *cmd)
 	  }
       }
 #endif
+#endif
+
       if (access (cmdLine, X_OK) == 0)
 	{
 	  // the arguments
@@ -1723,35 +1727,17 @@ main (int argc, char **argv, char **envp)
   if (port->init)
     port->init ();
 
-#if defined(_MSC_VER)
-
-  {
-    int i;
-
     // Create a default exe search path from the path to the sdcc command
 
-    strcpy (DefaultExePath, argv[0]);
 
-    for (i = strlen (DefaultExePath); i > 0; i--)
-      if (DefaultExePath[i] == '\\')
-	{
-	  DefaultExePath[i] = '\0';
-	  break;
-	}
 
-    if (i == 0)
-      DefaultExePath[0] = '\0';
-  }
-#else
-
-  if (strchr(argv[0], '/'))
+  if (strchr(argv[0], DIR_SEPARATOR_CHAR))
   {
       strcpy(DefaultExePath, argv[0]);
-      *(strrchr(DefaultExePath, '/')) = 0;
+      *(strrchr(DefaultExePath, DIR_SEPARATOR_CHAR)) = 0;
       try_dir[0] = DefaultExePath;
   }
 
-#endif
 
   setDefaultOptions ();
   parseCmdLine (argc, argv);

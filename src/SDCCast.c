@@ -3198,7 +3198,8 @@ decorateType (ast * tree)
 	goto errorTreeReturn;
       }
 
-      if (options.stackAuto || IFFUNC_ISREENT (LTYPE (tree)))
+      if ((options.stackAuto || IFFUNC_ISREENT (LTYPE (tree))) && 
+	  !IFFUNC_ISBUILTIN(LTYPE(tree)))
 	{
 	  //FUNC_ARGS(tree->left->ftype) = 
 	  //reverseVal (FUNC_ARGS(tree->left->ftype));

@@ -68,9 +68,7 @@ programs is:
 	--pcode-verbose	enable verbose pcode generator messages
 
 - port options
-	--pgen-banksel	enable banksel directives for the assembler
-			This will be turned on by default later, but left as
-			is for now
+	--pno-banksel	disable banksel directives for the assembler
 	--pomit-config-words	does not emit configuration instruction in
 			the translation This is useful when copmiling
 			multiple sources, when you do not want multiple

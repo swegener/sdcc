@@ -103,12 +103,77 @@ const char *pic16_AopType(short type)
   return "BAD TYPE";
 }
 
-const char *pic16_pCodeOpType(  pCodeOp *pcop)
+const char *pic16_pCodeOpType(pCodeOp *pcop)
 {
 
   if(pcop) {
 
     switch(pcop->type) {
+
+    case  PO_NONE:
+      return "PO_NONE";
+    case  PO_W:
+      return  "PO_W";
+    case  PO_WREG:
+      return  "PO_WREG";
+    case  PO_STATUS:
+      return  "PO_STATUS";
+    case  PO_BSR:
+      return  "PO_BSR";
+    case  PO_FSR0:
+      return  "PO_FSR0";
+    case  PO_INDF0:
+      return  "PO_INDF0";
+    case  PO_INTCON:
+      return  "PO_INTCON";
+    case  PO_GPR_REGISTER:
+      return  "PO_GPR_REGISTER";
+    case  PO_GPR_BIT:
+      return  "PO_GPR_BIT";
+    case  PO_GPR_TEMP:
+      return  "PO_GPR_TEMP";
+    case  PO_SFR_REGISTER:
+      return  "PO_SFR_REGISTER";
+    case  PO_PCL:
+      return  "PO_PCL";
+    case  PO_PCLATH:
+      return  "PO_PCLATH";
+    case  PO_PCLATU:
+      return  "PO_PCLATU";
+    case  PO_PRODL:
+      return  "PO_PRODL";
+    case  PO_PRODH:
+      return  "PO_PRODH";
+    case PO_LITERAL:
+      return  "PO_LITERAL";
+    case PO_REL_ADDR:
+      return "PO_REL_ADDR";
+    case  PO_IMMEDIATE:
+      return  "PO_IMMEDIATE";
+    case  PO_DIR:
+      return  "PO_DIR";
+    case  PO_CRY:
+      return  "PO_CRY";
+    case  PO_BIT:
+      return  "PO_BIT";
+    case  PO_STR:
+      return  "PO_STR";
+    case  PO_LABEL:
+      return  "PO_LABEL";
+    case  PO_WILD:
+      return  "PO_WILD";
+    }
+  }
+
+  return "BAD PO_TYPE";
+}
+
+const char *pic16_pCodeOpSubType(pCodeOp *pcop)
+{
+
+  if(pcop && (pcop->type == PO_GPR_BIT)) {
+
+    switch(PCORB(pcop)->subtype) {
 
     case  PO_NONE:
       return "PO_NONE";
@@ -1025,7 +1090,7 @@ void pic16_genPlus (iCode *ic)
 				// right is signed, oh dear ...
 				for(i=size; i< AOP_SIZE(result); i++) {
 					pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),i));
-					pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(result),size-1,FALSE,FALSE),7,0));
+					pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(result),size-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 					pic16_emitpcode(POC_COMF, pic16_popGet(AOP(result),i));
 					pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(left),i));
 					pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),i));
@@ -1076,7 +1141,7 @@ void pic16_genPlus (iCode *ic)
 				for(i=size; i< AOP_SIZE(result); i++) {
 					if(size < AOP_SIZE(left)) {
 						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-						pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),size-1,FALSE,FALSE),7,0));
+						pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),size-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 						pic16_emitpcode(POC_COMFW, pic16_popCopyReg(&pic16_pc_wreg));
 						if (pic16_sameRegs(AOP(left), AOP(result)))
 						{
@@ -1116,15 +1181,15 @@ void pic16_genPlus (iCode *ic)
 			/* Now this is really horrid. Gotta check the sign of the addends and propogate
 			* to the result */
 
-			pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_LEFT(ic)),offset-1,FALSE,FALSE),7,0));
+			pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_LEFT(ic)),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 			pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
-			pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_RIGHT(ic)),offset-1,FALSE,FALSE),7,0));
+			pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_RIGHT(ic)),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 			pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(IC_RESULT(ic)),offset));
 
 			/* if chars or ints or being signed extended to longs: */
 			if(size) {
 				pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0));
-				pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE),7,0));
+				pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 				pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0xff));
 			}
 		}
@@ -1268,12 +1333,12 @@ void pic16_addSign(operand *result, int offset, int sign)
 
       if(size == 1) {
 	pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),offset));
-	pic16_emitpcode(POC_BTFSC,pic16_newpCodeOpBit(pic16_aopGet(AOP(result),offset-1,FALSE,FALSE),7,0));
+	pic16_emitpcode(POC_BTFSC,pic16_newpCodeOpBit(pic16_aopGet(AOP(result),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 	pic16_emitpcode(POC_DECF, pic16_popGet(AOP(result),offset));
       } else {
 
 	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0));
-	pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(result),offset-1,FALSE,FALSE),7,0));
+	pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(result),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
 	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0xff));
 	while(size--)
 	  pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset+size));
@@ -1345,8 +1410,8 @@ void pic16_genMinus (iCode *ic)
 
   /* if I can do an decrement instead
      of subtract then GOOD for ME */
-  //  if (pic16_genMinusDec (ic) == TRUE)
-  //    goto release;   
+//  if (pic16_genMinusDec (ic) == TRUE)
+//    goto release;   
 
   size = pic16_getDataSize(IC_RESULT(ic));   
   same = pic16_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic)));
@@ -2006,10 +2071,10 @@ void pic16_genSMult8X8_8 (operand *left,
 
   
 #if 0
-  pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),0,FALSE,FALSE),7,0));
+  pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),0,FALSE,FALSE),7,0, PO_GPR_REGISTER));
   pic16_emitpcode(POC_SUBWF, pic16_popCopyReg(result_hi));
   pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),0));
-  pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),0,FALSE,FALSE),7,0));
+  pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),0,FALSE,FALSE),7,0, PO_GPR_REGISTER));
   pic16_emitpcode(POC_SUBWF, pic16_popGet(AOP(result),1));
 #endif
 }

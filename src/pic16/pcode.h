@@ -267,19 +267,20 @@ typedef enum
   POC_SUBFWB_D1,
   POC_SWAPF,
   POC_SWAPFW,
-//  POC_TRIS , // To be removed
-  POC_TBLRD,		// patch 15
-  POC_TBLRD_POSTINC,	//
-  POC_TBLRD_POSTDEC,	//
-  POC_TBLRD_PREINC,	//
-  POC_TBLWT,		//
-  POC_TBLWT_POSTINC,	//
-  POC_TBLWT_POSTDEC,	//
-  POC_TBLWT_PREINC,	// patch 15
+  POC_TBLRD,
+  POC_TBLRD_POSTINC,
+  POC_TBLRD_POSTDEC,
+  POC_TBLRD_PREINC,
+  POC_TBLWT,
+  POC_TBLWT_POSTINC,
+  POC_TBLWT_POSTDEC,
+  POC_TBLWT_PREINC,
   POC_TSTFSZ,
   POC_XORLW,
   POC_XORWF,
-  POC_XORFW
+  POC_XORFW,
+
+  POC_BANKSEL
 } PIC_OPCODE;
 
 
@@ -925,7 +926,7 @@ pCodeOp *pic16_newpCodeOpLabel(char *name, int key);
 pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space);
 pCodeOp *pic16_newpCodeOpLit(int lit);
 pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2);
-pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace);
+pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace, PIC_OPTYPE subt);
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name);
 pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE p);
 pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop);

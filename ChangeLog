@@ -1,3 +1,43 @@
+2004-06-30 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/Makefile.in: fixed bug in target objects-pic16,
+	* device/lib/pic16/Makefile: prefixed with dash (-) command under
+	target 'clean',
+	* doc/sdccman.lyx: changed version to 2.4.2 and added some port
+	specific command line arguments. Also added sample lkr script
+	for placing a variable at a specific memory bank.
+	* src/pic16/device.c (pic16_dump_gsection): NEW, to dump variables
+	at a specific memory bank,
+	* (pic16_dump_isection): fixed bug which caused string literals to
+	be omitted when dumping idata section,
+	* (pic16_groupRegistersInSection): added code to handle registers
+	in specific memory banks,
+	* src/pic16/gen.c: labelOffset is prefixed with pic16_ and made
+	public, all references are renamed too,
+	* (pic16_aopGet): removed switch cases for AOP_R0,AOP_R1,AOP_DPTR,
+	AOP_DPTR2,
+	* (pic16_storeForReturn): added case to handle when dest is WREG,
+	* src/pic16/genarith.c (pic16_pCodeOpSubType): NEW,
+	* src/pic16/glue.c (pic16emitRegularMap): when adding a register in
+	pic16_rel_udata, check to see if that register is marked as being
+	a member of a specific memory bank,
+	* (pic16_printIvalCharPtr): added code to add string literals either
+	to code or the idata sections,
+	* src/pic16/main.c (_process_pragma): added \n to WHITE constant,
+	also accept the 'udata' pragma,
+	* src/pic16/main.h: new structure types sectName and sectSym
+	* src/pic16/pcode.c: added new pCodeInstruction entry for BANKSEL
+	* (newpCodeOpBit): added PIC_OPTYPE subt in function prototype,
+	* (pic16_findPrevInstruction): fixed, it returned nothing,
+	* (insertBankSwitch): fixed to emit banksel/skip and skip/banksel
+	instruction combinations,
+	* (pic16_FixRegisterBanking): heavily reorganised,
+	* (pic16_AnalyzeBanking): if generating banksel directives is
+	disabled, then don't call FixRegisterBanking at all,
+	* src/pic16/ralloc.c (bitEQUs, aliasEQUs, allDefsOutOfRange):
+	completely removed,
+	* (pic16_writeUsedRegisters): added call to pic16_dump_gsection
+
 2004-06-29 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCglue.c (printChar): fixed bug #973350, patch provided by

@@ -2690,6 +2690,33 @@ pCodeInstruction pic16_pciXORLW = {
 };
 
 
+pCodeInstruction pic16_pciBANKSEL = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_BANKSEL,
+  "BANKSEL",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,   // inCond
+  PCC_NONE, // outCond
+  PCI_MAGIC
+};
+
+
 #define MAX_PIC16MNEMONICS 100
 pCodeInstruction *pic16Mnemonics[MAX_PIC16MNEMONICS];
 
@@ -2999,7 +3026,7 @@ void pic16initMnemonics(void)
   pic16Mnemonics[POC_RETURN] = &pic16_pciRETURN;
   pic16Mnemonics[POC_RLCF] = &pic16_pciRLCF;
   pic16Mnemonics[POC_RLCFW] = &pic16_pciRLCFW;
-  pic16Mnemonics[POC_RLNCF] = &pic16_pciRLNCF; // was [POC_RLCF] !!!
+  pic16Mnemonics[POC_RLNCF] = &pic16_pciRLNCF;
   pic16Mnemonics[POC_RLNCFW] = &pic16_pciRLNCFW;
   pic16Mnemonics[POC_RRCF] = &pic16_pciRRCF;
   pic16Mnemonics[POC_RRCFW] = &pic16_pciRRCFW;
@@ -3015,18 +3042,19 @@ void pic16initMnemonics(void)
   pic16Mnemonics[POC_SUBFWB_D1] = &pic16_pciSUBFWB_D1;
   pic16Mnemonics[POC_SWAPF] = &pic16_pciSWAPF;
   pic16Mnemonics[POC_SWAPFW] = &pic16_pciSWAPFW;
-  pic16Mnemonics[POC_TBLRD] = &pic16_pciTBLRD;			// patch 15
-  pic16Mnemonics[POC_TBLRD_POSTINC] = &pic16_pciTBLRD_POSTINC;	//
-  pic16Mnemonics[POC_TBLRD_POSTDEC] = &pic16_pciTBLRD_POSTDEC;	//
-  pic16Mnemonics[POC_TBLRD_PREINC] = &pic16_pciTBLRD_PREINC;	//
-  pic16Mnemonics[POC_TBLWT] = &pic16_pciTBLWT;			//
-  pic16Mnemonics[POC_TBLWT_POSTINC] = &pic16_pciTBLWT_POSTINC;	//
-  pic16Mnemonics[POC_TBLWT_POSTDEC] = &pic16_pciTBLWT_POSTDEC;	//
-  pic16Mnemonics[POC_TBLWT_PREINC] = &pic16_pciTBLWT_PREINC;	// patch 15
+  pic16Mnemonics[POC_TBLRD] = &pic16_pciTBLRD;
+  pic16Mnemonics[POC_TBLRD_POSTINC] = &pic16_pciTBLRD_POSTINC;
+  pic16Mnemonics[POC_TBLRD_POSTDEC] = &pic16_pciTBLRD_POSTDEC;
+  pic16Mnemonics[POC_TBLRD_PREINC] = &pic16_pciTBLRD_PREINC;
+  pic16Mnemonics[POC_TBLWT] = &pic16_pciTBLWT;
+  pic16Mnemonics[POC_TBLWT_POSTINC] = &pic16_pciTBLWT_POSTINC;
+  pic16Mnemonics[POC_TBLWT_POSTDEC] = &pic16_pciTBLWT_POSTDEC;
+  pic16Mnemonics[POC_TBLWT_PREINC] = &pic16_pciTBLWT_PREINC;
   pic16Mnemonics[POC_TSTFSZ] = &pic16_pciTSTFSZ;
   pic16Mnemonics[POC_XORLW] = &pic16_pciXORLW;
   pic16Mnemonics[POC_XORWF] = &pic16_pciXORWF;
   pic16Mnemonics[POC_XORFW] = &pic16_pciXORFW;
+  pic16Mnemonics[POC_BANKSEL] = &pic16_pciBANKSEL;
 
   for(i=0; i<MAX_PIC16MNEMONICS; i++)
     if(pic16Mnemonics[i])
@@ -3923,12 +3951,13 @@ pCodeOp *pic16_newpCodeOpWild2(int id, int id2, pCodeWildBlock *pcwb, pCodeOp *s
   return pcop;
 }
 
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace)
+pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace, PIC_OPTYPE subt)
 {
   pCodeOp *pcop;
-
+  
   pcop = Safe_calloc(1,sizeof(pCodeOpRegBit) );
   pcop->type = PO_GPR_BIT;
   if(s)
@@ -3938,12 +3967,14 @@ pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace)
 
   PCORB(pcop)->bit = bit;
   PCORB(pcop)->inBitSpace = inBitSpace;
+  PCORB(pcop)->subtype = subt;
 
   /* pCodeOpBit is derived from pCodeOpReg. We need to init this too */
   PCOR(pcop)->r = NULL;
   PCOR(pcop)->rIdx = 0;
   return pcop;
 }
+
 
 /*-----------------------------------------------------------------*
  * pCodeOp *pic16_newpCodeOpReg(int rIdx) - allocate a new register
@@ -4010,7 +4041,7 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
   switch(type) {
   case PO_BIT:
   case PO_GPR_BIT:
-    pcop = pic16_newpCodeOpBit(name, -1,0);
+    pcop = pic16_newpCodeOpBit(name, -1,0, type);
     break;
 
   case PO_LITERAL:
@@ -4104,6 +4135,8 @@ void pic16_emitDB(char c, char ptype, void *p)
 	l = strlen(DBd.buffer);
 	sprintf(DBd.buffer+l,"%s0x%02x", (DBd.count>0?", ":""), c & 0xff);
 
+//	fprintf(stderr, "%s:%d DBbuffer: '%s'\n", __FILE__, __LINE__, DBd.buffer);
+	
 	DBd.count++;
 	if (DBd.count>= DB_ITEMS_PER_LINE)
 		pic16_flushDB(ptype, p);
@@ -4122,6 +4155,8 @@ void pic16_emitDS(char *s, char ptype, void *p)
 
 	l = strlen(DBd.buffer);
 	sprintf(DBd.buffer+l,"%s%s", (DBd.count>0?", ":""), s);
+
+//	fprintf(stderr, "%s:%d DBbuffer: '%s'\n", __FILE__, __LINE__, DBd.buffer);
 
 	DBd.count++;	//=strlen(s);
 	if (DBd.count>=16)
@@ -4987,9 +5022,9 @@ static pBranch *pBranchFind(pBranch *pb,pCode *pc)
 }
 
 /*-----------------------------------------------------------------*/
-/* pCodeUnlink - Unlink the given pCode from its pCode chain.      */
+/* pic16_pCodeUnlink - Unlink the given pCode from its pCode chain.      */
 /*-----------------------------------------------------------------*/
-static void pCodeUnlink(pCode *pc)
+void pic16_pCodeUnlink(pCode *pc)
 {
   pBranch *pb1,*pb2;
   pCode *pc1;
@@ -5007,21 +5042,21 @@ static void pCodeUnlink(pCode *pc)
 
   /* Remove the branches */
 
-  pb1 = pc->from;
+  pb1 = PCI(pc)->from;
   while(pb1) {
-    pc1 = pb1->pc;    /* Get the pCode that branches to the
+    PCI(pc1) = pb1->pc;    /* Get the pCode that branches to the
 		       * one we're unlinking */
 
     /* search for the link back to this pCode (the one we're
      * unlinking) */
-    if(pb2 = pBranchFind(pc1->to,pc)) {
-      pb2->pc = pc->to->pc;  // make the replacement
+    if((pb2 = pBranchFind(PCI(pc1)->to,pc))) {
+      pb2->pc = PCI(pc)->to->pc;  // make the replacement
 
       /* if the pCode we're unlinking contains multiple 'to'
        * branches (e.g. this a skip instruction) then we need
        * to copy these extra branches to the chain. */
-      if(pc->to->next)
-	pic16_pBranchAppend(pb2, pc->to->next);
+      if(PCI(pc)->to->next)
+	pic16_pBranchAppend(pb2, PCI(pc)->to->next);
     }
     
     pb1 = pb1->next;
@@ -5217,7 +5252,7 @@ pCode * pic16_findNextInstruction(pCode *pci)
 }
 
 /*-----------------------------------------------------------------*/
-/* pic16_findNextInstruction - given a pCode, find the next instruction  */
+/* pic16_findPrevInstruction - given a pCode, find the next instruction  */
 /*                       in the linked list                        */
 /*-----------------------------------------------------------------*/
 pCode * pic16_findPrevInstruction(pCode *pci)
@@ -5225,6 +5260,8 @@ pCode * pic16_findPrevInstruction(pCode *pci)
   pCode *pc = pci;
 
   while(pc) {
+    pc = pc->prev;
+
     if((pc->type == PC_OPCODE)
     	|| (pc->type == PC_WILD)
     	|| (pc->type == PC_ASMDIR)
@@ -5236,7 +5273,6 @@ pCode * pic16_findPrevInstruction(pCode *pci)
     fprintf(stderr,"pic16_findPrevInstruction:  ");
     printpCode(stderr, pc);
 #endif
-    pc = pc->next;
   }
 
   //fprintf(stderr,"Couldn't find instruction\n");
@@ -5272,7 +5308,7 @@ static pCode * findFunctionEnd(pCode *pc)
 static void AnalyzeLabel(pCode *pc)
 {
 
-  pCodeUnlink(pc);
+  pic16_pCodeUnlink(pc);
 
 }
 #endif
@@ -5327,8 +5363,6 @@ regs * pic16_getRegFromInstruction(pCode *pc)
   case PO_FSR0:
     return PCOR(PCI(pc)->pcop)->r;
 
-    //    return typeRegWithIdx (PCOR(PCI(pc)->pcop)->rIdx, REG_SFR, 0);
-
   case PO_BIT:
   case PO_GPR_TEMP:
 //	fprintf(stderr, "pic16_getRegFromInstruction - bit or temp\n");
@@ -5338,16 +5372,13 @@ regs * pic16_getRegFromInstruction(pCode *pc)
     if(PCOI(PCI(pc)->pcop)->r)
       return (PCOI(PCI(pc)->pcop)->r);
 
-    //fprintf(stderr, "pic16_getRegFromInstruction - immediate\n");
-    return pic16_dirregWithName(PCI(pc)->pcop->name);
-    //return NULL; // PCOR(PCI(pc)->pcop)->r;
-
   case PO_GPR_BIT:
     return PCOR(PCI(pc)->pcop)->r;
 
   case PO_DIR:
 //	fprintf(stderr, "pic16_getRegFromInstruction - dir\n");
     return PCOR(PCI(pc)->pcop)->r;
+
   case PO_LITERAL:
     //fprintf(stderr, "pic16_getRegFromInstruction - literal\n");
     break;
@@ -5356,7 +5387,7 @@ regs * pic16_getRegFromInstruction(pCode *pc)
 //	fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
 //	genericPrint(stderr, pc);
 //	assert( 0 );
-    break;
+	break;
   }
 
   return NULL;
@@ -5924,8 +5955,11 @@ int pic16_isPCinFlow(pCode *pc, pCode *pcflow)
 /*                                                                 */
 /* position == 0: insert before                                    */
 /* position == 1: insert after pc                                  */
-/* position == 2: 0 previous was a skip instruction                */
+/* position == 2: like 0 but previous was a skip instruction       */
 /*-----------------------------------------------------------------*/
+pCodeOp *pic16_popGetLabel(unsigned int key);
+extern int pic16_labelOffset;
+
 static void insertBankSwitch(int position, pCode *pc)
 {
   pCode *new_pc;
@@ -5937,13 +5971,15 @@ static void insertBankSwitch(int position, pCode *pc)
 	/* emit BANKSEL [symbol] */
 
 	reg = pic16_getRegFromInstruction(pc);
-	if(!reg)return;
+	if(!reg) {
+		if(!(PCI(pc)->pcop && PCI(pc)->pcop->type == PO_GPR_BIT))return;
+	}
 	new_pc = pic16_newpCodeAsmDir("BANKSEL", "%s", pic16_get_op_from_instruction(PCI(pc)));
 	
 //	position = 0;		// position is always before (sanity check!)
 
 #if 0
-	fprintf(stderr, "%s:%d: inserting bank switch\tbank = %d\n", __FUNCTION__, __LINE__, bsr);
+	fprintf(stderr, "%s:%d: inserting bank switch\n", __FUNCTION__, __LINE__);
 	pc->print(stderr, pc);
 #endif
 
@@ -5951,27 +5987,65 @@ static void insertBankSwitch(int position, pCode *pc)
 		case 1: {
 			/* insert the bank switch after this pc instruction */
 			pCode *pcnext = pic16_findNextInstruction(pc);
-			pic16_pCodeInsertAfter(pc, new_pc);
-			if(pcnext)pc = pcnext;
+
+				pic16_pCodeInsertAfter(pc, new_pc);
+				if(pcnext)pc = pcnext;
 		}; break;
 		
 		case 0:
 			/* insert the bank switch BEFORE this pc instruction */
 			pic16_pCodeInsertAfter(pc->prev, new_pc);
 			break;
+
+		case 2: {
+			/* just like 0, but previous was a skip instruction,
+			 * so some care should be taken */
+			  symbol *tlbl;
+			  pCode *pcnext, *pcprev, *npci;;
+			  PIC_OPCODE ipci;
+			  
+			  	pic16_labelOffset += 10000;
+			  	tlbl = newiTempLabel(NULL);
+			  	
+			  	/* invert skip instruction */
+				pcprev = pic16_findPrevInstruction(pc);
+				ipci = PCI(pcprev)->inverted_op;
+				npci = pic16_newpCode(ipci, PCI(pcprev)->pcop);
+
+#if 1
+				PCI(npci)->from = PCI(pcprev)->from;
+				PCI(npci)->to = PCI(pcprev)->to;
+				PCI(npci)->label = PCI(pcprev)->label;
+				PCI(npci)->pcflow = PCI(pcprev)->pcflow;
+				PCI(npci)->cline = PCI(pcprev)->cline;
+#endif
+
+//				memmove(PCI(pcprev), PCI(npci), sizeof(pCode) + sizeof(PIC_OPCODE) + sizeof(char const * const));
+
+#if 1
+				pic16_pCodeInsertAfter(pcprev->prev, npci);
+				/* unlink the pCode */
+				pcprev->prev->next = pcprev->next;
+				pcprev->next->prev = pcprev->prev;
+#endif
+				
+				pcnext = pic16_newpCode(POC_GOTO, pic16_popGetLabel(tlbl->key));
+			  	pic16_pCodeInsertAfter(pc->prev, pcnext);
+			  	pic16_pCodeInsertAfter(pc->prev, new_pc);
+			  	
+			  	pcnext = pic16_newpCodeLabel(NULL,tlbl->key+100+pic16_labelOffset);
+			  	pic16_pCodeInsertAfter(pc, pcnext);
+			}; break;
 	}
 	
 
 	/* Move the label, if there is one */
-
 	if(PCI(pc)->label) {
 //		fprintf(stderr, "%s:%d: moving label due to bank switch directive src= 0x%p dst= 0x%p\n",
 //			__FILE__, __LINE__, pc, new_pc);
 		PCAD(new_pc)->pci.label = PCI(pc)->label;
 		PCI(pc)->label = NULL;
 	}
-
-//  fprintf(stderr, "BankSwitch has been inserted\n");
 }
 
 
@@ -6357,6 +6431,12 @@ static int OptimizepCode(char dbName)
   return matches;
 }
 
+
+
+const char *pic16_pCodeOpType(pCodeOp *pcop);
+const char *pic16_pCodeOpSubType(pCodeOp *pcop);
+
+
 /*-----------------------------------------------------------------*/
 /* pic16_popCopyGPR2Bit - copy a pcode operator                          */
 /*-----------------------------------------------------------------*/
@@ -6365,7 +6445,8 @@ pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval)
 {
   pCodeOp *pcop;
 
-  pcop = pic16_newpCodeOpBit(pc->name, bitval, 0);
+//  fprintf(stderr, "%s:%d pc type: %s\n", __FILE__, __LINE__, pic16_pCodeOpType(pc));
+  pcop = pic16_newpCodeOpBit(pc->name, bitval, 0, pc->type);
 
   if( !( (pcop->type == PO_LABEL) ||
 	 (pcop->type == PO_LITERAL) ||
@@ -6395,102 +6476,81 @@ static void pic16_FixRegisterBanking(pBlock *pb)
   pCode *pc=NULL;
   pCode *pcprev=NULL;
   regs *reg, *prevreg;
-
+  int flag=0;
+  
 	if(!pb)
 		return;
 
 	pc = pic16_findNextpCode(pb->pcHead, PC_OPCODE);
-	if(!pc)
-		return;
+	if(!pc)return;
 
 	/* loop through all of the flow blocks with in one pblock */
 
 //	fprintf(stderr,"%s:%d: Register banking\n", __FUNCTION__, __LINE__);
 
-  prevreg = NULL;
-  do {
-    /* at this point, pc should point to a PC_FLOW object */
-    /* for each flow block, determine the register banking 
-       requirements */
+	prevreg = NULL;
+	do {
+		/* at this point, pc should point to a PC_FLOW object */
+		/* for each flow block, determine the register banking 
+		 * requirements */
 
-      if(isPCI(pc) && !PCI(pc)->is2MemOp) {
+		if(!isPCI(pc))goto loop;
+
+		if(PCI(pc)->is2MemOp)goto loop;
+       
 		reg = pic16_getRegFromInstruction(pc);
 
 #if 0
+		pc->print(stderr, pc);
 		fprintf(stderr, "reg = %p\n", reg);
+
 		if(reg) {
 			fprintf(stderr, "%s:%d:  %s  %d\n",__FUNCTION__, __LINE__, reg->name, reg->rIdx);
-			fprintf(stderr, "addr = 0x%03x, bank = %d, bit=%d\tmapped = %d sfr=%d fix=%d\n",
-				reg->address,REG_BANK(reg),reg->isBitField, reg->isMapped,
-				pic16_finalMapping[ reg->address ].isSFR, reg->isFixed);
+			fprintf(stderr, "addr = 0x%03x, bit=%d\tfix=%d\n",
+				reg->address,reg->isBitField, reg->isFixed);
 		}
 #endif
 
 		/* we can be 99% that within a pBlock, between two consequtive
 		 * refernces to the same register, the extra banksel is needless */
+	 
+	 
+		/* now make some tests to make sure that instruction needs bank switch */
 
-		if((reg && !isACCESS_BANK(reg) && (isBankInstruction(pc) == -1))
-			&& (!isPCI_LIT(pc))
-			&& (PCI(pc)->op != POC_CALL)
-
-			&& ( ((pic16_options.opt_banksel>0)
-				&& (!prevreg || (prevreg && !pic16_areRegsSame(reg, prevreg))))
-			    || (!pic16_options.opt_banksel)
-			   )
-			   	   )
-			   {
-		  /* Examine the instruction before this one to make sure it is
-		   * not a skip type instruction */
-			pcprev = findPrevpCode(pc->prev, PC_OPCODE);
-
-			/* FIXME: if previous is SKIP pCode, we should move the BANKSEL
-			 * before SKIP, but we have to check if the SKIP uses BANKSEL, etc... */
-			if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
-				prevreg = reg;
-				if(!pic16_options.no_banksel)
-					insertBankSwitch(0, pc);
-			} else {
-//				if(pcprev && isPCI_SKIP(pcprev))assert(0);
-			}
+		/* if not no register exists, and if not a bit opcode goto loop */
+		if(!reg) {
+			if(!(PCI(pc)->pcop && PCI(pc)->pcop->type == PO_GPR_BIT))goto loop;
 		}
+		 
+		if(isPCI_SKIP(pc)) {
+//			fprintf(stderr, "instruction is SKIP instruction\n");
+		}
+		if((reg && isACCESS_BANK(reg)) || !isBankInstruction(pc))goto loop;
 
-	pcprev = pc;
+		if(isPCI_LIT(pc))goto loop;
+	 
+		if(PCI(pc)->op == POC_CALL)goto loop;
 
-      }
+		/* Examine the instruction before this one to make sure it is
+		 * not a skip type instruction */
+		pcprev = findPrevpCode(pc->prev, PC_OPCODE);
 
-      pc = pc->next;
-  }while (pc);
+		/* FIXME: if previous is SKIP pCode, we should move the BANKSEL
+		 * before SKIP, but we have to check if the SKIP uses BANKSEL, etc... */
+		flag = 0;
+		if(pcprev && isPCI_SKIP(pcprev))flag=2;	//goto loop;
+		 
+		prevreg = reg;
+		insertBankSwitch(flag, pc);
+		pcprev = pc;
 
-#if 0
-  if(pcprev && cur_bank) {
-
-    int pos = 1;  /* Assume that the bank switch instruction(s)
-		   * are inserted after this instruction */
-
-    if((PCI(pcprev)->op == POC_RETLW) || 
-       (PCI(pcprev)->op == POC_RETURN) || 
-       (PCI(pcprev)->op == POC_RETFIE)) {
-
-      /* oops, a RETURN - we need to switch banks *before* the RETURN */
-
-      pos = 0;
-
-    } 
-	    
-    /* Brute force - make sure that we point to bank 0 at the
-     * end of each flow block */
-
-//    insertBankSwitch(pos, pcprev, 0);
-/*
-    new_pc = pic16_newpCode(POC_MOVLB, pic16_newpCodeOpLit(0));
-    pic16_pCodeInsertAfter(pcprev, new_pc);
-*/
-    cur_bank = 0;
-    //fprintf(stderr, "Brute force switch\n");
-  }
-#endif
-
+//		fprintf(stderr, "BANK SWITCH inserted\n");
+		
+loop:
+		pc = pc->next;
+	} while (pc);
 }
+
 
 
 static void pBlockDestruct(pBlock *pb)
@@ -6721,9 +6781,12 @@ void pic16_AnalyzeBanking(void)
 
 	if(!the_pFile)return;
 
-	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-//		fprintf(stderr, "%s:%d: Fix register banking in pb= 0x%p\n", __FILE__, __LINE__, pb);
-		pic16_FixRegisterBanking(pb);
+	
+	if(!pic16_options.no_banksel) {
+		for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+//			fprintf(stderr, "%s:%d: Fix register banking in pb= 0x%p\n", __FILE__, __LINE__, pb);
+			pic16_FixRegisterBanking(pb);
+		}
 	}
 
 }

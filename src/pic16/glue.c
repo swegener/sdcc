@@ -132,7 +132,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 
 #if 0
-		fprintf(stderr, "\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\n",
+		fprintf(stderr, "%s\t%s: sym: %s\tused: %d\textern: %d\tstatic: %d\taggregate: %d\n",
+			__FUNCTION__,
 			map->sname, sym->name, sym->used, IS_EXTERN(sym->etype), IS_STATIC(sym->etype),
 			IS_AGGREGATE(sym->type));
 		printTypeChain( sym->type, stderr );
@@ -188,7 +189,18 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 #endif
 
 				reg = pic16_allocDirReg( operandFromSymbol( sym ));
-				checkAddReg(&pic16_rel_udata, reg);
+//				addSet(&pic16_dynAllocRegs, reg);
+				
+				{
+				  sectSym *ssym;
+				  int found=0;
+				  
+				  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
+				  		if(!strcmp(ssym->name, reg->name))found=1;
+					}
+					
+					if(!found)checkAddReg(&pic16_rel_udata, reg);
+				}
 			}
 
 		/* if extern then do nothing or is a function
@@ -277,10 +289,26 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					} else {
 						reg = pic16_allocDirReg( operandFromSymbol( sym ) );
 					}
-					if(checkAddReg(&pic16_rel_udata, reg)) {
-						addSetHead(&publics, sym);
+
+					{
+					  sectSym *ssym;
+					  int found=0;
+				  
+					  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
+					  		if(!strcmp(ssym->name, reg->name))found=1;
+						}
+					
+						if(!found)
+							if(checkAddReg(&pic16_rel_udata, reg)) {
+								addSetHead(&publics, sym);
+							}
+
 					}
+
+
+		
 				} else
+
 					addSetHead(&publics, sym);
 			}
 
@@ -842,6 +870,7 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
         {
           fprintf (stderr, "*** internal error: unknown size in "
                    "printIvalCharPtr.\n");
+	  assert(0);
         }
     }
   else
@@ -860,7 +889,6 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
 	  pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
 	  pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
 	  pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
-	  
           break;
 
         default:
@@ -868,8 +896,9 @@ int pic16_printIvalCharPtr (symbol * sym, sym_link * type, value * val, char pty
         }
     }
 
-  if (val->sym && val->sym->isstrlit && !isinSet(statsg->syms, val->sym)) {
-    addSet (&statsg->syms, val->sym);
+  if (val->sym && val->sym->isstrlit) {	// && !isinSet(statsg->syms, val->sym)) {
+  	if(ptype == 'p' && !isinSet(statsg->syms, val->sym))addSet (&statsg->syms, val->sym);
+  	else if(ptype == 'f' /*&& !isinSet(rel_idataSymSet, val->sym)*/)addSet(&rel_idataSymSet, val->sym);
   }
 
   return 1;
@@ -928,7 +957,6 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
   value *val;
   int size;
 
-
 #if 0
 	fprintf(stderr, "%s:%d initialising pointer: %s size: %d\n", __FILE__, __LINE__,
 		sym->rname, getSize(sym->type));
@@ -975,6 +1003,8 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
             pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
             pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
             pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
+        default:
+        	assert(0);
         }
       return;
     }
@@ -995,7 +1025,8 @@ void pic16_printIvalPtr (symbol * sym, sym_link * type, initList * ilist, char p
       pic16_printGPointerType (val->name, sym->name, (IS_PTR(type)?DCL_TYPE(type):PTR_TYPE(SPEC_OCLS(sym->etype))),
                          (IS_PTR (val->type) ? DCL_TYPE (val->type) :
                           PTR_TYPE (SPEC_OCLS (val->etype))), ptype, p);
-    }
+    } else
+    	assert(0);
   return;
 }
 
@@ -1011,8 +1042,12 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
   if (!p)
     return;
 
-//	fprintf(stderr, "%s:%d generating init for %s\n", __FILE__, __LINE__, sym->name);
-
+#if 0
+	fprintf(stderr, "%s:%d generating init for %s\n", __FILE__, __LINE__, sym->name);
+	fprintf(stderr, "%s: IS_STRUCT: %d  IS_ARRAY: %d  IS_PTR: %d  IS_SPEC: %d\n", sym->name,
+		IS_STRUCT(type), IS_ARRAY(type), IS_PTR(type), IS_SPEC(type));
+#endif
+	
   /* if structure then */
   if (IS_STRUCT (type))
     {
@@ -1094,8 +1129,6 @@ pic16emitStaticSeg (memmap * map)
 {
   symbol *sym;
 
-  fprintf (map->oFile, ";\t.area\t%s\n", map->sname);
-
   //fprintf(stderr, "%s\n",__FUNCTION__);
 
   pic16_initDB();
@@ -1106,8 +1139,8 @@ pic16emitStaticSeg (memmap * map)
     {
 
 #if 0
-	fprintf(stderr, "\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
-CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
+	fprintf(stderr, "%s\t%s: sym: %s\tused: %d\tSPEC_ABSA: %d\tSPEC_AGGREGATE: %d\tCODE: %d\n\
+CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 		map->sname, sym->name, sym->used, SPEC_ABSA(sym->etype), IS_AGGREGATE(sym->type),
 		IS_CODE(sym->etype), IN_CODESPACE( SPEC_OCLS(sym->etype)), IS_CONSTANT(sym->etype),
 		IS_PTR_CONST(sym->etype), SPEC_CONST(sym->etype));
@@ -1172,6 +1205,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 	      
 	      pic16_addpCode2pBlock(pb,pcf);
 	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
+//	      fprintf(stderr, "%s:%d [1] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
 	      pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
 
@@ -1188,11 +1222,13 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 
 	      /* special case for character strings */
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
-		  SPEC_CVAL (sym->etype).v_char)
+		  SPEC_CVAL (sym->etype).v_char) {
+
+//		fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
+
 		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
-	      else {
+	      } else {
 	      	assert(0);
-		fprintf (code->oFile, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
 	      }
 	    }
   
@@ -1211,8 +1247,10 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 
 	      pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
 	      pic16_addpBlock(pb);
-	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
 
+//	      fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
+
+	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
 	      pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
 	      noAlloc--;
@@ -1220,14 +1258,17 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n",
 
 	      /* symbol doesn't have absolute address and no initial value */
 	      /* allocate space */
+//	      fprintf(stderr, "%s:%d [3] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
 	      fprintf (code->oFile, "%s:\n", sym->rname);
 	      /* special case for character strings */
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
-		  SPEC_CVAL (sym->etype).v_char)
+		  SPEC_CVAL (sym->etype).v_char) {
+		
+//		fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, sym->rname);
+
 		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
-	      else {
+	      } else {
 	        assert(0);
-		fprintf (code->oFile, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
 	      }
 	    }
 	}
@@ -1285,7 +1326,6 @@ pic16createInterruptVect (FILE * vFile)
 	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
 		fprintf (vFile, ";\t.area\t%s\n", CODE_NAME);
 		fprintf(vFile, ".intvecs\tcode\t0x%06x\n", pic16_options.ivt_loc);
-		fprintf (vFile, "__interrupt_vect:\n");
 
 		/* this is an overkill since WE are the port,
 		 * and we know if we have a genIVT function! */
@@ -1491,9 +1531,9 @@ pic16glue ()
 
 		if(initsfpnt) {
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("stack"))));
+				pic16_popGetLit2(1, pic16_newpCodeOpRegFromStr("_stack"))));
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
-				pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("stack"))));
+				pic16_popGetLit2(2, pic16_newpCodeOpRegFromStr("_stack"))));
 		}
 
 		/* put in the call to main */

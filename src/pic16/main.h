@@ -1,6 +1,8 @@
 #ifndef MAIN_INCLUDE
 #define MAIN_INCLUDE
 
+#include "ralloc.h"
+
 bool x_parseOptions (char **argv, int *pargc);
 void x_setDefaultOptions (void);
 void x_finaliseOptions (void);
@@ -15,8 +17,20 @@ typedef struct absSym {
 	unsigned int address;
 } absSym;
 
+typedef struct sectName {
+	char *name;
+	set *regsSet;
+} sectName;
+
+typedef struct sectSym {
+	sectName *section;
+	char *name;
+	regs *reg;
+} sectSym;
 
 extern set *absSymSet;
+extern set *sectNames;
+extern set *sectSyms;
 
 
 #endif

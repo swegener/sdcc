@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.1
+SDCC 2.4.2
 \size footnotesize 
 
 \newline 
@@ -15104,6 +15104,49 @@ status Collapsed
 -preplace-udata-with=[kword] Replaces the default udata keyword for allocating
  unitialized data variables with [kword].
  Valid keywords are: "udata_acs", "udata_shr", "udata_ovr".
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-ivt-loc <nnnn> positions the Interrupt Vector Table at location <nnnn>.
+ Useful for bootloaders.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-asm= sets the full path and name of an external assembler to call.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-link= sets the full path and name of an external linker to call.
 \layout Subsubsection
 
 Debugging Options
@@ -15394,9 +15437,6 @@ It is important to initialize the stack, otherwise strange things can happen.
 \newline 
 The stack pragma should be used only once in a project.
  Multiple pragmas may result in indeterminate behaviour of the program.
-\newline 
-If you omit setting the pragma the port emits a warning message before linking.
- If not initializing the stack is desired ignore the message.
 \layout LyX-Code
 
 Example:
@@ -15408,8 +15448,112 @@ Example:
 \layout LyX-Code
 
 #pragma stack 0x5ff
+\layout List
+\labelwidthstring 00.00.0000
+
+udata pragma udata instructs the compiler to emit code so that linker will
+ place a variable at a specific memory bank
 \layout LyX-Code
 
+Example:
+\layout LyX-Code
+
+\layout LyX-Code
+
+/* places variable foo at bank2 */
+\layout LyX-Code
+
+#pragma udata bank2 foo
+\layout LyX-Code
+
+char foo;
+\layout Standard
+
+In order for this pragma to work there are some changes that must be made
+ in the .lkr script used in link stage.
+ In the following example a sample .lkr file is shown:
+\layout LyX-Code
+
+\layout LyX-Code
+
+// Sample linker script for the PIC18F452 processor
+\layout LyX-Code
+
+LIBPATH .
+\layout LyX-Code
+
+CODEPAGE   NAME=vectors    START=0x0            END=0x29           PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=page       START=0x2A           END=0x7FFF
+\layout LyX-Code
+
+CODEPAGE   NAME=idlocs     START=0x200000       END=0x200007       PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=config     START=0x300000       END=0x30000D       PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=devid      START=0x3FFFFE       END=0x3FFFFF       PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=eedata     START=0xF00000       END=0xF000FF       PROTECTED
+\layout LyX-Code
+
+ACCESSBANK NAME=accessram  START=0x0            END=0x7F
+\layout LyX-Code
+
+\layout LyX-Code
+
+DATABANK   NAME=gpr0       START=0x80           END=0xFF
+\layout LyX-Code
+
+DATABANK   NAME=gpr1       START=0x100          END=0x1FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr2       START=0x200          END=0x2FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr3       START=0x300          END=0x3FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr4       START=0x400          END=0x4FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr5       START=0x500          END=0x5FF
+\layout LyX-Code
+
+ACCESSBANK NAME=accesssfr  START=0xF80          END=0xFFF          PROTECTED
+\layout LyX-Code
+
+\layout LyX-Code
+
+SECTION    NAME=CONFIG     ROM=config
+\layout LyX-Code
+
+\layout LyX-Code
+
+SECTION    NAME=bank0      RAM=gpr0
+\layout LyX-Code
+
+SECTION    NAME=bank1      RAM=gpr1
+\layout LyX-Code
+
+SECTION    NAME=bank2      RAM=gpr2
+\layout LyX-Code
+
+SECTION    NAME=bank3      RAM=gpr3
+\layout LyX-Code
+
+SECTION    NAME=bank4      RAM=gpr4
+\layout LyX-Code
+
+SECTION    NAME=bank5      RAM=gpr5
+\layout Standard
+
+The linker will recognise the section name set in the pragma statement and
+ will position the variable at the memory bank set with the RAM field at
+ the SECTION line in the linker script file.
 \layout Subsection
 
 Header Files
@@ -15900,7 +16044,17 @@ PROD (PRODL and PRODH)
 FSR0 (FSR0L and FSR0H)
 \layout Standard
 
-These registers are restored upon return from the interrupt routine
+These registers are restored upon return from the interrupt routine.
+ 
+\layout Standard
+
+When entering a high priority interrupt WREG, STATUS and BSR are not explicit
+ saved by software.
+ The hardware shadow registers for WREG, STATUS and BSR are used in these
+ cases.
+\layout Standard
+
+
 \begin_inset Foot
 collapsed false
 

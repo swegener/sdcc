@@ -77,6 +77,8 @@ set *pic16_dynInternalRegs=NULL;
 static hTab  *dynDirectRegNames= NULL;
 //static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
+extern set *sectNames;
+
 set *pic16_rel_udata=NULL;	/* relocatable uninitialized registers */
 set *pic16_fix_udata=NULL;	/* absolute uninitialized registers */
 set *pic16_equ_data=NULL;	/* registers used by equates */
@@ -574,14 +576,14 @@ pic16_allocDirReg (operand *op )
 
 	name = OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name;
 
-	if(!SPEC_OCLS( OP_SYM_ETYPE(op))) {									// patch 13
-		if(pic16_debug_verbose)										//
-		{												//
-			fprintf(stderr, "%s:%d symbol %s(r:%s) is not assigned to a memmap\n", __FILE__, __LINE__,	//
-		    		OP_SYMBOL(op)->name, OP_SYMBOL(op)->rname);								//
-		}												//
-		return NULL;											//
-	}													// patch 13
+	if(!SPEC_OCLS( OP_SYM_ETYPE(op))) {
+		if(pic16_debug_verbose)
+		{
+			fprintf(stderr, "%s:%d symbol %s(r:%s) is not assigned to a memmap\n", __FILE__, __LINE__,
+		    		OP_SYMBOL(op)->name, OP_SYMBOL(op)->rname);
+		}
+		return NULL;
+	}
 
 	debugLog ("%s:%d symbol name %s\n", __FUNCTION__, __LINE__, name);
 //	fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
@@ -663,8 +665,8 @@ pic16_allocDirReg (operand *op )
 //			if(SPEC_SCLS(OP_SYM_ETYPE(op)))regtype = REG_SFR;
 
 			if(OP_SYMBOL(op)->onStack) {
-//				fprintf(stderr, "%s:%d onStack %s\n", __FILE__, __LINE__, OP_SYMBOL(op)->name);
-				OP_SYMBOL(op)->onStack = 0;
+				fprintf(stderr, "%s:%d onStack %s\n", __FILE__, __LINE__, OP_SYMBOL(op)->name);
+//				OP_SYMBOL(op)->onStack = 0;
 				SPEC_OCLS(OP_SYM_ETYPE(op)) = data;
 				regtype = REG_GPR;
 			}
@@ -979,6 +981,8 @@ extern void pic16_dump_isection(FILE *of, set *section, int fix);
 extern void pic16_dump_int_registers(FILE *of, set *section);
 extern void pic16_dump_idata(FILE *of, set *idataSymSet);
 
+extern void pic16_dump_gsection(FILE *of, set *sections);
+
 static void packBits(set *bregs)
 {
   set *regset;
@@ -1041,66 +1045,6 @@ static void packBits(set *bregs)
       
 }
 
-
-
-#if 0
-static void bitEQUs(FILE *of, set *bregs)
-{
-  regs *breg,*bytereg;
-  int bit_no=0;
-
-  //fprintf(stderr," %s\n",__FUNCTION__);
-  for (breg = setFirstItem(bregs) ; breg ;
-       breg = setNextItem(bregs)) {
-
-    //fprintf(stderr,"bit reg: %s\n",breg->name);
-
-    bytereg = breg->reg_alias;
-    if(bytereg)
-      fprintf (of, "%s\tEQU\t( (%s<<3)+%d)\n",
-	       breg->name,
-	       bytereg->name,
-	       breg->rIdx & 0x0007);
-
-    else {
-      fprintf(stderr, "bit field is not assigned to a register\n");
-      fprintf (of, "%s\tEQU\t( (bitfield%d<<3)+%d)\n",
-	       breg->name,
-	       bit_no>>3,
-	       bit_no & 0x0007);
-
-      bit_no++;
-    }
-  }
-      
-}
-
-static void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
-{
-  regs *reg;
-
-
-  for (reg = setFirstItem(fregs) ; reg ;
-       reg = setNextItem(fregs)) {
-
-    if(!reg->isEmitted && reg->wasUsed) {
-      if(use_rIdx) {
-        if (reg->type != REG_SFR) {
-	  fprintf (of, "%s\tEQU\t0x%03x\n",
-		   reg->name,
-		   reg->rIdx);
-        }
-      }
-      else
-	fprintf (of, "%s\tEQU\t0x%03x\n",
-		 reg->name,
-		 reg->address);
-    }
-  }
-      
-}
-#endif
-
 void pic16_writeUsedRegs(FILE *of) 
 {
 	packBits(pic16_dynDirectBitRegs);
@@ -1126,40 +1070,15 @@ void pic16_writeUsedRegs(FILE *of)
 	/* dump internal registers */
 	pic16_dump_int_registers(of, pic16_int_regs);
 	
+	/* dump generic section variables */
+	pic16_dump_gsection(of, sectNames);
+
 	/* dump other variables */
 	pic16_dump_usection(of, pic16_rel_udata, 0);
 	pic16_dump_usection(of, pic16_fix_udata, 1);
 	
 }
 
-#if 0
-/*-----------------------------------------------------------------*/
-/* allDefsOutOfRange - all definitions are out of a range          */
-/*-----------------------------------------------------------------*/
-static bool
-allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
-{
-  int i;
-
-  debugLog ("%s\n", __FUNCTION__);
-  if (!defs)
-    return TRUE;
-
-  for (i = 0; i < defs->size; i++)
-    {
-      iCode *ic;
-
-      if (bitVectBitValue (defs, i) &&
-	  (ic = hTabItemWithKey (iCodehTab, i)) &&
-	  (ic->seq >= fseq && ic->seq <= toseq))
-
-	return FALSE;
-
-    }
-
-  return TRUE;
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */

@@ -208,7 +208,7 @@ model-pic16:
 	  fi
 
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
-	cd $(PORTDIR)/bin; ls *$(OEXT) > $(PORT).lib
+	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
 
 build-dir: $(PORTDIR)

@@ -137,13 +137,18 @@ int initsfpnt=0;		/* set to 1 if source provides a pragma for stack
 				 * so glue() later emits code to initialize stack/frame pointers */
 set *absSymSet;
 
+set *sectNames=NULL;			/* list of section listed in pragma directives */
+set *sectSyms=NULL;			/* list of symbols set in a specific section */
+
+
 static int
 _process_pragma(const char *sz)
 {
-  static const char *WHITE = " \t";
+  static const char *WHITE = " \t\n";
   
   char	*ptr = strtok((char *)sz, WHITE);
 
+  	/* #pragma maxram [maxram] */
 	if (startsWith (ptr, "maxram")) {
 	  char *maxRAM = strtok((char *)NULL, WHITE);
 
@@ -157,6 +162,7 @@ _process_pragma(const char *sz)
 		}
 	}
 	
+	/* #pragma stack [stack-position] */
 	if(startsWith(ptr, "stack")) {
 	  char *stackPosS = strtok((char *)NULL, WHITE);
 	  value *stackPosVal;
@@ -179,6 +185,7 @@ _process_pragma(const char *sz)
 	  return 0;
 	}
 	
+	/* #pragma code [symbol] [location] */
 	if(startsWith(ptr, "code")) {
 	  char *symname = strtok((char *)NULL, WHITE);
 	  char *location = strtok((char *)NULL, WHITE);
@@ -195,8 +202,49 @@ _process_pragma(const char *sz)
 			__FILE__, __LINE__, symname, absS->address);
 
 	  return 0;
-	}	  
+	}
 
+	/* #pragma udata [section-name] [symbol] */
+	if(startsWith(ptr, "udata")) {
+	  char *sectname = strtok((char *)NULL, WHITE);
+	  char *symname = strtok((char *)NULL, WHITE);
+	  sectSym *ssym;
+	  sectName *snam;
+	  int found=0;
+	  
+	  	while(symname) {
+
+	  		ssym = Safe_calloc(1, sizeof(sectSyms));
+			ssym->name = Safe_calloc(1, strlen(symname)+2);
+			sprintf(ssym->name, "_%s", symname);
+	  		ssym->reg = NULL;
+
+			addSet(&sectSyms, ssym);
+
+			found = 0;
+			for(snam=setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {
+				if(!strcmp(sectname, snam->name)){ found=1; break; }
+			}
+			
+			if(!found) {
+				snam = Safe_calloc(1, sizeof(sectNames));
+				snam->name = Safe_strdup( sectname );
+				snam->regsSet = NULL;
+				
+				addSet(&sectNames, snam);
+			}
+			
+			ssym->section = snam;
+				
+//	  		fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
+//	  		 	ssym->name, snam->name, snam);
+
+	  		symname = strtok((char *)NULL, WHITE);
+		}
+
+	  return 0;
+	}
+	
   return 1;
 }
 

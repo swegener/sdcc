@@ -513,7 +513,7 @@ static void * cvt_altpat_mnem1a(void *pp,pCodeWildBlock *pcwb)
   }
 
   if(pic16Mnemonics[opcode]->isBitInst)
-    pcosubtype = pic16_newpCodeOpBit(NULL,-1,0);
+    pcosubtype = pic16_newpCodeOpBit(NULL,-1,0, PO_GPR_REGISTER);
   else
     pcosubtype = pic16_newpCodeOp(NULL,PO_GPR_REGISTER);
 
@@ -810,7 +810,7 @@ static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb)
     //pcosubtype = cvt_extract_status(p[1].pct[0].tok.s, p[3].pct[0].tok.s);
 
     //if(pcosubtype == NULL) {
-    pcosubtype = pic16_newpCodeOpBit(p[1].pct[0].tok.s,p[3].pct[0].tok.n,0);
+    pcosubtype = pic16_newpCodeOpBit(p[1].pct[0].tok.s,p[3].pct[0].tok.n,0, PO_GPR_REGISTER);
     //}
   } else
     pcosubtype = pic16_newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
@@ -1965,7 +1965,7 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	  /* now check whether the second operand matches */
 	  if(PCOW2(PCI(pcd)->pcop) && (PCOR2(PCI(pcd)->pcop)->pcop2->type == PO_WILD)) {
 	
-		fprintf(stderr, "%s:%d %s second operand is wild\n", __FILE__, __LINE__, __FUNCTION__);
+//		fprintf(stderr, "%s:%d %s second operand is wild\n", __FILE__, __LINE__, __FUNCTION__);
 	
 		  index = PCOW2(PCI(pcd)->pcop)->id;
 		//DFPRINTF((stderr,"destination is wild\n"));
@@ -2225,7 +2225,7 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
 
   case PO_GPR_BIT:
 
-    pcopnew = pic16_newpCodeOpBit(pcop->name, PCORB(pcop)->bit,PCORB(pcop)->inBitSpace);
+    pcopnew = pic16_newpCodeOpBit(pcop->name, PCORB(pcop)->bit,PCORB(pcop)->inBitSpace, PO_GPR_REGISTER);
     PCOR(pcopnew)->r = PCOR(pcop)->r;
     PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
     DFPRINTF((stderr," pCodeOpCopy Bit -register index\n"));

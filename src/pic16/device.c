@@ -35,6 +35,7 @@
 #include "newalloc.h"
 
 
+#include "main.h"
 #include "pcode.h"
 #include "ralloc.h"
 #include "device.h"
@@ -382,7 +383,7 @@ static PIC16_device Pics16[] = {
       { 0xff, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0xff, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
     }
-  },
+  }
 
 };
 
@@ -527,9 +528,28 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 	free(rlist);
 }
 
+void pic16_dump_gsection(FILE *of, set *sections)
+{
+  regs *r;
+  sectName *sname;
+
+  	for(sname = setFirstItem(sections); sname; sname = setNextItem(sections)) {
+		fprintf(of, "\n\n%s\tudata\n", sname->name);
+
+  		for(r=setFirstItem(sname->regsSet); r; r=setNextItem(sname->regsSet)) {
+#if 0
+  			fprintf(stderr, "%s:%d emitting variable %s for section %s (%p)\n", __FILE__, __LINE__,
+  				r->name, sname->name, sname);
+#endif
+			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+		}
+	}
+}
+
 
 /* forward declaration */
 void pic16_printIval(symbol * sym, sym_link * type, initList * ilist, char ptype, void *p);
+extern void pic16_pCodeConstString(char *name, char *value);
 
 void pic16_dump_isection(FILE *of, set *section, int fix)
 {
@@ -558,9 +578,22 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 	if(!fix) {
 		fprintf(of, "\n\n\tidata\n");
 		for(s = setFirstItem(section); s; s = setNextItem(section)) {
-			fprintf(of, "%s", s->rname);
-			pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
-			pic16_flushDB('f', (void *)of);
+
+			if(s->ival) {
+				fprintf(of, "%s", s->rname);
+				pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
+				pic16_flushDB('f', (void *)of);
+			} else {
+				if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
+					&& SPEC_CVAL (s->etype).v_char) {
+
+//					fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
+					pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
+				} else {
+				      	assert(0);
+				}
+			}
+				
 		}
 	} else {
 	  int j=0;
@@ -580,9 +613,21 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 				fprintf(of, "\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
 			}
 
-			fprintf(of, "%s", s->rname);
-			pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
-			pic16_flushDB('f', (void *)of);
+			if(s->ival) {
+				fprintf(of, "%s", s->rname);
+				pic16_printIval(s, s->type, s->ival, 'f', (void *)of);
+				pic16_flushDB('f', (void *)of);
+			} else {
+				if (IS_ARRAY (s->type) && IS_CHAR (s->type->next)
+					&& SPEC_CVAL (s->etype).v_char) {
+
+//					fprintf(stderr, "%s:%d printing code string from %s\n", __FILE__, __LINE__, s->rname);
+					pic16_pCodeConstString(s->rname , SPEC_CVAL (s->etype).v_char);
+				} else {
+				      	assert(0);
+				}
+			}
+
 
 			sprev = s;
 		}
@@ -823,6 +868,8 @@ int checkAddSym(set **set, symbol *sym)
 void pic16_groupRegistersInSection(set *regset)
 {
   regs *reg;
+  sectSym *ssym;
+  int docontinue=0;
 
 	for(reg=setFirstItem(regset); reg; reg = setNextItem(regset)) {
 
@@ -842,6 +889,20 @@ void pic16_groupRegistersInSection(set *regset)
 					(reg->regop?(OP_SYMBOL(reg->regop)->ival?1:0):-1),
 					(reg->regop?(OP_SYMBOL(reg->regop)->level):-1) );
 #endif
+			
+			docontinue=0;
+			for(ssym=setFirstItem(sectSyms);ssym;ssym=setNextItem(sectSyms)) {
+				if(!strcmp(ssym->name, reg->name)) {
+//					fprintf(stderr, "%s:%d section found %s (%p) with var %s\n",
+//							__FILE__, __LINE__, ssym->section->name, ssym->section, ssym->name);
+					addSet(&ssym->section->regsSet, reg);
+					docontinue=1;
+				}
+			}
+
+			if(docontinue)continue;
+
+//			fprintf(stderr, "%s:%d reg: %s\n", __FILE__, __LINE__, reg->name);
 
 			if(reg->alias == 0x80) {
 				checkAddReg(&pic16_equ_data, reg);

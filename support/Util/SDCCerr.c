@@ -357,6 +357,8 @@ struct
     "newline in string constant" },
 { E_CANNOT_USE_GENERIC_POINTER, ERROR_LEVEL_ERROR,
     "cannot use generic pointer %s to initialize %s" },
+{ W_EXCESS_SHORT_OPTIONS, ERROR_LEVEL_WARNING,
+    "Only one short option can be specified at a time.  Rest of %s ignored." }
 };
 
 /*

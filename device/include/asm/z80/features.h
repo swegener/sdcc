@@ -6,4 +6,6 @@
 #define _REENTRANT
 #define _CODE
 
+#define _SDCC_MANGLES_SUPPORT_FUNS	1
+
 #endif

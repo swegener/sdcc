@@ -21,6 +21,13 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
+
+#include <sdcc-lib.h>
+
+#if _SDCC_MANGLES_SUPPORT_FUNS
+unsigned long _modulong (unsigned long a, unsigned long b);
+#endif
+
 long  _modslong (long a, long b)
 {
        long r;

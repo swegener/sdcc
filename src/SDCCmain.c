@@ -585,6 +585,15 @@ getIntArg(const char *szStart, char **argv, int *pi, int argc)
     return (int)floatFromVal(constVal(getStringArg(szStart, argv, pi, argc)));
 }
 
+static void
+verifyShortOption(const char *opt)
+{
+  if (strlen(opt) != 2)
+    {
+      werror (W_EXCESS_SHORT_OPTIONS, opt);
+    }
+}
+
 static bool
 tryHandleUnsupportedOpt(char **argv, int *pi)
 {
@@ -644,22 +653,29 @@ tryHandleSimpleOpt(char **argv, int *pi)
                 }
 
             for (i = 0; i < LENGTH(optionsTable); i++) 
-                {
-                    if (optionsTable[i].shortOpt == shortOpt || 
-                        (longOpt && optionsTable[i].longOpt && strcmp(optionsTable[i].longOpt, longOpt) == 0))
-                        {
-                            // If it is a flag then we can handle it here
-                            if (optionsTable[i].pparameter != NULL) 
-                                {
-                                    (*optionsTable[i].pparameter)++;
-                                    return 1;
-                                }
-                            else {
-                                // Not a flag.  Handled manually later.
-                                return 0;
-                            }
-                        }
-                }
+              {
+                if (optionsTable[i].shortOpt == shortOpt ||
+                    (longOpt && optionsTable[i].longOpt && 
+                     strcmp(optionsTable[i].longOpt, longOpt) == 0))
+                  {
+
+                    // If it is a flag then we can handle it here
+                    if (optionsTable[i].pparameter != NULL) 
+                      {
+                        if (optionsTable[i].shortOpt == shortOpt)
+                          {
+                            verifyShortOption(argv[*pi]);
+                          }
+
+                        (*optionsTable[i].pparameter)++;
+                        return 1;
+                      }
+                    else {
+                      // Not a flag.  Handled manually later.
+                      return 0;
+                    }
+                  }
+              }
             // Didn't find in the table
             return 0;
         }
@@ -864,6 +880,8 @@ parseCmdLine (int argc, char **argv)
 	  switch (argv[i][1])
 	    {
 	    case 'h':
+              verifyShortOption(argv[i]);
+
 	      printUsage ();
 	      exit (0);
 	      break;
@@ -874,6 +892,8 @@ parseCmdLine (int argc, char **argv)
 	      break;
 
 	    case 'c':
+              verifyShortOption(argv[i]);
+
 	      options.cc_only = 1;
 	      break;
 
@@ -906,6 +926,8 @@ parseCmdLine (int argc, char **argv)
 	      break;
 
 	    case 'v':
+              verifyShortOption(argv[i]);
+
 	      printVersionInfo ();
 	      exit (0);
 	      break;

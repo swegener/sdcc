@@ -4270,6 +4270,39 @@ genRLC (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genGetHbit - generates code get highest order bit               */
+/*-----------------------------------------------------------------*/
+static void
+genGetHbit (iCode * ic)
+{
+  operand *left, *result;
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  aopOp (left, ic, FALSE, FALSE);
+  aopOp (result, ic, FALSE, FALSE);
+
+  /* get the highest order byte into a */
+  emit2("ld a,%s", aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
+
+  if (AOP_TYPE (result) == AOP_CRY)
+    {
+      emit2 ("rl a");
+      outBitC (result);
+    }
+  else
+    {
+      emit2 ("rlc a");
+      /* PENDING: For re-target. */
+      emit2 ("and a,#1");
+      outAcc (result);
+    }
+
+
+  freeAsmop (left, NULL, ic);
+  freeAsmop (result, NULL, ic);
+}
+
+/*-----------------------------------------------------------------*/
 /* shiftR2Left2Result - shift right two bytes from left to result  */
 /*-----------------------------------------------------------------*/
 static void
@@ -5692,8 +5725,9 @@ genZ80Code (iCode * lic)
 	  break;
 
 	case GETHBIT:
-	  emit2 ("; genHBIT");
-	  wassert (0);
+	  emit2 ("; genGetHBIT");
+	  genGetHbit (ic);
+          break;
 
 	case LEFT_OP:
 	  emit2 ("; genLeftShift");

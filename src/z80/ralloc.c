@@ -105,8 +105,6 @@ static regs _z80_regs[] =
   {REG_GPR, B_IDX, "b", 1},
   {REG_GPR, E_IDX, "e", 1},
   {REG_GPR, D_IDX, "d", 1},
-    /*    { REG_GPR, L_IDX , "l", 1 },
-       { REG_GPR, H_IDX , "h", 1 }, */
 #if DEBUG_FAKE_EXTRA_REGS
   {REG_GPR, M_IDX, "m", 1},
   {REG_GPR, N_IDX, "n", 1},

@@ -1,6 +1,6 @@
 /** Simple test for the mul/div/mod operations.
 
-    type: int, char, short
+    type: int, char, short, long
     storage: static,
     attr: volatile,
 */

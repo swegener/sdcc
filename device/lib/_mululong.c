@@ -34,6 +34,8 @@ union bil {
 } ;
 #if defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390)
 #define bcast(x) ((union bil _xdata  *)&(x))
+#elif defined(__z80) || defined(__gbz80)
+#define bcast(x) ((union bil *)&(x))
 #else
 #define bcast(x) ((union bil _near *)&(x))
 #endif

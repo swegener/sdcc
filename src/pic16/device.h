@@ -67,6 +67,7 @@ typedef struct {
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
 #define STACK_MODEL_LARGE	(pic16_options.stack_model == 1)
 
+extern set *idataSymSet;
 
 extern pic16_options_t pic16_options;
 extern PIC16_device *pic16;

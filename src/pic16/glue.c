@@ -58,6 +58,8 @@ extern char *iComments2;
 
 extern int initsfpnt;
 
+set *idataSymSet=NULL;
+
 extern DEFSETFUNC (closeTmpFiles);
 extern DEFSETFUNC (rmTmpFiles);
 
@@ -219,8 +221,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 				reg = pic16_dirregWithName( sym->name );
 				if(!reg) {
-					fprintf(stderr, "%s:%d: implicit add of symbol = %s\n",
-							__FUNCTION__, __LINE__, sym->name);
+//					fprintf(stderr, "%s:%d: implicit add of symbol = %s\n",
+//							__FUNCTION__, __LINE__, sym->name);
 
 					op = operandFromSymbol( sym );
 					reg = pic16_allocDirReg( op );
@@ -281,9 +283,11 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 			if (IS_AGGREGATE (sym->type))
 				ival = initAggregates (sym, sym->ival, NULL);
-			else
+			else {
+				addSet(&idataSymSet, copySymbol(sym));
 				ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
 					decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
+			}
 			codeOutFile = statsg->oFile;
 			GcurMemmap = statsg;
 			eBBlockFromiCode (iCodeFromAst (ival));
@@ -329,19 +333,26 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, pBlock *pb)
 
   switch (getSize (type)) {
   case 1:
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
+    // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
+    pic16_emitDB(pb, BYTE_IN_LONG(ulval,0)); 
     break;
 
   case 2:
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
+    // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
+    // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
+    pic16_emitDB(pb, BYTE_IN_LONG(ulval,0)); 
+    pic16_emitDB(pb, BYTE_IN_LONG(ulval,1)); 
     break;
 
   case 4:
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,2))));
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,3))));
+    // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
+    // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
+    // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,2))));
+    // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,3))));
+    pic16_emitDB(pb, BYTE_IN_LONG(ulval,0)); 
+    pic16_emitDB(pb, BYTE_IN_LONG(ulval,1)); 
+    pic16_emitDB(pb, BYTE_IN_LONG(ulval,2)); 
+    pic16_emitDB(pb, BYTE_IN_LONG(ulval,3)); 
     break;
   }
 }
@@ -358,7 +369,7 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
   if(!pb)
     return 0;
 
-  fprintf(stderr, "%s\n",__FUNCTION__);
+  // fprintf(stderr, "%s\n",__FUNCTION__);
   if (!s)
     {
 
@@ -374,9 +385,14 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
 	  pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";omitting call to printChar"));
 
 	  if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0)
-	    while (remain--)
-	      //tfprintf (oFile, "\t!db !constbyte\n", 0);
-	      pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(0)));
+            {
+	      while (remain--)
+                {
+	          //tfprintf (oFile, "\t!db !constbyte\n", 0);
+	          // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(0)));
+                  pic16_emitDB(pb,0);
+                }
+            }
 	  return 1;
 	}
       else
@@ -385,10 +401,12 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
   else {
     //printChar (oFile, s, strlen (s) + 1);
 
-    for(remain=0; remain<strlen(s); remain++) {
-      pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(s[remain])));
-      //fprintf(stderr,"0x%02x ",s[remain]);
-    }
+    for(remain=0; remain<strlen(s); remain++) 
+      {
+        // pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(s[remain])));
+        //fprintf(stderr,"0x%02x ",s[remain]);
+        pic16_emitDB(pb, s[remain]);
+      }
     //fprintf(stderr,"\n");
   }
   return 1;
@@ -407,11 +425,12 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   if(!pb)
     return;
 
+
   /* take care of the special   case  */
   /* array of characters can be init  */
   /* by a string                      */
   if (IS_CHAR (type->next)) {
-    //fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
+    fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
     if (!IS_LITERAL(list2val(ilist)->etype)) {
       werror (W_INIT_WRONG);
       return;
@@ -530,8 +549,10 @@ pic16emitStaticSeg (memmap * map)
 
 
       /* if it is "extern" then do nothing */
-      if (IS_EXTERN (sym->etype))
+      if (IS_EXTERN (sym->etype)) {
+	addSetHead(&externs, sym);
 	continue;
+      }
 
       /* if it is not static add it to the public
          table */
@@ -592,6 +613,7 @@ pic16emitStaticSeg (memmap * map)
 	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
 
 	      printIval (sym, sym->type, sym->ival, pb);
+              pic16_flushDB(pb);
 	      noAlloc--;
 	    }
 	  else

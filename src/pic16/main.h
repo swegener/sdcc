@@ -32,6 +32,7 @@ typedef struct absSym {
 	unsigned int address;
 } absSym;
 
+
 extern set *absSymSet;
 
 

@@ -57,8 +57,18 @@ pCodeOpReg pic16_pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_intcon    = {{PO_INTCON,  "INTCON"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_pclatu    = {{PO_PCLATU,  "PCLATU"}, -1, NULL,0,NULL}; // patch 14
 pCodeOpReg pic16_pc_wreg      = {{PO_WREG,    "WREG"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_bsr       = {{PO_BSR,     "BSR"}, -1, NULL,0,NULL};
+
+pCodeOpReg pic16_pc_tosl      = {{PO_SFR_REGISTER,   "TOSL"}, -1, NULL,0,NULL}; // patch 14
+pCodeOpReg pic16_pc_tosh      = {{PO_SFR_REGISTER,   "TOSH"}, -1, NULL,0,NULL}; //
+pCodeOpReg pic16_pc_tosu      = {{PO_SFR_REGISTER,   "TOSU"}, -1, NULL,0,NULL}; // patch 14
+
+pCodeOpReg pic16_pc_tblptrl   = {{PO_SFR_REGISTER,   "TBLPTRL"}, -1, NULL,0,NULL}; // patch 15
+pCodeOpReg pic16_pc_tblptrh   = {{PO_SFR_REGISTER,   "TBLPTRH"}, -1, NULL,0,NULL}; //
+pCodeOpReg pic16_pc_tblptru   = {{PO_SFR_REGISTER,   "TBLPTRU"}, -1, NULL,0,NULL}; //
+pCodeOpReg pic16_pc_tablat    = {{PO_SFR_REGISTER,   "TABLAT"}, -1, NULL,0,NULL};  // patch 15
 
 //pCodeOpReg pic16_pc_fsr0	= {{PO_FSR0,	"FSR0"}, -1, NULL,0,NULL}; //deprecated !
 
@@ -69,23 +79,23 @@ pCodeOpReg pic16_pc_fsr1h	= {{PO_FSR0,	"FSR1H"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr2l	= {{PO_FSR0,	"FSR2L"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr2h	= {{PO_FSR0,	"FSR2H"}, -1, NULL, 0, NULL};
 
-pCodeOpReg pic16_pc_indf0		= {{PO_INDF0,	"INDF0"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_indf0	= {{PO_INDF0,	"INDF0"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_postinc0	= {{PO_INDF0,	"POSTINC0"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_postdec0	= {{PO_INDF0,	"POSTDEC0"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_preinc0		= {{PO_INDF0,	"PREINC0"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_plusw0		= {{PO_INDF0,	"PLUSW0"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_preinc0	= {{PO_INDF0,	"PREINC0"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_plusw0	= {{PO_INDF0,	"PLUSW0"}, -1, NULL, 0, NULL};
 
-pCodeOpReg pic16_pc_indf1		= {{PO_INDF0,	"INDF1"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_indf1	= {{PO_INDF0,	"INDF1"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_postinc1	= {{PO_INDF0,	"POSTINC1"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_postdec1	= {{PO_INDF0,	"POSTDEC1"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_preinc1		= {{PO_INDF0,	"PREINC1"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_plusw1		= {{PO_INDF0,	"PLUSW1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_preinc1	= {{PO_INDF0,	"PREINC1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_plusw1	= {{PO_INDF0,	"PLUSW1"}, -1, NULL, 0, NULL};
 
-pCodeOpReg pic16_pc_indf2		= {{PO_INDF0,	"INDF2"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_indf2	= {{PO_INDF0,	"INDF2"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_postinc2	= {{PO_INDF0,	"POSTINC2"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_postdec2	= {{PO_INDF0,	"POSTDEC2"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_preinc2		= {{PO_INDF0,	"PREINC2"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_plusw2		= {{PO_INDF0,	"PLUSW2"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_preinc2	= {{PO_INDF0,	"PREINC2"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_plusw2	= {{PO_INDF0,	"PLUSW2"}, -1, NULL, 0, NULL};
 
 pCodeOpReg pic16_pc_prodl	= {{PO_PRODL, "PRODL"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_prodh	= {{PO_PRODH, "PRODH"}, -1, NULL, 0, NULL};
@@ -2355,6 +2365,214 @@ pCodeInstruction pic16_pciSWAPFW = {
   PCI_MAGIC
 };
 
+pCodeInstruction pic16_pciTBLRD = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLRD,
+  "TBLRD*",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciTBLRD_POSTINC = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLRD_POSTINC,
+  "TBLRD*+",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciTBLRD_POSTDEC = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLRD_POSTDEC,
+  "TBLRD*-",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciTBLRD_PREINC = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLRD_PREINC,
+  "TBLRD+*",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciTBLWT = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLWT,
+  "TBLWT*",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciTBLWT_POSTINC = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLWT_POSTINC,
+  "TBLWT*+",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciTBLWT_POSTDEC = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLWT_POSTDEC,
+  "TBLWT*-",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
+pCodeInstruction pic16_pciTBLWT_PREINC = {	// patch 15
+  {PC_OPCODE, NULL, NULL, 0, NULL, 
+   genericDestruct,
+   genericPrint},
+  POC_TBLWT_PREINC,
+  "TBLWT+*",
+  NULL, // from branch
+  NULL, // to branch
+  NULL, // label
+  NULL, // operand
+  NULL, // flow block
+  NULL, // C source 
+  0,    // num ops
+  0,0,  // dest, bit instruction
+  0,0,  // branch, skip
+  0,    // literal operand
+  0,    // RAM access bit
+  0,    // fast call/return mode select bit
+  0,	// second memory operand
+  0,	// second literal operand
+  POC_NOP,
+  PCC_NONE,  // inCond
+  PCC_NONE  , // outCond
+  PCI_MAGIC
+};
+
 pCodeInstruction pic16_pciTSTFSZ = { // mdubuc - New
   {PC_OPCODE, NULL, NULL, 0, NULL, 
    //   genericAnalyze,
@@ -2557,8 +2775,20 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_status.r = pic16_allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
 	pic16_pc_pcl.r = pic16_allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
 	pic16_pc_pclath.r = pic16_allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x80);
+	pic16_pc_pclatu.r = pic16_allocProcessorRegister(IDX_PCLATU,"PCLATU", PO_PCLATU, 0x80);
 	pic16_pc_intcon.r = pic16_allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x80);
 	pic16_pc_wreg.r = pic16_allocProcessorRegister(IDX_WREG,"WREG", PO_WREG, 0x80);
+	pic16_pc_bsr.r = pic16_allocProcessorRegister(IDX_BSR,"BSR", PO_BSR, 0x80);
+
+	pic16_pc_tosl.r = pic16_allocProcessorRegister(IDX_TOSL,"TOSL", PO_SFR_REGISTER, 0x80);
+	pic16_pc_tosh.r = pic16_allocProcessorRegister(IDX_TOSH,"TOSH", PO_SFR_REGISTER, 0x80);
+	pic16_pc_tosu.r = pic16_allocProcessorRegister(IDX_TOSU,"TOSU", PO_SFR_REGISTER, 0x80);
+
+	pic16_pc_tblptrl.r = pic16_allocProcessorRegister(IDX_TBLPTRL,"TBLPTRL", PO_SFR_REGISTER, 0x80); // patch 15
+	pic16_pc_tblptrh.r = pic16_allocProcessorRegister(IDX_TBLPTRH,"TBLPTRH", PO_SFR_REGISTER, 0x80); // patch 15
+	pic16_pc_tblptru.r = pic16_allocProcessorRegister(IDX_TBLPTRU,"TBLPTRU", PO_SFR_REGISTER, 0x80); // patch 15
+	pic16_pc_tablat.r = pic16_allocProcessorRegister(IDX_TABLAT,"TABLAT", PO_SFR_REGISTER, 0x80); // patch 15
+
 
 //	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"FSR0", PO_FSR0, 0x80); // deprecated !
 
@@ -2594,7 +2824,19 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_intcon.rIdx = IDX_INTCON;
 	pic16_pc_pcl.rIdx = IDX_PCL;
 	pic16_pc_pclath.rIdx = IDX_PCLATH;
+	pic16_pc_pclatu.rIdx = IDX_PCLATU;
 	pic16_pc_wreg.rIdx = IDX_WREG;
+	pic16_pc_bsr.rIdx = IDX_BSR;
+
+	pic16_pc_tosl.rIdx = IDX_TOSL;
+	pic16_pc_tosh.rIdx = IDX_TOSH;
+	pic16_pc_tosu.rIdx = IDX_TOSU;
+
+	pic16_pc_tblptrl.rIdx = IDX_TBLPTRL; // patch 15
+	pic16_pc_tblptrh.rIdx = IDX_TBLPTRH; // patch 15
+	pic16_pc_tblptru.rIdx = IDX_TBLPTRU; // patch 15
+	pic16_pc_tablat.rIdx = IDX_TABLAT;   // patch 15
+
 //	pic16_pc_fsr0.rIdx = IDX_FSR0;
 	pic16_pc_fsr0l.rIdx = IDX_FSR0L;
 	pic16_pc_fsr0h.rIdx = IDX_FSR0H;
@@ -2621,7 +2863,7 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_prodh.rIdx = IDX_PRODH;
 	
 	pic16_pc_kzero.r = pic16_allocInternalRegister(IDX_KZ,"KZ",PO_GPR_REGISTER,0);
-	pic16_pc_ssave.r = pic16_allocInternalRegister(IDX_SSAVE,"SSAVE", PO_GPR_REGISTER, 0x80);
+	pic16_pc_ssave.r = pic16_allocInternalRegister(IDX_SSAVE,"SSAVE", PO_GPR_REGISTER, 0);
 	pic16_pc_wsave.r = pic16_allocInternalRegister(IDX_WSAVE,"WSAVE", PO_GPR_REGISTER, 0);
 	
 	pic16_pc_kzero.rIdx = IDX_KZ;
@@ -2755,6 +2997,14 @@ void pic16initMnemonics(void)
   pic16Mnemonics[POC_SUBFWB_D1] = &pic16_pciSUBFWB_D1;
   pic16Mnemonics[POC_SWAPF] = &pic16_pciSWAPF;
   pic16Mnemonics[POC_SWAPFW] = &pic16_pciSWAPFW;
+  pic16Mnemonics[POC_TBLRD] = &pic16_pciTBLRD;			// patch 15
+  pic16Mnemonics[POC_TBLRD_POSTINC] = &pic16_pciTBLRD_POSTINC;	//
+  pic16Mnemonics[POC_TBLRD_POSTDEC] = &pic16_pciTBLRD_POSTDEC;	//
+  pic16Mnemonics[POC_TBLRD_PREINC] = &pic16_pciTBLRD_PREINC;	//
+  pic16Mnemonics[POC_TBLWT] = &pic16_pciTBLWT;			//
+  pic16Mnemonics[POC_TBLWT_POSTINC] = &pic16_pciTBLWT_POSTINC;	//
+  pic16Mnemonics[POC_TBLWT_POSTDEC] = &pic16_pciTBLWT_POSTDEC;	//
+  pic16Mnemonics[POC_TBLWT_PREINC] = &pic16_pciTBLWT_PREINC;	// patch 15
   pic16Mnemonics[POC_TSTFSZ] = &pic16_pciTSTFSZ;
   pic16Mnemonics[POC_XORLW] = &pic16_pciXORLW;
   pic16Mnemonics[POC_XORWF] = &pic16_pciXORWF;
@@ -3327,12 +3577,12 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
   char *lbp=buffer;
   
 	pcad = Safe_calloc(1, sizeof(pCodeAsmDir));
-	pcad->pc.type = PC_ASMDIR;
-	pcad->pc.prev = pcad->pc.next = NULL;
-	pcad->pc.pb = NULL;
+	pcad->pci.pc.type = PC_ASMDIR;
+	pcad->pci.pc.prev = pcad->pci.pc.next = NULL;
+	pcad->pci.pc.pb = NULL;
 	
-	pcad->pc.destruct = genericDestruct;
-	pcad->pc.print = genericPrint;
+	pcad->pci.pc.destruct = genericDestruct;
+	pcad->pci.pc.print = genericPrint;
 
 	if(asdir && *asdir) {
 		
@@ -3707,6 +3957,64 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
   return pcop;
 }
 
+
+typedef struct DBdata
+  {
+    int count;
+    char buffer[256];
+  } DBdata;
+
+struct DBdata DBd;
+static int DBd_init = -1;
+
+/*-----------------------------------------------------------------*/
+/*    Add "DB" directives to a pBlock                              */
+/*-----------------------------------------------------------------*/
+void pic16_emitDB(pBlock *pb, char c)
+{
+  int l;
+  if (DBd_init<0) // we need to initialize
+    {
+      DBd_init = 0;
+      DBd.count = 0;
+      DBd.buffer[0] = '\0';
+    }
+
+  l = strlen(DBd.buffer);
+
+  if (DBd.count>0)
+    {
+      sprintf(DBd.buffer+l,", 0x%02x", c & 0xff);
+    }
+  else
+    {
+      sprintf(DBd.buffer,"0x%02x", c & 0xff);
+    }
+   
+  DBd.count++;
+
+  if (DBd.count>=16)
+    {
+       pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
+       DBd.count = 0;
+       DBd.buffer[0] = '\0';
+    }
+   
+}
+
+/*-----------------------------------------------------------------*/
+/*    Flush pending "DB" data to a pBlock                          */
+/*-----------------------------------------------------------------*/
+void pic16_flushDB(pBlock *pb)
+{
+  if (DBd.count>0)
+    {
+       pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
+       DBd.count = 0;
+       DBd.buffer[0] = '\0';
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 void pic16_pCodeConstString(char *name, char *value)
@@ -3728,10 +4036,9 @@ void pic16_pCodeConstString(char *name, char *value)
   pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(name,-1));
 
   do {
-    pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(*value)));
+        pic16_emitDB(pb, *value);
   }while (*value++);
-
-
+  pic16_flushDB(pb);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3889,7 +4196,7 @@ void pic16_printpBlock(FILE *of, pBlock *pb)
 			if(pb->dbName == 'A') {
 			  absSym *ab;
 				for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet))
-					if(strcmp(ab->name, PCF(pc)->fname)) {
+					if(!strcmp(ab->name, PCF(pc)->fname)) {
 						fprintf(of, "\t0X%06X", ab->address);
 						break;
 					}
@@ -4277,7 +4584,13 @@ static char *pic16_pCode2str(char *str, size_t size, pCode *pc)
     SAFE_snprintf(&s,&size,";#CSRC\t%s %d\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
     break;
   case PC_ASMDIR:
-  	SAFE_snprintf(&s,&size,"\t%s\t%s\n", PCAD(pc)->directive, PCAD(pc)->arg?PCAD(pc)->arg:"");
+	if(PCAD(pc)->directive) {
+	  	SAFE_snprintf(&s,&size,"\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
+	} else
+	if(PCAD(pc)->arg) {
+		/* special case to handle inline labels without a tab */
+		SAFE_snprintf(&s,&size,"%s\n", PCAD(pc)->arg);
+	}
   	break;
 
   case PC_BAD:
@@ -4360,16 +4673,23 @@ static void genericPrint(FILE *of, pCode *pc)
   case PC_CSOURCE:
     fprintf(of,";#CSRC\t%s %d\t\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
     break;
+
   case PC_ASMDIR:
 	{
-	  pBranch *pbl = PCAD(pc)->label;
+	  pBranch *pbl = PCAD(pc)->pci.label;
 		while(pbl && pbl->pc) {
 			if(pbl->pc->type == PC_LABEL)
 				pCodePrintLabel(of, pbl->pc);
 			pbl = pbl->next;
 		}
 	}
-	fprintf(of, "\t%s\t%s\n", PCAD(pc)->directive, PCAD(pc)->arg?PCAD(pc)->arg:"");
+	if(PCAD(pc)->directive) {
+		fprintf(of, "\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
+	} else
+	if(PCAD(pc)->arg) {
+		/* special case to handle inline labels without tab */
+		fprintf(of, "%s\n", PCAD(pc)->arg);
+	}
   	break;
   	
   case PC_LABEL:
@@ -4470,6 +4790,7 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
   while(b) {
     if(b->pc == pc) {
       //fprintf (stderr, "found label\n");
+      //pc->print(stderr, pc);
 
       /* Found a label */
       if(bprev) {
@@ -4651,7 +4972,9 @@ static int compareLabel(pCode *pc, pCodeOpLabel *pcop_label)
     if( ((pCodeLabel *)pc)->key ==  pcop_label->key)
       return TRUE;
   }
-  if(pc->type == PC_OPCODE) {
+  if((pc->type == PC_OPCODE)
+  	|| (pc->type == PC_ASMDIR)
+  	) {
     pbr = PCI(pc)->label;
     while(pbr) {
       if(pbr->pc->type == PC_LABEL) {
@@ -4754,6 +5077,9 @@ static pCode * findPrevpCode(pCode *pc, PC_TYPE pct)
 
   return NULL;
 }
+
+
+//#define PCODE_DEBUG
 /*-----------------------------------------------------------------*/
 /* pic16_findNextInstruction - given a pCode, find the next instruction  */
 /*                       in the linked list                        */
@@ -4763,7 +5089,10 @@ pCode * pic16_findNextInstruction(pCode *pci)
   pCode *pc = pci;
 
   while(pc) {
-    if((pc->type == PC_OPCODE) || (pc->type == PC_WILD))
+    if((pc->type == PC_OPCODE)
+    	|| (pc->type == PC_WILD)
+    	|| (pc->type == PC_ASMDIR)
+    	)
       return pc;
 
 #ifdef PCODE_DEBUG
@@ -4783,8 +5112,29 @@ pCode * pic16_findNextInstruction(pCode *pci)
 /*-----------------------------------------------------------------*/
 pCode * pic16_findPrevInstruction(pCode *pci)
 {
-  return findPrevpCode(pci, PC_OPCODE);
+  pCode *pc = pci;
+
+  while(pc) {
+    if((pc->type == PC_OPCODE)
+    	|| (pc->type == PC_WILD)
+    	|| (pc->type == PC_ASMDIR)
+    	)
+      return pc;
+      
+
+#ifdef PCODE_DEBUG
+    fprintf(stderr,"pic16_findPrevInstruction:  ");
+    printpCode(stderr, pc);
+#endif
+    pc = pc->next;
+  }
+
+  //fprintf(stderr,"Couldn't find instruction\n");
+  return NULL;
 }
+
+#undef PCODE_DEBUG
+
 #if 0
 /*-----------------------------------------------------------------*/
 /* findFunctionEnd - given a pCode find the end of the function    */
@@ -5510,7 +5860,7 @@ static void insertBankSwitch(int position, pCode *pc, int bsr)
 	if(PCI(pc)->label) {
 //		fprintf(stderr, "%s:%d: moving label due to bank switch directive src= 0x%p dst= 0x%p\n",
 //			__FILE__, __LINE__, pc, new_pc);
-		PCAD(new_pc)->label = PCI(pc)->label;
+		PCAD(new_pc)->pci.label = PCI(pc)->label;
 		PCI(pc)->label = NULL;
 	}
 
@@ -5828,6 +6178,8 @@ void pic16_pBlockMergeLabels(pBlock *pb)
 //	fprintf(stderr,"Checking label key = %d\n",PCL(pc)->key);
 
       if((pcnext = pic16_findNextInstruction(pc) )) {
+
+//		pcnext->print(stderr, pcnext);
 
 	// Unlink the pCode label from it's pCode chain
 	pic16_unlinkpCode(pc);

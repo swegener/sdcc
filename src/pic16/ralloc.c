@@ -571,6 +571,15 @@ pic16_allocDirReg (operand *op )
 
 	name = OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name;
 
+	if(!SPEC_OCLS( OP_SYM_ETYPE(op))) {									// patch 13
+		if(pic16_debug_verbose)										//
+		{												//
+			fprintf(stderr, "%s:%d symbol %s(r:%s) is not assigned to a memmap\n", __FILE__, __LINE__,	//
+		    		OP_SYMBOL(op)->name, OP_SYMBOL(op)->rname);								//
+		}												//
+		return NULL;											//
+	}													// patch 13
+
 	debugLog ("%s symbol name %s\n", __FUNCTION__,name);
 //	fprintf(stderr, "%s symbol name %s\n", __FUNCTION__,name);
 
@@ -638,6 +647,7 @@ pic16_allocDirReg (operand *op )
 			if(pic16_debug_verbose)
 			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
 			    		OP_SYMBOL(op)->name);
+			debugLog("%s:%d sym: %s in codespace\n", __FUNCTION__, __LINE__, OP_SYMBOL(op)->name);
 	    	  return NULL;
 		}
 
@@ -646,6 +656,15 @@ pic16_allocDirReg (operand *op )
 
 			if(SPEC_SCLS(OP_SYM_ETYPE(op)))regtype = REG_SFR;
 	
+			if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {						// patch 13
+				if(pic16_debug_verbose)									//
+				{											//
+					fprintf(stderr, "%s:%d symbol %s NOT in dirspace\n", __FILE__, __LINE__,	//
+				    		OP_SYMBOL(op)->name);							//
+				}											//
+//				return NULL;										//
+			}												// patch 13
+
 			reg = newReg(regtype, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
 			debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
 
@@ -676,6 +695,12 @@ pic16_allocDirReg (operand *op )
 	if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
 		reg->isFixed = 1;
 		reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
+
+		/* work around for user defined registers in access bank */
+		if((reg->address < 0x80)
+			|| (reg->address >= 0xf80))
+			reg->accessBank = 1;
+		
 		debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
 	}
 
@@ -928,6 +953,7 @@ extern void pic16_dump_equates(FILE *of, set *equs);
 //extern void pic16_dump_map(void);
 extern void pic16_dump_section(FILE *of, set *section, int fix);
 extern void pic16_dump_int_registers(FILE *of, set *section);
+extern void pic16_dump_idata(FILE *of, set *idataSymSet);
 
 static void packBits(set *bregs)
 {
@@ -1081,14 +1107,17 @@ void pic16_writeUsedRegs(FILE *of)
 
 	/* dump equates */
 	pic16_dump_equates(of, pic16_equ_data);
-	
+
+	/* dump initialised data */
+	pic16_dump_idata(of, idataSymSet);
+
 	/* dump internal registers */
 	pic16_dump_int_registers(of, pic16_int_regs);
 	
 	/* dump other variables */
 	pic16_dump_section(of, pic16_rel_udata, 0);
 	pic16_dump_section(of, pic16_fix_udata, 1);
-
+	
 }
 
 #if 0
@@ -2563,8 +2592,9 @@ regTypeNum ()
 #else
     if(IS_CODEPTR (sym->type)) {
 #endif
-      debugLog ("  %d const pointer type requires %d registers, changing to 2\n",__LINE__,sym->nRegs);
-      sym->nRegs = 2;
+      // what IS this ???? (HJD)
+      debugLog ("  %d const pointer type requires %d registers, changing to 3\n",__LINE__,sym->nRegs); // patch 14
+      sym->nRegs = 3; // patch 14
     }
 
       if (sym->nRegs > 4) {
@@ -2985,6 +3015,13 @@ pack:
 
 }
 
+#define NO_packRegsForAccUse
+#define NO_packRegsForSupport
+#define NO_packRegsForOneuse
+#define NO_cast_peep
+
+
+#ifndef NO_packRegsForSupport
 /*-----------------------------------------------------------------*/
 /* findAssignToSym : scanning backwards looks for first assig found */
 /*-----------------------------------------------------------------*/
@@ -3062,7 +3099,10 @@ findAssignToSym (operand * op, iCode * ic)
 
 
 }
+#endif
 
+
+#ifndef NO_packRegsForSupport
 /*-----------------------------------------------------------------*/
 /* packRegsForSupport :- reduce some registers for support calls   */
 /*-----------------------------------------------------------------*/
@@ -3140,10 +3180,12 @@ right:
 
   return change;
 }
+#endif
+
 
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
 
-
+#ifndef NO_packRegsForOneuse
 /*-----------------------------------------------------------------*/
 /* packRegsForOneuse : - will reduce some registers for single Use */
 /*-----------------------------------------------------------------*/
@@ -3273,6 +3315,8 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   return sic;
 
 }
+#endif
+
 
 /*-----------------------------------------------------------------*/
 /* isBitwiseOptimizable - requirements of JEAN LOUIS VERN          */
@@ -3304,11 +3348,12 @@ isBitwiseOptimizable (iCode * ic)
     return FALSE;
 }
 
+
+#ifndef NO_packRegsForAccUse
+
 /*-----------------------------------------------------------------*/
 /* packRegsForAccUse - pack registers for acc use                  */
 /*-----------------------------------------------------------------*/
-#if 0
-
 static void
 packRegsForAccUse (iCode * ic)
 {
@@ -3464,6 +3509,7 @@ accuse:
 }
 #endif
 
+
 /*-----------------------------------------------------------------*/
 /* packForPush - hueristics to reduce iCode for pushing            */
 /*-----------------------------------------------------------------*/
@@ -3582,14 +3628,6 @@ static void isData(sym_link *sl)
 }
 
 
-/* set if conditional to 1 to disable optimizations */
-
-#define NO_packRegsForAccUse
-#if 0
-#define NO_packRegsForSupport
-#define NO_packRegsForOneuse
-//#define NO_cast_peep
-#endif
 /*--------------------------------------------------------------------*/
 /* pic16_packRegisters - does some transformations to reduce          */
 /*                   register pressure                                */
@@ -3616,7 +3654,8 @@ pic16_packRegisters (eBBlock * ebp)
 //		debugLog("%d\n", __LINE__);
 	/* find assignment of the form TrueSym := iTempNN:1 */
 	/* see BUGLOG0001 for workaround with the CAST - VR */
-	if ((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic))
+	if ( (ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) ) // patch 11
+//	if ( (ic->op == '=') && !POINTER_SET (ic) ) // patch 11
 	  change += packRegsForAssign (ic, ebp);
 	/* debug stuff */
 	if (ic->op == '=')
@@ -4039,6 +4078,10 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
 
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);
+
+//  debugLog ("ebbs after serialRegAssign:\n");
+//  dumpEbbsToDebug (ebbs, count);
+
 
   //pic16_freeAllRegs();
 

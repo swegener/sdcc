@@ -1,3 +1,66 @@
+2004-03-01 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/device.c (pic16_dump_section): fixed a bug that allowed
+	the sorting of rlist with NULL elements
+	* (print_idataType, print_idata): NEW to create idata sections
+	* src/pic16/device.h: idataSymSet new variable
+	* src/pic16/gen.c (genFunction): fixed some bugs in string
+	comparing, improved the aboslute section creation for ISRs,
+	added FSR0L/FSR0H in registers that are saved in an ISR,
+	* (genInline): fixed the processing of inline snippets,
+	now they undergo no process by the peephole optimizer
+	* src/pic16/glue.c (pic16emitRegularMap): symbols with initialiser
+	are placed in idataSymSet,
+	* (pic16emitStaticSeg): extern symbols are added in externs,
+	* src/pic16/ralloc.c (pic16_allocDirReg): work around to reduce bank
+	switching when aboslute variables are placed in access bank memory
+	* (pic16_writeUsedRegs): added call to pic16_dump_idata,
+	* (packRegsForSupport,packRegsForAccUse,packRegsForOneuse):
+	commented out with #if,
+	* (pic16_packRegisters): reintroduce the check for CAST because some
+	symbols are not correctly handled,
+	* src/pic16/pcode.h: changed the definition of pCodeAsmDir to hold a
+	pCodeInstruction instead of pCode,
+	* src/pic16/pcode.c (pic16_newpCodeAsmDir): modified for the new
+	pCodeAsmDir definition,
+	* (pic16_pCode2str, genericPrint): when an AsmDir pcode has a NULL
+	directive, then the argument directive is emitted without the leading
+	tab, hack for inline labels which must be in the first column,
+	* (compareLabel,pic16_findNextInstruction),
+	* (pic16_findPrevInstruction): added case for PO_ASMDIR,
+	* (insertBankSwitch): modified for the new pCodeAsmDir,
+
+2004-03-01 Hans-Juergen Dorn <hans.dorn AT apl-landau.de>
+	patch applied by Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (pic16_popGet): case PO_DIR, adds the offset to
+	instance,
+	* (pushSide): commented out with #if,
+	* (assignResultValue): fixed some typos in saving
+	registers,
+	* (genPcall): FIXED and sync'ed with genCall,
+	* (genDataPointerGet,genDataPointerSet): using offset not leoffset
+	* (genNearPointerGet): fixed to handle some more cases,
+	implementation scheme via table reads,
+	* (genConstPointerGet): modified to access code memory correct,
+	* (genCodePointerGet,genNearPointerSet,genGenPointerSet): modified
+	and improved to handle some cases
+	* glue.c (printIvalType,printIvalChar,emitStaticSeg): use "DB"
+	instead of "RETLW" for init data
+	* src/pic16/ralloc.c (pic16_allocDirReg): warning when a symbol is
+	not IN_DIRSPACE, work around to reduce bank switching when aboslute
+	variables are placed in access bank memory (<0x80 and >=0xf80),
+	* src/pic16/pcode.c: added SFRs TBLPTR, TABLAT, added opcodes TBLRD,
+	TBLRD_POSTINC,TBLRD_POSTDEC,TBLRD_PREINC,TBLWT,TBLWT_POSTINC,
+	TBLWT_POSTDEC,TBLWT_PREINC
+	* Fixed initialisation of BSR, set "alias" for SSAVE to "0"
+	* (pic16_emitDB,pic16_flushDB): New functions to generate "DB"
+	directives
+	* (pic16_pCodeConstString): use "DB" instead of "RETLW"
+	* src/pic16/pcode.h: added TBLRD*,TBLWT*, added pic16_emitDB,
+	pic16_flushDB, made pic16_newpCodeAsmDir public, added TBLPTR, TABLAT
+	* src/pic16/ralloc.h: added IDX_BSR,IDX_TBLPTR*,IDX_TABLAT
+
 2004-02-29  Borut Razem <borut.razem AT siol.net>
 
 	* src/Makefile.in, src/SDCCutil.c, support/Util/findme.c,

@@ -983,7 +983,7 @@ void pic16_genPlus (iCode *ic)
 
 		if ((AOP_TYPE(left) == AOP_PCODE) && (
 				(AOP(left)->aopu.pcop->type == PO_LITERAL) || 
-				(AOP(left)->aopu.pcop->type == PO_DIR) || 
+//				(AOP(left)->aopu.pcop->type == PO_DIR) ||   // patch 9
 				(AOP(left)->aopu.pcop->type == PO_IMMEDIATE)))
 		{
 			// add to literal operand

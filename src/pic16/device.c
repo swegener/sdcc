@@ -283,14 +283,14 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 	for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
 		rlist[i] = rprev; i++;
 	}
-
-	/* sort symbols according to their address */
-	qsort(rlist, elementsInSet(section), sizeof(regs *), regCompare);
 	
 	if(!i) {
 		if(rlist)free(rlist);
 	  return;
 	}
+
+	/* sort symbols according to their address */
+	qsort(rlist, i	/*elementsInSet(section)*/, sizeof(regs *), regCompare);
 	
 	if(!fix) {
 		fprintf(of, "\n\n\tudata\n");
@@ -348,6 +348,134 @@ void pic16_dump_int_registers(FILE *of, set *section)
 	free(rlist);
 }
 
+
+#ifdef WORDS_BIGENDIAN
+  #define _ENDIAN(x)  (3-x)
+#else
+  #define _ENDIAN(x)  (x)
+#endif
+
+#define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
+
+/*-----------------------------------------------------------------*/
+/* printIvalType - generates ival for int/char                     */
+/*-----------------------------------------------------------------*/
+void print_idataType (FILE *of, symbol *sym, sym_link * type, initList * ilist)
+{
+  value *val;
+  unsigned long ulval;
+
+  //fprintf(stderr, "%s\n",__FUNCTION__);
+
+  /* if initList is deep */
+  if (ilist->type == INIT_DEEP)
+    ilist = ilist->init.deep;
+
+  if (!IS_AGGREGATE(sym->type) && getNelements(type, ilist)>1) {
+    werror (W_EXCESS_INITIALIZERS, "scalar", sym->name, sym->lineDef);
+  }
+
+  if (!(val = list2val (ilist))) {
+    // assuming a warning has been thrown
+    val=constVal("0");
+  }
+
+  if (val->type != type) {
+    val = valCastLiteral(type, floatFromVal(val));
+  }
+
+  if(val) 
+    ulval = (unsigned long) floatFromVal (val);
+  else
+    ulval =0;
+
+  switch (getSize (type)) {
+    case 1:
+	fprintf(of, "%s\tdata\t0x%02x\n", sym->name, (unsigned char)BYTE_IN_LONG(ulval, 0));
+//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
+	break;
+
+    case 2:
+//	fprintf(of, "%s\tdw\t0x%04x\n", sym->name, (unsigned int)(BYTE_IN_LONG(ulval, 0)
+//					+ (BYTE_IN_LONG(ulval, 1) << 8)));
+	fprintf(of, "%s\tdata\t0x%02x,0x%02x\n", sym->name, (unsigned char)BYTE_IN_LONG(ulval, 0),
+					(unsigned char)(BYTE_IN_LONG(ulval, 1) << 8));
+//    	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
+//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
+	break;
+
+    case 4:
+	fprintf(of, "%s\tdw\t0x%04x,0x%04x\n", sym->name, (unsigned int)(BYTE_IN_LONG(ulval, 0)
+					+ (BYTE_IN_LONG(ulval, 1) << 8)),
+					(unsigned)(BYTE_IN_LONG(ulval, 2)
+					+ (BYTE_IN_LONG(ulval, 3) << 8)));
+//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
+//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
+//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,2))));
+//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,3))));
+	break;
+  }
+}
+
+
+
+/*-----------------------------------------------------------------*/
+/* printIval - generates code for initial value                    */
+/*-----------------------------------------------------------------*/
+void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist)
+{
+  if (!ilist)
+    return;
+
+  /* if structure then    */
+  if (IS_STRUCT (type))
+    {
+      //fprintf(stderr,"%s struct\n",__FUNCTION__);
+      //printIvalStruct (sym, type, ilist, oFile);
+      return;
+    }
+
+  /* if this is a pointer */
+  if (IS_PTR (type))
+    {
+      //fprintf(stderr,"%s pointer\n",__FUNCTION__);
+      //printIvalPtr (sym, type, ilist, oFile);
+      return;
+    }
+
+  /* if this is an array   */
+  if (IS_ARRAY (type))
+    {
+      //fprintf(stderr,"%s array\n",__FUNCTION__);
+//      printIvalArray (sym, type, ilist, pb);
+      return;
+    }
+
+  /* if type is SPECIFIER */
+  if (IS_SPEC (type))
+    {
+//	fprintf(stderr,"%s spec\n",__FUNCTION__);
+      print_idataType(of, sym, type, ilist);
+      return;
+    }
+}
+
+
+void pic16_dump_idata(FILE *of, set *idataSymSet)
+{
+  int i;
+  symbol *ids;
+  
+
+	i = elementsInSet(idataSymSet);
+	if(!i)return;
+	
+	fprintf(of, "\n\n; Initialised data (idata)\n");
+	fprintf(of, "\tidata\n");
+	for(ids = setFirstItem(idataSymSet); ids; ids = setNextItem(idataSymSet))
+	      print_idata(of, ids, ids->type, ids->ival);
+
+}
 
 
 /*-----------------------------------------------------------------*
@@ -617,3 +745,4 @@ int pic16_getConfigWord(int address)
     return 0;
   }
 }
+

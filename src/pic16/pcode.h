@@ -268,6 +268,14 @@ typedef enum
   POC_SWAPF,
   POC_SWAPFW,
 //  POC_TRIS , // To be removed
+  POC_TBLRD,		// patch 15
+  POC_TBLRD_POSTINC,	//
+  POC_TBLRD_POSTDEC,	//
+  POC_TBLRD_PREINC,	//
+  POC_TBLWT,		//
+  POC_TBLWT_POSTINC,	//
+  POC_TBLWT_POSTDEC,	//
+  POC_TBLWT_PREINC,	// patch 15
   POC_TSTFSZ,
   POC_XORLW,
   POC_XORWF,
@@ -501,17 +509,6 @@ typedef struct pCodeCSource
     pCodeAsmDir
 **************************************************/
 
-typedef struct pCodeAsmDir
-{
-  pCode pc;
-  
-  char *directive;
-  char *arg;
-
-  pBranch *label;
-} pCodeAsmDir;
-
-
 /*************************************************
     pCodeFlow
 
@@ -621,6 +618,20 @@ typedef struct pCodeInstruction
 #define PCI_MAGIC	0x6e12
   unsigned int pci_magic;	// sanity check for pci initialization
 } pCodeInstruction;
+
+
+
+/*************************************************
+    pCodeAsmDir
+**************************************************/
+
+typedef struct pCodeAsmDir
+{
+  pCodeInstruction pci;
+  
+  char *directive;
+  char *arg;
+} pCodeAsmDir;
 
 
 /*************************************************
@@ -897,6 +908,10 @@ void pic16_printCallTree(FILE *of);
 void pCodePeepInit(void);
 void pic16_pBlockConvert2ISR(pBlock *pb);
 void pic16_pBlockConvert2Absolute(pBlock *pb);
+void pic16_emitDB(pBlock *pb, char c);		  // Add DB directives to a pBlock
+void pic16_flushDB(pBlock *pb);			  // Add pending DB data to a pBlock
+
+pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...); 
 
 pCodeOp *pic16_newpCodeOpLabel(char *name, int key);
 pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space);
@@ -923,7 +938,15 @@ extern pCodeOpReg pic16_pc_status;
 extern pCodeOpReg pic16_pc_intcon;
 extern pCodeOpReg pic16_pc_pcl;
 extern pCodeOpReg pic16_pc_pclath;
+extern pCodeOpReg pic16_pc_pclatu; // patch 14
 extern pCodeOpReg pic16_pc_wreg;
+extern pCodeOpReg pic16_pc_tosl; // patch 14
+extern pCodeOpReg pic16_pc_tosh; // patch 14
+extern pCodeOpReg pic16_pc_tosu; // patch 14
+extern pCodeOpReg pic16_pc_tblptrl; // patch 15
+extern pCodeOpReg pic16_pc_tblptrh; //
+extern pCodeOpReg pic16_pc_tblptru; //
+extern pCodeOpReg pic16_pc_tablat;  // patch 15
 extern pCodeOpReg pic16_pc_bsr;
 extern pCodeOpReg pic16_pc_fsr0;
 extern pCodeOpReg pic16_pc_fsr0l;

@@ -126,37 +126,48 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 #define IDX_PCL     0xff9
 #define IDX_STATUS  0xfd8
 #define IDX_PCLATH  0xffa
+#define IDX_PCLATU  0xffb /* patch 14 */
 #define IDX_INTCON  0xff2
 #define IDX_WREG    0xfe8
+#define IDX_BSR     0xfe0
+
+#define IDX_TOSL    0xffd /* patch 14 */
+#define IDX_TOSH    0xffe /* patch 14 */
+#define IDX_TOSU    0xfff /* patch 14 */
+
+#define IDX_TBLPTRL 0xff6 /* patch 15 */
+#define IDX_TBLPTRH 0xff7 /* patch 15 */
+#define IDX_TBLPTRU 0xff8 /* patch 15 */
+#define IDX_TABLAT  0xff5 /* patch 15 */
 
 #define IDX_FSR0    0xfe9
 #define IDX_FSR0L   0xfe9
 #define IDX_FSR0H   0xfea
-#define IDX_FSR1L	0xfe1
-#define IDX_FSR1H	0xfe2
-#define IDX_FSR2L	0xfd9
-#define IDX_FSR2H	0xfda
+#define IDX_FSR1L   0xfe1
+#define IDX_FSR1H   0xfe2
+#define IDX_FSR2L   0xfd9
+#define IDX_FSR2H   0xfda
 
-#define IDX_INDF0		0xfef
-#define IDX_POSTINC0	0xfee
-#define IDX_POSTDEC0	0xfed
-#define IDX_PREINC0		0xfec
-#define IDX_PLUSW0		0xfeb
+#define IDX_INDF0       0xfef
+#define IDX_POSTINC0    0xfee
+#define IDX_POSTDEC0    0xfed
+#define IDX_PREINC0     0xfec
+#define IDX_PLUSW0      0xfeb
 
-#define IDX_INDF1		0xfe7
-#define IDX_POSTINC1	0xfe6
-#define IDX_POSTDEC1	0xfe5
-#define IDX_PREINC1		0xfe4
-#define IDX_PLUSW1		0xfe3
+#define IDX_INDF1       0xfe7
+#define IDX_POSTINC1    0xfe6
+#define IDX_POSTDEC1    0xfe5
+#define IDX_PREINC1     0xfe4
+#define IDX_PLUSW1      0xfe3
 
-#define IDX_INDF2		0xfdf
-#define IDX_POSTINC2	0xfde
-#define IDX_POSTDEC2	0xfdd
-#define IDX_PREINC2		0xfdc
-#define IDX_PLUSW2		0xfdb
+#define IDX_INDF2       0xfdf
+#define IDX_POSTINC2    0xfde
+#define IDX_POSTDEC2    0xfdd
+#define IDX_PREINC2     0xfdc
+#define IDX_PLUSW2      0xfdb
 
-#define IDX_PRODL	0xff3
-#define IDX_PRODH	0xff4
+#define IDX_PRODL       0xff3
+#define IDX_PRODH       0xff4
 
 #define IDX_KZ      0x7fff   /* Known zero - actually just a general purpose reg. */
 #define IDX_WSAVE   0x7ffe

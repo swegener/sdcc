@@ -401,7 +401,7 @@ conditional_expr
 
 assignment_expr
    : conditional_expr
-   | unary_expr assignment_operator assignment_expr   
+   | cast_expr assignment_operator assignment_expr   
                      { 
 				 
 			     switch ($2) {

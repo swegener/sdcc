@@ -5265,7 +5265,7 @@ emitinline (iCode * ic, char *inlin)
               if (*l=='#')
                 l++;
               sym->isref = 1;
-              if (!sym->allocreq && !sym->ismyparm)
+              if (sym->level && !sym->allocreq && !sym->ismyparm)
                 {
                   werror (E_ID_UNDEF, sym->name);
                   werror (W_CONTINUE,

@@ -1,3 +1,10 @@
+2004-09-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (emitinline): fixed bug #1029778
+	* src/SDCC.y (assignment_expr): fixed the grammer so that assignment
+	to a cast object is no longer a syntax error ("fixes" bug #1030006,
+	and starts toward RFE #905167)
+
 2004-09-17 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (mov2f): New function to move an operand to

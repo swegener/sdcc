@@ -6,7 +6,7 @@ replace restart {
 replace restart {
 	ld %1,%1
 } by {
-	; Rule 1: Removed redundent load
+        ; Removed redundent load
 }
 replace restart {
 	xor a,a
@@ -22,7 +22,6 @@ replace restart {
 	cp a,#0x00
 	jp nz,%1
 } by {
-        ; Rule 3: Changed cp #0 to or
 	or	a,a
 	jp	nz,%1
 }
@@ -33,7 +32,6 @@ replace restart {
 	jp	%3
 %2:
 } by {
-	; Rule 4: Changed jp order
 	jp	z,%2
 %1:
 	jp	%3
@@ -44,7 +42,6 @@ replace restart {
 	jp	%2
 %1:
 } by {
-	; Rule 5: Changed jump logic
 	jp	z,%2
 %1:
 }
@@ -53,7 +50,6 @@ replace restart {
 	jp	%2
 %1:
 } by {
-	; Rule 6: Changed jump logic
 	jp	nz,%2
 %1:
 }
@@ -61,14 +57,12 @@ replace restart {
 	or	a,%1
 	or	a,a
 } by {
-	; Rule 7: Removed redundent or
 	or	a,%1
 }
 replace restart {
 	or	a,%1)
         or      a,a
 } by {
-	; Rule 8: Removed redundent or for (ix)
 	or	a,%1)
 }
 replace restart {

@@ -120,7 +120,7 @@
 enum 
 {
   /* Set to enable debugging trace statements in the output assembly code. */
-  DISABLE_DEBUG = 0,
+  DISABLE_DEBUG = 0
 };
 
 static char *_z80_return[] =
@@ -3733,11 +3733,9 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 	  emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
 	  if (size > 1)
 	    {
-	      size--;
-	      offset++;
-	      while (size--)
+	      while (--size)
 		{
-		  emit2 ("or a,%s", aopGet (AOP (left), offset, FALSE));
+		  emit2 ("or a,%s", aopGet (AOP (left), ++offset, FALSE));
 		}
 	    }
 	  else

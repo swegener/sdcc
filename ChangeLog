@@ -1,3 +1,9 @@
+2001-10-11  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/gen.c (gencjneshort): Fixed
+
+	* src/z80/ralloc.c (packRegsForHLUse): Added pack into HL for cast then ipush.
+
 2001-10-09  Michael Hope  <michaelh@juju.net.nz>
 
 	* support/regression/tests/bug-469671.c: Added.

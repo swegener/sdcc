@@ -1,3 +1,7 @@
+2003-03-17  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/ds390/peeph.def: fix bug #704878: added rule 213.b suggested by Jan Rejlek
+
 2003-03-16    <johan@balder>
 
 	Undid the hackup of const and volatile, the problem is much bigger

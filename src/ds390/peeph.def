@@ -1675,14 +1675,24 @@ replace {
 
 replace {
 	mov  %1,#(( %2 >> 8 ) ^ 0x80)
-} by {	
+} by {
+	; Peephole 213.a inserted fix
 	mov  %1,#(%2 >> 8)
+	xrl  %1,#0x80
+} if portIsDS390
+
+replace {
+	mov  %1,#(( %2 >> 16 ) ^ 0x80)
+} by {
+	; Peephole 213.b inserted fix
+	mov  %1,#(%2 >> 16)
 	xrl  %1,#0x80
 } if portIsDS390
 
 replace {
 	mov  %1,#(( %2 + %3 >> 8 ) ^ 0x80)
 } by {	
+	; Peephole 213.c inserted fix
 	mov  %1,#((%2 + %3) >> 8)
 	xrl  %1,#0x80
 } if portIsDS390

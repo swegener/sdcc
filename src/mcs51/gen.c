@@ -1548,10 +1548,13 @@ saveRegisters (iCode * lic)
 
   /* if the registers have been saved already or don't need to be then
      do nothing */
-  if (ic->regsSaved || IFFUNC_CALLEESAVES(OP_SYMBOL(IC_LEFT(ic))->type) ||
-      IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT (ic))))
+  if (ic->regsSaved)
     return;
-
+  if (IS_SYMOP(IC_LEFT(ic)) &&
+      (IFFUNC_CALLEESAVES(OP_SYMBOL(IC_LEFT(ic))->type) ||
+       IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT (ic)))))
+    return;
+  
   /* safe the registers in use at this time but skip the
      ones for the result */
   rsave = bitVectCplAnd (bitVectCopy (ic->rMask), 

@@ -2034,11 +2034,14 @@ saveRegisters (iCode * lic)
 
   /* if the registers have been saved already then
      do nothing */
-  if (ic->regsSaved || IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(ic)))) return ;
+  if (ic->regsSaved || 
+      (IS_SYMOP(IC_LEFT(ic)) && IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(ic)))))
+    return ;
 
   /* special case if DPTR alive across a function call then must save it 
      even though callee saves */
-  if (IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type)) {
+  if (IS_SYMOP(IC_LEFT(ic)) &&
+      IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type)) {
       int i;
       rsave = newBitVect(ic->rMask->size);
       for (i = DPL_IDX ; i <= B_IDX ; i++ ) {

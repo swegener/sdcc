@@ -512,6 +512,7 @@ PORT z80_port =
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
   TRUE,                         /* Array initializer support. */	
+  0,                            /* no CSE cost estimation yet */
   PORT_MAGIC
 };
 
@@ -594,5 +595,6 @@ PORT gbz80_port =
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
   TRUE,                         /* Array initializer support. */
+  0,                            /* no CSE cost estimation yet */
   PORT_MAGIC
 };

@@ -123,7 +123,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_ICODE_IN_ASM	"--i-code-in-asm"
 #define OPTION_PRINT_SEARCH_DIRS "--print-search-dirs"
 #define OPTION_MSVC_ERROR_STYLE "--vc"
-#define OPTION_USE_STDOUT "--use-stdout"
+#define OPTION_USE_STDOUT       "--use-stdout"
 
 static const OPTION
 optionsTable[] = {
@@ -1127,8 +1127,11 @@ parseCmdLine (int argc, char **argv)
 	    case 'M':
 	      {
 		preProcOnly = 1;
-		addSet(&preArgvSet, Safe_strdup("-M"));
-		break;
+                if (argv[i][2] == 'M')
+		  addSet(&preArgvSet, Safe_strdup("-MM"));
+                else
+		  addSet(&preArgvSet, Safe_strdup("-M"));
+	        break;
 	      }
 	    case 'C':
 	      {

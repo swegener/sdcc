@@ -87,6 +87,12 @@
 #include <string.h>
 #include <ctype.h>
 
+#if defined(__BORLANDC__) || defined(_MSC_VER)
+#define STRCASECMP stricmp
+#else
+#define STRCASECMP strcasecmp
+#endif
+
 #ifdef HAVE_SYS_ISA_DEFS_H
 #include <sys/isa_defs.h>
 #endif
@@ -469,7 +475,7 @@ _emit2 (const char *inst, const char *fmt,...)
 static void
 _emitMove(const char *to, const char *from)
 {
-  if (strcasecmp(to, from) != 0) 
+  if (STRCASECMP(to, from) != 0) 
     {
       emit2("ld %s,%s", to, from);
     }
@@ -491,6 +497,7 @@ aopDump(const char *plabel, asmop *aop)
       break;
     default:
       /* No information. */
+      break;
     }
 }
 

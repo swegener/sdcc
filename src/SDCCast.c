@@ -2030,9 +2030,18 @@ static void
 addCast (ast **tree, RESULT_TYPE resultType, bool upcast)
 {
   sym_link *newLink;
+  bool upCasted = FALSE;
   
   switch (resultType)
     {
+      case RESULT_TYPE_NONE:
+	/* char: promote to int */
+	if (!upcast ||
+	    getSize ((*tree)->etype) >= INTSIZE)
+	  return;
+	newLink = newIntLink();
+	upCasted = TRUE;
+	break;
       case RESULT_TYPE_CHAR:
 	if (getSize ((*tree)->etype) <= 1)
 	  return;
@@ -2051,22 +2060,26 @@ addCast (ast **tree, RESULT_TYPE resultType, bool upcast)
 	    getSize ((*tree)->etype) >= INTSIZE)
 	  return;
 	newLink = newIntLink();
+	upCasted = TRUE;
 	break;
       case RESULT_TYPE_OTHER:
 	if (!upcast)
 	  return;
-        /* long, float: promote to int */
+        /* return type is long, float: promote char to int */
 	if (getSize ((*tree)->etype) >= INTSIZE)
 	  return;
 	newLink = newIntLink();
+	upCasted = TRUE;
 	break;
       default:
 	return;
     }
   (*tree)->decorated = 0;
   *tree = newNode (CAST, newAst_LINK (newLink), *tree);
-  /* keep unsigned type */
-  SPEC_USIGN ((*tree)->left->opval.lnk) = IS_UNSIGNED ((*tree)->right->etype) ? 1 : 0;
+  /* keep unsigned type during cast to smaller type,
+     but not when promoting from char to int */
+  if (!upCasted)
+    SPEC_USIGN ((*tree)->left->opval.lnk) = IS_UNSIGNED ((*tree)->right->etype) ? 1 : 0;
   *tree = decorateType (*tree, resultType);
 }
 

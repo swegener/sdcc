@@ -1,10 +1,10 @@
-# Microsoft Developer Studio Project File - Name="msc51a" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="mcs51a" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Generic Project" 0x010a
 
-CFG=msc51a - Win32 Release
+CFG=mcs51a - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,12 +13,12 @@ CFG=msc51a - Win32 Release
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "mcs51a.mak" CFG="msc51a - Win32 Release"
+!MESSAGE NMAKE /f "mcs51a.mak" CFG="mcs51a - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "msc51a - Win32 Debug" (based on "Win32 (x86) Generic Project")
-!MESSAGE "msc51a - Win32 Release" (based on "Win32 (x86) Generic Project")
+!MESSAGE "mcs51a - Win32 Debug" (based on "Win32 (x86) Generic Project")
+!MESSAGE "mcs51a - Win32 Release" (based on "Win32 (x86) Generic Project")
 !MESSAGE 
 
 # Begin Project
@@ -27,7 +27,7 @@ CFG=msc51a - Win32 Release
 # PROP Scc_LocalPath ""
 MTL=midl.exe
 
-!IF  "$(CFG)" == "msc51a - Win32 Debug"
+!IF  "$(CFG)" == "mcs51a - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -40,7 +40,7 @@ MTL=midl.exe
 # PROP Intermediate_Dir ""
 # PROP Target_Dir ""
 
-!ELSEIF  "$(CFG)" == "msc51a - Win32 Release"
+!ELSEIF  "$(CFG)" == "mcs51a - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -57,13 +57,13 @@ MTL=midl.exe
 
 # Begin Target
 
-# Name "msc51a - Win32 Debug"
-# Name "msc51a - Win32 Release"
+# Name "mcs51a - Win32 Debug"
+# Name "mcs51a - Win32 Release"
 # Begin Source File
 
 SOURCE=.\peeph.def
 
-!IF  "$(CFG)" == "msc51a - Win32 Debug"
+!IF  "$(CFG)" == "mcs51a - Win32 Debug"
 
 # Begin Custom Build
 InputPath=.\peeph.def
@@ -73,7 +73,7 @@ InputPath=.\peeph.def
 
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "msc51a - Win32 Release"
+!ELSEIF  "$(CFG)" == "mcs51a - Win32 Release"
 
 # Begin Custom Build
 InputPath=.\peeph.def

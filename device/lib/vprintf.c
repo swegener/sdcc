@@ -35,6 +35,10 @@ extern void putchar(const char);
 
 typedef char _generic *ptr_t;
 
+#ifdef toupper
+#undef toupper
+#endif
+
 //#define toupper(c) ((c)&=~0x20)
 #define toupper(c) ((c)&=0xDF)
 
@@ -235,11 +239,23 @@ get_conversion_spec:
       case 'P':
 	PTR = va_arg(ap,ptr_t);
 
+#ifdef SDCC_MODEL_FLAT24
+	output_char(memory_id[(value.byte[3] > 3) ? 4 : value.byte[3]] );
+	output_char(':');
+	output_char('0');
+	output_char('x');
+	output_2digits(value.byte[2]);
+	output_2digits(value.byte[1]);
+	output_2digits(value.byte[0]);
+#else
 	output_char( memory_id[(value.byte[2] > 3) ? 4 : value.byte[2]] );
-	output_char( ':' );
-	if ((value.byte[2] != 0x00) && (value.byte[2] != 0x03))
+	output_char(':');
+	output_char('0');
+	output_char('x');
+	if ((value.byte[2] != 0x00 /* DSEG */) && (value.byte[2] != 0x03 /* SSEG */))
 	  output_2digits( value.byte[1] );
 	output_2digits( value.byte[0] );
+#endif
 	break;
 
       case 'D':

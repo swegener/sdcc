@@ -229,6 +229,17 @@ rm -f _test_.* a.out)
 
 # Checking characteristics of compilers and other programs
 # --------------------------------------------------------
+
+# Cross compiling overrides
+if test "$CC" = "i586-mingw32msvc-gcc"; then
+  ac_cv_c_bigendian=no
+  ac_cv_sizeof_char=1
+  ac_cv_sizeof_short=2
+  ac_cv_sizeof_int=4 
+  ac_cv_sizeof_long=4
+  ac_cv_sizeof_long_long=4
+fi
+
 AC_C_BIGENDIAN
 AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,ucsim_cv_MM,
 echo "#include <stdio.h>" >_test_.c
@@ -279,6 +290,7 @@ AC_SUBST(PICOPT)
 
 # Checks for typedefs, structures, and compiler characteristics.
 # ===========================================================================
+
 
 AC_TYPE_SIGNAL
 AC_CHECK_SIZEOF(char)

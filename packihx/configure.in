@@ -4,11 +4,16 @@ AC_PREREQ(2.13)
 
 AC_PROG_CC
 
-AC_CHECK_SIZEOF(char)
-AC_CHECK_SIZEOF(short)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
-AC_CHECK_SIZEOF(long long)
+# Defaults are for gcc on a 32 bit machine
+if test "$ac_cv_prog_cc_cross" = "yes"; then
+  AC_MSG_WARN("Cannot determine the sizeof basic types while cross compiling.  Using gcc on a 32 bit machine defaults.")
+fi
+
+AC_CHECK_SIZEOF(char, 1)
+AC_CHECK_SIZEOF(short, 2)
+AC_CHECK_SIZEOF(int, 4)
+AC_CHECK_SIZEOF(long, 4)
+AC_CHECK_SIZEOF(long long, 8)
 
 type_name()
 {

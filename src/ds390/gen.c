@@ -746,7 +746,7 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
     }
 
   /* if already has a asmop then continue */
-  if (op->aop)
+  if (op->aop && aop->size == getSize(sym->type))
     return;
 
   /* if the underlying symbol has a aop */

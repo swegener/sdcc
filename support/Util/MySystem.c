@@ -30,7 +30,14 @@
 #include <sys/stat.h>
 #endif
 
+
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+#include <unistd.h>
+#else
+// No unistd.h in Borland C++
+extern int access (const char *, int);
 #define X_OK 1
+#endif
 
 /*!
 Call an external program with arguements

@@ -1,3 +1,7 @@
+2003-05-21    <johan@balder>
+
+	* src/SDCCglue.c (printIval): fixed bug #739934
+
 2003-05-19  Bernhard Held <bernhard@bernhardheld.de>
 
 	Applied patch from bug 737905 (renamed yylineo to mylineno):

@@ -51,7 +51,6 @@ char  *fullSrcFileName ;/* full name for the source file */
 char  *srcFileName     ;/* source file name with the .c stripped */
 char  *moduleName      ;/* module name is srcFilename stripped of any path */
 char *preArgv[128]	   ;/* pre-processor arguments	*/
-int   preArgc	= 0	   ;/* pre-processor argument count	*/
 int   currRegBank = 0 ;
 struct optimize optimize ;
 struct options  options ;
@@ -116,6 +115,20 @@ char    *preOutName;
 #define OPTION_CALLEE_SAVES "-callee-saves"
 #define OPTION_NOREGPARMS   "-noregparms"
 
+static const char *linkCmd[] = {
+    "$1", "-nf", "$2", NULL
+};
+
+static const char *preCmd[] = {
+    "sdcpp", "-version", "-Wall", "-lang-c++", "-DSDCC=1", 
+    "-I" SDCC_INCLUDE_DIR, "$l", "$1", "$2", NULL
+};
+
+static const char *asmCmd[] = {
+    "$1", "-plosgffc", "$2.asm", NULL
+};
+
+
 extern PORT mcs51_port;
 extern PORT z80_port;
 
@@ -145,13 +158,70 @@ static int _setPort(const char *name)
     return 1;
 }
 
+static void _buildCmdLine(char *into, char **args, const char **cmds, 
+			  const char *p1, const char *p2, 
+			  const char *p3, const char **list)
+{
+    const char *p, *from;
+
+    while (*cmds) {
+	*args = into;
+	args++;
+
+	from = *cmds;
+	cmds++;
+	*into = '\0';
+
+	/* See if it has a '$' anywhere - if not, just copy */
+	if ((p = strchr(from, '$'))) {
+	    strncpy(into, from, p - from);
+	    from = p+2;
+	    p++;
+	    switch (*p) {
+	    case '1':
+		if (p1)
+		    strcat(into, p1);
+		break;
+	    case '2':
+		if (p2)
+		    strcat(into, p2);
+		break;
+	    case '3':
+		if (p3)
+		    strcat(into, p3);
+		break;
+	    case 'l': {
+		const char **tmp = list;
+		if (tmp) {
+		    while (*tmp) {
+			strcpy(into, *tmp);
+			into += strlen(into)+1;
+			*args = into;
+			args++;
+			tmp++;
+		    }
+		}
+		break;
+	    }
+	    default:
+		assert(0);
+	    }
+	}
+	strcat(into, from);
+	if (strlen(into) == 0)
+	    args--;
+	into += strlen(into)+1;
+    }
+    *args = NULL;
+}
+
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info			   */
 /*-----------------------------------------------------------------*/
 void	printVersionInfo ()
 {
     int i;
-
+    
     fprintf (stderr,
 	     "SDCC : ");
     for (i=0; i<NUM_PORTS; i++)
@@ -238,11 +308,6 @@ static void setDefaultOptions()
 	preArgv[i] = linkOptions [i] =
 	    asmOptions[i] = relFiles[i] = libFiles[i] =
 	    libPaths[i] = NULL ;
-    preArgv[preArgc++] = "-version";
-    preArgv[preArgc++] = "-Wall";
-    preArgv[preArgc++] = "-lang-c++";
-    preArgv[preArgc++] = "-DSDCC=1";
-    preArgv[preArgc++] = "-I" SDCC_INCLUDE_DIR ;
 
     /* first the options part */
     options.stack_loc = 0; /* stack pointer initialised to 0 */
@@ -343,6 +408,18 @@ static void processFile (char *s)
   
 }
 
+static void _addToList(char **list, const char *str)
+{
+    /* This is the bad way to do things :) */
+    while (*list)
+	list++;
+    *list = strdup(str);
+    if (!*list) {
+	werror(E_OUT_OF_MEM,__FILE__, 0);
+	exit (1);
+    }
+    *(++list) = NULL;
+}
 
 /*-----------------------------------------------------------------*/
 /* parseCmdLine - parses the command line and sets the options     */
@@ -825,23 +902,13 @@ int   parseCmdLine ( int argc, char **argv )
 		    else
 			rest = &argv[i][2] ;
 		    
-		    /* increase allocation for preprocessor argv 
-		       if (!(preArgv = realloc(preArgv,(preArgc+1)*sizeof(char **)))) {
-		       werror (E_OUT_OF_MEM);
-		       exit (1);
-		       } */
 		    if ( argv[i][1] == 'Y' )
 			argv[i][1] = 'I';
 		    if (argv[i][1] == 'M')
 			preProcOnly = 1;
 
-		    if (!(preArgv[preArgc] = GC_malloc(strlen(rest)+3))) {
-			werror(E_OUT_OF_MEM,__FILE__,strlen(rest)+3);			
-			exit (1);
-		    }
-		    
-		    sprintf(preArgv[preArgc],"-%c%s",sOpt,rest);
-		    preArgc++ ;
+		    sprintf(buffer, "-%c%s", sOpt, rest);
+		    _addToList(preArgv, buffer);
 		}
 		break ;
 
@@ -920,7 +987,8 @@ int my_system (const char *cmd, char **cmd_argv)
 static void linkEdit (char **envp)
 {
     FILE *lnkfile ;
-    char *lnkArgs[4];
+    char *argv[128];
+
     int i;
     if (!srcFileName)
 	srcFileName = "temp";
@@ -984,13 +1052,10 @@ static void linkEdit (char **envp)
     fprintf (lnkfile,"\n-e\n");
     fclose(lnkfile);
 
-    /* call the linker */
-    lnkArgs[0] = "aslink";
-    lnkArgs[1] = "-nf";
-    lnkArgs[2] = srcFileName;
-    lnkArgs[3] = NULL;
+    _buildCmdLine(buffer, argv, linkCmd, port->linker.exec_name, srcFileName, NULL, NULL);
 
-    if (my_system("aslink",lnkArgs)) {
+    /* call the linker */
+    if (my_system(argv[0], argv)) {
 	perror("Cannot exec linker");
 	exit(1);
     }
@@ -1009,67 +1074,48 @@ static void linkEdit (char **envp)
 /*-----------------------------------------------------------------*/
 static void assemble (char **envp)
 {
-    char *asmArgs[128];  /* assembler arguments */
-    /* PENDING: A bit messy */
-    char buffer2[1024];
+    char *argv[128];  /* assembler arguments */
 
-    int i = 2;
+    _buildCmdLine(buffer, argv, asmCmd, port->assembler.exec_name, srcFileName, NULL, asmOptions);
 
-    asmArgs[0] = port->assembler.exec_name;
-    
-    asmArgs[1] = port->assembler.debug_opts;
-
-    /* add the extra options if any */
-    for (; asmOptions[i-2] ; i++)
-	asmArgs[i] = asmOptions[i-2];
-
-    if (port->assembler.requires_output_name) {
-	sprintf(buffer2, srcFileName);
-	strcat(buffer2, ".o");
-	asmArgs[i++] = buffer2;
-    }
-	
-    /* create the assembler file name */
-    sprintf (buffer, srcFileName);
-    strcat (buffer, ".asm");
-    asmArgs[i++] = buffer;
-
-    asmArgs[i] = 0; /* end of args */
-
-    if (my_system(port->assembler.exec_name, asmArgs)) {
-	perror("Cannot exec linker");
+    if (my_system(argv[0], argv)) {
+	perror("Cannot exec assember");
 	exit(1);
     }
 }
+
+
 
 /*-----------------------------------------------------------------*/
 /* preProcess - spawns the preprocessor with arguments		   */
 /*-----------------------------------------------------------------*/
 static int preProcess (char **envp)
 {
-        
+    char *argv[128];
+
+    preOutName = NULL;
+
     /* if using external stack define the macro */
     if ( options.useXstack )
-	preArgv[preArgc++] = "-DSDCC_USE_XSTACK" ;
+	_addToList(preArgv, "-DSDCC_USE_XSTACK");
     
     /* set the macro for stack autos	*/
     if ( options.stackAuto )
-	preArgv[preArgc++] = "-DSDCC_STACK_AUTO";
+	_addToList(preArgv, "-DSDCC_STACK_AUTO");
     
     /* set the macro for large model	*/
     if ( options.model )
-	preArgv[preArgc++] = "-DSDCC_MODEL_LARGE" ;
+	_addToList(preArgv, "-DSDCC_MODEL_LARGE");
     else
-	preArgv[preArgc++] = "-DSDCC_MODEL_SMALL" ;
+	_addToList(preArgv, "-DSDCC_MODEL_SMALL");
     
-    preArgv[preArgc++] = fullSrcFileName ;
     if (!preProcOnly)
-	preArgv[preArgc++] = preOutName = strdup(tmpnam(NULL));
-    preArgv[preArgc] = NULL;
+	preOutName = strdup(tmpnam(NULL));
 
-    preArgv[0] = "sdcpp";
+    _buildCmdLine(buffer, argv, preCmd, fullSrcFileName, 
+		  preOutName, srcFileName, preArgv);
 
-    if (my_system("sdcpp",preArgv)) {
+    if (my_system(argv[0], argv)) {
 	unlink (preOutName);
 	perror("Cannot exec Preprocessor");
 	exit(1);

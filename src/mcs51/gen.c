@@ -2872,8 +2872,8 @@ genPlusIncr (iCode * ic)
 
   D(emitcode (";     genPlusIncr",""));
 
-  /* if increment 16 bits in register */
-  if (AOP_TYPE(IC_LEFT(ic)) == AOP_REG &&
+  /* if increment >=16 bits in register or direct space */
+  if ((AOP_TYPE(IC_LEFT(ic)) == AOP_REG || AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) && 
       (size > 1) &&
       (icount == 1))
@@ -3232,8 +3232,8 @@ genMinusDec (iCode * ic)
 
   D(emitcode (";     genMinusDec",""));
 
-  /* if decrement 16 bits in register */
-  if (AOP_TYPE(IC_LEFT(ic)) == AOP_REG &&
+  /* if decrement >=16 bits in register or direct space */
+  if ((AOP_TYPE(IC_LEFT(ic)) == AOP_REG || AOP_TYPE(IC_LEFT(ic)) == AOP_DIR) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
       (size > 1) &&
       (icount == 1))

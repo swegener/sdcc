@@ -907,6 +907,10 @@ floatFromVal (value * val)
     return (double) SPEC_CVAL (val->etype).v_ulong;
   }
 
+  if (SPEC_NOUN (val->etype) == V_VOID) {
+    return (double) SPEC_CVAL (val->etype).v_ulong;
+  }
+
   // we are lost !
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	  "floatFromVal: unknown value");

@@ -451,6 +451,10 @@ callFuncByName (char *fname,
     }
     ,
     {
+      "operandsNotSame", operandsNotSame
+    }
+    ,
+    {
       "operandsNotSame3", operandsNotSame3
     }
     ,
@@ -473,10 +477,6 @@ callFuncByName (char *fname,
     {
       "operandsNotSame8", operandsNotSame8
     }
-    ,
-    {
-      "operandsNotSame", operandsNotSame
-    }
     ,	  
     {
       "24bitMode", flat24bitMode
@@ -497,16 +497,40 @@ callFuncByName (char *fname,
       "24bitModeAndPortDS390", flat24bitModeAndPortDS390
     }
   };
-  int i;
+  int 	i;
+  char  *cmdCopy, *funcName, *funcArgs;
+  int 	rc = -1;
+    
+  /* Isolate the function name part (we are passed the full condition 
+   * string including arguments) 
+   */
+  cmdCopy = Safe_strdup(fname);
+  funcName = strtok(cmdCopy, " \t");
+  funcArgs = strtok(NULL, "");
 
-  for (i = 0; i < ((sizeof (ftab)) / (sizeof (struct ftab))); i++)
-    if (strncmp (ftab[i].fname, fname, strlen (ftab[i].fname)) == 0)
-      {
-	return (*ftab[i].func) (vars, currPl, head,
-				fname + strlen (ftab[i].fname));
-      }
-  fprintf (stderr, "could not find named function in function table\n");
-  return TRUE;
+    for (i = 0; i < ((sizeof (ftab)) / (sizeof (struct ftab))); i++)
+    {
+	if (strcmp (ftab[i].fname, funcName) == 0)
+	{
+	    rc = (*ftab[i].func) (vars, currPl, head,
+				  funcArgs);
+	}
+    }
+    
+    Safe_free(cmdCopy);
+    
+    if (rc == -1)
+    {
+	fprintf (stderr, 
+		 "could not find named function \"%s\" in "
+		 "peephole function table\n",
+		 funcName);
+        // If the function couldn't be found, let's assume it's
+	// a bad rule and refuse it.
+	rc = FALSE;
+    }
+    
+  return rc;
 }
 
 /*-----------------------------------------------------------------*/

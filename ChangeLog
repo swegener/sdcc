@@ -1,3 +1,9 @@
+2003-03-11 Kevin Vigor <kevin@vigor.nu>
+	* src/SDCCpeeph.c: quit being lazy and made proper fix (peephole
+	test function names must now match exactly).
+	* src/SDCCcse.c: added special case in findCheaperOp to allow
+	extending a short integer. Makes less awful code for bug 700121 test case.
+
 2003-03-11  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/lkmain.c: Added ASlink-Warning to messages 

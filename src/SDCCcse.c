@@ -363,13 +363,22 @@ DEFSETFUNC (findCheaperOp)
       if (IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
 	  SPEC_NOUN(operandType(cop)) != SPEC_NOUN(operandType(*opp)))
 	{
-	    //fprintf(stderr, 
-	    //	    "findCheaperOp: "
-	    //      "was about to replace %s with %s, Kev says no.\n",
-	    //	    nounName(operandType(cop)),
-	    //	    nounName(operandType(*opp)));
-	    *opp = NULL;
-	    return 0;
+	    // special case: we can make an unsigned char literal 
+	    // into an int literal with no cost.
+	    if (isOperandLiteral(*opp)
+	     && SPEC_NOUN(operandType(*opp)) == V_CHAR
+	     && SPEC_NOUN(operandType(cop)) == V_INT)
+	    {
+		*opp = operandFromOperand (*opp);
+		SPEC_NOUN(operandType(*opp)) = V_INT;
+	    }
+	    else
+	    {
+		// No clue...
+		*opp = NULL;
+		return 0;
+	    }
+	    
         }
 	  
       LRH(printf ("findCheaperOp: %s < %s\n",\

@@ -285,7 +285,7 @@ char *argv[];
 		bsp->b_base = (struct base *)new(sizeof(struct base));
 		bsp = bsp->b_base;
 		bsp->b_strp = (char *)malloc(18);
-		sprintf(bsp->b_strp, "_BSS_%d=0xA000", i);
+		sprintf(bsp->b_strp, "_DATA_%d=0xA000", i);
 	}
 #endif /* GAMEBOY */
 

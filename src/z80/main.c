@@ -14,7 +14,14 @@ static char _gbz80_defaultRules[] =
 
 Z80_OPTS z80_opts;
 
+static struct {
+    bool fsetAsmType;
+} _G;
+
 static char *_keywords[] = { NULL };
+
+extern PORT gbz80_port;
+extern PORT z80_port;
 
 #include "mappings.i"
 
@@ -27,7 +34,6 @@ static void _z80_init(void)
 static void _gbz80_init(void)
 {
     z80_opts.sub = SUB_GBZ80;
-    asm_addTree(&_asxxxx_gb);
 }
 
 static int regParmFlg = 0; /* determine if we can register a parameter */
@@ -57,6 +63,36 @@ static int _process_pragma(const char *sz)
 
 static bool _parseOptions(int *pargc, char **argv, int *i)
 {
+    if (argv[*i][0] == '-') {
+	if (argv[*i][1] == 'b' && IS_GB) {
+	    int bank = atoi(argv[*i] + 3);
+	    char buffer[128];
+	    switch (argv[*i][2]) {
+	    case 'o':
+		/* ROM bank */
+		sprintf(buffer, "_CODE_%u", bank);
+		gbz80_port.mem.code_name = gc_strdup(buffer);
+		return TRUE;
+	    case 'a':
+		/* RAM bank */
+		sprintf(buffer, "_DATA_%u", bank);
+		gbz80_port.mem.data_name = gc_strdup(buffer);
+		return TRUE;
+	    }
+	}
+	else if (!strncmp(argv[*i], "--asm=", 6)) {
+	    if (!strcmp(argv[*i], "--asm=rgbds")) {
+		asm_addTree(&_rgbds_gb);
+		_G.fsetAsmType = TRUE;
+		return TRUE;
+	    }
+	    else if (!strcmp(argv[*i], "--asm=asxxxx")) {
+		asm_addTree(&_asxxxx_gb);
+		_G.fsetAsmType = TRUE;
+		return TRUE;
+	    }
+	}
+    }
     return FALSE;
 }
 
@@ -64,6 +100,8 @@ static void _finaliseOptions(void)
 {
     port->mem.default_local_map = data;
     port->mem.default_globl_map = data;
+    if (!_G.fsetAsmType && IS_GB)
+	asm_addTree(&_asxxxx_gb);
 }
 
 static void _setDefaultOptions(void)

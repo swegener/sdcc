@@ -983,7 +983,6 @@ int   parseCmdLine ( int argc, char **argv )
 	    fprintf(cdbFile,"M:%s\n",moduleName);
 	}
     }
-    port->finaliseOptions();
     return 0;
 }
 
@@ -1286,10 +1285,13 @@ int main ( int argc, char **argv , char **envp)
     /* Initalise the port. */
     if (port->init)
 	port->init();
-    
-    initMem();
+
     setDefaultOptions();
     parseCmdLine(argc,argv);
+
+    initMem();
+
+    port->finaliseOptions();
 
     /* if no input then printUsage & exit */
     if ((!options.c1mode && !srcFileName && !nrelFiles) || (options.c1mode && !srcFileName && !options.out_name)) {

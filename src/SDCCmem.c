@@ -77,7 +77,6 @@ memmap *allocMap (char rspace,     /* sfr space            */
 /*-----------------------------------------------------------------*/
 void initMem ()
 {	
-	
 	/* allocate all the segments */
 	/* xternal stack segment ;   
 	           SFRSPACE       -   NO
@@ -246,7 +245,6 @@ void initMem ()
 void allocIntoSeg (symbol *sym) 
 {
     memmap *segment = SPEC_OCLS(sym->etype);
-
     addSet (&segment->syms,sym);
 }
 

@@ -1,3 +1,7 @@
+2002-02-23    <johan@balder>
+
+	* src/SDCCdflow.c (computeDataFlow): fixed bug #460088
+
 2002-02-22    <johan@balder>
 
 	* src/SDCCast.c: fixed bug #514865

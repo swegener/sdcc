@@ -274,7 +274,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  /* if the ival is a symbol assigned to an aggregate,
 	     (bug #458099 -> #462479)
 	     we don't need it anymore, so delete it from its segment */
-	  if (IS_AST_SYM_VALUE(sym->ival->init.node) &&
+	  if (sym->ival->type == INIT_NODE &&
+	      IS_AST_SYM_VALUE(sym->ival->init.node) &&
 	      IS_AGGREGATE (sym->type) ) {
 	    symIval=AST_SYMBOL(sym->ival->init.node);
 	    segment = SPEC_OCLS (symIval->etype);

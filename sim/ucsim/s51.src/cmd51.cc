@@ -97,7 +97,7 @@ cl_51cons::interpret(char *cmd)
     i++;
   if (cmd_table[i].name == NULL)
     {
-      fprintf(sim->cmd_out(), "Unknown command.\n");
+      sim->cmd->printf("Unknown command.\n");
       if (last_command)
 	{
 	  free(last_command);

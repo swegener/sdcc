@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (info.cc)
+ * Simulator of microcontrollers (cmd.src/info.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -153,4 +153,4 @@ cl_info_hw_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 }
 
 
-/* End of info.cc */
+/* End of cmd.src/info.cc */

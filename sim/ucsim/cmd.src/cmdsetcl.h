@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (cmdsetcl.h)
+ * Simulator of microcontrollers (cmd.src/cmdsetcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef CMDSETCL_HEADER
-#define CMDSETCL_HEADER
+#ifndef CMD_CMDSETCL_HEADER
+#define CMD_CMDSETCL_HEADER
 
 #include "newcmdcl.h"
 
@@ -337,4 +337,4 @@ public:
 
 #endif
 
-/* End of cmdsetcl.h */
+/* End of cmd.src/cmdsetcl.h */

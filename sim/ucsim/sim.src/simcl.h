@@ -88,9 +88,9 @@ public:
   virtual void stop(int reason);
 
   // Obsolete, for old commander
-public:
-  FILE *cmd_out(void);
-  FILE *cmd_in(void);
+  //public:
+  //FILE *cmd_out(void);
+  //FILE *cmd_in(void);
 };
 
 

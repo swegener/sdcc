@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (infocl.h)
+ * Simulator of microcontrollers (cmd.src/infocl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef INFOCL_HEADER
-#define INFOCL_HEADER
+#ifndef CMD_INFOCL_HEADER
+#define CMD_INFOCL_HEADER
 
 #include "newcmdcl.h"
 
@@ -70,4 +70,4 @@ public:
 
 #endif
 
-/* End of infocl.h */
+/* End of cmd.src/infocl.h */

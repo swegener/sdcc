@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (get.cc)
+ * Simulator of microcontrollers (cmd.src/get.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -76,4 +76,4 @@ cl_get_cmd::timer(class cl_cmdline *cmdline, class cl_console *con)
 }
 
 
-/* End of get.cc */
+/* End of cmd.src/get.cc */

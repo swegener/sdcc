@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (cmdcl.h)
+ * Simulator of microcontrollers (cmd.src/cmdcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef CMDCL_HEADER
-#define CMDCL_HEADER
+#ifndef CMD_NEWCMDCL_HEADER
+#define CMD_NEWCMDCL_HEADER
 
 
 #include "ddconfig.h"
@@ -136,9 +136,11 @@ public:
 
 class cl_console: public cl_base
 {
+  friend class cl_commander;
+protected:
+  FILE *in, *out;
 public:
   class cl_sim *sim;
-  FILE *in, *out;
   char *last_command;
   int flags; // See CONS_XXXX
   char *prompt;
@@ -227,4 +229,4 @@ public:
 
 #endif
 
-/* End of cmdcl.h */
+/* End of cmd.src/cmdcl.h */

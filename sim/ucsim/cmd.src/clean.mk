@@ -1,3 +1,7 @@
+#
+# ucsim cmd.src/clean.mk
+#
+
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
@@ -21,3 +25,5 @@ mostlyclean: clean
 # everything deleted by distclean plus files created by bison, etc.
 # -----------------------------------------------------------------------
 realclean: distclean
+
+# End of cmd.src/clean.mk

@@ -2112,13 +2112,13 @@ fi
 
 
 
-echo $ac_n "checking for type of accept's length pointer parameter""... $ac_c" 1>&6
-echo "configure:2117: checking for type of accept's length pointer parameter" >&5
-if eval "test \"`echo '$''{'dxpc_cv_accept_length_type'+set}'`\" = set"; then
+echo $ac_n "checking for type of length pointer parameter of accept""... $ac_c" 1>&6
+echo "configure:2117: checking for type of length pointer parameter of accept" >&5
+if eval "test \"`echo '$''{'s51_cv_accept_length_type'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   ac_save_CPPFLAGS="$CPPFLAGS"
-    dxpc_cv_accept_length_type=no
+    s51_cv_accept_length_type=no
     for ac_val in int size_t socklen_t; do
       CPPFLAGS="$ac_save_CPPFLAGS -DACCEPT_SOCKLEN_T=$ac_val"
       cat > conftest.$ac_ext <<EOF
@@ -2132,7 +2132,7 @@ struct sockaddr a; $ac_val len; accept (0, &a, &len);
 EOF
 if { (eval echo configure:2134: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  dxpc_cv_accept_length_type=$ac_val; break
+  s51_cv_accept_length_type=$ac_val; break
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
@@ -2142,11 +2142,11 @@ rm -f conftest*
     CPPFLAGS="$ac_save_CPPFLAGS"
 fi
 
-echo "$ac_t""$dxpc_cv_accept_length_type" 1>&6
+echo "$ac_t""$s51_cv_accept_length_type" 1>&6
 
-  if test $dxpc_cv_accept_length_type != no; then
+  if test $s51_cv_accept_length_type != no; then
     cat >> confdefs.h <<EOF
-#define ACCEPT_SOCKLEN_T $dxpc_cv_accept_length_type
+#define ACCEPT_SOCKLEN_T $s51_cv_accept_length_type
 EOF
 
   fi

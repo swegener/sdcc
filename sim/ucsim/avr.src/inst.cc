@@ -46,16 +46,32 @@ cl_avr::nop(t_mem code)
 }
 
 
+/*
+ * Sleep
+ * SLEEP
+ * 1001 0101 100X 1000
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::sleep(t_mem code)
 {
+  sleep_executed= 1;
   return(resGO);
 }
 
 
+/*
+ * Watchdog Reset
+ * WDR
+ * 1001 0101 101X 1000
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::wdr(t_mem code)
 {
+  //FIXME
   return(resGO);
 }
 

@@ -48,7 +48,7 @@ public:
   cl_option(void *opt, char *Iid, char *Ihelp);
   ~cl_option(void);
 
-  virtual void print(FILE *f)= 0;
+  virtual void print(class cl_console *con)= 0;
 
   virtual bool get_value(void)= 0;
 
@@ -62,7 +62,7 @@ class cl_bool_opt: public cl_option
 public:
   cl_bool_opt(bool *opt, char *Iid, char *Ihelp);
 
-  virtual void print(FILE *f);
+  virtual void print(class cl_console *con);
   virtual bool get_value(void);
   virtual void set_value(bool);
   virtual void set_value(char *s);
@@ -75,7 +75,7 @@ public:
 public:
   cl_cons_debug_opt(class cl_sim *Asim, char *Iid, char *Ihelp);
 
-  virtual void print(FILE *f);
+  virtual void print(class cl_console *con);
 
   virtual bool get_value(void);
 

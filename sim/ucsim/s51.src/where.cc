@@ -70,7 +70,7 @@ where_memory(cl_mem *mem, bool cs, class cl_sim *sim)
 	found= str[i] == (cs?mem->get(start+i):toupper(mem->get(start+i)));
       if (found)
 	{
-	  dump_memory(mem, &tmp, start+len-1, 8, sim->cmd_out(), sim);
+	  dump_memory(mem, &tmp, start+len-1, 8, sim->cmd->actual_console,sim);
 	  start+= len;
 	}
       else

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (newcmd.cc)
+ * Simulator of microcontrollers (cmd.src/newcmd.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -1122,4 +1122,4 @@ cl_commander::proc_input(void)
 }
 
 
-/* End of newcmd.cc */
+/* End of cmd.src/newcmd.cc */

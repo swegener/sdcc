@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 main(int argc, char *argv[])
 {
-  simulator= new cl_simavr(0, argc, argv);
+  simulator= new cl_simavr(argc, argv);
   simulator->init();
   simulator->main();
   delete simulator;

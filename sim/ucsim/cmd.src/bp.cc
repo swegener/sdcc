@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (bp.cc)
+ * Simulator of microcontrollers (cmd.src/bp.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -116,4 +116,4 @@ cl_clear_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 }
 
 
-/* End of bp.cc */
+/* End of cmd.src/bp.cc */

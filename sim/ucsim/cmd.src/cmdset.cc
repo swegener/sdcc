@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (cmdset.cc)
+ * Simulator of microcontrollers (cmd.src/cmdset.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -464,4 +464,4 @@ cl_kill_cmd::do_work(class cl_cmdline */*cmdline*/, class cl_console */*con*/)
 }
 
 
-/* End of cmdset.cc */
+/* End of cmd.src/cmdset.cc */

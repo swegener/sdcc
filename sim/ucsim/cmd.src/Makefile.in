@@ -1,5 +1,5 @@
 #
-# S51 mcs51/Makefile
+# ucsim cmd.src/Makefile
 #
 # (c) Drotos Daniel, Talker Bt. 1997
 #
@@ -114,4 +114,4 @@ checkconf:
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
 	fi
 
-# End of mcs51/Makefile.in
+# End of cmd.src/Makefile.in

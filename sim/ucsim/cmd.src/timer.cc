@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (timer.cc)
+ * Simulator of microcontrollers (cmd.src/timer.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -263,4 +263,4 @@ cl_timer_cmd::val(class cl_cmdline *cmdline, class cl_console *con)
 }
 
 
-/* End of timer.cc */
+/* End of cmd.src/timer.cc */

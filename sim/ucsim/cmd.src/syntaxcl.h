@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (syntaxcl.h)
+ * Simulator of microcontrollers (cmd.src/syntaxcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,9 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef SYNTAXCL_HEADER
-#define SYNTAXCL_HEADER
+#ifndef CMD_SYNTAXCL_HEADER
+#define CMD_SYNTAXCL_HEADER
 
 #endif
 
-/* End of syntaxcl.h */
+/* End of cmd.src/syntaxcl.h */

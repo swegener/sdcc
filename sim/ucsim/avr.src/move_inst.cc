@@ -411,9 +411,24 @@ cl_avr::ld_Rd_$X(t_mem code)
 }
 
 
+/*
+ * Pop Register from Stack
+ * POP Rd 0<=d<=31
+ * 1001 000d dddd 1111
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::pop_Rd(t_mem code)
 {
+  t_addr d;
+  t_mem D;
+
+  d= (code&0x1f0)>>4;
+  pop_data(&D);
+  ram->write(d, &D);
+  tick(1);
+  
   return(resGO);
 }
 
@@ -609,9 +624,24 @@ cl_avr::st_$X_Rr(t_mem code)
 }
 
 
+/*
+ * Push register on Stack
+ * PUSH Rr 0<=r<=31
+ * 1001 001d dddd 1111
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::push_Rr(t_mem code)
 {
+  t_addr d;
+  t_mem D;
+
+  d= (code&0x1f0)>>4;
+  D= ram->read(d);
+  push_data(D);
+  tick(1);
+
   return(resGO);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (cmdutil.h)
+ * Simulator of microcontrollers (cmd.src/cmdutil.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -25,8 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef CMDUTIL_HEADER
-#define CMDUTIL_HEADER
+#ifndef CMD_CMDUTIL_HEADER
+#define CMD_CMDUTIL_HEADER
 
 #include "ddconfig.h"
 
@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern int make_server_socket(unsigned short int port);
-extern void print_bin(long data, int bits, FILE *f);
+//extern void print_bin(long data, int bits, class cl_console *con);
 extern struct name_entry *get_name_entry(struct name_entry tabl[],
 					 char *name,
 					 class cl_uc *uc);
@@ -47,4 +47,4 @@ extern char *proc_escape(char *string, int *len);
 
 #endif
 
-/* End of cmdutil.h */
+/* End of cmd.src/cmdutil.h */

@@ -328,17 +328,15 @@ cmd_show(char *cmd, class cl_uc *uc, class cl_sim *sim)
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Parameter is not given.\n");
+      sim->cmd->printf("Parameter is not given.\n");
       return(DD_FALSE);
     }
   if (*s == 'c')
-    {
-      fprintf(sim->cmd_out(), "%s\n", copying);
-    }
+    sim->cmd->printf("%s\n", copying);
   else if (*s == 'w')
-    fprintf(sim->cmd_out(), "%s\n", warranty);
+    sim->cmd->printf("%s\n", warranty);
   else
-    fprintf(sim->cmd_out(), "Unknown parameter.\n");
+    sim->cmd->printf("Unknown parameter.\n");
   return(DD_FALSE);
 }
 

@@ -46,7 +46,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 void
 dump_memory(cl_mem *mem,
-	    t_addr *start, t_addr stop, int bpl, FILE *f,
+	    t_addr *start, t_addr stop, int bpl, class cl_console *con,
 	    class cl_sim *sim)
 {
   int i;
@@ -54,7 +54,7 @@ dump_memory(cl_mem *mem,
   while ((*start <= stop) &&
 	 (*start < mem->size))
     {
-      sim->cmd->printf("%06x ", *start);
+      con->printf("%06x ", *start);
       for (i= 0; (i < bpl) &&
 	     (*start+i < mem->size) &&
 	     (*start+i <= stop);
@@ -62,20 +62,20 @@ dump_memory(cl_mem *mem,
 	{
 	  char format[10];
 	  sprintf(format, "%%0%dx ", mem->width/4);
-	  fprintf(f, format/*"%02x "*/, mem->get(*start+i));
+	  con->printf(format/*"%02x "*/, mem->get(*start+i));
 	}
       while (i < bpl)
 	{
-	  fprintf(f, "   ");
+	  con->printf("   ");
 	  i++;
 	}
       for (i= 0; (i < bpl) &&
 	     (*start+i < mem->size) &&
 	     (*start+i <= stop);
 	   i++)
-	fprintf(f, "%c",
-		isprint(mem->get(*start+i))?(char)mem->get(*start+i):'.');
-      fprintf(f, "\n");
+	con->printf("%c",
+		    isprint(mem->get(*start+i))?(char)mem->get(*start+i):'.');
+      con->printf("\n");
       (*start)+= bpl;
     }
 }
@@ -144,66 +144,68 @@ cmd_dump_port(char *cmd, class t_uc51 *uc, class cl_sim *sim)
 {
   uchar data;
 
+  if (sim->cmd->actual_console == 0)
+    return(DD_FALSE);
   data= uc->get_mem(MEM_SFR, P0);
   sim->cmd->printf("P0    ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c", data, data, isprint(data)?data:'.');
 
   data= uc->get_mem(MEM_SFR, P1);
   sim->cmd->printf("    P1    ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c\n", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[0];
   sim->cmd->printf("Pin0  ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[1];
   sim->cmd->printf("    Pin1  ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c\n", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[0] & uc->get_mem(MEM_SFR, P0);
   sim->cmd->printf("Port0 ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[1] & uc->get_mem(MEM_SFR, P1);
   sim->cmd->printf("    Port1 ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c\n", data, data, isprint(data)?data:'.');
 
   sim->cmd->printf("\n");
 
   data= uc->get_mem(MEM_SFR, P2);
   sim->cmd->printf("P2    ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c", data, data, isprint(data)?data:'.');
 
   data= uc->get_mem(MEM_SFR, P3);
   sim->cmd->printf("    P3    ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c\n", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[2];
   sim->cmd->printf("Pin2  ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[3];
   sim->cmd->printf("    Pin3  ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c\n", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[2] & uc->get_mem(MEM_SFR, P2);
   sim->cmd->printf("Port2 ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c", data, data, isprint(data)?data:'.');
 
   data= uc->port_pins[3] & uc->get_mem(MEM_SFR, P3);
   sim->cmd->printf("    Port3 ");
-  print_bin(data, 8, sim->cmd_out());
+  sim->cmd->actual_console->print_bin(data, 8);
   sim->cmd->printf(" 0x%02x %3d %c\n", data, data, isprint(data)?data:'.');
 
   return(DD_FALSE);
@@ -243,7 +245,8 @@ cmd_dump_sfr(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       }
   else
     // dump all
-    dump_memory(uc->mem(MEM_SFR), &start, 255, 16, sim->cmd_out(), sim);
+    dump_memory(uc->mem(MEM_SFR), &start, 255, 16, sim->cmd->actual_console,
+		sim);
   return(DD_FALSE);
 }
 

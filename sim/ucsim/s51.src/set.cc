@@ -59,7 +59,7 @@ set_memory(cl_mem *mem, t_addr first,
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Address has not given.\n");
+      sim->cmd->printf("Address has not given.\n");
       return;
     }
   if (tabl)
@@ -72,28 +72,26 @@ set_memory(cl_mem *mem, t_addr first,
       if (p &&
 	  *p)
 	{
-	  fprintf(sim->cmd_out(), "Bad address.\n");
+	  sim->cmd->printf("Bad address.\n");
 	  return;
 	}
     }
   start= addr;
   if (start >= mem->size)
     {
-      fprintf(sim->cmd_out(),
-	      "Address %ld(0x%lx) is bigger than %ld(0x%lx).\n",
-	      start, start, mem->size-1, mem->size-1);
+      sim->cmd->printf("Address %ld(0x%lx) is bigger than %ld(0x%lx).\n",
+		       start, start, mem->size-1, mem->size-1);
       return;
     }
   if (!(start >= first))
     {
-      fprintf(sim->cmd_out(),
-	      "Address %ld(0x%lx) is less than %ld(0x%lx).\n",
-	      start, start, first, first);
+      sim->cmd->printf("Address %ld(0x%lx) is less than %ld(0x%lx).\n",
+		       start, start, first, first);
       return;
     }
   if ((s= strtok(NULL, " \t\v")) == NULL)
     {
-      fprintf(sim->cmd_out(), "Data has not given.\n");
+      sim->cmd->printf("Data has not given.\n");
       return;
     }
   while (s &&
@@ -105,7 +103,7 @@ set_memory(cl_mem *mem, t_addr first,
 	  if (p &&
 	      *p)
 	    {
-	      fprintf(sim->cmd_out(), "Bad data %s\n", s);
+	      sim->cmd->printf("Bad data %s\n", s);
 	      break;
 	    }
 	  mem->set(addr, data);
@@ -142,7 +140,7 @@ set_memory(cl_mem *mem, t_addr first,
 	}
       s= strtok(NULL, " \t\v");
     }
-  dump_memory(mem, &start, addr-1, 16, sim->cmd_out(), sim);
+  dump_memory(mem, &start, addr-1, 16, sim->cmd->actual_console, sim);
 }
 
 
@@ -209,25 +207,25 @@ cmd_set_bit(char *cmd, class cl_uc *uc, class cl_sim *sim)
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Address has not given.\n");
+      sim->cmd->printf("Address has not given.\n");
       return(DD_FALSE);
     }
   if (!interpret_bitname(s, uc, &cell, &addr, &bitaddr, &bitmask, NULL))
     {
-      fprintf(sim->cmd_out(), "Bad address %s\n", s);
+      sim->cmd->printf("Bad address %s\n", s);
       return(DD_FALSE);
     }
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Data has not given.\n");
+      sim->cmd->printf("Data has not given.\n");
       return(DD_FALSE);
     }
   while (s)
     {
       if (!isdigit(*s))
 	{
-	  fprintf(sim->cmd_out(), "Bad data %s\n", s);
+	  sim->cmd->printf("Bad data %s\n", s);
 	  return(DD_FALSE);
 	}
       if (*s == '0')
@@ -254,26 +252,26 @@ cmd_set_port(char *cmd, class cl_uc *uc, class cl_sim *sim)
   
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Port number has not given.\n");
+      sim->cmd->printf("Port number has not given.\n");
       return(DD_FALSE);
     }
   port= strtol(s, &p, 0);
   if ((p && *p) ||
       (port > 3))
     {
-      fprintf(sim->cmd_out(), "Port number %s is wrong.\n", s);
+      sim->cmd->printf("Port number %s is wrong.\n", s);
       return(DD_FALSE);
     }
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Date has not given.\n");
+      sim->cmd->printf("Date has not given.\n");
       return(DD_FALSE);
     }
   data= strtol(s, &p, 0);
   if (p && *p)
     {
-      fprintf(sim->cmd_out(), "Data %s is wrong.\n", s);
+      sim->cmd->printf("Data %s is wrong.\n", s);
       return(DD_FALSE);
     }
   uc->port_pins[port]= data;
@@ -300,7 +298,7 @@ fill_memory(uchar *what, int size, int first, class cl_uc *uc,
       (start < 0) ||
       (start < first) ||
       (start >= size))
-    fprintf(sim->cmd_out(), "Start address %s is wrong.\n", s);
+    sim->cmd->printf("Start address %s is wrong.\n", s);
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     return;
@@ -308,13 +306,13 @@ fill_memory(uchar *what, int size, int first, class cl_uc *uc,
   if ((p && *p) ||
       (stop < start) ||
       (stop >= size))
-    fprintf(sim->cmd_out(), "Stop address %s is wrong.\n", s);
+    sim->cmd->printf("Stop address %s is wrong.\n", s);
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     return;
   data= strtol(s, &p, 0);
   if (p && *p)
-    fprintf(sim->cmd_out(), "Data %s is wrong.\n", s);
+    sim->cmd->printf("Data %s is wrong.\n", s);
   
   while (start <= stop)
     {

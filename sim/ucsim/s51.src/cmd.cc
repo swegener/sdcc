@@ -94,9 +94,9 @@ cmd_get_option(char *cmd, class cl_uc *uc, class cl_sim *sim)
       if (!s ||
 	  !strcmp(s, o->id))
 	{
-	  fprintf(sim->cmd_out(), "%s ", o->id);
-	  o->print(sim->cmd_out());
-	  fprintf(sim->cmd_out(), " %s\n", o->help);
+	  sim->cmd->printf("%s ", o->id);
+	  o->print(sim->cmd->actual_console);
+	  sim->cmd->printf(" %s\n", o->help);
 	}
     }
   return(DD_FALSE);
@@ -116,12 +116,12 @@ cmd_set_option(char *cmd, class cl_uc *uc, class cl_sim *sim)
 
   if ((id= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Name of option has not given.\n");
+      sim->cmd->printf("Name of option has not given.\n");
       return(DD_FALSE);
     }
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Value has not given.\n");
+      sim->cmd->printf("Value has not given.\n");
       return(DD_FALSE);
     }
   for (i= 0; i < uc->options->count; i++)

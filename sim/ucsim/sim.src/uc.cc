@@ -356,7 +356,10 @@ cl_uc::read_hex_file(const char *name)
   uchar low= 0, high;
 
   if (!name)
-    f= sim->/*FIXME*/cmd_in();
+    {
+      sim->cmd->printf("cl_uc::read_hex_file File name not specified\n");
+      return(-1);
+    }
   else
     if ((f= fopen(name, "r")) == NULL)
       {
@@ -426,18 +429,17 @@ cl_uc::read_hex_file(const char *name)
 		  else
 		    if (sim->get_iarg('V', 0) &&
 			rtyp != 1)
-		      fprintf(sim->cmd_out(),
-			      "Unknown record type %d(0x%x)\n", rtyp, rtyp);
+		      sim->cmd->printf("Unknown record type %d(0x%x)\n",
+				       rtyp, rtyp);
 		}
 	      else
 		if (sim->get_iarg('V', 0))
-		  fprintf(sim->cmd_out(),
-			  "Checksum error (%x instead of %x) in record %ld.\n",
-			  chk, sum, recnum);
+		  sim->cmd->printf("Checksum error (%x instead of %x) in "
+				   "record %ld.\n", chk, sum, recnum);
 	    }
 	  else
 	    if (sim->get_iarg('V', 0))
-	      fprintf(sim->cmd_out(), "Read error in record %ld.\n", recnum);
+	      sim->cmd->printf("Read error in record %ld.\n", recnum);
 	}
     }
   if (get_mem_width(MEM_ROM) > 8 &&
@@ -447,7 +449,7 @@ cl_uc::read_hex_file(const char *name)
   if (name)
     fclose(f);
   if (sim->get_iarg('V', 0))
-    fprintf(sim->cmd_out(), "%ld records have been read\n", recnum);
+    sim->cmd->printf("%ld records have been read\n", recnum);
   analyze(0);
   return(written);
 }

@@ -43,6 +43,7 @@ cl_avr::ijmp(t_mem code)
 
   z= ram->get(ZH)*256 + ram->get(ZL);
   PC= ((PC & ~0xffff) | z) % rom->size;
+  //FIXME: analyze
   return(resGO);
 }
 
@@ -54,9 +55,26 @@ cl_avr::eijmp(t_mem code)
 }
 
 
+/*
+ * Indirect Call to Subroutine
+ * ICALL
+ * 1001 0101 XXXX 1001
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::icall(t_mem code)
 {
+  t_mem zl, zh;
+  t_addr z;
+  
+  push_addr(PC);
+  zl= ram->read(ZL);
+  zh= ram->read(ZH);
+  z= zh*256 + zl;
+  PC= (PC & ~0xffff) | (z & 0xffff);
+  //FIXME: analyze
+  tick(2);
   return(resGO);
 }
 
@@ -68,16 +86,43 @@ cl_avr::eicall(t_mem code)
 }
 
 
+/*
+ * Return from Subroutine
+ * RET
+ * 1001 0101 0XX0 1000
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::ret(t_mem code)
 {
+  t_addr a;
+
+  pop_addr(&a);
+  PC= a % rom->size;
+  tick(3);
   return(resGO);
 }
 
 
+/*
+ * Return from Interrupt
+ * RETI
+ * 1001 0101 0XX1 1000
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::reti(t_mem code)
 {
+  t_addr a;
+
+  pop_addr(&a);
+  PC= a % rom->size;
+  t_mem sreg= ram->read(SREG);
+  sreg|= BIT_I;
+  ram->write(SREG, &sreg);
+  tick(3);
   return(resGO);
 }
 
@@ -105,9 +150,26 @@ cl_avr::rjmp_k(t_mem code)
 }
 
 
+/*
+ * Relative Call to Subroutine
+ * RCALL k
+ * 1101 kkkk kkkk kkkk -1K<=k<=+1k
+ *____________________________________________________________________________
+ */
+
 int
 cl_avr::rcall_k(t_mem code)
 {
+  t_addr k;
+
+  push_addr(PC);
+  k= code & 0xfff;
+  if (k & 0x800)
+    k|= ~0xfff;
+  PC= (signed)PC + (signed)k;
+  PC= PC % rom->size;
+  tick(2);
+
   return(resGO);
 }
 
@@ -161,8 +223,7 @@ cl_avr::jmp_k(t_mem code)
 
   k= ((code&0x1f0)>>3)|(code&1);
   k= (k<<16)|fetch();
-  PC= k;
-  //FIXME: analyze
+  PC= k % rom->size;
   tick(2);
   return(resGO);
 }
@@ -183,7 +244,8 @@ cl_avr::call_k(t_mem code)
 
   k= (((code&0x1f0)>>3)|(code&1))*0x10000;
   k= k + fetch();
-
+  push_addr(PC);
+  PC= k % rom->size;
   tick(3);
   return(resGO);
 }
@@ -209,7 +271,7 @@ cl_avr::brbs_s_k(t_mem code)
     {
       if (code&0x200)
 	k|= -128;
-      PC= (PC+k) % get_mem_size(MEM_ROM);
+      PC= (PC+k) % rom->size;
       tick(1);
     }
   return(resGO);
@@ -236,7 +298,7 @@ cl_avr::brbc_s_k(t_mem code)
     {
       if (code&0x200)
 	k|= -128;
-      PC= (PC+k) % get_mem_size(MEM_ROM);
+      PC= (PC+k) % rom->size;
       tick(1);
     }
   return(resGO);
@@ -266,7 +328,7 @@ cl_avr::sbrc_Rr_b(t_mem code)
 	i++;
       if (dt[i].mnemonic != NULL)
 	{
-	  PC= (PC + dt[i].length) % get_mem_size(MEM_ROM);
+	  PC= (PC + dt[i].length) % rom->size;
 	  tick(1);
 	}
       else
@@ -299,7 +361,7 @@ cl_avr::sbrs_Rr_b(t_mem code)
 	i++;
       if (dt[i].mnemonic != NULL)
 	{
-	  PC= (PC + dt[i].length) % get_mem_size(MEM_ROM);
+	  PC= (PC + dt[i].length) % rom->size;
 	  tick(1);
 	}
       else

@@ -38,7 +38,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern void dump_memory(cl_mem *mem, t_addr *start, t_addr stop,
-			int bpl, FILE *f, class cl_sim *sim);
+			int bpl, class cl_console *con,
+			class cl_sim *sim);
 
 extern bool cmd_disass(char *cmd, class t_uc51 *uc, class cl_sim *sim);
 extern bool cmd_dump_port(char *cmd, class t_uc51 *uc, class cl_sim *sim);

@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (syntax.cc)
+ * Simulator of microcontrollers (cmd.src/syntax.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -28,4 +28,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local
 #include "syntaxcl.h"
 
-/* End of syntax.cc */
+/* End of cmd.src/syntax.cc */

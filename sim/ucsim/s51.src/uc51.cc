@@ -405,7 +405,7 @@ t_uc51::print_regs(class cl_console *con)
   uchar data;
 
   start= sfr->get(PSW) & 0x18;
-  dump_memory(iram, &start, start+7, 8, sim->cmd_out(), sim);
+  dump_memory(iram, &start, start+7, 8, /*sim->cmd_out()*/con, sim);
   start= sfr->get(PSW) & 0x18;
   data= iram->get(iram->get(start));
   con->printf("%06x %02x %c",

@@ -70,12 +70,12 @@ cl_bool_opt::cl_bool_opt(bool *opt, char *Iid, char *Ihelp):
 {}
 
 void
-cl_bool_opt::print(FILE *f)
+cl_bool_opt::print(class cl_console *con)
 {
   if (*(bool *)option)
-    fprintf(f, "TRUE");
+    con->printf("TRUE");
   else
-    fprintf(f, "FALSE");
+    con->printf("FALSE");
 }
 
 bool
@@ -121,13 +121,13 @@ cl_cons_debug_opt::cl_cons_debug_opt(class cl_sim *Asim,
 }
 
 void
-cl_cons_debug_opt::print(FILE *f)
+cl_cons_debug_opt::print(class cl_console *con)
 {
   if (sim->cmd->actual_console &&
       sim->cmd->actual_console->flags & CONS_DEBUG)
-    fprintf(f, "TRUE");
+    con->printf("TRUE");
   else
-    fprintf(f, "FALSE");
+    con->printf("FALSE");
 }
 
 bool

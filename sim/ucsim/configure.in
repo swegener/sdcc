@@ -172,29 +172,28 @@ if test "$s51_cv_getcwd" = "yes"; then
   AC_DEFINE(GNU_GETCWD)
 fi
 
-AC_DEFUN(dxpc_ACCEPT_LENGTH_T,
- [AC_CACHE_CHECK([for type of accept's length pointer parameter],
-   dxpc_cv_accept_length_type,
+AC_DEFUN(s51_ACCEPT_LENGTH_T,
+ [AC_CACHE_CHECK([for type of length pointer parameter of accept],
+   s51_cv_accept_length_type,
    [ac_save_CPPFLAGS="$CPPFLAGS"
-    dxpc_cv_accept_length_type=no
+    s51_cv_accept_length_type=no
     for ac_val in int size_t socklen_t; do
       CPPFLAGS="$ac_save_CPPFLAGS -DACCEPT_SOCKLEN_T=$ac_val"
       AC_TRY_COMPILE([#include <sys/types.h>
 #include <sys/socket.h>],
         [struct sockaddr a; $ac_val len; accept (0, &a, &len);],
-        [dxpc_cv_accept_length_type=$ac_val; break])
+        [s51_cv_accept_length_type=$ac_val; break])
     done
     CPPFLAGS="$ac_save_CPPFLAGS"])
 
-  if test $dxpc_cv_accept_length_type != no; then
-    AC_DEFINE_UNQUOTED(ACCEPT_SOCKLEN_T, $dxpc_cv_accept_length_type,
-      [Define to be the type of accept's length parameter (without
-the \*').])
+  if test $s51_cv_accept_length_type != no; then
+    AC_DEFINE_UNQUOTED(ACCEPT_SOCKLEN_T, $s51_cv_accept_length_type,
+      [Define to be the type of length parameter of accept (without the \*').])
   fi
  ]
 )
 
-dxpc_ACCEPT_LENGTH_T
+s51_ACCEPT_LENGTH_T
 
 # Macro definitions
 ###################

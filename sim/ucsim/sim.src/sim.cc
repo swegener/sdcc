@@ -467,7 +467,7 @@ cl_sim::stop(int reason)
  * Obsolete methods for old commander
  */
 
-FILE *
+/*FILE *
 cl_sim::cmd_in(void)
 {
   if (!cmd ||
@@ -477,9 +477,9 @@ cl_sim::cmd_in(void)
     return(cmd->actual_console->in?cmd->actual_console->in:stdin);
   class cl_console *con= (class cl_console *)(cmd->cons->at(0));
   return(con->in?con->in:stdin);
-}
+}*/
 
-FILE *
+/*FILE *
 cl_sim::cmd_out(void)
 {
   if (!cmd ||
@@ -489,7 +489,7 @@ cl_sim::cmd_out(void)
     return(cmd->actual_console->out?cmd->actual_console->out:stdout);
   class cl_console *con= (class cl_console *)(cmd->cons->at(0));
   return(con->out?con->out:stdout);
-}
+}*/
 
 
 /*

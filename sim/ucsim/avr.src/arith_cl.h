@@ -23,5 +23,5 @@
   virtual int dec_Rd(t_mem code);
   virtual int mul_Rd_Rr(t_mem code);
   virtual int adiw_Rdl_K(t_mem code);
-
+  virtual int sbiw_Rdl_K(t_mem code);
 /* End of avr.src/arith_cl.h */

@@ -192,16 +192,16 @@ cmd_brk_dele(char *cmd, class t_uc51 *uc, class cl_sim *sim)
 
   if ((id= strtok(NULL, delimiters)) == NULL)
     {
-      fprintf(sim->cmd_out(), "Event has not given.\n");
+      sim->cmd->printf("Event has not given.\n");
       return(DD_FALSE);
     }
   if ((s= strtok(NULL, delimiters)) == NULL)
-    fprintf(sim->cmd_out(), "Address has not given.\n");
+    sim->cmd->printf("Address has not given.\n");
   else
     {
       addr= (uint)strtol(s, NULL, 0);
       if (uc->ebrk_at(addr, id) == NULL)
-	fprintf(sim->cmd_out(), "No %s breakpoint at %06x\n", id, addr);
+	sim->cmd->printf("No %s breakpoint at %06x\n", id, addr);
       else
 	uc->rm_ebrk(addr, id);
     }

@@ -54,8 +54,7 @@ cmd_go(char *cmd, class t_uc51 *uc, class cl_sim *sim)
 
   if (sim->state & SIM_GO)
     {
-      fprintf(sim->cmd_out(),
-	      "Execution is already running.\n");
+      sim->cmd->printf("Execution is already running.\n");
       return(0);
     }
   if ((start_str= strtok(NULL, delimiters)) != NULL)
@@ -68,15 +67,14 @@ cmd_go(char *cmd, class t_uc51 *uc, class cl_sim *sim)
     {
       if (!uc->inst_at(start) &&
 	  uc->debug)
-	fprintf(sim->cmd_out(),
-		"Warning: maybe not instruction at 0x%06lx\n", start);
+	sim->cmd->printf("Warning: maybe not instruction at 0x%06lx\n", start);
       uc->PC= start;
     }
   if (stop >= 0)
     {
       if (start == (t_addr)stop)
 	{
-	  fprintf(sim->cmd_out(), "Addresses must be different.\n");
+	  sim->cmd->printf("Addresses must be different.\n");
 	  return(DD_FALSE);
 	}
       if ((b= uc->fbrk_at(stop)))
@@ -200,15 +198,14 @@ cmd_pc(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   if (p &&
       ((p == s) ||
        *p))
-    fprintf(sim->cmd_out(), "Wrong parameter, PC unchanged.\n");
+    sim->cmd->printf("Wrong parameter, PC unchanged.\n");
   else
     {
       if (pc >= EROM_SIZE)
 	pc= 0;
       if (!uc->inst_at(pc) &&
 	  uc->debug)
-	fprintf(sim->cmd_out(),
-		"Warning: maybe not instruction at %06lx\n", pc);
+	sim->cmd->printf("Warning: maybe not instruction at %06lx\n", pc);
       uc->PC= pc;
       uc->print_disass(uc->PC, sim->cmd->actual_console);
     }

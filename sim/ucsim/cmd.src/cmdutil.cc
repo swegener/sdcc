@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (cmdutil.cc)
+ * Simulator of microcontrollers (cmd.src/cmdutil.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
  * 
@@ -86,18 +86,18 @@ make_server_socket(unsigned short int port)
  * Printing out an integer in binary format
  */
 
-void
-print_bin(long data, int bits, FILE *f)
+/*void
+print_bin(long data, int bits, class cl_console *con)
 {
   long mask= 1;
 
   mask= mask << ((bits >= 1)?(bits-1):0);
   while (bits--)
     {
-      fprintf(f, "%c", (data&mask)?'1':'0');
+      con->printf("%c", (data&mask)?'1':'0');
       mask>>= 1;
     }
-}
+}*/
 
 
 /*
@@ -283,4 +283,4 @@ proc_escape(char *string, int *len)
 }
 
 
-/* End of cmdutil.cc */
+/* End of cmd.src/cmdutil.cc */

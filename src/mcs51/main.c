@@ -124,11 +124,7 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 static bool cseCostEstimation (iCode *ic, iCode *pdic)
 {
     operand *result = IC_RESULT(ic);
-    operand *right  = IC_RIGHT(ic);
-    operand *left   = IC_LEFT(ic);
     sym_link *result_type = operandType(result);
-    sym_link *right_type  = (right ? operandType(right) : 0);
-    sym_link *left_type   = (left  ? operandType(left)  : 0);
 
     /* if it is a pointer then return ok for now */
     if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;

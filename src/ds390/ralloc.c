@@ -36,6 +36,8 @@
 /* since the pack the registers depending strictly on the MCU      */
 /*-----------------------------------------------------------------*/
 
+#define D(x)
+
 /* Global data */
 static struct
   {
@@ -1307,7 +1309,7 @@ static void fillGaps()
 	if (sym->uptr && !sym->ruonly && getSize(sym->type) < 4) {
 	    if (packRegsDPTRuse(operandFromSymbol(sym))) {
 
-		printf("FILL GAPS: found more DPTR use for %s in func %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN");
+                D (printf ("FILL GAPS: found more DPTR use for %s in func %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
 		/* if this was ssigned to registers then */
 		if (bitVectBitValue(_G.totRegAssigned,sym->key)) {
 
@@ -1392,10 +1394,10 @@ static void fillGaps()
 		sym->regs[i] = NULL;
 	    }
 	    freeAllRegs();
-	    printf("Fill Gap gave up due to positioning for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN");
+	    D (printf ("Fill Gap gave up due to positioning for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
 	    continue ;	    
 	}
-	printf("FILLED GAP for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN");
+	D (printf ("FILLED GAP for %s in function %s\n",sym->name, currFunc ? currFunc->name : "UNKNOWN"));
 	_G.totRegAssigned = bitVectSetBit(_G.totRegAssigned,sym->key);
 	sym->isspilt = sym->spillA = 0 ;
 	sym->usl.spillLoc->allocreq--;

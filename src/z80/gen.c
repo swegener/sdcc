@@ -411,7 +411,7 @@ _emitMove(const char *to, const char *from)
     }
 }
 
-static void
+void
 aopDump(const char *plabel, asmop *aop)
 {
   emitDebug("; Dump of %s: type %s size %u", plabel, aopNames[aop->type], aop->size);
@@ -924,7 +924,7 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 	  /* force a new aop if sizes differ */
 	  sym->usl.spillLoc->aop = NULL;
       }
-      op->aop = aop =
+      sym->aop = op->aop = aop =
 	aopForSym (ic, sym->usl.spillLoc, result, requires_a);
       wassertl (aop->size >= getSize (sym->type), "Operand doesn't fit in the spill location");
       aop->size = getSize (sym->type);
@@ -6940,9 +6940,7 @@ static void
 genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
 {
   operand *from, *to, *count;
-  symbol *label;
   bool deInUse;
-  iCode *pcall;
 
   wassertl (nParams == 3, "Built-in memcpy must have two parameters");
   to = pparams[2];

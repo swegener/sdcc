@@ -129,7 +129,6 @@ iCodeTable codeTable[] =
 void checkConstantRange(sym_link *ltype, value *val, char *msg, 
 			int pedantic) {
   double max;
-  char message[132]="";
   int warnings=0;
   int negative=0;
   long v;

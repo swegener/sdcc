@@ -3337,7 +3337,7 @@ genPlus (iCode * ic)
   _startLazyDPSEvaluation ();
   while (size--)
     {
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC)
+      if (AOP_TYPE(IC_LEFT(ic)) == AOP_ACC && !AOP_NEEDSACC(IC_RIGHT(ic)))
 	{
 	  MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, TRUE));
 	  if (offset == 0)
@@ -3349,13 +3349,33 @@ genPlus (iCode * ic)
 	}
       else
 	{
+	  if (AOP_TYPE(IC_LEFT(ic)) == AOP_ACC && (offset == 0))
+	  {
+	      /* right is going to use ACC or we would have taken the
+	       * above branch.
+	       */
+	      assert(AOP_NEEDSACC(IC_RIGHT(ic)));
+	      D(emitcode(";", "+ AOP_ACC special case."););
+	      emitcode("xch", "a, %s", DP2_RESULT_REG);
+	  }
 	  MOVA (aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, TRUE));
 	  if (offset == 0)
-	    emitcode ("add", "a,%s",
-		  aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, FALSE));
+	  {
+	    if (AOP_TYPE(IC_LEFT(ic)) == AOP_ACC)
+	    {
+	        emitcode("add", "a, %s", DP2_RESULT_REG); 
+	    }
+	    else
+	    {
+	    	emitcode ("add", "a,%s",
+		  	aopGet (AOP(IC_LEFT(ic)), offset, FALSE, FALSE, FALSE));
+	    }
+          }
 	  else
+	  {
 	    emitcode ("addc", "a,%s",
 		  aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE, FALSE));
+	  }
 	}
       if (!pushResult)
 	{

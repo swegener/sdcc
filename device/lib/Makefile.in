@@ -150,7 +150,9 @@ include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08 model-pic16
+all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08
+
+# model-pic16
 
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 

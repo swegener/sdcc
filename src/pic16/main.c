@@ -405,8 +405,6 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
         }
 
         if(ISOPT(USE_CRT)) {
-          char *tmp;
-        
             pic16_options.no_crt = 0;
             pic16_options.crt_name = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
         }

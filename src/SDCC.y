@@ -1021,21 +1021,32 @@ declarator2_function_attributes
    : function_declarator2		  { $$ = $1 ; } 
    | function_declarator2 function_attribute  { 
            // copy the functionAttributes (not the args and hasVargs !!)
-           sym_link *funcType=$1->etype;
-           struct value *args=FUNC_ARGS(funcType);
-           unsigned hasVargs=FUNC_HASVARARGS(funcType);
+           struct value *args;
+           unsigned hasVargs;
+           sym_link *funcType=$1->type;
 
-           memcpy (&funcType->funcAttrs, &$2->funcAttrs, 
-    	       sizeof($2->funcAttrs));
+	   while (funcType && !IS_FUNC(funcType))
+	     funcType = funcType->next;
+	   
+	   if (!funcType)
+	     werror (E_FUNC_ATTR);
+	   else
+	     {
+	       args=FUNC_ARGS(funcType);
+               hasVargs=FUNC_HASVARARGS(funcType);
 
-           FUNC_ARGS(funcType)=args;
-           FUNC_HASVARARGS(funcType)=hasVargs;
+               memcpy (&funcType->funcAttrs, &$2->funcAttrs, 
+    	           sizeof($2->funcAttrs));
 
-           // just to be sure
-           memset (&$2->funcAttrs, 0,
-    	       sizeof($2->funcAttrs));
+               FUNC_ARGS(funcType)=args;
+               FUNC_HASVARARGS(funcType)=hasVargs;
+
+               // just to be sure
+               memset (&$2->funcAttrs, 0,
+    	           sizeof($2->funcAttrs));
            
-           addDecl ($1,0,$2); 
+               addDecl ($1,0,$2); 
+	     }
    }     
    ;
 
@@ -1078,26 +1089,26 @@ function_declarator2
    | declarator2 '('            { NestLevel++ ; currBlockno++;  }
                      parameter_type_list ')'
          {
+             sym_link *funcType;
 	   
 	     addDecl ($1,FUNCTION,NULL) ;
+
+	     funcType = $1->type;
+	     while (funcType && !IS_FUNC(funcType))
+	       funcType = funcType->next;
 	   
-	     FUNC_HASVARARGS($1->type) = IS_VARG($4);
-	     FUNC_ARGS($1->type) = reverseVal($4);
+	     assert (funcType);
+	     
+	     FUNC_HASVARARGS(funcType) = IS_VARG($4);
+	     FUNC_ARGS(funcType) = reverseVal($4);
 	     
 	     /* nest level was incremented to take care of the parms  */
 	     NestLevel-- ;
 	     currBlockno--;
 
 	     // if this was a pointer (to a function)
-	     if (IS_PTR($1->type)) {
-	       // move the args and hasVargs to the function
-	       FUNC_ARGS($1->etype)=FUNC_ARGS($1->type);
-	       FUNC_HASVARARGS($1->etype)=FUNC_HASVARARGS($1->type);
-	       memset (&$1->type->funcAttrs, 0,
-		       sizeof($1->type->funcAttrs));
-	       // remove the symbol args (if any)
+	     if (!IS_FUNC($1->type))
 	       cleanUpLevel(SymbolTab,NestLevel+1);
-	     }
 	     
 	     $$ = $1;
          }

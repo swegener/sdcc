@@ -7977,7 +7977,7 @@ static void genNearPointerGet (operand *left,
 	aopOp (result,ic,FALSE);
 	
 	/* if bitfield then unpack the bits */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 		genUnpackBits (result,rname,POINTER);
 	else {
 		/* we have can just get the values */
@@ -8075,7 +8075,7 @@ static void genPagedPointerGet (operand *left,
 	aopOp (result,ic,FALSE);
 	
 	/* if bitfield then unpack the bits */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 		genUnpackBits (result,rname,PPOINTER);
 	else {
 		/* we have can just get the values */
@@ -8153,7 +8153,7 @@ static void genFarPointerGet (operand *left,
 	aopOp(result,ic,FALSE);
 	
 	/* if bit then unpack */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 		genUnpackBits(result,"dptr",FPOINTER);
 	else {
 		size = AOP_SIZE(result);
@@ -8203,7 +8203,7 @@ static void genCodePointerGet (operand *left,
 	aopOp(result,ic,FALSE);
 	
 	/* if bit then unpack */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 		genUnpackBits(result,"dptr",CPOINTER);
 	else {
 		size = AOP_SIZE(result);
@@ -8265,7 +8265,7 @@ static void genGenPointerGet (operand *left,
 	/* so dptr know contains the address */
 	
 	/* if bit then unpack */
-	//if (IS_BITVAR(retype)) 
+	//if (IS_BITFIELD(retype)) 
 	//  genUnpackBits(result,"dptr",GPOINTER);
 	
 release:
@@ -8646,7 +8646,7 @@ static void genNearPointerSet (operand *right,
 	//if (AOP_TYPE(result) == AOP_IMMD &&
 	if (AOP_TYPE(result) == AOP_PCODE &&  //AOP_TYPE(result) == AOP_IMMD &&
 		DCL_TYPE(ptype) == POINTER   &&
-		!IS_BITVAR(retype)) {
+		!IS_BITFIELD(retype)) {
 		genDataPointerSet (right,result,ic);
 		freeAsmop(result,NULL,ic,TRUE);
 		return;
@@ -8679,7 +8679,7 @@ static void genNearPointerSet (operand *right,
 	
 	
 	/* if bitfield then unpack the bits */
-	if (IS_BITVAR(retype)) {
+	if (IS_BITFIELD(retype)) {
 		werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 			"The programmer is obviously confused");
 		//genPackBits (retype,right,rname,POINTER);
@@ -8784,7 +8784,7 @@ static void genPagedPointerSet (operand *right,
 	aopOp (right,ic,FALSE);
 	
 	/* if bitfield then unpack the bits */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 		genPackBits (retype,right,rname,PPOINTER);
 	else {
 		/* we have can just get the values */
@@ -8862,7 +8862,7 @@ static void genFarPointerSet (operand *right,
 	aopOp(right,ic,FALSE);
 	
 	/* if bit then unpack */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 		genPackBits(retype,right,"dptr",FPOINTER);
 	else {
 		size = AOP_SIZE(right);
@@ -8958,7 +8958,7 @@ static void genGenPointerSet (operand *right,
 	
 	
 	/* if bit then unpack */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 		genPackBits(retype,right,"dptr",GPOINTER);
 	else {
 		size = AOP_SIZE(right);

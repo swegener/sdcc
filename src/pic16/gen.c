@@ -3889,6 +3889,7 @@ static void genSkipz2(resolvedIfx *rifx, int invert_condition)
   rifx->generated = 1;
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* genSkipz                                                        */
 /*-----------------------------------------------------------------*/
@@ -3913,6 +3914,8 @@ static void genSkipz(iCode *ifx, int condition)
     pic16_emitcode("goto","_%05d_DS_",IC_FALSE(ifx)->key+100+labelOffset);
 
 }
+#endif
+
 /*-----------------------------------------------------------------*/
 /* genSkipCond                                                     */
 /*-----------------------------------------------------------------*/
@@ -6469,6 +6472,7 @@ static void genGetHbit (iCode *ic)
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* AccRol - rotate left accumulator by known count                 */
 /*-----------------------------------------------------------------*/
@@ -6506,6 +6510,7 @@ static void AccRol (int shCount)
             break;
     }
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* AccLsh - left shift accumulator by known count                  */
@@ -8366,7 +8371,7 @@ static void genNearPointerGet (operand *left,
     pic16_aopOp (result,ic,FALSE);
     
       /* if bitfield then unpack the bits */
-    if (IS_BITVAR(retype)) 
+    if (IS_BITFIELD(retype)) 
 	genUnpackBits (result,rname,POINTER);
     else {
 	/* we have can just get the values */
@@ -8464,7 +8469,7 @@ static void genPagedPointerGet (operand *left,
     pic16_aopOp (result,ic,FALSE);
 
     /* if bitfield then unpack the bits */
-    if (IS_BITVAR(retype)) 
+    if (IS_BITFIELD(retype)) 
 	genUnpackBits (result,rname,PPOINTER);
     else {
 	/* we have can just get the values */
@@ -8542,7 +8547,7 @@ static void genFarPointerGet (operand *left,
     pic16_aopOp(result,ic,FALSE);
 
     /* if bit then unpack */
-    if (IS_BITVAR(retype)) 
+    if (IS_BITFIELD(retype)) 
         genUnpackBits(result,"dptr",FPOINTER);
     else {
         size = AOP_SIZE(result);
@@ -8592,7 +8597,7 @@ static void genCodePointerGet (operand *left,
     pic16_aopOp(result,ic,FALSE);
 
     /* if bit then unpack */
-    if (IS_BITVAR(retype)) 
+    if (IS_BITFIELD(retype)) 
         genUnpackBits(result,"dptr",CPOINTER);
     else {
         size = AOP_SIZE(result);
@@ -8654,7 +8659,7 @@ static void genGenPointerGet (operand *left,
   /* so dptr know contains the address */
 
   /* if bit then unpack */
-	if (IS_BITVAR(retype)) 
+	if (IS_BITFIELD(retype)) 
 	genUnpackBits(result,"BAD",GPOINTER);
 
  release:
@@ -9073,7 +9078,7 @@ static void genNearPointerSet (operand *right,
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
   /* if bitfield then unpack the bits */
-  if (IS_BITVAR(retype)) {
+  if (IS_BITFIELD(retype)) {
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 	   "The programmer is obviously confused");
 //	genPackBits (retype,right,"BAD",POINTER);
@@ -9178,7 +9183,7 @@ static void genPagedPointerSet (operand *right,
     pic16_aopOp (right,ic,FALSE);
 
     /* if bitfield then unpack the bits */
-    if (IS_BITVAR(retype)) 
+    if (IS_BITFIELD(retype)) 
 	genPackBits (retype,right,rname,PPOINTER);
     else {
 	/* we have can just get the values */
@@ -9256,7 +9261,7 @@ static void genFarPointerSet (operand *right,
     pic16_aopOp(right,ic,FALSE);
 
     /* if bit then unpack */
-    if (IS_BITVAR(retype)) 
+    if (IS_BITFIELD(retype)) 
         genPackBits(retype,right,"dptr",FPOINTER);
     else {
         size = AOP_SIZE(right);
@@ -9353,7 +9358,7 @@ static void genGenPointerSet (operand *right,
 
 
   /* if bit then unpack */
-  if (IS_BITVAR(retype)) 
+  if (IS_BITFIELD(retype)) 
     genPackBits(retype,right,"dptr",GPOINTER);
   else {
     size = AOP_SIZE(right);

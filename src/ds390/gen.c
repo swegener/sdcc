@@ -9366,7 +9366,7 @@ genNearPointerGet (operand * left,
   aopOp (result, ic, FALSE, FALSE);
 
   /* if bitfield then unpack the bits */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
     genUnpackBits (result, rname, POINTER);
   else
     {
@@ -9466,7 +9466,7 @@ genPagedPointerGet (operand * left,
   aopOp (result, ic, FALSE, FALSE);
 
   /* if bitfield then unpack the bits */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
     genUnpackBits (result, rname, PPOINTER);
   else
     {
@@ -9571,7 +9571,7 @@ genFarPointerGet (operand * left,
   aopOp (result, ic, FALSE, (AOP_INDPTRn(left) ? FALSE : TRUE));
 
   /* if bit then unpack */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype)) {
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype)) {
       if (AOP_INDPTRn(left)) {
 	  genSetDPTR(AOP(left)->aopu.dptr);
       }
@@ -9691,7 +9691,7 @@ genCodePointerGet (operand * left,
   aopOp (result, ic, FALSE, (AOP_INDPTRn(left) ? FALSE : TRUE));
 
   /* if bit then unpack */
-  if (IS_BITVAR (retype)) {
+  if (IS_BITFIELD (retype)) {
       if (AOP_INDPTRn(left)) {
 	  genSetDPTR(AOP(left)->aopu.dptr);
       }
@@ -9816,7 +9816,7 @@ genGenPointerGet (operand * left,
   _G.bInUse--;
 
   /* if bit then unpack */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
   {
     genUnpackBits (result, "dptr", GPOINTER);
   }
@@ -10153,8 +10153,8 @@ genNearPointerSet (operand * right,
   aopOp (right, ic, FALSE, FALSE);
 
   /* if bitfield then unpack the bits */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
-    genPackBits ((IS_BITVAR (retype) ? retype : letype), right, rname, POINTER);
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
+    genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, rname, POINTER);
   else
     {
       /* we have can just get the values */
@@ -10249,8 +10249,8 @@ genPagedPointerSet (operand * right,
   aopOp (right, ic, FALSE, FALSE);
 
   /* if bitfield then unpack the bits */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
-    genPackBits ((IS_BITVAR (retype) ? retype : letype), right, rname, PPOINTER);
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
+    genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, rname, PPOINTER);
   else
     {
       /* we have can just get the values */
@@ -10356,11 +10356,11 @@ genFarPointerSet (operand * right,
   aopOp (right, ic, FALSE, (AOP_INDPTRn(result) ? FALSE : TRUE));
 
   /* if bit then unpack */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype)) {
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype)) {
       if (AOP_INDPTRn(result)) {
 	  genSetDPTR(AOP(result)->aopu.dptr);
       }
-      genPackBits ((IS_BITVAR (retype) ? retype : letype), right, "dptr", FPOINTER);
+      genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, "dptr", FPOINTER);
       if (AOP_INDPTRn(result)) {
 	  genSetDPTR(0);
       }
@@ -10478,9 +10478,9 @@ genGenPointerSet (operand * right,
     
 
   /* if bit then unpack */
-  if (IS_BITVAR (retype) || IS_BITVAR (letype))
+  if (IS_BITFIELD (retype) || IS_BITFIELD (letype))
     {
-	genPackBits ((IS_BITVAR (retype) ? retype : letype), right, "dptr", GPOINTER);
+	genPackBits ((IS_BITFIELD (retype) ? retype : letype), right, "dptr", GPOINTER);
     }
   else
     {
@@ -11166,7 +11166,7 @@ genCast (iCode * ic)
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
     return;
 
-  aopOp (right, ic, FALSE, FALSE);
+  aopOp (right, ic, FALSE, AOP_IS_STR (result));
   aopOp (result, ic, FALSE, (AOP_TYPE(right) == AOP_DPTR));
 
   /* if the result is a bit */

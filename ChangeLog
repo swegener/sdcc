@@ -1,3 +1,29 @@
+2004-02-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genNearPointerGet, genPagedPointerGet,
+	genFarPointerGet, genCodePointerGet, genGenPointerGet,
+	genNearPointerSet, genPagedPointerSet, genFarPointerSet,
+	genGenPointerSet),
+	* src/ds390/gen.c (genNearPointerGet, genPagedPointerGet,
+	genFarPointerGet, genCodePointerGet, genGenPointerGet,
+	genNearPointerSet, genPagedPointerSet, genFarPointerSet,
+	genGenPointerSet),
+	* src/pic16/gen.c (genNearPointerGet, genPagedPointerGet,
+	genFarPointerGet, genCodePointerGet, genGenPointerGet,
+	genNearPointerSet, genPagedPointerSet, genFarPointerSet,
+	genGenPointerSet),
+	* src/pic/gen.c (genNearPointerGet, genPagedPointerGet,
+	genFarPointerGet, genCodePointerGet, genGenPointerGet,
+	genNearPointerSet, genPagedPointerSet, genFarPointerSet,
+	genGenPointerSet): fixed bug #892400
+	* src/pic16/gen.c (genSkipz, AccRol): disabled functions with #if 0
+	to eliminate build warnings.
+	* src/SDCCast.c (processParms),
+	* src/SDCC.y (function_declarator2, declarator2_function_attributes):
+	fixed bug 751859
+	* support/valdiag/valdiag.py: added GCC to the list of defines active
+	when compiling with gcc
+
 2004-02-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/Util/SDCCerr.h,

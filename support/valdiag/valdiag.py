@@ -32,7 +32,8 @@ gcc = {
     "CCDEF":"-D",
     "CCOUTPUT":"-o",
     "defined": {
-        "__GNUC__":"1"
+        "__GNUC__":"1",
+        "GCC":"1"
     },
     "ignoremsg": [
     ]

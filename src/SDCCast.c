@@ -679,6 +679,7 @@ processParms (ast *func,
   if (func->type != EX_VALUE && !IFFUNC_ISREENT (functype) && !options.stackAuto)
     {
       werror (W_NONRENT_ARGS);
+      fatalError++;
       return 1;
     }
 

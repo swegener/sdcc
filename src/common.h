@@ -4,6 +4,10 @@
 #include <string.h>
 #include <assert.h>
 
+
+#ifndef COMMON_H
+#define COMMON_H
+
 #if defined(__APPLE__) && (__MACH__)
 #ifdef _G
 #undef _G
@@ -36,3 +40,5 @@
 #include "port.h"
 
 #include "newalloc.h"
+
+#endif

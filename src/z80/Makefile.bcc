@@ -1,28 +1,23 @@
-PRJDIR = ../..
+# Makefile for Borlad C++
 
-# !include $(PRJDIR)/Makefile.common
+PRJDIR = ../..
 
 OBJ = gen.obj ralloc.obj main.obj support.obj
 LIB = port.lib
 
-!include ..\..\Bcc.inc
-CFLAGS  = -I.. -I. -I..\.. -I..\..\support
+!include $(PRJDIR)/Bcc.inc
+CFLAGS = $(CFLAGS) -I.. -I$(PRJDIR)
 
 all: $(LIB)
 
 main.obj: main.c peeph.rul peeph-z80.rul peeph-gbz80.rul
 
-$(LIB): peeph.rul $(OBJ)
-	if exist $(LIB) del $(LIB)
-        tlib /a $(LIB) +gen.obj +ralloc.obj +main.obj +support.obj
+$(LIB): $(OBJ)
+        if exist $(LIB) del $(LIB)
+        tlib $@ @&&!
++$(**: = &^
++)
+!
 
-peeph.rul: peeph.def
-        gawk -f ../SDCCpeeph.awk peeph.def > peeph.rul
-
-peeph-gbz80.rul: peeph-gbz80.def
-        gawk -f ../SDCCpeeph.awk peeph-gbz80.def > peeph-gbz80.rul
-
-peeph-z80.rul: peeph-z80.def
-        gawk -f ../SDCCpeeph.awk peeph-z80.def > peeph-z80.rul
-
-# include clean.mk
+.def.rul:
+        gawk -f ../SDCCpeeph.awk $< > $@

@@ -1,8 +1,14 @@
 #Generic rules and options for building with Borland C++
 
+.cacheautodepend
+
+YACC = bison
+LEX = flex
+CC = bcc32
+
 SLIB = $(PRJDIR)/support/Util
 
-OFLAGS = -6 -O2 -g0 -w-proto
+OFLAGS = -6 -O2 -w-proto -g0
 
 .c.obj:
-        BCC32 -c -o$@ $(OFLAGS) $(CFLAGS) $(CPPFLAGS) -I$(SLIB) $<
+        $(CC) -c -o$@ $(OFLAGS) $(CFLAGS) $(CPPFLAGS) -I$(SLIB) $<

@@ -1,18 +1,14 @@
-PRJDIR		= ..
+# Makefile for Borlad C++
+
+PRJDIR          = ../../../..
+
+!include $(PRJDIR)/Bcc.inc
 
 OBJECTS         = tinitalk.obj
 
 TARGET          = tinitalk.exe
 
-# Compiling entire program or any subproject
-# ------------------------------------------
 all: $(TARGET)
 
-
-# My rules
-# --------
 $(TARGET): $(OBJECTS)
-        bcc32 -e$(TARGET) $(OBJECTS)
-
-!include ..\Bcc.inc
-
+        $(CC) $(CFLAGS) -e$(TARGET) $(OBJECTS)

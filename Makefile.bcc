@@ -1,53 +1,34 @@
-all: as ports sdcc packihx cpp2
+# Makefile for Borlad C++
 
-as:
-	cd as\mcs51
-	make -f Makefile.bcc
-	cd ..\..
+all: config asx8051 as-z80 sdcc packihx cpp2
+
+
+config: sdcc_vc.h
+
+sdcc_vc.h: sdcc_vc_in.h configure_vc.awk
+        gawk -f configure_vc.awk sdcc_vc_in.h > sdcc_vc.h
+
+asx8051:
+        cd as\mcs51
+        make -f Makefile.bcc
+        cd ..\..
+
+as-z80:
+        cd as\z80
+        make -f Makefile.bcc
+        cd ..\..
 
 cpp2:
-	cd support\cpp2
-	make -f Makefile.bcc
-	cd ..\..
-
-ports: z80 mcs51 avr ds390 pic xa51
-
-z80:
-	cd src\z80
-	make -f Makefile.bcc
-	cd ..\..
-
-mcs51:
-	cd src\mcs51
-	make -f Makefile.bcc
-	cd ..\..
-
-avr:
-	cd src\avr
-	make -f Makefile.bcc
-	cd ..\..
-
-ds390:
-	cd src\ds390
-	make -f Makefile.bcc
-	cd ..\..
-
-pic:
-	cd src\pic
-	make -f Makefile.bcc
-	cd ..\..
-
-xa51:
-	cd src\xa51
-	make -f Makefile.bcc
-	cd ..\..
+        cd support\cpp2
+        make -f Makefile.bcc
+        cd ..\..
 
 sdcc:
-	cd src
-	make -f Makefile.bcc
-	cd ..
+        cd src
+        make -f Makefile.bcc
+        cd ..
 
 packihx:
-	cd packihx
-	make -f Makefile.bcc
-	cd ..
+        cd packihx
+        make -f Makefile.bcc
+        cd ..

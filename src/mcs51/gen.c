@@ -4007,6 +4007,7 @@ genCmp (operand * left, operand * right,
 {
   int size, offset = 0;
   unsigned long lit = 0L;
+  bool rightInB;
 
   D(emitcode (";     genCmp",""));
 
@@ -4064,6 +4065,9 @@ genCmp (operand * left, operand * right,
 	  CLRC;
 	  while (size--)
 	    {
+	      rightInB = aopGetUsesAcc(AOP (right), offset);
+	      if (rightInB)
+		emitcode ("mov", "b,%s", aopGet (AOP (right), offset, FALSE, FALSE));
 	      MOVA (aopGet (AOP (left), offset, FALSE, FALSE));
 	      if (sign && size == 0)
 		{
@@ -4077,13 +4081,20 @@ genCmp (operand * left, operand * right,
 		    }
 		  else
 		    {
-		      emitcode ("mov", "b,%s", aopGet (AOP (right), offset++, FALSE, FALSE));
+		      if (!rightInB)
+		        emitcode ("mov", "b,%s", aopGet (AOP (right), offset, FALSE, FALSE));
 		      emitcode ("xrl", "b,#0x80");
 		      emitcode ("subb", "a,b");
 		    }
 		}
 	      else
-		emitcode ("subb", "a,%s", aopGet (AOP (right), offset++, FALSE, FALSE));
+		{
+		  if (rightInB)
+		    emitcode ("subb", "a,b");
+		  else
+		    emitcode ("subb", "a,%s", aopGet (AOP (right), offset, FALSE, FALSE));
+		}
+	      offset++;
 	    }
 	}
     }

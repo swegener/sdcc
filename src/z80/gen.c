@@ -14,7 +14,7 @@
   With loopInduction on				Breaks		198B
   With all working on				20796	158	196C
   Slightly better genCmp(signed)		20597	159	195B
-
+  
   Michael Hope <michaelh@earthling.net>	2000
   Based on the mcs51 generator - Sandeep Dutta . sandeep.dutta@usa.net (1998)
                            and -  Jean-Louis VERN.jlvern@writeme.com (1999)
@@ -538,18 +538,19 @@ dealloc:
     }
 }
 
-char *aopGetWord(asmop *aop, int offset)
+char *aopGetWordLong(asmop *aop, int offset, bool with_hash)
 {
     char *s = buffer ;
     char *rs;
 
-    assert(aop->size == 2);
+    if (aop->size != 2)
+	return NULL;
     assert(offset == 0);
 
     /* depending on type */
     switch (aop->type) {
     case AOP_IMMD:
-	sprintf (s,"#%s",aop->aopu.aop_immd);
+	sprintf (s,"%s%s",with_hash ? "#" : "", aop->aopu.aop_immd);
 	ALLOC_ATOMIC(rs,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
@@ -561,7 +562,7 @@ char *aopGetWord(asmop *aop, int offset)
 	if (!IS_FLOAT(val->type)) {
 	    unsigned long v = floatFromVal(val);
 
-	    sprintf(buffer,"#0x%04lx", v);
+	    sprintf(buffer,"%s0x%04lx", with_hash ? "#" : "", v);
 	    ALLOC_ATOMIC(rs,strlen(buffer)+1);
 	    return strcpy (rs,buffer);
 	}
@@ -570,6 +571,11 @@ char *aopGetWord(asmop *aop, int offset)
     }
     }
     return NULL;
+}
+
+char *aopGetWord(asmop *aop, int offset)
+{
+    return aopGetWordLong(aop, offset, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1376,16 +1382,30 @@ static bool genPlusIncr (iCode *ic)
     if (AOP_TYPE(IC_RIGHT(ic)) != AOP_LIT)
         return FALSE;
     
+    emitcode("", "; genPlusIncr");
+
+    icount = floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
+
+    /* If result is a pair */
+    if (isPair(AOP(IC_RESULT(ic)))) {
+	char *left = aopGetWordLong(AOP(IC_LEFT(ic)), 0, FALSE);
+	if (left) {
+	    /* Both a lit on the right and a true symbol on the left */
+	    emitcode("ld", "%s,#%s + %d", getPairName(AOP(IC_RESULT(ic))), left, icount);
+	    return TRUE;
+	}
+    }
+
     /* if the literal value of the right hand side
        is greater than 4 then it is not worth it */
-    if ((icount =  floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit)) > 4)
+    if (icount > 4)
         return FALSE ;
 
     /* Inc a pair */
     if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) &&
 	isPair(AOP(IC_RESULT(ic)))) {
 	while (icount--) {
-	    emitcode("inc", "%s", getPairName(AOP(IC_RESULT(ic))));
+	    emitcode("inc", "%s ; 1", getPairName(AOP(IC_RESULT(ic))));
 	}
 	return TRUE;
     }
@@ -1498,6 +1518,22 @@ static void genPlus (iCode *ic)
         goto release;   
 
     size = getDataSize(IC_RESULT(ic));
+
+    /* Special case when left and right are constant */
+    if (isPair(AOP(IC_RESULT(ic)))) {
+	char *left, *right;
+	
+	left = aopGetWordLong(AOP(IC_LEFT(ic)), 0, FALSE);
+	right = aopGetWordLong(AOP(IC_RIGHT(ic)), 0, FALSE);
+	if (left && right) {
+	    /* It's a pair */
+	    /* PENDING: fix */
+	    char buffer[100];
+	    sprintf(buffer, "#(%s + %s)", left, right);
+	    emitcode("ld", "%s,%s", getPairName(AOP(IC_RESULT(ic))), buffer);
+	    goto release;
+	}
+    }
 
     while(size--) {
 	if (AOP_TYPE(IC_LEFT(ic)) == AOP_ACC) {
@@ -1758,10 +1794,15 @@ static void genCmp (operand *left,operand *right,
         size = max(AOP_SIZE(left),AOP_SIZE(right));
 
         /* if unsigned char cmp with lit, just compare */
-        if((size == 1) && !sign &&
+        if((size == 1) && 
            (AOP_TYPE(right) == AOP_LIT && AOP_TYPE(left) != AOP_DIR )){
 	    emitcode("ld", "a,%s", aopGet(AOP(left), offset, FALSE));
-	    emitcode("cp", "%s", aopGet(AOP(right), offset, FALSE));
+	    if (sign) {
+		emitcode("xor", "a,#0x80");
+		emitcode("cp", "%s^0x80", aopGet(AOP(right), offset, FALSE));
+	    }
+	    else 
+		emitcode("cp", "%s", aopGet(AOP(right), offset, FALSE));
         } 
 	else {
             if(AOP_TYPE(right) == AOP_LIT) {
@@ -1785,30 +1826,46 @@ static void genCmp (operand *left,operand *right,
                     goto release;
                 }
             }
-	    CLRC;
-            while (size--) {
-		/* Do a long subtract */
-                MOVA(aopGet(AOP(left),offset,FALSE));
-                if (sign && size == 0) {
-		    /* Ugly but hey */
-		    emitcode("push", "af");
+	    if (sign) {
+		/* First setup h and l contaning the top most bytes XORed */
+		bool fDidXor = FALSE;
+		if (AOP_TYPE(left) == AOP_LIT){
+		    unsigned long lit = (unsigned long)
+			floatFromVal(AOP(left)->aopu.aop_lit);
+		    emitcode("ld", "l,#0x%02x",
+			     0x80 ^ (unsigned int)((lit >> ((size-1)*8)) & 0x0FFL));
+		}
+		else {
+		    emitcode("ld", "a,%s", aopGet(AOP(left), size-1, FALSE));
 		    emitcode("xor", "a,#0x80");
 		    emitcode("ld", "l,a");
-                    if (AOP_TYPE(right) == AOP_LIT){
-                        unsigned long lit = (unsigned long)
-			    floatFromVal(AOP(right)->aopu.aop_lit);
-			emitcode("pop", "af");
-			emitcode("ld", "a,l");
-			emitcode("sbc","a,#0x%02x",
-				 0x80 ^ (unsigned int)((lit >> (offset*8)) & 0x0FFL));                       
-                    } else {
-			emitcode("ld", "a,%s",aopGet(AOP(right),offset++,FALSE));
-			emitcode("xor", "a,#0x80");
-			emitcode("ld", "h,a");
-			emitcode("pop", "af");
-			emitcode("ld", "a,l");
-                        emitcode("sbc", "a,h");
-                    }
+		    fDidXor = TRUE;
+		}
+		if (AOP_TYPE(right) == AOP_LIT) {
+		    unsigned long lit = (unsigned long)
+			floatFromVal(AOP(right)->aopu.aop_lit);
+		    emitcode("ld", "h,#0x%02x",
+			     0x80 ^ (unsigned int)((lit >> ((size-1)*8)) & 0x0FFL));
+		}
+		else {
+		    emitcode("ld", "a,%s", aopGet(AOP(right), size-1, FALSE));
+		    emitcode("xor", "a,#0x80");
+		    emitcode("ld", "h,a");
+		    fDidXor = TRUE;
+		}
+		if (!fDidXor)
+		    CLRC;
+	    }
+	    else {
+		CLRC;
+	    }
+            while (size--) {
+		/* Do a long subtract */
+		if (!sign || size) 
+		    MOVA(aopGet(AOP(left),offset,FALSE));
+                if (sign && size == 0) {
+		    emitcode("ld", "a,l");
+		    emitcode("sbc", "a,h");
 		}
 		else {
 		    /* Subtract through, propagating the carry */
@@ -3147,6 +3204,7 @@ static void genGenPointerGet (operand *left,
     if (AOP_TYPE(left) == AOP_IMMD)
 	emitcode("ld","hl,%s",aopGet(AOP(left),0,TRUE));
     else { /* we need to get it byte by byte */
+	
 	emitcode("ld", "l,%s", aopGet(AOP(left), 0, FALSE));
 	emitcode("ld", "h,%s", aopGet(AOP(left), 1, FALSE));
     }
@@ -3401,18 +3459,30 @@ static void genAssign (iCode *ic)
        (AOP_TYPE(result) != AOP_REG) &&
        (AOP_TYPE(right) == AOP_LIT) &&
        !IS_FLOAT(operandType(right)) &&
-       (lit < 256L)){
-	emitcode("xor","a,a");
+       (lit < 256L)) {
+	bool fXored = FALSE;
+	offset = 0;
 	/* Work from the top down.
 	   Done this way so that we can use the cached copy of 0
 	   in A for a fast clear */
 	while (size--) {
-	    if((unsigned int)((lit >> (size*8)) & 0x0FFL)== 0)
-		aopPut(AOP(result),"a",size);
+	    if((unsigned int)((lit >> (offset*8)) & 0x0FFL)== 0) {
+		if (!fXored && size>1) {
+		    emitcode("xor", "a,a");
+		    fXored = TRUE;
+		}
+		if (fXored) {
+		    aopPut(AOP(result),"a",offset);
+		}
+		else {
+		    aopPut(AOP(result), "#0", offset);
+		}
+	    }
 	    else
 		aopPut(AOP(result),
-		       aopGet(AOP(right),size,FALSE),
-		       size);
+		       aopGet(AOP(right),offset,FALSE),
+		       offset);
+	    offset++;
 	}
     } else {
 	while (size--) {
@@ -3838,8 +3908,8 @@ void genZ80Code (iCode *lic)
 
     /* now we are ready to call the 
        peep hole optimizer */
-    /*    if (!options.nopeep)
-	  peepHole (&lineHead); */
+    if (!options.nopeep)
+	peepHole (&lineHead);
 
     /* now do the actual printing */
     printLine (lineHead,codeOutFile);

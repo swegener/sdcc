@@ -91,9 +91,6 @@ SDCCy.c: SDCC.y
 SDCClex.c: SDCC.lex SDCCy.h
 	$(LEX) -t $< >$@
 
-SDCCpeeph.rul: SDCCpeeph.def
-	$(AWK) -f SDCCpeeph.awk SDCCpeeph.def > SDCCpeeph.rul
-
 .y.c:
 	rm -f $*.cc $*.h
 	$(YACC) -d $<

@@ -1661,6 +1661,18 @@ static bool isBitwiseOptimizable (iCode *ic)
     return FALSE; 
 }
 
+/** Optimisations:
+    Certian assignments involving pointers can be temporarly stored
+    in HL.  Esp.
+genAssign
+    ld	iy,#_Blah
+    ld	bc,(iy)
+genAssign (ptr)
+    ld	hl,bc
+    ld	iy,#_Blah2
+    ld	(iy),(hl)
+*/
+
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
     be able to be stored in the accumelator.
@@ -1871,28 +1883,25 @@ void packRegisters (eBBlock *ebp)
 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);	
 #endif
 
-#if 0
 	/* if pointer set & left has a size more than
 	   one and right is not in far space */
 	if (POINTER_SET(ic)                    &&
-	    !isOperandInFarSpace(IC_RIGHT(ic)) &&
+	    /* MLH: no such thing.
+	       !isOperandInFarSpace(IC_RIGHT(ic)) && */
 	    !OP_SYMBOL(IC_RESULT(ic))->remat   &&
 	    !IS_OP_RUONLY(IC_RIGHT(ic))        &&
 	    getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 )
 
 	    packRegsForOneuse (ic,IC_RESULT(ic),ebp);
-#endif
 
-#if 0
 	/* if pointer get */
 	if (POINTER_GET(ic)                    &&
-	    !isOperandInFarSpace(IC_RESULT(ic))&&
+	    /* MLH: dont have far space
+	       !isOperandInFarSpace(IC_RESULT(ic))&& */
 	    !OP_SYMBOL(IC_LEFT(ic))->remat     &&
 	    !IS_OP_RUONLY(IC_RESULT(ic))         &&
 	    getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 )
-
 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);
-#endif
 
 	/* pack registers for accumulator use, when the result of an
 	   arithmetic or bit wise operation has only one use, that use is

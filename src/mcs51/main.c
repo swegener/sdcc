@@ -8,6 +8,11 @@
 #include "main.h"
 #include "ralloc.h"
 
+static char _defaultRules[] =
+{
+#include "peeph.rul"
+};
+
 /* list of key words used by msc51 */
 static char *_mcs51_keywords[] =     {
     "at",
@@ -133,6 +138,9 @@ PORT mcs51_port = {
     },
     {
 	_linkCmd
+    },
+    {
+	_defaultRules
     },
     {
     	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

@@ -10,9 +10,12 @@ CFLAGS += -I.. -I. -I../..
 
 all: $(LIB)
 
-$(LIB): $(OBJ)
+$(LIB): peeph.rul $(OBJ)
 	rm -f $(LIB)
 	ar r $(LIB) $(OBJ)
 	ranlib $(LIB)
+
+peeph.rul: peeph.def
+	$(AWK) -f ../SDCCpeeph.awk peeph.def > peeph.rul
 
 include clean.mk

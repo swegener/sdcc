@@ -1,6 +1,11 @@
 #include "common.h"
 #include "ralloc.h"
 
+static char _defaultRules[] =
+{
+#include "peeph.rul"
+};
+
 static char *_z80_keywords[] = { NULL };
 
 void z80_assignRegisters (eBBlock **ebbs, int count);
@@ -17,7 +22,7 @@ static void _z80_finaliseOptions(void)
 static void _z80_setDefaultOptions(void)
 {    
     options.genericPtr = 1;   /* default on */
-    options.nopeep    = 1;
+    options.nopeep    = 0;
     options.stackAuto = 1;
     options.mainreturn = 1;
     options.noregparms = 1;
@@ -66,6 +71,9 @@ PORT z80_port = {
     },
     {
 	_linkCmd
+    },
+    {
+	_defaultRules
     },
     {
     	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

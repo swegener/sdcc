@@ -1,0 +1,5 @@
+replace restart {
+	ld %1,%1
+} by {
+	; Removed redundent load
+}

@@ -49,6 +49,11 @@
 */
 unsigned _clock(void);
 
+/** Print the number of t-states this program has been executing for.
+    Optional :)
+*/
+void _printTStates(void);
+
 /** Set to one to print more messages about expected values etc. 
  */
 #define DEBUG	0
@@ -124,7 +129,7 @@ int main(void)
     /* overflow may occur for this array element.                   */
 
     /* 32766 is the highest value for a 16 bitter */
-    Number_Of_Runs = 20000;
+    Number_Of_Runs = 32766;
 
     runTime = _clock();
 
@@ -256,6 +261,7 @@ int main(void)
     printf("Time: %u ticks\n", runTime);
     printf("Dhrystones/s = %u\n", Number_Of_Runs / (runTime/HZ));
     printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
+    _printTStates();
 }
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)
@@ -454,7 +460,7 @@ void Proc_8 (int *Arr_1_Par_Ref, int *Arr_2_Par_Ref,
     DPRINTF(("-> Proc_8\n"));
     Int_Loc = Int_1_Par_Val + 5;
     Arr_1_Par_Ref [Int_Loc] = Int_2_Par_Val;
-    DPRINTF(("Int_Loc %d == 8\n", Int_Loc));
+    DPRINTF(("Int_Loc %d == 8 Int_2_Par_Val %d == 7\n", Int_Loc, Int_2_Par_Val));
 
     Arr_1_Par_Ref [Int_Loc+1] = Arr_1_Par_Ref [Int_Loc];
     Arr_1_Par_Ref [Int_Loc+30] = Int_Loc;
@@ -463,6 +469,7 @@ void Proc_8 (int *Arr_1_Par_Ref, int *Arr_2_Par_Ref,
     Arr_2_Par_Ref [Int_Loc * 50 + Int_Loc-1] += 1;
     Arr_2_Par_Ref [(Int_Loc+20 *50) + Int_Loc] = Arr_1_Par_Ref [Int_Loc];
     Int_Glob = 5;
+    DPRINTF(("Arr_1_Glob[8] %d == 7\n", Arr_1_Par_Ref[8]));
 }
 
 /*********************************************************************/

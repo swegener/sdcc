@@ -29,6 +29,11 @@ typedef struct {
 	const char **cmd;
     } linker;
 
+    struct {
+	/** Default peephole rules */
+	char *default_rules;
+    } peep;
+
     /** Basic type sizes */
     struct {
 	int char_size;

@@ -29,11 +29,6 @@
 peepRule *rootRules = NULL;
 peepRule *currRule  = NULL;
 
-char *defaultRules =
-{
-#include "SDCCpeeph.rul"
-};
- 
 static bool matchLine (char *, char *, hTab **);
 
 #define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *head)
@@ -705,7 +700,7 @@ void initPeepHole ()
     char *s;
 
     /* read in the default rules */
-    readRules(defaultRules);
+    readRules(port->peep.default_rules);
 
     /* if we have any additional file read it too */
     if (options.peep_file) {

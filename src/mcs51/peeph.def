@@ -4148,3 +4148,48 @@ replace {
 	sjmp	%20
 %3:
 } if labelJTInRange
+
+// applies to: a = (a << 1) | (a >> 15);
+replace {
+	mov	a,%1
+	add	a,%1
+	mov	%1,a
+	mov	a,%2
+	rlc	a
+	mov	%2,a
+	mov	a,%1
+	mov	acc.0,c
+	mov	%1,a
+} by {
+	;	Peephole 261.a	optimized left rol
+	mov	a,%1
+	rlc	a
+	xch	a,%2
+	rlc	a
+	xch	a,%2
+	mov	acc.0,c
+	mov	%1,a
+}
+
+// applies to: a = (a << 15) | (a >> 1);
+replace {
+	clr	c
+	mov	a,%1
+	rrc	a
+	mov	%1,a
+	mov	a,%2
+	rrc	a
+	mov	%2,a
+	mov	a,%1
+	mov	acc.7,c
+	mov	%1,a
+} by {
+	;	Peephole 261.b	optimized right rol
+	mov	a,%1
+	rrc	a
+	xch	a,%2
+	rrc	a
+	xch	a,%2
+	mov	acc.7,c
+	mov	%1,a
+}

@@ -361,7 +361,7 @@ parseWithComma (char **dest, char *src)
 {
   int i = 0;
 
-  strtok (src, "\n \t");
+  strtok (src, "\r\n \t");
   /* skip the initial white spaces */
   while (isspace (*src))
     src++;

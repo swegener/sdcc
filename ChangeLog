@@ -1,5 +1,13 @@
 2001-10-13  Michael Hope  <michaelh@juju.net.nz>
 
+	* src/SDCCmain.c (linkEdit): Added support for passing a legacy command line through the processor.
+
+	* src/mcs51/main.c (_linkCmd): Added bin path to command.
+
+	* src/SDCCmain.c (initValues): Added support for when it it called just to link.
+
+	* as/mcs51/lklibr.c (libfil;): Turned off 'library file' message.
+
 	* src/SDCCval.c (constVal): Fixed usage of 'L' modifier problems on ppc.
 
 	* support/regression/tests/longor.c: Added.

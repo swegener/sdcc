@@ -135,6 +135,12 @@ static char **_fTmp;
 
 extern FILE *codeOutFile;
 
+enum
+  {
+    INT8MIN = -128,
+    INT8MAX = 127
+  };
+
 /** Enum covering all the possible register pairs.
  */
 typedef enum
@@ -536,10 +542,10 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
   if (sym->onStack || sym->iaccess)
     {
       /* The pointer that is used depends on how big the offset is.
-         Normally everything is AOP_STK, but for offsets of < -127 or
-         > 128 on the Z80 an extended stack pointer is used.
+         Normally everything is AOP_STK, but for offsets of < -128 or
+         > 127 on the Z80 an extended stack pointer is used.
       */
-      if (IS_Z80 && (options.ommitFramePtr || sym->stack < -127 || sym->stack > (int)(128-getSize (sym->type))))
+      if (IS_Z80 && (options.ommitFramePtr || sym->stack < INT8MIN || sym->stack > (int)(INT8MAX-getSize (sym->type))))
         {
           emitDebug ("; AOP_EXSTK for %s", sym->rname);
           sym->aop = aop = newAsmop (AOP_EXSTK);
@@ -1082,7 +1088,7 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
 		      adjustPair (pair, &_G.pairs[pairId].offset, offset);
 		      return;
 		    }
-		  if (pairId == PAIR_IY && abs (offset) < 127)
+		  if (pairId == PAIR_IY && (offset >= INT8MIN && offset <= INT8MAX))
 		    {
 		      return;
 		    }
@@ -1159,6 +1165,22 @@ fetchHL (asmop * aop)
 }
 
 static void
+setupPairFromSP (PAIR_ID id, int offset)
+{
+  wassertl (id == PAIR_HL, "Setup relative to SP only implemented for HL");
+
+  if (offset < INT8MIN || offset > INT8MAX)
+    {
+      emit2 ("ld hl,!immedword", offset);
+      emit2 ("add hl,sp");
+    }
+  else
+    {
+      emit2 ("!ldahlsp", offset);
+    }
+}
+
+static void
 setupPair (PAIR_ID pairId, asmop * aop, int offset)
 {
   switch (aop->type)
@@ -1215,7 +1237,7 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
 	  }
 	else
 	  {
-	    emit2 ("!ldahlsp", abso + _G.stack.pushed);
+            setupPairFromSP (PAIR_HL, abso + _G.stack.pushed);
 	  }
 	_G.pairs[pairId].offset = abso;
 	break;
@@ -2579,7 +2601,9 @@ genFunction (iCode * ic)
   /* adjust the stack for the function */
   _G.stack.last = sym->stack;
 
-  if (sym->stack)
+  if (sym->stack && IS_GB && sym->stack > -INT8MIN)
+    emit2 ("!enterxl", sym->stack);
+  else if (sym->stack)
     emit2 ("!enterx", sym->stack);
   else
     emit2 ("!enter");
@@ -2605,7 +2629,11 @@ genEndFunction (iCode * ic)
 
       /* PENDING: calleeSave */
 
-      if (_G.stack.offset)
+      if (_G.stack.offset && IS_GB && _G.stack.offset > INT8MAX)
+        {
+          emit2 ("!leavexl", _G.stack.offset);
+        }
+      else if (_G.stack.offset)
         {
           emit2 ("!leavex", _G.stack.offset);
         }
@@ -5566,21 +5594,19 @@ genAddrOf (iCode * ic)
 	  spillCached ();
 	  if (sym->stack <= 0)
 	    {
-	      emit2 ("!ldahlsp", sym->stack + _G.stack.pushed + _G.stack.offset);
+              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset);
 	    }
 	  else
 	    {
-	      emit2 ("!ldahlsp", sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
+              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
 	    }
-	  emit2 ("ld d,h");
-	  emit2 ("ld e,l");
+          commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
 	}
       else
 	{
 	  emit2 ("ld de,!hashedstr", sym->rname);
+          commitPair (AOP (IC_RESULT (ic)), PAIR_DE);
 	}
-      aopPut (AOP (IC_RESULT (ic)), "e", 0);
-      aopPut (AOP (IC_RESULT (ic)), "d", 1);
     }
   else
     {
@@ -5598,8 +5624,7 @@ genAddrOf (iCode * ic)
 	{
 	  emit2 ("ld hl,#%s", sym->rname);
 	}
-      aopPut (AOP (IC_RESULT (ic)), "l", 0);
-      aopPut (AOP (IC_RESULT (ic)), "h", 1);
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
     }
   freeAsmop (IC_RESULT (ic), NULL, ic);
 }

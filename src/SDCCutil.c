@@ -271,13 +271,20 @@ static hTab *_mainValues;
 void
 setMainValue (const char *pname, const char *pvalue)
 {
+  assert(pname);
+  assert(pvalue);
+
   shash_add (&_mainValues, pname, pvalue);
 }
 
 void
 buildCmdLine2 (char *pbuffer, const char *pcmd)
 {
-  char *poutcmd = msprintf(_mainValues, pcmd);
+  char *poutcmd;
+  assert(pbuffer && pcmd);
+  assert(_mainValues);
+
+  poutcmd = msprintf(_mainValues, pcmd);
   strcpy(pbuffer, poutcmd);
 }
 

@@ -36,7 +36,9 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom)
   bool fdidsomething = FALSE;
   char *pinto = apinto;
 
-  assert(pinto && pvals && pfrom);
+  assert(pinto);
+  assert(pvals);
+  assert(pfrom);
 
   while (*pfrom)
     {

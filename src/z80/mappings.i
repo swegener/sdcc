@@ -15,9 +15,19 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "enter", "" },
     { "enterx", 
       "lda sp,-%d(sp)" },
+    { "enterxl",
+                "ld hl,#-%d\n"
+                "\tadd\thl,sp\n"
+                "\tld\tsp,hl"
+    },
     { "leave", ""
     },
     { "leavex", "lda sp,%d(sp)"
+    },
+    { "leavexl",
+                "ld hl,#%d\n"
+                "\tadd\thl,sp\n"
+                "\tld\tsp,hl"
     },
     { "pusha", 
       "push af\n"

@@ -207,7 +207,6 @@ char *libfil;
 		lbnh->libfil = (char *) new (strlen(libfil) + 1);
 		strcpy(lbnh->libfil,libfil);
 		lbnh->libspc = str;
-		fprintf(stderr,"library file %s\n",str);
 	} else {
 		free(str);
 	}

@@ -128,7 +128,7 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 */
 static const char *_linkCmd[] =
 {
-  "aslink", "-nf", "$1", NULL
+  "{bindir}{sep}aslink", "-nf", "$1", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */

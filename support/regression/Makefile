@@ -101,6 +101,7 @@ PORT_RESULTS = $(ALL_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out)
 SDCC_DIR = ../..
 SDCC_EXTRA_DIR = ../../../sdcc-extra
 
+
 # Defaults.  Override in spec.mk if required.
 # Path to SDCC
 SDCC = $(SDCC_DIR)/bin/sdcc

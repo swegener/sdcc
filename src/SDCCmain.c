@@ -1164,7 +1164,9 @@ linkEdit (char **envp)
 
   if (port->linker.cmd)
     {
-      buildCmdLine (buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
+      char buffer2[PATH_MAX];
+      buildCmdLine (buffer2, port->linker.cmd, srcFileName, NULL, NULL, NULL);
+      buildCmdLine2 (buffer, buffer2);
     }
   else
     {
@@ -1449,10 +1451,11 @@ initValues (void)
 {
   populateMainValues (_baseValues);
   setMainValue ("port", port->target);
-  setMainValue ("fullsrcfilename", fullSrcFileName);
-  setMainValue ("srcfilename", srcFileName);
   setMainValue ("objext", port->linker.rel_ext);
   setMainValue ("asmext", port->assembler.file_ext);
+
+  setMainValue ("fullsrcfilename", fullSrcFileName ? fullSrcFileName : "fullsrcfilename");
+  setMainValue ("srcfilename", srcFileName ? srcFileName : "srcfilename");
 }
 
 /*
@@ -1505,11 +1508,11 @@ main (int argc, char **argv, char **envp)
       exit (0);
     }
 
+  initValues ();
+  _discoverPaths (argv[0]);
+
   if (srcFileName)
     {
-      initValues ();
-      _discoverPaths (argv[0]);
-
       preProcess (envp);
 
       initMem ();

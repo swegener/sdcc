@@ -51,19 +51,17 @@ testMul(void)
 
     i = 5;
 
-    LOG(("i*5 == 25 = %u\n", (int)i*5));
+    LOG(("i*5 == 25 = %u\n", (int)(i*5)));
     result = i*5;
     ASSERT(result == 25);
-    LOG(("i*-4 == -20 = %u\n", (int)i*-4));
+    LOG(("i*-4 == -20 = %u\n", (int)(i*-4)));
     ASSERT(i*-4 == -20);
 
     i = -10;
-    LOG(("i*12 == -120 = %u\n", (int)i*12));
+    LOG(("i*12 == -120 = %u\n", (int)(i*12)));
     ASSERT(i*12 == -120);
-    LOG(("i*-3 == 30 = %u\n", (int)i*-3));
+    LOG(("i*-3 == 30 = %u\n", (int)(i*-3)));
     ASSERT(i*-3 == 30);
-
-    LOG(("30 == %u\n", (int)i*-3));
 }
 
 void

@@ -146,4 +146,6 @@ main(void)
            );
 
     _exitEmu();
+
+    return 0;
 }

@@ -64,6 +64,9 @@ testSmallSparseZero(void)
     ASSERT(smallSparseZero[6] == 0);
     ASSERT(smallSparseZero[7] == 0);
     ASSERT(smallSparseZero[8] == 0);
+
+    // Make the compiler happy
+    ASSERT(smallSparseZeroTail[0] == 1);
 }
 
 #ifdef __mcs51

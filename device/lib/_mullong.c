@@ -536,7 +536,7 @@ _mululong (unsigned long a, unsigned long b)	// in future: _mullong
 long
 _mulslong (long a, long b)	// obsolete
 {
-  _mululong (a, b);
+  return _mululong (a, b);
 }
 
 #endif // _MULLONG_ASM

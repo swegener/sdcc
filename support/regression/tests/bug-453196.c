@@ -69,4 +69,6 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val)
 {
     UNUSED(Ch_1_Par_Val);
     UNUSED(Ch_2_Par_Val);
+
+    return 0;
 }

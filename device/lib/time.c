@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <time.h>
 
-#define FIXDS390BUG (long)
-
 // please note that the tm structure has the years since 1900,
 // but time returns the seconds since 1970
 
@@ -178,28 +176,28 @@ time_t mktime(struct tm *timeptr) {
     CheckTime(timeptr);
 
     // seconds from 1970 till 1 jan 00:00:00 this year
-    seconds= FIXDS390BUG (year-1970)*60*60*24*365;
+    seconds= (year-1970)*60*60*24*365;
 
     // add extra days for leap years
     for (i=1970; i<year; i++) {
 	if (LEAP_YEAR(i)) {
-	    seconds+= FIXDS390BUG 60*60*24;
+	    seconds+= 60*60*24;
 	}
     }
 
     // add days for this year
     for (i=0; i<month; i++) {
       if (i==1 && LEAP_YEAR(year)) { 
-	seconds+= FIXDS390BUG 60*60*24*29;
+	seconds+= 60*60*24*29;
       } else {
-	seconds+= FIXDS390BUG 60*60*24*monthDays[i];
+	seconds+= 60*60*24*monthDays[i];
       }
     }
 
-    seconds+= FIXDS390BUG (timeptr->tm_mday-1)*60*60*24;
-    seconds+= FIXDS390BUG timeptr->tm_hour*60*60;
-    seconds+= FIXDS390BUG timeptr->tm_min*60;
-    seconds+= FIXDS390BUG timeptr->tm_sec;
+    seconds+= timeptr->tm_mday-1*60*60*24;
+    seconds+= timeptr->tm_hour*60*60;
+    seconds+= timeptr->tm_min*60;
+    seconds+= timeptr->tm_sec;
     return seconds;
 }
 

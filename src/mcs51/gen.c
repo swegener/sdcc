@@ -63,7 +63,7 @@ static char *spname ;
 
 static char *fReturn8051[] = {"dpl","dph","b","a" };
 static char *fReturn390[] = {"dpl","dph","dpx", "b","a" };
-static unsigned fReturnSize = 4;
+unsigned fReturnSize = 4; /* shared with ralloc.c */
 static char **fReturn = fReturn8051;
 static char *accUse[] = {"a","b"};
 

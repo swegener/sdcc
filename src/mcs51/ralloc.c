@@ -1721,7 +1721,7 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     
     /* only upto 2 bytes since we cannot predict
        the usage of b, & acc */
-    if (getSize(operandType(op)) > 2 && 
+    if (getSize(operandType(op)) >  (fReturnSize - 2) &&
 	ic->op != RETURN             &&
 	ic->op != SEND)
 	return NULL;

@@ -60,6 +60,15 @@ static void _mcs51_finaliseOptions(void)
     {
         port->s.fptr_size = 3;
         port->s.gptr_size = 4;
+        port->stack.isr_overhead++;   /* Will save dpx on ISR entry. */
+        #if 1
+        port->stack.call_overhead++; 	   /* This acounts for the extra byte 
+        				    * of return addres on the stack.
+        				    * but is ugly. There must be a 
+        				    * better way.
+        				    */
+	#endif        				    
+        
     } 
 }
 

@@ -1,3 +1,14 @@
+2004-12-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genCpl): fixed bit=~(char/bit) bugs, added warning
+	* src/ds390/main.c (_ds390_regparm): don't pass bit params in registers
+	* src/ds390/ralloc.c (serialRegAssign): spill bits
+	* src/mcs51/gen.c (genCpl): fixed bit=~(char) bugs, added warning
+	* support/Util/SDCCerr.c,
+	* support/Util/SDCCerr.h: added warning W_COMPLEMENT for using bit=~(bit)
+	* support/regression/tests/bitvars.c: added tests for bitwise complement(~)
+	* support/regression/tests/bitwise.c: added test for bitwise complement(~)
+
 2004-12-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/sdcc-lib.h: inserted LGPL, added includes

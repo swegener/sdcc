@@ -417,6 +417,8 @@ struct
 { W_POSSBUG2, ERROR_LEVEL_WARNING,
    "possible code generation error at %s line %d,\n"
    " please report problem and send source code at SDCC-USER list on SF.Net"},
+{ W_COMPLEMENT, ERROR_LEVEL_WARNING,
+   "using ~ on bit/bool/unsigned char variables can give unexpected results due to promotion to int" },
 };
 
 /*

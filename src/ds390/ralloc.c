@@ -1271,7 +1271,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
       unusedLRs = deassignUnsedLRs(ebbs[i]);
 
-      /* of all instructions do */
+      /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
 
@@ -1325,6 +1325,16 @@ serialRegAssign (eBBlock ** ebbs, int count)
                   spillThis (sym);
                   continue;
                 }
+
+              /* if this is a bit variable then don't use precious registers
+                 along with expensive bit-to-char conversions but just spill
+                 it */
+              if (SPEC_NOUN(sym->etype) == V_BIT)
+                {
+                  spillThis (sym);
+                  continue;
+                }
+
               /* if trying to allocate this will cause
                  a spill and there is nothing to spill
                  or this one is rematerializable then

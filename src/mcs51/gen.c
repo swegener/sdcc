@@ -1668,8 +1668,9 @@ genCpl (iCode * ic)
   int offset = 0;
   int size;
   symbol *tlbl;
+  sym_link *letype = getSpec (operandType (IC_LEFT (ic)));
 
-  D(emitcode (";     genCpl",""));
+  D(emitcode (";", "genCpl"));
 
   /* assign asmOps to operand & result */
   aopOp (IC_LEFT (ic), ic, FALSE);
@@ -1678,27 +1679,32 @@ genCpl (iCode * ic)
   /* special case if in bit space */
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
     {
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
+      char *l;
+
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY ||
+          (SPEC_USIGN (letype) && IS_CHAR (letype)))
         {
-          /* promotion rules are responsible for this strange result: */
+          /* promotion rules are responsible for this strange result:
+             bit -> int -> ~int -> bit
+             uchar -> int -> ~int -> bit
+          */
+          werror(W_COMPLEMENT);
           emitcode ("setb", "%s", IC_RESULT (ic)->aop->aopu.aop_dir);
           goto release;
         }
 
       tlbl=newiTempLabel(NULL);
+      l = aopGet (AOP (IC_LEFT (ic)), offset++, FALSE, FALSE);
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC ||
           AOP_TYPE (IC_LEFT (ic)) == AOP_REG ||
           IS_AOP_PREG (IC_LEFT (ic)))
         {
-          emitcode ("cjne", "%s,#0x01,%05d$",
-                    aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE),
-                    tlbl->key + 100);
+          emitcode ("cjne", "%s,#0xFF,%05d$", l, tlbl->key + 100);
         }
       else
         {
-          char *l = aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE);
           MOVA (l);
-          emitcode ("cjne", "a,#0x01,%05d$", tlbl->key + 100);
+          emitcode ("cjne", "a,#0xFF,%05d$", tlbl->key + 100);
         }
       emitcode ("", "%05d$:", tlbl->key + 100);
       outBitC (IC_RESULT(ic));

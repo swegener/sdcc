@@ -78,6 +78,8 @@ _ds390_reset_regparm (void)
 static int
 _ds390_regparm (sym_link * l)
 {
+    if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
+        return 0;
     if (options.parms_in_bank1 == 0) {
 	/* simple can pass only the first parameter in a register */
 	if (regParmFlg)

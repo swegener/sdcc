@@ -3,90 +3,111 @@
 
 /* This routine is intended to setup the DS80C390 in contiguous addressing
    mode, using a 10-bit stack (mapped to 0x400000).
-   It can be called from _sdcc_gs_init_startup in ANY mode.
-   Since it reinitializes the stack, it does a "ljmp" back to
-   __sdcc_init_data instead of returning. */
+   It assumes that _sdcc_gsinit_startup is called from a boot loader
+   in 22-bit contiguous addressing mode */
 
+/* Uncomment this if you are using the tini loader 000515. Make sure 
+   XSEG starts at 0x100080 or it will overwrite your IVT. This won't harm 
+   if you are using the 990824 loader */
+#define TINI_LOADER_0515
 
 unsigned char _sdcc_external_startup(void)
 {
+  IE=0; // disable ALL interrupts
 
-  // Let us assume we got here because the reset vector pointed to
-  // _sdcc_gsinit_startup. So, we are in 16-bit mode, 8051 stack.
-  // (not tested yet)
-  // 
-  // But it could as well have been a bootloader calling _sdcc_gsinit_startup
-  // at 0x10000 in 22-bit Contiguous Addressing Mode, 8051 or whatever stack.
-  // Hey :) that is a TINI!
-  // (tested "TINI loader 08-24-99 09:34" and "TINI loader 05-15-00 17:45")
+  _asm
+    ; save the 24-bit return address
+    pop ar2; msb
+    pop ar1
+    pop ar0; lsb
 
-  // disable ALL interrupts
-  IE=0;
+    ; use A19..16 and !CE3..0, no CAN
+    mov _TA,#0xaa; timed access
+    mov _TA,#0x55
+    mov _P4CNT,#0x3f
 
-  // use A19..16 and !CE3..0, no CAN
-  TA = 0xaa; // timed access
-  TA = 0x55;
-  P4CNT = 0x3f;
-  
-  // use !PCE3..0, serial 1 at P5.2/3
-  TA = 0xaa; // timed access
-  TA = 0x55;
-  P5CNT = 0x27;
-  
-  // disable watchdog
-  EWT=0;
+    ; use !PCE3..0, serial 1 at P5.2/3
+    mov _TA,#0xaa; timed access
+    mov _TA,#0x55
+    mov _P5CNT,#0x27
 
-  // watchdog set to 9.1 seconds
-  // timers at 1/4 xtal
-  // no stretch-cycles for movx
-  CKCON = 0xf9;
-  
-  // use internal 4k RAM as stack memory at 0x400000 and
-  // move CANx Memory access to 0x401000 and upwards
-  TA = 0xaa; // timed access
-  TA = 0x55;
-  //MCON = 0xef; // program and/or data memory access
-  MCON = 0xaf; // data memory access only
+    ; disable watchdog
+    mov _EWT,#0x00
 
-  PMR = 0x82; // two clocks per cycle
-  PMR = 0x92; // enable multiplier
-  while (!(EXIF&0x08))
-    // wait for multiplier to be ready
-    ;
-  PMR = 0x12; // one clock per cycle, xtal*2 
+    ; watchdog set to 9.1 seconds
+    ; timers at 1/4 xtal
+    ; no strech-cycles for movx
+    mov _CKCON,#0xf9;
 
-  // Never mind port 2. If external hardware sets !MUX, it should take care
-  // of demultiplexing port 0 using !ALE as well, but we do not care...
+    ; use internal 4k RAM as data(stack) memory at 0x400000 and
+    ; move CANx memory access to 0x401000 and upwards
+    ; use !CE* for program and/or data memory access
+    mov _TA,#0xaa; timed access
+    mov _TA,#0x55
+    mov _MCON,#0xaf;
 
-  // switch to: 
-  //   22-bit Contiguous Addressing Mode
-  //   10-bit Stack Mode
-  TA = 0xaa; // timed access
-  TA = 0x55;
-  ACON = 0x06;
+    mov _PMR,#0x82; two clocks per cycle
+    mov _PMR,#0x92; enable multiplier
+_Startup390WaitForClock:
+    mov a,_EXIF
+    jnb acc.3,_Startup390WaitForClock; wait for multiplier to be ready
+    mov _PMR,#0x12; one clock per cycle, xtal*2
 
-  // Set the stack to 0, although it is now mapped to 0x400000
-  // So be aware when accessing the stack !
-  ESP=SP=0; // note: we can not return from here anymore :)
+    mov _TA,#0xaa; timed access
+    mov _TA,#0x55
+    mov _ACON,#0x06; 24-bit addresses, 10-bit stack at 0x400000
+
+    mov _ESP,#0x00; reinitialize the stack
+    mov _SP,#0x00
+
+    ; restore the 24-bit return address
+    push ar0; lsb
+    push ar1
+    push ar2; msb
+  _endasm;
+
+#ifdef TINI_LOADER_0515
+  // Copy the Interrupt Vector Table (128 bytes) from 0x10000 to 0x100000
+  // Make sure that XSEG starts at 0x100080 in this case!
+  _asm
+  push dpx
+  push dph
+  push dpl
+  push dps
+  push b
+  push acc
+  mov dps,#0x00 ; make sure no autoincrement in progress
+  mov dptr,#0x10000 ; from
+  inc dps ; switch to alternate dptr
+  mov dptr,#0x100000 ; to
+  mov b,#0x80 ; count
+
+_Startup390CopyIVT:
+  inc dps
+  movx a,@dptr
+  inc dptr
+  inc dps
+  movx @dptr,a
+  inc dptr
+  djnz b,_Startup390CopyIVT
+
+  pop acc
+  pop b
+  pop dps
+  pop dpl
+  pop dph
+  pop dpx
+  _endasm;
+#endif
 
   // global interrupt enable, all masks cleared
-  // let the Gods be with you :)
+  // let the Gods be with us :)
   IE = 0x80; 
 
-  // now that the stack is initialized, we can safely call
+  // now that the stack is re-initialized, we can safely call
   Serial390Init();
 
-  // I HATE this, but:
-  // We can do this safely because either AP is zero-ed when called from
-  // the reset vector, or should have been set by the bootloader to the bank
-  // in which we were called. We did not change it, so it will work as 
-  // long as we stay within the same (64k) bank.
-
-_asm
-  ljmp __sdcc_init_data
-_endasm;
-
-  // the compiler _SHOULD_ warn us if we did not do a:
-// return 0;
+  // signal _sdcc_gsinit_startup to initialize data (call _sdcc_init_data)
+  return 0; 
 }
 

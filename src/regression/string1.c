@@ -6,7 +6,7 @@ unsigned char dummy=0;
 //unsigned bit bit1;
 
 typedef unsigned char byte;
-data at 0x06 unsigned char  PORTB;
+
 
 byte uchar0;
 const byte arr[] = { 1,2,8,9,0 };

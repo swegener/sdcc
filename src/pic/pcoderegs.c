@@ -348,7 +348,7 @@ void RemoveUnusedRegisters(void)
 {
   /* First, get rid of registers that are used only one time */
 
-  RemoveRegsFromSet(dynInternalRegs);
+  //RemoveRegsFromSet(dynInternalRegs);
   RemoveRegsFromSet(dynAllocRegs);
   RemoveRegsFromSet(dynStackRegs);
   /*

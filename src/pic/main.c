@@ -240,6 +240,7 @@ _pic14_genAssemblerPreamble (FILE * of)
 
   fprintf (of, "\tlist\tp=%s\n",&name[1]);
   fprintf (of, "\t__CONFIG 0x%x\n",getConfigWord(0x2007));
+  fprintf (of, "\tradix dec");
   fprintf (of, "\ninclude \"%s.inc\"\n",name);
 }
 

@@ -523,6 +523,8 @@ void initStack(int base_address, int size)
     addSet(&dynStackRegs,newReg(REG_STK, PO_GPR_TEMP,base_address++,NULL,1,0));
 }
 
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
 regs *
 allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 {
@@ -531,10 +533,13 @@ allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
   return addSet(&dynProcessorRegs,newReg(REG_SFR, po_type, rIdx, name,1,alias));
 }
 
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
+
 regs *
 allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 {
-  regs * reg = newReg(REG_SFR, po_type, rIdx, name,1,alias);
+  regs * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias);
 
   //fprintf(stderr,"allocInternalRegister %s addr =0x%x\n",name,rIdx);
   if(reg) {
@@ -832,7 +837,7 @@ pic14_allocWithIdx (int idx)
     debugLog ("Dynamic Register not found\n");
 
 
-    fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
+    //fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
     werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	    "regWithIdx not found");
     exit (1);
@@ -1061,6 +1066,7 @@ void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
 void writeUsedRegs(FILE *of) 
 {
   packBits(dynDirectBitRegs);
+
 
   assignFixedRegisters(dynAllocRegs);
   assignFixedRegisters(dynStackRegs);

@@ -102,7 +102,7 @@ void addMemRange(memRange *r, int type)
 
   do {
     for (i=r->start_address; i<= r->end_address; i++) {
-      if (i <= pic->maxRAMaddress) {
+      if ((i|alias) <= pic->maxRAMaddress) {
 	finalMapping[i | alias].isValid = 1;
 	finalMapping[i | alias].alias = r->alias;
 	finalMapping[i | alias].bank  = r->bank;
@@ -112,6 +112,9 @@ void addMemRange(memRange *r, int type)
 	} else {
 	  finalMapping[i | alias].isSFR  = 0;
 	}
+      } else {
+	fprintf(stderr, "WARNING: %s:%s memory at 0x%x is beyond max ram = 0x%x\n",
+		__FILE__,__FUNCTION__,(i|alias), pic->maxRAMaddress);
       }
     }
 
@@ -403,6 +406,8 @@ int isSFR(int address)
 
 }
 
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
 int validAddress(int address, int reg_size)
 {
   int i;
@@ -424,6 +429,8 @@ int validAddress(int address, int reg_size)
   return 1;
 }
 
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
 void mapRegister(regs *reg)
 {
 
@@ -467,6 +474,8 @@ void mapRegister(regs *reg)
 
 }
 
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
 int assignRegister(regs *reg, int start_address)
 {
   int i;
@@ -509,6 +518,8 @@ int assignRegister(regs *reg, int start_address)
   return -1;
 }
 
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
 void assignFixedRegisters(set *regset)
 {
   regs *reg;
@@ -522,6 +533,8 @@ void assignFixedRegisters(set *regset)
 
 }
 
+/*-----------------------------------------------------------------*
+ *-----------------------------------------------------------------*/
 void assignRelocatableRegisters(set *regset, int used)
 {
 

@@ -75,7 +75,7 @@ static pBlock *pb_dead_pcodes = NULL;
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
-int debug_verbose = 1;                /* Set true to inundate .asm file */
+int debug_verbose = 0;                /* Set true to inundate .asm file */
 
 static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
@@ -3671,7 +3671,7 @@ void LinkFlow(pBlock *pb)
       //pc->print(stderr,pc);
 
       if(!(pcol && isPCOLAB(pcol))) {
-	if((PCI(pc)->op != POC_RETLW) && (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL)) {
+	if((PCI(pc)->op != POC_RETLW) && (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL) && (PCI(pc)->op != POC_RETFIE) ) {
 	  pc->print(stderr,pc);
 	  fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
 	}

@@ -146,7 +146,8 @@ PORT tlcs900h_port =
     NULL,
     NULL,
     0,
-    NULL
+    NULL,
+    NULL			/* no do_assemble function */
   },
   {
     _linkCmd,
@@ -196,6 +197,7 @@ PORT tlcs900h_port =
   _tlcs900h_getRegName,
   _tlcs900h_keywords,
   _tlcs900h_genAssemblerPreamble,
+  NULL,				/* no genAssemblerEnd */
   _tlcs900h_genIVT,
   0, // _tlcs900h_genXINIT
   _tlcs900h_reset_regparm,

@@ -516,6 +516,7 @@ PORT z80_port =
   _getRegName,
   _keywords,
   0,				/* no assembler preamble */
+  NULL,				/* no genAssemblerEnd */
   0,				/* no local IVT generation code */
   0,                            /* no genXINIT code */
   _reset_regparm,
@@ -556,7 +557,8 @@ PORT gbz80_port =
     "-plosgff",			/* Options with debug */
     "-plosgff",			/* Options without debug */
     0,
-    ".asm"
+    ".asm",
+    NULL			/* no do_assemble function */
   },
   {
     NULL,
@@ -606,6 +608,7 @@ PORT gbz80_port =
   _getRegName,
   _keywords,
   0,				/* no assembler preamble */
+  NULL,				/* no genAssemblerEnd */
   0,				/* no local IVT generation code */
   0,                            /* no genXINIT code */
   _reset_regparm,

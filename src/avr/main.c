@@ -161,7 +161,9 @@ PORT avr_port = {
 	 "-plosgff",		/* Options with debug */
 	 "-plosgff",		/* Options without debug */
 	 0,
-	".s"},
+	".s",
+	 NULL,			/* no do_assemble */
+	},
 	{
 	 _linkCmd,
          NULL,
@@ -206,6 +208,7 @@ PORT avr_port = {
 	_avr_getRegName,
 	_avr_keywords,
 	_avr_genAssemblerPreamble,
+	NULL,				/* no genAssemblerEnd */
 	_avr_genIVT,
 	NULL, // _avr_genXINIT
 	_avr_reset_regparm,

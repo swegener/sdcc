@@ -233,7 +233,8 @@ PORT pic_port =
 	//"-plosgffc",          /* Options with debug */
 	//"-plosgff",           /* Options without debug */
     0,
-    ".asm"
+    ".asm",
+    NULL			/* no do_assemble function */
   },
   {
     _linkCmd,
@@ -287,6 +288,7 @@ PORT pic_port =
   _pic14_getRegName,
   _pic14_keywords,
   _pic14_genAssemblerPreamble,
+  NULL,				/* no genAssemblerEnd */
   _pic14_genIVT,
   NULL, // _pic14_genXINIT
   _pic14_reset_regparm,

@@ -209,7 +209,8 @@ PORT mcs51_port =
     "-plosgffc",		/* Options with debug */
     "-plosgff",			/* Options without debug */
     0,
-    ".asm"
+    ".asm",
+    NULL			/* no do_assemble function */
   },
   {
     _linkCmd,
@@ -259,6 +260,7 @@ PORT mcs51_port =
   _mcs51_getRegName,
   _mcs51_keywords,
   _mcs51_genAssemblerPreamble,
+  NULL,				/* no genAssemblerEnd */
   _mcs51_genIVT,
   _mcs51_genXINIT,
   _mcs51_reset_regparm,

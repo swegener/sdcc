@@ -147,7 +147,8 @@ PORT i186_port = {
         NULL,
         NULL,
         0,
-        ".s"
+        ".s",
+	NULL			/* no do_assemble function */
     },
     {
         _linkCmd,
@@ -197,6 +198,7 @@ PORT i186_port = {
     _i186_getRegName ,
     _i186_keywords,
     _i186_genAssemblerPreamble,
+    NULL,				/* no genAssemblerEnd */
     _i186_genIVT ,
     NULL, // _i186_genXINIT
     _i186_reset_regparm,

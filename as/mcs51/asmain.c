@@ -15,6 +15,7 @@
 #include <setjmp.h>
 #include <string.h>
 #if !defined(_MSC_VER)
+#include <unistd.h>
 #include <alloc.h>
 #endif
 #include "asm.h"
@@ -149,6 +150,9 @@ extern VOID machine(struct mne *);
  *		REL, LST, and/or SYM files may be generated.
  */
 
+int fatalErrors=0;
+char relFile[128];
+
 int
 main(argc, argv)
 char *argv[];
@@ -243,8 +247,11 @@ char *argv[];
 			if (inpfil == 0) {
 				if (lflag)
 					lfp = afile(p, "lst", 1);
-				if (oflag)
-					ofp = afile(p, "rel", 1);
+				if (oflag) {
+				  ofp = afile(p, "rel", 1);
+				  // save the file name if we have to delete it on error
+				  strcpy(relFile,afn);
+				}
 				if (sflag)
 					tfp = afile(p, "sym", 1);
 			}
@@ -319,8 +326,10 @@ char *argv[];
 	if (lflag) {
 		lstsym(lfp);
 	}
-	asexit(aserr != 0);
-	return 0;
+	//printf ("aserr: %d\n", aserr);
+	//printf ("fatalErrors: %d\n", fatalErrors);
+	asexit(fatalErrors);
+	return 0; // hush the compiler
 }
 
 /*)Function	VOID	asexit(i)
@@ -365,7 +374,11 @@ int i;
 	/*for (j=0; j<MAXINC && ifp[j] != NULL; j++) {
 		fclose(ifp[j]);
 		}*/
-
+	if (i) {
+	  // remove output file
+	  printf ("removing %s\n", relFile);
+	  unlink(relFile);
+	}
 	exit(i);
 }
 

@@ -96,6 +96,10 @@ SOURCE=..\support\Util\BuildCmd.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cdbFile.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\support\Util\MySystem.c
 # End Source File
 # Begin Source File
@@ -150,6 +154,10 @@ SOURCE=.\SDCCcflow.c
 # Begin Source File
 
 SOURCE=.\SDCCcse.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCdebug.c
 # End Source File
 # Begin Source File
 

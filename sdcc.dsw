@@ -171,6 +171,33 @@ Package=<4>
 
 ###############################################################################
 
+Project: "hc08"=.\src\hc08\hc08.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name hc08a
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "hc08a"=.\src\hc08\hc08a.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "librarian"=.\support\librarian\librarian.dsp - Package Owner=<4>
 
 Package=<5>
@@ -370,6 +397,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name pic16
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name hc08
     End Project Dependency
 }}}
 

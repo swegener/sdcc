@@ -1,3 +1,11 @@
+2001-11-18  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* sdcc/support/regression/tests/bug-460010.c: fix seg violation on host
+
+	* sdcc/support/regression/tests/muldiv.c: fix output on mcs51
+
+	* sdcc/support/regression/tests/stacks.c: fix DSEG overflow on mcs51
+
 2001-11-07  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* sdcc/sim/device/lib/_gptrget.c: mem region 5 (idata) added

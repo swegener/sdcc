@@ -35,7 +35,7 @@ testUnsignedMul(void)
 
     i = 37;
 
-    LOG(("i*3 == 111 = %u\n", i*3));
+    LOG(("i*3 == 111 = %u\n", (int)(i*3)));
     result = i*3;
     ASSERT(result == 111);
 

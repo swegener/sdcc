@@ -20,7 +20,11 @@ testStack(void)
 {
   volatile char above;
   volatile char above2;
+#ifndef __mcs51
   volatile char ac[{size}];
+#else
+  volatile char ac[{size} - 100];
+#endif
   volatile char below;
   volatile char * volatile p;
 

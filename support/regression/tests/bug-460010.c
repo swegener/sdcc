@@ -17,7 +17,13 @@ func( unsigned char a )
 void
 testBadPromotion(void)
 {
+
+#ifdef SDCC
   unsigned char c=*((unsigned XDATA char*)(0xa000));
+#else
+  unsigned char loc_c;
+  unsigned char c=*(unsigned char*)&loc_c;
+#endif 
   
   func(c); 
   

@@ -157,6 +157,11 @@ _ds390_genAssemblerPreamble (FILE * of)
       fputs ("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
       fputs ("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
       fputs ("ap = 0x9C\t\t; ap register unknown to assembler\n", of);
+      fputs ("mcnt0 = 0xD1\t\t; mcnt0 register unknown to assembler\n", of);
+      fputs ("mcnt1 = 0xD2\t\t; mcnt1 register unknown to assembler\n", of);
+      fputs ("ma = 0xD3\t\t; ma register unknown to assembler\n", of);
+      fputs ("mb = 0xD4\t\t; mb register unknown to assembler\n", of);
+      fputs ("mc = 0xD5\t\t; mc register unknown to assembler\n", of);
 }
 
 /* Generate interrupt vector table. */
@@ -257,9 +262,9 @@ PORT ds390_port =
   {
     +1, 1, 4, 1, 1, 0
   },
-    /* ds390 has an 8 bit mul */
+    /* ds390 has an 16 bit mul & div */
   {
-    1, -1
+    2, -1
   },
   "_",
   _ds390_init,

@@ -469,7 +469,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 	{
 	  if (options.model == MODEL_FLAT24)
 	    emitcode ("mov", "dpx1,#0x40");
-   TR_DPTR("#2");
+	  TR_DPTR("#2");
 	  emitcode ("mov", "dph1,#0x00");
 	  emitcode ("mov", "dpl1, a");
 	}
@@ -987,8 +987,8 @@ aopGet (asmop * aop,
 	  genSetDPTR (1);
 	  if (!canClobberACC)
 	    {
-       TR_AP("#1");
-	      emitcode ("xch", "a, %s", DP2_RESULT_REG);
+		    TR_AP("#1");
+		    emitcode ("xch", "a, %s", DP2_RESULT_REG);
 	    }
 	}
 
@@ -4057,6 +4057,136 @@ genMultOneByte (operand * left,
 }
 
 /*-----------------------------------------------------------------*/
+/* genMultTwoByte - use the DS390 MAC unit to do 16*16 multiply    */
+/*-----------------------------------------------------------------*/
+static void genMultTwoByte (operand *left, operand *right, 
+			    operand *result, iCode *ic)
+{
+	sym_link *retype = getSpec(operandType(right));
+	sym_link *letype = getSpec(operandType(left));
+	int umult = SPEC_USIGN(retype) | SPEC_USIGN(letype);
+	symbol *lbl;
+
+	if (AOP_TYPE (left) == AOP_LIT) {
+		operand *t = right;
+		right = left;
+		left = t;
+	}
+	/* load up MB with right */
+	if (!umult) {
+		emitcode("clr","F0");
+		if (AOP_TYPE(right) == AOP_LIT) {
+			int val=floatFromVal (AOP (right)->aopu.aop_lit);
+			if (val < 0) {
+				emitcode("setb","F0");
+				val = -val;
+			} 
+			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);
+			emitcode ("mov","mb,#0x%02x",val & 0xff);
+		} else {
+			lbl = newiTempLabel(NULL);
+			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
+			emitcode ("mov","a,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
+			emitcode ("jnb","acc.7,%05d$",lbl->key+100);		
+			emitcode ("xch", "a,b");
+			emitcode ("cpl","a");
+			emitcode ("add", "a,#1");
+			emitcode ("xch", "a,b");
+			emitcode ("cpl", "a"); // msb
+			emitcode ("addc", "a,#0");
+			emitcode ("setb","F0");
+			emitcode ("","%05d$:",lbl->key+100);
+			emitcode ("mov","mb,b");
+			emitcode ("mov","mb,a");
+		}
+	} else {
+		emitcode ("mov","mb,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","mb,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
+	}
+	/* load up MA with left */
+	if (!umult) {
+		lbl = newiTempLabel(NULL);
+		emitcode ("mov","b,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","a,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
+		emitcode ("jnb","acc.7,%05d$",lbl->key+100);
+		emitcode ("xch", "a,b");
+		emitcode ("cpl","a");
+		emitcode ("add", "a,#1");
+		emitcode ("xch", "a,b");
+		emitcode ("cpl", "a"); // msb
+		emitcode ("addc","a,#0");
+		emitcode ("jbc","F0,%05d$",lbl->key+100);
+		emitcode ("setb","F0");
+		emitcode ("","%05d$:",lbl->key+100);
+		emitcode ("mov","ma,b");
+		emitcode ("mov","ma,a");
+	} else {
+		emitcode ("mov","ma,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","ma,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
+	}
+	/* wait for multiplication to finish */
+	lbl = newiTempLabel(NULL);
+	emitcode("","%05d$:", lbl->key+100);
+	emitcode("mov","a,mcnt1");
+	emitcode("anl","a,#0x80");
+	emitcode("jnz","%05d$",lbl->key+100);
+	
+	freeAsmop (left, NULL, ic, TRUE);
+	freeAsmop (right, NULL, ic,TRUE);
+	aopOp(result, ic, TRUE, FALSE);
+
+	/* if unsigned then simple */	
+	if (umult) {
+		emitcode ("mov","a,ma");
+		if (AOP_SIZE(result) >= 4) aopPut(AOP(result),"a",3);
+		emitcode ("mov","a,ma");
+		if (AOP_SIZE(result) >= 3) aopPut(AOP(result),"a",2);
+		aopPut(AOP(result),"ma",1);
+		aopPut(AOP(result),"ma",0);
+	} else {
+		emitcode("push","ma");
+		emitcode("push","ma");
+		emitcode("push","ma");
+		MOVA("ma");
+		/* negate result if needed */
+		lbl = newiTempLabel(NULL); 	
+		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("cpl","a");
+		emitcode("add","a,#1");
+		emitcode("","%05d$:", lbl->key+100);
+		aopPut(AOP(result),"a",0);
+		emitcode("pop","acc");
+		lbl = newiTempLabel(NULL); 	
+		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("cpl","a");
+		emitcode("addc","a,#0");
+		emitcode("","%05d$:", lbl->key+100);
+		aopPut(AOP(result),"a",1);
+		emitcode("pop","acc");
+		if (AOP_SIZE(result) >= 3) {
+			lbl = newiTempLabel(NULL); 	
+			emitcode("jnb","F0,%05d$",lbl->key+100);
+			emitcode("cpl","a");
+			emitcode("addc","a,#0");			
+			emitcode("","%05d$:", lbl->key+100);
+			aopPut(AOP(result),"a",2);
+		}
+		emitcode("pop","acc");
+		if (AOP_SIZE(result) >= 4) {
+			lbl = newiTempLabel(NULL); 	
+			emitcode("jnb","F0,%05d$",lbl->key+100);
+			emitcode("cpl","a");
+			emitcode("addc","a,#0");			
+			emitcode("","%05d$:", lbl->key+100);
+			aopPut(AOP(result),"a",3);
+		}
+		
+	}
+	freeAsmop (result, NULL, ic, TRUE);
+	return ;
+}
+
+/*-----------------------------------------------------------------*/
 /* genMult - generates code for multiplication                     */
 /*-----------------------------------------------------------------*/
 static void
@@ -4088,6 +4218,11 @@ genMult (iCode * ic)
       goto release;
     }
 
+  if (AOP_SIZE (left) == 2 && AOP_SIZE(right) == 2) {
+	  /* use the ds390 ARITHMETIC accel UNIT */
+	  genMultTwoByte (left, right, result, ic);
+	  return ;
+  }
   /* should have been converted to function call */
   assert (0);
 
@@ -4222,6 +4357,111 @@ genDivOneByte (operand * left,
 }
 
 /*-----------------------------------------------------------------*/
+/* genDivTwoByte - use the DS390 MAC unit to do 16/16 divide       */
+/*-----------------------------------------------------------------*/
+static void genDivTwoByte (operand *left, operand *right, 
+			    operand *result, iCode *ic)
+{
+	sym_link *retype = getSpec(operandType(right));
+	sym_link *letype = getSpec(operandType(left));
+	int umult = SPEC_USIGN(retype) | SPEC_USIGN(letype);
+	symbol *lbl;
+
+	/* load up MA with left */
+	if (!umult) {
+		emitcode("clr","F0");
+		lbl = newiTempLabel(NULL);
+		emitcode ("mov","b,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","a,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
+		emitcode ("jnb","acc.7,%05d$",lbl->key+100);
+		emitcode ("xch", "a,b");
+		emitcode ("cpl","a");
+		emitcode ("add", "a,#1");
+		emitcode ("xch", "a,b");
+		emitcode ("cpl", "a"); // msb
+		emitcode ("addc","a,#0");
+		emitcode ("setb","F0");
+		emitcode ("","%05d$:",lbl->key+100);
+		emitcode ("mov","ma,b");
+		emitcode ("mov","ma,a");
+	} else {
+		emitcode ("mov","ma,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","ma,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
+	}
+
+	/* load up MB with right */
+	if (!umult) {
+		if (AOP_TYPE(right) == AOP_LIT) {
+			int val=floatFromVal (AOP (right)->aopu.aop_lit);
+			if (val < 0) {
+				lbl = newiTempLabel(NULL);
+				emitcode ("jbc","F0,%05d$",lbl->key+100);
+				emitcode("setb","F0");
+				emitcode ("","%05d$:",lbl->key+100);
+				val = -val;
+			} 
+			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);
+			emitcode ("mov","mb,#0x%02x",val & 0xff);
+		} else {
+			lbl = newiTempLabel(NULL);
+			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
+			emitcode ("mov","a,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
+			emitcode ("jnb","acc.7,%05d$",lbl->key+100);		
+			emitcode ("xch", "a,b");
+			emitcode ("cpl","a");
+			emitcode ("add", "a,#1");
+			emitcode ("xch", "a,b");
+			emitcode ("cpl", "a"); // msb
+			emitcode ("addc", "a,#0");
+			emitcode ("jbc","F0,%05d$",lbl->key+100);
+			emitcode ("setb","F0");
+			emitcode ("","%05d$:",lbl->key+100);
+			emitcode ("mov","mb,b");
+			emitcode ("mov","mb,a");
+		}
+	} else {
+		emitcode ("mov","mb,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","mb,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
+	}
+
+	/* wait for multiplication to finish */
+	lbl = newiTempLabel(NULL);
+	emitcode("","%05d$:", lbl->key+100);
+	emitcode("mov","a,mcnt1");
+	emitcode("anl","a,#0x80");
+	emitcode("jnz","%05d$",lbl->key+100);
+	
+	freeAsmop (left, NULL, ic, TRUE);
+	freeAsmop (right, NULL, ic,TRUE);
+	aopOp(result, ic, TRUE, FALSE);
+
+	/* if unsigned then simple */	
+	if (umult) {
+		aopPut(AOP(result),"ma",1);
+		aopPut(AOP(result),"ma",0);
+	} else {
+		emitcode("push","ma");
+		MOVA("ma");
+		/* negate result if needed */
+		lbl = newiTempLabel(NULL); 	
+		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("cpl","a");
+		emitcode("add","a,#1");
+		emitcode("","%05d$:", lbl->key+100);
+		aopPut(AOP(result),"a",0);
+		emitcode("pop","acc");
+		lbl = newiTempLabel(NULL); 	
+		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("cpl","a");
+		emitcode("addc","a,#0");
+		emitcode("","%05d$:", lbl->key+100);
+		aopPut(AOP(result),"a",1);
+	}
+	freeAsmop (result, NULL, ic, TRUE);
+	return ;
+}
+
+/*-----------------------------------------------------------------*/
 /* genDiv - generates code for division                            */
 /*-----------------------------------------------------------------*/
 static void
@@ -4253,6 +4493,11 @@ genDiv (iCode * ic)
       goto release;
     }
 
+  if (AOP_SIZE (left) == 2 && AOP_SIZE(right) == 2) {
+	  /* use the ds390 ARITHMETIC accel UNIT */
+	  genDivTwoByte (left, right, result, ic);
+	  return ;
+  }
   /* should have been converted to function call */
   assert (0);
 release:
@@ -4360,6 +4605,83 @@ genModOneByte (operand * left,
 }
 
 /*-----------------------------------------------------------------*/
+/* genModTwoByte - use the DS390 MAC unit to do 16%16 modulus      */
+/*-----------------------------------------------------------------*/
+static void genModTwoByte (operand *left, operand *right, 
+			    operand *result, iCode *ic)
+{
+	sym_link *retype = getSpec(operandType(right));
+	sym_link *letype = getSpec(operandType(left));
+	int umult = SPEC_USIGN(retype) | SPEC_USIGN(letype);
+	symbol *lbl;
+
+	/* load up MA with left */
+	if (!umult) {
+		lbl = newiTempLabel(NULL);
+		emitcode ("mov","b,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","a,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
+		emitcode ("jnb","acc.7,%05d$",lbl->key+100);
+		emitcode ("xch", "a,b");
+		emitcode ("cpl","a");
+		emitcode ("add", "a,#1");
+		emitcode ("xch", "a,b");
+		emitcode ("cpl", "a"); // msb
+		emitcode ("addc","a,#0");
+		emitcode ("","%05d$:",lbl->key+100);
+		emitcode ("mov","ma,b");
+		emitcode ("mov","ma,a");
+	} else {
+		emitcode ("mov","ma,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","ma,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
+	}
+
+	/* load up MB with right */
+	if (!umult) {
+		if (AOP_TYPE(right) == AOP_LIT) {
+			int val=floatFromVal (AOP (right)->aopu.aop_lit);
+			if (val < 0) {
+				val = -val;
+			} 
+			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);
+			emitcode ("mov","mb,#0x%02x",val & 0xff);
+		} else {
+			lbl = newiTempLabel(NULL);
+			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
+			emitcode ("mov","a,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
+			emitcode ("jnb","acc.7,%05d$",lbl->key+100);		
+			emitcode ("xch", "a,b");
+			emitcode ("cpl","a");
+			emitcode ("add", "a,#1");
+			emitcode ("xch", "a,b");
+			emitcode ("cpl", "a"); // msb
+			emitcode ("addc", "a,#0");
+			emitcode ("","%05d$:",lbl->key+100);
+			emitcode ("mov","mb,b");
+			emitcode ("mov","mb,a");
+		}
+	} else {
+		emitcode ("mov","mb,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
+		emitcode ("mov","mb,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
+	}
+
+	/* wait for multiplication to finish */
+	lbl = newiTempLabel(NULL);
+	emitcode("","%05d$:", lbl->key+100);
+	emitcode("mov","a,mcnt1");
+	emitcode("anl","a,#0x80");
+	emitcode("jnz","%05d$",lbl->key+100);
+	
+	freeAsmop (left, NULL, ic, TRUE);
+	freeAsmop (right, NULL, ic,TRUE);
+	aopOp(result, ic, TRUE, FALSE);
+
+	aopPut(AOP(result),"mb",1);
+	aopPut(AOP(result),"mb",0);
+	freeAsmop (result, NULL, ic, TRUE);
+	return ;
+}
+
+/*-----------------------------------------------------------------*/
 /* genMod - generates code for division                            */
 /*-----------------------------------------------------------------*/
 static void
@@ -4390,6 +4712,12 @@ genMod (iCode * ic)
       genModOneByte (left, right, result, ic);
       goto release;
     }
+
+  if (AOP_SIZE (left) == 2 && AOP_SIZE(right) == 2) {
+	  /* use the ds390 ARITHMETIC accel UNIT */
+	  genModTwoByte (left, right, result, ic);
+	  return ;
+  }
 
   /* should have been converted to function call */
   assert (0);

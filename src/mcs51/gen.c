@@ -3339,9 +3339,9 @@ genMultOneByte (operand * left,
     /* AND literal negative */
     if (val < 0) {
       emitcode ("cpl", "F0"); // complement sign flag
-      emitcode ("mov", "b,#%02x", -val);
+      emitcode ("mov", "b,#0x%02x", -val);
     } else {
-      emitcode ("mov", "b,#%02x", val);
+      emitcode ("mov", "b,#0x%02x", val);
     }
   } else {
     lbl=newiTempLabel(NULL);

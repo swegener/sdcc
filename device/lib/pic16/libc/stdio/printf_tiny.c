@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------
-    printf_small.c - source file for reduced version of printf
+    printf_tiny.c - source file for reduced version of printf
 
     Modified for pic16 port, by Vangelis Rokas, 2004 (vrokas@otenet.gr)
     
@@ -49,25 +49,21 @@
      %ho       octal               char
      %c        character           char
      %s        character           generic pointer
-     %f        float               float
 */
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void printf_small(char *fmt, ...) 
+void printf_tiny(char *fmt, ...) 
 {
   char *ch;
   char radix;
   char flong;
   char fstr;
   char fchar;
-  char ffloat;
-  float flt;
   char *str;
   data char *str1;
-//#define str1	str
   long val;
 //  static
   char buffer[35];
@@ -78,8 +74,7 @@ void printf_small(char *fmt, ...)
 
     while( *ch ) {			//for (; *fmt ; fmt++ )
         if (*ch == '%') {
-            flong = 0; fstr = 0; fchar = 0;
-            ffloat = 0;
+            flong = fstr = fchar = 0;
             radix = 0;
             ch++;
 
@@ -93,7 +88,6 @@ void printf_small(char *fmt, ...)
             }
             
             if(*ch == 's')fstr = 1;
-            else if(*ch == 'f')ffloat = 1;
             else if(*ch == 'd')radix = 10;
             else if(*ch == 'x')radix = 16;
             else if(*ch == 'c')radix = 0;
@@ -102,15 +96,6 @@ void printf_small(char *fmt, ...)
             if(fstr) {
                 str = va_arg(ap, char *);
                 while (*str) putchar(*str++);
-            } else
-            if(ffloat) {
-                flt = va_arg(ap, float);
-                x_ftoa(flt, buffer, 32, 6);
-                str1 = buffer;
-                while( *str1 )str1++; str1--;
-                while( *str1 == '0' )str1--; str1++;
-                *str1 = 0; str1 = buffer;
-                while( *str1 )putchar(*str1++);
             } else {
               if(flong)val = va_arg(ap, long);
               else

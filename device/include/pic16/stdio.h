@@ -53,7 +53,11 @@
 
 /*-----------------------------------------------------------------------*/
 
+/* printf_small() supports float print */
 extern void printf_small(char *, ...);
+
+/* printf_tiny() does not support float print */
+extern void printf_tiny(char *, ...);
 
 extern int printf (char *,...);
 extern int vprintf (char *, va_list);

@@ -15,7 +15,7 @@
 
 #define NUMBER_OF_DIGITS 32
 
-void ultoa(unsigned long value, data char* string, unsigned char radix)
+void ultoa(unsigned long value, data char *string, unsigned char radix)
 {
 unsigned char index;
 char buffer[NUMBER_OF_DIGITS];  /* space for NUMBER_OF_DIGITS + '\0' */
@@ -35,7 +35,7 @@ char buffer[NUMBER_OF_DIGITS];  /* space for NUMBER_OF_DIGITS + '\0' */
   *string = 0;  /* string terminator */
 }
 
-void ltoa(long value, data char* string, unsigned char radix)
+void ltoa(long value, data char *string, unsigned char radix)
 {
   if (value < 0 && radix == 10) {
     *string++ = '-';

@@ -21,7 +21,7 @@ CFILES	= $(patsubst %,%.c,$(SRCS))
 OFILES	= $(patsubst %.c,%.o,$(CFILES))
 
 
-DEBUG=
+DEBUG= --stack-auto
 #COMPILE_FLAGS   += --pomit-config-words --pomit-ivt --no-peep
 COMPILE_FLAGS	+= $(DEBUG)
 

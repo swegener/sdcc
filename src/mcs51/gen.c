@@ -884,7 +884,6 @@ static void
 aopPut (asmop * aop, char *s, int offset)
 {
   char *d = buffer;
-  symbol *lbl;
 
   if (aop->size && offset > (aop->size - 1))
     {
@@ -1039,17 +1038,22 @@ aopPut (asmop * aop, char *s, int offset)
 	    emitcode ("mov", "%s,c", aop->aopu.aop_dir);
 	  else
 	    {
-	      lbl = newiTempLabel (NULL);
-
 	      if (strcmp (s, "a"))
 		{
 		  MOVA (s);
 		}
-	      emitcode ("clr", "c");
-	      emitcode ("jz", "%05d$", lbl->key + 100);
-	      emitcode ("cpl", "c");
-	      emitcode ("", "%05d$:", lbl->key + 100);
-	      emitcode ("mov", "%s,c", aop->aopu.aop_dir);
+#if 0 // jwk: I am not 1000% sure
+	      {
+		symbol *lbl = newiTempLabel (NULL);
+		emitcode ("clr", "c");
+		emitcode ("jz", "%05d$", lbl->key + 100);
+		emitcode ("cpl", "c");
+		emitcode ("", "%05d$:", lbl->key + 100);
+		emitcode ("mov", "%s,c", aop->aopu.aop_dir);
+	      }
+#else
+	      emitcode ("mov", "%s,acc.0", aop->aopu.aop_dir);
+#endif
 	    }
 	}
       break;

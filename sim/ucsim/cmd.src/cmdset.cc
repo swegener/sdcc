@@ -187,9 +187,10 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
       sim->start(con);
       //sim->uc->do_inst(-1);
     }
-  else
+  else {
     sim->uc->do_inst(1);
-  sim->uc->print_regs(con);
+    sim->uc->print_regs(con);
+  }
   return(DD_FALSE);
 }
 

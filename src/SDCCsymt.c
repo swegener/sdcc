@@ -1097,7 +1097,8 @@ checkSClass (symbol * sym)
 
   /* if parameter or local variable then change */
   /* the storage class to reflect where the var will go */
-  if (sym->level && SPEC_SCLS (sym->etype) == S_FIXED)
+  if (sym->level && SPEC_SCLS (sym->etype) == S_FIXED &&
+      !IS_STATIC(sym->etype))
     {
       if (options.stackAuto || (currFunc && IS_RENT (currFunc->etype)))
 	{

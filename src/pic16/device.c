@@ -76,6 +76,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -94,6 +98,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -112,6 +120,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -130,6 +142,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -148,6 +164,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -166,6 +186,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -184,6 +208,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -202,6 +230,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -220,6 +252,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -238,6 +274,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -256,6 +296,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -274,6 +318,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -292,6 +340,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -310,6 +362,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0xff, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0xff, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0xff, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -328,6 +384,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -346,6 +406,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -364,6 +428,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   },
   {
@@ -382,6 +450,10 @@ static PIC16_device Pics16[] = {
       { -1, 0, 0xff } /* 7 */  , { 0xff, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
       { 0xff, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0xff, 0, 0xff } /* c */ , 
       { 0x40, 0, 0xff } /* d */  }
+    },
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
     }
   }
 
@@ -811,6 +883,8 @@ int checkAddReg(set **set, regs *reg)
 {
   regs *tmp;
 
+
+  	if(!reg)return 0;
 #if DEBUG_CHECK
 	fprintf(stderr, "%s: about to insert REGister: %s ... ", __FUNCTION__, reg->name);
 #endif
@@ -837,6 +911,7 @@ int checkAddSym(set **set, symbol *sym)
 {
   symbol *tmp;
 
+  	if(!sym)return 0;
 #if DEBUG_CHECK
 	fprintf(stderr, "%s: about to add SYMbol: %s ... ", __FUNCTION__, sym->name);
 #endif
@@ -873,10 +948,13 @@ void pic16_groupRegistersInSection(set *regset)
 
 	for(reg=setFirstItem(regset); reg; reg = setNextItem(regset)) {
 
-//		fprintf(stderr, "%s:%d group registers in section, reg: %s\n", __FILE__, __LINE__, reg->name);
-
-		if(reg->wasUsed
-			&& !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop)))) {
+#if 0
+		fprintf(stderr, "%s:%d group registers in section, reg: %s (used: %d, %p)\n",
+			__FILE__, __LINE__, reg->name, reg->wasUsed, reg);
+#endif
+		if((reg->wasUsed
+			&& !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop))))
+		  ) {
 			
 			/* avoid grouping registers that have an initial value,
 			 * they will be added later in idataSymSet */
@@ -947,3 +1025,14 @@ void pic16_assignConfigWordValue(int address, int value)
         }
 }
 
+void pic16_assignIdByteValue(int address, char value)
+{
+  int i;
+
+  	for(i=0;i<pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart+1;i++) {
+  		if(address == pic16->idInfo.idAddrStart+i) {
+  			pic16->idInfo.irInfo[i].value = value;
+  			pic16->idInfo.irInfo[i].emit = 1;
+		}
+	}
+}

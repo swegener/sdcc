@@ -37,6 +37,9 @@
 #define STRCASECMP strcasecmp
 #endif
 
+//#define USE_ONSTACK
+
+
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
 /* some routines are non-processor specific & can be reused when   */
@@ -86,7 +89,7 @@ set *pic16_int_regs=NULL;	/* internal registers placed in access bank 0 to 0x7f 
 
 set *pic16_builtin_functions=NULL;
 
-static int dynrIdx=0x10;		//0x20;		// starting temporary register rIdx
+static int dynrIdx=0x00;		//0x20;		// starting temporary register rIdx
 static int rDirectIdx=0;
 
 int pic16_nRegs = 128;   // = sizeof (regspic16) / sizeof (regs);
@@ -505,7 +508,7 @@ allocReg (short type)
 
 	reg->isFree=0;
 
-//	debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
+	debugLog ("%s of type %s for register rIdx: %d\n", __FUNCTION__, debugLogRegType (type), dynrIdx-1);
 
 //	fprintf(stderr,"%s:%d: %s\t%s addr= 0x%x\trIdx= 0x%02x isFree: %d\n",
 //		__FILE__, __LINE__, __FUNCTION__, reg->name, reg->address, reg->rIdx, reg->isFree);
@@ -513,6 +516,7 @@ allocReg (short type)
 	if(reg) {
 		reg->accessBank = 1;	/* this is a temporary register alloc in accessBank */
 		reg->isLocal = 1;	/* this is a local frame register */
+//		reg->wasUsed = 1;
 	}
 	
 	if (currFunc) {
@@ -649,68 +653,60 @@ pic16_allocDirReg (operand *op )
 		 * a new one and put it in the hash table AND in the 
 		 * dynDirectRegNames set */
 		if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
-
-//			if(pic16_debug_verbose)
-//			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
-//			    		OP_SYMBOL(op)->name);
-
 			debugLog("%s:%d sym: %s in codespace\n", __FUNCTION__, __LINE__, OP_SYMBOL(op)->name);
 	    	  return NULL;
 		}
 
-		if(1) {	//!PIC16_IS_CONFIG_ADDRESS(address)) 
-//			fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
-			/* this is an error, why added? -- VR */
-//			if(SPEC_SCLS(OP_SYM_ETYPE(op)))regtype = REG_SFR;
-
-			if(OP_SYMBOL(op)->onStack) {
-				fprintf(stderr, "%s:%d onStack %s\n", __FILE__, __LINE__, OP_SYMBOL(op)->name);
-//				OP_SYMBOL(op)->onStack = 0;
-				SPEC_OCLS(OP_SYM_ETYPE(op)) = data;
-				regtype = REG_GPR;
-			}
-
-			if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {						// patch 13
-				if(pic16_debug_verbose)									//
-				{											//
-					fprintf(stderr, "dispace:%d farspace:%d codespace:%d regspace:%d stack:%d eeprom: %d\n",
-						IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
-						IN_FARSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
-						IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
-						IN_REGSP( SPEC_OCLS( OP_SYM_ETYPE(op))),
-						IN_STACK( OP_SYM_ETYPE(op)),
-						SPEC_OCLS(OP_SYM_ETYPE(op)) == eeprom);
-
-					fprintf(stderr, "%s:%d symbol %s NOT in dirspace\n", __FILE__, __LINE__,	//
-				    		OP_SYMBOL(op)->name);							//
-				}											//
-			}												// patch 13
-
-			reg = newReg(regtype, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
-			debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
-
-
-//			if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-//				fprintf(stderr, " ralloc.c at fixed address: %s - changing to REG_SFR\n",name);
-//				reg->type = REG_SFR;
-//			}
-
-			if (IS_BITVAR (OP_SYM_ETYPE(op))) {
-//				fprintf(stderr, "%s:%d adding %s in bit registers\n", __FILE__, __LINE__, reg->name);
-				addSet(&pic16_dynDirectBitRegs, reg);
-				reg->isBitField = 1;
-			} else {
-//				fprintf(stderr, "%s:%d adding %s in direct registers\n", __FILE__, __LINE__, reg->name);
-//				addSet(&pic16_dynDirectRegs, reg);
-				checkAddReg(&pic16_dynDirectRegs, reg);
-			}
-	
-		} else {
-			debugLog ("  -- %s is declared at address 0x30000x\n",name);
-	
-		  return NULL;
+#ifndef USE_ONSTACK
+		if(OP_SYMBOL(op)->onStack) {
+			fprintf(stderr, "%s:%d onStack %s offset: %d\n", __FILE__, __LINE__,
+				OP_SYMBOL(op)->name, OP_SYMBOL(op)->stack);
+			OP_SYMBOL(op)->onStack = 0;
+			SPEC_OCLS(OP_SYM_ETYPE(op)) = data;
+			regtype = REG_GPR;
+			return (reg);
+#endif			
 		}
+
+		if(!IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
+			if(pic16_debug_verbose)
+			{
+				fprintf(stderr, "dispace:%d farspace:%d codespace:%d regspace:%d stack:%d eeprom: %d\n",
+					IN_DIRSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+					IN_FARSPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+					IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op))),
+					IN_REGSP( SPEC_OCLS( OP_SYM_ETYPE(op))),
+					IN_STACK( OP_SYM_ETYPE(op)),
+					SPEC_OCLS(OP_SYM_ETYPE(op)) == eeprom);
+
+					fprintf(stderr, "%s:%d symbol %s NOT in dirspace\n", __FILE__, __LINE__,
+			    		OP_SYMBOL(op)->name);
+			}
+		}
+
+		reg = newReg(regtype, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0, op);
+		debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
+
+
+//		if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
+//			fprintf(stderr, " ralloc.c at fixed address: %s - changing to REG_SFR\n",name);
+//			reg->type = REG_SFR;
+//		}
+
+		if (IS_BITVAR (OP_SYM_ETYPE(op))) {
+//			fprintf(stderr, "%s:%d adding %s in bit registers\n", __FILE__, __LINE__, reg->name);
+			addSet(&pic16_dynDirectBitRegs, reg);
+			reg->isBitField = 1;
+		} else {
+//			fprintf(stderr, "%s:%d adding %s in direct registers\n", __FILE__, __LINE__, reg->name);
+//			addSet(&pic16_dynDirectRegs, reg);
+			checkAddReg(&pic16_dynDirectRegs, reg);
+		}
+	
+	} else {
+//		debugLog ("  -- %s is declared at address 0x30000x\n",name);
+	  return NULL;
 	}
 
 	if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
@@ -797,7 +793,7 @@ regs *pic16_typeRegWithIdx (int idx, int type, int fixed)
     }
     break;
   case REG_SFR:
-    if( (dReg = regWithIdx ( pic16_dynProcessorRegs, idx, fixed)) != NULL ) {
+    if( (dReg = regWithIdx ( pic16_dynProcessorRegs, idx, 1)) != NULL ) {
       debugLog ("Found a Processor Register!\n");
       return dReg;
     }
@@ -826,8 +822,10 @@ pic16_regWithIdx (int idx)
   if( (dReg = pic16_typeRegWithIdx(idx,REG_SFR,0)) != NULL)
     return dReg;
 
+#if 0
   if( (dReg = pic16_typeRegWithIdx(idx,REG_STK,0)) != NULL)
     return dReg;
+#endif
 
   return NULL;
 }
@@ -2140,7 +2138,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      /* else we assign registers to it */
 	      _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
 
-	      debugLog ("  %d - \n", __LINE__);
+	      debugLog ("  %d - nRegs: %d\n", __LINE__, sym->nRegs);
 	      if(debugF) 
 		bitVectDebugOn(_G.regAssigned, debugF);
 
@@ -2710,36 +2708,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
 //	fprintf(stderr, "%s:%d symbol = %s\n", __FILE__, __LINE__, OP_SYMBOL( IC_RESULT(ic))->name);
 
-#if 0
-  /* if this is at an absolute address, then get the address. */
-  if (SPEC_ABSA ( OP_SYM_ETYPE(IC_RESULT(ic))) ) {
-    if(PIC16_IS_CONFIG_ADDRESS( SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))))) {
-      debugLog ("  %d - found config word declaration\n", __LINE__);
-      if(IS_VALOP(IC_RIGHT(ic))) {
-	debugLog ("  setting config word to %x\n", 
-		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
-
-	fprintf(stderr, "%s:%d  setting config word to %x\n", __FILE__, __LINE__, 
-		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
-
-	pic16_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
-				(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
-      }
-
-
- 	debugLog(" %d\n", __LINE__);
-
-      /* remove the assignment from the iCode chain. */
-
-      remiCodeFromeBBlock (ebp, ic);
-      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
-      hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
-
-      return 1;
-
-    }
-  }
-#endif
 	debugLog(" %d - actuall processing\n", __LINE__ );
 
   if (!IS_ITEMP (IC_RESULT (ic))) {
@@ -2884,10 +2852,12 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       OP_SYMBOL (IC_RESULT (ic))->iaccess)
     {
 
-#if 0
+#ifndef USE_ONSTACK
 	/* clear the onStack flag, the port doesn't support it yet! FIXME */
-	if(OP_SYMBOL(IC_RESULT(ic))->onStack)
+	if(OP_SYMBOL(IC_RESULT(ic))->onStack) {
 		OP_SYMBOL(IC_RESULT(ic))->onStack = 0;
+	  return 0;
+	}
 #endif
 	
 
@@ -2988,9 +2958,11 @@ findAssignToSym (operand * op, iCode * ic)
 	      OP_SYMBOL (IC_RIGHT (dic))->onStack)
 	    {
 
-#if 0
-		if(OP_SYMBOL(IC_RESULT(ic))->onStack)
+#if USE_ONSTACK
+		if(OP_SYMBOL(IC_RESULT(ic))->onStack) {
 			OP_SYMBOL(IC_RESULT(ic))->onStack = 0;
+		  return NULL;
+		}
 #endif
 
 	      if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key &&

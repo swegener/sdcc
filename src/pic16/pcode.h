@@ -675,6 +675,8 @@ typedef struct pCodeFunction
 
   int absblock;    /* hack to emulate a block pCodes in absolute position
                       but not inside a function */
+  int stackusage;  /* stack positions used in function */
+  
 } pCodeFunction;
 
 

@@ -37,6 +37,7 @@
 #endif
 
 #define CONFIGURATION_WORDS	20
+#define IDLOCATION_BYTES	20
 
 typedef struct {
 	int sfrLoAddr;
@@ -56,6 +57,17 @@ typedef struct {
 	configRegInfo_t crInfo[ CONFIGURATION_WORDS ];
 } configWordsInfo_t;
 
+typedef struct {
+	unsigned char emit;
+	unsigned char value;
+} idRegInfo_t;
+
+typedef struct {
+	int idAddrStart;	/* starting ID address */
+	int idAddrEnd;		/* ending ID address */
+	idRegInfo_t irInfo[ IDLOCATION_BYTES ];
+} idBytesInfo_t;
+
 
 #define PROCESSOR_NAMES    4
 /* Processor unique attributes */
@@ -68,6 +80,7 @@ typedef struct PIC16_device {
   int extMIface;		/* device has external memory interface */
   sfrRangeInfo_t sfrRange;	/* SFR range */
   configWordsInfo_t cwInfo;	/* configuration words info */
+  idBytesInfo_t idInfo;		/* ID Locations info */
 } PIC16_device;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
@@ -86,6 +99,7 @@ typedef struct {
 	int stack_model;
 	int ivt_loc;
 	int nodefaultlibs;
+	int dumpcalltree;
 } pic16_options_t;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
@@ -99,11 +113,13 @@ extern PIC16_device *pic16;
 
 /****************************************/
 void pic16_assignConfigWordValue(int address, int value);
-int pic16_getConfigWord(int address);
+void pic16_assignIdByteValue(int address, char value);
 int pic16_isREGinBank(regs *reg, int bank);
 int pic16_REGallBanks(regs *reg);
 void pic16_setMaxRAM(int size);
 int PIC16_IS_CONFIG_ADDRESS(int address);
+int PIC16_IS_IDLOC_ADDRESS(int address);
+int PIC16_IS_HWREG_ADDRESS(int address);
 
 int checkAddReg(set **set, regs *reg);
 int checkAddSym(set **set, symbol *reg);

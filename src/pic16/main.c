@@ -92,7 +92,7 @@ void pic16_emitDebuggerSymbol (char *);
  
 extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
 extern void pic16_emitConfigRegs(FILE *of);
-
+extern void pic16_emitIDRegs(FILE *of);
 
 
 
@@ -112,6 +112,7 @@ _pic16_init (void)
 	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
 	pic16_options.ivt_loc = 0x000000;		/* default location of interrupt vectors */
 	pic16_options.nodefaultlibs = 0;		/* link default libraries */
+	pic16_options.dumpcalltree = 0;
 }
 
 static void
@@ -289,6 +290,7 @@ OPTION pic16_optionsTable[]= {
 
 	{ 0,	"--denable-peeps",	&pic16_enable_peeps,	"explicit enable of peepholes"},
 	{ 0,	IVT_LOC,	NULL,	"<nnnn> interrupt vector table location"},
+	{ 0,	"--calltree",		&pic16_options.dumpcalltree,	"dump call tree in .calltree file"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -493,6 +495,7 @@ _pic16_setDefaultOptions (void)
 	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
 	pic16_options.ivt_loc = 0x000000;
 	pic16_options.nodefaultlibs = 0;
+	pic16_options.dumpcalltree = 0;
 }
 
 static const char *
@@ -528,19 +531,8 @@ _pic16_genAssemblerPreamble (FILE * of)
 
 	if(!pic16_options.omit_configw) {
 		pic16_emitConfigRegs(of);
-#if 0		
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300001, pic16_getConfigWord(0x300001));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300002, pic16_getConfigWord(0x300002));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300003, pic16_getConfigWord(0x300003));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300005, pic16_getConfigWord(0x300005));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300006, pic16_getConfigWord(0x300006));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300008, pic16_getConfigWord(0x300008));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300009, pic16_getConfigWord(0x300009));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000a, pic16_getConfigWord(0x30000a));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000b, pic16_getConfigWord(0x30000b));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000c, pic16_getConfigWord(0x30000c));
-		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000d, pic16_getConfigWord(0x30000d));
-#endif
+		fprintf(of, "\n");
+		pic16_emitIDRegs(of);
 	}
 	
   fprintf (of, "\tradix dec\n");
@@ -671,7 +663,7 @@ oclsExpense (struct memmap *oclass)
   return 0;
 }
 
-/** $1 is always the basename.
+/** $1 is the input object file (PIC16 specific)	// >>always the basename<<.
     $2 is always the output file.
     $3 -L path and -l libraries
     $l is the list of extra options that should be there somewhere...
@@ -679,7 +671,7 @@ oclsExpense (struct memmap *oclass)
 */
 const char *pic16_linkCmd[] =
 {
-  "gplink", "$3", "\"$1.o\"", "-o \"$2\"", "$l", NULL
+  "gplink", "$l", "-o \"$2\"", "\"$1\"","$3", NULL
 };
 
 

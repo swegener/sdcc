@@ -1620,18 +1620,36 @@ linkEdit (char **envp)
   if (port->linker.cmd)
     {
       char buffer2[PATH_MAX];
-      set *libSet=NULL;
+      char buffer3[PATH_MAX];
+      set *tempSet=NULL, *libSet=NULL;
 
+      strcpy(buffer3, dstFileName);
       if(TARGET_IS_PIC16) {
-         /* use $3 to set the linker include directories */
-         libSet = appendStrSet(libDirsSet, "-I\"", "\"");
+        
+         /* use $l to set the linker include directories */
+         tempSet = appendStrSet(libDirsSet, "-I\"", "\"");
+         mergeSets(&linkOptionsSet, tempSet);
+         
+         tempSet = appendStrSet(libPathsSet, "-I\"", "\"");
+         mergeSets(&linkOptionsSet, tempSet);
 
-         /* now add the libraries from command line */
+         /* use $3 for libraries from command line --> libSet */
          mergeSets(&libSet, libFilesSet);
+
+         tempSet = appendStrSet(relFilesSet, "", "");
+         mergeSets(&libSet, tempSet);
+//         libSet = reverseSet(libSet);
+
+	if(fullSrcFileName) {
+//		strcpy(buffer3, strrchr(fullSrcFileName, DIR_SEPARATOR_CHAR)+1);
+		/* if it didn't work, revert to old behaviour */
+		if(!strlen(buffer3))strcpy(buffer3, dstFileName);
+		strcat(buffer3, port->linker.rel_ext);
+		
+	} else strcpy(buffer3, "");
       }
       
-      buildCmdLine (buffer2, port->linker.cmd, dstFileName, scratchFileName, (libSet?joinStrSet(libSet):NULL), linkOptionsSet);
-      if(libSet)deleteSet(&libSet);
+      buildCmdLine (buffer2, port->linker.cmd, buffer3, scratchFileName, (libSet?joinStrSet(libSet):NULL), linkOptionsSet);
 
       buildCmdLine2 (buffer, sizeof(buffer), buffer2);
     }
@@ -2055,6 +2073,7 @@ static void doPrintSearchDirs(void)
 
     printf("libdir:\n");
     fputStrSet(stdout, libDirsSet);
+    fputStrSet(stdout, libPathsSet);
 }
 
 

@@ -1519,7 +1519,7 @@ pCodeInstruction pic16_pciMOVFF = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
-  PCC_REGISTER2, // outCond
+  PCC_REGISTER, // outCond
   PCI_MAGIC
 };
 
@@ -2804,7 +2804,7 @@ void  pic16_pCodeInitRegisters(void)
 	
 	initialized = 1;
 
-	pic16_initStack(0xfff, 8);
+//	pic16_initStack(0xfff, 8);
 	pic16_init_pic(port->processor);
 
 	pic16_pc_status.r = pic16_allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
@@ -3506,8 +3506,9 @@ pCode *pic16_newpCodeFunction(char *mod,char *f)
   } else
     pcf->fname = NULL;
 
-  return ( (pCode *)pcf);
+  pcf->stackusage = 0;
 
+  return ( (pCode *)pcf);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3857,11 +3858,10 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
 		PCOI(pcop)->r = r;
 		
 		if(r) {
-//			fprintf(stderr, "%s:%d %s reg %s exists\n",__FILE__, __LINE__, __FUNCTION__, name);
+//			fprintf(stderr, "%s:%d %s reg %s exists (r: %p)\n",__FILE__, __LINE__, __FUNCTION__, name, r);
 			PCOI(pcop)->rIdx = r->rIdx;
 		} else {
-//			fprintf(stderr, "%s:%d %s reg %s doesn't exist\n",
-//				__FILE__, __LINE__, __FUNCTION__, name);
+//			fprintf(stderr, "%s:%d %s reg %s doesn't exist\n", __FILE__, __LINE__, __FUNCTION__, name);
 			PCOI(pcop)->rIdx = -1;
 		}
 //			fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);
@@ -3970,8 +3970,8 @@ pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace, PIC_OPTYPE subt)
   PCORB(pcop)->subtype = subt;
 
   /* pCodeOpBit is derived from pCodeOpReg. We need to init this too */
-  PCOR(pcop)->r = NULL;
-  PCOR(pcop)->rIdx = 0;
+  PCOR(pcop)->r = pic16_dirregWithName(s);	//NULL;
+//  PCOR(pcop)->rIdx = 0;
   return pcop;
 }
 
@@ -5260,7 +5260,6 @@ pCode * pic16_findPrevInstruction(pCode *pci)
   pCode *pc = pci;
 
   while(pc) {
-    pc = pc->prev;
 
     if((pc->type == PC_OPCODE)
     	|| (pc->type == PC_WILD)
@@ -5273,6 +5272,7 @@ pCode * pic16_findPrevInstruction(pCode *pci)
     fprintf(stderr,"pic16_findPrevInstruction:  ");
     printpCode(stderr, pc);
 #endif
+    pc = pc->prev;
   }
 
   //fprintf(stderr,"Couldn't find instruction\n");
@@ -5369,9 +5369,13 @@ regs * pic16_getRegFromInstruction(pCode *pc)
     return PCOR(PCI(pc)->pcop)->r;
 
   case PO_IMMEDIATE:
+//    return pic16_dirregWithName(PCOI(PCI(pc)->pcop)->r->name);
+
     if(PCOI(PCI(pc)->pcop)->r)
       return (PCOI(PCI(pc)->pcop)->r);
-
+    else
+      return NULL;
+    
   case PO_GPR_BIT:
     return PCOR(PCI(pc)->pcop)->r;
 
@@ -5436,15 +5440,19 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
     return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
 
   case PO_IMMEDIATE:
-//	break;
-#if 1
+#if 0
 //    if(PCOI(PCI(pc)->pcop)->r)
 //      return (PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r);
 
     //fprintf(stderr, "pic16_getRegFromInstruction2 - immediate\n");
-    return pic16_dirregWithName(PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r->name);
-    //return NULL; // PCOR(PCI(pc)->pcop)->r;
+    return pic16_dirregWithName(PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r->name);
 #endif
+
+    if(PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r)
+      return (PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r);
+    else
+      return NULL;
+
 
   case PO_GPR_BIT:
 	break;
@@ -5689,7 +5697,6 @@ static void dumpCond(int cond)
   static char *pcc_str[] = {
     //"PCC_NONE",
     "PCC_REGISTER",
-    "PCC_REGISTER2",
     "PCC_C",
     "PCC_Z",
     "PCC_DC",
@@ -6008,7 +6015,7 @@ static void insertBankSwitch(int position, pCode *pc)
 			  	tlbl = newiTempLabel(NULL);
 			  	
 			  	/* invert skip instruction */
-				pcprev = pic16_findPrevInstruction(pc);
+				pcprev = pic16_findPrevInstruction(pc->prev);
 				ipci = PCI(pcprev)->inverted_op;
 				npci = pic16_newpCode(ipci, PCI(pcprev)->pcop);
 
@@ -6801,7 +6808,8 @@ static void buildCallTree(void    )
   pBranch *pbr;
   pBlock  *pb;
   pCode   *pc;
-
+  regs *r;
+  
   if(!the_pFile)
     return;
 
@@ -6836,6 +6844,19 @@ static void buildCallTree(void    )
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     pCode *pc_fstart=NULL;
     for(pc = pb->pcHead; pc; pc = pc->next) {
+
+    	if(isPCI(pc) && pc_fstart) {
+		if(PCI(pc)->is2MemOp) {
+			r = pic16_getRegFromInstruction2(pc);
+			if(r && !strcmp(r->name, "POSTDEC1"))
+			  	PCF(pc_fstart)->stackusage++;
+		} else {
+			r = pic16_getRegFromInstruction(pc);
+			if(r && !strcmp(r->name, "PREINC1"))
+				PCF(pc_fstart)->stackusage--;
+		}
+	}
+
       if(isPCF(pc)) {
 	if (PCF(pc)->fname) {
 
@@ -7048,6 +7069,8 @@ static void pBlockStats(FILE *of, pBlock *pb)
       r = setNextItem(pb->tregisters);
     }
   }
+  
+  fprintf(of, "; uses %d bytes of stack\n", 1+ elementsInSet(pb->tregisters));
 }
 
 /*-----------------------------------------------------------------*/
@@ -7184,7 +7207,7 @@ static set *register_usage(pBlock *pb)
 /* pct2 - writes the call tree to a file                           */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
-static void pct2(FILE *of,pBlock *pb,int indent)
+static void pct2(FILE *of,pBlock *pb,int indent,int usedstack)
 {
   pCode *pc,*pcn;
   int i;
@@ -7193,8 +7216,10 @@ static void pct2(FILE *of,pBlock *pb,int indent)
   if(!of)
     return;
 
-  if(indent > 10)
+  if(indent > 10) {
+  	fprintf(of, "recursive function\n");
     return; //recursion ?
+  }
 
   pc = setFirstItem(pb->function_entries);
 
@@ -7204,12 +7229,13 @@ static void pct2(FILE *of,pBlock *pb,int indent)
   pb->visited = 0;
 
   for(i=0;i<indent;i++)   // Indentation
-    fputc(' ',of);
+  	fputs("+   ", of);
+  fputs("+- ", of);
 
-  if(pc->type == PC_FUNCTION)
-    fprintf(of,"%s\n",PCF(pc)->fname);
-  else
-    return;  // ???
+  if(pc->type == PC_FUNCTION) {
+    usedstack += PCF(pc)->stackusage;
+    fprintf(of,"%s (stack: %i)\n",PCF(pc)->fname, usedstack);
+  } else return;  // ???
 
 
   pc = setFirstItem(pb->function_calls);
@@ -7220,7 +7246,7 @@ static void pct2(FILE *of,pBlock *pb,int indent)
 
       pcn = findFunction(dest);
       if(pcn) 
-	pct2(of,pcn->pb,indent+1);
+	pct2(of,pcn->pb,indent+1, usedstack);	// + PCF(pcn)->stackusage);
     } else
       fprintf(of,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
 
@@ -7252,7 +7278,6 @@ void pic16_printCallTree(FILE *of)
     pBlockStats(of,pb);
 
 
-
   fprintf(of,"Call Tree\n");
   pbr = the_pFile->functions;
   while(pbr) {
@@ -7277,8 +7302,8 @@ void pic16_printCallTree(FILE *of)
 
   fprintf(of,"\n**************\n\na better call tree\n");
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if(pb->visited)
-      pct2(of,pb,0);
+//    if(pb->visited)
+      pct2(of,pb,0,0);
   }
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {

@@ -1867,4 +1867,15 @@ extern sfr at 0xfff TOSU;
 #define _EBTRB_ON_6H	0xBF	/* Enabled */
 
 
+/* Device ID locations */
+#define __IDLOC0	0x200000
+#define __IDLOC1	0x200001
+#define __IDLOC2	0x200002
+#define __IDLOC3	0x200003
+#define __IDLOC4	0x200004
+#define __IDLOC5	0x200005
+#define __IDLOC6	0x200006
+#define __IDLOC7	0x200007
+
+
 #endif

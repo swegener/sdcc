@@ -168,16 +168,16 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
     reg = pic16_getRegFromInstruction(pc);
 
     if(reg) {
-
 #if 0
       fprintf(stderr, "reg= %p\n", reg);
       fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);
-      fprintf(stderr, "addr = 0x%03x, type = %d  rIdx=0x%03x",
+      fprintf(stderr, "addr = 0x%03x, type = %d  rIdx=0x%03x ",
       	      reg->address,reg->type,reg->rIdx);
       fprintf(stderr, "command = %s\n", PCI(pc)->mnemonic);
       	      
 #endif
 
+//      fprintf(stderr, "trying to get first operand from pCode reg= %s\n", reg->name);
       addSetIfnotP(& (PCFL(pcfl)->registers), reg);
 
       if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
@@ -193,18 +193,18 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 	   and set up the second operand too */
 	if(PCI(pc)->is2MemOp) {
 			reg = pic16_getRegFromInstruction2(pc);
+			if(reg) {
+//				fprintf(stderr, "trying to get second operand from pCode reg= %s\n", reg->name);
+				addSetIfnotP(& (PCFL(pcfl)->registers), reg);
 
-//			fprintf(stderr, "trying to get second operand from pCode reg= %s\n", reg->name);
-			addSetIfnotP(& (PCFL(pcfl)->registers), reg);
-
-			if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
-				addSetIfnotP(& (reg->reglives.usedpFlows), pcfl);
-
-			if(PCC_REGISTER & PCI(pc)->outCond)
-				addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
+				if((PCC_REGISTER | PCC_LITERAL) & PCI(pc)->inCond)
+					addSetIfnotP(& (reg->reglives.usedpFlows), pcfl);
+					
+				if((PCC_REGISTER | PCC_REGISTER2) & PCI(pc)->outCond)
+					addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
 			
-			addSetIfnotP(& (reg->reglives.usedpCodes), pc);
-
+				addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+			}
 	}
 #endif
 
@@ -318,8 +318,11 @@ static void  RemoveRegsFromSet(set *regset)
     if(used <= 1) {
 
 //	fprintf(stderr," reg %s isfree=%d, wasused=%d\n",reg->name,reg->isFree,reg->wasUsed);
+
       if(used == 0) {
-//		fprintf(stderr,"%s:%d: getting rid of reg %s\n",__FILE__, __LINE__, reg->name);
+
+//	fprintf(stderr,"%s:%d: getting rid of reg %s\n",__FILE__, __LINE__, reg->name);
+
 	reg->isFree = 1;
 	reg->wasUsed = 0;
       } else {
@@ -329,10 +332,9 @@ static void  RemoveRegsFromSet(set *regset)
 	pc = setFirstItem(reg->reglives.usedpCodes);
 
 	if(reg->type == REG_SFR) {
-		fprintf(stderr, "not removing SFR reg %s even though used only once\n",reg->name);
+		fprintf(stderr, "not removing SFR reg %s even though used only once\n", reg->name);
 	  continue;
 	}
-
 
 	if(isPCI(pc)) {
 	  if(PCI(pc)->label) {
@@ -355,7 +357,10 @@ static void  RemoveRegsFromSet(set *regset)
 	    pc->print(stderr,pc);
 	    fprintf(stderr,"reg %s, type =%d\n",r->name, r->type);
 	  }
-//		fprintf(stderr,"%s:%d: removing reg %s because it is used only once\n",__FILE__, __LINE__, reg->name);
+
+	  fprintf(stderr,"%s:%d: removing reg %s because it is used only once\n",__FILE__, __LINE__, reg->name);
+
+
 	  Remove1pcode(pc, reg);
 	  /*
 	    pic16_unlinkpCode(pc);
@@ -399,6 +404,12 @@ static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int 
 {
   if(!reg)
     return;
+
+#if 0
+  fprintf(stderr,"removing 2 instructions:\n");
+  pc1->print(stderr,pc1);
+  pc2->print(stderr,pc2);
+#endif
 
   if(pc1)
     Remove1pcode(pc1, reg);
@@ -733,7 +744,7 @@ static void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_l
       if(used && !pcfl_used && pcfl_assigned) {
 	pCode *pc;
 
-//		fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
+		fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
 
 	pc = setFirstItem(reg->reglives.usedpCodes);
 	while(pc) {
@@ -835,14 +846,14 @@ void pic16_pCodeRegOptimizeRegUsage(int level)
     fprintf(stderr, "No registers saved on this pass\n");
 
 
-/*
+#if 0
   fprintf(stderr,"dynamically allocated regs:\n");
   dbg_regusage(pic16_dynAllocRegs);
   fprintf(stderr,"stack regs:\n");
   dbg_regusage(pic16_dynStackRegs);
   fprintf(stderr,"direct regs:\n");
   dbg_regusage(pic16_dynDirectRegs);
-*/
+#endif
 }
 
 

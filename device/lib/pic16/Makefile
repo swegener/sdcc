@@ -29,7 +29,7 @@ build-all-libraries:
 
 
 clean: all-clean
-	-$(RM) -f bin/*
+	$(RM) -f bin/*.*
 
 
 

@@ -140,10 +140,6 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		fprintf(stderr, "\n");
 #endif
 
-//		if(PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype)))
-//			continue;
-
-
 		/* if extern then add to externs */
 		if (IS_EXTERN (sym->etype)) {
 			checkAddSym(&externs, sym);
@@ -189,16 +185,17 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 #endif
 
 				reg = pic16_allocDirReg( operandFromSymbol( sym ));
-//				addSet(&pic16_dynAllocRegs, reg);
 				
 				{
 				  sectSym *ssym;
 				  int found=0;
 				  
+#if 1
 				  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
 				  		if(!strcmp(ssym->name, reg->name))found=1;
 					}
-					
+#endif
+
 					if(!found)checkAddReg(&pic16_rel_udata, reg);
 				}
 			}
@@ -294,10 +291,12 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					  sectSym *ssym;
 					  int found=0;
 				  
+#if 1
 					  	for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
 					  		if(!strcmp(ssym->name, reg->name))found=1;
 						}
-					
+#endif
+
 						if(!found)
 							if(checkAddReg(&pic16_rel_udata, reg)) {
 								addSetHead(&publics, sym);
@@ -1117,9 +1116,20 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
 
 int PIC16_IS_CONFIG_ADDRESS(int address)
 {
-
-  return (address >= pic16->cwInfo.confAddrStart && address <= pic16->cwInfo.confAddrEnd);
+  return ((address >= pic16->cwInfo.confAddrStart && address <= pic16->cwInfo.confAddrEnd));
 }
+
+int PIC16_IS_IDLOC_ADDRESS(int address)
+{
+   return ((address >= pic16->idInfo.idAddrStart && address <= pic16->idInfo.idAddrEnd));
+}
+
+/* wrapper function for the above */
+int PIC16_IS_HWREG_ADDRESS(int address)
+{
+  return (PIC16_IS_CONFIG_ADDRESS(address) || PIC16_IS_IDLOC_ADDRESS(address));
+}
+
 
 /*-----------------------------------------------------------------*/
 /* emitStaticSeg - emitcode for the static segment                 */
@@ -1151,6 +1161,13 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
         if(SPEC_ABSA(sym->etype) && PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))) {
 		pic16_assignConfigWordValue(SPEC_ADDR(sym->etype),
 			(int) floatFromVal(list2val(sym->ival)));
+
+		continue;
+        }
+
+        if(SPEC_ABSA(sym->etype) && PIC16_IS_IDLOC_ADDRESS(SPEC_ADDR(sym->etype))) {
+		pic16_assignIdByteValue(SPEC_ADDR(sym->etype),
+			(char) floatFromVal(list2val(sym->ival)));
 
 		continue;
         }
@@ -1289,6 +1306,17 @@ void pic16_emitConfigRegs(FILE *of)
 			fprintf (of, "\t__config 0x%x, 0x%hhx\n",
 				pic16->cwInfo.confAddrStart+i,
 				pic16->cwInfo.crInfo[i].value);
+}
+
+void pic16_emitIDRegs(FILE *of)
+{
+  int i;
+
+	for(i=0;i<pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart;i++)
+		if(pic16->idInfo.irInfo[i].emit)
+			fprintf (of, "\t__idlocs 0x%06x, 0x%hhx\n",
+				pic16->idInfo.idAddrStart+i,
+				pic16->idInfo.irInfo[i].value);
 }
 
 
@@ -1433,6 +1461,7 @@ pic16emitOverlay (FILE * afile)
 	     and addPublics allowed then add it to the public set */
 	  if ((sym->_isparm && !IS_REGPARM (sym->etype))
 	      && !IS_STATIC (sym->etype)) {
+//	      fprintf(stderr, "%s:%d %s accessed\n", __FILE__, __LINE__, __FUNCTION__);
 	      checkAddSym(&publics, sym);
 //	    addSetHead (&publics, sym);
 	  }
@@ -1576,8 +1605,8 @@ pic16glue ()
 	pic16emitOverlay(ovrFile);
 	pic16_AnalyzepCode('*');
 
-#if 0
-	{
+#if 1
+	if(pic16_options.dumpcalltree) {
 	  FILE *cFile;
 		sprintf(buffer, dstFileName);
 		strcat(buffer, ".calltree");
@@ -1609,18 +1638,18 @@ pic16glue ()
     
 	/* initial comments */
 	pic16initialComments (asmFile);
-    
+
 	/* print module name */
 	fprintf(asmFile, "#FILE\t\"%s\"\n", fullSrcFileName);
-    
+
 	/* Let the port generate any global directives, etc. */
 	if (port->genAssemblerPreamble) {
 		port->genAssemblerPreamble(asmFile);
 	}
-    
+	
 	/* print the extern variables to this module */
 	pic16_printExterns(asmFile);
-  
+	
 	/* print the global variables in this module */
 	pic16printPublics (asmFile);
 
@@ -1631,41 +1660,10 @@ pic16glue ()
 	fprintf (asmFile, "%s", iComments2);
 	copyFile (asmFile, sfr->oFile);
 #endif
-    
 
 	/* Put all variables into a cblock */
 	pic16_AnalyzeBanking();
 	pic16_writeUsedRegs(asmFile);
-
-#if 0
-	/* create the overlay segments */
-	fprintf (asmFile, "%s", iComments2);
-	fprintf (asmFile, "; overlayable items in internal ram \n");
-	fprintf (asmFile, "%s", iComments2);    
-	copyFile (asmFile, ovrFile);
-#endif
-
-#if 0
-
-	/* create the stack segment MOF */
-	if (mainf && IFFUNC_HASBODY(mainf->type)) {
-		fprintf (asmFile, "%s", iComments2);
-		fprintf (asmFile, "; Stack segment in internal ram \n");
-		fprintf (asmFile, "%s", iComments2);    
-		fprintf (asmFile, ";\t.area\tSSEG\t(DATA)\n"
-			";__start__stack:\n;\t.ds\t1\n\n");
-	}
-#endif
-
-#if 0
-	/* no indirect data in pic */
-	/* create the idata segment */
-	fprintf (asmFile, "%s", iComments2);
-	fprintf (asmFile, "; indirectly addressable internal ram data\n");
-	fprintf (asmFile, "%s", iComments2);
-	copyFile (asmFile, idata->oFile);
-#endif
-
 
 #if 0
 	/* no xdata in pic */

@@ -360,8 +360,10 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     bool r0iu = FALSE , r1iu = FALSE;
     bool r0ou = FALSE , r1ou = FALSE;
 
-	//fprintf(stderr, "%s:%d: getting free ptr from ic = %c\n", __FUNCTION__, __LINE__, ic->op);
+    fprintf(stderr, "%s:%d: getting free ptr from ic = %c result: %d\n", __FUNCTION__, __LINE__, ic->op, result);
 
+    (*aopp)->type = AOP_STK;    
+    return NULL;
     /* the logic: if r0 & r1 used in the instruction
     then we are in trouble otherwise */
 
@@ -540,13 +542,16 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
     /* if symbol was initially placed onStack then we must re-place it
      * to direct memory, since pic16 does not have a specific stack */
     if(sym->onStack) {
-//	sym->onStack = 0;
+    	fprintf(stderr, "%s:%d symbol %s on stack\n", __FILE__, __LINE__, OP_SYMBOL(op)->name);
+#if 0
+	sym->onStack = 0;
     	SPEC_OCLS( sym->etype ) = data;
     	space = data;
+#endif
     }
-    
 
-#if 1
+
+#if 0
     /* assign depending on the storage class */
     /* if it is on the stack or indirectly addressable */
     /* space we need to assign either r0 or r1 to it   */    
@@ -555,9 +560,26 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 	DEBUGpic16_emitcode("; ***", "%s:%d sym->onStack:%d || sym->iaccess:%d",
 		__FUNCTION__, __LINE__, sym->onStack, sym->iaccess);
 	
-        sym->aop = aop = newAsmop(0);
-        aop->aopu.aop_ptr = getFreePtr(ic,&aop,result);
+//        sym->aop = aop = newAsmop(0);
+//        aop->aopu.aop_ptr = getFreePtr(ic,&aop,result);
+//        aop->size = getSize(sym->type);
+
+        fprintf(stderr, "%s:%d\t%s\n", __FILE__, __LINE__, __FUNCTION__);
+
+        sym->aop = aop = newAsmop (AOP_REG);
+//        aop->aopu.aop_dir = sym->name;	//sym->rname ;
+	aop->aopu.aop_reg[0] = pic16_regWithIdx(IDX_PLUSW2);	//pic16_pc_plusw2.r;
         aop->size = getSize(sym->type);
+	DEBUGpic16_emitcode(";","%d sym->rname = %s, size = %d",__LINE__,sym->rname,aop->size);
+	
+	/* initialise for stack access via frame pointer */
+	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(sym->stack));
+	
+	
+//	if(IC_LEFT(ic))pic16_allocDirReg( IC_LEFT(ic) );
+//	else if(IC_RIGHT(ic))pic16_allocDirReg(IC_RIGHT(ic));
+	
+	return (aop);
 
         /* now assign the address of the variable to 
         the pointer register */
@@ -588,6 +610,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
     }
 #endif
 
+#if 0
     if (sym->onStack && options.stack10bit)
     {
         /* It's on the 10 bit stack, which is located in
@@ -618,7 +641,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
     	aop->size = getSize(sym->type); 
     	return aop;
     }
-
+#endif
     //DEBUGpic16_emitcode(";","%d",__LINE__);
     /* if in bit space */
     if (IN_BITSPACE(space)) {
@@ -1247,8 +1270,13 @@ char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname)
       strcpy(rs,s);   
       return rs;
 
+      case AOP_STK:
+//        pCodeOp *pcop = aop->aop
+	break;
+
     }
 
+    fprintf(stderr, "%s:%d unsupported aop->type: %s\n", __FILE__, __LINE__, pic16_AopType(aop->type));
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
            "aopget got unsupported aop->type");
     exit(0);
@@ -1283,7 +1311,7 @@ pCodeOp *pic16_popGetTempReg(void)
 }
 
 /*-----------------------------------------------------------------*/
-/* pic16_popGetTempReg - create a new temporary pCodeOp                  */
+/* pic16_popReleaseTempReg - create a new temporary pCodeOp                  */
 /*-----------------------------------------------------------------*/
 void pic16_popReleaseTempReg(pCodeOp *pcop)
 {
@@ -1423,6 +1451,7 @@ static pCodeOp *pic16_popRegFromIdx(int rIdx)
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 	PCOR(pcop)->rIdx = rIdx;
 	PCOR(pcop)->r = pic16_regWithIdx(rIdx);
+
 	PCOR(pcop)->r->isFree = 0;
 	PCOR(pcop)->r->wasUsed = 1;
 
@@ -1563,6 +1592,7 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	DEBUGpic16_emitcode(";","%d\tAOP_REG", __LINE__);
 	
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+//	pcop->type = PO_GPR_REGISTER;
 	PCOR(pcop)->rIdx = rIdx;
 	PCOR(pcop)->r = pic16_regWithIdx(rIdx);
 	PCOR(pcop)->r->wasUsed=1;
@@ -3296,12 +3326,21 @@ static void genFunction (iCode *ic)
 			DEBUGpic16_emitcode("; **", "Saving used registers in stack");
 			for ( i = 0 ; i < sym->regsUsed->size ; i++) {
 				if (bitVectBitValue(sym->regsUsed,i)) {
-//					fprintf(stderr, "%s:%d function %s uses register %s\n",
-//							__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
-//							pic16_regWithIdx(i)->name);
+#if 0
+					fprintf(stderr, "%s:%d function %s uses register %s\n",
+							__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
+							pic16_regWithIdx(i)->name);
+#endif
 
 					pic16_pushpCodeOp( pic16_popRegFromIdx(i) );
 					_G.nRegsSaved++;
+
+					if(!pic16_regWithIdx(i)->wasUsed) {
+						fprintf(stderr, "%s:%d register %s is used in function but was wasUsed = 0d\n",
+							__FILE__, __LINE__, pic16_regWithIdx(i)->name);
+
+						pic16_regWithIdx(i)->wasUsed = 1;
+					}
 				}
 			}
 		}
@@ -3337,9 +3376,13 @@ static void genFunction (iCode *ic)
 				for ( i = 0 ; i < sym->regsUsed->size ; i++) {
 					if (bitVectBitValue(sym->regsUsed,i)) {
 
-//						fprintf(stderr, "%s:%d function %s uses register %s\n",
-//								__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
-//								pic16_regWithIdx(i)->name);
+#if 0
+						fprintf(stderr, "%s:%d function %s uses register %s (wasUsed: %d, %p)\n",
+								__FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name,
+								pic16_regWithIdx(i)->name,
+								pic16_regWithIdx(i)->wasUsed,
+								pic16_regWithIdx(i));
+#endif
 
 						pic16_pushpCodeOp( pic16_popRegFromIdx(i) );
 
@@ -3348,6 +3391,14 @@ static void genFunction (iCode *ic)
 //							&pic16_pc_postdec1, 0));
 
 						_G.nRegsSaved++;
+
+						if(!pic16_regWithIdx(i)->wasUsed) {
+							fprintf(stderr, "%s:%d register %s is used in function but was wasUsed = 0d\n",
+								__FILE__, __LINE__, pic16_regWithIdx(i)->name);
+
+							pic16_regWithIdx(i)->wasUsed = 1;
+						}
+					
 					}
 				}
 			}
@@ -5084,12 +5135,16 @@ static void genCmp (operand *left,operand *right,
     if(sign) {
       /* Sigh. thus sucks... */
       if(size) {
+      	pCodeOp *pctemp;
+      	
+      	pctemp = pic16_popGetTempReg();
 	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),size));
-	pic16_emitpcode(POC_MOVWF, pic16_popRegFromIdx(pic16_Gstack_base_addr));
+	pic16_emitpcode(POC_MOVWF, pctemp);		//pic16_pic16_popRegFromIdx(pic16_Gstack_base_addr));
 	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0x80));
-	pic16_emitpcode(POC_XORWF, pic16_popRegFromIdx(pic16_Gstack_base_addr));
+	pic16_emitpcode(POC_XORWF, pctemp);		//pic16_popRegFromIdx(pic16_Gstack_base_addr));
 	pic16_emitpcode(POC_XORFW, pic16_popGet(AOP(right),size));
-	pic16_emitpcode(POC_SUBFW, pic16_popRegFromIdx(pic16_Gstack_base_addr));
+	pic16_emitpcode(POC_SUBFW, pctemp);		//pic16_popRegFromIdx(pic16_Gstack_base_addr));
+	pic16_popReleaseTempReg(pctemp);
       } else {
 	/* Signed char comparison */
 	/* Special thanks to Nikolai Golovchenko for this snippet */
@@ -5148,7 +5203,8 @@ check_carry:
   if ((AOP_TYPE(result) != AOP_CRY) 
   	&& AOP_SIZE(result)) {
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-//    pic16_emitpLabel( rFalseIfx.lbl->key );
+
+    if(!ifx)pic16_emitpLabel( rFalseIfx.lbl->key );
 
     pic16_outBitC(result);
   } else {

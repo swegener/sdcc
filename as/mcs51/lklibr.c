@@ -15,6 +15,9 @@
  *
  */
 
+#define EQ(A,B) !strcmp((A),(B))
+#define MAXLINE 254 /*when using fgets*/
+
 #if defined(__APPLE__) && defined(__MACH__)
 #include <sys/types.h>
 #include <sys/malloc.h>
@@ -281,6 +284,196 @@ search()
 	}
 }
 
+/*Load a .rel file embedded in a sdcclib file*/
+void LoadRel(FILE * libfp, char * ModName)
+{
+	char str[NINPUT+2];
+	int state=0;
+
+	while (fgets(str, NINPUT, libfp) != NULL)
+	{
+		str[NINPUT+1] = '\0';
+		chop_crlf(str);
+		switch(state)
+		{
+			case 0:
+				if(EQ(str, "<FILE>"))
+				{
+					fgets(str, NINPUT, libfp);
+					str[NINPUT+1] = '\0';
+					chop_crlf(str);
+					if(EQ(str, ModName)) state=1;
+					else
+					{
+						printf("Bad offset in library file str=%s, Modname=%s\n", str, ModName);
+						lkexit(1);
+					}
+				}
+			break;
+			case 1:
+				if(EQ(str, "<REL>")) state=2;
+			break;
+			case 2:
+				if(EQ(str, "</REL>")) return;
+				ip = str;
+				link_main();
+			break;
+		}
+	}
+}
+
+/*Load an .adb file embedded in a sdcclib file.  If there is
+something between <ADB> and </ADB> returns 1, otherwise returns 0.
+This way the aomf51 will not have uselless empty modules. */
+
+int LoadAdb(FILE * libfp)
+{
+	char str[MAXLINE+1];
+	int state=0;
+	int ToReturn=0;
+
+	while (fgets(str, MAXLINE, libfp) != NULL)
+	{
+		str[NINPUT+1] = '\0';
+		chop_crlf(str);
+		switch(state)
+		{
+			case 0:
+				if(EQ(str, "<ADB>")) state=1;
+			break;
+			case 1:
+				if(EQ(str, "</ADB>")) return ToReturn;
+				fprintf(dfp, "%s\n", str);
+				ToReturn=1;
+			break;
+		}
+	}
+	return ToReturn;
+}
+
+/*Check for a symbol in a SDCC library.  If found, add the embedded .rel and
+.adb files from the library.  The library must be created with the SDCC
+librarian 'sdcclib' since the linking process depends on the correct file offsets
+embedded in the library file.*/
+
+int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
+{
+	struct lbfile *lbfh, *lbf;
+	char name[NCPS]="";
+	char ModName[NCPS]="";
+	char FLine[MAXLINE+1];
+	int state=0;
+	long IndexOffset, FileOffset;
+
+	while(!feof(libfp))
+    {
+        FLine[0]=0;
+        fgets(FLine, MAXLINE, libfp);
+        chop_crlf(FLine);
+
+        switch(state)
+        {
+            case 0:
+                if(EQ(FLine, "<INDEX>"))
+                {
+					/*The next line has the size of the index*/
+                    FLine[0]=0;
+                    fgets(FLine, MAXLINE, libfp);
+                    chop_crlf(FLine);
+					IndexOffset=atol(FLine);
+					state=1;
+                }
+            break;
+            case 1:
+                if(EQ(FLine, "<MODULE>"))
+				{
+					/*The next line has the name of the module and the offset
+					of the corresponding embedded file in the library*/
+                    FLine[0]=0;
+                    fgets(FLine, MAXLINE, libfp);
+                    chop_crlf(FLine);
+					sscanf(FLine, "%s %ld", ModName, &FileOffset);
+					state=2;
+				}
+                else if(EQ(FLine, "</INDEX>"))
+				{
+					/*Reached the end of the index.  The symbol is not in this library.*/
+					return 0;
+				}
+            break;
+            case 2:
+                if(EQ(FLine, "</MODULE>"))
+				{
+					/*The symbol is not in this module, try the next one*/
+                    state=1;
+				}
+                else
+				{
+					/*Check if this is the symbol we are looking for.*/
+					if (strncmp(SymName, FLine, NCPS)==0)
+					{
+						/*The symbol is in this module.*/
+
+						/*As in the original library format, it is assumed that the .rel
+						files reside in the same directory as the lib files.*/
+						strcat(DirLib, ModName);
+						strcat(DirLib, ".rel"); /*FSEPX???*/
+
+						/*If this module has been loaded already don't load it again.*/
+						lbf = lbfhead;
+						while (lbf)
+						{
+							if(EQ(DirLib, lbf->filspc)) return 1;/*Already loaded*/
+							lbf=lbf->next;
+						}
+						
+						/*Add the embedded file to the list of files to be loaded in
+						the second pass.  That is performed latter by the function
+						library() below.*/
+						lbfh = (struct lbfile *) new (sizeof(struct lbfile));
+						if (lbfhead == NULL)
+						{
+							lbfhead = lbfh;
+						}
+						else
+						{
+							lbf = lbfhead;
+							while (lbf->next)
+							lbf = lbf->next;
+							lbf->next = lbfh;
+						}
+
+						lbfh->libspc = PathLib;
+						lbfh->filspc = DirLib;
+						lbfh->relfil = (char *) new (strlen(ModName) + 1);
+						strcpy(lbfh->relfil, ModName);
+						/*Library embedded file, so lbfh->offset must be >=0*/
+						lbfh->offset = IndexOffset+FileOffset;
+						
+						/*Jump to where the .rel begins and load it.*/
+						fseek(libfp, lbfh->offset, SEEK_SET);
+						LoadRel(libfp, ModName);
+
+						/* if cdb information required & .adb file present */
+						if (dflag && dfp)
+						{
+							if(LoadAdb(libfp))
+								SaveLinkedFilePath(DirLib);
+						}
+						return 1; /*Found the symbol, so success!*/
+					}
+				}
+            break;
+			
+			default:
+				return 0; /*It should never reach this point, but just in case...*/
+			break;
+        }
+    }
+
+	return 0; /*The symbol is not in this library*/
+}
+
 /*)Function	VOID	fndsym(name)
  *
  *		char	*name		symbol name to find
@@ -364,13 +557,16 @@ char *name;
 	char symname[NINPUT];
 	char *path,*str;
 	char c;
+	int result;
 
 	/*
 	 * Search through every library in the linked list "lbnhead".
 	 */
 
-/*1*/	for (lbnh=lbnhead; lbnh; lbnh=lbnh->next) {
-		if ((libfp = fopen(lbnh->libspc, "r")) == NULL) {
+	for (lbnh=lbnhead; lbnh; lbnh=lbnh->next)
+	{
+		if ((libfp = fopen(lbnh->libspc, "r")) == NULL)
+		{
 			fprintf(stderr, "Cannot open library file %s\n",
 				lbnh->libspc);
 			lkexit(1);
@@ -383,104 +579,143 @@ char *name;
 		 * for a .REL file in this library.
 		 */
 
-/*2*/		while (fgets(relfil, NINPUT, libfp) != NULL) {
+		while (fgets(relfil, NINPUT, libfp) != NULL)
+		{
 		    relfil[NINPUT+1] = '\0';
 		    chop_crlf(relfil);
-		    if (path != NULL) {
-			str = (char *) new (strlen(path)+strlen(relfil)+6);
-			strcpy(str,path);
+		    if (path != NULL)
+			{
+				str = (char *) new (strlen(path)+strlen(relfil)+6);
+				strcpy(str,path);
 #ifdef	OTHERSYSTEM
-			if (str[strlen(str)-1] != '/') {
-				strcat(str,"/");
-			}
+				if (str[strlen(str)-1] != '/')
+				{
+					strcat(str,"/");
+				}
 #endif
-		    } else {
-			str = (char *) new (strlen(relfil) + 5);
 		    }
-		    if (relfil[0] == '\\') {
-			strcat(str,relfil+1);
-		    } else {
-			strcat(str,relfil);
+			else
+			{
+				str = (char *) new (strlen(relfil) + 5);
 		    }
-		    if(strchr(relfil,FSEPX) == NULL) {
-			sprintf(&str[strlen(str)], "%crel", FSEPX);
-		    }
-/*3*/		    if ((fp = fopen(str, "r")) != NULL) {
 
-			/*
-			 * Read in the object file.  Look for lines that
-			 * begin with "S" and end with "D".  These are
-			 * symbol table definitions.  If we find one, see
-			 * if it is our symbol.  Make sure we only read in
-			 * our object file and don't go into the next one.
-			 */
+			if(strcmp(relfil, "<SDCCLIB>")==0)
+			{
+				result=SdccLib(lbnh->libspc, libfp, str, name);
+				fclose(libfp);
+				if(result) return(1); /*Found the symbol*/
+				free(str);
+				/*The symbol is not in the current library,
+				check the next library in the list*/
+				break; 
+			}
+
+			/*From here down is the support for libraries in the original format*/
+			if (relfil[0] == '\\')
+			{
+				strcat(str,relfil+1);
+		    }
+			else
+			{
+				strcat(str,relfil);
+		    }
+		    
+			if(strchr(relfil, FSEPX) == NULL)
+			{
+				sprintf(&str[strlen(str)], "%crel", FSEPX);
+		    }
+
+			if ((fp = fopen(str, "r")) != NULL)
+			{
+
+				/*
+				 * Read in the object file.  Look for lines that
+				 * begin with "S" and end with "D".  These are
+				 * symbol table definitions.  If we find one, see
+				 * if it is our symbol.  Make sure we only read in
+				 * our object file and don't go into the next one.
+				 */
 			
-/*4*/			while (fgets(buf, NINPUT, fp) != NULL) {
+				while (fgets(buf, NINPUT, fp) != NULL)
+				{
+					buf[NINPUT+1] = '\0';
+					chop_crlf(buf);
+					/*
+					 * Skip everything that's not a symbol record.
+					 */
+					if (buf[0] != 'S') continue;
 
-			buf[NINPUT+1] = '\0';
-			chop_crlf(buf);
+					/*
+					* When a 'T line' is found terminate file scan.
+					* All 'S line's preceed 'T line's in .REL files.
+					*/
+					if (buf[0] == 'T') break;
 
-			/*
-			 * Skip everything that's not a symbol record.
-			 */
-			if (buf[0] != 'S')
-				continue;
+					sscanf(buf, "S %s %c", symname, &c);
 
-			/*
-			 * When a 'T line' is found terminate file scan.
-			 * All 'S line's preceed 'T line's in .REL files.
-			 */
-			if (buf[0] == 'T')
-				break;
+					/*
+					* If we find a symbol definition for the
+					* symbol we're looking for, load in the
+					* file and add it to lbfhead so it gets
+					* loaded on pass number 2.
+					*/
+					if (strncmp(symname, name, NCPS) == 0 && c == 'D')
+					{
+						lbfh = (struct lbfile *) new (sizeof(struct lbfile));
+						if (lbfhead == NULL)
+						{
+							lbfhead = lbfh;
+						}
+						else
+						{
+							lbf = lbfhead;
+							while (lbf->next)
+							lbf = lbf->next;
+							lbf->next = lbfh;
+						}
 
-			sscanf(buf, "S %s %c", symname, &c);
-
-			/*
-			 * If we find a symbol definition for the
-			 * symbol we're looking for, load in the
-			 * file and add it to lbfhead so it gets
-			 * loaded on pass number 2.
-			 */
-/*5*/			if (strncmp(symname, name, NCPS) == 0 && c == 'D') {
-
-			lbfh = (struct lbfile *) new (sizeof(struct lbfile));
-			if (lbfhead == NULL) {
-				lbfhead = lbfh;
-			} else {
-				lbf = lbfhead;
-				while (lbf->next)
-					lbf = lbf->next;
-				lbf->next = lbfh;
+						lbfh->libspc = lbnh->libspc;
+						lbfh->filspc = str;
+						lbfh->relfil = (char *) new (strlen(relfil) + 1);
+						lbfh->offset = -1; /*Stand alone rel file*/
+						strcpy(lbfh->relfil,relfil);
+						fclose(fp);
+						fclose(libfp);		       
+			
+						/* if cdb information required & adb file present */
+						if (dflag && dfp)
+						{
+							FILE *xfp = afile(str,"adb",0); //JCF: Nov 30, 2002
+							if (xfp)
+							{
+								SaveLinkedFilePath(str);
+								copyfile(dfp,xfp);
+								fclose(xfp);
+							}
+						}
+						loadfile(str);
+						return (1);
+					}
+				}
+				fclose(fp);
 			}
-			lbfh->libspc = lbnh->libspc;
-			lbfh->filspc = str;
-			lbfh->relfil = (char *) new (strlen(relfil) + 1);
-			strcpy(lbfh->relfil,relfil);
-			fclose(fp);
-			fclose(libfp);		       
-			/* if cdb information required & cdb file present */
-			if (dflag && dfp) {
-			    FILE *xfp = afile(str,"adb",0); //JCF: Nov 30, 2002
-			    if (xfp) {
-				SaveLinkedFilePath(str);
-				copyfile(dfp,xfp);
-				fclose(xfp);
-			    }
-			}
-			loadfile(str);
-			return (1);
-
-/*5*/			}
-
-/*4*/			}
-		    fclose(fp);
-/*3*/		    }
-
-		    free(str);
-/*2*/		}
+			free(str);
+		}
 		fclose(libfp);
-/*1*/	}
+	}
 	return(0);
+}
+
+void loadfile_SdccLib(char * libspc, char * module, long offset)
+{
+	FILE *fp;
+
+	if ((fp = fopen(libspc,"r")) != NULL)
+	{
+		fseek(fp, offset, SEEK_SET);
+		LoadRel(fp, module);
+		fclose(fp);
+	}
 }
 
 /*)Function	VOID	library()
@@ -506,8 +741,18 @@ library()
 {
 	struct lbfile *lbfh;
 
-	for (lbfh=lbfhead; lbfh; lbfh=lbfh->next) {
-		loadfile(lbfh->filspc);
+	for (lbfh=lbfhead; lbfh; lbfh=lbfh->next)
+	{
+		if(lbfh->offset<0)
+		{
+			/*Stand alone rel file (original lib format)*/
+			loadfile(lbfh->filspc);
+		}
+		else
+		{
+			/*rel file embedded in lib (new lib format)*/
+			loadfile_SdccLib(lbfh->libspc, lbfh->relfil, lbfh->offset);
+		}
 	}
 }
 

@@ -15,8 +15,8 @@ typedef struct {
 
 extern Z80_OPTS z80_opts;
 
-#define wassertl(a,s)	(a) ? 0 : \
- 		werror (E_INTERNAL_ERROR,__FILE__,__LINE__, s)
+#define wassertl(a,s)	((a) ? 0 : \
+        (werror (E_INTERNAL_ERROR,__FILE__,__LINE__, s), 0))
 
 #define wassert(a)    wassertl(a,"code generator internal error")
 

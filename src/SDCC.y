@@ -74,7 +74,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 
 %token <yychar> IDENTIFIER TYPE_NAME
 %token <val>   CONSTANT   STRING_LITERAL
-%token SIZEOF 
+%token SIZEOF TYPEOF 
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP 
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
@@ -278,6 +278,7 @@ unary_expr
    | unary_operator cast_expr { $$ = newNode($1,$2,NULL)    ;  }
    | SIZEOF unary_expr        { $$ = newNode(SIZEOF,NULL,$2);  }
    | SIZEOF '(' type_name ')' { $$ = newAst_VALUE(sizeofOp($3)); }
+   | TYPEOF unary_expr        { $$ = newNode(TYPEOF,NULL,$2);  }
    ;
               
 unary_operator

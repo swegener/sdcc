@@ -171,6 +171,7 @@ struct options  save_options  ;
 "while"        { count(); return(WHILE); }
 "xdata"        { count(); TKEYWORD(XDATA); }
 "..."	       { count(); return(VAR_ARGS);}
+"__typeof"     { count(); return TYPEOF;}
 {L}({L}|{D})*  { count(); return(check_type()); }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0{D}+{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }

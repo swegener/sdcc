@@ -207,7 +207,8 @@ optionsTable[] = {
     { 0,    "--profile",            &options.profile, "On supported ports, generate extra profiling information" },
     { 0,    "--fommit-frame-pointer", &options.ommitFramePtr, "Leave out the frame pointer." },
     { 0,    "--all-callee-saves",   &options.all_callee_saves, "callee will always save registers used" },
-    { 0,    "--use-accelerator",    &options.useAccelerator,"generate code for  DS390 Arithmetic Accelerator"}
+    { 0,    "--use-accelerator",    &options.useAccelerator,"generate code for  DS390 Arithmetic Accelerator"},
+    { 0,    "--stack-probe",   	    &options.stack_probe,"insert call to function __stack_probe at each function prologue"}
 };
 
 /** Table of all unsupported options and help text to display when one

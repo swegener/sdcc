@@ -230,6 +230,7 @@ struct options
     char *calleeSaves[128];	/* list of functions using callee save */
     char *excludeRegs[32];	/* registers excluded from saving */
     int all_callee_saves; 	/* callee saves for all functions */
+    int stack_probe;            /* insert call to function __stack_probe */
     /* starting address of the segments */
     int xstack_loc;		/* initial location of external stack */
     int stack_loc;		/* initial value of internal stack pointer */
@@ -237,7 +238,7 @@ struct options
     int data_loc;		/* interram start location       */
     int idata_loc;		/* indirect address space        */
     int code_loc;		/* code location start           */
-    int iram_size;		/* internal ram size (used only for error checking) */
+    int iram_size;		/* internal ram size (used only for error checking) */    
   };
 
 /* forward definition for variables accessed globally */

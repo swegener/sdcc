@@ -1975,7 +1975,9 @@ decorateType (ast * tree)
     ast *dtl, *dtr;
 
     dtl = decorateType (tree->left);
-    dtr = decorateType (tree->right);
+    /* delay right side for '?' operator since conditional macro expansions might
+       rely on this */
+    dtr = (tree->opval.op == '?' ? tree->right : decorateType (tree->right));
 
     /* this is to take care of situations
        when the tree gets rewritten */
@@ -2887,6 +2889,79 @@ decorateType (ast * tree)
 
       /*------------------------------------------------------------------*/
       /*----------------------------*/
+      /*             typeof         */
+      /*----------------------------*/
+    case TYPEOF:
+	/* return typeof enum value */
+	tree->type = EX_VALUE;
+	{
+	    int typeofv = 0;
+	    if (IS_SPEC(tree->right->ftype)) {
+		switch (SPEC_NOUN(tree->right->ftype)) {
+		case V_INT:
+		    if (SPEC_LONG(tree->right->ftype)) typeofv = TYPEOF_LONG;
+		    else typeofv = TYPEOF_INT;
+		    break;
+		case V_FLOAT:
+		    typeofv = TYPEOF_FLOAT;
+		    break;
+		case V_CHAR:
+		    typeofv = TYPEOF_CHAR;
+		    break;
+		case V_VOID:
+		    typeofv = TYPEOF_VOID;
+		    break;
+		case V_STRUCT:
+		    typeofv = TYPEOF_STRUCT;
+		    break;
+		case V_BIT:
+		    typeofv = TYPEOF_BIT;
+		    break;
+		case V_SBIT:
+		    typeofv = TYPEOF_SBIT;
+		    break;
+		default:
+		    break;
+		}
+	    } else {
+		switch (DCL_TYPE(tree->right->ftype)) {
+		case POINTER:
+		    typeofv = TYPEOF_POINTER;
+		    break;
+		case FPOINTER:
+		    typeofv = TYPEOF_FPOINTER;
+		    break;
+		case CPOINTER:
+		    typeofv = TYPEOF_CPOINTER;
+		    break;
+		case GPOINTER:
+		    typeofv = TYPEOF_GPOINTER;
+		    break;
+		case PPOINTER:
+		    typeofv = TYPEOF_PPOINTER;
+		    break;
+		case IPOINTER:
+		    typeofv = TYPEOF_IPOINTER;
+		    break;
+		case ARRAY:
+		    typeofv = TYPEOF_ARRAY;
+		    break;
+		case FUNCTION:
+		    typeofv = TYPEOF_FUNCTION;
+		    break;
+		default:
+		    break;
+		}
+	    }
+	    sprintf (buffer, "%d", typeofv);
+	    tree->opval.val = constVal (buffer);
+	    tree->right = tree->left = NULL;
+	    TETYPE (tree) = getSpec (TTYPE (tree) =
+				     tree->opval.val->type);
+	}
+	return tree;
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
       /* conditional operator  '?'  */
       /*----------------------------*/
     case '?':
@@ -2894,13 +2969,14 @@ decorateType (ast * tree)
       assert(IS_COLON_OP(tree->right));
       /* if already known then replace the tree : optimizer will do it
 	 but faster to do it here */
-      if (IS_LITERAL (LTYPE(tree))) {
+      if (IS_LITERAL (LTYPE(tree))) {	  
 	  if ( ((int) floatFromVal (valFromType (LETYPE (tree)))) != 0) {
-	      return tree->right->left ;
+	      return decorateType(tree->right->left) ;
 	  } else {
-	      return tree->right->right ;
+	      return decorateType(tree->right->right) ;
 	  }
       } else {
+	  tree->right = decorateType(tree->right);
 	  TTYPE (tree) = RTYPE(tree);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
       }

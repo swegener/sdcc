@@ -1033,7 +1033,8 @@ pic16glue ()
 	pic16initialComments (asmFile);
     
 	/* print module name */
-	fprintf (asmFile, ";\t.module %s\n", moduleName);
+//	fprintf (asmFile, ";\t.module %s\n", moduleName);
+	fprintf(asmFile, "#FILE\t\"%s\"\n", fullSrcFileName);
     
 	/* Let the port generate any global directives, etc. */
 	if (port->genAssemblerPreamble) {

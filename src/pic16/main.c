@@ -679,7 +679,7 @@ PORT pic16_port =
   {
     _asmCmd,			/* assembler command and arguments */
     NULL,			/* alternate macro based form */
-    NULL,			/* arguments for debug mode */
+    "-g",			/* arguments for debug mode */
     NULL,			/* arguments for normal mode */
     0,				/* print externs as global */
     ".asm",			/* assembler file extension */

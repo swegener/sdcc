@@ -4579,7 +4579,8 @@ static char *pic16_pCode2str(char *str, size_t size, pCode *pc)
     SAFE_snprintf(&s,&size,";\t--FLOW change\n");
     break;
   case PC_CSOURCE:
-    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+//    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+      SAFE_snprintf(&s,&size,"#LINE\t%d; %s\t%s\n", PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
     break;
   case PC_ASMDIR:
 	if(PCAD(pc)->directive) {
@@ -4669,7 +4670,9 @@ static void genericPrint(FILE *of, pCode *pc)
     break;
 
   case PC_CSOURCE:
-    fprintf(of,";#CSRC\t%s %d\t\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+//    fprintf(of,";#CSRC\t%s %d\t\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    fprintf(of,"#LINE\t%d; %s\t%s\n", PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
+         
     break;
 
   case PC_ASMDIR:

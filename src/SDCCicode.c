@@ -2065,10 +2065,14 @@ operand *geniCodeDerefPtr (operand *op)
     }
     
     /* now get rid of the pointer part */
-    if (lvaluereq && IS_ITEMP(op))
+    if (lvaluereq && IS_ITEMP(op) && !IS_PTR(optype->next))
+    {
 	retype = getSpec(rtype = copyLinkChain(optype)) ;
+    }
     else
+    {
 	retype = getSpec(rtype = copyLinkChain(optype->next)) ;
+    }
     
     /* if this is a pointer then outputclass needs 2b updated */
     if (IS_PTR(optype)) 

@@ -1805,10 +1805,80 @@ replace {
 
 replace {
 	mov     dps, #0x00
-	mov     dp%1,a
+	mov     %1,a
 	mov     dps, #0x01
 } by {
 	; Peephole 222 removed DPS abuse.
-	mov     dp%1,a
+	mov     %1,a
         mov     dps, #0x01
+}
+
+replace {
+	mov	dps, #0x00
+	xch	a, ap
+	mov 	%1, ap
+	mov	dps, #0x01
+} by {
+	; Peephole 222a removed DPS abuse.
+	xch     a, ap
+        mov     %1, ap
+        mov     dps, #0x01
+}
+
+replace {
+	mov 	dps, #0x%1
+	inc	dptr
+	movx	a,@dptr
+	mov	%2,a
+	mov	dps, #0x%1
+} by {
+	mov     dps, #0x%1
+        inc     dptr
+        movx    a,@dptr
+        mov     %2,a
+; Peephole 223: yet more DPS abuse removed.
+}
+
+replace {
+	mov	dps, #0x00
+	inc	dps
+} by {
+	mov	dps, #0x01
+}
+
+replace {
+	mov	dps, #0x0%1
+	mov	dptr, %2
+	mov	dps, #0x0%1
+} by {
+	mov     dps, #0x0%1
+        mov     dptr, %2
+}
+
+replace {
+	mov	dps, #0x01
+	mov	dptr, %1
+	mov	dps, #0x00
+	mov	dptr, %2
+	inc	dps
+} by {
+	mov	dps, #0x00
+	mov	dptr, %2
+	inc	dps
+	mov	dptr, %1
+; Peephole 224a: DPS usage re-arranged.
+}
+
+replace {
+	mov	dps, #0x0%1
+	mov	dptr, %2
+	mov	dps, #0x0%3
+	mov	dptr, %4
+	mov	dps, #0x0%1
+} by {
+	mov	dps, #0x0%3
+	mov	dptr, %4
+	mov	dps, #0x0%1
+	mov	dptr, %2
+; Peephole 224: DPS usage re-arranged.
 }

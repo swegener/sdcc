@@ -502,7 +502,9 @@ union bil {
         unsigned long l;
         struct { unsigned char b0; unsigned int i12; unsigned char b3;} bi;
 } ;
-#if defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390)
+#if defined(SDCC_USE_XSTACK)
+#  define bcast(x) ((union bil pdata *)&(x))
+#elif (defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390)) && !defined(SDCC_STACK_AUTO)
 #  define bcast(x) ((union bil xdata *)&(x))
 #elif defined(__z80) || defined(__gbz80)
 #  define bcast(x) ((union bil *)&(x))

@@ -37,27 +37,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 int cl_xa::get_reg(int word_flag, unsigned int index)
 {
-  //if (index < 3) { /* banked */
-  //  if (word_flag)
-  //    return get_word_direct(0x400+index);
-  //  else
-  //    return mem_direct[0x400+index];
-  //} else { /* non-banked */
-    if (word_flag)
-      return get_word_direct(index);
-    else
-      return mem_direct[index];
-  //}
+  int result;
+
+  if (word_flag) {
+    result = get_word_direct(index);
+  }
+  else {
+    result = get_byte_direct(index);
+  }
+  return result;
 }
 
 bool cl_xa::get_bit(int bit) {
   short offset=0;
+  unsigned char result;
+
   if (bit>=0x200) {
     // in sfr space
     bit-=0x200;
     offset=0x400;
   }
-  return mem_direct[offset + (bit/8)] & (1 << (bit%8));
+  result = get_byte_direct(offset + (bit/8)) & (1 << (bit%8));
+  return result;
+  //return mem_direct[offset + (bit/8)] & (1 << (bit%8));
 }
 
 void cl_xa::set_bit(int bit, int value) {
@@ -67,11 +69,16 @@ void cl_xa::set_bit(int bit, int value) {
     bit-=0x200;
     offset=0x400;
   }
+#if 0
+  i = get_byte_direct(offset + (bit/8));
   if (value) {
-    mem_direct[offset + (bit/8)] |= (1 << (bit%8));
+    set_byte_direct(offset + (bit/8), i | (1 << (bit%8) );
+    //mem_direct[offset + (bit/8)] |= (1 << (bit%8));
   } else {
-    mem_direct[offset + (bit/8)] &= ~(1 << (bit%8));
+    set_byte_direct( offset + (bit/8), i & ~(1 << (bit%8) );
+    //mem_direct[offset + (bit/8)] &= ~(1 << (bit%8));
   }
+#endif
 }
 
 #define RI_F0 ((code >> 4) & 0xf)
@@ -490,7 +497,36 @@ int cl_xa::inst_MOVC(uint code, int operands)
       }
     }
     break;
-    // fixme, 2 more
+    case A_APLUSDPTR:
+    {  /* R4l=ACC, R6=DPTR */
+      unsigned int addr = (PC & 0xff0000) | (reg1(4) + reg2(6));
+      unsigned short result;
+      unsigned char flags;
+      flags = get_psw();
+
+      flags &= ~(BIT_Z | BIT_N); /* clear these bits */
+      result = getcode1(addr);
+      set_reg1( 4, result);
+      if (result == 0) flags |= BIT_Z;
+      if (result & 0x80) flags |= BIT_N;
+      set_psw(flags);
+    }
+    break;
+    case A_APLUSPC:
+    {  /* R4l=ACC, R6=DPTR */
+      unsigned int addr = (PC + reg1(4));
+      unsigned short result;
+      unsigned char flags;
+      flags = get_psw();
+
+      flags &= ~(BIT_Z | BIT_N); /* clear these bits */
+      result = getcode1(addr);
+      set_reg1( 4, result);
+      if (result == 0) flags |= BIT_Z;
+      if (result & 0x80) flags |= BIT_N;
+      set_psw(flags);
+    }
+    break;
   }
   return(resGO);
 }

@@ -41,20 +41,19 @@ struct t_regs
   int dummy;
 };
 
-/* macros suck, can we use inline functions instead
-   for the same effect? karl
+/* these macros suck, what was I thinking?  Try to make it go fast
+   at the our expense?  Daniels going to hate me if I continue to
+   clutter up his nice C++ with old crusty C macros :)  Karl.
 */
 
-/* direct is a special code space for built-in ram and SFR, 1K size */
-#define set_word_direct(_index, _value) { \
-      mem_direct[(_index)+1] = (_value >> 8); \
-      mem_direct[(_index)] = (_value & 0xff); }
+/* store to sfr */
+#define set_word_direct(addr, val) { sfr->set((t_addr) (addr), (val) & 0xff); \
+                            sfr->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
+#define set_byte_direct(addr, val) sfr->set((t_addr) (addr), (val) )
 
-#define get_word_direct(_index) \
-      ( (mem_direct[(_index+1)] << 8) | mem_direct[(_index)] )
-
-#define set_byte_direct(_index, _value) (mem_direct[_index] = _value)
-#define get_byte_direct(_index) (mem_direct[_index])
+/* get from sfr */
+#define get_byte_direct(addr) sfr->get((t_addr) (addr))
+#define get_word_direct(addr) (sfr->get((t_addr) (addr)) | (sfr->get((t_addr) (addr+1)) << 8) )
 
 /* store to ram */
 #define store2(addr, val) { ram->set((t_addr) (addr), (val) & 0xff); \
@@ -78,19 +77,11 @@ struct t_regs
 #define reg1(_index) (unsigned char)get_reg(0, (_index))
 
 #define set_reg1(_index, _value) { \
-  if ((_index) < 3) { /* banked */ \
-      mem_direct[REGS_OFFSET+(_index)] = _value; \
-  } else { /* non-banked */ \
-      mem_direct[REGS_OFFSET+(_index)] = _value; \
-  } \
+  set_byte_direct((REGS_OFFSET+(_index<<1)), _value); \
 }
 
 #define set_reg2(_index, _value) { \
-  if ((_index) < 3) { /* banked */ \
-     set_word_direct((REGS_OFFSET+(_index<<1)), _value); \
-  } else { /* non-banked */ \
-     set_word_direct((REGS_OFFSET+(_index<<1)), _value); \
-  } \
+     set_word_direct( (REGS_OFFSET+(_index<<1)), _value); \
 }
 
 #define set_reg(_word_flag, _index, _value) { \
@@ -100,7 +91,9 @@ struct t_regs
     { set_reg1((_index), _value) } \
 }
 
-/* R7 mirrors 1 of 2 real SP's */
+/* R7 mirrors 1 of 2 real SP's
+  note: we will probably need a real function here...
+ */
 #define set_sp(_value) { \
   { set_word_direct(REGS_OFFSET+(7*2), _value); } \
 }
@@ -117,7 +110,7 @@ struct t_regs
 #define get_scr() get_byte_direct(SCR)
 #define set_scr(scr) set_byte_direct(SCR, scr)
 
-// PSW bits...
+// PSW bits...(note: consider replacing with Bit defines used in s51.src code)
 #define BIT_C  0x80
 #define BIT_AC 0x40
 #define BIT_V  0x04
@@ -133,7 +126,6 @@ Developer Notes.
 This user guide has got the detailed information on the XA chip. 
 
 http://www.semiconductors.philips.com/acrobat/various/XA_USER_GUIDE_1.pdf
-
 
 f: {unused slot(word accessable only) for R8-R15}
 e: R7h,R7l  Stack pointer, ptr to USP(PSW.SM=0), or SSP(PSW.SM=1)
@@ -157,7 +149,6 @@ addr1: MSB
 
 Data word access limited to word boundaries.  If non-word address used,
 then will act as lesser word alignment used(addr b0=0).
-(note: trigger an exception in simulator if otherwise).
 
 Internal memory takes precedence over external memory, unless
 explicit movx used.
@@ -171,7 +162,6 @@ SFR(1K direct space) is above normal 1K direct address space(0-3FFH)
 between 400H to 7FFH.
 
 Branch targets must reside on even boundaries
-(note: trigger an exception in simulator if otherwise).
 
 MOVC instructions use either PC(SSEL.4=0) or CS(SSEL.4=1) register.
 
@@ -193,7 +183,89 @@ PSW Flags: Carry(C), Aux Carry(AC), Overflow(V), Negative(N), Zero(Z).
 
 Stack ptr is pre-decremented, followed by load(word operation),
 default SPs are set to 100H.  So first PUSH would go to FEH-FFH.
---------------------------------------------------------------------
+
+DIRECT MEMORY SPACE
+
+When we speak of direct memory space we refer to opcodes like
+MOV Rd, direct
+The "direct" part is always composed of 11 bits in the opcode.
+So the total size of "direct" space is 2K bytes.
+
+1.) This direct memory space contains the SFRs starting at 0x400 offset.
+
+Internal onchip memory(SFRs and onchip RAM) always override
+external memory.  Read the specific Chip documentation for the
+location of SFRs and RAM.
+
+The codes space is independent.
+
+The registers: 4 banks of 8 bytes(R0-R3), R4-R7 8 bytes, and stack
+pointers are self contained and not part of any address space.
+(The CS,ES,DS appear to reside in SFR space).
+
+This is still confusing, let take some examples.
+
+---------------------------
+XA-G49 chip has 2k bytes built in RAM.
+
+According to the XA-G49 datasheet:
+
+With the DS set to 0, then all indirect address references
+between 0-7FFH reference the onchip 2K RAM.  Direct address
+references below 0x400 access onchip 2K RAM.
+
+With the DS not set to 0, then all indirect address references
+between 0-7FFH reference external memory.  Direct address
+references below 0x400 access external memory.
+
+Any direct address references between 400H and 7FFH access the SFRs
+regardless of the segment register contents.
+
+To access any external memory which overlaps the 2K onchip memory
+ues the MOVX instruction.
+
+---------------------------
+Proposed segment layout use for SDCC/XA compiler:
+
+XDATA -> external memory(use indirect addressing, ignore direct
+   addressing, ignore any overlap with onchip memory).
+
+IDATA -> onchip memory(use indirect addressing, ignore direct
+   addressing, assume small model where DS,ES always 0).
+
+DATA -> SFR memory access using direct addressing.
+
+CODE -> Far calls/returns are available.
+
+(Johan, Im just trying to spell this out explicitly for
+my own understanding.)
+
+---------------------------
+Proposed segment layout use for ucSim XA simulator.
+
+ram -> external memory.
+
+rom -> external/internal code.
+
+sfr -> SFR register space.  Include registers/register banks here
+in some unused location to provide a means to dump all the register
+file contents using the "ds" command.  Could make sfr memory larger
+than 0x800, and use the space above 0x800 to hold registers/sp-s.
+
+idata -> onchip memory.
+
+I think we can determine the size of idata memory at run time, so
+this could allow for various sized onchip memorys.  So indirect
+memory accesses like this:
+set_indirect1(addr, value) {
+  if (addr < mem_size(idata)) {
+    set_idata(addr,value);
+  } else {
+    set_xdata(addr,value);
+  }
+}
+
+----------------------------------------------
 #endif
 
 

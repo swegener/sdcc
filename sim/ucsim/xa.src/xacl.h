@@ -45,17 +45,20 @@ public:
   cl_mem *rom;
   struct t_regs regs;
 
+  class cl_mem *sfr, *iram;
+
   // for now make it as simple as possible
-  TYPE_UBYTE mem_direct[1024*2];
-#ifndef WORDS_BIGENDIAN
-  TYPE_UWORD *wmem_direct;  /* word pointer at mem_direct */
-#endif
+//  TYPE_UBYTE mem_direct[1024*2];
+//#ifndef WORDS_BIGENDIAN
+//  TYPE_UWORD *wmem_direct;  /* word pointer at mem_direct */
+//#endif
 
 public:
   cl_xa(class cl_sim *asim);
   virtual int init(void);
   virtual char *id_string(void);
 
+  virtual class cl_mem *mk_mem(enum mem_class type, char *class_name);
   virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
 

@@ -176,18 +176,22 @@ enum op_operands {
   REG_DATA8_REL8,
   REG_DATA16_REL8,
   IREG_DATA8_REL8,
-  IREG_DATA16_REL8
+  IREG_DATA16_REL8,
 
+  A_APLUSDPTR,
+  A_APLUSPC
 };
 
 // table of dissassembled instructions
 struct xa_dis_entry
 {
-  uint  code, mask;
-  char  branch;
-  uchar length;
-  int mnemonic;
-  int operands;
+  uint is1byte; /* only grab 1 byte for table lookup(most are 2 bytes) */
+  uint code;    /* bits in opcode used to match table entry(with mask) */
+  uint mask;    /* mask used on .code to match up a common opcode */
+  char branch;  /* used by main app to implement "next" around calls */
+  uchar length; /* total length of opcode, used by dissasembler and main app */
+  int mnemonic; /* type of opcode(ADD, ADDC...) */
+  int operands; /* unique classification of operands: Rd,Rs = REG_REG,... */
 };
 
 extern struct dis_entry glob_disass_xa[];

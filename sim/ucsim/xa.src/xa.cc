@@ -45,7 +45,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 #include "regsxa.h"
 
-
 /*
  * Base type of xa controllers
  */
@@ -63,8 +62,6 @@ cl_xa::init(void)
   ram= mem(MEM_XRAM);
   rom= mem(MEM_ROM);
 
-  wmem_direct = (TYPE_UWORD *) &mem_direct[0];
-
   /* set SCR to osc/4, native XA mode, flat 24 */
   set_scr(0);
   /* initialize SP to 100H */
@@ -77,6 +74,17 @@ cl_xa::init(void)
   printf("The XA Simulator is in development, UNSTABLE, DEVELOPERS ONLY!\n");
 
   return(0);
+}
+
+class cl_mem *
+cl_xa::mk_mem(enum mem_class type, char *class_name)
+{
+  class cl_mem *m= cl_uc::mk_mem(type, class_name);
+  if (type == MEM_SFR)
+    sfr= m;
+  if (type == MEM_IRAM)
+    iram= m;
+  return(m);
 }
 
 char *
@@ -95,6 +103,8 @@ cl_xa::get_mem_size(enum mem_class type)
 {
   switch(type)
     {
+    case MEM_IRAM: return(0x2000);
+    case MEM_SFR: return(0x2000);
     case MEM_ROM: return(0x10000);
     case MEM_XRAM: return(0x10000);
     default: return(0);
@@ -570,6 +580,14 @@ cl_xa::disass(t_addr addr, char *sep)
               ((signed char)get_mem(MEM_ROM, addr+immed_offset+2) * 2) & 0xfffe );
     break;
 
+    case A_APLUSDPTR :
+      strcpy(parm_str, "A, [A+DPTR]");
+    break;
+
+    case A_APLUSPC :
+      strcpy(parm_str, "A, [A+PC]");
+    break;
+
     default:
       strcpy(parm_str, "???");
     break;
@@ -654,7 +672,7 @@ int cl_xa::exec_inst(void)
   code = (code1 << 8);
   i= 0;
   while ( ((code & disass_xa[i].mask) != disass_xa[i].code ||
-           ((disass_xa[i].mask & 0x00ff) != 0)) /* one byte op code */
+          (!disass_xa[i].is1byte)) /* not a one byte op code */
                     &&
          disass_xa[i].mnemonic != BAD_OPCODE)
     i++;

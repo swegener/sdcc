@@ -30,7 +30,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 5 -show_section_numbers -local_icons -dir $(MANUAL).html $(MANUAL)
+	-latex2html -split 5 -show_section_numbers -local_icons -info "" -dir $(MANUAL).html $(MANUAL)
 	mv `basename $< .tex`.orig.tex $<
 
 $(TSS).html/index.html: $(TSS).tex
@@ -40,7 +40,7 @@ $(TSS).html/index.html: $(TSS).tex
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 0 -local_icons -dir $(TSS).html $(TSS)
+	-latex2html -split 0 -local_icons -info "" -dir $(TSS).html $(TSS)
 	mv `basename $< .tex`.orig.tex $<
 
 $(CDB).html/index.html: $(CDB).tex
@@ -50,7 +50,7 @@ $(CDB).html/index.html: $(CDB).tex
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 0 -show_section_numbers -local_icons -dir $(CDB).html $(CDB)
+	-latex2html -split 0 -show_section_numbers -local_icons -info "" -dir $(CDB).html $(CDB)
 	mv `basename $< .tex`.orig.tex $<
 
 %.txt: %.lyx

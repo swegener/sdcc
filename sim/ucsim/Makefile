@@ -29,6 +29,7 @@ libs: main.mk
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
+.PHONY: install INSTALL Install
 install:
 	$(MAKE) -f main.mk install
 	@for pkg in $(PKGS); do\

@@ -219,6 +219,7 @@ char *printCLine (char *srcFile, int lineno) {
     if (strcmp (lastSrcFile, srcFile) != 0) {
       fclose (inFile);
       inFile = NULL;
+      inLineNo = 0;
     }
   }
   if (!inFile) {

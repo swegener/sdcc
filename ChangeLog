@@ -1,3 +1,7 @@
+2001-09-07    <johan@FRIJA>
+
+	* src/SDCCglue.c (emitRegularMap): only delete a symbol when it is a symbol
+
 2001-09-06    <johan@FRIJA>
 
 	* src/SDCC.y: this could be a fix for bug #458744 (1.37)

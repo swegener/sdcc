@@ -59,6 +59,14 @@ MTL=midl.exe
 
 # Name "all - Win32 Release"
 # Name "all - Win32 Debug"
+# Begin Group "Info"
+
+# PROP Default_Filter ". .txt"
+# Begin Source File
+
+SOURCE=.\ChangeLog
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=".\bin_vc\as-gbz80.exe"
@@ -95,7 +103,7 @@ SOURCE=".\bin_vc\as-hc08.exe"
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # Begin Custom Build
-InputPath=.\bin_vc\as-hc08.exe
+InputPath=".\bin_vc\as-hc08.exe"
 
 "bin\as-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\as-hc08.exe bin /y > nul
@@ -106,7 +114,7 @@ InputPath=.\bin_vc\as-hc08.exe
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=.\bin_vc\as-hc08.exe
+InputPath=".\bin_vc\as-hc08.exe"
 
 "bin\as-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\as-hc08.exe bin /y > nul
@@ -239,7 +247,7 @@ SOURCE=".\bin_vc\link-hc08.exe"
 !IF  "$(CFG)" == "all - Win32 Release"
 
 # Begin Custom Build
-InputPath=.\bin_vc\link-hc08.exe
+InputPath=".\bin_vc\link-hc08.exe"
 
 ".\bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-hc08.exe  bin /y > nul
@@ -250,7 +258,7 @@ InputPath=.\bin_vc\link-hc08.exe
 
 # PROP Ignore_Default_Tool 1
 # Begin Custom Build
-InputPath=.\bin_vc\link-hc08.exe
+InputPath=".\bin_vc\link-hc08.exe"
 
 ".\bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-hc08.exe  bin /y > nul

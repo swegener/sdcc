@@ -1363,7 +1363,7 @@ preProcess (char **envp)
 
       /* Have to set cppoutfilename to something, even if just pre-processing. */
       setMainValue ("cppoutfilename", preOutName ? preOutName : "");
-	
+
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
 
@@ -1560,6 +1560,9 @@ main (int argc, char **argv, char **envp)
     exit (1);
   }
 
+  /* install atexit handler */
+  atexit(rm_tmpfiles);
+
   /* Before parsing the command line options, do a 
    * search for the port and processor and initialize
    * them if they're found. (We can't gurantee that these
@@ -1624,58 +1627,38 @@ main (int argc, char **argv, char **envp)
 
       yyparse ();
 
-      if (!fatalError)
-	{
-	  if (TARGET_IS_PIC) {
-	    /* TSD PIC port hack - if the PIC port option is enabled
-	       and SDCC is used to generate PIC code, then we will
-	       generate .asm files in gpasm's format instead of SDCC's
-	       assembler's format
-	    */
+      if (fatalError) {
+        // @FIX: Dario Vecchio 03-05-2001
+        if (preOutName) {
+          if (yyin && yyin != stdin)
+            fclose (yyin);
+          unlink (preOutName);
+          Safe_free (preOutName);
+        }
+        // EndFix
+        return 1;
+      }
+
+      if (TARGET_IS_PIC) {
+        /* TSD PIC port hack - if the PIC port option is enabled
+           and SDCC is used to generate PIC code, then we will
+           generate .asm files in gpasm's format instead of SDCC's
+           assembler's format
+        */
 #if !OPT_DISABLE_PIC
-	    picglue ();
+        picglue ();
 #endif
-	  } else {
-	    glue ();
-	  }
+      }
+      else {
+        glue ();
+      }
 
-	  if (fatalError)
-	    {
-              // @FIX: Dario Vecchio 03-05-2001
-              if (preOutName)
-                {
-                  if (yyin && yyin != stdin)
-                    fclose (yyin);
-                  unlink (preOutName);
-                  Safe_free (preOutName);
-                }
-              // EndFix
-	      return 1;
-	    }
-	  if (!options.c1mode && !noAssemble)
-	    {
-	      if (options.verbose)
-		printf ("sdcc: Calling assembler...\n");
-	      assemble (envp);
-	    }
-	}
-      else
-	{
-          // @FIX: Dario Vecchio 03-05-2001
-          if (preOutName)
-            {
-              if (yyin && yyin != stdin)
-                fclose (yyin);
-              unlink (preOutName);
-              Safe_free (preOutName);
-            }
-          // EndFix
-          #if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
-          rm_tmpfiles();
-          #endif
-	  return 1;
-	}
-
+      if (!options.c1mode && !noAssemble)
+        {
+          if (options.verbose)
+            printf ("sdcc: Calling assembler...\n");
+          assemble (envp);
+        }
     }
 
   closeDumpFiles();

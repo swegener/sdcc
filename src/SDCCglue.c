@@ -60,7 +60,7 @@ DEFSETFUNC (closeTmpFiles)
 }
 
 /*-----------------------------------------------------------------*/
-/* rmTmpFiles - closes all tmp files created by the compiler    */
+/* rmTmpFiles - unlinks all tmp files created by the compiler      */
 /*                 because of BRAIN DEAD MS/DOS & CYGNUS Libraries */
 /*-----------------------------------------------------------------*/
 DEFSETFUNC (rmTmpFiles)
@@ -73,6 +73,21 @@ DEFSETFUNC (rmTmpFiles)
       Safe_free (name);
     }
   return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* rm_tmpfiles - close and remove temporary files and delete sets  */
+/*-----------------------------------------------------------------*/
+void
+rm_tmpfiles (void)
+{
+  /* close temporary files */
+  applyToSet (tmpfileSet, closeTmpFiles);
+  /* remove temporary files */
+  applyToSet (tmpfileNameSet, rmTmpFiles);
+  /* delete temorary file sets */
+  deleteSet (&tmpfileSet);
+  deleteSet (&tmpfileNameSet);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1165,7 +1180,7 @@ emitStaticSeg (memmap * map, FILE * out)
 /* emitMaps - emits the code for the data portion the code         */
 /*-----------------------------------------------------------------*/
 void 
-emitMaps ()
+emitMaps (void)
 {
   inInitMode++;
   /* no special considerations for the following
@@ -1414,7 +1429,7 @@ emitOverlay (FILE * afile)
 /* glue - the final glue that hold the whole thing together        */
 /*-----------------------------------------------------------------*/
 void 
-glue ()
+glue (void)
 {
   FILE *vFile;
   FILE *asmFile;
@@ -1665,18 +1680,9 @@ glue ()
       port->genAssemblerEnd(asmFile);
   }
   fclose (asmFile);
-  applyToSet (tmpfileSet, closeTmpFiles);
-  applyToSet (tmpfileNameSet, rmTmpFiles);
-}
 
-#if defined (__MINGW32__) || defined (__CYGWIN__) || defined (_MSC_VER)
-void
-rm_tmpfiles (void)
-{
-  applyToSet (tmpfileSet, closeTmpFiles);
-  applyToSet (tmpfileNameSet, rmTmpFiles);
+  rm_tmpfiles ();
 }
-#endif
 
 /** Creates a temporary file name a'la tmpnam which avoids the bugs
     in cygwin wrt c:\tmp.

@@ -961,6 +961,6 @@ picglue ()
   fprintf (asmFile,"\tend\n");
 
   fclose (asmFile);
-  applyToSet(tmpfileSet,closeTmpFiles);
-  applyToSet(tmpfileNameSet, rmTmpFiles);
+
+  rm_tmpfiles();
 }

@@ -17,7 +17,6 @@ CFG=src - Win32 Debug
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "src - Win32 Release" (based on "Win32 (x86) Console Application")
 !MESSAGE "src - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
@@ -27,35 +26,6 @@ CFG=src - Win32 Debug
 # PROP Scc_LocalPath ""
 CPP=cl.exe
 RSC=rc.exe
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir ""
-# PROP Intermediate_Dir ""
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /G3 /Zp1 /W3 /GX /O2 /I ".." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# SUBTRACT CPP /WX
-# ADD BASE RSC /l 0x409 /d "NDEBUG"
-# ADD RSC /l 0x409 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib /nologo /subsystem:console /machine:I386 /nodefaultlib:"libcd" /out:"..\bin\sdcc.exe"
-# SUBTRACT LINK32 /incremental:yes /nodefaultlib
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
 # PROP BASE Output_Dir "Debug"
@@ -68,7 +38,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /G3 /ML /W3 /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
+# ADD CPP /nologo /G3 /ML /W3 /WX /Gm /GX /ZI /Od /I ".." /I "..\support\util" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FR /J /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -78,12 +48,8 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib /nologo /subsystem:console /pdb:none /debug /machine:I386 /nodefaultlib:"libcd" /out:"..\bin\sdcc.exe"
 # SUBTRACT LINK32 /verbose /nodefaultlib
-
-!ENDIF 
-
 # Begin Target
 
-# Name "src - Win32 Release"
 # Name "src - Win32 Debug"
 # Begin Group "Source Files"
 
@@ -99,9 +65,6 @@ SOURCE=..\support\Util\NewAlloc.c
 # Begin Source File
 
 SOURCE=.\SDCC.lex
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
 USERDEP__SDCC_="sdccy.h"	
 # Begin Custom Build
 InputPath=.\SDCC.lex
@@ -110,27 +73,10 @@ InputPath=.\SDCC.lex
 	flex  -osdcclex.c sdcc.lex
 
 # End Custom Build
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
-USERDEP__SDCC_="sdccy.h"	
-# Begin Custom Build
-InputPath=.\SDCC.lex
-
-"SDCClex.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	flex  -osdcclex.c sdcc.lex
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\SDCC.y
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
 # Begin Custom Build
 InputPath=.\SDCC.y
 
@@ -138,19 +84,6 @@ InputPath=.\SDCC.y
 	bison  -d -v -o sdccy.c sdcc.y
 
 # End Custom Build
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\SDCC.y
-
-"sdccy.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	bison  -d -v -o sdccy.c sdcc.y
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -367,171 +300,67 @@ SOURCE=.\spawn.h
 # Begin Source File
 
 SOURCE=.\regression\add.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\arrays.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\b.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\bool1.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\call1.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\compare.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\compare2.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\for.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\pointer1.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\struct1.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\sub.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\TempTest.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=.\regression\while.c
-
-!IF  "$(CFG)" == "src - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "src - Win32 Debug"
-
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # End Group
 # End Target

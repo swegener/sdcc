@@ -5404,12 +5404,13 @@ void AnalyzeBanking(void)
 	pBlock  *pb;
 	
 	if(!picIsInitialized()) {
-		fprintf(stderr,"Temporary ERROR: at the moment you have to use\n");
-		fprintf(stderr,"an include file create by inc2h.pl. See SDCC source:\n");
-		fprintf(stderr,"support/scripts/inc2h.pl\n");
-		fprintf(stderr,"this is a nuisance bug that will be fixed shortly\n");
+//		fprintf(stderr,"Temporary ERROR: at the moment you have to use\n");
+//		fprintf(stderr,"an include file create by inc2h.pl. See SDCC source:\n");
+//		fprintf(stderr,"support/scripts/inc2h.pl\n");
+//		fprintf(stderr,"this is a nuisance bug that will be fixed shortly\n");
 		
-		exit(1);
+//		exit(1);
+		setDefMaxRam(); // Max RAM has not been included, so use default setting
 	}
 	
 	/* Phase x - Flow Analysis - Used Banks

@@ -80,6 +80,7 @@ typedef struct PIC_device {
 	memRange *sfr;              /* SFR memory map */
 
 	int maxRAMaddress;          /* maximum value for a data address */
+	int defMaxRAMaddrs;         /* default maximum value for a data address */
 	int bankMask;               /* Bitmask that is ANDed with address to extract banking bits */
 	//  int hasAliasedRAM:1;        /* True if there are bank independent registers */
 
@@ -99,5 +100,6 @@ int isREGinBank(regs *reg, int bank);
 int REGallBanks(regs *reg);
 void addMemRange(memRange *r, int type);
 void setMaxRAM(int size);
+void setDefMaxRam(void);
 
 #endif  /* __DEVICE_H__ */

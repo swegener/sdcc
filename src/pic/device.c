@@ -39,8 +39,9 @@ static PIC_device Pics[] = {
 		{"p16f627", "16f627", "pic16f627", "f627"}, /* processor name */
 		(memRange *)NULL,
 		(memRange *)NULL,
-		0,                               /* max ram address (calculated) */
-		0x80,                            /* Bank Mask */
+		0,                /* max ram address (calculated) */
+		0x1ff,            /* default max ram address */
+		0x80,             /* Bank Mask */
 	},
 	
 	{
@@ -48,6 +49,7 @@ static PIC_device Pics[] = {
 		(memRange *)NULL,
 		(memRange *)NULL,
 		0,
+		0x1ff,
 		0x80,
 	},
 	
@@ -56,6 +58,7 @@ static PIC_device Pics[] = {
 			(memRange *)NULL,
 			(memRange *)NULL,
 			0,
+			0xcf,
 			0x80,
 	},
 	
@@ -64,6 +67,7 @@ static PIC_device Pics[] = {
 			(memRange *)NULL,
 			(memRange *)NULL,
 			0,
+			0x1ff,
 			0x180,
 	},
 
@@ -72,6 +76,7 @@ static PIC_device Pics[] = {
 			(memRange *)NULL,
 			(memRange *)NULL,
 			0,
+			0x1ff,
 			0x180,
 	},
 	
@@ -80,6 +85,7 @@ static PIC_device Pics[] = {
 			(memRange *)NULL,
 			(memRange *)NULL,
 			0,
+			0x1ff,
 			0x80,
 	},
 
@@ -617,4 +623,12 @@ int getConfigWord(int address)
 	else
 		return 0;
 	
+}
+
+/*-----------------------------------------------------------------*
+*  
+*-----------------------------------------------------------------*/
+void setDefMaxRam(void)
+{
+	setMaxRAM(pic->defMaxRAMaddrs); // Max RAM has not been included, so use default setting
 }

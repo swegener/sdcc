@@ -998,6 +998,8 @@ void pic16_genPlus (iCode *ic)
 				}
 				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
 			}
+			
+			DEBUGpic16_pic16_AopTypeSign(__LINE__, NULL, right, NULL);
 
 			// add leftover bytes
 			if (SPEC_USIGN(getSpec(operandType(right)))) {

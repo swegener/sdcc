@@ -127,22 +127,23 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 
 /* Define register address that are constant across PIC16 family */
 #define IDX_TMR0    0xfd6
-#define IDX_PCL     0xff9
 #define IDX_STATUS  0xfd8
-#define IDX_PCLATH  0xffa
-#define IDX_PCLATU  0xffb /* patch 14 */
 #define IDX_INTCON  0xff2
 #define IDX_WREG    0xfe8
 #define IDX_BSR     0xfe0
 
-#define IDX_TOSL    0xffd /* patch 14 */
-#define IDX_TOSH    0xffe /* patch 14 */
-#define IDX_TOSU    0xfff /* patch 14 */
+#define IDX_PCL     0xff9
+#define IDX_PCLATH  0xffa
+#define IDX_PCLATU  0xffb 
 
-#define IDX_TBLPTRL 0xff6 /* patch 15 */
-#define IDX_TBLPTRH 0xff7 /* patch 15 */
-#define IDX_TBLPTRU 0xff8 /* patch 15 */
-#define IDX_TABLAT  0xff5 /* patch 15 */
+#define IDX_TOSL    0xffd
+#define IDX_TOSH    0xffe
+#define IDX_TOSU    0xfff
+
+#define IDX_TBLPTRL 0xff6
+#define IDX_TBLPTRH 0xff7
+#define IDX_TBLPTRU 0xff8
+#define IDX_TABLAT  0xff5
 
 #define IDX_FSR0    0xfe9
 #define IDX_FSR0L   0xfe9

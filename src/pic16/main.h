@@ -13,7 +13,7 @@ typedef struct {
 } pic16_sectioninfo_t;
 
 typedef struct absSym {
-	char *name;
+	char name[SDCC_SYMNAME_MAX+1];
 	unsigned int address;
 } absSym;
 

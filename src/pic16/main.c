@@ -156,6 +156,8 @@ _process_pragma(const char *sz)
 			maxRAMaddress = (int)floatFromVal(maxRAMVal);
 			pic16_setMaxRAM(maxRAMaddress);
 		}
+
+          return 0;
 	}
 	
 	/* #pragma stack [stack-position] [stack-len] */
@@ -178,7 +180,10 @@ _process_pragma(const char *sz)
 
 		if(stackLen < 1) {
 			stackLen = 64;
-			fprintf(stderr, "%s:%d setting stack to default size %d\n", __FILE__, __LINE__, stackLen);
+			fprintf(stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
+		                      filename, lineno-1, stackLen, stackLen);
+                        
+//			fprintf(stderr, "%s:%d setting stack to default size %d\n", __FILE__, __LINE__, stackLen);
 		}
 
 //	  	fprintf(stderr, "Initializing stack pointer at 0x%x len 0x%x\n", stackPos, stackLen);
@@ -210,13 +215,20 @@ _process_pragma(const char *sz)
 	  value *addr;
 
 		absS = Safe_calloc(1, sizeof(absSym));
-		absS->name = Safe_strdup( symname );
+		sprintf(absS->name, "_%s", symname);
+		
 		addr = constVal( location );
 		absS->address = (unsigned int)floatFromVal( addr );
 
+		if((absS->address % 2) != 0) {
+		  absS->address--;
+		  fprintf(stderr, "%s:%d: warning: code memory locations should be word aligned, will locate to 0x%06x instead\n",
+		                      filename, lineno-1, absS->address);
+                }
+
 		addSet(&absSymSet, absS);
-		fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
-			__FILE__, __LINE__, symname, absS->address);
+//		fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
+//			__FILE__, __LINE__, symname, absS->address);
 
 	  return 0;
 	}
@@ -402,6 +414,8 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
         if(ISOPT(USE_CRT)) {
             pic16_options.no_crt = 0;
             pic16_options.crt_name = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
+
+            return TRUE;
         }
         
   return FALSE;
@@ -471,7 +485,7 @@ static void _pic16_linkEdit(void)
   	 *
   	 */
   	 
-  	sprintf(lfrm, "{linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}");
+  	sprintf(lfrm, "{linker} {incdirs} {lflags} -o {outfile} {user_ofile} {spec_ofiles} {ofiles} {libs}");
   	   	 
   	shash_add(&linkValues, "linker", "gplink");
 
@@ -485,7 +499,8 @@ static void _pic16_linkEdit(void)
 
   	if(fullSrcFileName) {
 		sprintf(temp, "%s.o", dstFileName);
-		addSetHead(&relFilesSet, Safe_strdup(temp));
+//		addSetHead(&relFilesSet, Safe_strdup(temp));
+                shash_add(&linkValues, "user_ofile", temp);
 	}
 
 	if(!pic16_options.no_crt)

@@ -1,3 +1,33 @@
+2004-10-16 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (struct _G): added field useWreg, is set to 1 when
+	WREG holds the first byte function parameters,
+	* (aopForSym): take special case for symbols which are in FARSPACE
+	but in CODESPACE too,
+	* (assignResultValue): modified to take into account _G.useWreg,
+	* (genCall): don't use wreg for parameter passing when function is
+	declared as reentrant, too, added optimization INCF to stack
+	pointer when stack parameter count is 1,
+	* (genFunction, genEndFunction): refurnished and fixed to not using
+	wreg for passing parameters when function has varargs or is
+	reentrant, fixed bug with symbol name compare for generating
+	functions in absolute address,
+	* (pic16_storeForReturn): refurnished,
+	* (genCmp): began writing a new version of the function, not ready
+	yet, therefore it is disabled,
+	* (genAssign): do not read code memory when assigning a function to
+	a pointer function,
+	* src/pic16/glue.c (pic16emitStaticSeg): abSym->name is defined an
+	array of characters, not pointer,
+	* (pic16initialComments): in debug mode emit an .ident directive for
+	the assembler,
+	* (_process_pragma): emit a new warning type (internal to pic16)
+	when setting stack to default length, emit a similar warning when
+	placing a function at absolute address and address is not word aligned
+	* (_pic16_parseOptions): added 'return TRUE' statement,
+	* (_pic16_linkEdit): if compiling a source, then add the source's
+	file object, first in the list of objects to link,
+
 2004-10-13 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/pcoderegs.c : increased count on regUsedinRange to prevent unnecessary warning.

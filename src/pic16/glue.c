@@ -1276,11 +1276,11 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      resolveIvalSym (sym->ival, sym->type);
 	      asym = newSymbol(sym->rname, 0);
 	      abSym = Safe_calloc(1, sizeof(absSym));
-	      abSym->name = Safe_strdup( sym->rname );
+	      strcpy(abSym->name, sym->rname);
 	      abSym->address = SPEC_ADDR( sym->etype );
 	      addSet(&absSymSet, abSym);
 	      
-	      pb = pic16_newpCodeChain(NULL, 'A',pic16_newpCodeCharP("; Starting pCode block for absolute Ival"));
+	      pb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute Ival"));
 	      pic16_addpBlock(pb);
 
 	      pcf = pic16_newpCodeFunction(moduleName, asym->name);
@@ -1450,6 +1450,11 @@ pic16initialComments (FILE * afile)
 	if(pic16_mplab_comp)
 		fprintf(afile, "; MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
 	fprintf (afile, iComments2);
+
+	if(options.debug) {
+		fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]\"\n",
+				SDCC_VERSION_STR, getBuildNumber() );
+	}
 }
 
 /*-----------------------------------------------------------------*/

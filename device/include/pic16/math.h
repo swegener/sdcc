@@ -28,6 +28,7 @@
 #ifndef __PIC16_MATH_H
 #define __PIC16_MATH_H	1
 
+#include <sdcc-lib.h>
 
 #define PI          3.1415926536
 #define TWO_PI      6.2831853071

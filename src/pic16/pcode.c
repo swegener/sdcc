@@ -4418,7 +4418,9 @@ void pic16_printpBlock(FILE *of, pBlock *pb)
 			if(pb->dbName == 'A') {
 			  absSym *ab;
 				for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet)) {
+//					fprintf(stderr, "%s:%d testing %s <-> %s\n", __FILE__, __LINE__, PCF(pc)->fname, ab->name);
 					if(!strcmp(ab->name, PCF(pc)->fname)) {
+//						fprintf(stderr, "%s:%d address = %x\n", __FILE__, __LINE__, ab->address);
 						fprintf(of, "\t0X%06X", ab->address);
 						break;
 					}

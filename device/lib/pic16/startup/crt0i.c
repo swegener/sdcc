@@ -29,7 +29,7 @@ extern void main (void);
 
 /* prototype for the startup function */
 void _entry (void) _naked interrupt 0;
-void _startup (void);
+void _startup (void) _naked;
 
 /* prototype for the initialized data setup */
 void _do_cinit (void);
@@ -45,7 +45,7 @@ void _entry (void) _naked interrupt 0
 }
 
 
-void _startup (void)
+void _startup (void) _naked
 {
 	_asm
 		// Initialize the stack pointer

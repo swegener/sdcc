@@ -162,6 +162,7 @@ void pic16_emitDebuggerSymbol (char *);
 bool pic16_sameRegs (asmop *aop1, asmop *aop2 );
 char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname);
 void DEBUGpic16_pic16_AopType(int line_no, operand *left, operand *right, operand *result);
+void DEBUGpic16_pic16_AopTypeSign(int line_no, operand *left, operand *right, operand *result);
 
 
 bool pic16_genPlusIncr (iCode *ic);

@@ -1,0 +1,59 @@
+PRJDIR          = ..
+
+include $(PRJDIR)/Makefile.common
+
+CFLAGS          += -Wall
+
+OBJECTS 	= packihx.o
+
+SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
+
+TARGET		= packihx
+
+all: $(TARGET)
+
+install: all installdirs
+	$(INSTALL) -s $(TARGET) $(bindir)/packihx
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	rm -f $(bindir)/packihx
+
+# Performing self-test
+# --------------------
+check:
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	$(INSTALL) -d $(bindir)
+
+
+# Creating dependencies
+# ---------------------
+dep:
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS)
+
+.c.o:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+
+checkconf:
+
+clean:
+	rm -f *core *[%~] *.[oa] *.output
+	rm -f .[a-z]*~ \#*
+	rm -f packihx
+
+distclean: clean
+	rm -f config.*

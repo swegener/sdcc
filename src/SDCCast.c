@@ -47,7 +47,7 @@ int labelKey = 1;
 
 int noLineno = 0;
 int noAlloc = 0;
-symbol *currFunc;
+symbol *currFunc=NULL;
 static ast *createIval (ast *, sym_link *, initList *, ast *);
 static ast *createIvalCharPtr (ast *, sym_link *, ast *);
 static ast *optimizeCompare (ast *);
@@ -4459,7 +4459,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		value *args=FUNC_ARGS(tree->left->opval.val->type);
 		fprintf(outfile,"FUNCTION (%s=%p) type (", 
 			tree->left->opval.val->name, tree);
-		printTypeChain (tree->ftype,outfile);
+		printTypeChain (tree->left->opval.val->type->next,outfile);
 		fprintf(outfile,") args (");
 		do {
 		  if (arg) {

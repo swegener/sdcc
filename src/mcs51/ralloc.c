@@ -1994,10 +1994,13 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 
       /* found it we need to remove it from the
          block */
-      for (sic = dic; sic != ic; sic = sic->next)
+      for (sic = dic; sic != ic; sic = sic->next) {
 	bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
+	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
+      }
 
       OP_SYMBOL(IC_LEFT (ic))=OP_SYMBOL(IC_RIGHT (dic));
+      OP_SYMBOL(IC_LEFT(ic))->liveTo = ic->seq;
       IC_LEFT (ic)->key = OP_SYMBOL(IC_RIGHT (dic))->key;
       remiCodeFromeBBlock (ebp, dic);
       bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
@@ -2027,11 +2030,14 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 	}
       /* found it we need to remove it from the
          block */
-      for (sic = dic; sic != ic; sic = sic->next)
+      for (sic = dic; sic != ic; sic = sic->next) {
 	bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
+	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
+      }
 
       IC_RIGHT (ic)->operand.symOperand =
 	IC_RIGHT (dic)->operand.symOperand;
+      OP_SYMBOL(IC_RIGHT(ic))->liveTo = ic->seq;
       IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
 
       remiCodeFromeBBlock (ebp, dic);

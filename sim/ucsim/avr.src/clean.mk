@@ -5,6 +5,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
+	rm -f *.lst *.list *.obj *.hex
 	rm -f savr
 
 

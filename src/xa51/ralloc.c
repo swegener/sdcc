@@ -524,29 +524,29 @@ noOverLap (set * itmpStack, symbol * fsym)
 /*-----------------------------------------------------------------*/
 /* isFree - will return 1 if the a free spil location is found     */
 /*-----------------------------------------------------------------*/
-static
-DEFSETFUNC (isFree)
-{
+static DEFSETFUNC (isFree) {
   symbol *sym = item;
   V_ARG (symbol **, sloc);
   V_ARG (symbol *, fsym);
-
+  
   /* if already found */
   if (*sloc)
     return 0;
-
+  
   /* if it is free && and the itmp assigned to
      this does not have any overlapping live ranges
      with the one currently being assigned and
      the size can be accomodated  */
   if (sym->isFree &&
       noOverLap (sym->usl.itmpStack, fsym) &&
-      getSize (sym->type) >= getSize (fsym->type))
-    {
-      *sloc = sym;
-      return 1;
-    }
-
+      /* TODO: this is a waste but causes to many problems 
+	 getSize (sym->type) >= getSize (fsym->type)) {
+      */
+      getSize (sym->type) == getSize (fsym->type)) {
+    *sloc = sym;
+    return 1;
+  }
+  
   return 0;
 }
 
@@ -557,8 +557,6 @@ static symbol *
 createStackSpil (symbol * sym)
 {
   symbol *sloc = NULL;
-  int useXstack, model;
-
   char slocBuffer[30];
 
   D(fprintf (stderr, "  createStackSpil: %s\n", sym->name));
@@ -575,17 +573,7 @@ createStackSpil (symbol * sym)
       return sym;
     }
 
-  /* could not then have to create one , this is the hard part
-     we need to allocate this on the stack : this is really a
-     hack!! but cannot think of anything better at this time */
-
-  if (sprintf (slocBuffer, "sloc%d", _G.slocNum++) >= sizeof (slocBuffer))
-    {
-      fprintf (stderr, "***Internal error: slocBuffer overflowed: %s:%d\n",
-	       __FILE__, __LINE__);
-      exit (1);
-    }
-
+  sprintf (slocBuffer, "sloc%d", _G.slocNum++);
   sloc = newiTemp (slocBuffer);
 
   /* set the type to the spilling symbol */
@@ -597,34 +585,12 @@ createStackSpil (symbol * sym)
   SPEC_VOLATILE(sloc->etype) = 0;
   SPEC_ABSA(sloc->etype) = 0;
 
-  /* we don't allow it to be allocated`
-     onto the external stack since : so we
-     temporarily turn it off ; we also
-     turn off memory model to prevent
-     the spil from going to the external storage
-   */
-
-  useXstack = options.useXstack;
-  model = options.model;
-/*     noOverlay = options.noOverlay; */
-/*     options.noOverlay = 1; */
-  options.model = options.useXstack = 0;
-
   allocLocal (sloc);
 
-  options.useXstack = useXstack;
-  options.model = model;
-/*     options.noOverlay = noOverlay; */
   sloc->isref = 1;		/* to prevent compiler warning */
 
-  /* if it is on the stack then update the stack */
-  if (IN_STACK (sloc->etype))
-    {
-      currFunc->stack += getSize (sloc->type);
-      _G.stackExtend += getSize (sloc->type);
-    }
-  else
-    _G.dataExtend += getSize (sloc->type);
+  currFunc->stack += getSize (sloc->type);
+  _G.stackExtend += getSize (sloc->type);
 
   /* add it to the _G.stackSpil set */
   addSetHead (&_G.stackSpil, sloc);
@@ -1921,6 +1887,7 @@ static void packRegisters (eBBlock * ebp) {
   iCode *ic;
   int change = 0;
   
+  return; // that's it for now
   while (1) {
     change = 0;
     
@@ -1932,7 +1899,6 @@ static void packRegisters (eBBlock * ebp) {
     if (!change)
       break;
   }
-  return; // that's it for now
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {

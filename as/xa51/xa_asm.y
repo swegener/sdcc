@@ -1136,7 +1136,7 @@ int reg(int reg_spec)
 int reg_indirect(int reg_spec)
 {
 	if (reg_spec & BYTE_REG)
-		error("Imdirect addressing may not use byte registers");
+		error("Indirect addressing may not use byte registers");
 	if ((reg_spec & 15) > 7)
 		error("Only R0 through R7 may be used for indirect addr");
 	return reg_spec & 7;

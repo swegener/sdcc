@@ -74,6 +74,7 @@ static struct
   {
     short inLine;
     short debugLine;
+    short stackExtend;
     short nRegsSaved;
     set *sendSet;
   }
@@ -139,10 +140,10 @@ static void emitcode (char *inst, char *fmt,...) {
 
 char *getStackOffset(int stack) {
   static char gsoBuf[1024];
-  sprintf (gsoBuf, "r7+(%d%+d%+d)", stack,
+  sprintf (gsoBuf, "r7+(%d%+d%+d%+d)", stack,
 	   FUNC_ISISR(currFunc->type) ? 
 	     port->stack.isr_overhead : port->stack.call_overhead,
-	   _G.nRegsSaved);
+	   currFunc->stack, _G.nRegsSaved);
   return gsoBuf;
 }
 
@@ -372,9 +373,9 @@ static asmop *aopForVal(operand *op) {
 	break;
       case 4:
 	sprintf (aop->name[0], "#0x%04lx",
+		 SPEC_CVAL(operandType(op)).v_ulong & 0xffff);
+	sprintf (aop->name[1], "#0x%04lx", 
 		 SPEC_CVAL(operandType(op)).v_ulong >> 16);
-	sprintf (aop->name[1], "#0x%04x", 
-		 SPEC_CVAL(operandType(op)).v_ulong && 0xffff);
 	break;
       default:
 	bailOut("aopForVal");
@@ -599,12 +600,16 @@ void printIc (char *op, iCode * ic, bool result, bool left, bool right) {
 /* toBoolean - return carry for operand!=0                           */
 /*-----------------------------------------------------------------*/
 static char *toBoolean (operand * op) {
+  symbol *tlbl=newiTempLabel(NULL);
+
   switch (AOP_SIZE(op)) 
     {
     case 1:
     case 2:
-      emitcode ("cmp", "%s,#0", AOP_NAME(op));
-      emitcode ("mov", "c,z");
+      emitcode ("cjne", "%s,#1,%05d$; %s", AOP_NAME(op), tlbl->key+100,
+		"This needs a second thought");
+      
+      emitcode ("", "%05d$:", tlbl->key+100);
       return "c";
     }
 
@@ -724,10 +729,11 @@ static void genFunction (iCode * ic) {
   symbol *sym=OP_SYMBOL(IC_LEFT(ic));
   sym_link *type=sym->type;
 
-  emitcode (";", "-----------------------------------------");
-  emitcode (";", " function %s", sym->name);
-  emitcode (";", "-----------------------------------------");
-  
+  emitcode (";", "genFunction %s", sym->rname);
+
+  /* print the allocation information */
+  printAllocInfo (currFunc, codeOutFile);
+
   emitcode ("", "%s:", sym->rname);
 
   if (IFFUNC_ISNAKED(type))
@@ -736,10 +742,10 @@ static void genFunction (iCode * ic) {
       return;
   }
 
-  /* if critical function then turn interrupts off */
-  if (IFFUNC_ISCRITICAL (type))
-    emitcode ("clr", "ea");
-
+  /* adjust the stack for locals used in this function */
+  if (sym->stack) {
+    emitcode ("sub", "r7,#%d\t; create stack space for locals", sym->stack);
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -750,13 +756,23 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
-  if (IFFUNC_ISNAKED(sym->type))
-  {
+  printIc ("genEndFunction", ic, 0,0,0);
+
+  if (IFFUNC_ISNAKED(sym->type)) {
       emitcode(";", "naked function: no epilogue.");
       return;
   }
 
-  printIc ("genEndFunction", ic, 0,0,0);
+  /* readjust the stock for locals used in this function */
+  if (sym->stack) {
+    emitcode ("add", "r7,#%d\t; release stack space for locals", sym->stack);
+  }
+
+  if (IFFUNC_ISISR(sym->type)) {
+    emitcode ("reti", "");
+  } else {
+    emitcode ("ret", "");
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -811,7 +827,57 @@ static void genGoto (iCode * ic) {
 /* genPlus - generates code for addition                           */
 /*-----------------------------------------------------------------*/
 static void genPlus (iCode * ic) {
+  operand *result=IC_RESULT(ic), *left=IC_LEFT(ic), *right=IC_RIGHT(ic);
+  int size;
+  char *instr;
+
   printIc ("genPlus", ic, 1,1,1);
+
+  size=aopOp(result, TRUE, TRUE);
+
+  /* if left is a literal, then exchange them */
+  if (IS_LITERAL(operandType(left))) {
+    operand *tmp = right;
+    right = left;
+    left = tmp;
+  }
+    
+  if (aopIsBit(result)) {
+    if (IS_LITERAL(operandType(right))) {
+      if (operandLitValue(right)) {
+	emitcode ("setb", AOP_NAME(result)[0]);
+	return;
+      }
+      aopOp(left, TRUE, TRUE);
+      emitcode ("mov", "%s,%s", AOP_NAME(result)[0], toBoolean(left));
+      return;
+    }
+    bailOut("genPlus: unfinished genPlus bit");
+  }
+  
+  aopOp(left, !aopIsPtr(result), !aopIsDir(result));
+  aopOp(right, !aopIsPtr(result), !aopIsDir(result));
+
+  if (size>1) {
+    instr="add.w";
+  } else {
+    instr="add.b";
+  }
+  if (!aopEqual(result->aop, left->aop, 0)) {
+    emitcode ("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+  }
+  emitcode (instr, "%s,%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+  if (size>2) {
+    if (!aopEqual(result->aop, left->aop, 1)) {
+      emitcode ("mov", "%s,%s", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+    }
+    if (size==3) {
+      // generic pointer
+    } else {
+      emitcode ("addc.w", "%s,%s", AOP_NAME(result)[1], AOP_NAME(right)[1]);
+    }
+  }
+  return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -961,10 +1027,12 @@ static void genAnd (iCode * ic, iCode * ifx) {
 /*-----------------------------------------------------------------*/
 static void genOr (iCode * ic, iCode * ifx) {
   operand *result=IC_RESULT(ic), *left=IC_LEFT(ic), *right=IC_RIGHT(ic);
-  int size=aopOp(result, TRUE, TRUE);
+  int size;
   char *instr;
 
   printIc ("genOr", ic, 1,1,1);
+
+  size=aopOp(result, TRUE, TRUE);
 
   /* if left is a literal, then exchange them */
   if (IS_LITERAL(operandType(left))) {
@@ -1076,9 +1144,24 @@ static void genPointerGet (iCode * ic, iCode *pi) {
   size=aopOp(result,TRUE,aopIsDir(left));
 
   if (IS_GENPTR(operandType(left))) {
-    emitcode (";", "INLINE\t_gptrget ; %s %s = [%s %s]", 
-	      AOP_NAME(result)[0], AOP_NAME(result)[1],
-	      AOP_NAME(left)[0], AOP_NAME(left)[1]);
+    symbol *tlbl1=newiTempLabel(NULL);
+    symbol *tlbl2=newiTempLabel(NULL);
+    emitcode ("cmp", "%s,#0x%02x", AOP_NAME(left)[1], CPOINTER);
+    emitcode ("bne", "%05d$", tlbl1->key+100);
+    // far/near pointer
+    emitcode ("mov", "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+    if (size>2) {
+      emitcode ("mov", "%s,[%s+2]", AOP_NAME(result)[1], AOP_NAME(left)[0]);
+    }
+    emitcode ("br", "%05d$", tlbl2->key+100);
+    emitcode ("", "%05d$:", tlbl1->key+100);
+    // code pointer
+    emitcode ("mov", "r0,%s", AOP_NAME(left)[0]);
+    emitcode ("movc", "%s,[r0+]", AOP_NAME(result)[0]);
+    if (size>2) {
+      emitcode ("movc", "%s,[r0+]", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+    }
+    emitcode ("", "%05d$:", tlbl2->key+100);
     return;
   }
 
@@ -1096,7 +1179,12 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	emitcode (MOV, "%s,[%s]", scratchReg, AOP_NAME(left)[0]);
 	emitcode (MOV, "%s,%s", AOP_NAME(result)[0], scratchReg);
       } else {
-	emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	if (pi) {
+	  emitcode (instr, "%s,[%s+]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	  pi->generated=1;
+	} else {
+	  emitcode (instr, "%s,[%s]", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+	}
       }
       if (size > 2) {
 	if (size==3) {
@@ -1107,8 +1195,13 @@ static void genPointerGet (iCode * ic, iCode *pi) {
 	  emitcode (MOV, "%s,[%s+2]", scratchReg, AOP_NAME(left)[0]);
 	  emitcode (MOV, "%s,%s", AOP_NAME(result)[1], scratchReg);
 	} else {
-	  emitcode (instr, "%s,[%s+2]", AOP_NAME(result)[1], 
-		    AOP_NAME(left)[0]);
+	  if (pi) {
+	    emitcode (instr, "%s,[%s+]", AOP_NAME(result)[1], 
+		      AOP_NAME(left)[0]);
+	  } else {
+	    emitcode (instr, "%s,[%s+2]", AOP_NAME(result)[1], 
+		      AOP_NAME(left)[0]);
+	  }
 	}
       }
       return;
@@ -1149,12 +1242,23 @@ static void genPointerSet (iCode * ic, iCode *pi) {
       } else {
 	instr=MOVB;
       }
-      emitcode (instr, "[%s],%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+      if (pi) {
+	emitcode (instr, "[%s+],%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+	pi->generated=1;
+      } else {
+	emitcode (instr, "[%s],%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+      }
       if (size > 2) {
 	if (size==3) {
 	  instr=MOVB;
 	}
-	emitcode (instr, "[%s+2],%s", AOP_NAME(result)[0], AOP_NAME(right)[1]);
+	if (pi) {
+	  emitcode (instr, "[%s+],%s", AOP_NAME(result)[0], 
+		    AOP_NAME(right)[1]);
+	} else {
+	  emitcode (instr, "[%s+2],%s", AOP_NAME(result)[0], 
+		    AOP_NAME(right)[1]);
+	}
       }
       return;
     }
@@ -1206,7 +1310,7 @@ static void genIfx (iCode * ic, iCode * popIc) {
       emitcode (trueOrFalse ? "beq" : "bne", "%05d$", tlbl->key+100);
       if (size > 2) {
 	if (size==3) {
-	  // generic pointer, just consider the pointer part
+	  // generic pointer, forget the generic part
 	} else {
 	  emitcode (instr, "%s,#0", AOP_NAME(cond)[1]);
 	  emitcode (trueOrFalse ? "beq" : "bne", "%05d$", tlbl->key+100);
@@ -1297,7 +1401,7 @@ static void genAssign (iCode * ic) {
       return;
     }
     /* we need to or */
-    emitcode ("mov", "%s,%s", AOP_NAME(result), toBoolean(right));
+    emitcode ("mov", "%s,%s; toBoolean", AOP_NAME(result), toBoolean(right));
     return;
   }
 
@@ -1398,10 +1502,6 @@ void genXA51Code (iCode * lic) {
   
   lineHead = lineCurr = NULL;
   
-  /* print the allocation information */
-  if (allocInfo)
-    printAllocInfo (currFunc, codeOutFile);
-
   /* if debug information required */
   if (options.debug && currFunc)
     {

@@ -71,7 +71,7 @@ typedef struct asmop
 		char *aop_immd2;	/* cast remat will generate this   */
 	} aop_immd;
 	int aop_stk;		/* stack offset when AOP_STK */
-	char *aop_str[4];	/* just a string array containing the location */
+	char *aop_str[5];	/* just a string array containing the location */
       }
     aopu;
   }

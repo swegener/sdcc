@@ -8,8 +8,8 @@ AUTOCONF	= autoconf
 PRJDIR		= .
 PKGS		= support/gc support/cpp \
 		  src as/mcs51 debugger/mcs51 \
-		  device/include device/lib
-PRJS		= simulator/mcs51
+		  device/include device/lib sim/mcs51
+PRJS		= sim/mcs51
 
 srcdir          = .
 

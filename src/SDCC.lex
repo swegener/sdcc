@@ -39,7 +39,7 @@ IS       (u|U|l|L)*
 char *stringLiteral();
 char *currFname;
 
-extern int lineno			;
+extern int lineno, column;
 extern char *filename ;
 extern char *fullSrcFileName ;
 int   yylineno = 1               ;
@@ -245,6 +245,13 @@ struct options  save_options  ;
 "\r\n"		   { count(); }
 "\n"		   { count(); }
 [ \t\v\f]      { count(); }
+\\ {
+  char ch=input();
+  if (ch!='\n') {
+    werror (W_STRAY_BACKSLASH, column);
+    unput(ch);
+  }
+}
 .			   { count()	; }
 %%
    
@@ -409,7 +416,6 @@ char *stringLiteral () {
       while ((ch = input()) && (isspace(ch) || ch=='\\')) {
 	switch (ch) {
 	case '\\':
-	  //werror (W_STRAY_BACKSLASH)
 	  break;
 	case '\n':
 	  yylineno++;

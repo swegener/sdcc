@@ -2045,7 +2045,7 @@ decorateType (ast * tree)
       /*----------------------------*/
     case PTR_OP:
       /* if not pointer to a structure */
-      if (!IS_PTR (LTYPE (tree)))
+      if (!IS_PTR (LTYPE (tree)) && !IS_ARRAY (LTYPE(tree)))
 	{
 	  werror (E_PTR_REQD);
 	  goto errorTreeReturn;

@@ -28,6 +28,9 @@
 #include <stdarg.h>
 
 #if defined(SDCC_MODEL_LARGE) || defined(SDCC_MODEL_FLAT24)
+#ifndef TINIBIOS_H
+#include <tinibios.h>
+#endif TINIBIOS_H
 #define XSPEC xdata
 #else
 #define XSPEC

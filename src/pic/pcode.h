@@ -76,7 +76,7 @@ struct regs;
  * The double parenthesis (()) are necessary
  * 
  ***********************************************************************/
-//#define PCODE_DEBUG
+#define PCODE_DEBUG
 
 #ifdef PCODE_DEBUG
 #define DFPRINTF(args) (fprintf args)

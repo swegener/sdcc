@@ -234,6 +234,7 @@ PORT pic_port =
   TARGET_ID_PIC,
   "pic14",
   "MCU pic",			/* Target name */
+  NULL,                         /* Processor */
   {
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,

@@ -455,6 +455,7 @@ PORT z80_port =
   TARGET_ID_Z80,
   "z80",
   "Zilog Z80",			/* Target name */
+  NULL,				/* Processor name */
   {
     FALSE,
     MODEL_MEDIUM | MODEL_SMALL,
@@ -546,6 +547,7 @@ PORT gbz80_port =
   TARGET_ID_GBZ80,
   "gbz80",
   "Gameboy Z80-like",		/* Target name */
+  NULL,
   {
     FALSE,
     MODEL_MEDIUM | MODEL_SMALL,

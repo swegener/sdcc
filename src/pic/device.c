@@ -48,6 +48,7 @@ memRange p16f627_sfr[] = {
   {0x02,  0x04,  0x180, 0},
   {0x05,  0x05,  0x000, 0},
   {0x06,  0x06,  0x100, 0},
+  {0x81,  0x81,  0x100, 1},
   {0x85,  0x85,  0x000, 1},
   {0x86,  0x86,  0x100, 1},
   {0x0a,  0x0b,  0x180, 0},
@@ -72,7 +73,8 @@ memRange p16f84_sfr[] = {
   {0x01,  0x01,  0x00, 0},
   {0x02,  0x04,  0x80, 0},
   {0x05,  0x06,  0x00, 0},
-  {0x85,  0x86,  0x80, 1},
+  {0x81,  0x81,  0x00, 1},
+  {0x85,  0x86,  0x00, 1},
   {0x08,  0x09,  0x00, 0},
   {0x88,  0x89,  0x00, 1},
   {0x0a,  0x0b,  0x80, 0},
@@ -94,6 +96,7 @@ memRange p16f877_sfr[] = {
   {0x02,  0x04,  0x180, 0},
   {0x05,  0x05,  0x000, 0},
   {0x85,  0x85,  0x000, 1},
+  {0x81,  0x81,  0x100, 1},
   {0x06,  0x06,  0x100, 0},
   {0x86,  0x86,  0x100, 1},
   {0x07,  0x09,  0x000, 0},
@@ -144,7 +147,7 @@ static PIC_device Pics[] = {
 
 static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);
 static int default_pic = 0;
-#define DEFAULT_PIC "f84"
+#define DEFAULT_PIC "f877"
 
 static PIC_device *pic=NULL;
 
@@ -463,7 +466,7 @@ void mapRegister(regs *reg)
 
     do {
 
-      fprintf(stdout,"mapping %s to address 0x%02x\n",reg->name, (reg->address+alias+i));
+      //fprintf(stdout,"mapping %s to address 0x%02x\n",reg->name, (reg->address+alias+i));
 
       finalMapping[reg->address + alias + i].reg = reg;
       finalMapping[reg->address + alias + i].instance = i;
@@ -535,7 +538,7 @@ void assignFixedRegisters(set *regset)
 
 }
 
-void assignRelocatableRegisters(set *regset)
+void assignRelocatableRegisters(set *regset, int used)
 {
 
   regs *reg;
@@ -546,7 +549,7 @@ void assignRelocatableRegisters(set *regset)
 
     //fprintf(stdout,"assigning %s\n",reg->name);
 
-    if(!reg->isFixed) 
+    if((!reg->isFixed) && ( (used==0) || reg->wasUsed))
       address = assignRegister(reg,address);
 
   }

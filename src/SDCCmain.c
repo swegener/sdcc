@@ -138,6 +138,7 @@ typedef struct {
 static const OPTION 
 optionsTable[] = {
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
+    { 'p',  NULL,                   NULL, "Select port specific processor e.g. -mpic14 -p16f84" },
     { 'd',  NULL,                   NULL, NULL },
     { 'D',  NULL,                   NULL, "Define macro as in -Dmacro" },
     { 'I',  NULL,                   NULL, "Add to the include (*.h) path, as in -Ipath" },
@@ -235,8 +236,6 @@ unsupportedOptTable[] = {
     { 'g',  NULL,	"use --generic instead" },
     { 'X',  NULL,	"use --xstack-loc instead" },
     { 'x',  NULL,	"use --xstack instead" },
-    { 'p',  NULL,	"use --stack-loc instead" },
-    { 'P',  NULL,	"use --stack-loc instead" },
     { 'i',  NULL,	"use --idata-loc instead" },
     { 'r',  NULL,	"use --xdata-loc instead" },
     { 's',  NULL,	"use --code-loc instead" },
@@ -293,10 +292,9 @@ static PORT *_ports[] =
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
 
-/**
-   remove me - TSD a hack to force sdcc to generate gpasm format .asm files.
- */
+#if !OPT_DISABLE_PIC
 extern void picglue ();
+#endif
 
 /** Sets the port to the one given by the command line option.
     @param    The name minus the option (eg 'mcs51')
@@ -327,11 +325,16 @@ _validatePorts (void)
     {
       if (_ports[i]->magic != PORT_MAGIC)
 	{
+	  /* Uncomment this line to debug which port is causing the problem
+	   * (the target name is close to the beginning of the port struct 
+	   * and probably can be accessed just fine). */
+	  fprintf(stderr,"%s :",_ports[i]->target);
 	  wassertl (0, "Port definition structure is incomplete");
 	}
     }
 }
 
+/* search through the command line options for the port */
 static void
 _findPort (int argc, char **argv)
 {
@@ -597,6 +600,13 @@ _setModel (int model, const char *sz)
     options.model = model;
   else
     werror (W_UNSUPPORTED_MODEL, sz, port->target);
+}
+
+static void
+_setProcessor (char *_processor)
+{
+  port->processor = _processor;
+  fprintf(stderr,"Processor: %s\n",_processor);
 }
 
 /** Gets the string argument to this option.  If the option is '--opt'
@@ -947,6 +957,11 @@ parseCmdLine (int argc, char **argv)
 	      _setPort (argv[i] + 2);
 	      break;
 
+	    case 'p':
+	      /* Used to select the processor in port */
+	      _setProcessor (getStringArg("-p", argv, &i, argc));
+	      break;
+
 	    case 'c':
               verifyShortOption(argv[i]);
 
@@ -1167,11 +1182,13 @@ linkEdit (char **envp)
 	}
 #endif
 
-#if !OPT_DISABLE_XA51
+#if !OPT_DISABLE_XA51 
+#ifdef STD_XA51_LIB
       if (options.model == MODEL_PAGE0)
 	{
 	  fprintf (lnkfile, "-l %s\n", STD_XA51_LIB);
 	}
+#endif
 #endif
       fprintf (lnkfile, "-l %s\n", STD_LIB);
       fprintf (lnkfile, "-l %s\n", STD_INT_LIB);

@@ -45,8 +45,8 @@ pCodeOpReg pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
 pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
 
 pCodeOpReg pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
-pCodeOpReg pc_wsave     = {{PO_GPR_REGISTER,  "W_SAVE"}, -1, NULL,0,NULL};
-pCodeOpReg pc_ssave     = {{PO_GPR_REGISTER,  "STATUS_SAVE"}, -1, NULL,0,NULL};
+pCodeOpReg pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
+pCodeOpReg pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
 
 static int mnemonics_initialized = 0;
 
@@ -56,7 +56,7 @@ static hTab *pic14MnemonicsHash = NULL;
 
 
 static pFile *the_pFile = NULL;
-static int peepOptimizing = 0;
+static int peepOptimizing = 1;
 static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
 

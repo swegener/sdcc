@@ -1529,9 +1529,17 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     PCOL(pcopnew)->lit = PCOL(pcop)->lit;
     break;
 
+  case PO_GPR_BIT:
+
+    pcopnew = newpCodeOpBit(pcop->name, PCORB(pcop)->bit,PCORB(pcop)->inBitSpace);
+    PCOR(pcopnew)->r = PCOR(pcop)->r;
+    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
+    DFPRINTF((stderr," pCodeOpCopy Bit -register index\n"));
+    return pcopnew;
+    break;
+
   case PO_GPR_REGISTER:
   case PO_GPR_TEMP:
-  case PO_GPR_BIT:
   case PO_FSR:
   case PO_INDF:
     //DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
@@ -1541,6 +1549,8 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     DFPRINTF((stderr," register index %d\n", PCOR(pcop)->r->rIdx));
     break;
 
+  case PO_STATUS:
+    DFPRINTF((stderr,"pCodeOpCopy PO_STATUS\n"));
   case PO_DIR:
     //DFPRINTF((stderr,"pCodeOpCopy PO_DIR\n"));
   case PO_SFR_REGISTER:
@@ -1548,7 +1558,6 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_NONE:
   case PO_W:
   case PO_INTCON:
-  case PO_STATUS:
   case PO_PCL:
   case PO_PCLATH:
 

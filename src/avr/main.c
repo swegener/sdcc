@@ -151,6 +151,7 @@ PORT avr_port = {
         TARGET_ID_AVR,
 	"avr",
 	"ATMEL AVR",		/* Target name */
+	NULL,			/* processor */
 	{
 	 TRUE,			/* Emit glue around main */
 	 MODEL_LARGE | MODEL_SMALL,

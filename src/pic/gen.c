@@ -1678,10 +1678,14 @@ static void genNot (iCode *ic)
   DEBUGpic14_AopType(__LINE__,IC_LEFT(ic),NULL,IC_RESULT(ic));
   /* if in bit space then a special case */
   if (AOP_TYPE(IC_LEFT(ic)) == AOP_CRY) {
-    pic14_emitcode("movlw","1<<garbage");
-    //pic14_emitcode("mov","c,%s",IC_LEFT(ic)->aop->aopu.aop_dir); 
-    //pic14_emitcode("cpl","c"); 
-    //pic14_outBitC(IC_RESULT(ic));
+    if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY) {
+      emitpcode(POC_MOVLW,popGet(AOP(IC_LEFT(ic)),0));
+      emitpcode(POC_XORWF,popGet(AOP(IC_RESULT(ic)),0));
+    } else {
+      emitpcode(POC_CLRF,popGet(AOP(IC_RESULT(ic)),0));
+      emitpcode(POC_BTFSS,popGet(AOP(IC_LEFT(ic)),0));
+      emitpcode(POC_INCF,popGet(AOP(IC_RESULT(ic)),0));
+    }
     goto release;
   }
 
@@ -4458,6 +4462,19 @@ static void genCmpEq (iCode *ic, iCode *ifx)
                 pic14_emitcode("ljmp","%05d_DS_",IC_FALSE(ifx)->key+100);
             }
             pic14_emitcode("","%05d_DS_:",tlbl->key+100+labelOffset);
+
+	    {
+	      /* left and right are both bit variables, result is carry */
+	      resolvedIfx rIfx;
+	      
+	      resolveIfx(&rIfx,ifx);
+
+	      emitpcode(POC_MOVLW,popGet(AOP(left),0));
+	      emitpcode(POC_ANDFW,popGet(AOP(left),0));
+	      emitpcode(POC_BTFSC,popGet(AOP(right),0));
+	      emitpcode(POC_ANDLW,popGet(AOP(left),0));
+	      genSkipz2(&rIfx);
+	    }
         } else {
 
 	  /* They're not both bit variables. Is the right a literal? */

@@ -36,9 +36,9 @@
 //    clrw
 //lab1
 //
-// However, the Rule has wild cards four wild cards.
-// The first allows the btfss instruction operate
-// on anything, not just the Z bit in status register.
+// However, the Rule has four wild cards.
+// The first allows the btfss instruction operator
+// be anything, not just the Z bit in status register.
 // The second wild card applies to a label.
 // The third wild card is for an instruction - any
 // single instruction can be substituted.

@@ -209,6 +209,7 @@ PORT xa51_port =
   TARGET_ID_XA51,
   "xa51",
   "MCU 80C51XA",       		/* Target name */
+  NULL,				/* Processor name */
   {
     FALSE,			/* Emit glue around main */
     MODEL_PAGE0,

@@ -760,6 +760,8 @@ pic14_allocWithIdx (int idx)
     debugLog ("Found a Stack Register!\n");
   } else if( (dReg = regWithIdx ( dynProcessorRegs, idx,0)) != NULL ) {
     debugLog ("Found a Processor Register!\n");
+  } else if( (dReg = regWithIdx ( dynInternalRegs, idx,0)) != NULL ) {
+    debugLog ("Found an Internal Register!\n");
   } else {
     
     debugLog ("Dynamic Register not found\n");
@@ -871,7 +873,7 @@ void writeSetUsedRegs(FILE *of, set *dRegs)
 
 }
 extern void assignFixedRegisters(set *regset);
-extern void assignRelocatableRegisters(set *regset);
+extern void assignRelocatableRegisters(set *regset,int used);
 extern void dump_map(void);
 extern void dump_cblock(FILE *of);
 
@@ -993,9 +995,10 @@ void writeUsedRegs(FILE *of)
   assignFixedRegisters(dynStackRegs);
   assignFixedRegisters(dynDirectRegs);
 
-  assignRelocatableRegisters(dynAllocRegs);
-  assignRelocatableRegisters(dynStackRegs);
-  assignRelocatableRegisters(dynDirectRegs);
+  assignRelocatableRegisters(dynInternalRegs,1);
+  assignRelocatableRegisters(dynAllocRegs,0);
+  assignRelocatableRegisters(dynStackRegs,0);
+  assignRelocatableRegisters(dynDirectRegs,0);
 
   //dump_map();
 

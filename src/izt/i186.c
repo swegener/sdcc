@@ -136,6 +136,7 @@ PORT i186_port = {
     TARGET_ID_I186,
     "i186",
     "Intel 80186",      /* Target name */
+    NULL,
     {
         FALSE,          /* Emit glue around main */
         MODEL_SMALL,

@@ -324,6 +324,7 @@ PORT ds390_port =
   TARGET_ID_DS390,
   "ds390",
   "DS80C390",			/* Target name */
+  NULL,
   {
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
@@ -607,6 +608,7 @@ PORT tininative_port =
   TARGET_ID_DS390,
   "TININative",
   "DS80C390",			/* Target name */
+	NULL,			/* processor */
   {
     FALSE,			/* Emit glue around main */
     MODEL_FLAT24,

@@ -860,7 +860,7 @@ picglue ()
   AnalyzepCode('*'); //code->dbName);
 
   //#ifdef PCODE_DEBUG
-  printCallTree(stderr);
+  //  printCallTree(stderr);
   //#endif
 
   pcode_test();

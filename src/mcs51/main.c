@@ -227,6 +227,7 @@ PORT mcs51_port =
   TARGET_ID_MCS51,
   "mcs51",
   "MCU 8051",			/* Target name */
+  NULL,				/* Processor name */
   {
     TRUE,			/* Emit glue around main */
     MODEL_SMALL | MODEL_LARGE,

@@ -51,6 +51,9 @@ typedef struct
 /** Target name string, used for --help */
     const char *target_name;
 
+/** Specific processor for the given target family. specified by -p */
+    char *processor;
+
     struct
       {
 	/** TRUE if all types of glue functions should be inserted into

@@ -105,12 +105,12 @@ __fail(const char *szMsg, const char *szCond, const char *szFile, int line)
 int 
 main(void)
 {
-    TESTFUN **cases;
+    TESTFUNP *cases;
     int numCases = 0;
 
     __printf("--- Running: %s\n", getSuiteName());
 
-    cases = (TESTFUN **)suite();
+    cases = suite();
 
     while (*cases) {
         __printf("Running %u\n", numCases);

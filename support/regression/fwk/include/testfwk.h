@@ -11,10 +11,10 @@ void __printf(const char *szFormat, ...) REENTRANT;
 #define FAIL()		FAILM("Failure")
 #define FAILM(_a)	__fail(_a, #_a, __FILE__, __LINE__)
 
-typedef void TESTFUN(void);
+typedef void (*TESTFUNP)(void);
 
 // Provided by the suite
-void **
+TESTFUNP *
 suite(void);
 
 const char *

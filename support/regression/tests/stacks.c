@@ -10,7 +10,7 @@ spoil(char a)
 }
 
 void
-spoilPtr(char *p)
+spoilPtr(volatile char *p)
 {
   UNUSED(p);
 }

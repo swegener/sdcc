@@ -9,7 +9,7 @@ outdir = 'gen'
 
 # Start of the test function table definition
 testfuntableheader = """
-static void (*const _tests[])(void) = {
+static TESTFUNP _tests[] = {
 """
 
 
@@ -20,10 +20,10 @@ testfuntablefooter = """\tNULL
 
 # Code to generate the suite function
 testfunsuite = """
-void **
+TESTFUNP *
 suite(void)
 {
-    return (void **)_tests;
+    return _tests;
 }
 
 const char *

@@ -5,9 +5,14 @@
 	* src/ds390/main.c: changed type of parameter asmOptions to set in _tininative_do_assemble()
 	* src/port.h: changed type of do_assemble() parameter to set
 	* src/SDCCmain.c: type of asmOptions changed to set, introduced setParseWithComma(),
-	  sdcpp defined without path, removed variable VersionString
+	  sdcpp defined without path, removed variable VersionString, introduced set binPathSet,
+	  definition of "cppoutfilename" macro with NULL value in preProcess()
 	* src/SDCCglobl.h: included "SDCCset.h", added declaration of setParseWithComma()
 	* src/SDCCglue.c: removed variable VersionString, inroduced spacesToUnderscores()
+	* support/Util/MySystem.c, support/Util/MySystem.h: rewrite, char *ExePathList[]
+	  replaced with set *binPathSet
+	* shash_add() deallocates the item, if allready exsists, before adding the new one
+	* src/SDCCmacro.c: handling macros with empty or NULL values in _evalMacros()
 
 2003-03-30  Scott Dattalo  <scott@dattalo.com>
 

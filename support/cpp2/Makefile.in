@@ -108,12 +108,12 @@ OBSTACK=obstack.o
 # End of variables for you to override.
 
 install: all
-	mkdir -p $(bindir)
-	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
+	mkdir -p $(DESTDIR)$(bindir)
+	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
 
 uninstall:
-	rm -f $(bindir)/sdcpp$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sdcpp$(EXEEXT)
 clean:
 	-rm -f $(TARGET) *.o core libcpp.a
 

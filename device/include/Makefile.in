@@ -28,7 +28,7 @@ srcdir          = @srcdir@
 
 include_dir_suffix = @include_dir_suffix@
 
-sdcc_includedir    = $(datadir)/$(include_dir_suffix)
+sdcc_includedir    = $(DESTDIR)$(datadir)/$(include_dir_suffix)
 
 CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
 

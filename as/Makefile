@@ -10,18 +10,18 @@ all:
 	$(MAKE) -C hc08 all E=$(E) BUILDDIR=$(BUILDDIR)
 
 install: all install-doc
-	$(INSTALL) $(PRJDIR)/bin/as-z80$(EXEEXT) `echo $(bindir)/as-z80$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/as-z80$(EXEEXT)|sed '$(transform)'`
-	$(INSTALL) $(PRJDIR)/bin/as-gbz80$(EXEEXT) `echo $(bindir)/as-gbz80$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/as-gbz80$(EXEEXT)|sed '$(transform)'`
-	$(INSTALL) $(PRJDIR)/bin/as-hc08$(EXEEXT) `echo $(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(PRJDIR)/bin/as-z80$(EXEEXT) `echo $(DESTDIR)$(bindir)/as-z80$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/as-z80$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(PRJDIR)/bin/as-gbz80$(EXEEXT) `echo $(DESTDIR)$(bindir)/as-gbz80$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/as-gbz80$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(PRJDIR)/bin/as-hc08$(EXEEXT) `echo $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
 
 install-doc:
-	$(INSTALL) -d $(docdir)/aslink
-	cp -f `find doc -maxdepth 1 -type f` $(docdir)/aslink
+	$(INSTALL) -d $(DESTDIR)$(docdir)/aslink
+	cp -f `find doc -maxdepth 1 -type f` $(DESTDIR)$(docdir)/aslink
 
 uninstall:
-	cd $(bindir); rm -f as-z80$(EXEEXT) as-gbz80$(EXEEXT) as-hc08$(EXEEXT)
+	cd $(DESTDIR)$(bindir); rm -f as-z80$(EXEEXT) as-gbz80$(EXEEXT) as-hc08$(EXEEXT)
 
 include clean.mk

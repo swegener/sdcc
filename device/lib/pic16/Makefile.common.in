@@ -24,5 +24,6 @@ MV	= @MV@
 LS	= @LS@
 SED	= @SED@
 
-MM	= -MM
-MODELFLAGS	= -mpic16
+# Quick+dirty fix: this should be defined elsewhere,
+# but it's needed for `make clean`; Bernhard
+MM = -MM

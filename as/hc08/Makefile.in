@@ -63,15 +63,15 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASHC08) `echo $(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
-	$(INSTALL) $(ASLINK) `echo $(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASHC08) `echo $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/as-hc08$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/as-hc08$(EXEEXT) $(bindir)/link-hc08$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/as-hc08$(EXEEXT) $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)
 
 
 # Performing self-test
@@ -87,7 +87,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	$(INSTALL) -d $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

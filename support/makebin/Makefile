@@ -11,11 +11,11 @@ $(BIN): $(OBJ)
 	$(CC) $(LDFLAGS) -o $(BIN) $(OBJ)
 
 install: all
-	mkdir -p $(bindir)
-	$(INSTALL) $(BIN) `echo $(bindir)/makebin$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/makebin$(EXEEXT)|sed '$(transform)'`
+	mkdir -p $(DESTDIR)$(bindir)
+	$(INSTALL) $(BIN) `echo $(DESTDIR)$(bindir)/makebin$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/makebin$(EXEEXT)|sed '$(transform)'`
 
 uninstall:
-	rm -f $(bindir)/makebin$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/makebin$(EXEEXT)
 
 include clean.mk

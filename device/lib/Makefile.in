@@ -32,7 +32,7 @@ srcdir          = @srcdir@
 
 lib_dir_suffix  = @lib_dir_suffix@
 
-sdcc_libdir     = $(datadir)/$(lib_dir_suffix)
+sdcc_libdir     = $(DESTDIR)$(datadir)/$(lib_dir_suffix)
 
 CPPFLAGS        = -I$(INCDIR)
 CFLAGS		= $(MODELFLAGS) --nostdinc

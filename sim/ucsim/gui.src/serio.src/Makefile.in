@@ -50,13 +50,13 @@ endif
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s serialview$(EXEEXT) $(bindir)
+	$(INSTALL) -s serialview$(EXEEXT) $(DESTDIR)$(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/serialview$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/serialview$(EXEEXT)
 
 
 # Performing self-test
@@ -74,7 +74,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	test -d $(bindir) || $(INSTALL) -d $(bindir)
+	test -d $(DESTDIR)$(bindir) || $(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

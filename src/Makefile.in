@@ -57,14 +57,14 @@ $(PRJDIR)/support/gc/libgc.a:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(TARGET) `echo $(bindir)/sdcc$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/sdcc$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/sdcc$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/sdcc$(EXEEXT)|sed '$(transform)'`
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/sdcc$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sdcc$(EXEEXT)
 
 # Performing self-test
 # --------------------
@@ -79,7 +79,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	$(INSTALL) -d $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

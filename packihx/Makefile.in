@@ -13,13 +13,13 @@ TARGET		= $(PRJDIR)/bin/packihx$(EXEEXT)
 all: $(TARGET)
 
 install: all installdirs
-	$(INSTALL) $(TARGET) `echo $(bindir)/packihx$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/packihx$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/packihx$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/packihx$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/packihx$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/packihx$(EXEEXT)
 
 # Performing self-test
 # --------------------
@@ -34,7 +34,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	$(INSTALL) -d $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

@@ -30,6 +30,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
 docdir          = @docdir@
+DESTDIR         =
 
 include_dir_suffix = @include_dir_suffix@
 lib_dir_suffix     = @lib_dir_suffix@

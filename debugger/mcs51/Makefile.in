@@ -56,18 +56,18 @@ all: checkconf $(TARGET)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(TARGET) $(bindir)/sdcdb$(EXEEXT)
-	$(STRIP) $(bindir)/sdcdb$(EXEEXT)
-	cp $(PRJDIR)/debugger/mcs51/sdcdb.el $(bindir)/sdcdb.el
-	cp $(PRJDIR)/debugger/mcs51/sdcdbsrc.el $(bindir)/sdcdbsrc.el
+	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
+	cp $(PRJDIR)/debugger/mcs51/sdcdb.el $(DESTDIR)$(bindir)/sdcdb.el
+	cp $(PRJDIR)/debugger/mcs51/sdcdbsrc.el $(DESTDIR)$(bindir)/sdcdbsrc.el
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/sdcdb$(EXEEXT)
-	rm -f $(bindir)/sdcdb.el
-	rm -f $(bindir)/sdcdbsrc.el
+	rm -f $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sdcdb.el
+	rm -f $(DESTDIR)$(bindir)/sdcdbsrc.el
 
 # Performing self-test
 # --------------------
@@ -82,7 +82,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	$(INSTALL) -d $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

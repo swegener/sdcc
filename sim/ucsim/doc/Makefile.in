@@ -35,16 +35,16 @@ doc: checkconf
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	cp *.html $(docdir)
-	cp *.gif $(docdir)
-	cp *.jpg $(docdir)
-	cp *.fig $(docdir)
+	cp *.html $(DESTDIR)$(docdir)
+	cp *.gif $(DESTDIR)$(docdir)
+	cp *.jpg $(DESTDIR)$(docdir)
+	cp *.fig $(DESTDIR)$(docdir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -rf $(docdir)
+	rm -rf $(DESTDIR)$(docdir)
 
 
 # Performing self-test
@@ -62,7 +62,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	test -d $(docdir) || $(INSTALL) -d $(docdir)
+	test -d $(DESTDIR)$(docdir) || $(INSTALL) -d $(DESTDIR)$(docdir)
 
 
 # Creating dependencies

@@ -64,13 +64,13 @@ all: checkconf otherlibs avr.src
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s savr$(EXEEXT) $(bindir)
+	$(INSTALL) -s savr$(EXEEXT) $(DESTDIR)$(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/savr
+	rm -f $(DESTDIR)$(bindir)/savr
 
 
 # Performing self-test
@@ -88,7 +88,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	test -d $(bindir) || $(INSTALL) -d $(bindir)
+	test -d $(DESTDIR)$(bindir) || $(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

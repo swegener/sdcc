@@ -54,12 +54,12 @@ $(LKZ80): $(SLIBOBJS) $(LKOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(LKZ80) $(bindir)/link-z80$(EXEEXT)
+	$(INSTALL) $(LKZ80) $(DESTDIR)$(bindir)/link-z80$(EXEEXT)
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/link-z80$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/link-z80$(EXEEXT)
 
 
 # Performing self-test
@@ -75,7 +75,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	$(INSTALL) -d $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

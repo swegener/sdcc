@@ -1957,6 +1957,21 @@ make install prefix=$(HOME)/local/sdcc
 \layout Standard
 
 Of course this doesn't change the search paths compiled into the binaries.
+\newline 
+
+\newline 
+Moreover the install path can be changed by defining DESTDIR
+\begin_inset LatexCommand \index{DESTDIR}
+
+\end_inset 
+
+:
+\layout LyX-Code
+
+make install DESTDIR=$(HOME)/sdcc.rpm/
+\layout Standard
+
+Please note that DESTDIR must have a trailing slash!
 \layout Section
 
 Search Paths

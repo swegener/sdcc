@@ -66,13 +66,13 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s shc08$(EXEEXT) $(bindir)
+	$(INSTALL) -s shc08$(EXEEXT) $(DESTDIR)$(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/shc08$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/shc08$(EXEEXT)
 
 
 # Performing self-test
@@ -90,7 +90,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	test -d $(bindir) || $(INSTALL) -d $(bindir)
+	test -d $(DESTDIR)$(bindir) || $(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

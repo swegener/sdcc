@@ -57,13 +57,13 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s sxa$(EXEEXT) $(bindir)
+	$(INSTALL) -s sxa$(EXEEXT) $(DESTDIR)$(bindir)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/sxa$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sxa$(EXEEXT)
 
 
 # Performing self-test
@@ -79,7 +79,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	test -d $(bindir) || $(INSTALL) -d $(bindir)
+	test -d $(DESTDIR)$(bindir) || $(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

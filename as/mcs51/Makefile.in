@@ -63,15 +63,15 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASX8051) `echo $(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
-	$(INSTALL) $(ASLINK) `echo $(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASX8051) `echo $(DESTDIR)$(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/asx8051$(EXEEXT) $(bindir)/aslink$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/asx8051$(EXEEXT) $(DESTDIR)$(bindir)/aslink$(EXEEXT)
 
 
 # Performing self-test
@@ -87,7 +87,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	$(INSTALL) -d $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

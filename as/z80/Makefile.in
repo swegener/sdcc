@@ -47,12 +47,12 @@ $(ASXZ80): $(ASOBJECTS)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASXZ80) $(bindir)/as-z80
+	$(INSTALL) $(ASXZ80) $(DESTDIR)$(bindir)/as-z80
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/as-z80
+	rm -f $(DESTDIR)$(bindir)/as-z80
 
 
 # Performing self-test
@@ -68,7 +68,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	$(INSTALL) -d $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
 
 
 # Creating dependencies

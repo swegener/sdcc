@@ -69,10 +69,10 @@ install: all installdirs
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(bindir)/s51$(EXEEXT)
-	rm -f $(bindir)/savr$(EXEEXT)
-	rm -f $(bindir)/serialview$(EXEEXT)
-	rm -f $(bindir)/portmon$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/s51$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/savr$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/serialview$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/portmon$(EXEEXT)
 
 
 # Performing self-test

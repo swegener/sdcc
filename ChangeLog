@@ -1,3 +1,7 @@
+2003-08-07  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/z80/ralloc.c (joinPushes): made compatible with new signedness
+
 2003-08-06  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCval.c (cheapestVal): changed behaviour to the same as constVal()

@@ -324,6 +324,23 @@ DEFSETFUNC (createLoop)
 #endif
 
   aloop->entry = ep->to;
+
+#ifdef LIVERANGEHUNT
+  // now also include those blocks that conditionally escape from this loop 
+  for (i=1; i<count; i++) {
+    if (ebbs[i]->hasConditionalExit) {
+      for (block=setFirstItem(aloop->regBlocks); 
+	   block; 
+	   block=setNextItem(aloop->regBlocks)) {
+	if (isinSet(block->predList, ebbs[i])) {
+	  printf ("%s has a forced exit from %s\n", 
+		  ebbs[i]->entryLabel->name, 
+		  block->entryLabel->name);
+	}
+      }
+    }
+  }	
+#else
   /* set max & min dfNum for loopRegion */
   for ( block = setFirstItem(aloop->regBlocks); block; 
 	block = setNextItem(aloop->regBlocks)) {
@@ -338,14 +355,11 @@ DEFSETFUNC (createLoop)
 	   ebbs[i]->dfnum < dfMax &&
 	  !isinSet(aloop->regBlocks,ebbs[i])) {
 	  if (!ebbs[i]->partOfLoop) {
-#if !defined(LIVERANGEHUNT)
 	    ebbs[i]->partOfLoop = aloop;
-#else
-	    loopInsert(&aloop->regBlocks,ebbs[i]);
-#endif
 	  }
       }
   }
+#endif
 
 #ifdef LIVERANGEHUNT
   printf ("================\n");

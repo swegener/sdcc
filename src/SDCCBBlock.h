@@ -38,6 +38,7 @@ typedef struct eBBlock
     unsigned int hasFcall:1;	/* has a function call */
     unsigned int noPath:1;	/* there is no path from _entry to this block */
     unsigned int isLastInLoop:1;	/* is the last block in a loop */
+    unsigned int hasConditionalExit; /* this block ends with a return or goto from a conditional block*/
     symbol *entryLabel;		/* entry label */
 
     iCode *sch;			/* pointer to start of code chain */

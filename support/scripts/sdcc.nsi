@@ -25,7 +25,7 @@
 
 !include "MUI.nsh"
 
-SetCompressor bzip2
+SetCompressor lzma
 
 !define SDCC_ROOT "..\.."
 
@@ -46,16 +46,22 @@ InstType "Full (Bin, Doc, Lib, Src)"
 InstType "Medium (Bin, Doc, Lib)"
 InstType "Compact (Bin, Doc)"
 
+;--------------------------------
+;Variables
+
+Var MUI_STARTMENUPAGE_VARIABLE
+
+;--------------------------------
 !define MUI_ABORTWARNING
 !insertmacro MUI_PAGE_WELCOME
 !define MUI_LICENSEPAGE_RADIOBUTTONS
 !insertmacro MUI_PAGE_LICENSE "${SDCC_ROOT}\COPYING.TXT"
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "SDCC"
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM"
-!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\%sSDCC"
+!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\SDCC"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "NSIS:StartMenuDir"
 !define MUI_STARTMENUPAGE_NODISABLE
-!insertmacro MUI_PAGE_STARTMENU
+!insertmacro MUI_PAGE_STARTMENU Application $MUI_STARTMENUPAGE_VARIABLE
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -203,13 +209,13 @@ Section "SDCC library sources"
 SectionEnd
 
 Section -Icons
-!insertmacro MUI_STARTMENU_WRITE_BEGIN
-  CreateDirectory "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}"
-  CreateShortCut "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\SDCC on the Web.lnk" "$INSTDIR\sdcc.url" 
-  CreateShortCut "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\Uninstall SDCC.lnk" "$INSTDIR\uninstall.exe" 
-  CreateShortCut "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\Documentation.lnk" "$INSTDIR\doc\README.TXT" "" "$INSTDIR\sdcc.ico" "" "" "" ""
-  CreateShortCut "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\Change Log.lnk" "$INSTDIR\doc\ChangeLog_head.txt" "" "$INSTDIR\sdcc.ico" "" "" "" ""
-  CreateShortCut "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\GPL 2 License.lnk" "$INSTDIR\COPYING.TXT" 
+!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+  CreateDirectory "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE"
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.lnk" "$INSTDIR\sdcc.url" 
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Uninstall SDCC.lnk" "$INSTDIR\uninstall.exe" 
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk" "$INSTDIR\doc\README.TXT" "" "$INSTDIR\sdcc.ico" "" "" "" ""
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk" "$INSTDIR\doc\ChangeLog_head.txt" "" "$INSTDIR\sdcc.ico" "" "" "" ""
+  CreateShortCut "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk" "$INSTDIR\COPYING.TXT" 
 !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
@@ -241,19 +247,19 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Section Uninstall
-  ReadRegStr ${MUI_STARTMENUPAGE_VARIABLE} ${MUI_STARTMENUPAGE_REGISTRY_ROOT} "${MUI_STARTMENUPAGE_REGISTRY_KEY}" "${MUI_STARTMENUPAGE_REGISTRY_VALUENAME}"
+  !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_STARTMENUPAGE_VARIABLE
 
   Delete "$INSTDIR\sdcc.url"
 
+  DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SDCC" "NSIS:StartMenuDir"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SDCC"
-  DeleteRegValue ${MUI_STARTMENUPAGE_REGISTRY_ROOT} "${MUI_STARTMENUPAGE_REGISTRY_KEY}" "${MUI_STARTMENUPAGE_REGISTRY_VALUENAME}"
 
   Delete "$INSTDIR\uninstall.exe"
-  Delete "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\GPL 2 License.lnk"
-  Delete "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\Change Log.lnk"
-  Delete "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\Documentation.lnk"
-  Delete "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\Uninstall SDCC.lnk"
-  Delete "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}\SDCC on the Web.lnk"
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\GPL 2 License.lnk"
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Change Log.lnk"
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Documentation.lnk"
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Uninstall SDCC.lnk"
+  Delete "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.lnk"
 
   Delete "$INSTDIR\lib\src\hc08\*.c"
   Delete "$INSTDIR\lib\src\hc08\hc08.lib"
@@ -325,7 +331,7 @@ Section Uninstall
   Delete "$INSTDIR\COPYING.TXT"
   Delete "$INSTDIR\sdcc.ico"
 
-  RMDir "$SMPROGRAMS\${MUI_STARTMENUPAGE_VARIABLE}"
+  RMDir "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE"
 
   RMDir "$INSTDIR\lib\src\z80"
   RMDir "$INSTDIR\lib\src\gbz80"

@@ -134,27 +134,27 @@ struct regs;
 
 typedef enum 
 {
-  PO_NONE=0,         // No operand e.g. NOP
-  PO_W,              // The 'W' register
-  PO_STATUS,         // The 'STATUS' register
-  PO_FSR,            // The "file select register" (in 18c it's one of three)
-  PO_INDF,           // The Indirect register
-  PO_INTCON,         // Interrupt Control register
-  PO_GPR_REGISTER,   // A general purpose register
-  PO_GPR_BIT,        // A bit of a general purpose register
-  PO_GPR_TEMP,       // A general purpose temporary register
-  PO_GPR_POINTER,    // A general purpose pointer
-  PO_SFR_REGISTER,   // A special function register (e.g. PORTA)
-  PO_PCL,            // Program counter Low register
-  PO_PCLATH,         // Program counter Latch high register
-  PO_LITERAL,        // A constant
-  PO_IMMEDIATE,      //  (8051 legacy)
-  PO_DIR,            // Direct memory (8051 legacy)
-  PO_CRY,            // bit memory (8051 legacy)
-  PO_BIT,            // bit operand.
-  PO_STR,            //  (8051 legacy)
-  PO_LABEL,
-  PO_WILD            // Wild card operand in peep optimizer
+	PO_NONE=0,         // No operand e.g. NOP
+	PO_W,              // The 'W' register
+	PO_STATUS,         // The 'STATUS' register
+	PO_FSR,            // The "file select register" (in 18c it's one of three)
+	PO_INDF,           // The Indirect register
+	PO_INTCON,         // Interrupt Control register
+	PO_GPR_REGISTER,   // A general purpose register
+	PO_GPR_BIT,        // A bit of a general purpose register
+	PO_GPR_TEMP,       // A general purpose temporary register
+	PO_GPR_POINTER,    // A general purpose pointer
+	PO_SFR_REGISTER,   // A special function register (e.g. PORTA)
+	PO_PCL,            // Program counter Low register
+	PO_PCLATH,         // Program counter Latch high register
+	PO_LITERAL,        // A constant
+	PO_IMMEDIATE,      //  (8051 legacy)
+	PO_DIR,            // Direct memory (8051 legacy)
+	PO_CRY,            // bit memory (8051 legacy)
+	PO_BIT,            // bit operand.
+	PO_STR,            //  (8051 legacy)
+	PO_LABEL,
+	PO_WILD            // Wild card operand in peep optimizer
 } PIC_OPTYPE;
 
 
@@ -169,61 +169,61 @@ typedef enum
 
 typedef enum
 {
-  POC_WILD=-1,   /* Wild card - used in the pCode peep hole optimizer
-		  * to represent ANY pic opcode */
-  POC_ADDLW=0,
-  POC_ADDWF,
-  POC_ADDFW,
-  POC_ANDLW,
-  POC_ANDWF,
-  POC_ANDFW,
-  POC_BCF,
-  POC_BSF,
-  POC_BTFSC,
-  POC_BTFSS,
-  POC_CALL,
-  POC_COMF,
-  POC_COMFW,
-  POC_CLRF,
-  POC_CLRW,
-  POC_CLRWDT,
-  POC_DECF,
-  POC_DECFW,
-  POC_DECFSZ,
-  POC_DECFSZW,
-  POC_GOTO,
-  POC_INCF,
-  POC_INCFW,
-  POC_INCFSZ,
-  POC_INCFSZW,
-  POC_IORLW,
-  POC_IORWF,
-  POC_IORFW,
-  POC_MOVF,
-  POC_MOVFW,
-  POC_MOVLW,
-  POC_MOVWF,
-  POC_NOP,
-  POC_RETLW,
-  POC_RETURN,
-  POC_RETFIE,
-  POC_RLF,
-  POC_RLFW,
-  POC_RRF,
-  POC_RRFW,
-  POC_SUBLW,
-  POC_SUBWF,
-  POC_SUBFW,
-  POC_SWAPF,
-  POC_SWAPFW,
-  POC_TRIS,
-  POC_XORLW,
-  POC_XORWF,
-  POC_XORFW,
-  POC_BANKSEL,
-  POC_PAGESEL,
+	POC_WILD=-1,   /* Wild card - used in the pCode peep hole optimizer
+	                * to represent ANY pic opcode */
+	POC_ADDLW=0,
+	POC_ADDWF,
+	POC_ADDFW,
+	POC_ANDLW,
+	POC_ANDWF,
+	POC_ANDFW,
+	POC_BCF,
+	POC_BSF,
+	POC_BTFSC,
+	POC_BTFSS,
+	POC_CALL,
+	POC_COMF,
+	POC_COMFW,
+	POC_CLRF,
+	POC_CLRW,
+	POC_CLRWDT,
+	POC_DECF,
+	POC_DECFW,
+	POC_DECFSZ,
+	POC_DECFSZW,
+	POC_GOTO,
+	POC_INCF,
+	POC_INCFW,
+	POC_INCFSZ,
+	POC_INCFSZW,
+	POC_IORLW,
+	POC_IORWF,
+	POC_IORFW,
+	POC_MOVF,
+	POC_MOVFW,
+	POC_MOVLW,
+	POC_MOVWF,
+	POC_NOP,
+	POC_RETLW,
+	POC_RETURN,
+	POC_RETFIE,
+	POC_RLF,
+	POC_RLFW,
+	POC_RRF,
+	POC_RRFW,
+	POC_SUBLW,
+	POC_SUBWF,
+	POC_SUBFW,
+	POC_SWAPF,
+	POC_SWAPFW,
+	POC_TRIS,
+	POC_XORLW,
+	POC_XORWF,
+	POC_XORFW,
+	POC_BANKSEL,
+	POC_PAGESEL,
 
-  MAX_PIC14MNEMONICS
+	MAX_PIC14MNEMONICS
 } PIC_OPCODE;
 
 
@@ -233,16 +233,16 @@ typedef enum
 
 typedef enum
 {
-  PC_COMMENT=0,   /* pCode is a comment     */
-  PC_INLINE,      /* user's inline code     */
-  PC_OPCODE,      /* PORT dependent opcode  */
-  PC_LABEL,       /* assembly label         */
-  PC_FLOW,        /* flow analysis          */
-  PC_FUNCTION,    /* Function start or end  */
-  PC_WILD,        /* wildcard - an opcode place holder used 
-		   * in the pCode peep hole optimizer */
-  PC_CSOURCE,     /* C-Source Line  */
-  PC_BAD          /* Mark the pCode object as being bad */
+	PC_COMMENT=0,   /* pCode is a comment     */
+	PC_INLINE,      /* user's inline code     */
+	PC_OPCODE,      /* PORT dependent opcode  */
+	PC_LABEL,       /* assembly label         */
+	PC_FLOW,        /* flow analysis          */
+	PC_FUNCTION,    /* Function start or end  */
+	PC_WILD,        /* wildcard - an opcode place holder used 
+	                 * in the pCode peep hole optimizer */
+	PC_CSOURCE,     /* C-Source Line  */
+	PC_BAD          /* Mark the pCode object as being bad */
 } PC_TYPE;
 
 /************************************************/
@@ -272,9 +272,9 @@ struct pCodeRegLives;
 
 typedef struct pBranch
 {
-  struct pCode   *pc;    // Next pCode in a branch
-  struct pBranch *next;  /* If more than one branch
-			  * the next one is here */
+	struct pCode   *pc;    // Next pCode in a branch
+	struct pBranch *next;  /* If more than one branch
+	                        * the next one is here */
 
 } pBranch;
 
@@ -294,91 +294,91 @@ typedef struct pBranch
 
 typedef struct pCodeOp
 {
-  PIC_OPTYPE type;
-  char *name;
-  
+	PIC_OPTYPE type;
+	char *name;
+
 } pCodeOp;
 #if 0
 typedef struct pCodeOpBit
 {
-  pCodeOp pcop;
-  int bit;
-  unsigned int inBitSpace: 1; /* True if in bit space, else
-				 just a bit of a register */
+	pCodeOp pcop;
+	int bit;
+	unsigned int inBitSpace: 1; /* True if in bit space, else
+	                            just a bit of a register */
 } pCodeOpBit;
 #endif
 typedef struct pCodeOpLit
 {
-  pCodeOp pcop;
-  int lit;
+	pCodeOp pcop;
+	int lit;
 } pCodeOpLit;
 
 typedef struct pCodeOpImmd
 {
-  pCodeOp pcop;
-  int offset;           /* low,med, or high byte of immediate value */
-  int index;            /* add this to the immediate value */
-  unsigned _const:1;    /* is in code space    */
-  unsigned _function:1; /* is a (pointer to a) function */
+	pCodeOp pcop;
+	int offset;           /* low,med, or high byte of immediate value */
+	int index;            /* add this to the immediate value */
+	unsigned _const:1;    /* is in code space    */
+	unsigned _function:1; /* is a (pointer to a) function */
 
-  int rIdx;             /* If this immd points to a register */
-  struct regs *r;       /* then this is the reg. */
+	int rIdx;             /* If this immd points to a register */
+	struct regs *r;       /* then this is the reg. */
 
 } pCodeOpImmd;
 
 typedef struct pCodeOpLabel
 {
-  pCodeOp pcop;
-  int key;
-  int offset;           /* low or high byte of label */
+	pCodeOp pcop;
+	int key;
+	int offset;           /* low or high byte of label */
 } pCodeOpLabel;
 
 typedef struct pCodeOpReg
 {
-  pCodeOp pcop;    // Can be either GPR or SFR
-  int rIdx;        // Index into the register table
-  struct regs *r;
-  int instance;    // byte # of Multi-byte registers
-  struct pBlock *pb;
+	pCodeOp pcop;    // Can be either GPR or SFR
+	int rIdx;        // Index into the register table
+	struct regs *r;
+	int instance;    // byte # of Multi-byte registers
+	struct pBlock *pb;
 } pCodeOpReg;
 
 typedef struct pCodeOpRegBit
 {
-  pCodeOpReg  pcor;       // The Register containing this bit
-  int bit;                // 0-7 bit number.
-  PIC_OPTYPE subtype;     // The type of this register.
-  unsigned int inBitSpace: 1; /* True if in bit space, else
-				 just a bit of a register */
+	pCodeOpReg  pcor;       // The Register containing this bit
+	int bit;                // 0-7 bit number.
+	PIC_OPTYPE subtype;     // The type of this register.
+	unsigned int inBitSpace: 1; /* True if in bit space, else
+	                            just a bit of a register */
 } pCodeOpRegBit;
 
 
 typedef struct pCodeOpRegPtr
 {
-  pCodeOpReg  pcor;       // The Register containing this bit
+	pCodeOpReg  pcor;       // The Register containing this bit
 
-  //  PIC_OPTYPE subtype;     // The type of this register.
-  //  unsigned int inBitSpace: 1; /* True if in bit space, else
+	//  PIC_OPTYPE subtype;     // The type of this register.
+	//  unsigned int inBitSpace: 1; /* True if in bit space, else
 
 } pCodeOpRegPtr;
 
 typedef struct pCodeOpStr /* Only used here for the name of fn being called or jumped to */
 {
-  pCodeOp  pcop;
-  unsigned isPublic: 1; /* True if not static ie extern */
+	pCodeOp  pcop;
+	unsigned isPublic: 1; /* True if not static ie extern */
 } pCodeOpStr;
 
 typedef struct pCodeOpWild
 {
-  pCodeOp pcop;
+	pCodeOp pcop;
 
-  struct pCodeWildBlock *pcwb;
+	struct pCodeWildBlock *pcwb;
 
-  int id;                 /* index into an array of char *'s that will match
-			   * the wild card. The array is in *pcp. */
-  pCodeOp *subtype;       /* Pointer to the Operand type into which this wild
-			   * card will be expanded */
-  pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
-			   * opcode we matched */
+	int id;                 /* index into an array of char *'s that will match
+	                         * the wild card. The array is in *pcp. */
+	pCodeOp *subtype;       /* Pointer to the Operand type into which this wild
+	                         * card will be expanded */
+	pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
+	                         * opcode we matched */
 
 } pCodeOpWild;
 
@@ -394,24 +394,24 @@ typedef struct pCodeOpWild
 
 typedef struct pCode
 {
-  PC_TYPE    type;
+	PC_TYPE    type;
 
-  struct pCode *prev;  // The pCode objects are linked together
-  struct pCode *next;  // in doubly linked lists.
+	struct pCode *prev;  // The pCode objects are linked together
+	struct pCode *next;  // in doubly linked lists.
 
-  unsigned id;         // unique ID number for all pCodes to assist in debugging
-  int seq;             // sequence number
+	unsigned id;         // unique ID number for all pCodes to assist in debugging
+	int seq;             // sequence number
 
-  struct pBlock *pb;   // The pBlock that contains this pCode.
+	struct pBlock *pb;   // The pBlock that contains this pCode.
 
-  /* "virtual functions"
-   *  The pCode structure is like a base class
-   * in C++. The subsequent structures that "inherit"
-   * the pCode structure will initialize these function
-   * pointers to something useful */
-  //  void (*analyze) (struct pCode *_this);
-  void (*destruct)(struct pCode *_this);
-  void (*print)  (FILE *of,struct pCode *_this);
+	/* "virtual functions"
+	 *  The pCode structure is like a base class
+	 * in C++. The subsequent structures that "inherit"
+	 * the pCode structure will initialize these function
+	 * pointers to something useful */
+	//  void (*analyze) (struct pCode *_this);
+	void (*destruct)(struct pCode *_this);
+	void (*print)  (FILE *of,struct pCode *_this);
 
 } pCode;
 
@@ -423,9 +423,9 @@ typedef struct pCode
 typedef struct pCodeComment
 {
 
-  pCode  pc;
+	pCode  pc;
 
-  char *comment;
+	char *comment;
 
 } pCodeComment;
 
@@ -436,11 +436,11 @@ typedef struct pCodeComment
 typedef struct pCodeCSource
 {
 
-  pCode  pc;
+	pCode  pc;
 
-  int  line_number;
-  char *line;
-  char *file_name;
+	int  line_number;
+	char *line;
+	char *file_name;
 
 } pCodeCSource;
 
@@ -460,33 +460,33 @@ typedef struct pCodeCSource
 typedef struct pCodeFlow
 {
 
-  pCode  pc;
+	pCode  pc;
 
-  pCode *end;   /* Last pCode in this flow. Note that
-		   the first pCode is pc.next */
+	pCode *end;   /* Last pCode in this flow. Note that
+	                 the first pCode is pc.next */
 
-  /*  set **uses;   * map the pCode instruction inCond and outCond conditions 
-		 * in this array of set's. The reason we allocate an 
-		 * array of pointers instead of declaring each type of 
-		 * usage is because there are port dependent usage definitions */
-  //int nuses;    /* number of uses sets */
+	/*  set **uses;   * map the pCode instruction inCond and outCond conditions 
+	 * in this array of set's. The reason we allocate an 
+	 * array of pointers instead of declaring each type of 
+	 * usage is because there are port dependent usage definitions */
+	//int nuses;    /* number of uses sets */
 
-  set *from;    /* flow blocks that can send control to this flow block */
-  set *to;      /* flow blocks to which this one can send control */
-  struct pCodeFlow *ancestor; /* The most immediate "single" pCodeFlow object that
-			       * executes prior to this one. In many cases, this 
-			       * will be just the previous */
+	set *from;    /* flow blocks that can send control to this flow block */
+	set *to;      /* flow blocks to which this one can send control */
+	struct pCodeFlow *ancestor; /* The most immediate "single" pCodeFlow object that
+	                             * executes prior to this one. In many cases, this 
+	                             * will be just the previous */
 
-  int inCond;   /* Input conditions - stuff assumed defined at entry */
-  int outCond;  /* Output conditions - stuff modified by flow block */
+	int inCond;   /* Input conditions - stuff assumed defined at entry */
+	int outCond;  /* Output conditions - stuff modified by flow block */
 
-  int firstBank; /* The first and last bank flags are the first and last */
-  int lastBank;  /* register banks used within one flow object */
+	int firstBank; /* The first and last bank flags are the first and last */
+	int lastBank;  /* register banks used within one flow object */
 
-  int FromConflicts;
-  int ToConflicts;
+	int FromConflicts;
+	int ToConflicts;
 
-  set *registers;/* Registers used in this flow */
+	set *registers;/* Registers used in this flow */
 
 } pCodeFlow;
 
@@ -505,9 +505,9 @@ typedef struct pCodeFlow
 */
 typedef struct pCodeFlowLink
 {
-  pCodeFlow  *pcflow;   /* pointer to linked pCodeFlow object */
+	pCodeFlow  *pcflow;   /* pointer to linked pCodeFlow object */
 
-  int bank_conflict;    /* records bank conflicts */
+	int bank_conflict;    /* records bank conflicts */
 
 } pCodeFlowLink;
 
@@ -522,30 +522,30 @@ typedef struct pCodeFlowLink
 typedef struct pCodeInstruction
 {
 
-  pCode  pc;
+	pCode  pc;
 
-  PIC_OPCODE op;        // The opcode of the instruction.
+	PIC_OPCODE op;        // The opcode of the instruction.
 
-  char const * const mnemonic;       // Pointer to mnemonic string
+	char const * const mnemonic;       // Pointer to mnemonic string
 
-  pBranch *from;       // pCodes that execute before this one
-  pBranch *to;         // pCodes that execute after
-  pBranch *label;      // pCode instructions that have labels
+	pBranch *from;       // pCodes that execute before this one
+	pBranch *to;         // pCodes that execute after
+	pBranch *label;      // pCode instructions that have labels
 
-  pCodeOp *pcop;               /* Operand, if this instruction has one */
-  pCodeFlow *pcflow;           /* flow block to which this instruction belongs */
-  pCodeCSource *cline;         /* C Source from which this instruction was derived */
+	pCodeOp *pcop;               /* Operand, if this instruction has one */
+	pCodeFlow *pcflow;           /* flow block to which this instruction belongs */
+	pCodeCSource *cline;         /* C Source from which this instruction was derived */
 
-  unsigned int num_ops;        /* Number of operands (0,1,2 for mid range pics) */
-  unsigned int isModReg:  1;   /* If destination is W or F, then 1==F */
-  unsigned int isBitInst: 1;   /* e.g. BCF */
-  unsigned int isBranch:  1;   /* True if this is a branching instruction */
-  unsigned int isSkip:    1;   /* True if this is a skip instruction */
-  unsigned int isLit:     1;   /* True if this instruction has an literal operand */
+	unsigned int num_ops;        /* Number of operands (0,1,2 for mid range pics) */
+	unsigned int isModReg:  1;   /* If destination is W or F, then 1==F */
+	unsigned int isBitInst: 1;   /* e.g. BCF */
+	unsigned int isBranch:  1;   /* True if this is a branching instruction */
+	unsigned int isSkip:    1;   /* True if this is a skip instruction */
+	unsigned int isLit:     1;   /* True if this instruction has an literal operand */
 
-  PIC_OPCODE inverted_op;      /* Opcode of instruction that's the opposite of this one */
-  unsigned int inCond;   // Input conditions for this instruction
-  unsigned int outCond;  // Output conditions for this instruction
+	PIC_OPCODE inverted_op;      /* Opcode of instruction that's the opposite of this one */
+	unsigned int inCond;   // Input conditions for this instruction
+	unsigned int outCond;  // Output conditions for this instruction
 
 } pCodeInstruction;
 
@@ -557,10 +557,10 @@ typedef struct pCodeInstruction
 typedef struct pCodeLabel
 {
 
-  pCode  pc;
+	pCode  pc;
 
-  char *label;
-  int key;
+	char *label;
+	int key;
 
 } pCodeLabel;
 
@@ -571,20 +571,20 @@ typedef struct pCodeLabel
 typedef struct pCodeFunction
 {
 
-  pCode  pc;
+	pCode  pc;
 
-  char *modname;
-  char *fname;     /* If NULL, then this is the end of
-		      a function. Otherwise, it's the
-		      start and the name is contained
-		      here */
+	char *modname;
+	char *fname;     /* If NULL, then this is the end of
+	                    a function. Otherwise, it's the
+	                    start and the name is contained
+	                    here */
 
-  pBranch *from;       // pCodes that execute before this one
-  pBranch *to;         // pCodes that execute after
-  pBranch *label;      // pCode instructions that have labels
+	pBranch *from;       // pCodes that execute before this one
+	pBranch *to;         // pCodes that execute after
+	pBranch *label;      // pCode instructions that have labels
 
-  int  ncalled;        /* Number of times function is called */
-  unsigned isPublic:1; /* True if the fn is not static and can be called from another module (ie a another c or asm file) */
+	int  ncalled;        /* Number of times function is called */
+	unsigned isPublic:1; /* True if the fn is not static and can be called from another module (ie a another c or asm file) */
 
 } pCodeFunction;
 
@@ -596,19 +596,19 @@ typedef struct pCodeFunction
 typedef struct pCodeWild
 {
 
-  pCodeInstruction  pci;
+	pCodeInstruction  pci;
 
-  int    id;     /* Index into the wild card array of a peepBlock 
-		  * - this wild card will get expanded into that pCode
-		  *   that is stored at this index */
+	int    id;     /* Index into the wild card array of a peepBlock 
+	                * - this wild card will get expanded into that pCode
+	                *   that is stored at this index */
 
-  /* Conditions on wild pcode instruction */
-  int    mustBeBitSkipInst:1;
-  int    mustNotBeBitSkipInst:1;
-  int    invertBitSkipInst:1;
+	/* Conditions on wild pcode instruction */
+	int    mustBeBitSkipInst:1;
+	int    mustNotBeBitSkipInst:1;
+	int    invertBitSkipInst:1;
 
-  pCodeOp *operand;  // Optional operand
-  pCodeOp *label;    // Optional label
+	pCodeOp *operand;  // Optional operand
+	pCodeOp *label;    // Optional label
 
 } pCodeWild;
 
@@ -625,23 +625,23 @@ typedef struct pCodeWild
 
 typedef struct pBlock
 {
-  memmap *cmemmap;   /* The snippet is from this memmap */
-  char   dbName;     /* if cmemmap is NULL, then dbName will identify the block */
-  pCode *pcHead;     /* A pointer to the first pCode in a link list of pCodes */
-  pCode *pcTail;     /* A pointer to the last pCode in a link list of pCodes */
+	memmap *cmemmap;   /* The snippet is from this memmap */
+	char   dbName;     /* if cmemmap is NULL, then dbName will identify the block */
+	pCode *pcHead;     /* A pointer to the first pCode in a link list of pCodes */
+	pCode *pcTail;     /* A pointer to the last pCode in a link list of pCodes */
 
-  struct pBlock *next;      /* The pBlocks will form a doubly linked list */
-  struct pBlock *prev;
+	struct pBlock *next;      /* The pBlocks will form a doubly linked list */
+	struct pBlock *prev;
 
-  set *function_entries;    /* dll of functions in this pblock */
-  set *function_exits;
-  set *function_calls;
-  set *tregisters;
+	set *function_entries;    /* dll of functions in this pblock */
+	set *function_exits;
+	set *function_calls;
+	set *tregisters;
 
-  set *FlowTree;
-  unsigned visited:1;       /* set true if traversed in call tree */
+	set *FlowTree;
+	unsigned visited:1;       /* set true if traversed in call tree */
 
-  unsigned seq;             /* sequence number of this pBlock */
+	unsigned seq;             /* sequence number of this pBlock */
 
 } pBlock;
 
@@ -658,10 +658,10 @@ typedef struct pBlock
 
 typedef struct pFile
 {
-  pBlock *pbHead;     /* A pointer to the first pBlock */
-  pBlock *pbTail;     /* A pointer to the last pBlock */
+	pBlock *pbHead;     /* A pointer to the first pBlock */
+	pBlock *pbTail;     /* A pointer to the last pBlock */
 
-  pBranch *functions; /* A SLL of functions in this pFile */
+	pBranch *functions; /* A SLL of functions in this pFile */
 
 } pFile;
 
@@ -675,17 +675,17 @@ typedef struct pFile
   a pBlock.
 **************************************************/
 typedef struct pCodeWildBlock {
-  pBlock    *pb;
-  struct pCodePeep *pcp;    // pointer back to ... I don't like this...
+	pBlock    *pb;
+	struct pCodePeep *pcp;    // pointer back to ... I don't like this...
 
-  int       nvars;          // Number of wildcard registers in target.
-  char    **vars;           // array of pointers to them
+	int       nvars;          // Number of wildcard registers in target.
+	char    **vars;           // array of pointers to them
 
-  int       nops;           // Number of wildcard operands in target.
-  pCodeOp **wildpCodeOps;   // array of pointers to the pCodeOp's.
+	int       nops;           // Number of wildcard operands in target.
+	pCodeOp **wildpCodeOps;   // array of pointers to the pCodeOp's.
 
-  int       nwildpCodes;    // Number of wildcard pCodes in target/replace
-  pCode   **wildpCodes;     // array of pointers to the pCode's.
+	int       nwildpCodes;    // Number of wildcard pCodes in target/replace
+	pCode   **wildpCodes;     // array of pointers to the pCode's.
 
 } pCodeWildBlock;
 
@@ -701,26 +701,26 @@ typedef struct pCodeWildBlock {
   pCode chain.
 **************************************************/
 typedef struct pCodePeep {
-  pCodeWildBlock target;     // code we'd like to optimize
-  pCodeWildBlock replace;    // and this is what we'll optimize it with.
+	pCodeWildBlock target;     // code we'd like to optimize
+	pCodeWildBlock replace;    // and this is what we'll optimize it with.
 
-  //pBlock *target;
-  //pBlock replace;            // and this is what we'll optimize it with.
+	//pBlock *target;
+	//pBlock replace;            // and this is what we'll optimize it with.
 
 
 
-  /* (Note: a wildcard register is a place holder. Any register
-   * can be replaced by the wildcard when the pcode is being 
-   * compared to the target. */
+	/* (Note: a wildcard register is a place holder. Any register
+	 * can be replaced by the wildcard when the pcode is being 
+	 * compared to the target. */
 
-  /* Post Conditions. A post condition is a condition that
-   * must be either true or false before the peep rule is
-   * accepted. For example, a certain rule may be accepted
-   * if and only if the Z-bit is not used as an input to 
-   * the subsequent instructions in a pCode chain.
-   */
-  unsigned int postFalseCond;  
-  unsigned int postTrueCond;
+	/* Post Conditions. A post condition is a condition that
+	 * must be either true or false before the peep rule is
+	 * accepted. For example, a certain rule may be accepted
+	 * if and only if the Z-bit is not used as an input to 
+	 * the subsequent instructions in a pCode chain.
+	 */
+	unsigned int postFalseCond;  
+	unsigned int postTrueCond;
 
 } pCodePeep;
 
@@ -734,10 +734,10 @@ way the peep hole optimizer behaves
 **************************************************/
 
 enum peepCommandTypes{
-  NOTBITSKIP = 0,
-  BITSKIP,
-  INVERTBITSKIP,
-  _LAST_PEEP_COMMAND_
+	NOTBITSKIP = 0,
+	BITSKIP,
+	INVERTBITSKIP,
+	_LAST_PEEP_COMMAND_
 };
 
 /*************************************************
@@ -746,8 +746,8 @@ enum peepCommandTypes{
 **************************************************/
 
 typedef struct peepCommand {
-  int id;
-  char *cmd;
+	int id;
+	char *cmd;
 } peepCommand;
 
 /*************************************************

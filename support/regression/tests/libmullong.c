@@ -15,7 +15,7 @@
 #    include "../../../../../device/lib/_mullong.c"
 #    define mullong(a,b) mullong_wrapper(a,b)
 #  else
-#    define mullong(a,b) (a*b)
+#    define mullong(a,b) mullong_wrapper(a,b)
 #  endif
 #else
 #  if defined(type_c)
@@ -28,7 +28,9 @@
 /* gcc 2.95.2 on usf-cf-x86-linux-1 (debian 2.2) has a bug with
  * packing structs
  */
-#if defined(PORT_HOST) && defined(type_c) && !defined(WORDS_BIGENDIAN)
+#if defined(PORT_HOST)
+
+#if defined(type_c) && !defined(WORDS_BIGENDIAN)
 struct
 {
   char c1;
@@ -43,9 +45,23 @@ mullong_wrapper (long a, long b)
     /* length of struct ok: use SDCC library */
     return _mullong (a, b);
   else
-    /* buggy gcc: use generic multiplication */
+  {
+      /* buggy gcc: use generic multiplication */
+      return a * b;
+  }
+}
+#endif
+
+#if defined(WORDS_BIGENDIAN)
+
+long
+mullong_wrapper (long a, long b)
+{
     return a * b;
 }
+
+#endif
+
 #endif
 
 void

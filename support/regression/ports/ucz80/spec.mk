@@ -2,8 +2,11 @@
 #
 
 # path to uCsim
-UCZ80 = $(SDCC_DIR)/bin/sz80
-#UCZ80 = $(SDCC_DIR)/bin/s51
+# path to uCsim
+SZ80A = $(SDCC_DIR)/sim/ucsim/sz80.src/sz80
+SZ80B = $(SDCC_DIR)/bin/sz80
+
+UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
 
 SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant

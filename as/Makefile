@@ -19,7 +19,7 @@ install: all install-doc
 
 install-doc:
 	$(INSTALL) -d $(docdir)/aslink
-	cp -f `find doc -maxdepth 1 -not -type d` $(docdir)/aslink
+	cp -f `find doc -maxdepth 1 -type f` $(docdir)/aslink
 
 uninstall:
 	cd $(bindir); rm -f as-z80$(EXEEXT) as-gbz80$(EXEEXT) as-hc08$(EXEEXT)

@@ -1,3 +1,21 @@
+2004-01-26  Michael Hope  <michaelh@juju.net.nz>
+
+	* support/regression/tests/literalop.c (mulWrapper): Added a
+	wrapper to remove integer overflow warnings.
+
+	* support/regression/tests/float_trans.c: Made work on host.
+
+	* support/regression/ports/ucz80/spec.mk (UCZ80): Made detect the
+	location of sz80.
+
+	* support/regression/generate-cases.py (main): Changed from inline
+	to a main method.
+
+	* doc/Makefile (install): Changed to depth first to get rid of
+	missing directory install warning.
+
+	* as/Makefile (install-doc): Made work on Mac.
+
 2004-01-25 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCast.c: added an additional type flow in decorateType() of

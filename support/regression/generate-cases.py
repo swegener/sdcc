@@ -176,12 +176,17 @@ class InstanceGenerator:
         # Remove the temporary file
         os.remove(self.tmpname)
 
-# Check and parse the command line arguments
-if len(sys.argv) < 3:
-    # PENDING: How to throw an error?
-    print "usage: generate-cases.py template.c outdir"
+def main():
+    # Check and parse the command line arguments
+    if len(sys.argv) < 3:
+        print "usage: generate-cases.py template.c outdir"
+        sys.exit(-1)
+        
+    # Input name is the first arg.
 
-# Input name is the first arg.
+    s = InstanceGenerator(sys.argv[1])
+    s.generate()
 
-s = InstanceGenerator(sys.argv[1])
-s.generate()
+if __name__ == '__main__':
+    main()
+    

@@ -11,7 +11,7 @@
 void
 testTrans(void)
 {
-#ifndef SDCC_z80
+#if !defined(SDCC_z80) && !PORT_HOST
 # ifdef SQRTF
       ASSERT(fabsf (sqrtf (5.0)     -   2.23606801) < 0.00001);
 # endif

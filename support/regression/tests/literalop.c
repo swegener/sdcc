@@ -40,6 +40,12 @@ volatile utype vu;
 
 unsigned LONG t1, t2;
 
+int
+mulWrapper(int a, int b)
+{
+    return a * b;
+}
+
 void
 testOpOp(void)
 {
@@ -77,7 +83,7 @@ testOpOp(void)
   ASSERT((stype)  1 * (utype) 0xfffffff7 == (utype) 0xfffffff7);
 
   ASSERT((unsigned char ) 0xfffffff8 * (unsigned char ) 0xfffffff7 == 0xef48);
-  ASSERT((unsigned short) 0xfffffff8 * (unsigned short) 0xfffffff7 == (sizeof(int) == 2 ? 0x0048 : 0xffef0048));
+  ASSERT(mulWrapper((unsigned short) 0xfffffff8, (unsigned short) 0xfffffff7) == (sizeof(int) == 2 ? 0x0048 : (unsigned int)0xffef0048));
   ASSERT((unsigned LONG ) 0xfffffff8 * (unsigned LONG ) 0xfffffff7 == 0x0048);
 
   ASSERT((stype         ) 0xfffffff8 * (stype         ) 0xfffffff7 == 72);
@@ -108,8 +114,8 @@ testOpOp(void)
   if (sizeof (int) == 2)
     ASSERT(0x7fff * (unsigned char) 2 < 1);
   else
-    ASSERT(0x7fffffff * (unsigned char) 2 < 1);
-  ASSERT(0x7fffffff  * (unsigned short) 2 < 1);
+    ASSERT(mulWrapper(0x7fffffff, (unsigned char) 2) < 1);
+  ASSERT(mulWrapper(0x7fffffff, (unsigned short) 2) < 1);
 
   /* mul icode: operandOperation() */
   s = -3;

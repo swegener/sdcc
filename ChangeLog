@@ -1,6 +1,7 @@
 2004-03-29 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (addCast): don't cast float to char
+	* device/lib/libsdcc.lib: added _memmove
 
 2004-03-28 Bernhard Held <bernhard AT bernhardheld.de>
 

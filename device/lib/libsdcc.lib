@@ -25,6 +25,7 @@ _strstr
 _strtok
 _memcmp
 _memcpy
+_memmove
 _memset
 _gptrget
 _gptrgetc

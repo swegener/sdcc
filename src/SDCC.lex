@@ -117,6 +117,7 @@ struct options  save_options  ;
 "if"           { count(); return(IF); }
 "int"          { count(); return(INT); }
 "interrupt"    { count(); return(INTERRUPT);}
+"banked"       { count(); TKEYWORD(BANKED);}
 "long"	       { count(); return(LONG); }
 "near"	       { count(); TKEYWORD(DATA);}
 "pdata"        { count(); TKEYWORD(PDATA); }

@@ -1756,6 +1756,8 @@ static void emitCall(iCode *ic, bool ispcall)
 /*-----------------------------------------------------------------*/
 static void genCall (iCode *ic)
 {
+    link *detype = getSpec(operandType(IC_LEFT(ic)));
+    if (IS_BANKED(detype)) emit2("; call to a banked function");
     emitCall(ic, FALSE);
 }
 
@@ -1798,12 +1800,13 @@ static void genFunction (iCode *ic)
     /* PENDING: portability. */
     emit2("__%s_start:", sym->rname);
     emit2("!functionlabeldef", sym->rname);
-
+   
     fetype = getSpec(operandType(IC_LEFT(ic)));
-
+    
     /* if critical function then turn interrupts off */
     if (SPEC_CRTCL(fetype))
 	emit2("!di");
+    if (SPEC_BANKED(fetype)) emit2("; Iam banked");
 
     /* if this is an interrupt service routine then
     save acc, b, dpl, dph  */

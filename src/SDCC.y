@@ -77,7 +77,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %token <yyint> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <yyint> XOR_ASSIGN OR_ASSIGN
 %token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR AT SBIT
-%token REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
+%token REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL BANKED
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID BIT
 %token STRUCT UNION ENUM ELIPSIS RANGE FAR _XDATA _CODE _GENERIC _NEAR _PDATA _IDATA _EEPROM
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN 
@@ -164,6 +164,10 @@ using_reentrant_interrupt
    |  CRITICAL       {  $$ = newLink ();
                         $$->class = SPECIFIER   ;
                         SPEC_CRTCL($$) = 1;
+                     }
+   |  BANKED         {$$ = newLink ();
+                        $$->class = SPECIFIER   ;
+                        SPEC_BANKED($$) = 1;
                      }
    |  Interrupt_storage
                      {

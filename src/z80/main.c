@@ -20,6 +20,7 @@ static struct {
 
 static char *_keywords[] = {
     "sfr",
+    "banked",
     NULL 
 };
 

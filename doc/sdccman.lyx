@@ -7027,18 +7027,18 @@ CALLEE-SAVES function1[,function2[,function3...]] - The compiler by default
  uses a caller saves convention for register saving across function calls,
  however this can cause unneccessary register pushing & popping when calling
  small functions from larger functions.
- This option can be used to switch the register saving convention for the
- function names specified.
+ This option can be used to switch off the register saving convention for
+ the function names specified.
  The compiler will not save registers when calling these functions, extra
- code will be generated at the entry & exit for these functions to save
- & restore the registers used by these functions, this can SUBSTANTIALLY
+ code need to be manually inserted at the entry & exit for these functions
+ to save & restore the registers used by these functions, this can SUBSTANTIALLY
  reduce code & improve run time performance of the generated code.
- In future the compiler (with interprocedural analysis) will be able to
- determine the appropriate scheme to use for each function call.
+ In the future the compiler (with interprocedural analysis) may be able
+ to determine the appropriate scheme to use for each function call.
  If ---callee-saves command line option is used, the function names specified
  in #pragma\SpecialChar ~
-CALLEE-SAVES is appended to the list of functions specified inthe
- command line.
+CALLEE-SAVES is appended to the list of functions specified in
+ the command line.
 \layout Standard
 
 The pragma's are intended to be used to turn-off certain optimizations which

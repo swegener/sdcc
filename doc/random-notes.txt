@@ -1,7 +1,22 @@
 Random notes
 ------------
-
 A random set of notes about sdcc and how it works.
+
+Sandeep:
+--------
+Adding memory maps for AVR, setup default map for
+local & global variables in port.h will be initialised
+by the _<port>_finaliseOptions() [good functions]..some
+kludges remain because of the "overlay" segment for 8051.
+
+The memory segment stuff will have to be made more flexible.
+Currently there does not seem to be a 1-to-1 correspondence 
+between storage class & memory map. (should there be??).
+
+Also Added check for memory map in SDCCmem.c allocLocal
+and allocglobal for "eeprom" memory space (AVR).
+
+
 
 Michael:
 --------

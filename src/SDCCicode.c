@@ -757,6 +757,24 @@ bool isOperandInFarSpace (operand *op)
 }
 
 /*-----------------------------------------------------------------*/
+/* isOperandOnStack - will return true if operand is on stack      */
+/*-----------------------------------------------------------------*/
+bool isOperandOnStack(operand *op)
+{
+    link *etype;
+
+    if (!op)
+	return FALSE;
+
+    if (!IS_SYMOP(op))
+	return FALSE ;
+
+    etype = getSpec(operandType(op));
+
+    return ((IN_STACK(etype)) ? TRUE : FALSE);
+}
+
+/*-----------------------------------------------------------------*/
 /* operandLitValue - literal value of an operand                   */
 /*-----------------------------------------------------------------*/
 double operandLitValue ( operand *op )
@@ -2307,7 +2325,7 @@ static void geniCodeSEParms (ast *parms)
 /*-----------------------------------------------------------------*/
 /* geniCodeParms - generates parameters                            */
 /*-----------------------------------------------------------------*/
-static void geniCodeParms ( ast *parms , int *stack, link *fetype)
+static void geniCodeParms ( ast *parms , int *stack, link *fetype, symbol *func)
 {
     iCode *ic ;
     operand *pval ; 
@@ -2317,8 +2335,8 @@ static void geniCodeParms ( ast *parms , int *stack, link *fetype)
     
     /* if this is a param node then do the left & right */
     if (parms->type == EX_OP && parms->opval.op == PARAM) {
-	geniCodeParms (parms->left, stack,fetype) ;
-	geniCodeParms (parms->right, stack,fetype);
+	geniCodeParms (parms->left, stack,fetype,func) ;
+	geniCodeParms (parms->right, stack,fetype,func);
 	return ;
     }
     
@@ -2342,8 +2360,7 @@ static void geniCodeParms ( ast *parms , int *stack, link *fetype)
 
     /* if register parm then make it a send */
     if (((parms->argSym && IS_REGPARM(parms->argSym->etype)) ||
-	IS_REGPARM(parms->etype)) && 
-	!IS_RENT(fetype)) {
+	IS_REGPARM(parms->etype)) && !func->hasVargs ) {
 	ic = newiCode(SEND,pval,NULL);
 	ADDTOCHAIN(ic);
     } else {
@@ -2383,7 +2400,7 @@ operand *geniCodeCall (operand *left, ast *parms)
     geniCodeSEParms ( parms );
 
     /* first the parameters */
-    geniCodeParms ( parms , &stack , getSpec(operandType(left)));
+    geniCodeParms ( parms , &stack , getSpec(operandType(left)), OP_SYMBOL(left));
     
     /* now call : if symbol then pcall */
     if (IS_ITEMP(left)) 

@@ -63,7 +63,6 @@ static char *spname ;
 char *fReturnAVR[] = {"r16","r17","r18","r19" };
 unsigned fAVRReturnSize = 4; /* shared with ralloc.c */
 char **fAVRReturn = fReturnAVR;
-
 static short rbank = -1;
 static char *larray[4] = {"lo8","hi8","hlo8","hhi8"};
 static char *tscr[4] = {"r0","r1","r24","r25"};
@@ -1303,7 +1302,7 @@ static void genCall (iCode *ic)
 	/* if send set is not empty the assign */
 	if (_G.sendSet) {
 		iCode *sic ;
-
+		int rnum = 16;
 		for (sic = setFirstItem(_G.sendSet) ; sic ; 
 		     sic = setNextItem(_G.sendSet)) {
 			int size, offset = 0;
@@ -1311,10 +1310,10 @@ static void genCall (iCode *ic)
 			size = AOP_SIZE(IC_LEFT(sic));
 			while (size--) {
 				char *l = aopGet(AOP(IC_LEFT(sic)),offset);
-				if (strcmp(l,fAVRReturn[offset]))
-					emitcode("mov","%s,%s",
-						 fAVRReturn[offset],
-						 l);
+				char *b = buffer;
+				sprintf(buffer,"r%d",rnum++);
+				if (strcmp(l,b))
+					emitcode("mov","%s,%s",b,l);
 				offset++;
 			}
 			freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
@@ -1365,7 +1364,7 @@ static void genPcall (iCode *ic)
 	/* if send set is not empty the assign */
 	if (_G.sendSet) {
 		iCode *sic ;
-
+		int rnum = 16;
 		for (sic = setFirstItem(_G.sendSet) ; sic ; 
 		     sic = setNextItem(_G.sendSet)) {
 			int size, offset = 0;
@@ -1373,10 +1372,10 @@ static void genPcall (iCode *ic)
 			size = AOP_SIZE(IC_LEFT(sic));
 			while (size--) {
 				char *l = aopGet(AOP(IC_LEFT(sic)),offset);
-				if (strcmp(l,fAVRReturn[offset]))
-					emitcode("mov","%s,%s",
-						 fAVRReturn[offset],
-						 l);
+				char *b = buffer;
+				sprintf(b,"r%d",rnum++);
+				if (strcmp(l,b))
+					emitcode("mov","%s,%s",b,l);
 				offset++;
 			}
 			freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
@@ -2064,6 +2063,7 @@ static int revavrcnd(int type)
 		if (rar[i].rtype== type) return rar[i].type;
 	}
 	assert(1); /* cannot happen */
+	return 0;  /* makes the compiler happy */
 }
 
 static char *br_name[4] = {"breq","brne","brlt","brge"};
@@ -2487,6 +2487,20 @@ static void genBitWise(iCode *ic, iCode *ifx, int bitop)
 	samerl = sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic)));
 	samerr = sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)));
 	while (size--) {
+		if (AOP_TYPE(right) == AOP_LIT) {
+			unsigned int lit = (int) floatFromVal (AOP(right)->aopu.aop_lit);
+			if (((lit >> (8*offset)) & 0xff) == 0) {
+				if (bitop == AVR_AND) {
+					aopPut(AOP(result),zero,offset++);
+					continue;
+				} else if (bitop == AVR_OR) {
+					if (!samerl)
+						aopPut(AOP(result),aopGet(AOP(left),offset),offset);
+					offset++;
+					continue;
+				}
+			}
+		}
 		if (samerl) {
 			if (AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT && (bitop == AVR_AND || bitop == AVR_OR)) {
 				emitcode(bopnames_lit[bitop],"%s,%s(%d)",aopGet(AOP(IC_LEFT(ic)),offset),
@@ -2577,7 +2591,6 @@ static void genRotC (iCode *ic, int lr)
 {
 	operand *left , *result ;
 	int size, offset = 0;
-	char *l;    
 
 	/* rotate right with carry */
 	left = IC_LEFT(ic);
@@ -2717,46 +2730,21 @@ static void genShiftLeftLit (iCode *ic)
 			lByteZ = 1;
 		}
 		if (shCount >= 4) {
-			if (lByteZ) {
-				emitcode("swap","%s",aopGet(AOP(result),1));
-				emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
-				shCount -= 4;				
-			} else {
-				int ssh;
-				shCount -= 4;
-				ssh = shCount;
-				if (sameRegs(AOP(left),AOP(result))) {
-					emitcode("mov","r1,%s",aopGet(AOP(left),0));
-					emitcode("swap","%s",aopGet(AOP(left),0));
-					emitcode("andi","%s,0xf0",aopGet(AOP(left),0));
-					emitcode("andi","r1,0x0f");
-					while(shCount--) {
-						emitcode("lsl","%s",aopGet(AOP(left),0));
-						emitcode("lsl","r1");
-					}
-					emitcode("swap","%s",aopGet(AOP(result),1));
-					emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
-					while (ssh--) emitcode("lsl","%s",aopGet(AOP(result),1));
-					emitcode("or","%s,r1",aopGet(AOP(result),1));
-					shCount =0;
-				} else {
-					MOVR0(aopGet(AOP(left),0));
-					emitcode("mov","r1,r0");
-					emitcode("swap","r0");
-					emitcode("andi","r0,0xf0");
-					emitcode("andi","r1,0x0f");
-					while(shCount--) {
-						emitcode("lsl","r0");
-						emitcode("lsl","r1");
-					}
-					aopPut(AOP(result),"r0",0);
-					aopPut(AOP(result),aopGet(AOP(left),1),1);
-					emitcode("swap","%s",aopGet(AOP(result),1));
-					emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
-					while (ssh--) emitcode("lsl","%s",aopGet(AOP(result),1));
-					emitcode("or","%s,r1",aopGet(AOP(result),1));
-					shCount =0;
-				}
+			shCount -= 4;
+			if (!sameRegs(AOP(left),AOP(result))) {
+				aopPut(AOP(result),aopGet(AOP(left),0),0);
+				aopPut(AOP(result),aopGet(AOP(left),1),1);					
+			}
+			emitcode("mov","r1,%s",aopGet(AOP(result),0));
+			emitcode("swap","%s",aopGet(AOP(result),0));
+			emitcode("andi","%s,0xf0",aopGet(AOP(result),0));
+			emitcode("andi","r1,0x0f");
+			emitcode("swap","%s",aopGet(AOP(result),1));
+			emitcode("andi","%s,0xf0",aopGet(AOP(result),1));
+			emitcode("or","%s,r1",aopGet(AOP(result),1));
+			while(shCount--) {
+				emitcode("lsl","%s",aopGet(AOP(result),0));
+				emitcode("rol","%s",aopGet(AOP(result),1));
 			}
 		}
 		if (!lByteZ && !sameRegs(AOP(result),AOP(left)) && shCount) {
@@ -2843,7 +2831,6 @@ static void genShiftLeftLit (iCode *ic)
 				break;
 			}
 		}
-
 	}
 
  release:	
@@ -2859,8 +2846,7 @@ static void genLeftShift (iCode *ic)
 {
 	operand *left,*right, *result;
 	int size, offset;
-	char *l;
-	symbol *tlbl , *tlbl1;
+	symbol *tlbl;
 
 	right = IC_RIGHT(ic);
 	left  = IC_LEFT(ic);
@@ -2907,6 +2893,210 @@ static void genLeftShift (iCode *ic)
 	else emitcode("dec","r24");
 	emitcode("brne","L%05d",tlbl->key);
 	
+	freeAsmop(left,NULL,ic,TRUE);
+	freeAsmop(right,NULL,ic,TRUE);
+	freeAsmop(result,NULL,ic,TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* genShiftRightLit - generate for right shift with known count    */
+/*-----------------------------------------------------------------*/
+static void genShiftRightLit (iCode *ic)
+{
+	operand *left = IC_LEFT(ic)
+		,*right= IC_RIGHT(ic)
+		,*result=IC_RESULT(ic);
+	int size , shCount, offset =0;
+	int hByteZ=0;
+	link *letype = getSpec(operandType(left));
+	int sign = !SPEC_USIGN(letype);
+
+	right = IC_RIGHT(ic);
+	left  = IC_LEFT(ic);
+	result = IC_RESULT(ic);
+
+	aopOp(left,ic,FALSE);
+	aopOp(result,ic,FALSE);
+	size = AOP_SIZE(result);
+	shCount = (int)floatFromVal (AOP(right)->aopu.aop_lit);
+
+	/* if signed then give up and use a loop to shift */	
+	if (sign) {
+		symbol *tlbl ;
+		if (!sameRegs(AOP(left),AOP(result))) {
+			while (size--) {
+				aopPut(AOP(result),aopGet(AOP(left),offset),offset);
+				offset++;
+			}
+			size = 	size = AOP_SIZE(result);
+			offset = 0;
+		}				
+		/* be as economical as possible */
+		if (shCount <= 4) {
+			offset = size -1;
+			while (shCount--) {
+				offset = size -1;
+				size = AOP_SIZE(result);
+				while (size--) {
+					if (offset == (size-1))
+						emitcode("asr","%s",aopGet(AOP(result),offset));
+					else
+						emitcode("lsr","%s",aopGet(AOP(result),offset));
+					offset--;
+				}
+			}
+		} else {
+			emitcode("ldi","r24,lo8(%d)",shCount);
+			tlbl = newiTempLabel(NULL);
+			emitcode("","L%05d:",tlbl->key);
+			offset = size -1;
+			while (size--) {
+				if (offset == (size-1)) emitcode("asr","%s",aopGet(AOP(result),offset));
+				else emitcode("lsr","%s",aopGet(AOP(result),offset));
+				offset--;
+			}
+			emitcode("dec","r24");
+			emitcode("brne","L%05d",tlbl->key);
+		}
+		goto release;
+	}
+	if (shCount > (size*8 -1)) {
+		while (size--) aopPut(AOP(result),zero,offset++);
+		goto release;
+	}
+	/* for unsigned we can much more efficient */
+	switch (size) {
+	case 1:
+		if (!sameRegs(AOP(left),AOP(result)))
+			aopPut(AOP(result),aopGet(AOP(left),0),0);
+		if (shCount >= 4) {
+			emitcode("swap","%s",aopGet(AOP(result),0));
+			emitcode("andi","%s,0x0f");
+			shCount -= 4;
+		}
+		while (shCount--)
+			emitcode("lsr","%s",aopGet(AOP(result),0));
+		break;
+	case 2:
+		if (shCount >= 12) {
+			aopPut(AOP(result),aopGet(AOP(left),1),0);
+			aopPut(AOP(result),zero,1);
+			emitcode("swap","%s",aopGet(AOP(result),0));
+			emitcode("andi","%s,0x0f",aopGet(AOP(result),0));
+			shCount -= 12;
+			hByteZ = 1;
+		}
+		if (shCount >= 8) {
+			aopPut(AOP(result),aopGet(AOP(left),1),0);
+			aopPut(AOP(result),zero,1);
+			shCount -= 8;
+			hByteZ = 1;
+		}
+		if (shCount >= 4) {
+			shCount -= 4;
+			if (!sameRegs(AOP(left),AOP(result))) {
+				aopPut(AOP(result),aopGet(AOP(left),0),0);
+				aopPut(AOP(result),aopGet(AOP(left),1),1);					
+			}
+			emitcode("mov","r1,%s",aopGet(AOP(result),1));
+			emitcode("swap","%s",aopGet(AOP(result),0));
+			emitcode("andi","%s,0x0f",aopGet(AOP(result),0));
+			emitcode("andi","r1,0xf0");
+			emitcode("or","%s,r1",aopGet(AOP(result),0));
+			emitcode("swap","%s",aopGet(AOP(result),1));
+			emitcode("andi","%s,0x0f",aopGet(AOP(result),1));
+			while(shCount--) {
+				emitcode("lsr","%s",aopGet(AOP(result),1));
+				emitcode("ror","%s",aopGet(AOP(result),0));
+			}
+			
+		}
+		if (!hByteZ && !sameRegs(AOP(result),AOP(left)) && shCount) {
+			offset = 0;
+			while(size--) {
+				aopPut(AOP(result),aopGet(AOP(left),offset),offset);
+				offset++;
+			}
+		}
+		while (shCount--) {
+			if (hByteZ) {
+				emitcode("lsr","%s",aopGet(AOP(result),0));
+			} else {
+				emitcode("lsr","%s",aopGet(AOP(result),1));
+				emitcode("ror","%s",aopGet(AOP(result),0));
+			}
+		}
+		break;
+		
+	case 3:
+		assert("shifting generic pointer ?\n");
+		break;
+	case 4:
+		/* 32 bits we do only byte boundaries */
+		if (shCount >= 24) {
+			aopPut(AOP(result),aopGet(AOP(left),3),0);
+			aopPut(AOP(result),zero,1);
+			aopPut(AOP(result),zero,2);
+			aopPut(AOP(result),zero,3);
+			hByteZ = 3;
+			shCount -= 24;
+		}
+		if (shCount >= 16) {
+			aopPut(AOP(result),aopGet(AOP(left),3),1);
+			aopPut(AOP(result),aopGet(AOP(left),2),0);
+			aopPut(AOP(result),zero,2);
+			aopPut(AOP(result),zero,3);
+			hByteZ = 2;
+			shCount -= 16;
+		}
+		if (shCount >= 8) {
+			aopPut(AOP(result),aopGet(AOP(left),1),0);
+			aopPut(AOP(result),aopGet(AOP(left),2),1);
+			aopPut(AOP(result),aopGet(AOP(left),3),2);
+			aopPut(AOP(result),zero,3);
+			shCount -= 8;
+			hByteZ = 1;
+		}
+		if (!hByteZ && !sameRegs(AOP(left),AOP(right))) {
+			offset = 0;
+			while (size--) {
+				aopPut(AOP(result),aopGet(AOP(left),offset),offset);
+				offset++;
+			}
+			offset = 0;
+			size = AOP_SIZE(result);
+		}
+		if (shCount) {
+			switch (hByteZ) {
+			case 0:
+				while (shCount--) {
+					emitcode("lsr","%s",aopGet(AOP(result),3));
+					emitcode("ror","%s",aopGet(AOP(result),2));
+					emitcode("ror","%s",aopGet(AOP(result),1));
+					emitcode("ror","%s",aopGet(AOP(result),0));
+				}
+				break;
+			case 1:
+				while (shCount--) {
+					emitcode("lsr","%s",aopGet(AOP(result),2));
+					emitcode("ror","%s",aopGet(AOP(result),1));
+					emitcode("ror","%s",aopGet(AOP(result),0));
+				}
+				break;
+			case 2:
+				while (shCount--) {
+					emitcode("lsr","%s",aopGet(AOP(result),1));
+					emitcode("ror","%s",aopGet(AOP(result),0));
+				}
+				break;
+			case 3:
+				while (shCount--) {
+					emitcode("lsr","%s",aopGet(AOP(result),0));
+				}
+				break;
+			}
+		}
+	}		
  release:
 	freeAsmop(left,NULL,ic,TRUE);
 	freeAsmop(right,NULL,ic,TRUE);
@@ -2919,15 +3109,99 @@ static void genLeftShift (iCode *ic)
 static void genRightShift (iCode *ic)
 {
 	operand *right, *left, *result;
-	link *retype ;
+	link *letype ;
 	int size, offset;
-	char *l;
-	symbol *tlbl, *tlbl1 ;
+	int sign = 0, first =1;
+	symbol *tlbl;
 
-
- release:
+	aopOp(right=IC_RIGHT(ic),ic,FALSE);
+	if (AOP_TYPE(right) == AOP_LIT) {
+		genShiftRightLit(ic);
+		return ;
+	}
+	/* unknown count */
+	if (AOP_SIZE(right) > 1) {
+		if (isRegPair(AOP(right))) {
+			emitcode("movw","r24,%s",aopGet(AOP(right),0));
+		} else {
+			emitcode("mov","r24,%s",aopGet(AOP(right),0));
+			emitcode("mov","r25,%s",aopGet(AOP(right),1));
+		}
+	} else {
+		emitcode("mov","r24,%s",aopGet(AOP(right),0));
+	}
+	aopOp(left=IC_LEFT(ic),ic,FALSE);
+	aopOp(result=IC_RESULT(ic),ic,FALSE);
+	size = AOP_SIZE(result);
+	tlbl = newiTempLabel(NULL);
+	emitcode("","L%05d:",tlbl->key);
+	offset = size -1;
+	letype = getSpec(operandType(left));
+	sign = !SPEC_USIGN(letype);
+	if (!sameRegs(AOP(left),AOP(result))) {
+		while (size--) {
+			aopPut(AOP(result),aopGet(AOP(left),offset),offset);
+			offset++;
+		}
+		size = AOP_SIZE(result);
+	}
+	size = AOP_SIZE(result);
+	while (size--) {
+		if (first) {
+			if (sign) emitcode("asr","%s",aopGet(AOP(result),offset));
+			else emitcode("lsr","%s",aopGet(AOP(result),offset));
+			first = 0;
+		}
+		else emitcode("ror","%s",aopGet(AOP(result),offset));
+		offset--;
+	}
+	if (AOP_SIZE(right) > 1) emitcode("sbiw","r24,1");
+	else emitcode("dec","r24");
+	emitcode("brne","L%05d",tlbl->key);
+	
 	freeAsmop(left,NULL,ic,TRUE);
 	freeAsmop(result,NULL,ic,TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* R0Rsh - shift right r0 by known count                           */
+/*-----------------------------------------------------------------*/
+static void R0Rsh (int shCount)
+{
+	shCount &= 0x0007;              // shCount : 0..7
+	switch(shCount){
+        case 0 :
+		break;
+        case 1 :
+		emitcode("lsr","r0");
+		break;
+        case 2 :
+		emitcode("lsr","r0");
+		emitcode("lsr","r0");
+		break;
+        case 3 :
+		emitcode("swap","r0");	    
+		emitcode("lsl","r0");
+		break;
+        case 4 :
+		emitcode("swap","r0");
+		break;
+        case 5 :
+		emitcode("swap","r0");
+		emitcode("lsr","r0");
+		break;
+        case 6 :
+		emitcode("swap","r0");
+		emitcode("lsr","r0");
+		emitcode("lsr","r0");
+		break;
+        case 7 :
+		emitcode("swap","r0");
+		emitcode("lsr","r0");
+		emitcode("lsr","r0");
+		emitcode("lsr","r0");
+		break;
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -2947,39 +3221,31 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 
 	case POINTER:
 	case IPOINTER:
-		emitcode("mov","a,@%s",rname);
-		break;
-	
 	case PPOINTER:
-		emitcode("movx","a,@%s",rname);
-		break;
-	
 	case FPOINTER:
-		emitcode("movx","a,@dptr");
+		emitcode("ld","r0,%s+",rname);
 		break;
 
 	case CPOINTER:
-		emitcode("clr","a");
-		emitcode("movc","a","@a+dptr");
+		emitcode("ldm","r0,%s+",rname);
 		break;
 
 	case GPOINTER:
-		emitcode("lcall","__gptrget");
+		emitcode("call","__gptrget_pi");
 		break;
 	}
 
 	/* if we have bitdisplacement then it fits   */
 	/* into this byte completely or if length is */
 	/* less than a byte                          */
-	if ((shCnt = SPEC_BSTR(etype)) || 
-	    (SPEC_BLEN(etype) <= 8))  {
-
-				/* shift right acc */
-		//		AccRsh(shCnt);
-
-		emitcode("anl","a,#0x%02x",
+	if ((shCnt = SPEC_BSTR(etype)) || (SPEC_BLEN(etype) <= 8))  {
+		
+		/* shift right r0 */
+		R0Rsh(shCnt);
+		emitcode("andi","r0,0x%02x",
 			 ((unsigned char) -1)>>(8 - SPEC_BLEN(etype)));
-		aopPut(AOP(result),"a",offset);
+
+		aopPut(AOP(result),"r0",offset);
 		return ;
 	}
 
@@ -2992,29 +3258,17 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 		switch (ptype) {
 		case POINTER:
 		case IPOINTER:
-			emitcode("inc","%s",rname);
-			emitcode("mov","a,@%s",rname);
-			break;
-	    
 		case PPOINTER:
-			emitcode("inc","%s",rname);
-			emitcode("movx","a,@%s",rname);
-			break;
-
 		case FPOINTER:
-			emitcode("inc","dptr");
-			emitcode("movx","a,@dptr");
+			emitcode("ld","r0,%s+",rname);
 			break;
 	    
 		case CPOINTER:
-			emitcode("clr","a");
-			emitcode("inc","dptr");
-			emitcode("movc","a","@a+dptr");
+			emitcode("ldm","r0,%s+",rname);
 			break;
 	    
 		case GPOINTER:
-			emitcode("inc","dptr");
-			emitcode("lcall","__gptrget");
+			emitcode("lcall","__gptrget_pi");
 			break;
 		}
 
@@ -3023,13 +3277,13 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
 		if ( rlen <= 0 )
 			break ;
 	
-		aopPut(AOP(result),"a",offset++);
+		aopPut(AOP(result),"r0",offset++);
        			      
 	}
     
 	if (rlen) {
-		emitcode("anl","a,#0x%02x",((unsigned char)-1)>>(-rlen));
-		aopPut(AOP(result),"a",offset);	       
+		emitcode("andi","r0,#0x%02x",((unsigned char)-1)>>(-rlen));
+		aopPut(AOP(result),"r0",offset);	       
 	}
     
 	return ;
@@ -3056,7 +3310,7 @@ static void genDataPointerGet (operand *left,
 			sprintf(buffer,"(%s + %d)",l+1,offset);
 		else
 			sprintf(buffer,"%s",l+1);
-		aopPut(AOP(result),buffer,offset++);
+		emitcode("lds","%s,%s",aopGet(AOP(result),offset++),buffer);
 	}
 
 	freeAsmop(left,NULL,ic,TRUE);

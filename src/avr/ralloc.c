@@ -1704,12 +1704,8 @@ static iCode *packRegsForOneuse (iCode *ic, operand *op , eBBlock *ebp)
     if (!IS_SYMOP(op))
 	return NULL;
     
-    /* only upto 2 bytes since we cannot predict
-       the usage of b, & acc */
-    if (getSize(operandType(op)) > fAVRReturnSize  &&
-	ic->op != RETURN             &&
-	ic->op != SEND)
-	return NULL;
+    /* returns only */
+    if (ic->op != RETURN) return NULL;
 
     /* this routine will mark the a symbol as used in one 
        instruction use only && if the defintion is local 
@@ -1835,138 +1831,6 @@ static bool isBitwiseOptimizable (iCode *ic)
 	return TRUE ;
     else
 	return FALSE ;    
-}
-
-/*-----------------------------------------------------------------*/
-/* packRegsForAccUse - pack registers for acc use                  */
-/*-----------------------------------------------------------------*/
-static void packRegsForAccUse (iCode *ic)
-{
-    iCode *uic;
-    
-    /* if + or - then it has to be one byte result */
-    if ((ic->op == '+' || ic->op == '-')
-	&& getSize(operandType(IC_RESULT(ic))) > 1)
-	return ;
-    
-    /* if shift operation make sure right side is not a literal */
-    if (ic->op == RIGHT_OP  &&
-	( isOperandLiteral(IC_RIGHT(ic)) ||
-	  getSize(operandType(IC_RESULT(ic))) > 1))
-	return ;
-	
-    if (ic->op == LEFT_OP &&        
-	( isOperandLiteral(IC_RIGHT(ic)) ||
-	  getSize(operandType(IC_RESULT(ic))) > 1))
-	return ;
-	
-    if (IS_BITWISE_OP(ic) &&
-	getSize(operandType(IC_RESULT(ic))) > 1)
-	return ;
-	    
-	
-    /* has only one definition */
-    if (bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1)
-	return ;
-
-    /* has only one use */
-    if (bitVectnBitsOn(OP_USES(IC_RESULT(ic))) > 1)
-	return ;
-
-    /* and the usage immediately follows this iCode */
-    if (!(uic = hTabItemWithKey(iCodehTab,
-				bitVectFirstBit(OP_USES(IC_RESULT(ic))))))
-	return ;
-
-    if (ic->next != uic)
-	return ;
-    
-    /* if it is a conditional branch then we definitely can */
-    if (uic->op == IFX  ) 
-	goto accuse;
-
-    if ( uic->op == JUMPTABLE )
-	return ;
-
-    /* if the usage is not is an assignment
-       or an arithmetic / bitwise / shift operation then not */
-    if (POINTER_SET(uic) && 
-	getSize(aggrToPtr(operandType(IC_RESULT(uic)),FALSE)) > 1)
-	return;
-
-    if (uic->op != '=' && 
-	!IS_ARITHMETIC_OP(uic) &&
-	!IS_BITWISE_OP(uic)    &&
-	uic->op != LEFT_OP &&
-	uic->op != RIGHT_OP )
-	return;
-
-    /* if used in ^ operation then make sure right is not a 
-       literl */
-    if (uic->op == '^' && isOperandLiteral(IC_RIGHT(uic)))
-	return ;
-
-    /* if shift operation make sure right side is not a literal */
-    if (uic->op == RIGHT_OP  &&
-	( isOperandLiteral(IC_RIGHT(uic)) ||
-	  getSize(operandType(IC_RESULT(uic))) > 1))
-	return ;
-
-    if (uic->op == LEFT_OP &&        
-	( isOperandLiteral(IC_RIGHT(uic)) ||
-	  getSize(operandType(IC_RESULT(uic))) > 1))
-	return ;
-	    
-    /* make sure that the result of this icode is not on the
-       stack, since acc is used to compute stack offset */
-    if (IS_TRUE_SYMOP(IC_RESULT(uic)) &&
-	OP_SYMBOL(IC_RESULT(uic))->onStack)
-	return ;
-
-    /* if either one of them in far space then we cannot */
-    if ((IS_TRUE_SYMOP(IC_LEFT(uic)) &&
-	 isOperandInFarSpace(IC_LEFT(uic))) ||
-	(IS_TRUE_SYMOP(IC_RIGHT(uic)) &&
-	 isOperandInFarSpace(IC_RIGHT(uic))))
-	return ;
-
-    /* if the usage has only one operand then we can */
-    if (IC_LEFT(uic) == NULL ||
-	IC_RIGHT(uic) == NULL) 
-	goto accuse;
-
-    /* make sure this is on the left side if not
-       a '+' since '+' is commutative */
-    if (ic->op != '+' &&
-	IC_LEFT(uic)->key != IC_RESULT(ic)->key)
-	return;
-
-    /* if one of them is a literal then we can */
-    if ((IC_LEFT(uic) && IS_OP_LITERAL(IC_LEFT(uic))) ||
-	(IC_RIGHT(uic) && IS_OP_LITERAL(IC_RIGHT(uic)))) {
-	OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
-	return ;
-    }
-
-    /* if the other one is not on stack then we can */
-    if (IC_LEFT(uic)->key == IC_RESULT(ic)->key &&
-	(IS_ITEMP(IC_RIGHT(uic)) ||
-	 (IS_TRUE_SYMOP(IC_RIGHT(uic)) &&
-	  !OP_SYMBOL(IC_RIGHT(uic))->onStack))) 
-	goto accuse;
-    
-    if (IC_RIGHT(uic)->key == IC_RESULT(ic)->key &&
-	(IS_ITEMP(IC_LEFT(uic)) ||
-	 (IS_TRUE_SYMOP(IC_LEFT(uic)) &&
-	  !OP_SYMBOL(IC_LEFT(uic))->onStack))) 
-	goto accuse ;
-
-    return ;
-
- accuse:
-    OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
-    
-        
 }
 
 /*-----------------------------------------------------------------*/
@@ -2102,34 +1966,10 @@ static void packRegisters (eBBlock *ebp)
 	    continue ;
 	}
 	
-	/* reduce for support function calls */
-/* 	if (ic->supportRtn || ic->op == '+' || ic->op == '-' ) */
-/* 	    packRegsForSupport (ic,ebp);	 */
-	
 	/* some cases the redundant moves can
 	   can be eliminated for return statements */
 	if ((ic->op == RETURN || ic->op == SEND))
 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);	
-
-	/* if pointer set & left has a size more than
-	   one and right is not in far space */
-/* 	if (POINTER_SET(ic)                    && */
-/* 	    !isOperandInFarSpace(IC_RIGHT(ic)) && */
-/* 	    !OP_SYMBOL(IC_RESULT(ic))->remat   && */
-/* 	    !IS_OP_RUONLY(IC_RIGHT(ic))        && */
-/* 	    getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 ) */
-
-/* 	    packRegsForOneuse (ic,IC_RESULT(ic),ebp); */
-
-	/* if pointer get */
-/* 	if (POINTER_GET(ic)                    && */
-/* 	    !isOperandInFarSpace(IC_RESULT(ic))&& */
-/* 	    !OP_SYMBOL(IC_LEFT(ic))->remat     && */
-/* 	    !IS_OP_RUONLY(IC_RESULT(ic))         && */
-/* 	    getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 ) */
-
-/* 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp); */
-
 
 	/* if this is cast for intergral promotion then
 	   check if only use of  the definition of the 
@@ -2170,38 +2010,6 @@ static void packRegisters (eBBlock *ebp)
 		}
 	    }
 	}
-	
-	/* pack for PUSH 
-	   iTempNN := (some variable in farspace) V1
-	   push iTempNN ;
-	   -------------
-	   push V1
-	*/
-/* 	if (ic->op == IPUSH ) { */
-/* 	    packForPush(ic,ebp); */
-/* 	} */
-	  
-	
-	/* pack registers for accumulator use, when the
-	   result of an arithmetic or bit wise operation
-	   has only one use, that use is immediately following
-	   the defintion and the using iCode has only one
-	   operand or has two operands but one is literal &
-	   the result of that operation is not on stack then
-	   we can leave the result of this operation in acc:b
-	   combination */
-/* 	if ((IS_ARITHMETIC_OP(ic)  */
-	     
-/* 	     || IS_BITWISE_OP(ic)  */
-	     
-/* 	     || ic->op == LEFT_OP || ic->op == RIGHT_OP */
-	     
-/* 	     ) && */
-/* 	    IS_ITEMP(IC_RESULT(ic)) && */
-/* 	    getSize(operandType(IC_RESULT(ic))) <= 2) */
-
-/* 	    packRegsForAccUse (ic); */
-
     }
 }
 

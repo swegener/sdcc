@@ -245,6 +245,7 @@ typedef struct icodeFuncTable
 /* forward references for functions                                */
 /*-----------------------------------------------------------------*/
 iCode   *reverseiCChain     (      );
+bool     isOperandOnStack   (operand *);
 int      isOperandVolatile  (operand *,bool);
 int      isOperandGlobal    (operand *);
 void     printiCChain    ( iCode * , FILE *);

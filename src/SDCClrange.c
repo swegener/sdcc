@@ -517,7 +517,7 @@ void rlivePoint (eBBlock **ebbs, int count)
 		    /* if it is live then add the lrange to ic->rlive */
 		if (lrange->liveFrom <= ic->seq &&
 		    lrange->liveTo   >= ic->seq ) {
-			lrange->isLiveFcall = (ic->op == CALL || ic->op == PCALL);
+			lrange->isLiveFcall |= (ic->op == CALL || ic->op == PCALL || ic->op == SEND);
 			ic->rlive = bitVectSetBit(ic->rlive,lrange->key);
 		}
 	    }

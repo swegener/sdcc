@@ -2241,12 +2241,10 @@ static void packRegisters (eBBlock *ebp)
 	   the result of that operation is not on stack then
 	   we can leave the result of this operation in acc:b
 	   combination */
-	if ((IS_ARITHMETIC_OP(ic) 
-	     
-	     || IS_BITWISE_OP(ic) 
-	     
+	if ((IS_ARITHMETIC_OP(ic) 	     
+	     || IS_BITWISE_OP(ic) 	     
 	     || ic->op == LEFT_OP || ic->op == RIGHT_OP
-	     
+	     || (ic->op == ADDRESS_OF && isOperandOnStack(IC_LEFT(ic)))
 	     ) &&
 	    IS_ITEMP(IC_RESULT(ic)) &&
 	    getSize(operandType(IC_RESULT(ic))) <= 2)

@@ -2106,6 +2106,17 @@ static void genFunction (iCode *ic)
     if (IS_RENT(sym->etype) || options.stackAuto) {
 
 	if (options.useXstack) {
+		/* set up the PAGE for the xternal stack */
+		if (sym->args) {
+			emitcode("push","dph");
+			emitcode("push","acc");
+		}
+		emitcode("mov","dph,__page_no__");
+		emitcode("movx","a,@dptr");
+		if (sym->args) {
+			emitcode("pop","acc");
+			emitcode("pop","dph");
+		}		
 	    emitcode("mov","r0,%s",spname);
 	    emitcode("mov","a,_bp");
 	    emitcode("movx","@r0,a");

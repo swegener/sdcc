@@ -278,6 +278,9 @@ static PORT *_ports[] =
 #if !OPT_DISABLE_TLCS900H
   &tlcs900h_port,
 #endif
+#if !OPT_DISABLE_TININative
+  &tininative_port,
+#endif
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))

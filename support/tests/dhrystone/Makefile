@@ -6,11 +6,11 @@ PROC = z80
 CC = $(TOPDIR)/bin/sdcc
 
 # -DNOENUM is here to make the results more predictable
-CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM -V -m$(PROC)
+CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM -V -m$(PROC) --profile
 
 OBJ = dhry.o
 
-all: dhry.ihx
+all: dhry.bin
 
 dhry.ihx: dhry.c
 	$(CC) $(CFLAGS) dhry.c

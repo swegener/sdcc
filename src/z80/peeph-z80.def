@@ -1,17 +1,9 @@
 replace restart {
-	or	a,%1(%2)
-	or	a,a
-	jp	nz,%3
-} by {
-	or	a,%1(%2)
-	; Removed redundent OR
-	jp	nz,%3
-}
-replace restart {
 	ld	a,%1(%2)
 	bit	%3,a
 	jp	%4,%5
 } by {
+        ; Rule 100: Removed redundent load
 	bit	%3,%1(%2)
 	jp	%4,%5
 }

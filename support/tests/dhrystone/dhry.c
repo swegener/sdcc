@@ -56,9 +56,11 @@
 #define memcpy(d,s,l) memcpyx(d,s,l)
 
 #elif defined(__z80)
-int _clock(void);
+unsigned int _clock(void);
+
 #define clock _clock
-#define CLOCKS_PER_SEC	10
+#define CLOCKS_PER_SEC	100
+#define PRINT_T_STATES	1
 
 #else
 /** For clock() */
@@ -76,7 +78,7 @@ void _printTStates(void);
 
 /** Set to one to print more messages about expected values etc. 
  */
-#define DEBUG	1
+#define DEBUG	0
 
 #if DEBUG
 #define DPRINTF(_a) printf _a
@@ -149,7 +151,7 @@ int main(void)
 #if DEBUG
     Number_Of_Runs = 3;
 #else
-    Number_Of_Runs = 10000;
+    Number_Of_Runs = 32766;
 #endif    
 
     runTime = clock();
@@ -288,12 +290,17 @@ int main(void)
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
 #endif
-    //    printf("Dhrystones/s = %lu\n", (unsigned long)Number_Of_Runs / (runTime/CLOCKS_PER_SEC));
+#if 1
+    printf("Number of runs: %u.  runTime: %u.\n", Number_Of_Runs, (unsigned)runTime);
+    printf("Dhrystones/s = %u\n", (unsigned)((unsigned long)Number_Of_Runs / (runTime/CLOCKS_PER_SEC)));
     printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
+#endif
 #ifdef PRINT_T_STATES    
     _printTStates();
 #endif    
+#if 1
     printf("Time: %lu ticks\n", runTime);
+#endif
 }
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)

@@ -22,15 +22,26 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 #include "string.h" 
+#include <sdcc-lib.h>
+
 #define NULL (void *)0
 
 char _generic *strcpy (
 	char _generic *d, 
 	char _generic *s) 
 {
+#if _SDCC_Z80_STYLE_LIB_OPT
+    register char _generic *to = d;
+    register char _generic *from = s;
+
+    while (*to++ = *from++) ;
+
+    return d;
+#else
     register char _generic *d1 = d;
 
     while (*d1++ = *s++) ;
 
     return d;
+#endif
 }

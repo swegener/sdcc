@@ -6,7 +6,7 @@
 */
 #include <testfwk.h>
 
-static void
+void
 testUnsignedModDiv(void)
 {
     {attr} {storage} unsigned {type} i;
@@ -27,7 +27,7 @@ testUnsignedModDiv(void)
     ASSERT(result == 32);
 }
 
-static void
+void
 testUnsignedMul(void)
 {
     {attr} {storage} unsigned {type} i;
@@ -43,7 +43,7 @@ testUnsignedMul(void)
     ASSERT(result == ((unsigned {type})444));
 }
 
-static void
+void
 testMul(void)
 {
     {attr} {storage} signed {type} i;
@@ -66,7 +66,7 @@ testMul(void)
     LOG(("30 == %u\n", (int)i*-3));
 }
 
-static void
+void
 testDiv(void)
 {
     {attr} {storage} signed {type} i;
@@ -84,7 +84,7 @@ testDiv(void)
     ASSERT(i/-12 == 4);
 }
 
-static void
+void
 testMod(void)
 {
     {attr} {storage} signed {type} i;

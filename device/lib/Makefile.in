@@ -32,7 +32,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 
 CPPFLAGS        = -I$(INCDIR)
-CFLAGS		= $(MODELFLAGS)
+CFLAGS		= $(MODELFLAGS) --nostdinc --nostdlib
 
 BUILDDIR        = build
 # Default
@@ -71,7 +71,10 @@ Z80SOURCES      = _atoi.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		  _strstr.c _strtok.c \
 		  puts.c gets.c \
-		  assert.c _strcat.c
+		  assert.c _strcat.c \
+		  _modslong.c _modulong.c \
+		  _mulslong.c _mululong.c \
+		  _divslong.c _divulong.c
 
 Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)
 

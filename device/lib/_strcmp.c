@@ -22,17 +22,29 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 #include "string.h" 
+#include <sdcc-lib.h>
+
 #define NULL (void *)0
 
 int strcmp (
-	char _generic   *src,
-	char _generic   *dst
+	char _generic   *asrc,
+	char _generic   *adst
 	)
 {
+#if _SDCC_Z80_STYLE_LIB_OPT
+	char ret = 0 ;
+        char _generic *src = asrc;
+        char _generic *dst = adst;
+
+	while( ! (*src - *dst) && *dst)
+		++src, ++dst;
+
+	return *src - *dst;
+#else
 	register int ret = 0 ;
 
-	while( ! (ret = *src - *dst) && *dst)
-		++src, ++dst;
+	while( ! (ret = *asrc - *adst) && *adst)
+		++asrc, ++adst;
 
 	if ( ret < 0 )
 		ret = -1 ;
@@ -40,4 +52,5 @@ int strcmp (
 		ret = 1 ;
 
 	return( ret );
+#endif
 }

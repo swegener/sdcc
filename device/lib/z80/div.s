@@ -1,7 +1,7 @@
 	;; Originally from GBDK by Pascal Felber.
 	.area	_CODE
 
-__divschar_rr_s::       
+__divschar_rrx_s::       
         ld      hl,#2+1
         add     hl,sp
         
@@ -10,7 +10,7 @@ __divschar_rr_s::
         ld      l,(hl)
         
         ;; Fall through
-__divschar_rr_hds::
+__divschar_rrx_hds::
         ld      c,l
         
         call    .div8
@@ -20,7 +20,7 @@ __divschar_rr_hds::
         	
 	ret
 	
-__modschar_rr_s::       
+__modschar_rrx_s::       
         ld      hl,#2+1
         add     hl,sp
         
@@ -29,7 +29,7 @@ __modschar_rr_s::
         ld      l,(hl)
         
         ;; Fall through
-__modschar_rr_hds::
+__modschar_rrx_hds::
         ld      c,l
 
        	call	.div8
@@ -39,7 +39,7 @@ __modschar_rr_hds::
         	
 	ret
 
-__divsint_rr_s::        
+__divsint_rrx_s::        
         ld      hl,#2+3
         add     hl,sp
         
@@ -53,7 +53,7 @@ __divsint_rr_s::
         ld      h,a
         
         ;; Fall through
-__divsint_rr_hds::
+__divsint_rrx_hds::
 	ld	b,h
 	ld	c,l
 
@@ -64,7 +64,7 @@ __divsint_rr_hds::
 	
 	ret
 	
-__modsint_rr_s::
+__modsint_rrx_s::
         ld      hl,#2+3
         add     hl,sp
         
@@ -78,7 +78,7 @@ __modsint_rr_s::
         ld      h,a
 
         ;; Fall through
-__modsint_rr_hds::
+__modsint_rrx_hds::
 	ld	b,h
 	ld	c,l
 
@@ -90,7 +90,7 @@ __modsint_rr_hds::
 	ret
 
 	;; Unsigned
-__divuchar_rr_s::       
+__divuchar_rrx_s::       
         ld      hl,#2+1
         add     hl,sp
         
@@ -99,7 +99,7 @@ __divuchar_rr_s::
         ld      l,(hl)
         
         ;; Fall through
-__divuchar_rr_hds::
+__divuchar_rrx_hds::
         ld      c,l
 	call	.divu8
 
@@ -108,7 +108,7 @@ __divuchar_rr_hds::
         
 	ret
 	
-__moduchar_rr_s::       
+__moduchar_rrx_s::       
         ld      hl,#2+1
         add     hl,sp
         
@@ -117,7 +117,7 @@ __moduchar_rr_s::
         ld      l,(hl)
         
         ;; Fall through
-__moduchar_rr_hds::
+__moduchar_rrx_hds::
         ld      c,l
 	call	.divu8
 
@@ -126,7 +126,7 @@ __moduchar_rr_hds::
 
         ret
 
-__divuint_rr_s::                
+__divuint_rrx_s::                
         ld      hl,#2+3
         add     hl,sp
         
@@ -140,7 +140,7 @@ __divuint_rr_s::
         ld      h,a
 
         ;; Fall through
-__divuint_rr_hds::
+__divuint_rrx_hds::
 	ld	b,h
 	ld	c,l
 	call	.divu16
@@ -150,7 +150,7 @@ __divuint_rr_hds::
 	
 	ret
 	
-__moduint_rr_s::                
+__moduint_rrx_s::                
         ld      hl,#2+3
         add     hl,sp
         
@@ -164,7 +164,7 @@ __moduint_rr_s::
         ld      h,a
         ;; Fall through
         
-__moduint_rr_hds::
+__moduint_rrx_hds::
 	ld	b,h
 	ld	c,l
 

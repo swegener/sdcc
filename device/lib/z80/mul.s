@@ -2,7 +2,7 @@
 	
 	.area	_CODE
 
-__mulschar_rr_s::
+__mulschar_rrx_s::
         ld      hl,#2
         add     hl,sp
 
@@ -11,7 +11,7 @@ __mulschar_rr_s::
         ld      l,(hl)                
 
         ;; Fall through
-__mulschar_rr_hds::
+__mulschar_rrx_hds::
         ;; Need to sign extend before going in.
         ld      c,l
         
@@ -27,7 +27,7 @@ __mulschar_rr_hds::
 
         jp      .mul16
 
-__muluchar_rr_s::
+__muluchar_rrx_s::
         ld      hl,#2
         add     hl,sp
 
@@ -43,8 +43,8 @@ __muluchar_rr_s::
         
         jp      .mulu16
         
-__mulsint_rr_s::
-__muluint_rr_s::
+__mulsint_rrx_s::
+__muluint_rrx_s::
         ld      hl,#2
         add     hl,sp
         
@@ -59,9 +59,9 @@ __muluint_rr_s::
 
         ;; Fall through
         
-__muluchar_rr_hds::
-__mulsint_rr_hds::
-__muluint_rr_hds::
+__muluchar_rrx_hds::
+__mulsint_rrx_hds::
+__muluint_rrx_hds::
 	;; Parameters:
 	;;	HL, DE (left, right irrelivent)
 	ld	b,h

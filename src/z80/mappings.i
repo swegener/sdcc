@@ -27,6 +27,14 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     },
     { "adjustsp", "lda sp,-%d(sp)" },
     { "fileprelude", "" },
+    { "profileenter",
+                "ld a,#3\n"
+                "\trst\t0x08"
+    },
+    { "profileexit",
+                "ld a,#4\n"
+                "\trst\t0x08"
+    },
     { NULL, NULL }
 };
 
@@ -78,6 +86,14 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
       		"\tpush\thl"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
+    { "profileenter",
+                "ld a,#3\n"
+                "\trst\t0x08"
+    },
+    { "profileexit",
+                "ld a,#4\n"
+                "\trst\t0x08"
+    },
     { NULL, NULL }
 };
 

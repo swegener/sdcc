@@ -294,10 +294,11 @@ _setDefaultOptions (void)
       params is the parameter format
 
    policy format:
-    rs
+    rsp
     where:
       r is 'r' for reentrant, 's' for static functions
       s is 'c' for callee saves, 'r' for caller saves
+      p is 'p' for profiling on, 'x' for profiling off
     examples:
       rr - reentrant, caller saves
    params format:
@@ -313,14 +314,10 @@ _mangleSupportFunctionName(char *original)
 
   if (TARGET_IS_Z80) 
     {
-      if (options.noRegParams) 
-        {
-          sprintf(buffer, "%s_rr_s", original);
-        }
-      else 
-        {
-          sprintf(buffer, "%s_rr_bds", original);
-        }
+      sprintf(buffer, "%s_rr%s_%s", original,
+              options.profile ? "f" : "x",
+              options.noRegParams ? "s" : "bds"
+              );
     }
   else 
     {

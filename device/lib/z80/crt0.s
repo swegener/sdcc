@@ -42,7 +42,7 @@ init:
         .area   _CODE
 __clock::
 	ld	a,#2
-	out	(0xff),a
+        rst     0x08
 	ret
 	
 _getsp::

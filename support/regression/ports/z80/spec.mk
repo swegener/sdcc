@@ -3,7 +3,7 @@
 
 RRZ80 = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80
 
-SDCCFLAGS += --lesspedantic
+SDCCFLAGS += --lesspedantic --profile
 
 EXEEXT = .bin
 

@@ -57,7 +57,9 @@ enum
 enum
   {
     D_ALLOC = 0,
-    D_ALLOC2 = 0
+    D_ALLOC2 = 0,
+    D_ACCUSE2 = 0,
+    D_ACCUSE2_VERBOSE = 0
   };
 
 #if 1
@@ -306,9 +308,8 @@ allLRs (symbol * sym, eBBlock * ebp, iCode * ic)
   return 1;
 }
 
-/*-----------------------------------------------------------------*/
-/* liveRangesWith - applies function to a given set of live range  */
-/*-----------------------------------------------------------------*/
+/** liveRangesWith - applies function to a given set of live range 
+ */
 set *
 liveRangesWith (bitVect * lrs, int (func) (symbol *, eBBlock *, iCode *),
 		eBBlock * ebp, iCode * ic)
@@ -342,9 +343,8 @@ liveRangesWith (bitVect * lrs, int (func) (symbol *, eBBlock *, iCode *),
 }
 
 
-/*-----------------------------------------------------------------*/
-/* leastUsedLR - given a set determines which is the least used    */
-/*-----------------------------------------------------------------*/
+/** leastUsedLR - given a set determines which is the least used 
+ */
 symbol *
 leastUsedLR (set * sset)
 {
@@ -375,9 +375,8 @@ leastUsedLR (set * sset)
   return sym;
 }
 
-/*-----------------------------------------------------------------*/
-/* noOverLap - will iterate through the list looking for over lap  */
-/*-----------------------------------------------------------------*/
+/** noOverLap - will iterate through the list looking for over lap
+ */
 static int 
 noOverLap (set * itmpStack, symbol * fsym)
 {
@@ -1430,7 +1429,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 {
   iCode *dic, *sic;
 
-  D (D_ALLOC, ("packRegsForAssing: running on ic %p\n", ic));
+  D (D_ALLOC, ("packRegsForAssign: running on ic %p\n", ic));
 
   if (
   /*      !IS_TRUE_SYMOP(IC_RESULT(ic)) || */
@@ -2004,25 +2003,48 @@ hluse:
   OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_HL;
 }
 
-bool 
+static bool 
 opPreservesA (iCode * ic, iCode * uic)
 {
-  /* if it is a conditional branch then we definitely can */
   if (uic->op == IFX)
-    return FALSE;
+    {
+      return TRUE;
+
+      if (getSize (operandType (IC_COND (uic))) == 1 &&
+          IS_OP_LITERAL (IC_COND (uic)))
+        {
+          return TRUE;
+        }
+
+      D (D_ACCUSE2, ("  + Dropping as operation is an IFX\n"));
+      return FALSE;
+    }
 
   if (uic->op == JUMPTABLE)
-    return FALSE;
+    {
+      D (D_ACCUSE2, ("  + Dropping as operation is a Jumptable\n"));
+      return FALSE;
+    }
+
+  /* A pointer assign preserves A if A is the left value. */
+  if (uic->op == '=' && POINTER_SET (uic))
+    {
+      return TRUE;
+    }
 
   /* if the usage has only one operand then we can */
   /* PENDING: check */
   if (IC_LEFT (uic) == NULL ||
       IC_RIGHT (uic) == NULL)
-    return FALSE;
+    {
+      D (D_ACCUSE2, ("  + Dropping as operation has only one operand\n"));
+      return FALSE;
+    }
 
   /* PENDING: check this rule */
   if (getSize (operandType (IC_RESULT (uic))) > 1)
     {
+      D (D_ACCUSE2, ("  + Dropping as operation has size is too big\n"));
       return FALSE;
     }
 
@@ -2042,65 +2064,116 @@ opPreservesA (iCode * ic, iCode * uic)
        1
     )
     {
+      D (D_ACCUSE2, ("  + Dropping as 'its a bad op'\n"));
       return FALSE;
     }
 
   /* PENDING */
   if (!IC_LEFT (uic) || !IC_RESULT (ic))
-    return FALSE;
+    {
+      D (D_ACCUSE2, ("  + Dropping for some reason #1\n"));
+      return FALSE;
+    }
 
 /** This is confusing :)  Guess for now */
   if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
       (IS_ITEMP (IC_RIGHT (uic)) ||
        (IS_TRUE_SYMOP (IC_RIGHT (uic)))))
-    return TRUE;
+    {
+      return TRUE;
+    }
 
   if (IC_RIGHT (uic)->key == IC_RESULT (ic)->key &&
       (IS_ITEMP (IC_LEFT (uic)) ||
        (IS_TRUE_SYMOP (IC_LEFT (uic)))))
-    return TRUE;
+    {
+      return TRUE;
+    }
+
+  D (D_ACCUSE2, ("  + Dropping as hit default case\n"));
 
   return FALSE;
 }
 
-static void 
-joinPushes (iCode * ic)
+static bool
+opIgnoresA (iCode * ic, iCode * uic)
 {
-#if 0
-  if (ic->op == IPUSH &&
-      isOperandLiteral (IC_LEFT (ic)) &&
-      getSize (operandType (IC_LEFT (ic))) == 1 &&
-      ic->next->op == IPUSH &&
-      isOperandLiteral (IC_LEFT (ic->next)) &&
-      getSize (operandType (IC_LEFT (ic->next))) == 1)
+  /* A increment of an iTemp by a constant is OK. */
+  if ( uic->op == '+' &&
+       IS_ITEMP (IC_LEFT (uic)) &&
+       IS_ITEMP (IC_RESULT (uic)) &&
+       IS_OP_LITERAL (IC_RIGHT (uic)))
     {
-      /* This is a bit tricky as michaelh doesnt know what he's doing.
-       */
-      /* First upgrade the size of (first) to int */
-      SPEC_NOUN (operandType (IC_LEFT (ic))) = V_INT;
+      unsigned int icount = (unsigned int) floatFromVal (IC_RIGHT (uic)->operand.valOperand);
 
-      floatFromVal (AOP /* need some sleep ... */ );
-      /* Now get and join the values */
-      value *val = aop->aopu.aop_lit;
-      /* if it is a float then it gets tricky */
-      /* otherwise it is fairly simple */
-      if (!IS_FLOAT (val->type))
-	{
-	  unsigned long v = floatFromVal (val);
-
-	  floatFrom ( /* need some sleep ... */ );
-	  printf ("Size %u\n", getSize (operandType (IC_LEFT (ic))));
-	  ic->next = ic->next->next;
-	}
+      /* Being an ITEMP means that we're already a symbol. */
+      if (icount == 1 &&
+          IC_RESULT (uic)->operand.symOperand->key == IC_LEFT (uic)->operand.symOperand->key
+          )
+        {
+          return TRUE;
+        }
     }
-#endif
+
+  return FALSE;
 }
+
+
+/* Some optimisation cases:
+
+   1. Part of memcpy
+;	genPointerGet
+	ld	l,-4(ix)
+	ld	h,-3(ix)
+	ld	c,(hl)
+;	genPlus
+	inc	-4(ix)
+	jp	nz,00108$
+	inc	-3(ix)
+00108$:
+;	genAssign (pointer)
+	ld	a,c
+	ld	(de),a
+ 
+      want to optimise down to:
+        ld       hl,-4(ix) ...
+        ld       a,(hl)
+        inc      -4(ix).w  ...
+        ld       (de),a
+
+      So genPointer get is OK
+      genPlus where the right is constant, left is iTemp, and result is same as left
+      genAssign (pointer) is OK
+
+    2. Part of _strcpy
+;	genPointerGet
+	ld	a,(de)
+	ld	c,a
+;	genIfx
+	xor	a,a
+	or	a,c
+	jp	z,00103$
+;	_strcpy.c 40
+;	genAssign (pointer)
+;	AOP_STK for _strcpy_to_1_1
+	ld	l,-2(ix)
+	ld	h,-1(ix)
+	ld	(hl),c
+
+      want to optimise down to:
+        ld 	a,(de)
+        or	a,a
+        jp	z,00103$
+        ld	(bc),a
+      
+      So genIfx where IC_COND has size of 1 and is a constant.
+*/
 
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
     be able to be stored in the accumulator.
 
-    Note that the 'A preserving' list is currently emperical :)e
+    Note that the 'A preserving' list is currently emperical :)
  */
 static void 
 packRegsForAccUse2 (iCode * ic)
@@ -2118,14 +2191,20 @@ packRegsForAccUse2 (iCode * ic)
        ic->op != EQ_OP &&
        ic->op != CAST &&
        1)
-    return;
+    {
+      D (D_ACCUSE2, ("  + Dropping as not a 'good' source command\n"));
+      return;
+    }
 
   /* if + or - then it has to be one byte result.
      MLH: Ok.
    */
   if ((ic->op == '+' || ic->op == '-')
       && getSize (operandType (IC_RESULT (ic))) > 1)
-    return;
+    {
+      D (D_ACCUSE2, ("  + Dropping as it's a big + or -\n"));
+      return;
+    }
 
   /* if shift operation make sure right side is not a literal.
      MLH: depends.
@@ -2145,6 +2224,7 @@ packRegsForAccUse2 (iCode * ic)
   /* has only one definition */
   if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) > 1)
     {
+      D (D_ACCUSE2, ("  + Dropping as it has more than one definition\n"));
       return;
     }
 
@@ -2160,6 +2240,7 @@ packRegsForAccUse2 (iCode * ic)
   if (!(uic = hTabItemWithKey (iCodehTab,
 			       bitVectFirstBit (OP_USES (IC_RESULT (ic))))))
     {
+      D (D_ACCUSE2, ("  + Dropping as usage does not follow first\n"));
       return;
     }
 
@@ -2175,20 +2256,59 @@ packRegsForAccUse2 (iCode * ic)
 	next = hTabItemWithKey (iCodehTab, setBit);
 	if (scan->next == next)
 	  {
+            D (D_ACCUSE2_VERBOSE, ("  ! Is next in line\n"));
+
 	    bitVectUnSetBit (uses, setBit);
 	    /* Still contigous. */
 	    if (!opPreservesA (ic, next))
 	      {
+                D (D_ACCUSE2, ("  + Dropping as operation doesn't preserve A\n"));
 		return;
 	      }
+            D (D_ACCUSE2_VERBOSE, ("  ! Preserves A, so continue scanning\n"));
 	    scan = next;
 	  }
+        else if (scan->next == NULL && bitVectnBitsOn (uses) == 1 && next != NULL)
+          {
+            if (next->prev == NULL)
+              {
+                if (!opPreservesA (ic, next))
+                  {
+                    D (D_ACCUSE2, ("  + Dropping as operation doesn't preserve A #2\n"));
+                    return;
+                  }
+                bitVectUnSetBit (uses, setBit);
+                scan = next;
+              }
+            else 
+              {
+                D (D_ACCUSE2, ("  + Dropping as last in list and next doesn't start a block\n"));
+                return;
+              }
+          }
+        else if (scan->next == NULL)
+          {
+            D (D_ACCUSE2, ("  + Dropping as hit the end of the list\n"));
+            D (D_ACCUSE2, ("  + Next in htab: %p\n", next));
+            return;
+          }
 	else
 	  {
-	    return;
+            if (opIgnoresA (ic, scan->next))
+              {
+                /* Safe for now. */
+                scan = scan->next;
+                D (D_ACCUSE2_VERBOSE, ("  ! Op ignores A, so continue scanning\n"));
+              }
+            else
+              {
+                D (D_ACCUSE2, ("  + Dropping as parts are not consecuitive and intermediate might use A\n"));
+                return;
+              }
 	  }
       }
     while (!bitVectIsZero (uses));
+
     OP_SYMBOL (IC_RESULT (ic))->accuse = ACCUSE_A;
     return;
   }
@@ -2441,7 +2561,6 @@ packRegisters (eBBlock * ebp)
 	  packRegsForAccUse2 (ic);
 	}
 #endif
-      joinPushes (ic);
     }
 }
 

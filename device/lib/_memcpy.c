@@ -22,14 +22,40 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 #include "string.h" 
+#include <sdcc-lib.h>
+
 #define NULL (void *)0
 
 void _generic * memcpy (
 	void _generic * dst,
 	void _generic * src,
-	int count
+	int acount
 	) 
 {
+#if _SDCC_Z80_STYLE_LIB_OPT
+	char _generic * d = dst;
+	char _generic * s = src;
+	int count = -acount;
+
+        count /= 4;
+        
+        while (count) {
+		*d++ = *s++;
+		*d++ = *s++;
+		*d++ = *s++;
+		*d++ = *s++;
+                count++;
+        }
+
+        if (acount & 2) {
+		*d++ = *s++; 
+		*d++ = *s++;
+        }
+        if (acount & 1) {
+		*d++ = *s++;
+        }
+	return dst;
+#else
 	void _generic * ret = dst;
 	char _generic * d = dst;
 	char _generic * s = src;
@@ -37,9 +63,10 @@ void _generic * memcpy (
 	/*
 	 * copy from lower addresses to higher addresses
 	 */
-	while (count--) {
+	while (acount--) {
 		*d++ = *s++;
 	}
 
 	return(ret);
+#endif
 }

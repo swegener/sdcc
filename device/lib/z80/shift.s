@@ -1,5 +1,5 @@
         ;;
-__rrulong_rr_s::                
+__rrulong_rrx_s::                
         ld      hl,#2+4
         add     hl,sp
                 
@@ -27,7 +27,7 @@ __rrulong_rr_s::
         dec     a
         jp      1$
 
-__rrslong_rr_s::        
+__rrslong_rrx_s::        
         ld      hl,#2+4
         add     hl,sp
                 
@@ -55,8 +55,8 @@ __rrslong_rr_s::
         dec     a
         jp      1$
         
-__rlslong_rr_s::                
-__rlulong_rr_s::                
+__rlslong_rrx_s::                
+__rlulong_rrx_s::                
         ld      hl,#2+4
         add     hl,sp
         

@@ -27,13 +27,22 @@ Boston, MA 02111-1307, USA. */
 #ifdef CPP_PREDEFINES
 #undef CPP_PREDEFINES
 #endif
+#if 0
+/* The whole configuration system should be fixed; we really shouldn't
+ * include this file at all.
+ *
+ * But at least let's not pretend we're Microsoft C version 8 running
+ * on Windows NT, eh?
+ */
 #define CPP_PREDEFINES "-Dunix -Di386 -DWIN32 -D_WIN32 \
   -DWINNT -D_M_IX86=300 -D_X86_=1 -D__STDC__=0 -DALMOST_STDC -D_MSC_VER=800 \
   -D__stdcall=__attribute__((__stdcall__)) \
   -D__cdecl=__attribute__((__cdecl__)) \
   -D_cdecl=__attribute__((__cdecl__)) \
   -Asystem(unix) -Asystem(winnt) -Acpu(i386) -Amachine(i386)"
-
+#else
+#define CPP_PREDEFINES "-DSDCC"
+#endif
 #define SIZE_TYPE "unsigned int"
 #define PTRDIFF_TYPE "int"
 #define WCHAR_UNSIGNED 1

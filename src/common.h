@@ -5,8 +5,8 @@
 #include <assert.h>
 
 #include "SDCCglobl.h"
-#include "SDCCast.h"
 #include "SDCCmem.h"
+#include "SDCCast.h"
 #include "SDCCy.h"
 #include "SDCChasht.h"
 #include "SDCCbitv.h"

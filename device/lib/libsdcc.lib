@@ -40,6 +40,7 @@ puts
 gets
 printfl
 printf_large
+printf_fast
 vprintf
 assert
 time

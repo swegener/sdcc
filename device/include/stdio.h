@@ -43,4 +43,8 @@ extern char *gets(char *);
 extern char getchar(void);
 extern void putchar(char);
 
+#ifdef __mcs51
+extern void printf_fast(code char *fmt, ...) _REENTRANT;
+#endif
+
 #endif /* __SDC51_STDIO_H */

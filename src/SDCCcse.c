@@ -326,16 +326,6 @@ DEFSETFUNC (findCheaperOp)
 	  (*opp)->isaddr = cop->isaddr;
 	}
 
-      if ((*opp)->type==VALUE && 
-	  IS_SYMOP(cop) && IS_GENPTR(OP_SYMBOL(cop)->type)) {
-	// This is a value assigned to a gpointer
-	if (1) {
-	  // this value is used for a cast, so we can not
-	  *opp=NULL;
-	  return 0;
-	}	
-      }
-
       return 1;
 
     }

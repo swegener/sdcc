@@ -2761,6 +2761,7 @@ decorateType (ast * tree)
       /* make sure the type is complete and sane */
       checkTypeSanity(LETYPE(tree), "(cast)");
 
+#if 0
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree))) {
 	      if (!IS_PTR (LTYPE (tree))) {
@@ -2788,6 +2789,22 @@ decorateType (ast * tree)
 	      TTYPE (tree) = LTYPE (tree);
 	      LRVAL (tree) = 1;
       }
+#else
+      /* if the right is a literal replace the tree */
+      if (IS_LITERAL (RETYPE (tree)) && !IS_PTR (LTYPE (tree))) {
+	tree->type = EX_VALUE;
+	tree->opval.val =
+	  valCastLiteral (LTYPE (tree),
+			  floatFromVal (valFromType (RETYPE (tree))));
+	tree->left = NULL;
+	tree->right = NULL;
+	TTYPE (tree) = tree->opval.val->type;
+	tree->values.literalFromCast = 1;
+      } else {
+	TTYPE (tree) = LTYPE (tree);
+	LRVAL (tree) = 1;
+      }
+#endif
 
       TETYPE (tree) = getSpec (TTYPE (tree));
 

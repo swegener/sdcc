@@ -568,6 +568,16 @@ rlivePoint (eBBlock ** ebbs, int count)
 		    ic->rlive = bitVectSetBit (ic->rlive, lrange->key);
 		}
 	    }
+	    /* overlapping live ranges should be eliminated */
+	    if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
+		if (SPIL_LOC(IC_RIGHT(ic)) == SPIL_LOC(IC_RESULT(ic))   && /* left & right share the same spil location */
+		    OP_SYMBOL(IC_RESULT(ic))->isreqv                    && /* left of assign is a register requivalent */
+		    !OP_SYMBOL(IC_RIGHT(ic))->isreqv                    && /* right side is not */
+		    OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->key           && /* right side live beyond this point */
+		    bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1 )        {  /* left has multiple definitions */
+		    SPIL_LOC(IC_RIGHT(ic)) = NULL; /* then cannot share */
+		}
+	    }
 	}
     }
 }
@@ -614,7 +624,7 @@ static void computeClash ()
 	    /* so they overlap : set both their clashes */
 	    inner->clashes = bitVectSetBit(inner->clashes,outer->key);
 	    outer->clashes = bitVectSetBit(outer->clashes,inner->key);
-	    
+#if 0	    
 	    /* check if they share the same spillocation */
 	    if (SYM_SPIL_LOC(inner) && SYM_SPIL_LOC(outer)) {
 		if (inner->reqv && !outer->reqv) SYM_SPIL_LOC(outer)=NULL;
@@ -622,6 +632,7 @@ static void computeClash ()
 		else if (inner->used > outer->used) SYM_SPIL_LOC(outer)=NULL;
 		else SYM_SPIL_LOC(inner)=NULL;
 	    }
+#endif
 	}
     }
 }

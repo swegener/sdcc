@@ -843,10 +843,6 @@ loop:
 		if ((ap = alookup(id)) != NULL) {
 			if (uaf && uf != ap->a_flag)
 				err('m');
-                        if (ap->a_flag & A_OVR) {
-				ap->a_size = 0; 
-                                ap->a_fuzz=0;
-			}
 		} else {
 			ap = (struct area *) new (sizeof(struct area));
 			ap->a_ap = areap;
@@ -1114,11 +1110,26 @@ register struct area *nap;
 	register struct area *oap;
 
 	oap = dot.s_area;
+	/* fprintf (stderr, "%s dot.s_area->a_size: %d dot.s_addr: %d\n",
+	     oap->a_id, dot.s_area->a_size, dot.s_addr); */
 	oap->a_fuzz = fuzz;
-	oap->a_size = dot.s_addr;
-	fuzz = nap->a_fuzz;
+	if (oap->a_flag & A_OVR) {
+	  // the size of an overlay is the biggest size encountered
+	  if (oap->a_size < dot.s_addr) {
+	    oap->a_size = dot.s_addr;
+	  }
+	} else {
+	  oap->a_size = dot.s_addr;
+	}
+	if (nap->a_flag & A_OVR) {
+	  // a new overlay starts at 0, no fuzz
+	  dot.s_addr = 0;
+	  fuzz = 0;
+	} else {
+	  dot.s_addr = nap->a_size;
+	  fuzz = nap->a_fuzz;
+	}
 	dot.s_area = nap;
-	dot.s_addr = nap->a_size;
 	outall();
 }
 

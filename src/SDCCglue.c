@@ -1226,11 +1226,15 @@ emitOverlay (FILE * afile)
 
       if (elementsInSet (ovrset))
 	{
+#if 0
 	  /* this dummy area is used to fool the assembler
 	     otherwise the assembler will append each of these
 	     declarations into one chunk and will not overlay
 	     sad but true */
 	  fprintf (afile, "\t.area _DUMMY\n");
+#else
+	  /* not anymore since asmain.c:1.13 */
+#endif
 	  /* output the area informtion */
 	  fprintf (afile, "\t.area\t%s\n", port->mem.overlay_name);	/* MOF */
 	}

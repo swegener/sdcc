@@ -125,7 +125,7 @@ include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models model-ds390 model-z80 model-gbz80
+all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80
 
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
@@ -140,6 +140,11 @@ model-ds390:
 	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
 	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 objects; \
 	fi
+	
+model-ds400:
+	if [ "`grep ds400 ../../ports.build`" = ds400 ]; then \
+	  $(MAKE) MODELFLAGS="-mds400" PORT=ds400 objects; \
+	fi	
 
 model-xa51:
 	if [ "`grep xa51 ../../ports.build`" = xa51 ]; then \
@@ -183,7 +188,7 @@ clean_intermediate:
 # ---------------------------------------------------
 install: all installdirs
 	cp -r $(BUILDDIR)/* $(sdcc_libdir)
-	cp -r ds390 gbz80 z80 *.c $(sdcc_libdir)/src
+	cp -r ds390 ds400 gbz80 z80 *.c $(sdcc_libdir)/src
 	rm `find $(sdcc_libdir)/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm'`
 
 # Deleting all the installed files
@@ -210,6 +215,7 @@ installdirs:
 	 mkdir -p $(sdcc_libdir)/$$model; \
 	done
 	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
+	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400	
 	mkdir -p $(sdcc_libdir)/src
 
 # Creating dependencies

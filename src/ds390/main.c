@@ -308,6 +308,13 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
     /* for others it is cheaper to do the cse */
     return 1;
 }
+
+bool _ds390_nativeMulCheck(iCode *ic, sym_link *left, sym_link *right)
+{
+    return FALSE; // #STUB
+}
+
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -401,7 +408,7 @@ PORT ds390_port =
   _ds390_regparm,
   NULL,
   NULL,
-  NULL,
+  _ds390_nativeMulCheck,
   FALSE,
   0,				/* leave lt */
   0,				/* leave gt */
@@ -700,5 +707,186 @@ PORT tininative_port =
   FPOINTER,			/* treat unqualified pointers as far pointers */
   0,				/* DONOT reset labelKey */
   0,				/* globals & local static NOT allowed */
+  PORT_MAGIC
+};
+
+static int
+_ds400_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+{
+    /* We can't generate a static IVT, since the boot rom creates one
+     * for us in rom_init.
+     * 
+     * we must patch it as part of the C startup.
+     */
+     fprintf (of, ";\tDS80C400 IVT must be generated at runtime.\n");
+    fprintf (of, "\tsjmp\t__sdcc_400boot\n");
+    fprintf (of, "\t.ascii\t'TINI'\t; required signature for 400 boot loader.\n");
+    fprintf (of, "\t.db\t0\t; selected bank: zero *should* work...\n");
+    fprintf (of, "\t__sdcc_400boot:\tljmp\t__sdcc_gsinit_startup\n");
+     return TRUE;
+}
+
+    
+
+static void
+_ds400_finaliseOptions (void)
+{
+  if (options.noXinitOpt) {
+    port->genXINIT=0;
+  }
+
+  // hackhack: we're a superset of the 390.
+  addToList (preArgv, "-DSDCC_ds390");  
+  addToList (preArgv, "-D__ds390");    
+    
+  /* Hack-o-matic: if we are using the flat24 model,
+   * adjust pointer sizes.
+   */
+  if (options.model != MODEL_FLAT24)  {
+      fprintf (stderr,
+	       "*** warning: ds400 port small and large model experimental.\n");
+      if (options.model == MODEL_LARGE)
+      {
+        port->mem.default_local_map = xdata;
+        port->mem.default_globl_map = xdata;
+      }
+      else
+      {
+        port->mem.default_local_map = data;
+        port->mem.default_globl_map = data;
+      }
+  }
+  else {
+    port->s.fptr_size = 3;
+    port->s.gptr_size = 4;
+
+    port->stack.isr_overhead += 2;	/* Will save dpx on ISR entry. */
+
+    port->stack.call_overhead += 2;	/* This acounts for the extra byte 
+				 * of return addres on the stack.
+				 * but is ugly. There must be a 
+				 * better way.
+				 */
+
+    port->mem.default_local_map = xdata;
+    port->mem.default_globl_map = xdata;
+
+    if (!options.stack10bit)
+    {
+    fprintf (stderr,
+	     "*** error: ds400 port only supports the 10 bit stack mode.\n");
+    } else {
+	if (!options.stack_loc) options.stack_loc = 0xffdc00;
+	// assumes IDM1:0 = 1:0, CMA = 1.
+    }
+    
+    /* generate native code 16*16 mul/div */
+    if (options.useAccelerator) 
+	    port->support.muldiv=2;
+    else 
+	    port->support.muldiv=1;
+
+     /* Fixup the memory map for the stack; it is now in
+     * far space and requires a FPOINTER to access it.
+     */
+    istack->fmap = 1;
+    istack->ptrType = FPOINTER;
+
+    if (options.parms_in_bank1) {
+	addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
+    }
+  }  /* MODEL_FLAT24 */
+}
+
+PORT ds400_port =
+{
+  TARGET_ID_DS400,
+  "ds400",
+  "DS80C400",			/* Target name */
+  NULL,
+  {
+    TRUE,			/* Emit glue around main */
+    MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
+    MODEL_SMALL
+  },
+  {
+    _asmCmd,
+    NULL,
+    "-plosgffc",		/* Options with debug */
+    "-plosgff",			/* Options without debug */
+    0,
+    ".asm",
+    NULL			/* no do_assemble function */
+  },
+  {
+    _linkCmd,
+    NULL,
+    NULL,
+    ".rel"
+  },
+  {
+    _defaultRules
+  },
+  {
+	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+    1, 2, 2, 4, 1, 2, 3, 1, 4, 4
+  },
+  {
+    "XSEG    (XDATA)",
+    "STACK   (DATA)",
+    "CSEG    (CODE)",
+    "DSEG    (DATA)",
+    "ISEG    (DATA)",
+    "XSEG    (XDATA)",
+    "BSEG    (BIT)",
+    "RSEG    (DATA)",
+    "GSINIT  (CODE)",
+    "OSEG    (OVR,DATA)",
+    "GSFINAL (CODE)",
+    "HOME    (CODE)",
+    "XISEG   (XDATA)", // initialized xdata
+    "XINIT   (CODE)", // a code copy of xiseg
+    NULL,
+    NULL,
+    1
+  },
+  {
+    +1, 1, 4, 1, 1, 0
+  },
+    /* ds390 has an 16 bit mul & div */
+  {
+    2, -1
+  },
+  "_",
+  _ds390_init,
+  _ds390_parseOptions,
+  NULL,
+  _ds400_finaliseOptions,
+  _ds390_setDefaultOptions,
+  ds390_assignRegisters,
+  _ds390_getRegName,
+  _ds390_keywords,
+  _ds390_genAssemblerPreamble,
+  NULL,				/* no genAssemblerEnd */
+  _ds400_genIVT,
+  _ds390_genXINIT,
+  _ds390_reset_regparm,
+  _ds390_regparm,
+  NULL,
+  NULL,
+  _ds390_nativeMulCheck,
+  FALSE,
+  0,				/* leave lt */
+  0,				/* leave gt */
+  1,				/* transform <= to ! > */
+  1,				/* transform >= to ! < */
+  1,				/* transform != to !(a == b) */
+  0,				/* leave == */
+  TRUE,                         /* we support array initializers. */
+  cseCostEstimation,
+  __ds390_builtins,             /* table of builtin functions */
+  GPOINTER,			/* treat unqualified pointers as "generic" pointers */
+  1,				/* reset labelKey to 1 */
+  1,				/* globals & local static allowed */
   PORT_MAGIC
 };

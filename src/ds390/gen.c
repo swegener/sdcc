@@ -518,14 +518,20 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 	if (stack_val < 0 && stack_val > -5) { /* between -5 & -1 */
 	    if (useDP2) {
 		if (options.model == MODEL_FLAT24)
-		    emitcode ("mov", "dpx1,#!constbyte", (options.stack_loc >> 16) & 0xff);
-		TR_DPTR("#2");
+		{
+		    emitcode ("mov", "dpx1,#!constbyte",
+			      (options.stack_loc >> 16) & 0xff);
+		}
 		emitcode ("mov", "dph1,_bpx+1");
+		
 		emitcode ("mov", "dpl1,_bpx");
 		emitcode ("mov","dps,#1");
 	    } else {
 		if (options.model == MODEL_FLAT24)
-		    emitcode ("mov", "dpx,#!constbyte", (options.stack_loc >> 16) & 0xff);
+		{
+		    emitcode ("mov", "dpx,#!constbyte",
+			      (options.stack_loc >> 16) & 0xff);
+		}
 		emitcode ("mov", "dph,_bpx+1");
 		emitcode ("mov", "dpl,_bpx");
 	    }
@@ -551,13 +557,18 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 	    emitcode ("subb","a,#!constbyte",(stack_val >> 8) & 0xff);
 	    if (useDP2) {
 		if (options.model == MODEL_FLAT24)
-		    emitcode ("mov", "dpx1,#!constbyte", (options.stack_loc >> 16) & 0xff);
-		TR_DPTR("#2");
+		{
+		    emitcode ("mov", "dpx1,#!constbyte",
+			      (options.stack_loc >> 16) & 0xff);
+		}
 		emitcode ("mov", "dph1,a");
 		emitcode ("mov", "dpl1,b");
 	    } else {
 		if (options.model == MODEL_FLAT24)
-		    emitcode ("mov", "dpx,#!constbyte", (options.stack_loc >> 16) & 0xff);
+		{
+		    emitcode ("mov", "dpx,#!constbyte",
+			      (options.stack_loc >> 16) & 0xff);
+		}
 		emitcode ("mov", "dph,a");
 		emitcode ("mov", "dpl,b");
 	    }
@@ -2510,6 +2521,18 @@ static void genSend(set *sendSet)
     }
 }
 
+static void
+adjustEsp(const char *reg)
+{
+    emitcode ("anl","%s,#3", reg);
+    if (TARGET_IS_DS400)
+    {
+	emitcode ("orl","%s,#!constbyte",
+		  reg,
+		  (options.stack_loc >> 8) & 0xff);
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
@@ -2635,7 +2658,7 @@ genCall (iCode * ic)
 	      emitcode ("subb","a,#!constbyte",ic->parmBytes & 0xff);
 	      emitcode ("mov","sp,a");
 	      emitcode ("mov","a,esp");
-	      emitcode ("anl","a,#3");
+	      adjustEsp("a");
 	      emitcode ("subb","a,#!constbyte",(ic->parmBytes >> 8) & 0xff);
 	      emitcode ("mov","esp,a");	  
 	      UNPROTECT_SP;
@@ -2753,7 +2776,7 @@ genPcall (iCode * ic)
 	      emitcode ("subb","a,#!constbyte",ic->parmBytes & 0xff);
 	      emitcode ("mov","sp,a");
 	      emitcode ("mov","a,esp");
-	      emitcode ("anl","a,#3");
+	      adjustEsp("a");
 	      emitcode ("subb","a,#!constbyte",(ic->parmBytes >> 8) & 0xff);
 	      emitcode ("mov","esp,a");	  
 	      UNPROTECT_SP;
@@ -3080,7 +3103,7 @@ genFunction (iCode * ic)
 	  emitcode ("push","_bpx+1");
 	  emitcode ("mov","_bpx,%s",spname);
 	  emitcode ("mov","_bpx+1,esp");
-	  emitcode ("anl","_bpx+1,#3");
+	  adjustEsp("_bpx+1");
       } else {
 	  if (options.useXstack) {
 	      emitcode ("mov", "r0,%s", spname);
@@ -3109,7 +3132,7 @@ genFunction (iCode * ic)
 	      emitcode ("add","a,#!constbyte", ((short) sym->stack & 0xff));
 	      emitcode ("mov","sp,a");
 	      emitcode ("mov","a,esp");
-	      emitcode ("anl","a,#3");
+	      adjustEsp("a");
 	      emitcode ("addc","a,#!constbyte", (((short) sym->stack) >> 8) & 0xff);
 	      emitcode ("mov","esp,a");
 	      UNPROTECT_SP;
@@ -7906,8 +7929,6 @@ shiftR2Left2Result (operand * left, int offl,
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftLLeftOrResult - shift left one byte from left, or to result */
 /*-----------------------------------------------------------------*/
@@ -7924,7 +7945,6 @@ shiftLLeftOrResult (operand * left, int offl,
   /* back to result */
   aopPut (AOP (result), "a", offr);
 }
-#endif
 
 #if 0
 //REMOVE ME!!!
@@ -8459,8 +8479,6 @@ genrshTwo (operand * result, operand * left,
 }
 #endif
 
-#if 0
-//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* shiftRLong - shift right one long from left to result           */
 /* offl = LSB or MSB16                                             */
@@ -8476,7 +8494,7 @@ shiftRLong (operand * left, int offl,
     werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
   }
 
-  MOVA (aopGet (AOP (left), MSB32, FALSE, NULL));
+  MOVA (aopGet (AOP (left), MSB32, FALSE, FALSE, NULL));
   
   if (offl==MSB16) {
     // shift is > 8
@@ -8484,7 +8502,7 @@ shiftRLong (operand * left, int offl,
       emitcode ("rlc", "a");
       emitcode ("subb", "a,acc");
       emitcode ("xch", "a,%s",
-		aopGet(AOP(left), MSB32, FALSE, DP2_RESULT_REG));
+		aopGet(AOP(left), MSB32, FALSE, FALSE, DP2_RESULT_REG));
     } else {
       aopPut (AOP(result), zero, MSB32);
     }
@@ -8500,34 +8518,31 @@ shiftRLong (operand * left, int offl,
 
   if (isSameRegs && offl==MSB16) {
     emitcode ("xch",
-	      "a,%s",aopGet (AOP (left), MSB24, FALSE, DP2_RESULT_REG));
+	      "a,%s",aopGet (AOP (left), MSB24, FALSE, FALSE, DP2_RESULT_REG));
   } else {
     aopPut (AOP (result), "a", MSB32);
-    MOVA (aopGet (AOP (left), MSB24, FALSE, NULL));
+    MOVA (aopGet (AOP (left), MSB24, FALSE, FALSE, NULL));
   }
 
   emitcode ("rrc", "a");
   if (isSameRegs && offl==1) {
     emitcode ("xch", "a,%s",
-	      aopGet (AOP (left), MSB16, FALSE, DP2_RESULT_REG));
+	      aopGet (AOP (left), MSB16, FALSE, FALSE, DP2_RESULT_REG));
   } else {
     aopPut (AOP (result), "a", MSB24);
-    MOVA (aopGet (AOP (left), MSB16, FALSE, NULL));
+    MOVA (aopGet (AOP (left), MSB16, FALSE, FALSE, NULL));
   }
   emitcode ("rrc", "a");
   aopPut (AOP (result), "a", MSB16 - offl);
 
   if (offl == LSB)
     {
-      MOVA (aopGet (AOP (left), LSB, FALSE, NULL));
+      MOVA (aopGet (AOP (left), LSB, FALSE, FALSE, NULL));
       emitcode ("rrc", "a");
       aopPut (AOP (result), "a", LSB);
     }
 }
-#endif
 
-#if 0
-//REMOVE ME!!!
 /*-----------------------------------------------------------------*/
 /* genrshFour - shift four byte by a known amount != 0             */
 /*-----------------------------------------------------------------*/
@@ -8535,22 +8550,24 @@ static void
 genrshFour (operand * result, operand * left,
 	    int shCount, int sign)
 {
-  D (emitcode (";", "genrshFour");
-    );
+  D (emitcode (";", "genrshFour"););
 
   /* if shifting more that 3 bytes */
   if (shCount >= 24)
     {
       shCount -= 24;
+      _startLazyDPSEvaluation();
       if (shCount)
 	shiftR1Left2Result (left, MSB32, result, LSB, shCount, sign);
       else
 	movLeft2Result (left, MSB32, result, LSB, sign);
       addSign (result, MSB16, sign);
+      _endLazyDPSEvaluation();
     }
   else if (shCount >= 16)
     {
       shCount -= 16;
+      _startLazyDPSEvaluation();
       if (shCount)
 	shiftR2Left2Result (left, MSB24, result, LSB, shCount, sign);
       else
@@ -8559,12 +8576,16 @@ genrshFour (operand * result, operand * left,
 	  movLeft2Result (left, MSB32, result, MSB16, sign);
 	}
       addSign (result, MSB24, sign);
+      _endLazyDPSEvaluation();
     }
   else if (shCount >= 8)
     {
       shCount -= 8;
+      _startLazyDPSEvaluation();
       if (shCount == 1)
-	shiftRLong (left, MSB16, result, sign);
+	{
+	    shiftRLong (left, MSB16, result, sign);
+	}
       else if (shCount == 0)
 	{
 	  movLeft2Result (left, MSB16, result, LSB, 0);
@@ -8580,9 +8601,11 @@ genrshFour (operand * result, operand * left,
 	  shiftR1Left2Result (left, MSB32, result, MSB24, shCount, sign);
 	  addSign (result, MSB32, sign);
 	}
+	_endLazyDPSEvaluation();
     }
   else
-    {				/* 1 <= shCount <= 7 */
+    {	
+	/* 1 <= shCount <= 7 */
       if (shCount <= 2)
 	{
 	  shiftRLong (left, LSB, result, sign);
@@ -8597,7 +8620,6 @@ genrshFour (operand * result, operand * left,
 	}
     }
 }
-#endif
 
 #ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
@@ -8621,7 +8643,8 @@ genRightShiftLiteral (operand * left,
   if ((shCount != 0)
    && (shCount < (size * 8))
    && (size != 1)
-   && (size != 2))
+   && (size != 2)
+   /* && (size != 4) in a minute... */)
   {
       D(emitcode (";", "genRightShiftLiteral wimping out"););	
       return FALSE;
@@ -8670,7 +8693,7 @@ genRightShiftLiteral (operand * left,
 	case 2:
 	  genrshTwo (result, left, shCount, sign);
 	  break;
-#if 0
+#if 1
 	case 4:
 	  genrshFour (result, left, shCount, sign);
 	  break;
@@ -10509,6 +10532,8 @@ genAddrOf (iCode * ic)
       /* if 10 bit stack */
       if (options.stack10bit) {
 	  char buff[10];
+	  int  offset;
+	  
 	  tsprintf(buff, sizeof(buff), 
 		   "#!constbyte",(options.stack_loc >> 16) & 0xff);
 	  /* if it has an offset then we need to compute it */
@@ -10527,9 +10552,13 @@ genAddrOf (iCode * ic)
 					     ((char) sym->stack )) & 0xff);
 	      emitcode ("mov", "b,a");
 	      emitcode ("mov", "a,_bpx+1");
-	      emitcode ("addc","a,#!constbyte", (((sym->stack < 0) ? 
-					      ((short) (sym->stack - _G.nRegsSaved)) :
-					      ((short) sym->stack )) >> 8) & 0xff);
+	      
+	      offset = (((sym->stack < 0) ? 
+			 ((short) (sym->stack - _G.nRegsSaved)) :
+			 ((short) sym->stack )) >> 8) & 0xff;
+	  
+	      emitcode ("addc","a,#!constbyte", offset);
+
 	      aopPut (AOP (IC_RESULT (ic)), "b", 0);
 	      aopPut (AOP (IC_RESULT (ic)), "a", 1);
 	      aopPut (AOP (IC_RESULT (ic)), buff, 2);
@@ -11160,7 +11189,7 @@ genCast (iCode * ic)
   /* also, if the source is a bit, we don't need to sign extend, because
    * it can't possibly have set the sign bit.
    */
-  if (SPEC_USIGN (rtype) || !IS_SPEC (rtype) || AOP_TYPE (right) == AOP_CRY)
+  if (!IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE (right) == AOP_CRY)
     {
       while (size--)
 	{

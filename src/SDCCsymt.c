@@ -1262,7 +1262,8 @@ checkSClass (symbol * sym, int isProto)
 	   * control this allcoation, but the code was originally that way, and
 	   * changing it for non-390 ports breaks the compiler badly.
 	   */
-	  bool useXdata = TARGET_IS_DS390 ? 1 : options.useXstack;
+	  bool useXdata = (TARGET_IS_DS390 || TARGET_IS_DS400) ? 
+		1 : options.useXstack;
 	  SPEC_SCLS (sym->etype) = (useXdata ?
 				    S_XDATA : S_FIXED);
 	}

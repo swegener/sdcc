@@ -482,6 +482,7 @@ AC_DEFINE_UNQUOTED(STD_INT_LIB,   "libint")
 AC_DEFINE_UNQUOTED(STD_LONG_LIB,  "liblong")
 AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat")
 AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390")
+AC_DEFINE_UNQUOTED(STD_DS400_LIB, "libds400")
 AC_DEFINE_UNQUOTED(STD_XA51_LIB,  "libxa51")
 
 # SDCC runtime environment variables
@@ -552,6 +553,17 @@ else
     echo ds390 >>ports.build
     AC_DEFINE_UNQUOTED(OPT_DISABLE_DS390, 0)
     AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, 0)
+fi
+
+AC_ARG_ENABLE(ds400-port,
+            AC_HELP_STRING([--disable-ds400-port],
+                           [Excludes the DS400 port]))
+echo ds400 >>ports.all
+if test "$enable_ds400_port" = "no"; then
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS300, 1)
+else
+    echo ds400 >>ports.build
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS400, 0)
 fi
 
 AC_ARG_ENABLE(pic-port,

@@ -1,3 +1,8 @@
+2003-04-29  Kevin Vigor <kevin@vigor.nu>
+
+	Initial support for DS80C400. "Hello world" runs on TINIm400 
+	(with polled I/O).
+
 2003-04-28  Karl Bongers(apply patches for Martin Helmling)
 
 	 * debugger/mcs51/sdcdb.c,simi.c,cmd.c,symtab.c and .h files.

@@ -36,6 +36,7 @@
 #undef STD_LONG_LIB
 #undef STD_FP_LIB
 #undef STD_DS390_LIB
+#undef STD_DS400_LIB
 #undef STD_XA51_LIB
 
 #undef HAVE_SYS_SOCKET_H
@@ -62,6 +63,7 @@
 #undef OPT_DISABLE_Z80
 #undef OPT_DISABLE_AVR
 #undef OPT_DISABLE_DS390
+#undef OPT_DISABLE_DS400
 #undef OPT_DISABLE_TININative
 #undef OPT_DISABLE_PIC
 #undef OPT_DISABLE_XA51

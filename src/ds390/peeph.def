@@ -2416,3 +2416,280 @@ replace {
 %1:
         ret
 }
+
+// applies to f.e. device/lib/log10f.c
+replace {
+        mov     %1,%9
+        mov     %2,%10
+        mov     %3,%11
+        mov     %4,%12
+        
+        mov     %5,%13
+        mov     %6,%14
+        mov     %7,%15
+        mov     %8,%16
+
+        mov     %9,%1
+        mov     %10,%2
+        mov     %11,%3
+        mov     %12,%4
+} by {
+        mov     %1,%9
+        mov     %2,%10
+        mov     %3,%11
+        mov     %4,%12
+        
+        mov     %5,%13
+        mov     %6,%14
+        mov     %7,%15
+        mov     %8,%16
+        ;       Peephole 238.a  removed 4 redundant moves
+} if operandsNotSame8 %1 %2 %3 %4 %5 %6 %7 %8
+
+// applies to device/lib/log10f.c
+replace {
+        mov     %1,%5
+        mov     %2,%6
+        mov     %3,%7
+        mov     %4,%8
+        
+        mov     %5,%1
+        mov     %6,%2
+        mov     %7,%3
+} by {
+        mov     %1,%5
+        mov     %2,%6
+        mov     %3,%7
+        mov     %4,%8
+        ;       Peephole 238.b  removed 3 redundant moves
+} if operandsNotSame7 %1 %2 %3 %4 %5 %6 %7
+
+// applies to f.e. device/lib/time.c
+replace {
+        mov     %1,%5
+        mov     %2,%6
+        
+        mov     %3,%7
+        mov     %4,%8
+
+        mov     %5,%1
+        mov     %6,%2
+} by {
+        mov     %1,%5
+        mov     %2,%6
+        
+        mov     %3,%7
+        mov     %4,%8
+        ;       Peephole 238.c  removed 2 redundant moves
+} if operandsNotSame4 %1 %2 %3 %4
+
+// applies to f.e. support/regression/tests/bug-524209.c
+replace {
+        mov     %1,%4
+        mov     %2,%5
+        mov     %3,%6
+
+        mov     %4,%1
+        mov     %5,%2
+        mov     %6,%3
+} by {
+        mov     %1,%4
+        mov     %2,%5
+        mov     %3,%6
+        ;       Peephole 238.d  removed 3 redundant moves
+} if operandsNotSame6 %1 %2 %3 %4 %5 %6 
+
+// applies to f.e. ser_ir.asm
+replace {
+        mov     r%1,acc
+} by {
+        ;       Peephole 239    used a instead of acc
+        mov     r%1,a
+}
+
+replace restart {
+	mov	a,%1
+	addc	a,#0x00
+} by {
+	;	Peephole 240    use clr instead of addc a,#0
+	clr	a
+	addc	a,%1
+}
+
+// peepholes 241.a to 241.c and 241.d to 241.f need to be in order
+replace {
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        cjne    r%6,#%7,%3
+        cjne    r%8,#%9,%3
+        mov     a,#0x01
+        sjmp    %10      
+%3:     
+        clr     a
+%10:     
+} by {
+        ;       Peephole 241.a  optimized compare
+        clr     a
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        cjne    r%6,#%7,%3
+        cjne    r%8,#%9,%3
+        inc     a
+%3:
+%10:
+} 
+
+// applies to f.e. time.c
+replace {
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        mov     a,#0x01
+        sjmp    %6      
+%3:     
+        clr     a
+%6:     
+} by {
+        ;       Peephole 241.b  optimized compare
+        clr     a
+        cjne    r%1,#%2,%3
+        cjne    r%4,#%5,%3
+        inc     a
+%3:
+%6:
+} 
+
+// applies to f.e. malloc.c
+replace {
+        cjne    r%1,#%2,%3
+        mov     a,#0x01
+        sjmp    %4
+%3:     
+        clr     a
+%4:     
+} by {
+        ;       Peephole 241.c  optimized compare
+        clr     a
+        cjne    r%1,#%2,%3
+        inc     a
+%3:
+%4:
+} 
+
+// applies to f.e. j = (k!=0x1000); 
+// with volatile idata long k;
+replace {
+        cjne    @r%1,#%2,%3
+	inc	r%1	
+        cjne    @r%1,#%4,%3
+	inc	r%1	
+        cjne    @r%1,#%5,%3
+	inc	r%1	
+        cjne    @r%1,#%6,%3
+        mov     a,#0x01
+        sjmp    %7      
+%3:     
+        clr     a
+%7:     
+} by {
+        ;       Peephole 241.d  optimized compare
+        clr     a
+        cjne    @r%1,#%2,%3
+	inc	r%1
+        cjne    @r%1,#%4,%3
+	inc	r%1
+        cjne    @r%1,#%5,%3
+	inc	r%1
+        cjne    @r%1,#%6,%3
+        inc     a
+%3:
+%7:
+} 
+
+// applies to f.e. j = (k!=0x1000); 
+// with volatile idata int k;
+replace {
+        cjne    @r%1,#%2,%3
+	inc	r%1	
+        cjne    @r%1,#%4,%3
+        mov     a,#0x01
+        sjmp    %7      
+%3:     
+        clr     a
+%7:     
+} by {
+        ;       Peephole 241.e  optimized compare
+        clr     a
+        cjne    @r%1,#%2,%3
+	inc	r%1
+        cjne    @r%1,#%4,%3
+        inc     a
+%3:
+%7:
+} 
+
+// applies to f.e. vprintf.asm (--stack-auto)
+replace {
+        cjne    @r%1,#%2,%3
+        mov     a,#0x01
+        sjmp    %7
+%3:     
+        clr     a
+%7:     
+} by {
+        ;       Peephole 241.f  optimized compare
+        clr     a
+        cjne    @r%1,#%2,%3
+        inc     a
+%3:
+%7:
+} 
+
+// applies to f.e. scott-bool1.c
+replace {
+        jnz     %1
+        mov     %2,%3
+%1:
+        jz      %4
+} by {
+        ;       Peephole 242.a  avoided branch jnz to jz
+        jnz     %1
+        mov     %2,%3
+        jz      %4
+%1:
+} if labelRefCount %1 1
+
+// applies to f.e. scott-bool1.c
+replace {
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+%1:
+        jz      %4
+} by {
+        ;       Peephole 242.b  avoided branch jnz to jz
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+        jz      %4
+%1:
+} if labelRefCount %1 1
+
+// applies to f.e. logic.c
+replace {
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+        orl     a,%6
+        orl     a,%7
+%1:
+        jz      %4
+} by {
+        ;       Peephole 242.c  avoided branch jnz to jz
+        jnz     %1
+        mov     %2,%3
+        orl     a,%5
+        orl     a,%6
+        orl     a,%7
+        jz      %4
+%1:
+} if labelRefCount %1 1

@@ -38,6 +38,7 @@
 #define STD_LONG_LIB          "liblong"
 #define STD_FP_LIB            "libfloat"
 #define STD_DS390_LIB         "libds390"
+#define STD_DS400_LIB	      "libds400"
 // #undef STD_XA51_LIB
 
 // #undef HAVE_SYS_SOCKET_H

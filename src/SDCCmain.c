@@ -273,6 +273,9 @@ static PORT *_ports[] =
 #if !OPT_DISABLE_XA51
   &xa51_port,
 #endif
+#if !OPT_DISABLE_DS400
+  &ds400_port,	
+#endif	
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
@@ -1357,7 +1360,21 @@ linkEdit (char **envp)
 	  break;
 	case MODEL_FLAT24:
 	  /* c = "flat24"; */
-	  c = "ds390";
+	    if (TARGET_IS_DS390)
+	    {
+		c = "ds390";
+	    }
+	    else if (TARGET_IS_DS400)
+	    {
+		c = "ds400";
+	    }
+	    else
+	    {
+		fprintf(stderr, 
+			"Add support for your FLAT24 target in %s @ line %d\n",
+			__FILE__, __LINE__);
+		exit(-1);
+	    }
 	  break;
 	case MODEL_PAGE0:
 	  c = "xa51";
@@ -1373,7 +1390,21 @@ linkEdit (char **envp)
 #if !OPT_DISABLE_DS390
       if (options.model == MODEL_FLAT24)
 	{
-	  fprintf (lnkfile, "-l %s\n", STD_DS390_LIB);
+	    if (TARGET_IS_DS390)
+	    {
+		fprintf (lnkfile, "-l %s\n", STD_DS390_LIB);
+	    }
+	    else if (TARGET_IS_DS400)
+	    {
+		fprintf (lnkfile, "-l %s\n", STD_DS400_LIB);
+	    }
+	    else
+	    {
+		fprintf(stderr, 
+			"Add support for your FLAT24 target in %s @ line %d\n",
+			__FILE__, __LINE__);
+		exit(-1);
+	    }	    
 	}
 #endif
 

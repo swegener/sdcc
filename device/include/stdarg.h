@@ -11,7 +11,7 @@ typedef unsigned char * va_list;
 #define va_start(list, last)	list = (unsigned char *)&last + sizeof(last)
 #define va_arg(list, type)	*((type *)((list += sizeof(type)) - sizeof(type)))
 
-#elif defined(__ds390)
+#elif defined(__ds390) || defined(__ds400)
 
 typedef	unsigned char * va_list ;
 #define va_arg(marker,type) *((type *)(marker -= sizeof(type)))

@@ -578,7 +578,6 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
 void 
 _printPointerType (FILE * oFile, const char *name)
 {
-  /* if (TARGET_IS_DS390) */
   if (options.model == MODEL_FLAT24)
     {
       fprintf (oFile, "\t.byte %s,(%s >> 8),(%s >> 16)", name, name, name);
@@ -1577,7 +1576,7 @@ glue (void)
   
   /*JCF: Create the areas for the register banks*/
   if(port->general.glue_up_main &&
-     (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51))
+     (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400))
   {
 	  if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
 	  {
@@ -1696,8 +1695,14 @@ glue (void)
 		   (unsigned int) options.xdata_loc & 0xff);
 	}
 
-      /* initialise the stack pointer.  JCF: aslink takes care of the location */
-	fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");	/* MOF */
+	// This should probably be a port option, but I'm being lazy.
+	// on the 400, the firmware boot loader gives us a valid stack
+	// (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
+	if (!TARGET_IS_DS400)
+	{
+	    /* initialise the stack pointer.  JCF: aslink takes care of the location */
+	    fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");	/* MOF */
+	}
 
       fprintf (asmFile, "\tlcall\t__sdcc_external_startup\n");
       fprintf (asmFile, "\tmov\ta,dpl\n");

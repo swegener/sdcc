@@ -15,6 +15,7 @@
 #define TARGET_ID_DS390    5
 #define TARGET_ID_PIC      6
 #define TARGET_ID_XA51     9
+#define TARGET_ID_DS400	   10
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -24,6 +25,7 @@
 #define TARGET_IS_Z80 (port->id==TARGET_ID_Z80)
 #define TARGET_IS_AVR (port->id==TARGET_ID_AVR)
 #define TARGET_IS_DS390 (port->id==TARGET_ID_DS390)
+#define TARGET_IS_DS400 (port->id==TARGET_ID_DS400)
 #define TARGET_IS_PIC   (port->id==TARGET_ID_PIC)
 #define TARGET_IS_XA51 (port->id==TARGET_ID_XA51)
 
@@ -283,6 +285,9 @@ extern PORT tininative_port;
 #endif
 #if !OPT_DISABLE_XA51
 extern PORT xa51_port;
+#endif
+#if !OPT_DISABLE_DS400
+extern PORT ds400_port;
 #endif
 
 #endif /* PORT_INCLUDE*/

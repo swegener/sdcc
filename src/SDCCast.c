@@ -414,6 +414,9 @@ int setAstLineno ( ast *tree, int lineno)
     return 0;
 }
 
+#if 0
+/* this functions seems to be superfluous?! kmh */
+
 /*-----------------------------------------------------------------*/
 /* resolveFromTable - will return the symbal table value           */
 /*-----------------------------------------------------------------*/
@@ -439,6 +442,7 @@ value *resolveFromTable (value *val)
 
     return val;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* funcOfType :- function of type with name                        */
@@ -577,10 +581,12 @@ int processParms (ast *func, value *defParm,
 	actParm->ftype= defParm->type;
     }
     
-    actParm->argSym = resolveFromTable(defParm)->sym ;
+/*    actParm->argSym = resolveFromTable(defParm)->sym ; */
+    actParm->argSym = defParm->sym;
     /* make a copy and change the regparm type to the defined parm */
     actParm->etype = getSpec(actParm->ftype = copyLinkChain(actParm->ftype));
     SPEC_REGPARM(actParm->etype) = SPEC_REGPARM(defParm->etype);
+    (*parmNumber)++;
     return 0;
 }
 /*-----------------------------------------------------------------*/

@@ -60,7 +60,6 @@ Authors and interested persons:
 * Johan Knol          <johan.knol AT iduna.nl>
 * Karl Bongers        <karl AT turbobit.com>
 * Kevin Vigor         <kevin AT vigor.nu>
-* Michael Hope        <michaelh AT juju.net.nz> <nz_michaelh AT yahoo.com>
 * Scott Dattalo       <scott AT dattalo.com>
 * Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 * Hans-Juergen Dorn   <hans.dorn AT apl-landau.de>
@@ -72,6 +71,7 @@ Authors and interested persons:
 * Borut Razem         <borut.razem AT siol.net>
 * Vangelis Rokas      <vrokas AT otenet.gr>
 * Paul Stoffregen     <paul AT pjrc.com>
+* Michael Hope        <michaelh AT juju.net.nz> <nz_michaelh AT yahoo.com>
 
 SDCC includes code from:
 * Alan Baldwin      <baldwin AT shop-pdp.kent.edu>

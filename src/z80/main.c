@@ -71,6 +71,14 @@ extern PORT z80_port;
 
 #include "mappings.i"
 
+static builtins _z80_builtins[] = {
+  /* Disabled for now.
+    { "__builtin_strcpy", "v", 2, {"cg*", "cg*" } },
+    { "__builtin_memcpy", "cg*", 3, {"cg*", "cg*", "ui" } },
+  */
+    { NULL , NULL,0, {NULL}}
+};    
+
 static void
 _z80_init (void)
 {
@@ -383,7 +391,7 @@ _getRegName (struct regs *reg)
     {
       return reg->name;
     }
-  assert (0);
+  //  assert (0);
   return "err";
 }
 
@@ -513,7 +521,7 @@ PORT z80_port =
   0,				/* leave == */
   TRUE,                         /* Array initializer support. */	
   0,                            /* no CSE cost estimation yet */
-  NULL, 			/* no builtin functions */
+  _z80_builtins,		/* no builtin functions */
   PORT_MAGIC
 };
 
@@ -597,6 +605,6 @@ PORT gbz80_port =
   0,				/* leave == */
   TRUE,                         /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
-  NULL, 			/* no builtin functions */
+  NULL,				/* no builtin functions */
   PORT_MAGIC
 };

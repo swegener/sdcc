@@ -2435,8 +2435,6 @@ emitCall (iCode * ic, bool ispcall)
 {
   sym_link *dtype = operandType (IC_LEFT (ic));
 
-  bitVect *rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
-
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     {
@@ -2581,21 +2579,23 @@ emitCall (iCode * ic, bool ispcall)
       else
 	{
 	  spillCached ();
-	  if (i > 6)
+	  if (i > 8)
 	    {
-	      emit2 ("ld hl,#%d", i);
-	      emit2 ("add hl,sp");
-	      emit2 ("ld sp,hl");
+	      emit2 ("ld iy,#%d", i);
+	      emit2 ("add iy,sp");
+	      emit2 ("ld sp,iy");
 	    }
 	  else
 	    {
 	      while (i > 1)
 		{
-		  emit2 ("pop hl");
+		  emit2 ("pop af");
 		  i -= 2;
 		}
 	      if (i)
-		emit2 ("inc sp");
+                {
+                  emit2 ("inc sp");
+                }
 	    }
 	}
     }
@@ -2604,54 +2604,58 @@ emitCall (iCode * ic, bool ispcall)
 
   if (_G.stack.pushedDE) 
     {
-      bool dInUse = bitVectBitValue(rInUse, D_IDX);
-      bool eInUse = bitVectBitValue(rInUse, E_IDX);
+      bool dInRet = bitVectBitValue(ic->rUsed, D_IDX);
+      bool eInRet = bitVectBitValue(ic->rUsed, E_IDX);
 
-      if (dInUse && eInUse) 
+      if (dInRet && eInRet)
         {
+          wassertl (0, "Shouldn't push DE if it's wiped out by the return");
+        }
+      else if (dInRet)
+        {
+          /* Only restore E */
+          emit2 ("ld a,d");
           _pop (PAIR_DE);
+          emit2 ("ld d,a");
         }
-      else if (dInUse)
+      else if (eInRet)
         {
-          _pop(PAIR_HL);
-          emit2 ("ld d,h");
-        }
-      else if (eInUse)
-        {
-          _pop(PAIR_HL);
-          emit2 ("ld e,l");
+          /* Only restore D */
+          _pop (PAIR_AF);
+          emit2 ("ld d,a");
         }
       else
         {
-          wassertl (0, "Neither D or E were in use but it was pushed.");
+          _pop (PAIR_DE);
         }
       _G.stack.pushedDE = FALSE;
     }
   
   if (_G.stack.pushedBC) 
     {
-      bool bInUse = bitVectBitValue(rInUse, B_IDX);
-      bool cInUse = bitVectBitValue(rInUse, C_IDX);
+      bool bInRet = bitVectBitValue(ic->rUsed, B_IDX);
+      bool cInRet = bitVectBitValue(ic->rUsed, C_IDX);
 
-      // If both B and C are used in the return value, then we won't get
-      // here.
-      if (bInUse && cInUse) 
+      if (bInRet && cInRet)
         {
+          wassertl (0, "Shouldn't push BC if it's wiped out by the return");
+        }
+      else if (bInRet)
+        {
+          /* Only restore C */
+          emit2 ("ld a,b");
           _pop (PAIR_BC);
+          emit2 ("ld b,a");
         }
-      else if (bInUse)
+      else if (cInRet)
         {
-          _pop(PAIR_HL);
-          emit2 ("ld b,h");
-        }
-      else if (cInUse)
-        {
-          _pop(PAIR_HL);
-          emit2 ("ld c,l");
+          /* Only restore B */
+          _pop (PAIR_AF);
+          emit2 ("ld b,a");
         }
       else
         {
-          wassertl (0, "Neither B or C were in use but it was pushed.");
+          _pop (PAIR_BC);
         }
       _G.stack.pushedBC = FALSE;
     }
@@ -4220,7 +4224,9 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
     }
 
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    {
+      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+    }
 
   /* if the right side is a literal then anything goes */
   if (AOP_TYPE (right) == AOP_LIT &&
@@ -4345,11 +4351,9 @@ genCmpEq (iCode * ic, iCode * ifx)
       else
 	{
 	  tlbl = newiTempLabel (NULL);
-          emitDebug(";1");
 	  gencjneshort (left, right, tlbl);
 	  if (IC_TRUE (ifx))
 	    {
-              emitDebug(";2");
 	      emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
 	      emitLabel (tlbl->key + 100);
 	    }
@@ -4357,7 +4361,6 @@ genCmpEq (iCode * ic, iCode * ifx)
 	    {
 	      /* PENDING: do this better */
 	      symbol *lbl = newiTempLabel (NULL);
-              emitDebug(";3");
 	      emit2 ("!shortjp !tlabel", lbl->key + 100);
 	      emitLabel (tlbl->key + 100);
 	      emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
@@ -6679,6 +6682,284 @@ genArrayInit (iCode * ic)
   freeAsmop (IC_LEFT(ic), NULL, ic);
 }
 
+static void
+_swap (PAIR_ID one, PAIR_ID two)
+{
+  if ((one == PAIR_DE && two == PAIR_HL) || (one == PAIR_HL && two == PAIR_DE))
+    {
+      emit2 ("ex de,hl");
+    }
+  else
+    {
+      emit2 ("ld a,%s", _pairs[one].l);
+      emit2 ("ld %s,%s", _pairs[one].l, _pairs[two].l);
+      emit2 ("ld %s,a", _pairs[two].l);
+      emit2 ("ld a,%s", _pairs[one].h);
+      emit2 ("ld %s,%s", _pairs[one].h, _pairs[two].h);
+      emit2 ("ld %s,a", _pairs[two].h);
+    }
+}
+
+/* The problem is that we may have all three pairs used and they may
+   be needed in a different order.
+
+   Note: Have ex de,hl
+
+   Combinations:
+     hl = hl		=> unity, fine
+     bc = bc
+     de = de
+
+     hl = hl		hl = hl, swap de <=> bc
+     bc = de
+     de = bc
+
+     hl = bc		Worst case
+     bc = de
+     de = hl
+     
+     hl = bc		de = de, swap bc <=> hl
+     bc = hl
+     de = de
+
+     hl = de		Worst case
+     bc = hl
+     de = bc
+
+     hl = de		bc = bc, swap hl <=> de
+     bc = bc
+     de = hl
+
+   Break it down into:
+    * Any pair = pair are done last
+    * Any pair = iTemp are done last
+    * Any swaps can be done any time
+
+   A worst case:
+    push p1
+    p1 = p2
+    p2 = p3
+    pop  p3
+
+   So how do we detect the cases?
+   How about a 3x3 matrix?
+   	source
+   dest x x x x
+        x x x x
+        x x x x (Fourth for iTemp/other)
+
+   First determin which mode to use by counting the number of unity and
+   iTemp assigns.
+     Three - any order
+     Two - Assign the pair first, then the rest
+     One - Swap the two, then the rest
+     Zero - Worst case.
+*/
+static void
+setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
+{
+  PAIR_ID ids[NUM_PAIRS][NUM_PAIRS];
+  PAIR_ID dest[3] = {
+    PAIR_BC, PAIR_HL, PAIR_DE
+  };
+  int i, j, nunity = 0;
+  memset (ids, PAIR_INVALID, sizeof (ids));
+
+  /* Sanity checks */
+  wassert (nparams == 3);
+
+  /* First save everything that needs to be saved. */
+  _saveRegsForCall (ic, 0);
+
+  /* Loading HL first means that DE is always fine. */
+  for (i = 0; i < nparams; i++)
+    {
+      aopOp (pparams[i], ic, FALSE, FALSE);
+      ids[dest[i]][getPairId (AOP (pparams[i]))] = TRUE;
+    }
+
+  /* Count the number of unity or iTemp assigns. */
+  for (i = 0; i < 3; i++) 
+    {
+      if (ids[dest[i]][dest[i]] == TRUE || ids[dest[i]][PAIR_INVALID] == TRUE)
+        {
+          nunity++;
+        }
+    }
+
+  if (nunity == 3)
+    {
+      /* Any order, fall through. */
+    }
+  else if (nunity == 2)
+    {
+      /* One is assigned.  Pull it out and assign. */
+      for (i = 0; i < 3; i++)
+        {
+          for (j = 0; j < NUM_PAIRS; j++)
+            {
+              if (ids[dest[i]][j] == TRUE)
+                {
+                  /* Found it.  See if it's the right one. */
+                  if (j == PAIR_INVALID || j == dest[i])
+                    {
+                      /* Keep looking. */
+                    }
+                  else
+                    {
+                      fetchPair(dest[i], AOP (pparams[i]));
+                      goto done;
+                    }
+                }
+            }
+        }
+    }
+  else if (nunity == 1)
+    {
+      /* Find the pairs to swap. */
+      for (i = 0; i < 3; i++)
+        {
+          for (j = 0; j < NUM_PAIRS; j++)
+            {
+              if (ids[dest[i]][j] == TRUE)
+                {
+                  if (j == PAIR_INVALID || j == dest[i])
+                    {
+                      /* Keep looking. */
+                    }
+                  else
+                    {
+                      _swap (j, dest[i]);
+                      goto done;
+                    }
+                }
+            }
+        }
+    }
+  else
+    {
+      int next = getPairId (AOP (pparams[0]));
+      emit2 ("push %s", _pairs[next].name);
+
+      if (next == dest[1])
+        {
+          fetchPair (dest[1], AOP (pparams[1]));
+          fetchPair (dest[2], AOP (pparams[2]));
+        }
+      else
+        {
+          fetchPair (dest[2], AOP (pparams[2]));
+          fetchPair (dest[1], AOP (pparams[1]));
+        }
+      emit2 ("pop %s", _pairs[dest[0]].name);
+    }
+ done:
+  /* Finally pull out all of the iTemps */
+  for (i = 0; i < 3; i++)
+    {
+      if (ids[dest[i]][PAIR_INVALID] == 1)
+        {
+          fetchPair (dest[i], AOP (pparams[i]));
+        }
+    }
+}
+
+static void
+genBuiltInStrcpy (iCode *ic, int nParams, operand **pparams)
+{
+  operand *from, *to;
+  symbol *label;
+  bool deInUse;
+
+  wassertl (nParams == 2, "Built-in strcpy must have two parameters");
+  to = pparams[0];
+  from = pparams[1];
+
+  deInUse = bitVectBitValue (ic->rMask, D_IDX) || bitVectBitValue(ic->rMask, E_IDX);
+
+  setupForBuiltin3 (ic, nParams, pparams);
+
+  label = newiTempLabel(NULL);
+
+  emitLabel (label->key);
+  emit2 ("ld a,(hl)");
+  emit2 ("ldi");
+  emit2 ("or a");
+  emit2 ("!shortjp nz,!tlabel ; 1", label->key);
+
+  freeAsmop (from, NULL, ic->next);
+  freeAsmop (to, NULL, ic);
+}
+
+static void
+genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
+{
+  operand *from, *to, *count;
+  symbol *label;
+  bool deInUse;
+  iCode *pcall;
+
+  wassertl (nParams == 3, "Built-in memcpy must have two parameters");
+  to = pparams[2];
+  from = pparams[1];
+  count = pparams[0];
+
+  deInUse = bitVectBitValue (ic->rMask, D_IDX) || bitVectBitValue(ic->rMask, E_IDX);
+
+  setupForBuiltin3 (ic, nParams, pparams);
+
+  emit2 ("ldir");
+
+  freeAsmop (count, NULL, ic->next->next);
+  freeAsmop (from, NULL, ic);
+
+  _restoreRegsAfterCall();
+
+  /* if we need assign a result value */
+  if ((IS_ITEMP (IC_RESULT (ic)) &&
+       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
+	OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
+      IS_TRUE_SYMOP (IC_RESULT (ic)))
+    {
+      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
+      movLeft2ResultLong (to, 0, IC_RESULT (ic), 0, 0, 2);
+      freeAsmop (IC_RESULT (ic), NULL, ic);
+    }
+
+  freeAsmop (to, NULL, ic->next);
+}
+
+/*-----------------------------------------------------------------*/
+/* genBuiltIn - calls the appropriate function to  generating code */
+/* for a built in function 					   */
+/*-----------------------------------------------------------------*/
+static void genBuiltIn (iCode *ic)
+{
+    operand *bi_parms[MAX_BUILTIN_ARGS];
+    int nbi_parms;
+    iCode *bi_iCode;
+    symbol *bif;
+
+    /* get all the arguments for a built in function */
+    bi_iCode = getBuiltinParms(ic,&nbi_parms,bi_parms);
+
+    /* which function is it */
+    bif = OP_SYMBOL(IC_LEFT(bi_iCode));
+
+    if (strcmp(bif->name,"__builtin_strcpy")==0) 
+      {
+	genBuiltInStrcpy(bi_iCode, nbi_parms, bi_parms);
+      } 
+    else if (strcmp(bif->name,"__builtin_memcpy")==0) 
+      {
+	genBuiltInMemcpy(bi_iCode, nbi_parms, bi_parms);
+      } 
+    else 
+      {
+	wassertl (0, "Unknown builtin function encountered");
+      }
+}
+
 /*-----------------------------------------------------------------*/
 /* genZ80Code - generate code for Z80 based controllers            */
 /*-----------------------------------------------------------------*/
@@ -6946,8 +7227,16 @@ genZ80Code (iCode * lic)
 	  break;
 
 	case SEND:
-	  emitDebug ("; addSet");
-	  addSet (&_G.sendSet, ic);
+	  if (ic->builtinSEND)
+            {
+              emitDebug ("; genBuiltIn");
+              genBuiltIn(ic);
+            }
+          else
+            {
+              emitDebug ("; addSet");
+              addSet (&_G.sendSet, ic);
+            }
 	  break;
 
 	case ARRAYINIT:

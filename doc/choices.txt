@@ -192,3 +192,30 @@ Pending optimisations:
         ...
         push    iTemp4
 
+Swaps:
+        ld      hl,bc           ; 8
+        ld      bc,de           ; 8
+        ld      de,hl           ; 8
+
+vs
+        push    bc		; 11
+        ld      bc,de           ; 8
+        pop     de              ; 11
+
+Swaps 2:
+        ld      a,h
+        ld      h,b
+        ld      b,a
+        ld      a,l
+        ld      l,c
+        ld      c,aq            ; 6*4 = 24
+
+Cleaning up the arguments to a call:
+         ld     iy,#n           ; 14
+         add    iy,sp           ; 15
+         ld     sp,iy           ; 10 = 39
+
+         pop    af              ; 5/byte
+
+
+So for 8 bytes and above use the first form.

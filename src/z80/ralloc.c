@@ -2128,7 +2128,7 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
   if (bitVectnBitsOn (OP_DEFS (op)) > 1)
     return NULL;
 
-  if (getSize (operandType (op)) != 2)
+  if (getSize (operandType (op)) > 2)
     return NULL;
 
   /* And this is the definition */
@@ -2174,6 +2174,18 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
             continue;
         }
 
+      if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic))
+          && isOperandInDirSpace (IC_RESULT (ic)))
+        return NULL;
+
+      if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic))
+          && isOperandInDirSpace (IC_LEFT (ic)))
+        return NULL;
+
+      if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic))
+          && isOperandInDirSpace (IC_RIGHT (ic)))
+        return NULL;
+
       /* Handle the non left/right/result ones first */
       if (ic->op == IFX)
         continue;
@@ -2183,7 +2195,16 @@ packRegsForHLUse3 (iCode * lic, operand * op, eBBlock * ebp)
       if (SKIP_IC2(ic))
         continue;
 
+      if (ic->op == CAST)
+        continue;
+
       if (ic->op == IPUSH && isOperandEqual (op, IC_LEFT (ic)))
+        continue;
+
+      if (ic->op == SEND && isOperandEqual (op, IC_LEFT (ic)))
+        continue;
+
+      if (ic->op == CALL && isOperandEqual (op, IC_RESULT (ic)))
         continue;
 
       if ((ic->op == '=' && !POINTER_SET(ic)) ||

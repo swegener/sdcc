@@ -1,3 +1,12 @@
+2001-11-23  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/z80/ralloc.c (packRegsForHLUse3): Changed to not pack into HL if anything is in direct space.
+	(packRegsForHLUse3): Added packing support for send, cast, and return value from a call.
+
+	* src/z80/peeph.def: Added rules for optimising pushes of part of a pair.
+
+	* src/z80/gen.c (emitCall): Changed the stack fixup to not use HL.
+
 2001-11-18  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/z80/gen.c (genCmp): Fixed compare on unsigned.

@@ -142,3 +142,39 @@ replace {
 } by {
         and     a,#%1
 }
+replace {
+	ld	b,l
+	ld	a,b
+	pop	bc
+	ld	b,a
+} by {
+	ld	a,l
+	pop	bc
+	ld	b,a
+}
+replace {
+	ld	d,l
+	ld	a,d
+	pop	de
+	ld	d,a
+} by {
+	ld	a,l
+	pop	de
+	ld	d,a
+}
+replace {
+	ld	a,b
+	push	af
+	inc	sp
+} by {
+        push    bc
+        inc     sp
+}
+replace {
+	ld	a,d
+	push	af
+	inc	sp
+} by {
+        push    de
+        inc     sp
+}

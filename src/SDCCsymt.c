@@ -790,8 +790,8 @@ getSize (sym_link * p)
       if (DCL_ELEM(p)) {
 	return DCL_ELEM (p) * getSize (p->next);
       } else {
-	werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
-		"can not tell the size of an array[]");
+	  //	werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+	  //	"can not tell the size of an array[]");
 	return 0;
       }
     case IPOINTER:
@@ -1116,13 +1116,6 @@ compStructSize (int su, structdef * sdef)
 	    checkDecl (loop, 1);
 	    sum += getSize (loop->type);
 	}
-
-#if 0 // jwk: this is done now in addDecl()
-	/* if function then do the arguments for it */
-	if (funcInChain (loop->type)) {
-	    processFuncArgs (loop);
-	}
-#endif
 
 	loop = loop->next;
 

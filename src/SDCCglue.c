@@ -292,23 +292,26 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		   sym->rname,
 		   SPEC_ADDR (sym->etype));
 	}
-      else
-	{
+      else {
 	  if (newSym) {
-	    // this has been moved to another segment
+	      // this has been moved to another segment
 	  } else {
-	    /* allocate space */
-	    if (options.debug) {
-	      fprintf (map->oFile, "==.\n");
-	    }
-	    if (IS_STATIC (sym->etype))
-	      tfprintf (map->oFile, "!slabeldef\n", sym->rname);
-	    else
-	      tfprintf (map->oFile, "!labeldef\n", sym->rname);
-	    tfprintf (map->oFile, "\t!ds\n", 
-		      (unsigned int) getSize (sym->type) & 0xffff);
+	      int size = getSize (sym->type);
+	      if (size==0) {
+		  werror(E_UNKNOWN_SIZE,sym->name);
+	      }
+	      /* allocate space */
+	      if (options.debug) {
+		  fprintf (map->oFile, "==.\n");
+	      }
+	      if (IS_STATIC (sym->etype))
+		  tfprintf (map->oFile, "!slabeldef\n", sym->rname);
+	      else
+		  tfprintf (map->oFile, "!labeldef\n", sym->rname);	      
+	      tfprintf (map->oFile, "\t!ds\n", 
+			(unsigned int)  size & 0xffff);
 	  }
-	}
+      }
     }
 }
 
@@ -1086,18 +1089,22 @@ emitStaticSeg (memmap * map, FILE * out)
 	      printIval (sym, sym->type, sym->ival, out);
 	      noAlloc--;
 	    }
-	  else
-	    {
+	  else {
 	      /* allocate space */
+	      int size = getSize (sym->type);
+	      
+	      if (size==0) {
+		  werror(E_UNKNOWN_SIZE,sym->name);
+	      }
 	      fprintf (out, "%s:\n", sym->rname);
 	      /* special case for character strings */
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
 		  SPEC_CVAL (sym->etype).v_char)
-		printChar (out,
-			   SPEC_CVAL (sym->etype).v_char,
-			   strlen (SPEC_CVAL (sym->etype).v_char) + 1);
+		  printChar (out,
+			     SPEC_CVAL (sym->etype).v_char,
+			     strlen (SPEC_CVAL (sym->etype).v_char) + 1);
 	      else
-		tfprintf (out, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
+		  tfprintf (out, "\t!ds\n", (unsigned int) size & 0xffff);
 	    }
 	}
     }
@@ -1342,16 +1349,20 @@ emitOverlay (FILE * afile)
 		       sym->rname,
 		       SPEC_ADDR (sym->etype));
 	    }
-	  else
-	    {
+	  else {
+	      int size = getSize(sym->type);
+
+	      if (size==0) {
+		  werror(E_UNKNOWN_SIZE,sym->name);
+	      }	      
 	      if (options.debug)
-		fprintf (afile, "==.\n");
+		  fprintf (afile, "==.\n");
 	      
 	      /* allocate space */
 	      tfprintf (afile, "!labeldef\n", sym->rname);
 	      tfprintf (afile, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
-	    }
-
+	  }
+	  
 	}
     }
 }

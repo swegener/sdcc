@@ -69,6 +69,21 @@ replace restart {
 %1:
 }
 
+// like peep5
+replace restart {
+        skpc
+        goto   %1
+%2:
+	incf   %3,f
+%1:
+} by {
+	;peep 5a
+	skpnc
+%2:
+	incf   %3,f
+%1:
+}
+
 // peep 6
 replace restart {
         skpnc
@@ -81,3 +96,4 @@ replace restart {
 	incf   %2,f
 %1:
 }
+

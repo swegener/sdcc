@@ -17,145 +17,120 @@ void done()
 
 }
 
-
-
-void char_lt_char(void)
+void bool_or1(void)
 {
-  if(achar0 < achar1)
+
+  if( (achar0 >0) || (achar1 >0 ))
     failures++;
 }
 
-void char_gt_char(void)
+void bool_or2(void)
 {
-  if(achar1 > achar0)
+
+  if( achar0 || achar1)
     failures++;
 }
 
-void char_lte_char(void)
+void bool_test1(void)
 {
-  if(achar0 <= achar1)
-    failures++;
-}
 
-void char_gte_char(void)
-{
-  if(achar1 >= achar0)
-    failures++;
-}
-
-void char_lt_lit(void)
-{
-  if(achar1 < 0x10)
-    failures++;
-}
-
-void char_gt_lit(void)
-{
-  if(achar1 > 0x10)
-    failures++;
-}
-
-void char_lte_lit(void)
-{
-  if(achar1 <= 0x0f)
-    failures++;
-}
-
-void char_gte_lit(void)
-{
-  if(achar1 >= 0x11)
+  if( (achar0==0) || achar1)
     failures++;
 }
 
 
-/* ints */
-
-void int_lt_int(void)
+void bool_test2(void)
 {
-  if(aint0 < aint1)
+
+  if( (achar0==0) || aint0)
     failures++;
 }
 
-void int_gt_int(void)
+void bool_and1(void)
 {
-  if(aint1 > aint0)
+
+  if( achar0 && achar1)
     failures++;
 }
 
-void int_lte_int(void)
+void bin_or1(void)
 {
-  if(aint0 <= aint1)
+
+  char t;
+
+  t = achar0 | achar1;
+  if(t)
     failures++;
 }
 
-void int_gte_int(void)
+void bin_xor1(void)
 {
-  if(aint1 >= aint0)
-    failures++;
-}
 
-void int_lt_lit(void)
-{
-  if(aint1 < 0x10)
-    failures++;
-}
-
-void int_gt_lit(void)
-{
-  if(aint1 > 0x10)
-    failures++;
-}
-
-void int_lte_lit(void)
-{
-  if(aint1 <= 0x0f)
-    failures++;
-}
-
-void int_gte_lit(void)
-{
-  if(aint1 >= 0x11)
+  if(achar0 ^ achar1)
     failures++;
 }
 
 
+void bool_test3(void)
+{
+
+  if((achar0 == 0x42) || (achar1 == 42))
+    failures++;
+}
 
 
+void bool_or_lit1(void)
+{
 
+  achar0 |= 0x0f;
 
+  if(achar0 > 0x10)
+    failures++;
+
+  if( (achar0 | 0x10) > 0xf0)
+    failures++;
+
+}
+
+void bool_and_lit1(void)
+{
+
+  achar0 &= 0xf0;
+
+  if(achar0 > 0x10)
+    failures++;
+
+  if( (achar0 & 0x10) > 0xf0)
+    failures++;
+
+  achar0 &= 0xef;
+
+}
 
 void main(void)
 {
 
-  char_lt_char();
-  char_gt_char();
+  bool_or1();
+  bool_or2();
+  bool_and1();
+  bin_or1();
+  bin_xor1();
 
   achar0++;
-  char_lt_char();
-  char_gt_char();
-  char_gte_char();
-  char_lte_char();
-
-  achar1 = 0x10;
-  char_lt_lit();
-  char_gt_lit();
-  char_lte_lit();
-  char_gte_lit();
+  bool_and1();
+  bool_test1();
+  bool_test2();
+  bool_test3();
 
 
+  achar0--; achar1++;
+  bool_and1();
 
-  int_lt_int();
-  int_gt_int();
+  achar0=0;
+  achar1=0;
 
-  aint0++;
-  int_lt_int();
-  int_gt_int();
-  int_gte_int();
-  int_lte_int();
-
-  aint1 = 0x10;
-  int_lt_lit();
-  int_gt_lit();
+  bool_or_lit1();
+  bool_and_lit1();
 
   success = failures;
   done();

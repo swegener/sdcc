@@ -54,24 +54,40 @@ static peepCommand peepCommands[] = {
 
 // Eventually this will go into device dependent files:
 pCodeOpReg pic16_pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_indf0     = {{PO_INDF0,   "INDF0"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_fsr0      = {{PO_FSR0,    "FSR0"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_intcon    = {{PO_INTCON,  "INTCON"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wreg      = {{PO_WREG,    "WREG"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_bsr       = {{PO_BSR,     "BSR"}, -1, NULL,0,NULL};
 
+pCodeOpReg pic16_pc_fsr0	= {{PO_FSR0,	"FSR0"}, -1, NULL,0,NULL}; //deprecated !
+
+pCodeOpReg pic16_pc_fsr0l	= {{PO_FSR0,	"FSR0L"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_fsr0h	= {{PO_FSR0,	"FSR0H"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr1l	= {{PO_FSR0,	"FSR1L"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr1h	= {{PO_FSR0,	"FSR1H"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr2l	= {{PO_FSR0,	"FSR2L"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr2h	= {{PO_FSR0,	"FSR2H"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_postinc1	= {{PO_FSR0,	"POSTINC1"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_preinc1	= {{PO_FSR0,	"PREINC1"}, -1, NULL, 0, NULL};
 
-pCodeOpReg pic16_pc_plusw2	= {{PO_FSR0,	"PLUSW2"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_preinc2	= {{PO_FSR0,	"PREINC1"}, -1, NULL, 0, NULL};
-pCodeOpReg pic16_pc_postdec1	= {{PO_FSR0,	"POSTDEV1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_indf0		= {{PO_INDF0,	"INDF0"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_postinc0	= {{PO_INDF0,	"POSTINC0"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_postdec0	= {{PO_INDF0,	"POSTDEC0"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_preinc0		= {{PO_INDF0,	"PREINC0"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_plusw0		= {{PO_INDF0,	"PLUSW0"}, -1, NULL, 0, NULL};
+
+pCodeOpReg pic16_pc_indf1		= {{PO_INDF0,	"INDF1"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_postinc1	= {{PO_INDF0,	"POSTINC1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_postdec1	= {{PO_INDF0,	"POSTDEC1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_preinc1		= {{PO_INDF0,	"PREINC1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_plusw1		= {{PO_INDF0,	"PLUSW1"}, -1, NULL, 0, NULL};
+
+pCodeOpReg pic16_pc_indf2		= {{PO_INDF0,	"INDF2"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_postinc2	= {{PO_INDF0,	"POSTINC2"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_postdec2	= {{PO_INDF0,	"POSTDEC2"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_preinc2		= {{PO_INDF0,	"PREINC2"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_plusw2		= {{PO_INDF0,	"PLUSW2"}, -1, NULL, 0, NULL};
+
+
 
 pCodeOpReg pic16_pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
@@ -2539,36 +2555,61 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_status.r = pic16_allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
 	pic16_pc_pcl.r = pic16_allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
 	pic16_pc_pclath.r = pic16_allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x80);
-	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"FSR0", PO_FSR0, 0x80);
-	pic16_pc_indf0.r = pic16_allocProcessorRegister(IDX_INDF0,"INDF0", PO_INDF0, 0x80);
 	pic16_pc_intcon.r = pic16_allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x80);
 	pic16_pc_wreg.r = pic16_allocProcessorRegister(IDX_WREG,"WREG", PO_WREG, 0x80);
 
+	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"FSR0", PO_FSR0, 0x80); // deprecated !
+
+	pic16_pc_fsr0l.r = pic16_allocProcessorRegister(IDX_FSR0L, "FSR0L", PO_FSR0, 0x80);
+	pic16_pc_fsr0h.r = pic16_allocProcessorRegister(IDX_FSR0H, "FSR0H", PO_FSR0, 0x80);
 	pic16_pc_fsr1l.r = pic16_allocProcessorRegister(IDX_FSR1L, "FSR1L", PO_FSR0, 0x80);
 	pic16_pc_fsr1h.r = pic16_allocProcessorRegister(IDX_FSR1H, "FSR1H", PO_FSR0, 0x80);
 	pic16_pc_fsr2l.r = pic16_allocProcessorRegister(IDX_FSR2L, "FSR2L", PO_FSR0, 0x80);
 	pic16_pc_fsr2h.r = pic16_allocProcessorRegister(IDX_FSR2H, "FSR2H", PO_FSR0, 0x80);
-	pic16_pc_postinc1.r = pic16_allocProcessorRegister(IDX_POSTINC1, "POSTINC1", PO_FSR0, 0x80);
-	pic16_pc_postdec1.r = pic16_allocProcessorRegister(IDX_POSTDEC1, "POSTDEC1", PO_FSR0, 0x80);
-	pic16_pc_preinc1.r = pic16_allocProcessorRegister(IDX_PREINC1, "PREINC1", PO_FSR0, 0x80);
+
+	pic16_pc_indf0.r = pic16_allocProcessorRegister(IDX_INDF0,"INDF0", PO_INDF0, 0x80);
+	pic16_pc_postinc0.r = pic16_allocProcessorRegister(IDX_POSTINC0, "POSTINC0", PO_INDF0, 0x80);
+	pic16_pc_postdec0.r = pic16_allocProcessorRegister(IDX_POSTDEC0, "POSTDEC0", PO_INDF0, 0x80);
+	pic16_pc_preinc0.r = pic16_allocProcessorRegister(IDX_PREINC0, "PREINC0", PO_INDF0, 0x80);
+	pic16_pc_plusw0.r = pic16_allocProcessorRegister(IDX_PLUSW0, "PLUSW0", PO_INDF0, 0x80);
 	
-	pic16_pc_preinc2.r = pic16_allocProcessorRegister(IDX_PREINC2, "PREINC2", PO_FSR0, 0x80);
-	pic16_pc_plusw2.r = pic16_allocProcessorRegister(IDX_PLUSW2, "PLUSW2", PO_FSR0, 0x80);
+	pic16_pc_indf1.r = pic16_allocProcessorRegister(IDX_INDF1,"INDF1", PO_INDF0, 0x80);
+	pic16_pc_postinc1.r = pic16_allocProcessorRegister(IDX_POSTINC1, "POSTINC1", PO_INDF0, 0x80);
+	pic16_pc_postdec1.r = pic16_allocProcessorRegister(IDX_POSTDEC1, "POSTDEC1", PO_INDF0, 0x80);
+	pic16_pc_preinc1.r = pic16_allocProcessorRegister(IDX_PREINC1, "PREINC1", PO_INDF0, 0x80);
+	pic16_pc_plusw1.r = pic16_allocProcessorRegister(IDX_PLUSW1, "PLUSW1", PO_INDF0, 0x80);
+
+	pic16_pc_indf2.r = pic16_allocProcessorRegister(IDX_INDF2,"INDF2", PO_INDF0, 0x80);
+	pic16_pc_postinc2.r = pic16_allocProcessorRegister(IDX_POSTINC2, "POSTINC2", PO_INDF0, 0x80);
+	pic16_pc_postdec2.r = pic16_allocProcessorRegister(IDX_POSTDEC2, "POSTDEC2", PO_INDF0, 0x80);
+	pic16_pc_preinc2.r = pic16_allocProcessorRegister(IDX_PREINC2, "PREINC2", PO_INDF0, 0x80);
+	pic16_pc_plusw2.r = pic16_allocProcessorRegister(IDX_PLUSW2, "PLUSW2", PO_INDF0, 0x80);
 	
 	pic16_pc_status.rIdx = IDX_STATUS;
-	pic16_pc_fsr0.rIdx = IDX_FSR0;
-	pic16_pc_indf0.rIdx = IDX_INDF0;
 	pic16_pc_intcon.rIdx = IDX_INTCON;
 	pic16_pc_pcl.rIdx = IDX_PCL;
 	pic16_pc_pclath.rIdx = IDX_PCLATH;
 	pic16_pc_wreg.rIdx = IDX_WREG;
+	pic16_pc_fsr0.rIdx = IDX_FSR0;
+	pic16_pc_fsr0l.rIdx = IDX_FSR0L;
+	pic16_pc_fsr0h.rIdx = IDX_FSR0H;
 	pic16_pc_fsr1l.rIdx = IDX_FSR1L;
 	pic16_pc_fsr1h.rIdx = IDX_FSR1H;
 	pic16_pc_fsr2l.rIdx = IDX_FSR2L;
 	pic16_pc_fsr2h.rIdx = IDX_FSR2H;
+	pic16_pc_indf0.rIdx = IDX_INDF0;
+	pic16_pc_postinc0.rIdx = IDX_POSTINC0;
+	pic16_pc_postdec0.rIdx = IDX_POSTDEC0;
+	pic16_pc_preinc0.rIdx = IDX_PREINC0;
+	pic16_pc_plusw0.rIdx = IDX_PLUSW0;
+	pic16_pc_indf1.rIdx = IDX_INDF1;
 	pic16_pc_postinc1.rIdx = IDX_POSTINC1;
 	pic16_pc_postdec1.rIdx = IDX_POSTDEC1;
 	pic16_pc_preinc1.rIdx = IDX_PREINC1;
+	pic16_pc_plusw1.rIdx = IDX_PLUSW1;
+	pic16_pc_indf2.rIdx = IDX_INDF2;
+	pic16_pc_postinc2.rIdx = IDX_POSTINC2;
+	pic16_pc_postdec2.rIdx = IDX_POSTDEC2;
 	pic16_pc_preinc2.rIdx = IDX_PREINC2;
 	pic16_pc_plusw2.rIdx = IDX_PLUSW2;
 	

@@ -1,3 +1,16 @@
+2004-02-10 Hans-Juergen Dorn <hans.dorn AT apl-landau.de>
+	   patch committed by Vangelis Rokas <vrokas AT otenet.gr>
+
+	* pcode.c,
+	* pcode.h,
+	* ralloc.h: added FSR0L, FSR0H and other missing PIC16 SFR's for
+	indirect addressing. Marked FSR0 as deprecated
+	* gen.c (pointerCode): commented out, not needed now
+	(pic16_popGet2p): new MOVFF helper function
+	(genGenPointerGet),
+	(genGenPointerSet): reimplemented with MOVFF and POSTINC0
+	(shiftRLong): removed duplicate debugging info
+
 2004-02-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/ds390/gen.c (genNearPointerGet),

@@ -15,24 +15,24 @@ testShiftClasses(void)
 {
     {attr} {storage} {type} i, result;
 
-    i = 50;
-    ASSERT(i>>3 == 6);
-    ASSERT(i<<2 == 200);
+    i = 30;
+    ASSERT(i>>3 == 3);
+    ASSERT(i<<2 == 120);
     
     result = i;
     result >>= 2;
-    ASSERT(result == 12);
+    ASSERT(result == 7);
 
     result = i;
     result <<= 2;
-    ASSERT(result == 200);
+    ASSERT(result == 120);
 }
 
 /** PENDING: Disabled. */
 static void
 testShiftByteMultiples(void)
 {
-#if 0
+#if 1
     {attr} {storage} {type} i;
 
     i = ({type}){vals};
@@ -41,7 +41,7 @@ testShiftByteMultiples(void)
     ASSERT(i>>24 == (({type}){vals} >> 24));
 
     i = ({type}){vals};
-    ASSERT(i<<8 == (({type}){vals} << 8));
+    ASSERT(i<<8  == (({type}){vals} << 8));;
     ASSERT(i<<16 == (({type}){vals} << 16));
     ASSERT(i<<24 == (({type}){vals} << 24));
 #endif

@@ -24,8 +24,8 @@ testStorageTypes(void)
     // Test compare against a const
     ASSERT(source == 17);
 
-    dest = spoilAssign(134);
-    ASSERT(dest == 134);
+    dest = spoilAssign(126);
+    ASSERT(dest == 126);
     ASSERT(dest != source);
 
     // Test assignment

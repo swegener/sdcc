@@ -26,7 +26,7 @@
 # The paths below assume that sdcc, sdcc-extra, and gbdk-lib all reside in
 # the same directory.
 
-# Old nores:
+# Old notes:
 # Starting at the bottom
 # Set of source test suites
 # Each source suite is processesd producing multiple device specific test suites.
@@ -75,6 +75,9 @@ test-z80:
 test-host:
 	$(MAKE) inter-port-clean clean test-port PORT=host
 
+test-host2:
+	$(MAKE) test-port PORT=host
+
 # Begin per-port rules
 # List of all of the known source test suites.
 ALL_TESTS = $(shell find $(TESTS_DIR) -name "*.c")
@@ -113,6 +116,7 @@ SDCCFLAGS += -Ifwk/include
 
 # Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%$(DIREXT): $(TESTS_DIR)/%.c $(GENERATE_CASES)
+	echo Processing $<
 	rm -rf $(CASES_DIR)/tests
 	mkdir -p $(CASES_DIR)/tests
 	mkdir -p $@
@@ -139,7 +143,7 @@ test-port: port-results
 # test
 
 # List of all of the generated iteration source files.
-SUB_CASES = $(wildcard $(CASES)/*.c)
+SUB_CASES = $(sort $(wildcard $(CASES)/*.c))
 # List of all the sub result logs generated from the iterations.
 SUB_RESULTS = $(SUB_CASES:%.c=%.out)
 # Overall target.  Concatenation of all of the sub results.

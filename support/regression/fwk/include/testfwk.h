@@ -8,6 +8,8 @@ void __printf(const char *szFormat, ...);
 
 #define ASSERT(_a) 	(__numTests++, (_a) ? (void)0 : __fail("Assertion failed", #_a, __FILE__, __LINE__))
 #define LOG(_a)		__printf _a
+#define FAIL()		FAILM("Failure")
+#define FAILM(_a)	__fail(_a, #_a, __FILE__, __LINE__)
 
 typedef void TESTFUN(void);
 
@@ -19,5 +21,7 @@ const char *
 getSuiteName(void);
 
 #define NULL	0
+
+#define UNUSED(_a)	if (_a) { }
 
 #endif

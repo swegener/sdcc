@@ -25,12 +25,20 @@
 
 unsigned char _decdptr ()
 {
-	_asm
+#ifdef SDCC_ds390    
+    	_asm
+        orl dps, #0xc0
+        inc dptr
+        anl dps, #0x3f
+        _endasm ;
+#else
+    	_asm
 		xch	a,dpl
 		jnz     00001$
 		dec	dph
 00001$:
 		dec	a
 		xch	a,dpl
-	_endasm ;	
+	_endasm ;
+#endif    
 }

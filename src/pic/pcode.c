@@ -37,42 +37,11 @@
 pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,NULL};
 pCodeOpReg pc_indf      = {{PO_INDF,    "INDF"}, -1, NULL,NULL};
 pCodeOpReg pc_fsr       = {{PO_FSR,     "FSR"}, -1, NULL,NULL};
+pCodeOpReg pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,NULL};
+pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,NULL};
 
 static int mnemonics_initialized = 0;
 
-#if 0
-//static char *PIC_mnemonics[] = {
-static char *scpADDLW = "ADDLW";
-static char *scpADDWF = "ADDWF";
-static char *scpANDLW = "ANDLW";
-static char *scpANDWF = "ANDWF";
-static char *scpBCF = "BCF";
-static char *scpBSF = "BSF";
-static char *scpBTFSC = "BTFSC";
-static char *scpBTFSS = "BTFSS";
-static char *scpCALL = "CALL";
-static char *scpCOMF = "COMF";
-static char *scpCLRF = "CLRF";
-static char *scpCLRW = "CLRW";
-static char *scpDECF = "DECF";
-static char *scpDECFSZ = "DECFSZ";
-static char *scpGOTO = "GOTO";
-static char *scpINCF = "INCF";
-static char *scpINCFSZ = "INCFSZ";
-static char *scpIORLW = "IORLW";
-static char *scpIORWF = "IORWF";
-static char *scpMOVF = "MOVF";
-static char *scpMOVLW = "MOVLW";
-static char *scpMOVWF = "MOVWF";
-static char *scpNEGF = "NEGF";
-static char *scpRETLW = "RETLW";
-static char *scpRETURN = "RETURN";
-static char *scpSUBLW = "SUBLW";
-static char *scpSUBWF = "SUBWF";
-static char *scpTRIS = "TRIS";
-static char *scpXORLW = "XORLW";
-static char *scpXORWF = "XORWF";
-#endif
 
 static hTab *pic14MnemonicsHash = NULL;
 
@@ -257,7 +226,6 @@ pCodeInstruction pciCALL = {
   PCC_NONE  // outCond
 };
 
-//fixme - need a COMFW instruction.
 pCodeInstruction pciCOMF = {
   {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
    genericAnalyze,
@@ -267,9 +235,23 @@ pCodeInstruction pciCOMF = {
   "COMF",
   NULL, // operand
   2,    // num ops
+  1,0,  // dest, bit instruction
+  PCC_REGISTER,  // inCond
+  PCC_REGISTER   // outCond
+};
+
+pCodeInstruction pciCOMFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_COMFW,
+  "COMF",
+  NULL, // operand
+  2,    // num ops
   0,0,  // dest, bit instruction
-  PCC_NONE, // inCond
-  PCC_NONE  // outCond
+  PCC_REGISTER,  // inCond
+  PCC_W   // outCond
 };
 
 pCodeInstruction pciCLRF = {
@@ -569,6 +551,62 @@ pCodeInstruction pciRETURN = {
 };
 
 
+pCodeInstruction pciRLF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_RLF,
+  "RLF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_C | PCC_REGISTER),   // inCond
+  (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
+};
+
+pCodeInstruction pciRLFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_RLFW,
+  "RLF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_C | PCC_REGISTER),   // inCond
+  (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+};
+
+pCodeInstruction pciRRF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_RRF,
+  "RRF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_C | PCC_REGISTER),   // inCond
+  (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
+};
+
+pCodeInstruction pciRRFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_RRFW,
+  "RRF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_C | PCC_REGISTER),   // inCond
+  (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+};
+
 pCodeInstruction pciSUBWF = {
   {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
    genericAnalyze,
@@ -611,6 +649,33 @@ pCodeInstruction pciSUBLW = {
   (PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
 };
 
+pCodeInstruction pciSWAPF = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_SWAPF,
+  "SWAPF",
+  NULL, // operand
+  2,    // num ops
+  1,0,  // dest, bit instruction
+  (PCC_REGISTER),   // inCond
+  (PCC_REGISTER) // outCond
+};
+
+pCodeInstruction pciSWAPFW = {
+  {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
+   genericAnalyze,
+   genericDestruct,
+   genericPrint},
+  POC_SWAPFW,
+  "SWAPF",
+  NULL, // operand
+  2,    // num ops
+  0,0,  // dest, bit instruction
+  (PCC_REGISTER),   // inCond
+  (PCC_W) // outCond
+};
 pCodeInstruction pciTRIS = {
   {PC_OPCODE, NULL, NULL, 0, NULL, NULL, NULL, NULL, 
    genericAnalyze,
@@ -775,6 +840,7 @@ void pic14initMnemonics(void)
   pic14Mnemonics[POC_BTFSS] = &pciBTFSS;
   pic14Mnemonics[POC_CALL] = &pciCALL;
   pic14Mnemonics[POC_COMF] = &pciCOMF;
+  pic14Mnemonics[POC_COMFW] = &pciCOMFW;
   pic14Mnemonics[POC_CLRF] = &pciCLRF;
   pic14Mnemonics[POC_CLRW] = &pciCLRW;
   pic14Mnemonics[POC_DECF] = &pciDECF;
@@ -796,9 +862,15 @@ void pic14initMnemonics(void)
   pic14Mnemonics[POC_NEGF] = &pciNEGF;
   pic14Mnemonics[POC_RETLW] = &pciRETLW;
   pic14Mnemonics[POC_RETURN] = &pciRETURN;
+  pic14Mnemonics[POC_RLF] = &pciRLF;
+  pic14Mnemonics[POC_RLFW] = &pciRLFW;
+  pic14Mnemonics[POC_RRF] = &pciRRF;
+  pic14Mnemonics[POC_RRFW] = &pciRRFW;
   pic14Mnemonics[POC_SUBLW] = &pciSUBLW;
   pic14Mnemonics[POC_SUBWF] = &pciSUBWF;
   pic14Mnemonics[POC_SUBFW] = &pciSUBFW;
+  pic14Mnemonics[POC_SWAPF] = &pciSWAPF;
+  pic14Mnemonics[POC_SWAPFW] = &pciSWAPFW;
   pic14Mnemonics[POC_TRIS] = &pciTRIS;
   pic14Mnemonics[POC_XORLW] = &pciXORLW;
   pic14Mnemonics[POC_XORWF] = &pciXORWF;
@@ -1126,7 +1198,7 @@ static void pCodeLabelDestruct(pCode *pc)
 
   unlinkPC(pc);
 
-  if(PCL(pc)->label)
+  if((pc->type == PC_LABEL) && PCL(pc)->label)
     free(PCL(pc)->label);
 
   free(pc);
@@ -1279,7 +1351,7 @@ pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype)
   return pcop;
 }
 
-pCodeOp *newpCodeOpBit(char *s, int bit)
+pCodeOp *newpCodeOpBit(char *s, int bit, int inBitSpace)
 {
   pCodeOp *pcop;
 
@@ -1288,10 +1360,20 @@ pCodeOp *newpCodeOpBit(char *s, int bit)
   pcop->name = Safe_strdup(s);   
 
   PCOB(pcop)->bit = bit;
-  if(bit>=0)
-    PCOB(pcop)->inBitSpace = 1;
-  else
-    PCOB(pcop)->inBitSpace = 0;
+  PCOB(pcop)->inBitSpace = inBitSpace;
+
+  return pcop;
+}
+
+pCodeOp *newpCodeOpReg(int rIdx)
+{
+  pCodeOp *pcop;
+
+  pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+
+  PCOR(pcop)->rIdx = rIdx;
+  PCOR(pcop)->r = pic14_regWithIdx(rIdx);
+  pcop->type = PCOR(pcop)->r->pc_type;
 
   return pcop;
 }
@@ -1305,7 +1387,7 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
 
   switch(type) {
   case PO_BIT:
-    pcop = newpCodeOpBit(name, -1);
+    pcop = newpCodeOpBit(name, -1,0);
     break;
 
   case PO_LITERAL:
@@ -1409,10 +1491,16 @@ void printpBlock(FILE *of, pBlock *pb)
 
 static void unlinkPC(pCode *pc)
 {
-  if(pc  && pc->prev && pc->next) {
 
-    pc->prev->next = pc->next;
-    pc->next->prev = pc->prev;
+
+  if(pc) {
+
+    if(pc->prev) 
+      pc->prev->next = pc->next;
+    if(pc->next)
+      pc->next->prev = pc->prev;
+
+    pc->prev = pc->next = NULL;
   }
 }
 static void genericDestruct(pCode *pc)
@@ -1449,6 +1537,7 @@ static char *get_op( pCodeInstruction *pcc)
 
     case PO_FSR:
     case PO_GPR_TEMP:
+    case PO_GPR_BIT:
       r = pic14_regWithIdx(PCOR(pcc->pcop)->r->rIdx);
       //fprintf(stderr,"getop: getting %s\nfrom:\n",r->name); //pcc->pcop->name);
       pBlockRegs(stderr,pcc->pc.pb);
@@ -1493,7 +1582,9 @@ char *pCode2str(char *str, int size, pCode *pc)
 	  else
 	    SAFE_snprintf(&s,&size,"%s,%d", get_op(PCI(pc)), 
 			  (((pCodeOpBit *)(PCI(pc)->pcop))->bit ));
-	} else
+	} else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+	  SAFE_snprintf(&s,&size,"%s,%d", get_op(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
+	}else
 	  SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op(PCI(pc)));
 	//PCI(pc)->pcop->t.bit );
       } else {
@@ -1664,6 +1755,22 @@ static void pCodePrintLabel(FILE *of, pCode *pc)
 
 }
 /*-----------------------------------------------------------------*/
+static void  unlinkpCodeFromBranch(pBranch *pb , pCode *pc)
+{
+  pBranch *b, *bprev;
+
+  bprev = NULL;
+  b = pb;
+  while(b) {
+    if(b->pc == pc) {
+      if(bprev)
+	bprev->next = b->next;
+    }
+    bprev = b;
+    b = b->next;
+  }
+
+}
 
 static pBranch * pBranchAppend(pBranch *h, pBranch *n)
 {
@@ -1800,35 +1907,44 @@ static void genericAnalyze(pCode *pc)
 }
 
 /*-----------------------------------------------------------------*/
+int compareLabel(pCode *pc, pCodeOpLabel *pcop_label)
+{
+  pBranch *pbr;
+
+  if(pc->type == PC_LABEL) {
+    if( ((pCodeLabel *)pc)->key ==  pcop_label->key)
+      return TRUE;
+  }
+  if(pc->type == PC_OPCODE) {
+    pbr = pc->label;
+    while(pbr) {
+      if(pbr->pc->type == PC_LABEL) {
+	if( ((pCodeLabel *)(pbr->pc))->key ==  pcop_label->key)
+	  return TRUE;
+      }
+      pbr = pbr->next;
+    }
+  }
+
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
 /* findLabel - Search the pCode for a particular label             */
 /*-----------------------------------------------------------------*/
 pCode * findLabel(pCodeOpLabel *pcop_label)
 {
   pBlock *pb;
   pCode  *pc;
-  pBranch *pbr;
 
   if(!the_pFile)
     return NULL;
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    for(pc = pb->pcHead; pc; pc = pc->next) {
-      if(pc->type == PC_LABEL) {
-	if( ((pCodeLabel *)pc)->key ==  pcop_label->key)
-	  return pc;
-      }
-      if(pc->type == PC_OPCODE) {
-	pbr = pc->label;
-	while(pbr) {
-	  if(pbr->pc->type == PC_LABEL) {
-	    if( ((pCodeLabel *)(pbr->pc))->key ==  pcop_label->key)
-	      return pc;
-	  }
-	  pbr = pbr->next;
-	}
-      }
-
-    }
+    for(pc = pb->pcHead; pc; pc = pc->next) 
+      if(compareLabel(pc,pcop_label))
+	return pc;
+    
   }
 
   fprintf(stderr,"Couldn't find label %s", pcop_label->pcop.name);
@@ -1954,14 +2070,79 @@ int OptimizepBlock(pBlock *pb)
   if(!pb || !peepOptimizing)
     return 0;
 
-  fprintf(stderr," Optimizing pBlock\n");
-
+  fprintf(stderr," Optimizing pBlock: %c\n",getpBlock_dbName(pb));
   for(pc = pb->pcHead; pc; pc = pc->next)
     matches += pCodePeepMatchRule(pc);
 
   return matches;
 
 }
+
+/*-----------------------------------------------------------------*/
+/* pBlockRemoveUnusedLabels - remove the pCode labels from the     */
+/*-----------------------------------------------------------------*/
+pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
+{
+  pCode *pc;
+
+  for(pc = pcs; pc; pc = pc->next) {
+
+    if((pc->type == PC_OPCODE) && 
+       (PCI(pc)->pcop) && 
+       (PCI(pc)->pcop->type == PO_LABEL) &&
+       (PCOLAB(PCI(pc)->pcop)->key == pcl->key))
+      return pc;
+  }
+ 
+
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* pBlockRemoveUnusedLabels - remove the pCode labels from the     */
+/*                            pCode chain if they're not used.     */
+/*-----------------------------------------------------------------*/
+void pBlockRemoveUnusedLabels(pBlock *pb)
+{
+  pCode *pc; pCodeLabel *pcl;
+
+  if(!pb)
+    return;
+
+  for(pc = pb->pcHead; pc; pc = pc->next) {
+
+    if(pc->type == PC_LABEL)
+      pcl = PCL(pc);
+    else if (pc->label)
+      pcl = PCL(pc->label->pc);
+    else continue;
+
+      /* This pCode is a label, so search the pBlock to see if anyone
+       * refers to it */
+
+    if( (pcl->key>0) && (!findInstructionUsingLabel(pcl, pb->pcHead))) {
+      /* Couldn't find an instruction that refers to this label
+       * So, unlink the pCode label from it's pCode chain
+       * and destroy the label */
+
+      fprintf(stderr," !!! REMOVED A LABEL !!! key = %d\n", pcl->key);
+
+      if(pc->type == PC_LABEL) {
+	//unlinkPC(pc);
+	pCodeLabelDestruct(pc);
+      } else {
+	unlinkpCodeFromBranch(pc->label, pc);
+	if(pc->label->next == NULL && pc->label->pc == NULL) {
+	  free(pc->label);
+	}
+      }
+
+    }
+  }
+
+}
+
+
 /*-----------------------------------------------------------------*/
 /* pBlockMergeLabels - remove the pCode labels from the pCode      */
 /*                     chain and put them into pBranches that are  */
@@ -1976,18 +2157,22 @@ void pBlockMergeLabels(pBlock *pb)
   if(!pb)
     return;
 
+  /* First, Try to remove any unused labels */
+  //pBlockRemoveUnusedLabels(pb);
+
+  /* Now loop through the pBlock and merge the labels with the opcodes */
+
   for(pc = pb->pcHead; pc; pc = pc->next) {
 
     if(pc->type == PC_LABEL) {
+      fprintf(stderr,"Checking label key = %d\n",PCL(pc)->key);
       if( !(pcnext = findNextInstruction(pc)) ) 
 	return;  // Couldn't find an instruction associated with this label
 
       // Unlink the pCode label from it's pCode chain
-      if(pc->prev) 
-	pc->prev->next = pc->next;
-      if(pc->next)
-	pc->next->prev = pc->prev;
+      unlinkPC(pc);
 
+      fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
       // And link it into the instruction's pBranch labels. (Note, since
       // it's possible to have multiple labels associated with one instruction
       // we must provide a means to accomodate the additional labels. Thus
@@ -1999,9 +2184,14 @@ void pBlockMergeLabels(pBlock *pb)
       pbr->next = NULL;
 
       pcnext->label = pBranchAppend(pcnext->label,pbr);
+      if(pcnext->prev) 
+	pc = pcnext->prev;
+      else
+	pc = pcnext;
     }
 
   }
+  pBlockRemoveUnusedLabels(pb);
 
 }
 
@@ -2052,6 +2242,8 @@ void AnalyzepCode(char dbName)
   /* First, merge the labels with the instructions */
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     if('*' == dbName || getpBlock_dbName(pb) == dbName) {
+
+      fprintf(stderr," analyze and merging block %c\n",dbName);
       pBlockMergeLabels(pb);
       AnalyzepBlock(pb);
     }

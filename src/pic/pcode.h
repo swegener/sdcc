@@ -105,8 +105,11 @@ typedef enum
   PO_FSR,            // The "file select register" (in 18c it's one of three)
   PO_INDF,           // The Indirect register
   PO_GPR_REGISTER,   // A general purpose register
+  PO_GPR_BIT,        // A bit of a general purpose register
   PO_GPR_TEMP,       // A general purpose temporary register
   PO_SFR_REGISTER,   // A special function register (e.g. PORTA)
+  PO_PCL,            // Program counter Low register
+  PO_PCLATH,         // Program counter Latch high register
   PO_LITERAL,        // A constant
   PO_IMMEDIATE,      //  (8051 legacy)
   PO_DIR,            // Direct memory (8051 legacy)
@@ -174,6 +177,7 @@ typedef enum
   POC_BTFSS,
   POC_CALL,
   POC_COMF,
+  POC_COMFW,
   POC_CLRF,
   POC_CLRW,
   POC_DECF,
@@ -195,9 +199,15 @@ typedef enum
   POC_NEGF,
   POC_RETLW,
   POC_RETURN,
+  POC_RLF,
+  POC_RLFW,
+  POC_RRF,
+  POC_RRFW,
   POC_SUBLW,
   POC_SUBWF,
   POC_SUBFW,
+  POC_SWAPF,
+  POC_SWAPFW,
   POC_TRIS,
   POC_XORLW,
   POC_XORWF,
@@ -296,6 +306,12 @@ typedef struct pCodeOpReg
   struct pBlock *pb;
 } pCodeOpReg;
 
+typedef struct pCodeOpRegBit
+{
+  pCodeOpReg  pcor;       // The Register containing this bit
+  int bit;                // 0-7 bit number.
+  PIC_OPTYPE subtype;     // The type of this register.
+} pCodeOpRegBit;
 
 
 /*************************************************
@@ -550,6 +566,7 @@ typedef struct pCodeOpWild
 #define PCOL(x)   ((pCodeOpLit *)(x))
 #define PCOLAB(x) ((pCodeOpLabel *)(x))
 #define PCOR(x)   ((pCodeOpReg *)(x))
+#define PCORB(x)  ((pCodeOpRegBit *)(x))
 #define PCOW(x)   ((pCodeOpWild *)(x))
 
 #define PBR(x)    ((pBranch *)(x))
@@ -577,7 +594,7 @@ void pCodePeepInit(void);
 
 pCodeOp *newpCodeOpLabel(int key);
 pCodeOp *newpCodeOpLit(int lit);
-pCodeOp *newpCodeOpBit(char *name, int bit);
+pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
 pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
 extern void pcode_test(void);
 
@@ -588,6 +605,8 @@ extern void pcode_test(void);
 extern pCodeOpReg pc_status;
 extern pCodeOpReg pc_indf;
 extern pCodeOpReg pc_fsr;
+extern pCodeOpReg pc_pcl;
+extern pCodeOpReg pc_pclath;
 
 
 ////////////////////   DELETE THIS ///////////////////

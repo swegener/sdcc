@@ -62,9 +62,14 @@ SRC = b.c \
 	compare2.c \
 	compare3.c \
 	for.c \
+	rotate1.c \
+	rotate2.c \
+	rotate3.c \
 	struct1.c \
 	sub.c \
-	while.c
+	switch1.c \
+	while.c \
+	xor.c
 
 COD := $(patsubst %.c, %.cod, $(SRC))
 ASM := $(patsubst %.c, %.asm, $(SRC))

@@ -119,18 +119,18 @@ extern unsigned fReturnSizePic;
 /* Macros for emitting skip instructions                           */
 /*-----------------------------------------------------------------*/
 
-#define emitSKPC    emitpcode(POC_BTFSS,popCopyGPR2Bit(&pc_status,PIC_C_BIT))
-#define emitSKPNC   emitpcode(POC_BTFSC,popCopyGPR2Bit(&pc_status,PIC_C_BIT))
-#define emitSKPZ    emitpcode(POC_BTFSS,popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
-#define emitSKPNZ   emitpcode(POC_BTFSC,popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
-#define emitSKPDC   emitpcode(POC_BTFSS,popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
-#define emitSKPNDC  emitpcode(POC_BTFSC,popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
-#define emitCLRZ    emitpcode(POC_BCF,  popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
-#define emitCLRC    emitpcode(POC_BCF,  popCopyGPR2Bit(&pc_status,PIC_C_BIT))
-#define emitCLRDC   emitpcode(POC_BCF,  popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
-#define emitSETZ    emitpcode(POC_BSF,  popCopyGPR2Bit(&pc_status,PIC_Z_BIT))
-#define emitSETC    emitpcode(POC_BSF,  popCopyGPR2Bit(&pc_status,PIC_C_BIT))
-#define emitSETDC   emitpcode(POC_BSF,  popCopyGPR2Bit(&pc_status,PIC_DC_BIT))
+#define emitSKPC    emitpcode(POC_BTFSS,popCopyGPR2Bit(PCOP(&pc_status),PIC_C_BIT))
+#define emitSKPNC   emitpcode(POC_BTFSC,popCopyGPR2Bit(PCOP(&pc_status),PIC_C_BIT))
+#define emitSKPZ    emitpcode(POC_BTFSS,popCopyGPR2Bit(PCOP(&pc_status),PIC_Z_BIT))
+#define emitSKPNZ   emitpcode(POC_BTFSC,popCopyGPR2Bit(PCOP(&pc_status),PIC_Z_BIT))
+#define emitSKPDC   emitpcode(POC_BTFSS,popCopyGPR2Bit(PCOP(&pc_status),PIC_DC_BIT))
+#define emitSKPNDC  emitpcode(POC_BTFSC,popCopyGPR2Bit(PCOP(&pc_status),PIC_DC_BIT))
+#define emitCLRZ    emitpcode(POC_BCF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_Z_BIT))
+#define emitCLRC    emitpcode(POC_BCF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_C_BIT))
+#define emitCLRDC   emitpcode(POC_BCF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_DC_BIT))
+#define emitSETZ    emitpcode(POC_BSF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_Z_BIT))
+#define emitSETC    emitpcode(POC_BSF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_C_BIT))
+#define emitSETDC   emitpcode(POC_BSF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_DC_BIT))
 
 int pic14_getDataSize(operand *op);
 void emitpcode(PIC_OPCODE poc, pCodeOp *pcop);
@@ -153,7 +153,7 @@ void genMinus (iCode *ic);
 
 pCodeOp *popGetLabel(unsigned int key);
 pCodeOp *popCopyReg(pCodeOpReg *pc);
-pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
+pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *popGetLit(unsigned int lit);
 pCodeOp *popGetWithString(char *str);
 pCodeOp *popRegFromString(char *str);

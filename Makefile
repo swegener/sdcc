@@ -38,10 +38,8 @@ TARGETS         += sdcc-packihx
 PKGS            += $(SDCC_PACKIHX)
 endif
 
-ifneq ($(OPT_ENABLE_LIBRARIAN), no)
 TARGETS         += sdcc-librarian
 PKGS            += $(SDCC_LIBRARIAN)
-endif
 
 PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
 		  src device/include $(SDCC_PACKIHX) $(SDCC_LIBRARIAN)

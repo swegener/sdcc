@@ -1,3 +1,24 @@
+2003-08-01  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    Added librarian to MSVC build:
+    * all.dsp
+    * sdcc.dsw
+    * support\librarian\librarian.dsp
+
+	'configure' not needed for librarian, removed:
+	* support\librarian\configure
+	* support\librarian\configure.in
+	* support\librarian\config_in.h
+	* support\librarian\Makefile.in
+
+	Hopefully these ones built the librarian and the rest of sdcc properly:
+	* Makefile
+	* Makefile.common.in
+
+	Messed up 'configure', so revert to previous version:
+	* configure
+	* configure.in
+
 2003-07-31  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCicode.c (operandOperation): 3. fix, this time for Alpha; ULONG has 64 bits

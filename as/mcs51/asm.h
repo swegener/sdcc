@@ -104,11 +104,11 @@
 #define	dca	area[0]		/* Dca, default code area */
 
 
-/* NB: for Flat24 extentions to work, addr_t must be at least 24
+/* NB: for Flat24 extentions to work, Addr_T must be at least 24
  * bits. This is checked at runtime when the .flat24 directive 
  * is processed.
  */
-typedef	unsigned int addr_t;
+typedef	unsigned int Addr_T;
 
 /*
  *	The area structure contains the parameter values for a
@@ -129,8 +129,8 @@ struct	area
 	struct	area *a_ap;	/* Area link */
 	char	a_id[NCPS];	/* Area Name */
 	int	a_ref;		/* Ref. number */
-	addr_t	a_size;		/* Area size */
-	addr_t	a_fuzz;		/* Area fuzz */
+	Addr_T	a_size;		/* Area size */
+	Addr_T	a_fuzz;		/* Area fuzz */
 	int	a_flag;		/* Area flags */
 };
 
@@ -250,7 +250,7 @@ struct	mne
 	char	*m_id;		/* Mnemonic JLH: change from [NCPS] */
 	char	m_type;		/* Mnemonic subtype */
 	char	m_flag;		/* Mnemonic flags */
-	addr_t	m_valu;		/* Value */
+	Addr_T	m_valu;		/* Value */
 };
 
 /*
@@ -275,7 +275,7 @@ struct	sym
 	char	s_flag;		/* Symbol flags */
 	struct	area *s_area;	/* Area line, 0 if absolute */
 	int	s_ref;		/* Ref. number */
-	addr_t	s_addr;		/* Address */
+	Addr_T	s_addr;		/* Address */
 };
 
 #define	S_GBL		01	/* Global */
@@ -334,7 +334,7 @@ struct	tsym
 	int t_flg;		/* flags */
 
 	struct	area *t_area;	/* Area */
-	addr_t	t_addr;		/* Address */
+	Addr_T	t_addr;		/* Address */
 };
 
 /*
@@ -414,10 +414,10 @@ extern	int	xflag;		/*	-x, listing radix flag
 				 */
 extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
-extern	addr_t	laddr;		/*	address of current assembler line
+extern	Addr_T	laddr;		/*	address of current assembler line
 				 *	or value of .if argument
 				 */
-extern	addr_t	fuzz;		/*	tracks pass to pass changes in the
+extern	Addr_T	fuzz;		/*	tracks pass to pass changes in the
 				 *	address of symbols caused by
 				 *	variable length instruction formats
 				 */
@@ -527,7 +527,7 @@ struct	expr
 {
 	char	e_mode;		/* Address mode */
 	char	e_flag;		/* Symbol flag */
-	addr_t	e_addr;		/* Address */
+	Addr_T	e_addr;		/* Address */
 	union	{
 		struct area *e_ap;
 		struct sym  *e_sp;
@@ -599,7 +599,7 @@ extern	VOID		rerr();
 
 /* asexpr.c */
 extern	VOID		abscheck();
-extern	addr_t		absexpr();
+extern	Addr_T		absexpr();
 extern	VOID		clrexpr();
 extern	int		digit();
 extern	int		is_abs();

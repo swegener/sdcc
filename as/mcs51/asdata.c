@@ -98,10 +98,10 @@ int	xflag;		/*	-x, listing radix flag
 			 */
 int	fflag;		/*	-f(f), relocations flagged flag
 			 */
-addr_t	laddr;		/*	address of current assembler line
+Addr_T	laddr;		/*	address of current assembler line
 			 *	or value of .if argument
 			 */
-addr_t	fuzz;		/*	tracks pass to pass changes in the
+Addr_T	fuzz;		/*	tracks pass to pass changes in the
 			 *	address of symbols caused by
 			 *	variable length instruction formats
 			 */
@@ -161,7 +161,7 @@ char	module[NCPS];	/*	module name string
  *		char	m_id[NCPS];	Mnemonic
  *		char	m_type;		Mnemonic subtype
  *		char	m_flag;		Mnemonic flags
- *		addr_t	m_valu;		Value
+ *		Addr_T	m_valu;		Value
  *	};
  */
 struct	mne	*mnehash[NHASH];
@@ -188,7 +188,7 @@ struct	mne	*mnehash[NHASH];
  *		char	s_flag;		Symbol flags
  *		struct	area *s_area;	Area line, 0 if absolute
  *		int	s_ref;		Ref. number
- *		addr_t	s_addr;		Address
+ *		Addr_T	s_addr;		Address
  *	};
  */
 struct	sym	sym[] = {
@@ -220,8 +220,8 @@ struct	sym *symhash[NHASH];	/*	array of pointers to NHASH
  *		struct	area *a_ap;	Area link
  *		char	a_id[NCPS];	Area Name
  *		int	a_ref;		Reference number
- *		addr_t	a_size;		Area size
- *		addr_t	a_fuzz;		Area fuzz
+ *		Addr_T	a_size;		Area size
+ *		Addr_T	a_fuzz;		Area fuzz
  *		int	a_flag;		Area flags
  *	};
  */

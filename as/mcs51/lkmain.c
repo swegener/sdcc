@@ -24,7 +24,7 @@
 #include "aslink.h"
 
 /* yuck - but including unistd.h causes problems on Cygwin by redefining
- * addr_t.
+ * Addr_T.
  */
 extern int unlink(const char *);
 
@@ -847,7 +847,7 @@ bassav()
  *		int	lkerr		error flag
  *
  *	 functions called:
- *		addr_t	expr()		lkeval.c
+ *		Addr_T	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		char	getnb()		lklex.c
@@ -956,7 +956,7 @@ gblsav()
  *		int	lkerr		error flag
  *
  *	 functions called:
- *		addr_t	expr()		lkeval.c
+ *		Addr_T	expr()		lkeval.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		char	getnb()		lklex.c
@@ -1100,7 +1100,7 @@ char *ft;
  *	 functions called:
  *		char	getnb()		lklex.c
  *		VOID	unget()		lklex.c
- *		addr_t	expr()		lkeval.c
+ *		Addr_T	expr()		lkeval.c
  *
  *	side effects:
  *		The iram_size may be modified.

@@ -88,14 +88,14 @@
  *	in the standard Intel Hex format.
  *
  *	local variables:
- *		addr_t	chksum		byte checksum
+ *		Addr_T	chksum		byte checksum
  *
  *	global variables:
  *		int	hilo		byte order
  *		FILE *	ofp		output file handle
  *		int	rtcnt		count of data words
  *		int	rtflg[]		output the data flag
- *		addr_t	rtval[]		relocated data
+ *		Addr_T	rtval[]		relocated data
  *
  *	functions called:
  *		int	fprintf()	c_library
@@ -107,7 +107,7 @@
 VOID
 ihx(i)
 {
-	register addr_t chksum;
+	register Addr_T chksum;
 
 	if (i) {
 		if (hilo == 0) {
@@ -137,13 +137,13 @@ ihx(i)
 
 /*)Function	ihxEntendedLinearAddress(i)
  *
- *		addr_t	i		16 bit extended linear address.
+ *		Addr_T	i		16 bit extended linear address.
  *
  *	The function ihxEntendedLinearAddress() writes an extended
  *	linear address record (type 04) to the output file.
  *
  *	local variables:
- *		addr_t	chksum		byte checksum
+ *		Addr_T	chksum		byte checksum
  *
  *	global variables:
  *		FILE *	ofp		output file handle
@@ -155,9 +155,9 @@ ihx(i)
  *		The data is output to the file defined by ofp.
  */
 VOID
-ihxEntendedLinearAddress(addr_t a)
+ihxEntendedLinearAddress(Addr_T a)
 {
-    addr_t 	chksum;
+    Addr_T 	chksum;
   
     /* The checksum is the complement of the bytes in the
      * record: the 2 is record length, 4 is the extended linear

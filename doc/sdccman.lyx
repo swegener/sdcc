@@ -1842,10 +1842,14 @@ the output path resp.
 \series bold 
 --data-loc
 \series default 
-<Value> The start location of the internal ram data segment, the default
- value is 0x30.The value entered can be in Hexadecimal or Decimal format,
- eg.
+<Value> The start location of the internal ram data segment.
+ The value entered can be in Hexadecimal or Decimal format, eg.
  --data-loc 0x20 or --data-loc 32.
+ (By default, the start location of the internal ram data segment 
+ is set as low as possible in memory, taking into account the used
+ register banks and the bit segment at address 0x20.
+ For example if register banks 0 and 1 are used without bit variables,
+ the data segment will be set, if --data-loc is not used, to location 0x10.)
 \layout List
 \labelwidthstring 00.00.0000
 

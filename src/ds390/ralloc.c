@@ -2248,7 +2248,7 @@ packRegsForAccUse (iCode * ic)
       OP_SYMBOL (IC_RESULT (uic))->onStack)
     return;
 #else
-  ifSymbolOnStack(IC_RESULT(uic))
+  if (isOperandOnStack(IC_RESULT(uic)))
     return;
 #endif
 

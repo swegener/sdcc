@@ -2152,9 +2152,9 @@ packRegsForAccUse (iCode * ic)
 #if 0
   if (IS_TRUE_SYMOP (IC_RESULT (uic)) &&
       OP_SYMBOL (IC_RESULT (uic))->onStack)
-     return;
+    return;
 #else
-  ifSymbolOnStack(IC_RESULT(uic))
+  if (isOperandOnStack(IC_RESULT(uic)))
     return;
 #endif
 

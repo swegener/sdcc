@@ -3046,14 +3046,14 @@ sfr at 0xA9 IP0         ; // interrupt priority register SAB80515 specific
 #ifdef IP0__x__LPS1__LPT2__LPS0__LPT1__LPX1__LPT0__LPX0
 #undef IP0__x__LPS1__LPT2__LPS0__LPT1__LPX1__LPT0__LPX0
 sfr at 0xB8 IP0         ; // interrupt priority register DS89C420 specific
-// Not directly accessible IP0 bits
-#define LPX0        0x01
-#define LPT0        0x02
-#define LPX1        0x04
-#define LPT1        0x08
-#define LPS0        0x10
-#define LPT2        0x20
-#define LPS1        0x40
+// Bit registers
+sbit at 0xB8 LPX0       ;
+sbit at 0xB9 LPT0       ;
+sbit at 0xBA LPX1       ;
+sbit at 0xBB LPT1       ;
+sbit at 0xBC LPS0       ;
+sbit at 0xBD LPT2       ;
+sbit at 0xBE LPS1       ;
 #endif
 
 #ifdef IP1__x__x__IP1_5__IP1_4__IP1_3__IP1_2__IP1_1__IP1_0
@@ -3071,14 +3071,14 @@ sfr at 0xB9 IP1         ; // interrupt priority register SAB80515 specific
 #ifdef IP1__x__MPS1__MPT2__MPS0__MPT1__MPX1__MPT0__MPX0
 #undef IP1__x__MPS1__MPT2__MPS0__MPT1__MPX1__MPT0__MPX0
 sfr at 0xB1 IP1         ; // interrupt priority register DS89C420 specific
-// Not directly accessible IP0 bits
-#define LPX0        0x01
-#define LPT0        0x02
-#define LPX1        0x04
-#define LPT1        0x08
-#define LPS0        0x10
-#define LPT2        0x20
-#define LPS1        0x40
+// Not directly accessible IP1 bits
+#define MPX0        0x01
+#define MPT0        0x02
+#define MPX1        0x04
+#define MPT1        0x08
+#define MPS0        0x10
+#define MPT2        0x20
+#define MPS1        0x40
 #endif
 
 #ifdef IP1__PT2__PCM2__PCM1__PCM0__PCT3__PCT2__PCT1__PCT0
@@ -4190,7 +4190,6 @@ sfr at 0xEE STE         ; // Set enable, P80C552 specific
 #define TG47        0x80
 #endif
 
-
 #ifdef SYSCON
 #undef SYSCON
 sfr at 0xB1 SYSCON      ; // XRAM Controller Access Control
@@ -4477,6 +4476,17 @@ sfr at 0x91 XPAGE       ; // Page Address Register for Extended On-Chip Ram - In
 #endif
 
 #ifdef MICROCONTROLLER_DS80C32X
+#define TF2_VECTOR      5       /* 0x2B */
+#define PFI_VECTOR      6       /* 0x33 */
+#define SIO1_VECTOR     7       /* 0x3B */
+#define IE2_VECTOR      8       /* 0x43 */
+#define IE3_VECTOR      9       /* 0x4B */
+#define IE4_VECTOR     10       /* 0x53 */
+#define IE5_VECTOR     11       /* 0x5B */
+#define WDI_VECTOR     12       /* 0x63 */
+#endif
+
+#ifdef MICROCONTROLLER_DS89C420
 #define TF2_VECTOR      5       /* 0x2B */
 #define PFI_VECTOR      6       /* 0x33 */
 #define SIO1_VECTOR     7       /* 0x3B */

@@ -1,3 +1,7 @@
+2005-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51reg.h: fixed bug 842007
+
 2005-03-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcflow.c (dfNumCompare): committed the wrong version of this

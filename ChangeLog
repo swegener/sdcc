@@ -1,6 +1,10 @@
+2004-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/sab80515.h: added sfr P6, changed GPL to LGPL
+
 2004-06-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-	device/include/sab80515.h: fixed bug #967492, DAPR is defined at adress 
+	device/include/sab80515.h: fixed bug #967492, DAPR is defined at adress
 	0xd8, but the correct adress is 0xda. Thanks to anonymous for reporting
 
 2004-06-06 Vangelis Rokas <vrokas AT otenet.gr>
@@ -27,7 +31,7 @@
 	* (target port-specific-objects-pic16): the libraries and objects
 	are copied to the build directory form the device/lib/pic16/bin
 	directory
-	
+
 	Cumulative patch concerning pic16 port:
 	* library directory has been re-organized,
 	* added support for PIC18F1220,

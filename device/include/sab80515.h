@@ -1,24 +1,24 @@
 /*-------------------------------------------------------------------------
-  Register Declarations for SIEMENS SAB 80515 Processor
+  Register Declarations for SIEMENS/INFINEON SAB 80515 Processor
 
    Written By - Bela Torok
    Bela.Torokt@kssg.ch
    based on reg51.h by Sandeep Dutta sandeep.dutta@usa.net
    KEIL C compatible definitions are included
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
@@ -59,14 +59,15 @@ sfr at 0xC5 CCH2        ; /* compare/capture register 2, high byte */
 sfr at 0xC6 CCL3        ; /* compare/capture register 3, low byte */
 sfr at 0xC7 CCH3        ; /* compare/capture register 3, high byte */
 sfr at 0xC8 T2CON       ;
-sfr at 0xCA CRCL		; /* compare/reload/capture register, low byte */
-sfr at 0xCB CRCH		; /* compare/reload/capture register, high byte */
+sfr at 0xCA CRCL        ; /* compare/reload/capture register, low byte */
+sfr at 0xCB CRCH        ; /* compare/reload/capture register, high byte */
 sfr at 0xCC TL2         ;
 sfr at 0xCD TH2         ;
 sfr at 0xD0 PSW         ;
-sfr at 0xD8 ADCON		; /* A/D-converter control register */
-sfr at 0xD9 ADDAT		; /* A/D-converter data register */
-sfr at 0xDA DAPR		; /* D/A-converter program register */
+sfr at 0xD8 ADCON       ; /* A/D-converter control register */
+sfr at 0xD9 ADDAT       ; /* A/D-converter data register */
+sfr at 0xDA DAPR        ; /* D/A-converter program register */
+sfr at 0xDB P6          ; /* Port 6 - SAB80515 specific */
 sfr at 0xE0 ACC         ;
 sfr at 0xE0 A           ;
 sfr at 0xE8 P4          ; /* Port 4 - SAB80515 specific */
@@ -228,14 +229,14 @@ sbit at 0xDE CLK        ;
 sbit at 0xDF BD         ;
 
 /* A */
-sbit at 0xA0 AREG_F0	;
-sbit at 0xA1 AREG_F1	;
-sbit at 0xA2 AREG_F2	;
-sbit at 0xA3 AREG_F3	;
-sbit at 0xA4 AREG_F4	;
-sbit at 0xA5 AREG_F5	;
-sbit at 0xA6 AREG_F6	;
-sbit at 0xA7 AREG_F7	;
+sbit at 0xA0 AREG_F0    ;
+sbit at 0xA1 AREG_F1    ;
+sbit at 0xA2 AREG_F2    ;
+sbit at 0xA3 AREG_F3    ;
+sbit at 0xA4 AREG_F4    ;
+sbit at 0xA5 AREG_F5    ;
+sbit at 0xA6 AREG_F6    ;
+sbit at 0xA7 AREG_F7    ;
 
 /* P4 */
 sbit at 0xE8 P4_0       ;
@@ -248,14 +249,14 @@ sbit at 0xEE P4_6       ;
 sbit at 0xEF P4_7       ;
 
 /* B */
-sbit at 0xF0 BREG_F0	;
-sbit at 0xF1 BREG_F1	;
-sbit at 0xF2 BREG_F2	;
-sbit at 0xF3 BREG_F3	;
-sbit at 0xF4 BREG_F4	;
-sbit at 0xF5 BREG_F5	;
-sbit at 0xF6 BREG_F6	;
-sbit at 0xF7 BREG_F7	;
+sbit at 0xF0 BREG_F0    ;
+sbit at 0xF1 BREG_F1    ;
+sbit at 0xF2 BREG_F2    ;
+sbit at 0xF3 BREG_F3    ;
+sbit at 0xF4 BREG_F4    ;
+sbit at 0xF5 BREG_F5    ;
+sbit at 0xF6 BREG_F6    ;
+sbit at 0xF7 BREG_F7    ;
 
 /* P5 */
 sbit at 0xF8 P5_0       ;
@@ -332,38 +333,38 @@ sbit at 0xFF P5_7       ;
 #define T2OE_           0x02
 
 /* WMCON bits */
-#define WMCON_WDTEN		0x01
-#define WMCON_WDTRST	0x02
-#define WMCON_DPS		0x04
-#define WMCON_EEMEN		0x08
-#define WMCON_EEMWE		0x10
-#define WMCON_PS0		0x20
-#define WMCON_PS1		0x40
-#define WMCON_PS2		0x80
+#define WMCON_WDTEN     0x01
+#define WMCON_WDTRST    0x02
+#define WMCON_DPS       0x04
+#define WMCON_EEMEN     0x08
+#define WMCON_EEMWE     0x10
+#define WMCON_PS0       0x20
+#define WMCON_PS1       0x40
+#define WMCON_PS2       0x80
 
 /* SPCR-SPI bits */
-#define SPCR_SPR0		0x01
-#define SPCR_SPR1 		0x02
-#define SPCR_CPHA		0x04
-#define SPCR_CPOL		0x08
-#define SPCR_MSTR		0x10
-#define SPCR_DORD		0x20
-#define SPCR_SPE		0x40
-#define SPCR_SPIE		0x80
+#define SPCR_SPR0       0x01
+#define SPCR_SPR1       0x02
+#define SPCR_CPHA       0x04
+#define SPCR_CPOL       0x08
+#define SPCR_MSTR       0x10
+#define SPCR_DORD       0x20
+#define SPCR_SPE        0x40
+#define SPCR_SPIE       0x80
 
 /* SPSR-SPI bits */
-#define SPSR_WCOL		0x40
-#define SPSR_SPIF		0x80
+#define SPSR_WCOL       0x40
+#define SPSR_SPIF       0x80
 
 /* SPDR-SPI bits */
-#define SPDR_SPD0		0x10
-#define SPDR_SPD1		0x20
-#define SPDR_SPD2		0x40
-#define SPDR_SPD3		0x80
-#define SPDR_SPD4		0x10
-#define SPDR_SPD5		0x20
-#define SPDR_SPD6		0x40
-#define SPDR_SPD7		0x80
+#define SPDR_SPD0       0x10
+#define SPDR_SPD1       0x20
+#define SPDR_SPD2       0x40
+#define SPDR_SPD3       0x80
+#define SPDR_SPD4       0x10
+#define SPDR_SPD5       0x20
+#define SPDR_SPD6       0x40
+#define SPDR_SPD7       0x80
 
 /* Interrupt numbers: address = (number * 8) + 3 */
 #define IE0_VECTOR      0       /* 0x03 external interrupt 0 */

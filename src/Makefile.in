@@ -6,7 +6,7 @@ PRJDIR		= ..
 
 include $(PRJDIR)/Makefile.common
 
-PORTS		= mcs51 z80 avr
+PORTS		= mcs51 z80 avr ds390
 PORT_LIBS	= $(PORTS:%=%/port.a)
 
 LIBS		= -lgc -lm @LIBS@

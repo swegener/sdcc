@@ -2675,9 +2675,16 @@ genCall (iCode * ic)
 	  if (size > 1)
 	    {
 	      emitcode ("mov", "b,%s", fReturn[1]);
+	      _G.bInUse++;
 	    }
 
+	  _G.accInUse++;
 	  aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
+	  _G.accInUse--;
+	  
+	  if (size > 1)
+	    _G.bInUse--;
+
 	  aopPut (AOP (IC_RESULT (ic)), "a", 0);
 
 	  if (size > 1)

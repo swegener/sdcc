@@ -1,3 +1,8 @@
+2004-01-13 Klaus Flittner <klaus_flittner@gmx.de>
+
+	* src/ds390/gen.c (genCall): fixed a double use of acc and b after
+	 a function call
+
 2004-01-13 Bernhard Held <bernhard@bernhardheld.de>
 
 	* configure,

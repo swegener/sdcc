@@ -34,11 +34,7 @@
 // This is a bit messy because we define link ourself
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
 
-#if 0		// Wasn't this fixed already
-#define link NoLiNk
 #include <unistd.h>
-#undef link
-#endif
 
 #else
 // No unistd.h in Borland C++

@@ -16,32 +16,25 @@
 #define UNIX_DIR_SEPARATOR_CHAR    '/'
 #define UNIX_DIR_SEPARATOR_STRING  "/"
 
-#if defined(__BORLANDC__)	/* Borland Turbo C/Win32 Host */
+#ifdef _WIN32       /* WIN32 native */
 
 #define NATIVE_WIN32 		1
-#define DIR_SEPARATOR_CHAR	    DOS_DIR_SEPARATOR_CHAR
-#define DIR_SEPARATOR_STRING	    DOS_DIR_SEPARATOR_STRING
-
-#elif defined(_MSC_VER)		/* Miscosoft VC6/Win32 Host */
-
-#define NATIVE_WIN32 		1
+#ifdef __MINGW32__  /* GCC MINGW32 depends on configure */
+#include "sdccconf.h"
+#else
 #include "sdcc_vc.h"
-#define DIR_SEPARATOR_CHAR	    DOS_DIR_SEPARATOR_CHAR
-#define DIR_SEPARATOR_STRING	    DOS_DIR_SEPARATOR_STRING
+#endif
+#define DIR_SEPARATOR_CHAR	DOS_DIR_SEPARATOR_CHAR
+#define DIR_SEPARATOR_STRING	DOS_DIR_SEPARATOR_STRING
+#define PATH_MAX                _MAX_PATH
 
-#elif defined(__MINGW32__)	/* MINGW32 DOS Host */
-
-#define NATIVE_WIN32		1
-#define DIR_SEPARATOR_CHAR	    DOS_DIR_SEPARATOR_CHAR
-#define DIR_SEPARATOR_STRING	    DOS_DIR_SEPARATOR_STRING
-
-#else /* Assume Un*x style system */
+#else               /* Assume Un*x style system */
 
 #include "sdccconf.h"
 #define DIR_SEPARATOR_CHAR	    UNIX_DIR_SEPARATOR_CHAR
 #define DIR_SEPARATOR_STRING	    UNIX_DIR_SEPARATOR_STRING
 
-#endif // _MSC_VER
+#endif
 
 #include "SDCCerr.h"
 
@@ -313,8 +306,7 @@ FILE *tempfile (void);
     in cygwin wrt c:\tmp.
     Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
 */
-char *
-tempfilename (void);
+char *tempfilename (void);
 
 /** An assert() macro that will go out through sdcc's error
     system.

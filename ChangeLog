@@ -1,3 +1,8 @@
+2004-03-26 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/small/Makefile: fixed parallel execution by
+	replacing `make` by `$(MAKE)`
+
 2004-03-23 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/vprintf.c (vsprintf): minor optimization, see bug #801101

@@ -318,7 +318,7 @@ symbolVal (symbol * sym)
 /*--------------------------------------------------------------------*/
 /* cheapestVal - convert a val to the cheapest as possible value      */
 /*--------------------------------------------------------------------*/
-value *cheapestVal (value *val) {
+static value *cheapestVal (value *val) {
   TYPE_DWORD  sval=0;
   TYPE_UDWORD uval=0;
 
@@ -357,11 +357,10 @@ value *cheapestVal (value *val) {
 	}
       }
     } else { // sval>=0
-      SPEC_USIGN(val->type)=1;
-      if (sval<=65535) {
+      if (sval<=32767) {
 	SPEC_LONG(val->type)=0;
 	SPEC_CVAL(val->type).v_int = (TYPE_WORD)sval;
-	if (sval<=255) {
+	if (sval<=127) {
 	  SPEC_NOUN(val->type)=V_CHAR;
 	}
       }
@@ -1044,7 +1043,6 @@ valMult (value * lval, value * rval)
         {
           TYPE_UDWORD ul = (TYPE_UWORD) floatFromVal (lval) *
                            (TYPE_UWORD) floatFromVal (rval);
-          
           SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) ul;
           if (!options.lessPedantic)
             {

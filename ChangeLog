@@ -1,3 +1,8 @@
+2003-08-06  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCval.c (cheapestVal): changed behaviour to the same as constVal()
+	* device/lib/time.c: fixed warning "integer overflow in expression"
+
 2003-08-05  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCval.c (cheapestVal, valueFromLit): use TYPE_* types

@@ -1062,6 +1062,10 @@ operandOperation (operand * left, operand * right,
       retval = operandFromValue (valCastLiteral (type,
 						 operandLitValue (left) *
 						 operandLitValue (right)));
+      if (!options.lessPedantic &&
+	  !IS_FLOAT (OP_VALUE(retval)->type) &&
+	  !SPEC_LONG (OP_VALUE(retval)->type))
+        ; /* TODO: werror (W_INT_OVL) */
       break;
     case '/':
       if ((TYPE_UDWORD) operandLitValue (right) == 0)

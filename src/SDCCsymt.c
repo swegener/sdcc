@@ -1292,6 +1292,60 @@ bool inCalleeSaveList ( char *s)
     return 0;
 }
 
+/*-----------------------------------------------------------------*/
+/* aggregateArgToPointer:  change an agggregate type function      */
+/* 			   argument to a pointer to that type.	   */
+/*-----------------------------------------------------------------*/
+void aggregateArgToPointer(value *val)
+{
+	if ( IS_AGGREGATE(val->type)) {
+	    /* if this is a structure */
+	    /* then we need to add a new link */
+	    if (IS_STRUCT(val->type)) {
+				/* first lets add DECLARATOR type */
+		sym_link *p = val->type ;
+		
+		werror(W_STRUCT_AS_ARG,val->name);
+		val->type = newLink();
+		val->type->next = p ;				
+	    }
+	    
+	    /* change to a pointer depending on the */
+	    /* storage class specified				*/
+	    switch (SPEC_SCLS(val->etype)) {
+	    case S_IDATA:
+		DCL_TYPE(val->type) = IPOINTER;
+		break;
+	    case S_PDATA:
+		DCL_TYPE(val->type) = PPOINTER;
+		break;
+	    case S_FIXED:
+	    case S_AUTO:
+	    case S_DATA:
+	    case S_REGISTER:
+		DCL_TYPE(val->type) = POINTER ;
+		break;
+	    case S_CODE:
+		DCL_TYPE(val->type) = CPOINTER;
+		break;
+	    case S_XDATA:
+		DCL_TYPE(val->type) = FPOINTER;
+		break;
+	    case S_EEPROM:
+		DCL_TYPE(val->type) = EEPPOINTER;
+		break;
+	    default :
+		DCL_TYPE(val->type) = GPOINTER;
+	    }
+	    
+	    /* is there is a symbol associated then */
+	    /* change the type of the symbol as well*/
+	    if ( val->sym ) {	       
+		val->sym->type = copyLinkChain(val->type);
+		val->sym->etype = getSpec(val->sym->type);
+	    }
+	}
+}
 /*------------------------------------------------------------------*/
 /* checkFunction - does all kinds of check on a function            */
 /*------------------------------------------------------------------*/
@@ -1368,8 +1422,25 @@ int   checkFunction (symbol   *sym)
     /* for all the expected args do */
     for (argCnt =  1    ; 
 	 exargs && acargs ; 
-         exargs = exargs->next, acargs = acargs->next, argCnt++ ) {
-	if ( checkType(exargs->type,acargs->type) <= 0) {
+         exargs = exargs->next, acargs = acargs->next, argCnt++ ) 
+    {
+        value *checkValue;
+        /* If the actual argument is an array, any prototype
+         * will have modified it to a pointer. Duplicate that
+         * change here.
+         */
+        if ( IS_AGGREGATE(acargs->type)) 
+        {
+            checkValue = copyValue(acargs);
+	    aggregateArgToPointer(checkValue);
+	} 
+	else
+	{
+	    checkValue = acargs;
+	}
+	
+	if ( checkType(exargs->type,checkValue->type) <= 0) 
+	{
 	    werror(E_ARG_TYPE,argCnt);
 	    return 0;
 	}
@@ -1434,53 +1505,8 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 	}
 	
 	if ( IS_AGGREGATE(val->type)) {
-	    /* if this is a structure */
-	    /* then we need to add a new link */
-	    if (IS_STRUCT(val->type)) {
-				/* first lets add DECLARATOR type */
-		sym_link *p = val->type ;
-		
-		werror(W_STRUCT_AS_ARG,val->name);
-		val->type = newLink();
-		val->type->next = p ;				
-	    }
-	    
-	    /* change to a pointer depending on the */
-	    /* storage class specified				*/
-	    switch (SPEC_SCLS(val->etype)) {
-	    case S_IDATA:
-		DCL_TYPE(val->type) = IPOINTER;
-		break;
-	    case S_PDATA:
-		DCL_TYPE(val->type) = PPOINTER;
-		break;
-	    case S_FIXED:
-	    case S_AUTO:
-	    case S_DATA:
-	    case S_REGISTER:
-		DCL_TYPE(val->type) = POINTER ;
-		break;
-	    case S_CODE:
-		DCL_TYPE(val->type) = CPOINTER;
-		break;
-	    case S_XDATA:
-		DCL_TYPE(val->type) = FPOINTER;
-		break;
-	    case S_EEPROM:
-		DCL_TYPE(val->type) = EEPPOINTER;
-		break;
-	    default :
-		DCL_TYPE(val->type) = GPOINTER;
-	    }
-	    
-	    /* is there is a symbol associated then */
-	    /* change the type of the symbol as well*/
-	    if ( val->sym ) {	       
-		val->sym->type = copyLinkChain(val->type);
-		val->sym->etype = getSpec(val->sym->type);
-	    }
+	    aggregateArgToPointer(val);
 	}
-	
 	val = val->next ;
 	pNum++;
     }

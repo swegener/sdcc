@@ -521,3 +521,17 @@ int isTargetKeyword(char *s)
     
     return 0;
 }
+
+extern int fatalError;
+
+int yyerror(char *s)
+{
+   fflush(stdout);
+
+   if (yylineno && filename)
+	fprintf(stdout,"\n%s(%d) %s: token -> '%s' ; column %d\n",
+		filename,yylineno,
+		s,yytext,column);
+   fatalError++;
+   return 0;
+}

@@ -1,19 +1,13 @@
 /** @file altlex.c
     An alternate lexer to SDCC.lex.
     In development - ie messy and just plain wrong.
+    Inspired by the gcc lexer, c-lex.c.
 */
 #include "common.h"
 #include "reswords.h"
 #include <assert.h>
 
 #define DUMP_OUTPUT		0
-
-FILE *yyin;
-
-int yylineno;
-int column;
-char *currFname;
-char *yytext;
 
 /* Right.  What are the parts of the C stream?  From SDCC.lex:
    D = [0..9]		digits
@@ -47,25 +41,37 @@ char *yytext;
 	 Punct	Try to read punct
 */	
 
-char linebuf[10000];
-int linepos, linelen;
-
-#define INLINE	inline
-#define ERRSINK stdout
-
-extern int fatalError ;
-extern int lineno ;
+extern int fatalError;
+extern int lineno;
 extern char *filename;
+
+FILE *yyin;
+
+int yylineno;
+char *currFname;
+char *yytext;
+
+static char linebuf[10000];
+static int linepos, linelen;
+static int end_of_file;
+
+#ifdef __GNUC__
+#define INLINE	inline
+#else
+#define INLINE 
+#endif
+
+#define ERRSINK stderr
 
 static void error(const char *sz, ...)
 {
     va_list ap;
     fatalError++;
     
-    if ( filename && lineno ) {
+    if (filename && lineno) {
 	fprintf(ERRSINK, "%s(%d):",filename,lineno);
     }
-    fprintf(ERRSINK, "error:");
+    fprintf(ERRSINK, "error *** ");
     va_start(ap, sz);
     vfprintf(ERRSINK, sz, ap);
     va_end(ap);
@@ -103,7 +109,7 @@ static int INLINE yungetc(int c)
 //#define UNGETC(_a)	ungetc(_a, yyin)
 #define ISL(_a)		(isalnum(_a) || _a == '_')
 #define ISALNUM(_a)	isalnum(_a)
-#define ISHEX(_a)	isalnum(_a)
+#define ISHEX(_a)	isxdigit(_a)
 
 static char *stringLiteral (void)
 {
@@ -176,7 +182,7 @@ static void discard_comments(int type)
 
 /* will return 1 if the string is a part
    of a target specific keyword */
-static int isTargetKeyword(const char *s)
+static INLINE int isTargetKeyword(const char *s)
 {
     int i;
     
@@ -190,7 +196,7 @@ static int isTargetKeyword(const char *s)
     return 0;
 }
 
-static int check_token(const char *sz)
+static INLINE int check_token(const char *sz)
 {
     const struct reserved_words *p;
     p = is_reserved_word(sz, strlen(sz));
@@ -210,255 +216,420 @@ static int check_token(const char *sz)
     }
 }
 
+static void handle_pragma(void)
+{
+    char line[128], *p;
+    int c;
+
+    c = GETC();
+    while (c == '\t' || c == ' ')
+	c = GETC();
+    p = line;
+    while (!isspace(c)) {
+	*p++ = c;
+	c = GETC();
+    }
+    *p = '\0';
+    if (line[0] == '\0')
+	error("Missing argument to pragma");
+    else {
+	/* First give the port a chance */
+	if (port->process_pragma && !port->process_pragma(line))
+	    return;
+	/* PENDING: all the SDCC shared pragmas */
+	/* Nothing handled it */
+	error("Unrecognised #pragma %s", line);
+    }
+}
+
+static void handle_line(void)
+{
+    int c;
+    char line[128], *p;
+
+    c = GETC();
+    while (c == '\t' || c == ' ')
+	c = GETC();
+    p = line;
+    while (isdigit(c)) {
+	*p++ = c;
+	c = GETC();
+    }
+    *p = '\0';
+    if (line[0] == '\0')
+	error("Error in number in #line");
+    /* This is weird but cpp seems to add an extra three to the line no */
+    yylineno = atoi(line) - 3;
+    lineno = yylineno;
+    /* Fetch the filename if there is one */
+    while (c == '\t' || c == ' ')
+	c = GETC();
+    if (c == '\"') {
+	p = line;
+	c = GETC();
+	while (c != '\"' && c != EOF && c != '\n') {
+	    *p++ = c;
+	    c = GETC();
+	}
+	if (c == '\"') {
+	    *p = '\0';
+	    currFname = gc_strdup(line);
+	}
+	filename = currFname;
+    }
+}
+
+static INLINE void invalid_directive(void)
+{
+    error("Invalid directive");
+}
+
+static INLINE int check_newline(void)
+{
+    int c;
+    yylineno++;
+    lineno = yylineno;
+
+    /* Skip any leading white space */
+    c = GETC();
+    while (c == '\t' || c == ' ')
+	c = GETC();
+    /* Were only interested in #something */
+    if (c != '#')
+	return c;
+    c = GETC();
+    while (c == '\t' || c == ' ')
+	c = GETC();
+    /* The text in the stream is the type of directive */
+    switch (c) {
+    case 'l':
+	/* Start of line? */
+	if (GETC() == 'i' && GETC() == 'n' && GETC() == 'e') {
+	    c = GETC();
+	    if (c == '\t' || c == ' ')
+		handle_line();
+	    else
+		invalid_directive();
+	}
+	else
+	    invalid_directive();
+	break;
+    case 'p':
+	/* Start of pragma? */
+	if (GETC() == 'r' && GETC() == 'a' && GETC() == 'g' &&
+	    GETC() == 'm' && GETC() == 'a') {
+	    c = GETC();
+	    if (c == '\t' || c == ' ')
+		handle_pragma();
+	    else
+		invalid_directive();
+	}
+	else
+	    invalid_directive();
+	break;
+    default:
+	invalid_directive();
+    }
+    /* Discard from here until the start of the next line */
+    while (c != '\n' && c != EOF)
+	c = GETC();
+    return c;
+}
+
+static int skip_whitespace(int c)
+{
+    while (1) {
+	switch (c) {
+	case ' ':
+	case '\t':
+	case '\f':
+	case '\v':
+	case '\b':
+	case '\r':
+	    c = GETC();
+	    break;
+	case '\n':
+	    c = check_newline();
+	default:
+	    return c;
+	}
+    }
+}
+
+void yyerror(const char *s)
+{
+   if (end_of_file)
+       error("%s at end of of input", s);
+   else if (yytext[0] == '\0')
+       error("%s at null character", s);
+   else if (yytext[0] == '"')
+       error("%s before string constant", s);
+   else if (yytext[0] == '\'')
+       error("%s before character constant", s);
+   else 
+       error("%s before %s", s, yytext);
+}
+
 static int _yylex(void)
 {
     int c;
-    char line[128];
+    static char line[128];
     char *p;
+
+    yytext = line;
 
     c = GETC();
     while (1) {
-	/* Handle comments first */
-	if (c == '/') {
-	    int c2 = GETC();
-	    if (c2 == '*' || c2 == '/') {
-		discard_comments(c2);
-		c = GETC();
-		continue;
-	    }
-	    else
-		UNGETC(c2);
-	}
 	switch (c) {
-	case EOF:
-	    return 0;
 	case ' ':
 	case '\t':
+	case '\f':
+	case '\v':
+	case '\b':
+	    /* Skip whitespace */
+	    c = GETC();
+	    break;
 	case '\r':
 	case '\n':
-	    /* Skip whitespace */
+	    c = skip_whitespace(c);
 	    break;
-	case 'a': case 'b': case 'c': case 'd':
-	case 'e': case 'f': case 'g': case 'h':
-	case 'i': case 'j': case 'k': case 'l':
-	case 'm': case 'n': case 'o': case 'p':
-	case 'q': case 'r': case 's': case 't':
-	case 'u': case 'v': case 'w': case 'x':
-	case 'y': case 'z':
-	case 'A': case 'B': case 'C': case 'D':
-	case 'E': case 'F': case 'G': case 'H':
-	case 'I': case 'J': case 'K': case 'L':
-	case 'M': case 'N': case 'O': case 'P':
-	case 'Q': case 'R': case 'S': case 'T':
-	case 'U': case 'V': case 'W': case 'X':
-	case 'Y': case 'Z':
-	case '_':
-	    /* Start of a token.  Parse. */
-	    p = line;
-	    *p++ = c;
-	    c = GETC();
-	    while (ISL(c)) {
-		*p++ = c;
-		c = GETC();
-	    }
-	    *p = '\0';
-	    UNGETC(c);
-	    return check_token(line);
-	case '0': case '1':
-	case '2': case '3': case '4': case '5':
-	case '6': case '7': case '8': case '9':
-	    p = line;
-	    *p++ = c;
-	    c = GETC();
-	    if (c == 'x' || c == 'X') {
-		*p++ = c;
-		c = GETC();
-	    }
-	    while (ISHEX(c)) {
-		*p++ = c;
-		c = GETC();
-	    }
-	    *p = '\0';
-	    UNGETC(c);
-	    yylval.val = constVal(line);
-	    return CONSTANT;
-	case '\"':
-	    /* A string */
-	    p = stringLiteral();
-	    yylval.val = strVal(p);
-	    return(STRING_LITERAL);
-	case '\'':
-	    /* Possible formats:
-	       ['\n', '\\', '\'', '\"'...]
-	       ['a'...]
-	    */
-	    p = line;
-	    *p++ = c;
-	    c = GETC();
-	    if (c == '\\') {
-		*p++ = c;
-		c = GETC();
-		/* Fall through */
-	    }
-	    *p++ = c;
-	    c = GETC();
-	    *p++ = c;
-	    *p = '\0';
-	    if (c != '\'') {
-		error("Unrecognised character constant %s", line);
-	    }
-	    yylval.val = charVal(line);
-	    return CONSTANT;
 	case '#':
-	    /* Assume a pragma and toast the rest of the line. */
-	    c = GETC();
-	    while (c != '\n') {
-		c = GETC();
-	    }
+	    UNGETC(c);
+	    c = check_newline();
 	    break;
-	case '=':
-	case '&':
-	case '!':
-	case '-':
-	case '+':
-	case '*':
-	case '/':
-	case '%':
-	case '<':
-	case '>':
-	case '^':
-	case '|': {
-	    /* Cases which can be compounds */
-	    /* The types and classes of composites are:
-	       >>= <<=
-	       += -= *= /= %= &= ^= |=
-	       >> << ++ --
-	       && ||
-	       <= >= == !=
-	       ->
-	       So a composite started by char 'x' can be:
-	         1. Followed by itself then an equals
-		 2. Followed by itself
-		 3. Followed by an equals
-		 4. Be a '->'
-		 5. Be by itself
-	    */
-	    int next = GETC();
-	    /* Class 1 and 2 */
-	    if (next == c) {
-		next = GETC();
-		/* Class 1 */
-		if (next == '=') {
-		    switch (c) {
-		    case '>':	// >>=
-			yylval.yyint = RIGHT_ASSIGN;
-			return RIGHT_ASSIGN;
-		    case '<':	// <<=
-			yylval.yyint = LEFT_ASSIGN;
-			return LEFT_ASSIGN;
-		    default:
-			error("Unrecognised token %c%c=", c, c);
-		    }
-		}
-		else {
-		    /* Push the next char back on and find the class */
-		    UNGETC(next);
-		    /* Case 2 */
-		    switch (c) {
-		    case '>':	// >>
-			return RIGHT_OP;
-		    case '<':	// <<
-			return LEFT_OP;
-		    case '+':
-			return INC_OP;
-		    case '-':
-			return DEC_OP;
-		    case '&':
-			return AND_OP;
-		    case '|':
-			return OR_OP;
-		    case '=':
-			return EQ_OP;
-		    default:
-			error("Unrecognised token %c%c", c, c);
-		    }
-		}
-	    }
-	    /* Case 3 */
-	    else if (next == '=') {
-		int result = 0;
-		switch (c) {
-		case '+':
-		    result = ADD_ASSIGN; break;
-		case '-':
-		    result = SUB_ASSIGN; break;
-		case '*':
-		    result = MUL_ASSIGN; break;
-		case '/':
-		    result = DIV_ASSIGN; break;
-		case '%':
-		    result = MOD_ASSIGN; break;
-		case '&':
-		    result = AND_ASSIGN; break;
-		case '^':
-		    result = XOR_ASSIGN; break;
-		case '|':
-		    result = OR_ASSIGN; break;
-		case '<':
-		    result = LE_OP; break;
-		case '>':
-		    result = GE_OP; break;
-		case '!':
-		    result = NE_OP; break;
-		default:
-		    error("Unrecognised token %c=", c);
-		}
-		if (result) {
-		    yylval.yyint = result;
-		    return result;
-		}
-	    }
-	    /* Case 4 */
-	    else if (c == '-' && next == '>') {
-		return PTR_OP;
-	    }
-	    /* Case 5 */
-	    else {
-		UNGETC(next);
-		return c;
-	    }
-	    break;
+	default:
+	    goto past_ws;
 	}
-	case '{':
-	    NestLevel++;
+    }
+
+ past_ws:
+    /* Handle comments first */
+    if (c == '/') {
+	int c2 = GETC();
+	if (c2 == '*' || c2 == '/') {
+	    discard_comments(c2);
+	    c = GETC();
+	}
+	else
+	    UNGETC(c2);
+    }
+    switch (c) {
+    case EOF:
+	end_of_file = TRUE;
+	line[0] = '\0';
+	return 0;
+    case 'a': case 'b': case 'c': case 'd':
+    case 'e': case 'f': case 'g': case 'h':
+    case 'i': case 'j': case 'k': case 'l':
+    case 'm': case 'n': case 'o': case 'p':
+    case 'q': case 'r': case 's': case 't':
+    case 'u': case 'v': case 'w': case 'x':
+    case 'y': case 'z':
+    case 'A': case 'B': case 'C': case 'D':
+    case 'E': case 'F': case 'G': case 'H':
+    case 'I': case 'J': case 'K': case 'L':
+    case 'M': case 'N': case 'O': case 'P':
+    case 'Q': case 'R': case 'S': case 'T':
+    case 'U': case 'V': case 'W': case 'X':
+    case 'Y': case 'Z':
+    case '_':
+	/* Start of a token.  Parse. */
+	p = line;
+	*p++ = c;
+	c = GETC();
+	while (ISL(c)) {
+	    *p++ = c;
+	    c = GETC();
+	}
+	*p = '\0';
+	UNGETC(c);
+	return check_token(line);
+    case '0': case '1':
+    case '2': case '3': case '4': case '5':
+    case '6': case '7': case '8': case '9':
+	p = line;
+	*p++ = c;
+	c = GETC();
+	if (c == 'x' || c == 'X') {
+	    *p++ = c;
+	    c = GETC();
+	}
+	while (ISHEX(c)) {
+	    *p++ = c;
+	    c = GETC();
+	}
+	*p = '\0';
+	UNGETC(c);
+	yylval.val = constVal(line);
+	return CONSTANT;
+    case '\"':
+	/* A string */
+	p = stringLiteral();
+	yylval.val = strVal(p);
+	return(STRING_LITERAL);
+    case '\'':
+	/* Possible formats:
+	   ['\n', '\\', '\'', '\"'...]
+	   ['a'...]
+	*/
+	p = line;
+	*p++ = c;
+	c = GETC();
+	if (c == '\\') {
+	    *p++ = c;
+	    c = GETC();
+	    /* Fall through */
+	}
+	*p++ = c;
+	c = GETC();
+	*p++ = c;
+	*p = '\0';
+	if (c != '\'') {
+	    error("Unrecognised character constant %s", line);
+	}
+	yylval.val = charVal(line);
+	return CONSTANT;
+    case '=':
+    case '&':
+    case '!':
+    case '-':
+    case '+':
+    case '*':
+    case '/':
+    case '%':
+    case '<':
+    case '>':
+    case '^':
+    case '|': {
+	/* Cases which can be compounds */
+	/* The types and classes of composites are:
+	   >>= <<=
+	   += -= *= /= %= &= ^= |=
+	   >> << ++ --
+	   && ||
+	   <= >= == !=
+	   ->
+	   So a composite started by char 'x' can be:
+	   1. Followed by itself then an equals
+	   2. Followed by itself
+	   3. Followed by an equals
+	   4. Be a '->'
+	   5. Be by itself
+	*/
+	int next = GETC();
+	/* Class 1 and 2 */
+	if (next == c) {
+	    next = GETC();
+	    /* Class 1 */
+	    if (next == '=') {
+		switch (c) {
+		case '>':	// >>=
+		    yylval.yyint = RIGHT_ASSIGN;
+		    return RIGHT_ASSIGN;
+		case '<':	// <<=
+		    yylval.yyint = LEFT_ASSIGN;
+		    return LEFT_ASSIGN;
+		default:
+		    error("Unrecognised token %c%c=", c, c);
+		}
+	    }
+	    else {
+		/* Push the next char back on and find the class */
+		UNGETC(next);
+		/* Case 2 */
+		switch (c) {
+		case '>':	// >>
+		    return RIGHT_OP;
+		case '<':	// <<
+		    return LEFT_OP;
+		case '+':
+		    return INC_OP;
+		case '-':
+		    return DEC_OP;
+		case '&':
+		    return AND_OP;
+		case '|':
+		    return OR_OP;
+		case '=':
+		    return EQ_OP;
+		default:
+		    error("Unrecognised token %c%c", c, c);
+		}
+	    }
+	}
+	/* Case 3 */
+	else if (next == '=') {
+	    int result = 0;
+	    switch (c) {
+	    case '+':
+		result = ADD_ASSIGN; break;
+	    case '-':
+		result = SUB_ASSIGN; break;
+	    case '*':
+		result = MUL_ASSIGN; break;
+	    case '/':
+		result = DIV_ASSIGN; break;
+	    case '%':
+		result = MOD_ASSIGN; break;
+	    case '&':
+		result = AND_ASSIGN; break;
+	    case '^':
+		result = XOR_ASSIGN; break;
+	    case '|':
+		result = OR_ASSIGN; break;
+	    case '<':
+		result = LE_OP; break;
+	    case '>':
+		result = GE_OP; break;
+	    case '!':
+		result = NE_OP; break;
+	    default:
+		error("Unrecognised token %c=", c);
+	    }
+	    if (result) {
+		yylval.yyint = result;
+		return result;
+	    }
+	}
+	/* Case 4 */
+	else if (c == '-' && next == '>') {
+	    return PTR_OP;
+	}
+	/* Case 5 */
+	else {
+	    UNGETC(next);
 	    return c;
-	case '}':
-	    NestLevel--;
-	    return c;
-	case '.':
+	}
+	break;
+    }
+    case '{':
+	NestLevel++;
+	return c;
+    case '}':
+	NestLevel--;
+	return c;
+    case '.':
+	c = GETC();
+	if (c == '.') {
 	    c = GETC();
 	    if (c == '.') {
-		c = GETC();
-		if (c == '.') {
-		    return VAR_ARGS;
-		}
+		return VAR_ARGS;
 	    }
-	    UNGETC(c);
-	    return '.';
-	case '[': case ']':
-	    return c;
-	case ',':
-	case ':':
-	case '(': case ')':
-	case '~':
-	case '?':
-	case ';':
-	    /* Special characters that cant be part of a composite */
-	    return c;
-	default:
-	    error("Unhandled char %c", c);
 	}
-	c = GETC();
+	UNGETC(c);
+	return '.';
+    case '[': case ']':
+	return c;
+    case ',':
+    case ':':
+    case '(': case ')':
+    case '~':
+    case '?':
+    case ';':
+	/* Special characters that cant be part of a composite */
+	return c;
+    default:
+	error("Unhandled character %c", c);
     }
     return 0;
 }

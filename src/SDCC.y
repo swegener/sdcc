@@ -1334,20 +1334,3 @@ identifier
    ;
 %%
 
-extern unsigned char *yytext;
-extern int column;
-extern char *filename;
-extern int fatalError;
-
-int yyerror(char *s)
-{
-   fflush(stdout);
-
-   if ( yylineno )
-	fprintf(stderr,"\n%s(%d) %s: token -> '%s' ; column %d\n",
-		filename,yylineno,
-		s,yytext,column);
-   fatalError++;
-   return 0;
-}
-

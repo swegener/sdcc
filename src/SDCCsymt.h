@@ -416,7 +416,7 @@ void	       initHashT	    (				   );
 bucket	      *newBucket	    (				   );
 void	       addSym		    ( bucket ** , void	 *, char  *, int, int);
 void	       deleteSym	    ( bucket ** , void	 *, char  *);
-void	      *findSym		    ( bucket ** , void	 *, char  *);
+void	      *findSym		    ( bucket ** , void	 *, const char  *);
 void          *findSymWithLevel     ( bucket ** , struct symbol *  );
 void          *findSymWithBlock     ( bucket ** , struct symbol *,int   );
 #include "SDCCmem.h"

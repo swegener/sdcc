@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-#define USE_STDOUT_FOR_ERRORS		1
+#define USE_STDOUT_FOR_ERRORS		0
 
 #if USE_STDOUT_FOR_ERRORS
 #define ERRSINK		stdout

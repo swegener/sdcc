@@ -60,7 +60,7 @@ bucket	 *newBucket ()
 /*-----------------------------------------------------------------*/
 /* hashKey - computes the hashkey given a symbol name              */
 /*-----------------------------------------------------------------*/
-int hashKey (char *s)
+int hashKey (const char *s)
 {
     unsigned long key = 0;
 
@@ -144,7 +144,7 @@ void  deleteSym ( bucket **stab, void *sym, char *sname)
 /*-----------------------------------------------------------------*/
 /* findSym - finds a symbol in a table				   */
 /*-----------------------------------------------------------------*/
-void  *findSym ( bucket **stab, void *sym, char *sname)
+void  *findSym ( bucket **stab, void *sym, const char *sname)
 {
    bucket *bp ;
 

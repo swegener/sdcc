@@ -1216,7 +1216,7 @@ stringToSymbol (value * val)
   static int charLbl = 0;
   symbol *sym;
   set *sp;
-  int size;
+  unsigned int size;
 
   // have we heard this before?
   for (sp=statsg->syms; sp; sp=sp->next) {
@@ -2594,15 +2594,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           LRVAL (tree) = RRVAL (tree) = 1;
           
-          /* AND is signless so make signedness of literal equal */
-          /* to signedness of left for better optimized code */
-          if (IS_LITERAL (RTYPE (tree)) &&
-              (getSize(LTYPE(tree)) == getSize(RTYPE(tree))) &&
-              (SPEC_USIGN(LTYPE(tree)) != SPEC_USIGN(RTYPE(tree))) )
-            {
-              SPEC_USIGN(RTYPE(tree)) = SPEC_USIGN(LTYPE(tree));
-            }
-
           TTYPE (tree) = computeType (LTYPE (tree),
                                       RTYPE (tree),
                                       resultType,
@@ -2790,15 +2781,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               /* both operands in litTree are literal now */
               decorateType (parent, resultType);
             }
-        }
-
-      /* OR/XOR are signless so make signedness of literal equal */
-      /* to signedness of left for better optimized code */
-      if (IS_LITERAL (RTYPE (tree)) &&
-          (getSize(LTYPE(tree)) == getSize(RTYPE(tree))) &&
-          (SPEC_USIGN(LTYPE(tree)) != SPEC_USIGN(RTYPE(tree))) )
-        {
-          SPEC_USIGN(RTYPE(tree)) = SPEC_USIGN(LTYPE(tree));
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;

@@ -1,3 +1,7 @@
+2004-07-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+        * src/SDCCast.c (decorateType): removed buggy fix for bug #979599
+
 2004-07-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c (printIvalArray): fixed bug #984229, thanks to Phuah
@@ -117,8 +121,8 @@
 
 2004-06-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-	* src/mcs51/peeph.def: added peepholes 182.d (return 0.0), 
-	256 (range check), 257 (do while), 258.a-f (bit banging 
+	* src/mcs51/peeph.def: added peepholes 182.d (return 0.0),
+	256 (range check), 257 (do while), 258.a-f (bit banging
 	f.e. on 3-wire SPI bus)
 
 2004-06-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
@@ -190,7 +194,7 @@
 	* src/z80/ralloc.c (serialRegAssign),
 	* src/ds390/ralloc.c (serialRegAssign),
 	* src/mcs51/ralloc.c (serialRegAssign): fixed bug #964479
-	
+
 2004-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeJumpTable): fixed bug #967601
@@ -215,7 +219,7 @@
 	command argument --denable-peeps, for testing,
         * device/lib/pic16/startup/Makefile: added --no-peep,--pomit-config-words,
         --pomit-ivt in COMPILE_FLAGS
- 
+
 2004-06-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/pic16/pcode.c (pic16_emitDB): removed double semicolon which fails

@@ -38,6 +38,19 @@ typedef struct {
 	int float_size;
 	int max_base_size;
     } s;
+    /** Names for all the memory regions */
+    struct {
+	const char *xstack_name;
+	const char *istack_name;
+	const char *code_name;
+	const char *data_name;
+	const char *idata_name;
+	const char *xdata_name;
+	const char *bit_name;
+	const char *reg_name;
+	const char *static_name;
+	const char *overlay_name;
+    } mem;
     struct {
 	/** -1 for grows down (z80), +1 for grows up (mcs51) */
 	int direction;

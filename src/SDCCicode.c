@@ -184,7 +184,7 @@ int printOperand (operand *op, FILE *file)
 		int i;
 		fprintf(file,"[");
 		for(i=0;i<OP_SYMBOL(op)->nRegs;i++)
-		    fprintf(file,"%s ", port->getRegName(OP_SYMBOL(op)));
+		    fprintf(file,"%s ", port->getRegName(OP_SYMBOL(op)->regs[i]));
 		fprintf(file,"]");
 	    }
 	} 

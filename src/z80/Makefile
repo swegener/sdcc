@@ -2,7 +2,7 @@ PRJDIR = ../..
 
 include $(PRJDIR)/Makefile.common
 
-OBJ = icode.o gen.o ralloc.o main.o glue.o mem.o
+OBJ = gen.o ralloc.o main.o
 LIB = port.a
 
 CFLAGS = -ggdb -Wall

@@ -123,6 +123,7 @@ PORT *port;
 
 static PORT *_ports[] = {
     &mcs51_port,
+    &z80_port
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
@@ -1001,19 +1002,28 @@ static void linkEdit (char **envp)
 static void assemble (char **envp)
 {
     char *asmArgs[128];  /* assembler arguments */
+    /* PENDING: A bit messy */
+    char buffer2[1024];
+
     int i = 2;
 
-    asmArgs[0] = "asx8051";
+    asmArgs[0] = port->assembler.exec_name;
     
 /*     if (options.debug) */
-    asmArgs[1] = "-plosgffc" ;
+    asmArgs[1] = port->assembler.debug_opts;
 /*     else */
-/* 	asmArgs[1] = "-plosgff"; */
+/* 	asmArgs[1] = port->assembler.plain_opts; */
 
     /* add the extra options if any */
     for (; asmOptions[i-2] ; i++)
 	asmArgs[i] = asmOptions[i-2];
 
+    if (port->assembler.requires_output_name) {
+	sprintf(buffer2, srcFileName);
+	strcat(buffer2, ".o");
+	asmArgs[i++] = buffer2;
+    }
+	
     /* create the assembler file name */
     sprintf (buffer, srcFileName);
     strcat (buffer, ".asm");
@@ -1021,7 +1031,7 @@ static void assemble (char **envp)
 
     asmArgs[i] = 0; /* end of args */
 
-    if (my_system("asx8051",asmArgs)) {
+    if (my_system(port->assembler.exec_name, asmArgs)) {
 	perror("Cannot exec linker");
 	exit(1);
     }
@@ -1083,8 +1093,8 @@ static void _findPort(int argc, char **argv)
 	argv++;
 	argc--;
     }
-    /* Assume mcs51 */
-    port = &mcs51_port;
+    /* Use the first in the list */
+    port = _ports[0];
 }
 
 /* 

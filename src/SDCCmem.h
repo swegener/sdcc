@@ -26,15 +26,15 @@ typedef  struct memmap{
 extern FILE	*junkFile ;	
 
 /* memory map prefixes  MOF added the DATA,CODE,XDATA,BIT */
-#define  XSTACK_NAME   "XSEG    (XDATA)"
-#define  ISTACK_NAME   "STACK   (DATA)"
-#define  CODE_NAME     "CSEG    (CODE)"
-#define  DATA_NAME     "DSEG    (DATA)"
-#define  IDATA_NAME    "ISEG    (DATA)"
-#define  XDATA_NAME    "XSEG    (XDATA)"
-#define  BIT_NAME      "BSEG    (BIT)"
-#define  REG_NAME      "RSEG    (DATA)"
-#define  STATIC_NAME   "GSINIT  (CODE)"
+#define  XSTACK_NAME   port->mem.xstack_name
+#define  ISTACK_NAME   port->mem.istack_name
+#define  CODE_NAME     port->mem.code_name
+#define  DATA_NAME     port->mem.data_name
+#define  IDATA_NAME    port->mem.idata_name
+#define  XDATA_NAME    port->mem.xdata_name
+#define  BIT_NAME      port->mem.bit_name
+#define  REG_NAME      port->mem.reg_name
+#define  STATIC_NAME   port->mem.static_name
  
 /* forward definition for variables */
 extern   memmap  *xstack;    /* xternal stack data         */

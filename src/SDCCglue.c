@@ -778,7 +778,7 @@ static void emitOverlay(FILE *afile)
     set *ovrset;
     
     if (!elementsInSet(ovrSetSets))
-	fprintf(afile,"\t.area\tOSEG\t(OVR,DATA)\n");
+	fprintf(afile,"\t.area\t%s\n", port->mem.overlay_name);
 
     /* for each of the sets in the overlay segment do */
     for (ovrset = setFirstItem(ovrSetSets); ovrset;
@@ -793,7 +793,7 @@ static void emitOverlay(FILE *afile)
 	       sad but true */
 	    fprintf(afile,"\t.area _DUMMY\n");
 	    /* output the area informtion */
-	    fprintf(afile,"\t.area\tOSEG\t(OVR,DATA)\n"); /* MOF */
+	    fprintf(afile,"\t.area\t%s\n", port->mem.overlay_name); /* MOF */
 	}
 	
 	for (sym = setFirstItem(ovrset); sym;
@@ -980,7 +980,7 @@ void glue ()
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; global & static initialisations\n");
     fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "\t.area GSINIT (CODE)\n"); /* MOF */
+    fprintf (asmFile, "\t.area %s\n", port->mem.static_name); /* MOF */
     if (mainf && mainf->fbody) {
 	fprintf (asmFile,"__sdcc_gsinit_startup:\n");
 	/* if external stack is specified then the
@@ -1018,7 +1018,7 @@ void glue ()
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; code\n");
     fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "\t.area CSEG (CODE)\n");
+    fprintf (asmFile, "\t.area %s\n", port->mem.code_name);
     if (mainf && mainf->fbody) {
 	
 	/* entry point @ start of CSEG */

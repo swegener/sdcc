@@ -45,16 +45,16 @@ typedef int bool;
 #endif
 
 /* size's in bytes  */
-#define CHARSIZE    1
-#define SHORTSIZE   1
-#define INTSIZE     2
-#define LONGSIZE    4
-#define PTRSIZE     1
-#define FPTRSIZE    2
-#define GPTRSIZE    3
-#define BITSIZE     1
-#define FLOATSIZE   4
-#define MAXBASESIZE 4
+#define CHARSIZE    port->s.char_size
+#define SHORTSIZE   port->s.short_size
+#define INTSIZE     port->s.int_size
+#define LONGSIZE    port->s.long_size
+#define PTRSIZE     port->s.ptr_size
+#define FPTRSIZE    port->s.fptr_size
+#define GPTRSIZE    port->s.gptr_size
+#define BITSIZE     port->s.bit_size
+#define FLOATSIZE   port->s.float_size
+#define MAXBASESIZE port->s.max_base_size
 
 
 #define PRAGMA_SAVE        "SAVE"

@@ -22,24 +22,9 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h" 
-#include "SDCChasht.h"
-#include "SDCCbitv.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCClabel.h"
-#include "SDCCBBlock.h"
-#include "SDCCloop.h"
-#include "SDCCcse.h"
-#include "SDCCcflow.h"
-#include "SDCCdflow.h"
-#include "SDCClrange.h"
-#include "SDCCralloc.h"
+
+#include "common.h"
+#include "ralloc.h"
 
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
@@ -87,7 +72,7 @@ regs regs8051[] =
     { REG_CND  ,CND_IDX,REG_CND , "C"  , "C"  ,  "xreg", 0, 1 },  
 };
 int mcs51_nRegs = 13;
-void spillThis (symbol *);
+static void spillThis (symbol *);
 
 /*-----------------------------------------------------------------*/
 /* allocReg - allocates register of given type                     */
@@ -283,7 +268,7 @@ static int notUsedInBlock (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* notUsedInRemaining - not used or defined in remain of the block */
 /*-----------------------------------------------------------------*/
-int notUsedInRemaining (symbol *sym, eBBlock *ebp, iCode *ic)
+static int notUsedInRemaining (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return ((usedInRemaining (operandFromSymbol(sym),ic) ? 0 : 1) &&
 	    allDefsOutOfRange (sym->defs,ic->seq,ebp->lSeq));
@@ -292,7 +277,7 @@ int notUsedInRemaining (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* allLRs - return true for all                                    */
 /*-----------------------------------------------------------------*/
-int allLRs (symbol *sym, eBBlock *ebp, iCode *ic)
+static int allLRs (symbol *sym, eBBlock *ebp, iCode *ic)
 {
     return 1;
 }
@@ -300,7 +285,7 @@ int allLRs (symbol *sym, eBBlock *ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* liveRangesWith - applies function to a given set of live range  */
 /*-----------------------------------------------------------------*/
-set *liveRangesWith (bitVect *lrs, int (func)(symbol *,eBBlock *, iCode *),
+static set *liveRangesWith (bitVect *lrs, int (func)(symbol *,eBBlock *, iCode *),
 		     eBBlock *ebp, iCode *ic)
 {
     set *rset = NULL;
@@ -333,7 +318,7 @@ set *liveRangesWith (bitVect *lrs, int (func)(symbol *,eBBlock *, iCode *),
 /*-----------------------------------------------------------------*/
 /* leastUsedLR - given a set determines which is the least used    */
 /*-----------------------------------------------------------------*/
-symbol *leastUsedLR (set *sset)
+static symbol *leastUsedLR (set *sset)
 {
     symbol *sym = NULL, *lsym = NULL ;
     
@@ -364,7 +349,7 @@ symbol *leastUsedLR (set *sset)
 /*-----------------------------------------------------------------*/
 /* noOverLap - will iterate through the list looking for over lap  */
 /*-----------------------------------------------------------------*/
-int noOverLap (set *itmpStack, symbol *fsym)
+static int noOverLap (set *itmpStack, symbol *fsym)
 {
     symbol *sym;
    
@@ -382,7 +367,7 @@ int noOverLap (set *itmpStack, symbol *fsym)
 /*-----------------------------------------------------------------*/
 /* isFree - will return 1 if the a free spil location is found     */
 /*-----------------------------------------------------------------*/
-DEFSETFUNC(isFree)
+static DEFSETFUNC(isFree)
 {
     symbol *sym = item;
     V_ARG(symbol **,sloc);
@@ -409,7 +394,7 @@ DEFSETFUNC(isFree)
 /*-----------------------------------------------------------------*/
 /* spillLRWithPtrReg :- will spil those live ranges which use PTR  */
 /*-----------------------------------------------------------------*/
-void spillLRWithPtrReg (symbol *forSym)
+static void spillLRWithPtrReg (symbol *forSym)
 {
     symbol *lrsym;
     regs *r0,*r1;
@@ -451,7 +436,7 @@ void spillLRWithPtrReg (symbol *forSym)
 /*-----------------------------------------------------------------*/
 /* createStackSpil - create a location on the stack to spil        */
 /*-----------------------------------------------------------------*/
-symbol *createStackSpil (symbol *sym)
+static symbol *createStackSpil (symbol *sym)
 {
     symbol *sloc= NULL;
     int useXstack, model, noOverlay;
@@ -525,7 +510,7 @@ symbol *createStackSpil (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* isSpiltOnStack - returns true if the spil location is on stack  */
 /*-----------------------------------------------------------------*/
-bool isSpiltOnStack (symbol *sym)
+static bool isSpiltOnStack (symbol *sym)
 {
     link *etype;
 
@@ -551,7 +536,7 @@ bool isSpiltOnStack (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* spillThis - spils a specific operand                            */
 /*-----------------------------------------------------------------*/
-void spillThis (symbol *sym)
+static void spillThis (symbol *sym)
 {
     int i;
     /* if this is rematerializable or has a spillLocation
@@ -590,7 +575,7 @@ void spillThis (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* selectSpil - select a iTemp to spil : rather a simple procedure */
 /*-----------------------------------------------------------------*/
-symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
+static symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 {
     bitVect *lrcs= NULL ; 
     set *selectS ;
@@ -683,7 +668,7 @@ symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 /*-----------------------------------------------------------------*/
 /* spilSomething - spil some variable & mark registers as free     */
 /*-----------------------------------------------------------------*/
-bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
+static bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
 {
     symbol *ssym;
     int i ;
@@ -771,7 +756,7 @@ regs *getRegPtr (iCode *ic, eBBlock *ebp, symbol *sym)
 /*-----------------------------------------------------------------*/
 /* getRegGpr - will try for GPR if not spil                        */
 /*-----------------------------------------------------------------*/
-regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
+static regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
 {
     regs *reg;
 
@@ -811,7 +796,7 @@ static bool symHasReg(symbol *sym,regs *reg)
 /* deassignLRs - check the live to and if they have registers & are*/
 /*               not spilt then free up the registers              */
 /*-----------------------------------------------------------------*/
-void deassignLRs (iCode *ic, eBBlock *ebp)
+static void deassignLRs (iCode *ic, eBBlock *ebp)
 {
     symbol *sym;
     int k;
@@ -904,7 +889,7 @@ void deassignLRs (iCode *ic, eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 /* reassignLR - reassign this to registers                         */
 /*-----------------------------------------------------------------*/
-void reassignLR (operand *op)
+static void reassignLR (operand *op)
 {
     symbol *sym = OP_SYMBOL(op);
     int i;
@@ -924,7 +909,7 @@ void reassignLR (operand *op)
 /*-----------------------------------------------------------------*/
 /* willCauseSpill - determines if allocating will cause a spill    */
 /*-----------------------------------------------------------------*/
-int willCauseSpill ( int nr, int rt)
+static int willCauseSpill ( int nr, int rt)
 {
     /* first check if there are any avlb registers
        of te type required */
@@ -987,7 +972,7 @@ static void positionRegs (symbol *result, symbol *opsym, int lineno)
 /*-----------------------------------------------------------------*/
 /* serialRegAssign - serially allocate registers to the variables  */
 /*-----------------------------------------------------------------*/
-void serialRegAssign (eBBlock **ebbs, int count)
+static void serialRegAssign (eBBlock **ebbs, int count)
 {
     int i;
 
@@ -1127,7 +1112,7 @@ void serialRegAssign (eBBlock **ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* rUmaskForOp :- returns register mask for an operand             */
 /*-----------------------------------------------------------------*/
-bitVect *rUmaskForOp (operand *op)
+static bitVect *rUmaskForOp (operand *op)
 {
     bitVect *rumask;
     symbol *sym;
@@ -1157,7 +1142,7 @@ bitVect *rUmaskForOp (operand *op)
 /*-----------------------------------------------------------------*/
 /* regsUsedIniCode :- returns bit vector of registers used in iCode*/
 /*-----------------------------------------------------------------*/
-bitVect *regsUsedIniCode (iCode *ic)
+static bitVect *regsUsedIniCode (iCode *ic)
 {
     bitVect *rmask = newBitVect(mcs51_nRegs);
 
@@ -1197,7 +1182,7 @@ bitVect *regsUsedIniCode (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* createRegMask - for each instruction will determine the regsUsed*/
 /*-----------------------------------------------------------------*/
-void createRegMask (eBBlock **ebbs, int count)
+static void createRegMask (eBBlock **ebbs, int count)
 {
     int i;
 
@@ -1261,7 +1246,7 @@ void createRegMask (eBBlock **ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* rematStr - returns the rematerialized string for a remat var    */
 /*-----------------------------------------------------------------*/
-char *rematStr (symbol *sym)
+static char *rematStr (symbol *sym)
 {
     char *s = buffer;   
     iCode *ic = sym->rematiCode;    
@@ -1288,7 +1273,7 @@ char *rematStr (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */
 /*-----------------------------------------------------------------*/
-void regTypeNum ()
+static void regTypeNum ()
 {
     symbol *sym;
     int k;
@@ -1379,7 +1364,7 @@ void regTypeNum ()
 /*-----------------------------------------------------------------*/
 /* freeAllRegs - mark all registers as free                        */
 /*-----------------------------------------------------------------*/
-void freeAllRegs()
+static void freeAllRegs()
 {
     int i;
 
@@ -1390,7 +1375,7 @@ void freeAllRegs()
 /*-----------------------------------------------------------------*/
 /* deallocStackSpil - this will set the stack pointer back         */
 /*-----------------------------------------------------------------*/
-DEFSETFUNC(deallocStackSpil)
+static DEFSETFUNC(deallocStackSpil)
 {
     symbol *sym = item;
 
@@ -1464,7 +1449,7 @@ static iCode *farSpacePackable (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* packRegsForAssign - register reduction for assignment           */
 /*-----------------------------------------------------------------*/
-int packRegsForAssign (iCode *ic,eBBlock *ebp)
+static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 {
     iCode *dic, *sic;
     
@@ -1576,7 +1561,7 @@ pack:
 /*-----------------------------------------------------------------*/
 /* findAssignToSym : scanning backwards looks for first assig found*/
 /*-----------------------------------------------------------------*/
-iCode *findAssignToSym (operand *op,iCode *ic)
+static iCode *findAssignToSym (operand *op,iCode *ic)
 {
     iCode *dic;
 
@@ -1648,7 +1633,7 @@ iCode *findAssignToSym (operand *op,iCode *ic)
 /*-----------------------------------------------------------------*/
 /* packRegsForSupport :- reduce some registers for support calls   */
 /*-----------------------------------------------------------------*/
-int packRegsForSupport (iCode *ic, eBBlock *ebp)
+static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 {
     int change = 0 ;
     /* for the left & right operand :- look to see if the
@@ -1864,7 +1849,7 @@ static bool isBitwiseOptimizable (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* packRegsForAccUse - pack registers for acc use                  */
 /*-----------------------------------------------------------------*/
-void packRegsForAccUse (iCode *ic)
+static void packRegsForAccUse (iCode *ic)
 {
     iCode *uic;
     

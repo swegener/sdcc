@@ -1,6 +1,13 @@
+/** @file main.c
+    mcs51 specific general functions.
+
+    Note that mlh prepended _mcs51_ on the static functions.  Makes
+    it easier to set a breakpoint using the debugger.
+*/
 #include "common.h"
 #include "main.h"
 #include "ralloc.h"
+
 
 void mcs51_assignRegisters (eBBlock **ebbs, int count);
 
@@ -41,6 +48,18 @@ PORT mcs51_port = {
     	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
 	1, 1, 2, 4, 1, 2, 3, 1, 4, 4
     },
+    {
+	"XSEG    (XDATA)",
+	"STACK   (DATA)",
+	"CSEG    (CODE)",
+	"DSEG    (DATA)",
+	"ISEG    (DATA)",
+	"XSEG    (XDATA)",
+	"BSEG    (BIT)",
+	"RSEG    (DATA)",
+	"GSINIT  (CODE)",
+	"OSEG    (OVR,DATA)"
+    },
     { 
 	+1, 1, 4, 0, 0
     },
@@ -54,4 +73,3 @@ PORT mcs51_port = {
     mcs51_assignRegisters,
     _mcs51_getRegName
 };
-

@@ -1,5 +1,5 @@
 #include "common.h"
-#include "main.h"
+#include "ralloc.h"
 
 void z80_assignRegisters (eBBlock **ebbs, int count);
 
@@ -31,6 +31,13 @@ static void _z80_setDefaultOptions(void)
     optimize.loopInduction = 0;
 }
 
+static const char *_z80_getRegName(struct regs *reg)
+{
+    if (reg)
+	return reg->name;
+    return "err";
+}
+
 /* Globals */
 PORT z80_port = {
     "z80",
@@ -48,6 +55,18 @@ PORT z80_port = {
     	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
 	1, 1, 2, 4, 2, 2, 2, 1, 4, 4
     },
+    {
+	"_XSEG",
+	"_STACK",
+	"_CODE",
+	"_DATA",
+	"_ISEG",
+	"_XSEG",
+	"_BSEG",
+	"_RSEG",
+	"_GSINIT",
+	"_OVERLAY"
+    },
     { 
 	-1, 0, 0, 8, 0
     },
@@ -59,5 +78,6 @@ PORT z80_port = {
     _z80_finaliseOptions,
     _z80_setDefaultOptions,
     z80_assignRegisters,
+    _z80_getRegName
 };
 

@@ -521,27 +521,6 @@ dealloc:
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* aopLiteral - string from a literal value                        */
-/*-----------------------------------------------------------------*/
-char *aopLiteral (value *val, int offset)
-{
-    char *rs;
-
-    /* if it is a float then it gets tricky */
-    /* otherwise it is fairly simple */
-    if (!IS_FLOAT(val->type)) {
-        unsigned long v = floatFromVal(val);
-
-        v >>= (offset * 8);
-        sprintf(buffer,"#0x%02x",((char) v) & 0xff);
-        ALLOC_ATOMIC(rs,strlen(buffer)+1);
-        return strcpy (rs,buffer);
-    }
-
-    assert(0);
-}
-
 char *aopGetWord(asmop *aop, int offset)
 {
     char *s = buffer ;
@@ -1221,12 +1200,7 @@ static void genEndFunction (iCode *ic)
         if (SPEC_CRTCL(sym->etype))
             emitcode("ei", "");
 	
-	if (sym->calleeSave) {
-	    /* Handled by cret */
-	}
-	else {
-	    assert(0);
-	}
+	/* PENDING: calleeSave */
 
 	/* if debug then send end of function */
  	if (options.debug && currFunc) { 

@@ -86,12 +86,12 @@ static void saverbank (int, iCode *,bool);
 #define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) emitcode("mov","a,%s",x);
 #define CLRC    emitcode("clr","c");
 
-lineNode *lineHead = NULL;
-lineNode *lineCurr = NULL;
+static lineNode *lineHead = NULL;
+static lineNode *lineCurr = NULL;
 
-unsigned char   SLMask[] = {0xFF ,0xFE, 0xFC, 0xF8, 0xF0,
+static unsigned char   SLMask[] = {0xFF ,0xFE, 0xFC, 0xF8, 0xF0,
 0xE0, 0xC0, 0x80, 0x00};
-unsigned char   SRMask[] = {0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
+static unsigned char   SRMask[] = {0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
 0x07, 0x03, 0x01, 0x00};
 
 #define LSB     0

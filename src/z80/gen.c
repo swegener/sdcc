@@ -3399,7 +3399,8 @@ genCmp (operand * left, operand * right,
 	      else
 		{
 		  /* Subtract through, propagating the carry */
-		  emit2 ("%s a,%s", offset == 0 ? "sub" : "sbc", aopGet (AOP (right), offset++, FALSE));
+		  emit2 ("%s a,%s", offset == 0 ? "sub" : "sbc", aopGet (AOP (right), offset, FALSE));
+		  offset++;
 		}
 	    }
 	}

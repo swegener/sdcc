@@ -1,7 +1,7 @@
-#This file was created by <sandeep> Sun Mar 26 12:40:23 2000
+#This file was created by <kvigor> Wed Oct  4 16:57:26 2000
 #LyX 1.0 (C) 1995-1999 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
-\textclass linuxdoc
+\textclass article
 \language english
 \inputencoding default
 \fontscheme default
@@ -35,10 +35,11 @@ Introduction
 \layout Standard
 
 SDCC is a Free ware , retargettable, optimizing ANSI-C compiler.
- The current version targets Intel 8051 based MCUs, it can be retargetted
- for other 8 bit MCUs or PICs.
+ The current version targets Intel 8051 based MCUs, including the Dallas
+ 80C390 variant, as well as the Zilog Z80 family.
+ It can be retargetted for other 8 bit MCUs or PICs.
  The entire source code for the compiler is distributed under GPL.
- SDCC used ASXXXX & ASLINK a Free ware, retargettable assembler & linker.
+ SDCC uses ASXXXX & ASLINK, a Freeware, retargettable assembler & linker.
  SDCC has extensive MCU (8051) specific language extensions, which lets
  it utilize the underlying hardware effectively.
  The front-end (parser) will be enhanced to handle language extensions for
@@ -75,7 +76,7 @@ inline assembler code
  to use other simulators.
  The latest version can be downloaded from 
 \series bold 
-http://www.geocities.com/ResearchTriangle/Forum/1353
+http://sdcc.sourceforge.net
 \layout Standard
 
 All packages used in this compiler system are 
@@ -119,38 +120,25 @@ Installation
 What you need before you start installation of SDCC ? A C Compiler, not
  just any C Compiler, gcc to be exact, you can get adventurous and try another
  compiler , I HAVEN'T tried it.
- GCC is free , and is available for almost all major platforms, if you are
- using 
+ GCC is free , and is available for almost all major platforms.
+ If you are using 
 \emph on 
 linux
 \emph default 
  you probably already have it, if you are using 
 \emph on 
-Windows 95/NT
+Windows 9x/NT
 \emph default 
  go to 
 \emph on 
-www.cygnus.com
+http://sources.redhat.com/
 \emph default 
  and download 
 \emph on 
-CYGWIN32
-\emph default 
- you will need the full development version of their tool (
-\emph on 
-full.exe)
-\emph default 
-, follow their instructions for installation (this is also free and is very
- easy to install), 
-\emph on 
-Windows
+Cygwin.
+
 \emph default 
  
-\emph on 
-95/NT 
-\emph default 
-users be aware that the compiler runs substantially slower on the Windows
- platform, I am not sure why.
 \layout Standard
 
 After you have installed 
@@ -268,7 +256,7 @@ Windows 95/NT
 CYGWIN shell)
 \emph default 
 , change to the directory where you extracted the package and give the command.
-\layout Verbatim
+\layout Standard
 
 ./sdccbuild.sh
 \layout Standard
@@ -350,7 +338,8 @@ The configure command has several options the most commonly used option
  for the sdcc executables and libraries, (default location is /usr/local).
  The installation process will create the following directory structure
  under the <directory name> specified.
-\layout Verbatim
+ 
+\layout Standard
 
 bin/ - binary exectables (add to PATH environment variable) 
 \newline 
@@ -438,7 +427,37 @@ small/ - Object & Library files for small model library
 \protected_separator 
 
 \protected_separator 
-large/ - Object & library files for large model library
+large/ - Object & library files for large model library 
+\newline 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+
+\protected_separator 
+ds390/ - Object & library files forDS80C390 library
+\newline 
+
 \layout Standard
 
 The command 
@@ -498,6 +517,21 @@ Will install the compiler and libraries in the appropriate directories.
 
 Special Notes for Windows Users.
  Provided by Michael Jamet[ mjamet@computer.org] 
+\layout Standard
+
+Please note: these instructions are valid for Cygwin versions prior to 1.0.
+ If you have Cygwin 1.0 or later, the generic 
+\begin_inset Quotes eld
+\end_inset 
+
+configure/make/make install
+\begin_inset Quotes erd
+\end_inset 
+
+ procedure described above should work as expected from the Cygwin shell.
+ If you have an earlier version of Cygwin, I strongly recommend upgrading.
+ If, however, you insist on using an earlier version, the following instructions
+ should prove helpful.
 \layout Standard
 
 
@@ -1220,7 +1254,15 @@ bin to your path however your Win32 system allows.
 
 \protected_separator 
  to the list.
- 
+\layout Subsubsection
+
+FreeBSD and other non-GNU unixes
+\layout Standard
+
+Note that the SDCC build environment uses Gnu make.
+ If this is not the default 'make' on your system, you may need to install
+ it.
+ On many systems, Gnu make is installed as 'gmake'.
 \layout Section
 
 Compiling.
@@ -1241,7 +1283,7 @@ Single Source file projects.
 
 For single source file projects the process is very simple.
  Compile your programs with the following command
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -1295,17 +1337,17 @@ Projects with multiple source files.
 SDCC can compile only ONE file at a time.
  Let us for example assume that you have a project containing the following
  files.
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
 foo1.c ( contains some functions )
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
 foo2.c (contains some more functions)
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -1313,12 +1355,12 @@ foomain.c (contains more functions and the function main)
 \layout Standard
 
 The first two files will need to be compiled separately with the commands
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
 sdcc -c foo1.c
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -1327,7 +1369,7 @@ sdcc -c foo2.c
 
 Then compile the source file containing main and link the other files together
  with the following command.
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -1339,12 +1381,12 @@ Alternatively
 foomain.c
 \emph default 
  can be separately compiled as well
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
 sdcc -c foomain.c 
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -1384,7 +1426,7 @@ this describes how to create a
 'mylib'
 \emph default 
 .
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -1411,6 +1453,38 @@ Command Line options
 \end_inset 
 
 
+\layout Itemize
+
+-mmcs51
+\begin_inset LatexCommand \label{-mmcs51}
+
+\end_inset 
+
+Generate code for the MCS51 (8051) family of processors.
+ This is the default processor target.
+\layout Itemize
+
+-mz80
+\begin_inset LatexCommand \label{-mz80}
+
+\end_inset 
+
+Generate code for the Z80 family of processors.
+ Various other options may not be applicable in this mode.
+ 
+\layout Itemize
+
+
+\series bold 
+-mds390
+\series default 
+
+\begin_inset LatexCommand \label{-mds390}
+
+\end_inset 
+
+Generate code for the DS80C390 processor.
+ Various other options may not be applicable in this mode.
 \layout Itemize
 
 
@@ -1472,9 +1546,8 @@ Generate code for Small Model programs see section Memory Models for more
 
 \end_inset 
 
-Generate code for Small Model programs see section Memory Models for more
- details.
- This is the default model.
+Generate code forDS80C390 24-bit flat mode.
+ See section Memory Models for more details.
 \layout Itemize
 
 
@@ -2692,7 +2765,7 @@ common subexpression elimination.
 \size scriptsize 
 eg.
  
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -2706,7 +2779,7 @@ j
 \layout Standard
 
 will be translated to
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -2721,7 +2794,7 @@ Some subexpressions are not as obvious as the above example.
 \layout Standard
 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -2735,7 +2808,7 @@ In this case the address arithmetic
 a->b[i] 
 \emph default 
 will be computed only once; the equivalent code in C would be.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -2758,7 +2831,7 @@ Dead-Code elimination.
 \layout Standard
 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -2812,7 +2885,7 @@ global = 3; /* unreachable */
 \layout Standard
 
 will be changed to
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -2848,7 +2921,7 @@ Copy-Propagation:
 \layout Standard
 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -2890,7 +2963,7 @@ return j;
 \layout Standard
 
 will be changed to 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -2959,7 +3032,7 @@ Loop Invariant:
 \layout Standard
 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -2975,7 +3048,7 @@ f += k + l;
 \layout Standard
 
 changed to
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3000,7 +3073,7 @@ This optimization substitutes an expression by a cheaper expression.
 \layout Standard
 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3008,7 +3081,7 @@ for (i=0;i < 100; i++) ar[i*5] = i*3;
 \layout Standard
 
 changed to
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3148,7 +3221,7 @@ Algebraic simplifications:
 
 SDCC does numerous algebraic simplifications, the following is a small sub-set
  of these optimizations.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3189,7 +3262,7 @@ The case labels are in numerical sequence , the labels need not be in order,
 \layout Standard
 
 eg 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3398,7 +3471,7 @@ Switch statements which have gaps in the numeric sequence or those that
 \layout Standard
 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3432,7 +3505,7 @@ case 12: ...
 \layout Standard
 
 If the above switch statement is broken down into two switch statements
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3451,7 +3524,7 @@ case 4: ...
  
 \newline 
 }
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3491,12 +3564,12 @@ g .
 \layout Standard
 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
 unsigned short i;
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3509,7 +3582,7 @@ i>>= 4;
 \layout Standard
 
 generates the following code.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3524,7 +3597,7 @@ mov _i,a
 
 In general SDCC will never setup a loop if the shift count is known.
  Another example
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3539,7 +3612,7 @@ i >>= 9;
 \layout Standard
 
 will generate
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3572,7 +3645,7 @@ Bit-rotation:
 
 A special case of the bit-shift operation is bit rotation, SDCC recognizes
  the following expression to be a left bit-rotation.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3587,7 +3660,7 @@ i = ( ( i << 1) | ( i >> 7));
 \layout Standard
 
 will generate the following code.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3618,7 +3691,7 @@ It is frequently required to obtain the highest order bit of an integral
  type (int,long,short or char types).
  SDCC recognizes the following expression to yield the highest order bit
  and generates optimized code for it.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -3660,7 +3733,7 @@ hob = (gint >> 15) & 1;
 \layout Standard
 
 Will generate the following code.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4017,12 +4090,12 @@ Variations of this case however will NOT be recognized .
  It is a standard C expression , so I heartily recommend this be the only
  way to get the highest order bit, (it is portable).
  Of course it will be recognized even if it is embedded in other expressions.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4051,7 +4124,7 @@ copt'
  A default set of rules are compiled into the compiler, additional rules
  may be added with the --peep-file <filename> option.
  The rule language is best illustrated with examples.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4063,7 +4136,7 @@ mov a,%1 } by { mov %1,a }
 \layout Standard
 
 The above rule will the following assembly sequence
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4073,7 +4146,7 @@ mov a,r1
 \layout Standard
 
 to
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4083,7 +4156,7 @@ mov r1,a
 Note: All occurrences of a '%n' ( pattern variable ) must denote the same
  string.
  With the above rule, the assembly sequence
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4097,7 +4170,7 @@ will remain unmodified.
  option), eg.
  some variants of the 8051 MCU allow only 'AJMP' and 'ACALL' , the following
  two rules will change all 'LJMP' & 'LCALL' to 'AJMP' & 'ACALL'.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4116,7 +4189,7 @@ e is MCU independent.
 \layout Standard
 
 The syntax for a rule is as follows ,
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4243,7 +4316,7 @@ restart
  it is intended to be used in situations where a transformation will trigger
  the same rule again.
  A good example of this the following rule.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4265,7 +4338,7 @@ restart
 \emph default 
 ' option only the inner most 'pop' 'push' pair would be eliminated.
  i.e.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4279,7 +4352,7 @@ push ar1
 \layout Standard
 
 would result in
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4300,7 +4373,7 @@ restart
 pop' 'push'
 \emph default 
  pairs will be eliminated to yield
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4312,7 +4385,7 @@ pop' 'push'
 A conditional function can be attached to a rule.
  Attaching rules are somewhat more involved, let me illustrate this with
  an example.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4404,7 +4477,7 @@ _generic
 \layout Standard
 
 Pointer declaration examples.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4414,7 +4487,7 @@ Pointer declaration examples.
 data unsigned char * xdata p;
 \newline 
 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4423,7 +4496,7 @@ data unsigned char * xdata p;
 xdata unsigned char * code p;
 \newline 
 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4443,7 +4516,7 @@ Well you get the idea.
  syntax for pointer declaration is also supported.
  Note the above examples will be portable to other commercially available
  compilers.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4464,7 +4537,7 @@ unsigned char _idata *uccp;
 
 All unqualified pointers are treated as 3 - byte '_generic' pointers.
  These type of pointers can also to be explicitly declared.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4505,7 +4578,7 @@ Automatic (local) variables and parameters to functions can either be placed
 \family typewriter 
 \size scriptsize 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4543,7 +4616,7 @@ When compiled with the default option (i.e.
 \family typewriter 
 \size scriptsize 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4640,7 +4713,7 @@ tion or division will NOT be overlayed since these are implemented using
 \layout Standard
 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4722,7 +4795,7 @@ critical
 \layout Standard
 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4757,11 +4830,11 @@ Data items can be assigned an absolute address with the
 at <address>
 \emph default 
  keyword, in addition to a storage class.
-\layout Verbatim
+\layout Standard
 
 eg.
  
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4790,12 +4863,12 @@ ap) are a good places to look for such overlaps.
 \layout Standard
 
 Absolute address can be specified for variables in all storage classes.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
 eg.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4819,7 +4892,7 @@ Interrupt Service Routines
 
 SDCC allows interrupt service routines to be coded in C, with some extended
  keywords.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -4863,7 +4936,7 @@ Interrupt Numbers and the corresponding address & descriptions for the Standard
  8051 are listed below.
  SDCC will automatically adjust the interrupt vector table to the maximum
  interrupt number specified.
-\layout Verbatim
+\layout Standard
 
 Interrupt # 
 \protected_separator 
@@ -5329,12 +5402,12 @@ per function)
  the peephole optimizer, this might cause some unexpected changes in the
  inline assembler code, please go throught the peephole optimizer rules
  defined in file 'SDCCpeeph.def' carefully before using this option.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -5382,12 +5455,12 @@ _asm ...
 
 Inline assembler code cannot reference any C-Labels however it can reference
  labels defined by the inline assembler.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -5635,8 +5708,9 @@ Memory Models
 
 \layout Standard
 
-SDCC allows two memory models, modules compiled with different memory models
- should be combined together, the results would be unpredictable.
+SDCC allows two memory models for MCS51 code.
+ Modules compiled with different memory models should be combined together,
+ the results would be unpredictable.
  The support routines supplied with the compiler are compiled in small-model
  by default, and will need to be recompiled using the large model if the
  large model is used.
@@ -5672,19 +5746,25 @@ This option generates code for the 24 bit contiguous addressing mode of
  See the data sheets at www.dalsemi.com for further information on this part.
 \layout Standard
 
+In older versions of the compiler, this option was used with the MCS51 code
+ generator (-mmcs51).
+ Now, however, the '390 has it's own code generator, selected by the -mds390
+ switch.
+ This code generator currently supports only the flat24 model, but the --model-f
+lat24 switch is still required, in case later versions of the code generator
+ support other models (such as the paged mode of the '390).
+ The combination of -mmcs51 and --model-flat24 is now depracated.
+\layout Standard
+
 Note that the compiler does not generate any code to place the processor
- into this mode (it defaults to 8051 compatible mode).
+ into24 bitmode (it defaults to 8051 compatible mode).
  Boot loader or similar code must ensure that the processor is in 24 bit
  contiguous addressing mode before calling the SDCC startup code.
 \layout Standard
 
 Like the --model-large option, variables will by default be placed into
  the XDATA segment.
- However, a current limitation is that the compiler will spill variables
- into the DATA segment when it runs out of registers.
- This means that compiling complex code can rapidly fill up the DATA segment.
- This limitation is being worked on, and should be addressed in the next
- release of sdcc.
+ 
 \layout Standard
 
 Segments may be placed anywhere in the 4 meg address space using the usual
@@ -5928,12 +6008,12 @@ after
 \noun default 
  a function, placing pragma's inside a function body could have unpredictable
  results.
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
 eg
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -6001,12 +6081,12 @@ stdio.h
 \emph on 
 Martijn van Balen <balen@natlab.research.philips.com>.
  
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
 %[flags][width][b|B|l|L]type
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -7063,7 +7143,7 @@ printf_small
 \series default 
 ).
  This simplified version of printf supports only the following formats.
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -7433,7 +7513,6 @@ character
 
 \protected_separator 
 _generic pointer
-\begin_deeper 
 \layout Standard
 
 The routine is 
@@ -7450,7 +7529,7 @@ putchar(char )
  When using the %s format the string / pointer should be cast to a generic
  pointer.
  eg.
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -7465,7 +7544,6 @@ n
 \end_inset 
 
 ,(char _generic *)mystr,myint);
-\end_deeper 
 \layout Itemize
 
 
@@ -7570,7 +7648,7 @@ malloc.h
  These routines will allocate memory from the external ram.
  Here is a description on how to use them (as described by the author).
 \begin_deeper 
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -7972,7 +8050,7 @@ asm_func
 
 \size footnotesize 
 extern int asm_func( unsigned short, unsigned short);
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -8022,7 +8100,7 @@ return c_func(10,9);
 \layout Standard
 
 The corresponding assembler function is:-
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -8281,14 +8359,14 @@ varaible name for the second parameter will be _<function_name>_PARM_2.
 \layout Standard
 
 Assemble the assembler routine with the following command.
-\layout Verbatim
+\layout Standard
 
 asx8051 -losg asmfunc.asm
 \layout Standard
 
 Then compile and link the assembler routine to the C source file with the
  following command,
-\layout Verbatim
+\layout Standard
 
 sdcc cfunc.c asmfunc.rel
 \layout Subsubsection
@@ -8305,14 +8383,14 @@ In this case the second parameter onwards will be passed on the stack ,
 
 \size footnotesize 
 extern int asm_func( unsigned short, unsigned short);
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
 
 \protected_separator 
 
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -8358,7 +8436,7 @@ return c_func(10,9);
 \layout Standard
 
 The corresponding assembler routine is.
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -8694,12 +8772,12 @@ In the following example the function
 asm_func
 \series default 
 , which takes two parameters.
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
 extern int asm_func( unsigned short, unsigned short);
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -8749,7 +8827,7 @@ return c_func(10,9);
 \layout Standard
 
 The corresponding assembler function is:-
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -9015,14 +9093,14 @@ left-most parameter name will be _<function_name>_PARM_1.
 \layout Standard
 
 Assemble the assembler routine with the following command.
-\layout Verbatim
+\layout Standard
 
 asx8051 -losg asmfunc.asm
 \layout Standard
 
 Then compile and link the assembler routine to the C source file with the
  following command,
-\layout Verbatim
+\layout Standard
 
 sdcc cfunc.c asmfunc.rel
 \layout Subsubsection
@@ -9039,14 +9117,14 @@ In this case the parameters will be passed on the stack , the parameters
 
 \size footnotesize 
 extern int asm_func( unsigned short, unsigned short);
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
 
 \protected_separator 
 
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -9092,7 +9170,7 @@ return c_func(10,9);
 \layout Standard
 
 The corresponding assembler routine is.
-\layout Verbatim
+\layout Standard
 
 
 \size scriptsize 
@@ -9466,13 +9544,13 @@ structures cannot be assigned values directly, cannot be passed as function
  parameters or assigned to each other and cannot be a return value from
  a function.
 \begin_deeper 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
 eg
 \end_deeper 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -9494,7 +9572,7 @@ s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
  
 \newline 
 }
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -9538,7 +9616,7 @@ longjmp
 \layout Enumerate
 
 Old K&R style function declarations are NOT allowed.
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -9557,13 +9635,13 @@ int i,j; /* are valid in ANSI ..
 
 functions declared as pointers must be dereferenced during the call.
 \begin_deeper 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
 int (*foo)();
 \end_deeper 
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -9609,7 +9687,7 @@ Note that the complexity level is not related to the number of lines of
  Large functions can have low complexity, and small functions can have large
  complexity levels.
  SDCC uses the following formula to compute the complexity.
-\layout Verbatim
+\layout Standard
 
 
 \size small 
@@ -9679,7 +9757,7 @@ Reducing the size of division , multiplication & modulus operations can
  reduce code size substantially.
  Take the following code for example.
 \begin_deeper 
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -9722,7 +9800,7 @@ For the modulus operation the variable ch will be promoted to unsigned int
  first then the modulus operation will be performed (this will lead to a
  call to a support routine).
  If the code is changed to 
-\layout Verbatim
+\layout Standard
 
 
 \size footnotesize 
@@ -10032,7 +10110,7 @@ The debugger can be started using the following command line.
 \layout Standard
 
 the file name foo).
-\layout Verbatim
+\layout Standard
 
 >sdcdb foo
 \layout Standard
@@ -10096,7 +10174,7 @@ break [line | file:line | function | file:function]
 \layout Standard
 
 Set breakpoint at specified line or function.
-\layout Verbatim
+\layout Standard
 
 sdcdb>break 100 
 \newline 
@@ -10111,7 +10189,7 @@ clear [line | file:line | function | file:function ]
 \layout Standard
 
 Clear breakpoint at specified line or function.
-\layout Verbatim
+\layout Standard
 
 sdcdb>clear 100
 \newline 
@@ -10285,7 +10363,7 @@ sdcdbsrc-serial nil
 \layout Standard
 
 The following is a list of key mapping for the debugger interface.
-\layout Verbatim
+\layout Standard
 
 
 \protected_separator 
@@ -11759,7 +11837,7 @@ As always, the code is the authoritave reference - see z80/ralloc.c and z80/gen.
 \layout Standard
 
 
-\begin_inset LatexCommand \index
+\begin_inset LatexCommand \index{}
 
 \end_inset 
 

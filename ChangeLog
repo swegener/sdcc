@@ -1,3 +1,7 @@
+2003-10-06 Bernhard Held <bernhard@bernhardheld.de>
+
+	* clean.mk: removed '=' in "-maxdepth=1"
+
 2003-10-06  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCC.lex, src/SDCC.lex: use dbuf for "_asm" definitions;

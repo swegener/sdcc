@@ -5,7 +5,7 @@ clean:
 	rm -f .[a-z]*~ \#*
 	rm -f $(PRJDIR)/bin/sdcc sdcc
 	for port in $(PORTS) ; do\
-	  $(MAKE) -C $$port -f clean.mk clean ;\
+	  $(MAKE) -C $$port clean ;\
 	done
 
 

@@ -1,22 +1,2 @@
-PRJDIR = ../..
-
-include $(PRJDIR)/Makefile.common
-
-OBJ = gen.o ralloc.o main.o support.o
-LIB = port.a
-
-CFLAGS += -I.. -I. -I../..
-
-all: $(LIB)
-
-$(LIB): peeph.rul peeph-z80.rul peeph-gbz80.rul $(OBJ)
-	rm -f $(LIB)
-	ar r $(LIB) $(OBJ)
-	$(RANLIB) $(LIB)
-
-%.rul: %.def
-	$(AWK) -f ../SDCCpeeph.awk $< > $@
-
-main.o: main.c peeph.rul peeph-z80.rul peeph-gbz80.rul mappings.i
-
-include clean.mk
+# Make all in this directory
+include ../port.mk

@@ -128,6 +128,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(SOURCES) $(INCDIR)/*.h
+	rm -f Makefile.dep
 	for i in $(SOURCES); do \
 	  $(CPP) -M $(CPPFLAGS) $$i >$${i}.dep; \
 	  cat $${i}.dep >>Makefile.dep; \

@@ -22,7 +22,7 @@ CFLAGS	+= -I$(SLIB)
 
 LDFLAGS += -lm $(EXTRALIBS)
 
-all:	$(OBJDIR) dep $(BINS)
+all:	dep $(BINS)
 
 dep: Makefile.dep
 
@@ -38,10 +38,10 @@ $(BINS): $(OBJS) $(SLIBOBJS)
 	$(CC) -o $(BINS) $(OBJS) $(SLIBOBJS) $(LDFLAGS)
 
 
-$(OBJDIR)/%.o:	%.c
+$(OBJDIR)/%.o:	%.c $(OBJDIR)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-$(OBJDIR)/%.o:	$(SLIB)/%.c
+$(OBJDIR)/%.o:	$(SLIB)/%.c $(OBJDIR)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 _as-z80:

@@ -1,3 +1,8 @@
+2004-11-19 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added peepholes 3.d-g and 177.g,h provided
+	  by anonymous in RFE #1067986, thanks
+
 2004-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* .version: bumped version to 2.4.7
@@ -42,7 +47,7 @@
 	* support/regression/ports/ucz80/spec.mk: use include and lib files from
 	  built version of sdcc instead of installed version
 
-2004-11-11 Maarten Brock <sourceforge.brock AT dse.nl>
+2004-11-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (toBoolean): fixed bug 1065458
 	* device/lib/Makefile.in: z80 uses printf_large.c, sprintf.c and

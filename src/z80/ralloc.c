@@ -2063,7 +2063,6 @@ joinPushes (iCode * ic)
        */
       /* First upgrade the size of (first) to int */
       SPEC_NOUN (operandType (IC_LEFT (ic))) = V_INT;
-      SPEC_SHORT (operandType (IC_LEFT (ic))) = 0;
 
       floatFromVal (AOP /* need some sleep ... */ );
       /* Now get and join the values */

@@ -2218,7 +2218,6 @@ packForPush (iCode * ic, eBBlock * ebp)
     sym_link *ditype=operandType(IC_RIGHT(dic));
 
     if (SPEC_USIGN(itype)!=SPEC_USIGN(ditype) ||
-	SPEC_SHORT(itype)!=SPEC_SHORT(ditype) ||
 	SPEC_LONG(itype)!=SPEC_LONG(ditype))
       return;
   }

@@ -500,6 +500,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
   // special case for "short"
   if (etype->select.s._short) {
     SPEC_NOUN(etype) = options.shortisint ? V_INT : V_CHAR;
+    etype->select.s._short = 0;
   }
 
   /* if no noun e.g. 

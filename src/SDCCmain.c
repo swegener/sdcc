@@ -2122,6 +2122,10 @@ main (int argc, char **argv, char **envp)
           glue();
         }
 
+      if (fatalError) {
+        exit (1);
+      }
+
       if (!options.c1mode && !noAssemble)
         {
           if (options.verbose)

@@ -26,6 +26,7 @@
 	* support/regression/tests/ast_constant_folding.c: changed finally to
 	'unsigned int'
 	* .version: new year, new version: 2.3.7
+	* src/SDCCmain.c (main): applied patch #866468
 
 2004-01-01 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

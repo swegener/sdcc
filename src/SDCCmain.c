@@ -406,7 +406,7 @@ setDefaultOptions ()
   options.nostdlib = 0;
   options.nostdinc = 0;
   options.verbose = 0;
-  options.shortis8bits = 1;
+  options.shortis8bits = 0;
 
   options.stack10bit=0;
 

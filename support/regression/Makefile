@@ -58,10 +58,9 @@ GENERATE_CASES = generate-cases.py
 
 # Magically generate the list of configured ports to test.
 # Each directory under ports/ is used as a port name.  Each port is tested.
-# The port name must be the same as the one used in the SDCC '-mxxx' argument.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out CVS mcs51 ds390 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out CVS mcs51 mcs51-large ds390 gbz80,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
@@ -80,11 +79,13 @@ test-z80:
 test-gbz80:
 	$(MAKE) inter-port-clean test-port PORT=gbz80
 
-# Helper rule for testing the mcs51 small model port only
+# Helper rule for testing the mcs51 port only
 test-mcs51:
 	$(MAKE) inter-port-clean test-port PORT=mcs51
+test-mcs51-large:
+	$(MAKE) inter-port-clean test-port PORT=mcs51-large
 
-	# Helper rule for testing the ds390 port only
+# Helper rule for testing the ds390 port only
 test-ds390:
 	$(MAKE) inter-port-clean test-port PORT=ds390
 
@@ -113,7 +114,7 @@ SDCC_EXTRA_DIR = ../../../sdcc-extra
 # Path to SDCC
 SDCC = $(SDCC_DIR)/bin/sdcc
 # Base flags.
-SDCCFLAGS = -m$(PORT)
+SDCCFLAGS +=
 # Extension of object intermediate files
 OBJEXT = .o
 # Extension of files that can be run in the emulator

@@ -2,6 +2,7 @@
   vprintf.c - formatted output conversion
  
              Written By - Martijn van Balen aed@iae.nl (1999)
+	     Added %f By - johan.knol@iduna.nl (2000)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -21,6 +22,7 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
+#define USE_FLOATS 1
 
 #include <stdarg.h>
 #include <string.h>
@@ -45,6 +47,7 @@ typedef union
   unsigned char  byte[5];
   long           l;
   unsigned long  ul;
+  float          f;
   char _generic *p;
 } value_t;
 
@@ -58,7 +61,7 @@ bit   lsd;
 
 data value_t        value;
 
-     unsigned short radix;
+unsigned short      radix;
 
 /****************************************************************************/
 
@@ -124,6 +127,111 @@ _endasm;
   }
 }
 
+#if USE_FLOATS
+
+/* This is a very inefficient but direct approach, since we have no math
+   library yet (e.g. log()).
+   It does most of the modifiers, but has some restrictions. E.g. the 
+   abs(float) shouldn't be bigger than an unsigned long (that's 
+   about 4294967295), but still makes it usefull for most real-life
+   applications.
+*/
+
+#define DEFAULT_FLOAT_PRECISION 6
+
+static void output_float (float f, unsigned char reqWidth, 
+			  signed char reqDecimals,
+			  bit left, bit zero, bit sign, bit space)
+{
+  char negative=0;
+  long integerPart;
+  float decimalPart;
+  char fpBuffer[128];
+  char fpBI=0, fpBD;
+  unsigned char minWidth, i;
+
+  // save the sign
+  if (f<0) {
+    negative=1;
+    f=-f;
+  }
+
+  // split the float
+  integerPart=f;
+  decimalPart=f-integerPart;
+
+  // fill the buffer with the integerPart (in reversed order!)
+  while (integerPart) {
+    fpBuffer[fpBI++]='0' + integerPart%10;
+    integerPart /= 10;
+  }
+  if (!fpBI) {
+    // we need at least a 0
+    fpBuffer[fpBI++]='0';
+  }
+
+  // display some decimals as default
+  if (reqDecimals==-1)
+    reqDecimals=DEFAULT_FLOAT_PRECISION;
+  
+  // fill buffer with the decimalPart (in normal order)
+  fpBD=fpBI;
+  if (i=reqDecimals /* that's an assignment */) {
+    do {
+      decimalPart *= 10.0;
+      // truncate the float
+      integerPart=decimalPart;
+      fpBuffer[fpBD++]='0' + integerPart;
+      decimalPart-=integerPart;
+    } while (--i);
+  }
+  
+  minWidth=fpBI; // we need at least these
+  minWidth+=reqDecimals?reqDecimals+1:0; // maybe these
+  if (negative || sign || space)
+    minWidth++; // and maybe even this :)
+  
+  if (!left && reqWidth>i) {
+    if (zero) {
+      if (negative) output_char('-');
+      else if (sign) output_char('+');
+      else if (space) output_char(' ');
+      while (reqWidth-->minWidth)
+	output_char ('0');
+    } else {
+      while (reqWidth-->minWidth)
+	output_char (' ');
+      if (negative) output_char('-');
+      else if (sign) output_char('+');
+      else if (space) output_char (' ');
+    }
+  } else {
+    if (negative) output_char('-');
+    else if (sign) output_char('+');
+    else if (space) output_char(' ');
+  }
+
+  // output the integer part
+  i=fpBI-1;
+  do {
+    output_char (fpBuffer[i]);
+  } while (i--);
+  
+  // ouput the decimal part
+  if (reqDecimals) {
+    output_char ('.');
+    i=fpBI;
+    while (reqDecimals--)
+      output_char (fpBuffer[i++]);
+  }
+
+  if (left && reqWidth>minWidth) {
+    while (reqWidth-->minWidth)
+      output_char(' ');
+  }
+}
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 int vsprintf (const char *buf, const char *format, va_list ap)
@@ -135,8 +243,10 @@ int vsprintf (const char *buf, const char *format, va_list ap)
   bit            signed_argument;
   bit            char_argument;
   bit            long_argument;
+  bit            float_argument;
 
   unsigned char  width;
+  signed char decimals;
   unsigned char  length;
   char           c;
 
@@ -152,7 +262,7 @@ int vsprintf (const char *buf, const char *format, va_list ap)
 
   while( c=*format++ )
   {
-    if ( c == '%' )
+    if ( c=='%' )
     {
       left_justify    = 0;
       zero_padding    = 0;
@@ -162,22 +272,37 @@ int vsprintf (const char *buf, const char *format, va_list ap)
       radix           = 0;
       char_argument   = 0;
       long_argument   = 0;
+      float_argument  = 0;
       width           = 0;
+      decimals        = -1;
 
 get_conversion_spec:
 
       c = *format++;
 
-      if (isdigit(c))
-      {
-        width = 10*width + (c - '0');
+      if (c=='%') {
+	output_char(c);
+	continue;
+      }
 
-	if (width == 0)
-	{
-	  /* first character of width is a zero */
-	  zero_padding = 1;
+      if (isdigit(c)) {
+	if (decimals==-1) {
+	  width = 10*width + (c - '0');
+	  if (width == 0) {
+	    /* first character of width is a zero */
+	    zero_padding = 1;
+	  }
+	} else {
+	  decimals = 10*decimals + (c-'0');
 	}
-        goto get_conversion_spec;
+	goto get_conversion_spec;
+      }
+
+      if (c=='.') {
+	if (decimals=-1) decimals=0;
+	else 
+	  ; // duplicate, ignore
+	goto get_conversion_spec;
       }
 
       lower_case = islower(c);
@@ -274,13 +399,30 @@ get_conversion_spec:
 	radix = 16;
 	break;
 
+      case 'F':
+	float_argument=1;
+	break;
+	
       default:
 	// nothing special, just output the character
 	output_char( c );
 	break;
       }
 
-      if (radix != 0)
+      if (float_argument) {
+	value.f=va_arg(ap,float);
+#if !USE_FLOATS
+	// treat as long hex
+	radix=16;
+	long_argument=1;
+	zero_padding=1;
+	width=8;
+#else
+	// ignore b and l conversion spec for now
+	output_float(value.f, width, decimals, left_justify, zero_padding, 
+		     prefix_sign, prefix_space);
+#endif
+      } else if (radix != 0)
       {
 	// Apperently we have to output an integral type
         // with radix "radix"
@@ -300,7 +442,7 @@ get_conversion_spec:
 	{
 	  value.l = va_arg(ap,long);
 	}
-	else
+	else // must be int
 	{
 	  value.l = va_arg(ap,int);
 	  if (!signed_argument)

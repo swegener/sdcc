@@ -37,7 +37,7 @@ all:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(CP) *.h $(datadir)/sdcc51inc/
+	$(CP) *.h $(datadir)/include/
 
 
 # Deleting all the installed files
@@ -59,7 +59,7 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	[ -d $(datadir)/sdcc51inc ] || mkdir -p $(datadir)/sdcc51inc
+	[ -d $(datadir)/include ] || mkdir -p $(datadir)/include
 
 
 # Creating dependencies

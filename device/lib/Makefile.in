@@ -73,12 +73,12 @@ models:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: installdirs
-	$(CP) *.c $(datadir)/sdcc51lib/
+	$(CP) *.c $(datadir)/lib/
 	for model in $(MODELS); do \
 	 [ -d $$model ] || $(MAKE) all; \
-	 $(CP) $$model/*.rel *.lib $(datadir)/sdcc51lib/$$model/; \
-	 $(CP) $$model/*.asm $(datadir)/sdcc51lib/$$model/; \
-	 $(CP) $$model/*.cdb $(datadir)/sdcc51lib/$$model/; \
+	 $(CP) $$model/*.rel *.lib $(datadir)/lib/$$model/; \
+	 $(CP) $$model/*.asm $(datadir)/lib/$$model/; \
+	 $(CP) $$model/*.cdb $(datadir)/lib/$$model/; \
 	done
 
 
@@ -87,7 +87,7 @@ install: installdirs
 uninstall:
 	for hdr in *.h; do rm -f $(datadir)/$$hdr; done
 	for model i $(MODELS); do \
-	  rm -rf $(datadir)/sdcc51lib/$$model; \
+	  rm -rf $(datadir)/lib/$$model; \
 	done
 
 
@@ -104,10 +104,10 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	[ -d $(datadir)/sdcc51lib ] || mkdir -p $(datadir)/sdcc51lib
+	[ -d $(datadir)/lib ] || mkdir -p $(datadir)/lib
 	for model in $(MODELS); do \
-	 [ -d $(datadir)/sdcc51lib/$$model ] || \
-	 mkdir -p $(datadir)/sdcc51lib/$$model; \
+	 [ -d $(datadir)/lib/$$model ] || \
+	 mkdir -p $(datadir)/lib/$$model; \
 	done
 
 

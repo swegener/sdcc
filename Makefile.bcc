@@ -1,21 +1,16 @@
-all: as cpp ports sdcc packihx cpp2
+all: as ports sdcc packihx cpp2
 
 as:
 	cd as\mcs51
 	make -f Makefile.bcc
 	cd ..\..
 
-cpp:
-	cd support\cpp
-	make -f Makefile.bcc
-	cd ..\..
-	
 cpp2:
 	cd support\cpp2
 	make -f Makefile.bcc
 	cd ..\..
 
-ports: z80 mcs51 avr ds390 pic izt xa51
+ports: z80 mcs51 avr ds390 pic xa51
 
 z80:
 	cd src\z80
@@ -42,11 +37,6 @@ pic:
 	make -f Makefile.bcc
 	cd ..\..
 
-izt:
-        cd src\izt
-	make -f Makefile.bcc
-        cd ..\..
-
 xa51:
 	cd src\xa51
 	make -f Makefile.bcc
@@ -61,4 +51,3 @@ packihx:
 	cd packihx
 	make -f Makefile.bcc
 	cd ..
-

@@ -1,0 +1,188 @@
+Toms AVR macro assembler version 1.11 (Dec 13 1999)
+Copyright (C) 1999 - Tom Mortensen
+E-mail: tomo@image.dk  WWW: http://www.image.dk/~tomo
+
++------------------+-----------------------------------------------------------+
+| Value            | Text                                                      |
+|------------------|-----------------------------------------------------------|
+| 000000 0000      |         nop                                               |
+|                  |                                                           |
+| 000001 1E1F      |         adc     r1,r31                                    |
+| 000002 0E2E      |         add     r2,r30                                    |
+| 000003 96C6      |         adiw    r24,54                                    |
+| 000004 224D      |         and     r4,r29                                    |
+| 000005 7F0D      |         andi    r16,253                                   |
+| 000006 9455      |         asr     r5                                        |
+| 000007 94F8      |         bclr    7                                         |
+| 000008 F866      |         bld     r6,6                                      |
+| 000009 0000      | lab1:   nop                                               |
+| 00000A F7F0      |         brbc    0,lab1                                    |
+| 00000B F7E9      |         brbc    1,lab1                                    |
+| 00000C F7E2      |         brbc    2,lab1                                    |
+| 00000D F7DB      |         brbc    3,lab1                                    |
+| 00000E F7D4      |         brbc    4,lab1                                    |
+| 00000F F7CD      |         brbc    5,lab1                                    |
+| 000010 F7C6      |         brbc    6,lab1                                    |
+| 000011 F7BF      |         brbc    7,lab1                                    |
+| 000012 F038      | lab2:   brbs    0,lab3                                    |
+| 000013 F031      |         brbs    1,lab3                                    |
+| 000014 F02A      |         brbs    2,lab3                                    |
+| 000015 F023      |         brbs    3,lab3                                    |
+| 000016 F01C      |         brbs    4,lab3                                    |
+| 000017 F015      |         brbs    5,lab3                                    |
+| 000018 F00E      |         brbs    6,lab3                                    |
+| 000019 F007      |         brbs    7,lab3                                    |
+| 00001A F408      | lab3:   brcc    lab4                                      |
+| 00001B F7F0      |         brcc    lab3                                      |
+| 00001C F008      | lab4:   brcs    lab5                                      |
+| 00001D F3F0      |         brcs    lab4                                      |
+| 00001E F009      | lab5:   breq    lab6                                      |
+| 00001F F3F1      |         breq    lab5                                      |
+| 000020 F40C      | lab6:   brge    lab7                                      |
+| 000021 F7F4      |         brge    lab6                                      |
+| 000022 F40D      | lab7:   brhc    lab8                                      |
+| 000023 F7F5      |         brhc    lab7                                      |
+| 000024 F00D      | lab8:   brhs    lab9                                      |
+| 000025 F3F5      |         brhs    lab8                                      |
+| 000026 F40F      | lab9:   brid    lab10                                     |
+| 000027 F7F7      |         brid    lab9                                      |
+| 000028 F00F      | lab10:  brie    lab11                                     |
+| 000029 F3F7      |         brie    lab10                                     |
+| 00002A F008      | lab11:  brlo    lab12                                     |
+| 00002B F3F0      |         brlo    lab11                                     |
+| 00002C F00C      | lab12:  brlt    lab13                                     |
+| 00002D F3F4      |         brlt    lab12                                     |
+| 00002E F00A      | lab13:  brmi    lab14                                     |
+| 00002F F3F2      |         brmi    lab13                                     |
+| 000030 F409      | lab14:  brne    lab15                                     |
+| 000031 F7F1      |         brne    lab14                                     |
+| 000032 F40A      | lab15:  brpl    lab16                                     |
+| 000033 F7F2      |         brpl    lab15                                     |
+| 000034 F408      | lab16:  brsh    lab17                                     |
+| 000035 F7F0      |         brsh    lab16                                     |
+| 000036 F40E      | lab17:  brtc    lab18                                     |
+| 000037 F7F6      |         brtc    lab17                                     |
+| 000038 F00E      | lab18:  brts    lab19                                     |
+| 000039 F3F6      |         brts    lab18                                     |
+| 00003A F40B      | lab19:  brvc    lab20                                     |
+| 00003B F7F3      |         brvc    lab19                                     |
+| 00003C F00B      | lab20:  brvs    lab21                                     |
+| 00003D F3F3      |         brvs    lab20                                     |
+| 00003E 9468      | lab21:  bset    6                                         |
+| 00003F FA75      |         bst     r7,5                                      |
+| 000040 940E 0000 |         call    0                                         |
+| 000042 940E 0009 |         call    lab1                                      |
+| 000044 940E 0047 |         call    lab22                                     |
+| 000046 0000      |         nop                                               |
+| 000047 9844      | lab22:  cbi     $8,4                                      |
+|                  |                                                           |
+| 000048 9488      |         clc                                               |
+| 000049 94D8      |         clh                                               |
+| 00004A 94F8      |         cli                                               |
+| 00004B 94A8      |         cln                                               |
+| 00004C 94C8      |         cls                                               |
+| 00004D 94E8      |         clt                                               |
+| 00004E 94B8      |         clv                                               |
+| 00004F 9498      |         clz                                               |
+|                  |                                                           |
+| 000050 9490      |         com     r9                                        |
+| 000051 14AB      |         cp      r10,r11                                   |
+| 000052 04CD      |         cpc     r12,r13                                   |
+| 000053 350F      |         cpi     r16,95                                    |
+| 000054 10EF      |         cpse    r14,r15                                   |
+| 000055 951A      |         dec     r17                                       |
+| 000056 2723      |         eor     r18,r19                                   |
+| 000057 9509      |         icall                                             |
+| 000058 9409      |         ijmp                                              |
+| 000059 B149      |         in      r20,9                                     |
+| 00005A 9553      |         inc     r21                                       |
+| 00005B 940C 0009 |         jmp     lab1                                      |
+| 00005D 940C 007A |         jmp     lab23                                     |
+| 00005F 916C      |         ld      r22,x                                     |
+| 000060 917D      |         ld      r23,x+                                    |
+| 000061 918E      |         ld      r24,-x                                    |
+| 000062 8198      |         ld      r25,y                                     |
+| 000063 91A9      |         ld      r26,y+                                    |
+| 000064 91BA      |         ld      r27,-y                                    |
+| 000065 ADCF      |         ldd     r28,y+63                                  |
+| 000066 81D0      |         ld      r29,z                                     |
+| 000067 91E1      |         ld      r30,z+                                    |
+| 000068 91F2      |         ld      r31,-z                                    |
+| 000069 8001      |         ldd     r0,z+1                                    |
+| 00006A EA1A      |         ldi     r17,170                                   |
+| 00006B 9010 3039 |         lds     r1,12345                                  |
+| 00006D 95C8      |         lpm                                               |
+|                  |         ;elpm                                             |
+| 00006E 9426      |         lsr     r2                                        |
+| 00006F 2C34      |         mov     r3,r4                                     |
+| 000070 9C56      |         mul     r5,r6                                     |
+| 000071 9471      |         neg     r7                                        |
+| 000072 2889      |         or      r8,r9                                     |
+| 000073 6525      |         ori     r18,85                                    |
+| 000074 B8A9      |         out     9,r10                                     |
+| 000075 90BF      |         pop     r11                                       |
+| 000076 92CF      |         push    r12                                       |
+| 000077 DF91      |         rcall   lab1                                      |
+| 000078 D001      |         rcall   lab23                                     |
+| 000079 0000      |         nop                                               |
+| 00007A 9508      | lab23:  ret                                               |
+| 00007B 9518      |         reti                                              |
+| 00007C CFFD      |         rjmp    lab23                                     |
+| 00007D C001      |         rjmp    lab24                                     |
+| 00007E 0000      |         nop                                               |
+| 00007F 94D7      | lab24:  ror     r13                                       |
+| 000080 08EF      |         sbc     r14,r15                                   |
+| 000081 4533      |         sbci    r19,83                                    |
+| 000082 9A52      |         sbi     10,2                                      |
+| 000083 995B      |         sbic    11,3                                      |
+| 000084 9B64      |         sbis    12,4                                      |
+| 000085 97DC      |         sbiw    r26,60                                    |
+| 000086 6F3E      |         sbr     r19,254                                   |
+| 000087 FD45      |         sbrc    r20,5                                     |
+| 000088 FF56      |         sbrs    r21,6                                     |
+| 000089 9408      |         sec                                               |
+| 00008A 9458      |         seh                                               |
+| 00008B 9478      |         sei                                               |
+| 00008C 9428      |         sen                                               |
+| 00008D 9448      |         ses                                               |
+| 00008E 9468      |         set                                               |
+| 00008F 9438      |         sev                                               |
+| 000090 9418      |         sez                                               |
+|                  |                                                           |
+| 000091 EF6F      |         ser     r22                                       |
+| 000092 9588      |         sleep                                             |
+| 000093 937C      |         st      x,r23                                     |
+| 000094 938D      |         st      x+,r24                                    |
+| 000095 939E      |         st      -x,r25                                    |
+| 000096 83A8      |         st      y,r26                                     |
+| 000097 93B9      |         st      y+,r27                                    |
+| 000098 93CA      |         st      -y,r28                                    |
+| 000099 A3DA      |         std     y+34,r29                                  |
+| 00009A 83E0      |         st      z,r30                                     |
+| 00009B 93F1      |         st      z+,r31                                    |
+| 00009C 9202      |         st      -z,r0                                     |
+| 00009D A213      |         st      z+35,r1                                   |
+| 00009E 9220 FF00 |         sts     $ff00,r2                                  |
+| 0000A0 1834      |         sub     r3,r4                                     |
+| 0000A1 57FB      |         subi    r31,123                                   |
+| 0000A2 9442      |         swap    r4                                        |
+| 0000A3 95A8      |         wdr                                               |
+|                  |                                                           |
+| 0000A4 0000      |         nop                                               |
+| 0000A5 940C 00A5 | a:      jmp     a                                         |
+|                  |                                                           |
+| 0000A7 2863 2920 |         .db     "(c) 1999 Talker Bt."                     |
+| 0000A9 3139 3939 |                                                           |
+| 0000AB 2054 616C |                                                           |
+| 0000AD 6B65 7220 |                                                           |
+| 0000AF 4274 2E00 |                                                           |
+|                  |                                                           |
++------------------+-----------------------------------------------------------+
+
+Errors      : 0
+Warnings    : 0
+Code        : 177
+Rom         : 0
+Data        : 0
+Unused Code : 0
+Unused Rom  : 0

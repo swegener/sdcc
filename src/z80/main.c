@@ -656,7 +656,8 @@ PORT gbz80_port =
     NULL,
     LINKCMD,
     NULL,
-    ".o"
+    ".o",
+    1
   },
   {
     _gbz80_defaultRules

@@ -68,6 +68,8 @@ extern void printChar (FILE * ofile, char *s, int plen);
 void  pCodeInitRegisters(void);
 int getConfigWord(int address);
 
+char *udata_section_name="udata";		// FIXME Temporary fix to change udata section name -- VR
+
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
 /*-----------------------------------------------------------------*/
@@ -643,8 +645,13 @@ pic14emitOverlay (FILE * afile)
 {
   set *ovrset;
 
-  if (!elementsInSet (ovrSetSets))
-    fprintf (afile, "\t%s\n", port->mem.overlay_name);
+/*  if (!elementsInSet (ovrSetSets))*/
+
+  /* the hack below, fixes translates for devices which
+   * only have udata_shr memory */
+  fprintf (afile, "%s\t%s\n",
+  	(elementsInSet(ovrSetSets)?"":";"),
+  	port->mem.overlay_name);
 
   /* for each of the sets in the overlay segment do */
   for (ovrset = setFirstItem (ovrSetSets); ovrset;
@@ -861,9 +868,9 @@ picglue ()
   copyFile (asmFile, sfr->oFile);
 
   fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; udata\n");
+  fprintf (asmFile, "; %s\n", udata_section_name);
   fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "\tudata\n");
+  fprintf (asmFile, "\t%s\n", udata_section_name);
   copyFile (asmFile, data->oFile);
 
   /* Put all variables into a cblock */

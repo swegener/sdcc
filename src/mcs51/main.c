@@ -291,7 +291,8 @@ PORT mcs51_port =
     _linkCmd,
     NULL,
     NULL,
-    ".rel"
+    ".rel",
+    1
   },
   {
     _defaultRules

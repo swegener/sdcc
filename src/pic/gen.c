@@ -9194,8 +9194,14 @@ static void genAddrOf (iCode *ic)
   offset = 0;
 
   while (size--) {
+	/* fixing bug #863624, reported from (errolv) */
+	emitpcode(POC_MOVLW, popGetImmd(OP_SYMBOL(left)->rname, offset, 0, IS_FUNC(OP_SYM_TYPE(left))));
+	emitpcode(POC_MOVWF, popGet(AOP(result), offset));
+	
+#if 0
     emitpcode(POC_MOVLW, popGet(AOP(left),offset));
     emitpcode(POC_MOVWF, popGet(AOP(result),offset));
+#endif
     offset++;
   }
 

@@ -104,6 +104,8 @@ typedef struct
 	void (*do_link) (void);
         /** Extension for object files (.rel, .obj, ...) */
 	const char *rel_ext;
+	/** 1 if port needs the .lnk file, 0 otherwise */
+	const int needLinkerScript;
       }
     linker;
 

@@ -372,13 +372,7 @@ _findPort (int argc, char **argv)
     }
 
   /* Use the first in the list */
-#if defined(DEFAULT_PORT)
-	/* VR - 13/5/2003 DEFAULT_PORT is defined in port.h */
-	port = &DEFAULT_PORT;
-#else
 	port = _ports[0];
-#endif
-
 }
 
 /* search through the command line options for the processor */
@@ -408,12 +402,8 @@ printVersionInfo (void)
 
   fprintf (stderr,
 	   "SDCC : ");
-  for (i = 0; i < NUM_PORTS; i++) {
+  for (i = 0; i < NUM_PORTS; i++)
     fprintf (stderr, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
-#ifdef DEFAULT_PORT
-	fprintf(stderr, "%s", (&DEFAULT_PORT == _ports[i])?"*":"");
-#endif
-  }
   
   fprintf (stderr, " " SDCC_VERSION_STR
 #ifdef SDCC_SUB_VERSION_STR
@@ -1297,6 +1287,8 @@ linkEdit (char **envp)
   int system_ret;
   const char *s;
 
+
+  if(port->linker.needLinkerScript) {
   /* first we need to create the <filename>.lnk file */
   SNPRINTF (scratchFileName, sizeof(scratchFileName),
 	    "%s.lnk", dstFileName);
@@ -1538,6 +1530,7 @@ linkEdit (char **envp)
 
   fprintf (lnkfile, "\n-e\n");
   fclose (lnkfile);
+  }	/* if(port->linker.needLinkerScript) */
 
   if (options.verbose)
     printf ("sdcc: Calling linker...\n");

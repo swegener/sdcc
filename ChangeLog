@@ -1,3 +1,35 @@
+2004-01-08 Vangelis Rokas <vrokas@otenet.gr>
+
+	* src/SDCCmain.c: removed various references to DEFAULT_PORT
+	* src/port.h: added flag needLinkerScript in port->linker
+	structure to inform whether to create a .lnk file or not,
+	* src/avr/main.c,
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/mcs51/main.c,
+	* src/pic/main.c,
+	* src/pic16/main.c,
+	* src/xa51/main.c,
+	* src/z80/main.c: changed appropriately to configure
+	needLinkerScript flag
+	* src/pic/gen.c,
+	* src/pic16/gen.c (genAddrOf): fixed bug #863624
+	* src/pic/glue.c: added variable udata_section_name to
+	override default uninitialized data segment definition for
+	devices only with SHAREBANK memory (reported from Erik Epetrich)
+	* (pic14emitOverlay): modified to emit a commented overlay segment
+	directive when no overlay data exist
+	* (picglue): modified to emit uninitialized data segment
+	according to udata_section_name
+	* src/pic/main.c (_pic14_parseOptions): added command line
+	options --udata-section-name=[name] to override default
+	udata definition name
+	* modified _linkCmd and _asmCmd to include compiler passed
+	arguments via -W option
+	* src/pic16/main.c: added $l in _asmCmd, changed extension for
+	object file from '.rel' to '.o' in port->linker structure,
+	changed size of fptr from 2 to 3 in port structure
+	
 2004-01-07  Borut Razem <borut.razem@siol.net>
 
 	* support/scripts/sdcc.nsi: update PATH

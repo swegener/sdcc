@@ -141,12 +141,32 @@ _process_pragma(const char *sz)
   return 1;
 }
 
+extern char *udata_section_name;
+
 static bool
 _pic14_parseOptions (int *pargc, char **argv, int *i)
 {
+  char buf[128];
+
   /* TODO: allow port-specific command line options to specify
    * segment names here.
    */
+
+	/* This is a temporary hack, to solve problems with some processors
+	 * that do not have udata section. It will be changed when a more
+	 * robust solution is figured out -- VR 27-11-2003 FIXME
+	 */
+	strcpy(buf, "--udata-section-name");
+	if(!strncmp(buf, argv[ *i ], strlen(buf))) {
+		if(strlen(argv[ *i ]) <= strlen(buf)+1) {
+			fprintf(stderr, "WARNING: no `%s' entered\n", buf+2);
+			exit(-1);
+		} else {
+			udata_section_name = strdup( strchr(argv[*i], '=') + 1 );
+		}
+		return 1;
+	}
+   
   return FALSE;
 }
 
@@ -354,12 +374,12 @@ oclsExpense (struct memmap *oclass)
 */
 static const char *_linkCmd[] =
 {
-  "gplink", "", "\"$1.o\"", NULL
+  "gplink", "-o $2", "\"$1.o\"", "$l", NULL
 };
 
 static const char *_asmCmd[] =
 {
-  "gpasm", "-c", "\"$1.asm\"", NULL
+  "gpasm", "$l", "-c", "\"$1.asm\"", NULL
 
 };
 
@@ -391,7 +411,8 @@ PORT pic_port =
     _linkCmd,
     NULL,
     NULL,
-    ".o"
+    ".o",
+    0
   },
   {
     _defaultRules

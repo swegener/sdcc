@@ -635,7 +635,7 @@ static const char *_linkCmd[] =
  */
 static const char *_asmCmd[] =
 {
-  "gpasm", "-c  -I/usr/local/share/gputils/header", "\"$1.asm\"", NULL
+  "gpasm", "$l", "-c", "\"$1.asm\"", NULL
 
 };
 
@@ -665,7 +665,8 @@ PORT pic16_port =
     _linkCmd,			/* linker command and arguments */
     NULL,			/* alternate macro based form */
     NULL,			/* no do_link function */
-    ".rel"			/* extension for object files */
+    ".o",			/* extension for object files */
+    0				/* no need for linker file */
   },
   {
     _defaultRules
@@ -677,7 +678,7 @@ PORT pic16_port =
     2,		/* int */
     4,		/* long */
     2,		/* ptr */
-    2,		/* fptr, this should be changed to 3 for far pointers (see Microchip) */
+    3,		/* fptr, far pointers (see Microchip) */
     2,		/* gptr */
     1,		/* bit */
     4,		/* float */

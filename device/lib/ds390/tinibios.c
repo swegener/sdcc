@@ -499,21 +499,15 @@ void ClockIrqHandler (void) interrupt 1 {
   _asm
     mov _TL0,_timer0ReloadValue
     mov _TH0,_timer0ReloadValue+1
-    mov a,#0x01
-    add a,_milliSeconds+0
-    mov _milliSeconds+0,a
-    jnc _ClockIrqHandlerDone
     clr a
-    addc a,_milliSeconds+1
-    mov _milliSeconds+1,a
-    jnc _ClockIrqHandlerDone
-    clr a
-    addc a,_milliSeconds+2
-    mov _milliSeconds+2,a
-    jnc _ClockIrqHandlerDone
-    clr a
-    addc a,_milliSeconds+3
-    mov _milliSeconds+3,a
+    inc _milliSeconds+0
+    cjne a,_milliSeconds+0,_ClockIrqHandlerDone
+    inc _milliSeconds+1
+    cjne a,_milliSeconds+1,_ClockIrqHandlerDone
+    inc _milliSeconds+2
+    cjne a,_milliSeconds+2,_ClockIrqHandlerDone
+    inc _milliSeconds+3
+    cjne a,_milliSeconds+3,_ClockIrqHandlerDone
    _ClockIrqHandlerDone:
   _endasm;
 }

@@ -1181,8 +1181,10 @@ checkSClass (symbol * sym, int isProto)
     SPEC_VOLATILE (sym->etype) = 1;
   
   /* global variables declared const put into code */
+  /* if no other storage class specified */
   if (sym->level == 0 &&
-      SPEC_CONST (sym->etype)) {
+      SPEC_CONST (sym->etype) &&
+      SPEC_SCLS(sym->etype) == S_FIXED) {
     SPEC_SCLS (sym->etype) = S_CODE;
   }
   

@@ -2793,14 +2793,20 @@ ast *backPatchLabels (ast *tree, symbol *trueLabel, symbol *falseLabel )
     
     /* change not */
     if (IS_NOT(tree)) {
+	int wasnot = IS_NOT(tree->left);
 	tree->left = backPatchLabels (tree->left,falseLabel,trueLabel);
 	
 	/* if the left is already a IFX */
 	if ( ! IS_IFX(tree->left) ) 
 	    tree->left = newNode (IFX,tree->left,NULL);
 	
-	tree->left->trueLabel = falseLabel ;
-	tree->left->falseLabel= trueLabel ;
+	if (wasnot) {
+	    tree->left->trueLabel = trueLabel ;
+	    tree->left->falseLabel= falseLabel ;
+	} else {
+	    tree->left->trueLabel = falseLabel ;
+	    tree->left->falseLabel= trueLabel ;
+	}
 	return tree->left ;
     }
     

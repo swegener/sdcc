@@ -185,6 +185,8 @@ PORT avr_port = {
 	 "OSEG",
 	 "GSFINAL",
 	 "HOME",
+	 NULL, // initialized xdata
+	 NULL, // a code copy of xiseg
 	 NULL,
 	 NULL,
 	 0,
@@ -205,6 +207,7 @@ PORT avr_port = {
 	_avr_keywords,
 	_avr_genAssemblerPreamble,
 	_avr_genIVT,
+	NULL, // _avr_genXINIT
 	_avr_reset_regparm,
 	_avr_regparm,
         NULL,

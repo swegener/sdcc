@@ -3666,7 +3666,7 @@ genPlus (iCode * ic)
 	      while (size--)
 		{
 		  MOVA (aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE, TRUE));
-		  emitcode ("addc", "a,#00");
+		  emitcode ("addc", "a,#0");
 		  aopPut (AOP (IC_RESULT (ic)), "a", offset++);
 		}
 	      _endLazyDPSEvaluation ();
@@ -5062,24 +5062,24 @@ genCmp (operand * left, operand * right,
 	  CLRC;
 	  while (size--)
 	    {
-	      emitcode (";", "genCmp #1: %d/%d/%d", size, sign, offset);
+	      //emitcode (";", "genCmp #1: %d/%d/%d", size, sign, offset);
 	      MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
-	      emitcode (";", "genCmp #2");
+	      //emitcode (";", "genCmp #2");
 	      if (sign && (size == 0))
 		{
-		  emitcode (";", "genCmp #3");
+		  //emitcode (";", "genCmp #3");
 		  emitcode ("xrl", "a,#0x80");
 		  if (AOP_TYPE (right) == AOP_LIT)
 		    {
 		      unsigned long lit = (unsigned long)
 		      floatFromVal (AOP (right)->aopu.aop_lit);
-		      emitcode (";", "genCmp #3.1");
+		      //emitcode (";", "genCmp #3.1");
 		      emitcode ("subb", "a,#!constbyte",
 				0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
 		    }
 		  else
 		    {
-		      emitcode (";", "genCmp #3.2");
+		      //emitcode (";", "genCmp #3.2");
 		      if (AOP_NEEDSACC (right))
 			{
 			  emitcode ("push", "acc");
@@ -5098,11 +5098,11 @@ genCmp (operand * left, operand * right,
 		{
 		  const char *s;
 
-		  emitcode (";", "genCmp #4");
+		  //emitcode (";", "genCmp #4");
 		  if (AOP_NEEDSACC (right))
 		    {
 		      /* Yuck!! */
-		      emitcode (";", "genCmp #4.1");
+		      //emitcode (";", "genCmp #4.1");
 		      emitcode ("xch", "a, b");
 		      MOVA (aopGet (AOP (right), offset++, FALSE, FALSE, TRUE));
 		      emitcode ("xch", "a, b");
@@ -5110,7 +5110,7 @@ genCmp (operand * left, operand * right,
 		    }
 		  else
 		    {
-		      emitcode (";", "genCmp #4.2");
+		      //emitcode (";", "genCmp #4.2");
 		      s = aopGet (AOP (right), offset++, FALSE, FALSE, FALSE);
 		    }
 
@@ -7831,7 +7831,7 @@ genLeftShiftLiteral (operand * left,
   aopOp(left, ic, FALSE, FALSE);
   aopOp(result, ic, FALSE, (AOP_TYPE(left) == AOP_DPTR));
 
-#if 1 // debug spew
+#if 0 // debug spew
   if (IS_SYMOP(left) && OP_SYMBOL(left)->aop)
   {
   	emitcode(";", "left (%s) is %d", OP_SYMBOL(left)->rname, AOP_TYPE(left));

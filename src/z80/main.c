@@ -486,6 +486,8 @@ PORT z80_port =
     "OVERLAY",
     "GSFINAL",
     "HOME",
+    NULL, // xidata
+    NULL, // xinit
     NULL,
     NULL,
     1
@@ -507,6 +509,7 @@ PORT z80_port =
   _keywords,
   0,				/* no assembler preamble */
   0,				/* no local IVT generation code */
+  0,                            /* no genXINIT code */
   _reset_regparm,
   _reg_parm,
   _process_pragma,
@@ -570,6 +573,8 @@ PORT gbz80_port =
     "OVERLAY",
     "GSFINAL",
     "HOME",
+    NULL, // xidata
+    NULL, // xinit
     NULL,
     NULL,
     1
@@ -591,6 +596,7 @@ PORT gbz80_port =
   _keywords,
   0,				/* no assembler preamble */
   0,				/* no local IVT generation code */
+  0,                            /* no genXINIT code */
   _reset_regparm,
   _reg_parm,
   _process_pragma,

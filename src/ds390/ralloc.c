@@ -36,7 +36,7 @@
 /* since the pack the registers depending strictly on the MCU      */
 /*-----------------------------------------------------------------*/
 
-#define D(x)
+#define D(x) x
 
 /* Global data */
 static struct
@@ -2116,7 +2116,13 @@ packRegsDPTRuse (operand * op)
 	    if (OP_SYMBOL(IC_RESULT(ic))->liveTo == 
 		OP_SYMBOL(IC_RESULT(ic))->liveFrom) continue ;
 	    etype = getSpec(type = operandType(IC_RESULT(ic)));
-	    if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic))) continue ;
+#if 0
+	    if (getSize(type) == 0 || isOperandEqual(op,IC_RESULT(ic))) 
+	      continue ;
+#else
+	    if (getSize(type)==0) 
+	      continue;
+#endif
 	    return NULL ;
 	}
 

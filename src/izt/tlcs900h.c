@@ -174,6 +174,8 @@ PORT tlcs900h_port =
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
     "HOME	 (CODE)",
+    NULL, // xidata
+    NULL, // xinit
     NULL,
     NULL,
     1
@@ -195,6 +197,7 @@ PORT tlcs900h_port =
   _tlcs900h_keywords,
   _tlcs900h_genAssemblerPreamble,
   _tlcs900h_genIVT,
+  0, // _tlcs900h_genXINIT
   _tlcs900h_reset_regparm,
   _tlcs900h_regparm,
   NULL,

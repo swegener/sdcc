@@ -120,6 +120,34 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   return FALSE;
 }
 
+/* Generate code to copy XINIT to XISEG */
+static void _mcs51_genXINIT (FILE * of) {
+  fprintf (of, ";	_mcs51_genXINIT() start\n");
+  fprintf (of, "	mov	a,#s_XINIT\n");
+  fprintf (of, "	add	a,#l_XINIT\n");
+  fprintf (of, "	mov	r1,a\n");
+  fprintf (of, "	mov	a,#s_XINIT>>8\n");
+  fprintf (of, "	addc	a,#l_XINIT>>8\n");
+  fprintf (of, "	mov	r2,a\n");
+  fprintf (of, "	mov	dptr,#s_XINIT\n");
+  fprintf (of, "	mov	r0,#s_XISEG\n");
+  fprintf (of, "	mov	p2,#(s_XISEG >> 8)\n");
+  fprintf (of, "00001$:	clr	a\n");
+  fprintf (of, "	movc	a,@a+dptr\n");
+  fprintf (of, "	movx	@r0,a\n");
+  fprintf (of, "	inc	dptr\n");
+  fprintf (of, "	inc	r0\n");
+  fprintf (of, "	cjne	r0,#0,00002$\n");
+  fprintf (of, "	inc	p2\n");
+  fprintf (of, "00002$:	mov	a,dpl\n");
+  fprintf (of, "	cjne	a,ar1,00001$\n");
+  fprintf (of, "	mov	a,dph\n");
+  fprintf (of, "	cjne	a,ar2,00001$\n");
+  fprintf (of, "	mov	p2,#0xFF\n");
+  fprintf (of, ";	_mcs51_genXINIT() end\n");
+}
+
+
 /* Do CSE estimation */
 static bool cseCostEstimation (iCode *ic, iCode *pdic)
 {
@@ -200,10 +228,12 @@ PORT mcs51_port =
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",
-    "GSINIT  (CODE)",
+    /* "GSINIT  (CODE)", */ "CSEG    (CODE)",
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
-    "HOME	 (CODE)",
+    "HOME    (CODE)",
+    "XISEG   (XDATA)", // initialized xdata
+    "XINIT   (CODE)", // a code copy of xiseg
     NULL,
     NULL,
     1
@@ -225,6 +255,7 @@ PORT mcs51_port =
   _mcs51_keywords,
   _mcs51_genAssemblerPreamble,
   _mcs51_genIVT,
+  _mcs51_genXINIT,
   _mcs51_reset_regparm,
   _mcs51_regparm,
   NULL,

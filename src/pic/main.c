@@ -265,6 +265,8 @@ PORT pic_port =
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
     "HOME	 (CODE)",
+    NULL, // xidata
+    NULL, // xinit
     NULL,
     NULL,
     1
@@ -286,6 +288,7 @@ PORT pic_port =
   _pic14_keywords,
   _pic14_genAssemblerPreamble,
   _pic14_genIVT,
+  NULL, // _pic14_genXINIT
   _pic14_reset_regparm,
   _pic14_regparm,
   NULL,

@@ -291,10 +291,12 @@ PORT ds390_port =
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",
-    "GSINIT  (CODE)",
+    /* "GSINIT  (CODE)", */ "CSEG    (CODE)",
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
-    "HOME	 (CODE)",
+    "HOME    (CODE)",
+    NULL, // xidata
+    NULL, // xinit
     NULL,
     NULL,
     1
@@ -316,6 +318,7 @@ PORT ds390_port =
   _ds390_keywords,
   _ds390_genAssemblerPreamble,
   _ds390_genIVT,
+  NULL, // _ds390_genXINIT
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,

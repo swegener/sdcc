@@ -3482,6 +3482,7 @@ static void genSkipCond(resolvedIfx *rifx,operand *op, int offset, int bit)
   rifx->generated = 1;
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* genChkZeroes :- greater or less than comparison                 */
 /*     For each byte in a literal that is zero, inclusive or the   */
@@ -3508,6 +3509,7 @@ static int genChkZeroes(operand *op, int lit,  int size)
 
   return (flag==0);
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genCmp :- greater or less than comparison                       */
@@ -3550,7 +3552,6 @@ static void genCmp (operand *left,operand *right,
     } else {
 
       symbol *lbl  = newiTempLabel(NULL);
-      int flag;
       int emitFinalCheck=1;
       symbol *truelbl  = newiTempLabel(NULL);
 
@@ -3616,7 +3617,6 @@ static void genCmp (operand *left,operand *right,
 	/* special cases */
 
 	if(sign) {
-	  unsigned int mlit = -lit;
 
 	  if(lit == 0) {
 	    genSkipCond(&rIfx,left,size,7);
@@ -3865,7 +3865,6 @@ static void genCmp (operand *left,operand *right,
 
 
 	  if(sign) {
-	    int mlit = -lit;
 	    int lp1 = lit+1;
 
 	    size--;

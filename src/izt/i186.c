@@ -175,6 +175,8 @@ PORT i186_port = {
         ".DATA",
         ".TEXT",
         ".TEXT",
+	NULL, // xidata
+	NULL, // xinit
         NULL,
         NULL,
         1
@@ -196,6 +198,7 @@ PORT i186_port = {
     _i186_keywords,
     _i186_genAssemblerPreamble,
     _i186_genIVT ,
+    NULL, // _i186_genXINIT
     _i186_reset_regparm,
     _i186_regparm,
     NULL,

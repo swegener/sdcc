@@ -1331,14 +1331,14 @@ valShift (value * lval, value * rval, int lr)
   if (SPEC_USIGN (val->type))
     {
       SPEC_CVAL (val->type).v_ulong = lr ?
-	(TYPE_UDWORD) floatFromVal (lval) << (TYPE_UDWORD) floatFromVal (rval) : \
-	(TYPE_UDWORD) floatFromVal (lval) >> (TYPE_UDWORD) floatFromVal (rval);
+	(TYPE_UDWORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
+	(TYPE_UDWORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
     }
   else
     {
       SPEC_CVAL (val->type).v_long = lr ?
-	(TYPE_DWORD) floatFromVal (lval) << (TYPE_UDWORD) floatFromVal (rval) : \
-	(TYPE_DWORD) floatFromVal (lval) >> (TYPE_UDWORD) floatFromVal (rval);
+	(TYPE_DWORD) floatFromVal (lval) << (TYPE_UWORD) floatFromVal (rval) : \
+	(TYPE_DWORD) floatFromVal (lval) >> (TYPE_UWORD) floatFromVal (rval);
     }
   return cheapestVal(val);
 }

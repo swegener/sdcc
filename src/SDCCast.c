@@ -159,7 +159,7 @@ newIfxNode (ast * condAst, symbol * trueLabel, symbol * falseLabel)
 /*-----------------------------------------------------------------*/
 /* copyAstValues - copies value portion of ast if needed     */
 /*-----------------------------------------------------------------*/
-void 
+void
 copyAstValues (ast * dest, ast * src)
 {
   switch (src->opval.op)
@@ -184,7 +184,7 @@ copyAstValues (ast * dest, ast * src)
     case ARRAYINIT:
 	dest->values.constlist = copyLiteralList(src->values.constlist);
 	break;
-	
+
     case FOR:
       AST_FOR (dest, trueLabel) = copySymbol (AST_FOR (src, trueLabel));
       AST_FOR (dest, continueLabel) = copySymbol (AST_FOR (src, continueLabel));
@@ -201,7 +201,7 @@ copyAstValues (ast * dest, ast * src)
 /* copyAst - makes a copy of a given astession                     */
 /*-----------------------------------------------------------------*/
 ast *
-copyAst (ast * src) 
+copyAst (ast * src)
 {
   ast *dest;
 
@@ -258,24 +258,24 @@ ast *removeIncDecOps (ast * tree) {
   if (!tree)
     return NULL;
 
-  if (tree->type == EX_OP && 
+  if (tree->type == EX_OP &&
       (tree->opval.op == INC_OP || tree->opval.op == DEC_OP)) {
     if (tree->left)
       tree=tree->left;
-    else 
+    else
       tree=tree->right;
   }
 
   tree->left=removeIncDecOps(tree->left);
   tree->right=removeIncDecOps(tree->right);
- 
+
  return tree;
 }
 
 /*-----------------------------------------------------------------*/
 /* hasSEFcalls - returns TRUE if tree has a function call          */
 /*-----------------------------------------------------------------*/
-bool 
+bool
 hasSEFcalls (ast * tree)
 {
   if (!tree)
@@ -555,7 +555,7 @@ funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
 	    args = args->next = newValue ();
 	}
     }
-    
+
     /* save it */
     addSymChain (sym);
     sym->cdef = 1;
@@ -567,7 +567,7 @@ funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
 /*-----------------------------------------------------------------*/
 /* reverseParms - will reverse a parameter tree                    */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 reverseParms (ast * ptree)
 {
   ast *ttree;
@@ -658,7 +658,7 @@ processParms (ast * func,
       if (IS_INTEGRAL (ftype)
 	  && (getSize (ftype) < (unsigned) INTSIZE))
 	{
-	  if (IS_AST_OP(actParm) && 
+	  if (IS_AST_OP(actParm) &&
 	      (actParm->opval.op == LEFT_OP ||
 	       actParm->opval.op == '*' ||
 	       actParm->opval.op == '+' ||
@@ -1015,7 +1015,7 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
     /* if type is SPECIFIER */
   if (IS_SPEC (type))
     rast = createIvalType (sym, type, ilist);
-  
+
   if (wid)
     return decorateType (resolveSymbols (newNode (NULLOP, wid, rast)));
   else
@@ -1777,7 +1777,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 /* if the for loop is reversible. If yes will set the value of     */
 /* the loop control var & init value & termination value           */
 /*-----------------------------------------------------------------*/
-bool 
+bool
 isLoopReversible (ast * loop, symbol ** loopCntrl,
 		  ast ** init, ast ** end)
 {
@@ -1861,10 +1861,10 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 		   newNode ('=',
 			    newAst_VALUE (symbolVal (sym)),
 			    end));
-  
+
   replLoopSym (loop->left, sym);
   setAstLineno (rloop, init->lineno);
-  
+
   rloop = newNode (NULLOP,
 		   newNode ('=',
 			    newAst_VALUE (symbolVal (sym)),
@@ -1877,14 +1877,63 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 							   newAst_VALUE (symbolVal (sym)),
 							   newAst_VALUE (constVal ("1"))),
 						  rloop))));
-  
+
   rloop->lineno=init->lineno;
   return decorateType (rloop);
-  
+
 }
 
 /*-----------------------------------------------------------------*/
-/* decorateType - compute type for this tree also does type cheking */
+/* searchLitOp - search tree (*ops only) for an ast with literal */
+/*-----------------------------------------------------------------*/
+static ast *
+searchLitOp (ast *tree, ast **parent, const char *ops)
+{
+  ast *ret;
+
+  if (tree && optimize.global_cse)
+    {
+      /* is there a literal operand? */
+      if (tree->right &&
+          IS_AST_OP(tree->right) &&
+          tree->right->right &&
+          (tree->right->opval.op == ops[0] || tree->right->opval.op == ops[1]))
+	{
+	  if (IS_LITERAL (RTYPE (tree->right)) ^
+	      IS_LITERAL (LTYPE (tree->right)))
+	    {
+	      tree->right->decorated = 0;
+	      tree->decorated = 0;
+	      *parent = tree;
+	      return tree->right;
+	    }
+	  ret = searchLitOp (tree->right, parent, ops);
+	  if (ret)
+	    return ret;
+        }
+      if (tree->left &&
+          IS_AST_OP(tree->left) &&
+          tree->left->right &&
+	  (tree->left->opval.op == ops[0] || tree->left->opval.op == ops[1]))
+	{
+	  if (IS_LITERAL (RTYPE (tree->left)) ^
+	      IS_LITERAL (LTYPE (tree->left)))
+	    {
+	      tree->left->decorated = 0;
+	      tree->decorated = 0;
+	      *parent = tree;
+	      return tree->left;
+	    }
+	  ret = searchLitOp (tree->left, parent, ops);
+	  if (ret)
+	    return ret;
+	}
+    }
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* decorateType - compute type for this tree also does type checking */
 /*          this is done bottom up, since type have to flow upwards */
 /*          it also does constant folding, and paramater checking  */
 /*-----------------------------------------------------------------*/
@@ -2163,7 +2212,7 @@ decorateType (ast * tree)
             TRVAL (tree) = 0;
             tree->type = EX_VALUE;
             tree->left = NULL;
-            tree->right = NULL;          
+            tree->right = NULL;
         }
 
       return tree;
@@ -2233,6 +2282,31 @@ decorateType (ast * tree)
 	    computeType (LTYPE (tree), RTYPE (tree));
 	  TETYPE (tree) = getSpec (TTYPE (tree));
 
+          /* if left is a literal exchange left & right */
+          if (IS_LITERAL (LTYPE (tree)))
+	    {
+	      ast *tTree = tree->left;
+	      tree->left = tree->right;
+	      tree->right = tTree;
+	    }
+
+	  /* if right is a literal and */
+	  /* we can find a 2nd literal in a and-tree then */
+	  /* rearrange the tree */
+	  if (IS_LITERAL (RTYPE (tree)))
+	    {
+	      ast *parent;
+	      ast *litTree = searchLitOp (tree, &parent, "&");
+	      if (litTree)
+		{
+	          ast *tTree = litTree->left;
+	          litTree->left = tree->right;
+	          tree->right = tTree;
+	          /* both operands in tTree are literal now */
+	          decorateType (parent);
+		}
+	    }
+
 	  LRVAL (tree) = RRVAL (tree) = 1;
 	  return tree;
 	}
@@ -2299,10 +2373,10 @@ decorateType (ast * tree)
       LLVAL (tree) = 1;
       TLVAL (tree) = 1;
 
-      #if 0      
+      #if 0
       if (IS_AST_OP (tree->left) && tree->left->opval.op == PTR_OP
           && IS_AST_VALUE (tree->left->left) && !IS_AST_SYM_VALUE (tree->left->left))
-        {  
+        {
           symbol *element = getStructElement (SPEC_STRUCT (LETYPE(tree->left)),
 				      AST_SYMBOL(tree->left->right));
 	  AST_VALUE(tree) = valPlus(AST_VALUE(tree->left->left),
@@ -2313,7 +2387,7 @@ decorateType (ast * tree)
 	  tree->values.literalFromCast = 1;
         }
       #endif
-      
+
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2328,6 +2402,31 @@ decorateType (ast * tree)
 	  return decorateType (wtree);
 	// fall through
       }
+
+      /* if left is a literal exchange left & right */
+      if (IS_LITERAL (LTYPE (tree)))
+	{
+	  ast *tTree = tree->left;
+	  tree->left = tree->right;
+	  tree->right = tTree;
+	}
+
+      /* if right is a literal and */
+      /* we can find a 2nd literal in a or-tree then */
+      /* rearrange the tree */
+      if (IS_LITERAL (RTYPE (tree)))
+	{
+	  ast *parent;
+	  ast *litTree = searchLitOp (tree, &parent, "|");
+	  if (litTree)
+	    {
+	      ast *tTree = litTree->left;
+	      litTree->left = tree->right;
+	      tree->right = tTree;
+	      /* both operands in tTree are literal now */
+	      decorateType (parent);
+	    }
+        }
       /*------------------------------------------------------------------*/
       /*----------------------------*/
       /*  bitwise xor               */
@@ -2357,6 +2456,32 @@ decorateType (ast * tree)
 	  TTYPE (tree) = tree->opval.val->type;
 	  return tree;
 	}
+
+      /* if left is a literal exchange left & right */
+      if (IS_LITERAL (LTYPE (tree)))
+	{
+	  ast *tTree = tree->left;
+	  tree->left = tree->right;
+	  tree->right = tTree;
+	}
+
+      /* if right is a literal and */
+      /* we can find a 2nd literal in a xor-tree then */
+      /* rearrange the tree */
+      if (IS_LITERAL (RTYPE (tree)))
+	{
+	  ast *parent;
+	  ast *litTree = searchLitOp (tree, &parent, "^");
+	  if (litTree)
+	    {
+	      ast *tTree = litTree->left;
+	      litTree->left = tree->right;
+	      tree->right = tTree;
+	      /* both operands in litTree are literal now */
+	      decorateType (parent);
+	    }
+        }
+
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
@@ -2384,10 +2509,43 @@ decorateType (ast * tree)
 				   tree->opval.val->type);
 	  return tree;
 	}
+
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree)));
+
+      /* if right is a literal and */
+      /* left is also a division by a literal then */
+      /* rearrange the tree */
+      if (IS_LITERAL (RTYPE (tree))
+          /* avoid infinite loop */
+          && (TYPE_UDWORD) floatFromVal (tree->right->opval.val) != 1)
+	{
+	  ast *parent;
+	  ast *litTree = searchLitOp (tree, &parent, "/");
+	  if (litTree)
+	    {
+	      if (IS_LITERAL (RTYPE (litTree)))
+		{
+		  /* foo_div */
+		  litTree->right = newNode ('*', litTree->right, tree->right);
+		  litTree->right->lineno = tree->lineno;
+
+		  tree->right->opval.val = constVal ("1");
+		  decorateType (parent);
+		}
+	      else
+		{
+		  /* litTree->left is literal: no gcse possible.
+		     We can't call decorateType(parent), because
+		     this would cause an infinit loop. */
+		  parent->decorated = 1;
+		  decorateType (litTree);
+		}
+	    }
+	}
+
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2482,6 +2640,23 @@ decorateType (ast * tree)
 	  tree->right = tTree;
 	}
 
+      /* if right is a literal and */
+      /* we can find a 2nd literal in a mul-tree then */
+      /* rearrange the tree */
+      if (IS_LITERAL (RTYPE (tree)))
+	{
+	  ast *parent;
+	  ast *litTree = searchLitOp (tree, &parent, "*");
+	  if (litTree)
+	    {
+	      ast *tTree = litTree->left;
+	      litTree->left = tree->right;
+	      tree->right = tTree;
+	      /* both operands in litTree are literal now */
+	      decorateType (parent);
+	    }
+        }
+
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
@@ -2572,6 +2747,46 @@ decorateType (ast * tree)
 	  ast *tTree = tree->left;
 	  tree->left = tree->right;
 	  tree->right = tTree;
+	}
+
+      /* if right is a literal and */
+      /* left is also an addition/subtraction with a literal then */
+      /* rearrange the tree */
+      if (IS_LITERAL (RTYPE (tree)))
+	{
+	  ast *litTree, *parent;
+	  litTree = searchLitOp (tree, &parent, "+-");
+	  if (litTree)
+	    {
+	      if (litTree->opval.op == '+')
+	        {
+		  /* foo_aa */
+		  ast *tTree = litTree->left;
+		  litTree->left = tree->right;
+		  tree->right = tree->left;
+		  tree->left = tTree;
+		}
+	      else if (litTree->opval.op == '-')
+		{
+		  if (IS_LITERAL (RTYPE (litTree)))
+		    {
+		      /* foo_asr */
+		      ast *tTree = litTree->left;
+		      litTree->left = tree->right;
+		      tree->right = tTree;
+		    }
+		  else
+		    {
+		      /* foo_asl */
+		      ast *tTree = litTree->right;
+		      litTree->right = tree->right;
+		      tree->right = tTree;
+		      litTree->opval.op = '+';
+		      tree->opval.op = '-';
+		    }
+		}
+	      decorateType (parent);
+	    }
 	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
@@ -2682,12 +2897,54 @@ decorateType (ast * tree)
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 computeType (LTYPE (tree),
 					      RTYPE (tree)));
+
       LRVAL (tree) = RRVAL (tree) = 1;
+
+      /* if right is a literal and */
+      /* left is also an addition/subtraction with a literal then */
+      /* rearrange the tree */
+      if (IS_LITERAL (RTYPE (tree))
+          /* avoid infinite loop */
+          && (TYPE_UDWORD) floatFromVal (tree->right->opval.val) != 0)
+	{
+	  ast *litTree, *litParent;
+	  litTree = searchLitOp (tree, &litParent, "+-");
+	  if (litTree)
+	    {
+	      if (litTree->opval.op == '+')
+	        {
+		  /* foo_sa */
+		  litTree->right = newNode ('-', litTree->right, tree->right);
+		  litTree->right->lineno = tree->lineno;
+
+		  tree->right->opval.val = constVal ("0");
+		}
+	      else if (litTree->opval.op == '-')
+		{
+		  if (IS_LITERAL (RTYPE (litTree)))
+		    {
+		      /* foo_ssr */
+		      litTree->right = newNode ('+', tree->right, litTree->right);
+		      litTree->right->lineno = tree->lineno;
+
+		      tree->right->opval.val = constVal ("0");
+		    }
+		  else
+		    {
+		      /* foo_ssl */
+		      ast *tTree = litTree->right;
+		      litTree->right = tree->right;
+		      tree->right = tTree;
+		    }
+		}
+	      decorateType (litParent);
+	    }
+	}
       return tree;
 
       /*------------------------------------------------------------------*/
       /*----------------------------*/
-      /*    compliment              */
+      /*    complement              */
       /*----------------------------*/
     case '~':
       /* can be only integral type */
@@ -2818,7 +3075,7 @@ decorateType (ast * tree)
 	  werror (E_CAST_ILLEGAL);
 	  goto errorTreeReturn;
 	}
-      
+
       /* make sure the type is complete and sane */
       checkTypeSanity(LETYPE(tree), "(cast)");
 
@@ -2865,7 +3122,7 @@ decorateType (ast * tree)
       if (IS_ADDRESS_OF_OP(tree->right)
           && IS_AST_SYM_VALUE (tree->right->left)
           && SPEC_ABSA (AST_SYMBOL (tree->right->left)->etype)) {
-	    
+
         tree->type = EX_VALUE;
 	tree->opval.val =
 	  valCastLiteral (LTYPE (tree),
@@ -2877,22 +3134,22 @@ decorateType (ast * tree)
 	tree->values.literalFromCast = 1;
         return tree;
       }
-      
+
       /* handle offsetof macro:            */
       /* #define offsetof(TYPE, MEMBER) \  */
-      /* ((unsigned) &((TYPE *)0)->MEMBER) */      
+      /* ((unsigned) &((TYPE *)0)->MEMBER) */
       if (IS_ADDRESS_OF_OP(tree->right)
           && IS_AST_OP (tree->right->left)
           && tree->right->left->opval.op == PTR_OP
           && IS_AST_OP (tree->right->left->left)
           && tree->right->left->left->opval.op == CAST
           && IS_AST_LIT_VALUE(tree->right->left->left->right)) {
-            
+
         symbol *element = getStructElement (
           SPEC_STRUCT (LETYPE(tree->right->left)),
 	  AST_SYMBOL(tree->right->left->right)
         );
-	
+
         if (element) {
           tree->type = EX_VALUE;
 	  tree->opval.val = valCastLiteral (
@@ -2900,7 +3157,7 @@ decorateType (ast * tree)
 	    element->offset
             + floatFromVal (valFromType (RETYPE (tree->right->left->left)))
           );
-        
+
 	  TTYPE (tree) = tree->opval.val->type;
           TETYPE (tree) = getSpec (TTYPE (tree));
 	  tree->left = NULL;
@@ -2908,7 +3165,7 @@ decorateType (ast * tree)
           return tree;
         }
       }
-      
+
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree))) {
         if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)) ) {
@@ -2963,8 +3220,8 @@ decorateType (ast * tree)
       }
       TTYPE (tree) = LTYPE (tree);
       LRVAL (tree) = 1;
-      
-#endif      
+
+#endif
       TETYPE (tree) = getSpec (TTYPE (tree));
 
       return tree;
@@ -3029,7 +3286,7 @@ decorateType (ast * tree)
       /* if they are pointers they must be castable */
       if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)))
 	{
-	  if (tree->opval.op==EQ_OP && 
+	  if (tree->opval.op==EQ_OP &&
 	      !IS_GENPTR(LTYPE(tree)) && IS_GENPTR(RTYPE(tree))) {
 	    // we cannot cast a gptr to a !gptr: switch the leaves
 	    struct ast *s=tree->left;
@@ -4553,7 +4810,7 @@ skipall:
   addSet (&operKeyReset, name);
   applyToSet (operKeyReset, resetParmKey);
 
-  if (options.debug)    
+  if (options.debug)
     cdbStructBlock(1);
 
   cleanUpLevel (LabelTab, 0);
@@ -4573,7 +4830,7 @@ skipall:
 
 void ast_print (ast * tree, FILE *outfile, int indent)
 {
-	
+
 	if (!tree) return ;
 
 	/* can print only decorated trees */
@@ -4586,7 +4843,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"ERROR_NODE(%p)\n",tree);
 	}
 
-	
+
 	/* print the line          */
 	/* if not block & function */
 	if (tree->type == EX_OP &&
@@ -4594,11 +4851,11 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 	     tree->opval.op != BLOCK &&
 	     tree->opval.op != NULLOP)) {
 	}
-	
+
 	if (tree->opval.op == FUNCTION) {
 	        int arg=0;
 		value *args=FUNC_ARGS(tree->left->opval.val->type);
-		fprintf(outfile,"FUNCTION (%s=%p) type (", 
+		fprintf(outfile,"FUNCTION (%s=%p) type (",
 			tree->left->opval.val->name, tree);
 		printTypeChain (tree->left->opval.val->type->next,outfile);
 		fprintf(outfile,") args (");
@@ -4625,8 +4882,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 				decls->name, decls);
 			printTypeChain(decls->type,outfile);
 			fprintf(outfile,")\n");
-			
-			decls = decls->next;			
+
+			decls = decls->next;
 		}
 		ast_print(tree->right,outfile,indent+2);
 		INDENT(indent,outfile);
@@ -4686,7 +4943,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 
 
 	/* depending on type of operator do */
-	
+
 	switch (tree->opval.op) {
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4746,7 +5003,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/*----------------------------*/
 		/*  bitwise and               */
 		/*----------------------------*/
-	case '&':			
+	case '&':
 		if (tree->right) {
 			fprintf(outfile,"& (%p) type (",tree);
 			printTypeChain(tree->ftype,outfile);
@@ -4782,7 +5039,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		ast_print(tree->left,outfile,indent+2);
 		ast_print(tree->right,outfile,indent+2);
 		return ;
-		
+
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
 		/*  division                  */

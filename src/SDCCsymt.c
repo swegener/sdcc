@@ -1509,8 +1509,7 @@ computeType (sym_link * type1, sym_link * type2)
 #endif
 
   /* if either of them unsigned but not val then make this unsigned */
-  if (((/*!IS_LITERAL(type1) &&*/ SPEC_USIGN (etype1)) ||
-       (/*!IS_LITERAL(type2) &&*/ SPEC_USIGN (etype2))) &&
+  if ((SPEC_USIGN (etype1) || SPEC_USIGN (etype2)) &&
       !IS_FLOAT (reType))
     SPEC_USIGN (reType) = 1;
   else

@@ -949,6 +949,124 @@ algebraicOpts (iCode * ic)
 	  IC_LEFT (ic) = NULL;
 	  SET_ISADDR (IC_RESULT (ic), 0);
 	}
+      break;
+    case BITWISEAND:
+      if (IS_OP_LITERAL (IC_LEFT (ic)))
+        {
+	  /* if BITWISEAND then check if one of them is a zero */
+	  /* if yes turn it into 0 assignment */
+	  if (operandLitValue (IC_LEFT (ic)) == 0.0)
+	    {
+	      if (IS_OP_VOLATILE (IC_RIGHT (ic)))
+	        return;
+	      ic->op = '=';
+	      IC_RIGHT (ic) = IC_LEFT (ic);
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	  /* if BITWISEAND then check if one of them is 0xff... */
+	  /* if yes turn it into assignment */
+	  if (operandLitValue (IC_LEFT (ic)) == -1.0)
+	    {
+	      ic->op = '=';
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	}
+      if (IS_OP_LITERAL (IC_RIGHT (ic)))
+        {
+	  /* if BITWISEAND then check if one of them is a zero */
+	  /* if yes turn it into 0 assignment */
+	  if (operandLitValue (IC_RIGHT (ic)) == 0.0)
+	    {
+	      if (IS_OP_VOLATILE (IC_LEFT (ic)))
+	        return;
+	      ic->op = '=';
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	  /* if BITWISEAND then check if one of them is 0xff... */
+	  /* if yes turn it into assignment */
+	  if (operandLitValue (IC_RIGHT (ic)) == -1.0)
+	    {
+	      ic->op = '=';
+	      IC_RIGHT (ic) = IC_LEFT (ic);
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	}
+      break;
+    case '|':
+      if (IS_OP_LITERAL (IC_LEFT (ic)))
+        {
+	  /* if BITWISEOR then check if one of them is a zero */
+	  /* if yes turn it into assignment */
+	  if (operandLitValue (IC_LEFT (ic)) == 0.0)
+	    {
+	      ic->op = '=';
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	  /* if BITWISEOR then check if one of them is 0xff... */
+	  /* if yes turn it into 0xff... assignment */
+	  if (operandLitValue (IC_LEFT (ic)) == -1.0)
+	    {
+	      ic->op = '=';
+	      IC_RIGHT (ic) = IC_LEFT (ic);
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	}
+      if (IS_OP_LITERAL (IC_RIGHT (ic)))
+        {
+	  /* if BITWISEOR then check if one of them is a zero */
+	  /* if yes turn it into assignment */
+	  if (operandLitValue (IC_RIGHT (ic)) == 0.0)
+	    {
+	      ic->op = '=';
+	      IC_RIGHT (ic) = IC_LEFT (ic);
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	  /* if BITWISEOR then check if one of them is 0xff... */
+	  /* if yes turn it into 0xff... assignment */
+	  if (operandLitValue (IC_RIGHT (ic)) == -1.0)
+	    {
+	      ic->op = '=';
+	      IC_LEFT (ic) = NULL;
+	      SET_RESULT_RIGHT (ic);
+	      return;
+	    }
+	}
+      break;
+    case '^':
+      /* if XOR then check if one of them is a zero */
+      /* if yes turn it into assignment */
+      if (IS_OP_LITERAL (IC_LEFT (ic)) &&
+	  operandLitValue (IC_LEFT (ic)) == 0.0)
+	{
+	  ic->op = '=';
+	  IC_LEFT (ic) = NULL;
+	  SET_RESULT_RIGHT (ic);
+	  return;
+	}
+      if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
+	  operandLitValue (IC_RIGHT (ic)) == 0.0)
+	{
+	  ic->op = '=';
+	  IC_RIGHT (ic) = IC_LEFT (ic);
+	  IC_LEFT (ic) = NULL;
+	  SET_RESULT_RIGHT (ic);
+	  return;
+	}
+      break;
     }
 
   return;
@@ -957,7 +1075,7 @@ algebraicOpts (iCode * ic)
 /*-----------------------------------------------------------------*/
 /* updateSpillLocation - keeps track of register spill location    */
 /*-----------------------------------------------------------------*/
-void 
+void
 updateSpillLocation (iCode * ic, int induction)
 {
 	sym_link *setype;

@@ -1,5 +1,6 @@
 2003-07-14  Bernhard Held <bernhard@bernhardheld.de>
 
+        * src/SDCCcse.c (algebraicOpts): CSE fun with &|^ and 0x00/0xff literals
 	pic16 progress by Vangelis:
 	* src/SDCCglobl.h:
 	* src/SDCCmain.c:

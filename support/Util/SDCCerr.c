@@ -32,7 +32,7 @@
 static struct {
     ERROR_LOG_LEVEL logLevel;
     FILE *out;
-	int style; // 1=MSVC
+    int style; /* 1=MSVC */
 } _SDCCERRG;
 
 extern char *filename ;
@@ -463,7 +463,7 @@ void vwerror (int errNum, va_list marker)
         fprintf(_SDCCERRG.out, "\n");
     }
     else {
-        // Below the logging level, drop.
+        /* Below the logging level, drop. */
     }
 }
 /*
@@ -473,12 +473,12 @@ werror - Output a standard eror message with variable number of arguements
 -------------------------------------------------------------------------------
 */
 
-void werror (int errNum, ... )
+void werror (int errNum, ...)
 {
-    va_list	marker;
+    va_list marker;
     va_start(marker,errNum);
     vwerror(errNum, marker);
-    va_end( marker );
+    va_end(marker);
 }
 
 
@@ -488,12 +488,12 @@ fatal - Output a standard eror message with variable number of arguements and
         call exit()
 -------------------------------------------------------------------------------
 */
-void fatal (int exitCode, int errNum, ... )
+void fatal (int exitCode, int errNum, ...)
 {
-    va_list	marker;
+    va_list marker;
     va_start(marker,errNum);
     vwerror(errNum, marker);
-    va_end( marker );
+    va_end(marker);
 
     exit(exitCode);
 }
@@ -506,5 +506,5 @@ style - Change the output error style to MSVC
 
 void    MSVC_style (int style)
 {
-	_SDCCERRG.style=style;
+    _SDCCERRG.style = style;
 }

@@ -344,14 +344,8 @@ print_line (special_flags)
     putc ('\n', print.outf);
   print.printed = 0;
 
-  /* SDCC likes #line, not # number. Should be fixed... */
-#if 0  
   fprintf (print.outf, "# %u \"%s\"%s%s\n",
 	   print.lineno, print.last_fname, special_flags, print.syshdr_flags);
-#else
-  fprintf (print.outf, "#line %u \"%s\"%s%s\n",
-	   print.lineno, print.last_fname, special_flags, print.syshdr_flags);
-#endif	   
 }
 
 /* Callbacks.  */

@@ -54,61 +54,10 @@ t_uc89c51r::t_uc89c51r(int Itype, int Itech, class cl_sim *asim):
 
 
 void
-<<<<<<< uc89c51r.cc
-t_uc89c51r::reset(void)
-{
-  t_uc51r::reset();
-  mem(MEM_SFR)->set_bit1(CCAPM0, bmECOM);
-  mem(MEM_SFR)->set_bit1(CCAPM1, bmECOM);
-  mem(MEM_SFR)->set_bit1(CCAPM2, bmECOM);
-  mem(MEM_SFR)->set_bit1(CCAPM3, bmECOM);
-  mem(MEM_SFR)->set_bit1(CCAPM4, bmECOM);
-  t0_overflows= 0;
-  dpl0= dph0= dpl1= dph1= 0;
-  set_mem(MEM_SFR, IPH, 0);
-}
-
-void
-t_uc89c51r::proc_write(uchar *addr)
-=======
 t_uc89c51r::mk_hw_elements(void)
->>>>>>> 1.2.2.3
 {
-<<<<<<< uc89c51r.cc
-  t_uc51r::proc_write(addr);
-
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP0L]))
-    mem(MEM_SFR)->set_bit0(CCAPM0, bmECOM);
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP0H]))
-    mem(MEM_SFR)->set_bit1(CCAPM0, bmECOM);
-
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP1L]))
-    mem(MEM_SFR)->set_bit0(CCAPM1, bmECOM);
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP1H]))
-    mem(MEM_SFR)->set_bit1(CCAPM1, bmECOM);
-
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP2L]))
-    mem(MEM_SFR)->set_bit0(CCAPM2, bmECOM);
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP2H]))
-    mem(MEM_SFR)->set_bit1(CCAPM2, bmECOM);
-
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP3L]))
-    mem(MEM_SFR)->set_bit0(CCAPM3, bmECOM);
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP3H]))
-    mem(MEM_SFR)->set_bit1(CCAPM3, bmECOM);
-
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP4L]))
-    mem(MEM_SFR)->set_bit0(CCAPM4, bmECOM);
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[CCAP4H]))
-    mem(MEM_SFR)->set_bit1(CCAPM4, bmECOM);
-=======
   class cl_hw *h;
->>>>>>> 1.2.2.3
 
-<<<<<<< uc89c51r.cc
-  if (addr == &(/*MEM(MEM_SFR)*/sfr->umem8[AUXR]))
-    mem(MEM_SFR)->set_bit0(AUXR, 0x04);
-=======
   t_uc51r::mk_hw_elements();
   hws->add(h= new cl_pca(this, 0));
   h->init();
@@ -122,7 +71,6 @@ t_uc89c51r::mk_hw_elements(void)
   h->init();*/
   hws->add(h= new cl_89c51r_dummy_hw(this));
   h->init();
->>>>>>> 1.2.2.3
 }
 
 
@@ -192,92 +140,17 @@ t_uc89c51r::post_inst(void)
 
 
 /*
-<<<<<<< uc89c51r.cc
- * Simulating timers
- *
- * Calling inherited method to simulate timer #0, #1, #2 and then 
- * simulating Programmable Counter Array
-=======
->>>>>>> 1.2.2.3
  */
 
-int
-t_uc89c51r::do_timers(int cycles)
-{
-  int res;
-
-<<<<<<< uc89c51r.cc
-  if ((res= t_uc51r::do_timers(cycles)) != resGO)
-    return(res);
-  return(do_pca(cycles));
-}
-=======
 cl_89c51r_dummy_hw::cl_89c51r_dummy_hw(class cl_uc *auc):
   cl_hw(auc, HW_DUMMY, 0, "_89c51r_dummy")
 {}
->>>>>>> 1.2.2.3
 
 int
-<<<<<<< uc89c51r.cc
-t_uc89c51r::t0_overflow(void)
-=======
 cl_89c51r_dummy_hw::init(void)
->>>>>>> 1.2.2.3
 {
-<<<<<<< uc89c51r.cc
-  uchar cmod= get_mem(MEM_SFR, CMOD) & (bmCPS0|bmCPS1);
-
-  if (cmod == bmCPS1)
-    t0_overflows++;
-  return(0);
-}
-
-
-/*
- * Simulating Programmable Counter Array
- */
-
-int
-t_uc89c51r::do_pca(int cycles)
-{
-  int ret= resGO;
-  uint ccon= get_mem(MEM_SFR, CCON);
-
-  if (!(ccon & bmCR))
-    return(resGO);
-  if (state == stIDLE &&
-      (ccon & bmCIDL))
-    return(resGO);
-
-  switch (get_mem(MEM_SFR, CMOD) & (bmCPS1|bmCPS0))
-    {
-    case 0:
-      ret= do_pca_counter(cycles);
-      break;
-    case bmCPS0:
-      ret= do_pca_counter(cycles*3);
-      break;
-    case bmCPS1:
-      ret= do_pca_counter(t0_overflows);
-      t0_overflows= 0;
-      break;
-    case (bmCPS0|bmCPS1):
-      if ((prev_p1 & bmECI) != 0 &
-	  (get_mem(MEM_SFR, P1) & bmECI) == 0)
-	do_pca_counter(1);
-      break;
-    }
-  return(ret);
-}
-
-int
-t_uc89c51r::do_pca_counter(int cycles)
-{
-  while (cycles--)
-=======
   class cl_mem *sfr= uc->mem(MEM_SFR);
   if (!sfr)
->>>>>>> 1.2.2.3
     {
       fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
     }

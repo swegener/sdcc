@@ -218,13 +218,6 @@ public:
   class cl_bitmap *bp_map;
   class cl_bitmap *inst_map;
 public:
-<<<<<<< memcl.h
-  cl_rom(t_addr asize, int awidth);
-  ~cl_rom(void);
-};
-
-/* New type */
-=======
   cl_rom(t_addr asize, int awidth, class cl_uc *auc);
   virtual ~cl_rom(void);
 };*/
@@ -232,14 +225,7 @@ public:
 /*
  * New type of memory simulation
  */
->>>>>>> 1.4.2.2
 
-<<<<<<< memcl.h
-class cl_cell: public cl_base
-{
-public:
-  t_mem data;
-=======
 class cl_registered_cell: public cl_normal_cell
 {
 public:
@@ -278,7 +264,6 @@ public:
 
 class cl_event_cell: public cl_normal_cell
 {
->>>>>>> 1.4.2.2
 protected:
   class cl_event_handler *eh;
 public:

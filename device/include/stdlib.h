@@ -25,7 +25,7 @@
 #ifndef __SDC51_STDLIB_H
 #define __SDC51_STDLIB_H 1
 
-#ifndef
+#ifndef NULL
 # define NULL (void *)0
 #endif
 

@@ -1,3 +1,7 @@
+2004-08-12 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/glue.c: Added struct initialisation fn printIvalStruct.
+
 2004-08-11 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/gen.c,

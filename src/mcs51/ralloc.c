@@ -1220,8 +1220,8 @@ serialRegAssign (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* rUmaskForOp :- returns register mask for an operand             */
 /*-----------------------------------------------------------------*/
-static bitVect *
-rUmaskForOp (operand * op)
+bitVect *
+mcs51_rUmaskForOp (operand * op)
 {
   bitVect *rumask;
   symbol *sym;
@@ -1261,7 +1261,7 @@ regsUsedIniCode (iCode * ic)
   if (ic->op == IFX)
     {
       rmask = bitVectUnion (rmask,
-			    rUmaskForOp (IC_COND (ic)));
+			    mcs51_rUmaskForOp (IC_COND (ic)));
       goto ret;
     }
 
@@ -1269,7 +1269,7 @@ regsUsedIniCode (iCode * ic)
   if (ic->op == JUMPTABLE)
     {
       rmask = bitVectUnion (rmask,
-			    rUmaskForOp (IC_JTCOND (ic)));
+			    mcs51_rUmaskForOp (IC_JTCOND (ic)));
 
       goto ret;
     }
@@ -1277,16 +1277,16 @@ regsUsedIniCode (iCode * ic)
   /* of all other cases */
   if (IC_LEFT (ic))
     rmask = bitVectUnion (rmask,
-			  rUmaskForOp (IC_LEFT (ic)));
+			  mcs51_rUmaskForOp (IC_LEFT (ic)));
 
 
   if (IC_RIGHT (ic))
     rmask = bitVectUnion (rmask,
-			  rUmaskForOp (IC_RIGHT (ic)));
+			  mcs51_rUmaskForOp (IC_RIGHT (ic)));
 
   if (IC_RESULT (ic))
     rmask = bitVectUnion (rmask,
-			  rUmaskForOp (IC_RESULT (ic)));
+			  mcs51_rUmaskForOp (IC_RESULT (ic)));
 
 ret:
   return rmask;

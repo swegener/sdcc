@@ -58,4 +58,6 @@ extern regs regs8051[];
 
 regs *mcs51_regWithIdx (int);
 
+bitVect *mcs51_rUmaskForOp (operand * op);
+
 #endif

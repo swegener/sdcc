@@ -1460,10 +1460,10 @@ saveRegisters (iCode * lic)
       IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT (ic))))
     return;
 
-  /* find the registers in use at this time
-     and push them away to safety */
-  rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
-			 ic->rUsed);
+  /* safe the registers in use at this time but skip the
+     ones for the result */
+  rsave = bitVectCplAnd (bitVectCopy (ic->rMask), 
+			 mcs51_rUmaskForOp (IC_RESULT(ic)));
 
   ic->regsSaved = 1;
   if (options.useXstack)
@@ -1503,10 +1503,11 @@ unsaveRegisters (iCode * ic)
 {
   int i;
   bitVect *rsave;
-  /* find the registers in use at this time
-     and push them away to safety */
-  rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
-			 ic->rUsed);
+
+  /* restore the registers in use at this time but skip the
+     ones for the result */
+  rsave = bitVectCplAnd (bitVectCopy (ic->rMask), 
+			 mcs51_rUmaskForOp (IC_RESULT(ic)));
 
   if (options.useXstack)
     {
@@ -1967,7 +1968,7 @@ genPcall (iCode * ic)
   sym_link *dtype;
   symbol *rlbl = newiTempLabel (NULL);
 
-
+  D(emitcode(";", "genPCall"));
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     saveRegisters (ic);

@@ -20,8 +20,9 @@
 #       o Provides the emulators
 #   * The gbdk-lib package from gbdk.
 #       o cvs -d cvs.gbdk.sourceforge.net:/cvsroot/gbdk co gbdk-lib
-#       o Provildes mul, div, and include files for the z80 tests.
+#       o Proviles mul, div, and include files for the z80 tests.
 #   * python 1.5 or above
+#   * uCsim for the mcs51 port
 #
 # The paths below assume that sdcc, sdcc-extra, and gbdk-lib all reside in
 # the same directory.
@@ -60,7 +61,7 @@ GENERATE_CASES = generate-cases.py
 # The port name must be the same as the one used in the SDCC '-mxxx' argument.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out CVS mcs51,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 all: test-ports
 

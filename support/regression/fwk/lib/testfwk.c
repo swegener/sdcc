@@ -57,6 +57,18 @@ static void _printn(int n)
     _putchar('0' + rem);
 }
 
+#ifdef SDCC_mcs51
+union
+{
+    struct
+    {
+      int  offset;
+      char data_space;
+    } part;
+    char *p;
+} generic_p_u;
+#endif
+
 void __printf(const char *szFormat, ...) REENTRANT
 {
     va_list ap;
@@ -66,7 +78,16 @@ void __printf(const char *szFormat, ...) REENTRANT
         if (*szFormat == '%') {
             switch (*++szFormat) {
             case 's': {
+#ifdef SDCC_mcs51
+#warning Workaround bug #436344
+                char GENERIC *sz;
+
+                generic_p_u.part.data_space = va_arg (ap, char);
+                generic_p_u.part.offset     = va_arg (ap, int);
+                sz = generic_p_u.p;
+#else
                 char GENERIC *sz = va_arg(ap, char GENERIC *);
+#endif
                 while (*sz) {
                     _putchar(*sz++);
                 }

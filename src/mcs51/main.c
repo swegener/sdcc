@@ -46,6 +46,11 @@ void mcs51_assignRegisters (eBBlock **ebbs, int count);
 
 static int regParmFlg = 0; /* determine if we can register a parameter */
 
+static void _mcs51_init(void)
+{
+    asm_addTree(&asm_asxxxx_mapping);
+}
+
 static void _mcs51_reset_regparm()
 {
     regParmFlg = 0;
@@ -231,7 +236,7 @@ PORT mcs51_port = {
     {
 	1
     },
-    NULL,
+    _mcs51_init,
     _mcs51_parseOptions,
     _mcs51_finaliseOptions,
     _mcs51_setDefaultOptions,

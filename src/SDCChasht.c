@@ -25,21 +25,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <assert.h>
 #include "SDCChasht.h"
-
 
 #define DEFAULT_HTAB_SIZE 128
 
 /*-----------------------------------------------------------------*/
 /* newHashtItem - creates a new hashtable Item                     */
 /*-----------------------------------------------------------------*/
- hashtItem *newHashtItem (int key, void *item)
+static hashtItem *_newHashtItem (int key, void *pkey, void *item)
 {
     hashtItem *htip;
 
     ALLOC(htip,sizeof(hashtItem));
     
     htip->key = key ;
+    htip->pkey = pkey;
     htip->item = item;
     htip->next = NULL ;
     return htip;
@@ -64,11 +65,8 @@ hTab *newHashTable (int size)
 }
 
 
-/*-----------------------------------------------------------------*/
-/* hTabAddItem - adds an item to the hash table                    */
-/*-----------------------------------------------------------------*/
-void hTabAddItem (hTab **htab, int key, void *item )
-{   
+void hTabAddItemLong(hTab **htab, int key, void *pkey, void *item)
+{
     hashtItem *htip ;
     hashtItem *last ;
 
@@ -92,7 +90,7 @@ void hTabAddItem (hTab **htab, int key, void *item )
 	(*htab)->minKey = key ;
 
     /* create the item */
-    htip = newHashtItem (key,item);
+    htip = _newHashtItem(key, pkey, item);
 
     /* if there is a clash then goto end of chain */
     if ((last = (*htab)->table[key])) {
@@ -106,11 +104,19 @@ void hTabAddItem (hTab **htab, int key, void *item )
 }
 
 /*-----------------------------------------------------------------*/
+/* hTabAddItem - adds an item to the hash table                    */
+/*-----------------------------------------------------------------*/
+void hTabAddItem (hTab **htab, int key, void *item )
+{   
+    hTabAddItemLong(htab, key, NULL, item);
+}
+
+/*-----------------------------------------------------------------*/
 /* hTabDeleteItem - either delete an item                          */
 /*-----------------------------------------------------------------*/
 void hTabDeleteItem (hTab **htab, int key ,
-                     void *item, int action ,
-                     int (*compareFunc)(void *,void *))
+                     const void *item, DELETE_ACTION action,
+                     int (*compareFunc)(const void *, const void *))
 {
     hashtItem *htip, **htipp ;
     
@@ -134,7 +140,7 @@ void hTabDeleteItem (hTab **htab, int key ,
         htip = (*htab)->table[key];
         for (; htip; htip = htip->next) {
 	    
-            if (compareFunc ? (*compareFunc)(item,htip->item) :
+            if (compareFunc ? compareFunc(item,htip->item) :
 		(item == htip->item) ) {
                 *htipp=htip->next;
                 break;
@@ -177,7 +183,7 @@ void hTabDeleteAll(hTab * p)
 }
 
 /*-----------------------------------------------------------------*/
-/* hTabClearAll - clear all entries inthe table (does not free)    */
+/* hTabClearAll - clear all entries in the table (does not free)    */
 /*-----------------------------------------------------------------*/
 void hTabClearAll (hTab *htab)
 {
@@ -192,24 +198,91 @@ void hTabClearAll (hTab *htab)
     htab->currKey = htab->nItems = htab->maxKey = 0;
 }
 
+static const hashtItem *_findItem(hTab *htab, int key, void *item, int (*compareFunc)(void *, void *))
+{
+    hashtItem *htip;
+
+    for (htip = htab->table[key] ; htip ; htip = htip->next ) {
+	/* if a compare function is given use it */
+	if (compareFunc && compareFunc(item,htip->item))
+	    break;
+	else
+	    if (item == htip->item)
+		break;
+    }
+    return htip;
+}
+
+static const hashtItem *_findByKey(hTab *htab, int key, const void *pkey, int (*compare)(const void *, const void *))
+{
+    hashtItem *htip;
+
+    assert(compare);
+
+    if (!htab)
+	return NULL;
+    
+    for (htip = htab->table[key] ; htip ; htip = htip->next ) {
+	/* if a compare function is given use it */
+	if (compare && compare(pkey, htip->pkey))
+	    break;
+	else
+	    if (pkey == htip->pkey)
+		break;
+    }
+    return htip;
+}
+
+void *hTabFindByKey(hTab *h, int key, const void *pkey, int (*compare)(const void *, const void *))
+{
+    const hashtItem *item;
+
+    if ((item = _findByKey(h, key, pkey, compare)))
+	return item->item;
+    return NULL;
+}
+
+int hTabDeleteByKey(hTab **h, int key, const void *pkey, int (*compare)(const void *, const void *))
+{
+    hashtItem *htip, **htipp ;
+    
+    if (!(*h))
+        return 0;
+    
+    /* first check if anything exists in the slot */
+    if (! (*h)->table[key] )
+        return 0;
+    
+    /* delete specific item */
+    /* if a compare function is given then use the compare */
+    /* function to find the item, else just compare the items */
+    
+    htipp = &((*h)->table[key]);
+    htip = (*h)->table[key];
+    for (; htip; htip = htip->next) {
+	if (
+	    (compare && compare(pkey, htip->pkey)) ||
+	    pkey == htip->pkey) {
+	    *htipp=htip->next;
+	    break;
+	}
+	htipp=&(htip->next);
+    }
+    (*h)->nItems-- ;
+    
+    if (!(*h)->nItems) {
+        *h = NULL;
+    }
+    return 1;
+}
+
 /*-----------------------------------------------------------------*/
 /* hTabIsInTable - will determine if an Item is in the hasht       */
 /*-----------------------------------------------------------------*/
 int hTabIsInTable (hTab *htab, int key, 
 		   void *item , int (*compareFunc)(void *,void *))
 {
-    hashtItem *htip ;
-
-    for (htip = htab->table[key] ; htip ; htip = htip->next ) {
-	/* if a compare function is given use it */
-	if (compareFunc && (*compareFunc)(item,htip->item))
-	    break ;
-	else
-	    if (item == htip->item)
-		break;
-    }
-
-    if ( htip)
+    if (_findItem(htab, key, item, compareFunc))
 	return 1;
     return 0;
 }
@@ -368,7 +441,7 @@ hashtItem *hTabSearch (hTab *htab, int key )
 }
 
 /*-----------------------------------------------------------------*/
-/* hTabItemWithKey - returns the first item with the gievn key     */
+/* hTabItemWithKey - returns the first item with the given key     */
 /*-----------------------------------------------------------------*/
 void *hTabItemWithKey (hTab *htab, int key )
 {
@@ -394,4 +467,36 @@ void hTabAddItemIfNotP (hTab **htab, int key, void *item)
 	return ;
 
     hTabAddItem(htab,key,item);
+}
+
+/** Simple implementation of a hash table which uses
+    string (key, value) pairs.  If a key already exists in the
+    table, the newly added value will replace it.
+    This is used for the assembler token table.  The replace existing
+    condition is used to implement inheritance.
+*/
+static int _compare(const void *s1, const void *s2)
+{
+    return !strcmp(s1, s2);
+}
+
+static int _hash(const char *sz)
+{
+    /* Dumb for now */
+    return *sz;
+}
+
+void shash_add(hTab **h, const char *szKey, const char *szValue)
+{
+    int key = _hash(szKey);
+    /* First, delete any that currently exist */
+    hTabDeleteByKey(h, key, szKey, _compare);
+    /* Now add in ours */
+    hTabAddItemLong(h, key, gc_strdup(szKey), gc_strdup(szValue));
+}
+
+const char *shash_find(hTab *h, const char *szKey)
+{
+    int key = _hash(szKey);
+    return (char *)hTabFindByKey(h, key, szKey, _compare);
 }

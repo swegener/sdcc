@@ -249,4 +249,18 @@ void parseWithComma (char **,char *) ;
 */
 FILE *tempfile(void);
 
+/** Creates a duplicate of the string 'sz' a'la strdup but using
+    libgc.
+*/
+char *gc_strdup(const char *sz);
+
+/** An assert() macro that will go out through sdcc's error
+    system.
+*/
+#define wassertl(a,s)	((a) ? 0 : \
+        (werror (E_INTERNAL_ERROR,__FILE__,__LINE__, s), 0))
+
+#define wassert(a)    wassertl(a,"code generator internal error")
+
+
 #endif

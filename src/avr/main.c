@@ -37,6 +37,11 @@ static char *_avr_keywords[] =     {
 
 static int regParmFlg = 0; /* determine if we can register a parameter */
 
+static void _avr_init(void)
+{
+    asm_addTree(&asm_asxxxx_mapping);
+}
+
 static void _avr_reset_regparm()
 {
     regParmFlg = 0;
@@ -174,7 +179,7 @@ PORT avr_port = {
     {
 	1
     },
-    NULL,
+    _avr_init,
     _avr_parseOptions,
     _avr_finaliseOptions,
     _avr_setDefaultOptions,

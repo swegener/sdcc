@@ -140,8 +140,13 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 {
     symbol *sym;
     
-    if (addPublics)
-	tfprintf(map->oFile, "\t!area\n", map->sname);
+    if (addPublics) {
+	/* PENDING: special case here - should remove */
+	if (!strcmp(map->sname, DATA_NAME))
+	    tfprintf(map->oFile, "\t!areadata\n", map->sname);
+	else
+	    tfprintf(map->oFile, "\t!area\n", map->sname);
+    }
     
     /* print the area name */
     for (sym = setFirstItem (map->syms); sym;
@@ -784,7 +789,7 @@ void createInterruptVect (FILE * vFile)
 	return;
     }
     
-    tfprintf(vFile, "\t!area\n", CODE_NAME);
+    tfprintf(vFile, "\t!areacode\n", CODE_NAME);
     fprintf (vFile, "__interrupt_vect:\n");
 
     
@@ -932,7 +937,7 @@ static void emitOverlay(FILE *afile)
 		    fprintf(afile,"==.\n");
 	
 		/* allocate space */
-		tfprintf(afile, "\t!labeldef\n", sym->rname);
+		tfprintf(afile, "!labeldef\n", sym->rname);
 		tfprintf(afile, "\t!ds\n", (unsigned int)getSize (sym->type) & 0xffff);
 	    }
 	    
@@ -1132,7 +1137,7 @@ void glue ()
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; code\n");
     fprintf (asmFile, "%s", iComments2);
-    tfprintf(asmFile, "\t!area\n", port->mem.code_name);
+    tfprintf(asmFile, "\t!areacode\n", CODE_NAME);
     if (mainf && mainf->fbody) {
 	
 	/* entry point @ start of CSEG */
@@ -1182,4 +1187,12 @@ FILE *tempfile(void)
 	return NULL;
     }
     return tmpfile();
+}
+
+char *gc_strdup(const char *s)
+{
+    char *ret;
+    ALLOC_ATOMIC(ret, strlen(s)+1);
+    strcpy(ret, s);
+    return ret;
 }

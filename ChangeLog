@@ -2,6 +2,10 @@
 
         * device/include/regc515c.h: fixed #758477
         * device/lib/_gptrget.c: saving some cycles in generic pointer get
+        * device/lib/_gptrput.c: saved a few bytes
+	* my tab spacing is 8, yours too?)
+        * device/lib/_ser.c: process RX bytes earlier than TX bytes
+        * device/lib/serial.c: process RX bytes earlier than TX bytes
         
 2003-07-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

@@ -53,6 +53,7 @@ Var MUI_STARTMENUPAGE_VARIABLE
 
 ;--------------------------------
 !define MUI_ABORTWARNING
+
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "${SDCC_ROOT}\COPYING.TXT"
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "SDCC"
@@ -65,7 +66,9 @@ Var MUI_STARTMENUPAGE_VARIABLE
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
+
 !insertmacro MUI_UNPAGE_INSTFILES
+
 !insertmacro MUI_LANGUAGE "English"
 
 Name "SDCC"
@@ -76,8 +79,38 @@ ShowInstDetails show
 ShowUnInstDetails show
 
 Function .onInit
+  ;Uninstall the old version, if present
+  ReadRegStr $R0 HKLM \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" \
+  "UninstallString"
+  StrCmp $R0 "" inst
+
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "$(^Name) is already installed. $\n$\nClick `OK` to remove the \
+  previous version or `Cancel` to cancel this upgrade." \
+  IDOK uninst
+  Abort
+
+uninst:
+  ;Run the uninstaller
+  ClearErrors
+  ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
+
+  ;IfErrors no_remove_uninstaller
+  ;  ;You can either use Delete /REBOOTOK in the uninstaller or add some code
+  ;  ;here to remove to remove the uninstaller. Use a registry key to check
+  ;  ;whether the user has chosen to uninstall. If you are using an uninstaller
+  ;  ;components page, make sure all sections are uninstalled.
+  ;no_remove_uninstaller:
+
+  Goto done
+inst:
+
+  ; install the new version
   MessageBox MB_YESNO|MB_ICONQUESTION "This will install $(^Name). Do you wish to continue?" IDYES +2
   Abort
+
+done:
 FunctionEnd
 
 Section -Common
@@ -222,12 +255,6 @@ Section -INI
   WriteIniStr "$INSTDIR\sdcc.url" "InternetShortcut" "URL" "http://sdcc.sourceforge.net/"
 SectionEnd
 
-Section -AddToPath
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you want to add $INSTDIR\bin to the PATH?" IDNO +3
-    Push "$INSTDIR\bin"
-    Call AddToPath
-SectionEnd
-
 Section -PostInstall
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SDCC" "DisplayName" "SDCC"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SDCC" "UninstallString" "$INSTDIR\uninstall.exe"
@@ -238,8 +265,14 @@ Section -PostInstall
   WriteUninstaller "$INSTDIR\uninstall.exe"
 SectionEnd
 
+Section -AddToPath
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you want to add $INSTDIR\bin to the PATH?" IDNO +3
+    Push "$INSTDIR\bin"
+    Call AddToPath
+SectionEnd
 
-#### Uninstaller code ####
+
+;;;; Uninstaller code ;;;;
 
 Function un.onInit
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you sure you want to completely remove $(^Name) and all of its components?" IDYES +2
@@ -392,7 +425,7 @@ Function AddToPath
   Push $3
   Push $4
 
-  # don't add if the path doesn't exist
+  ; don't add if the path doesn't exist
   IfFileExists $0 "" AddToPath_done
 
   Call IsNT
@@ -431,8 +464,8 @@ Function AddToPath
     FileOpen $1 "$1\autoexec.bat" a
     FileSeek $1 -1 END
     FileReadByte $1 $2
-    IntCmp $2 26 0 +2 +2 # DOS EOF
-      FileSeek $1 -1 END # write over EOF
+    IntCmp $2 26 0 +2 +2 ; DOS EOF
+      FileSeek $1 -1 END ; write over EOF
     FileWrite $1 "$\r$\nSET PATH=%PATH%;$3$\r$\n"
     FileClose $1
     SetRebootFlag true
@@ -440,9 +473,9 @@ Function AddToPath
 
   AddToPath_NT:
     ReadRegStr $1 HKCU "Environment" "PATH"
-    StrCpy $2 $1 1 -1 # copy last char
-    StrCmp $2 ";" 0 +2 # if last char == ;
-      StrCpy $1 $1 -1 # remove last char
+    StrCpy $2 $1 1 -1  ; copy last char
+    StrCmp $2 ";" 0 +2 ; if last char == ;
+      StrCpy $1 $1 -1  ; remove last char
     StrCmp $1 "" AddToPath_NTdoIt
       StrCpy $0 "$1;$0"
     AddToPath_NTdoIt:
@@ -469,7 +502,7 @@ Function un.RemoveFromPath
   Push $5
   Push $6
 
-  IntFmt $6 "%c" 26 # DOS EOF
+  IntFmt $6 "%c" 26 ; DOS EOF
 
   Call un.IsNT
   Pop $1
@@ -485,9 +518,9 @@ Function un.RemoveFromPath
 
     unRemoveFromPath_dosLoop:
       FileRead $1 $3
-      StrCpy $5 $3 1 -1 # read last char
-      StrCmp $5 $6 0 +2 # if DOS EOF
-        StrCpy $3 $3 -1 # remove DOS EOF so we can compare
+      StrCpy $5 $3 1 -1 ; read last char
+      StrCmp $5 $6 0 +2 ; if DOS EOF
+        StrCpy $3 $3 -1 ; remove DOS EOF so we can compare
       StrCmp $3 "$0$\r$\n" unRemoveFromPath_dosLoopRemoveLine
       StrCmp $3 "$0$\n" unRemoveFromPath_dosLoopRemoveLine
       StrCmp $3 "$0" unRemoveFromPath_dosLoopRemoveLine
@@ -509,26 +542,26 @@ Function un.RemoveFromPath
 
   unRemoveFromPath_NT:
     ReadRegStr $1 HKCU "Environment" "PATH"
-    StrCpy $5 $1 1 -1 # copy last char
-    StrCmp $5 ";" +2 # if last char != ;
-      StrCpy $1 "$1;" # append ;
+    StrCpy $5 $1 1 -1 ; copy last char
+    StrCmp $5 ";" +2  ; if last char != ;
+      StrCpy $1 "$1;" ; append ;
     Push $1
     Push "$0;"
-    Call un.StrStr ; Find `$0;` in $1
-    Pop $2 ; pos of our dir
+    Call un.StrStr    ; Find `$0;` in $1
+    Pop $2            ; pos of our dir
     StrCmp $2 "" unRemoveFromPath_done
       ; else, it is in path
-      # $0 - path to add
-      # $1 - path var
+      ; $0 - path to add
+      ; $1 - path var
       StrLen $3 "$0;"
       StrLen $4 $2
-      StrCpy $5 $1 -$4 # $5 is now the part before the path to remove
-      StrCpy $6 $2 "" $3 # $6 is now the part after the path to remove
+      StrCpy $5 $1 -$4   ; $5 is now the part before the path to remove
+      StrCpy $6 $2 "" $3 ; $6 is now the part after the path to remove
       StrCpy $3 $5$6
 
-      StrCpy $5 $3 1 -1 # copy last char
-      StrCmp $5 ";" 0 +2 # if last char == ;
-        StrCpy $3 $3 -1 # remove last char
+      StrCpy $5 $3 1 -1  ; copy last char
+      StrCmp $5 ";" 0 +2 ; if last char == ;
+        StrCpy $3 $3 -1  ; remove last char
 
       StrCmp $3 "" +3
         ; New PATH not empty: update the registry
@@ -548,9 +581,9 @@ Function un.RemoveFromPath
     Pop $0
 FunctionEnd
 
-###########################################
-#            Utility Functions            #
-###########################################
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;            Utility Functions            ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; IsNT
 ; no input
@@ -595,8 +628,8 @@ FunctionEnd
 
 !macro StrStr un
 Function ${un}StrStr
-Exch $R1 ; st=haystack,old$R1, $R1=needle
-  Exch    ; st=old$R1,haystack
+Exch $R1   ; st=haystack,old$R1, $R1=needle
+  Exch     ; st=old$R1,haystack
   Exch $R2 ; st=old$R1,old$R2, $R2=haystack
   Push $R3
   Push $R4

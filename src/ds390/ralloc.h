@@ -27,11 +27,14 @@
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
 
-enum { R2_IDX = 0, R3_IDX , R4_IDX  ,
-       R5_IDX   ,R6_IDX   , R7_IDX  ,
-       R0_IDX   ,R1_IDX   , X8_IDX  ,
-       X9_IDX   ,X10_IDX  , X11_IDX ,
-       X12_IDX  ,CND_IDX };
+enum
+  {
+    R2_IDX = 0, R3_IDX, R4_IDX,
+    R5_IDX, R6_IDX, R7_IDX,
+    R0_IDX, R1_IDX, X8_IDX,
+    X9_IDX, X10_IDX, X11_IDX,
+    X12_IDX, CND_IDX
+  };
 
 
 #define REG_PTR 0x01
@@ -39,20 +42,21 @@ enum { R2_IDX = 0, R3_IDX , R4_IDX  ,
 #define REG_CND 0x04
 /* definition for the registers */
 typedef struct regs
-{
-    short type;          /* can have value 
-			    REG_GPR, REG_PTR or REG_CND */
-    short rIdx ;         /* index into register table */
-    short otype;        
-    char *name ;         /* name */
-    char *dname;         /* name when direct access needed */
-    char *base ;         /* base address */
-    short offset;        /* offset from the base */
-    unsigned isFree :1;  /* is currently unassigned  */    
-} regs;
+  {
+    short type;			/* can have value 
+				   REG_GPR, REG_PTR or REG_CND */
+    short rIdx;			/* index into register table */
+    short otype;
+    char *name;			/* name */
+    char *dname;		/* name when direct access needed */
+    char *base;			/* base address */
+    short offset;		/* offset from the base */
+    unsigned isFree:1;		/* is currently unassigned  */
+  }
+regs;
 extern regs regs390[];
 
-regs  *ds390_regWithIdx (int);
+regs *ds390_regWithIdx (int);
 
 extern int ds390_ptrRegReq;
 extern int ds390_nRegs;

@@ -9,9 +9,9 @@
  * (like bitx = bity + bitz;) */
 #define SUPPORT_BIT_ARITHMETIC 1
 
-unsigned char success=0;
-unsigned char failures=0;
-unsigned char dummy=0;
+unsigned char success = 0;
+unsigned char failures = 0;
+unsigned char dummy = 0;
 
 #if SUPPORT_BIT_TYPES
 
@@ -36,55 +36,60 @@ unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 unsigned char *acharP = 0;
 
-struct chars {
-  unsigned char c0,c1;
-};
+struct chars
+  {
+    unsigned char c0, c1;
+  };
 
 
 struct chars char_struct;
 
-void done()
+void
+done ()
 {
 
   dummy++;
 
 }
 
-void struct_test(void)
+void
+struct_test (void)
 {
 
-  if(char_struct.c0 || char_struct.c1)
+  if (char_struct.c0 || char_struct.c1)
     failures++;
 
   char_struct.c0++;
 
-  if(char_struct.c0 != 1)
+  if (char_struct.c0 != 1)
     failures++;
 }
 
-void ptr_to_struct(struct chars *p)
+void
+ptr_to_struct (struct chars *p)
 {
 
-  if(p->c1)
+  if (p->c1)
     failures++;
 
 
   p->c1++;
 
-  if(p->c1 != 1)
+  if (p->c1 != 1)
     failures++;
 }
 
 
-void main(void)
+void
+main (void)
 {
 
 
   char_struct.c0 = 0;
   char_struct.c1 = 0;
-  struct_test();
-  ptr_to_struct(&char_struct);
+  struct_test ();
+  ptr_to_struct (&char_struct);
 
   success = failures;
-  done();
+  done ();
 }

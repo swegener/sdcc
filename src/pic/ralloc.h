@@ -28,11 +28,14 @@
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
 
-enum { R2_IDX = 0, R3_IDX , R4_IDX  ,
-       R5_IDX   ,R6_IDX   , R7_IDX  ,
-       R0_IDX   ,R1_IDX   , X8_IDX  ,
-       X9_IDX   ,X10_IDX  , X11_IDX ,
-       X12_IDX  ,CND_IDX };
+enum
+  {
+    R2_IDX = 0, R3_IDX, R4_IDX,
+    R5_IDX, R6_IDX, R7_IDX,
+    R0_IDX, R1_IDX, X8_IDX,
+    X9_IDX, X10_IDX, X11_IDX,
+    X12_IDX, CND_IDX
+  };
 
 
 #define REG_PTR 0x01
@@ -40,34 +43,36 @@ enum { R2_IDX = 0, R3_IDX , R4_IDX  ,
 #define REG_CND 0x04
 /* definition for the registers */
 typedef struct regs
-{
-    short type;          /* can have value 
-			    REG_GPR, REG_PTR or REG_CND */
-    short rIdx ;         /* index into register table */
-  //    short otype;        
-    char *name ;         /* name */
-    char *dname;         /* name when direct access needed */
-  //  char *base ;         /* base address */
-    short offset;        /* offset from the base */
-    unsigned isFree :1;  /* is currently unassigned  */
-  unsigned wasUsed :1;   /* becomes true if register has been used */
-} regs;
+  {
+    short type;			/* can have value 
+				   REG_GPR, REG_PTR or REG_CND */
+    short rIdx;			/* index into register table */
+    //    short otype;        
+    char *name;			/* name */
+    char *dname;		/* name when direct access needed */
+    //  char *base ;         /* base address */
+    short offset;		/* offset from the base */
+    unsigned isFree:1;		/* is currently unassigned  */
+    unsigned wasUsed:1;		/* becomes true if register has been used */
+  }
+regs;
 extern regs regspic14[];
 extern int pic14_nRegs;
 
-regs  *pic14_regWithIdx (int);
+regs *pic14_regWithIdx (int);
 
 
-enum PIC_register_types {
-  PIC_INDF,
-  PIC_TMR0,
-  PIC_FSR,
-  PIC_STATUS,
-  PIC_IOPORT,
-  PIC_IOTRIS,
-  PIC_GPR,         /*  A general purpose file register */
-  PIC_SFR          /*  A special function register */
-};
+enum PIC_register_types
+  {
+    PIC_INDF,
+    PIC_TMR0,
+    PIC_FSR,
+    PIC_STATUS,
+    PIC_IOPORT,
+    PIC_IOTRIS,
+    PIC_GPR,			/*  A general purpose file register */
+    PIC_SFR			/*  A special function register */
+  };
 
 
 #endif

@@ -15,168 +15,181 @@ static char _defaultRules[] =
 };
 
 /* list of key words used by msc51 */
-static char *_ds390_keywords[] =     {
-    "at",
-    "bit",
-    "code",
-    "critical",
-    "data",
-    "far",
-    "idata",
-    "interrupt",
-    "near",
-    "pdata",
-    "reentrant",
-    "sfr",
-    "sbit",
-    "using",
-    "xdata",
-    "_data",
-    "_code",
-    "_generic",
-    "_near",
-    "_xdata",
-    "_pdata",
-    "_idata",
-    NULL
+static char *_ds390_keywords[] =
+{
+  "at",
+  "bit",
+  "code",
+  "critical",
+  "data",
+  "far",
+  "idata",
+  "interrupt",
+  "near",
+  "pdata",
+  "reentrant",
+  "sfr",
+  "sbit",
+  "using",
+  "xdata",
+  "_data",
+  "_code",
+  "_generic",
+  "_near",
+  "_xdata",
+  "_pdata",
+  "_idata",
+  NULL
 };
 
 
-void ds390_assignRegisters (eBBlock **ebbs, int count);
+void ds390_assignRegisters (eBBlock ** ebbs, int count);
 
-static int regParmFlg = 0; /* determine if we can register a parameter */
+static int regParmFlg = 0;	/* determine if we can register a parameter */
 
-static void _ds390_init(void)
+static void
+_ds390_init (void)
 {
-    asm_addTree(&asm_asxxxx_mapping);
+  asm_addTree (&asm_asxxxx_mapping);
 }
 
-static void _ds390_reset_regparm()
+static void
+_ds390_reset_regparm ()
 {
-    regParmFlg = 0;
+  regParmFlg = 0;
 }
 
-static int _ds390_regparm( sym_link *l)
+static int
+_ds390_regparm (sym_link * l)
 {
-    /* for this processor it is simple
-       can pass only the first parameter in a register */
-    if (regParmFlg)
-	return 0;
+  /* for this processor it is simple
+     can pass only the first parameter in a register */
+  if (regParmFlg)
+    return 0;
 
-    regParmFlg = 1;
-    return 1;
+  regParmFlg = 1;
+  return 1;
 }
 
-static bool _ds390_parseOptions(int *pargc, char **argv, int *i)
+static bool
+_ds390_parseOptions (int *pargc, char **argv, int *i)
 {
-    /* TODO: allow port-specific command line options to specify
-     * segment names here.
-     */
-    return FALSE;
+  /* TODO: allow port-specific command line options to specify
+   * segment names here.
+   */
+  return FALSE;
 }
 
-static void _ds390_finaliseOptions(void)
+static void
+_ds390_finaliseOptions (void)
 {
-    /* Hack-o-matic: if we are using the flat24 model,
-     * adjust pointer sizes.
-     */
-    if (options.model != MODEL_FLAT24)
+  /* Hack-o-matic: if we are using the flat24 model,
+   * adjust pointer sizes.
+   */
+  if (options.model != MODEL_FLAT24)
     {
-	fprintf(stderr, 
-		"*** warning: ds390 port only supports the flat24 model.\n");    
-	options.model = MODEL_FLAT24;
+      fprintf (stderr,
+	       "*** warning: ds390 port only supports the flat24 model.\n");
+      options.model = MODEL_FLAT24;
     }
-    port->s.fptr_size = 3;
-    port->s.gptr_size = 4;
-    port->stack.isr_overhead++;   /* Will save dpx on ISR entry. */
+  port->s.fptr_size = 3;
+  port->s.gptr_size = 4;
+  port->stack.isr_overhead++;	/* Will save dpx on ISR entry. */
 #if 1
-    port->stack.call_overhead++; 	   /* This acounts for the extra byte 
-        				    * of return addres on the stack.
-        				    * but is ugly. There must be a 
-        				    * better way.
-        				    */
+  port->stack.call_overhead++;	/* This acounts for the extra byte 
+				 * of return addres on the stack.
+				 * but is ugly. There must be a 
+				 * better way.
+				 */
 #endif
 
-    if (options.model) {
-	port->mem.default_local_map = xdata;
-	port->mem.default_globl_map = xdata;
-    } else {
-	port->mem.default_local_map = data;
-	port->mem.default_globl_map = data;
-    }
-    
-    if (options.stack10bit)
+  if (options.model)
     {
-    	if (options.model != MODEL_FLAT24)
-    	{
-            fprintf(stderr, 
-        	    "*** warning: 10 bit stack mode is only supported in flat24 model.\n");
-            fprintf(stderr, "\t10 bit stack mode disabled.\n");
-            options.stack10bit = 0;
-        }
-        else
-        {
-            /* Fixup the memory map for the stack; it is now in
-             * far space and requires a FPOINTER to access it.
-             */
-            istack->fmap = 1;
-            istack->ptrType = FPOINTER; 
-        }
+      port->mem.default_local_map = xdata;
+      port->mem.default_globl_map = xdata;
+    }
+  else
+    {
+      port->mem.default_local_map = data;
+      port->mem.default_globl_map = data;
+    }
+
+  if (options.stack10bit)
+    {
+      if (options.model != MODEL_FLAT24)
+	{
+	  fprintf (stderr,
+		   "*** warning: 10 bit stack mode is only supported in flat24 model.\n");
+	  fprintf (stderr, "\t10 bit stack mode disabled.\n");
+	  options.stack10bit = 0;
+	}
+      else
+	{
+	  /* Fixup the memory map for the stack; it is now in
+	   * far space and requires a FPOINTER to access it.
+	   */
+	  istack->fmap = 1;
+	  istack->ptrType = FPOINTER;
+	}
     }
 }
 
-static void _ds390_setDefaultOptions(void)
+static void
+_ds390_setDefaultOptions (void)
 {
 }
 
-static const char *_ds390_getRegName(struct regs *reg)
+static const char *
+_ds390_getRegName (struct regs *reg)
 {
-    if (reg)
-	return reg->name;
-    return "err";
+  if (reg)
+    return reg->name;
+  return "err";
 }
 
-static void _ds390_genAssemblerPreamble(FILE *of)
+static void
+_ds390_genAssemblerPreamble (FILE * of)
 {
-   if (options.model == MODEL_FLAT24)
-   {
-       fputs(".flat24 on\t\t; 24 bit flat addressing\n", of);
-       fputs("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
-       fputs("dps = 0x86\t\t; dps register unknown to assembler\n", of);
-       fputs("dpl1 = 0x84\t\t; dpl1 register unknown to assembler\n", of);
-       fputs("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
-       fputs("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
-       fputs("ap = 0x9C\t\t; ap register unknown to assembler\n", of);       
-   }
+  if (options.model == MODEL_FLAT24)
+    {
+      fputs (".flat24 on\t\t; 24 bit flat addressing\n", of);
+      fputs ("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
+      fputs ("dps = 0x86\t\t; dps register unknown to assembler\n", of);
+      fputs ("dpl1 = 0x84\t\t; dpl1 register unknown to assembler\n", of);
+      fputs ("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
+      fputs ("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
+      fputs ("ap = 0x9C\t\t; ap register unknown to assembler\n", of);
+    }
 }
 
 /* Generate interrupt vector table. */
-static int _ds390_genIVT(FILE *of, symbol **interrupts, int maxInterrupts)
+static int
+_ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
-    int i;
-    
-    if (options.model != MODEL_FLAT24)
+  int i;
+
+  if (options.model != MODEL_FLAT24)
     {
-        /* Let the default code handle it. */
-    	return FALSE;
+      /* Let the default code handle it. */
+      return FALSE;
     }
-    
-    fprintf (of, "\tajmp\t__sdcc_gsinit_startup\n");
-    
-    /* now for the other interrupts */
-    for (i = 0; i < maxInterrupts; i++) 
+
+  fprintf (of, "\tajmp\t__sdcc_gsinit_startup\n");
+
+  /* now for the other interrupts */
+  for (i = 0; i < maxInterrupts; i++)
     {
-	if (interrupts[i])
+      if (interrupts[i])
 	{
-	    fprintf(of, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+	  fprintf (of, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
 	}
-	else
+      else
 	{
-	    fprintf(of, "\treti\n\t.ds\t7\n");
+	  fprintf (of, "\treti\n\t.ds\t7\n");
 	}
     }
-    
-    return TRUE;
+
+  return TRUE;
 }
 
 /** $1 is always the basename.
@@ -185,85 +198,87 @@ static int _ds390_genIVT(FILE *of, symbol **interrupts, int maxInterrupts)
     $l is the list of extra options that should be there somewhere...
     MUST be terminated with a NULL.
 */
-static const char *_linkCmd[] = {
-    "aslink", "-nf", "$1", NULL
+static const char *_linkCmd[] =
+{
+  "aslink", "-nf", "$1", NULL
 };
 
-static const char *_asmCmd[] = {
-    "asx8051", "-plosgff", "$1.asm", NULL
+static const char *_asmCmd[] =
+{
+  "asx8051", "-plosgff", "$1.asm", NULL
 };
 
 /* Globals */
-PORT ds390_port = {
-    "ds390",
-    "DS80C390",			/* Target name */
-    {
-	TRUE,			/* Emit glue around main */
-	MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
-	MODEL_SMALL
-    },
-    {	
-	_asmCmd,
-	"-plosgffc",		/* Options with debug */
-	"-plosgff",		/* Options without debug */
-	0
-    },
-    {
-	_linkCmd,
-	NULL,
-	".rel"
-    },
-    {
-	_defaultRules
-    },
-    {
-    	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-	1, 1, 2, 4, 1, 2, 3, 1, 4, 4
-    },
-    {
-	"XSEG    (XDATA)",
-	"STACK   (DATA)",
-	"CSEG    (CODE)",
-	"DSEG    (DATA)",
-	"ISEG    (DATA)",
-	"XSEG    (XDATA)",
-	"BSEG    (BIT)",
-	"RSEG    (DATA)",
-	"GSINIT  (CODE)",
-	"OSEG    (OVR,DATA)",
-	"GSFINAL (CODE)",
-	"HOME	 (CODE)",
-	NULL,
-	NULL,
-	1
-    },
-    { 
-	+1, 1, 4, 1, 1, 0
-    },
-    /* ds390 has an 8 bit mul */
-    {
-	1, 0
-    },
-    "_",
-    _ds390_init,
-    _ds390_parseOptions,
-    _ds390_finaliseOptions,
-    _ds390_setDefaultOptions,
-    ds390_assignRegisters,
-    _ds390_getRegName ,
-    _ds390_keywords,
-    _ds390_genAssemblerPreamble,
-    _ds390_genIVT ,
-    _ds390_reset_regparm,
-    _ds390_regparm,
+PORT ds390_port =
+{
+  "ds390",
+  "DS80C390",			/* Target name */
+  {
+    TRUE,			/* Emit glue around main */
+    MODEL_SMALL | MODEL_LARGE | MODEL_FLAT24,
+    MODEL_SMALL
+  },
+  {
+    _asmCmd,
+    "-plosgffc",		/* Options with debug */
+    "-plosgff",			/* Options without debug */
+    0
+  },
+  {
+    _linkCmd,
     NULL,
-    FALSE,
-    0,  /* leave lt */
-    0,  /* leave gt */
-    1,  /* transform <= to ! > */
-    1,  /* transform >= to ! < */
-    1,  /* transform != to !(a == b) */
-    0,  /* leave == */
-    PORT_MAGIC
+    ".rel"
+  },
+  {
+    _defaultRules
+  },
+  {
+	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
+    1, 1, 2, 4, 1, 2, 3, 1, 4, 4
+  },
+  {
+    "XSEG    (XDATA)",
+    "STACK   (DATA)",
+    "CSEG    (CODE)",
+    "DSEG    (DATA)",
+    "ISEG    (DATA)",
+    "XSEG    (XDATA)",
+    "BSEG    (BIT)",
+    "RSEG    (DATA)",
+    "GSINIT  (CODE)",
+    "OSEG    (OVR,DATA)",
+    "GSFINAL (CODE)",
+    "HOME	 (CODE)",
+    NULL,
+    NULL,
+    1
+  },
+  {
+    +1, 1, 4, 1, 1, 0
+  },
+    /* ds390 has an 8 bit mul */
+  {
+    1, 0
+  },
+  "_",
+  _ds390_init,
+  _ds390_parseOptions,
+  _ds390_finaliseOptions,
+  _ds390_setDefaultOptions,
+  ds390_assignRegisters,
+  _ds390_getRegName,
+  _ds390_keywords,
+  _ds390_genAssemblerPreamble,
+  _ds390_genIVT,
+  _ds390_reset_regparm,
+  _ds390_regparm,
+  NULL,
+  FALSE,
+  0,				/* leave lt */
+  0,				/* leave gt */
+  1,				/* transform <= to ! > */
+  1,				/* transform >= to ! < */
+  1,				/* transform != to !(a == b) */
+  0,				/* leave == */
+  PORT_MAGIC
 };
-

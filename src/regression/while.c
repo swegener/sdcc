@@ -1,8 +1,8 @@
 //#include "p16c84.h"
 
-unsigned char success=0;
-unsigned char failures=0;
-unsigned char dummy=0;
+unsigned char success = 0;
+unsigned char failures = 0;
+unsigned char dummy = 0;
 
 bit bit0 = 0;
 unsigned int aint0 = 0;
@@ -11,32 +11,37 @@ unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 
 
-void done()
+void
+done ()
 {
 
   dummy++;
 
 }
 
-void while1(void)
+void
+while1 (void)
 {
-  unsigned char i=10;
+  unsigned char i = 10;
 
-  do {
-    achar0++;
-  } while(--i);
+  do
+    {
+      achar0++;
+    }
+  while (--i);
 
-  if(achar0 != 10)
+  if (achar0 != 10)
     failures++;
 
 }
 
 
-void main(void)
+void
+main (void)
 {
-  while1();
+  while1 ();
 
 
   success = failures;
-  done();
+  done ();
 }

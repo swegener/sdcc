@@ -383,8 +383,10 @@ static asmop *aopForRemat (symbol *sym)
 
         /* if plus or minus print the right hand side */
         if (ic->op == '+' || ic->op == '-') {
-            sprintf(s,"0x%04x %c ",(int) operandLitValue(IC_RIGHT(ic)),
-                    ic->op );
+	    if (ic->op == '-')
+		sprintf(s,"-0x%04x + ",(int) operandLitValue(IC_RIGHT(ic))) ;
+	    else
+		sprintf(s,"0x%04x + ",(int) operandLitValue(IC_RIGHT(ic)));
             s += strlen(s);
             ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
             continue ;

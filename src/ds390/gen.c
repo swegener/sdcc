@@ -6583,13 +6583,32 @@ static void genFarPointerGet (operand *left,
     if (AOP_TYPE(left) != AOP_STR) {
         /* if this is remateriazable */
         if (AOP_TYPE(left) == AOP_IMMD)
+        {
             emitcode("mov","dptr,%s",aopGet(AOP(left),0,TRUE,FALSE));
-        else { /* we need to get it byte by byte */
-            emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE));
-            emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE));
-            if (options.model == MODEL_FLAT24)
+        }
+        else 
+        { 
+            /* we need to get it byte by byte */
+	    if (AOP_TYPE(left) != AOP_DPTR)
+	    {
+            	emitcode("mov","dpl,%s",aopGet(AOP(left),0,FALSE,FALSE));
+            	emitcode("mov","dph,%s",aopGet(AOP(left),1,FALSE,FALSE));
+            	if (options.model == MODEL_FLAT24)
+            	{
+               	    emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE));
+            	}
+            }
+            else
             {
-               emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE));
+                 /* We need to generate a load to DPTR indirect through DPTR. */
+                 D(emitcode(";", "genFarPointerGet -- indirection special case."););
+                 emitcode("push", "%s", aopGet(AOP(left),0,FALSE,TRUE));
+                 emitcode("push", "%s", aopGet(AOP(left),1,FALSE,TRUE));
+                 emitcode("mov", "dpx,%s",aopGet(AOP(left),2,FALSE,FALSE));
+                 emitcode("pop", "acc");
+                 emitcode("mov", "dph,a");
+                 emitcode("pop", "acc");
+                 emitcode("mov", "dpl,a");
             }
         }
     }
@@ -7156,18 +7175,35 @@ static void genFarPointerSet (operand *right,
         /* if this is remateriazable */
         if (AOP_TYPE(result) == AOP_IMMD)
             emitcode("mov","dptr,%s",aopGet(AOP(result),0,TRUE,FALSE));
-        else { /* we need to get it byte by byte */
-            emitcode("mov","dpl,%s",aopGet(AOP(result),0,FALSE,FALSE));
-            emitcode("mov","dph,%s",aopGet(AOP(result),1,FALSE,FALSE));
-            if (options.model == MODEL_FLAT24)
+        else 
+        {
+            /* we need to get it byte by byte */
+	    if (AOP_TYPE(result) != AOP_DPTR)
+	    {
+            	emitcode("mov","dpl,%s",aopGet(AOP(result),0,FALSE,FALSE));
+            	emitcode("mov","dph,%s",aopGet(AOP(result),1,FALSE,FALSE));
+            	if (options.model == MODEL_FLAT24)
+            	{
+               	    emitcode("mov", "dpx,%s",aopGet(AOP(result),2,FALSE,FALSE));
+            	}
+            }
+            else
             {
-               emitcode("mov", "dpx,%s",aopGet(AOP(result),2,FALSE,FALSE));
+                 /* We need to generate a load to DPTR indirect through DPTR. */
+                 D(emitcode(";", "genFarPointerSet -- indirection special case."););
+                 emitcode("push", "%s", aopGet(AOP(result),0,FALSE,TRUE));
+                 emitcode("push", "%s", aopGet(AOP(result),1,FALSE,TRUE));
+                 emitcode("mov", "dpx,%s",aopGet(AOP(result),2,FALSE,FALSE));
+                 emitcode("pop", "acc");
+                 emitcode("mov", "dph,a");
+                 emitcode("pop", "acc");
+                 emitcode("mov", "dpl,a");
             }
         }
     }
     /* so dptr know contains the address */
     freeAsmop(result,NULL,ic,TRUE);
-    aopOp(right,ic,FALSE, FALSE);
+    aopOp(right,ic,FALSE, TRUE);
 
     /* if bit then unpack */
     if (IS_BITVAR(retype)) 

@@ -44,6 +44,13 @@ void serial_init(void)
 void serial_interrupt_handler(void) interrupt 4 using 1
 {
     ES=0;
+    if ( RI )
+	{
+	    RI = 0;
+	    srx_buffer[srx_index_in++]=SBUF;
+	    work_flag_byte_arrived = 1;
+	    rx_serial_buffer_empty = 0;
+	}
     if ( TI )
 	{
 	    TI = 0;
@@ -53,13 +60,6 @@ void serial_interrupt_handler(void) interrupt 4 using 1
 		    work_flag_buffer_transfered = 1;
 		}
 	    else SBUF = stx_buffer[stx_index_out++];
-	}
-    if ( RI )
-	{
-	    RI = 0;
-	    srx_buffer[srx_index_in++]=SBUF;
-	    work_flag_byte_arrived = 1;
-	    rx_serial_buffer_empty = 0;
 	}
     ES=1;
 }

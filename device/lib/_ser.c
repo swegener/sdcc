@@ -83,6 +83,11 @@ ser_interrupt_handler(void) interrupt 4 using 1
 {
   ES=0;
 
+  if (RI) {
+    RI = 0;
+    ser_rxBuffer[ser_rxIndexIn++] = SBUF;
+  }
+
   if (TI) {
     TI = 0;
     if (ser_txIndexIn == ser_txIndexOut) {
@@ -91,11 +96,6 @@ ser_interrupt_handler(void) interrupt 4 using 1
     else {
       SBUF = ser_txBuffer[ser_txIndexOut++];
     }
-  }
-
-  if (RI) {
-    RI = 0;
-    ser_rxBuffer[ser_rxIndexIn++] = SBUF;
   }
 
   ES=1;

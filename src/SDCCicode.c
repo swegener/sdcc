@@ -918,9 +918,9 @@ isOperandInDirSpace (operand * op)
   return (IN_DIRSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
 }
 
-/*------------------------------------------------------------------*/
-/* isOperandInDirSpace - will return true if operand is in dirSpace */
-/*------------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
+/* isOperandInCodeSpace - will return true if operand is in codeSpace */
+/*--------------------------------------------------------------------*/
 bool 
 isOperandInCodeSpace (operand * op)
 {

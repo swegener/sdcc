@@ -9988,7 +9988,7 @@ genPackBits (sym_link * etype,
   for (rlen=blen;rlen>=8;rlen-=8)
     {
       emitPtrByteSet (rname, p_type, 
-                      aopGet (AOP (right), offset++, FALSE, FALSE, NULL) );
+                      aopGet (AOP (right), offset++, FALSE, TRUE, NULL) );
       if (rlen>8)
         emitcode ("inc", "%s", rname);
     }

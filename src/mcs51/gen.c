@@ -7522,11 +7522,19 @@ genCodePointerGet (operand * left,
 
       while (size--)
 	{
-	  emitcode ("clr", "a");
-	  emitcode ("movc", "a,@a+dptr");
-	  aopPut (AOP (result), "a", offset++);
-	  if (size || pi)
-	    emitcode ("inc", "dptr");
+	  if (pi)
+	    {
+	      emitcode ("clr", "a");
+	      emitcode ("movc", "a,@a+dptr");
+	      aopPut (AOP (result), "a", offset++);
+   	      emitcode ("inc", "dptr");
+	    }
+	  else
+	    { 
+	      emitcode ("mov", "a,#0x%02x", offset);
+	      emitcode ("movc", "a,@a+dptr");
+	      aopPut (AOP (result), "a", offset++);
+	    }
 	}
     }
 

@@ -1,3 +1,15 @@
+2003-02-10  Borut Razem <borut.razem@siol.net>
+
+	* doc/bccinst.txt, packihx/packihx.c, sdcc_vc_in.h, src/SDCCset.h,
+	support/cpp2/config.in: Borland C++ build doesn't depend on Cygwin configure
+	* Bcc.ini, Makefile.bcc, as/mcs51/Makefile.bcc,
+	device/examples/ds390/tinitalk/Makefile.bcc, packihx/Makefile.bcc,
+	support/cpp2/Makefile.bcc, src/Makefile.bcc, src/avr/Makefile.bcc,
+	src/ds390/Makefile.bcc, src/izt/Makefile.bcc, src/mcs51/Makefile.bcc,
+	src/pic/Makefile.bcc, src/pic16/Makefile.bcc, src/xa15/Makefile.bcc,
+	src/z80/Makefile.bcc: Borland Makefile cleanup
+	* as/z80/Makefile.bcc: Added Borland Makefile
+
 2003-02-10  Bernhard Held <bernhard@bernhardheld.de>
 
 	* doc/sdccman.lyx: new pragma NOIV by "Johannes Stezenbach" <js@convergence.de>

@@ -14,7 +14,7 @@
 #include <ctype.h>
 #include <assert.h>
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 
 typedef unsigned char Uint8 ;
 typedef unsigned Uint16 ;

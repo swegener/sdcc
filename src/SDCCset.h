@@ -26,7 +26,7 @@
 #define SDCCSET_H
 #include <stdarg.h>
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #include "sdcc_vc.h"
 #else
 #include "sdccconf.h"

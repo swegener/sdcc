@@ -7,10 +7,8 @@
 #undef SDCC_VERSION_P
 #undef SDCC_VERSION_STR
 
-/* MSVC 6 does not have __FUNCTION__ preprocessor macro defined */
-
-#if defined(_MSC_VER) && (_MSC_VER < 1300)
-#define __FUNCTION__ __FILE__
+#ifndef __FUNCTION__
+#define __FUNCTION__  __FILE__
 #endif
 
 #undef PREFIX

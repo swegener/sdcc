@@ -1882,3 +1882,13 @@ replace {
 	mov	dptr, %2
 ; Peephole 224: DPS usage re-arranged.
 }
+
+replace {
+	mov	dps, #0x01
+	mov	dptr, %1
+	mov	dps, #0x00
+} by {
+	mov	dps, #0x01
+	mov	dptr, %1
+	dec	dps
+}

@@ -659,6 +659,44 @@ static void computeClash ()
 }
 
 /*-----------------------------------------------------------------*/
+/* allDefsOutOfRange - all definitions are out of a range          */
+/*-----------------------------------------------------------------*/
+bool
+allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
+{
+  int i;
+
+  if (!defs)
+    return TRUE;
+
+  for (i = 0; i < defs->size; i++)
+    {
+      iCode *ic;
+
+      if (bitVectBitValue (defs, i) &&
+	  (ic = hTabItemWithKey (iCodehTab, i)) &&
+	  (ic->seq >= fseq && ic->seq <= toseq))
+
+	return FALSE;
+
+    }
+
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* notUsedInBlock - not used in this block                         */
+/*-----------------------------------------------------------------*/
+int
+notUsedInBlock (symbol * sym, eBBlock * ebp, iCode *ic)
+{
+  return (!bitVectBitsInCommon (sym->defs, ebp->usesDefs) &&
+	  allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq) &&
+	  allDefsOutOfRange (sym->uses, ebp->fSeq, ebp->lSeq));
+}
+
+
+/*-----------------------------------------------------------------*/
 /* computeLiveRanges - computes the live ranges for variables      */
 /*-----------------------------------------------------------------*/
 void 
@@ -687,3 +725,4 @@ computeLiveRanges (eBBlock ** ebbs, int count)
   /* compute which overlaps with what */
   computeClash();
 }
+

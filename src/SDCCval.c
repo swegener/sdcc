@@ -374,6 +374,9 @@ static value *cheapestVal (value *val) {
 
 static value *cheapestVal (value *val)
 {
+  if (IS_FLOAT (val->type) || IS_CHAR (val->type))
+    return val;
+
   /* - signed/unsigned must not be changed.
      - long must not be changed.
 

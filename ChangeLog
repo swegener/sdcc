@@ -1,3 +1,9 @@
+2004-01-18 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCval.c (cheapestVal): added missing checks
+	* src/SDCCicode.c (usualBinaryConversions): fixed condition
+	* src/SDCCicode.c (geniCodeAdd): fixed part of bug #877103
+
 2004-01-16 Klaus Flittner <klaus_flittner@gmx.de>
 
 	* src/ds390/gen.c (aopOp3): fixed the assignment of different dptrs to
@@ -18,7 +24,7 @@
 	to Pics16. Updated all references to them.
 	* src/pic16/glue.c (pic16glue): corrected bug with code
 	initialization which bypassed the variable initializations block.
-	
+
 	* device/lib/pic16/Makefile.rules: removed --penable-stack from
 	COMPILE_FLAGS and added the --nostdinc option
 
@@ -48,11 +54,11 @@
 	files into pic16 directory
 	* in target 'installdirs' added line to create directory pic16 in
 	the installation path
-	
+
 	* device/include/Makefile.in (version 1.11): in target 'install'
 	added lines to copy all header files to installation path,
 	* in target 'installdirs' added line create directory for pic16
-	headers in the installation path 
+	headers in the installation path
 
 2004-01-13 Klaus Flittner <klaus_flittner@gmx.de>
 

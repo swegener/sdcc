@@ -1764,12 +1764,19 @@ usualBinaryConversions (operand ** op1, operand ** op2,
      This if for 'mul a,b', which takes two chars and returns an int */
   if (   isMul
       /* && promoteCharToInt	superfluous, already handled by computeType() */
-      && IS_CHAR (getSpec (ltype))
-      && IS_CHAR (getSpec (rtype))
-      && !(IS_UNSIGNED (getSpec (rtype)) ^ IS_UNSIGNED (getSpec (ltype)))
       && IS_INT  (getSpec (ctype)))
-    return ctype;
+    {
+      sym_link *retype = getSpec (rtype);
+      sym_link *letype = getSpec (ltype);
 
+      if (   IS_CHAR (letype)
+	  && IS_CHAR (retype)
+	  && IS_UNSIGNED (letype)
+	  && IS_UNSIGNED (retype))
+	{
+	  return ctype;
+	}
+    }
   *op1 = geniCodeCast (ctype, *op1, TRUE);
   *op2 = geniCodeCast (ctype, *op2, TRUE);
 
@@ -2216,6 +2223,7 @@ geniCodeAdd (operand * left, operand * right, int lvl)
       if (getSize (ltype->next) != 1)
         {
 	  size  = operandFromLit (getSize (ltype->next));
+	  SPEC_USIGN (getSpec (operandType (size))) = 1;
 	  indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
 	  right = geniCodeMultiply (right, size, (getArraySizePtr(left) >= INTSIZE));
 	  /* Even if right is a 'unsigned char',
@@ -3778,7 +3786,7 @@ ast2iCode (ast * tree,int lvl)
 	return geniCodeDerefPtr (geniCodeRValue (left, FALSE),lvl);
 
     case '-':
-      if (right) 
+      if (right)
 	return geniCodeSubtract (geniCodeRValue (left, FALSE),
 				 geniCodeRValue (right, FALSE));
       else

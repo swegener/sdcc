@@ -384,7 +384,8 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 	dReg->reglives.assignedpFlows = newSet();
 	dReg->regop = refop;
   
-	hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
+	if(!(type == REG_SFR && alias == 0x80))
+		hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
 
   return dReg;
 }
@@ -566,6 +567,7 @@ pic16_allocDirReg (operand *op )
 
 	if(!IS_SYMOP(op)) {
 		debugLog ("%s BAD, op is NULL\n", __FUNCTION__);
+//		fprintf(stderr, "%s BAD, op is NULL\n", __FUNCTION__);
 	  return NULL;
 	}
 
@@ -751,6 +753,7 @@ regs *pic16_typeRegWithIdx (int idx, int type, int fixed)
   regs *dReg;
 
   debugLog ("%s - requesting index = 0x%x\n", __FUNCTION__,idx);
+//  fprintf(stderr, "%s - requesting index = 0x%x\n", __FUNCTION__, idx);
 
   switch (type) {
 
@@ -818,6 +821,7 @@ pic16_allocWithIdx (int idx)
   regs *dReg;
 
   debugLog ("%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
+//  fprintf(stderr, "%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
 
   if( (dReg = regWithIdx ( pic16_dynAllocRegs, idx,0)) != NULL) {
 
@@ -3015,10 +3019,14 @@ pack:
 
 }
 
+#if 1
+
 #define NO_packRegsForAccUse
 #define NO_packRegsForSupport
 #define NO_packRegsForOneuse
 #define NO_cast_peep
+
+#endif
 
 
 #ifndef NO_packRegsForSupport

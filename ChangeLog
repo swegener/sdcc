@@ -1,3 +1,7 @@
+2004-02-03 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/ralloc.c (newReg): fixed bug #908929
+
 2004-03-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/ds390/gen.c: added missing #include "main.h"

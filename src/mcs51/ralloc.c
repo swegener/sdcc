@@ -1763,12 +1763,19 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
      we cannot */
   for (dic = ic->prev; dic; dic = dic->prev)
     {
+
+#if 0 /* jwk: This collides with 1.43 but I really see no need for
+	 this anymore. It fixes bug #716790 and substantially improves 
+	 redundant register usage around function calls.
+      */
+
       /* if there is a function call then don't pack it */
       if ((dic->op == CALL || dic->op == PCALL))
 	{
 	  dic = NULL;
 	  break;
 	}
+#endif
 
       if (SKIP_IC2 (dic))
 	continue;

@@ -1,5 +1,6 @@
 2003-04-17    <johan@balder>
 
+	* src/mcs51/ralloc.c (packRegsForAssign): fixed bug #716790 and removes lot's of redundant register usage around function calls
 	* src/mcs51/ralloc.c (packRegisters): fixed bug #720667
 
 2003-04-13  Borut Razem <borut.razem@siol.net>

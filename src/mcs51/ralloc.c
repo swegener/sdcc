@@ -737,7 +737,7 @@ static bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
 /*-----------------------------------------------------------------*/
 /* getRegPtr - will try for PTR if not a GPR type if not spil      */
 /*-----------------------------------------------------------------*/
-regs *getRegPtr (iCode *ic, eBBlock *ebp, symbol *sym)
+static regs *getRegPtr (iCode *ic, eBBlock *ebp, symbol *sym)
 {
     regs *reg;
 

@@ -31,6 +31,33 @@ static char *_avr_keywords[] =     {
     NULL
 };
 
+static int regParmFlg = 0; /* determine if we can register a parameter */
+
+static void _avr_reset_regparm()
+{
+    regParmFlg = 0;
+}
+
+static int _avr_regparm( link *l)
+{
+    /* the first eight bytes will be passed in
+       registers r0-r7. but we won't split variables
+       i.e. if not enough registers left to hold
+       the parameter then the whole parameter along
+       with rest of the parameters go onto the stack */
+    if (regParmFlg < 8 ) {
+	int size ;
+	if ((size = getSize(l)) > (8 - regParmFlg)) {
+	    /* all remaining go on stack */
+	    regParmFlg = 8;
+	    return 0;
+	}
+	regParmFlg += size;
+	return 1;
+    }
+    
+    return 0;
+}
 
 void avr_assignRegisters (eBBlock **ebbs, int count);
 
@@ -44,12 +71,26 @@ static bool _avr_parseOptions(int *pargc, char **argv, int *i)
 
 static void _avr_finaliseOptions(void)
 {
-    port->default_local_map =
-	port->default_globl_map = xdata;
+    port->mem.default_local_map =
+	port->mem.default_globl_map = xdata;
+    /* change stack to be in far space */
+    /* internal stack segment ;   
+       SFRSPACE       -   NO
+       FAR-SPACE      -   YES
+       PAGED          -   NO
+       DIRECT-ACCESS  -   NO
+       BIT-ACCESS     -   NO
+       CODE-ACESS     -   NO 
+       DEBUG-NAME     -   'B'
+       POINTER-TYPE   -   POINTER
+    */
+    istack	  = allocMap (0, 1, 0, 0, 0, 0,options.stack_loc, ISTACK_NAME,'B',FPOINTER);
+
 }
 
 static void _avr_setDefaultOptions(void)
 {
+    options.stackAuto = 1;
 }
 
 static const char *_avr_getRegName(struct regs *reg)
@@ -104,7 +145,7 @@ PORT avr_port = {
     },
     {
     	/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-	1, 1, 2, 4, 1, 2, 3, 1, 4, 4
+	1, 1, 2, 4, 2, 2, 3, 1, 4, 4
     },
     {
 	"XSEG    (XDATA)",
@@ -136,6 +177,8 @@ PORT avr_port = {
     _avr_getRegName ,
     _avr_keywords,
     _avr_genAssemblerPreamble,
-    _avr_genIVT
+    _avr_genIVT,
+    _avr_reset_regparm,
+    _avr_regparm
 };
 

@@ -131,13 +131,15 @@ static const char *_preCmd[] = {
 extern PORT mcs51_port;
 extern PORT z80_port;
 extern PORT gbz80_port;
+extern PORT avr_port;
 
 PORT *port;
 
 static PORT *_ports[] = {
     &mcs51_port,
     &z80_port,
-    &gbz80_port
+    &gbz80_port,
+    &avr_port
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
@@ -156,7 +158,8 @@ static int _setPort(const char *name)
 	}
     }
     /* Error - didnt find */
-    return 1;
+    werror(E_UNKNOWN_TARGET,name);
+    exit(1);
 }
 
 static void _buildCmdLine(char *into, char **args, const char **cmds, 

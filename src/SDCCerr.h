@@ -131,4 +131,5 @@
 #define  W_POSSBUG          128         /* possible code generation error */
 #define  W_PTR_ASSIGN       129         /* incampatible pointer assignment */
 #define  W_UNKNOWN_MODEL    130		/* Unknown memory model */
+#define  E_UNKNOWN_TARGET   131         /* target not defined   */
 void werror(int, ...);

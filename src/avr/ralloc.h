@@ -27,16 +27,19 @@
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
 
-enum { R2_IDX = 0, R3_IDX , R4_IDX  ,
-       R5_IDX   ,R6_IDX   , R7_IDX  ,
-       R0_IDX   ,R1_IDX   , X8_IDX  ,
-       X9_IDX   ,X10_IDX  , X11_IDX ,
-       X12_IDX  ,CND_IDX };
+enum { R0_IDX = 0, R1_IDX , R2_IDX , R3_IDX , R4_IDX , 
+       R5_IDX    , R6_IDX , R7_IDX , R8_IDX , R9_IDX ,
+       R10_IDX   , R11_IDX, R12_IDX, R13_IDX, R14_IDX,
+       R15_IDX   , R16_IDX, R17_IDX, R18_IDX, R19_IDX,
+       R20_IDX   , R21_IDX, R22_IDX, R23_IDX, R24_IDX,
+       R25_IDX   , R26_IDX, R27_IDX, R28_IDX, R29_IDX,
+       R30_IDX   , R31_IDX, X_IDX  , Z_IDX  , CND_IDX };
 
 
 #define REG_PTR 0x01
 #define REG_GPR 0x02
 #define REG_CND 0x04
+
 /* definition for the registers */
 typedef struct regs
 {
@@ -50,8 +53,8 @@ typedef struct regs
     short offset;        /* offset from the base */
     unsigned isFree :1;  /* is currently unassigned  */    
 } regs;
-extern regs regs8051[];
+extern regs regsAVR[];
 
-regs  *mcs51_regWithIdx (int);
+regs  *avr_regWithIdx (int);
 
 #endif

@@ -1,3 +1,8 @@
+2003-01-24  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/mcs51/peeph.def: better assembler identation by Frieder
+	* src/mcs51/gen.c: better assembler identation by Frieder
+
 2003-01-22  Bernhard Held <bernhard@bernhardheld.de>
 
 	* as/z80/string.h: removed for gcc 3.2

@@ -590,9 +590,8 @@ static void lnkFuncEnd (char *s)
 
     s++;
     sscanf(s,"%x",&func->sym->eaddr);
-#ifdef SDCDB_DEBUG
-    printf("%s(eaddr%x)\n",func->sym->name,func->sym->eaddr);
-#endif
+
+    Dprintf(D_symtab, ("%s(eaddr%x)\n",func->sym->name,func->sym->eaddr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -616,9 +615,8 @@ static void lnkSymRec (char *s)
 
     s++;
     sscanf(s,"%x",&sym->addr);
-#ifdef SDCDB_DEBUG
-    printf("%s(%x)\n",sym->name,sym->addr);
-#endif
+
+    Dprintf(D_symtab, ("%s(%x)\n",sym->name,sym->addr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -648,9 +646,7 @@ static void lnkAsmSrc (char *s)
     line--;
     if (line < mod->nasmLines) {
   mod->asmLines[line]->addr = addr;
-#ifdef SDCDB_DEBUG
-  printf("%s(%d:%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src);
-#endif
+  Dprintf(D_symtab, ("%s(%d:%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src));
     }
 }
 
@@ -690,10 +686,8 @@ static void lnkCSrc (char *s)
   mod->cLines[line]->addr = addr;
   mod->cLines[line]->block = block;
   mod->cLines[line]->level = level;
-#ifdef SDCDB_DEBUG
-  printf("%s(%d:%x) %s",mod->c_name,
-         line+1,addr,mod->cLines[line]->src);
-#endif
+  Dprintf(D_symtab, ("%s(%d:%x) %s",mod->c_name,
+         line+1,addr,mod->cLines[line]->src));
     }
     return;
 

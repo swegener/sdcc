@@ -540,8 +540,10 @@ context *discoverContext (unsigned addr)
     int line = 0;
 
     /* find the function we are in */
-    if (!applyToSet(functions,funcInAddr,addr,&func))
-	return NULL;
+    if (!applyToSet(functions,funcInAddr,addr,&func)) {
+      fprintf(stderr, "Error?:discoverContext: cannot apply to set!\n");
+     	return NULL;
+    }
 
     currCtxt->func = func;
     currCtxt->addr = func->laddr = addr;
@@ -592,8 +594,30 @@ void simGo (unsigned int gaddr)
        if not then we continue with the execution 
        of the program */
     if (!rv) {
+      fprintf(stdout, "Stopping at non-user breakpoint\n");
+
+// notes: kpb
+// I took this out, after running "run" it would just keep re-running
+// even after a lot of break points hit.  For some reason above code
+// not triggering(dispatchCB).  This seems to be by design, startup adds
+// a bunch of breakpoints-but they are not USER breakpoints.  Perhaps the
+// debugger changed with its implementation of "go"("run").  It seems we
+// need to add a "next" or "step" followed by a "run"...
+// I added a "step" in simi.c when we want a resume function, this seems
+// to work.
+
+// still there is question of how do we stop it initially, since
+// it must be started before it can get a context.  If so, we would
+// want it to just run up to an initial entry point you'd think...
+// I don't see why we can't set breakpoints before an initial run,
+// this does not seem right to me.
+
+// line #'s are a bit off too.
+
+#if 0
 	gaddr = -1;
 	goto top ;
+#endif
     }
     
 }
@@ -1574,8 +1598,15 @@ int cmdClrUserBp (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdSimulator (char *s, context *cctxt)
 {   
-    sendSim(s);
-    sendSim("\n");
+  char tmpstr[82];
+
+    if (strlen(s) > 80) {
+      printf("error 3A\n");
+      exit(1);
+    }
+    strcpy(tmpstr, s);
+    strcat(tmpstr, "\n");
+    sendSim(tmpstr);
     waitForSim();
     fprintf(stdout,"%s",simResponse());
     return 0;

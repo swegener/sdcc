@@ -430,12 +430,11 @@ static void functionPoints ()
 
   sym = func->sym;
 
-#ifdef SDCDB_DEBUG
-  printf("func '%s' has entry '%x' exit '%x'\n",
+  Dprintf(D_sdcdb, ("func '%s' has entry '%x' exit '%x'\n",
          func->sym->name,
          func->sym->addr,
-         func->sym->eaddr);
-#endif
+         func->sym->eaddr));
+
   if (!func->sym->addr && !func->sym->eaddr)
       continue ;
 
@@ -496,20 +495,21 @@ static void functionPoints ()
   }
 
 #ifdef SDCDB_DEBUG
-  printf("function '%s' has the following C exePoints\n",
-         func->sym->name);
+  Dprintf(D_sdcdb, ("function '%s' has the following C exePoints\n",
+         func->sym->name));
   {
       exePoint *ep;
 
       for (ep = setFirstItem(func->cfpoints); ep;
      ep = setNextItem(func->cfpoints))
-    fprintf (stdout,"{%x,%d} %s",ep->addr,ep->line,mod->cLines[ep->line]->src);
+     Dprintf(D_sdcdb, ("{%x,%d} %s",
+         ep->addr,ep->line,mod->cLines[ep->line]->src));
 
-      fprintf(stdout," and the following ASM exePoints\n");
+      Dprintf(D_sdcdb, (" and the following ASM exePoints\n"));
       for (ep = setFirstItem(func->afpoints); ep;
-     ep = setNextItem(func->afpoints))
-    fprintf (stdout,"{%x,%d} %s",ep->addr,ep->line,mod->asmLines[ep->line]->src);
-
+           ep = setNextItem(func->afpoints))
+        Dprintf (D_sdcdb, ("{%x,%d} %s",
+            ep->addr,ep->line,mod->asmLines[ep->line]->src));
   }
 #endif
     }

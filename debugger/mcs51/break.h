@@ -37,7 +37,6 @@ enum {
     FENTRY  ,
     FEXIT};  
 
-    
 typedef struct breakp
 {
     unsigned addr;           /* address of break point */

@@ -31,6 +31,19 @@ char userBpPresent = 0;
 /* call stack can be 1024 deep */
 STACK_DCL(callStack,function *,1024);
 
+#ifdef SDCDB_DEBUG
+char *debug_bp_type_strings[] =
+    {"ERR-0",
+     "DATA",
+    "CODE"    ,
+    "A_CODE"  ,
+    "USER"    ,
+    "STEP"    ,
+    "NEXT"    ,
+    "FENTRY"  ,
+    "FEXIT", "", ""};
+#endif
+
 /*-----------------------------------------------------------------*/
 /* setBreakPoint - creates an entry in the break point table       */
 /*-----------------------------------------------------------------*/
@@ -41,6 +54,12 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
     breakp *bp, *bpl;
     static long bpnum = 0;
     char simbuf[50];
+
+    Dprintf(D_break, ("setBreakPoint: addr:%x atype:%s bpType:%s [%s:%d]\n",
+        addr,
+        debug_bp_type_strings[addrType],
+        debug_bp_type_strings[bpType],
+        fileName, lineno));
 
     /* allocate & init a new bp */
     bp = Safe_calloc(1,sizeof(breakp));
@@ -91,6 +110,7 @@ void deleteSTEPbp ()
     breakp *bp;
     int k;
 
+    Dprintf(D_break, ("Deleting all STEP BPs\n"));
     /* for break points delete if they are STEP */
     for ( bp = hTabFirstItem(bptable,&k); bp ;
     bp = hTabNextItem(bptable,&k)) {
@@ -118,6 +138,8 @@ void deleteNEXTbp ()
     breakp *bp;
     int k;
     char simcmd[50];
+
+    Dprintf(D_break, ("Deleting all NEXT BPs\n"));
 
     /* for break points delete if they are NEXT */
     for ( bp = hTabFirstItem(bptable,&k); bp ;
@@ -149,6 +171,8 @@ void deleteUSERbp (int bpnum)
     int k;
     char simcmd[50];
 
+    Dprintf(D_break, ("deleteUSERbp %d\n", bpnum));
+
     /* for break points delete if they are STEP */
     for ( bp = hTabFirstItem(bptable,&k); bp ;
     bp = hTabNextItem(bptable,&k)) {
@@ -163,6 +187,7 @@ void deleteUSERbp (int bpnum)
          send command to simulator to delete bp from this addr */
       if (hTabSearch(bptable,bp->addr) == NULL) {
     simClearBP (bp->addr);
+    Dprintf(D_break, ("deleteUSERbp:simClearBP 0x%x\n", bp->addr));
 
       }
       fprintf(stdout,"Deleted breakpoint %d\n",
@@ -256,6 +281,8 @@ int dispatchCB (unsigned addr, context *ctxt)
     breakp *bp;
     int rv =0;
 
+    Dprintf(D_break, ("dispatchCB: addr:0x%x \n", addr));
+
     /* if no break points set for this address
        then use a simulator stop break point */
     if ((bp = hTabFirstItemWK(bptable,addr)) == NULL) {
@@ -270,6 +297,10 @@ int dispatchCB (unsigned addr, context *ctxt)
 
     }
 
+    if (rv == 0) {
+      Dprintf(D_break, ("dispatchCB: WARNING rv==0\n", rv));
+    }
+
     return rv;
 }
 
@@ -278,6 +309,8 @@ int dispatchCB (unsigned addr, context *ctxt)
 /*-----------------------------------------------------------------*/
 BP_CALLBACK(fentryCB)
 {
+    Dprintf(D_break, ("fentryCB: BP_CALLBACK entry\n"));
+
     /* add the current function into the call stack */
     STACK_PUSH(callStack,ctxt->func);
 
@@ -293,6 +326,8 @@ BP_CALLBACK(fentryCB)
 /*-----------------------------------------------------------------*/
 BP_CALLBACK(fexitCB)
 {
+    Dprintf(D_break, ("fexitCB: BP_CALLBACK entry\n"));
+
     /* pop the top most from the call stack */
     STACK_POP(callStack);
     return 0;
@@ -302,6 +337,8 @@ BP_CALLBACK(fexitCB)
 /*-----------------------------------------------------------------*/
 BP_CALLBACK(userBpCB)
 {
+    Dprintf(D_break, ("userBpCB: BP_CALLBACK entry\n"));
+
     if (srcMode == SRC_CMODE) {
   fprintf(stdout,"Breakpoint %d, %s() at %s:%d\n",
     bpnum,
@@ -331,6 +368,8 @@ BP_CALLBACK(userBpCB)
 BP_CALLBACK(stepBpCB)
 {
     static function *lfunc = NULL;
+
+    Dprintf(D_break, ("stepBpCB: BP_CALLBACK entry\n"));
 
     if (srcMode == SRC_CMODE) {
   if ((lfunc && lfunc != ctxt->func) || !lfunc)
@@ -367,6 +406,8 @@ BP_CALLBACK(stepBpCB)
 BP_CALLBACK(nextBpCB)
 {
     static function *lfunc = NULL;
+
+    Dprintf(D_break, ("nextBpCB: BP_CALLBACK entry\n"));
 
     if (srcMode == SRC_CMODE) {
   if ((lfunc && lfunc != ctxt->func) || !lfunc)

@@ -54,19 +54,20 @@ void readSim(int resetp)
     if (resetp)
 	sbp = simibuff;
     
-#ifdef SDCDB_DEBUG
-    fprintf(stderr,"stderr--> reading from sim\n");
-#endif
+    Dprintf(D_simi, ("readSim: reading from sim["));
 
     while ((ch = fgetc(simin))) {
+
 #ifdef SDCDB_DEBUG	
-	fputc(ch,stdout);
+ if (D_simi) {
+  	fputc(ch,stdout);
+ }
 #endif
+
 	*sbp++ = ch;    
     }
-#ifdef SDCDB_DEBUG
-    fprintf(stderr,"stderr--> reading from sim done\n");
-#endif
+
+    Dprintf(D_simi, ("] end readSim\n"));
 
     *sbp = '\0';
 }
@@ -97,9 +98,7 @@ void openSimulator (char **args, int nargs)
 
     /* fork and start the simulator as a subprocess */
     if ((simPid = fork())) {
-#ifdef SDCDB_DEBUG
-	printf("simulator pid %d\n",(int) simPid);
-#endif
+      Dprintf(D_simi, ("simulator pid %d\n",(int) simPid));
     }
     else {
 	
@@ -159,6 +158,7 @@ char *simResponse()
 /*-----------------------------------------------------------------*/
 void sendSim(char *s)
 {
+    Dprintf(D_simi, ("sendSim-->%s", s));  // s has LF at end already
     fputs(s,simout);
     fflush(simout);
 }
@@ -280,7 +280,7 @@ void simLoadFile (char *s)
 {
     char buff[128];
 
-    sprintf(buff,"l %s\n",s);
+    sprintf(buff,"l \"%s\"\n",s);
     printf(buff);
     sendSim(buff);
     waitForSim();    
@@ -295,12 +295,41 @@ unsigned int simGoTillBp ( unsigned int gaddr)
     unsigned addr ; 
     char *sfmt;
 
+    /* kpb: new code 8-03-01 */
+    if (gaddr == 0) {
+      /* initial start, start & stop from address 0 */
+     	char buf[20];
+         // this program is setting up a bunch of breakpoints automatically
+         // at key places.  Like at startup & main() and other function
+         // entry points.  So we don't need to setup one here..
+      //sendSim("break 0x0\n");
+      //sleep(1);
+      //waitForSim();
+
+     	sendSim("run 0x0\n");
+      sleep(1);  /* do I need this? */
+    } else	if (gaddr == -1) { /* resume */
+
+      // try adding this(kpb)
+      sendSim("step\n");
+      usleep(100000);
+      waitForSim();
+
+     	sendSim ("run\n");
+    }
+    else {
+      printf("Error, simGoTillBp > 0!\n");
+      exit(1);
+    }
+
+#if 0
     if (gaddr != -1) {
 	char buf[20];
 	sprintf(buf,"g 0x%x\n",gaddr);
 	sendSim(buf);
     } else	
 	sendSim ("g\n");
+#endif
     
     waitForSim();
     
@@ -327,15 +356,18 @@ unsigned int simGoTillBp ( unsigned int gaddr)
 	sr++;
     }
 
-    if (!*sr) return 0;
+    if (!*sr) {
+      fprintf(stderr, "Error?, simGoTillBp failed to Stop\n");
+      return 0;
+    }
 
     while (isspace(*sr)) sr++ ;
 
-    if (sscanf(sr,sfmt,&addr) != 1)
-	return 0;
-    else
+    if (sscanf(sr,sfmt,&addr) != 1) {
+      fprintf(stderr, "Error?, simGoTillBp failed to get Addr\n");
+      return 0;
+    }
 	return addr;
-     
 
 }
 
@@ -378,7 +410,9 @@ char  *simRegs()
     char *rb = regBuff;
     int i;
 
-    sendSim("dr\n");
+    sendSim("info registers\n");
+    //kpb(8-5-01) sendSim("dr\n");
+
     waitForSim();
     /* make it some more readable */
     resp  = simResponse();
@@ -386,10 +420,24 @@ char  *simRegs()
     /* the response is of the form 
        XXXXXX R0 R1 R2 R3 R4 R5 R6 R7 ........
        XXXXXX XX . ACC=0xxx dd cc B=0xxx dd cc DPTR= 0xxxxx @DPTR= 0xxx dd cc
-       XXXXXX XX . PSW= 0xxx CY=[1|0] AC=[0|1] OV=[0|1] P=[1|0] */
+       XXXXXX XX . PSW= 0xxx CY=[1|0] AC=[0|1] OV=[0|1] P=[1|0]
+
+Format as of 8-4-01:
+       0x00 00 00 00 00 00 00 00 00 ........
+       000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+       000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+F  0x006d 75 87 80 MOV   PCON,#80
+*/
+
     memset(regBuff,0,sizeof(regBuff));
     /* skip the first numerics */
     while (*resp && !isxdigit(*resp)) resp++;
+
+    if (strncmp(resp, "0x", 2)) {
+      fprintf(stderr, "Error: Format1A\n");
+      return regBuff;
+    }
+    resp += 2;
     while (*resp && isxdigit(*resp)) resp++;
 
     /* now get the eight registers */

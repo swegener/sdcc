@@ -26,6 +26,18 @@
 
 /* #define SDCDB_DEBUG */
 
+#ifdef SDCDB_DEBUG
+// set D_x to 0 to turn off, 1 to turn on.
+#define D_break  1
+#define D_simi   1
+#define D_sdcdb  1
+#define D_symtab 1
+
+#define Dprintf(f, fs) {if (f) printf fs ; }
+#else
+#define Dprintf(f, fs) { }
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

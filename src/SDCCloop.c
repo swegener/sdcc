@@ -231,7 +231,8 @@ DEFSETFUNC (addToExitsMarkDepth)
   V_ARG (region *, lr);
 
   /* mark the loop depth of this block */
-  if (!ebp->depth)
+  //if (!ebp->depth)
+  if (ebp->depth<depth)
     ebp->depth = depth;
 
   /* put the loop region info in the block */
@@ -803,7 +804,7 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 		     "this will keep the regressions tests going.\n",
 		     __FILE__, __LINE__);
 	    continue;
-	  } continue;
+	  }
 
 	  /* replace the inducted variable by the iTemp */
 	  replaceSymBySym (loopReg->regBlocks, IC_RESULT (ic), IC_RIGHT (ic));

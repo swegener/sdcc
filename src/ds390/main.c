@@ -201,6 +201,31 @@ _ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   return TRUE;
 }
 
+/* Do CSE estimation */
+static bool cseCostEstimation (iCode *ic, iCode *pdic)
+{
+    operand *result = IC_RESULT(ic);
+    operand *right  = IC_RIGHT(ic);
+    operand *left   = IC_LEFT(ic);
+    sym_link *result_type = operandType(result);
+    sym_link *right_type  = (right ? operandType(right) : 0);
+    sym_link *left_type   = (left  ? operandType(left)  : 0);
+    
+    /* if it is a pointer then return ok for now */
+    if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;
+    
+    /* if bitwise | add & subtract then no since mcs51 is pretty good at it 
+       so we will cse only if they are local (i.e. both ic & pdic belong to
+       the same basic block */
+    if (IS_BITWISE_OP(ic) || ic->op == '+' || ic->op == '-') {
+	/* then if they are the same Basic block then ok */
+	if (ic->eBBlockNum == pdic->eBBlockNum) return 1;
+	else return 0;
+    }
+	
+    /* for others it is cheaper to do the cse */
+    return 1;
+}
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -296,5 +321,6 @@ PORT ds390_port =
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
   TRUE,                         /* we support array initializers. */
+  cseCostEstimation,
   PORT_MAGIC
 };

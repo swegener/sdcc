@@ -152,9 +152,10 @@ sfr at 0xd5 MC;
 sfr at 0xd8 WDCON; // watch dog
   sbit at 0xd8 RWT;
   sbit at 0xd9 EWT;
-  sbit at 0xda WTRF;
-  sbit at 0xdb PF1;
-  sbit at 0xdc EPF1;
+  sbit at 0xda WDRF;
+  sbit at 0xdb WDIF;
+  sbit at 0xdc PFI;
+  sbit at 0xdd EPFI;
   sbit at 0xde POR;
   sbit at 0xdf SMOD_1;
 sfr at 0xe0 ACC; // accumulator

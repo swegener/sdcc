@@ -120,10 +120,11 @@ eBBSuccessors (eBBlock ** ebbs, int count)
 
 	  if (ebbs[i]->ech)
 	    {
-
+#if 0
 	      if (ebbs[i]->ech->op != GOTO &&
 		  ebbs[i]->ech->op != RETURN &&
 		  ebbs[i]->ech->op != JUMPTABLE)
+#endif
 		{
 		  int j = i + 1;
 

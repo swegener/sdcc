@@ -22,7 +22,7 @@ CFLAGS	+= -I$(PRJDIR)/as/$(PORT) -I$(SLIB)
 all:	$(BINS)
 
 $(BINS): $(OBJDIR) $(OBJS) $(SLIBOBJS)
-	$(CC) $(LDFLAGS) -o $(BINS) $(OBJS) $(SLIBOBJS) 
+	$(CC) $(LDFLAGS) -g -o $(BINS) $(OBJS) $(SLIBOBJS) 
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)

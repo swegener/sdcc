@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <alloc.h>
+#include <stdlib.h>
 #include "aslink.h"
 
 /*)Module	lklist.c

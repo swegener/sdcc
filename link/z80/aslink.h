@@ -89,7 +89,8 @@
 #define	HMASK	077		/* Hash mask */
 #define	NLPP	60		/* Lines per page */
 #define	NTXT	16		/* T values */
-#define	FILSPC	80		/* File spec length */
+/** PENDING: Taking this to 256 causes a segfault. */
+#define	FILSPC	100		/* File spec length */
 
 /*
  *	The "R_" relocation constants define values used in

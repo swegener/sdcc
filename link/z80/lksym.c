@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <alloc.h>
+#include <stdlib.h>
 #include "aslink.h"
 
 /*)Module	lksym.c
@@ -56,7 +56,6 @@
 VOID
 syminit()
 {
-	register int h;
 	struct sym **spp;
 
 	spp = &symhash[0];
@@ -348,7 +347,7 @@ symmod(fp, tsp)
 FILE *fp;
 struct sym *tsp;
 {
-	register int i, j;
+    register int i;
 	struct sym **p;
 
 	if ((hp = headp) != NULL) {

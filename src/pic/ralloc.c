@@ -407,8 +407,27 @@ debugLogRegType (short type)
       return "REG_CND";
     }
 
-  sprintf (buffer, "unkown reg type %d", type);
+  sprintf (buffer, "unknown reg type %d", type);
   return buffer;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static int regname2key(char const *name)
+{
+  int key = 0;
+
+  if(!name)
+    return 0;
+
+  while(*name) {
+
+    key += (*name++) + 1;
+
+  }
+
+  return ( (key + (key >> 4) + (key>>8)) & 0x3f);
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -434,7 +453,11 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
   //fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
   dReg->isFree = 0;
   dReg->wasUsed = 1;
-  dReg->isFixed = 0;
+  if(type == REG_SFR)
+    dReg->isFixed = 1;
+  else
+    dReg->isFixed = 0;
+
   dReg->isMapped = 0;
   dReg->isEmitted = 0;
   dReg->address = 0;
@@ -443,6 +466,8 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
   dReg->reg_alias = NULL;
   dReg->reglives.usedpFlows = newSet();
   dReg->reglives.assignedpFlows = newSet();
+
+  hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
 
   return dReg;
 }
@@ -492,6 +517,8 @@ void initStack(int base_address, int size)
   int i;
 
   Gstack_base_addr = base_address;
+  //fprintf(stderr,"initStack");
+
   for(i = 0; i<size; i++)
     addSet(&dynStackRegs,newReg(REG_STK, PO_GPR_TEMP,base_address++,NULL,1,0));
 }
@@ -499,6 +526,8 @@ void initStack(int base_address, int size)
 regs *
 allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 {
+
+  //fprintf(stderr,"allocProcessorRegister %s addr =0x%x\n",name,rIdx);
   return addSet(&dynProcessorRegs,newReg(REG_SFR, po_type, rIdx, name,1,alias));
 }
 
@@ -507,6 +536,7 @@ allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 {
   regs * reg = newReg(REG_SFR, po_type, rIdx, name,1,alias);
 
+  //fprintf(stderr,"allocInternalRegister %s addr =0x%x\n",name,rIdx);
   if(reg) {
     reg->wasUsed = 0;
     return addSet(&dynInternalRegs,reg);
@@ -522,30 +552,13 @@ allocReg (short type)
 {
 
   debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
+  //fprintf(stderr,"allocReg\n");
 
 
   return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
 
 }
 
-/*-----------------------------------------------------------------*/
-/*-----------------------------------------------------------------*/
-static int regname2key(char const *name)
-{
-  int key = 0;
-
-  if(!name)
-    return 0;
-
-  while(*name) {
-
-    key += (*name++) + 1;
-
-  }
-
-  return ( (key + (key >> 4) + (key>>8)) & 0x3f);
-
-}
 
 /*-----------------------------------------------------------------*/
 /* dirregWithName - search for register by name                    */
@@ -632,7 +645,21 @@ allocDirReg (operand *op )
     return NULL;
 
   /* First, search the hash table to see if there is a register with this name */
-  reg = dirregWithName(name);
+  if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && !(IS_BITVAR (OP_SYM_ETYPE(op))) ) {
+    reg = regWithIdx (dynProcessorRegs, SPEC_ADDR ( OP_SYM_ETYPE(op)), 1);
+/*
+    if(!reg) 
+      fprintf(stderr,"ralloc %s is at fixed address but not a processor reg, addr=0x%x\n",
+	      name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
+    else
+      fprintf(stderr,"ralloc %s at fixed address has already been declared, addr=0x%x\n",
+	      name, SPEC_ADDR ( OP_SYM_ETYPE(op)));
+*/
+  } else {
+    //fprintf(stderr,"ralloc %s \n", name);
+    
+    reg = dirregWithName(name);
+  }
 
   if(!reg) {
     int address = 0;
@@ -646,20 +673,24 @@ allocDirReg (operand *op )
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
     if(!IS_CONFIG_ADDRESS(address)) {
+      //fprintf(stderr,"allocating new reg %s\n",name);
+
       reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
       debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
-/*
+
+      //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+
       if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-	reg->isFixed = 1;
-	reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
-	debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
+
+	//fprintf(stderr, " ralloc.c at fixed address: %s - changing to REG_SFR\n",name);
+	reg->type = REG_SFR;
       }
-*/
-      hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+
       if (IS_BITVAR (OP_SYM_ETYPE(op)))
 	addSet(&dynDirectBitRegs, reg);
       else
 	addSet(&dynDirectRegs, reg);
+
     } else {
       debugLog ("  -- %s is declared at address 0x2007\n",name);
 
@@ -689,8 +720,6 @@ allocRegByName (char *name, int size)
     exit(1);
   }
 
-  debugLog ("%s symbol name %s\n", __FUNCTION__,name);
-
   /* First, search the hash table to see if there is a register with this name */
   reg = dirregWithName(name);
 
@@ -699,12 +728,12 @@ allocRegByName (char *name, int size)
     /* Register wasn't found in hash, so let's create
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
-
+    //fprintf (stderr,"%s symbol name %s\n", __FUNCTION__,name);
     reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0 );
 
     debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
 
-    hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
+    //hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
     addSet(&dynDirectRegs, reg);
   }
 
@@ -754,36 +783,6 @@ typeRegWithIdx (int idx, int type, int fixed)
     break;
   }
 
-#if 0
-
-  if( (dReg = regWithIdx ( dynAllocRegs, idx, fixed)) != NULL) {
-
-    debugLog ("Found a Dynamic Register!\n");
-    return dReg;
-  }
-
-  if( (dReg = regWithIdx ( dynStackRegs, idx, fixed)) != NULL ) {
-    debugLog ("Found a Stack Register!\n");
-    return dReg;
-  }
-
-  if( (dReg = regWithIdx ( dynDirectRegs, idx, fixed)) != NULL ) {
-    debugLog ("Found a Direct Register!\n");
-    return dReg;
-  }
-
-  if( (dReg = regWithIdx ( dynProcessorRegs, idx, fixed)) != NULL ) {
-    debugLog ("Found a Processor Register!\n");
-    return dReg;
-  }
-#endif
-
-  /*
-    if( (dReg = regWithIdx ( dynDirectBitRegs, idx, fixed)) != NULL ) {
-    debugLog ("Found a bit Register!\n");
-    return dReg;
-    }
-  */
 
   return NULL;
 }
@@ -857,7 +856,7 @@ pic14_findFreeReg(short type)
   case REG_GPR:
     if((dReg = regFindFree(dynAllocRegs)) != NULL)
       return dReg;
-
+    //fprintf(stderr,"findfreereg\n");
     return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
 
   case REG_STK:
@@ -924,7 +923,6 @@ nfreeRegsType (int type)
   return nFreeRegs (type);
 }
 
-//<<<<<<< ralloc.c
 void writeSetUsedRegs(FILE *of, set *dRegs)
 {
 
@@ -954,6 +952,7 @@ void packBits(set *bregs)
   int byte_no=-1;
   char buffer[20];
 
+
   for (regset = bregs ; regset ;
        regset = regset->next) {
 
@@ -971,12 +970,12 @@ void packBits(set *bregs)
       if(!bitfield) {
 	sprintf (buffer, "fbitfield%02x", breg->address);
 	//fprintf(stderr,"new bit field\n");
-	bitfield = newReg(REG_GPR, PO_GPR_BIT,breg->address,buffer,1,0);
+	bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0);
 	bitfield->isBitField = 1;
 	bitfield->isFixed = 1;
 	bitfield->address = breg->address;
 	addSet(&dynDirectRegs,bitfield);
-	hTabAddItem(&dynDirectRegNames, regname2key(buffer), bitfield);
+	//hTabAddItem(&dynDirectRegNames, regname2key(buffer), bitfield);
       } else {
 	//fprintf(stderr,"  which is occupied by %s (addr = %d)\n",bitfield->name,bitfield->address);
 	;
@@ -993,7 +992,7 @@ void packBits(set *bregs)
 	relocbitfield = newReg(REG_GPR, PO_GPR_BIT,rDirectIdx++,buffer,1,0);
 	relocbitfield->isBitField = 1;
 	addSet(&dynDirectRegs,relocbitfield);
-	hTabAddItem(&dynDirectRegNames, regname2key(buffer), relocbitfield);
+	//hTabAddItem(&dynDirectRegNames, regname2key(buffer), relocbitfield);
 
       }
 
@@ -1037,7 +1036,7 @@ void bitEQUs(FILE *of, set *bregs)
   }
       
 }
-void aliasEQUs(FILE *of, set *fregs)
+void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
 {
   regs *reg;
 
@@ -1045,10 +1044,16 @@ void aliasEQUs(FILE *of, set *fregs)
   for (reg = setFirstItem(fregs) ; reg ;
        reg = setNextItem(fregs)) {
 
-    if(!reg->isEmitted && reg->wasUsed)
-      fprintf (of, "%s\tEQU\t0x%03x\n",
-	       reg->name,
-	       reg->address);
+    if(!reg->isEmitted && reg->wasUsed) {
+      if(use_rIdx)
+	fprintf (of, "%s\tEQU\t0x%03x\n",
+		 reg->name,
+		 reg->rIdx);
+      else
+	fprintf (of, "%s\tEQU\t0x%03x\n",
+		 reg->name,
+		 reg->address);
+    }
   }
       
 }
@@ -1070,9 +1075,10 @@ void writeUsedRegs(FILE *of)
 
   dump_cblock(of);
   bitEQUs(of,dynDirectBitRegs);
-  aliasEQUs(of,dynAllocRegs);
-  aliasEQUs(of,dynDirectRegs);
-  aliasEQUs(of,dynStackRegs);
+  aliasEQUs(of,dynAllocRegs,0);
+  aliasEQUs(of,dynDirectRegs,0);
+  aliasEQUs(of,dynStackRegs,0);
+  aliasEQUs(of,dynProcessorRegs,1);
 
 }
 
@@ -1104,8 +1110,7 @@ allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
   return TRUE;
 }
 #endif
-//=======
-//>>>>>>> 1.28
+
 /*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */
 /*-----------------------------------------------------------------*/
@@ -2376,7 +2381,7 @@ rematStr (symbol * sym)
 	  //s += strlen(s);
 	  //ic = OP_SYMBOL(IC_LEFT(ic))->rematiCode;
 	  //continue ;
-	  fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
+	  //fprintf(stderr, "ralloc.c:%d OOPS %s\n",__LINE__,s);
 	  return buffer;
 	}
 

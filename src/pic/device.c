@@ -559,7 +559,7 @@ void mapRegister(regs *reg)
 
     do {
 
-      // fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
+      //fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
 
       finalMapping[reg->address + alias + i].reg = reg;
       finalMapping[reg->address + alias + i].instance = i;
@@ -587,7 +587,7 @@ int assignRegister(regs *reg, int start_address)
   if(reg->isFixed) {
 
     if (validAddress(reg->address,reg->size)) {
-
+      fprintf(stderr,"%s -  %s address = 0x%03x\n",__FUNCTION__,reg->name, reg->address);
       mapRegister(reg);
       return reg->address;
     }

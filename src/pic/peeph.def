@@ -164,7 +164,7 @@ replace restart {
 replace restart {
 	decf	%1,f
 	movf	%1,w
-	btfss	status,z
+	btfss	_STATUS,z
 	goto	%2
 } by {
 	; peep 3 - decf/mov/skpz to decfsz
@@ -223,7 +223,17 @@ replace restart {
 	movf	%2,w
 	xorwf	%1,w
 } by {
-	; peep 9 - Removed redundant move
+	; peep 9a - Removed redundant move
 	movwf	%1
 	xorwf	%2,w
+}
+
+replace restart {
+	movwf	%1
+	movf	%2,w
+	iorwf	%1,w
+} by {
+	; peep 9b - Removed redundant move
+	movwf	%1
+	iorwf	%2,w
 }

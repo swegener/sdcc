@@ -64,7 +64,7 @@ extern void initialComments (FILE * afile);
 extern void printPublics (FILE * afile);
 
 extern void printChar (FILE * ofile, char *s, int plen);
-
+void  pCodeInitRegisters(void);
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
@@ -734,31 +734,9 @@ picglue ()
   FILE *vFile;
   FILE *asmFile;
   FILE *ovrFile = tempfile();
-  //  int i;
-#if 0
-  set *s=NULL,*t=NULL;
-  char a=1,b=2,c=3;
-
-
-  addSet(&s,&a);
-  addSet(&s,&b);
-  addSet(&s,&c);
-
-  DFPRINTF((stderr,"\n\n\n******************\n\n\n"));
-  for(t=s; t; t=t->next) {
-    if(t->item) 
-      DFPRINTF((stderr,"Set item %d\n",*(char *)t->item));
-  }
-
-  s =reverseSet(s);
-  for(t=s; t; t=t->next) {
-    if(t->item) 
-      DFPRINTF((stderr,"Set item %d\n",*(char *)t->item));
-  }
-#endif
 
   addSetHead(&tmpfileSet,ovrFile);
-
+  pCodeInitRegisters();
 
   if (mainf && IFFUNC_HASBODY(mainf->type)) {
 

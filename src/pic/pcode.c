@@ -50,12 +50,12 @@ peepCommand peepCommands[] = {
 
 
 // Eventually this will go into device dependent files:
-pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
+pCodeOpReg pc_status    = {{PO_STATUS,  "_STATUS"}, -1, NULL,0,NULL};
 pCodeOpReg pc_indf      = {{PO_INDF,    "INDF"}, -1, NULL,0,NULL};
 pCodeOpReg pc_fsr       = {{PO_FSR,     "FSR"}, -1, NULL,0,NULL};
 pCodeOpReg pc_intcon    = {{PO_INTCON,  ""}, -1, NULL,0,NULL};
 pCodeOpReg pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
-pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
+pCodeOpReg pc_pclath    = {{PO_PCLATH,  "_PCLATH"}, -1, NULL,0,NULL};
 
 pCodeOpReg pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
@@ -1206,13 +1206,18 @@ extern void init_pic(char *);
 
 void  pCodeInitRegisters(void)
 {
+  static int initialized=0;
+
+  if(initialized)
+    return;
+  initialized = 1;
 
   initStack(0xfff, 8);
   init_pic(port->processor);
 
-  pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
+  pc_status.r = allocProcessorRegister(IDX_STATUS,"_STATUS", PO_STATUS, 0x80);
   pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
-  pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x80);
+  pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"_PCLATH", PO_PCLATH, 0x80);
   pc_fsr.r = allocProcessorRegister(IDX_FSR,"FSR", PO_FSR, 0x80);
   pc_indf.r = allocProcessorRegister(IDX_INDF,"INDF", PO_INDF, 0x80);
   pc_intcon.r = allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x80);
@@ -2779,11 +2784,14 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static pBranch * pBranchAppend(pBranch *h, pBranch *n)
+pBranch * pBranchAppend(pBranch *h, pBranch *n)
 {
   pBranch *b;
 
   if(!h)
+    return n;
+
+  if(h == n)
     return n;
 
   b = h;
@@ -3600,7 +3608,7 @@ void LinkFlow(pBlock *pb)
       //pc->print(stderr,pc);
 
       if(!(pcol && isPCOLAB(pcol))) {
-	if((PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL)) {
+	if((PCI(pc)->op != POC_RETLW) && (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL)) {
 	  pc->print(stderr,pc);
 	  fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
 	}

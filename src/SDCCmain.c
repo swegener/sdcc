@@ -1265,8 +1265,8 @@ linkEdit (char **envp)
   WRITE_SEG_LOC (BIT_NAME, 0);
 
   /* JCF: stack start */
-  if(options.stack_loc) {
-	WRITE_SEG_LOC ("SSEG", options.stack_loc & 0xff);
+  if ( (options.stack_loc) && (options.stack_loc<0x100) ) {
+	WRITE_SEG_LOC ("SSEG", options.stack_loc);
   }
 
   /* add the extra linker options */

@@ -71,5 +71,11 @@ regs *pic14_regWithIdx (int);
 void  pic14_freeAllRegs ();
 void  pic14_deallocateAllRegs ();
 regs *pic14_findFreeReg(short type);
+regs *pic14_allocWithIdx (int idx);
+
+/* Define register address that are constant across PIC family */
+#define IDX_INDF    0
+#define IDX_FSR     4
+#define IDX_KZ      0x7fff   /* Known zero - actually just a general purpose reg. */
 
 #endif

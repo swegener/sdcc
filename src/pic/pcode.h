@@ -607,6 +607,7 @@ extern pCodeOpReg pc_indf;
 extern pCodeOpReg pc_fsr;
 extern pCodeOpReg pc_pcl;
 extern pCodeOpReg pc_pclath;
+extern pCodeOpReg pc_kzero;
 
 
 ////////////////////   DELETE THIS ///////////////////

@@ -40,6 +40,8 @@ pCodeOpReg pc_fsr       = {{PO_FSR,     "FSR"}, -1, NULL,NULL};
 pCodeOpReg pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,NULL};
 pCodeOpReg pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,NULL};
 
+pCodeOpReg pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,NULL};
+
 static int mnemonics_initialized = 0;
 
 
@@ -773,11 +775,14 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 void  pCodeInitRegisters(void)
 {
 
-  pc_fsr.rIdx = 4;
-  pc_fsr.r = pic14_regWithIdx(4);
+  pc_fsr.rIdx = IDX_FSR;
+  pc_fsr.r = pic14_regWithIdx(IDX_FSR);
 
-  pc_indf.rIdx = 0;
-  pc_indf.r = pic14_regWithIdx(0);
+  pc_indf.rIdx = IDX_INDF;
+  pc_indf.r = pic14_regWithIdx(IDX_INDF);
+
+  pc_kzero.rIdx = IDX_KZ;
+  pc_kzero.r = pic14_regWithIdx(IDX_KZ);
 
 }
 
@@ -2076,8 +2081,8 @@ void AnalyzepBlock(pBlock *pb)
 
   /* Find all of the registers used in this pBlock */
   for(pc = pb->pcHead; pc; pc = pc->next) {
-    if(pc->type == PC_OPCODE) {
-      if(PCI(pc)->pcop && PCI(pc)->pcop->type == PO_GPR_TEMP) {
+    if(pc->type == PC_OPCODE && PCI(pc)->pcop) {
+      if(PCI(pc)->pcop->type == PO_GPR_TEMP) {
 
 	/* Loop through all of the registers declared so far in
 	   this block and see if we find this one there */
@@ -2102,7 +2107,20 @@ void AnalyzepBlock(pBlock *pb)
 	} else 
 	  fprintf(stderr,"found register in pblock: reg %d\n",r->rIdx);
       }
+      if(PCI(pc)->pcop->type == PO_GPR_REGISTER) {
+	if(PCOR(PCI(pc)->pcop)->r) {
+	  pic14_allocWithIdx (PCOR(PCI(pc)->pcop)->r->rIdx);
+	  fprintf(stderr,"found register in pblock: reg 0x%x\n",PCOR(PCI(pc)->pcop)->r->rIdx);
+	} else {
+	  if(PCI(pc)->pcop->name)
+	    fprintf(stderr,"ERROR: %s is a NULL register\n",PCI(pc)->pcop->name );
+	  else
+	    fprintf(stderr,"ERROR: NULL register\n");
+	}
+      }
     }
+
+
   }
 }
 

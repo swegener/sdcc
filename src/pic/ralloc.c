@@ -134,8 +134,12 @@ regs regspic14[] =
   {REG_STK, PO_GPR_TEMP, 0x46, "r0x46", "r0x46", 0x46, 1, 0},
   {REG_STK, PO_GPR_TEMP, 0x47, "r0x47", "r0x47", 0x47, 1, 0},
 
-  {REG_STK, PO_FSR, 4, "FSR", "FSR", 4, 1, 0},
-  {REG_STK, PO_INDF, 0, "INDF", "INDF", 0, 1, 0},
+  {REG_SFR, PO_GPR_REGISTER, IDX_KZ,    "KZ",  "KZ",   IDX_KZ,   1, 0}, /* Known zero */
+
+
+  {REG_STK, PO_FSR,      IDX_FSR,  "FSR",  "FSR",  IDX_FSR,  1, 0},
+  {REG_STK, PO_INDF,     IDX_INDF, "INDF", "INDF", IDX_INDF, 1, 0},
+
 
 };
 
@@ -532,6 +536,29 @@ pic14_regWithIdx (int idx)
   exit (1);
 }
 
+/*-----------------------------------------------------------------*/
+/* pic14_regWithIdx - returns pointer to register wit index number       */
+/*-----------------------------------------------------------------*/
+regs *
+pic14_allocWithIdx (int idx)
+{
+  int i;
+
+  debugLog ("%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
+
+  for (i = 0; i < pic14_nRegs; i++)
+    if (regspic14[i].rIdx == idx){
+      debugLog ("%s - alloc fount index = 0x%x\n", __FUNCTION__,idx);
+      regspic14[i].wasUsed = 1;
+      regspic14[i].isFree = 0;
+      return &regspic14[i];
+    }
+  //return &regspic14[0];
+  fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
+  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	  "regWithIdx not found");
+  exit (1);
+}
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 regs *
@@ -2001,8 +2028,10 @@ pic14_deallocateAllRegs ()
 
   debugLog ("%s\n", __FUNCTION__);
   for (i = 0; i < pic14_nRegs; i++) {
-    regspic14[i].isFree = 1;
-    regspic14[i].wasUsed = 0;
+    if(regspic14[i].pc_type == PO_GPR_TEMP) {
+      regspic14[i].isFree = 1;
+      regspic14[i].wasUsed = 0;
+    }
   }
 }
 

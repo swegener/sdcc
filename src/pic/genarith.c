@@ -65,6 +65,7 @@
 
 
 #define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0xff)
+void DEBUGpic14_AopType(int line_no, operand *left, operand *right, operand *result);
 
 const char *AopType(short type)
 {
@@ -727,6 +728,8 @@ void genPlus (iCode *ic)
   aopOp (IC_RIGHT(ic),ic,FALSE);
   aopOp (IC_RESULT(ic),ic,TRUE);
 
+  DEBUGpic14_AopType(__LINE__,IC_LEFT(ic),IC_RIGHT(ic),IC_RESULT(ic));
+
   /* if literal, literal on the right or
      if left requires ACC or right is already
      in ACC */
@@ -879,6 +882,9 @@ void genPlus (iCode *ic)
       
   } else {
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);    
+
+    /* Add the first bytes */
+
     if(strcmp(aopGet(AOP(IC_LEFT(ic)),0,FALSE,FALSE),"a") == 0 ) {
       emitpcode(POC_ADDFW, popGet(AOP(IC_RIGHT(ic)),0));
       emitpcode(POC_MOVWF,popGet(AOP(IC_RESULT(ic)),0));
@@ -907,8 +913,9 @@ void genPlus (iCode *ic)
       }
     }
 
+    size = min( AOP_SIZE(IC_RESULT(ic)), AOP_SIZE(IC_RIGHT(ic))) - 1;
     offset = 1;
-    size--;
+
 
     while(size--){
       if (!pic14_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
@@ -935,6 +942,49 @@ void genPlus (iCode *ic)
     }
 
   }
+
+  if (AOP_SIZE(IC_RESULT(ic)) > AOP_SIZE(IC_RIGHT(ic))) {
+    int sign =  !(SPEC_USIGN(getSpec(operandType(IC_LEFT(ic)))) |
+		  SPEC_USIGN(getSpec(operandType(IC_RIGHT(ic)))) );
+
+
+    /* Need to extend result to higher bytes */
+    size = AOP_SIZE(IC_RESULT(ic)) - AOP_SIZE(IC_RIGHT(ic)) - 1;
+
+    /* First grab the carry from the lower bytes */
+    emitpcode(POC_CLRF, popGet(AOP(IC_RESULT(ic)),offset));
+    emitpcode(POC_RLF,  popGet(AOP(IC_RESULT(ic)),offset));
+
+
+    if(sign) {
+      /* Now this is really horrid. Gotta check the sign of the addends and propogate
+       * to the result */
+
+      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(IC_LEFT(ic)),offset-1,FALSE,FALSE),7,0));
+      emitpcode(POC_DECF,  popGet(AOP(IC_RESULT(ic)),offset));
+      emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(IC_RIGHT(ic)),offset-1,FALSE,FALSE),7,0));
+      emitpcode(POC_DECF,  popGet(AOP(IC_RESULT(ic)),offset));
+
+      /* if chars or ints or being signed extended to longs: */
+      if(size) {
+	emitpcode(POC_MOVLW, popGetLit(0));
+	emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(IC_RESULT(ic)),offset,FALSE,FALSE),7,0));
+	emitpcode(POC_MOVLW, popGetLit(0xff));
+      }
+    }
+
+    offset++;
+    while(size--) {
+      
+      if(sign)
+	emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset));
+      else
+	emitpcode(POC_CLRF,  popGet(AOP(IC_RESULT(ic)),offset));
+
+      offset++;
+    }
+  }
+
 
   //adjustArithmeticResult(ic);
 

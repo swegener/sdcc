@@ -1733,7 +1733,7 @@ operand *geniCodeArray (operand *left,operand *right)
     }
 
     /* array access */
-    if (/* getSize(ltype) > 1 &&  */(getSize(operandType(right)) < INTSIZE)) 
+    if (getSize(operandType(right)) < INTSIZE) 
     {
         /* Widen the index type to int first. */
 	right = geniCodeCast(INTTYPE,right,TRUE);	    

@@ -1,3 +1,12 @@
+2003-05-11  Borut Razem <borut.razem@siol.net>
+
+	* src/SDCCutil.c: WIN32 version of getBinPath() calls GetModuleFileName() to determine
+	the path of bin directory, so that PATH is the only env. variable, which has to be set
+	in case of standard installation.
+	* src/ds390/ds390.dsp: increased /Zm option value to 1000
+	* src/pic/main.c: add quotes to file name parameters for gplink and gpasm
+	* src/SDCCglobl.h, src/SDCCmain.c, doc/sdccman.lyx: added --print-search-dirs command line option
+
 2003-05-04  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (linkEdit): fixed buffer overflow for gbz80

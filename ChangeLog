@@ -1,5 +1,12 @@
 2004-05-25 Vangelis Rokas <vrokas AT otenet.gr>
 
+	Updated pic16 library sources and headers.
+	* device/lib/pic16/pic18f*/ ,
+	* device/include/pic16/*.h: modified to handle structured SFR
+	definitions
+
+2004-05-25 Vangelis Rokas <vrokas AT otenet.gr>
+
 	* src/port.h (PORT structure): added hook initPaths, now each
 	port can declare its own default search paths,
 	which can been seen with the --print-search-dirs option,

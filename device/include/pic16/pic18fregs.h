@@ -17,6 +17,9 @@
 
 
 #if defined(pic18f242)
+#  include <pic18f242.h>
+
+#elif defined(pic18f248)
 #  include <pic18f248.h>
 
 #elif defined(pic18f252)
@@ -35,7 +38,7 @@
 #  include <pic18f452.h>
 
 #elif defined(pic18f458)
-# include <pic18f458.h>
+#  include <pic18f458.h>
 
 #else
 #  error Unsupported processor

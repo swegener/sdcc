@@ -7378,28 +7378,54 @@ static void
 shiftRLong (operand * left, int offl,
 	    operand * result, int sign)
 {
-  if (!sign)
+  int isSameRegs=sameRegs(AOP(left),AOP(result));
+
+  if (isSameRegs && offl>1) {
+    // we are in big trouble, but this shouldn't happen
+    werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
+  }
+
+  MOVA (aopGet (AOP (left), MSB32, FALSE, FALSE));
+  
+  if (offl==MSB16) {
+    // shift is > 8
+    if (sign) {
+      emitcode ("rlc", "a");
+      emitcode ("subb", "a,acc");
+      emitcode ("xch", "a,%s", aopGet(AOP(left), MSB32, FALSE, FALSE));
+    } else {
+      aopPut (AOP(result), zero, MSB32);
+    }
+  }
+
+  if (!sign) {
     emitcode ("clr", "c");
-  MOVA (aopGet (AOP (left), MSB32, FALSE, FALSE, TRUE));
-  if (sign)
+  } else {
     emitcode ("mov", "c,acc.7");
-  emitcode ("rrc", "a");
-  aopPut (AOP (result), "a", MSB32 - offl);
-  if (offl == MSB16)
-    /* add sign of "a" */
-    addSign (result, MSB32, sign);
+  }
 
-  MOVA (aopGet (AOP (left), MSB24, FALSE, FALSE, TRUE));
   emitcode ("rrc", "a");
-  aopPut (AOP (result), "a", MSB24 - offl);
 
-  MOVA (aopGet (AOP (left), MSB16, FALSE, FALSE, TRUE));
+  if (isSameRegs && offl==MSB16) {
+    emitcode ("xch", "a,%s",aopGet (AOP (left), MSB24, FALSE, FALSE));
+  } else {
+    aopPut (AOP (result), "a", MSB32);
+    MOVA (aopGet (AOP (left), MSB24, FALSE, FALSE));
+  }
+
+  emitcode ("rrc", "a");
+  if (isSameRegs && offl==1) {
+    emitcode ("xch", "a,%s",aopGet (AOP (left), MSB16, FALSE, FALSE));
+  } else {
+    aopPut (AOP (result), "a", MSB24);
+    MOVA (aopGet (AOP (left), MSB16, FALSE, FALSE));
+  }
   emitcode ("rrc", "a");
   aopPut (AOP (result), "a", MSB16 - offl);
 
   if (offl == LSB)
     {
-      MOVA (aopGet (AOP (left), LSB, FALSE, FALSE, TRUE));
+      MOVA (aopGet (AOP (left), LSB, FALSE, FALSE));
       emitcode ("rrc", "a");
       aopPut (AOP (result), "a", LSB);
     }

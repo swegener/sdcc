@@ -6151,12 +6151,14 @@ genLeftShiftLiteral (operand * left,
 	  break;
 
 	case 2:
-	case 3:
 	  genlshTwo (result, left, shCount);
 	  break;
 
 	case 4:
 	  genlshFour (result, left, shCount);
+	  break;
+	default:
+	  fprintf(stderr, "*** ack! mystery literal shift!\n");
 	  break;
 	}
     }
@@ -6311,22 +6313,48 @@ static void
 shiftRLong (operand * left, int offl,
 	    operand * result, int sign)
 {
-  if (!sign)
-    emitcode ("clr", "c");
+  int isSameRegs=sameRegs(AOP(left),AOP(result));
+
+  if (isSameRegs && offl>1) {
+    // we are in big trouble, but this shouldn't happen
+    werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
+  }
+
   MOVA (aopGet (AOP (left), MSB32, FALSE, FALSE));
-  if (sign)
+  
+  if (offl==MSB16) {
+    // shift is > 8
+    if (sign) {
+      emitcode ("rlc", "a");
+      emitcode ("subb", "a,acc");
+      emitcode ("xch", "a,%s", aopGet(AOP(left), MSB32, FALSE, FALSE));
+    } else {
+      aopPut (AOP(result), zero, MSB32);
+    }
+  }
+
+  if (!sign) {
+    emitcode ("clr", "c");
+  } else {
     emitcode ("mov", "c,acc.7");
-  emitcode ("rrc", "a");
-  aopPut (AOP (result), "a", MSB32 - offl);
-  if (offl == MSB16)
-    /* add sign of "a" */
-    addSign (result, MSB32, sign);
+  }
 
-  MOVA (aopGet (AOP (left), MSB24, FALSE, FALSE));
   emitcode ("rrc", "a");
-  aopPut (AOP (result), "a", MSB24 - offl);
 
-  MOVA (aopGet (AOP (left), MSB16, FALSE, FALSE));
+  if (isSameRegs && offl==MSB16) {
+    emitcode ("xch", "a,%s",aopGet (AOP (left), MSB24, FALSE, FALSE));
+  } else {
+    aopPut (AOP (result), "a", MSB32);
+    MOVA (aopGet (AOP (left), MSB24, FALSE, FALSE));
+  }
+
+  emitcode ("rrc", "a");
+  if (isSameRegs && offl==1) {
+    emitcode ("xch", "a,%s",aopGet (AOP (left), MSB16, FALSE, FALSE));
+  } else {
+    aopPut (AOP (result), "a", MSB24);
+    MOVA (aopGet (AOP (left), MSB16, FALSE, FALSE));
+  }
   emitcode ("rrc", "a");
   aopPut (AOP (result), "a", MSB16 - offl);
 

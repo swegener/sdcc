@@ -4,7 +4,7 @@ void _xdata * memcpyx (
 	void _xdata * dst,
 	void _xdata * src,
 	int count
-	) 
+	) _naked
 {
     /* Shut compiler up about unused parameters. */
     dst; src; count;
@@ -87,6 +87,7 @@ _memcpy_done:
     pop dpl
     pop dph
     pop dpx
+    ret
 _endasm;    
     
 }

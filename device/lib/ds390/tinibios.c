@@ -487,16 +487,17 @@ void ClockInit() {
 // This needs to be SUPER fast. What we really want is:
 
 #if 0
-void ClockIrqHandler (void) interrupt 1 {
+void junk_ClockIrqHandler (void) interrupt 10 {
   TL0=timer0ReloadValue&0xff;
   TH0=timer0ReloadValue>>8;
   milliSeconds++;
 }
 #else
 // but look at the code, and the pushes and pops, so:
-#pragma EXCLUDE b,dpl,dph,dpx
-void ClockIrqHandler (void) interrupt 1 {
+void ClockIrqHandler (void) interrupt 1 _naked
+{
   _asm
+    push acc
     mov _TL0,_timer0ReloadValue
     mov _TH0,_timer0ReloadValue+1
     clr a
@@ -507,11 +508,11 @@ void ClockIrqHandler (void) interrupt 1 {
     inc _milliSeconds+2
     cjne a,_milliSeconds+2,_ClockIrqHandlerDone
     inc _milliSeconds+3
-    cjne a,_milliSeconds+3,_ClockIrqHandlerDone
    _ClockIrqHandlerDone:
+    pop acc
+    reti
   _endasm;
 }
-#pragma EXCLUDE NONE
 #endif
 
 // we can't just use milliSeconds

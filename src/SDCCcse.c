@@ -328,9 +328,12 @@ DEFSETFUNC (findCheaperOp)
 
       if ((*opp)->type==VALUE && 
 	  IS_SYMOP(cop) && IS_GENPTR(OP_SYMBOL(cop)->type)) {
-	// this is a pointer to some space, so we can not
-	*opp=NULL;
-	return 0;
+	// This is a value assigned to a gpointer
+	if (1) {
+	  // this value is used for a cast, so we can not
+	  *opp=NULL;
+	  return 0;
+	}	
       }
 
       return 1;

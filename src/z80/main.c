@@ -25,11 +25,11 @@ static void _z80_setDefaultOptions(void)
     options.intlong_rent = 1;
 
     optimize.global_cse = 0;    
-    optimize.label1 = 0;
-    optimize.label2 = 0;
-    optimize.label3 = 0;
-    optimize.label4 = 0;    
-    optimize.loopInvariant = 0;
+    optimize.label1 = 1;
+    optimize.label2 = 1;
+    optimize.label3 = 1;
+    optimize.label4 = 1;    
+    optimize.loopInvariant = 1;
     optimize.loopInduction = 0;
 }
 

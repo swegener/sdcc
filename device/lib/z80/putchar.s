@@ -4,7 +4,8 @@ _putchar::
 	ld	ix,#0
 	add	ix,sp
 
-	ld	a,4(ix)
+	ld	l,4(ix)
+	ld	a,#0
 	out	(0xff),a
 
 	pop	ix

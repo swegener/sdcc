@@ -1,26 +1,40 @@
 /*-------------------------------------------------------------------------
-  SDCCgen51.c - source file for code generation for 8051
+  gen.c - Z80 specific code generator.
+
+  Benchmarks on dhry.c 2.1 with 32766 loops and a 10ms clock:
+						ticks	dhry	size
+  Base with asm strcpy / strcmp / memcpy:	23198	141	1A14
+  Improved WORD push				22784	144	19AE
+  With label1 on				22694	144	197E
+  With label2 on				22743	144	198A
+  With label3 on				22776	144	1999
+  With label4 on				22776	144	1999
+  With all 'label' on				22661	144	196F
+  With loopInvariant on				20919	156	19AB
+  With loopInduction on				Breaks		198B
+  With all working on				20796	158	196C
+
+  Michael Hope <michaelh@earthling.net>	2000
+  Based on the mcs51 generator - Sandeep Dutta . sandeep.dutta@usa.net (1998)
+                           and -  Jean-Louis VERN.jlvern@writeme.com (1999)
+	 
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
   
-  Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-         and -  Jean-Louis VERN.jlvern@writeme.com (1999)
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
   
-	 This program is free software; you can redistribute it and/or modify it
-	 under the terms of the GNU General Public License as published by the
-	 Free Software Foundation; either version 2, or (at your option) any
-	 later version.
-	 
-	 This program is distributed in the hope that it will be useful,
-	 but WITHOUT ANY WARRANTY; without even the implied warranty of
-	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	 GNU General Public License for more details.
-	 
-	 You should have received a copy of the GNU General Public License
-	 along with this program; if not, write to the Free Software
-	 Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-	 
-	 In other words, you are welcome to use, share and improve this program.
-	 You are forbidden to forbid anyone else to use, share and improve
-	 what you give them.   Help stamp out software-hoarding!
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  
+  In other words, you are welcome to use, share and improve this program.
+  You are forbidden to forbid anyone else to use, share and improve
+  what you give them.   Help stamp out software-hoarding!
 
 -------------------------------------------------------------------------*/
 
@@ -1030,8 +1044,14 @@ static void genIpush (iCode *ic)
 	    if (s) {
 		emitcode("ld", "hl,%s", s);
 		emitcode("push", "hl");
-		goto release;
 	    }
+	    else {
+		/* Optimise here - load into HL then push HL */
+		emitcode("ld", "l,%s", aopGet(AOP(IC_LEFT(ic)), 0, FALSE));
+		emitcode("ld", "h,%s", aopGet(AOP(IC_LEFT(ic)), 1, FALSE));
+		emitcode("push", "hl");
+	    }
+	    goto release;
 	}
 	offset = size;
 	while (size--) {
@@ -1142,15 +1162,6 @@ static void emitCall (iCode *ic, bool ispcall)
         freeAsmop(IC_RESULT(ic),NULL, ic);
     }
 
-    /* PENDING: mega hack */
-    {
-	char *s = OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
-	    OP_SYMBOL(IC_LEFT(ic))->rname :
-	    OP_SYMBOL(IC_LEFT(ic))->name;
-	if (!strcmp(s, "__mulsint") ||
-	    !strcmp(s, "__divsint"))
-	    IC_LEFT(ic)->parmBytes = 4;
-    }
     /* adjust the stack for parameters if required */
     if (IC_LEFT(ic)->parmBytes) {
 	int i = IC_LEFT(ic)->parmBytes;

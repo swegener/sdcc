@@ -12,8 +12,8 @@ OBJ = dhry.o
 all: dhry
 
 dhry: $(OBJ)
-	$(LD) -n -- -i -j -k$(LIBDIR) -lz80.lib \
-	-b_CODE=0x200 -b_DATA=0xc000 dhry.ihx $(LIBDIR)crt0.o $(OBJ)
+	$(LD) -n -- -i -m -k$(LIBDIR) -lz80.lib \
+	-b_CODE=0x200 dhry.ihx $(LIBDIR)crt0.o $(OBJ)
 	cat dhry.ihx | ../../makebin/makebin > dhry.rom
 
 native:

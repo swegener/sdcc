@@ -71,7 +71,7 @@ Boolean Func_3 (Enumeration Enum_Par_Val);
 
 void printf(const char *format, ...);
 void exit(int val);
-unsigned clock(void);
+unsigned _clock(void);
 
 /*#define DPRINTF(_a)  printf _a*/
 #define DPRINTF(_a)
@@ -115,8 +115,7 @@ int main(void)
     /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
     /* overflow may occur for this array element.                   */
 
-    Number_Of_Runs = 32000;
-    clock();
+    Number_Of_Runs = 32766;
 
     /* Main test loop */
     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index) {
@@ -188,7 +187,7 @@ int main(void)
 
     printf("Run_Index = %d\n", Run_Index);
 
-    endTime = clock();
+    endTime = _clock();
 
     printf ("Execution ends\n");
     printf ("\n");
@@ -243,8 +242,8 @@ int main(void)
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
 
-    printf("Time: %u secs\n", endTime);
-    printf("Dhrystones/tick = %u\n", Number_Of_Runs / endTime);
+    printf("Time: %u ticks\n", endTime);
+    printf("Dhrystones/tick = %u\n", Number_Of_Runs / (endTime/100));
 }
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)

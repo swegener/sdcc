@@ -19,18 +19,13 @@
 	.org	0x30
 	reti
 	.org	0x38
-	jp	__int
+	reti
 	
 	.org	0x150
 init:
 	;; Stack at the top of memory.
 	ld	sp,#0xffff        
 
-	ld	a,#0x01
-	out	(0x09),a
-	ld	a,#0xEF
-	out	(0x07),a
-	
 	;; Use _main instead of main to bypass sdcc's intelligence
 	ei
 	call	__main
@@ -40,29 +35,9 @@ init:
 	.area	_CODE
 	.area	_DATA
 
-__ticks:
-	.ds	2
-	.area	_CODE
-__int:
-	push	af
-	push	hl
-	ld	hl,#__ticks
-	inc	(hl)
-	jr	nz,1$
-	inc	hl
-	inc	(hl)
-1$:
-	pop	hl
-	pop	af
-	ei
-	ret
-
-_clock::
-	ld	hl,#__ticks
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
+__clock::
+	ld	a,#2
+	out	(0xff),a
 	ret
 	
 _getsp::
@@ -72,8 +47,8 @@ _getsp::
 	
 _exit::
 	;; Exit - special code to the emulator
-	ld	a,#0
-	out	(1),a
+	ld	a,#1
+	out	(0xff),a
 1$:
 	halt
 	jr	1$

@@ -165,7 +165,7 @@ char *id;
 	do {
 		if (p < &id[NCPS])
 			*p++ = c;
-	} while (ctype[c=get()] &	(~(SPACE|ILL)));
+	} while (ctype[c=get()] & (0xFF - (SPACE|ILL)));
 	unget(c);
 	while (p < &id[NCPS])
 		*p++ = 0;

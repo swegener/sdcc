@@ -43,7 +43,7 @@
 #    endif
 #  elif defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _MULINT_ASM_SMALL_AUTO
 #      else
 #        define _MULINT_ASM_SMALL
@@ -74,21 +74,33 @@ _muluint (unsigned int a, unsigned int b)	// in future: _mulint
     mov r3,dpl ; lsb_a
 
     mov b,r3 ; lsb_a
+#if defined(SDCC_PARMS_IN_BANK1)
+    mov a,b1_0
+#else
     mov dptr,#__muluint_PARM_2
     movx a,@dptr ; lsb_b
+#endif
     mul ab ; lsb_a*lsb_b
     mov r0,a
     mov r1,b
 
     mov b,r2 ; msb_a
+#if defined(SDCC_PARMS_IN_BANK1)
+    mov a,b1_0
+#else
     movx a,@dptr ; lsb_b
+#endif
     mul ab ; msb_a*lsb_b
     add a,r1
     mov r1,a
 
     mov b,r3 ; lsb_a
+#if defined(SDCC_PARMS_IN_BANK1)
+    mov a,b1_1
+#else
     inc dptr
     movx a,@dptr ; msb_b
+#endif
     mul ab ; lsb_a*msb_b
     add a,r1
 
@@ -119,14 +131,19 @@ _mulint_dummy (void) _naked
 		.globl __muluint		; obsolete
 		.globl __mulsint		; obsolete
 
-#if !defined(SDCC_STACK_AUTO)
+#if !defined(SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
 
 #if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
 #else
 		.area OSEG    (OVR,DATA)
 #endif
-
+#if defined(SDCC_PARMS_IN_BANK1)
+	#define bl 	(b1_0)	 
+	#define bh 	(b1_1)	 
+#else
+	#define bl 	(__mulint_PARM_2)	 
+	#define bh 	(__mulint_PARM_2 + 1)	 
 	__mulint_PARM_2:
 	__muluint_PARM_2:			; obsolete
 	__mulsint_PARM_2:			; obsolete
@@ -136,24 +153,25 @@ _mulint_dummy (void) _naked
 		.globl __mulsint_PARM_2		; obsolete
 
 		.ds	2
+#endif						     
 
 		.area CSEG    (CODE)
 
 		; globbered registers none
 
 		mov	a,dpl			;  1  al
-		mov	b,__mulint_PARM_2	;  2  bl
+		mov	b,bl			;  2  bl
 		mul	ab			;  4  al * bl
 		xch	a,dpl			;  1  store low-byte of return value, fetch al
 		push	b			;  2
 
-		mov	b,__mulint_PARM_2 + 1	;  2  bh
+		mov	b,bh			;  2  bh
 		mul	ab			;  4  al * bh
 		pop	b			;  2
 		add	a,b			;  1
 		xch	a,dph			;  1  ah -> acc
 
-		mov	b,__mulint_PARM_2	;  2  bl
+		mov	b,bl			;  2  bl
 		mul	ab			;  4  ah * bl
 		add	a,dph			;  1
 		mov	dph,a			;  1
@@ -206,7 +224,7 @@ union uu {
 unsigned int
 _muluint (unsigned int a, unsigned int b)	// in future: _mulint
 {
-#ifdef SDCC_MODEL_LARGE		// still needed for large + stack-auto
+#if defined(SDCC_MODEL_LARGE) || defined(SDCC_ds390)		// still needed for large + stack-auto
 	union uu xdata *x;
 	union uu xdata *y;
 	union uu t;

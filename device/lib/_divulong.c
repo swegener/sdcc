@@ -30,7 +30,7 @@
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _DIVULONG_ASM_SMALL_AUTO
 #      else
 #        define _DIVULONG_ASM_SMALL
@@ -61,6 +61,7 @@ _divlong_dummy (void) _naked
 		#define reste1	r5
 		#define reste2	r6
 		#define reste3	r7
+#if !defined(SDCC_PARMS_IN_BANK1)
 
 #if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
@@ -81,7 +82,12 @@ _divlong_dummy (void) _naked
 		#define b1      (__divulong_PARM_2 + 1)
 		#define b2      (__divulong_PARM_2 + 2)
 		#define b3      (__divulong_PARM_2 + 3)
-
+#else
+		#define b0      (b1_0)
+		#define b1      (b1_1)
+		#define b2      (b1_2)
+		#define b3      (b1_3)
+#endif // !SDCC_PARMS_IN_BANK1
 					; parameter a comes in a, b, dph, dpl
 		mov	a3,a		; save parameter a3
 

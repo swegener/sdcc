@@ -56,7 +56,7 @@ _divuint_dummy (void) _naked
 		#define al      dpl
 		#define ah      dph
 
-#ifdef SDCC_STACK_AUTO
+#if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 
 		ar0 = 0			; BUG register set is not considered
 		ar1 = 1
@@ -78,6 +78,7 @@ _divuint_dummy (void) _naked
 
 #else // SDCC_STACK_AUTO
 
+#if !defined(SDCC_PARMS_IN_BANK1)
 #if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
 #else
@@ -92,10 +93,14 @@ _divuint_dummy (void) _naked
 		.ds	2
 
 		.area CSEG    (CODE)
-
+#endif // !SDCC_PARMS_IN_BANK1
+#if defined(SDCC_PARMS_IN_BANK1)
+		#define bl      (b1_0)
+		#define bh      (b1_1)
+#else
 		#define bl      (__divuint_PARM_2)
 		#define bh      (__divuint_PARM_2 + 1)
-
+#endif // SDCC_PARMS_IN_BANK1
 #endif // SDCC_STACK_AUTO
 
 		mov	count,#16

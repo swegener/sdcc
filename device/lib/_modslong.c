@@ -36,7 +36,7 @@ unsigned long _modulong (unsigned long a, unsigned long b);
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _MODSLONG_ASM_SMALL_AUTO
 #      else
 #        define _MODSLONG_ASM_SMALL
@@ -58,14 +58,19 @@ _modslong_dummy (void) _naked
 		#define a3	r1
 
 		.globl __modslong
-
+#if defined(SDCC_PARMS_IN_BANK1)
+		#define b0      (b1_0)
+		#define b1      (b1_1)
+		#define b2      (b1_2)
+		#define b3      (b1_3)
+#else
 		// _modslong_PARM_2 shares the same memory with _modulong_PARM_2
 		// and is defined in _modulong.c
 		#define b0      (__modslong_PARM_2)
 		#define b1      (__modslong_PARM_2 + 1)
 		#define b2      (__modslong_PARM_2 + 2)
 		#define b3      (__modslong_PARM_2 + 3)
-
+#endif
 	__modslong:
 					; a3 in acc
 					; b3 in (__modslong_PARM_2 + 3)

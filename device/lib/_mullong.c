@@ -38,7 +38,7 @@
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _MULLONG_ASM_SMALL_AUTO
 #      else
 #        define _MULLONG_ASM_SMALL
@@ -72,13 +72,23 @@ _mullong_dummy (void) _naked
 		#define c2 r6
 		#define c3 r7
 
+		#define a0 dpl
+		#define a1 dph
+		#define a2 r2
+		#define a3 r3
+
 	; c0  a0 * b0
 	; c1  a1 * b0 + a0 * b1
 	; c2  a2 * b0 + a1 * b1 + a0 * b2
 	; c3  a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
 
-#if !defined SDCC_STACK_AUTO
-
+#if !defined(SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
+#if defined(SDCC_PARMS_IN_BANK1)
+		#define b0  (b1_0)
+		#define b1  (b1_1)
+		#define b2  (b1_2)
+		#define b3  (b1_3)
+#else
 #if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
 #else
@@ -95,21 +105,17 @@ _mullong_dummy (void) _naked
 
 		.ds	4
 
+		b0 =  __mullong_PARM_2
+		b1 = (__mullong_PARM_2+1)
+		b2 = (__mullong_PARM_2+2)
+		b3 = (__mullong_PARM_2+3)
+
+#endif
 		.area CSEG    (CODE)
 
 					; parameter a comes in a, b, dph, dpl
 		mov	r2,b		; save parameter a
 		mov	r3,a
-
-		#define a0 dpl
-		#define a1 dph
-		#define a2 r2
-		#define a3 r3
-
-		b0 =  __mullong_PARM_2
-		b1 = (__mullong_PARM_2+1)
-		b2 = (__mullong_PARM_2+2)
-		b3 = (__mullong_PARM_2+3)
 
 					;	Byte 0
 		mov	a,a0
@@ -341,6 +347,7 @@ _mullong_dummy (void) _naked
 	; c2  a2 * b0 + a1 * b1 + a0 * b2
 	; c3  a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
 
+#if !defined(SDCC_PARMS_IN_BANK1)
 		.area XSEG    (XDATA)
 
 	__mullong_PARM_2:
@@ -352,7 +359,7 @@ _mullong_dummy (void) _naked
 		.globl __mulslong_PARM_2	; obsolete
 
 		.ds	4
-
+#endif
 		.area CSEG    (CODE)
 
 					; parameter a comes in a, b, dph, dpl
@@ -368,15 +375,23 @@ _mullong_dummy (void) _naked
 
 					;	Byte 0
 		mov	b,a0
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_0		; b0						   
+#else
 		mov	dptr,#__mullong_PARM_2
 		movx	a,@dptr		; b0
+#endif
 		mul	ab		; a0 * b0
 		mov	c0,a
 		mov	c1,b
 
 					;	Byte 1
 		mov	b,a1
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_0		; b0						   
+#else
 		movx	a,@dptr		; b0
+#endif
 		mul	ab		; a1 * b0
 		add	a,c1
 		mov	c1,a
@@ -386,8 +401,12 @@ _mullong_dummy (void) _naked
 		
 
 		mov	b,a0
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_1		; b1
+#else
 		inc	dptr		; b1
 		movx	a,@dptr
+#endif
 		mul	ab		; a0 * b1
 		add	a,c1
 		mov	c1,a
@@ -400,7 +419,11 @@ _mullong_dummy (void) _naked
 
 					;	Byte 2
 		mov	b,a1
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_1		; b1
+#else
 		movx	a,@dptr		; b1
+#endif
 		mul	ab		; a1 * b1
 		add	a,c2
 		mov	c2,a
@@ -409,8 +432,12 @@ _mullong_dummy (void) _naked
 		mov	c3,a
 
 		mov	b,a0
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_2		; b2
+#else
 		inc	dptr		; b2
 		movx	a,@dptr
+#endif
 		mul	ab		; a0 * b2
 		add	a,c2
 		mov	c2,a
@@ -419,8 +446,12 @@ _mullong_dummy (void) _naked
 		mov	c3,a
 
 		mov	b,a2
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_0		; b0
+#else
 		mov	dptr,#__mullong_PARM_2
 		movx	a,@dptr		; b0
+#endif
 		mul	ab		; a2 * b0
 		add	a,c2
 		mov	c2,a
@@ -430,28 +461,44 @@ _mullong_dummy (void) _naked
 
 					;	Byte 3
 		mov	b,a3
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_0		; b0
+#else
 		movx	a,@dptr		; b0
+#endif
 		mul	ab		; a3 * b0
 		add	a,c3
 		mov	c3,a
 
 		mov	b,a2
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_1		; b1
+#else
 		inc	dptr		; b1
 		movx	a,@dptr
+#endif
 		mul	ab		; a2 * b1
 		add	a,c3
 		mov	c3,a
 
 		mov	b,a1
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_2		; b2
+#else
 		inc	dptr		; b2
 		movx	a,@dptr
+#endif
 		mul	ab		; a1 * b2
 		add	a,c3
 		mov	c3,a
 
 		mov	b,a0
+#if defined(SDCC_PARMS_IN_BANK1)
+		mov	a,b1_3		; b3
+#else
 		inc	dptr		; b3
 		movx	a,@dptr
+#endif
 		mul	ab		; a0 * b3
 		add	a,c3
 

@@ -32,7 +32,7 @@
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#      if defined(SDCC_STACK_AUTO) && !defined (SDCC_PARMS_IN_BANK1)
 #        define _MODULONG_ASM_SMALL_AUTO
 #      else
 #        define _MODULONG_ASM_SMALL
@@ -50,8 +50,19 @@ _modlong_dummy (void) _naked
 
 		.globl __modulong
 
-	__modulong:
+		#define a0	dpl
+		#define a1	dph
+		#define a2	b
+		#define a3	r1
+		#define count   r0
 
+	__modulong:
+#if defined(SDCC_PARMS_IN_BANK1)
+		#define b0      (b1_0)
+		#define b1      (b1_1)
+		#define b2      (b1_2)
+		#define b3      (b1_3)
+#else
 #if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
 #else
@@ -67,18 +78,12 @@ _modlong_dummy (void) _naked
 
 		.area CSEG    (CODE)
 
-		#define count   r0
-
-		#define a0	dpl
-		#define a1	dph
-		#define a2	b
-		#define a3	r1
 
 		#define b0      (__modulong_PARM_2)
 		#define b1      (__modulong_PARM_2 + 1)
 		#define b2      (__modulong_PARM_2 + 2)
 		#define b3      (__modulong_PARM_2 + 3)
-
+#endif
 					; parameter a comes in a, b, dph, dpl
 		mov	a3,a		; save parameter a3
 

@@ -37,7 +37,7 @@ unsigned long _divulong (unsigned long a, unsigned long b);
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _DIVSLONG_ASM_SMALL_AUTO
 #      else
 #        define _DIVSLONG_ASM_SMALL
@@ -62,11 +62,17 @@ _divslong_dummy (void) _naked
 
 		// _divslong_PARM_2 shares the same memory with _divulong_PARM_2
 		// and is defined in _divulong.c
+#if defined(SDCC_PARMS_IN_BANK1)
+		#define b0      (b1_0)
+		#define b1      (b1_1)
+		#define b2      (b1_2)
+		#define b3      (b1_3)
+#else
 		#define b0      (__divslong_PARM_2)
 		#define b1      (__divslong_PARM_2 + 1)
 		#define b2      (__divslong_PARM_2 + 2)
 		#define b3      (__divslong_PARM_2 + 3)
-
+#endif
 	__divslong:
 					; a3 in acc
 					; b3 in (__divslong_PARM_2 + 3)

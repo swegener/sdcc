@@ -38,7 +38,7 @@ unsigned unsigned _divuint (unsigned a, unsigned b);
 #if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO)
+#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 #        define _DIVSINT_ASM_SMALL_AUTO
 #      else
 #        define _DIVSINT_ASM_SMALL
@@ -61,9 +61,13 @@ _divsint_dummy (void) _naked
 
 		// _divsint_PARM_2 shares the same memory with _divuint_PARM_2
 		// and is defined in _divuint.c
+#if defined(SDCC_PARMS_IN_BANK1)
+		#define b0      (b1_0)
+		#define b1      (b1_1)
+#else
 		#define b0      (__divsint_PARM_2)
 		#define b1      (__divsint_PARM_2 + 1)
-
+#endif
 	__divsint:
 					; a1 in dph
 					; b1 in (__divsint_PARM_2 + 1)

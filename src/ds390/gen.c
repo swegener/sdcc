@@ -4731,29 +4731,47 @@ static void genAnd (iCode *ic, iCode *ifx)
                 outBitC(result);
             } else if(ifx)
                 jmpTrueOrFalse(ifx, tlbl);
-        } else {
-	    for(;(size--);offset++) {
+        } else 
+        {
+	    for(;(size--);offset++) 
+	    {
 		// normal case
 		// result = left & right
-		if(AOP_TYPE(right) == AOP_LIT){
-		    if((bytelit = (int)((lit >> (offset*8)) & 0x0FFL)) == 0x0FF){
+		if(AOP_TYPE(right) == AOP_LIT)
+		{
+		    if((bytelit = (int)((lit >> (offset*8)) & 0x0FFL)) == 0x0FF)
+		    {
 			aopPut(AOP(result),
 			       aopGet(AOP(left),offset,FALSE,FALSE,FALSE),
 			       offset);
 			continue;
-		    } else if(bytelit == 0){
+		    } 
+		    else if (bytelit == 0)
+		    {
 			aopPut(AOP(result),zero,offset);
 			continue;
 		    }
+                    D(emitcode(";", "better literal AND."););
+                    MOVA(aopGet(AOP(left),offset,FALSE,FALSE,TRUE));
+                    emitcode("anl", "a, %s", aopGet(AOP(right),offset,
+                    			        FALSE,FALSE,FALSE));
+		    
 		}
-		// faster than result <- left, anl result,right
-		// and better if result is SFR
-		if (AOP_TYPE(left) == AOP_ACC) 
-		    emitcode("anl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE,FALSE));
-		else {
-		    MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
-		    emitcode("anl","a,%s",
-			     aopGet(AOP(left),offset,FALSE,FALSE,FALSE));
+		else
+		{
+		    // faster than result <- left, anl result,right
+		    // and better if result is SFR
+		    if (AOP_TYPE(left) == AOP_ACC) 
+	 	    {
+		    	emitcode("anl","a,%s",aopGet(AOP(right),offset,
+		    		                     FALSE,FALSE,FALSE));
+		    }
+		    else 
+		    {
+		    	MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
+		    	emitcode("anl","a,%s",
+			         aopGet(AOP(left),offset,FALSE,FALSE,FALSE));
+		    }
 		}
 		aopPut(AOP(result),"a",offset);
 	    }
@@ -4908,37 +4926,59 @@ static void genOr (iCode *ic, iCode *ifx)
     }
 
     /* if left is same as result */
-    if(sameRegs(AOP(result),AOP(left))){
-        for(;size--; offset++) {
+    if(sameRegs(AOP(result),AOP(left)))
+    {
+        for(;size--; offset++) 
+        {
             if(AOP_TYPE(right) == AOP_LIT){
                 if(((lit >> (offset*8)) & 0x0FFL) == 0x00L)
+                {
                     continue;
+                }
                 else 
-		    if (IS_AOP_PREG(left)) {
+                {
+		    if (IS_AOP_PREG(left)) 
+		    {
 			MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
 			emitcode("orl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE,FALSE));
 			aopPut(AOP(result),"a",offset);
-		    } else
+		    } 
+		    else
+		    {
 			emitcode("orl","%s,%s",
 				 aopGet(AOP(left),offset,FALSE,TRUE,FALSE),
 				 aopGet(AOP(right),offset,FALSE,FALSE,FALSE));
-            } else {
-		if (AOP_TYPE(left) == AOP_ACC) 
+		    }
+		}
+            } 
+            else 
+            {
+		if (AOP_TYPE(left) == AOP_ACC)
+		{ 
 		    emitcode("orl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE,FALSE));
-		else {		    
+		}
+		else 
+		{		    
 		    MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
-		    if (IS_AOP_PREG(left)) {
+		    if (IS_AOP_PREG(left)) 
+		    {
 			emitcode("orl","a,%s",aopGet(AOP(left),offset,FALSE,TRUE,FALSE));
 			aopPut(AOP(result),"a",offset);
-		    } else
+		    } 
+		    else
+		    {
 			emitcode("orl","%s,a",
 				 aopGet(AOP(left),offset,FALSE,TRUE,FALSE));
+		    }
 		}
             }
         }
-    } else {
+    }
+    else
+    {
         // left & result in different registers
-        if(AOP_TYPE(result) == AOP_CRY){
+        if(AOP_TYPE(result) == AOP_CRY)
+        {
             // result = bit
             // if(size), result in bit
             // if(!size && ifx), conditional oper: if(left | right)
@@ -4959,27 +4999,46 @@ static void genOr (iCode *ic, iCode *ifx)
                 outBitC(result);
             } else if(ifx)
                 jmpTrueOrFalse(ifx, tlbl);
-        } else for(;(size--);offset++){
-            // normal case
-            // result = left & right
-            if(AOP_TYPE(right) == AOP_LIT){
-                if(((lit >> (offset*8)) & 0x0FFL) == 0x00L){
-                    aopPut(AOP(result),
-                           aopGet(AOP(left),offset,FALSE,FALSE,FALSE),
-                           offset);
-                    continue;
+        } 
+        else 
+        {
+            for(;(size--);offset++)
+            {
+                // normal case
+                // result = left & right
+                if(AOP_TYPE(right) == AOP_LIT)
+                {
+                    if(((lit >> (offset*8)) & 0x0FFL) == 0x00L)
+                    {
+                    	aopPut(AOP(result),
+                               aopGet(AOP(left),offset,FALSE,FALSE,FALSE),
+                               offset);
+                        continue;
+                    }
+                    D(emitcode(";", "better literal OR."););
+                    MOVA(aopGet(AOP(left),offset,FALSE,FALSE,TRUE));
+                    emitcode("orl", "a, %s", aopGet(AOP(right),offset,
+                    			        FALSE,FALSE,FALSE));
+                     
                 }
+                else
+                {
+                    // faster than result <- left, anl result,right
+                    // and better if result is SFR
+	            if (AOP_TYPE(left) == AOP_ACC) 
+	            {
+		    	emitcode("orl","a,%s",aopGet(AOP(right),offset,
+		    				     FALSE,FALSE,FALSE));
+		    }
+	            else 
+	            {
+		    	MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
+		    	emitcode("orl","a,%s",
+			         aopGet(AOP(left),offset,FALSE,FALSE,FALSE));
+	            }
+	        }
+	        aopPut(AOP(result),"a",offset);			
             }
-            // faster than result <- left, anl result,right
-            // and better if result is SFR
-	    if (AOP_TYPE(left) == AOP_ACC) 
-		emitcode("orl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE,FALSE));
-	    else {
-		MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
-		emitcode("orl","a,%s",
-			 aopGet(AOP(left),offset,FALSE,FALSE,FALSE));
-	    }
-	    aopPut(AOP(result),"a",offset);			
         }
     }
 
@@ -5173,25 +5232,39 @@ static void genXor (iCode *ic, iCode *ifx)
                 outBitC(result);
             } else if(ifx)
                 jmpTrueOrFalse(ifx, tlbl);
-        } else for(;(size--);offset++){
+        } else for(;(size--);offset++)
+        {
             // normal case
             // result = left & right
-            if(AOP_TYPE(right) == AOP_LIT){
-                if(((lit >> (offset*8)) & 0x0FFL) == 0x00L){
+            if(AOP_TYPE(right) == AOP_LIT)
+            {
+                if(((lit >> (offset*8)) & 0x0FFL) == 0x00L)
+                {
                     aopPut(AOP(result),
                            aopGet(AOP(left),offset,FALSE,FALSE,FALSE),
                            offset);
                     continue;
                 }
+                D(emitcode(";", "better literal XOR."););
+                MOVA(aopGet(AOP(left),offset,FALSE,FALSE,TRUE));
+                emitcode("xrl", "a, %s", aopGet(AOP(right),offset,
+                    			        FALSE,FALSE,FALSE));                
             }
-            // faster than result <- left, anl result,right
-            // and better if result is SFR
-	    if (AOP_TYPE(left) == AOP_ACC)
-		emitcode("xrl","a,%s",aopGet(AOP(right),offset,FALSE,FALSE,FALSE));
-	    else {
-		MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
-		emitcode("xrl","a,%s",
-			 aopGet(AOP(left),offset,FALSE,TRUE,FALSE));
+            else
+            {
+                // faster than result <- left, anl result,right
+                // and better if result is SFR
+	        if (AOP_TYPE(left) == AOP_ACC)
+	        {
+		    emitcode("xrl","a,%s",aopGet(AOP(right),offset,
+		    	     FALSE,FALSE,FALSE));
+		}
+	    	else 
+	    	{
+		    MOVA(aopGet(AOP(right),offset,FALSE,FALSE,TRUE));
+		    emitcode("xrl","a,%s",
+			     aopGet(AOP(left),offset,FALSE,TRUE,FALSE));
+	        }
 	    }
 	    aopPut(AOP(result),"a",offset);
         }

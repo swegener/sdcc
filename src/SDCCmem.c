@@ -370,6 +370,12 @@ void allocGlobal ( symbol *sym )
 	allocIntoSeg (sym)  ;
 	return ;
     }
+
+    if ( SPEC_SCLS(sym->etype) == S_EEPROM  )    {
+	SPEC_OCLS(sym->etype) = eeprom ;
+	allocIntoSeg (sym)  ;
+	return ;
+    }
     
     return ;
 }
@@ -604,8 +610,14 @@ void allocLocal ( symbol *sym  )
 	return  ;
     }
 
-    if ( SPEC_SCLS(sym->etype) == S_DATA  )    {
+    if ( SPEC_SCLS(sym->etype) == S_DATA  ) {
 	SPEC_OCLS(sym->etype) = (options.noOverlay ? data : overlay );
+	allocIntoSeg(sym)  ;
+	return ;
+    }
+
+    if ( SPEC_SCLS(sym->etype) == S_EEPROM  ) {
+	SPEC_OCLS(sym->etype) = eeprom;
 	allocIntoSeg(sym)  ;
 	return ;
     }

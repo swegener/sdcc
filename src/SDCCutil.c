@@ -357,7 +357,7 @@ char *strncatz(char *dest, const char *src, size_t n)
 }
 
 
-#if defined(HAVE_VSNPRINTF) || defined(have_VSPRINTF)
+#if defined(HAVE_VSNPRINTF) || defined(HAVE_VSPRINTF)
 size_t SDCCsnprintf(char *dst, size_t n, const char *fmt, ...)
 {
     va_list args;

@@ -1530,17 +1530,18 @@ compareType (sym_link * dest, sym_link * src)
 /*------------------------------------------------------------------*/
 /* inCalleeSaveList - return 1 if found in callee save list          */
 /*------------------------------------------------------------------*/
-bool 
-inCalleeSaveList (char *s)
+static int
+calleeCmp(void *p1, void *p2)
 {
-  int i;
+  return (strcmp((char *)p1, (char *)(p2)) == 0);
+}
 
-  if (options.all_callee_saves) return 1;
-  for (i = 0; options.calleeSaves[i]; i++)
-    if (strcmp (options.calleeSaves[i], s) == 0)
-      return 1;
-
-  return 0;
+bool
+inCalleeSaveList(char *s)
+{
+  if (options.all_callee_saves)
+    return 1;
+  return isinSetWith(options.calleeSavesSet, s, calleeCmp);
 }
 
 /*-----------------------------------------------------------------*/

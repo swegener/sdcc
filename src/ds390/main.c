@@ -169,6 +169,7 @@ _ds390_genAssemblerPreamble (FILE * of)
       fputs ("mb = 0xD4\t\t; mb register unknown to assembler\n", of);
       fputs ("mc = 0xD5\t\t; mc register unknown to assembler\n", of);
       fputs ("F1 = 0xD1\t\t; F1 user flag unknown to assembler\n", of);
+      fputs ("_ESP = 0x9B\t\t; ESP user flag unknown to assembler\n", of);
 }
 
 /* Generate interrupt vector table. */
@@ -205,11 +206,11 @@ _ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 static bool cseCostEstimation (iCode *ic, iCode *pdic)
 {
     operand *result = IC_RESULT(ic);
-    operand *right  = IC_RIGHT(ic);
-    operand *left   = IC_LEFT(ic);
+    //operand *right  = IC_RIGHT(ic);
+    //operand *left   = IC_LEFT(ic);
     sym_link *result_type = operandType(result);
-    sym_link *right_type  = (right ? operandType(right) : 0);
-    sym_link *left_type   = (left  ? operandType(left)  : 0);
+    //sym_link *right_type  = (right ? operandType(right) : 0);
+    //sym_link *left_type   = (left  ? operandType(left)  : 0);
     
     /* if it is a pointer then return ok for now */
     if (IC_RESULT(ic) && IS_PTR(result_type)) return 1;

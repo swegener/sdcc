@@ -2256,6 +2256,7 @@ genCall (iCode * ic)
 	{
 	  int size, offset = 0;
 
+#if 0
 	  aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
 	  size = AOP_SIZE (IC_LEFT (sic));
 
@@ -2291,6 +2292,29 @@ genCall (iCode * ic)
 		   		    fReturn[size], regs390[size].name);
 	      }
 	  }
+#else
+	  // we know that dpl(hxb) is the result, so
+	  _startLazyDPSEvaluation ();
+	  size=getSize(operandType(IC_LEFT(sic)));
+	  if (size>1) {
+	    aopOp (IC_LEFT (sic), sic, FALSE, TRUE);
+	  } else {
+	    aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
+	  }
+	  while (size--)
+	    {
+	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,
+				FALSE, FALSE, TRUE);
+	      if (strcmp (l, fReturn[offset]))
+		{
+		  emitcode ("mov", "%s,%s",
+			    fReturn[offset],
+			    l);
+		}
+	      offset++;
+	    }
+	  _endLazyDPSEvaluation ();
+#endif
 	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
 	}
       _G.sendSet = NULL;
@@ -2443,9 +2467,14 @@ genPcall (iCode * ic)
 	{
 	  int size, offset = 0;
 
-	  aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
-	  size = AOP_SIZE (IC_LEFT (sic));
+	  // we know that dpl(hxb) is the result, so
 	  _startLazyDPSEvaluation ();
+	  size=getSize(operandType(IC_LEFT(sic)));
+	  if (size>1) {
+	    aopOp (IC_LEFT (sic), sic, FALSE, TRUE);
+	  } else {
+	    aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
+	  }
 	  while (size--)
 	    {
 	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,

@@ -1,4 +1,6 @@
 /** Function pointer tests.
+
+    type: char, int, long
  */
 #include <testfwk.h>
 
@@ -6,7 +8,7 @@
    on the z80.
 */
 typedef void (*NOARGFUNPTR)(void);
-typedef void (*ONEARGFUNPTR)(int) REENTRANT;
+typedef void (*ONEARGFUNPTR)({type}) REENTRANT;
 
 int count;
 
@@ -17,7 +19,7 @@ incCount(void)
 }
 
 void
-incBy(int a) REENTRANT
+incBy({type} a) REENTRANT
 {
   count += a;
 }
@@ -29,7 +31,7 @@ callViaPtr(NOARGFUNPTR fptr)
 }
 
 void
-callViaPtr2(ONEARGFUNPTR fptr, int arg)
+callViaPtr2(ONEARGFUNPTR fptr, {type} arg)
 {
   (*fptr)(arg);
 }

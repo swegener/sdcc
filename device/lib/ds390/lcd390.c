@@ -51,12 +51,12 @@ xdata at 0x38000b static unsigned char lcdDrd;
 
 #define LcdWait { while (lcdIrd&0x80) ; }
 
-#else ifdef LCD_RW
+#else // ifdef LCD_RW
 
 // wait for 100us
 #define LcdWait { ClockMicroSecondsDelay(100) ; }
 
-#endif ifdef LCD_RW
+#endif // ifdef LCD_RW
 
 void LcdInit() {
   

@@ -53,7 +53,11 @@ unsigned int _muluint (unsigned int a, unsigned int b)
     mov r1,b
 
     mov b,r2 ; msb_a
+#if defined(SDCC_ds390) || defined(SDCC_MODEL_LARGE)
     movx a,@dptr ; lsb_b
+#else // must be SDCC_MODEL_SMALL
+    mov a,__muluint_PARM_2 ; lsb_b
+#endif
     mul ab ; msb_a*lsb_b
     add a,r1
     mov r1,a

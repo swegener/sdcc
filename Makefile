@@ -40,7 +40,7 @@ sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules
-sdcc-bin: sdcc-cc sdcc-aslink
+sdcc-bin: sdcc-cc sdcc-aslink sdcc-misc
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

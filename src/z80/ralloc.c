@@ -1830,7 +1830,6 @@ static void packRegsForHLUse (iCode *ic)
 	goto hluse;
     return;
  hluse:
-    printf("Hey, it worked!\n");
     OP_SYMBOL(IC_RESULT(ic))->accuse = ACCUSE_HL;
 }
 

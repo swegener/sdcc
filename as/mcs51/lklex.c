@@ -156,7 +156,7 @@ char *id;
 /*)Function	VOID	getfid(fid,c)
  *
  *		char *	str		a pointer to a string of
- *					maximum length FILENAME_MAX
+ *					maximum length PATH_MAX
  *		int	c		this is first character to
  *					copy to the string buffer
  *
@@ -164,9 +164,9 @@ char *id;
  *	from the current position copying the next string
  *	into the external string buffer (str).  The string ends when a
  *	non SPACE type character is found. The maximum number of
- *	characters copied is FILENAME_MAX. If the input string is larger than
- *	FILENAME_MAX characters then the string is truncated, if the input string
- *	is shorter than FILENAME_MAX characters then the string is NULL filled.
+ *	characters copied is PATH_MAX. If the input string is larger than
+ *	PATH_MAX characters then the string is truncated, if the input string
+ *	is shorter than PATH_MAX characters then the string is NULL filled.
  *
  *	local variables:
  *		char *	p		pointer to external string buffer
@@ -195,11 +195,11 @@ char *str;
 
 	p = str;
 	do {
-		if (p < &str[FILENAME_MAX-1])
+		if (p < &str[PATH_MAX-1])
 			*p++ = c;
 		c = get();
 	} while (c && ((ctype[c] != SPACE)||(c == ':')||(c == '\\')));
-	while (p < &str[FILENAME_MAX])
+	while (p < &str[PATH_MAX])
 		*p++ = 0;
 }
 

@@ -48,6 +48,11 @@
 #define SPACE ' '
 #define ZERO  0
 
+#include <limits.h>		/* PATH_MAX		     */
+#ifndef PATH_MAX		/* POSIX, but not required   */
+#define PATH_MAX 255		/* define a reasonable value */
+#endif
+
 #define  MAX_FNAME_LEN  128
 #define  MAX_REG_PARMS  1
 typedef int bool;
@@ -316,6 +321,6 @@ extern struct _dumpFiles dumpFiles[];
 /* Buffer which can be used to hold a file name; assume it will
  * be trashed by any function call within SDCC.
  */
-extern char scratchFileName[FILENAME_MAX];
+extern char scratchFileName[PATH_MAX];
 
 #endif

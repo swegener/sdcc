@@ -1,3 +1,25 @@
+2001-10-11  Bernhard Held  <bernhard@bernhardheld.de>
+
+	* as/mcs51/asdata.c: replaced FILENAME_MAX with PATH_MAX
+
+	* as/mcs51/aslink.h: define PATH_MAX
+
+	* as/mcs51/asm.h: define PATH_MAX
+
+	* as/mcs51/asmain.c: replaced FILENAME_MAX with PATH_MAX
+
+	* as/mcs51/asnoice.c: replaced FILENAME_MAX with PATH_MAX
+
+	* as/mcs51/lklex.c: replaced FILENAME_MAX with PATH_MAX
+
+	* as/mcs51/lkmain.c: replaced FILENAME_MAX with PATH_MAX
+
+	* src/SDCCglobl.h: define PATH_MAX
+
+	* src/SDCCmacro.c: replaced FILENAME_MAX with PATH_MAX
+
+	* src/SDCCmain.c: replaced FILENAME_MAX with PATH_MAX
+
 2001-10-11  Michael Hope  <michaelh@juju.net.nz>
 
 	* src/z80/gen.c (gencjneshort): Fixed

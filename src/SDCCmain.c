@@ -79,8 +79,8 @@ int ds390_jammed = 0;
 #endif
 
 // Globally accessible scratch buffer for file names.
-char scratchFileName[FILENAME_MAX];
-char buffer[FILENAME_MAX];
+char scratchFileName[PATH_MAX];
+char buffer[PATH_MAX];
 
 // In MSC VC6 default search path for exe's to path for this
 

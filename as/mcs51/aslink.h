@@ -80,13 +80,21 @@
 #endif
 
 /*
+ * PATH_AMX
+ */
+#include <limits.h>
+#ifndef PATH_MAX		/* POSIX, but not required   */
+#define PATH_MAX 255		/* define a reasonable value */
+#endif
+
+/*
  * This file defines the format of the
  * relocatable binary file.
  */
 
 #define NCPS	80		/* characters per symbol (JLH: change from 8) */
 #define	NDATA	16		/* actual data */
-#define	NINPUT	FILENAME_MAX	/* Input buffer size (BH: change from 128) */
+#define	NINPUT	PATH_MAX	/* Input buffer size */
 #define	NHASH	64		/* Buckets in hash table */
 #define	HMASK	077		/* Hash mask */
 #define	NLPP	60		/* Lines per page */

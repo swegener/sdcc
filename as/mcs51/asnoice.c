@@ -17,7 +17,7 @@ static char* BaseFileName( int fileNumber );
 char* BaseFileName( int fileNumber )
 {
 	static int prevFile = -1;
-        static char baseName[ FILENAME_MAX ];
+        static char baseName[ PATH_MAX ];
 
         char *p1, *p2;
 
@@ -85,7 +85,7 @@ void DefineNoICE_Line()
 {
         static int prevFile = -1;
         static struct area *pPrevArea = NULL;
-        static char baseName[ FILENAME_MAX ];
+        static char baseName[ PATH_MAX ];
 
         int j;
         char *p1, *p2;

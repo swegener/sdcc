@@ -479,7 +479,7 @@ asmbl()
 	struct expr e1;
 	char id[NCPS];
 	char opt[NCPS];
-	char fn[FILENAME_MAX];
+	char fn[PATH_MAX];
 	char *p;
 	int d, n, uaf, uf;
 
@@ -911,7 +911,7 @@ loop:
 		d = getnb();
 		p = fn;
 		while ((c = get()) != d) {
-			if (p < &fn[FILENAME_MAX-1]) {
+			if (p < &fn[PATH_MAX-1]) {
 				*p++ = c;
 			} else {
 				break;
@@ -1053,8 +1053,8 @@ int wf;
 	p2 = strrchr (afn, FSEPX);		// search last '.'
 	if (!p2)
 		p2 = afn + strlen (afn);
-	if (p2 > &afn[FILENAME_MAX-4])		// truncate filename, if it's too long
-		p2 = &afn[FILENAME_MAX-4];
+	if (p2 > &afn[PATH_MAX-4])		// truncate filename, if it's too long
+		p2 = &afn[PATH_MAX-4];
 	*p2++ = FSEPX;
 
 	// choose a file-extension
@@ -1067,7 +1067,7 @@ int wf;
 	}
 
 	while ((c = *p3++) != 0) {		// strncpy
-		if (p2 < &afn[FILENAME_MAX-1])
+		if (p2 < &afn[PATH_MAX-1])
 			*p2++ = c;
 	}
 	*p2++ = 0;

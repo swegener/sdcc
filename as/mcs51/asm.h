@@ -77,6 +77,14 @@
 #endif
 
 /*
+ * PATH_MAX
+ */
+#include <limits.h>
+#ifndef PATH_MAX		/* POSIX, but not required   */
+#define PATH_MAX		/* define a reasonable value */
+#endif
+
+/*
  * Assembler definitions.
  */
 #define	LFTERM	'('		/* Left expression delimeter */
@@ -85,7 +93,7 @@
 #define NCPS	80		/* Chars. per symbol (JLH: change from 8) */
 #define	HUGE	1000		/* A huge number */
 #define NERR	3		/* Errors per line */
-#define	NINPUT	FILENAME_MAX	/* Input buffer size (BH: change from 128) */
+#define	NINPUT	PATH_MAX	/* Input buffer size (BH: change from 128) */
 #define NCODE	128		/* Listing code buffer size */
 #define NTITL	64		/* Title buffer size */
 #define	NSBTL	64		/* SubTitle buffer size */
@@ -370,16 +378,16 @@ extern	int	iflvl[MAXIF+1];	/*	array of IF-ELSE-ENDIF flevel
 				 *	values indexed by tlevel
 				 */
 extern	char
-	afn[FILENAME_MAX];		/*	afile() temporary filespec
+	afn[PATH_MAX];		/*	afile() temporary filespec
 				 */
 extern	char
-	srcfn[MAXFIL][FILENAME_MAX];	/*	array of source file names
+	srcfn[MAXFIL][PATH_MAX];	/*	array of source file names
 				 */
 extern	int
 	srcline[MAXFIL];	/*	current source file line
 				 */
 extern	char
-	incfn[MAXINC][FILENAME_MAX];	/*	array of include file names
+	incfn[MAXINC][PATH_MAX];	/*	array of include file names
 				 */
 extern	int
 	incline[MAXINC];	/*	current include file line

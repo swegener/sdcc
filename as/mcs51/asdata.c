@@ -51,13 +51,13 @@ int	iflvl[MAXIF+1];	/*	array of IF-ELSE-ENDIF flevel
 			 *	values indexed by tlevel
 			 */
 
-char	afn[FILENAME_MAX];		/*	afile temporary file name
+char	afn[PATH_MAX];		/*	afile temporary file name
 				 */
-char	srcfn[MAXFIL][FILENAME_MAX];	/*	array of source file names
+char	srcfn[MAXFIL][PATH_MAX];	/*	array of source file names
 				 */
 int	srcline[MAXFIL];	/*	source line number
 				 */
-char	incfn[MAXINC][FILENAME_MAX];	/*	array of include file names
+char	incfn[MAXINC][PATH_MAX];	/*	array of include file names
 				 */
 int	incline[MAXINC];	/*	include line number
 				 */

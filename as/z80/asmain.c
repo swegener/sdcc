@@ -1024,30 +1024,36 @@ char *fn;
 char *ft;
 int wf;
 {
-	register char *p1, *p2, *p3;
+	register char *p2, *p3;
 	register int c;
 	FILE *fp;
 
-	p1 = fn;
 	p2 = afn;
 	p3 = ft;
-	while ((c = *p1++) != 0 && c != FSEPX) {
-		if (p2 < &afn[FILSPC-4])
-			*p2++ = c;
-	}
+
+	strcpy (afn, fn);
+	p2 = strrchr (afn, FSEPX);		// search last '.'
+	if (!p2)
+		p2 = afn + strlen (afn);
+	if (p2 > &afn[FILSPC-4])		// truncate filename, if it's too long
+		p2 = &afn[FILSPC-4];
 	*p2++ = FSEPX;
-	if (*p3 == 0) {
-		if (c == FSEPX) {
-			p3 = p1;
-		} else {
-			p3 = dsft;
-		}
+
+	// choose a file-extension
+	if (*p3 == 0) {					// extension supplied?
+		p3 = strrchr (fn, FSEPX);	// no: extension in fn?
+		if (p3)
+			++p3;
+		else
+			p3 = dsft;					// no: default extension
 	}
-	while ((c = *p3++) != 0) {
+
+	while ((c = *p3++) != 0) {		// strncpy
 		if (p2 < &afn[FILSPC-1])
 			*p2++ = c;
 	}
 	*p2++ = 0;
+
 	if ((fp = fopen(afn, wf?"w":"r")) == NULL) {
 		fprintf(stderr, "%s: cannot %s.\n", afn, wf?"create":"open");
 		asexit(1);

@@ -40,7 +40,7 @@
 #.SILENT:
 
 # All original tests live in TESTS_DIR and below
-TESTS_DIR = tests-min
+TESTS_DIR = tests
 TESTS_NAME = $(TESTS_DIR)
 # All suite results go in RESULTS_DIR
 RESULTS_DIR = results
@@ -70,7 +70,7 @@ test-ports:
 
 # Helper rule for testing the z80 port only
 test-z80:
-	$(MAKE) inter-port-clean clean test-port PORT=z80
+	$(MAKE) inter-port-clean test-port PORT=z80
 
 # Helper rule for testing the host cc only
 test-host:
@@ -116,19 +116,19 @@ SDCCFLAGS += -Ifwk/include
 .PRECIOUS: $(PORT_CASES_DIR)/% %$(OBJEXT) %$(EXEEXT)
 
 # Rule to generate the iterations of a test suite off the soure suite.
-$(PORT_CASES_DIR)/%$(DIREXT): $(TESTS_DIR)/%.c $(GENERATE_CASES)
+$(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)
 	echo Processing $<
 	rm -rf $(CASES_DIR)/$(TESTS_NAME)
 	mkdir -p $(CASES_DIR)/$(TESTS_NAME)
-	mkdir -p $@
+	mkdir -p `dirname $@`
 	python $(GENERATE_CASES) $< > /dev/null
-	cp $(CASES_DIR)/$(TESTS_NAME)/*.c $@
+	cp $(CASES_DIR)/$(TESTS_NAME)/*.c `dirname $@`
 	touch $@
 
 # Rule linking the combined results log to all of the files in the
 # iteration directory.
-$(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%$(DIREXT)
-	$(MAKE) iterations PORT=$(PORT) CASES=$<
+$(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
+	$(MAKE) iterations PORT=$(PORT) CASES=`dirname $<`
 
 # Rule to summaries the results for one port after all of the tests
 # have been run.

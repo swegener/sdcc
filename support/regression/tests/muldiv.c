@@ -40,7 +40,7 @@ testUnsignedMul(void)
     ASSERT(result == 111);
 
     result = i*12;
-    ASSERT(result == (({type})444));
+    ASSERT(result == ((unsigned {type})444));
 }
 
 static void

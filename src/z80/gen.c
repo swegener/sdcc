@@ -4179,13 +4179,15 @@ genXor (iCode * ic, iCode * ifx)
 		  _moveA (aopGet (AOP (right), offset, FALSE));
 		  emit2 ("xor a,%s",
 			    aopGet (AOP (left), offset, FALSE));
-		  aopPut (AOP (result), "a", 0);
+		  aopPut (AOP (result), "a", offset);
 		}
 	    }
 	  else
 	    {
 	      if (AOP_TYPE (left) == AOP_ACC)
-		emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
+                {
+                  emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
+                }
 	      else
 		{
 		  _moveA (aopGet (AOP (right), offset, FALSE));
@@ -4220,14 +4222,15 @@ genXor (iCode * ic, iCode * ifx)
 	      }
 	    // faster than result <- left, anl result,right
 	    // and better if result is SFR
-	    if (AOP_TYPE (left) == AOP_ACC)
-	      emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
+	    if (AOP_TYPE (left) == AOP_ACC) 
+              {
+                emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
+              }
 	    else
 	      {
 		_moveA (aopGet (AOP (right), offset, FALSE));
 		emit2 ("xor a,%s",
 			  aopGet (AOP (left), offset, FALSE));
-		aopPut (AOP (result), "a", 0);
 	      }
 	    aopPut (AOP (result), "a", offset);
 	  }

@@ -10,18 +10,24 @@
 static {type1}
 returnFirstArg({type1} arg1, {type2} arg2, {type3} arg3)
 {
+    UNUSED(arg2);
+    UNUSED(arg3);
     return arg1;
 }
 
 static {type2}
 returnSecondArg({type1} arg1, {type2} arg2, {type3} arg3)
 {
+    UNUSED(arg1);
+    UNUSED(arg3);
     return arg2;
 }
 
 static {type3}
 returnThirdArg({type1} arg1, {type2} arg2, {type3} arg3)
 {
+    UNUSED(arg1);
+    UNUSED(arg2);
     return arg3;
 }
 

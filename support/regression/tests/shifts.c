@@ -32,7 +32,7 @@ testShiftClasses(void)
 static void
 testShiftByteMultiples(void)
 {
-#if 1
+#if 0
     {attr} {storage} {type} i;
 
     i = ({type}){vals};

@@ -1145,7 +1145,6 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	/* if this is an assignment from true symbol
 	   to a temp then do pointer post inc/dec optimzation */
 	if (ic->op == '=' && !POINTER_SET(ic) &&
-	    IS_TRUE_SYMOP(IC_RIGHT(ic)) && IS_ITEMP(IC_RESULT(ic)) &&
 	    IS_PTR(operandType(IC_RESULT(ic)))) {
 	    ptrPostIncDecOpt(ic);
 	}

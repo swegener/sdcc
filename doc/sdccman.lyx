@@ -1674,10 +1674,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -5222,6 +5222,30 @@ status Collapsed
 
  Causes the linker to check if the external ram usage is within limits of
  the given value.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-size
+\series default 
+<Value>
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ Causes the linker to check if the code memory usage is within limits of
+ the given value.
 \layout Subsubsection
 
 DS390 Options
@@ -6214,30 +6238,6 @@ status Collapsed
 /
 \end_inset 
 
--code-size
-\series default 
-<Value>
-\begin_inset LatexCommand \index{-\/-code-size<Value>}
-
-\end_inset 
-
- Causes the linker to check if the code usage is within limits of the given
- value.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
 -nostdincl
 \begin_inset LatexCommand \index{-\/-nostdincl}
 
@@ -6429,7 +6429,7 @@ status Collapsed
 
 \series default 
  Display errors and warnings using MSVC style, so you can use SDCC with
- visual studio
+ visual studio.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6445,14 +6445,14 @@ status Collapsed
 /
 \end_inset 
 
--use-stderr
+-use-stdout
 \begin_inset LatexCommand \index{-\/-use-stdout}
 
 \end_inset 
 
 
 \series default 
- Send errors and warnings to stdout instead of stderr
+ Send errors and warnings to stdout instead of stderr.
 \layout Subsubsection
 
 Intermediate Dump Options
@@ -7573,11 +7573,11 @@ le space.
 
 
 \family typewriter 
-extern bit SDI;
+extern volatile bit SDI;
 \newline 
-extern bit SCLK;
+extern volatile bit SCLK;
 \newline 
-extern bit CPOL;
+extern volatile bit CPOL;
 \newline 
 
 \newline 
@@ -9687,8 +9687,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9981,8 +9981,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -11028,8 +11028,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text

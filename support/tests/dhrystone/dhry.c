@@ -87,6 +87,8 @@ Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 Boolean Func_2 (char *Str_1_Par_Ref, char *Str_2_Par_Ref);
 Boolean Func_3 (Enumeration Enum_Par_Val);
 
+unsigned getsp(void);
+
 int main(void)
 {
     One_Fifty       Int_1_Loc;
@@ -105,7 +107,6 @@ int main(void)
     Next_Ptr_Glob = &_r[0];
     Ptr_Glob = &_r[1];
 
-
     Ptr_Glob->Ptr_Comp                    = Next_Ptr_Glob;
     Ptr_Glob->Discr                       = Ident_1;
     Ptr_Glob->variant.var_1.Enum_Comp     = Ident_3;
@@ -123,13 +124,15 @@ int main(void)
     /* overflow may occur for this array element.                   */
 
     /* 32766 is the highest value for a 16 bitter */
-    Number_Of_Runs = 32766;
+    Number_Of_Runs = 10000;
 
     runTime = clock();
 
     /* Main test loop */
     for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index) {
 	DPRINTF(("Run_Index = %d\n", Run_Index));
+	if (!(Run_Index & 1023))
+	    printf("Loops: %u\r", Run_Index);
 	Proc_5();
 	Proc_4();
 	/* Ch_1_Glob == 'A', Ch_2_Glob == 'B', Bool_Glob == true */

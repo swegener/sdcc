@@ -6,21 +6,41 @@ SHELL		= /bin/sh
 AUTOCONF	= autoconf
 
 PRJDIR		= .
-PKGS		= support/gc support/cpp \
-		  src as/mcs51 as/z80 link/z80 debugger/mcs51 \
-		  device/include device/lib sim/ucsim
+PKGS		= debugger/mcs51 sim/ucsim
+SDCC_LIBS	= support/gc support/cpp
+SDCC_ASLINK	= as/mcs51 as link
+
 PRJS		= sim/ucsim
 PORTS		= mcs51 z80
 
 srcdir          = .
 
-
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf
+all: checkconf sdcc
+
+sdcc-libs:
+	for lib in $(SDCC_LIBS); do $(MAKE) -C $$lib; done
+
+sdcc-cc: sdcc-libs
+	$(MAKE) -C src
+
+sdcc-aslink:
+	for as in $(SDCC_ASLINK); do $(MAKE) -C $$as; done
+
+sdcc-misc:
 	for pkg in $(PKGS); do $(MAKE) -C $$pkg; done
+	$(MAKE) -C sim/ucsim
+
+sdcc-device:
+	$(MAKE) -C device/include
+	$(MAKE) -C device/lib
+
+sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc
 	$(MAKE) -f main.mk all
 
+# Some interesting sub rules
+sdcc-bin: sdcc-cc sdcc-aslink
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

@@ -44,3 +44,4 @@ printf_fast
 vprintf
 assert
 time
+bpx

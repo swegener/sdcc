@@ -56,120 +56,9 @@ sequenceiCode (eBBlock ** ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
-/* markVisited - will set the visited flag for the given Block     */
-/*-----------------------------------------------------------------*/
-DEFSETFUNC (markVisited)
-{
-  eBBlock *ebp = item;
-
-  if (ebp->visited)
-    return 0;
-  ebp->visited = 1;
-  applyToSet (ebp->succList, markVisited);
-  return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* isOpAlive - checks to see if the usage in this block is the     */
-/*             uses the same definitions as this one               */
-/*-----------------------------------------------------------------*/
-DEFSETFUNC (isOpAlive)
-{
-  eBBlock *ebp = item;
-  V_ARG (operand *, op);
-  V_ARG (eBBlock *, orig);
-  V_ARG (iCode *, ic);
-
-  if (ebp->visited)
-    return 0;
-
-  ebp->visited = 1;
-
-  /* if we have reached the originating block */
-  /* or this block has some definiton for it  */
-  /* then check if it is used between start & */
-  /* this point */
-  if (ebp == orig ||
-      bitVectBitsInCommon (OP_DEFS (op), ebp->defSet))
-    if (usedBetweenPoints (op, ebp->sch, ic))
-      return 1;
-    else
-      {
-	applyToSet (ebp->succList, markVisited);
-	return 0;
-      }
-  else
-    /* choosing this more expensive one since 
-       killDeadCode will take away some definitions
-       but there is not way right now to take away
-       the usage information for the corresponding
-       usages, this will lead to longer live ranges */
-  if (usedInRemaining (op, ebp->sch))
-    return 1;
-
-
-  return (applyToSet (ebp->succList, isOpAlive, op, orig, ic));
-}
-
-/*-----------------------------------------------------------------*/
-/* isLastUse - return TRUE if no usage of this operand after this  */
-/*-----------------------------------------------------------------*/
-int 
-isLastUse (operand * op, eBBlock * ebp, iCode * ic,
-	   eBBlock ** ebbs, int count)
-{
-  int i;
-
-  /* if this is used in the remaining */
-  if (usedInRemaining (op, ic))
-    return 0;
-
-  if (getenv ("SDCC_LRKLAUS"))
-    {
-      /* if not then check any of the following blocks use it */
-      for (i = 0; i < count; i++)
-        {
-          if (ebbs[i]->fSeq <= ebp->fSeq)
-	    continue;
-          if (usedInRemaining (op, ebbs[i]->sch))
-	    return 0;
-        }
-    }
-  else
-    {
-      /* if not then check any of the successor blocks use it */
-      for (i = 0; i < count;)
-        ebbs[i++]->visited = 0;
-      if (applyToSet (ebp->succList, isOpAlive, op, ebp, ic))
-        return 0;
-    }
-
-  /* this is the last use */
-  return 1;
-}
-
-/*-----------------------------------------------------------------*/
-/* unionDefsUsed - unions the defsUsed in a block                  */
-/*-----------------------------------------------------------------*/
-DEFSETFUNC (unionDefsUsed)
-{
-  eBBlock *ebp = item;
-  V_ARG (bitVect **, bvp);
-
-  if (ebp->visited)
-    return 0;
-
-  ebp->visited = 1;
-
-  *bvp = bitVectUnion (*bvp, ebp->usesDefs);
-  applyToSet (ebp->succList, unionDefsUsed, bvp);
-  return 0;
-}
-
-/*-----------------------------------------------------------------*/
 /* setFromRange - sets the from range of a given operand           */
 /*-----------------------------------------------------------------*/
-void 
+void
 setFromRange (operand * op, int from)
 {
   /* only for compiler defined temporaries */
@@ -211,484 +100,435 @@ setToRange (operand * op, int to, bool check)
 }
 
 /*-----------------------------------------------------------------*/
-/* firstDeOf - finds the first definition in seq for op            */
+/* setFromRange - sets the from range of a given operand           */
 /*-----------------------------------------------------------------*/
-static iCode *
-firstDefOf (operand * op)
+void
+setLiveFrom (symbol * sym, int from)
 {
-  int i;
-  iCode *ric = NULL, *lic = NULL;
-  int fSeq = INT_MAX;
-
-  if (!OP_DEFS (op))
-    return NULL;
-
-  for (i = 0; i < OP_DEFS (op)->size; i++)
-    {
-      if (bitVectBitValue (OP_DEFS (op), i) &&
-	  (lic = hTabItemWithKey (iCodehTab, i)) &&
-	  lic->seq < fSeq)
-	{
-
-	  fSeq = lic->seq;
-	  ric = lic;
-	}
-    }
-  return ric;
-}
-/*-----------------------------------------------------------------*/
-/* useDefLoopCheck - check for uses before init inside loops       */
-/*-----------------------------------------------------------------*/
-static void 
-useDefLoopCheck (operand * op, iCode * ic)
-{
-  /* this is for situations like the following
-     int a,b;
-
-     while (...) {
-     a = ... ;
-     ...
-     _some_usage_of_b_;
-     ...
-     b = ... ;
-     } 
-     in this case the definition of 'b' will flow to the usages
-     but register allocator cannot handle these situations.so
-     will mark as spilt */
-
-  int i = 0, fdSeq;
-  int er = 0;
-  iCode *tic;
-
-  /* get the first definition */
-  if (!(tic = firstDefOf (op)))
-    return;
-
-  fdSeq = tic->seq;
-  /* now go thru the usages & make sure they follow
-     the first definition */
-  for (i = 0; i <= OP_USES (op)->size; i++)
-    {
-      if (bitVectBitValue (OP_USES (op), i) &&
-	  (tic = hTabItemWithKey (iCodehTab, i)) &&
-	  tic->seq < fdSeq)
-	{
-	  er = 1;
-	  break;
-	}
-    }
-
-  /* found a usage without definition */
-  if (er)
-    {
-      if (OP_SYMBOL (op)->isreqv && SPIL_LOC (op))
-	{
-
-	  werror (W_LOCAL_NOINIT,
-		  SPIL_LOC (op)->name,
-		  ic->filename, ic->lineno);
-	}
-      else
-	{
-
-	  werror (W_LOCAL_NOINIT,
-		  OP_SYMBOL (op)->name,
-		  ic->filename, ic->lineno);
-	}
-#if 0 // this will create a segfault: bug #498971
-      OP_SYMBOL (op)->isspilt = 1;
-#endif
-    }
-}
-
-
-/*-----------------------------------------------------------------*/
-/* operandLUse - check and set the last use for a given operand    */
-/*-----------------------------------------------------------------*/
-operand *
-operandLUse (operand * op, eBBlock ** ebbs,
-	     int count, iCode * ic, eBBlock * ebp)
-{
-  setFromRange (op, ic->seq);
-  if (ic->depth)
-    OP_SYMBOL (op)->used += (((unsigned int) 1 << ic->depth) + 1);
-  else
-    OP_SYMBOL (op)->used += 1;
-
-  if (isLastUse (op, ebp, ic->next, ebbs, count) ||
-      (OP_LIVETO (op) && OP_LIVETO (op) < ic->seq))
-    {
-      int torange = ic->seq;
-
-      /* if this is a SEND then the toRange should be extended
-         to the call */
-      if (ic->op == SEND)
-        {
-          iCode *lic ;
-          for (lic = ic->next ; lic ; lic = lic->next)
-            {
-              if (lic->op == CALL || lic->op == PCALL)
-                break;
-            }
-          /* found it : mark */
-          if (lic)
-            torange = lic->prev->seq;
-        }
-      /* if this is the last use then if this block belongs
-         to a  loop &  some definition  comes into the loop
-         then extend the live range to  the end of the loop */
-      if (getenv ("SDCC_LRKLAUS"))
-        {
-	  if (ebp->KpartOfLoop)
-            {
-              region *aloop;
-
-              aloop = setFirstItem (ebp->KpartOfLoop);
-              for (; aloop; aloop = setNextItem (ebp->KpartOfLoop))
-                {
-                  if (hasIncomingDefs (aloop, op))
-                    torange = findLoopEndSeq (aloop);
-                }
-            }
-	}
-      else
-        {
-          if (ebp->partOfLoop
-	      && hasIncomingDefs (ebp->partOfLoop, op))
-	    {
-	      torange = findLoopEndSeq (ebp->partOfLoop);
-	    }
-	}
-
-      op = operandFromOperand (op);
-      setToRange (op, torange, FALSE);
-    }
-  ic->uses = bitVectSetBit (ic->uses, op->key);
-
-  if (!OP_SYMBOL (op)->udChked)
-    {
-      sym_link *type = operandType (op);
-      sym_link *etype = getSpec (type);
-
-      OP_SYMBOL (op)->udChked = 1;
-      /* good place to check if unintialised */
-      if ((IS_TRUE_SYMOP (op) || OP_SYMBOL (op)->isreqv) &&
-	  OP_SYMBOL (op)->islocal &&
-	  !IS_AGGREGATE (type) &&
-	  !IS_FUNC (type) &&
-	  ic->op != ADDRESS_OF &&
-	  !IS_STATIC (etype))
-	{
-
-	  if (bitVectIsZero (op->usesDefs) && OP_SYMBOL(op)->ival==NULL)
-	    {
-	      OP_SYMBOL (op)->isspilt = 1;
-
-	      if (OP_SYMBOL (op)->isreqv &&
-		  !OP_SYMBOL (op)->_isparm && SPIL_LOC (op))
-		{
-
-		  werror (W_LOCAL_NOINIT,
-			  SPIL_LOC (op)->name,
-			  ic->filename, ic->lineno);
-		}
-	      else
-		{
-
-		  werror (W_LOCAL_NOINIT,
-			  OP_SYMBOL (op)->name,
-			  ic->filename, ic->lineno);
-		}
-	    }
-	  else
-	    {
-	      if (ebp->depth && op->usesDefs &&
-		  !OP_SYMBOL (op)->_isparm)
-		{
-		  /* check non-inits inside loops */
-		  useDefLoopCheck (op, ic);
-		}
-	    }
-	}
-    }
-  return op;
+  if (!sym->liveFrom || sym->liveFrom > from)
+    sym->liveFrom = from;
 }
 
 /*-----------------------------------------------------------------*/
-/* killAllAlive - mark all the definitions living with this seq    */
+/* setToRange - set the range to for an operand                    */
 /*-----------------------------------------------------------------*/
-void 
-killAllAlive (int seq)
+void
+setLiveTo (symbol * sym, int to)
 {
-  symbol *sym;
-  int k;
-
-  for (sym = hTabFirstItem (liveRanges, &k); sym;
-       sym = hTabNextItem (liveRanges, &k))
-    if (!sym->liveTo || (sym->liveTo < sym->liveFrom))
-      sym->liveTo = seq;
-}
-/*-----------------------------------------------------------------*/
-/* defUsedAfterLoop - all definitions & usages before sequence num */
-/*-----------------------------------------------------------------*/
-bool 
-defUsedAfterLoop (operand * op, int seq)
-{
-  int i;
-  iCode *ic;
-
-  /* check for the usages first */
-  if (OP_SYMBOL (op)->uses && !bitVectIsZero (OP_SYMBOL (op)->uses))
-    {
-      for (i = 0; i < OP_SYMBOL (op)->uses->size; i++)
-	{
-
-	  if (bitVectBitValue (OP_SYMBOL (op)->uses, i) &&	/* usage found */
-	      (ic = hTabItemWithKey (iCodehTab, i)) &&	/*    ""       */
-	      ic->seq > seq)	/* & is after the seq */
-	    return TRUE;
-	}
-    }
-
-  return FALSE;
+  if (!sym->liveTo || sym->liveTo < to)
+    sym->liveTo = to;
 }
 
 /*-----------------------------------------------------------------*/
 /* markLiveRanges - for each operand mark the liveFrom & liveTo    */
 /*-----------------------------------------------------------------*/
-void 
-markLiveRanges (eBBlock * ebp, eBBlock ** ebbs, int count)
+void
+markLiveRanges (eBBlock ** ebbs, int count)
 {
-  iCode *ic;
-  bitVect *defsUsed = NULL;
-  bitVect *defsNotUsed = NULL;
+  int i, key;
+  symbol *sym;
+  
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+      
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+	  if (ic->op == CALL || ic->op == PCALL)
+	      if (bitVectIsZero (OP_SYMBOL (IC_RESULT (ic))->uses))
+		bitVectUnSetBit (ebbs[i]->defSet, ic->key);
+
+	  /* for all iTemps alive at this iCode */
+	  for (key = 1; key < ic->rlive->size; key++)
+	    {
+	      if (!bitVectBitValue(ic->rlive, key))
+	        continue;
+
+	      sym = hTabItemWithKey(liveRanges, key);
+	      setLiveTo(sym, ic->seq);
+	      setLiveFrom(sym, ic->seq);
+	    }
+
+	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* markAlive - marks the operand as alive between sic and eic      */
+/*-----------------------------------------------------------------*/
+void
+markAlive (iCode * sic, iCode * eic, int key)
+{
+  iCode *dic;
+
+  for (dic = sic; dic != eic->next; dic = dic->next)
+    {
+      dic->rlive = bitVectSetBit (dic->rlive, key);
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* findNextUseSym - finds the next use of the symbol and marks it  */
+/*                  alive in between                               */
+/*-----------------------------------------------------------------*/
+int
+findNextUseSym (eBBlock *ebp, iCode *ic, symbol * sym)
+{
+  int retval = 0;
+  iCode *uic;
+  eBBlock *succ;
+
+  hTabAddItemIfNotP (&liveRanges, sym->key, sym);
+
+  if (!ic)
+    goto check_successors;
+
+  /* if we check a complete block and the symbol */
+  /* is alive at the beginning of the block */
+  /* and not defined in the first instructions */
+  /* then a next use exists (return 1) */
+  if ((ic == ebp->sch) && bitVectBitValue(ic->rlive, sym->key))
+    {
+      /* check if the first instruction is a def of this op */
+      if (ic->op == JUMPTABLE || ic->op == IFX || SKIP_IC2(ic))
+        return 1;
+
+      if (IS_ITEMP(IC_RESULT(ic)))
+        if (IC_RESULT(ic)->key == sym->key)
+	  return 0;
+
+      return 1;
+    }
+
+  if (ebp->visited)
+    return 0;
+
+  ebp->visited = 1;
+
+  /* for all remaining instructions in current block */
+  for (uic = ic; uic; uic = uic->next)
+    {
+
+      if (SKIP_IC2(uic))
+        continue;
+
+      if (uic->op == JUMPTABLE)
+        {
+          if (IS_ITEMP(IC_JTCOND(uic)) && IC_JTCOND(uic)->key == sym->key)
+            {
+	      markAlive(ic, uic, sym->key);
+	      return 1;
+	    }
+	   continue;
+	 }
+
+      if (uic->op == IFX)
+        {
+          if (IS_ITEMP(IC_COND(uic)) && IC_COND(uic)->key == sym->key)
+            {
+	      markAlive(ic, uic, sym->key);
+	      return 1;
+	    }
+	   continue;
+	 }
+
+      if (IS_ITEMP (IC_LEFT (uic)))
+        if (IC_LEFT (uic)->key == sym->key)
+          {
+	    markAlive(ic, uic, sym->key);
+	    return 1;
+	  }
+
+      if (IS_ITEMP (IC_RIGHT (uic)))
+        if (IC_RIGHT (uic)->key == sym->key)
+	  {
+	    markAlive (ic, uic, sym->key);
+	    return 1;
+	  }
+
+      if (IS_ITEMP (IC_RESULT (uic)))
+        if (IC_RESULT (uic)->key == sym->key)
+	  {
+	    if (POINTER_SET (uic))
+	      {
+	        markAlive (ic, uic, sym->key);
+                return 1;
+	      }
+	    else
+	      return 0;
+	  }
+
+    }
+
+  /* check all successors */
+check_successors:
+
+  succ = setFirstItem (ebp->succList);
+  for (; succ; succ = setNextItem (ebp->succList))
+    {
+      retval += findNextUseSym (succ, succ->sch, sym);
+    }
+
+  if (retval)
+    {
+      markAlive (ic, ebp->ech, sym->key);
+      return 1;
+    }
+
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* findNextUse - finds the next use of the operand and marks it    */
+/*               alive in between                                  */
+/*-----------------------------------------------------------------*/
+int
+findNextUse (eBBlock *ebp, iCode *ic, operand *op)
+{
+  if (op->isaddr)
+    OP_SYMBOL (op)->isptr = 1;
+
+  OP_SYMBOL (op)->key = op->key;
+
+  return findNextUseSym (ebp, ic, OP_SYMBOL(op));
+}
+
+/*-----------------------------------------------------------------*/
+/* unvisitBlocks - clears visited in all blocks                    */
+/*-----------------------------------------------------------------*/
+void unvisitBlocks (eBBlock ** ebbs, int count)
+{
   int i;
 
-  /* for all the instructions */
-  for (ic = ebp->sch; ic; ic = ic->next)
-    {
-      if (ic->op == CALL || ic->op == PCALL)
-	{
-	  setFromRange (IC_RESULT (ic), ic->seq);
-	  /* if the result has no usage then 
-	     mark this as the end of its life too 
-	     and take it away from the defs for the block */
-	  if (bitVectIsZero (OP_SYMBOL (IC_RESULT (ic))->uses))
-	    {
-	      setToRange (IC_RESULT (ic), ic->seq, FALSE);
-	      bitVectUnSetBit (ebp->defSet, ic->key);
-	    }
-	}
+  for (i = 0; i < count; i++)
+    ebbs[i]->visited = 0;
+}
 
-      if (SKIP_IC2 (ic))
-	continue;
-
-      /* take care of the special icodes first */
-      if (ic->op == JUMPTABLE && IS_SYMOP (IC_JTCOND (ic)))
-	{
-	  operandLUse (IC_JTCOND (ic), ebbs, count, ic, ebp);
-	  continue;
-	}
-
-      if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
-	{
-	  operandLUse (IC_COND (ic), ebbs, count, ic, ebp);
-	  continue;
-	}
-
-      if (IS_SYMOP (IC_LEFT (ic)))
-	operandLUse (IC_LEFT (ic), ebbs, count, ic, ebp);
-
-      if (IS_SYMOP (IC_RIGHT (ic)))
-	operandLUse (IC_RIGHT (ic), ebbs, count, ic, ebp);
-
-      if (POINTER_SET (ic))
-	operandLUse (IC_RESULT (ic), ebbs, count, ic, ebp);
-      else if (IC_RESULT (ic))
-	ic->defKey = IC_RESULT (ic)->key;
-    }
-
-
-  /* for all the definitions in the block */
-  /* compute and set the live from        */
-  if (ebp->ldefs && !bitVectIsZero (ebp->ldefs))
-    {
-      for (i = 0; i < ebp->ldefs->size; i++)
-	{
-	  iCode *dic;
-
-	  if (bitVectBitValue (ebp->ldefs, i) &&
-	      (dic = hTabItemWithKey (iCodehTab, i)))
-	    {
-
-	      /* if the definition has a from & it is greater */
-	      /* than the defininng iCode->seq then change it */
-	      setFromRange (IC_RESULT (dic), dic->seq);
-	    }
-	}
-    }
-
-  /* special case for lastBlock in a loop: here we
-     mark the end of all the induction variables for the
-     loop */
-  if (ebp->isLastInLoop && !bitVectIsZero (ebp->linds))
-    {
-      for (i = 0; i <= ebp->linds->size; i++)
-	{
-	  iCode *dic;
-
-	  if (bitVectBitValue (ebp->linds, i) &&
-	      (dic = hTabItemWithKey (iCodehTab, i)))
-	    {
-
-	      /* if this is a register equvalent make sure
-	         it is not defined or used anywhere after the loop */
-	      if (OP_SYMBOL (IC_RESULT (dic))->isreqv &&
-		  defUsedAfterLoop (IC_RESULT (dic), ebp->lSeq))
-		continue;
-
-	      setToRange (IC_RESULT (dic), (ebp->lSeq), FALSE);
-	    }
-	}
-    }
-
-  /* for defnitions coming into the block if they */
-  /* not used by itself & any of its successors   */
-  /* they are dead */
-  /* first union the definitions used in all successors
-     and itself */
-  for (i = 0; i < count; ebbs[i++]->visited = 0);
-  applyToSet (ebp->succList, unionDefsUsed, &defsUsed);
-  defsUsed = bitVectUnion (defsUsed, ebp->usesDefs);
-
-  /* now subract the result of these unions from */
-  /* the incoming definitions this will give the */
-  /* definitions that are never used in the future */
-  defsNotUsed = bitVectCplAnd (bitVectCopy (ebp->inDefs),
-			       defsUsed);
-
-  /* mark the end of the defintions */
-  if (!bitVectIsZero (defsNotUsed) && ebp->sch)
-    {
-      for (i = 0; i < defsNotUsed->size; i++)
-	{
-	  iCode *dic;
-
-	  if (bitVectBitValue (defsNotUsed, i) &&
-	      (dic = hTabItemWithKey (iCodehTab, i)))
-	    {
-	      setToRange (IC_RESULT (dic), (ebp->fSeq - 1), TRUE);
-	    }
-	}
-    }
-
-
-  /* if we reach a lock with noPath to it then kill all
-     the live ranges alive at this point */
-/*     if (ebp->noPath || ebp->entryLabel == returnLabel) */
-  if (ebp->entryLabel == returnLabel)
-    killAllAlive (ebp->fSeq);
+/*-----------------------------------------------------------------*/
+/* unvisitBlocks - clears visited in all blocks                    */
+/*-----------------------------------------------------------------*/
+void
+incUsed (iCode *ic, operand *op)
+{
+  if (ic->depth)
+    OP_SYMBOL (op)->used += (((unsigned int) 1 << ic->depth) + 1);
+  else
+    OP_SYMBOL (op)->used += 1;
 }
 
 /*-----------------------------------------------------------------*/
 /* rlivePoint - for each point compute the ranges that are alive   */
 /*-----------------------------------------------------------------*/
-void 
+void
 rlivePoint (eBBlock ** ebbs, int count)
 {
-    int i;
-    
-    /* for all blocks do */
-    for (i = 0; i < count; i++) {
-	iCode *ic;
-	
-	/* for all instruction in the block do */
-	for (ic = ebbs[i]->sch; ic; ic = ic->next) {
-	    symbol *lrange;
-	    int k;
-	    
+  int i, key;
+  eBBlock *succ;
+  bitVect *alive;
+
+  /* for all blocks do */
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+
+      /* for all instructions in this block do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+
+	  if (!ic->rlive)
 	    ic->rlive = newBitVect (operandKey);
-	    /* for all symbols in the liverange table */
-	    for (lrange = hTabFirstItem (liveRanges, &k); lrange;
-		 lrange = hTabNextItem (liveRanges, &k)) {
-		
-		/* if it is live then add the lrange to ic->rlive */
-		if (lrange->liveFrom <= ic->seq &&
-		    lrange->liveTo >= ic->seq) {
-		    lrange->isLiveFcall |= ((lrange->liveFrom < ic->seq) && 
-					    (ic->op == CALL || ic->op == PCALL || ic->op == SEND));
-		    if (ic->op == CALL && lrange->liveFrom == ic->seq) continue;
-		    ic->rlive = bitVectSetBit (ic->rlive, lrange->key);
+
+	  if (SKIP_IC2(ic))
+	    continue;
+
+	  if (ic->op == JUMPTABLE && IS_SYMOP(IC_JTCOND(ic)))
+	    {
+	      incUsed (ic, IC_JTCOND(ic));
+
+	      if (!IS_ITEMP(IC_JTCOND(ic)))
+	        continue;
+
+	      unvisitBlocks(ebbs, count);
+	      ic->rlive = bitVectSetBit (ic->rlive, IC_JTCOND(ic)->key);
+	      findNextUse (ebbs[i], ic->next, IC_JTCOND(ic));
+
+	      continue;
+	    }
+
+	  if (ic->op == IFX && IS_SYMOP(IC_COND(ic)))
+	    {
+	      incUsed (ic, IC_COND(ic));
+
+	      if (!IS_ITEMP(IC_COND(ic)))
+	        continue;
+
+	      unvisitBlocks (ebbs, count);
+	      ic->rlive = bitVectSetBit (ic->rlive, IC_COND(ic)->key);
+	      findNextUse (ebbs[i], ic->next, IC_COND(ic));
+
+	      continue;
+	    }
+
+	  if (IS_SYMOP(IC_LEFT(ic)))
+	    {
+	      incUsed (ic, IC_LEFT(ic));
+	      if (IS_ITEMP(IC_LEFT(ic)))
+	        {
+
+	          unvisitBlocks(ebbs, count);
+	          ic->rlive = bitVectSetBit (ic->rlive, IC_LEFT(ic)->key);
+	          findNextUse (ebbs[i], ic->next, IC_LEFT(ic));
+
+		  /* if this is a send extend the LR to the call */
+		  if (ic->op == SEND)
+		    {
+		      iCode *lic;
+		      for (lic = ic; lic; lic = lic->next)
+		        {
+			  if (lic->op == CALL)
+			    {
+			      markAlive (ic, lic->prev, IC_LEFT (ic)->key);
+			      break;
+			    }
+			}
+		    }
 		}
 	    }
-#if 0
-	    /* overlapping live ranges should be eliminated */
-	    if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
-		if (SPIL_LOC(IC_RIGHT(ic)) == SPIL_LOC(IC_RESULT(ic))   && /* left & right share the same spil location */
-		    OP_SYMBOL(IC_RESULT(ic))->isreqv                    && /* left of assign is a register requivalent */
-		    !OP_SYMBOL(IC_RIGHT(ic))->isreqv                    && /* right side is not */
-		    OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->key           && /* right side live beyond this point */
-		    bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1 )        {  /* left has multiple definitions */
-		    SPIL_LOC(IC_RIGHT(ic)) = NULL; /* then cannot share */
+
+	  if (IS_SYMOP(IC_RIGHT(ic)))
+	    {
+	      incUsed (ic, IC_RIGHT(ic));
+	      if (IS_ITEMP(IC_RIGHT(ic)))
+	        {
+	          unvisitBlocks(ebbs, count);
+	          ic->rlive = bitVectSetBit (ic->rlive, IC_RIGHT(ic)->key);
+	          findNextUse (ebbs[i], ic->next, IC_RIGHT(ic));
 		}
 	    }
-#endif
+
+	  if (IS_ITEMP(IC_RESULT(ic)))
+	    {
+	      unvisitBlocks(ebbs, count);
+	      ic->rlive = bitVectSetBit (ic->rlive, IC_RESULT(ic)->key);
+	      findNextUse (ebbs[i], ic->next, IC_RESULT(ic));
+	    }
+
+	  if (!POINTER_SET(ic) && IC_RESULT(ic))
+	    ic->defKey = IC_RESULT(ic)->key;
+
 	}
+
+      /* check all symbols that are alive in the last instruction */
+      /* but are not alive in all successors */
+
+      succ = setFirstItem (ebbs[i]->succList);
+      if (!succ)
+        continue;
+
+      alive = succ->sch->rlive;
+      while ((succ = setNextItem (ebbs[i]->succList)))
+        {
+	  alive = bitVectIntersect (alive, succ->sch->rlive);
+	}
+
+      alive = bitVectCplAnd ( bitVectCopy (ebbs[i]->ech->rlive), alive);
+
+      for (key = 1; key < alive->size; key++)
+        {
+	  if (!bitVectBitValue (alive, key))
+	    continue;
+
+	  unvisitBlocks(ebbs, count);
+	  findNextUseSym (ebbs[i], NULL, hTabItemWithKey (liveRanges, key));
+	}
+
     }
 }
 
 /*-----------------------------------------------------------------*/
 /* computeClash - find out which live ranges collide with others   */
 /*-----------------------------------------------------------------*/
-static void computeClash ()
+static void
+computeClash (eBBlock ** ebbs, int count)
 {
-    hTab *lRangeCopy = newHashTable(hTabMaxKey(liveRanges));
-    void *item;
-    symbol *outer, *inner;
-    int key, key1;
+  int i;
 
-    /* have to make a copy of the liveRanges hashTable :: UGHH .*/
-    for (item = hTabFirstItem(liveRanges,&key); item ; 
-	 item = hTabNextItem(liveRanges,&key)) {
-	hTabAddItem(&lRangeCopy,key,item);
-    }
-   
-    /* outerloop : for each liverange do */
-    for (outer = hTabFirstItem(liveRanges,&key); outer ; 
-	 outer = hTabNextItem(liveRanges,&key)) {
+  /* for all blocks do */
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
 
-	/* if the liveFrom & To are the same then skip, 
-	   could happen for unused return values from functions */
-	if (outer->liveFrom == outer->liveTo) continue;
+      /* for every iCode do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+	{
+	  symbol *sym1, *sym2;
+	  int key1, key2;
 
-	/* innerloop : for the inner loop we can start from the
-	   item after the outer loop */
-	inner = hTabFirstItemWK (lRangeCopy,outer->key);
-	inner = hTabNextItem (lRangeCopy,&key1 );
-	for (; inner ; inner = hTabNextItem( lRangeCopy ,&key1)) {
+	  /* for all iTemps alive at this iCode */
+	  for (key1 = 1; key1 < ic->rlive->size; key1++)
+	    {
+	      if (!bitVectBitValue(ic->rlive, key1))
+	        continue;
 
-	    if (inner->liveFrom == inner->liveTo) continue;
-	    if (inner->liveTo < outer->liveFrom)  continue;
-	    if (inner->liveFrom > outer->liveTo)  continue;
-	    
-	    /* if one of them are being defined where the other
-	       one end , then no overlap (i.e. they can goto same registers */
-	    if (inner->liveFrom == outer->liveTo ||
-		outer->liveFrom == inner->liveTo) continue;
+	      sym1 = hTabItemWithKey(liveRanges, key1);
 
-	    /* so they overlap : set both their clashes */
-	    inner->clashes = bitVectSetBit(inner->clashes,outer->key);
-	    outer->clashes = bitVectSetBit(outer->clashes,inner->key);
+	      if (!sym1->isitmp)
+	        continue;
 
-	    /* check if they share the same spillocation */
-	    if (SYM_SPIL_LOC(inner) && SYM_SPIL_LOC(outer) && 
-		SYM_SPIL_LOC(inner) == SYM_SPIL_LOC(outer)) {
-		if (inner->reqv && !outer->reqv) SYM_SPIL_LOC(outer)=NULL;
-		else if (outer->reqv && !inner->reqv) SYM_SPIL_LOC(inner)=NULL;
-		else if (inner->used > outer->used) SYM_SPIL_LOC(outer)=NULL;
-		else SYM_SPIL_LOC(inner)=NULL;
+	      /* for all other iTemps alive at this iCode */
+	      for (key2 = key1+1; key2 < ic->rlive->size; key2++)
+	        {
+		  if (!bitVectBitValue(ic->rlive, key2))
+		    continue;
+
+		  sym2 = hTabItemWithKey(liveRanges, key2);
+		  
+		  if (!sym2->isitmp)
+		    continue;
+
+		  /* if the result and left or right is an iTemp */
+		  /* than possibly the iTemps do not clash */
+		  if ((ic->op != JUMPTABLE) && (ic->op != IFX) &&
+		      IS_ITEMP(IC_RESULT(ic)) &&
+		      (IS_ITEMP(IC_LEFT(ic)) || IS_ITEMP(IC_RIGHT(ic))))
+		    {
+		      if (OP_SYMBOL(IC_RESULT(ic))->key == key1)
+		        {
+		          if (IS_SYMOP(IC_LEFT(ic)))
+			    if (OP_SYMBOL(IC_LEFT(ic))->key == key2)
+			      continue;
+		          if (IS_SYMOP(IC_RIGHT(ic)))
+			    if (OP_SYMBOL(IC_RIGHT(ic))->key == key2)
+			      continue;
+			}
+
+		      if (OP_SYMBOL(IC_RESULT(ic))->key == key2)
+		        {
+		          if (IS_SYMOP(IC_LEFT(ic)))
+			    if (OP_SYMBOL(IC_LEFT(ic))->key == key1)
+			      continue;
+		          if (IS_SYMOP(IC_RIGHT(ic)))
+			    if (OP_SYMBOL(IC_RIGHT(ic))->key == key1)
+			      continue;
+			}
+		    }
+
+		  /* the iTemps do clash. set the bits in clashes */
+		  sym1->clashes = bitVectSetBit (sym1->clashes, key2);
+		  sym2->clashes = bitVectSetBit (sym2->clashes, key1);
+
+		  /* check if they share the same spill location */
+		  /* what is this good for? */
+	          if (SYM_SPIL_LOC(sym1) && SYM_SPIL_LOC(sym2) &&
+		      SYM_SPIL_LOC(sym1) == SYM_SPIL_LOC(sym2))
+		    {
+		      if (sym1->reqv && !sym2->reqv) SYM_SPIL_LOC(sym2)=NULL;
+		      else if (sym2->reqv && !sym1->reqv) SYM_SPIL_LOC(sym1)=NULL;
+		      else if (sym1->used > sym2->used) SYM_SPIL_LOC(sym2)=NULL;
+		      else SYM_SPIL_LOC(sym1)=NULL;
+		    }
+		}
 	    }
-
 	}
     }
 }
@@ -730,6 +570,32 @@ notUsedInBlock (symbol * sym, eBBlock * ebp, iCode *ic)
 	  allDefsOutOfRange (sym->uses, ebp->fSeq, ebp->lSeq));
 }
 
+/*-----------------------------------------------------------------*/
+/* adjustIChain - correct the sch and ech pointers                 */
+/*-----------------------------------------------------------------*/
+void
+adjustIChain (eBBlock ** ebbs, int count)
+{
+  int i;
+  
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+      
+      if (ebbs[i]->noPath)
+        continue;
+
+      ic = ebbs[i]->sch;
+      while (ic->prev)
+        ic = ic->prev;
+      ebbs[i]->sch = ic;
+      
+      ic = ebbs[i]->ech;
+      while (ic->next)
+        ic = ic->next;
+      ebbs[i]->ech = ic;
+    }
+}
 
 /*-----------------------------------------------------------------*/
 /* computeLiveRanges - computes the live ranges for variables      */
@@ -737,7 +603,10 @@ notUsedInBlock (symbol * sym, eBBlock * ebp, iCode *ic)
 void
 computeLiveRanges (eBBlock ** ebbs, int count)
 {
-  int i = 0;
+  /* first look through all blocks and adjust the
+     sch and ech pointers */
+  adjustIChain (ebbs, count);
+
   /* sequence the code the live ranges are computed
      in terms of this sequence additionally the
      routine will also create a hashtable of instructions */
@@ -748,22 +617,14 @@ computeLiveRanges (eBBlock ** ebbs, int count)
   iCodeSeqhTab = newHashTable (iCodeKey);
   sequenceiCode (ebbs, count);
 
-  if (getenv ("SDCC_LRKLAUS"))
-    {
-      /* add blocks between loop blocks as part of that loop */
-      addLoopBlocks (ebbs, count);
-    }
-
-  /* call routine to mark the from & to live ranges for
-     variables used */
-  setToNull ((void *) &liveRanges);
-  for (i = 0; i < count; i++)
-    markLiveRanges (ebbs[i], ebbs, count);
-
   /* mark the ranges live for each point */
+  setToNull ((void *) &liveRanges);
   rlivePoint (ebbs, count);
 
+  /* mark the from & to live ranges for variables used */
+  markLiveRanges (ebbs, count);
+
   /* compute which overlaps with what */
-  computeClash();
+  computeClash(ebbs, count);
 }
 

@@ -235,19 +235,10 @@ DEFSETFUNC (addToExitsMarkDepth)
   if (ebp->depth<depth)
     ebp->depth = depth;
 
-  if (getenv ("SDCC_LRKLAUS"))
-    {
-      /* put the loop region info in the block */
-      if (!isinSet (ebp->KpartOfLoop, lr))
-        addSetHead (&ebp->KpartOfLoop, lr);
-    }
-  else
-    {
-      /* NOTE: here we will update only the inner most loop
-         that it is a part of */
-      if (!ebp->partOfLoop)
-        ebp->partOfLoop = lr;
-    }
+  /* NOTE: here we will update only the inner most loop
+     that it is a part of */
+  if (!ebp->partOfLoop)
+    ebp->partOfLoop = lr;
 
   /* if any of the successors go out of the loop then */
   /* we add this one to the exits */
@@ -1223,58 +1214,4 @@ loopOptimizations (hTab * orderedLoops, eBBlock ** ebbs, int count)
     }
 
   return change;
-}
-
-/*-----------------------------------------------------------------*/
-/* addLoopBlocks - will add all blocks inside a loop to this loop  */
-/* this should fix most of the liverange problems                  */
-/*-----------------------------------------------------------------*/
-void
-addLoopBlocks (eBBlock ** ebbs, int count)
-{
-  region *aloop;
-  struct eBBlock *block;
-  int seqMin, seqMax;
-  int i, j;
-
-  for (i = 0; i < count; i++)
-    {
-      if (!ebbs[i]->KpartOfLoop)
-        continue;
-
-      /* for all loops this block belongs to */
-      /* add inner block not already marked as part of this loop */
-      aloop = setFirstItem (ebbs[i]->KpartOfLoop);
-      for (; aloop; aloop = setNextItem (ebbs[i]->KpartOfLoop))
-        {
-
-          if (aloop->visited)
-            continue;
-
-          aloop->visited = 1;
-
-          /* set max & min Seq for loopRegion */
-          block = setFirstItem (aloop->regBlocks);
-          seqMax = block->lSeq;
-          seqMin = block->fSeq;
-          for (; block; block = setNextItem (aloop->regBlocks))
-	    {
-              if (block->lSeq > seqMax)
-                seqMax = block->lSeq;
-              if (block->fSeq < seqMin)
-                seqMin = block->fSeq;
-            }
-
-          /* add all blocks between seqMin, seqMax to loop */
-          for (j = 0; j < count; j++)
-	    {
-              if (ebbs[j]->fSeq > seqMin && ebbs[j]->lSeq < seqMax &&
-                  !isinSet (aloop->regBlocks, ebbs[j]))
-		{
-                  if (!isinSet (ebbs[j]->KpartOfLoop, aloop))
-	            addSetHead (&ebbs[j]->KpartOfLoop, aloop);
-	        }
-	    }
-	}
-    }
 }

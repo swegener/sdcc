@@ -1,3 +1,12 @@
+2003-10-28 Klaus Flittner <klaus_flittner@gmx.de>
+
+	Replaced the livrange code.
+	* src/SDCClrange.c: added new LR code
+	* src/SDCCloop.c,
+	* src/SDCCBBlock.h: removed remainig parts from old LR code
+	* src/ds390/ralloc.c,
+	* src/ds390/gen.c: minor fixes to make it work with new code
+
 2003-10-28 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* as/hc08/asm.h,

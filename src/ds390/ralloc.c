@@ -1671,7 +1671,7 @@ createRegMask (eBBlock ** ebbs, int count)
 			  "createRegMask cannot find live range");
 		  exit (0);
 		}
-	      
+#if 0
 	      /* special case for ruonly */
 	      if (sym->ruonly && sym->liveFrom != sym->liveTo) {
 		  int size = getSize(sym->type);
@@ -1680,6 +1680,7 @@ createRegMask (eBBlock ** ebbs, int count)
 		      ic->rMask = bitVectSetBit (ic->rMask, j++);
 		  continue ;
 	      }
+#endif
 	      /* if no register assigned to it */
 	      if (!sym->nRegs || sym->isspilt)
 		continue;

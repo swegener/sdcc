@@ -1961,7 +1961,7 @@ genUminus (iCode * ic)
 
   /* assign asmops */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
-  aopOp (IC_RESULT (ic), ic, TRUE, AOP_USESDPTR(IC_LEFT (ic)));
+  aopOp (IC_RESULT (ic), ic, TRUE, (AOP_TYPE(IC_LEFT (ic)) == AOP_DPTR));
 
   /* if both in bit space then special
      case */
@@ -2664,9 +2664,9 @@ genCall (iCode * ic)
 	}
       else
 	{
-	  _G.accInUse++;
+	  _G.bInUse++;
 	  aopOp (IC_RESULT (ic), ic, FALSE, TRUE);
-	  _G.accInUse--;
+	  _G.bInUse--;
 
 	  assignResultValue (IC_RESULT (ic));
 

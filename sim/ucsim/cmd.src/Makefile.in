@@ -113,11 +113,11 @@ $(PRJDIR)/libcmd.a: $(OBJECTS)
 #	mv y.tab.c $*.cc
 #	mv y.tab.h $*.h
 
+ifeq ($(DEVEL),yes)
 .y.cc:
 	rm -f $*.cc $*.h
 	$(BISON_PLUS_PLUS) -d -o $*.cc $<
 
-ifeq ($(DEVEL),yes)
 .l.cc:
 	rm -f $*.cc
 	$(LEX) --c++ -o $*.cc $<

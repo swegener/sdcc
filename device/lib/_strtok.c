@@ -37,7 +37,16 @@ char * strtok (
 
 	if ( str )
 		s = str ;
+	if ( !s )
+		return NULL;
 
+	while (*s) {
+		if (strchr(control,*s))
+			s++;
+		else
+			break;
+	}
+	
 	s1 = s ;
 
 	while (*s) {
@@ -47,6 +56,12 @@ char * strtok (
 		}
 		s++ ;
 	}
-	return (NULL);
+
+	s = NULL;
+
+	if (*s1)
+		return s1;
+	else
+		return NULL;
 }  
 

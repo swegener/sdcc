@@ -1,9 +1,24 @@
 2004-01-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* device/include/z180.h,
+	* device/lib/_memcpy.c,
+	* device/lib/_memmove.c,
+	* device/lib/_mulint.c,
+	* device/lib/ser_ir.c,
+	* device/lib/ser_ir_cts_rts.c,
+	* device/lib/_strcmp.c,
+	* device/lib/_strtok.c: fixed pragmas to non-deprecated form
+	* src/z80/main.c (_process_pragma): add support for pragmas bank and
+	portmode; added deprecation warning for bank= and protmode= forms.
+	Also, guard against buffer overflow.
+	* src/z80/gen.c (aopGet): generate better code for sfr banked read
+
+2004-01-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/hc08/main.c (_hc08_genAssemblerPreamble): fixed bug #875487. Also
 	changed interrupt vector table generation to only emit declared vectors.
 	* device/include/Makefile.in: added missing backslash
-	* device/lib/pic16/Makefile.rules: pass $(MODELFLAGS) to compiler
+	* device/lib/pic16/Makefile.rules: add $(MODELFLAGS) to $(CFLAGS)
 
 2004-01-13 Vangelis Rokas <vrokas@otenet.gr>
 

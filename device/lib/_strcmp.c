@@ -32,7 +32,7 @@ int strcmp (
 	)
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
-#pragma NOINDUCTION
+#pragma noinduction
 
 	char ret = 0 ;
         char * src = asrc;

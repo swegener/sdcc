@@ -19,7 +19,7 @@
 #endif
 
 /* will want this to be the case by default (I think) */
-#pragma portmode=z180
+#pragma portmode z180
 
 static void _ENABLE_Z180_ASSEMBLER_(void) _naked { _asm .hd64 _endasm; }
 

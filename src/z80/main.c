@@ -133,10 +133,15 @@ _reg_parm (sym_link * l)
 static int
 _process_pragma (const char *sz)
 {
-  if( startsWith( sz, "bank=" ))
+  if( startsWith( sz, "bank=" ) || startsWith( sz, "bank " ))
   {
     char buffer[128];
-    strcpy (buffer, sz + 5);
+    
+    if (sz[4]=='=')
+      werror(W_DEPRECATED_PRAGMA, "bank=");
+    
+    strncpy (buffer, sz + 5, sizeof (buffer));
+    buffer[sizeof (buffer) - 1 ] = '\0';
     chomp (buffer);
     if (isdigit (buffer[0]))
     {
@@ -151,7 +156,8 @@ _process_pragma (const char *sz)
 	  /* Arg was a bank number.  Handle in an ASM independent
 	     way. */
       char num[128];
-      strcpy (num, sz + 5);
+      strncpy (num, sz + 5, sizeof (num));
+      num[sizeof (num) -1] = '\0';
       chomp (num);
 
       switch (_G.asmType)
@@ -174,11 +180,15 @@ _process_pragma (const char *sz)
     code->sname = gbz80_port.mem.code_name;
     return 0;
   }
-  else if( startsWith( sz, "portmode=" ))
+  else if( startsWith( sz, "portmode=" ) || startsWith( sz, "portmode " ))
   { /*.p.t.20030716 - adding pragma to manipulate z80 i/o port addressing modes */
     char bfr[128];
 
-    strcpy( bfr, sz + 9 );
+    if (sz[8]=='=')
+      werror(W_DEPRECATED_PRAGMA, "portmode=");
+
+    strncpy( bfr, sz + 9, sizeof (bfr));
+    bfr[sizeof (bfr) - 1] = '\0';
     chomp( bfr );
 
     if     ( !strcmp( bfr, "z80"     )){ z80_opts.port_mode =  80; }

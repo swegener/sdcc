@@ -24,8 +24,8 @@
 #include "string.h" 
 
 #if defined(SDCC_MODEL_LARGE) || defined (SDCC_MODEL_FLAT24)
-#pragma NOINDUCTION
-#pragma NOINVARIANT
+#pragma noinduction
+#pragma noinvariant
 #endif
 
 char * strtok (

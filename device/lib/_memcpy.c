@@ -34,7 +34,7 @@ void * memcpy (
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
 
-#pragma NOINDUCTION
+#pragma noinduction
 
 	char * d = dst;
 	char * s = src;

@@ -54,8 +54,8 @@
 
 #if defined(_MULINT_ASM_LARGE)
 
-#pragma SAVE
-#pragma LESS_PEDANTIC
+#pragma save
+#pragma less_pedantic
 int
 _mulint (int a, int b)
 {
@@ -107,12 +107,12 @@ _mulint (int a, int b)
     ret
   _endasm;
 }
-#pragma RESTORE
+#pragma restore
 
 #elif defined(_MULINT_ASM_SMALL) || defined(_MULINT_ASM_SMALL_AUTO)
 
-#pragma SAVE
-#pragma LESS_PEDANTIC
+#pragma save
+#pragma less_pedantic
 int
 _mulint_dummy (void) _naked
 {
@@ -200,7 +200,7 @@ _mulint_dummy (void) _naked
 
 	_endasm ;
 }
-#pragma RESTORE
+#pragma restore
 
 #else
 

@@ -1684,15 +1684,9 @@ aopGet (asmop * aop, int offset, bool bit16)
       { /*.p.t.20030716 handling for i/o port read access for Z80 */
         if( aop->paged )
         { /* banked mode */
-          if( aop->bcInUse )  emit2( "push bc" );
-
-          emit2( "ld bc,#%s", aop->aopu.aop_dir );
-          emit2( "in a,(c)" );
-
-          if( aop->bcInUse )
-            emit2( "pop bc" );
-          else
-            spillPair (PAIR_BC);
+	  /* reg A goes to address bits 15-8 during "in a,(x)" instruction */
+	  emit2( "ld a,!msbimmeds", aop->aopu.aop_dir);
+	  emit2( "in a,(!lsbimmeds)", aop->aopu.aop_dir);
         }
         else if( z80_opts.port_mode == 180 )
         { /* z180 in0/out0 mode */

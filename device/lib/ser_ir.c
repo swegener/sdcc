@@ -105,8 +105,8 @@ unsigned char ser_getc (void)
    ES = 1;
    return (c);
 }
-#pragma SAVE
-#pragma NOINDUCTION
+#pragma save
+#pragma noinduction
 void ser_puts (unsigned char *s)
 {
    unsigned char c;
@@ -115,7 +115,7 @@ void ser_puts (unsigned char *s)
 	   ser_putc (c);
    }
 }
-#pragma RESTORE
+#pragma restore
 void ser_gets (unsigned char *s, unsigned char len)
 {
    unsigned char pos, c;

@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------
 
-  SDCCralloc.c - source file for register allocation. (8051) specific
+  SDCCralloc.c - source file for register allocation. 68HC08 specific
 
                 Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
@@ -655,7 +655,7 @@ spillThis (symbol * sym)
   if (!(sym->remat || sym->usl.spillLoc))
     createStackSpil (sym);
 
-  /* mark it has spilt & put it in the spilt set */
+  /* mark it as spilt & put it in the spilt set */
   sym->isspilt = sym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
 
@@ -1414,7 +1414,7 @@ static void fillGaps()
 
     if (getenv("DISABLE_FILL_GAPS")) return;
 
-    /* look for livernages that was spilt by the allocator */
+    /* look for liveranges that were spilt by the allocator */
     for (sym = hTabFirstItem(liveRanges,&key) ; sym ;
 	 sym = hTabNextItem(liveRanges,&key)) {
 

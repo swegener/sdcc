@@ -1207,7 +1207,7 @@ static iCode *hasInc (operand *op, iCode *ic, int osize) {
       }
     }
     /* if the operand used or deffed */
-    if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
+    if (bitVectBitValue(OP_USES(op),lic->key) || lic->defKey == op->key) {
       return NULL;
     }
     /* if GOTO or IFX */

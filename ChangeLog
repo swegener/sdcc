@@ -1,3 +1,30 @@
+2004-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_gptrget.c,
+	* device/lib/_gptrput.c: updated comment
+	* device/lib/calloc.c,
+	* device/lib/free.c,
+	* device/lib/malloc.c,
+	* device/lib/realloc.c: added LGPL, made them reentrant-safe
+	* src/SDCCcse.c (cseBBlock),
+	* src/SDCCicode.c (printOperand, geniCodeArray),
+	* src/SDCCicode.h (struct operand): fixed bug 868103
+	* support/regression/tests/bug-868103.c: added
+	* src/SDCCast.c (searchLitOp),
+	* src/SDCCcse.h (struct cseDef),
+	* src/SDCCglue.c (printIvalArray, spacesToUnderscores),
+	* src/SDCCicode.h (struct operand),
+	* src/SDCCsymt.h (struct sym_link),
+	* src/avr/gen.c (hasInc),
+	* src/ds390/gen.c (hasInc),
+	* src/hc08/gen.c (genPlusIncr, hasInc),
+	* src/mcs51/gen.c (hasInc),
+	* src/pic16/glue.c (pic16_printIvalChar),
+	* src/pic16/ralloc.c (regWithIdx),
+	* src/xa51/gen.c (hasInc) : removed warnings
+	* src/SDCCast.c (createBlock): added comment ???
+	* src/hc08/ralloc.c: updated comments
+
 2004-09-07 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: updated section on switch statements, added

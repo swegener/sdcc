@@ -825,7 +825,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
                 FILE * oFile)
 {
   initList *iloop;
-  int size = 0;
+  unsigned int size = 0;
 
   if (ilist) {
     /* take care of the special   case  */
@@ -1571,7 +1571,7 @@ emitOverlay (FILE * afile)
 static char *
 spacesToUnderscores (char *dest, const char *src, size_t len)
 {
-  int i;
+  unsigned int i;
   char *p;
 
   assert(dest != NULL);

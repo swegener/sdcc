@@ -640,7 +640,7 @@ static int
 pic16_printIvalChar (sym_link * type, initList * ilist, char *s, char ptype, void *p)
 {
   value *val;
-  int remain;
+  unsigned int remain;
 
   if(!p)
     return 0;

@@ -234,12 +234,12 @@ printOperand (operand * op, FILE * file)
     case SYMBOL:
 #define REGA 1
 #ifdef REGA
-      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d re%d rm%d nos%d ru%d dp%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
+      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d a2p%d re%d rm%d nos%d ru%d dp%d}",		/*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
 	       (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name),
 	       op->key,
 	       OP_LIVEFROM (op), OP_LIVETO (op),
 	       OP_SYMBOL (op)->stack,
-	       op->isaddr, OP_SYMBOL (op)->isreqv, 
+	       op->isaddr, op->aggr2ptr, OP_SYMBOL (op)->isreqv, 
 	       OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc,
 	       OP_SYMBOL(op)->ruonly,OP_SYMBOL(op)->dptr
 	);
@@ -2307,7 +2307,7 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
 }
 
 /*-----------------------------------------------------------------*/
-/* aggrToPtr - changes an aggregate to pointer to an aggregate     */
+/* aggrToPtr - changes an "aggregate" to a "pointer to aggregate"  */
 /*-----------------------------------------------------------------*/
 sym_link *
 aggrToPtr (sym_link * type, bool force)
@@ -2416,7 +2416,11 @@ geniCodeArray (operand * left, operand * right, int lvl)
 				      !IS_PTR (ltype->next))
 				     ? ltype : ltype->next), 0);
 
-  IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (ltype->next));
+  if (!IS_AGGREGATE (ltype->next))
+    {
+      IC_RESULT (ic)->isaddr = 1;
+      IC_RESULT (ic)->aggr2ptr = 1;
+    }
   ADDTOCHAIN (ic);
 
   return IC_RESULT (ic);
@@ -2436,7 +2440,7 @@ geniCodeStruct (operand * left, operand * right, bool islval)
 				      right->operand.symOperand);
 
   wassert(IS_SYMOP(right));
-    
+
   /* add the offset */
   ic = newiCode ('+', left, operandFromLit (element->offset));
 
@@ -2449,10 +2453,10 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   SPEC_OCLS (retype) = SPEC_OCLS (etype);
   SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype);
   SPEC_CONST (retype) |= SPEC_CONST (etype);
-  
+
   if (IS_PTR (element->type))
     setOperandType (IC_RESULT (ic), aggrToPtr (operandType (IC_RESULT (ic)), TRUE));
-  
+
   IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (element->type));
 
   ADDTOCHAIN (ic);
@@ -3495,18 +3499,18 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* inserts jumps to the default label for the missing numbers */
   /* and decides later whether it is worth it */
   min = (int) floatFromVal (vch = caseVals);
-  
+
   while (vch->next)
     {
       cnt++;
       vch = vch->next;
     }
   max = (int) floatFromVal (vch);
-  
+
   /* Exit if the range is too large to handle with a jump table. */
   if (1 + max - min > port->jumptableCost.maxCount)
     return 0;
-  
+
   switch (getSize (operandType (cond)))
     {
     case 1: sizeIndex = 0; break;
@@ -3536,7 +3540,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
       if (1 + max <= port->jumptableCost.maxCount)
         min = 0;
     }
-  
+    
   /* Compute the total size cost of a jump table. */
   sizeofJumpTable = (1 + max - min) * port->jumptableCost.sizeofElement
                      + port->jumptableCost.sizeofDispatch
@@ -3548,7 +3552,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* If the size cost of the jump table is uneconomical then exit */
   if (sizeofMatchJump <  sizeofJumpTable)
     return 0;
-    
+
   /* The jump table is preferable. */
   
   /* First, a label for the default or missing cases. */
@@ -3565,7 +3569,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
                 tree->values.switchVals.swNum);
     }
   falseLabel = newiTempLabel (buffer);
-      
+
   /* Build the list of labels for the jump table. */
   vch = caseVals;
   t = (int) floatFromVal (vch);

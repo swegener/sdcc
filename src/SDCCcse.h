@@ -31,7 +31,7 @@
 typedef struct cseDef
   {
 
-    unsigned int key;
+    int key;
     operand *sym;		/* defining symbol */
     iCode *diCode;		/* defining instruction */
     bitVect *ancestors;		/* keys of the symbol's ancestors */

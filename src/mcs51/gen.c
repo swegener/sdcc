@@ -137,8 +137,6 @@ emitcode (char *inst, const char *fmt,...)
   while (isspace (*lbp))
     lbp++;
 
-  //printf ("%s\n", lb);
-
   if (lbp && *lbp)
     lineCurr = (lineCurr ?
                 connectLine (lineCurr, newLineNode (lb)) :
@@ -181,8 +179,8 @@ mova (const char *x)
 static regs *
 getFreePtr (iCode * ic, asmop ** aopp, bool result)
 {
-  bool r0iu = FALSE, r1iu = FALSE;
-  bool r0ou = FALSE, r1ou = FALSE;
+  bool r0iu, r1iu;
+  bool r0ou, r1ou;
 
   /* the logic: if r0 & r1 used in the instruction
      then we are in trouble otherwise */
@@ -633,7 +631,7 @@ operandsEqu (operand * op1, operand * op2)
 {
   symbol *sym1, *sym2;
 
-  /* if they not symbols */
+  /* if they're not symbols */
   if (!IS_SYMOP (op1) || !IS_SYMOP (op2))
     return FALSE;
 
@@ -650,6 +648,7 @@ operandsEqu (operand * op1, operand * op2)
   if (sym1 == sym2)
     return TRUE;
 
+  /* if they have the same rname */
   if (sym1->rname[0] && sym2->rname[0]
       && strcmp (sym1->rname, sym2->rname) == 0)
     return TRUE;
@@ -2222,7 +2221,7 @@ genCall (iCode * ic)
   D(emitcode(";     genCall",""));
 
   dtype = operandType (IC_LEFT (ic));
-  /* if send set is not empty the assign */
+  /* if send set is not empty then assign */
   if (_G.sendSet)
     {
         if (IFFUNC_ISREENT(dtype)) { /* need to reverse the send set */
@@ -5226,7 +5225,7 @@ hasInc (operand *op, iCode *ic,int osize)
       return lic;
     }
     /* if the operand used or deffed */
-    if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
+    if (bitVectBitValue(OP_USES(op),lic->key) || lic->defKey == op->key) {
       return NULL;
     }
     /* if GOTO or IFX */

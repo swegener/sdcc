@@ -651,7 +651,7 @@ loadRegFromAop (regs *reg, asmop *aop, int loffset)
     }
 
 forceload:
-  
+
   switch (regidx)
     {
       case A_IDX:
@@ -1123,7 +1123,7 @@ storeRegToFullAop (regs *reg, asmop *aop, bool isSigned)
 
 /*--------------------------------------------------------------------------*/
 /* transferAopAop - Transfer the value at logical offset srcofs of asmop    */
-/*                  srcaop to logical offset dstofs of asmop dstofs.        */
+/*                  srcaop to logical offset dstofs of asmop dstaop.        */
 /*--------------------------------------------------------------------------*/
 static void
 transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
@@ -1329,10 +1329,10 @@ rmwWithAop (char *rmwop, asmop *aop, int loffset)
         break;
       case AOP_EXT:
         needpula = pushRegIfUsed (hc08_reg_a);
-	loadRegFromAop (hc08_reg_a, aop, loffset);
+        loadRegFromAop (hc08_reg_a, aop, loffset);
         rmwWithReg (rmwop, hc08_reg_a);
         if (strcmp ("tst", rmwop))
-	  storeRegToAop (hc08_reg_a, aop, loffset);
+          storeRegToAop (hc08_reg_a, aop, loffset);
         pullOrFreeReg (hc08_reg_a, needpula);
         break;
       case AOP_DUMMY:
@@ -2658,7 +2658,7 @@ static void genSend(set *sendSet)
     iCode *sic;
 
     for (sic = setFirstItem (sendSet); sic;
-	 sic = setNextItem (sendSet)) {
+         sic = setNextItem (sendSet)) {
 	  int size, offset = 0;
 	  aopOp (IC_LEFT (sic), sic, FALSE);
 	  size = AOP_SIZE (IC_LEFT (sic));
@@ -2688,7 +2688,7 @@ genCall (iCode * ic)
   D(emitcode(";     genCall",""));
 
   dtype = operandType (IC_LEFT (ic));
-  /* if send set is not empty the assign */
+  /* if send set is not empty then assign */
   if (_G.sendSet)
     {
 	if (IFFUNC_ISREENT(dtype)) { /* need to reverse the send set */
@@ -3218,7 +3218,7 @@ genPlusIncr (iCode * ic)
   bool needpulh;
   bool needpula;
   unsigned int size = getDataSize (IC_RESULT (ic));
-  int offset;
+  unsigned int offset;
   symbol *tlbl = NULL;
   
   left = IC_LEFT (ic);
@@ -4647,7 +4647,7 @@ hasInc (operand *op, iCode *ic,int osize)
       return lic;
     }
     /* if the operand used or deffed */
-    if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
+    if (bitVectBitValue(OP_USES(op),lic->key) || lic->defKey == op->key) {
       return NULL;
     }
     /* if GOTO or IFX */

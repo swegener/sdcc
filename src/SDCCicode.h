@@ -1,25 +1,25 @@
 /*-------------------------------------------------------------------------
 
-  SDCCicode.h - intermediate code generation etc.                 
+  SDCCicode.h - intermediate code generation etc.
                 Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 #include "SDCCbitv.h"
 #include "SDCCset.h"
@@ -73,35 +73,36 @@ OPTYPE;
 /* typedef for operand */
 typedef struct operand
   {
-    OPTYPE type;		/* type of operand */
-    unsigned int isaddr:1;	/* is an address   */
-    unsigned int isvolatile:1;	/* is a volatile operand */
-    unsigned int isGlobal:1;	/* is a global operand */
-    unsigned int isPtr:1;	/* is assigned a pointer */
-    unsigned int isGptr:1;	/* is a generic pointer  */
-    unsigned int isParm:1;	/* is a parameter        */
-    unsigned int isLiteral:1;	/* operand is literal    */
+    OPTYPE type;                /* type of operand */
+    unsigned int isaddr:1;      /* is an address   */
+    unsigned int aggr2ptr:1;    /* must change aggregate to pointer to aggregate */
+    unsigned int isvolatile:1;  /* is a volatile operand */
+    unsigned int isGlobal:1;    /* is a global operand */
+    unsigned int isPtr:1;       /* is assigned a pointer */
+    unsigned int isGptr:1;      /* is a generic pointer  */
+    unsigned int isParm:1;      /* is a parameter        */
+    unsigned int isLiteral:1;   /* operand is literal    */
 
-    unsigned key;
+    int key;
     union
       {
-	struct symbol *symOperand;	/* operand is of type symbol */
-	struct value *valOperand;	/* operand is of type value  */
-	struct sym_link *typeOperand;	/* operand is of type typechain */
+        struct symbol *symOperand;      /* operand is of type symbol */
+        struct value *valOperand;       /* operand is of type value  */
+        struct sym_link *typeOperand;   /* operand is of type typechain */
       }
     operand;
 
-    bitVect *usesDefs;		/* which definitions are used by this */
-    struct asmop *aop;		/* asm op for this operand */
+    bitVect *usesDefs;          /* which definitions are used by this */
+    struct asmop *aop;          /* asm op for this operand */
   }
 operand;
 
-extern operand *validateOpType(operand 		*op, 
-			       const char 	*macro,
-			       const char 	*args,
-			       OPTYPE 		type,
-			       const char 	*file, 
-			       unsigned 	line);
+extern operand *validateOpType(operand          *op,
+                               const char       *macro,
+                               const char       *args,
+                               OPTYPE           type,
+                               const char       *file,
+                               unsigned         line);
 
 #define OP_SYMBOL(op) validateOpType(op, "OP_SYMBOL", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand
 #define OP_VALUE(op)  validateOpType(op, "OP_VALUE", #op, VALUE, __FILE__, __LINE__)->operand.valOperand
@@ -127,71 +128,71 @@ extern operand *validateOpType(operand 		*op,
 
 typedef struct iCode
   {
-    unsigned int op;		/* operation defined */
-    int key;			/* running key for this iCode */
-    int seq;			/* sequence number within routine */
-    int seqPoint;		/* sequence point */
-    short depth;		/* loop depth of this iCode */
-    short level;		/* scope level */
-    short block;		/* sequential block number */
-    unsigned nosupdate:1;	/* don't update spillocation with this */
-    unsigned generated:1;	/* code generated for this one */
-    unsigned parmPush:1;	/* parameter push Vs spill push */
-    unsigned supportRtn:1;	/* will cause a call to a support routine */
-    unsigned regsSaved:1;	/* registers have been saved */
-    unsigned bankSaved:1;	/* register bank has been saved */
+    unsigned int op;            /* operation defined */
+    int key;                    /* running key for this iCode */
+    int seq;                    /* sequence number within routine */
+    int seqPoint;               /* sequence point */
+    short depth;                /* loop depth of this iCode */
+    short level;                /* scope level */
+    short block;                /* sequential block number */
+    unsigned nosupdate:1;       /* don't update spillocation with this */
+    unsigned generated:1;       /* code generated for this one */
+    unsigned parmPush:1;        /* parameter push Vs spill push */
+    unsigned supportRtn:1;      /* will cause a call to a support routine */
+    unsigned regsSaved:1;       /* registers have been saved */
+    unsigned bankSaved:1;       /* register bank has been saved */
     unsigned builtinSEND:1;     /* SEND for parameter of builtin function */
 
-    struct iCode *next;		/* next in chain */
-    struct iCode *prev;		/* previous in chain */
-    set *movedFrom;		/* if this iCode gets moved to another block */
-    bitVect *rlive;		/* ranges that are live at this point */
-    int defKey;			/* key for the operand being defined  */
-    bitVect *uses;		/* vector of key of used symbols      */
-    bitVect *rUsed;		/* registers used by this instruction */
-    bitVect *rMask;		/* registers in use during this instruction */
+    struct iCode *next;         /* next in chain */
+    struct iCode *prev;         /* previous in chain */
+    set *movedFrom;             /* if this iCode gets moved to another block */
+    bitVect *rlive;             /* ranges that are live at this point */
+    int defKey;                 /* key for the operand being defined  */
+    bitVect *uses;              /* vector of key of used symbols      */
+    bitVect *rUsed;             /* registers used by this instruction */
+    bitVect *rMask;             /* registers in use during this instruction */
     union
       {
-	struct
-	  {
-	    operand *left;	/* left if any   */
-	    operand *right;	/* right if any  */
-	    operand *result;	/* result of this op */
-	  }
-	lrr;
+        struct
+          {
+            operand *left;      /* left if any   */
+            operand *right;     /* right if any  */
+            operand *result;    /* result of this op */
+          }
+        lrr;
 
-	struct
-	  {
-	    operand *condition;	/* if this is a conditional */
-	    symbol *trueLabel;	/* true for conditional     */
-	    symbol *falseLabel;	/* false for conditional    */
-	  }
-	cnd;
+        struct
+          {
+            operand *condition; /* if this is a conditional */
+            symbol *trueLabel;  /* true for conditional     */
+            symbol *falseLabel; /* false for conditional    */
+          }
+        cnd;
 
-	struct
-	  {
-	    operand *condition;	/* condition for the jump */
-	    set *labels;	/* ordered set of labels  */
-	  }
-	jmpTab;
+        struct
+          {
+            operand *condition; /* condition for the jump */
+            set *labels;        /* ordered set of labels  */
+          }
+        jmpTab;
 
       }
     ulrrcnd;
 
-    symbol *label;		/* for a goto statement     */
+    symbol *label;              /* for a goto statement     */
 
-    char *inlineAsm;		/* pointer to inline assembler code */
+    char *inlineAsm;            /* pointer to inline assembler code */
     literalList *arrayInitList; /* point to array initializer list. */
 
-    int lineno;			/* file & lineno for debug information */
+    int lineno;                 /* file & lineno for debug information */
     char *filename;
-    
-    int parmBytes;		/* if call/pcall, count of parameter bytes 
-    				   on stack */
-    int argreg;			/* argument regno for SEND/RECEIVE */
+
+    int parmBytes;              /* if call/pcall, count of parameter bytes
+                                   on stack */
+    int argreg;                 /* argument regno for SEND/RECEIVE */
     int eBBlockNum;             /* belongs to which eBBlock */
-    char riu;			/* after ralloc, the registers in use */
-    struct ast * tree;		/* ast node for this iCode (if not NULL) */
+    char riu;                   /* after ralloc, the registers in use */
+    struct ast * tree;          /* ast node for this iCode (if not NULL) */
   }
 iCode;
 
@@ -207,37 +208,37 @@ iCodeTable;
 
 /* useful macros */
 #define SKIP_IC2(x)  (x->op == GOTO     ||     \
-		      x->op == LABEL    ||     \
-		      x->op == FUNCTION ||     \
+                      x->op == LABEL    ||     \
+                      x->op == FUNCTION ||     \
                       x->op == INLINEASM ||    \
-		      x->op == ENDFUNCTION   )
+                      x->op == ENDFUNCTION   )
 
 #define SKIP_IC1(x)  (x->op == CALL     ||     \
-		      SKIP_IC2(x) )
+                      SKIP_IC2(x) )
 
 #define SKIP_IC(x)   (x->op == PCALL    ||     \
-		      x->op == IPUSH    ||     \
+                      x->op == IPUSH    ||     \
                       x->op == IPOP     ||     \
                       x->op == JUMPTABLE ||    \
                       x->op == RECEIVE  ||     \
-		      x->op == ARRAYINIT ||    \
-		      SKIP_IC1(x)||  \
-		      x->op == SEND         )
+                      x->op == ARRAYINIT ||    \
+                      SKIP_IC1(x)||  \
+                      x->op == SEND         )
 
-#define SKIP_IC3(x) (SKIP_IC2(x) ||	\
-		     x->op == JUMPTABLE )
+#define SKIP_IC3(x) (SKIP_IC2(x) ||     \
+                     x->op == JUMPTABLE )
 
 #define IS_CONDITIONAL(x) (x->op == EQ_OP || \
-			   x->op == '<'   || \
-			   x->op == '>'   || \
-			   x->op == LE_OP || \
-			   x->op == GE_OP || \
-			   x->op == NE_OP )
+                           x->op == '<'   || \
+                           x->op == '>'   || \
+                           x->op == LE_OP || \
+                           x->op == GE_OP || \
+                           x->op == NE_OP )
 
 #define IS_TRUE_SYMOP(op) (op && IS_SYMOP(op) && !IS_ITEMP(op))
 
 #define POINTER_SET(ic) ( ic && ic->op == '='           \
-			     && IS_ITEMP(IC_RESULT(ic)) \
+                             && IS_ITEMP(IC_RESULT(ic)) \
                              && IC_RESULT(ic)->isaddr )
 
 #define POINTER_GET(ic) ( ic && ic->op == GET_VALUE_AT_ADDRESS  \
@@ -245,10 +246,10 @@ iCodeTable;
                              &&  IC_LEFT(ic)->isaddr )
 
 #define IS_ARITHMETIC_OP(x) (x && (x->op == '+' || \
-				   x->op == '-' || \
-				   x->op == '/' || \
-				   x->op == '*' || \
-				   x->op == '%'))
+                                   x->op == '-' || \
+                                   x->op == '/' || \
+                                   x->op == '*' || \
+                                   x->op == '%'))
 #define IS_BITWISE_OP(x) (x && (x->op == BITWISEAND || \
                                 x->op == '|'        || \
                                 x->op == '^'))
@@ -256,25 +257,25 @@ iCodeTable;
 #define ASSIGNMENT(ic) ( ic && ic->op == '=')
 
 #define ASSIGN_SYM_TO_ITEMP(ic) (ic && ic->op == '=' && \
-			     IS_TRUE_SYMOP(IC_RIGHT(ic)) && \
+                             IS_TRUE_SYMOP(IC_RIGHT(ic)) && \
                              IS_ITEMP(IC_RESULT(ic)))
 
 #define ASSIGN_ITEMP_TO_SYM(ic) (ic && ic->op == '=' && \
-			     IS_TRUE_SYMOP(IC_RESULT(ic)) && \
+                             IS_TRUE_SYMOP(IC_RESULT(ic)) && \
                              IS_ITEMP(IC_RIGHT(ic)))
 
 #define ASSIGN_ITEMP_TO_ITEMP(ic) (ic && ic->op == '=' &&\
-				   !POINTER_SET(ic)    &&\
-				   IS_ITEMP(IC_RIGHT(ic)) &&\
-				   IS_ITEMP(IC_RESULT(ic)))
+                                   !POINTER_SET(ic)    &&\
+                                   IS_ITEMP(IC_RIGHT(ic)) &&\
+                                   IS_ITEMP(IC_RESULT(ic)))
 
 #define ADD_SUBTRACT_ITEMP(ic) (ic && (ic->op == '+' || ic->op == '-') && \
-				IS_ITEMP(IC_RESULT(ic)) && \
-				( ( IS_ITEMP(IC_LEFT(ic)) ) ||  ( IS_SYMOP(IC_LEFT(ic)) ) ) && \
+                                IS_ITEMP(IC_RESULT(ic)) && \
+                                ( ( IS_ITEMP(IC_LEFT(ic)) ) ||  ( IS_SYMOP(IC_LEFT(ic)) ) ) && \
                                   IS_OP_LITERAL(IC_RIGHT(ic)))
 
 #define ASSIGNMENT_TO_SELF(ic) (!POINTER_SET(ic) && !POINTER_GET(ic) && \
-			        ic->op == '=' && IC_RESULT(ic)->key == IC_RIGHT(ic)->key )
+                                ic->op == '=' && IC_RESULT(ic)->key == IC_RIGHT(ic)->key )
 
 #define IS_CAST_ICODE(ic) (ic && ic->op == CAST)
 #define SET_ISADDR(op,v) {op = operandFromOperand(op); op->isaddr = v;}

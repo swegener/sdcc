@@ -224,7 +224,7 @@ typedef struct sym_link
       unsigned intrtn:1;	/* this is an interrupt routin */
       unsigned rbank:1;		/* seperate register bank     */
       unsigned intno;		/* 1=Interrupt svc routine    */
-      unsigned regbank;		/* register bank 2b used      */
+      short    regbank;		/* register bank 2b used      */
       unsigned builtin;		/* is a builtin function      */
       unsigned javaNative;    	/* is a JavaNative Function (TININative ONLY) */
       unsigned overlay;    	/* force parameters & locals into overlay segment */

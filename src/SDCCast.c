@@ -1969,7 +1969,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 /* searchLitOp - search tree (*ops only) for an ast with literal */
 /*-----------------------------------------------------------------*/
 static ast *
-searchLitOp (ast *tree, ast **parent, const char *ops)
+searchLitOp (ast *tree, ast **parent, const unsigned char *ops)
 {
   ast *ret;
 
@@ -4416,7 +4416,7 @@ createBlock (symbol * decl, ast * body)
   ex = newNode (BLOCK, NULL, body);
   ex->values.sym = decl;
   
-  ex->right = ex->right;
+  ex->right = ex->right;///?????
   ex->level++;
   ex->lineno = 0;
   return ex;

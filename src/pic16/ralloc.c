@@ -401,7 +401,7 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 /* regWithIdx - Search through a set of registers that matches idx */
 /*-----------------------------------------------------------------*/
 static regs *
-regWithIdx (set *dRegs, int idx, int fixed)
+regWithIdx (set *dRegs, int idx, unsigned fixed)
 {
   regs *dReg;
 

@@ -2638,7 +2638,7 @@ genCall (iCode * ic)
     if (!ic->regsSaved)
       saveRegisters (ic);
 
-  /* if send set is not empty the assign */
+  /* if send set is not empty then assign */
   /* We've saved all the registers we care about;
   * therefore, we may clobber any register not used
   * in the calling convention (i.e. anything not in
@@ -6394,7 +6394,7 @@ hasInc (operand *op, iCode *ic, int osize)
           return lic;
       }
       /* if the operand used or deffed */
-      if (bitVectBitValue(OP_USES(op),lic->key) || (unsigned) lic->defKey == op->key) {
+      if (bitVectBitValue(OP_USES(op),lic->key) || lic->defKey == op->key) {
           return NULL;
       }
       /* if GOTO or IFX */

@@ -296,7 +296,7 @@ hasInc (operand *op, iCode *ic)
 			return lic;
 		}
 		/* if the operand used or deffed */
-		if (bitVectBitValue(OP_USES(op),lic->key) || ((unsigned) lic->defKey == op->key)) {
+		if (bitVectBitValue(OP_USES(op),lic->key) || (lic->defKey == op->key)) {
 			return NULL;
 		}
 		lic = lic->next;
@@ -1545,7 +1545,7 @@ static void
 genCall (iCode * ic)
 {
 
-	/* if send set is not empty the assign */
+	/* if send set is not empty then assign */
 	if (_G.sendSet) {
 		iCode *sic;
 		int rnum = 16;

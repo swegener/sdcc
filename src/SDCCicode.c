@@ -2116,10 +2116,20 @@ operand *geniCodeUnaryMinus (operand *op)
 operand *geniCodeLeftShift (operand *left, operand *right)
 { 
     iCode *ic;
-    sym_link *ltype = operandType(left);
+
+    /* Operands must be promoted to int, according to ISO. */    
+    if (getSize(operandType(right)) < INTSIZE) 
+    {
+	right = geniCodeCast(INTTYPE,right,TRUE);	    
+    }    
+
+    if (getSize(operandType(left)) < INTSIZE) 
+    {
+	left = geniCodeCast(INTTYPE,left,TRUE);	    
+    }
     
     ic = newiCode(LEFT_OP,left,right);
-    IC_RESULT(ic) = newiTempOperand(ltype,0);
+    IC_RESULT(ic) = newiTempOperand(operandType(left),0);
     ADDTOCHAIN(ic);
     return IC_RESULT(ic) ;  
 }
@@ -2130,10 +2140,20 @@ operand *geniCodeLeftShift (operand *left, operand *right)
 operand *geniCodeRightShift (operand *left, operand *right)
 { 
     iCode *ic;
-    sym_link *ltype = operandType(left);
+
+    /* Operands must be promoted to int, according to ISO. */    
+    if (getSize(operandType(right)) < INTSIZE) 
+    {
+	right = geniCodeCast(INTTYPE,right,TRUE);	    
+    }    
+
+    if (getSize(operandType(left)) < INTSIZE) 
+    {
+	left = geniCodeCast(INTTYPE,left,TRUE);	    
+    }
     
     ic = newiCode(RIGHT_OP,left,right);
-    IC_RESULT(ic) = newiTempOperand(ltype,0);
+    IC_RESULT(ic) = newiTempOperand(operandType(left),0);
     ADDTOCHAIN(ic);
     return IC_RESULT(ic) ;  
 }

@@ -1,3 +1,7 @@
+2003-04-30  Bernhard Held <bernhard@bernhardheld.de>
+
+	* support/regression/tests/float.c: workaround 33 bit hex constant
+
 2003-04-29  Scott Dattalo  <scott@dattalo.com>
 
 	* src/pic/pcoderegs.c Applied patch from Jim Hawkridge <jim@jimhawkridge.uk.eu.org>

@@ -1581,15 +1581,15 @@ usualUnaryConversions (operand * op)
 /* perform "usual binary conversions"                              */
 /*-----------------------------------------------------------------*/
 sym_link *
-usualBinaryConversions (operand ** op1, operand ** op2)
+usualBinaryConversions (operand ** op1, operand ** op2, int implicit)
 {
   sym_link *ctype;
   sym_link *rtype = operandType (*op2);
   sym_link *ltype = operandType (*op1);
   
   ctype = computeType (ltype, rtype);
-  *op1 = geniCodeCast (ctype, *op1, TRUE);
-  *op2 = geniCodeCast (ctype, *op2, TRUE);
+  *op1 = geniCodeCast (ctype, *op1, implicit);
+  *op2 = geniCodeCast (ctype, *op2, implicit);
   
   return ctype;
 }
@@ -1685,8 +1685,10 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   if (IS_PTR(type)) { // to a pointer
     if (!IS_PTR(optype) && !IS_FUNC(optype) && !IS_AGGREGATE(optype)) { // from a non pointer
       if (IS_INTEGRAL(optype)) { 
-	// maybe this is NULL, than it's ok.
-	if (!(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong ==0))) {
+	// maybe this is NULL, than it's ok. 
+	// !implicit is always ok, e.g. "(char *) = (char *) + 3;"
+	if (implicit &&
+	    !(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong ==0))) {
 	  if (!TARGET_IS_Z80 && !TARGET_IS_GBZ80 && IS_GENPTR(type)) {
 	    // no way to set the storage
 	    if (IS_LITERAL(optype)) {
@@ -1696,7 +1698,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 	      werror(E_NONPTR2_GENPTR);
 	      errors++;
 	    }
-	  } else if (implicit) {
+	  } else {
 	    werror(W_INTEGRAL2PTR_NOCAST);
 	    errors++;
 	  }
@@ -1816,7 +1818,7 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
     p2 = powof2 ((unsigned long) floatFromVal (right->operand.valOperand));
   }
 
-  resType = usualBinaryConversions (&left, &right);
+  resType = usualBinaryConversions (&left, &right, TRUE);
 #if 1
   rtype = operandType (right);
   retype = getSpec (rtype);
@@ -1873,7 +1875,7 @@ geniCodeDivision (operand * left, operand * right)
   sym_link *ltype = operandType (left);
   sym_link *letype = getSpec (ltype);
 
-  resType = usualBinaryConversions (&left, &right);
+  resType = usualBinaryConversions (&left, &right, TRUE);
 
   /* if the right is a literal & power of 2 */
   /* then make it a right shift             */
@@ -1910,7 +1912,7 @@ geniCodeModulus (operand * left, operand * right)
     return operandFromValue (valMod (left->operand.valOperand,
 				     right->operand.valOperand));
 
-  resType = usualBinaryConversions (&left, &right);
+  resType = usualBinaryConversions (&left, &right, TRUE);
 
   /* now they are the same size */
   ic = newiCode ('%', left, right);
@@ -1984,7 +1986,7 @@ geniCodeSubtract (operand * left, operand * right)
     }
   else
     {				/* make them the same size */
-      resType = usualBinaryConversions (&left, &right);
+      resType = usualBinaryConversions (&left, &right, TRUE);
     }
 
   ic = newiCode ('-', left, right);
@@ -2004,7 +2006,7 @@ geniCodeSubtract (operand * left, operand * right)
 /* geniCodeAdd - generates iCode for addition                      */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeAdd (operand * left, operand * right,int lvl)
+geniCodeAdd (operand * left, operand * right, int lvl, int ptrMath)
 {
   iCode *ic;
   sym_link *resType;
@@ -2026,7 +2028,7 @@ geniCodeAdd (operand * left, operand * right,int lvl)
     return right;
 
   /* if left is an array or pointer then size */
-  if (IS_PTR (ltype))
+  if (ptrMath && IS_PTR (ltype))
     {
       isarray = left->isaddr;
       // there is no need to multiply with 1
@@ -2037,8 +2039,8 @@ geniCodeAdd (operand * left, operand * right,int lvl)
       resType = copyLinkChain (ltype);
     }
   else
-    {				/* make them the same size */
-      resType = usualBinaryConversions (&left, &right);
+    { // make them the same size
+      resType = usualBinaryConversions (&left, &right, FALSE);
     }
 
   /* if they are both literals then we know */
@@ -2137,7 +2139,7 @@ geniCodeArray (operand * left, operand * right,int lvl)
 	{
 	  left = geniCodeRValue (left, FALSE);
 	}
-      return geniCodeDerefPtr (geniCodeAdd (left, right,lvl),lvl);
+      return geniCodeDerefPtr (geniCodeAdd (left, right, lvl, 1), lvl);
     }
 
   right = geniCodeMultiply (right,
@@ -2592,7 +2594,7 @@ geniCodeLogic (operand * left, operand * right, int op)
 			 OP_VALUE(right), "compare operation", 1);
     }
 
-  ctype = usualBinaryConversions (&left, &right);
+  ctype = usualBinaryConversions (&left, &right, TRUE);
 
   ic = newiCode (op, left, right);
   IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);
@@ -3464,7 +3466,7 @@ ast2iCode (ast * tree,int lvl)
     case '+':
       if (right)
 	return geniCodeAdd (geniCodeRValue (left, FALSE),
-			    geniCodeRValue (right, FALSE),lvl);
+			    geniCodeRValue (right, FALSE),lvl, 0);
       else
 	return geniCodeRValue (left, FALSE);	/* unary '+' has no meaning */
 
@@ -3554,7 +3556,7 @@ ast2iCode (ast * tree,int lvl)
 	return geniCodeAssign (left,
 		     geniCodeAdd (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  right,lvl), 0);
+				  right,lvl,1), 0);
       }
     case SUB_ASSIGN:
       {

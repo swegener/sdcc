@@ -40,32 +40,46 @@
 #include "ownet.h"   
 #include "thermo21.h"
 
-// TINI hack
-#define ExitProg(msg,exit_code) {printf("%s\n",msg); exit(exit_code);}
-
 // defines
 #define MAXDEVICES   20
 
 // local function prototypes
-static void PrintResults(ThermoStateType *,FILE *,int);
+void PrintResults(ThermoStateType *,FILE *,int);
+
+// tini hack
+#define ExitProg(msg,exit_code) {printf("%s\n",msg); exit(exit_code);}
+int argc=2;
+char *argv[]={__FILE__, "exow"};
 
 //----------------------------------------------------------------------
 //  This is the Main routine for thermodl.
 //
-int main()
+int main() //short argc, char **argv)
 {
-   int Fahrenheit=FALSE,num,i,j;
-   FILE *fp=stdout;
+   int Fahrenheit=FALSE,filenum,num,i,j;
+   FILE *fp;
    char return_msg[128];
    ThermoStateType ThermoState;
    uchar ThermoSN[MAXDEVICES][8]; //the serial numbers for the devices
    int portnum=0;
 
+   // check arguments to see if request instruction with '?' or too many
+   if ((argc < 2) || (argc > 4) || ((argc > 1) && (argv[1][0] == '?' || argv[1][1] == '?')))
+       ExitProg("\nusage: thermodl 1wire_net_name <output_filename> </Fahrenheit>\n"
+              "  - Thermochron download on the 1-Wire Net port\n"
+              "  - 1wire_net_port required port name\n"
+              "    example: \"COM1\" (Win32 DS2480),\"/dev/cua0\" \n"
+              "    (Linux DS2480),\"1\" (Win32 TMEX)\n"
+              "  - <output_filename> optional output filename\n"
+              "  - </Fahrenheit> optional Fahrenheit mode (default Celsius)\n"
+              "  - version 2.00\n",1);
+
    // attempt to acquire the 1-Wire Net
-   if (!owAcquire(portnum,""))
-     return 0;
+   if (!owAcquire(portnum,argv[1],return_msg))
+      ExitProg(return_msg,1);
 
    // success
+   printf("%s",return_msg);
 
    //----------------------------------------
    // Introduction
@@ -75,6 +89,37 @@ int main()
 
    // check arguments for temperature conversion and filename
    Fahrenheit = FALSE;
+   filenum = 0;
+   if (argc >= 3)
+   {
+      if (argv[2][0] != '/')
+         filenum = 2;
+      else if ((argv[2][1] == 'F') || (argv[2][1] == 'f'))
+         Fahrenheit = TRUE;
+
+      if (argc == 4)
+      {    
+         if (argv[3][0] != '/')
+            filenum = 3;
+         else if ((argv[3][1] == 'F') || (argv[3][1] == 'f'))
+            Fahrenheit = TRUE;
+      }   
+   }
+
+   // open the output file  
+   fp = NULL;
+   if (filenum > 0)
+   {
+      fp = fopen(argv[filenum],"w+");
+      if(fp == NULL)
+      {    
+         printf("ERROR, Could not open output file!\n");
+         exit(1);
+      }
+      else
+         printf("File '%s' opened to write mission results.\n",
+                 argv[filenum]);
+   }
 
    // get list of Thermochron's 
 	num = FindDevices(portnum, &ThermoSN[0],THERMO_FAM, MAXDEVICES);
@@ -84,6 +129,7 @@ int main()
       ExitProg("Thermochron not present on 1-Wire\n",1);   
 
    // loop to download each Thermochron
+
    for (i = 0; i < num; i++)
    {
       // set the serial number portion in the thermo state
@@ -116,11 +162,18 @@ int main()
       }
    }
 
+   // close opened file
+   if (fp != NULL)
+   {
+      printf("File '%s' closed.\n",
+              argv[filenum]);
+      fclose(fp);
+   }
+
    // release the 1-Wire Net
-   owRelease(portnum);
+   owRelease(portnum,return_msg);
    printf("\n%s",return_msg);
    ExitProg("End program normally\n",0);
-
    return 0;
 }
 
@@ -129,15 +182,14 @@ int main()
 //
 void PrintResults(ThermoStateType *ThermoState, FILE *fp, int ConvertToF)
 {
-  //char *str;  
-  char str[80000];
+   char str[80000];  
 
    // check if need to use standard out
    if (fp == NULL)
       fp = stdout;
 
-   // get big block to use as a buffer
 #if 0
+   // get big block to use as a buffer
    str = malloc(80000);   
    if (str == NULL)
    {
@@ -167,7 +219,9 @@ void PrintResults(ThermoStateType *ThermoState, FILE *fp, int ConvertToF)
       &ThermoState->HistData, &ThermoState->LogData, &str[0]); 
    fprintf(fp,"%s\n",str);
 
+#if 0
    // free the memory block used
-   //free(str);
+   free(str);
+#endif
 }
 

@@ -48,6 +48,16 @@ int fprintf (FILE *fp, xdata char *format, ...) reentrant {
   va_end(arg);
 }
 
+int fopen(char * path, char *mode) {
+  path, mode; //hush the compiler
+  return 0;
+}
+
+int fclose(FILE *fp) {
+  fp; // hust the compiler
+  return 0;
+}
+
 static int RunThermoScript(int,ThermoStateType *,ThermoScript script[], FILE *fp);
 static int ThermoStep(int,ThermoStateType *,ThermoScript *,int *,int *,int *,char *);
 static int ReadPages(int,int,int,int *,uchar *);

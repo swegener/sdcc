@@ -37,9 +37,6 @@
 #include "ownet.h"
 #include "ds2480.h"
 
-// local functions       
-static int bitacc(int,int,int,uchar *);
-
 // globally used 
 uchar SerialNum[MAX_PORTNUM][8];
 

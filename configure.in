@@ -177,9 +177,9 @@ if test "${datadir}" = "\${prefix}/share"; then
 else
   sdcc_datadir=${datadir}
 fi
-AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir}/sdcc51inc")
-AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir}/sdcc51inc")
-AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${sdcc_datadir}/sdcc51lib")
+AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir}/include")
+AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir}/include")
+AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${sdcc_datadir}/lib")
 AC_DEFINE_UNQUOTED(STD_LIB, "libsdcc")
 AC_DEFINE_UNQUOTED(STD_INT_LIB, "libint")
 AC_DEFINE_UNQUOTED(STD_LONG_LIB, "liblong")

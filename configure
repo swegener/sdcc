@@ -2406,15 +2406,15 @@ else
   sdcc_datadir=${datadir}
 fi
 cat >> confdefs.h <<EOF
-#define STANDARD_INCLUDE_DIR "${sdcc_datadir}/sdcc51inc"
+#define STANDARD_INCLUDE_DIR "${sdcc_datadir}/include"
 EOF
 
 cat >> confdefs.h <<EOF
-#define SDCC_INCLUDE_DIR "${sdcc_datadir}/sdcc51inc"
+#define SDCC_INCLUDE_DIR "${sdcc_datadir}/include"
 EOF
 
 cat >> confdefs.h <<EOF
-#define SDCC_LIB_DIR "${sdcc_datadir}/sdcc51lib"
+#define SDCC_LIB_DIR "${sdcc_datadir}/lib"
 EOF
 
 cat >> confdefs.h <<EOF

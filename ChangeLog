@@ -1,3 +1,7 @@
+2004-04-27 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* as/hc08/lkelf.c: sdccconf.h is not available in WIN32
+
 2004-04-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCpeeph.c (replaceRule): support empty replacement peephole

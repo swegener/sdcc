@@ -23,7 +23,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include "aslink.h"
-#include "sdccconf.h"
+
+#ifdef _WIN32
+#  ifdef __MINGW32__ /* GCC MINGW32 depends on configure */
+#    include "sdccconf.h"
+#  else
+#    include "sdcc_vc.h"
+#  endif
+#else /* Assume Un*x style system */
+#  include "sdccconf.h"
+#endif
 
 static int execStartMSB;
 static int execStartLSB;

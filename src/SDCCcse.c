@@ -790,6 +790,7 @@ algebraicOpts (iCode * ic)
 	  IC_LEFT (ic) = NULL;
 	  IC_RESULT (ic) = operandFromOperand (IC_RESULT (ic));
 	  IC_RESULT (ic)->isaddr = 0;
+	  break;
 	}
       /* if this is a division then check if right */
       /* is one then change it to an assignment    */

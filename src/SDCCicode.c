@@ -1027,8 +1027,10 @@ operand *operandFromSymbol (symbol *sym)
 	!sym->reqv               &&     /* does not already have a register euivalence */
 	!IS_VOLATILE(sym->etype) &&     /* not declared as volatile */
 	!IS_STATIC(sym->etype)   &&     /* and not declared static  */
-	!sym->islbl              &&
-	!IN_FARSPACE(SPEC_OCLS(sym->etype))) {     /* not a label */
+	!sym->islbl              &&     /* not a label */
+	!IN_FARSPACE(SPEC_OCLS(sym->etype)) && /* not in far space */
+	!IS_BITVAR(sym->etype)          /* not a bit variable */
+	) {
 	
 	/* we will use it after all optimizations
 	   and before liveRange calculation */

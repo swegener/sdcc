@@ -1485,7 +1485,13 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 
 	if (SKIP_IC2(dic))
 	    continue;
-	
+
+	if (IS_TRUE_SYMOP(IC_RESULT(dic)) &&
+	    IS_OP_VOLATILE(IC_RESULT(dic))) {
+		dic = NULL;
+		break;
+	}
+
 	if (IS_SYMOP(IC_RESULT(dic)) &&
 	    IC_RESULT(dic)->key == IC_RIGHT(ic)->key) {
 	    if (POINTER_SET(dic))

@@ -41,7 +41,10 @@ all:
 # ----------------------------------------------------
 install: all installdirs
 	$(CP) -r asm *.h $(sdcc_includedir)
-	find $(sdcc_includedir) -type d -name 'CVS' -exec rm {} \;
+        if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
+                $(CP) pic16/*.h $(sdcc_includedir)/pic16 ; \
+        fi
+ 	find $(sdcc_includedir) -type d -name 'CVS' -exec rm {} \;
 
 
 # Deleting all the installed files
@@ -64,6 +67,7 @@ installcheck:
 # ---------------------------------
 installdirs:
 	[ -d $(sdcc_includedir) ] || mkdir -p $(sdcc_includedir)
+	[ -d $(sdcc_includedir)/pic16 ] || mkdir -p $(sdcc_includedir)/pic16
 
 
 # Creating dependencies

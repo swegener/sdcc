@@ -5,7 +5,7 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mhc08
 SAS = $(TOPDIR)/bin/as6808
 
-OBJ = _ret.rel _divuint.rel _divulong.rel
+OBJ = _ret.rel _divuint.rel _divulong.rel _mulint.rel _mullong.rel
 
 LIB = hc08.lib
 CC = $(SCC)

@@ -204,70 +204,34 @@ cl_hc08::inst_stx(t_mem code, bool prefix)
 int
 cl_hc08::inst_add(t_mem code, bool prefix)
 {
-  int result;
-  uchar operand;
+  int result, operand1, operand2;
 
-  operand = OPERAND(code, prefix);
-  result = (regs.A + operand) & 0xff;
+  operand1 = regs.A;
+  operand2 = OPERAND(code, prefix);
+  result = operand1 + operand2;
   FLAG_NZ (result);
-  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & operand & ~result)
-                              | (~regs.A & ~operand & result)));
-  FLAG_ASSIGN (BIT_H, 0x08 & ((regs.A & operand)
-                              | (operand & ~result)
-                              | (~result & regs.A)));
-  FLAG_ASSIGN (BIT_C, 0x80 & ((regs.A & operand)
-                              | (operand & ~result)
-                              | (~result & regs.A)));
-
-#if 0
-  fprintf (stdout, "add 0x%02x + 0x%02x      = 0x%02x ",regs.A, operand, result & 0xff);
-  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
-  	(regs.P & BIT_V)!=0,
-  	(regs.P & BIT_H)!=0,
-  	(regs.P & BIT_C)!=0,
-  	(regs.P & BIT_N)!=0,
-  	(regs.P & BIT_Z)!=0);
-#endif
+  FLAG_ASSIGN (BIT_V, 0x80 & (operand1 ^ operand2 ^ result ^ (result >>1)));
+  FLAG_ASSIGN (BIT_C, 0x100 & result);
+  FLAG_ASSIGN (BIT_H, 0x10 & (operand1 ^ operand2 ^ result));
   
-  regs.A = result;
+  regs.A = result & 0xff;
   return(resGO);
 }
 
 int
 cl_hc08::inst_adc(t_mem code, bool prefix)
 {
-  int result;
-  uchar operand;
-  int sresult;
-  uchar carryin = (regs.P & BIT_C)!=0;
+  int result, operand1, operand2;
+  int carryin = (regs.P & BIT_C)!=0;
 
-  operand = OPERAND(code, prefix);
-  result = regs.A + operand + carryin;
-  sresult = (signed char)regs.A + (signed char)operand + ((regs.P & BIT_C)!=0);
-  FLAG_NZ (result & 0xff);
-  FLAG_ASSIGN (BIT_V, (sresult<-128) || (sresult>127));
-  /* 0x80 & ((regs.A & operand & ~result)
-                              | (~regs.A & ~operand & result))); */
-  FLAG_ASSIGN (BIT_H, (result & 0xf) < (regs.A & 0xf));
-  /*				0x10 & ((regs.A & operand)
-                              | (operand & ~result)
-                              | (~result & regs.A))); */
-  FLAG_ASSIGN (BIT_C, result & 0x100);
-  /*				0x80 & ((regs.A & operand)
-                              | (operand & ~result)
-                              | (~result & regs.A))); */
-  
-#if 0
-  fprintf (stdout, "adc 0x%02x + 0x%02x + %d = 0x%02x ",
-  	regs.A, operand, carryin, result & 0xff);
-  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
-  	(regs.P & BIT_V)!=0,
-  	(regs.P & BIT_H)!=0,
-  	(regs.P & BIT_C)!=0,
-  	(regs.P & BIT_N)!=0,
-  	(regs.P & BIT_Z)!=0);
-#endif
-  
+  operand1 = regs.A;
+  operand2 = OPERAND(code, prefix);
+  result = operand1 + operand2 + carryin;
+  FLAG_NZ (result);
+  FLAG_ASSIGN (BIT_V, 0x80 & (operand1 ^ operand2 ^ result ^ (result >>1)));
+  FLAG_ASSIGN (BIT_C, 0x100 & result);
+  FLAG_ASSIGN (BIT_H, 0x10 & (operand1 ^ operand2 ^ result));
+
   regs.A = result & 0xff;
   return(resGO);
 }
@@ -275,90 +239,63 @@ cl_hc08::inst_adc(t_mem code, bool prefix)
 int
 cl_hc08::inst_sub(t_mem code, bool prefix)
 {
-  int result;
-  uchar operand;
+  int result, operand1, operand2;
 
-  operand = OPERAND(code, prefix);
-  result = (regs.A - operand) & 0xff;
+  operand1 = regs.A;
+  operand2 = OPERAND(code, prefix);
+  result = operand1 - operand2;
   FLAG_NZ (result);
-  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & ~operand & ~result)
-                              | (~regs.A & operand & result)));
-  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
-                              | (operand & result)
-                              | (result & ~regs.A)));
-#if 0  
-  fprintf (stdout, "sub 0x%02x - 0x%02x      = 0x%02x ",regs.A, operand, result & 0xff);
-  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
-  	(regs.P & BIT_V)!=0,
-  	(regs.P & BIT_H)!=0,
-  	(regs.P & BIT_C)!=0,
-  	(regs.P & BIT_N)!=0,
-  	(regs.P & BIT_Z)!=0);
-#endif  
-  regs.A = result;
+  FLAG_ASSIGN (BIT_V, 0x80 & (operand1 ^ operand2 ^ result ^ (result >>1)));
+  FLAG_ASSIGN (BIT_C, 0x100 & result);
+
+  regs.A = result & 0xff;
   return(resGO);
 }
 
 int
 cl_hc08::inst_sbc(t_mem code, bool prefix)
 {
-  int result;
-  uchar operand;
-  uchar carryin = (regs.P & BIT_C)!=0;
+  int result, operand1, operand2;
+  int carryin = (regs.P & BIT_C)!=0;
 
-  operand = OPERAND(code, prefix);
-  result = (regs.A - operand - carryin) & 0xff;
+  operand1 = regs.A;
+  operand2 = OPERAND(code, prefix);
+  result = operand1 - operand2 - carryin;
   FLAG_NZ (result);
-  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & ~operand & ~result)
-                              | (~regs.A & operand & result)));
-  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
-                              | (operand & result)
-                              | (result & ~regs.A)));
-#if 0  
-  fprintf (stdout, "sbc 0x%02x - 0x%02x - %d = 0x%02x ",
-  	regs.A, operand, carryin, result & 0xff);
-  fprintf (stdout, "(V=%d, H=%d, C=%d, N=%d, Z=%d), ",
-  	(regs.P & BIT_V)!=0,
-  	(regs.P & BIT_H)!=0,
-  	(regs.P & BIT_C)!=0,
-  	(regs.P & BIT_N)!=0,
-  	(regs.P & BIT_Z)!=0);
-#endif  
-  regs.A = result;
+  FLAG_ASSIGN (BIT_V, 0x80 & (operand1 ^ operand2 ^ result ^ (result >>1)));
+  FLAG_ASSIGN (BIT_C, 0x100 & result);
+
+  regs.A = result & 0xff;
   return(resGO);
 }
 
 int
 cl_hc08::inst_cmp(t_mem code, bool prefix)
 {
-  int result;
-  uchar operand;
+  int result, operand1, operand2;
 
-  operand = OPERAND(code, prefix);
-  result = (regs.A - operand) & 0xff;
+  operand1 = regs.A;
+  operand2 = OPERAND(code, prefix);
+  result = operand1 - operand2;
   FLAG_NZ (result);
-  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.A & ~operand & ~result)
-                              | (~regs.A & operand & result)));
-  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.A & operand)
-                              | (operand & result)
-                              | (result & ~regs.A)));
+  FLAG_ASSIGN (BIT_V, 0x80 & (operand1 ^ operand2 ^ result ^ (result >>1)));
+  FLAG_ASSIGN (BIT_C, 0x100 & result);
+
   return(resGO);
 }
 
 int
 cl_hc08::inst_cpx(t_mem code, bool prefix)
 {
-  int result;
-  uchar operand;
+  int result, operand1, operand2;
 
-  operand = OPERAND(code, prefix);
-  result = (regs.X - operand) & 0xff;
+  operand1 = regs.X;
+  operand2 = OPERAND(code, prefix);
+  result = operand1 - operand2;
   FLAG_NZ (result);
-  FLAG_ASSIGN (BIT_V, 0x80 & ((regs.X & ~operand & ~result)
-                              | (~regs.X & operand & result)));
-  FLAG_ASSIGN (BIT_C, 0x80 & ((~regs.X & operand)
-                              | (operand & result)
-                              | (result & ~regs.X)));
+  FLAG_ASSIGN (BIT_V, 0x80 & (operand1 ^ operand2 ^ result ^ (result >>1)));
+  FLAG_ASSIGN (BIT_C, 0x100 & result);
+
   return(resGO);
 }
 
@@ -402,7 +339,10 @@ cl_hc08::inst_ais(t_mem code, bool prefix)
 int
 cl_hc08::inst_aix(t_mem code, bool prefix)
 {
-  regs.X = regs.X + (signed char)fetch();
+  int hx = (regs.H << 8) | (regs.X);
+  hx += (signed char)fetch();
+  regs.H = (hx >> 8) & 0xff;
+  regs.X = hx & 0xff;
   return(resGO);
 }
 
@@ -901,11 +841,11 @@ cl_hc08::inst_mul(t_mem code, bool prefix)
 int
 cl_hc08::inst_div(t_mem code, bool prefix)
 {
-  int dividend = (regs.H << 8) | regs.A;
-  int quotient;
+  unsigned int dividend = (regs.H << 8) | regs.A;
+  unsigned int quotient;
 
   if (regs.X) {
-    quotient = dividend / regs.X;
+    quotient = dividend / (unsigned int)regs.X;
     if (quotient<=0xff) {
       regs.A = quotient;
       regs.H = dividend % regs.X;
@@ -1124,8 +1064,8 @@ cl_hc08::inst_sthx(t_mem code, bool prefix)
   store1((ea+1) & 0xffff, regs.X);
 
   FLAG_CLEAR(BIT_V);
-  FLAG_ASSIGN(BIT_N, regs.X & 0x80);
-  FLAG_ASSIGN(BIT_Z, !regs.X && !regs.A);
+  FLAG_ASSIGN(BIT_N, regs.H & 0x80);
+  FLAG_ASSIGN(BIT_Z, !regs.X && !regs.H);
   return(resGO);
 }
 
@@ -1147,8 +1087,8 @@ cl_hc08::inst_ldhx(t_mem code, bool prefix)
     return(resHALT);
   
   FLAG_CLEAR(BIT_V);
-  FLAG_ASSIGN(BIT_N, regs.X & 0x80);
-  FLAG_ASSIGN(BIT_Z, !regs.X && !regs.A);
+  FLAG_ASSIGN(BIT_N, regs.H & 0x80);
+  FLAG_ASSIGN(BIT_Z, !regs.X && !regs.H);
   return(resGO);
 }
 
@@ -1172,16 +1112,12 @@ cl_hc08::inst_cphx(t_mem code, bool prefix)
     return(resHALT);
 
   hx = (regs.H << 8) | regs.X;
+  result = hx-operand;
 
-  result = (hx-operand) & 0xffff;
-
-  FLAG_ASSIGN (BIT_V, 0x8000 & ((hx & ~operand & ~result)
-                              | (~hx & operand & result)));
-  FLAG_ASSIGN (BIT_C, 0x8000 & ((~hx & operand)
-                              | (operand & result)
-                              | (result & ~hx)));
+  FLAG_ASSIGN (BIT_V, 0x8000 & (hx ^ operand ^ result ^ (result>>1)));
+  FLAG_ASSIGN (BIT_C, 0x10000 & result);
   FLAG_ASSIGN(BIT_N, result & 0x8000);
-  FLAG_ASSIGN(BIT_Z, !result);
+  FLAG_ASSIGN(BIT_Z, !(result & 0xffff));
                               
   return(resGO);
 }

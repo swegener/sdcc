@@ -5,7 +5,7 @@
 #ifndef __SDC51_STDARG_H
 #define __SDC51_STDARG_H 1
 
-#if defined(__z80) || defined(__gbz80)
+#if defined(__z80) || defined(__gbz80) || defined(__hc08)
 
 typedef unsigned char * va_list;
 #define va_start(list, last)	list = (unsigned char *)&last + sizeof(last)

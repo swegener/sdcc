@@ -1920,7 +1920,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 
     case AOP_LIT:
       if (bit16)
-        return aopLiteralLong (aop->aopu.aop_lit, loffset, 2);
+        return aopLiteralLong (aop->aopu.aop_lit, /*loffset*/ 0, 2);
       else
         return aopLiteral (aop->aopu.aop_lit, loffset);
 
@@ -5374,7 +5374,7 @@ XAccRsh (int shCount, bool sign)
       **   rola       1  1        bcde fgh0  0000 000a   0
       **   lslx       1  1        cdef gh00  0000 000a   b
       **   rola       1  1        cdef gh00  0000 00ab   0
-      **   clrx       1  1        0000 0000  0000 000a   0
+      **   clrx       1  1        0000 0000  0000 00ab   0
       ** total: 6 cycles, 6 bytes
       */
       loadRegFromConst (hc08_reg_x, zero);
@@ -5430,12 +5430,12 @@ XAccRsh (int shCount, bool sign)
       ;
     }
 
-  /* lslx/rola is only 2 cycles and bytes, so an unrolled loop is often  */
+  /* lsrx/rora is only 2 cycles and bytes, so an unrolled loop is often  */
   /* the fastest and shortest.                                           */
   for (i=0;i<shCount;i++)
     {
-      rmwWithReg ("lsl", hc08_reg_x);
-      rmwWithReg ("rol", hc08_reg_a);
+      rmwWithReg ("lsr", hc08_reg_x);
+      rmwWithReg ("ror", hc08_reg_a);
     }
 
 }

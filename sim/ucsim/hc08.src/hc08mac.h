@@ -36,7 +36,7 @@
 #define FLAG_ASSIGN(f,c) {regs.P = (c) ? regs.P | (f) : regs.P & ~(f);}
 #define FLAG_NZ(f) { \
       regs.P = (regs.P & ~(BIT_N|BIT_Z)) \
-      | ((f) ? 0 : BIT_Z) \
+      | (((f) & 0xff) ? 0 : BIT_Z) \
       | (((f) & 0x80) ? BIT_N : 0) \
       ; }
 #define EA_IMM(c) ((((c) >> 4) & 0xf)==0xa)

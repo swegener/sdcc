@@ -784,7 +784,7 @@ void pic14initMnemonics(void)
   mnemonics_initialized = 1;
 }
 
-int getpCode(char *mnem,int dest)
+int getpCode(char *mnem,unsigned dest)
 {
 
   pCodeInstruction *pci;

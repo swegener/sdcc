@@ -721,7 +721,7 @@ int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
 int advTokIdx(int *v, int amt)
 {
 
-  if(*v + amt > tokIdx)
+  if((unsigned) (*v + amt) > tokIdx)
     return 1;
 
   *v += amt;
@@ -734,7 +734,7 @@ int advTokIdx(int *v, int amt)
 
 void dumpTokens(void)
 {
-  int i;
+  unsigned i;
   pCode *pc;
 
   if(!tokIdx)

@@ -16,6 +16,7 @@
   Slightly better genCmp(signed)		20597	159	195B
   Better reg packing, first peephole		20038	163	1873
   With assign packing				19281	165	1849
+  5/3/00					17741	185	17B6
 
   Michael Hope <michaelh@earthling.net>	2000
   Based on the mcs51 generator - Sandeep Dutta . sandeep.dutta@usa.net (1998)

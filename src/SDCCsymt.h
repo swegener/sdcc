@@ -136,11 +136,11 @@ typedef enum {
 } DECLARATOR_TYPE;
 
 typedef struct declarator {
-    DECLARATOR_TYPE dcl_type;     /* POINTER,ARRAY or FUNCTION  */
-    short    num_elem;     /* # of elems if type==array  */
-    short    ptr_const :1;   /* pointer is constant        */
-    short    ptr_volatile:1; /* pointer is volatile        */
-    struct link *tspec;     /* pointer type specifier      */
+    DECLARATOR_TYPE dcl_type;       /* POINTER,ARRAY or FUNCTION  */
+    unsigned int    num_elem;       /* # of elems if type==array  */
+    short           ptr_const :1;   /* pointer is constant        */
+    short           ptr_volatile:1; /* pointer is volatile        */
+    struct link     *tspec;         /* pointer type specifier      */
 } declarator ;
 
 #define DECLARATOR   0

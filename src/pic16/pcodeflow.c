@@ -155,7 +155,6 @@ void pic16_BuildFlowTree(pBlock *pb)
 
   dbg_dumpFlowTree(FlowTree);
 }
-#endif
 
 static void dbg_dumpFlow(pBlock *pb)
 {
@@ -182,8 +181,9 @@ static void dbg_dumpFlow(pBlock *pb)
       fprintf(stderr,"\n");
     }
   }
-
 }
+#endif
+
 /*-----------------------------------------------------------------*
  * void BuildFlowSegment(set *segment, pCodeFlow *pcflow)
  *-----------------------------------------------------------------*/

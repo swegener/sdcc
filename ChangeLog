@@ -7,6 +7,9 @@
 	* src/SDCC.lex
 	* src/SDCCsymt.c
 	* src/SDCCval.c	
+	* src/pic16/pcode.c: Cleaned warnings
+	* src/pic16/pcodeflow.c: Cleaned warnings
+	* src/pic16/pcoderegs.c: Cleaned warnings
 
 2003-05-19  Scott Dattalo  <scott@dattalo.com>
 

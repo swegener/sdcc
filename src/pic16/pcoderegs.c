@@ -66,6 +66,7 @@ void AddRegToFlow(regs *reg, pCodeFlow *pcfl)
 /*-----------------------------------------------------------------*
  * 
  *-----------------------------------------------------------------*/
+#if 0
 static void dbg_regusage(set *fregs)
 {
   regs *reg;
@@ -118,10 +119,12 @@ static void dbg_regusage(set *fregs)
     }
   }
 }
+#endif
 
 /*-----------------------------------------------------------------*
  * 
  *-----------------------------------------------------------------*/
+#if 0
 static void dbg_dumpregusage(void)
 {
 
@@ -140,7 +143,7 @@ static void dbg_dumpregusage(void)
   dbg_regusage(pic16_dynProcessorRegs);
 
 }
-
+#endif
 
 /*-----------------------------------------------------------------*
  * void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)

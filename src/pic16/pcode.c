@@ -2268,7 +2268,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
   len = strlen(buffer);
   if(len > *size) {
     fprintf(stderr,"WARNING, it looks like %s has overflowed\n",__FUNCTION__);
-    fprintf(stderr,"len = %d is > str size %d\n",len,*size);
+    fprintf(stderr,"len = %d is > str size %d\n",len, (int) *size);
   }
 
   strcpy(*str, buffer);
@@ -3662,7 +3662,7 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static char *pCode2str(char *str, int size, pCode *pc)
+static char *pCode2str(char *str, size_t size, pCode *pc)
 {
   char *s = str;
 

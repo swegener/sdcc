@@ -2485,7 +2485,7 @@ packRegisters (eBBlock * ebp)
       if ((IS_ARITHMETIC_OP (ic)
 	   || IS_CONDITIONAL(ic)
 	   || IS_BITWISE_OP (ic)
-	   || ic->op == LEFT_OP || ic->op == RIGHT_OP
+	   || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
 	   || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))
 	  ) &&
 	  IS_ITEMP (IC_RESULT (ic)) &&

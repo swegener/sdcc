@@ -1956,6 +1956,7 @@ genCall (iCode * ic)
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
+	OP_SYMBOL (IC_RESULT (ic))->accuse || 
 	OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {

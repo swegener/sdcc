@@ -200,6 +200,8 @@ gcc_AC_C_COMPILE_ENDIAN
 # See if we have the mktemp command.
 AC_CHECK_PROG(have_mktemp_command, mktemp, yes, no)
 
+AC_CHECK_PROG(STRIP, strip, strip, :)
+
 # See if the stage1 system preprocessor understands the ANSI C
 # preprocessor stringification operator.  (Used by symcat.h.)
 AC_C_STRINGIZE

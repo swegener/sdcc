@@ -4,131 +4,131 @@ SDCC Compiler User Guide
 
 Table of Contents
 
-1 Introduction
-    1.1 About SDCC
-    1.2 Open Source
-    1.3 Typographic conventions
-    1.4 Compatibility with previous versions
-    1.5 System Requirements
-    1.6 Other Resources
-    1.7 Wishes for the future
-2 Installation
-    2.1 Linux/Unix Installation
-    2.2 Windows Installation
-        2.2.1 Windows Install Using a Binary Package
-        2.2.2 Windows Install Using Cygwin
-    2.3 Testing out the SDCC Compiler
-    2.4 Install Trouble-shooting
-        2.4.1 SDCC cannot find libraries or header files.
-        2.4.2 SDCC does not compile correctly.
-        2.4.3 What the ./configure does
-        2.4.4 What the make does.
-        2.4.5 What the make install command does.
-    2.5 Additional Information for Windows Users
-        2.5.1 Getting started with Cygwin
-        2.5.2 Running SDCC as Native Compiled Executables
-    2.6 SDCC on Other Platforms
-    2.7 Advanced Install Options
-    2.8 Components of SDCC
-        2.8.1 sdcc - The Compiler
-        2.8.2 sdcpp (C-Preprocessor)
-        2.8.3 asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80 (The Assemblers and Linkage Editors)
-        2.8.4 s51 - Simulator
-        2.8.5 sdcdb - Source Level Debugger
-3 Using SDCC
-    3.1 Compiling
-        3.1.1 Single Source File Projects
-        3.1.2 Projects with Multiple Source Files
-        3.1.3 Projects with Additional Libraries
-    3.2 Command Line Options
-        3.2.1 Processor Selection Options
-        3.2.2 Preprocessor Options
-        3.2.3 Linker Options
-        3.2.4 MCS51 Options
-        3.2.5 DS390 Options
-        3.2.6 Optimization Options
-        3.2.7 Other Options
-        3.2.8 Intermediate Dump Options
-    3.3 MCS51/DS390 Storage Class Language Extensions
-        3.3.1 xdata
-        3.3.2 data
-        3.3.3 idata
-        3.3.4 bit
-        3.3.5 sfr / sbit
-    3.4 Pointers
-    3.5 Parameters & Local Variables
-    3.6 Overlaying
-    3.7 Interrupt Service Routines
-    3.8 Critical Functions
-    3.9 Naked Functions
-    3.10 Functions using private banks
-    3.11 Absolute Addressing
-    3.12 Startup Code
-    3.13 Inline Assembler Code
-    3.14 int(16 bit) and long (32 bit) Support
-    3.15 Floating Point Support
-    3.16 MCS51 Memory Models
-    3.17 DS390 Memory Models
-    3.18 Defines Created by the Compiler
-4 SDCC Technical Data
-    4.1 Optimizations
-        4.1.1 Sub-expression Elimination
-        4.1.2 Dead-Code Elimination
-        4.1.3 Copy-Propagation
-        4.1.4 Loop Optimizations
-        4.1.5 Loop Reversing
-        4.1.6 Algebraic Simplifications
-        4.1.7 'switch' Statements
-        4.1.8 Bit-shifting Operations.
-        4.1.9 Bit-rotation
-        4.1.10 Highest Order Bit
-        4.1.11 Peep-hole Optimizer
-    4.2 Pragmas
-    4.3 <pending: this is messy and incomplete> Library Routines
-    4.4 Interfacing with Assembly Routines
-        4.4.1 Global Registers used for Parameter Passing
-        4.4.2 Assembler Routine(non-reentrant)
-        4.4.3 Assembler Routine(reentrant)
-    4.5 External Stack
-    4.6 ANSI-Compliance
-    4.7 Cyclomatic Complexity
-5 TIPS
-    5.1 Notes on MCS51 memory layout
-6 Retargetting for other MCUs.
-7 SDCDB - Source Level Debugger
-    7.1 Compiling for Debugging
-    7.2 How the Debugger Works
-    7.3 Starting the Debugger
-    7.4 Command Line Options.
-    7.5 Debugger Commands.
-        7.5.1 break [line | file:line | function | file:function]
-        7.5.2 clear [line | file:line | function | file:function ]
-        7.5.3 continue
-        7.5.4 finish
-        7.5.5 delete [n]
-        7.5.6 info [break | stack | frame | registers ]
-        7.5.7 step
-        7.5.8 next
-        7.5.9 run
-        7.5.10 ptype variable 
-        7.5.11 print variable
-        7.5.12 file filename
-        7.5.13 frame
-        7.5.14 set srcmode
-        7.5.15 ! simulator command
-        7.5.16 quit.
-    7.6 Interfacing with XEmacs.
-8 Other Processors
-    8.1 The Z80 and gbz80 port
-9 Support
-    9.1 Reporting Bugs
-10 Acknowledgments
+Introduction
+    About SDCC
+    Open Source
+    Typographic conventions
+    Compatibility with previous versions
+    System Requirements
+    Other Resources
+    Wishes for the future
+Installation
+    Linux/Unix Installation
+    Windows Installation
+        Windows Install Using a Binary Package
+        Windows Install Using Cygwin
+    Testing out the SDCC Compiler
+    Install Trouble-shooting
+        SDCC cannot find libraries or header files.
+        SDCC does not compile correctly.
+        What the ./configure does
+        What the make does.
+        What the make install command does.
+    Additional Information for Windows Users
+        Getting started with Cygwin
+        Running SDCC as Native Compiled Executables
+    SDCC on Other Platforms
+    Advanced Install Options
+    Components of SDCC
+        sdcc - The Compiler
+        sdcpp (C-Preprocessor)
+        asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80 (The Assemblers and Linkage Editors)
+        s51 - Simulator
+        sdcdb - Source Level Debugger
+Using SDCC
+    Compiling
+        Single Source File Projects
+        Projects with Multiple Source Files
+        Projects with Additional Libraries
+    Command Line Options
+        Processor Selection Options
+        Preprocessor Options
+        Linker Options
+        MCS51 Options
+        DS390 Options
+        Optimization Options
+        Other Options
+        Intermediate Dump Options
+    MCS51/DS390 Storage Class Language Extensions
+        xdata
+        data
+        idata
+        bit
+        sfr / sbit
+    Pointers
+    Parameters & Local Variables
+    Overlaying
+    Interrupt Service Routines
+    Critical Functions
+    Naked Functions
+    Functions using private banks
+    Absolute Addressing
+    Startup Code
+    Inline Assembler Code
+    int(16 bit) and long (32 bit) Support
+    Floating Point Support
+    MCS51 Memory Models
+    DS390 Memory Models
+    Defines Created by the Compiler
+SDCC Technical Data
+    Optimizations
+        Sub-expression Elimination
+        Dead-Code Elimination
+        Copy-Propagation
+        Loop Optimizations
+        Loop Reversing
+        Algebraic Simplifications
+        'switch' Statements
+        Bit-shifting Operations.
+        Bit-rotation
+        Highest Order Bit
+        Peep-hole Optimizer
+    Pragmas
+    <pending: this is messy and incomplete> Library Routines
+    Interfacing with Assembly Routines
+        Global Registers used for Parameter Passing
+        Assembler Routine(non-reentrant)
+        Assembler Routine(reentrant)
+    External Stack
+    ANSI-Compliance
+    Cyclomatic Complexity
+TIPS
+    Notes on MCS51 memory layout
+Retargetting for other MCUs.
+SDCDB - Source Level Debugger
+    Compiling for Debugging
+    How the Debugger Works
+    Starting the Debugger
+    Command Line Options.
+    Debugger Commands.
+        break [line | file:line | function | file:function]
+        clear [line | file:line | function | file:function ]
+        continue
+        finish
+        delete [n]
+        info [break | stack | frame | registers ]
+        step
+        next
+        run
+        ptype variable 
+        print variable
+        file filename
+        frame
+        set srcmode
+        ! simulator command
+        quit.
+    Interfacing with XEmacs.
+Other Processors
+    The Z80 and gbz80 port
+Support
+    Reporting Bugs
+Acknowledgments
 
 
 
-1 Introduction
+ Introduction
 
-1.1 About SDCC
+ About SDCC
 
 SDCC is a Freeware, retargettable, optimizing ANSI-C compiler
 by Sandeep Dutta designed for 8 bit Microprocessors. The
@@ -145,18 +145,18 @@ various microcontrollers and underlying hardware effectively.
 In addition to the MCU specific optimizations SDCC also does
 a host of standard optimizations like:
 
-* global sub expression elimination, 
+ global sub expression elimination, 
 
-* loop optimizations (loop invariant, strength reduction
+ loop optimizations (loop invariant, strength reduction
   of induction variables and loop reversing), 
 
-* constant folding & propagation, 
+ constant folding & propagation, 
 
-* copy propagation, 
+ copy propagation, 
 
-* dead code elimination 
+ dead code elimination 
 
-* jumptables for switch statements.
+ jumptables for switch statements.
 
 For the back-end SDCC uses a global register allocation scheme
 which should be well suited for other 8 bit MCUs. 
@@ -166,13 +166,13 @@ which is MCU independent.
 
 Supported data-types are:
 
-* char (8 bits, 1 byte), 
+ char (8 bits, 1 byte), 
 
-* short and int (16 bits, 2 bytes), 
+ short and int (16 bits, 2 bytes), 
 
-* long (32 bit, 4 bytes)
+ long (32 bit, 4 bytes)
 
-* float (4 byte IEEE). 
+ float (4 byte IEEE). 
 
 The compiler also allows inline assembler code to be embedded
 anywhere in a function. In addition, routines developed
@@ -189,7 +189,7 @@ the debugger currently uses ucSim a freeware simulator for
 
 The latest version can be downloaded from [http://sdcc.sourceforge.net/].
 
-1.2 Open Source
+ Open Source
 
 All packages used in this compiler system are opensource
 and freeware; source code for all the sub-packages (asxxxx
@@ -213,14 +213,14 @@ this program. You are forbidden to forbid anyone else to
 use, share and improve what you give them. Help stamp out
 software-hoarding! 
 
-1.3 Typographic conventions
+ Typographic conventions
 
 Throughout this manual, we will use the following convention.
 Commands you have to type in are printed in "sans serif".
 Code samples are printed in typewriter font. Interesting
 items and new terms are printed in italicised type.
 
-1.4 Compatibility with previous versions
+ Compatibility with previous versions
 
 This version has numerous bug fixes compared with the previous
 version. But we also introduced some incompatibilities with
@@ -228,25 +228,25 @@ older versions. Not just for the fun of it, but to make
 the compiler more stable, efficient and ANSI compliant. 
 
 
-* short is now equivalent to int (16 bits), it used to be
+ short is now equivalent to int (16 bits), it used to be
   equivalent to char (8 bits)
 
-* the default directory where include, library and documention
+ the default directory where include, library and documention
   files are stored is no in /usr/local/share
 
-* char type parameters to vararg functions are casted to
+ char type parameters to vararg functions are casted to
   int unless explicitly casted, e.g.: 
     char a=3;
     printf ("%d %c\n", a, (char)a);
    will push a as an int and as a char resp.
 
-* option --regextend has been removed
+ option --regextend has been removed
 
-* option --noreparms has been removed
+ option --noreparms has been removed
 
 <pending: more incompatibilities?>
 
-1.5 System Requirements
+ System Requirements
 
 What do you need before you start installation of SDCC? A
 computer, and a desire to compute. The preferred method
@@ -255,7 +255,7 @@ gcc and make. For Windows some pre-compiled binary distributions
 are available for your convenience. You should have some
 experience with command line tools and compiler use.
 
-1.6 Other Resources
+ Other Resources
 
 The SDCC home page at [http://sdcc.sourceforge.net/]
 is a great place to find distribution sets. You can also
@@ -269,7 +269,7 @@ and can be found in the source distribution. If you want
 the latest unreleased software, the complete source package
 is available directly by anonymous CVS on cvs.sdcc.sourceforge.net.
 
-1.7 Wishes for the future
+ Wishes for the future
 
 There are (and always will be) some things that could be
 done. Here are some I can think of:
@@ -285,33 +285,33 @@ If you can think of some more, please send them to the list.
 
 <pending: And then of course a proper index-table>
 
-2 Installation
+ Installation
 
-2.1 Linux/Unix Installation
+ Linux/Unix Installation
 
-1. Download the source package, it will be named something
+ Download the source package, it will be named something
   like sdcc-2.x.x.tgz.
 
-2. Bring up a command line terminal, such as xterm.
+ Bring up a command line terminal, such as xterm.
 
-3. Unpack the file using a command like: "tar -xzf sdcc-2.x.x.tgz",
+ Unpack the file using a command like: "tar -xzf sdcc-2.x.x.tgz",
   this will create a sub-directory called sdcc with all
   of the sources.
 
-4. Change directory into the main SDCC directory, for example
+ Change directory into the main SDCC directory, for example
   type: "cd sdcc".
 
-5. Type "./configure". This configures the package for compilation
+ Type "./configure". This configures the package for compilation
   on your system.
 
-6. Type "make". All of the source packages will compile, this
+ Type "make". All of the source packages will compile, this
   can take a while.
 
-7. Type "make install" as root. This copies the binary executables,
+ Type "make install" as root. This copies the binary executables,
   the include files, the libraries and the documentation
   to the install directories.
 
-2.2 Windows Installation
+ Windows Installation
 
 <pending: is this complete? where is borland, mingw>
 
@@ -325,40 +325,40 @@ not familiar with the Unix command line environment, you
 may want to read the section on additional information for
 Windows users prior to your initial installation.
 
-2.2.1 Windows Install Using a Binary Package
+ Windows Install Using a Binary Package
 
-1. Download the binary package and unpack it using your favorite
+ Download the binary package and unpack it using your favorite
   unpacking tool (gunzip, WinZip, etc). This should unpack
   to a group of sub-directories. An example directory structure
   after unpacking is: c:\usr\local\bin for the executables,
   c:\usr\local\share\sdcc\include and c:\usr\local\share\sdcc\lib
   for the include and libraries.
 
-2. Adjust your environment PATH to include the location of
+ Adjust your environment PATH to include the location of
   the bin directory. For example, make a setsdcc.bat file
   with the following: set PATH=c:\usr\local\bin;%PATH%
 
-3. When you compile with sdcc, you may need to specify the
+ When you compile with sdcc, you may need to specify the
   location of the lib and include folders. For example,
   sdcc -I c:\usr\local\share\sdcc\include -L c:\usr\local\share\sdcc\lib\small
   test.c
 
-2.2.2 Windows Install Using Cygwin
+ Windows Install Using Cygwin
 
-1. Download and install the cygwin package from the redhat
+ Download and install the cygwin package from the redhat
   site[http://sources.redhat.com/cygwin/]. Currently,
   this involved downloading a small install program which
   then automates downloading and installing selected parts
   of the package (a large 80M byte sized dowload for the
   whole thing). 
 
-2. Bring up a Unix/Bash command line terminal from the Cygwin
+ Bring up a Unix/Bash command line terminal from the Cygwin
   menu.
 
-3. Follow the instructions in the preceding Linux/Unix installation
+ Follow the instructions in the preceding Linux/Unix installation
   section.
 
-2.3 Testing out the SDCC Compiler
+ Testing out the SDCC Compiler
 
 The first thing you should do after installing your SDCC
 compiler is to see if it runs. Type "sdcc --version" at
@@ -422,9 +422,9 @@ string.h file, then the problem is that sdcc cannot find
 the /usr/local/share/sdcc/include directory (see the Install
 trouble-shooting section for suggestions).
 
-2.4 Install Trouble-shooting
+ Install Trouble-shooting
 
-2.4.1 SDCC cannot find libraries or header files.
+ SDCC cannot find libraries or header files.
 
 The default installation assumes the libraries and header
 files are located at "/usr/local/share/sdcc/lib"
@@ -432,7 +432,7 @@ and "/usr/local/share/sdcc/include".
 An alternative is to specify these locations as compiler
 options like this: "sdcc -L /usr/local/sdcc/lib/small -I /usr/local/sdcc/include test.c".
 
-2.4.2 SDCC does not compile correctly.
+ SDCC does not compile correctly.
 
 A thing to try is starting from scratch by unpacking the
 .tgz source package again in an empty directory. Confure
@@ -445,7 +445,7 @@ problem. Or a relevant part of this be attached to an email
 that could be helpful when requesting help from the mailing
 list.
 
-2.4.3 What the "./configure"
+ What the "./configure"
   does
 
 The "./configure" command is a script
@@ -454,13 +454,13 @@ to ensure the source package compiles on your system. It
 will take a few minutes to run, and will compile a few tests
 to determine what compiler features are installed.
 
-2.4.4 What the "make" does.
+ What the "make" does.
 
 This runs the GNU make tool, which automatically compiles
 all the source packages into the final installed binary
 executables.
 
-2.4.5 What the "make install"
+ What the "make install"
   command does.
 
 This will install the compiler, other executables and libraries
@@ -468,7 +468,7 @@ in to the appropriate system directories. The default is
 to copy the executables to /usr/local/bin and the libraries
 and header files to /usr/local/share/sdcc/lib and /usr/local/share/sdcc/include.
 
-2.5 Additional Information for Windows Users
+ Additional Information for Windows Users
 
 <pending: is this up to date?>
 
@@ -491,7 +491,7 @@ if not you may find it easier to start by installing a binary
 Windows package. The binary packages work with the Windows
 file system conventions.
 
-2.5.1 Getting started with Cygwin
+ Getting started with Cygwin
 
 SDCC is typically distributed as a tarred/gzipped file (.tgz).
 This is a packed file similar to a .zip file. Cygwin includes
@@ -514,7 +514,7 @@ prompt, you will need to use the forward '/' slashes. Unix
 does not have a concept of drive letters, such as "c:",
 instead all files systems attach and appear as directories.
 
-2.5.2 Running SDCC as Native Compiled Executables
+ Running SDCC as Native Compiled Executables
 
 If you use the pre-compiled binaries, the install directories
 for the libraries and header files may need to be specified
@@ -530,17 +530,17 @@ you would run "make -f Makefile.bcc". A command line version
 of the Borland 32-bit compiler can be downloaded from the
 Inprise web site.
 
-2.6 SDCC on Other Platforms
+ SDCC on Other Platforms
 
-* FreeBSD and other non-GNU Unixes - Make sure the GNU make
+ FreeBSD and other non-GNU Unixes - Make sure the GNU make
   is installed as the default make tool.
 
-* SDCC has been ported to run under a variety of operating
+ SDCC has been ported to run under a variety of operating
   systems and processors. If you can run GNU GCC/make then
   chances are good SDCC can be compiled and run on your
   system.
 
-2.7 Advanced Install Options
+ Advanced Install Options
 
 The "configure" command has several options.
 The most commonly used option is --prefix=<directory name>,
@@ -565,7 +565,7 @@ The command "./configure --prefix=/usr/local"
 will configure the compiler to be installed in directory
 /usr/local.
 
-2.8 Components of SDCC
+ Components of SDCC
 
 SDCC is not just a compiler, but a collection of tools by
 various developers. These include linkers, assemblers, simulators
@@ -582,53 +582,53 @@ programs:
  
 In <installdir>/bin:
 
-* sdcc - The compiler.
+ sdcc - The compiler.
 
-* sdcpp - The C preprocessor.
+ sdcpp - The C preprocessor.
 
-* asx8051 - The assembler for 8051 type processors.
+ asx8051 - The assembler for 8051 type processors.
 
-* as-z80, as-gbz80 - The Z80 and GameBoy Z80 assemblers.
+ as-z80, as-gbz80 - The Z80 and GameBoy Z80 assemblers.
 
-* aslink -The linker for 8051 type processors.
+ aslink -The linker for 8051 type processors.
 
-* link-z80, link-gbz80 - The Z80 and GameBoy Z80 linkers.
+ link-z80, link-gbz80 - The Z80 and GameBoy Z80 linkers.
 
-* s51 - The ucSim 8051 simulator.
+ s51 - The ucSim 8051 simulator.
 
-* sdcdb - The source debugger.
+ sdcdb - The source debugger.
 
-* packihx - A tool to pack Intel hex files.
+ packihx - A tool to pack Intel hex files.
 
 In <installdir>/share/sdcc/include
 
-* the include files
+ the include files
 
 In <installdir>/share/sdcc/lib
 
-* the sources of the runtime library and the subdirs small
+ the sources of the runtime library and the subdirs small
   large and ds390 with the precompiled relocatables.
 
 In <installdir>/share/sdcc/doc
 
-* the documentation
+ the documentation
 
 As development for other processors proceeds, this list will
 expand to include executables to support processors like
 AVR, PIC, etc.
 
-2.8.1 sdcc - The Compiler
+ sdcc - The Compiler
 
 This is the actual compiler, it in turn uses the c-preprocessor
 and invokes the assembler and linkage editor.
 
-2.8.2 sdcpp (C-Preprocessor)
+ sdcpp (C-Preprocessor)
 
 The preprocessor is a modified version of the GNU preprocessor.
 The C preprocessor is used to pull in #include sources,
 process #ifdef statements, #defines and so on.
 
-2.8.3 asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80
+ asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80
   (The Assemblers and Linkage Editors)
 
 This is retargettable assembler & linkage editor, it was
@@ -636,24 +636,24 @@ developed by Alan Baldwin. John Hartman created the version
 for 8051, and I (Sandeep) have made some enhancements and
 bug fixes for it to work properly with the SDCC.
 
-2.8.4 s51 - Simulator
+ s51 - Simulator
 
 S51 is a freeware, opensource simulator developed by Daniel
 Drotos ([mailto:drdani@mazsola.iit.uni-miskolc.hu]).
 The simulator is built as part of the build process. For
 more information visit Daniel's website at: [http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51] .
 
-2.8.5 sdcdb - Source Level Debugger
+ sdcdb - Source Level Debugger
 
 Sdcdb is the companion source level debugger. The current
 version of the debugger uses Daniel's Simulator S51, but
 can be easily changed to use other simulators.
 
-3 Using SDCC
+ Using SDCC
 
-3.1 Compiling
+ Compiling
 
-3.1.1 Single Source File Projects
+ Single Source File Projects
 
 For single source file 8051 projects the process is very
 simple. Compile your programs with the following command
@@ -676,7 +676,7 @@ sourcefile.cdb - An optional file (with --debug) containing
 debug information
 
 
-3.1.2 Projects with Multiple Source Files
+ Projects with Multiple Source Files
 
 SDCC can compile only ONE file at a time. Let us for example
 assume that you have a project containing the following
@@ -708,7 +708,7 @@ The file containing the main() function must be the first
 file specified in the command line, since the linkage editor
 processes file in the order they are presented to it.
 
-3.1.3 Projects with Additional Libraries
+ Projects with Additional Libraries
 
 Some reusable routines may be compiled into a library, see
 the documentation for the assembler and linkage editor (which
@@ -730,9 +730,9 @@ modules in seperate source files. The lib file now should
 name all the modules.rel files. For an example see the standard
 library file libsdcc.lib in the directory <installdir>/share/lib/small.
 
-3.2 Command Line Options
+ Command Line Options
 
-3.2.1 Processor Selection Options
+ Processor Selection Options
 
 -mmcs51 Generate code for the MCS51 (8051) family of processors.
 This is the default processor target.
@@ -752,7 +752,7 @@ not complete).
 -mtlcs900h Generate code for the Toshiba TLCS-900H processor(In
 development, not complete).
 
-3.2.2 Preprocessor Options
+ Preprocessor Options
 
 -I<path> The additional location where the pre processor
 will look for <..h> or "..h"
@@ -804,7 +804,7 @@ output.
 -dN Like `-dD' except that the macro arguments and contents
 are omitted. Only `#define name' is included in the output.
 
-3.2.3 Linker Options
+ Linker Options
 
 -L --lib-path <absolute path to additional libraries> This
 option is passed to the linkage editor's additional libraries
@@ -853,7 +853,7 @@ Intel Hex format. (This is the default option).
 --out-fmt-s19 The linker output (final object code) is in
 Motorola S19 format.
 
-3.2.4 MCS51 Options
+ MCS51 Options
 
 --model-large Generate code for Large model programs see
 section Memory Models for more details. If this option is
@@ -865,7 +865,7 @@ are compiled with small model, they will need to be recompiled.
 section Memory Models for more details. This is the default
 model.
 
-3.2.5 DS390 Options
+ DS390 Options
 
 --model-flat24 Generate 24-bit flat mode code. This is the
 one and only that the ds390 code generator supports right
@@ -892,7 +892,7 @@ option. It also only makes sense if the processor is in
 24 bit contiguous addressing mode (see the --model-flat24
 option).
 
-3.2.6 Optimization Options
+ Optimization Options
 
 --nogcse Will not do global subexpression elimination, this
 option may be used when the compiler creates undesirably
@@ -926,7 +926,7 @@ for a given function only.
 
 --noloopreverse Will not do loop reversal optimization.
 
-3.2.7 Other Options
+ Other Options
 
 -c --compile-only will compile and assemble the source,
 but will not call the linkage editor.
@@ -1036,7 +1036,7 @@ the default library path to the linker.
 
 -V Shows the actual commands the compiler is executing.
 
-3.2.8 Intermediate Dump Options
+ Intermediate Dump Options
 
 The following options are provided for the purpose of retargetting
 and debugging the compiler. These provided a means to dump
@@ -1073,12 +1073,12 @@ assignment, into a file named <source filename>.dumprassgn.
 --dumpall Will cause all the above mentioned dumps to be
 created.
 
-3.3 MCS51/DS390 Storage Class Language Extensions
+ MCS51/DS390 Storage Class Language Extensions
 
 In addition to the ANSI storage classes SDCC allows the following
 MCS51 specific storage classes.
 
-3.3.1 xdata
+ xdata
 
 Variables declared with this storage class will be placed
 in the extern RAM. This is the default storage class for
@@ -1086,7 +1086,7 @@ Large Memory model, e.g.:
 
 xdata unsigned char xduc;
 
-3.3.2 data
+ data
 
 This is the default storage class for Small Memory model.
 Variables declared with this storage class will be allocated
@@ -1094,7 +1094,7 @@ in the internal RAM, e.g.:
 
 data int iramdata;
 
-3.3.3 idata
+ idata
 
 Variables declared with this storage class will be allocated
 into the indirectly addressable portion of the internal
@@ -1102,7 +1102,7 @@ ram of a 8051, e.g.:
 
 idata int idi;
 
-3.3.4 bit
+ bit
 
 This is a data-type and a storage class specifier. When a
 variable is declared as a bit, it is allocated into the
@@ -1110,7 +1110,7 @@ bit addressable memory of 8051, e.g.:
 
 bit iFlag;
 
-3.3.5 sfr / sbit
+ sfr / sbit
 
 Like the bit keyword, sfr / sbit signifies both a data-type
 and storage class, they are used to describe the special
@@ -1121,7 +1121,7 @@ sfr at 0x80 P0; /* special function register P0 at location
 0x80 */
 sbit at 0xd7 CY; /* CY (Carry Flag) */
 
-3.4 Pointers
+ Pointers
 
 SDCC allows (via language extensions) pointers to explicitly
 point to any of the memory spaces of the 8051. In addition
@@ -1176,7 +1176,7 @@ Explicitly specifying the pointer type will generate the
 most efficient code. Pointers declared using a mixture of
 OLD and NEW style could have unpredictable results.
 
-3.5 Parameters & Local Variables
+ Parameters & Local Variables
 
 Automatic (local) variables and parameters to functions can
 either be placed on the stack or in data-space. The default
@@ -1221,7 +1221,7 @@ classes for parameters will be ignored), their allocation
 is governed by the memory model in use, and the reentrancy
 options.
 
-3.6 Overlaying
+ Overlaying
 
 For non-reentrant functions SDCC will try to reduce internal
 ram space usage by overlaying parameters and local variables
@@ -1271,7 +1271,7 @@ ISR. The #pragma NOOVERLAY ensures that
 the parameters and local variables for the function are
 NOT overlayed.
 
-3.7 Interrupt Service Routines
+ Interrupt Service Routines
 
 SDCC allows interrupt service routines to be coded in C,
 with some extended keywords.
@@ -1347,7 +1347,7 @@ is not recommended, avoid it if possible.
 
 Also see the _naked modifier.
 
-3.8 Critical Functions
+ Critical Functions
 
 A special keyword may be associated with a function declaring
 it as critical. SDCC will generate code to disable all interrupts
@@ -1364,7 +1364,7 @@ int foo () critical
 The critical attribute maybe used with other attributes like
 reentrant.
 
-3.9 Naked Functions
+ Naked Functions
 
 A special keyword may be associated with a function declaring
 it as _naked. The _naked function modifier attribute prevents
@@ -1423,7 +1423,7 @@ inside a _naked function, there are many ways to shoot yourself
 in the foot doing this, and is is recommended that you stick
 to inline assembler.
 
-3.10 Functions using private banks
+ Functions using private banks
 
 The using attribute (which tells the compiler to use a register
 bank other than the default bank zero) should only be applied
@@ -1465,7 +1465,7 @@ if those functions use the same bank as the ISR (see note
 zero. It is very inefficient to call a function using a
 different, non-zero bank from an ISR. 
 
-3.11 Absolute Addressing
+ Absolute Addressing
 
 Data items can be assigned an absolute address with the at
 <address> keyword, in addition to a storage class, e.g.:
@@ -1494,7 +1494,7 @@ in the bit-addressable space. There is no real advantage
 to assigning absolute addresses to variables in this manner,
 unless you want strict control over all the variables allocated.
 
-3.12 Startup Code
+ Startup Code
 
 The compiler inserts a call to the C routine _sdcc__external__startup()
 at the start of the CODE area. This routine is in the runtime
@@ -1507,7 +1507,7 @@ routine to your program to override the default if you need
 to setup hardware or perform some other critical operation
 prior to static & global variable initialization.
 
-3.13 Inline Assembler Code
+ Inline Assembler Code
 
 SDCC allows the use of in-line assembler with a few restriction
 as regards labels. All labels defined within inline assembler
@@ -1561,7 +1561,7 @@ in inline assembly within the scope of the funtion.
 The same goes the other way, ie. labels defines in inline
 assembly CANNOT be accessed by C statements.
 
-3.14 int(16 bit) and long (32 bit) Support
+ int(16 bit) and long (32 bit) Support
 
 For signed & unsigned int (16 bit) and long (32 bit) variables,
 division, multiplication and modulus operations are implemented
@@ -1592,7 +1592,7 @@ is unavoidable then the above routines will need to be compiled
 with the --stack-auto option, after which the source program
 will have to be compiled with --int-long-rent option.
 
-3.15 Floating Point Support
+ Floating Point Support
 
 SDCC supports IEEE (single precision 4bytes) floating point
 numbers.The floating point support routines are derived
@@ -1621,7 +1621,7 @@ Note if all these routines are used simultaneously the data
 space might overflow. For serious floating point usage it
 is strongly recommended that the large model be used.
 
-3.16 MCS51 Memory Models
+ MCS51 Memory Models
 
 SDCC allows two memory models for MCS51 code, small and large.
 Modules compiled with different memory models should never
@@ -1644,7 +1644,7 @@ are disabled when the program is compiled using the large
 model, it is therefore strongly recommdended that the small
 model be used unless absolutely required.
 
-3.17 DS390 Memory Models
+ DS390 Memory Models
 
 The only model supported is Flat 24. This generates code
 for the 24 bit contiguous addressing mode of the Dallas
@@ -1677,39 +1677,39 @@ passed to the linker by using the option -Wl-r on the sdcc
 command line. However, currently the linker can not handle
 code segments > 64k.
 
-3.18 Defines Created by the Compiler
+ Defines Created by the Compiler
 
 The compiler creates the following #defines.
 
-* SDCC - this Symbol is always defined.
+ SDCC - this Symbol is always defined.
 
-* SDCC_mcs51 or SDCC_ds390 or SDCC_z80, etc - depending on
+ SDCC_mcs51 or SDCC_ds390 or SDCC_z80, etc - depending on
   the model used (e.g.: -mds390)
 
-* __mcs51 or __ds390 or __z80, etc - depending on the model
+ __mcs51 or __ds390 or __z80, etc - depending on the model
   used (e.g. -mz80)
 
-* SDCC_STACK_AUTO - this symbol is defined when --stack-auto
+ SDCC_STACK_AUTO - this symbol is defined when --stack-auto
   option is used.
 
-* SDCC_MODEL_SMALL - when --model-small is used.
+ SDCC_MODEL_SMALL - when --model-small is used.
 
-* SDCC_MODEL_LARGE - when --model-large is used.
+ SDCC_MODEL_LARGE - when --model-large is used.
 
-* SDCC_USE_XSTACK - when --xstack option is used.
+ SDCC_USE_XSTACK - when --xstack option is used.
 
-* SDCC_STACK_TENBIT - when -mds390 is used
+ SDCC_STACK_TENBIT - when -mds390 is used
 
-* SDCC_MODEL_FLAT24 - when -mds390 is used
+ SDCC_MODEL_FLAT24 - when -mds390 is used
 
-4 SDCC Technical Data
+ SDCC Technical Data
 
-4.1 Optimizations
+ Optimizations
 
 SDCC performs a host of standard optimizations in addition
 to some MCU specific optimizations. 
 
-4.1.1 Sub-expression Elimination
+ Sub-expression Elimination
 
 The compiler does local and global common subexpression elimination,
 e.g.: 
@@ -1739,7 +1739,7 @@ iTemp.d = 11;
 The compiler will try to keep these temporary variables in
 registers.
 
-4.1.2 Dead-Code Elimination
+ Dead-Code Elimination
 
 int global; 
 void f () { 
@@ -1759,7 +1759,7 @@ int global; void f ()
   return; 
 }
 
-4.1.3 Copy-Propagation
+ Copy-Propagation
 
 int f() { 
   int i, j; 
@@ -1780,7 +1780,7 @@ int f() {
 Note: the dead stores created by this copy propagation will
 be eliminated by dead-code elimination.
 
-4.1.4 Loop Optimizations
+ Loop Optimizations
 
 Two types of loop optimizations are done by SDCC loop invariant
 lifting and strength reduction of loop induction variables.
@@ -1832,7 +1832,7 @@ for (i=0;i< 100;i++) {
 The more expensive multiplication is changed to a less expensive
 addition.
 
-4.1.5 Loop Reversing
+ Loop Reversing
 
 This optimization is done to reduce the overhead of checking
 loop boundaries for every iteration. Some simple loops can
@@ -1843,32 +1843,32 @@ is reversible (note: more sophisticated compilers use data-dependency
 analysis to make this determination, SDCC uses a more simple
 minded analysis).
 
-* The 'for' loop is of the form 
+ The 'for' loop is of the form 
   
   for (<symbol> = <expression> ; <sym> [< | <=] <expression>
   ; [<sym>++ | <sym> += 1])
       <for body>
 
-* The <for body> does not contain "continue"
+ The <for body> does not contain "continue"
   or 'break".
 
-* All goto's are contained within the loop.
+ All goto's are contained within the loop.
 
-* No function calls within the loop.
+ No function calls within the loop.
 
-* The loop control variable <sym> is not assigned any value
+ The loop control variable <sym> is not assigned any value
   within the loop
 
-* The loop control variable does NOT participate in any arithmetic
+ The loop control variable does NOT participate in any arithmetic
   operation within the loop.
 
-* There are NO switch statements in the loop.
+ There are NO switch statements in the loop.
 
 Note djnz instruction can be used for 8-bit values only,
 therefore it is advantageous to declare loop control symbols
 as char. Ofcourse this may not be possible on all situations.
 
-4.1.6 Algebraic Simplifications
+ Algebraic Simplifications
 
 SDCC does numerous algebraic simplifications, the following
 is a small sub-set of these optimizations.
@@ -1881,12 +1881,12 @@ i = j / 1 ; /* changed to */ i = j;
 Note the subexpressions given above are generally introduced
 by macro expansions or as a result of copy/constant propagation.
 
-4.1.7 'switch' Statements
+ 'switch' Statements
 
 SDCC changes switch statements to jump tables when the following
 conditions are true. 
 
-* The case labels are in numerical sequence, the labels need
+ The case labels are in numerical sequence, the labels need
   not be in order, and the starting number need not be one
   or zero.
   
@@ -1912,10 +1912,10 @@ conditions are true.
   Both the above switch statements will be implemented using
   a jump-table.
 
-* The number of case labels is at least three, since it takes
+ The number of case labels is at least three, since it takes
   two conditional statements to handle the boundary conditions.
 
-* The number of case labels is less than 84, since each label
+ The number of case labels is less than 84, since each label
   takes 3 bytes and a jump-table can be utmost 256 bytes
   long. 
 
@@ -1958,7 +1958,7 @@ then both the switch statements will be implemented using
 jump-tables whereas the unmodified switch statement will
 not be.
 
-4.1.8 Bit-shifting Operations.
+ Bit-shifting Operations.
 
 Bit shifting is one of the most frequently used operation
 in embedded programming. SDCC tries to implement bit-shift
@@ -1995,7 +1995,7 @@ mov _i,a
 Note that SDCC stores numbers in little-endian format (i.e.
 lowest order first).
 
-4.1.9 Bit-rotation
+ Bit-rotation
 
 A special case of the bit-shift operation is bit rotation,
 SDCC recognizes the following expression to be a left bit-rotation:
@@ -2017,7 +2017,7 @@ as bit-rotation, i.e.:
 
 i = ((i >> 7) | (i << 1)); /* left-bit rotation */
 
-4.1.10 Highest Order Bit
+ Highest Order Bit
 
 It is frequently required to obtain the highest order bit
 of an integral type (long, int, short or char types). SDCC
@@ -2063,7 +2063,7 @@ xyz = gint + ((gint >> 15) & 1);
 
 will still be recognized.
 
-4.1.11 Peep-hole Optimizer
+ Peep-hole Optimizer
 
 The compiler uses a rule based, pattern matching and re-writing
 mechanism for peep-hole optimization. It is inspired by
@@ -2193,38 +2193,38 @@ rules that are compiled into the compiler, you can add your
 own rules in the default set there if you get tired of specifying
 the --peep-file option.
 
-4.2 Pragmas
+ Pragmas
 
 SDCC supports the following #pragma directives. This directives
 are applicable only at a function level.
 
-* SAVE - this will save all the current options.
+ SAVE - this will save all the current options.
 
-* RESTORE - will restore the saved options from the last
+ RESTORE - will restore the saved options from the last
   save. Note that SAVES & RESTOREs cannot be nested. SDCC
   uses the same buffer to save the options each time a SAVE
   is called.
 
-* NOGCSE - will stop global subexpression elimination.
+ NOGCSE - will stop global subexpression elimination.
 
-* NOINDUCTION - will stop loop induction optimizations.
+ NOINDUCTION - will stop loop induction optimizations.
 
-* NOJTBOUND - will not generate code for boundary value checking,
+ NOJTBOUND - will not generate code for boundary value checking,
   when switch statements are turned into jump-tables.
 
-* NOOVERLAY - the compiler will not overlay the parameters
+ NOOVERLAY - the compiler will not overlay the parameters
   and local variables of a function.
 
-* NOLOOPREVERSE - Will not do loop reversal optimization
+ NOLOOPREVERSE - Will not do loop reversal optimization
 
-* EXCLUDE NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma
+ EXCLUDE NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma
   disables generation of pair of push/pop instruction in
   ISR function (using interrupt keyword). The directive
   should be placed immediately before the ISR function definition
   and it affects ALL ISR functions following it. To enable
   the normal register saving for ISR functions use #pragma EXCLUDE none.
 
-* CALLEE-SAVES function1[,function2[,function3...]] - The
+ CALLEE-SAVES function1[,function2[,function3...]] - The
   compiler by default uses a caller saves convention for
   register saving across function calls, however this can
   cause unneccessary register pushing & popping when calling
@@ -2269,7 +2269,7 @@ The compiler will generate a warning message when extra space
 is allocated. It is strongly recommended that the SAVE and
 RESTORE pragma's be used when changing options for a function.
 
-4.3 <pending: this is messy and incomplete> Library Routines
+ <pending: this is messy and incomplete> Library Routines
 
 The following library routines are provided for your convenience.
 
@@ -2375,14 +2375,14 @@ should be cast to a generic pointer. eg.
 printf_small("my str %s, my int %d\n",(char
 _generic *)mystr,myint);
 
-* stdarg.h - contains definition for the following macros
+ stdarg.h - contains definition for the following macros
   to be used for variable parameter list, note that a function
   can have a variable parameter list if and only if it is
   'reentrant'
 
   va_list, va_start, va_arg, va_end.
 
-* setjmp.h - contains defintion for ANSI setjmp & longjmp
+ setjmp.h - contains defintion for ANSI setjmp & longjmp
   routines. Note in this case setjmp & longjmp can be used
   between functions executing within the same register bank,
   if long jmp is executed from a function that is using
@@ -2392,22 +2392,22 @@ _generic *)mystr,myint);
   & a 16 byte return address), and can be placed in any
   address space.
 
-* stdlib.h - contains the following functions.
+ stdlib.h - contains the following functions.
 
   atoi, atol.
 
-* string.h - contains the following functions.
+ string.h - contains the following functions.
 
   strcpy, strncpy, strcat, strncat, strcmp, strncmp, strchr,
   strrchr, strspn, strcspn, strpbrk, strstr, strlen, strtok,
   memcpy, memcmp, memset.
 
-* ctype.h - contains the following routines.
+ ctype.h - contains the following routines.
 
   iscntrl, isdigit, isgraph, islower, isupper, isprint, ispunct,
   isspace, isxdigit, isalnum, isalpha.
 
-* malloc.h - The malloc routines are developed by Dmitry
+ malloc.h - The malloc routines are developed by Dmitry
   S. Obukhov (dso@usa.net). These routines will allocate
   memory from the external ram. Here is a description on
   how to use them (as described by the author).
@@ -2441,7 +2441,7 @@ _generic *)mystr,myint);
   current_buffer = malloc(0x100); 
        //
 
-* serial.h - Serial IO routines are also developed by Dmitry
+ serial.h - Serial IO routines are also developed by Dmitry
   S. Obukhov (dso@usa.net). These routines are interrupt
   driven with a 256 byte circular buffer, they also expect
   external ram to be present. Please see documentation in
@@ -2449,18 +2449,18 @@ _generic *)mystr,myint);
   "serial.h" MUST be included in the file containing
   the 'main' function.
 
-* ser.h - Alternate serial routine provided by Wolfgang Esslinger
+ ser.h - Alternate serial routine provided by Wolfgang Esslinger
   <wolfgang@WiredMinds.com> these routines are more compact
   and faster. Please see documentation in file SDCCDIR/sdcc51lib/ser.c
 
-* ser_ir.h - Another alternate set of serial routines provided
+ ser_ir.h - Another alternate set of serial routines provided
   by Josef Wolf <jw@raven.inka.de>, these routines do not
   use the external ram.
 
-* reg51.h - contains register definitions for a standard
+ reg51.h - contains register definitions for a standard
   8051
 
-* float.h - contains min, max and other floating point related
+ float.h - contains min, max and other floating point related
   stuff.
 
 All library routines are compiled as --model-small, they
@@ -2471,9 +2471,9 @@ have to be recompiled with the appropriate compiler option.
 Have not had time to do the more involved routines like printf,
 will get to them shortly.
 
-4.4 Interfacing with Assembly Routines
+ Interfacing with Assembly Routines
 
-4.4.1 Global Registers used for Parameter Passing
+ Global Registers used for Parameter Passing
 
 The compiler always uses the global registers DPL,DPH,B and
 ACC to pass the first parameter to a routine. The second
@@ -2481,7 +2481,7 @@ parameter onwards is either allocated on the stack (for
 reentrant routines or if --stack-auto is used) or in the
 internal / external ram (depending on the memory model). 
 
-4.4.2 Assembler Routine(non-reentrant)
+ Assembler Routine(non-reentrant)
 
 In the following example the function cfunc calls an assembler
 routine asm_func, which takes two parameters.
@@ -2537,7 +2537,7 @@ file with the following command:
 
 sdcc cfunc.c asmfunc.rel
 
-4.4.3 Assembler Routine(reentrant)
+ Assembler Routine(reentrant)
 
 In this case the second parameter onwards will be passed
 on the stack, the parameters are pushed from right to left
@@ -2582,7 +2582,7 @@ note the extra entry & exit linkage required for the assembler
 code, _bp is the stack frame pointer and is used to compute
 the offset into the stack for parameters and local variables.
 
-4.5 External Stack
+ External Stack
 
 The external stack is located at the start of the external
 ram segment, and is 256 bytes in size. When --xstack option
@@ -2599,13 +2599,13 @@ external ram segment into PORT P2, therefore when using
 the External Stack option, this port MAY NOT be used by
 the application program.
 
-4.6 ANSI-Compliance
+ ANSI-Compliance
 
 Deviations from the compliancy.
 
-* functions are not always reentrant.
+ functions are not always reentrant.
 
-* structures cannot be assigned values directly, cannot be
+ structures cannot be assigned values directly, cannot be
   passed as function parameters or assigned to each other
   and cannot be a return value from a function, e.g.:
   
@@ -2627,13 +2627,13 @@ Deviations from the compliancy.
   allowed in ANSI */ 
   }
 
-* 'long long' (64 bit integers) not supported.
+ 'long long' (64 bit integers) not supported.
 
-* 'double' precision floating point not supported.
+ 'double' precision floating point not supported.
 
-* No support for setjmp and longjmp (for now).
+ No support for setjmp and longjmp (for now).
 
-* Old K&R style function declarations are NOT allowed.
+ Old K&R style function declarations are NOT allowed.
   
   foo(i,j) /* this old style of function declarations */
   
@@ -2643,7 +2643,7 @@ Deviations from the compliancy.
       ... 
   }
 
-* functions declared as pointers must be dereferenced during
+ functions declared as pointers must be dereferenced during
   the call.
   
   int (*foo)();
@@ -2652,7 +2652,7 @@ Deviations from the compliancy.
   (*foo)(); /* ansi standard allows calls to be made like
   'foo()' */
 
-4.7 Cyclomatic Complexity
+ Cyclomatic Complexity
 
 Cyclomatic complexity of a function is defined as the number
 of independent paths the program can take during execution
@@ -2682,31 +2682,31 @@ of the function, it does however provide a good starting
 point for which functions you might look at for further
 optimization.
 
-5 TIPS
+ TIPS
 
 Here are a few guidelines that will help the compiler generate
 more efficient code, some of the tips are specific to this
 compiler others are generally good programming practice.
 
-* Use the smallest data type to represent your data-value.
+ Use the smallest data type to represent your data-value.
   If it is known in advance that the value is going to be
   less than 256 then use a 'char' instead of a 'short' or
   'int'.
 
-* Use unsigned when it is known in advance that the value
+ Use unsigned when it is known in advance that the value
   is not going to be negative. This helps especially if
   you are doing division or multiplication.
 
-* NEVER jump into a LOOP.
+ NEVER jump into a LOOP.
 
-* Declare the variables to be local whenever possible, especially
+ Declare the variables to be local whenever possible, especially
   loop control variables (induction).
 
-* Since the compiler does not do implicit integral promotion,
+ Since the compiler does not do implicit integral promotion,
   the programmer should do an explicit cast when integral
   promotion is required.
 
-* Reducing the size of division, multiplication & modulus
+ Reducing the size of division, multiplication & modulus
   operations can reduce code size substantially. Take the
   following code for example.
   
@@ -2732,7 +2732,7 @@ compiler others are generally good programming practice.
   versions of the compiler will be smart enough to detect
   such optimization oppurtunities).
 
-5.1 Notes on MCS51 memory layout
+ Notes on MCS51 memory layout
 
 The 8051 family of micro controller have a minimum of 128
 bytes of internal memory which is structured as follows
@@ -2805,21 +2805,21 @@ to try and squeeze the data area in the unused register
 banks if it will fit, and start the stack after the last
 bit variable.
 
-6 Retargetting for other MCUs.
+ Retargetting for other MCUs.
 
 The issues for retargetting the compiler are far too numerous
 to be covered by this document. What follows is a brief
 description of each of the seven phases of the compiler
 and its MCU dependency.
 
-* Parsing the source and building the annotated parse tree.
+ Parsing the source and building the annotated parse tree.
   This phase is largely MCU independent (except for the
   language extensions). Syntax & semantic checks are also
   done in this phase, along with some initial optimizations
   like back patching labels and the pattern matching optimizations
   like bit-rotation etc.
 
-* The second phase involves generating an intermediate code
+ The second phase involves generating an intermediate code
   which can be easy manipulated during the later phases.
   This phase is entirely MCU independent. The intermediate
   code generation assumes the target machine has unlimited
@@ -2827,7 +2827,7 @@ and its MCU dependency.
   iTemp. The compiler can be made to dump a human readable
   form of the code generated by using the --dumpraw option.
 
-* This phase does the bulk of the standard optimizations
+ This phase does the bulk of the standard optimizations
   and is also MCU independent. This phase can be broken
   down into several sub-phases:
   
@@ -2841,14 +2841,14 @@ and its MCU dependency.
   subexpression elimination' and 'dead code elimination'
   again.
 
-* This phase determines the live-ranges; by live range I
+ This phase determines the live-ranges; by live range I
   mean those iTemp variables defined by the compiler that
   still survive after all the optimizations. Live range
   analysis is essential for register allocation, since these
   computation determines which of these iTemps will be assigned
   to registers, and for how long.
 
-* Phase five is register allocation. There are two parts
+ Phase five is register allocation. There are two parts
   to this process.
   
   The first part I call 'register packing' (for lack of a
@@ -2861,17 +2861,17 @@ and its MCU dependency.
   of the limited number of index registers available in
   the 8051.
 
-* The Code generation phase is (unhappily), entirely MCU
+ The Code generation phase is (unhappily), entirely MCU
   dependent and very little (if any at all) of this code
   can be reused for other MCU. However the scheme for allocating
   a homogenized assembler operand for each iCode operand
   may be reused.
 
-* As mentioned in the optimization section the peep-hole
+ As mentioned in the optimization section the peep-hole
   optimizer is rule based system, which can reprogrammed
   for other MCUs.
 
-7 SDCDB - Source Level Debugger
+ SDCDB - Source Level Debugger
 
 SDCC is distributed with a source level debugger. The debugger
 uses a command line interface, the command repertoire of
@@ -2882,7 +2882,7 @@ and installs the debugger in the target directory specified
 during configuration. The debugger allows you debug BOTH
 at the C source and at the ASM source level.
 
-7.1 Compiling for Debugging
+ Compiling for Debugging
 
 The debug option must be specified for all files
 for which debug information is to be generated. The complier
@@ -2890,7 +2890,7 @@ generates a .cdb file for each of these files. The linker
 updates the .cdb file with the address information. This
 .cdb is used by the debugger.
 
-7.2 How the Debugger Works
+ How the Debugger Works
 
 When the --debug option is specified the compiler generates
 extra symbol information some of which are put into the
@@ -2903,7 +2903,7 @@ the program, the program execution is controlled by the
 debugger. When a command is issued for the debugger, it
 translates it into appropriate commands for the simulator.
 
-7.3 Starting the Debugger
+ Starting the Debugger
 
 The debugger can be started using the following command line.
 (Assume the file you are debugging has the file name foo).
@@ -2912,15 +2912,15 @@ sdcdb foo
 
 The debugger will look for the following files.
 
-* foo.c - the source file.
+ foo.c - the source file.
 
-* foo.cdb - the debugger symbol information file.
+ foo.cdb - the debugger symbol information file.
 
-* foo.ihx - the intel hex format object file.
+ foo.ihx - the intel hex format object file.
 
-7.4 Command Line Options.
+ Command Line Options.
 
-* --directory=<source file directory> this option can used
+ --directory=<source file directory> this option can used
   to specify the directory search list. The debugger will
   look into the directory list specified for source, cdb
   & ihx files. The items in the directory list must be separated
@@ -2929,23 +2929,23 @@ The debugger will look for the following files.
   be --directory=/home/src1:/home/src2. Note there can be
   no spaces in the option. 
 
-* -cd <directory> - change to the <directory>.
+ -cd <directory> - change to the <directory>.
 
-* -fullname - used by GUI front ends.
+ -fullname - used by GUI front ends.
 
-* -cpu <cpu-type> - this argument is passed to the simulator
+ -cpu <cpu-type> - this argument is passed to the simulator
   please see the simulator docs for details.
 
-* -X <Clock frequency > this options is passed to the simulator
+ -X <Clock frequency > this options is passed to the simulator
   please see the simulator docs for details.
 
-* -s <serial port file> passed to simulator see the simulator
+ -s <serial port file> passed to simulator see the simulator
   docs for details.
 
-* -S <serial in,out> passed to simulator see the simulator
+ -S <serial in,out> passed to simulator see the simulator
   docs for details.
 
-7.5 Debugger Commands.
+ Debugger Commands.
 
 As mention earlier the command interface for the debugger
 has been deliberately kept as close the GNU debugger gdb,
@@ -2953,7 +2953,7 @@ as possible. This will help the integration with existing
 graphical user interfaces (like ddd, xxgdb or xemacs) existing
 for the GNU debugger.
 
-7.5.1 break [line | file:line | function | file:function]
+ break [line | file:line | function | file:function]
 
 Set breakpoint at specified line or function:
 
@@ -2962,7 +2962,7 @@ sdcdb>break foo.c:100
 sdcdb>break funcfoo
 sdcdb>break foo.c:funcfoo
 
-7.5.2 clear [line | file:line | function | file:function ]
+ clear [line | file:line | function | file:function ]
 
 Clear breakpoint at specified line or function:
 
@@ -2971,64 +2971,64 @@ sdcdb>clear foo.c:100
 sdcdb>clear funcfoo
 sdcdb>clear foo.c:funcfoo
 
-7.5.3 continue
+ continue
 
 Continue program being debugged, after breakpoint.
 
-7.5.4 finish
+ finish
 
 Execute till the end of the current function.
 
-7.5.5 delete [n]
+ delete [n]
 
 Delete breakpoint number 'n'. If used without any option
 clear ALL user defined break points.
 
-7.5.6 info [break | stack | frame | registers ]
+ info [break | stack | frame | registers ]
 
-* info break - list all breakpoints
+ info break - list all breakpoints
 
-* info stack - show the function call stack.
+ info stack - show the function call stack.
 
-* info frame - show information about the current execution
+ info frame - show information about the current execution
   frame.
 
-* info registers - show content of all registers.
+ info registers - show content of all registers.
 
-7.5.7 step
+ step
 
 Step program until it reaches a different source line.
 
-7.5.8 next
+ next
 
 Step program, proceeding through subroutine calls.
 
-7.5.9 run
+ run
 
 Start debugged program.
 
-7.5.10 ptype variable 
+ ptype variable 
 
 Print type information of the variable.
 
-7.5.11 print variable
+ print variable
 
 print value of variable.
 
-7.5.12 file filename
+ file filename
 
 load the given file name. Note this is an alternate method
 of loading file for debugging.
 
-7.5.13 frame
+ frame
 
 print information about current frame.
 
-7.5.14 set srcmode
+ set srcmode
 
 Toggle between C source & assembly source.
 
-7.5.15 ! simulator command
+ ! simulator command
 
 Send the string following '!' to the simulator, the simulator
 response is displayed. Note the debugger does not interpret
@@ -3036,11 +3036,11 @@ the command being sent to the simulator, so if a command
 like 'go' is sent the debugger can loose its execution context
 and may display incorrect values.
 
-7.5.16 quit.
+ quit.
 
 "Watch me now. Iam going Down. My name is Bobby Brown"
 
-7.6 Interfacing with XEmacs.
+ Interfacing with XEmacs.
 
 Two files (in emacs lisp) are provided for the interfacing
 with XEmacs, sdcdb.el and sdcdbsrc.el. These two files can
@@ -3069,11 +3069,11 @@ directly are bound to default values in the file sdcdbsrc.el.
 The variables are listed below, these values maybe changed
 as required.
 
-* sdcdbsrc-cpu-type '51
+ sdcdbsrc-cpu-type '51
 
-* sdcdbsrc-frequency '11059200
+ sdcdbsrc-frequency '11059200
 
-* sdcdbsrc-serial nil
+ sdcdbsrc-serial nil
 
 The following is a list of key mapping for the debugger interface.
 
@@ -3144,9 +3144,9 @@ Toggle list mode
 ;; 
 
 
-8 Other Processors
+ Other Processors
 
-8.1 The Z80 and gbz80 port
+ The Z80 and gbz80 port
 
 SDCC can target both the Zilog Z80 and the Nintendo Gameboy's
 Z80-like gbz80. The port is incomplete - long support is
@@ -3163,7 +3163,7 @@ are stored in HL. One bad side effect of using IX as the
 base pointer is that a functions stack frame is limited
 to 127 bytes - this will be fixed in a later version.
 
-9 Support
+ Support
 
 SDCC has grown to be a large project. The compiler alone
 (without the preprocessor, assembler and linker) is about
@@ -3177,7 +3177,7 @@ SDCC users. There are lots of ways to contribute, and we
 encourage you to take part in making SDCC a great software
 package.
 
-9.1 Reporting Bugs
+ Reporting Bugs
 
 Send an email to the mailing list at 'user-sdcc@sdcc.sourceforge.net'
 or 'devel-sdcc@sdcc.sourceforge.net'. Bugs will be fixed
@@ -3188,7 +3188,7 @@ code, this can be very helpful. Compiling your program with
 the --dumpall option can sometimes be useful in locating
 optimization problems.
 
-10 Acknowledgments
+ Acknowledgments
 
 Sandeep Dutta (sandeep.dutta@usa.net) - SDCC, the compiler,
 MCS51 code generator, Debugger, AVR port

@@ -28,6 +28,9 @@
       Made everything static
 -------------------------------------------------------------------------*/
 
+#define D
+//#define D(x) x
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1611,6 +1614,8 @@ genIpush (iCode * ic)
   int size, offset = 0;
   char *l;
 
+  D(emitcode (";", "genIpush"));
+
   /* if this is not a parm push : ie. it is spill push
      and spill push is always done on the local stack */
   if (!ic->parmPush)
@@ -1839,6 +1844,7 @@ genCall (iCode * ic)
   bool restoreBank = FALSE;
   bool swapBanks = FALSE;
 
+  D(emitcode(";", "genCall"));
   /* if send set is not empty the assign */
   if (_G.sendSet)
     {
@@ -8145,6 +8151,8 @@ genCast (iCode * ic)
   sym_link *rtype = operandType (IC_RIGHT (ic));
   operand *right = IC_RIGHT (ic);
   int size, offset;
+
+  D(emitcode(";", "genCast"));
 
   /* if they are equivalent then do nothing */
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))

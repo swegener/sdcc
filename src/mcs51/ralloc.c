@@ -1902,6 +1902,16 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 			 bitVectFirstBit (OP_DEFS (op)))))
     return NULL;
 
+  /* if that only usage is a cast */
+  if (dic->op == CAST) {
+    /* to a bigger type */
+    if (getSize(OP_SYM_TYPE(IC_RESULT(dic))) > 
+	getSize(OP_SYM_TYPE(IC_RIGHT(dic)))) {
+      /* than we can not, since we cannot predict the usage of b & acc */
+      return NULL;
+    }
+  }
+
   /* found the definition now check if it is local */
   if (dic->seq < ebp->fSeq ||
       dic->seq > ebp->lSeq)

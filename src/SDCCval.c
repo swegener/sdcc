@@ -1044,6 +1044,10 @@ valComplement (value * val)
 	SPEC_CVAL (val->etype).v_uint = ~SPEC_CVAL (val->etype).v_uint;
       else
 	SPEC_CVAL (val->etype).v_int = ~SPEC_CVAL (val->etype).v_int;
+      if (SPEC_NOUN(val->etype) == V_CHAR)
+        if (   SPEC_CVAL(val->etype).v_int < -128
+            || SPEC_CVAL(val->etype).v_int >  127)
+          SPEC_NOUN(val->etype) = V_INT;
     }
   // ~(unsigned 3) now really is signed
   SPEC_USIGN(val->etype)=0;

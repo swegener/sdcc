@@ -2115,6 +2115,7 @@ resultTypePropagate (ast *tree, RESULT_TYPE resultType)
       case ':':
       case '|':
       case '^':
+      case '~':
       case '*':
       case '+':
       case '-':
@@ -3334,6 +3335,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
 	  return tree;
 	}
+      tree->left = addCast (tree->left, resultType, TRUE);
       LRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));
       return tree;

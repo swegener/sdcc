@@ -1311,7 +1311,9 @@ operandOperation (operand * left, operand * right,
       break;
 
     case '~':
-      retval = operandFromLit (~((TYPE_UDWORD) operandLitValue (left)));
+      retval = operandFromValue (valCastLiteral (type,
+                                                 ~((TYPE_UDWORD)
+                                                   operandLitValue (left))));
       break;
 
     case '!':

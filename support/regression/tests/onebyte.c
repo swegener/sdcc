@@ -169,3 +169,20 @@ testAnd(void)
   ucL = 0x80;  cR = 0x80; r16 = ucL &  cR; r16b =  cR & ucL; ASSERT(r16 ==           0x80); ASSERT(r16b ==           0x80);
   ucL = 0x80; ucR = 0x80; r16 = ucL & ucR; r16b = ucR & ucL; ASSERT(r16 ==           0x80); ASSERT(r16b ==           0x80);
 }
+
+void
+testComplement(void)
+{
+  {attrR}           char  c;
+  {attrR}  unsigned char uc;
+  volatile         short r16;
+
+   c = 0x00;  r16 = ~ c; ASSERT(r16    == (short) 0xffff); ASSERT(  ~ c < 0);
+  uc = 0x00;  r16 = ~uc; ASSERT(r16    == (short) 0xffff); ASSERT(  ~uc < 0);
+  ASSERT(~ (char)          0x00 == (short) 0xffff); ASSERT(~ (char)          0x00 < 0);
+  ASSERT(~ (unsigned char) 0x00 == (short) 0xffff); ASSERT(~ (unsigned char) 0x00 < 0);
+   c = 0x80;  r16 = ~ c; ASSERT(r16 == (short) 0x007f); ASSERT(~ c > 0);
+  uc = 0x80;  r16 = ~uc; ASSERT(r16 == (short) 0xff7f); ASSERT(~uc < 0);
+  ASSERT(~ (char)          0x80 == (short) 0x007f); ASSERT(~ (char)          0x80 > 0);
+  ASSERT(~ (unsigned char) 0x80 == (short) 0xff7f); ASSERT(~ (unsigned char) 0x80 < 0);
+}

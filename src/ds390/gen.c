@@ -6633,7 +6633,7 @@ genlshFour (operand * result, operand * left, int shCount)
 	movLeft2Result (left, LSB, result, MSB32, 0);
       aopPut (AOP (result), zero, LSB);
       aopPut (AOP (result), zero, MSB16);
-      aopPut (AOP (result), zero, MSB32);
+      aopPut (AOP (result), zero, MSB24);
       return;
     }
 

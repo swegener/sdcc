@@ -1880,21 +1880,18 @@ glue (void)
       /* entry point @ start of CSEG */
       fprintf (asmFile, "__sdcc_program_startup:\n");
 
-      /* put in the call to main */
-      fprintf (asmFile, "\tlcall\t_main\n");
+      /* put in jump or call to main */
       if (options.mainreturn)
-	{
-
-	  fprintf (asmFile, ";\treturn from main ; will return to caller\n");
-	  fprintf (asmFile, "\tret\n");
-
-	}
+        {
+          fprintf (asmFile, "\tljmp\t_main\n");   /* needed? */
+          fprintf (asmFile, ";\treturn from main will return to caller\n");
+        }
       else
-	{
-
-	  fprintf (asmFile, ";\treturn from main will lock up\n");
-	  fprintf (asmFile, "\tsjmp .\n");
-	}
+        {
+          fprintf (asmFile, "\tlcall\t_main\n");
+          fprintf (asmFile, ";\treturn from main will lock up\n");
+          fprintf (asmFile, "\tsjmp .\n");
+        }
     }
   copyFile (asmFile, code->oFile);
 

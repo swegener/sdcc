@@ -1545,23 +1545,6 @@ checkDecl (symbol * sym, int isProto)
   return 0;
 }
 
-/*-------------------------------------------------------------------*/
-/* copyStruct - makes a copy of the struct chain & rets ptr 2 struct */
-/*-------------------------------------------------------------------*/
-structdef *
-copyStruct (structdef * src)
-{
-  structdef *dst = (void *) NULL;
-
-  if (src)
-    {
-      dst = newStruct(src->tag);
-      memcpy(dst, src, sizeof(structdef));      /* copy it */
-      dst->fields = copySymbolChain(src->fields);
-    }
-  return dst;
-}
-
 /*------------------------------------------------------------------*/
 /* copyLinkChain - makes a copy of the link chain & rets ptr 2 head */
 /*------------------------------------------------------------------*/
@@ -1575,17 +1558,6 @@ copyLinkChain (sym_link * p)
   while (curr)
     {
       memcpy (loop, curr, sizeof (sym_link));   /* copy it */
-      if ((curr == p) && IS_STRUCT(curr) && SPEC_STRUCT(curr)->type == STRUCT)
-        {
-          /* if this is a struct specifier which ends */
-          /* with an array of unspecified length then */
-          /* copy the struct and it's fields */
-          struct symbol *field = SPEC_STRUCT(curr)->fields;
-          while (field && field->next)
-            field = field->next; /* find last one */
-          if (field && IS_ARRAY(field->type) && !DCL_ELEM(field->type))
-            SPEC_STRUCT(loop) = copyStruct(SPEC_STRUCT(curr));
-        }
       loop->next = (curr->next ? newLink (curr->next->class) : (void *) NULL);
       loop = loop->next;
       curr = curr->next;
@@ -1593,6 +1565,7 @@ copyLinkChain (sym_link * p)
 
   return head;
 }
+
 
 /*------------------------------------------------------------------*/
 /* cleanUpBlock - cleansup the symbol table specified for all the   */

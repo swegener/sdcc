@@ -1,5 +1,13 @@
 2004-08-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCsymt.c: undid changes that were not meant to be committed
+
+2004-08-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/hc08spec.mk: REENTRANT must be reentrant
+
+2004-08-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/hc08/gen.c (genUminusFloat): fixed bug where only 3 bytes were
 	  copied and wrong bit got inverted
 

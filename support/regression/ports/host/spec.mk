@@ -5,7 +5,7 @@ SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -DREENTRANT=
 EXEEXT = .bin
 
 # Required extras
-EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
+EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 %.out: %$(EXEEXT)
 	mkdir -p `dirname $@`
@@ -15,9 +15,12 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) -o $@ $< $(EXTRAS)
 
-%$(OBJEXT): %.c fwk/include/*.h
+%$(OBJEXT): %.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+ports/$(PORT)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 _clean:
-	rm -f ports/$(PORT)/support.o
+	rm -f ports/$(PORT)/support.o ports/$(PORT)/testfwk$(OBJEXT)
 

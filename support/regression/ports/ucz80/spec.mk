@@ -6,12 +6,12 @@ UCZ80 = $(SDCC_DIR)/bin/sz80
 #UCZ80 = $(SDCC_DIR)/bin/s51
 
 SDCCFLAGS +=-mz80 --lesspedantic --profile -DREENTRANT=
-#SDCCFLAGS +=--lesspedantic -DREENTRANT=reentrant --stack-after-data
+#SDCCFLAGS +=--lesspedantic -DREENTRANT=reentrant
 
 #OBJEXT = .o
 EXEEXT = .ihx
 
-EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
+EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
 #%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
@@ -25,6 +25,9 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
+$(PORTS_DIR)/$(PORT)/%$(OBJEXT): fwk/lib/%.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
 # run simulator with 10 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
@@ -35,6 +38,5 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 fwk/lib/timeout: fwk/lib/timeout.c
 
 _clean:
-	rm -f fwk/lib/timeout fwk/lib/timeout.exe $(PORTS_DIR)/$(PORT)/*.rel $(PORTS_DIR)/$(PORT)/*.rst \
-	      $(PORTS_DIR)/$(PORT)/*.lst $(PORTS_DIR)/$(PORT)/*.sym temp.lnk
+	rm -f ports/$(PORT)/testfwk.asm ports/$(PORT)/*.lst ports/$(PORT)/*.o ports/$(PORT)/*.sym
 

@@ -11,7 +11,7 @@ SDCCFLAGS +=-mxa51 --lesspedantic -DREENTRANT=
 OBJEXT = .rel
 EXEEXT = .hex
 
-EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
+EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .hex
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
@@ -20,6 +20,9 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 	mv fwk/lib/testfwk.map $(@:.hex=.map)
 
 %$(OBJEXT): %.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORTS_DIR)/$(PORT)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # run simulator with 10 seconds timeout
@@ -33,6 +36,6 @@ fwk/lib/timeout: fwk/lib/timeout.c
 
 _clean:
 	rm -f fwk/lib/timeout fwk/lib/timeout.exe $(PORTS_DIR)/$(PORT)/*.rel $(PORTS_DIR)/$(PORT)/*.rst \
-	      $(PORTS_DIR)/$(PORT)/*.lst $(PORTS_DIR)/$(PORT)/*.sym $(PORTS_DIR)/$(PORT)/*.xa temp.lnk
+	      $(PORTS_DIR)/$(PORT)/*.lst $(PORTS_DIR)/$(PORT)/*.sym $(PORTS_DIR)/$(PORT)/*.xa $(PORTS_DIR)/$(PORT)/*.lnk
 
 

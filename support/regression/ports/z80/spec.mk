@@ -8,7 +8,7 @@ SDCCFLAGS +=-mz80 --lesspedantic --profile -DREENTRANT=
 EXEEXT = .bin
 
 # Needs parts of gbdk-lib, namely the internal mul/div/mod functions.
-EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
+EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 # Rule to generate a Emulator .bin file from the .ihx linker output.
 %$(EXEEXT): %.ihx
@@ -25,9 +25,9 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 	$(SDCC_DIR)/bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.c
-	$(SDCC) $(SDCCFLAGS) -c $<
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-fwk/lib/testfwk$(OBJEXT): fwk/lib/testfwk.c
+ports/$(PORT)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # PENDING: Path to sdcc-extra
@@ -37,5 +37,5 @@ fwk/lib/testfwk$(OBJEXT): fwk/lib/testfwk.c
 	-grep -n FAIL $@ /dev/null || true
 
 _clean:
-	rm -f ports/$(PORT)/*.lst ports/$(PORT)/*.o ports/$(PORT)/*.sym
+	rm -f ports/$(PORT)/testfwk.asm ports/$(PORT)/*.lst ports/$(PORT)/*.o ports/$(PORT)/*.sym
 

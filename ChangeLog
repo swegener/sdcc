@@ -6,6 +6,8 @@
 	* as/mcs51/lkmem (summary): better fix for sp problem
 	* src/SDCCglue.c (glue): __start_stack - 1, saves 1 byte!
 	* src/ds390/main.c (_ds390_finaliseOptions, _tininative_finaliseOptions): stack_loc = 0x400008
+	* support/regression/ports/*/spec.mk: moving testfwk-object to port dir allow parallel execution of regression tests
+					      remove --stack-after-data
 
 2003-01-12  Bernhard Held <bernhard@bernhardheld.de>
 

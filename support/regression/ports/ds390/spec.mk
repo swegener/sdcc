@@ -6,12 +6,12 @@ S51B = $(SDCC_DIR)/bin/s51
 
 S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant --stack-after-data
+SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant
 
 OBJEXT = .rel
 EXEEXT = .ihx
 
-EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
+EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
@@ -20,6 +20,9 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
+$(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT): fwk/lib/testfwk.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+	
 # run simulator with 10 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
@@ -29,7 +32,9 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 
 fwk/lib/timeout: fwk/lib/timeout.c
 
+
 _clean:
 	rm -f fwk/lib/timeout fwk/lib/timeout.exe $(PORTS_DIR)/$(PORT)/*.rel $(PORTS_DIR)/$(PORT)/*.rst \
-	      $(PORTS_DIR)/$(PORT)/*.lst $(PORTS_DIR)/$(PORT)/*.sym $(PORTS_DIR)/$(PORT)/*.asm temp.lnk
+	      $(PORTS_DIR)/$(PORT)/*.lst $(PORTS_DIR)/$(PORT)/*.sym $(PORTS_DIR)/$(PORT)/*.asm \
+	      $(PORTS_DIR)/$(PORT)/*.lnk $(PORTS_DIR)/$(PORT)/*.map $(PORTS_DIR)/$(PORT)/*.mem
 

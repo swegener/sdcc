@@ -1008,7 +1008,8 @@ static void  checkSClass ( symbol *sym )
 	sym->ival == NULL               &&
 	!sym->level                     &&
 	port->mem.code_ro               &&
-	!IS_EXTERN(sym->etype)) 
+	!IS_EXTERN(sym->etype)		&&
+	!funcInChain(sym->type)) 
 	werror(E_CODE_NO_INIT,sym->name);
     
     /* if parameter or local variable then change */

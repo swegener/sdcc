@@ -265,6 +265,7 @@ iCodeTable;
 #define IS_CAST_ICODE(ic) (ic && ic->op == CAST)
 #define SET_ISADDR(op,v) {op = operandFromOperand(op); op->isaddr = v;}
 #define SET_RESULT_RIGHT(ic) {SET_ISADDR(IC_RIGHT(ic),0); SET_ISADDR(IC_RESULT(ic),0);}
+#define IS_ASSIGN_ICODE(ic) (ASSIGNMENT(ic) && !POINTER_SET(ic))
 
 #define OP_DEFS(op) op->operand.symOperand->defs
 #define OP_USES(op) op->operand.symOperand->uses

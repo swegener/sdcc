@@ -50,11 +50,29 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name avra
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name yacc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name config
+    End Project Dependency
 }}}
 
 ###############################################################################
 
 Project: "avra"=.\src\avr\avra.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "config"=.\config.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -76,6 +94,12 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name ds390a
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name yacc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name config
     End Project Dependency
 }}}
 
@@ -103,6 +127,12 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name msc51a
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name yacc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name config
     End Project Dependency
 }}}
 
@@ -143,11 +173,44 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name pica
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name yacc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name config
+    End Project Dependency
 }}}
 
 ###############################################################################
 
 Project: "pica"=.\src\pic\pica.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "sdcpp"=.\support\cpp2\sdcpp.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name sdcppa
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "sdcppa"=.\support\cpp2\sdcppa.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -185,6 +248,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name xa51
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name yacc
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -200,11 +266,29 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name xa51a
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name yacc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name config
+    End Project Dependency
 }}}
 
 ###############################################################################
 
 Project: "xa51a"=.\src\xa51\xa51a.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "yacc"=.\src\yacc.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -226,6 +310,12 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name z80a
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name yacc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name config
     End Project Dependency
 }}}
 
@@ -254,3 +344,4 @@ Package=<3>
 }}}
 
 ###############################################################################
+

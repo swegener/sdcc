@@ -784,8 +784,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 		FILE * oFile)
 {
   initList *iloop;
-  int lcnt = 0, size = 0;
-  sym_link *last_type;
+  int size = 0;
 
   /* take care of the special   case  */
   /* array of characters can be init  */
@@ -807,40 +806,28 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       return;
     }
 
-  iloop = ilist->init.deep;
-  lcnt = DCL_ELEM (type);
-  for (last_type = type->next; 
-       last_type && IS_DECL(last_type) && DCL_ELEM (last_type); 
-       last_type = last_type->next) {
-    lcnt *= DCL_ELEM (last_type);
-  }
-
-  for (;;)
+  for (iloop=ilist->init.deep; iloop; iloop=iloop->next)
     {
-      size++;
       printIval (sym, type->next, iloop, oFile);
-      iloop = (iloop ? iloop->next : NULL);
-
-
-      /* if not array limits given & we */
-      /* are out of initialisers then   */
-      if (!DCL_ELEM (type) && !iloop)
-	break;
-
-      /* no of elements given and we    */
-      /* have generated for all of them */
-      if (!--lcnt) {
-	/* if initializers left */
-	if (iloop) {
-	  werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
-	}
+      
+      if (++size > DCL_ELEM(type)) {
+	werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
 	break;
       }
     }
-
-  /* if we have not been given a size  */
-  if (!DCL_ELEM (type))
+  
+  if (DCL_ELEM(type)) {
+    // pad with zeros if needed
+    if (size<DCL_ELEM(type)) {
+      size = (DCL_ELEM(type) - size) * getSize(type->next);
+      while (size--) {
+	tfprintf (oFile, "\t!db !constbyte\n", 0);
+      }
+    }
+  } else {
+    // we have not been given a size, but we now know it
     DCL_ELEM (type) = size;
+  }
 
   return;
 }

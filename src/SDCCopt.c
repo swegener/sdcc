@@ -978,7 +978,7 @@ killDeadCode (eBBlock ** ebbs, int count)
 		      symbol * resultsym = OP_SYMBOL (IC_RESULT (ic));
 		      symbol * prereqv = resultsym->prereqv;
 		      
-		      if (OP_SYMBOL (prereqv->reqv) == resultsym)
+		      if (prereqv && prereqv->reqv && (OP_SYMBOL (prereqv->reqv) == resultsym))
 			{
 			  operand * newreqv;
 

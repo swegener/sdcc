@@ -1,3 +1,7 @@
+2005-05-09 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCopt.c (killDeadCode): fixed bug #1156016
+
 2005-03-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.h: moved CRITICAL and ENDCRITICAL from SKIP_IC2 to SKIP_IC

@@ -225,24 +225,22 @@ operand *operandLUse (operand *op, eBBlock **ebbs,
 	    ic->op != ADDRESS_OF      &&
 	    !IS_STATIC(etype)         ) {
 	    
-/* 	    if (OP_SYMBOL(op)->isreqv && !OP_SYMBOL(op)->_isparm){ */
-		
-/* 		if (SPIL_LOC(op) &&  */
-/* 		    bitVectIsZero(SPIL_LOC(op)->defs)) { */
-/* 		    OP_SYMBOL(op)->isspilt = 1; */
-/* 		    werror(W_LOCAL_NOINIT,			    */
-/* 			   SPIL_LOC(op)->name,			   */
-/* 			   ic->filename,ic->lineno);  */
-/* 		} */
-/* 	    } else { */
-		
-	    if (bitVectIsZero(op->usesDefs)) {
+	    if (bitVectIsZero(op->usesDefs)) {		
 		OP_SYMBOL(op)->isspilt = 1;
-		werror(W_LOCAL_NOINIT,			   
-		       OP_SYMBOL(op)->name,			  
-		       ic->filename,ic->lineno); 
-	    }
-/* 	    } */
+		
+		if (OP_SYMBOL(op)->isreqv && 
+		    !OP_SYMBOL(op)->_isparm && SPIL_LOC(op) ) {
+
+		    werror(W_LOCAL_NOINIT,			    
+ 			   SPIL_LOC(op)->name,			   
+ 			   ic->filename,ic->lineno);
+		} else {
+
+		    werror(W_LOCAL_NOINIT,			   
+			   OP_SYMBOL(op)->name,			  
+			   ic->filename,ic->lineno); 
+		}
+ 	    } 
 	}
     }
     return op;

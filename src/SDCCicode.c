@@ -2078,7 +2078,7 @@ operand *geniCodeDerefPtr (operand *op)
     if (IS_PTR(optype)) 
 	setOClass(optype,retype);    
         
-    #if 1
+    #if 0
     /* This block moved here from its original location
      * ten lines later by KV, 2/27/2000.
      * 
@@ -2101,7 +2101,7 @@ operand *geniCodeDerefPtr (operand *op)
 		  IS_CHAR(rtype)   ||
 		  IS_FLOAT(rtype) );
 
-    #if 0
+    #if 1
     /* Moved upwards */
     if (!lvaluereq)
 	op = geniCodeRValue(op,TRUE);
@@ -2797,6 +2797,7 @@ operand *ast2iCode (ast *tree)
 	 tree->opval.op != INLINEASM ) {
 	if (IS_ASSIGN_OP(tree->opval.op) || 
 	    IS_DEREF_OP(tree)            || 
+	    (tree->opval.op == '&' && !tree->right) ||
 	    tree->opval.op == PTR_OP) {
 	    lvaluereq++;
 	    left = operandFromAst(tree->left);
@@ -2804,7 +2805,8 @@ operand *ast2iCode (ast *tree)
 	} else {
 	    left =  operandFromAst(tree->left);
 	}
-	if (tree->opval.op == INC_OP || tree->opval.op == DEC_OP) {
+	if (tree->opval.op == INC_OP || 
+	    tree->opval.op == DEC_OP) {
 	    lvaluereq++;
 	    right= operandFromAst(tree->right);
 	    lvaluereq--;

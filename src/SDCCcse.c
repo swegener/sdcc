@@ -103,7 +103,8 @@ void replaceAllSymBySym (iCode *ic, operand *from , operand *to)
 	    IC_RESULT(lic)->isaddr = siaddr ;
 	}
 
-	if (IC_RIGHT(lic) && IC_RIGHT(lic)->key == from->key ) {
+	if (IS_SYMOP(to) &&
+	    IC_RIGHT(lic) && IC_RIGHT(lic)->key == from->key ) {
 	    bitVectUnSetBit (OP_USES(from),lic->key);
 	    OP_USES(to) = bitVectSetBit(OP_USES(to),lic->key);
 	    siaddr = IC_RIGHT(lic)->isaddr ;
@@ -111,7 +112,8 @@ void replaceAllSymBySym (iCode *ic, operand *from , operand *to)
 	    IC_RIGHT(lic)->isaddr = siaddr ;
 	}
 
-	if (IC_LEFT(lic) && IC_LEFT(lic)->key == from->key ) {
+	if (IS_SYMOP(to) &&
+	    IC_LEFT(lic) && IC_LEFT(lic)->key == from->key ) {
 	    bitVectUnSetBit (OP_USES(from),lic->key);
 	    OP_USES(to) = bitVectSetBit(OP_USES(to),lic->key);
 	    siaddr = IC_LEFT(lic)->isaddr ;

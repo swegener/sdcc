@@ -1,5 +1,7 @@
 2001-10-09  Michael Hope  <michaelh@juju.net.nz>
 
+	* support/regression/tests/bug-469671.c: Added.
+
 	* src/z80/gen.c (shiftIntoPair): Fixed up warning.
 
 2001-10-08  Michael Hope  <michaelh@juju.net.nz>

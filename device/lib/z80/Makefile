@@ -9,7 +9,7 @@ OBJ = div.o mul.o putchar.o printf.o # asm_strings.o string.s
 LIB = z80.lib
 CC = $(SCC)
 AS = $(SAS)
-CFLAGS = -I../include -I.
+CFLAGS = -I../../include -I.
 
 all: $(LIB) crt0.o
 

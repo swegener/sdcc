@@ -63,7 +63,7 @@ objects: $(OBJECTS)
 
 models:
 	for model in $(MODELS); do \
-	  mkdir $$model; \
+	  test -d $$model || mkdir $$model; \
 	  $(MAKE) CFLAGS="$(CFLAGS) --model-$$model" objects; \
 	  mv *.rel $$model; \
 	  mv *.asm $$model; \
@@ -117,7 +117,7 @@ dep: Makefile.dep
 
 Makefile.dep: $(SOURCES) $(INCDIR)/*.h
 	for i in $(SOURCES); do \
-	  $(CPP) -M $(CPPFLAGS) $$i $${i}.dep; \
+	  $(CPP) -M $(CPPFLAGS) $$i >$${i}.dep; \
 	  cat $${i}.dep >>Makefile.dep; \
 	  rm $${i}.dep; \
 	done

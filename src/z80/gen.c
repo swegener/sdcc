@@ -6815,7 +6815,7 @@ genGenPointerSet (operand * right,
     {
       fetchPair (pairId, AOP (result));
     }
-  /* so hl know contains the address */
+  /* so hl now contains the address */
   freeAsmop (result, NULL, ic);
 
   /* if bit then unpack */
@@ -7491,12 +7491,25 @@ genArrayInit (iCode * ic)
     
   if (type && type->next)
     {
-      elementSize = getSize(type->next);
+      if (IS_SPEC(type->next))
+        {
+          elementSize = getSize(type->next);
+        }
+      else if (IS_ARRAY(type->next) && type->next->next)
+        {
+          elementSize = getSize(type->next->next);
+        }
+      else
+        {
+          wassertl (0, "Can't determine element size in genArrayInit.");
+        }
     }
   else
     {
       wassertl (0, "Can't determine element size in genArrayInit.");
     }
+
+  wassertl ((elementSize > 0) && (elementSize <= 4), "Illegal element size in genArrayInit.");
 
   iLoop = IC_ARRAYILIST(ic);
   lastVal = (unsigned)-1;
@@ -7510,17 +7523,14 @@ genArrayInit (iCode * ic)
     {
       ix = iLoop->count;
 
-      if (ix != 0)
+      for (i = 0; i < ix; i++)
         {
-          for (i = 0; i < ix; i++)
+          for (eIndex = 0; eIndex < elementSize; eIndex++)
             {
-              for (eIndex = 0; eIndex < elementSize; eIndex++)
-                {
-                  val = (((int)iLoop->literalValue) >> (eIndex * 8)) & 0xff;
-                  _rleAppend(&rle, val);
-                }
+              val = (((int)iLoop->literalValue) >> (eIndex * 8)) & 0xff;
+              _rleAppend(&rle, val);
             }
-	}
+        }
 	
       iLoop = iLoop->next;
     }

@@ -38,16 +38,16 @@
 symbol *interrupts[INTNO_MAX+1];
 
 void printIval (symbol *, sym_link *, initList *, FILE *);
-set *publics = NULL;		/* public variables */
-set *externs = NULL;		/* Varibles that are declared as extern */
+set *publics = NULL;            /* public variables */
+set *externs = NULL;            /* Varibles that are declared as extern */
 
 /* TODO: this should be configurable (DS803C90 uses more than 6) */
 unsigned maxInterrupts = 6;
 int allocInfo = 1;
 symbol *mainf;
 set *pipeSet = NULL;            /* set of pipes */
-set *tmpfileSet = NULL;		/* set of tmp file created by the compiler */
-set *tmpfileNameSet = NULL;	/* All are unlinked at close. */
+set *tmpfileSet = NULL;         /* set of tmp file created by the compiler */
+set *tmpfileNameSet = NULL;     /* All are unlinked at close. */
 
 /*-----------------------------------------------------------------*/
 /* closePipes - closes all pipes created by the compiler           */
@@ -136,52 +136,52 @@ copyFile (FILE * dest, FILE * src)
 char *
 aopLiteralLong (value * val, int offset, int size)
 {
-	union {
-		float f;
-		unsigned char c[4];
-	}
-	fl;
+  union {
+    float f;
+    unsigned char c[4];
+  }
+  fl;
 
-	if (!val) {
-	  // assuming we have been warned before
-	  val=constVal("0");
-	}
+  if (!val) {
+    // assuming we have been warned before
+    val=constVal("0");
+  }
 
-	/* if it is a float then it gets tricky */
-	/* otherwise it is fairly simple */
-	if (!IS_FLOAT (val->type)) {
-		unsigned long v = (unsigned long) floatFromVal (val);
+  /* if it is a float then it gets tricky */
+  /* otherwise it is fairly simple */
+  if (!IS_FLOAT (val->type)) {
+    unsigned long v = (unsigned long) floatFromVal (val);
 
-		v >>= (offset * 8);
-		switch (size) {
-		case 1:
-			tsprintf (buffer, sizeof(buffer), 
-				  "!immedbyte", (unsigned int) v & 0xff);
-			break;
-		case 2:
-			tsprintf (buffer, sizeof(buffer), 
-				  "!immedword", (unsigned int) v & 0xffff);
-			break;
-		default:
-			/* Hmm.  Too big for now. */
-			assert (0);
-		}
-		return Safe_strdup (buffer);
-	}
+    v >>= (offset * 8);
+    switch (size) {
+    case 1:
+      tsprintf (buffer, sizeof(buffer), 
+          "!immedbyte", (unsigned int) v & 0xff);
+      break;
+    case 2:
+      tsprintf (buffer, sizeof(buffer), 
+          "!immedword", (unsigned int) v & 0xffff);
+      break;
+    default:
+      /* Hmm.  Too big for now. */
+      assert (0);
+    }
+    return Safe_strdup (buffer);
+  }
 
-	/* PENDING: For now size must be 1 */
-	assert (size == 1);
+  /* PENDING: For now size must be 1 */
+  assert (size == 1);
 
-	/* it is type float */
-	fl.f = (float) floatFromVal (val);
+  /* it is type float */
+  fl.f = (float) floatFromVal (val);
 #ifdef WORDS_BIGENDIAN
-	tsprintf (buffer, sizeof(buffer), 
-		  "!immedbyte", fl.c[3 - offset]);
+  tsprintf (buffer, sizeof(buffer), 
+      "!immedbyte", fl.c[3 - offset]);
 #else
-	tsprintf (buffer, sizeof(buffer), 
-		  "!immedbyte", fl.c[offset]);
+  tsprintf (buffer, sizeof(buffer), 
+      "!immedbyte", fl.c[offset]);
 #endif
-	return Safe_strdup (buffer);
+  return Safe_strdup (buffer);
 }
 
 /*-----------------------------------------------------------------*/
@@ -190,7 +190,7 @@ aopLiteralLong (value * val, int offset, int size)
 char *
 aopLiteral (value * val, int offset)
 {
-	return aopLiteralLong (val, offset, 1);
+  return aopLiteralLong (val, offset, 1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -209,13 +209,13 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
     {
       /* PENDING: special case here - should remove */
       if (!strcmp (map->sname, CODE_NAME))
-	tfprintf (map->oFile, "\t!areacode\n", map->sname);
+        tfprintf (map->oFile, "\t!areacode\n", map->sname);
       else if (!strcmp (map->sname, DATA_NAME))
-	tfprintf (map->oFile, "\t!areadata\n", map->sname);
+        tfprintf (map->oFile, "\t!areadata\n", map->sname);
       else if (!strcmp (map->sname, HOME_NAME))
-	tfprintf (map->oFile, "\t!areahome\n", map->sname);
+        tfprintf (map->oFile, "\t!areahome\n", map->sname);
       else
-	tfprintf (map->oFile, "\t!area\n", map->sname);
+        tfprintf (map->oFile, "\t!area\n", map->sname);
     }
  
   for (sym = setFirstItem (map->syms); sym;
@@ -225,144 +225,157 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
       /* if extern then add it into the extern list */
       if (IS_EXTERN (sym->etype))
-	{
+        {
           addSetHead (&externs, sym);
-	  continue;
-	}
+          continue;
+        }
 
       /* if allocation required check is needed
          then check if the symbol really requires
          allocation only for local variables */
 
       if (arFlag && !IS_AGGREGATE (sym->type) &&
-	  !(sym->_isparm && !IS_REGPARM (sym->etype)) &&
-	  !sym->allocreq && sym->level)
-	continue;
+          !(sym->_isparm && !IS_REGPARM (sym->etype)) &&
+          !sym->allocreq && sym->level)
+        continue;
 
       /* for bitvar locals and parameters */
       if (!arFlag && !sym->allocreq && sym->level 
-	  && !SPEC_ABSA (sym->etype)) {
-	continue;
+          && !SPEC_ABSA (sym->etype)) {
+        continue;
       }
 
       /* if global variable & not static or extern
          and addPublics allowed then add it to the public set */
       if ((sym->level == 0 ||
-	   (sym->_isparm && !IS_REGPARM (sym->etype))) &&
-	  addPublics &&
-	  !IS_STATIC (sym->etype) &&
+           (sym->_isparm && !IS_REGPARM (sym->etype))) &&
+          addPublics &&
+          !IS_STATIC (sym->etype) &&
           (IS_FUNC(sym->type) ? (sym->used || IFFUNC_HASBODY(sym->type)) : 1))
-	{
-	  addSetHead (&publics, sym);
-	}
+        {
+          addSetHead (&publics, sym);
+        }
 
       /* if extern then do nothing or is a function
          then do nothing */
       if (IS_FUNC (sym->type) && !(sym->isitmp))
-	continue;
+        continue;
 
       /* print extra debug info if required */
       if (options.debug)
-	{
-	  if (!sym->level) /* global */
-	    {
-	      if (IS_STATIC (sym->etype))
-	        fprintf (map->oFile, "F%s$", moduleName); /* scope is file */
-	      else
-	        fprintf (map->oFile, "G$");	/* scope is global */
-	    }
-	  else
-	    {
-	      /* symbol is local */
-	      fprintf (map->oFile, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
-	    }
-	  fprintf (map->oFile, "%s$%d$%d", sym->name, sym->level, sym->block);
-	}
+        {
+          if (!sym->level) /* global */
+            {
+              if (IS_STATIC (sym->etype))
+                fprintf (map->oFile, "F%s$", moduleName); /* scope is file */
+              else
+                fprintf (map->oFile, "G$");     /* scope is global */
+            }
+          else
+            {
+              /* symbol is local */
+              fprintf (map->oFile, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
+            }
+          fprintf (map->oFile, "%s$%d$%d", sym->name, sym->level, sym->block);
+        }
       
       /* if it has an initial value then do it only if
          it is a global variable */
       if (sym->ival && sym->level == 0) {
-	if (SPEC_OCLS(sym->etype)==xidata) {
-	  /* create a new "XINIT (CODE)" symbol, that will be emitted later
-	     in the static seg */
-	  newSym=copySymbol (sym);
-	  SPEC_OCLS(newSym->etype)=xinit;
-	  SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
-	  SNPRINTF (newSym->rname, sizeof(newSym->rname), "__xinit_%s", sym->rname);
-	  if (IS_SPEC (newSym->type))
+        if (SPEC_OCLS(sym->etype)==xidata) {
+          /* create a new "XINIT (CODE)" symbol, that will be emitted later
+             in the static seg */
+          newSym=copySymbol (sym);
+          SPEC_OCLS(newSym->etype)=xinit;
+          SNPRINTF (newSym->name, sizeof(newSym->name), "__xinit_%s", sym->name);
+          SNPRINTF (newSym->rname, sizeof(newSym->rname), "__xinit_%s", sym->rname);
+          if (IS_SPEC (newSym->type))
             SPEC_CONST (newSym->type) = 1;
           else
             DCL_PTR_CONST (newSym->type) = 1;
-	  SPEC_STAT(newSym->etype)=1;
-	  resolveIvalSym(newSym->ival, newSym->type);
+          SPEC_STAT(newSym->etype)=1;
+          resolveIvalSym(newSym->ival, newSym->type);
 
-	  // add it to the "XINIT (CODE)" segment
-	  addSet(&xinit->syms, newSym);
-	  sym->ival=NULL;
-	} else {
-	  if (IS_AGGREGATE (sym->type)) {
-	    ival = initAggregates (sym, sym->ival, NULL);
-	  } else {
-	    if (getNelements(sym->type, sym->ival)>1) {
-	      werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", 
-		      sym->name);
-	    }
-	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
-			    decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
-	  }
-	  codeOutFile = statsg->oFile;
+          // add it to the "XINIT (CODE)" segment
+          addSet(&xinit->syms, newSym);
 
-	  if (ival) {
-	    // set ival's lineno to where the symbol was defined
-	    setAstLineno (ival, lineno=sym->lineDef);
-	    // check if this is not a constant expression
-	    if (!constExprTree(ival)) {
-	      werror (E_CONST_EXPECTED, "found expression");
-	      // but try to do it anyway
-	    }
-	    allocInfo = 0;
+          if (!SPEC_ABSA (sym->etype))
+            {
+              FILE *tmpFile = tempfile ();
+              addSetHead (&tmpfileSet, tmpFile);
+              // before allocation we must parse the sym->ival tree
+              // but without actually generating initialization code
+              noAlloc++;
+              resolveIvalSym (sym->ival, sym->type);
+              printIval (sym, sym->type, sym->ival, tmpFile);
+              noAlloc--;
+            }
+
+          sym->ival=NULL;
+        } else {
+          if (IS_AGGREGATE (sym->type)) {
+            ival = initAggregates (sym, sym->ival, NULL);
+          } else {
+            if (getNelements(sym->type, sym->ival)>1) {
+              werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", 
+                      sym->name);
+            }
+            ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
+                            decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
+          }
+          codeOutFile = statsg->oFile;
+
+          if (ival) {
+            // set ival's lineno to where the symbol was defined
+            setAstLineno (ival, lineno=sym->lineDef);
+            // check if this is not a constant expression
+            if (!constExprTree(ival)) {
+              werror (E_CONST_EXPECTED, "found expression");
+              // but try to do it anyway
+            }
+            allocInfo = 0;
             if (!astErrors(ival))
-	      eBBlockFromiCode (iCodeFromAst (ival));
-	    allocInfo = 1;
-	  }
-	}	  
-	sym->ival = NULL;
+              eBBlockFromiCode (iCodeFromAst (ival));
+            allocInfo = 1;
+          }
+        }         
+        sym->ival = NULL;
       }
 
-      /* if is has an absolute address then generate
+      /* if it has an absolute address then generate
          an equate for this no need to allocate space */
       if (SPEC_ABSA (sym->etype))
-	{
-	  char *equ="=";
-	  if (options.debug) {
-	    fprintf (map->oFile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-	  }
-	  if (TARGET_IS_XA51) {
-	    if (map==sfr) {
-	      equ="sfr";
-	    } else if (map==bit || map==sfrbit) {
-	      equ="bit";
-	    }
-	  }
-	  fprintf (map->oFile, "%s\t%s\t0x%04x\n",
-		   sym->rname, equ,
-		   SPEC_ADDR (sym->etype));
-	}
+        {
+          char *equ="=";
+          if (options.debug) {
+            fprintf (map->oFile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+          }
+          if (TARGET_IS_XA51) {
+            if (map==sfr) {
+              equ="sfr";
+            } else if (map==bit || map==sfrbit) {
+              equ="bit";
+            }
+          }
+          fprintf (map->oFile, "%s\t%s\t0x%04x\n",
+                   sym->rname, equ,
+                   SPEC_ADDR (sym->etype));
+        }
       else {
-	int size = getSize (sym->type);
-	if (size==0) {
-	  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
-	}
-	/* allocate space */
-	if (options.debug) {
-	  fprintf (map->oFile, "==.\n");
-	}
-	if (IS_STATIC (sym->etype))
-	  tfprintf (map->oFile, "!slabeldef\n", sym->rname);
-	else
-	  tfprintf (map->oFile, "!labeldef\n", sym->rname);	      
-	tfprintf (map->oFile, "\t!ds\n", 
-		  (unsigned int)  size & 0xffff);
+        int size = getAllocSize (sym->type);
+        if (size==0) {
+          werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
+        }
+        /* allocate space */
+        if (options.debug) {
+          fprintf (map->oFile, "==.\n");
+        }
+        if (IS_STATIC (sym->etype))
+          tfprintf (map->oFile, "!slabeldef\n", sym->rname);
+        else
+          tfprintf (map->oFile, "!labeldef\n", sym->rname);           
+        tfprintf (map->oFile, "\t!ds\n", 
+                  (unsigned int)  size & 0xffff);
       }
     }
 }
@@ -373,130 +386,136 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 value *
 initPointer (initList * ilist, sym_link *toType)
 {
-	value *val;
-	ast *expr = list2expr (ilist);
-	
-	if (!expr)
-		goto wrong;
-	
-	/* try it the oldway first */
-	if ((val = constExprValue (expr, FALSE)))
-		return val;
-	
-	/* ( ptr + constant ) */
-	if (IS_AST_OP (expr) &&
-	    (expr->opval.op == '+' || expr->opval.op == '-') &&
-	    IS_AST_SYM_VALUE (expr->left) &&
-	    (IS_ARRAY(expr->left->ftype) || IS_PTR(expr->left->ftype)) &&
-	    compareType(toType, expr->left->ftype) &&
-	    IS_AST_LIT_VALUE (expr->right)) {
-	  return valForCastAggr (expr->left, expr->left->ftype,
-				      expr->right,
-				      expr->opval.op);
-	}
-	
-	/* (char *)&a */
-	if (IS_AST_OP(expr) && expr->opval.op==CAST &&
-	    IS_AST_OP(expr->right) && expr->right->opval.op=='&') {
-	  if (compareType(toType, expr->left->ftype)!=1) {
-	    werror (W_INIT_WRONG);
-	    printFromToType(expr->left->ftype, toType);
-	  }
-	  // skip the cast ???
-	  expr=expr->right;
-	}
+  value *val;
+  ast *expr;
 
-	/* no then we have to do these cludgy checks */
-	/* pointers can be initialized with address of
-	   a variable or address of an array element */
-	if (IS_AST_OP (expr) && expr->opval.op == '&') {
-		/* address of symbol */
-		if (IS_AST_SYM_VALUE (expr->left)) {
-			val = copyValue (AST_VALUE (expr->left));
-			val->type = newLink (DECLARATOR);
-			if (SPEC_SCLS (expr->left->etype) == S_CODE) {
-				DCL_TYPE (val->type) = CPOINTER;
-				DCL_PTR_CONST (val->type) = port->mem.code_ro;
-			}
-			else if (SPEC_SCLS (expr->left->etype) == S_XDATA)
-				DCL_TYPE (val->type) = FPOINTER;
-			else if (SPEC_SCLS (expr->left->etype) == S_XSTACK)
-				DCL_TYPE (val->type) = PPOINTER;
-			else if (SPEC_SCLS (expr->left->etype) == S_IDATA)
-				DCL_TYPE (val->type) = IPOINTER;
-			else if (SPEC_SCLS (expr->left->etype) == S_EEPROM)
-				DCL_TYPE (val->type) = EEPPOINTER;
-			else
-				DCL_TYPE (val->type) = POINTER;
-			val->type->next = expr->left->ftype;
-			val->etype = getSpec (val->type);
-			return val;
-		}
+  if (!ilist) {
+      return valCastLiteral(toType, 0.0);
+  }
 
-		/* if address of indexed array */
-		if (IS_AST_OP (expr->left) && expr->left->opval.op == '[')
-			return valForArray (expr->left);
+  expr = list2expr (ilist);
+  
+  if (!expr)
+    goto wrong;
+  
+  /* try it the old way first */
+  if ((val = constExprValue (expr, FALSE)))
+    return val;
+  
+  /* ( ptr + constant ) */
+  if (IS_AST_OP (expr) &&
+      (expr->opval.op == '+' || expr->opval.op == '-') &&
+      IS_AST_SYM_VALUE (expr->left) &&
+      (IS_ARRAY(expr->left->ftype) || IS_PTR(expr->left->ftype)) &&
+      compareType(toType, expr->left->ftype) &&
+      IS_AST_LIT_VALUE (expr->right)) {
+    return valForCastAggr (expr->left, expr->left->ftype,
+                           expr->right,
+                           expr->opval.op);
+  }
+  
+  /* (char *)&a */
+  if (IS_AST_OP(expr) && expr->opval.op==CAST &&
+      IS_AST_OP(expr->right) && expr->right->opval.op=='&') {
+    if (compareType(toType, expr->left->ftype)!=1) {
+      werror (W_INIT_WRONG);
+      printFromToType(expr->left->ftype, toType);
+    }
+    // skip the cast ???
+    expr=expr->right;
+  }
 
-		/* if address of structure element then
-		   case 1. a.b ; */
-		if (IS_AST_OP (expr->left) &&
-		    expr->left->opval.op == '.') {
-			return valForStructElem (expr->left->left,
-						 expr->left->right);
-		}
+  /* no then we have to do these cludgy checks */
+  /* pointers can be initialized with address of
+     a variable or address of an array element */
+  if (IS_AST_OP (expr) && expr->opval.op == '&') {
+    /* address of symbol */
+    if (IS_AST_SYM_VALUE (expr->left)) {
+      val = copyValue (AST_VALUE (expr->left));
+      val->type = newLink (DECLARATOR);
+      if (SPEC_SCLS (expr->left->etype) == S_CODE) {
+        DCL_TYPE (val->type) = CPOINTER;
+        DCL_PTR_CONST (val->type) = port->mem.code_ro;
+      }
+      else if (SPEC_SCLS (expr->left->etype) == S_XDATA)
+        DCL_TYPE (val->type) = FPOINTER;
+      else if (SPEC_SCLS (expr->left->etype) == S_XSTACK)
+        DCL_TYPE (val->type) = PPOINTER;
+      else if (SPEC_SCLS (expr->left->etype) == S_IDATA)
+        DCL_TYPE (val->type) = IPOINTER;
+      else if (SPEC_SCLS (expr->left->etype) == S_EEPROM)
+        DCL_TYPE (val->type) = EEPPOINTER;
+      else
+        DCL_TYPE (val->type) = POINTER;
+      val->type->next = expr->left->ftype;
+      val->etype = getSpec (val->type);
+      return val;
+    }
 
-		/* case 2. (&a)->b ;
-		   (&some_struct)->element */
-		if (IS_AST_OP (expr->left) &&
-		    expr->left->opval.op == PTR_OP &&
-		    IS_ADDRESS_OF_OP (expr->left->left)) {
-		  return valForStructElem (expr->left->left->left,
-					   expr->left->right);
-		}
-	}
-	/* case 3. (((char *) &a) +/- constant) */
-	if (IS_AST_OP (expr) &&
-	    (expr->opval.op == '+' || expr->opval.op == '-') &&
-	    IS_AST_OP (expr->left) && expr->left->opval.op == CAST &&
-	    IS_AST_OP (expr->left->right) &&
-	    expr->left->right->opval.op == '&' &&
-	    IS_AST_LIT_VALUE (expr->right)) {
+    /* if address of indexed array */
+    if (IS_AST_OP (expr->left) && expr->left->opval.op == '[')
+      return valForArray (expr->left);
 
-		return valForCastAggr (expr->left->right->left,
-				       expr->left->left->opval.lnk,
-				       expr->right, expr->opval.op);
+    /* if address of structure element then
+       case 1. a.b ; */
+    if (IS_AST_OP (expr->left) &&
+        expr->left->opval.op == '.') {
+      return valForStructElem (expr->left->left,
+                               expr->left->right);
+    }
 
-	}
-	/* case 4. (char *)(array type) */
-	if (IS_CAST_OP(expr) && IS_AST_SYM_VALUE (expr->right) &&
-	    IS_ARRAY(expr->right->ftype)) {
+    /* case 2. (&a)->b ;
+       (&some_struct)->element */
+    if (IS_AST_OP (expr->left) &&
+        expr->left->opval.op == PTR_OP &&
+        IS_ADDRESS_OF_OP (expr->left->left)) {
+      return valForStructElem (expr->left->left->left,
+                               expr->left->right);
+    }
+  }
+  /* case 3. (((char *) &a) +/- constant) */
+  if (IS_AST_OP (expr) &&
+      (expr->opval.op == '+' || expr->opval.op == '-') &&
+      IS_AST_OP (expr->left) && expr->left->opval.op == CAST &&
+      IS_AST_OP (expr->left->right) &&
+      expr->left->right->opval.op == '&' &&
+      IS_AST_LIT_VALUE (expr->right)) {
 
-		val = copyValue (AST_VALUE (expr->right));
-		val->type = newLink (DECLARATOR);
-		if (SPEC_SCLS (expr->right->etype) == S_CODE) {
-			DCL_TYPE (val->type) = CPOINTER;
-			DCL_PTR_CONST (val->type) = port->mem.code_ro;
-		}
-		else if (SPEC_SCLS (expr->right->etype) == S_XDATA)
-			DCL_TYPE (val->type) = FPOINTER;
-		else if (SPEC_SCLS (expr->right->etype) == S_XSTACK)
-			DCL_TYPE (val->type) = PPOINTER;
-		else if (SPEC_SCLS (expr->right->etype) == S_IDATA)
-			DCL_TYPE (val->type) = IPOINTER;
-		else if (SPEC_SCLS (expr->right->etype) == S_EEPROM)
-			DCL_TYPE (val->type) = EEPPOINTER;
-		else
-			DCL_TYPE (val->type) = POINTER;
-		val->type->next = expr->right->ftype->next;
-		val->etype = getSpec (val->type);
-		return val;
-	}
+    return valForCastAggr (expr->left->right->left,
+                           expr->left->left->opval.lnk,
+                           expr->right, expr->opval.op);
+
+  }
+  /* case 4. (char *)(array type) */
+  if (IS_CAST_OP(expr) && IS_AST_SYM_VALUE (expr->right) &&
+      IS_ARRAY(expr->right->ftype)) {
+
+    val = copyValue (AST_VALUE (expr->right));
+    val->type = newLink (DECLARATOR);
+    if (SPEC_SCLS (expr->right->etype) == S_CODE) {
+      DCL_TYPE (val->type) = CPOINTER;
+      DCL_PTR_CONST (val->type) = port->mem.code_ro;
+    }
+    else if (SPEC_SCLS (expr->right->etype) == S_XDATA)
+      DCL_TYPE (val->type) = FPOINTER;
+    else if (SPEC_SCLS (expr->right->etype) == S_XSTACK)
+      DCL_TYPE (val->type) = PPOINTER;
+    else if (SPEC_SCLS (expr->right->etype) == S_IDATA)
+      DCL_TYPE (val->type) = IPOINTER;
+    else if (SPEC_SCLS (expr->right->etype) == S_EEPROM)
+      DCL_TYPE (val->type) = EEPPOINTER;
+    else
+      DCL_TYPE (val->type) = POINTER;
+    val->type->next = expr->right->ftype->next;
+    val->etype = getSpec (val->type);
+    return val;
+  }
  wrong:
-	if (expr)
-	  werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
-	else
-	  werror (E_INCOMPAT_PTYPES);
-	return NULL;
+  if (expr)
+    werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
+  else
+    werror (E_INCOMPAT_PTYPES);
+  return NULL;
 
 }
 
@@ -516,35 +535,35 @@ printChar (FILE * ofile, char *s, int plen)
     {
       i = 60;
       while (i && pplen < plen)
-	{
-	  if (*s < ' ' || *s == '\"' || *s=='\\')
-	    {
-	      *p = '\0';
-	      if (p != buf)
-		tfprintf (ofile, "\t!ascii\n", buf);
-	      tfprintf (ofile, "\t!db !constbyte\n", (unsigned char)*s);
-	      p = buf;
-	    }
-	  else
-	    {
-	      *p = *s;
-	      p++;
-	    }
-	  s++;
-	  pplen++;
-	  i--;
-	}
+        {
+          if (*s < ' ' || *s == '\"' || *s=='\\')
+            {
+              *p = '\0';
+              if (p != buf)
+                tfprintf (ofile, "\t!ascii\n", buf);
+              tfprintf (ofile, "\t!db !constbyte\n", (unsigned char)*s);
+              p = buf;
+            }
+          else
+            {
+              *p = *s;
+              p++;
+            }
+          s++;
+          pplen++;
+          i--;
+        }
       if (p != buf)
-	{
-	  *p = '\0';
-	  tfprintf (ofile, "\t!ascii\n", buf);
-	  p = buf;
-	}
+        {
+          *p = '\0';
+          tfprintf (ofile, "\t!ascii\n", buf);
+          p = buf;
+        }
 
       if (len > 60)
-	len -= 60;
+        len -= 60;
       else
-	len = 0;
+        len = 0;
     }
   while (pplen < plen)
     {
@@ -565,9 +584,9 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
     case POINTER:
       return GPTYPE_NEAR;
     case GPOINTER:
-	werror (E_CANNOT_USE_GENERIC_POINTER, 
-		iname ? iname : "<null>", 
-		oname ? oname : "<null>");
+      werror (E_CANNOT_USE_GENERIC_POINTER, 
+              iname ? iname : "<null>", 
+              oname ? oname : "<null>");
       exit (1);
     case FPOINTER:
       return GPTYPE_FAR;
@@ -577,7 +596,7 @@ pointerTypeToGPByte (const int p_type, const char *iname, const char *oname)
       return GPTYPE_XSTACK;
     default:
       fprintf (stderr, "*** internal error: unknown pointer type %d in GPByte.\n",
-	       p_type);
+               p_type);
       break;
     }
   return -1;
@@ -621,7 +640,7 @@ printPointerType (FILE * oFile, const char *name)
 /*-----------------------------------------------------------------*/
 void 
 printGPointerType (FILE * oFile, const char *iname, const char *oname,
-		   const unsigned int type)
+                   const unsigned int type)
 {
   _printPointerType (oFile, iname);
   fprintf (oFile, ",#0x%02x\n", pointerTypeToGPByte (type, iname, oname));
@@ -633,55 +652,55 @@ printGPointerType (FILE * oFile, const char *iname, const char *oname,
 void 
 printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 {
-	value *val;
+  value *val;
 
-	/* if initList is deep */
-	if (ilist->type == INIT_DEEP)
-		ilist = ilist->init.deep;
+  /* if initList is deep */
+  if (ilist && (ilist->type == INIT_DEEP))
+    ilist = ilist->init.deep;
 
-	if (!(val = list2val (ilist))) {
-	  // assuming a warning has been thrown
-	  val=constVal("0");
-	}
+  if (!(val = list2val (ilist))) {
+    // assuming a warning has been thrown
+    val=constVal("0");
+  }
 
-	if (val->type != type) {
-	  val = valCastLiteral(type, floatFromVal(val));
-	}
-	
-	switch (getSize (type)) {
-	case 1:
-		if (!val)
-			tfprintf (oFile, "\t!db !constbyte\n", 0);
-		else
-			tfprintf (oFile, "\t!dbs\n",
-				  aopLiteral (val, 0));
-		break;
+  if (val->type != type) {
+    val = valCastLiteral(type, floatFromVal(val));
+  }
+  
+  switch (getSize (type)) {
+  case 1:
+    if (!val)
+      tfprintf (oFile, "\t!db !constbyte\n", 0);
+    else
+      tfprintf (oFile, "\t!dbs\n",
+                aopLiteral (val, 0));
+    break;
 
-	case 2:
-		if (port->use_dw_for_init)
-			tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
-		else if (port->little_endian)
-			fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
-		else
-			fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
-		break;
-	case 4:
-		if (!val) {
-			tfprintf (oFile, "\t!dw !constword\n", 0);
-			tfprintf (oFile, "\t!dw !constword\n", 0);
-		}
-		else if (port->little_endian) {
-			fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-				 aopLiteral (val, 0), aopLiteral (val, 1),
-				 aopLiteral (val, 2), aopLiteral (val, 3));
-		}
-		else {
-			fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-				 aopLiteral (val, 3), aopLiteral (val, 2),
-				 aopLiteral (val, 1), aopLiteral (val, 0));
-		}
-		break;
-	}
+  case 2:
+    if (port->use_dw_for_init)
+      tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
+    else if (port->little_endian)
+      fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
+    else
+      fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
+    break;
+  case 4:
+    if (!val) {
+      tfprintf (oFile, "\t!dw !constword\n", 0);
+      tfprintf (oFile, "\t!dw !constword\n", 0);
+    }
+    else if (port->little_endian) {
+      fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+               aopLiteral (val, 0), aopLiteral (val, 1),
+               aopLiteral (val, 2), aopLiteral (val, 3));
+    }
+    else {
+      fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+               aopLiteral (val, 3), aopLiteral (val, 2),
+               aopLiteral (val, 1), aopLiteral (val, 0));
+    }
+    break;
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -689,49 +708,49 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 /*-----------------------------------------------------------------*/
 void printIvalBitFields(symbol **sym, initList **ilist, FILE * oFile)
 {
-	value *val ;
-	symbol *lsym = *sym;
-	initList *lilist = *ilist ;
-	unsigned long ival = 0;
-	int size =0;
+  value *val ;
+  symbol *lsym = *sym;
+  initList *lilist = *ilist ;
+  unsigned long ival = 0;
+  int size =0;
 
-	
-	do {
-		unsigned long i;
-		val = list2val(lilist);
-		if (size) {
-			if (SPEC_BLEN(lsym->etype) > 8) {
-				size += ((SPEC_BLEN (lsym->etype) / 8) + 
-					 (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
-			}
-		} else {
-			size = ((SPEC_BLEN (lsym->etype) / 8) + 
-				 (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
-		}
-		i = (unsigned long)floatFromVal(val);
-		i <<= SPEC_BSTR (lsym->etype);
-		ival |= i;
-		if (! ( lsym->next &&
-			(IS_BITFIELD(lsym->next->type)) &&
-			(SPEC_BSTR(lsym->next->etype)))) break;
-		lsym = lsym->next;
-		lilist = lilist->next;
-	} while (1);
-	switch (size) {
-	case 1:
-		tfprintf (oFile, "\t!db !constbyte\n",ival);
-		break;
+  
+  do {
+    unsigned long i;
+    val = list2val(lilist);
+    if (size) {
+      if (SPEC_BLEN(lsym->etype) > 8) {
+        size += ((SPEC_BLEN (lsym->etype) / 8) + 
+                 (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+      }
+    } else {
+      size = ((SPEC_BLEN (lsym->etype) / 8) + 
+              (SPEC_BLEN (lsym->etype) % 8 ? 1 : 0));
+    }
+    i = (unsigned long)floatFromVal(val);
+    i <<= SPEC_BSTR (lsym->etype);
+    ival |= i;
+    if (! ( lsym->next &&
+          (IS_BITFIELD(lsym->next->type)) &&
+          (SPEC_BSTR(lsym->next->etype)))) break;
+    lsym = lsym->next;
+    lilist = lilist->next;
+  } while (1);
+  switch (size) {
+  case 1:
+    tfprintf (oFile, "\t!db !constbyte\n",ival);
+    break;
 
-	case 2:
-		tfprintf (oFile, "\t!dw !constword\n",ival);
-		break;
-	case 4: /* EEP: why is this db and not dw? */
-		tfprintf (oFile, "\t!db  !constword,!constword\n",
-			 (ival >> 8) & 0xffff, (ival & 0xffff));
-		break;
-	}
-	*sym = lsym;
-	*ilist = lilist;
+  case 2:
+    tfprintf (oFile, "\t!dw !constword\n",ival);
+    break;
+  case 4: /* EEP: why is this db and not dw? */
+    tfprintf (oFile, "\t!db  !constword,!constword\n",
+             (ival >> 8) & 0xffff, (ival & 0xffff));
+    break;
+  }
+  *sym = lsym;
+  *ilist = lilist;
 }
 
 /*-----------------------------------------------------------------*/
@@ -739,30 +758,33 @@ void printIvalBitFields(symbol **sym, initList **ilist, FILE * oFile)
 /*-----------------------------------------------------------------*/
 void 
 printIvalStruct (symbol * sym, sym_link * type,
-		 initList * ilist, FILE * oFile)
+                 initList * ilist, FILE * oFile)
 {
-	symbol *sflds;
-	initList *iloop;
+  symbol *sflds;
+  initList *iloop = NULL;
 
-	sflds = SPEC_STRUCT (type)->fields;
-	if (ilist->type != INIT_DEEP) {
-		werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
-		return;
-	}
+  sflds = SPEC_STRUCT (type)->fields;
 
-	iloop = ilist->init.deep;
+  if (ilist) {
+    if (ilist->type != INIT_DEEP) {
+      werrorfl (sym->fileDef, sym->lineDef, E_INIT_STRUCT, sym->name);
+      return;
+    }
 
-	for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
-		if (IS_BITFIELD(sflds->type)) {
-			printIvalBitFields(&sflds,&iloop,oFile);
-		} else {
-			printIval (sym, sflds->type, iloop, oFile);
-		}
-	}
-	if (iloop) {
-	  werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "struct", sym->name);
-	}
-	return;
+    iloop = ilist->init.deep;
+  }
+
+  for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
+    if (IS_BITFIELD(sflds->type)) {
+      printIvalBitFields(&sflds,&iloop,oFile);
+    } else {
+      printIval (sym, sflds->type, iloop, oFile);
+    }
+  }
+  if (iloop) {
+    werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "struct", sym->name);
+  }
+  return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -779,16 +801,16 @@ printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
       val = list2val (ilist);
       /* if the value is a character string  */
       if (IS_ARRAY (val->type) && IS_CHAR (val->etype))
-	{
-	  if (!DCL_ELEM (type))
-	    DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
+        {
+          if (!DCL_ELEM (type))
+            DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
 
-	  printChar (oFile, SPEC_CVAL (val->etype).v_char, DCL_ELEM (type));
+          printChar (oFile, SPEC_CVAL (val->etype).v_char, DCL_ELEM (type));
 
-	  return 1;
-	}
+          return 1;
+        }
       else
-	return 0;
+        return 0;
     }
   else
     printChar (oFile, s, strlen (s) + 1);
@@ -800,47 +822,47 @@ printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
 /*-----------------------------------------------------------------*/
 void
 printIvalArray (symbol * sym, sym_link * type, initList * ilist,
-		FILE * oFile)
+                FILE * oFile)
 {
   initList *iloop;
   int size = 0;
 
-  /* take care of the special   case  */
-  /* array of characters can be init  */
-  /* by a string                      */
-  if (IS_CHAR (type->next)) {
-    if (!IS_LITERAL(list2val(ilist)->etype)) {
-      werrorfl (ilist->filename, ilist->lineno, E_CONST_EXPECTED);
-      return;
+  if (ilist) {
+    /* take care of the special   case  */
+    /* array of characters can be init  */
+    /* by a string                      */
+    if (IS_CHAR (type->next)) {
+      if (!IS_LITERAL(list2val(ilist)->etype)) {
+        werrorfl (ilist->filename, ilist->lineno, E_CONST_EXPECTED);
+        return;
+      }
+      if (printIvalChar (type,
+                         (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
+                         oFile, SPEC_CVAL (sym->etype).v_char))
+        return;
     }
-    if (printIvalChar (type,
-		       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
-		       oFile, SPEC_CVAL (sym->etype).v_char))
-      return;
-  }
-  /* not the special case             */
-  if (ilist->type != INIT_DEEP)
-    {
+    /* not the special case             */
+    if (ilist->type != INIT_DEEP) {
       werrorfl (ilist->filename, ilist->lineno, E_INIT_STRUCT, sym->name);
       return;
     }
 
-  for (iloop=ilist->init.deep; iloop; iloop=iloop->next)
-    {
+    for (iloop=ilist->init.deep; iloop; iloop=iloop->next) {
       printIval (sym, type->next, iloop, oFile);
       
-      if (++size > DCL_ELEM(type)) {
-	werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "array", sym->name);
-	break;
+      if ((++size > DCL_ELEM(type)) && DCL_ELEM(type)) {
+        werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "array", sym->name);
+        break;
       }
     }
+  }
   
   if (DCL_ELEM(type)) {
     // pad with zeros if needed
     if (size<DCL_ELEM(type)) {
       size = (DCL_ELEM(type) - size) * getSize(type->next);
       while (size--) {
-	tfprintf (oFile, "\t!db !constbyte\n", 0);
+        tfprintf (oFile, "\t!db !constbyte\n", 0);
       }
     }
   } else {
@@ -860,15 +882,18 @@ printIvalFuncPtr (sym_link * type, initList * ilist, FILE * oFile)
   value *val;
   int dLvl = 0;
 
-  val = list2val (ilist);
+  if (ilist)
+    val = list2val (ilist);
+  else
+    val = valCastLiteral(type, 0.0);
 
   if (!val) {
-    // an error has been thrown allready
+    // an error has been thrown already
     val=constVal("0");
   }
 
   if (IS_LITERAL(val->etype)) {
-    if (compareType(type,val->etype)==0) {
+    if (compareType(type, val->etype) == 0) {
       werrorfl (ilist->filename, ilist->lineno, E_INCOMPAT_TYPES);
       printFromToType (val->type, type);
     }
@@ -887,13 +912,13 @@ printIvalFuncPtr (sym_link * type, initList * ilist, FILE * oFile)
   if (!val->sym)
     {
       if (port->use_dw_for_init)
-	{
-	  tfprintf (oFile, "\t!dws\n", val->name);
-	}
+        {
+          tfprintf (oFile, "\t!dws\n", val->name);
+        }
       else
-	{
-	  printPointerType (oFile, val->name);
-	}
+        {
+          printPointerType (oFile, val->name);
+        }
     }
   else if (port->use_dw_for_init)
     {
@@ -923,99 +948,99 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 
   if (val->name && strlen (val->name))
     {
-      if (size == 1)		/* This appears to be Z80 specific?? */
-	{
-	  tfprintf (oFile,
-		    "\t!dbs\n", val->name);
-	}
+      if (size == 1)            /* This appears to be Z80 specific?? */
+        {
+          tfprintf (oFile,
+                    "\t!dbs\n", val->name);
+        }
       else if (size == FPTRSIZE)
-	{
-	  if (port->use_dw_for_init)
-	    {
-	      tfprintf (oFile, "\t!dws\n", val->name);
-	    }
-	  else
-	    {
-	      printPointerType (oFile, val->name);
-	    }
-	}
+        {
+          if (port->use_dw_for_init)
+            {
+              tfprintf (oFile, "\t!dws\n", val->name);
+            }
+          else
+            {
+              printPointerType (oFile, val->name);
+            }
+        }
       else if (size == GPTRSIZE)
-	{
-	  int type;
-	  if (IS_PTR (val->type)) {
-	    type = DCL_TYPE (val->type);
-	  } else {
-	    type = PTR_TYPE (SPEC_OCLS (val->etype));
-	  }
-	  if (val->sym && val->sym->isstrlit) {
-	    // this is a literal string
-	    type=CPOINTER;
-	  }
-	  printGPointerType (oFile, val->name, sym->name, type);
-	}
+        {
+          int type;
+          if (IS_PTR (val->type)) {
+            type = DCL_TYPE (val->type);
+          } else {
+            type = PTR_TYPE (SPEC_OCLS (val->etype));
+          }
+          if (val->sym && val->sym->isstrlit) {
+            // this is a literal string
+            type=CPOINTER;
+          }
+          printGPointerType (oFile, val->name, sym->name, type);
+        }
       else
-	{
-	  fprintf (stderr, "*** internal error: unknown size in "
-		   "printIvalCharPtr.\n");
-	}
+        {
+          fprintf (stderr, "*** internal error: unknown size in "
+                   "printIvalCharPtr.\n");
+        }
     }
   else
     {
       // these are literals assigned to pointers
       switch (size)
-	{
-	case 1:
-	  tfprintf (oFile, "\t!dbs\n", aopLiteral (val, 0));
-	  break;
-	case 2:
-	  if (port->use_dw_for_init)
-	    tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, size));
-	  else if (port->little_endian)
-	    tfprintf (oFile, "\t.byte %s,%s\n",
-		      aopLiteral (val, 0), aopLiteral (val, 1));
-	  else
-	    tfprintf (oFile, "\t.byte %s,%s\n",
-		      aopLiteral (val, 1), aopLiteral (val, 0));
-	  break;
-	case 3:
-	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
-	    // non-zero mcs51 generic pointer
-	    werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
-	  }
-	  if (port->little_endian) {
-	    fprintf (oFile, "\t.byte %s,%s,%s\n",
-	 	     aopLiteral (val, 0), 
-		     aopLiteral (val, 1),
-		     aopLiteral (val, 2));
-	  } else {
-	    fprintf (oFile, "\t.byte %s,%s,%s\n",
-	 	     aopLiteral (val, 2), 
-		     aopLiteral (val, 1),
-		     aopLiteral (val, 0));
-	  }
-	  break;
-	case 4:
-	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
-	    // non-zero ds390 generic pointer
-	    werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
-	  }
-	  if (port->little_endian) {
-	    fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-		     aopLiteral (val, 0), 
-		     aopLiteral (val, 1), 
-		     aopLiteral (val, 2),
-		     aopLiteral (val, 3));
-	  } else {
-	    fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-		     aopLiteral (val, 3), 
-		     aopLiteral (val, 2), 
-		     aopLiteral (val, 1),
-		     aopLiteral (val, 0));
-	  }
-	  break;
-	default:
-	  assert (0);
-	}
+        {
+        case 1:
+          tfprintf (oFile, "\t!dbs\n", aopLiteral (val, 0));
+          break;
+        case 2:
+          if (port->use_dw_for_init)
+            tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, size));
+          else if (port->little_endian)
+            tfprintf (oFile, "\t.byte %s,%s\n",
+                      aopLiteral (val, 0), aopLiteral (val, 1));
+          else
+            tfprintf (oFile, "\t.byte %s,%s\n",
+                      aopLiteral (val, 1), aopLiteral (val, 0));
+          break;
+        case 3:
+          if (IS_GENPTR(type) && floatFromVal(val)!=0) {
+            // non-zero mcs51 generic pointer
+            werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
+          }
+          if (port->little_endian) {
+            fprintf (oFile, "\t.byte %s,%s,%s\n",
+                     aopLiteral (val, 0), 
+                     aopLiteral (val, 1),
+                     aopLiteral (val, 2));
+          } else {
+            fprintf (oFile, "\t.byte %s,%s,%s\n",
+                     aopLiteral (val, 2), 
+                     aopLiteral (val, 1),
+                     aopLiteral (val, 0));
+          }
+          break;
+        case 4:
+          if (IS_GENPTR(type) && floatFromVal(val)!=0) {
+            // non-zero ds390 generic pointer
+            werrorfl (sym->fileDef, sym->lineDef, E_LITERAL_GENERIC);
+          }
+          if (port->little_endian) {
+            fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+                     aopLiteral (val, 0), 
+                     aopLiteral (val, 1), 
+                     aopLiteral (val, 2),
+                     aopLiteral (val, 3));
+          } else {
+            fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+                     aopLiteral (val, 3), 
+                     aopLiteral (val, 2), 
+                     aopLiteral (val, 1),
+                     aopLiteral (val, 0));
+          }
+          break;
+        default:
+          assert (0);
+        }
     }
 
   if (val->sym && val->sym->isstrlit && !isinSet(statsg->syms, val->sym)) {
@@ -1035,7 +1060,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
   int size;
 
   /* if deep then   */
-  if (ilist->type == INIT_DEEP)
+  if (ilist && (ilist->type == INIT_DEEP))
     ilist = ilist->init.deep;
 
   /* function pointer     */
@@ -1063,60 +1088,60 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
   if (IS_LITERAL (val->etype))
     {
       switch (getSize (type))
-	{
-	case 1:
-	  tfprintf (oFile, "\t!db !constbyte\n", (unsigned int) floatFromVal (val) & 0xff);
-	  break;
-	case 2:
-	  if (port->use_dw_for_init)
-	    tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
-	  else if (port->little_endian)
-	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
-	  else
-	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
-	  break;
-	case 3: // how about '390??
-	  fprintf (oFile, "; generic printIvalPtr\n");
-	  if (port->little_endian)
-	    {
-	      fprintf (oFile, "\t.byte %s,%s",
-		       aopLiteral (val, 0), aopLiteral (val, 1));
-	    }
-	  else
-	    {
-	      fprintf (oFile, "\t.byte %s,%s",
-		       aopLiteral (val, 1), aopLiteral (val, 0));
-	    }
-	  if (IS_GENPTR (val->type))
-	    fprintf (oFile, ",%s\n", aopLiteral (val, 2));
-	  else if (IS_PTR (val->type))
-	    fprintf (oFile, ",#%x\n", pointerTypeToGPByte (DCL_TYPE (val->type), NULL, NULL));
-	  else
-	    fprintf (oFile, ",%s\n", aopLiteral (val, 2));
-	}
+        {
+        case 1:
+          tfprintf (oFile, "\t!db !constbyte\n", (unsigned int) floatFromVal (val) & 0xff);
+          break;
+        case 2:
+          if (port->use_dw_for_init)
+            tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
+          else if (port->little_endian)
+            tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
+          else
+            tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
+          break;
+        case 3: // how about '390??
+          fprintf (oFile, "; generic printIvalPtr\n");
+          if (port->little_endian)
+            {
+              fprintf (oFile, "\t.byte %s,%s",
+                       aopLiteral (val, 0), aopLiteral (val, 1));
+            }
+          else
+            {
+              fprintf (oFile, "\t.byte %s,%s",
+                       aopLiteral (val, 1), aopLiteral (val, 0));
+            }
+          if (IS_GENPTR (val->type))
+            fprintf (oFile, ",%s\n", aopLiteral (val, 2));
+          else if (IS_PTR (val->type))
+            fprintf (oFile, ",#%x\n", pointerTypeToGPByte (DCL_TYPE (val->type), NULL, NULL));
+          else
+            fprintf (oFile, ",%s\n", aopLiteral (val, 2));
+        }
       return;
     }
 
 
   size = getSize (type);
 
-  if (size == 1)		/* Z80 specific?? */
+  if (size == 1)                /* Z80 specific?? */
     {
       tfprintf (oFile, "\t!dbs\n", val->name);
     }
   else if (size == FPTRSIZE)
     {
       if (port->use_dw_for_init) {
-	tfprintf (oFile, "\t!dws\n", val->name);
+        tfprintf (oFile, "\t!dws\n", val->name);
       } else {
-	printPointerType (oFile, val->name);
+        printPointerType (oFile, val->name);
       }
     }
   else if (size == GPTRSIZE)
     {
       printGPointerType (oFile, val->name, sym->name,
-			 (IS_PTR (val->type) ? DCL_TYPE (val->type) :
-			  PTR_TYPE (SPEC_OCLS (val->etype))));
+                         (IS_PTR (val->type) ? DCL_TYPE (val->type) :
+                          PTR_TYPE (SPEC_OCLS (val->etype))));
     }
   return;
 }
@@ -1129,9 +1154,6 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 {
   sym_link *itype;
   
-  if (!ilist)
-    return;
-
   /* if structure then    */
   if (IS_STRUCT (type))
     {
@@ -1146,31 +1168,34 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
       return;
     }
 
-  // not an aggregate, ilist must be a node
-  if (ilist->type!=INIT_NODE) {
-      // or a 1-element list
-    if (ilist->init.deep->next) {
-      werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", 
-	      sym->name);
-    } else {
-      ilist=ilist->init.deep;
-    }
-  }
+  if (ilist)
+    {
+      // not an aggregate, ilist must be a node
+      if (ilist->type!=INIT_NODE) {
+          // or a 1-element list
+        if (ilist->init.deep->next) {
+          werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", 
+                  sym->name);
+        } else {
+          ilist=ilist->init.deep;
+        }
+      }
 
-  // and the type must match
-  itype=ilist->init.node->ftype;
+      // and the type must match
+      itype=ilist->init.node->ftype;
 
-  if (compareType(type, itype)==0) {
-    // special case for literal strings
-    if (IS_ARRAY (itype) && IS_CHAR (getSpec(itype)) &&
-	// which are really code pointers
-	IS_PTR(type) && DCL_TYPE(type)==CPOINTER) {
-      // no sweat
-    } else {
-      werrorfl (ilist->filename, ilist->lineno, E_TYPE_MISMATCH, "assignment", " ");
-      printFromToType(itype, type);
+      if (compareType(type, itype)==0) {
+        // special case for literal strings
+        if (IS_ARRAY (itype) && IS_CHAR (getSpec(itype)) &&
+            // which are really code pointers
+            IS_PTR(type) && DCL_TYPE(type)==CPOINTER) {
+          // no sweat
+        } else {
+          werrorfl (ilist->filename, ilist->lineno, E_TYPE_MISMATCH, "assignment", " ");
+          printFromToType(itype, type);
+        }
+      }
     }
-  }
 
   /* if this is a pointer */
   if (IS_PTR (type))
@@ -1204,7 +1229,7 @@ emitStaticSeg (memmap * map, FILE * out)
 
       /* if it is "extern" then do nothing */
       if (IS_EXTERN (sym->etype))
-	continue;
+        continue;
 
       /* if it is not static add it to the public
          table */
@@ -1216,69 +1241,69 @@ emitStaticSeg (memmap * map, FILE * out)
       /* print extra debug info if required */
       if (options.debug) {
 
-	if (!sym->level)
-	  {			/* global */
-	    if (IS_STATIC (sym->etype))
-	      fprintf (out, "F%s$", moduleName);	/* scope is file */
-	    else
-	      fprintf (out, "G$");	/* scope is global */
-	  }
-	else
-	  /* symbol is local */
-	  fprintf (out, "L%s$",
-		   (sym->localof ? sym->localof->name : "-null-"));
-	fprintf (out, "%s$%d$%d", sym->name, sym->level, sym->block);
+        if (!sym->level)
+          {                     /* global */
+            if (IS_STATIC (sym->etype))
+              fprintf (out, "F%s$", moduleName);        /* scope is file */
+            else
+              fprintf (out, "G$");      /* scope is global */
+          }
+        else
+          /* symbol is local */
+          fprintf (out, "L%s$",
+                   (sym->localof ? sym->localof->name : "-null-"));
+        fprintf (out, "%s$%d$%d", sym->name, sym->level, sym->block);
       }
       
       /* if it has an absolute address */
       if (SPEC_ABSA (sym->etype))
-	{
-	  if (options.debug)
-	    fprintf (out, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-	  
-	  fprintf (out, "%s\t=\t0x%04x\n",
-		   sym->rname,
-		   SPEC_ADDR (sym->etype));
-	}
+        {
+          if (options.debug)
+            fprintf (out, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+          
+          fprintf (out, "%s\t=\t0x%04x\n",
+                   sym->rname,
+                   SPEC_ADDR (sym->etype));
+        }
       else
-	{
-	  if (options.debug)
-	    fprintf (out, " == .\n");
-	  
-	  /* if it has an initial value */
-	  if (sym->ival)
-	    {
-	      fprintf (out, "%s:\n", sym->rname);
-	      noAlloc++;
-	      resolveIvalSym (sym->ival, sym->type);
-	      printIval (sym, sym->type, sym->ival, out);
-	      noAlloc--;
-	      /* if sym is a simple string and sym->ival is a string, 
-		 WE don't need it anymore */
-	      if (IS_ARRAY(sym->type) && IS_CHAR(sym->type->next) &&
-		  IS_AST_SYM_VALUE(list2expr(sym->ival)) &&
-		  list2val(sym->ival)->sym->isstrlit) {
-		freeStringSymbol(list2val(sym->ival)->sym);
-	      }
-	    }
-	  else {
-	      /* allocate space */
-	      int size = getSize (sym->type);
-	      
-	      if (size==0) {
-		  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE,sym->name);
-	      }
-	      fprintf (out, "%s:\n", sym->rname);
-	      /* special case for character strings */
-	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
-		  SPEC_CVAL (sym->etype).v_char)
-		  printChar (out,
-			     SPEC_CVAL (sym->etype).v_char,
-			     size);
-	      else
-		  tfprintf (out, "\t!ds\n", (unsigned int) size & 0xffff);
-	    }
-	}
+        {
+          if (options.debug)
+            fprintf (out, " == .\n");
+          
+          /* if it has an initial value */
+          if (sym->ival)
+            {
+              fprintf (out, "%s:\n", sym->rname);
+              noAlloc++;
+              resolveIvalSym (sym->ival, sym->type);
+              printIval (sym, sym->type, sym->ival, out);
+              noAlloc--;
+              /* if sym is a simple string and sym->ival is a string, 
+                 WE don't need it anymore */
+              if (IS_ARRAY(sym->type) && IS_CHAR(sym->type->next) &&
+                  IS_AST_SYM_VALUE(list2expr(sym->ival)) &&
+                  list2val(sym->ival)->sym->isstrlit) {
+                freeStringSymbol(list2val(sym->ival)->sym);
+              }
+            }
+          else {
+              /* allocate space */
+              int size = getSize (sym->type);
+              
+              if (size==0) {
+                  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE,sym->name);
+              }
+              fprintf (out, "%s:\n", sym->rname);
+              /* special case for character strings */
+              if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
+                  SPEC_CVAL (sym->etype).v_char)
+                  printChar (out,
+                             SPEC_CVAL (sym->etype).v_char,
+                             size);
+              else
+                  tfprintf (out, "\t!ds\n", (unsigned int) size & 0xffff);
+            }
+        }
     }
 }
 
@@ -1339,7 +1364,7 @@ createInterruptVect (FILE * vFile)
   if (!(mainf = findSymWithLevel (SymbolTab, mainf)))
     {
       if (!options.cc_only && !noAssemble && !options.c1mode)
-	werror (E_NO_MAIN);
+        werror (E_NO_MAIN);
       return;
     }
 
@@ -1348,7 +1373,7 @@ createInterruptVect (FILE * vFile)
     {
       /* if ! compile only then main function should be present */
       if (!options.cc_only && !noAssemble)
-	werror (E_NO_MAIN);
+        werror (E_NO_MAIN);
       return;
     }
 
@@ -1366,20 +1391,20 @@ createInterruptVect (FILE * vFile)
 
       /* now for the other interrupts */
       for (; i < maxInterrupts; i++)
-	{
-	  if (interrupts[i])
-	    {
-	      fprintf (vFile, "\tljmp\t%s\n", interrupts[i]->rname);
-	      if ( i != maxInterrupts - 1 )
-	 	fprintf (vFile, "\t.ds\t5\n");
-	    }
-	  else
-	    {
-	      fprintf (vFile, "\treti\n");
-	      if ( i != maxInterrupts - 1 )
-		fprintf (vFile, "\t.ds\t7\n");
-	    }
-	}
+        {
+          if (interrupts[i])
+            {
+              fprintf (vFile, "\tljmp\t%s\n", interrupts[i]->rname);
+              if ( i != maxInterrupts - 1 )
+                fprintf (vFile, "\t.ds\t5\n");
+            }
+          else
+            {
+              fprintf (vFile, "\treti\n");
+              if ( i != maxInterrupts - 1 )
+                fprintf (vFile, "\t.ds\t7\n");
+            }
+        }
     }
 }
 
@@ -1460,83 +1485,83 @@ emitOverlay (FILE * afile)
       symbol *sym;
 
       if (elementsInSet (ovrset))
-	{
-	  /* output the area informtion */
-	  fprintf (afile, "\t.area\t%s\n", port->mem.overlay_name);	/* MOF */
-	}
+        {
+          /* output the area informtion */
+          fprintf (afile, "\t.area\t%s\n", port->mem.overlay_name);     /* MOF */
+        }
 
       for (sym = setFirstItem (ovrset); sym;
-	   sym = setNextItem (ovrset))
-	{
-	  /* if extern then it is in the publics table: do nothing */
-	  if (IS_EXTERN (sym->etype))
-	    continue;
+           sym = setNextItem (ovrset))
+        {
+          /* if extern then it is in the publics table: do nothing */
+          if (IS_EXTERN (sym->etype))
+            continue;
 
-	  /* if allocation required check is needed
-	     then check if the symbol really requires
-	     allocation only for local variables */
-	  if (!IS_AGGREGATE (sym->type) &&
-	      !(sym->_isparm && !IS_REGPARM (sym->etype))
-	      && !sym->allocreq && sym->level)
-	    continue;
+          /* if allocation required check is needed
+             then check if the symbol really requires
+             allocation only for local variables */
+          if (!IS_AGGREGATE (sym->type) &&
+              !(sym->_isparm && !IS_REGPARM (sym->etype))
+              && !sym->allocreq && sym->level)
+            continue;
 
-	  /* if global variable & not static or extern
-	     and addPublics allowed then add it to the public set */
-	  if ((sym->_isparm && !IS_REGPARM (sym->etype))
-	      && !IS_STATIC (sym->etype))
+          /* if global variable & not static or extern
+             and addPublics allowed then add it to the public set */
+          if ((sym->_isparm && !IS_REGPARM (sym->etype))
+              && !IS_STATIC (sym->etype))
             {
               addSetHead (&publics, sym);
             }
 
-	  /* if extern then do nothing or is a function
-	     then do nothing */
-	  if (IS_FUNC (sym->type))
-	    continue;
+          /* if extern then do nothing or is a function
+             then do nothing */
+          if (IS_FUNC (sym->type))
+            continue;
 
-	  /* print extra debug info if required */
-	  if (options.debug)
-	    {
-	      if (!sym->level)
-		{		/* global */
-		  if (IS_STATIC (sym->etype))
-		    fprintf (afile, "F%s$", moduleName);	/* scope is file */
-		  else
-		    fprintf (afile, "G$");	/* scope is global */
-		}
-	      else
-		/* symbol is local */
-		fprintf (afile, "L%s$",
-			 (sym->localof ? sym->localof->name : "-null-"));
-	      fprintf (afile, "%s$%d$%d", sym->name, sym->level, sym->block);
-	    }
+          /* print extra debug info if required */
+          if (options.debug)
+            {
+              if (!sym->level)
+                {               /* global */
+                  if (IS_STATIC (sym->etype))
+                    fprintf (afile, "F%s$", moduleName);        /* scope is file */
+                  else
+                    fprintf (afile, "G$");      /* scope is global */
+                }
+              else
+                /* symbol is local */
+                fprintf (afile, "L%s$",
+                         (sym->localof ? sym->localof->name : "-null-"));
+              fprintf (afile, "%s$%d$%d", sym->name, sym->level, sym->block);
+            }
 
-	  /* if is has an absolute address then generate
-	     an equate for this no need to allocate space */
-	  if (SPEC_ABSA (sym->etype))
-	    {
+          /* if is has an absolute address then generate
+             an equate for this no need to allocate space */
+          if (SPEC_ABSA (sym->etype))
+            {
 
-	      if (options.debug)
-		fprintf (afile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+              if (options.debug)
+                fprintf (afile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
 
-	      fprintf (afile, "%s\t=\t0x%04x\n",
-		       sym->rname,
-		       SPEC_ADDR (sym->etype));
-	    }
-	  else {
-	      int size = getSize(sym->type);
+              fprintf (afile, "%s\t=\t0x%04x\n",
+                       sym->rname,
+                       SPEC_ADDR (sym->etype));
+            }
+          else {
+              int size = getSize(sym->type);
 
-	      if (size==0) {
-		  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE);
-	      }	      
-	      if (options.debug)
-		  fprintf (afile, "==.\n");
-	      
-	      /* allocate space */
-	      tfprintf (afile, "!labeldef\n", sym->rname);
-	      tfprintf (afile, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
-	  }
-	  
-	}
+              if (size==0) {
+                  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE);
+              }       
+              if (options.debug)
+                  fprintf (afile, "==.\n");
+              
+              /* allocate space */
+              tfprintf (afile, "!labeldef\n", sym->rname);
+              tfprintf (afile, "\t!ds\n", (unsigned int) getSize (sym->type) & 0xffff);
+          }
+          
+        }
     }
 }
 
@@ -1685,7 +1710,7 @@ glue (void)
   }
   
   if(mcs51_like)
-  {
+    {
       /* copy the sbit segment */
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; special function bits \n");
@@ -1693,21 +1718,21 @@ glue (void)
       copyFile (asmFile, sfrbit->oFile);
   
       /*JCF: Create the areas for the register banks*/
-	  if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
-	  {
-		 fprintf (asmFile, "%s", iComments2);
-		 fprintf (asmFile, "; overlayable register banks \n");
-		 fprintf (asmFile, "%s", iComments2);
-		 if(RegBankUsed[0])
-			fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
-		 if(RegBankUsed[1]||options.parms_in_bank1)
-			fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
-		 if(RegBankUsed[2])
-			fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
-		 if(RegBankUsed[3])
-			fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
-	  }
-  }
+      if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
+      {
+         fprintf (asmFile, "%s", iComments2);
+         fprintf (asmFile, "; overlayable register banks \n");
+         fprintf (asmFile, "%s", iComments2);
+         if(RegBankUsed[0])
+            fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
+         if(RegBankUsed[1]||options.parms_in_bank1)
+            fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
+         if(RegBankUsed[2])
+            fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
+         if(RegBankUsed[3])
+            fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
+      }
+    }
 
   /* copy the data segment */
   fprintf (asmFile, "%s", iComments2);
@@ -1731,7 +1756,7 @@ glue (void)
       fprintf (asmFile, "; Stack segment in internal ram \n");
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "\t.area\tSSEG\t(DATA)\n"
-	       "__start__stack:\n\t.ds\t1\n\n");
+               "__start__stack:\n\t.ds\t1\n\n");
     }
 
   /* create the idata segment */
@@ -1756,7 +1781,7 @@ glue (void)
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; external stack \n");
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "\t.area XSEG (XDATA)\n");	/* MOF */
+      fprintf (asmFile, "\t.area XSEG (XDATA)\n");      /* MOF */
       fprintf (asmFile, "\t.ds 256\n");
     }
 
@@ -1779,7 +1804,7 @@ glue (void)
   if (port->extraAreas.genExtraAreaDeclaration)
   {
       port->extraAreas.genExtraAreaDeclaration(asmFile, 
-					       mainf && IFFUNC_HASBODY(mainf->type));
+                                               mainf && IFFUNC_HASBODY(mainf->type));
   }
     
   /* copy the interrupt vector table */
@@ -1802,7 +1827,7 @@ glue (void)
    * the post_static_name area will immediately follow the static_name
    * area.
    */
-  tfprintf (asmFile, "\t!area\n", port->mem.static_name);	/* MOF */
+  tfprintf (asmFile, "\t!area\n", port->mem.static_name);       /* MOF */
   tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
   tfprintf (asmFile, "\t!area\n", port->mem.static_name);
 
@@ -1810,8 +1835,8 @@ glue (void)
     {
       if (port->genInitStartup)
         {
-	   port->genInitStartup(asmFile);
-	}
+           port->genInitStartup(asmFile);
+        }
       else
         {
           fprintf (asmFile, "__sdcc_gsinit_startup:\n");
@@ -1820,21 +1845,21 @@ glue (void)
              going into P2 and the lower order going into
              spx */
           if (options.useXstack)
-	    {
-	      fprintf (asmFile, "\tmov\tP2,#0x%02x\n",
-		       (((unsigned int) options.xdata_loc) >> 8) & 0xff);
-	      fprintf (asmFile, "\tmov\t_spx,#0x%02x\n",
-		       (unsigned int) options.xdata_loc & 0xff);
-	    }
+            {
+              fprintf (asmFile, "\tmov\tP2,#0x%02x\n",
+                       (((unsigned int) options.xdata_loc) >> 8) & 0xff);
+              fprintf (asmFile, "\tmov\t_spx,#0x%02x\n",
+                       (unsigned int) options.xdata_loc & 0xff);
+            }
 
           // This should probably be a port option, but I'm being lazy.
           // on the 400, the firmware boot loader gives us a valid stack
           // (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
           if (!TARGET_IS_DS400)
-	    {
-	      /* initialise the stack pointer.  JCF: aslink takes care of the location */
-	      fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");	/* MOF */
-	    }
+            {
+              /* initialise the stack pointer.  JCF: aslink takes care of the location */
+              fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
+            }
 
           fprintf (asmFile, "\tlcall\t__sdcc_external_startup\n");
           fprintf (asmFile, "\tmov\ta,dpl\n");
@@ -1844,10 +1869,10 @@ glue (void)
 
           // if the port can copy the XINIT segment to XISEG
           if (port->genXINIT)
-	    {
-	      port->genXINIT(asmFile);
+            {
+              port->genXINIT(asmFile);
             }
-	}
+        }
 
     }
   copyFile (asmFile, statsg->oFile);
@@ -1863,9 +1888,9 @@ glue (void)
     }
 
   fprintf (asmFile,
-	   "%s"
-	   "; Home\n"
-	   "%s", iComments2, iComments2);
+           "%s"
+           "; Home\n"
+           "%s", iComments2, iComments2);
   tfprintf (asmFile, "\t!areahome\n", HOME_NAME);
   copyFile (asmFile, home->oFile);
 
@@ -1904,7 +1929,7 @@ glue (void)
 }
 
 
-/** Creates a temporary file with unoque file name
+/** Creates a temporary file with unique file name
     Scans, in order:
     - TMP, TEMP, TMPDIR env. varibles
     - if Un*x system: /usr/tmp and /tmp
@@ -1934,8 +1959,8 @@ tempfileandname(char *fname, size_t len)
         if (!warning_emitted)
           {
             fprintf (stderr, "TMP not defined in environment, using %s for temporary files\n.", tmpdir);
-	    warning_emitted = 1;
-	  }
+            warning_emitted = 1;
+          }
       }
   }
 #else

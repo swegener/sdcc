@@ -973,6 +973,7 @@ DEFSETFUNC(diCodeForSym)
 int constFold (iCode *ic, set *cseSet)
 {
     iCode *dic = NULL;
+    iCode *ldic= NULL;
     /* this routine will change
        a = b + 10;
        c = a + 10;
@@ -1006,6 +1007,16 @@ int constFold (iCode *ic, set *cseSet)
     if (!IS_OP_LITERAL(IC_RIGHT(dic)))
 	return 0;
 
+    /* find the definition of the left operand
+       of dic.then check if this defined with a
+       get_pointer return 0 if the pointer size is
+       less than 2 (MCS51 specific) */
+    if (!(applyToSet(cseSet,diCodeForSym,IC_LEFT(dic),&ldic)))
+	return 0;
+
+    if (POINTER_GET(ldic) && getSize(operandType(IC_LEFT(ldic))) <= 1)
+	return 0;
+    
     /* it is if the operations are the same*/
     /* the literal parts need to be added  */
     IC_LEFT(ic) = operandFromOperand(IC_LEFT(dic));    

@@ -2021,7 +2021,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		if (sym->liveTo > ic->seq)
 			continue;
 		
-		/* if it was spilt on stack then we can 
+			/* if it was spilt on stack then we can 
 		mark the stack spil location as free */
 		if (sym->isspilt)
 		{
@@ -2036,9 +2036,9 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		if (!bitVectBitValue (_G.regAssigned, sym->key))
 			continue;
 		
-		/* special case check if this is an IFX &
-		the privious one was a pop and the 
-		previous one was not spilt then keep track
+			/* special case check if this is an IFX &
+			the privious one was a pop and the 
+			previous one was not spilt then keep track
 		of the symbol */
 		if (ic->op == IFX && ic->prev &&
 			ic->prev->op == IPOP &&
@@ -2067,6 +2067,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 				result->liveTo > ic->seq &&	/* and will live beyond this */
 				result->liveTo <= ebp->lSeq &&	/* does not go beyond this block */
 				result->liveFrom == ic->seq &&    /* does not start before here */				result->regType == sym->regType &&	/* same register types */
+				result->regType == sym->regType &&	/* same register types */
 				result->nRegs &&	/* which needs registers */
 				!result->isspilt &&	/* and does not already have them */
 				!result->remat &&
@@ -2265,7 +2266,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				IS_TRUE_SYMOP (IC_RESULT (ic)))
 				OP_SYMBOL (IC_RESULT (ic))->allocreq = 1;
 			
-			/* take away registers from live
+				/* take away registers from live
 			ranges that end at this instruction */
 			deassignLRs (ic, ebbs[i]);
 			
@@ -2405,43 +2406,43 @@ serialRegAssign (eBBlock ** ebbs, int count)
 					ptrRegSet = 0;
 				}
 				
-			}
 		}
+	}
 	}
 
-	/* Check for and fix any problems with uninitialized operands */
+    /* Check for and fix any problems with uninitialized operands */
     for (i = 0; i < count; i++)
-	{
-		iCode *ic;
-		
-		if (ebbs[i]->noPath &&
-			(ebbs[i]->entryLabel != entryLabel &&
-			ebbs[i]->entryLabel != returnLabel))
-			continue;
-		
-		for (ic = ebbs[i]->sch; ic; ic = ic->next)
-		{
-			if (SKIP_IC2 (ic))
-				continue;
-			
-			if (ic->op == IFX)
-			{
-				verifyRegsAssigned (IC_COND (ic), ic);
-				continue;
-			}
-			
-			if (ic->op == JUMPTABLE)
-			{
-				verifyRegsAssigned (IC_JTCOND (ic), ic);
-				continue;
-			}
-			
-			verifyRegsAssigned (IC_RESULT (ic), ic);
-			verifyRegsAssigned (IC_LEFT (ic), ic);
-			verifyRegsAssigned (IC_RIGHT (ic), ic);
-		}
-	}
-	
+      {
+	iCode *ic;
+
+	if (ebbs[i]->noPath &&
+	    (ebbs[i]->entryLabel != entryLabel &&
+	     ebbs[i]->entryLabel != returnLabel))
+	    continue;
+
+	for (ic = ebbs[i]->sch; ic; ic = ic->next)
+	  {
+	    if (SKIP_IC2 (ic))
+	      continue;
+
+	    if (ic->op == IFX)
+	      {
+	        verifyRegsAssigned (IC_COND (ic), ic);
+	        continue;
+	      }
+
+	    if (ic->op == JUMPTABLE)
+	      {
+	        verifyRegsAssigned (IC_JTCOND (ic), ic);
+	        continue;
+	      }
+
+	    verifyRegsAssigned (IC_RESULT (ic), ic);
+	    verifyRegsAssigned (IC_LEFT (ic), ic);
+	    verifyRegsAssigned (IC_RIGHT (ic), ic);
+          }
+      }    
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -4111,7 +4112,7 @@ pic14_assignRegisters (eBBlock ** ebbs, int count)
 	if (options.dump_pack)
 		dumpEbbsToFileExt (DUMP_PACK, ebbs, count);
 	
-	/* first determine for each live range the number of 
+		/* first determine for each live range the number of 
 	registers & the type of registers required for each */
 	regTypeNum ();
 	

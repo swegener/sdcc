@@ -1,3 +1,8 @@
+2004-08-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/pic/ralloc.c (deassignLR): allthough pic port is buggy already,
+	  there's no need to make it worse
+
 2004-08-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/ralloc.c (deassignLR),

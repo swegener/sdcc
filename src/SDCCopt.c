@@ -846,14 +846,14 @@ eBBlockFromiCode (iCode * ic)
   /* global common subexpression elimination  */
   if (optimize.global_cse)
     {
-      change += cseAllBlocks (ebbs, saveCount, TRUE);
+      change += cseAllBlocks (ebbs, saveCount, FALSE);
       if (options.dump_gcse)
 	dumpEbbsToFileExt (DUMP_GCSE, ebbs, saveCount);
     }
   else
     {
       // compute the dataflow only
-      assert(cseAllBlocks (ebbs, saveCount, FALSE)==0);
+      assert(cseAllBlocks (ebbs, saveCount, TRUE)==0);
     }
   /* kill dead code */
   kchange = killDeadCode (ebbs, saveCount);
@@ -876,7 +876,7 @@ eBBlockFromiCode (iCode * ic)
   if (lchange || kchange)
     {
       computeDataFlow (ebbs, saveCount);
-      change += cseAllBlocks (ebbs, saveCount, TRUE);
+      change += cseAllBlocks (ebbs, saveCount, FALSE);
       if (options.dump_loop)
 	dumpEbbsToFileExt (DUMP_LOOPG, ebbs, count);
 

@@ -1,5 +1,7 @@
 2001-11-18  Michael Hope  <michaelh@juju.net.nz>
 
+	* src/z80/gen.c (genCmp): Fixed compare on unsigned.
+
 	* src/z80/ralloc.c (packRegsForHLUse3): Created and optimised.
 	(packRegsForIYUse): Created and optimised.
 

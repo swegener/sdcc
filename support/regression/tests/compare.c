@@ -88,6 +88,19 @@ testCompareVariables(void)
     ASSERT(left >= right);
 }
 
+static void
+testUnsignedCompare(void)
+{
+    {attr} {storage} unsigned {type} left, right;
+
+    left = 0;
+    right = (unsigned {type})-1;
+
+    ASSERT(left < right);
+    ASSERT(left <= right);
+    ASSERT(right > left);
+    ASSERT(right >= left);
+}
 /*
                 Common cases:
                         Around zero

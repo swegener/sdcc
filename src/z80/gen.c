@@ -3272,13 +3272,13 @@ genPlus (iCode * ic)
           emit2 ("add hl,%s", _pairs[left].name);
           goto release;
         }
-      else if (right != PAIR_INVALID)
+      else if (right != PAIR_INVALID && right != PAIR_HL)
         {
           fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
           emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
           goto release;
         }
-      else if (left != PAIR_INVALID)
+      else if (left != PAIR_INVALID && left != PAIR_HL)
         { 
           fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
           emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
@@ -3290,10 +3290,10 @@ genPlus (iCode * ic)
         }
     }
 
-  if (isPair (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_LEFT (ic)) == AOP_IMMD)
+  if (isPair (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_LEFT (ic)) == AOP_IMMD && getPairId (AOP (IC_RIGHT (ic))) != PAIR_HL)
     {
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
-      emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
+      emit2 ("add hl,%s ; 2", getPairName (AOP (IC_RIGHT (ic))));
       spillCached();
       commitPair ( AOP (IC_RESULT (ic)), PAIR_HL);
       goto release;
@@ -4112,14 +4112,21 @@ release:
          code a little differently */
       if (ifx)
         {
-          if (IS_GB)
+          if (sign)
             {
-              emit2 ("rlca");
-              genIfxJump (ifx, swap_sense ? "nc" : "c");
+              if (IS_GB)
+                {
+                  emit2 ("rlca");
+                  genIfxJump (ifx, swap_sense ? "nc" : "c");
+                }
+              else
+                {
+                  genIfxJump (ifx, swap_sense ? "p" : "m");
+                }
             }
           else
             {
-              genIfxJump (ifx, swap_sense ? "p" : "m");
+              genIfxJump (ifx, swap_sense ? "nc" : "c");
             }
         }
       else

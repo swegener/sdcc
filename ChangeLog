@@ -1,3 +1,8 @@
+2003-02-18    <johan@balder>
+
+	* as/mcs51/asmain.c (asmbl): module can start with a digit
+	* as/z80/asmain.c (asmbl): module can start with a digit
+
 2003-02-16  Bernhard Held <bernhard@bernhardheld.de>
 
 	* sim/ucsim/mkecho: inserted #!/bin/sh for Cygwin, so that it's executable

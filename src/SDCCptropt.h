@@ -28,5 +28,8 @@
 
 void ptrPostIncDecOpt (iCode *);
 int ptrAddition (iCode *);
+symbol * ptrBaseRematSym (symbol *);
+int ptrPseudoSymSafe (symbol *, iCode *);
+void ptrPseudoSymConvert (symbol *, iCode *, char *);
 
 #endif

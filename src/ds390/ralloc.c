@@ -1853,23 +1853,13 @@ regTypeNum ()
 	      (ic = hTabItemWithKey (iCodehTab,
 				     bitVectFirstBit (sym->defs))) &&
 	      POINTER_GET (ic) &&
-	      !sym->noSpilLoc &&
-	      !IS_BITVAR (sym->etype))
+	      !IS_BITVAR (sym->etype) &&
+	      (aggrToPtrDclType (operandType (IC_LEFT (ic)), FALSE) == POINTER))
 	    {
-	      /* and that pointer is remat in data space */
-	      if (IS_SYMOP (IC_LEFT (ic)) &&
-		  OP_SYMBOL (IC_LEFT (ic))->remat &&
-		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
-		  DCL_TYPE (aggrToPtr (operandType(IC_LEFT(ic)), FALSE)) == POINTER)
-		{
 
-		  /* create a psuedo symbol & force a spil */
-		  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
-		  psym->type = sym->type;
-		  psym->etype = sym->etype;
-		  strncpyz (psym->rname, psym->name, sizeof(psym->rname));
-		  sym->isspilt = 1;
-		  sym->usl.spillLoc = psym;
+	      if (ptrPseudoSymSafe (sym, ic))
+		{
+	          ptrPseudoSymConvert (sym, ic, rematStr (OP_SYMBOL (IC_LEFT (ic))));
 		  continue;
 		}
 

@@ -313,6 +313,7 @@ operand *operandFromValue (value *);
 operand *operandFromSymbol (symbol *);
 operand *operandFromLink (sym_link *);
 sym_link *aggrToPtr (sym_link *, bool);
+int aggrToPtrDclType (sym_link *, bool);
 int piCode (void *, FILE *);
 int printOperand (operand *, FILE *);
 void setOperandType (operand *, sym_link *);

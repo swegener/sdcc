@@ -2322,6 +2322,19 @@ aggrToPtr (sym_link * type, bool force)
   return ptype;
 }
 
+/*------------------------------------------------------------------*/
+/* aggrToPtrDclType - like aggrToPtr, but returns only the DCL_TYPE */
+/*------------------------------------------------------------------*/
+int
+aggrToPtrDclType (sym_link * type, bool force)
+{
+  if (IS_PTR (type) && !force)
+    return DCL_TYPE (type);
+
+  /* return the pointer depending on the storage class */
+  return PTR_TYPE (SPEC_OCLS (getSpec (type)));
+}
+
 /*-----------------------------------------------------------------*/
 /* geniCodeArray2Ptr - array to pointer                            */
 /*-----------------------------------------------------------------*/

@@ -1762,35 +1762,13 @@ regTypeNum (eBBlock *ebbs)
 	      (ic = hTabItemWithKey (iCodehTab,
 				     bitVectFirstBit (sym->defs))) &&
 	      POINTER_GET (ic) &&
-	      !sym->noSpilLoc &&
-	      !IS_BITVAR (sym->etype))
+	      !IS_BITVAR (sym->etype) &&
+	      (aggrToPtrDclType (operandType (IC_LEFT (ic)), FALSE) == POINTER))
 	    {
 
-
-	      /* and that pointer is remat in data space */
-              if (IS_SYMOP (IC_LEFT (ic)) &&
-		  OP_SYMBOL (IC_LEFT (ic))->remat &&
-		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
-		  DCL_TYPE (aggrToPtr (operandType(IC_LEFT(ic)), FALSE)) == POINTER)
+	      if (ptrPseudoSymSafe (sym, ic))
 		{
-		  /* create a psuedo symbol & force a spil */
-		  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
-		  psym->type = sym->type;
-		  psym->etype = sym->etype;
-                  
-		  strcpy (psym->rname, psym->name);
-		  sym->isspilt = 1;
-		  sym->usl.spillLoc = psym;
-#if 0 // an alternative fix for bug #480076
-		  /* now this is a useless assignment to itself */
-		  remiCodeFromeBBlock (ebbs, ic);
-#else
-		  /* now this really is an assignment to itself, make it so;
-		     it will be optimized out later */
-		  ic->op='=';
-		  ReplaceOpWithCheaperOp(&IC_RIGHT(ic), IC_RESULT(ic));
-		  IC_LEFT(ic)=NULL;
-#endif
+	          ptrPseudoSymConvert (sym, ic, rematStr (OP_SYMBOL (IC_LEFT (ic))));
 		  continue;
 		}
 

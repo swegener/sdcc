@@ -201,6 +201,7 @@ support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile
+Makefile.common:Makefile.common.in
 )
 
 # End of configure/configure.in

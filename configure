@@ -2561,6 +2561,7 @@ support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile
+Makefile.common:Makefile.common.in
  sdccconf.h:sdccconf_in.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
@@ -2662,6 +2663,7 @@ support/cpp/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile
+Makefile.common:Makefile.common.in
 "}
 EOF
 cat >> $CONFIG_STATUS <<\EOF

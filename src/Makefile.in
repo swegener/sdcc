@@ -2,49 +2,18 @@
 #
 #
 
-# Version
-VERSION         = @VERSION@
-VERSIONHI       = @VERSIONHI@
-VERSIONLO       = @VERSIONLO@
-VERSIONP        = @VERSIONP@
-
-# Programs
-SHELL		= /bin/sh
-CC		= @CC@
-CPP		= @CPP@
-RANLIB		= @RANLIB@
-INSTALL		= @INSTALL@
-YACC            = @YACC@ 
-LEX             = @LEX@ 
-AWK             = @AWK@
-# Directories
 PRJDIR		= ..
 
-prefix          = @prefix@
-exec_prefix     = @exec_prefix@
-bindir          = @bindir@
-libdir          = @libdir@
-datadir         = @datadir@
-includedir      = @includedir@
-mandir          = @mandir@
-man1dir         = $(mandir)/man1
-man2dir         = $(mandir)/man2
-infodir         = @infodir@
-srcdir          = @srcdir@
+include $(PRJDIR)/Makefile.common
 
-# Flags
-DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR) -I$(PRJDIR)/support
-CFLAGS          = @CFLAGS@ -Wall
-M_OR_MM         = @M_OR_MM@
-LIBS		= -lgc @LIBS@
+LIBS		= $(PORT)/port.a -lgc @LIBS@
 LIBDIRS		= -L$(PRJDIR)/support/gc
 
 OBJECTS 	= SDCCy.o SDCClex.o SDCCerr.o SDCChasht.o SDCCmain.o \
 		  SDCCsymt.o SDCCopt.o SDCCast.o SDCCmem.o SDCCval.o \
-		  SDCCralloc.o SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
+		  SDCCicode.o SDCCbitv.o SDCCset.o SDCClabel.o \
 		  SDCCBBlock.o SDCCloop.o SDCCcse.o SDCCcflow.o SDCCdflow.o \
-		  SDCClrange.o SDCCptropt.o SDCCgen51.o SDCCpeeph.o SDCCglue.o spawn.o
+		  SDCClrange.o SDCCptropt.o SDCCpeeph.o SDCCglue.o spawn.o
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/bin/sdcc
@@ -52,7 +21,10 @@ TARGET		= $(PRJDIR)/bin/sdcc
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf $(PRJDIR)/support/gc/libgc.a $(TARGET)
+all: port checkconf $(PRJDIR)/support/gc/libgc.a $(TARGET)
+
+port:
+	$(MAKE) -C $(PORT)
 
 $(PRJDIR)/support/gc/libgc.a:
 	cd $(PRJDIR)/support/gc && $(MAKE)

@@ -6618,7 +6618,7 @@ genUnpackBitsImmed (operand * left,
      but the partial byte at the end.  */
   for (rlen=blen;rlen>=8;rlen-=8)
     {
-      loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+      loadRegFromAop (hc08_reg_a, derefaop, size-offset-1);
       if (!ifx)
         storeRegToAop (hc08_reg_a, AOP (result), offset);
       else
@@ -6629,7 +6629,7 @@ genUnpackBitsImmed (operand * left,
   /* Handle the partial byte at the end */
   if (rlen)
     {
-      loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+      loadRegFromAop (hc08_reg_a, derefaop, size-offset-1);
       emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8-rlen));
       storeRegToAop (hc08_reg_a, AOP (result), offset++);
     }
@@ -6903,7 +6903,7 @@ genPackBits (sym_link * etype,
 }
 
 /*-----------------------------------------------------------------*/
-/* genPackBits - generates code for packed bit storage             */
+/* genPackBitsImmed - generates code for packed bit storage        */
 /*-----------------------------------------------------------------*/
 static void
 genPackBitsImmed (operand *result, sym_link * etype, operand * right, iCode * ic)
@@ -7006,7 +7006,7 @@ genPackBitsImmed (operand *result, sym_link * etype, operand * right, iCode * ic
   /* all except the partial byte at the end                 */
   for (rlen=blen;rlen>=8;rlen-=8)
     {
-      transferAopAop (AOP (right), offset, derefaop, size-offset);
+      transferAopAop (AOP (right), offset, derefaop, size-offset-1);
       offset++;
     }
 
@@ -7022,13 +7022,13 @@ genPackBitsImmed (operand *result, sym_link * etype, operand * right, iCode * ic
           litval = (int) floatFromVal (AOP (right)->aopu.aop_lit);
           litval >>= (blen-rlen);
           litval &= (~mask) & 0xff;
-          loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+          loadRegFromAop (hc08_reg_a, derefaop, size-offset-1);
           if ((mask|litval)!=0xff)
             emitcode ("and","#0x%02x", mask);
           if (litval)
             emitcode ("ora","#0x%02x", litval);
           hc08_dirtyReg (hc08_reg_a, FALSE);
-          storeRegToAop (hc08_reg_a, derefaop, size-offset);
+          storeRegToAop (hc08_reg_a, derefaop, size-offset-1);
           hc08_dirtyReg (hc08_reg_a, FALSE);
           hc08_freeReg (hc08_reg_a);
           goto release;
@@ -7041,10 +7041,10 @@ genPackBitsImmed (operand *result, sym_link * etype, operand * right, iCode * ic
       hc08_dirtyReg (hc08_reg_a, FALSE);
       pushReg (hc08_reg_a, TRUE);
 
-      loadRegFromAop (hc08_reg_a, derefaop, size-offset);
+      loadRegFromAop (hc08_reg_a, derefaop, size-offset-1);
       emitcode ("and", "#0x%02x", mask);
       emitcode ("ora", "1,s");
-      storeRegToAop (hc08_reg_a, derefaop, size-offset);
+      storeRegToAop (hc08_reg_a, derefaop, size-offset-1);
       pullReg (hc08_reg_a);
     }
 

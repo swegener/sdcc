@@ -1,3 +1,8 @@
+2004-08-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genPackBitsImmed, genUnpackBitsImmed): fix offset
+	problem in bitfields >= 8 bits.
+
 2004-08-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c: undid changes that were not meant to be committed

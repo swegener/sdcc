@@ -783,7 +783,13 @@ getSize (sym_link * p)
   switch (DCL_TYPE (p))
     {
     case ARRAY:
-      return DCL_ELEM (p) * getSize (p->next);
+      if (DCL_ELEM(p)) {
+	return DCL_ELEM (p) * getSize (p->next);
+      } else {
+	werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+		"can not tell the size of an array[]");
+	return 0;
+      }
     case IPOINTER:
     case PPOINTER:
     case POINTER:
@@ -1410,11 +1416,11 @@ computeType (sym_link * type1, sym_link * type2)
   else if (IS_BITVAR (etype2) && !IS_BITVAR (etype1))
     rType = copyLinkChain (type1);
   else
-    /* if one of them is a pointer then that
+    /* if one of them is a pointer or array then that
        prevails */
-  if (IS_PTR (type1))
+  if (IS_PTR (type1) || IS_ARRAY (type1))
     rType = copyLinkChain (type1);
-  else if (IS_PTR (type2))
+  else if (IS_PTR (type2) || IS_ARRAY (type2))
     rType = copyLinkChain (type2);
   else if (getSize (type1) > getSize (type2))
     rType = copyLinkChain (type1);

@@ -172,10 +172,13 @@ deleteItemIf (set ** sset, int (*cond) (void *, va_list),...)
   set *sp = *sset;
   va_list ap;
 
-  va_start (ap, cond);
-
   while (sp)
     {
+      // On the x86 va_list is just a pointer, so due to pass by value
+      // ap is not mofified by the called function.  On the PPC va_list
+      // is a pointer to a structure, so ap is modified.  Re-init each time.
+      va_start (ap, cond);
+
       if ((*cond) (sp->item, ap))
 	{
 	  deleteSetItem (sset, sp->item);
@@ -183,6 +186,7 @@ deleteItemIf (set ** sset, int (*cond) (void *, va_list),...)
 	  continue;
 	}
 
+      va_end(ap);
       sp = sp->next;
     }
 }

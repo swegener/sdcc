@@ -8536,8 +8536,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -8832,8 +8832,8 @@ SDCC supports IEEE (single precision 4bytes) floating point numbers.The floating
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0(null)">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0(null)">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -9790,6 +9790,46 @@ SDCC_MODEL_FLAT24
 -mds390
 \emph default 
  is used
+\layout Subsection
+
+Redirecting output on Windows Shells
+\layout Standard
+
+SDCC writes it's error messages to 
+\begin_inset Quotes sld
+\end_inset 
+
+standard error
+\begin_inset Quotes srd
+\end_inset 
+
+.
+ The windows shell (command or cmd) can't redirect it to a file.
+ The solution is to use a reasonable shell or a helper program like redir.exe:
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.cygwin.com/ml/cygwin/1999-02/msg00603.html}
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/misc/redir.zip}
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{ftp://ftp.xraylith.wisc.edu/pub/khan/gnu-win32/mingw32/misc/README.redir}
+
+\end_inset 
+
+
 \layout Section
 \pagebreak_top 
 SDCC Technical Data

@@ -545,7 +545,7 @@ deallocParms (value * val)
 	  strcpy (lval->sym->rname, buffer);
 	  strcpy (lval->name, strcpy (lval->sym->name, lval->sym->rname));
 	  addSym (SymbolTab, lval->sym, lval->sym->name,
-		  lval->sym->level, lval->sym->block);
+		  lval->sym->level, lval->sym->block, 1);
 	  lval->sym->_isparm = 1;
 	  addSet (&operKeyReset, lval->sym);
 	}
@@ -794,7 +794,7 @@ allocVariables (symbol * symChain)
 	  if (csym && csym->level == sym->level)
 	    werror (E_DUPLICATE_TYPEDEF, sym->name);
 
-	  addSym (TypedefTab, sym, sym->name, sym->level, sym->block);
+	  addSym (TypedefTab, sym, sym->name, sym->level, sym->block, 0);
 	  continue;		/* go to the next one         */
 	}
       /* make sure it already exist */

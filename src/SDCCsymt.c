@@ -98,16 +98,16 @@ addSym (bucket ** stab,
 	void *sym,
 	char *sname,
 	int level,
-	int block)
+	int block,
+	int checkType)
 {
   int i;			/* index into the hash Table */
   bucket *bp;			/* temp bucket    *         */
 
-  if (getenv("DEBUG_SANITY")) {
-    fprintf (stderr, "addSym: %s ", sname);
-  }
-  /* Make sure sym is a symbol and not a structdef */
-  if (StructTab!=stab) {
+  if (checkType) {
+    if (getenv("DEBUG_SANITY")) {
+      fprintf (stderr, "addSym: %s ", sname);
+    }
     /* make sure the type is complete and sane */
     checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
   }
@@ -478,7 +478,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
   noun=nounName(etype);
 
   if (getenv("DEBUG_SANITY")) {
-    fprintf (stderr, "checking sanity for %s\n", name);
+    fprintf (stderr, "checking sanity for %s %x\n", name, (int)etype);
   }
 
   if ((SPEC_NOUN(etype)==V_CHAR || 
@@ -938,7 +938,7 @@ addSymChain (symbol * symHead)
 	      /* delete current entry */
 	      deleteSym (SymbolTab, csym, csym->name);
 	      /* add new entry */
-	      addSym (SymbolTab, sym, sym->name, sym->level, sym->block);
+	      addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
 	    }
 	  else			/* not extern */
 	    werror (E_DUPLICATE, sym->name);
@@ -956,7 +956,7 @@ addSymChain (symbol * symHead)
 		werror (W_EXTERN_MISMATCH, csym->name);
 	    }
 	}
-      addSym (SymbolTab, sym, sym->name, sym->level, sym->block);
+      addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
     }
 }
 
@@ -1579,6 +1579,7 @@ checkFunction (symbol * sym)
 {
   symbol *csym;
   value *exargs, *acargs;
+  value *checkValue;
   int argCnt = 0;
 
   if (getenv("DEBUG_SANITY")) {
@@ -1666,7 +1667,12 @@ checkFunction (symbol * sym)
        exargs && acargs;
        exargs = exargs->next, acargs = acargs->next, argCnt++)
     {
-      value *checkValue;
+      if (getenv("DEBUG_SANITY")) {
+	fprintf (stderr, "checkFunction: %s ", exargs->name);
+      }
+      /* make sure the type is complete and sane */
+      checkTypeSanity(exargs->etype, exargs->name);
+
       /* If the actual argument is an array, any prototype
        * will have modified it to a pointer. Duplicate that
        * change here.
@@ -1696,7 +1702,7 @@ checkFunction (symbol * sym)
   /* replace with this defition */
   sym->cdef = csym->cdef;
   deleteSym (SymbolTab, csym, csym->name);
-  addSym (SymbolTab, sym, sym->name, sym->level, sym->block);
+  addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
   if (IS_EXTERN (csym->etype) && !
       IS_EXTERN (sym->etype))
     {

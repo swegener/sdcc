@@ -709,24 +709,23 @@ struct_or_union
    ;
 
 opt_stag
-   : stag
-   |  {  /* synthesize a name add to structtable */
-         $$ = newStruct(genSymName(NestLevel)) ;
-         $$->level = NestLevel ;
-         addSym (StructTab, $$, $$->tag,$$->level,currBlockno) ;
-      }
-   ;
+: stag
+|  {  /* synthesize a name add to structtable */
+     $$ = newStruct(genSymName(NestLevel)) ;
+     $$->level = NestLevel ;
+     addSym (StructTab, $$, $$->tag,$$->level,currBlockno, 0);
+};
 
 stag
-   :  identifier  {  /* add name to structure table */
-                     $$ = findSymWithBlock (StructTab,$1,currBlockno);
-                     if (! $$ ) {
-                        $$ = newStruct($1->name) ;
-                        $$->level = NestLevel ;
-                        addSym (StructTab, $$, $$->tag,$$->level,currBlockno) ;			 
-                     }
-                  }
-   ;
+:  identifier  {  /* add name to structure table */
+     $$ = findSymWithBlock (StructTab,$1,currBlockno);
+     if (! $$ ) {
+       $$ = newStruct($1->name) ;
+       $$->level = NestLevel ;
+       addSym (StructTab, $$, $$->tag,$$->level,currBlockno,0);
+     }
+};
+
 
 struct_declaration_list
    : struct_declaration
@@ -799,7 +798,7 @@ enum_specifier
 						    (csym && csym->level == $2->level))
                                                    werror(E_DUPLICATE_TYPEDEF,csym->name);
 
-                                                addSym ( enumTab,$2,$2->name,$2->level,$2->block);
+                                                addSym ( enumTab,$2,$2->name,$2->level,$2->block, 0);
 						addSymChain ($4);
                                                 allocVariables (reverseSyms($4));
                                                 $$ = copyLinkChain(cenum->type);

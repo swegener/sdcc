@@ -539,7 +539,7 @@ newiTempLabel (char *s)
   itmplbl->isitmp = 1;
   itmplbl->islbl = 1;
   itmplbl->key = labelKey++;
-  addSym (LabelTab, itmplbl, itmplbl->name, 0, 0);
+  addSym (LabelTab, itmplbl, itmplbl->name, 0, 0, 0);
   return itmplbl;
 }
 
@@ -557,7 +557,7 @@ newiTempPreheaderLabel ()
   itmplbl->isitmp = 1;
   itmplbl->islbl = 1;
   itmplbl->key = labelKey++;
-  addSym (LabelTab, itmplbl, itmplbl->name, 0, 0);
+  addSym (LabelTab, itmplbl, itmplbl->name, 0, 0, 0);
   return itmplbl;
 }
 

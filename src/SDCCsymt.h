@@ -451,7 +451,7 @@ void cdbSymbol (symbol *, FILE *, int, int);
 void cdbStructBlock (int, FILE *);
 void initHashT ();
 bucket *newBucket ();
-void addSym (bucket **, void *, char *, int, int);
+void addSym (bucket **, void *, char *, int, int, int checkType);
 void deleteSym (bucket **, void *, char *);
 void *findSym (bucket **, void *, const char *);
 void *findSymWithLevel (bucket **, struct symbol *);

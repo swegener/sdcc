@@ -611,6 +611,14 @@ processParms (ast * func,
   if (!defParm && !actParm)
     return 0;
 
+  if (defParm) {
+    if (getenv("DEBUG_SANITY")) {
+      fprintf (stderr, "addSym: %s ", defParm->name);
+    }
+    /* make sure the type is complete and sane */
+    checkTypeSanity(defParm->etype, defParm->name);
+  }
+
   /* if the function is being called via a pointer &   */
   /* it has not been defined a reentrant then we cannot */
   /* have parameters                                   */
@@ -1034,7 +1042,7 @@ gatherAutoInit (symbol * autoChain)
 	  /* insert the symbol into the symbol table */
 	  /* with level = 0 & name = rname       */
 	  newSym = copySymbol (sym);
-	  addSym (SymbolTab, newSym, newSym->name, 0, 0);
+	  addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
 
 	  /* now lift the code to main */
 	  if (IS_AGGREGATE (sym->type))
@@ -3332,7 +3340,7 @@ createLabel (symbol * label, ast * stmnt)
   if ((csym = findSym (LabelTab, NULL, name)))
     werror (E_DUPLICATE_LABEL, label->name);
   else
-    addSym (LabelTab, label, name, label->level, 0);
+    addSym (LabelTab, label, name, label->level, 0, 0);
 
   label->islbl = 1;
   label->key = labelKey++;

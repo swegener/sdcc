@@ -2330,7 +2330,7 @@ static unsigned long getValBasic(symbol *sym, link *type, char *val)
     }v;
 
     if (IS_FLOAT(type)) 	
-        v.f = strtof(val,NULL);    
+        v.f = strtod(val,NULL);    
     else
 	if (IS_PTR(type))
 	    v.val = strtol(val,NULL,0);

@@ -1,3 +1,11 @@
+2004-01-20  Michael Hope  <michaelh@juju.net.nz>
+
+	* sim/ucsim/gui.src/serio.src/main.cc: Fixed unconditional use of
+	getopt.h.
+
+	* debugger/mcs51/cmd.c (getValBasic): Changed strtof to strtod as
+	strtof is not part of C89 and isn't included with Mac OS X.
+
 2004-01-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genPlusIncr, genUminus, genMinusDec, genCmp,

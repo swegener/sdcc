@@ -1,3 +1,8 @@
+2003-10-28 Bernhard Held <bernhard@bernhardheld.de>
+
+	* .version: bumped to 2.3.6 to reflect the big improvements
+	made by Erik and Klaus. Thanks!
+
 2003-10-28 Klaus Flittner <klaus_flittner@gmx.de>
 
 	Replaced the livrange code.

@@ -5892,6 +5892,7 @@ static iCode *ifxForOp ( operand *op, iCode *ic )
     }
 
 
+#if 0
     /* the code below is completely untested
      * it just allows ulong2fs.c compile -- VR */
 	 
@@ -5919,7 +5920,7 @@ static iCode *ifxForOp ( operand *op, iCode *ic )
     					__FILE__, __FUNCTION__, __LINE__);
 
 //  return ic->next->next;		/* this just might work */ /* FIXME FIXME */
-
+#endif
     return NULL;
 }
 /*-----------------------------------------------------------------*/

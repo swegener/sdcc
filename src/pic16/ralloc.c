@@ -3692,8 +3692,8 @@ pic16_packRegisters (eBBlock * ebp)
 //		debugLog("%d\n", __LINE__);
 	/* find assignment of the form TrueSym := iTempNN:1 */
 	/* see BUGLOG0001 for workaround with the CAST - VR */
-	if ( (ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) ) // patch 11
-//	if ( (ic->op == '=') && !POINTER_SET (ic) ) // patch 11
+//	if ( (ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic) ) // patch 11
+ 	if ( (ic->op == '=') && !POINTER_SET (ic) ) // patch 11
 	  change += packRegsForAssign (ic, ebp);
 	/* debug stuff */
 	if (ic->op == '=')

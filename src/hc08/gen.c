@@ -4239,6 +4239,7 @@ genPointerGetSetOfs (iCode *ic)
   if (!sym->remat)
     return FALSE;
     
+  
   if (pget)
     {
       D(emitcode (";     genPointerGetOfs",""));
@@ -4248,9 +4249,27 @@ genPointerGetSetOfs (iCode *ic)
       
       aopOp (IC_RIGHT(ic), ic, FALSE);
       aopOp (IC_RESULT(lic), lic, FALSE);
-      
 
-      loadRegFromAop (hc08_reg_hx, AOP (IC_RIGHT (ic)), 0);
+      if (AOP_SIZE (IC_RIGHT (ic)) == 1)
+        {
+          if (SPEC_USIGN (getSpec (operandType (IC_RIGHT (ic)))))
+            {
+              loadRegFromAop (hc08_reg_x, AOP (IC_RIGHT (ic)), 0);
+              loadRegFromConst (hc08_reg_h, zero);
+            }
+          else
+            {
+              loadRegFromAop (hc08_reg_a, AOP (IC_RIGHT (ic)), 0);
+              transferRegReg (hc08_reg_a, hc08_reg_x, FALSE);
+              emitcode ("rola","");
+              emitcode ("clra","");
+              emitcode ("sbc", "#0");
+              hc08_useReg (hc08_reg_a);
+              transferRegReg (hc08_reg_a, hc08_reg_h, FALSE);
+           }
+        }
+      else
+        loadRegFromAop (hc08_reg_hx, AOP (IC_RIGHT (ic)), 0);
       size = AOP_SIZE (IC_RESULT(lic));
       derefaop->size = size;
       offset=0;
@@ -4284,8 +4303,26 @@ genPointerGetSetOfs (iCode *ic)
       aopOp (IC_RIGHT(ic), ic, FALSE);
       aopOp (IC_RIGHT(lic), lic, FALSE);
       
-
-      loadRegFromAop (hc08_reg_hx, AOP (IC_RIGHT (ic)), 0);
+      if (AOP_SIZE (IC_RIGHT (ic)) == 1)
+        {
+          if (SPEC_USIGN (getSpec (operandType (IC_RIGHT (ic)))))
+            {
+              loadRegFromAop (hc08_reg_x, AOP (IC_RIGHT (ic)), 0);
+              loadRegFromConst (hc08_reg_h, zero);
+            }
+          else
+            {
+              loadRegFromAop (hc08_reg_a, AOP (IC_RIGHT (ic)), 0);
+              transferRegReg (hc08_reg_a, hc08_reg_x, FALSE);
+              emitcode ("rola","");
+              emitcode ("clra","");
+              emitcode ("sbc", "#0");
+              hc08_useReg (hc08_reg_a);
+              transferRegReg (hc08_reg_a, hc08_reg_h, FALSE);
+           }
+        }
+      else
+        loadRegFromAop (hc08_reg_hx, AOP (IC_RIGHT (ic)), 0);
       size = AOP_SIZE (IC_RIGHT(lic));
       derefaop->size = size;
       offset=0;

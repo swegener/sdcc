@@ -1,3 +1,8 @@
+2004-03-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genPointerGetSetOfs): correctly handle 1 byte array
+	offsets (fixes bug #923936)
+
 2004-03-26 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/small/Makefile: fixed parallel execution by

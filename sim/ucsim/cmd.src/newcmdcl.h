@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include <stdio.h>
+#include <sys/types.h>	// to define fd_set
 #if FD_HEADER_OK
 # include HEADER_FD
 #endif

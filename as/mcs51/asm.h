@@ -81,7 +81,7 @@
  */
 #include <limits.h>
 #ifndef PATH_MAX		/* POSIX, but not required   */
-#ifdef _MSC_VER			/* Microsoft C */
+#if defined(_MSC_VER) || defined(__BORLANDC__)  /* Microsoft C or Borland C*/
 #include <stdlib.h>
 #define PATH_MAX	_MAX_PATH
 #else

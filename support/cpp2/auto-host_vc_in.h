@@ -42,6 +42,8 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.*/
 #define __STDC__			1
 
 #define ssize_t int
+
+#ifdef _MSC_VER
 /*So, which ones are the standard types? */
 #define ino_t _ino_t
 #define dev_t _dev_t
@@ -70,5 +72,6 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.*/
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4090 )
 #pragma warning( disable : 4022 )
+#endif  _MSC_VER
 
 #endif /*CPP2_VC_H_*/

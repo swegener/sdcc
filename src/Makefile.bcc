@@ -5,8 +5,8 @@ PRJDIR		= ..
 !include ..\Bcc.inc
 CFLAGS  = -I. -I.. -I..\support
 
-PORTS           = mcs51 z80 avr ds390 pic izt
-PORT_LIBS       = mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib izt/port.lib
+PORTS           = mcs51 xa51 z80 avr ds390 pic
+PORT_LIBS       = mcs51/port.lib xa51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib
 
 #LIBS		= -lgc
 #LIBDIRS		= -L$(PRJDIR)/support/gc
@@ -20,7 +20,7 @@ OBJECTS         = SDCCy.obj SDCClex.obj SDCChasht.obj SDCCmain.obj \
                   SDCCicode.obj SDCCbitv.obj SDCCset.obj SDCClabel.obj \
                   SDCCBBlock.obj SDCCloop.obj SDCCcse.obj SDCCcflow.obj SDCCdflow.obj \
                   SDCClrange.obj SDCCptropt.obj SDCCpeeph.obj SDCCglue.obj \
-                  asm.obj
+                  asm.obj SDCCutil.obj SDCCmacro.obj
 
 SLIBOBJS	= $(SLIB)\SDCCerr.obj $(SLIB)\NewAlloc.obj $(SLIB)\MySystem.obj $(SLIB)\BuildCmd.obj
 

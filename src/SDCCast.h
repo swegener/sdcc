@@ -106,6 +106,7 @@ typedef  struct   ast {
 #define  IS_AST_VALUE(x)	(x && x->type == EX_VALUE && x->opval.val)
 #define  IS_AST_LINK(x)		(x->type == EX_LINK)   
 #define  IS_AST_NOT_OPER(x)	(x && IS_AST_OP(x) && x->opval.op == '!')
+#define  IS_ARRAY_OP(x) (IS_AST_OP(x) && x->opval.op == '[')
 #define  IS_COMPARE_OP(x)	(IS_AST_OP(x)		&&		\
 				  (x->opval.op == '>'	||		\
 				   x->opval.op == '<'	||		\

@@ -2756,8 +2756,13 @@ operand *ast2iCode (ast *tree)
 	    (tree->opval.op == '&' && !tree->right) ||
 	    tree->opval.op == PTR_OP) {
 	    lvaluereq++;
-	    left = operandFromAst(tree->left);
-	    lvaluereq--;
+	    if (IS_ARRAY_OP(tree->left) && IS_ARRAY_OP(tree->left->left)) {
+		lvaluereq--;
+		left = operandFromAst(tree->left);
+	    } else {
+		left = operandFromAst(tree->left);
+		lvaluereq--;
+	    }
 	} else {
 	    left =  operandFromAst(tree->left);
 	}

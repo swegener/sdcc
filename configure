@@ -2722,12 +2722,14 @@ echo ds390 >>ports.all
 if test "$enable_ds390_port" = "no"; then
     cat >> confdefs.h <<EOF
 #define OPT_DISABLE_DS390 1
+#define OPT_DISABLE_TININative 1
 EOF
 
 else
     echo ds390 >>ports.build
     cat >> confdefs.h <<EOF
 #define OPT_DISABLE_DS390 0
+#define OPT_DISABLE_TININative 0
 EOF
 
 fi

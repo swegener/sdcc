@@ -1,3 +1,8 @@
+2004-06-05 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/pic16/startup/Makefile: added $(MODELFLAGS)
+	in COMPILE_FLAGS. Thanks to G. Gallant for report.
+
 2004-06-05 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: minor changes, mentioned beta vendor support

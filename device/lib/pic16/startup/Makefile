@@ -22,7 +22,7 @@ SRCS	=	crt0	\
 
 
 # add nostdinc and nostdlib for this device libraries
-COMPILE_FLAGS	+= --nostdinc --nostdlib
+COMPILE_FLAGS	+= $(MODELFLAGS) --nostdinc --nostdlib
 
 CFILES	= $(patsubst %,%.c,$(SRCS))
 OFILES	= $(patsubst %.c,%.o,$(CFILES))

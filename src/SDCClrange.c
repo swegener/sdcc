@@ -367,17 +367,33 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op, eBBlock **ebbs, int count)
   int i;
   bitVect * succVect;
   bitVect * predVect;
-  
+  eBBlock * pred;
+
   /* If liveness is already known, then a previous call to findNextUse() */
   /* has already taken care of everything. */
   if (ic && bitVectBitValue(ic->rlive, op->key))
     return;
-  
+
+  if (!ic)
+    {
+      /* We are at the start of a block. If the operand is alive at the */
+      /* end of all predecessors, then a previous call to findNextUse() */
+      /* has already taken care of everything. */
+      
+      pred = setFirstItem (ebp->predList);
+      for (; pred; pred = setNextItem (ebp->predList))
+        if (pred->ech && !bitVectBitValue(pred->ech->rlive, op->key))
+          break;
+      
+      if (!pred)
+        return;
+    }
+
   if (op->isaddr)
     OP_SYMBOL (op)->isptr = 1;
 
   OP_SYMBOL (op)->key = op->key;
-  
+
   /* Otherwise, it appears that this symbol was used prior to definition.     */
   /* Just fix the live range; we'll deal with a diagnostic message elsewhere. */
   /* If the symbol use was in a loop, we need to extend the live range to the */
@@ -388,7 +404,7 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op, eBBlock **ebbs, int count)
   unvisitBlocks (ebbs, count);
   predVect = newBitVect (count);
   applyToSet (ebp->predList, findRecursivePred, predVect);
-  
+
   /* Blocks that are both recursively predecessors and successors are in */
   /* a loop with the current iCode. Mark the operand as alive in them.   */
   for (i = 0; i < count; i++)
@@ -396,7 +412,7 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op, eBBlock **ebbs, int count)
       if (bitVectBitValue(succVect, i) && bitVectBitValue(predVect, i))
         markAlive (ebbs[i]->sch, ebbs[i]->ech, op->key);
     }
-  
+
   freeBitVect (succVect);
   freeBitVect (predVect);
 }

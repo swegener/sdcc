@@ -1,5 +1,9 @@
 2004-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCClrange.c (findPrevUse): fixed bug #1007371
+
+2004-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCsymt.h,
 	* src/SDCCsymt.c (changePointer, checkDecl, addSymChain): changed
 	parameter of changePointer() from symbol* to sym_link*

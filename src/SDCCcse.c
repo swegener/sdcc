@@ -276,11 +276,14 @@ DEFSETFUNC(findPointerSet)
     cseDef *cdp = item;
     V_ARG(operand *,op);
     V_ARG(operand **,opp);
+    V_ARG(operand *,rop);
 
     if (POINTER_SET(cdp->diCode)               &&
 	IC_RESULT(cdp->diCode)->key == op->key &&
 	!isOperandVolatile(IC_RESULT(cdp->diCode),TRUE) &&
-	!isOperandVolatile(IC_RIGHT(cdp->diCode),TRUE)) {
+	!isOperandVolatile(IC_RIGHT(cdp->diCode),TRUE)  &&
+	getSize(operandType(IC_RESULT(cdp->diCode))) ==
+	getSize(operandType(rop))) {
 	*opp = IC_RIGHT(cdp->diCode);
 	return 1;
     }
@@ -1224,7 +1227,7 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 		       for the same pointer visible if yes
 		       then change this into an assignment */
 		    pdop = NULL;
-		    if (applyToSetFTrue(cseSet,findPointerSet,IC_LEFT(ic),&pdop) &&
+		    if (applyToSetFTrue(cseSet,findPointerSet,IC_LEFT(ic),&pdop,IC_RESULT(ic)) &&
 			!bitVectBitValue(ebb->ptrsSet,pdop->key)){
 			ic->op = '=';
 			IC_LEFT(ic) = NULL;
@@ -1351,7 +1354,7 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	    !(IS_BITFIELD(OP_SYMBOL(IC_RESULT(ic))->etype) ||
 	       isOperandVolatile(IC_LEFT(ic),TRUE))) {
 	    pdop = NULL;
-	    applyToSet(ptrSetSet,findPointerSet,IC_LEFT(ic),&pdop);
+	    applyToSet(ptrSetSet,findPointerSet,IC_LEFT(ic),&pdop,IC_RESULT(ic));
 	    /* if we find it then locally replace all
 	       references to the result with what we assigned */
 	    if (pdop) {

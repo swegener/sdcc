@@ -156,7 +156,7 @@ case ifelse($2,,"[$]$1",$2) in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) $1=`echo "[$]$1" | sed 's,[[\\/]][[\\/]]*,\1\\\\\\\\,g'` ;;
+ *\\*) $1=`echo "[$]$1" | sed 's,[[\\/]][[\\/]]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1/,g'` ;;

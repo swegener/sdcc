@@ -6212,7 +6212,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6251,7 +6251,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6290,7 +6290,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6330,7 +6330,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6359,7 +6359,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) norm_inc_dir_suffix=`echo "[$]norm_inc_dir_suffix" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6385,7 +6385,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) norm_lib_dir_suffix=`echo "[$]norm_lib_dir_suffix" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6435,7 +6435,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6456,7 +6456,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6502,7 +6502,7 @@ case "$_lcl_notation" in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6525,7 +6525,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) bin2data_dir=`echo "[$]bin2data_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) bin2data_dir=`echo "$bin2data_dir" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) bin2data_dir=`echo "$bin2data_dir" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) bin2data_dir=`echo "$bin2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6574,7 +6574,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6595,7 +6595,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6641,7 +6641,7 @@ case "$_lcl_notation" in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6664,7 +6664,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) prefix2bin_dir=`echo "[$]prefix2bin_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6713,7 +6713,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6734,7 +6734,7 @@ case '/' in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6780,7 +6780,7 @@ case "$_lcl_notation" in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
@@ -6803,7 +6803,7 @@ case $dir_separator in
 # - convert the first slash
 # - replace a slash with a double-backslash
 # *\\*) prefix2data_dir=`echo "[$]prefix2data_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,[\\/][\\/]*,\1\\\\\\\\,g'` ;;
+ *\\*) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,[\\/][\\/]*,\\\\\\\\,g'` ;;
 
 # if the path contains slashes, also turn backslashes into slashes
  *) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;

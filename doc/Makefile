@@ -5,8 +5,8 @@ TSS = test_suite_spec
 CDB = cdbfileformat
 
 all: $(MANUAL).pdf $(MANUAL).html $(MANUAL).txt \
-#	$(TSS).pdf $(TSS).html $(TSS).txt \
-#	$(CDB).pdf $(CDB).html $(CDB).txt
+	$(TSS).pdf $(TSS).html $(TSS).txt \
+	$(CDB).pdf $(CDB).html $(CDB).txt
 
 install:
 	$(INSTALL) -d $(docdir)

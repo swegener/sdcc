@@ -1,3 +1,8 @@
+2003-09-17  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (cnvFromFloatCast, cnvToFloatCast): fixed
+	bug #613775
+
 2003-09-16  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genFunction, genEndFunction),

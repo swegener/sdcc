@@ -947,9 +947,9 @@ operandsEqu (operand * op1, operand * op2)
   if (sym1 == sym2)
     return 1;
 
-  if (strcmp (sym1->rname, sym2->rname) == 0)
+  if (sym1->rname[0] && sym2->rname[0]
+      && strcmp (sym1->rname, sym2->rname) == 0)
     return 2;
-
 
   /* if left is a tmp & right is not */
   if (IS_ITEMP (op1) &&
@@ -7501,6 +7501,7 @@ genArrayInit (iCode * ic)
         }
       else
         {
+	  printTypeChainRaw (type, NULL);
           wassertl (0, "Can't determine element size in genArrayInit.");
         }
     }

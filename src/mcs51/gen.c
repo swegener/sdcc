@@ -650,9 +650,9 @@ operandsEqu (operand * op1, operand * op2)
   if (sym1 == sym2)
     return TRUE;
 
-  if (strcmp (sym1->rname, sym2->rname) == 0)
+  if (sym1->rname[0] && sym2->rname[0]
+      && strcmp (sym1->rname, sym2->rname) == 0)
     return TRUE;
-
 
   /* if left is a tmp & right is not */
   if (IS_ITEMP (op1) &&
@@ -4777,6 +4777,9 @@ genCmp (operand * left, operand * right,
 		      if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
 			{
 			  genIfxJump (ifx, "acc.7", left, right, result);
+			  freeAsmop (right, NULL, ic, TRUE);
+			  freeAsmop (left, NULL, ic, TRUE);
+
 			  return;
 			}
 		      else

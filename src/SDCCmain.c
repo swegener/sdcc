@@ -1017,6 +1017,7 @@ parseCmdLine (int argc, char **argv)
 	  if (!port->parseOption (&argc, argv, &i))
 	    {
 	      werror (W_UNKNOWN_OPTION, argv[i]);
+	      continue;
 	    }
 	  else
 	    {

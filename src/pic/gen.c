@@ -697,9 +697,10 @@ static bool operandsEqu ( operand *op1, operand *op2)
   if (sym1 == sym2)
     return TRUE ;
   
-  if (strcmp(sym1->rname,sym2->rname) == 0)
+  if (sym1->rname[0] && sym2->rname[0]
+      && strcmp (sym1->rname, sym2->rname) == 0)
     return TRUE;
-  
+
   
   /* if left is a tmp & right is not */
   if (IS_ITEMP(op1)  && 

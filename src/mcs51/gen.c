@@ -28,7 +28,7 @@
       Made everything static
 -------------------------------------------------------------------------*/
 
-#define D
+#define D(x)
 //#define D(x) x
 
 #include <stdio.h>
@@ -165,9 +165,9 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
 
   /* first check if r0 & r1 are used by this
      instruction, in which case we are in trouble */
-  if ((r0iu = bitVectBitValue (ic->rUsed, R0_IDX)) &&
-      (r1iu = bitVectBitValue (ic->rUsed, R1_IDX)))
-    {
+  r0iu = bitVectBitValue (ic->rUsed, R0_IDX);
+  r1iu = bitVectBitValue (ic->rUsed, R1_IDX);
+  if (r0iu && r1iu) {
       goto endOfWorld;
     }
 
@@ -8017,6 +8017,8 @@ genAssign (iCode * ic)
   operand *result, *right;
   int size, offset;
   unsigned long lit = 0L;
+
+  D(emitcode(";","genAssign"));
 
   result = IC_RESULT (ic);
   right = IC_RIGHT (ic);

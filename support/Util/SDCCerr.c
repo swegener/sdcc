@@ -145,7 +145,7 @@ struct
    "operand invalid for bitwise operation" },
 { E_ANDOR_OP, ERROR_LEVEL_ERROR,
    "Invalid operand for '&&' or '||'" },
-{ E_TYPE_MISMATCH, ERROR_LEVEL_WARNING,
+{ E_TYPE_MISMATCH, ERROR_LEVEL_ERROR,
    "indirections to different types %s %s " },
 { E_AGGR_ASSIGN, ERROR_LEVEL_ERROR,
    "cannot assign values to aggregates" },

@@ -756,11 +756,11 @@ struct_declaration
 	       if (!sym->type) {
 		   sym->type = copyLinkChain($1);
 		   sym->etype = getSpec(sym->type);
-		   /* make sure the type is complete and sane */
-		   checkTypeSanity(sym->etype, sym->name);
 	       }
 	       else
 		   addDecl (sym,0,cloneSpec($1));   	       
+	       /* make sure the type is complete and sane */
+	       checkTypeSanity(sym->etype, sym->name);
 	   }
            $$ = $2;
        }

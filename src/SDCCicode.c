@@ -1599,7 +1599,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 
   /* if casting to/from pointers, do some checking */
   if (IS_PTR(type)) { // to a pointer
-    if (!IS_PTR(optype) && !IS_FUNC(optype)) { // from a non pointer
+    if (!IS_PTR(optype) && !IS_FUNC(optype) && !IS_AGGREGATE(optype)) { // from a non pointer
       if (IS_INTEGRAL(optype)) { 
 	// maybe this is NULL, than it's ok.
 	if (!(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong ==0))) {

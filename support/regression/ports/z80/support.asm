@@ -19,11 +19,11 @@ __init::
 	;; Call the main function
 	CALL	_main
         ld      a, #0
-        out	(1), a
+        rst     8
 
 __putchar::
-        ld      a,l
-        out     (0xff),a
+        ld      a,#1
+        rst     #8
         ret
 
         ;; Segment order

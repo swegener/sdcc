@@ -1,3 +1,10 @@
+2003-04-12  Borut Razem <borut.razem@siol.net>
+
+	* completed "different paths" task:
+	* src/SDCCmacro.c: fixed bug in handling quotes
+	* src/SDCCutil.c, src/SDCCutil.c: rewritten getPrefixFromBinPath()
+	* src/SDCCmain.c: _discoverPaths() replaced with setBinPaths(), setIncludePath() and setLibPath()
+
 2003-04-12  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/pic/pcoderegs.c (Remove1pcode): fix warning on alpha

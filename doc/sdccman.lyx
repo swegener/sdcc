@@ -3448,7 +3448,16 @@ cyclomatic complexity
 ---i-code-in-asm
 \series default 
  Include i-codes in the asm file.
- Looks like noise but is most helpfull for debugging the compiler itself.
+ Sounds like noise but is most helpfull for debugging the compiler itself.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+---less-pedantic
+\series default 
+ Disable some of the more pedantic warnings (jwk burps: please be more specific
+ here, please!)
 \layout Subsubsection
 
 Intermediate Dump Options
@@ -6745,15 +6754,15 @@ Pragmas
 \layout Standard
 
 SDCC supports the following #pragma directives.
- This directives are applicable only at a function level.
 \layout Itemize
 
 SAVE - this will save all the current options.
 \layout Itemize
 
 RESTORE - will restore the saved options from the last save.
- Note that SAVES & RESTOREs cannot be nested.
+ Note that SAVEs & RESTOREs cannot be nested.
  SDCC uses the same buffer to save the options each time a SAVE is called.
+ (jwk burps: either fix that or throw a warning)
 \layout Itemize
 
 NOGCSE - will stop global subexpression elimination.
@@ -6768,6 +6777,10 @@ NOJTBOUND - will not generate code for boundary value checking, when switch
 
 NOOVERLAY - the compiler will not overlay the parameters and local variables
  of a function.
+\layout Itemize
+
+LESS_PEDANTIC - the compiler will not warn you anymore for obvious mistakes,
+ you'r on your own now ;-(
 \layout Itemize
 
 NOLOOPREVERSE - Will not do loop reversal optimization

@@ -1790,7 +1790,7 @@ saveRegisters (iCode * lic)
     for (i = 0; i < ds390_nRegs; i++)
       {
 	if (bitVectBitValue (rsave, i))
-	  emitcode ("push", "%s", ds390_regWithIdx (i)->dname);
+	  emitcode ("push", "%s ;jwk saveRegisters", ds390_regWithIdx (i)->dname);
       }
 
   detype = getSpec (operandType (IC_LEFT (ic)));
@@ -1839,7 +1839,7 @@ unsaveRegisters (iCode * ic)
     for (i = ds390_nRegs; i >= 0; i--)
       {
 	if (bitVectBitValue (rsave, i))
-	  emitcode ("pop", "%s", ds390_regWithIdx (i)->dname);
+	  emitcode ("pop", "%s ;jwk unsaveRegisters", ds390_regWithIdx (i)->dname);
       }
 
 }
@@ -1940,7 +1940,6 @@ genIpush (iCode * ic)
   D (emitcode (";", "genIpush ");
     );
 
-
   /* if this is not a parm push : ie. it is spill push
      and spill push is always done on the local stack */
   if (!ic->parmPush)
@@ -1962,7 +1961,7 @@ genIpush (iCode * ic)
 	      MOVA (l);
 	      l = "acc";
 	    }
-	  emitcode ("push", "%s", l);
+	  emitcode ("push", "%s ;jwk genIpush: !parm", l);
 	}
       _endLazyDPSEvaluation ();
       return;
@@ -1999,7 +1998,7 @@ genIpush (iCode * ic)
 	  emitcode ("push", "acc");
 	}
       else
-	emitcode ("push", "%s", l);
+	emitcode ("push", "%s ;jwk genIpush", l);
     }
   _endLazyDPSEvaluation ();
 
@@ -2028,7 +2027,7 @@ genIpop (iCode * ic)
   _startLazyDPSEvaluation ();
   while (size--)
     {
-      emitcode ("pop", "%s", aopGet (AOP (IC_LEFT (ic)), offset--,
+      emitcode ("pop", "%s ;jwk genIpop", aopGet (AOP (IC_LEFT (ic)), offset--,
 				     FALSE, TRUE, TRUE));
     }
   _endLazyDPSEvaluation ();
@@ -7878,15 +7877,15 @@ genGenPointerGet (operand * left,
 	    l=aopGet(AOP(left),0,FALSE,FALSE,TRUE);
 	    genSetDPTR(0);
 	    _flushLazyDPS();
-	    emitcode ("mov", "dpl,%s", l);
+	    emitcode ("mov", "dpl,%s ;jwk lazy genGenPointerGet", l);
 	    l=aopGet(AOP(left),1,FALSE,FALSE,TRUE);
 	    genSetDPTR(0);
 	    _flushLazyDPS();
-	    emitcode ("mov", "dph,%s", l);
+	    emitcode ("mov", "dph,%s ;jwk lazy genGenPointerGet", l);
 	    l=aopGet(AOP(left),2,FALSE,FALSE,TRUE);
 	    genSetDPTR(0);
 	    _flushLazyDPS();
-	    emitcode ("mov", "dpx,%s", l);
+	    emitcode ("mov", "dpx,%s ;jwk lazy genGenPointerGet", l);
 	    emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
 	  } else {
 	    emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,TRUE));

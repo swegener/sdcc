@@ -1,3 +1,8 @@
+2003-05-28  Bernhard Held <bernhard@bernhardheld.de>
+
+	* doc/sdccman.lyx: fix double dash and other minor things
+	* doc/Makefile: fix double dash
+
 2003-05-28  Karl Bongers(patches from Martin Helmling)
 	* debugger/mcs51/sdcdb.c,cmd.c,break.c and .h files. Martin adds
 	  condition and ignore commands.
@@ -6,13 +11,24 @@
 
 	* doc/sdccman.lyx: Changes all over, index improved, smaller margins. The manual
 	  is in parts still quite out of date, I did changes as far as I felt makes sense
-	  for a non-native english speaker. 
+	  for a non-native english speaker.
 	  Please feel free to add to the manual or to correct my changes.
 	* doc/Makefile: undid touching the date of intermediate tex files.
 
 2003-05-26  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* doc/sdccman.lyx: Manual has an index now
+
+2003-05-25  Bernhard Held <bernhard@bernhardheld.de>
+
+	Finalize muluint/mulsint and mululong/mulslong merging:
+	* device/lib/_mulint.c
+	* device/lib/_mullong.c
+	* device/lib/gbz80/mul.s
+	* device/lib/gbz80/stubs.s
+	* device/lib/z80/mul.s
+	* device/lib/z80/stubs.s
+	* src/SDCCsymt.c (initCSupport)
 
 2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 

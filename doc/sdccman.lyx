@@ -35,8 +35,22 @@
 \layout Comment
 
 Please note: double dashed longoptions (e.g.
- --version) need three dashes in this document to be visable in html and
- pdf output.
+ --version) are written this way: -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-
+\layout Comment
+
+Two resp.
+ three consecutive dashes simply result in a long resp.
+ extra long dash.
 \layout Title
 
 SDCC Compiler User Guide
@@ -149,8 +163,17 @@ inline assembler code
 \newline 
 
 \newline 
-SDCC also provides an option (--cyclomatic) to report the relative complexity
- of a function.
+SDCC also provides an option (-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-cyclomatic) to report the relative complexity of a function.
  These functions can then be further optimized, or hand coded in assembly
  if needed.
  
@@ -307,13 +330,43 @@ n", a, (char)a);
  will push a as an int and as a char resp.
 \layout Itemize
 
-option ---regextend has been removed
+option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-regextend has been removed
 \layout Itemize
 
-option ---noregparms has been removed
+option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-noregparms has been removed
 \layout Itemize
 
-option ---stack-after-data has been removed
+option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-after-data has been removed
 \layout Standard
 
 
@@ -422,19 +475,59 @@ The install paths, search paths and other options are defined when running
 \layout List
 \labelwidthstring 00.00.0000
 
----prefix see tabel below
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-prefix see tabel below
 \layout List
 \labelwidthstring 00.00.0000
 
----exec_prefix see tabel below
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-exec_prefix see tabel below
 \layout List
 \labelwidthstring 00.00.0000
 
----bindir see tabel below
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-bindir see tabel below
 \layout List
 \labelwidthstring 00.00.0000
 
----datadir see tabel below
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-datadir see tabel below
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -460,54 +553,173 @@ sdccconf_h_dir_separator environment variable, either / or
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-mcs51-port Excludes the Intel mcs51 port
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-mcs51-port Excludes the Intel mcs51 port
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-gbz80-port Excludes the Gameboy gbz80 port
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-gbz80-port Excludes the Gameboy gbz80 port
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-z80-port Excludes the z80 port
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-z80-port Excludes the z80 port
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-avr-port Excludes the AVR port
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-avr-port Excludes the AVR port
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-ds390-port Excludes the DS390 port
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-ds390-port Excludes the DS390 port
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-pic-port Excludes the PIC port
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-pic-port Excludes the PIC port
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-xa51-port Excludes the XA51 port
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-xa51-port Excludes the XA51 port
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-ucsim Disables configuring and building of ucsim
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-ucsim Disables configuring and building of ucsim
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-device-lib-build Disables automatically building device libraries
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-device-lib-build Disables automatically building device libraries
 \layout List
 \labelwidthstring 00.00.0000
 
----disable-packihx Disables building packihx
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-disable-packihx Disables building packihx
 \layout List
 \labelwidthstring 00.00.0000
 
----enable-libgc Use the Bohem memory allocator.
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-enable-libgc Use the Bohem memory allocator.
  Lower runtime footprint.
 \layout Standard
 
 Furthermore the environment variables CC, CFLAGS, ...
  the tools and their arguments can be influenced.
- Please see `configure ---help` and the man/info pages of `configure` for
- details.
+ Please see `configure -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-help` and the man/info pages of `configure` for details.
 \newline 
 
 \newline 
@@ -972,7 +1184,7 @@ Examples:
 ./configure
 \layout LyX-Code
 
-./configure ---prefix=
+./configure --prefix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -980,7 +1192,7 @@ Examples:
 \begin_inset Quotes srd
 \end_inset 
 
- ---datadir=
+ --datadir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -991,7 +1203,7 @@ Examples:
 
 \layout LyX-Code
 
-./configure ---disable-avr-port ---disable-xa51-port
+./configure --disable-avr-port --disable-xa51-port
 \layout Standard
 
 To crosscompile on linux for Mingw32 (see also 'sdcc/support/scripts/sdcc_mingw3
@@ -1050,7 +1262,7 @@ i586-mingw32msvc-strip
 
 \layout LyX-Code
 
-  ---prefix=
+  --prefix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1063,7 +1275,7 @@ i586-mingw32msvc-strip
 
 \layout LyX-Code
 
-  ---datadir=
+  --datadir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1136,17 +1348,17 @@ lib
 
 \layout LyX-Code
 
-  ---disable-device-lib-build 
+  --disable-device-lib-build
 \backslash 
 
 \layout LyX-Code
 
-  ---disable-ucsim 
+  --disable-ucsim
 \backslash 
 
 \layout LyX-Code
 
-  ---host=i586-mingw32msvc ---build=unknown-unknown-linux-gnu
+  --host=i586-mingw32msvc --build=unknown-unknown-linux-gnu
 \layout Standard
 
 To 
@@ -1192,7 +1404,7 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
 
 \layout LyX-Code
 
-  ---prefix=
+  --prefix=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1205,7 +1417,7 @@ compile on Cygwin for Mingw32(see also sdcc/support/scripts/sdcc_cygwin_mingw32)
 
 \layout LyX-Code
 
-  ---datadir=
+  --datadir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1278,11 +1490,21 @@ lib
 
 \layout LyX-Code
 
-  ---disable-ucsim
+  --disable-ucsim
 \layout Standard
 
 'configure' is quite slow on Cygwin (at least on windows before Win2000/XP).
- The option '--C' turns on caching, which gives a little bit extra speed.
+ The option '-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-C' turns on caching, which gives a little bit extra speed.
  However if options are changed, it can be necessary to delete the config.cache
  file.
 \layout Subsection
@@ -1809,7 +2031,17 @@ Win32 builds
 
 \layout Standard
 
----I dir
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-I dir
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1817,7 +2049,17 @@ Win32 builds
 
 \layout Standard
 
----I dir
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-I dir
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1825,7 +2067,17 @@ Win32 builds
 
 \layout Standard
 
----I dir
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-I dir
 \end_inset 
 </cell>
 </row>
@@ -2019,7 +2271,17 @@ include
 \newline 
 
 \newline 
- The option ---nostdinc disables the last two search paths.
+ The option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nostdinc disables the last two search paths.
 \newline 
 
 \newline 
@@ -2030,7 +2292,17 @@ With the exception of
 \begin_inset Quotes sld
 \end_inset 
 
----L dir
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-L dir
 \begin_inset Quotes srd
 \end_inset 
 
@@ -2081,7 +2353,17 @@ Win32 builds
 
 \layout Standard
 
----L dir
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-L dir
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -2089,7 +2371,17 @@ Win32 builds
 
 \layout Standard
 
----L dir
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-L dir
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -2097,7 +2389,17 @@ Win32 builds
 
 \layout Standard
 
----L dir
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-L dir
 \end_inset 
 </cell>
 </row>
@@ -2363,7 +2665,17 @@ Don't delete any of the stray spaces in the table above without checking
 \SpecialChar ~
 
 \newline 
-The option ---nostdlib disables the last two search paths.
+The option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nostdlib disables the last two search paths.
 \layout Subsection
 
 Building SDCC
@@ -2913,7 +3225,17 @@ The first thing you should do after installing your SDCC compiler is to
  Type 
 \family sans 
 \series bold 
-"sdcc ---version"
+"sdcc -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-version"
 \begin_inset LatexCommand \index{version}
 
 \end_inset 
@@ -3471,8 +3793,18 @@ sourcefile.ihx
 
 \end_inset 
 
- with ---out-fmt-s19
-\begin_inset LatexCommand \index{---out-fmt-s19}
+ with -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-out-fmt-s19
+\begin_inset LatexCommand \index{-\/-out-fmt-s19}
 
 \end_inset 
 
@@ -3496,8 +3828,18 @@ sourcefile.adb
 \end_inset 
 
  - An intermediate file containing debug information needed to create the
- .cdb file (with ---debug
-\begin_inset LatexCommand \index{---debug}
+ .cdb file (with -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug
+\begin_inset LatexCommand \index{-\/-debug}
 
 \end_inset 
 
@@ -3509,7 +3851,17 @@ sourcefile.cdb
 
 \end_inset 
 
- - An optional file (with ---debug) containing debug information
+ - An optional file (with -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug) containing debug information
 \layout Itemize
 
 sourcefile.
@@ -3518,7 +3870,17 @@ sourcefile.
 
 \end_inset 
 
- An optional AOMF51 file containing debug information (with ---debug)
+ An optional AOMF51 file containing debug information (with -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug)
 \layout Itemize
 
 sourcefile.dump*
@@ -3526,8 +3888,17 @@ sourcefile.dump*
 
 \end_inset 
 
- - Dump file to debug the compiler it self (with ---dumpall) (see section
- 
+ - Dump file to debug the compiler it self (with -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpall) (see section 
 \begin_inset Quotes sld
 \end_inset 
 
@@ -4139,13 +4510,27 @@ Linker Options
 
 \series bold 
 -L\SpecialChar ~
----lib-path
-\begin_inset LatexCommand \index{---lib-path}
+-
+\series default 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series bold 
+-lib-path
+\begin_inset LatexCommand \index{-\/-lib-path}
 
 \end_inset 
 
 
-\begin_inset LatexCommand \index{-L ---lib-path}
+\begin_inset LatexCommand \index{-L -\/-lib-path}
 
 \end_inset 
 
@@ -4169,10 +4554,20 @@ Linker Options
 
 
 \series bold 
----xram-loc
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xram-loc
 \series default 
 
-\begin_inset LatexCommand \index{---xram-loc}
+\begin_inset LatexCommand \index{-\/-xram-loc}
 
 \end_inset 
 
@@ -4182,17 +4577,46 @@ Linker Options
 \end_inset 
 
 , default value is 0.
- The value entered can be in Hexadecimal or Decimal format, e.g.: ---xram-loc
- 0x8000 or ---xram-loc 32768.
+ The value entered can be in Hexadecimal or Decimal format, e.g.: -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xram-loc 0x8000 or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xram-loc 32768.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
----code-loc
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-loc
 \series default 
 
-\begin_inset LatexCommand \index{---code-loc}
+\begin_inset LatexCommand \index{-\/-code-loc}
 
 \end_inset 
 
@@ -4204,17 +4628,46 @@ Linker Options
  segment, default value 0.
  Note when this option is used the interrupt vector table is also relocated
  to the given address.
- The value entered can be in Hexadecimal or Decimal format, e.g.: ---code-loc
- 0x8000 or ---code-loc 32768.
+ The value entered can be in Hexadecimal or Decimal format, e.g.: -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-loc 0x8000 or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-loc 32768.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
----stack-loc
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-loc
 \series default 
 
-\begin_inset LatexCommand \index{---stack-loc}
+\begin_inset LatexCommand \index{-\/-stack-loc}
 
 \end_inset 
 
@@ -4227,7 +4680,27 @@ Linker Options
  Using this option the stack can be placed anywhere in the internal memory
  space of the 8051.
  The value entered can be in Hexadecimal or Decimal format, e.g.
- ---stack-loc 0x20 or ---stack-loc 32.
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-loc 0x20 or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-loc 32.
  Since the sp register is incremented before a push or call, the initial
  sp will be set to one byte prior the provided value.
  The provided value should not overlap any other memory areas such as used
@@ -4238,10 +4711,20 @@ Linker Options
 
 
 \series bold 
----data-loc
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-data-loc
 \series default 
 
-\begin_inset LatexCommand \index{---data-loc}
+\begin_inset LatexCommand \index{-\/-data-loc}
 
 \end_inset 
 
@@ -4252,21 +4735,61 @@ Linker Options
 
  segment.
  The value entered can be in Hexadecimal or Decimal format, eg.
- ---data-loc 0x20 or ---data-loc 32.
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-data-loc 0x20 or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-data-loc 32.
  (By default, the start location of the internal ram data segment  is set
  as low as possible in memory, taking into account the used register banks
  and the bit segment at address 0x20.
  For example if register banks 0 and 1 are used without bit variables, the
- data segment will be set, if ---data-loc is not used, to location 0x10.)
+ data segment will be set, if -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-data-loc is not used, to location 0x10.)
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
----idata-loc
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-idata-loc
 \series default 
 
-\begin_inset LatexCommand \index{---idata-loc}
+\begin_inset LatexCommand \index{-\/-idata-loc}
 
 \end_inset 
 
@@ -4277,14 +4800,44 @@ Linker Options
 
 , default value is 0x80.
  The value entered can be in Hexadecimal or Decimal format, eg.
- ---idata-loc 0x88 or ---idata-loc 136.
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-idata-loc 0x88 or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-idata-loc 136.
 \layout List
 \labelwidthstring 00.00.0000
 
 
 \series bold 
----out-fmt-ihx
-\begin_inset LatexCommand \index{---out-fmt-ihx}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-out-fmt-ihx
+\begin_inset LatexCommand \index{-\/-out-fmt-ihx}
 
 \end_inset 
 
@@ -4304,8 +4857,18 @@ The linker output (final object code) is in Intel Hex format.
 
 
 \series bold 
----out-fmt-s19
-\begin_inset LatexCommand \index{---out-fmt-s19}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-out-fmt-s19
+\begin_inset LatexCommand \index{-\/-out-fmt-s19}
 
 \end_inset 
 
@@ -4338,8 +4901,18 @@ MCS51 Options
 
 
 \series bold 
----model-large
-\begin_inset LatexCommand \index{---model-large}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-large
+\begin_inset LatexCommand \index{-\/-model-large}
 
 \end_inset 
 
@@ -4356,8 +4929,18 @@ MCS51 Options
 
 
 \series bold 
----model-small
-\begin_inset LatexCommand \index{---model-small}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-small
+\begin_inset LatexCommand \index{-\/-model-small}
 
 \end_inset 
 
@@ -4389,10 +4972,20 @@ DS390 Options
 
 
 \series bold 
----model-flat24
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-flat24
 \series default 
 
-\begin_inset LatexCommand \index{---model-flat24}
+\begin_inset LatexCommand \index{-\/-model-flat24}
 
 \end_inset 
 
@@ -4415,10 +5008,20 @@ Generate 24-bit flat mode code.
 
 
 \series bold 
----stack-10bit
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-10bit
 \series default 
 
-\begin_inset LatexCommand \index{--stack-10bit}
+\begin_inset LatexCommand \index{-\/-stack-10bit}
 
 \end_inset 
 
@@ -4443,8 +5046,18 @@ Generate 24-bit flat mode code.
  any re-entrant functions compiled with this option.
  In principle, this should work with the 
 \emph on 
----stack-auto
-\begin_inset LatexCommand \index{---stack-auto}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset 
 
@@ -4453,8 +5066,18 @@ Generate 24-bit flat mode code.
  option, but that has not been tested.
  It is incompatible with the 
 \emph on 
----xstack
-\begin_inset LatexCommand \index{---xstack}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack
+\begin_inset LatexCommand \index{-\/-xstack}
 
 \end_inset 
 
@@ -4464,7 +5087,17 @@ Generate 24-bit flat mode code.
  It also only makes sense if the processor is in 24 bit contiguous addressing
  mode (see the 
 \emph on 
----model-flat24 option
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-flat24 option
 \emph default 
 ).
 \layout Subsubsection
@@ -4485,8 +5118,18 @@ Optimization Options
 
 
 \series bold 
----nogcse
-\begin_inset LatexCommand \index{---nogcse}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nogcse
+\begin_inset LatexCommand \index{-\/-nogcse}
 
 \end_inset 
 
@@ -4514,8 +5157,18 @@ NOGCSE
 
 
 \series bold 
----noinvariant
-\begin_inset LatexCommand \index{---noinvariant}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-noinvariant
+\begin_inset LatexCommand \index{-\/-noinvariant}
 
 \end_inset 
 
@@ -4536,8 +5189,18 @@ NOINVARIANT
 
 
 \series bold 
----noinduction
-\begin_inset LatexCommand \index{---noinduction}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-noinduction
+\begin_inset LatexCommand \index{-\/-noinduction}
 
 \end_inset 
 
@@ -4557,8 +5220,18 @@ ION
 
 
 \series bold 
----nojtbound
-\begin_inset LatexCommand \index{---nojtbound}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nojtbound
+\begin_inset LatexCommand \index{-\/-nojtbound}
 
 \end_inset 
 
@@ -4589,8 +5262,18 @@ NOJTBOUND
 
 
 \series bold 
----noloopreverse
-\begin_inset LatexCommand \index{---noloopreverse}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-noloopreverse
+\begin_inset LatexCommand \index{-\/-noloopreverse}
 
 \end_inset 
 
@@ -4608,12 +5291,22 @@ optimization.
 \layout List
 \labelwidthstring 00.00.0000
 
----
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-
 \series bold 
 nolabelopt
 \series default 
  
-\begin_inset LatexCommand \index{---nolabelopt }
+\begin_inset LatexCommand \index{-\/-nolabelopt }
 
 \end_inset 
 
@@ -4623,8 +5316,18 @@ Will not optimize labels (makes the dumpfiles more readable).
 
 
 \series bold 
----no-xinit-opt
-\begin_inset LatexCommand \index{---no-xinit-opt}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-xinit-opt
+\begin_inset LatexCommand \index{-\/-no-xinit-opt}
 
 \end_inset 
 
@@ -4646,13 +5349,23 @@ Other Options
 
 \series bold 
 -c\SpecialChar ~
----compile-only
-\begin_inset LatexCommand \index{---compile-only}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-compile-only
+\begin_inset LatexCommand \index{-\/-compile-only}
 
 \end_inset 
 
 
-\begin_inset LatexCommand \index{-c ---compile-only}
+\begin_inset LatexCommand \index{-c -\/-compile-only}
 
 \end_inset 
 
@@ -4664,8 +5377,22 @@ Other Options
 
 
 \series bold 
---c1mode
-\begin_inset LatexCommand \index{--c1mode}
+-
+\series default 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series bold 
+-c1mode
+\begin_inset LatexCommand \index{-\/-c1mode}
 
 \end_inset 
 
@@ -4711,8 +5438,18 @@ The output path resp.
 
 
 \series bold 
----stack-auto
-\begin_inset LatexCommand \index{---stack-auto}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset 
 
@@ -4748,8 +5485,18 @@ reentrant
 
 
 \series bold 
----xstack
-\begin_inset LatexCommand \index{---xstack}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack
+\begin_inset LatexCommand \index{-\/-xstack}
 
 \end_inset 
 
@@ -4763,8 +5510,18 @@ reentrant
 
 
 \series bold 
----callee-saves
-\begin_inset LatexCommand \index{---callee-saves}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-callee-saves
+\begin_inset LatexCommand \index{-\/-callee-saves}
 
 \end_inset 
 
@@ -4787,11 +5544,21 @@ reentrant
  reduce code & improve run time performance of the generated code.
  In the future the compiler (with interprocedural analysis) will be able
  to determine the appropriate scheme to use for each function call.
- DO NOT use this option for built-in functions such as _muluint..., if this
+ DO NOT use this option for built-in functions such as _mulint..., if this
  option is used for a library function the appropriate library function
  needs to be recompiled with the same option.
  If the project consists of multiple source files then all the source file
- should be compiled with the same ---callee-saves option string.
+ should be compiled with the same -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-callee-saves option string.
  Also see #pragma\SpecialChar ~
 CALLEE-SAVES
 \begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
@@ -4804,8 +5571,18 @@ CALLEE-SAVES
 
 
 \series bold 
----debug
-\begin_inset LatexCommand \index{---debug}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug
+\begin_inset LatexCommand \index{-\/-debug}
 
 \end_inset 
 
@@ -4823,10 +5600,20 @@ When this option is used the compiler will generate debug information, that
 
 
 \series bold 
----peep-file
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-peep-file
 \series default 
 
-\begin_inset LatexCommand \index{---peep-file}
+\begin_inset LatexCommand \index{-\/-peep-file}
 
 \end_inset 
 
@@ -4885,8 +5672,18 @@ Stop after the stage of compilation proper; do not assemble.
 
 
 \series bold 
----int-long-reent
-\begin_inset LatexCommand \index{---int-long-reent}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-int-long-reent
+\begin_inset LatexCommand \index{-\/-int-long-reent}
 
 \end_inset 
 
@@ -4900,8 +5697,18 @@ Stop after the stage of compilation proper; do not assemble.
 
 
 \series bold 
----cyclomatic
-\begin_inset LatexCommand \index{---cyclomatic}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-cyclomatic
+\begin_inset LatexCommand \index{-\/-cyclomatic}
 
 \end_inset 
 
@@ -4933,8 +5740,18 @@ cyclomatic complexity
 
 
 \series bold 
----float-reent
-\begin_inset LatexCommand \index{---float-reent}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-float-reent
+\begin_inset LatexCommand \index{-\/-float-reent}
 
 \end_inset 
 
@@ -4954,8 +5771,18 @@ cyclomatic complexity
 
 
 \series bold 
----nooverlay
-\begin_inset LatexCommand \index{---nooverlay}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nooverlay
+\begin_inset LatexCommand \index{-\/-nooverlay}
 
 \end_inset 
 
@@ -4968,8 +5795,18 @@ cyclomatic complexity
 
 
 \series bold 
----main-return
-\begin_inset LatexCommand \index{---main-return}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-main-return
+\begin_inset LatexCommand \index{-\/-main-return}
 
 \end_inset 
 
@@ -4990,8 +5827,18 @@ cyclomatic complexity
 
 
 \series bold 
----no-peep
-\begin_inset LatexCommand \index{---no-peep}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-peep
+\begin_inset LatexCommand \index{-\/-no-peep}
 
 \end_inset 
 
@@ -5003,8 +5850,18 @@ cyclomatic complexity
 
 
 \series bold 
----peep-asm
-\begin_inset LatexCommand \index{---peep-asm}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-peep-asm
+\begin_inset LatexCommand \index{-\/-peep-asm}
 
 \end_inset 
 
@@ -5024,10 +5881,20 @@ cyclomatic complexity
 
 
 \series bold 
----iram-size
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-iram-size
 \series default 
 <Value>
-\begin_inset LatexCommand \index{---iram-size<Value>}
+\begin_inset LatexCommand \index{-\/-iram-size<Value>}
 
 \end_inset 
 
@@ -5038,10 +5905,20 @@ cyclomatic complexity
 
 
 \series bold 
----xram-size
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xram-size
 \series default 
 <Value>
-\begin_inset LatexCommand \index{---xram-size<Value>}
+\begin_inset LatexCommand \index{-\/-xram-size<Value>}
 
 \end_inset 
 
@@ -5052,10 +5929,20 @@ cyclomatic complexity
 
 
 \series bold 
----code-size
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-size
 \series default 
 <Value>
-\begin_inset LatexCommand \index{---code-size<Value>}
+\begin_inset LatexCommand \index{-\/-code-size<Value>}
 
 \end_inset 
 
@@ -5066,8 +5953,18 @@ cyclomatic complexity
 
 
 \series bold 
----nostdincl
-\begin_inset LatexCommand \index{---nostdincl}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nostdincl
+\begin_inset LatexCommand \index{-\/-nostdincl}
 
 \end_inset 
 
@@ -5080,8 +5977,18 @@ cyclomatic complexity
 
 
 \series bold 
----nostdlib
-\begin_inset LatexCommand \index{---nostdlib}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nostdlib
+\begin_inset LatexCommand \index{-\/-nostdlib}
 
 \end_inset 
 
@@ -5098,8 +6005,18 @@ cyclomatic complexity
 
 
 \series bold 
----verbose
-\begin_inset LatexCommand \index{---verbose}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-verbose
+\begin_inset LatexCommand \index{-\/-verbose}
 
 \end_inset 
 
@@ -5124,8 +6041,18 @@ cyclomatic complexity
 
 
 \series bold 
----no-c-code-in-asm
-\begin_inset LatexCommand \index{---no-c-code-in-asm}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-c-code-in-asm
+\begin_inset LatexCommand \index{-\/-no-c-code-in-asm}
 
 \end_inset 
 
@@ -5138,8 +6065,18 @@ cyclomatic complexity
 
 
 \series bold 
----i-code-in-asm
-\begin_inset LatexCommand \index{---i-code-in-asm}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-i-code-in-asm
+\begin_inset LatexCommand \index{-\/-i-code-in-asm}
 
 \end_inset 
 
@@ -5152,8 +6089,18 @@ cyclomatic complexity
 
 
 \series bold 
----less-pedantic
-\begin_inset LatexCommand \index{---less-pedantic}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-less-pedantic
+\begin_inset LatexCommand \index{-\/-less-pedantic}
 
 \end_inset 
 
@@ -5166,8 +6113,18 @@ cyclomatic complexity
 
 
 \series bold 
----print-search-dirs
-\begin_inset LatexCommand \index{---print-search-dirs}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-print-search-dirs
+\begin_inset LatexCommand \index{-\/-print-search-dirs}
 
 \end_inset 
 
@@ -5204,8 +6161,18 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
----dumpraw
-\begin_inset LatexCommand \index{---dumpraw}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpraw
+\begin_inset LatexCommand \index{-\/-dumpraw}
 
 \end_inset 
 
@@ -5230,8 +6197,18 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
----dumpgcse
-\begin_inset LatexCommand \index{---dumpgcse}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpgcse
+\begin_inset LatexCommand \index{-\/-dumpgcse}
 
 \end_inset 
 
@@ -5250,8 +6227,18 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
----dumpdeadcode
-\begin_inset LatexCommand \index{---dumpdeadcode}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpdeadcode
+\begin_inset LatexCommand \index{-\/-dumpdeadcode}
 
 \end_inset 
 
@@ -5270,8 +6257,18 @@ The following options are provided for the purpose of retargetting and debugging
 
 
 \series bold 
----dumploop
-\begin_inset LatexCommand \index{---dumploop}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumploop
+\begin_inset LatexCommand \index{-\/-dumploop}
 
 \end_inset 
 
@@ -5293,8 +6290,18 @@ Will create a dump of iCode's, after loop optimizations
 
 
 \series bold 
----dumprange
-\begin_inset LatexCommand \index{---dumprange}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumprange
+\begin_inset LatexCommand \index{-\/-dumprange}
 
 \end_inset 
 
@@ -5316,8 +6323,18 @@ Will create a dump of iCode's, after live range analysis
 
 
 \series bold 
----dumlrange
-\begin_inset LatexCommand \index{---dumlrange}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumlrange
+\begin_inset LatexCommand \index{-\/-dumlrange}
 
 \end_inset 
 
@@ -5334,8 +6351,18 @@ Will create a dump of iCode's, after live range analysis
 
 
 \series bold 
----dumpregassign
-\begin_inset LatexCommand \index{---dumpregassign}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpregassign
+\begin_inset LatexCommand \index{-\/-dumpregassign}
 
 \end_inset 
 
@@ -5357,8 +6384,18 @@ Will create a dump of iCode's, after register assignment
 
 
 \series bold 
----dumplrange
-\begin_inset LatexCommand \index{---dumplrange}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumplrange
+\begin_inset LatexCommand \index{-\/-dumplrange}
 
 \end_inset 
 
@@ -5370,8 +6407,18 @@ Will create a dump of iCode's, after register assignment
 
 
 \series bold 
----dumpall
-\begin_inset LatexCommand \index{---dumpall}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpall
+\begin_inset LatexCommand \index{-\/-dumpall}
 
 \end_inset 
 
@@ -5787,8 +6834,18 @@ They can be placed on the stack
 
  either by using the
 \emph on 
- ---stack-auto
-\begin_inset LatexCommand \index{--stack-auto}
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset 
 
@@ -5831,7 +6888,17 @@ reentrant
 \emph default 
 keyword or the
 \emph on 
- ---stack-auto
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
 \emph default 
  option should be used sparingly.
  Note that the reentrant keyword just means that the parameters & local
@@ -5902,7 +6969,17 @@ bvar
  in internal ram.
  When compiled with 
 \emph on 
----stack-auto
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
 \emph default 
  or when a function is declared as 
 \emph on 
@@ -6143,8 +7220,18 @@ NOOVERLAY
  then the support routines (as mentioned in a following section) will have
  to be recompiled using the
 \emph on 
- ---stack-auto
-\begin_inset LatexCommand \index{---stack-auto}
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset 
 
@@ -6152,10 +7239,20 @@ NOOVERLAY
 \emph default 
  option and the source file will need to be compiled using the 
 \emph on 
----int-long-ren
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-int-long-ren
 \emph default 
 t
-\begin_inset LatexCommand \index{---int-long-rent}
+\begin_inset LatexCommand \index{-\/-int-long-rent}
 
 \end_inset 
 
@@ -7016,8 +8113,18 @@ per function
  be placed in a separate line (as the example shows).
  When the 
 \emph on 
----peep-asm
-\begin_inset LatexCommand \index{--peep-asm}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-peep-asm
+\begin_inset LatexCommand \index{-\/-peep-asm}
 
 \end_inset 
 
@@ -7224,9 +8331,7 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \newline 
 
 \newline 
-_mulsint.c - signed 16 bit multiplication (calls _muluint)
-\newline 
-_muluint.c - unsigned 16 bit multiplication
+_mulint.c - 16 bit multiplication
 \newline 
 _divsint.c - signed 16 bit division (calls _divuint)
 \newline 
@@ -7236,9 +8341,7 @@ _modsint.c - signed 16 bit modulus (call _moduint)
 \newline 
 _moduint.c - unsigned 16 bit modulus
 \newline 
-_mulslong.c - signed 32 bit multiplication (calls _mululong)
-\newline 
-_mululong.c - unsigned32 bit multiplication
+_mullong.c - 32 bit multiplication
 \newline 
 _divslong.c - signed 32 division (calls _divulong)
 \newline 
@@ -7272,8 +8375,18 @@ non-reentrant
  If this is unavoidable then the above routines will need to be compiled
  with the 
 \emph on 
----stack-auto
-\begin_inset LatexCommand \index{---stack-auto}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset 
 
@@ -7281,8 +8394,18 @@ non-reentrant
 \emph default 
  option, after which the source program will have to be compiled with 
 \emph on 
----int-long-rent
-\begin_inset LatexCommand \index{---int-long-rent}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-int-long-rent
+\begin_inset LatexCommand \index{-\/-int-long-rent}
 
 \end_inset 
 
@@ -7471,7 +8594,17 @@ tinibios
 \newline 
 Like the 
 \emph on 
----model-large
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-large
 \emph default 
  option, variables will by default be placed into the XDATA segment.
  
@@ -7479,7 +8612,17 @@ Like the
 
 \newline 
 Segments may be placed anywhere in the 4 meg address space using the usual
- ---*-loc options.
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-*-loc options.
  Note that if any segments are located above 64K, the -r flag must be passed
  to the linker to generate the proper segment relocations, and the Intel
  HEX output format must be used.
@@ -7559,7 +8702,17 @@ SDCC_STACK_AUTO
 
  - this symbol is defined when 
 \emph on 
----stack-auto
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
 \emph default 
  option is used.
 \layout Itemize
@@ -7571,7 +8724,17 @@ SDCC_MODEL_SMALL
 
  - when 
 \emph on 
----model-small
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-small
 \emph default 
  is used.
 \layout Itemize
@@ -7583,7 +8746,17 @@ SDCC_MODEL_LARGE
 
  - when 
 \emph on 
----model-large
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-large
 \emph default 
  is used.
 \layout Itemize
@@ -7595,7 +8768,17 @@ SDCC_USE_XSTACK
 
  - when 
 \emph on 
----xstack
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack
 \emph default 
  option is used.
 \layout Itemize
@@ -7877,8 +9060,17 @@ Two types of loop optimizations are done by SDCC loop invariant lifting
  The compiler will generate a warning message when it is forced to allocate
  extra space either on the stack or data space.
  If this extra space allocation is undesirable then induction optimization
- can be eliminated either for the entire source file (with ---noinduction
- option) or for a given function only using #pragma\SpecialChar ~
+ can be eliminated either for the entire source file (with -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-noinduction option) or for a given function only using #pragma\SpecialChar ~
 NOINDUCTION
 \begin_inset LatexCommand \index{\#pragma NOINDUCTION}
 
@@ -8752,8 +9944,18 @@ copt
  A default set of rules are compiled into the compiler, additional rules
  may be added with the 
 \emph on 
----peep-file
-\begin_inset LatexCommand \index{---peep-file}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-peep-file
+\begin_inset LatexCommand \index{-\/-peep-file}
 
 \end_inset 
 
@@ -8852,7 +10054,17 @@ will remain unmodified.
 \newline 
 Other special case optimizations may be added by the user (via 
 \emph on 
----peep-file option
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-peep-file option
 \emph default 
 ).
  E.g.
@@ -9149,7 +10361,17 @@ g the variable bindings is passed as a parameter).
  have some better means.
  If you are looking at this file, you will also see the default rules that
  are compiled into the compiler, you can add your own rules in the default
- set there if you get tired of specifying the ---peep-file option.
+ set there if you get tired of specifying the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-peep-file option.
 \layout Subsection
 
 Pragmas
@@ -9299,7 +10521,17 @@ CALLEE-SAVES
  reduce code & improve run time performance of the generated code.
  In the future the compiler (with interprocedural analysis) may be able
  to determine the appropriate scheme to use for each function call.
- If ---callee-saves command line option is used, the function names specified
+ If -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-callee-saves command line option is used, the function names specified
  in #pragma\SpecialChar ~
 CALLEE-SAVES
 \begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
@@ -9439,8 +10671,18 @@ and
 \emph default 
  to pass the first parameter to a routine.
  The second parameter onwards is either allocated on the stack (for reentrant
- routines or if ---stack-auto is used) or in the internal / external ram
- (depending on the memory model).
+ routines or if -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto is used) or in the internal / external ram (depending on the
+ memory model).
  
 \layout Subsubsection
 
@@ -9866,12 +11108,32 @@ External Stack
 
 The external stack is located at the start of the external ram segment,
  and is 256 bytes in size.
- When ---xstack option is used to compile the program, the parameters and
- local variables of all reentrant functions are allocated in this area.
+ When -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack option is used to compile the program, the parameters and local
+ variables of all reentrant functions are allocated in this area.
  This option is provided for programs with large stack space requirements.
- When used with the ---stack-auto option, all parameters and local variables
- are allocated on the external stack (note support libraries will need to
- be recompiled with the same options).
+ When used with the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto option, all parameters and local variables are allocated on
+ the external stack (note support libraries will need to be recompiled with
+ the same options).
 \layout Standard
 
 The compiler outputs the higher order address byte of the external ram segment
@@ -10216,8 +11478,18 @@ If any of the 128 bit variables are used, or near data is being used then
 \layout Standard
 
 The amount of stack being used is affected by the use of the "internal stack"
- to save registers before a subroutine call is made (---stack-auto
-\begin_inset LatexCommand \index{---stack-auto}
+ to save registers before a subroutine call is made (-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
 
 \end_inset 
 
@@ -10227,14 +11499,44 @@ The amount of stack being used is affected by the use of the "internal stack"
 
 If you detect that the stack is over writing you data, then the following
  can be done.
- ---xstack will cause an external stack to be used for saving registers
- and (if ---stack-auto is being used) storing parameters and local variables.
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack will cause an external stack to be used for saving registers and
+ (if -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto is being used) storing parameters and local variables.
  However this will produce more code which will be slower to execute.
  
 \layout Standard
 
----stack-loc
-\begin_inset LatexCommand \index{---stack-loc}
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-loc
+\begin_inset LatexCommand \index{-\/-stack-loc}
 
 \end_inset 
 
@@ -10245,18 +11547,18 @@ If you detect that the stack is over writing you data, then the following
  the stack.
 \layout Standard
 
----stack-after-data
-\begin_inset LatexCommand \index{---stack-after-data}
+-
+\begin_inset ERT
+status Collapsed
 
-\end_inset 
-
-, similar to the ---stack-loc, but it automatically places the stack after
- the end of the "near data".
- Again this could waste any spare register space.
 \layout Standard
 
----data-loc
-\begin_inset LatexCommand \index{---data-loc}
+\backslash 
+/
+\end_inset 
+
+-data-loc
+\begin_inset LatexCommand \index{-\/-data-loc}
 
 \end_inset 
 
@@ -10275,9 +11577,28 @@ Conclusion.
 If you find that the stack is over writing your bit variables or "near data"
  then the approach which best utilised the internal memory is to position
  the "near data" after the last bank of used registers or, if you use bit
- variables, after the last bit variable by using the ---data-loc, e.g.
- if two register banks are being used and no bit variables, ---data-loc
- 16, and use the ---stack-after-data option.
+ variables, after the last bit variable by using the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-data-loc, e.g.
+ if two register banks are being used and no bit variables, -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-data-loc 16.
 \layout Standard
 
 If bit variables are being used, another method would be to try and squeeze
@@ -10926,7 +12247,17 @@ The second phase involves generating an intermediate code which can be easy
  The intermediate code generation assumes the target machine has unlimited
  number of registers, and designates them with the name iTemp.
  The compiler can be made to dump a human readable form of the code generated
- by using the ---dumpraw option.
+ by using the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpraw option.
 \layout Itemize
 
 This phase does the bulk of the standard optimizations and is also MCU independe
@@ -11031,9 +12362,19 @@ debug option must be specified for all files for which debug information
 How the Debugger Works
 \layout Standard
 
-When the ---debug option is specified the compiler generates extra symbol
- information some of which are put into the the assembler source and some
- are put into the .adb file.
+When the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug option is specified the compiler generates extra symbol information
+ some of which are put into the the assembler source and some are put into
+ the .adb file.
   Then the linker creates the .cdb file from the individual .adb files with
  the address information for the symbols.
  The debugger reads the symbolic information generated by the compiler &
@@ -11082,13 +12423,43 @@ foo.ihx - the intel hex format
 Command Line Options.
 \layout Itemize
 
----directory=<source file directory> this option can used to specify the
- directory search list.
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-directory=<source file directory> this option can used to specify the directory
+ search list.
  The debugger will look into the directory list specified for source, cdb
  & ihx files.
  The items in the directory list must be separated by ':', e.g.
  if the source files can be in the directories /home/src1 and /home/src2,
- the ---directory option should be ---directory=/home/src1:/home/src2.
+ the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-directory option should be -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-directory=/home/src1:/home/src2.
  Note there can be no spaces in the option.
  
 \layout Itemize
@@ -11415,7 +12786,7 @@ Comment
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
--------- 
+--------
 \newline 
 ;; 
 \newline 
@@ -12171,8 +13542,18 @@ Bug reports are automatically forwarded to the developer mailing list and
  which reproduces the problem.
  If you can isolate the problem by looking at the generated assembly code,
  this can be very helpful.
- Compiling your program with the ---dumpall
-\begin_inset LatexCommand \index{---dumpall}
+ Compiling your program with the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpall
+\begin_inset LatexCommand \index{-\/-dumpall}
 
 \end_inset 
 
@@ -12227,7 +13608,7 @@ collapsed false
 \layout Standard
 
 Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
- spam and automated messages (mid 2003)
+ automated messages (mid 2003)
 \end_inset 
 
  and the 
@@ -12376,8 +13757,8 @@ The anatomy of the compiler
 \shape italic 
 This is an excerpt from an atricle published in Circuit Cellar MagaZine
  in august 2000.
- It's a little outdated (the compiler is much more efficient now and user/devell
-oper friendly), but pretty well exposes the guts of it all.
+ It's a little outdated (the compiler is much more efficient now and user/develo
+per friendly), but pretty well exposes the guts of it all.
 \shape default 
 
 \newline 
@@ -12597,7 +13978,7 @@ mul = 0;
 \newline 
 15.\SpecialChar ~
 \SpecialChar ~
-for (i = 0, j = 10 ; i < 10 ; i++, j---) {
+for (i = 0, j = 10 ; i < 10 ; i++, j--) {
 \newline 
 16.\SpecialChar ~
 \SpecialChar ~

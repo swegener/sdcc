@@ -965,20 +965,20 @@ operandOperation (operand * left, operand * right,
 
       break;
     case LEFT_OP:
-      retval = operandFromLit (((SPEC_USIGN(let) ? 
+      retval = operandFromLit ((SPEC_USIGN(let) ? 
 				  (unsigned long) operandLitValue (left) :
 				  (long) operandLitValue (left)) <<
 				 (SPEC_USIGN(ret) ? 
 				  (unsigned long) operandLitValue (right) :
-				  (long) operandLitValue (right))));
+				  (long) operandLitValue (right)));
       break;
     case RIGHT_OP:
-      retval = operandFromLit (((SPEC_USIGN(let) ? 
+      retval = operandFromLit ((SPEC_USIGN(let) ? 
 				  (unsigned long) operandLitValue (left) :
 				  (long) operandLitValue (left)) >>
 				 (SPEC_USIGN(ret) ? 
 				  (unsigned long) operandLitValue (right) :
-				  (long) operandLitValue (right))));
+				  (long) operandLitValue (right)));
       break;
     case EQ_OP:
       retval = operandFromLit (operandLitValue (left) ==
@@ -1005,16 +1005,28 @@ operandOperation (operand * left, operand * right,
 			       operandLitValue (right));
       break;
     case BITWISEAND:
-      retval = operandFromLit ((unsigned long) operandLitValue (left) &
-			       (unsigned long) operandLitValue (right));
+      retval = operandFromLit ((SPEC_USIGN(let) ?
+				(unsigned long) operandLitValue (left) :
+				(long) operandLitValue (left)) &
+			       (SPEC_USIGN(ret) ?
+				(unsigned long) operandLitValue (right) :
+				(long) operandLitValue (right)));
       break;
     case '|':
-      retval = operandFromLit ((unsigned long) operandLitValue (left) |
-			       (unsigned long) operandLitValue (right));
+      retval = operandFromLit ((SPEC_USIGN(let) ?
+				(unsigned long) operandLitValue (left) :
+				(long) operandLitValue (left)) |
+			       (SPEC_USIGN(ret) ?
+				(unsigned long) operandLitValue (right) :
+				(long) operandLitValue (right)));
       break;
     case '^':
-      retval = operandFromLit ((unsigned long) operandLitValue (left) ^
-			       (unsigned long) operandLitValue (right));
+      retval = operandFromLit ((SPEC_USIGN(let) ?
+				(unsigned long) operandLitValue (left) :
+				(long) operandLitValue (left)) ^
+			       (SPEC_USIGN(ret) ?
+				(unsigned long) operandLitValue (right) :
+				(long) operandLitValue (right)));
       break;
     case AND_OP:
       retval = operandFromLit (operandLitValue (left) &&

@@ -394,9 +394,9 @@ value *
 constFloatVal (char *s)
 {
   value *val = newValue ();
-  float sval;
+  double sval;
 
-  if (sscanf (s, "%f", &sval) != 1)
+  if (sscanf (s, "%lf", &sval) != 1)
     {
       werror (E_INVALID_FLOAT_CONST, s);
       return constVal ("0");

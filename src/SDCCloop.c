@@ -798,12 +798,12 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 	  OP_SYMBOL (IC_RESULT (indIc))->isind = 1;
 	  ip = newInduction (IC_RIGHT (ic), dic->op, litValue, indIc, NULL);
 
-	  if (1) {
+	  if (0) {
 	    fprintf (stderr, "%s:%d: stupid way to avoid bug #467035, but\n"
 		     "this will keep the regressions tests going.\n",
 		     __FILE__, __LINE__);
 	    continue;
-	  }
+	  } continue;
 
 	  /* replace the inducted variable by the iTemp */
 	  replaceSymBySym (loopReg->regBlocks, IC_RESULT (ic), IC_RIGHT (ic));

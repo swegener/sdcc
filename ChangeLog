@@ -1,3 +1,11 @@
+2004-05-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c (killDeadCode): fixed bug #907733
+	* support/Util/SDCCerr.c: reworded E_AUTO_ASSUMED diagnostic to clarify
+	that the variable, not the function, should be static
+	* src/SDCCval.c (valCastLiteral): fixed bit initialization from literal
+	to be consistent with non-literal case
+
 2004-05-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (isConformingBody): fixed bug #949967

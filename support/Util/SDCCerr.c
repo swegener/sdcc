@@ -85,7 +85,7 @@ struct
 { W_INIT_IGNORED, ERROR_LEVEL_WARNING,
    "Variable in the storage class cannot be initialized.'%s'" },
 { E_AUTO_ASSUMED, ERROR_LEVEL_ERROR,
-   "storage class not allowed for automatic variable '%s' in reentrant function unless static" },
+   "variable '%s' must be static to have storage class in reentrant function" },
 { E_AUTO_ABSA, ERROR_LEVEL_ERROR,
    "absolute address not allowed for automatic var '%s' in reentrant function " },
 { W_INIT_WRONG, ERROR_LEVEL_WARNING,

@@ -1574,7 +1574,7 @@ valCastLiteral (sym_link * dtype, double fval)
       SPEC_CVAL (val->etype).v_float = fval;
   else if (SPEC_NOUN (val->etype) == V_BIT ||
            SPEC_NOUN (val->etype) == V_SBIT)
-    SPEC_CVAL (val->etype).v_uint = l & 1;   
+    SPEC_CVAL (val->etype).v_uint = l ? 1 : 0;
   else if (SPEC_NOUN (val->etype) == V_BITFIELD)
     SPEC_CVAL (val->etype).v_uint = l &
 				    (0xffffu >> (16 - SPEC_BLEN (val->etype)));

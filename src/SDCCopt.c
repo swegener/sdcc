@@ -883,7 +883,8 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      if (IC_RESULT (ic) && POINTER_SET (ic))
 		continue;
               
-              if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
+              if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next)
+	          && !SPIL_LOC (IC_RESULT (ic)))
                 continue;
 
 	      /* if the result is used in the remainder of the */
@@ -945,6 +946,16 @@ killDeadCode (eBBlock ** ebbs, int count)
 		      if (isOperandEqual (IC_RIGHT(ic), IC_LEFT(ic->next))
 		          || isOperandEqual (IC_RIGHT(ic), IC_RIGHT(ic->next)))
 		        volRight = FALSE;
+		    }
+		  
+		  if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
+		    {
+		      if (SPIL_LOC (IC_RESULT (ic)))
+			{
+			  IC_RESULT (ic) = newiTempFromOp (IC_RESULT (ic));
+			  SPIL_LOC (IC_RESULT (ic)) = NULL;
+			}
+		      continue;
 		    }
 		  
 		  change = 1;

@@ -1,5 +1,10 @@
 # Regression testing Makefile for Pic Port of SDCC
 #
+# note that this regression suite was started before
+# the one in sdcc/regression. The regression suite in
+# sdcc/regression is better suited for testing mature
+# ports.
+#
 # GPL'd
 #
 # T. Scott Dattalo scott@dattalo.com
@@ -58,6 +63,7 @@ SRC = b.c \
 	add.c \
 	add2.c \
 	add3.c \
+	and1.c \
 	bool1.c \
 	call1.c \
 	compare.c \
@@ -96,6 +102,8 @@ all:	test
 # The .stc files are script files for gpsim
 .cod.stc:
 	./$(CREATESTC) $*.cod $*.stc
+	echo "Created $*.stc"
+	./$(SIMULATE) $*.stc $(LOGFILE)
 
 # this will also make .stc files
 #%.stc : %.cod
@@ -111,12 +119,6 @@ asm : $(ASM)
 stc : $(STC)
 
 test:	$(STC)
-	if [ -n "$(STC)" ]; then \
-	stcfiles="$(STC)" ; \
-	for f in $$stcfiles ; do \
-	  ./$(SIMULATE) $$f $(LOGFILE); \
-	done ; \
-	fi
 	echo "Done - Results are in $(LOGFILE)"
 
 cleancod:

@@ -1536,7 +1536,7 @@ int pic14_getDataSize(operand *op)
 /*-----------------------------------------------------------------*/
 void pic14_outAcc(operand *result)
 {
-    int size, offset;
+
     DEBUGpic14_emitcode ("; ***","%s  %d - Warning no code will be generated here",__FUNCTION__,__LINE__);
 
 #if 0
@@ -3625,15 +3625,26 @@ static void genc16bit2lit(operand *op, int lit, int offset)
     emitpcode(POC_MOVFW,popGet(AOP(op),offset+i,FALSE,FALSE));
     emitpcode(POC_XORLW,popGetLit(BYTEofLONG(lit,i)));
   }
+
   i ^= 1;
 
-  if(BYTEofLONG(lit,i)) {
+  switch( BYTEofLONG(lit,i)) { 
+  case 0:
+    emitpcode(POC_IORFW,popGet(AOP(op),offset+i,FALSE,FALSE));
+    break;
+  case 1:
+    emitSKPNZ;
+    emitpcode(POC_DECFW,popGet(AOP(op),offset+i,FALSE,FALSE));
+    break;
+  case 0xff:
+    emitSKPNZ;
+    emitpcode(POC_INCFW,popGet(AOP(op),offset+i,FALSE,FALSE));
+    break;
+  default:
     emitpcode(POC_MOVLW,popGetLit(BYTEofLONG(lit,i)));
     emitSKPNZ;
     emitpcode(POC_XORFW,popGet(AOP(op),offset+i,FALSE,FALSE));
 
-  }else {
-    emitpcode(POC_IORFW,popGet(AOP(op),offset+i,FALSE,FALSE));
   }
 
 }
@@ -4333,15 +4344,11 @@ static void genAnd (iCode *ic, iCode *ifx)
             // if(left &  2^n)
 	  else{
 	    if(ifx){
-	      pCodeOp *pcorb = popGet(AOP(left),0,TRUE,FALSE);
-	      PCORB(pcorb)->subtype = PCOP(pcorb)->type;
-	      PCOP(pcorb)->type = PO_GPR_BIT;
-	      PCORB(pcorb)->bit = posbit;
 	      if(IC_TRUE(ifx)) {
-		emitpcode(POC_BTFSC, pcorb); 
+		emitpcode(POC_BTFSC,newpCodeOpBit(aopGet(AOP(left),0,FALSE,FALSE),posbit,0));
 		emitpcode(POC_GOTO,popGetLabel(IC_TRUE(ic)->key));
 	      } else {
-		emitpcode(POC_BTFSS, pcorb); 
+		emitpcode(POC_BTFSS,newpCodeOpBit(aopGet(AOP(left),0,FALSE,FALSE),posbit,0));
 		emitpcode(POC_GOTO,popGetLabel(IC_FALSE(ic)->key));
 	      }
 	      ifx->generated = 1;
@@ -4386,6 +4393,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 
     /* if left is same as result */
     if(pic14_sameRegs(AOP(result),AOP(left))){
+      int know_W = -1;
       for(;size--; offset++,lit>>=8) {
 	if(AOP_TYPE(right) == AOP_LIT){
 	  switch(lit & 0xff) {
@@ -4395,8 +4403,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 	    emitpcode(POC_CLRF,popGet(AOP(result),offset,FALSE,FALSE));
 	    break;
 	  case 0xff:
-	    pic14_emitcode("movf","%s,w",aopGet(AOP(right),offset,FALSE,FALSE));
-	    emitpcode(POC_MOVWF,popGet(AOP(right),offset,FALSE,FALSE));
+	    /* and'ing with 0xff is a nop when the result and left are the same */
 	    break;
 
 	  default:
@@ -4405,11 +4412,15 @@ static void genAnd (iCode *ic, iCode *ifx)
 	      if(p>=0) {
 		/* only one bit is set in the literal, so use a bcf instruction */
 		pic14_emitcode("bcf","%s,%d",aopGet(AOP(left),offset,FALSE,TRUE),p);
-		emitpcode(POC_BCF,popGet(AOP(left),offset,FALSE,TRUE));
+		//emitpcode(POC_BCF,popGet(AOP(left),offset,FALSE,TRUE));
+		emitpcode(POC_BCF,newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),p,0));
+
 	      } else {
 		pic14_emitcode("movlw","0x%x", (lit & 0xff));
 		pic14_emitcode("andwf","%s,f",aopGet(AOP(left),offset,FALSE,TRUE));
-		emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+		if(know_W != (lit&0xff))
+		  emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
+		know_W = lit &0xff;
 		emitpcode(POC_ANDWF,popGet(AOP(left),offset,FALSE,TRUE));
 	      }
 	    }    

@@ -1,3 +1,9 @@
+2003-06-18  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* src/SDCCglobl.h, src/SDCCmain.c:
+	option --use-stdout sends errors to stdout instead of stderr.
+	(changes to sdccman.lyx comming soon)
+
 2003-06-18  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/Util/MySystem.c (merge_command): quick fix for Linux segfault with \"cmd\" arg

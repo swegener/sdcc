@@ -117,6 +117,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_ICODE_IN_ASM	"--i-code-in-asm"
 #define OPTION_PRINT_SEARCH_DIRS "--print-search-dirs"
 #define OPTION_MSVC_ERROR_STYLE "--vc"
+#define OPTION_USE_STDOUT "--use-stdout"
 
 static const OPTION
 optionsTable[] = {
@@ -217,6 +218,7 @@ optionsTable[] = {
     { 0,    OPTION_ICODE_IN_ASM,    &options.iCodeInAsm, "include i-code as comments in the asm file"},
     { 0,    OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
     { 0,    OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
+    { 0,    OPTION_USE_STDOUT, &options.use_stdout, "send errors to stdout instead of stderr"},
     /* End of options */
 #if 0 /* 10jun03 !OPT_DISABLE_PIC16 */
     { 0,    "--no-movff",	    &options.no_movff, "disable generating MOVFF opcode in PIC16 port"},
@@ -1269,6 +1271,7 @@ parseCmdLine (int argc, char **argv)
 	werror (E_FILE_OPEN_ERR, scratchFileName);
     }
   MSVC_style(options.vc_err_style);
+  if(options.use_stdout) SetErrorOut(stdout);
   return 0;
 }
 

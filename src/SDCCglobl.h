@@ -243,6 +243,7 @@ struct options
     int iCodeInAsm;             /* show i-code in asm */
     int printSearchDirs;        /* display the directories in the compiler's search path */
     int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
+    int use_stdout;             /* send errors to stdout instead of stderr */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */

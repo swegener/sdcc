@@ -3529,8 +3529,14 @@ ast  *createFunction   (symbol  *name,   ast  *body )
     processFuncArgs(currFunc,0);
     
     /* set the stack pointer */
-    stackPtr = -1 - (IS_ISR(name->etype)) - (IS_RENT(name->etype) | options.stackAuto);
-    xstackPtr= -1;
+    /* PENDING: check this for the mcs51 */
+    stackPtr = -port->stack.direction * port->stack.call_overhead;
+    if (IS_ISR(name->etype))
+	stackPtr -= port->stack.direction * port->stack.isr_overhead;
+    if (IS_RENT(name->etype) || options.stackAuto)
+	stackPtr -= port->stack.direction * port->stack.reent_overhead;
+
+    xstackPtr = -port->stack.direction * port->stack.call_overhead;
     
     fetype = getSpec(name->type); /* get the specifier for the function */
     /* if this is a reentrant function then */

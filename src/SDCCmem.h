@@ -9,7 +9,7 @@ struct set ;
 struct value ;
 typedef  struct memmap{
     unsigned char  pageno;/* page no for this variable  */
-    char     *sname;    /*   character prefix for map */
+    const char     *sname;    /*   character prefix for map */
     char     dbName ;   /* debugger address space name */
     int      slbl ;    /* label counter for space    */
     unsigned sloc    ;    /* starting location          */
@@ -63,7 +63,7 @@ extern   struct  set     *ovrSetSets;
 #define IN_CODESPACE(map)       (map && map->codesp)
 
 /* forward decls for functions    */
-memmap     *allocMap       (char,char,char,char,char,char,unsigned,char *,char );
+memmap     *allocMap       (char,char,char,char,char,char,unsigned, const char *,char );
 void        initMem        (                                );
 void        allocGlobal    (struct symbol  *                );
 void        allocLocal     (struct symbol  *                );

@@ -60,8 +60,9 @@ typedef struct {
 	int isr_overhead;
 	/** Standard overhead for a function call */
 	int call_overhead;
-	/** Initial SP offset */
-	int start_sp;
+	/** Re-enterant space */
+	int reent_overhead;
+	
     } stack;
     struct {
 	/** One more than the smallest mul/div operation the processor can do nativley 

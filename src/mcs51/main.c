@@ -61,7 +61,7 @@ PORT mcs51_port = {
 	"OSEG    (OVR,DATA)"
     },
     { 
-	+1, 1, 4, 0, 0
+	+1, 1, 4, 1, 1
     },
     /* mcs51 has an 8 bit mul */
     {

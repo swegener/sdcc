@@ -39,7 +39,7 @@ memmap *allocMap (char rspace,     /* sfr space            */
 		  char bitaddr,    /* bit addressable space*/
 		  char codemap,    /* this is code space   */
 		  unsigned sloc,   /* starting location    */
-		  char *name,      /* 2 character name     */
+		  const char *name,      /* 2 character name     */
 		  char dbName     
 		  )
 {
@@ -362,6 +362,7 @@ void allocParms ( value  *val )
 	    /* choose which stack 2 use	  */
 	    /*  use xternal stack */
 	    if ( options.useXstack )	{
+		/* PENDING: stack direction support */
 		SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = xstack ;
 		SPEC_STAK(lval->etype) = SPEC_STAK(lval->sym->etype) = lval->sym->stack =
 		    xstackPtr - getSize(lval->type);		
@@ -369,11 +370,19 @@ void allocParms ( value  *val )
 	    }
 	    else   {	/* use internal stack   */
 		SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = istack ;
-		SPEC_STAK(lval->etype) = SPEC_STAK(lval->sym->etype) = lval->sym->stack = 
-		    stackPtr - ( SPEC_BANK(currFunc->etype) ? 1 : 0) - 
-		    getSize(lval->type) -
-		    (IS_ISR(currFunc->etype) ? 4 : 0); 
-		stackPtr -= getSize (lval->type);
+		if (port->stack.direction > 0) {
+		    SPEC_STAK(lval->etype) = SPEC_STAK(lval->sym->etype) = lval->sym->stack = 
+			stackPtr - ( SPEC_BANK(currFunc->etype) ? port->stack.bank_overhead : 0) - 
+			getSize(lval->type) -
+			(IS_ISR(currFunc->etype) ? port->stack.isr_overhead : 0); 
+		    stackPtr -= getSize (lval->type);
+		}
+		else {
+		    /* This looks like the wrong order but it turns out OK... */
+		    /* PENDING: isr, bank overhead, ... */
+		    SPEC_STAK(lval->etype) = SPEC_STAK(lval->sym->etype) = lval->sym->stack = stackPtr;
+		    stackPtr += getSize (lval->type);
+		}		    
 	    }
 	    allocIntoSeg(lval->sym);
 	}
@@ -473,14 +482,21 @@ void allocLocal ( symbol *sym  )
 	       
 	sym->onStack = 1;
 	if ( options.useXstack ) { 
+	    /* PENDING: stack direction for xstack */
 	    SPEC_OCLS(sym->etype) = xstack ;
 	    SPEC_STAK(sym->etype) = sym->stack = (xstackPtr + 1);
 	    xstackPtr += getSize (sym->type) ;
 	}
 	else {
 	    SPEC_OCLS(sym->etype) = istack ;
-	    SPEC_STAK(sym->etype) = sym->stack = ( stackPtr + 1);
-	    stackPtr += getSize (sym->type) ;
+	    if (port->stack.direction > 0) {
+		SPEC_STAK(sym->etype) = sym->stack = ( stackPtr + 1);
+		stackPtr += getSize (sym->type) ;
+	    }
+	    else {
+		stackPtr -= getSize (sym->type);
+		SPEC_STAK(sym->etype) = sym->stack = stackPtr;
+	    }
 	}
 	allocIntoSeg(sym);
 	return ;
@@ -704,12 +720,18 @@ void redoStackOffsets ()
 	int size = getSize(sym->type);
 	/* nothing to do with parameters so continue */
 	if ((sym->_isparm && !IS_REGPARM(sym->etype)))
-		continue ;
+	    continue ;
 	
 	if ( IS_AGGREGATE(sym->type)) {
+	    if (port->stack.direction > 0) {
 		SPEC_STAK(sym->etype) = sym->stack = ( sPtr + 1);
 		sPtr += size;
-		continue ;
+	    }
+	    else {
+		sPtr -= size;
+		SPEC_STAK(sym->etype) = sym->stack = sPtr;
+	    }
+	    continue;
 	}
 
 	/* if allocation not required then subtract
@@ -720,8 +742,14 @@ void redoStackOffsets ()
 	    continue ;
 	}
 
-	SPEC_STAK(sym->etype) = sym->stack = ( sPtr + 1);
-	sPtr += size ;
+	if (port->stack.direction > 0) {
+	    SPEC_STAK(sym->etype) = sym->stack = ( sPtr + 1);
+	    sPtr += size ;
+	}
+	else {
+	    sPtr -= size ;
+	    SPEC_STAK(sym->etype) = sym->stack = sPtr;
+	}
     }
 
     /* do the same for the external stack */
@@ -732,12 +760,12 @@ void redoStackOffsets ()
 	int size  = getSize(sym->type);
 	/* nothing to do with parameters so continue */
 	if ((sym->_isparm && !IS_REGPARM(sym->etype)))
-		continue ;
+	    continue ;
 	
 	if (IS_AGGREGATE(sym->type)) {
-		SPEC_STAK(sym->etype) = sym->stack = ( xsPtr + 1);
-		xsPtr += size ;
-		continue ;
+	    SPEC_STAK(sym->etype) = sym->stack = ( xsPtr + 1);
+	    xsPtr += size ;
+	    continue ;
 	}      
 
 	/* if allocation not required then subtract

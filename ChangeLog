@@ -1,3 +1,64 @@
+2002-01-30  Sandeep Dutta  <sandeep@ddi.com>
+
+	* src/mcs51/gen.c, src/mcs51/main.c, src/mcs51/ralloc.c:
+	Added support for --parms-in-bank1
+
+	* src/ds390/peeph.def:
+	added a few more peephole optimzations
+
+	* src/ds390/main.c:
+	1) added __builtin_inp & __builtin_outp used to read in data of given length
+	   from a memory mapped port
+	2) added __builtin_memcmp
+	3) added __builtin_swapw swap bytes of a short
+
+	* src/ds390/gen.c, src/ds390/gen.h, src/ds390/ralloc.c:
+	1) handle multiple send & receives from register bank1
+	2) ralloc can now allocate DPTR1 to some liveRanges
+
+	* src/SDCCsymt.c, src/SDCCsymt.h:
+	changes to handle multiple sends & receives
+
+	* src/SDCCptropt.h:
+	added some pointer arithmetic optimization
+
+	* src/SDCCptropt.c:
+	added some pointer arithmetic optimizations but not stable yet so not
+	called from anywhere (will get this working shortly)
+
+	* src/SDCCopt.c: fixed for multiple sends & receives
+
+	* src/SDCCmain.c:
+	1) added options --parms-in-bank1 (ds390/mcs51) & --protect-sp-update
+	2) preprocessing done AFTER port->finalizeoptions . This allows ports to
+	   set preprocessor defines (depending on options)
+
+	* src/SDCCicode.c, src/SDCCicode.h:
+	changes made to handle multiple sends & receives
+
+	* src/SDCCglobl.h:
+	Added options --protect-sp-update (ds390) and --parms-in-bank1 (ds390/mcs51)
+
+	* src/SDCCcse.c, src/SDCCcse.h:
+	added function findbackward def (to be used in upcoming optimization)
+
+	* src/SDCCcflow.c, src/SDCCcflow.h:
+	added function returnAtEnd - to determine if a basic block terminates with
+	a RETURN iCode
+
+	* src/SDCCast.c, src/SDCCast.h:
+	added option parms-in-bank1
+
+	* device/lib/_divsint.c, device/lib/_divslong.c, device/lib/_divuint.c 
+	* device/lib/_divulong.c, device/lib/_modsint.c, device/lib/_modslong.c 
+	* device/lib/_modulong.c, device/lib/_mulint.c, device/lib/_mullong.c:
+	adjusted for --parms-in-bank1 option
+
+	* device/include/string.h:
+	donot redefine "reentrant" keyword
+
+	* device/include/ds80c390.h: Added some more SFRs
+
 2002-01-28  Bernhard Held  <bernhard@bernhardheld.de>
 
 	* sim/ucsim: Merged branch ucsim-034-pre3 to main trunk; new version 0.4 

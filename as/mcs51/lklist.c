@@ -1212,10 +1212,10 @@ int summary(struct area * areap)
 	}
 
 	for(j=0; j<7; j++)
-		for(k=Ram[j].Start; k<(Ram[j].Start+Ram[j].Size); k++)
+		for(k=Ram[j].Start; (k<(Ram[j].Start+Ram[j].Size))&&(k<0x100); k++)
 			dram[k]|=Ram[j].flag; /*Mark as used*/
 	
-	for(k=IRam.Start; k<(IRam.Start+IRam.Size); k++)
+	for(k=IRam.Start; (k<(IRam.Start+IRam.Size))&&(k<0x100); k++)
 		dram[k]|=IRam.flag; /*Mark as used*/
 
 	/*Compute the amount of unused memory in direct data Ram.  This is the
@@ -1251,7 +1251,7 @@ int summary(struct area * areap)
 		}
 	}
 
-	for(k=Ram[6].Start; k<(Ram[6].Start+Ram[6].Size); k++)
+	for(k=Ram[6].Start; (k<(Ram[6].Start+Ram[6].Size))&&(k<0x100); k++)
 	{
 		if(dram[k]!=Ram[6].flag)
 		{
@@ -1261,11 +1261,11 @@ int summary(struct area * areap)
 		}
 	}
 
-	if(Ram[7].Size>0x80)
+	if((Ram[6].Start+Ram[6].Size)>0x80)
 	{
 		sprintf(buff, "*** ERROR: Insuficient DRAM memory.  "
-					"%d byte%s short.\n", Ram[7].Size-0x80,
-					((Ram[7].Size-0x80)==1)?"":"s");
+					"%d byte%s short.\n", (Ram[6].Start+Ram[6].Size)-0x80,
+					((Ram[6].Start+Ram[6].Size)==1)?"":"s");
 		REPORT_ERROR(buff);
 	}
 

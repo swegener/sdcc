@@ -1636,6 +1636,14 @@ linkEdit (char **envp)
       *q = 0;
       strncatz(buffer, ".mem", sizeof(buffer));
       rename (scratchFileName, buffer);
+      if (options.debug)
+        {
+          *p = 0;
+          strncatz (scratchFileName, ".cdb", sizeof(scratchFileName));
+          *q = 0;
+          strncatz(buffer, ".cdb", sizeof(buffer));
+          rename (scratchFileName, buffer);
+        }
     }
   if (system_ret)
     {

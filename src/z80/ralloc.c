@@ -763,6 +763,7 @@ regs *
 getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
   regs *reg;
+  int j;
 
   D (D_ALLOC, ("getRegGpr: on ic %p\n", ic));
 tryAgain:
@@ -779,6 +780,11 @@ tryAgain:
       D (D_ALLOC, ("getRegGpr: have to spill.\n"));
       return NULL;
     }
+  
+  /* make sure partially assigned registers aren't reused */
+  for (j=0; j<=sym->nRegs; j++)
+    if (sym->regs[j])
+      sym->regs[j]->isFree = 0;
 
   /* this looks like an infinite loop but 
      in really selectSpil will abort  */

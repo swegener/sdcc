@@ -782,6 +782,7 @@ static regs *
 getRegPtr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
   regs *reg;
+  int j;
 
 tryAgain:
   /* try for a ptr type */
@@ -796,6 +797,11 @@ tryAgain:
   if (!spilSomething (ic, ebp, sym))
     return NULL;
 
+  /* make sure partially assigned registers aren't reused */
+  for (j=0; j<=sym->nRegs; j++)
+    if (sym->regs[j])
+      sym->regs[j]->isFree = 0;
+      
   /* this looks like an infinite loop but 
      in really selectSpil will abort  */
   goto tryAgain;
@@ -808,7 +814,8 @@ static regs *
 getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym)
 {
   regs *reg;
-
+  int j;
+  
 tryAgain:
   /* try for gpr type */
   if ((reg = allocReg (REG_GPR)))
@@ -822,6 +829,11 @@ tryAgain:
   if (!spilSomething (ic, ebp, sym))
     return NULL;
 
+  /* make sure partially assigned registers aren't reused */
+  for (j=0; j<=sym->nRegs; j++)
+    if (sym->regs[j])
+      sym->regs[j]->isFree = 0;
+      
   /* this looks like an infinite loop but 
      in really selectSpil will abort  */
   goto tryAgain;
@@ -1208,6 +1220,17 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    mcs51_ptrRegReq++;
 		    ptrRegSet = 1;
 		}
+		if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic))
+		    && SPEC_OCLS(OP_SYMBOL (IC_LEFT (ic))->etype) == idata) {
+		    mcs51_ptrRegReq++;
+		    ptrRegSet = 1;
+		}
+		if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic))
+		    && SPEC_OCLS(OP_SYMBOL (IC_RIGHT (ic))->etype) == idata) {
+		    mcs51_ptrRegReq++;
+		    ptrRegSet = 1;
+		}
+		
 		/* else we assign registers to it */
 		_G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
 		_G.totRegAssigned = bitVectSetBit (_G.totRegAssigned, sym->key);

@@ -408,7 +408,7 @@ register struct expr *esp;
                                 }
                                 tp = tp->t_lnk;
                         }
-                        /* err('u'); */
+                        err('u');
                         return;
                 }
                 r = radix;

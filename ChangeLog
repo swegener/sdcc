@@ -1,4 +1,14 @@
-2004-01-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2004-01-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/ralloc.c (getRegPtr, getRegGpr),
+	* src/ds390/ralloc.c (getRegPtr, getRegGpr),
+	* src/pic/ralloc.c (getRegPtr, getRegGpr),
+	* src/pic16/ralloc.c (getRegPtr, getRegGpr),
+	* src/z80/ralloc.c (getRegGpr): fixed bug #883361
+	* as/mcs51/asexpr.c (term),
+	* as/hc08/asexpr.c (term): fixed bug #887146
+
+2004-01-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (genMult): handle single byte result product
 	* src/SDCCopt.c (killDeadCode): never convert ADDRESS_OF iCode to

@@ -1,3 +1,10 @@
+2003-11-04  Borut Razem <borut.razem@siol.net>
+
+	* configure, configure.in, sdcc_vc_in.h, sdcconf.h,
+	  support/Util/NewAlloc.c, as/hc08/lklibr.c, as/mcs51/lklibr.c,
+	  as/z80/aslist.c, as/z80/assym.c: decision to include malloc.h
+	  transferred to configure
+
 2003-11-03 Bernhard Held <bernhard@bernhardheld.de>
 
 	Use headers defined in the C[++] standards:

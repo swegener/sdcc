@@ -21,7 +21,9 @@
 #include <sys/types.h>
 #include <sys/malloc.h>
 #else
+#ifdef HAVE_MALLOC_H
 #include <malloc.h>
+#endif
 #endif
 
 

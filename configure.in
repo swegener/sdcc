@@ -69,7 +69,7 @@ AC_LANG([C])
 
 # Checking for header files.
 # ===========================================================================
-AC_CHECK_HEADERS(sys/socket.h)
+AC_CHECK_HEADERS(sys/socket.h malloc.h)
 
 
 # Checking for functions

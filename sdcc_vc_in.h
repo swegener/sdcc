@@ -39,9 +39,10 @@
 #define STD_FP_LIB            "libfloat"
 #define STD_DS390_LIB         "libds390"
 #define STD_DS400_LIB	      "libds400"
-// #undef STD_XA51_LIB
+/* #undef STD_XA51_LIB */
 
-// #undef HAVE_SYS_SOCKET_H
+/* #undef HAVE_SYS_SOCKET_H */
+#define HAVE_MALLOC_H
 
 #undef HAVE_STRERROR
 #define HAVE_VSNPRINTF

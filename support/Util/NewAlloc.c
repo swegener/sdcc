@@ -30,8 +30,10 @@ functions.
 #include <stdio.h>
 #if defined(__APPLE__) && defined(__MACH__)
 #include <sys/malloc.h>
-#elseif !defined(__FreeBSD__)
+#else
+#ifdef HAVE_MALLOC_H
 #include <malloc.h>
+#endif
 #endif
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +50,7 @@ functions.
    allocated with malloc() then the program will segfault.  Might as
    well drop it and let the garbase collector take care of things.
 */
-#define FREE(_a)	
+#define FREE(_a)
 
 #else
 

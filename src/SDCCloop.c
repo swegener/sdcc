@@ -1,3 +1,9 @@
+//#define LIVERANGEHUNT
+#ifdef LIVERANGEHUNT
+  #define LRH(x) x
+#else
+  #define LRH(x)
+#endif
 /*-------------------------------------------------------------------------
 
   SDCCloop.c - source file for loop detection & optimizations
@@ -153,6 +159,7 @@ loopInsert (set ** regionSet, eBBlock * block)
 {
   if (!isinSet (*regionSet, block))
     {
+      LRH(printf ("loopInsert: %s\n", block->entryLabel->name));
       addSetHead (regionSet, block);
       STACK_PUSH (regionStack, block);
     }
@@ -229,7 +236,7 @@ DEFSETFUNC (addToExitsMarkDepth)
   V_ARG (set **, exits);
   V_ARG (int, depth);
   V_ARG (region *, lr);
-
+  LRH(printf ("addToExitsMarkDepth: %s %d\n", ebp->entryLabel->name, depth));
   /* mark the loop depth of this block */
   //if (!ebp->depth)
   if (ebp->depth<depth)
@@ -265,13 +272,36 @@ DEFSETFUNC (createLoop)
   eBBlock *block;
   int dfMin = count ,dfMax =0, i;
 
+  LRH(printf("CreateLoop\n"));
   /* make sure regionStack is empty */
   while (!STACK_EMPTY (regionStack))
     STACK_POP (regionStack);
 
   /* add the entryBlock */
   addSet (&aloop->regBlocks, ep->to);
+#ifdef LIVERANGEHUNT
+  // print regBlocks jwk
+  { 
+    eBBlock *ebp;
+    region *lp=aloop;
+    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
+      printf ("cl1 %s ", ebp->entryLabel->name);
+    }
+    printf (" %d\n", count);
+  }
+#endif
   loopInsert (&aloop->regBlocks, ep->from);
+#ifdef LIVERANGEHUNT
+  // print regBlocks jwk
+  { 
+    eBBlock *ebp;
+    region *lp=aloop;
+    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
+      printf ("cl2 %s ", ebp->entryLabel->name);
+    }
+    printf (" %d\n", count);
+  }
+#endif
 
   while (!STACK_EMPTY (regionStack))
     {
@@ -280,6 +310,18 @@ DEFSETFUNC (createLoop)
       if (block != ep->to)
 	applyToSet (block->predList, insertIntoLoop, &aloop->regBlocks);
     }
+
+#ifdef LIVERANGEHUNT
+  // print regBlocks jwk
+  { 
+    eBBlock *ebp;
+    region *lp=aloop;
+    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
+      printf ("cl3 %s ", ebp->entryLabel->name);
+    }
+    printf (" %d\n", count);
+  }
+#endif
 
   aloop->entry = ep->to;
   /* set max & min dfNum for loopRegion */
@@ -292,11 +334,12 @@ DEFSETFUNC (createLoop)
   /* all blocks that have dfnumbers between dfMin & dfMax are also
      part of loop */
   for (i = 0 ; i < count ; i++) {
-      if (ebbs[i]->dfnum > dfMin && 
-	  ebbs[i]->dfnum < dfMax &&
+    if (ebbs[i]->dfnum > dfMin && 
+	   ebbs[i]->dfnum < dfMax &&
 	  !isinSet(aloop->regBlocks,ebbs[i])) {
 	  if (!ebbs[i]->partOfLoop) ebbs[i]->partOfLoop = aloop;
       }
+    LRH(printf("****** %d %d %d %x %s\n", ebbs[i]->dfnum, dfMin, dfMax, ebbs[i]->partOfLoop, ebbs[i]->entryLabel->name));
   }
 
   /* now add it to the set */
@@ -1167,6 +1210,7 @@ createLoopRegions (eBBlock ** ebbs, int count)
   int maxDepth = 0;
   region *lp;
 
+  LRH(printf ("createLoopRegions: %x\n", ebbs));
   /* get all the back edges in the graph */
   if (!applyToSet (graphEdges, backEdges, &bEdges))
     return 0;			/* found no loops */
@@ -1174,6 +1218,18 @@ createLoopRegions (eBBlock ** ebbs, int count)
   /* for each of these back edges get the blocks that */
   /* constitute the loops                             */
   applyToSet (bEdges, createLoop, &allRegion, ebbs,count);
+#ifdef LIVERANGEHUNT
+  // print regBlocks
+  { 
+    eBBlock *ebp;
+    lp=setFirstItem(allRegion);
+    printf ("createLoopRegions: ");
+    for (ebp=setFirstItem(lp->regBlocks); ebp; ebp=setNextItem(lp->regBlocks)) {
+      printf ("%s ", ebp->entryLabel->name);
+    }
+    printf (" %d\n", count);
+  }
+#endif
 
   /* now we will create regions from these loops               */
   /* loops with the same entry points are considered to be the */
@@ -1187,6 +1243,7 @@ createLoopRegions (eBBlock ** ebbs, int count)
 
   applyToSet (allRegion, mergeInnerLoops, allRegion, &maxDepth);
   maxDepth++;
+
   /* now create all the exits .. also */
   /* create an ordered set of loops   */
   /* i.e. we process loops in the inner to outer order */

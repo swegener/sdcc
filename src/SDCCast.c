@@ -2242,6 +2242,10 @@ decorateType (ast * tree)
       	break;
       }
       
+      /* This breaks with extern declarations, bitfields, and perhaps other */
+      /* cases (gcse). Let's leave this optimization disabled for now and   */
+      /* ponder if there's a safe way to do this. -- EEP                    */
+      #if 0
       if (IS_ADDRESS_OF_OP (tree->left) && IS_AST_SYM_VALUE(tree->left->left)
           && SPEC_ABSA (AST_SYMBOL (tree->left->left)->etype))
         {
@@ -2274,7 +2278,8 @@ decorateType (ast * tree)
             tree->left = NULL;
             tree->right = NULL;
         }
-
+      #endif
+      
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -5695,4 +5700,24 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 void PA(ast *t)
 {
 	ast_print(t,stdout,0);
+}
+
+
+
+/*-----------------------------------------------------------------*/
+/* astErrors : returns non-zero if errors present in tree          */
+/*-----------------------------------------------------------------*/
+int astErrors(ast *t)
+{
+  int errors=0;
+  
+  if (t)
+    {
+      if (t->isError)
+        errors++;
+      errors += astErrors(t->left);
+      errors += astErrors(t->right);
+    }
+    
+  return errors;
 }

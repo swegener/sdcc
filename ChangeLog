@@ -1,3 +1,14 @@
+2003-11-26 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): disabled a transformation I added in
+	revision 1.188 (access to fields of a structure at an absolute address);
+	it breaks with bitfields, extern declarations, and gcse analysis.
+	* src/SDCCopt.c (isLocalWithoutDef): if ADDRESS_OF applied to a symbol, it
+	could be assigned through a pointer, so don't complain.
+	* src/SDCCast.c (astErrors),
+	* src/SDCCast.h,
+	* src/SDCCglue.c (emitRegularMap): fixed bug #847813
+
 2003-11-26 Vangelis Rokas <vrokas@otenet.gr>
 	
 	* src/pic16/main.c (_pic16_genIVT): fixed interrupt vector table

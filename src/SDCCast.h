@@ -211,6 +211,7 @@ bool hasSEFcalls (ast *);
 void addSymToBlock (symbol *, ast *);
 void freeStringSymbol(symbol *);
 DEFSETFUNC(resetParmKey);
+int astErrors(ast *);
 
 // exported variables 
 extern set *operKeyReset;

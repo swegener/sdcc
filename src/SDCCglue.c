@@ -321,7 +321,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	      // but try to do it anyway
 	    }
 	    allocInfo = 0;
-	    eBBlockFromiCode (iCodeFromAst (ival));
+            if (!astErrors(ival))
+	      eBBlockFromiCode (iCodeFromAst (ival));
 	    allocInfo = 1;
 	  }
 	}	  

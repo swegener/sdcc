@@ -572,6 +572,9 @@ isLocalWithoutDef (symbol * sym)
   if (IS_AGGREGATE (sym->type))
     return 0;
   
+  if (sym->addrtaken)
+    return 0;
+  
   return !sym->defs;
 }
 

@@ -23,6 +23,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#define P2_PAGES_PDATA 0 /* not all devices use P2 to page pdata memory */
 
 /* the  return value is expected to be in acc, and not in the standard
  * location dpl. Therefore we choose return type void here: */
@@ -43,7 +44,7 @@ _gptrget (char *gptr)
         dec     a
         jz      00003$	; 2 code
 	dec     a
-	jz      00004$
+	jz      00004$	; 3 pdata
 	dec     a	; 4 skip generic pointer
 	dec     a
 	jz      00001$	; 5 idata
@@ -78,11 +79,19 @@ _gptrget (char *gptr)
         movc    a,@a+dptr
         sjmp    00005$
 ;
-;   pointer to xternal stack
+;   pointer to xternal stack or pdata
 ;
  00004$:
+#if P2_PAGES_PDATA
         mov     dph,p2          ; p2 holds high byte for pdata access
         movx    a,@dptr
+#else
+    	push 	ar0
+	mov     r0,dpl
+        movx    a,@r0
+	pop	ar0
+#endif	
+	
 ;
 ;   return
 ;
@@ -109,7 +118,7 @@ _gptrgetWord (unsigned *gptr)
         dec     a
         jz      00003$	; 2 code
 	dec     a
-	jz      00004$
+	jz      00004$  ; 3 pdata
 	dec     a	; 4 skip generic pointer
 	dec     a
 	jz      00001$	; 5 idata

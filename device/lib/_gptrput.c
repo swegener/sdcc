@@ -23,8 +23,8 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-/* the  return value is expected to be in acc, and not in the standard
- * location dpl. Therefore we choose return type void here: */
+#define P2_PAGES_PDATA 0 /* not all devices use P2 to page pdata memory */
+
 void
 _gptrput (char *gptr, char c)
 {
@@ -67,9 +67,18 @@ _gptrput (char *gptr, char c)
 	sjmp    00005$
 
  00004$:
+#if P2_PAGES_PDATA
 	pop     acc
-	mov     dph,p2
+	mov     dph,p2	        ; p2 holds high byte for pdata access
 	movx    @dptr,a
+#else
+	pop     acc
+    	push 	ar0
+	mov     r0,dpl
+        movx    @r0,a
+	pop	ar0
+#endif	
+
  00005$:
 _endasm;
 }
@@ -90,7 +99,7 @@ _gptrputWord ()
         dec     a
         jz      00013$	; 2 code
         dec     a
-        jz      00014$
+        jz      00014$  ; 3 pdata
 	dec	a	; 4 skip generic pointer
 	dec	a
 	jz	00011$	; 5 idata

@@ -134,7 +134,7 @@ copy propagation,
 dead code elimination 
 \layout Itemize
 
-jumptables for 
+jump tables for 
 \emph on 
 switch
 \emph default 
@@ -321,7 +321,7 @@ short is now equivalent to int (16 bits), it used to be equivalent to char
  (8 bits) which is not ANSI compliant
 \layout Itemize
 
-the default directory for gcc-builds where include, library and documention
+the default directory for gcc-builds where include, library and documentation
  files are stored is now in /usr/local/share
 \layout Itemize
 
@@ -486,7 +486,7 @@ Configure Options
 
 The install paths, search paths and other options are defined when running
  'configure'.
- The defaults can be overriden by:
+ The defaults can be overridden by:
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -500,7 +500,7 @@ status Collapsed
 /
 \end_inset 
 
--prefix see tabel below
+-prefix see table below
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -514,7 +514,7 @@ status Collapsed
 /
 \end_inset 
 
--exec_prefix see tabel below
+-exec_prefix see table below
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -528,7 +528,7 @@ status Collapsed
 /
 \end_inset 
 
--bindir see tabel below
+-bindir see table below
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -542,19 +542,19 @@ status Collapsed
 /
 \end_inset 
 
--datadir see tabel below
+-datadir see table below
 \layout List
 \labelwidthstring 00.00.0000
 
-docdir environment variable, see tabel below
+docdir environment variable, see table below
 \layout List
 \labelwidthstring 00.00.0000
 
-include_dir_suffix environment variable, see tabel below
+include_dir_suffix environment variable, see table below
 \layout List
 \labelwidthstring 00.00.0000
 
-lib_dir_suffix environment variable, see tabel below
+lib_dir_suffix environment variable, see table below
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1221,8 +1221,8 @@ Examples:
 ./configure --disable-avr-port --disable-xa51-port
 \layout Standard
 
-To crosscompile on linux for Mingw32 (see also 'sdcc/support/scripts/sdcc_mingw3
-2'):
+To cross compile on linux for Mingw32 (see also 'sdcc/support/scripts/sdcc_mingw
+32'):
 \layout LyX-Code
 
 ./configure 
@@ -2813,10 +2813,10 @@ On OSX 2.x it was reported, that the default gcc (version 3.1 20020420 (prerelea
 ./configure CC=gcc2 CXX=g++2
 \layout Subsubsection
 
-Crosscompiling SDCC on Linux for Windows
+Cross compiling SDCC on Linux for Windows
 \layout Standard
 
-With the Mingw32 gcc crosscompiler it's easy to compile SDCC for Win32.
+With the Mingw32 gcc cross compiler it's easy to compile SDCC for Win32.
  See section 'Configure Options'.
 \layout Subsubsection
 
@@ -3035,7 +3035,7 @@ bin_vc.
 \backslash 
 bin_vc to sdcc
 \backslash 
-bin before runing SDCC.
+bin before running SDCC.
  
 \newline 
 
@@ -3189,10 +3189,10 @@ From the sdcc directory, run the command "make -f Makefile.bcc".
  sdcdb.exe (which currently doesn't build under Borland C++).
 \layout Enumerate
 
-If you modify any source files and need to rebuild, be aware that the dependanci
+If you modify any source files and need to rebuild, be aware that the dependenci
 es may not be correctly calculated.
  The safest option is to delete all .obj files and run the build again.
- From a Cygwin BASH prompt, this can easily be done with the commmand:
+ From a Cygwin BASH prompt, this can easily be done with the command:
 \newline 
 
 \newline 
@@ -3213,7 +3213,7 @@ find .
 \newline 
 
 \newline 
-or on Windows NT/2000/XP from the command prompt with the commmand:
+or on Windows NT/2000/XP from the command prompt with the command:
 \newline 
 
 \family sans 
@@ -3291,7 +3291,7 @@ Install and search paths
 Make sure the compiler works on a very simple example.
  Type in the following test.c program using your favorite 
 \series default 
-ascii 
+ASCII 
 \series medium 
 editor:
 \layout Verse
@@ -3523,7 +3523,7 @@ Install and Search PATHS
 
 .
 \newline 
-On most systems you will need super-user privilages to do this.
+On most systems you will need super-user privileges to do this.
 \layout Subsection
 
 Components of SDCC
@@ -3650,13 +3650,13 @@ S51 is a freeware, opensource simulator developed by Daniel Drotos (
 
 ).
  The simulator is built as part of the build process.
- For more information visit Daniel's website at: 
+ For more information visit Daniel's web site at: 
 \begin_inset LatexCommand \url{http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51}
 
 \end_inset 
 
 .
- It currently support the core mcs51, the Dallas DS80C390 and the Philips
+ It currently support the core mcs51, the Dallas DS80C390 and the Phillips
  XA51 family.
 \layout Subsubsection
 
@@ -4093,7 +4093,7 @@ Note here that
 \newline 
 
 \newline 
-The most efficient way to use libraries is to keep seperate modules in seperate
+The most efficient way to use libraries is to keep separate modules in separate
  source files.
  The lib file now should name all the modules.rel files.
  For an example see the standard library file 
@@ -4288,7 +4288,7 @@ p16f627 p16f628 p16f84 p16f873 p16f877?
 
 
 \series default 
- Generate code for the Philips XA51
+ Generate code for the Phillips XA51
 \begin_inset LatexCommand \index{XA51}
 
 \end_inset 
@@ -5536,7 +5536,7 @@ status Collapsed
 
 \series default 
  The compiler by default uses a caller saves convention for register saving
- across function calls, however this can cause unneccessary register pushing
+ across function calls, however this can cause unnecessary register pushing
  & popping when calling small functions from larger functions.
  This option can be used to switch the register saving convention for the
  function names specified.
@@ -5544,7 +5544,7 @@ status Collapsed
  code will be generated at the entry & exit for these functions to save
  & restore the registers used by these functions, this can SUBSTANTIALLY
  reduce code & improve run time performance of the generated code.
- In the future the compiler (with interprocedural analysis) will be able
+ In the future the compiler (with inter procedural analysis) will be able
  to determine the appropriate scheme to use for each function call.
  DO NOT use this option for built-in functions such as _mulint..., if this
  option is used for a library function the appropriate library function
@@ -6085,7 +6085,7 @@ status Collapsed
 
 \series default 
  Include i-codes in the asm file.
- Sounds like noise but is most helpfull for debugging the compiler itself.
+ Sounds like noise but is most helpful for debugging the compiler itself.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6559,7 +6559,7 @@ SDCC_LIB
 
 There are some more environment variables recognized by SDCC, but these
  are solely used for debugging purposes.
- They can change or disappear very quickly, and will never be documentated.
+ They can change or disappear very quickly, and will never be documented.
 \layout Subsection
 
 MCS51/DS390 Storage Class
@@ -6736,7 +6736,8 @@ code unsigned char * code p;
 \newline 
 
 \newline 
-/* the folowing is a generic pointer physically located in xdata space */
+/* the following is a generic pointer physically located in xdata space
+ */
 \newline 
 char * xdata p;
 \layout Standard
@@ -6919,7 +6920,7 @@ bit bvar;
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-data at 0x31 unsiged char j;
+data at 0x31 unsigned char j;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -7832,7 +7833,7 @@ non-interrupt
 \emph default 
  function (but may occasionally be useful anyway
 \begin_inset Foot
-collapsed true
+collapsed false
 
 \layout Standard
 
@@ -8131,7 +8132,7 @@ bit CPOL;\SpecialChar ~
 /*This is a variable, let the linker allocate this one*/
 \layout Standard
 
-and you can use the same hardware dependant routine without changes, as
+and you can use the same hardware dependent routine without changes, as
  for example in a library.
  This is somehow similar to sbit, but only one absolute address has to be
  specified in the whole project.
@@ -8233,7 +8234,7 @@ status Collapsed
 
 .
  This might cause some unexpected changes in the inline assembler code.
- Please go throught the peephole optimizer rules defined in file 
+ Please go through the peephole optimizer rules defined in file 
 \emph on 
 SDCCpeeph.def
 \emph default 
@@ -8377,7 +8378,7 @@ _endasm ;
 \layout Standard
 
 In other words inline assembly code can access labels defined in inline
- assembly within the scope of the funtion.
+ assembly within the scope of the function.
  The same goes the other way, ie.
  labels defines in inline assembly CANNOT be accessed by C statements.
 \layout Subsection
@@ -8398,7 +8399,8 @@ int (16 bit)
 For signed & unsigned int (16 bit) and long (32 bit) variables, division,
  multiplication and modulus operations are implemented by support routines.
  These support routines are all developed in ANSI-C to facilitate porting
- to other MCUs, although some model specific assembler optimations are used.
+ to other MCUs, although some model specific assembler optimizations are
+ used.
  The following files contain the described routine, all of them can be found
  in <installdir>/share/sdcc/lib.
 \newline 
@@ -9358,7 +9360,7 @@ never
  be combined together or the results would be unpredictable.
  The library routines supplied with the compiler are compiled as both small
  and large.
- The compiled library modules are contained in seperate directories as small
+ The compiled library modules are contained in separate directories as small
  and large so that you can link to either set.
  
 \layout Standard
@@ -9383,7 +9385,7 @@ Judicious usage of the processor specific storage classes
  and the 'reentrant' function type will yield much more efficient code,
  than using the large model.
  Several optimizations are disabled when the program is compiled using the
- large model, it is therefore strongly recommdended that the small model
+ large model, it is therefore strongly recommended that the small model
  be used unless absolutely required.
 \layout Subsection
 
@@ -11221,7 +11223,7 @@ CALLEE-SAVES
 
  function1[,function2[,function3...]] - The compiler by default uses a caller
  saves convention for register saving across function calls, however this
- can cause unneccessary register pushing & popping when calling small functions
+ can cause unnecessary register pushing & popping when calling small functions
  from larger functions.
  This option can be used to switch off the register saving convention for
  the function names specified.
@@ -11229,7 +11231,7 @@ CALLEE-SAVES
  code need to be manually inserted at the entry & exit for these functions
  to save & restore the registers used by these functions, this can SUBSTANTIALLY
  reduce code & improve run time performance of the generated code.
- In the future the compiler (with interprocedural analysis) may be able
+ In the future the compiler (with inter procedural analysis) may be able
  to determine the appropriate scheme to use for each function call.
  If -
 \begin_inset ERT
@@ -11405,8 +11407,8 @@ Assembler Routine(non-reentrant
 
 \layout Standard
 
-In the following example the function cfunc calls an assembler routine asm_func,
- which takes two parameters.
+In the following example the function c_func calls an assembler routine
+ asm_func, which takes two parameters.
 \layout Verse
 
 
@@ -11521,7 +11523,7 @@ add    a,_asm_func_PARM_2
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-mov     dpl,a 
+mov    dpl,a 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -11531,7 +11533,11 @@ mov     dpl,a
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-mov   dpl
+mov\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+dpl
 \begin_inset LatexCommand \index{DPTR, DPH, DPL}
 
 \end_inset 
@@ -11589,8 +11595,8 @@ acc,b,dptr
 \begin_inset Quotes erd
 \end_inset 
 
- for four bytes, the varible name for the second parameter will be _<function_na
-me>_PARM_2.
+ for four bytes, the variable name for the second parameter will be _<function_n
+ame>_PARM_2.
 \newline 
 
 \newline 
@@ -11839,7 +11845,7 @@ ANSI-Compliance
 
 \layout Standard
 
-Deviations from the compliancy.
+Deviations from the compliance:
 \layout Itemize
 
 functions are not always reentrant.
@@ -11982,7 +11988,7 @@ int (*foo)();
 \newline 
 /* has to be called like this */ 
 \newline 
-(*foo)(); /* ansi standard allows calls to be made like 'foo()' */
+(*foo)(); /* ANSI standard allows calls to be made like 'foo()' */
 \end_deeper 
 \layout Subsection
 
@@ -12141,17 +12147,17 @@ The 8051 family of microcontrollers have a minimum of 128 bytes of internal
 
 \layout Standard
 
-Adittionally some members of the MCS51 family may have up to 128 bytes of
+Additionally some members of the MCS51 family may have up to 128 bytes of
  additional, indirectly addressable, internal RAM memory (
 \emph on 
 idata
 \emph default 
 ).
- Furtermore, some chips may have some built in external memory (
+ Furthermore, some chips may have some built in external memory (
 \emph on 
 xdata
 \emph default 
-) which should not be confused with the internal, direclty addressable RAM
+) which should not be confused with the internal, directly addressable RAM
  memory (
 \emph on 
 data
@@ -12261,8 +12267,8 @@ status Collapsed
 
  allows you to specify the start of the stack, i.e.
  you could start it after any data in the general purpose area.
- If your microcontroller has aditional indirectly addressable internal RAM
- (
+ If your microcontroller has additional indirectly addressable internal
+ RAM (
 \emph on 
 idata
 \emph default 
@@ -12334,7 +12340,7 @@ status Collapsed
 
 .
  If in doubt, don't specify any options and see if the resulting memory
- layout is appropiate, then you can twik it.
+ layout is appropriate, then you can adjust it.
 \layout Standard
 
 The 8051 linker generates two files with memory allocation information.
@@ -13396,7 +13402,7 @@ foo.c - the source file.
 foo.cdb - the debugger symbol information file.
 \layout Itemize
 
-foo.ihx - the intel hex format
+foo.ihx - the Intel hex format
 \begin_inset LatexCommand \index{Intel hex format}
 
 \end_inset 
@@ -14435,15 +14441,15 @@ The Z80 and gbz80 port
 
 SDCC can target both the Zilog Z80 and the Nintendo Gameboy's Z80-like gbz80.
  The port is incomplete - long support is incomplete (mul, div and mod are
- unimplimented), and both float and bitfield support is missing.
+ unimplemented), and both float and bitfield support is missing.
  Apart from that the code generated is correct.
 \layout Standard
 
 As always, the code is the authoritave reference - see z80/ralloc.c and z80/gen.c.
  The stack frame is similar to that generated by the IAR Z80 compiler.
  IX is used as the base pointer, HL is used as a temporary register, and
- BC and DE are available for holding varibles.
- IY is currently unusued.
+ BC and DE are available for holding variables.
+ IY is currently unused.
  Return values are stored in HL.
  One bad side effect of using IX as the base pointer is that a functions
  stack frame is limited to 127 bytes - this will be fixed in a later version.
@@ -14604,7 +14610,7 @@ Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
  a similar problem.
 \layout Subsection
 
-Changelog
+ChangeLog
 \begin_inset LatexCommand \index{Changelog}
 
 \end_inset 
@@ -14653,7 +14659,7 @@ You'll find some small examples in the directory sdcc/device/examples/
 \layout Comment
 
 Maybe we should include some links to real world applications.
- Preferrably pointer to pointers (one for each architecture) so this stays
+ Preferably pointer to pointers (one for each architecture) so this stays
  manageable here?
 \layout Subsection
 
@@ -14739,7 +14745,7 @@ The anatomy of the compiler
 
 
 \shape italic 
-This is an excerpt from an atricle published in Circuit Cellar MagaZine
+This is an excerpt from an article published in Circuit Cellar Magazine
  in august 2000.
  It's a little outdated (the compiler is much more efficient now and user/develo
 per friendly), but pretty well exposes the guts of it all.

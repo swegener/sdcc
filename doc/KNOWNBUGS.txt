@@ -1,6 +1,0 @@
-SDCC known bugs
----------------
-$Id$
-
-ds390 port:
-* The linker does not yet supports segments >64k.

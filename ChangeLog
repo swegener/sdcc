@@ -1,3 +1,23 @@
+2002-03-03    <johan@FRIJA>
+
+	* support/Util/SDCCerr.c: did something, but don't no why anymore
+
+	* support/regression/tests/bug-524691.c: made it a little less shy 
+
+	* src/SDCCast.c (decorateType): fixed bug #524697 
+
+	* src/SDCCast.c: made some lineno improvements
+
+	* src/SDCCval.c (getNelements): changed warning to error
+
+	* src/SDCCglue.c (printIvalArray): changed warning to error
+
+	* src/SDCCicode.c: fixed a warning for mingw
+
+	* src/SDCCast.c (decorateType): fixed the << promotion for ops
+
+	* src/SDCCicode.c (geniCodeDivision): divide is shift only for unsigned (bug #524685)
+
 2002-03-02  Sandeep Dutta  <sandeep@ddi.com>
 
 	* src/ds390/peeph.def:

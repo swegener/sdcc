@@ -310,11 +310,11 @@ _setValues(void)
       setMainValue ("z80outext", ".ihx");
     }
 
-  setMainValue ("z80stdobjdstfilename" , "{dstfilename}{objext}");
-  setMainValue ("z80stdlinkdstfilename", "{dstfilename}{z80outext}");
+  setMainValue ("stdobjdstfilename" , "{dstfilename}{objext}");
+  setMainValue ("stdlinkdstfilename", "{dstfilename}{z80outext}");
 
   setMainValue ("z80extraobj", joinn (relFiles, nrelFiles));
-  
+
   sprintf (buffer, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
   setMainValue ("z80bases", buffer);
 }
@@ -444,13 +444,13 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     "{bindir}{sep}link-{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
     " {z80extralibfiles} {z80extralibpaths}" \
-    " {z80outputtypeflag} {z80linkdstfilename}" \
+    " {z80outputtypeflag} {linkdstfilename}" \
     " {z80crt0}" \
     " {dstfilename}{objext}" \
-    " {z80extraobj}" 
+    " {z80extraobj}"
 
 #define ASMCMD \
-    "{bindir}{sep}as-{port} -plosgff {z80objdstfilename} {dstfilename}{asmext}"
+    "{bindir}{sep}as-{port} -plosgff {objdstfilename} {dstfilename}{asmext}"
 
 /* Globals */
 PORT z80_port =

@@ -16,12 +16,7 @@
 #endif
 
 #undef PREFIX
-#define PREFIX                ""  // this should be probably set to
-                                  // something else, but currently I
-                                  // don't have idea to what.
-                                  // I defined it as empty string,
-                                  // so that SDCC at least compiles
-                                  // on VC. [borutr 07.aug.2002]
+#define PREFIX                "\\sdcc"
 
 #undef DATADIR
 #undef SRCDIR

@@ -605,12 +605,12 @@ spillThis (symbol * sym)
 	sym->regs[i] = NULL;
       }
 
-  /* if spilt on stack then free up r0 & r1 
+  /* if spilt on stack then free up r0 & r1
      if they could have been assigned to some
      LIVE ranges */
-  if (!ds390_ptrRegReq && isSpiltOnStack (sym))
+  if (!ds390_ptrRegReq && isSpiltOnStack (sym) && !options.stack10bit)
     {
-      ds390_ptrRegReq += !options.stack10bit;
+      ds390_ptrRegReq ++;
       spillLRWithPtrReg (sym);
     }
 

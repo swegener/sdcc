@@ -45,7 +45,8 @@ typedef struct eBBlock
     iCode *ech;			/* pointer to last of code chain  */
 
     struct eBBlock *preHeader;	/* preheader if this is a loop entry */
-    set *partOfLoop;	/* set of loop regions this block is part of */
+    set *KpartOfLoop;		/* set of loop regions this block is part of */
+    struct region *partOfLoop;	/* pointer to the loop region this block is part of */
 
     /* control flow analysis */
     set *succList;		/* list eBBlocks which are successors  */

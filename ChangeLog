@@ -1,3 +1,16 @@
+2003-10-05 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCloop.c (assignmentsToSym, loopInduction): cast argument of
+	setToNull() to (void *) to avoid gcc3.x's warning: "dereferencing
+	type-punned pointer will break strict-aliasing rules"
+	Old LR behaviour is again default; Klaus' LR can be choosen by
+	defining the environment variable LRKLAUS
+	* src/SDCCBBlock.h
+	* src/SDCCloop.c
+	* src/SDCCloop.h
+	* src/SDCClrange.c
+	* src/ds390/ralloc.c (spillThis): applied Klaus' patch
+
 2003-10-05  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCC.lex, support/Util/SDCCerr.c, sdcc/support/Util/SDCCerr.h:
@@ -7,8 +20,8 @@
 2003-10-04  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* doc/sdccman.lyx: various additions and updates (interrupts, inline
-	  assembly, critical functions, atomic, nojtbound) 
-        
+	  assembly, critical functions, atomic, nojtbound)
+
 2003-10-04 Bernhard Held <bernhard@bernhardheld.de>
 
 	Applied liferange patch from Klaus Flittner <klaus_flittner@gmx.de>

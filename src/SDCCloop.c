@@ -235,9 +235,19 @@ DEFSETFUNC (addToExitsMarkDepth)
   if (ebp->depth<depth)
     ebp->depth = depth;
 
-  /* put the loop region info in the block */
-  if (!isinSet (ebp->partOfLoop, lr))
-    addSetHead (&ebp->partOfLoop, lr);
+  if (getenv ("LRKLAUS"))
+    {
+      /* put the loop region info in the block */
+      if (!isinSet (ebp->KpartOfLoop, lr))
+        addSetHead (&ebp->KpartOfLoop, lr);
+    }
+  else
+    {
+      /* NOTE: here we will update only the inner most loop
+         that it is a part of */
+      if (!ebp->partOfLoop)
+        ebp->partOfLoop = lr;
+    }
 
   /* if any of the successors go out of the loop then */
   /* we add this one to the exits */
@@ -327,7 +337,7 @@ assignmentsToSym (set * sset, operand * sym)
          in this block */
       bitVect *defs = bitVectIntersect (ebp->ldefs, OP_DEFS (sym));
       assigns += bitVectnBitsOn (defs);
-      setToNull ((void **) &defs);
+      setToNull ((void *) &defs);
 
     }
 
@@ -1055,7 +1065,7 @@ loopInduction (region * loopReg, eBBlock ** ebbs, int count)
       lastBlock->linds = bitVectUnion(lastBlock->linds,indVect);
     }
 
-  setToNull ((void **) &indVars);
+  setToNull ((void *) &indVars);
   return change;
 }
 
@@ -1229,13 +1239,13 @@ addLoopBlocks (eBBlock ** ebbs, int count)
 
   for (i = 0; i < count; i++)
     {
-      if (!ebbs[i]->partOfLoop)
+      if (!ebbs[i]->KpartOfLoop)
         continue;
 
       /* for all loops this block belongs to */
       /* add inner block not already marked as part of this loop */
-      aloop = setFirstItem (ebbs[i]->partOfLoop);
-      for (; aloop; aloop = setNextItem (ebbs[i]->partOfLoop))
+      aloop = setFirstItem (ebbs[i]->KpartOfLoop);
+      for (; aloop; aloop = setNextItem (ebbs[i]->KpartOfLoop))
         {
 
           if (aloop->visited)
@@ -1261,8 +1271,8 @@ addLoopBlocks (eBBlock ** ebbs, int count)
               if (ebbs[j]->fSeq > seqMin && ebbs[j]->lSeq < seqMax &&
                   !isinSet (aloop->regBlocks, ebbs[j]))
 		{
-                  if (!isinSet (ebbs[i]->partOfLoop, aloop))
-	            addSetHead (&ebbs[j]->partOfLoop, aloop);
+                  if (!isinSet (ebbs[j]->KpartOfLoop, aloop))
+	            addSetHead (&ebbs[j]->KpartOfLoop, aloop);
 	        }
 	    }
 	}

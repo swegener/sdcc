@@ -124,13 +124,24 @@ isLastUse (operand * op, eBBlock * ebp, iCode * ic,
   if (usedInRemaining (op, ic))
     return 0;
 
-  /* if not then check any of the following blocks use it */
-  for (i = 0; i < count; i++)
+  if (getenv ("LRKLAUS"))
     {
-      if (ebbs[i]->fSeq <= ebp->fSeq)
-	continue;
-      if (usedInRemaining (op, ebbs[i]->sch))
-	return 0;
+      /* if not then check any of the following blocks use it */
+      for (i = 0; i < count; i++)
+        {
+          if (ebbs[i]->fSeq <= ebp->fSeq)
+	    continue;
+          if (usedInRemaining (op, ebbs[i]->sch))
+	    return 0;
+        }
+    }
+  else
+    {
+      /* if not then check any of the successor blocks use it */
+      for (i = 0; i < count;)
+        ebbs[i++]->visited = 0;
+      if (applyToSet (ebp->succList, isOpAlive, op, ebp, ic))
+        return 0;
     }
 
   /* this is the last use */
@@ -310,31 +321,42 @@ operandLUse (operand * op, eBBlock ** ebbs,
       int torange = ic->seq;
 
       /* if this is a SEND then the toRange should be extended
-	 to the call */
+         to the call */
       if (ic->op == SEND)
         {
-	  iCode *lic ;
-	  for (lic = ic->next ; lic ; lic = lic->next)
-	    {
-	      if (lic->op == CALL || lic->op == PCALL)
-	        break;
-	    }
-	  /* found it : mark */
-	  if (lic)
-	    torange = lic->prev->seq;
+          iCode *lic ;
+          for (lic = ic->next ; lic ; lic = lic->next)
+            {
+              if (lic->op == CALL || lic->op == PCALL)
+                break;
+            }
+          /* found it : mark */
+          if (lic)
+            torange = lic->prev->seq;
         }
       /* if this is the last use then if this block belongs
          to a  loop &  some definition  comes into the loop
          then extend the live range to  the end of the loop */
-      if (ebp->partOfLoop)
+      if (getenv ("LRKLAUS"))
         {
-	  region *aloop;
+	  if (ebp->KpartOfLoop)
+            {
+              region *aloop;
 
-	  aloop = setFirstItem (ebp->partOfLoop);
-	  for (; aloop; aloop = setNextItem (ebp->partOfLoop))
+              aloop = setFirstItem (ebp->KpartOfLoop);
+              for (; aloop; aloop = setNextItem (ebp->KpartOfLoop))
+                {
+                  if (hasIncomingDefs (aloop, op))
+                    torange = findLoopEndSeq (aloop);
+                }
+            }
+	}
+      else
+        {
+          if (ebp->partOfLoop
+	      && hasIncomingDefs (ebp->partOfLoop, op))
 	    {
-	      if (hasIncomingDefs (aloop, op))
-		torange = findLoopEndSeq (aloop);
+	      torange = findLoopEndSeq (ebp->partOfLoop);
 	    }
 	}
 
@@ -712,7 +734,7 @@ notUsedInBlock (symbol * sym, eBBlock * ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* computeLiveRanges - computes the live ranges for variables      */
 /*-----------------------------------------------------------------*/
-void 
+void
 computeLiveRanges (eBBlock ** ebbs, int count)
 {
   int i = 0;
@@ -726,8 +748,11 @@ computeLiveRanges (eBBlock ** ebbs, int count)
   iCodeSeqhTab = newHashTable (iCodeKey);
   sequenceiCode (ebbs, count);
 
-  /* add blocks between loop blocks as part of that loop */
-  addLoopBlocks (ebbs, count);
+  if (getenv ("LRKLAUS"))
+    {
+      /* add blocks between loop blocks as part of that loop */
+      addLoopBlocks (ebbs, count);
+    }
 
   /* call routine to mark the from & to live ranges for
      variables used */

@@ -44,7 +44,7 @@ OBJECTS		= _atoi.rel _atol.rel _autobaud.rel _bp.rel _schar2fs.rel \
 		  _isupper.rel _isxdigit.rel _slong2fs.rel _memcmp.rel \
 		  _memcpy.rel _memset.rel _modsint.rel _modslong.rel \
 		  _moduint.rel _modulong.rel _mulsint.rel _muluint.rel \
-		  _mululong.rel _muslong.rel _ser.rel _setjmp.rel \
+		  _mululong.rel _mulslong.rel _ser.rel _setjmp.rel \
 		  _spx.rel _startup.rel _strchr.rel _strcmp.rel _strcpy.rel \
 		  _strcspn.rel _strlen.rel _strncat.rel _strncmp.rel \
 		  _strncpy.rel _strpbrk.rel _strrchr.rel _strspn.rel \

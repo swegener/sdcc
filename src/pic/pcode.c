@@ -75,7 +75,7 @@ static pFile *the_pFile = NULL;
 static pBlock *pb_dead_pcodes = NULL;
 
 /* Hardcoded flags to change the behavior of the PIC port */
-static int peepOptimizing = 0;        /* run the peephole optimizer if nonzero */
+static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
 int debug_verbose = 0;                /* Set true to inundate .asm file */
 

@@ -1993,7 +1993,7 @@ int pCodePeepMatchRule(pCode *pc)
 		if(matched) {
 			
 			pCode *pcprev;
-			pCode *pcr;
+			pCode *pcr, *pcout;
 			
 			
 			/* We matched a rule! Now we have to go through and remove the
@@ -2011,6 +2011,7 @@ int pCodePeepMatchRule(pCode *pc)
 			
 			
 			/* Unlink the original code */
+			pcout = pc;
 			pcprev = pc->prev;
 			pcprev->next = pcin;
 			if(pcin) 
@@ -2087,8 +2088,7 @@ int pCodePeepMatchRule(pCode *pc)
 				} else if (pcr->type == PC_COMMENT) {
 					pCodeInsertAfter(pc, newpCodeCharP( ((pCodeComment *)(pcr))->comment));
 				}
-				
-				
+
 				pc = pc->next;
 #ifdef PCODE_DEBUG
 				DFPRINTF((stderr,"  NEW Code:"));
@@ -2108,12 +2108,27 @@ int pCodePeepMatchRule(pCode *pc)
 				
 			}
 			
+			/* Copy C code comments to new code. */
+			pc = pcprev->next;
+			if (pc) {
+				for (; pcout!=pcin; pcout=pcout->next) {
+					if (pcout->type==PC_OPCODE && PCI(pcout)->cline) {
+						while (pc->type!=PC_OPCODE || PCI(pc)->cline) {
+							pc = pc->next;
+							if (!pc)
+								break;
+						}
+						PCI(pc)->cline = PCI(pcout)->cline;
+					}
+				}
+			}
+				
 			return 1;
-	}
+		}
 next_rule:
-	peeprules = peeprules->next;
-  }
-  DFPRINTF((stderr," no rule matched\n"));
+		peeprules = peeprules->next;
+	}
+	DFPRINTF((stderr," no rule matched\n"));
 
-  return 0;
+	return 0;
 }

@@ -2169,7 +2169,8 @@ accuse:
 static void
 packForPush (iCode * ic, eBBlock * ebp)
 {
-  iCode *dic;
+  iCode *dic, *lic;
+  bitVect *dbv;
 
   if (ic->op != IPUSH || !IS_ITEMP (IC_LEFT (ic)))
     return;
@@ -2186,6 +2187,13 @@ packForPush (iCode * ic, eBBlock * ebp)
 
   if (dic->op != '=' || POINTER_SET (dic))
     return;
+
+  /* make sure the right side does not have any definitions
+     inbetween */
+  dbv = OP_DEFS(IC_RIGHT(dic));
+  for (lic = ic; lic != dic ; lic = lic->prev) {
+	  if (bitVectBitValue(dbv,lic->key)) return ;
+  }
 
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */

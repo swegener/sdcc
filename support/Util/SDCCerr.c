@@ -228,7 +228,7 @@ struct
 { W_LONG_UNSUPPORTED, ERROR_LEVEL_WARNING,
    "'%s' 'long' not supported , declared as 'int' ." },
 { W_LITERAL_GENERIC, ERROR_LEVEL_WARNING,
-   "LITERAL value being cast to '_generic' pointer" },
+   "illegal cast of LITERAL value to 'generic' pointer: assuming 'xdata' pointer" },
 { E_SFR_ADDR_RANGE, ERROR_LEVEL_ERROR,
    "%s '%s' address out of range" },
 { E_BITVAR_STORAGE, ERROR_LEVEL_ERROR,

@@ -90,6 +90,23 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
 }
 
 /*-----------------------------------------------------------------*/
+/* flat24bitModeAndPortDS390 - 					   */
+/*-----------------------------------------------------------------*/
+FBYNAME (flat24bitModeAndPortDS390)
+{
+    return ((strcmp(port->target,"ds390") == 0) && 
+	    (options.model == MODEL_FLAT24));
+}
+
+/*-----------------------------------------------------------------*/
+/* portIsDS390 - return true if port is DS390  			   */
+/*-----------------------------------------------------------------*/
+FBYNAME (portIsDS390)
+{
+    return (strcmp(port->target,"ds390") == 0);
+}
+
+/*-----------------------------------------------------------------*/
 /* flat24bitMode - will check to see if we are in flat24 mode      */
 /*-----------------------------------------------------------------*/
 FBYNAME (flat24bitMode)
@@ -253,6 +270,12 @@ callFuncByName (char *fname,
       "labelRefCount", labelRefCount
     }
     ,
+    {
+      "portIsDS390", portIsDS390
+    },
+    {
+      "24bitModeAndPortDS390", flat24bitModeAndPortDS390
+    }
   };
   int i;
 

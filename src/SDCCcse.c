@@ -2057,7 +2057,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* if after all this it becomes an assignment to self
          then delete it and continue */
-      if (ASSIGNMENT_TO_SELF (ic))
+      if (ASSIGNMENT_TO_SELF (ic) && !isOperandVolatile (IC_RIGHT(ic), FALSE))
         {
           remiCodeFromeBBlock (ebb, ic);
           continue;

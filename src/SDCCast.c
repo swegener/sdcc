@@ -1533,6 +1533,8 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
         }
 
     }
+  else
+    return FALSE;
 
   /* check loop expression is of the form <sym>++ */
   if (!IS_AST_OP (loopExpr))

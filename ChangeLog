@@ -1,3 +1,8 @@
+2005-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (cseBBlock): retain assignment to self when volatile
+	* src/SDCCast.c (isLoopCountable): fixed bug #1161985
+
 2005-03-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c: removed inline assembly for portability and

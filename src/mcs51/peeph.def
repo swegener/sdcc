@@ -524,7 +524,7 @@ replace {
 } by {
 	;	Peephole 123	jump optimization
 	cjne	%1,%2,%3
-	smp	%4
+	sjmp	%4
 %3:
 } if labelRefCount %3 1
 
@@ -3830,7 +3830,7 @@ replace {
 } if notVolatile %1
 
 // Peepholes 259.x are not compatible with peepholex 250.x
-// Peepholes 250.x add jumps to a previously unused label. As the 
+// Peepholes 250.x add jumps to a previously unused label. As the
 // labelRefCount is not increased, peepholes 259.x are (mistakenly) applied.
 // (Mail on sdcc-devel 2004-10-25)
 // Note: Peepholes 193..199, 251 remove jumps to previously used labels without
@@ -3840,7 +3840,7 @@ replace {
 // applies to f.e. vprintf.c
 //replace {
 //	sjmp	%1
-//%2:	
+//%2:
 //	ret
 //} by {
 //	sjmp	%1
@@ -3851,7 +3851,7 @@ replace {
 // applies to f.e. gets.c
 //replace {
 //	ljmp	%1
-//%2:	
+//%2:
 //	ret
 //} by {
 //	ljmp	%1
@@ -3860,7 +3860,7 @@ replace {
 //} if labelRefCount %2 0
 
 // optimizing jumptables
-// Please note: to enable peephole 260.x you currently have to set 
+// Please note: to enable peephole 260.x you currently have to set
 // the environment variable SDCC_SJMP_JUMPTABLE
 replace {
 	add	a,%1

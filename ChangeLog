@@ -1,3 +1,7 @@
+2005-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/peeph.def: fixed bug 1170013
+
 2005-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51reg.h: fixed bug 842007

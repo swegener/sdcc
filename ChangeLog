@@ -1,3 +1,7 @@
+2003-01-31    <johan@CP255758-A>
+
+	* src/ds390/main.c (_ds390_genAssemblerPreamble): applied Jan Rejlek's >64K startup patch
+
 2003-01-30    <johan@balder>
 
 	* src/SDCCBBlock.c: automatic bug detection

@@ -230,7 +230,7 @@ _ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
       return FALSE;
     }
 
-  fprintf (of, "\tajmp\t__sdcc_gsinit_startup\n");
+  fprintf (of, "\tajmp\t__reset_vect\n");
 
   /* now for the other interrupts */
   for (i = 0; i < maxInterrupts; i++)
@@ -244,6 +244,8 @@ _ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 	  fprintf (of, "\treti\n\t.ds\t7\n");
 	}
     }
+
+  fprintf (of, "__reset_vect:\n\tljmp\t__sdcc_gsinit_startup\n");
 
   return TRUE;
 }

@@ -1513,15 +1513,9 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  if (pdic && compareType (operandType (IC_RESULT (pdic)),
 				 operandType (IC_RESULT (ic))) != 1)
 	    pdic = NULL;
-
-	  // TODO: this must go, a weak fix for bug #467035
-	  if (pdic && (pdic->level > ic->level)) {
-	    // pdic was inside an inner loop
-	    pdic = NULL;
-	  }
-	  
 	}
 
+#if 0 
       /* if found then eliminate this and add to */
       /* to cseSet an element containing result */
       /* of this with previous opcode           */
@@ -1578,7 +1572,22 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	  defic = ic;
 
 	}
+#else
+      /* Alternate code */
+      if (pdic && IS_ITEMP(IC_RESULT(ic))) {
+	  /* if previous definition found change this to an assignment */
+	  ic->op = '=';
+	  IC_RIGHT(ic) = operandFromOperand(IC_RESULT(pdic));
+	  SET_ISADDR(IC_RESULT(ic),0);
+	  SET_ISADDR(IC_RIGHT (ic),0);	  
+      }
 
+      if (!(POINTER_SET (ic)) && IC_RESULT (ic)) {
+	  deleteItemIf (&cseSet, ifDefSymIsX, IC_RESULT (ic));
+	  addSetHead (&cseSet, newCseDef (IC_RESULT (ic), ic));
+      }
+      defic = ic;
+#endif
       /* if assignment to a parameter which is not
          mine and type is a pointer then delete
          pointerGets to take care of aliasing */

@@ -156,12 +156,12 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 /* Generate code to copy XINIT to XISEG */
 static void _mcs51_genXINIT (FILE * of) {
   fprintf (of, ";	_mcs51_genXINIT() start\n");
-  fprintf (of, "	mov	a,#l_XINIT\n");
-  fprintf (of, "	mov	r1,a\n");
+  fprintf (of, "	mov	r1,#l_XINIT\n");
   fprintf (of, "	mov	r2,#(l_XINIT >> 8)\n");
+  fprintf (of, "	mov	a,r1\n");
   fprintf (of, "	orl	a,r2\n");
   fprintf (of, "	jz	00003$\n");
-  fprintf (of, "	inc	r2\n");  
+  fprintf (of, "	mov	r2,#((l_XINIT+255) >> 8)\n");
   fprintf (of, "	mov	dptr,#s_XINIT\n");
   fprintf (of, "	mov	r0,#s_XISEG\n");
   fprintf (of, "	mov	p2,#(s_XISEG >> 8)\n");

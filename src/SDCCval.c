@@ -326,9 +326,9 @@ constVal (char *s)
 	SPEC_CVAL (val->type).v_int = sval;
     }
 
-  // check the size and make it a short if required
+  // check the size and make it a char if possible
   if (sval < 256)
-    SPEC_SHORT (val->etype) = 1;
+    SPEC_NOUN (val->etype) = V_CHAR;
 
   return val;
 

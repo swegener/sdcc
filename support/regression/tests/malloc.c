@@ -23,15 +23,15 @@ testMalloc(void)
 
   p1 = malloc(5);
   ASSERT(p1 != NULL);
-  LOG(("p1: %u\n", p1));
+  LOG(("p1: %u\n", (unsigned) p1));
 
   p2 = malloc(20);
   ASSERT(p2 != NULL);
-  LOG(("p2: %u\n", p2));
+  LOG(("p2: %u\n", (unsigned) p2));
 
   free(p2);
 
   p3 = malloc(10);
   ASSERT(p3 != NULL);
-  LOG(("p3, after freeing p2: %u\n", p3));
+  LOG(("p3, after freeing p2: %u\n", (unsigned) p3));
 }

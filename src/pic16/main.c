@@ -66,6 +66,9 @@ static char *_pic16_keywords[] =
   NULL
 };
 
+
+extern char *pic16_processor_base_name(void);
+
 void  pic16_pCodeInitRegisters(void);
 
 void pic16_assignRegisters (eBBlock ** ebbs, int count);
@@ -174,9 +177,15 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 static void
 _pic16_finaliseOptions (void)
 {
+	port->mem.default_local_map = data;
+	port->mem.default_globl_map = data;
 
-      port->mem.default_local_map = data;
-      port->mem.default_globl_map = data;
+	setMainValue("mcu", pic16_processor_base_name() );
+	addSet(&preArgvSet, Safe_strdup("-DMCU={mcu}"));
+}
+
+
+/* all the rest is commented ifdef'd out */
 #if 0
   /* Hack-o-matic: if we are using the flat24 model,
    * adjust pointer sizes.
@@ -232,7 +241,7 @@ _pic16_finaliseOptions (void)
 	}
     }
 #endif
-}
+
 
 static void
 _pic16_setDefaultOptions (void)
@@ -247,7 +256,6 @@ _pic16_getRegName (struct regs *reg)
   return "err";
 }
 
-extern char *pic16_processor_base_name(void);
 
 static void
 _pic16_genAssemblerPreamble (FILE * of)
@@ -263,7 +271,6 @@ _pic16_genAssemblerPreamble (FILE * of)
   fprintf (of, "\tlist\tp=%s\n",&name[1]);
   fprintf (of, "\tinclude \"%s.inc\"\n",name);
 
-#if 0
   fprintf (of, "\t__config _CONFIG1H,0x%x\n",pic16_getConfigWord(0x300001));
   fprintf (of, "\t__config _CONFIG2L,0x%x\n",pic16_getConfigWord(0x300002));
   fprintf (of, "\t__config _CONFIG2H,0x%x\n",pic16_getConfigWord(0x300003));
@@ -275,7 +282,6 @@ _pic16_genAssemblerPreamble (FILE * of)
   fprintf (of, "\t__config _CONFIG6H,0x%x\n",pic16_getConfigWord(0x30000b));
   fprintf (of, "\t__config _CONFIG7L,0x%x\n",pic16_getConfigWord(0x30000c));
   fprintf (of, "\t__config _CONFIG7H,0x%x\n",pic16_getConfigWord(0x30000d));
-#endif
 
   fprintf (of, "\tradix dec\n");
 }
@@ -300,16 +306,16 @@ _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 
 	fprintf(of, "; RESET vector\n");
 	fprintf(of, "\tgoto\t__sdcc_gsinit_startup\n");
-	fprintf(of, "\tres 6\n");
+	fprintf(of, "\tres 4\n");
 
 
 	fprintf(of, "; High priority interrupt vector 0x0008\n");
 	if(interrupts[1]) {
 		fprintf(of, "\tgoto\t%s\n", interrupts[1]->rname);
-		fprintf(of, "\tres\t8\n");
+		fprintf(of, "\tres\t12\n"); 
 	} else {
 		fprintf(of, "\tretfie\n");
-		fprintf(of, "\tres\t8\n");
+		fprintf(of, "\tres\t14\n");
 	}
 
 	fprintf(of, "; Low priority interrupt vector 0x0018\n");

@@ -61,7 +61,6 @@ static int optimized_for_speed = 0;
   hack hack
 
 */
-int options_no_movff = 1;
 
 /* max_key keeps track of the largest label number used in 
    a function. This is then used to adjust the label offset

@@ -289,11 +289,11 @@ static PORT *_ports[] =
 #if !OPT_DISABLE_DS390
   &ds390_port,
 #endif
-#if !OPT_DISABLE_PIC
-  &pic_port,
-#endif
 #if !OPT_DISABLE_PIC16
   &pic16_port,
+#endif
+#if !OPT_DISABLE_PIC
+  &pic_port,
 #endif
 #if !OPT_DISABLE_TININative
   &tininative_port,

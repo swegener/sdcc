@@ -809,7 +809,7 @@ pic16glue ()
 
   pic16_InlinepCode();
 
-	pic16_AnalyzepCode('*');
+  pic16_AnalyzepCode('*');
 
   pic16_pcode_test();
 

@@ -90,8 +90,8 @@ typedef struct PIC_device {
 
   int maxRAMaddress;          /* maximum value for a data address */
   int bankMask;               /* Bitmask that is ANDed with address to extract banking bits */
-  //  int hasAliasedRAM:1;        /* True if there are bank independent registers */
-
+  int RAMsize;		      /* size of Data RAM - VR 031120 */
+  int extMIface;               /* device has external memory interface */
 } PIC_device;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */

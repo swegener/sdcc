@@ -1,3 +1,18 @@
+2003-11-26 Vangelis Rokas <vrokas@otenet.gr>
+	
+	* src/pic16/main.c (_pic16_genIVT): fixed interrupt vector table
+	* src/pic16/main.c (_pic16_genAssemblerPreamble): re-enabled the
+	output of __config directives, since gpasm now supports them
+	* src/pic16/main.c (_pic16_finaliseOptions): define MCU
+	pre-processor macro, i.e. -DMCU=p18f452
+	* src/pic16/ralloc.c: renamed packRegisters to pic16_packRegisters,
+	and modified to handle 'cast' icode similarly to '=' icode
+	* src/pic16/device.h (typedef struct PIC_device): added field
+	'extMIface' to indicate that chip has external memory interface
+	* src/pic16/device.c: added chips 18F248, 18F258, 18F448, 18F458,
+	18F6520, 18F6620, 18F6680, 18F6720, 18F8520, 18F8620, 18F8680,
+	18F8720
+
 2003-11-26 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCC.y (pointer): fixed bug #846006

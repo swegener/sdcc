@@ -3451,12 +3451,13 @@ static void isData(sym_link *sl)
   }
     
 }
-/*-----------------------------------------------------------------*/
-/* packRegisters - does some transformations to reduce register    */
-/*                   pressure                                      */
-/*-----------------------------------------------------------------*/
+/*--------------------------------------------------------------------*/
+/* pic16_packRegisters - does some transformations to reduce          */
+/*                   register pressure                                */
+/*                                                                    */
+/*--------------------------------------------------------------------*/
 static void
-packRegisters (eBBlock * ebp)
+pic16_packRegisters (eBBlock * ebp)
 {
   iCode *ic;
   int change = 0;
@@ -3475,7 +3476,8 @@ packRegisters (eBBlock * ebp)
       {
 
 	/* find assignment of the form TrueSym := iTempNN:1 */
-	if (ic->op == '=' && !POINTER_SET (ic))
+	/* see BUGLOG0001 for workaround with the CAST - VR */
+	if ((ic->op == '=' || ic->op == CAST) && !POINTER_SET (ic))
 	  change += packRegsForAssign (ic, ebp);
 	/* debug stuff */
 	if (ic->op == '=')
@@ -3825,7 +3827,7 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   /* change assignments this will remove some
      live ranges reducing some register pressure */
   for (i = 0; i < count; i++)
-    packRegisters (ebbs[i]);
+    pic16_packRegisters (ebbs[i]);
 
   {
     regs *reg;

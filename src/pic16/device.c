@@ -20,6 +20,15 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
+
+/*
+	VR - Began writing code to make PIC16 C source files independent from
+	the header file (created by the inc2h.pl)
+
+	- adding maximum RAM memory into PIC_Device structure
+
+*/
+
 #include <stdio.h>
 
 #include "common.h"   // Include everything in the SDCC src directory
@@ -38,42 +47,164 @@
 
 static PIC_device Pics[] = {
   {
-    {"p18f242", "18f242", "pic18f242", "f242"},
-    (memRange *)NULL,
-    (memRange *)NULL,
+    {"p18f242", "18f242", "pic18f242", "f242"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
     0,
-    0x300,
+    0x300,						// bank mask
+    0x300,						// RAMsize
+    0
   },
 
   {
-    {"p18f252", "18f252", "pic18f252", "f252"},
-    (memRange *)NULL,
-    (memRange *)NULL,
+    {"p18f252", "18f252", "pic18f252", "f252"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
     0,
-    0x600,
+    0x600,						// bank mask
+    0x600,						// RAMsize
+    0
   },
 
   {
-    {"p18f442", "18f442", "pic18f442", "f442"},
-    (memRange *)NULL,
-    (memRange *)NULL,
+    {"p18f442", "18f442", "pic18f442", "f442"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
     0,
-    0x300,
+    0x300,						// bank mask
+    0x300,						// RAMsize
+    0
   },
 
   {
-    {"p18f452", "18f452", "pic18f452", "f452"},
-    (memRange *)NULL,
-    (memRange *)NULL,
+    {"p18f452", "18f452", "pic18f452", "f452"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
     0,
-    0x600,
+    0x600,						// bank mask
+    0x600,						// RAMsize
+    0
+  },
+
+  {
+    {"p18f248", "18f248", "pic18f248", "f248"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0x300,						// bank mask
+    0x300,						// RAMsize
+    0
+  },
+
+  {
+    {"p18f258", "18f258", "pic18f258", "f258"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0x600,						// bank mask
+    0x600,						// RAMsize
+    0
+  },
+
+  {
+    {"p18f448", "18f448", "pic18f448", "f448"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0x300,						// bank mask
+    0x300,						// RAMsize
+    0
+  },
+
+  {
+    {"p18f458", "18f458", "pic18f458", "f458"},		// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0x600,						// bank mask
+    0x600,						// RAMsize
+    0
+  },
+
+  {
+    {"p18f6520", "18f6520", "pic18f6520", "f6520"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0x800,						// bank mask
+    0x800,						// RAMsize
+    1
+  },
+
+  {
+    {"p18f6620", "18f6620", "pic18f6620", "f6620"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0xf00,						// bank mask
+    0xf00,						// RAMsize
+    1
+  },
+  {
+    {"p18f6680", "18f6680", "pic18f6680", "f6680"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0xc00,						// bank mask
+    0xc00,						// RAMsize
+    1
+  },
+  {
+    {"p18f6720", "18f6720", "pic18f6720", "f6720"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0xf00,						// bank mask
+    0xf00,						// RAMsize
+    1
+  },
+  {
+    {"p18f8520", "18f8520", "pic18f8520", "f8520"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0x800,						// bank mask
+    0x800,						// RAMsize
+    1
+  },
+  {
+    {"p18f8620", "18f8620", "pic18f8620", "f8620"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0xf00,						// bank mask
+    0xf00,						// RAMsize
+    1
+  },
+  {
+    {"p18f8680", "18f8680", "pic18f8680", "f8680"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0xc00,						// bank mask
+    0x800,						// RAMsize
+    1
+  },
+  {
+    {"p18f8720", "18f8720", "pic18f8720", "f8720"},	// aliases
+    (memRange *)NULL,					// ram memory map
+    (memRange *)NULL,					// sfr memory map
+    0,
+    0xf00,						// bank mask
+    0xf00,						// RAMsize
+    1
   },
 
 };
 
 static int num_of_supported_PICS = sizeof(Pics)/sizeof(PIC_device);
 
-#define DEFAULT_PIC "f452"
+#define DEFAULT_PIC "452"
 
 static PIC_device *pic=NULL;
 
@@ -136,6 +267,9 @@ void pic16_addMemRange(memRange *r, int type)
     fprintf(stderr, "missing \"#pragma maxram\" setting\n");
     return;
   }
+
+//	fprintf(stderr, "%s: adding memory range from 0x%x to 0x%x type= %d\n",
+//		__FUNCTION__, r->start_address, r->end_address, type);
 
   do {
     for (i=r->start_address; i<= r->end_address; i++) {
@@ -525,16 +659,17 @@ static int assignRegister(regs *reg, int start_address)
 {
   int i;
 
-	//fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
+//	fprintf(stderr,"%s -  %s start_address = 0x%03x\t(max=0x%03x)\n",__FUNCTION__,reg->name, start_address, pic->maxRAMaddress);
   if(reg->isFixed) {
 
     if (validAddress(reg->address,reg->size)) {
-      //fprintf(stderr,"%s -  %s address = 0x%03x\n",__FUNCTION__,reg->name, reg->address);
+//	fprintf(stderr,"fixed %s -  %s address = 0x%03x\n",__FUNCTION__,reg->name, reg->address);
       mapRegister(reg);
       return reg->address;
     }
 
     if( isSFR(reg->address)) {
+//	fprintf(stderr,"sfr %s -  %s address = 0x%03x\n",__FUNCTION__,reg->name, reg->address);
       mapRegister(reg);
       return reg->address;
     }

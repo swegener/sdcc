@@ -14,7 +14,8 @@
   With loopInduction on				Breaks		198B
   With all working on				20796	158	196C
   Slightly better genCmp(signed)		20597	159	195B
-  
+  Better reg packing, first peephole		20038	163	1873
+
   Michael Hope <michaelh@earthling.net>	2000
   Based on the mcs51 generator - Sandeep Dutta . sandeep.dutta@usa.net (1998)
                            and -  Jean-Louis VERN.jlvern@writeme.com (1999)

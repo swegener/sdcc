@@ -1617,6 +1617,7 @@ usualBinaryConversions (operand ** op1, operand ** op2)
   sym_link *ltype = operandType (*op1);
   
   ctype = computeType (ltype, rtype);
+
   *op1 = geniCodeCast (ctype, *op1, TRUE);
   *op2 = geniCodeCast (ctype, *op2, TRUE);
   
@@ -2048,9 +2049,11 @@ geniCodeAdd (operand * left, operand * right, int lvl)
   int isarray = 0;
   LRTYPE;
 
+#if 0
   /* if left is an array then array access */
   if (IS_ARRAY (ltype))
     return geniCodeArray (left, right,lvl);
+#endif
 
   /* if the right side is LITERAL zero */
   /* return the left side              */
@@ -2062,7 +2065,7 @@ geniCodeAdd (operand * left, operand * right, int lvl)
     return right;
 
   /* if left is a pointer then size */
-  if (IS_PTR (ltype))
+  if (IS_PTR (ltype) || IS_ARRAY(ltype))
     {
       isarray = left->isaddr;
       // there is no need to multiply with 1

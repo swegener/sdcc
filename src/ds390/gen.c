@@ -6665,22 +6665,25 @@ genlshTwo (operand * result, operand * left, int shCount)
       shCount -= 8;
 
       _startLazyDPSEvaluation();
-      aopPut (AOP (result), zero, LSB);
+
       if (size > 1)
 	{
 	  if (shCount)
 	  {
 	    _endLazyDPSEvaluation();
 	    shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+      	    aopPut (AOP (result), zero, LSB);	    
 	  }
 	  else
 	  {
 	    movLeft2Result (left, LSB, result, MSB16, 0);
+	    aopPut (AOP (result), zero, LSB);
 	    _endLazyDPSEvaluation();
 	  }
 	}
 	else
 	{
+	  aopPut (AOP (result), zero, LSB);
 	  _endLazyDPSEvaluation();
 	}
   }

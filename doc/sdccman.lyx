@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.3
+SDCC 2.4.4
 \size footnotesize 
 
 \newline 
@@ -128,7 +128,8 @@ C
 \emph on 
 C
 \emph default 
-ompiler) is a Freeware, retargettable, optimizing ANSI-C compiler by 
+ompiler) is an open source, retargettable, optimizing ANSI-C compiler by
+ 
 \series bold 
 Sandeep Dutta
 \series default 
@@ -143,7 +144,17 @@ Sandeep Dutta
  It can be retargetted for other microprocessors, support for Microchip
  PIC, Atmel AVR is under development.
  The entire source code for the compiler is distributed under GPL.
- SDCC uses ASXXXX & ASLINK, a Freeware, retargettable assembler & linker.
+ SDCC uses ASXXXX
+\begin_inset LatexCommand \index{asXXXX (as-gbz80, as-hc08, asx8051, as-z80)}
+
+\end_inset 
+
+ & ASLINK
+\begin_inset LatexCommand \index{aslink}
+
+\end_inset 
+
+, an open source retargettable assembler & linker.
  SDCC has extensive language extensions suitable for utilizing various microcont
 rollers and underlying hardware effectively.
  
@@ -274,7 +285,7 @@ Open Source
 
 All packages used in this compiler system are 
 \emph on 
-opensource
+open source
 \emph default 
  and 
 \emph on 
@@ -3147,11 +3158,14 @@ SDCC sources use the unix line ending LF.
  And use an editor which can handle LF-only line endings.
  Make sure not to commit files with windows line endings.
  The tabulator spacing
-\begin_inset LatexCommand \index{tabulator spacing (8)}
+\begin_inset LatexCommand \index{tabulator spacing (8 columns)}
 
 \end_inset 
 
  used in the project is 8.
+ Although a tabulator spacing of 8 is a sensible choice for programmers
+ (it's a power of 2 and allows to display 8/16 bit signed variables without
+ loosing columns) the plan is to move towards using only spaces in the source.
 \layout Subsection
 
 Building SDCC Using Microsoft Visual C++ 6.0/NET (MSVC)
@@ -9091,7 +9105,7 @@ xdata
  0x7ffe unsigned int chksum;
 \layout Standard
 
-In the above example the variable chksum will located at 0x7ffe and 0x7fff
+In the above example the variable chksum will be located at 0x7ffe and 0x7fff
  of the external ram.
  The compiler does 
 \emph on 
@@ -9133,8 +9147,7 @@ In case of memory mapped I/O devices the keyword
 \emph on 
 volatile
 \emph default 
- have to be used to tell the compiler that accesses might not be optimized
- away:
+ has to be used to tell the compiler that accesses might not be removed:
 \layout Verse
 
 
@@ -9901,7 +9914,7 @@ volatile
 If the access to these variables is not 
 \emph on 
 atomic
-\begin_inset LatexCommand \index{atomic access}
+\begin_inset LatexCommand \index{atomic}
 
 \end_inset 
 
@@ -10719,6 +10732,101 @@ interrupt priorities
 
  and don't add complexity unless you have to.
  
+\layout Subsection
+
+Semaphore
+\begin_inset LatexCommand \index{semaphore}
+
+\end_inset 
+
+ locking (mcs51/ds390)
+\layout Standard
+
+Some architectures (mcs51/ds390) have an atomic
+\begin_inset LatexCommand \index{atomic}
+
+\end_inset 
+
+ bit test and
+\emph on 
+ 
+\emph default 
+clear
+\emph on 
+ 
+\emph default 
+instruction.
+ These type of instructions are typically used in preemptive multitasking
+ systems, where a routine f.e.
+ claims the use of a data structure ('acquires a lock
+\begin_inset LatexCommand \index{lock}
+
+\end_inset 
+
+ on it'), makes some modifications and then releases the lock when the data
+ structure is consistent again.
+ The instruction may also be used if interrupt and non-interrupt code have
+ to compete for a resource.
+ With the atomic bit test and clear instruction interrupts
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ don't have to be disabled for the locking operation.
+ 
+\layout Standard
+
+SDCC generates this instruction if the source follows this pattern:
+\layout Verse
+
+
+\family typewriter 
+volatile bit resource_is_free; 
+\newline 
+
+\newline 
+if (resource_is_free) 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+resource_is_free=0; 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+resource_is_free=1;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+} 
+\layout Standard
+
+Note, mcs51 and ds390 support only an atomic
+\begin_inset LatexCommand \index{atomic}
+
+\end_inset 
+
+ bit test and 
+\emph on 
+clear
+\emph default 
+ instruction (as opposed to atomic bit test and 
+\emph on 
+set).
 \layout Section
 
 Functions using private register banks
@@ -18034,7 +18142,27 @@ sdcc/Changelog
 
 \layout Standard
 
-ASXXXX Assemblers and ASLINK Relocating Linker
+ASXXXX
+\begin_inset LatexCommand \index{asXXXX (as-gbz80, as-hc08, asx8051, as-z80)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Assembler documentation}
+
+\end_inset 
+
+ Assemblers and ASLINK
+\begin_inset LatexCommand \index{aslink}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Linker documentation}
+
+\end_inset 
+
+ Relocating Linker
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -19459,10 +19587,6 @@ void f () {
 \SpecialChar ~
 global = 2; 
 \newline 
-\SpecialChar ~
-\SpecialChar ~
-return; 
-\newline 
 }
 \layout Subsection
 
@@ -19827,17 +19951,19 @@ Note the subexpressions
 
 \layout Standard
 
-SDCC changes switch statements to jump tables
+SDCC can optimize switch statements to jump tables
 \begin_inset LatexCommand \index{jump tables}
 
 \end_inset 
 
- when the following conditions are true.
- 
+.
+ It makes the decision based on an estimate of the generated code size.
+ SDCC is quite liberal in the requirements for jump table generation: 
 \layout Itemize
 
-The case labels are in numerical sequence, the labels need not be in order,
- and the starting number need not be one or zero.
+The labels need not be in order, and the starting number need not be one
+ or zero, the case labels are in numerical sequence or not too many case
+ labels are missing.
 \begin_deeper 
 \layout Verse
 
@@ -19964,8 +20090,7 @@ case 3: ...\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-case 2: ...
- 
+
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -19997,6 +20122,164 @@ case 6: ...\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 case 3: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 7: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 4: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 8: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 5: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 9: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 6: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 10: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 7: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 11: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 8: ...
  
 \newline 
 }\SpecialChar ~
@@ -20044,16 +20327,24 @@ Both the above switch statements will be implemented using a jump-table.
 \end_deeper 
 \layout Itemize
 
-The number of case labels is at least three, since it takes two conditional
- statements to handle the boundary conditions.
+The number of case labels is not larger than supported by the target architectur
+e.
 \layout Itemize
 
-The number of case labels is less than 84, since each label takes 3 bytes
- and a jump-table can be utmost 256 bytes long.
+If the case labels are not in numerical sequence ('gaps' between cases)
+ SDCC checks whether a jump table with additionally inserted dummy cases
+ is still attractive.
+ 
+\layout Itemize
+
+If the starting number is not zero and a check for the lower boundary of
+ the jump-table can thus be eliminated SDCC might insert dummy cases 0,
+ ...
+ .
 \layout Standard
 
-Switch statements which have gaps in the numeric sequence or those that
- have more that 84 case labels can be split into more than one switch statement
+Switch statements which have large gaps in the numeric sequence or those
+ that have too many case labels can be split into more than one switch statement
  for efficient code generation, e.g.:
 \layout Verse
 
@@ -20083,22 +20374,52 @@ case 4: ...
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 9: ...
+case 5: ...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 10: ...
+case 6: ...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 11: ...
+case 7: ...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 12: ...
+case 101: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 102: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 103: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 104: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 105: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 106: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 107: ...
  
 \newline 
 }
@@ -20131,6 +20452,21 @@ case 3: ...
 case 4: ...
  
 \newline 
+\SpecialChar ~
+\SpecialChar ~
+case 5: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 6: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 7: ...
+ 
+\newline 
 }
 \layout Standard
 
@@ -20143,27 +20479,37 @@ switch (i) {
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 9:\SpecialChar ~
-\SpecialChar ~
-...
+case 101: ...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 10:\SpecialChar ~
-...
+case 102: ...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 11:\SpecialChar ~
-...
+case 103: ...
  
 \newline 
 \SpecialChar ~
 \SpecialChar ~
-case 12:\SpecialChar ~
-...
+case 104: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 105: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 106: ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+case 107: ...
  
 \newline 
 }
@@ -20171,9 +20517,15 @@ case 12:\SpecialChar ~
 
 then both the switch statements will be implemented using jump-tables whereas
  the unmodified switch statement will not be.
- You might also consider inserting dummy cases 0 and 5 to 8 in this example.
- 
-\newline 
+\layout Comment
+
+There might be reasons which SDCC cannot know about to either favour or
+ not favour jump tables.
+ If the target system has to be as quick for the last switch case as for
+ the first (pro jump table), or if the switch argument is known to be zero
+ in the majority of the cases (contra jump table).
+\layout Standard
+
 The pragma nojtbound
 \begin_inset LatexCommand \index{\#pragma nojtbound}
 
@@ -21530,7 +21882,16 @@ Figure II gives a table of iCode operations supported by the compiler.
 \series bold 
 \shape italic 
 \color red
-<Where is Figure II ?>
+<Where is Figure II?>
+\layout Comment
+
+In the original article Figure II was announced to be downloadable on 
+\shape italic 
+Circuit Cellar
+\shape default 
+'s web site.
+ Unfortunately it never seemed to have shown up there, so: where is Figure
+ II?
 \layout Paragraph*
 
 ICode Example

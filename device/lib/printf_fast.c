@@ -97,6 +97,7 @@ static data unsigned char field_width;
 #endif
 
 #ifdef FLOAT
+#define SDCC_FLOAT_LIB
 #include <float.h>
 static bit continue_float;
 #ifndef FLOAT_FIXED4
@@ -612,17 +613,20 @@ print_float:
 	mov	_field_width, #0
 #endif
 print_float_begin:
-	mov	exp_b, r0		// keep r0 safe, will need it again
+	push	ar0		// keep r0 safe, will need it again
 	lcall	printf_get_float
 	clr	c
 	mov	a, #158			// check for large float we can't print
-	subb	a, exp_a
+	subb	a, r7
 	jnc	print_float_size_ok
 printf_float_too_big:
 	// TODO: should print some sort of overflow error??
+	pop	ar0
 	ljmp	printf_format_loop
 print_float_size_ok:
-	lcall	__fs_rshift_a
+	push	dpl
+	lcall	fs_rshift_a
+	pop	dpl
 	setb	_continue_float
 #ifndef LONG
 	mov	a, r3
@@ -635,10 +639,12 @@ print_float_size_ok:
 	lcall	printf_putchar
 	// now that the integer part is printed, we need to refetch the
 	// float from the va_args and extract the fractional part
-	mov	r0, exp_b
+	pop	ar0
 	lcall	printf_get_float
 	push	ar0
-	mov	a, exp_a
+	push	dpl
+	push	dph
+	mov	a, r7
 	cjne	a, #126, print_float_frac_lshift
 	sjmp	print_float_frac // input between 0.5 to 0.9999
 print_float_frac_lshift:
@@ -663,7 +669,7 @@ print_float_frac_rshift:
 	//Acc (exponent) is less than 126 (input < 0.5)
 	cpl	a
 	add	a, #127
-	lcall	__fs_rshift_a
+	lcall	fs_rshift_a
 print_float_frac:
 	// now we've got the fractional part, so now is the time to
 	// convert to BCD... just convert each bit to BCD using a
@@ -672,8 +678,6 @@ print_float_frac:
 	clr	a
 	mov	r6, a
 	mov	r5, a
-	push	dpl
-	push	dph
 	mov	dptr, #_frac2bcd	// FLOAT_FIXED4 version (14 entries)
 print_float_frac_loop:
 	mov	a, r3
@@ -784,7 +788,9 @@ print_float_default_done:
 print_float_begin:
 	push	ar0			// keep r0 safe, will need it again
 	lcall	printf_get_float
-	mov	a, exp_a
+	push	dpl
+	push	dph
+	mov	a, r7
 	cjne	a, #126, print_float_frac_lshift
 	sjmp	print_float_frac	// input between 0.5 to 0.9999
 
@@ -810,17 +816,15 @@ print_float_frac_rshift:
 	//Acc (exponent) is less than 126 (input < 0.5)
 	cpl	a
 	add	a, #127
-	lcall	__fs_rshift_a
+	lcall	fs_rshift_a
 print_float_frac:
-	// Convert the fraction in r4/r3/r2/r1 into 8 BCD digits in exb_b/r7/r6/r5
+	// Convert the fraction in r4/r3/r2/r1 into 8 BCD digits in r0/r7/r6/r5
 	mov	b, #27
 	clr	a
-	mov	exp_b, a
+	mov	r0, a
 	mov	r7, a
 	mov	r6, a
 	mov	r5, a
-	push	dpl
-	push	dph
 	mov	dptr, #_frac2bcd	// FLOAT version (27 entries)
 print_float_frac_loop:
 	mov	a, r1
@@ -853,17 +857,15 @@ print_float_frac_loop:
 	mov	r7, a
 	mov	a, #3
 	movc	a, @a+dptr
-	addc	a, exp_b
+	addc	a, r0
 	da	a
-	mov	exp_b, a
+	mov	r0, a
 print_float_frac_skip:
 	inc	dptr
 	inc	dptr
 	inc	dptr
 	inc	dptr
 	djnz	b, print_float_frac_loop
-	pop	dph
-	pop	dpl
 print_float_frac_roundoff:
 	// Now it's time to round-off the BCD digits to the desired precision.
 	clr	a
@@ -875,7 +877,8 @@ print_float_frac_roundoff:
 	rl	a
 	rl	a
 	anl	a, #0xFC
-	lcall	__fs_rshift_a		// divide r4/r3/r2/r1 by 10^frac_field_width
+	mov	dph, r0			// fs_rshift_a will overwrite r0 & dpl
+	lcall	fs_rshift_a		// divide r4/r3/r2/r1 by 10^frac_field_width
 	mov	a, r5
 	add	a, r1			// add rounding to fractional part
 	da	a
@@ -888,11 +891,13 @@ print_float_frac_roundoff:
 	addc	a, r3
 	da	a
 	mov	_float_frac_bcd+1, a
-	mov	a, exp_b
+	mov	a, dph
 	addc	a, r4
 	da	a
 	mov	_float_frac_bcd+0, a
 	mov	sign_b, c		// keep fractional carry in sign_b
+	pop	dph
+	pop	dpl
 print_float_int:
 	// Time to work on the integer portion... fetch the float again, check
 	// size (exponent), scale to integer, add the fraction's carry, and
@@ -902,13 +907,15 @@ print_float_int:
 	push	ar0
 	clr	c
 	mov	a, #158			// check for large float we can't print
-	subb	a, exp_a
+	subb	a, r7
 	jnc	print_float_size_ok
 printf_float_too_big:
 	// TODO: should print some sort of overflow error??
 	ljmp	printf_format_loop
 print_float_size_ok:
-	lcall	__fs_rshift_a
+	push	dpl
+	lcall	fs_rshift_a
+	pop	dpl
 	jnb	sign_b, print_float_do_int
 	// if we get here, the fractional round off caused the
 	// integer part to increment.  Add 1 for a proper result
@@ -1002,7 +1009,7 @@ get_float_frac_digit_done:
 
 #if 0
 pm2_print_float:
-	 mov	a, exp_a
+	 mov	a, r7
 	 lcall	pm2_entry_phex
 	 mov	a, #0x20
 	 lcall	pm2_entry_cout
@@ -1013,7 +1020,7 @@ pm2_print_float:
 #endif
 
 	// Fetch a float from the va_args and put it into
-	// exp_a/r4/r3/r2 and also clear r1 and preset
+	// r7(exp) r4/r3/r2(mant) and also clear r1 and preset
 	// the flags
 printf_get_float:
 	mov	a, @r0
@@ -1026,7 +1033,7 @@ printf_get_float:
 	mov	a, r1
 	rlc	a
 	mov	_negative_flag, c
-	mov	exp_a, a
+	mov	r7, a
 	jz	printf_get_float_2
 	orl	ar4, #0x80
 printf_get_float_2:

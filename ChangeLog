@@ -1,3 +1,15 @@
+2004-12-25 Paul Stoffregen <paul AT pjrc.com>
+	* device/lib/printf_fast.c: improvements to float output
+	* device/include/float.h: add defines for assembly float library
+	* device/lib/_fsget1arg.c: receive 1 float arg
+	* device/lib/_fsget2args.c: receive 2 float args (reentrant)
+	* device/lib/_fsnormalize.c: normalize a float
+	* device/lib/_fsreturnval.c: return float, various helper routines
+	* device/lib/_fsrshift.c: right shift a float's mantissa
+	* device/lib/_fsswapargs.c: swap 2 floats
+	* device/lib/Makefile.in: build these 6 new files for mcs51
+	* device/lib/libfloat.lib: add these 6 files to the library
+
 2004-12-26 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/avr.src/arith_inst.cc: fixed bug #1088372- savr is not

@@ -70,9 +70,26 @@ char __fslt (float, float);
 char __fseq (float, float);
 char __fsqt (float, float);
 
-#endif
+
+#if defined(SDCC_FLOAT_LIB) && defined(SDCC_mcs51) && !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+
+// This adds extra code for proper round-off, in
+// an attempt to match the results from gcc.
+#define FLOAT_FULL_ACCURACY
+
+// This adds about 66 bytes to the code size and
+// significantly speeds up shift operations more
+// than 8 bits (common when subtracting numbers
+// of siginifantly different magnitude and scaling
+// to fixed point)
+#define FLOAT_SHIFT_SPEEDUP
+
+#define sign_a  psw.1
+#define sign_b  psw.5
+#define exp_a dpl
+#define exp_b dph
+#endif	// using mcs51 assembly
 
 
-
-
+#endif	// __SDC51_FLOAT_H
 

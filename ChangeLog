@@ -1,3 +1,10 @@
+2004-03-09 Hans Dorn <hjdorn AT users.sourceforge.net>
+
+	* src/pic16/gen.c (genSkip),
+	(genc16bit2lit), (gencjneshort): commented out
+	(is_LitOp): new helper function, checks operand type
+	(genCmpEq): rewritten
+
 2004-03-08 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/regression/tests/bug-908454.c: added

@@ -4332,6 +4332,9 @@ static void genIfxJump (iCode *ic, char *jval)
     ic->generated = 1;
 }
 
+#if 0
+// not needed ATM
+
 /*-----------------------------------------------------------------*/
 /* genSkip                                                         */
 /*-----------------------------------------------------------------*/
@@ -4382,6 +4385,7 @@ static void genSkip(iCode *ifx,int status_bit)
   }
 
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genSkipc                                                        */
@@ -5231,6 +5235,10 @@ static void genCmpLt (iCode *ic, iCode *ifx)
     pic16_freeAsmop(result,NULL,ic,TRUE); 
 }
 
+#if 0
+// not needed ATM
+// FIXME reenable literal optimisation when the pic16 port is stable
+
 /*-----------------------------------------------------------------*/
 /* genc16bit2lit - compare a 16 bit value to a literal             */
 /*-----------------------------------------------------------------*/
@@ -5281,7 +5289,10 @@ static void genc16bit2lit(operand *op, int lit, int offset)
   }
 
 }
+#endif
 
+#if 0
+// not needed ATM
 /*-----------------------------------------------------------------*/
 /* gencjneshort - compare and jump if not equal                    */
 /*-----------------------------------------------------------------*/
@@ -5509,6 +5520,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
   if(ifx)
     ifx->generated = 1;
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -5532,6 +5544,131 @@ static void gencjne(operand *left, operand *right, iCode *ifx)
 
 }
 #endif
+
+
+/*-----------------------------------------------------------------*/
+/* is_LitOp - check if operand has to be treated as literal        */
+/*-----------------------------------------------------------------*/
+static bool is_LitOp(operand *op)
+{
+  return (AOP_TYPE(op) == AOP_LIT)
+      || ( (AOP_TYPE(op) == AOP_PCODE)
+          && ( (AOP(op)->aopu.pcop->type == PO_LITERAL)
+              || (AOP(op)->aopu.pcop->type == PO_IMMEDIATE) ));  
+}
+
+
+/*-----------------------------------------------------------------*/
+/* genCmpEq - generates code for equal to                          */
+/*-----------------------------------------------------------------*/
+static void genCmpEq (iCode *ic, iCode *ifx)
+{
+  operand *left, *right, *result;
+  symbol *falselbl = newiTempLabel(NULL);
+  symbol *donelbl = newiTempLabel(NULL);
+
+  int preserve_result = 0;
+  int generate_result = 0;
+  int i=0;
+
+  pic16_aopOp((left=IC_LEFT(ic)),ic,FALSE);
+  pic16_aopOp((right=IC_RIGHT(ic)),ic,FALSE);
+  pic16_aopOp((result=IC_RESULT(ic)),ic,TRUE);
+ 
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
+
+  if( (AOP_TYPE(right) == AOP_CRY) || (AOP_TYPE(left) == AOP_CRY) )
+    {
+      DEBUGpic16_emitcode ("; ***","%s  %d -- ERROR",__FUNCTION__,__LINE__);
+      fprintf(stderr, "%s  %d error - left/right CRY operands not supported\n",__FUNCTION__,__LINE__);
+      goto release;
+    }
+
+  if (is_LitOp(left) || (AOP_TYPE(right) == AOP_ACC))
+    {
+      operand *tmp = right ;
+      right = left;
+      left = tmp;
+    }
+
+  if ( regsInCommon(left, result) || regsInCommon(right, result) )
+    preserve_result = 1;
+
+  if(result && AOP_SIZE(result))
+    generate_result = 1;
+
+  if(generate_result && !preserve_result)
+    {
+      for(i = 0; i < AOP_SIZE(result); i++)
+        pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),i));
+    }
+
+  for(i=0; i < AOP_SIZE(left); i++)
+    {
+      if(AOP_TYPE(left) != AOP_ACC)
+        {
+          if(is_LitOp(left))
+            pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(left), i));
+          else
+            pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), i));
+        }
+      if(is_LitOp(right))
+        pic16_emitpcode(POC_XORLW, pic16_popGet(AOP(right), i)); 
+      else
+        pic16_emitpcode(POC_XORFW, pic16_popGet(AOP(right), i)); 
+
+      pic16_emitpcode(POC_BNZ,pic16_popGetLabel(falselbl->key));
+    }
+
+  // result == true
+
+  if(generate_result && preserve_result)
+    {
+      for(i = 0; i < AOP_SIZE(result); i++)
+        pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),i));
+    }
+
+  if(generate_result)
+    pic16_emitpcode(POC_INCF, pic16_popGet(AOP(result), 0)); // result = true
+
+  if(generate_result && preserve_result)
+    pic16_emitpcode(POC_GOTO,pic16_popGetLabel(donelbl->key));
+
+  if(ifx && IC_TRUE(ifx))
+    pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_TRUE(ifx)->key));
+
+  if(ifx && IC_FALSE(ifx))
+    pic16_emitpcode(POC_GOTO,pic16_popGetLabel(donelbl->key));
+
+  pic16_emitpLabel(falselbl->key);
+
+  // result == false
+
+  if(ifx && IC_FALSE(ifx))
+    pic16_emitpcode(POC_GOTO,pic16_popGetLabel(IC_FALSE(ifx)->key));
+
+  if(generate_result && preserve_result)
+    {
+      for(i = 0; i < AOP_SIZE(result); i++)
+        pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),i));
+    }
+
+  pic16_emitpLabel(donelbl->key);
+
+  if(ifx)
+    ifx->generated = 1;
+
+release:
+  pic16_freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+  pic16_freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+  pic16_freeAsmop(result,NULL,ic,TRUE);
+
+}
+
+
+#if 0
+// old version kept for reference
 
 /*-----------------------------------------------------------------*/
 /* genCmpEq - generates code for equal to                          */
@@ -5850,6 +5987,7 @@ release:
     pic16_freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* ifxForOp - returns the icode containing the ifx for operand     */
@@ -5890,7 +6028,6 @@ static iCode *ifxForOp ( operand *op, iCode *ic )
 			   OP_SYMBOL(op)->liveTo,
 			   ic->next->seq);
     }
-
 
 #if 0
     /* the code below is completely untested

@@ -1055,7 +1055,6 @@ checkSClass (symbol * sym)
        SPEC_SCLS (sym->etype) != S_XSTACK &&
        SPEC_SCLS (sym->etype) != S_CONSTANT))
     {
-
       werror (E_AUTO_ASSUMED, sym->name);
       SPEC_SCLS (sym->etype) = S_AUTO;
     }
@@ -1620,8 +1619,7 @@ processFuncArgs (symbol * func, int ignoreName)
     {
       /* mark it as a register parameter if
          the function does not have VA_ARG
-         and as port dictates
-         not inhibited by command line option or #pragma */
+         and as port dictates */
       if (!func->hasVargs &&
 	  (*port->reg_parm) (val->type))
 	{

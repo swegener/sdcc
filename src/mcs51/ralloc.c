@@ -1913,7 +1913,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   if (bitVectnBitsOn (OP_DEFS (op)) > 1)
     return NULL;		/* has more than one definition */
 
-  /* get the that definition */
+  /* get that definition */
   if (!(dic =
 	hTabItemWithKey (iCodehTab,
 			 bitVectFirstBit (OP_DEFS (op)))))
@@ -1999,6 +1999,12 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 	{
 	  return NULL;
 	}
+      /* if left or right or result is on stack */
+      if (isOperandOnStack(IC_LEFT(dic)) ||
+	  isOperandOnStack(IC_RIGHT(dic)) ||
+	  isOperandOnStack(IC_RESULT(dic))) {
+	return NULL;
+      }
     }
 
   OP_SYMBOL (op)->ruonly = 1;
@@ -2197,8 +2203,9 @@ packForPush (iCode * ic, eBBlock * ebp)
   /* make sure the right side does not have any definitions
      inbetween */
   dbv = OP_DEFS(IC_RIGHT(dic));
-  for (lic = ic; lic != dic ; lic = lic->prev) {
-	  if (bitVectBitValue(dbv,lic->key)) return ;
+  for (lic = ic; lic && lic != dic ; lic = lic->prev) {
+    if (bitVectBitValue(dbv,lic->key)) 
+      return ;
   }
   /* we now we know that it has one & only one def & use
      and the that the definition is an assignment */
@@ -2339,8 +2346,14 @@ packRegisters (eBBlock * ebp)
          can be eliminated for return statements */
       if ((ic->op == RETURN || ic->op == SEND) &&
 	  !isOperandInFarSpace (IC_LEFT (ic)) &&
-	  options.model == MODEL_SMALL)
-	packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+	  options.model == MODEL_SMALL) {
+	if (0 && options.stackAuto) {
+	  /* we should check here if acc will be clobbered for stack
+	     offset calculations */
+	} else {
+	  packRegsForOneuse (ic, IC_LEFT (ic), ebp);
+	}
+      }
 
       /* if pointer set & left has a size more than
          one and right is not in far space */

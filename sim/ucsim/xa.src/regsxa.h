@@ -106,7 +106,11 @@ struct t_regs
     { set_reg1((_index), _value) } \
 }
 
-  /* R7 mirrors 1 of 2 real SP's */
+// fixme: implement
+#define get_bit(x) (x)
+#define set_bit(x,y)
+
+/* R7 mirrors 1 of 2 real SP's */
 #define set_sp(_value) { \
   { set_word_direct(0x400+(7*2), _value); } \
 }

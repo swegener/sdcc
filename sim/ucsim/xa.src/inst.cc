@@ -382,20 +382,17 @@ cl_xa::inst_BR(uint code, int operands)
 int
 cl_xa::inst_JMP(uint code, int operands)
 {
-  unsigned int jmpaddr;
-  short saddr;
+  int jmpAddr;
 
   switch(operands) {
     case REL16:
     {
-      saddr = fetch2();
-      jmpaddr = saddr;
-      jmpaddr *= 2;
-      PC = (PC + jmpaddr) & 0xfffffffe;
+      jmpAddr = (signed short)fetch2()*2;
+      PC = (PC + jmpAddr) & 0xfffffffe;
     }
     break;
     case IREG:
-      PC &= 0xffff0000;
+      PC &= 0xff0000;
       PC |= (reg2(RI_07) & 0xfffe);  /* word aligned */
     break;
     /* fixme 2 more... */
@@ -405,13 +402,13 @@ cl_xa::inst_JMP(uint code, int operands)
 int
 cl_xa::inst_CALL(uint code, int operands)
 {
-  unsigned int jmpaddr;
+  int jmpaddr;
   unsigned int sp;
 
   switch(operands) {
     case REL16:
     {
-      jmpaddr = fetch2();
+      jmpaddr = (signed short)fetch2();
       sp = get_sp() - 4;
       set_sp(sp);
       store2(sp, PC);
@@ -422,16 +419,18 @@ cl_xa::inst_CALL(uint code, int operands)
     break;
     case IREG:
     {
-      sp = get_sp() - 4;
+      sp = get_sp() - 2;
       set_sp(sp);
       store2(sp, PC);
-      store2(sp+2, 0);  /* segment(not sure about ordering...) */
+#if 0 // only in huge model
+      store2(sp+2, ...
+#endif
       jmpaddr = reg2(RI_07);
       jmpaddr *= 2;
       PC = (PC + jmpaddr) & 0xfffffffe;
     }
     break;
-    /* fixme 2 more... */
+    /* fixme 2 more... */ /* johan: which ones? */
   }
   return(resGO);
 }
@@ -442,7 +441,10 @@ cl_xa::inst_RET(uint code, int operands)
   unsigned short sp;
   sp = get_sp();
   retaddr = get2(sp);
-  //retaddr |= get2(sp+2) << 16);
+#if 0 // only in huge model
+  retaddr |= get2(sp+2) << 16;
+#endif
+  set_sp(sp+2);
   PC = retaddr;
   return(resGO);
 }
@@ -454,15 +456,22 @@ cl_xa::inst_Bcc(uint code, int operands)
 int
 cl_xa::inst_JB(uint code, int operands)
 {
-  short saddr = (fetch1() * 2);
-  if (get_psw() & BIT_Z) {
-      PC += saddr;
+  short bitAddr=((code&0x3)<<8) + fetch1();
+  short jmpAddr = (fetch1() * 2);
+  if (get_bit(bitAddr)) {
+    PC = (PC+jmpAddr)&0xfffffe;
   }
   return(resGO);
 }
 int
 cl_xa::inst_JNB(uint code, int operands)
 {
+  short bitAddr=((code&0x3)<<8) + fetch1();
+  short jmpAddr = (fetch1() * 2);
+  if (!get_bit(bitAddr)) {
+    PC = (PC+jmpAddr)&0xfffffe;
+  }
+  return(resGO);
   return(resGO);
 }
 int
@@ -573,7 +582,7 @@ cl_xa::inst_DJNZ(uint code, int operands)
 int
 cl_xa::inst_JZ(uint code, int operands)
 {
-  /* reg1(8) = R4.b, is ACC for MCS51 compatiblility */
+  /* reg1(8) = R4L, is ACC for MCS51 compatiblility */
   short saddr = (fetch1() * 2);
   if (reg1(8)==0) {
       PC += saddr;
@@ -584,7 +593,7 @@ int
 cl_xa::inst_JNZ(uint code, int operands)
 {
   short saddr = (fetch1() * 2);
-  /* reg1(8) = R4.b, is ACC for MCS51 compatiblility */
+  /* reg1(8) = R4L, is ACC for MCS51 compatiblility */
   if (reg1(8)!=0) {
     PC = (PC + saddr) & 0xfffffe;
   }

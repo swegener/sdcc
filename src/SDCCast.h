@@ -29,6 +29,7 @@
 #include "SDCCsymt.h"
 #include "SDCCval.h"
 #include "SDCCset.h"
+#include "SDCCmem.h"
 
 #define  EX_OP       0
 #define  EX_VALUE    1

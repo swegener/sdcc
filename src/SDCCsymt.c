@@ -103,7 +103,8 @@ addSym (bucket ** stab,
   int i;			/* index into the hash Table */
   bucket *bp;			/* temp bucket    *         */
 
-  checkTypeSanity(((symbol *)sym)->etype, sname);
+  /* Make sure sym is a symbol and not a structdef */
+  if (StructTab!=stab) checkTypeSanity(((symbol *)sym)->etype, sname);
 
   /* the symbols are always added at the head of the list  */
   i = hashKey (sname);

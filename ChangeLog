@@ -1,3 +1,8 @@
+2004-10-17 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: cross compiling of WIN32 setup.exe on Linux
+	as a part of nightly build
+
 2004-10-16 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/gen.c (struct _G): added field useWreg, is set to 1 when

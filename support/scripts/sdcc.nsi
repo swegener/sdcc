@@ -441,7 +441,7 @@ SectionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 !verbose 3
-!include "WinMessages.NSH"
+!include "WinMessages.nsh"
 !verbose 4
 
 ; AddToPath - Adds the given dir to the search path.

@@ -467,6 +467,9 @@ extern sym_link *validateLink(sym_link 	*l,
 #define IS_CODE(x)      (IS_SPEC(x)  && SPEC_SCLS(x) == S_CODE)
 #define IS_REGPARM(x)   (IS_SPEC(x) && SPEC_REGPARM(x))
 
+/* symbol check macros */
+#define IS_AUTO(x) (x->level && !IS_STATIC(x->etype) && !IS_EXTERN(x->etype))
+
 /* forward declaration for the global vars */
 extern bucket *SymbolTab[];
 extern bucket *StructTab[];

@@ -1,5 +1,15 @@
 2004-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCCsymt.h: added IS_AUTO(symbol) test macro
+	* src/SDCCopt.c (isLocalWithoutDef),
+	* src/SDCCicode.c (operandFromSymbol): use the IS_AUTO test macro
+	which adds a !IS_EXTERN codition. Fixes bugs #877426 and #751703.
+	(credit to Maarten Brock for patch #949363, on which this is based)
+	* support/regression/tests/bug-751703.c: some test cases of extern used
+	within inner scopes.
+
+2004-05-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/SDCCdwarf2.c (dwMatchTypes): structs must have matching
 	SPEC_STRUCT
 	* src/SDCCdwarf2.c (dwTagFromType): fix to handle recursive

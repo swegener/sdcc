@@ -1527,16 +1527,15 @@ operandFromSymbol (symbol * sym)
     ok = 0;
 
   if (!IS_AGGREGATE (sym->type) &&	/* not an aggregate */
-      !IS_FUNC (sym->type) &&	/* not a function   */
-      !sym->_isparm &&		/* not a parameter  */
-      sym->level &&		/* is a local variable */
-      !sym->addrtaken &&	/* whose address has not been taken */
-      !sym->reqv &&		/* does not already have a reg equivalence */
+      !IS_FUNC (sym->type) &&		/* not a function   */
+      !sym->_isparm &&			/* not a parameter  */
+      IS_AUTO (sym) &&			/* is a local auto variable */
+      !sym->addrtaken &&		/* whose address has not been taken */
+      !sym->reqv &&			/* does not already have a reg equivalence */
       !IS_VOLATILE (sym->etype) &&	/* not declared as volatile */
-      !IS_STATIC (sym->etype) &&	/* and not declared static  */
-      !sym->islbl &&		/* not a label */
-      ok &&			/* farspace check */
-      !IS_BITVAR (sym->etype)	/* not a bit variable */
+      !sym->islbl &&			/* not a label */
+      ok &&				/* farspace check */
+      !IS_BITVAR (sym->etype)		/* not a bit variable */
     )
     {                                   
 

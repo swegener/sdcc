@@ -93,7 +93,7 @@ SDCCERR - SDCC Standard error handler
 #define	 E_EXTERN_INIT	   75	     /* extern variable initialised	*/
 #define  E_PRE_PROC_FAILED 76	     /* preprocessor failed		*/
 #define  E_DUP_FAILED	   77	     /* file DUP failed             */
-#define  W_INCOMPAT_CAST   78	     /* incompatible pointer casting */
+#define  E_INCOMPAT_TYPES  78	     /* incompatible types casting */
 #define  W_LOOP_ELIMINATE  79	     /* loop eliminated			      */	  
 #define  W_NO_SIDE_EFFECTS  80	     /* expression has no side effects */
 #define  W_CONST_TOO_LARGE  81	     /* constant out of range		  */
@@ -103,7 +103,7 @@ SDCCERR - SDCC Standard error handler
 #define  W_NO_REFERENCE	    85		/* no reference to local variable	*/
 #define	 E_OP_UNKNOWN_SIZE  86		/* unknown size for operand			*/
 #define  W_LONG_UNSUPPORTED 87		/* 'long' not supported yet			*/
-#define  W_LITERAL_GENERIC  88		/* literal being cast to generic pointer */
+#define  E_LITERAL_GENERIC  88		/* literal being cast to generic pointer */
 #define  E_SFR_ADDR_RANGE   89		/* sfr address out of range			*/
 #define	 E_BITVAR_STORAGE   90		/* storage given for 'bit' variable	*/
 #define  E_EXTERN_MISMATCH  91		/* extern declaration mismatches    */
@@ -142,9 +142,9 @@ SDCCERR - SDCC Standard error handler
 #define  E_CAST_ZERO        124         /* casting to from size zero  */
 #define  W_CONST_RANGE      125         /* constant too large         */
 #define  W_CODE_UNREACH     126         /* unreachable code           */
-#define  W_NONPTR2_GENPTR   127         /* non pointer cast to generic pointer */
+#define  E_NONPTR2_GENPTR   127         /* non pointer cast to generic pointer */
 #define  W_POSSBUG          128         /* possible code generation error */
-#define  W_PTR_ASSIGN       129         /* incampatible pointer assignment */
+#define  E_INCOMPAT_PTYPES  129         /* incampatible pointer assignment */
 #define  W_UNKNOWN_MODEL    130		/* Unknown memory model */
 #define  E_UNKNOWN_TARGET   131         /* target not defined   */
 #define	 W_INDIR_BANKED	    132		/* Indirect call to a banked fun */
@@ -169,6 +169,8 @@ SDCCERR - SDCC Standard error handler
 #define E_CANNOT_USE_GENERIC_POINTER 151
 #define W_EXCESS_SHORT_OPTIONS 152
 #define E_VOID_VALUE_USED 153
+#define W_INTEGRAL2PTR_NOCAST 154
+#define W_PTR2INTEGRAL_NOCAST 155
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

@@ -745,7 +745,7 @@ processParms (ast * func,
 
   /* the parameter type must be at least castable */
   if (compareType (defParm->type, actParm->ftype) == 0) {
-    werror (W_INCOMPAT_CAST);
+    werror (E_INCOMPAT_TYPES);
     fprintf (stderr, "type --> '");
     printTypeChain (actParm->ftype, stderr);
     fprintf (stderr, "' ");
@@ -2082,8 +2082,12 @@ decorateType (ast * tree)
       {
 	sym_link *ltc = (tree->right ? RTYPE (tree) : LTYPE (tree));
 	COPYTYPE (TTYPE (tree), TETYPE (tree), ltc);
-	if (!tree->initMode && IS_CONSTANT (TETYPE (tree)))
+	if (!tree->initMode) {
+	  if ((IS_SPEC(TETYPE(tree)) && IS_CONSTANT (TETYPE (tree))) ||
+	      (IS_PTR(TTYPE(tree)) && DCL_PTR_CONST(TTYPE(tree)))) {
 	  werror (E_CODE_WRITE, "++/--");
+	  }
+	}
 
 	if (tree->right)
 	  RLVAL (tree) = 1;
@@ -2732,7 +2736,7 @@ decorateType (ast * tree)
       /* make sure the type is complete and sane */
       checkTypeSanity(LETYPE(tree), "(cast)");
 
-#if 1
+#if 0
       /* if the right is a literal replace the tree */
       if (IS_LITERAL (RETYPE (tree))) {
 	      if (!IS_PTR (LTYPE (tree))) {
@@ -3106,22 +3110,15 @@ decorateType (ast * tree)
 	  fprintf (stderr, "'\n");
 	}
 
-      /* extra checks for pointer types */
-      if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) &&
-	  !IS_GENPTR (LTYPE (tree)))
-	{
-	  if (DCL_TYPE (LTYPE (tree)) != DCL_TYPE (RTYPE (tree)))
-	    werror (W_PTR_ASSIGN);
-	}
-
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       LTYPE (tree));
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
       if (!tree->initMode ) {
-	      if (IS_CONSTANT (LETYPE (tree))) {
-		      werror (E_CODE_WRITE, " ");
-	      } 
+	if ((IS_SPEC(LETYPE(tree)) && IS_CONSTANT (LETYPE (tree))) ||
+	    (IS_PTR(LTYPE(tree)) && DCL_PTR_CONST(LTYPE(tree)))) {
+	  werror (E_CODE_WRITE, " ");
+	}
       }
       if (LRVAL (tree))
 	{

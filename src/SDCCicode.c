@@ -1595,20 +1595,45 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
     return operandFromValue (valCastLiteral (type,
 					     operandLitValue (op)));
 
-  /* if casting to some pointer type &&
-     the destination is not a generic pointer
-     then give a warning : (only for implicit casts) */
-  if (IS_PTR (optype) && implicit &&
-      (DCL_TYPE (optype) != DCL_TYPE (type)) &&
-      !IS_GENPTR (type))
-    {
-      werror (W_INCOMPAT_CAST);
-      fprintf (stderr, "from type '");
-      printTypeChain (optype, stderr);
-      fprintf (stderr, "' to type '");
-      printTypeChain (type, stderr);
-      fprintf (stderr, "'\n");
+
+  /* if casting to/from pointers, do some checking */
+  if (IS_PTR(type)) { // to a pointer
+    if (!IS_PTR(optype)) { // from a non pointer
+      if (IS_INTEGRAL(optype)) { 
+	// maybe this is NULL, than it's ok.
+	if (!(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong ==0))) {
+	  if (IS_GENPTR(type)) {
+	    // no way to set the storage
+	    if (IS_LITERAL(optype)) {
+	      werror(E_LITERAL_GENERIC);
+	    } else {
+	      werror(E_NONPTR2_GENPTR);
+	    }
+	  } else if (implicit) {
+	    werror(W_INTEGRAL2PTR_NOCAST);
+	  }
+	}
+      }	else { // shouldn't do that with float, array or structure
+	werror(E_INCOMPAT_TYPES);
+      }
+    } else { // from a pointer to a pointer
+      if (implicit) { // if not to generic, they have to match 
+	if ((!IS_GENPTR(type) && (DCL_TYPE(optype) != DCL_TYPE(type)))) {
+	  werror(E_INCOMPAT_PTYPES);
+	}
+      }
     }
+  } else { // to a non pointer
+    if (IS_PTR(optype)) { // from a pointer
+      if (implicit) { // sneaky
+	if (IS_INTEGRAL(type)) {
+	  werror(W_PTR2INTEGRAL_NOCAST);
+	} else { // shouldn't do that with float, array or structure
+	  werror(E_INCOMPAT_TYPES);
+	}
+      }
+    }
+  }
 
   /* if they are the same size create an assignment */
   if (getSize (type) == getSize (optype) &&

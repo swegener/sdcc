@@ -7251,23 +7251,44 @@ genReceive (iCode * ic)
 static void
 genDummyRead (iCode * ic)
 {
-  operand *right;
+  operand *op;
   int size, offset;
 
-  right = IC_RIGHT (ic);
-  aopOp (right, ic, FALSE, FALSE);
-  
-  /* general case */
-  size = AOP_SIZE (right);
-  offset = 0;
-
-  while (size--)
+  op = IC_RIGHT (ic);
+  if (op && IS_SYMOP (op))
     {
-      _moveA (aopGet (AOP (right), offset, FALSE));
-      offset++;
-    }
+      aopOp (op, ic, FALSE, FALSE);
+  
+      /* general case */
+      size = AOP_SIZE (op);
+      offset = 0;
 
-  freeAsmop (right, NULL, ic);
+      while (size--)
+	{
+	  _moveA (aopGet (AOP (op), offset, FALSE));
+	  offset++;
+	}
+
+      freeAsmop (op, NULL, ic);
+    }
+  
+  op = IC_LEFT (ic);
+  if (op && IS_SYMOP (op))
+    {
+      aopOp (op, ic, FALSE, FALSE);
+  
+      /* general case */
+      size = AOP_SIZE (op);
+      offset = 0;
+
+      while (size--)
+	{
+	  _moveA (aopGet (AOP (op), offset, FALSE));
+	  offset++;
+	}
+
+      freeAsmop (op, NULL, ic);
+    }
 }
 
 enum

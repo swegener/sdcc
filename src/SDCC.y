@@ -97,8 +97,8 @@ bool uselessDecl = TRUE;
 %token DUMMY_READ_VOLATILE ENDCRITICAL SWAP
 
 %type <yyint>  Interrupt_storage
-%type <sym> identifier  declarator  declarator2 enumerator_list enumerator
-%type <sym> struct_declarator
+%type <sym> identifier  declarator  declarator2 declarator3 enumerator_list enumerator
+%type <sym> struct_declarator function_declarator function_declarator2
 %type <sym> struct_declarator_list  struct_declaration   struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
 %type <sym> declaration_list identifier_list parameter_identifier_list
@@ -161,12 +161,12 @@ external_definition
    ;
 
 function_definition
-   : declarator function_body  {   /* function type not specified */
+   : function_declarator function_body  {   /* function type not specified */
                                    /* assume it to be 'int'       */
                                    addDecl($1,0,newIntLink());
 				   $$ = createFunction($1,$2); 
                                } 
-   | declaration_specifiers declarator function_body  
+   | declaration_specifiers function_declarator function_body  
                                 {   
 				    pointerTypes($2->type,copyLinkChain($1));
 				    addDecl($2,0,$1); 
@@ -227,6 +227,7 @@ function_body
    | declaration_list compound_statement
          {
             werror(E_OLD_STYLE,($1 ? $1->name: "")) ;
+	    fprintf(stderr, "case 1\n");
 	    exit(1);
          }
    ;
@@ -942,6 +943,20 @@ opt_assign_expr
    ;
 
 declarator
+   : declarator3		        { $$ = $1 ; } 
+   | pointer declarator3
+         {
+	     addDecl ($2,0,reverseLink($1));
+	     $$ = $2 ;
+         }
+   ;
+
+declarator3
+   : declarator2_function_attributes	{ $$ = $1 ; }
+   | declarator2			{ $$ = $1 ; }
+   ;
+
+function_declarator
    : declarator2_function_attributes	{ $$ = $1; }
    | pointer declarator2_function_attributes
          {
@@ -949,19 +964,10 @@ declarator
 	     $$ = $2 ;
          }
    ;
-
+   
 declarator2_function_attributes
-   : declarator2		  { $$ = $1 ; } 
-   | declarator2 function_attribute  { 
-       if ((! $1) || (! IS_FUNC($1->etype)))
-         {
-           // function_attribute is only allowed if declarator2 was
-           // an actual function
-           werror(E_FUNC_ATTR);
-           $$=$1;
-         }
-       else
-         {
+   : function_declarator2		  { $$ = $1 ; } 
+   | function_declarator2 function_attribute  { 
            // copy the functionAttributes (not the args and hasVargs !!)
            sym_link *funcType=$1->etype;
            struct value *args=FUNC_ARGS(funcType);
@@ -978,14 +984,13 @@ declarator2_function_attributes
     	       sizeof($2->funcAttrs));
            
            addDecl ($1,0,$2); 
-         }
    }     
    ;
 
 declarator2
    : identifier
    | '(' declarator ')'     { $$ = $2; }
-   | declarator2 '[' ']'
+   | declarator3 '[' ']'
          {
             sym_link   *p;
 
@@ -994,7 +999,7 @@ declarator2
             DCL_ELEM(p) = 0     ;
             addDecl($1,0,p);
          }
-   | declarator2 '[' constant_expr ']'
+   | declarator3 '[' constant_expr ']'
          {
             sym_link   *p ;
 			value *tval;
@@ -1014,7 +1019,10 @@ declarator2
             }		                
             addDecl($1,0,p);
          }
-   | declarator2 '('  ')'	{  addDecl ($1,FUNCTION,NULL) ;   }
+   ;
+
+function_declarator2
+   : declarator2 '('  ')'	{  addDecl ($1,FUNCTION,NULL) ;   }
    | declarator2 '(' { NestLevel++ ; currBlockno++; } parameter_type_list ')'
          {
 	   
@@ -1043,13 +1051,13 @@ declarator2
    | declarator2 '(' parameter_identifier_list ')'
          {	   
 	   werror(E_OLD_STYLE,$1->name) ;	  
-	   
+	   fprintf(stderr, "case 2\n");
 	   /* assume it returns an int */
 	   $1->type = $1->etype = newIntLink();
 	   $$ = $1 ;
          }
    ;
-
+   
 pointer
    : unqualified_pointer { $$ = $1 ;}
    | unqualified_pointer type_specifier_list   

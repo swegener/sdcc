@@ -3066,7 +3066,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   if (!IS_FUNC(OP_SYMBOL(left)->type) && 
       !IS_CODEPTR(OP_SYMBOL(left)->type)) {
     werror (E_FUNCTION_EXPECTED);
-    return NULL;
+    return operandFromValue(valueFromLit(0));
   }
 
   /* take care of parameters with side-effecting

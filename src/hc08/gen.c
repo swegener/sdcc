@@ -7305,28 +7305,47 @@ genReceive (iCode * ic)
 static void
 genDummyRead (iCode * ic)
 {
-  operand *right;
+  operand *op;
   int size, offset;
 
   D(emitcode(";     genDummyRead",""));
 
-  right = IC_RIGHT (ic);
-
-  aopOp (right, ic, FALSE);
-
-  /* bit variables done */
-  /* general case */
-  size = AOP_SIZE (right);
-  offset = 0;
-
-  while (size--)
+  op = IC_RIGHT (ic);
+  if (op && IS_SYMOP (op))
     {
-      loadRegFromAop (hc08_reg_a, AOP (right), offset);
-      hc08_freeReg (hc08_reg_a);
-      offset++;
-    }
 
-  freeAsmop (right, NULL, ic, TRUE);
+      aopOp (op, ic, FALSE);
+
+      size = AOP_SIZE (op);
+      offset = 0;
+
+      while (size--)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (op), offset);
+          hc08_freeReg (hc08_reg_a);
+          offset++;
+        }
+
+      freeAsmop (op, NULL, ic, TRUE);
+   }
+  op = IC_LEFT (ic);
+  if (op && IS_SYMOP (op))
+    {
+
+      aopOp (op, ic, FALSE);
+
+      size = AOP_SIZE (op);
+      offset = 0;
+
+      while (size--)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (op), offset);
+          hc08_freeReg (hc08_reg_a);
+          offset++;
+        }
+
+      freeAsmop (op, NULL, ic, TRUE);
+   }
 }
 
 /*-----------------------------------------------------------------*/

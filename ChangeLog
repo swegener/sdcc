@@ -1,3 +1,29 @@
+2003-12-08 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c (killDeadCode): change iCode type to DUMMY_READ_VOLATILE
+	instead of deleting the iCode when an operand is volatile
+	* src/z80/gen.c (genDummyRead),
+	* src/mcs51/gen.c (genDummyRead),
+	* src/ds390/gen.c (genDummyRead),
+	* src/hc08/gen.c (genDummyRead): handle operands in IC_LEFT and/or IC_RIGHT,
+	not just IC_RIGHT
+	* src/SDCCicode.c (geniCodeCall): fixed bug #851607
+	* src/SDCC.y: fixed bug #850420
+
+2003-12-05 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	Applied z80 i/o port patch from Peter Townson and fixed some operators
+	to better handle operands in A register.
+	* device/include/z180.h
+	* src/SDCC.y
+	* src/SDCCglue.c
+	* src/z80/gen.c
+	* src/z80/gen.h
+	* src/z80/main.c
+	* src/z80/peeph-z80.def
+	* src/z80/peeph.def
+	* src/z80/z80.h
+
 2003-12-03 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (addSymChain, compareTypeExact): fixed bug #838241 again

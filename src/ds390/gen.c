@@ -12714,34 +12714,59 @@ static void genSystemGetCurrentID(iCode *ic,int nparms, operand **parms,char *na
 static void
 genDummyRead (iCode * ic)
 {
-  operand *right;
+  operand *op;
   int size, offset;
 
   D(emitcode(";     genDummyRead",""));
 
-  right = IC_RIGHT (ic);
-
-  aopOp (right, ic, FALSE, FALSE);
-
-  /* if the result is a bit */
-  if (AOP_TYPE (right) == AOP_CRY)
+  op = IC_RIGHT (ic);
+  if (op && IS_SYMOP (op))
     {
-      emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-      goto release;
+      aopOp (op, ic, FALSE, FALSE);
+
+      /* if the result is a bit */
+      if (AOP_TYPE (op) == AOP_CRY)
+        emitcode ("mov", "c,%s", AOP (op)->aopu.aop_dir);
+      else
+	{
+	  /* bit variables done */
+	  /* general case */
+	  size = AOP_SIZE (op);
+	  offset = 0;
+	  while (size--)
+	  {
+	    MOVA (aopGet (AOP (op), offset, FALSE, FALSE, FALSE));
+	    offset++;
+	  }
+	}
+
+      freeAsmop (op, NULL, ic, TRUE);
     }
 
-  /* bit variables done */
-  /* general case */
-  size = AOP_SIZE (right);
-  offset = 0;
-  while (size--)
+  op = IC_LEFT (ic);
+  if (op && IS_SYMOP (op))
     {
-      MOVA (aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
-      offset++;
-    }
+      aopOp (op, ic, FALSE, FALSE);
 
-release:
-  freeAsmop (right, NULL, ic, TRUE);
+      /* if the result is a bit */
+      if (AOP_TYPE (op) == AOP_CRY)
+        emitcode ("mov", "c,%s", AOP (op)->aopu.aop_dir);
+      else
+	{
+	  /* bit variables done */
+	  /* general case */
+	  size = AOP_SIZE (op);
+	  offset = 0;
+	  while (size--)
+	  {
+	    MOVA (aopGet (AOP (op), offset, FALSE, FALSE, FALSE));
+	    offset++;
+	  }
+	}
+
+      freeAsmop (op, NULL, ic, TRUE);
+    }
+    
 }
 
 /*-----------------------------------------------------------------*/

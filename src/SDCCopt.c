@@ -763,6 +763,10 @@ killDeadCode (eBBlock ** ebbs, int count)
                   ic->op == ENDCRITICAL)
 		continue;
 
+	      /* Since both IFX & JUMPTABLE (in SKIP_IC) have been tested for */
+	      /* it is now safe to assume IC_LEFT, IC_RIGHT, & IC_RESULT are  */
+	      /* valid. */
+
 	      /* if the result is volatile then continue */
 	      if (IC_RESULT (ic) && isOperandVolatile (IC_RESULT (ic), FALSE))
 		continue;
@@ -815,11 +819,14 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      /* kill this one if required */
 	      if (kill)
 		{
+		  bool volLeft = IS_SYMOP (IC_LEFT (ic))
+				 && isOperandVolatile (IC_LEFT (ic), FALSE);
+		  bool volRight = IS_SYMOP (IC_RIGHT (ic)) 
+				  && isOperandVolatile (IC_RIGHT (ic), FALSE);
+
 		  change = 1;
 		  gchange++;
-		  /* eliminate this */
-		  remiCodeFromeBBlock (ebbs[i], ic);
-
+		  
 		  /* now delete from defUseSet */
 		  deleteItemIf (&ebbs[i]->outExprs, ifDiCodeIsX, ic);
 		  bitVectUnSetBit (ebbs[i]->outDefs, ic->key);
@@ -827,12 +834,33 @@ killDeadCode (eBBlock ** ebbs, int count)
 		  /* and defset of the block */
 		  bitVectUnSetBit (ebbs[i]->defSet, ic->key);
 
-		  /* for the left & right remove the usage */
-		  if (IS_SYMOP (IC_LEFT (ic)))
-		    bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+		  /* delete the result */
+		  IC_RESULT (ic) = NULL;
+		  
+		  if (volLeft || volRight)
+		    {
+		      /* something is volatile, so keep the iCode */
+		      /* and change the operator instead */
+		      ic->op = DUMMY_READ_VOLATILE;
 
-		  if (IS_SYMOP (IC_RIGHT (ic)))
-		    bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+		      /* keep only the volatile operands */      
+		      if (!volLeft)
+			IC_LEFT (ic) = NULL;
+		      if (!volRight)
+			IC_RIGHT (ic) = NULL;
+		    }
+		  else
+		    {
+		      /* nothing is volatile, eliminate the iCode */
+		      remiCodeFromeBBlock (ebbs[i], ic);
+
+		      /* for the left & right remove the usage */
+		      if (IS_SYMOP (IC_LEFT (ic)))
+			bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+
+		      if (IS_SYMOP (IC_RIGHT (ic)))
+			bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+		    }
 		}
 
 	    }			/* end of all instructions */

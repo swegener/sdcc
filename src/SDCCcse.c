@@ -1243,13 +1243,14 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	
 	/* do some algebraic optimizations if possible */
 	algebraicOpts (ic);
-	if (POINTER_GET(ic)) fixUpTypes(ic);
 	while (constFold(ic,cseSet));
 
 	/* small klugde */
 	if (POINTER_GET(ic) && !IS_PTR(operandType(IC_LEFT(ic)))) {
 	    setOperandType(IC_LEFT(ic),
 			   aggrToPtr(operandType(IC_LEFT(ic)),FALSE));
+	    fixUpTypes(ic);
+
 	}
 	if (POINTER_SET(ic) && !IS_PTR(operandType(IC_RESULT(ic)))) {
 	    setOperandType(IC_RESULT(ic),
@@ -1357,6 +1358,9 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	      IS_ITEMP(IC_RESULT(ic))               &&
 	    ! computeOnly) {
 	    applyToSet (cseSet,findPrevIc,ic,&pdic);
+	    if (pdic && checkType(operandType(IC_RESULT(pdic)),
+				  operandType(IC_RESULT(ic))) != 1)
+		    pdic = NULL;
 	} 
        
 	/* if found then eliminate this and add to*/

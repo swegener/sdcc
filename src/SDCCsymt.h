@@ -511,7 +511,6 @@ extern sym_link *floatType;
 typedef enum
 {
   RESULT_TYPE_NONE = 0,	/* operands will be promoted to int */
-  RESULT_CHECK = 0, /* TODO: replace all occurences with the appropriate type and remove me */
   RESULT_TYPE_BIT,
   RESULT_TYPE_CHAR,
   RESULT_TYPE_INT,

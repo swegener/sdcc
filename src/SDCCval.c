@@ -120,7 +120,7 @@ convertIListToConstList(initList *src, literalList **lList)
 	    return FALSE;
 	}
 
-	if (!IS_AST_LIT_VALUE(decorateType(resolveSymbols(iLoop->init.node), RESULT_CHECK)))
+	if (!IS_AST_LIT_VALUE(decorateType(resolveSymbols(iLoop->init.node), RESULT_TYPE_NONE)))
 	{
 	    return FALSE;
 	}

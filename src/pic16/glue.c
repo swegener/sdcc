@@ -375,7 +375,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					addSet(&rel_idataSymSet, copySymbol(sym));
 
 //					ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
-//						decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
+//						decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_TYPE_NONE));
 			}
 
 			if(ival) {

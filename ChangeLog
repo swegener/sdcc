@@ -1,3 +1,12 @@
+2004-09-15 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCsymt.h: removed RESULT_CHECK
+	* src/SDCCast.c,
+	* src/SDCCglue.c,
+	* src/SDCCval.c,
+	* src/pic/glue.c,
+	* src/pic16/glue.c: replaced RESULT_CHECK with RESULT_TYPE_NONE
+
 2004-09-15 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/SDCCicode.c (piCode): applied patch from Raphael Neider,

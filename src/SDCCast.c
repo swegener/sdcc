@@ -834,8 +834,8 @@ createIvalType (ast * sym, sym_link * type, initList * ilist)
   if (ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
-  iExpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_CHECK);
-  return decorateType (newNode ('=', sym, iExpr), RESULT_CHECK);
+  iExpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE);
+  return decorateType (newNode ('=', sym, iExpr), RESULT_TYPE_NONE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -865,8 +865,8 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
         break;
       sflds->implicit = 1;
       lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
-      lAst = decorateType (resolveSymbols (lAst), RESULT_CHECK);
-      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast)), RESULT_CHECK);
+      lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
+      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast)), RESULT_TYPE_NONE);
     }
 
   if (iloop) {
@@ -896,9 +896,9 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
   if (IS_CHAR (type->next))
     if ((rast = createIvalCharPtr (sym,
                                    type,
-                        decorateType (resolveSymbols (list2expr (ilist)), RESULT_CHECK))))
+                        decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE))))
 
-      return decorateType (resolveSymbols (rast), RESULT_CHECK);
+      return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 
     /* not the special case             */
     if (ilist->type != INIT_DEEP)
@@ -914,7 +914,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
     {
         ast *aSym;
 
-        aSym = decorateType (resolveSymbols(sym), RESULT_CHECK);
+        aSym = decorateType (resolveSymbols(sym), RESULT_TYPE_NONE);
         
         rast = newNode(ARRAYINIT, aSym, NULL);
         rast->values.constlist = literalL;
@@ -943,7 +943,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
             ast *aSym;
             
             aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size++))));
-            aSym = decorateType (resolveSymbols (aSym), RESULT_CHECK);
+            aSym = decorateType (resolveSymbols (aSym), RESULT_TYPE_NONE);
             rast = createIval (aSym, type->next, iloop, rast);
             iloop = (iloop ? iloop->next : NULL);
             if (!iloop)
@@ -973,7 +973,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
         DCL_ELEM (type) = size;
     }
 
-    return decorateType (resolveSymbols (rast), RESULT_CHECK);
+    return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 }
 
 
@@ -1027,7 +1027,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       // now WE don't need iexpr's symbol anymore
       freeStringSymbol(AST_SYMBOL(iexpr));
 
-      return decorateType (resolveSymbols (rast), RESULT_CHECK);
+      return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
     }
 
   return NULL;
@@ -1046,7 +1046,7 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist)
   if (ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
-  iexpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_CHECK);
+  iexpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE);
 
   /* if character pointer */
   if (IS_CHAR (type->next))
@@ -1084,9 +1084,9 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
     rast = createIvalType (sym, type, ilist);
 
   if (wid)
-    return decorateType (resolveSymbols (newNode (NULLOP, wid, rast)), RESULT_CHECK);
+    return decorateType (resolveSymbols (newNode (NULLOP, wid, rast)), RESULT_TYPE_NONE);
   else
-    return decorateType (resolveSymbols (rast), RESULT_CHECK);
+    return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1302,7 +1302,7 @@ bool constExprTree (ast *cexpr) {
     return TRUE;
   }
 
-  cexpr = decorateType (resolveSymbols (cexpr), RESULT_CHECK);
+  cexpr = decorateType (resolveSymbols (cexpr), RESULT_TYPE_NONE);
 
   switch (cexpr->type) 
     {
@@ -1366,7 +1366,7 @@ bool constExprTree (ast *cexpr) {
 value *
 constExprValue (ast * cexpr, int check)
 {
-  cexpr = decorateType (resolveSymbols (cexpr), RESULT_CHECK);
+  cexpr = decorateType (resolveSymbols (cexpr), RESULT_TYPE_NONE);
 
   /* if this is not a constant then */
   if (!IS_LITERAL (cexpr->ftype))
@@ -1961,7 +1961,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
                                                   rloop))));
 
   rloop->lineno=init->lineno;
-  return decorateType (rloop, RESULT_CHECK);
+  return decorateType (rloop, RESULT_TYPE_NONE);
 
 }
 
@@ -2563,7 +2563,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             ast *otree = optimizeGetHbit (tree);
 
             if (otree != tree)
-              return decorateType (otree, RESULT_CHECK);
+              return decorateType (otree, RESULT_TYPE_NONE);
           }
 
           /* if left is a literal exchange left & right */
@@ -2693,11 +2693,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       {
         ast *wtree = optimizeRRCRLC (tree);
         if (wtree != tree)
-          return decorateType (wtree, RESULT_CHECK);
+          return decorateType (wtree, RESULT_TYPE_NONE);
         
         wtree = optimizeSWAP (tree);
         if (wtree != tree)
-          return decorateType (wtree, RESULT_CHECK);
+          return decorateType (wtree, RESULT_TYPE_NONE);
       }
 
       /* if left is a literal exchange left & right */
@@ -2850,7 +2850,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               else
                 {
                   /* litTree->left is literal: no gcse possible.
-                     We can't call decorateType(parent, RESULT_CHECK), because
+                     We can't call decorateType(parent, RESULT_TYPE_NONE), because
                      this would cause an infinit loop. */
                   parent->decorated = 1;
                   decorateType (litTree, resultType);
@@ -3757,7 +3757,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                      tree->right); /* val 0 */
               tree->right->lineno = tree->lineno;
               tree->right->left->lineno = tree->lineno;
-              decorateType (tree->right, RESULT_CHECK);
+              decorateType (tree->right, RESULT_TYPE_NONE);
             }
         }
       /* if they are both literal then */
@@ -4044,7 +4044,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           goto errorTreeReturn;
         }
 
-      tree->right = decorateType (newNode ('+', copyAst (tree->left), tree->right), RESULT_CHECK);
+      tree->right = decorateType (newNode ('+', copyAst (tree->left), tree->right), RESULT_TYPE_NONE);
       tree->opval.op = '=';
 
       return tree;
@@ -4182,7 +4182,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             decorateType (newNode (CAST,
                           newAst_LINK (copyLinkChain (currFunc->type->next)),
                                         tree->right),
-                          RESULT_CHECK);
+                          RESULT_TYPE_NONE);
         }
 
       RRVAL (tree) = 1;
@@ -4231,9 +4231,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
     case FOR:
 
-      decorateType (resolveSymbols (AST_FOR (tree, initExpr)), RESULT_CHECK);
-      decorateType (resolveSymbols (AST_FOR (tree, condExpr)), RESULT_CHECK);
-      decorateType (resolveSymbols (AST_FOR (tree, loopExpr)), RESULT_CHECK);
+      decorateType (resolveSymbols (AST_FOR (tree, initExpr)), RESULT_TYPE_NONE);
+      decorateType (resolveSymbols (AST_FOR (tree, condExpr)), RESULT_TYPE_NONE);
+      decorateType (resolveSymbols (AST_FOR (tree, loopExpr)), RESULT_TYPE_NONE);
 
       /* if the for loop is reversible then
          reverse it otherwise do what we normally
@@ -4252,7 +4252,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                           AST_FOR (tree, initExpr),
                                           AST_FOR (tree, condExpr),
                                           AST_FOR (tree, loopExpr),
-                                          tree->left), RESULT_CHECK);
+                                          tree->left), RESULT_TYPE_NONE);
       }
     case PARAM:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -4477,7 +4477,7 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
       return NULL;
     }
 
-  caseVal = decorateType (resolveSymbols (caseVal), RESULT_CHECK);
+  caseVal = decorateType (resolveSymbols (caseVal), RESULT_TYPE_NONE);
   /* if not a constant then error  */
   if (!IS_LITERAL (caseVal->ftype))
     {
@@ -4835,7 +4835,7 @@ optimizeGetHbit (ast * tree)
       && !port->hasExtBitOp(GETHBIT, getSize (TTYPE (tree->left->left))))
     return tree;
 
-  return decorateType (newNode (GETHBIT, tree->left->left, NULL), RESULT_CHECK);
+  return decorateType (newNode (GETHBIT, tree->left->left, NULL), RESULT_TYPE_NONE);
 
 }
 
@@ -5102,7 +5102,7 @@ optimizeCompare (ast * root)
           break;
         }
 
-      return decorateType (optExpr, RESULT_CHECK);
+      return decorateType (optExpr, RESULT_TYPE_NONE);
     }
 
   vleft = (root->left->type == EX_VALUE ?
@@ -5176,7 +5176,7 @@ optimizeCompare (ast * root)
               break;
             }
         }
-      return decorateType (resolveSymbols (optExpr), RESULT_CHECK);
+      return decorateType (resolveSymbols (optExpr), RESULT_TYPE_NONE);
     }                           /* end-of-if of BITVAR */
 
 noOptimize:
@@ -5354,7 +5354,7 @@ createFunction (symbol * name, ast * body)
     {
       GcurMemmap = statsg;
       codeOutFile = statsg->oFile;
-      eBBlockFromiCode (iCodeFromAst (decorateType (resolveSymbols (staticAutos), RESULT_CHECK)));
+      eBBlockFromiCode (iCodeFromAst (decorateType (resolveSymbols (staticAutos), RESULT_TYPE_NONE)));
       staticAutos = NULL;
     }
 

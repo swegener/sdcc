@@ -28,6 +28,11 @@
 #include "pcode.h"
 #include "ralloc.h"
 
+#if defined(__BORLANDC__) || defined(_MSC_VER)
+#define STRCASECMP stricmp
+#else
+#define STRCASECMP strcasecmp
+#endif
 
 pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
 
@@ -247,7 +252,7 @@ static pCodeOp *cvt_extract_status(char *reg, char *bit)
 {
   int len;
 
-  if(strcasecmp(reg, pc_status.pcop.name))
+  if(STRCASECMP(reg, pc_status.pcop.name))
     return NULL;
 
   len = strlen(bit);

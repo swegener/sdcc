@@ -26,6 +26,13 @@
 
 #include "pcode.h"
 #include "ralloc.h"
+
+#if defined(__BORLANDC__) || defined(_MSC_VER)
+#define STRCASECMP stricmp
+#else
+#define STRCASECMP strcasecmp
+#endif
+
 // Eventually this will go into device dependent files:
 pCodeOpReg pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,NULL};
 pCodeOpReg pc_indf      = {{PO_INDF,    "INDF"}, -1, NULL,NULL};
@@ -790,7 +797,7 @@ int getpCode(char *mnem,int dest)
 
   while(pci) {
 
-    if(strcasecmp(pci->mnemonic, mnem) == 0) {
+    if(STRCASECMP(pci->mnemonic, mnem) == 0) {
       if((pci->num_ops <= 1) || (pci->dest == dest))
 	return(pci->op);
     }

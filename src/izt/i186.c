@@ -34,6 +34,7 @@ static IZT_PORT _i186_port = {
 static char _defaultRules[] =
 {
 	//#include "peeph.rul"
+    ""
 };
 
 /* list of key words used by i186 */

@@ -1162,9 +1162,9 @@ deleteGetPointers (set ** cseSet, set ** pss, operand * op, eBBlock * ebb)
 	     iTemp1 = iTemp0 + 8;
 	     iTemp2 = iTemp1 + 8; */
 	  if (isinSetWith (compItems, (void*)IC_LEFT (cdp->diCode), 
-			   (void*)isOperandEqual) ||
+			   (insetwithFunc)isOperandEqual) ||
 	      isinSetWith (compItems, (void*)IC_RIGHT (cdp->diCode), 
-			   (void*)isOperandEqual))
+			   (insetwithFunc)isOperandEqual))
 	    {
 	      addSet (&compItems, IC_RESULT (cdp->diCode));
 	    }

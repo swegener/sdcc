@@ -1,25 +1,25 @@
-# Generated automatically from Makefile.in by configure.
-#
-#
-#
-
 PRJDIR		= ..
 
 # !include $(PRJDIR)/Makefile.common
 
-PORTS		= mcs51 z80 avr ds390 pic
-PORT_LIBS       = mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib
+!include ..\Bcc.inc
+CFLAGS  = -I. -I.. -I..\support
+
+PORTS           = mcs51 z80 avr ds390 pic izt
+PORT_LIBS       = mcs51/port.lib z80/port.lib avr/port.lib ds390/port.lib pic/port.lib izt/port.lib
 
 LIBS		= -lgc 
 LIBDIRS		= -L$(PRJDIR)/support/gc
 LIBGC           = $(PRJDIR)/support/gc/gc.lib
 
-OBJECTS         = SDCCy.obj SDCClex.obj SDCCerr.obj SDCChasht.obj SDCCmain.obj \
+OBJECTS         = SDCCy.obj SDCClex.obj SDCChasht.obj SDCCmain.obj \
                   SDCCsymt.obj SDCCopt.obj SDCCast.obj SDCCmem.obj SDCCval.obj \
                   SDCCicode.obj SDCCbitv.obj SDCCset.obj SDCClabel.obj \
                   SDCCBBlock.obj SDCCloop.obj SDCCcse.obj SDCCcflow.obj SDCCdflow.obj \
                   SDCClrange.obj SDCCptropt.obj SDCCpeeph.obj SDCCglue.obj \
                   asm.obj
+
+SLIBOBJS	= $(SLIB)\SDCCerr.obj $(SLIB)\NewAlloc.obj
 
 TARGET          = $(PRJDIR)/bin/sdcc.exe
 
@@ -28,7 +28,7 @@ TARGET          = $(PRJDIR)/bin/sdcc.exe
 all: $(LIBGC) $(TARGET)
 
 ports:
-#        for i in $(PORTS); do $(MAKE) -C $$i; done
+        for i in $(PORTS); do $(MAKE) -C $$i; done
 
 #$(PRJDIR)/support/gc/libgc.a:
 #        cd $(PRJDIR)/support/gc && $(MAKE)
@@ -40,11 +40,8 @@ ports:
 
 # My rules
 # --------
-$(TARGET): $(OBJECTS) $(PORT_LIBS)
-        bcc32 -e$(TARGET) $(OBJECTS) $(PORT_LIBS) $(LIBGC)
-
-!include ..\Bcc.inc
-CFLAGS  = -I. -I.. -I..\support
+$(TARGET): $(OBJECTS) $(SLIBOBJS) $(PORT_LIBS)
+        bcc32 -e$(TARGET) $(OBJECTS) $(SLIBOBJS) $(PORT_LIBS) $(LIBGC)
 
 SDCCy.h: SDCCy.c
 

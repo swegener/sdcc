@@ -257,9 +257,11 @@ _emitterCompare (const void *p1, const void *p2)
 static bool
 _tryEmittingiCode (hTab * h, iCode * ic)
 {
-  EMITTER key =
-  {ic->op, NULL};
+  EMITTER key; // = {ic->op, NULL}; Borland C chokes on this; initialize below
   EMITTER *found;
+
+  key.op = ic->op;
+  key.emit = NULL;
 
   found = hTabFindByKey (h, ic->op, &key, _emitterCompare);
 

@@ -1,14 +1,9 @@
-# Generated automatically from Makefile.in by configure.
-#
-#
-#
-
 VERSION         = 2.2.0
 VERSIONHI       = 2
 VERSIONLO       = 2
 VERSIONP        = 0
 
-PRJDIR		= ../..
+PRJDIR		= ..\..
 
 srcdir		= .
 prefix		= /cygnus/cygwin-b20/kvigor/
@@ -30,6 +25,8 @@ LDFLAGS		=
 
 OBJECTS         = cppalloc.obj cpperror.obj cppexp.obj cpphash.obj cpplib.obj cppmain.obj
 
+SLIBOBJS	= $(SLIB)\NewAlloc.obj
+
 TARGET          = $(PRJDIR)\bin\sdcpp.exe
 
 
@@ -37,8 +34,8 @@ TARGET          = $(PRJDIR)\bin\sdcpp.exe
 # ------------------------------------------
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
-        bcc32 -e$(TARGET) $(OBJECTS)
+$(TARGET): $(SLIBOBJS) $(OBJECTS)
+        bcc32 -e$(TARGET) $(OBJECTS) $(SLIBOBJS)
 
 !include Makefile.dep
 

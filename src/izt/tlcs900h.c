@@ -33,6 +33,7 @@ static IZT_PORT _tlcs900h_port =
 static char _defaultRules[] =
 {
     //#include "peeph.rul"
+    ""
 };
 
 static char *_tlcs900h_keywords[] =

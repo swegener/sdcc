@@ -435,7 +435,9 @@ mergeSpec (sym_link * dest, sym_link * src)
     SPEC_NOUN (dest) = SPEC_NOUN (src);
 
   /* if destination has no storage class */
-  if (!SPEC_SCLS (dest) || (SPEC_SCLS(dest) == S_CONSTANT && SPEC_SCLS (src)))
+  if (!SPEC_SCLS (dest) || 
+      ((SPEC_SCLS(dest) == S_CONSTANT || SPEC_SCLS(dest) == S_REGISTER) && 
+       SPEC_SCLS (src)))
     SPEC_SCLS (dest) = SPEC_SCLS (src);
   /* special case for const */
   /* copy all the specifications  */

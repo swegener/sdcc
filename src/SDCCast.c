@@ -4158,8 +4158,6 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 	}
 
 	
-	INDENT(indent,outfile);
-
 	/* print the line          */
 	/* if not block & function */
 	if (tree->type == EX_OP &&
@@ -4188,13 +4186,17 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			decls = decls->next;			
 		}
 		ast_print(tree->right,outfile,indent+4);
+		fprintf(outfile,"}\n");
 		return;
 	}
 	if (tree->opval.op == NULLOP) {
+		fprintf(outfile,"\n");
 		ast_print(tree->left,outfile,indent);
+		fprintf(outfile,"\n");
 		ast_print(tree->right,outfile,indent);
 		return ;
 	}
+	INDENT(indent,outfile);
 
 	/*------------------------------------------------------------------*/
 	/*----------------------------*/
@@ -4222,6 +4224,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 			fprintf(outfile," type (");
 			printTypeChain(tree->ftype,outfile);
 			fprintf(outfile,")\n");
+		} else {
+			fprintf(outfile,"\n");
 		}
 		return ;
 	}
@@ -4703,9 +4707,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/*----------------------------*/
 	case RETURN:
 		fprintf(outfile,"RETURN (%p) type (",tree);
-		printTypeChain(tree->ftype,outfile);
+		printTypeChain(tree->right->ftype,outfile);
 		fprintf(outfile,")\n");
-		ast_print(tree->left,outfile,indent+4);
+		ast_print(tree->right,outfile,indent+4);
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/
@@ -4740,8 +4744,9 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		/* ifx Statement              */
 		/*----------------------------*/
 	case IFX:
+		ast_print(tree->left,outfile,indent);
+		INDENT(indent,outfile);
 		fprintf(outfile,"IF (%p) \n",tree);
-		ast_print(tree->left,outfile,indent+4);
 		if (tree->trueLabel) {
 			INDENT(indent,outfile);
 			fprintf(outfile,"NE(==) 0 goto %s\n",tree->trueLabel->name);

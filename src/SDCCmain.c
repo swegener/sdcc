@@ -1729,6 +1729,7 @@ setBinPaths(const char *argv0)
 }
 
 /* Set system include path */
+static void
 setIncludePath(void)
 {
   char *p;

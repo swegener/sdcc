@@ -39,14 +39,14 @@ IS       (u|U|l|L)*
 #include "newalloc.h"
 #include "dbuf.h"
 
-char *stringLiteral();
+static char *stringLiteral(void);
 char *currFname;
 
 extern int lineno, column;
-extern char *filename ;
-int   mylineno = 1               ;
-void count()                     ;
-int process_pragma(char *);
+extern char *filename;
+int  mylineno = 1;
+static void count(void);
+static int process_pragma(char *);
 #undef yywrap
 
 #ifndef YYPROTO
@@ -72,17 +72,17 @@ static void my_unput(char c)
 }
 
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
-			        check_type(yytext))
+			        check_type())
 char *asmbuff=NULL;
 int asmbuffSize=0;
 char *asmp ;
-extern int check_type		();
- extern int isTargetKeyword     ();
-extern int checkCurrFile	(char *);
-extern int processPragma	(char *);
-extern int printListing		(int   );
-struct optimize save_optimize ;
-struct options  save_options  ;
+static int check_type(void);
+static int isTargetKeyword(char *s);
+static int checkCurrFile (char *s);
+//extern int processPragma	(char *);
+//extern int printListing		(int   );
+struct optimize save_optimize;
+struct options  save_options;
 %}
 
 %x asm

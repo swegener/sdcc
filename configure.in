@@ -118,6 +118,7 @@ AC_DEFINE_UNQUOTED(HEADER_FD, ${sdcc_cv_fd})
 # ===========================================================================
 AC_CHECK_FUNCS(strlen strcpy strcat strstr strcmp strerror strtok strdup)
 AC_CHECK_FUNCS(strchr memcpy vsnprintf snprintf vsprintf)
+AC_CHECK_FUNCS(mkstemp)
 dnl AC_CHECK_FUNCS(getline)
 dnl AC_CHECK_FUNCS(getdelim)
 AC_CHECK_FUNCS(fgets)

@@ -1,3 +1,8 @@
+2003-02-26  Bernhard Held <bernhard@bernhardheld.de>
+
+	* configure.in: test for mkstemp
+	* sdccconf_in.h: add HAVE_MKSTEMP
+
 2003-02-24  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/include/ctype.h: removed warning while using --stack-auto

@@ -315,8 +315,7 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 			
 			init_addr = r->address;
 
-			if(rprev && (init_addr != (rprev->address + rprev->size))
-				&& !(r1 && (init_addr != r1->address))) {
+			if(rprev && (init_addr > (rprev->address + rprev->size))) {
 				fprintf(of, "\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
 			}
 

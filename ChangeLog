@@ -1,3 +1,8 @@
+2004-05-30 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/device.c (pic16_dump_section): corrected bug which
+	caused some symbols of the libraries to be misplaced
+
 2004-05-28 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/glue.c,

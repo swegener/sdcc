@@ -1,7 +1,11 @@
+2004-08-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/ralloc.c (packRegsForAssign): ported some bug fixes from the
+	mcs51 port
+
 2004-08-16 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/gen.c: Restored fn genRet as previous fix was incorrect.
-
 
 2004-08-14 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

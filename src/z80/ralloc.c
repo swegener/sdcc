@@ -1684,26 +1684,57 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if (SKIP_IC2 (dic))
 	continue;
 
-      if (IS_SYMOP (IC_RESULT (dic)) &&
-	  IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
-	{
-	  break;
-	}
+      if (dic->op == IFX)
+        {
+          if (IS_SYMOP (IC_COND (dic)) &&
+	      (IC_COND (dic)->key == IC_RESULT (ic)->key ||
+	       IC_COND (dic)->key == IC_RIGHT (ic)->key))
+	    {
+	      dic = NULL;
+	      break;
+	    }
+        }
+      else
+        {
+          if (IS_TRUE_SYMOP (IC_RESULT (dic)) &&
+	      IS_OP_VOLATILE (IC_RESULT (dic)))
+	    {
+	      dic = NULL;
+	      break;
+	    }
 
-      if (IS_SYMOP (IC_RIGHT (dic)) &&
-	  (IC_RIGHT (dic)->key == IC_RESULT (ic)->key ||
-	   IC_RIGHT (dic)->key == IC_RIGHT (ic)->key))
-	{
-	  dic = NULL;
-	  break;
-	}
+          if (IS_SYMOP (IC_RESULT (dic)) &&
+	      IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
+	    {
+	      if (POINTER_SET (dic))
+	        dic = NULL;
 
-      if (IS_SYMOP (IC_LEFT (dic)) &&
-	  (IC_LEFT (dic)->key == IC_RESULT (ic)->key ||
-	   IC_LEFT (dic)->key == IC_RIGHT (ic)->key))
-	{
-	  dic = NULL;
-	  break;
+	      break;
+	    }
+
+          if (IS_SYMOP (IC_RIGHT (dic)) &&
+	      (IC_RIGHT (dic)->key == IC_RESULT (ic)->key ||
+	       IC_RIGHT (dic)->key == IC_RIGHT (ic)->key))
+	    {
+	      dic = NULL;
+	      break;
+	    }
+
+          if (IS_SYMOP (IC_LEFT (dic)) &&
+	      (IC_LEFT (dic)->key == IC_RESULT (ic)->key ||
+	       IC_LEFT (dic)->key == IC_RIGHT (ic)->key))
+	    {
+	      dic = NULL;
+	      break;
+	    }
+
+          if (IS_SYMOP (IC_RESULT (dic)) &&
+	      IC_RESULT (dic)->key == IC_RESULT (ic)->key)
+	    {
+	      dic = NULL;
+	      break;
+	    }
+	    
 	}
     }
 

@@ -1,3 +1,28 @@
+2002-02-10  Karl Bongers <karl@turbobit.com>
+
+	* debugger/*:
+	Fixed up SDCDB debugger somewhat.  Updated debugger/README
+	with lots of comments and notes.
+
+	* device/examples/test2.c:
+	Fix bug, "red" variable not being initialized(compiler complained).
+
+	* device/examples/Makefile, examples/test3.c:
+	Add Makefile in device/examples folder, compiles test3.c
+	for use as a multiple module SDCDB test case.
+
+	* sim/ucsim/cmd.src/cmdset.cc:
+	Took out debug printfs in ucsim "next" command.
+
+	* sim/ucsim/xa.src:
+	Karl and Johan start ucsim XA support.  Most dissassembly working,
+	about 75% emulation done(plenty of work remaining).
+
+	* sim/ucsim/z80.src:
+	Add Z80 support to ucsim, add test-ucz80 regression test,
+	notice ucsim/z80 emulation fails on examples/test3.c/itoa code.
+	Notice z80 compiler fails on examples/test3.c/crc code.
+
 2002-01-30  Sandeep Dutta  <sandeep@ddi.com>
 
 	* src/mcs51/gen.c, src/mcs51/main.c, src/mcs51/ralloc.c:

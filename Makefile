@@ -10,6 +10,7 @@ PKGS		= support/gc support/cpp \
 		  src as/mcs51 debugger/mcs51 \
 		  device/include device/lib sim/mcs51
 PRJS		= sim/mcs51
+PORTS		= mcs51 z80
 
 srcdir          = .
 
@@ -26,8 +27,7 @@ all: checkconf
 install:
 	$(MAKE) -f main.mk install
 	@for pkg in $(PKGS); do\
-	  CURDIR=`pwd`;\
-	  cd $$pkg && $(MAKE) install; cd $(CURDIR);\
+	  $(MAKE) -C $$pkg install ;\
 	done
 
 
@@ -36,32 +36,37 @@ install:
 uninstall:
 	$(MAKE) -f main.mk uninstall
 	@for pkg in $(PKGS); do\
-	  CURDIR=`pwd`;\
-	  cd cmd && $(MAKE) uninstall; cd $(CURDIR);\
+	  $(MAKE) -C $$pkg uninstall ;\
 	done
 
 
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
+	@echo "+ Cleaning root of the project..."
 	$(MAKE) -f clean.mk clean
-	for pkg in $(PKGS); do $(MAKE) -C $$pkg clean; done
-	@for prj in $(PRJS); do\
-	  CURDIR=`pwd`;\
-	  cd $$prj && $(MAKE) clean; cd $(CURDIR);\
+	@echo "+ Cleaning packages in their directories..."
+	for pkg in $(PKGS); do\
+	  $(MAKE) PORTS="$(PORTS)" -C $$pkg clean ;\
+	done
+	@echo "+ Cleaning sub-projects using Makefile..."
+	for prj in $(PRJS); do\
+	  $(MAKE) -C $$prj clean ;\
 	done
 
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
-distclean: clean
+distclean:
+	@echo "+ DistCleaning root of the project..."
 	$(MAKE) -f clean.mk distclean
-	@for pkg in $(PKGS); do\
-	  CURDIR=`pwd`;\
-	  cd $$pkg && $(MAKE) -f clean.mk distclean; cd $(CURDIR);\
+	@echo "+ DistCleaning packages using clean.mk..."
+	for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" distclean ;\
 	done
-	@for prj in $(PRJS); do\
-	  cd $$prj && $(MAKE) distclean; cd ..;\
+	@echo "+ DistCleaning sub-projects using Makefile..."
+	for prj in $(PRJS); do\
+	  $(MAKE) -C $$prj distclean ;\
 	done
 
 
@@ -69,13 +74,11 @@ distclean: clean
 # -----------------------------------------
 mostlyclean: clean
 	$(MAKE) -f clean.mk mostlyclean
-	@for pkg in $(PKGS); do\
-	  CURDIR=`pwd`;\
-	  cd $$pkg && $(MAKE) -f clean.mk mostlyclean; cd $(CURDIR);\
+	for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" mostlyclean ;\
 	done
-	@for prj in $(PRJS); do\
-	  CURDIR=`pwd`;\
-	  cd $$prj && $(MAKE) mostlyclean; cd $(CURDIR);\
+	for prj in $(PRJS); do\
+	  $(MAKE) -C $$prj mostlyclean ;\
 	done
 
 
@@ -84,13 +87,11 @@ mostlyclean: clean
 # -----------------------------------------------------------------------
 realclean: distclean
 	$(MAKE) -f clean.mk realclean
-	@for pkg in $(PKGS); do\
-	  CURDIR=`pwd`;\
-	  cd $$pkg && $(MAKE) -f clean.mk realclean; cd $(CURDIR);\
+	for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg -f clean.mk PORTS="$(PORTS)" realclean ;\
 	done
-	@for prj in $(PRJS); do\
-	  CURDIR=`pwd`;\
-	  cd $$prj && $(MAKE) realclean; cd $(CURDIR);\
+	for prj in $(PRJS); do\
+	  $(MAKE) -C $$prj realclean ;\
 	done
 
 
@@ -119,13 +120,21 @@ installcheck:
 dep:
 	$(MAKE) -f main.mk dep
 	@for pkg in $(PKGS); do\
-	  CURDIR=`pwd`;\
-	  cd $$pkg && $(MAKE) dep; cd $(CURDIR);\
+	  $(MAKE) -C $$pkg dep ;\
 	done
 
 
 # My rules
 # --------
+newer: distclean
+	@if [ -f start ]; then \
+	  tar cvf - \
+	    `find . -newer start -type f -print` |\
+	  gzip -9c >`date '+%m%d%H%M'`.tgz; \
+	else \
+	  echo "start file not found.\n"; \
+	  exit 1; \
+	fi
 
 putcopyright:
 	'put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l

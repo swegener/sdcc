@@ -2345,7 +2345,7 @@ sfr at 0xDE CTRELL      ; // com.timer rel register low byte SAB80517
 
 #ifdef DAPR__SAB80515
 #undef DAPR__SAB80515
-sfr at 0xD8 DAPR        ; // D/A-converter program register SAB80515 specific
+sfr at 0xDA DAPR        ; // D/A-converter program register SAB80515 specific
 #endif
 
 #ifdef DAPR__SAB80517

@@ -1,3 +1,6 @@
+2002-12-27  Bernhard Held <bernhard@bernhardheld.de>
+        * as/mcs51/Makefile.in: fixed typo lkomf51.o -> lkaomf51.o
+
 2002-12-26  Bernhard Held <bernhard@bernhardheld.de>
 	* src/mcs51/main.c: removed {bindir}{sep} from aslink
 

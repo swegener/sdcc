@@ -1175,9 +1175,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    continue;		      
 		}
 
-		if (strcmp(sym->name,"iTemp121")==0) {
-		  printf ("Oops\n");
-		}
 		/* if it has a spillocation & is used less than
 		   all other live ranges then spill this */
 		if (willCS) {

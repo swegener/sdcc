@@ -1197,6 +1197,10 @@ static int preProcess (char **envp)
 	/* set the macro for stack autos	*/
 	if ( options.stackAuto )
 	    _addToList(preArgv, "-DSDCC_STACK_AUTO");
+	    
+	/* set the macro for stack autos	*/
+	if ( options.stack10bit )
+	    _addToList(preArgv, "-DSDCC_STACK_TENBIT");	
     
 	/* set the macro for large model	*/
 	switch(options.model)

@@ -7058,26 +7058,13 @@ static void genAssign (iCode *ic)
     aopOp(right,ic,FALSE);
     
     /* special case both in far space */
-    /* However, if we are using 10 bit stack mode,
-     * the result should be held in DPTR2,
-     * so we can operate without the special case.
-     *
-     * I think.
-     */
-    if (AOP_TYPE(right) == AOP_DPTR &&
+    if ((AOP_TYPE(right) == AOP_DPTR ||
+         AOP_TYPE(right) == AOP_DPTR2) &&
 	IS_TRUE_SYMOP(result)       &&
 	isOperandInFarSpace(result)) {
 	
-	if (!options.stack10bit)
-	{
-	    genFarFarAssign (result,right,ic);
-            return ;
-        }
-        else
-        {
-            fprintf(stderr, "*** 10bit stack opt 1\n");
-            emitcode(";", "look at me: optimization possible?\n");
-        }
+	genFarFarAssign (result,right,ic);
+	return ;
     }
 
     aopOp(result,ic,TRUE);

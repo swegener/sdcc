@@ -771,7 +771,6 @@ int buildlibraryindex(void)
                     /*Get the built in index of a library*/
 				    This=buildlibraryindex_SdccLib(lbnh->libspc, libfp, str, This);
 				    free(str);
-				    fclose(libfp);
 				    break; /*get the index for next library*/
 			    }
                 
@@ -1052,7 +1051,6 @@ char *name;
 			if(strcmp(relfil, "<SDCCLIB>")==0)
 			{
 				result=SdccLib(lbnh->libspc, libfp, str, name);
-				fclose(libfp);
 				if(result) return(1); /*Found the symbol*/
 				free(str);
 				/*The symbol is not in the current library,

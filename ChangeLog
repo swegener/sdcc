@@ -1,3 +1,8 @@
+2003-09-18  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	*link/z80/lklibr.c, as/mcs51/lklibr.c: Fixed Linux segfaults when
+	trying to fclose a FILE* that was already closed.  
+
 2003-09-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c (structElemType): fixed bug #808291 (members

@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f bin/*
+	-rm -f bin/*
 
 
 # Deleting all files created by configuring or building the program

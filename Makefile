@@ -43,9 +43,7 @@ uninstall:
 # --------------------------------------------------
 clean:
 	$(MAKE) -f clean.mk clean
-	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk clean; cd ..;\
-	done
+	for pkg in $(PKGS); do $(MAKE) -C $$pkg clean; done
 	@for prj in $(PRJS); do\
 	  cd $$prj && $(MAKE) clean; cd ..;\
 	done

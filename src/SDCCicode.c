@@ -2620,7 +2620,7 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
 
   /* first check the type for pointer assignement */
   if (left->isaddr && IS_PTR (ltype) && IS_ITEMP (left) &&
-      compareType (ltype, rtype) < 0)
+      compareType (ltype, rtype) <= 0)
     {
       if (compareType (ltype->next, rtype) < 0)
 	right = geniCodeCast (ltype->next, right, TRUE);

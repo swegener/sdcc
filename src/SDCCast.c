@@ -2776,7 +2776,7 @@ decorateType (ast * tree)
       /* if unary plus */
       if (!tree->right)
 	{
-	  if (!IS_INTEGRAL (LTYPE (tree)))
+	  if (!IS_ARITHMETIC (LTYPE (tree)))
 	    {
 	      werror (E_UNARY_OP, '+');
 	      goto errorTreeReturn;
@@ -3249,7 +3249,7 @@ decorateType (ast * tree)
 	  tree->opval.val = valCastLiteral (
 	    LTYPE (tree),
 	    element->offset
-            + floatFromVal (valFromType (RETYPE (tree->right->left->left)))
+            + floatFromVal (valFromType (RTYPE (tree->right->left->left)))
           );
 
 	  TTYPE (tree) = tree->opval.val->type;
@@ -3285,7 +3285,7 @@ decorateType (ast * tree)
           sym->cdef = 1;
           sym->isref = 1;
           SPEC_STAT (sym->etype) = 1;
-          SPEC_ADDR(sym->etype) = floatFromVal (valFromType (RETYPE (tree)));
+          SPEC_ADDR(sym->etype) = floatFromVal (valFromType (RTYPE (tree)));
           SPEC_ABSA(sym->etype) = 1;
           addSym (SymbolTab, sym, sym->name, 0, 0, 0);
           allocGlobal (sym);
@@ -3303,7 +3303,7 @@ decorateType (ast * tree)
 	  tree->type = EX_VALUE;
 	  tree->opval.val =
 	  valCastLiteral (LTYPE (tree),
-			  floatFromVal (valFromType (RETYPE (tree))));
+			  floatFromVal (valFromType (RTYPE (tree))));
 	  TTYPE (tree) = tree->opval.val->type;
 	  tree->left = NULL;
 	  tree->right = NULL;
@@ -3348,8 +3348,8 @@ decorateType (ast * tree)
 	  IS_LITERAL (LTYPE (tree)))
 	{
 	  tree->type = EX_VALUE;
-	  tree->opval.val = valLogicAndOr (valFromType (LETYPE (tree)),
-					   valFromType (RETYPE (tree)),
+	  tree->opval.val = valLogicAndOr (valFromType (LTYPE (tree)),
+					   valFromType (RTYPE (tree)),
 					   tree->opval.op);
 	  tree->right = tree->left = NULL;
 	  TETYPE (tree) = getSpec (TTYPE (tree) =
@@ -3390,7 +3390,7 @@ decorateType (ast * tree)
 	  if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
 	    {
 	      werror (E_COMPARE_OP);
-	      fprintf (stderr, "comparring type ");
+	      fprintf (stderr, "comparing type ");
 	      printTypeChain (LTYPE (tree), stderr);
 	      fprintf (stderr, "to type ");
 	      printTypeChain (RTYPE (tree), stderr);

@@ -2176,11 +2176,11 @@ geniCodeAdd (operand * left, operand * right, int lvl)
 
   /* if the right side is LITERAL zero */
   /* return the left side              */
-  if (IS_LITERAL (retype) && right->isLiteral && !floatFromVal (valFromType (retype)))
+  if (IS_LITERAL (retype) && right->isLiteral && !floatFromVal (valFromType (rtype)))
     return left;
 
   /* if left is literal zero return right */
-  if (IS_LITERAL (letype) && left->isLiteral && !floatFromVal (valFromType (letype)))
+  if (IS_LITERAL (letype) && left->isLiteral && !floatFromVal (valFromType (ltype)))
     return right;
 
   /* if left is a pointer then size */
@@ -2202,8 +2202,8 @@ geniCodeAdd (operand * left, operand * right, int lvl)
   /* if they are both literals then we know */
   if (IS_LITERAL (letype) && IS_LITERAL (retype)
       && left->isLiteral && right->isLiteral)
-    return operandFromValue (valPlus (valFromType (letype),
-				      valFromType (retype)));
+    return operandFromValue (valPlus (valFromType (ltype),
+				      valFromType (rtype)));
 
   ic = newiCode ('+', left, right);
 

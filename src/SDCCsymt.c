@@ -1000,6 +1000,23 @@ addSymChain (symbol * symHead)
 	      DCL_ELEM(csym->type) = DCL_ELEM(sym->type);
 	  }
 
+	#if 0
+	/* If only one of the definitions used the "at" keyword, copy */
+	/* the address to the other. */
+	if (IS_SPEC(csym->etype) && SPEC_ABSA(csym->etype)
+	    && IS_SPEC(sym->etype) && !SPEC_ABSA(sym->etype))
+	  {
+	    SPEC_ABSA (sym->etype) = 1;
+	    SPEC_ADDR (sym->etype) = SPEC_ADDR (csym->etype);
+	  }
+	if (IS_SPEC(csym->etype) && !SPEC_ABSA(csym->etype)
+	    && IS_SPEC(sym->etype) && SPEC_ABSA(sym->etype))
+	  {
+	    SPEC_ABSA (csym->etype) = 1;
+	    SPEC_ADDR (csym->etype) = SPEC_ADDR (sym->etype);
+	  }
+	#endif
+  
         error = 0;        
         if (csym->ival && sym->ival)
           error = 1;
@@ -1012,7 +1029,15 @@ addSymChain (symbol * symHead)
 	    werror (E_EXTERN_MISMATCH, sym->name);
           else
 	    werror (E_DUPLICATE, sym->name);
-	  printFromToType (csym->type, sym->type);
+	  fprintf (stderr, "from type '");
+	  printTypeChain (csym->type, stderr);
+	  if (IS_SPEC (csym->etype) && SPEC_ABSA (csym->etype))
+	    fprintf(stderr, " at 0x%x", SPEC_ADDR (csym->etype));
+	  fprintf (stderr, "'\nto type '");
+	  printTypeChain (sym->type, stderr);
+	  if (IS_SPEC (sym->etype) && SPEC_ABSA (sym->etype))
+	    fprintf(stderr, " at 0x%x", SPEC_ADDR (sym->etype));
+	  fprintf (stderr, "'\n");
 	  continue;
 	}
 

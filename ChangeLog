@@ -1,3 +1,13 @@
+2003-12-13 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodeAdd),
+	* src/SDCCast.c (decorateType): fixed bug #857753 (need to be careful
+	with valFromType if type might be a pointer and host is big endian).
+	* src/SDCCast.c (decorateType): unary plus compatible with all arithmetic
+	types, not just integer types. 
+	* src/SDCCsymt.c (addSymChain): clarified error message when symbol is
+	multiply defined with mismatching "at" address.
+
 2003-12-12 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/ds390/main.c (PORT tininative_port): fixed bug #858416

@@ -1,3 +1,7 @@
+2001-09-08    <johan@FRIJA>
+
+	* src/SDCCicode.c (geniCodeCall): a CPOINTER can be used as a function
+
 2001-09-07    <johan@FRIJA>
 
 	* src/SDCCicode.c (newiCodeCondition): fixed bug #456235 (1.77)

@@ -329,6 +329,7 @@ symbol;
                                      DCL_TYPE(x) == UPOINTER  ))
 #define IS_PTR_CONST(x) (IS_PTR(x) && DCL_PTR_CONST(x))
 #define IS_FARPTR(x) (IS_DECL(x) && DCL_TYPE(x) == FPOINTER)
+#define IS_CODEPTR(x) (IS_DECL(x) && DCL_TYPE(x) == CPOINTER)
 #define IS_GENPTR(x) (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
 #define IS_FUNC(x)   (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
 #define IS_LONG(x)   (IS_SPEC(x) && x->select.s._long)

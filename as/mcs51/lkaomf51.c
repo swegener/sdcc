@@ -378,6 +378,7 @@ void OutputAOEMF51(void)
 
 				/*Content Record*/
 				OutputByte(0x06);/*REC TYPE*/
+				if(procedure[k].EndAdd==-1) procedure[k].EndAdd=HexSize;
 				recsize=procedure[k].EndAdd-procedure[k].BeginAdd+1+4;
 				OutputWord(recsize);/*Record Length*/
 				OutputByte(0x00);/*SEG ID*/

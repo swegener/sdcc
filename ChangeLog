@@ -1,3 +1,7 @@
+2003-06-20  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/aomf51.c: Make sure the size of the last procedure is correct.
+
 2003-06-19  Borut Razem <borut.razem@siol.net>
 
 	* src/z80/main.c: fixed Z80 port again: missing -k library paths in linker command line

@@ -11450,7 +11450,7 @@ The 8051 family of microcontrollers have a minimum of 128 bytes of internal
 \newline 
 - Bytes 20-2F - 16 bytes to hold 128 bit variables and, 
 \newline 
-- Bytes 30-7F - 60 bytes for general purpose use.
+- Bytes 30-7F - 80 bytes for general purpose use.
 \newline 
 
 \layout Standard
@@ -11506,7 +11506,7 @@ data
 \end_inset 
 
  grows, it will use up the remaining register banks, and the 16 bytes used
- by the 128 bit variables, and 60 bytes for general purpose use.
+ by the 128 bit variables, and 80 bytes for general purpose use.
  If any bit variables are used, the data variables will be placed after
  the byte holding the last bit variable.
  For example, if register banks 0 and 1 are used, and there are 9 bit variables

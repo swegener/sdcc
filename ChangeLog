@@ -3,6 +3,8 @@
 	* src/Makefile.in: remove spawn.o
 	* src/SDCCmain.c: remove spawn.h
 	* src/SDCCmain.c (printVersionInfo): report MINGW32 instead of UNIX
+	* src/spawn.c: removed
+	* src/spawn.h: removed
 
 2003-01-24    <johan@CP255758-A>
 

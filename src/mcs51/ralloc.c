@@ -2139,6 +2139,10 @@ packRegsForAccUse (iCode * ic)
       IC_LEFT (uic)->key != IC_RESULT (ic)->key)
     return;
 
+#if 0
+  // this is too dangerous and need further restrictions
+  // see bug #447547
+
   /* if one of them is a literal then we can */
   if ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
       (IC_RIGHT (uic) && IS_OP_LITERAL (IC_RIGHT (uic))))
@@ -2146,6 +2150,7 @@ packRegsForAccUse (iCode * ic)
       OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
       return;
     }
+#endif
 
   /* if the other one is not on stack then we can */
   if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&

@@ -520,8 +520,15 @@ processFile (char *s)
       /* copy the file name into the buffer */
       strcpy (buffer, s);
 
-      /* get rid of the "." */
-      strtok (buffer, ".");
+      /* get rid of the "."-extension */
+
+      /* is there a dot at all? */
+      if (strchr (buffer, '.') &&
+          /* is the dot in the filename, not in the path? */
+          (strrchr (buffer, '/' ) < strrchr (buffer, '.') ||
+           strrchr (buffer, '\\') < strrchr (buffer, '.')))
+        *strrchr (buffer, '.') = '\0';
+
       srcFileName = Safe_alloc ( strlen (buffer) + 1);
       strcpy (srcFileName, buffer);
 

@@ -226,7 +226,7 @@ endOfWorld :
     /* other wise this is true end of the world */
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
            "getFreePtr should never reach here");
-    exit(0);
+    exit(1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -898,7 +898,7 @@ static char *aopGet (asmop *aop,
 
     werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
            "aopget got unsupported aop->type");
-    exit(0);
+    exit(1);
 }
 /*-----------------------------------------------------------------*/
 /* aopPut - puts a string for a aop                                */
@@ -911,7 +911,7 @@ static void aopPut (asmop *aop, char *s, int offset)
     if (aop->size && offset > ( aop->size - 1)) {
         werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
                "aopPut got offset > aop->size");
-        exit(0);
+        exit(1);
     }
 
     /* will assign value to value */
@@ -960,7 +960,7 @@ static void aopPut (asmop *aop, char *s, int offset)
 	if (aop->code) {
 	    werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 		   "aopPut writting to code space");
-	    exit(0);
+	    exit(1);
 	}
 	
 	while (offset > aop->coff) {
@@ -1079,7 +1079,7 @@ static void aopPut (asmop *aop, char *s, int offset)
     default :
 	werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
 	       "aopPut got unsupported aop->type");
-	exit(0);    
+	exit(1);    
     }    
 
 }
@@ -3145,6 +3145,19 @@ static void genMinus (iCode *ic)
 
         size = getDataSize(IC_LEFT(ic));
 
+	/* If the pushed data is bigger than the result,
+	 * simply discard unused bytes. Icky, but works.
+	 *
+	 * Should we throw a warning here? We're losing data...
+	 */
+	while (size > getDataSize(IC_RESULT(ic)))
+	{
+	   emitcode(";", "discarding unused result byte.");
+	   emitcode("pop", "acc");
+	   size--;
+	   offset--; 
+	}
+
         while(size--)
         {
             emitcode("pop", "acc");
@@ -3641,7 +3654,7 @@ static void genCmp (operand *left,operand *right,
         {
             werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
                    "both CMP operands need ACC!");
-            exit(-1);
+            exit(1);
         }
         else
         {

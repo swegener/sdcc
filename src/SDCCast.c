@@ -2213,7 +2213,7 @@ decorateType (ast * tree)
 
 /*------------------------------------------------------------------*/
 /*----------------------------*/
-      /*  address dereference       */
+/*  address dereference       */
 /*----------------------------*/
     case '*':			/* can be unary  : if right is null then unary operation */
       if (!tree->right)
@@ -2234,7 +2234,7 @@ decorateType (ast * tree)
 	  TETYPE (tree) = getSpec (TTYPE (tree));
 	  tree->args = tree->left->args;
 	  tree->hasVargs = tree->left->hasVargs;
-	  SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE (tree));
+	  SPEC_CONST (TETYPE (tree)) = DCL_PTR_CONST (LTYPE(tree));
 	  return tree;
 	}
 
@@ -2387,6 +2387,7 @@ decorateType (ast * tree)
 	      tree->opval.val = valUnaryPM (valFromType (LETYPE (tree)));
 	      tree->left = NULL;
 	      TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
+	      SPEC_USIGN(TETYPE(tree)) = 0;
 	      return tree;
 	    }
 	  LRVAL (tree) = 1;
@@ -2950,9 +2951,11 @@ decorateType (ast * tree)
 			       LTYPE (tree));
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
-      if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-	werror (E_CODE_WRITE, " ");
-
+      if (!tree->initMode ) {
+	      if (IS_CONSTANT (LETYPE (tree))) {
+		      werror (E_CODE_WRITE, " ");
+	      } 
+      }
       if (LRVAL (tree))
 	{
 	  werror (E_LVALUE_REQUIRED, "=");

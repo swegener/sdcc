@@ -326,8 +326,7 @@ symbol;
 #define IS_LONG(x)   (IS_SPEC(x) && x->select.s._long)
 #define IS_SHORT(x)   (IS_SPEC(x) && x->select.s._short)
 #define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s._typedef)
-#define IS_CONSTANT(x)  (IS_SPEC(x) && (x->select.s.sclass == S_CONSTANT ||\
-                                        x->select.s._const == 1))
+#define IS_CONSTANT(x)  (IS_SPEC(x) && ( x->select.s._const == 1))
 #define IS_STRUCT(x) (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
 #define IS_ABSOLUTE(x)  (IS_SPEC(x) && x->select.s._absadr )
 #define IS_REGISTER(x)  (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)

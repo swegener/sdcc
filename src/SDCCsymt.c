@@ -197,7 +197,7 @@ findSymWithLevel (bucket ** stab, symbol * sym)
 	  if (bp->level && bp->level == sym->level && bp->block == sym->block)
 	    return (bp->sym);
 	  /* if levels don't match then we are okay */
-	  if (bp->level && bp->level != sym->level)
+	  if (bp->level && bp->level != sym->level && bp->block <= sym->block)
 	    return (bp->sym);
 	  /* if this is a global variable then we are ok too */
 	  if (bp->level == 0)
@@ -1785,6 +1785,8 @@ printTypeChain (sym_link * type, FILE * of)
 	    fprintf (of, "volatile ");
 	  if (SPEC_USIGN (type))
 	    fprintf (of, "unsigned ");
+	  if (SPEC_CONST (type))
+	    fprintf (of, "const ");
 
 	  switch (SPEC_NOUN (type))
 	    {

@@ -175,12 +175,12 @@ _process_pragma (const char *sz)
 
 static const char *_gbz80_rgbasmCmd[] =
 {
-  "rgbasm", "-o$1.o", "$1.asm", NULL
+  "rgbasm", "-o\"$1.o\"", "\"$1.asm\"", NULL
 };
 
 static const char *_gbz80_rgblinkCmd[] =
 {
-  "xlink", "-tg", "-n$1.sym", "-m$1.map", "-zFF", "$1.lnk", NULL
+  "xlink", "-tg", "-n\"$1.sym\"", "-m\"$1.map\"", "-zFF", "\"$1.lnk\"", NULL
 };
 
 static void
@@ -287,8 +287,8 @@ _setValues(void)
 {
   if (options.nostdlib == FALSE)
     {
-      setMainValue ("z80libspec", "-k{libdir}{sep}{port} -l{port}.lib");
-      setMainValue ("z80crt0", "{libdir}{sep}{port}{sep}crt0{objext}");
+      setMainValue ("z80libspec", "-k\"{libdir}{sep}{port}\" -l\"{port}.lib\"");
+      setMainValue ("z80crt0", "\"{libdir}{sep}{port}{sep}crt0{objext}\"");
     }
   else
     {
@@ -443,13 +443,13 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     "link-{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
     " {z80extralibfiles} {z80extralibpaths}" \
-    " {z80outputtypeflag} {linkdstfilename}" \
+    " {z80outputtypeflag} \"{linkdstfilename}\"" \
     " {z80crt0}" \
-    " {dstfilename}{objext}" \
+    " \"{dstfilename}{objext}\"" \
     " {z80extraobj}"
 
 #define ASMCMD \
-    "as-{port} -plosgff {objdstfilename} {dstfilename}{asmext}"
+    "as-{port} -plosgff \"{objdstfilename}\" \"{dstfilename}{asmext}\""
 
 /* Globals */
 PORT z80_port =

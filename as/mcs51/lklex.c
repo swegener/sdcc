@@ -198,9 +198,12 @@ char *str;
 		if (p < &str[PATH_MAX-1])
 			*p++ = c;
 		c = get();
-	} while (c && ((ctype[c] != SPACE)||(c == ':')||(c == '\\')));
-	while (p < &str[PATH_MAX])
-		*p++ = 0;
+	} while (c);
+        /* trim trailing spaces */
+        while (ctype[*(--p)] == SPACE)
+          ;
+        /* terminate the string */
+        *(++p) = '\0';
 }
 
 /*)Function	char	getnb()

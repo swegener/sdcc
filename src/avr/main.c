@@ -138,12 +138,12 @@ _avr_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
     MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] = {
-	"linkavr", "", "$1", NULL
+	"linkavr", "", "\"$1\"", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] = {
-	"asavr", "$l" , "$3", "$1.s", NULL
+	"asavr", "$l" , "$3", "\"$1.s\"", NULL
 };
 
 /* Globals */

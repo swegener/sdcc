@@ -337,8 +337,11 @@ static const char *_linkCmd[] =
  */
 static const char *_asmCmd[] =
 {
-  "gpasm", "-c  -I /usr/local/share/gpasm/header -o $2", "$1.asm", NULL
-
+  /* This should be:
+   * "gpasm", "-c  -I \"{datadir}\" -o \"$2\"", "\"$1.asm\"", NULL
+   * but unfortunately buildCmdLine() doesn't expand {xxx} macros.
+   */
+  "gpasm", "-c  -I \"/usr/local/share/gpasm/header\" -o \"$2\"", "\"$1.asm\"", NULL
 };
 
 /* Globals */

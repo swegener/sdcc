@@ -43,7 +43,8 @@ static char *_xa51_keywords[] =
 };
 
 extern int rewinds;
-void   _xa51_genAssemblerEnd () {
+void   _xa51_genAssemblerEnd (FILE * of)
+{
   //fprintf (stderr, "Did %d rewind%c for c-line in asm comments\n", rewinds,
   //rewinds==1 ? '\0' : 's');
 }
@@ -195,13 +196,13 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 */
 static const char *_linkCmd[] =
 {
-  "xa_link", "", "$1", NULL
+  "xa_link", "", "\"$1\"", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
 {
-  "xa_rasm", "$l", "$3", "$1.asm", NULL
+  "xa_rasm", "$l", "$3", "\"$1.asm\"", NULL
 };
 
 /* Globals */

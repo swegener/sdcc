@@ -4494,9 +4494,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		return;
 	}
 	if (tree->opval.op == NULLOP) {
-		fprintf(outfile,"\n");
 		ast_print(tree->left,outfile,indent);
-		fprintf(outfile,"\n");
 		ast_print(tree->right,outfile,indent);
 		return ;
 	}
@@ -5056,14 +5054,22 @@ void ast_print (ast * tree, FILE *outfile, int indent)
 		fprintf(outfile,"IF (%p) \n",tree);
 		ast_print(tree->left,outfile,indent+2);
 		if (tree->trueLabel) {
-			INDENT(indent,outfile);
+			INDENT(indent+2,outfile);
 			fprintf(outfile,"NE(!=) 0 goto %s\n",tree->trueLabel->name);
 		}
 		if (tree->falseLabel) {
-			INDENT(indent,outfile);
+			INDENT(indent+2,outfile);
 			fprintf(outfile,"EQ(==) 0 goto %s\n",tree->falseLabel->name);
 		}
 		ast_print(tree->right,outfile,indent+2);
+		return ;
+		/*----------------------------*/
+		/* goto Statement              */
+		/*----------------------------*/
+	case GOTO:
+		fprintf(outfile,"GOTO (%p) \n",tree);
+		ast_print(tree->left,outfile,indent+2);
+		fprintf(outfile,"\n");
 		return ;
 		/*------------------------------------------------------------------*/
 		/*----------------------------*/

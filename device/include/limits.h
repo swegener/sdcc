@@ -30,7 +30,7 @@
 #define CHAR_MIN   -128
 #define SCHAR_MAX   CHAR_MAX
 #define SCHAR_MIN   CHAR_MIN
-#define UCHAR_MAX   255
+#define UCHAR_MAX   0xff
 #define UCHAR_MIN   0
 #define SHRT_MAX    CHAR_MAX
 #define SHRT_MIN    CHAR_MIN
@@ -38,11 +38,11 @@
 #define USHRT_MIN   UCHAR_MIN
 #define INT_MIN    -32768
 #define INT_MAX     32767
-#define UINT_MAX    65535
+#define UINT_MAX    0xffff
 #define UINT_MIN    0
 #define LONG_MIN   -2147483648
 #define LONG_MAX    2147483647
-#define ULONG_MAX   4294967295
+#define ULONG_MAX   0xffffffff
 #define ULONG_MIN   0
 
 

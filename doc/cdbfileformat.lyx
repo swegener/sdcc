@@ -711,7 +711,7 @@ status Collapsed
 |
 \end_inset 
 
- L { function 
+ L { <function> 
 \begin_inset ERT
 status Collapsed
 
@@ -727,7 +727,7 @@ status Collapsed
 \begin_inset Quotes eld
 \end_inset 
 
- }
+ }}
 \newline 
 <$><Name>
 \newline 
@@ -1487,7 +1487,7 @@ status Collapsed
 |
 \end_inset 
 
- L { function 
+ L { <function> 
 \begin_inset ERT
 status Collapsed
 
@@ -1503,7 +1503,7 @@ status Collapsed
 \begin_inset Quotes eld
 \end_inset 
 
- }
+ }}
 \newline 
 <$><Name>
 \newline 
@@ -2789,7 +2789,7 @@ ng C-Line Records.
 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="28" columns="3">
+<lyxtabular version="3" rows="27" columns="3">
 <features>
 <column alignment="center" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -3572,30 +3572,6 @@ L:C$vars.c$27$1$1:CE
 
 \family typewriter 
 }
-\end_inset 
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-28
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
 \end_inset 
 </cell>
 </row>

@@ -2574,14 +2574,25 @@ else
     sdcc_datadir_tmp=${datadir}/sdcc
 fi
 
-
-cat >> confdefs.h <<EOF
+if test "${includedir}" = "\${prefix}/include"; then
+   cat >> confdefs.h <<EOF
 #define STANDARD_INCLUDE_DIR "${sdcc_datadir_tmp}/include"
 EOF
 
-cat >> confdefs.h <<EOF
+   cat >> confdefs.h <<EOF
 #define SDCC_INCLUDE_DIR "${sdcc_datadir_tmp}/include"
 EOF
+
+else 
+   cat >> confdefs.h <<EOF
+#define STANDARD_INCLUDE_DIR "${includedir}"
+EOF
+
+   cat >> confdefs.h <<EOF
+#define SDCC_INCLUDE_DIR "${includedir}"
+EOF
+
+fi
 
 cat >> confdefs.h <<EOF
 #define SDCC_LIB_DIR "${sdcc_datadir_tmp}/lib"
@@ -2721,10 +2732,18 @@ if test "$enable_ds390_port" = "no"; then
 #define OPT_DISABLE_DS390 1
 EOF
 
+    cat >> confdefs.h <<EOF
+#define OPT_DISABLE_TININative 1
+EOF
+
 else
     echo ds390 >>ports.build
     cat >> confdefs.h <<EOF
 #define OPT_DISABLE_DS390 0
+EOF
+
+    cat >> confdefs.h <<EOF
+#define OPT_DISABLE_TININative 0
 EOF
 
 fi
@@ -2804,7 +2823,7 @@ fi
 
 if test "$enable_libgc" = "yes"; then
         echo $ac_n "checking for GC_malloc in -lgc""... $ac_c" 1>&6
-echo "configure:2808: checking for GC_malloc in -lgc" >&5
+echo "configure:2827: checking for GC_malloc in -lgc" >&5
 ac_lib_var=`echo gc'_'GC_malloc | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2812,7 +2831,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgc  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2816 "configure"
+#line 2835 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -2823,7 +2842,7 @@ int main() {
 GC_malloc()
 ; return 0; }
 EOF
-if { (eval echo configure:2827: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2846: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

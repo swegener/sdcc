@@ -10,7 +10,7 @@
 /* PENDING */
 #define NULL	0
 
-STATIC void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(char, void *), void *pData)
+STATIC void _printn(unsigned u, unsigned base, char issigned, volatile void (*emitter)(char, void *), void *pData)
 {
     const char *_hex = "0123456789ABCDEF";
     if (issigned && ((int)u < 0)) {
@@ -22,7 +22,7 @@ STATIC void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(ch
     (*emitter)(_hex[u%base], pData);
 }
 
-STATIC void _printf(const char *format, void (*emitter)(char, void *), void *pData, va_list va)
+STATIC void _printf(const char *format, volatile void (*emitter)(char, void *), void *pData, va_list va)
 {
     while (*format) {
 	if (*format == '%') {

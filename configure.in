@@ -202,9 +202,14 @@ else
     sdcc_datadir_tmp=${datadir}/sdcc
 fi
 
+if test "${includedir}" = "\${prefix}/include"; then
+   AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
+   AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
+else 
+   AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${includedir}")
+   AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${includedir}")
+fi
 
-AC_DEFINE_UNQUOTED(STANDARD_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
-AC_DEFINE_UNQUOTED(SDCC_INCLUDE_DIR, "${sdcc_datadir_tmp}/include")
 AC_DEFINE_UNQUOTED(SDCC_LIB_DIR, "${sdcc_datadir_tmp}/lib")
 AC_DEFINE_UNQUOTED(STD_LIB, "libsdcc")
 AC_DEFINE_UNQUOTED(STD_INT_LIB, "libint")
@@ -261,9 +266,11 @@ AC_ARG_ENABLE(ds390-port,[  --disable-ds390-port    Excludes the DS390 port])
 echo ds390 >>ports.all
 if test "$enable_ds390_port" = "no"; then
     AC_DEFINE_UNQUOTED(OPT_DISABLE_DS390, 1)
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, 1)
 else
     echo ds390 >>ports.build
     AC_DEFINE_UNQUOTED(OPT_DISABLE_DS390, 0)
+    AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, 0)
 fi
 
 AC_ARG_ENABLE(pic-port,[  --disable-pic-port      Excludes the PIC port])

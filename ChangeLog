@@ -1,3 +1,13 @@
+2002-04-22  Michael Hope  <michaelh@vroom>
+
+	* device/lib/z80/printf.c: Changed emitter to volatile to work around a pcall bug.
+
+	* configure.in (DD_COPT): Added include support required for gbdk.
+
+	* .version: Bumped version number just to increase it.
+
+	* src/SDCCmain.c: Added -nostdinc to the default options.
+
 2002-04-15  Michael Hope  <michaelh@vroom>
 
 	* device/lib/z80/printf.c (sprintf): Added.
@@ -105,7 +115,6 @@
 
 	* sdcc/src/SDCCcse.c: Better fix for bug # 514308
 
->>>>>>> 1.105
 2002-03-02    <johan@FRIJA>
 
 	* src/SDCCast.c (decorateType): fixed bug #524708

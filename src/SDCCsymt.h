@@ -207,6 +207,8 @@ typedef struct sym_link
       unsigned intno;		/* 1=Interrupt svc routine    */
       unsigned regbank;		/* register bank 2b used      */
       unsigned builtin;		/* is a builtin function      */
+      unsigned javaNative;    	/* is a JavaNative Function (TININative ONLY) */
+      unsigned overlay;    	/* force parameters & locals into overlay segment */
     } funcAttrs;
 
     struct sym_link *next;	/* next element on the chain  */
@@ -336,6 +338,10 @@ symbol;
 #define IFFUNC_ISCRITICAL(x) (IS_FUNC(x) && FUNC_ISCRITICAL(x))
 #define FUNC_ISBUILTIN(x) (x->funcAttrs.builtin)
 #define IFFUNC_ISBUILTIN(x) (IS_FUNC(x) && FUNC_ISBUILTIN(x))
+#define FUNC_ISJAVANATIVE(x) (x->funcAttrs.javaNative)
+#define IFFUNC_ISJAVANATIVE(x) (IS_FUNC(x) && FUNC_ISJAVANATIVE(x))
+#define FUNC_ISOVERLAY(x) (x->funcAttrs.overlay)
+#define IFFUNC_ISOVERLAY(x) (IS_FUNC(x) && FUNC_ISOVERLAY(x))
 
 // jwk: I am not sure about this
 #define IFFUNC_ISBANKEDCALL(x) (!IFFUNC_NONBANKED(x) && \

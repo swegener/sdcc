@@ -8478,6 +8478,46 @@ genReceive (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* gen51AggregateAssign - copy complete array's or structures            */
+/*-----------------------------------------------------------------*/
+void gen51AggregateAssign(iCode *ic) {
+  operand *left=IC_LEFT(ic);
+  operand *right=IC_RIGHT(ic);
+  char *fromName=OP_SYMBOL(right)->rname;
+  char *toName=OP_SYMBOL(left)->rname;
+  int fromSize=getSize(OP_SYMBOL(right)->type);
+  int toSize=getSize(OP_SYMBOL(left)->type);
+  int count=toSize;
+
+  if (fromSize!=toSize) {
+    fprintf (stderr, "*** error aggregates have different size");
+    if (fromSize<toSize)
+      count=fromSize;
+  }
+  
+  // memcpy from cseg to xseg
+  emitcode (";", "initialize %s", OP_SYMBOL(IC_LEFT(ic))->name);
+  emitcode ("mov", "dptr,#_memcpy_PARM_2");
+  emitcode ("mov", "a,#%s", fromName);
+  emitcode ("movx", "@dptr,a");
+  emitcode ("inc", "dptr");
+  emitcode ("mov", "a,#(%s>>8)", fromName);
+  emitcode ("movx", "@dptr,a");
+  emitcode ("inc", "dptr");
+  emitcode ("mov", "a,#%02x;	from cseg", 2);
+  emitcode ("movx", "@dptr,a");
+  emitcode ("mov", "dptr,#_memcpy_PARM_3");
+  emitcode ("mov", "a,#(%d>>0);	number of bytes", count);
+  emitcode ("movx", "@dptr,a");
+  emitcode ("inc", "dptr");
+  emitcode ("mov", "a,#(%d>>8)", count);
+  emitcode ("movx", "@dptr,a");
+  emitcode ("mov", "dptr,#%s", toName);
+  emitcode ("mov", "b,#%02x;	only to xseg for now", 1);
+  emitcode ("lcall", "_memcpy");
+}
+
+/*-----------------------------------------------------------------*/
 /* gen51Code - generate code for 8051 based controllers            */
 /*-----------------------------------------------------------------*/
 void
@@ -8715,6 +8755,10 @@ gen51Code (iCode * lic)
 
 	case SEND:
 	  addSet (&_G.sendSet, ic);
+	  break;
+
+	case ARRAYINIT:
+	  gen51AggregateAssign(ic);
 	  break;
 
 	default:

@@ -3035,8 +3035,16 @@ geniCodeArrayInit (ast * tree, operand *array)
 {
   iCode *ic;
 
-  ic = newiCode (ARRAYINIT, array, NULL);
-  IC_ARRAYILIST (ic) = tree->values.constlist;
+  if (!getenv("TRY_THE_NEW_INITIALIZER")) {
+    ic = newiCode (ARRAYINIT, array, NULL);
+    IC_ARRAYILIST (ic) = tree->values.constlist;
+  } else {
+    operand *left=newOperand(), *right=newOperand();
+    left->type=right->type=SYMBOL;
+    OP_SYMBOL(left)=AST_SYMBOL(tree->left);
+    OP_SYMBOL(right)=AST_SYMBOL(tree->right);
+    ic = newiCode (ARRAYINIT, left, right);
+  }
   ADDTOCHAIN (ic);
 }
 

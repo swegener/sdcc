@@ -1036,67 +1036,35 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
 /* this has to go */ void printIval (symbol *, sym_link *, initList *, FILE *);
 
 ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
+  ast *ast;
+  symbol *newSym;
 
   if (getenv("TRY_THE_NEW_INITIALIZER")) {
 
     if (!TARGET_IS_MCS51 || !(options.model==MODEL_LARGE)) {
       fprintf (stderr, "Can't \"TRY_THE_NEW_INITIALIZER\" unless "
-	       "with -mmcs51 and --model-large\n");
+	       "with -mmcs51 and --model-large");
       exit(404);
     }
 
-    if (SPEC_OCLS(sym->type->next)!=xdata) {
-      fprintf (stderr, "Can't \"TRY_THE_NEW_INITALIZER\" unless in xdata\n");
-      exit (405);
-    }
-    
-    if (getSize(sym->type) > 64) { // else it is'n worth it: do it the old way
-      // emit the inital values in cseg, then copy it to where it belongs
-      initList *iLoop;
-      int count, size=getSize(sym->type->next);
-      
-      if (ival->type != INIT_DEEP) {
-	werror (E_INIT_STRUCT, sym->name);
-	return NULL;
-      }
-      
-      tfprintf (code->oFile, "; initial data for %s\n", sym->name);
-      // TODO: this has to be a unique name
-      tfprintf (code->oFile, "_init_%s:", sym->name);
-      
-      for (count=0, iLoop=ival->init.deep; iLoop; iLoop=iLoop->next) {
-	count += size;
-	printIval (sym, sym->type->next, iLoop, code->oFile);
-      }
-      
-      // Now we only have to copy <count> bytes from cseg.
-      // This is VERY -mmcs51 --model-large specific for now, 
-      // in fact we should generate
-      // some icodes here that does the trick. But ok: experimental
-      // Trick: memcpy (sym->name, _init_(sym->name), count)
-      fprintf (statsg->oFile, ";	%s	%d\n", filename, sym->lineDef);
-      fprintf (statsg->oFile, ";	copy initial data from cseg _init_%s to %s\n", 
-	       sym->name, sym->name);
-      fprintf (statsg->oFile, "	mov dptr,#_memcpy_PARM_2\n");
-      fprintf (statsg->oFile, "	mov a,#_init_%s\n", sym->name);
-      fprintf (statsg->oFile, "	movx @dptr,a\n");
-      fprintf (statsg->oFile, "	inc dptr\n");
-      fprintf (statsg->oFile, "	mov a,#(_init_%s>>8)\n", sym->name);
-      fprintf (statsg->oFile, "	movx @dptr,a\n");
-      fprintf (statsg->oFile, "	inc dptr\n");
-      fprintf (statsg->oFile, "	mov a,#%02x;	from cseg\n", 1);
-      fprintf (statsg->oFile, "	movx @dptr,a\n");
-      fprintf (statsg->oFile, "	mov dptr,#_memcpy_PARM_3\n");
-      fprintf (statsg->oFile, "	mov a,#(%d>>0);	number of bytes\n", count);
-      fprintf (statsg->oFile, "	movx @dptr,a\n");
-      fprintf (statsg->oFile, "	inc dptr\n");
-      fprintf (statsg->oFile, "	mov a,#(%d>>8)\n", count);
-      fprintf (statsg->oFile, "	movx @dptr,a\n");
-      fprintf (statsg->oFile, "	mov dptr,#_%s\n", sym->name);
-      fprintf (statsg->oFile, "	mov b,#%02x;	only to xseg for now\n", 2);
-      fprintf (statsg->oFile, "	lcall _memcpy\n");
-      
-      return NULL;
+    if (SPEC_OCLS(sym->etype)==xdata &&
+	getSize(sym->type) > 16) { // else it isn't worth it: do it the old way
+
+      // copy this symbol
+      newSym=copySymbol (sym);
+      SPEC_OCLS(newSym->type->next)=code;
+      sprintf (newSym->name, "%s_init__", sym->name);
+      sprintf (newSym->rname,"%s_init__", sym->rname);
+      addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
+
+      // emit it in the static segment
+      addSet(&statsg->syms, newSym);
+
+      // now memcpy() the entire array from cseg
+      ast=newNode (ARRAYINIT, // ASSIGN_AGGREGATE
+		   newAst_VALUE (symbolVal (sym)), 
+		   newAst_VALUE (symbolVal (newSym)));
+      return decorateType(resolveSymbols(ast));
     }
   }
   

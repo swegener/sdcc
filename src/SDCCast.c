@@ -1958,6 +1958,22 @@ decorateType (ast * tree)
       tree->left = dtl;
     if (dtr != tree->right)
       tree->right = dtr;
+
+    /* special case for left shift operation : cast up right->left if type of left
+       has greater size than right */
+    if (tree->left && tree->right && tree->right->opval.op == LEFT_OP) {
+	int lsize = getSize(LTYPE(tree));
+	int rsize = getSize(RTYPE(tree));
+
+	if (lsize > rsize) {
+	    tree->right->decorated = 0;
+	    tree->right->left = newNode( CAST, (lsize == 2 ? 
+					       newAst_LINK(newIntLink()) : 
+					       newAst_LINK(newLongLink())),
+					tree->right->left);
+	    tree->right = decorateType(tree->right);
+	}
+    }
   }
 
   /* depending on type of operator do */
@@ -2671,6 +2687,7 @@ decorateType (ast * tree)
 				   tree->opval.val->type);
 	  return tree;
 	}
+#if 0
       /* a left shift must be done with at least 16bits */
       if ((tree->opval.op==LEFT_OP) && (getSize(LTYPE(tree))<2)) {
 	// insert a cast
@@ -2685,19 +2702,31 @@ decorateType (ast * tree)
 	  SPEC_NOUN(tree->left->opval.val->type)=V_INT;
 	}
       }
+#endif
       /* if only the right side is a literal & we are
          shifting more than size of the left operand then zero */
       if (IS_LITERAL (RTYPE (tree)) &&
 	  ((unsigned) floatFromVal (valFromType (RETYPE (tree)))) >=
 	  (getSize (LTYPE (tree)) * 8))
 	{
-	  werror (W_SHIFT_CHANGED,
-		  (tree->opval.op == LEFT_OP ? "left" : "right"));
-	  tree->type = EX_VALUE;
-	  tree->left = tree->right = NULL;
-	  tree->opval.val = constVal ("0");
-	  TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
-	  return tree;
+	    /* if left shift then cast up */
+	    if (tree->opval.op==LEFT_OP) {
+		int size = getSize(LTYPE(tree));
+		tree->left = 
+		    decorateType (newNode (CAST,
+					   (size == 1 ? newAst_LINK(newIntLink()) : 
+					    (size == 2 ? newAst_LINK(newLongLink()) : 
+					     newAst_LINK(newIntLink()))),
+					   tree->left));
+	    } else {
+		werror (W_SHIFT_CHANGED,
+			(tree->opval.op == LEFT_OP ? "left" : "right"));
+		tree->type = EX_VALUE;
+		tree->left = tree->right = NULL;
+		tree->opval.val = constVal ("0");
+		TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
+		return tree;
+	    }
 	}
       LRVAL (tree) = RRVAL (tree) = 1;
       if (IS_LITERAL (LTYPE (tree)) && !IS_LITERAL (RTYPE (tree)))

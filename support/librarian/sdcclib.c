@@ -41,7 +41,7 @@ char AdbName[PATH_MAX];
 #define NEQ(A,B) strcmp((A),(B))
 
 int action=0;
-FILE *lib, *newlib, *rel, *adb, *index;
+FILE *lib, *newlib, *rel, *adb, *libindex;
 char FLine[MAXLINE+1];
 char ModName[MAXLINE+1];
 int state=0;
@@ -220,8 +220,8 @@ void AddRel(void)
     }
     fprintf(newlib, "<FILES>\n\n");
 
-    index=fopen(IndexName, "w");
-    if(index==NULL)
+    libindex=fopen(IndexName, "w");
+    if(libindex==NULL)
     {
         printf("ERROR: Couldn't create temporary file '%s'", IndexName);
         fclose(lib);
@@ -248,7 +248,7 @@ void AddRel(void)
                     {
                         newlibpos=ftell(newlib);
                         fprintf(newlib, "<FILE>\n%s\n", FLine);
-                        fprintf(index, "<MODULE>\n%s %ld\n", FLine, newlibpos);
+                        fprintf(libindex, "<MODULE>\n%s %ld\n", FLine, newlibpos);
                         state++;
                     }
                 }                
@@ -258,7 +258,7 @@ void AddRel(void)
                 if(EQ(FLine, "</FILE>"))
                 {
                     fprintf(newlib, "\n");
-                    fprintf(index, "</MODULE>\n\n");
+                    fprintf(libindex, "</MODULE>\n\n");
                     state=0;
                     inrel=0;
                 }
@@ -269,7 +269,7 @@ void AddRel(void)
                     if(FLine[0]=='S')
                     {
                         sscanf(FLine, "S %s %c", symname, &c);
-                        if(c=='D') fprintf(index, "%s\n", symname);
+                        if(c=='D') fprintf(libindex, "%s\n", symname);
                     }
                 }
             break;
@@ -280,7 +280,7 @@ void AddRel(void)
     {
         newlibpos=ftell(newlib);
         fprintf(newlib, "<FILE>\n%s\n<REL>\n", ModName);
-        fprintf(index, "<MODULE>\n%s %ld\n", ModName, newlibpos);
+        fprintf(libindex, "<MODULE>\n%s %ld\n", ModName, newlibpos);
         while(!feof(rel))
         {
             FLine[0]=0;
@@ -293,11 +293,11 @@ void AddRel(void)
             if(FLine[0]=='S')
             {
                 sscanf(FLine, "S %s %c", symname, &c);
-                if(c=='D') fprintf(index, "%s\n", symname);
+                if(c=='D') fprintf(libindex, "%s\n", symname);
             }
         }
         fclose(rel);
-        fprintf(index, "</MODULE>\n");
+        fprintf(libindex, "</MODULE>\n");
         fprintf(newlib, "</REL>\n<ADB>\n");
     
         adb=fopen(AdbName, "r");
@@ -319,16 +319,16 @@ void AddRel(void)
     }
 
     /*Put the temporary files together as a new library file*/
-    indexsize=ftell(index);
-    fflush(index);
+    indexsize=ftell(libindex);
+    fflush(libindex);
     fflush(newlib);
     fclose(newlib);
     if(lib!=NULL) fclose(lib);
-    fclose(index);
+    fclose(libindex);
 
     newlib=fopen(LibNameTmp, "r");
     lib=fopen(LibName, "w");
-    index=fopen(IndexName, "r");
+    libindex=fopen(IndexName, "r");
 
     fprintf(lib, "<SDCCLIB>\n\n");
     fprintf(lib, "<INDEX>\n");
@@ -336,10 +336,10 @@ void AddRel(void)
     indexsize+=ftell(lib)+12+14;
     fprintf(lib, "%10ld\n", indexsize);
 
-    while(!feof(index))
+    while(!feof(libindex))
     {
         FLine[0]=0;
-        fgets(FLine, MAXLINE, index);
+        fgets(FLine, MAXLINE, libindex);
         fprintf(lib, "%s", FLine);
     }
     fprintf(lib, "\n</INDEX>\n\n");
@@ -355,7 +355,7 @@ void AddRel(void)
 
     fclose(newlib);
     fclose(lib);
-    fclose(index);
+    fclose(libindex);
 
     unlink(LibNameTmp);
     unlink(IndexName);

@@ -6,7 +6,7 @@
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  * Other contributors include:
  *   Karl Bongers karl@turbobit.com,
- *   Johan Knol 
+ *   Johan Knol johan.knol@iduna.nl
  */
 
 /* This file is part of microcontroller simulator: ucsim.
@@ -323,21 +323,21 @@ cl_xa::disass(t_addr addr, char *sep)
               reg_strs[((code >> 4) & 0xf)] );
     break;
     case REG_IREGOFF8 :
-      sprintf(parm_str, "%s,[%s+%02d]",
+      sprintf(parm_str, "%s,[%s+%02x]",
               reg_strs[((code >> 4) & 0xf)],
               w_reg_strs[(code & 0x7)],
               get_mem(MEM_ROM, addr+immed_offset));
       ++immed_offset;
     break;
     case IREGOFF8_REG :
-      sprintf(parm_str, "[%s+%02d],%s",
+      sprintf(parm_str, "[%s+%02x],%s",
               w_reg_strs[(code & 0x7)],
               get_mem(MEM_ROM, addr+immed_offset),
               reg_strs[((code >> 4) & 0xf)] );
       ++immed_offset;
     break;
     case REG_IREGOFF16 :
-      sprintf(parm_str, "%s,[%s+%04d]",
+      sprintf(parm_str, "%s,[%s+%04x]",
               reg_strs[((code >> 4) & 0xf)],
               w_reg_strs[(code & 0x7)],
               (short)((get_mem(MEM_ROM, addr+immed_offset+1)) |
@@ -346,7 +346,7 @@ cl_xa::disass(t_addr addr, char *sep)
       ++immed_offset;
     break;
     case IREGOFF16_REG :
-      sprintf(parm_str, "[%s+%04d],%s",
+      sprintf(parm_str, "[%s+%04x],%s",
               w_reg_strs[(code & 0x7)],
               (short)((get_mem(MEM_ROM, addr+immed_offset+1)) |
                      (get_mem(MEM_ROM, addr+immed_offset)<<8)),
@@ -421,14 +421,14 @@ cl_xa::disass(t_addr addr, char *sep)
       ++immed_offset;
     break;
     case IREGOFF8_DATA8 :
-      sprintf(parm_str, "[%s+%02d], 0x%02x",
+      sprintf(parm_str, "[%s+%02x], 0x%02x",
               w_reg_strs[((code >> 4) & 0x7)],
               get_mem(MEM_ROM, addr+immed_offset),
               get_mem(MEM_ROM, addr+immed_offset+1) );
       immed_offset += 2;
     break;
     case IREGOFF8_DATA16 :
-      sprintf(parm_str, "[%s+%02d], 0x%04x",
+      sprintf(parm_str, "[%s+%02x], 0x%04x",
               w_reg_strs[((code >> 4) & 0x7)],
               get_mem(MEM_ROM, addr+immed_offset),
               (short)((get_mem(MEM_ROM, addr+immed_offset+2)) |
@@ -436,7 +436,7 @@ cl_xa::disass(t_addr addr, char *sep)
       immed_offset += 3;
     break;
     case IREGOFF16_DATA8 :
-      sprintf(parm_str, "[%s+%04d], 0x%02x",
+      sprintf(parm_str, "[%s+%04x], 0x%02x",
               w_reg_strs[((code >> 4) & 0x7)],
               (short)((get_mem(MEM_ROM, addr+immed_offset+1)) |
                      (get_mem(MEM_ROM, addr+immed_offset+0)<<8)),
@@ -444,7 +444,7 @@ cl_xa::disass(t_addr addr, char *sep)
       immed_offset += 3;
     break;
     case IREGOFF16_DATA16 :
-      sprintf(parm_str, "[%s+%04d], 0x%04x",
+      sprintf(parm_str, "[%s+%04x], 0x%04x",
               w_reg_strs[((code >> 4) & 0x7)],
               (short)((get_mem(MEM_ROM, addr+immed_offset+1)) |
                      (get_mem(MEM_ROM, addr+immed_offset+0)<<8)),
@@ -542,8 +542,53 @@ cl_xa::disass(t_addr addr, char *sep)
 	      ((signed short)((get_mem(MEM_ROM, addr+1)<<8) + get_mem(MEM_ROM, addr+2))*2+addr+len)&0xfffe);
     break;
 
-    case RLIST :
-      strcpy(parm_str, "RLIST");
+    case RLIST : {
+      /* TODO: the list should be comma reperated
+	 and maybe for POP the list should be reversed */
+      unsigned char rlist=code&0xff;
+      parm_str[0]='\0';
+      if (code&0x0800) { // word list
+	if (code&0x4000) { // R8-R15
+	  if (rlist&0x80) strcat (parm_str, "R15 ");
+	  if (rlist&0x40) strcat (parm_str, "R14");
+	  if (rlist&0x20) strcat (parm_str, "R13 ");
+	  if (rlist&0x10) strcat (parm_str, "R12 ");
+	  if (rlist&0x08) strcat (parm_str, "R11 ");
+	  if (rlist&0x04) strcat (parm_str, "R10 ");
+	  if (rlist&0x02) strcat (parm_str, "R9 ");
+	  if (rlist&0x01) strcat (parm_str, "R8 ");
+	} else { // R7-R0
+	  if (rlist&0x80) strcat (parm_str, "R7 ");
+	  if (rlist&0x40) strcat (parm_str, "R6 ");
+	  if (rlist&0x20) strcat (parm_str, "R5 ");
+	  if (rlist&0x10) strcat (parm_str, "R4 ");
+	  if (rlist&0x08) strcat (parm_str, "R3 ");
+	  if (rlist&0x04) strcat (parm_str, "R2 ");
+	  if (rlist&0x02) strcat (parm_str, "R1 ");
+	  if (rlist&0x01) strcat (parm_str, "R0 ");
+	}
+      } else { // byte list
+	if (code&0x4000) { //R7h-R4l
+	  if (rlist&0x80) strcat (parm_str, "R7h ");
+	  if (rlist&0x40) strcat (parm_str, "R7l ");
+	  if (rlist&0x20) strcat (parm_str, "R6h ");
+	  if (rlist&0x10) strcat (parm_str, "R6l ");
+	  if (rlist&0x08) strcat (parm_str, "R5h ");
+	  if (rlist&0x04) strcat (parm_str, "R5l ");
+	  if (rlist&0x02) strcat (parm_str, "R4h ");
+	  if (rlist&0x01) strcat (parm_str, "R4l ");
+	} else { // R3h-R0l
+	  if (rlist&0x80) strcat (parm_str, "R3h ");
+	  if (rlist&0x40) strcat (parm_str, "R3l ");
+	  if (rlist&0x20) strcat (parm_str, "R2h ");
+	  if (rlist&0x10) strcat (parm_str, "R2l ");
+	  if (rlist&0x08) strcat (parm_str, "R1h ");
+	  if (rlist&0x04) strcat (parm_str, "R1l ");
+	  if (rlist&0x02) strcat (parm_str, "R0h ");
+	  if (rlist&0x01) strcat (parm_str, "R0l ");
+	}
+      }
+    }
     break;
 
     case REG_DIRECT_REL8 :
@@ -607,6 +652,7 @@ cl_xa::disass(t_addr addr, char *sep)
     buf= (char *)malloc(6+strlen(p)+1);
   else
     buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
+
   for (p= work, b= buf; *p != ' '; p++, b++)
     *b= *p;
   p++;
@@ -632,18 +678,18 @@ cl_xa::print_regs(class cl_console *con)
   unsigned char flags;
 
   flags = get_psw();
-  con->dd_printf("CA---VNZ  Flags: %02x ", flags);
+  con->dd_printf("CA---VNZ | ", flags);
   con->dd_printf("R0:%04x R1:%04x R2:%04x R3:%04x\n",
                  reg2(0), reg2(1), reg2(2), reg2(3));
 
-  con->dd_printf("%c%c---%c%c%c            ",
+  con->dd_printf("%c%c---%c%c%c | ",
          (flags & BIT_C)?'1':'0',
          (flags & BIT_AC)?'1':'0',
          (flags & BIT_V)?'1':'0',
          (flags & BIT_N)?'1':'0',
          (flags & BIT_Z)?'1':'0');
 
-  con->dd_printf("R4:%04x R5:%04x R6:%04x R7(SP):%04x ES:%04x  DS:%04x\n",
+  con->dd_printf("R4:%04x R5:%04x R6:%04x SP:%04x ES:%04x  DS:%04x\n",
                  reg2(4), reg2(5), reg2(6), reg2(7), 0, 0);
 
   print_disass(PC, con);

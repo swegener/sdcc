@@ -143,9 +143,7 @@ static void emitcode (char *inst, char *fmt,...) {
 
 char *getStackOffset(int stack) {
   static char gsoBuf[1024];
-  sprintf (gsoBuf, "r7+(%d%+d%+d%+d)", stack,
-	   FUNC_ISISR(currFunc->type) ? 
-	     port->stack.isr_overhead : port->stack.call_overhead,
+  sprintf (gsoBuf, "r7+(%d%+d%+d)", stack,
 	   currFunc->stack, _G.nRegsSaved);
   return gsoBuf;
 }

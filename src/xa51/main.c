@@ -257,8 +257,8 @@ PORT xa51_port =
   {
     -1, // stack grows down
     0, // bank overhead NUY
-    6, // isr overhead
-    4, // function call overhead
+    4, // isr overhead, page zero mode
+    2, // function call overhead, page zero mode
     0, // reentrant overhead NUY
     0 // banked overhead NUY
   },

@@ -1,8 +1,8 @@
 #include <xa.h>
 
-bit b1, b2;
-data d1, d2;
-xdata x1, x2;
+bit b1, b2=1;
+data d1, d2=2;
+xdata x1, x2=3;
 
 #define	BAUD_RATE 9600
 #define	OSC 20000000L	/* Xtal frequency */

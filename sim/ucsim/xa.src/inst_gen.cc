@@ -126,7 +126,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
                       )
                 );
       } else {
-        int offset = (int)((short)fetch2());
         set_reg1( RI_F0,
                   FUNC1( reg1(RI_F0),
                         get1(reg2(RI_07)+offset)

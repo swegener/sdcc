@@ -177,11 +177,19 @@ int cl_xa::inst_ASR(uint code, int operands)
 
 int cl_xa::inst_BCC(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  if (!(get_psw() & BIT_C)) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 
 int cl_xa::inst_BCS(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  if (get_psw() & BIT_C) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 
@@ -189,21 +197,39 @@ int cl_xa::inst_BEQ(uint code, int operands)
 {
   short jmpAddr = fetch1()*2;
   if (get_psw() & BIT_Z) {
-    PC=(PC+jmpAddr)&0xfffffffe;
+    PC=(PC+jmpAddr)&0xfffffe;
   }
   return(resGO);
 }
 
 int cl_xa::inst_BG(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  short flags=get_psw();
+  bool Z=flags&BIT_Z, C=flags&BIT_C;
+  if (!(Z|C)) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BGE(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  short flags=get_psw();
+  bool N=flags&BIT_N, V=flags&BIT_V;
+  if (!(N^V)) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BGT(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  short flags=get_psw();
+  bool Z=flags&BIT_Z, N=flags&BIT_N, V=flags&BIT_V;
+  if (!((Z|N)^V)) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BKPT(uint code, int operands)
@@ -212,34 +238,72 @@ int cl_xa::inst_BKPT(uint code, int operands)
 }
 int cl_xa::inst_BL(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  short flags=get_psw();
+  bool Z=flags&BIT_Z, C=flags&BIT_C;
+  if (Z|C) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BLE(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  short flags=get_psw();
+  bool Z=flags&BIT_Z, N=flags&BIT_N, V=flags&BIT_V;
+  if ((Z|N)^V) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BLT(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  short flags=get_psw();
+  bool N=flags&BIT_N, V=flags&BIT_V;
+  if (N^V) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BMI(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  if (get_psw()&BIT_N) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BNE(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  if (!(get_psw()&BIT_Z)) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BNV(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  if (!(get_psw()&BIT_V)) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BOV(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  if (get_psw()&BIT_V) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 int cl_xa::inst_BPL(uint code, int operands)
 {
+  short jmpAddr = fetch1()*2;
+  if (!(get_psw()&BIT_N)) {
+    PC=(PC+jmpAddr)&0xfffffe;
+  }
   return(resGO);
 }
 
@@ -352,8 +416,7 @@ int cl_xa::inst_CJNE(uint code, int operands)
 int cl_xa::inst_CLR(uint code, int operands)
 {
   unsigned short bitAddr = (code&0x03 << 8) + fetch();
-  // fixme: implement
-  bitAddr=bitAddr;
+  set_bit (bitAddr, 0);
   return(resGO);
 }
 
@@ -608,13 +671,12 @@ int cl_xa::inst_ORL(uint code, int operands)
 
 int cl_xa::inst_POP(uint code, int operands)
 {
+  unsigned short sp=get_sp();
   switch(operands) {
     case DIRECT:
     {
-      unsigned short sp;
       unsigned short direct_addr = ((operands & 0x7) << 8) | fetch();
 
-      sp = get_sp();
       if (code & 0x0800) {  /* word op */
         set_word_direct(direct_addr, get2(sp) );
       } else {
@@ -625,9 +687,50 @@ int cl_xa::inst_POP(uint code, int operands)
     break;
 
     case RLIST:
-      // fixme: implement
+    {
       unsigned char rlist = fetch();
-      rlist = rlist; //shutup compiler
+      if (code & 0x08) { // word op
+	if (code & 0x40) { // R8-R15
+	  if (rlist&0x01) { set_reg2(8, get2(sp)); sp+=2; }
+	  if (rlist&0x02) { set_reg2(9, get2(sp)); sp+=2; }
+	  if (rlist&0x04) { set_reg2(10, get2(sp)); sp+=2; }
+	  if (rlist&0x08) { set_reg2(11, get2(sp)); sp+=2; }
+	  if (rlist&0x10) { set_reg2(12, get2(sp)); sp+=2; }
+	  if (rlist&0x20) { set_reg2(13, get2(sp)); sp+=2; }
+	  if (rlist&0x40) { set_reg2(14, get2(sp)); sp+=2; }
+	  if (rlist&0x80) { set_reg2(15, get2(sp)); sp+=2; }
+	} else { // R0-R7
+	  if (rlist&0x01) { set_reg2(0, get2(sp)); sp+=2; }
+	  if (rlist&0x02) { set_reg2(1, get2(sp)); sp+=2; }
+	  if (rlist&0x04) { set_reg2(2, get2(sp)); sp+=2; }
+	  if (rlist&0x08) { set_reg2(3, get2(sp)); sp+=2; }
+	  if (rlist&0x10) { set_reg2(4, get2(sp)); sp+=2; }
+	  if (rlist&0x20) { set_reg2(5, get2(sp)); sp+=2; }
+	  if (rlist&0x40) { set_reg2(6, get2(sp)); sp+=2; }
+	  if (rlist&0x80) { set_reg2(7, get2(sp)); sp+=2; }
+	}
+      } else { // byte op
+	if (code & 0x40) { // R4l-R7h
+	  if (rlist&0x01) { set_reg1(8, get1(sp)); sp+=2; }
+	  if (rlist&0x02) { set_reg1(9, get1(sp)); sp+=2; }
+	  if (rlist&0x04) { set_reg1(10, get1(sp)); sp+=2; }
+	  if (rlist&0x08) { set_reg1(11, get1(sp)); sp+=2; }
+	  if (rlist&0x10) { set_reg1(12, get1(sp)); sp+=2; }
+	  if (rlist&0x20) { set_reg1(13, get1(sp)); sp+=2; }
+	  if (rlist&0x40) { set_reg1(14, get1(sp)); sp+=2; }
+	  if (rlist&0x80) { set_reg1(15, get1(sp)); sp+=2; }
+	} else { // R0l-R3h
+	  if (rlist&0x01) { set_reg1(0, get1(sp)); sp+=2; }
+	  if (rlist&0x02) { set_reg1(1, get1(sp)); sp+=2; }
+	  if (rlist&0x04) { set_reg1(2, get1(sp)); sp+=2; }
+	  if (rlist&0x08) { set_reg1(3, get1(sp)); sp+=2; }
+	  if (rlist&0x10) { set_reg1(4, get1(sp)); sp+=2; }
+	  if (rlist&0x20) { set_reg1(5, get1(sp)); sp+=2; }
+	  if (rlist&0x40) { set_reg1(6, get1(sp)); sp+=2; }
+	  if (rlist&0x80) { set_reg1(7, get1(sp)); sp+=2; }
+	}
+      }
+    }
     break;
   }
   return(resGO);
@@ -652,12 +755,54 @@ int cl_xa::inst_PUSH(uint code, int operands)
     break;
 
     case RLIST:
-      // fixme: implement
+    {
+      unsigned short sp=get_sp();
       unsigned char rlist = fetch();
-      rlist = rlist; //shutup compiler
+      if (code & 0x08) { // word op
+	if (code & 0x40) { // R15-R8
+	  if (rlist&0x80) { sp-=2; store2(sp, reg2(15)); }
+	  if (rlist&0x40) { sp-=2; store2(sp, reg2(14)); }
+	  if (rlist&0x20) { sp-=2; store2(sp, reg2(13)); }
+	  if (rlist&0x10) { sp-=2; store2(sp, reg2(12)); }
+	  if (rlist&0x08) { sp-=2; store2(sp, reg2(11)); }
+	  if (rlist&0x04) { sp-=2; store2(sp, reg2(10)); }
+	  if (rlist&0x02) { sp-=2; store2(sp, reg2(9)); }
+	  if (rlist&0x01) { sp-=2; store2(sp, reg2(8)); }
+	} else { // R7-R0
+	  if (rlist&0x80) { sp-=2; store2(sp, reg2(7)); }
+	  if (rlist&0x40) { sp-=2; store2(sp, reg2(6)); }
+	  if (rlist&0x20) { sp-=2; store2(sp, reg2(5)); }
+	  if (rlist&0x10) { sp-=2; store2(sp, reg2(4)); }
+	  if (rlist&0x08) { sp-=2; store2(sp, reg2(3)); }
+	  if (rlist&0x04) { sp-=2; store2(sp, reg2(2)); }
+	  if (rlist&0x02) { sp-=2; store2(sp, reg2(1)); }
+	  if (rlist&0x01) { sp-=2; store2(sp, reg2(0)); }
+	}
+      } else { // byte op
+	if (code & 0x40) { // R7h-R4l
+	  if (rlist&0x80) { sp-=2; store2(sp, reg2(15)); }
+	  if (rlist&0x40) { sp-=2; store2(sp, reg2(14)); }
+	  if (rlist&0x20) { sp-=2; store2(sp, reg2(13)); }
+	  if (rlist&0x10) { sp-=2; store2(sp, reg2(12)); }
+	  if (rlist&0x08) { sp-=2; store2(sp, reg2(11)); }
+	  if (rlist&0x04) { sp-=2; store2(sp, reg2(10)); }
+	  if (rlist&0x02) { sp-=2; store2(sp, reg2(9)); }
+	  if (rlist&0x01) { sp-=2; store2(sp, reg2(8)); }
+	} else { // R3h-R0l
+	  if (rlist&0x80) { sp-=2; store2(sp, reg2(7)); }
+	  if (rlist&0x40) { sp-=2; store2(sp, reg2(6)); }
+	  if (rlist&0x20) { sp-=2; store2(sp, reg2(5)); }
+	  if (rlist&0x10) { sp-=2; store2(sp, reg2(4)); }
+	  if (rlist&0x08) { sp-=2; store2(sp, reg2(3)); }
+	  if (rlist&0x04) { sp-=2; store2(sp, reg2(2)); }
+	  if (rlist&0x02) { sp-=2; store2(sp, reg2(1)); }
+	  if (rlist&0x01) { sp-=2; store2(sp, reg2(0)); }
+	}
+      }
+      set_sp(sp);
+    }
     break;
   }
-  
   return(resGO);
 }
 int cl_xa::inst_RESET(uint code, int operands)
@@ -718,13 +863,18 @@ int cl_xa::inst_RRC(uint code, int operands)
 int cl_xa::inst_SETB(uint code, int operands)
 {
   unsigned short bitAddr = (code&0x03 << 8) + fetch();
-  // fixme: implement
-  bitAddr=bitAddr;
+  set_bit (bitAddr, 1);
   return(resGO);
 }
 
 int cl_xa::inst_SEXT(uint code, int operands)
 {
+  bool neg=get_psw()&BIT_N;
+  if (code & 0x0800) { // word op
+    set_reg2(RI_F0, neg ? 0xffff : 0);
+  } else {
+    set_reg1(RI_F0, neg ? 0xff : 0);
+  }
   return(resGO);
 }
 

@@ -28,8 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#define REGS_OFFSET 0
-//#define REGS_OFFSET 0x400
+#define REGS_OFFSET 0x800
 
 #ifndef REGSAVR_HEADER
 #define REGSAVR_HEADER
@@ -73,18 +72,6 @@ struct t_regs
 #define get_xdata1(addr) ram->get((t_addr) (addr))
 #define get_xdata2(addr) (ram->get((t_addr) (addr)) | (ram->get((t_addr) (addr+1)) << 8) )
 
-#if 0
-  moved to inst.cc as functions
-/* store to ram */
-#define store2(addr, val) { ram->set((t_addr) (addr), (val) & 0xff); \
-                            ram->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
-#define store1(addr, val) ram->set((t_addr) (addr), val)
-
-/* get from ram */
-#define get1(addr) ram->get((t_addr) (addr))
-#define get2(addr) (ram->get((t_addr) (addr)) | (ram->get((t_addr) (addr+1)) << 8) )
-#endif
-
 /* get from code */
 #define getcode1(addr) rom->get((t_addr) (addr))
 #define getcode2(addr) (rom->get((t_addr) (addr)) | (rom->get((t_addr) (addr+1)) << 8) )
@@ -94,8 +81,8 @@ struct t_regs
 #define fetch1() fetch()
 
 /* get a 1 or 2 byte register */
-#define reg2(_index) get_reg(1, (_index<<1)) /* function in inst.cc */
-#define reg1(_index) (unsigned char)get_reg(0, (_index))
+#define reg2(_index) get_reg(1, REGS_OFFSET + (_index<<1)) /* function in inst.cc */
+#define reg1(_index) (unsigned char)get_reg(0, REGS_OFFSET + (_index))
 
 #define set_reg1(_index, _value) { \
   set_byte_direct((REGS_OFFSET+(_index)), _value); \

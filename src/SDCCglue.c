@@ -734,12 +734,13 @@ printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
 /*-----------------------------------------------------------------*/
 /* printIvalArray - generates code for array initialization        */
 /*-----------------------------------------------------------------*/
-void 
+void
 printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 		FILE * oFile)
 {
   initList *iloop;
   int lcnt = 0, size = 0;
+  sym_link *last_type;
 
   /* take care of the special   case  */
   /* array of characters can be init  */
@@ -762,7 +763,9 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
     }
 
   iloop = ilist->init.deep;
-  lcnt = DCL_ELEM (type);
+  lcnt = 1;
+  for (last_type = type; last_type; last_type = last_type->next)
+    lcnt *= DCL_ELEM (last_type);
 
   for (;;)
     {

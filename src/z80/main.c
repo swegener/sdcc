@@ -627,6 +627,16 @@ PORT z80_port =
   {
     z80_emitDebuggerSymbol
   },
+  {
+    255,        /* maxCount */
+    3,          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4,4,4},    /* sizeofMatchJump[] */
+    {0,0,0},    /* sizeofRangeCompare[] */
+    0,          /* sizeofSubtract */
+    3,          /* sizeofDispatch */
+  },
   "_",
   _z80_init,
   _parseOptions,
@@ -731,6 +741,16 @@ PORT gbz80_port =
   },
   {
     z80_emitDebuggerSymbol
+  },
+  {
+    255,        /* maxCount */
+    3,          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4,4,4},    /* sizeofMatchJump[] */
+    {0,0,0},    /* sizeofRangeCompare[] */
+    0,          /* sizeofSubtract */
+    3,          /* sizeofDispatch */
   },
   "_",
   _gbz80_init,

@@ -715,6 +715,14 @@ PORT mcs51_port =
   {
     mcs51_emitDebuggerSymbol
   },
+  {
+    255/3,      /* maxCount */
+    3,          /* sizeofElement */
+    {6,9,15},   /* sizeofMatchJump[] */
+    {9,18,36},  /* sizeofRangeCompare[] */
+    4,          /* sizeofSubtract */
+    7,          /* sizeofDispatch */
+  },
   "_",
   _mcs51_init,
   _mcs51_parseOptions,

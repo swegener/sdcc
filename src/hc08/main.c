@@ -463,6 +463,14 @@ PORT hc08_port =
       1,			/* offsetSP */
     },
   },
+  {
+    255/3,      /* maxCount */
+    3,          /* sizeofElement */
+    {8,16,32},  /* sizeofMatchJump[] */
+    {8,16,32},  /* sizeofRangeCompare[] */
+    5,          /* sizeofSubtract */
+    11,         /* sizeofDispatch */
+  },
   "_",
   _hc08_init,
   _hc08_parseOptions,

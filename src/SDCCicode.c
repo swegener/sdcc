@@ -3471,7 +3471,8 @@ exit:
 int 
 geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
 {
-  int min = 0, max = 0, t, cnt = 0;
+  int min, max, cnt = 1;
+  int i, t;
   value *vch;
   iCode *ic;
   operand *boundary;
@@ -3479,6 +3480,10 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   set *labels = NULL;
   int needRangeCheck = !optimize.noJTabBoundary
                        || tree->values.switchVals.swDefault;
+  sym_link *cetype = getSpec (operandType (cond));
+  int sizeofMinCost, sizeofMaxCost;
+  int sizeofMatchJump, sizeofJumpTable;
+  int sizeIndex;
 
   if (!tree || !caseVals)
     return 0;
@@ -3486,48 +3491,104 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   /* the criteria for creating a jump table is */
   /* all integer numbers between the maximum & minimum must */
   /* be present , the maximum value should not exceed 255 */
-  min = max = (int) floatFromVal (vch = caseVals);
-  SNPRINTF (buffer, sizeof(buffer), 
-	    "_case_%d_%d",
-	   tree->values.switchVals.swNum,
-	   min);
-  addSet (&labels, newiTempLabel (buffer));
-
-  /* if there is only one case value then no need */
-  if (!(vch = vch->next))
-    return 0;
-
-  while (vch)
+  /* If not all integer numbers are present the algorithm */
+  /* inserts jumps to the default label for the missing numbers */
+  /* and decides later whether it is worth it */
+  min = (int) floatFromVal (vch = caseVals);
+  
+  while (vch->next)
     {
-      if (((t = (int) floatFromVal (vch)) - max) != 1)
-	return 0;
-      SNPRINTF (buffer, sizeof(buffer), 
-		"_case_%d_%d",
-	       tree->values.switchVals.swNum,
-	       t);
-      addSet (&labels, newiTempLabel (buffer));
-      max = t;
       cnt++;
       vch = vch->next;
     }
-
-  /* if the number of case statements <= 2 then */
-  /* it is not economical to create the jump table */
-  /* since two compares are needed for boundary conditions */
-  if ((needRangeCheck && cnt <= 2) || max > (255 / 3))
+  max = (int) floatFromVal (vch);
+  
+  /* Exit if the range is too large to handle with a jump table. */
+  if (1 + max - min > port->jumptableCost.maxCount)
     return 0;
+  
+  switch (getSize (operandType (cond)))
+    {
+    case 1: sizeIndex = 0; break;
+    case 2: sizeIndex = 1; break;
+    case 4: sizeIndex = 2; break;
+    default: return 0;
+    }
+  
+  /* Compute the size cost of the range check and subtraction. */
+  sizeofMinCost = 0;
+  sizeofMaxCost = 0;
+  if (needRangeCheck)
+    {
+      if (!(min==0 && IS_UNSIGNED (cetype)))
+        sizeofMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
+      sizeofMaxCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
+    }
+  if (min)
+    sizeofMinCost += port->jumptableCost.sizeofSubtract;
+  
+  /* If the size cost of handling a non-zero minimum exceeds the */
+  /* cost of extending the range down to zero, then it might be */
+  /* better to extend the range to zero. */
+  if (min > 0 && sizeofMinCost >= (min * port->jumptableCost.sizeofElement))
+    {
+      /* Only extend the jump table if it would still be manageable. */
+      if (1 + max <= port->jumptableCost.maxCount)
+        min = 0;
+    }
+  
+  /* Compute the total size cost of a jump table. */
+  sizeofJumpTable = (1 + max - min) * port->jumptableCost.sizeofElement
+                     + port->jumptableCost.sizeofDispatch
+                     + sizeofMinCost + sizeofMaxCost;
 
+  /* Compute the total size cost of a match & jump sequence */
+  sizeofMatchJump = cnt * port->jumptableCost.sizeofMatchJump[sizeIndex];
+  
+  /* If the size cost of the jump table is uneconomical then exit */
+  if (sizeofMatchJump <  sizeofJumpTable)
+    return 0;
+    
+  /* The jump table is preferable. */
+  
+  /* First, a label for the default or missing cases. */
   if (tree->values.switchVals.swDefault)
     {
-	SNPRINTF (buffer, sizeof(buffer), "_default_%d", tree->values.switchVals.swNum);
+      SNPRINTF (buffer, sizeof(buffer),
+                "_default_%d",
+                tree->values.switchVals.swNum);
     }
   else
     {
-	SNPRINTF (buffer, sizeof(buffer), "_swBrk_%d", tree->values.switchVals.swNum);
+      SNPRINTF (buffer, sizeof(buffer),
+                "_swBrk_%d",
+                tree->values.switchVals.swNum);
     }
-    
-
   falseLabel = newiTempLabel (buffer);
+      
+  /* Build the list of labels for the jump table. */
+  vch = caseVals;
+  t = (int) floatFromVal (vch);
+  for (i=min; i<=max; i++)
+    {
+      if (vch && t==i)
+        {
+          /* Explicit case: make a new label for it. */
+          SNPRINTF (buffer, sizeof(buffer), 
+                    "_case_%d_%d",
+                    tree->values.switchVals.swNum,
+                    i);
+          addSet (&labels, newiTempLabel (buffer));
+          vch = vch->next;
+          if (vch)
+            t = (int) floatFromVal (vch);
+        }
+      else
+        {
+          /* Implicit case: use the default label. */
+          addSet (&labels, falseLabel);
+        }
+    }
 
   /* If cond is volatile, it might change after the boundary  */
   /* conditions are tested to an out of bounds value, causing */
@@ -3546,7 +3607,6 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
       cond = newcond;
     }
 
-  /* so we can create a jumptable */
   /* first we rule out the boundary conditions */
   /* if only optimization says so */
   if (needRangeCheck)

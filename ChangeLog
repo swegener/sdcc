@@ -1,3 +1,19 @@
+2004-09-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/port.h,
+	* src/mcs51/main.c,
+	* src/ds390/main.c,
+	* src/z80/main.c,
+	* src/hc08/main.c,
+	* src/pic/main.c,
+	* src/pic16/main.c,
+	* src/avr/main.c,
+	* src/xa51/main.c
+	* src/SDCCicode.c (geniCodeJumpTable): Better logic to determine if a
+	a jump table is the best form for a switch statement, including
+	automatic insertion of missing cases to make the case range
+	continuous. Developed in collaboration with Frieder Ferlemann.
+
 2004-09-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c (canDefAccResult): multi-byte shift is unsafe for

@@ -870,6 +870,14 @@ PORT ds390_port =
   {
     ds390_emitDebuggerSymbol
   },
+  {
+    255/4,      /* maxCount */
+    4,          /* sizeofElement */
+    {8,12,20},  /* sizeofMatchJump[] */
+    {10,14,22}, /* sizeofRangeCompare[] */
+    4,          /* sizeofSubtract */
+    7,          /* sizeofDispatch */
+  },
   "_",
   _ds390_init,
   _ds390_parseOptions,
@@ -1173,6 +1181,14 @@ PORT tininative_port =
   {
     ds390_emitDebuggerSymbol
   },
+  {
+    255/4,      /* maxCount */
+    4,          /* sizeofElement */
+    {8,12,20},  /* sizeofMatchJump[] */
+    {10,14,22}, /* sizeofRangeCompare[] */
+    4,          /* sizeofSubtract */
+    7,          /* sizeofDispatch */
+  },
   "",
   _tininative_init,
   _ds390_parseOptions,
@@ -1390,6 +1406,14 @@ PORT ds400_port =
   },
   {
     ds390_emitDebuggerSymbol
+  },
+  {
+    255/4,      /* maxCount */
+    4,          /* sizeofElement */
+    {8,12,20},  /* sizeofMatchJump[] */
+    {10,14,22}, /* sizeofRangeCompare[] */
+    4,          /* sizeofSubtract */
+    7,          /* sizeofDispatch */
   },
   "_",
   _ds390_init,

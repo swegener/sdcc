@@ -212,7 +212,18 @@ typedef struct
 	dwarf;
       }
     debugger;
-    
+
+    struct
+      {
+        int maxCount;
+        int sizeofElement;
+        int sizeofMatchJump[3];
+        int sizeofRangeCompare[3];
+        int sizeofSubtract;
+        int sizeofDispatch;
+      }
+    jumptableCost;
+        
 /** Prefix to add to a C function (eg "_") */
     const char *fun_prefix;
 

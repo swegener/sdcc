@@ -1,3 +1,5 @@
+//#define JWK_FIX_SHIFT_BUG
+//#define JWK_FIX_IMPLICIT_CAST
 /*-------------------------------------------------------------------------
   SDCCast.c - source file for parser support & all ast related routines
 
@@ -667,7 +669,24 @@ processParms (ast * func,
       if (IS_INTEGRAL (ftype)
 	  && (getSize (ftype) < (unsigned) INTSIZE))
 	{
+#ifdef JWK_FIX_IMPLICIT_CAST
+	  if (IS_AST_OP(actParm) && 
+	      (actParm->opval.op == LEFT_OP ||
+	       actParm->opval.op == '*' ||
+	       actParm->opval.op == '+' ||
+	       actParm->opval.op == '-') &&
+	      actParm->right) {
+	    // we should cast an operand instead of the result
+	    actParm->decorated = 0;
+	    actParm->left = newNode( CAST, newAst_LINK(newIntLink()),
+					 actParm->left);
+	    actParm = decorateType(actParm);
+	  } else {
+	    newType = newAst_LINK(INTTYPE);
+	  }
+#else
 	  newType = newAst_LINK(INTTYPE);
+#endif
 	}
 
       if (IS_PTR(ftype) && !IS_GENPTR(ftype))
@@ -1959,20 +1978,23 @@ decorateType (ast * tree)
     if (dtr != tree->right)
       tree->right = dtr;
 
-#if 0 // not sure yet if this covers all the cases
+#ifdef JWK_FIX_IMPLICIT_CAST
     if (IS_AST_OP(tree) &&
 	(tree->opval.op == CAST || tree->opval.op == '=') &&
-	getSize(LTYPE(tree)) > getSize(RTYPE(tree))) {
+	(getSize(LTYPE(tree)) > getSize(RTYPE(tree))) &&
+	(getSize(RTYPE(tree)) < INTSIZE)) {
       // this is a cast/assign to a bigger type
-      if (IS_AST_OP(tree->right) && tree->right->right &&
+      if (IS_AST_OP(tree->right) && 
 	  (tree->right->opval.op == LEFT_OP ||
 	   tree->right->opval.op == '*' ||
 	   tree->right->opval.op == '+' ||
-	   tree->right->opval.op == '-')) {
-	// we should cast the operands instead of the result
-	fprintf (stderr, "*** we should promote operands instead of result\n");
-	fprintf (stderr, "(%d = %d op %d)\n", getSize(LTYPE(tree)),
-		 getSize(LTYPE(tree->right)), getSize(RTYPE(tree->right)));
+	   tree->right->opval.op == '-') &&
+	  tree->right->right) {
+	// we should cast an operand instead of the result
+	tree->right->decorated = 0;
+	tree->right->left = newNode( CAST, newAst_LINK(newIntLink()),
+				     tree->right->left);
+	tree->right = decorateType(tree->right);
       }
     }
 #else
@@ -2410,18 +2432,16 @@ decorateType (ast * tree)
 	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
+      TETYPE (tree) = getSpec (TTYPE (tree) =
+			       computeType (LTYPE (tree),
+					    RTYPE (tree)));
+
       /* promote result to int if left & right are char
 	 this will facilitate hardware multiplies 8bit x 8bit = 16bit */
       if (IS_CHAR(LETYPE(tree)) && IS_CHAR(RETYPE(tree))) {
-	TETYPE (tree) = getSpec (TTYPE (tree) =
-				 computeType (LTYPE (tree),
-					      RTYPE (tree)));
 	SPEC_NOUN(TETYPE(tree)) = V_INT;
-      } else {
-	TETYPE (tree) = getSpec (TTYPE (tree) =
-				 computeType (LTYPE (tree),
-					      RTYPE (tree)));
       }
+
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2706,30 +2726,28 @@ decorateType (ast * tree)
 				   tree->opval.val->type);
 	  return tree;
 	}
-#if 0
-      /* a left shift must be done with at least 16bits */
-      if ((tree->opval.op==LEFT_OP) && (getSize(LTYPE(tree))<2)) {
-	// insert a cast
-	if (IS_AST_SYM_VALUE(tree->left) || IS_AST_OP(tree->left)) {
-	  tree->left = 
-	    decorateType (newNode (CAST,
-				   newAst_LINK(copyLinkChain(LTYPE(tree))),
-				   tree->left));
-	  SPEC_NOUN(tree->left->left->ftype)=V_INT;
-	} else {
-	  // must be a literal, we can do it right away
-	  SPEC_NOUN(tree->left->opval.val->type)=V_INT;
-	}
-      }
-#endif
+
       /* if only the right side is a literal & we are
          shifting more than size of the left operand then zero */
       if (IS_LITERAL (RTYPE (tree)) &&
 	  ((unsigned) floatFromVal (valFromType (RETYPE (tree)))) >=
 	  (getSize (LTYPE (tree)) * 8))
 	{
+#ifdef JWK_FIX_SHIFT_BUG
+	  if (tree->opval.op==LEFT_OP ||
+	      (tree->opval.op==RIGHT_OP && SPEC_USIGN(LETYPE(tree)))) {
+	    lineno=tree->lineno;
+	    werror (W_SHIFT_CHANGED,
+		    (tree->opval.op == LEFT_OP ? "left" : "right"));
+	    tree->type = EX_VALUE;
+	    tree->left = tree->right = NULL;
+	    tree->opval.val = constVal ("0");
+	    TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
+	    return tree;
+	  }
+#else
 	    /* if left shift then cast up */
-	    if (tree->opval.op==LEFT_OP) {
+	  if (tree->opval.op==LEFT_OP) {
 		int size = getSize(LTYPE(tree));
 		tree->left = 
 		    decorateType (newNode (CAST,
@@ -2746,6 +2764,7 @@ decorateType (ast * tree)
 		TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
 		return tree;
 	    }
+#endif
 	}
       LRVAL (tree) = RRVAL (tree) = 1;
       if (IS_LITERAL (LTYPE (tree)) && !IS_LITERAL (RTYPE (tree)))

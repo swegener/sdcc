@@ -6,7 +6,7 @@
    on the z80.
 */
 typedef void (*NOARGFUNPTR)(void);
-typedef void (*ONEARGFUNPTR)(int);
+typedef void (*ONEARGFUNPTR)(int) REENTRANT;
 
 int count;
 
@@ -17,7 +17,7 @@ incCount(void)
 }
 
 void
-incBy(int a)
+incBy(int a) REENTRANT
 {
   count += a;
 }

@@ -1413,6 +1413,13 @@ preProcess (char **envp)
 		    preOutName, srcFileName, preArgv);
       if (my_system (buffer))
 	{
+          // @FIX: Dario Vecchio 03-05-2001
+          if (preOutName)
+            {
+              unlink (preOutName);
+              free (preOutName);
+            }
+          // EndFix
 	  exit (1);
 	}
 
@@ -1534,6 +1541,15 @@ main (int argc, char **argv, char **envp)
 
 	  if (fatalError)
 	    {
+              // @FIX: Dario Vecchio 03-05-2001
+              if (preOutName)
+                {
+                  if (yyin && yyin != stdin)
+                    fclose (yyin);
+                  unlink (preOutName);
+                  free (preOutName);
+                }
+              // EndFix
 	      return 1;
 	    }
 	  if (!options.c1mode)
@@ -1545,6 +1561,15 @@ main (int argc, char **argv, char **envp)
 	}
       else
 	{
+          // @FIX: Dario Vecchio 03-05-2001
+          if (preOutName)
+            {
+              if (yyin && yyin != stdin)
+                fclose (yyin);
+              unlink (preOutName);
+              free (preOutName);
+            }
+          // EndFix
 	  return 1;
 	}
 

@@ -1,5 +1,5 @@
-/*-------------------------------------------------------------------------
-   Register Declarations for the Cygnal C8051F000-C8051F017 Processor Range
+/*---------------------------------------------------------------------------
+   Register Declarations for the Cygnal/SiLabs C8051F000-F017 Processor Range
 
    Copyright (C) 2003 - Maarten Brock, sourceforge.brock@dse.nl
 
@@ -16,7 +16,7 @@
    You should have received a copy of the GNU Lesser General Public
    License along with this library; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
--------------------------------------------------------------------------*/
+---------------------------------------------------------------------------*/
 
 #ifndef C8051F000_H
 #define C8051F000_H

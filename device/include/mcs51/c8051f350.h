@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   Register Declarations for the Cygnal C8051F31x Processor Range
+   Register Declarations for the SiLabs C8051F35x Processor Range
 
    Copyright (C) 2004 - Maarten Brock, sourceforge.brock@dse.nl
 
@@ -18,8 +18,8 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 -------------------------------------------------------------------------*/
 
-#ifndef C8051F310_H
-#define C8051F310_H
+#ifndef C8051F350_H
+#define C8051F350_H
 
 
 /*  BYTE Registers  */
@@ -42,15 +42,15 @@ sfr at 0x92 TMR3RLL  ;  /* TIMER 3 CAPTURE REGISTER - LOW BYTE           */
 sfr at 0x93 TMR3RLH  ;  /* TIMER 3 CAPTURE REGISTER - HIGH BYTE          */
 sfr at 0x94 TMR3L    ;  /* TIMER 3 - LOW BYTE                            */
 sfr at 0x95 TMR3H    ;  /* TIMER 3 - HIGH BYTE                           */
+sfr at 0x96 IDA0     ;  /* CURRENT MODE DAC 0                            */
 sfr at 0x98 SCON     ;  /* SERIAL PORT CONTROL                           */
 sfr at 0x98 SCON0    ;  /* SERIAL PORT CONTROL                           */
 sfr at 0x99 SBUF     ;  /* SERIAL PORT BUFFER                            */
 sfr at 0x99 SBUF0    ;  /* SERIAL PORT BUFFER                            */
-sfr at 0x9A CPT1CN   ;  /* COMPARATOR 1 CONTROL                          */
-sfr at 0x9B CPT0CN   ;  /* COMPARATOR 0 CONTROL                          */
-sfr at 0x9C CPT1MD   ;  /* COMPARATOR 1 MODE SELECTION                   */
+sfr at 0x9A ADC0DECL ;  /* ADC DECIMATION LOW                            */
+sfr at 0x9B ADC0DECH ;  /* ADC DECIMATION HIGH                           */
+sfr at 0x9C CPT0CN   ;  /* COMPARATOR 0 CONTROL                          */
 sfr at 0x9D CPT0MD   ;  /* COMPARATOR 0 MODE SELECTION                   */
-sfr at 0x9E CPT1MX   ;  /* COMPARATOR 1 MUX SELECTION                    */
 sfr at 0x9F CPT0MX   ;  /* COMPARATOR 0 MUX SELECTION                    */
 sfr at 0xA0 P2       ;  /* PORT 2                                        */
 sfr at 0xA1 SPI0CFG  ;  /* SPI0 CONFIGURATION                            */
@@ -59,30 +59,33 @@ sfr at 0xA3 SPI0DAT  ;  /* SPI0 DATA                                     */
 sfr at 0xA4 P0MDOUT  ;  /* PORT 0 OUTPUT MODE CONFIGURATION              */
 sfr at 0xA5 P1MDOUT  ;  /* PORT 1 OUTPUT MODE CONFIGURATION              */
 sfr at 0xA6 P2MDOUT  ;  /* PORT 2 OUTPUT MODE CONFIGURATION              */
-sfr at 0xA7 P3MDOUT  ;  /* PORT 3 OUTPUT MODE CONFIGURATION              */
 sfr at 0xA8 IE       ;  /* INTERRUPT ENABLE                              */
 sfr at 0xA9 CLKSEL   ;  /* SYSTEM CLOCK SELECT                           */
 sfr at 0xAA EMI0CN   ;  /* EXTERNAL MEMORY INTERFACE CONTROL             */
 sfr at 0xAA _XPAGE   ;  /* XDATA/PDATA PAGE                              */
-sfr at 0xB0 P3       ;  /* PORT 3                                        */
+sfr at 0xAB ADC0CGL  ;  /* ADC 0 GAIN CALIBRATION LOW                    */
+sfr at 0xAC ADC0CGM  ;  /* ADC 0 GAIN CALIBRATION MIDDLE                 */
+sfr at 0xAD ADC0CGH  ;  /* ADC 0 GAIN CALIBRATION HIGH                   */
 sfr at 0xB1 OSCXCN   ;  /* EXTERNAL OSCILLATOR CONTROL                   */
 sfr at 0xB2 OSCICN   ;  /* INTERNAL OSCILLATOR CONTROL                   */
 sfr at 0xB3 OSCICL   ;  /* INTERNAL OSCILLATOR CALIBRATION               */
 sfr at 0xB6 FLSCL    ;  /* FLASH MEMORY TIMING PRESCALER                 */
 sfr at 0xB7 FLKEY    ;  /* FLASH ACESS LIMIT                             */
 sfr at 0xB8 IP       ;  /* INTERRUPT PRIORITY                            */
-sfr at 0xBA AMX0N    ;  /* ADC 0 MUX NEGATIVE CHANNEL SELECTION          */
-sfr at 0xBB AMX0P    ;  /* ADC 0 MUX POSITIVE CHANNEL SELECTION          */
-sfr at 0xBC ADC0CF   ;  /* ADC 0 CONFIGURATION                           */
-sfr at 0xBD ADC0L    ;  /* ADC 0 DATA WORD LSB                           */
-sfr at 0xBE ADC0H    ;  /* ADC 0 DATA WORD MSB                           */
+sfr at 0xB9 IDA0CN   ;  /* CURRENT MODE DAC 0 - CONTROL                  */
+sfr at 0xBA ADC0COL  ;  /* ADC 0 OFFSET CALIBRATION LOW                  */
+sfr at 0xBB ADC0COM  ;  /* ADC 0 OFFSET CALIBRATION MIDDLE               */
+sfr at 0xBC ADC0COH  ;  /* ADC 0 OFFSET CALIBRATION HIGH                 */
+sfr at 0xBD ADC0BUF  ;  /* ADC 0 BUFFER CONTROL                          */
+sfr at 0xBE CLKMUL   ;  /* CLOCK MULTIPLIER                              */
+sfr at 0xBF ADC0DAC  ;  /* ADC 0 OFFSET DAC                              */
 sfr at 0xC0 SMB0CN   ;  /* SMBUS CONTROL                                 */
 sfr at 0xC1 SMB0CF   ;  /* SMBUS CONFIGURATION                           */
 sfr at 0xC2 SMB0DAT  ;  /* SMBUS DATA                                    */
-sfr at 0xC3 ADC0GTL  ;  /* ADC 0 GREATER-THAN LOW BYTE                   */
-sfr at 0xC4 ADC0GTH  ;  /* ADC 0 GREATER-THAN HIGH BYTE                  */
-sfr at 0xC5 ADC0LTL  ;  /* ADC 0 LESS-THAN LOW BYTE                      */
-sfr at 0xC6 ADC0LTH  ;  /* ADC 0 LESS-THAN HIGH BYTE                     */
+sfr at 0xC3 ADC0L    ;  /* ADC 0 OUTPUT LOW BYTE                         */
+sfr at 0xC4 ADC0M    ;  /* ADC 0 OUTPUT MIDDLE BYTE                      */
+sfr at 0xC5 ADC0H    ;  /* ADC 0 OUTPUT HIGH BYTE                        */
+sfr at 0xC6 ADC0MUX  ;  /* ADC 0 MULTIPLEXER                             */
 sfr at 0xC8 T2CON    ;  /* TIMER 2 CONTROL                               */
 sfr at 0xC8 TMR2CN   ;  /* TIMER 2 CONTROL                               */
 sfr at 0xCA RCAP2L   ;  /* TIMER 2 CAPTURE REGISTER - LOW BYTE           */
@@ -97,45 +100,44 @@ sfr at 0xD0 PSW      ;  /* PROGRAM STATUS WORD                           */
 sfr at 0xD1 REF0CN   ;  /* VOLTAGE REFERENCE 0 CONTROL                   */
 sfr at 0xD4 P0SKIP   ;  /* PORT 0 SKIP                                   */
 sfr at 0xD5 P1SKIP   ;  /* PORT 1 SKIP                                   */
-sfr at 0xD6 P2SKIP   ;  /* PORT 2 SKIP                                   */
+sfr at 0xD7 IDA1CN   ;  /* CURRENT MODE DAC 1 - CONTROL                  */
 sfr at 0xD8 PCA0CN   ;  /* PCA CONTROL                                   */
 sfr at 0xD9 PCA0MD   ;  /* PCA MODE                                      */
 sfr at 0xDA PCA0CPM0 ;  /* PCA MODULE 0 MODE REGISTER                    */
 sfr at 0xDB PCA0CPM1 ;  /* PCA MODULE 1 MODE REGISTER                    */
 sfr at 0xDC PCA0CPM2 ;  /* PCA MODULE 2 MODE REGISTER                    */
-sfr at 0xDD PCA0CPM3 ;  /* PCA MODULE 3 MODE REGISTER                    */
-sfr at 0xDE PCA0CPM4 ;  /* PCA MODULE 4 MODE REGISTER                    */
+sfr at 0xDD IDA1     ;  /* CURRENT MODE DAC 1                            */
 sfr at 0xE0 ACC      ;  /* ACCUMULATOR                                   */
 sfr at 0xE1 XBR0     ;  /* PORT MUX CONFIGURATION REGISTER 0             */
 sfr at 0xE2 XBR1     ;  /* PORT MUX CONFIGURATION REGISTER 1             */
+sfr at 0xE3 PFE0CN   ;  /* PREFETCH ENGINE CONTROL                       */
 sfr at 0xE4 IT01CF   ;  /* INT0/INT1 CONFIGURATION REGISTER              */
 sfr at 0xE4 INT01CF  ;  /* INT0/INT1 CONFIGURATION REGISTER              */
 sfr at 0xE6 EIE1     ;  /* EXTERNAL INTERRUPT ENABLE 1                   */
-sfr at 0xE8 ADC0CN   ;  /* ADC 0 CONTROL                                 */
-sfr at 0xE9 PCA0CPL1 ;  /* PCA CAPTURE 1 LOW                             */
-sfr at 0xEA PCA0CPH1 ;  /* PCA CAPTURE 1 HIGH                            */
-sfr at 0xEB PCA0CPL2 ;  /* PCA CAPTURE 2 LOW                             */
-sfr at 0xEC PCA0CPH2 ;  /* PCA CAPTURE 2 HIGH                            */
-sfr at 0xED PCA0CPL3 ;  /* PCA CAPTURE 3 LOW                             */
-sfr at 0xEE PCA0CPH3 ;  /* PCA CAPTURE 3 HIGH                            */
+sfr at 0xE8 ADC0STA  ;  /* ADC 0 STATUS                                  */
+sfr at 0xE9 PCA0CPL0 ;  /* PCA CAPTURE 0 LOW                             */
+sfr at 0xEA PCA0CPH0 ;  /* PCA CAPTURE 0 HIGH                            */
+sfr at 0xEB PCA0CPL1 ;  /* PCA CAPTURE 1 LOW                             */
+sfr at 0xEC PCA0CPH1 ;  /* PCA CAPTURE 1 HIGH                            */
+sfr at 0xED PCA0CPL2 ;  /* PCA CAPTURE 2 LOW                             */
+sfr at 0xEE PCA0CPH2 ;  /* PCA CAPTURE 2 HIGH                            */
 sfr at 0xEF RSTSRC   ;  /* RESET SOURCE                                  */
 sfr at 0xF0 B        ;  /* B REGISTER                                    */
 sfr at 0xF1 P0MODE   ;  /* PORT 0 INPUT MODE CONFIGURATION               */
 sfr at 0xF1 P0MDIN   ;  /* PORT 0 INPUT MODE CONFIGURATION               */
 sfr at 0xF2 P1MODE   ;  /* PORT 1 INPUT MODE CONFIGURATION               */
 sfr at 0xF2 P1MDIN   ;  /* PORT 1 INPUT MODE CONFIGURATION               */
-sfr at 0xF3 P2MODE   ;  /* PORT 2 INPUT MODE CONFIGURATION               */
-sfr at 0xF3 P2MDIN   ;  /* PORT 2 INPUT MODE CONFIGURATION               */
-sfr at 0xF4 P3MODE   ;  /* PORT 3 INPUT MODE CONFIGURATION               */
-sfr at 0xF4 P3MDIN   ;  /* PORT 3 INPUT MODE CONFIGURATION               */
+sfr at 0xF3 ADC0MD   ;  /* ADC 0 MODE                                    */
+sfr at 0xF4 ADC0CN   ;  /* ADC 0 CONTROL                                 */
 sfr at 0xF6 EIP1     ;  /* EXTERNAL INTERRUPT PRIORITY REGISTER 1        */
+sfr at 0xF7 ADC0CLK  ;  /* ADC 0 CLOCK                                   */
 sfr at 0xF8 SPI0CN   ;  /* SPI0 CONTROL                                  */
 sfr at 0xF9 PCA0L    ;  /* PCA COUNTER LOW                               */
 sfr at 0xFA PCA0H    ;  /* PCA COUNTER HIGH                              */
-sfr at 0xFB PCA0CPL0 ;  /* PCA CAPTURE 0 LOW                             */
-sfr at 0xFC PCA0CPH0 ;  /* PCA CAPTURE 0 HIGH                            */
-sfr at 0xFD PCA0CPL4 ;  /* PCA CAPTURE 4 LOW                             */
-sfr at 0xFE PCA0CPH4 ;  /* PCA CAPTURE 4 HIGH                            */
+sfr at 0xFB ADC0CF   ;  /* ADC 0 CONFIGURATION                           */
+sfr at 0xFC ADC0FL   ;  /* ADC 0 FAST FILTER OUTPUT LOW                  */
+sfr at 0xFD ADC0FM   ;  /* ADC 0 FAST FILTER OUTPUT MIDDLE               */
+sfr at 0xFE ADC0FH   ;  /* ADC 0 FAST FILTER OUTPUT HIGH                 */
 sfr at 0xFF VDM0CN   ;  /* VDD MONITOR CONTROL                           */
 
 
@@ -208,16 +210,6 @@ sbit at 0xAD ET2     ;  /* IE.5 - TIMER 2 INTERRUPT ENABLE               */
 sbit at 0xAE ESPI0   ;  /* IE.6 - SPI0 INTERRUPT ENABLE                  */
 sbit at 0xAF EA      ;  /* IE.7 - GLOBAL INTERRUPT ENABLE                */
 
-/*  P3  0xB0 */
-sbit at 0xB0 P3_0    ;
-sbit at 0xB1 P3_1    ;
-sbit at 0xB2 P3_2    ;
-sbit at 0xB3 P3_3    ;
-sbit at 0xB4 P3_4    ;
-sbit at 0xB5 P3_5    ;
-sbit at 0xB6 P3_6    ;
-sbit at 0xB7 P3_7    ;
-
 /*  IP  0xB8 */
 sbit at 0xB8 PX0     ;  /* IP.0 - EXTERNAL INTERRUPT 0 PRIORITY          */
 sbit at 0xB9 PT0     ;  /* IP.1 - TIMER 0 PRIORITY                       */
@@ -242,6 +234,7 @@ sbit at 0xC7 MASTER  ;  /* SMB0CN.7 - SMBUS 0 MASTER/SLAVE INDICATOR     */
 sbit at 0xC8 T2XCLK  ;  /* TMR2CN.0 - TIMER 2 EXTERNAL CLOCK SELECT      */
 sbit at 0xCA TR2     ;  /* TMR2CN.2 - TIMER 2 ON/OFF CONTROL             */
 sbit at 0xCB T2SPLIT ;  /* TMR2CN.3 - TIMER 2 SPLIT MODE ENABLE          */
+sbit at 0xCD TF2CEN  ;  /* TMR2CN.5 - TIMER 2 LOW-FREQ OSC CAPTURE ENABLE*/
 sbit at 0xCD TF2LEN  ;  /* TMR2CN.5 - TIMER 2 LOW BYTE INTERRUPT ENABLE  */
 sbit at 0xCE TF2L    ;  /* TMR2CN.6 - TIMER 2 LOW BYTE OVERFLOW FLAG     */
 sbit at 0xCF TF2     ;  /* TMR2CN.7 - TIMER 2 OVERFLOW FLAG              */
@@ -261,20 +254,18 @@ sbit at 0xD7 CY      ;  /* PSW.7 - CARRY FLAG                            */
 sbit at 0xD8 CCF0    ;  /* PCA0CN.0 - PCA MODULE 0 CAPTURE/COMPARE FLAG  */
 sbit at 0xD9 CCF1    ;  /* PCA0CN.1 - PCA MODULE 1 CAPTURE/COMPARE FLAG  */
 sbit at 0xDA CCF2    ;  /* PCA0CN.2 - PCA MODULE 2 CAPTURE/COMPARE FLAG  */
-sbit at 0xDB CCF3    ;  /* PCA0CN.3 - PCA MODULE 3 CAPTURE/COMPARE FLAG  */
-sbit at 0xDC CCF4    ;  /* PCA0CN.4 - PCA MODULE 4 CAPTURE/COMPARE FLAG  */
 sbit at 0xDE CR      ;  /* PCA0CN.6 - PCA COUNTER/TIMER RUN CONTROL      */
 sbit at 0xDF CF      ;  /* PCA0CN.7 - PCA COUNTER/TIMER OVERFLOW FLAG    */
 
-/*  ADC0CN  0xE8 */
-sbit at 0xE8 AD0CM0  ;  /* ADC0CN.0 - ADC 0 START OF CONV. MODE BIT 0    */
-sbit at 0xE9 AD0CM1  ;  /* ADC0CN.1 - ADC 0 START OF CONV. MODE BIT 1    */
-sbit at 0xEA AD0CM2  ;  /* ADC0CN.2 - ADC 0 START OF CONV. MODE BIT 2    */
-sbit at 0xEB AD0WINT ;  /* ADC0CN.3 - ADC 0 WINDOW COMPARE INT. FLAG     */
-sbit at 0xEC AD0BUSY ;  /* ADC0CN.4 - ADC 0 BUSY FLAG                    */
+/*  ADC0STA  0xE8 */
+sbit at 0xE8 AD0OVR  ;  /* ADC0CN.0 - ADC 0 OVERRUN FLAG                 */
+sbit at 0xE9 AD0ERR  ;  /* ADC0CN.1 - ADC 0 ERROR FLAG                   */
+sbit at 0xEA AD0CALC ;  /* ADC0CN.2 - ADC 0 CALIBRATION COMPLETE FLAG    */
+sbit at 0xEB AD0FFC  ;  /* ADC0CN.3 - ADC 0 FAST FILTER CLIP FLAG        */
+sbit at 0xEC AD0S3C  ;  /* ADC0CN.4 - ADC 0 SINC3 FILTER CLIP FLAG       */
 sbit at 0xED AD0INT  ;  /* ADC0CN.5 - ADC 0 CONV. COMPLETE INT. FLAG     */
-sbit at 0xEE AD0TM   ;  /* ADC0CN.6 - ADC 0 TRACK MODE                   */
-sbit at 0xEF AD0EN   ;  /* ADC0CN.7 - ADC 0 ENABLE                       */
+sbit at 0xEE AD0CBSY ;  /* ADC0CN.6 - ADC 0 CALIBRATION IN PROGRESS FLAG */
+sbit at 0xEF AD0BUSY ;  /* ADC0CN.7 - ADC 0 CONVERSION IN PROGRESS FLAG  */
 
 /*  SPI0CN  0xF8 */
 sbit at 0xF8 SPIEN   ;  /* SPI0CN.0 - SPI0 ENABLE                        */
@@ -295,7 +286,6 @@ sbit at 0xFF SPIF    ;  /* SPI0CN.7 - SPI0 INTERRUPT FLAG                */
 #define PSWE              0x01    /* PSCTL                               */
 #define PSEE              0x02    /* PSCTL                               */
 #define ECP0              0x20    /* EIE1                                */
-#define ECP1              0x40    /* EIE1                                */
 #define PORSF             0x02    /* RSTSRC                              */
 #define SWRSF             0x10    /* RSTSRC                              */
 #define ECCF              0x01    /* PCA0CPMn                            */
@@ -310,7 +300,5 @@ sbit at 0xFF SPIF    ;  /* SPI0CN.7 - SPI0 INTERRUPT FLAG                */
 #define CP0OEN            0x10    /* XBR0                                */
 #define CP0AE             0x20    /* XBR0                                */
 #define CP0AOEN           0x20    /* XBR0                                */
-#define CP1E              0x40    /* XBR0                                */
-#define CP1AE             0x80    /* XBR0                                */
 
 #endif

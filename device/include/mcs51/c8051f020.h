@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   Register Declarations for the Cygnal C8051F02x Processor Range
+   Register Declarations for the Cygnal/SiLabs C8051F02x Processor Range
 
    Copyright (C) 2004 - Maarten Brock, sourceforge.brock@dse.nl
 

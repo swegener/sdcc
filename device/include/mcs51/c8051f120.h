@@ -1,5 +1,5 @@
-/*-------------------------------------------------------------------------
-   Register Declarations for the Cygnal C8051F12x Processor Range
+/*---------------------------------------------------------------------------
+   Register Declarations for the Cygnal/SiLabs C8051F12x-F13x Processor Range
 
    Copyright (C) 2003 - Maarten Brock, sourceforge.brock@dse.nl
 
@@ -16,7 +16,7 @@
    You should have received a copy of the GNU Lesser General Public
    License along with this library; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
--------------------------------------------------------------------------*/
+---------------------------------------------------------------------------*/
 
 #ifndef C8051F120_H
 #define C8051F120_H
@@ -154,8 +154,9 @@ sfr at 0xCA RCAP4L   ;  /* TIMER 4 CAPTURE REGISTER - LOW BYTE           */
 sfr at 0xCB RCAP4H   ;  /* TIMER 4 CAPTURE REGISTER - HIGH BYTE          */
 sfr at 0xCC TMR4L    ;  /* TIMER 4 - LOW BYTE                            */
 sfr at 0xCD TMR4H    ;  /* TIMER 4 - HIGH BYTE                           */
+sfr at 0xE8 ADC2CN   ;  /* ADC 2 CONTROL                                 */
 
-/*  Page 0x02 */
+/*  Page 0x03 */
 sfr at 0x91 MAC0BL   ;  /* MAC0 B Register Low Byte                      */
 sfr at 0x92 MAC0BH   ;  /* MAC0 B Register High Byte                     */
 sfr at 0x93 MAC0ACC0 ;  /* MAC0 Accumulator Byte 0 (LSB)                 */
@@ -200,7 +201,6 @@ sfr at 0xD8 P5       ;  /* PORT 5                                        */
 sfr at 0xE1 XBR0     ;  /* CROSSBAR CONFIGURATION REGISTER 0             */
 sfr at 0xE2 XBR1     ;  /* CROSSBAR CONFIGURATION REGISTER 1             */
 sfr at 0xE3 XBR2     ;  /* CROSSBAR CONFIGURATION REGISTER 2             */
-sfr at 0xE8 ADC2CN   ;  /* ADC 2 CONTROL                                 */
 sfr at 0xE8 P6       ;  /* PORT 6                                        */
 sfr at 0xF8 P7       ;  /* PORT 7                                        */
 

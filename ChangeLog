@@ -1,3 +1,8 @@
+2003-09-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (structElemType): fixed bug #808291 (members
+	of const struct should be treated as if const themselves)
+
 2003-09-18  Bernhard Held <bernhard@bernhardheld.de>
 	* src/SDCCval.c (valPlus, valMinus): fixed bug #808337
 

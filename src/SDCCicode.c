@@ -2741,13 +2741,9 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
       pval = geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
     }
 
-  /* if register arg then make it a send */
-  if (((argVals->sym && IS_REGPARM (argVals->sym->etype)) ||
-       IS_REGPARM (parms->etype)) && !IFFUNC_HASVARARGS(func->type))
-    //!DECL_HASVARARGS(func->type) && 
-    //!options.stackAuto &&
-    //!IS_RENT(func->etype) &&
-    //IS_REGPARM (argVals->sym->etype))
+  /* if register parm then make it a send */
+  if ((parms->argSym && IS_REGPARM(parms->argSym->etype)) ||
+      (IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(func->type)))
     {
       ic = newiCode (SEND, pval, NULL);
       ADDTOCHAIN (ic);

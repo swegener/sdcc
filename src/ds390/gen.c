@@ -9263,6 +9263,7 @@ genArrayInit (iCode * ic)
     int         elementSize = 0, eIndex;
     unsigned    val, lastVal;
     sym_link    *type;
+    operand     *left=IC_LEFT(ic);
     
     D (emitcode (";", "genArrayInit "););
 
@@ -9276,9 +9277,17 @@ genArrayInit (iCode * ic)
     }
     else if (AOP_TYPE(IC_LEFT(ic)) != AOP_DPTR)
     {
-	werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		"Unexpected operand to genArrayInit.\n");
-	exit(1);
+#if 0
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	      "Unexpected operand to genArrayInit.\n");
+      exit(1);
+#else
+      // a regression because of SDCCcse.c:1.52
+      emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
+      emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE, TRUE));
+      if (options.model == MODEL_FLAT24)
+	emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
+#endif
     }
     
     type = operandType(IC_LEFT(ic));

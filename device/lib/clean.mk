@@ -6,7 +6,7 @@ clean:
 	rm -f *core *[%~] *.[oa] *.rel *.lst *.sym *.asm *.ihx *.dump* *.cdb
 	rm -f .[a-z]*~
 	rm -f *.dump*
-	rm -r build
+	rm -rf build
 	for model in $(MODELS); do \
 	  rm -rf $$model; \
 	done

@@ -56,6 +56,7 @@ SIMULATE = simulate
 # List the C files to be test here:
 SRC = b.c \
 	add.c \
+	add2.c \
 	bool1.c \
 	call1.c \
 	compare.c \

@@ -185,6 +185,18 @@ void c_abcd(void)
   if(aint0 == 0x00cd)
     failures++;
 
+  if(aint0 == 0x05cd)
+    failures++;
+
+  if(aint0 == 0xab05)
+    failures++;
+
+  if(aint0 == 0xab01)
+    failures++;
+
+  if(aint0 == 0x01cd)
+    failures++;
+
   if(aint0 == 0x1234abcd)
     failures++;
 

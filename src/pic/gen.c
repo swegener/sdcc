@@ -3805,7 +3805,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 		    emitpcode(POC_MOVFW,popGet(AOP(left),offset,FALSE,FALSE));
 		    emitpcode(POC_XORLW,popGetLit(l));
 		    emitpcode(POC_MOVLW,popGetLit(h));
-		    emitSKPZ;
+		    emitSKPNZ;
 		    emitpcode(POC_XORFW,popGet(AOP(left),offset+1,FALSE,FALSE));
 /*
 		    pic14_emitcode("movf","%s,w",aopGet(AOP(left),offset,FALSE,FALSE));

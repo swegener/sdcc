@@ -1,3 +1,8 @@
+2003-01-22  Bernhard Held <bernhard@bernhardheld.de>
+
+	* as/z80/string.h: disable this header for gcc 3.2
+	* support/makebin/makebin.c: #include <string.h> for gcc 3.2
+
 2003-01-19  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (linkEdit): rename mem and map files even in case of failure

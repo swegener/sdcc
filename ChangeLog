@@ -1,3 +1,13 @@
+2003-03-12    <johan@balder>
+
+	* src/SDCCBBlock.h: more LRH debugging junk
+	* src/SDCCcflow.h: more LRH debugging junk
+	* src/SDCCloop.c: more LRH debugging junk
+	* src/SDCC.y (struct_declaration): fixed bug #697590
+	* src/SDCCsymt.[hc] (cloneSpec): NEVER EVER use this again
+	* src/ds390/gen.c (aopForRemat): fixed bug #700031
+	* src/SDCCglue.c (emitStaticSeg): fixed bug #700797
+
 2003-03-11 Kevin Vigor <kevin@vigor.nu>
 	* src/SDCCpeeph.c: quit being lazy and made proper fix (peephole
 	test function names must now match exactly).

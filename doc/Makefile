@@ -25,7 +25,7 @@ $(TSS).html: $(TSS).tex
 %.txt: %.lyx
 	lyx -e text $<
 
-%.pdf: %.dvi
+%.pdf: %.tex %.dvi
 	which pdflatex > /dev/null && pdflatex $* || dvipdf $*
 
 %.dvi: %.tex

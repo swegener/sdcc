@@ -333,7 +333,7 @@ static asmop *newAsmop (short type)
 /*-----------------------------------------------------------------*/
 /* aopForSym - for a true symbol                                   */
 /*-----------------------------------------------------------------*/
-static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
+static asmop *aopForSym (iCode *ic,symbol *sym,bool result, bool requires_a)
 {
     asmop *aop;
     memmap *space= SPEC_OCLS(sym->etype);
@@ -359,18 +359,17 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
         return aop;
     }
 
-#if 0
     if (IS_GB) {
 	/* if it is in direct space */
-	if (IN_DIRSPACE(space)) {
-	    sym->aop = aop = newAsmop (AOP_DIR);
+	printf("sname %s: regsp %u\n", space->sname, space->regsp);
+	if (IN_REGSP(space) && !requires_a) {
+	    sym->aop = aop = newAsmop (AOP_SFR);
 	    aop->aopu.aop_dir = sym->rname ;
 	    aop->size = getSize(sym->type);
-	    emitcode("", "; AOP_DIR for %s", sym->rname);
+	    emitcode("", "; AOP_SFR for %s", sym->rname);
 	    return aop;
 	}
     }
-#endif
 
     /* only remaining is far space */
     /* in which case DPTR gets the address */
@@ -506,12 +505,16 @@ bool sameRegs (asmop *aop1, asmop *aop2 )
 {
     int i;
 
-    if (aop1 == aop2)
-        return TRUE ;
+    if (aop1->type == AOP_SFR ||
+	aop2->type == AOP_SFR)
+	return FALSE;
+
+    if (aop1 == aop2) 
+        return TRUE;
 
     if (aop1->type != AOP_REG ||
         aop2->type != AOP_REG )
-        return FALSE ;
+        return FALSE;
 
     if (aop1->size != aop2->size)
         return FALSE ;
@@ -527,7 +530,7 @@ bool sameRegs (asmop *aop1, asmop *aop2 )
 /*-----------------------------------------------------------------*/
 /* aopOp - allocates an asmop for an operand  :                    */
 /*-----------------------------------------------------------------*/
-static void aopOp (operand *op, iCode *ic, bool result)
+static void aopOp (operand *op, iCode *ic, bool result, bool requires_a)
 {
     asmop *aop;
     symbol *sym;
@@ -556,7 +559,7 @@ static void aopOp (operand *op, iCode *ic, bool result)
 
     /* if this is a true symbol */
     if (IS_TRUE_SYMOP(op)) {    
-        op->aop = aopForSym(ic,OP_SYMBOL(op),result);
+        op->aop = aopForSym(ic,OP_SYMBOL(op),result, requires_a);
         return ;
     }
 
@@ -609,7 +612,7 @@ static void aopOp (operand *op, iCode *ic, bool result)
 
         /* else spill location  */
         sym->aop = op->aop = aop = 
-                                  aopForSym(ic,sym->usl.spillLoc,result);
+                                  aopForSym(ic,sym->usl.spillLoc,result, requires_a);
         aop->size = getSize(sym->type);
         return;
     }
@@ -859,6 +862,11 @@ static void setupPair(PAIR_ID pairId, asmop *aop, int offset)
     _G.pairs[pairId].last_type = aop->type;
 }
 
+static void emitIntLabel(int key)
+{
+    emit2("!tlabeldef", key);
+}
+
 static void emitLabel(int key)
 {
     emit2("!tlabeldef", key);
@@ -898,14 +906,20 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	
     case AOP_DIR:
 	wassert(IS_GB);
-	/* PENDING: for re-target: currently unsupported. */
-	wassert(0);
 	emitcode("ld", "a,(%s+%d) ; x", aop->aopu.aop_dir, offset);
 	sprintf(s, "a");
 	ALLOC_ATOMIC(rs,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
 	
+    case AOP_SFR:
+	wassert(IS_GB);
+	emitcode("ldh", "a,(%s+%d) ; x", aop->aopu.aop_dir, offset);
+	sprintf(s, "a");
+	ALLOC_ATOMIC(rs,strlen(s)+1);
+	strcpy(rs,s);   
+	return rs;
+
     case AOP_REG:
 	return aop->aopu.aop_reg[offset]->name;
 
@@ -1002,10 +1016,16 @@ static void aopPut (asmop *aop, char *s, int offset)
     case AOP_DIR:
 	/* Direct.  Hmmm. */
 	wassert(IS_GB);
-	/* Currently unsupported */
-	wassert(0);
-	emitcode("ld", "a,%s", s);
+	if (strcmp(s, "a"))
+	    emitcode("ld", "a,%s", s);
 	emitcode("ld", "(%s+%d),a", aop->aopu.aop_dir, offset);
+	break;
+	
+    case AOP_SFR:
+	wassert(IS_GB);
+	if (strcmp(s, "a"))
+	    emitcode("ld", "a,%s", s);
+	emitcode("ldh", "(%s+%d),a", aop->aopu.aop_dir, offset);
 	break;
 	
     case AOP_REG:
@@ -1201,8 +1221,8 @@ static void genNot (iCode *ic)
     link *optype = operandType(IC_LEFT(ic));
 
     /* assign asmOps to operand & result */
-    aopOp (IC_LEFT(ic),ic,FALSE);
-    aopOp (IC_RESULT(ic),ic,TRUE);
+    aopOp (IC_LEFT(ic),ic,FALSE, TRUE);
+    aopOp (IC_RESULT(ic),ic,TRUE, FALSE);
 
     /* if in bit space then a special case */
     if (AOP_TYPE(IC_LEFT(ic)) == AOP_CRY) {
@@ -1238,8 +1258,8 @@ static void genCpl (iCode *ic)
 
 
     /* assign asmOps to operand & result */
-    aopOp (IC_LEFT(ic),ic,FALSE);
-    aopOp (IC_RESULT(ic),ic,TRUE);
+    aopOp (IC_LEFT(ic),ic,FALSE, FALSE);
+    aopOp (IC_RESULT(ic),ic,TRUE, FALSE);
 
     /* if both are in bit space then 
     a special case */
@@ -1270,8 +1290,8 @@ static void genUminus (iCode *ic)
     link *optype, *rtype;
 
     /* assign asmops */
-    aopOp(IC_LEFT(ic),ic,FALSE);
-    aopOp(IC_RESULT(ic),ic,TRUE);
+    aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
+    aopOp(IC_RESULT(ic),ic,TRUE, FALSE);
 
     /* if both in bit space then special
     case */
@@ -1363,7 +1383,7 @@ static void genIpush (iCode *ic)
         if (OP_SYMBOL(IC_LEFT(ic))->isspilt)
             return ;
 
-        aopOp(IC_LEFT(ic),ic,FALSE);
+        aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
         size = AOP_SIZE(IC_LEFT(ic));
         /* push it on the stack */
 	if (isPair(AOP(IC_LEFT(ic)))) {
@@ -1388,7 +1408,7 @@ static void genIpush (iCode *ic)
        at this point? */
 
     /* then do the push */
-    aopOp(IC_LEFT(ic),ic,FALSE);
+    aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
 
     size = AOP_SIZE(IC_LEFT(ic));
 
@@ -1429,7 +1449,7 @@ static void genIpop (iCode *ic)
     if (OP_SYMBOL(IC_LEFT(ic))->isspilt)
         return ;
 
-    aopOp(IC_LEFT(ic),ic,FALSE);
+    aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
     size = AOP_SIZE(IC_LEFT(ic));
     offset = (size-1);
     if (isPair(AOP(IC_LEFT(ic)))) {
@@ -1462,7 +1482,7 @@ static void emitCall (iCode *ic, bool ispcall)
 	for (sic = setFirstItem(sendSet) ; sic ; 
 	     sic = setNextItem(sendSet)) {
 	    int size, offset = 0;
-	    aopOp(IC_LEFT(sic),sic,FALSE);
+	    aopOp(IC_LEFT(sic),sic,FALSE, FALSE);
 	    size = AOP_SIZE(IC_LEFT(sic));
 	    while (size--) {
 		char *l = aopGet(AOP(IC_LEFT(sic)),offset,
@@ -1479,7 +1499,7 @@ static void emitCall (iCode *ic, bool ispcall)
     }
 
     if (ispcall) {
-	aopOp(IC_LEFT(ic),ic,FALSE);
+	aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
 
 	if (isLitWord(AOP(IC_LEFT(ic)))) {
 	    emitcode("", "; Special case where the pCall is to a constant");
@@ -1515,7 +1535,7 @@ static void emitCall (iCode *ic, bool ispcall)
         IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
 
         accInUse++;
-        aopOp(IC_RESULT(ic),ic,FALSE);
+        aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
         accInUse--;
 
 	assignResultValue(IC_RESULT(ic));
@@ -1678,7 +1698,7 @@ static void genRet (iCode *ic)
     
     /* we have something to return then
        move the return value into place */
-    aopOp(IC_LEFT(ic),ic,FALSE);
+    aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
     size = AOP_SIZE(IC_LEFT(ic));
     
     if ((size == 2) && ((l = aopGetWord(AOP(IC_LEFT(ic)), 0)))) {
@@ -1793,7 +1813,7 @@ static bool genPlusIncr (iCode *ic)
 	symbol *tlbl = NULL;
 	while (size--) {
 	    if (offset) {
-		emitLabel(tlbl->key+100);
+		emitIntLabel(tlbl->key+100);
 	    }
 	    emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)), offset++, FALSE));
 	    if (size) {
@@ -1815,7 +1835,6 @@ static bool genPlusIncr (iCode *ic)
     if (sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
 	while (icount--)
 	    emitcode ("inc","%s",aopGet(AOP(IC_LEFT(ic)),0, FALSE));
-	
         return TRUE ;
     }
     
@@ -1849,9 +1868,9 @@ static void genPlus (iCode *ic)
 
     /* special cases :- */
 
-    aopOp (IC_LEFT(ic),ic,FALSE);
-    aopOp (IC_RIGHT(ic),ic,FALSE);
-    aopOp (IC_RESULT(ic),ic,TRUE);
+    aopOp (IC_LEFT(ic),ic,FALSE, FALSE);
+    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE);
+    aopOp (IC_RESULT(ic),ic,TRUE, FALSE);
 
     /* Swap the left and right operands if:
 
@@ -1923,13 +1942,13 @@ static void genPlus (iCode *ic)
 		emitcode("adc","a,%s",
 			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
 	} else {
-	    MOVA(aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
+	    MOVA(aopGet(AOP(IC_LEFT(ic)),offset,FALSE));
 	    if(offset == 0)
 		emitcode("add","a,%s",
-			 aopGet(AOP(IC_LEFT(ic)),offset,FALSE));
+			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
 	    else
 		emitcode("adc","a,%s",
-			 aopGet(AOP(IC_LEFT(ic)),offset,FALSE));
+			 aopGet(AOP(IC_RIGHT(ic)),offset,FALSE));
 	}
         aopPut(AOP(IC_RESULT(ic)),"a",offset++);      
     }
@@ -2032,9 +2051,9 @@ static void genMinus (iCode *ic)
     int size, offset = 0;
     unsigned long lit = 0L;
 
-    aopOp (IC_LEFT(ic),ic,FALSE);
-    aopOp (IC_RIGHT(ic),ic,FALSE);
-    aopOp (IC_RESULT(ic),ic,TRUE);
+    aopOp (IC_LEFT(ic),ic,FALSE, FALSE);
+    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE);
+    aopOp (IC_RESULT(ic),ic,TRUE, FALSE);
 
     /* special cases :- */
     /* if both left & right are in bit space */
@@ -2303,9 +2322,9 @@ static void genCmpGt (iCode *ic, iCode *ifx)
     retype =getSpec(operandType(right));
     sign =  !(SPEC_USIGN(letype) | SPEC_USIGN(retype));
     /* assign the amsops */
-    aopOp (left,ic,FALSE);
-    aopOp (right,ic,FALSE);
-    aopOp (result,ic,TRUE);
+    aopOp (left,ic,FALSE, FALSE);
+    aopOp (right,ic,FALSE, FALSE);
+    aopOp (result,ic,TRUE, FALSE);
 
     genCmp(right, left, result, ifx, sign);
 
@@ -2332,9 +2351,9 @@ static void genCmpLt (iCode *ic, iCode *ifx)
     sign =  !(SPEC_USIGN(letype) | SPEC_USIGN(retype));
 
     /* assign the amsops */
-    aopOp (left,ic,FALSE);
-    aopOp (right,ic,FALSE);
-    aopOp (result,ic,TRUE);
+    aopOp (left,ic,FALSE, FALSE);
+    aopOp (right,ic,FALSE, FALSE);
+    aopOp (result,ic,TRUE, FALSE);
 
     genCmp(left, right, result, ifx, sign);
 
@@ -2444,9 +2463,9 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 {
     operand *left, *right, *result;
 
-    aopOp((left=IC_LEFT(ic)),ic,FALSE);
-    aopOp((right=IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE);
+    aopOp((left=IC_LEFT(ic)),ic,FALSE, FALSE);
+    aopOp((right=IC_RIGHT(ic)),ic,FALSE, FALSE);
+    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
 
     /* Swap operands if it makes the operation easier. ie if:
        1.  Left is a literal.
@@ -2542,9 +2561,9 @@ static void genAndOp (iCode *ic)
     /* note here that && operations that are in an if statement are
        taken away by backPatchLabels only those used in arthmetic
        operations remain */
-    aopOp((left=IC_LEFT(ic)),ic,FALSE);
-    aopOp((right=IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,FALSE);
+    aopOp((left=IC_LEFT(ic)),ic,FALSE, TRUE);
+    aopOp((right=IC_RIGHT(ic)),ic,FALSE, TRUE);
+    aopOp((result=IC_RESULT(ic)),ic,FALSE, FALSE);
 
     /* if both are bit variables */
     if (AOP_TYPE(left) == AOP_CRY &&
@@ -2575,9 +2594,9 @@ static void genOrOp (iCode *ic)
     /* note here that || operations that are in an
        if statement are taken away by backPatchLabels
        only those used in arthmetic operations remain */
-    aopOp((left=IC_LEFT(ic)),ic,FALSE);
-    aopOp((right=IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,FALSE);
+    aopOp((left=IC_LEFT(ic)),ic,FALSE, TRUE);
+    aopOp((right=IC_RIGHT(ic)),ic,FALSE, TRUE);
+    aopOp((result=IC_RESULT(ic)),ic,FALSE, FALSE);
 
     /* if both are bit variables */
     if (AOP_TYPE(left) == AOP_CRY &&
@@ -2647,9 +2666,9 @@ static void genAnd (iCode *ic, iCode *ifx)
     unsigned long lit = 0L;
     int bytelit = 0;
 
-    aopOp((left = IC_LEFT(ic)),ic,FALSE);
-    aopOp((right= IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE);
+    aopOp((left = IC_LEFT(ic)),ic,FALSE, FALSE);
+    aopOp((right= IC_RIGHT(ic)),ic,FALSE, FALSE);
+    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
 
 #ifdef DEBUG_TYPE
     emitcode("","; Type res[%d] = l[%d]&r[%d]",
@@ -2771,7 +2790,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 			MOVA(aopGet(AOP(left),offset,FALSE));
 			emitcode("and","a,%s",
 				 aopGet(AOP(right),offset,FALSE));
-			emitcode("ld", "%s,a", aopGet(AOP(left),offset,FALSE));
+			aopPut(AOP(left), "a", offset);
 		    }
 		}
 
@@ -2783,7 +2802,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 		    MOVA(aopGet(AOP(left),offset,FALSE));
 		    emitcode("and","a,%s",
 			     aopGet(AOP(right),offset,FALSE));
-		    emitcode("ld", "%s,a", aopGet(AOP(left),offset,FALSE));
+		    aopPut(AOP(left), "a", offset);
 		}
             }
         }
@@ -2836,9 +2855,9 @@ static void genOr (iCode *ic, iCode *ifx)
     int size, offset=0;
     unsigned long lit = 0L;
 
-    aopOp((left = IC_LEFT(ic)),ic,FALSE);
-    aopOp((right= IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE);
+    aopOp((left = IC_LEFT(ic)),ic,FALSE, FALSE);
+    aopOp((right= IC_RIGHT(ic)),ic,FALSE, FALSE);
+    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
 
 #if 1
     emitcode("","; Type res[%d] = l[%d]&r[%d]",
@@ -2895,19 +2914,19 @@ static void genOr (iCode *ic, iCode *ifx)
                 if(((lit >> (offset*8)) & 0x0FFL) == 0x00L)
                     continue;
                 else {
-		    MOVA(aopGet(AOP(right),offset,FALSE));
-		    emitcode("or","a,%s; 5",
-			     aopGet(AOP(left),offset,FALSE));
-		    aopPut(AOP(result),"a ; 8", offset);
+		    MOVA(aopGet(AOP(left),offset,FALSE));
+		    emitcode("or","a,%s",
+			     aopGet(AOP(right),offset,FALSE));
+		    aopPut(AOP(result),"a", offset);
 		}
             } else {
 		if (AOP_TYPE(left) == AOP_ACC) 
-		    emitcode("or","a,%s ; 6",aopGet(AOP(right),offset,FALSE));
+		    emitcode("or","a,%s",aopGet(AOP(right),offset,FALSE));
 		else {		    
-		    MOVA(aopGet(AOP(right),offset,FALSE));
-		    emitcode("or","a,%s ; 7",
-			     aopGet(AOP(left),offset,FALSE));
-		    aopPut(AOP(result),"a ; 8", offset);
+		    MOVA(aopGet(AOP(left),offset,FALSE));
+		    emitcode("or","a,%s",
+			     aopGet(AOP(right),offset,FALSE));
+		    aopPut(AOP(result),"a", offset);
 		}
             }
         }
@@ -2957,9 +2976,9 @@ static void genXor (iCode *ic, iCode *ifx)
     int size, offset=0;
     unsigned long lit = 0L;
 
-    aopOp((left = IC_LEFT(ic)),ic,FALSE);
-    aopOp((right= IC_RIGHT(ic)),ic,FALSE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE);
+    aopOp((left = IC_LEFT(ic)),ic,FALSE, FALSE);
+    aopOp((right= IC_RIGHT(ic)),ic,FALSE, FALSE);
+    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
 
     /* if left is a literal & right is not then exchange them */
     if ((AOP_TYPE(left) == AOP_LIT && AOP_TYPE(right) != AOP_LIT) ||
@@ -3337,8 +3356,8 @@ static void genLeftShiftLiteral (operand *left,
 
     freeAsmop(right,NULL,ic);
 
-    aopOp(left,ic,FALSE);
-    aopOp(result,ic,FALSE);
+    aopOp(left,ic,FALSE, FALSE);
+    aopOp(result,ic,FALSE, FALSE);
 
     size = getSize(operandType(result));
 
@@ -3388,7 +3407,7 @@ static void genLeftShift (iCode *ic)
     left  = IC_LEFT(ic);
     result = IC_RESULT(ic);
 
-    aopOp(right,ic,FALSE);
+    aopOp(right,ic,FALSE, FALSE);
 
     /* if the shift count is known then do it 
     as efficiently as possible */
@@ -3404,8 +3423,8 @@ static void genLeftShift (iCode *ic)
     emitcode("ld","a,%s",aopGet(AOP(right),0,FALSE));
     emitcode("inc","a");
     freeAsmop (right,NULL,ic);
-    aopOp(left,ic,FALSE);
-    aopOp(result,ic,FALSE);
+    aopOp(left,ic,FALSE, FALSE);
+    aopOp(result,ic,FALSE, FALSE);
 
     /* now move the left to the result if they are not the
        same */
@@ -3553,8 +3572,8 @@ static void genRightShiftLiteral (operand *left,
 
     freeAsmop(right,NULL,ic);
 
-    aopOp(left,ic,FALSE);
-    aopOp(result,ic,FALSE);
+    aopOp(left,ic,FALSE, FALSE);
+    aopOp(result,ic,FALSE, FALSE);
 
     size = getSize(operandType(result));
 
@@ -3619,7 +3638,7 @@ static void genRightShift (iCode *ic)
     left  = IC_LEFT(ic);
     result = IC_RESULT(ic);
 
-    aopOp(right,ic,FALSE);
+    aopOp(right,ic,FALSE, FALSE);
 
     /* if the shift count is known then do it 
     as efficiently as possible */
@@ -3628,8 +3647,8 @@ static void genRightShift (iCode *ic)
         return;
     }
 
-    aopOp(left,ic,FALSE);
-    aopOp(result,ic,FALSE);
+    aopOp(left,ic,FALSE, FALSE);
+    aopOp(result,ic,FALSE, FALSE);
 
     /* now move the left to the result if they are not the
     same */
@@ -3689,8 +3708,8 @@ static void genGenPointerGet (operand *left,
     if (IS_GB)
 	pair = PAIR_DE;
 
-    aopOp(left,ic,FALSE);
-    aopOp(result,ic,FALSE);
+    aopOp(left,ic,FALSE, FALSE);
+    aopOp(result,ic,FALSE, FALSE);
     
     if (isPair(AOP(left)) && AOP_SIZE(result)==1) {
 	/* Just do it */
@@ -3777,8 +3796,8 @@ static void genGenPointerSet (operand *right,
     link *retype = getSpec(operandType(right));
     PAIR_ID pairId = PAIR_HL;
 
-    aopOp(result,ic,FALSE);
-    aopOp(right,ic,FALSE);
+    aopOp(result,ic,FALSE, FALSE);
+    aopOp(right,ic,FALSE, FALSE);
 
     if (IS_GB)
 	pairId = PAIR_DE;
@@ -3860,7 +3879,7 @@ static void genIfx (iCode *ic, iCode *popIc)
     operand *cond = IC_COND(ic);
     int isbit =0;
 
-    aopOp(cond,ic,FALSE);
+    aopOp(cond,ic,FALSE, TRUE);
 
     /* get the value into acc */
     if (AOP_TYPE(cond) != AOP_CRY)
@@ -3894,7 +3913,7 @@ static void genAddrOf (iCode *ic)
 {
     symbol *sym = OP_SYMBOL(IC_LEFT(ic));
 
-    aopOp(IC_RESULT(ic),ic,FALSE);
+    aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
 
     /* if the operand is on the stack then we 
     need to get the stack offset of this
@@ -3948,8 +3967,8 @@ static void genAssign (iCode *ic)
     }
 #endif
 
-    aopOp(right,ic,FALSE);
-    aopOp(result,ic,TRUE);
+    aopOp(right,ic,FALSE, FALSE);
+    aopOp(result,ic,TRUE, FALSE);
 
     /* if they are the same registers */
     if (sameRegs(AOP(right),AOP(result))) {
@@ -4035,7 +4054,7 @@ static void genJumpTab (iCode *ic)
     symbol *jtab;
     char *l;
 
-    aopOp(IC_JTCOND(ic),ic,FALSE);
+    aopOp(IC_JTCOND(ic),ic,FALSE, FALSE);
     /* get the condition into accumulator */
     l = aopGet(AOP(IC_JTCOND(ic)),0,FALSE);
     if (!IS_GB)
@@ -4073,8 +4092,8 @@ static void genCast (iCode *ic)
     if (operandsEqu(IC_RESULT(ic),IC_RIGHT(ic)))
         return ;
 
-    aopOp(right,ic,FALSE) ;
-    aopOp(result,ic,FALSE);
+    aopOp(right,ic,FALSE, FALSE);
+    aopOp(result,ic,FALSE, FALSE);
 
     /* if the result is a bit */
     if (AOP_TYPE(result) == AOP_CRY) {
@@ -4154,7 +4173,7 @@ static void genReceive (iCode *ic)
 	wassert(0);
     } else {
 	accInUse++;
-	aopOp(IC_RESULT(ic),ic,FALSE);  
+	aopOp(IC_RESULT(ic),ic,FALSE, FALSE);  
 	accInUse--;
 	assignResultValue(IC_RESULT(ic));	
     }

@@ -20,6 +20,12 @@ static va_list _iprintf(char *pInto, const char *szFormat, va_list ap)
 	    case 'r':
 		wassert(0);
 		break;
+	    /* Name of the code segment */
+	    case 'C':
+		strcpy(pInto, CODE_NAME);
+		pInto = pStart + strlen(pStart);
+		sz++;
+		break;
 	    default:
 		{
 		    /* Scan out the arg and pass it on to sprintf */
@@ -129,6 +135,7 @@ void asm_addTree(const ASM_MAPPINGS *pMappings)
 
 static const ASM_MAPPING _asxxxx_mapping[] = {
     { "labeldef", "%s::" },
+    { "slabeldef", "%s:" },
     { "tlabeldef", "%05d$:" },
     { "tlabel", "%05d$" },
     { "immed", "#" },

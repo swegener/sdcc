@@ -31,6 +31,7 @@ symbol *interrupts[256];
 void printIval (symbol *, link *, initList *, FILE *);
 extern int noAlloc;
 set *publics = NULL;		/* public variables */
+set *externs = NULL;		/* Varibles that are declared as extern */
 
 /* TODO: this should be configurable (DS803C90 uses more than 6) */
 int maxInterrupts = 6;
@@ -152,9 +153,11 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
     for (sym = setFirstItem (map->syms); sym;
 	 sym = setNextItem (map->syms))  {
 	
-	/* if extern then do nothing */
-	if (IS_EXTERN (sym->etype))
+	/* if extern then add it into the extern list */
+	if (IS_EXTERN (sym->etype)) {
+	    addSetHead (&externs, sym);
 	    continue;
+	}
 	
 	/* if allocation required check is needed
 	   then check if the symbol really requires
@@ -207,7 +210,10 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    /* allocate space */
 	    if ((options.debug || sym->level == 0) && !options.nodebug)
 		fprintf(map->oFile,"==.\n");
-	    tfprintf(map->oFile, "!labeldef\n", sym->rname);
+	    if (IS_STATIC(sym->etype))
+		tfprintf(map->oFile, "!slabeldef\n", sym->rname);
+	    else
+		tfprintf(map->oFile, "!labeldef\n", sym->rname);
 	    tfprintf(map->oFile, "\t!ds\n", (unsigned int)getSize (sym->type) & 0xffff);
 	}
 	
@@ -845,11 +851,27 @@ void printPublics (FILE * afile)
     symbol *sym;
     
     fprintf (afile, "%s", iComments2);
-    fprintf (afile, "; publics variables in this module\n");
+    fprintf (afile, "; Public variables in this module\n");
     fprintf (afile, "%s", iComments2);
     
     for (sym = setFirstItem (publics); sym;
 	 sym = setNextItem (publics))
+	tfprintf(afile, "\t!global\n", sym->rname);
+}
+
+/*-----------------------------------------------------------------*/
+/* printExterns - generates .global for externs                    */
+/*-----------------------------------------------------------------*/
+void printExterns (FILE * afile)
+{
+    symbol *sym;
+    
+    fprintf (afile, "%s", iComments2);
+    fprintf (afile, "; Externals used\n");
+    fprintf (afile, "%s", iComments2);
+    
+    for (sym = setFirstItem (externs); sym;
+	 sym = setNextItem (externs))
 	tfprintf(afile, "\t!global\n", sym->rname);
 }
 
@@ -881,8 +903,8 @@ static void emitOverlay(FILE *afile)
 	
 	for (sym = setFirstItem(ovrset); sym;
 	     sym = setNextItem(ovrset)) {
-	
-	    /* if extern then do nothing */
+
+	    /* if extern then add it to the publics tabledo nothing */
 	    if (IS_EXTERN (sym->etype))
 		continue;
 	    
@@ -1006,7 +1028,8 @@ void glue ()
     
     /* print the global variables in this module */
     printPublics (asmFile);
-    
+    printExterns (asmFile);
+
     /* copy the sfr segment */
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; special function registers\n");

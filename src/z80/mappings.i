@@ -1,4 +1,8 @@
 static const ASM_MAPPING _asxxxx_gb_mapping[] = {
+    /* We want to prepend the _ */
+    { "area", ".area _%s" },
+    { "areacode", ".area _%s" },
+    { "areadata", ".area _%s" },
     { "functionlabeldef", "%s:" },
     { "*hl", "(hl)" },
     { "di", "di" },
@@ -63,6 +67,7 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 
 static const ASM_MAPPING _rgbds_mapping[] = {
     { "global", "GLOBAL %s" },
+    { "slabeldef", "%s:" },
     { "labeldef", "%s:" },
     { "tlabeldef", ".l%05d:" },
     { "tlabel", ".l%05d" },
@@ -90,8 +95,8 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "functionlabeldef", "%s:" },
     { "zero", "$00" },
     { "one", "$01" },
-    { "area", "SECTION \"%s\",CODE" },
-    { "areacode", "SECTION \"CODE\",CODE" },
+    { "area", "SECTION \"%s\",%C" },
+    { "areacode", "SECTION \"CODE\",%C" },
     { "areadata", "SECTION \"DATA\",BSS" },
     { "ascii", "DB \"%s\"" },
     { "ds", "DS %d" },
@@ -145,6 +150,7 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
 
 static const ASM_MAPPING _isas_mapping[] = {
     { "global", "GLOBAL %s" },
+    { "slabeldef", "%s:" },
     { "labeldef", "%s:" },
     { "tlabeldef", "?l%05d:" },
     { "tlabel", "?l%05d" },

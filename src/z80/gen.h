@@ -32,7 +32,9 @@ typedef enum {
     /* Is in a register */
     AOP_REG, 
     /* Is in direct space */
-    AOP_DIR, 
+    AOP_DIR,
+    /* SFR space ($FF00 and above) */
+    AOP_SFR,
     /* Is on the stack */
     AOP_STK ,
     /* Is an immediate value */

@@ -1545,7 +1545,8 @@ operand *geniCodeSubtract (operand *left, operand *right)
 	return geniCodePtrPtrSubtract (left,right);
     
     /* if they are both literal then we know the result */
-    if (IS_LITERAL(letype) && IS_LITERAL(retype)) 
+    if (IS_LITERAL(letype) && IS_LITERAL(retype)
+	&& left->isLiteral && right->isLiteral) 
 	return operandFromValue (valMinus(left->operand.valOperand,
 					  right->operand.valOperand));
     
@@ -1585,18 +1586,18 @@ operand *geniCodeAdd (operand *left, operand *right )
     operand *size ;
     int isarray = 0;
     LRTYPE ;
-    
+
     /* if left is an array then array access */
     if (IS_ARRAY(ltype)) 
 	return geniCodeArray (left,right);           
     
     /* if the right side is LITERAL zero */
     /* return the left side              */
-    if (IS_LITERAL(retype) && !floatFromVal(valFromType(retype)))
+    if (IS_LITERAL(retype) && right->isLiteral && !floatFromVal(valFromType(retype)))
 	return left;
     
     /* if left is literal zero return right */
-    if (IS_LITERAL(letype) && !floatFromVal(valFromType(letype)))
+    if (IS_LITERAL(letype) && left->isLiteral && !floatFromVal(valFromType(letype)))
 	return right ;
     
     /* if left is an array or pointer then size */
@@ -1615,7 +1616,8 @@ operand *geniCodeAdd (operand *left, operand *right )
     }
     
     /* if they are both literals then we know */
-    if (IS_LITERAL(letype) && IS_LITERAL(retype))
+    if (IS_LITERAL(letype) && IS_LITERAL(retype)
+	&& left->isLiteral && right->isLiteral)
 	return operandFromValue (valPlus(valFromType(letype),
 					 valFromType(retype)));
     

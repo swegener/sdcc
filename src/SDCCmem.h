@@ -63,6 +63,7 @@ extern   struct  set     *ovrSetSets;
 #define IN_DIRSPACE(map)        (map && map->direct)
 #define IN_PAGEDSPACE(map)      (map && map->paged )
 #define IN_CODESPACE(map)       (map && map->codesp)
+#define IN_REGSP(map)		(map && map->regsp)
 #define PTR_TYPE(map)           (map ? (map->ptrType ? map->ptrType : POINTER)\
                                      : GPOINTER)
 

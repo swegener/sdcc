@@ -1024,7 +1024,7 @@ copy_rest_of_line (
 	  break;
 	case '/':
 	  nextc = PEEKC();
-	  if (nextc == '*' || (opts->cplusplus_comments && nextc == '*'))
+	  if (nextc == '*' || (opts->cplusplus_comments && nextc == '/'))
 	    goto scan_directive_token;
 	  break;
 	case '\f':
@@ -1396,6 +1396,11 @@ collect_expansion (
 	  /* Mark this as a concatenation-point, as if it had been ##.  */
 	  concat = p;
 #endif
+	}
+	else if (*p == '/') {
+	    /* A c++ comment.  Discard to the end of line */
+	    exp_p--;
+	    p = limit;
 	}
 	break;
       }

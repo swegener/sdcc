@@ -660,7 +660,7 @@ aopForRemat (symbol * sym)
 		"(%s %c 0x%04x)",
 		OP_SYMBOL (IC_LEFT (ic))->rname,
 		val >= 0 ? '+' : '-',
-		abs (val) & 0xffff);
+		abs (val) & 0xffffff);
   }
   else 
   {

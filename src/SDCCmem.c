@@ -709,11 +709,11 @@ allocLocal (symbol * sym)
      will remove and put into the 'data' segment if required after 
      overlay  analysis has been done */
   if (options.model == MODEL_SMALL) {
-    SPEC_OCLS (sym->etype) = 
-      (options.noOverlay ? port->mem.default_local_map
-       : overlay);
+      SPEC_OCLS (sym->etype) = 
+	(options.noOverlay ? port->mem.default_local_map
+	 : overlay);
   } else {
-    SPEC_OCLS (sym->etype) = port->mem.default_local_map;
+      SPEC_OCLS (sym->etype) = port->mem.default_local_map;
   }
   allocIntoSeg (sym);
 }
@@ -960,18 +960,6 @@ redoStackOffsets (void)
       xsPtr += size;
     }
 
-  /* if the debug option is set then output the
-     symbols to the map file */
-  if (options.debug)
-    {
-      for (sym = setFirstItem (istack->syms); sym;
-	   sym = setNextItem (istack->syms))
-	cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
-      for (sym = setFirstItem (xstack->syms); sym;
-	   sym = setNextItem (xstack->syms))
-	cdbSymbol (sym, cdbFile, FALSE, FALSE);
-    }
 }
 
 /*-----------------------------------------------------------------*/

@@ -263,18 +263,22 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	continue;
 
       /* print extra debug info if required */
-      if (options.debug) {
-	cdbSymbol (sym, cdbFile, FALSE, FALSE);
-	if (!sym->level) /* global */
-	  if (IS_STATIC (sym->etype))
-	    fprintf (map->oFile, "F%s$", moduleName); /* scope is file */
+      if (options.debug)
+	{
+	  if (!sym->level) /* global */
+	    {
+	      if (IS_STATIC (sym->etype))
+	        fprintf (map->oFile, "F%s$", moduleName); /* scope is file */
+	      else
+	        fprintf (map->oFile, "G$");	/* scope is global */
+	    }
 	  else
-	    fprintf (map->oFile, "G$");	/* scope is global */
-	else
-	  /* symbol is local */
-	  fprintf (map->oFile, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
-	fprintf (map->oFile, "%s$%d$%d", sym->name, sym->level, sym->block);
-      }
+	    {
+	      /* symbol is local */
+	      fprintf (map->oFile, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
+	    }
+	  fprintf (map->oFile, "%s$%d$%d", sym->name, sym->level, sym->block);
+	}
       
       /* if it has an initial value then do it only if
          it is a global variable */
@@ -1150,7 +1154,7 @@ emitStaticSeg (memmap * map, FILE * out)
 
       /* print extra debug info if required */
       if (options.debug) {
-	cdbSymbol (sym, cdbFile, FALSE, FALSE);
+
 	if (!sym->level)
 	  {			/* global */
 	    if (IS_STATIC (sym->etype))
@@ -1420,8 +1424,6 @@ emitOverlay (FILE * afile)
 	  /* print extra debug info if required */
 	  if (options.debug)
 	    {
-	      cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
 	      if (!sym->level)
 		{		/* global */
 		  if (IS_STATIC (sym->etype))
@@ -1479,7 +1481,7 @@ glue (void)
   addSetHead (&tmpfileSet, ovrFile);
   /* print the global struct definitions */
   if (options.debug)
-    cdbStructBlock (0, cdbFile);
+    cdbStructBlock (0);
 
   vFile = tempfile ();
   /* PENDING: this isnt the best place but it will do */
@@ -1495,6 +1497,8 @@ glue (void)
   emitMaps ();
   /* do the overlay segments */
   emitOverlay (ovrFile);
+
+  outputDebugSymbols();
 
   /* now put it all together into the assembler file */
   /* create the assembler file name */

@@ -1,6 +1,25 @@
 2003-03-23  Bernhard Held <bernhard@bernhardheld.de>
 
 	* doc/cdbfile.html: removed, replaced by cdbfileformat.lyx
+	Added Lenny Story's debug infrastructure changes:
+	* src/Makefile.in:  added new files cdbFile.c and SDCCdebug.c
+	* src/Makefile.bcc: added new files cdbFile.c and SDCCdebug.c
+	* src/cdbFile.c: added
+	* src/SDCCdebug.c: added
+	* src/SDCCdebug.h: added
+	* src/SDCCast.c (createFunction)
+	* src/SDCCglue.c (emitRegularMap, emitStaticSeg, emitOverlay, glue)
+	* src/SDCCmain.c (parseCmdLine, main)
+	* src/SDCCmem.c (redoStackOffsets)
+	* src/SDCCsymt.c (cdbStructBlock, cdbTypeInfo, cdbSymbol, cdbStruct, cdbStructBlock)
+	* src/SDCCsymt.h
+	* src/common.h
+	* src/avr/gen.c (genAVRCode)
+	* src/ds390/gen.c (gen390Code)
+	* src/mcs51/gen.c (gen51Code) 
+	* src/pic/gen.c (genpic14Code)
+	* src/pic/glue.c (pic14emitRegularMap, pic14emitStaticSeg, pic14emitOverlay, picglue)
+	* src/xa51/gen.c (genXA51Code)
 
 2003-03-22  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 

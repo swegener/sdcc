@@ -29,6 +29,7 @@
 #include "SDCCopt.h"
 #include "SDCCglue.h"
 #include "SDCCpeeph.h"
+#include "SDCCdebug.h"
 #include "SDCCutil.h"
 
 #include "asm.h"

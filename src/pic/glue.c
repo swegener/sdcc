@@ -140,9 +140,6 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       /* print extra debug info if required */
       if (options.debug || sym->level == 0)
 	{
-
-	  cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
 	  if (!sym->level)	/* global */
 	    if (IS_STATIC (sym->etype))
 	      fprintf (map->oFile, "F%s_", moduleName);		/* scope is file */
@@ -447,11 +444,6 @@ pic14emitStaticSeg (memmap * map)
       /* print extra debug info if required */
       if (options.debug || sym->level == 0)
 	{
-	  /* NOTE to me - cdbFile may be null in which case,
-	   * the sym name will be printed to stdout. oh well */
-	  if(cdbFile)
-	    cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
 	  if (!sym->level)
 	    {			/* global */
 	      if (IS_STATIC (sym->etype))
@@ -680,9 +672,6 @@ pic14emitOverlay (FILE * afile)
 	  /* print extra debug info if required */
 	  if (options.debug || sym->level == 0)
 	    {
-
-	      cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
 	      if (!sym->level)
 		{		/* global */
 		  if (IS_STATIC (sym->etype))
@@ -774,7 +763,7 @@ picglue ()
 
   /* print the global struct definitions */
   if (options.debug)
-    cdbStructBlock (0,cdbFile);
+    cdbStructBlock (0);
 
   vFile = tempfile();
   /* PENDING: this isnt the best place but it will do */

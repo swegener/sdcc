@@ -12700,7 +12700,7 @@ gen390Code (iCode * lic)
   /* if debug information required */
   if (options.debug && currFunc)
     {
-      cdbSymbol (currFunc, cdbFile, FALSE, TRUE);
+      debugFile->writeFunction(currFunc);
       _G.debugLine = 1;
       if (IS_STATIC (currFunc->etype))
 	emitcode ("", "F%s$%s$0$0 ==.", moduleName, currFunc->name);

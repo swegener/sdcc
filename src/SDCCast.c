@@ -1211,14 +1211,14 @@ processBlockVars (ast * tree, int *stack, int action)
       ast *autoInit;
 
       if (action == ALLOCATE)
-	{
+        {
 	  *stack += allocVariables (tree->values.sym);
 	  autoInit = gatherAutoInit (tree->values.sym);
-
+	
 	  /* if there are auto inits then do them */
 	  if (autoInit)
 	    tree->left = newNode (NULLOP, autoInit, tree->left);
-	}
+        }
       else			/* action is deallocate */
 	deallocLocal (tree->values.sym);
     }
@@ -3545,7 +3545,7 @@ createBlock (symbol * decl, ast * body)
 
   ex = newNode (BLOCK, NULL, body);
   ex->values.sym = decl;
-
+  
   ex->right = ex->right;
   ex->level++;
   ex->lineno = 0;
@@ -4397,6 +4397,7 @@ skipall:
 
   /* dealloc the block variables */
   processBlockVars (body, &stack, DEALLOCATE);
+  outputDebugStackSymbols();
   /* deallocate paramaters */
   deallocParms (FUNC_ARGS(name->type));
 
@@ -4411,8 +4412,8 @@ skipall:
   addSet (&operKeyReset, name);
   applyToSet (operKeyReset, resetParmKey);
 
-  if (options.debug)
-    cdbStructBlock (1, cdbFile);
+  if (options.debug)    
+    cdbStructBlock(1);
 
   cleanUpLevel (LabelTab, 0);
   cleanUpBlock (StructTab, 1);

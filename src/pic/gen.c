@@ -9907,7 +9907,7 @@ void genpic14Code (iCode *lic)
     /* if debug information required */
     if (options.debug && currFunc) { 
       if (currFunc) {
-	cdbSymbol(currFunc,cdbFile,FALSE,TRUE);
+	debugFile->writeFunction(currFunc);
 	_G.debugLine = 1;
 	if (IS_STATIC(currFunc->etype)) {
 	  pic14_emitcode("",";F%s$%s$0$0     %d",moduleName,currFunc->name,__LINE__);

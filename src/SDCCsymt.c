@@ -1770,6 +1770,29 @@ checkFunction (symbol * sym, symbol *csym)
   return 1;
 }
 
+/*------------------------------------------------------------------*/
+/* cdbStructBlock - calls struct printing for a blcks               */
+/*------------------------------------------------------------------*/
+void cdbStructBlock (int block)
+{
+  int i;
+  bucket **table = StructTab;
+  bucket *chain;
+
+  /* go thru the entire  table  */
+  for (i = 0; i < 256; i++)
+    {
+      for (chain = table[i]; chain; chain = chain->next)
+	{
+	  if (chain->block >= block)
+	    {
+	      if(debugFile)
+		debugFile->writeType((structdef *)chain->sym, chain->block, 0, NULL);
+	    }
+	}
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* processFuncArgs - does some processing with function args       */
 /*-----------------------------------------------------------------*/
@@ -2080,206 +2103,6 @@ printTypeChain (sym_link * start, FILE * of)
     fprintf (of, "\n");
 }
 
-/*-----------------------------------------------------------------*/
-/* cdbTypeInfo - print the type information for debugger           */
-/*-----------------------------------------------------------------*/
-void
-cdbTypeInfo (sym_link * type, FILE * of)
-{
-  fprintf (of, "{%d}", getSize (type));
-  while (type)
-    {
-      if (IS_DECL (type))
-	{
-	  switch (DCL_TYPE (type))
-	    {
-	    case FUNCTION:
-	      fprintf (of, "DF,");
-	      break;
-	    case GPOINTER:
-	      fprintf (of, "DG,");
-	      break;
-	    case CPOINTER:
-	      fprintf (of, "DC,");
-	      break;
-	    case FPOINTER:
-	      fprintf (of, "DX,");
-	      break;
-	    case POINTER:
-	      fprintf (of, "DD,");
-	      break;
-	    case IPOINTER:
-	      fprintf (of, "DI,");
-	      break;
-	    case PPOINTER:
-	      fprintf (of, "DP,");
-	      break;
-	    case EEPPOINTER:
-	      fprintf (of, "DA,");
-	      break;
-	    case ARRAY:
-	      fprintf (of, "DA%d,", DCL_ELEM (type));
-	      break;
-	    default:
-	      break;
-	    }
-	}
-      else
-	{
-	  switch (SPEC_NOUN (type))
-	    {
-	    case V_INT:
-	      if (IS_LONG (type))
-		fprintf (of, "SL");
-	      else
-		fprintf (of, "SI");
-	      break;
-
-	    case V_CHAR:
-	      fprintf (of, "SC");
-	      break;
-
-	    case V_VOID:
-	      fprintf (of, "SV");
-	      break;
-
-	    case V_FLOAT:
-	      fprintf (of, "SF");
-	      break;
-
-	    case V_STRUCT:
-	      fprintf (of, "ST%s", SPEC_STRUCT (type)->tag);
-	      break;
-
-	    case V_SBIT:
-	      fprintf (of, "SX");
-	      break;
-
-	    case V_BIT:
-	      fprintf (of, "SB%d$%d", SPEC_BSTR (type), SPEC_BLEN (type));
-	      break;
-
-	    default:
-	      break;
-	    }
-	  fputs (":", of);
-	  if (SPEC_USIGN (type))
-	    fputs ("U", of);
-	  else
-	    fputs ("S", of);
-	}
-      type = type->next;
-    }
-}
-/*-----------------------------------------------------------------*/
-/* cdbSymbol - prints a symbol & its type information for debugger */
-/*-----------------------------------------------------------------*/
-void 
-cdbSymbol (symbol * sym, FILE * of, int isStructSym, int isFunc)
-{
-  memmap *map;
-
-  if (!sym)
-    return;
-  if (!of)
-    of = stdout;
-
-  if (isFunc)
-    fprintf (of, "F:");
-  else
-    fprintf (of, "S:");		/* symbol record */
-  /* if this is not a structure symbol then
-     we need to figure out the scope information */
-  if (!isStructSym)
-    {
-      if (!sym->level)
-	{
-	  /* global */
-	  if (IS_STATIC (sym->etype))
-	    fprintf (of, "F%s$", moduleName);	/* scope is file */
-	  else
-	    fprintf (of, "G$");	/* scope is global */
-	}
-      else
-	/* symbol is local */
-	fprintf (of, "L%s$", (sym->localof ? sym->localof->name : "-null-"));
-    }
-  else
-    fprintf (of, "S$");		/* scope is structure */
-
-  /* print the name, & mangled name */
-  fprintf (of, "%s$%d$%d(", sym->name,
-	   sym->level, sym->block);
-
-  cdbTypeInfo (sym->type, of);
-  fprintf (of, "),");
-
-  /* print the address space */
-  map = SPEC_OCLS (sym->etype);
-  fprintf (of, "%c,%d,%d",
-	   (map ? map->dbName : 'Z'), sym->onStack, SPEC_STAK (sym->etype));
-
-  /* if assigned to registers then output register names */
-  /* if this is a function then print
-     if is it an interrupt routine & interrupt number
-     and the register bank it is using */
-  if (isFunc)
-    fprintf (of, ",%d,%d,%d", FUNC_ISISR (sym->type),
-	     FUNC_INTNO (sym->type), FUNC_REGBANK (sym->type));
-  /* alternate location to find this symbol @ : eg registers
-     or spillication */
-
-  if (!isStructSym)
-    fprintf (of, "\n");
-}
-
-/*-----------------------------------------------------------------*/
-/* cdbStruct - print a structure for debugger                      */
-/*-----------------------------------------------------------------*/
-void 
-cdbStruct (structdef * sdef, int block, FILE * of,
-	   int inStruct, char *tag)
-{
-  symbol *sym;
-
-  fprintf (of, "T:");
-  /* if block # then must have function scope */
-  fprintf (of, "F%s$", moduleName);
-  fprintf (of, "%s[", (tag ? tag : sdef->tag));
-  for (sym = sdef->fields; sym; sym = sym->next)
-    {
-      fprintf (of, "({%d}", sym->offset);
-      cdbSymbol (sym, of, TRUE, FALSE);
-      fprintf (of, ")");
-    }
-  fprintf (of, "]");
-  if (!inStruct)
-    fprintf (of, "\n");
-}
-
-/*------------------------------------------------------------------*/
-/* cdbStructBlock - calls struct printing for a blcks               */
-/*------------------------------------------------------------------*/
-void 
-cdbStructBlock (int block, FILE * of)
-{
-  int i;
-  bucket **table = StructTab;
-  bucket *chain;
-  wassert (of);
-
-  /* go thru the entire  table  */
-  for (i = 0; i < 256; i++)
-    {
-      for (chain = table[i]; chain; chain = chain->next)
-	{
-	  if (chain->block >= block)
-	    {
-	      cdbStruct ((structdef *) chain->sym, chain->block, of, 0, NULL);
-	    }
-	}
-    }
-}
 
 /*-----------------------------------------------------------------*/
 /* powof2 - returns power of two for the number if number is pow 2 */

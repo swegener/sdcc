@@ -31,6 +31,7 @@
 #include "MySystem.h"
 #include "SDCCmacro.h"
 #include "SDCCutil.h"
+#include "SDCCdebug.h"
 #include "SDCCargs.h"
 
 #if NATIVE_WIN32
@@ -49,7 +50,6 @@
 extern int yyparse ();
 
 FILE *srcFile;			/* source file          */
-FILE *cdbFile = NULL;		/* debugger information output file */
 char *fullSrcFileName;		/* full name for the source file; */
 				/* can be NULL while c1mode or linking without compiling */
 char *fullDstFileName;		/* full name for the output file; */
@@ -1115,6 +1115,7 @@ parseCmdLine (int argc, char **argv)
 		addToList (preArgv, "-C");
 		break;
 	      }
+
 	    case 'd':
 	    case 'D':
 	    case 'I':
@@ -1244,18 +1245,15 @@ parseCmdLine (int argc, char **argv)
   if (!options.xstack_loc)
     options.xstack_loc = options.xdata_loc;
 
-  /* if debug option is set the open the cdbFile */
+  /* if debug option is set then open the cdbFile */
   if (options.debug && fullSrcFileName)
     {
       SNPRINTF (scratchFileName, sizeof(scratchFileName), 
 		"%s.adb", dstFileName); //JCF: Nov 30, 2002
-      if ((cdbFile = fopen (scratchFileName, "w")) == NULL)
-	werror (E_FILE_OPEN_ERR, scratchFileName);
+      if(debugFile->openFile(scratchFileName))
+	debugFile->writeModule(moduleName);
       else
-	{
-	  /* add a module record */
-	  fprintf (cdbFile, "M:%s\n", moduleName);
-	}
+	werror (E_FILE_OPEN_ERR, scratchFileName);
     }
   return 0;
 }
@@ -1955,8 +1953,8 @@ main (int argc, char **argv, char **envp)
     }
   closeDumpFiles();
 
-  if (cdbFile)
-    fclose (cdbFile);
+  if (options.debug && debugFile)
+    debugFile->closeFile();
 
   if (!options.cc_only &&
       !fatalError &&

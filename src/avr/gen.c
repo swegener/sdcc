@@ -5103,7 +5103,7 @@ genAVRCode (iCode * lic)
 	/* if debug information required */
 	/*     if (options.debug && currFunc) { */
 	if (currFunc) {
-		cdbSymbol (currFunc, cdbFile, FALSE, TRUE);
+		debugFile->writeFunction(currFunc);
 		_G.debugLine = 1;
 /* 		emitcode ("", ".type %s,@function", currFunc->name); */
 		_G.debugLine = 0;

@@ -50,7 +50,7 @@ enum {
   GSINIT=1,
   CSEG,
   XINIT,
-  //GSFINAL, // do we need this?
+  GSFINAL, // here goes the final output
 
   // these are only for storage
   BSEG,
@@ -90,10 +90,10 @@ char *refModes[]={
 
 int fatalErrors=0;
 
-char gsinitImage[CODESIZE];
-char csegImage[CODESIZE];
-char xinitImage[CODESIZE];
-//char gsfinalImage[CODESIZE];
+unsigned char gsinitImage[CODESIZE];
+unsigned char csegImage[CODESIZE];
+unsigned char xinitImage[CODESIZE];
+unsigned char gsfinalImage[CODESIZE];
 
 struct SEGMENT {
   short id;
@@ -109,7 +109,7 @@ struct SEGMENT {
   {GSINIT,  "GSINIT",  0, 0, 0, 0, gsinitImage},
   {CSEG,    "CSEG",    0, 0, 0, 0, csegImage},
   {XINIT,   "XINIT",   0, 0, 0, 0, xinitImage},
-  //{GSFINAL, "GSFINAL", 0, 0, 0, 0, NULL},
+  {GSFINAL, "GSFINAL", 0, 0, 0, 0, gsfinalImage},
 
   {BSEG,    "BSEG",    0, 0, 0, 0, NULL},
   {DSEG,    "DSEG",    0, 0, 0, 0, NULL},
@@ -209,7 +209,7 @@ void addToModules (char *name, int isLib) {
   module=calloc(1, sizeof(struct MODULE));
   module->name=strdup(name);
   for (s=0; s<MAX_SEGMENTS; s++) {
-    module->offset[s]=segments[s].current;
+    module->offset[s]=segments[s]._size;
   }
   module->isLib=isLib;
   if (!modules) {
@@ -365,6 +365,7 @@ void readModule(char *module, int isLib) {
 	}
 	// double check repeated 'A' records
 	if (currentModule->size[currentSegment->id]) {
+	  // pleased to meet you again, I hope ...
 	  if (currentModule->size[currentSegment->id] != size) {
 	    fprintf (stderr, "*** %s:%d error %s size %d != %d\n",
 		     module, currentLine,
@@ -372,13 +373,10 @@ void readModule(char *module, int isLib) {
 		     currentModule->size[currentSegment->id], 
 		     size);
 	    fatalErrors++;
-	  } else {
-	    // pleased to meet you again
 	  }
 	} else {
-	  currentModule->size[currentSegment->id]=size;
-	  currentModule->offset[currentSegment->id]+=currentSegment->_size;
 	  currentSegment->_size += size;
+	  currentModule->size[currentSegment->id] = size;
 	}
 	// never mind about the flags for now
 	break;
@@ -413,7 +411,6 @@ void readModule(char *module, int isLib) {
 	char *tline=NULL;
 	if (currentSegment->id!=CSEG && 
 	    currentSegment->id!=GSINIT &&
-	    //currentSegment->id!=GSFINAL &&
 	    currentSegment->id!=XINIT) {
 	  fprintf (stderr, "%s:%d cannot emit bytes in %s\n",
 		   module, currentLine, currentSegment->name);
@@ -423,7 +420,9 @@ void readModule(char *module, int isLib) {
 	  fprintf (stderr, "%s:%d error in T record\n", module, currentLine);
 	  fatalErrors++;
 	}
-	address+=currentSegment->current;
+
+	address+=currentModule->offset[currentSegment->id];
+	//address+=currentSegment->current;
 	for ( ;
 	      (tline=strtok(NULL, " \t\n")) && 
 		(sscanf(tline, "%02x", &byte)==1);
@@ -434,11 +433,11 @@ void readModule(char *module, int isLib) {
 	break;
       }
       case 'R': {
-	unsigned address, from;
+	unsigned address, pc;
 	char symbol[132];
 	char how[32];
-	sscanf (line, "R %x %[^ ] %[^ ] %x", &address, how, symbol, &from);
-	addToRefs (symbol, address, how, from);
+	sscanf (line, "R %x %[^ ] %[^ ] %x", &address, how, symbol, &pc);
+	addToRefs (symbol, address, how, pc);
 	break;
       }
       default:
@@ -455,11 +454,38 @@ void readModule(char *module, int isLib) {
 
 void writeModule(char *outFileName) {
   FILE *fOut;
+  unsigned int address=segments[GSFINAL].start;
+  unsigned int size=segments[GSFINAL]._size;
+  unsigned int len;
+  unsigned int checksum;
+
+  fprintf (stderr, "writeModule: %s from 0x%04x to 0x%04x\n",
+	   outFileName, 
+	   address,
+	   address+size);
 
   if ((fOut=fopen(outFileName, "w"))==NULL) {
     perror (outFileName);
   }
-  // oops, forgot something :) */
+  fprintf (fOut, "Just for now, make it a little bit more readable\n");
+
+  while (size) {
+    len = size>16 ? 16 : size;
+    size-=len;
+    fprintf (fOut, ":%02X.%04X.%02X >", len, address, 0);
+    checksum = len + (address>>8) + (address&0xff);
+    while (len--) {
+      checksum += gsfinalImage[address];
+      fprintf (fOut, " %02X", gsfinalImage[address++]);
+    }
+    checksum &= 0xff;
+    if (checksum) {
+      checksum = 0x100 - checksum;
+    }
+    fprintf (fOut, " < %02X\n", checksum);
+  }
+  fprintf (fOut, ":00000001FF\n");
+
   fclose (fOut);
 }
 
@@ -467,9 +493,9 @@ int relocate() {
   struct SYMBOL *symbol;
   struct REFERENCE *reference;
   char *from, *to;
-  int length=segments[GSINIT].current +
-    segments[CSEG].current +
-    segments[XINIT].current;
+  int length=segments[GSINIT]._size +
+    segments[CSEG]._size +
+    segments[XINIT]._size;
   int unresolved=0;
 
   // first check if it will fit
@@ -489,23 +515,35 @@ int relocate() {
     return unresolved;
   }
 
-  // GSINIT gets the --code-loc
-  segments[GSINIT].start=segments[CSEG].start;
-  segments[CSEG].start=segments[GSINIT].start+segments[GSINIT]._size;
-  // concat cseg and gsinit
+  // GSFINAL starts at --code-loc ( -b CSEG = 0x1234 )
+  segments[GSFINAL].start=segments[CSEG].start;
+  memset(gsfinalImage, 0xff, CODESIZE);
+
+  // copy gsinit to gsfinal
+  from = gsinitImage;
+  to = gsfinalImage + segments[GSFINAL].start + segments[GSFINAL]._size;
+  memcpy(to, from, segments[GSINIT]._size);
+  segments[GSINIT].start=segments[GSFINAL].start;
+  segments[GSFINAL]._size += segments[GSINIT]._size;
+    
+  // append cseg to gsfinal
   from=csegImage;
-  to=&gsinitImage[segments[GSINIT].start+segments[GSINIT]._size];
+  to = gsfinalImage + segments[GSFINAL].start + segments[GSFINAL]._size;
   memcpy(to, from, segments[CSEG]._size);
-  segments[XINIT].start=segments[CSEG].start+segments[CSEG]._size;
+  segments[CSEG].start=segments[GSFINAL].start+segments[GSFINAL]._size;
+  segments[GSFINAL]._size += segments[CSEG]._size;
+
+  // append xinit to gsfinal
   from=xinitImage;
-  to+=segments[CSEG]._size;
+  to = gsfinalImage + segments[GSFINAL].start + segments[GSFINAL]._size;
   memcpy(to, from, segments[XINIT]._size);
-#if 0
-  from=gsfinalImage;
-  to+=segments[XINIT]._size;
-  memcpy(to, from, segments[GSFINAL]._size);
-#endif
-  segments[XISEG].start=segments[XSEG].start+segments[XINIT]._size;  
+  segments[XINIT].start=segments[GSFINAL].start+segments[GSFINAL]._size;
+  segments[GSFINAL]._size += segments[XINIT]._size;
+
+  // XISEG is located after XSEG
+  segments[XISEG].start=segments[XSEG].start + 
+    segments[XSEG]._size;  
+
   // now relocate the defined symbols
   for (symbol=symbols; symbol; symbol=symbol->next) {
     if (!symbol->absolute) {
@@ -522,6 +560,7 @@ int relocate() {
       fatalErrors++;
     } else {
       reference->address += symbol->segment->start;
+      reference->pc += symbol->segment->start;
       switch (reference->how) 
 	{
 	case REL_FFFF: {
@@ -701,12 +740,13 @@ int main(int argc, char **argv) {
 
   // add the segment symbols
   currentSegment=findSegmentByName("XINIT");
-  addToDefs("s_XINIT", segments[XINIT].start, 0);
-  addToDefs("l_XINIT", segments[XINIT]._size, 0);
+  addToDefs("s_XINIT", 0, 0);
+  addToDefs("l_XINIT", segments[XINIT]._size, 1);
   currentSegment=findSegmentByName("XISEG");
-  addToDefs("s_XISEG", segments[XISEG].start, 0);
-  addToDefs("l_XISEG", segments[XISEG]._size, 0);
+  addToDefs("s_XISEG", 0, 0);
+  addToDefs("l_XISEG", segments[XISEG]._size, 1);
 
+#if 1
   // mark the resolved references
   resolve();
 
@@ -730,6 +770,7 @@ int main(int argc, char **argv) {
   if (unresolved==0) {
     writeModule(outFileName);
   }
+#endif
 
   // the modules
   fprintf (mapOut, "Modules:\n");
@@ -738,7 +779,8 @@ int main(int argc, char **argv) {
     for (s=0; s<MAX_SEGMENTS; s++) {
       if (module->size[s]) {
 	fprintf (mapOut, "\t\t%s:0x%04x-0x%04x\n", segments[s].name,
-		 module->offset[s], module->offset[s]+module->size[s]);
+		 module->offset[s]+segments[s].start,
+		 module->offset[s]+segments[s].start+module->size[s]);
       }
     }
   }
@@ -763,7 +805,6 @@ int main(int argc, char **argv) {
 	     symbol->address, symbol->module->name);
   }
 
-  writeModule(outFileName);
   fclose(mapOut);
   return fatalErrors? 1 : 0;
 }

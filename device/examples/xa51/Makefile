@@ -2,11 +2,11 @@ CC = sdcc
 
 CFLAGS= -Wa-s 
 MFLAGS= -mxa51
-LFLAGS= --xram-loc 0x4000
+LFLAGS= --code-loc 0x1000 --xram-loc 0x4000
 
 all: hello.hex
 
-OBJECTS = hello.rel hwinit.rel
+OBJECTS = hello.rel hwinit.rel dummy.rel
 
 hello.hex: $(OBJECTS)
 	$(CC) $(MFLAGS) $(LFLAGS) $(OBJECTS)

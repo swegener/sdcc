@@ -223,7 +223,7 @@ int validateChecksum(Line *line)
     if (checksum != line->checksum)
     {
         fprintf(stderr, "packihx: invalid checksum %X (want %X) @ line %d\n", 
-        	(unsigned)checksum, (unsigned)(line->checksum),
+        	(unsigned)(line->checksum), (unsigned)checksum, 
         	lineno);
         return -1;	
     }

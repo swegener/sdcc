@@ -43,7 +43,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #ifndef __ds390
-#include <reg51.h> // for the SP
+#include <8051.h> // for the SP
 #endif
 
 static data volatile char ch;

@@ -25,7 +25,7 @@
   You are forbidden to forbid anyone else to use, share and improve
   what you give them.   Help stamp out software-hoarding!
   -------------------------------------------------------------------------*/
-#include <reg51.h>
+#include <8051.h>
 /*
 ; To set the baud rate, use this formula or use autobaud()
 ; baud_const = 256 - (crystal / (12 * 16 * baud)) */

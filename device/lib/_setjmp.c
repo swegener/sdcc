@@ -21,7 +21,7 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <reg51.h>
+#include <8051.h>
 
 
 

@@ -1,4 +1,4 @@
-#include <reg51.h>
+#include <8051.h>
 
 #define BUFSIZE 16
 #define T0H 0xfc

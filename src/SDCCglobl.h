@@ -73,23 +73,6 @@ typedef int bool;
 #define FLOATSIZE   port->s.float_size
 #define MAXBASESIZE port->s.max_base_size
 
-
-#define PRAGMA_SAVE        "SAVE"
-#define PRAGMA_RESTORE     "RESTORE"
-#define PRAGMA_NOINDUCTION "NOINDUCTION"
-#define PRAGMA_NOINVARIANT "NOINVARIANT"
-#define PRAGMA_NOLOOPREV   "NOLOOPREVERSE"
-#define PRAGMA_INDUCTION   "INDUCTION"
-#define PRAGMA_STACKAUTO   "STACKAUTO"
-#define PRAGMA_NOJTBOUND   "NOJTBOUND"
-#define PRAGMA_NOGCSE      "NOGCSE"
-#define PRAGMA_NOOVERLAY   "NOOVERLAY"
-#define PRAGMA_CALLEESAVES "CALLEE-SAVES"
-#define PRAGMA_EXCLUDE     "EXCLUDE"
-#define PRAGMA_NOIV        "NOIV"
-#define PRAGMA_OVERLAY     "OVERLAY"
-#define PRAGMA_LESSPEDANTIC "LESS_PEDANTIC"
-
 #define  SMALL_MODEL 0
 #define  LARGE_MODEL 1
 #define  TRUE 1
@@ -117,40 +100,43 @@ typedef int bool;
 #define COPYTYPE(start,end,from) (end = getSpec (start = from))
 
 
-/* generalpurpose stack related macros */
-#define  STACK_DCL(stack,type,size)                   \
-         typedef  type  t_##stack   ;                 \
-         t_##stack   stack[size]    ;                 \
-         t_##stack   (*p_##stack) = stack + (size);   \
+/* general purpose stack related macros */
+#define  STACK_DCL(stack,type,size)                                   \
+         typedef  type  t_##stack   ;                                 \
+         t_##stack   stack[size]    ;                                 \
+         t_##stack   (*p_##stack) = stack;
 
 /* define extern stack */
-#define EXTERN_STACK_DCL(stack,type,size)             \
-        typedef type t_##stack     ;                  \
-        extern t_##stack stack[size] ;                \
+#define EXTERN_STACK_DCL(stack,type,size)                             \
+        typedef type t_##stack     ;                                  \
+        extern t_##stack stack[size] ;                                \
         extern t_##stack *p_##stack;
 
-#define  STACK_FULL(stack)    ((p_##stack) <= stack )
-#define  STACK_EMPTY(stack)   ((p_##stack) >= (stack +      \
-                              sizeof(stack)/sizeof(*stack)) )
+#define  STACK_EMPTY(stack)     ((p_##stack) <= stack )
+#define  STACK_FULL(stack)      ((p_##stack) >= (stack +              \
+                                sizeof(stack)/sizeof(*stack))         )
 
-#define  STACK_PUSH_(stack,x) (*--p_##stack = (x))
-#define  STACK_POP_(stack)    (*p_##stack++)
+#define  STACK_PUSH_(stack, x)  (*++p_##stack = (x))
+#define  STACK_POP_(stack)      (*p_##stack--)
 
-#define  STACK_PUSH(stack,x)  (STACK_FULL(stack)                  \
-                              ?((t_##stack)(long)(STACK_ERR(1)))  \
-                              : STACK_PUSH_(stack,x)              )
+#define  STACK_PUSH(stack, x)   (STACK_FULL(stack)                    \
+                                ? (STACK_ERR(1, stack), *p_##stack)   \
+                                : STACK_PUSH_(stack,x)                )
 
-#define  STACK_POP(stack)     (STACK_EMPTY(stack)                 \
-                              ?((t_##stack)(long)(STACK_ERR(0)))  \
-                              : STACK_POP_(stack)                 )
+#define  STACK_POP(stack)       (STACK_EMPTY(stack)                   \
+                                ? (STACK_ERR(-1, stack), *p_##stack)  \
+                                : STACK_POP_(stack)                   )
 
-#define  STACK_PEEK(stack)    (STACK_EMPTY(stack)                 \
-                              ?((t_##stack) NULL)                 \
-                              : *p_##stack                        )
+#define  STACK_PEEK(stack)      (STACK_EMPTY(stack)                   \
+                                ? (STACK_ERR(0, stack), *p_##stack)   \
+                                : *p_##stack                          )
 
-#define  STACK_ERR(o)         ( o                                 \
-                              ? fprintf(stderr,"stack Overflow\n")\
-                              : fprintf(stderr,"stack underflow\n"))
+#define  STACK_ERR(o, stack)    (werror(E_STACK_VIOLATION, #stack,    \
+                                        (o < 0)                       \
+                                        ? "underflow"                 \
+                                        : (o > 0)                     \
+                                          ? "overflow"                \
+                                          : "empty"), exit(1))
 
 /* optimization options */
 struct optimize

@@ -23,10 +23,10 @@
 #include "sdccconf.h"
 #else
 #include "sdcc_vc.h"
+#define PATH_MAX                _MAX_PATH
 #endif
 #define DIR_SEPARATOR_CHAR	DOS_DIR_SEPARATOR_CHAR
 #define DIR_SEPARATOR_STRING	DOS_DIR_SEPARATOR_STRING
-#define PATH_MAX                _MAX_PATH
 
 #else               /* Assume Un*x style system */
 

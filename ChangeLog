@@ -1,3 +1,7 @@
+2003-03-09  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCglobl.h: PATH_MAX is already defined in mingw32 headers
+
 2003-03-09  Borut Razem <borut.razem@siol.net>
 
 	* src/SDCCglue.c: re-implemented tempfilename() and tempfile(): using mkstemp() if available

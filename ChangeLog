@@ -4,7 +4,8 @@
 	non-reentrant function __modsint in the interrupt function (thus 
 	corrupting math operations during serial I/O)
 	* device/lib/ser_ir.c: as above, changed buffersize 
-	* src/mcs51/peeph.def: added 259.a,b for removing redundant ret
+	* src/mcs51/peeph.def: added 259.a,b for removing redundant ret,
+	256.c,d for zeroing
 	* doc/Makefile: added option -t for rsync
 
 2004-10-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

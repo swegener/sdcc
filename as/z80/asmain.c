@@ -91,7 +91,7 @@
  *		int	fflag		-f(f), relocations flagged flag
  *		int	flevel		IF-ELSE-ENDIF flag will be non
  *					zero for false conditional case
- *		addr_t	fuzz		tracks pass to pass changes in the
+ *		Addr_T	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
  *		int	gflag		-g, make undefined symbols global flag
@@ -405,7 +405,7 @@ int i;
  *					ASCII character
  *		int	flevel		IF-ELSE-ENDIF flag will be non
  *					zero for false conditional case
- *		addr_t	fuzz		tracks pass to pass changes in the
+ *		Addr_T	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
  *		int	ifcnd[]		array of IF statement condition
@@ -417,7 +417,7 @@ int i;
  *		int	incline[]	current include file line
  *		int	incfil		current file handle index
  *					for include files
- *		addr_t	laddr		address of current assembler line
+ *		Addr_T	laddr		address of current assembler line
  *					or value of .if argument
  *		int	lmode		listing mode
  *		int	lop		current line number on page
@@ -432,7 +432,7 @@ int i;
  *		int	tlevel		current conditional level
  *
  *	functions called:
- *		addr_t	absexpr()	asexpr.c
+ *		Addr_T	absexpr()	asexpr.c
  *		area *	alookup()	assym.c
  *		VOID	clrexpr()	asexpr.c
  *		int	digit()		asexpr.c
@@ -1074,7 +1074,7 @@ int wf;
  *
  *	global variables:
  *		sym	dot		defined as sym[0]
- *		addr_t	fuzz		tracks pass to pass changes in the
+ *		Addr_T	fuzz		tracks pass to pass changes in the
  *					address of symbols caused by
  *					variable length instruction formats
  *
@@ -1103,7 +1103,7 @@ register struct area *nap;
 /*)Function	VOID	phase(ap, a)
  *
  *		area *	ap		pointer to area
- *		addr_t	a		address in area
+ *		Addr_T	a		address in area
  *
  *	Function phase() compares the area ap and address a
  *	with the current area dot.s_area and address dot.s_addr
@@ -1127,7 +1127,7 @@ register struct area *nap;
 VOID
 phase(ap, a)
 struct area *ap;
-addr_t a;
+Addr_T a;
 {
 	if (ap != dot.s_area || a != dot.s_addr)
 		err('p');

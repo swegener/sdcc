@@ -32,7 +32,7 @@
  *
  *	asexpr.c contains the following functions:
  *		VOID	abscheck()
- *		addr_t	absexpr()
+ *		Addr_T	absexpr()
  *		VOID	clrexpr()
  *		int	digit()
  *		VOID	expr()
@@ -190,7 +190,7 @@ int n;
         unget(c);
 }
 
-/*)Function	addr_t	absexpr()
+/*)Function	Addr_T	absexpr()
  *
  *	The function absexpr() evaluates an expression, verifies it
  *	is absolute (i.e. not position dependent or relocatable), and
@@ -212,7 +212,7 @@ int n;
  *		a 'r' error is reported.
  */
 
-addr_t
+Addr_T
 absexpr()
 {
         struct expr e;

@@ -102,7 +102,7 @@ FILE *appendDumpFile (int id) {
 
   if (!dumpFilesPtr->filePtr) {
     // not used before, create it
-    strcpy (scratchFileName, srcFileName);
+    strcpy (scratchFileName, dstFileName);
     strcat (scratchFileName, dumpFilesPtr->ext);
     if (!(dumpFilesPtr->filePtr = fopen (scratchFileName, "w"))) {
       werror (E_FILE_OPEN_ERR, scratchFileName);

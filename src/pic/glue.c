@@ -808,8 +808,15 @@ picglue ()
   /* create the assembler file name */
     
   if (!options.c1mode) {
-    sprintf (buffer, srcFileName);
-    strcat (buffer, ".asm");
+    if (noAssemble && fullDstFileName)
+      {
+        sprintf (buffer, fullDstFileName);
+      }
+    else
+      {
+        sprintf (buffer, dstFileName);
+        strcat (buffer, ".asm");
+      }
   }
   else {
     strcpy(buffer, options.out_name);

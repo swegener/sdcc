@@ -130,7 +130,7 @@ tvsprintf (char *buffer, const char *format, va_list ap)
 	      break;
 	    case 'F':
 	      // Source file name.
-	      pInto = _appendAt (pInto, newFormat, srcFileName);
+	      pInto = _appendAt (pInto, newFormat, fullSrcFileName);
               sz++;
 	      break;
             case 'N':

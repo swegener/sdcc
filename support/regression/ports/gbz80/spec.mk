@@ -11,7 +11,7 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %.gb: %.c $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $< $(EXTRAS)
+	$(SDCC) $(SDCCFLAGS) $< $(EXTRAS) -o $@
 
 %$(OBJEXT): %.asm
 	../../bin/as-gbz80 -plosgff $@ $<
@@ -20,7 +20,7 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 	../../bin/as-gbz80 -plosgff $@ $<
 
 %$(OBJEXT): %.c
-	$(SDCC) $(SDCCFLAGS) -c $<
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # PENDING: Path to sdcc-extra
 %.out: %$(EXEEXT)

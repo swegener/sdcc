@@ -15,18 +15,16 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(EXTRAS) $<
-	mv fwk/lib/testfwk.ihx $@
-	mv fwk/lib/testfwk.map $(@:.ihx=.map)
+	$(SDCC) $(SDCCFLAGS) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.c
-	$(SDCC) $(SDCCFLAGS) -c $<
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # run simulator with 10 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
 	-fwk/lib/timeout 10 $(S51) -tds390f -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd >/dev/null || \
-          echo -e --- FAIL: \"timeout, simulation killed\" in $(<:.ihx=.c)"\n"--- Summary: 1/1/1: timeout >> $@
+          echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
 
 fwk/lib/timeout: fwk/lib/timeout.c

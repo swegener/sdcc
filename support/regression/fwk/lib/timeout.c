@@ -26,10 +26,10 @@
 
 #define USAGE PROGNAME " : 1.00\n" \
               "Usage : " PROGNAME " timeout_in_seconds filename [arguments]\n" \
-              "  ´filename´ is executed, the arguments are passed to ´filename´.\n" \
-              "  When ´filename´exits before the timeout expires, the\n" \
-              "  exit-status of ´filename´ is returned.\n" \
-              "  When the timeout expires before ´filename´ exits, ´filename´\n" \
+              "  \"filename\" is executed, the arguments are passed to \"filename\".\n" \
+              "  When \"filename\" exits before the timeout expires, the\n" \
+              "  exit-status of \"filename\" is returned.\n" \
+              "  When the timeout expires before \"filename\" exits, \"filename\"\n" \
               "  will be killed and an exit-status of 1 is returned.\n"
 
 /* First the program tries to limit the maximum CPU-time to the timeout-value.
@@ -163,3 +163,4 @@ main (int argc, char * const *argv)
         }
     }
 }
+

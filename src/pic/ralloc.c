@@ -102,14 +102,14 @@ debugLog (char *fmt,...)
   //char *bufferP=buffer;
   va_list ap;
 
-  if (!debug || !srcFileName)
+  if (!debug || !dstFileName)
     return;
 
 
   if (!debugF)
     {
       /* create the file name */
-      strcpy (buffer, srcFileName);
+      strcpy (buffer, dstFileName);
       strcat (buffer, ".d");
 
       if (!(debugF = fopen (buffer, (append ? "a+" : "w"))))

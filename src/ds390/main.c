@@ -516,11 +516,11 @@ static void _tininative_do_assemble (const char * const *asmOptions)
     };
     char buffer[100];
 
-    buildCmdLine(buffer,macroCmd,srcFileName,NULL,NULL,NULL);
+    buildCmdLine(buffer,macroCmd,dstFileName,NULL,NULL,NULL);
     if (my_system(buffer)) {
 	exit(1);
     }
-    buildCmdLine(buffer,a390Cmd,srcFileName,NULL,NULL,asmOptions);
+    buildCmdLine(buffer,a390Cmd,dstFileName,NULL,NULL,asmOptions);
     if (my_system(buffer)) {
 	exit(1);
     }    

@@ -1460,8 +1460,16 @@ glue (void)
 
   if (!options.c1mode)
     {
-      sprintf (scratchFileName, srcFileName);
+      /* -o option overrides default name? */
+      if (noAssemble && fullDstFileName)
+        {
+          strcpy (scratchFileName, fullDstFileName);
+        }
+      else
+        {
+          strcpy (scratchFileName, dstFileName);
       strcat (scratchFileName, port->assembler.file_ext);
+        }
     }
   else
     {

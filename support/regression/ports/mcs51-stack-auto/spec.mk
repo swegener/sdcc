@@ -43,10 +43,7 @@ $(LIBDIR):
 	mkdir -p $(LIBDIR)
 
 $(LIBDIR)/%.rel: $(LIBSRCDIR)/%.c
-	-$(SDCC) -I../../device/include $(LIBSDCCFLAGS) -c $< \
-	 && mv -f $(<:.c=.rel) $@ \
-	 && mv -f $(<:.c=.asm) $(@:.rel=.asm) \
-	 && mv -f $(<:.c=.lst) $(@:.rel=.lst)
+	-$(SDCC) -I../../device/include $(LIBSDCCFLAGS) -c $< -o $@
 
 lib-files:
 	cp $(LIBSRCDIR)/*.lib $(LIBDIR)

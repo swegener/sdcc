@@ -53,7 +53,6 @@
 #define PATH_MAX 255		/* define a reasonable value */
 #endif
 
-#define  MAX_FNAME_LEN  128
 #define  MAX_REG_PARMS  1
 typedef int bool;
 
@@ -260,8 +259,15 @@ struct options
 extern int noAssemble;         /* no assembly, stop after code generation */
 extern char *yytext;
 extern char *currFname;
-extern char *srcFileName;	/* source file name without the extenstion */
-extern char *moduleName;	/* source file name without path & extension */
+extern char *fullSrcFileName;	/* full name for the source file; */
+				/* can be NULL while linking without compiling */
+extern char *fullDstFileName;	/* full name for the output file; */
+				/* only given by -o, otherwise NULL */
+extern char *dstFileName;	/* destination file name without extension */
+extern char *dstPath;		/* path for the output files; */
+				/* "" is equivalent with cwd */
+extern char *moduleName;	/* module name is source file without path and extension */
+				/* can be NULL while linking without compiling */
 extern int currLineno;		/* current line number    */
 extern int yylineno;		/* line number of the current file SDCC.lex */
 extern FILE *yyin;		/* */

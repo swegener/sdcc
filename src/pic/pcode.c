@@ -1587,7 +1587,7 @@ void pcode_test(void)
     char buffer[100];
 
     /* create the file name */
-    strcpy(buffer,srcFileName);
+    strcpy(buffer,dstFileName);
     strcat(buffer,".p");
 
     if( !(pFile = fopen(buffer, "w" ))) {

@@ -1,3 +1,29 @@
+2003-01-11  Bernhard Held <bernhard@bernhardheld.de>
+
+	* .version: Bumped version number to 2.3.3
+	* src/SDCCBBlock.c: new option -o
+	* src/SDCCglobl.h: new option -o
+	* src/SDCCglue.c: new option -o
+	* src/SDCCmain.c: new option -o
+	* src/asm.c: new option -o
+	* src/ds390/main.c: new option -o
+	* src/pic/glue.c: new option -o
+	* src/pic/pcode.c: new option -o
+	* src/pic/ralloc.c: new option -o
+	* src/pic16/glue.c: new option -o
+	* src/pic16/pcode.c: new option -o
+	* src/pic16/ralloc.c: new option -o
+	* src/z80/main.c: new option -o
+	* device/lib/Makefile.in: use -o
+	* support/regression/ports/ds390/spec.mk: use -o
+	* support/regression/ports/gbz80/spec.mk: use -o
+	* support/regression/ports/mcs51/spec.mk: use -o
+	* support/regression/ports/mcs51-stack-auto/spec.mk: use -o
+	* support/regression/ports/z80/spec.mk: use -o
+	* support/regression/ports/ucz80/spec.mk: use -o
+	* support/regression/ports/xa51/spec.mk: use -o
+	* support/regression/fwk/lib/timeout.c: fix usage string
+
 2003-01-09  Bernhard Held <bernhard@bernhardheld.de>
 	* src/mcs51/gen.c (genPlus): replaced "mov b,acc" by "mov b,a" Fiorenzo D. Ramaglia <fd.ramaglia@tin.it>
 	

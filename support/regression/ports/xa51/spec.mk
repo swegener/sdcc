@@ -15,12 +15,12 @@ EXTRAS = fwk/lib/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
 
 # Rule to link into .hex
 %$(EXEEXT): %$(OBJEXT) $(EXTRAS)
-	$(SDCC) $(SDCCFLAGS) $(EXTRAS) $<
+	$(SDCC) $(SDCCFLAGS) $(EXTRAS) $< -o $@
 	mv fwk/lib/testfwk.hex $@
 	mv fwk/lib/testfwk.map $(@:.hex=.map)
 
 %$(OBJEXT): %.c
-	$(SDCC) $(SDCCFLAGS) -c $<
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # run simulator with 10 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout

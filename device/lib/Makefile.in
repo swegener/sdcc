@@ -233,9 +233,7 @@ include clean.mk
 .SUFFIXES: .rel .o
 
 $(PORTDIR)/%$(OEXT): %.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
-	mv -f `basename $@` $@
-	mv -f `basename $@ $(OEXT)`.asm $(PORTDIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 # Remaking configuration
 # ----------------------

@@ -187,15 +187,10 @@ static void
 _gbz80_rgblink (void)
 {
   FILE *lnkfile;
-  const char *sz;
-
   int i;
-  sz = srcFileName;
-  if (!sz)
-    sz = "a";
 
   /* first we need to create the <filename>.lnk file */
-  sprintf (scratchFileName, "%s.lnk", sz);
+  sprintf (scratchFileName, "%s.lnk", dstFileName);
   if (!(lnkfile = fopen (scratchFileName, "w")))
     {
       werror (E_FILE_OPEN_ERR, scratchFileName);
@@ -204,8 +199,7 @@ _gbz80_rgblink (void)
 
   fprintf (lnkfile, "[Objects]\n");
 
-  if (srcFileName)
-    fprintf (lnkfile, "%s.o\n", sz);
+  fprintf (lnkfile, "%s.o\n", dstFileName);
 
   for (i = 0; i < nrelFiles; i++)
     fprintf (lnkfile, "%s\n", relFiles[i]);
@@ -216,11 +210,11 @@ _gbz80_rgblink (void)
     fprintf (lnkfile, "%s\n", libFiles[i]);
 
 
-  fprintf (lnkfile, "\n[Output]\n" "%s.gb", sz);
+  fprintf (lnkfile, "\n[Output]\n" "%s.gb", dstFileName);
 
   fclose (lnkfile);
 
-  buildCmdLine (buffer,port->linker.cmd, sz, NULL, NULL, NULL);
+  buildCmdLine (buffer,port->linker.cmd, dstFileName, NULL, NULL, NULL);
   /* call the linker */
   if (my_system (buffer))
     {
@@ -315,6 +309,9 @@ _setValues(void)
       setMainValue ("z80outputtypeflag", "-i");
       setMainValue ("z80outext", ".ihx");
     }
+
+  setMainValue ("z80stdobjdstfilename" , "{dstfilename}{objext}");
+  setMainValue ("z80stdlinkdstfilename", "{dstfilename}{z80outext}");
 
   setMainValue ("z80extraobj", joinn (relFiles, nrelFiles));
   
@@ -447,13 +444,13 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     "{bindir}{sep}link-{port} -n -c -- {z80bases} -m -j" \
     " {z80libspec}" \
     " {z80extralibfiles} {z80extralibpaths}" \
-    " {z80outputtypeflag} {srcfilename}{z80outext}" \
+    " {z80outputtypeflag} {z80linkdstfilename}" \
     " {z80crt0}" \
-    " {srcfilename}{objext}" \
+    " {dstfilename}{objext}" \
     " {z80extraobj}" 
 
 #define ASMCMD \
-    "{bindir}{sep}as-{port} -plosgff {srcfilename}{objext} {srcfilename}{asmext}"
+    "{bindir}{sep}as-{port} -plosgff {z80objdstfilename} {dstfilename}{asmext}"
 
 /* Globals */
 PORT z80_port =

@@ -51,9 +51,15 @@ extern int yyparse ();
 
 FILE *srcFile;			/* source file          */
 FILE *cdbFile = NULL;		/* debugger information output file */
-char *fullSrcFileName;		/* full name for the source file */
-char *srcFileName;		/* source file name with the .c stripped */
-char *moduleName;		/* module name is srcFilename stripped of any path */
+char *fullSrcFileName;		/* full name for the source file; */
+				/* can be NULL while linking without compiling */
+char *fullDstFileName;		/* full name for the output file; */
+				/* only given by -o, otherwise NULL */
+char *dstFileName;		/* destination file name without extension */
+char *dstPath = "";		/* path for the output files; */
+				/* "" is equivalent with cwd */
+char *moduleName;		/* module name is source file without path and extension */
+				/* can be NULL while linking without compiling */
 const char *preArgv[128];	/* pre-processor arguments  */
 int currRegBank = 0;
 int RegBankUsed[4]={1, 0, 0, 0};	/*JCF: Reg Bank 0 used by default*/
@@ -150,6 +156,7 @@ optionsTable[] = {
     { 0,    "--nojtbound",          &optimize.noJTabBoundary, "Don't generate boundary check for jump tables" },
     { 0,    "--noloopreverse",      &optimize.noLoopReverse, "Disable the loop reverse optimisation" },
     { 'c',  "--compile-only",       &options.cc_only, "Compile and assemble, but do not link" },
+    { 'o',  NULL,                   NULL, "Place the output into the given path resp. file" },
     { 0,    "--dumpraw",            &options.dump_raw, "Dump the internal structure after the initial parse" },
     { 0,    "--dumpgcse",           &options.dump_gcse, NULL },
     { 0,    "--dumploop",           &options.dump_loop, NULL },
@@ -535,7 +542,7 @@ processFile (char *s)
     {
       /* source file name : not if we already have a
          source file */
-      if (srcFileName)
+      if (fullSrcFileName)
 	{
 	  werror (W_TOO_MANY_SRC, s);
 	  return;
@@ -554,28 +561,35 @@ processFile (char *s)
       /* get rid of the "."-extension */
 
       /* is there a dot at all? */
-      if (strchr (buffer, '.') &&
+      if (strrchr (buffer, '.') &&
           /* is the dot in the filename, not in the path? */
-          (strrchr (buffer, '/' ) < strrchr (buffer, '.') ||
-           strrchr (buffer, '\\') < strrchr (buffer, '.')))
+          (strrchr (buffer, DIR_SEPARATOR_CHAR) < strrchr (buffer, '.')))
+        {
         *strrchr (buffer, '.') = '\0';
-
-      srcFileName = Safe_alloc ( strlen (buffer) + 1);
-      strcpy (srcFileName, buffer);
+        }
 
       /* get rid of any path information
-         for the module name; do this by going
-         backwards till we get to either '/' or '\' or ':'
-         or start of buffer */
+         for the module name; */
       fext = buffer + strlen (buffer);
+#if NATIVE_WIN32
+      /* do this by going backwards till we
+         get '\' or ':' or start of buffer */
       while (fext != buffer &&
-	     *(fext - 1) != '\\' &&
-	     *(fext - 1) != '/' &&
+	     *(fext - 1) != DIR_SEPARATOR_CHAR &&
 	     *(fext - 1) != ':')
+        {
 	fext--;
-      moduleName = Safe_alloc ( strlen (fext) + 1);
-      strcpy (moduleName, fext);
-
+        }
+#else
+      /* do this by going backwards till we
+         get '/' or start of buffer */
+      while (fext != buffer &&
+	     *(fext - 1) != DIR_SEPARATOR_CHAR)
+        {
+          fext--;
+        }
+#endif
+      moduleName = Safe_strdup ( fext );
       return;
     }
 
@@ -603,7 +617,7 @@ processFile (char *s)
 static void
 _processC1Arg (char *s)
 {
-  if (srcFileName)
+  if (fullSrcFileName)
     {
       if (options.out_name)
 	{
@@ -784,7 +798,7 @@ tryHandleSimpleOpt(char **argv, int *pi)
 /*-----------------------------------------------------------------*/
 /* parseCmdLine - parses the command line and sets the options     */
 /*-----------------------------------------------------------------*/
-int
+static int
 parseCmdLine (int argc, char **argv)
 {
   int i;
@@ -1010,6 +1024,46 @@ parseCmdLine (int argc, char **argv)
             case 'l':
                 libFiles[nlibFiles++] = getStringArg("-l", argv, &i, argc);
                 break;
+            
+            case 'o':
+              {
+                char *p;
+
+                /* copy the file name into the buffer */
+                strcpy (buffer, getStringArg("-o", argv, &i, argc));
+                /* point to last character */
+                p = buffer + strlen (buffer) - 1;
+                if (*p == DIR_SEPARATOR_CHAR)
+                  {
+                    /* only output path specified */
+                    dstPath = Safe_strdup (buffer);
+                    fullDstFileName = NULL;
+                  }
+                else
+                  {
+                    fullDstFileName = Safe_strdup (buffer);
+
+                    /* get rid of the "."-extension */
+
+                    /* is there a dot at all? */
+                    if (strrchr (buffer, '.') &&
+                        /* is the dot in the filename, not in the path? */
+                        (strrchr (buffer, DIR_SEPARATOR_CHAR) < strrchr (buffer, '.')))
+                      *strrchr (buffer, '.') = '\0';
+
+                    dstFileName = Safe_strdup (buffer);
+
+                    /* strip module name to get path */
+                    p = strrchr (buffer, DIR_SEPARATOR_CHAR);
+                    if (p)
+                      {
+                        /* path with trailing / */
+                        p[1] = '\0';
+                        dstPath = Safe_strdup (buffer);
+                      }
+                  }
+                break;
+              }
 
 	    case 'W':
               /* pre-processer options */
@@ -1103,14 +1157,49 @@ parseCmdLine (int argc, char **argv)
 	}
     }
 
+  /* if no dstFileName given with -o, we've to find one: */
+  if (!dstFileName)
+    {
+      /* use the modulename from the C-source */
+      if (fullSrcFileName)
+        {
+          dstFileName = Safe_alloc (strlen (dstPath) + strlen (moduleName) + 1);
+          strcpy (dstFileName, dstPath);
+          strcat (dstFileName, moduleName);
+        }
+      /* use the modulename from the first object file */
+      else if (nrelFiles >= 1)
+        {
+          char *objectName;
+
+          strcpy (buffer, relFiles[0]);
+          /* remove extension (it must be .rel) */
+          *strrchr (buffer, '.') = '\0';
+          /* remove path */
+          objectName = strrchr (buffer, DIR_SEPARATOR_CHAR);
+          if (objectName)
+            {
+              ++objectName;
+            }
+          else
+            {
+              objectName = buffer;
+            }
+          dstFileName = Safe_alloc (strlen (dstPath) + strlen (objectName) + 1);
+          strcpy (dstFileName, dstPath);
+          strcat (dstFileName, objectName);
+        }
+      /* else no module given: help text is displayed */
+    }
+
   /* set up external stack location if not explicitly specified */
   if (!options.xstack_loc)
     options.xstack_loc = options.xdata_loc;
 
   /* if debug option is set the open the cdbFile */
-  if (options.debug && srcFileName)
+  if (options.debug && fullSrcFileName)
     {
-      sprintf (scratchFileName, "%s.adb", srcFileName); //JCF: Nov 30, 2002
+      sprintf (scratchFileName, "%s.adb", dstFileName); //JCF: Nov 30, 2002
       if ((cdbFile = fopen (scratchFileName, "w")) == NULL)
 	werror (E_FILE_OPEN_ERR, scratchFileName);
       else
@@ -1130,13 +1219,10 @@ linkEdit (char **envp)
 {
   FILE *lnkfile;
   char *segName, *c;
-
   int i;
-  if (!srcFileName)
-    srcFileName = "temp";
 
   /* first we need to create the <filename>.lnk file */
-  sprintf (scratchFileName, "%s.lnk", srcFileName);
+  sprintf (scratchFileName, "%s.lnk", dstFileName);
   if (!(lnkfile = fopen (scratchFileName, "w")))
     {
       werror (E_FILE_OPEN_ERR, scratchFileName);
@@ -1243,8 +1329,8 @@ linkEdit (char **envp)
     fprintf (lnkfile, "-l %s\n", libFiles[i]);
 
   /* put in the object files */
-  if (strcmp (srcFileName, "temp"))
-    fprintf (lnkfile, "%s ", srcFileName);
+  if (fullSrcFileName)
+    fprintf (lnkfile, "%s ", dstFileName);
 
   for (i = 0; i < nrelFiles; i++)
     fprintf (lnkfile, "%s\n", relFiles[i]);
@@ -1258,7 +1344,7 @@ linkEdit (char **envp)
   if (port->linker.cmd)
     {
       char buffer2[PATH_MAX];
-      buildCmdLine (buffer2, port->linker.cmd, srcFileName, NULL, NULL, NULL);
+      buildCmdLine (buffer2, port->linker.cmd, dstFileName, NULL, NULL, NULL);
       buildCmdLine2 (buffer, buffer2);
     }
   else
@@ -1270,14 +1356,22 @@ linkEdit (char **envp)
     {
       exit (1);
     }
-
-  if (strcmp (srcFileName, "temp") == 0)
+  /* -o option overrides default name? */
+  if (fullDstFileName)
     {
-      /* rename "temp.cdb" to "firstRelFile.cdb" */
-      char *f = strtok (Safe_strdup (relFiles[0]), ".");
-      f = strcat (f, ".cdb");
-      rename ("temp.cdb", f);
-      srcFileName = NULL;
+      /* the linked file gets the name of the first modul */
+      if (fullSrcFileName)
+    {
+          strcpy (scratchFileName, dstFileName);
+        }
+      else
+        {
+          strcpy (scratchFileName, relFiles[0]);
+          /* strip ".rel" extension */
+          *strrchr (scratchFileName, '.') = '\0';
+        }
+      strcat (scratchFileName, options.out_fmt ? ".S19" : ".ihx");
+      rename (scratchFileName, fullDstFileName);
     }
 }
 
@@ -1291,7 +1385,7 @@ assemble (char **envp)
 	port->assembler.do_assemble(asmOptions);
 	return ;
     } else if (port->assembler.cmd) {
-	buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL,
+        buildCmdLine (buffer, port->assembler.cmd, dstFileName, NULL,
 		      options.debug ? port->assembler.debug_opts : port->assembler.plain_opts,
 		      asmOptions);
     } else {
@@ -1303,6 +1397,12 @@ assemble (char **envp)
 	   perror ("Cannot exec assembler");
 	*/
 	exit (1);
+    }
+    /* -o option overrides default name? */
+    if (options.cc_only && fullDstFileName) {
+        strcpy (scratchFileName, dstFileName);
+        strcat (scratchFileName, ".rel");
+        rename (scratchFileName, fullDstFileName);
     }
 }
 
@@ -1549,8 +1649,28 @@ initValues (void)
   setMainValue ("objext", port->linker.rel_ext);
   setMainValue ("asmext", port->assembler.file_ext);
 
+  setMainValue ("dstfilename", dstFileName);
   setMainValue ("fullsrcfilename", fullSrcFileName ? fullSrcFileName : "fullsrcfilename");
-  setMainValue ("srcfilename", srcFileName ? srcFileName : "srcfilename");
+  
+  if (options.cc_only && fullDstFileName)
+    /* compile + assemble and -o given: -o specifies name of object file */
+    {
+      setMainValue ("z80objdstfilename", fullDstFileName);
+    }
+  else
+    {
+      setMainValue ("z80objdstfilename", "{z80stdobjdstfilename}");
+    }
+  if (fullDstFileName)
+    /* if we're linking, -o gives the final file name */
+    {
+      setMainValue ("z80linkdstfilename", fullDstFileName);
+    }
+  else
+    {
+      setMainValue ("z80linkdstfilename", "{z80stdlinkdstfilename}");
+    }
+
 }
 
 /*
@@ -1609,8 +1729,8 @@ main (int argc, char **argv, char **envp)
   parseCmdLine (argc, argv);
 
   /* if no input then printUsage & exit */
-  if ((!options.c1mode && !srcFileName && !nrelFiles) || 
-      (options.c1mode && !srcFileName && !options.out_name))
+  if ((!options.c1mode && !fullSrcFileName && !nrelFiles) ||
+      (options.c1mode && !fullSrcFileName && !options.out_name))
     {
       printUsage ();
       exit (0);
@@ -1619,7 +1739,7 @@ main (int argc, char **argv, char **envp)
   initValues ();
   _discoverPaths (argv[0]);
 
-  if (srcFileName)
+  if (fullSrcFileName)
     {
 
       initMem ();
@@ -1690,7 +1810,7 @@ main (int argc, char **argv, char **envp)
       !fatalError &&
       !noAssemble &&
       !options.c1mode &&
-      (srcFileName || nrelFiles))
+      (fullSrcFileName || nrelFiles))
     {
       if (port->linker.do_link)
 	port->linker.do_link ();

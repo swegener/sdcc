@@ -1267,9 +1267,11 @@ void genMinus (iCode *ic)
       /* res = 0 - right */
       if (pic14_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic))) ) {
 	emitpcode(POC_COMF,  popGet(AOP(IC_RIGHT(ic)),0));
+	emitpcode(POC_INCF,  popGet(AOP(IC_RIGHT(ic)),0));
       } else { 
-	emitpcode(POC_MOVFW,  popGet(AOP(IC_RIGHT(ic)),0));
+	emitpcode(POC_COMFW,  popGet(AOP(IC_RIGHT(ic)),0));
 	emitpcode(POC_MOVWF,  popGet(AOP(IC_RESULT(ic)),0));
+	emitpcode(POC_INCF,   popGet(AOP(IC_RESULT(ic)),0));
       }
       goto release;
     }

@@ -47,8 +47,6 @@ void c_0(void)
   if(ulong0 > 0)
     failures++;
 
-  if(ulong0 < 0)
-    failures++;
 }
 
 // compare to 1
@@ -72,9 +70,6 @@ void c_1(void)
     failures++;
 
   if(long1 < 0)
-    failures++;
-
-  if(ulong1 < 0)
     failures++;
 
   if(long1 < 1)
@@ -160,8 +155,10 @@ void c_200(void)
 
 // compare to 0x20000
 // assumes
-// achar0 == 0x20000
-// aint0  == 0x20000
+// long0  == 0x20000
+// ulong0 == 0x20000
+// long1  != 0x20000
+// ulong1 != 0x20000
 
 void c_20000(void)
 {
@@ -369,6 +366,32 @@ void c_long2long_neq(void)
     failures++;
 
 }
+
+
+//  long0=-100;
+//  long1=-1000;
+void
+c_long2neglit(void)
+{
+
+  if(long0>0)
+    failures++;
+  if(long1>0)
+    failures++;
+
+  if(long1 > long0)
+    failures++;
+
+  if(long1 > 100)
+    failures++;
+
+  if(long0 > -50)
+    failures++;
+
+  if(long1 < -5000)
+    failures++;
+}
+
 void
 main (void)
 {
@@ -400,6 +423,10 @@ main (void)
 
   long0 = -1;
   c_minus1();
+
+  long0=-100;
+  long1=-1000;
+  c_long2neglit();
 
   success = failures;
   done ();

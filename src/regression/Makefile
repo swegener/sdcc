@@ -79,12 +79,15 @@ SRC = b.c \
 	rotate1.c \
 	rotate2.c \
 	rotate3.c \
+	rotate4.c \
 	struct1.c \
 	sub.c \
 	sub2.c \
 	switch1.c \
 	while.c \
 	xor.c
+
+#	mul1.c \
 
 COD := $(patsubst %.c, %.cod, $(SRC))
 ASM := $(patsubst %.c, %.asm, $(SRC))

@@ -266,6 +266,13 @@ void c_minus1(void)
     failures++;
 }
 
+void c_c0gtc1(void)
+{
+
+  if(char0 < char1)
+    failures++;
+}
+
 void
 main (void)
 {
@@ -300,6 +307,14 @@ main (void)
   char0 = -1;
   int0 = -1;
   c_minus1();
+
+
+  char0 = 5;
+  char1 = 3;
+  c_c0gtc1();
+
+  char1 = -3;
+  c_c0gtc1();
 
   success = failures;
   done ();

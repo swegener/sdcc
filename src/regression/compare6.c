@@ -4,7 +4,7 @@ unsigned char success = 0;
 unsigned char failures = 0;
 unsigned char dummy = 0;
 
-bit bit0 = 0;
+//bit bit0 = 0;
 int int0 = 0;
 int int1 = 0;
 unsigned char uchar0 = 0;
@@ -152,6 +152,14 @@ void c_long(void)
 
 }
 
+void c_uminus(void)
+{
+
+  int1 = -int0;
+  if(int1 < 0)
+    failures++;
+}
+
 void
 main (void)
 {
@@ -159,6 +167,11 @@ main (void)
   c_char();
   c_int();
   c_long();
+
+  int0 = -1;
+  c_uminus();
+  if(int1 != 1)
+    failures++;
 
   success = failures;
   done ();

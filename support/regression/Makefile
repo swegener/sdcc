@@ -84,6 +84,8 @@ test-mcs51:
 	$(MAKE) inter-port-clean test-port PORT=mcs51
 test-mcs51-large:
 	$(MAKE) inter-port-clean test-port PORT=mcs51-large
+test-mcs51-stack-auto:
+	$(MAKE) inter-port-clean make-library test-port PORT=mcs51-stack-auto
 
 # Helper rule for testing the ds390 port only
 test-ds390:

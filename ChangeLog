@@ -1,3 +1,7 @@
+2004-08-13 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/gen.c: Fixed problem with fn returning a variable bigger than a char.
+
 2004-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClrange.c (findPrevUse): fixed bug #1007371

@@ -417,7 +417,7 @@ int SdccLib(char * PathLib, FILE * libfp, char * DirLib, char * SymName)
 						/*As in the original library format, it is assumed that the .rel
 						files reside in the same directory as the lib files.*/
 						strcat(DirLib, ModName);
-						strcat(DirLib, ".rel"); /*FSEPX???*/
+				        sprintf(&DirLib[strlen(DirLib)], "%crel", FSEPX);
 
 						/*If this module has been loaded already don't load it again.*/
 						lbf = lbfhead;

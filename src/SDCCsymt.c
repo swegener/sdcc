@@ -122,14 +122,6 @@ addSym (bucket ** stab,
     }
     /* make sure the type is complete and sane */
     checkTypeSanity(csym->etype, csym->name);
-
-    // jwk: if this is a function ptr with a void arg, remove it
-    if (IS_DECL(csym->type) && DCL_TYPE(csym->type)==CPOINTER) {
-      sym_link *type=csym->type->next;
-      if (FUNC_ARGS(type) && SPEC_NOUN(FUNC_ARGS(type)->type)==V_VOID) {
-	FUNC_ARGS(type)=NULL;
-      }
-    }
   }
 
   /* prevent overflow of the (r)name buffers */
@@ -418,6 +410,9 @@ addDecl (symbol * sym, int type, sym_link * p)
   sym_link *tail;
   sym_link *t;
 
+  if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "SDCCsymt.c:addDecl(%s,%d,%p)\n", sym->name, type, p);
+
   /* if we are passed a link then set head & tail */
   if (p)
     {
@@ -480,6 +475,12 @@ addDecl (symbol * sym, int type, sym_link * p)
       SPEC_VOLATILE (sym->etype) = SPEC_VOLATILE (DCL_TSPEC (p));
       DCL_TSPEC (p) = NULL;
     }
+
+  // if there is a function in this type chain
+  if (p && funcInChain(sym->type)) {
+    processFuncArgs (sym);
+  }
+
   return;
 }
 
@@ -1107,10 +1108,12 @@ compStructSize (int su, structdef * sdef)
 	    sum += getSize (loop->type);
 	}
 
+#if 0 // jwk: this is done now in addDecl()
 	/* if function then do the arguments for it */
 	if (funcInChain (loop->type)) {
-	    processFuncArgs (loop, 1);
+	    processFuncArgs (loop);
 	}
+#endif
 
 	loop = loop->next;
 
@@ -1770,11 +1773,19 @@ checkFunction (symbol * sym, symbol *csym)
 /* processFuncArgs - does some processing with function args       */
 /*-----------------------------------------------------------------*/
 void 
-processFuncArgs (symbol * func, int ignoreName)
+processFuncArgs (symbol * func)
 {
   value *val;
   int pNum = 1;
   sym_link *funcType=func->type;
+
+  if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "SDCCsymt.c:processFuncArgs(%s)\n", func->name);
+
+  // if this is a pointer to a function
+  if (IS_PTR(funcType)) {
+    funcType=funcType->next;
+  }
 
   /* if this function has variable argument list */
   /* then make the function a reentrant one    */

@@ -370,7 +370,6 @@ allocGlobal (symbol * sym)
     {
       /* set the output class */
       SPEC_OCLS (sym->etype) = port->mem.default_globl_map;
-      // jwk: we need to set SPEC_SCLS now !!!!
       /* generate the symbol  */
       allocIntoSeg (sym);
       return;
@@ -800,8 +799,9 @@ allocVariables (symbol * symChain)
       /* then args  processing  */
       if (funcInChain (csym->type))
 	{
-
-	  processFuncArgs (csym, 1);
+#if 1 // jwk: TODO should have been done already in addDecl() (oclass????)
+	  processFuncArgs (csym);
+#endif
 	  /* if register bank specified then update maxRegBank */
 	  if (maxRegBank < FUNC_REGBANK (csym->type))
 	    maxRegBank = FUNC_REGBANK (csym->type);

@@ -3094,7 +3094,6 @@ decorateType (ast * tree)
       if (processParms (tree->left,
 			FUNC_ARGS(tree->left->ftype),
 			tree->right, &parmNumber, TRUE)) {
-	//fprintf (stderr, "jwk: error in processParms()\n");
 	goto errorTreeReturn;
       }
 
@@ -4102,6 +4101,9 @@ createFunction (symbol * name, ast * body)
   sym_link *fetype;
   iCode *piCode = NULL;
 
+  if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "SDCCast.c:createFunction(%s)\n", name->name);
+
   /* if check function return 0 then some problem */
   if (checkFunction (name, NULL) == 0)
     return NULL;
@@ -4132,7 +4134,10 @@ createFunction (symbol * name, ast * body)
     }
   name->lastLine = yylineno;
   currFunc = name;
-  processFuncArgs (currFunc, 0);
+
+#if 0 // jwk: this is now done in addDecl()
+  processFuncArgs (currFunc);
+#endif
 
   /* set the stack pointer */
   /* PENDING: check this for the mcs51 */

@@ -469,7 +469,7 @@ void addSymChain (symbol *);
 sym_link *structElemType (sym_link *, value *);
 symbol *getStructElement (structdef *, symbol *);
 sym_link *computeType (sym_link *, sym_link *);
-void processFuncArgs (symbol *, int);
+void processFuncArgs (symbol *);
 int isSymbolEqual (symbol *, symbol *);
 int powof2 (unsigned long);
 void printTypeChain (sym_link *, FILE *);

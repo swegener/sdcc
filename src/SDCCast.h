@@ -100,7 +100,6 @@ typedef struct ast
     sym_link *ftype;		/* start of type chain for this subtree */
     sym_link *etype;		/* end of type chain for this subtree   */
 
-    symbol *argSym;		/* argument symbols            */
     struct ast *left;		/* pointer to left tree        */
     struct ast *right;		/* pointer to right tree       */
     symbol *trueLabel;		/* if statement trueLabel */

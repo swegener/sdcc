@@ -2112,10 +2112,8 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   SPEC_OCLS (retype) = SPEC_OCLS (etype);
   SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype);
 
-#if 1 // jwk
   if (IS_PTR (element->type))
     setOperandType (IC_RESULT (ic), aggrToPtr (operandType (IC_RESULT (ic)), TRUE));
-#endif
 
   IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (element->type));
 
@@ -2734,8 +2732,7 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
     }
 
   /* if register parm then make it a send */
-  if ((parms->argSym && IS_REGPARM(parms->argSym->etype)) ||
-      (IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(func->type)))
+  if (IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(func->type))
     {
       ic = newiCode (SEND, pval, NULL);
       ADDTOCHAIN (ic);

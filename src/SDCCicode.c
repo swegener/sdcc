@@ -1406,121 +1406,16 @@ usualUnaryConversions (operand * op)
 sym_link *
 usualBinaryConversions (operand ** op1, operand ** op2)
 {
-  if (!options.ANSIint)
-    {
-      /* "Classic" SDCC behavior. */
-      sym_link *ctype;
-      sym_link *rtype = operandType (*op2);
-      sym_link *ltype = operandType (*op1);
-
-      ctype = computeType (ltype, rtype);
-      *op1 = geniCodeCast (ctype, *op1, TRUE);
-      *op2 = geniCodeCast (ctype, *op2, TRUE);
-
-      return ctype;
-    }
-
-  *op1 = usualUnaryConversions (*op1);
-  *op2 = usualUnaryConversions (*op2);
-
-  /* Try to make the two operands of the same type, following
-   * the "usual binary conversions" promotion rules.
-   *
-   * NB: floating point types are not yet properly handled; we
-   * follow the "classic" behavior.
-   */
-
-  if (IS_FLOAT (operandType (*op1)) || IS_FLOAT (operandType (*op2)))
-    {
-      return newFloatLink ();
-    }
-
-  if (!IS_INTEGRAL (operandType (*op1)) || !IS_INTEGRAL (operandType (*op2)))
-    {
-      /* if either is not an integer type, we're done. */
-      return copyLinkChain (operandType (*op1));	/* Punt! we should never get here. */
-    }
-
-  /* If either is an unsigned long, make sure both are. */
-  if (SPEC_USIGN (operandType (*op1)) && IS_LONG (operandType (*op1)))
-    {
-      if (!SPEC_USIGN (operandType (*op2)) || !IS_LONG (operandType (*op2)))
-	{
-	  *op2 = geniCodeCast (ULONGTYPE, *op2, TRUE);
-	}
-      return copyLinkChain (operandType (*op1));
-    }
-
-  if (SPEC_USIGN (operandType (*op2)) && IS_LONG (operandType (*op2)))
-    {
-      if (!SPEC_USIGN (operandType (*op1)) || !IS_LONG (operandType (*op1)))
-	{
-	  *op1 = geniCodeCast (ULONGTYPE, *op1, TRUE);
-	}
-      return copyLinkChain (operandType (*op2));
-    }
-
-  /* Next, if one is long and the other is int (signed or un),
-   * cast both to long.
-   *
-   * Note that because in our environment a long can hold all
-   * the values of an unsigned int, the "long/unsigned int" pair
-   * in the ANSI conversion table is unnecessary; this test
-   * handles that case implicitly.
-   */
-  if (IS_LONG (operandType (*op1)))
-    {
-      /* NB: because of the unary conversions, op2 cannot
-       * be smaller than int. Therefore, if it is not
-       * long, it is a regular int.
-       */
-      if (!IS_LONG (operandType (*op2)))
-	{
-	  *op2 = geniCodeCast (LONGTYPE, *op2, TRUE);
-	}
-      return copyLinkChain (operandType (*op1));
-    }
-
-  if (IS_LONG (operandType (*op2)))
-    {
-      /* NB: because of the unary conversions, op2 cannot
-       * be smaller than int. Therefore, if it is not
-       * long, it is a regular int.
-       */
-      if (!IS_LONG (operandType (*op1)))
-	{
-	  *op1 = geniCodeCast (LONGTYPE, *op1, TRUE);
-	}
-      return copyLinkChain (operandType (*op2));
-    }
-
-  /* All right, neither is long; they must both be integers.
-
-   * Only remaining issue is signed vs. unsigned; if one is unsigned
-   * and the other isn't, convert both to unsigned.
-   */
-  if (SPEC_USIGN (operandType (*op1)))
-    {
-      if (!SPEC_USIGN (operandType (*op2)))
-	{
-	  *op2 = geniCodeCast (UINTTYPE, *op2, TRUE);
-	}
-      return copyLinkChain (operandType (*op1));
-    }
-
-  if (SPEC_USIGN (operandType (*op2)))
-    {
-      if (!SPEC_USIGN (operandType (*op1)))
-	{
-	  *op1 = geniCodeCast (UINTTYPE, *op1, TRUE);
-	}
-      return copyLinkChain (operandType (*op2));
-    }
-
-  /* Done! */
-  return copyLinkChain (operandType (*op1));
+  sym_link *ctype;
+  sym_link *rtype = operandType (*op2);
+  sym_link *ltype = operandType (*op1);
+  
+  ctype = computeType (ltype, rtype);
+  *op1 = geniCodeCast (ctype, *op1, TRUE);
+  *op2 = geniCodeCast (ctype, *op2, TRUE);
+  
+  return ctype;
 }
-
 
 /*-----------------------------------------------------------------*/
 /* geniCodeValueAtAddress - generate intermeditate code for value  */
@@ -1690,7 +1585,6 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 {
   iCode *ic;
   int p2 = 0;
-  int saveOption=0;
   sym_link *resType;
   LRTYPE;
 
@@ -1703,11 +1597,6 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
     p2 = powof2 ((unsigned long) floatFromVal (right->operand.valOperand));
   }
 
-  if (resultIsInt)
-    {
-      saveOption = options.ANSIint;
-      options.ANSIint = 0;
-    }
   resType = usualBinaryConversions (&left, &right);
 #if 1
   rtype = operandType (right);
@@ -1717,7 +1606,6 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 #endif
   if (resultIsInt)
     {
-      options.ANSIint = saveOption;
       SPEC_NOUN(getSpec(resType))=V_INT;
       SPEC_SHORT(getSpec(resType))=0;
     }
@@ -2446,16 +2334,6 @@ geniCodeLeftShift (operand * left, operand * right)
 {
   iCode *ic;
 
-
-  /* Note that we don't use the usual binary conversions for the
-   * shift operations, in accordance with our ANSI friends.
-   */
-  if (options.ANSIint)
-    {
-      right = usualUnaryConversions (right);
-      left = usualUnaryConversions (left);
-    }
-
   ic = newiCode (LEFT_OP, left, right);
   IC_RESULT (ic) = newiTempOperand (operandType (left), 0);
   ADDTOCHAIN (ic);
@@ -2469,16 +2347,6 @@ operand *
 geniCodeRightShift (operand * left, operand * right)
 {
   iCode *ic;
-
-
-  /* Note that we don't use the usual binary conversions for the
-   * shift operations, in accordance with our ANSI friends.
-   */
-  if (options.ANSIint)
-    {
-      right = usualUnaryConversions (right);
-      left = usualUnaryConversions (left);
-    }
 
   ic = newiCode (RIGHT_OP, left, right);
   IC_RESULT (ic) = newiTempOperand (operandType (left), 0);

@@ -130,7 +130,6 @@ char DefaultExePath[128];
 #define OPTION_NOSTDLIB     "-nostdlib"
 #define OPTION_NOSTDINC     "-nostdinc"
 #define OPTION_VERBOSE      "-verbose"
-#define OPTION_ANSIINT      "-ansiint"
 static const char *_preCmd[] =
 {
   "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1",
@@ -932,12 +931,6 @@ parseCmdLine (int argc, char **argv)
 	  if (strcmp (&argv[i][1], OPTION_VERBOSE) == 0)
 	    {
 	      options.verbose = 1;
-	      continue;
-	    }
-
-	  if (strcmp (&argv[i][1], OPTION_ANSIINT) == 0)
-	    {
-	      options.ANSIint = 1;
 	      continue;
 	    }
 

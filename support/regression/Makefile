@@ -37,10 +37,11 @@
 
 # Uncomment this to show only errors and the summary.
 # Comment this out for debugging.
-.SILENT:
+#.SILENT:
 
 # All original tests live in TESTS_DIR and below
-TESTS_DIR = tests
+TESTS_DIR = tests-min
+TESTS_NAME = $(TESTS_DIR)
 # All suite results go in RESULTS_DIR
 RESULTS_DIR = results
 # All data relating to supported ports live in their own directory
@@ -117,11 +118,11 @@ SDCCFLAGS += -Ifwk/include
 # Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%$(DIREXT): $(TESTS_DIR)/%.c $(GENERATE_CASES)
 	echo Processing $<
-	rm -rf $(CASES_DIR)/tests
-	mkdir -p $(CASES_DIR)/tests
+	rm -rf $(CASES_DIR)/$(TESTS_NAME)
+	mkdir -p $(CASES_DIR)/$(TESTS_NAME)
 	mkdir -p $@
 	python $(GENERATE_CASES) $< > /dev/null
-	cp $(CASES_DIR)/tests/*.c $@
+	cp $(CASES_DIR)/$(TESTS_NAME)/*.c $@
 	touch $@
 
 # Rule linking the combined results log to all of the files in the

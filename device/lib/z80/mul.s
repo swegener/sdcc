@@ -28,6 +28,15 @@ __mulschar_rr_hds::
         jp      .mul16
 
 __muluchar_rr_s::
+        ld      hl,#2
+        add     hl,sp
+
+        ld      e,(hl)
+        inc     hl
+        ld      c,(hl)                
+
+        jp      .mulu16
+        
 __mulsint_rr_s::
 __muluint_rr_s::
         ld      hl,#2
@@ -49,7 +58,6 @@ __mulsint_rr_hds::
 __muluint_rr_hds::
 	;; Parameters:
 	;;	HL, DE (left, right irrelivent)
-	;; Must preserve BC
 	ld	b,h
 	ld	c,l
 	

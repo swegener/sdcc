@@ -1,16 +1,53 @@
 /** Simple test for the mul/div/mod operations.
 
-    type: int, signed char, short
+    type: int, char, short
     storage: static,
     attr: volatile,
 */
 #include <testfwk.h>
 
 static void
+testUnsignedModDiv(void)
+{
+    {attr} {storage} unsigned {type} i;
+    unsigned {type} result;
+
+    i = 100;
+
+    result = i/3;
+    ASSERT(result == 33);
+
+    result = i/12;
+    ASSERT(result == 8);
+
+    result = i%7;
+    ASSERT(result == 2);
+
+    result = i%34;
+    ASSERT(result == 32);
+}
+
+static void
+testUnsignedMul(void)
+{
+    {attr} {storage} unsigned {type} i;
+    unsigned {type} result;
+
+    i = 37;
+
+    LOG(("i*3 == 111 = %u\n", i*3));
+    result = i*3;
+    ASSERT(result == 111);
+
+    result = i*12;
+    ASSERT(result == (({type})444));
+}
+
+static void
 testMul(void)
 {
-    {attr} {storage} {type} i;
-    {type} result;
+    {attr} {storage} signed {type} i;
+    signed {type} result;
 
     i = 5;
 
@@ -32,7 +69,7 @@ testMul(void)
 static void
 testDiv(void)
 {
-    {attr} {storage} {type} i;
+    {attr} {storage} signed {type} i;
 
     i = 100;
     LOG(("i/5 == 20 = %u\n", (int)i/5));
@@ -50,7 +87,7 @@ testDiv(void)
 static void
 testMod(void)
 {
-    {attr} {storage} {type} i;
+    {attr} {storage} signed {type} i;
 
     // Disabled the LOG functions due to a bug in sdcc involving
     // vaargs.

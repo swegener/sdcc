@@ -99,19 +99,13 @@ __divuchar_rr_s::
         ld      l,(hl)
         
         ;; Fall through
-__divuchar_rr_hds::	
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
+__divuchar_rr_hds::
+        ld      c,l
 	call	.divu8
 
 	ld	l,c
         ld      h,b
-        	
-	pop	ix
+        
 	ret
 	
 __moduchar_rr_s::       
@@ -124,19 +118,13 @@ __moduchar_rr_s::
         
         ;; Fall through
 __moduchar_rr_hds::
-	push	ix
-	ld	ix,#0
-	add	ix,sp
-
-	ld	c,8(ix)
-	ld	e,9(ix)
+        ld      c,l
 	call	.divu8
 
 	ld	l,e
         ld      h,d
-        	
-	pop	ix
-	ret
+
+        ret
 
 __divuint_rr_s::                
         ld      hl,#2+3

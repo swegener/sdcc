@@ -96,6 +96,7 @@ char buffer[PATH_MAX * 2];
 
 #define OPTION_STACK_8BIT       "--stack-8bit"
 #define OPTION_OUT_FMT_IHX      "--out-fmt-ihx"
+#define OPTION_OUT_FMT_S19      "--out-fmt-s19"
 #define OPTION_LARGE_MODEL      "--model-large"
 #define OPTION_MEDIUM_MODEL     "--model-medium"
 #define OPTION_SMALL_MODEL      "--model-small"
@@ -239,7 +240,7 @@ optionsTable[] = {
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
     { 0,    OPTION_LIB_PATH,        NULL, "<path> use this path to search for libraries" },
     { 0,    OPTION_OUT_FMT_IHX,     NULL, "Output in Intel hex format" },
-    { 0,    "--out-fmt-s19",        &options.out_fmt, "Output in S19 hex format" },
+    { 0,    OPTION_OUT_FMT_S19,     NULL, "Output in S19 hex format" },
     { 0,    OPTION_XRAM_LOC,        NULL, "<nnnn> External Ram start location" },
     { 0,    OPTION_XRAM_SIZE,       NULL, "<nnnn> External Ram size" },
     { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },
@@ -882,6 +883,12 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
+          if (strcmp (argv[i], OPTION_OUT_FMT_S19) == 0)
+            {
+              options.out_fmt = 1;
+              continue;
+            }
+
           if (strcmp (argv[i], OPTION_LARGE_MODEL) == 0)
             {
               _setModel (MODEL_LARGE, argv[i]);
@@ -1474,7 +1481,8 @@ linkEdit (char **envp)
           WRITE_SEG_LOC (BIT_NAME, 0);
 
           /* stack start */
-          if ( (options.stack_loc) && (options.stack_loc<0x100) )
+          if ( (options.stack_loc) && (options.stack_loc<0x100) &&
+               !TARGET_IS_HC08)
             {
               WRITE_SEG_LOC ("SSEG", options.stack_loc);
             }

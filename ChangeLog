@@ -1,3 +1,12 @@
+2004-11-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCmain.c (parseCmdLine, optionsTable[]): fixed bug with
+	  --out-fmt-s19 turning into --out-fmt-elf if s19 was already
+	  selected.
+	* src/SDCCmain.c (linkEdit): don't define SSEG for HC08
+	* src/hc08/main.c (_hc08_setDefaultOptions): default xdata to be
+	  contiguous with data
+
 2004-11-19 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/_gptrget.c (_gptrget),

@@ -139,7 +139,7 @@ _hc08_setDefaultOptions (void)
 {
   options.code_loc = 0x8000;
   options.data_loc = 0x80;
-  options.xdata_loc = 0x100;
+  options.xdata_loc = 0;	/* 0 means immediately following data */
   options.stack_loc = 0x7fff;
   options.out_fmt = 1;		/* use motorola S19 output */
 

@@ -74,6 +74,7 @@ static struct
     short nRegsSaved;
     set *sendSet;
     iCode *current_iCode;
+    symbol *currentFunc;
   }
 _G;
 
@@ -257,6 +258,60 @@ endOfWorld:
 	  "getFreePtr should never reach here");
   exit (1);
 }
+
+
+/*-----------------------------------------------------------------*/
+/* getTempRegs - initialize an array of pointers to GPR registers */
+/*               that are not in use. Returns 1 if the requested   */
+/*               number of registers were available, 0 otherwise.  */
+/*-----------------------------------------------------------------*/
+int
+getTempRegs(regs **tempRegs, int size, iCode *ic)
+{
+  bitVect * freeRegs;
+  int i;
+  int offset;
+  
+  if (!ic)
+    ic = _G.current_iCode;
+  if (!ic)
+    return 0;
+  if (!_G.currentFunc)
+    return 0;
+ 
+  freeRegs = newBitVect(8);
+  bitVectSetBit (freeRegs, R2_IDX);
+  bitVectSetBit (freeRegs, R3_IDX);
+  bitVectSetBit (freeRegs, R4_IDX);
+  bitVectSetBit (freeRegs, R5_IDX);
+  bitVectSetBit (freeRegs, R6_IDX);
+  bitVectSetBit (freeRegs, R7_IDX);
+  
+  if (IFFUNC_CALLEESAVES(_G.currentFunc->type))
+    {
+      bitVect * newfreeRegs;
+      newfreeRegs = bitVectIntersect (freeRegs, _G.currentFunc->regsUsed);
+      freeBitVect(freeRegs);
+      freeRegs = newfreeRegs;
+    }
+  freeRegs = bitVectCplAnd (freeRegs, ic->rMask);
+  
+  offset = 0;	  
+  for (i=0; i<freeRegs->size; i++)
+    {
+      if (bitVectBitValue(freeRegs,i))
+        tempRegs[offset++] = mcs51_regWithIdx(i);
+      if (offset>=size)
+        {
+	  freeBitVect(freeRegs);
+	  return 1;
+	}
+    }
+
+  freeBitVect(freeRegs);
+  return 1;
+}
+
 
 /*-----------------------------------------------------------------*/
 /* newAsmop - creates a new asmOp                                  */
@@ -2317,6 +2372,7 @@ genFunction (iCode * ic)
 
   emitcode ("", "%s:", sym->rname);
   ftype = operandType (IC_LEFT (ic));
+  _G.currentFunc = sym;
 
   if (IFFUNC_ISNAKED(ftype))
   {
@@ -2621,6 +2677,7 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
+  _G.currentFunc = NULL;
   if (IFFUNC_ISNAKED(sym->type))
   {
       emitcode(";", "naked function: no epilogue.");
@@ -9078,6 +9135,46 @@ genReceive (iCode * ic)
 	  (OP_SYMBOL (IC_RESULT (ic))->isspilt ||
 	   IS_TRUE_SYMOP (IC_RESULT (ic)))) {
 
+	  regs *tempRegs[4];
+	  int receivingA = 0;
+	  int roffset = 0;
+	      
+	  for (offset = 0; offset<size; offset++)
+	    if (!strcmp (fReturn[offset], "a"))
+	      receivingA = 1;
+	  
+	  if (!receivingA)
+	    {
+	      if (size==1 || getTempRegs(tempRegs, size-1, ic))
+		{
+		  for (offset = size-1; offset>0; offset--)
+		    emitcode("mov","%s,%s", tempRegs[roffset++]->name, fReturn[offset]);
+		  emitcode("mov","a,%s", fReturn[0]);
+		  _G.accInUse++;
+		  aopOp (IC_RESULT (ic), ic, FALSE);
+		  _G.accInUse--;
+		  aopPut (AOP (IC_RESULT (ic)), "a", offset,
+		          isOperandVolatile (IC_RESULT (ic), FALSE));
+		  for (offset = 1; offset<size; offset++)
+		    aopPut (AOP (IC_RESULT (ic)), tempRegs[--roffset]->name, offset,
+			    isOperandVolatile (IC_RESULT (ic), FALSE));
+		  goto release;
+		}
+	    }
+	  else
+	    {
+	      if (getTempRegs(tempRegs, size, ic))
+		{
+		  for (offset = 0; offset<size; offset++)
+		    emitcode("mov","%s,%s", tempRegs[offset]->name, fReturn[offset]);
+		  aopOp (IC_RESULT (ic), ic, FALSE);
+		  for (offset = 0; offset<size; offset++)
+		    aopPut (AOP (IC_RESULT (ic)), tempRegs[offset]->name, offset,
+			    isOperandVolatile (IC_RESULT (ic), FALSE));
+		  goto release;
+		}
+	    }
+
 	  offset = fReturnSizeMCS51 - size;
 	  while (size--) {
 	      emitcode ("push", "%s", (strcmp (fReturn[fReturnSizeMCS51 - offset - 1], "a") ?
@@ -9106,6 +9203,8 @@ genReceive (iCode * ic)
 	  aopPut (AOP (IC_RESULT (ic)), rb1regs[rb1off++ -5], offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
       }
   }
+
+release:  
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
 }
 
@@ -9237,6 +9336,7 @@ gen51Code (iCode * lic)
   iCode *ic;
   int cln = 0;
 
+  _G.currentFunc = NULL;
   lineHead = lineCurr = NULL;
 
   /* print the allocation information */

@@ -1,5 +1,11 @@
 2004-01-09 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
+	* src/mcs51/gen.c (genFunction, genEndFunction, genReceive, getTempRegs,
+	gen51Code): more efficient parameter receive for --model-large
+	("bug" #845294)
+
+2004-01-09 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
 	* src/ds390/main.c,
 	* src/z80/main.c: added missed needLinkerScript flags (more than
 	one port structure defined in these file)

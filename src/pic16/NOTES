@@ -18,6 +18,27 @@ Scott Dattalo	<scott AT dattalo.com>
 
 ======================================================================
 ======================================================================
+2004-Aug-30 Vangelis Rokas
+1. A few months ago Hans Dorn had the idea to support general pointer
+for accessing all code, eeprom data and data ram memory. These pointers
+would have 3 bytes of size (24-bits), of which only the 21 lower bits
+would be useful. The rest of them could be used to indicate the pointer
+type. I.e.
+0x4xxxxxxx would mean code pointer
+0x8xxxxxxx would mean eeprom pointer
+0xcxxxxxxx would mean data ram pointer
+
+The implementatio of such pointers needs a lot of work and general
+reform of pointer access, data initializing functions and the writing
+of support functions for decoding their type.
+
+The implementation of such pointers along with the implementation of
+a more SDCC like stack access system will allow the writing of variable
+arguments functions like printf etc... Also one set of functions will be
+able to handle all data types without having to worry about where they
+are placed.
+
+
 2004-May-23 Vangelis Rokas
 
 1. The improvement of the port has been stalled a bit. But, struct/union

@@ -9183,7 +9183,7 @@ release:
 /*-----------------------------------------------------------------*/
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
-static void genUnpackBits (operand *result, char *rname, int ptype)
+static void genUnpackBits (operand *result, operand *left, char *rname, int ptype)
 {    
     int shCnt ;
     int rlen = 0 ;
@@ -9421,7 +9421,8 @@ static void genNearPointerGet (operand *left,
 			&& ((AOP(left)->aopu.pcop->type == PO_IMMEDIATE)
 				|| (AOP(left)->aopu.pcop->type == PO_DIR))) // patch 10
 		{
-			pic16_loadFSR0( left );  // patch 10
+			if(!IS_BITFIELD(retype))
+				pic16_loadFSR0( left );  // patch 10
 		} else {
 			// set up FSR0 with address from left
 			pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),0), pic16_popCopyReg(&pic16_pc_fsr0l))); // patch 10
@@ -9435,7 +9436,7 @@ static void genNearPointerGet (operand *left,
     
       /* if bitfield then unpack the bits */
     if (IS_BITFIELD(retype)) 
-	genUnpackBits (result, NULL, POINTER);
+	genUnpackBits (result, left, NULL, POINTER);
     else {
 	/* we have can just get the values */
       int size = AOP_SIZE(result);
@@ -9549,7 +9550,7 @@ static void genPagedPointerGet (operand *left,
 
     /* if bitfield then unpack the bits */
     if (IS_BITFIELD(retype)) 
-	genUnpackBits (result,rname,PPOINTER);
+	genUnpackBits (result,left,rname,PPOINTER);
     else {
 	/* we have can just get the values */
 	int size = AOP_SIZE(result);
@@ -9627,7 +9628,7 @@ static void genFarPointerGet (operand *left,
 
     /* if bit then unpack */
     if (IS_BITFIELD(retype)) 
-        genUnpackBits(result,"dptr",FPOINTER);
+        genUnpackBits(result,left,"dptr",FPOINTER);
     else {
         size = AOP_SIZE(result);
         offset = 0 ;
@@ -9677,7 +9678,7 @@ static void genCodePointerGet (operand *left,
 
     /* if bit then unpack */
     if (IS_BITFIELD(retype)) 
-        genUnpackBits(result,"dptr",CPOINTER);
+        genUnpackBits(result,left,"dptr",CPOINTER);
     else {
         size = AOP_SIZE(result);
         offset = 0 ;
@@ -9750,7 +9751,7 @@ static void genGenPointerGet (operand *left,
 
   /* if bit then unpack */
 	if (IS_BITFIELD(retype)) 
-		genUnpackBits(result,"BAD",GPOINTER);
+		genUnpackBits(result,left,"BAD",GPOINTER);
 
 	release:
 	pic16_freeAsmop(left,NULL,ic,TRUE);
@@ -9929,7 +9930,7 @@ static void genPointerGet (iCode *ic)
 /*-----------------------------------------------------------------*/
 /* genPackBits - generates code for packed bit storage             */
 /*-----------------------------------------------------------------*/
-static void genPackBits (sym_link    *etype ,
+static void genPackBits (sym_link    *etype , operand *result,
                          operand *right ,
                          char *rname, int p_type)
 {
@@ -9952,12 +9953,24 @@ static void genPackBits (sym_link    *etype ,
 
 			lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
 //			pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
-			if(lit) {
-				pic16_emitpcode(POC_BSF,
-					pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
+			if((p_type == POINTER) && (result)) {
+				/* workaround to reduce the extra lfsr instruction */
+				if(lit) {
+					pic16_emitpcode(POC_BSF,
+						pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), 0), bstr));
+				} else {
+					pic16_emitpcode(POC_BCF,
+						pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), 0), bstr));
+				}
 			} else {
-				pic16_emitpcode(POC_BCF,
-					pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
+
+				if(lit) {
+					pic16_emitpcode(POC_BSF,
+						pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
+				} else {
+					pic16_emitpcode(POC_BCF,
+						pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
+				}
 			}
 	
 		  return;
@@ -10192,6 +10205,7 @@ static void genNearPointerSet (operand *right,
 			&& ((AOP(result)->aopu.pcop->type == PO_IMMEDIATE)
 				|| (AOP(result)->aopu.pcop->type == PO_DIR))) // patch 10
 		{
+		  if(!IS_BITFIELD(resetype))
 			pic16_loadFSR0( result );  // patch 10
 		} else {
 			// set up FSR0 with address of result
@@ -10207,7 +10221,7 @@ static void genNearPointerSet (operand *right,
 
 	/* if bitfield then unpack the bits */
 	if (IS_BITFIELD(resetype)) {
-		genPackBits (resetype, right, NULL, POINTER);
+		genPackBits (resetype, result, right, NULL, POINTER);
 	} else {
 		/* we have can just get the values */
 	  int size = AOP_SIZE(right);
@@ -10313,7 +10327,7 @@ static void genPagedPointerSet (operand *right,
 
     /* if bitfield then unpack the bits */
     if (IS_BITFIELD(retype)) 
-	genPackBits (retype,right,rname,PPOINTER);
+	genPackBits (retype,result,right,rname,PPOINTER);
     else {
 	/* we have can just get the values */
 	int size = AOP_SIZE(right);
@@ -10391,7 +10405,7 @@ static void genFarPointerSet (operand *right,
 
     /* if bit then unpack */
     if (IS_BITFIELD(retype)) 
-        genPackBits(retype,right,"dptr",FPOINTER);
+        genPackBits(retype,result,right,"dptr",FPOINTER);
     else {
         size = AOP_SIZE(right);
         offset = 0 ;
@@ -10498,7 +10512,7 @@ static void genGenPointerSet (operand *right,
 
 	/* if bit then unpack */
 	if (IS_BITFIELD(retype)) 
-		genPackBits(retype,right,"dptr",GPOINTER);
+		genPackBits(retype,result,right,"dptr",GPOINTER);
 	else {
 		size = AOP_SIZE(right);
 		offset = 0 ;
@@ -10837,12 +10851,14 @@ static void genAssign (iCode *ic)
   if(AOP_TYPE(right) != AOP_LIT
   	&& IN_CODESPACE(SPEC_OCLS(OP_SYMBOL(right)->etype))) {
   	DEBUGpic16_emitcode(";   ", "%s:%d symbol in code space, take special care\n", __FUNCTION__, __LINE__);
+  	fprintf(stderr, "%s:%d symbol %s = [ %s ] is in code space\n", __FILE__, __LINE__, OP_SYMBOL(result)->name, OP_SYMBOL(right)->name);
 
 	// set up table pointer
 	if( (AOP_TYPE(right) == AOP_PCODE)
 		&& ((AOP(right)->aopu.pcop->type == PO_IMMEDIATE)
 		|| (AOP(right)->aopu.pcop->type == PO_DIR)))
 	{
+		fprintf(stderr, "%s:%d inside block 1\n", __FILE__, __LINE__);
 		pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(right),0));
 		pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_tblptrl));
 		pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(right),1));
@@ -10850,6 +10866,7 @@ static void genAssign (iCode *ic)
 		pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(right),2));
 		pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_tblptru));
 	} else {
+		fprintf(stderr, "%s:%d inside block 2\n", __FILE__, __LINE__);
 		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(right),0),
 				pic16_popCopyReg(&pic16_pc_tblptrl)));
 		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(right),1),

@@ -286,6 +286,8 @@ _process_pragma(const char *sz)
 #define NO_DEFLIBS	"--nodefaultlibs"
 #define MPLAB_COMPAT	"--mplab-comp"
 
+#define NL_OPT		"--nl="
+
 char *alt_asm=NULL;
 char *alt_link=NULL;
 
@@ -296,6 +298,7 @@ extern int pic16_pcode_verbose;
 
 int pic16_fstack=0;
 int pic16_enable_peeps=0;
+int pic16_nl=0;			/* 0 for LF, 1 for CRLF */
 
 OPTION pic16_optionsTable[]= {
 	{ 0,	NO_DEFLIBS,		&pic16_options.nodefaultlibs,	"do not link default libraries when linking"},
@@ -304,7 +307,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
 	{ 0,	"--pomit-ivt",		&pic16_options.omit_ivt,	"omit the generation of the Interrupt Vector Table"},
 	{ 0,	"--pleave-reset-vector",&pic16_options.leave_reset,	"when omitting IVT leave RESET vector"},
-	{ 0,	STACK_MODEL,	NULL,	"use stack model 'small' (default) or 'large'"},
+	{ 0,	STACK_MODEL,		NULL,				"use stack model 'small' (default) or 'large'"},
 
 	{ 0,	"--debug-xtra",		&pic16_debug_verbose,	"show more debug info in assembly output"},
 	{ 0,	"--debug-ralloc",	&pic16_ralloc_debug,	"dump register allocator debug file *.d"},
@@ -320,6 +323,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--calltree",		&pic16_options.dumpcalltree,	"dump call tree in .calltree file"},
 	{ 0,	MPLAB_COMPAT,		&pic16_mplab_comp,	"enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
 	{ 0,	"--fstack",		&pic16_fstack,		"enable stack optimizations"},
+	{ 0,	NL_OPT,		NULL,				"new line, \"lf\" or \"crlf\""},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -350,8 +354,8 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 
 	if(ISOPT(STACK_MODEL)) {
 		stkmodel = getStringArg(STACK_MODEL, argv, i, *pargc);
-		if(STRCASECMP(stkmodel, "small"))pic16_options.stack_model = 0;
-		else if(STRCASECMP(stkmodel, "large"))pic16_options.stack_model = 1;
+		if(!STRCASECMP(stkmodel, "small"))pic16_options.stack_model = 0;
+		else if(!STRCASECMP(stkmodel, "large"))pic16_options.stack_model = 1;
 		else {
 			fprintf(stderr, "Unknown stack model: %s", stkmodel);
 			exit(-1);
@@ -383,7 +387,20 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 		pic16_options.ivt_loc = getIntArg(IVT_LOC, argv, i, *pargc);
 		return TRUE;
 	}
-
+	
+	if(ISOPT(NL_OPT)) {
+          char *tmp;
+            
+            tmp = Safe_strdup( getStringArg(NL_OPT, argv, i, *pargc) );
+            if(!STRCASECMP(tmp, "lf"))pic16_nl = 0;
+            else if(!STRCASECMP(tmp, "crlf"))pic16_nl = 1;
+            else {
+                  fprintf(stderr, "invalid termination character id\n");
+                  exit(-1);
+            }
+            return TRUE;
+        }
+        
   return FALSE;
 }
 

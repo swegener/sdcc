@@ -34,5 +34,6 @@ extern set *sectSyms;
 
 extern int pic16_mplab_comp;
 extern int pic16_fstack;
+extern int pic16_nl;
 
 #endif

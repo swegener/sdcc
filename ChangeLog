@@ -1,3 +1,12 @@
+2004-09-01 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (genPackBits): added operand right in function
+	parameters, load result directly if p_type is POINTER (that is
+	called by genNearPointerSet)
+	* (genUnPackBits): added operand left in function parameters,
+	* (genNearPointerGet, genNearPointerSet): prevent the loading of
+	FSR0 if accessing bitfields,
+
 2004-08-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdio.h: added NULL, size_t, typedef pfn_outputchar,

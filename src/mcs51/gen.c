@@ -1449,25 +1449,25 @@ genCpl (iCode * ic)
 	  goto release;
 	}
 
-    tlbl=newiTempLabel(NULL);
-    if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC ||
-	AOP_TYPE (IC_LEFT (ic)) == AOP_REG ||
-	IS_AOP_PREG (IC_LEFT (ic)))
-      {
-	emitcode ("cjne", "%s,#0x01,%05d$",
-		  aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE),
-		  tlbl->key + 100);
-      }
-    else
-      {
-        char *l = aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE);
-        MOVA (l);
-        emitcode ("cjne", "a,#0x01,%05d$", tlbl->key + 100);
-      }
-    emitcode ("", "%05d$:", tlbl->key + 100);
-    outBitC (IC_RESULT(ic));
-    goto release;
-  }
+      tlbl=newiTempLabel(NULL);
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC ||
+	  AOP_TYPE (IC_LEFT (ic)) == AOP_REG ||
+	  IS_AOP_PREG (IC_LEFT (ic)))
+	{
+	  emitcode ("cjne", "%s,#0x01,%05d$",
+		    aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE),
+		    tlbl->key + 100);
+	}
+      else
+	{
+	  char *l = aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE);
+	  MOVA (l);
+	  emitcode ("cjne", "a,#0x01,%05d$", tlbl->key + 100);
+	}
+      emitcode ("", "%05d$:", tlbl->key + 100);
+      outBitC (IC_RESULT(ic));
+      goto release;
+    }
 
   size = AOP_SIZE (IC_RESULT (ic));
   while (size--)

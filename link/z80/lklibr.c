@@ -579,7 +579,7 @@ int fndsym( char *name )
                 {
                     char absPath1[PATH_MAX];
                     char absPath2[PATH_MAX];
-#if defined(__BORLANDC__) || defined(_MSC_VER)
+#if defined(__BORLANDC__) || defined(_MSC_VER) || defined(__MINGW32__)
                     int j;
 
                     _fullpath(absPath1, FirstFound->libspc, PATH_MAX);

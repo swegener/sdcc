@@ -531,8 +531,9 @@ sym_link *
 mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
 
-  sym_link *symlink;
+  sym_link *symlink=dest;
 
+#if 0
   if (!IS_SPEC(dest)) {
     // This can happen for pointers, find the end type
     while (dest && !IS_SPEC(dest))
@@ -550,6 +551,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   } else {
     symlink=dest;
   }
+#endif
 
   if (!IS_SPEC(dest) || !IS_SPEC(src)) {
     werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");

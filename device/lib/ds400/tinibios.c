@@ -31,9 +31,6 @@
 
 #define TIMED_ACCESS(sfr,value) { TA=0xaa; TA=0x55; sfr=value; }
 
-#undef OSCILLATOR
-#define OSCILLATOR 14745600
-
 unsigned char _sdcc_external_startup(void)
 {
     IE = 0; // Disable all interrupts.
@@ -89,8 +86,7 @@ static data unsigned char serial0Buffered;
 */
 
 
-#define SERIAL0_BAUDRATE 115200
-#define TIMER_RELOAD (65536 - ((OSCILLATOR) / (32 * SERIAL0_BAUDRATE)))
+#define TIMER_RELOAD (65536 - ((OSCILLATOR) / (32 * SERIAL_0_BAUD)))
 
 void Serial0Init (unsigned long baud, unsigned char buffered) {
   
@@ -224,12 +220,125 @@ void ClockInit() {
 
 // we can't just use milliSeconds
 unsigned long ClockTicks(void) {
-    return DSS_gettimemillis();
+    return task_gettimemillis_long();
 }
 
 void ClockMilliSecondsDelay(unsigned long delay) {
-  unsigned long ms = DSS_gettimemillis() + delay;
+  unsigned long ms = task_gettimemillis_long() + delay;
 
-    while (ms > DSS_gettimemillis())
+    while (ms > task_gettimemillis_long())
         ;
+}
+
+// Return the start of the XI_SEG. Really just a workaround for the
+// fact that the linker defined symbol (s_XISEG) isn't directly accessible
+// from C due to the lack of a leading underscore, and I'm too lazy to hack 
+// the linker.
+static void xdata *_xisegStart(void) _naked
+{
+_asm    
+	mov	dptr, #(s_XISEG)
+	ret
+_endasm;
+}
+
+// Return the length of the XI_SEG. Really just a workaround for the
+// fact that the linker defined symbol (l_XISEG) isn't directly accessible
+// from C due to the lack of a leading underscore, and I'm too lazy to hack 
+// the linker.
+static unsigned  _xisegLen(void) _naked
+{
+_asm    
+	mov	dptr, #(l_XISEG)
+	ret
+_endasm;
+}
+
+// Returns the address of the first byte available for heap memory, 
+// i.e. the first byte following the XI_SEG.
+static void xdata *_firstHeapByte(void)
+{
+    unsigned char xdata *start;
+    
+    start = (unsigned char xdata *) _xisegStart();	
+    start += _xisegLen();
+
+    return (void xdata *)start;
+}
+
+// TINIm400 specific startup.
+
+// The last addressible byte of the CE0 area. 
+#define CE0_END 0xfffff
+
+unsigned char romInit(unsigned char noisy,
+		      char           speed)
+{
+    void xdata *heapStart;
+    void xdata *heapEnd;
+    unsigned long heapLen; 
+    unsigned char rc;
+
+    if (speed == SPEED_2X)
+    {
+	PMR = 0x82;
+        PMR = 0x92;
+
+        while (!(EXIF & 8))
+            ;
+
+        PMR = 0x12;
+    }
+    else if (speed == SPEED_4X)
+    {
+	// Hangs on TINIm400!
+	PMR = 0x82;
+	PMR = 0x8a;
+        PMR = 0x9a;
+
+        while (!(EXIF & 8))
+            ;
+
+        PMR = 0x1a;
+    }
+    
+    heapStart = _firstHeapByte();
+    heapEnd = (void xdata *)CE0_END;
+
+    rc = init_rom(heapStart, heapEnd);
+    
+    if (noisy)
+    {
+	if (rc)
+	{
+	    printf("error: rom_init returns %d\n", (int)rc);
+	    return rc;
+	}
+	else
+	{
+	    heapLen = CE0_END - (unsigned long)heapStart;
+	    printf("Heap starts at %p, length %luK\n", heapStart, heapLen / 1024);
+	}
+    }
+    
+    task_settickreload(RELOAD_14_746);
+    
+    // Switch to interrupt driven serial I/O now that the rom is initialized.
+    Serial0SwitchToBuffered();
+    
+    P5 &= ~4; // LED on.
+    
+    return 0;
+}
+
+// Install an interrupt handler.
+void installInterrupt(void (*isrPtr)(void), unsigned char offset)
+{
+    unsigned char xdata * vectPtr = (unsigned char xdata *) offset;
+    unsigned long isr = (unsigned long)isrPtr;
+
+    *vectPtr++ = 0x02;
+    *vectPtr++ = (unsigned char)(isr >> 16);
+    *vectPtr++ = (unsigned char)(isr >> 8);
+    *vectPtr = (unsigned char)isr;
 }

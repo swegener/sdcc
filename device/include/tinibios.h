@@ -38,7 +38,11 @@ void ClockMicroSecondsDelay(unsigned int us);
 #define SERIAL_1_RECEIVE_BUFFER_SIZE 64
 
 // I know someone is fooling with the crystals
-#define OSCILLATOR 18432000L
+#if defined(SDCC_ds400)
+# define OSCILLATOR 14745600L
+#else
+# define OSCILLATOR 18432000L
+#endif
 
 /* Set the cpu speed in clocks per machine cycle, valid values are:
    1024: Divide-by-1024 (power management) mode (screws ALL timers and serial)
@@ -95,7 +99,30 @@ extern char i2cReceiveBuffer[I2C_BUFSIZE];
 unsigned char _sdcc_external_startup(void);
 void Serial0IrqHandler (void) interrupt 4;
 void Serial1IrqHandler (void) interrupt 7;
+
+#if !defined(SDCC_ds400)
 void ClockInit();
 void ClockIrqHandler (void) interrupt 1 _naked;
+#endif
+
+#if defined(SDCC_ds400)
+// functions for dealing with the ds400 ROM firmware.
+
+// A wrapper which calls rom_init allocating all available RAM in CE0
+// to the heap, sets the serial port to SERIAL_0_BAUD, sets up the 
+// millisecond timer, and diddles the clock multiplier.
+
+// Values for the romInit "speed" parameter.
+#define SPEED_1X	0 /* no clock multiplier, normal speed. */
+#define SPEED_2X	1 /* 2x clock multiplier. */
+#define SPEED_4X	2 /* 4x clock, DOESN'T WORK ON TINIm400! */
+
+unsigned char romInit(unsigned char noisy,
+		      char speed);
+
+// Install an interrupt handler.
+void installInterrupt(void (*isrPtr)(void), unsigned char offset);
+#endif
+
 
 #endif /* TINIBIOS_H */

@@ -3,20 +3,33 @@
 #ifndef DS400ROM_H_
 #define DS400ROM_H_
 
-extern unsigned char DSS_rom_init(void xdata *loMem,
-			          void xdata *hiMem) _naked;
+extern unsigned char init_rom(void xdata *loMem,
+			      void xdata *hiMem) _naked;
 
-extern unsigned long DSS_gettimemillis(void) _naked;
+extern unsigned long task_gettimemillis_long(void) _naked;
 
-extern unsigned char DSS_getthreadID(void) _naked;
+extern unsigned char task_getthreadID(void) _naked;
 
-// Utility functions.
+/** Timer reload value for 14.746 MHz crystal. */
+#define RELOAD_14_746 0xfb33
 
-// A wrapper which calls rom_init allocating all available RAM in CE0
-// to the heap.
-unsigned char romInit(unsigned char noisy);
+/** Timer reload value for 18.432 MHz crystal. */
+#define RELOAD_18_432 0xfa00
 
-// Install an interrupt handler.
-void installInterrupt(void (*isrPtr)(void), unsigned char offset);
+/** Timer reload value for 29.491 MHz crystal. */
+#define RELOAD_29_491 0xfd99
+
+/** Timer reload value for 36.864 MHz crystal. */
+#define RELOAD_36_864 0xfd00
+
+/** Timer reload value for 58.982 MHz crystal. */
+#define RELOAD_58_982 0xfecc
+
+/** Timer reload value for 73.728 MHz crystal. */
+#define RELOAD_73_728 0xfe80
+
+extern unsigned int task_gettickreload(void);
+
+extern void task_settickreload(unsigned);
 
 #endif

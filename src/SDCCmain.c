@@ -1349,6 +1349,12 @@ linkEdit (char **envp)
   if ( (options.stack_loc) && (options.stack_loc<0x100) ) {
 	WRITE_SEG_LOC ("SSEG", options.stack_loc);
   }
+  
+  /* If the port has any special linker area declarations, get 'em */
+  if (port->extraAreas.genExtraAreaLinkOptions)
+  {
+	port->extraAreas.genExtraAreaLinkOptions(lnkfile);
+  }
 
   /* add the extra linker options */
   fputStrSet(lnkfile, linkOptionsSet);

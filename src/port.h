@@ -149,6 +149,13 @@ typedef struct
       }
     mem;
 
+    struct
+      {
+	  void (*genExtraAreaDeclaration)(FILE *, bool);
+	  void (*genExtraAreaLinkOptions)(FILE *);
+      }
+    extraAreas;
+      
     /* stack related information */
     struct
       {

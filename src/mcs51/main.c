@@ -277,6 +277,7 @@ PORT mcs51_port =
     NULL,
     1
   },
+  { NULL, NULL },
   {
     +1, 0, 4, 1, 1, 0
   },

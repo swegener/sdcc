@@ -542,6 +542,7 @@ PORT z80_port =
     NULL,
     1
   },
+  { NULL, NULL },
   {
     -1, 0, 0, 4, 0, 2
   },
@@ -636,6 +637,7 @@ PORT gbz80_port =
     NULL,
     1
   },
+  { NULL, NULL },
   {
     -1, 0, 0, 2, 0, 4
   },

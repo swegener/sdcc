@@ -194,6 +194,7 @@ PORT avr_port = {
 	 NULL,
 	 0,
 	 },
+        { NULL, NULL },
 	{
 	 -1, 1, 4, 1, 1, 0},
 	/* avr has an 8 bit mul */

@@ -126,15 +126,11 @@ void main(void)
 
 #if defined(SDCC_ds400)
     // Intialize the ROM.
-    if (romInit(1))
+    if (romInit(1, SPEED_2X))
     {
         // We're hosed. romInit will have printed an error, nothing more to do.
         return;
     }
-
-    ClockInit();
-    
-    P5 &= ~4; // LED on.
 #endif    
     
     printf("[dhry]\n");
@@ -162,8 +158,11 @@ void main(void)
 #if DEBUG
     Number_Of_Runs = 1;
 #else
-    // Number_Of_Runs = 32766;
-    Number_Of_Runs = 2048;
+#if defined(SDCC_ds400)    
+    Number_Of_Runs = 10240;
+#else    
+    Number_Of_Runs = 32766;
+#endif    
 #endif    
 
     runTime = clock();

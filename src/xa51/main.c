@@ -258,6 +258,7 @@ PORT xa51_port =
     NULL, // default global map
     1
   },
+  { NULL, NULL },
   {
     -1, // stack grows down
     0, // bank overhead NUY

@@ -30,6 +30,14 @@
 #include <stdio.h>
 #include <ds400rom.h>
 
+// ROM globals, taken from startup400.a51
+data unsigned char at 0x68 DSS_wos_crit_count;
+data unsigned int at 0x6b DSS_timerReload;
+data unsigned char at 0x6d DSS_curr_pc[3];
+data unsigned char at 0x72 DSS_sched[3];
+data unsigned char at 0x74 DSS_ms_count[5];
+data unsigned char at 0x7b DSS_hb_chandle[5];
+    
 // Register bank 3 equates.
 #define R0_B3     0x18
 #define R1_B3     0x19
@@ -334,8 +342,8 @@ _endasm;
 	lcall   __romredirect
 
 
-// DSS_rom_init: the ds400 ROM_INIT ROM function.
-unsigned char DSS_rom_init(void xdata *loMem,
+// init_rom: the ds400 ROM_INIT ROM function.
+unsigned char init_rom(void xdata *loMem,
 		       void xdata *hiMem) _naked
 {    
     // shut compiler up about unused parameters.
@@ -348,8 +356,8 @@ _asm
 	mov	r2, dpx
 	mov	r1, dph
 	mov     r0, dpl
-	; hiMem is in _DSS_rom_init_PARM_2
-	mov	dptr, #_DSS_rom_init_PARM_2
+	; hiMem is in _init_rom_PARM_2
+	mov	dptr, #_init_rom_PARM_2
 	mov	r5, dpx
 	mov     r4, dph
 	mov     r3, dpl
@@ -364,7 +372,7 @@ _endasm	;
 
 // DSS_gettimemillis: note that the ROM actually returns 5 bytes of time,
 // we're discarding the high byte here.
-unsigned long DSS_gettimemillis(void) _naked
+unsigned long task_gettimemillis_long(void) _naked
 {
 _asm    
     ; no parameters to load. 
@@ -378,7 +386,7 @@ _asm
 _endasm;
 }
 
-unsigned char DSS_getthreadID(void) _naked
+unsigned char task_getthreadID(void) _naked
 {
 _asm    
     ; no parameters to load. 
@@ -389,87 +397,13 @@ _asm
 _endasm;    
 }
 
-
-
-// Various utility functions.
-
-// Return the start of the XI_SEG. Really just a workaround for the
-// fact that the linker defined symbol (s_XISEG) isn't directly accessible
-// from C due to the lack of a leading underscore, and I'm too lazy to hack 
-// the linker.
-static void xdata *_xisegStart(void) _naked
+unsigned int task_gettickreload(void)
 {
-_asm    
-	mov	dptr, #(s_XISEG)
-	ret
-_endasm;
+    return DSS_timerReload;
 }
 
-// Return the length of the XI_SEG. Really just a workaround for the
-// fact that the linker defined symbol (l_XISEG) isn't directly accessible
-// from C due to the lack of a leading underscore, and I'm too lazy to hack 
-// the linker.
-static unsigned  _xisegLen(void) _naked
+void task_settickreload(unsigned int rl)
 {
-_asm    
-	mov	dptr, #(l_XISEG)
-	ret
-_endasm;
+    DSS_timerReload = rl;
 }
 
-// Returns the address of the first byte available for heap memory, 
-// i.e. the first byte following the XI_SEG.
-static void xdata *_firstHeapByte(void)
-{
-    unsigned char xdata *start;
-    
-    start = (unsigned char xdata *) _xisegStart();	
-    start += _xisegLen();
-
-    return (void xdata *)start;
-}
-
-// A simple wrapper for ROM_INIT which allocates all available RAM in the CE0 area
-// to the heap.
-
-// The last addressible byte of the CE0 area. 
-#define CE0_END 0xfffff
-
-unsigned char romInit(unsigned char noisy)
-{
-    void xdata *heapStart;
-    void xdata *heapEnd;
-    unsigned long heapLen; 
-    unsigned char rc;
-    
-    heapStart = _firstHeapByte();
-    heapEnd = (void xdata *)CE0_END;
-
-    rc = DSS_rom_init(heapStart, heapEnd);
-    
-    if (noisy)
-    {
-	if (rc)
-	{
-	    printf("error: rom_init returns %d\n", (int)rc);
-	}
-	else
-	{
-	    heapLen = CE0_END - (unsigned long)heapStart;
-	    printf("Heap starts at %p, length %luK\n", heapStart, heapLen / 1024);
-	}
-    }
-    return rc;
-}
-
-// Install an interrupt handler.
-void installInterrupt(void (*isrPtr)(void), unsigned char offset)
-{
-    unsigned char xdata * vectPtr = (unsigned char xdata *) offset;
-    unsigned long isr = (unsigned long)isrPtr;
-
-    *vectPtr++ = 0x02;
-    *vectPtr++ = (unsigned char)(isr >> 16);
-    *vectPtr++ = (unsigned char)(isr >> 8);
-    *vectPtr = (unsigned char)isr;
-}

@@ -384,6 +384,7 @@ PORT ds390_port =
     NULL,
     1
   },
+  { NULL, NULL },
   {
     +1, 1, 4, 1, 1, 0
   },
@@ -673,6 +674,7 @@ PORT tininative_port =
     NULL,
     1
   },
+  { NULL, NULL },
   {
     +1, 1, 4, 1, 1, 0
   },
@@ -806,6 +808,27 @@ _ds400_finaliseOptions (void)
   }  /* MODEL_FLAT24 */
 }
 
+extern char * iComments2;
+
+static void _ds400_generateRomDataArea(FILE *fp, bool isMain)
+{
+    /* Only do this for the file containing main() */
+    if (isMain)
+    {
+	fprintf(fp, "%s", iComments2);
+	fprintf(fp, "; the direct data area used by the DS80c400 ROM code.\n");
+	fprintf(fp, "%s", iComments2);
+	fprintf(fp, ".area ROMSEG (ABS,CON,DATA)\n\n");
+	fprintf(fp, ".ds 24 ; 24 bytes of directs used starting at 0x68\n\n");
+    }
+}
+
+static void _ds400_linkRomDataArea(FILE *fp)
+{
+    fprintf(fp, "-b ROMSEG = 0x0068\n");
+}
+
+
 PORT ds400_port =
 {
   TARGET_ID_DS400,
@@ -858,6 +881,7 @@ PORT ds400_port =
     NULL,
     1
   },
+  { _ds400_generateRomDataArea, _ds400_linkRomDataArea },
   {
     +1, 1, 4, 1, 1, 0
   },

@@ -47,35 +47,14 @@ void main(void)
 {
     char buffer[80];
     
-    // At this stage, the rom isn't initalized. We do have polled serial I/O, though.
+    // At this stage, the rom isn't initalized. We do have polled serial I/O, but that's
+    // about the only functional library service.
     printf("TINIm400 monitor rev 0.0\n");
-    
-    P5 |= 4; // LED off.
-    
-    // double the cpu speed.
-    if (1)
-    {
-	PMR = 0x82;
-	PMR = 0x92;
-	
-	while (!(EXIF & 8))
-	    ;
-	
-	PMR = 0x12;
-    }
-    
-    // Intialize the ROM.
-    if (romInit(1))
-    {
-	// We're hosed. romInit will have printed an error, nothing more to do.
-	return;
-    }
-    
-    P5 &= ~4; // LED on.
 
-    // Switch to interrupt driven serial I/O now that the rom is initialized.
-    Serial0SwitchToBuffered();
+    romInit(1, SPEED_2X);
 
+    // Now we're cooking with gas.
+    
     while (1)
     {
 	// monitor prompt.
@@ -99,7 +78,7 @@ void main(void)
 	}
 	else if (!strcmp(buffer, "thread"))
 	{
-	    printf("Thread ID: %d\n", (int)DSS_getthreadID());
+	    printf("Thread ID: %d\n", (int)task_getthreadID());
 	}
 	else if (!strcmp(buffer, "sleep"))
 	{

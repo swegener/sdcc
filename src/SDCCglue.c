@@ -1668,6 +1668,13 @@ glue (void)
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, xidata->oFile);
 
+  /* If the port wants to generate any extra areas, let it do so. */
+  if (port->extraAreas.genExtraAreaDeclaration)
+  {
+      port->extraAreas.genExtraAreaDeclaration(asmFile, 
+					       mainf && IFFUNC_HASBODY(mainf->type));
+  }
+    
   /* copy the interrupt vector table */
   if (mainf && IFFUNC_HASBODY(mainf->type))
     {

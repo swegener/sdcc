@@ -1,3 +1,7 @@
+2003-07-01 Kevin Vigor <kevin@vigor.nu>
+
+        * DS800C400 fun, improved ROM interface and tinibios.
+
 2003-06-27 Kevin Vigor <kevin@vigor.nu>
 
 	* More support for DS80C400. Now includes beginning of interface to ROM.

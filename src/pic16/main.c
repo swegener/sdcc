@@ -412,6 +412,7 @@ PORT pic16_port =
     NULL,
     1        // code is read only
   },
+  { NULL, NULL },
   {
     +1, 1, 4, 1, 1, 0
   },

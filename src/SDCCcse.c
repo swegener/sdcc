@@ -282,7 +282,7 @@ DEFSETFUNC(findPointerSet)
 	IC_RESULT(cdp->diCode)->key == op->key &&
 	!isOperandVolatile(IC_RESULT(cdp->diCode),TRUE) &&
 	!isOperandVolatile(IC_RIGHT(cdp->diCode),TRUE)  &&
-	getSize(operandType(IC_RESULT(cdp->diCode))) ==
+	getSize(operandType(IC_RIGHT(cdp->diCode))) ==
 	getSize(operandType(rop))) {
 	*opp = IC_RIGHT(cdp->diCode);
 	return 1;

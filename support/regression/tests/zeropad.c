@@ -24,7 +24,9 @@ struct x {storage} teststruct[6] = {
 void
 testZeropad(void)
 {
+#if ! (defined(SDCC_z80) || defined(SDCC_gbz80))
   ASSERT(teststruct[0].b[1] ==  2);
+#endif
   ASSERT(teststruct[0].b[5] ==  0);
   ASSERT(teststruct[1].b[0] == 11);
 

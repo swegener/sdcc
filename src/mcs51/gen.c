@@ -2022,7 +2022,7 @@ genPcall (iCode * ic)
   /* if we are calling a function that is not using
      the same register bank then we need to save the
      destination registers on the stack */
-  dtype = operandType (IC_LEFT (ic));
+  dtype = operandType (IC_LEFT (ic))->next;
   if (currFunc && dtype && !FUNC_ISNAKED(dtype) &&
       IFFUNC_ISISR (currFunc->type) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype))) {

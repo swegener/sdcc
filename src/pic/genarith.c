@@ -906,13 +906,14 @@ void genPlus (iCode *ic)
 	  emitpcode(POC_ADDWF, popGet(AOP(IC_LEFT(ic)),0));
 	else {
 	  if( (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD) ||
+	      (AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) ||
 	      (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT) ) {
 	    emitpcode(POC_ADDLW, popGet(AOP(IC_LEFT(ic)),0));
 	  } else {
 	    emitpcode(POC_ADDFW, popGet(AOP(IC_LEFT(ic)),0));
-	    if ( AOP_TYPE(IC_RESULT(ic)) != AOP_ACC)
-	      emitpcode(POC_MOVWF,popGet(AOP(IC_RESULT(ic)),0));
 	  }
+	  if ( AOP_TYPE(IC_RESULT(ic)) != AOP_ACC)
+	    emitpcode(POC_MOVWF,popGet(AOP(IC_RESULT(ic)),0));
 	}
       }
     }

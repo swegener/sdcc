@@ -57,7 +57,7 @@ extern DEFSETFUNC (rmTmpFiles);
 
 extern void AnalyzeBanking (void);
 extern void copyFile (FILE * dest, FILE * src);
-
+extern void InlinepCode(void);
 extern void writeUsedRegs(FILE *);
 
 extern void initialComments (FILE * afile);
@@ -813,12 +813,16 @@ picglue ()
   pic14emitOverlay(ovrFile);
 
 
-  AnalyzepCode('*'); //code->dbName);
+  AnalyzepCode('*');
 
   //#ifdef PCODE_DEBUG
-  //  printCallTree(stderr);
+  //printCallTree(stderr);
   //#endif
+/*
+  InlinepCode();
 
+  AnalyzepCode('*');
+*/
   pcode_test();
 
 

@@ -233,8 +233,9 @@ typedef enum
   PC_LABEL,       /* assembly label         */
   PC_FLOW,        /* flow analysis          */
   PC_FUNCTION,    /* Function start or end  */
-  PC_WILD         /* wildcard - an opcode place holder used 
+  PC_WILD,        /* wildcard - an opcode place holder used 
 		   * in the pCode peep hole optimizer */
+  PC_CSOURCE      /* C-Source Line  */
 } PC_TYPE;
 
 /************************************************/
@@ -398,6 +399,22 @@ typedef struct pCodeComment
 } pCodeComment;
 
 /*************************************************
+    pCodeComment
+**************************************************/
+
+typedef struct pCodeCSource
+{
+
+  pCode  pc;
+
+  int  line_number;
+  char *line;
+  char *file_name;
+
+} pCodeCSource;
+
+
+/*************************************************
     pCodeFlow
 
   The Flow object is used as marker to separate 
@@ -451,9 +468,9 @@ typedef struct pCodeInstruction
   pBranch *to;         // pCodes that execute after
   pBranch *label;      // pCode instructions that have labels
 
-  pCodeOp *pcop;              /* Operand, if this instruction has one */
-
-  pCodeFlow *pcflow;   /* flow block to which this instruction belongs */
+  pCodeOp *pcop;               /* Operand, if this instruction has one */
+  pCodeFlow *pcflow;           /* flow block to which this instruction belongs */
+  pCodeCSource *cline;         /* C Source from which this instruction was derived */
 
   unsigned int num_ops;        /* Number of operands (0,1,2 for mid range pics) */
   unsigned int isModReg:  1;   /* If destination is W or F, then 1==F */
@@ -500,6 +517,8 @@ typedef struct pCodeFunction
   pBranch *from;       // pCodes that execute before this one
   pBranch *to;         // pCodes that execute after
   pBranch *label;      // pCode instructions that have labels
+
+  int  ncalled;    /* Number of times function is called */
 
 } pCodeFunction;
 
@@ -673,8 +692,9 @@ typedef struct peepCommand {
 #define PCI(x)    ((pCodeInstruction *)(x))
 #define PCL(x)    ((pCodeLabel *)(x))
 #define PCF(x)    ((pCodeFunction *)(x))
-#define PCFL(x)    ((pCodeFlow *)(x))
+#define PCFL(x)   ((pCodeFlow *)(x))
 #define PCW(x)    ((pCodeWild *)(x))
+#define PCCS(x)   ((pCodeCSource *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
 //#define PCOB(x)   ((pCodeOpBit *)(x))
@@ -698,6 +718,7 @@ pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char 
 pCode *newpCodeInlineP(char *cP);            // Create a new pCode given a char *
 pCode *newpCodeFunction(char *g, char *f);   // Create a new function
 pCode *newpCodeLabel(char *name,int key);    // Create a new label given a key
+pCode *newpCodeCSource(int ln, char *f, char *l); // Create a new symbol line 
 pBlock *newpCodeChain(memmap *cm,char c, pCode *pc); // Create a new pBlock
 void printpBlock(FILE *of, pBlock *pb);      // Write a pBlock to a file
 void printpCode(FILE *of, pCode *pc);        // Write a pCode to a file
@@ -706,7 +727,7 @@ void addpBlock(pBlock *pb);                  // Add a pBlock to a pFile
 void copypCode(FILE *of, char dbName);       // Write all pBlocks with dbName to *of
 void movepBlock2Head(char dbName);           // move pBlocks around
 void AnalyzepCode(char dbName);
-void OptimizepCode(char dbName);
+int OptimizepCode(char dbName);
 void printCallTree(FILE *of);
 void pCodePeepInit(void);
 void pBlockConvert2ISR(pBlock *pb);

@@ -12,6 +12,8 @@ unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 unsigned char *acharP = 0;
 
+char buff[10];
+
 void
 done ()
 {
@@ -56,15 +58,76 @@ f3 (void)
   return &achar0;
 }
 
+void f4(unsigned char *ucP, unsigned char uc)
+{
+
+  if(!ucP) {
+    failures++;
+    return;
+  }
+
+  if(*ucP != uc)
+    failures++;
+
+}
+
+void init_array(char start_value)
+{
+  unsigned char c;
+
+  for(c=0; c<sizeof(buff); c++)
+    buff[c] = start_value++;
+
+}
+
+void check_array(char base_value)
+{
+  unsigned char c;
+
+  for(c=0; c<sizeof(buff); c++)
+    if(buff[c] != (base_value+c))
+      failures++;
+
+}
+
+void index_by_pointer(unsigned char *index, unsigned char expected_value)
+{
+
+  if(buff[*index] != expected_value)
+    failures++;
+
+}
+
 void
 main (void)
 {
+
+  init_array(4);
+  check_array(4);
+
+  if(buff[achar0 + 7] != 4+7)
+    failures++;
+
+  //  dummy = buff[5];
+  dummy = buff[achar0];
+
+  if(dummy != 4)
+    failures++;
+
+  if(dummy != (buff[achar0+1] -1)) 
+    failures++;
+
+  index_by_pointer(&dummy, 8);
+
   f1 (&achar0);
   f2 (&aint0);
 
   acharP = f3 ();
   if ((acharP == 0) || (*acharP))
     failures++;
+
+  achar0 = 5;
+  f4(&achar0, achar0);
 
   success = failures;
   done ();

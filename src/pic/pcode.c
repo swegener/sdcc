@@ -70,7 +70,7 @@ static hTab *pic14pCodePeepCommandsHash = NULL;
 
 
 static pFile *the_pFile = NULL;
-static int peepOptimizing = 0;
+static int peepOptimizing = 1;
 static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
 
@@ -120,6 +120,7 @@ pCodeInstruction pciADDWF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -140,6 +141,7 @@ pCodeInstruction pciADDFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -160,6 +162,7 @@ pCodeInstruction pciADDLW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -180,6 +183,7 @@ pCodeInstruction pciANDLW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -200,6 +204,7 @@ pCodeInstruction pciANDWF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -220,6 +225,7 @@ pCodeInstruction pciANDFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -240,6 +246,7 @@ pCodeInstruction pciBCF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
@@ -260,6 +267,7 @@ pCodeInstruction pciBSF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,1,  // dest, bit instruction
   0,0,  // branch, skip
@@ -280,6 +288,7 @@ pCodeInstruction pciBTFSC = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
@@ -300,6 +309,7 @@ pCodeInstruction pciBTFSS = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,1,  // dest, bit instruction
   1,1,  // branch, skip
@@ -320,6 +330,7 @@ pCodeInstruction pciCALL = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
@@ -340,6 +351,7 @@ pCodeInstruction pciCOMF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -360,6 +372,7 @@ pCodeInstruction pciCOMFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -380,6 +393,7 @@ pCodeInstruction pciCLRF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -400,6 +414,7 @@ pCodeInstruction pciCLRW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   0,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -420,6 +435,7 @@ pCodeInstruction pciDECF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -440,6 +456,7 @@ pCodeInstruction pciDECFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -460,6 +477,7 @@ pCodeInstruction pciDECFSZ = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   1,1,  // branch, skip
@@ -480,6 +498,7 @@ pCodeInstruction pciDECFSZW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   1,1,  // branch, skip
@@ -500,6 +519,7 @@ pCodeInstruction pciGOTO = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
@@ -520,6 +540,7 @@ pCodeInstruction pciINCF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -540,6 +561,7 @@ pCodeInstruction pciINCFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -560,6 +582,7 @@ pCodeInstruction pciINCFSZ = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   1,1,  // branch, skip
@@ -580,6 +603,7 @@ pCodeInstruction pciINCFSZW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   1,1,  // branch, skip
@@ -600,6 +624,7 @@ pCodeInstruction pciIORWF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -620,6 +645,7 @@ pCodeInstruction pciIORFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -640,6 +666,7 @@ pCodeInstruction pciIORLW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -660,6 +687,7 @@ pCodeInstruction pciMOVF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -680,6 +708,7 @@ pCodeInstruction pciMOVFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -700,6 +729,7 @@ pCodeInstruction pciMOVWF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -720,6 +750,7 @@ pCodeInstruction pciMOVLW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -739,6 +770,7 @@ pCodeInstruction pciNOP = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   0,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -759,6 +791,7 @@ pCodeInstruction pciRETFIE = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   0,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
@@ -779,6 +812,7 @@ pCodeInstruction pciRETLW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
@@ -799,6 +833,7 @@ pCodeInstruction pciRETURN = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   0,    // num ops
   0,0,  // dest, bit instruction
   1,0,  // branch, skip
@@ -819,6 +854,7 @@ pCodeInstruction pciRLF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -839,6 +875,7 @@ pCodeInstruction pciRLFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -859,6 +896,7 @@ pCodeInstruction pciRRF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -879,6 +917,7 @@ pCodeInstruction pciRRFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -899,6 +938,7 @@ pCodeInstruction pciSUBWF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -919,6 +959,7 @@ pCodeInstruction pciSUBFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -939,6 +980,7 @@ pCodeInstruction pciSUBLW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -959,6 +1001,7 @@ pCodeInstruction pciSWAPF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -979,6 +1022,7 @@ pCodeInstruction pciSWAPFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -999,6 +1043,7 @@ pCodeInstruction pciTRIS = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -1019,6 +1064,7 @@ pCodeInstruction pciXORWF = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   1,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -1039,6 +1085,7 @@ pCodeInstruction pciXORFW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   2,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -1059,6 +1106,7 @@ pCodeInstruction pciXORLW = {
   NULL, // label
   NULL, // operand
   NULL, // flow block
+  NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
   0,0,  // branch, skip
@@ -1148,7 +1196,7 @@ extern void init_pic(char *);
 void  pCodeInitRegisters(void)
 {
 
-  initStack(0x38, 8);
+  initStack(0xfff, 8);
   init_pic(port->processor);
 
   pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
@@ -1672,6 +1720,8 @@ pCode *newpCodeFunction(char *mod,char *f)
   pcf->pc.destruct = genericDestruct;
   pcf->pc.print = pCodePrintFunction;
 
+  pcf->ncalled = 0;
+
   if(mod) {
     //_ALLOC_ATOMIC(pcf->modname,strlen(mod)+1);
     pcf->modname = Safe_calloc(1,strlen(mod)+1);
@@ -1726,6 +1776,38 @@ pCode *newpCodeFlow(void )
 
 }
 
+/*-----------------------------------------------------------------*/
+/* newpCodeCSource - create a new pCode Source Symbol              */
+/*-----------------------------------------------------------------*/
+
+pCode *newpCodeCSource(int ln, char *f, char *l)
+{
+
+  pCodeCSource *pccs;
+    
+  pccs = Safe_calloc(1,sizeof(pCodeCSource));
+
+  pccs->pc.type = PC_CSOURCE;
+  pccs->pc.prev = pccs->pc.next = NULL;
+  pccs->pc.pb = NULL;
+
+  pccs->pc.destruct = genericDestruct;
+  pccs->pc.print = genericPrint;
+
+  pccs->line_number = ln;
+  if(l)
+    pccs->line = Safe_strdup(l);
+  else
+    pccs->line = NULL;
+
+  if(f)
+    pccs->file_name = Safe_strdup(f);
+  else
+    pccs->file_name = NULL;
+
+  return ( (pCode *)pccs);
+
+}
 /*-----------------------------------------------------------------*/
 /* pCodeLabelDestruct - free memory used by a label.               */
 /*-----------------------------------------------------------------*/
@@ -2114,6 +2196,43 @@ void addpBlock(pBlock *pb)
 }
 
 /*-----------------------------------------------------------------*/
+/* removepBlock - remove a pBlock from the pFile                   */
+/*-----------------------------------------------------------------*/
+void removepBlock(pBlock *pb)
+{
+  pBlock *pbs;
+
+  if(!the_pFile)
+    return;
+
+
+  //fprintf(stderr," Removing pBlock: dbName =%c\n",getpBlock_dbName(pb));
+
+  for(pbs = the_pFile->pbHead; pbs; pbs = pbs->next) {
+    if(pbs == pb) {
+
+      if(pbs == the_pFile->pbHead)
+	the_pFile->pbHead = pbs->next;
+
+      if (pbs == the_pFile->pbTail) 
+	the_pFile->pbTail = pbs->prev;
+
+      if(pbs->next)
+	pbs->next->prev = pbs->prev;
+
+      if(pbs->prev)
+	pbs->prev->next = pbs->next;
+
+      return;
+
+    }
+  }
+
+  fprintf(stderr, "Warning: call to %s:%s didn't find pBlock\n",__FILE__,__FUNCTION__);
+
+}
+
+/*-----------------------------------------------------------------*/
 /* printpCode - write the contents of a pCode to a file            */
 /*-----------------------------------------------------------------*/
 void printpCode(FILE *of, pCode *pc)
@@ -2161,6 +2280,10 @@ static void unlinkPC(pCode *pc)
 
 
   if(pc) {
+#ifdef PCODE_DEBUG
+    fprintf(stderr,"Unlinking: ");
+    printpCode(stderr, pc);
+#endif
     if(pc->prev) 
       pc->prev->next = pc->next;
     if(pc->next)
@@ -2285,9 +2408,11 @@ static char *get_op_from_instruction( pCodeInstruction *pcc)
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 {
 
-  fprintf(of,"pcodeopprint\n");
+  fprintf(of,"pcodeopprint- not implemented\n");
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 char *pCode2str(char *str, int size, pCode *pc)
 {
   char *s = str;
@@ -2355,6 +2480,10 @@ char *pCode2str(char *str, int size, pCode *pc)
   case PC_FLOW:
     SAFE_snprintf(&s,&size,";\t--FLOW change\n");
     break;
+  case PC_CSOURCE:
+  SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    break;
+
   }
 
   return str;
@@ -2390,6 +2519,8 @@ static void genericPrint(FILE *of, pCode *pc)
       }
     }
 
+    if(PCI(pc)->cline) 
+      genericPrint(of,PCODE(PCI(pc)->cline));
 
     {
       char str[256];
@@ -2446,6 +2577,9 @@ static void genericPrint(FILE *of, pCode *pc)
     fprintf(of,";Start of new flow, seq=%d\n",pc->seq);
     break;
 
+  case PC_CSOURCE:
+    fprintf(of,";#CSRC\t%s %d\n;  %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    break;
   case PC_LABEL:
   default:
     fprintf(of,"unknown pCode type %d\n",pc->type);
@@ -2796,12 +2930,14 @@ pCode * findPrevpCode(pCode *pc, PC_TYPE pct)
 /* findNextInstruction - given a pCode, find the next instruction  */
 /*                       in the linked list                        */
 /*-----------------------------------------------------------------*/
-pCode * findNextInstruction(pCode *pc)
+pCode * findNextInstruction(pCode *pci)
 {
+  pCode *pc = pci;
 
   while(pc) {
     if((pc->type == PC_OPCODE) || (pc->type == PC_WILD))
       return pc;
+
 #ifdef PCODE_DEBUG
     fprintf(stderr,"findNextInstruction:  ");
     printpCode(stderr, pc);
@@ -2814,8 +2950,17 @@ pCode * findNextInstruction(pCode *pc)
 }
 
 /*-----------------------------------------------------------------*/
+/* findNextInstruction - given a pCode, find the next instruction  */
+/*                       in the linked list                        */
+/*-----------------------------------------------------------------*/
+pCode * findPrevInstruction(pCode *pci)
+{
+  return findPrevpCode(pci, PC_OPCODE);
+}
+
+/*-----------------------------------------------------------------*/
 /* findFunctionEnd - given a pCode find the end of the function    */
-/*                   that contains it     t                        */
+/*                   that contains it                              */
 /*-----------------------------------------------------------------*/
 pCode * findFunctionEnd(pCode *pc)
 {
@@ -3231,15 +3376,35 @@ void LinkFlow(pBlock *pb)
 /*-----------------------------------------------------------------*/
 int OptimizepBlock(pBlock *pb)
 {
-  pCode *pc;
+  pCode *pc, *pcprev;
   int matches =0;
 
   if(!pb || !peepOptimizing)
     return 0;
 
   DFPRINTF((stderr," Optimizing pBlock: %c\n",getpBlock_dbName(pb)));
+/*
   for(pc = pb->pcHead; pc; pc = pc->next)
     matches += pCodePeepMatchRule(pc);
+*/
+
+  pc = findNextInstruction(pb->pcHead);
+  pcprev = pc->prev;
+  do {
+
+
+    if(pCodePeepMatchRule(pc)) {
+
+      matches++;
+
+      if(pcprev)
+	pc = findNextInstruction(pcprev->next);
+      else 
+	pc = findNextInstruction(pb->pcHead);
+    } else
+      pc = findNextInstruction(pc->next);
+  } while(pc);
+
   if(matches)
     DFPRINTF((stderr," Optimizing pBlock: %c - matches=%d\n",getpBlock_dbName(pb),matches));
   return matches;
@@ -3293,8 +3458,7 @@ void pBlockRemoveUnusedLabels(pBlock *pb)
        * So, unlink the pCode label from it's pCode chain
        * and destroy the label */
 
-      DFPRINTF((stderr," !!! REMOVED A LABEL !!! key = %d\n", pcl->key));
-
+      DFPRINTF((stderr," !!! REMOVED A LABEL !!! key = %d, %s\n", pcl->key,pcl->label));
       if(pc->type == PC_LABEL) {
 	unlinkPC(pc);
 	pCodeLabelDestruct(pc);
@@ -3333,30 +3497,51 @@ void pBlockMergeLabels(pBlock *pb)
   for(pc = pb->pcHead; pc; pc = pc->next) {
 
     if(pc->type == PC_LABEL) {
+
+      //fprintf(stderr," checking merging label %s\n",PCL(pc)->label);
       //fprintf(stderr,"Checking label key = %d\n",PCL(pc)->key);
-      if( !(pcnext = findNextInstruction(pc)) ) 
-	return;  // Couldn't find an instruction associated with this label
+      if((pcnext = findNextInstruction(pc) )) {
 
-      // Unlink the pCode label from it's pCode chain
-      unlinkPC(pc);
+	pCode *pcn = pc->next;
 
-      //fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
-      // And link it into the instruction's pBranch labels. (Note, since
-      // it's possible to have multiple labels associated with one instruction
-      // we must provide a means to accomodate the additional labels. Thus
-      // the labels are placed into the singly-linked list "label" as 
-      // opposed to being a single member of the pCodeInstruction.)
+	// Unlink the pCode label from it's pCode chain
+	unlinkPC(pc);
+	
+	//fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
+	// And link it into the instruction's pBranch labels. (Note, since
+	// it's possible to have multiple labels associated with one instruction
+	// we must provide a means to accomodate the additional labels. Thus
+	// the labels are placed into the singly-linked list "label" as 
+	// opposed to being a single member of the pCodeInstruction.)
 
-      //_ALLOC(pbr,sizeof(pBranch));
-      pbr = Safe_calloc(1,sizeof(pBranch));
-      pbr->pc = pc;
-      pbr->next = NULL;
+	//_ALLOC(pbr,sizeof(pBranch));
+	pbr = Safe_calloc(1,sizeof(pBranch));
+	pbr->pc = pc;
+	pbr->next = NULL;
 
-      PCI(pcnext)->label = pBranchAppend(PCI(pcnext)->label,pbr);
-      if(pcnext->prev) 
-	pc = pcnext->prev;
-      else
-	pc = pcnext;
+
+	PCI(pcnext)->label = pBranchAppend(PCI(pcnext)->label,pbr);
+      
+	pc = pcn;
+
+      } else {
+	fprintf(stderr, "WARNING: couldn't associate label %s with an instruction\n",PCL(pc)->label);
+      }
+    } else if(pc->type == PC_CSOURCE) {
+
+      /* merge the source line symbolic info into the next instruction */
+      if((pcnext = findNextInstruction(pc) )) {
+
+	pCode *pcn = pc->next;
+
+	// Unlink the pCode label from it's pCode chain
+	unlinkPC(pc);
+	PCI(pcnext)->cline = PCCS(pc);
+	//fprintf(stderr, "merging CSRC\n");
+	//genericPrint(stderr,pcnext);
+	pc = pcn;
+      }
+
     }
 
   }
@@ -3366,7 +3551,7 @@ void pBlockMergeLabels(pBlock *pb)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-void OptimizepCode(char dbName)
+int OptimizepCode(char dbName)
 {
 #define MAX_PASSES 4
 
@@ -3375,11 +3560,12 @@ void OptimizepCode(char dbName)
   pBlock *pb;
 
   if(!the_pFile)
-    return;
+    return 0;
 
   DFPRINTF((stderr," Optimizing pCode\n"));
 
   do {
+    matches = 0;
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
       if('*' == dbName || getpBlock_dbName(pb) == dbName)
 	matches += OptimizepBlock(pb);
@@ -3387,6 +3573,7 @@ void OptimizepCode(char dbName)
   }
   while(matches && ++passes < MAX_PASSES);
 
+  return matches;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3663,7 +3850,7 @@ void buildCallTree(void    )
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     pCode *pc_fstart=NULL;
     for(pc = pb->pcHead; pc; pc = pc->next) {
-      if(isPCF(pc)) {  //pc->type == PC_FUNCTION) {
+      if(isPCF(pc)) {
 	if (PCF(pc)->fname) {
 
 	  if(STRCASECMP(PCF(pc)->fname, "_main") == 0) {
@@ -3672,7 +3859,6 @@ void buildCallTree(void    )
 	    pb->dbName = 'M';
 	  }
 
-	  //_ALLOC(pbr,sizeof(pBranch));
 	  pbr = Safe_calloc(1,sizeof(pBranch));
 	  pbr->pc = pc_fstart = pc;
 	  pbr->next = NULL;
@@ -3690,7 +3876,7 @@ void buildCallTree(void    )
 
 	  addSet(&pb->function_exits, pc);
 	}
-      } else if(isCALL(pc)) {// if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
+      } else if(isCALL(pc)) {
 	addSet(&pb->function_calls,pc);
       }
     }
@@ -3748,19 +3934,15 @@ void AnalyzepCode(char dbName)
       if('*' == dbName || getpBlock_dbName(pb) == dbName) {
 
 	DFPRINTF((stderr," analyze and merging block %c\n",dbName));
-	//fprintf(stderr," analyze and merging block %c\n",getpBlock_dbName(pb));
 	pBlockMergeLabels(pb);
 	AnalyzepBlock(pb);
+      } else {
+	DFPRINTF((stderr," skipping block analysis dbName=%c blockname=%c\n",dbName,getpBlock_dbName));
       }
     }
 
-    changes = 0;
+    changes = OptimizepCode(dbName);
 
-    for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-      if('*' == dbName || getpBlock_dbName(pb) == dbName)
-	changes += OptimizepBlock(pb);
-    }
-      
   } while(changes && (i++ < MAX_PASSES));
 
   buildCallTree();
@@ -4006,10 +4188,10 @@ void pct2(FILE *of,pBlock *pb,int indent)
   //  set *registersInCallPath = NULL;
 
   if(!of)
-    return;// registers;
+    return;
 
   if(indent > 10)
-    return; // registers;   //recursion ?
+    return; //recursion ?
 
   pc = setFirstItem(pb->function_entries);
 
@@ -4043,77 +4225,6 @@ void pct2(FILE *of,pBlock *pb,int indent)
 
 
 }
-
-#if 0
-  fprintf(stderr,"pBlock before register optim.\n");
-  pBlockStats(stderr,pb);  // debug
-
-  if(registersInCallPath) {
-    /* registers were used in the functions this pBlock has called */
-    /* so now, we need to see if these collide with the ones we are using here */
-
-    regs *r1,*r2, *newreg;
-
-    fprintf(stderr,"comparing registers\n");
-
-    r1 = setFirstItem(registersInCallPath);
-    while(r1) {
-
-      r2 = setFirstItem(pb->registers);
-
-      while(r2) {
-
-	if(r2->rIdx == r1->rIdx) {
-	  newreg = pic14_findFreeReg();
-
-
-	  if(!newreg) {
-	    fprintf(stderr,"Bummer, no more registers.\n");
-	    exit(1);
-	  }
-
-	  fprintf(stderr,"Cool found register collision nIdx=%d moving to %d\n",
-		  r1->rIdx, newreg->rIdx);
-	  r2->rIdx = newreg->rIdx;
-	  //if(r2->name) free(r2->name);
-	  if(newreg->name)
-	    r2->name = Safe_strdup(newreg->name);
-	  else
-	    r2->name = NULL;
-	  newreg->isFree = 0;
-	  newreg->wasUsed = 1;
-	}
-	r2 = setNextItem(pb->registers);
-      }
-
-      r1 = setNextItem(registersInCallPath);
-    }
-
-    /* Collisions have been resolved. Now free the registers in the call path */
-    r1 = setFirstItem(registersInCallPath);
-    while(r1) {
-      newreg = pic14_regWithIdx(r1->rIdx);
-      newreg->isFree = 1;
-      r1 = setNextItem(registersInCallPath);
-    }
-
-  } else
-    MarkUsedRegisters(pb->registers);
-
-  registers = unionSets(pb->registers, registersInCallPath, THROW_NONE);
-
-  if(registers) 
-    fprintf(stderr,"returning regs\n");
-  else
-    fprintf(stderr,"not returning regs\n");
-
-  fprintf(stderr,"pBlock after register optim.\n");
-  pBlockStats(stderr,pb);  // debug
-
-
-  return registers;
-
-#endif
 
 
 /*-----------------------------------------------------------------*/
@@ -4161,17 +4272,6 @@ void printCallTree(FILE *of)
   }
 
 
-  /* Re-allocate the registers so that there are no collisions
-   * between local variables when one function call another */
-#if 0
-  pic14_deallocateAllRegs();
-
-  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if(!pb->visited)
-      register_usage(pb);
-  }
-#endif
-
   fprintf(of,"\n**************\n\na better call tree\n");
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     if(pb->visited)
@@ -4181,4 +4281,149 @@ void printCallTree(FILE *of)
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     fprintf(of,"block dbname: %c\n", getpBlock_dbName(pb));
   }
+}
+
+
+
+/*-----------------------------------------------------------------*/
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+
+void InlineFunction(pBlock *pb)
+{
+  pCode *pc;
+  pCode *pc_call;
+
+  if(!pb)
+    return;
+
+  pc = setFirstItem(pb->function_calls);
+
+  for( ; pc; pc = setNextItem(pb->function_calls)) {
+
+    if(isCALL(pc)) {
+      pCode *pcn = findFunction(get_op_from_instruction(PCI(pc)));
+      pCode *pct;
+      pCode *pce;
+
+      pBranch *pbr;
+
+      if(pcn && isPCF(pcn) && (PCF(pcn)->ncalled == 1)) {
+	
+	//fprintf(stderr,"Cool can inline:\n");
+	//pcn->print(stderr,pcn);
+
+	//fprintf(stderr,"recursive call Inline\n");
+	InlineFunction(pcn->pb);
+	//fprintf(stderr,"return from recursive call Inline\n");
+
+	/*
+	  At this point, *pc points to a CALL mnemonic, and
+	  *pcn points to the function that is being called.
+
+	  To in-line this call, we need to remove the CALL
+	  and RETURN(s), and link the function pCode in with
+	  the CALLee pCode.
+
+	*/
+
+
+	/* Remove the CALL */
+	pc_call = pc;
+	pc = pc->prev;
+
+	/* remove callee pBlock from the pBlock linked list */
+	removepBlock(pcn->pb);
+
+	pce = pcn;
+	while(pce) {
+	  pce->pb = pb;
+	  pce = pce->next;
+	}
+
+	/* Remove the Function pCode */
+	pct = findNextInstruction(pcn->next);
+
+	/* Link the function with the callee */
+	pc->next = pcn->next;
+	pcn->next->prev = pc;
+	
+	/* Convert the function name into a label */
+
+	pbr = Safe_calloc(1,sizeof(pBranch));
+	pbr->pc = newpCodeLabel(PCF(pcn)->fname, -1);
+	pbr->next = NULL;
+	PCI(pct)->label = pBranchAppend(PCI(pct)->label,pbr);
+	PCI(pct)->label = pBranchAppend(PCI(pct)->label,PCI(pc_call)->label);
+
+	/* turn all of the return's except the last into goto's */
+	/* check case for 2 instruction pBlocks */
+	pce = findNextInstruction(pcn->next);
+	while(pce) {
+	  pCode *pce_next = findNextInstruction(pce->next);
+
+	  if(pce_next == NULL) {
+	    /* found the last return */
+	    pCode *pc_call_next =  findNextInstruction(pc_call->next);
+
+	    //fprintf(stderr,"found last return\n");
+	    //pce->print(stderr,pce);
+	    pce->prev->next = pc_call->next;
+	    pc_call->next->prev = pce->prev;
+	    PCI(pc_call_next)->label = pBranchAppend(PCI(pc_call_next)->label,
+						      PCI(pce)->label);
+	  }
+
+	  pce = pce_next;
+	}
+
+
+      }
+    } else
+      fprintf(stderr,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
+
+  }
+
+}
+
+/*-----------------------------------------------------------------*/
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+
+void InlinepCode(void)
+{
+
+  pBlock  *pb;
+  pCode   *pc;
+
+  if(!the_pFile)
+    return;
+
+
+  /* Loop through all of the function definitions and count the
+   * number of times each one is called */
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+
+    pc = setFirstItem(pb->function_calls);
+
+    for( ; pc; pc = setNextItem(pb->function_calls)) {
+
+      if(isCALL(pc)) {
+	pCode *pcn = findFunction(get_op_from_instruction(PCI(pc)));
+	if(pcn && isPCF(pcn)) {
+	  PCF(pcn)->ncalled++;
+	}
+      } else
+	fprintf(stderr,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
+
+    }
+  }
+
+
+  /* Now, Loop through the function definitions again, but this
+   * time inline those functions that have only been called once. */
+
+  InlineFunction(the_pFile->pbHead);
+
 }

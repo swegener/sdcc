@@ -23,8 +23,7 @@
 
 #include "common.h"   // Include everything in the SDCC src directory
 #include "newalloc.h"
-
-
+//#define PCODE_DEBUG
 #include "pcode.h"
 #include "pcodeflow.h"
 #include "ralloc.h"
@@ -1157,13 +1156,13 @@ void postinit_pCodeWildBlock(pCodeWildBlock *pcwb)
   if(!pcwb)
     return;
 
-  pcwb->nvars++;
+  pcwb->nvars+=2;
   pcwb->nops = pcwb->nvars;
 
   pcwb->vars = Safe_calloc(pcwb->nvars, sizeof(char *));
   pcwb->wildpCodeOps = Safe_calloc(pcwb->nvars, sizeof(pCodeOp *));
 
-  pcwb->nwildpCodes++;
+  pcwb->nwildpCodes+=2;
   pcwb->wildpCodes = Safe_calloc(pcwb->nwildpCodes, sizeof(pCode *));
 
 }
@@ -1221,19 +1220,6 @@ void  peepRules2pCode(peepRule *rules)
     pcps = Safe_calloc(1,sizeof(pCodePeepSnippets));
     peepSnippets = DLL_append((_DLL*)peepSnippets,(_DLL*)pcps);
 
-/*
-    curPeep = pcps->peep  = Safe_calloc(1,sizeof(pCodePeep));
-
-    curPeep->vars = NULL; 
-    curPeep->wildpCodes = NULL; curPeep->wildpCodeOps = NULL;
-    curPeep->postFalseCond = PCC_NONE;
-    curPeep->postTrueCond  = PCC_NONE;
-
-
-    curPeep->target = curBlock = newpCodeChain(NULL, 'W', NULL);
-    sMaxWildVar  = 0;
-    sMaxWildMnem = 0;
-*/
     currentRule = pcps->peep  = Safe_calloc(1,sizeof(pCodePeep));
     initpCodePeep(currentRule);
 
@@ -1254,8 +1240,6 @@ void  peepRules2pCode(peepRule *rules)
     //DFPRINTF((stderr,"\nReplaced by:\n"));
 
 
-    //curPeep->replace = curBlock = newpCodeChain(NULL, 'W', NULL);
-
     /* Convert the replace block */
     peepRuleBlock2pCodeBlock(pr->replace, &currentRule->replace);
 
@@ -1263,7 +1247,7 @@ void  peepRules2pCode(peepRule *rules)
     //printpBlock(stderr, curBlock);
 
     //DFPRINTF((stderr,"replace with labels merged:\n"));
-    //pBlockMergeLabels(curBlock);
+
     pBlockMergeLabels(currentRule->replace.pb);
     //printpBlock(stderr, currentRule->replace.pb);
 
@@ -1272,18 +1256,8 @@ void  peepRules2pCode(peepRule *rules)
     /* The rule has been converted to pCode. Now allocate
      * space for the wildcards */
     
-/*
-     ++sMaxWildVar;
-    curPeep->nvars = sMaxWildVar;
-    curPeep->vars = Safe_calloc(sMaxWildVar, sizeof(char *));
-
-    curPeep->nops = sMaxWildVar;
-    curPeep->wildpCodeOps = Safe_calloc(sMaxWildVar, sizeof(pCodeOp *));
-
-    curPeep->nwildpCodes = ++sMaxWildMnem;
-    curPeep->wildpCodes = Safe_calloc(sMaxWildMnem, sizeof(char *));
-*/
     postinit_pCodeWildBlock(&currentRule->target);
+    postinit_pCodeWildBlock(&currentRule->replace);
 
     //return; // debug ... don't want to go through all the rules yet
   }
@@ -1455,31 +1429,49 @@ int pCodePeepMatchLabels(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
   /* Check for a label associated with this wild pCode */
   // If the wild card has a label, make sure the source code does too.
   if(PCI(pcd)->label) {
-    pCode *pcl;
+    pCode *pcl = PCI(pcd)->label->pc;
+
+#ifdef PCODE_DEBUG
+    int li = -PCL(pcl)->key;
+
+    if(peepBlock->target.vars[li] == NULL) {
+      if(PCI(pcs)->label) {
+	DFPRINTF((stderr,"first time for a label: %d %s\n",li,PCL(PCI(pcs)->label->pc)->label));
+      }
+    } else {
+      // DFPRINTF((stderr,"label id = %d \n",PCL(PCI(pcd)->label->pc)->key));
+      DFPRINTF((stderr," label id: %d %s\n",li,peepBlock->target.vars[li]));
+      if(PCI(pcs)->label) {
+	DFPRINTF((stderr," src %s\n",PCL(PCI(pcs)->label->pc)->label));
+      }
+    }
+#endif
+
 
     if(!PCI(pcs)->label)
       return 0;
 
-    pcl = PCI(pcd)->label->pc;
-
     labindex = -PCL(pcl)->key;
-    //DFPRINTF((stderr,"label id = %d (labindex = %d)\n",PCL(pcl)->key,labindex));
     if(peepBlock->target.vars[labindex] == NULL) {
       // First time to encounter this label
       peepBlock->target.vars[labindex] = PCL(PCI(pcs)->label->pc)->label;
-      //DFPRINTF((stderr,"first time for a label: %d %s\n",labindex, peepBlock->vars[labindex]));
+      DFPRINTF((stderr,"first time for a label: %d %s\n",labindex,PCL(PCI(pcs)->label->pc)->label));
+
     } else {
       if(strcmp(peepBlock->target.vars[labindex],PCL(PCI(pcs)->label->pc)->label) != 0) {
-	// DFPRINTF((stderr,"labels don't match\n"));
+	DFPRINTF((stderr,"labels don't match dest %s != src %s\n",peepBlock->target.vars[labindex],PCL(PCI(pcs)->label->pc)->label));
 	return 0;
       }
-      //DFPRINTF((stderr,"matched a label\n"));
+      DFPRINTF((stderr,"matched a label %d %s -hey\n",labindex,peepBlock->target.vars[labindex]));
     }
   } else {
-    // DFPRINTF((stderr,"destination doesn't have a label\n"));
+    //DFPRINTF((stderr,"destination doesn't have a label\n"));
 
     if(PCI(pcs)->label)
       return 0;
+
+    //DFPRINTF((stderr,"neither src nor dest have labels\n"));
+
   }
 
   return 1;
@@ -1520,6 +1512,12 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
   /* one-for-one match. Here the source and destination opcodes 
    * are not wild. However, there may be a label or a wild operand */
 
+  if(pcs) {
+    if(PCI(pcs)->label) {
+      DFPRINTF((stderr,"Match line source label: %s\n",PCL(PCI(pcs)->label->pc)->label));
+    }
+  }
+
   if(pcs->type == pcd->type) {
 
     if(pcs->type == PC_OPCODE) {
@@ -1528,11 +1526,11 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       if(PCI(pcs)->op != PCI(pcd)->op)
 	return 0;
 
-      /*
+#ifdef PCODE_DEBUG
       DFPRINTF((stderr,"%s comparing\n",__FUNCTION__));
       pcs->print(stderr,pcs);
       pcd->print(stderr,pcd);
-      */
+#endif
 
       if(!pCodePeepMatchLabels(peepBlock, pcs, pcd))
 	return 0;
@@ -1586,7 +1584,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	    if(peepBlock->target.vars[index])
 	      return  (strcmp(peepBlock->target.vars[index],n) == 0);
 	    else {
-	      // DFPRINTF((stderr,"first time for a variable: %d, %s\n",index,n));
+	      DFPRINTF((stderr,"first time for a variable: %d, %s\n",index,n));
 	      peepBlock->target.vars[index] = n;
 	      return 1;
 	    }
@@ -1607,19 +1605,21 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
 
     index = PCW(pcd)->id;
-
-    //    DFPRINTF((stderr,"%s comparing wild cards\n",__FUNCTION__));
-    //pcs->print(stderr,pcs);
-    //pcd->print(stderr,pcd);
-
+#ifdef PCODE_DEBUG
+    DFPRINTF((stderr,"%s comparing wild cards\n",__FUNCTION__));
+    pcs->print(stderr,pcs);
+    pcd->print(stderr,pcd);
+#endif
     peepBlock->target.wildpCodes[PCW(pcd)->id] = pcs;
 
-    if(!pCodePeepMatchLabels(peepBlock, pcs, pcd))
+    if(!pCodePeepMatchLabels(peepBlock, pcs, pcd)) {
+      DFPRINTF((stderr," Failing because labels don't match\n"));
       return 0;
+    }
 
     if(PCW(pcd)->mustBeBitSkipInst & !(PCI(pcs)->isBitInst && PCI(pcs)->isSkip)) {
       // doesn't match because the wild pcode must be a bit skip
-      //fprintf(stderr," Failing match because bit skip is req:\n");
+      DFPRINTF((stderr," Failing match because bit skip is req\n"));
       //pcd->print(stderr,pcd);
       //pcs->print(stderr,pcs);
       return 0;
@@ -1627,7 +1627,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
     if(PCW(pcd)->mustNotBeBitSkipInst & (PCI(pcs)->isBitInst && PCI(pcs)->isSkip)) {
       // doesn't match because the wild pcode must *not* be a bit skip
-      //fprintf(stderr," Failing match because don't want skip :\n");
+      DFPRINTF((stderr," Failing match because shouldn't be bit skip\n"));
       //pcd->print(stderr,pcd);
       //pcs->print(stderr,pcs);
       return 0;
@@ -1637,18 +1637,20 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
       if(peepBlock->target.vars[index]) {
 	int i = (strcmp(peepBlock->target.vars[index],PCI(pcs)->pcop->name) == 0);
-	/*
+#ifdef PCODE_DEBUG
+
 	if(i)
 	  DFPRINTF((stderr," (matched)\n"));
 	else {
 	  DFPRINTF((stderr," (no match: wild card operand mismatch\n"));
-	  DFPRINTF((stderr,"  peepblock= %s,  pcodeop= %s\n"),
-		  peepBlock->vars[index],
-		  PCI(pcs)->pcop->name);
+	  DFPRINTF((stderr,"  peepblock= %s,  pcodeop= %s\n",
+		  peepBlock->target.vars[index],
+		  PCI(pcs)->pcop->name));
 	}
-	*/
+#endif
 	return i;
       } else {
+	DFPRINTF((stderr," (matched %s\n",PCI(pcs)->pcop->name));
 	peepBlock->target.vars[index] = PCI(pcs)->pcop->name;
 	return 1;
       }
@@ -1678,10 +1680,27 @@ void pCodePeepClrVars(pCodePeep *pcp)
   if(!pcp)
     return;
 
-  for(i=0;i<pcp->target.nvars; i++) {
+  DFPRINTF((stderr," Clearing peep rule vars\n"));
+  DFPRINTF((stderr," %d %d %d  %d %d %d\n",
+	    pcp->target.nvars,pcp->target.nops,pcp->target.nwildpCodes,
+	    pcp->replace.nvars,pcp->replace.nops,pcp->replace.nwildpCodes));
+
+  for(i=0;i<pcp->target.nvars; i++)
     pcp->target.vars[i] = NULL;
+  for(i=0;i<pcp->target.nops; i++)
     pcp->target.wildpCodeOps[i] = NULL;
-  }
+  for(i=0;i<pcp->target.nwildpCodes; i++)
+    pcp->target.wildpCodes[i] = NULL;
+
+  for(i=0;i<pcp->replace.nvars; i++)
+    pcp->replace.vars[i] = NULL;
+  for(i=0;i<pcp->replace.nops; i++)
+    pcp->replace.wildpCodeOps[i] = NULL;
+  for(i=0;i<pcp->replace.nwildpCodes; i++)
+    pcp->replace.wildpCodes[i] = NULL;
+
+
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -1857,6 +1876,7 @@ int pCodePeepMatchRule(pCode *pc)
 {
   pCodePeep *peepBlock;
   pCode *pct, *pcin;
+  pCodeCSource *pc_cline=NULL;
   _DLL *peeprules;
   int matched;
 
@@ -1871,12 +1891,20 @@ int pCodePeepMatchRule(pCode *pc)
     }
 
     pCodePeepClrVars(peepBlock);
-
+/*
     pcin = pc;
     if(IS_PCCOMMENT(pcin))
       pc = pcin = findNextInstruction(pcin->next);
+*/
+    pcin = pc = findNextInstruction(pc);
 
     pct = peepBlock->target.pb->pcHead;
+#ifdef PCODE_DEBUG
+    {
+      pCode *pcr = peepBlock->replace.pb->pcHead;
+      if(pcr) pct->print(stderr,pcr);
+    }
+#endif
     matched = 0;
     while(pct && pcin) {
 
@@ -1891,8 +1919,9 @@ int pCodePeepMatchRule(pCode *pc)
 	DFPRINTF((stderr," partial match... no more code\n"));
 	matched = 0; 
       }
-      if(!pct)
+      if(!pct) {
 	DFPRINTF((stderr," end of rule\n"));
+      }
     }
 
     if(matched) {
@@ -1924,11 +1953,12 @@ int pCodePeepMatchRule(pCode *pc)
       printpCodeString(stderr,peepBlock->target.pb->pcHead,10);
       DFPRINTF((stderr,"first thing matched\n"));
       pc->print(stderr,pc);
-#endif
       if(pcin) {
 	DFPRINTF((stderr,"last thing matched\n"));
 	pcin->print(stderr,pcin);
       }
+#endif
+
 
       /* Unlink the original code */
       pcprev = pc->prev;
@@ -1936,21 +1966,38 @@ int pCodePeepMatchRule(pCode *pc)
       if(pcin) 
 	pcin->prev = pc->prev;
 
+
+
       {
 	/*     DEBUG    */
 	/* Converted the deleted pCodes into comments */
 
 	char buf[256];
+	pCodeCSource *pc_cline2=NULL;
 
 	buf[0] = ';';
 	buf[1] = '#';
 
 	while(pc &&  pc!=pcin) {
+
+	  if(pc->type == PC_OPCODE && PCI(pc)->cline) {
+	    if(pc_cline) {
+	      pc_cline2->pc.next = PCODE(PCI(pc)->cline);
+	      pc_cline2 = PCCS(pc_cline2->pc.next);
+	    } else {
+	      pc_cline = pc_cline2 = PCI(pc)->cline;
+	      pc_cline->pc.seq = pc->seq;
+	    }
+	  }
+
 	  pCode2str(&buf[2], 254, pc);
 	  pCodeInsertAfter(pcprev, newpCodeCharP(buf));
 	  pcprev = pcprev->next;
 	  pc = pc->next;
+
 	}
+	if(pc_cline2)
+	  pc_cline2->pc.next = NULL;
       }
 
       if(pcin)
@@ -1961,6 +2008,7 @@ int pCodePeepMatchRule(pCode *pc)
       pcr = peepBlock->replace.pb->pcHead;  // This is the replacement code
       while (pcr) {
 	pCodeOp *pcop=NULL;
+	
 	/* If the replace pcode is an instruction with an operand, */
 	/* then duplicate the operand (and expand wild cards in the process). */
 	if(pcr->type == PC_OPCODE) {
@@ -1991,9 +2039,22 @@ int pCodePeepMatchRule(pCode *pc)
 
 
 	pc = pc->next;
-	//if(pc)
-	//  pc->print(stderr,pc);
+#ifdef PCODE_DEBUG
+	DFPRINTF((stderr,"  NEW Code:"));
+	if(pc) pc->print(stderr,pc);
+#endif
 	pcr = pcr->next;
+      }
+
+      /* We have just replaced the inefficient code with the rule.
+       * Now, we need to re-add the C-source symbols if there are any */
+      pc = pcprev;
+      while(pc_cline ) {
+       
+	pc =  findNextInstruction(pc->next);
+	PCI(pc)->cline = pc_cline;
+	pc_cline = PCCS(pc_cline->pc.next);
+	
       }
 
       return 1;
@@ -2001,6 +2062,7 @@ int pCodePeepMatchRule(pCode *pc)
   next_rule:
     peeprules = peeprules->next;
   }
+  DFPRINTF((stderr," no rule matched\n"));
 
   return 0;
 }

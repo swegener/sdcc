@@ -494,6 +494,19 @@ pic14_regWithIdx (int idx)
 }
 
 /*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+regs *
+pic14_findFreeReg(void)
+{
+  int i;
+
+  for (i = 0; i < pic14_nRegs; i++)
+    if (regspic14[i].isFree)
+      return &regspic14[i];
+
+  return NULL;
+}
+/*-----------------------------------------------------------------*/
 /* freeReg - frees a register                                      */
 /*-----------------------------------------------------------------*/
 static void
@@ -1923,8 +1936,8 @@ regTypeNum ()
 /*-----------------------------------------------------------------*/
 /* freeAllRegs - mark all registers as free                        */
 /*-----------------------------------------------------------------*/
-static void
-freeAllRegs ()
+void
+pic14_freeAllRegs ()
 {
   int i;
 
@@ -1932,6 +1945,21 @@ freeAllRegs ()
   for (i = 0; i < pic14_nRegs; i++)
     regspic14[i].isFree = 1;
 }
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void
+pic14_deallocateAllRegs ()
+{
+  int i;
+
+  debugLog ("%s\n", __FUNCTION__);
+  for (i = 0; i < pic14_nRegs; i++) {
+    regspic14[i].isFree = 1;
+    regspic14[i].wasUsed = 0;
+  }
+}
+
 
 /*-----------------------------------------------------------------*/
 /* deallocStackSpil - this will set the stack pointer back         */
@@ -3064,7 +3092,7 @@ pic14_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void **) &_G.stackSpil);
   setToNull ((void **) &_G.spiltSet);
   /* mark all registers as free */
-  freeAllRegs ();
+  pic14_freeAllRegs ();
 
   debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
   debugLogClose ();

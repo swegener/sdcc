@@ -83,6 +83,9 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
 static void
 _pic14_finaliseOptions (void)
 {
+
+      port->mem.default_local_map = data;
+      port->mem.default_globl_map = data;
 #if 0
   /* Hack-o-matic: if we are using the flat24 model,
    * adjust pointer sizes.

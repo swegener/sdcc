@@ -22,6 +22,7 @@
 
 #include "common.h"   // Include everything in the SDCC src directory
 #include "newalloc.h"
+#include "ralloc.h"
 
 #include "pcode.h"
 
@@ -65,6 +66,7 @@ static char *scpXORWF = "XORWF";
 
 static pFile *the_pFile = NULL;
 static int peepOptimizing = 1;
+static int GpCodeSequenceNumber = 1;
 
 /****************************************************************/
 /****************************************************************/
@@ -122,6 +124,60 @@ char *Safe_strdup(char *str)
     
 }
 
+char getpBlock_dbName(pBlock *pb)
+{
+  if(!pb)
+    return 0;
+
+  if(pb->cmemmap)
+    return pb->cmemmap->dbName;
+
+  return pb->dbName;
+}
+/*-----------------------------------------------------------------*/
+/* movepBlock2Head - given the dbname of a pBlock, move all        */
+/*                   instances to the front of the doubly linked   */
+/*                   list of pBlocks                               */
+/*-----------------------------------------------------------------*/
+
+void movepBlock2Head(char dbName)
+{
+  pBlock *pb;
+
+  pb = the_pFile->pbHead;
+
+  while(pb) {
+
+    if(getpBlock_dbName(pb) == dbName) {
+      pBlock *pbn = pb->next;
+      pb->next = the_pFile->pbHead;
+      the_pFile->pbHead->prev = pb;
+      the_pFile->pbHead = pb;
+
+      if(pb->prev)
+	pb->prev->next = pbn;
+
+      // If the pBlock that we just moved was the last
+      // one in the link of all of the pBlocks, then we
+      // need to point the tail to the block just before
+      // the one we moved.
+      // Note: if pb->next is NULL, then pb must have 
+      // been the last pBlock in the chain.
+
+      if(pbn)
+	pbn->prev = pb->prev;
+      else
+	the_pFile->pbTail = pb->prev;
+
+      pb = pbn;
+
+    } else
+      pb = pb->next;
+
+  }
+
+}
+
 void copypCode(FILE *of, char dbName)
 {
   pBlock *pb;
@@ -129,10 +185,8 @@ void copypCode(FILE *of, char dbName)
   if(!of || !the_pFile)
     return;
 
-  fprintf(of,";dumping pcode to a file");
-
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if(pb->cmemmap->dbName == dbName)
+    if(getpBlock_dbName(pb) == dbName)
       printpBlock(of,pb);
   }
 
@@ -161,7 +215,12 @@ void pcode_test(void)
 
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
       fprintf(pFile,"\n\tNew pBlock\n\n");
-      fprintf(pFile,"%s, dbName =%c\n",pb->cmemmap->sname,pb->cmemmap->dbName);
+      if(pb->cmemmap)
+	fprintf(pFile,"%s",pb->cmemmap->sname);
+      else
+	fprintf(pFile,"internal pblock");
+
+      fprintf(pFile,", dbName =%c\n",getpBlock_dbName(pb));
       printpBlock(pFile,pb);
     }
   }
@@ -169,6 +228,24 @@ void pcode_test(void)
 
 /*-----------------------------------------------------------------*/
 /* newpCode - create and return a newly initialized pCode          */
+/*                                                                 */
+/*  fixme - rename this                                            */
+/*                                                                 */
+/* The purpose of this routine is to create a new Instruction      */
+/* pCode. This is called by gen.c while the assembly code is being */
+/* generated.                                                      */
+/*                                                                 */
+/* Inouts:                                                         */
+/*  PIC_OPCODE op - the assembly instruction we wish to create.    */
+/*                  (note that the op is analogous to but not the  */
+/*                  same thing as the opcode of the instruction.)  */
+/*  pCdoeOp *pcop - pointer to the operand of the instruction.     */
+/*                                                                 */
+/* Outputs:                                                        */
+/*  a pointer to the new malloc'd pCode is returned.               */
+/*                                                                 */
+/*                                                                 */
+/*                                                                 */
 /*-----------------------------------------------------------------*/
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
 {
@@ -176,22 +253,31 @@ pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
     
 
   pci = Safe_calloc(1, sizeof(pCodeInstruction));
-  pci->pc.analyze = genericAnalyze;
-  pci->pc.destruct = genericDestruct;
-  pci->pc.type = PC_OPCODE;
-  pci->op = op;
-  pci->pc.prev = pci->pc.next = NULL;
-  pci->pcop = pcop;
-  pci->dest = 0;
-  pci->bit_inst = 0;
-  pci->num_ops = 2;
-  pci->inCond = pci->outCond = PCC_NONE;
-  pci->pc.print = genericPrint;
-  pci->pc.from = pci->pc.to = pci->pc.label = NULL;
+
+  pci->pc.analyze  = genericAnalyze;       // pointers to the generic functions, it
+  pci->pc.destruct = genericDestruct;      // doesn't hurt to think about C++ virtual
+  pci->pc.print    = genericPrint;         // functions here.
+  pci->pc.type = PC_OPCODE;                // 
+  pci->op = op;                            // the "opcode" for the instruction.
+  pci->pc.prev = pci->pc.next = NULL;      // The pCode gets linked in later
+  pci->pcop = pcop;                        // The operand of the instruction
+  pci->dest = 0;                           // e.g. W or F 
+  pci->bit_inst = 0;                       // e.g. btfxx instructions
+  pci->num_ops = 2;                        // Most instructions have two ops...
+  pci->inCond = pci->outCond = PCC_NONE;   /* input/output conditions. This is used during
+					    * optimization to ascertain instruction dependencies.
+					    * For example, if an instruction affects the Z bit,
+					    * then the output condition for this instruction
+					    * is "z bit is affected". The "conditions" are bit
+					    * constants defined in pcode.h. */
+  pci->pc.from = pci->pc.to = NULL;        // Flow linkages are defined later
+  pci->pc.label = NULL;                    // Labels get merged into instructions here.
+  pci->pc.pb = NULL;                       // The pBlock to which this instruction belongs
 
   if(pcop && pcop->name)
     printf("newpCode  operand name %s\n",pcop->name);
 
+  // The most pic dependent portion of the pCode logic:
   switch(op) { 
 
   case POC_ANDLW:
@@ -354,6 +440,19 @@ pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
   return (pCode *)pci;
 }     	
 
+/*-----------------------------------------------------------------*/
+/* newpCodeWild - create a "wild" as in wild card pCode            */
+/*                                                                 */
+/* Wild pcodes are used during the peep hole optimizer to serve    */
+/* as place holders for any instruction. When a snippet of code is */
+/* compared to a peep hole rule, the wild card opcode will match   */
+/* any instruction. However, the optional operand and label are    */
+/* additional qualifiers that must also be matched before the      */
+/* line (of assembly code) is declared matched. Note that the      */
+/* operand may be wild too.                                        */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label)
 {
 
@@ -364,6 +463,7 @@ pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_la
   pcw->pc.type = PC_WILD;
   pcw->pc.prev = pcw->pc.next = NULL;
   pcw->pc.from = pcw->pc.to = pcw->pc.label = NULL;
+  pcw->pc.pb = NULL;
 
   pcw->pc.analyze = genericAnalyze;
   pcw->pc.destruct = genericDestruct;
@@ -391,6 +491,7 @@ pCode *newpCodeCharP(char *cP)
   pcc->pc.type = PC_COMMENT;
   pcc->pc.prev = pcc->pc.next = NULL;
   pcc->pc.from = pcc->pc.to = pcc->pc.label = NULL;
+  pcc->pc.pb = NULL;
 
   pcc->pc.analyze = genericAnalyze;
   pcc->pc.destruct = genericDestruct;
@@ -416,6 +517,7 @@ pCode *newpCodeFunction(char *mod,char *f)
   pcf->pc.type = PC_FUNCTION;
   pcf->pc.prev = pcf->pc.next = NULL;
   pcf->pc.from = pcf->pc.to = pcf->pc.label = NULL;
+  pcf->pc.pb = NULL;
 
   pcf->pc.analyze = genericAnalyze;
   pcf->pc.destruct = genericDestruct;
@@ -449,6 +551,7 @@ pCode *newpCodeLabel(int key)
   pcl->pc.type = PC_LABEL;
   pcl->pc.prev = pcl->pc.next = NULL;
   pcl->pc.from = pcl->pc.to = pcl->pc.label = NULL;
+  pcl->pc.pb = NULL;
 
   pcl->pc.analyze = genericAnalyze;
   pcl->pc.destruct = genericDestruct;
@@ -465,6 +568,14 @@ pCode *newpCodeLabel(int key)
   return ( (pCode *)pcl);
 
 }
+pCode *newpCodeLabelStr(char *str)
+{
+  pCode *pc = newpCodeLabel(-1);
+
+  PCL(pc)->label = Safe_strdup(str);
+
+  return pc;
+}
 
 /*-----------------------------------------------------------------*/
 /* newpBlock - create and return a pointer to a new pBlock         */
@@ -476,6 +587,10 @@ pBlock *newpBlock(void)
 
   _ALLOC(PpB,sizeof(pBlock));
   PpB->next = PpB->prev = NULL;
+
+  PpB->function_entries = PpB->function_exits = PpB->function_calls = NULL;
+  PpB->registers = NULL;
+  PpB->visited = 0;
 
   return PpB;
 
@@ -490,13 +605,14 @@ pBlock *newpBlock(void)
  *-----------------------------------------------------------------*/
 
 
-pBlock *newpCodeChain(memmap *cm,pCode *pc)
+pBlock *newpCodeChain(memmap *cm,char c, pCode *pc)
 {
 
-  pBlock *pB = newpBlock();
+  pBlock *pB  = newpBlock();
 
-  pB->pcHead = pB->pcTail = pc;
+  pB->pcHead  = pB->pcTail = pc;
   pB->cmemmap = cm;
+  pB->dbName  = c;
 
   return pB;
 }
@@ -576,6 +692,7 @@ pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype)
   PCOW(pcop)->id = id;
   PCOW(pcop)->pcp = pcp;
   PCOW(pcop)->subtype = subtype;
+  PCOW(pcop)->matched = NULL;
 
   return pcop;
 }
@@ -588,7 +705,10 @@ pCodeOp *newpCodeOpBit(char *s, int bit)
   pcop->type = PO_BIT;
   pcop->name = Safe_strdup(s);   
   PCOB(pcop)->bit = bit;
-  PCOB(pcop)->inBitSpace = 1;
+  if(bit>=0)
+    PCOB(pcop)->inBitSpace = 1;
+  else
+    PCOB(pcop)->inBitSpace = 0;
 
   return pcop;
 }
@@ -602,6 +722,7 @@ void addpCode2pBlock(pBlock *pb, pCode *pc)
   pb->pcTail->next = pc;
   pc->prev = pb->pcTail;
   pc->next = NULL;
+  pc->pb = pb;
   pb->pcTail = pc;
 }
 
@@ -673,9 +794,6 @@ void printpBlock(FILE *of, pBlock *pb)
 /*                                                                 */
 /*       pCode processing                                          */
 /*                                                                 */
-/*    The stuff that follows is very PIC specific!                 */
-/*                                                                 */
-/*                                                                 */
 /*                                                                 */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
@@ -696,10 +814,41 @@ static void genericDestruct(pCode *pc)
   free(pc);
 }
 
+
+void pBlockRegs(FILE *of, pBlock *pb)
+{
+
+  regs  *r;
+
+  r = setFirstItem(pb->registers);
+  while (r) {
+    fprintf(of,"   %s\n",r->name);
+    r = setNextItem(pb->registers);
+  }
+}
+
+
 static char *get_op( pCodeInstruction *pcc)
 {
-  if(pcc && pcc->pcop && pcc->pcop->name)
+  if(pcc && pcc->pcop) {
+
+
+
+  if(pcc->pcop->type == PO_GPR_TEMP) {
+    regs *r;
+    r = pic14_regWithIdx(PCOR(pcc->pcop)->r->rIdx);
+    //pcc->pcop->name = Safe_strdup(r->name);
+    //sprintf(buffer, "R0X%x",PCOR(pcc->pcop)->rIdx);
+    //pcc->pcop->name = Safe_strdup(PCOR(pcc->pcop)->r->name);
+    fprintf(stderr,"getop: getting %s\nfrom:\n",r->name); //pcc->pcop->name);
+    pBlockRegs(stderr,pcc->pc.pb);
+    return r->name;
+  }
+
+  if  (pcc->pcop->name)
     return pcc->pcop->name;
+
+  }
   return "NO operand";
 }
 
@@ -754,9 +903,16 @@ static void genericPrint(FILE *of, pCode *pc)
 
 	if(PCI(pc)->pcop->type == PO_BIT) {
 	  if( PCI(pc)->num_ops == 2)
+	    fprintf(of,"(%s >> 3),%c",get_op(PCI(pc)),((PCI(pc)->dest) ? 'F':'W'));
+	  else
+	    fprintf(of,"(1 << (%s & 7))",get_op(PCI(pc)));
+
+/*
+	  if( PCI(pc)->num_ops == 2)
 	    fprintf(of,"(%s >> 3),%c",PCI(pc)->pcop->name,((PCI(pc)->dest) ? 'F':'W'));
 	  else
 	    fprintf(of,"(1 << (%s & 7))",PCI(pc)->pcop->name);
+*/
 	}else {
 	  fprintf(of,"%s",get_op(PCI(pc)));
 
@@ -826,7 +982,7 @@ static void pCodePrintFunction(FILE *of, pCode *pc)
       i++;
       exits = exits->next;
     }
-    if(i) i--;
+    //if(i) i--;
     fprintf(of,"; %d exit point%c\n",i, ((i==1) ? ' ':'s'));
     
   }else {
@@ -1144,9 +1300,36 @@ void AnalyzepBlock(pBlock *pb)
   if(!pb)
     return;
 
-  for(pc = pb->pcHead; pc; pc = pc->next)
-    pc->analyze(pc);
+  /* Find all of the registers used in this pBlock */
+  for(pc = pb->pcHead; pc; pc = pc->next) {
+    if(pc->type == PC_OPCODE) {
+      if(PCI(pc)->pcop && PCI(pc)->pcop->type == PO_GPR_TEMP) {
 
+	/* Loop through all of the registers declared so far in
+	   this block and see if we find this new there */
+
+	regs *r = setFirstItem(pb->registers);
+
+	while(r) {
+	  if(r->rIdx == PCOR(PCI(pc)->pcop)->r->rIdx) {
+	    PCOR(PCI(pc)->pcop)->r = r;
+	    break;
+	  }
+	  r = setNextItem(pb->registers);
+	}
+
+	if(!r) {
+	  /* register wasn't found */
+	  r = Safe_calloc(1, sizeof(regs));
+	  memcpy(r,PCOR(PCI(pc)->pcop)->r, sizeof(regs));
+	  addSet(&pb->registers, r);
+	  PCOR(PCI(pc)->pcop)->r = r;
+	  fprintf(stderr,"added register to pblock: reg %d\n",r->rIdx);
+	} else 
+	  fprintf(stderr,"found register in pblock: reg %d\n",r->rIdx);
+      }
+    }
+  }
 }
 
 int OptimizepBlock(pBlock *pb)
@@ -1225,7 +1408,7 @@ void OptimizepCode(char dbName)
 
   do {
     for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-      if(pb->cmemmap->dbName == dbName)
+      if('*' == dbName || getpBlock_dbName(pb) == dbName)
 	matches += OptimizepBlock(pb);
     }
   }
@@ -1254,37 +1437,70 @@ void AnalyzepCode(char dbName)
 
   /* First, merge the labels with the instructions */
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if(pb->cmemmap->dbName == dbName)
+    if('*' == dbName || getpBlock_dbName(pb) == dbName) {
       pBlockMergeLabels(pb);
+      AnalyzepBlock(pb);
+    }
   }
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if(pb->cmemmap->dbName == dbName)
+    if('*' == dbName || getpBlock_dbName(pb) == dbName)
       OptimizepBlock(pb);
   }
 
   /* Now build the call tree.
      First we examine all of the pCodes for functions.
-     
+     Keep in mind that the function boundaries coincide
+     with pBlock boundaries. 
+
+     The algorithm goes something like this:
+     We have two nested loops. The outer loop iterates
+     through all of the pBlocks/functions. The inner
+     loop iterates through all of the pCodes for
+     a given pBlock. When we begin iterating through
+     a pBlock, the variable pc_fstart, pCode of the start
+     of a function, is cleared. We then search for pCodes
+     of type PC_FUNCTION. When one is encountered, we
+     initialize pc_fstart to this and at the same time
+     associate a new pBranch object that signifies a 
+     branch entry. If a return is found, then this signifies
+     a function exit point. We'll link the pCodes of these
+     returns to the matching pc_fstart.
+
+     When we're done, a doubly linked list of pBranches
+     will exist. The head of this list is stored in
+     `the_pFile', which is the meta structure for all
+     of the pCode. Look at the printCallTree function
+     on how the pBranches are linked together.
+
    */
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if(pb->cmemmap->dbName == dbName) {
+    if('*' == dbName || getpBlock_dbName(pb) == dbName) {
       pCode *pc_fstart=NULL;
       for(pc = pb->pcHead; pc; pc = pc->next) {
 	if(pc->type == PC_FUNCTION) {
 	  if (PCF(pc)->fname) {
+	    // I'm not liking this....
 	    // Found the beginning of a function.
 	    _ALLOC(pbr,sizeof(pBranch));
 	    pbr->pc = pc_fstart = pc;
 	    pbr->next = NULL;
 
 	    the_pFile->functions = pBranchAppend(the_pFile->functions,pbr);
+
+	    // Here's a better way of doing the same:
+	    addSet(&pb->function_entries, pc);
+
 	  } else {
 	    // Found an exit point in a function, e.g. return
 	    // (Note, there may be more than one return per function)
 	    if(pc_fstart)
 	      pBranchLink(pc_fstart, pc);
+
+	    addSet(&pb->function_exits, pc);
 	  }
+	} else	if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
+	  addSet(&pb->function_calls,pc);
 	}
       }
     }
@@ -1304,9 +1520,338 @@ bool ispCodeFunction(pCode *pc)
   return 0;
 }
 
+/*-----------------------------------------------------------------*/
+/* findFunction - Search for a function by name (given the name)   */
+/*                in the set of all functions that are in a pBlock */
+/* (note - I expect this to change because I'm planning to limit   */
+/*  pBlock's to just one function declaration                      */
+/*-----------------------------------------------------------------*/
+pCode *findFunction(char *fname)
+{
+  pBlock *pb;
+  pCode *pc;
+  if(!fname)
+    return NULL;
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+
+    pc = setFirstItem(pb->function_entries);
+    while(pc) {
+    
+      if((pc->type == PC_FUNCTION) &&
+	 (PCF(pc)->fname) && 
+	 (strcmp(fname, PCF(pc)->fname)==0))
+	return pc;
+
+      pc = setNextItem(pb->function_entries);
+
+    }
+
+  }
+  return NULL;
+}
+
+void MarkUsedRegisters(set *regset)
+{
+
+  regs *r1,*r2;
+
+  for(r1=setFirstItem(regset); r1; r1=setNextItem(regset)) {
+    r2 = pic14_regWithIdx(r1->rIdx);
+    r2->isFree = 0;
+    r2->wasUsed = 1;
+  }
+}
+
+void pBlockStats(FILE *of, pBlock *pb)
+{
+
+  pCode *pc;
+  regs  *r;
+
+  fprintf(of,"***\n  pBlock Stats\n***\n");
+
+  // for now just print the first element of each set
+  pc = setFirstItem(pb->function_entries);
+  if(pc) {
+    fprintf(of,"entry\n");
+    pc->print(of,pc);
+  }
+  pc = setFirstItem(pb->function_exits);
+  if(pc) {
+    fprintf(of,"has an exit\n");
+    pc->print(of,pc);
+  }
+
+  pc = setFirstItem(pb->function_calls);
+  if(pc) {
+    fprintf(of,"functions called\n");
+
+    while(pc) {
+      pc->print(of,pc);
+      pc = setNextItem(pb->function_calls);
+    }
+  }
+
+  r = setFirstItem(pb->registers);
+  if(r) {
+    int n = elementsInSet(pb->registers);
+
+    fprintf(of,"%d compiler assigned register%c:\n",n, ( (n!=1) ? 's' : ' '));
+
+    while (r) {
+      fprintf(of,"   %s\n",r->name);
+      r = setNextItem(pb->registers);
+    }
+  }
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+void sequencepCode(void)
+{
+  pBlock *pb;
+  pCode *pc;
+
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+
+    pb->seq = GpCodeSequenceNumber+1;
+
+    for( pc = pb->pcHead; pc; pc = pc->next)
+      pc->seq = ++GpCodeSequenceNumber;
+  }
+
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+set *register_usage(pBlock *pb)
+{
+  pCode *pc,*pcn;
+  set *registers=NULL;
+  set *registersInCallPath = NULL;
+
+  /* check recursion */
+
+  pc = setFirstItem(pb->function_entries);
+
+  if(!pc)
+    return registers;
+
+  pb->visited = 1;
+
+  if(pc->type != PC_FUNCTION)
+    fprintf(stderr,"%s, first pc is not a function???\n",__FUNCTION__);
+
+  pc = setFirstItem(pb->function_calls);
+  for( ; pc; pc = setNextItem(pb->function_calls)) {
+
+    if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
+      char *dest = get_op(PCI(pc));
+
+      pcn = findFunction(dest);
+      if(pcn) 
+	registersInCallPath = register_usage(pcn->pb);
+    } else
+      fprintf(stderr,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
+
+  }
+
+
+  pBlockStats(stderr,pb);  // debug
+  if(registersInCallPath) {
+    /* registers were used in the functions this pBlock has called */
+    /* so now, we need to see if these collide with the ones we are */
+    /* using here */
+
+    regs *r1,*r2, *newreg;
+
+    fprintf(stderr,"comparing registers\n");
+
+    r1 = setFirstItem(registersInCallPath);
+    while(r1) {
+
+      r2 = setFirstItem(pb->registers);
+
+      while(r2) {
+
+	if(r2->rIdx == r1->rIdx) {
+	  newreg = pic14_findFreeReg();
+
+
+	  if(!newreg) {
+	    fprintf(stderr,"Bummer, no more registers.\n");
+	    exit(1);
+	  }
+
+	  fprintf(stderr,"Cool found register collision nIdx=%d moving to %d\n",
+		  r1->rIdx, newreg->rIdx);
+	  r2->rIdx = newreg->rIdx;
+	  //if(r2->name) free(r2->name);
+	  r2->name = Safe_strdup(newreg->name);
+	  newreg->isFree = 0;
+	  newreg->wasUsed = 1;
+	}
+	r2 = setNextItem(pb->registers);
+      }
+
+      r1 = setNextItem(registersInCallPath);
+    }
+
+    /* Collisions have been resolved. Now free the registers in the call path */
+    r1 = setFirstItem(registersInCallPath);
+    while(r1) {
+      newreg = pic14_regWithIdx(r1->rIdx);
+      newreg->isFree = 1;
+      r1 = setNextItem(registersInCallPath);
+    }
+
+  } else
+    MarkUsedRegisters(pb->registers);
+
+  registers = unionSets(pb->registers, registersInCallPath, THROW_NONE);
+
+  if(registers) 
+    fprintf(stderr,"returning regs\n");
+  else
+    fprintf(stderr,"not returning regs\n");
+
+  fprintf(stderr,"pBlock after register optim.\n");
+  pBlockStats(stderr,pb);  // debug
+
+
+  return registers;
+}
+
+/*-----------------------------------------------------------------*/
+/* printCallTree - writes the call tree to a file                  */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+void pct2(FILE *of,pBlock *pb,int indent)
+{
+  pCode *pc,*pcn;
+  int i;
+  //  set *registersInCallPath = NULL;
+
+  if(!of)
+    return;// registers;
+
+  if(indent > 10)
+    return; // registers;   //recursion ?
+
+  pc = setFirstItem(pb->function_entries);
+
+  if(!pc)
+    return;
+
+  pb->visited = 0;
+
+  for(i=0;i<indent;i++)   // Indentation
+    fputc(' ',of);
+
+  if(pc->type == PC_FUNCTION)
+    fprintf(of,"%s\n",PCF(pc)->fname);
+  else
+    return;  // ???
+
+
+  pc = setFirstItem(pb->function_calls);
+  for( ; pc; pc = setNextItem(pb->function_calls)) {
+
+    if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
+      char *dest = get_op(PCI(pc));
+
+      pcn = findFunction(dest);
+      if(pcn) 
+	pct2(of,pcn->pb,indent+1);
+    } else
+      fprintf(of,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
+
+  }
+
+
+}
+
+#if 0
+  fprintf(stderr,"pBlock before register optim.\n");
+  pBlockStats(stderr,pb);  // debug
+
+  if(registersInCallPath) {
+    /* registers were used in the functions this pBlock has called */
+    /* so now, we need to see if these collide with the ones we are using here */
+
+    regs *r1,*r2, *newreg;
+
+    fprintf(stderr,"comparing registers\n");
+
+    r1 = setFirstItem(registersInCallPath);
+    while(r1) {
+
+      r2 = setFirstItem(pb->registers);
+
+      while(r2) {
+
+	if(r2->rIdx == r1->rIdx) {
+	  newreg = pic14_findFreeReg();
+
+
+	  if(!newreg) {
+	    fprintf(stderr,"Bummer, no more registers.\n");
+	    exit(1);
+	  }
+
+	  fprintf(stderr,"Cool found register collision nIdx=%d moving to %d\n",
+		  r1->rIdx, newreg->rIdx);
+	  r2->rIdx = newreg->rIdx;
+	  //if(r2->name) free(r2->name);
+	  r2->name = Safe_strdup(newreg->name);
+	  newreg->isFree = 0;
+	  newreg->wasUsed = 1;
+	}
+	r2 = setNextItem(pb->registers);
+      }
+
+      r1 = setNextItem(registersInCallPath);
+    }
+
+    /* Collisions have been resolved. Now free the registers in the call path */
+    r1 = setFirstItem(registersInCallPath);
+    while(r1) {
+      newreg = pic14_regWithIdx(r1->rIdx);
+      newreg->isFree = 1;
+      r1 = setNextItem(registersInCallPath);
+    }
+
+  } else
+    MarkUsedRegisters(pb->registers);
+
+  registers = unionSets(pb->registers, registersInCallPath, THROW_NONE);
+
+  if(registers) 
+    fprintf(stderr,"returning regs\n");
+  else
+    fprintf(stderr,"not returning regs\n");
+
+  fprintf(stderr,"pBlock after register optim.\n");
+  pBlockStats(stderr,pb);  // debug
+
+
+  return registers;
+
+#endif
+
+
+/*-----------------------------------------------------------------*/
+/* printCallTree - writes the call tree to a file                  */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+
 void printCallTree(FILE *of)
 {
   pBranch *pbr;
+  pBlock  *pb;
+  pCode   *pc;
 
   if(!the_pFile)
     return;
@@ -1314,12 +1859,17 @@ void printCallTree(FILE *of)
   if(!of)
     of = stderr;
 
-  pbr = the_pFile->functions;
+  fprintf(of, "\npBlock statistics\n");
+  for(pb = the_pFile->pbHead; pb;  pb = pb->next )
+    pBlockStats(stderr,pb);
+
+
 
   fprintf(of,"Call Tree\n");
+  pbr = the_pFile->functions;
   while(pbr) {
     if(pbr->pc) {
-      pCode *pc = pbr->pc;
+      pc = pbr->pc;
       if(!ispCodeFunction(pc))
 	fprintf(of,"bug in call tree");
 
@@ -1334,6 +1884,27 @@ void printCallTree(FILE *of)
     }
 
     pbr = pbr->next;
+  }
+
+
+  /* Re-allocate the registers so that there are no collisions
+   * between local variables when one function call another */
+
+  pic14_deallocateAllRegs();
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+    if(!pb->visited)
+      register_usage(pb);
+  }
+
+  fprintf(of,"\n**************\n\na better call tree\n");
+  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+    if(pb->visited)
+      pct2(of,pb,0);
+  }
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+    fprintf(of,"block dbname: %c\n", getpBlock_dbName(pb));
   }
 }
 /*-----------------------------------------------------------------
@@ -1431,12 +2002,12 @@ void pCodePeepInit(void)
   peepSnippets = DLL_append((_DLL*)peepSnippets,(_DLL*)pcps);
 
 
-  pb = newpCodeChain(NULL, newpCode(POC_MOVWF, newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER))) );
+  pb = newpCodeChain(NULL, 'W', newpCode(POC_MOVWF, newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER))) );
   addpCode2pBlock( pb,     newpCode(POC_MOVFW, newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER))) );
 
   pcp->target = pb;
 
-  pcp->replace = newpCodeChain(NULL, newpCode(POC_MOVWF, newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER))) );
+  pcp->replace = newpCodeChain(NULL, 'W',newpCode(POC_MOVWF, newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER))) );
 
   /* Allocate space to store pointers to the wildcard variables */
   pcp->nvars = 1;
@@ -1460,8 +2031,10 @@ void pCodePeepInit(void)
   {
     pCodeOp *pcl;
     pCodeOp *pcw;
+    pCodeOp *pcwb;
 
-    pb = newpCodeChain(NULL, newpCode(POC_BTFSC, newpCodeOpWild(0,pcp,newpCodeOpBit(NULL,-1))) );
+    pcwb =  newpCodeOpWild(0,pcp,newpCodeOpBit(NULL,-1));
+    pb = newpCodeChain(NULL, 'W',newpCode(POC_BTFSC,pcwb));
 
     pcl = newpCodeOpLabel(-1);
     pcw = newpCodeOpWild(1, pcp, pcl);
@@ -1472,7 +2045,7 @@ void pCodePeepInit(void)
 
     pcp->target = pb;
 
-    pb = newpCodeChain(NULL, newpCode(POC_BTFSS, newpCodeOpWild(0,pcp,newpCodeOpBit(NULL,-1))) );
+    pb = newpCodeChain(NULL, 'W',newpCode(POC_BTFSS, pcwb));
     addpCode2pBlock( pb,     newpCodeWild(0,NULL,NULL));
     addpCode2pBlock( pb,     newpCodeWild(1,NULL,pcw));
 
@@ -1509,12 +2082,12 @@ void pCodePeepInit(void)
 
     pcw = newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER));
 
-    pb = newpCodeChain(NULL, newpCode(POC_MOVWF, pcw));
+    pb = newpCodeChain(NULL, 'W', newpCode(POC_MOVWF, pcw));
     addpCode2pBlock( pb,     newpCode(POC_MOVWF, pcw));
 
     pcp->target = pb;
 
-    pb = newpCodeChain(NULL, newpCode(POC_MOVWF, pcw));
+    pb = newpCodeChain(NULL, 'W',newpCode(POC_MOVWF, pcw));
 
     pcp->replace = pb;
 
@@ -1590,17 +2163,28 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	if (PCI(pcd)->pcop->type == PO_WILD) {
 	  index = PCOW(PCI(pcd)->pcop)->id;
 
+	  fprintf(stderr,"destination is wild\n");
 #ifdef DEBUG_PCODEPEEP
 	  if (index > peepBlock->nvars) {
 	    fprintf(stderr,"%s - variables exceeded\n",__FUNCTION__);
 	    exit(1);
 	  }
 #endif
-	  if(peepBlock->vars[index])
-	    return (strcmp(peepBlock->vars[index],PCI(pcs)->pcop->name) == 0);
-	  else {
-	    peepBlock->vars[index] = PCI(pcs)->pcop->name;
-	    return 1;
+	  PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
+	  {
+	    char *n;
+
+	    if(PCI(pcs)->pcop->type == PO_GPR_TEMP)
+	      n = PCOR(PCI(pcs)->pcop)->r->name;
+	    else
+	      n = PCI(pcs)->pcop->name;
+
+	    if(peepBlock->vars[index])
+	      return  (strcmp(peepBlock->vars[index],n) == 0);
+	    else {
+	      peepBlock->vars[index] = n; //PCI(pcs)->pcop->name;
+	      return 1;
+	    }
 	  }
 	}
       } else
@@ -1644,6 +2228,7 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
     }
 
     if(PCW(pcd)->operand) {
+      PCOW(PCI(pcd)->pcop)->matched = PCI(pcs)->pcop;
       if(peepBlock->vars[index]) {
 	int i = (strcmp(peepBlock->vars[index],PCI(pcs)->pcop->name) == 0);
 	if(i)
@@ -1661,9 +2246,12 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
       }
     }
 
-    pcs = findNextInstruction(pcs->next);
-    fprintf(stderr," (next to match)\n");
-    pcs->print(stderr,pcs);
+    pcs = findNextInstruction(pcs->next); 
+    if(pcs) {
+      fprintf(stderr," (next to match)\n");
+      pcs->print(stderr,pcs);
+    }
+
     return 1; /*  wild card matches */
   }
 
@@ -1721,8 +2309,15 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
   case PO_WILD:
     /* Here we expand the wild card into the appropriate type: */
     /* By recursively calling pCodeOpCopy */
-    pcopnew = pCodeOpCopy(PCOW(pcop)->subtype);
-    pcopnew->name = Safe_strdup(PCOW(pcop)->pcp->vars[PCOW(pcop)->id]);
+    if(PCOW(pcop)->matched)
+      pcopnew = pCodeOpCopy(PCOW(pcop)->matched);
+    else {
+      // Probably a label
+      pcopnew = pCodeOpCopy(PCOW(pcop)->subtype);
+      pcopnew->name = Safe_strdup(PCOW(pcop)->pcp->vars[PCOW(pcop)->id]);
+      fprintf(stderr,"copied a wild op named %s\n",pcopnew->name);
+    }
+
     return pcopnew;
     break;
 
@@ -1738,6 +2333,7 @@ static pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     break;
 
   case PO_GPR_REGISTER:
+  case PO_GPR_TEMP:
   case PO_SFR_REGISTER:
   case PO_DIR:
   case PO_STR:
@@ -1817,7 +2413,7 @@ int pCodePeepMatchRule(pCode *pc)
 	fprintf(stderr," end of rule\n");
     }
 
-    if(matched) {
+    if(matched && pcin) {
 
       /* So far we matched the rule up to the point of the conditions .
        * In other words, all of the opcodes match. Now we need to see
@@ -1833,7 +2429,7 @@ int pCodePeepMatchRule(pCode *pc)
 	matched = 0;
     }
 
-    if(matched) {
+    if(matched && pcin) {
 
       pCode *pcprev;
       pCode *pcr;
@@ -1849,7 +2445,6 @@ int pCodePeepMatchRule(pCode *pc)
       fprintf(stderr,"last thing matched\n");
       pcin->print(stderr,pcin);
 
-
       /* Unlink the original code */
       pcprev = pc->prev;
       pcprev->next = pcin;
@@ -1862,7 +2457,7 @@ int pCodePeepMatchRule(pCode *pc)
       while (pcr) {
 	pCodeOp *pcop=NULL;
 	/* If the replace pcode is an instruction with an operand, */
-	/* then duplicate the operand (and expand wild cards in the process. */
+	/* then duplicate the operand (and expand wild cards in the process). */
 	if(pcr->type == PC_OPCODE) {
 	  if(PCI(pcr)->pcop)
 	    pcop = pCodeOpCopy(PCI(pcr)->pcop);
@@ -1872,7 +2467,9 @@ int pCodePeepMatchRule(pCode *pc)
 	  pCodeInsertAfter(pc,peepBlock->wildpCodes[PCW(pcr)->id]);
 	}
 
+
 	pc = pc->next;
+	pc->print(stderr,pc);
 	pcr = pcr->next;
       }
 

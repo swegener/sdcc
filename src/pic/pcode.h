@@ -19,6 +19,8 @@
    
 -------------------------------------------------------------------------*/
 
+#include "ralloc.h"
+
 /*
    Post code generation
 
@@ -102,6 +104,7 @@ typedef enum
   PO_FSR,            // The "file select register" (in 18c it's one of three)
   PO_INDF,           // The Indirect register
   PO_GPR_REGISTER,   // A general purpose register
+  PO_GPR_TEMP,       // A general purpose temporary register
   PO_SFR_REGISTER,   // A special function register (e.g. PORTA)
   PO_LITERAL,        // A constant
   PO_IMMEDIATE,      //  (8051 legacy)
@@ -283,6 +286,14 @@ typedef struct pCodeOpLabel
   int key;
 } pCodeOpLabel;
 
+typedef struct pCodeOpReg
+{
+  pCodeOp pcop;    // Can be either GPR or SFR
+  int rIdx;        // Index into the register table
+  regs *r;
+  struct pBlock *pb;
+} pCodeOpReg;
+
 
 
 /*************************************************
@@ -301,9 +312,13 @@ typedef struct pCode
   struct pCode *prev;  // The pCode objects are linked together
   struct pCode *next;  // in doubly linked lists.
 
+  int seq;             // sequence number
+
   pBranch *from;       // pCodes that execute before this one
   pBranch *to;         // pCodes that execute after
   pBranch *label;      // pCode instructions that have labels
+
+  struct pBlock *pb;   // The pBlock that contains this pCode.
 
   /* "virtual functions"
    *  The pCode structure is like a base class
@@ -424,11 +439,21 @@ typedef struct pCodeWild
 typedef struct pBlock
 {
   memmap *cmemmap;   /* The snippet is from this memmap */
+  char   dbName;     /* if cmemmap is NULL, then dbName will identify the block */
   pCode *pcHead;     /* A pointer to the first pCode in a link list of pCodes */
   pCode *pcTail;     /* A pointer to the last pCode in a link list of pCodes */
 
   struct pBlock *next;      /* The pBlocks will form a doubly linked list */
   struct pBlock *prev;
+
+  set *function_entries;    /* dll of functions in this pblock */
+  set *function_exits;
+  set *function_calls;
+  set *registers;
+
+  unsigned visited:1;       /* set true if traversed in call tree */
+
+  unsigned seq;             /* sequence number of this pBlock */
 
 } pBlock;
 
@@ -500,6 +525,9 @@ typedef struct pCodeOpWild
 			   * the wild card. The array is in *pcp. */
   pCodeOp *subtype;       /* Pointer to the Operand type into which this wild
 			   * card will be expanded */
+  pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
+			   * opcode we matched */
+
 } pCodeOpWild;
 
 /*************************************************
@@ -516,6 +544,7 @@ typedef struct pCodeOpWild
 #define PCOB(x)   ((pCodeOpBit *)(x))
 #define PCOL(x)   ((pCodeOpLit *)(x))
 #define PCOLAB(x) ((pCodeOpLabel *)(x))
+#define PCOR(x)   ((pCodeOpReg *)(x))
 #define PCOW(x)   ((pCodeOpWild *)(x))
 
 #define PBR(x)    ((pBranch *)(x))
@@ -527,13 +556,15 @@ typedef struct pCodeOpWild
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
 pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char *
 pCode *newpCodeFunction(char *g, char *f);   // Create a new function
-pCode *newpCodeLabel(int key);               // Create a new label
-pBlock *newpCodeChain(memmap *cm,pCode *pc); // Create a new pBlock
+pCode *newpCodeLabel(int key);               // Create a new label given a key
+pCode *newpCodeLabelStr(char *str);          // Create a new label given a string
+pBlock *newpCodeChain(memmap *cm,char c, pCode *pc); // Create a new pBlock
 void printpBlock(FILE *of, pBlock *pb);      // Write a pBlock to a file
 void printpCode(FILE *of, pCode *pc);        // Write a pCode to a file
 void addpCode2pBlock(pBlock *pb, pCode *pc); // Add a pCode to a pBlock
 void addpBlock(pBlock *pb);                  // Add a pBlock to a pFile
 void copypCode(FILE *of, char dbName);       // Write all pBlocks with dbName to *of
+void movepBlock2Head(char dbName);           // move pBlocks around
 void AnalyzepCode(char dbName);
 void OptimizepCode(char dbName);
 void printCallTree(FILE *of);

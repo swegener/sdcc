@@ -120,7 +120,7 @@ static unsigned char   SRMask[] = {0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
 
 #define FUNCTION_LABEL_INC  20
 static int labelOffset=0;
-static int debug_verbose=1;
+static int debug_verbose=0;
 
 static  pBlock *pb;
 
@@ -207,7 +207,8 @@ static void emitcode (char *inst,char *fmt, ...)
     lineCurr->isInline = _G.inLine;
     lineCurr->isDebug  = _G.debugLine;
 
-    addpCode2pBlock(pb,newpCodeCharP(lb));
+    if(debug_verbose)
+      addpCode2pBlock(pb,newpCodeCharP(lb));
 
     va_end(ap);
 }
@@ -1118,18 +1119,31 @@ static pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname)
 	return pcop;
 	
     case AOP_REG:
-      DEBUGemitcode(";","%d",__LINE__);
-      pcop = Safe_calloc(1,sizeof(pCodeOp) );
-      pcop->type = PO_GPR_REGISTER;
-      if (dname)
-	rs = aop->aopu.aop_reg[offset]->dname;
-      else 
-	rs = aop->aopu.aop_reg[offset]->name;
+      {
+	int len;
 
-      DEBUGemitcode(";","%d  %s",__LINE__,rs);
-      pcop->name = Safe_calloc(1,(strlen(rs)+1));
-      strcpy(pcop->name,rs);   
-      return pcop;
+	DEBUGemitcode(";","%d",__LINE__);
+	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+	pcop->type = PO_GPR_REGISTER;
+	if (dname)
+	  rs = aop->aopu.aop_reg[offset]->dname;
+	else 
+	  rs = aop->aopu.aop_reg[offset]->name;
+
+	PCOR(pcop)->rIdx = aop->aopu.aop_reg[offset]->rIdx;
+	PCOR(pcop)->r = pic14_regWithIdx(aop->aopu.aop_reg[offset]->rIdx);
+	// Really nasty hack to check for temporary registers
+	len = strlen(rs);
+	if(len >=3 && rs[0]=='r' && rs[1]=='0' && rs[2]=='x')
+	  pcop->type = PO_GPR_TEMP;
+	else
+	  fprintf(stderr,"popGet - AOP_REG is not a temp: %s\n",rs);
+
+	DEBUGemitcode(";","%d  %s",__LINE__,rs);
+	pcop->name = NULL;// Safe_calloc(1,(strlen(rs)+1));
+	//strcpy(pcop->name,rs);   
+	return pcop;
+      }
 
     case AOP_CRY:
       pcop = newpCodeOpBit(aop->aopu.aop_dir,0);
@@ -8938,7 +8952,7 @@ void genpic14Code (iCode *lic)
 
     lineHead = lineCurr = NULL;
 
-    pb = newpCodeChain(GcurMemmap,newpCodeCharP("; Starting pCode block"));
+    pb = newpCodeChain(GcurMemmap,0,newpCodeCharP("; Starting pCode block"));
     addpBlock(pb);
 
     /* if debug information required */

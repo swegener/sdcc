@@ -1001,6 +1001,49 @@ picglue ()
   int i;
 
   addSetHead(&tmpfileSet,ovrFile);
+
+
+  if (mainf && mainf->fbody) {
+
+    pBlock *pb = newpCodeChain(NULL,'X',newpCodeCharP("; Starting pCode block"));
+    addpBlock(pb);
+
+    /* entry point @ start of CSEG */
+    addpCode2pBlock(pb,newpCodeLabelStr("__sdcc_program_startup"));
+    /* put in the call to main */
+    addpCode2pBlock(pb,newpCode(POC_CALL,newpCodeOp("_main",PO_STR)));
+
+    if (options.mainreturn) {
+
+      addpCode2pBlock(pb,newpCodeCharP(";\treturn from main will return to caller\n"));
+      addpCode2pBlock(pb,newpCode(POC_RETURN,NULL));
+
+    } else {
+
+      addpCode2pBlock(pb,newpCodeCharP(";\treturn from main will lock up\n"));
+      addpCode2pBlock(pb,newpCode(POC_GOTO,newpCodeOp("$",PO_STR)));
+
+    }
+  }
+
+
+  /* At this point we've got all the code in the form of pCode structures */
+  /* Now it needs to be rearranged into the order it should be placed in the */
+  /* code space */
+
+  movepBlock2Head(code->dbName);     // Last
+  movepBlock2Head('X');
+  movepBlock2Head(statsg->dbName);   // First
+
+
+  AnalyzepCode('*'); //code->dbName);
+  printCallTree(stderr);
+
+  pCodePeepInit();
+
+  OptimizepCode(code->dbName);
+
+
   /* print the global struct definitions */
   if (options.debug)
     cdbStructBlock (0,cdbFile);
@@ -1063,14 +1106,13 @@ picglue ()
     
 
   /* Put all variables into a cblock */
-  fprintf (asmFile, "\n\n\tcblock  0x13\n\n");
+  fprintf (asmFile, "\n\n\tcblock  0x0c\n\n");
 
   for(i=0; i<pic14_nRegs; i++) {
     if(regspic14[i].wasUsed && (regspic14[i].offset>=0x0c) )
       fprintf (asmFile, "\t%s\n",regspic14[i].name);
   }
-  //fprintf (asmFile, "\tr0x0C\n");
-  //fprintf (asmFile, "\tr0x0D\n");
+
 
   /* For now, create a "dpl" and a "dph" in the register space */
   /* of the pic so that we can use the same calling mechanism */
@@ -1182,26 +1224,7 @@ picglue ()
 	      (unsigned int)options.xdata_loc & 0xff);
     }
 
-    /* initialise the stack pointer */
-    /* if the user specified a value then use it */
-    if (options.stack_loc) 
-      fprintf(asmFile,";\tmov\tsp,#%d\n",options.stack_loc);
-    else 
-      /* no: we have to compute it */
-      if (!options.stackOnData && maxRegBank <= 3)
-	fprintf(asmFile,";\tmov\tsp,#%d\n",((maxRegBank + 1) * 8) -1); 
-      else
-	fprintf(asmFile,";\tmov\tsp,#__start__stack\n"); /* MOF */
-
-    fprintf (asmFile,";\tlcall\t__sdcc_external_startup\n");
-    fprintf (asmFile,";\tmov\ta,dpl\n");
-    fprintf (asmFile,";\tjz\t__sdcc_init_data\n");
-    fprintf (asmFile,";\tljmp\t__sdcc_program_startup\n");
-    fprintf (asmFile,";__sdcc_init_data:\n");
-	
   }
-  //copyFile (asmFile, statsg->oFile);
-  copypCode(asmFile, statsg->dbName);
 
   if (port->general.glue_up_main && mainf && mainf->fbody)
     {
@@ -1218,33 +1241,13 @@ picglue ()
   fprintf (asmFile, "; code\n");
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, ";\t.area %s\n", port->mem.code_name);
-  if (mainf && mainf->fbody) {
-	
-    /* entry point @ start of CSEG */
-    fprintf (asmFile,"__sdcc_program_startup:\n");
-	
-    /* put in the call to main */
-    fprintf(asmFile,"\tcall\t_main\n");
-    if (options.mainreturn) {
 
-      fprintf(asmFile,";\treturn from main ; will return to caller\n");
-      fprintf(asmFile,"\treturn\n");
-
-    } else {
-	           
-      fprintf(asmFile,";\treturn from main will lock up\n");
-      fprintf(asmFile,"\tgoto\t$\n");
-    }
-  }
-
-  AnalyzepCode(code->dbName);
-  pCodePeepInit();
-
-  OptimizepCode(code->dbName);
   //copyFile (asmFile, code->oFile);
+
+  copypCode(asmFile, statsg->dbName);
+  copypCode(asmFile, 'X');
   copypCode(asmFile, code->dbName);
 
-  printCallTree(stderr);
 
   fprintf (asmFile,"\tend\n");
 

@@ -60,7 +60,9 @@ extern regs regspic14[];
 extern int pic14_nRegs;
 
 regs *pic14_regWithIdx (int);
-
+void  pic14_freeAllRegs ();
+void  pic14_deallocateAllRegs ();
+regs *pic14_findFreeReg(void);
 
 enum PIC_register_types
   {

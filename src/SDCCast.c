@@ -3717,8 +3717,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
     case SIZEOF:		/* evaluate wihout code generation */
       /* change the type to a integer */
+      {
+	int size = getSize (tree->right->ftype);
+	SNPRINTF(buffer, sizeof(buffer), "%d", size);
+	if (!size && !IS_VOID(tree->right->ftype))
+	  werrorfl (tree->filename, tree->lineno, E_SIZEOF_INCOMPLETE_TYPE);
+      }
       tree->type = EX_VALUE;
-      SNPRINTF(buffer, sizeof(buffer), "%d", (getSize (tree->right->ftype)));
       tree->opval.val = constVal (buffer);
       tree->right = tree->left = NULL;
       TETYPE (tree) = getSpec (TTYPE (tree) =
@@ -4200,12 +4205,15 @@ value *
 sizeofOp (sym_link * type)
 {
   char buff[10];
+  int size;
 
   /* make sure the type is complete and sane */
   checkTypeSanity(type, "(sizeof)");
 
   /* get the size and convert it to character  */
-  SNPRINTF (buff, sizeof(buff), "%d", getSize (type));
+  SNPRINTF (buff, sizeof(buff), "%d", size = getSize (type));
+  if (!size && !IS_VOID(type))
+    werror (E_SIZEOF_INCOMPLETE_TYPE);
 
   /* now convert into value  */
   return constVal (buff);

@@ -407,6 +407,8 @@ struct
    "enumeration constant not an integer" },
 { W_DEPRECATED_PRAGMA, ERROR_LEVEL_WARNING,
    "pragma %s is deprecated, please see documentation for details" },
+{ E_SIZEOF_INCOMPLETE_TYPE, ERROR_LEVEL_ERROR,
+   "sizeof applied to an incomplete type" },
 };
 
 /*

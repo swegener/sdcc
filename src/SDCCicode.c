@@ -1862,6 +1862,12 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       return op;
     }
 
+  if (IS_ITEMP (op) && IS_ARRAY (OP_SYMBOL (op)->type))
+    {
+      geniCodeArray2Ptr (op);
+      op->isaddr = 0;
+    }
+    
   /* if the operand is already the desired type then do nothing */
   if (compareType (type, optype) == 1)
     return op;

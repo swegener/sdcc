@@ -211,7 +211,9 @@ optionsTable[] = {
     { 0,    "--all-callee-saves",   &options.all_callee_saves, "callee will always save registers used" },
     { 0,    "--use-accelerator",    &options.useAccelerator,"generate code for  DS390 Arithmetic Accelerator"},
     { 0,    "--stack-probe",   	    &options.stack_probe,"insert call to function __stack_probe at each function prologue"},
-    { 0,    "--tini-libid",   	    NULL,"<nnnn> LibraryID used in -mTININative"}
+    { 0,    "--tini-libid",   	    NULL,"<nnnn> LibraryID used in -mTININative"},
+    { 0,    "--protect-sp-update",  &options.protect_sp_update,"DS390 - will disable interrupts during ESP:SP updates"},
+    { 0,    "--parms-in-bank1",	    &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"}
 };
 
 /** Table of all unsupported options and help text to display when one
@@ -1540,11 +1542,11 @@ main (int argc, char **argv, char **envp)
 
   if (srcFileName)
     {
-      preProcess (envp);
 
       initMem ();
 
       port->finaliseOptions ();
+      preProcess (envp);
 
       initSymt ();
       initiCode ();

@@ -3309,6 +3309,7 @@ static void genDivbits (operand *left,
 
     MOVA(l);    
 
+    emitcode("clr","c"); //jwk
     emitcode("div","ab");
     emitcode("rrc","a");
     aopPut(AOP(result),"c",0);
@@ -3334,6 +3335,7 @@ static void genDivOneByte (operand *left,
         emitcode("mov","b,%s", aopGet(AOP(right),0,FALSE,FALSE));
         l = aopGet(AOP(left),0,FALSE,FALSE);
         MOVA(l);        
+	emitcode("clr","c"); //jwk
         emitcode("div","ab");
         aopPut(AOP(result),"a",0);
         while (size--)
@@ -3370,6 +3372,7 @@ static void genDivOneByte (operand *left,
     emitcode("","%05d$:",(lbl->key+100));
 
     /* now the division */
+    emitcode("clr","c"); //jwk
     emitcode("div","ab");
     /* we are interested in the lower order
     only */
@@ -3455,6 +3458,7 @@ static void genModbits (operand *left,
 
     MOVA(l);       
 
+    emitcode("clr","c"); //jwk
     emitcode("div","ab");
     emitcode("mov","a,b");
     emitcode("rrc","a");
@@ -3478,6 +3482,7 @@ static void genModOneByte (operand *left,
         emitcode("mov","b,%s", aopGet(AOP(right),0,FALSE,FALSE));
         l = aopGet(AOP(left),0,FALSE,FALSE);
         MOVA(l);    
+	emitcode("clr","c"); //jwk
         emitcode("div","ab");
         aopPut(AOP(result),"b",0);
         return ;
@@ -3514,6 +3519,7 @@ static void genModOneByte (operand *left,
     emitcode("","%05d$:",(lbl->key+100));
 
     /* now the multiplication */
+    emitcode("clr","c"); //jwk
     emitcode("div","ab");
     /* we are interested in the lower order
     only */

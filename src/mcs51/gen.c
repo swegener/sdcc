@@ -3195,6 +3195,7 @@ genPlus (iCode * ic)
   int skip_bytes = 0;
   char *add = "add";
   asmop *leftOp, *rightOp;
+  operand * op;
 
   /* special cases :- */
 
@@ -3256,26 +3257,58 @@ genPlus (iCode * ic)
     goto release;
 
   size = getDataSize (IC_RESULT (ic));
+  leftOp = AOP(IC_LEFT(ic));
+  rightOp = AOP(IC_RIGHT(ic));
+  op=IC_LEFT(ic);
+
+  /* if this is an add for an array access
+     at a 256 byte boundary */
+  if ( 2 == size
+       && AOP_TYPE (op) == AOP_IMMD
+       && IS_SYMOP (op)
+       && IS_SPEC (OP_SYM_ETYPE (op))
+       && SPEC_ABSA (OP_SYM_ETYPE (op))
+       && (SPEC_ADDR (OP_SYM_ETYPE (op)) & 0xff) == 0
+     )
+    {
+      D(emitcode (";     genPlus aligned array",""));
+      aopPut (AOP (IC_RESULT (ic)),
+ 	      aopGet (rightOp, 0, FALSE, FALSE),
+ 	      0,
+ 	      isOperandVolatile (IC_RESULT (ic), FALSE));
+
+      if( 1 == getDataSize (IC_RIGHT (ic)) )
+	{
+	  aopPut (AOP (IC_RESULT (ic)),
+		  aopGet (leftOp, 1, FALSE, FALSE),
+		  1,
+		  isOperandVolatile (IC_RESULT (ic), FALSE));
+	}
+      else
+        {
+	  MOVA (aopGet (AOP (IC_LEFT (ic)), 1, FALSE, FALSE));
+	  emitcode ("add", "a,%s", aopGet (rightOp, 1, FALSE, FALSE));
+	  aopPut (AOP (IC_RESULT (ic)), "a", 1, isOperandVolatile (IC_RESULT (ic), FALSE));
+	}
+      goto release;
+    }
 
   /* if the lower bytes of a literal are zero skip the addition */
   if (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT )
-    {          
+    {
        while ((0 == ((unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) & (0xff << skip_bytes*8))) &&
               (skip_bytes+1 < size))
-         {  
+         {
            skip_bytes++;
 	 }
        if (skip_bytes)
          D(emitcode (";     genPlus shortcut",""));
     }
 
-  leftOp = AOP(IC_LEFT(ic));
-  rightOp = AOP(IC_RIGHT(ic));
-  
   while (size--)
     {
       if( offset >= skip_bytes )
-        {	
+        {
 	  if (aopGetUsesAcc (leftOp, offset) && aopGetUsesAcc (rightOp, offset))
 	    {
 	      emitcode("mov", "b,a");

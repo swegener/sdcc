@@ -142,6 +142,12 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 		/* if extern then add to externs */
 		if (IS_EXTERN (sym->etype)) {
+			
+			/* reduce overhead while linking by not declaring
+			 * extern unused external functions (usually declared
+			 * in header files) */
+			if(IS_FUNC(sym->type) && !sym->used)continue;
+			
 			checkAddSym(&externs, sym);
 			continue;
 		}

@@ -1759,7 +1759,7 @@ sig_handler (int signal)
       sig_string = "Unknown?";
       break;
     }
-  fprintf (stderr, "Catched signal %d: %s\n", signal, sig_string);
+  fprintf (stderr, "Caught signal %d: %s\n", signal, sig_string);
   exit (1);
 }
 
@@ -1783,13 +1783,6 @@ main (int argc, char **argv, char **envp)
 
   /* install atexit handler */
   atexit(rm_tmpfiles);
-
-  /* install signal handler;
-     it's only purpuse is to call exit() to remove temp files */
-  signal (SIGABRT, sig_handler);
-  signal (SIGTERM, sig_handler);
-  signal (SIGINT , sig_handler);
-  signal (SIGSEGV, sig_handler);
 
   /* Before parsing the command line options, do a
    * search for the port and processor and initialize
@@ -1824,6 +1817,16 @@ main (int argc, char **argv, char **envp)
   }
 #endif
   parseCmdLine (argc, argv);
+
+  /* install signal handler;
+     it's only purpuse is to call exit() to remove temp files */
+  if (!options.debug)
+    {
+      signal (SIGABRT, sig_handler);
+      signal (SIGTERM, sig_handler);
+      signal (SIGINT , sig_handler);
+      signal (SIGSEGV, sig_handler);
+    }
 
   /* if no input then printUsage & exit */
   if ((!options.c1mode && !fullSrcFileName && !nrelFiles) ||

@@ -1,3 +1,7 @@
+2003-02-09  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCmain.c: signal handling is switched off by --debug
+
 2003-02-08  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/lib/_mulint.c: small fix for large/ds390 --int-long-reent resp. --stack-auto

@@ -600,6 +600,8 @@ bindVar (int key, char **s, hTab ** vtab)
 	      if (*vvx == ')')
 		ubb--;
 	    }
+	  // include the trailing ')'
+	  *vv++ = *vvx++;
 	}
       else
 	*vv++ = *vvx++;

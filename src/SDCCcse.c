@@ -997,7 +997,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 	  /* if BITWISEAND then check if one of them is 0xff... */
 	  /* if yes turn it into assignment */
 	  {
-	    long val;
+	    unsigned val;
 
 	    switch (getSize (operandType (IC_RIGHT (ic))))
 	      {
@@ -1013,7 +1013,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 	      default:
 	        return;
 	      }
-	    if (((long) operandLitValue (IC_RIGHT (ic)) & val) == val)
+	    if (((unsigned) operandLitValue (IC_RIGHT (ic)) & val) == val)
 	    {
 	      ic->op = '=';
 	      IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1065,7 +1065,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 	  /* if BITWISEOR then check if one of them is 0xff... */
 	  /* if yes turn it into 0xff... assignment */
 	  {
-	    long val;
+	    unsigned val;
 
 	    switch (getSize (operandType (IC_RIGHT (ic))))
 	      {
@@ -1081,7 +1081,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 	      default:
 	        return;
 	      }
-	    if (((long) operandLitValue (IC_RIGHT (ic)) & val) == val)
+	    if (((unsigned) operandLitValue (IC_RIGHT (ic)) & val) == val)
 	      {
 		if (IS_OP_VOLATILE (IC_LEFT (ic)))
 		{

@@ -65,7 +65,7 @@ static char *scpXORWF = "XORWF";
 
 
 static pFile *the_pFile = NULL;
-static int peepOptimizing = 1;
+static int peepOptimizing = 0;
 static int GpCodeSequenceNumber = 1;
 
 /****************************************************************/

@@ -61,6 +61,7 @@ SRC = b.c \
 	compare.c \
 	compare2.c \
 	for.c \
+	sub.c \
 	while.c
 
 COD := $(patsubst %.c, %.cod, $(SRC))

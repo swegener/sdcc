@@ -10,12 +10,12 @@ void done(void)
 {
   success++;
 }
-
+/*
 void incptr(unsigned char *ucP)
 {
   *ucP = *ucP + 1;
 }
-
+*/
 
 void inc(unsigned char k)
 {

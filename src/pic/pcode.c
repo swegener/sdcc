@@ -696,7 +696,7 @@ void  pCodeInitRegisters(void)
 /*                                                                 */
 /*-----------------------------------------------------------------*/
 
-int mnem2key(char *mnem)
+int mnem2key(char const *mnem)
 {
   int key = 0;
 
@@ -705,7 +705,7 @@ int mnem2key(char *mnem)
 
   while(*mnem) {
 
-    key += *mnem++ +1;
+    key += toupper(*mnem++) +1;
 
   }
 
@@ -767,39 +767,6 @@ void pic14initMnemonics(void)
   for(i=0; i<MAX_PIC14MNEMONICS; i++)
     if(pic14Mnemonics[i])
       hTabAddItem(&pic14MnemonicsHash, mnem2key(pic14Mnemonics[i]->mnemonic), pic14Mnemonics[i]);
-/*
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpADDLW), scpADDLW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpADDWF),scpADDWF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpANDLW),scpANDLW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpANDWF),scpANDWF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBCF),scpBCF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBSF),scpBSF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBTFSC),scpBTFSC);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpBTFSS),scpBTFSS);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCALL),scpCALL);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCOMF),scpCOMF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCLRF),scpCLRF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpCLRW),scpCLRW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpDECF),scpDECF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpDECFSZ),scpDECFSZ);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpGOTO),scpGOTO);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpINCF),scpINCF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpINCFSZ),scpINCFSZ);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpIORLW),scpIORLW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpIORWF),scpIORWF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpMOVF),scpMOVF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpMOVLW),scpMOVLW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpMOVWF),scpMOVWF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpNEGF),scpNEGF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpRETLW),scpRETLW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpRETURN),scpRETURN);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpSUBLW),scpSUBLW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpSUBWF),scpSUBWF);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpTRIS),scpTRIS);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpXORLW),scpXORLW);
-  hTabAddItem(&pic14MnemonicsHash, mnem2key(scpXORWF),scpXORWF);
-*/
-
   pci = hTabFirstItem(pic14MnemonicsHash, &key);
 
   while(pci) {
@@ -810,6 +777,27 @@ void pic14initMnemonics(void)
   mnemonics_initialized = 1;
 }
 
+int getpCode(char *mnem)
+{
+
+  pCodeInstruction *pci;
+  int key = mnem2key(mnem);
+
+  if(!mnemonics_initialized)
+    pic14initMnemonics();
+
+  pci = hTabFirstItemWK(pic14MnemonicsHash, key);
+
+  while(pci) {
+
+    if(strcasecmp(pci->mnemonic, mnem) == 0)
+      return(pci->op);
+    pci = hTabNextItemWK (pic14MnemonicsHash);
+  
+  }
+
+  return -1;
+}
 
 char getpBlock_dbName(pBlock *pb)
 {
@@ -965,7 +953,7 @@ pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
     
   pci = Safe_calloc(1, sizeof(pCodeInstruction));
 
-  if((op < MAX_PIC14MNEMONICS) && pic14Mnemonics[op]) {
+  if((op>=0) && (op < MAX_PIC14MNEMONICS) && pic14Mnemonics[op]) {
     memcpy(pci, pic14Mnemonics[op], sizeof(pCodeInstruction));
     pci->pcop = pcop;
 
@@ -1083,6 +1071,19 @@ pCode *newpCodeFunction(char *mod,char *f)
 
 }
 
+static void pCodeLabelDestruct(pCode *pc)
+{
+
+  if(!pc)
+    return;
+
+  unlinkPC(pc);
+
+  if(PCL(pc)->label)
+    free(PCL(pc)->label);
+
+  free(pc);
+}
 
 pCode *newpCodeLabel(int key)
 {
@@ -1098,7 +1099,7 @@ pCode *newpCodeLabel(int key)
   pcl->pc.pb = NULL;
 
   pcl->pc.analyze = genericAnalyze;
-  pcl->pc.destruct = genericDestruct;
+  pcl->pc.destruct = pCodeLabelDestruct;
   pcl->pc.print = pCodePrintLabel;
 
   pcl->key = key;

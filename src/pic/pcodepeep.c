@@ -33,7 +33,7 @@ pCodeOp *newpCodeOpWild(int id, pCodePeep *pcp, pCodeOp *subtype);
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);
 pCode * findNextInstruction(pCode *pc);
 char *Safe_strdup(char *str);
-
+int getpCode(char *mnem);
 
 /****************************************************************/
 /*
@@ -63,7 +63,30 @@ typedef struct pCodePeepSnippets
 } pCodePeepSnippets;
 
 
+/****************************************************************/
+/*                                                              */
+/* peepSnippets -                                               */
+/*                                                              */
+/****************************************************************/
+
 static pCodePeepSnippets  *peepSnippets=NULL;
+
+/****************************************************************/
+/*                                                              */
+/* curPeep                                                      */
+/*                                                              */
+/****************************************************************/
+
+static pCodePeep          *curPeep=NULL;
+
+/****************************************************************/
+/*                                                              */
+/* curBlock                                                     */
+/*                                                              */
+/****************************************************************/
+
+static pBlock             *curBlock=NULL;
+
 
 typedef struct pCodeToken 
 {
@@ -81,7 +104,7 @@ unsigned   tokIdx=0;
 
 
 typedef enum  {
-  PCT_SPACE,
+  PCT_SPACE=1,
   PCT_PERCENT,
   PCT_COLON,
   PCT_COMMA,
@@ -103,7 +126,8 @@ unsigned int parsedPatIdx=0;
 
 
 typedef enum {
-  PCP_LABEL,
+  PCP_LABEL=1,
+  PCP_NUMBER,
   PCP_STR,
   PCP_WILDVAR,
   PCP_WILDSTR,
@@ -111,6 +135,7 @@ typedef enum {
 } pCodePatterns;
 
 static char pcpat_label[]      = {PCT_PERCENT, PCT_NUMBER, PCT_COLON, 0};
+static char pcpat_number[]     = {PCT_NUMBER, 0};
 static char pcpat_string[]     = {PCT_STRING, 0};
 static char pcpat_wildString[] = {PCT_PERCENT, PCT_STRING, 0};
 static char pcpat_wildVar[]    = {PCT_PERCENT, PCT_NUMBER, 0};
@@ -118,7 +143,7 @@ static char pcpat_comma[]      = {PCT_COMMA, 0};
 
 
 typedef struct pcPattern {
-  int pt;                 // Pattern type
+  char pt;                 // Pattern type
   char *tokens;           // list of tokens that describe the pattern
   void * (*f) (void *);
 } pcPattern;
@@ -128,38 +153,144 @@ pcPattern pcpArr[] = {
   {PCP_WILDSTR,   pcpat_wildString, NULL},
   {PCP_STR,       pcpat_string,     NULL},
   {PCP_WILDVAR,   pcpat_wildVar,    NULL},
-  {PCP_COMMA,     pcpat_comma,      NULL}
+  {PCP_COMMA,     pcpat_comma,      NULL},
+  {PCP_NUMBER,    pcpat_number,     NULL}
 };
 
 #define PCPATTERNS (sizeof(pcpArr)/sizeof(pcPattern))
 
 // Assembly Line Token
 typedef enum {
-  ALT_LABEL,
+  ALT_LABEL=1,
   ALT_MNEM0,
   ALT_MNEM1,
-  ALT_MNEM2
+  ALT_MNEM1A,
+  ALT_MNEM1B,
+  ALT_MNEM2,
+  ALT_MNEM2A
 } altPatterns;
 
 static char alt_label[]     = { PCP_LABEL, 0};
 static char alt_mnem0[]     = { PCP_STR, 0};
 static char alt_mnem1[]     = { PCP_STR, PCP_STR, 0};
+static char alt_mnem1a[]    = { PCP_STR, PCP_WILDVAR, 0};
+static char alt_mnem1b[]    = { PCP_STR, PCP_NUMBER, 0};
 static char alt_mnem2[]     = { PCP_STR, PCP_STR, PCP_COMMA, PCP_STR, 0};
+static char alt_mnem2a[]    = { PCP_STR, PCP_WILDVAR, PCP_COMMA, PCP_STR, 0};
 
 static void * cvt_altpat_label(void *pp);
+static void * cvt_altpat_mnem0(void *pp);
+static void * cvt_altpat_mnem1(void *pp);
+static void * cvt_altpat_mnem1a(void *pp);
+static void * cvt_altpat_mnem1b(void *pp);
+static void * cvt_altpat_mnem2(void *pp);
+static void * cvt_altpat_mnem2a(void *pp);
 
 pcPattern altArr[] = {
   {ALT_LABEL,        alt_label,  cvt_altpat_label},
-  {ALT_MNEM2,        alt_mnem2,  NULL},
+  {ALT_MNEM2A,       alt_mnem2a, cvt_altpat_mnem2a},
+  {ALT_MNEM2,        alt_mnem2,  cvt_altpat_mnem2},
+  {ALT_MNEM1B,       alt_mnem1b, cvt_altpat_mnem1b},
+  {ALT_MNEM1A,       alt_mnem1a, cvt_altpat_mnem1a},
+  {ALT_MNEM1,        alt_mnem1,  cvt_altpat_mnem1},
+  {ALT_MNEM0,        alt_mnem0,  cvt_altpat_mnem0},
 
 };
+
+#define ALTPATTERNS (sizeof(altArr)/sizeof(pcPattern))
+
 /*-----------------------------------------------------------------*/
+/* cvt_altpat_label - convert assembly line type to a pCode label  */
+/* INPUT: pointer to the parsedPattern                             */
+/*                                                                 */
+/*  pp[0] - label                                                  */
+/*                                                                 */
+/* label pattern => '%' number ':'                                 */
+/* at this point, we wish to extract only the 'number'             */
+/*                                                                 */
 /*-----------------------------------------------------------------*/
 static void * cvt_altpat_label(void *pp)
 {
-  fprintf(stderr,"altpat_label\n");
+  parsedPattern *p = pp;
+
+  fprintf(stderr,"altpat_label with ID = %d\n",p->pct[1].tok.n);
+  return newpCodeOpLabel(-p->pct[1].tok.n);
+
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem0(void *pp)
+{
+  fprintf(stderr,"altpat_mnem0\n");
   return NULL;
 }
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem1(void *pp)
+{
+  fprintf(stderr,"altpat_mnem1\n");
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* cvt_altpat_mem1a - convert assembly line type to a pCode        */
+/*                    instruction with 1 wild operand.             */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - wild var                                               */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem1a(void *pp)
+{
+  parsedPattern *p = pp;
+
+  pCodeInstruction *pci=NULL;
+
+  //    pCodeOp *pcw;
+
+  //  pcw = newpCodeOpWild(0,pcp,newpCodeOp(NULL,PO_GPR_REGISTER));
+
+  fprintf(stderr,"altpat_mnem1a %s var %d\n",  p->pct[0].tok.s,p[1].pct[1].tok.n);
+
+/*
+  pci = PCI(newpCode(getpCode(p->pct[0].tok.s),
+		     newpCodeOpWild(p[1].pct[1].tok.n, curPeep, NULL)));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+*/
+
+  return pci;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem1b(void *pp)
+{
+  fprintf(stderr,"altpat_mnem1b\n");
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem2(void *pp)
+{
+  fprintf(stderr,"altpat_mnem2\n");
+  return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem2a(void *pp)
+{
+  fprintf(stderr,"altpat_mnem2a\n");
+  return NULL;
+}
+
+
+
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -262,8 +393,13 @@ static void parseLineNode(char *ln)
     }
     ln++;
   }
+
+  tokArr[tokIdx].tt = 0;
 }
 
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
 
 
@@ -300,6 +436,9 @@ void dump1Token(pCodeTokens tt)
 }
 
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
 int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
 {
   int i=0;
@@ -330,6 +469,44 @@ int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
 
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
+int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
+{
+  int i=0;
+  
+  if(!pct || !pat || !*pct)
+    return 0;
+
+
+  while(i < max_tokens) {
+
+    if(*pct == 0) {
+      //fprintf(stderr,"matched\n");
+      return i;
+    }
+
+    //dump1Token(*pat); fprintf(stderr,"\n");
+
+    if( !pat || !pat->pcp )
+      return 0;
+
+    if (pat->pcp->pt != *pct)  
+      return 0;
+
+    //fprintf(stderr," pct=%d\n",*pct);
+    pct++;
+    pat++;
+    i++;
+  }
+
+  return 0;
+
+}
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
 int advTokIdx(int *v, int amt)
 {
 
@@ -341,9 +518,13 @@ int advTokIdx(int *v, int amt)
 
 }
 
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
 void dumpTokens(void)
 {
   int i;
+  pCode *pc;
 
   if(!tokIdx)
     return;
@@ -359,12 +540,16 @@ void dumpTokens(void)
     int lpcpIdx;
     int ltokIdx =0;
     int matching = 0;
-    int j;
+    int j,k;
 
-    pCodeOp *pcl   = NULL;       // Storage for a label
-    pCodeOp *pco1  = NULL;       // 1st operand
-    pCodeOp *pco2  = NULL;       // 2nd operand
-    pCode   *pc    = NULL;       // Mnemonic
+    char * cPmnem  = NULL;     // Pointer to non-wild mnemonic (if any)
+    char * cP1stop = NULL;
+    char * cP2ndop = NULL;
+
+    //pCodeOp *pcl   = NULL;       // Storage for a label
+    //pCodeOp *pco1  = NULL;       // 1st operand
+    //pCodeOp *pco2  = NULL;       // 2nd operand
+    //pCode   *pc    = NULL;       // Mnemonic
 
     typedef enum {
       PS_START,
@@ -401,15 +586,18 @@ void dumpTokens(void)
 	    break;
 
 	  case  PCP_STR:
+	    fprintf(stderr,"  %s is",tokArr[ltokIdx].tok.s);
 	    switch(state) {
 	    case PS_START:
 	    case PS_HAVE_LABEL:
 	      fprintf(stderr,"  mnem\n");
+	      cPmnem = tokArr[ltokIdx].tok.s;
 	      state = PS_HAVE_MNEM;
 	      break;
 	    case PS_HAVE_MNEM:
 	      fprintf(stderr,"  1st operand\n");
-	      pco1 = newpCodeOp(NULL,PO_GPR_REGISTER);
+	      cP1stop = tokArr[ltokIdx].tok.s;
+	      //pco1 = newpCodeOp(NULL,PO_GPR_REGISTER);
 	      state = PS_HAVE_1OPERAND;
 	      break;
 	    case PS_HAVE_1OPERAND:
@@ -417,6 +605,9 @@ void dumpTokens(void)
 	      break;
 	    case PS_HAVE_COMMA:
 	      fprintf(stderr,"  2 operands\n");
+	      cP2ndop = tokArr[ltokIdx].tok.s;
+	      break;
+	    case PS_HAVE_2OPERANDS:
 	      break;
 	    }
 	    break;
@@ -437,6 +628,29 @@ void dumpTokens(void)
 	      break;
 	    case PS_HAVE_COMMA:
 	      fprintf(stderr,"  2nd operand is wild\n");
+	      break;
+	    case PS_HAVE_2OPERANDS:
+	      break;
+	    }
+	    break;
+
+	  case  PCP_NUMBER:
+	    switch(state) {
+	    case PS_START:
+	    case PS_HAVE_LABEL:
+	      fprintf(stderr,"  ERROR number\n");
+	      break;
+	    case PS_HAVE_MNEM:
+	      fprintf(stderr,"  1st operand is a number\n");
+	      state = PS_HAVE_1OPERAND;
+	      break;
+	    case PS_HAVE_1OPERAND:
+	      fprintf(stderr,"  error expecting comma\n");
+	      break;
+	    case PS_HAVE_COMMA:
+	      fprintf(stderr,"  2nd operand is a number\n");
+	      break;
+	    case PS_HAVE_2OPERANDS:
 	      break;
 	    }
 	    break;
@@ -470,12 +684,35 @@ void dumpTokens(void)
 
     } while (matching);
 
+    parsedPatArr[lparsedPatIdx].pcp = NULL;
+    parsedPatArr[lparsedPatIdx].pct = NULL;
+
+    j=k=0;
+    do {
+      int c;
+      //fprintf(stderr,"comparing alt pattern %d (first token %d)\n",k,altArr[k].tokens[0]);
+      if( (c=altComparePattern( altArr[k].tokens, &parsedPatArr[j],10) ) ) {
+	//fprintf(stderr," found a valid assembly line!!!\n");
+	if( altArr[k].f) {
+	  pc = altArr[k].f(&parsedPatArr[j]);
+	  if(pc && pc->print)
+	    pc->print(stderr,pc);
+	  if(pc && pc->destruct) pc->destruct(pc);
+	}
+	j += c;
+      }
+      k++;
+    }
+    while(j<=lparsedPatIdx && k<ALTPATTERNS);
+
+
     fprintf(stderr,"\nConverting parsed line to pCode:\n\n");
 
     j = 0;
     do {
       if(parsedPatArr[j].pcp && parsedPatArr[j].pcp->f )
 	parsedPatArr[j].pcp->f(&parsedPatArr[j]);
+      fprintf(stderr,"  %d",parsedPatArr[j].pcp->pt);
       j++;
     }
     while(j<lparsedPatIdx);
@@ -483,81 +720,39 @@ void dumpTokens(void)
     fprintf(stderr,"\n");
 
   }
-  return;
-  /*now decode */
-#if 0
-  i=0;
 
-  if(pcComparePattern(&tokArr[0], pcpat_label, tokIdx +1)) {
-    fprintf(stderr,"has a wild label\n");
-    if(advTokIdx(&i, sizeof(pcpat_label) -1))
-      return;
-  }
-
-  if( (tokArr[i].tt == PCT_SPACE) && (advTokIdx(&i, 1)) ) // eat space
-    return;
-
-  if(pcComparePattern(&tokArr[i], pcpat_wildMnem, tokIdx +1 -i)) {
-    fprintf(stderr,"has a wild mnemonic\n");
-    if(advTokIdx(&i, sizeof(pcpat_wildMnem) -1))
-      return;
-  } else if(pcComparePattern(&tokArr[i], pcpat_Mnem, tokIdx +1 -i)) {
-    fprintf(stderr,"has a mnemonic\n");
-    if(advTokIdx(&i, sizeof(pcpat_Mnem) -1))
-     return;
-  } else
-    return;  // doesn't matter what follows
-
-  if( (tokArr[i].tt == PCT_SPACE) && (advTokIdx(&i, 1)) ) // eat space
-    return;
-
-  fprintf(stderr,"checking variable; next token  ");
-  dump1Token(tokArr[i].tt);
-  fprintf(stderr,"\n");
-
-  if(pcComparePattern(&tokArr[i], pcpat_wildVar, tokIdx +1 -i)) {
-    fprintf(stderr,"has a wild var\n");
-    if(advTokIdx(&i, sizeof(pcpat_wildVar) -1))
-      return;
-  } else if(pcComparePattern(&tokArr[i], pcpat_Var, tokIdx +1 -i)) {
-    fprintf(stderr,"has a var\n");
-    if(advTokIdx(&i, sizeof(pcpat_Var) -1))
-      return;
-  } else
-    return;
-
-  if(  ((tokArr[i].tt == PCT_SPACE) || (tokArr[i].tt == PCT_COMMA))
-       && (advTokIdx(&i, 1)) ) // eat space
-    return;
-
-  if(pcComparePattern(&tokArr[i], pcpat_wildVar, tokIdx +10 -i)) {
-    fprintf(stderr,"has a wild var\n");
-    if(advTokIdx(&i, sizeof(pcpat_wildVar) -1))
-      return;
-  } else if(pcComparePattern(&tokArr[i], pcpat_Var, tokIdx +10 -i)) {
-    fprintf(stderr,"has a var\n");
-    if(advTokIdx(&i, sizeof(pcpat_Var) -1))
-      return;
-  } else if(tokArr[i].tt == PCT_NUMBER) {
-    fprintf(stderr,"has a number\n");
-    if (advTokIdx(&i, 1))
-      return;
-  } else
-    return;
-#endif
 
 }
+
+/*-----------------------------------------------------------------*/
+/* peepRules2pCode - parse the "parsed" peep hole rules to generate*/
+/*                   pCode.                                        */
+/*                                                                 */
+/* SDCCpeeph parses the peep rules file and extracts variables,    */
+/* removes white space, and checks the syntax. This function       */
+/* extends that processing to produce pCode objects. You can kind  */
+/* think of this function as an "assembler", though instead of     */
+/* taking raw text to produce machine code, it produces pCode.     */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
 
 void  peepRules2pCode(peepRule *rules)
 {
   peepRule *pr;
   lineNode *ln;
 
+  pCodePeepSnippets *pcps;
+
   for (pr = rules; pr; pr = pr->next) {
     fprintf(stderr,"\nRule:\n\n");
+
+    pcps = Safe_calloc(1,sizeof(pCodePeepSnippets));
+    curPeep = pcps->peep  = Safe_calloc(1,sizeof(pCodePeep));
+    //peepSnippets = DLL_append((_DLL*)peepSnippets,(_DLL*)pcps);
+
     for(ln = pr->match; ln; ln = ln->next) {
       fprintf(stderr,"%s\n",ln->line);
-      //parseLineNode(ln->line);
+
       parseLineNode(ln->line);
       dumpTokens();
 

@@ -482,6 +482,7 @@ sbit at 0xFF P7_7    ;
 #define TIMER01_PAGE      0x00     /* TIMER 0 AND TIMER 1                */
 #define CPT0_PAGE         0x01     /* COMPARATOR 0                       */
 #define CPT1_PAGE         0x02     /* COMPARATOR 1                       */
+#define CPT2_PAGE         0x03     /* COMPARATOR 2                       */
 #define UART0_PAGE        0x00     /* UART 0                             */
 #define UART1_PAGE        0x01     /* UART 1                             */
 #define SPI0_PAGE         0x00     /* SPI 0                              */

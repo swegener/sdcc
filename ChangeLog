@@ -1,6 +1,10 @@
+2004-02-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/c8051f040.h: added define CPT2_PAGE
+
 2005-02-01 Slade Rich <slade_rich AT users.sourceforge.net>
 
-	* src/pic16/pic16.dsp : Added file graph.c to make it compile under windows 
+	* src/pic16/pic16.dsp : Added file graph.c to make it compile under windows
 	* src/pic16/Makefile.bcc : Do not use this file but added file graph.c as it
 	 appeared to be required
 

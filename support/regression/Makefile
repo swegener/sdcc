@@ -91,6 +91,10 @@ test-mcs51-stack-auto:
 test-ds390:
 	$(MAKE) inter-port-clean test-port PORT=ds390
 
+# Helper rule for testing the z80 port only(use ucSim simulator)
+test-ucz80:
+	$(MAKE) inter-port-clean test-port PORT=ucz80
+
 ### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) inter-port-clean test-port PORT=host

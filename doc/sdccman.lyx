@@ -18,7 +18,7 @@
 \graphics default
 \paperfontsize default
 \spacing single 
-\papersize Default
+\papersize letterpaper
 \paperpackage a4
 \use_geometry 1
 \use_amsmath 0
@@ -58,13 +58,6 @@ status Collapsed
 Two resp.
  three consecutive dashes simply result in a long resp.
  extra long dash.
-\layout Comment
-
-This document would need some rework: The Installation section is much to
- 
-\layout Comment
-
-intimidating (as is the section about sdcdb).
 \layout Comment
 
 Architecture specific stuff (like memory models, code examples) should maybe
@@ -124,8 +117,8 @@ Sandeep Dutta
 \end_inset 
 
 , etc), Zilog Z80 based MCUs, and the Dallas DS80C390 variant.
- It can be retargetted for other microprocessors, support for PIC, AVR is
- under development.
+ It can be retargetted for other microprocessors, support for Microchip
+ PIC, Atmel AVR is under development.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses ASXXXX & ASLINK, a Freeware, retargettable assembler & linker.
  SDCC has extensive language extensions suitable for utilizing various microcont
@@ -467,6 +460,8 @@ code banking
  support for mcs51
 \newline 
 
+\newline 
+
 \family default 
 If you can think of some more, please see the chapter 9 about filing feature
  requests
@@ -490,6 +485,20 @@ Installation
 \end_inset 
 
 
+\layout Standard
+
+For most users it is sufficient to skip to either section 
+\begin_inset LatexCommand \ref{sub:Building-SDCC-on-Linux}
+
+\end_inset 
+
+ or section 
+\begin_inset LatexCommand \ref{sub:Windows-Install}
+
+\end_inset 
+
+.
+ More detailled instructions follow below.
 \layout Subsection
 
 Configure Options
@@ -2757,6 +2766,11 @@ Building SDCC
 \layout Subsubsection
 
 Building SDCC on Linux
+\begin_inset LatexCommand \label{sub:Building-SDCC-on-Linux}
+
+\end_inset 
+
+
 \layout Enumerate
 
 
@@ -2881,32 +2895,6 @@ Building SDCC on Windows
 With the exception of Cygwin the SDCC binaries uCsim and sdcdb can't be
  built on Windows.
  They use Unix-sockets, which are not available on Win32.
-\layout Subsubsection
-
-Windows Install Using a Binary Package
-\layout Enumerate
-
-Download the binary package and unpack it using your favorite unpacking
- tool (gunzip, WinZip, etc).
- This should unpack to a group of sub-directories.
- An example directory structure after unpacking the mingw32 package is:
- c:
-\backslash 
-sdcc
-\backslash 
-bin for the executables, c:
-\backslash 
-sdcc
-\backslash 
-include and c:
-\backslash 
-sdcc
-\backslash 
-lib for the include and libraries.
-\layout Enumerate
-
-Adjust your environment variable PATH to include the location of the bin
- directory or start sdcc using the full path.
 \layout Subsubsection
 
 Building SDCC using Cygwin and Mingw32
@@ -3071,10 +3059,11 @@ mount -s -u -c /mnt
 \layout Standard
 
 SDCC sources use the unix line ending LF.
- Life is much easier, if you store the source tree on a drive, which is
- mount in binary mode.
+ Life is much easier, if you store the source tree on a drive which is mounted
+ in binary mode.
  And use an editor which can handle LF-only line endings.
  Make sure not to commit files with windows line endings.
+ The tabulator spacing used in the project is 8.
 \layout Subsubsection
 
 Building SDCC Using Microsoft Visual C++ 6.0/NET (MSVC)
@@ -3267,7 +3256,8 @@ From the sdcc directory, run the command "make -f Makefile.bcc".
 If you modify any source files and need to rebuild, be aware that the dependenci
 es may not be correctly calculated.
  The safest option is to delete all .obj files and run the build again.
- From a Cygwin BASH prompt, this can easily be done with the command:
+ From a Cygwin BASH prompt, this can easily be done with the command (be
+ sure you are in the sdcc directory):
 \newline 
 
 \newline 
@@ -3299,16 +3289,68 @@ del /s *.obj *.lib *.rul
 \family default 
 \series default 
  from the sdcc directory.
+\layout Subsubsection
+
+Windows Install Using a Binary Package
+\begin_inset LatexCommand \label{sub:Windows-Install}
+
+\end_inset 
+
+
+\layout Enumerate
+
+Download the binary package and unpack it using your favorite unpacking
+ tool (gunzip, WinZip, etc).
+ This should unpack to a group of sub-directories.
+ An example directory structure after unpacking the mingw32 package is:
+ c:
+\backslash 
+sdcc
+\backslash 
+bin for the executables, c:
+\backslash 
+sdcc
+\backslash 
+include and c:
+\backslash 
+sdcc
+\backslash 
+lib for the include and libraries.
+\layout Enumerate
+
+Adjust your environment variable PATH to include the location of the bin
+ directory or start sdcc using the full path.
 \layout Subsection
 
 Building the Documentation
 \layout Standard
 
-...
- coming soon
+If the necessary tools are installed it is as easy as changing into the
+ doc directory and typing 
+\family sans 
+\series bold 
+
+\begin_inset Quotes srd
+\end_inset 
+
+make
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family default 
+\series default 
+ there.
+ If you want to avoid installing the tools you will have some success with
+ a bootable Knoppix CD 
+\begin_inset LatexCommand \url{http://www.knopper.net}
+
+\end_inset 
+
+.
 \layout Subsection
 
-Testing out the SDCC Compiler
+Testing the SDCC Compiler
 \layout Standard
 
 The first thing you should do after installing your SDCC compiler is to
@@ -3609,7 +3651,7 @@ make install
 \layout Standard
 
 This will install the compiler, other executables libraries and include
- files in to the appropriate directories.
+ files into the appropriate directories.
  See section 
 \begin_inset Quotes sld
 \end_inset 
@@ -3729,7 +3771,7 @@ asx8051, as-z80, as-gbz80, aslink, link-z80, link-gbz80 - The Assemblers
 This is retargettable assembler & linkage editor, it was developed by Alan
  Baldwin.
  John Hartman created the version for 8051, and I (Sandeep) have made some
- enhancements and bug fixes for it to work properly with the SDCC.
+ enhancements and bug fixes for it to work properly with SDCC.
 \layout Subsubsection
 
 s51 - The Simulator
@@ -3753,7 +3795,7 @@ S51 is a freeware, opensource simulator developed by Daniel Drotos (
 \end_inset 
 
 .
- It currently support the core mcs51, the Dallas DS80C390 and the Phillips
+ It currently supports the core mcs51, the Dallas DS80C390 and the Phillips
  XA51 family.
 \layout Subsubsection
 
@@ -3912,12 +3954,24 @@ status Collapsed
 \end_inset 
 
 .
- If you need another format you might want to use objdump
+ If you need another format you might want to use 
+\family sans 
+\shape italic 
+objdump
+\family default 
+\shape default 
+
 \begin_inset LatexCommand \index{objdump}
 
 \end_inset 
 
- or srecord
+ or
+\family sans 
+\shape italic 
+ srecord
+\family default 
+\shape default 
+
 \begin_inset LatexCommand \index{srecord}
 
 \end_inset 
@@ -3973,7 +4027,12 @@ sourcefile.
 
 \end_inset 
 
- An optional AOMF51 file containing debug information (with -
+ An optional AOMF51
+\begin_inset LatexCommand \index{AOMF51}
+
+\end_inset 
+
+ file containing debug information (with -
 \begin_inset ERT
 status Collapsed
 
@@ -3983,7 +4042,13 @@ status Collapsed
 /
 \end_inset 
 
--debug)
+-debug).
+ This format is commonly used by third party tools (debuggers
+\begin_inset LatexCommand \index{Debugger}
+
+\end_inset 
+
+, simulators, emulators)
 \layout Itemize
 
 sourcefile.dump*
@@ -4267,7 +4332,7 @@ Processor Selection Options
 
 
 \series default 
- Generate code for the DS80C390
+ Generate code for the Dallas DS80C390
 \begin_inset LatexCommand \index{DS80C390}
 
 \end_inset 
@@ -4285,7 +4350,7 @@ Processor Selection Options
 
 
 \series default 
- Generate code for the DS80C400
+ Generate code for the Dallas DS80C400
 \begin_inset LatexCommand \index{DS80C400}
 
 \end_inset 
@@ -4303,7 +4368,7 @@ Processor Selection Options
 
 
 \series default 
- Generate code for the Z80
+ Generate code for the Zilog Z80
 \begin_inset LatexCommand \index{Z80}
 
 \end_inset 
@@ -4368,12 +4433,12 @@ I think it is fair to direct users there for now.
 
 
 \series default 
- Generate code for the PIC 14
+ Generate code for the Microchip PIC 14
 \begin_inset LatexCommand \index{PIC14}
 
 \end_inset 
 
--bit processors (Microchip p16f84 and variants).
+-bit processors (p16f84 and variants).
 \layout Comment
 
 p16f627 p16f628 p16f84 p16f873 p16f877?
@@ -4389,12 +4454,12 @@ p16f627 p16f628 p16f84 p16f873 p16f877?
 
 
 \series default 
- Generate code for the PIC 16
+ Generate code for the Microchip PIC 16
 \begin_inset LatexCommand \index{PIC16}
 
 \end_inset 
 
--bit processors (Microchip p18f452 and variants).
+-bit processors (p18f452 and variants).
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4473,7 +4538,7 @@ Preprocessor Options
 
 \series default 
  Command line definition of macros.
- Passed to the pre processor.
+ Passed to the preprocessor.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4496,7 +4561,12 @@ Preprocessor Options
 '-newline if it is long.
  The list of rules is printed on standard output instead of the preprocessed
  C program.
- `-M' implies `-E'.
+ `-M' implies `-E
+\begin_inset LatexCommand \index{-E}
+
+\end_inset 
+
+'.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4549,17 +4619,6 @@ file"'.
 \series default 
  Assert the answer answer for question, in case it is tested with a preprocessor
  conditional such as `#if #question(answer)'.
- `-A-' disables the standard assertions that normally describe the target
- machine.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--Aquestion
-\series default 
- (answer) Assert the answer answer for question, in case it is tested with
- a preprocessor conditional such as `#if #question(answer)'.
  `-A-' disables the standard assertions that normally describe the target
  machine.
 \layout List
@@ -5045,34 +5104,6 @@ status Collapsed
 /
 \end_inset 
 
--model-large
-\begin_inset LatexCommand \index{-\/-model-large}
-
-\end_inset 
-
-
-\series default 
- Generate code for Large model programs see section Memory Models for more
- details.
- If this option is used all source files in the project should be compiled
- with this option.
- In addition the standard library routines are compiled with small model,
- they will need to be recompiled.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
 -model-small
 \begin_inset LatexCommand \index{-\/-model-small}
 
@@ -5088,6 +5119,105 @@ status Collapsed
 Generate code for Small Model programs see section Memory Models for more
  details.
  This is the default model.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-large
+\begin_inset LatexCommand \index{-\/-model-large}
+
+\end_inset 
+
+
+\series default 
+ Generate code for Large model programs see section Memory Models for more
+ details.
+ If this option is used all source files in the project should be compiled
+ with this option.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack
+\begin_inset LatexCommand \index{-\/-xstack}
+
+\end_inset 
+
+
+\series default 
+ Uses a pseudo stack in the first 256 bytes in the external ram for allocating
+ variables and passing parameters.
+ See section on external stack for more details.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-iram-size
+\series default 
+<Value>
+\begin_inset LatexCommand \index{-\/-iram-size<Value>}
+
+\end_inset 
+
+ Causes the linker to check if the internal ram usage is within limits of
+ the given value.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xram-size
+\series default 
+<Value>
+\begin_inset LatexCommand \index{-\/-xram-size<Value>}
+
+\end_inset 
+
+ Causes the linker to check if the external ram usage is within limits of
+ the given value.
 \layout Subsubsection
 
 DS390 Options
@@ -5534,7 +5664,7 @@ status Collapsed
 
 
 \series default 
- Will not memcpy initialized data in far space from code space.
+ Will not memcpy initialized data from code space into xdata space.
  This saves a few bytes in code space if you don't have initialized data.
 \layout Subsubsection
 
@@ -5696,38 +5826,8 @@ status Collapsed
 /
 \end_inset 
 
--xstack
-\begin_inset LatexCommand \index{-\/-xstack}
-
-\end_inset 
-
-
-\series default 
- Uses a pseudo stack in the first 256 bytes in the external ram for allocating
- variables and passing parameters.
- See section on external stack for more details.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
 -callee-saves
 \begin_inset LatexCommand \index{-\/-callee-saves}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{function prologue}
 
 \end_inset 
 
@@ -5740,9 +5840,27 @@ status Collapsed
  This option can be used to switch the register saving convention for the
  function names specified.
  The compiler will not save registers when calling these functions, no extra
- code will be generated at the entry & exit for these functions to save
- & restore the registers used by these functions, this can SUBSTANTIALLY
- reduce code & improve run time performance of the generated code.
+ code will be generated at the entry & exit (function prologue
+\series bold 
+
+\begin_inset LatexCommand \index{function prologue}
+
+\end_inset 
+
+
+\series default 
+ & epilogue
+\series bold 
+
+\begin_inset LatexCommand \index{function epilogue}
+
+\end_inset 
+
+
+\series default 
+) for these functions to save & restore the registers used by these functions,
+ this can SUBSTANTIALLY reduce code & improve run time performance of the
+ generated code.
  In the future the compiler (with inter procedural analysis) will be able
  to determine the appropriate scheme to use for each function call.
  DO NOT use this option for built-in functions such as _mulint..., if this
@@ -5796,31 +5914,6 @@ When this option is used the compiler will generate debug information, that
  can be used with the SDCDB.
  The debug information is collected in a file with .cdb extension.
  For more information see documentation for SDCDB.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--peep-file
-\series default 
-
-\begin_inset LatexCommand \index{-\/-peep-file}
-
-\end_inset 
-
-<filename> This option can be used to use additional rules to be used by
- the peep hole optimizer.
- See section Peep Hole optimizations for details on how to write these rules.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6038,6 +6131,31 @@ status Collapsed
 /
 \end_inset 
 
+-peep-file
+\series default 
+
+\begin_inset LatexCommand \index{-\/-peep-file}
+
+\end_inset 
+
+<filename> This option can be used to use additional rules to be used by
+ the peep hole optimizer.
+ See section Peep Hole optimizations for details on how to write these rules.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
 -no-peep
 \begin_inset LatexCommand \index{-\/-no-peep}
 
@@ -6077,54 +6195,6 @@ status Collapsed
 
  rules defined in the source file tree '<target>/peeph.def' before using
  this option.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--iram-size
-\series default 
-<Value>
-\begin_inset LatexCommand \index{-\/-iram-size<Value>}
-
-\end_inset 
-
- Causes the linker to check if the internal ram usage is within limits of
- the given value.
-\layout List
-\labelwidthstring 00.00.0000
-
-
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--xram-size
-\series default 
-<Value>
-\begin_inset LatexCommand \index{-\/-xram-size<Value>}
-
-\end_inset 
-
- Causes the linker to check if the external ram usage is within limits of
- the given value.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6714,20 +6784,10 @@ SDCC_LEAVE_SIGNALS
 
 
 \series bold 
-TMP
-\begin_inset LatexCommand \index{TMP}
-
-\end_inset 
-
-,\SpecialChar ~
-TEMP
-\begin_inset LatexCommand \index{TEMP}
-
-\end_inset 
-
-,\SpecialChar ~
+TMP,\SpecialChar ~
+TEMP,\SpecialChar ~
 TMPDIR
-\begin_inset LatexCommand \index{TMPDIR}
+\begin_inset LatexCommand \index{TMP, TEMP, TMPDIR}
 
 \end_inset 
 
@@ -6820,28 +6880,6 @@ In addition to the ANSI storage classes SDCC allows the following MCS51
  specific storage classes.
 \layout Subsubsection
 
-xdata
-\begin_inset LatexCommand \index{xdata}
-
-\end_inset 
-
-
-\layout Standard
-
-Variables declared with this storage class will be placed in the external
- RAM.
- This is the 
-\series bold 
-default
-\series default 
- storage class for Large Memory model, e.g.:
-\layout Verse
-
-
-\family typewriter 
-xdata unsigned char xduc;
-\layout Subsubsection
-
 data
 \begin_inset LatexCommand \index{data}
 
@@ -6861,7 +6899,78 @@ default
 
 
 \family typewriter 
-data int iramdata;
+data unsigned char test_data;
+\layout Standard
+
+Writing 0x01 to this variable generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+75*00 01\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+_test_data,#0x01 
+\layout Subsubsection
+
+xdata
+\begin_inset LatexCommand \index{xdata}
+
+\end_inset 
+
+
+\layout Standard
+
+Variables declared with this storage class will be placed in the external
+ RAM.
+ This is the 
+\series bold 
+default
+\series default 
+ storage class for Large Memory model, e.g.:
+\layout Verse
+
+
+\family typewriter 
+xdata unsigned char test_xdata;
+\layout Standard
+
+Writing 0x01 to this variable generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+90s00r00\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+dptr,#_test_xdata 
+\newline 
+74\SpecialChar ~
+01\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+a,#0x01 
+\newline 
+F0\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+movx\SpecialChar ~
+@dptr,a 
 \layout Subsubsection
 
 idata
@@ -6878,7 +6987,186 @@ Variables declared with this storage class will be allocated into the indirectly
 
 
 \family typewriter 
-idata int idi;
+idata unsigned char test_idata;
+\layout Standard
+
+Writing 0x01 to this variable generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+78r00\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+r0,#_test_idata
+\newline 
+76\SpecialChar ~
+01\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+@r0,#0x01 
+\layout Subsubsection
+
+pdata
+\begin_inset LatexCommand \index{pdata}
+
+\end_inset 
+
+
+\layout Standard
+
+Paged xdata access is currently not as straightforward as using the other
+ addressing modes of a 8051.
+ The following example writes 0x01 to the address pointed to.
+ Please note, pdata access physically accesses xdata memory.
+ The high byte of the address is determined by port P2 (or in case of some
+ 8051 variants by a separate Special Function Register).
+\layout Verse
+
+
+\family typewriter 
+pdata unsigned char *test_pdata_ptr;
+\newline 
+
+\newline 
+void main() 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+test_pdata_ptr = (pdata *)0xfe; 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+*test_pdata_ptr = 1; 
+\newline 
+} 
+\layout Standard
+
+Generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+75*01 FE\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+ _test_pdata_ptr,#0xFE
+\newline 
+78 FE\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+ r0,#0xFE 
+\newline 
+74 01\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+ a,#0x01
+\newline 
+F2\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+movx @r0,a 
+\layout Standard
+
+Be extremely carefull if you use pdata together with the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack
+\begin_inset LatexCommand \index{-\/-xstack}
+
+\end_inset 
+
+ option.
+\layout Subsubsection
+
+code
+\begin_inset LatexCommand \index{code}
+
+\end_inset 
+
+
+\layout Standard
+
+'Variables' declared with this storage class will be placed in the code
+ memory:
+\layout Verse
+
+
+\family typewriter 
+code unsigned char test_code;
+\layout Standard
+
+Read access to this variable generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+90s00r6F\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov dptr,#_test_code
+\newline 
+E4\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+clr a
+\newline 
+93\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+movc a,@a+dptr 
 \layout Subsubsection
 
 bit
@@ -6896,7 +7184,23 @@ This is a data-type and a storage class specifier.
 
 
 \family typewriter 
-bit iFlag;
+bit test_bit;
+\layout Standard
+
+Writing 1 to this variable generates the assembly code:
+\layout Verse
+
+
+\family typewriter 
+D2*00\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+setb\SpecialChar ~
+_test_bit
 \layout Subsubsection
 
 sfr
@@ -6927,7 +7231,8 @@ sfr at
 
 \end_inset 
 
- 0x80 P0; /* special function register P0 at location 0x80 */
+ 0x80 P0;\SpecialChar ~
+ /* special function register P0 at location 0x80 */
 \newline 
 sbit at 0xd7 CY; /* CY (Carry Flag
 \begin_inset LatexCommand \index{Flags}
@@ -7108,6 +7413,10 @@ unsigned char foo(char i) reentrant
 \newline 
 { 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ...
  
 \newline 
@@ -7152,7 +7461,9 @@ Local variables can be assigned storage classes and absolute
 
 
 \family typewriter 
-unsigned char foo() {
+unsigned char foo() 
+\newline 
+{
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -7222,6 +7533,11 @@ Parameters however are not allowed any storage class, (storage classes for
 \layout Subsection
 
 Overlaying
+\begin_inset LatexCommand \label{sub:Overlaying}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Overlaying}
 
 \end_inset 
@@ -7327,12 +7643,7 @@ void some_isr () interrupt
 
 \end_inset 
 
- 2 using
-\begin_inset LatexCommand \index{using}
-
-\end_inset 
-
- 1 
+ 2
 \newline 
 {
 \newline 
@@ -7388,7 +7699,11 @@ void timer_isr (void) interrupt 1 using 1
 \newline 
 { 
 \newline 
-..
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+...
  
 \newline 
 }
@@ -7404,8 +7719,8 @@ interrupt
 
 \emph default 
  keyword is the interrupt number this routine will service.
- When present, the compiler will insert a call to this routine in the
- interrupt vector table for the interrupt number specified.
+ When present, the compiler will insert a call to this routine in the interrupt
+ vector table for the interrupt number specified.
  The 
 \emph on 
 using
@@ -7741,9 +8056,19 @@ a, b & dptr
 Calling other functions from an interrupt service routine is not recommended,
  avoid it if possible.
 \newline 
+For some pitfalls see section 
+\begin_inset LatexCommand \ref{sub:Overlaying}
 
+\end_inset 
+
+about Overlaying and section 
+\begin_inset LatexCommand \ref{sub:Functions-using-private-banks}
+
+\end_inset 
+
+about Functions using private banks.
 \newline 
-Also see the _naked modifier.
+
 \layout Subsection
 
 Critical Functions
@@ -7773,9 +8098,17 @@ int foo () critical
 \newline 
 { 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ...
  
 \newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ...
  
 \newline 
@@ -7788,6 +8121,11 @@ reentrant.
 \layout Subsection
 
 Naked Functions
+\begin_inset LatexCommand \label{sub:Naked-Functions}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Naked functions}
 
 \end_inset 
@@ -7842,6 +8180,8 @@ volatile
 \end_inset 
 
  data unsigned char counter;
+\newline 
+
 \newline 
 void simpleInterrupt(void) interrupt
 \begin_inset LatexCommand \index{interrupt}
@@ -7921,7 +8261,7 @@ For an 8051 target, the generated simpleInterrupt looks like:
 
 
 \family typewriter 
-_simpleIterrupt:
+_simpleInterrupt:
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -8081,7 +8421,15 @@ _counter
 reti\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-; MUST explicitly include ret(i) in _naked function.
+; MUST explicitly include ret or reti in _naked function.
+\layout Standard
+
+The #pragma directive EXCLUDE
+\begin_inset LatexCommand \index{\#pragma EXCLUDE}
+
+\end_inset 
+
+ also allows to reduce pushing & popping the registers.
 \layout Standard
 
 While there is nothing preventing you from writing C code inside a _naked
@@ -8090,6 +8438,11 @@ While there is nothing preventing you from writing C code inside a _naked
 \layout Subsection
 
 Functions using private banks
+\begin_inset LatexCommand \label{sub:Functions-using-private-banks}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{bank}
 
 \end_inset 
@@ -8306,7 +8659,7 @@ le space.
  One possible use would be to write hardware portable code.
  For example, if you have a routine that uses one or more of the microcontroller
  I/O pins, and such pins are different for two different hardwares, you
- can declare the I/O pins in you routine using
+ can declare the I/O pins in your routine using:
 \layout Verse
 
 
@@ -8401,12 +8754,12 @@ bit at 0x80 SDI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-/*I/O port 0, bit 0*/
+/* I/O port 0, bit 0 */
 \newline 
 bit at 0x81 SCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-/*I/O port 0, bit 1*/
+/* I/O port 0, bit 1 */
 \newline 
 bit CPOL;\SpecialChar ~
 \SpecialChar ~
@@ -8419,7 +8772,7 @@ bit CPOL;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-/*This is a variable, let the linker allocate this one*/
+/* This is a variable, let the linker allocate this one */
 \layout Standard
 
 Similarly, for the second hardware you would use
@@ -8431,12 +8784,12 @@ bit at 0x83 SDI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-/*I/O port 0, bit 3*/
+/* I/O port 0, bit 3 */
 \newline 
 bit at 0x91 SCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-/*I/O port 1, bit 1*/
+/* I/O port 1, bit 1 */
 \newline 
 bit CPOL;\SpecialChar ~
 \SpecialChar ~
@@ -8449,7 +8802,7 @@ bit CPOL;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-/*This is a variable, let the linker allocate this one*/
+/* This is a variable, let the linker allocate this one */
 \layout Standard
 
 and you can use the same hardware dependent routine without changes, as
@@ -8487,8 +8840,9 @@ at the start of the CODE area.
 .
  By default this routine returns 0, if this routine returns a non-zero value,
  the static & global variable initialization will be skipped and the function
- main will be invoked Other wise static & global variables will be initialized
- before the function main is invoked.
+ main will be invoked.
+ Otherwise static & global variables will be initialized before the function
+ main is invoked.
  You could add a 
 \emph on 
 _sdcc_external_startup()
@@ -8496,6 +8850,30 @@ _sdcc_external_startup()
  routine to your program to override the default if you need to setup hardware
  or perform some other critical operation prior to static & global variable
  initialization.
+ See also the compiler option 
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-xinit
+\emph default 
+-
+\emph on 
+opt
+\emph default 
+
+\begin_inset LatexCommand \index{-\/-no-xinit-opt}
+
+\end_inset 
+
+.
 \layout Subsection
 
 Inline Assembler Code
@@ -8527,9 +8905,7 @@ per function
 .
  It is strongly recommended that each assembly instruction (including labels)
  be placed in a separate line (as the example shows).
- When the 
-\emph on 
--
+ When the -
 \begin_inset ERT
 status Collapsed
 
@@ -8539,7 +8915,9 @@ status Collapsed
 /
 \end_inset 
 
--peep-asm
+-
+\emph on 
+peep-asm
 \begin_inset LatexCommand \index{-\/-peep-asm}
 
 \end_inset 
@@ -8701,6 +9079,14 @@ In other words inline assembly code can access labels defined in inline
  assembly within the scope of the function.
  The same goes the other way, ie.
  labels defines in inline assembly CANNOT be accessed by C statements.
+\layout Standard
+
+An example acessing a C variable is in section 
+\begin_inset LatexCommand \ref{sub:Naked-Functions}
+
+\end_inset 
+
+.
 \layout Subsection
 
 int (16 bit)
@@ -8721,8 +9107,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
  These support routines are all developed in ANSI-C to facilitate porting
  to other MCUs, although some model specific assembler optimizations are
  used.
- The following files contain the described routine, all of them can be found
- in <installdir>/share/sdcc/lib.
+ The following files contain the described routines, all of them can be
+ found in <installdir>/share/sdcc/lib.
 \newline 
 
 \layout Standard
@@ -9670,7 +10056,15 @@ MCS51 Memory Models
 
 \layout Standard
 
-SDCC allows two memory models for MCS51 code, small and large.
+SDCC allows two memory models for MCS51 code, 
+\shape slanted 
+small
+\shape default 
+ and 
+\shape slanted 
+large
+\shape default 
+.
  Modules compiled with different memory models should 
 \emph on 
 never
@@ -9731,21 +10125,6 @@ The only model supported is Flat 24
  In this mode, up to four meg of external RAM or code space can be directly
  addressed.
  See the data sheets at www.dalsemi.com for further information on this part.
-\newline 
-
-\newline 
-In older versions of the compiler, this option was used with the MCS51 code
- generator (
-\emph on 
--mmcs51
-\emph default 
-).
- Now, however, the '390 has it's own code generator, selected by the 
-\emph on 
--mds390
-\emph default 
- switch.
- 
 \newline 
 
 \newline 
@@ -10313,11 +10692,11 @@ will be translated to
 
 
 \family typewriter 
-iTemp = x + y 
+iTemp = x + y; 
 \newline 
-i = iTemp + 1 
+i = iTemp + 1; 
 \newline 
-j = iTemp
+j = iTemp;
 \layout Standard
 
 Some subexpressions are not as obvious as the above example, e.g.:
@@ -10356,7 +10735,9 @@ Dead-Code Elimination
 
 
 \family typewriter 
-int global; 
+int global;
+\newline 
+
 \newline 
 void f () { 
 \newline 
@@ -10367,6 +10748,10 @@ int i;
 \SpecialChar ~
 \SpecialChar ~
 i = 1; \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 /* dead store */ 
 \newline 
 \SpecialChar ~
@@ -10395,9 +10780,11 @@ will be changed to
 
 
 \family typewriter 
-int global; void f () 
+int global;
 \newline 
-{
+
+\newline 
+void f () {
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -10528,6 +10915,8 @@ for (i = 0 ; i < 100 ; i ++)
 \newline 
 \SpecialChar ~
 \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 f += k + l;
 \layout Standard
 
@@ -10540,6 +10929,8 @@ itemp = k + l;
 \newline 
 for (i = 0; i < 100; i++) 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 f += itemp;
@@ -10562,6 +10953,8 @@ Strength Reduction
 \family typewriter 
 for (i=0;i < 100; i++)
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 ar[i*5] = i*3;
@@ -10689,7 +11082,11 @@ SDCC does numerous algebraic simplifications, the following is a small sub-set
 \family typewriter 
 i = j + 0 ; /* changed to */ i = j; 
 \newline 
-i /= 2; /* changed to */ i >>= 1; 
+i /= 2;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ /* changed to */ i >>= 1; 
 \newline 
 i = j - j ; /* changed to */ i = 0; 
 \newline 
@@ -10786,7 +11183,7 @@ case 4: ...\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-case 1: ...
+case 0: ...
  
 \newline 
 \SpecialChar ~
@@ -10818,7 +11215,7 @@ case 5: ...\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-case 2: ...
+case 1: ...
  
 \newline 
 \SpecialChar ~
@@ -10850,7 +11247,7 @@ case 3: ...\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-case 3: ...
+case 2: ...
  
 \newline 
 \SpecialChar ~
@@ -10882,7 +11279,7 @@ case 6: ...\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-case 4: ...
+case 3: ...
  
 \newline 
 }\SpecialChar ~
@@ -10925,6 +11322,8 @@ case 4: ...
 \layout Standard
 
 Both the above switch statements will be implemented using a jump-table.
+ The example to the right side is slightly more efficient as the check for
+ the lower bound of the jump-table is not needed.
 \end_deeper 
 \layout Itemize
 
@@ -11052,6 +11451,7 @@ case 12:\SpecialChar ~
 
 then both the switch statements will be implemented using jump-tables whereas
  the unmodified switch statement will not be.
+ You might also consider dummy cases 0 and 5 to 8 in this example.
  The pragma NOJTBOUND
 \begin_inset LatexCommand \index{\#pragma NOJTBOUND}
 
@@ -11093,7 +11493,7 @@ unsigned char i;
 ...
  
 \newline 
-i>>= 4; 
+i >>= 4; 
 \newline 
 ...
 \layout Standard
@@ -11133,15 +11533,25 @@ will generate:
 
 
 \family typewriter 
-mov a,(_i + 1) 
+mov\SpecialChar ~
+\SpecialChar ~
+a,(_i + 1) 
 \newline 
-mov (_i + 1),#0x00 
+mov\SpecialChar ~
+\SpecialChar ~
+(_i + 1),#0x00 
 \newline 
-clr c 
+clr\SpecialChar ~
+\SpecialChar ~
+c 
 \newline 
-rrc a 
+rrc\SpecialChar ~
+\SpecialChar ~
+a 
 \newline 
-mov _i,a
+mov\SpecialChar ~
+\SpecialChar ~
+_i,a
 \layout Standard
 
 Note that SDCC stores numbers in little-endian format (i.e.
@@ -11181,11 +11591,18 @@ will generate the following code:
 
 
 \family typewriter 
-mov a,_i 
+mov\SpecialChar ~
+\SpecialChar ~
+a,_i 
 \newline 
-rl a 
+rl\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+a 
 \newline 
-mov _i,a
+mov\SpecialChar ~
+\SpecialChar ~
+_i,a
 \layout Standard
 
 SDCC uses pattern matching on the parse tree to determine this operation.Variatio
@@ -11219,6 +11636,8 @@ unsigned int gint;
 \newline 
 foo () { 
 \newline 
+\SpecialChar ~
+\SpecialChar ~
 unsigned char hob; 
 \newline 
 \SpecialChar ~
@@ -11763,11 +12182,23 @@ labelInRange
 g the variable bindings is passed as a parameter).
  If you want to code more such functions, take a close look at the function
  labelInRange and the calling mechanism in source file SDCCpeeph.c.
- I know this whole thing is a little kludgey, but maybe some day we will
+ Currently implemented are 
+\emph on 
+labelInRange, labelRefCount, labelIsReturnOnly, operandsNotSame, xramMovcOption,
+ 24bitMode, portIsDS390, 24bitModeAndPortDS390 
+\emph default 
+and
+\emph on 
+ notVolatile
+\emph default 
+.
+\layout Standard
+
+I know this whole thing is a little kludgey, but maybe some day we will
  have some better means.
- If you are looking at this file, you will also see the default rules that
- are compiled into the compiler, you can add your own rules in the default
- set there if you get tired of specifying the -
+ If you are looking at this file, you will see the default rules that are
+ compiled into the compiler, you can add your own rules in the default set
+ there if you get tired of specifying the -
 \begin_inset ERT
 status Collapsed
 
@@ -11817,7 +12248,7 @@ NOGCSE
 
 \end_inset 
 
- - will stop global subexpression elimination.
+ - will stop global common subexpression elimination.
 \layout Itemize
 
 NOINDUCTION
@@ -11834,7 +12265,8 @@ NOJTBOUND
 \end_inset 
 
  - will not generate code for boundary value checking, when switch statements
- are turned into jump-tables.
+ are turned into jump-tables (dangerous).
+ 
 \layout Itemize
 
 NOOVERLAY
@@ -11964,14 +12396,26 @@ The pragma's are intended to be used to turn-off certain optimizations which
 
 \end_inset 
 
- /* save the current settings */ 
+ \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* save the current settings */ 
 \newline 
 #pragma NOGCSE
 \begin_inset LatexCommand \index{\#pragma NOGCSE}
 
 \end_inset 
 
- /* turnoff global subexpression elimination */ 
+ \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* turnoff global subexpression elimination */ 
 \newline 
 #pragma NOINDUCTION
 \begin_inset LatexCommand \index{\#pragma NOINDUCTION}
@@ -12015,7 +12459,12 @@ The compiler will generate a warning message when extra space is allocated.
 
 Library Routines
 \emph on 
- <pending: this is messy and incomplete>
+ 
+\layout Standard
+
+
+\emph on 
+<pending: this is messy and incomplete>
 \emph default 
  
 \layout Enumerate
@@ -12027,9 +12476,25 @@ Stdclib functions (puts, printf, strcat etc)
 \layout Enumerate
 
 Math functions (sin, pow, sqrt etc)
+\layout Standard
+
+Libraries included in SDCC should have a license at least as liberal as
+ the GNU Lesser General Public License
+\begin_inset LatexCommand \index{GNU Lesser General Public License, LGPL}
+
+\end_inset 
+
+ 
+\emph on 
+LGPL
+\emph default 
+.
 \layout Comment
 
-license statements for the libraries are missing
+license statements for the libraries are missing.
+ sdcc/device/lib/ser_ir.c f.e.
+ comes with a GPL (as opposed to LGPL) License - this will not be liberal
+ enough for many embedded programmers.
 \layout Subsection
 
 Interfacing with Assembly Routines
@@ -12083,8 +12548,8 @@ status Collapsed
 /
 \end_inset 
 
--stack-auto is used) or in the internal / external ram (depending on the
- memory model).
+-stack-auto is used) or in data / xdata memory (depending on the memory
+ model).
  
 \layout Subsubsection
 
@@ -12484,6 +12949,11 @@ The compiling and linking procedure remains the same, however note the extra
 \layout Subsection
 
 External Stack
+\begin_inset LatexCommand \label{sub:External-Stack}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{stack}
 
 \end_inset 
@@ -12816,6 +13286,17 @@ unsigned char ch1 = (unsigned char)p1 % ch ;
 It would substantially reduce the code generated (future versions of the
  compiler will be smart enough to detect such optimization opportunities).
 \end_deeper 
+\layout Itemize
+
+Have a look at the assembly listing to get a 
+\begin_inset Quotes sld
+\end_inset 
+
+feeling
+\begin_inset Quotes srd
+\end_inset 
+
+ for the code generation.
 \layout Subsection
 
 Notes on MCS51 memory
@@ -12857,7 +13338,7 @@ xdata
 data
 \emph default 
 ).
- Usually this built in 
+ Sometimes this built in 
 \emph on 
 xdata
 \emph default 
@@ -13054,8 +13535,6 @@ Tools
 \end_inset 
 
  included in the distribution
-\newline 
-
 \layout Standard
 \align center 
 
@@ -13464,8 +13943,6 @@ Related open source tools
 \end_inset 
 
 
-\newline 
-
 \layout Standard
 \align center 
 
@@ -13731,16 +14208,7 @@ Debugger, serves nicely as GUI to sdcdb
 
 \end_inset 
 
-
-\begin_inset Foot
-collapsed false
-
-\layout Standard
-
-(sdcdb and ddd are available for Unix only)
-\end_inset 
-
-
+ (Unix only)
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -13767,8 +14235,6 @@ collapsed false
 \layout Subsection
 
 Related documentation / recommended reading
-\newline 
-
 \layout Standard
 \align center 
 
@@ -15186,13 +15652,24 @@ Other Processors
 The Z80 and gbz80 port
 \layout Standard
 
-SDCC can target both the Zilog Z80 and the Nintendo Gameboy's Z80-like gbz80.
+SDCC can target both the Zilog 
+\begin_inset LatexCommand \index{Z80}
+
+\end_inset 
+
+ and the Nintendo Gameboy's Z80-like gbz80
+\begin_inset LatexCommand \index{GameBoy Z80}
+
+\end_inset 
+
+.
  The port is incomplete - long support is incomplete (mul, div and mod are
  unimplemented), and both float and bitfield support is missing.
  Apart from that the code generated is correct.
 \layout Standard
 
-As always, the code is the authoritave reference - see z80/ralloc.c and z80/gen.c.
+As always, the code is the authoritative reference - see z80/ralloc.c and
+ z80/gen.c.
  The stack frame is similar to that generated by the IAR Z80 compiler.
  IX is used as the base pointer, HL is used as a temporary register, and
  BC and DE are available for holding variables.
@@ -16884,12 +17361,20 @@ Dominators are basic blocks that WILL execute before reaching this basic
 if (something)
 \layout Standard
 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 [basic block 2]
 \layout Standard
 
 else
 \layout Standard
 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 [basic block 3]
 \layout Standard
 

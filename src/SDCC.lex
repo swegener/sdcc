@@ -573,10 +573,13 @@ int yyerror(char *s)
 {
    fflush(stdout);
 
-   if (yylineno && filename)
-	fprintf(stdout,"\n%s:%d: %s: token -> '%s' ; column %d\n",
-		filename,yylineno,
-		s,yytext,column);
-   fatalError++;
+   if (yylineno && filename) {
+     fprintf(stdout,"\n%s:%d: %s: token -> '%s' ; column %d\n",
+	     filename,yylineno,
+	     s,yytext,column);
+     fatalError++;
+   } else {
+     // this comes from an empy file, no problem
+   }
    return 0;
 }

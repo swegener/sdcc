@@ -1,3 +1,14 @@
+2002-09-18    <wiml@hhhh.org>
+
+	* SDCClrange.h: exposed setFromRange() and setToRange()
+	* mcs51/ralloc.c: fixed over-eager packRegsForSupport() and
+	  packRegsForAccUse() (bug 542397)
+	* mcs51/gen.c: MOVA() is now a function to avoid calling aopGet()
+	  multiple times and emitting the fetch operations more than once
+	  added aopGetUsesAcc() function to allow binary operators to
+	  fetch their operands in the correct order; made genMinus() emit
+	  compact code for X = LITERAL - Y 
+
 2002-09-00  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 	* \sdcc\as\mcs51\lklist.c: Fixed incorrect number of parameters to
 	sprintf() in line 1267.

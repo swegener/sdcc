@@ -1473,6 +1473,7 @@ createRegMask (eBBlock ** ebbs, int count)
 		{
 		  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 			  "createRegMask cannot find live range");
+		  fprintf(stderr, "\tmissing live range: key=%d\n", j);
 		  exit (0);
 		}
 
@@ -1858,13 +1859,23 @@ pack:
 
 }
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 /* findAssignToSym : scanning backwards looks for first assig found */
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 static iCode *
 findAssignToSym (operand * op, iCode * ic)
 {
   iCode *dic;
+
+  /* This routine is used to find sequences like
+     iTempAA = FOO;
+     ...;  (intervening ops don't use iTempAA or modify FOO)
+     blah = blah + iTempAA;
+
+     and eliminate the use of iTempAA, freeing up its register for
+     other uses.
+  */
+     
 
   for (dic = ic->prev; dic; dic = dic->prev)
     {
@@ -1875,37 +1886,7 @@ findAssignToSym (operand * op, iCode * ic)
 	  IC_RESULT (dic)->key == op->key
 /*          &&  IS_TRUE_SYMOP(IC_RIGHT(dic)) */
 	)
-	{
-
-	  /* we are interested only if defined in far space */
-	  /* or in stack space in case of + & - */
-
-	  /* if assigned to a non-symbol then return
-	     FALSE */
-	  if (!IS_SYMOP (IC_RIGHT (dic)))
-	    return NULL;
-
-	  /* if the symbol is in far space then
-	     we should not */
-	  if (isOperandInFarSpace (IC_RIGHT (dic)))
-	    return NULL;
-
-	  /* for + & - operations make sure that
-	     if it is on the stack it is the same
-	     as one of the three operands */
-	  if ((ic->op == '+' || ic->op == '-') &&
-	      OP_SYMBOL (IC_RIGHT (dic))->onStack)
-	    {
-
-	      if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key &&
-		  IC_LEFT (ic)->key != IC_RIGHT (dic)->key &&
-		  IC_RIGHT (ic)->key != IC_RIGHT (dic)->key)
-		return NULL;
-	    }
-
-	  break;
-
-	}
+	break;  /* found where this temp was defined */
 
       /* if we find an usage then we cannot delete it */
       if (IC_LEFT (dic) && IC_LEFT (dic)->key == op->key)
@@ -1918,6 +1899,40 @@ findAssignToSym (operand * op, iCode * ic)
 	return NULL;
     }
 
+  if (!dic)
+    return NULL;   /* didn't find any assignment to op */
+
+  /* we are interested only if defined in far space */
+  /* or in stack space in case of + & - */
+  
+  /* if assigned to a non-symbol then don't repack regs */
+  if (!IS_SYMOP (IC_RIGHT (dic)))
+    return NULL;
+  
+  /* if the symbol is volatile then we should not */
+  if (isOperandVolatile (IC_RIGHT (dic), TRUE))
+    return NULL;
+  /* XXX TODO --- should we be passing FALSE to isOperandVolatile()?
+     What does it mean for an iTemp to be volatile, anyway? Passing
+     TRUE is more cautious but may prevent possible optimizations */
+
+  /* if the symbol is in far space then we should not */
+  if (isOperandInFarSpace (IC_RIGHT (dic)))
+    return NULL;
+  
+  /* for + & - operations make sure that
+     if it is on the stack it is the same
+     as one of the three operands */
+  if ((ic->op == '+' || ic->op == '-') &&
+      OP_SYMBOL (IC_RIGHT (dic))->onStack)
+    {
+      
+      if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key &&
+	  IC_LEFT (ic)->key != IC_RIGHT (dic)->key &&
+	  IC_RIGHT (ic)->key != IC_RIGHT (dic)->key)
+	return NULL;
+    }
+  
   /* now make sure that the right side of dic
      is not defined between ic & dic */
   if (dic)
@@ -1931,9 +1946,46 @@ findAssignToSym (operand * op, iCode * ic)
     }
 
   return dic;
-
-
 }
+
+/*-----------------------------------------------------------------*/
+/* reassignAliasedSym - used by packRegsForSupport to replace      */
+/*                      redundant iTemp with equivalent symbol     */
+/*-----------------------------------------------------------------*/
+static void
+reassignAliasedSym (eBBlock *ebp, iCode *assignment, iCode *use, operand *op)
+{
+  iCode *ic;
+  unsigned oldSymKey, newSymKey;
+
+  oldSymKey = op->key;
+  newSymKey = IC_RIGHT(assignment)->key;
+
+  /* only track live ranges of compiler-generated temporaries */
+  if (!IS_ITEMP(IC_RIGHT(assignment)))
+    newSymKey = 0;
+
+  /* update the live-value bitmaps */
+  for (ic = assignment; ic != use; ic = ic->next) {
+    bitVectUnSetBit (ic->rlive, oldSymKey);
+    if (newSymKey != 0)
+      ic->rlive = bitVectSetBit (ic->rlive, newSymKey);
+  }
+
+  /* update the sym of the used operand */
+  OP_SYMBOL(op) = OP_SYMBOL(IC_RIGHT(assignment));
+  op->key = OP_SYMBOL(op)->key;
+
+  /* update the sym's liverange */
+  if ( OP_LIVETO(op) < ic->seq )
+    setToRange(op, ic->seq, FALSE);
+
+  /* remove the assignment iCode now that its result is unused */
+  remiCodeFromeBBlock (ebp, assignment);
+  bitVectUnSetBit(OP_SYMBOL(IC_RESULT(assignment))->defs, assignment->key);
+  hTabDeleteItem (&iCodehTab, assignment->key, assignment, DELETE_ITEM, NULL);
+}
+  
 
 /*-----------------------------------------------------------------*/
 /* packRegsForSupport :- reduce some registers for support calls   */
@@ -1941,9 +1993,8 @@ findAssignToSym (operand * op, iCode * ic)
 static int
 packRegsForSupport (iCode * ic, eBBlock * ebp)
 {
-  int change = 0;
-  iCode *dic, *sic;
-
+  iCode *dic;
+  
   /* for the left & right operand :- look to see if the
      left was assigned a true symbol in far space in that
      case replace them */
@@ -1953,64 +2004,39 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
     {
       dic = findAssignToSym (IC_LEFT (ic), ic);
 
-      if (!dic)
-	goto right;
-
-      /* found it we need to remove it from the
-         block */
-      for (sic = dic; sic != ic; sic = sic->next) {
-	bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
-	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
-      }
-
-      OP_SYMBOL(IC_LEFT (ic))=OP_SYMBOL(IC_RIGHT (dic));
-      OP_SYMBOL(IC_LEFT(ic))->liveTo = ic->seq;
-      IC_LEFT (ic)->key = OP_SYMBOL(IC_RIGHT (dic))->key;
-      remiCodeFromeBBlock (ebp, dic);
-      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-      hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
-      change++;
+      if (dic)
+	{
+	  /* found it we need to remove it from the block */
+	  reassignAliasedSym (ebp, dic, ic, IC_LEFT(ic));
+	  return 1;
+	}
     }
 
   /* do the same for the right operand */
- right:
-  if (!change &&
-      IS_ITEMP (IC_RIGHT (ic)) &&
+  if (IS_ITEMP (IC_RIGHT (ic)) &&
       OP_SYMBOL (IC_RIGHT (ic))->liveTo <= ic->seq)
     {
       iCode *dic = findAssignToSym (IC_RIGHT (ic), ic);
-      iCode *sic;
 
-      if (!dic)
-	return change;
-
-      /* if this is a subtraction & the result
-         is a true symbol in far space then don't pack */
-      if (ic->op == '-' && IS_TRUE_SYMOP (IC_RESULT (dic)))
+      if (dic)
 	{
-	  sym_link *etype = getSpec (operandType (IC_RESULT (dic)));
-	  if (IN_FARSPACE (SPEC_OCLS (etype)))
-	    return change;
+	  /* if this is a subtraction & the result
+	     is a true symbol in far space then don't pack */
+	  if (ic->op == '-' && IS_TRUE_SYMOP (IC_RESULT (dic)))
+	    {
+	      sym_link *etype = getSpec (operandType (IC_RESULT (dic)));
+	      if (IN_FARSPACE (SPEC_OCLS (etype)))
+		return 0;
+	    }
+	  /* found it we need to remove it from the
+	     block */
+	  reassignAliasedSym (ebp, dic, ic, IC_RIGHT(ic));
+	  
+	  return 1;
 	}
-      /* found it we need to remove it from the
-         block */
-      for (sic = dic; sic != ic; sic = sic->next) {
-	bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
-	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
-      }
-
-      IC_RIGHT (ic)->operand.symOperand =
-	IC_RIGHT (dic)->operand.symOperand;
-      OP_SYMBOL(IC_RIGHT(ic))->liveTo = ic->seq;
-      IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
-
-      remiCodeFromeBBlock (ebp, dic);
-      bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-      hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
-      change++;
     }
 
-  return change;
+  return 0;
 }
 
 #define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
@@ -2197,6 +2223,63 @@ isBitwiseOptimizable (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* isCommutativeOp - tests whether this op cares what order its    */
+/*                   operands are in                               */
+/*-----------------------------------------------------------------*/
+bool isCommutativeOp(char op)
+{
+  if (op == '+' || op == '*' || op == EQ_OP ||
+      op == '^' || op == '|' || op == BITWISEAND)
+    return TRUE;
+  else
+    return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* operandUsesAcc - determines whether the code generated for this */
+/*                  operand will have to use the accumulator       */
+/*-----------------------------------------------------------------*/
+bool operandUsesAcc(operand *op)
+{
+  if (!op)
+    return FALSE;
+
+  if (IS_SYMOP(op)) {
+    symbol *sym = OP_SYMBOL(op);
+    memmap *symspace;
+
+    if (sym->accuse)
+      return TRUE;  /* duh! */
+
+    if (IN_STACK(sym->etype) || sym->onStack ||
+	(SPIL_LOC(op) && SPIL_LOC(op)->onStack))
+      return TRUE;  /* acc is used to calc stack offset */
+
+    if (IS_ITEMP(op))
+      {
+	if (SPIL_LOC(op)) {
+	  sym = SPIL_LOC(op);  /* if spilled, look at spill location */
+	} else {
+	  return FALSE;  /* more checks? */
+	}
+      }
+
+    symspace = SPEC_OCLS(sym->etype);
+
+    if (sym->iaccess && symspace->paged)
+      return TRUE;  /* must fetch paged indirect sym via accumulator */
+    
+    if (IN_BITSPACE(symspace))
+      return TRUE;  /* fetching bit vars uses the accumulator */
+    
+    if (IN_FARSPACE(symspace) || IN_CODESPACE(symspace)) 
+      return TRUE;  /* fetched via accumulator and dptr */
+  }
+
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
 /* packRegsForAccUse - pack registers for acc use                  */
 /*-----------------------------------------------------------------*/
 static void
@@ -2264,12 +2347,12 @@ packRegsForAccUse (iCode * ic)
   if (uic->op == JUMPTABLE)
     return;
 
-  /* if the usage is not is an assignment
-     or an arithmetic / bitwise / shift operation then not */
   if (POINTER_SET (uic) &&
       getSize (aggrToPtr (operandType (IC_RESULT (uic)), FALSE)) > 1)
     return;
 
+  /* if the usage is not is an assignment
+     or an arithmetic / bitwise / shift operation then not */
   if (uic->op != '=' &&
       !IS_ARITHMETIC_OP (uic) &&
       !IS_BITWISE_OP (uic) &&
@@ -2278,16 +2361,16 @@ packRegsForAccUse (iCode * ic)
     return;
 
   /* if used in ^ operation then make sure right is not a 
-     literl */
+     literal (WIML: Why is this?) */
   if (uic->op == '^' && isOperandLiteral (IC_RIGHT (uic)))
     return;
 
   /* if shift operation make sure right side is not a literal */
+  /* WIML: Why is this? */
   if (uic->op == RIGHT_OP &&
       (isOperandLiteral (IC_RIGHT (uic)) ||
        getSize (operandType (IC_RESULT (uic))) > 1))
     return;
-
   if (uic->op == LEFT_OP &&
       (isOperandLiteral (IC_RIGHT (uic)) ||
        getSize (operandType (IC_RESULT (uic))) > 1))
@@ -2304,11 +2387,11 @@ packRegsForAccUse (iCode * ic)
     return;
 #endif
 
-  /* if either one of them in far space then we cannot */
-  if ((IS_TRUE_SYMOP (IC_LEFT (uic)) &&
-       isOperandInFarSpace (IC_LEFT (uic))) ||
-      (IS_TRUE_SYMOP (IC_RIGHT (uic)) &&
-       isOperandInFarSpace (IC_RIGHT (uic))))
+  /* if the other operand uses the accumulator then we cannot */
+  if ( (IC_LEFT(uic)->key == IC_RESULT(ic)->key &&
+	operandUsesAcc(IC_RIGHT(uic))) ||
+       (IC_RIGHT(uic)->key == IC_RESULT(ic)->key &&
+	operandUsesAcc(IC_LEFT(uic))) ) 
     return;
 
   /* if the usage has only one operand then we can */
@@ -2316,10 +2399,11 @@ packRegsForAccUse (iCode * ic)
       IC_RIGHT (uic) == NULL)
     goto accuse;
 
-  /* make sure this is on the left side if not
-     a '+' since '+' is commutative */
-  if (ic->op != '+' &&
-      IC_LEFT (uic)->key != IC_RESULT (ic)->key)
+  /* make sure this is on the left side if not commutative */
+  /* except for '-', which has been written to be able to
+     handle reversed operands */
+  if (!(isCommutativeOp(ic->op) || ic->op == '-') &&
+       IC_LEFT (uic)->key != IC_RESULT (ic)->key)
     return;
 
 #if 0
@@ -2335,24 +2419,8 @@ packRegsForAccUse (iCode * ic)
     }
 #endif
 
-  /* if the other one is not on stack then we can */
-  if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
-      (IS_ITEMP (IC_RIGHT (uic)) ||
-       (IS_TRUE_SYMOP (IC_RIGHT (uic)) &&
-	!OP_SYMBOL (IC_RIGHT (uic))->onStack)))
-    goto accuse;
-
-  if (IC_RIGHT (uic)->key == IC_RESULT (ic)->key &&
-      (IS_ITEMP (IC_LEFT (uic)) ||
-       (IS_TRUE_SYMOP (IC_LEFT (uic)) &&
-	!OP_SYMBOL (IC_LEFT (uic))->onStack)))
-    goto accuse;
-
-  return;
-
 accuse:
   OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
-
 
 }
 

@@ -105,7 +105,7 @@ static void saveRBank (int, iCode *, bool);
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
 
-#define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) emitcode("mov","a,%s",x);
+#define MOVA(x) mova(x)  /* use function to avoid multiple eval */
 #define CLRC    emitcode("clr","c")
 #define SETC    emitcode("setb","c")
 
@@ -157,6 +157,19 @@ emitcode (char *inst, char *fmt,...)
   lineCurr->isInline = _G.inLine;
   lineCurr->isDebug = _G.debugLine;
   va_end (ap);
+}
+
+/*-----------------------------------------------------------------*/
+/* mova - moves specified value into accumulator                   */
+/*-----------------------------------------------------------------*/
+static void
+mova (char *x)
+{
+  /* do some early peephole optimization */
+  if (!strcmp(x, "a") || !strcmp(x, "acc"))
+    return;
+
+  emitcode("mov","a,%s", x);
 }
 
 /*-----------------------------------------------------------------*/
@@ -754,6 +767,50 @@ dealloc:
 	}
     }
 }
+
+/*-----------------------------------------------------------------*/
+/* aopGetUsesAcc - indicates ahead of time whether aopGet() will   */
+/*                 clobber the accumulator                         */
+/*-----------------------------------------------------------------*/
+static bool
+aopGetUsesAcc (asmop *aop, int offset)
+{
+  if (offset > (aop->size - 1))
+    return FALSE;
+
+  switch (aop->type) 
+    {
+
+    case AOP_R0:
+    case AOP_R1:
+      if (aop->paged)
+	return TRUE;
+    case AOP_DPTR:
+      return TRUE;
+    case AOP_IMMD:
+      return FALSE;
+    case AOP_DIR:
+      return FALSE;
+    case AOP_REG:
+      wassert(strcmp(aop->aopu.aop_reg[offset]->name, "a"));
+      return FALSE;
+    case AOP_CRY:
+      return TRUE;
+    case AOP_ACC:
+      return TRUE;
+    case AOP_LIT:
+      return FALSE;
+    case AOP_STR:
+      if (strcmp (aop->aopu.aop_str[offset], "a") == 0)
+	return TRUE;
+      return FALSE;
+    default:
+      /* Error case --- will have been caught already */
+      wassert(0);
+      return FALSE;
+    }
+}
+
 
 /*-----------------------------------------------------------------*/
 /* aopGet - for fetching value of the aop                          */
@@ -3062,6 +3119,8 @@ static void
 genPlus (iCode * ic)
 {
   int size, offset = 0;
+  char *add;
+  asmop *leftOp, *rightOp;
 
   /* special cases :- */
 
@@ -3124,29 +3183,32 @@ genPlus (iCode * ic)
 
   size = getDataSize (IC_RESULT (ic));
 
+  leftOp = AOP(IC_LEFT(ic));
+  rightOp = AOP(IC_RIGHT(ic));
+  add = "add";
+
   while (size--)
     {
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC)
+      if (aopGetUsesAcc (leftOp, offset) && aopGetUsesAcc (rightOp, offset))
 	{
-	  MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE));
-	  if (offset == 0)
-	    emitcode ("add", "a,%s",
-		      aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE));
-	  else
-	    emitcode ("addc", "a,%s",
-		      aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE));
+	  emitcode("mov", "b,acc");
+	  MOVA (aopGet (leftOp,  offset, FALSE, TRUE));
+	  emitcode("xch", "a,b");
+	  MOVA (aopGet (rightOp, offset, FALSE, TRUE));
+	  emitcode (add, "a,b");
+	}
+      else if (aopGetUsesAcc (leftOp, offset))
+	{
+	  MOVA (aopGet (leftOp, offset, FALSE, TRUE));
+	  emitcode (add, "a,%s", aopGet (rightOp, offset, FALSE, TRUE));
 	}
       else
 	{
-	  MOVA (aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE));
-	  if (offset == 0)
-	    emitcode ("add", "a,%s",
-		      aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE));
-	  else
-	    emitcode ("addc", "a,%s",
-		      aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE));
+	  MOVA (aopGet (rightOp, offset, FALSE, TRUE));
+	  emitcode (add, "a,%s", aopGet (leftOp, offset, FALSE, TRUE));
 	}
       aopPut (AOP (IC_RESULT (ic)), "a", offset++);
+      add = "addc";  /* further adds must propagate carry */
     }
 
   adjustArithmeticResult (ic);
@@ -3337,7 +3399,6 @@ static void
 genMinus (iCode * ic)
 {
   int size, offset = 0;
-  unsigned long lit = 0L;
 
   D(emitcode (";", "genMinus"));
 
@@ -3361,25 +3422,17 @@ genMinus (iCode * ic)
 
   size = getDataSize (IC_RESULT (ic));
 
-  if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
+  /* if literal, add a,#-lit, else normal subb */
+  if (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT)
     {
-      CLRC;
-    }
-  else
-    {
+      unsigned long lit = 0L;
+
       lit = (unsigned long) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
       lit = -(long) lit;
-    }
 
-  /* if literal, add a,#-lit, else normal subb */
-  while (size--)
-    {
-      MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE));
-      if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
-	emitcode ("subb", "a,%s",
-		  aopGet (AOP (IC_RIGHT (ic)), offset, FALSE, FALSE));
-      else
+      while (size--)
 	{
+	  MOVA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE, FALSE));
 	  /* first add without previous c */
 	  if (!offset) {
 	    if (!size && lit==-1) {
@@ -3392,10 +3445,42 @@ genMinus (iCode * ic)
 	    emitcode ("addc", "a,#0x%02x",
 		      (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
 	  }
+	  aopPut (AOP (IC_RESULT (ic)), "a", offset++);
 	}
-      aopPut (AOP (IC_RESULT (ic)), "a", offset++);
     }
+  else
+    {
+      asmop *leftOp, *rightOp;
+      bool borrow;
 
+      borrow = FALSE;
+      leftOp = AOP(IC_LEFT(ic));
+      rightOp = AOP(IC_RIGHT(ic));
+
+      while (size--)
+	{
+	  if (aopGetUsesAcc(rightOp, offset)) {
+	    wassertl(!aopGetUsesAcc(leftOp, offset), "accumulator clash");
+	    MOVA (aopGet(rightOp, offset, FALSE, TRUE));
+	    if (borrow) {
+	      emitcode( "cpl", "c");
+	    } else {
+	      emitcode( "setb", "c");
+	    }
+	    emitcode("subb", "a,%s", aopGet(leftOp, offset, FALSE, TRUE));
+	    emitcode("cpl", "a");
+	  } else {
+	    MOVA (aopGet (leftOp, offset, FALSE, FALSE));
+	    emitcode ((borrow? "subb" : "sub"), "a,%s",
+		      aopGet(rightOp, offset, FALSE, TRUE));
+	  }
+
+	  aopPut (AOP (IC_RESULT (ic)), "a", offset++);
+	  borrow = TRUE;  /* subsequent subtracts must propagate borrow */
+	}
+    }
+  
+  
   adjustArithmeticResult (ic);
 
 release:
@@ -3458,6 +3543,7 @@ genMultOneByte (operand * left,
 	  SPEC_USIGN(operandType(right)))) {
     // just an unsigned 8*8=8/16 multiply
     //emitcode (";","unsigned");
+    // TODO: check for accumulator clash between left & right aops?
     emitcode ("mov", "b,%s", aopGet (AOP (right), 0, FALSE, FALSE));
     MOVA (aopGet (AOP (left), 0, FALSE, FALSE));
     emitcode ("mul", "ab");
@@ -6405,7 +6491,8 @@ genLeftShiftLiteral (operand * left,
 	  genlshFour (result, left, shCount);
 	  break;
 	default:
-	  fprintf(stderr, "*** ack! mystery literal shift!\n");
+	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+		  "*** ack! mystery literal shift!\n");
 	  break;
 	}
     }

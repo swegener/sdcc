@@ -56,6 +56,7 @@ char *srcFileName;		/* source file name with the .c stripped */
 char *moduleName;		/* module name is srcFilename stripped of any path */
 const char *preArgv[128];	/* pre-processor arguments  */
 int currRegBank = 0;
+int RegBankUsed[4]={1, 0, 0, 0};	/*JCF: Reg Bank 0 used by default*/
 struct optimize optimize;
 struct options options;
 char *VersionString = SDCC_VERSION_STR;
@@ -478,7 +479,7 @@ setDefaultOptions ()
   options.stack_loc = 0;	/* stack pointer initialised to 0 */
   options.xstack_loc = 0;	/* xternal stack starts at 0 */
   options.code_loc = 0;		/* code starts at 0 */
-  options.data_loc = 0x0030;	/* data starts at 0x0030 */
+  options.data_loc = 0;		/* JCF: By default let the linker locate data */
   options.xdata_loc = 0;
   options.idata_loc = 0x80;
   options.genericPtr = 1;	/* default on */
@@ -1139,8 +1140,8 @@ linkEdit (char **envp)
       exit (1);
     }
 
-  /* now write the options */
-  fprintf (lnkfile, "-mux%c\n", (options.out_fmt ? 's' : 'i'));
+  /* now write the options.  JCF: added option 'y' */
+  fprintf (lnkfile, "-myux%c\n", (options.out_fmt ? 's' : 'i'));
 
   /* if iram size specified */
   if (options.iram_size)
@@ -1159,7 +1160,9 @@ linkEdit (char **envp)
   WRITE_SEG_LOC (CODE_NAME, options.code_loc);
 
   /* data segment start */
-  WRITE_SEG_LOC (DATA_NAME, options.data_loc);
+  if(options.data_loc){ /*JCF: If zero, the linker chooses the best place for data*/
+	  WRITE_SEG_LOC (DATA_NAME, options.data_loc);
+  }
 
   /* xdata start */
   WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
@@ -1171,6 +1174,11 @@ linkEdit (char **envp)
 
   /* bit segment start */
   WRITE_SEG_LOC (BIT_NAME, 0);
+
+  /* JCF: stack start */
+  if(options.stack_loc) {
+	WRITE_SEG_LOC ("SSEG", options.stack_loc & 0xff);
+  }
 
   /* add the extra linker options */
   for (i = 0; linkOptions[i]; i++)

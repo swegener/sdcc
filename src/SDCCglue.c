@@ -1503,6 +1503,22 @@ glue (void)
   fprintf (asmFile, "; special function bits \n");
   fprintf (asmFile, "%s", iComments2);
   copyFile (asmFile, sfrbit->oFile);
+  
+  /*JCF: Create the areas for the register banks*/
+  if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
+  {
+     fprintf (asmFile, "%s", iComments2);
+     fprintf (asmFile, "; overlayable register banks \n");
+     fprintf (asmFile, "%s", iComments2);
+     if(RegBankUsed[0])
+        fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
+     if(RegBankUsed[1]||options.parms_in_bank1)
+        fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
+     if(RegBankUsed[2])
+        fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
+     if(RegBankUsed[3])
+        fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
+  }
 
   /* copy the data segment */
   fprintf (asmFile, "%s", iComments2);
@@ -1605,15 +1621,7 @@ glue (void)
 		   (unsigned int) options.xdata_loc & 0xff);
 	}
 
-      /* initialise the stack pointer */
-      /* if the user specified a value then use it */
-      if (options.stack_loc)
-	fprintf (asmFile, "\tmov\tsp,#%d\n", options.stack_loc & 0xff);
-      else
-	/* no: we have to compute it */
-      if (!options.stackOnData && maxRegBank <= 3)
-	fprintf (asmFile, "\tmov\tsp,#%d\n", ((maxRegBank + 1) * 8) - 1);
-      else
+      /* initialise the stack pointer.  JCF: aslink takes care of the location */
 	fprintf (asmFile, "\tmov\tsp,#__start__stack\n");	/* MOF */
 
       fprintf (asmFile, "\tlcall\t__sdcc_external_startup\n");

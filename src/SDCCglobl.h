@@ -273,6 +273,7 @@ extern int xstackPtr;		/* external stack pointer    SDCC.y   */
 extern int reentrant;		/* /X flag has been sent     SDCC.y */
 extern char buffer[];		/* general buffer      SDCCgen.c   */
 extern int currRegBank;		/* register bank being used   SDCCgens.c   */
+extern int RegBankUsed[4];	/* JCF: register banks used	  SDCCmain.c   */
 extern struct symbol *currFunc;	/* current function    SDCCgens.c */
 extern int cNestLevel;		/* block nest level  SDCCval.c      */
 extern int currBlockno;		/* sequentail block number */

@@ -844,6 +844,8 @@ allocVariables (symbol * symChain)
 	  /* if register bank specified then update maxRegBank */
 	  if (maxRegBank < FUNC_REGBANK (csym->type))
 	    maxRegBank = FUNC_REGBANK (csym->type);
+	  /*JCF: Mark the register bank as used*/
+      RegBankUsed[FUNC_REGBANK(csym->type)]=1;
 	}
 
       /* if this is a extern variable then change the */

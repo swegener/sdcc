@@ -1,3 +1,9 @@
+2004-02-20 Hubert Sack <sack AT digiplan.de>
+	committed by Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added peepholes 3.h-k and 132.a-f from
+	patch #1121755
+
 2004-02-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/SDCCpeeph.def: new keyword "labelRefCountChange" which allows peepholes

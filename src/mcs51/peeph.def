@@ -118,6 +118,70 @@ replace {
 }
 
 replace {
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	mov	%3,#0x00
+} by {
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	;	Peephole 3.h	changed mov %3,#0x00 to %3,a
+	mov	%3,a
+}
+
+replace {
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	mov	%3,a
+	mov	%4,#0x00
+} by {
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	mov	%3,a
+	;	Peephole 3.i	changed mov %4,#0x00 to %4,a
+	mov	%4,a
+}
+
+replace {
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	mov	%3,a
+	mov	%4,a
+	mov	%5,#0x00
+} by {
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	mov	%3,a
+	mov	%4,a
+	;	Peephole 3.j	changed mov %5,#0x00 to %5,a
+	mov	%5,a
+}
+
+replace {
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	mov	%3,a
+	mov	%4,a
+	mov	%5,a
+	mov	%6,#0x00
+} by {
+	clr a
+	mov %1,a
+	mov %2,a
+	mov %3,a
+	mov %4,a
+	mov %5,a
+	;	Peephole 3.k	changed mov %6,#0x00 to %6,a
+	mov %6,a
+}
+
+replace {
 	mov	%1,a
 	mov	dptr,#%2
 	mov	a,%1
@@ -565,6 +629,80 @@ replace {
 	dec	%1
 	mov	%2,%1
 }
+
+// ideally the optimizations of rules 132.x should be done in genCmpXX
+replace {
+	clr	c
+	mov	a,#%1
+	subb	a,%2
+	mov	%3,c
+} by {
+	;	Peephole 132.a	optimized genCmpGt by inverse logic (acc differs)
+	mov	a,%2
+	add	a,#0xff - %1
+	mov	%3,c
+}
+
+replace {
+	clr	c
+	mov	a,#%1
+	subb	a,%2
+	jnc	%5
+} by {
+	;	Peephole 132.b	optimized genCmpGt by inverse logic (acc differs)
+	mov	a,%2
+	add	a,#0xff - %1
+	jnc	%5
+}
+
+replace {
+	clr	c
+	mov	a,#%1
+	subb	a,%2
+	jc	%5
+} by {
+	;	Peephole 132.c	optimized genCmpGt by inverse logic (acc differs)
+	mov	a,%2
+	add	a,#0xff - %1
+	jc	%5
+}
+
+replace {
+	clr	c
+	mov	a,%1
+	subb	a,#%2
+	mov	%3,c
+} by {
+	;	Peephole 132.d	optimized genCmpGt by inverse logic
+	mov	a,#0x100 - %2
+	add	a,%1
+	mov	%3,c
+} if operandsNotRelated('0x00' %2)
+
+replace {
+	clr	c
+	mov	a,%1
+	subb	a,#%2
+	jnc	%5
+} by {
+	;	Peephole 132.e	optimized genCmpLt by inverse logic (carry differs)
+	mov	a,#0x100 - %2
+	add	a,%1
+	jc	%5
+} if operandsNotRelated('0x00' %2)
+
+replace {
+	clr	c
+	mov	a,%1
+	subb	a,#%2
+	jc	%5
+} by {
+	;	Peephole 132.f	optimized genCmpLt by inverse logic (carry differs)
+	mov	a,#0x100 - %2
+	add	a,%1
+	jnc	%5
+} if operandsNotRelated('0x00' %2)
+
 
 replace {
 	mov	r%1,%2

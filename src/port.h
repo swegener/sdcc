@@ -144,6 +144,7 @@ typedef struct
 	const char *code_name;
 	const char *data_name;
 	const char *idata_name;
+	const char *pdata_name;
 	const char *xdata_name;
 	const char *bit_name;
 	const char *reg_name;

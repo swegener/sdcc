@@ -36,6 +36,7 @@ extern FILE *junkFile;
 #define  CODE_NAME     port->mem.code_name
 #define  DATA_NAME     port->mem.data_name
 #define  IDATA_NAME    port->mem.idata_name
+#define  PDATA_NAME    port->mem.pdata_name
 #define  XDATA_NAME    port->mem.xdata_name
 #define  XIDATA_NAME   port->mem.xidata_name
 #define  XINIT_NAME    port->mem.xinit_name
@@ -46,24 +47,25 @@ extern FILE *junkFile;
 #define  OVERLAY_NAME  port->mem.overlay_name
 
 /* forward definition for variables */
-extern memmap *xstack;		/* xternal stack data         */
-extern memmap *istack;		/* internal stack             */
-extern memmap *code;		/* code segment               */
-extern memmap *data;		/* internal data upto 128     */
-extern memmap *xdata;		/* external data              */
-extern memmap *xidata;          /* the initialized xdata       */
-extern memmap *xinit;           /* the initializers for xidata */
-extern memmap *idata;		/* internal data upto 256     */
-extern memmap *bit;		/* bit addressable space      */
-extern memmap *statsg;		/* static code segment        */
-extern memmap *sfr;		/* register space             */
-extern memmap *sfrbit;		/* sfr bit space              */
-extern memmap *reg;		/* register space             */
-extern memmap *generic;		/* unknown                    */
-extern memmap *overlay;		/* the overlay segment        */
-extern memmap *eeprom;		/* eepromp space              */
-extern memmap *eeprom;		/* eepromp space              */
-extern memmap *home;		/* Non-banked home space      */
+extern memmap *xstack;		/* xternal stack data           */
+extern memmap *istack;		/* internal stack               */
+extern memmap *code;		/* code segment                 */
+extern memmap *data;		/* internal data upto 128       */
+extern memmap *pdata;		/* paged external data upto 256 */
+extern memmap *xdata;		/* external data                */
+extern memmap *xidata;          /* the initialized xdata        */
+extern memmap *xinit;           /* the initializers for xidata  */
+extern memmap *idata;		/* internal data upto 256       */
+extern memmap *bit;		/* bit addressable space        */
+extern memmap *statsg;		/* static code segment          */
+extern memmap *sfr;		/* register space               */
+extern memmap *sfrbit;		/* sfr bit space                */
+extern memmap *reg;		/* register space               */
+extern memmap *generic;		/* unknown                      */
+extern memmap *overlay;		/* the overlay segment          */
+extern memmap *eeprom;		/* eepromp space                */
+extern memmap *eeprom;		/* eepromp space                */
+extern memmap *home;		/* Non-banked home space        */
 
 extern int fatalError;
 

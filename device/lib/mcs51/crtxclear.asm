@@ -34,16 +34,27 @@
 	.area GSINIT4 (CODE)
 
 __mcs51_genXRAMCLEAR::
+	mov	r0,#l_PSEG
+	mov	a,r0
+	orl	a,#(l_PSEG >> 8)
+	jz	00005$
+	mov	r1,#s_PSEG
+	mov	__XPAGE,#(s_PSEG >> 8)
+	clr     a
+00004$:	movx	@r1,a
+	inc	r1
+	djnz	r0,00004$
+00005$:
 	mov	r0,#l_XSEG
 	mov	a,r0
 	orl	a,#(l_XSEG >> 8)
-	jz	00005$
+	jz	00007$
 	mov	r1,#((l_XSEG + 255) >> 8)
 	mov	dptr,#s_XSEG
 	clr     a
-00004$:	movx	@dptr,a
+00006$:	movx	@dptr,a
 	inc	dptr
-	djnz	r0,00004$
-	djnz	r1,00004$
-00005$:
+	djnz	r0,00006$
+	djnz	r1,00006$
+00007$:
 

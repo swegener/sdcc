@@ -173,10 +173,17 @@ models:
 	  done \
 	fi
 
-model-mcs51-reentrant:
+model-mcs51-stack-auto:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
 	  for model in $(MODELS); do \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --int-long-reent --float-reent" PORT=reent-$$model objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$$model-stack-auto objects; \
+	  done \
+	fi
+
+model-mcs51-xstack-auto:
+	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
+	  for model in $(MODELS); do \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$$model-xstack-auto objects; \
 	  done \
 	fi
 

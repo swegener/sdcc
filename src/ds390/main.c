@@ -70,7 +70,7 @@ _ds390_init (void)
 }
 
 static void
-_ds390_reset_regparm ()
+_ds390_reset_regparm (void)
 {
   regParmFlg = 0;
 }
@@ -235,8 +235,25 @@ _ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 
   if (options.model != MODEL_FLAT24)
     {
-      /* Let the default code handle it. */
-      return FALSE;
+      fprintf (of, "\tljmp\t__sdcc_gsinit_startup\n");
+
+      /* now for the other interrupts */
+      for (i = 0; i < maxInterrupts; i++)
+        {
+          if (interrupts[i])
+            {
+              fprintf (of, "\tljmp\t%s\n", interrupts[i]->rname);
+              if ( i != maxInterrupts - 1 )
+                fprintf (of, "\t.ds\t5\n");
+            }
+          else
+            {
+              fprintf (of, "\treti\n");
+              if ( i != maxInterrupts - 1 )
+                fprintf (of, "\t.ds\t7\n");
+            }
+        }
+      return TRUE;
     }
 
   fprintf (of, "\tajmp\t__reset_vect\n");
@@ -846,6 +863,7 @@ PORT ds390_port =
     "CSEG    (CODE)",
     "DSEG    (DATA)",
     "ISEG    (DATA)",
+    "PSEG    (PAG,XDATA)",
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",
@@ -983,7 +1001,7 @@ static void _tininative_finaliseOptions (void)
 
 static int _tininative_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
-    return 1;
+    return TRUE;
 }
 static void _tininative_genAssemblerPreamble (FILE * of)
 {
@@ -1157,13 +1175,14 @@ PORT tininative_port =
     "CSEG    (CODE)",
     "DSEG    (DATA)",
     "ISEG    (DATA)",
+    "PSEG    (PAG,XDATA)",
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",
     "GSINIT  (CODE)",
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
-    "HOME	 (CODE)",
+    "HOME    (CODE)",
     NULL,
     NULL,
     NULL,
@@ -1383,6 +1402,7 @@ PORT ds400_port =
     "CSEG    (CODE)",
     "DSEG    (DATA)",
     "ISEG    (DATA)",
+    "PSEG    (PAG,XDATA)",
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",

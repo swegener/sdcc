@@ -103,15 +103,18 @@ char buffer[PATH_MAX * 2];
 #define OPTION_DUMP_ALL         "--dumpall"
 #define OPTION_PEEP_FILE        "--peep-file"
 #define OPTION_LIB_PATH         "--lib-path"
-#define OPTION_XSTACK_LOC       "--xstack-loc"
 #define OPTION_CALLEE_SAVES     "--callee-saves"
 #define OPTION_STACK_LOC        "--stack-loc"
-#define OPTION_XRAM_LOC         "--xram-loc"
-#define OPTION_IRAM_SIZE        "--iram-size"
-#define OPTION_VERSION          "--version"
+#define OPTION_XSTACK_LOC       "--xstack-loc"
 #define OPTION_DATA_LOC         "--data-loc"
-#define OPTION_CODE_LOC         "--code-loc"
 #define OPTION_IDATA_LOC        "--idata-loc"
+#define OPTION_XRAM_LOC         "--xram-loc"
+#define OPTION_CODE_LOC         "--code-loc"
+#define OPTION_STACK_SIZE       "--stack-size"
+#define OPTION_IRAM_SIZE        "--iram-size"
+#define OPTION_XRAM_SIZE        "--xram-size"
+#define OPTION_CODE_SIZE        "--code-size"
+#define OPTION_VERSION          "--version"
 #define OPTION_NO_LABEL_OPT     "--nolabelopt"
 #define OPTION_NO_LOOP_INV      "--noinvariant"
 #define OPTION_NO_LOOP_IND      "--noinduction"
@@ -121,14 +124,11 @@ char buffer[PATH_MAX * 2];
 #define OPTION_SHORT_IS_8BITS   "--short-is-8bits"
 #define OPTION_TINI_LIBID       "--tini-libid"
 #define OPTION_NO_XINIT_OPT     "--no-xinit-opt"
-#define OPTION_XRAM_SIZE        "--xram-size"
-#define OPTION_CODE_SIZE        "--code-size"
 #define OPTION_NO_CCODE_IN_ASM  "--no-c-code-in-asm"
 #define OPTION_ICODE_IN_ASM     "--i-code-in-asm"
 #define OPTION_PRINT_SEARCH_DIRS "--print-search-dirs"
 #define OPTION_MSVC_ERROR_STYLE "--vc"
 #define OPTION_USE_STDOUT       "--use-stdout"
-#define OPTION_STACK_SIZE       "--stack-size"
 #define OPTION_PACK_IRAM        "--pack-iram"
 #define OPTION_NO_PEEP_COMMENTS "--no-peep-comments"
 #define OPTION_OPT_CODE_SPEED   "--opt-code-speed"
@@ -172,12 +172,10 @@ optionsTable[] = {
     { 0,    OPTION_SMALL_MODEL,     NULL, "internal data space is used (default)" },
 #if !OPT_DISABLE_DS390
     { 0,    OPTION_FLAT24_MODEL,    NULL, "use the flat24 model for the ds390 (default)" },
-#endif
-    { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
-#if !OPT_DISABLE_DS390
     { 0,    OPTION_STACK_8BIT,      NULL, "use the 8bit stack for the ds390 (not supported yet)" },
     { 0,    "--stack-10bit",        &options.stack10bit, "use the 10bit stack for ds390 (default)" },
 #endif
+    { 0,    "--stack-auto",         &options.stackAuto, "Stack automatic variables" },
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
     { 0,    "--int-long-reent",     &options.intlong_rent, "Use reenterant calls on the int and long support functions" },
     { 0,    "--float-reent",        &options.float_rent, "Use reenterant calls on the float support functions" },
@@ -1337,6 +1335,13 @@ parseCmdLine (int argc, char **argv)
       /* else no module given: help text is displayed */
     }
 
+  /* set int, long and float reentrancy based on stack-auto */
+  if (options.stackAuto)
+    {
+      options.intlong_rent++;
+      options.float_rent++;
+    }
+
   /* set up external stack location if not explicitly specified */
   if (!options.xstack_loc)
     options.xstack_loc = options.xdata_loc;
@@ -1450,8 +1455,12 @@ linkEdit (char **envp)
               WRITE_SEG_LOC (DATA_NAME, options.data_loc);
             }
 
-          /* xdata start */
-          WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
+          /* xdata segment start. If zero, the linker chooses
+             the best place for xdata */
+          if(options.xdata_loc)
+            {
+              WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
+            }
 
           /* indirect data */
           if (IDATA_NAME)
@@ -1459,14 +1468,14 @@ linkEdit (char **envp)
               WRITE_SEG_LOC (IDATA_NAME, options.idata_loc);
             }
 
-            /* bit segment start */
-            WRITE_SEG_LOC (BIT_NAME, 0);
+          /* bit segment start */
+          WRITE_SEG_LOC (BIT_NAME, 0);
 
-            /* stack start */
-            if ( (options.stack_loc) && (options.stack_loc<0x100) )
-              {
-                WRITE_SEG_LOC ("SSEG", options.stack_loc);
-              }
+          /* stack start */
+          if ( (options.stack_loc) && (options.stack_loc<0x100) )
+            {
+              WRITE_SEG_LOC ("SSEG", options.stack_loc);
+            }
         }
       else /*For the z80, gbz80*/
         {
@@ -1494,7 +1503,7 @@ linkEdit (char **envp)
             {
               switch (options.model)
                 {
-                  case MODEL_SMALL:
+                case MODEL_SMALL:
                   c = "small";
                   break;
                 case MODEL_LARGE:

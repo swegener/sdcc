@@ -64,7 +64,7 @@ _xa51_init (void)
 }
 
 static void
-_xa51_reset_regparm ()
+_xa51_reset_regparm (void)
 {
   regParmFlg = 0;
 }
@@ -275,6 +275,7 @@ PORT xa51_port =
     "CSEG    (CODE)",
     "DSEG    (DATA)",
     NULL, //"ISEG    (DATA)",
+    NULL, //"PSEG    (PAG,XDATA)",
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     NULL, //"RSEG    (DATA)",

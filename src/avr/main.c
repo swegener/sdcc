@@ -42,7 +42,7 @@ _avr_init (void)
 }
 
 static void
-_avr_reset_regparm ()
+_avr_reset_regparm (void)
 {
 	regParmFlg = 0;
 }
@@ -207,6 +207,7 @@ PORT avr_port = {
 	 "CSEG",
 	 "DSEG",
 	 "ISEG",
+	 NULL, //PSEG
 	 "XSEG",
 	 "BSEG",
 	 "RSEG",

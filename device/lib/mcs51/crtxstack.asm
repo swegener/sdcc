@@ -46,7 +46,7 @@ __sdcc_init_xstack::
 
 	.area GSINIT5 (CODE)
 
-; Need to initialize in GSINIT5 because __mcs51_genXINIT modifies __PAGESFR
+; Need to initialize in GSINIT5 because __mcs51_genXINIT modifies __XPAGE
 ; and __mcs51_genRAMCLEAR modifies _spx.
 	
 	mov	__XPAGE,#(__start__xstack >> 8)

@@ -436,6 +436,7 @@ PORT pic_port =
 		"code",
 		"DSEG    (DATA)",
 		"ISEG    (DATA)",
+		NULL, /* pdata */
 		"XSEG    (XDATA)",
 		"BSEG    (BIT)",
 		"RSEG    (DATA)",

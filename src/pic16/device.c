@@ -562,7 +562,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 {
   static int abs_usection_no=0;
   regs *r, *rprev;
-  int init_addr, i;
+  unsigned int init_addr, i;
   regs **rlist;
   regs *r1;
 
@@ -587,7 +587,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
 			fprintf(of, "%s\tres\t%d\n", r->name, r->size);
 		}
 	} else {
-	  int j=0;
+	  unsigned int j=0;
 	  int deb_addr=0;
 
 		rprev = NULL;
@@ -647,7 +647,7 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 {
   static int abs_isection_no=0;
   symbol *s, *sprev;
-  int init_addr, i;
+  unsigned int init_addr, i;
   symbol **slist;
 
 	/* put all symbols in an array */
@@ -688,7 +688,7 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
 				
 		}
 	} else {
-	  int j=0;
+	  unsigned int j=0;
 	  symbol *s1;
 	  
 		sprev = NULL;

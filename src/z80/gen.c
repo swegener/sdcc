@@ -2397,7 +2397,7 @@ genUminusFloat (operand * op, operand * result)
   emitDebug("; genUminusFloat");
 
   /* for this we just need to flip the
-     first it then copy the rest in place */
+     first bit then copy the rest in place */
   size = AOP_SIZE (op) - 1;
 
   _moveA(aopGet (AOP (op), MSB32, FALSE));
@@ -7431,7 +7431,7 @@ _rleCommit(RLECTX *self)
     chunks.
 */
 static void
-_rleAppend(RLECTX *self, int c)
+_rleAppend(RLECTX *self, unsigned c)
 {
   int i;
 

@@ -9,6 +9,7 @@ memmap *xstack = NULL;		/* xternal stack data          */
 memmap *istack = NULL;		/* internal stack              */
 memmap *code = NULL;		/* code segment                */
 memmap *data = NULL;		/* internal data upto 128      */
+memmap *pdata = NULL;		/* paged external data         */
 memmap *xdata = NULL;		/* external data               */
 memmap *xidata = NULL;          /* the initialized xdata       */
 memmap *xinit = NULL;           /* the initializers for xidata */
@@ -175,6 +176,22 @@ initMem ()
     overlay = NULL;
   }
 
+  /* Xternal paged segment ;   
+     SFRSPACE       -   NO
+     FAR-SPACE      -   YES
+     PAGED          -   YES
+     DIRECT-ACCESS  -   NO
+     BIT-ACCESS     -   NO
+     CODE-ACESS     -   NO 
+     DEBUG-NAME     -   'P'
+     POINTER-TYPE   -   PPOINTER
+   */
+  if (PDATA_NAME) {
+    pdata = allocMap (0, 1, 1, 0, 0, 0, options.xstack_loc, PDATA_NAME, 'P', PPOINTER);
+  } else {
+    pdata = NULL;
+  }
+
   /* Xternal Data segment - 
      SFRSPACE       -   NO
      FAR-SPACE      -   YES
@@ -189,7 +206,7 @@ initMem ()
   xidata = allocMap (0, 1, 0, 0, 0, 0, 0, XIDATA_NAME, 'F', FPOINTER);
   xinit = allocMap (0, 1, 0, 0, 0, 1, 0, XINIT_NAME, 'C', CPOINTER);
 
-  /* Inderectly addressed internal data segment
+  /* Indirectly addressed internal data segment
      SFRSPACE       -   NO
      FAR-SPACE      -   NO
      PAGED          -   NO
@@ -203,7 +220,7 @@ initMem ()
     idata = allocMap (0, 0, 0, 0, 0, 0, options.idata_loc, 
 		      IDATA_NAME, 'G', IPOINTER);
   } else {
-    idata=NULL;
+    idata = NULL;
   }
 
   /* Static segment (code for variables );
@@ -327,21 +344,21 @@ allocGlobal (symbol * sym)
          then put it in the interrupt service array */
       if (FUNC_ISISR (sym->type) && !options.noiv
           && (FUNC_INTNO (sym->type) != INTNO_UNSPEC))
-	{
-	  if (interrupts[FUNC_INTNO (sym->type)])
-	    werror (E_INT_DEFINED,
-		    FUNC_INTNO (sym->type),
-		    interrupts[FUNC_INTNO (sym->type)]->name);
-	  else
-	    interrupts[FUNC_INTNO (sym->type)] = sym;
+        {
+          if (interrupts[FUNC_INTNO (sym->type)])
+            werror (E_INT_DEFINED,
+                    FUNC_INTNO (sym->type),
+                    interrupts[FUNC_INTNO (sym->type)]->name);
+          else
+            interrupts[FUNC_INTNO (sym->type)] = sym;
 
-	  /* automagically extend the maximum interrupts */
-	  if (FUNC_INTNO (sym->type) >= maxInterrupts)
-	    maxInterrupts = FUNC_INTNO (sym->type) + 1;
-	}
+          /* automagically extend the maximum interrupts */
+          if (FUNC_INTNO (sym->type) >= maxInterrupts)
+            maxInterrupts = FUNC_INTNO (sym->type) + 1;
+	    }
       /* if it is not compiler defined */
       if (!sym->cdef)
-	allocIntoSeg (sym);
+        allocIntoSeg (sym);
 
       return;
     }
@@ -377,8 +394,8 @@ allocGlobal (symbol * sym)
 
   if(!TARGET_IS_PIC16 || (TARGET_IS_PIC16 && sym->level))
   /* register storage class ignored changed to FIXED */
-  if (SPEC_SCLS (sym->etype) == S_REGISTER)
-    SPEC_SCLS (sym->etype) = S_FIXED;
+    if (SPEC_SCLS (sym->etype) == S_REGISTER)
+      SPEC_SCLS (sym->etype) = S_FIXED;
 
   /* if data specified then  */
   if (SPEC_SCLS (sym->etype) == S_DATA)
@@ -418,9 +435,9 @@ allocGlobal (symbol * sym)
       // should we move this to the initialized data segment?
       if (port->genXINIT &&
 	  sym->ival && (sym->level==0) && !SPEC_ABSA(sym->etype)) {
-	SPEC_OCLS(sym->etype)=xidata;
+        SPEC_OCLS(sym->etype)=xidata;
       } else {
-	SPEC_OCLS (sym->etype) = xdata;
+        SPEC_OCLS (sym->etype) = xdata;
       }
       allocIntoSeg (sym);
       return;
@@ -429,6 +446,14 @@ allocGlobal (symbol * sym)
   if (SPEC_SCLS (sym->etype) == S_IDATA)
     {
       SPEC_OCLS (sym->etype) = idata;
+      sym->iaccess = 1;
+      allocIntoSeg (sym);
+      return;
+    }
+
+  if (SPEC_SCLS (sym->etype) == S_PDATA)
+    {
+      SPEC_OCLS (sym->etype) = pdata;
       sym->iaccess = 1;
       allocIntoSeg (sym);
       return;
@@ -463,7 +488,7 @@ allocParms (value * val)
          it as a local variable by adding it
          to the first block we see in the body */
       if (IS_REGPARM (lval->etype))
-	continue;
+        continue;
 
       /* mark it as my parameter */
       lval->sym->ismyparm = 1;
@@ -472,20 +497,20 @@ allocParms (value * val)
 
       /* if automatic variables r 2b stacked */
       if (options.stackAuto || IFFUNC_ISREENT (currFunc->type))
-	{
+        {
 
-	  if (lval->sym)
-	    lval->sym->onStack = 1;
+          if (lval->sym)
+            lval->sym->onStack = 1;
 
 	  /* choose which stack 2 use   */
 	  /*  use xternal stack */
 	  if (options.useXstack)
 	    {
-	      /* PENDING: stack direction support */
-	      SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xstack;
-	      SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
-		xstackPtr - getSize (lval->type);
-	      xstackPtr -= getSize (lval->type);
+          /* PENDING: stack direction support */
+          SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xstack;
+          SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
+            xstackPtr - getSize (lval->type);
+          xstackPtr -= getSize (lval->type);
 	    }
 	  else
 	    {			/* use internal stack   */
@@ -623,7 +648,7 @@ allocLocal (symbol * sym)
 
   /* this is automatic           */
 
-  /* if it to be placed on the stack */
+  /* if it's to be placed on the stack */
   if (options.stackAuto || reentrant) {
     sym->onStack = 1;
     if (options.useXstack) {
@@ -833,15 +858,15 @@ allocVariables (symbol * symChain)
       /* if this is a function or a pointer to function */
       /* then args  processing  */
       if (funcInChain (csym->type))
-	{
-	  processFuncArgs (csym);
+        {
+          processFuncArgs (csym);
 
-	  /* if register bank specified then update maxRegBank */
-	  if (maxRegBank < FUNC_REGBANK (csym->type))
-	    maxRegBank = FUNC_REGBANK (csym->type);
-	  /*JCF: Mark the register bank as used*/
-      RegBankUsed[FUNC_REGBANK(csym->type)]=1;
-	}
+          /* if register bank specified then update maxRegBank */
+          if (maxRegBank < FUNC_REGBANK (csym->type))
+            maxRegBank = FUNC_REGBANK (csym->type);
+          /*JCF: Mark the register bank as used*/
+          RegBankUsed[FUNC_REGBANK(csym->type)]=1;
+        }
 
       /* if this is a extern variable then change the */
       /* level to zero temporarily                                    */

@@ -542,6 +542,34 @@ union bil {
                         |3.0|         G
                           |-------> only this side 32 x 32 -> 32
 */
+#if defined(SDCC_USE_XSTACK)
+// currently the original code without u fails with --xstack
+// it runs out of pointer registers
+long
+_mullong (long a, long b)
+{
+        union bil t, u;
+
+        t.i.hi   = bcast(a)->b.b0 * bcast(b)->b.b2;          // A
+        t.i.lo   = bcast(a)->b.b0 * bcast(b)->b.b0;          // A
+        u.bi.b3  = bcast(a)->b.b0 * bcast(b)->b.b3;          // B
+        u.bi.i12 = bcast(a)->b.b0 * bcast(b)->b.b1;          // B
+        u.bi.b0  = 0;                                        // B
+        t.l += u.l;
+
+        t.b.b3  += bcast(a)->b.b3 * bcast(b)->b.b0;          // G
+        t.b.b3  += bcast(a)->b.b2 * bcast(b)->b.b1;          // F
+        t.i.hi  += bcast(a)->b.b2 * bcast(b)->b.b0;          // E
+        t.i.hi  += bcast(a)->b.b1 * bcast(b)->b.b1;          // D
+
+        u.bi.b3  = bcast(a)->b.b1 * bcast(b)->b.b2;          // C
+        u.bi.i12 = bcast(a)->b.b1 * bcast(b)->b.b0;          // C
+        u.bi.b0  = 0;                                        // C
+        t.l += u.l;
+
+        return t.l;
+}
+#else
 long
 _mullong (long a, long b)
 {
@@ -572,5 +600,6 @@ _mullong (long a, long b)
 
         return t.l + b;
 }
+#endif
 
 #endif // _MULLONG_ASM

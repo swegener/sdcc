@@ -857,6 +857,7 @@ PORT pic16_port =
     "CSEG    (CODE)",		// code
     "DSEG    (DATA)",		// data
     "ISEG    (DATA)",		// idata
+    NULL,					// pdata
     "XSEG    (XDATA)",		// xdata
     "BSEG    (BIT)",		// bit
     "RSEG    (DATA)",		// reg

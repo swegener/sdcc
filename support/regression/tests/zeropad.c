@@ -1,6 +1,6 @@
 /** Zeropad tests.
 
-    storage: idata, xdata, code,
+    storage: idata, pdata, xdata, code,
 */
 #ifndef STORAGE
 #define STORAGE {storage}
@@ -22,12 +22,14 @@ typedef unsigned int size_t;
 
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
 # define idata
+# define pdata
 # define xdata
 # define code
 #endif
 
 #if defined(SDCC_hc08)
 # define idata data
+# define pdata data
 #endif
 
 const char *string1 = "\x00\x01";

@@ -62,7 +62,7 @@ _hc08_init (void)
 }
 
 static void
-_hc08_reset_regparm ()
+_hc08_reset_regparm (void)
 {
   regParmFlg = 0;
 }
@@ -423,6 +423,7 @@ PORT hc08_port =
     "CSEG (CODE)",
     "DSEG",
     NULL, /* "ISEG" */
+    NULL, /* "PSEG" */
     "XSEG",
     "BSEG",
     "RSEG",

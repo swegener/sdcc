@@ -58,7 +58,7 @@ _mcs51_init (void)
 }
 
 static void
-_mcs51_reset_regparm ()
+_mcs51_reset_regparm (void)
 {
   regParmFlg = 0;
 }
@@ -152,7 +152,27 @@ _mcs51_genAssemblerPreamble (FILE * of)
 static int
 _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 {
-  return FALSE;
+  int i;
+
+  fprintf (of, "\tljmp\t__sdcc_gsinit_startup\n");
+
+  /* now for the other interrupts */
+  for (i = 0; i < maxInterrupts; i++)
+    {
+      if (interrupts[i])
+        {
+          fprintf (of, "\tljmp\t%s\n", interrupts[i]->rname);
+          if ( i != maxInterrupts - 1 )
+            fprintf (of, "\t.ds\t5\n");
+        }
+      else
+        {
+          fprintf (of, "\treti\n");
+          if ( i != maxInterrupts - 1 )
+            fprintf (of, "\t.ds\t7\n");
+        }
+    }
+  return TRUE;
 }
 
 static void	  
@@ -178,7 +198,6 @@ _mcs51_genInitStartup (FILE *of)
     {
       tfprintf (of, "\t!global\n", "__sdcc_init_xstack");
       tfprintf (of, "\t!global\n", "__start__xstack");
-      fprintf (of, "__start__xstack = 0x%04x", options.xdata_loc);
     }
 
   // if the port can copy the XINIT segment to XISEG
@@ -686,11 +705,12 @@ PORT mcs51_port =
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
   {
-    "XSEG    (XDATA)",
+    "XSTK    (PAG,XDATA)",
     "STACK   (DATA)",
     "CSEG    (CODE)",
     "DSEG    (DATA)",
     "ISEG    (DATA)",
+    "PSEG    (PAG,XDATA)",
     "XSEG    (XDATA)",
     "BSEG    (BIT)",
     "RSEG    (DATA)",

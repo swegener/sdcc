@@ -1,3 +1,55 @@
+2004-10-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/lkarea.c: removed old K&R style,
+	  (lnksect): changed check on boundary error,
+	  (lnksect2): changed check on boundary error,
+	  (lnksect2): extend XSTK to end of page if size = 1
+	* as/mcs51/lkmain.c: removed old K&R style,
+	  (Areas51): create l_IRAM symbol
+	* as/mcs51/lkmem.c (summary2): added report on PSEG and XSTK
+	* device/lib/Makefile.in: renamed model-mcs51-reentrant to
+	  model-mcs51-stack-auto, added model-mcs51-xstack-auto
+	* device/lib/_mullong.c: added version to be compiled with xstack
+	* device/lib/mcs51/crtclear.asm: clear only upto --iram-size
+	* device/lib/mcs51/crtxclear.asm: clear pdata as well
+	* device/lib/mcs51/crtxstack.asm: fixed comment
+	* src/SDCCglue.c: maxInterrupts defaults to 0,
+	  (emitMaps): added pdata,
+	  (createInterruptVect): (re)moved default,
+	  (glue): added pdata,
+	  (glue): moved __start__xstack to XSTK with default size 1
+	* src/SDCCmain.c (parseCmdLine): automatically set options.intlong_rent
+	  and options.float_rent when options.stackAuto is set,
+	  (linkEdit): only write XDATA_NAME if provided on command line
+	* src/SDCCmem.h,
+	* src/SDCCmem.c: added pdata
+	* src/port.h: added pdata_name to PORT
+	* src/mcs51/gen.c (toBoolean): fixed for Acc use of aopGet,
+	  (saveRegisters, unsaveRegisters): removed usage of B,
+	  (genMinus): fixed accumulator clash,
+	  (genJumpTab): added comment, this needs another look
+	* src/mcs51/gen.c: added check for "B in use" paranoia,
+	  added pushB() and popB()
+	* src/mcs51/peeph.def: restart after 177.c so 177.a can get a second
+	  chance
+	* src/avr/main.c,
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/mcs51/main.c,
+	* src/pic/main.c,
+	* src/pic16/main.c,
+	* src/xa51/main.c,
+	* src/z80/main.c: (reset_regparms) made void parameter explicit and
+	  added PSEG (PAG,XDATA) or NULL to port specifier
+	* src/ds390/main.c (_ds390_genIVT): moved implemented default in here
+	* src/mcs51/main.c (_mcs51_genIVT): moved implemented default in here,
+	  (_mcs51_genInitStartup): removed __start__xstack equ,
+	  (mcs51_port): moved xstack from XSEG (XDATA) to XSTK (PAG,XDATA)
+	* src/pic16/device.c (pic16_dump_usection, pic16_dump_isection),
+	* src/z80/gen.c (_rleAppend): fixed warnings
+	* support/regression/tests/zeropad.c: added pdata test
+	* .version: bumped to 2.4.6
+
 2004-10-17 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: cross compiling of WIN32 setup.exe on Linux

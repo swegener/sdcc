@@ -112,7 +112,7 @@ _gbz80_init (void)
 }
 
 static void
-_reset_regparm ()
+_reset_regparm (void)
 {
   _G.regParams = 0;
 }
@@ -603,6 +603,7 @@ PORT z80_port =
     "CODE",
     "DATA",
     "ISEG",
+    NULL, /* pdata */
     "XSEG",
     "BSEG",
     "RSEG",
@@ -718,6 +719,7 @@ PORT gbz80_port =
     "CODE",
     "DATA",
     "ISEG",
+    NULL, /* pdata */
     "XSEG",
     "BSEG",
     "RSEG",

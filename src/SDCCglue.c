@@ -39,10 +39,9 @@ symbol *interrupts[INTNO_MAX+1];
 
 void printIval (symbol *, sym_link *, initList *, FILE *);
 set *publics = NULL;            /* public variables */
-set *externs = NULL;            /* Varibles that are declared as extern */
+set *externs = NULL;            /* Variables that are declared as extern */
 
-/* TODO: this should be configurable (DS803C90 uses more than 6) */
-unsigned maxInterrupts = 6;
+unsigned maxInterrupts = 0;
 int allocInfo = 1;
 symbol *mainf;
 set *pipeSet = NULL;            /* set of pipes */
@@ -1321,6 +1320,7 @@ emitMaps (void)
   emitRegularMap (data, TRUE, TRUE);
   emitRegularMap (idata, TRUE, TRUE);
   emitRegularMap (bit, TRUE, FALSE);
+  emitRegularMap (pdata, TRUE, TRUE);
   emitRegularMap (xdata, TRUE, TRUE);
   if (port->genXINIT) {
     emitRegularMap (xidata, TRUE, TRUE);
@@ -1355,7 +1355,6 @@ flushStatics (void)
 void 
 createInterruptVect (FILE * vFile)
 {
-  unsigned i = 0;
   mainf = newSymbol ("main", 0);
   mainf->block = 0;
 
@@ -1382,28 +1381,8 @@ createInterruptVect (FILE * vFile)
 
   if (!port->genIVT || !(port->genIVT (vFile, interrupts, maxInterrupts)))
     {
-      /* "generic" interrupt table header (if port doesn't specify one).
-       * Look suspiciously like 8051 code to me...
-       */
-
-      fprintf (vFile, "\tljmp\t__sdcc_gsinit_startup\n");
-
-      /* now for the other interrupts */
-      for (; i < maxInterrupts; i++)
-        {
-          if (interrupts[i])
-            {
-              fprintf (vFile, "\tljmp\t%s\n", interrupts[i]->rname);
-              if ( i != maxInterrupts - 1 )
-                fprintf (vFile, "\t.ds\t5\n");
-            }
-          else
-            {
-              fprintf (vFile, "\treti\n");
-              if ( i != maxInterrupts - 1 )
-                fprintf (vFile, "\t.ds\t7\n");
-            }
-        }
+      /* There's no such thing as a "generic" interrupt table header. */
+      wassert(0);
     }
 }
 
@@ -1774,18 +1753,26 @@ glue (void)
     copyFile (asmFile, bit->oFile);
   }
 
-  /* if external stack then reserve space of it */
+  /* copy paged external ram data */
+  if (mcs51_like)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; paged external ram data\n");
+      fprintf (asmFile, "%s", iComments2);
+      copyFile (asmFile, pdata->oFile);
+    }
+
+  /* if external stack then reserve space for it */
   if (mainf && IFFUNC_HASBODY(mainf->type) && options.useXstack)
     {
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; external stack \n");
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "\t.area XSEG (XDATA)\n");      /* MOF */
-      fprintf (asmFile, "\t.ds 256\n");
+      fprintf (asmFile, "\t.area XSTK (PAG,XDATA)\n"
+               "__start__xstack:\n\t.ds\t1\n\n");
     }
 
-
-  /* copy xtern ram data */
+  /* copy external ram data */
   if (mcs51_like) {
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; external ram data\n");
@@ -1793,7 +1780,7 @@ glue (void)
     copyFile (asmFile, xdata->oFile);
   }
 
-  /* copy xternal initialized ram data */
+  /* copy external initialized ram data */
   fprintf (asmFile, "%s", iComments2);
   fprintf (asmFile, "; external initialized ram data\n");
   fprintf (asmFile, "%s", iComments2);
@@ -1930,9 +1917,9 @@ glue (void)
 
 /** Creates a temporary file with unique file name
     Scans, in order:
-    - TMP, TEMP, TMPDIR env. varibles
+    - TMP, TEMP, TMPDIR env. variables
     - if Un*x system: /usr/tmp and /tmp
-    - root directory using mkstemp() if avaliable
+    - root directory using mkstemp() if available
     - default location using tempnam()
 */
 static int

@@ -1022,7 +1022,7 @@ replace {
 
 // applies to f.e. bug-408972.c
 // not before peephole 177.c
-replace {
+replace restart {
 	mov	%1,%2
 	mov	%3,%4
 	mov	%2,%1

@@ -42,11 +42,10 @@ endif
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/bin/sdcc
-PACKIHX		= $(PRJDIR)/bin/packihx
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: ports checkconf $(LIBGC) $(TARGET) $(PACKIHX)
+all: ports checkconf $(LIBGC) $(TARGET)
 
 ports:
 	for i in $(PORTS); do $(MAKE) -C $$i; done
@@ -58,7 +57,6 @@ $(PRJDIR)/support/gc/libgc.a:
 # ---------------------------------------------------
 install: all installdirs
 	$(INSTALL) -s $(TARGET) $(bindir)/sdcc
-	$(INSTALL) $(PACKIHX) $(bindir)/packihx
 
 
 # Deleting all the installed files
@@ -98,9 +96,6 @@ include clean.mk
 # --------
 $(TARGET): $(OBJECTS) $(PORT_LIBS)
 	$(CC) -o $@ $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
-
-$(PACKIHX): packihx
-	  $(INSTALL) packihx $(PACKIHX)
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

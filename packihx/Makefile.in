@@ -8,7 +8,7 @@ OBJECTS 	= packihx.o
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
-TARGET		= packihx
+TARGET		= $(PRJDIR)/bin/packihx
 
 all: $(TARGET)
 
@@ -50,10 +50,4 @@ $(TARGET): $(OBJECTS)
 
 checkconf:
 
-clean:
-	rm -f *core *[%~] *.[oa] *.output
-	rm -f .[a-z]*~ \#*
-	rm -f packihx
-
-distclean: clean
-	rm -f config.*
+include clean.mk

@@ -9,11 +9,12 @@ PRJDIR		= .
 SDCC_MISC	= debugger/mcs51 sim/ucsim
 SDCC_LIBS	= support/cpp
 SDCC_ASLINK	= as/mcs51 as link
+SDCC_PACKIHX	= packihx
 
 PKGS		= $(SDCC_MISC) $(SDCC_LIBS) $(SDCC_ASLINK) \
-		  src device/include device/lib
+		  src device/include device/lib $(SDCC_PACKIHX)
 PKGS_TINI	= $(SDCC_LIBS) $(SDCC_ASLINK) \
-		  src device/include
+		  src device/include $(SDCC_PACKIHX)
 PORTS		= mcs51 z80
 
 srcdir          = .
@@ -41,6 +42,9 @@ sdcc-aslink:
 sdcc-misc:
 	for misc in $(SDCC_MISC); do $(MAKE) -C $$misc; done
 
+sdcc-packihx:
+	$(MAKE) -C $(SDCC_PACKIHX)
+
 sdcc-device:
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib
@@ -49,10 +53,10 @@ sdcc-device-tini:
 	$(MAKE) -C device/include
 	$(MAKE) -C device/lib modelDS390
 
-sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc-device
+sdcc: sdcc-cc sdcc-aslink sdcc-misc sdcc-device sdcc-packihx
 	$(MAKE) -f main.mk all
 
-sdcc-tini: sdcc-cc sdcc-aslink sdcc-device-tini
+sdcc-tini: sdcc-cc sdcc-aslink sdcc-device-tini sdcc-packihx
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules

@@ -886,6 +886,21 @@ eBBlockFromiCode (iCode * ic)
 
     }
 
+  // this is a good place to check missing return values
+  if (currFunc) {
+    if (!IS_VOID(currFunc->type->next)) {
+      eBBlock *bp;
+      // make sure all predecessors of the last block end in a return
+      for (bp=setFirstItem(ebbs[saveCount-1]->predList); 
+	   bp; 
+	   bp=setNextItem(ebbs[saveCount-1]->predList)) {
+	if (bp->ech->op != RETURN) {
+	  werror (E_VOID_FUNC, currFunc->name);
+	}
+      }
+    }
+  }
+
   /* sort it back by block number */
   qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);
 
@@ -916,6 +931,8 @@ eBBlockFromiCode (iCode * ic)
   /* throw away blocks */
   setToNull ((void **) &graphEdges);
   ebbs = NULL;
+  
+  currFunc=NULL;
 
   return NULL;
 }

@@ -570,7 +570,7 @@ iCode *copyiCode (iCode *ic)
 
     case JUMPTABLE:
 	IC_JTCOND(nic) = operandFromOperand(IC_JTCOND(ic));
-	IC_JTLABELS(nic) = IC_JTLABLES(ic);
+	IC_JTLABELS(nic) = IC_JTLABELS(ic);
 	break;
 
     case CALL:
@@ -581,7 +581,7 @@ iCode *copyiCode (iCode *ic)
 	break;
 
     case INLINEASM:
-	IC_INLINE(nic) = IC_ININE(ic);
+	IC_INLINE(nic) = IC_INLINE(ic);
 	break;
 	
     default:

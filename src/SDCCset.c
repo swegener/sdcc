@@ -405,6 +405,26 @@ elementsInSet (set * s)
 }
 
 /*-----------------------------------------------------------------*/
+/* reverseSet - reverse the order of the items of a set            */
+/*-----------------------------------------------------------------*/
+
+set *
+reverseSet(set * s)
+{
+  set *t = NULL;
+  set *u = NULL;
+
+  while(s->next) {
+    t = s->next;
+    s->next = u;
+    u = s;
+    s = t;
+  }
+  s->next = u;
+  return s;
+}
+
+/*-----------------------------------------------------------------*/
 /* subtractFromSet - take away from set1 elements of set2          */
 /*-----------------------------------------------------------------*/
 set *

@@ -78,6 +78,6 @@ void *peekSet (set *);
 void *setFirstItem (set *);
 void *setNextItem (set *);
 void setToNull (void **);
-
+set *reverseSet (set *);
 
 #endif

@@ -999,6 +999,25 @@ picglue ()
   FILE *asmFile;
   FILE *ovrFile = tempfile();
   int i;
+  set *s=NULL,*t=NULL;
+  char a=1,b=2,c=3;
+
+
+  addSet(&s,&a);
+  addSet(&s,&b);
+  addSet(&s,&c);
+
+  fprintf(stdout,"\n\n\n******************\n\n\n");
+  for(t=s; t; t=t->next) {
+    if(t->item) 
+      fprintf(stdout,"Set item %d\n",*(char *)t->item);
+  }
+
+  s =reverseSet(s);
+  for(t=s; t; t=t->next) {
+    if(t->item) 
+      fprintf(stdout,"Set item %d\n",*(char *)t->item);
+  }
 
   addSetHead(&tmpfileSet,ovrFile);
 

@@ -2443,8 +2443,9 @@ void pBlockStats(FILE *of, pBlock *pb)
     fprintf(of,";functions called:\n");
 
     while(pc) {
-      fprintf(of,";   ");
-      pc->print(of,pc);
+      if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
+	fprintf(of,";   %s\n",get_op(PCI(pc)));
+      }
       pc = setNextItem(pb->function_calls);
     }
   }

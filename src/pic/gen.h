@@ -157,7 +157,7 @@ pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *popGetLit(unsigned int lit);
 pCodeOp *popGetWithString(char *str);
 pCodeOp *popRegFromString(char *str);
-pCodeOp *popGet (asmop *aop, int offset, bool bit16, bool dname);
+pCodeOp *popGet (asmop *aop, int offset);//, bool bit16, bool dname);
 
 
 void aopPut (asmop *aop, char *s, int offset);

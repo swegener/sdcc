@@ -110,6 +110,16 @@ call8(unsigned char uc1,unsigned char uc2)
   return uc1+uc2;
 }
 
+void call9(unsigned int ui1, unsigned int ui2)
+{
+
+  if(ui1 != 0x1234)
+    failures++;
+  if(ui2 != 0x5678)
+    failures++;
+
+}
+
 void
 main (void)
 {
@@ -144,6 +154,8 @@ main (void)
 
   if(uchar0 != 7)
     failures++;
+
+  call9(0x1234,0x5678);
 
   success = failures;
   done ();

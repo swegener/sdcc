@@ -5,12 +5,12 @@ $Id$
 
 Welcome to SDCC, a freeware, retargettable, optimizing ANSI C compiler
 that supports a growing list of processors including the Intel mcs51
-family, the Zilog Z80, and the ds390.
+family, the Zilog z80 and the Maxim ds390.
 
-See share/doc/sdcc/INSTALL.txt for the installation instructions for
+See share/sdcc/doc/INSTALL.txt for the installation instructions for
 the binary kits.
 
-See the share/doc/sdcc directory for more documentation.
+See the share/sdcc/doc directory for more documentation.
 
 See http://sdcc.sourceforge.net/ for the latest information on sdcc.
 
@@ -36,8 +36,9 @@ questions on the user mailing list.  See:
 
 
 Notes:
-* The avr, and pic ports are currently experimental.
-
+* The hc08, ds400, pic14 and pic16 are currently experimental, but work is in
+progress. Please check http://sdcc.sourceforge.net/snap.php for snapshots.
+* The TININative, gbz80, avr and xa51 ports are no longer maintained.
 
 Roadmap:
 COPYING		- GPL v2
@@ -52,25 +53,33 @@ support/	- Libraries and apps that may not be provided by your system.
 
 
 Authors and interested persons:
-* Sandeep Dutta (sandeep@users.sourceforge.net)
+* Sandeep Dutta (sandeep AT users.sourceforge.net)
 
-* Daniel Drotos     <drdani@mazsola.iit.uni-miskolc.hu>
-* Jean Loius-VERN   <jlvern@writeme.com>
-* Johan Knol        <johan.knol@iduna.nl>
-* Karl Bongers      <karl@turbobit.com>
-* Kevin Vigor       <kevin@vigor.nu>
-* Michael Hope      <michaelh@juju.net.nz> <nz_michaelh@yahoo.com>
-* Scott Dattalo     <scott@dattalo.com> 
-
+* Daniel Drotos       <drdani AT mazsola.iit.uni-miskolc.hu>
+* Jean Loius-VERN     <jlvern AT writeme.com>
+* Johan Knol          <johan.knol AT iduna.nl>
+* Karl Bongers        <karl AT turbobit.com>
+* Kevin Vigor         <kevin AT vigor.nu>
+* Michael Hope        <michaelh AT juju.net.nz> <nz_michaelh AT yahoo.com>
+* Scott Dattalo       <scott AT dattalo.com>
+* Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+* Hans-Juergen Dorn   <hans.dorn AT apl-landau.de>
+* Daniel Drotos       <drdani AT mazsola.lit.uni.miskolc.hu>
+* Frieder Ferlemann   <frieder.ferlemann AT web.de>
+* Klaus Flittner      <klaus_flittner AT gmx.de>
+* Bernhard Held       <bernhard AT bernhardheld.de>
+* Erik Petrich        <epetrich AT ivorytower.norman.ok.us>
+* Borut Razem         <borut.razem AT siol.net>
+* Vangelis Rokas      <vrokas AT otenet.gr>
+* Paul Stoffregen     <paul AT pjrc.com>
 
 SDCC includes code from:
-* Alan Baldwin      <baldwin@shop-pdp.kent.edu>
+* Alan Baldwin      <baldwin AT shop-pdp.kent.edu>
    Initial version of ASXXXX and  ASLINK. 
-* John Hartman      <jhartman@compuserve.com>
+* John Hartman      <jhartman AT compuserve.com>
    Porting ASXXX and ASLINK for 8051.
-* Dmitry S. Obukhov <dso@usa.net>
+* Dmitry S. Obukhov <dso AT usa.net>
    malloc and serial I/O routines.
 * Pascal Felber
    Some of the Z80 related files are borrowed from the Gameboy
    Development Kit (GBDK).
-

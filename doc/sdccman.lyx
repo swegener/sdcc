@@ -13409,6 +13409,15 @@ External Stack
 
 \layout Standard
 
+
+\series bold 
+Attention
+\series default 
+: this option wasn't maintained for a long time and is quite buggy.
+ Small programs might work.
+ You've been warned!
+\layout Standard
+
 The external stack (-
 \begin_inset ERT
 status Collapsed

@@ -2,6 +2,9 @@
 
 	* device/include/Makefile.in (install): fixed by replacing spaces
 	by tabs
+	* doc/README.txt,
+	* doc/INSTALL.txt: updated for release
+	* doc/sdccman.lyx: added warning for --xstack being buggy
 
 2004-02-20 Bernhard Held <bernhard AT bernhardheld.de>
 

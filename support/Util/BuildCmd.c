@@ -96,6 +96,7 @@ buildCmdLine (char *into, const char **cmds,
 	break;
 
       default:
+        par = NULL;
 	assert(0);
       }
 

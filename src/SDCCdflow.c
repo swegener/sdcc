@@ -182,9 +182,8 @@ void computeDataFlow (eBBlock **ebbs, int count)
 	    /* indefitions are easy just merge them by union */
 	    /* these are the definitions that can possibly   */
 	    /* reach this block                              */
-	    firstTime = 1;	    
+	    firstTime = 1;
 	    applyToSet(pred,mergeInDefs,ebbs[i],&firstTime);
-
 
 	    /* if none of the edges coming to this block */
 	    /* dominate this block then add the immediate dominator */
@@ -205,9 +204,10 @@ void computeDataFlow (eBBlock **ebbs, int count)
 	    /* figure out the incoming expressions */
 	    /* this is a little more complex       */	    
 	    setToNull ((void **)&ebbs[i]->inExprs);
-	    firstTime = 1;
-	    applyToSet(pred,mergeInExprs,ebbs[i],&firstTime); 
-
+	    if (optimize.global_cse) {
+		    firstTime = 1;
+		    applyToSet(pred,mergeInExprs,ebbs[i],&firstTime); 
+	    }
 	    setToNull ((void **)&pred);
 	    
 	    /* do cse with computeOnly flag set to TRUE */

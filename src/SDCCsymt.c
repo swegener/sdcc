@@ -1495,7 +1495,7 @@ void  processFuncArgs   (symbol *func, int ignoreName)
 
 	    sprintf(val->name,"_%s_PARM_%d",func->name,pNum++);
 	    val->sym = newSymbol(val->name,1);
-	    SPEC_OCLS(val->etype) = (options.model ? xdata : data);
+	    SPEC_OCLS(val->etype) = port->mem.default_local_map;
 	    val->sym->type = copyLinkChain (val->type);
 	    val->sym->etype = getSpec (val->sym->type);
 	    val->sym->_isparm = 1;

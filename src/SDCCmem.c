@@ -466,7 +466,7 @@ void allocParms ( value  *val )
 		   first, we will remove it from the overlay segment
 		   after the overlay determination has been done */
 		SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = 
-		    ( options.model ? port->mem.default_local_map : 
+		    ( options.model == MODEL_SMALL ? port->mem.default_local_map : 
 		      (options.noOverlay ? port->mem.default_local_map
 		       :overlay ));
 	    
@@ -640,7 +640,7 @@ void allocLocal ( symbol *sym  )
     /* again note that we have put it into the overlay segment
        will remove and put into the 'data' segment if required after 
        overlay  analysis has been done */   
-    SPEC_OCLS(sym->etype) = ( options.model  ? port->mem.default_local_map : 
+    SPEC_OCLS(sym->etype) = ( options.model == MODEL_SMALL ? port->mem.default_local_map : 
 			      (options.noOverlay ? port->mem.default_local_map
 			       : overlay )) ;
     allocIntoSeg (sym); 
@@ -912,6 +912,58 @@ static void printAllocInfoSeg ( memmap *map, symbol *func, FILE *of)
 	/* otherwise give rname */
 	fprintf(of,"in memory with name '%s'\n",sym->rname);
     }
+}
+
+/*-----------------------------------------------------------------*/
+/* canOverlayLocals - returns true if the local variables can overlayed */
+/*-----------------------------------------------------------------*/
+static bool canOverlayLocals (eBBlock **ebbs, int count)
+{
+    int i;
+    /* if staticAuto is in effect or the current function
+       being compiled is reentrant or the overlay segment
+       is empty or no overlay option is in effect then */
+    if (options.noOverlay ||
+	options.stackAuto ||
+	(currFunc &&
+	 (IS_RENT(currFunc->etype) ||
+	  IS_ISR(currFunc->etype))) ||
+	elementsInSet(overlay->syms) == 0)
+	
+	return FALSE;
+
+    /* otherwise do thru the blocks and see if there
+       any function calls if found then return false */
+    for (i = 0; i < count ; i++ ) {
+	iCode *ic;
+
+	for (ic = ebbs[i]->sch; ic ; ic = ic->next)
+	    if (ic && ( ic->op == CALL || ic->op == PCALL))
+		return FALSE;
+    }
+
+    /* no function calls found return TRUE */
+    return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* doOverlays - move the overlay segment to appropriate location   */
+/*-----------------------------------------------------------------*/
+void doOverlays( eBBlock **ebbs, int count)
+{
+    /* check if the parameters and local variables
+       of this function can be put in the overlay segment
+       This check is essentially to see if the function
+       calls any other functions if yes then we cannot
+       overlay */
+    if (canOverlayLocals(ebbs,count))
+	/* if we can then put the parameters &
+	   local variables in the overlay set */
+	overlay2Set();       
+    else
+	/* otherwise put them into data where
+	   they belong */
+	overlay2data();
 }
 
 /*-----------------------------------------------------------------*/

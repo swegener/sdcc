@@ -7,6 +7,8 @@
 
 struct set ;
 struct value ;
+struct eBBlock;
+
 typedef  struct memmap{
     unsigned char  pageno;    /* page no for this variable  */
     const char     *sname;    /*   character prefix for map */
@@ -82,5 +84,6 @@ int         allocVariables (struct symbol  *                );
 void        overlay2Set    (                                );
 void        overlay2data   (                                );
 void        redoStackOffsets(                               );
-void        printAllocInfo (struct symbol *, FILE *);
+void        printAllocInfo (struct symbol *, FILE *         );
+void        doOverlays     (struct eBBlock **, int count    );
 #endif

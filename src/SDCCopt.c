@@ -613,38 +613,6 @@ static void printCyclomatic (eBBlock **ebbs, int count)
     werror(I_CYCLOMATIC,currFunc->name,nEdges,nNodes, nEdges - nNodes + 2);
 }
 
-/*-----------------------------------------------------------------*/
-/* canOverlayLocals - returns true if the local variables can overlayed */
-/*-----------------------------------------------------------------*/
-static bool canOverlayLocals (eBBlock **ebbs, int count)
-{
-    int i;
-    /* if staticAuto is in effect or the current function
-       being compiled is reentrant or the overlay segment
-       is empty or no overlay option is in effect then */
-    if (options.noOverlay ||
-	options.stackAuto ||
-	(currFunc &&
-	 (IS_RENT(currFunc->etype) ||
-	  IS_ISR(currFunc->etype))) ||
-	elementsInSet(overlay->syms) == 0)
-	
-	return FALSE;
-
-    /* otherwise do thru the blocks and see if there
-       any function calls if found then return false */
-    for (i = 0; i < count ; i++ ) {
-	iCode *ic;
-
-	for (ic = ebbs[i]->sch; ic ; ic = ic->next)
-	    if (ic && ( ic->op == CALL || ic->op == PCALL))
-		return FALSE;
-    }
-
-    /* no function calls found return TRUE */
-    return TRUE;
-}
-
 
 /*-----------------------------------------------------------------*/
 /* eBBlockFromiCode - creates extended basic blocks from iCode     */
@@ -767,19 +735,6 @@ eBBlock **eBBlockFromiCode (iCode *ic)
        operations to be as they are for optimzations */
     convertToFcall (ebbs,count);
 
-    /* check if the parameters and local variables
-       of this function can be put in the overlay segment
-       This check is essentially to see if the function
-       calls any other functions if yes then we cannot
-       overlay */
-    if (canOverlayLocals(ebbs,count))
-	/* if we can then put the parameters &
-	   local variables in the overlay set */
-	overlay2Set();       
-    else
-	/* otherwise put them into data where
-	   they belong */
-	overlay2data();
 
     /* compute the live ranges */
     computeLiveRanges (ebbs,count);
@@ -797,4 +752,6 @@ eBBlock **eBBlockFromiCode (iCode *ic)
 
     return NULL;
 }
+
+
 /* (add-hook 'c-mode-hook (lambda () (setq c-basic-offset 4))) */

@@ -27,7 +27,7 @@
 #define SDCCBBLOCK_H 1
 
 /* definition of a basic block */
-typedef struct eBasicBlock {
+typedef struct eBBlock {
     int dfnum ;             /* depth first number */
     int bbnum ;             /* index into array of numbers */
     int depth ;             /* loop depth of this block */
@@ -42,7 +42,7 @@ typedef struct eBasicBlock {
     iCode *sch ;            /* pointer to start of code chain */
     iCode *ech ;            /* pointer to last of code chain  */
 
-    struct eBasicBlock *preHeader ; /* preheader if this is a loop entry */
+    struct eBBlock     *preHeader ; /* preheader if this is a loop entry */
     struct region      *partOfLoop; /* pointer to the loop region this block is part of */
 
     /* control flow analysis */

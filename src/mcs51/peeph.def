@@ -2423,3 +2423,99 @@ replace {
 %3:
         sjmp    %5      
 } if labelInRange
+
+// applies to f.e. simplefloat.c (saving 1 cycle)
+replace {
+	mov	r%1,dpl
+	mov	a,r%1
+} by {
+        ;       Peephole 244.a  moving first to a instead of r%1
+	mov	a,dpl
+	mov	r%1,a
+}
+
+// applies to f.e. _itoa.c (saving 1 cycle)
+replace {
+	mov	r%1,dph
+	mov	a,r%1
+} by {
+        ;       Peephole 244.b  moving first to a instead of r%1
+	mov	a,dph
+	mov	r%1,a
+}
+
+
+// applies to f.e. bug-460010.c (saving 1 cycle)
+replace {
+	mov	r%1,a
+	mov	dpl,r%1
+} by {
+        ;       Peephole 244.c  loading dpl from a instead of r%1
+	mov	r%1,a
+	mov	dpl,a
+}
+
+replace {
+	mov	r%1,a
+	mov	dph,r%1
+} by {
+        ;       Peephole 244.d  loading dph from a instead of r%1
+	mov	r%1,a
+	mov	dph,a
+}
+
+// this one is safe but disables 245.a 245.b
+// please remove 245 if 245.a 245.b are found to be safe
+// applies to f.e. scott-compare.c
+replace {
+	clr	a
+	rlc	a
+	mov	r%1,a
+	cjne	a,#0x01,%2
+%2:	
+	clr	a
+	rlc	a
+	mov	r%1,a
+} by {
+        ;       Peephole 245    optimized complement (r%1 and acc set needed?)
+	cpl	c
+	clr	a
+	rlc	a
+	mov	r%1,a	
+} if labelRefCount %2 1
+
+// this one will not be triggered if 245 is present
+// please remove 245 if 245.a 245.b are found to be safe
+// applies to f.e. vprintf.c
+replace {
+	clr	a
+	rlc	a
+	mov	r%1,a
+	cjne	a,#0x01,%2
+%2:	
+	clr	a
+	rlc	a
+	mov	r%1,a
+	jz	%3
+} by {
+        ;       Peephole 245.a   optimized conditional jump (r%1 and acc not set!)
+	jc	%3
+} if labelRefCount %2 1
+
+// this one will not be triggered if 245 is present
+// please remove 245 if 245.a 245.b are found to be safe
+// applies to f.e. scott-compare.c
+replace {
+	clr	a
+	rlc	a
+	mov	r%1,a
+	cjne	a,#0x01,%2
+%2:	
+	clr	a
+	rlc	a
+	mov	r%1,a
+	jnz	%3
+} by {
+        ;       Peephole 245.b   optimized conditional jump (r%1 and acc not set!)
+	jnc	%3
+} if labelRefCount %2 1

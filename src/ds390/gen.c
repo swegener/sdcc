@@ -3841,12 +3841,17 @@ genMinus (iCode * ic)
       else
 	{
 	  /* first add without previous c */
-	  if (!offset)
-	    emitcode ("add", "a,#0x%02x",
-		      (unsigned int) (lit & 0x0FFL));
-	  else
+	  if (!offset) {
+	    if (!size && lit==-1) {
+	      emitcode ("dec", "a");
+	    } else {
+	      emitcode ("add", "a,#0x%02x",
+			(unsigned int) (lit & 0x0FFL));
+	    }
+	  } else {
 	    emitcode ("addc", "a,#0x%02x",
 		      (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+	  }
 	}
 
       if (pushResult)

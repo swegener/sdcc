@@ -547,7 +547,7 @@ int process_pragma(char *s)
     }
 
     if (strncmp(cp,PRAGMA_NOLOOPREV,strlen(PRAGMA_NOLOOPREV)) == 0) {
-	doPragma(P_EXCLUDE,NULL);
+	doPragma(P_LOOPREV,NULL);
 	return 0;
     }
 

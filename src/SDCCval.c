@@ -343,33 +343,31 @@ value *cheapestVal (value *val) {
   }
 
   if (SPEC_USIGN(val->type)) {
+    if (uval<=0xffff) {
+      SPEC_LONG(val->type)=0;
+      SPEC_CVAL(val->type).v_uint = uval;
+    }
     if (uval<=0xff) {
       SPEC_NOUN(val->type)=V_CHAR;
-      SPEC_LONG(val->type)=0;
-    } else {
-      if (uval<=0xffff) {
-	SPEC_LONG(val->type)=0;
-      }
     }
-  } else {
+  } else { // not unsigned
     if (sval<0) {
+      if (sval>=-32768) {
+	SPEC_LONG(val->type)=0;
+	SPEC_CVAL(val->type).v_int = sval & 0xffff;
+      }
       if (sval>=-128) {
 	SPEC_NOUN(val->type)=V_CHAR;
 	SPEC_CVAL(val->type).v_int &= 0xff;
-	SPEC_LONG(val->type)=0;
-      } else {
-	if (sval>=-32768) {
-	  SPEC_LONG(val->type)=0;
-	}
       }
-    } else {
-      if (sval<=127) {
-	SPEC_NOUN(val->type)=V_CHAR;
+    } else { // sval>=0
+      SPEC_USIGN(val->type)=1;
+      if (sval<=65535) {
 	SPEC_LONG(val->type)=0;
-      } else {
-	if (sval<=32767) {
-	  SPEC_LONG(val->type)=0;
-	}
+	SPEC_CVAL(val->type).v_int = sval;
+      }
+      if (sval<=255) {
+	SPEC_NOUN(val->type)=V_CHAR;
       }
     }
   }

@@ -146,11 +146,11 @@ SDCCFLAGS += -Ifwk/include -Itests
 # Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)
 	echo Processing $<
-	rm -rf $(CASES_DIR)/$(TESTS_NAME)
-	mkdir -p $(CASES_DIR)/$(TESTS_NAME)
+	rm -rf $(CASES_DIR)/$(PORT)/$(TESTS_NAME)
+	mkdir -p $(CASES_DIR)/$(PORT)/$(TESTS_NAME)
 	mkdir -p `dirname $@`
-	python $(GENERATE_CASES) $< > /dev/null
-	cp $(CASES_DIR)/$(TESTS_NAME)/*.c `dirname $@`
+	python $(GENERATE_CASES) $< $(CASES_DIR)/$(PORT) > /dev/null
+	cp $(CASES_DIR)/$(PORT)/$(TESTS_NAME)/*.c `dirname $@`
 	touch $@
 
 # Rule linking the combined results log to all of the files in the

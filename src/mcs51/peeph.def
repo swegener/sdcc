@@ -2070,10 +2070,35 @@ replace {
 }
 
 replace {
-        mov     r%1,a
-        mov     a,ar%1
+        sjmp    %1
+%2:
+        mov     %3,%4
+%5:
+        ret
 } by {
-        mov     r%1,a
-        ; Peephole 237   removed redundant move
+        ; Peephole 237a  removed sjmp to ret
+        ret
+%2:
+        mov     %3,%4
+%1:
+        ret
 }
 
+replace {
+        sjmp    %1
+%2:
+        mov     %3,%4
+        mov     dpl,%6
+        mov     dph,%7
+%5:
+        ret
+} by {
+        ; Peephole 237b  removed sjmp to ret
+        ret
+%2:
+        mov     %3,%4
+        mov     dpl,%6
+        mov     dph,%7
+%1:
+        ret
+}

@@ -1194,7 +1194,7 @@ linkEdit (char **envp)
 {
   FILE *lnkfile;
   char *segName, *c;
-  int i;
+  int i, system_ret;
 
   /* first we need to create the <filename>.lnk file */
   sprintf (scratchFileName, "%s.lnk", dstFileName);
@@ -1350,10 +1350,7 @@ linkEdit (char **envp)
       buildCmdLine2 (buffer, port->linker.mcmd);
     }
 
-  if (my_system (buffer))
-    {
-      exit (1);
-    }
+  system_ret = my_system (buffer);
   /* TODO: most linker don't have a -o parameter */
   /* -o option overrides default name? */
   if (fullDstFileName)
@@ -1391,6 +1388,10 @@ linkEdit (char **envp)
       strcpy (p, "mem");
       strcpy (q, "mem");
       rename (scratchFileName, fullDstFileName);
+    }
+  if (system_ret)
+    {
+      exit (1);
     }
 }
 

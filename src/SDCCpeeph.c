@@ -836,8 +836,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
       (*shead)->prev->next = lhead;
       lhead->prev = (*shead)->prev;
     }
-  else
-    *shead = lhead;
+  *shead = lhead;
   /* now for the tail */
   if (stail && stail->next)
     {

@@ -1,6 +1,15 @@
 2003-01-19  Bernhard Held <bernhard@bernhardheld.de>
 
-        * moved tinitalk to device/examples/ds390
+	* src/SDCCmain.c (linkEdit): rename mem and map files even in case of failure
+	* src/SDCCpeeph.c (replaceRule): fix bug #663503
+	* support/regression/Makefile: separate temp files for ports
+	* support/regression/generate-cases.py: separate temp files for ports
+	* src/mcs51/peeph.def: Frieder: removed 237 (obsolete by 236g and 105); added 237 a/b
+	* src/ds390/peeph.def: Frieder: removed 237 (obsolete by 236g and 105); added 237 a/b
+
+2003-01-19  Bernhard Held <bernhard@bernhardheld.de>
+
+	* moved tinitalk to device/examples/ds390
 
 2003-01-14  Bernhard Held <bernhard@bernhardheld.de>
 
@@ -30,7 +39,7 @@
 
 	* src/SDCCmain.c (main): port->finaliseOptions() moved for z80 linking
 	* src/SDCCutil.c (join): ugly bug: missing '\0'
-	* as/mcs51/lkmem.c (summary): sp on address 7 is save
+	* as/mcs51/lkmem.c (summary): sp on address 7 is safe
 
 2003-01-11  Bernhard Held <bernhard@bernhardheld.de>
 
@@ -387,7 +396,7 @@
 
 	* support/regression/tests/bug-524691.c: made it a little less shy 
 
-	* src/SDCCast.c (decorateType): fixed bug #524697 
+	* src/SDCCast.c (decorateType): fixed bug #524697
 
 	* src/SDCCast.c: made some lineno improvements
 

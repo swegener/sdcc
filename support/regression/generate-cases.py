@@ -5,7 +5,7 @@ import sys, re, tempfile, os
 
 # Globals
 # Directory that the generated files should be placed into
-outdir = 'gen'
+outdir = sys.argv[2]
 
 # Start of the test function table definition
 testfuntableheader = """
@@ -177,9 +177,9 @@ class InstanceGenerator:
         os.remove(self.tmpname)
 
 # Check and parse the command line arguments
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
     # PENDING: How to throw an error?
-    print "usage: generate-cases.py template.c"
+    print "usage: generate-cases.py template.c outdir"
 
 # Input name is the first arg.
 

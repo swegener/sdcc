@@ -33,7 +33,9 @@
 #include "crcutil.h"
 
 // Local global variables
+#ifdef WANT_CRC_16
 static short oddparity[16] = { 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 };
+#endif
 static unsigned char dscrc_table[] = {
         0, 94,188,226, 97, 63,221,131,194,156,126, 32,163,253, 31, 65,
       157,195, 33,127,252,162, 64, 30, 95,  1,227,189, 62, 96,130,220,

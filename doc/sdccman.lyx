@@ -463,8 +463,12 @@ code banking
 \newline 
 
 \family default 
-If you can think of some more, please see the chapter 9 about filing feature
- requests
+If you can think of some more, please see the chapter 
+\begin_inset LatexCommand \ref{sub:Requesting-Features}
+
+\end_inset 
+
+ about filing feature requests
 \begin_inset LatexCommand \index{Requesting features}
 
 \end_inset 
@@ -479,7 +483,7 @@ If you can think of some more, please see the chapter 9 about filing feature
 
 \layout Section
 \pagebreak_top 
-Installation
+Installing SDCC
 \begin_inset LatexCommand \index{Installation}
 
 \end_inset 
@@ -4313,7 +4317,7 @@ Processor Selection Options
 
 
 \series default 
- Generate code for the MCS51
+ Generate code for the Intel MCS51
 \begin_inset LatexCommand \index{MCS51}
 
 \end_inset 
@@ -6748,6 +6752,121 @@ status Collapsed
 \size default 
 \bar default 
 Will cause all the above mentioned dumps to be created.
+\layout Subsubsection
+
+Redirecting output on Windows Shells
+\layout Standard
+
+By default SDCC writes it's error messages to 
+\begin_inset Quotes sld
+\end_inset 
+
+standard error
+\begin_inset Quotes srd
+\end_inset 
+
+.
+ To force all messages to 
+\begin_inset Quotes sld
+\end_inset 
+
+standard output
+\begin_inset Quotes srd
+\end_inset 
+
+ use 
+\series bold 
+-
+\series default 
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series bold 
+\emph default 
+-
+\series default 
+use-stdout
+\begin_inset LatexCommand \index{-\/-use-stdout}
+
+\end_inset 
+
+.
+ Aditionaly, if you happen to have visual studio installed in your windows
+ machine, you can use it to compile your sources using a custom build and
+ the SDCC -
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\emph default 
+-vc
+\begin_inset LatexCommand \index{-\/-vc}
+
+\end_inset 
+
+ option.
+ Something like this should work:
+\newline 
+
+\newline 
+
+\series bold 
+c:
+\backslash 
+sdcc
+\backslash 
+bin
+\backslash 
+sdcc.exe -
+\series default 
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series bold 
+\emph default 
+-vc -
+\series default 
+\emph on 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\series bold 
+\emph default 
+-model-large -c $(InputPath)
 \layout Subsection
 
 Environment variables
@@ -7245,14 +7364,14 @@ sbit at 0xd7 CY; /* CY (Carry Flag
 \end_inset 
 
 ) */
-\layout Subsection
+\layout Subsubsection
 
 Pointers
 \begin_inset LatexCommand \index{Pointers}
 
 \end_inset 
 
-
+ to MCS51/DS390 specific memory spaces
 \layout Standard
 
 SDCC allows (via language extensions) pointers to explicitly point to any
@@ -7334,6 +7453,271 @@ generic
  routines.
  Explicitly specifying the pointer type will generate the most efficient
  code.
+\layout Subsection
+
+Absolute Addressing
+\begin_inset LatexCommand \index{Absolute addressing}
+
+\end_inset 
+
+
+\layout Standard
+
+Data items can be assigned an absolute address with the 
+\emph on 
+at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ <address>
+\emph default 
+ keyword, in addition to a storage class, e.g.:
+\layout Verse
+
+
+\family typewriter 
+xdata
+\begin_inset LatexCommand \index{xdata}
+
+\end_inset 
+
+ at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x7ffe unsigned int chksum;
+\layout Standard
+
+In the above example the variable chksum will located at 0x7ffe and 0x7fff
+ of the external ram.
+ The compiler does not actually reserve any space for variables declared
+ in this way (they are implemented with an equate in the assembler).
+ Thus it is left to the programmer to make sure there are no overlaps with
+ other variables that are declared without the absolute address.
+ The assembler listing file (.lst
+\begin_inset LatexCommand \index{.lst}
+
+\end_inset 
+
+) and the linker output files (.rst
+\begin_inset LatexCommand \index{.rst}
+
+\end_inset 
+
+) and (.map
+\begin_inset LatexCommand \index{.map}
+
+\end_inset 
+
+) are good places to look for such overlaps.
+\layout Standard
+
+In case of memory mapped I/O devices the keyword 
+\emph on 
+volatile
+\emph default 
+ should be used to tell the compiler that accesses might not be optimized
+ away:
+\layout Verse
+
+
+\family typewriter 
+volatile
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+ xdata
+\begin_inset LatexCommand \index{xdata}
+
+\end_inset 
+
+ at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x8000 unsigned char PORTA_8255;
+\layout Standard
+
+Absolute address can be specified for variables in all storage classes,
+ e.g.:
+\layout Verse
+
+
+\family typewriter 
+bit
+\begin_inset LatexCommand \index{bit}
+
+\end_inset 
+
+ at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+ 0x02 bvar;
+\layout Standard
+
+The above example will allocate the variable at offset 0x02 in the bit-addressab
+le space.
+ There is no real advantage to assigning absolute addresses to variables
+ in this manner, unless you want strict control over all the variables allocated.
+ One possible use would be to write hardware portable code.
+ For example, if you have a routine that uses one or more of the microcontroller
+ I/O pins, and such pins are different for two different hardwares, you
+ can declare the I/O pins in your routine using:
+\layout Verse
+
+
+\family typewriter 
+extern bit SDI;
+\newline 
+extern bit SCLK;
+\newline 
+extern bit CPOL;
+\newline 
+
+\newline 
+void DS1306_put(unsigned char value)
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+unsigned char mask=0x80;
+\newline 
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+while(mask)
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDI=(value & mask)?1:0;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SCLK=!CPOL;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SCLK=CPOL;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mask/=2;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+}
+\newline 
+}
+\layout Standard
+
+Then, someplace in the code for the first hardware you would use
+\layout Verse
+
+
+\family typewriter 
+bit at 0x80 SDI;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* I/O port 0, bit 0 */
+\newline 
+bit at 0x81 SCLK;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* I/O port 0, bit 1 */
+\newline 
+bit CPOL;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* This is a variable, let the linker allocate this one */
+\layout Standard
+
+Similarly, for the second hardware you would use
+\layout Verse
+
+
+\family typewriter 
+bit at 0x83 SDI;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* I/O port 0, bit 3 */
+\newline 
+bit at 0x91 SCLK;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* I/O port 1, bit 1 */
+\newline 
+bit CPOL;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* This is a variable, let the linker allocate this one */
+\layout Standard
+
+and you can use the same hardware dependent routine without changes, as
+ for example in a library.
+ This is somehow similar to sbit, but only one absolute address has to be
+ specified in the whole project.
 \layout Subsection
 
 Parameters
@@ -8546,271 +8930,6 @@ It is most efficient if your ISR calls no other functions.
  
 \layout Subsection
 
-Absolute Addressing
-\begin_inset LatexCommand \index{Absolute addressing}
-
-\end_inset 
-
-
-\layout Standard
-
-Data items can be assigned an absolute address with the 
-\emph on 
-at
-\begin_inset LatexCommand \index{at}
-
-\end_inset 
-
- <address>
-\emph default 
- keyword, in addition to a storage class, e.g.:
-\layout Verse
-
-
-\family typewriter 
-xdata
-\begin_inset LatexCommand \index{xdata}
-
-\end_inset 
-
- at
-\begin_inset LatexCommand \index{at}
-
-\end_inset 
-
- 0x7ffe unsigned int chksum;
-\layout Standard
-
-In the above example the variable chksum will located at 0x7ffe and 0x7fff
- of the external ram.
- The compiler does not actually reserve any space for variables declared
- in this way (they are implemented with an equate in the assembler).
- Thus it is left to the programmer to make sure there are no overlaps with
- other variables that are declared without the absolute address.
- The assembler listing file (.lst
-\begin_inset LatexCommand \index{.lst}
-
-\end_inset 
-
-) and the linker output files (.rst
-\begin_inset LatexCommand \index{.rst}
-
-\end_inset 
-
-) and (.map
-\begin_inset LatexCommand \index{.map}
-
-\end_inset 
-
-) are good places to look for such overlaps.
-\layout Standard
-
-In case of memory mapped I/O devices the keyword 
-\emph on 
-volatile
-\emph default 
- should be used to tell the compiler that accesses might not be optimized
- away:
-\layout Verse
-
-
-\family typewriter 
-volatile
-\begin_inset LatexCommand \index{volatile}
-
-\end_inset 
-
- xdata
-\begin_inset LatexCommand \index{xdata}
-
-\end_inset 
-
- at
-\begin_inset LatexCommand \index{at}
-
-\end_inset 
-
- 0x8000 unsigned char PORTA_8255;
-\layout Standard
-
-Absolute address can be specified for variables in all storage classes,
- e.g.:
-\layout Verse
-
-
-\family typewriter 
-bit
-\begin_inset LatexCommand \index{bit}
-
-\end_inset 
-
- at
-\begin_inset LatexCommand \index{at}
-
-\end_inset 
-
- 0x02 bvar;
-\layout Standard
-
-The above example will allocate the variable at offset 0x02 in the bit-addressab
-le space.
- There is no real advantage to assigning absolute addresses to variables
- in this manner, unless you want strict control over all the variables allocated.
- One possible use would be to write hardware portable code.
- For example, if you have a routine that uses one or more of the microcontroller
- I/O pins, and such pins are different for two different hardwares, you
- can declare the I/O pins in your routine using:
-\layout Verse
-
-
-\family typewriter 
-extern bit SDI;
-\newline 
-extern bit SCLK;
-\newline 
-extern bit CPOL;
-\newline 
-
-\newline 
-void DS1306_put(unsigned char value)
-\newline 
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-unsigned char mask=0x80;
-\newline 
-
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-while(mask)
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDI=(value & mask)?1:0;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SCLK=!CPOL;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SCLK=CPOL;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mask/=2;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-}
-\newline 
-}
-\layout Standard
-
-Then, someplace in the code for the first hardware you would use
-\layout Verse
-
-
-\family typewriter 
-bit at 0x80 SDI;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* I/O port 0, bit 0 */
-\newline 
-bit at 0x81 SCLK;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* I/O port 0, bit 1 */
-\newline 
-bit CPOL;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* This is a variable, let the linker allocate this one */
-\layout Standard
-
-Similarly, for the second hardware you would use
-\layout Verse
-
-
-\family typewriter 
-bit at 0x83 SDI;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* I/O port 0, bit 3 */
-\newline 
-bit at 0x91 SCLK;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* I/O port 1, bit 1 */
-\newline 
-bit CPOL;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* This is a variable, let the linker allocate this one */
-\layout Standard
-
-and you can use the same hardware dependent routine without changes, as
- for example in a library.
- This is somehow similar to sbit, but only one absolute address has to be
- specified in the whole project.
-\layout Subsection
-
 Startup Code
 \begin_inset LatexCommand \index{Startup code}
 
@@ -9087,6 +9206,457 @@ An example acessing a C variable is in section
 \end_inset 
 
 .
+\layout Subsection
+
+Interfacing with Assembler Code
+\begin_inset LatexCommand \index{Assembler routines}
+
+\end_inset 
+
+
+\layout Subsubsection
+
+Global Registers used for Parameter Passing
+\begin_inset LatexCommand \index{Parameter passing}
+
+\end_inset 
+
+
+\layout Standard
+
+The compiler always uses the global registers 
+\emph on 
+DPL, DPH
+\begin_inset LatexCommand \index{DPTR, DPH, DPL}
+
+\end_inset 
+
+, B
+\begin_inset LatexCommand \index{B (register)}
+
+\end_inset 
+
+ 
+\emph default 
+and
+\emph on 
+ ACC
+\begin_inset LatexCommand \index{ACC}
+
+\end_inset 
+
+
+\emph default 
+ to pass the first parameter to a routine.
+ The second parameter onwards is either allocated on the stack (for reentrant
+ routines or if -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto is used) or in data / xdata memory (depending on the memory
+ model).
+ 
+\layout Subsubsection
+
+Assembler Routine(non-reentrant
+\begin_inset LatexCommand \index{reentrant}
+
+\end_inset 
+
+)
+\begin_inset LatexCommand \index{Assembler routines (non-reentrant)}
+
+\end_inset 
+
+
+\layout Standard
+
+In the following example the function c_func calls an assembler routine
+ asm_func, which takes two parameters.
+\layout Verse
+
+
+\family typewriter 
+extern int asm_func(unsigned char, unsigned char);
+\newline 
+
+\newline 
+int c_func (unsigned char i, unsigned char j)
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+return asm_func(i,j);
+\newline 
+}
+\newline 
+
+\newline 
+int main()
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+return c_func(10,9);
+\newline 
+}
+\layout Standard
+
+The corresponding assembler function is:
+\layout Verse
+
+
+\family typewriter 
+.globl _asm_func_PARM_2 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+.globl _asm_func 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+.area OSEG 
+\newline 
+_asm_func_PARM_2:
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+.ds     1 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+.area CSEG 
+\newline 
+_asm_func: 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov    a,dpl 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+add    a,_asm_func_PARM_2 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov    dpl,a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+dpl
+\begin_inset LatexCommand \index{DPTR, DPH, DPL}
+
+\end_inset 
+
+,#0x00 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ret
+\layout Standard
+
+Note here that the return values are placed in 'dpl' - One byte return value,
+ 'dpl' LSB & 'dph' MSB for two byte values.
+ 'dpl', 'dph' and 'b' for three byte values (generic pointers) and 'dpl','dph','
+b' & 'acc' for four byte values.
+\layout Standard
+
+The parameter naming convention is _<function_name>_PARM_<n>, where n is
+ the parameter number starting from 1, and counting from the left.
+ The first parameter is passed in 
+\begin_inset Quotes eld
+\end_inset 
+
+dpl
+\begin_inset Quotes erd
+\end_inset 
+
+ for One bye parameter, 
+\begin_inset Quotes eld
+\end_inset 
+
+dptr
+\begin_inset Quotes erd
+\end_inset 
+
+ if two bytes, 
+\begin_inset Quotes eld
+\end_inset 
+
+b,dptr
+\begin_inset Quotes erd
+\end_inset 
+
+ for three bytes and 
+\begin_inset Quotes eld
+\end_inset 
+
+acc,b,dptr
+\begin_inset Quotes erd
+\end_inset 
+
+ for four bytes, the variable name for the second parameter will be _<function_n
+ame>_PARM_2.
+\newline 
+
+\newline 
+Assemble the assembler routine with the following command:
+\newline 
+
+\newline 
+
+\family sans 
+\series bold 
+asx8051 -losg asmfunc.asm
+\newline 
+
+\newline 
+
+\family default 
+\series default 
+Then compile and link the assembler routine to the C source file with the
+ following command:
+\newline 
+
+\newline 
+
+\family sans 
+\series bold 
+sdcc cfunc.c asmfunc.rel
+\layout Subsubsection
+
+Assembler Routine(reentrant
+\begin_inset LatexCommand \index{reentrant}
+
+\end_inset 
+
+)
+\begin_inset LatexCommand \index{Assembler routines (reentrant)}
+
+\end_inset 
+
+
+\layout Standard
+
+In this case the second parameter onwards will be passed on the stack, the
+ parameters are pushed from right to left i.e.
+ after the call the left most parameter will be on the top of the stack.
+ Here is an example:
+\layout Verse
+
+
+\family typewriter 
+extern int asm_func(unsigned char, unsigned char);
+\newline 
+
+\newline 
+int c_func (unsigned char i, unsigned char j) reentrant 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+return asm_func(i,j); 
+\newline 
+} 
+\newline 
+
+\newline 
+int main() 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+return c_func(10,9); 
+\newline 
+}
+\layout Standard
+
+The corresponding assembler routine is:
+\layout Verse
+
+
+\family typewriter 
+.globl _asm_func 
+\newline 
+_asm_func: 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+push  _bp 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov _bp,sp 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  r2,dpl
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  a,_bp 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+clr  c 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+add  a,#0xfd 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  r0,a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+add  a,#0xfc
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  r1,a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  a,@r0 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+add  a,r2
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  dpl,a 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  dph,#0x00 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+mov  sp,_bp 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+pop  _bp 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ret
+\layout Standard
+
+The compiling and linking procedure remains the same, however note the extra
+ entry & exit linkage required for the assembler code, _bp is the stack
+ frame pointer and is used to compute the offset into the stack for parameters
+ and local variables.
 \layout Subsection
 
 int (16 bit)
@@ -10190,6 +10760,252 @@ status Collapsed
  However, currently the linker can not handle code segments > 64k.
 \layout Subsection
 
+Pragmas
+\begin_inset LatexCommand \index{Pragmas}
+
+\end_inset 
+
+
+\layout Standard
+
+SDCC supports the following #pragma directives.
+\layout Itemize
+
+SAVE
+\begin_inset LatexCommand \index{\#pragma SAVE}
+
+\end_inset 
+
+ - this will save all current options to the SAVE/RESTORE stack.
+ See RESTORE.
+\layout Itemize
+
+RESTORE
+\begin_inset LatexCommand \index{\#pragma RESTORE}
+
+\end_inset 
+
+ - will restore saved options from the last save.
+ SAVEs & RESTOREs can be nested.
+ SDCC uses a SAVE/RESTORE stack: SAVE pushes current options to the stack,
+ RESTORE pulls current options from the stack.
+ See SAVE.
+\layout Itemize
+
+NOGCSE
+\begin_inset LatexCommand \index{\#pragma NOGCSE}
+
+\end_inset 
+
+ - will stop global common subexpression elimination.
+\layout Itemize
+
+NOINDUCTION
+\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+
+\end_inset 
+
+ - will stop loop induction optimizations.
+\layout Itemize
+
+NOJTBOUND
+\begin_inset LatexCommand \index{\#pragma NOJTBOUND}
+
+\end_inset 
+
+ - will not generate code for boundary value checking, when switch statements
+ are turned into jump-tables (dangerous).
+ 
+\layout Itemize
+
+NOOVERLAY
+\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
+
+\end_inset 
+
+ - the compiler will not overlay the parameters and local variables of a
+ function.
+\layout Itemize
+
+LESS_PEDANTIC
+\begin_inset LatexCommand \index{\#pragma LESS\_PEDANTIC}
+
+\end_inset 
+
+ - the compiler will not warn you anymore for obvious mistakes, you'r on
+ your own now ;-(
+\layout Itemize
+
+NOLOOPREVERSE
+\begin_inset LatexCommand \index{\#pragma NOLOOPREVERSE}
+
+\end_inset 
+
+ - Will not do loop reversal optimization
+\layout Itemize
+
+EXCLUDE
+\begin_inset LatexCommand \index{\#pragma EXCLUDE}
+
+\end_inset 
+
+ NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation of
+ pair of push/pop
+\begin_inset LatexCommand \index{push/pop}
+
+\end_inset 
+
+ instruction in ISR function (using interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ keyword).
+ The directive should be placed immediately before the ISR function definition
+ and it affects ALL ISR functions following it.
+ To enable the normal register saving for ISR functions use #pragma\SpecialChar ~
+EXCLUDE\SpecialChar ~
+none
+\begin_inset LatexCommand \index{\#pragma EXCLUDE}
+
+\end_inset 
+
+.
+\layout Itemize
+
+NOIV
+\begin_inset LatexCommand \index{\#pragma NOIV}
+
+\end_inset 
+
+ - Do not generate interrupt vector table entries for all ISR functions
+ defined after the pragma.
+ This is useful in cases where the interrupt vector table must be defined
+ manually, or when there is a secondary, manually defined interrupt vector
+ table (e.g.
+ for the autovector feature of the Cypress EZ-USB FX2).
+\layout Itemize
+
+CALLEE-SAVES
+\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{function prologue}
+
+\end_inset 
+
+ function1[,function2[,function3...]] - The compiler by default uses a caller
+ saves convention for register saving across function calls, however this
+ can cause unnecessary register pushing & popping when calling small functions
+ from larger functions.
+ This option can be used to switch off the register saving convention for
+ the function names specified.
+ The compiler will not save registers when calling these functions, extra
+ code need to be manually inserted at the entry & exit for these functions
+ to save & restore the registers used by these functions, this can SUBSTANTIALLY
+ reduce code & improve run time performance of the generated code.
+ In the future the compiler (with inter procedural analysis) may be able
+ to determine the appropriate scheme to use for each function call.
+ If -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-callee-saves command line option is used, the function names specified
+ in #pragma\SpecialChar ~
+CALLEE-SAVES
+\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
+
+\end_inset 
+
+ is appended to the list of functions specified in the command line.
+\layout Standard
+
+The pragma's are intended to be used to turn-off certain optimizations which
+ might cause the compiler to generate extra stack / data space to store
+ compiler generated temporary variables.
+ This usually happens in large functions.
+ Pragma directives should be used as shown in the following example, they
+ are used to control options & optimizations for a given function; pragmas
+ should be placed before and/or after a function, placing pragma's inside
+ a function body could have unpredictable results.
+\layout Verse
+
+
+\family typewriter 
+#pragma SAVE
+\begin_inset LatexCommand \index{\#pragma SAVE}
+
+\end_inset 
+
+ \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* save the current settings */ 
+\newline 
+#pragma NOGCSE
+\begin_inset LatexCommand \index{\#pragma NOGCSE}
+
+\end_inset 
+
+ \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* turnoff global subexpression elimination */ 
+\newline 
+#pragma NOINDUCTION
+\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
+
+\end_inset 
+
+ /* turn off induction optimizations */ 
+\newline 
+int foo () 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+ \SpecialChar ~
+ ...
+ 
+\newline 
+\SpecialChar ~
+ \SpecialChar ~
+ /* large code */ 
+\newline 
+\SpecialChar ~
+ \SpecialChar ~
+ ...
+ 
+\newline 
+} 
+\newline 
+#pragma RESTORE
+\begin_inset LatexCommand \index{\#pragma RESTORE}
+
+\end_inset 
+
+ /* turn the optimizations back on */
+\layout Standard
+
+The compiler will generate a warning message when extra space is allocated.
+ It is strongly recommended that the SAVE and RESTORE pragma's be used when
+ changing options for a function.
+\layout Subsection
+
 Defines Created by the Compiler
 \begin_inset LatexCommand \index{Defines created by the compiler}
 
@@ -10535,34 +11351,53 @@ when
 
 \newline 
 
+\layout Section
+\pagebreak_top 
+Debugging with SDCDB
+\begin_inset LatexCommand \index{sdcdb}
+
+\end_inset 
+
+ 
+\layout Standard
+
+SDCC is distributed with a source level debugger
+\begin_inset LatexCommand \index{Debugger}
+
+\end_inset 
+
+.
+ The debugger uses a command line interface, the command repertoire of the
+ debugger has been kept as close to gdb
+\begin_inset LatexCommand \index{gdb}
+
+\end_inset 
+
+ (the GNU debugger) as possible.
+ The configuration and build process is part of the standard compiler installati
+on, which also builds and installs the debugger in the target directory
+ specified during configuration.
+ The debugger allows you debug BOTH at the C source and at the ASM source
+ level.
+ Sdcdb is available on Unix platforms only.
 \layout Subsection
 
-Redirecting output on Windows Shells
+Compiling for Debugging
 \layout Standard
 
-By default SDCC writes it's error messages to 
-\begin_inset Quotes sld
-\end_inset 
+The \SpecialChar \-
+\SpecialChar \-
+debug option must be specified for all files for which debug information
+ is to be generated.
+ The complier generates a .adb file for each of these files.
+ The linker creates the .cdb file from the .adb files and the address information.
+ This .cdb is used by the debugger.
+\layout Subsection
 
-standard error
-\begin_inset Quotes srd
-\end_inset 
+How the Debugger Works
+\layout Standard
 
-.
- To force all messages to 
-\begin_inset Quotes sld
-\end_inset 
-
-standard output
-\begin_inset Quotes srd
-\end_inset 
-
- use 
-\series bold 
--
-\series default 
-\emph on 
-
+When the -
 \begin_inset ERT
 status Collapsed
 
@@ -10572,55 +11407,58 @@ status Collapsed
 /
 \end_inset 
 
+-debug option is specified the compiler generates extra symbol information
+ some of which are put into the the assembler source and some are put into
+ the .adb file.
+  Then the linker creates the .cdb file from the individual .adb files with
+ the address information for the symbols.
+ The debugger reads the symbolic information generated by the compiler &
+ the address information generated by the linker.
+ It uses the SIMULATOR (Daniel's S51) to execute the program, the program
+ execution is controlled by the debugger.
+ When a command is issued for the debugger, it translates it into appropriate
+ commands for the simulator.
+\layout Subsection
 
-\series bold 
-\emph default 
--
-\series default 
-use-stdout
-\begin_inset LatexCommand \index{-\/-use-stdout}
-
-\end_inset 
-
-.
- Aditionaly, if you happen to have visual studio installed in your windows
- machine, you can use it to compile your sources using a custom build and
- the SDCC -
-\emph on 
-
-\begin_inset ERT
-status Collapsed
-
+Starting the Debugger
 \layout Standard
 
-\backslash 
-/
-\end_inset 
-
-
-\emph default 
--vc
-\begin_inset LatexCommand \index{-\/-vc}
-
-\end_inset 
-
- option.
- Something like this should work:
+The debugger can be started using the following command line.
+ (Assume the file you are debugging has the file name foo).
 \newline 
 
 \newline 
 
+\family sans 
 \series bold 
-c:
-\backslash 
-sdcc
-\backslash 
-bin
-\backslash 
-sdcc.exe -
-\series default 
-\emph on 
+sdcdb foo
+\newline 
 
+\family default 
+\series default 
+
+\newline 
+The debugger will look for the following files.
+\layout Itemize
+
+foo.c - the source file.
+\layout Itemize
+
+foo.cdb - the debugger symbol information file.
+\layout Itemize
+
+foo.ihx - the Intel hex format
+\begin_inset LatexCommand \index{Intel hex format}
+
+\end_inset 
+
+ object file.
+\layout Subsection
+
+Command Line Options.
+\layout Itemize
+
+-
 \begin_inset ERT
 status Collapsed
 
@@ -10630,13 +11468,13 @@ status Collapsed
 /
 \end_inset 
 
-
-\series bold 
-\emph default 
--vc -
-\series default 
-\emph on 
-
+-directory=<source file directory> this option can used to specify the directory
+ search list.
+ The debugger will look into the directory list specified for source, cdb
+ & ihx files.
+ The items in the directory list must be separated by ':', e.g.
+ if the source files can be in the directories /home/src1 and /home/src2,
+ the -
 \begin_inset ERT
 status Collapsed
 
@@ -10646,10 +11484,2550 @@ status Collapsed
 /
 \end_inset 
 
+-directory option should be -
+\begin_inset ERT
+status Collapsed
 
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-directory=/home/src1:/home/src2.
+ Note there can be no spaces in the option.
+ 
+\layout Itemize
+
+-cd <directory> - change to the <directory>.
+\layout Itemize
+
+-fullname - used by GUI front ends.
+\layout Itemize
+
+-cpu <cpu-type> - this argument is passed to the simulator please see the
+ simulator docs for details.
+\layout Itemize
+
+-X <Clock frequency > this options is passed to the simulator please see
+ the simulator docs for details.
+\layout Itemize
+
+-s <serial port file> passed to simulator see the simulator docs for details.
+\layout Itemize
+
+-S <serial in,out> passed to simulator see the simulator docs for details.
+\layout Subsection
+
+Debugger Commands.
+\layout Standard
+
+As mentioned earlier the command interface for the debugger has been deliberatel
+y kept as close the GNU debugger gdb, as possible.
+ This will help the integration with existing graphical user interfaces
+ (like ddd, xxgdb or xemacs) existing for the GNU debugger.
+ If you use a graphical user interface for the debugger you can skip the
+ next sections.
+\layout Subsubsection*
+
+break [line | file:line | function | file:function]
+\layout Standard
+
+Set breakpoint at specified line or function:
+\newline 
+
+\newline 
+
+\family sans 
 \series bold 
+sdcdb>break 100 
+\newline 
+sdcdb>break foo.c:100
+\newline 
+sdcdb>break funcfoo
+\newline 
+sdcdb>break foo.c:funcfoo
+\layout Subsubsection*
+
+clear [line | file:line | function | file:function ]
+\layout Standard
+
+Clear breakpoint at specified line or function:
+\newline 
+
+\newline 
+
+\family sans 
+\series bold 
+sdcdb>clear 100
+\newline 
+sdcdb>clear foo.c:100
+\newline 
+sdcdb>clear funcfoo
+\newline 
+sdcdb>clear foo.c:funcfoo
+\layout Subsubsection*
+
+continue
+\layout Standard
+
+Continue program being debugged, after breakpoint.
+\layout Subsubsection*
+
+finish
+\layout Standard
+
+Execute till the end of the current function.
+\layout Subsubsection*
+
+delete [n]
+\layout Standard
+
+Delete breakpoint number 'n'.
+ If used without any option clear ALL user defined break points.
+\layout Subsubsection*
+
+info [break | stack | frame | registers ]
+\layout Itemize
+
+info break - list all breakpoints
+\layout Itemize
+
+info stack - show the function call stack.
+\layout Itemize
+
+info frame - show information about the current execution frame.
+\layout Itemize
+
+info registers - show content of all registers.
+\layout Subsubsection*
+
+step
+\layout Standard
+
+Step program until it reaches a different source line.
+\layout Subsubsection*
+
+next
+\layout Standard
+
+Step program, proceeding through subroutine calls.
+\layout Subsubsection*
+
+run
+\layout Standard
+
+Start debugged program.
+\layout Subsubsection*
+
+ptype variable 
+\layout Standard
+
+Print type information of the variable.
+\layout Subsubsection*
+
+print variable
+\layout Standard
+
+print value of variable.
+\layout Subsubsection*
+
+file filename
+\layout Standard
+
+load the given file name.
+ Note this is an alternate method of loading file for debugging.
+\layout Subsubsection*
+
+frame
+\layout Standard
+
+print information about current frame.
+\layout Subsubsection*
+
+set srcmode
+\layout Standard
+
+Toggle between C source & assembly source.
+\layout Subsubsection*
+
+! simulator command
+\layout Standard
+
+Send the string following '!' to the simulator, the simulator response is
+ displayed.
+ Note the debugger does not interpret the command being sent to the simulator,
+ so if a command like 'go' is sent the debugger can loose its execution
+ context and may display incorrect values.
+\layout Subsubsection*
+
+quit.
+\layout Standard
+
+"Watch me now.
+ Iam going Down.
+ My name is Bobby Brown"
+\layout Subsection
+
+Interfacing with XEmacs
+\begin_inset LatexCommand \index{XEmacs}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Emacs}
+
+\end_inset 
+
+.
+\layout Standard
+
+Two files (in emacs lisp) are provided for the interfacing with XEmacs,
+ sdcdb.el and sdcdbsrc.el.
+ These two files can be found in the $(prefix)/bin directory after the installat
+ion is complete.
+ These files need to be loaded into XEmacs for the interface to work.
+ This can be done at XEmacs startup time by inserting the following into
+ your '.xemacs' file (which can be found in your HOME directory): 
+\newline 
+
+\newline 
+
+\family typewriter 
+(load-file sdcdbsrc.el) 
+\family default 
+
+\newline 
+
+\newline 
+.xemacs is a lisp file so the () around the command is REQUIRED.
+ The files can also be loaded dynamically while XEmacs is running, set the
+ environment variable 'EMACSLOADPATH' to the installation bin directory
+ (<installdir>/bin), then enter the following command ESC-x load-file sdcdbsrc.
+ To start the interface enter the following command: 
+\newline 
+
+\newline 
+
+\family sans 
+\series bold 
+ESC-x sdcdbsrc
+\family default 
+\series default 
+
+\newline 
+
+\newline 
+You will prompted to enter the file name to be debugged.
+ 
+\newline 
+
+\newline 
+The command line options that are passed to the simulator directly are bound
+ to default values in the file sdcdbsrc.el.
+ The variables are listed below, these values maybe changed as required.
+\layout Itemize
+
+sdcdbsrc-cpu-type '51
+\layout Itemize
+
+sdcdbsrc-frequency '11059200
+\layout Itemize
+
+sdcdbsrc-serial nil
+\layout Standard
+
+The following is a list of key mapping for the debugger interface.
+\layout Standard
+
+\SpecialChar ~
+
+\family typewriter 
+
+\newline 
+;; Current Listing :: 
+\newline 
+;;key\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+binding\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Comment 
+\newline 
+;;---\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+------\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+--------
+\newline 
+;; 
+\newline 
+;; n\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-next-from-src\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB next command 
+\newline 
+;; b\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-back-from-src\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB back command 
+\newline 
+;; c\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-cont-from-src\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB continue command
+\newline 
+;; s\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-step-from-src\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB step command 
+\newline 
+;; ?\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-whatis-c-sexp\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB ptypecommand for data at 
+\newline 
+;;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ buffer point 
+\newline 
+;; x\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdbsrc-delete\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB Delete all breakpoints if no arg 
+\newline 
+;;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+given or delete arg (C-u arg x) 
+\newline 
+;; m\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdbsrc-frame\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB Display current frame if no arg, 
+\newline 
+;;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+given or display frame arg 
+\newline 
+;;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+buffer point 
+\newline 
+;; !\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdbsrc-goto-sdcdb\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Goto the SDCDB output buffer 
+\newline 
+;; p\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-print-c-sexp\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB print command for data at 
+\newline 
+;;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ buffer point 
+\newline 
+;; g\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdbsrc-goto-sdcdb\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Goto the SDCDB output buffer 
+\newline 
+;; t\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdbsrc-mode\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Toggles Sdcdbsrc mode (turns it off) 
+\newline 
+;; 
+\newline 
+;; C-c C-f\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-finish-from-src\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+SDCDB finish command 
+\newline 
+;; 
+\newline 
+;; C-x SPC\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdb-break\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Set break for line with point 
+\newline 
+;; ESC t\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdbsrc-mode\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Toggle Sdcdbsrc mode 
+\newline 
+;; ESC m\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ sdcdbsrc-srcmode\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ Toggle list mode 
+\newline 
+;; 
+\newline 
+
+\layout Section
+\pagebreak_top 
+TIPS
+\layout Standard
+
+Here are a few guidelines that will help the compiler generate more efficient
+ code, some of the tips are specific to this compiler others are generally
+ good programming practice.
+\layout Itemize
+
+Use the smallest data type to represent your data-value.
+ If it is known in advance that the value is going to be less than 256 then
+ use an 'unsigned char' instead of a 'short' or 'int'.
+\layout Itemize
+
+Use unsigned when it is known in advance that the value is not going to
+ be negative.
+ This helps especially if you are doing division or multiplication.
+\layout Itemize
+
+NEVER jump into a LOOP.
+\layout Itemize
+
+Declare the variables to be local whenever possible, especially loop control
+ variables (induction).
+\layout Itemize
+
+Since the compiler does not always do implicit integral promotion, the programme
+r should do an explicit cast when integral promotion is required.
+\layout Itemize
+
+Reducing the size of division, multiplication & modulus operations can reduce
+ code size substantially.
+ Take the following code for example.
+\begin_deeper 
+\layout Verse
+
+
+\family typewriter 
+foobar(unsigned int p1, unsigned char ch)
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+unsigned char ch1 = p1 % ch ;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+....
+\newline 
+}
+\layout Standard
+
+For the modulus operation the variable ch will be promoted to unsigned int
+ first then the modulus operation will be performed (this will lead to a
+ call to support routine _moduint()), and the result will be casted to a
+ char.
+ If the code is changed to 
+\layout Verse
+
+
+\family typewriter 
+foobar(unsigned int p1, unsigned char ch)
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+unsigned char ch1 = (unsigned char)p1 % ch ;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+....
+\newline 
+}
+\layout Standard
+
+It would substantially reduce the code generated (future versions of the
+ compiler will be smart enough to detect such optimization opportunities).
+\end_deeper 
+\layout Itemize
+
+Have a look at the assembly listing to get a 
+\begin_inset Quotes sld
+\end_inset 
+
+feeling
+\begin_inset Quotes srd
+\end_inset 
+
+ for the code generation.
+\layout Subsection
+
+Notes on MCS51 memory
+\begin_inset LatexCommand \index{MCS51 memory}
+
+\end_inset 
+
+ layout
+\layout Standard
+
+The 8051 family of microcontrollers have a minimum of 128 bytes of internal
+ RAM memory which is structured as follows
+\newline 
+
+\newline 
+- Bytes 00-1F - 32 bytes to hold up to 4 banks of the registers R0 to R7,
+ 
+\newline 
+- Bytes 20-2F - 16 bytes to hold 128 bit variables and, 
+\newline 
+- Bytes 30-7F - 80 bytes for general purpose use.
+\newline 
+
+\layout Standard
+
+Additionally some members of the MCS51 family may have up to 128 bytes of
+ additional, indirectly addressable, internal RAM memory (
+\emph on 
+idata
 \emph default 
--model-large -c $(InputPath)
+).
+ Furthermore, some chips may have some built in external memory (
+\emph on 
+xdata
+\emph default 
+) which should not be confused with the internal, directly addressable RAM
+ memory (
+\emph on 
+data
+\emph default 
+).
+ Sometimes this built in 
+\emph on 
+xdata
+\emph default 
+ memory has to be activated before using it (you can probably find this
+ information on the datasheet of the microcontroller your are using).
+\layout Standard
+
+Normally SDCC will only use the first bank
+\begin_inset LatexCommand \index{bank}
+
+\end_inset 
+
+ of registers (register bank 0), but it is possible to specify that other
+ banks of registers should be used in interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ routines.
+ By default, the compiler will place the stack after the last byte of allocated
+ memory for variables.
+ For example, if the first 2 banks of registers are used, and only four
+ bytes are used for 
+\emph on 
+data
+\emph default 
+ variables, it will position the base of the internal stack at address 20
+ (0x14).
+ This implies that as the stack
+\begin_inset LatexCommand \index{stack}
+
+\end_inset 
+
+ grows, it will use up the remaining register banks, and the 16 bytes used
+ by the 128 bit variables, and 80 bytes for general purpose use.
+ If any bit variables are used, the data variables will be placed after
+ the byte holding the last bit variable.
+ For example, if register banks 0 and 1 are used, and there are 9 bit variables
+ (two bytes used), 
+\emph on 
+data
+\emph default 
+ variables will be placed starting at address 0x22.
+ You can also use -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-data-loc
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ to specify the start address of the 
+\emph on 
+data
+\emph default 
+ and -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-iram-size to specify the size of the total internal RAM (
+\emph on 
+data
+\emph default 
++
+\emph on 
+idata
+\emph default 
+).
+ 
+\layout Standard
+
+By default the 8051 linker will place the stack after the last byte of data
+ variables.
+ Option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-loc
+\begin_inset LatexCommand \index{-\/-stack-loc}
+
+\end_inset 
+
+ allows you to specify the start of the stack, i.e.
+ you could start it after any data in the general purpose area.
+ If your microcontroller has additional indirectly addressable internal
+ RAM (
+\emph on 
+idata
+\emph default 
+) you can place the stack on it.
+ You may also need to use -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xdata-loc
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ to set the start address of the external RAM (
+\emph on 
+xdata
+\emph default 
+) and -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xram-size
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ to specify its size.
+ Same goes for the code memory, using -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-loc
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+ and -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-code-size
+\begin_inset LatexCommand \index{-\/-data-loc}
+
+\end_inset 
+
+.
+ If in doubt, don't specify any options and see if the resulting memory
+ layout is appropriate, then you can adjust it.
+\layout Standard
+
+The 8051 linker generates two files with memory allocation information.
+ The first, with extension .map shows all the variables and segments.
+ The second with extension .mem shows the final memory layout.
+ The linker will complaint either if memory segments overlap, there is not
+ enough memory, or there is not enough space for stack.
+ If you get any linking warnings and/or errors related to stack or segments
+ allocation, take a look at either the .map or .mem files to find out what
+ the problem is.
+ The .mem file may even suggest a solution to the problem.
+\layout Subsection
+
+Tools
+\begin_inset LatexCommand \index{Tools}
+
+\end_inset 
+
+ included in the distribution
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="12" columns="3">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Name
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Purpose
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Directory
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+uCsim
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Simulator for various architectures
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcc/sim/ucsim
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+keil2sdcc.pl
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+header file conversion
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcc/support/scripts
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+mh2h.c
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+header file conversion
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcc/support/scripts
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+as-gbz80
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Assembler
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+as-z80
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Assembler
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+asx8051
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Assembler
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcdb
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Simulator
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+aslink
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Linker
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link-z80
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Linker
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+link-gbz80
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Linker
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+packihx
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ihx packer
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+sdcc/bin
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+
+\layout Subsection
+
+Related open source tools
+\begin_inset LatexCommand \index{Related tools}
+
+\end_inset 
+
+
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="8" columns="3">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="30line%">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Name
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Purpose
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Where to get
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+gpsim
+\begin_inset LatexCommand \index{gpsim}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+PIC simulator
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.dattalo.com/gnupic/gpsim.html}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+flP5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+PIC programmer
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://digilander.libero.it/fbradasc/FLP5.html}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+srecord
+\begin_inset LatexCommand \index{srecord}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Object file conversion, checksumming, ...
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://srecord.sourceforge.net/}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+objdump
+\begin_inset LatexCommand \index{objdump}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Object file conversion, ...
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Part of binutils (should be there anyway)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+doxygen
+\begin_inset LatexCommand \index{doxygen}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Source code documentation system
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.doxygen.org}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+splint
+\begin_inset LatexCommand \index{splint}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Statically checks c sources
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.splint.org}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ddd
+\begin_inset LatexCommand \index{ddd}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Debugger, serves nicely as GUI to sdcdb
+\begin_inset LatexCommand \index{sdcdb}
+
+\end_inset 
+
+ (Unix only)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.gnu.org/software/ddd/}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+
+\layout Subsection
+
+Related documentation / recommended reading
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="block" valignment="top" leftline="true" width="30line%">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Name
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Subject / Title
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Where to get
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+S.
+ S.
+ Muchnick
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Advanced Compiler Design and Implementation
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+bookstore
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+c-refcard.pdf
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+C Reference Card
+\begin_inset LatexCommand \index{C Reference card}
+
+\end_inset 
+
+, 2 pages
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.refcards.com/about/c.html}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+test_suite_spec.pdf
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcc regression test
+\begin_inset LatexCommand \index{Regression test}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcc/doc
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+cdbfileformat.pd
+\family default 
+\series default 
+\shape default 
+\size default 
+\emph default 
+\bar default 
+\noun default 
+\color default
+f
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcc internal documentation
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+sdcc/doc
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\newline 
+
+\layout Section
+\pagebreak_top 
+Support
+\begin_inset LatexCommand \index{Support}
+
+\end_inset 
+
+
+\layout Standard
+
+SDCC has grown to be a large project.
+ The compiler alone (without the preprocessor, assembler and linker) is
+ about 40,000 lines of code (blank stripped).
+ The open source nature of this project is a key to its continued growth
+ and support.
+ You gain the benefit and support of many active software developers and
+ end users.
+ Is SDCC perfect? No, that's why we need your help.
+ The developers take pride in fixing reported bugs.
+ You can help by reporting the bugs and helping other SDCC users.
+ There are lots of ways to contribute, and we encourage you to take part
+ in making SDCC a great software package.
+ 
+\layout Standard
+
+The SDCC project is hosted on the sdcc sourceforge site at 
+\begin_inset LatexCommand \htmlurl{http://sourceforge.net/projects/sdcc}
+
+\end_inset 
+
+.
+ You'll find the complete set of mailing lists
+\begin_inset LatexCommand \index{Mailing list}
+
+\end_inset 
+
+, forums, bug reporting system, patch submission
+\begin_inset LatexCommand \index{Patch submission}
+
+\end_inset 
+
+ system, download
+\begin_inset LatexCommand \index{download}
+
+\end_inset 
+
+ area and cvs code repository
+\begin_inset LatexCommand \index{cvs code repository}
+
+\end_inset 
+
+ there.
+\layout Subsection
+
+Reporting Bugs
+\begin_inset LatexCommand \index{Bugs}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Reporting bugs}
+
+\end_inset 
+
+
+\layout Standard
+
+The recommended way of reporting bugs is using the infrastructure of the
+ sourceforge site.
+ You can follow the status of bug reports there and have an overview about
+ the known bugs.
+\layout Standard
+
+Bug reports are automatically forwarded to the developer mailing list and
+ will be fixed ASAP.
+ When reporting a bug, it is very useful to include a small test program
+ (the smaller the better) which reproduces the problem.
+ If you can isolate the problem by looking at the generated assembly code,
+ this can be very helpful.
+ Compiling your program with the -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-dumpall
+\begin_inset LatexCommand \index{-\/-dumpall}
+
+\end_inset 
+
+ option can sometimes be useful in locating optimization problems.
+ When reporting a bug please maker sure you:
+\layout Enumerate
+
+Attach the code you are compiling with SDCC.
+ 
+\layout Enumerate
+
+Specify the exact command you use to run SDCC, or attach your Makefile.
+ 
+\layout Enumerate
+
+Specify the SDCC version (type "sdcc -v"), your platform, and operating
+ system.
+ 
+\layout Enumerate
+
+Provide an exact copy of any error message or incorrect output.
+ 
+\layout Enumerate
+
+Put something meaningful in the subject of your message.
+\layout Standard
+
+Please attempt to include these 5 important parts, as applicable, in all
+ requests for support or when reporting any problems or bugs with SDCC.
+ Though this will make your message lengthy, it will greatly improve your
+ chance that SDCC users and developers will be able to help you.
+ Some SDCC developers are frustrated by bug reports without code provided
+ that they can use to reproduce and ultimately fix the problem, so please
+ be sure to provide sample code if you are reporting a bug! 
+\layout Standard
+
+Please have a short check that you are using a recent version of SDCC and
+ the bug is not yet known.
+ This is the link for reporting bugs: 
+\begin_inset LatexCommand \htmlurl{http://sourceforge.net/tracker/?group_id=599&atid=100599}
+
+\end_inset 
+
+.
+\layout Subsection
+
+Requesting Features
+\begin_inset LatexCommand \label{sub:Requesting-Features}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Feature request}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Requesting features}
+
+\end_inset 
+
+
+\layout Standard
+
+Like bug reports feature requests are forwarded to the developer mailing
+ list.
+ This is the link for requesting features: 
+\begin_inset LatexCommand \htmlurl{http://sourceforge.net/tracker/?group_id=599&atid=350599}
+
+\end_inset 
+
+.
+\layout Subsection
+
+Getting Help
+\layout Standard
+
+These links should take you directly to the 
+\begin_inset LatexCommand \url[Mailing lists]{http://sourceforge.net/mail/?group_id=599}
+
+\end_inset 
+
+
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
+ automated messages (mid 2003)
+\end_inset 
+
+ and the 
+\begin_inset LatexCommand \url[Forums]{http://sourceforge.net/forum/?group_id=599}
+
+\end_inset 
+
+, lists and forums are archived so if you are lucky someone already had
+ a similar problem.
+\layout Subsection
+
+ChangeLog
+\begin_inset LatexCommand \index{Changelog}
+
+\end_inset 
+
+
+\layout Standard
+
+You can follow the status of the cvs version
+\begin_inset LatexCommand \index{version}
+
+\end_inset 
+
+ of SDCC by watching the file 
+\begin_inset LatexCommand \htmlurl[ChangeLog]{http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/sdcc/sdcc/ChangeLog?rev=HEAD&content-type=text/plain}
+
+\end_inset 
+
+ in the cvs-repository.
+\layout Subsection
+
+Release policy
+\begin_inset LatexCommand \index{Release policy}
+
+\end_inset 
+
+
+\layout Standard
+
+Historically there often were long delays between official releases and
+ the sourceforge download area tends to get not updated at all.
+ Current excuses might refer to problems with live range analysis, but if
+ this is fixed, the next problem rising is that another excuse will have
+ to be found.
+ Kidding aside, we have to get better there! On the other hand there are
+ daily snapshots available at 
+\begin_inset LatexCommand \htmlurl[snap]{http://sdcc.sourceforge.net/snap.php}
+
+\end_inset 
+
+, and you can always built the very last version (hopefully with many bugs
+ fixed, and features added) from the source code available at 
+\begin_inset LatexCommand \htmlurl[Source]{http://sdcc.sourceforge.net/snap.php#Source}
+
+\end_inset 
+
+.
+\layout Subsection
+
+Examples
+\begin_inset LatexCommand \index{Examples}
+
+\end_inset 
+
+
+\layout Standard
+
+You'll find some small examples in the directory sdcc/device/examples/
+\layout Comment
+
+Maybe we should include some links to real world applications.
+ Preferably pointer to pointers (one for each architecture) so this stays
+ manageable here?
+\layout Subsection
+
+Quality control
+\begin_inset LatexCommand \index{Quality control}
+
+\end_inset 
+
+
+\layout Standard
+
+The compiler is passed through nightly compile and build checks.
+ The so called 
+\shape italic 
+regression tests
+\shape default 
+
+\begin_inset LatexCommand \index{Regression test}
+
+\end_inset 
+
+ check that SDCC itself compiles flawlessly on several platforms and checks
+ the quality of the code generated by SDCC by running the code through simulator
+s.
+ There is a separate document 
+\shape italic 
+test_suite.pdf
+\begin_inset LatexCommand \index{Test suite}
+
+\end_inset 
+
+
+\shape default 
+ about this.
+\layout Standard
+
+You'll find the test code in the directory 
+\shape italic 
+sdcc/support/regression
+\shape default 
+.
+ You can run these tests manually by running 
+\family sans 
+make
+\family default 
+ in this directory (or f.e.
+ 
+\family sans 
+make test-mcs51
+\family default 
+ if you don't want to run the complete tests).
+ The test code might also be interesting if you want to look for examples
+\begin_inset LatexCommand \index{Examples}
+
+\end_inset 
+
+ checking corner cases of SDCC or if you plan to submit patches
+\begin_inset LatexCommand \index{Patch submission}
+
+\end_inset 
+
+.
+\layout Standard
+
+The pic port uses a different set of regression tests, you'll find them
+ in the directory 
+\shape italic 
+sdcc/src/regression
+\shape default 
+.
 \layout Section
 \pagebreak_top 
 SDCC Technical Data
@@ -12211,252 +15589,6 @@ status Collapsed
 -peep-file option.
 \layout Subsection
 
-Pragmas
-\begin_inset LatexCommand \index{Pragmas}
-
-\end_inset 
-
-
-\layout Standard
-
-SDCC supports the following #pragma directives.
-\layout Itemize
-
-SAVE
-\begin_inset LatexCommand \index{\#pragma SAVE}
-
-\end_inset 
-
- - this will save all current options to the SAVE/RESTORE stack.
- See RESTORE.
-\layout Itemize
-
-RESTORE
-\begin_inset LatexCommand \index{\#pragma RESTORE}
-
-\end_inset 
-
- - will restore saved options from the last save.
- SAVEs & RESTOREs can be nested.
- SDCC uses a SAVE/RESTORE stack: SAVE pushes current options to the stack,
- RESTORE pulls current options from the stack.
- See SAVE.
-\layout Itemize
-
-NOGCSE
-\begin_inset LatexCommand \index{\#pragma NOGCSE}
-
-\end_inset 
-
- - will stop global common subexpression elimination.
-\layout Itemize
-
-NOINDUCTION
-\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
-
-\end_inset 
-
- - will stop loop induction optimizations.
-\layout Itemize
-
-NOJTBOUND
-\begin_inset LatexCommand \index{\#pragma NOJTBOUND}
-
-\end_inset 
-
- - will not generate code for boundary value checking, when switch statements
- are turned into jump-tables (dangerous).
- 
-\layout Itemize
-
-NOOVERLAY
-\begin_inset LatexCommand \index{\#pragma NOOVERLAY}
-
-\end_inset 
-
- - the compiler will not overlay the parameters and local variables of a
- function.
-\layout Itemize
-
-LESS_PEDANTIC
-\begin_inset LatexCommand \index{\#pragma LESS\_PEDANTIC}
-
-\end_inset 
-
- - the compiler will not warn you anymore for obvious mistakes, you'r on
- your own now ;-(
-\layout Itemize
-
-NOLOOPREVERSE
-\begin_inset LatexCommand \index{\#pragma NOLOOPREVERSE}
-
-\end_inset 
-
- - Will not do loop reversal optimization
-\layout Itemize
-
-EXCLUDE
-\begin_inset LatexCommand \index{\#pragma EXCLUDE}
-
-\end_inset 
-
- NONE | {acc[,b[,dpl[,dph]]] - The exclude pragma disables generation of
- pair of push/pop
-\begin_inset LatexCommand \index{push/pop}
-
-\end_inset 
-
- instruction in ISR function (using interrupt
-\begin_inset LatexCommand \index{interrupt}
-
-\end_inset 
-
- keyword).
- The directive should be placed immediately before the ISR function definition
- and it affects ALL ISR functions following it.
- To enable the normal register saving for ISR functions use #pragma\SpecialChar ~
-EXCLUDE\SpecialChar ~
-none
-\begin_inset LatexCommand \index{\#pragma EXCLUDE}
-
-\end_inset 
-
-.
-\layout Itemize
-
-NOIV
-\begin_inset LatexCommand \index{\#pragma NOIV}
-
-\end_inset 
-
- - Do not generate interrupt vector table entries for all ISR functions
- defined after the pragma.
- This is useful in cases where the interrupt vector table must be defined
- manually, or when there is a secondary, manually defined interrupt vector
- table (e.g.
- for the autovector feature of the Cypress EZ-USB FX2).
-\layout Itemize
-
-CALLEE-SAVES
-\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{function prologue}
-
-\end_inset 
-
- function1[,function2[,function3...]] - The compiler by default uses a caller
- saves convention for register saving across function calls, however this
- can cause unnecessary register pushing & popping when calling small functions
- from larger functions.
- This option can be used to switch off the register saving convention for
- the function names specified.
- The compiler will not save registers when calling these functions, extra
- code need to be manually inserted at the entry & exit for these functions
- to save & restore the registers used by these functions, this can SUBSTANTIALLY
- reduce code & improve run time performance of the generated code.
- In the future the compiler (with inter procedural analysis) may be able
- to determine the appropriate scheme to use for each function call.
- If -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--callee-saves command line option is used, the function names specified
- in #pragma\SpecialChar ~
-CALLEE-SAVES
-\begin_inset LatexCommand \index{\#pragma CALLEE-SAVES}
-
-\end_inset 
-
- is appended to the list of functions specified in the command line.
-\layout Standard
-
-The pragma's are intended to be used to turn-off certain optimizations which
- might cause the compiler to generate extra stack / data space to store
- compiler generated temporary variables.
- This usually happens in large functions.
- Pragma directives should be used as shown in the following example, they
- are used to control options & optimizations for a given function; pragmas
- should be placed before and/or after a function, placing pragma's inside
- a function body could have unpredictable results.
-\layout Verse
-
-
-\family typewriter 
-#pragma SAVE
-\begin_inset LatexCommand \index{\#pragma SAVE}
-
-\end_inset 
-
- \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* save the current settings */ 
-\newline 
-#pragma NOGCSE
-\begin_inset LatexCommand \index{\#pragma NOGCSE}
-
-\end_inset 
-
- \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* turnoff global subexpression elimination */ 
-\newline 
-#pragma NOINDUCTION
-\begin_inset LatexCommand \index{\#pragma NOINDUCTION}
-
-\end_inset 
-
- /* turn off induction optimizations */ 
-\newline 
-int foo () 
-\newline 
-{ 
-\newline 
-\SpecialChar ~
- \SpecialChar ~
- ...
- 
-\newline 
-\SpecialChar ~
- \SpecialChar ~
- /* large code */ 
-\newline 
-\SpecialChar ~
- \SpecialChar ~
- ...
- 
-\newline 
-} 
-\newline 
-#pragma RESTORE
-\begin_inset LatexCommand \index{\#pragma RESTORE}
-
-\end_inset 
-
- /* turn the optimizations back on */
-\layout Standard
-
-The compiler will generate a warning message when extra space is allocated.
- It is strongly recommended that the SAVE and RESTORE pragma's be used when
- changing options for a function.
-\layout Subsection
-
 Library Routines
 \emph on 
  
@@ -12478,8 +15610,13 @@ Stdclib functions (puts, printf, strcat etc)
 Math functions (sin, pow, sqrt etc)
 \layout Standard
 
-Libraries included in SDCC should have a license at least as liberal as
- the GNU Lesser General Public License
+Libraries
+\begin_inset LatexCommand \index{Libraries}
+
+\end_inset 
+
+ included in SDCC should have a license at least as liberal as the GNU Lesser
+ General Public License
 \begin_inset LatexCommand \index{GNU Lesser General Public License, LGPL}
 
 \end_inset 
@@ -12495,457 +15632,6 @@ license statements for the libraries are missing.
  sdcc/device/lib/ser_ir.c f.e.
  comes with a GPL (as opposed to LGPL) License - this will not be liberal
  enough for many embedded programmers.
-\layout Subsection
-
-Interfacing with Assembly Routines
-\begin_inset LatexCommand \index{Assembler routines}
-
-\end_inset 
-
-
-\layout Subsubsection
-
-Global Registers used for Parameter Passing
-\begin_inset LatexCommand \index{Parameter passing}
-
-\end_inset 
-
-
-\layout Standard
-
-The compiler always uses the global registers 
-\emph on 
-DPL, DPH
-\begin_inset LatexCommand \index{DPTR, DPH, DPL}
-
-\end_inset 
-
-, B
-\begin_inset LatexCommand \index{B (register)}
-
-\end_inset 
-
- 
-\emph default 
-and
-\emph on 
- ACC
-\begin_inset LatexCommand \index{ACC}
-
-\end_inset 
-
-
-\emph default 
- to pass the first parameter to a routine.
- The second parameter onwards is either allocated on the stack (for reentrant
- routines or if -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--stack-auto is used) or in data / xdata memory (depending on the memory
- model).
- 
-\layout Subsubsection
-
-Assembler Routine(non-reentrant
-\begin_inset LatexCommand \index{reentrant}
-
-\end_inset 
-
-)
-\begin_inset LatexCommand \index{Assembler routines (non-reentrant)}
-
-\end_inset 
-
-
-\layout Standard
-
-In the following example the function c_func calls an assembler routine
- asm_func, which takes two parameters.
-\layout Verse
-
-
-\family typewriter 
-extern int asm_func(unsigned char, unsigned char);
-\newline 
-
-\newline 
-int c_func (unsigned char i, unsigned char j)
-\newline 
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-return asm_func(i,j);
-\newline 
-}
-\newline 
-
-\newline 
-int main()
-\newline 
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-return c_func(10,9);
-\newline 
-}
-\layout Standard
-
-The corresponding assembler function is:
-\layout Verse
-
-
-\family typewriter 
-.globl _asm_func_PARM_2 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-.globl _asm_func 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-.area OSEG 
-\newline 
-_asm_func_PARM_2:
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-.ds     1 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-.area CSEG 
-\newline 
-_asm_func: 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov    a,dpl 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-add    a,_asm_func_PARM_2 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov    dpl,a 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-dpl
-\begin_inset LatexCommand \index{DPTR, DPH, DPL}
-
-\end_inset 
-
-,#0x00 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-ret
-\layout Standard
-
-Note here that the return values are placed in 'dpl' - One byte return value,
- 'dpl' LSB & 'dph' MSB for two byte values.
- 'dpl', 'dph' and 'b' for three byte values (generic pointers) and 'dpl','dph','
-b' & 'acc' for four byte values.
-\layout Standard
-
-The parameter naming convention is _<function_name>_PARM_<n>, where n is
- the parameter number starting from 1, and counting from the left.
- The first parameter is passed in 
-\begin_inset Quotes eld
-\end_inset 
-
-dpl
-\begin_inset Quotes erd
-\end_inset 
-
- for One bye parameter, 
-\begin_inset Quotes eld
-\end_inset 
-
-dptr
-\begin_inset Quotes erd
-\end_inset 
-
- if two bytes, 
-\begin_inset Quotes eld
-\end_inset 
-
-b,dptr
-\begin_inset Quotes erd
-\end_inset 
-
- for three bytes and 
-\begin_inset Quotes eld
-\end_inset 
-
-acc,b,dptr
-\begin_inset Quotes erd
-\end_inset 
-
- for four bytes, the variable name for the second parameter will be _<function_n
-ame>_PARM_2.
-\newline 
-
-\newline 
-Assemble the assembler routine with the following command:
-\newline 
-
-\newline 
-
-\family sans 
-\series bold 
-asx8051 -losg asmfunc.asm
-\newline 
-
-\newline 
-
-\family default 
-\series default 
-Then compile and link the assembler routine to the C source file with the
- following command:
-\newline 
-
-\newline 
-
-\family sans 
-\series bold 
-sdcc cfunc.c asmfunc.rel
-\layout Subsubsection
-
-Assembler Routine(reentrant
-\begin_inset LatexCommand \index{reentrant}
-
-\end_inset 
-
-)
-\begin_inset LatexCommand \index{Assembler routines (reentrant)}
-
-\end_inset 
-
-
-\layout Standard
-
-In this case the second parameter onwards will be passed on the stack, the
- parameters are pushed from right to left i.e.
- after the call the left most parameter will be on the top of the stack.
- Here is an example:
-\layout Verse
-
-
-\family typewriter 
-extern int asm_func(unsigned char, unsigned char);
-\newline 
-
-\newline 
-int c_func (unsigned char i, unsigned char j) reentrant 
-\newline 
-{ 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-return asm_func(i,j); 
-\newline 
-} 
-\newline 
-
-\newline 
-int main() 
-\newline 
-{ 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-return c_func(10,9); 
-\newline 
-}
-\layout Standard
-
-The corresponding assembler routine is:
-\layout Verse
-
-
-\family typewriter 
-.globl _asm_func 
-\newline 
-_asm_func: 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-push  _bp 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov _bp,sp 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  r2,dpl
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  a,_bp 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-clr  c 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-add  a,#0xfd 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  r0,a 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-add  a,#0xfc
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  r1,a 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  a,@r0 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-add  a,r2
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  dpl,a 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  dph,#0x00 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov  sp,_bp 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-pop  _bp 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-ret
-\layout Standard
-
-The compiling and linking procedure remains the same, however note the extra
- entry & exit linkage required for the assembler code, _bp is the stack
- frame pointer and is used to compute the offset into the stack for parameters
- and local variables.
 \layout Subsection
 
 External Stack
@@ -13197,1236 +15883,49 @@ Having said that the industry standard is 10, you should be aware that in
  The complexity level is by no means an absolute measure of the algorithmic
  complexity of the function, it does however provide a good starting point
  for which functions you might look at for further optimization.
-\layout Section
-\pagebreak_top 
-TIPS
-\layout Standard
-
-Here are a few guidelines that will help the compiler generate more efficient
- code, some of the tips are specific to this compiler others are generally
- good programming practice.
-\layout Itemize
-
-Use the smallest data type to represent your data-value.
- If it is known in advance that the value is going to be less than 256 then
- use an 'unsigned char' instead of a 'short' or 'int'.
-\layout Itemize
-
-Use unsigned when it is known in advance that the value is not going to
- be negative.
- This helps especially if you are doing division or multiplication.
-\layout Itemize
-
-NEVER jump into a LOOP.
-\layout Itemize
-
-Declare the variables to be local whenever possible, especially loop control
- variables (induction).
-\layout Itemize
-
-Since the compiler does not always do implicit integral promotion, the programme
-r should do an explicit cast when integral promotion is required.
-\layout Itemize
-
-Reducing the size of division, multiplication & modulus operations can reduce
- code size substantially.
- Take the following code for example.
-\begin_deeper 
-\layout Verse
-
-
-\family typewriter 
-foobar(unsigned int p1, unsigned char ch)
-\newline 
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-unsigned char ch1 = p1 % ch ;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-....
-\newline 
-}
-\layout Standard
-
-For the modulus operation the variable ch will be promoted to unsigned int
- first then the modulus operation will be performed (this will lead to a
- call to support routine _moduint()), and the result will be casted to a
- char.
- If the code is changed to 
-\layout Verse
-
-
-\family typewriter 
-foobar(unsigned int p1, unsigned char ch)
-\newline 
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-unsigned char ch1 = (unsigned char)p1 % ch ;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-....
-\newline 
-}
-\layout Standard
-
-It would substantially reduce the code generated (future versions of the
- compiler will be smart enough to detect such optimization opportunities).
-\end_deeper 
-\layout Itemize
-
-Have a look at the assembly listing to get a 
-\begin_inset Quotes sld
-\end_inset 
-
-feeling
-\begin_inset Quotes srd
-\end_inset 
-
- for the code generation.
 \layout Subsection
 
-Notes on MCS51 memory
-\begin_inset LatexCommand \index{MCS51 memory}
+Other Processors
+\layout Subsubsection
 
-\end_inset 
-
- layout
+The Z80 and gbz80 port
 \layout Standard
 
-The 8051 family of microcontrollers have a minimum of 128 bytes of internal
- RAM memory which is structured as follows
-\newline 
-
-\newline 
-- Bytes 00-1F - 32 bytes to hold up to 4 banks of the registers R0 to R7,
- 
-\newline 
-- Bytes 20-2F - 16 bytes to hold 128 bit variables and, 
-\newline 
-- Bytes 30-7F - 80 bytes for general purpose use.
-\newline 
-
-\layout Standard
-
-Additionally some members of the MCS51 family may have up to 128 bytes of
- additional, indirectly addressable, internal RAM memory (
-\emph on 
-idata
-\emph default 
-).
- Furthermore, some chips may have some built in external memory (
-\emph on 
-xdata
-\emph default 
-) which should not be confused with the internal, directly addressable RAM
- memory (
-\emph on 
-data
-\emph default 
-).
- Sometimes this built in 
-\emph on 
-xdata
-\emph default 
- memory has to be activated before using it (you can probably find this
- information on the datasheet of the microcontroller your are using).
-\layout Standard
-
-Normally SDCC will only use the first bank
-\begin_inset LatexCommand \index{bank}
+SDCC can target both the Zilog 
+\begin_inset LatexCommand \index{Z80}
 
 \end_inset 
 
- of registers (register bank 0), but it is possible to specify that other
- banks of registers should be used in interrupt
-\begin_inset LatexCommand \index{interrupt}
-
-\end_inset 
-
- routines.
- By default, the compiler will place the stack after the last byte of allocated
- memory for variables.
- For example, if the first 2 banks of registers are used, and only four
- bytes are used for 
-\emph on 
-data
-\emph default 
- variables, it will position the base of the internal stack at address 20
- (0x14).
- This implies that as the stack
-\begin_inset LatexCommand \index{stack}
-
-\end_inset 
-
- grows, it will use up the remaining register banks, and the 16 bytes used
- by the 128 bit variables, and 80 bytes for general purpose use.
- If any bit variables are used, the data variables will be placed after
- the byte holding the last bit variable.
- For example, if register banks 0 and 1 are used, and there are 9 bit variables
- (two bytes used), 
-\emph on 
-data
-\emph default 
- variables will be placed starting at address 0x22.
- You can also use -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--data-loc
-\begin_inset LatexCommand \index{-\/-data-loc}
-
-\end_inset 
-
- to specify the start address of the 
-\emph on 
-data
-\emph default 
- and -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--iram-size to specify the size of the total internal RAM (
-\emph on 
-data
-\emph default 
-+
-\emph on 
-idata
-\emph default 
-).
- 
-\layout Standard
-
-By default the 8051 linker will place the stack after the last byte of data
- variables.
- Option -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--stack-loc
-\begin_inset LatexCommand \index{-\/-stack-loc}
-
-\end_inset 
-
- allows you to specify the start of the stack, i.e.
- you could start it after any data in the general purpose area.
- If your microcontroller has additional indirectly addressable internal
- RAM (
-\emph on 
-idata
-\emph default 
-) you can place the stack on it.
- You may also need to use -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--xdata-loc
-\begin_inset LatexCommand \index{-\/-data-loc}
-
-\end_inset 
-
- to set the start address of the external RAM (
-\emph on 
-xdata
-\emph default 
-) and -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--xram-size
-\begin_inset LatexCommand \index{-\/-data-loc}
-
-\end_inset 
-
- to specify its size.
- Same goes for the code memory, using -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--code-loc
-\begin_inset LatexCommand \index{-\/-data-loc}
-
-\end_inset 
-
- and -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--code-size
-\begin_inset LatexCommand \index{-\/-data-loc}
+ and the Nintendo Gameboy's Z80-like gbz80
+\begin_inset LatexCommand \index{GameBoy Z80}
 
 \end_inset 
 
 .
- If in doubt, don't specify any options and see if the resulting memory
- layout is appropriate, then you can adjust it.
-\layout Standard
-
-The 8051 linker generates two files with memory allocation information.
- The first, with extension .map shows all the variables and segments.
- The second with extension .mem shows the final memory layout.
- The linker will complaint either if memory segments overlap, there is not
- enough memory, or there is not enough space for stack.
- If you get any linking warnings and/or errors related to stack or segments
- allocation, take a look at either the .map or .mem files to find out what
- the problem is.
- The .mem file may even suggest a solution to the problem.
-\layout Subsection
-
-Tools
-\begin_inset LatexCommand \index{Tools}
-
-\end_inset 
-
- included in the distribution
-\layout Standard
-\align center 
-
-\begin_inset  Tabular
-<lyxtabular version="3" rows="12" columns="3">
-<features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Name
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Purpose
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Directory
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-uCsim
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Simulator for various architectures
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-sdcc/sim/ucsim
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-keil2sdcc.pl
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-header file conversion
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-sdcc/support/scripts
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-mh2h.c
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-header file conversion
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-sdcc/support/scripts
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-as-gbz80
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Assembler
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-as-z80
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Assembler
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-asx8051
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Assembler
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-sdcdb
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Simulator
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-aslink
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Linker
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-link-z80
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Linker
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-link-gbz80
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Linker
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-packihx
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-ihx packer
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-sdcc/bin
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\newline 
-
-\layout Subsection
-
-Related open source tools
-\begin_inset LatexCommand \index{Related tools}
-
-\end_inset 
-
-
-\layout Standard
-\align center 
-
-\begin_inset  Tabular
-<lyxtabular version="3" rows="8" columns="3">
-<features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Name
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Purpose
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Where to get
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-gpsim
-\begin_inset LatexCommand \index{gpsim}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-PIC simulator
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://www.dattalo.com/gnupic/gpsim.html}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-flP5
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-PIC programmer
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://digilander.libero.it/fbradasc/FLP5.html}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-srecord
-\begin_inset LatexCommand \index{srecord}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Object file conversion, checksumming, ...
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://srecord.sourceforge.net/}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-objdump
-\begin_inset LatexCommand \index{objdump}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Object file conversion, ...
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Part of binutils (should be there anyway)
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-doxygen
-\begin_inset LatexCommand \index{doxygen}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Source code documentation system
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://www.doxygen.org}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-splint
-\begin_inset LatexCommand \index{splint}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Statically checks c sources
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://www.splint.org}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-ddd
-\begin_inset LatexCommand \index{ddd}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Debugger, serves nicely as GUI to sdcdb
-\begin_inset LatexCommand \index{sdcdb}
-
-\end_inset 
-
- (Unix only)
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://www.gnu.org/software/ddd/}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\newline 
-
-\layout Subsection
-
-Related documentation / recommended reading
-\layout Standard
-\align center 
-
-\begin_inset  Tabular
-<lyxtabular version="3" rows="5" columns="3">
-<features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Name
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Subject / Title
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Where to get
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-S.
- S.
- Muchnick
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Advanced Compiler Design and Implementation
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-bookstore
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-c-refcard.pdf
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-C Reference Card
-\begin_inset LatexCommand \index{C Reference card}
-
-\end_inset 
-
-, 2 pages
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\begin_inset LatexCommand \url{http://www.refcards.com/about/c.html}
-
-\end_inset 
-
-
-\end_inset 
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-test_suite_spec.pdf
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-sdcc regression test
+ The Z80 port is passed through the same 
+\emph on 
+regressions tests
 \begin_inset LatexCommand \index{Regression test}
 
 \end_inset 
 
 
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-sdcc/doc
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-
-\family roman 
-\series medium 
-\shape up 
-\size normal 
-\emph off 
-\bar no 
-\noun off 
-\color none
-cdbfileformat.pd
-\family default 
-\series default 
-\shape default 
-\size default 
 \emph default 
-\bar default 
-\noun default 
-\color default
-f
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
+ as MCS51 and DS390 ports, so floating point support, support for long variables
+ and bitfield support is fine.
 \layout Standard
 
-sdcc internal documentation
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
+As always, the code is the authoritative reference - see z80/ralloc.c and
+ z80/gen.c.
+ The stack frame is similar to that generated by the IAR Z80 compiler.
+ IX is used as the base pointer, HL is used as a temporary register, and
+ BC and DE are available for holding variables.
+ IY is currently unused.
+ Return values are stored in HL.
+ One bad side effect of using IX as the base pointer is that a functions
+ stack frame is limited to 127 bytes - this will be fixed in a later version.
+\layout Subsection
 
-\layout Standard
-
-sdcc/doc
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\newline 
-
-\layout Section
-\pagebreak_top 
 Retargetting for other MCUs.
 \layout Standard
 
@@ -14519,1483 +16018,6 @@ The Code generation phase is (unhappily), entirely MCU dependent and very
 
 As mentioned in the optimization section the peep-hole optimizer is rule
  based system, which can reprogrammed for other MCUs.
-\layout Section
-\pagebreak_top 
-SDCDB
-\begin_inset LatexCommand \index{sdcdb}
-
-\end_inset 
-
- - Source Level Debugger
-\begin_inset LatexCommand \index{Debugger}
-
-\end_inset 
-
-
-\layout Standard
-
-SDCC is distributed with a source level debugger.
- The debugger uses a command line interface, the command repertoire of the
- debugger has been kept as close to gdb
-\begin_inset LatexCommand \index{gdb}
-
-\end_inset 
-
- (the GNU debugger) as possible.
- The configuration and build process is part of the standard compiler installati
-on, which also builds and installs the debugger in the target directory
- specified during configuration.
- The debugger allows you debug BOTH at the C source and at the ASM source
- level.
- Sdcdb is available on Unix platforms only.
-\layout Subsection
-
-Compiling for Debugging
-\layout Standard
-
-The \SpecialChar \-
-\SpecialChar \-
-debug option must be specified for all files for which debug information
- is to be generated.
- The complier generates a .adb file for each of these files.
- The linker creates the .cdb file from the .adb files and the address information.
- This .cdb is used by the debugger.
-\layout Subsection
-
-How the Debugger Works
-\layout Standard
-
-When the -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--debug option is specified the compiler generates extra symbol information
- some of which are put into the the assembler source and some are put into
- the .adb file.
-  Then the linker creates the .cdb file from the individual .adb files with
- the address information for the symbols.
- The debugger reads the symbolic information generated by the compiler &
- the address information generated by the linker.
- It uses the SIMULATOR (Daniel's S51) to execute the program, the program
- execution is controlled by the debugger.
- When a command is issued for the debugger, it translates it into appropriate
- commands for the simulator.
-\layout Subsection
-
-Starting the Debugger
-\layout Standard
-
-The debugger can be started using the following command line.
- (Assume the file you are debugging has the file name foo).
-\newline 
-
-\newline 
-
-\family sans 
-\series bold 
-sdcdb foo
-\newline 
-
-\family default 
-\series default 
-
-\newline 
-The debugger will look for the following files.
-\layout Itemize
-
-foo.c - the source file.
-\layout Itemize
-
-foo.cdb - the debugger symbol information file.
-\layout Itemize
-
-foo.ihx - the Intel hex format
-\begin_inset LatexCommand \index{Intel hex format}
-
-\end_inset 
-
- object file.
-\layout Subsection
-
-Command Line Options.
-\layout Itemize
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--directory=<source file directory> this option can used to specify the directory
- search list.
- The debugger will look into the directory list specified for source, cdb
- & ihx files.
- The items in the directory list must be separated by ':', e.g.
- if the source files can be in the directories /home/src1 and /home/src2,
- the -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--directory option should be -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--directory=/home/src1:/home/src2.
- Note there can be no spaces in the option.
- 
-\layout Itemize
-
--cd <directory> - change to the <directory>.
-\layout Itemize
-
--fullname - used by GUI front ends.
-\layout Itemize
-
--cpu <cpu-type> - this argument is passed to the simulator please see the
- simulator docs for details.
-\layout Itemize
-
--X <Clock frequency > this options is passed to the simulator please see
- the simulator docs for details.
-\layout Itemize
-
--s <serial port file> passed to simulator see the simulator docs for details.
-\layout Itemize
-
--S <serial in,out> passed to simulator see the simulator docs for details.
-\layout Subsection
-
-Debugger Commands.
-\layout Standard
-
-As mention earlier the command interface for the debugger has been deliberately
- kept as close the GNU debugger gdb, as possible.
- This will help the integration with existing graphical user interfaces
- (like ddd, xxgdb or xemacs) existing for the GNU debugger.
-\layout Subsubsection
-
-break [line | file:line | function | file:function]
-\layout Standard
-
-Set breakpoint at specified line or function:
-\newline 
-
-\newline 
-
-\family sans 
-\series bold 
-sdcdb>break 100 
-\newline 
-sdcdb>break foo.c:100
-\newline 
-sdcdb>break funcfoo
-\newline 
-sdcdb>break foo.c:funcfoo
-\layout Subsubsection
-
-clear [line | file:line | function | file:function ]
-\layout Standard
-
-Clear breakpoint at specified line or function:
-\newline 
-
-\newline 
-
-\family sans 
-\series bold 
-sdcdb>clear 100
-\newline 
-sdcdb>clear foo.c:100
-\newline 
-sdcdb>clear funcfoo
-\newline 
-sdcdb>clear foo.c:funcfoo
-\layout Subsubsection
-
-continue
-\layout Standard
-
-Continue program being debugged, after breakpoint.
-\layout Subsubsection
-
-finish
-\layout Standard
-
-Execute till the end of the current function.
-\layout Subsubsection
-
-delete [n]
-\layout Standard
-
-Delete breakpoint number 'n'.
- If used without any option clear ALL user defined break points.
-\layout Subsubsection
-
-info [break | stack | frame | registers ]
-\layout Itemize
-
-info break - list all breakpoints
-\layout Itemize
-
-info stack - show the function call stack.
-\layout Itemize
-
-info frame - show information about the current execution frame.
-\layout Itemize
-
-info registers - show content of all registers.
-\layout Subsubsection
-
-step
-\layout Standard
-
-Step program until it reaches a different source line.
-\layout Subsubsection
-
-next
-\layout Standard
-
-Step program, proceeding through subroutine calls.
-\layout Subsubsection
-
-run
-\layout Standard
-
-Start debugged program.
-\layout Subsubsection
-
-ptype variable 
-\layout Standard
-
-Print type information of the variable.
-\layout Subsubsection
-
-print variable
-\layout Standard
-
-print value of variable.
-\layout Subsubsection
-
-file filename
-\layout Standard
-
-load the given file name.
- Note this is an alternate method of loading file for debugging.
-\layout Subsubsection
-
-frame
-\layout Standard
-
-print information about current frame.
-\layout Subsubsection
-
-set srcmode
-\layout Standard
-
-Toggle between C source & assembly source.
-\layout Subsubsection
-
-! simulator command
-\layout Standard
-
-Send the string following '!' to the simulator, the simulator response is
- displayed.
- Note the debugger does not interpret the command being sent to the simulator,
- so if a command like 'go' is sent the debugger can loose its execution
- context and may display incorrect values.
-\layout Subsubsection
-
-quit.
-\layout Standard
-
-"Watch me now.
- Iam going Down.
- My name is Bobby Brown"
-\layout Subsection
-
-Interfacing with XEmacs
-\begin_inset LatexCommand \index{XEmacs}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{Emacs}
-
-\end_inset 
-
-.
-\layout Standard
-
-Two files (in emacs lisp) are provided for the interfacing with XEmacs,
- sdcdb.el and sdcdbsrc.el.
- These two files can be found in the $(prefix)/bin directory after the installat
-ion is complete.
- These files need to be loaded into XEmacs for the interface to work.
- This can be done at XEmacs startup time by inserting the following into
- your '.xemacs' file (which can be found in your HOME directory): 
-\newline 
-
-\newline 
-
-\family typewriter 
-(load-file sdcdbsrc.el) 
-\family default 
-
-\newline 
-
-\newline 
-.xemacs is a lisp file so the () around the command is REQUIRED.
- The files can also be loaded dynamically while XEmacs is running, set the
- environment variable 'EMACSLOADPATH' to the installation bin directory
- (<installdir>/bin), then enter the following command ESC-x load-file sdcdbsrc.
- To start the interface enter the following command: 
-\newline 
-
-\newline 
-
-\family sans 
-\series bold 
-ESC-x sdcdbsrc
-\family default 
-\series default 
-
-\newline 
-
-\newline 
-You will prompted to enter the file name to be debugged.
- 
-\newline 
-
-\newline 
-The command line options that are passed to the simulator directly are bound
- to default values in the file sdcdbsrc.el.
- The variables are listed below, these values maybe changed as required.
-\layout Itemize
-
-sdcdbsrc-cpu-type '51
-\layout Itemize
-
-sdcdbsrc-frequency '11059200
-\layout Itemize
-
-sdcdbsrc-serial nil
-\layout Standard
-
-The following is a list of key mapping for the debugger interface.
-\layout Standard
-
-\SpecialChar ~
-
-\family typewriter 
-
-\newline 
-;; Current Listing :: 
-\newline 
-;;key\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-binding\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-Comment 
-\newline 
-;;---\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-------\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
---------
-\newline 
-;; 
-\newline 
-;; n\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-next-from-src\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB next command 
-\newline 
-;; b\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-back-from-src\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB back command 
-\newline 
-;; c\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-cont-from-src\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB continue command
-\newline 
-;; s\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-step-from-src\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB step command 
-\newline 
-;; ?\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-whatis-c-sexp\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB ptypecommand for data at 
-\newline 
-;;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- buffer point 
-\newline 
-;; x\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-delete\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB Delete all breakpoints if no arg 
-\newline 
-;;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-given or delete arg (C-u arg x) 
-\newline 
-;; m\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-frame\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB Display current frame if no arg, 
-\newline 
-;;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-given or display frame arg 
-\newline 
-;;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-buffer point 
-\newline 
-;; !\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-goto-sdcdb\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-Goto the SDCDB output buffer 
-\newline 
-;; p\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-print-c-sexp\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB print command for data at 
-\newline 
-;;\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- buffer point 
-\newline 
-;; g\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-goto-sdcdb\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-Goto the SDCDB output buffer 
-\newline 
-;; t\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-mode\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-Toggles Sdcdbsrc mode (turns it off) 
-\newline 
-;; 
-\newline 
-;; C-c C-f\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-finish-from-src\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-SDCDB finish command 
-\newline 
-;; 
-\newline 
-;; C-x SPC\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdb-break\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-Set break for line with point 
-\newline 
-;; ESC t\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-mode\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-Toggle Sdcdbsrc mode 
-\newline 
-;; ESC m\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- sdcdbsrc-srcmode\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- Toggle list mode 
-\newline 
-;; 
-\family default 
-
-\newline 
-
-\layout Section
-
-Other Processors
-\layout Subsection
-
-The Z80 and gbz80 port
-\layout Standard
-
-SDCC can target both the Zilog 
-\begin_inset LatexCommand \index{Z80}
-
-\end_inset 
-
- and the Nintendo Gameboy's Z80-like gbz80
-\begin_inset LatexCommand \index{GameBoy Z80}
-
-\end_inset 
-
-.
- The port is incomplete - long support is incomplete (mul, div and mod are
- unimplemented), and both float and bitfield support is missing.
- Apart from that the code generated is correct.
-\layout Standard
-
-As always, the code is the authoritative reference - see z80/ralloc.c and
- z80/gen.c.
- The stack frame is similar to that generated by the IAR Z80 compiler.
- IX is used as the base pointer, HL is used as a temporary register, and
- BC and DE are available for holding variables.
- IY is currently unused.
- Return values are stored in HL.
- One bad side effect of using IX as the base pointer is that a functions
- stack frame is limited to 127 bytes - this will be fixed in a later version.
-\layout Section
-\pagebreak_top 
-Support
-\begin_inset LatexCommand \index{Support}
-
-\end_inset 
-
-
-\layout Standard
-
-SDCC has grown to be a large project.
- The compiler alone (without the preprocessor, assembler and linker) is
- about 40,000 lines of code (blank stripped).
- The open source nature of this project is a key to its continued growth
- and support.
- You gain the benefit and support of many active software developers and
- end users.
- Is SDCC perfect? No, that's why we need your help.
- The developers take pride in fixing reported bugs.
- You can help by reporting the bugs and helping other SDCC users.
- There are lots of ways to contribute, and we encourage you to take part
- in making SDCC a great software package.
- 
-\layout Standard
-
-The SDCC project is hosted on the sdcc sourceforge site at 
-\begin_inset LatexCommand \htmlurl{http://sourceforge.net/projects/sdcc}
-
-\end_inset 
-
-.
- You'll find the complete set of mailing lists
-\begin_inset LatexCommand \index{Mailing list}
-
-\end_inset 
-
-, forums, bug reporting system, patch submission
-\begin_inset LatexCommand \index{Patch submission}
-
-\end_inset 
-
- system, download
-\begin_inset LatexCommand \index{download}
-
-\end_inset 
-
- area and cvs code repository
-\begin_inset LatexCommand \index{cvs code repository}
-
-\end_inset 
-
- there.
-\layout Subsection
-
-Reporting Bugs
-\begin_inset LatexCommand \index{Bugs}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{Reporting bugs}
-
-\end_inset 
-
-
-\layout Standard
-
-The recommended way of reporting bugs is using the infrastructure of the
- sourceforge site.
- You can follow the status of bug reports there and have an overview about
- the known bugs.
-\layout Standard
-
-Bug reports are automatically forwarded to the developer mailing list and
- will be fixed ASAP.
- When reporting a bug, it is very useful to include a small test program
- (the smaller the better) which reproduces the problem.
- If you can isolate the problem by looking at the generated assembly code,
- this can be very helpful.
- Compiling your program with the -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--dumpall
-\begin_inset LatexCommand \index{-\/-dumpall}
-
-\end_inset 
-
- option can sometimes be useful in locating optimization problems.
- When reporting a bug please maker sure you:
-\layout Enumerate
-
-Attach the code you are compiling with SDCC.
- 
-\layout Enumerate
-
-Specify the exact command you use to run SDCC, or attach your Makefile.
- 
-\layout Enumerate
-
-Specify the SDCC version (type "sdcc -v"), your platform, and operating
- system.
- 
-\layout Enumerate
-
-Provide an exact copy of any error message or incorrect output.
- 
-\layout Enumerate
-
-Put something meaningful in the subject of your message.
-\layout Standard
-
-Please attempt to include these 5 important parts, as applicable, in all
- requests for support or when reporting any problems or bugs with SDCC.
- Though this will make your message lengthy, it will greatly improve your
- chance that SDCC users and developers will be able to help you.
- Some SDCC developers are frustrated by bug reports without code provided
- that they can use to reproduce and ultimately fix the problem, so please
- be sure to provide sample code if you are reporting a bug! 
-\layout Standard
-
-Please have a short check that you are using a recent version of SDCC and
- the bug is not yet known.
- This is the link for reporting bugs: 
-\begin_inset LatexCommand \htmlurl{http://sourceforge.net/tracker/?group_id=599&atid=100599}
-
-\end_inset 
-
-.
-\layout Subsection
-
-Requesting Features
-\begin_inset LatexCommand \index{Feature request}
-
-\end_inset 
-
-
-\begin_inset LatexCommand \index{Requesting features}
-
-\end_inset 
-
-
-\layout Standard
-
-Like bug reports feature requests are forwarded to the developer mailing
- list.
- This is the link for requesting features: 
-\begin_inset LatexCommand \htmlurl{http://sourceforge.net/tracker/?group_id=599&atid=350599}
-
-\end_inset 
-
-.
-\layout Subsection
-
-Getting Help
-\layout Standard
-
-These links should take you directly to the 
-\begin_inset LatexCommand \url[Mailing lists]{http://sourceforge.net/mail/?group_id=599}
-
-\end_inset 
-
-
-\begin_inset Foot
-collapsed false
-
-\layout Standard
-
-Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
- automated messages (mid 2003)
-\end_inset 
-
- and the 
-\begin_inset LatexCommand \url[Forums]{http://sourceforge.net/forum/?group_id=599}
-
-\end_inset 
-
-, lists and forums are archived so if you are lucky someone already had
- a similar problem.
-\layout Subsection
-
-ChangeLog
-\begin_inset LatexCommand \index{Changelog}
-
-\end_inset 
-
-
-\layout Standard
-
-You can follow the status of the cvs version
-\begin_inset LatexCommand \index{version}
-
-\end_inset 
-
- of SDCC by watching the file 
-\begin_inset LatexCommand \htmlurl[ChangeLog]{http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/sdcc/sdcc/ChangeLog?rev=HEAD&content-type=text/plain}
-
-\end_inset 
-
- in the cvs-repository.
-\layout Subsection
-
-Release policy
-\begin_inset LatexCommand \index{Release policy}
-
-\end_inset 
-
-
-\layout Standard
-
-Historically there often were long delays between official releases and
- the sourceforge download area tends to get not updated at all.
- Current excuses might refer to problems with live range analysis, but if
- this is fixed, the next problem rising is that another excuse will have
- to be found.
- Kidding aside, we have to get better there! On the other hand there are
- daily snapshots available at 
-\begin_inset LatexCommand \htmlurl[snap]{http://sdcc.sourceforge.net/snap.php}
-
-\end_inset 
-
-, and you can always built the very last version (hopefully with many bugs
- fixed, and features added) from the source code available at 
-\begin_inset LatexCommand \htmlurl[Source]{http://sdcc.sourceforge.net/snap.php#Source}
-
-\end_inset 
-
-.
-\layout Subsection
-
-Examples
-\begin_inset LatexCommand \index{Examples}
-
-\end_inset 
-
-
-\layout Standard
-
-You'll find some small examples in the directory sdcc/device/examples/
-\layout Comment
-
-Maybe we should include some links to real world applications.
- Preferably pointer to pointers (one for each architecture) so this stays
- manageable here?
-\layout Subsection
-
-Quality control
-\begin_inset LatexCommand \index{Quality control}
-
-\end_inset 
-
-
-\layout Standard
-
-The compiler is passed through nightly compile and build checks.
- The so called 
-\shape italic 
-regression tests
-\shape default 
-
-\begin_inset LatexCommand \index{Regression test}
-
-\end_inset 
-
- check that SDCC itself compiles flawlessly on several platforms and checks
- the quality of the code generated by SDCC by running the code through simulator
-s.
- There is a separate document 
-\shape italic 
-test_suite.pdf
-\begin_inset LatexCommand \index{Test suite}
-
-\end_inset 
-
-
-\shape default 
- about this.
-\layout Standard
-
-You'll find the test code in the directory 
-\shape italic 
-sdcc/support/regression
-\shape default 
-.
- You can run these tests manually by running 
-\family sans 
-make
-\family default 
- in this directory (or f.e.
- 
-\family sans 
-make test-mcs51
-\family default 
- if you don't want to run the complete tests).
- The test code might also be interesting if you want to look for examples
-\begin_inset LatexCommand \index{Examples}
-
-\end_inset 
-
- checking corner cases of SDCC or if you plan to submit patches
-\begin_inset LatexCommand \index{Patch submission}
-
-\end_inset 
-
-.
-\layout Standard
-
-The pic port uses a different set of regression tests, you'll find them
- in the directory 
-\shape italic 
-sdcc/src/regression
-\shape default 
-.
 \layout Section
 \pagebreak_top 
 Compiler internals

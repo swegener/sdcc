@@ -1309,7 +1309,8 @@ valBitwise (value * lval, value * rval, int op)
 
   /* create a new value */
   val = newValue ();
-  val->type = copyLinkChain (lval->type);
+  val->type = copyLinkChain (getSize(rval->type) > getSize(lval->type) ?
+			     rval->type : lval->type);
   val->etype = getSpec (val->type);
 
   switch (op)

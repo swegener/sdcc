@@ -1,3 +1,7 @@
+2003-02-01    <johan@balder>
+
+	* src/SDCCval.c (valBitwise): fixed Karl's "2 | (1<<8)"
+
 2003-01-31    <johan@CP255758-A>
 
 	* src/ds390/main.c (_ds390_genAssemblerPreamble): applied Jan Rejlek's >64K startup patch

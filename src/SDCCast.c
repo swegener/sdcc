@@ -2284,6 +2284,7 @@ decorateType (ast * tree)
 	ast *wtree = optimizeRRCRLC (tree);
 	if (wtree != tree)
 	  return decorateType (wtree);
+	// fall through
       }
       /*------------------------------------------------------------------*/
       /*----------------------------*/

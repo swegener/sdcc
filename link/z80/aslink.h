@@ -12,6 +12,7 @@
 /*
  * Extensions: P. Felber
  */
+#include <linux/limits.h>
 
 #define	VERSION	"V01.75"
 
@@ -84,13 +85,12 @@
 #endif /* SDK */
 /* #define	NCPS	32 */	/* characters per symbol */
 #define	NDATA	16		/* actual data */
-#define	NINPUT	128		/* Input buffer size */
+#define	NINPUT	PATH_MAX	/* Input buffer size */
 #define	NHASH	64		/* Buckets in hash table */
 #define	HMASK	077		/* Hash mask */
 #define	NLPP	60		/* Lines per page */
 #define	NTXT	16		/* T values */
-/** PENDING: Taking this to 256 causes a segfault. */
-#define	FILSPC	100		/* File spec length */
+#define	FILSPC	PATH_MAX	/* File spec length */
 
 /*
  *	The "R_" relocation constants define values used in

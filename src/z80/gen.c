@@ -118,7 +118,7 @@
 */
 
 enum {
-  DISABLE_DEBUG = 1
+  DISABLE_DEBUG = 0
 };
 
 static char *_z80_return[] =
@@ -2748,7 +2748,7 @@ genPlus (iCode * ic)
   if (genPlusIncr (ic) == TRUE)
     goto release;
 
-  emitDebug ("; genPlusIncr failed");
+  emitDebug ("; Can't optimise plus by inc, falling back to the normal way");
 
   size = getDataSize (IC_RESULT (ic));
 
@@ -2756,10 +2756,11 @@ genPlus (iCode * ic)
   if (isPair (AOP (IC_RESULT (ic))))
     {
       char *left, *right;
-
       left = aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE);
       right = aopGetLitWordLong (AOP (IC_RIGHT (ic)), 0, FALSE);
-      if (left && right)
+
+      if (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT && AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT &&
+          left && right)
 	{
 	  /* It's a pair */
 	  /* PENDING: fix */
@@ -2841,7 +2842,7 @@ genPlus (iCode * ic)
 	    }
 	  else if (size == 4)
 	    {
-	      emitDebug ("; WARNING: This add is probably broken.\n");
+	      wassertl (0, "Hit bad case for add");
 	    }
 	}
     }

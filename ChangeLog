@@ -1,0 +1,7 @@
+2001-08-29  Michael Hope  <michaelh@juju.net.nz>
+
+	* link/z80/aslink.h: Fixed long file name support.  Is now based off PATH_MAX instead of a constant.
+
+	* src/z80/gen.c: Fixed add and sub for the case where left or right are in static space.
+	
+

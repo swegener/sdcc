@@ -1094,21 +1094,23 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	      /* if it has a spillocation & is used less than
 	         all other live ranges then spill this */
-	      if (willCS && sym->usl.spillLoc)
-		{
-
-		  symbol *leastUsed =
-		  leastUsedLR (liveRangesWith (spillable,
-					       allLRs,
-					       ebbs[i],
-					       ic));
-		  if (leastUsed &&
-		      leastUsed->used > sym->used)
-		    {
-		      spillThis (sym);
-		      continue;
-		    }
-		}
+	      if (willCS) {
+		      if (sym->usl.spillLoc) {
+			      symbol *leastUsed = leastUsedLR (liveRangesWith (spillable,
+									       allLRs, ebbs[i], ic));
+			      if (leastUsed && leastUsed->used > sym->used) {
+				      spillThis (sym);
+				      continue;
+			      }
+		      } else {
+			      /* if none of the liveRanges have a spillLocation then better
+				 to spill this one than anything else already assigned to registers */
+			      if (liveRangesWith(spillable,noSpilLoc,ebbs[i],ic)) {
+				      spillThis (sym);
+				      continue;
+			      }
+		      }
+	      }
 
 	      /* else we assign registers to it */
 	      regAssigned = bitVectSetBit (regAssigned, sym->key);

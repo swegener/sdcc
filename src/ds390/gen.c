@@ -460,49 +460,68 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 
   if (sym->onStack && options.stack10bit)
     {
+	short stack_val = -((sym->stack < 0) ?
+			    ((short) (sym->stack - _G.nRegsSaved)) :
+			    ((short) sym->stack)) ;
       /* It's on the 10 bit stack, which is located in
        * far data space.
        */
-
-      if (_G.accInUse)
-	emitcode ("push", "acc");
-
-      if (_G.bInUse)
-	emitcode ("push", "b");
-
-      emitcode ("mov", "a,_bpx");
-      emitcode ("clr","c");
-      emitcode ("subb", "a,#!constbyte",
-		-((sym->stack < 0) ?
-		  ((short) (sym->stack - _G.nRegsSaved)) :
-		  ((short) sym->stack)) & 0xff);
-      emitcode ("mov","b,a");
-      emitcode ("mov","a,_bpx+1");
-      emitcode ("subb","a,#!constbyte",(-((sym->stack < 0) ?
-				     ((short) (sym->stack - _G.nRegsSaved)) :
-				     ((short) sym->stack)) >> 8) & 0xff);
-      if (useDP2) {
-	  if (options.model == MODEL_FLAT24)
-	      emitcode ("mov", "dpx1,#!constbyte", (options.stack_loc >> 16) & 0xff);
-	  TR_DPTR("#2");
-	  emitcode ("mov", "dph1,a");
-	  emitcode ("mov", "dpl1,b");
-      } else {
-	  if (options.model == MODEL_FLAT24)
-	      emitcode ("mov", "dpx,#!constbyte", (options.stack_loc >> 16) & 0xff);
-	  emitcode ("mov", "dph,a");
-	  emitcode ("mov", "dpl,b");
-      }
-
-      if (_G.bInUse)
-	emitcode ("pop", "b");
-
-      if (_G.accInUse)
-	emitcode ("pop", "acc");
-
-      sym->aop = aop = newAsmop ((short) (useDP2 ? AOP_DPTR2 : AOP_DPTR));
-      aop->size = getSize (sym->type);
-      return aop;
+	if (stack_val < 0 && stack_val > -3) { /* between -3 & -1 */
+	    if (useDP2) {
+		if (options.model == MODEL_FLAT24)
+		    emitcode ("mov", "dpx1,#!constbyte", (options.stack_loc >> 16) & 0xff);
+		TR_DPTR("#2");
+		emitcode ("mov", "dph1,_bpx+1");
+		emitcode ("mov", "dpl1,_bpx");
+		emitcode ("mov","dps,#1");
+	    } else {
+		if (options.model == MODEL_FLAT24)
+		    emitcode ("mov", "dpx,#!constbyte", (options.stack_loc >> 16) & 0xff);
+		emitcode ("mov", "dph,_bpx+1");
+		emitcode ("mov", "dpl,_bpx");
+	    }
+	    stack_val = -stack_val;
+	    while (stack_val--) {
+		emitcode ("inc","dptr");
+	    }
+	    if (useDP2) {
+		emitcode("mov","dps,#0");
+	    }
+	}  else {
+	    if (_G.accInUse)
+		emitcode ("push", "acc");
+	    
+	    if (_G.bInUse)
+		emitcode ("push", "b");
+	
+	    emitcode ("mov", "a,_bpx");
+	    emitcode ("clr","c");
+	    emitcode ("subb", "a,#!constbyte", stack_val & 0xff);
+	    emitcode ("mov","b,a");
+	    emitcode ("mov","a,_bpx+1");
+	    emitcode ("subb","a,#!constbyte",(stack_val >> 8) & 0xff);
+	    if (useDP2) {
+		if (options.model == MODEL_FLAT24)
+		    emitcode ("mov", "dpx1,#!constbyte", (options.stack_loc >> 16) & 0xff);
+		TR_DPTR("#2");
+		emitcode ("mov", "dph1,a");
+		emitcode ("mov", "dpl1,b");
+	    } else {
+		if (options.model == MODEL_FLAT24)
+		    emitcode ("mov", "dpx,#!constbyte", (options.stack_loc >> 16) & 0xff);
+		emitcode ("mov", "dph,a");
+		emitcode ("mov", "dpl,b");
+	    }
+	    
+	    if (_G.bInUse)
+		emitcode ("pop", "b");
+	    
+	    if (_G.accInUse)
+		emitcode ("pop", "acc");
+	}
+	sym->aop = aop = newAsmop ((short) (useDP2 ? AOP_DPTR2 : AOP_DPTR));
+	aop->size = getSize (sym->type);
+	return aop;
     }
 
   /* if in bit space */
@@ -1887,6 +1906,7 @@ saveRegisters (iCode * lic)
 	  if (bitVectBitValue(ic->rMask,i))
 	      rsave = bitVectSetBit(rsave,i);
       }
+      rsave = bitVectCplAnd(rsave,ds390_rUmaskForOp (IC_RESULT(ic)));
   } else {
     /* safe the registers in use at this time but skip the
        ones for the result */
@@ -1941,6 +1961,7 @@ unsaveRegisters (iCode * ic)
 	  if (bitVectBitValue(ic->rMask,i))
 	      rsave = bitVectSetBit(rsave,i);
       }
+      rsave = bitVectCplAnd(rsave,ds390_rUmaskForOp (IC_RESULT(ic)));
   } else {
     /* restore the registers in use at this time but skip the
        ones for the result */
@@ -2323,43 +2344,6 @@ genCall (iCode * ic)
 	{
 	  int size, offset = 0;
 
-#if 0
-	  aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
-	  size = AOP_SIZE (IC_LEFT (sic));
-
-	  _startLazyDPSEvaluation ();
-	  while (size--)
-	    {
-	      char *l = aopGet (AOP(IC_LEFT(sic)), offset,
-				FALSE, FALSE, TRUE);
-	        if ((AOP_TYPE(IC_LEFT(sic)) == AOP_DPTR) && size)
-	        {
-	            emitcode("mov", "%s,%s", regs390[offset].name, l);
-	        }
-	        else if (strcmp (l, fReturn[offset]))
-	        {
-		    emitcode ("mov", "%s,%s",
-			      fReturn[offset],
-			      l);
-	        }
-	      offset++;
-	    }
-	  _endLazyDPSEvaluation ();
-	  if (AOP_TYPE(IC_LEFT(sic)) == AOP_DPTR)
-	  {
-	      size = AOP_SIZE (IC_LEFT (sic));
-	      if (size)
-	      {
-	         size--;
-	      }
-	      while (size)
-	      {
-	      	   size--;
-		   emitcode("mov", "%s,%s",
-		   		    fReturn[size], regs390[size].name);
-	      }
-	  }
-#else
 	  // we know that dpl(hxb) is the result, so
 	  _startLazyDPSEvaluation ();
 	  size=getSize(operandType(IC_LEFT(sic)));
@@ -2382,7 +2366,6 @@ genCall (iCode * ic)
 	      offset++;
 	    }
 	  _endLazyDPSEvaluation ();
-#endif
 	  freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
 	}
       _G.sendSet = NULL;
@@ -2448,16 +2431,23 @@ genCall (iCode * ic)
   /* adjust the stack for parameters if
      required */
   if (ic->parmBytes) {
+      int i;
       if (options.stack10bit) {
-	  emitcode ("clr","c");
-	  emitcode ("mov","a,sp");
-	  emitcode ("subb","a,#!constbyte",ic->parmBytes & 0xff);
-	  emitcode ("mov","sp,a");
-	  emitcode ("mov","a,esp");
-	  emitcode ("subb","a,#!constbyte",(ic->parmBytes >> 8) & 0xff);
-	  emitcode ("mov","esp,a");	  
+	  if (ic->parmBytes <= 4) {
+	      emitcode(";","stack adjustment for parms");
+	      for (i=0; i < ic->parmBytes ; i++) {
+		  emitcode("pop","acc");
+	      }
+	  } else {
+	      emitcode ("clr","c");
+	      emitcode ("mov","a,sp");
+	      emitcode ("subb","a,#!constbyte",ic->parmBytes & 0xff);
+	      emitcode ("mov","sp,a");
+	      emitcode ("mov","a,esp");
+	      emitcode ("subb","a,#!constbyte",(ic->parmBytes >> 8) & 0xff);
+	      emitcode ("mov","esp,a");	  
+	  }
       } else {
-	  int i;
 	  if (ic->parmBytes > 3) {
 	      emitcode ("mov", "a,%s", spname);
 	      emitcode ("add", "a,#!constbyte", (-ic->parmBytes) & 0xff);
@@ -3350,6 +3340,13 @@ genPlusIncr (iCode * ic)
   if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
+  if (size == 1 && AOP(IC_LEFT(ic)) == AOP(IC_RESULT(ic)) &&
+      AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ) {
+      while (icount--) {
+	  emitcode("inc","%s",aopGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE,FALSE));
+      }
+      return TRUE;
+  }
   /* if increment 16 bits in register */
   if (
        AOP_TYPE (IC_LEFT (ic)) == AOP_REG &&
@@ -3575,9 +3572,9 @@ adjustArithmeticResult (iCode * ic)
 #define AOP_OP_3_NOFATAL(ic, rc) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR) || \
-                                  (OP_SYMBOL(IC_RESULT(ic))->ruonly)); \
+                                  ((OP_SYMBOL(IC_RESULT(ic))->ruonly) && !isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)))); \
     if (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2 && \
-        (isOperandInFarSpace(IC_RESULT(ic)) || OP_SYMBOL(IC_RESULT(ic))->ruonly )) \
+        (isOperandInFarSpace(IC_RESULT(ic)) || (OP_SYMBOL(IC_RESULT(ic))->ruonly && !isOperandEqual(IC_LEFT(ic),IC_RESULT(ic))))) \
     { \
        /* No can do; DPTR & DPTR2 in use, and we need another. */ \
        rc = TRUE; \
@@ -3850,6 +3847,13 @@ genMinusDec (iCode * ic)
   if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
+  if (size == 1 && AOP(IC_LEFT(ic)) == AOP(IC_RESULT(ic)) &&
+      AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ) {
+      while (icount--) {
+	  emitcode("dec","%s",aopGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE,FALSE));
+      }
+      return TRUE;
+  }
   /* if decrement 16 bits in register */
   if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG &&
       AOP_TYPE (IC_RESULT (ic)) == AOP_REG &&
@@ -5076,7 +5080,7 @@ genCmp (operand * left, operand * right,
 
       /* if unsigned char cmp with lit, do cjne left,#right,zz */
       if ((size == 1) && !sign &&
-	  (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR))
+	  (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_STR))
 	{
 	  symbol *lbl = newiTempLabel (NULL);
 	  emitcode ("cjne", "%s,%s,!tlabel",
@@ -5579,7 +5583,7 @@ ifxForOp (operand * op, iCode * ic)
 /* hasInc - operand is incremented before any other use            */
 /*-----------------------------------------------------------------*/
 static iCode *
-hasInc (operand *op, iCode *ic)
+hasInc (operand *op, iCode *ic, int osize)
 {
   sym_link *type = operandType(op);
   sym_link *retype = getSpec (type);
@@ -5590,7 +5594,7 @@ hasInc (operand *op, iCode *ic)
   if (!IS_SYMOP(op)) return NULL;
 
   if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
-  isize = getSize(type->next);
+  if (osize != (isize = getSize(type->next))) return NULL;
   while (lic) {
       /* if operand of the form op = op + <sizeof *op> */
       if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
@@ -11966,12 +11970,12 @@ gen390Code (iCode * lic)
 	  break;
 
 	case GET_VALUE_AT_ADDRESS:
-	  genPointerGet (ic,hasInc(IC_LEFT(ic),ic));
+	  genPointerGet (ic,hasInc(IC_LEFT(ic),ic, getSize(operandType(IC_LEFT(ic)))));
 	  break;
 
 	case '=':
 	  if (POINTER_SET (ic))
-	    genPointerSet (ic,hasInc(IC_RESULT(ic),ic));
+	    genPointerSet (ic,hasInc(IC_RESULT(ic),ic,getSize(operandType(IC_RIGHT(ic)))));
 	  else
 	    genAssign (ic);
 	  break;

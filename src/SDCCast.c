@@ -613,7 +613,7 @@ int processParms (ast *func, value *defParm,
             DCL_TYPE(newType->opval.lnk) = GPOINTER;
         }
         
-        if (newType)
+        if (0 && newType)
         {
      	    /* cast required; change this op to a cast. */
             ast *parmCopy = resolveSymbols(copyAst(actParm));
@@ -622,7 +622,7 @@ int processParms (ast *func, value *defParm,
 	    actParm->opval.op = CAST;
 	    actParm->left = newType;
 	    actParm->right= parmCopy;
-	    decorateType(actParm);           
+	    decorateType(actParm);
         }
         
         return 0;
@@ -665,6 +665,7 @@ int processParms (ast *func, value *defParm,
     }
     
 /*    actParm->argSym = resolveFromTable(defParm)->sym ; */
+
     actParm->argSym = defParm->sym;
     /* make a copy and change the regparm type to the defined parm */
     actParm->etype = getSpec(actParm->ftype = copyLinkChain(actParm->ftype));
@@ -2783,7 +2784,7 @@ ast *decorateType (ast *tree)
 	/* if there is going to be a casing required then add it */
 	if (checkType(currFunc->type->next,RTYPE(tree)) < 0 ) 
 	{
-#ifdef DEMAND_INTEGER_PROMOTION	
+#if 0 && defined DEMAND_INTEGER_PROMOTION	
 	    if (IS_INTEGRAL(currFunc->type->next))
 	    {
 	    	pushTypeCastToLeaves(currFunc->type->next, tree->right, &(tree->right));

@@ -4226,7 +4226,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 
     D(emitcode(";", "genCmpEq "););
 
-    AOP_OP_3(ic);
+    AOP_OP_2(ic);
     AOP_SET_LOCALS(ic);
 #if 0
     aopOp((left=IC_LEFT(ic)),ic,FALSE, FALSE);
@@ -4244,7 +4244,10 @@ static void genCmpEq (iCode *ic, iCode *ifx)
         IC_LEFT(ic) = t;
     }
 
-    if(ifx && !AOP_SIZE(result)){
+    if (ifx && /* !AOP_SIZE(result) */ 
+       OP_SYMBOL(result) && 
+       OP_SYMBOL(result)->regType == REG_CND)
+    {
         symbol *tlbl;
         /* if they are both bit variables */
         if (AOP_TYPE(left) == AOP_CRY &&
@@ -4294,7 +4297,10 @@ static void genCmpEq (iCode *ic, iCode *ifx)
         }
         /* mark the icode as generated */
         ifx->generated = 1;
-        goto release ;
+        
+        freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        return ;
     }
 
     /* if they are both bit variables */
@@ -4318,6 +4324,12 @@ static void genCmpEq (iCode *ic, iCode *ifx)
             emitcode("cpl","c");
             emitcode("","%05d$:",(lbl->key+100));
         }
+        
+        freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+               
+	aopOp(result,ic,TRUE, FALSE);
+               
         /* c = 1 if egal */
         if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)){
             outBitC(result);
@@ -4331,7 +4343,13 @@ static void genCmpEq (iCode *ic, iCode *ifx)
         then put the result in place */
         outBitC(result);
     } else {
-        gencjne(left,right,newiTempLabel(NULL));    
+        gencjne(left,right,newiTempLabel(NULL));
+        
+        freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+        freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
+               
+	aopOp(result,ic,TRUE, FALSE);
+	
         if (AOP_TYPE(result) == AOP_CRY && AOP_SIZE(result)) {
             aopPut(AOP(result),"a",0);
             goto release ;
@@ -4348,8 +4366,6 @@ static void genCmpEq (iCode *ic, iCode *ifx)
     }
 
 release:
-    freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
-    freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
     freeAsmop(result,NULL,ic,TRUE);
 }
 

@@ -46,13 +46,13 @@ transform       = @program_transform_name@
 
 # Flags
 
-DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = $(INCLUDEFLAGS) -I. -I$(PRJDIR) -I$(SLIB)
-CFLAGS          = -Wall @CFLAGS@
-LDFLAGS         = @LDFLAGS@
+DEFS           += $(subs -DHAVE_CONFIG_H,,@DEFS@)
+CPPFLAGS       += $(INCLUDEFLAGS) -I. -I$(PRJDIR) -I$(SLIB)
+CFLAGS         += -Wall @CFLAGS@
+LDFLAGS        += @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 
-EXTRALIBS	= @LIBS@
+EXTRALIBS      += @LIBS@
 
 # Shared settings between all the sub Makefiles
 # Done here so that we don't have to start a Make from the top levelport

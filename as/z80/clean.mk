@@ -1,11 +1,13 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
+include ../../Makefile.common
+
 clean:
 	rm -rf obj
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(BUILDDIR)/as-z80   as-z80
-	rm -f $(BUILDDIR)/as-gbz80 as-gbz80
+	rm -f $(BUILDDIR)/as-z80$(EXEEXT)   as-z80$(EXEEXT)
+	rm -f $(BUILDDIR)/as-gbz80$(EXEEXT) as-gbz80$(EXEEXT)
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

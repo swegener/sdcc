@@ -22,8 +22,9 @@
 #the Free Software Foundation, 59 Temple Place - Suite 330,
 #Boston MA 02111-1307, USA.
 
+EXEEXT = @EXEEXT@
 PRJDIR = ../..
-TARGET = $(PRJDIR)/bin/sdcpp
+TARGET = $(PRJDIR)/bin/sdcpp$(EXEEXT)
 
 # This is the default target.
 all: $(TARGET)
@@ -108,11 +109,11 @@ OBSTACK=obstack.o
 
 install: all
 	mkdir -p $(bindir)
-	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp|sed '$(transform)'`
-	$(STRIP) `echo $(bindir)/sdcpp|sed '$(transform)'`
+	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
 
 uninstall:
-	rm -f $(bindir)/sdcpp
+	rm -f $(bindir)/sdcpp$(EXEEXT)
 clean:
 	-rm -f $(TARGET) *.o core libcpp.a
 

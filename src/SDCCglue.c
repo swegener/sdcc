@@ -45,7 +45,7 @@ set *externs = NULL;		/* Varibles that are declared as extern */
 int maxInterrupts = 6;
 int allocInfo = 1;
 symbol *mainf;
-char *VersionString;
+extern char *VersionString;
 set *tmpfileSet = NULL; /* set of tmp file created by the compiler */
 set *tmpfileNameSet = NULL; /* All are unlinked at close. */
 

@@ -3,7 +3,7 @@
   SDCCralloc.h - header file register allocation
 
                 Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
-		PIC port   - T. Scott Dattalo scott@dattalo.com (2000)
+    PIC port   - T. Scott Dattalo scott@dattalo.com (2000)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -33,20 +33,20 @@
 
 enum
 {
-	R2_IDX = 0, R3_IDX, R4_IDX,
-	R5_IDX, R6_IDX, R7_IDX,
-	R0_IDX, R1_IDX, X8_IDX,
-	X9_IDX, X10_IDX, X11_IDX,
-	X12_IDX, CND_IDX
+  R2_IDX = 0, R3_IDX, R4_IDX,
+  R5_IDX, R6_IDX, R7_IDX,
+  R0_IDX, R1_IDX, X8_IDX,
+  X9_IDX, X10_IDX, X11_IDX,
+  X12_IDX, CND_IDX
 };
 
 enum {
-	REG_PTR=1,
-	REG_GPR,
-	REG_CND,
-	REG_SFR,
-	REG_STK,
-	REG_TMP
+  REG_PTR=1,
+  REG_GPR,
+  REG_CND,
+  REG_SFR,
+  REG_STK,
+  REG_TMP
 };
 //#define REG_PTR 0x01
 //#define REG_GPR 0x02
@@ -58,28 +58,28 @@ enum {
 /* definition for the registers */
 typedef struct regs
 {
-	short type;  /* can have value 
-	              * REG_GPR, REG_PTR or REG_CND 
-	              * This like the "meta-type" */
-	short pc_type;              /* pcode type */
-	short rIdx;  /* index into register table */
-	//	short otype;        
-	char *name;  /* name */
+  short type;  /* can have value 
+                * REG_GPR, REG_PTR or REG_CND 
+                * This like the "meta-type" */
+  short pc_type;              /* pcode type */
+  short rIdx;  /* index into register table */
+  //  short otype;        
+  char *name;  /* name */
 
-	unsigned isFree:1;          /* is currently unassigned  */
-	unsigned wasUsed:1;         /* becomes true if register has been used */
-	unsigned isFixed:1;         /* True if address can't change */
-	unsigned isMapped:1;        /* The Register's address has been mapped to physical RAM */
-	unsigned isBitField:1;      /* True if reg is type bit OR is holder for several bits */
-	unsigned isEmitted:1;       /* True if the reg has been written to a .asm file */
-	unsigned isPublic:1;        /* True if the reg is not static and can be modified in another module (ie a another c or asm file) */
-	unsigned isExtern:1;        /* True if the reg is in another module */
-	unsigned address;           /* reg's address if isFixed | isMapped is true */
-	unsigned size;              /* 0 for byte, 1 for int, 4 for long */
-	unsigned alias;             /* Alias mask if register appears in multiple banks */
-	struct regs *reg_alias;     /* If more than one register share the same address 
-	                             * then they'll point to each other. (primarily for bits)*/
-	pCodeRegLives reglives;     /* live range mapping */
+  unsigned isFree:1;          /* is currently unassigned  */
+  unsigned wasUsed:1;         /* becomes true if register has been used */
+  unsigned isFixed:1;         /* True if address can't change */
+  unsigned isMapped:1;        /* The Register's address has been mapped to physical RAM */
+  unsigned isBitField:1;      /* True if reg is type bit OR is holder for several bits */
+  unsigned isEmitted:1;       /* True if the reg has been written to a .asm file */
+  unsigned isPublic:1;        /* True if the reg is not static and can be modified in another module (ie a another c or asm file) */
+  unsigned isExtern:1;        /* True if the reg is in another module */
+  unsigned address;           /* reg's address if isFixed | isMapped is true */
+  unsigned size;              /* 0 for byte, 1 for int, 4 for long */
+  unsigned alias;             /* Alias mask if register appears in multiple banks */
+  struct regs *reg_alias;     /* If more than one register share the same address 
+                               * then they'll point to each other. (primarily for bits)*/
+  pCodeRegLives reglives;     /* live range mapping */
 }
 regs;
 extern regs regspic14[];

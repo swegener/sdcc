@@ -1,3 +1,8 @@
+2004-03-21  Scott Dattalo  <scott AT dattalo.com>
+	* src/pic/gen.c, src/pic/gen.h, src/pic/genarith.c, src/pic/pcode.c:
+	Bit operands were not being handled properly in the pic14 port.
+	(now src/regression/add.c passes again).
+
 2004-03-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.y (labeled_statement): case and default no longer require

@@ -59,14 +59,10 @@ main(int argc, char *argv[])
       init_pair(1, COLOR_WHITE, COLOR_BLUE);
       init_pair(2, COLOR_WHITE, COLOR_RED);
     }
-
-  #ifdef NCURSES_VERSION
-  /* has_key is a ncurses specific function. */
   if (has_key(KEY_UP))
     printw("has UP KEY_UP=0x%x\n",KEY_UP);
   else
     printf("has no UP\n");
-  #endif
   c= getch();
   printw("got %d %x\n",c,c);
 

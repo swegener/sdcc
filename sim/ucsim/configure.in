@@ -100,18 +100,19 @@ AC_CHECK_LIB(nsl,xdr_short)
 AC_CHECK_LIB(panel,panel_above,
 panel_ok="yes"
 curses_ok="yes"
-LIBS="$LIBS -lpanel -lcurses"
+CURSES_LIBS="-lpanel -lcurses"
 ,
 panel_ok="no"
 AC_CHECK_LIB(curses,nl,
 curses_ok="yes"
-LIBS="$LIBS -lcurses"
+CURSES_LIBS="-lcurses"
 ,
 ncurses_ok="no")
 ,
 -lcurses)
 AC_SUBST(panel_ok)
 AC_SUBST(curses_ok)
+AC_SUBST(CURSES_LIBS)
 
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(vsnprintf vasprintf)

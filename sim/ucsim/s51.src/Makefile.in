@@ -49,7 +49,7 @@ OBJECTS         = s51.o glob.o sim51.o cmd51.o \
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs s51.src tests
+all: checkconf otherlibs s51.src
 
 tests: test_ser.ihx
 

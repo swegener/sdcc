@@ -116,6 +116,28 @@ dep:
 putcopyright:
 	'put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
 
+newer: distclean
+	@if [ -f start ]; then \
+	  tar cvf - \
+	    `find . -newer start -type f -print` |\
+	  gzip -9c >ucsim-newer-`date '+%Y.%m.%d-%H:%M'`.tgz; \
+	else \
+	  echo "start file not found.\n"; \
+	  exit 1; \
+	fi
+
+print-newer:
+	@if [ -f start ]; then \
+	  find . -newer start -type f -print ;\
+	else \
+	  echo "start file not found.\n" ;\
+	  exit 1 ;\
+	fi
+
+lines:
+	@find . \( -name '*.[ch]' -o -name '*.cc' -o -name '*.hh' \) \
+	-exec cat {} \; | clines
+
 
 # Remaking configuration
 # ----------------------

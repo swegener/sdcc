@@ -9,13 +9,13 @@ CP		= /bin/cp
 PRJDIR		= ../..
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src
+CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR)
+#		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
-LIBS		= @LIBS@
+LIBS		= @CURSES_LIBS@ @LIBS@
 
 curses_ok	= @curses_ok@
 

@@ -48,7 +48,7 @@ TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs avr.src tests
+all: checkconf otherlibs avr.src
 
 tests: $(TEST_OBJ)
 

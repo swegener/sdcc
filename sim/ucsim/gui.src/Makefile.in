@@ -19,7 +19,7 @@ CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lutil -lsim -lcmd
+LIBS		= @LIBS@ @CURSES_LIBS@ -L$(PRJDIR)
 
 curses_ok	= @curses_ok@
 
@@ -49,7 +49,7 @@ all: gui.src
 libs: guilib
 
 ifeq ($(curses_ok),yes)
-gui.src: checkconf guilib a
+gui.src: checkconf guilib
 else
 gui.src: checkconf guilib
 endif
@@ -58,7 +58,7 @@ endif
 	done
 
 a: a.o
-	$(CXX) $(LDFLAGS) a.o -o $@ $(LIBS)
+	$(CXX) $(LDFLAGS) $(LIBS) a.o -o $@
 
 
 # Compiling and installing everything and runing test

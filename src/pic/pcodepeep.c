@@ -1690,13 +1690,13 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	  if(!peepBlock->target.wildpCodeOps[index]) {
 	    peepBlock->target.wildpCodeOps[index] = PCI(pcs)->pcop;
 
-	    //if(PCI(pcs)->pcop->type == PO_GPR_TEMP) 
+	    //fprintf(stderr, "first time for wild opcode #%d\n",index);
+	    return 1;
 
 	  } else {
 	    /*
 	      pcs->print(stderr,pcs);
 	      pcd->print(stderr,pcd);
-
 	      fprintf(stderr, "comparing operands of these instructions, result %d\n",
 	      pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index])
 	      );
@@ -1730,11 +1730,25 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	  }
 
 	} else if (PCI(pcd)->pcop->type == PO_LITERAL) {
+	  /*
+	    pcs->print(stderr,pcs);
+	    pcd->print(stderr,pcd);
+
+	    fprintf(stderr, "comparing literal operands of these instructions, result %d\n",
+	    pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop));
+	  */
 	  return pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop);
 
+	} else {
+	  /* FIXME - need an else to check the case when the destination 
+	   * isn't a wild card */
+	  /*
+	  fprintf(stderr, "Destination is not wild: operand compare =%d\n",
+		  pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop));
+	  */
+	  return  pCodeOpCompare(PCI(pcs)->pcop, PCI(pcd)->pcop);
+
 	}
-	/* FIXME - need an else to check the case when the destination 
-	 * isn't a wild card */
       } else
 	/* The pcd has no operand. Lines match if pcs has no operand either*/
 	return (PCI(pcs)->pcop == NULL);
@@ -2081,7 +2095,6 @@ int pCodePeepMatchRule(pCode *pc)
 
       if(!pcin && pct) {
 	DFPRINTF((stderr," partial match... no more code\n"));
-	fprintf(stderr," partial match... no more code\n");
 	matched = 0; 
       }
       if(!pct) {

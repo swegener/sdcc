@@ -291,3 +291,41 @@ replace restart {
         ;     peep 12 - Removed redundant move
         comf    %1,f
 }
+
+replace restart {
+	clrf	%1
+	rlf	%1,f
+	movlw	0x01
+	xorwf	%1,f
+	movf	%1,w
+	btfss	STATUS,2
+	goto	%2
+
+} by {
+        ;     peep 13 - Optimized carry sequence
+	clrf	%1
+	incf	%1,F
+	btfss	status,C
+	goto	%2
+	clrf	%1
+	
+}
+
+replace restart {
+	clrf	%1
+	rlf	%1,f
+	movlw	0x01
+	xorwf	%1,f
+	movf	%1,w
+	btfsc	STATUS,2
+	goto	%2
+
+} by {
+        ;     peep 13a - Optimized carry sequence
+	clrf	%1
+	incf	%1,F
+	btfsc	status,C
+	goto	%2
+	clrf	%1
+	
+}

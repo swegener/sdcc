@@ -1,3 +1,9 @@
+2003-04-28  Scott Dattalo  <scott@DATTALO.COM>
+
+	* src/pic/pCodepeep.c non-wildcard asmops are now handled
+	* src/pic/peeph.def Added two rules to optimize carry manipulation
+	* src/pic/* removed debug printfs
+
 2003-04-28  Bernhard Held <bernhard@bernhardheld.de>
 
 	* debugger/mcs51/cmd.c: added header newalloc.h

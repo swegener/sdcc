@@ -212,7 +212,7 @@ void dump_sfr(FILE *of)
   static int udata_flag=0;
 
   //dump_map();   /* display the register map */
-  fprintf(stdout,";dump_sfr  \n");
+  //fprintf(stdout,";dump_sfr  \n");
   if (pic->maxRAMaddress < 0) {
     fprintf(stderr, "missing \"#pragma maxram\" setting\n");
     return;
@@ -452,7 +452,7 @@ void mapRegister(regs *reg)
 
     do {
 
-      fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
+      //fprintf(stdout,"mapping %s to address 0x%02x, reg size = %d\n",reg->name, (reg->address+alias+i),reg->size);
 
       finalMapping[reg->address + alias + i].reg = reg;
       finalMapping[reg->address + alias + i].instance = i;
@@ -466,7 +466,7 @@ void mapRegister(regs *reg)
     } while (alias>=0);
   }
 
-  fprintf(stderr,"%s - %s addr = 0x%03x, size %d\n",__FUNCTION__,reg->name, reg->address,reg->size);
+  //fprintf(stderr,"%s - %s addr = 0x%03x, size %d\n",__FUNCTION__,reg->name, reg->address,reg->size);
 
   reg->isMapped = 1;
 
@@ -478,7 +478,7 @@ int assignRegister(regs *reg, int start_address)
 {
   int i;
 
-  fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
+  //fprintf(stderr,"%s -  %s start_address = 0x%03x\n",__FUNCTION__,reg->name, start_address);
   if(reg->isFixed) {
 
     if (validAddress(reg->address,reg->size)) {
@@ -543,7 +543,7 @@ void assignRelocatableRegisters(set *regset, int used)
   for (reg = setFirstItem(regset) ; reg ; 
        reg = setNextItem(regset)) {
 
-    fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
+    //fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
 
     if((!reg->isFixed) && ( used || reg->wasUsed))
       address = assignRegister(reg,address);

@@ -282,7 +282,7 @@ static void Remove1pcode(pCode *pc, regs *reg, int debug_code)
     SAFE_snprintf(ppbuff,&size, ";%d", debug_code);
     pCode2str(*ppbuff, size, pc);
     pCodeInsertBefore(pc, newpCodeCharP(buff1));
-    fprintf(stderr,"removing instruction:\n%s\n",buff1);
+    //fprintf(stderr,"removing instruction:\n%s\n",buff1);
   }
 
   pc->destruct(pc);
@@ -344,7 +344,7 @@ void  RemoveRegsFromSet(set *regset)
 	    pc->print(stderr,pc);
 	    fprintf(stderr,"reg %s, type =%d\n",r->name, r->type);
 	  }
-	  fprintf(stderr," removing reg %s because it is used only once\n",reg->name);
+	  //fprintf(stderr," removing reg %s because it is used only once\n",reg->name);
 	  Remove1pcode(pc, reg, 1);
 	  /*
 	    unlinkpCode(pc);
@@ -389,7 +389,7 @@ static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int 
   if(!reg)
     return;
 
-  fprintf(stderr,"%s\n",__FUNCTION__);
+  //fprintf(stderr,"%s\n",__FUNCTION__);
   if(pc1)
     Remove1pcode(pc1, reg, debug_code++);
 

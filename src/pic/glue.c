@@ -113,7 +113,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
   for (sym = setFirstItem (map->syms); sym;
        sym = setNextItem (map->syms)) {
 
-    printf("%s\n",sym->name);
+    //printf("%s\n",sym->name);
 
     /* if extern then add it into the extern list */
     if (IS_EXTERN (sym->etype)) {
@@ -280,7 +280,7 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
   if(!pb)
     return 0;
 
-  fprintf(stderr, "%s\n",__FUNCTION__);
+  //fprintf(stderr, "%s\n",__FUNCTION__);
   if (!s)
     {
 

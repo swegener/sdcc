@@ -321,7 +321,7 @@ usedInRemaining (operand * op, iCode * ic)
 	  if (lic->op == CALL) {
 	    args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type);
 	  } else {
-	    args=FUNC_ARGS(OP_SYMBOL(IC_LEFT(lic))->type->next);
+	    args=FUNC_ARGS(operandType(IC_LEFT(lic))->next);
 	  }
 	  if ((IS_PARM (op) &&
 	       isParameterToCall (args, op)) ||

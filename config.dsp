@@ -87,5 +87,34 @@ InputPath=.\sdcc_vc_in.h
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\version.awk
+
+!IF  "$(CFG)" == "config - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\src\version.awk
+
+".\src\version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	gawk -f $(InputPath) ChangeLog  > .\src\version.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "config - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputPath=.\src\version.awk
+
+".\src\version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	gawk -f $(InputPath) ChangeLog  > .\src\version.h
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Target
 # End Project

@@ -1,3 +1,9 @@
+2003-02-23  Borut Razem <borut.razem@siol.net>
+
+	* src/asm.h: corrected assertion in function printILine(): _pipe() was not executed on MSVC,
+	because NDEBUG is defined (see man assert)
+	* sdcc_vc_in.h: vsnprintf is defined as _vsnprintf on MSVC
+
 2003-02-23  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/gen.c (genUminusFloat): avoided dptr in-/decrement for xdata variables

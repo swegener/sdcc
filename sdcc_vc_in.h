@@ -32,9 +32,10 @@
 // #undef HAVE_ENDIAN_H
 
 #undef HAVE_STRERROR
-#undef HAVE_VSNPRINTF
-#undef HAVE_SNPRINTF
-#define HAVE_VSPRINTF
+#define HAVE_VSNPRINTF
+#define vsnprintf _vsnprintf	
+#undef HAVE_SPRINTF
+#undef HAVE_VSPRINTF
 
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_GBZ80

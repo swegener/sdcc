@@ -1,3 +1,7 @@
+2003-07-26  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    *src/SDCCmain.c: do not search for crt0.o when using --nostdlib
+
 2003-07-24  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCicode.c (operandOperation): really fixed problem with bitops

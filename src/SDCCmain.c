@@ -1483,7 +1483,8 @@ linkEdit (char **envp)
   /*For the z80 and gbz80 ports, try to find where crt0.o is...
   It is very important for this file to be first on the linking proccess
   so the areas are set in the correct order, expecially _GSINIT*/
-  if ((TARGET_IS_Z80 || TARGET_IS_GBZ80) && !options.no_std_crt0) /*For the z80, gbz80*/
+  if ((TARGET_IS_Z80 || TARGET_IS_GBZ80) &&
+      !options.no_std_crt0 && !options.nostdlib) /*For the z80, gbz80*/
   {
       char crt0path[PATH_MAX];
       FILE * crt0fp;

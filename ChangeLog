@@ -3,6 +3,7 @@
 	* src/mcs51/main.c: fixed bug #737001 for the mcs51. SDCC clears 
 	xdata and data memory on startup. Set the environment variable 
 	SDCC_NOGENRAMCLEAR to disable this.
+	* src/mcs51/peephole.def,
 	* src/ds390/peephole.def: using the atomic test and clear instruction jbc
 	(allows non-interrupt and interrupt code to safely compete for a resource
 	without the non-interrupt code having to disable interrupts)

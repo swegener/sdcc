@@ -541,7 +541,24 @@ static builtins __tininative_builtins[] = {
     { "MM_Free","i",1,{"i"}},                          /* int  MM_Free  (int)      		*/
     { "MM_Deref","cx*",1,{"i"}},                       /* char *MM_Free  (int)      		*/
     { "MM_UnrestrictedPersist","c",1,{"i"}},           /* char  MM_UnrestrictedPersist  (int)   */
-    { "MM_AppTag","c",2,{"i","c"}},                    /* char *MM_AppTag  (int,char)      	*/
+    /* System functions */
+    { "System_ExecJavaProcess","c",2,{"cx*","i"}},     /* char System_ExecJavaProcess (char *,int) */
+    { "System_GetRTCRegisters","v",1,{"cx*"}},	       /* void System_GetRTCRegisters (char *) */
+    { "System_SetRTCRegisters","v",1,{"cx*"}},	       /* void System_SetRTCRegisters (char *) */
+    { "System_ThreadSleep","v",2,{"l","c"}},           /* void System_ThreadSleep (long,char)  */
+    { "System_ThreadSleep_ExitCriticalSection","v",2,{"l","c"}},/* void System_ThreadSleep_ExitCriticalSection (long,char)  */
+    { "System_ProcessSleep","v",2,{"l","c"}},           /* void System_ProcessSleep (long,char)  */
+    { "System_ProcessSleep_ExitCriticalSection","v",2,{"l","c"}},/* void System_ProcessSleep_ExitCriticalSection (long,char)  */
+    { "System_ThreadResume","c",2,{"c","c"}},          /* char System_ThreadResume(char,char)  */
+    { "System_SaveJavaThreadState","v",0,{NULL}},      /* void System_SaveJavaThreadState()    */
+    { "System_RestoreJavaThreadState","v",0,{NULL}},   /* void System_RestoreJavaThreadState() */
+    { "System_ProcessYield","v",0,{NULL}},             /* void System_ProcessYield() */
+    { "System_ProcessSuspend","v",0,{NULL}},           /* void System_ProcessSuspend() */
+    { "System_ProcessResume","v",1,{"c"}},             /* void System_ProcessResume(char) */
+    { "System_RegisterPoll","c",1,{"vF*"}},            /* char System_RegisterPoll ((void *func pointer)()) */
+    { "System_RemovePoll","c",1,{"vF*"}},              /* char System_RemovePoll ((void *func pointer)()) */
+    { "System_GetCurrentProcessId","c",0,{NULL}},      /* char System_GetCurrentProcessId() */
+    { "System_GetCurrentThreadId","c",0,{NULL}},       /* char System_GetCurrentThreadId() */
     { NULL , NULL,0, {NULL}} 			   /* mark end of table */
 };    
 

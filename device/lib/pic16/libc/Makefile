@@ -14,7 +14,8 @@
 
 DIRS	=	ctype \
 		stdlib \
-		string
+		string \
+		utils
 
 LIB	= libp18c.lib
 

@@ -23,7 +23,7 @@
 -------------------------------------------------------------------------*/
 #include <string.h>
 
-void *memset (void *buf, unsigned char ch, size_t count) 
+void *memset (void _STRING_SPEC *buf, unsigned char ch, size_t count) 
 {
   register unsigned char *ret = buf;
 

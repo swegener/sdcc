@@ -44,5 +44,6 @@ dep .depend:
 		$(SED) s/.rel/.o/g .tmpdepend >> .depend; \
 		$(RM) -f .tmpdepend; \
 	done;
+	if [ ! -e .depend ]; then touch .depend; fi;
 
 include .depend

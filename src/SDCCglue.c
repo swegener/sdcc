@@ -239,7 +239,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  sprintf (newSym->name, "_xinit_%s", sym->name);
 	  sprintf (newSym->rname,"_xinit_%s", sym->rname);
 	  SPEC_CONST(newSym->etype)=1;
-	  SPEC_STAT(newSym->etype)=1;
+	  //SPEC_STAT(newSym->etype)=1;
 	  addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
 	  
 	  // add it to the "XINIT (CODE)" segment

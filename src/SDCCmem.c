@@ -264,11 +264,6 @@ void
 allocIntoSeg (symbol * sym)
 {
   memmap *segment = SPEC_OCLS (sym->etype);
-  // should we move this to the initialized data segment?
-  if (port->genXINIT && segment==xdata &&
-      sym->ival && sym->level==0 && !SPEC_ABSA(sym->etype)) {
-    segment=SPEC_OCLS(sym->etype)=xidata;
-  }
   addSet (&segment->syms, sym);
 }
 
@@ -394,6 +389,12 @@ allocGlobal (symbol * sym)
   if (SPEC_SCLS (sym->etype) == S_XDATA)
     {
       SPEC_OCLS (sym->etype) = xdata;
+      // should we move this to the initialized data segment?
+      if (port->genXINIT &&
+	  sym->ival && (sym->level==0) && !SPEC_ABSA(sym->etype)) {
+	SPEC_OCLS(sym->etype)=xidata;
+	addSet(&xidata->syms, sym);
+      }
       allocIntoSeg (sym);
       return;
     }

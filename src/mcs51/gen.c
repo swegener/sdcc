@@ -1710,32 +1710,36 @@ static void
 unsaveRBank (int bank, iCode * ic, bool popPsw)
 {
   int i;
-  asmop *aop;
+  asmop *aop = NULL;
   regs *r = NULL;
 
+  if (options.useXstack)
+  {
+      if (!ic)
+      {
+      	  /* Assume r0 is available for use. */
+      	  r = mcs51_regWithIdx (R0_IDX);;          
+      }	
+      else
+      {
+	  aop = newAsmop (0);
+	  r = getFreePtr (ic, &aop, FALSE);
+      }
+      emitcode ("mov", "%s,_spx", r->name);      
+  }
+  
   if (popPsw)
     {
       if (options.useXstack)
-	{
-          if (!ic)
-          {
-              werror(E_INTERNAL_ERROR, __FILE__, __LINE__,
-                     "unexpected null IC in saveRBank");
-              return;
-          }	
-	
-	  aop = newAsmop (0);
-	  r = getFreePtr (ic, &aop, FALSE);
-
-
-	  emitcode ("mov", "%s,_spx", r->name);
+      {
 	  emitcode ("movx", "a,@%s", r->name);
 	  emitcode ("mov", "psw,a");
 	  emitcode ("dec", "%s", r->name);
-
 	}
       else
+      {
 	emitcode ("pop", "psw");
+      }
     }
 
   for (i = (mcs51_nRegs - 1); i >= 0; i--)
@@ -1755,11 +1759,13 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
 
   if (options.useXstack)
     {
-
       emitcode ("mov", "_spx,%s", r->name);
-      freeAsmop (NULL, aop, ic, TRUE);
-
     }
+    
+  if (aop)
+  {
+      freeAsmop (NULL, aop, ic, TRUE);  
+  }    
 }
 
 /*-----------------------------------------------------------------*/
@@ -1769,21 +1775,22 @@ static void
 saveRBank (int bank, iCode * ic, bool pushPsw)
 {
   int i;
-  asmop *aop;
+  asmop *aop = NULL;
   regs *r = NULL;
 
   if (options.useXstack)
     {
       if (!ic)
       {
-          werror(E_INTERNAL_ERROR, __FILE__, __LINE__,
-                 "unexpected null IC in saveRBank");
-          return;
+      	  /* Assume r0 is available for use. */
+      	  r = mcs51_regWithIdx (R0_IDX);;
       }
-      aop = newAsmop (0);
-      r = getFreePtr (ic, &aop, FALSE);
+      else
+      {
+      	  aop = newAsmop (0);
+      	  r = getFreePtr (ic, &aop, FALSE);
+      }
       emitcode ("mov", "%s,_spx", r->name);
-
     }
 
   for (i = 0; i < mcs51_nRegs; i++)
@@ -1808,7 +1815,6 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
 	  emitcode ("movx", "@%s,a", r->name);
 	  emitcode ("inc", "%s", r->name);
 	  emitcode ("mov", "_spx,%s", r->name);
-	  freeAsmop (NULL, aop, ic, TRUE);
 
 	}
       else
@@ -1819,10 +1825,15 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
       emitcode ("mov", "psw,#0x%02x", (bank << 3) & 0x00ff);
     }
 
+    if (aop)
+    {
+        freeAsmop (NULL, aop, ic, TRUE);
+    }
+
   if (ic)
   {  
       ic->bankSaved = 1;
-}
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -2109,6 +2120,7 @@ genFunction (iCode * ic)
 {
   symbol *sym;
   sym_link *fetype;
+  bool   switchedPSW = FALSE;
 
   _G.nRegsSaved = 0;
   /* create the function header */
@@ -2255,7 +2267,21 @@ genFunction (iCode * ic)
 	             	werror(W_FUNCPTR_IN_USING_ISR);   
 	            }
 	        }
-	        
+
+		if (banksToSave && options.useXstack)
+		{
+		    /* Since we aren't passing it an ic, 
+		     * saveRBank will assume r0 is available to abuse.
+		     *
+		     * So switch to our (trashable) bank now, so
+		     * the caller's R0 isn't trashed.
+		     */
+		    emitcode ("push", "psw");
+		    emitcode ("mov", "psw,#0x%02x", 
+		    	      (SPEC_BANK (sym->etype) << 3) & 0x00ff);
+		    switchedPSW = TRUE;
+		}
+		
 	        for (ix = 0; ix < MAX_REGISTER_BANKS; ix++)
 	        {
 	             if (banksToSave & (1 << ix))
@@ -2293,7 +2319,8 @@ genFunction (iCode * ic)
     }
 
   /* set the register bank to the desired value */
-  if (SPEC_BANK (sym->etype) || IS_ISR (sym->etype))
+  if ((SPEC_BANK (sym->etype) || IS_ISR (sym->etype))
+   && !switchedPSW)
     {
       emitcode ("push", "psw");
       emitcode ("mov", "psw,#0x%02x", (SPEC_BANK (sym->etype) << 3) & 0x00ff);
@@ -2389,7 +2416,16 @@ genEndFunction (iCode * ic)
 
   /* restore the register bank  */
   if (SPEC_BANK (sym->etype) || IS_ISR (sym->etype))
-    emitcode ("pop", "psw");
+  {
+    if (!SPEC_BANK (sym->etype) || !IS_ISR (sym->etype)
+     || !options.useXstack)
+    {
+        /* Special case of ISR using non-zero bank with useXstack
+         * is handled below.
+         */
+        emitcode ("pop", "psw");
+    }
+  }
 
   if (IS_ISR (sym->etype))
     {
@@ -2400,7 +2436,6 @@ genEndFunction (iCode * ic)
          registers :-) */
       if (!SPEC_BANK (sym->etype))
 	{
-
 	  /* if this function does not call any other
 	     function then we can be economical and
 	     save only those registers that are used */
@@ -2434,17 +2469,25 @@ genEndFunction (iCode * ic)
 	    /* This ISR uses a non-zero bank.
 	     *
 	     * Restore any register banks saved by genFunction
-	     * in reverse order/
+	     * in reverse order.
 	     */
 	    unsigned savedBanks = SPEC_ISR_SAVED_BANKS(currFunc->etype);
 	    int ix;
-	    
+	  
 	    for (ix = MAX_REGISTER_BANKS - 1; ix >= 0; ix--)
 	    {
 	        if (savedBanks & (1 << ix))
 	        {
 	            unsaveRBank(ix, NULL, FALSE);
 	        }
+	    }
+	    
+	    if (options.useXstack)
+	    {
+	    	/* Restore bank AFTER calling unsaveRBank,
+	     	 * since it can trash r0.
+	     	 */
+	    	emitcode ("pop", "psw");
 	    }
 	}
 

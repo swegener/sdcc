@@ -195,6 +195,33 @@ Package=<4>
 
 ###############################################################################
 
+Project: "pic16"=.\src\pic16\pic16.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name pic16a
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "pic16a"=.\src\pic16\pic16a.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "pica"=.\src\pic\pica.dsp - Package Owner=<4>
 
 Package=<5>
@@ -262,6 +289,9 @@ Package=<4>
     End Project Dependency
     Begin Project Dependency
     Project_Dep_Name yacc
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name pic16
     End Project Dependency
 }}}
 

@@ -2019,10 +2019,10 @@ decorateType (ast * tree)
 
   switch (tree->opval.op)
     {
-/*------------------------------------------------------------------*/
-/*----------------------------*/
-      /*        array node          */
-/*----------------------------*/
+	    /*------------------------------------------------------------------*/
+	    /*----------------------------*/
+	    /*        array node          */
+	    /*----------------------------*/
     case '[':
 
       /* determine which is the array & which the index */
@@ -2061,10 +2061,10 @@ decorateType (ast * tree)
       }
       return tree;
 
-/*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
       /*      struct/union          */
-/*----------------------------*/
+      /*----------------------------*/
     case '.':
       /* if this is not a structure */
       if (!IS_STRUCT (LTYPE (tree)))
@@ -2078,10 +2078,10 @@ decorateType (ast * tree)
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
-/*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
       /*    struct/union pointer    */
-/*----------------------------*/
+      /*----------------------------*/
     case PTR_OP:
       /* if not pointer to a structure */
       if (!IS_PTR (LTYPE (tree)))
@@ -2746,10 +2746,10 @@ decorateType (ast * tree)
 	}
       return tree;
 
-/*------------------------------------------------------------------*/
-/*----------------------------*/
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
       /*         casting            */
-/*----------------------------*/
+      /*----------------------------*/
     case CAST:			/* change the type   */
       /* cannot cast to an aggregate type */
       if (IS_AGGREGATE (LTYPE (tree)))
@@ -2762,22 +2762,32 @@ decorateType (ast * tree)
       checkTypeSanity(LETYPE(tree), "(cast)");
 
       /* if the right is a literal replace the tree */
-      if (IS_LITERAL (RETYPE (tree)) && !IS_PTR (LTYPE (tree)))
-	{
-	  tree->type = EX_VALUE;
-	  tree->opval.val =
-	    valCastLiteral (LTYPE (tree),
-			    floatFromVal (valFromType (RETYPE (tree))));
-	  tree->left = NULL;
-	  tree->right = NULL;
-	  TTYPE (tree) = tree->opval.val->type;
-	  tree->values.literalFromCast = 1;
-	}
-      else
-	{
-	  TTYPE (tree) = LTYPE (tree);
-	  LRVAL (tree) = 1;
-	}
+      if (IS_LITERAL (RETYPE (tree))) {
+	      if (!IS_PTR (LTYPE (tree))) {
+		      tree->type = EX_VALUE;
+		      tree->opval.val =
+			      valCastLiteral (LTYPE (tree),
+					      floatFromVal (valFromType (RETYPE (tree))));
+		      tree->left = NULL;
+		      tree->right = NULL;
+		      TTYPE (tree) = tree->opval.val->type;
+		      tree->values.literalFromCast = 1;
+	      } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree))) {
+		      sym_link *rest = LTYPE(tree)->next;
+		      werror(W_LITERAL_GENERIC);		      
+		      TTYPE(tree) = newLink();
+		      DCL_TYPE(TTYPE(tree)) = FPOINTER;
+		      TTYPE(tree)->next = rest;
+		      tree->left->opval.lnk = TTYPE(tree);
+		      LRVAL (tree) = 1;
+	      } else {
+		      TTYPE (tree) = LTYPE (tree);
+		      LRVAL (tree) = 1;
+	      }
+      } else {
+	      TTYPE (tree) = LTYPE (tree);
+	      LRVAL (tree) = 1;
+      }
 
       TETYPE (tree) = getSpec (TTYPE (tree));
 

@@ -3544,9 +3544,25 @@ ast2iCode (ast * tree,int lvl)
     case RIGHT_OP:
       return geniCodeRightShift (geniCodeRValue (left, FALSE),
 				 geniCodeRValue (right, FALSE));
-    case CAST:
+    case CAST: 
+#if 1 // just in case Paul detects another sloc regression again :)
+      {
+	operand *op;
+	
+	// let's keep this simple: get the rvalue we need
+	op=geniCodeRValue (right, FALSE);
+	// now cast it to whatever we want
+	op=geniCodeCast (operandType(left), op, FALSE);
+	// if this is going to be used as an lvalue, make it so
+	if (tree->lvalue) {
+	  op->isaddr=1;
+	}
+	return op;
+      }
+#else // bug #604575
       return geniCodeCast (operandType (left),
 			   geniCodeRValue (right, FALSE), FALSE);
+#endif
 
     case '~':
     case '!':

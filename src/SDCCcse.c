@@ -1539,6 +1539,10 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 		{
 		  if (IS_ITEMP (pdop) || IS_OP_LITERAL (pdop))
 		    {
+			/* some non dominating block does POINTER_SET with
+			   this variable .. unsafe to remove any POINTER_GETs */
+			if (bitVectBitValue(ebb->ndompset,IC_LEFT(ic)->key))
+			    ebb->ptrsSet = bitVectSetBit(ebb->ptrsSet,pdop->key);
 		      IC_LEFT (ic) = pdop;
 		      change = 1;
 		    }
@@ -1617,7 +1621,7 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 
       /* Alternate code */
       if (pdic && IS_ITEMP(IC_RESULT(ic))) {
-	if (POINTER_GET(ic) && (pdic->level < ic->level)) {
+	if (POINTER_GET(ic) && bitVectBitValue(ebb->ptrsSet,IC_LEFT(ic)->key)) {
 	  /* Mmm, found an equivalent pointer get at a lower level. 
 	     This could be a loop however with the same pointer set 
 	     later on */

@@ -119,7 +119,7 @@ convertIListToConstList(initList *src, literalList **lList)
 	    return FALSE;
 	}
 
-	if (!IS_AST_LIT_VALUE(decorateType(resolveSymbols(iLoop->init.node))))
+	if (!IS_AST_LIT_VALUE(decorateType(resolveSymbols(iLoop->init.node), RESULT_CHECK)))
 	{
 	    return FALSE;
 	}
@@ -275,7 +275,7 @@ resolveIvalSym (initList * ilist)
     return;
 
   if (ilist->type == INIT_NODE)
-    ilist->init.node = decorateType (resolveSymbols (ilist->init.node));
+    ilist->init.node = decorateType (resolveSymbols (ilist->init.node), RESULT_CHECK);
 
   if (ilist->type == INIT_DEEP)
     resolveIvalSym (ilist->init.deep);
@@ -389,18 +389,17 @@ static value *cheapestVal (value *val)
       !SPEC_USIGN(val->type) &&
       !SPEC_LONG(val->type) &&
       SPEC_CVAL(val->type).v_int >= -128 &&
-      SPEC_CVAL(val->type).v_int <=  127)
+      SPEC_CVAL(val->type).v_int <     0)
 
     {
       SPEC_NOUN(val->type) = V_CHAR;
     }
-  /* this could be too aggressive:
-     'unsigned char' promotes to 'signed int', so that we can
+  /* 'unsigned char' promotes to 'signed int', so that we can
      reduce it the other way */
   if (IS_INT(val->type) &&
       !SPEC_USIGN(val->type) &&
       !SPEC_LONG(val->type) &&
-      SPEC_CVAL(val->type).v_int >= 128 &&
+      SPEC_CVAL(val->type).v_int >=   0 &&
       SPEC_CVAL(val->type).v_int <= 255)
 
     {
@@ -526,19 +525,8 @@ value *constVal (char *s)
 				     the programer wants */
       SPEC_NOUN (val->type) = V_INT;
     }
-    else if (dval>0x7f && !SPEC_USIGN (val->type)) { // check if we have to promote to int
-#if 0
-      if ((hex || octal) && /* hex or octal constants may be stored in unsigned type */
-          dval<=0xff) {
-        SPEC_USIGN (val->type) = 1;
-      } else {
-	SPEC_NOUN (val->type) = V_INT;
-      }
-#else
-      /* this is quite agressive: 'unsigned char' will be promoted to 'signed int',
-         so that the signedness of a char shouldn't matter */
+    else { /* store char's always as unsigned; this helps other optimizations */
       SPEC_USIGN (val->type) = 1;
-#endif
     }
     if (dval>0xffff && SPEC_USIGN (val->type)) { // check if we have to promote to long
       SPEC_LONG (val->type) = 1;
@@ -1267,7 +1255,7 @@ valMinus (value * lval, value * rval)
   SPEC_LONG  (val->type) = (SPEC_LONG  (lval->etype) | SPEC_LONG  (rval->etype));
   SPEC_USIGN (val->type) = SPEC_USIGN (computeType (lval->etype,
 						    rval->etype,
-						    FALSE));
+						    TRUE));
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) - floatFromVal (rval);
   else  if (SPEC_LONG (val->type))
@@ -1455,9 +1443,9 @@ valBitwise (value * lval, value * rval, int op)
 
   /* create a new value */
   val = newValue ();
-  val->type = copyLinkChain (getSize(rval->type) > getSize(lval->type) ?
-			     rval->type : lval->type);
+  val->type = computeType (lval->etype, rval->etype, FALSE);
   val->etype = getSpec (val->type);
+  SPEC_SCLS (val->etype) = S_LITERAL;
 
   switch (op)
     {
@@ -1465,19 +1453,19 @@ valBitwise (value * lval, value * rval, int op)
       if (SPEC_LONG (val->type))
 	{
 	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_ulong = (unsigned long) floatFromVal (lval) &
-	      (unsigned long) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) &
+	      (TYPE_UDWORD) floatFromVal (rval);
 	  else
-	    SPEC_CVAL (val->type).v_long = (long) floatFromVal (lval) &
-	      (long) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_long = (TYPE_DWORD) floatFromVal (lval) &
+	      (TYPE_DWORD) floatFromVal (rval);
 	}
       else
 	{
 	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) &
-	      (unsigned) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) floatFromVal (lval) &
+	      (TYPE_UWORD) floatFromVal (rval);
 	  else
-	    SPEC_CVAL (val->type).v_int = (int) floatFromVal (lval) & (int) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_int = (TYPE_WORD) floatFromVal (lval) & (TYPE_WORD) floatFromVal (rval);
 	}
       break;
 
@@ -1485,20 +1473,20 @@ valBitwise (value * lval, value * rval, int op)
       if (SPEC_LONG (val->type))
 	{
 	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_ulong = (unsigned long) floatFromVal (lval) |
-	      (unsigned long) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) |
+	      (TYPE_UDWORD) floatFromVal (rval);
 	  else
-	    SPEC_CVAL (val->type).v_long = (long) floatFromVal (lval) |
-	      (long) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_long = (TYPE_DWORD) floatFromVal (lval) |
+	      (TYPE_DWORD) floatFromVal (rval);
 	}
       else
 	{
 	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) |
-	      (unsigned) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) floatFromVal (lval) |
+	      (TYPE_UWORD) floatFromVal (rval);
 	  else
 	    SPEC_CVAL (val->type).v_int =
-	      (int) floatFromVal (lval) | (int) floatFromVal (rval);
+	      (TYPE_WORD) floatFromVal (lval) | (TYPE_WORD) floatFromVal (rval);
 	}
 
       break;
@@ -1507,24 +1495,24 @@ valBitwise (value * lval, value * rval, int op)
       if (SPEC_LONG (val->type))
 	{
 	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_ulong = (unsigned long) floatFromVal (lval) ^
-	      (unsigned long) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) ^
+	      (TYPE_UDWORD) floatFromVal (rval);
 	  else
-	    SPEC_CVAL (val->type).v_long = (long) floatFromVal (lval) ^
-	      (long) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_long = (TYPE_DWORD) floatFromVal (lval) ^
+	      (TYPE_DWORD) floatFromVal (rval);
 	}
       else
 	{
 	  if (SPEC_USIGN (val->type))
-	    SPEC_CVAL (val->type).v_uint = (unsigned) floatFromVal (lval) ^
-	      (unsigned) floatFromVal (rval);
+	    SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) floatFromVal (lval) ^
+	      (TYPE_UWORD) floatFromVal (rval);
 	  else
 	    SPEC_CVAL (val->type).v_int =
-	      (int) floatFromVal (lval) ^ (int) floatFromVal (rval);
+	      (TYPE_WORD) floatFromVal (lval) ^ (TYPE_WORD) floatFromVal (rval);
 	}
       break;
     }
-
+    
   return cheapestVal(val);
 }
 
@@ -1541,7 +1529,7 @@ valLogicAndOr (value * lval, value * rval, int op)
   val->type = val->etype = newCharLink ();
   val->type->class = SPECIFIER;
   SPEC_SCLS (val->type) = S_LITERAL;	/* will remain literal */
-  SPEC_USIGN (val->type) = 0;
+  SPEC_USIGN (val->type) = 1;
 
   switch (op)
     {

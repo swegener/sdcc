@@ -723,7 +723,7 @@ processParms (ast * func,
 	    actParm->decorated = 0;
 	    actParm->left = newNode( CAST, newAst_LINK(newIntLink()),
 					 actParm->left);
-	    actParm = decorateType(actParm);
+	    actParm = decorateType(actParm, RESULT_CHECK);
 	  } else {
 	    newType = newAst_LINK(INTTYPE);
 	  }
@@ -743,13 +743,13 @@ processParms (ast * func,
       if (newType)
 	{
 	  /* cast required; change this op to a cast. */
-	  ast *parmCopy = decorateType(resolveSymbols (copyAst (actParm)));
+	  ast *parmCopy = decorateType(resolveSymbols (copyAst (actParm)), RESULT_CHECK);
 
 	  actParm->type = EX_OP;
 	  actParm->opval.op = CAST;
 	  actParm->left = newType;
 	  actParm->right = parmCopy;
-	  decorateType (actParm);
+	  decorateType (actParm, RESULT_CHECK);
 	}
       else if (actParm->type == EX_OP && actParm->opval.op == PARAM)
 	{
@@ -797,7 +797,7 @@ processParms (ast * func,
   /* if the parameter is castable then add the cast */
   if (compareType (defParm->type, actParm->ftype) < 0)
     {
-      ast *pTree = decorateType(resolveSymbols (copyAst (actParm)));
+      ast *pTree = decorateType(resolveSymbols (copyAst (actParm)), RESULT_CHECK);
 
       /* now change the current one to a cast */
       actParm->type = EX_OP;
@@ -807,7 +807,7 @@ processParms (ast * func,
       actParm->etype = defParm->etype;
       actParm->ftype = defParm->type;
       actParm->decorated=0; /* force typechecking */
-      decorateType (actParm);
+      decorateType (actParm, RESULT_CHECK);
     }
 
   /* make a copy and change the regparm type to the defined parm */
@@ -829,8 +829,8 @@ createIvalType (ast * sym, sym_link * type, initList * ilist)
   if (ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
-  iExpr = decorateType (resolveSymbols (list2expr (ilist)));
-  return decorateType (newNode ('=', sym, iExpr));
+  iExpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_CHECK);
+  return decorateType (newNode ('=', sym, iExpr), RESULT_CHECK);
 }
 
 /*-----------------------------------------------------------------*/
@@ -860,8 +860,8 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
 	break;
       sflds->implicit = 1;
       lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
-      lAst = decorateType (resolveSymbols (lAst));
-      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast)));
+      lAst = decorateType (resolveSymbols (lAst), RESULT_CHECK);
+      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast)), RESULT_CHECK);
     }
 
   if (iloop) {
@@ -891,9 +891,9 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
   if (IS_CHAR (type->next))
     if ((rast = createIvalCharPtr (sym,
 				   type,
-			decorateType (resolveSymbols (list2expr (ilist))))))
+			decorateType (resolveSymbols (list2expr (ilist)), RESULT_CHECK))))
 
-      return decorateType (resolveSymbols (rast));
+      return decorateType (resolveSymbols (rast), RESULT_CHECK);
 
     /* not the special case             */
     if (ilist->type != INIT_DEEP)
@@ -909,7 +909,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
     {
 	ast *aSym;
 
-	aSym = decorateType (resolveSymbols(sym));
+	aSym = decorateType (resolveSymbols(sym), RESULT_CHECK);
 	
 	rast = newNode(ARRAYINIT, aSym, NULL);
 	rast->values.constlist = literalL;
@@ -937,7 +937,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 	    ast *aSym;
 	    
 	    aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size++))));
-	    aSym = decorateType (resolveSymbols (aSym));
+	    aSym = decorateType (resolveSymbols (aSym), RESULT_CHECK);
 	    rast = createIval (aSym, type->next, iloop, rast);
 	    iloop = (iloop ? iloop->next : NULL);
 	    if (!iloop)
@@ -965,7 +965,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 	DCL_ELEM (type) = size;
     }
 
-    return decorateType (resolveSymbols (rast));
+    return decorateType (resolveSymbols (rast), RESULT_CHECK);
 }
 
 
@@ -1019,7 +1019,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       // now WE don't need iexpr's symbol anymore
       freeStringSymbol(AST_SYMBOL(iexpr));
 
-      return decorateType (resolveSymbols (rast));
+      return decorateType (resolveSymbols (rast), RESULT_CHECK);
     }
 
   return NULL;
@@ -1038,7 +1038,7 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist)
   if (ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
-  iexpr = decorateType (resolveSymbols (list2expr (ilist)));
+  iexpr = decorateType (resolveSymbols (list2expr (ilist)), RESULT_CHECK);
 
   /* if character pointer */
   if (IS_CHAR (type->next))
@@ -1076,9 +1076,9 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
     rast = createIvalType (sym, type, ilist);
 
   if (wid)
-    return decorateType (resolveSymbols (newNode (NULLOP, wid, rast)));
+    return decorateType (resolveSymbols (newNode (NULLOP, wid, rast)), RESULT_CHECK);
   else
-    return decorateType (resolveSymbols (rast));
+    return decorateType (resolveSymbols (rast), RESULT_CHECK);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1294,7 +1294,7 @@ bool constExprTree (ast *cexpr) {
     return TRUE;
   }
 
-  cexpr = decorateType (resolveSymbols (cexpr));
+  cexpr = decorateType (resolveSymbols (cexpr), RESULT_CHECK);
 
   switch (cexpr->type) 
     {
@@ -1358,7 +1358,7 @@ bool constExprTree (ast *cexpr) {
 value *
 constExprValue (ast * cexpr, int check)
 {
-  cexpr = decorateType (resolveSymbols (cexpr));
+  cexpr = decorateType (resolveSymbols (cexpr), RESULT_CHECK);
 
   /* if this is not a constant then */
   if (!IS_LITERAL (cexpr->ftype))
@@ -1951,7 +1951,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 						  rloop))));
 
   rloop->lineno=init->lineno;
-  return decorateType (rloop);
+  return decorateType (rloop, RESULT_CHECK);
 
 }
 
@@ -2005,15 +2005,122 @@ searchLitOp (ast *tree, ast **parent, const char *ops)
 }
 
 /*-----------------------------------------------------------------*/
-/* decorateType - compute type for this tree also does type checking */
-/*          this is done bottom up, since type have to flow upwards */
-/*          it also does constant folding, and paramater checking  */
+/* getResultFromType                                               */
 /*-----------------------------------------------------------------*/
+static RESULT_TYPE
+getResultTypeFromType (sym_link *type)
+{
+  /* type = getSpec (type); */
+  if (IS_BITVAR (type))
+    return RESULT_TYPE_BIT;
+  if (IS_BITFIELD (type))
+    return RESULT_TYPE_CHAR;
+  if (IS_CHAR (type))
+    return RESULT_TYPE_CHAR;
+  if (   IS_INT (type)
+      && !IS_LONG (type))
+    return RESULT_TYPE_INT;
+  return RESULT_TYPE_OTHER;
+}
+
+/*-----------------------------------------------------------------*/
+/* addCast - adds casts to a type specified by RESULT_TYPE         */
+/*-----------------------------------------------------------------*/
+static void
+addCast (ast **tree, RESULT_TYPE resultType)
+{
+  sym_link *newLink;
+  
+  switch (resultType)
+    {
+      case RESULT_TYPE_CHAR:
+	if (getSize ((*tree)->etype) <= 1)
+	  return;
+	newLink = newCharLink();
+	break;
+      case RESULT_TYPE_INT:
+#if 0
+        /* casting from long to int costs additional 4 bytes dram! */
+	if (getSize ((*tree)->etype) <= INTSIZE)
+	  return;
+	newLink = newIntLink();
+	break;
+#else
+        /* warn ("Loosing significant digits"); */
+	return;
+#endif
+      default:
+	return;
+    }
+  (*tree)->decorated = 0;
+  *tree = newNode (CAST, newAst_LINK (newLink), *tree);
+  /* keep unsigned type */
+  SPEC_USIGN ((*tree)->left->opval.lnk) = IS_UNSIGNED ((*tree)->right->etype) ? 1 : 0;
+  *tree = decorateType (*tree, resultType);
+}
+
+/*-----------------------------------------------------------------*/
+/* resultTypePropagate - decides if resultType can be propagated   */
+/*-----------------------------------------------------------------*/
+static RESULT_TYPE
+resultTypePropagate (ast *tree, RESULT_TYPE resultType)
+{
+  switch (tree->opval.op)
+    {
+      case '=':
+      case '?':
+      case ':':
+      case '|':
+      case '^':
+	return resultType;
+      case '&':
+	if (!tree->right)
+	  /* can be unary */
+	  return RESULT_TYPE_NONE;
+	else
+	  return resultType;
+      default:
+	return RESULT_TYPE_NONE;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* getLeftResultType - gets type from left branch for propagation  */
+/*-----------------------------------------------------------------*/
+static RESULT_TYPE
+getLeftResultType (ast *tree, RESULT_TYPE resultType)
+{
+  switch (tree->opval.op)
+    {
+      case '=':
+      case CAST:
+	if (IS_PTR (tree->left->ftype))
+	  return RESULT_TYPE_NONE;
+	else
+	  return getResultTypeFromType (tree->left->etype);
+      case RETURN:
+	if (IS_PTR (currFunc->type->next))
+	  return RESULT_TYPE_NONE;
+	else
+	  return getResultTypeFromType (currFunc->type->next);
+      default:
+	return resultType;
+    }
+}
+
+/*--------------------------------------------------------------------*/
+/* decorateType - compute type for this tree, also does type checking.*/
+/* This is done bottom up, since type has to flow upwards.            */
+/* resultType flows top-down and forces e.g. char-arithmetik, if the  */
+/* result is a char and the operand(s) are int's.                     */
+/* It also does constant folding, and parameter checking.             */
+/*--------------------------------------------------------------------*/
 ast *
-decorateType (ast * tree)
+decorateType (ast * tree, RESULT_TYPE resultType)
 {
   int parmNumber;
   sym_link *p;
+  RESULT_TYPE resultTypeProp;
 
   if (!tree)
     return tree;
@@ -2045,7 +2152,7 @@ decorateType (ast * tree)
 
 /*------------------------------------------------------------------*/
 /*----------------------------*/
-  /*   leaf has been reached    */
+/*   leaf has been reached    */
 /*----------------------------*/
   lineno=tree->lineno;
   /* if this is of type value */
@@ -2130,11 +2237,26 @@ decorateType (ast * tree)
 	  }
       }
     #endif
+
+    /* Before decorating the left branch we've to decide in dependence
+       upon tree->opval.op, if resultType can be propagated */
+    if (getenv ("SDCC_NEWTYPEFLOW"))
+      resultTypeProp = resultTypePropagate (tree, resultType);
+    else
+      resultTypeProp = RESULT_TYPE_NONE; /* provide initialization */
+
+    dtl = decorateType (tree->left, resultTypeProp);
+
+    /* After decorating the left branch there's type information available
+       in tree->left->?type. If the op is e.g. '=' we extract the type
+       information from there and propagate it to the right branch. */
+    if (getenv ("SDCC_NEWTYPEFLOW"))
+      resultTypeProp = getLeftResultType (tree, resultTypeProp);
     
-    dtl = decorateType (tree->left);
-    /* delay right side for '?' operator since conditional macro expansions might
-       rely on this */
-    dtr = (tree->opval.op == '?' ? tree->right : decorateType (tree->right));
+    /* delay right side for '?' operator since conditional macro expansions
+       might rely on this */
+    dtr = tree->opval.op == '?' ? tree->right :
+                                  decorateType (tree->right, resultTypeProp);
 
     /* this is to take care of situations
        when the tree gets rewritten */
@@ -2145,25 +2267,28 @@ decorateType (ast * tree)
     if ((dtl && dtl->isError) || (dtr && dtr->isError))
       return tree;
 
-    if (IS_AST_OP(tree) &&
-	(tree->opval.op == CAST || tree->opval.op == '=') &&
-	(getSize(LTYPE(tree)) > getSize(RTYPE(tree))) &&
-	(getSize(RTYPE(tree)) < (unsigned) INTSIZE)) {
-      // this is a cast/assign to a bigger type
-      if (IS_AST_OP(tree->right) &&
-	  IS_INTEGRAL(tree->right->ftype) &&
-	  (tree->right->opval.op == LEFT_OP ||
-	   tree->right->opval.op == '*' ||
-	   tree->right->opval.op == '+' ||
-	   tree->right->opval.op == '-') &&
-	  tree->right->right) {
-	// we should cast an operand instead of the result
-	tree->right->decorated = 0;
-	tree->right->left = newNode( CAST, newAst_LINK(newIntLink()),
-				     tree->right->left);
-	tree->right = decorateType(tree->right);
+    if (!getenv ("SDCC_NEWTYPEFLOW"))
+      {
+        if (IS_AST_OP(tree) &&
+	    (tree->opval.op == CAST || tree->opval.op == '=') &&
+	    (getSize(LTYPE(tree)) > getSize(RTYPE(tree))) &&
+	    (getSize(RTYPE(tree)) < (unsigned) INTSIZE)) {
+          /* this is a cast/assign to a bigger type */
+	  if (IS_AST_OP(tree->right) &&
+	      IS_INTEGRAL(tree->right->ftype) &&
+	      (tree->right->opval.op == LEFT_OP ||
+	       tree->right->opval.op == '*' ||
+	       tree->right->opval.op == '+' ||
+	       tree->right->opval.op == '-') &&
+	       tree->right->right) {
+	    /* we should cast an operand instead of the result */
+	    tree->right->decorated = 0;
+	    tree->right->left = newNode( CAST, newAst_LINK(newIntLink()),
+				         tree->right->left);
+	    tree->right = decorateType(tree->right, RESULT_CHECK);
+          }
+        }
       }
-    }
   }
 
   /* depending on type of operator do */
@@ -2378,11 +2503,15 @@ decorateType (ast * tree)
 	    ast *otree = optimizeGetHbit (tree);
 
 	    if (otree != tree)
-	      return decorateType (otree);
+	      return decorateType (otree, RESULT_CHECK);
 	  }
 
-	  TTYPE (tree) =
-	    computeType (LTYPE (tree), RTYPE (tree), FALSE);
+	  if (getenv ("SDCC_NEWTYPEFLOW"))
+	    {
+	      addCast (&tree->left,  resultType);
+	      addCast (&tree->right, resultType);
+	    }
+	  TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), FALSE);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
 
           /* if left is a literal exchange left & right */
@@ -2406,11 +2535,12 @@ decorateType (ast * tree)
 	          litTree->left = tree->right;
 	          tree->right = tTree;
 	          /* both operands in tTree are literal now */
-	          decorateType (parent);
+	          decorateType (parent, RESULT_CHECK);
 		}
 	    }
 
 	  LRVAL (tree) = RRVAL (tree) = 1;
+	  
 	  return tree;
 	}
 
@@ -2504,11 +2634,11 @@ decorateType (ast * tree)
       {
 	ast *wtree = optimizeRRCRLC (tree);
 	if (wtree != tree)
-	  return decorateType (wtree);
+	  return decorateType (wtree, RESULT_CHECK);
 	
 	wtree = optimizeSWAP (tree);
 	if (wtree != tree)
-	  return decorateType (wtree);
+	  return decorateType (wtree, RESULT_CHECK);
       }
 
       /* if left is a literal exchange left & right */
@@ -2532,7 +2662,7 @@ decorateType (ast * tree)
 	      litTree->left = tree->right;
 	      tree->right = tTree;
 	      /* both operands in tTree are literal now */
-	      decorateType (parent);
+	      decorateType (parent, RESULT_CHECK);
 	    }
         }
       /* fall through */
@@ -2589,11 +2719,16 @@ decorateType (ast * tree)
 	      litTree->left = tree->right;
 	      tree->right = tTree;
 	      /* both operands in litTree are literal now */
-	      decorateType (parent);
+	      decorateType (parent, RESULT_CHECK);
 	    }
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
+      if (getenv ("SDCC_NEWTYPEFLOW"))
+        {
+          addCast (&tree->left,  resultType);
+          addCast (&tree->right, resultType);
+        }
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
@@ -2628,7 +2763,7 @@ decorateType (ast * tree)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-					    TRUE));
+		! (IS_UNSIGNED (LTYPE (tree)) && IS_UNSIGNED (RTYPE (tree)))));
 
       /* if right is a literal and */
       /* left is also a division by a literal then */
@@ -2648,15 +2783,15 @@ decorateType (ast * tree)
 		  litTree->right->lineno = tree->lineno;
 
 		  tree->right->opval.val = constVal ("1");
-		  decorateType (parent);
+		  decorateType (parent, RESULT_CHECK);
 		}
 	      else
 		{
 		  /* litTree->left is literal: no gcse possible.
-		     We can't call decorateType(parent), because
+		     We can't call decorateType(parent, RESULT_CHECK), because
 		     this would cause an infinit loop. */
 		  parent->decorated = 1;
-		  decorateType (litTree);
+		  decorateType (litTree, RESULT_CHECK);
 		}
 	    }
 	}
@@ -2694,7 +2829,7 @@ decorateType (ast * tree)
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
-					    TRUE));
+		! (IS_UNSIGNED (LTYPE (tree)) && IS_UNSIGNED (RTYPE (tree)))));
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2799,16 +2934,26 @@ decorateType (ast * tree)
 	      litTree->left = tree->right;
 	      tree->right = tTree;
 	      /* both operands in litTree are literal now */
-	      decorateType (parent);
+	      decorateType (parent, RESULT_CHECK);
 	    }
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      TETYPE (tree) = getSpec (TTYPE (tree) =
-			       computeType (LTYPE (tree),
-					    RTYPE (tree),
-					    TRUE));
-
+      if (!getenv ("SDCC_NEWTYPEFLOW"))
+        TETYPE (tree) = getSpec (TTYPE (tree) =
+				 computeType (LTYPE (tree),
+					      RTYPE (tree),
+					      TRUE));
+      else
+	{
+          addCast (&tree->left,  resultType);
+          addCast (&tree->right, resultType);
+	  TETYPE (tree) = getSpec (TTYPE (tree) =
+				   computeType (LTYPE (tree),
+					        RTYPE (tree),
+		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+	}
+      
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -2926,7 +3071,7 @@ decorateType (ast * tree)
 		      tree->opval.op = '-';
 		    }
 		}
-	      decorateType (parent);
+	      decorateType (parent, RESULT_CHECK);
 	    }
 	}
 
@@ -2936,10 +3081,21 @@ decorateType (ast * tree)
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 LTYPE (tree));
       else
-	TETYPE (tree) = getSpec (TTYPE (tree) =
-				 computeType (LTYPE (tree),
-					      RTYPE (tree),
-					      FALSE));
+        if (!getenv ("SDCC_NEWTYPEFLOW"))
+          TETYPE (tree) = getSpec (TTYPE (tree) =
+				   computeType (LTYPE (tree),
+					        RTYPE (tree),
+					        FALSE));
+	else
+          {
+	    addCast (&tree->left,  resultType);
+            addCast (&tree->right, resultType);
+            TETYPE (tree) = getSpec (TTYPE (tree) =
+				     computeType (LTYPE (tree),
+					          RTYPE (tree),
+		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+	   }
+	
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -3036,10 +3192,20 @@ decorateType (ast * tree)
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 LTYPE (tree));
       else
-	TETYPE (tree) = getSpec (TTYPE (tree) =
-				 computeType (LTYPE (tree),
-					      RTYPE (tree),
-					      FALSE));
+        if (!getenv ("SDCC_NEWTYPEFLOW"))
+          TETYPE (tree) = getSpec (TTYPE (tree) =
+				   computeType (LTYPE (tree),
+					        RTYPE (tree),
+					        FALSE));
+	else
+	  {
+	    addCast (&tree->left,  resultType);
+	    addCast (&tree->right, resultType);
+	    TETYPE (tree) = getSpec (TTYPE (tree) =
+				     computeType (LTYPE (tree),
+					          RTYPE (tree),
+		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+	  }
 
       LRVAL (tree) = RRVAL (tree) = 1;
 
@@ -3080,7 +3246,7 @@ decorateType (ast * tree)
 		      tree->right = tTree;
 		    }
 		}
-	      decorateType (litParent);
+	      decorateType (litParent, RESULT_CHECK);
 	    }
 	}
       return tree;
@@ -3182,11 +3348,20 @@ decorateType (ast * tree)
       LRVAL (tree) = RRVAL (tree) = 1;
       if (tree->opval.op == LEFT_OP)
 	{
-	  /* promote char to int */
-	  TETYPE (tree) = getSpec (TTYPE (tree) =
-				   computeType (LTYPE (tree),
-						LTYPE (tree), /* no, not RTYPE! */
-						TRUE));
+	  if (!getenv ("SDCC_NEWTYPEFLOW"))
+	    /* promote char to int */
+	    TETYPE (tree) = getSpec (TTYPE (tree) =
+				     computeType (LTYPE (tree),
+						  LTYPE (tree), /* no, not RTYPE! */
+						  TRUE));
+	  else
+	    {
+	      addCast (&tree->left,  resultType);
+	      TETYPE (tree) = getSpec (TTYPE (tree) =
+				       computeType (LTYPE (tree),
+					            RTYPE (tree),
+			       resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
+	    }
 	}
       else /* RIGHT_OP */
 	{
@@ -3496,7 +3671,9 @@ decorateType (ast * tree)
 	}
       /* if unsigned value < 0  then always false */
       /* if (unsigned value) > 0 then '(unsigned value) ? 1 : 0' */
-      if (SPEC_USIGN(LETYPE(tree)) && IS_LITERAL(RTYPE(tree))  &&
+      if (SPEC_USIGN(LETYPE(tree)) &&
+          !IS_CHAR(LETYPE(tree)) && /* promotion to signed int */
+          IS_LITERAL(RTYPE(tree))  &&
 	  ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0)
 	{
 	  if (tree->opval.op == '<')
@@ -3513,7 +3690,7 @@ decorateType (ast * tree)
 				     tree->right); /* val 0 */
 	      tree->right->lineno = tree->lineno;
 	      tree->right->left->lineno = tree->lineno;
-	      decorateType (tree->right);
+	      decorateType (tree->right, RESULT_CHECK);
 	    }
         }
       /* if they are both literal then */
@@ -3630,20 +3807,22 @@ decorateType (ast * tree)
       /*----------------------------*/
     case '?':
       /* the type is value of the colon operator (on the right) */
-      assert(IS_COLON_OP(tree->right));
+      assert (IS_COLON_OP (tree->right));
       /* if already known then replace the tree : optimizer will do it
 	 but faster to do it here */
-      if (IS_LITERAL (LTYPE(tree))) {	  
-	  if ( ((int) floatFromVal (valFromType (LETYPE (tree)))) != 0) {
-	      return decorateType(tree->right->left) ;
-	  } else {
-	      return decorateType(tree->right->right) ;
-	  }
-      } else {
-	  tree->right = decorateType(tree->right);
-	  TTYPE (tree) = RTYPE(tree);
+      if (IS_LITERAL (LTYPE (tree)))
+	{
+	  if (((int) floatFromVal (valFromType (LETYPE (tree)))) != 0)
+            return decorateType (tree->right->left, resultTypeProp);
+	  else
+	    return decorateType (tree->right->right, resultTypeProp);
+	}
+      else
+	{
+	  tree->right = decorateType (tree->right, resultTypeProp);
+	  TTYPE (tree) = RTYPE (tree);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
-      }
+	}
       return tree;
 
     case ':':
@@ -3790,7 +3969,7 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
 
-      tree->right = decorateType (newNode ('+', copyAst (tree->left), tree->right));
+      tree->right = decorateType (newNode ('+', copyAst (tree->left), tree->right), RESULT_CHECK);
       tree->opval.op = '=';
 
       return tree;
@@ -3897,13 +4076,14 @@ decorateType (ast * tree)
 	  goto errorTreeReturn;
 	}
 
-      /* if there is going to be a casing required then add it */
+      /* if there is going to be a casting required then add it */
       if (compareType (currFunc->type->next, RTYPE (tree)) < 0)
 	{
 	  tree->right =
 	    decorateType (newNode (CAST,
-			   newAst_LINK (copyLinkChain (currFunc->type->next)),
-				   tree->right));
+			  newAst_LINK (copyLinkChain (currFunc->type->next)),
+					tree->right),
+			  RESULT_CHECK);
 	}
 
       RRVAL (tree) = 1;
@@ -3952,9 +4132,9 @@ decorateType (ast * tree)
       /*----------------------------*/
     case FOR:
 
-      decorateType (resolveSymbols (AST_FOR (tree, initExpr)));
-      decorateType (resolveSymbols (AST_FOR (tree, condExpr)));
-      decorateType (resolveSymbols (AST_FOR (tree, loopExpr)));
+      decorateType (resolveSymbols (AST_FOR (tree, initExpr)), RESULT_CHECK);
+      decorateType (resolveSymbols (AST_FOR (tree, condExpr)), RESULT_CHECK);
+      decorateType (resolveSymbols (AST_FOR (tree, loopExpr)), RESULT_CHECK);
 
       /* if the for loop is reversible then
          reverse it otherwise do what we normally
@@ -3973,7 +4153,7 @@ decorateType (ast * tree)
 					  AST_FOR (tree, initExpr),
 					  AST_FOR (tree, condExpr),
 					  AST_FOR (tree, loopExpr),
-					  tree->left));
+					  tree->left), RESULT_CHECK);
       }
     default:
       TTYPE (tree) = TETYPE (tree) = NULL;
@@ -4189,7 +4369,7 @@ createCase (ast * swStat, ast * caseVal, ast * stmnt)
       return NULL;
     }
 
-  caseVal = decorateType (resolveSymbols (caseVal));
+  caseVal = decorateType (resolveSymbols (caseVal), RESULT_CHECK);
   /* if not a constant then error  */
   if (!IS_LITERAL (caseVal->ftype))
     {
@@ -4547,7 +4727,7 @@ optimizeGetHbit (ast * tree)
       && !port->hasExtBitOp(GETHBIT, getSize (TTYPE (tree->left->left))))
     return tree;
 
-  return decorateType (newNode (GETHBIT, tree->left->left, NULL));
+  return decorateType (newNode (GETHBIT, tree->left->left, NULL), RESULT_CHECK);
 
 }
 
@@ -4814,7 +4994,7 @@ optimizeCompare (ast * root)
 	  break;
 	}
 
-      return decorateType (optExpr);
+      return decorateType (optExpr, RESULT_CHECK);
     }
 
   vleft = (root->left->type == EX_VALUE ?
@@ -4888,7 +5068,7 @@ optimizeCompare (ast * root)
 	      break;
 	    }
 	}
-      return decorateType (resolveSymbols (optExpr));
+      return decorateType (resolveSymbols (optExpr), RESULT_CHECK);
     }				/* end-of-if of BITVAR */
 
 noOptimize:
@@ -5034,7 +5214,8 @@ createFunction (symbol * name, ast * body)
   SNPRINTF (name->rname, sizeof(name->rname), "%s%s", port->fun_prefix, name->name);
 
   body = resolveSymbols (body);	/* resolve the symbols */
-  body = decorateType (body);	/* propagateType & do semantic checks */
+  body = decorateType (body, RESULT_TYPE_NONE);	/* propagateType & do semantic checks */
+					
 
   ex = newAst_VALUE (symbolVal (name));	/* create name */
   ex = newNode (FUNCTION, ex, body);
@@ -5065,7 +5246,7 @@ createFunction (symbol * name, ast * body)
     {
       GcurMemmap = statsg;
       codeOutFile = statsg->oFile;
-      eBBlockFromiCode (iCodeFromAst (decorateType (resolveSymbols (staticAutos))));
+      eBBlockFromiCode (iCodeFromAst (decorateType (resolveSymbols (staticAutos), RESULT_CHECK)));
       staticAutos = NULL;
     }
 

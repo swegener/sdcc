@@ -1554,9 +1554,16 @@ computeType (sym_link * type1, sym_link * type2, bool promoteCharToInt)
     SPEC_NOUN (reType) = V_INT;
 
   if (   (   (   SPEC_USIGN (etype1)
-	      && (getSize (etype1) >= getSize (reType)))
+              /* if this operand is promoted to a larger
+		 type don't check it's signedness */
+	      && (getSize (etype1) >= getSize (reType))
+	      /* We store signed literals in the range 0...255 as
+		 'unsigned char'. If there was no promotion to 'signed int'
+		 they must not force an unsigned operation: */
+	      && !(IS_CHAR (etype1) && IS_LITERAL (etype1)))
 	  || (   SPEC_USIGN (etype2)
-	      && (getSize (etype2) >= getSize (reType))))
+	      && (getSize (etype2) >= getSize (reType))
+	      && !(IS_CHAR (etype2) && IS_LITERAL (etype2))))
       && !IS_FLOAT (reType))
     SPEC_USIGN (reType) = 1;
   else

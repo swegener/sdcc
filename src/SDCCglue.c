@@ -308,7 +308,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		      sym->name);
 	    }
 	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
-			    decorateType (resolveSymbols (list2expr (sym->ival))));
+			    decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
 	  }
 	  codeOutFile = statsg->oFile;
 

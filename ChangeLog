@@ -1,3 +1,24 @@
+2004-01-25 Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCast.c: added an additional type flow in decorateType() of
+	opposite direction, see feature request #860006; it's enabled at runtime
+	by setting the environment variable SDCC_NEWTYPEFLOW
+	* src/SDCCast.h: changed prototype of decorateType()
+	* src/SDCCglue.c (emitRegularMap): updated call of decorateType()
+	* src/SDCCicode.c (geniCodeDivision) (geniCodeModulus): promotion from
+	'char' to 'int' can be omitted, if both operands are 'unsigned char';
+	see feature request #877103
+	* src/SDCCval.c: updated call of decorateType()
+	(valBitwise): fixed bug #882876
+	(valMinus): added promotion
+	(valLogicAndOr): result is unsigned
+	(cheapestVal) (constVal): literals from 0...255 are 'unsigned char' now
+	* src/SDCCsymt.c (computeType),
+	* src/mcs51/gen.c (genCmpGt) (genCmpLt): literal 'unsigned char'
+	must not cause an unsigned operation
+	* src/pic/glue (pic14emitRegularMap),
+	* src/pic16/glue.c (pic16emitRegularMap): updated call of decorateType()
+
 2004-01-23 Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/pic/pcode.c (PCodeID): commented out left over debug code

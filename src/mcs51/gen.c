@@ -4334,7 +4334,8 @@ genCmpGt (iCode * ic, iCode * ifx)
 
   letype = getSpec (operandType (left));
   retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
+  sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
+           (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
   /* assign the amsops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
@@ -4363,8 +4364,8 @@ genCmpLt (iCode * ic, iCode * ifx)
 
   letype = getSpec (operandType (left));
   retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
-
+  sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
+           (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
   /* assign the amsops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);

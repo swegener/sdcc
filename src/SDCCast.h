@@ -170,6 +170,16 @@ ast;
 			  x == AND_ASSIGN || x == OR_ASSIGN || x == INC_OP || x == DEC_OP)
 #define IS_DEREF_OP(x) (( x->opval.op == '*' && x->right == NULL) || x->opval.op == '.')
 
+typedef enum
+{
+  RESULT_TYPE_NONE = 0,
+  RESULT_CHECK = 0, /* TODO: replace all occurences with the appropriate type and remove me */
+  RESULT_TYPE_BIT,
+  RESULT_TYPE_CHAR,
+  RESULT_TYPE_INT,
+  RESULT_TYPE_OTHER
+} RESULT_TYPE;
+
 /* forward declarations for global variables */
 extern ast *staticAutos;
 extern FILE *codeOutFile;
@@ -196,7 +206,7 @@ ast *createDefault (ast *, ast *, ast *);
 ast *forLoopOptForm (ast *);
 ast *argAst (ast *);
 ast *resolveSymbols (ast *);
-ast *decorateType (ast *);
+ast *decorateType (ast *, RESULT_TYPE);
 ast *createWhile (symbol *, symbol *, symbol *, ast *, ast *);
 ast *createIf (ast *, ast *, ast *);
 ast *createDo (symbol *, symbol *, symbol *, ast *, ast *);

@@ -212,7 +212,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	ival = initAggregates (sym, sym->ival, NULL);
       else
 	ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
-			decorateType (resolveSymbols (list2expr (sym->ival))));
+			decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
       codeOutFile = statsg->oFile;
       GcurMemmap = statsg;
       eBBlockFromiCode (iCodeFromAst (ival));

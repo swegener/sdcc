@@ -2059,7 +2059,9 @@ geniCodeDivision (operand * left, operand * right)
   sym_link *ltype = operandType (left);
   sym_link *letype = getSpec (ltype);
 
-  resType = usualBinaryConversions (&left, &right, TRUE, FALSE);
+  resType = usualBinaryConversions (&left, &right,
+              (IS_UNSIGNED (retype) && IS_UNSIGNED (letype)) ? FALSE : TRUE,
+	      FALSE);
 
   /* if the right is a literal & power of 2
      and left is unsigned then make it a
@@ -2098,7 +2100,9 @@ geniCodeModulus (operand * left, operand * right)
     return operandFromValue (valMod (left->operand.valOperand,
 				     right->operand.valOperand));
 
-  resType = usualBinaryConversions (&left, &right, TRUE, FALSE);
+  resType = usualBinaryConversions (&left, &right,
+              (IS_UNSIGNED (retype) && IS_UNSIGNED (letype)) ? FALSE : TRUE,
+	      FALSE);
 
   /* now they are the same size */
   ic = newiCode ('%', left, right);

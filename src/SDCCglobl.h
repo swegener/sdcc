@@ -253,10 +253,13 @@ extern int nrelFiles;
 extern char *relFiles[128];
 extern char *libFiles[128] ;
 extern int nlibFiles;
+
+/*
 void buildCmdLine(char *into, char **args, const char **cmds, 
 			  const char *p1, const char *p2, 
 			  const char *p3, const char **list);
 int my_system (const char *cmd, char **cmd_argv);
+*/
 
 void parseWithComma (char **,char *) ;
 

@@ -22,6 +22,8 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
+#define USE_SYSTEM_SYSTEM_CALLS
+
 #include "common.h"
 #include <ctype.h>
 
@@ -195,6 +197,62 @@ static void _validatePorts(void)
     }
 }
 
+#ifdef USE_SYSTEM_SYSTEM_CALLS
+void buildCmdLine(char *into, const char **cmds, 
+			  const char *p1, const char *p2, 
+			  const char *p3, const char **list)
+{
+    const char *p, *from;
+
+    *into = '\0';
+
+    while (*cmds) {
+
+	from = *cmds;
+	cmds++;
+
+	//printf ("%s\n", from);
+	/* See if it has a '$' anywhere - if not, just copy */
+	if ((p = strchr(from, '$'))) {
+	    strncat(into, from, p - from);
+	    /* seperate it */
+	    strcat(into, " ");
+	    from = p+2;
+	    p++;
+	    switch (*p) {
+	    case '1':
+		if (p1)
+		    strcat(into, p1);
+		break;
+	    case '2':
+		if (p2)
+		    strcat(into, p2);
+		break;
+	    case '3':
+		if (p3)
+		    strcat(into, p3);
+		break;
+	    case 'l': {
+		const char **tmp = list;
+		if (tmp) {
+		    while (*tmp) {
+		        //printf ("list: %s\n", *tmp);
+			strcat(into, *tmp);
+			strcat(into, " ");
+			tmp++;
+		    }
+		}
+		break;
+	    }
+	    default:
+		assert(0);
+	    }
+	}
+	strcat(into, from); // this include the ".asm" from "$1.asm"
+	strcat(into, " ");
+    }
+}
+#else
 void buildCmdLine(char *into, char **args, const char **cmds, 
 			  const char *p1, const char *p2, 
 			  const char *p3, const char **list)
@@ -253,6 +311,7 @@ void buildCmdLine(char *into, char **args, const char **cmds,
     }
     *args = NULL;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info			   */
@@ -1079,6 +1138,33 @@ int   parseCmdLine ( int argc, char **argv )
 /* my_system - will call a program with arguments                  */
 /*-----------------------------------------------------------------*/
 
+#ifdef USE_SYSTEM_SYSTEM_CALLS
+int my_system (const char *cmd)
+{    
+#if NATIVE_WIN32
+  /* Mung slashes into backslashes to keep WIndoze happy. */
+  {
+    char *r;
+    r = cmd;
+    
+    while (*r)
+      {
+	if (*r == '/')
+	  {
+	    *r = '\\';
+	  }
+	r++;
+      }
+  }
+#endif
+
+    //printf ("my_system(%s)\n",cmd);
+    if (verboseExec) {
+      printf ("+ %s\n", cmd);
+    }
+    return (system(cmd));
+}
+#else
 #if defined(_MSC_VER)
 
 char *try_dir[]= {NULL};			// TODO : Fill in some default search list
@@ -1151,6 +1237,7 @@ int my_system (const char *cmd, char **cmd_argv)
     
     return 0;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* linkEdit : - calls the linkage editor  with options             */
@@ -1158,7 +1245,9 @@ int my_system (const char *cmd, char **cmd_argv)
 static void linkEdit (char **envp)
 {
     FILE *lnkfile ;
+#ifndef USE_SYSTEM_SYSTEM_CALLS
     char *argv[128];
+#endif
     char *segName, *c;
 
     int i;
@@ -1259,14 +1348,21 @@ static void linkEdit (char **envp)
     fprintf (lnkfile,"\n-e\n");
     fclose(lnkfile);
 
-    buildCmdLine(buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
-
     if (options.verbose)
       printf ("sdcc: Calling linker...\n");
+
+#ifdef USE_SYSTEM_SYSTEM_CALLS
+    buildCmdLine(buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
+    // ignore linker errors for now, not tested
+    my_system(buffer);
+#else
+    buildCmdLine(buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
     if (my_system(argv[0], argv)) {
 	perror("Cannot exec linker");
 	exit(1);
     }
+
+#endif
 
     if (strcmp(srcFileName,"temp") == 0) {
 	/* rename "temp.cdb" to "firstRelFile.cdb" */
@@ -1282,14 +1378,22 @@ static void linkEdit (char **envp)
 /*-----------------------------------------------------------------*/
 static void assemble (char **envp)
 {
+#ifdef USE_SYSTEM_SYSTEM_CALLS
+    buildCmdLine(buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
+    if (my_system(buffer)) {
+      fprintf (stderr, "sdcc: aborted while assembling, look above for messages (if any :)\n");
+      exit(1);
+    }
+#else
     char *argv[128];  /* assembler arguments */
 
     buildCmdLine(buffer, argv, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
 
     if (my_system(argv[0], argv)) {
-	perror("Cannot exec assember");
+	perror("Cannot exec assembler");
 	exit(1);
     }
+#endif
 }
 
 
@@ -1299,7 +1403,9 @@ static void assemble (char **envp)
 /*-----------------------------------------------------------------*/
 static int preProcess (char **envp)
 {
+#ifndef USE_SYSTEM_SYSTEM_CALLS
     char *argv[128];
+#endif
     char procDef[128];
 
     preOutName = NULL;
@@ -1348,11 +1454,16 @@ static int preProcess (char **envp)
 	if (!preProcOnly)
 	    preOutName = strdup(tmpnam(NULL));
 
-	buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
-		      preOutName, srcFileName, preArgv);
-
 	if (options.verbose)
 	  printf ("sdcc: Calling preprocessor...\n");
+
+#ifdef USE_SYSTEM_SYSTEM_CALLS
+	buildCmdLine(buffer, _preCmd, fullSrcFileName, 
+		      preOutName, srcFileName, preArgv);
+	my_system(buffer);
+#else
+	buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
+		      preOutName, srcFileName, preArgv);
 
 	if (my_system(argv[0], argv)) {
 	    unlink (preOutName);
@@ -1360,6 +1471,7 @@ static int preProcess (char **envp)
 	    exit(1);
 	}
 
+#endif
 	if (preProcOnly)
 	    exit(0);
     }

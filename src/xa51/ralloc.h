@@ -27,52 +27,33 @@
 #ifndef SDCCRALLOC_H
 #define SDCCRALLOC_H 1
 
-#define ubyte unsigned char
-#define byte ubyte
-#define sbyte signed char
-#define uword unsigned char
-#define word uword
-#define sword signed char
-#define udword unsigned int
-#define dword udword
-#define sdword signed int
-
 #define REG_PTR 0x01 // pointer register
 #define REG_GPR 0x02 // general purpose register
 #define REG_CND 0x04 // condition (bit) register
 #define REG_SCR 0x40 // scratch register
 #define REG_STK 0x80 // stack pointer register
 
+// register ID's
+enum {
+  R0L_ID=0x10,R0H_ID,R1L_ID,R1H_ID,R2L_ID,R2H_ID,R3L_ID,R3H_ID,
+  R4L_ID,R4H_ID,R5L_ID,R5H_ID,R6L_ID,R6H_ID,R7L_ID,R7H_ID,
+  R0_ID=0x20, R1_ID, R2_ID, R3_ID, R4_ID, R5_ID, R6_ID, R7_ID,
+  R8_ID, I9_ID, R10_ID, R11_ID, R12_ID, R13_ID, R14_ID, R15_ID,
+  R0R1_ID=0x40, R2R3_ID, R4R5_ID, R6R7_ID
+};
+
 typedef struct regs {
-  ubyte rIdx; // a unique # for this one
-  ubyte size; // size of register (0,1,2,4)
-  ubyte type; // pointer, general purpose, condition (bit)
+  unsigned char rIdx; // the register ID
+  unsigned char size; // size of register (1,2,4)
+  unsigned char type; // scratch, pointer, general purpose, stack, condition (bit)
   char *name;
-  udword regMask;
-  uword offset;
+  unsigned long regMask;
   bool isFree;
-  symbol *sym;
+  symbol *sym; // used by symbol
 } regs;
 
-#if 0
-/* definition for the registers */
-typedef struct regs
-  {
-    short type;			/* can have value REG_CND, REG_8BITS, 
-				   REG_16BITS or REG_32BITS */
-    short rIdx;			/* index into register table */
-    short otype;
-    char *name;			/* name */
-    char *dname;		/* name when direct access needed */
-    char *base;			/* base address */
-    short offset;		/* offset from the base */
-    unsigned isFree:1;		/* is currently unassigned  */
-  }
-regs;
-#endif
-
 extern regs regsXA51[];
-extern udword xa51RegsInUse;
+extern unsigned long xa51RegsInUse;
 
 regs *xa51_regWithIdx (int);
 

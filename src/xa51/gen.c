@@ -213,9 +213,9 @@ static asmop *aopForSym(symbol *sym,
 	  sprintf (aop->name[0], "r0");
 	  return aop;
 	case 3:
-	  emitcode ("mov.w", "r0,[%s] ;aopForSym:stack:3", getStackOffset(sym->stack));
+	  emitcode ("mov.w", "r0,[%s] ;aopForSym:stack:3.w", getStackOffset(sym->stack));
 	  sprintf (aop->name[0], "r0");
-	  emitcode ("mov.b", "r1l,[%s] ;aopForSym:stack:3", getStackOffset(sym->stack+2));
+	  emitcode ("mov.b", "r1l,[%s] ;aopForSym:stack:3.b", getStackOffset(sym->stack+2));
 	  sprintf (aop->name[1], "r1l");
 	  return aop;
 	case 4:
@@ -1105,33 +1105,43 @@ static void genCmp (iCode * ic, char *trueInstr, char *falseInstr) {
   char *instr;
   int jlbl;
 
-  if (!ifx) {
-    bailOut("genCmp: no ifx");
-  } else {
-    ifx->generated=1;
-  }
 
   size=aopOp(left, TRUE, TRUE);
   aopOp(right, !aopIsPtr(left), TRUE);
-
-  if (IC_TRUE(ifx)) {
-    isTrue=TRUE;
-    jlbl=IC_TRUE(ifx)->key+100;
-  } else {
-    isTrue=FALSE;
-    jlbl=IC_FALSE(ifx)->key+100;
-  }
 
   if (size==1) {
     instr="cmp.b";
   } else {
     instr="cmp.w";
   }
-  emitcode(instr, "%s,%s", AOP_NAME(left)[0], AOP_NAME(right)[0]);
-  emitcode(isTrue ? trueInstr : falseInstr, "%05d$", jlbl);
+
+  if (!ifx) {
+    aopOp(IC_RESULT(ic), !aopIsPtr(left), TRUE);
+    jlbl=newiTempLabel(NULL)->key+100;
+    emitcode("mov", "%s,#-1", AOP_NAME(IC_RESULT(ic))[0]);
+    emitcode(instr, "%s,%s", AOP_NAME(left)[0], AOP_NAME(right)[0]);
+    emitcode(isTrue ? trueInstr : falseInstr, "%05d$", jlbl);
+    emitcode("cpl", "%s", AOP_NAME(IC_RESULT(ic))[0]);
+    emitcode("", "%05d$:", jlbl);
+  } else {
+    emitcode(instr, "%s,%s", AOP_NAME(left)[0], AOP_NAME(right)[0]);
+    if (IC_TRUE(ifx)) {
+      isTrue=TRUE;
+      jlbl=IC_TRUE(ifx)->key+100;
+    } else {
+      isTrue=FALSE;
+      jlbl=IC_FALSE(ifx)->key+100;
+    }
+    
+    emitcode(isTrue ? trueInstr : falseInstr, "%05d$", jlbl);
+
+    ifx->generated=1;
+  }
+
   if (size>2) {
     bailOut("genCmp: size > 2");
   }
+
 }
 
 /*-----------------------------------------------------------------*/

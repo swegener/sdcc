@@ -129,7 +129,7 @@ SDCCERR - SDCC Standard error handler
 #define  W_PTR_TYPE_INVALID 111         /* invalid type specifier for pointer       */
 #define  W_IMPLICIT_FUNC    112         /* function declared implicitly             */
 #define  W_CONTINUE         113         /* more than one line                       */
-#define  I_TOOMANY_SPILS    114         /* too many spils occured                   */
+#define  I_EXTENDED_STACK_SPILS    114         /* too many spils occured                   */
 #define  W_UNKNOWN_PRAGMA   115         /* #pragma directive unsupported            */
 #define  W_SHIFT_CHANGED    116         /* shift changed to zero                    */
 #define  W_UNKNOWN_OPTION   117         /* don't know the option                    */

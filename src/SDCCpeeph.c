@@ -51,7 +51,7 @@ static bool matchLine (char *, char *, hTab **);
 bool isLabelDefinition (const char *line, const char **start, int *len);
 
 #define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
-	lineNode *head, const char *cmdLine)
+	lineNode *head, char *cmdLine)
 
 #if !OPT_DISABLE_PIC
 void peepRules2pCode(peepRule *);
@@ -757,6 +757,128 @@ error:
            " malformed: %s\n", cmdLine);
   return FALSE;
 }
+
+
+/*------------------------------------------------------------------*/
+/* setFromConditionArgs - parse a peephole condition's arguments    */
+/* to produce a set of strings, one per argument. Variables %x will */
+/* be replaced with their values. String literals (in single or     */
+/* double quotes) are accepted an return in unquoted form.          */
+/*------------------------------------------------------------------*/
+static set *
+setFromConditionArgs (char *cmdLine, hTab * vars)
+{
+  int varNumber;
+  char *var;
+  char *digitend;
+  set *operands = NULL;
+
+  if (!cmdLine)
+    return NULL;
+  
+  while (*cmdLine && isspace(*cmdLine))
+    cmdLine++;
+
+  while (*cmdLine)
+    {
+      if (*cmdLine == '%')
+        {
+          cmdLine++;
+          if (!isdigit(*cmdLine))
+            goto error;
+          varNumber = strtol(cmdLine, &digitend, 10);
+          cmdLine = digitend;
+
+          var = hTabItemWithKey (vars, varNumber);
+
+          if (var)
+            {
+              addSetHead (&operands, var);
+            }
+          else
+            goto error;
+        }
+      else if (*cmdLine == '"' || *cmdLine == '\'' )
+        {
+          char quote = *cmdLine;
+          
+          var = ++cmdLine;
+          while (*cmdLine && *cmdLine != quote)
+            cmdLine++;
+          if (*cmdLine == quote)
+            *cmdLine++ = '\0';
+          else
+            goto error;
+          addSetHead (&operands, var);
+        }
+      else
+        goto error;
+        
+      while (*cmdLine && isspace(*cmdLine))
+        cmdLine++;
+    }
+
+  return operands;
+
+error:
+  deleteSet (&operands);
+  return NULL;
+}
+
+static const char *
+operandBaseName (const char *op)
+{
+  if (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
+    {
+      if (!strcmp (op, "acc") || !strncmp (op, "acc.", 4))
+        return "a";
+      if (!strncmp (op, "ar", 2) && isdigit(*(op+2)) && !*(op+3))
+        return op+1;
+    }
+
+  return op;
+}
+
+
+/*-------------------------------------------------------------------*/
+/* operandsNotRelated - returns true of the condition's operands are */
+/* not related (taking into account register name aliases). N-way    */
+/* comparison performed between all operands.                        */
+/*-------------------------------------------------------------------*/
+FBYNAME (operandsNotRelated)
+{
+  set *operands;
+  const char *op1, *op2;
+  
+  operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+    {
+      fprintf (stderr,
+               "*** internal error: operandsUnrelated peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }  
+
+  while ((op1 = setFirstItem (operands)))
+    {
+      deleteSetItem (&operands, (void*)op1);
+      op1 = operandBaseName (op1);
+            
+      for (op2 = setFirstItem (operands); op2; op2 = setNextItem (operands))
+        {
+          op2 = operandBaseName (op2);
+          if (strcmp (op1, op2) == 0)
+            {
+              deleteSet (&operands);
+              return FALSE;
+            }
+        }
+    }
+
+  deleteSet (&operands);
+  return TRUE;
+}
     
 
 /*-----------------------------------------------------------------*/
@@ -772,7 +894,7 @@ callFuncByName (char *fname,
   struct ftab
   {
     char *fname;
-    int (*func) (hTab *, lineNode *, lineNode *, lineNode *, const char *);
+    int (*func) (hTab *, lineNode *, lineNode *, lineNode *, char *);
   }
   ftab[] =
   {
@@ -838,40 +960,90 @@ callFuncByName (char *fname,
     },
     {
       "notVolatile", notVolatile
+    },
+    {
+      "operandsNotRelated", operandsNotRelated
     }
   };
   int 	i;
-  char  *cmdCopy, *funcName, *funcArgs;
-  int 	rc = -1;
+  char  *cmdCopy, *funcName, *funcArgs, *cmdTerm;
+  char  c;
+  int 	rc;
     
   /* Isolate the function name part (we are passed the full condition 
    * string including arguments) 
    */
-  cmdCopy = Safe_strdup(fname);
-  funcName = strtok(cmdCopy, " \t");
-  funcArgs = strtok(NULL, "");
-
-    for (i = 0; i < ((sizeof (ftab)) / (sizeof (struct ftab))); i++)
+  cmdTerm = cmdCopy = Safe_strdup(fname);
+  
+  do
     {
-	if (strcmp (ftab[i].fname, funcName) == 0)
-	{
-	    rc = (*ftab[i].func) (vars, currPl, endPl, head,
-				  funcArgs);
-	}
-    }
+      funcArgs = funcName = cmdTerm;
+      while ((c = *funcArgs) && c != ' ' && c != '\t' && c != '(')
+        funcArgs++;
+      *funcArgs = '\0';  /* terminate the function name */
+      if (c)
+        funcArgs++;
+      
+      /* Find the start of the arguments */
+      if (c == ' ' || c == '\t')
+        while ((c = *funcArgs) && (c == ' ' || c == '\t'))
+          funcArgs++;
+      
+      /* If the arguments started with an opening parenthesis,  */
+      /* use the closing parenthesis for the end of the         */
+      /* arguments and look for the start of another condition  */
+      /* that can optionally follow. If there was no opening    */
+      /* parethesis, then everything that follows are arguments */
+      /* and there can be no additional conditions.             */
+      if (c == '(')
+        {
+          cmdTerm = funcArgs;
+          while ((c = *cmdTerm) && c != ')')
+            cmdTerm++;
+          *cmdTerm = '\0';  /* terminate the arguments */
+          if (c == ')')
+            {
+              cmdTerm++;
+              while ((c = *cmdTerm) && (c == ' ' || c == '\t' || c == ','))
+                cmdTerm++;
+              if (!*cmdTerm)
+                cmdTerm = NULL;
+            }
+          else
+            cmdTerm = NULL; /* closing parenthesis missing */
+        }
+      else
+        cmdTerm = NULL;
+
+      if (!*funcArgs)
+        funcArgs = NULL;
+        
+      rc = -1;
+      for (i = 0; i < ((sizeof (ftab)) / (sizeof (struct ftab))); i++)
+        {
+	  if (strcmp (ftab[i].fname, funcName) == 0)
+	    {
+	      rc = (*ftab[i].func) (vars, currPl, endPl, head,
+				    funcArgs);
+              break;
+	    }
+        }
     
-    if (rc == -1)
-    {
-	fprintf (stderr, 
-		 "could not find named function \"%s\" in "
-		 "peephole function table\n",
-		 funcName);
-        // If the function couldn't be found, let's assume it's
-	// a bad rule and refuse it.
-	rc = FALSE;
+      if (rc == -1)
+        {
+	  fprintf (stderr, 
+		   "could not find named function \"%s\" in "
+		   "peephole function table\n",
+		   funcName);
+          // If the function couldn't be found, let's assume it's
+	  // a bad rule and refuse it.
+	  rc = FALSE;
+          break;
+        }
     }
-
-    Safe_free(cmdCopy);
+  while (rc && cmdTerm);
+  
+  Safe_free(cmdCopy);
     
   return rc;
 }

@@ -1,3 +1,14 @@
+2004-12-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCpeeph.c (callFuncByName): support combined peephole rule
+	  conditions,
+	  (setFromConditionArgs): friendly operand parser for peephole rules,
+	  (operandBaseName, operandsNotRelated): new peephole condition
+	  "operandsNotRelated" -- similar to "operandsNotSame", but takes
+	  architecture specific register naming into account, handles n-way
+	  comparisons, and supports quoted literals
+	* src/mcs51/peeph.def: restored rule 177.d with an extra condition
+
 2004-12-02 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: fixed bug #1076940

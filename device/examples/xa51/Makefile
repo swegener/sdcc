@@ -1,6 +1,6 @@
 CC = sdcc
 
-CFLAGS= -Wa-s -V
+CFLAGS= -Wa-s -V --verbose
 MFLAGS= -mxa51
 #LFLAGS=
 

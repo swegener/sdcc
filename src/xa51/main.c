@@ -181,7 +181,6 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
     return 1;
 }
 
-#if 0
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -190,9 +189,8 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 */
 static const char *_linkCmd[] =
 {
-  "{bindir}{sep}aslink", "-nf", "$1", NULL
+  "xa_link", "", NULL
 };
-#endif
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_asmCmd[] =
@@ -221,9 +219,9 @@ PORT xa51_port =
     NULL			/* no do_assemble function */
   },
   {
-    NULL, //_linkCmd,
+    _linkCmd,
     NULL,
-    xa_link,
+    NULL,
     ".rel"
   },
   {

@@ -1119,7 +1119,8 @@ linkEdit (char **envp)
   WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
 
   /* indirect data */
-  WRITE_SEG_LOC (IDATA_NAME, options.idata_loc);
+  if (IDATA_NAME)
+    WRITE_SEG_LOC (IDATA_NAME, options.idata_loc);
 
   /* bit segment start */
   WRITE_SEG_LOC (BIT_NAME, 0);

@@ -1,3 +1,7 @@
+2003-05-19  Bernhard Held <bernhard@bernhardheld.de>
+
+	* doc/sdccman.lyx: fixed bug 739745
+
 2003-05-18  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/port.h: removed DEFAULT_PORT, it's not yet pic16 ;-)

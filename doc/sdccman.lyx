@@ -5653,7 +5653,7 @@ Startup Code
 
 The compiler inserts a call to the C routine 
 \emph on 
-_sdcc__external__startup()
+_sdcc_external_startup()
 \series bold 
 \emph default 
  
@@ -5666,7 +5666,7 @@ at the start of the CODE area.
  before the function main is invoked.
  You could add a 
 \emph on 
-_sdcc__external__startup()
+_sdcc_external_startup()
 \emph default 
  routine to your program to override the default if you need to setup hardware
  or perform some other critical operation prior to static & global variable

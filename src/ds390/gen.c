@@ -9418,8 +9418,11 @@ genGenPointerGet (operand * left,
 	  _endLazyDPSEvaluation ();
 	}
     }
-  /* so dptr know contains the address */
+
+  /* so dptr-b now contains the address */
+  _G.bInUse++;
   aopOp (result, ic, FALSE, TRUE);
+  _G.bInUse--;
 
   /* if bit then unpack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))

@@ -1,5 +1,6 @@
 2003-01-24    <johan@CP255758-A>
 
+	* src/ds390/gen.c (aopOp): fixed bug #667458
 	* src/SDCCglue.c (emitRegularMap): fixed bug #458099 again
 	* src/SDCCast.c (createIvalCharPtr): fixed bug #661910
 	(createIvalCharPtr): an ival doesn't always have a storage class anymore

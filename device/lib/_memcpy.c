@@ -28,9 +28,9 @@
 
 #define NULL (void *)0
 
-void _generic * memcpy (
-	void _generic * dst,
-	void _generic * src,
+void * memcpy (
+	void * dst,
+	void * src,
 	int acount
 	) 
 {
@@ -38,8 +38,8 @@ void _generic * memcpy (
 
 #pragma NOINDUCTION
 
-	char _generic * d = dst;
-	char _generic * s = src;
+	char * d = dst;
+	char * s = src;
 	int count = -acount;
 
         count /= 4;
@@ -61,9 +61,9 @@ void _generic * memcpy (
         }
 	return dst;
 #else
-	void _generic * ret = dst;
-	char _generic * d = dst;
-	char _generic * s = src;
+	void * ret = dst;
+	char * d = dst;
+	char * s = src;
 	
 	/*
 	 * copy from lower addresses to higher addresses

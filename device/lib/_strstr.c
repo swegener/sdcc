@@ -24,14 +24,14 @@
 #include "string.h" 
 #define NULL (void *)0
 
-char _generic * strstr (
-	char _generic * str1,
-	char _generic * str2
+char * strstr (
+	char * str1,
+	char * str2
 	) 
 {
-	char _generic *cp =  str1;
-	char _generic *s1;
-	char _generic *s2;
+	char * cp = str1;
+	char * s1;
+	char * s2;
 
 	if ( !*str2 )
 	    return str1;

@@ -49,7 +49,7 @@
 
 /****************************************************************************/
 
-typedef char _generic *ptr_t;
+typedef char * ptr_t;
 
 #ifdef toupper
 #undef toupper
@@ -64,7 +64,7 @@ typedef union
   long           l;
   unsigned long  ul;
   float          f;
-  char _generic *p;
+  char           *p;
 } value_t;
 
 

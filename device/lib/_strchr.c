@@ -24,8 +24,8 @@
 #include "string.h" 
 #define NULL (void *)0
 
-char _generic *  strchr (
-	char _generic * string,
+char * strchr (
+	char * string,
 	char ch
 	)
 {

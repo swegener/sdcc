@@ -25,7 +25,7 @@
 
 
 
-int longjmp (unsigned char _generic *bp, int rv)
+int longjmp (unsigned char *bp, int rv)
 {
     unsigned char lsp; 
     lsp = *(bp+2);
@@ -35,8 +35,8 @@ int longjmp (unsigned char _generic *bp, int rv)
     return rv;
 }
 
-int setjmp( unsigned char _generic *bp) {    
-  
+int setjmp (unsigned char *bp)
+{    
     /* registers would have been saved on the
        stack anyway so we need to save SP
        and the return address */     
@@ -44,5 +44,4 @@ int setjmp( unsigned char _generic *bp) {
     *bp++ = *((unsigned char data *)SP - 1);    
     *bp   = SP;
     return 0;
-	
 }

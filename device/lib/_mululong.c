@@ -33,11 +33,11 @@ union bil {
         struct { unsigned char b0; unsigned int i12; unsigned char b3;} bi;
 } ;
 #if defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390)
-#define bcast(x) ((union bil _xdata  *)&(x))
+#define bcast(x) ((union bil xdata  *)&(x))
 #elif defined(__z80) || defined(__gbz80)
 #define bcast(x) ((union bil *)&(x))
 #else
-#define bcast(x) ((union bil _near *)&(x))
+#define bcast(x) ((union bil near *)&(x))
 #endif
 
 /*

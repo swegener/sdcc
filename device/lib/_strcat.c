@@ -23,12 +23,12 @@
 -------------------------------------------------------------------------*/
 #include "string.h" 
 #define NULL (void *)0
-char _generic *  strcat (
-        char _generic * dst,
-        char _generic * src
+char * strcat (
+        char * dst,
+        char * src
         )
 {
-        char _generic * cp = dst;
+        char * cp = dst;
 
         while( *cp )
                 cp++;                   /* find end of dst */

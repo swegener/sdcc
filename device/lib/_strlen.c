@@ -24,7 +24,7 @@
 #include "string.h" 
 #define NULL (void *)0
 
-int strlen ( char _generic *str ) 
+int strlen ( char * str ) 
 {
 	register int i = 0 ;
 

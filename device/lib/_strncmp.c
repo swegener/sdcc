@@ -25,8 +25,8 @@
 #define NULL (void *)0
 
 int strncmp (
-	char _generic * first,
-	char _generic * last,
+	char * first,
+	char * last,
 	int count
 	) 
 {

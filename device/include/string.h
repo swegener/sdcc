@@ -27,7 +27,6 @@
 #define __SDC51_STRING_H 1
 
 #ifndef SDCC_mcs51
-#define _generic
 #define reentrant
 #endif
 
@@ -38,46 +37,46 @@
 #warning Make sure you recompiled _str*.c and _mem*.c library functions as 'reentrant'
 #endif
 
-extern char _generic *strcpy (char _generic *, char _generic *) reentrant ;
-extern char _generic *strncpy(char _generic *, char _generic *,int ) reentrant ;
-extern char _generic *strcat (char _generic *, char _generic *) reentrant ;
-extern char _generic *strncat(char _generic *, char _generic *,int ) reentrant ;
-extern int            strcmp (char _generic *, char _generic *) reentrant ;
-extern int            strncmp(char _generic *, char _generic *,int ) reentrant ;
-extern char _generic *strchr (char _generic *, char           ) reentrant ;
-extern char _generic *strrchr(char _generic *, char           ) reentrant ;
-extern int            strspn (char _generic *, char _generic *) reentrant ;
-extern int            strcspn(char _generic *, char _generic *) reentrant ;
-extern char _generic *strpbrk(char _generic *, char _generic *) reentrant ;
-extern char _generic *strstr (char _generic *, char _generic *) reentrant ;
-extern int            strlen (char _generic *                 ) reentrant ;
-extern char _generic *strtok (char _generic *, char _generic *) reentrant ;
-extern void _generic *memcpy (void _generic *, void _generic *, int ) reentrant ;
-extern int            memcmp (void _generic *, void _generic *, int ) reentrant ;
-extern void _generic *memset (void _generic *, unsigned char  , int ) reentrant ;
+extern char *strcpy (char *, char *) reentrant ;
+extern char *strncpy(char *, char *,int ) reentrant ;
+extern char *strcat (char *, char *) reentrant ;
+extern char *strncat(char *, char *,int ) reentrant ;
+extern int   strcmp (char *, char *) reentrant ;
+extern int   strncmp(char *, char *,int ) reentrant ;
+extern char *strchr (char *, char  ) reentrant ;
+extern char *strrchr(char *, char  ) reentrant ;
+extern int   strspn (char *, char *) reentrant ;
+extern int   strcspn(char *, char *) reentrant ;
+extern char *strpbrk(char *, char *) reentrant ;
+extern char *strstr (char *, char *) reentrant ;
+extern int   strlen (char *        ) reentrant ;
+extern char *strtok (char *, char *) reentrant ;
+extern void *memcpy (void *, void *, int ) reentrant ;
+extern int   memcmp (void *, void *, int ) reentrant ;
+extern void *memset (void *, unsigned char  , int ) reentrant ;
  
 #else
 
-extern char _generic *strcpy (char _generic *, char _generic *)  ;
-extern char _generic *strncpy(char _generic *, char _generic *,int )  ;
-extern char _generic *strcat (char _generic *, char _generic *)  ;
-extern char _generic *strncat(char _generic *, char _generic *,int )  ;
-extern int            strcmp (char _generic *, char _generic *)  ;
-extern int            strncmp(char _generic *, char _generic *,int )  ;
-extern char _generic *strchr (char _generic *, char           )  ;
-extern char _generic *strrchr(char _generic *, char           )  ;
-extern int            strspn (char _generic *, char _generic *)  ;
-extern int            strcspn(char _generic *, char _generic *)  ;
-extern char _generic *strpbrk(char _generic *, char _generic *)  ;
-extern char _generic *strstr (char _generic *, char _generic *)  ;
-extern int            strlen (char _generic *  )  ;
-extern char _generic *strtok (char _generic *, char _generic *)  ;
-extern void _generic *memcpy (void _generic *, void _generic *, int )  ;
-extern int            memcmp (void _generic *, void _generic *, int )  ;
-extern void _generic *memset (void _generic *, unsigned char  , int )  ;
+extern char *strcpy (char *, char *)  ;
+extern char *strncpy(char *, char *,int )  ;
+extern char *strcat (char *, char *)  ;
+extern char *strncat(char *, char *,int )  ;
+extern int   strcmp (char *, char *)  ;
+extern int   strncmp(char *, char *,int )  ;
+extern char *strchr (char *, char  )  ;
+extern char *strrchr(char *, char  )  ;
+extern int   strspn (char *, char *)  ;
+extern int   strcspn(char *, char *)  ;
+extern char *strpbrk(char *, char *)  ;
+extern char *strstr (char *, char *)  ;
+extern int   strlen (char *  )  ;
+extern char *strtok (char *, char *)  ;
+extern void *memcpy (void *, void *, int )  ;
+extern int   memcmp (void *, void *, int )  ;
+extern void *memset (void *, unsigned char  , int )  ;
 
 #if SDCC_ds390
-extern void _xdata *memcpyx(void _xdata *, void _xdata *, int) _naked;
+extern void xdata * memcpyx(void xdata *, void xdata *, int) _naked;
 #endif
 
 #endif

@@ -24,12 +24,12 @@
 #include "string.h" 
 #define NULL (void *)0
 
-char _generic *strncpy (
-	char _generic *d ,
-	char _generic *s ,
-	int            n ) 
+char *strncpy (
+	char * d,
+	char * s,
+	int n ) 
 {
-	register char _generic *d1 =  d;
+	register char * d1 =  d;
 
 	while ( n-- )
 		*d++ = *s++ ;

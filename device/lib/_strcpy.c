@@ -28,19 +28,19 @@
 
 #define NULL (void *)0
 
-char _generic *strcpy (
-	char _generic *d, 
-	char _generic *s) 
+char * strcpy (
+	char * d, 
+	char * s) 
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
-    register char _generic *to = d;
-    register char _generic *from = s;
+    register char * to = d;
+    register char * from = s;
 
     while (*to++ = *from++) ;
 
     return d;
 #else
-    register char _generic *d1 = d;
+    register char * d1 = d;
 
     while (*d1++ = *s++) ;
 

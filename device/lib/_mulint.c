@@ -207,11 +207,11 @@ unsigned int
 _muluint (unsigned int a, unsigned int b)	// in future: _mulint
 {
 #ifdef SDCC_MODEL_LARGE		// still needed for large + stack-auto
-	union uu _xdata *x;
-	union uu _xdata *y; 
+	union uu xdata *x;
+	union uu xdata *y; 
 	union uu t;
-        x = (union uu _xdata *)&a;
-        y = (union uu _xdata *)&b;
+        x = (union uu xdata *)&a;
+        y = (union uu xdata *)&b;
 #else
 	register union uu *x;
 	register union uu *y; 

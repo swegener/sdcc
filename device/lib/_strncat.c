@@ -24,13 +24,13 @@
 #include "string.h" 
 #define NULL (void *)0
 
-char _generic * strncat (
-	char _generic * front,
-	char _generic * back,
+char * strncat (
+	char * front,
+	char * back,
 	int count
 	) 
 {
-	char _generic *start = front;
+	char *start = front;
 
 	while (*front++);
 

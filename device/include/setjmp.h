@@ -27,7 +27,7 @@
 
 typedef unsigned char jmp_buf[3];
 
-int setjmp (unsigned char _generic *);
-int longjmp(unsigned char _generic *,int);
+int setjmp (unsigned char *);
+int longjmp(unsigned char *, int);
 
 #endif

@@ -29,13 +29,12 @@
 #pragma NOINVARIANT
 #endif
 
-char _generic *strtok (
-		char    _generic *str ,
-		char    _generic *control
-		      ) 
+char * strtok (
+	char * str,
+	char * control ) 
 {
-	static  char _generic   *s ;
-	register char _generic *s1 ;
+	static  char * s;
+	register char * s1;
 
 	if ( str )
 		s = str ;

@@ -25,18 +25,18 @@
 #define NULL (void *)0
 
 int memcmp (
-	void _generic * buf1,
-	void _generic * buf2,
+	void * buf1,
+	void * buf2,
 	int count
 	) 
 {
 	if (!count)
 		return(0);
 
-	while ( --count && *((char _generic *)buf1) == *((char _generic *)buf2) ) {
-		buf1 = (char _generic *)buf1 + 1;
-		buf2 = (char _generic *)buf2 + 1;
+	while ( --count && *((char *)buf1) == *((char *)buf2) ) {
+		buf1 = (char *)buf1 + 1;
+		buf2 = (char *)buf2 + 1;
 	}
 
-	return( *((unsigned char _generic *)buf1) - *((unsigned char _generic *)buf2) );
+	return( *((unsigned char *)buf1) - *((unsigned char *)buf2) );
 }

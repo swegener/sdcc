@@ -149,12 +149,12 @@ printf_eot:
 
 
 	/* print a string... just grab each byte with __gptrget */
-	/* the user much pass a 24 bit _generic pointer */
+	/* the user much pass a 24 bit generic pointer */
 
 printf_string:
 	push	dph		// save addr in fmt onto stack
 	push	dpl
-	mov	b, @r0		// b has type of address (_generic *)
+	mov	b, @r0		// b has type of address (generic *)
 	dec	r0
 	mov	dph, @r0
 	dec	r0

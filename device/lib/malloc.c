@@ -16,19 +16,19 @@
 
             MEMHEADER
             {
-              MEMHEADER _xdata *  next;
-              MEMHEADER _xdata *  prev;
+              MEMHEADER xdata *  next;
+              MEMHEADER xdata *  prev;
               unsigned int       len;
               unsigned char      mem[1];
             };
 
             #define HEADER_SIZE (sizeof(MEMHEADER)-1)
-            #define NULL        (void _xdata * ) 0
+            #define NULL        (void xdata * ) 0
 
 
             //Static here means: can be accessed from this module only
-            static MEMHEADER _xdata * FIRST_MEMORY_HEADER_PTR;
-            void init_dynamic_memory(MEMHEADER _xdata * array, unsigned int size) 
+            static MEMHEADER xdata * FIRST_MEMORY_HEADER_PTR;
+            void init_dynamic_memory(MEMHEADER xdata * array, unsigned int size) 
             {
 
             //This function MUST be called after the RESET.
@@ -52,21 +52,21 @@
 
               if ( !array ) /*Reserved memory starts on 0x0000 but it's NULL...*/
               {             //So, we lost one byte!
-                 array = (MEMHEADER _xdata * )((char _xdata * ) array + 1) ;
+                 array = (MEMHEADER xdata * )((char xdata * ) array + 1) ;
                  size --;
               }
               FIRST_MEMORY_HEADER_PTR = array;
               //Reserve a mem for last header
-              array->next = (MEMHEADER _xdata * )(((char _xdata * ) array) + size - HEADER_SIZE);
+              array->next = (MEMHEADER xdata * )(((char xdata * ) array) + size - HEADER_SIZE);
               array->next->next = NULL; //And mark it as last
               array->prev       = NULL; //and mark first as first
               array->len        = 0;    //Empty and ready.
             }
 
-            void  _xdata * malloc (unsigned int size)
+            void  xdata * malloc (unsigned int size)
             {
-              register MEMHEADER _xdata * current_header;
-              register MEMHEADER _xdata * new_header;
+              register MEMHEADER xdata * current_header;
+              register MEMHEADER xdata * new_header;
 
               if (size>(0xFFFF-HEADER_SIZE)) return NULL; //To prevent overflow in next line
               size += HEADER_SIZE; //We need a memory for header too
@@ -92,7 +92,7 @@
                  current_header->len = size; //for first allocation
                  return (current_header->mem);
               } //else create new header at the begin of spare
-              new_header = (MEMHEADER _xdata * )((char _xdata *)current_header + current_header->len);
+              new_header = (MEMHEADER xdata * )((char xdata *)current_header + current_header->len);
               new_header->next = current_header->next; //and plug it into the chain
               new_header->prev = current_header;
               current_header->next  = new_header;
@@ -101,12 +101,12 @@
               return (new_header->mem);
             }
 
-            void free (MEMHEADER _xdata * p)
+            void free (MEMHEADER xdata * p)
             {
-              register MEMHEADER _xdata * prev_header;
+              register MEMHEADER xdata * prev_header;
               if ( p ) //For allocated pointers only!
               {
-                  p = (MEMHEADER _xdata * )((char _xdata *)  p - HEADER_SIZE); //to start of header
+                  p = (MEMHEADER xdata * )((char xdata *)  p - HEADER_SIZE); //to start of header
                   if ( p->prev ) // For the regular header
                   {
                     prev_header = p->prev;

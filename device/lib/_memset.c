@@ -24,17 +24,16 @@
 #include "string.h" 
 #define NULL (void *)0
 
-void  _generic *memset (
-	void _generic * buf,
-	unsigned char   ch ,
-	int          count
-		       ) 
+void * memset (
+	void * buf,
+	unsigned char ch ,
+	int count) 
 {
-	register unsigned char _generic *ret = buf;
+	register unsigned char * ret = buf;
 
 	while (count--) {
-		*(unsigned char _generic *) ret = ch;
-		ret = ((unsigned char _generic *) ret) + 1;
+		*(unsigned char *) ret = ch;
+		ret = ((unsigned char *) ret) + 1;
 	}
 
 	return buf ;

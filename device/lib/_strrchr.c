@@ -24,12 +24,12 @@
 #include "string.h" 
 #define NULL (void *)0
 
-char _generic *  strrchr (
-	char _generic * string,
+char * strrchr (
+	char * string,
 	char ch
 	) 
 {
-	char _generic *start = string;
+	char * start = string;
 
 	while (*string++)                       /* find end of string */
 		;
@@ -38,7 +38,7 @@ char _generic *  strrchr (
 		;
 
 	if (*string == ch)                /* char found ? */
-		return( (char _generic *)string );
+		return( (char *)string );
 
 	return (NULL) ;
 }

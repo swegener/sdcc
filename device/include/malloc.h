@@ -29,8 +29,8 @@
 
 MEMHEADER
 {
-      MEMHEADER _xdata *  next;
-      MEMHEADER _xdata *  prev;
+      MEMHEADER xdata *  next;
+      MEMHEADER xdata *  prev;
       unsigned int       len;
       unsigned char      mem[1];
 };

@@ -1,8 +1,8 @@
 #include <string.h>
 
-void _xdata * memcpyx (
-	void _xdata * dst,
-	void _xdata * src,
+void xdata * memcpyx (
+	void xdata * dst,
+	void xdata * src,
 	int count
 	) _naked
 {

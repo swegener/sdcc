@@ -29,16 +29,16 @@
 #define NULL (void *)0
 
 int strcmp (
-	char _generic   *asrc,
-	char _generic   *adst
+	char * asrc,
+	char * adst
 	)
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
 #pragma NOINDUCTION
 
 	char ret = 0 ;
-        char _generic *src = asrc;
-        char _generic *dst = adst;
+        char * src = asrc;
+        char * dst = adst;
 
 	while( ! (*src - *dst) && *dst)
 		++src, ++dst;

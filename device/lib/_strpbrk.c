@@ -24,9 +24,9 @@
 #include "string.h" 
 #define NULL (void *)0
 
-char _generic *strpbrk ( 
-	char _generic *string ,
-	char _generic *control
+char * strpbrk ( 
+	char * string ,
+	char * control
 		       ) 
 {
 	register char ch ;

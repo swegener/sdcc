@@ -25,8 +25,8 @@
 #define NULL (void *)0
 
 int strcspn ( 
-	char _generic * string ,
-	char _generic * control 
+	char * string ,
+	char * control 
 	    ) 
 {
 	register int count = 0 ;

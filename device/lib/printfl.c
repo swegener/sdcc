@@ -37,7 +37,7 @@
      %lo       octal               long
      %ho       octal               char
      %c        character           char
-     %s        character           _generic pointer
+     %s        character           generic pointer
 */
 
 #include <stdarg.h>
@@ -143,7 +143,7 @@ void printf_small (char * fmt, ... ) reentrant
             }
 
             if (string_flag) {
-                str = va_arg(ap, char _generic *);
+                str = va_arg(ap, char *);
                 while (*str) putchar(*str++);
                 continue ;
             }

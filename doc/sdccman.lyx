@@ -6978,10 +6978,10 @@ SAVE - this will save all current options to the SAVE/RESTORE stack.
  See RESTORE.
 \layout Itemize
 
-RESTORE - will restore the saved options from the last save.
+RESTORE - will restore saved options from the last save.
  SAVEs & RESTOREs can be nested.
  SDCC uses a SAVE/RESTORE stack: SAVE pushes current options to the stack,
- RESTORE pulls current optios from the stack.
+ RESTORE pulls current options from the stack.
  See SAVE.
 \layout Itemize
 

@@ -19,7 +19,7 @@
               MEMHEADER xdata *  next;
               MEMHEADER xdata *  prev;
               unsigned int       len;
-              unsigned char      mem[1];
+	      unsigned char      mem;
             };
 
             #define HEADER_SIZE (sizeof(MEMHEADER)-1)
@@ -90,7 +90,7 @@
               if (!current_header->len)
               { //This code works only for first_header in the list and only
                  current_header->len = size; //for first allocation
-                 return (current_header->mem);
+                 return ((xdata *)&(current_header->mem));
               } //else create new header at the begin of spare
               new_header = (MEMHEADER xdata * )((char xdata *)current_header + current_header->len);
               new_header->next = current_header->next; //and plug it into the chain
@@ -98,7 +98,7 @@
               current_header->next  = new_header;
               if (new_header->next)  new_header->next->prev = new_header;
               new_header->len  = size; //mark as used
-              return (new_header->mem);
+              return ((xdata *)&(new_header->mem));
             }
 
             void free (MEMHEADER xdata * p)

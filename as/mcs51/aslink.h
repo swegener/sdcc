@@ -633,7 +633,7 @@ extern	VOID		bassav();
 extern	VOID		gblsav();
 extern	VOID		iramsav();
 extern	VOID		iramcheck();
-extern	VOID		link();
+extern	VOID		link_main();
 extern	VOID		lkexit();
 extern	int		main();
 extern	VOID		map();

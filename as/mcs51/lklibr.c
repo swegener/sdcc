@@ -524,7 +524,7 @@ library()
  *		int	fclose()	c_library
  *		int	fgets()		c_library
  *		FILE *	fopen()		c_library
- *		VOID	link()		lkmain.c
+ *		VOID	link_main()	lkmain.c
  *		int	strlen()	c_library
  *
  *	side effects:
@@ -546,7 +546,7 @@ char *filspc;
 			if (str[i] == '\n')
 				str[i] = '\0';
 			ip = str;
-			link();
+			link_main();
 		}
 		fclose(fp);
 	}

@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <alloc.h>
+#include <unistd.h>
 #include "aslink.h"
 
 
@@ -32,7 +33,7 @@
  *		FILE *	afile(fn,ft,wf)
  *		VOID	bassav()
  *		VOID	gblsav()
-  *		VOID	link()
+  *		VOID	link_main()
  *		VOID	lkexit()
  *		VOID	main(argc,argv)
  *		VOID	map()
@@ -111,7 +112,7 @@
  *		int	fprintf()	c_library
  *		int	getline()	lklex.c
  *		VOID	library()	lklibr.c
- *		VOID	link()		lkmain.c
+ *		VOID	link_main()	lkmain.c
  *		VOID	lkexit()	lkmain.c
  *		VOID	lnkarea()	lkarea.c
  *		VOID	map()		lkmain.c
@@ -227,7 +228,7 @@ char *argv[];
                         if ((ip[0] == ';') && (ip[1] == '!') && jfp) {
                         	fprintf( jfp, "%s\n", &ip[2] );
                         }
-			link();
+			link_main();
 		}
 		if (pass == 0) {
 			/*
@@ -348,9 +349,9 @@ int i;
 	exit(i);
 }
 
-/*)Function	link()
+/*)Function	link_main()
  *
- *	The function link() evaluates the directives for each line of
+ *	The function link_main() evaluates the directives for each line of
  *	text read from the .rel file(s).  The valid directives processed
  *	are:
  *		X, D, Q, H, M, A, S, T, R, and P.
@@ -380,7 +381,7 @@ int i;
  */
 
 VOID
-link()
+link_main()
 {
 	register int c;
 

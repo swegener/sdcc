@@ -11,6 +11,9 @@ void usage(void)
     puts("Available commands:\n");
     puts("ledon: turns LED on.");
     puts("ledoff: turns LED off.");
+    puts("startclock: starts millisecond timer.");
+    puts("clock: reports millisecond timer.");
+    puts("sleep: sleeps for 10 seconds (or forever if you didn't startclock first).");
 }
 
 void main(void)
@@ -49,6 +52,24 @@ void main(void)
 	    P5 |= 4;
 	    printf("LED off.\n");
 	}
+	else if (!strcmp(buffer, "startclock"))
+	{
+	    printf("Starting clock...\n");
+	    ClockInit();
+	}
+	else if (!strcmp(buffer, "clock"))
+	{
+	    printf("Clock: %ld\n", ClockTicks());
+	}
+	else if (!strcmp(buffer, "sleep"))
+	{
+	    printf("Sleeping for 10 seconds...\n");
+	    
+	    ClockMilliSecondsDelay(10 * 1000);
+	    
+	    printf("Back.\n");
+	}
+	
 	else if (buffer[0])
 	{
 	    printf("Unknown command \"%s\".\n", buffer);

@@ -54,6 +54,10 @@
 #define CLOCKS_PER_SEC 1000
 #define memcpy(d,s,l) memcpyx(d,s,l)
 
+# if defined(SDCC_ds400)
+# include <ds400rom.h>
+# endif
+
 #elif defined(__z80) || defined(__gbz80)
 unsigned int _clock(void);
 
@@ -107,7 +111,7 @@ Boolean Func_3 (Enumeration Enum_Par_Val);
 
 unsigned getsp(void);
 
-int main(void)
+void main(void)
 {
     One_Fifty       Int_1_Loc;
     REG   One_Fifty       Int_2_Loc;
@@ -120,6 +124,19 @@ int main(void)
     REG   int             Number_Of_Runs;
     unsigned  long runTime;
 
+#if defined(SDCC_ds400)
+    // Intialize the ROM.
+    if (romInit(1))
+    {
+        // We're hosed. romInit will have printed an error, nothing more to do.
+        return;
+    }
+
+    ClockInit();
+    
+    P5 &= ~4; // LED on.
+#endif    
+    
     printf("[dhry]\n");
 
     Next_Ptr_Glob = &_r[0];
@@ -145,7 +162,8 @@ int main(void)
 #if DEBUG
     Number_Of_Runs = 1;
 #else
-    Number_Of_Runs = 32766;
+    // Number_Of_Runs = 32766;
+    Number_Of_Runs = 2048;
 #endif    
 
     runTime = clock();

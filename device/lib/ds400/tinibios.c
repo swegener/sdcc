@@ -29,6 +29,9 @@
 
 #define TIMED_ACCESS(sfr,value) { TA=0xaa; TA=0x55; sfr=value; }
 
+#undef OSCILLATOR
+#define OSCILLATOR 14725600
+
 unsigned char _sdcc_external_startup(void)
 {
     IE = 0; // Disable all interrupts.
@@ -207,4 +210,79 @@ void Serial0Flush() {
   } else {
     TI_0=1;
   }
+}
+
+// now let's go for the clock stuff
+
+// these REALLY need to be in data space for the irq routine!
+static data unsigned long milliSeconds=0;
+static data unsigned int timer0ReloadValue;
+
+void ClockInit() {
+  unsigned long timerReloadValue= OSCILLATOR / 1000 / 4;
+
+  timer0ReloadValue=~timerReloadValue;
+  // initialise timer 0
+  ET0=0; // disable timer interrupts initially
+  
+  TCON = (TCON&0xcc)|0x00; // stop timer, clear overflow
+  TMOD = (TMOD&0xf0)|0x01; // 16 bit counter
+  CKCON|=0x08; // timer uses xtal/4
+  
+  TL0=timer0ReloadValue&0xff;
+  TH0=timer0ReloadValue>>8;
+  
+  installInterrupt(ClockIrqHandler, 0xB);
+    
+  ET0=1; // enable timer interrupts
+  TR0=1; // start timer
+}
+
+// This needs to be SUPER fast. What we really want is:
+
+#if 0
+void junk_ClockIrqHandler (void) interrupt 10 {
+  TL0=timer0ReloadValue&0xff;
+  TH0=timer0ReloadValue>>8;
+  milliSeconds++;
+}
+#else
+// but look at the code, and the pushes and pops, so:
+void ClockIrqHandler (void) interrupt 1 _naked
+{
+  _asm
+    push acc
+    push psw
+    mov _TL0,_timer0ReloadValue
+    mov _TH0,_timer0ReloadValue+1
+    clr a
+    inc _milliSeconds+0
+    cjne a,_milliSeconds+0,_ClockIrqHandlerDone
+    inc _milliSeconds+1
+    cjne a,_milliSeconds+1,_ClockIrqHandlerDone
+    inc _milliSeconds+2
+    cjne a,_milliSeconds+2,_ClockIrqHandlerDone
+    inc _milliSeconds+3
+   _ClockIrqHandlerDone:
+    pop psw
+    pop acc
+    reti
+  _endasm;
+}
+#endif
+
+// we can't just use milliSeconds
+unsigned long ClockTicks(void) {
+  unsigned long ms;
+  ET0=0;
+  ms=milliSeconds;
+  ET0=1;
+  return ms;
+}
+
+void ClockMilliSecondsDelay(unsigned long delay) {
+  long ms=ClockTicks()+delay;
+
+  while (ms>ClockTicks())
+    ;
 }

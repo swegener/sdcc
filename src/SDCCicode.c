@@ -40,6 +40,13 @@ int scopeLevel;
 
 symbol *returnLabel;		/* function return label */
 symbol *entryLabel;		/* function entry  label */
+
+#if defined(__BORLANDC__) || defined(_MSC_VER)
+#define LONG_LONG __int64
+#else
+#define LONG_LONG long long
+#endif
+
 /*-----------------------------------------------------------------*/
 /* forward definition of some functions */
 operand *geniCodeDivision (operand *, operand *);
@@ -113,6 +120,57 @@ iCodeTable codeTable[] =
   {ARRAYINIT, "arrayInit", picGenericOne, NULL},
 };
 
+/*-----------------------------------------------------------------*/
+/* checkConstantRange: check a constant against the type           */
+/*-----------------------------------------------------------------*/
+
+/*   pedantic=0: allmost anything is allowed as long as the absolute
+       value is within the bit range of the type, and -1 is treated as
+       0xf..f for unsigned types (e.g. in assign)
+     pedantic=1: -1==-1, not allowed for unsigned types (e.g. in compare)
+     pedantic>1: "char c=200" is not allowed (evaluates to -56)
+*/
+
+void checkConstantRange(sym_link *ltype, long v, char *msg, int pedantic) {
+  LONG_LONG max = (LONG_LONG) 1 << bitsForType(ltype);
+  char message[132]="";
+  int warnings=0;
+  int negative=0;
+
+#if 0
+  // this could be a good idea
+  if (options.pedantic)
+    pedantic=2;
+#endif
+
+  if (v<0) {
+    negative=1;
+    // if not pedantic: -1 equals to 0xf..f
+    if (SPEC_USIGN(ltype) && (!pedantic ? v!=-1 : 1)) {
+      warnings++;
+    }
+    v=-v;
+  }
+
+  // if very pedantic: "char c=200" is not allowed
+  if (pedantic>1 && !SPEC_USIGN(ltype)) {
+    max = max/2 + negative;
+  }
+
+  if (v >= max) {
+    warnings++;
+  }
+
+  if (warnings) {
+    sprintf (message, "for %s %s in %s", 
+	     SPEC_USIGN(ltype) ? "unsigned" : "signed",
+	     nounName(ltype), msg);
+    werror (W_CONST_RANGE, message);
+
+    if (pedantic>1)
+      fatalError++;
+  }
+}
 
 /*-----------------------------------------------------------------*/
 /* operandName - returns the name of the operand                   */
@@ -2381,12 +2439,6 @@ geniCodeRightShift (operand * left, operand * right)
   return IC_RESULT (ic);
 }
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define LONG_LONG __int64
-#else
-#define LONG_LONG long long
-#endif
-
 /*-----------------------------------------------------------------*/
 /* geniCodeLogic- logic code                                       */
 /*-----------------------------------------------------------------*/
@@ -2402,11 +2454,8 @@ geniCodeLogic (operand * left, operand * right, int op)
      check if the literal value is within bounds */
   if (IS_INTEGRAL (ltype) && IS_VALOP (right) && IS_LITERAL (rtype))
     {
-      int nbits = bitsForType (ltype);
-      long v = (long) operandLitValue (right);
-
-      if (v >= ((LONG_LONG) 1 << nbits) && v > 0)
-	werror (W_CONST_RANGE, " compare operation ");
+      checkConstantRange(ltype, 
+			 operandLitValue(right), "compare operation", 1);
     }
 
   ctype = usualBinaryConversions (&left, &right);
@@ -2498,14 +2547,8 @@ geniCodeAssign (operand * left, operand * right, int nosupdate)
      check if the literal value is within bounds */
   if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype))
     {
-      /* TODO: this won't warn for e.g. int = -12345678, or bit = -1
-	 we need a checkConstant2Type(constVal,sym_link *)
-	 also for send and return */
-      int nbits = bitsForType (ltype);
-      long v = (long) operandLitValue (right);
-
-      if (v >= ((LONG_LONG) 1 << nbits) && v > 0)
-	werror (W_CONST_RANGE, " = operation");
+      checkConstantRange(ltype, 
+			 (long)operandLitValue(right), "= operation", 0);
     }
 
   /* if the left & right type don't exactly match */

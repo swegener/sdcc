@@ -260,6 +260,12 @@ PORT mcs51_port = {
     _mcs51_reset_regparm,
     _mcs51_regparm,
     NULL,
-    FALSE
+    FALSE,
+    0,  /* leave lt */
+    0,  /* leave gt */
+    1,  /* transform <= to ! > */
+    1,  /* transform >= to ! < */
+    1,  /* transform != to !(a == b) */
+    0   /* leave == */
 };
 

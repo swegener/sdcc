@@ -200,6 +200,13 @@ PORT avr_port = {
     _avr_genIVT,
     _avr_reset_regparm,
     _avr_regparm,
-    FALSE
+    FALSE,
+    0,   /* leave lt */
+    1,   /* transform gt ==> not le */
+    0,   /* leave le */
+    0,   /* leave ge */
+    0,   /* leave !=  */
+    0,   /* leave == */
+
 };
 

@@ -1,3 +1,12 @@
+2003-11-04 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (ifxOptimize),
+	* src/SDCClabel.c (labelIfx, deleteIfx): When the condition to
+	an IFX iCode is volatile, convert to DUMMY_READ_VOLATILE instead
+	deleting the IFX iCode.
+	* src/hc08/ralloc.c: reduced unneeded slocs
+	* src/hc08/gen.c: fixed bug in asmopToBoolean
+
 2003-11-04  Borut Razem <borut.razem@siol.net>
 
 	* configure, configure.in, sdcc_vc_in.h, sdcconf.h,

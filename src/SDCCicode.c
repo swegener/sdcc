@@ -1690,7 +1690,7 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
 {
   iCode *ic;
   int p2 = 0;
-  int saveOption;
+  int saveOption=0;
   sym_link *resType;
   LRTYPE;
 

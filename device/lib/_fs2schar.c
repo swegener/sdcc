@@ -1,11 +1,11 @@
-#include <_float.h>
+#include <limits.h>
 
 /* convert float to signed char */
 signed char __fs2schar (float f) {
   signed long sl=__fs2slong(f);
-  if (sl>=SCHAR_MAX)
-    return SCHAR_MAX;
-  if (sl<=SCHAR_MIN) 
-    return -SCHAR_MIN;
+  if (sl>=CHAR_MAX)
+    return CHAR_MAX;
+  if (sl<=CHAR_MIN) 
+    return -CHAR_MIN;
   return sl;
 }

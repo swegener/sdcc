@@ -16,7 +16,7 @@
 
 /* (c)2000: hacked a little by johan.knol@iduna.nl for sdcc */
 
-#include <_float.h>
+#include <limits.h>
 
 /* the following deal with IEEE single-precision numbers */
 #define EXCESS		126

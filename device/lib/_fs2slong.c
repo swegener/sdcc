@@ -1,4 +1,4 @@
-#include <_float.h>
+#include <limits.h>
 
 /* convert float to signed long */
 signed long __fs2slong (float f) {
@@ -7,12 +7,12 @@ signed long __fs2slong (float f) {
     return 0;
 
   if (f<0) {
-    if (f<=SLONG_MIN)
-      return SLONG_MIN;
+    if (f<=LONG_MIN)
+      return LONG_MIN;
     return -__fs2ulong(-f);
   } else {
-    if (f>=SLONG_MAX)
-      return SLONG_MAX;
+    if (f>=LONG_MAX)
+      return LONG_MAX;
     return __fs2ulong(f);
   }
 }

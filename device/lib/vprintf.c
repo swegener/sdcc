@@ -355,7 +355,7 @@ get_conversion_spec:
 	goto get_conversion_spec;
 
       case 'C':
-       	output_char( va_arg(ap,unsigned char) );
+       	output_char( va_arg(ap,int) );
 	break;
 
       case 'S':

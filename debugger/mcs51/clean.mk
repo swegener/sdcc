@@ -4,7 +4,7 @@ clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
 	rm -f $(PRJDIR)/bin/sdcdb
-
+	$(PRJDIR)/support/Util/SDCCerr.o
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

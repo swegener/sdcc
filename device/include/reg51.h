@@ -25,7 +25,7 @@
 #ifndef REG51_H
 #define REG51_H
 
-#warning This file (reg.h) is obsolete, depending on your harware
+#warning This file (reg51.h) is obsolete, depending on your harware
 #warning use include <8051.h>, or include <8052.h>!
 
 /*  BYTE Register  */

@@ -16,8 +16,6 @@
 
 /* (c)2000: hacked a little by johan.knol@iduna.nl for sdcc */
 
-#include <_float.h>
-
 /* the following deal with IEEE single-precision numbers */
 #define EXCESS		126
 #define SIGNBIT		((unsigned long)0x80000000)

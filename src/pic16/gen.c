@@ -2969,7 +2969,7 @@ static void genPcall (iCode *ic)
 
 	/* make the call by writing the pointer into pc */
 // FIXME Disabled writes to PCLATU because of gpsim problems
-#if 0
+#if 1
 	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)),2), pic16_popCopyReg(&pic16_pc_pclatu)));
 #else
 	fprintf(stderr,

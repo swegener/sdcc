@@ -1,3 +1,8 @@
+2004-06-02 Vangelis Rokas <vrokas AT otenet.gr>
+
+        * src/pic16/gen.c (genPcall): warning about gpsim and PCLATU
+	is commented out
+                
 2004-06-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genPointerGetSetOfs): disabled optimization if

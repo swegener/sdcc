@@ -1,3 +1,10 @@
+2004-08-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genPointerGet, genNearPointerGet, genPagedPointerGet,
+	genFarPointerGet, genCodePointerGet, genGenPointerGet, genUnpackBits),
+	* src/mcs51/ralloc.c (packRegisters): optimze pointer get values used as
+	conditionals
+
 2004-08-22 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: peepholes 248.i-m for xdata bitfields

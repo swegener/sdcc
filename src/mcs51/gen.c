@@ -8053,7 +8053,7 @@ emitPtrByteSet (char *rname, int p_type, char *src)
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
 static void
-genUnpackBits (operand * result, char *rname, int ptype)
+genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
 {
   int offset = 0;       /* result byte offset */
   int rsize;            /* result size */
@@ -8061,6 +8061,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
   sym_link *etype;      /* bitfield type information */
   int blen;             /* bitfield length */
   int bstr;             /* bitfield starting bit within byte */
+  char buffer[10];
 
   D(emitcode (";     genUnpackBits",""));
 
@@ -8069,6 +8070,26 @@ genUnpackBits (operand * result, char *rname, int ptype)
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
+  if (ifx && blen <= 8)
+    {
+      emitPtrByteGet (rname, ptype, FALSE);
+      if (blen == 1)
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "acc.%d", bstr);
+          genIfxJump (ifx, buffer, NULL, NULL, NULL);
+	}
+      else
+        {
+          if (blen < 8)
+            emitcode ("anl", "a,#0x%02x",
+	              (((unsigned char) -1) >> (8 - blen)) << bstr);
+          genIfxJump (ifx, "a", NULL, NULL, NULL);
+	}
+      return;
+    }
+  wassert (!ifx);
+  
   /* If the bitfield length is less than a byte */
   if (blen < 8)
     {
@@ -8146,7 +8167,8 @@ static void
 genNearPointerGet (operand * left,
                    operand * result,
                    iCode * ic,
-                   iCode * pi)
+                   iCode * pi,
+		   iCode * ifx)
 {
   asmop *aop = NULL;
   regs *preg = NULL;
@@ -8213,7 +8235,7 @@ genNearPointerGet (operand * left,
 
   /* if bitfield then unpack the bits */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, rname, POINTER);
+    genUnpackBits (result, rname, POINTER, ifx);
   else
     {
       /* we have can just get the values */
@@ -8222,11 +8244,12 @@ genNearPointerGet (operand * left,
 
       while (size--)
         {
-          if (IS_AOP_PREG (result) || AOP_TYPE (result) == AOP_STK)
+          if (ifx || IS_AOP_PREG (result) || AOP_TYPE (result) == AOP_STK)
             {
 
               emitcode ("mov", "a,@%s", rname);
-              aopPut (AOP (result), "a", offset, isOperandVolatile (result, FALSE));
+              if (!ifx)
+                aopPut (AOP (result), "a", offset, isOperandVolatile (result, FALSE));
             }
           else
             {
@@ -8265,6 +8288,11 @@ genNearPointerGet (operand * left,
             emitcode ("dec", "%s", rname);
         }
     }
+  
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a", left, NULL, result);
+    }
 
   /* done */
   freeAsmop (result, NULL, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
@@ -8279,7 +8307,8 @@ static void
 genPagedPointerGet (operand * left,
                     operand * result,
                     iCode * ic,
-                    iCode *pi)
+                    iCode *pi,
+		    iCode *ifx)
 {
   asmop *aop = NULL;
   regs *preg = NULL;
@@ -8312,7 +8341,7 @@ genPagedPointerGet (operand * left,
 
   /* if bitfield then unpack the bits */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, rname, PPOINTER);
+    genUnpackBits (result, rname, PPOINTER, ifx);
   else
     {
       /* we have can just get the values */
@@ -8323,7 +8352,8 @@ genPagedPointerGet (operand * left,
         {
 
           emitcode ("movx", "a,@%s", rname);
-          aopPut (AOP (result), "a", offset, isOperandVolatile (result, FALSE));
+          if (!ifx)
+            aopPut (AOP (result), "a", offset, isOperandVolatile (result, FALSE));
 
           offset++;
 
@@ -8355,6 +8385,11 @@ genPagedPointerGet (operand * left,
           while (size--)
             emitcode ("dec", "%s", rname);
         }
+    }
+
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a", left, NULL, result);
     }
 
   /* done */
@@ -8429,7 +8464,7 @@ loadDptrFromOperand (operand *op, bool loadBToo)
 /*-----------------------------------------------------------------*/
 static void
 genFarPointerGet (operand * left,
-                  operand * result, iCode * ic, iCode * pi)
+                  operand * result, iCode * ic, iCode * pi, iCode * ifx)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
@@ -8444,7 +8479,7 @@ genFarPointerGet (operand * left,
 
   /* if bit then unpack */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, "dptr", FPOINTER);
+    genUnpackBits (result, "dptr", FPOINTER, ifx);
   else
     {
       size = AOP_SIZE (result);
@@ -8453,17 +8488,26 @@ genFarPointerGet (operand * left,
       while (size--)
         {
           emitcode ("movx", "a,@dptr");
-          aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
+	  if (!ifx)
+            aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
           if (size || pi)
             emitcode ("inc", "dptr");
         }
+
+    }
+  
+  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR)
+    {
+      aopPut ( AOP (left), "dpl", 0, isOperandVolatile (left, FALSE));
+      aopPut ( AOP (left), "dph", 1, isOperandVolatile (left, FALSE));
+      pi->generated = 1;
     }
 
-  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
-    aopPut ( AOP (left), "dpl", 0, isOperandVolatile (left, FALSE));
-    aopPut ( AOP (left), "dph", 1, isOperandVolatile (left, FALSE));
-    pi->generated = 1;
-  }
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a", left, NULL, result);
+    }
+
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -8473,7 +8517,7 @@ genFarPointerGet (operand * left,
 /*-----------------------------------------------------------------*/
 static void
 genCodePointerGet (operand * left,
-                    operand * result, iCode * ic, iCode *pi)
+                    operand * result, iCode * ic, iCode *pi, iCode *ifx)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
@@ -8488,7 +8532,7 @@ genCodePointerGet (operand * left,
 
   /* if bit then unpack */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, "dptr", CPOINTER);
+    genUnpackBits (result, "dptr", CPOINTER, ifx);
   else
     {
       size = AOP_SIZE (result);
@@ -8500,23 +8544,32 @@ genCodePointerGet (operand * left,
             {
               emitcode ("clr", "a");
               emitcode ("movc", "a,@a+dptr");
-              aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
+              if (!ifx)
+                aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
               emitcode ("inc", "dptr");
             }
           else
             {
               emitcode ("mov", "a,#0x%02x", offset);
               emitcode ("movc", "a,@a+dptr");
-              aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
+              if (!ifx)
+                aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
             }
         }
     }
 
-  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
-    aopPut ( AOP (left), "dpl", 0, isOperandVolatile (left, FALSE));
-    aopPut ( AOP (left), "dph", 1, isOperandVolatile (left, FALSE));
-    pi->generated = 1;
-  }
+  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR)
+    {
+      aopPut ( AOP (left), "dpl", 0, isOperandVolatile (left, FALSE));
+      aopPut ( AOP (left), "dph", 1, isOperandVolatile (left, FALSE));
+      pi->generated = 1;
+    }
+
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a", left, NULL, result);
+    }
+
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -8526,7 +8579,7 @@ genCodePointerGet (operand * left,
 /*-----------------------------------------------------------------*/
 static void
 genGenPointerGet (operand * left,
-                  operand * result, iCode * ic, iCode *pi)
+                  operand * result, iCode * ic, iCode *pi, iCode *ifx)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
@@ -8541,7 +8594,7 @@ genGenPointerGet (operand * left,
 
   /* if bit then unpack */
   if (IS_BITFIELD (retype))
-    genUnpackBits (result, "dptr", GPOINTER);
+    genUnpackBits (result, "dptr", GPOINTER, ifx);
   else
     {
       size = AOP_SIZE (result);
@@ -8550,17 +8603,26 @@ genGenPointerGet (operand * left,
       while (size--)
         {
           emitcode ("lcall", "__gptrget");
-          aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
+          if (!ifx)
+            aopPut (AOP (result), "a", offset++, isOperandVolatile (result, FALSE));
           if (size || pi)
             emitcode ("inc", "dptr");
         }
     }
 
-  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR) {
-    aopPut ( AOP (left), "dpl", 0, isOperandVolatile (left, FALSE));
-    aopPut ( AOP (left), "dph", 1, isOperandVolatile (left, FALSE));
-    pi->generated = 1;
-  }
+  if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR)
+    {
+      aopPut ( AOP (left), "dpl", 0, isOperandVolatile (left, FALSE));
+      aopPut ( AOP (left), "dph", 1, isOperandVolatile (left, FALSE));
+      pi->generated = 1;
+    }
+
+  if (ifx && !ifx->generated)
+    {
+      genIfxJump (ifx, "a", left, NULL, result);
+    }
+
+    
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -8569,7 +8631,7 @@ genGenPointerGet (operand * left,
 /* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
 static void
-genPointerGet (iCode * ic, iCode *pi)
+genPointerGet (iCode * ic, iCode *pi, iCode *ifx)
 {
   operand *left, *result;
   sym_link *type, *etype;
@@ -8579,6 +8641,9 @@ genPointerGet (iCode * ic, iCode *pi)
 
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
+  
+  if (getSize (operandType (result))>1)
+    ifx = NULL;
 
   /* depending on the type of pointer we need to
      move it to the correct pointer register */
@@ -8607,23 +8672,23 @@ genPointerGet (iCode * ic, iCode *pi)
 
     case POINTER:
     case IPOINTER:
-      genNearPointerGet (left, result, ic, pi);
+      genNearPointerGet (left, result, ic, pi, ifx);
       break;
 
     case PPOINTER:
-      genPagedPointerGet (left, result, ic, pi);
+      genPagedPointerGet (left, result, ic, pi, ifx);
       break;
 
     case FPOINTER:
-      genFarPointerGet (left, result, ic, pi);
+      genFarPointerGet (left, result, ic, pi, ifx);
       break;
 
     case CPOINTER:
-      genCodePointerGet (left, result, ic, pi);
+      genCodePointerGet (left, result, ic, pi, ifx);
       break;
 
     case GPOINTER:
-      genGenPointerGet (left, result, ic, pi);
+      genGenPointerGet (left, result, ic, pi, ifx);
       break;
     }
 
@@ -10208,7 +10273,10 @@ gen51Code (iCode * lic)
           break;
 
         case GET_VALUE_AT_ADDRESS:
-          genPointerGet (ic, hasInc(IC_LEFT(ic),ic,getSize(operandType(IC_RESULT(ic)))));
+          genPointerGet (ic,
+                         hasInc (IC_LEFT (ic), ic,
+			         getSize (operandType (IC_RESULT (ic)))),
+                         ifxForOp (IC_RESULT (ic), ic) );
           break;
 
         case '=':

@@ -5715,6 +5715,12 @@ int astErrors(ast *t)
     {
       if (t->isError)
         errors++;
+  
+      if (t->type == EX_VALUE
+          && t->opval.val->sym
+          && t->opval.val->sym->undefined)
+        errors++;
+
       errors += astErrors(t->left);
       errors += astErrors(t->right);
     }

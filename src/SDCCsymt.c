@@ -1851,6 +1851,12 @@ checkFunction (symbol * sym, symbol *csym)
     fprintf (stderr, "checkFunction: %s ", sym->name);
   }
 
+  if (!IS_DECL(sym->type) || DCL_TYPE(sym->type)!=FUNCTION)
+    {
+      werror(E_SYNTAX_ERROR, sym->name);
+      return 0;
+    }
+    
   /* make sure the type is complete and sane */
   checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
 

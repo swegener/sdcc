@@ -1,3 +1,9 @@
+2003-11-27 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCClrange.c (findNextUseSym, rlivePoint): fixed bug #849795
+	* src/SDCCast.c (astErrors): fixed bug #846007
+	* src/SDCCsymt.c (checkFunction): fixed follow-up bug on bug #846007
+
 2003-11-26 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): disabled a transformation I added in

@@ -287,7 +287,7 @@ check_successors:
 
   if (retval)
     {
-      markAlive (ic, ebp->ech, sym->key);
+      if (ic) markAlive (ic, ebp->ech, sym->key);
       return 1;
     }
 
@@ -469,10 +469,12 @@ rlivePoint (eBBlock ** ebbs, int count)
       alive = succ->sch->rlive;
       while ((succ = setNextItem (ebbs[i]->succList)))
         {
-	  alive = bitVectIntersect (alive, succ->sch->rlive);
+	  if (succ->sch)
+            alive = bitVectIntersect (alive, succ->sch->rlive);
 	}
 
-      alive = bitVectCplAnd ( bitVectCopy (ebbs[i]->ech->rlive), alive);
+      if (ebbs[i]->ech)
+        alive = bitVectCplAnd ( bitVectCopy (ebbs[i]->ech->rlive), alive);
 
       for (key = 1; key < alive->size; key++)
         {

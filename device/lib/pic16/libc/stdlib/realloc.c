@@ -7,21 +7,21 @@
 
 #include "malloc.h"
 
-extern unsigned char *_dynamicHeap;			/* pointer to heap */
+extern unsigned char _MALLOC_SPEC *_dynamicHeap;			/* pointer to heap */
 
-unsigned char *realloc(unsigned char *mblock, unsigned char len)
+unsigned char _MALLOC_SPEC *realloc(unsigned char _MALLOC_SPEC *mblock, unsigned char len)
 {
-  _malloc_rec *pHeap;			/* pointer to block header */
-  _malloc_rec *temp;
+  _malloc_rec _MALLOC_SPEC *pHeap;			/* pointer to block header */
+  _malloc_rec _MALLOC_SPEC *temp;
   unsigned char bLen;			/* size of block  */
   unsigned char eLen;
 
 	if(len > MAX_BLOCK_SIZE)
-		return ((unsigned char *)0);
+		return ((unsigned char _MALLOC_SPEC *)0);
 
 	len++;		/* increase to count header too */
 
-	pHeap = (_malloc_rec *)(mblock-1);
+	pHeap = (_malloc_rec _MALLOC_SPEC *)(mblock-1);
 	bLen = pHeap->bits.count;
 
 	/* new size is same as old, return pointer */
@@ -34,7 +34,7 @@ unsigned char *realloc(unsigned char *mblock, unsigned char len)
 		temp->bits.alloc = 0;
 		temp->bits.count = bLen - len;
 
-		return (((unsigned char *)pHeap) + 1);
+		return (((unsigned char _MALLOC_SPEC *)pHeap) + 1);
 	}
 
 	/* so, new segment has size bigger than the old one
@@ -69,11 +69,11 @@ unsigned char *realloc(unsigned char *mblock, unsigned char len)
 			eLen -= i;
 		}
 
-		return (((unsigned char *)pHeap) + 1);
+		return (((unsigned char _MALLOC_SPEC *)pHeap) + 1);
 	}
 
 
 	/* no could not find a valid block, return NULL */
 
-  return ((unsigned char *)0);
+  return ((unsigned char _MALLOC_SPEC *)0);
 }

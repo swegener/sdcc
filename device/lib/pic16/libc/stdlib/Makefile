@@ -20,7 +20,8 @@ SRCS	= 	atof \
 		free \
 		ltoa \
 		malloc \
-		realloc
+		realloc \
+		x_ftoa
 
 
 CFILES	= $(patsubst %,%.c,$(SRCS))

@@ -7,19 +7,19 @@
 
 #include "malloc.h"
 
-extern unsigned char *_dynamicHeap;			/* pointer to heap */
+extern unsigned char _MALLOC_SPEC *_dynamicHeap;			/* pointer to heap */
 
-unsigned char *malloc(unsigned char len)
+unsigned char _MALLOC_SPEC *malloc(unsigned char len)
 {
-  _malloc_rec *pHeap;			/* pointer to block header */
-  _malloc_rec *temp;
+  _malloc_rec _MALLOC_SPEC *pHeap;			/* pointer to block header */
+  _malloc_rec _MALLOC_SPEC *temp;
   unsigned char bLen;			/* size of block  */
   unsigned char eLen;
 
 	if(len > _MAX_HEAP_SIZE)
-		return ((unsigned char *)0);
+		return ((unsigned char _MALLOC_SPEC *)0);
 
-	pHeap = (_malloc_rec *)&_dynamicHeap;
+	pHeap = (_malloc_rec _MALLOC_SPEC *)&_dynamicHeap;
 
 
 	while(1) {
@@ -27,7 +27,7 @@ unsigned char *malloc(unsigned char len)
 		
 		/* if datum is zero, then last block, return NULL */
 		if(pHeap->datum == 0)
-			return ((unsigned char *)0);
+			return ((unsigned char _MALLOC_SPEC *)0);
 
 		/* if current block is allocated then proceed to next */
 		if(pHeap->bits.alloc) {
@@ -89,6 +89,6 @@ unsigned char *malloc(unsigned char len)
 			temp->bits.alloc = 0;
 		}
 
-		return ((unsigned char *)pHeap + 1);
+		return ((unsigned char _MALLOC_SPEC *)pHeap + 1);
 	}
 }

@@ -8125,7 +8125,7 @@ status Collapsed
 /
 \end_inset 
 
--portmode=z180 (?) and a compiler #pragma\SpecialChar ~
+-portmode=180 (80) and a compiler #pragma\SpecialChar ~
 portmode
 \begin_inset LatexCommand \index{\#pragma portmode}
 

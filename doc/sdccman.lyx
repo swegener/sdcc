@@ -655,6 +655,8 @@ $PREFIX/$BIN_DIR_SUFFIX
 
 \backslash 
 sdcc
+\backslash 
+bin
 \end_inset 
 </cell>
 </row>
@@ -1180,7 +1182,7 @@ include
 
 \layout Standard
 
-path(arv[0])/../
+path(argv[0])/../
 \newline 
 
 \emph on 
@@ -1206,7 +1208,7 @@ $INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-path(arv[0])
+path(argv[0])
 \backslash 
 ..
 \backslash 
@@ -1220,7 +1222,11 @@ include
 
 \layout Standard
 
+
+\emph on 
 $DATADIR/
+\emph default 
+
 \newline 
 
 \emph on 
@@ -1232,9 +1238,9 @@ $INCLUDE_DIR_SUFFIX
 
 \layout Standard
 
-/usr/local/share/
+/usr/local/share/sdcc/
 \newline 
-sdcc/include
+include
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1259,22 +1265,33 @@ sdcc/include
 
 \newline 
 3.
- Library files (the 
+ Library files 
+\newline 
+With the exception of 
+\begin_inset Quotes sld
+\end_inset 
+
+---L dir
+\begin_inset Quotes srd
+\end_inset 
+
+ the 
 \shape italic 
 model
 \shape default 
- is auto-appended by the compiler, e.g.
- small, large, z80, ds390 etc.)
-\newline 
+ is auto-appended by the compiler (e.g.
+ small, large, z80, ds390 etc.).
  
+\newline 
+
 \begin_inset  Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features>
 <column alignment="left" valignment="top" leftline="true" width="1.7in">
-<column alignment="left" valignment="top" leftline="true" width="1.6in">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="1.2in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="1.2in">
 <row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -1282,7 +1299,7 @@ model
 Search path
 \end_inset 
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -1300,7 +1317,7 @@ Win32 default
 </cell>
 </row>
 <row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -1308,7 +1325,7 @@ Win32 default
 ---L dir
 \end_inset 
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -1326,28 +1343,28 @@ Win32 default
 </cell>
 </row>
 <row topline="true">
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-$SDCC_LIB_PATH/<
-\shape italic 
-model
-\shape default 
->
-\end_inset 
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
-$SDCC_LIB_PATH/<
-\shape italic 
-model
-\shape default 
->
+$SDCC_LIB_PATH/
+\newline 
+
+\emph on 
+<model>
+\end_inset 
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+$SDCC_LIB_PATH/
+\newline 
+
+\emph on 
+<model>
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1357,11 +1374,11 @@ model
 
 $SDCC_LIB_PATH
 \backslash 
-<
-\shape italic 
-model
-\shape default 
->
+
+\newline 
+
+\emph on 
+<model>
 \end_inset 
 </cell>
 </row>
@@ -1377,13 +1394,7 @@ $SDCC_HOME/
 \emph on 
 $SEARCH_SUFFIX/
 \newline 
-$LIB_DIR_SUFFIX
-\emph default 
-/<
-\shape italic 
-model
-\shape default 
->
+$LIB_DIR_SUFFIX/<model>
 \end_inset 
 </cell>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1395,14 +1406,12 @@ $SDCC_HOME/
 \newline 
 share/sdcc/
 \newline 
-lib/<
-\shape italic 
-model
-\shape default 
->
+lib/
+\emph on 
+<model>
 \end_inset 
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -1411,45 +1420,75 @@ $SDCC_HOME
 \backslash 
 lib
 \backslash 
-<
-\shape italic 
-model
-\shape default 
->
+
+\emph on 
+
+\newline 
+<model>
 \end_inset 
 </cell>
 </row>
 <row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
-path(arv[0])/../
-\emph on 
-
+path(argv[0]/../
 \newline 
+
+\emph on 
 $SEARCH_SUFFIX/
-\emph default 
-
 \newline 
-
-\emph on 
-$LIB_DIR_SUFFIX/
-\emph default 
-<
-\shape italic 
-model
-\shape default 
->
+$LIB_DIR_SUFFIX/<model>
 \end_inset 
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
 (not on *nix)
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1457,17 +1496,58 @@ model
 
 \layout Standard
 
-path(arv[0])
+path(argv[0]
 \backslash 
 ..
 \backslash 
 lib
 \backslash 
-<
-\shape italic 
-model
-\shape default 
->
+
+\emph on 
+
+\newline 
+<model>
+\newline 
+
+\emph default 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
 \end_inset 
 </cell>
 </row>
@@ -1481,27 +1561,19 @@ model
 \emph on 
 $DATADIR/
 \newline 
-$LIB_DIR_SUFFIX/
-\emph default 
-<
-\shape italic 
-model
-\shape default 
->
+$LIB_DIR_SUFFIX/<model>
 \end_inset 
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
 /usr/local/share/sdcc/
 \newline 
-lib/<
-\shape italic 
-model
-\shape default 
->
+lib/
+\emph on 
+<model>
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -1509,17 +1581,7 @@ model
 
 \layout Standard
 
-
-\backslash 
-sdcc
-\backslash 
-lib
-\backslash 
-<
-\shape italic 
-model
-\shape default 
->
+(not on Win32)
 \end_inset 
 </cell>
 </row>
@@ -1528,17 +1590,16 @@ model
 \end_inset 
 
 
-\newline 
- 
-\newline 
-The option ---nostdlib disables the last two search paths.
-\newline 
+\layout Comment
+
+Don't delete any of the stray spaces in the table line 5 without checking
+ the HTML output (last line)!
+\layout Standard
+
+\SpecialChar ~
 
 \newline 
-So, for windoze it is highly recommended to set the environment variable
- SDCC_HOME to prevent needless usage of -I and -L options.
- For *nix-builds SDCC_HOME should only be set when sdcc is installed in
- non-standard paths.
+The option ---nostdlib disables the last two search paths.
 \layout Subsection
 
 Linux and other gcc-based systems (cygwin, mingw32, osx)

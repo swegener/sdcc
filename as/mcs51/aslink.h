@@ -647,6 +647,7 @@ extern	char		endline();
 extern	char		get();
 extern	VOID		getfid();
 extern	VOID		getid();
+extern	VOID		getSid();
 extern	int		getline();
 extern	int		getmap();
 extern	char		getnb();

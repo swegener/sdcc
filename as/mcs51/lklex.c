@@ -23,6 +23,7 @@
  *		char	get()
  *		VOID	getfid()
  *		VOID	getid()
+ *		VOID	getSid()
  *		int	getline()
  *		int	getmap()
  *		char	getnb()
@@ -89,6 +90,64 @@ char *id;
 		if (p < &id[NCPS])
 			*p++ = c;
 	} while (ctype[c=get()] & (LETTER|DIGIT));
+	unget(c);
+	while (p < &id[NCPS])
+		*p++ = 0;
+}
+
+/*)Function	VOID	getSid (char *id)
+ *
+ *		char *	id		a pointer to a string of
+ *					maximum length NCPS
+ *
+ *  getSid is derived from getid. It is called from newsym()
+ *  in lksym.c, when an S-record has to be scanned. getSid accepts
+ *  much more characters than getid, which is necessary for SDCC.
+ * 
+ *	The function getSid() scans the current input text line
+ *	from the current position copying the next string
+ *	into the external string buffer (id).  The string ends when a space
+ *  character (space, tab, \0) is found. The maximum number of
+ *	characters copied is NCPS.  If the input string is larger than
+ *	NCPS characters then the string is truncated, if the input string
+ *	is shorter than NCPS characters then the string is NULL filled.
+ *	Intervening white space (SPACES and TABS) are skipped.
+ *
+ *	local variables:
+ *		char *	p		pointer to external string buffer
+ *		int	c		current character value
+ *
+ *	global variables:
+ *		char	ctype[]		a character array which defines the
+ *					type of character being processed.
+ *					This index is the character
+ *					being processed.
+ *
+ *	called functions:
+ *		char	get()		lklex.c
+ *		char	getnb()		lklex.c
+ *		VOID	unget()		lklex.c
+ *
+ *	side effects:
+ *		use of getnb(), get(), and unget() updates the
+ *		global pointer ip the position in the current
+ *		input text line.
+ */
+
+VOID
+getSid (id)
+char *id;
+{
+  register int c;
+	register char *p;
+
+  c = getnb();
+	p = id;
+	do {
+		if (p < &id[NCPS])
+			*p++ = c;
+		c = get();
+	} while (c != '\0' && c != ' ' && c != '\t');
 	unget(c);
 	while (p < &id[NCPS])
 		*p++ = 0;

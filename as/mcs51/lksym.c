@@ -108,6 +108,7 @@ syminit()
  *		Addr_T	eval()		lkeval.c
  *		VOID	exit()		c_library
  *		int	fprintf()	c_library
+ *		char	getSid()	lklex.c
  *		char	get()		lklex.c
  *		char	getnb()		lklex.c
  *		sym *	lkpsym()	lksym.c
@@ -140,7 +141,7 @@ newsym()
 	struct sym **s;
 	char id[NCPS];
 
-	getid(id, -1);
+	getSid(id);	// old: getid(id, -1);
 	tsp = lkpsym(id, 1);
 	c = getnb();get();get();
 	if (c == 'R') {

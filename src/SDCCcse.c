@@ -253,26 +253,38 @@ DEFSETFUNC (findCheaperOp)
       /* do a special check this will help in */
       /* constant propagation & dead code elim */
       /* for assignments only                 */
-      if (cdp->diCode->op == '=')
-	{
-	  /* if the result is volatile then return result */
-	  if (IS_OP_VOLATILE (IC_RESULT (cdp->diCode)))
+      if (cdp->diCode->op == '=') {
+	/* if the result is volatile then return result */
+	if (IS_OP_VOLATILE (IC_RESULT (cdp->diCode)))
+	  *opp = IC_RESULT (cdp->diCode);
+	else 
+	  /* if this is a straight assignment and
+	     left is a temp then prefer the temporary to the
+	     true symbol */
+	  if (!POINTER_SET (cdp->diCode) &&
+	      IS_ITEMP (IC_RESULT (cdp->diCode)) &&
+	      IS_TRUE_SYMOP (IC_RIGHT (cdp->diCode)))
 	    *opp = IC_RESULT (cdp->diCode);
-	  else
-	    /* if this is a straight assignment and
-	       left is a temp then prefer the temporary to the
-	       true symbol */
-	    if (!POINTER_SET (cdp->diCode) &&
-		IS_ITEMP (IC_RESULT (cdp->diCode)) &&
-		IS_TRUE_SYMOP (IC_RIGHT (cdp->diCode)))
-	    *opp = IC_RESULT (cdp->diCode);
-	  else
+	  else {
 	    /* if straight assignement && and both
 	       are temps then prefer the one that
 	       will not need extra space to spil, also
 	       take into consideration if right side
 	       an induction variable
-	     */
+	    */
+
+#if SomeOneUnderStandsThis
+	    /* This causes the bug:
+	       
+	       void test (unsigned u) {
+	         // the following cast is ignored
+	         for (; (int) u >= 0;)
+	           ++u;
+	         }
+	       }
+
+	       where casts are ignored */
+
 	    if (!POINTER_SET (cdp->diCode) &&
 		IS_ITEMP (IC_RESULT (cdp->diCode)) &&
 		IS_ITEMP (IC_RIGHT (cdp->diCode)) &&
@@ -281,12 +293,13 @@ DEFSETFUNC (findCheaperOp)
 		  SPIL_LOC (IC_RESULT (cdp->diCode))) ||
 		 (SPIL_LOC (IC_RESULT (cdp->diCode)) &&
 		  SPIL_LOC (IC_RESULT (cdp->diCode)) ==
-		  SPIL_LOC (IC_RIGHT (cdp->diCode))))
-	    )
-	    *opp = IC_RESULT (cdp->diCode);
-	  else
-	    *opp = IC_RIGHT (cdp->diCode);
-	}
+		  SPIL_LOC (IC_RIGHT (cdp->diCode)))))
+	      *opp = IC_RESULT (cdp->diCode);
+	    else
+	      *opp = IC_RIGHT (cdp->diCode);
+#endif
+	  }
+      }
       else
 	*opp = IC_RESULT (cdp->diCode);
     }

@@ -1,3 +1,9 @@
+2005-02-01 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic16/pic16.dsp : Added file graph.c to make it compile under windows 
+	* src/pic16/Makefile.bcc : Do not use this file but added file graph.c as it
+	 appeared to be required
+
 2004-01-31 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added include/asm/ds390, include/asm/mcs51,

@@ -1587,8 +1587,8 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   if (!IS_ITEMP (IC_RIGHT (ic)) ||
       OP_SYMBOL (IC_RIGHT (ic))->isind ||
-      OP_LIVETO (IC_RIGHT (ic)) > ic->seq ||
-      IS_BITFIELD (etype))
+      OP_LIVETO (IC_RIGHT (ic)) > ic->seq
+      /* why? || IS_BITFIELD (etype) */ )
     {
       return 0;
     }

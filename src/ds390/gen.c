@@ -1842,10 +1842,10 @@ saveRegisters (iCode * lic)
 	      rsave = bitVectSetBit(rsave,i);
       }
   } else {
-      /* find the registers in use at this time
-	 and push them away to safety */
-      rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
-			     ic->rUsed);
+    /* safe the registers in use at this time but skip the
+       ones for the result */
+    rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+			   ds390_rUmaskForOp (IC_RESULT(ic)));
   }
   ic->regsSaved = 1;
   if (options.useXstack)
@@ -1896,10 +1896,10 @@ unsaveRegisters (iCode * ic)
 	      rsave = bitVectSetBit(rsave,i);
       }
   } else {
-      /* find the registers in use at this time
-	 and push them away to safety */
-      rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
-			     ic->rUsed);
+    /* restore the registers in use at this time but skip the
+       ones for the result */
+    rsave = bitVectCplAnd (bitVectCopy (ic->rMask), 
+			   ds390_rUmaskForOp (IC_RESULT(ic)));
   }
   if (options.useXstack)
     {

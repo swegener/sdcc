@@ -1408,8 +1408,8 @@ static void fillGaps()
 /*-----------------------------------------------------------------*/
 /* rUmaskForOp :- returns register mask for an operand             */
 /*-----------------------------------------------------------------*/
-static bitVect *
-rUmaskForOp (operand * op)
+bitVect *
+ds390_rUmaskForOp (operand * op)
 {
   bitVect *rumask;
   symbol *sym;
@@ -1449,7 +1449,7 @@ regsUsedIniCode (iCode * ic)
   if (ic->op == IFX)
     {
       rmask = bitVectUnion (rmask,
-			    rUmaskForOp (IC_COND (ic)));
+			    ds390_rUmaskForOp (IC_COND (ic)));
       goto ret;
     }
 
@@ -1457,7 +1457,7 @@ regsUsedIniCode (iCode * ic)
   if (ic->op == JUMPTABLE)
     {
       rmask = bitVectUnion (rmask,
-			    rUmaskForOp (IC_JTCOND (ic)));
+			    ds390_rUmaskForOp (IC_JTCOND (ic)));
 
       goto ret;
     }
@@ -1465,16 +1465,16 @@ regsUsedIniCode (iCode * ic)
   /* of all other cases */
   if (IC_LEFT (ic))
     rmask = bitVectUnion (rmask,
-			  rUmaskForOp (IC_LEFT (ic)));
+			  ds390_rUmaskForOp (IC_LEFT (ic)));
 
 
   if (IC_RIGHT (ic))
     rmask = bitVectUnion (rmask,
-			  rUmaskForOp (IC_RIGHT (ic)));
+			  ds390_rUmaskForOp (IC_RIGHT (ic)));
 
   if (IC_RESULT (ic))
     rmask = bitVectUnion (rmask,
-			  rUmaskForOp (IC_RESULT (ic)));
+			  ds390_rUmaskForOp (IC_RESULT (ic)));
 
 ret:
   return rmask;

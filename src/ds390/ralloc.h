@@ -60,6 +60,8 @@ extern regs regs390[];
 
 regs *ds390_regWithIdx (int);
 
+bitVect *ds390_rUmaskForOp (operand * op);
+
 extern int ds390_ptrRegReq;
 extern int ds390_nRegs;
 

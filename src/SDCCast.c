@@ -1899,6 +1899,7 @@ decorateType (ast * tree)
 /*----------------------------*/
   /*   leaf has been reached    */
 /*----------------------------*/
+  lineno=tree->lineno;
   /* if this is of type value */
   /* just get the type        */
   if (tree->type == EX_VALUE)

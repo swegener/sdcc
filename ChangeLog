@@ -1,3 +1,7 @@
+2003-01-07    <johan@balder>
+
+	* src/SDCCast.c (decorateType): fixed bug #600035
+
 2003-01-07  Bernhard Held <bernhard@bernhardheld.de>
 	* as/mcs51/lkmem.c: added several l-modifiers to printf to remove warnings
 	* as/mcs51/lkaomf51.c: #include <ctype.h> to remove warnings

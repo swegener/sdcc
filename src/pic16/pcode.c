@@ -112,6 +112,12 @@ pCodeOpReg pic16_pc_kzero     = {{PO_GPR_REGISTER,  "KZ"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wsave     = {{PO_GPR_REGISTER,  "WSAVE"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_ssave     = {{PO_GPR_REGISTER,  "SSAVE"}, -1, NULL,0,NULL};
 
+pCodeOpReg pic16_pc_gptrreg     = {{PO_GPR_REGISTER,  "__GPTRREG"}, -1, NULL,0,NULL};
+
+pCodeOpReg pic16_pc_gpsimio   = {{PO_GPR_REGISTER, "GPSIMIO"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_gpsimio2  = {{PO_GPR_REGISTER, "GPSIMIO2"}, -1, NULL, 0, NULL};
+
+
 static int mnemonics_initialized = 0;
 
 
@@ -2817,6 +2823,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 #endif    //  USE_VSNPRINTF
 #endif
 
+extern set *externs;
 extern  void pic16_initStack(int base_address, int size);
 extern regs *pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
 extern regs *pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias);
@@ -2940,6 +2947,15 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_eedata.rIdx = IDX_EEDATA;
 	pic16_pc_eeadr.rIdx = IDX_EEADR;
 	
+	
+	pic16_pc_gpsimio.r = pic16_allocProcessorRegister(IDX_GPSIMIO, "GPSIMIO", PO_GPR_REGISTER, 0x80);
+	pic16_pc_gpsimio2.r = pic16_allocProcessorRegister(IDX_GPSIMIO2, "GPSIMIO2", PO_GPR_REGISTER, 0x80);
+
+	pic16_pc_gpsimio.rIdx = IDX_GPSIMIO;
+	pic16_pc_gpsimio2.rIdx = IDX_GPSIMIO2;
+
+	pic16_pc_gptrreg.r = newReg(REG_SFR, PO_GPR_REGISTER, 0, "__GPTRREG", 1, 0x40, NULL);	//PO_GPR_REGISTER, 0x00);
+	pic16_pc_gptrreg.rIdx = 0;
 
 	/* probably should put this in a separate initialization routine */
 	pb_dead_pcodes = newpBlock();

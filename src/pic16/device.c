@@ -625,6 +625,7 @@ void pic16_dump_gsection(FILE *of, set *sections)
   sectName *sname;
 
   	for(sname = setFirstItem(sections); sname; sname = setNextItem(sections)) {
+  		if(!strcmp(sname->name, "access"))continue;
 		fprintf(of, "\n\n%s\tudata\n", sname->name);
 
   		for(r=setFirstItem(sname->regsSet); r; r=setNextItem(sname->regsSet)) {
@@ -1020,8 +1021,15 @@ void pic16_groupRegistersInSection(set *regset)
 				if(!strcmp(ssym->name, reg->name)) {
 //					fprintf(stderr, "%s:%d section found %s (%p) with var %s\n",
 //							__FILE__, __LINE__, ssym->section->name, ssym->section, ssym->name);
-					addSet(&ssym->section->regsSet, reg);
-					docontinue=1;
+					if(strcmp(ssym->section->name, "access")) {
+						addSet(&ssym->section->regsSet, reg);
+						docontinue=1;
+						break;
+					} else {
+						docontinue=0;
+						reg->accessBank = 1;
+						break;
+					}
 				}
 			}
 
@@ -1040,7 +1048,8 @@ void pic16_groupRegistersInSection(set *regset)
 					checkAddReg(&pic16_int_regs, reg);
 				else {
 					if(reg->accessBank) {
-						checkAddReg(&pic16_acs_udata, reg);
+						if(reg->alias != 0x40)
+							checkAddReg(&pic16_acs_udata, reg);
 					} else
 						checkAddReg(&pic16_rel_udata, reg);
 				}

@@ -200,7 +200,11 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					}
 #endif
 
-					if(!found)checkAddReg(&pic16_rel_udata, reg);
+					if(!found)
+						checkAddReg(&pic16_rel_udata, reg);
+					else
+						checkAddSym(&publics, sym);
+
 				}
 			}
 
@@ -592,7 +596,6 @@ static void
 pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype, void *p)
 {
   value *val;
-  unsigned long ulval;
 
 //  fprintf(stderr, "%s for symbol %s\n",__FUNCTION__, sym->rname);
 
@@ -618,26 +621,24 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
     val = valCastLiteral(type, floatFromVal(val));
   }
 
-  if(val) 
-    ulval = (unsigned long) floatFromVal (val);
-  else
-    ulval =0;
-
   switch (getSize (type)) {
   case 1:
-    pic16_emitDB(BYTE_IN_LONG(ulval,0), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
     break;
 
   case 2:
-    pic16_emitDB(BYTE_IN_LONG(ulval,0), ptype, p);
-    pic16_emitDB(BYTE_IN_LONG(ulval,1), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
     break;
-
+  case 3:
+    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
   case 4:
-    pic16_emitDB(BYTE_IN_LONG(ulval,0), ptype, p);
-    pic16_emitDB(BYTE_IN_LONG(ulval,1), ptype, p);
-    pic16_emitDB(BYTE_IN_LONG(ulval,2), ptype, p);
-    pic16_emitDB(BYTE_IN_LONG(ulval,3), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 0), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 1), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 2), ptype, p);
+    pic16_emitDB(pic16aopLiteral(val, 3), ptype, p);
     break;
   }
 }

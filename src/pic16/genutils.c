@@ -417,3 +417,39 @@ void pic16_DumpOp(char *prefix, operand *op)
 	}
 
 }
+
+
+void gpsimio2_pcop(pCodeOp *pcop)
+{
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pcop, pic16_popCopyReg(&pic16_pc_gpsimio2)));
+}
+
+void gpsimio2_lit(unsigned char lit)
+{
+  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit));
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_wreg), pic16_popCopyReg(&pic16_pc_gpsimio2)));
+}
+
+void gpsimio2_str(char *buf)
+{
+  while(*buf) {
+    gpsimio2_lit(*buf);
+    buf++;
+  }
+}
+
+void gpsimDebug_StackDump(char *fname, int line, char *info)
+{
+  pic16_emitpcomment("; gpsim debug stack dump; %s @ %d\tinfo: ", fname, line, info);
+  
+  gpsimio2_str("&c[S:");
+  gpsimio2_str(info);
+  gpsimio2_str("] &h");
+  
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_fsr1h),
+                pic16_popCopyReg(&pic16_pc_gpsimio2)));
+  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_fsr1l),
+                pic16_popCopyReg(&pic16_pc_gpsimio2)));
+
+  gpsimio2_lit('\n');
+}

@@ -1,3 +1,34 @@
+2004-10-10 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/device.c (pic16_dump_gsection,
+	* pic16_groupRegistersInSection): handle symbols declared to be in
+	access bank differently,
+	* src/pic16/gen.c (struct _G): added field resDirect,
+	* (aopForSym): if symbol on stack and iCode is '=' and result exists,
+	send values read from stack directly to result and don't allocate
+	temporary values,
+	* (pic16_sameRegs): fixed bug that allowed MOVFF to move between
+	same registers,
+	* (pic16_sameRegsOfs): NEW,
+	* (freeAsmop): if _G.resDirect is set then do not mark registers as
+	free because they were not allocated from temporary pool,
+	* pic16_popRegFromString): workaround to fix a problem with
+	allocating variables twice or never,
+	* (genGenPointerGet): using PRODL instead of FSR0H,
+	* (genGenPointerSet): using POSTDEC1 (that is a stack location)
+	instead of FSR0H,
+	* (genAssign): take advantage of the _G.resDirect flag,
+	* (genCast): around line 11844, use mov2f instead of directly
+	MOVFF'ing between operands to account for literal values,
+	* src/pic16/genutils.c: some new debug functions for gpsim have been
+	added,
+	* src/pic16/glue.c (pic16_printIvalType): fixed bug that initialized
+	float with integer part only,
+	* src/pic16/main.c (_process_pragma): handle pragma udata access to
+	place variables in access bank
+	* device/lib/pic16/libsdcc/gptr/gptr*.c: using BRA instead of GOTO,
+	updated sources to reflect recent changes in gen.c
+
 2004-10-06 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/pic16/libsdcc/Makefile.rules: fixed bug concerning

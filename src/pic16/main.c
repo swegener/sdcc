@@ -225,18 +225,22 @@ _process_pragma(const char *sz)
 	if(startsWith(ptr, "udata")) {
 	  char *sectname = strtok((char *)NULL, WHITE);
 	  char *symname = strtok((char *)NULL, WHITE);
+	  symbol *nsym;
 	  sectSym *ssym;
 	  sectName *snam;
 	  int found=0;
 	  
 	  	while(symname) {
-
 	  		ssym = Safe_calloc(1, sizeof(sectSyms));
 			ssym->name = Safe_calloc(1, strlen(symname)+2);
 			sprintf(ssym->name, "_%s", symname);
 	  		ssym->reg = NULL;
 
 			addSet(&sectSyms, ssym);
+
+                        nsym = newSymbol(symname, 0);
+                        strcpy(nsym->rname, ssym->name);
+			checkAddSym(&publics, nsym);
 
 			found = 0;
 			for(snam=setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {

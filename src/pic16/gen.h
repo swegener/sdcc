@@ -173,6 +173,8 @@ void pic16_addSign(operand *result, int offset, int sign);
 void pic16_genMinusBits (iCode *ic);
 void pic16_genMinus (iCode *ic);
 
+pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst);
+void pic16_emitpcomment (char *fmt, ...);
 
 pCodeOp *pic16_popGetLabel(unsigned int key);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);

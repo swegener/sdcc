@@ -1049,5 +1049,8 @@ extern pCodeOpReg pic16_pc_kzero;
 extern pCodeOpReg pic16_pc_wsave;     /* wsave and ssave are used to save W and the Status */
 extern pCodeOpReg pic16_pc_ssave;     /* registers during an interrupt */
 
+extern pCodeOpReg pic16_pc_gpsimio;
+extern pCodeOpReg pic16_pc_gpsimio2;
+extern pCodeOpReg pic16_pc_gptrreg;
 
 #endif // __PCODE_H__

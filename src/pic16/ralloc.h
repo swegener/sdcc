@@ -187,4 +187,7 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 #define IDX_WSAVE   0x7ffe
 #define IDX_SSAVE   0x7ffd
 
+#define IDX_GPSIMIO	0xf7f
+#define IDX_GPSIMIO2	0xf7e
+
 #endif

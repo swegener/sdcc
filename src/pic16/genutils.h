@@ -33,6 +33,9 @@ void pic16_DumpAop(char *prefix, asmop *aop);
 void pic16_DumpSymbol(char *prefix, symbol *sym);
 void pic16_DumpOp(char *prefix, operand *op);
 
+void gpsimio2_pcop(pCodeOp *pcop);
+void gpsimio2_lit(unsigned char lit);
 
+void gpsimDebug_StackDump(char *fname, int line, char *info);
 
 #endif	/* __GENUTILS_H__ */

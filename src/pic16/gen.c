@@ -60,6 +60,8 @@ extern pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...);
 static void mov2w (asmop *aop, int offset);
 static void mov2f(asmop *dst, asmop *src, int offset);
 static void mov2fp(pCodeOp *dst, asmop *src, int offset);
+static pCodeOp *pic16_popRegFromIdx(int rIdx);
+
 //static int aopIdx (asmop *aop, int offset);
 
 int pic16_labelOffset=0;
@@ -78,7 +80,6 @@ static int max_key=0;
 static int GpsuedoStkPtr=0;
 
 pCodeOp *pic16_popGetImmd(char *name, unsigned int offset, int index);
-pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst);
 
 unsigned int pic16aopLiteral (value *val, int offset);
 const char *pic16_AopType(short type);
@@ -137,6 +138,7 @@ static struct {
     int usefastretfie;
     bitVect *fregsUsed;
     int stack_lat;			/* stack offset latency */
+    int resDirect;
 } _G;
 
 /* Resolved ifx structure. This structure stores information
@@ -595,6 +597,8 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 
     DEBUGpic16_emitcode("; ***","%s %d",__FUNCTION__,__LINE__);
 
+    _G.resDirect = 0;	/* clear flag that instructs the result is loaded directly from aopForSym */
+    
 //    sym = OP_SYMBOL(op);
 
     /* if already has one */
@@ -628,10 +632,21 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
         aop->aopu.stk.stk = sym->stack;
         aop->size = getSize(sym->type);
 
-        for(i=0;i<aop->size;i++) {
-          aop->aopu.stk.pop[i] = pcop[i] = pic16_popGetTempRegCond( _G.fregsUsed, 0 );
-          _G.fregsUsed = bitVectSetBit(_G.fregsUsed, PCOR(pcop[i])->r->rIdx);
-        }
+
+        DEBUGpic16_emitcode("; +++", "%s:%d", __FILE__, __LINE__);
+        pic16_DumpAop("aopForSym", AOP( IC_RESULT(ic) ));
+        if((ic->op == '=') && IC_RESULT(ic) && AOP( IC_RESULT(ic) )
+          && (AOP_TYPE(IC_RESULT(ic)) == AOP_REG) ) {
+          
+          for(i=0;i<aop->size;i++)
+            aop->aopu.stk.pop[i] = pcop[i] = pic16_popRegFromIdx( AOP(IC_RESULT(ic))->aopu.aop_reg[i]->rIdx);
+            _G.resDirect = 1;	/* notify that result will be loaded directly from aopForSym */
+        } else
+          for(i=0;i<aop->size;i++) {
+            aop->aopu.stk.pop[i] = pcop[i] = pic16_popGetTempRegCond( _G.fregsUsed, 0 );
+            _G.fregsUsed = bitVectSetBit(_G.fregsUsed, PCOR(pcop[i])->r->rIdx);
+          }
+
 
 //        fprintf(stderr, "%s:%d\t%s\tsym size %d\n", __FILE__, __LINE__, __FUNCTION__, aop->size);
 
@@ -814,6 +829,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 static asmop *aopForRemat (operand *op) // x symbol *sym)
 {
   symbol *sym = OP_SYMBOL(op);
+  operand *refop;
   iCode *ic = NULL, *oldic;
   asmop *aop = newAsmop(AOP_PCODE);
   int val = 0;
@@ -845,14 +861,15 @@ static asmop *aopForRemat (operand *op) // x symbol *sym)
 	}
 
 	offset = OP_SYMBOL(IC_LEFT(ic))->offset;
+	refop = IC_LEFT(ic);
 
 	if(!op->isaddr)viaimmd++; else viaimmd=0;
 		
 /* set the following if to 1 to revert to good old immediate code */
-	if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))
+	if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(refop)))
 		|| viaimmd) {
 
-		DEBUGpic16_emitcode("%s:%d immediate", __FILE__, __LINE__);
+		DEBUGpic16_emitcode(";", "%s:%d immediate", __FILE__, __LINE__);
 
 		aop->aopu.pcop = pic16_popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname, 0, val);
 
@@ -864,7 +881,7 @@ static asmop *aopForRemat (operand *op) // x symbol *sym)
 
 		PCOI(aop->aopu.pcop)->index = val;
 	} else {
-		DEBUGpic16_emitcode("%s:%d dir", __FILE__, __LINE__);
+		DEBUGpic16_emitcode(";", "%s:%d dir", __FILE__, __LINE__);
 
 		aop->aopu.pcop = pic16_popRegFromString(OP_SYMBOL(IC_LEFT(ic))->rname,
 				getSize( OP_SYMBOL( IC_LEFT(ic))->type), val, op);
@@ -1000,22 +1017,37 @@ bool pic16_sameRegs (asmop *aop1, asmop *aop2 )
 
     if(aop1->type == AOP_ACC && aop2->type == AOP_ACC)return TRUE;
 
-#if 0
     if (aop1->type != AOP_REG ||
         aop2->type != AOP_REG )
         return FALSE ;
-#endif
 
     if (aop1->size != aop2->size )
         return FALSE ;
 
-    for (i = 0 ; i < aop1->size ; i++ )
-        if (aop1->aopu.aop_reg[i] !=
-            aop2->aopu.aop_reg[i] )
+    for (i = 0 ; i < aop1->size ; i++ ) {
+//        if(aop1->aopu.aop_reg[i]->type != aop2->aopu.aop_reg[i]->type)return FALSE;
+
+//        if(aop1->aopu.aop_reg[i]->type == AOP_REG)
+        if (strcmp(aop1->aopu.aop_reg[i]->name, aop2->aopu.aop_reg[i]->name ))
             return FALSE ;
+    }
 
     return TRUE ;
 }
+
+bool pic16_sameRegsOfs(asmop *aop1, asmop *aop2, int offset)
+{
+    DEBUGpic16_emitcode(";***", "%s aop1->type = %s\taop2->type = %s (offset = %d)\n", __FUNCTION__,
+    		pic16_AopType(aop1->type), pic16_AopType(aop2->type), offset);
+
+    if(aop1 == aop2)return TRUE;
+    if(aop1->type != AOP_REG || aop2->type != AOP_REG)return FALSE;
+      
+      if(strcmp(aop1->aopu.aop_reg[offset]->name, aop2->aopu.aop_reg[offset]->name))return FALSE;
+    
+  return TRUE;
+}
+
 
 /*-----------------------------------------------------------------*/
 /* pic16_aopOp - allocates an asmop for an operand  :                    */
@@ -1094,8 +1126,7 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
         /* rematerialize it NOW */
         if (sym->remat) {
 
-            sym->aop = op->aop = aop =
-                                      aopForRemat (op);
+            sym->aop = op->aop = aop = aopForRemat (op);
             aop->size = getSize(sym->type);
 	    //DEBUGpic16_emitcode(";"," %d: size %d, %s\n",__LINE__,aop->size,aop->aopu.aop_immd);
             return;
@@ -1255,8 +1286,11 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
                 if(_G.accInUse)pic16_poppCodeOp( pic16_popCopyReg(&pic16_pc_wreg) );
               }
 
-              for(i=0;i<aop->size;i++)
-                PCOR(aop->aopu.stk.pop[i] )->r->isFree = 1;
+              if(!_G.resDirect) {
+                for(i=0;i<aop->size;i++)
+                  PCOR(aop->aopu.stk.pop[i] )->r->isFree = 1;
+              }
+              _G.resDirect = 0;
           }
           break;
 #if 0
@@ -1669,9 +1703,11 @@ static pCodeOp *pic16_popRegFromString(char *str, int size, int offset, operand 
   PCOR(pcop)->r = pic16_dirregWithName(pcop->name);
 
   /* make sure that register doesn't exist,
-   * and operand isn't NULL */
+   * and operand isn't NULL
+   * and symbol isn't in codespace (codespace symbols are handled elsewhere) */
   if((PCOR(pcop)->r == NULL) 
-    && (op)) {
+    && (op)
+    && !IN_CODESPACE(SPEC_OCLS(OP_SYM_ETYPE(op)))) {
 //	fprintf(stderr, "%s:%d - couldn't find %s in allocated regsters, size= %d ofs= %d\n",
 //		__FUNCTION__, __LINE__, str, size, offset);
 
@@ -2167,6 +2203,7 @@ static void mov2f(asmop *dst, asmop *src, int offset)
     pic16_emitpcode(POC_MOVLW, pic16_popGet(src, offset));
     pic16_emitpcode(POC_MOVWF, pic16_popGet(dst, offset));
   } else {
+    if(pic16_sameRegsOfs(src, dst, offset))return;
     pic16_emitpcode(POC_MOVFF, pic16_popGet2p( pic16_popGet(src, offset),
                       pic16_popGet(dst, offset)));
   }
@@ -2991,6 +3028,7 @@ static void genCall (iCode *ic)
   sym_link *ftype;   
   int stackParms=0;
   int use_wreg=0;
+  char *fname;
   
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -3002,6 +3040,11 @@ static void genCall (iCode *ic)
 	/* initialise stackParms for IPUSH pushes */
 //	stackParms = psuedoStkPtr;
 //	fprintf(stderr, "%s:%d ic parmBytes = %d\n", __FILE__, __LINE__, ic->parmBytes);
+    fname = OP_SYMBOL(IC_LEFT(ic))->rname[0]?OP_SYMBOL(IC_LEFT(ic))->rname:OP_SYMBOL(IC_LEFT(ic))->name;
+
+#if 0
+    gpsimDebug_StackDump(__FILE__, __LINE__, fname );
+#endif
 
     /* if send set is not empty the assign */
     if (_G.sendSet) {
@@ -3026,9 +3069,11 @@ static void genCall (iCode *ic)
         }
 */
 
+
 //        stackParms = psuedoStkPtr;
         stackParms = 0;
-
+        use_wreg = 0;
+        
         for (sic = setFirstItem(_G.sendSet) ; sic ; sic = setNextItem(_G.sendSet)) {
           int size, offset = 0;
 
@@ -3062,56 +3107,56 @@ static void genCall (iCode *ic)
           }
 
           /* save last parameter to stack if functions has varargs */
-          if(IFFUNC_HASVARARGS(ftype))
-                  pushw();
-          else
-            use_wreg = 1;		/* last parameter in WREG */
+          if(IFFUNC_HASVARARGS(ftype))pushw();
+          else use_wreg = 1;		/* last parameter in WREG */
           
           _G.stackRegSet = _G.sendSet;
           _G.sendSet = NULL;
-      }
+    }
 
-      /* make the call */
-      pic16_emitpcode(POC_CALL,pic16_popGetWithString(OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
-                      OP_SYMBOL(IC_LEFT(ic))->rname :
-                      OP_SYMBOL(IC_LEFT(ic))->name));
+    /* make the call */
+    pic16_emitpcode(POC_CALL,pic16_popGetWithString(fname));
 
-      GpsuedoStkPtr=0;
-      /* if we need to assign a result value */
-      if ((IS_ITEMP(IC_RESULT(ic))
-            && (OP_SYMBOL(IC_RESULT(ic))->nRegs
-                || OP_SYMBOL(IC_RESULT(ic))->spildir ))
-          || IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
+    GpsuedoStkPtr=0;
+    /* if we need to assign a result value */
+    if ((IS_ITEMP(IC_RESULT(ic))
+          && (OP_SYMBOL(IC_RESULT(ic))->nRegs
+              || OP_SYMBOL(IC_RESULT(ic))->spildir ))
+        || IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
 
-        _G.accInUse++;
-        pic16_aopOp(IC_RESULT(ic),ic,FALSE);
-        _G.accInUse--;
+      _G.accInUse++;
+      pic16_aopOp(IC_RESULT(ic),ic,FALSE);
+      _G.accInUse--;
 
-        assignResultValue(IC_RESULT(ic), 1);
+      assignResultValue(IC_RESULT(ic), 1);
 
-        DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
-                  pic16_AopType(AOP_TYPE(IC_RESULT(ic))));
+      DEBUGpic16_emitcode ("; ","%d left %s",__LINE__,
+                pic16_AopType(AOP_TYPE(IC_RESULT(ic))));
 		
-        pic16_freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
-      }
+      pic16_freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
+    }
 
-      if(!stackParms && ic->parmBytes) {
-        stackParms = ic->parmBytes;
-      }
+    if(!stackParms && ic->parmBytes) {
+      stackParms = ic->parmBytes;
+    }
       
-      stackParms -= use_wreg;
+    stackParms -= use_wreg;
       
-      if(stackParms>0) {
-        pic16_emitpcode(POC_MOVLW, pic16_popGetLit(stackParms));
-        pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( &pic16_pc_fsr1l ));
-        if(STACK_MODEL_LARGE) {
-          emitSKPNC;
-          pic16_emitpcode(POC_INCF, pic16_popCopyReg( &pic16_pc_fsr1h ));
-        }
+    if(stackParms>0) {
+      pic16_emitpcode(POC_MOVLW, pic16_popGetLit(stackParms));
+      pic16_emitpcode(POC_ADDWF, pic16_popCopyReg( &pic16_pc_fsr1l ));
+      if(STACK_MODEL_LARGE) {
+        emitSKPNC;
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg( &pic16_pc_fsr1h ));
       }
+    }
 
-      /* adjust the stack for parameters if required */
-//      fprintf(stderr, "%s:%d: %s ic->parmBytes= %d\n", __FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name, ic->parmBytes);
+#if 0
+    gpsimDebug_StackDump(__FILE__, __LINE__, fname);
+#endif
+
+    /* adjust the stack for parameters if required */
+//    fprintf(stderr, "%s:%d: %s ic->parmBytes= %d\n", __FILE__, __LINE__, OP_SYMBOL(IC_LEFT(ic))->name, ic->parmBytes);
 
 #if 0
       /* if register bank was saved then pop them */
@@ -10016,9 +10061,9 @@ static void genGenPointerGet (operand *left,
 
     } else { /* we need to get it byte by byte */
 
-      /* set up WREG:FSR0H:FSR0L with address from left */
+      /* set up WREG:PRODL:FSR0L with address from left */
       pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),1), pic16_popCopyReg(&pic16_pc_fsr0h)));
+      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),1), pic16_popCopyReg(&pic16_pc_prodl)));
       pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 2));
       
       switch( size ) {
@@ -10041,6 +10086,7 @@ static void genGenPointerGet (operand *left,
           sym = newSymbol( fgptrget, 0 );
           strcpy(sym->rname, fgptrget);
           checkAddSym(&externs, sym);
+
 //          fprintf(stderr, "%s:%d adding extern symbol %s in externs\n", __FILE__, __LINE__, fgptrget);
       }
               
@@ -10875,7 +10921,7 @@ static void genGenPointerSet (operand *right,
 
 
     /* load value to write in TBLPTRH:TBLPTRL:PRODH:PRODL */
-    mov2fp(pic16_popCopyReg(&pic16_pc_prodl), AOP(right), 0);
+    mov2fp(pic16_popCopyReg(&pic16_pc_gptrreg), AOP(right), 0);
     if(size>1)mov2fp(pic16_popCopyReg(&pic16_pc_prodh), AOP(right), 1);
     if(size>2)mov2fp(pic16_popCopyReg(&pic16_pc_tblptrl), AOP(right), 2);
     if(size>3)mov2fp(pic16_popCopyReg(&pic16_pc_tblptrh), AOP(right), 3);
@@ -10884,7 +10930,7 @@ static void genGenPointerSet (operand *right,
     pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result), 0),
                                 pic16_popCopyReg(&pic16_pc_fsr0l)));
     pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(result), 1),
-                                pic16_popCopyReg(&pic16_pc_fsr0h)));
+                                pic16_popCopyReg(&pic16_pc_prodl)));
     pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(result), 2));
     
 
@@ -10892,6 +10938,7 @@ static void genGenPointerSet (operand *right,
     switch (size) {
       case 1: strcpy(fgptrput, "__gptrput1"); break;
       case 2: strcpy(fgptrput, "__gptrput2"); break;
+      case 3: strcpy(fgptrput, "__gptrput3"); break;
       case 4: strcpy(fgptrput, "__gptrput4"); break;
       default:
         werror(W_POSSBUG2, __FILE__, __LINE__);
@@ -10906,6 +10953,11 @@ static void genGenPointerSet (operand *right,
         sym = newSymbol( fgptrput, 0 );
         strcpy(sym->rname, fgptrput);
         checkAddSym(&externs, sym);
+
+	sym = newSymbol("__GPTRREG", 0);
+        strcpy(sym->rname, "__GPTRREG");
+        checkAddSym(&externs, sym);
+
 //          fprintf(stderr, "%s:%d adding extern symbol %s in externs\n", __FILE__, __LINE__, fgptrget);
     }
 
@@ -11149,8 +11201,11 @@ static void genAssign (iCode *ic)
   if (operandsEqu (IC_RESULT(ic),IC_RIGHT(ic)))
     return ;
 
-  pic16_aopOp(right,ic,FALSE);
+  /* reversed order operands are aopOp'ed so that result operand
+   * is effective in case right is a stack symbol. This maneauver
+   * allows to use the _G.resDirect flag later */
   pic16_aopOp(result,ic,TRUE);
+  pic16_aopOp(right,ic,FALSE);
 
   DEBUGpic16_pic16_AopType(__LINE__,NULL,right,result);
 
@@ -11317,32 +11372,15 @@ static void genAssign (iCode *ic)
 	pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right),offset));
 	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
     } else {
-  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+      DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
-#if 1
-	/* This is a hack to turn MOVFW/MOVWF pairs to MOVFF command. It
-	   normally should work, but mind that the W register live range
-	   is not checked, so if the code generator assumes that the W
-	   is already loaded after such a pair, wrong code will be generated.
-	   
-	   Checking the live range is the next step.
-	   This is experimental code yet and has not been fully tested yet.
-	   USE WITH CARE. Revert to old code by setting 0 to the condition above.
-	   Vangelis Rokas 030603 (vrokas@otenet.gr) */
-	   
-	pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset));
-#else	
-	/* This is the old code, which is assumed(?!) that works fine(!?) */
-
-	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right),offset));
-	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
-#endif
+      if(!_G.resDirect)		/* use this aopForSym feature */
+        pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset));
     }
 	    
     offset++;
   }
-
-    
+  
  release:
   pic16_freeAsmop (right,NULL,ic,FALSE);
   pic16_freeAsmop (result,NULL,ic,TRUE);
@@ -11800,9 +11838,7 @@ static void genCast (iCode *ic)
     size = AOP_SIZE(right);
     offset = 0 ;
     while (size--) {
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset));
-//      pic16_emitpcode(POC_MOVFW,   pic16_popGet(AOP(right),offset));
-//      pic16_emitpcode(POC_MOVWF,   pic16_popGet(AOP(result),offset));
+      mov2f(AOP(result), AOP(right), offset);
       offset++;
     }
 

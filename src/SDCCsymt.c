@@ -1031,24 +1031,25 @@ structElemType (sym_link * stype, value * id)
   sym_link *type, *etype;
   sym_link *petype = getSpec (stype);
 
-  if (!fields || !id)
-    return NULL;
+  if (fields && id) {
+    
+    /* look for the id */
+    while (fields)
+      {
+	if (strcmp (fields->rname, id->name) == 0)
+	  {
+	    type = copyLinkChain (fields->type);
+	    etype = getSpec (type);
+	    SPEC_SCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
+				 SPEC_SCLS (etype) : SPEC_SCLS (petype));
+	    return type;
+	  }
+	fields = fields->next;
+      }
+  }
 
-  /* look for the id */
-  while (fields)
-    {
-      if (strcmp (fields->rname, id->name) == 0)
-	{
-	  type = copyLinkChain (fields->type);
-	  etype = getSpec (type);
-	  SPEC_SCLS (etype) = (SPEC_SCLS (petype) == S_REGISTER ?
-			       SPEC_SCLS (etype) : SPEC_SCLS (petype));
-	  return type;
-	}
-      fields = fields->next;
-    }
   werror (E_NOT_MEMBER, id->name);
-
+    
   // the show must go on
   return newIntLink();
 }

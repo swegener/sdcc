@@ -4156,7 +4156,8 @@ genMinus (iCode * ic)
   aopOp (IC_RIGHT (ic), ic, FALSE, 
 	 (AOP_INDPTRn(IC_LEFT(ic)) ? FALSE : (AOP_USESDPTR(IC_LEFT(ic)) ? TRUE : FALSE)));
   if ((AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR) &&
-      (AOP_TYPE (IC_RIGHT (ic)) == AOP_DPTR2))
+      ((AOP_TYPE (IC_RIGHT (ic)) == AOP_DPTR2)
+       || OP_SYMBOL(IC_RESULT(ic))->ruonly))
     {
       pushResult = TRUE;
     }

@@ -2634,11 +2634,12 @@ sbit at 0xAF EEA	;
 sfr at 0xA8 IE;
 sbit at 0xA8 EX0;
 sbit at 0xA9 ET0;
-sbit at 0xAA ET1;
-sbit at 0xAB ES;
-sbit at 0xAC ET2;
-sbit at 0xAD EC;
-sbit at 0xAE EA;
+sbit at 0xAA EX1;
+sbit at 0xAB ET1;
+sbit at 0xAC ES;
+sbit at 0xAD ET2;
+sbit at 0xAE EC;
+sbit at 0xAF EA;
 #endif
 
 #ifdef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0

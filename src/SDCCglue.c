@@ -400,7 +400,7 @@ printChar (FILE * ofile, char *s, int plen)
 	      *p = '\0';
 	      if (p != buf)
 		tfprintf (ofile, "\t!ascii\n", buf);
-	      tfprintf (ofile, "\t!db !constbyte\n", *s);
+	      tfprintf (ofile, "\t!db !constbyte\n", (unsigned char)*s);
 	      p = buf;
 	    }
 	  else

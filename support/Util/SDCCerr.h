@@ -152,6 +152,8 @@ SDCCERR - SDCC Standard error handler
 #define	 W_BANKED_WITH_NONBANKED 134	/* banked and nonbanked attributes mixed */
 #define	 W_BANKED_WITH_STATIC 135	/* banked and static mixed */
 #define  W_INT_TO_GEN_PTR_CAST 136	/* Converting integer type to generic pointer. */
+#define  W_ESC_SEQ_OOR_FOR_CHAR 137     /* Escape sequence of of range for char */
+#define  E_INVALID_HEX 138              /* \x used with no following hex digits */
 
 /** Describes the maximum error level that will be logged.  Any level
     includes all of the levels listed after it.

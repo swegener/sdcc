@@ -186,7 +186,9 @@ struct  {
 { WARNING,"warning *** Model '%s' not supported for %s, ignored.\n"},
 { WARNING,"warning *** Both banked and nonbanked attributes used.  nonbanked wins.\n"},
 { WARNING,"warning *** Both banked and static used.  static wins.\n"},
-{ WARNING,"warning *** converting integer type to generic pointer: assuming XDATA\n"}
+{ WARNING,"warning *** converting integer type to generic pointer: assuming XDATA\n"},
+{ WARNING,"warning *** escape sequence out of range for char.\n"},
+{ ERROR  ,"error   *** \\x used with no following hex digits.\n"}
 };
 /*
 -------------------------------------------------------------------------------

@@ -335,12 +335,38 @@ constVal (char *s)
 }
 
 /*------------------------------------------------------------------*/
+/* octalEscape - process an octal constant of max three digits      */
+/* return the octal value, throw a warning for illegal octal        */
+/* adjust src to point at the last proccesed char                   */
+/*------------------------------------------------------------------*/
+
+char octalEscape (char **str) {
+  int digits;
+  unsigned value=0;
+
+  for (digits=0; digits<3; digits++) {
+    if (**str>='0' && **str<='7') {
+      value = value*8 + (**str-'0');
+      (*str)++;
+    } else {
+      break;
+    }
+  }
+  if (digits) {
+    if (value > 255 /* || (**str>='0' && **str<='7') */ ) {
+      werror (W_ESC_SEQ_OOR_FOR_CHAR);
+    }
+    (*str)--;
+  }
+  return value;
+}
+
+/*------------------------------------------------------------------*/
 /* copyStr - copies src to dest ignoring leading & trailing \"s     */
 /*------------------------------------------------------------------*/
 void 
 copyStr (char *dest, char *src)
 {
-  unsigned int x;
   while (*src)
     {
       if (*src == '\"')
@@ -371,21 +397,35 @@ copyStr (char *dest, char *src)
 	    case 'a':
 	      *dest++ = '\a';
 	      break;
+
 	    case '0':
-	      /* embedded octal or hex constant */
-	      if (*(src + 1) == 'x' ||
-		  *(src + 1) == 'X')
-		{
-		  x = strtol (src, &src, 16);
-		  *dest++ = x;
-		}
-	      else
-		{
-		  /* must be octal */
-		  x = strtol (src, &src, 8);
-		  *dest++ = x;
-		}
+	    case '1':
+	    case '2':
+	    case '3':
+	    case '4':
+	    case '5':
+	    case '6':
+	    case '7':
+	      *dest++ = octalEscape(&src);
 	      break;
+
+	    case 'x': {
+	      char *s=++src;
+	      unsigned long value=strtol (src, &src, 16);
+
+	      if (s==src) {
+		// no valid hex found
+		werror(E_INVALID_HEX);
+	      } else {
+		if (value>255) {
+		  werror(W_ESC_SEQ_OOR_FOR_CHAR);
+		} else {
+		  *dest++ = value;
+		}
+		src--;
+	      }
+	      break;
+	    }
 
 	    case '\\':
 	      *dest++ = '\\';

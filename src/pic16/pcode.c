@@ -3446,7 +3446,8 @@ pCode *pic16_newpCodeFunction(char *mod,char *f)
   pcf->pc.print = pCodePrintFunction;
 
   pcf->ncalled = 0;
-
+  pcf->absblock = 0;
+  
   if(mod) {
     pcf->modname = Safe_calloc(1,strlen(mod)+1);
     strcpy(pcf->modname,mod);
@@ -3847,6 +3848,35 @@ pCodeOp *pic16_newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
+pCodeOp *pic16_newpCodeOpWild2(int id, int id2, pCodeWildBlock *pcwb, pCodeOp *subtype, pCodeOp *subtype2)
+{
+  char *s = buffer;
+  pCodeOp *pcop;
+
+
+  if(!pcwb || !subtype || !subtype2) {
+    fprintf(stderr, "Wild opcode declaration error: %s-%d\n",__FILE__,__LINE__);
+    exit(1);
+  }
+
+  pcop = Safe_calloc(1,sizeof(pCodeOpWild));
+  pcop->type = PO_WILD;
+  sprintf(s,"%%%d",id);
+  pcop->name = Safe_strdup(s);
+
+  PCOW(pcop)->id = id;
+  PCOW(pcop)->pcwb = pcwb;
+  PCOW(pcop)->subtype = subtype;
+  PCOW(pcop)->matched = NULL;
+
+  PCOW(pcop)->id2 = id2;
+  PCOW(pcop)->subtype2 = subtype2;
+
+  return pcop;
+}
+
+/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace)
 {
   pCodeOp *pcop;
@@ -3909,7 +3939,7 @@ pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
   regs *r;
 
 	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
-	PCOR(pcop)->r = r = pic16_allocRegByName(name, 1);
+	PCOR(pcop)->r = r = pic16_allocRegByName(name, 1, NULL);
 	PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
 	pcop->type = PCOR(pcop)->r->pc_type;
 	pcop->name = PCOR(pcop)->r->name;
@@ -3974,6 +4004,7 @@ typedef struct DBdata
 
 struct DBdata DBd;
 static int DBd_init = -1;
+static int DB_prev = -1;
 
 /*-----------------------------------------------------------------*/
 /*    Add "DB" directives to a pBlock                              */
@@ -3981,33 +4012,52 @@ static int DBd_init = -1;
 void pic16_emitDB(pBlock *pb, char c)
 {
   int l;
-  if (DBd_init<0) // we need to initialize
-    {
-      DBd_init = 0;
-      DBd.count = 0;
-      DBd.buffer[0] = '\0';
-    }
+  char *frm, tbuf[8];;
+  char frm_alnum[]="%c";
+  char frm_other[]="0x%02x";
 
-  l = strlen(DBd.buffer);
 
-  if (DBd.count>0)
-    {
-      sprintf(DBd.buffer+l,", 0x%02x", c & 0xff);
-    }
-  else
-    {
-      sprintf(DBd.buffer,"0x%02x", c & 0xff);
-    }
-   
-  DBd.count++;
+	if (DBd_init<0) {
+	 // we need to initialize
+		DBd_init = 0;
+		DBd.count = 0;
+		DBd.buffer[0] = '\0';
+	}
 
-  if (DBd.count>=16)
-    {
-       pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
-       DBd.count = 0;
-       DBd.buffer[0] = '\0';
-    }
-   
+	l = strlen(DBd.buffer);
+
+	if(isprint( c ))frm = frm_alnum;
+	else frm = frm_other;
+	sprintf(tbuf, frm, c & 0xff);
+	
+	if(!isprint(DB_prev)) {
+		if(isprint(c))
+			if(DBd.count)strcat(DBd.buffer, ", \"");
+			else strcat(DBd.buffer, "\"");
+		else if(DBd.count) strcat(DBd.buffer, ", ");
+	} else
+		if(!isprint(c))strcat(DBd.buffer, "\", ");
+	
+	strcat(DBd.buffer, tbuf);
+
+#if 0		
+	if (DBd.count>0) {
+		sprintf(DBd.buffer+l,", 0x%02x", c & 0xff);
+	} else {
+		sprintf(DBd.buffer,"0x%02x", c & 0xff);
+	}
+#endif
+
+	DBd.count++;
+	DB_prev = c;
+	
+	if (DBd.count>=16) {
+		if(isprint(c))strcat(DBd.buffer, "\"");
+		pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
+		DBd.count = 0;
+		DBd.buffer[0] = '\0';
+		DB_prev = 0;
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -4017,6 +4067,7 @@ void pic16_flushDB(pBlock *pb)
 {
   if (DBd.count>0)
     {
+       if(isprint(DB_prev))strcat(DBd.buffer, "\"");
        pic16_addpCode2pBlock(pb,pic16_newpCodeAsmDir("DB", "%s", DBd.buffer));
        DBd.count = 0;
        DBd.buffer[0] = '\0';
@@ -4194,7 +4245,7 @@ void pic16_printpBlock(FILE *of, pBlock *pb)
 			  absSym *ab;
 				for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet)) {
 					if(!strcmp(ab->name, PCF(pc)->fname)) {
-						fprintf(of, "\t0X%06X\n", ab->address);
+						fprintf(of, "\t0X%06X", ab->address);
 						break;
 					}
 				}
@@ -4483,7 +4534,7 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 /*-----------------------------------------------------------------*/
 /* pic16_pCode2str - convert a pCode instruction to string               */
 /*-----------------------------------------------------------------*/
-static char *pic16_pCode2str(char *str, size_t size, pCode *pc)
+char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 {
   char *s = str;
   regs *r;
@@ -4715,28 +4766,30 @@ static void pCodePrintFunction(FILE *of, pCode *pc)
     fprintf(of,"F_%s",((pCodeFunction *)pc)->modname);
 #endif
 
-  if(PCF(pc)->fname) {
-    pBranch *exits = PCF(pc)->to;
-    int i=0;
-    fprintf(of,"%s", PCF(pc)->fname);
-    
-//    	if(pic16_pcode_verbose)
-    		fprintf(of, "\t;Function start");
-    
-    fprintf(of, "\n");
-    
-    while(exits) {
-      i++;
-      exits = exits->next;
-    }
-    //if(i) i--;
+  if(!PCF(pc)->absblock) {
+      if(PCF(pc)->fname) {
+      pBranch *exits = PCF(pc)->to;
+      int i=0;
 
-	if(pic16_pcode_verbose)
-		fprintf(of,"; %d exit point%c\n",i, ((i==1) ? ' ':'s'));
+      fprintf(of,"%s:", PCF(pc)->fname);
     
-  } else {
-	if((PCF(pc)->from && 
-		PCF(pc)->from->pc->type == PC_FUNCTION &&
+      if(pic16_pcode_verbose)
+        fprintf(of, "\t;Function start");
+    
+      fprintf(of, "\n");
+    
+      while(exits) {
+        i++;
+        exits = exits->next;
+      }
+      //if(i) i--;
+
+      if(pic16_pcode_verbose)
+        fprintf(of,"; %d exit point%c\n",i, ((i==1) ? ' ':'s'));
+    
+    } else {
+  	if((PCF(pc)->from && 
+  		PCF(pc)->from->pc->type == PC_FUNCTION &&
 		PCF(PCF(pc)->from->pc)->fname) ) {
 
 		if(pic16_pcode_verbose)
@@ -4746,6 +4799,7 @@ static void pCodePrintFunction(FILE *of, pCode *pc)
 			fprintf(of,"; exit point [can't find entry point]\n");
 	}
 	fprintf(of, "\n");
+    }
   }
 }
 /*-----------------------------------------------------------------*/
@@ -5747,8 +5801,10 @@ static void LinkFlow(pBlock *pb)
 		/* continue if label is '$' which assembler knows how to parse */
 		if(((PCI(pc)->pcop->type == PO_STR) && !strcmp(PCI(pc)->pcop->name, "$")))continue;
 
-		pc->print(stderr,pc);
-		fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
+		if(pic16_pcode_verbose) {
+			pc->print(stderr,pc);
+			fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
+		}
 	}
 	continue;
       }
@@ -5808,56 +5864,50 @@ int pic16_isPCinFlow(pCode *pc, pCode *pcflow)
 
 
 /*-----------------------------------------------------------------*/
-/* insertBankSwitch - inserts a bank switch statement in the assembly listing */
+/* insertBankSwitch - inserts a bank switch statement in the       */
+/*                    assembly listing                             */
+/*                                                                 */
+/* position == 0: insert before                                    */
+/* position == 1: insert after pc                                  */
+/* position == 2: 0 previous was a skip instruction                */
 /*-----------------------------------------------------------------*/
-static void insertBankSwitch(int position, pCode *pc, int bsr)
+static void insertBankSwitch(int position, pCode *pc)
 {
   pCode *new_pc;
   regs *reg;
 
-  if(!pc)
-    return;
-
-/*
- * if bsr == -1 then do not insert a MOVLB instruction, but rather
- * insert a BANKSEL assembler directive for the symbol used by
- * the pCode. This will allow the linker to setup the correct
- * bank at linking time
- */
-
-	if(pic16_options.no_banksel || bsr != -1) {
-//		new_pc = pic16_newpCode(POC_MOVLB, pic16_newpCodeOpLit(bsr));
+	if(!pc)
 		return;
-	} else {
-		/* emit the BANKSEL [symbol] */
 
-		/* FIXME */
-		/* IMPORTANT: The following code does not check if a symbol is
-		 * split in multiple banks. This should be corrected. - VR 6/6/2003 */
+	/* emit BANKSEL [symbol] */
 
-		reg = pic16_getRegFromInstruction(pc);
-		if(!reg)return;
-		new_pc = pic16_newpCodeAsmDir("BANKSEL", "%s", pic16_get_op_from_instruction(PCI(pc)));
-		
-		position = 0;		// position is always before (sanity check!)
-	}
+	reg = pic16_getRegFromInstruction(pc);
+	if(!reg)return;
+	new_pc = pic16_newpCodeAsmDir("BANKSEL", "%s", pic16_get_op_from_instruction(PCI(pc)));
+	
+//	position = 0;		// position is always before (sanity check!)
 
 #if 0
 	fprintf(stderr, "%s:%d: inserting bank switch\tbank = %d\n", __FUNCTION__, __LINE__, bsr);
 	pc->print(stderr, pc);
 #endif
 
-	if(position) {
-		/* insert the bank switch after this pc instruction */
-		pCode *pcnext = pic16_findNextInstruction(pc);
-		pic16_pCodeInsertAfter(pc, new_pc);
-		if(pcnext)
-			pc = pcnext;
+	switch(position) {
+		case 1: {
+			/* insert the bank switch after this pc instruction */
+			pCode *pcnext = pic16_findNextInstruction(pc);
+			pic16_pCodeInsertAfter(pc, new_pc);
+			if(pcnext)pc = pcnext;
+		}; break;
+		
+		case 0:
+			/* insert the bank switch BEFORE this pc instruction */
+			pic16_pCodeInsertAfter(pc->prev, new_pc);
+			break;
+	}
+	
 
-	} else
-		pic16_pCodeInsertAfter(pc->prev, new_pc);
-
-  /* Move the label, if there is one */
+	/* Move the label, if there is one */
 
 	if(PCI(pc)->label) {
 //		fprintf(stderr, "%s:%d: moving label due to bank switch directive src= 0x%p dst= 0x%p\n",
@@ -6202,6 +6252,7 @@ void pic16_pBlockMergeLabels(pBlock *pb)
 	PCI(pcnext)->label = pic16_pBranchAppend(PCI(pcnext)->label,pbr);
 #endif
       } else {
+	if(pic16_pcode_verbose)
 	fprintf(stderr, "WARNING: couldn't associate label %s with an instruction\n",PCL(pc)->label);
       }
     } else if(pc->type == PC_CSOURCE) {
@@ -6340,7 +6391,8 @@ static void pic16_FixRegisterBanking(pBlock *pb)
 			 * before SKIP, but we have to check if the SKIP uses BANKSEL, etc... */
 			if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
 				prevreg = reg;
-				insertBankSwitch(0, pc, (pic16_options.no_banksel)?0:-1);
+				if(!pic16_options.no_banksel)
+					insertBankSwitch(0, pc);
 			}
 		}
 

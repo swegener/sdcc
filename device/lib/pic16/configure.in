@@ -1,0 +1,41 @@
+#
+# configure.in - input script to autoconf to
+#                configure directory
+#
+# This file is part of the GNU PIC Library.
+#
+# January, 2004
+# The GNU PIC Library is maintained by,
+# 	Vangelis Rokas <vrokas@otenet.gr>
+#
+# $Id$
+#
+
+# Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.57)
+AC_INIT
+
+#AC_DEFUN(AC_CONFIG_SRCDIR)
+#AC_DEFUN(AC_CONFIG_FILES)
+
+# Checks for programs.
+AC_CHECK_PROG(GPASM,	gpasm,	gpasm, :)
+AC_CHECK_PROG(GPLINK,	gplink,	gplink, :)
+AC_CHECK_PROG(GPLIB,	gplib,	gplib, :)
+
+AC_CHECK_PROG(RM,	rm,	rm, :)
+AC_CHECK_PROG(CP,	cp,	cp, :)
+AC_CHECK_PROG(MV,	mv,	mv, :)
+AC_CHECK_PROG(LS,	ls,	ls, :)
+AC_CHECK_PROG(SED,	sed,	sed, :)
+
+# Checks for libraries.
+
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+AC_CONFIG_FILES([Makefile.common])
+AC_OUTPUT

@@ -1,6 +1,6 @@
 
 /*
- * pic18f242.h - 18F242 Device Library Header
+ * pic18f242.h - PIC18F242 Device Library Header
  *
  * This file is part of the GNU PIC Library.
  *
@@ -60,9 +60,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} PORTAbits_t;
+} __PORTAbits_t;
 
-extern volatile PORTAbits_t at 0xf80 PORTAbits;
+extern volatile __PORTAbits_t at 0xf80 PORTAbits;
 
 extern sfr at 0xf81 PORTB;
 typedef union {
@@ -87,9 +87,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} PORTBbits_t;
+} __PORTBbits_t;
 
-extern volatile PORTBbits_t at 0xf81 PORTBbits;
+extern volatile __PORTBbits_t at 0xf81 PORTBbits;
 
 extern sfr at 0xf82 PORTC;
 typedef union {
@@ -125,9 +125,9 @@ typedef union {
 		unsigned CK:1;
 		unsigned DT:1;
 	};
-} PORTCbits_t;
+} __PORTCbits_t;
 
-extern volatile PORTCbits_t at 0xf82 PORTCbits;
+extern volatile __PORTCbits_t at 0xf82 PORTCbits;
 
 extern sfr at 0xf89 LATA;
 typedef union {
@@ -141,9 +141,9 @@ typedef union {
 		unsigned LATA6:1;
 		unsigned :1;
 	};
-} LATAbits_t;
+} __LATAbits_t;
 
-extern volatile LATAbits_t at 0xf89 LATAbits;
+extern volatile __LATAbits_t at 0xf89 LATAbits;
 
 extern sfr at 0xf8a LATB;
 typedef union {
@@ -157,9 +157,9 @@ typedef union {
 		unsigned LATB6:1;
 		unsigned LATB7:1;
 	};
-} LATBbits_t;
+} __LATBbits_t;
 
-extern volatile LATBbits_t at 0xf8a LATBbits;
+extern volatile __LATBbits_t at 0xf8a LATBbits;
 
 extern sfr at 0xf8b LATC;
 typedef union {
@@ -173,9 +173,9 @@ typedef union {
 		unsigned LATC6:1;
 		unsigned LATC7:1;
 	};
-} LATCbits_t;
+} __LATCbits_t;
 
-extern volatile LATCbits_t at 0xf8b LATCbits;
+extern volatile __LATCbits_t at 0xf8b LATCbits;
 
 extern sfr at 0xf92 TRISA;
 typedef union {
@@ -189,9 +189,9 @@ typedef union {
 		unsigned TRISA6:1;
 		unsigned :1;
 	};
-} TRISAbits_t;
+} __TRISAbits_t;
 
-extern volatile TRISAbits_t at 0xf92 TRISAbits;
+extern volatile __TRISAbits_t at 0xf92 TRISAbits;
 
 extern sfr at 0xf93 TRISB;
 typedef union {
@@ -205,9 +205,9 @@ typedef union {
 		unsigned TRISB6:1;
 		unsigned TRISB7:1;
 	};
-} TRISBbits_t;
+} __TRISBbits_t;
 
-extern volatile TRISBbits_t at 0xf93 TRISBbits;
+extern volatile __TRISBbits_t at 0xf93 TRISBbits;
 
 extern sfr at 0xf94 TRISC;
 typedef union {
@@ -221,9 +221,9 @@ typedef union {
 		unsigned TRISC6:1;
 		unsigned TRISC7:1;
 	};
-} TRISCbits_t;
+} __TRISCbits_t;
 
-extern volatile TRISCbits_t at 0xf94 TRISCbits;
+extern volatile __TRISCbits_t at 0xf94 TRISCbits;
 
 extern sfr at 0xf9d PIE1;
 typedef union {
@@ -237,9 +237,9 @@ typedef union {
 		unsigned ADIE:1;
 		unsigned PSPIE:1;
 	};
-} PIE1bits_t;
+} __PIE1bits_t;
 
-extern volatile PIE1bits_t at 0xf9d PIE1bits;
+extern volatile __PIE1bits_t at 0xf9d PIE1bits;
 
 extern sfr at 0xf9e PIR1;
 typedef union {
@@ -253,9 +253,9 @@ typedef union {
 		unsigned ADIF:1;
 		unsigned PSPIF:1;
 	};
-} PIR1bits_t;
+} __PIR1bits_t;
 
-extern volatile PIR1bits_t at 0xf9e PIR1bits;
+extern volatile __PIR1bits_t at 0xf9e PIR1bits;
 
 extern sfr at 0xf9f IPR1;
 typedef union {
@@ -269,9 +269,9 @@ typedef union {
 		unsigned ADIP:1;
 		unsigned PSPIP:1;
 	};
-} IPR1bits_t;
+} __IPR1bits_t;
 
-extern volatile IPR1bits_t at 0xf9f IPR1bits;
+extern volatile __IPR1bits_t at 0xf9f IPR1bits;
 
 extern sfr at 0xfa0 PIE2;
 typedef union {
@@ -285,9 +285,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} PIE2bits_t;
+} __PIE2bits_t;
 
-extern volatile PIE2bits_t at 0xfa0 PIE2bits;
+extern volatile __PIE2bits_t at 0xfa0 PIE2bits;
 
 extern sfr at 0xfa1 PIR2;
 typedef union {
@@ -301,9 +301,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} PIR2bits_t;
+} __PIR2bits_t;
 
-extern volatile PIR2bits_t at 0xfa1 PIR2bits;
+extern volatile __PIR2bits_t at 0xfa1 PIR2bits;
 
 extern sfr at 0xfa2 IPR2;
 typedef union {
@@ -317,9 +317,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} IPR2bits_t;
+} __IPR2bits_t;
 
-extern volatile IPR2bits_t at 0xfa2 IPR2bits;
+extern volatile __IPR2bits_t at 0xfa2 IPR2bits;
 
 extern sfr at 0xfa6 EECON1;
 typedef union {
@@ -333,9 +333,9 @@ typedef union {
 		unsigned CFGS:1;
 		unsigned EEPGD:1;
 	};
-} EECON1bits_t;
+} __EECON1bits_t;
 
-extern volatile EECON1bits_t at 0xfa6 EECON1bits;
+extern volatile __EECON1bits_t at 0xfa6 EECON1bits;
 
 extern sfr at 0xfa7 EECON2;
 extern sfr at 0xfa8 EEDATA;
@@ -352,9 +352,9 @@ typedef union {
 		unsigned RX9:1;
 		unsigned SPEN:1;
 	};
-} RCSTAbits_t;
+} __RCSTAbits_t;
 
-extern volatile RCSTAbits_t at 0xfab RCSTAbits;
+extern volatile __RCSTAbits_t at 0xfab RCSTAbits;
 
 extern sfr at 0xfac TXSTA;
 typedef union {
@@ -368,9 +368,9 @@ typedef union {
 		unsigned TX9:1;
 		unsigned CSRC:1;
 	};
-} TXSTAbits_t;
+} __TXSTAbits_t;
 
-extern volatile TXSTAbits_t at 0xfac TXSTAbits;
+extern volatile __TXSTAbits_t at 0xfac TXSTAbits;
 
 extern sfr at 0xfad TXREG;
 extern sfr at 0xfae RCREG;
@@ -387,9 +387,9 @@ typedef union {
 		unsigned T3CCP2:1;
 		unsigned RD16:1;
 	};
-} T3CONbits_t;
+} __T3CONbits_t;
 
-extern volatile T3CONbits_t at 0xfb1 T3CONbits;
+extern volatile __T3CONbits_t at 0xfb1 T3CONbits;
 
 extern sfr at 0xfb2 TMR3L;
 extern sfr at 0xfb3 TMR3H;
@@ -405,9 +405,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} CCP2CONbits_t;
+} __CCP2CONbits_t;
 
-extern volatile CCP2CONbits_t at 0xfba CCP2CONbits;
+extern volatile __CCP2CONbits_t at 0xfba CCP2CONbits;
 
 extern sfr at 0xfbb CCPR2L;
 extern sfr at 0xfbc CCPR2H;
@@ -423,9 +423,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} CCP1CONbits_t;
+} __CCP1CONbits_t;
 
-extern volatile CCP1CONbits_t at 0xfbd CCP1CONbits;
+extern volatile __CCP1CONbits_t at 0xfbd CCP1CONbits;
 
 extern sfr at 0xfbe CCPR1L;
 extern sfr at 0xfbf CCPR1H;
@@ -441,9 +441,9 @@ typedef union {
 		unsigned ADCS2:1;
 		unsigned ADFM:1;
 	};
-} ADCON1bits_t;
+} __ADCON1bits_t;
 
-extern volatile ADCON1bits_t at 0xfc1 ADCON1bits;
+extern volatile __ADCON1bits_t at 0xfc1 ADCON1bits;
 
 extern sfr at 0xfc2 ADCON0;
 typedef union {
@@ -457,9 +457,9 @@ typedef union {
 		unsigned ADCS0:1;
 		unsigned ADCS1:1;
 	};
-} ADCON0bits_t;
+} __ADCON0bits_t;
 
-extern volatile ADCON0bits_t at 0xfc2 ADCON0bits;
+extern volatile __ADCON0bits_t at 0xfc2 ADCON0bits;
 
 extern sfr at 0xfc3 ADRESL;
 extern sfr at 0xfc4 ADRESH;
@@ -475,9 +475,9 @@ typedef union {
 		unsigned ACKSTAT:1;
 		unsigned GCEN:1;
 	};
-} SSPCON2bits_t;
+} __SSPCON2bits_t;
 
-extern volatile SSPCON2bits_t at 0xfc5 SSPCON2bits;
+extern volatile __SSPCON2bits_t at 0xfc5 SSPCON2bits;
 
 extern sfr at 0xfc6 SSPCON1;
 typedef union {
@@ -491,9 +491,9 @@ typedef union {
 		unsigned SSPOV:1;
 		unsigned WCOL:1;
 	};
-} SSPCON1bits_t;
+} __SSPCON1bits_t;
 
-extern volatile SSPCON1bits_t at 0xfc6 SSPCON1bits;
+extern volatile __SSPCON1bits_t at 0xfc6 SSPCON1bits;
 
 extern sfr at 0xfc7 SSPSTAT;
 typedef union {
@@ -507,9 +507,9 @@ typedef union {
 		unsigned CKE:1;
 		unsigned SMP:1;
 	};
-} SSPSTATbits_t;
+} __SSPSTATbits_t;
 
-extern volatile SSPSTATbits_t at 0xfc7 SSPSTATbits;
+extern volatile __SSPSTATbits_t at 0xfc7 SSPSTATbits;
 
 extern sfr at 0xfc8 SSPADD;
 extern sfr at 0xfc9 SSPBUF;
@@ -525,9 +525,9 @@ typedef union {
 		unsigned TOUTPS3:1;
 		unsigned :1;
 	};
-} T2CONbits_t;
+} __T2CONbits_t;
 
-extern volatile T2CONbits_t at 0xfca T2CONbits;
+extern volatile __T2CONbits_t at 0xfca T2CONbits;
 
 extern sfr at 0xfcb PR2;
 extern sfr at 0xfcc TMR2;
@@ -543,9 +543,9 @@ typedef union {
 		unsigned :1;
 		unsigned RD16:1;
 	};
-} T1CONbits_t;
+} __T1CONbits_t;
 
-extern volatile T1CONbits_t at 0xfcd T1CONbits;
+extern volatile __T1CONbits_t at 0xfcd T1CONbits;
 
 extern sfr at 0xfce TMR1L;
 extern sfr at 0xfcf TMR1H;
@@ -561,9 +561,9 @@ typedef union {
 		unsigned :1;
 		unsigned IPEN:1;
 	};
-} RCONbits_t;
+} __RCONbits_t;
 
-extern volatile RCONbits_t at 0xfd0 RCONbits;
+extern volatile __RCONbits_t at 0xfd0 RCONbits;
 
 extern sfr at 0xfd1 WDTCON;
 typedef union {
@@ -588,9 +588,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} WDTCONbits_t;
+} __WDTCONbits_t;
 
-extern volatile WDTCONbits_t at 0xfd1 WDTCONbits;
+extern volatile __WDTCONbits_t at 0xfd1 WDTCONbits;
 
 extern sfr at 0xfd2 LVDCON;
 typedef union {
@@ -615,9 +615,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} LVDCONbits_t;
+} __LVDCONbits_t;
 
-extern volatile LVDCONbits_t at 0xfd2 LVDCONbits;
+extern volatile __LVDCONbits_t at 0xfd2 LVDCONbits;
 
 extern sfr at 0xfd3 OSCCON;
 typedef union {
@@ -631,9 +631,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} OSCCONbits_t;
+} __OSCCONbits_t;
 
-extern volatile OSCCONbits_t at 0xfd3 OSCCONbits;
+extern volatile __OSCCONbits_t at 0xfd3 OSCCONbits;
 
 extern sfr at 0xfd5 T0CON;
 extern sfr at 0xfd6 TMR0L;
@@ -650,9 +650,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} STATUSbits_t;
+} __STATUSbits_t;
 
-extern volatile STATUSbits_t at 0xfd8 STATUSbits;
+extern volatile __STATUSbits_t at 0xfd8 STATUSbits;
 
 extern sfr at 0xfd9 FSR2L;
 extern sfr at 0xfda FSR2H;
@@ -700,9 +700,9 @@ typedef union {
 		unsigned INT1IP:1;
 		unsigned INT2IP:1;
 	};
-} INTCON3bits_t;
+} __INTCON3bits_t;
 
-extern volatile INTCON3bits_t at 0xff0 INTCON3bits;
+extern volatile __INTCON3bits_t at 0xff0 INTCON3bits;
 
 extern sfr at 0xff1 INTCON2;
 typedef union {
@@ -716,9 +716,9 @@ typedef union {
 		unsigned INTEDG0:1;
 		unsigned RBPU:1;
 	};
-} INTCON2bits_t;
+} __INTCON2bits_t;
 
-extern volatile INTCON2bits_t at 0xff1 INTCON2bits;
+extern volatile __INTCON2bits_t at 0xff1 INTCON2bits;
 
 extern sfr at 0xff2 INTCON;
 typedef union {
@@ -732,9 +732,9 @@ typedef union {
 		unsigned PEIE:1;
 		unsigned GIE:1;
 	};
-} INTCONbits_t;
+} __INTCONbits_t;
 
-extern volatile INTCONbits_t at 0xff2 INTCONbits;
+extern volatile __INTCONbits_t at 0xff2 INTCONbits;
 
 extern sfr at 0xff3 PRODL;
 extern sfr at 0xff4 PRODH;
@@ -757,14 +757,135 @@ typedef union {
 		unsigned STKUNF:1;
 		unsigned STKFUL:1;
 	};
-} STKPTRbits_t;
+} __STKPTRbits_t;
 
-extern volatile STKPTRbits_t at 0xffc STKPTRbits;
+extern volatile __STKPTRbits_t at 0xffc STKPTRbits;
 
 extern sfr at 0xffd TOSL;
 extern sfr at 0xffe TOSH;
 extern sfr at 0xfff TOSU;
 
 
-#endif
+/* Configuration registers locations */
+#define __CONFIG0H	0x300001
+#define __CONFIG1L	0x300002
+#define __CONFIG1H	0x300003
+#define __CONFIG2H	0x300005
+#define __CONFIG3L	0x300006
+#define __CONFIG4L	0x300008
+#define __CONFIG4H	0x300009
+#define __CONFIG5L	0x30000A
+#define __CONFIG5H	0x30000B
+#define __CONFIG6L	0x30000C
+#define __CONFIG6H	0x30000D
 
+
+
+/* Oscillator 0H options */
+#define _OSC_RC_OSC2_0H	0xFF	/* RC-OSC2 as RA6 */
+#define _OSC_HS_PLL_0H	0xFE	/* HS-PLL Enabled */
+#define _OSC_EC_OSC2_RA6_0H	0xFD	/* EC-OSC2 as RA6 */
+#define _OSC_EC_OSC2_Clock_Out_0H	0xFC	/* EC-OSC2 as Clock_Out */
+#define _OSC_RC_0H	0xFB	/* RC */
+#define _OSC_HS_0H	0xFA	/* HS */
+#define _OSC_XT_0H	0xF9	/* XT */
+#define _OSC_LP_0H	0xF8	/* LP */
+
+/* Osc. Switch Enable 0H options */
+#define _OSCS_OFF_0H	0xFF	/* Disabled */
+#define _OSCS_ON_0H	0xDF	/* Enabled */
+
+/* Power Up Timer 1L options */
+#define _PUT_OFF_1L	0xFF	/* Disabled */
+#define _PUT_ON_1L	0xFE	/* Enabled */
+
+/* Brown Out Detect 1L options */
+#define _BODEN_ON_1L	0xFF	/* Enabled */
+#define _BODEN_OFF_1L	0xFD	/* Disabled */
+
+/* Brown Out Voltage 1L options */
+#define _BODENV_2_0V_1L	0xFF	/* 2.0V */
+#define _BODENV_2_7V_1L	0xFB	/* 2.7V */
+#define _BODENV_4_2V_1L	0xF7	/* 4.2V */
+#define _BODENV_4_5V_1L	0xF3	/* 4.5V */
+
+/* Watchdog Timer 1H options */
+#define _WDT_ON_1H	0xFF	/* Enabled */
+#define _WDT_OFF_1H	0xFE	/* Disabled */
+
+/* Watchdog Postscaler 1H options */
+#define _WDTPS_1_128_1H	0xFF	/* 1:128 */
+#define _WDTPS_1_64_1H	0xFD	/* 1:64 */
+#define _WDTPS_1_32_1H	0xFB	/* 1:32 */
+#define _WDTPS_1_16_1H	0xF9	/* 1:16 */
+#define _WDTPS_1_8_1H	0xF7	/* 1:8 */
+#define _WDTPS_1_4_1H	0xF5	/* 1:4 */
+#define _WDTPS_1_2_1H	0xF3	/* 1:2 */
+#define _WDTPS_1_1_1H	0xF1	/* 1:1 */
+
+/* CCP2 Mux 2H options */
+#define _CCP2MUX_RC1_2H	0xFF	/* RC1 */
+#define _CCP2MUX_RB3_2H	0xFE	/* RB3 */
+
+/* Low Voltage Program 3L options */
+#define _LVP_ON_3L	0xFF	/* Enabled */
+#define _LVP_OFF_3L	0xFB	/* Disabled */
+
+/* Background Debug 3L options */
+#define _BACKBUG_OFF_3L	0xFF	/* Disabled */
+#define _BACKBUG_ON_3L	0x7F	/* Enabled */
+
+/* Stack Overflow Reset 3L options */
+#define _STVR_ON_3L	0xFF	/* Enabled */
+#define _STVR_OFF_3L	0xFE	/* Disabled */
+
+/* Code Protect 00200-01FFF 4L options */
+#define _CP_0_OFF_4L	0xFF	/* Disabled */
+#define _CP_0_ON_4L	0xFE	/* Enabled */
+
+/* Code Protect 02000-03FFF 4L options */
+#define _CP_1_OFF_4L	0xFF	/* Disabled */
+#define _CP_1_ON_4L	0xFD	/* Enabled */
+
+/* Data EE Read Protect 4H options */
+#define _CPD_OFF_4H	0xFF	/* Disabled */
+#define _CPD_ON_4H	0x7F	/* Enabled */
+
+/* Code Protect Boot 4H options */
+#define _CPB_OFF_4H	0xFF	/* Disabled */
+#define _CPB_ON_4H	0xBF	/* Enabled */
+
+/* Table Write Protect 00200-01FFF 5L options */
+#define _WRT_0_OFF_5L	0xFF	/* Disabled */
+#define _WRT_0_ON_5L	0xFE	/* Enabled */
+
+/* Table Write Protect 02000-03FFF 5L options */
+#define _WRT_1_OFF_5L	0xFF	/* Disabled */
+#define _WRT_1_ON_5L	0xFD	/* Enabled */
+
+/* Data EE Write Protect 5H options */
+#define _WRTD_OFF_5H	0xFF	/* Disabled */
+#define _WRTD_ON_5H	0x7F	/* Enabled */
+
+/* Table Write Protect Boot 5H options */
+#define _WRTB_OFF_5H	0xFF	/* Disabled */
+#define _WRTB_ON_5H	0xBF	/* Enabled */
+
+/* Config. Write Protect 5H options */
+#define _WRTC_OFF_5H	0xFF	/* Disabled */
+#define _WRTC_ON_5H	0xDF	/* Enabled */
+
+/* Table Read Protect 00200-01FFF 6L options */
+#define _EBTR_0_OFF_6L	0xFF	/* Disabled */
+#define _EBTR_0_ON_6L	0xFE	/* Enabled */
+
+/* Table Read Protect 02000-03FFF 6L options */
+#define _EBTR_1_OFF_6L	0xFF	/* Disabled */
+#define _EBTR_1_ON_6L	0xFD	/* Enabled */
+
+/* Table Read Protect Boot 6H options */
+#define _EBTRB_OFF_6H	0xFF	/* Disabled */
+#define _EBTRB_ON_6H	0xBF	/* Enabled */
+
+
+#endif

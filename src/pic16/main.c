@@ -90,18 +90,15 @@ extern set *libFilesSet;
 /* for an unknowned reason. - EEP */
 void pic16_emitDebuggerSymbol (char *);
  
+extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
+extern void pic16_emitConfigRegs(FILE *of);
+
+
+
 
 static void
 _pic16_init (void)
 {
-#if 0
-  char pic16incDir[512];
-  char pic16libDir[512];
-  set *pic16incDirsSet;
-  set *pic16libDirsSet;
-  char devlib[512];
-#endif
-
 	asm_addTree (&asm_asxxxx_mapping);
 	pic16_pCodeInitRegisters();
 	maxInterrupts = 2;
@@ -113,31 +110,6 @@ _pic16_init (void)
 	pic16_options.omit_ivt = 0;
 	pic16_options.leave_reset = 0;
 	pic16_options.stack_model = 0;			/* 0 for 'small', 1 for 'large' */
-
-
-#if 0
- 	setMainValue("mcu", pic16->name[2] );
-	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
-
-	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
-	sprintf(pic16libDir, "%s/pic16", LIB_DIR_SUFFIX);
-
-	if(!options.nostdinc) {
-		/* setup pic16 include directory */
-		pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
-		mergeSets(&includeDirsSet, pic16incDirsSet);
-	}
-	
-	if(!options.nostdlib) {
-		/* setup pic16 library directory */
-		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
-		mergeSets(&libDirsSet, pic16libDirsSet);
-	
-		/* now add the library for the device */
-		sprintf(devlib, "%s.lib", pic16->name[2]);
-		addSet(&libFilesSet, Safe_strdup(devlib));
-	}
-#endif
 }
 
 static void
@@ -226,6 +198,11 @@ _process_pragma(const char *sz)
 #define STACK_MODEL	"--pstack-model="
 #define OPT_BANKSEL	"--obanksel="
 
+#define ALT_ASM		"--asm="
+#define ALT_LINK	"--link="
+
+char *alt_asm=NULL;
+char *alt_link=NULL;
 
 extern int pic16_debug_verbose;
 extern int pic16_ralloc_debug;
@@ -244,6 +221,9 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--pcode-verbose",	&pic16_pcode_verbose,	"dump pcode related info"},
 		
 	{ 0,	REP_UDATA,	NULL,	"Place udata variables at another section: udata_acs, udata_ovr, udata_shr"},
+
+	{ 0,	ALT_ASM,	NULL,	"Use alternative assembler"},
+	{ 0,	ALT_LINK,	NULL,	"Use alternative linker"},
 
 	{ 0,	NULL,		NULL,	NULL}
 	};
@@ -294,25 +274,33 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 		return TRUE;
 	}
 	
+	if(ISOPT(ALT_ASM)) {
+		alt_asm = Safe_strdup(getStringArg(ALT_ASM, argv, i, *pargc));
+		return TRUE;
+	}
+	
+	if(ISOPT(ALT_LINK)) {
+		alt_link = Safe_strdup(getStringArg(ALT_LINK, argv, i, *pargc));
+		return TRUE;
+	}
+
+
   return FALSE;
 }
 
 static void _pic16_initPaths(void)
 {
-#if 1
   char pic16incDir[512];
   char pic16libDir[512];
   set *pic16incDirsSet;
   set *pic16libDirsSet;
   char devlib[512];
-#endif
 
-#if 1
  	setMainValue("mcu", pic16->name[2] );
 	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
 
-	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
-	sprintf(pic16libDir, "%s/pic16", LIB_DIR_SUFFIX);
+	sprintf(pic16incDir, "%s%cpic16", INCLUDE_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
+	sprintf(pic16libDir, "%s%cpic16", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
 
 	if(!options.nostdinc) {
 		/* setup pic16 include directory */
@@ -329,50 +317,32 @@ static void _pic16_initPaths(void)
 		sprintf(devlib, "%s.lib", pic16->name[2]);
 		addSet(&libFilesSet, Safe_strdup(devlib));
 	}
-#endif
 }
 
+
+/* forward declarations */
+extern const char *pic16_linkCmd[];
+extern const char *pic16_asmCmd[];
 
 static void
 _pic16_finaliseOptions (void)
 {
-#if 0
-  char pic16incDir[512];
-  char pic16libDir[512];
-  set *pic16incDirsSet;
-  set *pic16libDirsSet;
-  char devlib[512];
-#endif
 	port->mem.default_local_map = data;
 	port->mem.default_globl_map = data;
+
+	/* peepholes are disabled for the time being */
+	options.nopeep = 1;
 
 	options.all_callee_saves = 1;		// always callee saves
 //	options.float_rent = 1;
 //	options.intlong_rent = 1;
 	
-#if 0
- 	setMainValue("mcu", pic16->name[2] );
-	addSet(&preArgvSet, Safe_strdup("-D{mcu}"));
 
-	sprintf(pic16incDir, "%s/pic16", INCLUDE_DIR_SUFFIX);
-	sprintf(pic16libDir, "%s/pic16", LIB_DIR_SUFFIX);
-
-	if(!options.nostdinc) {
-		/* setup pic16 include directory */
-		pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
-		mergeSets(&includeDirsSet, pic16incDirsSet);
-	}
+	if(alt_asm && strlen(alt_asm))
+		pic16_asmCmd[0] = alt_asm;
 	
-	if(!options.nostdlib) {
-		/* setup pic16 library directory */
-		pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
-		mergeSets(&libDirsSet, pic16libDirsSet);
-	
-		/* now add the library for the device */
-		sprintf(devlib, "%s.lib", pic16->name[2]);
-		addSet(&libFilesSet, Safe_strdup(devlib));
-	}
-#endif
+	if(alt_link && strlen(alt_link))
+		pic16_linkCmd[0] = alt_link;
 }
 
 
@@ -439,27 +409,6 @@ _pic16_setDefaultOptions (void)
 {
 	/* initialize to defaults section locations, names and addresses */
 	pic16_sectioninfo.at_udata	= "udata";
-	pic16_sectioninfo.at_udataacs	= "udata_acs";
-	pic16_sectioninfo.at_udataovr	= "udata_ovr";
-	pic16_sectioninfo.at_udatashr	= "udata_shr";
-
-	/* initialize to nothing, so let linker decide about their names */
-	pic16_sectioninfo.name_code	=
-	pic16_sectioninfo.name_idata	=
-	pic16_sectioninfo.name_udata	=
-	pic16_sectioninfo.name_udataacs =
-	pic16_sectioninfo.name_udataovr =
-	pic16_sectioninfo.name_udatashr = "";
-
-	/* initialize to -1, so let linker decide about their address */
-	pic16_sectioninfo.addr_code	=
-	pic16_sectioninfo.addr_idata	=
-	pic16_sectioninfo.addr_udata	=
-	pic16_sectioninfo.addr_udataacs =
-	pic16_sectioninfo.addr_udataovr =
-	pic16_sectioninfo.addr_udatashr = -1;
-
-
 
 	/* set pic16 port options to defaults */
 	pic16_options.no_banksel = 0;
@@ -502,6 +451,8 @@ _pic16_genAssemblerPreamble (FILE * of)
 	fprintf (of, "\tlist\tp=%s\n",&name[1]);
 
 	if(!pic16_options.omit_configw) {
+		pic16_emitConfigRegs(of);
+#if 0		
 		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300001, pic16_getConfigWord(0x300001));
 		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300002, pic16_getConfigWord(0x300002));
 		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x300003, pic16_getConfigWord(0x300003));
@@ -513,6 +464,7 @@ _pic16_genAssemblerPreamble (FILE * of)
 		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000b, pic16_getConfigWord(0x30000b));
 		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000c, pic16_getConfigWord(0x30000c));
 		fprintf (of, "\t__config 0x%x,0x%hhx\n", 0x30000d, pic16_getConfigWord(0x30000d));
+#endif
 	}
 	
   fprintf (of, "\tradix dec\n");
@@ -561,13 +513,18 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
 //	fprintf(stderr,"checking for native mult for %c (size: %d)\n", ic->op, getSize(OP_SYMBOL(IC_RESULT(ic))->type));
 
-	/* support mul for char/int {/long} */
-	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 2)
+#if 1
+	/* multiplication is fixed */
+	/* support mul for char/int/long */
+	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) <= 4)
 		&& (ic->op == '*'))return TRUE;
-	
+#endif
+
+#if 0
 	/* support div for char/int/long */
-	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 0)
+	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) <= 0)
 		&& (ic->op == '/'))return TRUE;
+#endif
 	
   return FALSE;
 }
@@ -644,9 +601,9 @@ oclsExpense (struct memmap *oclass)
     $l is the list of extra options that should be there somewhere...
     MUST be terminated with a NULL.
 */
-static const char *_linkCmd[] =
+const char *pic16_linkCmd[] =
 {
-  "gplink", "$3", "\"$1.o\"", "-o $1", "$l", NULL
+  "gplink", "$3", "\"$1.o\"", "-o \"$2\"", "$l", NULL
 };
 
 
@@ -657,9 +614,9 @@ static const char *_linkCmd[] =
     $l is the list of extra options that should be there somewhere...
     MUST be terminated with a NULL.
 */
-static const char *_asmCmd[] =
+const char *pic16_asmCmd[] =
 {
-  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", NULL
+  "gpasm", "$l", "$3", "-c", "\"$1.asm\"", "-o \"$2\"", NULL
 
 };
 
@@ -677,7 +634,7 @@ PORT pic16_port =
     MODEL_SMALL
   },
   {
-    _asmCmd,			/* assembler command and arguments */
+    pic16_asmCmd,		/* assembler command and arguments */
     NULL,			/* alternate macro based form */
     "-g",			/* arguments for debug mode */
     NULL,			/* arguments for normal mode */
@@ -686,7 +643,7 @@ PORT pic16_port =
     NULL			/* no do_assemble function */
   },
   {
-    _linkCmd,			/* linker command and arguments */
+    pic16_linkCmd,		/* linker command and arguments */
     NULL,			/* alternate macro based form */
     NULL,			/* no do_link function */
     ".o",			/* extension for object files */

@@ -48,7 +48,6 @@
 
 regs *pic16_typeRegWithIdx (int idx, int type, int fixed);
 extern void genpic16Code (iCode *);
-extern void pic16_assignConfigWordValue(int address, int value);
 
 /* Global data */
 static struct
@@ -373,8 +372,8 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 		dReg->accessBank = 0;
 	}
 
-//	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\taccess= %d\n",dReg->name,rIdx, dReg->accessBank);
-  	
+//	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\taccess= %d\tregop= %p\n",dReg->name,rIdx, dReg->accessBank, refop);
+
 	dReg->size = size;
 	dReg->alias = alias;
 	dReg->reg_alias = NULL;
@@ -557,11 +556,6 @@ pic16_dirregWithName (char *name)
   return NULL; // name wasn't found in the hash table
 }
 
-int PIC16_IS_CONFIG_ADDRESS(int address)
-{
-
-  return address >= 0x300000 && address <= 0x300000d;
-}
 
 /*-----------------------------------------------------------------*/
 /* pic16_allocDirReg - allocates register of given type                  */
@@ -653,14 +647,16 @@ pic16_allocDirReg (operand *op )
 		 * a new one and put it in the hash table AND in the 
 		 * dynDirectRegNames set */
 		if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
-			if(pic16_debug_verbose)
-			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
-			    		OP_SYMBOL(op)->name);
+
+//			if(pic16_debug_verbose)
+//			    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
+//			    		OP_SYMBOL(op)->name);
+
 			debugLog("%s:%d sym: %s in codespace\n", __FUNCTION__, __LINE__, OP_SYMBOL(op)->name);
 	    	  return NULL;
 		}
 
-		if(!PIC16_IS_CONFIG_ADDRESS(address)) {
+		if(1) {	//!PIC16_IS_CONFIG_ADDRESS(address)) {
 //			fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
 			/* this is an error, why added? -- VR */
@@ -736,7 +732,7 @@ pic16_allocDirReg (operand *op )
 /* pic16_allocRegByName - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
 regs *
-pic16_allocRegByName (char *name, int size)
+pic16_allocRegByName (char *name, int size, operand *op)
 {
 
   regs *reg;
@@ -754,8 +750,8 @@ pic16_allocRegByName (char *name, int size)
     /* Register wasn't found in hash, so let's create
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
-    //fprintf (stderr,"%s symbol name %s\n", __FUNCTION__,name);
-    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0, NULL);
+	fprintf (stderr,"%s:%d symbol name %s\tregop= %p\n", __FUNCTION__, __LINE__, name, op);
+    reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0, op);
 
     debugLog ("%d  -- added %s to hash, size = %d\n", __LINE__, name,reg->size);
 	//fprintf(stderr, "  -- added %s to hash, size = %d\n", name,reg->size);
@@ -978,7 +974,8 @@ extern void pic16_groupRegistersInSection(set *regset);
 
 extern void pic16_dump_equates(FILE *of, set *equs);
 //extern void pic16_dump_map(void);
-extern void pic16_dump_section(FILE *of, set *section, int fix);
+extern void pic16_dump_usection(FILE *of, set *section, int fix);
+extern void pic16_dump_isection(FILE *of, set *section, int fix);
 extern void pic16_dump_int_registers(FILE *of, set *section);
 extern void pic16_dump_idata(FILE *of, set *idataSymSet);
 
@@ -1136,14 +1133,17 @@ void pic16_writeUsedRegs(FILE *of)
 	pic16_dump_equates(of, pic16_equ_data);
 
 	/* dump initialised data */
-	pic16_dump_idata(of, idataSymSet);
+	pic16_dump_isection(of, rel_idataSymSet, 0);
+	pic16_dump_isection(of, fix_idataSymSet, 1);
+
+//	pic16_dump_idata(of, idataSymSet);
 
 	/* dump internal registers */
 	pic16_dump_int_registers(of, pic16_int_regs);
 	
 	/* dump other variables */
-	pic16_dump_section(of, pic16_rel_udata, 0);
-	pic16_dump_section(of, pic16_fix_udata, 1);
+	pic16_dump_usection(of, pic16_rel_udata, 0);
+	pic16_dump_usection(of, pic16_fix_udata, 1);
 	
 }
 
@@ -2114,6 +2114,15 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 	  debugLog ("  op: %s\n", decodeOp (ic->op));
 
+		if(IC_RESULT(ic) && !IS_ITEMP( IC_RESULT(ic)))
+			pic16_allocDirReg(IC_RESULT(ic));
+
+		if(IC_LEFT(ic) && !IS_ITEMP( IC_LEFT(ic)))
+			pic16_allocDirReg(IC_LEFT(ic));
+
+		if(IC_RIGHT(ic) && !IS_ITEMP( IC_RIGHT(ic)))
+			pic16_allocDirReg(IC_RIGHT(ic));
+
 	  /* if this is an ipop that means some live
 	     range will have to be assigned again */
 	  if (ic->op == IPOP)
@@ -2786,6 +2795,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
 //	fprintf(stderr, "%s:%d symbol = %s\n", __FILE__, __LINE__, OP_SYMBOL( IC_RESULT(ic))->name);
 
+#if 0
   /* if this is at an absolute address, then get the address. */
   if (SPEC_ABSA ( OP_SYM_ETYPE(IC_RESULT(ic))) ) {
     if(PIC16_IS_CONFIG_ADDRESS( SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))))) {
@@ -2793,8 +2803,10 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if(IS_VALOP(IC_RIGHT(ic))) {
 	debugLog ("  setting config word to %x\n", 
 		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
-//	fprintf(stderr, "  setting config word to %x\n", 
-//		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
+
+	fprintf(stderr, "%s:%d  setting config word to %x\n", __FILE__, __LINE__, 
+		  (int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
+
 	pic16_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
 				(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
       }
@@ -2812,6 +2824,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
     }
   }
+#endif
 	debugLog(" %d - actuall processing\n", __LINE__ );
 
   if (!IS_ITEMP (IC_RESULT (ic))) {
@@ -2819,12 +2832,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
     debugLog ("  %d - result is not temp\n", __LINE__);
   }
 
-#if 0
-  if (IC_LEFT (ic) && !IS_ITEMP (IC_LEFT (ic))) {
-    debugLog ("  %d - left is not temp, allocating\n", __LINE__);
-    pic16_allocDirReg(IC_LEFT (ic));
-  }
-#endif
 
 /* See BUGLOG0001 - VR */
 #if 1
@@ -2876,21 +2883,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
 	debugLog("%d\tSearching for iTempNN\n", __LINE__);
 
-#if 0
-	if(IS_TRUE_SYMOP( IC_RESULT(dic))) {
-		debugLog("%d - dic result is a TRUE_SYMOP\n", __LINE__);
-		debugAopGet(" result is ", IC_RESULT(dic));
-	}
-	if(IS_TRUE_SYMOP( IC_LEFT(dic))) {
-		debugLog("%d - dic left is a SYMOP\n", __LINE__);
-		debugAopGet("   left is ", IC_LEFT(dic));
-	}
-	if(IS_TRUE_SYMOP( IC_RIGHT(dic))) {
-		debugLog("%d - dic right is a SYMOP\n", __LINE__);
-		debugAopGet("  right is ", IC_RIGHT(dic));
-	}
-#endif
-
       if (IS_TRUE_SYMOP (IC_RESULT (dic)) &&
 	  IS_OP_VOLATILE (IC_RESULT (dic)))
 	{
@@ -2898,27 +2890,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	  dic = NULL;
 	  break;
 	}
-
-#if 0
-      if (IS_TRUE_SYMOP( IC_RIGHT (dic)) &&
-      		IS_OP_VOLATILE (IC_RIGHT(dic)))
-      	{
-      	  debugLog ("  %d - dic right is VOLATILE\n", __LINE__);
-      	  dic = NULL;
-      	  break;
-      	}
-#endif
-
-#if 0
-      if (IS_TRUE_SYMOP( IC_LEFT (dic)) &&
-      		IS_OP_VOLATILE (IC_LEFT(dic)))
-      	{
-      	  debugLog ("  %d - dic left is VOLATILE\n", __LINE__);
-      	  dic = NULL;
-      	  break;
-      	}
-#endif
-
 
 #if 1
       if( IS_SYMOP( IC_RESULT(dic)) &&

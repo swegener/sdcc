@@ -439,6 +439,9 @@ typedef struct pCodeOpWild
 			   * card will be expanded */
   pCodeOp *matched;       /* When a wild matches, we'll store a pointer to the
 			   * opcode we matched */
+  int id2;		  /* same as id but for second wild operand */
+  pCodeOp *subtype2;	  /* Poiter to the second Operand type */
+  pCodeOp *matched2;	  /* same as matched but for second wil operand */
 
 } pCodeOpWild;
 
@@ -669,6 +672,8 @@ typedef struct pCodeFunction
 
   int  ncalled;    /* Number of times function is called */
 
+  int absblock;    /* hack to emulate a block pCodes in absolute position
+                      but not inside a function */
 } pCodeFunction;
 
 

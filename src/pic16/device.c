@@ -46,31 +46,17 @@ static PIC16_device Pics16[] = {
     0,
     0x300,						// bank mask
     0x300,						// RAMsize
-    0
-  },
-
-  {
-    {"p18f252", "18f252", "pic18f252", "f252"},		// aliases
     0,
-    0x600,						// bank mask
-    0x600,						// RAMsize
-    0
-  },
-
-  {
-    {"p18f442", "18f442", "pic18f442", "f442"},		// aliases
-    0,
-    0x300,						// bank mask
-    0x300,						// RAMsize
-    0
-  },
-
-  {
-    {"p18f452", "18f452", "pic18f452", "f452"},		// aliases
-    0,
-    0x600,						// bank mask
-    0x600,						// RAMsize
-    0
+	{
+		/* PIC18F242 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
 
   {
@@ -78,7 +64,35 @@ static PIC16_device Pics16[] = {
     0,
     0x300,						// bank mask
     0x300,						// RAMsize
-    0
+    0,
+	{
+		/* PIC18F248 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { -1, 0, 0xff } /* 5 */  , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
+  },
+
+  {
+    {"p18f252", "18f252", "pic18f252", "f252"},		// aliases
+    0,
+    0x600,						// bank mask
+    0x600,						// RAMsize
+    0,
+	{
+		/* PIC18F252 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
 
   {
@@ -86,7 +100,35 @@ static PIC16_device Pics16[] = {
     0,
     0x600,						// bank mask
     0x600,						// RAMsize
-    0
+    0,
+	{
+		/* PIC18F258 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { -1, 0, 0xff } /* 5 */  , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
+  },
+
+  {
+    {"p18f442", "18f442", "pic18f442", "f442"},		// aliases
+    0,
+    0x300,						// bank mask
+    0x300,						// RAMsize
+    0,
+	{
+		/* PIC18F442 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
 
   {
@@ -94,7 +136,35 @@ static PIC16_device Pics16[] = {
     0,
     0x300,						// bank mask
     0x300,						// RAMsize
-    0
+    0,
+	{
+		/* PIC18F448 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { -1, 0, 0xff } /* 5 */  , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
+  },
+  
+  {
+    {"p18f452", "18f452", "pic18f452", "f452"},		// aliases
+    0,
+    0x600,						// bank mask
+    0x600,						// RAMsize
+    0,
+	{
+		/* PIC18F452 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
 
   {
@@ -102,15 +172,54 @@ static PIC16_device Pics16[] = {
     0,
     0x600,						// bank mask
     0x600,						// RAMsize
-    0
+    0,
+	{
+		/* PIC18F458 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { -1, 0, 0xff } /* 5 */  , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
+
+  {
+    {"p18f1220", "18f1220", "pic18f1220", "f1220"},	// aliases
+    0,
+    0x200,
+    0x200,
+    0,
+	{
+		/* PIC18F1220 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0xcf, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x1f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x80, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x03, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x03, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x03, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
+  },
+
 
   {
     {"p18f6520", "18f6520", "pic18f6520", "f6520"},	// aliases
     0,
     0x800,						// bank mask
     0x800,						// RAMsize
-    1
+    1,
+	{
+		/* PIC18F6520 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ 0x80, 0, 0xff } /* 4 */ , { 0x88, 0, 0xff } /* 5 */ , { -1, 0, 0xff } /* 6 */  , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
 
   {
@@ -118,50 +227,125 @@ static PIC16_device Pics16[] = {
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
-    1
+    1,
+	{
+		/* PIC18F6620 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
+
   {
     {"p18f6680", "18f6680", "pic18f6680", "f6680"},	// aliases
     0,
     0xc00,						// bank mask
     0xc00,						// RAMsize
-    1
+    1,
+	{
+		/* PIC18F6680 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x2f, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x1f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x83, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
+
   {
     {"p18f6720", "18f6720", "pic18f6720", "f6720"},	// aliases
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
-    1
+    1,
+	{
+		/* PIC18F6720 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ -1, 0, 0xff } /* 4 */  , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0xff, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0xff, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0xff, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
+
   {
     {"p18f8520", "18f8520", "pic18f8520", "f8520"},	// aliases
     0,
     0x800,						// bank mask
     0x800,						// RAMsize
-    1
+    1,
+	{
+		/* PIC18F8520 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ 0x83, 0, 0xff } /* 4 */ , { 0x88, 0, 0xff } /* 5 */ , { -1, 0, 0xff } /* 6 */  , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ } 
+	}
   },
+
   {
     {"p18f8620", "18f8620", "pic18f8620", "f8620"},	// aliases
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
-    1
+    1,
+	{
+		/* PIC18F8620 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ 0x83, 0, 0xff } /* 4 */ , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ }
+	}
   },
   {
     {"p18f8680", "18f8680", "pic18f8680", "f8680"},	// aliases
     0,
     0xc00,						// bank mask
     0x800,						// RAMsize
-    1
+    1,
+	{
+		/* PIC18F8680 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x2f, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x1f, 0, 0xff } /* 3 */ , 
+		{ 0x83, 0, 0xff } /* 4 */ , { 0x83, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ }
+	}
   },
+
   {
     {"p18f8720", "18f8720", "pic18f8720", "f8720"},	// aliases
     0,
     0xf00,						// bank mask
     0xf00,						// RAMsize
-    1
-  },
+    1,
+	{
+		/* PIC18F8720 configuration words */
+		0x300001,
+		0x30000d,
+		{ { 0x27, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x0f, 0, 0xff } /* 3 */ , 
+		{ 0x83, 0, 0xff } /* 4 */ , { 0x01, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
+		{ -1, 0, 0xff } /* 7 */  , { 0xff, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
+		{ 0xff, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0xff, 0, 0xff } /* c */ , 
+		{ 0x40, 0, 0xff } /* d */ }
+	}
+  }
 
 };
 
@@ -170,54 +354,6 @@ static int num_of_supported_PICS = sizeof(Pics16)/sizeof(PIC16_device);
 #define DEFAULT_PIC "452"
 
 PIC16_device *pic16=NULL;
-
-#define DEFAULT_CONFIG_BYTE 0xff
-
-#define CONFIG1H_WORD_ADDRESS 0x300001
-#define DEFAULT_CONFIG1H_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG2L_WORD_ADDRESS 0x300002
-#define DEFAULT_CONFIG2L_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG2H_WORD_ADDRESS 0x300003
-#define DEFAULT_CONFIG2H_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG3H_WORD_ADDRESS 0x300005
-#define DEFAULT_CONFIG3H_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG4L_WORD_ADDRESS 0x300006
-#define DEFAULT_CONFIG4L_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG5L_WORD_ADDRESS 0x300008
-#define DEFAULT_CONFIG5L_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG5H_WORD_ADDRESS 0x300009
-#define DEFAULT_CONFIG5H_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG6L_WORD_ADDRESS 0x30000a
-#define DEFAULT_CONFIG6L_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG6H_WORD_ADDRESS 0x30000b
-#define DEFAULT_CONFIG6H_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG7L_WORD_ADDRESS 0x30000c
-#define DEFAULT_CONFIG7L_WORD DEFAULT_CONFIG_BYTE
-
-#define CONFIG7H_WORD_ADDRESS 0x30000d
-#define DEFAULT_CONFIG7H_WORD DEFAULT_CONFIG_BYTE
-
-static unsigned int config1h_word = DEFAULT_CONFIG1H_WORD;
-static unsigned int config2l_word = DEFAULT_CONFIG2L_WORD;
-static unsigned int config2h_word = DEFAULT_CONFIG2H_WORD;
-static unsigned int config3h_word = DEFAULT_CONFIG3H_WORD;
-static unsigned int config4l_word = DEFAULT_CONFIG4L_WORD;
-static unsigned int config5l_word = DEFAULT_CONFIG5L_WORD;
-static unsigned int config5h_word = DEFAULT_CONFIG5H_WORD;
-static unsigned int config6l_word = DEFAULT_CONFIG6L_WORD;
-static unsigned int config6h_word = DEFAULT_CONFIG6H_WORD;
-static unsigned int config7l_word = DEFAULT_CONFIG7L_WORD;
-static unsigned int config7h_word = DEFAULT_CONFIG7H_WORD;
-
 unsigned int stackPos = 0;
 
 extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
@@ -263,10 +399,9 @@ int regCompare(const void *a, const void *b)
 	if( (*i)->address < (*j)->address)return -1;
 	
 	/* and secondarily by size */
+	/* register size sorting may have strange results use with care */
 	if( (*i)->size > (*j)->size)return 1;
 	if( (*i)->size < (*j)->size)return -1;
-	
-	/* register size sorting may have strange results use with care */
 	
 	/* finally if in same address and same size sort by name */
 	return (strcmp( (*i)->name, (*j)->name));
@@ -274,12 +409,33 @@ int regCompare(const void *a, const void *b)
   return 0;
 }
 
-void pic16_dump_section(FILE *of, set *section, int fix)
+int symCompare(const void *a, const void *b)
 {
-  static int abs_section_no=0;
+  const symbol *const *i = a;
+  const symbol *const *j = b;
+
+	/* sort primarily by the address */
+	if( SPEC_ADDR((*i)->etype) > SPEC_ADDR((*j)->etype))return 1;
+	if( SPEC_ADDR((*i)->etype) < SPEC_ADDR((*j)->etype))return -1;
+	
+	/* and secondarily by size */
+	/* register size sorting may have strange results use with care */
+	if( getSize((*i)->etype) > getSize((*j)->etype))return 1;
+	if( getSize((*i)->etype) < getSize((*j)->etype))return -1;
+
+	/* finally if in same address and same size sort by name */
+	return (strcmp( (*i)->rname, (*j)->rname));
+
+  return 0;
+}
+
+void pic16_dump_usection(FILE *of, set *section, int fix)
+{
+  static int abs_usection_no=0;
   regs *r, *rprev;
   int init_addr, i;
   regs **rlist;
+  regs *r1;
 
 	/* put all symbols in an array */
 	rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
@@ -303,27 +459,29 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 		}
 	} else {
 	  int j=0;
-	  regs *r1;
-	  
+	  int deb_addr=0;
+
 		rprev = NULL;
 		init_addr = rlist[j]->address;
-		fprintf(of, "\n\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
+		deb_addr = init_addr;
+		fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
 	
 		for(j=0;j<i;j++) {
 			r = rlist[j];
 			if(j < i-1)r1 = rlist[j+1]; else r1 = NULL;
 			
 			init_addr = r->address;
-
-			if(rprev && (init_addr > (rprev->address + rprev->size))) {
-				fprintf(of, "\nstatic_%s_%02d\tudata\t0X%04X\n", moduleName, abs_section_no++, init_addr);
+			deb_addr = init_addr;
+			
+			if((rprev && (init_addr > (rprev->address + rprev->size)))) {
+				fprintf(of, "\n\nustat_%s_%02d\tudata\t0X%04X\n", moduleName, abs_usection_no++, init_addr);
 			}
 
-
 			if(r1 && (init_addr == r1->address)) {
-				fprintf(of, "%s\tres\t0\n\n", r->name);
+				fprintf(of, "\n%s\tres\t0\n", r->name);
 			} else {
 				fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+				deb_addr += r->size;
 			}
 			
 			rprev = r;
@@ -331,6 +489,72 @@ void pic16_dump_section(FILE *of, set *section, int fix)
 	}
 	free(rlist);
 }
+
+
+/* forward declaration */
+void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist);
+
+void pic16_dump_isection(FILE *of, set *section, int fix)
+{
+  static int abs_isection_no=0;
+  symbol *s, *sprev;
+  int init_addr, i;
+  symbol **slist;
+
+	/* put all symbols in an array */
+	slist = Safe_calloc(elementsInSet(section), sizeof(symbol *));
+	s = slist[0]; i = 0;
+	for(sprev = setFirstItem(section); sprev; sprev = setNextItem(section)) {
+		slist[i] = sprev; i++;
+	}
+	
+	if(!i) {
+		if(slist)free(slist);
+	  return;
+	}
+
+	/* sort symbols according to their address */
+	qsort(slist, i, sizeof(symbol *), symCompare);
+	
+	if(!fix) {
+		fprintf(of, "\n\n\tidata\n");
+		for(s = setFirstItem(section); s; s = setNextItem(section)) {
+			print_idata(of, s, s->type, s->ival);
+		}
+	} else {
+	  int j=0;
+	  symbol *s1;
+	  
+		sprev = NULL;
+		init_addr = SPEC_ADDR(slist[j]->etype);
+		fprintf(of, "\n\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
+	
+		for(j=0;j<i;j++) {
+			s = slist[j];
+			if(j < i-1)s1 = slist[j+1]; else s1 = NULL;
+			
+			init_addr = SPEC_ADDR(s->etype);
+
+			if(sprev && (init_addr > (SPEC_ADDR(sprev->etype) + getSize(sprev->etype)))) {
+				fprintf(of, "\nistat_%s_%02d\tidata\t0X%04X\n", moduleName, abs_isection_no++, init_addr);
+			}
+
+			print_idata(of, s, s->type, s->ival);
+			
+#if 0
+			if(r1 && (init_addr == r1->address)) {
+				fprintf(of, "%s\tres\t0\n\n", r->name);
+			} else {
+				fprintf(of, "%s\tres\t%d\n", r->name, r->size);
+			}
+#endif
+			
+			sprev = s;
+		}
+	}
+	free(slist);
+}
+
 
 void pic16_dump_int_registers(FILE *of, set *section)
 {
@@ -371,6 +595,8 @@ void pic16_dump_int_registers(FILE *of, set *section)
 
 #define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
 
+
+
 /*-----------------------------------------------------------------*/
 /* printIvalType - generates ival for int/char                     */
 /*-----------------------------------------------------------------*/
@@ -405,21 +631,22 @@ void print_idataType (FILE *of, symbol *sym, sym_link * type, initList * ilist)
 
   switch (getSize (type)) {
     case 1:
-	fprintf(of, "%s\tdata\t0x%02x\n", sym->name, (unsigned char)BYTE_IN_LONG(ulval, 0));
+	if(isprint(BYTE_IN_LONG(ulval, 0)))
+		fprintf(of, "%s\tdata\t\"%c\"\n", sym->rname, (unsigned char)BYTE_IN_LONG(ulval, 0));
+	else
+		fprintf(of, "%s\tdata\t0x%02x\n", sym->rname, (unsigned char)BYTE_IN_LONG(ulval, 0));
 //	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
 	break;
 
     case 2:
-//	fprintf(of, "%s\tdw\t0x%04x\n", sym->name, (unsigned int)(BYTE_IN_LONG(ulval, 0)
-//					+ (BYTE_IN_LONG(ulval, 1) << 8)));
-	fprintf(of, "%s\tdata\t0x%02x,0x%02x\n", sym->name, (unsigned char)BYTE_IN_LONG(ulval, 0),
-					(unsigned char)(BYTE_IN_LONG(ulval, 1) << 8));
-//    	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,0))));
-//	pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETLW,pic16_newpCodeOpLit(BYTE_IN_LONG(ulval,1))));
+	fprintf(of, "%s\tdw\t0x%02x, 0x%02x\n", sym->rname, (unsigned int)(BYTE_IN_LONG(ulval, 0)),
+					(unsigned int)(BYTE_IN_LONG(ulval, 1)));
+//	fprintf(of, "%s\tdata\t0x%04x\n", sym->rname, (unsigned int)BYTE_IN_LONG(ulval, 0) +
+//					(unsigned int)(BYTE_IN_LONG(ulval, 1) << 8));
 	break;
 
     case 4:
-	fprintf(of, "%s\tdw\t0x%04x,0x%04x\n", sym->name, (unsigned int)(BYTE_IN_LONG(ulval, 0)
+	fprintf(of, "%s\tdw\t0x%04x,0x%04x\n", sym->rname, (unsigned int)(BYTE_IN_LONG(ulval, 0)
 					+ (BYTE_IN_LONG(ulval, 1) << 8)),
 					(unsigned)(BYTE_IN_LONG(ulval, 2)
 					+ (BYTE_IN_LONG(ulval, 3) << 8)));
@@ -432,9 +659,139 @@ void print_idataType (FILE *of, symbol *sym, sym_link * type, initList * ilist)
 }
 
 
+/*-----------------------------------------------------------------*/
+/* print_idataChar - generates initital value for character array    */
+/*-----------------------------------------------------------------*/
+static int 
+print_idataChar (FILE *of, symbol *sym, sym_link * type, initList * ilist, char *s)
+{
+  value *val;
+  int remain;
+  char old_ch=0, *vchar;
+
+  // fprintf(stderr, "%s\n",__FUNCTION__);
+  if (!s)
+    {
+
+      val = list2val (ilist);
+      /* if the value is a character string  */
+      if (IS_ARRAY (val->type) && IS_CHAR (val->etype))
+	{
+	  if (!DCL_ELEM (type))
+	    DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
+
+
+	  fprintf(of, "%s\tdata\t", sym->rname);
+	  vchar = SPEC_CVAL(val->etype).v_char;
+	  for(remain=0; remain<DCL_ELEM(type); remain++) {
+		if(!isprint(old_ch)) {
+			if(isprint(vchar[remain]))fprintf(of, "%s\"%c", (remain?", ":""), vchar[remain]);
+			else fprintf(of, "0x%02x", vchar[remain]);
+		} else
+			if(!isprint(vchar[remain]))fprintf(of, "\", 0x%02x", vchar[remain]);
+			else fprintf(of, "%c", vchar[remain]);
+		old_ch = vchar[ remain ];
+	  }
+//	     fprintf(of, "0x%02x%s", SPEC_CVAL(val->etype).v_char[ remain ], (remain==DCL_ELEM(type)-1?"":","));
+			
+
+	  if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0)
+            {
+	      while (remain--)
+                {
+		  fprintf(of, "0x%02x%s", 0x00 /*SPEC_CVAL(val->etype).v_char[ remain ]*/ , (remain==DCL_ELEM(type)-1?"":","));
+                }
+            }
+		fprintf(of, "\n");
+	  return 1;
+	}
+      else
+	return 0;
+    }
+  else {
+    fprintf(of, "%s\tdata\t", sym->rname);
+    vchar = s; old_ch = 0;
+    for(remain=0; remain<strlen(s); remain++) 
+      {
+	if(!isprint(old_ch)) {
+		if(isprint(vchar[remain]))fprintf(of, "%s\"%c", (remain?", ":""), vchar[remain]);
+		else fprintf(of, "0x%02x", vchar[remain]);
+	} else
+		if(!isprint(vchar[remain]))fprintf(of, "\", 0x%02x", vchar[remain]);
+		else fprintf(of, "%c", vchar[remain]);
+	old_ch = vchar[ remain ];
+//	fprintf(of, "0x%02x%s", s[ remain ], (remain==strlen(s)-1?"":","));
+      }
+  }
+  return 1;
+}
 
 /*-----------------------------------------------------------------*/
-/* printIval - generates code for initial value                    */
+/* print_idataArray - generates code for array initialization        */
+/*-----------------------------------------------------------------*/
+static void 
+print_idataArray (FILE *of, symbol * sym, sym_link * type, initList * ilist)
+{
+  initList *iloop;
+  int lcnt = 0, size = 0;
+
+  /* take care of the special   case  */
+  /* array of characters can be init  */
+  /* by a string                      */
+  if (IS_CHAR (type->next)) {
+//    fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
+    if (!IS_LITERAL(list2val(ilist)->etype)) {
+      werror (W_INIT_WRONG);
+      return;
+    }
+    if (print_idataChar (of, sym, type,
+		       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
+		       SPEC_CVAL (sym->etype).v_char))
+      return;
+  }
+  /* not the special case             */
+  if (ilist->type != INIT_DEEP)
+    {
+      werror (E_INIT_STRUCT, sym->name);
+      return;
+    }
+
+  iloop = ilist->init.deep;
+  lcnt = DCL_ELEM (type);
+
+  for (;;)
+    {
+      //fprintf(stderr,"%s:%d - is_char\n",__FUNCTION__,__LINE__);
+      size++;
+      print_idata (of, sym, type->next, iloop);
+      iloop = (iloop ? iloop->next : NULL);
+
+
+      /* if not array limits given & we */
+      /* are out of initialisers then   */
+      if (!DCL_ELEM (type) && !iloop)
+	break;
+
+      /* no of elements given and we    */
+      /* have generated for all of them */
+      if (!--lcnt) {
+	/* if initializers left */
+	if (iloop) {
+	  werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
+	}
+	break;
+      }
+    }
+
+  /* if we have not been given a size  */
+  if (!DCL_ELEM (type))
+    DCL_ELEM (type) = size;
+
+  return;
+}
+
+/*-----------------------------------------------------------------*/
+/* print_idata - generates code for initial value                    */
 /*-----------------------------------------------------------------*/
 void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist)
 {
@@ -446,6 +803,9 @@ void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist)
     {
       //fprintf(stderr,"%s struct\n",__FUNCTION__);
       //printIvalStruct (sym, type, ilist, oFile);
+      fprintf(stderr, "%s:%d: PIC16 port error: structure initialisation is not implemented yet.\n",
+      	__FILE__, __LINE__);
+      abort();
       return;
     }
 
@@ -454,6 +814,9 @@ void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist)
     {
       //fprintf(stderr,"%s pointer\n",__FUNCTION__);
       //printIvalPtr (sym, type, ilist, oFile);
+      fprintf(stderr, "%s:%d: PIC16 port error: pointer initialisation is not immplemented yet.\n",
+      	__FILE__, __LINE__);
+      abort();
       return;
     }
 
@@ -461,7 +824,7 @@ void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist)
   if (IS_ARRAY (type))
     {
       //fprintf(stderr,"%s array\n",__FUNCTION__);
-//      printIvalArray (sym, type, ilist, pb);
+      print_idataArray (of, sym, type, ilist);
       return;
     }
 
@@ -475,21 +838,6 @@ void print_idata(FILE *of, symbol * sym, sym_link * type, initList * ilist)
 }
 
 
-void pic16_dump_idata(FILE *of, set *idataSymSet)
-{
-  int i;
-  symbol *ids;
-  
-
-	i = elementsInSet(idataSymSet);
-	if(!i)return;
-	
-	fprintf(of, "\n\n; Initialised data (idata)\n");
-	fprintf(of, "\tidata\n");
-	for(ids = setFirstItem(idataSymSet); ids; ids = setNextItem(idataSymSet))
-	      print_idata(of, ids, ids->type, ids->ival);
-
-}
 
 
 /*-----------------------------------------------------------------*
@@ -691,9 +1039,18 @@ void pic16_groupRegistersInSection(set *regset)
 
 		if(reg->wasUsed
 			&& !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop)))) {
+			
+			/* avoid grouping registers that have an initial value,
+			 * they will be added later in idataSymSet */
+			if(reg->regop && (OP_SYMBOL(reg->regop)->ival && !OP_SYMBOL(reg->regop)->level))
+				continue;
 
-//			fprintf(stderr, "%s:%d register %s alias:%d fix:%d\n",
-//				__FILE__, __LINE__, reg->name, reg->alias, reg->isFixed);
+#if 0
+			fprintf(stderr, "%s:%d register %s alias:%d fix:%d ival=%i level=%i\n",
+				__FILE__, __LINE__, reg->name, reg->alias, reg->isFixed,
+					(reg->regop?(OP_SYMBOL(reg->regop)->ival?1:0):-1),
+					(reg->regop?(OP_SYMBOL(reg->regop)->level):-1) );
+#endif
 
 			if(reg->alias) {
 				checkAddReg(&pic16_equ_data, reg);
@@ -723,82 +1080,17 @@ void pic16_groupRegistersInSection(set *regset)
  * This routine will assign a value to that address.
  *
  *-----------------------------------------------------------------*/
-
 void pic16_assignConfigWordValue(int address, int value)
 {
-  switch(address) {
-  case CONFIG1H_WORD_ADDRESS:
-    config1h_word = value;
-    break;
-  case CONFIG2L_WORD_ADDRESS:
-    config2l_word = value;
-    break;
-  case CONFIG2H_WORD_ADDRESS:
-    config2h_word = value;
-    break;
-  case CONFIG3H_WORD_ADDRESS:
-    config3h_word = value;
-    break;
-  case CONFIG4L_WORD_ADDRESS:
-    config4l_word = value;
-    break;
-  case CONFIG5L_WORD_ADDRESS:
-    config5l_word = value;
-    break;
-  case CONFIG5H_WORD_ADDRESS:
-    config5h_word = value;
-    break;
-  case CONFIG6L_WORD_ADDRESS:
-    config6l_word = value;
-    break;
-  case CONFIG6H_WORD_ADDRESS:
-    config6h_word = value;
-    break;
-  case CONFIG7L_WORD_ADDRESS:
-    config7l_word = value;
-    break;
-  case CONFIG7H_WORD_ADDRESS:
-    config7h_word = value;
-    break;
-  }
+  int i;
 
-//	fprintf(stderr,"setting config word to 0x%x\n",value);
-
-}
-/*-----------------------------------------------------------------*
- * int pic16_getConfigWord(int address)
- *
- * Get the current value of the config word.
- *
- *-----------------------------------------------------------------*/
-
-int pic16_getConfigWord(int address)
-{
-  switch(address) {
-  case CONFIG1H_WORD_ADDRESS:
-    return config1h_word;
-  case CONFIG2L_WORD_ADDRESS:
-    return config2l_word;
-  case CONFIG2H_WORD_ADDRESS:
-    return config2h_word;
-  case CONFIG3H_WORD_ADDRESS:
-    return config3h_word;
-  case CONFIG4L_WORD_ADDRESS:
-    return config4l_word;
-  case CONFIG5L_WORD_ADDRESS:
-    return config5l_word;
-  case CONFIG5H_WORD_ADDRESS:
-    return config5h_word;
-  case CONFIG6L_WORD_ADDRESS:
-    return config6l_word;
-  case CONFIG6H_WORD_ADDRESS:
-    return config6h_word;
-  case CONFIG7L_WORD_ADDRESS:
-    return config7l_word;
-  case CONFIG7H_WORD_ADDRESS:
-    return config7h_word;
-  default:
-    return 0;
-  }
+	for(i=0;i<pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart+1;i++) {
+		if(pic16->cwInfo.crInfo[i].mask != -1) {
+//			fprintf(stderr, "setting location 0x%X\n", pic16->cwInfo.confAddrStart+i);
+			pic16->cwInfo.crInfo[i].value = value;
+			pic16->cwInfo.crInfo[i].emit = 1;
+			return;
+		}
+	}
 }
 

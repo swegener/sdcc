@@ -36,6 +36,21 @@
 #define STRCASECMP strcasecmp
 #endif
 
+#define CONFIGURATION_WORDS	20
+
+typedef struct {
+	int mask;
+	int emit;
+	int value;
+} configRegInfo;
+
+typedef struct {
+	int confAddrStart;	/* starting address */
+	int confAddrEnd;	/* ending address */
+	configRegInfo crInfo[ CONFIGURATION_WORDS ];
+} configWordsInfo;
+
+
 
 #define PROCESSOR_NAMES    4
 /* Processor unique attributes */
@@ -46,6 +61,7 @@ typedef struct PIC16_device {
   int bankMask;               /* Bitmask that is ANDed with address to extract banking bits */
   int RAMsize;		      /* size of Data RAM - VR 031120 */
   int extMIface;               /* device has external memory interface */
+  configWordsInfo cwInfo;	/* configuration words info */
 } PIC16_device;
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
@@ -67,7 +83,8 @@ typedef struct {
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
 #define STACK_MODEL_LARGE	(pic16_options.stack_model == 1)
 
-extern set *idataSymSet;
+extern set *fix_idataSymSet;
+extern set *rel_idataSymSet;
 
 extern pic16_options_t pic16_options;
 extern PIC16_device *pic16;
@@ -78,6 +95,7 @@ int pic16_getConfigWord(int address);
 int pic16_isREGinBank(regs *reg, int bank);
 int pic16_REGallBanks(regs *reg);
 void pic16_setMaxRAM(int size);
+int PIC16_IS_CONFIG_ADDRESS(int address);
 
 int checkAddReg(set **set, regs *reg);
 int checkAddSym(set **set, symbol *reg);

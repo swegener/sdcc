@@ -117,11 +117,9 @@ regs *pic16_findFreeReg(short type);
 regs *pic16_allocWithIdx (int idx);
 
 regs *pic16_allocDirReg (operand *op );
-regs *pic16_allocRegByName (char *name, int size );
+regs *pic16_allocRegByName (char *name, int size, operand *op);
 
 regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
-
-int PIC16_IS_CONFIG_ADDRESS(int address);
 
 /* Define register address that are constant across PIC16 family */
 #define IDX_TMR0    0xfd6

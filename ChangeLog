@@ -1,3 +1,44 @@
+2004-06-04 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/Makefile.in: removed comment line with model-pic16,
+	* (target port-specific-objects-pic16): the libraries and objects
+	are copied to the build directory form the device/lib/pic16/bin
+	directory
+	
+	Cumulative patch concerning pic16 port:
+	* library directory has been re-organized,
+	* added support for PIC18F1220,
+	* added headers and library sources for chips 18f1220,18f6520,
+	18f6620,18f6680,18f6720,18f8520,18f8620,18f8680,18f8720
+
+	* configuration registers setting has changed, now each supported
+	device has a complete description of the registers it uses,
+	* all initialisations are moved to idata sections, these section
+	can be absolute or relocatable,
+	* fixed initialisation of codespace variables,
+	* fixed warning about PCLATU and gpsim,
+	* src/pic16/gen.c (genCmp): now can handle partially iCodes with no ifx,
+	* (genAssign): use table reads when assigning from variables in codespace,
+	* src/pic16/glue.c (pic16emitStaticSeg): fixed to correctly initialise
+	char/int variables placed in codespace,
+	* (pic16_emitConfigRegs): NEW, emits a list with configuration
+	registers set in .asm file, no need for --pomit-config-words anymore,
+	* (pic16glue): some 8051 legacy segments are commented out
+	(to be removed completely),
+	* added support for alternative assembler and linker with --asm=
+	and --link= command line arguments,
+	* peepholes are disabled automatically in the port, no need to
+	specify on command line,
+	* port supports natively char/int/long multiplication, but converts
+	all divisions to support functions,
+	* main.c: pic16_linkCmd and pic16_asmCmd changed to force output
+	to the file set in variable $2,
+	* pcode.c (pic16_emitDB, pic16_flushDB): modified to print printable
+	strings in ASCII format and not in hex,
+	* ralloc.c (serialRegAssign): added a triplet of conditional calls
+	to pic16_allocDirReg for IC_RESULT, IC_LEFT and IC_RIGHT so to
+	allocate proper register if iCodes aren't temporary,
+
 2004-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/zeropad.c: added TEST_G macro for alpha

@@ -208,7 +208,7 @@ model-pic16:
 	  fi
 
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
-	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
+	cd $(PORTDIR)/bin; ls *$(OEXT) > $(PORT).lib
 
 
 build-dir: $(PORTDIR)
@@ -225,7 +225,7 @@ port-specific-objects:
 port-specific-objects-pic16:
 	if [ -d $(PORT) ]; then \
 	  $(MAKE) -C $(PORT); \
-	  cp -f $(PORT)/*.lib $(PORTDIR); \
+	  cp -f $(PORT)/bin/* $(PORTDIR); \
 	fi
 
 lib-files:

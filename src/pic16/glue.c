@@ -61,7 +61,8 @@ extern char *iComments2;
 
 extern int initsfpnt;
 
-set *idataSymSet=NULL;
+set *rel_idataSymSet=NULL;
+set *fix_idataSymSet=NULL;
 
 extern DEFSETFUNC (closeTmpFiles);
 extern DEFSETFUNC (rmTmpFiles);
@@ -74,11 +75,11 @@ extern void pic16_writeUsedRegs(FILE *);
 extern void initialComments (FILE * afile);
 extern void printPublics (FILE * afile);
 
-extern void printChar (FILE * ofile, char *s, int plen);
 void  pic16_pCodeInitRegisters(void);
 pCodeOp *pic16_popGetLit(unsigned int lit);
 pCodeOp *pic16_popGetLit2(unsigned int lit, pCodeOp *arg2);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
+extern void pic16_pCodeConstString(char *name, char *value);
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
@@ -120,14 +121,14 @@ static void
 pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 {
   symbol *sym;
-  int i, size, bitvars = 0;;
+//  int i, size, bitvars = 0;;
 
 //	fprintf(stderr, "%s:%d map name= %s\n", __FUNCTION__, __LINE__, map->sname);
 	
 	if(addPublics)
 		fprintf (map->oFile, ";\t.area\t%s\n", map->sname);
-
 		/* print the area name */
+
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
 
 #if 0
@@ -136,6 +137,11 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		printTypeChain( sym->type, stderr );
 		fprintf(stderr, "\n");
 #endif
+
+//		if(PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype)))
+//			continue;
+
+
 		/* if extern then add to externs */
 		if (IS_EXTERN (sym->etype)) {
 			checkAddSym(&externs, sym);
@@ -149,7 +155,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			!(sym->_isparm && !IS_REGPARM (sym->etype)) &&
 			!sym->allocreq && sym->level) {
 
-			fprintf(stderr, "%s:%d special case, continuing...\n", __FILE__, __LINE__);
+//			fprintf(stderr, "%s:%d special case, continuing...\n", __FILE__, __LINE__);
 
 			continue;
 		}
@@ -164,12 +170,14 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			checkAddSym(&publics, sym);
 //			addSetHead(&publics, sym);
 		} else
-			if(IS_STATIC(sym->etype)) {
+			if(IS_STATIC(sym->etype)
+				&& !(sym->ival && !sym->level)
+			) {
 			  regs *reg;
 				/* add it to udata list */
 
-				fprintf(stderr, "%s:%d adding %s (%s) remat=%d\n", __FILE__, __LINE__,
-					sym->name, sym->rname, sym->remat);
+//				fprintf(stderr, "%s:%d adding %s (%s) remat=%d\n", __FILE__, __LINE__,
+//					sym->name, sym->rname, sym->remat);
 					
 						//, OP_SYMBOL(operandFromSymbol(sym))->name);
 #define SET_IMPLICIT	1
@@ -189,7 +197,6 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			if(SPEC_OCLS(sym->etype) == code) {
 //				fprintf(stderr, "%s:%d: symbol added: %s\n", __FILE__, __LINE__, sym->rname);
 				checkAddSym(&publics, sym);
-//				addSetHead(&publics, sym);
 			}
 			continue;
 		}
@@ -211,9 +218,6 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		}
 #endif
 
-		/* FIXME -- VR
-		 * The equates are nice, but do not allow relocatable objects to
-		 * be created in the form that I (VR) want to make SDCC to work */
 
 		/* if is has an absolute address then generate
 		an equate for this no need to allocate space */
@@ -242,13 +246,16 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 					if(IS_STRUCT(sym->type))
 						sym->implicit = 1;		// mark as implicit
 #endif
-					reg = pic16_allocDirReg( operandFromSymbol(sym) );
-					if(reg) {
-						if(checkAddReg(&pic16_fix_udata, reg)) {
-							/* and add to globals list if not exist */
-							addSet(&publics, sym);
+					if(!sym->ival) {
+						reg = pic16_allocDirReg( operandFromSymbol(sym) );
+						if(reg) {
+							if(checkAddReg(&pic16_fix_udata, reg)) {
+								/* and add to globals list if not exist */
+								addSet(&publics, sym);
+							}
 						}
-					}
+					} else
+						addSet(&publics, sym);
 				}
 			}
 		} else {
@@ -264,13 +271,16 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 				if(IS_STRUCT(sym->type))
 					sym->implicit = 1;		// mark as implicit
 #endif
-				reg = pic16_allocDirReg( operandFromSymbol( sym ) );
-				if(checkAddReg(&pic16_rel_udata, reg)) {
+				if(!sym->ival) {
+					reg = pic16_allocDirReg( operandFromSymbol( sym ) );
+					if(checkAddReg(&pic16_rel_udata, reg)) {
+						addSetHead(&publics, sym);
+					}
+				} else
 					addSetHead(&publics, sym);
-//					addSetHead(&externs, sym);
-				}
 			}
 
+#if 0
 			/* allocate space */
 			/* If this is a bit variable, then allocate storage after 8 bits have been declared */
 			/* unlike the 8051, the pic does not have a separate bit area. So we emulate bit ram */
@@ -284,7 +294,8 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 						fprintf (map->oFile, "\t%s_%d\n", sym->rname, i);
 				}
 			}
-//			fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
+			fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
+#endif
 		}
 	
 		/* FIXME -- VR Fix the following, so that syms to be placed
@@ -293,77 +304,45 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		/* if it has an initial value then do it only if
 			it is a global variable */
 
-#if 1
 		if (sym->ival && sym->level == 0) {
 		  ast *ival = NULL;
 
-//			if(SPEC_OCLS(sym->etype)==data) {
-//				fprintf(stderr, "%s: sym %s placed in data\n", map->sname, sym->name);
-//			}
+#if 0
+			if(SPEC_OCLS(sym->etype)==data) {
+				fprintf(stderr, "%s: sym %s placed in data segment\n", map->sname, sym->name);
+			}
+
+			if(SPEC_OCLS(sym->etype)==code) {
+				fprintf(stderr, "%s: sym %s placed in code segment\n", map->sname, sym->name);
+			}
+#endif
 
 //			fprintf(stderr, "'%s': sym '%s' has initial value\n", map->sname, sym->name);
 
-			if (IS_AGGREGATE (sym->type))
-				ival = initAggregates (sym, sym->ival, NULL);
-			else {
-#if 0
-				tic = iCodeFromAst(decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
+			if (IS_AGGREGATE (sym->type)) {
+				if(SPEC_ABSA(sym->etype))
+					addSet(&fix_idataSymSet, copySymbol(sym));
+				else
+					addSet(&rel_idataSymSet, copySymbol(sym));
+//				ival = initAggregates (sym, sym->ival, NULL);
+			} else {
+				if(SPEC_ABSA(sym->etype))
+					addSet(&fix_idataSymSet, copySymbol(sym));
+				else
+					addSet(&rel_idataSymSet, copySymbol(sym));
 
-				if(IS_PTR(sym->type)
-					&& !IS_CODEPTR(sym->type)
-					&& IS_AGGREGATE(OP_SYMBOL(IC_LEFT(tic))->type)) {
-					
-						fprintf(stderr, "symbol %s is a non-code pointer with aggregate initialiser\n", sym->name);
-
-						nsym = copySymbol( sym );
-						sprintf(tbuffer, "_tempbuf_%s", sym->name);
-						strcpy(nsym->name, tbuffer);
-						
-//						nsym->name = Safe_strdup( tbuf );
-						
-						codeOutFile = statsg->oFile;
-						GcurMemmap = statsg;
-						/* assignment of temporary buffer initialiser */
-						ival = initAggregates(nsym, nsym->ival, NULL);
-
-/*
-						ival = newNode ('=', newAst_VALUE(symbolVal (nsym)),
-							decorateType (resolveSymbols (list2expr (nsym->ival)), RESULT_CHECK));
-*/
-
-						fprintf(stderr, "%s:%d: iCode: %s\n", __FILE__, __LINE__,
-							strdup( printILine(iCodeFromAst(ival) )));
-
-						eBBlockFromiCode(iCodeFromAst(ival));
-						
-						/* assignment of symbol to temporary buffer */
-						ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
-							newAst_VALUE(symbolVal(nsym)));
-
-						fprintf(stderr, "%s:%d: iCode: %s\n", __FILE__, __LINE__,
-							strdup( printILine(iCodeFromAst(ival) )));
-
-
-						eBBlockFromiCode(iCodeFromAst(ival));
-						
-						sym->ival = NULL;
-						ival = NULL;
-				} else {
-#endif
-					addSet(&idataSymSet, copySymbol(sym));
-					ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
-						decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
-//				}
+//					ival = newNode ('=', newAst_VALUE(symbolVal (sym)),
+//						decorateType (resolveSymbols (list2expr (sym->ival)), RESULT_CHECK));
 			}
 
 			if(ival) {
+				setAstLineno(ival, sym->lineDef);
 				codeOutFile = statsg->oFile;
 				GcurMemmap = statsg;
 				eBBlockFromiCode (iCodeFromAst (ival));
 				sym->ival = NULL;
 			}
 		}
-#endif
 	}
 }
 
@@ -450,9 +429,10 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
 	  if (!DCL_ELEM (type))
 	    DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
 
-	  //printChar (oFile, SPEC_CVAL (val->etype).v_char, DCL_ELEM (type));
-	  //fprintf(stderr, "%s omitting call to printChar\n",__FUNCTION__);
-	  pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";omitting call to printChar"));
+		for(remain=0; remain<DCL_ELEM(type); remain++)
+			pic16_emitDB(pb, SPEC_CVAL(val->etype).v_char[ remain ]);
+			
+//	  pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";omitting call to printChar"));
 
 	  if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0)
             {
@@ -505,6 +485,13 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       werror (W_INIT_WRONG);
       return;
     }
+
+	fprintf(stderr, "%s:%d adding %s to idata\n", __FILE__, __LINE__, sym->name);
+	if(SPEC_ABSA(sym->etype))
+		addSet(&fix_idataSymSet, copySymbol(sym));
+	else
+		addSet(&rel_idataSymSet, copySymbol(sym));
+
     if (printIvalChar (type,
 		       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
 		       pb, SPEC_CVAL (sym->etype).v_char))
@@ -551,6 +538,8 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   return;
 }
 
+
+
 /*-----------------------------------------------------------------*/
 /* printIval - generates code for initial value                    */
 /*-----------------------------------------------------------------*/
@@ -560,11 +549,16 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
   if (!ilist || !pb)
     return;
 
+//	fprintf(stderr, "%s:%d generating init for %s\n", __FILE__, __LINE__, sym->name);
+
   /* if structure then    */
   if (IS_STRUCT (type))
     {
       //fprintf(stderr,"%s struct\n",__FUNCTION__);
       //printIvalStruct (sym, type, ilist, oFile);
+	fprintf(stderr, "%s:%d: PIC16 port error: structure initialisation is not implemented yet.\n",
+		__FILE__, __LINE__);
+	abort();
       return;
     }
 
@@ -573,6 +567,9 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
     {
       //fprintf(stderr,"%s pointer\n",__FUNCTION__);
       //printIvalPtr (sym, type, ilist, oFile);
+	fprintf(stderr, "%s:%d: PIC16 port error: pointer initialisation is not implemented yet.\n",
+		__FILE__, __LINE__);
+	abort();
       return;
     }
 
@@ -593,7 +590,12 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
     }
 }
 
-extern void pic16_pCodeConstString(char *name, char *value);
+int PIC16_IS_CONFIG_ADDRESS(int address)
+{
+
+  return (address >= pic16->cwInfo.confAddrStart && address <= pic16->cwInfo.confAddrEnd);
+}
+
 /*-----------------------------------------------------------------*/
 /* emitStaticSeg - emitcode for the static segment                 */
 /*-----------------------------------------------------------------*/
@@ -617,6 +619,14 @@ pic16emitStaticSeg (memmap * map)
 	fprintf(stderr, "\n");
 #endif
 
+        if(SPEC_ABSA(sym->etype)
+             && (SPEC_ABSA(sym->etype) && PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype)))) {
+             
+		pic16_assignConfigWordValue(SPEC_ADDR (sym->etype),
+			(int) floatFromVal(list2val( sym->ival )));
+
+		continue;
+        }
 
 	/* if it is "extern" then do nothing */
 	if (IS_EXTERN (sym->etype)) {
@@ -631,11 +641,8 @@ pic16emitStaticSeg (memmap * map)
 	/* if it is not static add it to the public
 	   table */
 	if (!IS_STATIC (sym->etype)) {
-
 		/* do not emit if it is a config word declaration */
-		if(!SPEC_ABSA(sym->etype)
-			|| (SPEC_ABSA(sym->etype) && !PIC16_IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))))
-				checkAddSym(&publics, sym);
+		checkAddSym(&publics, sym);
 	}
 
 #if 0
@@ -675,11 +682,56 @@ pic16emitStaticSeg (memmap * map)
 	  fprintf (code->oFile, "%s\t=\t0x%04x\n",
 		   sym->rname,
 		   SPEC_ADDR (sym->etype));
-	}
-      else
-	{
-		fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
-			__FILE__, __LINE__, sym->name);
+
+	  /* if it has an initial value */
+	  if (sym->ival)
+	    {
+	      pBlock *pb;
+              symbol *asym;
+              absSym *abSym;
+              pCode *pcf;
+              
+	      noAlloc++;
+	      resolveIvalSym (sym->ival, sym->type);
+	      asym = newSymbol(sym->rname, 0);
+	      abSym = Safe_calloc(1, sizeof(absSym));
+	      abSym->name = Safe_strdup( sym->rname );
+	      abSym->address = SPEC_ADDR( sym->etype );
+	      addSet(&absSymSet, abSym);
+	      
+	      pb = pic16_newpCodeChain(NULL, 'A',pic16_newpCodeCharP("; Starting pCode block for absolute Ival"));
+	      pic16_addpBlock(pb);
+
+	      pcf = pic16_newpCodeFunction(moduleName, asym->name);
+	      PCF(pcf)->absblock = 1;
+	      
+	      pic16_addpCode2pBlock(pb,pcf);
+	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
+	      printIval (sym, sym->type, sym->ival, pb);
+              pic16_flushDB(pb);
+
+	      pic16_addpCode2pBlock(pb, pic16_newpCodeFunction(NULL, NULL));
+	      noAlloc--;
+	    }
+	  else
+	    {
+
+	      /* allocate space */
+	      fprintf (code->oFile, "%s:\n", sym->rname);
+	      /* special case for character strings */
+	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
+		  SPEC_CVAL (sym->etype).v_char)
+		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
+		/*printChar (code->oFile,
+			   SPEC_CVAL (sym->etype).v_char,
+			   strlen (SPEC_CVAL (sym->etype).v_char) + 1);*/
+	      else
+		fprintf (code->oFile, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
+	    }
+  
+	} else {
+//		fprintf(stderr, "%s:%d spec_absa is false for symbol: %s\n",
+//			__FILE__, __LINE__, sym->name);
 
 	  if (options.debug || sym->level == 0)
 	    fprintf (code->oFile, " == .\n");
@@ -723,8 +775,20 @@ pic16emitStaticSeg (memmap * map)
 
 
 /*-----------------------------------------------------------------*/
-/* emitMaps - emits the code for the data portion the code         */
+/* pic16_emitConfigRegs - emits the configuration registers              */
 /*-----------------------------------------------------------------*/
+void pic16_emitConfigRegs(FILE *of)
+{
+  int i;
+
+	for(i=0;i<pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart;i++)
+		if(pic16->cwInfo.crInfo[i].emit)	//mask != -1)
+			fprintf (of, "\t__config 0x%x, 0x%hhx\n",
+				pic16->cwInfo.confAddrStart+i,
+				pic16->cwInfo.crInfo[i].value);
+}
+
+
 static void
 pic16emitMaps ()
 {
@@ -772,13 +836,13 @@ pic16createInterruptVect (FILE * vFile)
 
 
 /*-----------------------------------------------------------------*/
-/* initialComments - puts in some initial comments                 */
+/* pic16initialComments - puts in some initial comments            */
 /*-----------------------------------------------------------------*/
 static void
 pic16initialComments (FILE * afile)
 {
   initialComments (afile);
-  fprintf (afile, "; PIC port for the 16-bit core\n");
+  fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
   fprintf (afile, iComments2);
 
 }
@@ -961,7 +1025,7 @@ pic16glue ()
 		pic16_addpBlock(pb);
 
 		/* entry point @ start of CSEG */
-		pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("__sdcc_program_startup\t;VR1",-1));
+		pic16_addpCode2pBlock(pb,pic16_newpCodeLabel("__sdcc_program_startup",-1));
 
 		if(initsfpnt) {
 			pic16_addpCode2pBlock(pb, pic16_newpCode(POC_LFSR,
@@ -1045,7 +1109,6 @@ pic16glue ()
 	pic16initialComments (asmFile);
     
 	/* print module name */
-//	fprintf (asmFile, ";\t.module %s\n", moduleName);
 	fprintf(asmFile, "#FILE\t\"%s\"\n", fullSrcFileName);
     
 	/* Let the port generate any global directives, etc. */
@@ -1072,11 +1135,15 @@ pic16glue ()
 	pic16_AnalyzeBanking();
 	pic16_writeUsedRegs(asmFile);
 
+#if 0
 	/* create the overlay segments */
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "; overlayable items in internal ram \n");
 	fprintf (asmFile, "%s", iComments2);    
 	copyFile (asmFile, ovrFile);
+#endif
+
+#if 0
 
 	/* create the stack segment MOF */
 	if (mainf && IFFUNC_HASBODY(mainf->type)) {
@@ -1086,6 +1153,7 @@ pic16glue ()
 		fprintf (asmFile, ";\t.area\tSSEG\t(DATA)\n"
 			";__start__stack:\n;\t.ds\t1\n\n");
 	}
+#endif
 
 #if 0
 	/* no indirect data in pic */
@@ -1118,12 +1186,13 @@ pic16glue ()
 	copyFile (asmFile, xdata->oFile);
 #endif
 
+#if 0
 	/* copy the bit segment */
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "; bit data\n");
 	fprintf (asmFile, "%s", iComments2);
 	copyFile (asmFile, bit->oFile);
-
+#endif
 
 	/* copy the interrupt vector table */
 	if(mainf && IFFUNC_HASBODY(mainf->type)) {
@@ -1139,26 +1208,14 @@ pic16glue ()
 	fprintf (asmFile, "%s", iComments2);
     
 #if 0
-	/* FIXME 8051 Legacy -- VR */
-	/* Everywhere we generate a reference to the static_name area, 
-	* (which is currently only here), we immediately follow it with a 
-	* definition of the post_static_name area. This guarantees that
-	* the post_static_name area will immediately follow the static_name
-	* area.
-	*/
-	fprintf (asmFile, ";\t.area %s\n", port->mem.static_name); /* MOF */
-	fprintf (asmFile, ";\t.area %s\n", port->mem.post_static_name);
-	fprintf (asmFile, ";\t.area %s\n", port->mem.static_name);
-#endif
-
-#if 0
 	/* copy over code */
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "\tcode\n");
 	fprintf (asmFile, "%s", iComments2);
 #endif
 
-	fprintf(asmFile, "; A code from now on!\n");
+	if(pic16_debug_verbose)
+		fprintf(asmFile, "; A code from now on!\n");
 	pic16_copypCode(asmFile, 'A');
 
 
@@ -1186,21 +1243,21 @@ pic16glue ()
 	fprintf(asmFile, "; I code from now on!\n");
 	pic16_copypCode(asmFile, 'I');
 
-//	if(pic16_debug_verbose)
+	if(pic16_debug_verbose)
 		fprintf(asmFile, "; dbName from now on!\n");
 	pic16_copypCode(asmFile, statsg->dbName);
 
 
 	if (port->general.glue_up_main && mainf && IFFUNC_HASBODY(mainf->type)) {
-		fprintf (asmFile,"\tgoto\t__sdcc_program_startup\t;VR2\n");
+		fprintf (asmFile,"\tgoto\t__sdcc_program_startup\n");
 	}
 	
 
-//	if(pic16_debug_verbose)
+	if(pic16_debug_verbose)
 		fprintf(asmFile, "; X code from now on!\n");
 	pic16_copypCode(asmFile, 'X');
 
-//	if(pic16_debug_verbose)
+	if(pic16_debug_verbose)
 		fprintf(asmFile, "; M code from now on!\n");
 	pic16_copypCode(asmFile, 'M');
 

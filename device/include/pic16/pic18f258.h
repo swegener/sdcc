@@ -1,6 +1,6 @@
 
 /*
- * pic18f258.h - 18F258 Device Library Header
+ * pic18f258.h - PIC18F258 Device Library Header
  *
  * This file is part of the GNU PIC Library.
  *
@@ -27,9 +27,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXF0SIDHbits_t;
+} __RXF0SIDHbits_t;
 
-extern volatile RXF0SIDHbits_t at 0xf00 RXF0SIDHbits;
+extern volatile __RXF0SIDHbits_t at 0xf00 RXF0SIDHbits;
 
 extern sfr at 0xf01 RXF0SIDL;
 typedef union {
@@ -43,9 +43,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXF0SIDLbits_t;
+} __RXF0SIDLbits_t;
 
-extern volatile RXF0SIDLbits_t at 0xf01 RXF0SIDLbits;
+extern volatile __RXF0SIDLbits_t at 0xf01 RXF0SIDLbits;
 
 extern sfr at 0xf02 RXF0EIDH;
 typedef union {
@@ -59,9 +59,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXF0EIDHbits_t;
+} __RXF0EIDHbits_t;
 
-extern volatile RXF0EIDHbits_t at 0xf02 RXF0EIDHbits;
+extern volatile __RXF0EIDHbits_t at 0xf02 RXF0EIDHbits;
 
 extern sfr at 0xf03 RXF0EIDL;
 typedef union {
@@ -75,9 +75,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXF0EIDLbits_t;
+} __RXF0EIDLbits_t;
 
-extern volatile RXF0EIDLbits_t at 0xf03 RXF0EIDLbits;
+extern volatile __RXF0EIDLbits_t at 0xf03 RXF0EIDLbits;
 
 extern sfr at 0xf04 RXF1SIDH;
 typedef union {
@@ -91,9 +91,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXF1SIDHbits_t;
+} __RXF1SIDHbits_t;
 
-extern volatile RXF1SIDHbits_t at 0xf04 RXF1SIDHbits;
+extern volatile __RXF1SIDHbits_t at 0xf04 RXF1SIDHbits;
 
 extern sfr at 0xf05 RXF1SIDL;
 typedef union {
@@ -107,9 +107,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXF1SIDLbits_t;
+} __RXF1SIDLbits_t;
 
-extern volatile RXF1SIDLbits_t at 0xf05 RXF1SIDLbits;
+extern volatile __RXF1SIDLbits_t at 0xf05 RXF1SIDLbits;
 
 extern sfr at 0xf06 RXF1EIDH;
 typedef union {
@@ -123,9 +123,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXF1EIDHbits_t;
+} __RXF1EIDHbits_t;
 
-extern volatile RXF1EIDHbits_t at 0xf06 RXF1EIDHbits;
+extern volatile __RXF1EIDHbits_t at 0xf06 RXF1EIDHbits;
 
 extern sfr at 0xf07 RXF1EIDL;
 typedef union {
@@ -139,9 +139,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXF1EIDLbits_t;
+} __RXF1EIDLbits_t;
 
-extern volatile RXF1EIDLbits_t at 0xf07 RXF1EIDLbits;
+extern volatile __RXF1EIDLbits_t at 0xf07 RXF1EIDLbits;
 
 extern sfr at 0xf08 RXF2SIDH;
 typedef union {
@@ -155,9 +155,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXF2SIDHbits_t;
+} __RXF2SIDHbits_t;
 
-extern volatile RXF2SIDHbits_t at 0xf08 RXF2SIDHbits;
+extern volatile __RXF2SIDHbits_t at 0xf08 RXF2SIDHbits;
 
 extern sfr at 0xf09 RXF2SIDL;
 typedef union {
@@ -171,9 +171,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXF2SIDLbits_t;
+} __RXF2SIDLbits_t;
 
-extern volatile RXF2SIDLbits_t at 0xf09 RXF2SIDLbits;
+extern volatile __RXF2SIDLbits_t at 0xf09 RXF2SIDLbits;
 
 extern sfr at 0xf0a RXF2EIDH;
 typedef union {
@@ -187,9 +187,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXF2EIDHbits_t;
+} __RXF2EIDHbits_t;
 
-extern volatile RXF2EIDHbits_t at 0xf0a RXF2EIDHbits;
+extern volatile __RXF2EIDHbits_t at 0xf0a RXF2EIDHbits;
 
 extern sfr at 0xf0b RXF2EIDL;
 typedef union {
@@ -203,9 +203,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXF2EIDLbits_t;
+} __RXF2EIDLbits_t;
 
-extern volatile RXF2EIDLbits_t at 0xf0b RXF2EIDLbits;
+extern volatile __RXF2EIDLbits_t at 0xf0b RXF2EIDLbits;
 
 extern sfr at 0xf0c RXF3SIDH;
 typedef union {
@@ -219,9 +219,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXF3SIDHbits_t;
+} __RXF3SIDHbits_t;
 
-extern volatile RXF3SIDHbits_t at 0xf0c RXF3SIDHbits;
+extern volatile __RXF3SIDHbits_t at 0xf0c RXF3SIDHbits;
 
 extern sfr at 0xf0d RXF3SIDL;
 typedef union {
@@ -235,9 +235,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXF3SIDLbits_t;
+} __RXF3SIDLbits_t;
 
-extern volatile RXF3SIDLbits_t at 0xf0d RXF3SIDLbits;
+extern volatile __RXF3SIDLbits_t at 0xf0d RXF3SIDLbits;
 
 extern sfr at 0xf0e RXF3EIDH;
 typedef union {
@@ -251,9 +251,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXF3EIDHbits_t;
+} __RXF3EIDHbits_t;
 
-extern volatile RXF3EIDHbits_t at 0xf0e RXF3EIDHbits;
+extern volatile __RXF3EIDHbits_t at 0xf0e RXF3EIDHbits;
 
 extern sfr at 0xf0f RXF3EIDL;
 typedef union {
@@ -267,9 +267,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXF3EIDLbits_t;
+} __RXF3EIDLbits_t;
 
-extern volatile RXF3EIDLbits_t at 0xf0f RXF3EIDLbits;
+extern volatile __RXF3EIDLbits_t at 0xf0f RXF3EIDLbits;
 
 extern sfr at 0xf10 RXF4SIDH;
 typedef union {
@@ -283,9 +283,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXF4SIDHbits_t;
+} __RXF4SIDHbits_t;
 
-extern volatile RXF4SIDHbits_t at 0xf10 RXF4SIDHbits;
+extern volatile __RXF4SIDHbits_t at 0xf10 RXF4SIDHbits;
 
 extern sfr at 0xf11 RXF4SIDL;
 typedef union {
@@ -299,9 +299,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXF4SIDLbits_t;
+} __RXF4SIDLbits_t;
 
-extern volatile RXF4SIDLbits_t at 0xf11 RXF4SIDLbits;
+extern volatile __RXF4SIDLbits_t at 0xf11 RXF4SIDLbits;
 
 extern sfr at 0xf12 RXF4EIDH;
 typedef union {
@@ -315,9 +315,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXF4EIDHbits_t;
+} __RXF4EIDHbits_t;
 
-extern volatile RXF4EIDHbits_t at 0xf12 RXF4EIDHbits;
+extern volatile __RXF4EIDHbits_t at 0xf12 RXF4EIDHbits;
 
 extern sfr at 0xf13 RXF4EIDL;
 typedef union {
@@ -331,9 +331,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXF4EIDLbits_t;
+} __RXF4EIDLbits_t;
 
-extern volatile RXF4EIDLbits_t at 0xf13 RXF4EIDLbits;
+extern volatile __RXF4EIDLbits_t at 0xf13 RXF4EIDLbits;
 
 extern sfr at 0xf14 RXF5SIDH;
 typedef union {
@@ -347,9 +347,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXF5SIDHbits_t;
+} __RXF5SIDHbits_t;
 
-extern volatile RXF5SIDHbits_t at 0xf14 RXF5SIDHbits;
+extern volatile __RXF5SIDHbits_t at 0xf14 RXF5SIDHbits;
 
 extern sfr at 0xf15 RXF5SIDL;
 typedef union {
@@ -363,9 +363,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXF5SIDLbits_t;
+} __RXF5SIDLbits_t;
 
-extern volatile RXF5SIDLbits_t at 0xf15 RXF5SIDLbits;
+extern volatile __RXF5SIDLbits_t at 0xf15 RXF5SIDLbits;
 
 extern sfr at 0xf16 RXF5EIDH;
 typedef union {
@@ -379,9 +379,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXF5EIDHbits_t;
+} __RXF5EIDHbits_t;
 
-extern volatile RXF5EIDHbits_t at 0xf16 RXF5EIDHbits;
+extern volatile __RXF5EIDHbits_t at 0xf16 RXF5EIDHbits;
 
 extern sfr at 0xf17 RXF5EIDL;
 typedef union {
@@ -395,9 +395,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXF5EIDLbits_t;
+} __RXF5EIDLbits_t;
 
-extern volatile RXF5EIDLbits_t at 0xf17 RXF5EIDLbits;
+extern volatile __RXF5EIDLbits_t at 0xf17 RXF5EIDLbits;
 
 extern sfr at 0xf18 RXM0SIDH;
 typedef union {
@@ -411,9 +411,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXM0SIDHbits_t;
+} __RXM0SIDHbits_t;
 
-extern volatile RXM0SIDHbits_t at 0xf18 RXM0SIDHbits;
+extern volatile __RXM0SIDHbits_t at 0xf18 RXM0SIDHbits;
 
 extern sfr at 0xf19 RXM0SIDL;
 typedef union {
@@ -427,9 +427,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXM0SIDLbits_t;
+} __RXM0SIDLbits_t;
 
-extern volatile RXM0SIDLbits_t at 0xf19 RXM0SIDLbits;
+extern volatile __RXM0SIDLbits_t at 0xf19 RXM0SIDLbits;
 
 extern sfr at 0xf1a RXM0EIDH;
 typedef union {
@@ -443,9 +443,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXM0EIDHbits_t;
+} __RXM0EIDHbits_t;
 
-extern volatile RXM0EIDHbits_t at 0xf1a RXM0EIDHbits;
+extern volatile __RXM0EIDHbits_t at 0xf1a RXM0EIDHbits;
 
 extern sfr at 0xf1b RXM0EIDL;
 typedef union {
@@ -459,9 +459,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXM0EIDLbits_t;
+} __RXM0EIDLbits_t;
 
-extern volatile RXM0EIDLbits_t at 0xf1b RXM0EIDLbits;
+extern volatile __RXM0EIDLbits_t at 0xf1b RXM0EIDLbits;
 
 extern sfr at 0xf1c RXM1SIDH;
 typedef union {
@@ -475,9 +475,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXM1SIDHbits_t;
+} __RXM1SIDHbits_t;
 
-extern volatile RXM1SIDHbits_t at 0xf1c RXM1SIDHbits;
+extern volatile __RXM1SIDHbits_t at 0xf1c RXM1SIDHbits;
 
 extern sfr at 0xf1d RXM1SIDL;
 typedef union {
@@ -491,9 +491,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXM1SIDLbits_t;
+} __RXM1SIDLbits_t;
 
-extern volatile RXM1SIDLbits_t at 0xf1d RXM1SIDLbits;
+extern volatile __RXM1SIDLbits_t at 0xf1d RXM1SIDLbits;
 
 extern sfr at 0xf1e RXM1EIDH;
 typedef union {
@@ -507,9 +507,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXM1EIDHbits_t;
+} __RXM1EIDHbits_t;
 
-extern volatile RXM1EIDHbits_t at 0xf1e RXM1EIDHbits;
+extern volatile __RXM1EIDHbits_t at 0xf1e RXM1EIDHbits;
 
 extern sfr at 0xf1f RXM1EIDL;
 typedef union {
@@ -523,9 +523,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXM1EIDLbits_t;
+} __RXM1EIDLbits_t;
 
-extern volatile RXM1EIDLbits_t at 0xf1f RXM1EIDLbits;
+extern volatile __RXM1EIDLbits_t at 0xf1f RXM1EIDLbits;
 
 extern sfr at 0xf20 TXB2CON;
 typedef union {
@@ -539,9 +539,9 @@ typedef union {
 		unsigned TXABT:1;
 		unsigned :1;
 	};
-} TXB2CONbits_t;
+} __TXB2CONbits_t;
 
-extern volatile TXB2CONbits_t at 0xf20 TXB2CONbits;
+extern volatile __TXB2CONbits_t at 0xf20 TXB2CONbits;
 
 extern sfr at 0xf21 TXB2SIDH;
 typedef union {
@@ -555,9 +555,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} TXB2SIDHbits_t;
+} __TXB2SIDHbits_t;
 
-extern volatile TXB2SIDHbits_t at 0xf21 TXB2SIDHbits;
+extern volatile __TXB2SIDHbits_t at 0xf21 TXB2SIDHbits;
 
 extern sfr at 0xf22 TXB2SIDL;
 typedef union {
@@ -571,9 +571,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} TXB2SIDLbits_t;
+} __TXB2SIDLbits_t;
 
-extern volatile TXB2SIDLbits_t at 0xf22 TXB2SIDLbits;
+extern volatile __TXB2SIDLbits_t at 0xf22 TXB2SIDLbits;
 
 extern sfr at 0xf23 TXB2EIDH;
 typedef union {
@@ -587,9 +587,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} TXB2EIDHbits_t;
+} __TXB2EIDHbits_t;
 
-extern volatile TXB2EIDHbits_t at 0xf23 TXB2EIDHbits;
+extern volatile __TXB2EIDHbits_t at 0xf23 TXB2EIDHbits;
 
 extern sfr at 0xf24 TXB2EIDL;
 typedef union {
@@ -603,9 +603,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} TXB2EIDLbits_t;
+} __TXB2EIDLbits_t;
 
-extern volatile TXB2EIDLbits_t at 0xf24 TXB2EIDLbits;
+extern volatile __TXB2EIDLbits_t at 0xf24 TXB2EIDLbits;
 
 extern sfr at 0xf25 TXB2DLC;
 typedef union {
@@ -619,9 +619,9 @@ typedef union {
 		unsigned TXB2TXRTR:1;
 		unsigned :1;
 	};
-} TXB2DLCbits_t;
+} __TXB2DLCbits_t;
 
-extern volatile TXB2DLCbits_t at 0xf25 TXB2DLCbits;
+extern volatile __TXB2DLCbits_t at 0xf25 TXB2DLCbits;
 
 extern sfr at 0xf26 TXB2D0;
 typedef union {
@@ -635,9 +635,9 @@ typedef union {
 		unsigned TXB2D06:1;
 		unsigned TXB2D07:1;
 	};
-} TXB2D0bits_t;
+} __TXB2D0bits_t;
 
-extern volatile TXB2D0bits_t at 0xf26 TXB2D0bits;
+extern volatile __TXB2D0bits_t at 0xf26 TXB2D0bits;
 
 extern sfr at 0xf27 TXB2D1;
 typedef union {
@@ -651,9 +651,9 @@ typedef union {
 		unsigned TXB2D16:1;
 		unsigned TXB2D17:1;
 	};
-} TXB2D1bits_t;
+} __TXB2D1bits_t;
 
-extern volatile TXB2D1bits_t at 0xf27 TXB2D1bits;
+extern volatile __TXB2D1bits_t at 0xf27 TXB2D1bits;
 
 extern sfr at 0xf28 TXB2D2;
 typedef union {
@@ -667,9 +667,9 @@ typedef union {
 		unsigned TXB2D26:1;
 		unsigned TXB2D27:1;
 	};
-} TXB2D2bits_t;
+} __TXB2D2bits_t;
 
-extern volatile TXB2D2bits_t at 0xf28 TXB2D2bits;
+extern volatile __TXB2D2bits_t at 0xf28 TXB2D2bits;
 
 extern sfr at 0xf29 TXB2D3;
 typedef union {
@@ -683,9 +683,9 @@ typedef union {
 		unsigned TXB2D36:1;
 		unsigned TXB2D37:1;
 	};
-} TXB2D3bits_t;
+} __TXB2D3bits_t;
 
-extern volatile TXB2D3bits_t at 0xf29 TXB2D3bits;
+extern volatile __TXB2D3bits_t at 0xf29 TXB2D3bits;
 
 extern sfr at 0xf2a TXB2D4;
 typedef union {
@@ -699,9 +699,9 @@ typedef union {
 		unsigned TXB2D46:1;
 		unsigned TXB2D47:1;
 	};
-} TXB2D4bits_t;
+} __TXB2D4bits_t;
 
-extern volatile TXB2D4bits_t at 0xf2a TXB2D4bits;
+extern volatile __TXB2D4bits_t at 0xf2a TXB2D4bits;
 
 extern sfr at 0xf2b TXB2D5;
 typedef union {
@@ -715,9 +715,9 @@ typedef union {
 		unsigned TXB2D56:1;
 		unsigned TXB2D57:1;
 	};
-} TXB2D5bits_t;
+} __TXB2D5bits_t;
 
-extern volatile TXB2D5bits_t at 0xf2b TXB2D5bits;
+extern volatile __TXB2D5bits_t at 0xf2b TXB2D5bits;
 
 extern sfr at 0xf2c TXB2D6;
 typedef union {
@@ -731,9 +731,9 @@ typedef union {
 		unsigned TXB2D66:1;
 		unsigned TXB2D67:1;
 	};
-} TXB2D6bits_t;
+} __TXB2D6bits_t;
 
-extern volatile TXB2D6bits_t at 0xf2c TXB2D6bits;
+extern volatile __TXB2D6bits_t at 0xf2c TXB2D6bits;
 
 extern sfr at 0xf2d TXB2D7;
 typedef union {
@@ -747,9 +747,9 @@ typedef union {
 		unsigned TXB2D76:1;
 		unsigned TXB2D77:1;
 	};
-} TXB2D7bits_t;
+} __TXB2D7bits_t;
 
-extern volatile TXB2D7bits_t at 0xf2d TXB2D7bits;
+extern volatile __TXB2D7bits_t at 0xf2d TXB2D7bits;
 
 extern sfr at 0xf2e CANSTATRO4;
 typedef union {
@@ -763,9 +763,9 @@ typedef union {
 		unsigned OPMODE1:1;
 		unsigned OPMODE2:1;
 	};
-} CANSTATRO4bits_t;
+} __CANSTATRO4bits_t;
 
-extern volatile CANSTATRO4bits_t at 0xf2e CANSTATRO4bits;
+extern volatile __CANSTATRO4bits_t at 0xf2e CANSTATRO4bits;
 
 extern sfr at 0xf30 TXB1CON;
 typedef union {
@@ -779,9 +779,9 @@ typedef union {
 		unsigned TXABT:1;
 		unsigned :1;
 	};
-} TXB1CONbits_t;
+} __TXB1CONbits_t;
 
-extern volatile TXB1CONbits_t at 0xf30 TXB1CONbits;
+extern volatile __TXB1CONbits_t at 0xf30 TXB1CONbits;
 
 extern sfr at 0xf31 TXB1SIDH;
 typedef union {
@@ -795,9 +795,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} TXB1SIDHbits_t;
+} __TXB1SIDHbits_t;
 
-extern volatile TXB1SIDHbits_t at 0xf31 TXB1SIDHbits;
+extern volatile __TXB1SIDHbits_t at 0xf31 TXB1SIDHbits;
 
 extern sfr at 0xf32 TXB1SIDL;
 typedef union {
@@ -811,9 +811,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} TXB1SIDLbits_t;
+} __TXB1SIDLbits_t;
 
-extern volatile TXB1SIDLbits_t at 0xf32 TXB1SIDLbits;
+extern volatile __TXB1SIDLbits_t at 0xf32 TXB1SIDLbits;
 
 extern sfr at 0xf33 TXB1EIDH;
 typedef union {
@@ -827,9 +827,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} TXB1EIDHbits_t;
+} __TXB1EIDHbits_t;
 
-extern volatile TXB1EIDHbits_t at 0xf33 TXB1EIDHbits;
+extern volatile __TXB1EIDHbits_t at 0xf33 TXB1EIDHbits;
 
 extern sfr at 0xf34 TXB1EIDL;
 typedef union {
@@ -843,9 +843,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} TXB1EIDLbits_t;
+} __TXB1EIDLbits_t;
 
-extern volatile TXB1EIDLbits_t at 0xf34 TXB1EIDLbits;
+extern volatile __TXB1EIDLbits_t at 0xf34 TXB1EIDLbits;
 
 extern sfr at 0xf35 TXB1DLC;
 typedef union {
@@ -859,9 +859,9 @@ typedef union {
 		unsigned TXRTR:1;
 		unsigned :1;
 	};
-} TXB1DLCbits_t;
+} __TXB1DLCbits_t;
 
-extern volatile TXB1DLCbits_t at 0xf35 TXB1DLCbits;
+extern volatile __TXB1DLCbits_t at 0xf35 TXB1DLCbits;
 
 extern sfr at 0xf36 TXB1D0;
 typedef union {
@@ -875,9 +875,9 @@ typedef union {
 		unsigned TXB1D06:1;
 		unsigned TXB1D07:1;
 	};
-} TXB1D0bits_t;
+} __TXB1D0bits_t;
 
-extern volatile TXB1D0bits_t at 0xf36 TXB1D0bits;
+extern volatile __TXB1D0bits_t at 0xf36 TXB1D0bits;
 
 extern sfr at 0xf37 TXB1D1;
 typedef union {
@@ -891,9 +891,9 @@ typedef union {
 		unsigned TXB1D16:1;
 		unsigned TXB1D17:1;
 	};
-} TXB1D1bits_t;
+} __TXB1D1bits_t;
 
-extern volatile TXB1D1bits_t at 0xf37 TXB1D1bits;
+extern volatile __TXB1D1bits_t at 0xf37 TXB1D1bits;
 
 extern sfr at 0xf38 TXB1D2;
 typedef union {
@@ -907,9 +907,9 @@ typedef union {
 		unsigned TXB1D26:1;
 		unsigned TXB1D27:1;
 	};
-} TXB1D2bits_t;
+} __TXB1D2bits_t;
 
-extern volatile TXB1D2bits_t at 0xf38 TXB1D2bits;
+extern volatile __TXB1D2bits_t at 0xf38 TXB1D2bits;
 
 extern sfr at 0xf39 TXB1D3;
 typedef union {
@@ -923,9 +923,9 @@ typedef union {
 		unsigned TXB1D36:1;
 		unsigned TXB1D37:1;
 	};
-} TXB1D3bits_t;
+} __TXB1D3bits_t;
 
-extern volatile TXB1D3bits_t at 0xf39 TXB1D3bits;
+extern volatile __TXB1D3bits_t at 0xf39 TXB1D3bits;
 
 extern sfr at 0xf3a TXB1D4;
 typedef union {
@@ -939,9 +939,9 @@ typedef union {
 		unsigned TXB1D46:1;
 		unsigned TXB1D47:1;
 	};
-} TXB1D4bits_t;
+} __TXB1D4bits_t;
 
-extern volatile TXB1D4bits_t at 0xf3a TXB1D4bits;
+extern volatile __TXB1D4bits_t at 0xf3a TXB1D4bits;
 
 extern sfr at 0xf3b TXB1D5;
 typedef union {
@@ -955,9 +955,9 @@ typedef union {
 		unsigned TXB1D56:1;
 		unsigned TXB1D57:1;
 	};
-} TXB1D5bits_t;
+} __TXB1D5bits_t;
 
-extern volatile TXB1D5bits_t at 0xf3b TXB1D5bits;
+extern volatile __TXB1D5bits_t at 0xf3b TXB1D5bits;
 
 extern sfr at 0xf3c TXB1D6;
 typedef union {
@@ -971,9 +971,9 @@ typedef union {
 		unsigned TXB1D66:1;
 		unsigned TXB1D67:1;
 	};
-} TXB1D6bits_t;
+} __TXB1D6bits_t;
 
-extern volatile TXB1D6bits_t at 0xf3c TXB1D6bits;
+extern volatile __TXB1D6bits_t at 0xf3c TXB1D6bits;
 
 extern sfr at 0xf3d TXB1D7;
 typedef union {
@@ -987,9 +987,9 @@ typedef union {
 		unsigned TXB1D76:1;
 		unsigned TXB1D77:1;
 	};
-} TXB1D7bits_t;
+} __TXB1D7bits_t;
 
-extern volatile TXB1D7bits_t at 0xf3d TXB1D7bits;
+extern volatile __TXB1D7bits_t at 0xf3d TXB1D7bits;
 
 extern sfr at 0xf3e CANSTATRO3;
 typedef union {
@@ -1003,9 +1003,9 @@ typedef union {
 		unsigned OPMODE1:1;
 		unsigned OPMODE2:1;
 	};
-} CANSTATRO3bits_t;
+} __CANSTATRO3bits_t;
 
-extern volatile CANSTATRO3bits_t at 0xf3e CANSTATRO3bits;
+extern volatile __CANSTATRO3bits_t at 0xf3e CANSTATRO3bits;
 
 extern sfr at 0xf40 TXB0CON;
 typedef union {
@@ -1019,9 +1019,9 @@ typedef union {
 		unsigned TXABT:1;
 		unsigned :1;
 	};
-} TXB0CONbits_t;
+} __TXB0CONbits_t;
 
-extern volatile TXB0CONbits_t at 0xf40 TXB0CONbits;
+extern volatile __TXB0CONbits_t at 0xf40 TXB0CONbits;
 
 extern sfr at 0xf41 TXB0SIDH;
 typedef union {
@@ -1035,9 +1035,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} TXB0SIDHbits_t;
+} __TXB0SIDHbits_t;
 
-extern volatile TXB0SIDHbits_t at 0xf41 TXB0SIDHbits;
+extern volatile __TXB0SIDHbits_t at 0xf41 TXB0SIDHbits;
 
 extern sfr at 0xf42 TXB0SIDL;
 typedef union {
@@ -1051,9 +1051,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} TXB0SIDLbits_t;
+} __TXB0SIDLbits_t;
 
-extern volatile TXB0SIDLbits_t at 0xf42 TXB0SIDLbits;
+extern volatile __TXB0SIDLbits_t at 0xf42 TXB0SIDLbits;
 
 extern sfr at 0xf43 TXB0EIDH;
 typedef union {
@@ -1067,9 +1067,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} TXB0EIDHbits_t;
+} __TXB0EIDHbits_t;
 
-extern volatile TXB0EIDHbits_t at 0xf43 TXB0EIDHbits;
+extern volatile __TXB0EIDHbits_t at 0xf43 TXB0EIDHbits;
 
 extern sfr at 0xf44 TXB0EIDL;
 typedef union {
@@ -1083,9 +1083,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} TXB0EIDLbits_t;
+} __TXB0EIDLbits_t;
 
-extern volatile TXB0EIDLbits_t at 0xf44 TXB0EIDLbits;
+extern volatile __TXB0EIDLbits_t at 0xf44 TXB0EIDLbits;
 
 extern sfr at 0xf45 TXB0DLC;
 typedef union {
@@ -1099,9 +1099,9 @@ typedef union {
 		unsigned TXRTR:1;
 		unsigned :1;
 	};
-} TXB0DLCbits_t;
+} __TXB0DLCbits_t;
 
-extern volatile TXB0DLCbits_t at 0xf45 TXB0DLCbits;
+extern volatile __TXB0DLCbits_t at 0xf45 TXB0DLCbits;
 
 extern sfr at 0xf46 TXB0D0;
 typedef union {
@@ -1115,9 +1115,9 @@ typedef union {
 		unsigned TXB0D06:1;
 		unsigned TXB0D07:1;
 	};
-} TXB0D0bits_t;
+} __TXB0D0bits_t;
 
-extern volatile TXB0D0bits_t at 0xf46 TXB0D0bits;
+extern volatile __TXB0D0bits_t at 0xf46 TXB0D0bits;
 
 extern sfr at 0xf47 TXB0D1;
 typedef union {
@@ -1131,9 +1131,9 @@ typedef union {
 		unsigned TXB0D16:1;
 		unsigned TXB0D17:1;
 	};
-} TXB0D1bits_t;
+} __TXB0D1bits_t;
 
-extern volatile TXB0D1bits_t at 0xf47 TXB0D1bits;
+extern volatile __TXB0D1bits_t at 0xf47 TXB0D1bits;
 
 extern sfr at 0xf48 TXB0D2;
 typedef union {
@@ -1147,9 +1147,9 @@ typedef union {
 		unsigned TXB0D26:1;
 		unsigned TXB0D27:1;
 	};
-} TXB0D2bits_t;
+} __TXB0D2bits_t;
 
-extern volatile TXB0D2bits_t at 0xf48 TXB0D2bits;
+extern volatile __TXB0D2bits_t at 0xf48 TXB0D2bits;
 
 extern sfr at 0xf49 TXB0D3;
 typedef union {
@@ -1163,9 +1163,9 @@ typedef union {
 		unsigned TXBD0D36:1;
 		unsigned TXB0D37:1;
 	};
-} TXB0D3bits_t;
+} __TXB0D3bits_t;
 
-extern volatile TXB0D3bits_t at 0xf49 TXB0D3bits;
+extern volatile __TXB0D3bits_t at 0xf49 TXB0D3bits;
 
 extern sfr at 0xf4a TXB0D4;
 typedef union {
@@ -1179,9 +1179,9 @@ typedef union {
 		unsigned TXB0D46:1;
 		unsigned TXB0D47:1;
 	};
-} TXB0D4bits_t;
+} __TXB0D4bits_t;
 
-extern volatile TXB0D4bits_t at 0xf4a TXB0D4bits;
+extern volatile __TXB0D4bits_t at 0xf4a TXB0D4bits;
 
 extern sfr at 0xf4b TXB0D5;
 typedef union {
@@ -1195,9 +1195,9 @@ typedef union {
 		unsigned TXB0D56:1;
 		unsigned TXB0D57:1;
 	};
-} TXB0D5bits_t;
+} __TXB0D5bits_t;
 
-extern volatile TXB0D5bits_t at 0xf4b TXB0D5bits;
+extern volatile __TXB0D5bits_t at 0xf4b TXB0D5bits;
 
 extern sfr at 0xf4c TXB0D6;
 typedef union {
@@ -1211,9 +1211,9 @@ typedef union {
 		unsigned TXB0D66:1;
 		unsigned TXB0D67:1;
 	};
-} TXB0D6bits_t;
+} __TXB0D6bits_t;
 
-extern volatile TXB0D6bits_t at 0xf4c TXB0D6bits;
+extern volatile __TXB0D6bits_t at 0xf4c TXB0D6bits;
 
 extern sfr at 0xf4d TXB0D7;
 typedef union {
@@ -1227,9 +1227,9 @@ typedef union {
 		unsigned TXB0D76:1;
 		unsigned TXB0D77:1;
 	};
-} TXB0D7bits_t;
+} __TXB0D7bits_t;
 
-extern volatile TXB0D7bits_t at 0xf4d TXB0D7bits;
+extern volatile __TXB0D7bits_t at 0xf4d TXB0D7bits;
 
 extern sfr at 0xf4e CANSTATRO2;
 typedef union {
@@ -1243,9 +1243,9 @@ typedef union {
 		unsigned OPMODE1:1;
 		unsigned OPMODE2:1;
 	};
-} CANSTATRO2bits_t;
+} __CANSTATRO2bits_t;
 
-extern volatile CANSTATRO2bits_t at 0xf4e CANSTATRO2bits;
+extern volatile __CANSTATRO2bits_t at 0xf4e CANSTATRO2bits;
 
 extern sfr at 0xf50 RXB1CON;
 typedef union {
@@ -1259,9 +1259,9 @@ typedef union {
 		unsigned RXM1:1;
 		unsigned RXFUL:1;
 	};
-} RXB1CONbits_t;
+} __RXB1CONbits_t;
 
-extern volatile RXB1CONbits_t at 0xf50 RXB1CONbits;
+extern volatile __RXB1CONbits_t at 0xf50 RXB1CONbits;
 
 extern sfr at 0xf51 RXB1SIDH;
 typedef union {
@@ -1275,9 +1275,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXB1SIDHbits_t;
+} __RXB1SIDHbits_t;
 
-extern volatile RXB1SIDHbits_t at 0xf51 RXB1SIDHbits;
+extern volatile __RXB1SIDHbits_t at 0xf51 RXB1SIDHbits;
 
 extern sfr at 0xf52 RXB1SIDL;
 typedef union {
@@ -1291,9 +1291,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXB1SIDLbits_t;
+} __RXB1SIDLbits_t;
 
-extern volatile RXB1SIDLbits_t at 0xf52 RXB1SIDLbits;
+extern volatile __RXB1SIDLbits_t at 0xf52 RXB1SIDLbits;
 
 extern sfr at 0xf53 RXB1EIDH;
 typedef union {
@@ -1307,9 +1307,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXB1EIDHbits_t;
+} __RXB1EIDHbits_t;
 
-extern volatile RXB1EIDHbits_t at 0xf53 RXB1EIDHbits;
+extern volatile __RXB1EIDHbits_t at 0xf53 RXB1EIDHbits;
 
 extern sfr at 0xf54 RXB1EIDL;
 typedef union {
@@ -1323,9 +1323,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXB1EIDLbits_t;
+} __RXB1EIDLbits_t;
 
-extern volatile RXB1EIDLbits_t at 0xf54 RXB1EIDLbits;
+extern volatile __RXB1EIDLbits_t at 0xf54 RXB1EIDLbits;
 
 extern sfr at 0xf55 RXB1DLC;
 typedef union {
@@ -1339,9 +1339,9 @@ typedef union {
 		unsigned RXRTR:1;
 		unsigned :1;
 	};
-} RXB1DLCbits_t;
+} __RXB1DLCbits_t;
 
-extern volatile RXB1DLCbits_t at 0xf55 RXB1DLCbits;
+extern volatile __RXB1DLCbits_t at 0xf55 RXB1DLCbits;
 
 extern sfr at 0xf56 RXB1D0;
 typedef union {
@@ -1355,9 +1355,9 @@ typedef union {
 		unsigned RXB1D06:1;
 		unsigned RXB1D07:1;
 	};
-} RXB1D0bits_t;
+} __RXB1D0bits_t;
 
-extern volatile RXB1D0bits_t at 0xf56 RXB1D0bits;
+extern volatile __RXB1D0bits_t at 0xf56 RXB1D0bits;
 
 extern sfr at 0xf57 RXB1D1;
 typedef union {
@@ -1371,9 +1371,9 @@ typedef union {
 		unsigned RXB1D16:1;
 		unsigned RXB1D17:1;
 	};
-} RXB1D1bits_t;
+} __RXB1D1bits_t;
 
-extern volatile RXB1D1bits_t at 0xf57 RXB1D1bits;
+extern volatile __RXB1D1bits_t at 0xf57 RXB1D1bits;
 
 extern sfr at 0xf58 RXB1D2;
 typedef union {
@@ -1387,9 +1387,9 @@ typedef union {
 		unsigned RXB1D26:1;
 		unsigned RXB1D27:1;
 	};
-} RXB1D2bits_t;
+} __RXB1D2bits_t;
 
-extern volatile RXB1D2bits_t at 0xf58 RXB1D2bits;
+extern volatile __RXB1D2bits_t at 0xf58 RXB1D2bits;
 
 extern sfr at 0xf59 RXB1D3;
 typedef union {
@@ -1403,9 +1403,9 @@ typedef union {
 		unsigned RXB1D36:1;
 		unsigned RXB1D37:1;
 	};
-} RXB1D3bits_t;
+} __RXB1D3bits_t;
 
-extern volatile RXB1D3bits_t at 0xf59 RXB1D3bits;
+extern volatile __RXB1D3bits_t at 0xf59 RXB1D3bits;
 
 extern sfr at 0xf5a RXB1D4;
 typedef union {
@@ -1419,9 +1419,9 @@ typedef union {
 		unsigned RXB1D46:1;
 		unsigned RXB1D47:1;
 	};
-} RXB1D4bits_t;
+} __RXB1D4bits_t;
 
-extern volatile RXB1D4bits_t at 0xf5a RXB1D4bits;
+extern volatile __RXB1D4bits_t at 0xf5a RXB1D4bits;
 
 extern sfr at 0xf5b RXB1D5;
 typedef union {
@@ -1435,9 +1435,9 @@ typedef union {
 		unsigned RXB1D56:1;
 		unsigned RXB1D57:1;
 	};
-} RXB1D5bits_t;
+} __RXB1D5bits_t;
 
-extern volatile RXB1D5bits_t at 0xf5b RXB1D5bits;
+extern volatile __RXB1D5bits_t at 0xf5b RXB1D5bits;
 
 extern sfr at 0xf5c RXB1D6;
 typedef union {
@@ -1451,9 +1451,9 @@ typedef union {
 		unsigned RXB1D66:1;
 		unsigned RXB1D67:1;
 	};
-} RXB1D6bits_t;
+} __RXB1D6bits_t;
 
-extern volatile RXB1D6bits_t at 0xf5c RXB1D6bits;
+extern volatile __RXB1D6bits_t at 0xf5c RXB1D6bits;
 
 extern sfr at 0xf5d RXB1D7;
 typedef union {
@@ -1467,9 +1467,9 @@ typedef union {
 		unsigned RXB1D76:1;
 		unsigned RXB1D77:1;
 	};
-} RXB1D7bits_t;
+} __RXB1D7bits_t;
 
-extern volatile RXB1D7bits_t at 0xf5d RXB1D7bits;
+extern volatile __RXB1D7bits_t at 0xf5d RXB1D7bits;
 
 extern sfr at 0xf5e CANSTATRO1;
 typedef union {
@@ -1483,9 +1483,9 @@ typedef union {
 		unsigned OPMODE1:1;
 		unsigned OPMODE2:1;
 	};
-} CANSTATRO1bits_t;
+} __CANSTATRO1bits_t;
 
-extern volatile CANSTATRO1bits_t at 0xf5e CANSTATRO1bits;
+extern volatile __CANSTATRO1bits_t at 0xf5e CANSTATRO1bits;
 
 extern sfr at 0xf60 RXB0CON;
 typedef union {
@@ -1499,9 +1499,9 @@ typedef union {
 		unsigned RXM1:1;
 		unsigned RXFUL:1;
 	};
-} RXB0CONbits_t;
+} __RXB0CONbits_t;
 
-extern volatile RXB0CONbits_t at 0xf60 RXB0CONbits;
+extern volatile __RXB0CONbits_t at 0xf60 RXB0CONbits;
 
 extern sfr at 0xf61 RXB0SIDH;
 typedef union {
@@ -1515,9 +1515,9 @@ typedef union {
 		unsigned SID9:1;
 		unsigned SID10:1;
 	};
-} RXB0SIDHbits_t;
+} __RXB0SIDHbits_t;
 
-extern volatile RXB0SIDHbits_t at 0xf61 RXB0SIDHbits;
+extern volatile __RXB0SIDHbits_t at 0xf61 RXB0SIDHbits;
 
 extern sfr at 0xf62 RXB0SIDL;
 typedef union {
@@ -1531,9 +1531,9 @@ typedef union {
 		unsigned SID1:1;
 		unsigned SID2:1;
 	};
-} RXB0SIDLbits_t;
+} __RXB0SIDLbits_t;
 
-extern volatile RXB0SIDLbits_t at 0xf62 RXB0SIDLbits;
+extern volatile __RXB0SIDLbits_t at 0xf62 RXB0SIDLbits;
 
 extern sfr at 0xf63 RXB0EIDH;
 typedef union {
@@ -1547,9 +1547,9 @@ typedef union {
 		unsigned EID14:1;
 		unsigned EID15:1;
 	};
-} RXB0EIDHbits_t;
+} __RXB0EIDHbits_t;
 
-extern volatile RXB0EIDHbits_t at 0xf63 RXB0EIDHbits;
+extern volatile __RXB0EIDHbits_t at 0xf63 RXB0EIDHbits;
 
 extern sfr at 0xf64 RXB0EIDL;
 typedef union {
@@ -1563,9 +1563,9 @@ typedef union {
 		unsigned EID6:1;
 		unsigned EID7:1;
 	};
-} RXB0EIDLbits_t;
+} __RXB0EIDLbits_t;
 
-extern volatile RXB0EIDLbits_t at 0xf64 RXB0EIDLbits;
+extern volatile __RXB0EIDLbits_t at 0xf64 RXB0EIDLbits;
 
 extern sfr at 0xf65 RXB0DLC;
 typedef union {
@@ -1579,9 +1579,9 @@ typedef union {
 		unsigned RTR:1;
 		unsigned :1;
 	};
-} RXB0DLCbits_t;
+} __RXB0DLCbits_t;
 
-extern volatile RXB0DLCbits_t at 0xf65 RXB0DLCbits;
+extern volatile __RXB0DLCbits_t at 0xf65 RXB0DLCbits;
 
 extern sfr at 0xf66 RXB0D0;
 extern sfr at 0xf67 RXB0D1;
@@ -1603,9 +1603,9 @@ typedef union {
 		unsigned OPMODE1:1;
 		unsigned OPMODE2:1;
 	};
-} CANSTATbits_t;
+} __CANSTATbits_t;
 
-extern volatile CANSTATbits_t at 0xf6e CANSTATbits;
+extern volatile __CANSTATbits_t at 0xf6e CANSTATbits;
 
 extern sfr at 0xf6f CANCON;
 typedef union {
@@ -1619,9 +1619,9 @@ typedef union {
 		unsigned REQOP1:1;
 		unsigned REQOP2:1;
 	};
-} CANCONbits_t;
+} __CANCONbits_t;
 
-extern volatile CANCONbits_t at 0xf6f CANCONbits;
+extern volatile __CANCONbits_t at 0xf6f CANCONbits;
 
 extern sfr at 0xf70 BRGCON1;
 typedef union {
@@ -1635,9 +1635,9 @@ typedef union {
 		unsigned SJW0:1;
 		unsigned SJW1:1;
 	};
-} BRGCON1bits_t;
+} __BRGCON1bits_t;
 
-extern volatile BRGCON1bits_t at 0xf70 BRGCON1bits;
+extern volatile __BRGCON1bits_t at 0xf70 BRGCON1bits;
 
 extern sfr at 0xf71 BRGCON2;
 typedef union {
@@ -1651,9 +1651,9 @@ typedef union {
 		unsigned SAM:1;
 		unsigned SEG2PHTS:1;
 	};
-} BRGCON2bits_t;
+} __BRGCON2bits_t;
 
-extern volatile BRGCON2bits_t at 0xf71 BRGCON2bits;
+extern volatile __BRGCON2bits_t at 0xf71 BRGCON2bits;
 
 extern sfr at 0xf72 BRGCON3;
 typedef union {
@@ -1667,9 +1667,9 @@ typedef union {
 		unsigned WAKFIL:1;
 		unsigned :1;
 	};
-} BRGCON3bits_t;
+} __BRGCON3bits_t;
 
-extern volatile BRGCON3bits_t at 0xf72 BRGCON3bits;
+extern volatile __BRGCON3bits_t at 0xf72 BRGCON3bits;
 
 extern sfr at 0xf73 CIOCON;
 typedef union {
@@ -1683,9 +1683,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} CIOCONbits_t;
+} __CIOCONbits_t;
 
-extern volatile CIOCONbits_t at 0xf73 CIOCONbits;
+extern volatile __CIOCONbits_t at 0xf73 CIOCONbits;
 
 extern sfr at 0xf74 COMSTAT;
 typedef union {
@@ -1699,9 +1699,9 @@ typedef union {
 		unsigned RXB1OVFL:1;
 		unsigned RXB0OVFL:1;
 	};
-} COMSTATbits_t;
+} __COMSTATbits_t;
 
-extern volatile COMSTATbits_t at 0xf74 COMSTATbits;
+extern volatile __COMSTATbits_t at 0xf74 COMSTATbits;
 
 extern sfr at 0xf75 RXERRCNT;
 typedef union {
@@ -1715,9 +1715,9 @@ typedef union {
 		unsigned REC6:1;
 		unsigned REC7:1;
 	};
-} RXERRCNTbits_t;
+} __RXERRCNTbits_t;
 
-extern volatile RXERRCNTbits_t at 0xf75 RXERRCNTbits;
+extern volatile __RXERRCNTbits_t at 0xf75 RXERRCNTbits;
 
 extern sfr at 0xf76 TXERRCNT;
 typedef union {
@@ -1731,9 +1731,9 @@ typedef union {
 		unsigned TEC6:1;
 		unsigned TEC7:1;
 	};
-} TXERRCNTbits_t;
+} __TXERRCNTbits_t;
 
-extern volatile TXERRCNTbits_t at 0xf76 TXERRCNTbits;
+extern volatile __TXERRCNTbits_t at 0xf76 TXERRCNTbits;
 
 extern sfr at 0xf80 PORTA;
 typedef union {
@@ -1780,9 +1780,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} PORTAbits_t;
+} __PORTAbits_t;
 
-extern volatile PORTAbits_t at 0xf80 PORTAbits;
+extern volatile __PORTAbits_t at 0xf80 PORTAbits;
 
 extern sfr at 0xf81 PORTB;
 typedef union {
@@ -1807,9 +1807,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} PORTBbits_t;
+} __PORTBbits_t;
 
-extern volatile PORTBbits_t at 0xf81 PORTBbits;
+extern volatile __PORTBbits_t at 0xf81 PORTBbits;
 
 extern sfr at 0xf82 PORTC;
 typedef union {
@@ -1845,9 +1845,9 @@ typedef union {
 		unsigned CK:1;
 		unsigned DT:1;
 	};
-} PORTCbits_t;
+} __PORTCbits_t;
 
-extern volatile PORTCbits_t at 0xf82 PORTCbits;
+extern volatile __PORTCbits_t at 0xf82 PORTCbits;
 
 extern sfr at 0xf89 LATA;
 typedef union {
@@ -1861,9 +1861,9 @@ typedef union {
 		unsigned LATA6:1;
 		unsigned :1;
 	};
-} LATAbits_t;
+} __LATAbits_t;
 
-extern volatile LATAbits_t at 0xf89 LATAbits;
+extern volatile __LATAbits_t at 0xf89 LATAbits;
 
 extern sfr at 0xf8a LATB;
 typedef union {
@@ -1877,9 +1877,9 @@ typedef union {
 		unsigned LATB6:1;
 		unsigned LATB7:1;
 	};
-} LATBbits_t;
+} __LATBbits_t;
 
-extern volatile LATBbits_t at 0xf8a LATBbits;
+extern volatile __LATBbits_t at 0xf8a LATBbits;
 
 extern sfr at 0xf8b LATC;
 typedef union {
@@ -1893,9 +1893,9 @@ typedef union {
 		unsigned LATC6:1;
 		unsigned LATC7:1;
 	};
-} LATCbits_t;
+} __LATCbits_t;
 
-extern volatile LATCbits_t at 0xf8b LATCbits;
+extern volatile __LATCbits_t at 0xf8b LATCbits;
 
 extern sfr at 0xf92 TRISA;
 typedef union {
@@ -1909,9 +1909,9 @@ typedef union {
 		unsigned TRISA6:1;
 		unsigned :1;
 	};
-} TRISAbits_t;
+} __TRISAbits_t;
 
-extern volatile TRISAbits_t at 0xf92 TRISAbits;
+extern volatile __TRISAbits_t at 0xf92 TRISAbits;
 
 extern sfr at 0xf93 TRISB;
 typedef union {
@@ -1925,9 +1925,9 @@ typedef union {
 		unsigned TRISB6:1;
 		unsigned TRISB7:1;
 	};
-} TRISBbits_t;
+} __TRISBbits_t;
 
-extern volatile TRISBbits_t at 0xf93 TRISBbits;
+extern volatile __TRISBbits_t at 0xf93 TRISBbits;
 
 extern sfr at 0xf94 TRISC;
 typedef union {
@@ -1941,9 +1941,9 @@ typedef union {
 		unsigned TRISC6:1;
 		unsigned TRISC7:1;
 	};
-} TRISCbits_t;
+} __TRISCbits_t;
 
-extern volatile TRISCbits_t at 0xf94 TRISCbits;
+extern volatile __TRISCbits_t at 0xf94 TRISCbits;
 
 extern sfr at 0xf9d PIE1;
 typedef union {
@@ -1957,9 +1957,9 @@ typedef union {
 		unsigned ADIE:1;
 		unsigned PSPIE:1;
 	};
-} PIE1bits_t;
+} __PIE1bits_t;
 
-extern volatile PIE1bits_t at 0xf9d PIE1bits;
+extern volatile __PIE1bits_t at 0xf9d PIE1bits;
 
 extern sfr at 0xf9e PIR1;
 typedef union {
@@ -1973,9 +1973,9 @@ typedef union {
 		unsigned ADIF:1;
 		unsigned PSPIF:1;
 	};
-} PIR1bits_t;
+} __PIR1bits_t;
 
-extern volatile PIR1bits_t at 0xf9e PIR1bits;
+extern volatile __PIR1bits_t at 0xf9e PIR1bits;
 
 extern sfr at 0xf9f IPR1;
 typedef union {
@@ -1989,9 +1989,9 @@ typedef union {
 		unsigned ADIP:1;
 		unsigned PSPIP:1;
 	};
-} IPR1bits_t;
+} __IPR1bits_t;
 
-extern volatile IPR1bits_t at 0xf9f IPR1bits;
+extern volatile __IPR1bits_t at 0xf9f IPR1bits;
 
 extern sfr at 0xfa0 PIE2;
 typedef union {
@@ -2005,9 +2005,9 @@ typedef union {
 		unsigned CMIE:1;
 		unsigned :1;
 	};
-} PIE2bits_t;
+} __PIE2bits_t;
 
-extern volatile PIE2bits_t at 0xfa0 PIE2bits;
+extern volatile __PIE2bits_t at 0xfa0 PIE2bits;
 
 extern sfr at 0xfa1 PIR2;
 typedef union {
@@ -2021,9 +2021,9 @@ typedef union {
 		unsigned CMIF:1;
 		unsigned :1;
 	};
-} PIR2bits_t;
+} __PIR2bits_t;
 
-extern volatile PIR2bits_t at 0xfa1 PIR2bits;
+extern volatile __PIR2bits_t at 0xfa1 PIR2bits;
 
 extern sfr at 0xfa2 IPR2;
 typedef union {
@@ -2037,9 +2037,9 @@ typedef union {
 		unsigned CMIP:1;
 		unsigned :1;
 	};
-} IPR2bits_t;
+} __IPR2bits_t;
 
-extern volatile IPR2bits_t at 0xfa2 IPR2bits;
+extern volatile __IPR2bits_t at 0xfa2 IPR2bits;
 
 extern sfr at 0xfa3 PIE3;
 typedef union {
@@ -2053,9 +2053,9 @@ typedef union {
 		unsigned WAKIE:1;
 		unsigned IVRE:1;
 	};
-} PIE3bits_t;
+} __PIE3bits_t;
 
-extern volatile PIE3bits_t at 0xfa3 PIE3bits;
+extern volatile __PIE3bits_t at 0xfa3 PIE3bits;
 
 extern sfr at 0xfa4 PIR3;
 typedef union {
@@ -2069,9 +2069,9 @@ typedef union {
 		unsigned WAKIF:1;
 		unsigned IVRF:1;
 	};
-} PIR3bits_t;
+} __PIR3bits_t;
 
-extern volatile PIR3bits_t at 0xfa4 PIR3bits;
+extern volatile __PIR3bits_t at 0xfa4 PIR3bits;
 
 extern sfr at 0xfa5 IPR3;
 typedef union {
@@ -2085,9 +2085,9 @@ typedef union {
 		unsigned WAKIP:1;
 		unsigned IVRP:1;
 	};
-} IPR3bits_t;
+} __IPR3bits_t;
 
-extern volatile IPR3bits_t at 0xfa5 IPR3bits;
+extern volatile __IPR3bits_t at 0xfa5 IPR3bits;
 
 extern sfr at 0xfa6 EECON1;
 typedef union {
@@ -2101,9 +2101,9 @@ typedef union {
 		unsigned CFGS:1;
 		unsigned EEPGD:1;
 	};
-} EECON1bits_t;
+} __EECON1bits_t;
 
-extern volatile EECON1bits_t at 0xfa6 EECON1bits;
+extern volatile __EECON1bits_t at 0xfa6 EECON1bits;
 
 extern sfr at 0xfa7 EECON2;
 extern sfr at 0xfa8 EEDATA;
@@ -2120,9 +2120,9 @@ typedef union {
 		unsigned RX9:1;
 		unsigned SPEN:1;
 	};
-} RCSTAbits_t;
+} __RCSTAbits_t;
 
-extern volatile RCSTAbits_t at 0xfab RCSTAbits;
+extern volatile __RCSTAbits_t at 0xfab RCSTAbits;
 
 extern sfr at 0xfac TXSTA;
 typedef union {
@@ -2136,9 +2136,9 @@ typedef union {
 		unsigned TX9:1;
 		unsigned CSRC:1;
 	};
-} TXSTAbits_t;
+} __TXSTAbits_t;
 
-extern volatile TXSTAbits_t at 0xfac TXSTAbits;
+extern volatile __TXSTAbits_t at 0xfac TXSTAbits;
 
 extern sfr at 0xfad TXREG;
 extern sfr at 0xfae RCREG;
@@ -2155,9 +2155,9 @@ typedef union {
 		unsigned T3CCP2:1;
 		unsigned RD16:1;
 	};
-} T3CONbits_t;
+} __T3CONbits_t;
 
-extern volatile T3CONbits_t at 0xfb1 T3CONbits;
+extern volatile __T3CONbits_t at 0xfb1 T3CONbits;
 
 extern sfr at 0xfb2 TMR3L;
 extern sfr at 0xfb3 TMR3H;
@@ -2173,9 +2173,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} CCP1CONbits_t;
+} __CCP1CONbits_t;
 
-extern volatile CCP1CONbits_t at 0xfbd CCP1CONbits;
+extern volatile __CCP1CONbits_t at 0xfbd CCP1CONbits;
 
 extern sfr at 0xfbe CCPR1L;
 extern sfr at 0xfbf CCPR1H;
@@ -2191,9 +2191,9 @@ typedef union {
 		unsigned ADCS2:1;
 		unsigned ADFM:1;
 	};
-} ADCON1bits_t;
+} __ADCON1bits_t;
 
-extern volatile ADCON1bits_t at 0xfc1 ADCON1bits;
+extern volatile __ADCON1bits_t at 0xfc1 ADCON1bits;
 
 extern sfr at 0xfc2 ADCON0;
 typedef union {
@@ -2207,9 +2207,9 @@ typedef union {
 		unsigned ADCS0:1;
 		unsigned ADCS1:1;
 	};
-} ADCON0bits_t;
+} __ADCON0bits_t;
 
-extern volatile ADCON0bits_t at 0xfc2 ADCON0bits;
+extern volatile __ADCON0bits_t at 0xfc2 ADCON0bits;
 
 extern sfr at 0xfc3 ADRESL;
 extern sfr at 0xfc4 ADRESH;
@@ -2225,9 +2225,9 @@ typedef union {
 		unsigned ACKSTAT:1;
 		unsigned GCEN:1;
 	};
-} SSPCON2bits_t;
+} __SSPCON2bits_t;
 
-extern volatile SSPCON2bits_t at 0xfc5 SSPCON2bits;
+extern volatile __SSPCON2bits_t at 0xfc5 SSPCON2bits;
 
 extern sfr at 0xfc6 SSPCON1;
 typedef union {
@@ -2241,9 +2241,9 @@ typedef union {
 		unsigned SSPOV:1;
 		unsigned WCOL:1;
 	};
-} SSPCON1bits_t;
+} __SSPCON1bits_t;
 
-extern volatile SSPCON1bits_t at 0xfc6 SSPCON1bits;
+extern volatile __SSPCON1bits_t at 0xfc6 SSPCON1bits;
 
 extern sfr at 0xfc7 SSPSTAT;
 typedef union {
@@ -2257,9 +2257,9 @@ typedef union {
 		unsigned CKE:1;
 		unsigned SMP:1;
 	};
-} SSPSTATbits_t;
+} __SSPSTATbits_t;
 
-extern volatile SSPSTATbits_t at 0xfc7 SSPSTATbits;
+extern volatile __SSPSTATbits_t at 0xfc7 SSPSTATbits;
 
 extern sfr at 0xfc8 SSPADD;
 extern sfr at 0xfc9 SSPBUF;
@@ -2275,9 +2275,9 @@ typedef union {
 		unsigned TOUTPS3:1;
 		unsigned :1;
 	};
-} T2CONbits_t;
+} __T2CONbits_t;
 
-extern volatile T2CONbits_t at 0xfca T2CONbits;
+extern volatile __T2CONbits_t at 0xfca T2CONbits;
 
 extern sfr at 0xfcb PR2;
 extern sfr at 0xfcc TMR2;
@@ -2293,9 +2293,9 @@ typedef union {
 		unsigned :1;
 		unsigned RD16:1;
 	};
-} T1CONbits_t;
+} __T1CONbits_t;
 
-extern volatile T1CONbits_t at 0xfcd T1CONbits;
+extern volatile __T1CONbits_t at 0xfcd T1CONbits;
 
 extern sfr at 0xfce TMR1L;
 extern sfr at 0xfcf TMR1H;
@@ -2311,9 +2311,9 @@ typedef union {
 		unsigned :1;
 		unsigned IPEN:1;
 	};
-} RCONbits_t;
+} __RCONbits_t;
 
-extern volatile RCONbits_t at 0xfd0 RCONbits;
+extern volatile __RCONbits_t at 0xfd0 RCONbits;
 
 extern sfr at 0xfd1 WDTCON;
 typedef union {
@@ -2338,9 +2338,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} WDTCONbits_t;
+} __WDTCONbits_t;
 
-extern volatile WDTCONbits_t at 0xfd1 WDTCONbits;
+extern volatile __WDTCONbits_t at 0xfd1 WDTCONbits;
 
 extern sfr at 0xfd2 LVDCON;
 typedef union {
@@ -2365,9 +2365,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} LVDCONbits_t;
+} __LVDCONbits_t;
 
-extern volatile LVDCONbits_t at 0xfd2 LVDCONbits;
+extern volatile __LVDCONbits_t at 0xfd2 LVDCONbits;
 
 extern sfr at 0xfd3 OSCCON;
 typedef union {
@@ -2381,9 +2381,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} OSCCONbits_t;
+} __OSCCONbits_t;
 
-extern volatile OSCCONbits_t at 0xfd3 OSCCONbits;
+extern volatile __OSCCONbits_t at 0xfd3 OSCCONbits;
 
 extern sfr at 0xfd5 T0CON;
 extern sfr at 0xfd6 TMR0L;
@@ -2400,9 +2400,9 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-} STATUSbits_t;
+} __STATUSbits_t;
 
-extern volatile STATUSbits_t at 0xfd8 STATUSbits;
+extern volatile __STATUSbits_t at 0xfd8 STATUSbits;
 
 extern sfr at 0xfd9 FSR2L;
 extern sfr at 0xfda FSR2H;
@@ -2450,9 +2450,9 @@ typedef union {
 		unsigned INT1IP:1;
 		unsigned :1;
 	};
-} INTCON3bits_t;
+} __INTCON3bits_t;
 
-extern volatile INTCON3bits_t at 0xff0 INTCON3bits;
+extern volatile __INTCON3bits_t at 0xff0 INTCON3bits;
 
 extern sfr at 0xff1 INTCON2;
 typedef union {
@@ -2466,9 +2466,9 @@ typedef union {
 		unsigned INTEDG0:1;
 		unsigned RBPU:1;
 	};
-} INTCON2bits_t;
+} __INTCON2bits_t;
 
-extern volatile INTCON2bits_t at 0xff1 INTCON2bits;
+extern volatile __INTCON2bits_t at 0xff1 INTCON2bits;
 
 extern sfr at 0xff2 INTCON;
 typedef union {
@@ -2482,9 +2482,9 @@ typedef union {
 		unsigned PEIE:1;
 		unsigned GIE:1;
 	};
-} INTCONbits_t;
+} __INTCONbits_t;
 
-extern volatile INTCONbits_t at 0xff2 INTCONbits;
+extern volatile __INTCONbits_t at 0xff2 INTCONbits;
 
 extern sfr at 0xff3 PRODL;
 extern sfr at 0xff4 PRODH;
@@ -2507,14 +2507,154 @@ typedef union {
 		unsigned STKUNF:1;
 		unsigned STKFUL:1;
 	};
-} STKPTRbits_t;
+} __STKPTRbits_t;
 
-extern volatile STKPTRbits_t at 0xffc STKPTRbits;
+extern volatile __STKPTRbits_t at 0xffc STKPTRbits;
 
 extern sfr at 0xffd TOSL;
 extern sfr at 0xffe TOSH;
 extern sfr at 0xfff TOSU;
 
 
-#endif
+/* Configuration registers locations */
+#define __CONFIG0H	0x300001
+#define __CONFIG1L	0x300002
+#define __CONFIG1H	0x300003
+#define __CONFIG3L	0x300006
+#define __CONFIG4L	0x300008
+#define __CONFIG4H	0x300009
+#define __CONFIG5L	0x30000A
+#define __CONFIG5H	0x30000B
+#define __CONFIG6L	0x30000C
+#define __CONFIG6H	0x30000D
 
+
+
+/* Oscillator 0H options */
+#define _OSC_RC_OSC2_0H	0xFF	/* RC-OSC2 as RA6 */
+#define _OSC_HS_PLL_0H	0xFE	/* HS-PLL Enabled */
+#define _OSC_EC_OSC2_RA6_0H	0xFD	/* EC-OSC2 as RA6 */
+#define _OSC_EC_OSC2_Clock_Out_0H	0xFC	/* EC-OSC2 as Clock_Out */
+#define _OSC_RC_0H	0xFB	/* RC */
+#define _OSC_HS_0H	0xFA	/* HS */
+#define _OSC_XT_0H	0xF9	/* XT */
+#define _OSC_LP_0H	0xF8	/* LP */
+
+/* Osc. Switch Enable 0H options */
+#define _OSCS_OFF_0H	0xFF	/* Disabled */
+#define _OSCS_ON_0H	0xDF	/* Enabled */
+
+/* Power Up Timer 1L options */
+#define _PUT_OFF_1L	0xFF	/* Disabled */
+#define _PUT_ON_1L	0xFE	/* Enabled */
+
+/* Brown Out Detect 1L options */
+#define _BODEN_ON_1L	0xFF	/* Enabled */
+#define _BODEN_OFF_1L	0xFD	/* Disabled */
+
+/* Brown Out Voltage 1L options */
+#define _BODENV_2_0V_1L	0xFF	/* 2.0V */
+#define _BODENV_2_7V_1L	0xFB	/* 2.7V */
+#define _BODENV_4_2V_1L	0xF7	/* 4.2V */
+#define _BODENV_4_5V_1L	0xF3	/* 4.5V */
+
+/* Watchdog Timer 1H options */
+#define _WDT_ON_1H	0xFF	/* Enabled */
+#define _WDT_OFF_1H	0xFE	/* Disabled */
+
+/* Watchdog Postscaler 1H options */
+#define _WDTPS_1_128_1H	0xFF	/* 1:128 */
+#define _WDTPS_1_64_1H	0xFD	/* 1:64 */
+#define _WDTPS_1_32_1H	0xFB	/* 1:32 */
+#define _WDTPS_1_16_1H	0xF9	/* 1:16 */
+#define _WDTPS_1_8_1H	0xF7	/* 1:8 */
+#define _WDTPS_1_4_1H	0xF5	/* 1:4 */
+#define _WDTPS_1_2_1H	0xF3	/* 1:2 */
+#define _WDTPS_1_1_1H	0xF1	/* 1:1 */
+
+/* Low Voltage Program 3L options */
+#define _LVP_ON_3L	0xFF	/* Enabled */
+#define _LVP_OFF_3L	0xFB	/* Disabled */
+
+/* Background Debug 3L options */
+#define _BACKBUG_OFF_3L	0xFF	/* Disabled */
+#define _BACKBUG_ON_3L	0x7F	/* Enabled */
+
+/* Stack Overflow Reset 3L options */
+#define _STVR_ON_3L	0xFF	/* Enabled */
+#define _STVR_OFF_3L	0xFE	/* Disabled */
+
+/* Code Protect 00200-01FFF 4L options */
+#define _CP_0_OFF_4L	0xFF	/* Disabled */
+#define _CP_0_ON_4L	0xFE	/* Enabled */
+
+/* Code Protect 02000-03FFF 4L options */
+#define _CP_1_OFF_4L	0xFF	/* Disabled */
+#define _CP_1_ON_4L	0xFD	/* Enabled */
+
+/* Code Protect 04000-05FFF 4L options */
+#define _CP_2_OFF_4L	0xFF	/* Disabled */
+#define _CP_2_ON_4L	0xFB	/* Enabled */
+
+/* Code Protect 06000-07FFF 4L options */
+#define _CP_3_OFF_4L	0xFF	/* Disabled */
+#define _CP_3_ON_4L	0xF7	/* Enabled */
+
+/* Data EE Read Protect 4H options */
+#define _CPD_OFF_4H	0xFF	/* Disabled */
+#define _CPD_ON_4H	0x7F	/* Enabled */
+
+/* Code Protect Boot 4H options */
+#define _CPB_OFF_4H	0xFF	/* Disabled */
+#define _CPB_ON_4H	0xBF	/* Enabled */
+
+/* Table Write Protect 00200-01FFF 5L options */
+#define _WRT_0_OFF_5L	0xFF	/* Disabled */
+#define _WRT_0_ON_5L	0xFE	/* Enabled */
+
+/* Table Write Protect 02000-03FFF 5L options */
+#define _WRT_1_OFF_5L	0xFF	/* Disabled */
+#define _WRT_1_ON_5L	0xFD	/* Enabled */
+
+/* Table Write Protect 04000-05FFF 5L options */
+#define _WRT_2_OFF_5L	0xFF	/* Disabled */
+#define _WRT_2_ON_5L	0xFB	/* Enabled */
+
+/* Table Write Protect 06000-07FFF 5L options */
+#define _WRT_3_OFF_5L	0xFF	/* Disabled */
+#define _WRT_3_ON_5L	0xF7	/* Enabled */
+
+/* Data EE Write Protect 5H options */
+#define _WRTD_OFF_5H	0xFF	/* Disabled */
+#define _WRTD_ON_5H	0x7F	/* Enabled */
+
+/* Table Write Protect Boot 5H options */
+#define _WRTB_OFF_5H	0xFF	/* Disabled */
+#define _WRTB_ON_5H	0xBF	/* Enabled */
+
+/* Config. Write Protect 5H options */
+#define _WRTC_OFF_5H	0xFF	/* Disabled */
+#define _WRTC_ON_5H	0xDF	/* Enabled */
+
+/* Table Read Protect 00200-01FFF 6L options */
+#define _EBTR_0_OFF_6L	0xFF	/* Disabled */
+#define _EBTR_0_ON_6L	0xFE	/* Enabled */
+
+/* Table Read Protect 02000-03FFF 6L options */
+#define _EBTR_1_OFF_6L	0xFF	/* Disabled */
+#define _EBTR_1_ON_6L	0xFD	/* Enabled */
+
+/* Table Read Protect 04000-05FFF 6L options */
+#define _EBTR_2_OFF_6L	0xFF	/* Disabled */
+#define _EBTR_2_ON_6L	0xFB	/* Enabled */
+
+/* Table Read Protect 06000-07FFF 6L options */
+#define _EBTR_3_OFF_6L	0xFF	/* Disabled */
+#define _EBTR_3_ON_6L	0xF7	/* Enabled */
+
+/* Table Read Protect Boot 6H options */
+#define _EBTRB_OFF_6H	0xFF	/* Disabled */
+#define _EBTRB_ON_6H	0xBF	/* Enabled */
+
+
+#endif

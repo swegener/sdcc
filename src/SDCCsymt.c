@@ -2540,12 +2540,12 @@ initCSupport ()
 	      if (tofrom)
 		{
 		  sprintf (buffer, "__fs2%s%s", ssu[su], sbwd[bwd]);
-		  __conv[tofrom][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], floatType, 1, options.float_rent);
+		  __conv[tofrom][bwd][su] = funcOfType (buffer, __multypes[bwd][su], floatType, 1, options.float_rent);
 		}
 	      else
 		{
 		  sprintf (buffer, "__%s%s2fs", ssu[su], sbwd[bwd]);
-		  __conv[tofrom][bwd][su] = funcOfType (_mangleFunctionName(buffer), floatType, __multypes[bwd][su], 1, options.float_rent);
+		  __conv[tofrom][bwd][su] = funcOfType (buffer, floatType, __multypes[bwd][su], 1, options.float_rent);
 		}
 	    }
 	}

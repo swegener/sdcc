@@ -2442,6 +2442,12 @@ packRegsForIYUse (iCode * lic, operand * op, eBBlock * ebp)
       return NULL;
     }
 
+  if (getSize (operandType (op)) != 2)
+    {
+      D (D_ACCUSE2, ("  + Dropping as operation has size is too big\n"));
+      return FALSE;
+    }
+
   /* Nothing else that clashes with this is using the scratch
      register.  Scan through all of the intermediate instructions and
      see if any of them could nuke HL.

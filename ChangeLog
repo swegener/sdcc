@@ -1,3 +1,9 @@
+2002-03-01  Michael Hope  <michaelh@vroom>
+
+	* src/SDCCsymt.c (initCSupport): Removed managling of support function names.
+
+	* src/z80/ralloc.c (packRegsForIYUse): Fixed fp bug where four byte operands were packed into IY.
+
 2002-03-01    <johan@FRIJA>
 
 	* src/SDCCglue.c (printIvalPtr): fixed bug #524211

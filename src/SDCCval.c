@@ -966,6 +966,8 @@ valComplement (value * val)
       else
 	SPEC_CVAL (val->etype).v_int = ~SPEC_CVAL (val->etype).v_int;
     }
+  // ~(unsigned 3) now really is signed
+  SPEC_USIGN(val->etype)=0;
   return val;
 }
 

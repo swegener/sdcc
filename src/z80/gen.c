@@ -1790,6 +1790,9 @@ genUminus (iCode * ic)
       goto release;
     }
 
+  /* otherwise subtract from zero */
+  size = AOP_SIZE (IC_LEFT (ic));
+
   if (AOP_SIZE (IC_RESULT (ic)) == 4 && IS_GB)
     {
       /* Create a new asmop with value zero */
@@ -1800,8 +1803,6 @@ genUminus (iCode * ic)
       goto release;
     }
 
-  /* otherwise subtract from zero */
-  size = AOP_SIZE (IC_LEFT (ic));
   offset = 0;
   _clearCarry();
   while (size--)

@@ -157,17 +157,17 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
    This clears XSEG, DSEG, BSEG, OSEG, SSEG */
 static void _mcs51_genRAMCLEAR (FILE * of) {
   fprintf (of, ";	_mcs51_genRAMCLEAR() start\n");
-  fprintf (of, "	mov	r1,#l_XSEG\n");
-  fprintf (of, "	mov	a,r1\n");
+  fprintf (of, "	mov	r0,#l_XSEG\n");
+  fprintf (of, "	mov	a,r0\n");
   fprintf (of, "	orl	a,#(l_XSEG >> 8)\n");
   fprintf (of, "	jz	00005$\n");
-  fprintf (of, "	mov	r0,#((l_XSEG + 255) >> 8)\n");
+  fprintf (of, "	mov	r1,#((l_XSEG + 255) >> 8)\n");
   fprintf (of, "	mov	dptr,#s_XSEG\n");
   fprintf (of, "	clr     a\n");
   fprintf (of, "00004$:	movx	@dptr,a\n");
   fprintf (of, "	inc	dptr\n");
-  fprintf (of, "	djnz	r1,00004$\n");
   fprintf (of, "	djnz	r0,00004$\n");
+  fprintf (of, "	djnz	r1,00004$\n");
   /* r0 is zero now. Clearing 256 byte assuming 128 byte devices don't mind */
   fprintf (of, "00005$:	mov	@r0,a\n");   
   fprintf (of, "	djnz	r0,00005$\n");

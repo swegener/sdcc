@@ -1,3 +1,8 @@
+2003-12-16 Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	(committed by Erik Petrich <epetrich@ivorytower.norman.ok.us> on Frieder's behalf)
+	* src/mcs51/main.c: fixed the fix for bug #737001
+
 2003-12-15  Borut Razem <borut.razem@siol.net>
 
 	* support/scripts/sdcc.nsi: updated for NSIS 2.0 beta 4

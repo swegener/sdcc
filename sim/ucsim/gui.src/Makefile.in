@@ -43,7 +43,7 @@ SERIO_PKG	= serio.src
 else
 SERIO_PKG	=
 endif
-CURSES_PKGS	= $(SERIO.PKG)
+CURSES_PKGS	= $(SERIO_PKG)
 
 # Common code
 OBJECTS		= rec.o
@@ -81,7 +81,7 @@ gui_api: ucsim_lib tool_lib
 # ---------------------------------------------------
 install: install_gui_api
 ifeq ($(curses_ok),yes)
-	@for pkg in $(PKGS); do\
+	@for pkg in $(CURSES_PKGS); do\
 	  cd $$pkg && $(MAKE) install ; cd ..;\
 	done
 endif
@@ -93,7 +93,7 @@ install_gui_api:
 # --------------------------------
 uninstall: uninstall_gui_api
 ifeq ($(curses_ok),yes)
-	@for pkg in $(PKGS); do\
+	@for pkg in $(CURSES_PKGS); do\
 	  cd $$pkg && $(MAKE) uninstall ; cd ..;\
 	done
 endif
@@ -104,14 +104,14 @@ uninstall_gui_api:
 # Performing self-test
 # --------------------
 check: check_local
-	@for pkg in $(PKGS); do\
+	@for pkg in $(CURSES_PKGS); do\
 	  cd $$pkg && $(MAKE) check ; cd ..;\
 	done
 
 check_local:
 
 test: test_local
-	@for pkg in $(PKGS); do\
+	@for pkg in $(CURSES_PKGS); do\
 	  cd $$pkg && $(MAKE) test ; cd ..;\
 	done
 
@@ -121,7 +121,7 @@ test_local:
 # Performing installation test
 # ----------------------------
 installcheck: installcheck_gui_api
-	@for pkg in $(PKGS); do\
+	@for pkg in $(CURSES_PKGS); do\
 	  cd $$pkg && $(MAKE) installcheck ; cd ..;\
 	done
 
@@ -131,7 +131,7 @@ installcheck_gui_api:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	@for pkg in $(PKGS); do\
+	@for pkg in $(CURSES_PKGS); do\
 	  cd $$pkg && $(MAKE) installdirs ; cd ..;\
 	done
 

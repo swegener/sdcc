@@ -222,7 +222,7 @@ clean_intermediate:
 install: all installdirs
 	cp -r $(BUILDDIR)/* $(sdcc_libdir)
 	cp -r ds390 ds400 gbz80 z80 hc08 *.c $(sdcc_libdir)/src
-	rm `find $(sdcc_libdir)/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm'`
+	rm -r `find $(sdcc_libdir)/src -name '*.rel' -or -name '*.dump*' -or -name '*.sym' -or -name '*.o' -or -name '*.lst' -or -name '*.asm' -or -name 'CVS'`
 
 # Deleting all the installed files
 # --------------------------------

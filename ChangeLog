@@ -1,3 +1,12 @@
+2004-01-06 Bernhard Held <bernhard@bernhardheld.de>
+
+	* sdcc.spec: updated
+	* device/include/Makefile.in: don't install CVS directories
+	* device/lib/Makefile.in: added removal of CVS directories after install
+	* doc/Makefile: fixed install, added local_icons
+	* sim/ucsim/gui.src/Makefile.in: fixed an old typo
+	* src/mcs51/gen.c (genRightShift): fixed bug #870788
+
 2004-01-06 Vangelis Rokas <vrokas@otenet.gr>
 
 	PIC16 port related changes:

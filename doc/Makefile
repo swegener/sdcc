@@ -4,49 +4,53 @@ MANUAL = sdccman
 TSS = test_suite_spec
 CDB = cdbfileformat
 
-all: $(MANUAL).pdf $(MANUAL).html $(MANUAL).txt \
-	$(TSS).pdf $(TSS).html $(TSS).txt \
-	$(CDB).pdf $(CDB).html $(CDB).txt
+all: $(MANUAL).pdf $(MANUAL).html/index.html $(MANUAL).txt \
+	$(TSS).pdf $(TSS).html/index.html $(TSS).txt \
+	$(CDB).pdf $(CDB).html/index.html $(CDB).txt
 
 install:
 	$(INSTALL) -d $(docdir)
 	cp -rf *.txt z80 avr $(docdir)
-	$(shell if [ -f $(MANUAL).html ]; then cp -rf $(MANUAL).html $(docdir); fi)
-	$(shell if [ -f $(TSS).html    ]; then cp -rf $(TSS).html    $(docdir); fi)
-	$(shell if [ -f $(CDB).html    ]; then cp -rf $(CDB).html    $(docdir); fi)
-	$(shell if [ -f *.pdf          ]; then cp -rf *.pdf          $(docdir); fi)
+	if [ -f $(MANUAL).html/index.html ]; then cp -rf $(MANUAL).html $(docdir); fi
+	if [ -f $(TSS).html/index.html    ]; then cp -rf $(TSS).html    $(docdir); fi
+	if [ -f $(CDB).html/index.html    ]; then cp -rf $(CDB).html    $(docdir); fi
+	if [ -f $(MANUAL).pdf             ]; then cp -rf $(MANUAL).pdf  $(docdir); fi
+	if [ -f $(TSS).pdf                ]; then cp -rf $(TSS).pdf     $(docdir); fi
+	if [ -f $(CDB).pdf                ]; then cp -rf $(CDB).pdf     $(docdir); fi
+	find $(docdir) -name "CVS" -type d | xargs rm -r
+	rm -f $(docdir)/*/WARNINGS $(docdir)/*/*.pl $(docdir)/*/images.*
 
 uninstall:
 	rm -rf $(docdir)
 
-$(MANUAL).html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
-	mkdir -p $@
+$(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
+	mkdir -p `dirname $@`
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
 	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 5 -show_section_numbers -dir $(MANUAL).html $(MANUAL)
+	-latex2html -split 5 -show_section_numbers -local_icons -dir $(MANUAL).html $(MANUAL)
 	mv `basename $< .tex`.orig.tex $<
 
-$(TSS).html: $(TSS).tex
-	mkdir -p $@
+$(TSS).html/index.html: $(TSS).tex
+	mkdir -p `dirname $@`
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
 	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 0 -dir $(TSS).html $(TSS)
+	-latex2html -split 0 -local_icons -dir $(TSS).html $(TSS)
 	mv `basename $< .tex`.orig.tex $<
 
-$(CDB).html: $(CDB).tex
-	mkdir -p $@
+$(CDB).html/index.html: $(CDB).tex
+	mkdir -p `dirname $@`
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
 	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 0 -show_section_numbers -dir $(CDB).html $(CDB)
+	-latex2html -split 0 -show_section_numbers -local_icons -dir $(CDB).html $(CDB)
 	mv `basename $< .tex`.orig.tex $<
 
 %.txt: %.lyx

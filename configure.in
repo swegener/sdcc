@@ -226,6 +226,7 @@ fi
 # Generating output files
 # ===========================================================================
 AC_CONFIG_SUBDIRS(sim/ucsim)
+AC_CONFIG_SUBDIRS(binutils-2.9.5.0.13)
 # MLH: removed as the rules are already in Makefile.common
 #as/z80/Makefile
 #link/z80/Makefile

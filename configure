@@ -531,7 +531,7 @@ fi
 
 
 
-for ac_prog in mawk gawk nawk awk
+for ac_prog in gawk mawk nawk awk
 do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -2445,6 +2445,7 @@ cat >> confdefs.h <<EOF
 #define STD_DS390_LIB "libds390"
 EOF
 
+
 cat >> confdefs.h <<EOF
 #define PREFIX "${prefix}"
 EOF
@@ -2460,7 +2461,7 @@ EOF
 
 # mlh: dont compile libgc if it's available locally
 echo $ac_n "checking for GC_malloc in -lgc""... $ac_c" 1>&6
-echo "configure:2461: checking for GC_malloc in -lgc" >&5
+echo "configure:2465: checking for GC_malloc in -lgc" >&5
 ac_lib_var=`echo gc'_'GC_malloc | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2468,7 +2469,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgc  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2469 "configure"
+#line 2473 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -2479,7 +2480,7 @@ int main() {
 GC_malloc()
 ; return 0; }
 EOF
-if { (eval echo configure:2480: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2484: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2577,6 +2578,8 @@ fi
 # Generating output files
 # ===========================================================================
 subdirs="sim/ucsim"
+
+subdirs="sim/ucsim binutils-2.9.5.0.13"
 
 # MLH: removed as the rules are already in Makefile.common
 #as/z80/Makefile
@@ -2999,7 +3002,7 @@ if test "$no_recursion" != yes; then
     esac
   done
 
-  for ac_config_dir in sim/ucsim; do
+  for ac_config_dir in sim/ucsim binutils-2.9.5.0.13; do
 
     # Do not complain, so a configure script can configure whichever
     # parts of a large source tree are present.

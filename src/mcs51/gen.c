@@ -239,7 +239,7 @@ endOfWorld:
   /* other wise this is true end of the world */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	  "getFreePtr should never reach here");
-  exit (0);
+  exit (1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -854,7 +854,7 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	  "aopget got unsupported aop->type");
-  exit (0);
+  exit (1);
 }
 /*-----------------------------------------------------------------*/
 /* aopPut - puts a string for a aop                                */
@@ -868,7 +868,7 @@ aopPut (asmop * aop, char *s, int offset)
     {
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	      "aopPut got offset > aop->size");
-      exit (0);
+      exit (1);
     }
 
   /* will assign value to value */
@@ -913,7 +913,7 @@ aopPut (asmop * aop, char *s, int offset)
 	{
 	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 		  "aopPut writting to code space");
-	  exit (0);
+	  exit (1);
 	}
 
       while (offset > aop->coff)
@@ -1039,7 +1039,7 @@ aopPut (asmop * aop, char *s, int offset)
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	      "aopPut got unsupported aop->type");
-      exit (0);
+      exit (1);
     }
 
 }
@@ -6958,7 +6958,11 @@ genNearPointerGet (operand * left,
   else
     rname = aopGet (AOP (left), 0, FALSE, FALSE);
 
+#ifdef THIS_COULD_BE_THE_EVER_LASTING_MIN_MIN_STACK_AUTO_BUG
   aopOp (result, ic, FALSE);
+#else
+  aopOp (result, ic, result?TRUE:FALSE);
+#endif
 
   /* if bitfield then unpack the bits */
   if (IS_BITVAR (retype))

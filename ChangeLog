@@ -1,3 +1,7 @@
+2001-09-06    <johan@FRIJA>
+
+	* src/SDCC.y: this could be a fix for bug #458744
+
 2001-09-05    <johan@FRIJA>
 
 	* src/SDCCglue.c (emitRegularMap): a fix for bug #458099/2

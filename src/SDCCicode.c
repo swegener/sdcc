@@ -838,11 +838,15 @@ operand *
 operandOperation (operand * left, operand * right,
 		  int op, sym_link * type)
 {
+  sym_link *let , *ret;
   operand *retval = (operand *) 0;
-
+  
   assert (isOperandLiteral (left));
-  if (right)
+  let = getSpec(operandType(left));
+  if (right) {
     assert (isOperandLiteral (right));
+    ret = getSpec(operandType(left));
+  }
 
   switch (op)
     {
@@ -874,22 +878,34 @@ operandOperation (operand * left, operand * right,
 						   operandLitValue (right)));
       break;
     case '%':
-      if ((unsigned long) operandLitValue (right) == 0)
-	{
+      if ((unsigned long) operandLitValue (right) == 0) {
 	  werror (E_DIVIDE_BY_ZERO);
 	  retval = right;
-	}
-      else
-	retval = operandFromLit ((unsigned long) operandLitValue (left) %
-				 (unsigned long) operandLitValue (right));
+      }
+      else 
+	retval = operandFromLit ((SPEC_USIGN(let) ? 
+				  (unsigned long) operandLitValue (left) :
+				  (long) operandLitValue (left)) %
+				 (SPEC_USIGN(ret) ? 
+				  (unsigned long) operandLitValue (right) :
+				  (long) operandLitValue (right)));
+
       break;
     case LEFT_OP:
-      retval = operandFromLit ((unsigned long) operandLitValue (left) <<
-			       (unsigned long) operandLitValue (right));
+      retval = operandFromLit (((SPEC_USIGN(let) ? 
+				  (unsigned long) operandLitValue (left) :
+				  (long) operandLitValue (left)) <<
+				 (SPEC_USIGN(ret) ? 
+				  (unsigned long) operandLitValue (right) :
+				  (long) operandLitValue (right))));
       break;
     case RIGHT_OP:
-      retval = operandFromLit ((unsigned long) operandLitValue (left) >>
-			       (unsigned long) operandLitValue (right));
+      retval = operandFromLit (((SPEC_USIGN(let) ? 
+				  (unsigned long) operandLitValue (left) :
+				  (long) operandLitValue (left)) >>
+				 (SPEC_USIGN(ret) ? 
+				  (unsigned long) operandLitValue (right) :
+				  (long) operandLitValue (right))));
       break;
     case EQ_OP:
       retval = operandFromLit (operandLitValue (left) ==

@@ -1,3 +1,7 @@
+2004-01-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/expf.c: fixed bug #1095792
+
 2005-01-24 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* device/lib/pic16/libm: added Math library sources

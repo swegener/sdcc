@@ -35,7 +35,7 @@
 // TODO: share with other temps
 static bit sign_bit;
 static data unsigned char expf_y[4];
-static unsigned char n;
+static data unsigned char n;
 
 
 float expf(float x)

@@ -2880,6 +2880,7 @@ packRegisters (eBBlock * ebp)
       /* if pointer get */
       if (!DISABLE_PACK_ONE_USE &&
 	  POINTER_GET (ic) &&
+	  IS_SYMOP (IC_LEFT (ic)) &&
       /* MLH: dont have far space
          !isOperandInFarSpace(IC_RESULT(ic))&& */
 	  !OP_SYMBOL (IC_LEFT (ic))->remat &&

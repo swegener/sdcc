@@ -74,12 +74,14 @@ _evalMacros(char *apinto, hTab *pvals, const char *pfrom, size_t alen)
 	      fprintf (stderr, "Cant find macro \"%s\"\n", name);
 	      wassertl (0, "Invalid macro name");
             }
-
-          /* Replace */
-          strncpy(pinto, pval, plen);
-          pinto += strlen(pval);
-	  plen -= plen > strlen(pval) ? strlen(pval) : plen;
-          fdidsomething = TRUE;
+	    else
+	    {
+		/* Replace */
+		strncpy(pinto, pval, plen);
+		pinto += strlen(pval);
+		plen -= plen > strlen(pval) ? strlen(pval) : plen;
+		fdidsomething = TRUE;
+	    }
 
           pfrom = pend+1;
         }

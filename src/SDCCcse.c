@@ -937,9 +937,13 @@ updateSpillLocation (iCode * ic, int induction)
 		    !IS_VOLATILE (setype) &&
 		    !IN_FARSPACE (SPEC_OCLS (setype)) &&
 		    !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
-
+	        {
+		    wassert(IS_SYMOP(IC_RESULT (ic)));
+		    wassert(IS_SYMOP(IC_RIGHT (ic)));
 			SPIL_LOC (IC_RIGHT (ic)) =
 				IC_RESULT (ic)->operand.symOperand;
+		}
+	    
 	}
 
 #if 0 /* this needs furthur investigation can save a lot of code */

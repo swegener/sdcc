@@ -109,22 +109,9 @@ static void saveRBank (int, iCode *, bool);
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
 
-/* #define MOVA(x) if (strcmp(x,"a") && strcmp(x,"acc")) emitcode("mov","a,%s",x); */
-#define MOVA(x) { \
-    	         char *_mova_tmp = strdup(x); \
-                 if (strcmp(_mova_tmp,"a") && strcmp(_mova_tmp,"acc")) \
-                 { \
-                    emitcode("mov","a,%s",_mova_tmp); \
-                 } \
-                 free(_mova_tmp); \
-                }
-#define MOVB(x) { char *_movb_tmp = strdup(x); \
-                 if (strcmp(_movb_tmp,"b")) \
-                 { \
-                    emitcode("mov","b,%s",_movb_tmp); \
-                 } \
-                 free(_movb_tmp); \
-                }
+#define MOVA(x) _movA(x)
+#define MOVB(x) _movB(x)
+                
 #define CLRC    emitcode("clr","c")
 #define SETC    emitcode("setb","c")
 
@@ -208,6 +195,30 @@ emitcode (char *inst, char *fmt,...)
     lineCurr->isInline = _G.inLine;
     lineCurr->isDebug = _G.debugLine;
     va_end (ap);
+}
+
+//
+// Move the passed value into A unless it is already there.
+// 
+static void
+_movA(const char *s)
+{
+    if (strcmp(s,"a") && strcmp(s,"acc"))
+    { 
+	emitcode("mov","a,%s",s);
+    } 
+}
+
+//
+// Move the passed value into B unless it is already there.
+// 
+static void
+_movB(const char *s)
+{
+    if (strcmp(s,"b"))
+    { 
+	emitcode("mov","b,%s",s);
+    } 
 }
 
 /*-----------------------------------------------------------------*/
@@ -9403,9 +9414,10 @@ genFarPointerGet (operand * left,
 	  _endLazyDPSEvaluation ();
       }
     pi->generated = 1;
-  } else if ((OP_SYMBOL(left)->ruonly || AOP_INDPTRn(left)) && 
+  } else if ((AOP_IS_STR(left) || AOP_INDPTRn(left)) && 
 	     AOP_SIZE(result) > 1 &&
-	     (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
+	     IS_SYMOP(left) &&
+	     (OP_SYMBOL(left)->liveTo > ic->seq || ic->depth)) {
       
       size = AOP_SIZE (result) - 1;
       if (AOP_INDPTRn(left)) {

@@ -819,6 +819,8 @@ isParameterToCall (value * args, operand * op)
 {
   value *tval = args;
 
+  wassert (IS_SYMOP(op));
+    
   while (tval)
     {
       if (tval->sym &&
@@ -841,7 +843,7 @@ isOperandGlobal (operand * op)
   if (IS_ITEMP (op))
     return 0;
 
-  if (op->type == SYMBOL &&
+  if (IS_SYMOP(op) &&
       (op->operand.symOperand->level == 0 ||
        IS_STATIC (op->operand.symOperand->etype) ||
        IS_EXTERN (op->operand.symOperand->etype))
@@ -2244,6 +2246,8 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   symbol *element = getStructElement (SPEC_STRUCT (etype),
 				      right->operand.symOperand);
 
+  wassert(IS_SYMOP(right));
+    
   /* add the offset */
   ic = newiCode ('+', left, operandFromLit (element->offset));
 
@@ -3769,4 +3773,36 @@ iCodeFromAst (ast * tree)
   entryLabel = newiTempLabel ("_entry");
   ast2iCode (tree,0);
   return reverseiCChain ();
+}
+
+static const char *opTypeToStr(OPTYPE op)
+{
+    switch(op)
+    {
+      case SYMBOL: return "symbol";
+      case VALUE: return "value";
+      case TYPE: return "type";
+    }
+    return "undefined type";    
+}
+
+
+operand *validateOpType(operand 	*op, 
+			const char 	*macro,
+			const char 	*args,
+			OPTYPE 		type,
+			const char 	*file, 
+			unsigned 	line)
+{    
+    if (op && op->type == type)
+    {
+	return op;
+    }
+    fprintf(stderr, 
+	    "Internal error: validateOpType failed in %s(%s) @ %s:%u:"
+	    " expected %s, got %s\n",
+	    macro, args, file, line, 
+	    opTypeToStr(type), op ? opTypeToStr(op->type) : "null op");
+    exit(-1);
+    return op; // never reached, makes compiler happy.
 }

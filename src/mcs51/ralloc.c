@@ -1606,7 +1606,8 @@ regTypeNum (eBBlock *ebbs)
 
 
 	      /* and that pointer is remat in data space */
-	      if (OP_SYMBOL (IC_LEFT (ic))->remat &&
+	      if (IS_SYMOP (IC_LEFT (ic)) &&
+		  OP_SYMBOL (IC_LEFT (ic))->remat &&
 		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
 		  DCL_TYPE (aggrToPtr (operandType(IC_LEFT(ic)), FALSE)) == POINTER)
 		{
@@ -2621,7 +2622,8 @@ packRegisters (eBBlock ** ebpp, int blockno)
       if (POINTER_SET (ic))
 	OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 
-      if (POINTER_GET (ic))
+      if (POINTER_GET (ic) &&
+	  IS_SYMOP(IC_LEFT (ic)))
 	OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
       if (!SKIP_IC2 (ic))
@@ -2686,6 +2688,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
       /* if pointer get */
       if (POINTER_GET (ic) &&
+	  IS_SYMOP (IC_LEFT (ic)) &&
 	  !isOperandInFarSpace (IC_RESULT (ic)) &&
 	  !OP_SYMBOL (IC_LEFT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RESULT (ic)) &&

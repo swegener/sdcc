@@ -1761,7 +1761,8 @@ regTypeNum ()
 	      !IS_BITVAR (sym->etype))
 	    {
 	      /* and that pointer is remat in data space */
-	      if (OP_SYMBOL (IC_LEFT (ic))->remat &&
+	      if (IS_SYMOP (IC_LEFT (ic)) &&
+		  OP_SYMBOL (IC_LEFT (ic))->remat &&
 		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
 		  DCL_TYPE (aggrToPtr (operandType(IC_LEFT(ic)), FALSE)) == POINTER)
 		{
@@ -2143,6 +2144,8 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
       }
 
+      wassert(IS_SYMOP(IC_LEFT (ic)));
+      wassert(IS_SYMOP(IC_RIGHT (dic)));
       IC_LEFT (ic)->operand.symOperand =
 	IC_RIGHT (dic)->operand.symOperand;
       OP_SYMBOL(IC_LEFT(ic))->liveTo = ic->seq;
@@ -2180,6 +2183,8 @@ right:
 	sic->rlive = bitVectSetBit (sic->rlive, IC_RIGHT (dic)->key);
       }
 
+      wassert(IS_SYMOP(IC_RIGHT (ic)));
+      wassert(IS_SYMOP(IC_RIGHT (dic)));	
       IC_RIGHT (ic)->operand.symOperand =
 	IC_RIGHT (dic)->operand.symOperand;
       IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
@@ -2764,20 +2769,22 @@ packRegisters (eBBlock * ebp)
 	}
 
       /* mark the pointer usages */
-      if (POINTER_SET (ic))
+      if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)))
 	OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 
-      if (POINTER_GET (ic))
+      if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic)))
 	OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
       if (ic->op == RETURN && IS_SYMOP (IC_LEFT(ic)))
 	  OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
       if (ic->op == RECEIVE && ic->argreg == 1 &&
+	  IS_SYMOP (IC_RESULT (ic)) &&
 	  getSize (operandType(IC_RESULT(ic))) <= 3)
 	  OP_SYMBOL (IC_RESULT(ic))->uptr = 1;
 
       if (ic->op == SEND && ic->argreg == 1 &&
+	  IS_SYMOP(IC_LEFT(ic)) &&
 	  getSize (aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) <= 3)
 	  OP_SYMBOL (IC_LEFT(ic))->uptr = 1;
 
@@ -2846,6 +2853,7 @@ packRegisters (eBBlock * ebp)
          one and right is not in far space */
       if (POINTER_SET (ic) &&
 	  !isOperandInFarSpace (IC_RIGHT (ic)) &&
+	  IS_SYMOP (IC_RESULT (ic)) &&
 	  !OP_SYMBOL (IC_RESULT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RIGHT (ic)) &&
 	  getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1) {
@@ -2856,6 +2864,7 @@ packRegisters (eBBlock * ebp)
       /* if pointer get */
       if (POINTER_GET (ic) &&
 	  !isOperandInFarSpace (IC_RESULT (ic)) &&
+	  IS_SYMOP (IC_LEFT (ic)) &&
 	  !OP_SYMBOL (IC_LEFT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RESULT (ic)) &&
 	  getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1) {

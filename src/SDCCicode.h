@@ -67,14 +67,6 @@ OPTYPE;
 #define IS_OP_GLOBAL(op)   (IS_SYMOP(op) && op->isGlobal)
 #define IS_OP_POINTER(op)  (IS_SYMOP(op) && op->isPtr)
 #define IS_OP_PARM(op)     (IS_SYMOP(op) && op->isParm)
-#define OP_SYMBOL(op)      op->operand.symOperand
-#define OP_SYM_TYPE(op)    op->operand.symOperand->type
-#define OP_SYM_ETYPE(op)   op->operand.symOperand->etype
-#define OP_VALUE(op)       op->operand.valOperand
-#define SPIL_LOC(op)       op->operand.symOperand->usl.spillLoc
-#define OP_LIVEFROM(op)    op->operand.symOperand->liveFrom
-#define OP_LIVETO(op)      op->operand.symOperand->liveTo
-#define OP_REQV(op)        op->operand.symOperand->reqv
 #define OP_ISLIVE_FCALL(op) (IS_ITEMP(op) && OP_SYMBOL(op)->isLiveFcall)
 #define SYM_SPIL_LOC(sym)  sym->usl.spillLoc
 
@@ -103,6 +95,22 @@ typedef struct operand
     struct asmop *aop;		/* asm op for this operand */
   }
 operand;
+
+extern operand *validateOpType(operand 		*op, 
+			       const char 	*macro,
+			       const char 	*args,
+			       OPTYPE 		type,
+			       const char 	*file, 
+			       unsigned 	line);
+
+#define OP_SYMBOL(op) validateOpType(op, "OP_SYMBOL", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand
+#define OP_VALUE(op)  validateOpType(op, "OP_VALUE", #op, VALUE, __FILE__, __LINE__)->operand.valOperand
+#define OP_SYM_TYPE(op)    validateOpType(op, "OP_SYM_TYPE", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->type
+#define OP_SYM_ETYPE(op)   validateOpType(op, "OP_SYM_ETYPE", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->etype
+#define SPIL_LOC(op)       validateOpType(op, "SPIL_LOC", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->usl.spillLoc
+#define OP_LIVEFROM(op)    validateOpType(op, "OP_LIVEFROM", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->liveFrom
+#define OP_LIVETO(op)      validateOpType(op, "OP_LIVETO", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->liveTo
+#define OP_REQV(op)        validateOpType(op, "OP_REQV", #op, SYMBOL, __FILE__, __LINE__)->operand.symOperand->reqv
 
 /* definition for intermediate code */
 #define IC_RESULT(x) (x)->ulrrcnd.lrr.result

@@ -87,6 +87,7 @@ static struct
     short r0Pushed;
     short r1Pushed;
     short accInUse;
+    short bInUse;
     short inLine;
     short debugLine;
     short nRegsSaved;
@@ -148,10 +149,10 @@ emitcode (char *inst, char *fmt,...)
 	sprintf (lb, "%s\t", inst);
       else
 	sprintf (lb, "%s", inst);
-      vsprintf (lb + (strlen (lb)), fmt, ap);
+      tvsprintf (lb + (strlen (lb)), fmt, ap);
     }
   else
-    vsprintf (lb, fmt, ap);
+    tvsprintf (lb, fmt, ap);
 
   while (isspace (*lbp))
     lbp++;
@@ -429,13 +430,19 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
 	      if (_G.accInUse)
 		emitcode ("push", "acc");
 
+	      if (_G.bInUse)
+		emitcode ("push", "b");
+
 	      emitcode ("mov", "a,_bp");
-	      emitcode ("add", "a,#0x%02x",
+	      emitcode ("add", "a,#!constbyte",
 			((sym->stack < 0) ?
 			 ((char) (sym->stack - _G.nRegsSaved)) :
 			 ((char) sym->stack)) & 0xff);
 	      emitcode ("mov", "%s,a",
 			aop->aopu.aop_ptr->name);
+
+	      if (_G.bInUse)
+		emitcode ("pop", "b");
 
 	      if (_G.accInUse)
 		emitcode ("pop", "acc");
@@ -460,29 +467,35 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
       if (_G.accInUse)
 	emitcode ("push", "acc");
 
+      if (_G.bInUse)
+	emitcode ("push", "b");
+
       emitcode ("mov", "a,_bpx");
       emitcode ("clr","c");
-      emitcode ("subb", "a,#0x%02x",
+      emitcode ("subb", "a,#!constbyte",
 		-((sym->stack < 0) ?
 		  ((short) (sym->stack - _G.nRegsSaved)) :
 		  ((short) sym->stack)) & 0xff);
       emitcode ("mov","b,a");
       emitcode ("mov","a,_bpx+1");
-      emitcode ("subb","a,#0x%02x",(-((sym->stack < 0) ?
+      emitcode ("subb","a,#!constbyte",(-((sym->stack < 0) ?
 				     ((short) (sym->stack - _G.nRegsSaved)) :
 				     ((short) sym->stack)) >> 8) & 0xff);
       if (useDP2) {
 	  if (options.model == MODEL_FLAT24)
-	      emitcode ("mov", "dpx1,#0x%02x", (options.stack_loc >> 16) & 0xff);
+	      emitcode ("mov", "dpx1,#!constbyte", (options.stack_loc >> 16) & 0xff);
 	  TR_DPTR("#2");
 	  emitcode ("mov", "dph1,a");
 	  emitcode ("mov", "dpl1,b");
       } else {
 	  if (options.model == MODEL_FLAT24)
-	      emitcode ("mov", "dpx,#0x%02x", (options.stack_loc >> 16) & 0xff);
+	      emitcode ("mov", "dpx,#!constbyte", (options.stack_loc >> 16) & 0xff);
 	  emitcode ("mov", "dph,a");
 	  emitcode ("mov", "dpl,b");
       }
+
+      if (_G.bInUse)
+	emitcode ("pop", "b");
 
       if (_G.accInUse)
 	emitcode ("pop", "acc");
@@ -586,7 +599,7 @@ aopForRemat (symbol * sym)
   strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
   /* set immd2 field if required */
   if (aop->aopu.aop_immd.from_cast_remat) {
-	  sprintf(buffer,"#0x%02x",ptr_type);
+	  tsprintf(buffer,"#!constbyte",ptr_type);
 	  aop->aopu.aop_immd.aop_immd2 = Safe_calloc (1, strlen (buffer) + 1);
 	  strcpy (aop->aopu.aop_immd.aop_immd2, buffer);
   }
@@ -897,7 +910,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 	if (stk)
 	  {
 	    emitcode ("mov", "a,_bp");
-	    emitcode ("add", "a,#0x%02x", ((char) stk) & 0xff);
+	    emitcode ("add", "a,#!constbyte", ((char) stk) & 0xff);
 	    emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
 	  }
 	else
@@ -1053,10 +1066,23 @@ aopGet (asmop * aop,
 	      sprintf(s,"%s",aop->aopu.aop_immd.aop_immd2);
       } else if (bit16)
 	sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
-      else if (offset)
-	sprintf (s, "#(%s >> %d)",
-		 aop->aopu.aop_immd.aop_immd1,
-		 offset * 8);
+      else if (offset) {
+	  switch (offset) {
+	  case 1:
+	      tsprintf(s,"#!his",aop->aopu.aop_immd.aop_immd1);
+	      break;
+	  case 2:
+	      tsprintf(s,"#!hihis",aop->aopu.aop_immd.aop_immd1);
+	      break;
+	  case 3:
+	      tsprintf(s,"#!hihihis",aop->aopu.aop_immd.aop_immd1);
+	      break;
+	  default: /* should not need this (just in case) */
+	      sprintf (s, "#(%s >> %d)",
+		       aop->aopu.aop_immd.aop_immd1,
+		       offset * 8);
+	  }
+      }
       else
 	sprintf (s, "#%s",
 		 aop->aopu.aop_immd.aop_immd1);
@@ -1283,9 +1309,9 @@ aopPut (asmop * aop, char *s, int offset)
 	      {
 		symbol *lbl = newiTempLabel (NULL);
 		emitcode ("clr", "c");
-		emitcode ("jz", "%05d$", lbl->key + 100);
+		emitcode ("jz", "!tlabel", lbl->key + 100);
 		emitcode ("cpl", "c");
-		emitcode ("", "%05d$:", lbl->key + 100);
+		emitcode ("", "!tlabeldef", lbl->key + 100);
 		emitcode ("mov", "%s,c", aop->aopu.aop_dir);
 	      }
 	    }
@@ -1429,9 +1455,9 @@ genNotFloat (operand * op, operand * res)
 
   tlbl = newiTempLabel (NULL);
   aopPut (res->aop, one, 1);
-  emitcode ("jz", "%05d$", (tlbl->key + 100));
+  emitcode ("jz", "!tlabel", (tlbl->key + 100));
   aopPut (res->aop, zero, 1);
-  emitcode ("", "%05d$:", (tlbl->key + 100));
+  emitcode ("", "!tlabeldef", (tlbl->key + 100));
 
   size = res->aop->size - 2;
   offset = 2;
@@ -1607,8 +1633,8 @@ genNot (iCode * ic)
   toBoolean (IC_LEFT (ic));
 
   tlbl = newiTempLabel (NULL);
-  emitcode ("cjne", "a,#0x01,%05d$", tlbl->key + 100);
-  emitcode ("", "%05d$:", tlbl->key + 100);
+  emitcode ("cjne", "a,#0x01,!tlabel", tlbl->key + 100);
+  emitcode ("", "!tlabeldef", tlbl->key + 100);
   outBitC (IC_RESULT (ic));
 
 release:
@@ -2209,7 +2235,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
 	emitcode ("push", "psw");
       }
 
-      emitcode ("mov", "psw,#0x%02x", (bank << 3) & 0x00ff);
+      emitcode ("mov", "psw,#!constbyte", (bank << 3) & 0x00ff);
     }
   
   if (aop)
@@ -2314,7 +2340,8 @@ genCall (iCode * ic)
 	  _startLazyDPSEvaluation ();
 	  size=getSize(operandType(IC_LEFT(sic)));
 	  if (size>1) {
-	    aopOp (IC_LEFT (sic), sic, FALSE, TRUE);
+	    aopOp (IC_LEFT (sic), sic, FALSE, 
+		   (IS_SYMOP(IC_LEFT(sic)) && OP_SYMBOL(IC_LEFT(sic))->ruonly ? FALSE : TRUE));
 	  } else {
 	    aopOp (IC_LEFT (sic), sic, FALSE, FALSE);
 	  }
@@ -2339,7 +2366,7 @@ genCall (iCode * ic)
     
   if (swapBanks)
   {
-        emitcode ("mov", "psw,#0x%02x", 
+        emitcode ("mov", "psw,#!constbyte", 
            ((FUNC_REGBANK(dtype)) << 3) & 0xff);
   }
 
@@ -2350,7 +2377,7 @@ genCall (iCode * ic)
 
   if (swapBanks)
   {
-       emitcode ("mov", "psw,#0x%02x", 
+       emitcode ("mov", "psw,#!constbyte", 
           ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
   }
 
@@ -2400,16 +2427,16 @@ genCall (iCode * ic)
       if (options.stack10bit) {
 	  emitcode ("clr","c");
 	  emitcode ("mov","a,sp");
-	  emitcode ("subb","a,#0x%02x",ic->parmBytes & 0xff);
+	  emitcode ("subb","a,#!constbyte",ic->parmBytes & 0xff);
 	  emitcode ("mov","sp,a");
 	  emitcode ("mov","a,esp");
-	  emitcode ("subb","a,#0x%02x",(ic->parmBytes >> 8) & 0xff);
+	  emitcode ("subb","a,#!constbyte",(ic->parmBytes >> 8) & 0xff);
 	  emitcode ("mov","esp,a");	  
       } else {
 	  int i;
 	  if (ic->parmBytes > 3) {
 	      emitcode ("mov", "a,%s", spname);
-	      emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
+	      emitcode ("add", "a,#!constbyte", (-ic->parmBytes) & 0xff);
 	      emitcode ("mov", "%s,a", spname);
 	  } else
 	      for (i = 0; i < ic->parmBytes; i++)
@@ -2456,14 +2483,14 @@ genPcall (iCode * ic)
   }
 
   /* push the return address on to the stack */
-  emitcode ("mov", "a,#%05d$", (rlbl->key + 100));
+  emitcode ("mov", "a,#!tlabel", (rlbl->key + 100));
   emitcode ("push", "acc");
-  emitcode ("mov", "a,#(%05d$ >> 8)", (rlbl->key + 100));
+  emitcode ("mov", "a,#!hil", (rlbl->key + 100));
   emitcode ("push", "acc");
 
   if (options.model == MODEL_FLAT24)
     {
-      emitcode ("mov", "a,#(%05d$ >> 16)", (rlbl->key + 100));
+      emitcode ("mov", "a,#!hihil", (rlbl->key + 100));
       emitcode ("push", "acc");
     }
 
@@ -2511,7 +2538,7 @@ genPcall (iCode * ic)
     }
 
   emitcode ("ret", "");
-  emitcode ("", "%05d$:", (rlbl->key + 100));
+  emitcode ("", "!tlabeldef", (rlbl->key + 100));
 
 
   /* if we need assign a result value */
@@ -2538,7 +2565,7 @@ genPcall (iCode * ic)
       if (ic->parmBytes > 3)
 	{
 	  emitcode ("mov", "a,%s", spname);
-	  emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
+	  emitcode ("add", "a,#!constbyte", (-ic->parmBytes) & 0xff);
 	  emitcode ("mov", "%s,a", spname);
 	}
       else
@@ -2648,11 +2675,11 @@ genFunction (iCode * ic)
 	{
 	  if (regs390[i].print) {
 	      if (strcmp (regs390[i].base, "0") == 0)
-		  emitcode ("", "%s = 0x%02x",
+		  emitcode ("", "%s = !constbyte",
 			    regs390[i].dname,
 			    8 * rbank + regs390[i].offset);
 	      else
-		  emitcode ("", "%s = %s + 0x%02x",
+		  emitcode ("", "%s = %s + !constbyte",
 			    regs390[i].dname,
 			    regs390[i].base,
 			    8 * rbank + regs390[i].offset);
@@ -2796,7 +2823,7 @@ genFunction (iCode * ic)
 		     * the caller's R0 isn't trashed.
 		     */
 		    emitcode ("push", "psw");
-		    emitcode ("mov", "psw,#0x%02x", 
+		    emitcode ("mov", "psw,#!constbyte", 
 		    	      (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
 		    switchedPSW = TRUE;
 		}
@@ -2843,7 +2870,7 @@ genFunction (iCode * ic)
    && !switchedPSW)
     {
       emitcode ("push", "psw");
-      emitcode ("mov", "psw,#0x%02x", (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
+      emitcode ("mov", "psw,#!constbyte", (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
     }
 
   if (IFFUNC_ISREENT (sym->type) || options.stackAuto) {
@@ -2874,10 +2901,10 @@ genFunction (iCode * ic)
 	  if ( i > 1024) werror (W_STACK_OVERFLOW, sym->name);
 	  assert (sym->recvSize <= 4);
 	  emitcode ("mov","a,sp");
-	  emitcode ("add","a,#0x%02x", ((short) sym->stack & 0xff));
+	  emitcode ("add","a,#!constbyte", ((short) sym->stack & 0xff));
 	  emitcode ("mov","sp,a");
 	  emitcode ("mov","a,esp");
-	  emitcode ("addc","a,#0x%02x", (((short) sym->stack) >> 8) & 0xff);
+	  emitcode ("addc","a,#!constbyte", (((short) sym->stack) >> 8) & 0xff);
 	  emitcode ("mov","esp,a");
       } else {
 	  if (i > 256)
@@ -2886,7 +2913,7 @@ genFunction (iCode * ic)
 	  if (i > 3 && sym->recvSize < 4) {
 	      
 	      emitcode ("mov", "a,sp");
-	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	      emitcode ("add", "a,#!constbyte", ((char) sym->stack & 0xff));
 	      emitcode ("mov", "sp,a");
 	      
 	  } else
@@ -2899,7 +2926,7 @@ genFunction (iCode * ic)
     {
 
       emitcode ("mov", "a,_spx");
-      emitcode ("add", "a,#0x%02x", ((char) sym->xstack & 0xff));
+      emitcode ("add", "a,#!constbyte", ((char) sym->xstack & 0xff));
       emitcode ("mov", "_spx,a");
     }
 
@@ -2935,7 +2962,7 @@ genEndFunction (iCode * ic)
      local stack */
   if (options.useXstack && sym->stack) {
       emitcode ("mov", "a,sp");
-      emitcode ("add", "a,#0x%02x", ((char) -sym->stack) & 0xff);
+      emitcode ("add", "a,#!constbyte", ((char) -sym->stack) & 0xff);
       emitcode ("mov", "sp,a");
   }
 
@@ -3180,7 +3207,7 @@ jumpret:
   if (!(ic->next && ic->next->op == LABEL &&
 	IC_LABEL (ic->next) == returnLabel))
 
-    emitcode ("ljmp", "%05d$", (returnLabel->key + 100));
+    emitcode ("ljmp", "!tlabel", (returnLabel->key + 100));
 
 }
 
@@ -3197,7 +3224,7 @@ genLabel (iCode * ic)
   D (emitcode (";", "genLabel ");
     );
 
-  emitcode ("", "%05d$:", (IC_LABEL (ic)->key + 100));
+  emitcode ("", "!tlabeldef", (IC_LABEL (ic)->key + 100));
 }
 
 /*-----------------------------------------------------------------*/
@@ -3208,7 +3235,7 @@ genGoto (iCode * ic)
 {
   D (emitcode (";", "genGoto ");
     );
-  emitcode ("ljmp", "%05d$", (IC_LABEL (ic)->key + 100));
+  emitcode ("ljmp", "!tlabel", (IC_LABEL (ic)->key + 100));
 }
 
 /*-----------------------------------------------------------------*/
@@ -3289,13 +3316,13 @@ genPlusIncr (iCode * ic)
       emitcode ("inc", "%s", aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE));
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	  IS_AOP_PREG (IC_RESULT (ic)))
-	emitcode ("cjne", "%s,#0x00,%05d$"
+	emitcode ("cjne", "%s,#0x00,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE)
 		  ,tlbl->key + 100);
       else
 	{
 	  emitcode ("clr", "a");
-	  emitcode ("cjne", "a,%s,%05d$"
+	  emitcode ("cjne", "a,%s,!tlabel"
 		    ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE)
 		    ,tlbl->key + 100);
 	}
@@ -3305,11 +3332,11 @@ genPlusIncr (iCode * ic)
 	{
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0x00,%05d$"
+	    emitcode ("cjne", "%s,#0x00,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, FALSE)
 		      ,tlbl->key + 100);
 	  else
-	    emitcode ("cjne", "a,%s,%05d$"
+	    emitcode ("cjne", "a,%s,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, FALSE)
 		      ,tlbl->key + 100);
 
@@ -3319,12 +3346,12 @@ genPlusIncr (iCode * ic)
 	{
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0x00,%05d$"
+	    emitcode ("cjne", "%s,#0x00,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, FALSE)
 		      ,tlbl->key + 100);
 	  else
 	    {
-	      emitcode ("cjne", "a,%s,%05d$"
+	      emitcode ("cjne", "a,%s,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, FALSE)
 			,tlbl->key + 100);
 	    }
@@ -3333,7 +3360,7 @@ genPlusIncr (iCode * ic)
 
       if (emitTlbl)
 	{
-	  emitcode ("", "%05d$:", tlbl->key + 100);
+	  emitcode ("", "!tlabeldef", tlbl->key + 100);
 	}
       return TRUE;
     }
@@ -3355,7 +3382,7 @@ genPlusIncr (iCode * ic)
       if (icount > 3)
 	{
 	  MOVA (aopGet (AOP (IC_LEFT (ic)), 0, FALSE, FALSE, TRUE));
-	  emitcode ("add", "a,#0x%02x", ((char) icount) & 0xff);
+	  emitcode ("add", "a,#!constbyte", ((char) icount) & 0xff);
 	  aopPut (AOP (IC_RESULT (ic)), "a", 0);
 	}
       else
@@ -3389,9 +3416,9 @@ outBitAcc (operand * result)
     }
   else
     {
-      emitcode ("jz", "%05d$", tlbl->key + 100);
+      emitcode ("jz", "!tlabel", tlbl->key + 100);
       emitcode ("mov", "a,%s", one);
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       outAcc (result);
     }
 }
@@ -3408,9 +3435,9 @@ genPlusBits (iCode * ic)
     {
       symbol *lbl = newiTempLabel (NULL);
       emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
-      emitcode ("jnb", "%s,%05d$", AOP (IC_RIGHT (ic))->aopu.aop_dir, (lbl->key + 100));
+      emitcode ("jnb", "%s,!tlabel", AOP (IC_RIGHT (ic))->aopu.aop_dir, (lbl->key + 100));
       emitcode ("cpl", "c");
-      emitcode ("", "%05d$:", (lbl->key + 100));
+      emitcode ("", "!tlabeldef", (lbl->key + 100));
       outBitC (IC_RESULT (ic));
     }
   else
@@ -3566,13 +3593,13 @@ genPlus (iCode * ic)
 	  while (size--) emitcode ("inc","dptr");
       } else {
 	  emitcode ("mov","a,dpl");
-	  emitcode ("add","a,#0x%02x",size & 0xff);
+	  emitcode ("add","a,#!constbyte",size & 0xff);
 	  emitcode ("mov","dpl,a");
 	  emitcode ("mov","a,dph");
-	  emitcode ("addc","a,#0x%02x",(size >> 8) & 0xff);
+	  emitcode ("addc","a,#!constbyte",(size >> 8) & 0xff);
 	  emitcode ("mov","dph,a");
 	  emitcode ("mov","a,dpx");
-	  emitcode ("addc","a,#0x%02x",(size >> 16) & 0xff);
+	  emitcode ("addc","a,#!constbyte",(size >> 16) & 0xff);
 	  emitcode ("mov","dpx,a");
       }
       freeAsmop (IC_RIGHT (ic), NULL, ic, FALSE);
@@ -3790,13 +3817,13 @@ genMinusDec (iCode * ic)
       if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	  AOP_TYPE (IC_RESULT (ic)) == AOP_DPTR ||
 	  IS_AOP_PREG (IC_RESULT (ic)))
-	emitcode ("cjne", "%s,#0xff,%05d$"
+	emitcode ("cjne", "%s,#0xff,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE)
 		  ,tlbl->key + 100);
       else
 	{
 	  emitcode ("mov", "a,#0xff");
-	  emitcode ("cjne", "a,%s,%05d$"
+	  emitcode ("cjne", "a,%s,!tlabel"
 		    ,aopGet (AOP (IC_RESULT (ic)), LSB, FALSE, FALSE, FALSE)
 		    ,tlbl->key + 100);
 	}
@@ -3806,12 +3833,12 @@ genMinusDec (iCode * ic)
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      AOP_TYPE (IC_RESULT (ic)) == AOP_DPTR ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0xff,%05d$"
+	    emitcode ("cjne", "%s,#0xff,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, FALSE)
 		      ,tlbl->key + 100);
 	  else
 	    {
-	      emitcode ("cjne", "a,%s,%05d$"
+	      emitcode ("cjne", "a,%s,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB16, FALSE, FALSE, FALSE)
 			,tlbl->key + 100);
 	    }
@@ -3822,12 +3849,12 @@ genMinusDec (iCode * ic)
 	  if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG ||
 	      AOP_TYPE (IC_RESULT (ic)) == AOP_DPTR ||
 	      IS_AOP_PREG (IC_RESULT (ic)))
-	    emitcode ("cjne", "%s,#0xff,%05d$"
+	    emitcode ("cjne", "%s,#0xff,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, FALSE)
 		      ,tlbl->key + 100);
 	  else
 	    {
-	      emitcode ("cjne", "a,%s,%05d$"
+	      emitcode ("cjne", "a,%s,!tlabel"
 		  ,aopGet (AOP (IC_RESULT (ic)), MSB24, FALSE, FALSE, FALSE)
 			,tlbl->key + 100);
 	    }
@@ -3835,7 +3862,7 @@ genMinusDec (iCode * ic)
 	}
       if (emitTlbl)
 	{
-	  emitcode ("", "%05d$:", tlbl->key + 100);
+	  emitcode ("", "!tlabeldef", tlbl->key + 100);
 	}
       return TRUE;
     }
@@ -3910,18 +3937,18 @@ genMinusBits (iCode * ic)
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
     {
       emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
-      emitcode ("jnb", "%s,%05d$", AOP (IC_RIGHT (ic))->aopu.aop_dir, (lbl->key + 100));
+      emitcode ("jnb", "%s,!tlabel", AOP (IC_RIGHT (ic))->aopu.aop_dir, (lbl->key + 100));
       emitcode ("cpl", "c");
-      emitcode ("", "%05d$:", (lbl->key + 100));
+      emitcode ("", "!tlabeldef", (lbl->key + 100));
       outBitC (IC_RESULT (ic));
     }
   else
     {
       emitcode ("mov", "c,%s", AOP (IC_RIGHT (ic))->aopu.aop_dir);
       emitcode ("subb", "a,acc");
-      emitcode ("jnb", "%s,%05d$", AOP (IC_LEFT (ic))->aopu.aop_dir, (lbl->key + 100));
+      emitcode ("jnb", "%s,!tlabel", AOP (IC_LEFT (ic))->aopu.aop_dir, (lbl->key + 100));
       emitcode ("inc", "a");
-      emitcode ("", "%05d$:", (lbl->key + 100));
+      emitcode ("", "!tlabeldef", (lbl->key + 100));
       aopPut (AOP (IC_RESULT (ic)), "a", 0);
       addSign (IC_RESULT (ic), MSB16, SPEC_USIGN (getSpec (operandType (IC_RESULT (ic)))));
     }
@@ -3995,11 +4022,11 @@ genMinus (iCode * ic)
 	    if (!size && lit==-1) {
 	      emitcode ("dec", "a");
 	    } else {
-	      emitcode ("add", "a,#0x%02x",
+	      emitcode ("add", "a,#!constbyte",
 			(unsigned int) (lit & 0x0FFL));
 	    }
 	  } else {
-	    emitcode ("addc", "a,#0x%02x",
+	    emitcode ("addc", "a,#!constbyte",
 		      (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
 	  }
 	}
@@ -4092,7 +4119,7 @@ genMultOneByte (operand * left,
     MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
     emitcode ("mul", "ab");
    
-    _G.accInUse++;
+    _G.accInUse++; _G.bInUse++;
     aopOp(result, ic, TRUE, FALSE);
       
       if (AOP_SIZE(result)<1 || AOP_SIZE(result)>2) 
@@ -4104,7 +4131,7 @@ genMultOneByte (operand * left,
       }      
       
     aopPut (AOP (result), "a", 0);
-    _G.accInUse--;
+    _G.accInUse--; _G.bInUse--;
     if (AOP_SIZE(result)==2) 
     {
       aopPut (AOP (result), "b", 1);
@@ -4119,13 +4146,13 @@ genMultOneByte (operand * left,
   MOVA (aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
 
   lbl=newiTempLabel(NULL);
-  emitcode ("jnb", "acc.7,%05d$",  lbl->key+100);
+  emitcode ("jnb", "acc.7,!tlabel",  lbl->key+100);
   // left side is negative, 8-bit two's complement, this fails for -128
   emitcode ("setb", "F0"); // set sign flag
   emitcode ("cpl", "a");
   emitcode ("inc", "a");
 
-  emitcode ("", "%05d$:", lbl->key+100);
+  emitcode ("", "!tlabeldef", lbl->key+100);
 
   /* if literal */
   if (AOP_TYPE(right)==AOP_LIT) {
@@ -4133,24 +4160,24 @@ genMultOneByte (operand * left,
     /* AND literal negative */
     if ((int) val < 0) {
       emitcode ("cpl", "F0"); // complement sign flag
-      emitcode ("mov", "b,#0x%02x", -val);
+      emitcode ("mov", "b,#!constbyte", -val);
     } else {
-      emitcode ("mov", "b,#0x%02x", val);
+      emitcode ("mov", "b,#!constbyte", val);
     }
   } else {
     lbl=newiTempLabel(NULL);
     emitcode ("mov", "b,a");
     emitcode ("mov", "a,%s", aopGet (AOP (right), 0, FALSE, FALSE, TRUE));
-    emitcode ("jnb", "acc.7,%05d$", lbl->key+100);
+    emitcode ("jnb", "acc.7,!tlabel", lbl->key+100);
     // right side is negative, 8-bit two's complement
     emitcode ("cpl", "F0"); // complement sign flag
     emitcode ("cpl", "a");
     emitcode ("inc", "a");
-    emitcode ("", "%05d$:", lbl->key+100);
+    emitcode ("", "!tlabeldef", lbl->key+100);
   }
   emitcode ("mul", "ab");
     
-  _G.accInUse++;
+  _G.accInUse++;_G.bInUse++;
   aopOp(result, ic, TRUE, FALSE);
     
   if (AOP_SIZE(result)<1 || AOP_SIZE(result)>2) 
@@ -4162,7 +4189,7 @@ genMultOneByte (operand * left,
   }    
     
   lbl=newiTempLabel(NULL);
-  emitcode ("jnb", "F0,%05d$", lbl->key+100);
+  emitcode ("jnb", "F0,!tlabel", lbl->key+100);
   // only ONE op was negative, we have to do a 8/16-bit two's complement
   emitcode ("cpl", "a"); // lsb
   if (AOP_SIZE(result)==1) {
@@ -4175,9 +4202,9 @@ genMultOneByte (operand * left,
     emitcode ("xch", "a,b");
   }
 
-  emitcode ("", "%05d$:", lbl->key+100);
+  emitcode ("", "!tlabeldef", lbl->key+100);
   aopPut (AOP (result), "a", 0);
-  _G.accInUse--;
+  _G.accInUse--;_G.bInUse--;
   if (AOP_SIZE(result)==2) {
     aopPut (AOP (result), "b", 1);
   }
@@ -4202,9 +4229,9 @@ static void genMultTwoByte (operand *left, operand *right,
 	/* save EA bit in F1 */
 	lbl = newiTempLabel(NULL);
 	emitcode ("setb","F1");
-	emitcode ("jbc","EA,%05d$",lbl->key+100);
+	emitcode ("jbc","EA,!tlabel",lbl->key+100);
 	emitcode ("clr","F1");
-	emitcode("","%05d$:",lbl->key+100);
+	emitcode("","!tlabeldef",lbl->key+100);
 
 	/* load up MB with right */
 	if (!umult) {
@@ -4215,13 +4242,13 @@ static void genMultTwoByte (operand *left, operand *right,
 				emitcode("setb","F0");
 				val = -val;
 			}
-			emitcode ("mov","mb,#0x%02x",val & 0xff);
-			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);		    
+			emitcode ("mov","mb,#!constbyte",val & 0xff);
+			emitcode ("mov","mb,#!constbyte",(val >> 8) & 0xff);		    
 		} else {
 			lbl = newiTempLabel(NULL);
 			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
 			emitcode ("mov","a,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
-			emitcode ("jnb","acc.7,%05d$",lbl->key+100);		
+			emitcode ("jnb","acc.7,!tlabel",lbl->key+100);		
 			emitcode ("xch", "a,b");
 			emitcode ("cpl","a");
 			emitcode ("add", "a,#1");
@@ -4229,7 +4256,7 @@ static void genMultTwoByte (operand *left, operand *right,
 			emitcode ("cpl", "a"); // msb
 			emitcode ("addc", "a,#0");
 			emitcode ("setb","F0");
-			emitcode ("","%05d$:",lbl->key+100);
+			emitcode ("","!tlabeldef",lbl->key+100);
 			emitcode ("mov","mb,b");
 			emitcode ("mov","mb,a");
 		}
@@ -4242,16 +4269,16 @@ static void genMultTwoByte (operand *left, operand *right,
 		lbl = newiTempLabel(NULL);
 		emitcode ("mov","b,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
 		emitcode ("mov","a,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
-		emitcode ("jnb","acc.7,%05d$",lbl->key+100);
+		emitcode ("jnb","acc.7,!tlabel",lbl->key+100);
 		emitcode ("xch", "a,b");
 		emitcode ("cpl","a");
 		emitcode ("add", "a,#1");
 		emitcode ("xch", "a,b");
 		emitcode ("cpl", "a"); // msb
 		emitcode ("addc","a,#0");
-		emitcode ("jbc","F0,%05d$",lbl->key+100);
+		emitcode ("jbc","F0,!tlabel",lbl->key+100);
 		emitcode ("setb","F0");
-		emitcode ("","%05d$:",lbl->key+100);
+		emitcode ("","!tlabeldef",lbl->key+100);
 		emitcode ("mov","ma,b");
 		emitcode ("mov","ma,a");
 	} else {
@@ -4260,10 +4287,10 @@ static void genMultTwoByte (operand *left, operand *right,
 	}
 	/* wait for multiplication to finish */
 	lbl = newiTempLabel(NULL);
-	emitcode("","%05d$:", lbl->key+100);
+	emitcode("","!tlabeldef", lbl->key+100);
 	emitcode("mov","a,mcnt1");
 	emitcode("anl","a,#0x80");
-	emitcode("jnz","%05d$",lbl->key+100);
+	emitcode("jnz","!tlabel",lbl->key+100);
 	
 	freeAsmop (left, NULL, ic, TRUE);
 	freeAsmop (right, NULL, ic,TRUE);
@@ -4284,10 +4311,10 @@ static void genMultTwoByte (operand *left, operand *right,
 		MOVA("ma");
 		/* negate result if needed */
 		lbl = newiTempLabel(NULL); 	
-		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("jnb","F0,!tlabel",lbl->key+100);
 		emitcode("cpl","a");
 		emitcode("add","a,#1");
-		emitcode("","%05d$:", lbl->key+100);
+		emitcode("","!tlabeldef", lbl->key+100);
 	        if (AOP_TYPE(result) == AOP_ACC)
 	        {
 		    D(emitcode(";", "ACC special case."););
@@ -4303,27 +4330,27 @@ static void genMultTwoByte (operand *left, operand *right,
 	    
 		emitcode("pop","acc");
 		lbl = newiTempLabel(NULL); 	
-		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("jnb","F0,!tlabel",lbl->key+100);
 		emitcode("cpl","a");
 		emitcode("addc","a,#0");
-		emitcode("","%05d$:", lbl->key+100);
+		emitcode("","!tlabeldef", lbl->key+100);
 		aopPut(AOP(result),"a",1);
 		emitcode("pop","acc");
 		if (AOP_SIZE(result) >= 3) {
 			lbl = newiTempLabel(NULL); 	
-			emitcode("jnb","F0,%05d$",lbl->key+100);
+			emitcode("jnb","F0,!tlabel",lbl->key+100);
 			emitcode("cpl","a");
 			emitcode("addc","a,#0");			
-			emitcode("","%05d$:", lbl->key+100);
+			emitcode("","!tlabeldef", lbl->key+100);
 			aopPut(AOP(result),"a",2);
 		}
 		emitcode("pop","acc");
 		if (AOP_SIZE(result) >= 4) {
 			lbl = newiTempLabel(NULL); 	
-			emitcode("jnb","F0,%05d$",lbl->key+100);
+			emitcode("jnb","F0,!tlabel",lbl->key+100);
 			emitcode("cpl","a");
 			emitcode("addc","a,#0");			
-			emitcode("","%05d$:", lbl->key+100);
+			emitcode("","!tlabeldef", lbl->key+100);
 			aopPut(AOP(result),"a",3);
 		}
 	        if (AOP_TYPE(result) == AOP_ACC)
@@ -4337,9 +4364,9 @@ static void genMultTwoByte (operand *left, operand *right,
 
 	/* restore EA bit in F1 */
 	lbl = newiTempLabel(NULL);
-	emitcode ("jnb","F1,%05d$",lbl->key+100);
+	emitcode ("jnb","F1,!tlabel",lbl->key+100);
 	emitcode ("setb","EA");
-	emitcode("","%05d$:",lbl->key+100);
+	emitcode("","!tlabeldef",lbl->key+100);
 	return ;
 }
 
@@ -4458,10 +4485,10 @@ genDivOneByte (operand * left,
   l = aopGet (AOP (right), 0, FALSE, FALSE, TRUE);
   MOVA (l);
   lbl = newiTempLabel (NULL);
-  emitcode ("jnb", "acc.7,%05d$", (lbl->key + 100));
+  emitcode ("jnb", "acc.7,!tlabel", (lbl->key + 100));
   emitcode ("cpl", "a");
   emitcode ("inc", "a");
-  emitcode ("", "%05d$:", (lbl->key + 100));
+  emitcode ("", "!tlabeldef", (lbl->key + 100));
   emitcode ("mov", "b,a");
 
   /* sign adjust left side */
@@ -4469,10 +4496,10 @@ genDivOneByte (operand * left,
   MOVA (l);
 
   lbl = newiTempLabel (NULL);
-  emitcode ("jnb", "acc.7,%05d$", (lbl->key + 100));
+  emitcode ("jnb", "acc.7,!tlabel", (lbl->key + 100));
   emitcode ("cpl", "a");
   emitcode ("inc", "a");
-  emitcode ("", "%05d$:", (lbl->key + 100));
+  emitcode ("", "!tlabeldef", (lbl->key + 100));
 
   /* now the division */
   emitcode ("nop", "; workaround for DS80C390 div bug.");
@@ -4484,16 +4511,16 @@ genDivOneByte (operand * left,
   emitcode ("pop", "acc");
   /* if there was an over flow we don't
      adjust the sign of the result */
-  emitcode ("jb", "ov,%05d$", (lbl->key + 100));
-  emitcode ("jnb", "acc.7,%05d$", (lbl->key + 100));
+  emitcode ("jb", "ov,!tlabel", (lbl->key + 100));
+  emitcode ("jnb", "acc.7,!tlabel", (lbl->key + 100));
   CLRC;
   emitcode ("clr", "a");
   emitcode ("subb", "a,b");
   emitcode ("mov", "b,a");
-  emitcode ("", "%05d$:", (lbl->key + 100));
+  emitcode ("", "!tlabeldef", (lbl->key + 100));
 
   /* now we are done */
-    _G.accInUse++;
+  _G.accInUse++;     _G.bInUse++;
     aopOp(result, ic, TRUE, FALSE);
     
     aopPut (AOP (result), "b", 0);
@@ -4509,7 +4536,7 @@ genDivOneByte (operand * left,
     {
 	aopPut (AOP (result), "a", offset++);
     }
-    _G.accInUse--;
+    _G.accInUse--;     _G.bInUse--;
 
 }
 
@@ -4527,9 +4554,9 @@ static void genDivTwoByte (operand *left, operand *right,
 	/* save EA bit in F1 */
 	lbl = newiTempLabel(NULL);
 	emitcode ("setb","F1");
-	emitcode ("jbc","EA,%05d$",lbl->key+100);
+	emitcode ("jbc","EA,!tlabel",lbl->key+100);
 	emitcode ("clr","F1");
-	emitcode("","%05d$:",lbl->key+100);
+	emitcode("","!tlabeldef",lbl->key+100);
 
 	/* load up MA with left */
 	if (!umult) {
@@ -4537,7 +4564,7 @@ static void genDivTwoByte (operand *left, operand *right,
 		lbl = newiTempLabel(NULL);
 		emitcode ("mov","b,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
 		emitcode ("mov","a,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
-		emitcode ("jnb","acc.7,%05d$",lbl->key+100);
+		emitcode ("jnb","acc.7,!tlabel",lbl->key+100);
 		emitcode ("xch", "a,b");
 		emitcode ("cpl","a");
 		emitcode ("add", "a,#1");
@@ -4545,7 +4572,7 @@ static void genDivTwoByte (operand *left, operand *right,
 		emitcode ("cpl", "a"); // msb
 		emitcode ("addc","a,#0");
 		emitcode ("setb","F0");
-		emitcode ("","%05d$:",lbl->key+100);
+		emitcode ("","!tlabeldef",lbl->key+100);
 		emitcode ("mov","ma,b");
 		emitcode ("mov","ma,a");
 	} else {
@@ -4559,27 +4586,27 @@ static void genDivTwoByte (operand *left, operand *right,
 			int val=floatFromVal (AOP (right)->aopu.aop_lit);
 			if (val < 0) {
 				lbl = newiTempLabel(NULL);
-				emitcode ("jbc","F0,%05d$",lbl->key+100);
+				emitcode ("jbc","F0,!tlabel",lbl->key+100);
 				emitcode("setb","F0");
-				emitcode ("","%05d$:",lbl->key+100);
+				emitcode ("","!tlabeldef",lbl->key+100);
 				val = -val;
 			} 
-			emitcode ("mov","mb,#0x%02x",val & 0xff);		    
-			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);
+			emitcode ("mov","mb,#!constbyte",val & 0xff);		    
+			emitcode ("mov","mb,#!constbyte",(val >> 8) & 0xff);
 		} else {
 			lbl = newiTempLabel(NULL);
 			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
 			emitcode ("mov","a,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
-			emitcode ("jnb","acc.7,%05d$",lbl->key+100);		
+			emitcode ("jnb","acc.7,!tlabel",lbl->key+100);		
 			emitcode ("xch", "a,b");
 			emitcode ("cpl","a");
 			emitcode ("add", "a,#1");
 			emitcode ("xch", "a,b");
 			emitcode ("cpl", "a"); // msb
 			emitcode ("addc", "a,#0");
-			emitcode ("jbc","F0,%05d$",lbl->key+100);
+			emitcode ("jbc","F0,!tlabel",lbl->key+100);
 			emitcode ("setb","F0");
-			emitcode ("","%05d$:",lbl->key+100);
+			emitcode ("","!tlabeldef",lbl->key+100);
 			emitcode ("mov","mb,b");
 			emitcode ("mov","mb,a");
 		}
@@ -4590,10 +4617,10 @@ static void genDivTwoByte (operand *left, operand *right,
 
 	/* wait for multiplication to finish */
 	lbl = newiTempLabel(NULL);
-	emitcode("","%05d$:", lbl->key+100);
+	emitcode("","!tlabeldef", lbl->key+100);
 	emitcode("mov","a,mcnt1");
 	emitcode("anl","a,#0x80");
-	emitcode("jnz","%05d$",lbl->key+100);
+	emitcode("jnz","!tlabel",lbl->key+100);
 	
 	freeAsmop (left, NULL, ic, TRUE);
 	freeAsmop (right, NULL, ic,TRUE);
@@ -4608,25 +4635,25 @@ static void genDivTwoByte (operand *left, operand *right,
 		MOVA("ma");
 		/* negate result if needed */
 		lbl = newiTempLabel(NULL); 	
-		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("jnb","F0,!tlabel",lbl->key+100);
 		emitcode("cpl","a");
 		emitcode("add","a,#1");
-		emitcode("","%05d$:", lbl->key+100);
+		emitcode("","!tlabeldef", lbl->key+100);
 		aopPut(AOP(result),"a",0);
 		emitcode("pop","acc");
 		lbl = newiTempLabel(NULL); 	
-		emitcode("jnb","F0,%05d$",lbl->key+100);
+		emitcode("jnb","F0,!tlabel",lbl->key+100);
 		emitcode("cpl","a");
 		emitcode("addc","a,#0");
-		emitcode("","%05d$:", lbl->key+100);
+		emitcode("","!tlabeldef", lbl->key+100);
 		aopPut(AOP(result),"a",1);
 	}
 	freeAsmop (result, NULL, ic, TRUE);
 	/* restore EA bit in F1 */
 	lbl = newiTempLabel(NULL);
-	emitcode ("jnb","F1,%05d$",lbl->key+100);
+	emitcode ("jnb","F1,!tlabel",lbl->key+100);
 	emitcode ("setb","EA");
-	emitcode("","%05d$:",lbl->key+100);
+	emitcode("","!tlabeldef",lbl->key+100);
 	return ;
 }
 
@@ -4734,10 +4761,10 @@ genModOneByte (operand * left,
   MOVA (l);
 
   lbl = newiTempLabel (NULL);
-  emitcode ("jnb", "acc.7,%05d$", (lbl->key + 100));
+  emitcode ("jnb", "acc.7,!tlabel", (lbl->key + 100));
   emitcode ("cpl", "a");
   emitcode ("inc", "a");
-  emitcode ("", "%05d$:", (lbl->key + 100));
+  emitcode ("", "!tlabeldef", (lbl->key + 100));
   emitcode ("mov", "b,a");
 
   /* sign adjust left side */
@@ -4745,10 +4772,10 @@ genModOneByte (operand * left,
   MOVA (l);
 
   lbl = newiTempLabel (NULL);
-  emitcode ("jnb", "acc.7,%05d$", (lbl->key + 100));
+  emitcode ("jnb", "acc.7,!tlabel", (lbl->key + 100));
   emitcode ("cpl", "a");
   emitcode ("inc", "a");
-  emitcode ("", "%05d$:", (lbl->key + 100));
+  emitcode ("", "!tlabeldef", (lbl->key + 100));
 
   /* now the multiplication */
   emitcode ("nop", "; workaround for DS80C390 div bug.");
@@ -4759,17 +4786,19 @@ genModOneByte (operand * left,
   emitcode ("pop", "acc");
   /* if there was an over flow we don't
      adjust the sign of the result */
-  emitcode ("jb", "ov,%05d$", (lbl->key + 100));
-  emitcode ("jnb", "acc.7,%05d$", (lbl->key + 100));
+  emitcode ("jb", "ov,!tlabel", (lbl->key + 100));
+  emitcode ("jnb", "acc.7,!tlabel", (lbl->key + 100));
   CLRC;
   emitcode ("clr", "a");
   emitcode ("subb", "a,b");
   emitcode ("mov", "b,a");
-  emitcode ("", "%05d$:", (lbl->key + 100));
-
+  emitcode ("", "!tlabeldef", (lbl->key + 100));
+  
+  _G.bInUse++;
   /* now we are done */
   aopOp(result, ic, TRUE, FALSE);    
   aopPut (AOP (result), "b", 0);
+  _G.bInUse--;
 
 }
 
@@ -4788,22 +4817,22 @@ static void genModTwoByte (operand *left, operand *right,
 	/* save EA bit in F1 */
 	lbl = newiTempLabel(NULL);
 	emitcode ("setb","F1");
-	emitcode ("jbc","EA,%05d$",lbl->key+100);
+	emitcode ("jbc","EA,!tlabel",lbl->key+100);
 	emitcode ("clr","F1");
-	emitcode("","%05d$:",lbl->key+100);
+	emitcode("","!tlabeldef",lbl->key+100);
 
 	if (!umult) {
 		lbl = newiTempLabel(NULL);
 		emitcode ("mov","b,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
 		emitcode ("mov","a,%s",aopGet(AOP(left),1,FALSE,FALSE,TRUE));
-		emitcode ("jnb","acc.7,%05d$",lbl->key+100);
+		emitcode ("jnb","acc.7,!tlabel",lbl->key+100);
 		emitcode ("xch", "a,b");
 		emitcode ("cpl","a");
 		emitcode ("add", "a,#1");
 		emitcode ("xch", "a,b");
 		emitcode ("cpl", "a"); // msb
 		emitcode ("addc","a,#0");
-		emitcode ("","%05d$:",lbl->key+100);
+		emitcode ("","!tlabeldef",lbl->key+100);
 		emitcode ("mov","ma,b");
 		emitcode ("mov","ma,a");
 	} else {
@@ -4818,20 +4847,20 @@ static void genModTwoByte (operand *left, operand *right,
 			if (val < 0) {
 				val = -val;
 			} 
-			emitcode ("mov","mb,#0x%02x",val & 0xff);
-			emitcode ("mov","mb,#0x%02x",(val >> 8) & 0xff);		    
+			emitcode ("mov","mb,#!constbyte",val & 0xff);
+			emitcode ("mov","mb,#!constbyte",(val >> 8) & 0xff);		    
 		} else {
 			lbl = newiTempLabel(NULL);
 			emitcode ("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE,TRUE));
 			emitcode ("mov","a,%s",aopGet(AOP(right),1,FALSE,FALSE,TRUE));
-			emitcode ("jnb","acc.7,%05d$",lbl->key+100);		
+			emitcode ("jnb","acc.7,!tlabel",lbl->key+100);		
 			emitcode ("xch", "a,b");
 			emitcode ("cpl","a");
 			emitcode ("add", "a,#1");
 			emitcode ("xch", "a,b");
 			emitcode ("cpl", "a"); // msb
 			emitcode ("addc", "a,#0");
-			emitcode ("","%05d$:",lbl->key+100);
+			emitcode ("","!tlabeldef",lbl->key+100);
 			emitcode ("mov","mb,b");
 			emitcode ("mov","mb,a");
 		}
@@ -4842,10 +4871,10 @@ static void genModTwoByte (operand *left, operand *right,
 
 	/* wait for multiplication to finish */
 	lbl = newiTempLabel(NULL);
-	emitcode("","%05d$:", lbl->key+100);
+	emitcode("","!tlabeldef", lbl->key+100);
 	emitcode("mov","a,mcnt1");
 	emitcode("anl","a,#0x80");
-	emitcode("jnz","%05d$",lbl->key+100);
+	emitcode("jnz","!tlabel",lbl->key+100);
 	
 	freeAsmop (left, NULL, ic, TRUE);
 	freeAsmop (right, NULL, ic,TRUE);
@@ -4857,9 +4886,9 @@ static void genModTwoByte (operand *left, operand *right,
 
 	/* restore EA bit in F1 */
 	lbl = newiTempLabel(NULL);
-	emitcode ("jnb","F1,%05d$",lbl->key+100);
+	emitcode ("jnb","F1,!tlabel",lbl->key+100);
 	emitcode ("setb","EA");
-	emitcode("","%05d$:",lbl->key+100);
+	emitcode("","!tlabeldef",lbl->key+100);
 	return ;
 }
 
@@ -4939,11 +4968,11 @@ genIfxJump (iCode * ic, char *jval)
 	       (strcmp (jval, "c") == 0 ? "jc" : "jb")));
     }
   if (strcmp (inst, "jb") == 0 || strcmp (inst, "jnb") == 0)
-    emitcode (inst, "%s,%05d$", jval, (tlbl->key + 100));
+    emitcode (inst, "%s,!tlabel", jval, (tlbl->key + 100));
   else
-    emitcode (inst, "%05d$", tlbl->key + 100);
-  emitcode ("ljmp", "%05d$", jlbl->key + 100);
-  emitcode ("", "%05d$:", tlbl->key + 100);
+    emitcode (inst, "!tlabel", tlbl->key + 100);
+  emitcode ("ljmp", "!tlabel", jlbl->key + 100);
+  emitcode ("", "!tlabeldef", tlbl->key + 100);
 
   /* mark the icode as generated */
   ic->generated = 1;
@@ -4984,11 +5013,11 @@ genCmp (operand * left, operand * right,
 	  (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR))
 	{
 	  symbol *lbl = newiTempLabel (NULL);
-	  emitcode ("cjne", "%s,%s,%05d$",
+	  emitcode ("cjne", "%s,%s,!tlabel",
 		    aopGet (AOP (left), offset, FALSE, FALSE, FALSE),
 		    aopGet (AOP (right), offset, FALSE, FALSE, FALSE),
 		    lbl->key + 100);
-	  emitcode ("", "%05d$:", lbl->key + 100);
+	  emitcode ("", "!tlabeldef", lbl->key + 100);
 	}
       else
 	{
@@ -5041,7 +5070,7 @@ genCmp (operand * left, operand * right,
 		      unsigned long lit = (unsigned long)
 		      floatFromVal (AOP (right)->aopu.aop_lit);
 		      emitcode (";", "genCmp #3.1");
-		      emitcode ("subb", "a,#0x%02x",
+		      emitcode ("subb", "a,#!constbyte",
 				0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
 		    }
 		  else
@@ -5215,7 +5244,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 	{
 	  char *l = aopGet (AOP (left), offset, FALSE, FALSE, TRUE);
 	  MOVA (l);
-	  emitcode ("cjne", "a,%s,%05d$",
+	  emitcode ("cjne", "a,%s,!tlabel",
 		    aopGet (AOP (right), offset, FALSE, FALSE, FALSE),
 		    lbl->key + 100);
 	  offset++;
@@ -5234,9 +5263,9 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 	  MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
 	  if ((AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) &&
 	      ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
-	    emitcode ("jnz", "%05d$", lbl->key + 100);
+	    emitcode ("jnz", "!tlabel", lbl->key + 100);
 	  else
-	    emitcode ("cjne", "a,%s,%05d$",
+	    emitcode ("cjne", "a,%s,!tlabel",
 		      aopGet (AOP (right), offset, FALSE, TRUE, FALSE),
 		      lbl->key + 100);
 	  offset++;
@@ -5251,7 +5280,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 	  if (strcmp (l, "b"))
 	    emitcode ("mov", "b,%s", l);
 	  MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-	  emitcode ("cjne", "a,b,%05d$", lbl->key + 100);
+	  emitcode ("cjne", "a,b,!tlabel", lbl->key + 100);
 	  offset++;
 	}
     }
@@ -5271,10 +5300,10 @@ gencjne (operand * left, operand * right, symbol * lbl)
   gencjneshort (left, right, lbl);
 
   emitcode ("mov", "a,%s", one);
-  emitcode ("sjmp", "%05d$", tlbl->key + 100);
-  emitcode ("", "%05d$:", lbl->key + 100);
+  emitcode ("sjmp", "!tlabel", tlbl->key + 100);
+  emitcode ("", "!tlabeldef", lbl->key + 100);
   emitcode ("clr", "a");
-  emitcode ("", "%05d$:", tlbl->key + 100);
+  emitcode ("", "!tlabeldef", tlbl->key + 100);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5333,24 +5362,24 @@ genCmpEq (iCode * ic, iCode * ifx)
 	    {
 	      symbol *lbl = newiTempLabel (NULL);
 	      emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
-	      emitcode ("jb", "%s,%05d$", AOP (right)->aopu.aop_dir, (lbl->key + 100));
+	      emitcode ("jb", "%s,!tlabel", AOP (right)->aopu.aop_dir, (lbl->key + 100));
 	      emitcode ("cpl", "c");
-	      emitcode ("", "%05d$:", (lbl->key + 100));
+	      emitcode ("", "!tlabeldef", (lbl->key + 100));
 	    }
 	  /* if true label then we jump if condition
 	     supplied is true */
 	  tlbl = newiTempLabel (NULL);
 	  if (IC_TRUE (ifx))
 	    {
-	      emitcode ("jnc", "%05d$", tlbl->key + 100);
-	      emitcode ("ljmp", "%05d$", IC_TRUE (ifx)->key + 100);
+	      emitcode ("jnc", "!tlabel", tlbl->key + 100);
+	      emitcode ("ljmp", "!tlabel", IC_TRUE (ifx)->key + 100);
 	    }
 	  else
 	    {
-	      emitcode ("jc", "%05d$", tlbl->key + 100);
-	      emitcode ("ljmp", "%05d$", IC_FALSE (ifx)->key + 100);
+	      emitcode ("jc", "!tlabel", tlbl->key + 100);
+	      emitcode ("ljmp", "!tlabel", IC_FALSE (ifx)->key + 100);
 	    }
-	  emitcode ("", "%05d$:", tlbl->key + 100);
+	  emitcode ("", "!tlabeldef", tlbl->key + 100);
 	}
       else
 	{
@@ -5358,16 +5387,16 @@ genCmpEq (iCode * ic, iCode * ifx)
 	  gencjneshort (left, right, tlbl);
 	  if (IC_TRUE (ifx))
 	    {
-	      emitcode ("ljmp", "%05d$", IC_TRUE (ifx)->key + 100);
-	      emitcode ("", "%05d$:", tlbl->key + 100);
+	      emitcode ("ljmp", "!tlabel", IC_TRUE (ifx)->key + 100);
+	      emitcode ("", "!tlabeldef", tlbl->key + 100);
 	    }
 	  else
 	    {
 	      symbol *lbl = newiTempLabel (NULL);
-	      emitcode ("sjmp", "%05d$", lbl->key + 100);
-	      emitcode ("", "%05d$:", tlbl->key + 100);
-	      emitcode ("ljmp", "%05d$", IC_FALSE (ifx)->key + 100);
-	      emitcode ("", "%05d$:", lbl->key + 100);
+	      emitcode ("sjmp", "!tlabel", lbl->key + 100);
+	      emitcode ("", "!tlabeldef", tlbl->key + 100);
+	      emitcode ("ljmp", "!tlabel", IC_FALSE (ifx)->key + 100);
+	      emitcode ("", "!tlabeldef", lbl->key + 100);
 	    }
 	}
       /* mark the icode as generated */
@@ -5404,9 +5433,9 @@ genCmpEq (iCode * ic, iCode * ifx)
 	{
 	  symbol *lbl = newiTempLabel (NULL);
 	  emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
-	  emitcode ("jb", "%s,%05d$", AOP (right)->aopu.aop_dir, (lbl->key + 100));
+	  emitcode ("jb", "%s,!tlabel", AOP (right)->aopu.aop_dir, (lbl->key + 100));
 	  emitcode ("cpl", "c");
-	  emitcode ("", "%05d$:", (lbl->key + 100));
+	  emitcode ("", "!tlabeldef", (lbl->key + 100));
 	}
 
       freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -5548,9 +5577,9 @@ genAndOp (iCode * ic)
     {
       tlbl = newiTempLabel (NULL);
       toBoolean (left);
-      emitcode ("jz", "%05d$", tlbl->key + 100);
+      emitcode ("jz", "!tlabel", tlbl->key + 100);
       toBoolean (right);
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
       freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   
@@ -5595,9 +5624,9 @@ genOrOp (iCode * ic)
     {
       tlbl = newiTempLabel (NULL);
       toBoolean (left);
-      emitcode ("jnz", "%05d$", tlbl->key + 100);
+      emitcode ("jnz", "!tlabel", tlbl->key + 100);
       toBoolean (right);
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
       freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   
@@ -5638,7 +5667,7 @@ static void
 continueIfTrue (iCode * ic)
 {
   if (IC_TRUE (ic))
-    emitcode ("ljmp", "%05d$", IC_TRUE (ic)->key + 100);
+    emitcode ("ljmp", "!tlabel", IC_TRUE (ic)->key + 100);
   ic->generated = 1;
 }
 
@@ -5649,7 +5678,7 @@ static void
 jumpIfTrue (iCode * ic)
 {
   if (!IC_TRUE (ic))
-    emitcode ("ljmp", "%05d$", IC_FALSE (ic)->key + 100);
+    emitcode ("ljmp", "!tlabel", IC_FALSE (ic)->key + 100);
   ic->generated = 1;
 }
 
@@ -5663,15 +5692,15 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
   if (IC_TRUE (ic))
     {
       symbol *nlbl = newiTempLabel (NULL);
-      emitcode ("sjmp", "%05d$", nlbl->key + 100);
-      emitcode ("", "%05d$:", tlbl->key + 100);
-      emitcode ("ljmp", "%05d$", IC_TRUE (ic)->key + 100);
-      emitcode ("", "%05d$:", nlbl->key + 100);
+      emitcode ("sjmp", "!tlabel", nlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
+      emitcode ("ljmp", "!tlabel", IC_TRUE (ic)->key + 100);
+      emitcode ("", "!tlabeldef", nlbl->key + 100);
     }
   else
     {
-      emitcode ("ljmp", "%05d$", IC_FALSE (ic)->key + 100);
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("ljmp", "!tlabel", IC_FALSE (ic)->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
     }
   ic->generated = 1;
 }
@@ -5885,13 +5914,13 @@ genAnd (iCode * ic, iCode * ifx)
 		  MOVA (aopGet (AOP (left), offset, FALSE, FALSE, TRUE));
 		  // byte ==  2^n ?
 		  if ((posbit = isLiteralBit (bytelit)) != 0)
-		    emitcode ("jb", "acc.%d,%05d$", (posbit - 1) & 0x07, tlbl->key + 100);
+		    emitcode ("jb", "acc.%d,!tlabel", (posbit - 1) & 0x07, tlbl->key + 100);
 		  else
 		    {
 		      if (bytelit != 0x0FFL)
 			emitcode ("anl", "a,%s",
 			  aopGet (AOP (right), offset, FALSE, TRUE, FALSE));
-		      emitcode ("jnz", "%05d$", tlbl->key + 100);
+		      emitcode ("jnz", "!tlabel", tlbl->key + 100);
 		    }
 		}
 	      offset++;
@@ -5900,7 +5929,7 @@ genAnd (iCode * ic, iCode * ifx)
 	  if (size)
 	    {
 	      emitcode ("clr", "c");
-	      emitcode ("", "%05d$:", tlbl->key + 100);
+	      emitcode ("", "!tlabeldef", tlbl->key + 100);
 	    }
 	  // if(left & literal)
 	  else
@@ -5984,13 +6013,13 @@ genAnd (iCode * ic, iCode * ifx)
 			    aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
 		}
 	      }
-	      emitcode ("jnz", "%05d$", tlbl->key + 100);
+	      emitcode ("jnz", "!tlabel", tlbl->key + 100);
 	      offset++;
 	    }
 	  if (size)
 	    {
 	      CLRC;
-	      emitcode ("", "%05d$:", tlbl->key + 100);
+	      emitcode ("", "!tlabeldef", tlbl->key + 100);
 	      outBitC (result);
 	    }
 	  else if (ifx)
@@ -6163,10 +6192,10 @@ genOr (iCode * ic, iCode * ifx)
 	      symbol *tlbl = newiTempLabel (NULL);
 	      if (!((AOP_TYPE (result) == AOP_CRY) && ifx))
 		emitcode ("setb", "c");
-	      emitcode ("jb", "%s,%05d$",
+	      emitcode ("jb", "%s,!tlabel",
 			AOP (left)->aopu.aop_dir, tlbl->key + 100);
 	      toBoolean (right);
-	      emitcode ("jnz", "%05d$", tlbl->key + 100);
+	      emitcode ("jnz", "!tlabel", tlbl->key + 100);
 	      if ((AOP_TYPE (result) == AOP_CRY) && ifx)
 		{
 		  jmpTrueOrFalse (ifx, tlbl);
@@ -6175,7 +6204,7 @@ genOr (iCode * ic, iCode * ifx)
 	      else
 		{
 		  CLRC;
-		  emitcode ("", "%05d$:", tlbl->key + 100);
+		  emitcode ("", "!tlabeldef", tlbl->key + 100);
 		}
 	    }
 	}
@@ -6213,9 +6242,9 @@ genOr (iCode * ic, iCode * ifx)
 	  if (size)
 	    {
 	      symbol *tlbl = newiTempLabel (NULL);
-	      emitcode ("jnz", "%05d$", tlbl->key + 100);
+	      emitcode ("jnz", "!tlabel", tlbl->key + 100);
 	      CLRC;
-	      emitcode ("", "%05d$:", tlbl->key + 100);
+	      emitcode ("", "!tlabeldef", tlbl->key + 100);
 	    }
 	  else
 	    {
@@ -6299,13 +6328,13 @@ genOr (iCode * ic, iCode * ifx)
 		emitcode ("orl", "a,%s",
 			  aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
 	      }
-	      emitcode ("jnz", "%05d$", tlbl->key + 100);
+	      emitcode ("jnz", "!tlabel", tlbl->key + 100);
 	      offset++;
 	    }
 	  if (size)
 	    {
 	      CLRC;
-	      emitcode ("", "%05d$:", tlbl->key + 100);
+	      emitcode ("", "!tlabeldef", tlbl->key + 100);
 	      outBitC (result);
 	    }
 	  else if (ifx)
@@ -6501,15 +6530,15 @@ genXor (iCode * ic, iCode * ifx)
 		  if (sizer == 1)
 		    // test the msb of the lsb
 		    emitcode ("anl", "a,#0xfe");
-		  emitcode ("jnz", "%05d$", tlbl->key + 100);
+		  emitcode ("jnz", "!tlabel", tlbl->key + 100);
 		  sizer--;
 		}
 	      // val = (0,1)
 	      emitcode ("rrc", "a");
 	    }
-	  emitcode ("jnb", "%s,%05d$", AOP (left)->aopu.aop_dir, (tlbl->key + 100));
+	  emitcode ("jnb", "%s,!tlabel", AOP (left)->aopu.aop_dir, (tlbl->key + 100));
 	  emitcode ("cpl", "c");
-	  emitcode ("", "%05d$:", (tlbl->key + 100));
+	  emitcode ("", "!tlabeldef", (tlbl->key + 100));
 	}
       // bit = c
       // val = c
@@ -6597,13 +6626,13 @@ genXor (iCode * ic, iCode * ifx)
 		      emitcode ("xrl", "a,%s", rOp);		      
 		  }
 		}
-	      emitcode ("jnz", "%05d$", tlbl->key + 100);
+	      emitcode ("jnz", "!tlabel", tlbl->key + 100);
 	      offset++;
 	    }
 	  if (size)
 	    {
 	      CLRC;
-	      emitcode ("", "%05d$:", tlbl->key + 100);
+	      emitcode ("", "!tlabeldef", tlbl->key + 100);
 	      outBitC (result);
 	    }
 	  else if (ifx)
@@ -6906,7 +6935,7 @@ AccLsh (int shCount)
 	  /* rotate left accumulator */
 	  AccRol (shCount);
 	  /* and kill the lower order bits */
-	  emitcode ("anl", "a,#0x%02x", SLMask[shCount]);
+	  emitcode ("anl", "a,#!constbyte", SLMask[shCount]);
 	}
     }
 }
@@ -6929,7 +6958,7 @@ AccRsh (int shCount)
 	  /* rotate right accumulator */
 	  AccRol (8 - shCount);
 	  /* and kill the higher order bits */
-	  emitcode ("anl", "a,#0x%02x", SRMask[shCount]);
+	  emitcode ("anl", "a,#!constbyte", SRMask[shCount]);
 	}
     }
 }
@@ -6962,11 +6991,11 @@ AccSRsh (int shCount)
 	  /* rotate right accumulator */
 	  AccRol (8 - shCount);
 	  /* and kill the higher order bits */
-	  emitcode ("anl", "a,#0x%02x", SRMask[shCount]);
-	  emitcode ("jnb", "acc.%d,%05d$", 7 - shCount, tlbl->key + 100);
-	  emitcode ("orl", "a,#0x%02x",
+	  emitcode ("anl", "a,#!constbyte", SRMask[shCount]);
+	  emitcode ("jnb", "acc.%d,!tlabel", 7 - shCount, tlbl->key + 100);
+	  emitcode ("orl", "a,#!constbyte",
 		    (unsigned char) ~SRMask[shCount]);
-	  emitcode ("", "%05d$:", tlbl->key + 100);
+	  emitcode ("", "!tlabeldef", tlbl->key + 100);
 	}
     }
 }
@@ -7111,7 +7140,7 @@ AccAXLsh (char *x, int shCount)
 
       AccRol (shCount);		// BBBAAAAA:CCCCCDDD
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SLMask[shCount]);	// BBB00000:CCCCCDDD
 
       emitcode ("xch", "a,%s", x);	// CCCCCDDD:BBB00000
@@ -7124,7 +7153,7 @@ AccAXLsh (char *x, int shCount)
 
       emitcode ("xch", "a,%s", x);	// DDDCCCCC:(BBB^DDD)CCCCC
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SLMask[shCount]);	// DDD00000:(BBB^DDD)CCCCC
 
       emitcode ("xch", "a,%s", x);	// (BBB^DDD)CCCCC:DDD00000
@@ -7133,7 +7162,7 @@ AccAXLsh (char *x, int shCount)
 
       break;
     case 6:			// AAAAAABB:CCCCCCDD
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 000000BB:CCCCCCDD
       emitcode ("mov", "c,acc.0");	// c = B
       emitcode ("xch", "a,%s", x);	// CCCCCCDD:000000BB
@@ -7155,7 +7184,7 @@ AccAXLsh (char *x, int shCount)
       break;
     case 7:			// a:x <<= 7
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 0000000B:CCCCCCCD
 
       emitcode ("mov", "c,acc.0");	// c = B
@@ -7206,14 +7235,14 @@ AccAXRsh (char *x, int shCount)
 
       AccRol (8 - shCount);	// DDDCCCCC:BBBAAAAA
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 000CCCCC:BBBAAAAA
 
       emitcode ("xrl", "a,%s", x);	// BBB(CCCCC^AAAAA):BBBAAAAA
 
       emitcode ("xch", "a,%s", x);	// BBBAAAAA:BBB(CCCCC^AAAAA)
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 000AAAAA:BBB(CCCCC^AAAAA)
 
       emitcode ("xch", "a,%s", x);	// BBB(CCCCC^AAAAA):000AAAAA
@@ -7232,7 +7261,7 @@ AccAXRsh (char *x, int shCount)
 
       emitcode ("xch", "a,%s", x);	// DDDDDDAA:BBBBBBCC
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 000000AA:BBBBBBCC
 
       break;
@@ -7244,7 +7273,7 @@ AccAXRsh (char *x, int shCount)
 
       emitcode ("xch", "a,%s", x);	// DDDDDDDA:BBBBBBCC
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 0000000A:BBBBBBBC
 
       break;
@@ -7290,14 +7319,14 @@ AccAXRshS (char *x, int shCount)
 
       AccRol (8 - shCount);	// DDDCCCCC:BBBAAAAA
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 000CCCCC:BBBAAAAA
 
       emitcode ("xrl", "a,%s", x);	// BBB(CCCCC^AAAAA):BBBAAAAA
 
       emitcode ("xch", "a,%s", x);	// BBBAAAAA:BBB(CCCCC^AAAAA)
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 000AAAAA:BBB(CCCCC^AAAAA)
 
       emitcode ("xch", "a,%s", x);	// BBB(CCCCC^AAAAA):000AAAAA
@@ -7306,11 +7335,11 @@ AccAXRshS (char *x, int shCount)
 
       emitcode ("xch", "a,%s", x);	// 000SAAAA:BBBCCCCC
 
-      emitcode ("jnb", "acc.%d,%05d$", 7 - shCount, tlbl->key + 100);
-      emitcode ("orl", "a,#0x%02x",
+      emitcode ("jnb", "acc.%d,!tlabel", 7 - shCount, tlbl->key + 100);
+      emitcode ("orl", "a,#!constbyte",
 		(unsigned char) ~SRMask[shCount]);	// 111AAAAA:BBBCCCCC
 
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       break;			// SSSSAAAA:BBBCCCCC
 
     case 6:			// AABBBBBB:CCDDDDDD
@@ -7323,14 +7352,14 @@ AccAXRshS (char *x, int shCount)
 
       emitcode ("xch", "a,%s", x);	// DDDDDDAA:BBBBBBCC
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 000000AA:BBBBBBCC
 
-      emitcode ("jnb", "acc.%d,%05d$", 7 - shCount, tlbl->key + 100);
-      emitcode ("orl", "a,#0x%02x",
+      emitcode ("jnb", "acc.%d,!tlabel", 7 - shCount, tlbl->key + 100);
+      emitcode ("orl", "a,#!constbyte",
 		(unsigned char) ~SRMask[shCount]);	// 111111AA:BBBBBBCC
 
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       break;
     case 7:			// ABBBBBBB:CDDDDDDD
 
@@ -7341,14 +7370,14 @@ AccAXRshS (char *x, int shCount)
 
       emitcode ("xch", "a,%s", x);	// DDDDDDDA:BBBBBBCC
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		SRMask[shCount]);	// 0000000A:BBBBBBBC
 
-      emitcode ("jnb", "acc.%d,%05d$", 7 - shCount, tlbl->key + 100);
-      emitcode ("orl", "a,#0x%02x",
+      emitcode ("jnb", "acc.%d,!tlabel", 7 - shCount, tlbl->key + 100);
+      emitcode ("orl", "a,#!constbyte",
 		(unsigned char) ~SRMask[shCount]);	// 1111111A:BBBBBBBC
 
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       break;
     default:
       break;
@@ -7912,7 +7941,7 @@ genLeftShift (iCode * ic)
        * but since I'm too lazy to fix that today, at least we can make
        * some small improvement.
        */
-       emitcode("mov", "b,#0x%02x",
+       emitcode("mov", "b,#!constbyte",
        	        ((int) floatFromVal (AOP (right)->aopu.aop_lit)) + 1);
   }
   else
@@ -7961,19 +7990,19 @@ genLeftShift (iCode * ic)
 
       l = aopGet (AOP (left), 0, FALSE, FALSE, TRUE);
       MOVA (l);
-      emitcode ("sjmp", "%05d$", tlbl1->key + 100);
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("sjmp", "!tlabel", tlbl1->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       emitcode ("add", "a,acc");
-      emitcode ("", "%05d$:", tlbl1->key + 100);
-      emitcode ("djnz", "b,%05d$", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl1->key + 100);
+      emitcode ("djnz", "b,!tlabel", tlbl->key + 100);
       aopPut (AOP (result), "a", 0);
       goto release;
     }
 
   reAdjustPreg (AOP (result));
 
-  emitcode ("sjmp", "%05d$", tlbl1->key + 100);
-  emitcode ("", "%05d$:", tlbl->key + 100);
+  emitcode ("sjmp", "!tlabel", tlbl1->key + 100);
+  emitcode ("", "!tlabeldef", tlbl->key + 100);
   l = aopGet (AOP (result), offset, FALSE, FALSE, TRUE);
   MOVA (l);
   emitcode ("add", "a,acc");
@@ -7989,8 +8018,8 @@ genLeftShift (iCode * ic)
   _endLazyDPSEvaluation ();
   reAdjustPreg (AOP (result));
 
-  emitcode ("", "%05d$:", tlbl1->key + 100);
-  emitcode ("djnz", "b,%05d$", tlbl->key + 100);
+  emitcode ("", "!tlabeldef", tlbl1->key + 100);
+  emitcode ("djnz", "b,!tlabel", tlbl->key + 100);
 release:
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
@@ -8312,7 +8341,7 @@ genSignedRightShift (iCode * ic)
        * but since I'm too lazy to fix that today, at least we can make
        * some small improvement.
        */
-       emitcode("mov", "b,#0x%02x",
+       emitcode("mov", "b,#!constbyte",
        	        ((int) floatFromVal (AOP (right)->aopu.aop_lit)) + 1);
   }
   else
@@ -8363,19 +8392,19 @@ genSignedRightShift (iCode * ic)
     {
       l = aopGet (AOP (left), 0, FALSE, FALSE, TRUE);
       MOVA (l);
-      emitcode ("sjmp", "%05d$", tlbl1->key + 100);
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("sjmp", "!tlabel", tlbl1->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       emitcode ("mov", "c,ov");
       emitcode ("rrc", "a");
-      emitcode ("", "%05d$:", tlbl1->key + 100);
-      emitcode ("djnz", "b,%05d$", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl1->key + 100);
+      emitcode ("djnz", "b,!tlabel", tlbl->key + 100);
       aopPut (AOP (result), "a", 0);
       goto release;
     }
 
   reAdjustPreg (AOP (result));
-  emitcode ("sjmp", "%05d$", tlbl1->key + 100);
-  emitcode ("", "%05d$:", tlbl->key + 100);
+  emitcode ("sjmp", "!tlabel", tlbl1->key + 100);
+  emitcode ("", "!tlabeldef", tlbl->key + 100);
   emitcode ("mov", "c,ov");
   _startLazyDPSEvaluation ();
   while (size--)
@@ -8387,8 +8416,8 @@ genSignedRightShift (iCode * ic)
     }
   _endLazyDPSEvaluation ();
   reAdjustPreg (AOP (result));
-  emitcode ("", "%05d$:", tlbl1->key + 100);
-  emitcode ("djnz", "b,%05d$", tlbl->key + 100);
+  emitcode ("", "!tlabeldef", tlbl1->key + 100);
+  emitcode ("djnz", "b,!tlabel", tlbl->key + 100);
 
 release:
   freeAsmop (left, NULL, ic, TRUE);
@@ -8456,7 +8485,7 @@ genRightShift (iCode * ic)
        * but since I'm too lazy to fix that today, at least we can make
        * some small improvement.
        */
-       emitcode("mov", "b,#0x%02x",
+       emitcode("mov", "b,#!constbyte",
        	        ((int) floatFromVal (AOP (right)->aopu.aop_lit)) + 1);
   }
   else
@@ -8503,19 +8532,19 @@ genRightShift (iCode * ic)
     {
       l = aopGet (AOP (left), 0, FALSE, FALSE, TRUE);
       MOVA (l);
-      emitcode ("sjmp", "%05d$", tlbl1->key + 100);
-      emitcode ("", "%05d$:", tlbl->key + 100);
+      emitcode ("sjmp", "!tlabel", tlbl1->key + 100);
+      emitcode ("", "!tlabeldef", tlbl->key + 100);
       CLRC;
       emitcode ("rrc", "a");
-      emitcode ("", "%05d$:", tlbl1->key + 100);
-      emitcode ("djnz", "b,%05d$", tlbl->key + 100);
+      emitcode ("", "!tlabeldef", tlbl1->key + 100);
+      emitcode ("djnz", "b,!tlabel", tlbl->key + 100);
       aopPut (AOP (result), "a", 0);
       goto release;
     }
 
   reAdjustPreg (AOP (result));
-  emitcode ("sjmp", "%05d$", tlbl1->key + 100);
-  emitcode ("", "%05d$:", tlbl->key + 100);
+  emitcode ("sjmp", "!tlabel", tlbl1->key + 100);
+  emitcode ("", "!tlabeldef", tlbl->key + 100);
   CLRC;
   _startLazyDPSEvaluation ();
   while (size--)
@@ -8528,8 +8557,8 @@ genRightShift (iCode * ic)
   _endLazyDPSEvaluation ();
   reAdjustPreg (AOP (result));
 
-  emitcode ("", "%05d$:", tlbl1->key + 100);
-  emitcode ("djnz", "b,%05d$", tlbl->key + 100);
+  emitcode ("", "!tlabeldef", tlbl1->key + 100);
+  emitcode ("djnz", "b,!tlabel", tlbl->key + 100);
 
 release:
   freeAsmop (left, NULL, ic, TRUE);
@@ -8589,7 +8618,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
       /* shift right acc */
       AccRsh (shCnt);
 
-      emitcode ("anl", "a,#0x%02x",
+      emitcode ("anl", "a,#!constbyte",
 		((unsigned char) -1) >> (8 - SPEC_BLEN (etype)));
       aopPut (AOP (result), "a", offset);
       return;
@@ -8643,7 +8672,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
 
   if (rlen)
     {
-      emitcode ("anl", "a,#0x%02x", ((unsigned char) -1) >> (rlen));
+      emitcode ("anl", "a,#!constbyte", ((unsigned char) -1) >> (rlen));
       aopPut (AOP (result), "a", offset);
     }
 
@@ -9288,7 +9317,7 @@ genPackBits (sym_link * etype,
 	      break;
 	    }
 
-	  emitcode ("anl", "a,#0x%02x", (unsigned char)
+	  emitcode ("anl", "a,#!constbyte", (unsigned char)
 		    ((unsigned char) (0xFF << (blen + bstr)) |
 		     (unsigned char) (0xFF >> (8 - bstr))));
 	  emitcode ("orl", "a,b");
@@ -9380,7 +9409,7 @@ genPackBits (sym_link * etype,
 	  break;
 	}
 
-      emitcode ("anl", "a,#0x%02x", ((unsigned char) -1 << rLen));
+      emitcode ("anl", "a,#!constbyte", ((unsigned char) -1 << rLen));
       emitcode ("orl", "a,b");
     }
 
@@ -9931,24 +9960,24 @@ genAddrOf (iCode * ic)
       /* if 10 bit stack */
       if (options.stack10bit) {
 	  char buff[10];
-	  sprintf(buff,"#0x%02x",(options.stack_loc >> 16) & 0xff);
+	  tsprintf(buff,"#!constbyte",(options.stack_loc >> 16) & 0xff);
 	  /* if it has an offset then we need to compute it */
-	  emitcode ("subb", "a,#0x%02x",
+	  emitcode ("subb", "a,#!constbyte",
 		    -((sym->stack < 0) ?
 		      ((short) (sym->stack - _G.nRegsSaved)) :
 		      ((short) sym->stack)) & 0xff);
 	  emitcode ("mov","b,a");
-	  emitcode ("mov","a,#0x%02x",(-((sym->stack < 0) ?
+	  emitcode ("mov","a,#!constbyte",(-((sym->stack < 0) ?
 					 ((short) (sym->stack - _G.nRegsSaved)) :
 					 ((short) sym->stack)) >> 8) & 0xff);
 	  if (sym->stack) {
 	      emitcode ("mov", "a,_bpx");
-	      emitcode ("add", "a,#0x%02x", ((sym->stack < 0) ? 
+	      emitcode ("add", "a,#!constbyte", ((sym->stack < 0) ? 
 					     ((char) (sym->stack - _G.nRegsSaved)) :
 					     ((char) sym->stack )) & 0xff);
 	      emitcode ("mov", "b,a");
 	      emitcode ("mov", "a,_bpx+1");
-	      emitcode ("addc","a,#0x%02x", (((sym->stack < 0) ? 
+	      emitcode ("addc","a,#!constbyte", (((sym->stack < 0) ? 
 					      ((short) (sym->stack - _G.nRegsSaved)) :
 					      ((short) sym->stack )) >> 8) & 0xff);
 	      aopPut (AOP (IC_RESULT (ic)), "b", 0);
@@ -9964,7 +9993,7 @@ genAddrOf (iCode * ic)
 	  /* if it has an offset then we need to compute it */
 	  if (sym->stack) {
 	      emitcode ("mov", "a,_bp");
-	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	      emitcode ("add", "a,#!constbyte", ((char) sym->stack & 0xff));
 	      aopPut (AOP (IC_RESULT (ic)), "a", 0);
 	  } else {
 	      /* we can just move _bp */
@@ -9994,12 +10023,24 @@ genAddrOf (iCode * ic)
   while (size--)
     {
       char s[SDCC_NAME_MAX];
-      if (offset)
-	sprintf (s, "#(%s >> %d)",
-		 sym->rname,
-		 offset * 8);
-      else
-	sprintf (s, "#%s", sym->rname);
+      if (offset) {
+	  switch (offset) {
+	  case 1:
+	      tsprintf(s,"!his",sym->rname);
+	      break;
+	  case 2:
+	      tsprintf(s,"!hihis",sym->rname);
+	      break;
+	  case 3:
+	      tsprintf(s,"!hihihis",sym->rname);
+	      break;
+	  default: /* should not need this (just in case) */
+	      sprintf (s, "#(%s >> %d)",
+		       sym->rname,
+		       offset * 8);
+	  }
+      } else
+	  sprintf (s, "#%s", sym->rname);
       aopPut (AOP (IC_RESULT (ic)), s, offset++);
     }
 
@@ -10082,10 +10123,10 @@ genArrayInit (iCode * ic)
 		tlbl = newiTempLabel (NULL);
 		if (firstpass || (count & 0xff))
 		{
-		    emitcode("mov", "b, #0x%x", count & 0xff);
+		    emitcode("mov", "b, #!constbyte", count & 0xff);
 		}
 		
-		emitcode ("", "%05d$:", tlbl->key + 100);
+		emitcode ("", "!tlabeldef", tlbl->key + 100);
 	    }
 	    
 	    firstpass = FALSE;
@@ -10095,7 +10136,7 @@ genArrayInit (iCode * ic)
 		val = (((int)iLoop->literalValue) >> (eIndex * 8)) & 0xff;
 		if (val != lastVal)
 		{
-		    emitcode("mov", "a, #0x%x", val);
+		    emitcode("mov", "a, #!constbyte", val);
 		    lastVal = val;
 		}
 		
@@ -10105,7 +10146,7 @@ genArrayInit (iCode * ic)
 	    
 	    if (count > 1)
 	    {
-		emitcode("djnz", "b, %05d$", tlbl->key + 100);
+		emitcode("djnz", "b, !tlabel", tlbl->key + 100);
 	    }
 	    
 	    ix -= count;
@@ -10359,13 +10400,13 @@ genJumpTab (iCode * ic)
   freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
 
   jtab = newiTempLabel (NULL);
-  emitcode ("mov", "dptr,#%05d$", jtab->key + 100);
+  emitcode ("mov", "dptr,#!tlabel", jtab->key + 100);
   emitcode ("jmp", "@a+dptr");
-  emitcode ("", "%05d$:", jtab->key + 100);
+  emitcode ("", "!tlabeldef", jtab->key + 100);
   /* now generate the jump labels */
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
        jtab = setNextItem (IC_JTLABELS (ic)))
-    emitcode ("ljmp", "%05d$", jtab->key + 100);
+    emitcode ("ljmp", "!tlabel", jtab->key + 100);
 
 }
 
@@ -10663,24 +10704,24 @@ genDjnz (iCode * ic, iCode * ifx)
       }
       emitcode ("dec", "%s", rByte);
       aopPut(AOP(IC_RESULT(ic)), rByte, 0);
-      emitcode ("jnz", "%05d$", lbl->key + 100);
+      emitcode ("jnz", "!tlabel", lbl->key + 100);
   }
   else if (IS_AOP_PREG (IC_RESULT (ic)))
     {
       emitcode ("dec", "%s",
 		aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE, FALSE));
       emitcode ("mov", "a,%s", aopGet (AOP (IC_RESULT (ic)), 0, FALSE, FALSE, FALSE));
-      emitcode ("jnz", "%05d$", lbl->key + 100);
+      emitcode ("jnz", "!tlabel", lbl->key + 100);
     }
   else
     {
-      emitcode ("djnz", "%s,%05d$", aopGet (AOP (IC_RESULT (ic)), 0, FALSE, TRUE, FALSE),
+      emitcode ("djnz", "%s,!tlabel", aopGet (AOP (IC_RESULT (ic)), 0, FALSE, TRUE, FALSE),
 		lbl->key + 100);
     }
-  emitcode ("sjmp", "%05d$", lbl1->key + 100);
-  emitcode ("", "%05d$:", lbl->key + 100);
-  emitcode ("ljmp", "%05d$", IC_TRUE (ifx)->key + 100);
-  emitcode ("", "%05d$:", lbl1->key + 100);
+  emitcode ("sjmp", "!tlabel", lbl1->key + 100);
+  emitcode ("", "!tlabeldef", lbl->key + 100);
+  emitcode ("ljmp", "!tlabel", IC_TRUE (ifx)->key + 100);
+  emitcode ("", "!tlabeldef", lbl1->key + 100);
 
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
   ifx->generated = 1;
@@ -10794,7 +10835,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode (";","OH! JOY auto increment with djnz (very fast)");
 	emitcode ("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
 	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
-	emitcode ("","%05d$:",lbl->key+100);
+	emitcode ("","!tlabeldef",lbl->key+100);
 	if (fromc) {
 	    emitcode ("clr","a");
 	    emitcode ("movc", "a,@a+dptr");
@@ -10803,7 +10844,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode ("movx", "@dptr,a");
 	emitcode ("inc", "dptr");
 	emitcode ("inc", "dptr");
-	emitcode ("djnz","b,%05d$",lbl->key+100);
+	emitcode ("djnz","b,!tlabel",lbl->key+100);
     } else {
 	symbol *lbl1 = newiTempLabel(NULL);
 	
@@ -10811,7 +10852,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode ("mov","ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
 	emitcode ("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
-	emitcode ("","%05d$:",lbl->key+100);
+	emitcode ("","!tlabeldef",lbl->key+100);
 	if (fromc) {
 	    emitcode ("clr","a");
 	    emitcode ("movc", "a,@a+dptr");
@@ -10822,15 +10863,15 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
 	emitcode ("inc", "dptr");
 	emitcode ("mov","a,b");
 	emitcode ("orl","a,ap");
-	emitcode ("jz","%05d$",lbl1->key+100);
+	emitcode ("jz","!tlabel",lbl1->key+100);
 	emitcode ("mov","a,ap");
 	emitcode ("add","a,#0xFF");
 	emitcode ("mov","ap,a");
 	emitcode ("mov","a,b");
 	emitcode ("addc","a,#0xFF");
 	emitcode ("mov","b,a");
-	emitcode ("sjmp","%05d$",lbl->key+100);
-	emitcode ("","%05d$:",lbl1->key+100);
+	emitcode ("sjmp","!tlabel",lbl->key+100);
+	emitcode ("","!tlabeldef",lbl1->key+100);
     }
     emitcode ("mov", "dps, #0"); 
     freeAsmop (count, NULL, ic, FALSE);
@@ -10891,31 +10932,31 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
 	l = aopGet(AOP (val), 0, FALSE, FALSE, TRUE);
 	emitcode ("mov", "b,%s",aopGet(AOP(count),0,FALSE,FALSE,FALSE));
 	MOVA(l);
-	emitcode ("","%05d$:",lbl->key+100);
+	emitcode ("","!tlabeldef",lbl->key+100);
 	emitcode ("movx", "@dptr,a");
 	emitcode ("inc", "dptr");
-	emitcode ("djnz","b,%05d$",lbl->key+100);
+	emitcode ("djnz","b,!tlabel",lbl->key+100);
     } else {
 	symbol *lbl1 = newiTempLabel(NULL);
 	
 	emitcode ("mov","ap,%s",aopGet (AOP (count), 0, FALSE, TRUE, TRUE));
 	emitcode ("mov","b,%s",aopGet (AOP (count), 1, FALSE, TRUE, TRUE));
-	emitcode ("","%05d$:",lbl->key+100);
+	emitcode ("","!tlabeldef",lbl->key+100);
 	l = aopGet(AOP (val), 0, FALSE, FALSE, TRUE);
 	MOVA(l);
 	emitcode ("movx", "a,@dptr");
 	emitcode ("inc", "dptr");
 	emitcode ("mov","a,b");
 	emitcode ("orl","a,ap");
-	emitcode ("jz","%05d$",lbl1->key+100);
+	emitcode ("jz","!tlabel",lbl1->key+100);
 	emitcode ("mov","a,ap");
 	emitcode ("add","a,#0xFF");
 	emitcode ("mov","ap,a");
 	emitcode ("mov","a,b");
 	emitcode ("addc","a,#0xFF");
 	emitcode ("mov","b,a");
-	emitcode ("sjmp","%05d$",lbl->key+100);
-	emitcode ("","%05d$:",lbl1->key+100);
+	emitcode ("sjmp","!tlabel",lbl->key+100);
+	emitcode ("","!tlabeldef",lbl1->key+100);
     }
     freeAsmop (count, NULL, ic, FALSE);
 }

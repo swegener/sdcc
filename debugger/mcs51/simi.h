@@ -31,9 +31,9 @@
 /* number of cache */
 #define IMEM_CACHE     0
 #define XMEM_CACHE     1
-#define NMEM_CACHE     2
+#define SREG_CACHE     2
+#define NMEM_CACHE     3
 /* special index */
-#define  REG_CACHE     3
 #define  BIT_CACHE     4
 
 typedef struct _memcache

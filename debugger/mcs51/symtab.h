@@ -233,7 +233,7 @@ typedef struct symbol {
 #define IS_ISR(x)		(IS_SPEC(x)  && SPEC_INTRTN(x))
 
 
-symbol *parseSymbol (char *, char **);
+symbol *parseSymbol (char *, char **, int );
 structdef *parseStruct (char *);
 void parseFunc (char *);
 module *parseModule (char *, bool  );

@@ -438,7 +438,7 @@ static void loadModules ()
 
   /* if symbol then parse the symbol */
   case  SYM_REC:
-      parseSymbol(loop->line,&rs);
+      parseSymbol(loop->line,&rs,2);
       break;
 
   case LNK_REC:
@@ -557,13 +557,13 @@ static void functionPoints ()
       for (ep = setFirstItem(func->cfpoints); ep;
      ep = setNextItem(func->cfpoints))
      Dprintf(D_sdcdb, ("sdcdb: {0x%x,%d} %s",
-         ep->addr,ep->line,mod->cLines[ep->line]->src));
+         ep->addr,ep->line+1,mod->cLines[ep->line]->src));
 
       Dprintf(D_sdcdb, ("sdcdb:  and the following ASM exePoints\n"));
       for (ep = setFirstItem(func->afpoints); ep;
            ep = setNextItem(func->afpoints))
         Dprintf (D_sdcdb, ("sdcdb: {0x%x,%d} %s",
-            ep->addr,ep->line,mod->asmLines[ep->line]->src));
+            ep->addr,ep->line+1,mod->asmLines[ep->line]->src));
   }
 #endif
     }
@@ -770,7 +770,7 @@ int interpretCmd (char *s)
           if (srcMode == SRC_CMODE)
             fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
                     currCtxt->func->mod->cfullname,
-                    currCtxt->cline,currCtxt->addr);
+                    currCtxt->cline+1,currCtxt->addr);
           else
             fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
                     currCtxt->func->mod->afullname,
@@ -921,7 +921,7 @@ static void parseCmdLine (int argc, char **argv)
 
       /* XTAL Frequency */
       if (strcmp(argv[i],"-X") == 0 ||
-    strcmp(argv[i],"-frequency") == 0) {
+          strcmp(argv[i],"-frequency") == 0) {
         simArgs[nsimArgs++] = "-X";
         simArgs[nsimArgs++] = strdup(argv[++i]);
         continue ;
@@ -930,7 +930,7 @@ static void parseCmdLine (int argc, char **argv)
       /* serial port */
       if ( (strcmp(argv[i],"-S") == 0) ||
            (strcmp(argv[i],"-s") == 0)) {
-        simArgs[nsimArgs++] = "-s";
+        simArgs[nsimArgs++] = strdup(argv[i]);
         simArgs[nsimArgs++] = strdup(argv[++i]);
         continue ;
       }
@@ -972,7 +972,7 @@ sigintr(int sig)
 {
     /* may be interrupt from user: stop debugger and also simulator */
     userinterrupt = 1;
-    sendSim("\n");
+    sendSim("stop\n");
 }
 
 /* the only child can be the simulator */

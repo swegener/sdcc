@@ -27,6 +27,7 @@
 #include "newalloc.h"
 
 static hTab *bptable = NULL;
+char doingSteps    = 0;
 char userBpPresent = 0;
 /* call stack can be 1024 deep */
 STACK_DCL(callStack,function *,1024);
@@ -59,7 +60,7 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
         addr,
         debug_bp_type_strings[addrType],
         debug_bp_type_strings[bpType],
-        fileName, lineno));
+        fileName, lineno+1));
 
     /* allocate & init a new bp */
     bp = Safe_calloc(1,sizeof(breakp));
@@ -73,28 +74,32 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
 
     /* if this is an user break point then
        check if there already exists one for this address */
-    if (bpType == USER) {
-  for ( bpl = hTabFirstItemWK(bptable,addr) ; bpl;
-        bpl = hTabNextItemWK(bptable)) {
+    if (bpType == USER)
+    {
+        for ( bpl = hTabFirstItemWK(bptable,addr) ; bpl;
+              bpl = hTabNextItemWK(bptable)) 
+        {
 
-      /* if also a user break point then issue Note : */
-      if (bpl->bpType == USER)
-    fprintf(stderr,"Note: breakpoint %d also set at pc 0x%x\n",
-      bpl->bpnum,bpl->addr);
-  }
+            /* if also a user break point then issue Note : */
+            if (bpl->bpType == USER)
+                fprintf(stderr,"Note: breakpoint %d also set at pc 0x%x\n",
+                        bpl->bpnum,bpl->addr);
+        }
 
-  fprintf(stderr,"Breakpoint %d at 0x%x: file %s, line %d.\n",
-    bp->bpnum, addr, fileName, lineno);
+        fprintf(stderr,"Breakpoint %d at 0x%x: file %s, line %d.\n",
+                bp->bpnum, addr, fileName, lineno+1);
 
-  userBpPresent++;
+        userBpPresent++;
     }
 
+    if (bpType != STEP && bpType != NEXT)
+    {
     /* if a break point does not already exist then
        send command to simulator to add one */
     if (!hTabSearch(bptable,addr))
-  /* send the break command to the simulator */
-  simSetBP (addr);
-
+        /* send the break command to the simulator */
+        simSetBP (addr);
+    }
 
     /* now add the break point to list */
     hTabAddItem(&bptable,addr,bp);
@@ -119,11 +124,12 @@ void deleteSTEPbp ()
   if (bp->bpType == STEP) {
       hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
+#if 0
       /* if this leaves no other break points then
          send command to simulator to delete bp from this addr */
       if (hTabSearch(bptable,bp->addr) == NULL)
     simClearBP (bp->addr);
-
+#endif
       free(bp);
   }
     }
@@ -149,13 +155,14 @@ void deleteNEXTbp ()
   if (bp->bpType == NEXT) {
       hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
+#if 0
       /* if this leaves no other break points then
          send command to simulator to delete bp from this addr */
       if (hTabSearch(bptable,bp->addr) == NULL) {
     simClearBP(bp->addr);
 
       }
-
+#endif
       free(bp);
   }
     }
@@ -224,7 +231,7 @@ void listUSERbp ()
   if (bp->bpType == USER ) {
       fprintf(stdout,"%-3d breakpoint     keep y   0x%08x at %s:%d\n",
         bp->bpnum,bp->addr,
-        bp->filename,bp->lineno);
+        bp->filename,bp->lineno+1);
 
   }
     }
@@ -286,6 +293,8 @@ int dispatchCB (unsigned addr, context *ctxt)
     /* if no break points set for this address
        then use a simulator stop break point */
     if ((bp = hTabFirstItemWK(bptable,addr)) == NULL) {
+      if ( doingSteps == 2 ) return 1;
+      if ( doingSteps ) return 0;
       return simStopBPCB(addr);
     }
 
@@ -344,18 +353,18 @@ BP_CALLBACK(userBpCB)
     bpnum,
     ctxt->func->sym->name,
     ctxt->func->mod->c_name,
-    ctxt->cline);
+    ctxt->cline+1);
   if (ctxt->func->mod && ctxt->cline > 0)
-      fprintf(stdout,"%d\t%s",ctxt->cline,
+      fprintf(stdout,"%d\t%s",ctxt->cline+1,
         ctxt->func->mod->cLines[ctxt->cline]->src);
     } else {
   fprintf(stdout,"Breakpoint %d, %s() at %s:%d\n",
     bpnum,
     ctxt->func->sym->name,
     ctxt->func->mod->asm_name,
-    ctxt->asmline);
+    ctxt->asmline+1);
   if (ctxt->func->mod && ctxt->asmline > 0)
-      fprintf(stdout,"%d\t%s",ctxt->asmline,
+      fprintf(stdout,"%d\t%s",ctxt->asmline+1,
         ctxt->func->mod->asmLines[ctxt->asmline]->src);
     }
 
@@ -376,10 +385,10 @@ BP_CALLBACK(stepBpCB)
       fprintf(stdout,"%s () at %s:%d\n",
         ctxt->func->sym->name,
         ctxt->func->mod->c_name,
-        ctxt->cline);
+        ctxt->cline+1);
 
   if (ctxt->func->mod && ctxt->cline > 0) {
-      fprintf(stdout,"%d\t%s",ctxt->cline ,
+      fprintf(stdout,"%d\t%s",ctxt->cline+1 ,
         ctxt->func->mod->cLines[ctxt->cline]->src);
   }
     } else {
@@ -414,10 +423,10 @@ BP_CALLBACK(nextBpCB)
       fprintf(stdout,"%s () at %s:%d\n",
         ctxt->func->sym->name,
         ctxt->func->mod->c_name,
-        ctxt->cline);
+        ctxt->cline+1);
 
   if (ctxt->func->mod && ctxt->cline > 0)
-      fprintf(stdout,"%d\t%s",ctxt->cline,
+      fprintf(stdout,"%d\t%s",ctxt->cline+1,
         ctxt->func->mod->cLines[ctxt->cline]->src);
     } else {
   if ((lfunc && lfunc != ctxt->func) || !lfunc)

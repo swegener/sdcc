@@ -38,7 +38,7 @@ FILE *simin ; /* stream for simulator input */
 FILE *simout; /* stream for simulator output */
 
 int sock = -1; /* socket descriptor to comm with simulator */
-pid_t simPid;
+pid_t simPid = -1;
 static char simibuff[MAX_SIM_BUFF];    /* sim buffer       */
 static char regBuff[MAX_SIM_BUFF];
 static char *sbp = simibuff;           /* simulator buffer pointer */
@@ -63,6 +63,10 @@ static char *getMemCache(unsigned int addr,int cachenum, int size)
         if ( cachenum == IMEM_CACHE )
         {
             sendSim("di 0x0 0xff\n");
+        }
+        else if ( cachenum == SREG_CACHE )
+        {
+            sendSim("ds 0x80 0xff\n");
         }
         else
         {
@@ -139,26 +143,11 @@ void openSimulator (char **args, int nargs)
     struct sockaddr_in sin;     
     int retry = 0;
     int i ;
- Dprintf(D_simi, ("simi: openSimulator\n"));
+    Dprintf(D_simi, ("simi: openSimulator\n"));
 
     invalidateCache(XMEM_CACHE);
     invalidateCache(IMEM_CACHE);
-    /* fork and start the simulator as a subprocess */
-    if ((simPid = fork())) {
-      Dprintf(D_simi, ("simi: simulator pid %d\n",(int) simPid));
-    }
-    else {
-      /* we are in the child process : start the simulator */
-      signal(SIGHUP , SIG_IGN );
-      signal(SIGINT , SIG_IGN );
-      signal(SIGABRT, SIG_IGN );
-      signal(SIGCHLD, SIG_IGN );
-
-      if (execvp(args[0],args) < 0) {
-        perror("cannot exec simulator");
-        exit(1);
-      }
-    }
+    invalidateCache(SREG_CACHE);
     
  try_connect:
     sock = socket(AF_INET,SOCK_STREAM,0);
@@ -168,14 +157,32 @@ void openSimulator (char **args, int nargs)
     sin.sin_addr.s_addr = inet_addr("127.0.0.1");
     sin.sin_port = htons(9756);
     
-    sleep(1);
     /* connect to the simulator */
     if (connect(sock,(struct sockaddr *) &sin, sizeof(sin)) < 0) {
 	/* if failed then wait 1 second & try again
 	   do this for 10 secs only */
 	if (retry < 10) {
+        if ( !retry )
+        {
+            /* fork and start the simulator as a subprocess */
+            if ((simPid = fork())) {
+                Dprintf(D_simi, ("simi: simulator pid %d\n",(int) simPid));
+            }
+            else {
+                /* we are in the child process : start the simulator */
+                signal(SIGHUP , SIG_IGN );
+                signal(SIGINT , SIG_IGN );
+                signal(SIGABRT, SIG_IGN );
+                signal(SIGCHLD, SIG_IGN );
+
+                if (execvp(args[0],args) < 0) {
+                    perror("cannot exec simulator");
+                    exit(1);
+                }
+            }
+        }
 	    retry ++;
-	    sleep (1);
+        sleep (1);
 	    goto try_connect;
 	}
 	perror("connect failed :");
@@ -219,7 +226,7 @@ void sendSim(char *s)
 
 
 static int getMemString(char *buffer, char wrflag, 
-                        unsigned int addr, char mem, int size )
+                        unsigned int *addr, char mem, int size )
 {
     int cachenr = NMEM_CACHE;
     char *prefix;
@@ -255,23 +262,18 @@ static int getMemString(char *buffer, char wrflag,
             {
                 cmd = "set bit";
             }
-            sprintf(buffer,"%s 0x%x\n",cmd,addr);
+            sprintf(buffer,"%s 0x%x\n",cmd,*addr);
             return cachenr;
             break;
         case 'I': /* SFR space */
             prefix = "sfr" ;
+            cachenr = SREG_CACHE;
             break;
         case 'R': /* Register space */ 
-            if ( !wrflag )
-            {
-                cachenr = REG_CACHE;
-                sprintf(buffer,"info reg\n");
-                return cachenr;
-            }
             prefix = "iram";
             /* get register bank */
             cachenr = simGetValue (0xd0,'I',1); 
-            addr   += cachenr & 0x18 ;
+            *addr  += cachenr & 0x18 ;
             cachenr = IMEM_CACHE;
             break;
         default: 
@@ -279,9 +281,9 @@ static int getMemString(char *buffer, char wrflag,
             return cachenr;
     }
     if ( wrflag )
-        sprintf(buffer,"%s %s 0x%x\n",cmd,prefix,addr,addr);
+        sprintf(buffer,"%s %s 0x%x\n",cmd,prefix,*addr);
     else
-        sprintf(buffer,"%s %s 0x%x 0x%x\n",cmd,prefix,addr,addr+size-1);
+        sprintf(buffer,"%s %s 0x%x 0x%x\n",cmd,prefix,*addr,*addr+size-1);
     return cachenr;
 }
 
@@ -294,7 +296,7 @@ int simSetValue (unsigned int addr,char mem, int size, unsigned long val)
     if ( size <= 0 )
         return 0;
 
-    cachenr = getMemString(buffer,1,addr,mem,size);
+    cachenr = getMemString(buffer,1,&addr,mem,size);
     if ( cachenr < NMEM_CACHE )
     {
         invalidateCache(cachenr);
@@ -326,7 +328,7 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
     if ( size <= 0 )
         return 0;
 
-    cachenr = getMemString(buffer,0,addr,mem,size);
+    cachenr = getMemString(buffer,0,&addr,mem,size);
 
     resp = NULL;
     if ( cachenr < NMEM_CACHE )
@@ -354,17 +356,6 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
         /* skip thru the address part */
         while (isxdigit(*resp)) resp++;
 
-        /* then make the branch for bit variables */
-        if ( cachenr == REG_CACHE ) 
-        {
-            /* skip registers */
-            for (i = 0 ; i < addr ; i++ ) 
-            {
-                while (isspace(*resp)) resp++ ;
-                /* skip */
-                while (isxdigit(*resp)) resp++;
-            }
-        }
     }   
     /* make the branch for bit variables */
     if ( cachenr == BIT_CACHE) 
@@ -431,16 +422,17 @@ void simLoadFile (char *s)
 /*-----------------------------------------------------------------*/
 unsigned int simGoTillBp ( unsigned int gaddr)
 {
-    char *sr, *svr;
+    char *sr;
     unsigned addr ; 
     char *sfmt;
     int wait_ms = 1000;
 
     invalidateCache(XMEM_CACHE);
     invalidateCache(IMEM_CACHE);
+    invalidateCache(SREG_CACHE);
     if (gaddr == 0) {
       /* initial start, start & stop from address 0 */
-      char buf[20];
+      //char buf[20];
 
          // this program is setting up a bunch of breakpoints automatically
          // at key places.  Like at startup & main() and other function
@@ -454,11 +446,11 @@ unsigned int simGoTillBp ( unsigned int gaddr)
       sendSim ("run\n");
       wait_ms = 100;
     }
-    else 	if (gaddr == 1 ) { /* nexti */
+    else 	if (gaddr == 1 ) { /* nexti or next */
       sendSim ("next\n");
       wait_ms = 100;
     }
-    else 	if (gaddr == 2 ) { /* stepi */
+    else 	if (gaddr == 2 ) { /* stepi or step */
       sendSim ("step\n");
       wait_ms = 100;
     }
@@ -470,56 +462,28 @@ unsigned int simGoTillBp ( unsigned int gaddr)
     waitForSim(wait_ms, NULL);
     
     /* get the simulator response */
-    svr  = sr = strdup(simResponse());
-
-    if ( gaddr == 1 || gaddr == 2 )
+    sr = simResponse();
+    /* check for errors */
+    while ( *sr )
     {
-        int nl;
-        for ( nl = 0; nl < 3 ; nl++ )
+        while ( *sr && *sr != 'E' ) sr++ ;
+        if ( !*sr )
+            break;
+        if ( ! strncmp(sr,"Error:",6))
         {
-            while (*sr && *sr != '\n') sr++ ;
-            sr++ ;
+            fputs(sr,stdout);
+            break;
         }
-        if ( nl < 3 )
-            return 0;
-        gaddr = strtol(sr,0,0);
-        /* empty response */
-        simibuff[0] = '\0';
-        return gaddr;
-        
-    }
-    /* figure out the address of the break point the simulators 
-       response in a break point situation is of the form 
-       [... F* <addr> <disassembled instruction> ] 
-       we will ignore till we get F* then parse the address */
-    while (*sr) {
-      if (strncmp(sr,"Stop at",7) == 0) {
-          sr += 7;
-          sfmt = "%x";
-          break;
-      } 
-
-      if (*sr == 'F' && ( *(sr+1) == '*' || *(sr+1) == ' ')) {
-          sr += 2;
-          sfmt = "%x";
-          break;
-      }
-      sr++;
+        sr++ ;
     }
 
-    if (!*sr) {
-      fprintf(stderr, "Error?, simGoTillBp failed to Stop\n");
-      return 0;
-    }
+    /* better solution: ask pc */
+    sendSim ("pc\n");
+    waitForSim(100, NULL);
+    sr = simResponse();
 
-    while (isspace(*sr)) sr++ ;
-
-    if (sscanf(sr,sfmt,&addr) != 1) {
-      fprintf(stderr, "Error?, simGoTillBp failed to get Addr\n");
-      return 0;
-    }
-	return addr;
-
+    gaddr = strtol(sr+3,0,0);
+    return gaddr;
 }
 
 /*-----------------------------------------------------------------*/
@@ -529,121 +493,11 @@ void simReset ()
 {
     invalidateCache(XMEM_CACHE);
     invalidateCache(IMEM_CACHE);
+    invalidateCache(SREG_CACHE);
     sendSim("res\n");
     waitForSim(100,NULL);
 }
 
-/*-----------------------------------------------------------------*/
-/* getValueStr - read a value followed by a string =               */
-/*-----------------------------------------------------------------*/
-static unsigned int getValueStr (char *src,char *cstr)
-{
-    int i = strlen(cstr);
-    int rv;
-    /* look for the string */
-    if (! (src = strstr(src,cstr)))
-	return 0;
-
-    src += i;
-    if (!*src) return 0;
-
-    /* look for the digit */
-    while (*src && !isxdigit(*src)) src++;
-    sscanf(src,"%x",&rv);
-    return rv;
-}
-
-/*-----------------------------------------------------------------*/
-/* simRegs - returns value of registers                            */
-/*-----------------------------------------------------------------*/
-char  *simRegs()
-{   
-    char *resp ;
-    unsigned int rv;
-    char *rb = regBuff;
-    int i;
-
-    sendSim("info registers\n");
-
-    waitForSim(100,NULL);
-         
-    resp  = simResponse();
-
-#if 0
-    return resp;
-
-#else
-    /*Take this out(2-09-02) cant see as its that useful to reformat, karl.*/
-  
-    /* the response is of the form 
-       XXXXXX R0 R1 R2 R3 R4 R5 R6 R7 ........
-       XXXXXX XX . ACC=0xxx dd cc B=0xxx dd cc DPTR= 0xxxxx @DPTR= 0xxx dd cc
-       XXXXXX XX . PSW= 0xxx CY=[1|0] AC=[0|1] OV=[0|1] P=[1|0]
-
-Format as of 8-4-01:
-       0x00 00 00 00 00 00 00 00 00 ........
-       000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
-       000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
-F  0x006d 75 87 80 MOV   PCON,#80
-*/
-
-    memset(regBuff,0,sizeof(regBuff));
-    /* skip the first numerics */
-    while (*resp && !isxdigit(*resp)) resp++;
-
-    if (strncmp(resp, "0x", 2)) {
-      fprintf(stderr, "Error: Format1A\n");
-      return regBuff;
-    }
-    resp += 2;
-    while (*resp && isxdigit(*resp)) resp++;
-
-    /* now get the eight registers */
-    for (i = 0 ; i < 7 ; i++) {
-        while (*resp && isspace(*resp)) resp++;
-	if (!*resp)
-	    break;
-	rv = strtol(resp,&resp,16);
-	sprintf(rb,"R%d  : 0x%02X %d %c\n",i,rv,rv,(isprint(rv) ? rv : '.'));
-	rb += strlen(rb);
-    }
-
-    if (!*resp) return regBuff;
-
-    /* skip till end of line */
-    while (*resp && *resp != '\n') resp++;
-    while (*resp && !isxdigit(*resp)) resp++;
-    while (*resp && isxdigit(*resp)) resp++;
-    
-    /* accumulator value */
-    rv = getValueStr(resp,"ACC");
-    sprintf(rb,"ACC : 0x%02X %d %c\n",rv,rv,(isprint(rv) ? rv : '.'));
-    rb += strlen(rb);
-    
-    /* value of B */
-    rv = getValueStr(resp,"B=");
-    sprintf(rb,"B   : 0x%02X %d %c\n",rv,rv,(isprint(rv) ? rv : '.'));
-    rb += strlen(rb);
-
-    rv = getValueStr(resp,"DPTR=");
-    sprintf(rb,"DPTR: 0x%04X %d\n",rv,rv);
-    rb += strlen(rb);
-
-    rv = getValueStr(resp,"@DPTR=");
-    sprintf(rb,"@DPTR: 0x%02X %d %c\n", rv,rv,(isprint(rv) ? rv : '.'));
-    rb += strlen(rb);
-    
-    sprintf(rb,"PSW  : 0x%02X | CY : %d | AC : %d | OV : %d | P : %d\n",
-	    getValueStr(resp,"PSW="),
-	    getValueStr(resp,"CY="),
-	    getValueStr(resp,"AC="),
-	    getValueStr(resp,"OV="),
-	    getValueStr(resp,"P="));
-
-    return regBuff;
-#endif
-
-}
 
 /*-----------------------------------------------------------------*/
 /* closeSimulator - close connection to simulator                  */
@@ -655,13 +509,14 @@ void closeSimulator ()
         simactive = 0;
         return;
     }
-    sendSim("q\n");
-    kill (simPid,SIGKILL);
+    sendSim("quit\n");
     fclose (simin);
     fclose (simout);
     shutdown(sock,2);   
     close(sock);    
     sock = -1;
+    if ( simPid > 0 )
+        kill (simPid,SIGKILL);
 }
 
 

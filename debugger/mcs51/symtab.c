@@ -97,10 +97,10 @@ void parseFunc (char *line)
 
     func = Safe_calloc(1,sizeof(function));
     func->sym = NULL;
-    applyToSet(symbols,symWithRName,line,&func->sym);
+    applyToSetFTrue(symbols,symWithRName,line,&func->sym);
     *rs++ = '0';
     if (! func->sym)
-        func->sym = parseSymbol(line,&rs);
+        func->sym = parseSymbol(line,&rs,1);
     func->sym->isfunc = 1;
     func->modName = currModName ;
     while(*rs && *rs != ',') rs++;
@@ -244,18 +244,33 @@ static char  *parseTypeInfo (symbol *sym, char *s)
 /*              {G|F<filename>|L<functionName>}'$'<name>'$'<level> */
 /*              '$'<block><type info>                              */
 /*-----------------------------------------------------------------*/
-symbol *parseSymbol (char *s, char **rs)
+symbol *parseSymbol (char *s, char **rs, int doadd)
 {
     symbol *nsym ;
+    char save_ch;
     char *bp = s;
 
-    nsym = Safe_calloc(1,sizeof(symbol));
-
-    /* copy over the mangled name */
-    while (*bp != '(') bp++;
-     bp -= 1;
-    nsym->rname = alloccpy(s,bp - s);
-
+    /* go the mangled name */
+    for ( bp = s; *bp && *bp != '('; bp++ );
+    save_ch = *--bp;
+    *bp = '\0';
+    nsym = NULL;
+    if ( doadd == 2 )
+    {
+        /* add only if not present and if linkrecord before symbol record*/
+        if ( applyToSetFTrue(symbols,symWithRName,s,&nsym))
+        {
+            if ( nsym->rname != nsym->name )
+                return;
+            doadd = 0;
+        }
+    }
+    if ( ! nsym )
+    {
+        nsym = Safe_calloc(1,sizeof(symbol));
+        nsym->rname = alloccpy(s,bp - s);
+    }
+    *bp = save_ch;
     /* if this is a Global Symbol */
     nsym->scopetype = *s;
     s++ ;
@@ -303,7 +318,9 @@ symbol *parseSymbol (char *s, char **rs)
     }
 
     *rs = s;
-    addSet(&symbols,nsym);
+    if ( doadd ) addSet(&symbols,nsym);
+
+    Dprintf(D_symtab, ("symtab: par %s(0x%x) add=%d sym=%p\n",nsym->name,nsym->addr,doadd,nsym));
 
     return nsym;
 }
@@ -336,7 +353,7 @@ structdef *parseStruct (char *s)
   offset = strtol(s,&s,10);
   while (*s != ':') s++;
   s++;
-  sym = parseSymbol(s,&s);
+  sym = parseSymbol(s,&s,0);
   sym->offset = offset ;
   s += 3;
   if (!fields)
@@ -618,7 +635,7 @@ static void lnkFuncEnd (char *s)
     s++;
     sscanf(s,"%x",&func->sym->eaddr);
 
-    Dprintf(D_symtab, ("symtab: %s(eaddr 0x%x)\n",func->sym->name,func->sym->eaddr));
+    Dprintf(D_symtab, ("symtab: ead %s(0x%x)\n",func->sym->name,func->sym->eaddr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -626,24 +643,31 @@ static void lnkFuncEnd (char *s)
 /*-----------------------------------------------------------------*/
 static void lnkSymRec (char *s)
 {
-    char sname[128], *bp = sname;
+    char *bp, save_ch ;
     symbol *sym;
 
-    /* copy till we get to a ':' */
-    while ( *s != ':')
-  *bp++ = *s++;
-    bp -= 1;
+    /* search  to a ':' */
+    for ( bp = s; *bp && *bp != ':'; bp++ );
+    save_ch = *--bp;
     *bp = '\0';
 
 
     sym = NULL;
-    if (!applyToSet(symbols,symWithRName,sname,&sym))
-  return ;
-
-    s++;
-    sscanf(s,"%x",&sym->addr);
-
-    Dprintf(D_symtab, ("symtab: %s(0x%x)\n",sym->name,sym->addr));
+    applyToSetFTrue(symbols,symWithRName,s,&sym);
+    if (! sym)
+    {
+        sym = Safe_calloc(1,sizeof(symbol));
+        sym->rname = alloccpy(s,bp - s);
+        sym->scopetype = *s;
+        sym->name  = sym->rname;
+        addSet(&symbols,sym); 
+    }
+    *bp = save_ch;
+    if ( *bp )
+    {
+        sscanf(bp+2,"%x",&sym->addr);
+    }
+    Dprintf(D_symtab, ("symtab: lnk %s(0x%x)\n",sym->name,sym->addr));
 }
 
 /*-----------------------------------------------------------------*/
@@ -673,7 +697,7 @@ static void lnkAsmSrc (char *s)
     line--;
     if (line < mod->nasmLines) {
   mod->asmLines[line]->addr = addr;
-  Dprintf(D_symtab, ("symtab: %s(%d:0x%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src));
+  Dprintf(D_symtab, ("symtab: asm %s(%d:0x%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src));
     }
 }
 
@@ -709,11 +733,14 @@ static void lnkCSrc (char *s)
     }
 
     line--;
-    if (line < mod->ncLines && line > 0) {
+    /* one line can have more than one address : (for loops !)*/
+    if (line < mod->ncLines && line > 0 &&
+        ( !mod->cLines[line]->addr ||
+           mod->cLines[line]->level > level )) {
   mod->cLines[line]->addr = addr;
   mod->cLines[line]->block = block;
   mod->cLines[line]->level = level;
-  Dprintf(D_symtab, ("symtab: %s(%d:0x%x) %s",mod->c_name,
+  Dprintf(D_symtab, ("symtab: ccc %s(%d:0x%x) %s",mod->c_name,
          line+1,addr,mod->cLines[line]->src));
     }
     return;

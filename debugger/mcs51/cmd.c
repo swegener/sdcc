@@ -483,8 +483,16 @@ DEFSETFUNC(moduleLineWithAddr)
         {
             *rmod = mod ;
             if (line )
-                *line = mod->ncLines;
-            return 1;
+            {
+                *line = 0;
+                for ( i=0; i < mod->ncLines; i++ ) 
+                {
+                    if ( mod->cLines[i]->addr > addr)
+                        break;
+                    *line = i;
+                }
+                return 1;
+            }
         }
     }
 
@@ -646,10 +654,10 @@ context *discoverContext (unsigned addr)
 
     /* find the function we are in */
     if (!applyToSet(functions,funcInAddr,addr,&func)) {
-        if (!applyToSet(functions,funcWithName,"main") ||
-            !applyToSet(modules,moduleLineWithAddr,addr,&mod,&line))
+        if (!applyToSet(functions,funcWithName,"main",&func) ||
+            !applyToSet(modules,moduleLineWithAddr,addr,&mod,NULL))
         {
-            fprintf(stderr, "Error?:discoverContext: cannot apply to set!\n");
+            fprintf(stderr, "Error?:discoverContext: cannot apply addr 0x%x\n",addr);
             return NULL;
         }
         currCtxt->func = func;
@@ -664,7 +672,10 @@ context *discoverContext (unsigned addr)
         currCtxt->modName = func->modName;
     
         /* find the c line number */
-        if(applyToSet(func->cfpoints,lineNearAddr,addr,
+        if(applyToSet(func->cfpoints,lineAtAddr,addr,
+                  &line,&currCtxt->block,&currCtxt->level)) 
+            currCtxt->cline = func->lline = line;
+        else if(applyToSet(func->cfpoints,lineNearAddr,addr,
                   &line,&currCtxt->block,&currCtxt->level)) 
             currCtxt->cline = func->lline = line;
         else
@@ -716,11 +727,15 @@ void simGo (unsigned int gaddr)
     if (!rv) {
       if (!initial_break_flag) {
         initial_break_flag = 1;  // kludge to stop only at first run
+#if 0
         fprintf(stdout, "Stopping at entry.  You can now list and set breakpoints\n");
+#endif
       }
       else {
-       	gaddr = -1;
-       	goto top ;
+       	if ( gaddr == 0 )
+            gaddr = -1;
+       	if ( gaddr == -1 || doingSteps == 1 )
+            goto top ;
       }
 
 // notes: kpb
@@ -1033,7 +1048,9 @@ int cmdSetUserBp (char *s, context *cctxt)
 		else
         {
             int line = func->exitline;
-            applyToSet(func->cfpoints,lineNearAddr,braddr,&line,NULL,NULL);
+            if ( !applyToSet(func->cfpoints,lineAtAddr,braddr,
+                                  &line,NULL,NULL))
+                applyToSet(func->cfpoints,lineNearAddr,braddr,&line,NULL,NULL);
             setBreakPoint ( braddr , CODE , USER , userBpCB ,
                             func->mod->c_name,line);
         }
@@ -1043,7 +1060,7 @@ int cmdSetUserBp (char *s, context *cctxt)
     /* check if line number */
     if (isdigit(*s)) {
 	/* get the lineno */
-	int line = atoi(s);
+	int line = atoi(s) -1;
 
 	/* if current context not present then we must get the module
 	   which has main & set the break point @ line number provided
@@ -1089,7 +1106,7 @@ int cmdSetUserBp (char *s, context *cctxt)
 	/* case c) filename:lineno */
 	if (isdigit(*(bp +1))) {	    	    
 	 
-	    setBPatModLine (mod,atoi(bp+1));	    
+	    setBPatModLine (mod,atoi(bp+1)-1);	    
 	    goto ret;
 	    
 	}
@@ -1229,7 +1246,9 @@ int cmdStepi (char *s, context *cctxt)
         fprintf(stdout,"The program is not being run.\n");
     else 
     {
+        doingSteps = 2;
 	    simGo(2);	
+        doingSteps = 0;
         showfull = 1;
     }
     return 0;
@@ -1310,7 +1329,9 @@ int cmdStep (char *s, context *cctxt)
 	    }
 	}
 
-	simGo(-1);
+    doingSteps = 1;
+	simGo(2);
+    doingSteps = 0;
     showfull = 1;
     }
     return 0;
@@ -1325,7 +1346,9 @@ int cmdNexti (char *s, context *cctxt)
         fprintf(stdout,"The program is not being run.\n");
     else 
     {
+        doingSteps = 2;
 	    simGo(1);	
+        doingSteps = 0;
         showfull = 1;
     }	
     return 0;
@@ -1395,7 +1418,9 @@ int cmdNext (char *s, context *cctxt)
 				   func->aexitline);
 		}
 	    }
-	    simGo(-1);	
+	    doingSteps = 1;
+        simGo(1);	
+	    doingSteps = 0;
         showfull = 1;
 	}
     }    
@@ -1700,6 +1725,69 @@ static void infoSymbols(context *ctxt)
 }
 
 /*-----------------------------------------------------------------*/
+/* infoRegisters - print register information                      */
+/*-----------------------------------------------------------------*/
+static void infoRegisters( int all, context *ctxt)
+{
+    static unsigned int regaddrs[] = {0x81,0x82,0x83,0xd0,0xe0,0xf0,0};
+    unsigned long val;
+    int i,j,*r;
+
+    i   = simGetValue (0xd0,'I',1);
+    fprintf(stdout,"PC  : 0x%04X  RegisterBank %d:\nR0-7:",ctxt->addr,(i>>3)&3);
+    for ( j = 0; j < 8 ; j++ )
+    {
+        val = simGetValue (j ,'R',1);
+        fprintf(stdout," 0x%02X",val);
+    }
+    fprintf(stdout,"\n");
+    val = simGetValue (0xe0,'I',1);
+    fprintf(stdout,"ACC : 0x%02X %d %c\n",val,val,(isprint(val) ? val : '.'));
+    val = simGetValue (0xf0,'I',1);
+    fprintf(stdout,"B   : 0x%02X %d %c\n",val,val,(isprint(val) ? val : '.'));
+    val = simGetValue (0x82,'I',2);
+    fprintf(stdout,"DPTR: 0x%04X %d\n",val,val);
+    val = simGetValue (0x81,'I',1);
+    fprintf(stdout,"SP  : 0x%02X\n",val);
+    fprintf(stdout,"PSW : 0x%02X | CY : %c | AC : %c | OV : %c | P : %c\n",
+            i,(i&0x80)?'1':'0',(i&0x40)?'1':'0',(i&4)?'1':'0',(i&1)?'1':'0');
+    if ( all )
+    {
+        fprintf(stdout,"Special Function Registers:\n");
+        r = regaddrs;
+        for ( i = 0x80 ; i < 0x100 ; i++ )
+        {
+            symbol *sym = NULL;
+            if ( *r && *r == i )
+            {
+                /* skip normal registers */
+                r++ ;
+                continue;
+            }
+            if (applyToSetFTrue(sfrsymbols,symWithAddr,i,'I',&sym))
+            {
+                val = simGetValue (sym->addr,sym->addrspace,sym->size);
+                fprintf(stdout,"%s : 0x%02x",sym->name,val);
+                if ( !(i & 0x07 ))
+                {
+                    for ( j = 0 ; j < 8 ; j++ )
+                    {
+                        sym = NULL;
+                        if (applyToSetFTrue(sfrsymbols,symWithAddr,i+j,'J',&sym))
+                        {
+                            //val = simGetValue (sym->addr,sym->addrspace,sym->size);
+                            fprintf(stdout," %s=%c",sym->name,(val&1)? '1':'0');
+                        }
+                        val >>= 1;
+                    }
+                }
+                fprintf(stdout,"\n");
+            }
+        }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* infoStack - print call stack information                        */
 /*-----------------------------------------------------------------*/
 static void infoStack(context *ctxt)
@@ -1762,40 +1850,14 @@ int cmdInfo (char *s, context *cctxt)
 
     /* info stack display call stack */
     if (strcmp(s,"registers") == 0) {
-	fprintf(stdout,"%s",simRegs());
-	return 0;
+        infoRegisters(0,cctxt);
+	    return 0;
     }
 
     /* info stack display call stack */
     if (strcmp(s,"all-registers") == 0) 
     {
-        int i,j;
-        fprintf(stdout,"%s",simRegs());
-        fprintf(stdout,"Special Function Registers:\n");
-        for ( i = 0 ; i < 0x100 ; i++ )
-        {
-            symbol *sym = NULL;
-            unsigned long val;
-            if (applyToSetFTrue(sfrsymbols,symWithAddr,i,'I',&sym))
-            {
-                val = simGetValue (sym->addr,sym->addrspace,sym->size);
-                fprintf(stdout,"%s=0x%02x",sym->name,val);
-                if ( !(i & 0x07 ))
-                {
-                    for ( j = 0 ; j < 8 ; j++ )
-                    {
-                        sym = NULL;
-                        if (applyToSetFTrue(sfrsymbols,symWithAddr,i+j,'J',&sym))
-                        {
-                            //val = simGetValue (sym->addr,sym->addrspace,sym->size);
-                            fprintf(stdout," %s=%c",sym->name,(val&1)? '1':'0');
-                        }
-                        val >>= 1;
-                    }
-                }
-                fprintf(stdout,"\n");
-            }
-        }
+        infoRegisters(1,cctxt);
         return 0;
     }
 
@@ -1851,7 +1913,7 @@ int cmdListSrc (char *s, context *cctxt)
     if (*s) {
 	/* case a) LINE */
 	if (isdigit(*s)) {
-	    sscanf(s,"%d",&pline);
+        pline = strtol(s,0,10) - 1;
 	    if (!cctxt || !cctxt->func || !cctxt->func->mod) {
 	      if (!list_mod) {
 	        fprintf(stdout,"Sdcdb fails to have a proper context at %d.\n", __LINE__);
@@ -1883,7 +1945,7 @@ int cmdListSrc (char *s, context *cctxt)
 			    return 0;
 			}
 		    }
-		    sscanf(bp,"%d",&pline);
+		    pline = strtol(bp,0,10) - 1;
 		} else {
 		    /* FILE:FUCTION */
 		    if (!applyToSet(functions,funcWithNameModule,bp,s,&func)) {
@@ -1902,6 +1964,16 @@ int cmdListSrc (char *s, context *cctxt)
 	    }
 	    else {
 		/* FUNCTION */
+            if (*s == '\'') 
+            {
+                /* 'FUNCTION' */
+                s++ ;
+                if ((bp = strrchr(s,'\''))) 
+                {
+                    *bp = '\0';
+                }
+                
+            }
 		if (!applyToSet(functions,funcWithName,s,&func)) {
 		    fprintf(stderr,"Function \"%s\" not defined.\n",s); 
 		    return 0;
@@ -1945,7 +2017,7 @@ int cmdListSrc (char *s, context *cctxt)
 
     if ( infomode )
     {
-	    fprintf(stdout,"Line %d of \"%s\" starts at address 0x%08x.\n",pline,
+	    fprintf(stdout,"Line %d of \"%s\" starts at address 0x%08x.\n",pline+1,
 		    list_mod->c_name, list_mod->cLines[pline]->addr);
         infomode=0;
         return 0;
@@ -2140,9 +2212,11 @@ static void printValBasic(symbol *sym, link *type,
             if (IS_CHAR(etype))
             { 
                 if ( isprint(v.val))
-                    printFmtInteger("'%c'",fmt,(long)v.val,0,size);
+                    printFmtInteger((SPEC_USIGN(etype)?"0x%02x":"'%c'"),
+                                    fmt,(long)v.val,0,size);
                 else
-                    printFmtInteger("'\\%o'",fmt,(long)v.val,0,size);
+                    printFmtInteger((SPEC_USIGN(etype)?"0x%02x":"'\\%o'"),
+                                    fmt,(long)v.val,0,size);
             }
             else
             {
@@ -2800,9 +2874,9 @@ static int printFrame(int framenr, int getlast)
     if ( func )
     {
         fprintf(stdout,"#%d  0x%08x in %s () at %s:%d\n",
-                framenr,func->laddr,func->sym->name,func->mod->c_name,func->lline);
+                framenr,func->laddr,func->sym->name,func->mod->c_name,func->lline+1);
         fprintf(stdout,"\032\032%s:%d:1:beg:0x%08x\n",
-                func->mod->cfullname,func->lline,func->laddr);
+                func->mod->cfullname,func->lline+1,func->laddr);
     }
     else
         fprintf(stdout,"No stack.\n");

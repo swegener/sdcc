@@ -65,6 +65,8 @@ typedef struct breakp
 	     context *ctxt)
 
 extern char userBpPresent;
+extern char doingSteps;
+
 int setBreakPoint (unsigned , char , char, 
 		    int (*callBack)(unsigned,char,char,int,context *),char *, int);
 

@@ -155,7 +155,7 @@ _ds390_finaliseOptions (void)
     fprintf (stderr,
 	     "*** error: ds390 port only supports the 10 bit stack mode.\n");
     } else {
-	if (!options.stack_loc) options.stack_loc = 0x400007;
+	if (!options.stack_loc) options.stack_loc = 0x400008;
     }
     
     /* generate native code 16*16 mul/div */
@@ -456,7 +456,7 @@ static void _tininative_finaliseOptions (void)
 	fprintf(stderr,"TININative supports only stack10bit \n");
     }
     
-    if (!options.stack_loc) options.stack_loc = 0x400007;
+    if (!options.stack_loc) options.stack_loc = 0x400008;
     
     /* generate native code 16*16 mul/div */
     if (options.useAccelerator) 

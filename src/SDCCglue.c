@@ -1633,7 +1633,7 @@ glue (void)
 	}
 
       /* initialise the stack pointer.  JCF: aslink takes care of the location */
-	fprintf (asmFile, "\tmov\tsp,#__start__stack\n");	/* MOF */
+	fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");	/* MOF */
 
       fprintf (asmFile, "\tlcall\t__sdcc_external_startup\n");
       fprintf (asmFile, "\tmov\ta,dpl\n");

@@ -2521,12 +2521,12 @@ genFunction (iCode * ic)
 	    }
 	  else
 	    {
-	      /* not callee-saves, we can clobber ar0 */
-	      emitcode ("mov", "ar0,a");
+	      /* not callee-saves, we can clobber r0 */
+	      emitcode ("mov", "r0,a");
 	      emitcode ("mov", "a,sp");
 	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
 	      emitcode ("mov", "sp,a");
-	      emitcode ("mov", "a,ar0");
+	      emitcode ("mov", "a,r0");
 	    }
 	}
       else

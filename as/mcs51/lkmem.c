@@ -251,46 +251,45 @@ int summary(struct area * areap)
 	}
 
 	/*Report the position of the begining of the stack*/
-	fprintf(of, "\nStack starts at: 0x%02lx", Stack.Start);
+	/* TODO find flag for DS390 */
+	fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx)",
+		0 ? "16 bit mode initial s" : "S", Stack.Start, Stack.Start-1);
 
 	/*Check that the stack pointer is landing in a safe place:*/
-	// if (!flat24Mode) TODO: bypass stack check for ds390
+	if( (dram[Stack.Start] & 0x8000) == 0x8000 )
 	{
-		if( (dram[Stack.Start] & 0x8000) == 0x8000 )
+		fprintf(of, ".\n");
+		sprintf(buff, "Stack set to unavailable memory.\n");
+		REPORT_ERROR(buff, 1);
+	}
+	else if(dram[Stack.Start])
+	{
+		fprintf(of, ".\n");
+		sprintf(buff, "Stack overlaps area ");
+		REPORT_ERROR(buff, 1);
+		for(j=0; j<7; j++)
 		{
-			fprintf(of, ".\n");
-			sprintf(buff, "Stack set to unavailable memory.\n");
-			REPORT_ERROR(buff, 1);
+       	                if(dram[Stack.Start]&Ram[j].flag)
+			{
+				sprintf(buff, "'%s'\n", Ram[j].Name);
+				break;
+			}
 		}
-		else if(dram[Stack.Start+1])
+		if(dram[Stack.Start]&IRam.flag)
 		{
-			fprintf(of, ".\n");
-			sprintf(buff, "Stack overlaps area ");
-			REPORT_ERROR(buff, 1);
-			for(j=0; j<7; j++)
-			{
-        	                if(dram[Stack.Start+1]&Ram[j].flag)
-				{
-					sprintf(buff, "'%s'\n", Ram[j].Name);
-					break;
-				}
-			}
-			if(dram[Stack.Start]&IRam.flag)
-			{
-				sprintf(buff, "'%s'\n", IRam.Name);
-			}
-			REPORT_ERROR(buff, 0);
+			sprintf(buff, "'%s'\n", IRam.Name);
 		}
-		else
+		REPORT_ERROR(buff, 0);
+	}
+	else
+	{
+		for(j=Stack.Start, k=0; (j<(int)iram_size)&&(dram[j]==0); j++, k++);
+		fprintf(of, " with %d bytes available\n", k);
+		if (k<MIN_STACK)
 		{
-			for(j=Stack.Start, k=0; (j<(int)iram_size)&&(dram[j]==0); j++, k++);
-			fprintf(of, " with %d bytes available\n", k);
-			if (k<MIN_STACK)
-			{
-				sprintf(buff, "Only %d byte%s available for stack.\n",
-					k, (k==1)?"":"s");
-				REPORT_WARNING(buff, 1);
-			}
+			sprintf(buff, "Only %d byte%s available for stack.\n",
+				k, (k==1)?"":"s");
+			REPORT_WARNING(buff, 1);
 		}
 	}
 

@@ -1,3 +1,12 @@
+2003-01-13  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/ds390/peeph.def: fix #123; add 14 rules by Fiorenzo D. Ramaglia <fd.ramaglia@tin.it>
+	* src/mcs51/peeph.def: fix #123; add 14 rules by Fiorenzo
+	* src/mcs51/gen.c (genFunction): emit r0 instead of ar0 by Fiorenzo
+	* as/mcs51/lkmem (summary): better fix for sp problem
+	* src/SDCCglue.c (glue): __start_stack - 1, saves 1 byte!
+	* src/ds390/main.c (_ds390_finaliseOptions, _tininative_finaliseOptions): stack_loc = 0x400008
+
 2003-01-12  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCmain.c (main): port->finaliseOptions() moved for z80 linking

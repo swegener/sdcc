@@ -2265,3 +2265,104 @@ replace {
 	mov	dptr,#%1
 	dec	dps
 } 
+
+// 14 rules by Fiorenzo D. Ramaglia <fd.ramaglia@tin.it>
+
+replace {
+        add  a,ar%1
+} by {
+        ; Peephole 236a
+        add  a,r%1
+}
+
+replace {
+        addc  a,ar%1
+} by {
+        ; Peephole 236b
+        addc  a,r%1
+}
+
+replace {
+        anl  a,ar%1
+} by {
+        ; Peephole 236c
+        anl  a,r%1
+}
+
+replace {
+        dec  ar%1
+} by {
+        ; Peephole 236d
+        dec  r%1
+}
+
+replace {
+        djnz  ar%1,%2
+} by {
+        ; Peephole 236e
+        djnz  r%1,%2
+}
+
+replace {
+        inc  ar%1
+} by {
+        ; Peephole 236f
+        inc  r%1
+}
+
+replace {
+        mov  a,ar%1
+} by {
+        ; Peephole 236g
+        mov  a,r%1
+}
+
+replace {
+        mov  ar%1,#%2
+} by {
+        ; Peephole 236h
+        mov  r%1,#%2
+}
+
+replace {
+        mov  ar%1,a
+} by {
+        ; Peephole 236i
+        mov  r%1,a
+}
+
+replace {
+        mov  ar%1,ar%2
+} by {
+        ; Peephole 236j
+        mov  r%1,ar%2
+}
+
+replace {
+        orl  a,ar%1
+} by {
+        ; Peephole 236k
+        orl  a,r%1
+}
+
+replace {
+        subb  a,ar%1
+} by {
+        ; Peephole 236l
+        subb  a,r%1
+}
+
+replace {
+        xch  a,ar%1
+} by {
+        ; Peephole 236m
+        xch  a,r%1
+}
+
+replace {
+        xrl  a,ar%1
+} by {
+        ; Peephole 236n
+        xrl  a,r%1
+}
+

@@ -825,7 +825,7 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
     }
 
   /* if already has a asmop then continue */
-  if (op->aop)
+  if (op->aop && aop->size == getSize(sym->type))
     {
       return;
     }
@@ -924,8 +924,6 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
 	aopForSym (ic, sym->usl.spillLoc, result, requires_a);
       wassertl (aop->size >= getSize (sym->type), "Operand doesn't fit in the spill location");
       aop->size = getSize (sym->type);
-      /* PENDING: HACK.  Can have different sizes in the same AOP. */
-      sym->usl.spillLoc->aop = NULL;
       return;
     }
 

@@ -1521,10 +1521,13 @@ operandFromAst (ast * tree,int lvl)
 
     case EX_LINK:
       return operandFromLink (tree->opval.lnk);
-    }
+      break;
 
-  assert (0);
-  /*  Just to keep the comiler happy */
+    default:
+      assert (0);
+    }
+  
+  /*  Just to keep the compiler happy */
   return (operand *) 0;
 }
 

@@ -35,7 +35,6 @@ typedef enum {
   EX_OP=0,
   EX_VALUE,
   EX_LINK,
-  EX_STMNT,
   EX_OPERAND
 } ASTTYPE;
 
@@ -58,7 +57,6 @@ typedef struct ast
 	value *val;		/* value if type = EX_VALUE */
 	sym_link *lnk;		/* sym_link * if type= EX_LINK  */
 	struct operand *oprnd;	/* used only for side effecting function calls */
-	unsigned stmnt;		/* statement if type=EX_STMNT */
 	unsigned op;		/* operator if type= EX_OP  */
       }
     opval;
@@ -180,7 +178,6 @@ extern struct memmap *GcurMemmap;
 ast *newAst_VALUE (value * val);
 ast *newAst_OP (unsigned op);
 ast *newAst_LINK (sym_link * val);
-ast *newAst_STMNT (unsigned val);
 
 void initAst ();
 ast *newNode (long, ast *, ast *);

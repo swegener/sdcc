@@ -110,14 +110,6 @@ newAst_LINK (sym_link * val)
   return ex;
 }
 
-ast *
-newAst_STMNT (unsigned val)
-{
-  ast *ex = newAst_ (EX_STMNT);
-  ex->opval.stmnt = val;
-  return ex;
-}
-
 /*-----------------------------------------------------------------*/
 /* newNode - creates a new node                                    */
 /*-----------------------------------------------------------------*/
@@ -1287,6 +1279,8 @@ bool constExprTree (ast *cexpr) {
       if (constExprTree(cexpr->left) && constExprTree(cexpr->right)) {
 	return TRUE;
       }
+    case EX_OPERAND:
+      return IS_CONSTANT(operandType(cexpr->opval.oprnd));
     }
   return FALSE;
 }  

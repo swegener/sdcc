@@ -242,9 +242,6 @@ static asmop *newAsmop (short type)
     return aop;
 }
 
-/* Turn this off if the world goes to hell. */
-#define LAZY_DPS_OPT
-
 static int _currentDPS;   /* Current processor DPS. */
 static int _desiredDPS;   /* DPS value compiler thinks we should be using. */
 static int _lazyDPS = 0;  /* if non-zero, we are doing lazy evaluation of DPS changes. */
@@ -257,7 +254,6 @@ static int _lazyDPS = 0;  /* if non-zero, we are doing lazy evaluation of DPS ch
 static void genSetDPTR(int n)
 {
 
-#ifdef LAZY_DPS_OPT
     /* If we are doing lazy evaluation, simply note the desired
      * change, but don't emit any code yet.
      */
@@ -266,7 +262,6 @@ static void genSetDPTR(int n)
         _desiredDPS = n;
         return;
     }
-#endif
 
     if (!n)
     {
@@ -902,9 +897,7 @@ static char *aopGet (asmop *aop,
       {
             genSetDPTR(1);
 
-#ifndef KEVIN_BROKE_IT
             if (!canClobberACC)
-#endif
             {
               emitcode("xch", "a, ap");
             }
@@ -935,13 +928,11 @@ static char *aopGet (asmop *aop,
       {
           genSetDPTR(0);
 
-#ifndef KEVIN_BROKE_IT
-            if (!canClobberACC)
-#endif
-            {
+          if (!canClobberACC)
+          {
               emitcode("xch", "a, ap");
               return "ap";
-            }
+          }
       }
 
       return (dname ? "acc" : "a");
@@ -2041,40 +2032,33 @@ static void genCall (iCode *ic)
     if ((IS_ITEMP(IC_RESULT(ic)) &&
          (OP_SYMBOL(IC_RESULT(ic))->nRegs ||
           OP_SYMBOL(IC_RESULT(ic))->spildir )) ||
-        IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
+        IS_TRUE_SYMOP(IC_RESULT(ic)) ) 
+    {
+  	if (isOperandInFarSpace(IC_RESULT(ic))
+   	 && getSize(operandType(IC_RESULT(ic))) <= 2)
+  	{
+      	    int size =  getSize(operandType(IC_RESULT(ic)));
 
-#ifdef LAZY_DPS_OPT
-  /* Not really related to LAZY_DPS_OPT, but don't want
-   * another testing flag right now...
-   */
-#define FAR_RETURN_OPT
-#ifdef FAR_RETURN_OPT
-  if (isOperandInFarSpace(IC_RESULT(ic))
-   && getSize(operandType(IC_RESULT(ic))) <= 2)
-  {
-      int size =  getSize(operandType(IC_RESULT(ic)));
+      	    /* Special case for 1 or 2 byte return in far space. */
+      	    emitcode(";", "Kevin function call abuse #1");
 
-       /* Special case for 1 or 2 byte return in far space. */
-      emitcode(";", "Kevin function call abuse #1");
+      	    MOVA(fReturn[0]);
+      	    if (size > 1)
+      	    {
+          	emitcode("mov", "b,%s", fReturn[1]);
+      	    }
 
-      MOVA(fReturn[0]);
-          if (size > 1)
-          {
-              emitcode("mov", "b,%s", fReturn[1]);
-          }
+      	    aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
+      	    aopPut(AOP(IC_RESULT(ic)),"a",0);
 
-          aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
-      aopPut(AOP(IC_RESULT(ic)),"a",0);
-
-      if (size > 1)
-      {
-          aopPut(AOP(IC_RESULT(ic)),"b",1);
-      }
-          freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
-  }
-  else
-#endif
-  {
+      	    if (size > 1)
+      	    {
+          	aopPut(AOP(IC_RESULT(ic)),"b",1);
+      	    }
+            freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
+   	}
+   	else
+   	{
             _G.accInUse++;
             aopOp(IC_RESULT(ic),ic,FALSE, TRUE);
             _G.accInUse--;
@@ -2083,51 +2067,6 @@ static void genCall (iCode *ic)
 
             freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
         }
-#else
-  if (!isOperandInFarSpace(IC_RESULT(ic)))
-  {
-            _G.accInUse++;
-            aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
-            _G.accInUse--;
-
-      assignResultValue(IC_RESULT(ic));
-
-            freeAsmop(IC_RESULT(ic),NULL, ic,TRUE);
-      }
-        else
-        {
-            /* Result is in far space, and requires DPTR to access
-             * it. Push the result onto the stack and restore from
-             * there.
-             */
-            int size = getSize(operandType(IC_RESULT(ic)));
-            int offset = size - 1;
-            char *l;
-
-      emitcode(";", "Kevin function call abuse #1");
-
-          /* first push the right side on to the stack */
-          /* NB: this relies on the fact that "a" is the last
-           * register in fReturn. If it were not, the MOVA
-           * would potentially clobber a returned byte in A.
-           */
-          while (size--) {
-          l = fReturn[offset--];
-      MOVA(l);
-    emitcode ("push","acc");
-          }
-
-          /* now assign DPTR to result */
-          aopOp(IC_RESULT(ic),ic,FALSE, FALSE);
-          size = AOP_SIZE(IC_RESULT(ic));
-          aopOp(IC_RESULT(ic),ic,FALSE, FALSE); /* bug? */
-          while (size--) {
-    emitcode ("pop","acc");
-    aopPut(AOP(IC_RESULT(ic)),"a",++offset);
-          }
-          freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
-  }
-#endif
     }
 
     /* adjust the stack for parameters if
@@ -2942,19 +2881,6 @@ static void adjustArithmeticResult(iCode *ic)
      }
 }
 
-#if 0
-#define AOP_OP_3(ic) \
-    aopOp (IC_LEFT(ic),ic,FALSE, FALSE); \
-    aopOp (IC_RIGHT(ic),ic,FALSE, TRUE); \
-    aopOp (IC_RESULT(ic),ic,TRUE, AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR); \
-    if (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR2 && \
-        AOP_TYPE(IC_RESULT(ic)) == AOP_DPTR2) \
-    { \
-        /* werror(E_INTERNAL_ERROR,__FILE__,__LINE__, */ \
-        fprintf(stderr,                                  \
-               "Ack: three operands in far space! (%s:%d %s:%d)\n", __FILE__, __LINE__, ic->filename, ic->lineno);   \
-    }
-#else
 #define AOP_OP_3(ic) \
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)); \
@@ -2995,9 +2921,6 @@ static void adjustArithmeticResult(iCode *ic)
     aopOp (IC_RIGHT(ic),ic,FALSE, FALSE); \
     aopOp (IC_LEFT(ic),ic,FALSE, (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
 
-#endif
-
-
 #define AOP_SET_LOCALS(ic) \
     left = IC_LEFT(ic); \
     right = IC_RIGHT(ic); \
@@ -3016,28 +2939,11 @@ static void genPlus (iCode *ic)
 
     /* special cases :- */
 
-#if 0
-    aopOp (IC_RIGHT(ic),ic,FALSE, FALSE);
-    aopOp (IC_LEFT(ic),ic,FALSE,
-         (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR));
-    if ((AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR2) &&
-        (AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR))
-    {
-        pushResult = TRUE;
-    }
-    else
-    {
-        aopOp (IC_RESULT(ic),ic,TRUE,
-               ((AOP_TYPE(IC_RIGHT(ic)) == AOP_DPTR)
-             || (AOP_TYPE(IC_LEFT(ic)) == AOP_DPTR)));
-    }
-#else
     AOP_OP_3_NOFATAL(ic, pushResult);
     if (pushResult)
     {
         D(emitcode(";", "genPlus: must push result: 3 ops in far space"););
     }
-#endif
 
     if (!pushResult)
     {
@@ -3585,11 +3491,6 @@ static void genMult (iCode *ic)
 
     /* assign the amsops */
     AOP_OP_3(ic);
-#if 0
-    aopOp (left,ic,FALSE, FALSE);
-    aopOp (right,ic,FALSE, TRUE);
-    aopOp (result,ic,TRUE, FALSE);
-#endif
 
     /* special cases first */
     /* both are bits */
@@ -3727,11 +3628,6 @@ static void genDiv (iCode *ic)
 
     /* assign the amsops */
     AOP_OP_3(ic);
-#if 0
-    aopOp (left,ic,FALSE, FALSE);
-    aopOp (right,ic,FALSE, TRUE);
-    aopOp (result,ic,TRUE, FALSE);
-#endif
 
     /* special cases first */
     /* both are bits */
@@ -3859,11 +3755,6 @@ static void genMod (iCode *ic)
 
     /* assign the amsops */
     AOP_OP_3(ic);
-#if 0
-    aopOp (left,ic,FALSE, FALSE);
-    aopOp (right,ic,FALSE, TRUE);
-    aopOp (result,ic,TRUE, FALSE);
-#endif
 
     /* special cases first */
     /* both are bits */
@@ -4241,11 +4132,6 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 
     AOP_OP_2(ic);
     AOP_SET_LOCALS(ic);
-#if 0
-    aopOp((left=IC_LEFT(ic)),ic,FALSE, FALSE);
-    aopOp((right=IC_RIGHT(ic)),ic,FALSE, TRUE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
-#endif
 
     /* if literal, literal on the right or
     if the right is in a pointer register and left
@@ -4417,11 +4303,6 @@ static void genAndOp (iCode *ic)
     only those used in arthmetic operations remain */
     AOP_OP_3(ic);
     AOP_SET_LOCALS(ic);
-#if 0
-    aopOp((left=IC_LEFT(ic)),ic,FALSE, FALSE);
-    aopOp((right=IC_RIGHT(ic)),ic,FALSE, TRUE);
-    aopOp((result=IC_RESULT(ic)),ic,FALSE, FALSE);
-#endif
 
     /* if both are bit variables */
     if (AOP_TYPE(left) == AOP_CRY &&
@@ -4459,11 +4340,6 @@ static void genOrOp (iCode *ic)
     only those used in arthmetic operations remain */
     AOP_OP_3(ic);
     AOP_SET_LOCALS(ic);
-#if 0
-    aopOp((left=IC_LEFT(ic)),ic,FALSE, FALSE);
-    aopOp((right=IC_RIGHT(ic)),ic,FALSE, TRUE);
-    aopOp((result=IC_RESULT(ic)),ic,FALSE, FALSE);
-#endif
 
     /* if both are bit variables */
     if (AOP_TYPE(left) == AOP_CRY &&
@@ -4560,11 +4436,6 @@ static void genAnd (iCode *ic, iCode *ifx)
 
     AOP_OP_3(ic);
     AOP_SET_LOCALS(ic);
-#if 0
-    aopOp((left = IC_LEFT(ic)),ic,FALSE, FALSE);
-    aopOp((right= IC_RIGHT(ic)),ic,FALSE, TRUE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
-#endif
 
 #ifdef DEBUG_TYPE
     emitcode("","; Type res[%d] = l[%d]&r[%d]",
@@ -4826,11 +4697,6 @@ static void genOr (iCode *ic, iCode *ifx)
 
     AOP_OP_3(ic);
     AOP_SET_LOCALS(ic);
-#if 0
-    aopOp((left = IC_LEFT(ic)),ic,FALSE, FALSE);
-    aopOp((right= IC_RIGHT(ic)),ic,FALSE, TRUE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
-#endif
 
 #ifdef DEBUG_TYPE
     emitcode("","; Type res[%d] = l[%d]&r[%d]",
@@ -5090,11 +4956,6 @@ static void genXor (iCode *ic, iCode *ifx)
 
     AOP_OP_3(ic);
     AOP_SET_LOCALS(ic);
-#if 0
-    aopOp((left = IC_LEFT(ic)),ic,FALSE, FALSE);
-    aopOp((right= IC_RIGHT(ic)),ic,FALSE, TRUE);
-    aopOp((result=IC_RESULT(ic)),ic,TRUE, FALSE);
-#endif
 
 #ifdef DEBUG_TYPE
     emitcode("","; Type res[%d] = l[%d]&r[%d]",
@@ -7952,51 +7813,50 @@ static void genFarFarAssign (operand *result, operand *right, iCode *ic)
     int offset = 0;
     char *l;
 
-#ifdef LAZY_DPS_OPT
     if (size > 1)
     {
-      /* This is a net loss for size == 1, but a big gain
-       * otherwise.
-       */
-      D(emitcode(";", "genFarFarAssign (improved)"););
+      	/* This is a net loss for size == 1, but a big gain
+       	 * otherwise.
+       	 */
+      	D(emitcode(";", "genFarFarAssign (improved)"););
 
-      aopOp(result,ic,TRUE, TRUE);
+      	aopOp(result,ic,TRUE, TRUE);
 
-      _startLazyDPSEvaluation();
-  while (size--)
-  {
-      aopPut(AOP(result),
-       aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
-       offset);
-      offset++;
-  }
-      _endLazyDPSEvaluation();
-      freeAsmop(result,NULL,ic,FALSE);
-      freeAsmop(right,NULL,ic,FALSE);
+      	_startLazyDPSEvaluation();
+  	while (size--)
+  	{
+      	    aopPut(AOP(result),
+       	    aopGet(AOP(right),offset,FALSE,FALSE,FALSE), offset);
+      	    offset++;
+  	}
+      	_endLazyDPSEvaluation();
+      	freeAsmop(result,NULL,ic,FALSE);
+      	freeAsmop(right,NULL,ic,FALSE);
     }
     else
-#endif
     {
-    D(emitcode(";", "genFarFarAssign "););
+    	D(emitcode(";", "genFarFarAssign "););
 
-    /* first push the right side on to the stack */
-    _startLazyDPSEvaluation();
-    while (size--) {
-  l = aopGet(AOP(right),offset++,FALSE,FALSE,TRUE);
-  MOVA(l);
-  emitcode ("push","acc");
-    }
+    	/* first push the right side on to the stack */
+    	_startLazyDPSEvaluation();
+    	while (size--) 
+    	{
+  	    l = aopGet(AOP(right),offset++,FALSE,FALSE,TRUE);
+  	    MOVA(l);
+  	    emitcode ("push","acc");
+    	}
 
-    freeAsmop(right,NULL,ic,FALSE);
-    /* now assign DPTR to result */
-    aopOp(result,ic,FALSE, FALSE);
-    size = AOP_SIZE(result);
-    while (size--) {
-  emitcode ("pop","acc");
-  aopPut(AOP(result),"a",--offset);
-    }
-    freeAsmop(result,NULL,ic,FALSE);
-    _endLazyDPSEvaluation();
+    	freeAsmop(right,NULL,ic,FALSE);
+    	/* now assign DPTR to result */
+    	aopOp(result,ic,FALSE, FALSE);
+    	size = AOP_SIZE(result);
+    	while (size--) 
+    	{
+  	    emitcode ("pop","acc");
+  	    aopPut(AOP(result),"a",--offset);
+    	}
+    	freeAsmop(result,NULL,ic,FALSE);
+    	_endLazyDPSEvaluation();
     }
 }
 
@@ -8028,10 +7888,10 @@ static void genAssign (iCode *ic)
     if ((AOP_TYPE(right) == AOP_DPTR ||
          AOP_TYPE(right) == AOP_DPTR2) &&
     /* IS_TRUE_SYMOP(result)       && */
-    isOperandInFarSpace(result)) {
-
-  genFarFarAssign (result,right,ic);
-  return ;
+    	isOperandInFarSpace(result)) 
+    {
+  	genFarFarAssign (result,right,ic);
+  	return ;
     }
 
     aopOp(result,ic,TRUE, FALSE);
@@ -8076,60 +7936,40 @@ static void genAssign (iCode *ic)
     if((size > 1) &&
        (AOP_TYPE(result) != AOP_REG) &&
        (AOP_TYPE(right) == AOP_LIT) &&
-       !IS_FLOAT(operandType(right))
-#ifndef LAZY_DPS_OPT
-       && (lit < 256L)
-#endif
-       )
+       !IS_FLOAT(operandType(right)))
     {
-#ifdef LAZY_DPS_OPT
-  D(emitcode(";", "Kevin's better literal load code"););
-  _startLazyDPSEvaluation();
-    while (size && ((unsigned int)(lit >> (offset*8)) != 0))
-  {
-      aopPut(AOP(result),
-             aopGet(AOP(right),offset,FALSE,FALSE,TRUE),
-             offset);
-      offset++;
-      size--;
-  }
-  /* And now fill the rest with zeros. */
-  if (size)
-  {
-      emitcode("clr","a");
-  }
-  while (size--)
-  {
-      aopPut(AOP(result), "a", offset++);
-  }
-  _endLazyDPSEvaluation();
-#else
-  emitcode("clr","a");
-
-  _startLazyDPSEvaluation();
-  while (size--)
-  {
-      if((unsigned int)((lit >> (size*8)) & 0x0FFL)== 0)
-    aopPut(AOP(result),"a",size);
-      else
-    aopPut(AOP(result),
-           aopGet(AOP(right),size,FALSE,FALSE,FALSE),
-           size);
-  }
-  _endLazyDPSEvaluation();
-#endif
+  	D(emitcode(";", "Kevin's better literal load code"););
+  	_startLazyDPSEvaluation();
+    	while (size && ((unsigned int)(lit >> (offset*8)) != 0))
+  	{
+      	    aopPut(AOP(result),
+             	   aopGet(AOP(right),offset,FALSE,FALSE,TRUE),
+                   offset);
+      	    offset++;
+            size--;
+  	}
+  	/* And now fill the rest with zeros. */
+  	if (size)
+  	{
+      	    emitcode("clr","a");
+  	}
+  	while (size--)
+  	{
+      	    aopPut(AOP(result), "a", offset++);
+  	}
+  	_endLazyDPSEvaluation();
     }
     else
     {
-  _startLazyDPSEvaluation();
-  while (size--)
-  {
-      aopPut(AOP(result),
-       aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
-       offset);
-      offset++;
-  }
-  _endLazyDPSEvaluation();
+  	_startLazyDPSEvaluation();
+  	while (size--)
+  	{
+      	    aopPut(AOP(result),
+       	    aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
+       		   offset);
+      	    offset++;
+  	}
+  	_endLazyDPSEvaluation();
     }
 
 release:

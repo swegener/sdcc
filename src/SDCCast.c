@@ -259,6 +259,9 @@ copyAst (ast * src)
   dest->level = src->level;
   dest->funcName = src->funcName;
 
+  if (src->ftype)
+    dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
+
   /* if this is a leaf */
   /* if value */
   if (src->type == EX_VALUE)
@@ -278,9 +281,6 @@ copyAst (ast * src)
 
   /* if this is a node that has special values */
   copyAstValues (dest, src);
-
-  if (src->ftype)
-    dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
 
   dest->trueLabel = copySymbol (src->trueLabel);
   dest->falseLabel = copySymbol (src->falseLabel);

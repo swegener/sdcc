@@ -1225,19 +1225,21 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		    }
 		}
 
-		/* if it shares registers with operands make sure
-		   that they are in the same position */
-		if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
-		    OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=') {
-		    positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-				  OP_SYMBOL (IC_LEFT (ic)));
-		}
-		/* do the same for the right operand */
-		if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
-		    OP_SYMBOL (IC_RIGHT (ic))->nRegs) {
-		    positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-				  OP_SYMBOL (IC_RIGHT (ic)));
-		}
+		if (!POINTER_SET(ic) && !POINTER_GET(ic)) {
+                    /* if it shares registers with operands make sure
+		       that they are in the same position */
+		    if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
+		        OP_SYMBOL (IC_LEFT (ic))->nRegs) {
+		        positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+				      OP_SYMBOL (IC_LEFT (ic)));
+		    }
+		    /* do the same for the right operand */
+		    if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
+		        OP_SYMBOL (IC_RIGHT (ic))->nRegs) {
+		        positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+				      OP_SYMBOL (IC_RIGHT (ic)));
+		    }
+                }
 
 		if (ptrRegSet) {
 		    mcs51_ptrRegReq--;
@@ -1311,14 +1313,14 @@ static void fillGaps()
 		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
 		if (SKIP_IC(ic)) continue;
 		assert(isSymbolEqual(sym,OP_SYMBOL(IC_RESULT(ic)))); /* just making sure */
-		/* if left is assigned to registers */
+                /* if left is assigned to registers */
 		if (IS_SYMOP(IC_LEFT(ic)) && 
 		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
-		    pdone += positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)));
+		    pdone += (positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)))>0);
 		}
 		if (IS_SYMOP(IC_RIGHT(ic)) && 
 		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
-		    pdone += positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)));
+		    pdone += (positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)))>0);
 		}
 		if (pdone > 1) break;
 	    }
@@ -1328,12 +1330,12 @@ static void fillGaps()
 		iCode *ic;
 		if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
 		if (SKIP_IC(ic)) continue;
-		if (!IS_ASSIGN_ICODE(ic)) continue ;
+		if (POINTER_SET(ic) || POINTER_GET(ic)) continue ;
 
 		/* if result is assigned to registers */
 		if (IS_SYMOP(IC_RESULT(ic)) && 
 		    bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
-		    pdone += positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)));
+		    pdone += (positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)))>0);
 		}
 		if (pdone > 1) break;
 	    }
@@ -1570,7 +1572,7 @@ regTypeNum (eBBlock *ebbs)
 	  if (sym->ruonly || sym->accuse)
 	    {
 	      if (IS_AGGREGATE (sym->type) || sym->isptr)
-		sym->type = aggrToPtr (sym->type, FALSE);
+	        sym->type = aggrToPtr (sym->type, FALSE);
 	      continue;
 	    }
 
@@ -1586,7 +1588,7 @@ regTypeNum (eBBlock *ebbs)
 
 
 	      /* and that pointer is remat in data space */
-	      if (IS_SYMOP (IC_LEFT (ic)) &&
+              if (IS_SYMOP (IC_LEFT (ic)) &&
 		  OP_SYMBOL (IC_LEFT (ic))->remat &&
 		  !IS_CAST_ICODE(OP_SYMBOL (IC_LEFT (ic))->rematiCode) &&
 		  DCL_TYPE (aggrToPtr (operandType(IC_LEFT(ic)), FALSE)) == POINTER)
@@ -1595,6 +1597,7 @@ regTypeNum (eBBlock *ebbs)
 		  symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
 		  psym->type = sym->type;
 		  psym->etype = sym->etype;
+                  
 		  strcpy (psym->rname, psym->name);
 		  sym->isspilt = 1;
 		  sym->usl.spillLoc = psym;
@@ -1703,23 +1706,40 @@ farSpacePackable (iCode * ic)
 	  getSize (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)) > 1)
 	return NULL;
 
-      /* if any three is a true symbol in far space */
-      if (IC_RESULT (dic) &&
-	  IS_TRUE_SYMOP (IC_RESULT (dic)) &&
-	  isOperandInFarSpace (IC_RESULT (dic)))
-	return NULL;
+      if (dic->op == IFX)
+        {
+          if (IC_COND (dic) &&
+	      IS_TRUE_SYMOP (IC_COND (dic)) &&
+	      isOperandInFarSpace (IC_COND (dic)))
+	    return NULL;
+        }
+      else if (dic->op == JUMPTABLE)
+        {
+          if (IC_JTCOND (dic) &&
+	      IS_TRUE_SYMOP (IC_JTCOND (dic)) &&
+	      isOperandInFarSpace (IC_JTCOND (dic)))
+	    return NULL;
+        }
+      else
+        {
+          /* if any three is a true symbol in far space */
+          if (IC_RESULT (dic) &&
+	      IS_TRUE_SYMOP (IC_RESULT (dic)) &&
+	      isOperandInFarSpace (IC_RESULT (dic)))
+	    return NULL;
 
-      if (IC_RIGHT (dic) &&
-	  IS_TRUE_SYMOP (IC_RIGHT (dic)) &&
-	  isOperandInFarSpace (IC_RIGHT (dic)) &&
-	  !isOperandEqual (IC_RIGHT (dic), IC_RESULT (ic)))
-	return NULL;
+          if (IC_RIGHT (dic) &&
+	      IS_TRUE_SYMOP (IC_RIGHT (dic)) &&
+	      isOperandInFarSpace (IC_RIGHT (dic)) &&
+	      !isOperandEqual (IC_RIGHT (dic), IC_RESULT (ic)))
+	    return NULL;
 
-      if (IC_LEFT (dic) &&
-	  IS_TRUE_SYMOP (IC_LEFT (dic)) &&
-	  isOperandInFarSpace (IC_LEFT (dic)) &&
-	  !isOperandEqual (IC_LEFT (dic), IC_RESULT (ic)))
-	return NULL;
+          if (IC_LEFT (dic) &&
+	      IS_TRUE_SYMOP (IC_LEFT (dic)) &&
+	      isOperandInFarSpace (IC_LEFT (dic)) &&
+	      !isOperandEqual (IC_LEFT (dic), IC_RESULT (ic)))
+	    return NULL;
+        }
 
       if (isOperandEqual (IC_RIGHT (ic), IC_RESULT (dic)))
 	{
@@ -1780,43 +1800,56 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if (SKIP_IC2 (dic))
 	continue;
 
-      if (IS_TRUE_SYMOP (IC_RESULT (dic)) &&
-	  IS_OP_VOLATILE (IC_RESULT (dic)))
-	{
-	  dic = NULL;
-	  break;
-	}
+      if (dic->op == IFX)
+        {
+          if (IS_SYMOP (IC_COND (dic)) &&
+	      (IC_COND (dic)->key == IC_RESULT (ic)->key ||
+	       IC_COND (dic)->key == IC_RIGHT (ic)->key))
+	    {
+	      dic = NULL;
+	      break;
+	    }
+        }
+      else
+        {
+          if (IS_TRUE_SYMOP (IC_RESULT (dic)) &&
+	      IS_OP_VOLATILE (IC_RESULT (dic)))
+	    {
+	      dic = NULL;
+	      break;
+	    }
 
-      if (IS_SYMOP (IC_RESULT (dic)) &&
-	  IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
-	{
-	  if (POINTER_SET (dic))
-	    dic = NULL;
+          if (IS_SYMOP (IC_RESULT (dic)) &&
+	      IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
+	    {
+	      if (POINTER_SET (dic))
+	        dic = NULL;
 
-	  break;
-	}
+	      break;
+	    }
 
-      if (IS_SYMOP (IC_RIGHT (dic)) &&
-	  (IC_RIGHT (dic)->key == IC_RESULT (ic)->key ||
-	   IC_RIGHT (dic)->key == IC_RIGHT (ic)->key))
-	{
-	  dic = NULL;
-	  break;
-	}
+          if (IS_SYMOP (IC_RIGHT (dic)) &&
+	      (IC_RIGHT (dic)->key == IC_RESULT (ic)->key ||
+	       IC_RIGHT (dic)->key == IC_RIGHT (ic)->key))
+	    {
+	      dic = NULL;
+	      break;
+	    }
 
-      if (IS_SYMOP (IC_LEFT (dic)) &&
-	  (IC_LEFT (dic)->key == IC_RESULT (ic)->key ||
-	   IC_LEFT (dic)->key == IC_RIGHT (ic)->key))
-	{
-	  dic = NULL;
-	  break;
-	}
+          if (IS_SYMOP (IC_LEFT (dic)) &&
+	      (IC_LEFT (dic)->key == IC_RESULT (ic)->key ||
+	       IC_LEFT (dic)->key == IC_RIGHT (ic)->key))
+	    {
+	      dic = NULL;
+	      break;
+	    }
 
-      if (POINTER_SET (dic) &&
-	  IC_RESULT (dic)->key == IC_RESULT (ic)->key)
-	{
-	  dic = NULL;
-	  break;
+          if (POINTER_SET (dic) &&
+	      IC_RESULT (dic)->key == IC_RESULT (ic)->key)
+	    {
+	      dic = NULL;
+	      break;
+	    }
 	}
     }
 
@@ -1913,14 +1946,28 @@ findAssignToSym (operand * op, iCode * ic)
 	break;  /* found where this temp was defined */
 
       /* if we find an usage then we cannot delete it */
-      if (IC_LEFT (dic) && IC_LEFT (dic)->key == op->key)
-	return NULL;
+      
+      if (dic->op == IFX)
+        {
+          if (IC_COND (dic) && IC_COND (dic)->key == op->key)
+            return NULL;
+        }
+      else if (dic->op == JUMPTABLE)
+        {
+          if (IC_JTCOND (dic) && IC_JTCOND (dic)->key == op->key)
+            return NULL;
+        }
+      else
+        {
+          if (IC_LEFT (dic) && IC_LEFT (dic)->key == op->key)
+	    return NULL;
 
-      if (IC_RIGHT (dic) && IC_RIGHT (dic)->key == op->key)
-	return NULL;
+          if (IC_RIGHT (dic) && IC_RIGHT (dic)->key == op->key)
+	    return NULL;
 
-      if (POINTER_SET (dic) && IC_RESULT (dic)->key == op->key)
-	return NULL;
+          if (POINTER_SET (dic) && IC_RESULT (dic)->key == op->key)
+	    return NULL;
+	}
     }
 
   if (!dic)
@@ -2793,8 +2840,10 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */
+  
   for (i = 0; i < count; i++)
     packRegisters (ebbs, i);
+  
 
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbs, count);

@@ -1,3 +1,17 @@
+2003-09-19  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (loadDptrFromOperand, genFarPointerGet,
+	genCodePointerGet, genGenPointerGet, genFarPointerSet,
+	genGenPointerSet): handle AOP_DPTR correctly when loading dptr
+	(ralloc doesn't intentionally do this now, but perhaps later)
+	* src/mcs51/ralloc.c (serialRegAssign, fillGaps),
+	* src/ds390/ralloc.c (serialRegAssign, fillGaps): fixed some
+	register positioning bugs (Fixed bug #762602 and #795325)
+	* src/SDCCicode.c (geniCodeDerefPtr): Track output class correctly
+	(Fixed bug #808779)
+	* src/z80/gen.c: increased _vemit2's buffer[] to handle long
+	lines that --i-code-in-asm generates
+
 2003-09-18  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	*link/z80/lklibr.c, as/mcs51/lklibr.c: Fixed Linux segfaults when

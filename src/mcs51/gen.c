@@ -420,6 +420,9 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   /* if it is in direct space */
   if (IN_DIRSPACE (space))
     {
+      //printf("aopForSym, using AOP_DIR for %s (%x)\n", sym->name, sym);
+      //printTypeChainRaw(sym->type, NULL);
+      //printf("space = %s\n", space ? space->sname : "NULL");
       sym->aop = aop = newAsmop (AOP_DIR);
       aop->aopu.aop_dir = sym->rname;
       aop->size = getSize (sym->type);
@@ -874,7 +877,6 @@ aopGetUsesAcc (asmop *aop, int offset)
       return FALSE;
     }
 }
-
 
 /*-----------------------------------------------------------------*/
 /* aopGet - for fetching value of the aop                          */
@@ -7539,6 +7541,66 @@ genPagedPointerGet (operand * left,
 
 }
 
+/*--------------------------------------------------------------------*/
+/* loadDptrFromOperand - load dptr (and optionally B) from operand op */
+/*--------------------------------------------------------------------*/
+static void
+loadDptrFromOperand (operand *op, bool loadBToo)
+{
+  if (AOP_TYPE (op) != AOP_STR)
+    {
+      /* if this is remateriazable */
+      if (AOP_TYPE (op) == AOP_IMMD)
+	{
+	  emitcode ("mov", "dptr,%s", aopGet (AOP (op), 0, TRUE, FALSE));
+          if (loadBToo)
+            {
+	      if (AOP(op)->aopu.aop_immd.from_cast_remat) 
+		emitcode ("mov", "b,%s",aopGet(AOP (op), AOP_SIZE(op)-1, FALSE, FALSE));
+	      else
+                {
+                  wassertl(FALSE, "need pointerCode");
+                  emitcode ("", "; mov b,???");
+                  /* genPointerGet and genPointerSet originally did different
+                  ** things for this case. Both seem wrong.
+                  ** from genPointerGet:
+		  **  emitcode ("mov", "b,#%d", pointerCode (retype));
+                  ** from genPointerSet:
+		  **  emitcode ("mov", "b,%s + 1", aopGet (AOP (result), 0, TRUE, FALSE));
+                  */
+                }
+            }
+	}
+      else if (AOP_TYPE (op) == AOP_DPTR)
+	{
+	  if (loadBToo)
+	    {
+	      MOVA (aopGet (AOP (op), 0, FALSE, FALSE));
+	      emitcode ("push", "acc");
+	      MOVA (aopGet (AOP (op), 1, FALSE, FALSE));
+	      emitcode ("push", "acc");
+	      emitcode ("mov", "b,%s", aopGet (AOP (op), 2, FALSE, FALSE));
+	      emitcode ("pop", "dph");
+	      emitcode ("pop", "dpl");
+	    }
+	  else
+	    {
+	      MOVA (aopGet (AOP (op), 0, FALSE, FALSE));
+	      emitcode ("push", "acc");
+	      emitcode ("mov", "dph,%s", aopGet (AOP (op), 1, FALSE, FALSE));
+	      emitcode ("pop", "dpl");
+	    }
+	}
+      else
+	{			/* we need to get it byte by byte */
+	  emitcode ("mov", "dpl,%s", aopGet (AOP (op), 0, FALSE, FALSE));
+	  emitcode ("mov", "dph,%s", aopGet (AOP (op), 1, FALSE, FALSE));
+	  if (loadBToo)
+	    emitcode ("mov", "b,%s", aopGet (AOP (op), 2, FALSE, FALSE));
+	}
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* genFarPointerGet - gget value from far space                    */
 /*-----------------------------------------------------------------*/
@@ -7552,21 +7614,9 @@ genFarPointerGet (operand * left,
   D(emitcode (";     genFarPointerGet",""));
 
   aopOp (left, ic, FALSE);
-
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (left) != AOP_STR)
-    {
-      /* if this is remateriazable */
-      if (AOP_TYPE (left) == AOP_IMMD)
-	emitcode ("mov", "dptr,%s", aopGet (AOP (left), 0, TRUE, FALSE));
-      else
-	{			/* we need to get it byte by byte */
-	  emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE));
-	  emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE));
-	}
-    }
-  /* so dptr know contains the address */
+  loadDptrFromOperand (left, FALSE);
+  
+  /* so dptr now contains the address */
   aopOp (result, ic, FALSE);
 
   /* if bit then unpack */
@@ -7608,21 +7658,9 @@ genCodePointerGet (operand * left,
   D(emitcode (";     genCodePointerGet",""));
 
   aopOp (left, ic, FALSE);
-
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (left) != AOP_STR)
-    {
-      /* if this is remateriazable */
-      if (AOP_TYPE (left) == AOP_IMMD)
-	emitcode ("mov", "dptr,%s", aopGet (AOP (left), 0, TRUE, FALSE));
-      else
-	{			/* we need to get it byte by byte */
-	  emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE));
-	  emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE));
-	}
-    }
-  /* so dptr know contains the address */
+  loadDptrFromOperand (left, FALSE);
+  
+  /* so dptr now contains the address */
   aopOp (result, ic, FALSE);
 
   /* if bit then unpack */
@@ -7673,27 +7711,8 @@ genGenPointerGet (operand * left,
   D(emitcode (";     genGenPointerGet",""));
 
   aopOp (left, ic, FALSE);
-
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (left) != AOP_STR)
-    {
-      /* if this is remateriazable */
-      if (AOP_TYPE (left) == AOP_IMMD)
-	{
-	  emitcode ("mov", "dptr,%s", aopGet (AOP (left), 0, TRUE, FALSE));
-	  if (AOP(left)->aopu.aop_immd.from_cast_remat) 
-		  emitcode ("mov", "b,%s",aopGet(AOP (left), AOP_SIZE(left)-1, FALSE, FALSE));
-	  else
-		  emitcode ("mov", "b,#%d", pointerCode (retype));
-	}
-      else
-	{			/* we need to get it byte by byte */
-	  emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE));
-	  emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE));
-	  emitcode ("mov", "b,%s", aopGet (AOP (left), 2, FALSE, FALSE));
-	}
-    }
+  loadDptrFromOperand (left, TRUE);
+  
   /* so dptr know contains the address */
   aopOp (result, ic, FALSE);
 
@@ -8185,20 +8204,8 @@ genFarPointerSet (operand * right,
   D(emitcode (";     genFarPointerSet",""));
 
   aopOp (result, ic, FALSE);
-
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (result) != AOP_STR)
-    {
-      /* if this is remateriazable */
-      if (AOP_TYPE (result) == AOP_IMMD)
-	emitcode ("mov", "dptr,%s", aopGet (AOP (result), 0, TRUE, FALSE));
-      else
-	{			/* we need to get it byte by byte */
-	  emitcode ("mov", "dpl,%s", aopGet (AOP (result), 0, FALSE, FALSE));
-	  emitcode ("mov", "dph,%s", aopGet (AOP (result), 1, FALSE, FALSE));
-	}
-    }
+  loadDptrFromOperand (result, FALSE);
+  
   /* so dptr know contains the address */
   aopOp (right, ic, FALSE);
 
@@ -8242,27 +8249,8 @@ genGenPointerSet (operand * right,
   D(emitcode (";     genGenPointerSet",""));
 
   aopOp (result, ic, FALSE);
-
-  /* if the operand is already in dptr
-     then we do nothing else we move the value to dptr */
-  if (AOP_TYPE (result) != AOP_STR)
-    {
-      /* if this is remateriazable */
-      if (AOP_TYPE (result) == AOP_IMMD)
-	{
-	  emitcode ("mov", "dptr,%s", aopGet (AOP (result), 0, TRUE, FALSE));
-	  if (AOP(result)->aopu.aop_immd.from_cast_remat) 
-		  emitcode ("mov", "b,%s",aopGet(AOP (result), AOP_SIZE(result)-1, FALSE, FALSE));
-	  else 
-		  emitcode ("mov", "b,%s + 1", aopGet (AOP (result), 0, TRUE, FALSE));
-	}
-      else
-	{			/* we need to get it byte by byte */
-	  emitcode ("mov", "dpl,%s", aopGet (AOP (result), 0, FALSE, FALSE));
-	  emitcode ("mov", "dph,%s", aopGet (AOP (result), 1, FALSE, FALSE));
-	  emitcode ("mov", "b,%s", aopGet (AOP (result), 2, FALSE, FALSE));
-	}
-    }
+  loadDptrFromOperand (result, TRUE);
+  
   /* so dptr know contains the address */
   aopOp (right, ic, FALSE);
 

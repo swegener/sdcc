@@ -51,6 +51,7 @@ operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *,int);
 int isLvaluereq(int lvl);
+void  setOClass (sym_link * ptr, sym_link * spec);
 
 #define PRINTFUNC(x) void x (FILE *of, iCode *ic, char *s)
 /* forward definition of ic print functions */
@@ -1800,7 +1801,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       if (IS_INTEGRAL(optype)) { 
 	// maybe this is NULL, than it's ok. 
 	if (!(IS_LITERAL(optype) && (SPEC_CVAL(optype).v_ulong ==0))) {
-	  if (!TARGET_IS_Z80 && !TARGET_IS_GBZ80 && IS_GENPTR(type)) {
+	  if (port->s.gptr_size > port->s.fptr_size && IS_GENPTR(type)) {
 	    // no way to set the storage
 	    if (IS_LITERAL(optype)) {
 	      werror(E_LITERAL_GENERIC);
@@ -1823,7 +1824,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 	}
       }
     } else { // from a pointer to a pointer
-      if (!TARGET_IS_Z80 && !TARGET_IS_GBZ80) {
+      if (port->s.gptr_size > port->s.fptr_size /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80*/) {
 	// if not a pointer to a function
 	if (!(IS_CODEPTR(type) && IS_FUNC(type->next) && IS_FUNC(optype))) {
 	  if (implicit) { // if not to generic, they have to match 
@@ -2189,7 +2190,6 @@ aggrToPtr (sym_link * type, bool force)
   sym_link *etype;
   sym_link *ptype;
 
-
   if (IS_PTR (type) && !force)
     return type;
 
@@ -2288,13 +2288,13 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   retype = getSpec (operandType (IC_RESULT (ic)));
   SPEC_SCLS (retype) = SPEC_SCLS (etype);
   SPEC_OCLS (retype) = SPEC_OCLS (etype);
-  SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype); /* EEP - I'm doubtful about this */
-
+  SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype);
+  SPEC_CONST (retype) |= SPEC_CONST (etype);
+  
   if (IS_PTR (element->type))
     setOperandType (IC_RESULT (ic), aggrToPtr (operandType (IC_RESULT (ic)), TRUE));
-
+  
   IC_RESULT (ic)->isaddr = (!IS_AGGREGATE (element->type));
-
 
   ADDTOCHAIN (ic);
   return (islval ? IC_RESULT (ic) : geniCodeRValue (IC_RESULT (ic), TRUE));
@@ -2594,11 +2594,10 @@ geniCodeDerefPtr (operand * op,int lvl)
   else
     {
       retype = getSpec (rtype = copyLinkChain (optype->next));
+      /* outputclass needs 2b updated */
+      setOClass (optype, retype);
     }
-
-  /* outputclass needs 2b updated */
-  setOClass (optype, retype);
-
+  
   op->isGptr = IS_GENPTR (optype);
 
   op->isaddr = (IS_PTR (rtype) ||

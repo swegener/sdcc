@@ -397,7 +397,7 @@ _newLineNode (char *line)
 static void
 _vemit2 (const char *szFormat, va_list ap)
 {
-  char buffer[256];
+  char buffer[INITIAL_INLINEASM];
 
   tvsprintf (buffer, sizeof(buffer), szFormat, ap);
 

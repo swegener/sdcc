@@ -1337,17 +1337,25 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		  if (!sym->regs[j])
 		    break;
 		}
-	      /* if it shares registers with operands make sure
+	      
+              /* if it shares registers with operands make sure
 	         that they are in the same position */
-	      if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
-		  OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=')
-		positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-			      OP_SYMBOL (IC_LEFT (ic)));
-	      /* do the same for the right operand */
-	      if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
-		  OP_SYMBOL (IC_RIGHT (ic))->nRegs)
-		positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-			      OP_SYMBOL (IC_RIGHT (ic)));
+	      if (!POINTER_SET(ic) && !POINTER_GET(ic))
+                {
+		  if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
+		      OP_SYMBOL (IC_LEFT (ic))->nRegs)
+                    {
+		      positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+				    OP_SYMBOL (IC_LEFT (ic)));
+		    }
+		  /* do the same for the right operand */
+		  if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
+		      OP_SYMBOL (IC_RIGHT (ic))->nRegs)
+                    {
+		      positionRegs (OP_SYMBOL (IC_RESULT (ic)),
+				    OP_SYMBOL (IC_RIGHT (ic)));
+		    }
+                }
 
 	      if (ptrRegSet)
 		{
@@ -1474,11 +1482,11 @@ static void fillGaps()
 		    /* if left is assigned to registers */
 		    if (IS_SYMOP(IC_LEFT(ic)) && 
 			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_LEFT(ic))->key)) {
-			pdone += positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)));
+			pdone += (positionRegs(sym,OP_SYMBOL(IC_LEFT(ic)))>0);
 		    }
 		    if (IS_SYMOP(IC_RIGHT(ic)) && 
 			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RIGHT(ic))->key)) {
-			pdone += positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)));
+			pdone += (positionRegs(sym,OP_SYMBOL(IC_RIGHT(ic)))>0);
 		    }
 		    if (pdone > 1) break;
 		}
@@ -1488,12 +1496,12 @@ static void fillGaps()
 		    iCode *ic;
 		    if (!(ic = hTabItemWithKey(iCodehTab,i))) continue ;
 		    if (SKIP_IC(ic)) continue;
-		    if (!IS_ASSIGN_ICODE(ic)) continue ;
+		    if (POINTER_SET(ic) || POINTER_GET(ic)) continue ;
 		    
 		    /* if result is assigned to registers */
 		    if (IS_SYMOP(IC_RESULT(ic)) && 
 			bitVectBitValue(_G.totRegAssigned,OP_SYMBOL(IC_RESULT(ic))->key)) {
-			pdone += positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)));
+			pdone += (positionRegs(sym,OP_SYMBOL(IC_RESULT(ic)))>0);
 		    }
 		    if (pdone > 1) break;
 		}

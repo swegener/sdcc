@@ -1,3 +1,14 @@
+2003-04-10  Scott Dattalo  <scott@dattalo.com>
+
+	* src/pic/* Applied the pointer-to-function patch from Steve Tell.
+	* src/pic/* Fixed several pointer bugs. (PIC port broke when the ruonly bit was
+	 set - this bit used to not be set...).
+        * src/pic/gen.c Fixed buf 609268 ==> x = (x+1) & 0xf; generated 
+          bad code in PIC Port
+        * src/regression/and2.c added to test bug 609268
+        * src/regression/Makefile added and2.c to regression test
+
+
 2003-04-08    <johan@CP255758-A>
 
 	* src/mcs51/gen.c (gen51Code): display reg usage in --icode-in-asm

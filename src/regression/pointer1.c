@@ -53,12 +53,14 @@ f2 (unsigned int *uiP)
 
 }
 
+
 unsigned char *
 f3 (void)
 {
 
   return &achar0;
 }
+
 
 void f4(unsigned char *ucP, unsigned char uc)
 {
@@ -100,6 +102,7 @@ void index_by_pointer(unsigned char *index, unsigned char expected_value)
 
 }
 
+
 void
 main (void)
 {
@@ -126,6 +129,9 @@ main (void)
 
   acharP = f3 ();
   if ((acharP == 0) || (*acharP))
+    failures++;
+  achar0 = 42;
+  if(*acharP != 42)
     failures++;
 
   achar0 = 5;

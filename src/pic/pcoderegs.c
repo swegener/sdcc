@@ -37,12 +37,14 @@
 #include "pcodeflow.h"
 
 extern void pCodeInsertAfter(pCode *pc1, pCode *pc2);
+extern void pCodeInsertBefore(pCode *pc1, pCode *pc2);
 extern void dbg_dumpregusage(void);
 extern pCode * findPrevInstruction(pCode *pci);
 extern pBranch * pBranchAppend(pBranch *h, pBranch *n);
 void unlinkpCode(pCode *pc);
 extern int pCodeSearchCondition(pCode *pc, unsigned int cond);
-
+char *pCode2str(char *str, int size, pCode *pc);
+void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...);
 int total_registers_saved=0;
 int register_optimization=1;
 
@@ -233,18 +235,16 @@ void pCodeRegMapLiveRanges(pBlock *pb)
 /*-----------------------------------------------------------------*
  *
  *-----------------------------------------------------------------*/
-static void Remove1pcode(pCode *pc, regs *reg)
+static void Remove1pcode(pCode *pc, regs *reg, int debug_code)
 {
+
   pCode *pcn=NULL;
 
   if(!reg || !pc)
     return;
 
   deleteSetItem (&(reg->reglives.usedpCodes),pc);
-/*
-  fprintf(stderr,"removing instruction:\n");
-  pc->print(stderr,pc);
-*/
+
   if(PCI(pc)->label) {
     pcn = findNextInstruction(pc->next);
 
@@ -264,6 +264,25 @@ static void Remove1pcode(pCode *pc, regs *reg)
 	PCI(pcn)->cline = PCI(pc)->cline;
       }
     }
+  }
+
+
+  if(1){
+    /*
+      Debug stuff. Comment out the instruction we're about to delete.
+    */
+
+    char buff1[256];
+    int size = 256;
+
+    char *pbuff,**ppbuff;
+    pbuff = buff1;
+    ppbuff = &pbuff;
+
+    SAFE_snprintf(ppbuff,&size, ";%d", debug_code);
+    pCode2str(*ppbuff, size, pc);
+    pCodeInsertBefore(pc, newpCodeCharP(buff1));
+    fprintf(stderr,"removing instruction:\n%s\n",buff1);
   }
 
   pc->destruct(pc);
@@ -325,8 +344,8 @@ void  RemoveRegsFromSet(set *regset)
 	    pc->print(stderr,pc);
 	    fprintf(stderr,"reg %s, type =%d\n",r->name, r->type);
 	  }
-	  //fprintf(stderr," removing reg %s because it is used only once\n",reg->name);
-	  Remove1pcode(pc, reg);
+	  fprintf(stderr," removing reg %s because it is used only once\n",reg->name);
+	  Remove1pcode(pc, reg, 1);
 	  /*
 	    unlinkpCode(pc);
 	    deleteSetItem (&(reg->reglives.usedpCodes),pc);
@@ -366,14 +385,16 @@ void RemoveUnusedRegisters(void)
  *-----------------------------------------------------------------*/
 static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int can_free)
 {
+  static int debug_code=99;
   if(!reg)
     return;
 
+  fprintf(stderr,"%s\n",__FUNCTION__);
   if(pc1)
-    Remove1pcode(pc1, reg);
+    Remove1pcode(pc1, reg, debug_code++);
 
   if(pc2) {
-    Remove1pcode(pc2, reg);
+    Remove1pcode(pc2, reg, debug_code++);
     deleteSetItem (&(PCFL(pcflow)->registers), reg);
 
     if(can_free) {
@@ -452,7 +473,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     */
 
     pCode *newpc;
-    //fprintf(stderr, "   CLRF/MOVFW. instruction after MOVFW is:\n");
+    fprintf(stderr, "   CLRF/MOVFW. instruction after MOVFW is:\n");
     pct1 = findNextInstruction(pc2->next);
 
     if(PCI(pct1)->op == POC_MOVWF) {
@@ -470,7 +491,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
     total_registers_saved++;  // debugging stats.
 
   } else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){
-    //fprintf(stderr, "   CLRF/IORFW.\n");
+    fprintf(stderr, "   CLRF/IORFW.\n");
 
     pct2 = findNextInstruction(pc2->next);
 
@@ -514,6 +535,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 
 	  if(pCodeSearchCondition(pct2, PCC_Z) < 1) {
 	    pCode *pct3 = findNextInstruction(pct2->next);
+	    fprintf(stderr,"ABCD\n");
 	    pct2->seq = pc1->seq;
 	    unlinkpCode(pct2);
 	    pCodeInsertAfter(findPrevInstruction(pc1->prev),pct2);
@@ -686,10 +708,10 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 
 	/*
 	  register has been used twice without ever being assigned */
-	//fprintf(stderr,"WARNING %s: reg %s used without being assigned\n",__FUNCTION__,reg->name);
+	fprintf(stderr,"WARNING %s: reg %s used without being assigned\n",__FUNCTION__,reg->name);
 
       } else {
-	//fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
+	fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
 	Remove2pcodes(pcfl_assigned, pc1, pc2, reg, 1);
 	total_registers_saved++;  // debugging stats.
       }
@@ -700,13 +722,13 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
       if(used && !pcfl_used && pcfl_assigned) {
 	pCode *pc;
 
-	//fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
+	fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
 
 	pc = setFirstItem(reg->reglives.usedpCodes);
 	while(pc) {
 
 	  pcfl_assigned = PCODE(PCI(pc)->pcflow);
-	  Remove1pcode(pc, reg);
+	  Remove1pcode(pc, reg,2);
 
 	  deleteSetItem (&(PCFL(pcfl_assigned)->registers), reg);
 	  /*

@@ -96,7 +96,7 @@ void main(void)
   c1 = 1;
   c3 = 5;
 
-  //m1();
+  m1();
 
   uc1 = 0x10;
   m2(2);
@@ -107,7 +107,7 @@ void main(void)
 
   ui3 = ui1*ui2;   // uint = uint * unit
 
-  m3(TESTLIT);
+  //m3(TESTLIT);
 
   success = failures;
   done();

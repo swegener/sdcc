@@ -2227,6 +2227,7 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
     pcop = newpCodeOpReg(-1);
     break;
 
+  case PO_GPR_POINTER:
   case PO_GPR_REGISTER:
     if(name)
       pcop = newpCodeOpRegFromStr(name);
@@ -2511,7 +2512,8 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 	SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
 	return buffer;
       }
-      return PCOR(pcop)->r->name;
+      //return PCOR(pcop)->r->name;
+      return pcop->name;
       break;
     case PO_GPR_TEMP:
       r = pic14_regWithIdx(PCOR(pcop)->r->rIdx);

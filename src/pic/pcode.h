@@ -143,6 +143,7 @@ typedef enum
   PO_GPR_REGISTER,   // A general purpose register
   PO_GPR_BIT,        // A bit of a general purpose register
   PO_GPR_TEMP,       // A general purpose temporary register
+  PO_GPR_POINTER,    // A general purpose pointer
   PO_SFR_REGISTER,   // A special function register (e.g. PORTA)
   PO_PCL,            // Program counter Low register
   PO_PCLATH,         // Program counter Latch high register
@@ -344,6 +345,15 @@ typedef struct pCodeOpRegBit
 				 just a bit of a register */
 } pCodeOpRegBit;
 
+
+typedef struct pCodeOpRegPtr
+{
+  pCodeOpReg  pcor;       // The Register containing this bit
+
+  //  PIC_OPTYPE subtype;     // The type of this register.
+  //  unsigned int inBitSpace: 1; /* True if in bit space, else
+
+} pCodeOpRegPtr;
 
 typedef struct pCodeOpWild
 {

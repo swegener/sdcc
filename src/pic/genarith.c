@@ -118,6 +118,8 @@ const char *pCodeOpType(  pCodeOp *pcop)
       return  "PO_INTCON";
     case  PO_GPR_REGISTER:
       return  "PO_GPR_REGISTER";
+    case  PO_GPR_POINTER:
+      return  "PO_GPR_POINTER";
     case  PO_GPR_BIT:
       return  "PO_GPR_BIT";
     case  PO_GPR_TEMP:

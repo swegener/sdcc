@@ -813,22 +813,34 @@ void aopOp (operand *op, iCode *ic, bool result)
 	}
 
         if (sym->ruonly ) {
-	  /*
-	  sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
-	  aop->aopu.pcop = popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
-	  //allocDirReg (IC_LEFT(ic));
-	  aop->size = getSize(sym->type);
-	  */
+	  if(sym->isptr) {  // && sym->uptr 
+	    aop = op->aop = sym->aop = newAsmop(AOP_PCODE);
+	    aop->aopu.pcop = newpCodeOp(NULL,PO_GPR_POINTER); //popCopyReg(&pc_fsr);
 
-	  unsigned i;
+	    //PCOI(aop->aopu.pcop)->_const = 0;
+	    //PCOI(aop->aopu.pcop)->index = 0;
+	    /*
+	      DEBUGpic14_emitcode(";","%d: rname %s, val %d, const = %d",
+	      __LINE__,sym->rname, 0, PCOI(aop->aopu.pcop)->_const);
+	    */
+	    //allocDirReg (IC_LEFT(ic));
 
-	  aop = op->aop = sym->aop = newAsmop(AOP_STR);
-	  aop->size = getSize(sym->type);
-	  for ( i = 0 ; i < fReturnSizePic ; i++ )
-	    aop->aopu.aop_str[i] = fReturn[i];
+	    aop->size = getSize(sym->type);
+	    DEBUGpic14_emitcode(";","%d",__LINE__);
+	    return;
 
-	  DEBUGpic14_emitcode(";","%d",__LINE__);
-	  return;
+	  } else {
+
+	    unsigned i;
+
+	    aop = op->aop = sym->aop = newAsmop(AOP_STR);
+	    aop->size = getSize(sym->type);
+	    for ( i = 0 ; i < fReturnSizePic ; i++ )
+	      aop->aopu.aop_str[i] = fReturn[i];
+
+	    DEBUGpic14_emitcode(";","%d",__LINE__);
+	    return;
+	  }
         }
 
         /* else spill location  */
@@ -1357,7 +1369,7 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	PCOR(pcop)->instance = offset;
 	pcop->type = PCOR(pcop)->r->pc_type;
 	//rs = aop->aopu.aop_reg[offset]->name;
-	//DEBUGpic14_emitcode(";","%d regiser idx = %d name =%s",__LINE__,rIdx,rs);
+	DEBUGpic14_emitcode(";","%d regiser idx = %d ",__LINE__,rIdx);
 	return pcop;
       }
 
@@ -1640,7 +1652,8 @@ void mov2w (asmop *aop, int offset)
   DEBUGpic14_emitcode ("; ***","%s  %d  offset=%d",__FUNCTION__,__LINE__,offset);
 
   if ( aop->type == AOP_PCODE ||
-       aop->type == AOP_LIT )
+       aop->type == AOP_LIT ||
+       aop->type == AOP_IMMD )
     emitpcode(POC_MOVLW,popGet(aop,offset));
   else
     emitpcode(POC_MOVFW,popGet(aop,offset));
@@ -2156,6 +2169,7 @@ static void assignResultValue(operand * oper)
     size--;
     emitpcode(POC_MOVWF, popGet(AOP(oper),size));
     GpsuedoStkPtr++;
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   }
 
   while (size--) {
@@ -2486,8 +2500,10 @@ static void genCall (iCode *ic)
 static void genPcall (iCode *ic)
 {
     sym_link *dtype;
-    symbol *rlbl = newiTempLabel(NULL);
-
+    symbol *albl = newiTempLabel(NULL);
+    symbol *blbl = newiTempLabel(NULL);
+    PIC_OPCODE poc;
+    operand *left;
 
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
     /* if caller saves & we have not saved then */
@@ -2503,54 +2519,48 @@ static void genPcall (iCode *ic)
         (FUNC_REGBANK(currFunc->type) != FUNC_REGBANK(dtype)))
         saverbank(FUNC_REGBANK(dtype),ic,TRUE);
 
-
-    /* push the return address on to the stack */
-    pic14_emitcode("mov","a,#%05d_DS_",(rlbl->key+100));
-    pic14_emitcode("push","acc");    
-    pic14_emitcode("mov","a,#(%05d_DS_ >> 8)",(rlbl->key+100));
-    pic14_emitcode("push","acc");
-    
-    if (options.model == MODEL_FLAT24)
-    {
-    	pic14_emitcode("mov","a,#(%05d_DS_ >> 16)",(rlbl->key+100));
-    	pic14_emitcode("push","acc");    
-    }
-
-    /* now push the calling address */
-    aopOp(IC_LEFT(ic),ic,FALSE);
+    left = IC_LEFT(ic);
+    aopOp(left,ic,FALSE);
+    DEBUGpic14_AopType(__LINE__,left,NULL,NULL);
 
     pushSide(IC_LEFT(ic), FPTRSIZE);
 
+    /* if send set is not empty, assign parameters */
+    if (_G.sendSet) {
+
+	DEBUGpic14_emitcode ("; ***","%s  %d - WARNING arg-passing to indirect call not supported",__FUNCTION__,__LINE__);
+	/* no way to pass args - W always gets used to make the call */
+    }
+/* first idea - factor out a common helper function and call it.
+   But don't know how to get it generated only once in its own block
+
+    if(AOP_TYPE(IC_LEFT(ic)) == AOP_DIR) {
+	    char *rname;
+	    char *buffer;
+	    rname = IC_LEFT(ic)->aop->aopu.aop_dir;
+	    DEBUGpic14_emitcode ("; ***","%s  %d AOP_DIR %s",__FUNCTION__,__LINE__,rname);
+	    buffer = Safe_calloc(1,strlen(rname)+16);
+	    sprintf(buffer, "%s_goto_helper", rname);
+	    addpCode2pBlock(pb,newpCode(POC_CALL,newpCodeOp(buffer,PO_STR)));
+	    free(buffer);
+    }
+*/
+    emitpcode(POC_CALL,popGetLabel(albl->key));
+    emitpcode(POC_GOTO,popGetLabel(blbl->key));
+    emitpLabel(albl->key);
+
+    poc = ( (AOP_TYPE(left) == AOP_PCODE) ? POC_MOVLW : POC_MOVFW);
+    
+    emitpcode(poc,popGet(AOP(left),1));
+    emitpcode(POC_MOVWF,popCopyReg(&pc_pclath));
+    emitpcode(poc,popGet(AOP(left),0));
+    emitpcode(POC_MOVWF,popCopyReg(&pc_pcl));
+
+    emitpLabel(blbl->key);
+
     freeAsmop(IC_LEFT(ic),NULL,ic,TRUE); 
 
-    /* if send set is not empty the assign */
-    if (_G.sendSet) {
-	iCode *sic ;
-
-	for (sic = setFirstItem(_G.sendSet) ; sic ; 
-	     sic = setNextItem(_G.sendSet)) {
-	    int size, offset = 0;
-	    aopOp(IC_LEFT(sic),sic,FALSE);
-	    size = AOP_SIZE(IC_LEFT(sic));
-	    while (size--) {
-		char *l = aopGet(AOP(IC_LEFT(sic)),offset,
-				FALSE,FALSE);
-		if (strcmp(l,fReturn[offset]))
-		    pic14_emitcode("mov","%s,%s",
-			     fReturn[offset],
-			     l);
-		offset++;
-	    }
-	    freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
-	}
-	_G.sendSet = NULL;
-    }
-
-    pic14_emitcode("ret","");
-    pic14_emitcode("","%05d_DS_:",(rlbl->key+100));
-
-
-    /* if we need assign a result value */
+    /* if we need to assign a result value */
     if ((IS_ITEMP(IC_RESULT(ic)) &&
          (OP_SYMBOL(IC_RESULT(ic))->nRegs ||
           OP_SYMBOL(IC_RESULT(ic))->spildir)) ||
@@ -2563,20 +2573,6 @@ static void genPcall (iCode *ic)
 	assignResultValue(IC_RESULT(ic));
 
         freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
-    }
-
-    /* adjust the stack for parameters if 
-    required */
-    if (ic->parmBytes) {
-        int i;
-        if (ic->parmBytes > 3) {
-            pic14_emitcode("mov","a,%s",spname);
-            pic14_emitcode("add","a,#0x%02x", (- ic->parmBytes) & 0xff);
-            pic14_emitcode("mov","%s,a",spname);
-        } else 
-            for ( i = 0 ; i <  ic->parmBytes ;i++)
-                pic14_emitcode("dec","%s",spname);
-
     }
 
     /* if register bank was saved then unsave them */
@@ -3016,8 +3012,10 @@ static void genRet (iCode *ic)
       l = aopGet(AOP(IC_LEFT(ic)),offset,
 		 FALSE,FALSE);
       if (strcmp(fReturn[offset],l)) {
-	if( ( (AOP(IC_LEFT(ic))->type) == AOP_IMMD) ||
-	    ((AOP(IC_LEFT(ic))->type) == AOP_LIT) ) {
+      if ((((AOP(IC_LEFT(ic))->type) == AOP_PCODE) && 
+	   AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE) ||
+	  ( (AOP(IC_LEFT(ic))->type) == AOP_IMMD) ||
+	  ( (AOP(IC_LEFT(ic))->type) == AOP_LIT) ) {
 	  emitpcode(POC_MOVLW, popGet(AOP(IC_LEFT(ic)),offset));
 	}else {
 	  emitpcode(POC_MOVFW, popGet(AOP(IC_LEFT(ic)),offset));
@@ -9337,6 +9335,10 @@ static void genAssign (iCode *ic)
 	emitpcode(POC_BTFSS, popGet(AOP(right),0));
 	emitpcode(POC_INCF, popGet(AOP(result),0));
       }
+    } else if (AOP_TYPE(right) == AOP_IMMD) {
+	    DEBUGpic14_emitcode ("; ***","%s  %d AOP_IMMD",__FUNCTION__,__LINE__);
+	    emitpcode(POC_MOVLW, popGet(AOP(right),offset));
+	    emitpcode(POC_MOVWF, popGet(AOP(result),offset));
     } else {
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
       emitpcode(POC_MOVFW, popGet(AOP(right),offset));

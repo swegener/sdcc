@@ -9,7 +9,8 @@ fi
 
 # compile
 ../../bin/sdcc -S -mpic14 $1.c
-gpasm -c  -I /usr/local/share/gpasm/header $1.asm
+#gpasm -c  -I /usr/local/share/gpasm/header $1.asm
+gpasm  $1.asm
 ./create_stc $1.cod $1.stc
 ./simulate $1.stc garbage.log
 cat garbage.log

@@ -2436,12 +2436,20 @@ regTypeNum ()
 
       /* if used in return only then we don't 
 	 need registers */
-      if (sym->ruonly || sym->accuse) {
+      if (sym->accuse) {
 	if (IS_AGGREGATE (sym->type) || sym->isptr)
 	  sym->type = aggrToPtr (sym->type, FALSE);
-	debugLog ("  %d - no reg needed - used as a return\n", __LINE__);
+	debugLog ("  %d - no reg needed - accumulator used\n", __LINE__);
 
 	continue;
+      }
+
+      if (sym->ruonly) {
+	//if (IS_AGGREGATE (sym->type) || sym->isptr)
+	//  sym->type = aggrToPtr (sym->type, FALSE);
+	debugLog ("  %d - used as a return\n", __LINE__);
+
+	//continue;
       }
 
       /* if the symbol has only one definition &

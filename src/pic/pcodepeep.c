@@ -1712,7 +1712,8 @@ int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	    case PO_GPR_TEMP:
 	    case PO_FSR:
 	      //case PO_INDF:
-	      n = PCOR(PCI(pcs)->pcop)->r->name;
+	      //n = PCOR(PCI(pcs)->pcop)->r->name;
+	      n = PCI(pcs)->pcop->name;
 
 	      break;
 	    default:
@@ -1863,6 +1864,26 @@ void pCodeInsertAfter(pCode *pc1, pCode *pc2)
 
 }
 
+/*------------------------------------------------------------------*/
+/*  pCodeInsertBefore - splice in the pCode chain starting with pc2 */
+/*                      into the pCode chain containing pc1         */
+/*------------------------------------------------------------------*/
+void pCodeInsertBefore(pCode *pc1, pCode *pc2)
+{
+
+  if(!pc1 || !pc2)
+    return;
+
+  pc2->prev = pc1->prev;
+  if(pc1->prev)
+    pc1->prev->next = pc2;
+
+  pc2->pb = pc1->pb;
+  pc2->next = pc1;
+  pc1->prev = pc2;
+
+}
+
 /*-----------------------------------------------------------------*/
 /* pCodeOpCopy - copy a pcode operator                             */
 /*-----------------------------------------------------------------*/
@@ -1927,6 +1948,7 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     return pcopnew;
     break;
 
+  case PO_GPR_POINTER:
   case PO_GPR_REGISTER:
   case PO_GPR_TEMP:
   case PO_FSR:

@@ -157,7 +157,7 @@ void	werror (int errNum, ... )
 	if ( ErrTab[errNum].errType== ERROR )
 		fatalError++ ;
 	
-	if ( lineno ) {
+	if ( filename && lineno ) {
 		fprintf(stderr,"%s(%d):",filename,lineno);
 	}
 	va_start(marker,errNum);

@@ -7,20 +7,20 @@ replace restart {
 	jp	%4,%5
 }
 replace {
-	ld	%1,%2)
-	ld	a,%2)
+	ld	%1,%2
+	ld	a,%2
 } by {
-        ld      %1,%2)
-        ld      a,%1
+	ld	%1,%2
+	ld	a,%1
 }
 replace {
-	ld	%1),a
+	ld	%1,a
 	xor	a,a
-	or	a,%1)
+	or	a,%1
 	jp	z,%2
 } by {
-        ld      %1),a
-        or      a,a
+	ld	%1,a
+	or	a,a
 	jp	z,%2
 }
 replace {
@@ -29,17 +29,141 @@ replace {
 	rla
 } by {
 	rlca
-        and     a,#0x01
+	and	a,#0x01
 }
 replace {
 	ld	%3,a
-	ld	l,%1)
-	ld	h,%2)
+	ld	l,%1
+	ld	h,%2
 	ld	l,(hl)
 	ld	a,%3
 } by {
 	ld	%3,a
-	ld	l,%1)
-	ld	h,%2)
+	ld	l,%1
+	ld	h,%2
 	ld	l,(hl)
+} if notVolatile %3
+
+;
+;--------------------------
+;
+replace restart {
+	pop	%1
+	push	%1
+	ld	%1,%2
+} by {
+	;	z80 removed redundant pop/push
+	ld	%1,%2
 }
+;
+;replace restart {
+	ld	a,%1
+	add	a,#0x01
+	ld	l,a
+} by {
+	;	z80 improved usage of 'inc'
+	ld	l,%1
+	inc	l
+	ld	a,l
+}
+
+replace restart {
+	ld	a,%1
+	add	a,#0xFF
+	ld	l,a
+} by {
+	;	z80 improved usage of 'dec'
+	ld	l,%1
+	dec	l
+	ld	a,l
+}
+
+replace restart {
+	ld	l,a
+	ld	c,%1
+	ld	a,l
+} by {
+	ld	l,a
+	ld	c,%1
+}
+
+replace restart {
+	ld	c,l
+	ld	a,c
+	and	a,#%1
+	ld	c,a
+	or	a,a
+} by {
+	;	z80 stream lining 'and' logic
+	ld	a,#%1
+	and	a,l
+	ld	c,a
+}
+
+replace restart {
+	ld	a,c
+	and	a,#%1
+	ld	c,a
+	or	a,a
+} by {
+	;	z80 stream lining 'and' logic
+	ld	a,#%1
+	and	a,c
+	ld	c,a
+}
+
+replace restart {
+	ld	a,c
+	or	a,#%1
+	ld	c,a
+} by {
+	;	z80 stream lining 'or' logic
+	ld	a,#%1
+	or	a,c
+	ld	c,a
+}
+
+; I don't think this works. neg does a unary minus of A, not HL  -- EEP
+;
+;replace {
+;	ld	a,c
+;	sub	a,%1
+;	ld	l,a
+;	ld	a,b
+;	sbc	a,%2
+;	ld	h,a
+;} by {
+;	;	z80/z180 peephole byte pointer subtraction
+;	xor	a
+;	ld	h,%1
+;	ld	l,%2
+;	sbc	hl,bc
+;	neg
+;}
+
+replace {
+%1:
+	in0     a,(%2)
+	and	a,#%3
+	jp	z,%4
+%5:
+	jp	%6
+%4:
+	call	%7
+	jp	%1
+%6:
+	ret
+} by {
+%1:
+	in0     a,(%2)
+	and	a,#%3
+	jp	nz,%5
+%4:
+	call	%7
+	jp	%1
+%5:
+%6:
+	ret
+}
+
+

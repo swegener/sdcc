@@ -1657,14 +1657,18 @@ glue (void)
   if (port->assembler.externGlobal)
     printExterns (asmFile);
 
-  if(mcs51_like)
+  if(( mcs51_like )
+   ||( TARGET_IS_Z80 )) /*.p.t.20030924 need to output SFR table for Z80 as well */
   {
       /* copy the sfr segment */
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; special function registers\n");
       fprintf (asmFile, "%s", iComments2);
       copyFile (asmFile, sfr->oFile);
-
+  }
+  
+  if(mcs51_like)
+  {
       /* copy the sbit segment */
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; special function bits \n");

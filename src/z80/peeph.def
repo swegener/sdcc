@@ -6,7 +6,7 @@ replace {
 replace restart {
 	ld %1,%1
 } by {
-        ; Removed redundent load
+	; Removed redundent load
 }
 replace restart {
 	xor a,a
@@ -94,26 +94,32 @@ replace restart {
 	xor	a,a
 	ld	a,#0x00
 } by {
-        xor     a,a
+	xor     a,a
 }
 replace {
-        ld      e,#0x00
-        ld      d,#0x00
+	ld	e,#0x00
+	ld	d,#0x00
 } by {
-        ld      de,#0x0000
+	ld	de,#0x0000
 }
 replace {
 	ld	l,#0x00
 	ld	h,#0x00
 } by {
-        ld      hl,#0x0000
+	ld	hl,#0x0000
+}
+replace {
+	ld	c,#0x00
+	ld	b,#0x00
+} by {
+	ld	bc,#0x0000
 }
 replace restart {
 	ld	%1,a
 	ld	a,%1
 } by {
-        ld	%1,a
-}
+	ld	%1,a
+} if notVolatile %1
 replace restart {
 	jp	%1,%2
 	jr	%3
@@ -133,14 +139,14 @@ replace {
 	ld	h,b
 	push	hl
 } by {
-        push	de
-        push    bc
+	push	de
+	push	bc
 }
 replace {
 	and	a,#%1
 	or	a,a
 } by {
-        and     a,#%1
+	and	a,#%1
 }
 replace {
 	ld	b,l
@@ -167,16 +173,16 @@ replace {
 	push	af
 	inc	sp
 } by {
-        push    bc
-        inc     sp
+	push	bc
+	inc	sp
 }
 replace {
 	ld	a,d
 	push	af
 	inc	sp
 } by {
-        push    de
-        inc     sp
+	push	de
+	inc	sp
 }
 replace {
 	ld	a,%1
@@ -210,3 +216,4 @@ replace {
 	ld	%1,%2
 	ld	%3,%4
 }
+

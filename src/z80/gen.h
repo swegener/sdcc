@@ -71,9 +71,11 @@ typedef struct asmop
     AOP_TYPE type;
     short coff;                 /* current offset */
     short size;                 /* total size */
-    bool code;                  /* is in Code space */
-    bool paged;                 /* in paged memory  */
-    bool freed;                 /* already freed    */
+    unsigned  code:1;               /* is in Code space */
+    unsigned  paged:1;              /* in paged memory  */
+    unsigned  freed:1;              /* already freed    */
+    unsigned  bcInUse:1;
+    unsigned  deInUse:1;
     union
       {
         value *aop_lit;         /* if literal */

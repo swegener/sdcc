@@ -105,7 +105,7 @@ bool uselessDecl = TRUE;
 %type <sym> declarator2_function_attributes while do for critical
 %type <lnk> pointer type_specifier_list type_specifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier
-%type <lnk> declaration_specifiers  sfr_reg_bit type_specifier2
+%type <lnk> declaration_specifiers sfr_reg_bit sfr_attributes type_specifier2
 %type <lnk> function_attribute function_attributes enum_specifier
 %type <lnk> abstract_declarator abstract_declarator2 unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
@@ -686,11 +686,23 @@ sfr_reg_bit
                SPEC_NOUN($$) = V_SBIT;
                SPEC_SCLS($$) = S_SBIT;
             }
-   |  SFR   {
+   |  sfr_attributes
+   ;
+
+sfr_attributes
+   : SFR    {
                $$ = newLink(SPECIFIER) ;
-               SPEC_NOUN($$) = V_CHAR;
-               SPEC_SCLS($$) = S_SFR ;
-	       SPEC_USIGN($$) = 1 ;
+               FUNC_REGBANK($$) = 0;
+               SPEC_NOUN($$)    = V_CHAR;
+               SPEC_SCLS($$)    = S_SFR ;
+               SPEC_USIGN($$)   = 1 ;
+            }
+   | SFR BANKED {
+               $$ = newLink(SPECIFIER) ;
+               FUNC_REGBANK($$) = 1;
+               SPEC_NOUN($$)    = V_CHAR;
+               SPEC_SCLS($$)    = S_SFR ;
+               SPEC_USIGN($$)   = 1 ;
             }
    ;
 

@@ -16,6 +16,8 @@ typedef struct
   {
     Z80_SUB_PORT sub;
     int calleeSavesBC;
+    int port_mode;
+    int port_back;
   }
 Z80_OPTS;
 

@@ -790,18 +790,34 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
       return aop;
     }
 
-  if (IS_GB)
+  if( IN_REGSP( space ))
+  { /*.p.t.20030716 minor restructure to add SFR support to the Z80 */
+    if (IS_GB)
     {
       /* if it is in direct space */
-      if (IN_REGSP (space) && !requires_a)
-	{
-	  sym->aop = aop = newAsmop (AOP_SFR);
-	  aop->aopu.aop_dir = sym->rname;
-	  aop->size = getSize (sym->type);
+      if( !requires_a )
+      {
+        sym->aop = aop = newAsmop (AOP_SFR);
+        aop->aopu.aop_dir = sym->rname;
+        aop->size = getSize (sym->type);
 	  emitDebug ("; AOP_SFR for %s", sym->rname);
-	  return aop;
-	}
+        return aop;
+      }
     }
+    else
+    { /*.p.t.20030716 adding SFR support to the Z80 port */
+      aop = newAsmop (AOP_SFR);
+      sym->aop          = aop;
+      aop->aopu.aop_dir = sym->rname;
+      aop->size         = getSize( sym->type );
+      aop->paged        = FUNC_REGBANK(sym->type);
+      aop->bcInUse      = isPairInUse( PAIR_BC, ic );
+      aop->deInUse      = isPairInUse( PAIR_DE, ic );
+      emitDebug( ";Z80 AOP_SFR for %s banked:%d bc:%d de:%d", sym->rname, FUNC_REGBANK(sym->type), aop->bcInUse, aop->deInUse );
+
+      return( aop );
+    }
+  }
 
   /* only remaining is far space */
   /* in which case DPTR gets the address */
@@ -994,6 +1010,11 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
   /* if already has a asmop then continue */
   if (op->aop)
     {
+      if (op->aop->type == AOP_SFR)
+        {
+          op->aop->bcInUse = isPairInUse( PAIR_BC, ic );
+          op->aop->deInUse = isPairInUse( PAIR_DE, ic );
+        }
       return;
     }
 
@@ -1001,6 +1022,11 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
     {
       op->aop = OP_SYMBOL (op)->aop;
+      if (op->aop->type == AOP_SFR)
+        {
+          op->aop->bcInUse = isPairInUse( PAIR_BC, ic );
+          op->aop->deInUse = isPairInUse( PAIR_DE, ic );
+        }
       return;
     }
 
@@ -1646,11 +1672,41 @@ aopGet (asmop * aop, int offset, bool bit16)
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_SFR:
-      wassert (IS_GB);
-      emit2 ("ldh a,(%s+%d)", aop->aopu.aop_dir, offset);
-      SNPRINTF (buffer, sizeof(buffer), "a");
+      if( IS_GB )
+      {
+        // wassert (IS_GB);
+        emit2 ("ldh a,(%s+%d)", aop->aopu.aop_dir, offset);
+        SNPRINTF (buffer, sizeof(buffer), "a");
 
-      return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
+        return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
+      }
+      else
+      { /*.p.t.20030716 handling for i/o port read access for Z80 */
+        if( aop->paged )
+        { /* banked mode */
+          if( aop->bcInUse )  emit2( "push bc" );
+
+          emit2( "ld bc,#%s", aop->aopu.aop_dir );
+          emit2( "in a,(c)" );
+
+          if( aop->bcInUse )
+            emit2( "pop bc" );
+          else
+            spillPair (PAIR_BC);
+        }
+        else if( z80_opts.port_mode == 180 )
+        { /* z180 in0/out0 mode */
+          emit2( "in0 a,(%s)", aop->aopu.aop_dir );
+        }
+        else
+        { /* 8 bit mode */
+          emit2( "in a,(%s)", aop->aopu.aop_dir );
+        }
+        
+        SNPRINTF (buffer, sizeof(buffer), "a");
+
+        return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
+      }
 
     case AOP_REG:
       return aop->aopu.aop_reg[offset]->name;
@@ -1815,10 +1871,49 @@ aopPut (asmop * aop, const char *s, int offset)
       break;
 
     case AOP_SFR:
-      wassert (IS_GB);
-      if (strcmp (s, "a"))
-	emit2 ("ld a,%s", s);
-      emit2 ("ldh (%s+%d),a", aop->aopu.aop_dir, offset);
+      if( IS_GB )
+      {
+        //  wassert (IS_GB);
+        if (strcmp (s, "a"))
+          emit2 ("ld a,%s", s);
+        emit2 ("ldh (%s+%d),a", aop->aopu.aop_dir, offset);
+      }
+      else
+      { /*.p.t.20030716 handling for i/o port read access for Z80 */
+        if( aop->paged )
+        { /* banked mode */
+          if( aop->bcInUse )  emit2( "push bc" );
+
+          emit2( "ld bc,#%s", aop->aopu.aop_dir );
+
+          if(( s[0] == '#'    ) /* immediate number */
+           ||( s[0] == '('    ) /* indirect register (ix or iy ??)*/
+           ||( isdigit( s[0] )))/* indirect register with offset (ix or iy ??)*/
+          {
+            emit2( "ld a,%s", s );
+            emit2( "out (c),a"  );
+          }
+          else
+          {
+            emit2( "out (c),%s", s );
+          }
+        
+          if( aop->bcInUse )
+            emit2( "pop bc"    );
+          else
+            spillPair (PAIR_BC);
+        }
+        else if( z80_opts.port_mode == 180 )
+        { /* z180 in0/out0 mode */
+          emit2( "ld a,%s", s );
+          emit2( "out0 (%s),a", aop->aopu.aop_dir );
+        }
+        else
+        { /* 8 bit mode */
+          emit2( "ld a,%s", s );
+          emit2( "out (%s),a", aop->aopu.aop_dir );
+        }
+      }
       break;
 
     case AOP_REG:
@@ -1974,7 +2069,7 @@ aopPut (asmop * aop, const char *s, int offset)
 #define AOP(op) op->aop
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
-#define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY))
+#define AOP_NEEDSACC(x) (AOP(x) && ((AOP_TYPE(x) == AOP_CRY) || (AOP_TYPE(x) == AOP_SFR)))
 
 static void
 commitPair (asmop * aop, PAIR_ID id)
@@ -3102,8 +3197,9 @@ genFunction (iCode * ic)
     emit2 ("!enterxl", sym->stack);
   else if (sym->stack)
     emit2 ("!enterx", sym->stack);
-  else
+  else if( !FUNC_ISNAKED( sym->type )) /*.p.t.20030716 - now supporting Naked funcitons */
     emit2 ("!enter");
+
   _G.stack.offset = sym->stack;
 }
 
@@ -3139,7 +3235,7 @@ genEndFunction (iCode * ic)
         {
           emit2 ("!leavex", _G.stack.offset);
         }
-      else
+      else if( !FUNC_ISNAKED( sym->type )) /*.p.t.20030716 - now supporting Naked funcitons */
         {
           emit2 ("!leave");
         }
@@ -3535,7 +3631,7 @@ genPlus (iCode * ic)
      in ACC */
 
   if ((AOP_TYPE (IC_LEFT (ic)) == AOP_LIT) ||
-      (AOP_NEEDSACC (IC_LEFT (ic))) ||
+      (AOP_NEEDSACC (IC_RIGHT (ic))) ||
       AOP_TYPE (IC_RIGHT (ic)) == AOP_ACC)
     {
       operand *t = IC_RIGHT (ic);
@@ -4901,7 +4997,7 @@ genAnd (iCode * ic, iCode * ifx)
 
   /* if left is a literal & right is not then exchange them */
   if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
-      AOP_NEEDSACC (left))
+      (AOP_NEEDSACC (right) && !AOP_NEEDSACC (left)))
     {
       operand *tmp = right;
       right = left;
@@ -5091,7 +5187,7 @@ genOr (iCode * ic, iCode * ifx)
 
   /* if left is a literal & right is not then exchange them */
   if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
-      AOP_NEEDSACC (left))
+      (AOP_NEEDSACC (right) && !AOP_NEEDSACC (left)))
     {
       operand *tmp = right;
       right = left;
@@ -5249,7 +5345,7 @@ genXor (iCode * ic, iCode * ifx)
 
   /* if left is a literal & right is not then exchange them */
   if ((AOP_TYPE (left) == AOP_LIT && AOP_TYPE (right) != AOP_LIT) ||
-      AOP_NEEDSACC (left))
+      (AOP_NEEDSACC (right) && !AOP_NEEDSACC (left)))
     {
       operand *tmp = right;
       right = left;
@@ -5326,9 +5422,9 @@ genXor (iCode * ic, iCode * ifx)
 		continue;
 	      else
 		{
-		  _moveA (aopGet (AOP (right), offset, FALSE));
+		  _moveA (aopGet (AOP (left), offset, FALSE));
 		  emit2 ("xor a,%s",
-			    aopGet (AOP (left), offset, FALSE));
+			    aopGet (AOP (right), offset, FALSE));
 		  aopPut (AOP (result), "a", offset);
 		}
 	    }
@@ -5340,9 +5436,9 @@ genXor (iCode * ic, iCode * ifx)
                 }
 	      else
 		{
-		  _moveA (aopGet (AOP (right), offset, FALSE));
+		  _moveA (aopGet (AOP (left), offset, FALSE));
 		  emit2 ("xor a,%s",
-			    aopGet (AOP (left), offset, FALSE));
+			    aopGet (AOP (right), offset, FALSE));
 		  aopPut (AOP (result), "a", offset);
 		}
 	    }
@@ -5378,9 +5474,9 @@ genXor (iCode * ic, iCode * ifx)
               }
 	    else
 	      {
-		_moveA (aopGet (AOP (right), offset, FALSE));
+		_moveA (aopGet (AOP (left), offset, FALSE));
 		emit2 ("xor a,%s",
-			  aopGet (AOP (left), offset, FALSE));
+			  aopGet (AOP (right), offset, FALSE));
 	      }
 	    aopPut (AOP (result), "a", offset);
 	  }

@@ -45,8 +45,9 @@ Z80_OPTS z80_opts;
 
 static OPTION _z80_options[] = 
   {
-    { 0,   "--callee-saves-bc", &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, NULL }
+    {  0,   "--callee-saves-bc", &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
+    { 80,   "--portmode",        &z80_opts.port_mode,     "Determine PORT I/O mode (z80/z180)" },
+    {  0, NULL }
   };
 
 typedef enum
@@ -72,6 +73,8 @@ static char *_keywords[] =
   "sfr",
   "nonbanked",
   "banked",
+  "at",       //.p.t.20030714 adding support for 'sfr at ADDR' construct
+  "_naked",   //.p.t.20030714 adding support for '_naked' functions
   NULL
 };
 
@@ -127,33 +130,32 @@ _reg_parm (sym_link * l)
         }
     }
 }
-
 static int
 _process_pragma (const char *sz)
 {
-  if (startsWith (sz, "bank="))
+  if( startsWith( sz, "bank=" ))
+  {
+    char buffer[128];
+    strcpy (buffer, sz + 5);
+    chomp (buffer);
+    if (isdigit (buffer[0]))
     {
-      char buffer[128];
-      strcpy (buffer, sz + 5);
-      chomp (buffer);
-      if (isdigit (buffer[0]))
-	{
 
-	}
-      else if (!strcmp (buffer, "BASE"))
-	{
-	  strcpy (buffer, "HOME");
-	}
-      if (isdigit (buffer[0]))
-	{
+    }
+    else if (!strcmp (buffer, "BASE"))
+    {
+      strcpy (buffer, "HOME");
+    }
+    if (isdigit (buffer[0]))
+    {
 	  /* Arg was a bank number.  Handle in an ASM independent
 	     way. */
-	  char num[128];
-	  strcpy (num, sz + 5);
-	  chomp (num);
+      char num[128];
+      strcpy (num, sz + 5);
+      chomp (num);
 
-	  switch (_G.asmType)
-	    {
+      switch (_G.asmType)
+      {
 	    case ASM_TYPE_ASXXXX:
 	      sprintf (buffer, "CODE_%s", num);
 	      break;
@@ -166,12 +168,28 @@ _process_pragma (const char *sz)
 	      break;
 	    default:
 	      wassert (0);
-	    }
-	}
-      gbz80_port.mem.code_name = Safe_strdup (buffer);
-      code->sname = gbz80_port.mem.code_name;
-      return 0;
+      }
     }
+    gbz80_port.mem.code_name = Safe_strdup (buffer);
+    code->sname = gbz80_port.mem.code_name;
+    return 0;
+  }
+  else if( startsWith( sz, "portmode=" ))
+  { /*.p.t.20030716 - adding pragma to manipulate z80 i/o port addressing modes */
+    char bfr[128];
+
+    strcpy( bfr, sz + 9 );
+    chomp( bfr );
+
+    if     ( !strcmp( bfr, "z80"     )){ z80_opts.port_mode =  80; }
+    else if( !strcmp( bfr, "z180"    )){ z80_opts.port_mode = 180; }
+    else if( !strcmp( bfr, "save"    )){ z80_opts.port_back = z80_opts.port_mode; }
+    else if( !strcmp( bfr, "restore" )){ z80_opts.port_mode = z80_opts.port_back; }
+    else                                 return( 1 );
+
+    return( 0 );
+  }
+
   return 1;
 }
 

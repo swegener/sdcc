@@ -3894,7 +3894,7 @@ bool aopOp3(iCode * ic)
 {
     bool dp1InUse, dp2InUse;
     bool useDp2;
-    
+
     // First, generate the right opcode. DPTR may be used if neither left nor result are
     // of type AOP_STR.
     
@@ -3954,13 +3954,17 @@ bool aopOp3(iCode * ic)
         
     // We've op'd the left & right. So, if left or right are the same operand as result, 
     // we know aopOp will succeed, and we can just do it & bail.
-    if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)) ||
-	isOperandEqual(IC_RIGHT(ic),IC_RESULT(ic)))
-    {
-//	D(emitcode(";", "aopOp3: (left | right) & result equal"););
-	aopOp(IC_RESULT(ic),ic,TRUE, FALSE);
+    if (isOperandEqual(IC_LEFT(ic),IC_RESULT(ic)))
+      {
+	aopOp (IC_RESULT (ic), ic, TRUE, AOP_USESDPTR2 (IC_LEFT (ic)));
 	return TRUE;
-    }
+      }
+    if (isOperandEqual(IC_RIGHT(ic),IC_RESULT(ic)))
+      {
+//	D(emitcode(";", "aopOp3: (left | right) & result equal"););
+	aopOp(IC_RESULT(ic),ic,TRUE, AOP_USESDPTR2 (IC_RIGHT (ic)));
+	return TRUE;
+      }
     
     // Operands may be equivalent (but not equal) if they share a spill location. If
     // so, use the same DPTR or DPTR2.

@@ -1,3 +1,8 @@
+2004-01-16 Klaus Flittner <klaus_flittner@gmx.de>
+
+	* src/ds390/gen.c (aopOp3): fixed the assignment of different dptrs to
+	equal operands
+
 2004-01-16 Vangelis Rokas <vrokas@otenet.gr>
 
 	* src/SDCCmain.c (linkEdit): variable $3 of the linker command is

@@ -2265,12 +2265,12 @@ static int findLabelBackwards(iCode *ic, int key)
         
         if (ic->op == LABEL && IC_LABEL(ic)->key == key)
         {
-            printf("findLabelBackwards = %d\n", count);
+            /* printf("findLabelBackwards = %d\n", count); */
             return count;
         }
     }
     
-    printf("findLabelBackwards: not found.\n");
+    /* printf("findLabelBackwards: not found.\n"); */
     
     return 0;
 }

@@ -25,150 +25,87 @@
 
 #include "common.h"
 
-/*-----------------------------------------------------------------*/
-/* pointerArithOpts - does some pointer arithmetic operations      */
-/*-----------------------------------------------------------------*/
- int pointerArithOpts (iCode *ic,  hTab *ptrs)
+/*-----------------------------------------------------------------------*/
+/* findPointerGetSet - find the pointer get or set for a operand         */
+/*-----------------------------------------------------------------------*/
+static iCode *findPointerGetSet(iCode *sic,operand *op)
 {
-    operand *asym ;
-    long  cval;
-    hashtItem *htip;
-    induction *ip ;
-    int lr = 0 ;
+    iCode *ic = sic;
 
-    /* the aim here is to reduce the arithmetics performed */
-    /* during repeated pointer access . for eg. there are  */
-    /* lot of places the code generated looks like this    */
-    /*  iTempNN = &[somevar]                               */
-    /*  iTempNX = iTempNN + constant-1                     */
-    /*  *(iTempNX) := somevalue                            */
-    /*  iTempNY = iTempNN + constant-2                     */
-    /*  *(iTempNY) := somevalue                            */
-    /*          we want to change this sequence to         */
-    /*  iTempNN = &[somevar]                               */
-    /*  iTempNN = iTempNN + constant-1                     */
-    /*  (*iTempNN) := someValue                            */
-    /* WHY ? this will reduce the number of definitions    */
-    /* as well as help us in register allocation           */
-    
-    /* first check if +/- */
-    if (ic->op != '+' && ic->op != '-' )
-	return 0;
+    for (; ic ; ic = ic->next) {
+	if ((POINTER_SET(ic) && isOperandEqual(op,IC_RESULT(ic))) ||
+	    (POINTER_GET(ic) && isOperandEqual(op,IC_LEFT(ic))))
+	    return ic;
 
-    /* if the result is not an iTemp */
-    if (!IS_ITEMP(IC_RESULT(ic)))
-	return 0;
+	/* if we find any other usage or definition of op null */
+	if (IC_RESULT(ic) && isOperandEqual(IC_RESULT(ic),op))
+	    return NULL;
 
-    /* if +/- then check if one of them is literal */
-    if (! IS_OP_LITERAL(IC_LEFT(ic)) &&
-	! IS_OP_LITERAL(IC_RIGHT(ic)) )
-	return 0;
+	if (IC_RIGHT(ic) && isOperandEqual(IC_RIGHT(ic),op))
+	    return NULL;
+	
+	if (IC_LEFT(ic) && isOperandEqual(IC_LEFT(ic),op))
+	    return NULL;
 
-    /* get the operand & literal value */
-    if  (IS_OP_LITERAL(IC_LEFT(ic))) {
-	    cval = operandLitValue(IC_LEFT(ic));
-	    asym = IC_RIGHT(ic) ;
-    } else {
-	cval = operandLitValue(IC_RIGHT(ic)) ;
-	lr++ ;
-	asym = IC_LEFT(ic);
     }
 
-    /* if this symbol does not exist the address of */
-    /* or if the symbol is the same as the result   */
-    if (asym->key == IC_RESULT(ic)->key ||
-	(htip = hTabSearch(ptrs,asym->key)) == NULL )
-	return 0;
-    
-    ip = htip->item;
-
-    
-    /* if the constant value in induction is zero */
-    /* then we just change the operand            */
-    if (ip->cval == 0) {	
-	ip->asym = IC_RESULT(ic) ;
-	ip->cval = cval ; /* update the offset info */
-	return 0;
-    }
-    /* we can do the substitution */
-    replaceAllSymBySym (ic->next, IC_RESULT(ic),ip->asym);
-    IC_RESULT(ic) = operandFromOperand(ip->asym);
-    
-    /* now we know that the constant value is greater than zero */
-    /* we have to do some arithmetic here : if the offset is greater */
-    /* than what we want then rechange it to subtraction        */
-    if ( ip->cval > cval) {
-	ic->op = '-' ;
-	if (lr) {
-	    IC_LEFT(ic) = operandFromOperand(ip->asym);
-	    IC_RIGHT(ic) = operandFromLit(ip->cval - cval);
-	}
-	else {
-	    IC_RIGHT(ic) = operandFromOperand(ip->asym);
-	    IC_LEFT(ic) = operandFromLit(ip->cval - cval);
-	}
-    } else {
-	if (lr) {
-	    IC_LEFT(ic) = operandFromOperand(ip->asym);
-	    IC_RIGHT(ic) = operandFromLit(cval - ip->cval);
-	}
-	else {
-	    IC_RIGHT(ic) = operandFromOperand (ip->asym);
-	    IC_LEFT(ic) = operandFromLit(cval - ip->cval);
-	}
-    }
-    
-    ip->cval = cval ;
-    return 1;
+    return NULL;
 }
 
-/*-----------------------------------------------------------------*/
-/* ptrAopts - pointer arithmetic optimizations for a basic block   */
-/*-----------------------------------------------------------------*/
-void ptrAopts (eBBlock **ebbs, int count)
+/*-----------------------------------------------------------------------*/
+/* ptrPostIncDecOpts - will do some pointer post increment optimizations */
+/*                     this will help register allocation amongst others */
+/*-----------------------------------------------------------------------*/
+void ptrPostIncDecOpt (iCode *sic)
 {
-    int i;
+    /* this is what we do. look for sequences like
 
-    hTab *pointers ; 
+       iTempX := _SOME_POINTER_;
+       iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
+       _SOME_POINTER_ := iTempY;
+       either       
+               iTempZ := @[iTempX];
+       or
+               *(iTempX) := ..something..
+       if we find this then transform this to
+       iTempX := _SOME_POINTER_;
+       either       
+               iTempZ := @[iTempX];
+       or 
+               *(iTempX) := ..something..
+       iTempY := _SOME_POINTER_ + nn ;   nn  = sizeof (pointed to object)
+       _SOME_POINTER_ := iTempY; */
 
-    /* for each basic block do */
-    for (i = 0 ; i < count ; i++ ) {
-	iCode *ic;
+    /* sounds simple enough so lets start , here I use -ve
+       tests all the way to return if any test fails */
+    iCode *pgs, *sh,*st;
 
-	setToNull((void **) &pointers);
-	/* iterate thru intructions in the basic block */
-	for (ic = ebbs[i]->sch ; ic ; ic = ic->next ) {
+    if (!( sic->next && sic->next->next && sic->next->next->next))
+	return ;    
+    if (sic->next->op != '+' && sic->next->op != '-') return;
+    if (!(sic->next->next->op == '=' &&
+	  !POINTER_SET(sic->next->next))) return;    
+    if (!isOperandEqual(IC_LEFT(sic->next),IC_RIGHT(sic)) ||
+	!IS_OP_LITERAL(IC_RIGHT(sic->next))    ) return;
+    if (operandLitValue(IC_RIGHT(sic->next)) !=
+	getSize(operandType(IC_RIGHT(sic))->next)) return;
+    if (!isOperandEqual(IC_RESULT(sic->next->next),
+			IC_RIGHT(sic))) return;
+    if (!isOperandEqual(IC_RESULT(sic->next),IC_RIGHT(sic->next->next))) return;
+    if (!(pgs = findPointerGetSet(sic->next->next,IC_RESULT(sic)))) 
+	return;
 
-	    if (SKIP_IC(ic) ||ic->op == IFX)
-		continue ;
-	    
-	    if (pointers)
-		pointerArithOpts(ic,pointers);
+    /* found the patter .. now do the transformation */
+    sh = sic->next; st = sic->next->next ;
 
-	    if (!POINTER_SET(ic) && IC_RESULT(ic))
-		/* delete from pointer access */
-		hTabDeleteItem (&pointers, IC_RESULT(ic)->key,NULL,DELETE_CHAIN,NULL);
-
-	    	/* set up for pointers */
-	    if ((ic->op == ADDRESS_OF  || ADD_SUBTRACT_ITEMP(ic)) &&
-		IS_ITEMP(IC_RESULT(ic)) ) {
-		operand *sym ;
-		operand *asym ;
-		long cval    ;
-		
-		if ( ic->op == ADDRESS_OF){	      
-		    sym = IC_RESULT(ic);
-		    asym = NULL ;
-		    cval = 0;
-		} else {
-		    sym = IC_LEFT(ic);
-		    asym = IC_RESULT(ic);
-		    cval = operandLitValue(IC_RIGHT(ic));
-		}
-		
-		/* put it in the pointer set */	   		
-	    }	
-	}
-
-    }
+    /* take the two out of the chain */
+    sic->next = st->next;
+    st->next->prev = sic;
+    
+    /* and put them after the pointer get/set icode */
+    if ((st->next = pgs->next))
+	st->next->prev = st;
+    pgs->next = sh;
+    sh->prev  = pgs;
+    
 }

@@ -1134,6 +1134,14 @@ int cseBBlock ( eBBlock *ebb, int computeOnly,
 	if (SKIP_IC2(ic))
 	    continue ;
 
+	/* if this is an assignment from true symbol
+	   to a temp then do pointer post inc/dec optimzation */
+	if (ic->op == '=' && !POINTER_SET(ic) &&
+	    IS_TRUE_SYMOP(IC_RIGHT(ic)) && IS_ITEMP(IC_RESULT(ic)) &&
+	    IS_PTR(operandType(IC_RESULT(ic)))) {
+	    ptrPostIncDecOpt(ic);
+	}
+
 	/* clear the def & use chains for the operands involved */
 	/* in this operation . since it can change due to opts  */
 	unsetDefsAndUses (ic);

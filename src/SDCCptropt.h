@@ -26,6 +26,6 @@
 #ifndef SDCCPTROPT_H
 #define SDCCPTROPT_H 1
 
-void ptrAopts (eBBlock **, int );
+void ptrPostIncDecOpt (iCode *);
 
 #endif

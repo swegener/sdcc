@@ -1590,28 +1590,30 @@ toBoolean (operand * oper)
 {
   int size = AOP_SIZE (oper) - 1;
   int offset = 1;
-  char *l = aopGet (AOP (oper), 0, FALSE, FALSE);
+  bool AccUsed = FALSE;
   bool pushedB;
 
-  if (!strncmp (l, "a", 2) || !strncmp (l, "acc", 4))
+  while (!AccUsed && size--)
     {
-      if (size--)
+      AccUsed |= aopGetUsesAcc(AOP (oper), offset++);
+    }
+
+  size = AOP_SIZE (oper) - 1;
+  offset = 1;
+  MOVA (aopGet (AOP (oper), 0, FALSE, FALSE));
+  if (AccUsed && (AOP (oper)->type != AOP_ACC))
+    {
+      pushedB = pushB ();
+      emitcode("mov", "b,a");
+      while (size--)
         {
-          pushedB = pushB ();
-          emitcode("mov", "b,a");
-          while (size--)
-            {
-              MOVA (aopGet (AOP (oper), offset++, FALSE, FALSE));
-              emitcode ("orl", "b,a");
-            }
-          MOVA (aopGet (AOP (oper), offset, FALSE, FALSE));
-          emitcode ("orl", "a,b");
-          popB (pushedB);
+          MOVA (aopGet (AOP (oper), offset++, FALSE, FALSE));
+          emitcode ("orl", "b,a");
         }
+      popB (pushedB);
     }
   else
     {
-      MOVA (l);
       while (size--)
         {
           emitcode ("orl", "a,%s", aopGet (AOP (oper), offset++, FALSE, FALSE));
@@ -2768,26 +2770,23 @@ genFunction (iCode * ic)
     }
 
 
-  if (IFFUNC_ISREENT (sym->type) || options.stackAuto)
+  if (reentrant)
     {
-
       if (options.useXstack)
         {
-          if (!accIsFree)
-            emitcode ("push", "acc");
-          emitcode ("mov", "r0,%s", spname);
-          emitcode ("mov", "a,_bp");
-          emitcode ("movx", "@r0,a");
-          emitcode ("inc", "%s", spname);
-          if (!accIsFree)
-            emitcode ("pop", "acc");
+              emitcode ("inc", "%s", spname);
+              emitcode ("mov", "r0,%s", spname);
+              emitcode ("xch", "a,_bp");
+              emitcode ("movx", "@r0,a");
+              emitcode ("mov", "a,r0");
+              emitcode ("xch", "a,_bp");
         }
       else
         {
           /* set up the stack */
           emitcode ("push", "_bp");     /* save the callers stack  */
+          emitcode ("mov", "_bp,%s", spname);
         }
-      emitcode ("mov", "_bp,%s", spname);
     }
 
   /* For some cases it is worthwhile to perform a RECEIVE iCode */
@@ -2853,7 +2852,6 @@ genFunction (iCode * ic)
   /* adjust the stack for the function */
   if (stackAdjust)
     {
-
       int i = stackAdjust;
       if (i > 256)
         werror (W_STACK_OVERFLOW, sym->name);
@@ -2934,12 +2932,13 @@ genFunction (iCode * ic)
 static void
 genEndFunction (iCode * ic)
 {
-  symbol *sym = OP_SYMBOL (IC_LEFT (ic));
+  symbol   *sym = OP_SYMBOL (IC_LEFT (ic));
   lineNode *lnp = lineCurr;
-  bitVect *regsUsed;
-  bitVect *regsUsedPrologue;
-  bitVect *regsUnneeded;
-  int idx;
+  bitVect  *regsUsed;
+  bitVect  *regsUsedPrologue;
+  bitVect  *regsUnneeded;
+  int      accIsFree = sym->recvSize < 4;
+  int      idx;
 
   _G.currentFunc = NULL;
   if (IFFUNC_ISNAKED(sym->type))
@@ -2966,20 +2965,24 @@ genEndFunction (iCode * ic)
      local stack */
   if (options.useXstack && sym->stack)
     {
+      if (!accIsFree)
+        emitcode ("push", "acc");
       emitcode ("mov", "a,sp");
       emitcode ("add", "a,#0x%02x", ((char) -sym->stack) & 0xff);
       emitcode ("mov", "sp,a");
+      if (!accIsFree)
+        emitcode ("pop", "acc");
     }
-
 
   if ((IFFUNC_ISREENT (sym->type) || options.stackAuto))
     {
       if (options.useXstack)
         {
+          emitcode ("xch", "a,_bp");
           emitcode ("mov", "r0,%s", spname);
           emitcode ("movx", "a,@r0");
-          emitcode ("mov", "_bp,a");
-          emitcode ("dec", "%s", spname);
+          emitcode ("xch", "a,_bp");
+          emitcode ("dec", "%s", spname); //read before freeing stack space (interrupts)
         }
       else
         {
@@ -4992,7 +4995,7 @@ genCmpGt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
-  genCmp (right, left, result, ifx, sign,ic);
+  genCmp (right, left, result, ifx, sign, ic);
 
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -10162,20 +10165,22 @@ genCritical (iCode *ic)
   D(emitcode(";     genCritical",""));
 
   if (IC_RESULT (ic))
-    aopOp (IC_RESULT (ic), ic, TRUE);
-
-  emitcode ("setb", "c");
-  emitcode ("jbc", "ea,%05d$", (tlbl->key + 100)); /* atomic test & clear */
-  emitcode ("clr", "c");
-  emitcode ("", "%05d$:", (tlbl->key + 100));
-
-  if (IC_RESULT (ic))
-    outBitC (IC_RESULT (ic)); /* save old ea in an operand */
+    {
+      aopOp (IC_RESULT (ic), ic, TRUE);
+      aopPut (AOP (IC_RESULT (ic)), one, 0, 0);
+      emitcode ("jbc", "ea,%05d$", (tlbl->key + 100)); /* atomic test & clear */
+      aopPut (AOP (IC_RESULT (ic)), zero, 0, 0);
+      emitcode ("", "%05d$:", (tlbl->key + 100));
+      freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+    }
   else
-    emitcode ("push", "psw"); /* save old ea via c in psw on top of stack*/
-
-  if (IC_RESULT (ic))
-    freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+    {
+      emitcode ("setb", "c");
+      emitcode ("jbc", "ea,%05d$", (tlbl->key + 100)); /* atomic test & clear */
+      emitcode ("clr", "c");
+      emitcode ("", "%05d$:", (tlbl->key + 100));
+      emitcode ("push", "psw"); /* save old ea via c in psw on top of stack*/
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -10196,7 +10201,8 @@ genEndCritical (iCode *ic)
         }
       else
         {
-          MOVA (aopGet (AOP (IC_RIGHT (ic)), 0, FALSE, FALSE));
+          if (AOP_TYPE (IC_RIGHT (ic)) != AOP_DUMMY)
+            MOVA (aopGet (AOP (IC_RIGHT (ic)), 0, FALSE, FALSE));
           emitcode ("rrc", "a");
           emitcode ("mov", "ea,c");
         }

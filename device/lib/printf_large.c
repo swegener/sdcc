@@ -183,7 +183,7 @@ static void calculate_digit( value_t* value, unsigned char radix )
     if (radix <= value->byte[4] )
     {
       value->byte[4] -= radix;
-      value->byte[0]++;
+      value->ul |= 1;
     }
   }
 }
@@ -200,7 +200,7 @@ static void calculate_digit( unsigned char radix )
     if (radix <= value.byte[4] )
     {
       value.byte[4] -= radix;
-      value.byte[0]++;
+      value.ul |= 1;
     }
   }
 }
@@ -648,12 +648,6 @@ get_conversion_spec:
         if (char_argument)
         {
           value.l = va_arg(ap,char);
-          if (!signed_argument)
-          {
-            value.byte[1] = 0x00;
-            value.byte[2] = 0x00;
-            value.byte[3] = 0x00;
-          }
         }
         else if (long_argument)
         {
@@ -662,11 +656,6 @@ get_conversion_spec:
         else // must be int
         {
           value.l = va_arg(ap,int);
-          if (!signed_argument)
-          {
-            value.byte[2] = 0x00;
-            value.byte[3] = 0x00;
-          }
         }
 
         if ( signed_argument )

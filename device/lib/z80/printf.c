@@ -1,5 +1,5 @@
 /** Simple printf implementation
-    Again a stub - will use the std one later...
+    This stub has been replaced by the std printf_large / sprintf / vprintf
 */
 
 #include <stdarg.h>

@@ -1,3 +1,7 @@
+2005-01-24 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* device/lib/pic16/libm: added Math library sources
+
 2005-01-24 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcode.h: added second memory operand to pCodeOpReg

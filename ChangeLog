@@ -1,3 +1,15 @@
+2003-04-19  Borut Razem <borut.razem@siol.net>
+
+	* "handling space characters in file path" task:
+	* src/SDCCmacro.c: fixed bug in handlig quote at the end of line
+	* support/Util/BuildCmd.c: define par as NULL if parameter value is invalid
+	* support/Util/MySystem.h: make it self-sufficient
+	* src/avr/main.c, src/ds390/main.c, src/mcs51/main.c, src/pic/main.c, src/xa51/main.c, sdcc/as/mcs51/lklex.c:
+	  handling space characters in file path
+	* src/SDCCmain.c: introduced setDataPaths() function, {datadir} macro
+	  (it will be used by assemblers, which have their own includes, e.g. gpasm)
+	* support/Util/MySystem.c: handling space characters in executable's path
+
 2003-04-19  Bernhard Held <bernhard@bernhardheld.de>
 
 	* as/z80/Makefile: fix permanent rebuild of z80

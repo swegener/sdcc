@@ -6,6 +6,8 @@ SHELL		= /bin/sh
 
 PRJDIR		= .
 
+include $(PRJDIR)/Makefile.common
+
 SDCC_MISC	= debugger/mcs51 sim/ucsim
 SDCC_LIBS	= support/cpp support/cpp2
 SDCC_DOC        = doc

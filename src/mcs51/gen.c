@@ -1003,7 +1003,7 @@ aopPut (asmop * aop, char *s, int offset)
 		}
 	      {
 		symbol *lbl = newiTempLabel (NULL);
-		emitcode ("clr", "c");
+		emitcode ("clr", "c; oops");
 		emitcode ("jz", "%05d$", lbl->key + 100);
 		emitcode ("cpl", "c");
 		emitcode ("", "%05d$:", lbl->key + 100);
@@ -8299,7 +8299,7 @@ genCast (iCode * ic)
   /* now depending on the sign of the source && destination */
   size = AOP_SIZE (result) - AOP_SIZE (right);
   /* if unsigned or not an integral type */
-  if (SPEC_USIGN (rtype) || !IS_SPEC (rtype))
+  if (SPEC_USIGN (rtype) || !IS_SPEC (rtype) || AOP_TYPE(right)==AOP_CRY)
     {
       while (size--)
 	aopPut (AOP (result), zero, offset++);

@@ -2765,7 +2765,7 @@ geniCodeCall (operand * left, ast * parms)
   geniCodeParms (parms, &stack, getSpec (operandType (left)), OP_SYMBOL (left));
 
   /* now call : if symbol then pcall */
-  if (IS_OP_POINTER (left))
+  if (IS_OP_POINTER (left) || IS_ITEMP(left))
     ic = newiCode (PCALL, left, NULL);
   else
     ic = newiCode (CALL, left, NULL);

@@ -1,3 +1,8 @@
+2003-03-11  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+	* as/mcs51/lkmain.c: Added ASlink-Warning to messages 
+	* as/mcs51/lkaomf51.c: Fixed bug when linking asmblink example
+
 2003-03-11 Kevin Vigor <kevin@vigor.nu>
 
 	* src/SDCCpeeph.c: fix so that operandsNotEqualX functions are

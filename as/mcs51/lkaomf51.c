@@ -462,20 +462,28 @@ void OutputAOEMF51(void)
 
 	for(j=-1; j<numproc; j++)
 	{
-		if(j==-1)
+		if(numproc)
+		{
+			if(j==-1)
+			{
+				i=HexBegin;
+				k=procedure[0].BeginAdd;
+			}
+			else if(j==(numproc-1))
+			{
+				i=procedure[j].EndAdd+1;
+				k=HexSize;
+			}
+			else
+			{
+				i=procedure[j].EndAdd+1;
+				k=procedure[j+1].BeginAdd;
+			}
+		}
+		else /*What, no procedures??? Ok, here it is the whole hex file*/
 		{
 			i=HexBegin;
-			k=procedure[0].BeginAdd;
-		}
-		else if(j==(numproc-1))
-		{
-			i=procedure[j].EndAdd+1;
 			k=HexSize;
-		}
-		else
-		{
-			i=procedure[j].EndAdd+1;
-			k=procedure[j+1].BeginAdd;
 		}
 
 		if(i<k)

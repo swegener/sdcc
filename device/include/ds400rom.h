@@ -3,10 +3,10 @@
 #ifndef DS400ROM_H_
 #define DS400ROM_H_
 
-extern unsigned char init_rom(void xdata *loMem,
-			      void xdata *hiMem) _naked;
+extern unsigned char init_rom(void __xdata *loMem,
+			      void __xdata *hiMem) __naked;
 
-extern unsigned long task_gettimemillis_long(void) _naked;
+extern unsigned long task_gettimemillis_long(void) __naked;
 
 extern unsigned char task_getthreadID(void) _naked;
 

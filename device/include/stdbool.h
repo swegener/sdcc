@@ -21,7 +21,7 @@
 #ifndef __SDC51_STDBOOL_H
 #define __SDC51_STDBOOL_H 1
 
-#define _Bool bit
+#define _Bool __bit
 
 #define bool _Bool
 #define true 1
@@ -32,7 +32,7 @@
  //as long as bit/bool cannot be used reentrant
  #define BOOL char
 #else
- #define BOOL bit
+ #define BOOL __bit
 #endif
 
 #endif

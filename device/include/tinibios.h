@@ -71,8 +71,8 @@ extern void LcdGoto(unsigned int collumnRow);
 extern void LcdPutChar(char c);
 extern void LcdPutString(char *string);
 extern void LcdLPutString(unsigned int collumnRow, char *string);
-extern void LcdPrintf(const char *format, ...) reentrant;
-extern void LcdLPrintf(unsigned int collumnRow, const char *format, ...) reentrant;
+extern void LcdPrintf(const char *format, ...) __reentrant;
+extern void LcdLPrintf(unsigned int collumnRow, const char *format, ...) __reentrant;
 
 // from i2c390.c
 #define I2C_BUFSIZE 128
@@ -97,12 +97,12 @@ extern char i2cReceiveBuffer[I2C_BUFSIZE];
 
 // internal functions used by tinibios.c
 unsigned char _sdcc_external_startup(void);
-void Serial0IrqHandler (void) interrupt 4;
-void Serial1IrqHandler (void) interrupt 7;
+void Serial0IrqHandler (void) __interrupt 4;
+void Serial1IrqHandler (void) __interrupt 7;
 
 #if !defined(SDCC_ds400)
 void ClockInit();
-void ClockIrqHandler (void) interrupt 1 _naked;
+void ClockIrqHandler (void) __interrupt 1 __naked;
 #endif
 
 #if defined(SDCC_ds400)

@@ -55,7 +55,7 @@ union float_long
 #if defined(SDCC_z80) || defined(SDCC_gbz80)
 #define _FLOAT_FUNC_REENTRANT
 #else
-#define _FLOAT_FUNC_REENTRANT reentrant
+#define _FLOAT_FUNC_REENTRANT __reentrant
 #endif
 
 /**********************************************

@@ -1,3 +1,47 @@
+2005-04-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/include/Makefile.in: add support for hc08 subdirectory
+	* device/include/hc08/: new subdirectory
+	* device/include/hc08/mc68hc908jkjl.h: new header contributed by
+	Lucas Loizaga, thanks!
+	* device/include/hc08/mc68hc908qy.h,
+	* device/include/hc08/mc68hc908gp32.h,
+	* device/include/hc08/mc68hc908jb8.h: moved hc08 register defs to
+	their own directory. Changed internal macro names to use the compiler
+	reserved namespace. Changed SDCC specific keywords to double
+	underlined form.
+	* device/include/math.h,
+	* device/include/malloc.h,
+	* device/include/stdarg.h,
+	* device/include/stdbool.h
+	* device/include/string.h,
+	* device/include/tinibios.h,
+	* device/include/ds400rom.h,
+	* device/include/8051.h,
+	* device/include/8052.h,
+	* device/include/80c51xa.h,
+	* device/include/at89c55.h,
+	* device/include/at89S8252.h,
+	* device/include/at89x51.h,
+	* device/include/at89x52.h,
+	* device/include/ds80c390.h,
+	* device/include/reg764.h,
+	* device/include/regc515c.h,
+	* device/include/sab80515.h,
+	* device/include/mcs51/c8051f000.h,
+	* device/include/mcs51/c8051f018.h,
+	* device/include/mcs51/c8051f020.h,
+	* device/include/mcs51/c8051f040.h,
+	* device/include/mcs51/c8051f060.h,
+	* device/include/mcs51/c8051f120.h,
+	* device/include/mcs51/c8051f300.h,
+	* device/include/mcs51/c8051f310.h,
+	* device/include/mcs51/c8051f320.h,
+	* device/include/mcs51/c8051f330.h,
+	* device/include/mcs51/c8051f350.h,
+	* device/include/z180.h: Changed SDCC specific keywords to double
+	underlined form.
+        
 2005-03-31 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/device.c (Pics16[]): added devices 18F2550, 18F4331,

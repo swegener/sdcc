@@ -40,25 +40,25 @@ void free (void * ptr);
 
 MEMHEADER
 {
-      MEMHEADER xdata *  next;
+      MEMHEADER __xdata *  next;
       unsigned int       len;
       unsigned char      mem[];
 };
 
 #ifdef SDCC_STACK_AUTO
 
-extern void init_dynamic_memory(void xdata * heap, unsigned int size) reentrant;
-extern void xdata * calloc (size_t nmemb, size_t size) reentrant;
-extern void xdata * malloc (size_t size) reentrant;
-extern void xdata * realloc (void * ptr, size_t size) reentrant;
-extern void free (void * ptr) reentrant;
+extern void init_dynamic_memory(void __xdata * heap, unsigned int size) __reentrant;
+extern void __xdata * calloc (size_t nmemb, size_t size) __reentrant;
+extern void __xdata * malloc (size_t size) __reentrant;
+extern void __xdata * realloc (void * ptr, size_t size) __reentrant;
+extern void free (void * ptr) __reentrant;
 
 #else
 
-extern void init_dynamic_memory(void xdata * heap, unsigned int size);
-extern void xdata * calloc (size_t nmemb, size_t size);
-extern void xdata * malloc (size_t size);
-extern void xdata * realloc (void * ptr, size_t size);
+extern void init_dynamic_memory(void __xdata * heap, unsigned int size);
+extern void __xdata * calloc (size_t nmemb, size_t size);
+extern void __xdata * malloc (size_t size);
+extern void __xdata * realloc (void * ptr, size_t size);
 extern void free (void * ptr);
 
 #endif

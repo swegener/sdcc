@@ -318,11 +318,6 @@ pointerTypes (sym_link * ptr, sym_link * type)
     ptr = ptr->next;
 
   /* could not find it */
-#if 0
-  if (!ptr || IS_SPEC (ptr) ||
-      DCL_TYPE(ptr)!=UPOINTER)
-    return;
-#else
   if (!ptr || IS_SPEC (ptr))
     return;
   
@@ -330,7 +325,6 @@ pointerTypes (sym_link * ptr, sym_link * type)
     pointerTypes (ptr->next, type);
     return;
   }
-#endif
 
   /* change the pointer type depending on the
      storage class of the type */
@@ -534,31 +528,34 @@ void checkTypeSanity(sym_link *etype, char *name) {
 /*------------------------------------------------------------------*/
 /* mergeSpec - merges two specifiers and returns the new one        */
 /*------------------------------------------------------------------*/
-#define LAST_MINUTE_2_3_0_FIX
 sym_link *
 mergeSpec (sym_link * dest, sym_link * src, char *name)
 {
 
-#ifdef LAST_MINUTE_2_3_0_FIX
   sym_link *symlink;
 
   if (!IS_SPEC(dest)) {
-    // This should not happen
-    fprintf (stderr, "*** internal error: can't merge declarators\n");
+    // This can happen for pointers, find the end type
+    while (dest && !IS_SPEC(dest))
+      dest=dest->next;
   }
   if (!IS_SPEC(src)) {
     // here we have a declarator as source, reverse them
     symlink=src;
     src=dest;
     dest=symlink;
-    while (!IS_SPEC(dest)) {
+    while (dest && !IS_SPEC(dest)) {
       // and find the specifier
       dest=dest->next;
     }
   } else {
     symlink=dest;
   }
-#endif
+
+  if (!IS_SPEC(dest) || !IS_SPEC(src)) {
+    werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "cannot merge declarator");
+    exit (1);
+  }
 
   if (getenv("DEBUG_mergeSpec")) {
     fprintf (stderr, "mergeSpec: \"%s\"\n", name);
@@ -624,11 +621,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
 
-#ifdef LAST_MINUTE_2_3_0_FIX
   return symlink;
-#else
-  return dest;
-#endif
 }
 
 /*------------------------------------------------------------------*/
@@ -1202,23 +1195,6 @@ checkSClass (symbol * sym, int isProto)
       sym->ival = NULL;
     }
 
-#if 0
-  /* if this is an automatic symbol then */
-  /* storage class will be ignored and   */
-  /* symbol will be allocated on stack/  */
-  /* data depending on flag             */
-  if (sym->level &&
-      (options.stackAuto || reentrant) &&
-      (SPEC_SCLS (sym->etype) != S_AUTO &&
-       SPEC_SCLS (sym->etype) != S_FIXED &&
-       SPEC_SCLS (sym->etype) != S_REGISTER &&
-       SPEC_SCLS (sym->etype) != S_STACK &&
-       SPEC_SCLS (sym->etype) != S_XSTACK))
-    {
-      werror (E_AUTO_ASSUMED, sym->name);
-      SPEC_SCLS (sym->etype) = S_AUTO;
-    }
-#else
   /* if this is an atomatic symbol */
   if (sym->level && (options.stackAuto || reentrant)) {
     if ((SPEC_SCLS (sym->etype) == S_AUTO ||
@@ -1234,7 +1210,6 @@ checkSClass (symbol * sym, int isProto)
       }
     }
   }
-#endif
   
   /* automatic symbols cannot be given   */
   /* an absolute address ignore it      */

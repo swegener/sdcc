@@ -3,7 +3,10 @@
 # model small
 
 # path to uCsim
-S51 = $(SDCC_DIR)/sim/ucsim/s51.src/s51
+S51A = $(SDCC_DIR)/sim/ucsim/s51.src/s51
+S51B = $(SDCC_DIR)/bin/s51
+
+S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
 SDCCFLAGS +=--lesspedantic -DREENTRANT=reentrant --stack-after-data
 

@@ -27,7 +27,7 @@ $(MANUAL).html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 5 -show_section_numbers -dir $(MANUAL).html $(MANUAL)
+	-latex2html -split 5 -show_section_numbers -bottom_navigation -dir $(MANUAL).html $(MANUAL)
 	mv `basename $< .tex`.orig.tex $<
 
 $(TSS).html: $(TSS).tex

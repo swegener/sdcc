@@ -1640,7 +1640,7 @@ Install paths
 
 
 \layout Standard
-\line_top \align center 
+\added_space_top medskip \align center 
 
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
@@ -1697,16 +1697,7 @@ Win32 builds
 
 \layout Standard
 
-Binary files
-\begin_inset Foot
-collapsed true
-
-\layout Standard
-
-preprocessor, assembler, and linker
-\end_inset 
-
-
+Binary files*
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1786,21 +1777,7 @@ include
 
 \layout Standard
 
-Library files
-\begin_inset Foot
-collapsed true
-
-\layout Standard
-
-the 
-\shape italic 
-model
-\shape default 
- is auto-appended by the compiler, e.g.
- small, large, z80, ds390 etc.
-\end_inset 
-
-
+Library file**
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1879,8 +1856,18 @@ doc
 \end_inset 
 
 
-\newline 
+\layout Verse
 
+
+\size footnotesize 
+*compiler, preprocessor, assembler, and linker
+\newline 
+**the 
+\shape italic 
+model
+\shape default 
+ is auto-appended by the compiler, e.g.
+ small, large, z80, ds390 etc
 \layout Standard
 \noindent 
 The install paths can still be changed during `make install` with e.g.:
@@ -6256,7 +6243,7 @@ status Collapsed
 \end_inset 
 
 -vc
-\begin_inset LatexCommand \index{-\/-print-search-dirs}
+\begin_inset LatexCommand \index{-\/-vc}
 
 \end_inset 
 
@@ -10071,7 +10058,12 @@ status Collapsed
 
 
 \emph default 
--vc option.
+-vc
+\begin_inset LatexCommand \index{-\/-vc}
+
+\end_inset 
+
+ option.
  Something like this should work:
 \newline 
 
@@ -10295,20 +10287,20 @@ will be changed to
 int f() { 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- int i,j; 
+\SpecialChar ~
+int i, j; 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- i = 10; 
+\SpecialChar ~
+i = 10; 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- j = 10; 
+\SpecialChar ~
+j = 10; 
 \newline 
 \SpecialChar ~
- \SpecialChar ~
- return 10; 
+\SpecialChar ~
+return 10; 
 \newline 
 }
 \layout Standard
@@ -10372,8 +10364,8 @@ Loop Invariant:
 \family typewriter 
 for (i = 0 ; i < 100 ; i ++) 
 \newline 
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 f += k + l;
 \layout Standard
 
@@ -10424,16 +10416,22 @@ itemp2 = 0;
 \newline 
 for (i=0;i< 100;i++) { 
 \newline 
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 ar[itemp1] = itemp2; 
 \newline 
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 itemp1 += 5; 
 \newline 
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 itemp2 += 3; 
 \newline 
 }
@@ -10570,106 +10568,197 @@ The case labels are in numerical sequence, the labels need not be in order,
 
 \family typewriter 
 switch(i) {\SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 switch (i) { 
 \newline 
-case 4:...
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 4: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 case 1: ...
  
 \newline 
-case 5:...
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 5: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 case 2: ...
  
 \newline 
-case 3:...
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 3: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 case 3: ...
  
 \newline 
-case 6:...
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+case 6: ...\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 case 4: ...
  
 \newline 
 }\SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
- \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 }
 \layout Standard
 

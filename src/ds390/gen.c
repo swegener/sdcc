@@ -5656,9 +5656,14 @@ genOr (iCode * ic, iCode * ifx)
 	    emitcode ("setb", "c");
 	  while (sizer--)
 	    {
-	      MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-	      emitcode ("orl", "a,%s",
-			aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+	      if (AOP_TYPE(right)==AOP_REG && AOP_TYPE(left)==AOP_ACC) {
+		emitcode ("orl", "a,%s",
+			  aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
+	      } else {
+		MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
+		emitcode ("orl", "a,%s",
+			  aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+	      }
 	      emitcode ("jnz", "%05d$", tlbl->key + 100);
 	      offset++;
 	    }
@@ -5930,9 +5935,14 @@ genXor (iCode * ic, iCode * ifx)
 		}
 	      else
 		{
-		  MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
-		  emitcode ("xrl", "a,%s",
-			  aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+		  if (AOP_TYPE(right)==AOP_REG && AOP_TYPE(left)==AOP_ACC) {
+		    emitcode ("xrl", "a,%s",
+			      aopGet (AOP (right), offset, FALSE, FALSE, FALSE));
+		  } else {
+		    MOVA (aopGet (AOP (right), offset, FALSE, FALSE, TRUE));
+		    emitcode ("xrl", "a,%s",
+			      aopGet (AOP (left), offset, FALSE, FALSE, FALSE));
+		  }
 		}
 	      emitcode ("jnz", "%05d$", tlbl->key + 100);
 	      offset++;

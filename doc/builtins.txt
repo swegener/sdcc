@@ -1,0 +1,125 @@
+/* This document is meant for developers */
+
+Implementation details of "builtin" functions in SDCC. 
+Built in functions are target/port specific and are defined in src/<arch>/main.c. 
+Here is a layout of the builtin structure (port.h).
+
+Front-End
+---------
+
+#define MAX_BUILTIN_ARGS	16
+/* definition of builtin functions */
+typedef struct builtins
+{
+    char *name ;		/* name of builtin function */
+    char *rtype;		/* return type as string : see typefromStr */
+    int  nParms;		/* number of parms : max 8 */
+    char *parm_types[MAX_BUILTIN_ARGS]; /* each parm type as string : see typeFromStr */
+} builtins ;
+
+The port structure contains a pointer to a table of the builtin functions. Example of the
+builtin function table.
+
+static builtins __ds390_builtins[] = {
+    { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
+    { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
+    { NULL , NULL,0, {NULL}} 			       /* mark end of table */
+};    
+
+Here the function names are prefixed with "__builtin" this is not a requirement, standard C
+library functions can also be defined in this table by a particular port to generate more
+efficient code .
+
+Function "initBuiltIns" in SDCCsymt.c is invoked to initialize the symbol table with the
+builtin functions. The return type & the parameter types are specified as encoded strings. 
+Function "typeFromStr" parses this encoded string and translates them into sym_link . 
+
+/*-----------------------------------------------------------------*/
+/* typeFromStr - create a typechain from an encoded string         */
+/* basic types - 	'c' - char            			   */
+/*   			's' - short				   */
+/* 			'i' - int                                  */
+/* 			'l' - long                                 */
+/*                      'f' - float				   */
+/*                      'v' - void				   */
+/*                      '*' - pointer - default (GPOINTER)	   */
+/* modifiers -          'u' - unsigned                             */
+/* pointer modifiers -  'g' - generic                              */
+/*                      'x' - xdata                                */
+/*                      'p' - code                                 */
+/*                      'd' - data                                 */                     
+/* examples : "ig*" - generic int *				   */
+/*            "cx*" - char xdata *                                 */
+/*            "ui" -  unsigned int                                 */
+/*-----------------------------------------------------------------*/
+
+So much for the front-end issues.
+
+iCode - implications.
+---------------------
+
+Intermediate code (iCode) will ALWAYS generate a SEND for parameters of a builtin function with
+a special flag (ic->builtinSEND) set. This eliminates the need for special processing for different
+memory models and --stack-auto option. All optimizations remain untouched. Example of intermediate code
+generated for builtin
+
+void memcpy(xdata char *d,xdata char *s)
+{
+    __builtin_memcpy_x2x(d,s+10,10);
+}
+iTemp0 [k2 lr3:12 so:0]{ ia0 re1 rm0 nos0 ru0}{xdata char xdata * }{ sir@ _memcpy_d_1_1}[_memcpy_d_1_1] = recv 
+iTemp2 [k7 lr4:12 so:0]{ ia0 re0 rm0 nos0 ru0}{xdata char xdata * }[r5 r6 r7 ] 
+       := _memcpy_PARM_2 [k6 lr0:0 so:0]{ ia0 re0 rm0 nos0 ru0}{xdata char xdata * }
+iTemp3 [k8 lr5:8 so:0]{ ia0 re0 rm0 nos0 ru0}{xdata char xdata * }[r0 r1 r2 ] = 
+       iTemp2 [k7 lr4:12 so:0]{ ia0 re0 rm0 nos0 ru0}{xdata char xdata * }[r5 r6 r7 ] + 0xa {literal unsigned char}
+send iTemp0 [k2 lr3:12 so:0]{ ia0 re1 rm0 nos0 ru0}{xdata char xdata * }{ sir@ _memcpy_d_1_1}[_memcpy_d_1_1]
+send iTemp3 [k8 lr5:8 so:0]{ ia0 re0 rm0 nos0 ru0}{xdata char xdata * }[r0 r1 r2 ]
+send 0xa {literal int}
+iTemp4 [k9 lr9:9 so:0]{ ia0 re0 rm0 nos0 ru1}{void} = 
+       call ___builtin_memcpy_x2x [k4 lr0:0 so:0]{ ia0 re0 rm0 nos0 ru0}{void function __builtin__}
+
+
+Backend/Code generation for builtin functions.
+----------------------------------------------
+
+When a SEND icode with the ic->builtinSEND flag is detected by the code generator, it should go
+into builtin function processing mode. E.g.
+
+	case SEND:
+	  if (ic->builtinSEND) genBuiltIn(ic);
+	  else addSet (&_G.sendSet, ic);
+	  break;
+
+SDCCicode.c contains a port/target independent routine (getBuiltinParms) which goes thru the 
+iCodes (starting from the first SEND (with builtinSEND set)) and returns the parameters and number 
+of parameters in an array, example. NOTE the function "getBuiltinParms" also marks the iCodes
+as "generated" .
+
+/*-----------------------------------------------------------------*/
+/* genBuiltIn - calls the appropriate function to  generating code */
+/* for a built in function 					   */
+/*-----------------------------------------------------------------*/
+static void genBuiltIn (iCode *ic)
+{
+    operand *bi_parms[MAX_BUILTIN_ARGS];
+    int nbi_parms;
+    iCode *bi_iCode;
+    symbol *bif;
+
+    /* get all the arguments for a built in function */
+    bi_iCode = getBuiltinParms(ic,&nbi_parms,bi_parms);
+
+    /* which function is it */
+    bif = OP_SYMBOL(IC_LEFT(bi_iCode));
+    if (strcmp(bif->name,"__builtin_memcpy_x2x")==0) {
+	genMemcpyX2X(bi_iCode,nbi_parms,bi_parms,0);
+    } else if (strcmp(bif->name,"__builtin_memcpy_c2x")==0) {
+	genMemcpyX2X(bi_iCode,nbi_parms,bi_parms,1);
+    } else {
+	werror(E_INTERNAL_ERROR,"unknown builtin function encountered\n");
+	return ;
+    }
+    return ;    
+}
+
+

@@ -185,6 +185,7 @@ typedef struct sym_link
       unsigned rbank:1;		/* seperate register bank     */
       unsigned intno;		/* 1=Interrupt svc routine    */
       unsigned regbank;		/* register bank 2b used      */
+      unsigned builtin;		/* is a builtin function      */
     } funcAttrs;
 
     struct sym_link *next;	/* next element on the chain  */
@@ -313,6 +314,8 @@ symbol;
 #define IFFUNC_BANKED(x) (IS_FUNC(x) && FUNC_BANKED(x))
 #define FUNC_ISCRITICAL(x) (x->funcAttrs.critical)
 #define IFFUNC_ISCRITICAL(x) (IS_FUNC(x) && FUNC_ISCRITICAL(x))
+#define FUNC_ISBUILTIN(x) (x->funcAttrs.builtin)
+#define IFFUNC_ISBUILTIN(x) (IS_FUNC(x) && FUNC_ISBUILTIN(x))
 
 // jwk: I am not sure about this
 #define IFFUNC_ISBANKEDCALL(x) (!IFFUNC_NONBANKED(x) && \
@@ -476,6 +479,7 @@ int isSymbolEqual (symbol *, symbol *);
 int powof2 (unsigned long);
 void printTypeChain (sym_link *, FILE *);
 void initCSupport ();
+void initBuiltIns ();
 void pointerTypes (sym_link *, sym_link *);
 void cdbTypeInfo (sym_link *, FILE *);
 void cdbSymbol (symbol *, FILE *, int, int);
@@ -489,6 +493,8 @@ void *findSymWithLevel (bucket **, struct symbol *);
 void *findSymWithBlock (bucket **, struct symbol *, int);
 void changePointer (symbol * sym);
 void checkTypeSanity(sym_link *etype, char *name);
+sym_link *typeFromStr (char *) ;
+
 
 extern char *nounName(sym_link *); /* noun strings */
 extern void printFromToType (sym_link *, sym_link *);

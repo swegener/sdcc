@@ -130,6 +130,7 @@ typedef struct iCode
     unsigned supportRtn:1;	/* will cause a call to a support routine */
     unsigned regsSaved:1;	/* registers have been saved */
     unsigned bankSaved:1;	/* register bank has been saved */
+    unsigned builtinSEND:1;     /* SEND for parameter of builtin function */
 
     struct iCode *next;		/* next in chain */
     struct iCode *prev;		/* previous in chain */
@@ -214,6 +215,9 @@ iCodeTable;
 		      x->op == ARRAYINIT ||    \
 		      SKIP_IC1(x)||  \
 		      x->op == SEND         )
+
+#define SKIP_IC3(x) (SKIP_IC2(x) ||	\
+		     x->op == JUMPTABLE )
 
 #define IS_CONDITIONAL(x) (x->op == EQ_OP || \
 			   x->op == '<'   || \
@@ -309,6 +313,7 @@ bool isOperandInFarSpace (operand *);
 operand *opFromOpWithDU (operand *, bitVect *, bitVect *);
 iCode *copyiCode (iCode *);
 operand *newiTempFromOp (operand *);
+iCode *getBuiltinParms (iCode *,int *, operand **);
 /*-----------------------------------------------------------------*/
 /* declaration of exported variables                               */
 /*-----------------------------------------------------------------*/

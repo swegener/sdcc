@@ -917,6 +917,31 @@ operandLitValue (operand * op)
 }
 
 /*-----------------------------------------------------------------*/
+/* getBuiltInParms - returns parameters to a builtin functions     */
+/*-----------------------------------------------------------------*/
+iCode *getBuiltinParms (iCode *ic, int *pcount, operand **parms)
+{
+    sym_link *ftype;
+
+    *pcount = 0;
+    /* builtin functions uses only SEND for parameters */
+    while (ic->op != CALL) {
+	assert(ic->op == SEND && ic->builtinSEND);
+	ic->generated = 1;    /* mark the icode as generated */
+	parms[*pcount] = IC_LEFT(ic);
+	ic = ic->next;
+	(*pcount)++;
+    }
+    
+    ic->generated = 1;
+    /* make sure this is a builtin function call */
+    assert(IS_SYMOP(IC_LEFT(ic)));
+    ftype = operandType(IC_LEFT(ic));
+    assert(IFFUNC_ISBUILTIN(ftype));
+    return ic;
+}
+
+/*-----------------------------------------------------------------*/
 /* operandOperation - perforoms operations on operands             */
 /*-----------------------------------------------------------------*/
 operand *
@@ -2732,9 +2757,11 @@ geniCodeParms (ast * parms, value *argVals, int *stack,
     }
 
   /* if register parm then make it a send */
-  if (IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(func->type))
+  if ((IS_REGPARM (parms->etype) && !IFFUNC_HASVARARGS(func->type)) ||
+      IFFUNC_ISBUILTIN(func->type))
     {
       ic = newiCode (SEND, pval, NULL);
+      ic->builtinSEND = FUNC_ISBUILTIN(func->type);
       ADDTOCHAIN (ic);
     }
   else

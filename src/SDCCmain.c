@@ -1527,6 +1527,7 @@ main (int argc, char **argv, char **envp)
       initSymt ();
       initiCode ();
       initCSupport ();
+      initBuiltIns();
       initPeepHole ();
 
       if (options.verbose)

@@ -575,6 +575,46 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
 }
 
 /*-----------------------------------------------------------------*/
+/* funcOfTypeVarg :- function of type with name and argtype        */
+/*-----------------------------------------------------------------*/
+symbol *
+funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
+{
+  
+    symbol *sym;
+    int i ;
+    /* create the symbol */
+    sym = newSymbol (name, 0);
+    
+    /* setup return value */
+    sym->type = newLink ();
+    DCL_TYPE (sym->type) = FUNCTION;
+    sym->type->next = typeFromStr(rtype);
+    sym->etype = getSpec (sym->type);
+    
+    /* if arguments required */
+    if (nArgs) {
+	value *args;
+	args = FUNC_ARGS(sym->type) = newValue ();
+	
+	for ( i = 0 ; i < nArgs ; i++ ) {
+	    args->type = typeFromStr(atypes[i]);
+	    args->etype = getSpec (args->type);
+	    SPEC_EXTR(args->etype)=1;
+	    if ((i + 1) == nArgs) break;
+	    args = args->next = newValue ();
+	}
+    }
+    
+    /* save it */
+    addSymChain (sym);
+    sym->cdef = 1;
+    allocVariables (sym);
+    return sym;
+
+}
+
+/*-----------------------------------------------------------------*/
 /* reverseParms - will reverse a parameter tree                    */
 /*-----------------------------------------------------------------*/
 void 

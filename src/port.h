@@ -29,6 +29,16 @@
 #define TARGET_IS_I186 (port->id==TARGET_ID_I186)
 #define TARGET_IS_TCLS900H (port->id==TARGET_ID_TCLS900H)
 
+#define MAX_BUILTIN_ARGS	16
+/* definition of builtin functions */
+typedef struct builtins
+{
+    char *name ;		/* name of builtin function */
+    char *rtype;		/* return type as string : see typefromStr */
+    int  nParms;		/* number of parms : max 8 */
+    char *parm_types[MAX_BUILTIN_ARGS]; /* each parm type as string : see typeFromStr */
+} builtins ;
+
 /* Processor specific names */
 typedef struct
   {
@@ -228,6 +238,7 @@ typedef struct
     bool arrayInitializerSuppported;  
     
     bool (*cseOk) (iCode *ic, iCode *pdic);
+    builtins *builtintable;    /* table of builtin functions */
 #define PORT_MAGIC 0xAC32
 /** Used at runtime to detect if this structure has been completly filled in. */
     int magic;

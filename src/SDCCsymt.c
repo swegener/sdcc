@@ -1943,7 +1943,7 @@ printTypeChain (sym_link * start, FILE * of)
 	  switch (DCL_TYPE (type))
 	    {
 	    case FUNCTION:
-	      fprintf (of, "function ");
+	      fprintf (of, "function %s", (IFFUNC_ISBUILTIN(type) ? "__builtin__" : " "));
 	      break;
 	    case GPOINTER:
 	      if (DCL_PTR_CONST (type))
@@ -2328,6 +2328,100 @@ _mangleFunctionName(char *in)
 }
 
 /*-----------------------------------------------------------------*/
+/* typeFromStr - create a typechain from an encoded string         */
+/* basic types - 	'c' - char            			   */
+/*   			's' - short				   */
+/* 			'i' - int                                  */
+/* 			'l' - long                                 */
+/*                      'f' - float				   */
+/*                      'v' - void				   */
+/*                      '*' - pointer - default (GPOINTER)	   */
+/* modifiers -          'u' - unsigned                             */
+/* pointer modifiers -  'g' - generic                              */
+/*                      'x' - xdata                                */
+/*                      'p' - code                                 */
+/*                      'd' - data                                 */                     
+/* examples : "ig*" - generic int *				   */
+/*            "cx*" - char xdata *                                 */
+/*            "ui" -  unsigned int                                 */
+/*-----------------------------------------------------------------*/
+sym_link *typeFromStr (char *s)
+{
+    sym_link *r = newLink();
+    int usign = 0;
+
+    do {
+	sym_link *nr;
+	switch (*s) {
+	case 'u' : 
+	    usign = 1;
+	    s++;
+	    continue ;
+	    break ;
+	case 'c':
+	    r->class = SPECIFIER;
+	    SPEC_NOUN(r) = V_CHAR;
+	    break;
+	case 's':
+	case 'i':
+	    r->class = SPECIFIER;
+	    SPEC_NOUN(r) = V_INT;
+	    break;
+	case 'l':
+	    r->class = SPECIFIER;
+	    SPEC_NOUN(r) = V_INT;
+	    SPEC_LONG(r) = 1;
+	    break;
+	case 'f':
+	    r->class = SPECIFIER;
+	    SPEC_NOUN(r) = V_FLOAT;
+	    break;
+	case 'v':
+	    r->class = SPECIFIER;
+	    SPEC_NOUN(r) = V_VOID;
+	    break;
+	case '*':
+	    DCL_TYPE(r) = GPOINTER;
+	    break;
+	case 'g':
+	case 'x':
+	case 'p':
+	case 'd':
+	    assert(*(s+1)=='*');
+	    nr = newLink();
+	    nr->next = r;
+	    r = nr;
+	    r->class = DECLARATOR ;
+	    switch (*s) {
+	    case 'g':
+		DCL_TYPE(r) = GPOINTER;
+		break;
+	    case 'x':
+		DCL_TYPE(r) = FPOINTER;
+		break;
+	    case 'p':
+		DCL_TYPE(r) = CPOINTER;
+		break;
+	    case 'd':
+		DCL_TYPE(r) = POINTER;
+		break;
+	    }
+	    s++;
+	    break;
+	default:
+	    werror(E_INTERNAL_ERROR,"typeFromStr");
+	    break;
+	}
+	if (IS_SPEC(r) && usign) {
+	    SPEC_USIGN(r) = 1;
+	    usign = 0;
+	}
+	s++;
+    } while (*s);
+    return r;
+}
+
+/*-----------------------------------------------------------------*/
 /* initCSupport - create functions for C support routines          */
 /*-----------------------------------------------------------------*/
 void 
@@ -2442,5 +2536,22 @@ initCSupport ()
 	      FUNC_NONBANKED (__rlrr[rlrr][bwd][su]->type) = 1;
 	    }
 	}
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* initBuiltIns - create prototypes for builtin functions          */
+/*-----------------------------------------------------------------*/
+void initBuiltIns()
+{
+    int i;
+    symbol *sym;
+
+    if (!port->builtintable) return ;
+
+    for (i = 0 ; port->builtintable[i].name ; i++) {
+	sym = funcOfTypeVarg(port->builtintable[i].name,port->builtintable[i].rtype,
+			     port->builtintable[i].nParms,port->builtintable[i].parm_types);
+	FUNC_ISBUILTIN(sym->type) = 1;
     }
 }

@@ -1,4 +1,11 @@
-2004-08-02 Slade Rich <slade_rich AT users.sourceforge.net>
+2004-08-11 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/gen.c,
+	* src/pic/pcode.c,
+	* src/pic/ralloc.h,
+	* src/pic/ralloc.c: Printing rIdx on internal verbose debug.
+
+2004-08-10 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/device.c,
 	* src/pic/device.h,

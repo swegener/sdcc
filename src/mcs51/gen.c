@@ -2219,22 +2219,22 @@ resultRemat (iCode * ic)
 /*-----------------------------------------------------------------*/
 /* inExcludeList - return 1 if the string is in exclude Reg list   */
 /*-----------------------------------------------------------------*/
+static int
+regsCmp(void *p1, void *p2)
+{
+  return (STRCASECMP((char *)p1, (char *)(p2)) == 0);
+}
+
 static bool
 inExcludeList (char *s)
 {
-  int i = 0;
+  const char *p = setFirstItem(options.excludeRegsSet);
 
-  if (options.excludeRegs[i] &&
-      STRCASECMP (options.excludeRegs[i], "none") == 0)
+  if (p == NULL || STRCASECMP(p, "none") == 0)
     return FALSE;
 
-  for (i = 0; options.excludeRegs[i]; i++)
-    {
-      if (options.excludeRegs[i] &&
-	  STRCASECMP (s, options.excludeRegs[i]) == 0)
-	return TRUE;
-    }
-  return FALSE;
+
+  return isinSetWith(options.excludeRegsSet, s, regsCmp);
 }
 
 /*-----------------------------------------------------------------*/

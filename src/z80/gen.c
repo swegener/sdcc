@@ -3113,14 +3113,21 @@ genFunction (iCode * ic)
 
   ftype = operandType (IC_LEFT (ic));
 
-  /* if critical function then turn interrupts off */
-  if (IFFUNC_ISCRITICAL (ftype))
-    emit2 ("!di");
-
   /* if this is an interrupt service routine then save all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
     {
-      emit2 ("!pusha");
+      if (!FUNC_ISNAKED( sym->type ))
+        {
+          emit2 ("!pusha");
+	}
+    }
+  else
+    {
+      /* if critical function then turn interrupts off */
+      if (IFFUNC_ISCRITICAL (sym->type))
+        {
+          emit2 ("!di");
+	}
     }
 
   /* PENDING: callee-save etc */
@@ -3218,64 +3225,80 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
+
+  /* PENDING: calleeSave */
+  if (IS_Z80 && _G.omitFramePtr)
+    {
+      if (_G.stack.offset)
+        emit2 ("!ldaspsp", _G.stack.offset);
+    }
+  else if (_G.stack.offset && IS_GB && _G.stack.offset > INT8MAX)
+    {
+      emit2 ("!leavexl", _G.stack.offset);
+    }
+  else if (_G.stack.offset)
+    {
+      emit2 ("!leavex", _G.stack.offset);
+    }
+  else if( !FUNC_ISNAKED( sym->type )) /*.p.t.20030716 - now supporting Naked funcitons */
+    {
+      emit2 ("!leave");
+    }
+      
+  if (_G.calleeSaves.pushedDE) 
+    {
+      emit2 ("pop de");
+      _G.calleeSaves.pushedDE = FALSE;
+    }
+
+  if (_G.calleeSaves.pushedBC) 
+    {
+      emit2 ("pop bc");
+      _G.calleeSaves.pushedBC = FALSE;
+    }
+
+  if (options.profile) 
+    {
+      emit2 ("!profileexit");
+    }
+
+  /* if this is an interrupt service routine then restore all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
     {
-      wassertl (0, "Tried to close an interrupt support function");
+      if (!FUNC_ISNAKED( sym->type ))
+        {
+          emit2 ("!popa");
+        }
     }
   else
     {
+      /* if critical function then turn interrupts back on */
       if (IFFUNC_ISCRITICAL (sym->type))
-	emit2 ("!ei");
+        emit2 ("!ei");
+    }
 
-      /* PENDING: calleeSave */
-
-      if (IS_Z80 && _G.omitFramePtr)
-        {
-          if (_G.stack.offset)
-            emit2 ("!ldaspsp", _G.stack.offset);
-        }
-      else if (_G.stack.offset && IS_GB && _G.stack.offset > INT8MAX)
-        {
-          emit2 ("!leavexl", _G.stack.offset);
-        }
-      else if (_G.stack.offset)
-        {
-          emit2 ("!leavex", _G.stack.offset);
-        }
-      else if( !FUNC_ISNAKED( sym->type )) /*.p.t.20030716 - now supporting Naked funcitons */
-        {
-          emit2 ("!leave");
-        }
-
-      if (_G.calleeSaves.pushedDE) 
-        {
-          emit2 ("pop de");
-          _G.calleeSaves.pushedDE = FALSE;
-        }
-
-      if (_G.calleeSaves.pushedBC) 
-        {
-          emit2 ("pop bc");
-          _G.calleeSaves.pushedBC = FALSE;
-        }
-
-      if (options.profile) 
-        {
-          emit2 ("!profileexit");
-        }
-
-
-      if (options.debug && currFunc)
-	{
-	  debugFile->writeEndFunction (currFunc, ic, 1);
-	}
+  if (options.debug && currFunc)
+    {
+      debugFile->writeEndFunction (currFunc, ic, 1);
+    }
       
+  if (IFFUNC_ISISR (sym->type))
+    {
+      /* "critical interrupt" is used to imply NMI handler */
+      if (IS_Z80 && IFFUNC_ISCRITICAL (sym->type))
+        emit2 ("retn");
+      else
+        emit2 ("reti");
+    }
+  else
+    {
       /* Both banked and non-banked just ret */
       emit2 ("ret");
-
-      sprintf (buffer, "%s_end", sym->rname);
-      emit2 ("!labeldef", buffer);
     }
+      
+  sprintf (buffer, "%s_end", sym->rname);
+  emit2 ("!labeldef", buffer);
+  
   _G.flushStatics = 1;
   _G.stack.pushed = 0;
   _G.stack.offset = 0;

@@ -35,6 +35,12 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
       "\tpush de\n"
       "\tpush hl"
     },
+    { "popa", 
+      "pop hl\n"
+      "\tpop de\n"
+      "\tpop bc\n"
+      "\tpop af"
+    },
     { "adjustsp", "lda sp,-%d(sp)" },
     { "fileprelude", "" },
     { "profileenter",
@@ -93,7 +99,15 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
       		"push af\n"
       		"\tpush\tbc\n"
       		"\tpush\tde\n"
-      		"\tpush\thl"
+      		"\tpush\thl\n"
+		"\tpush\tiy"
+    },
+    { "popa",
+		"pop iy\n"
+		"\tpop\thl\n"
+		"\tpop\tde\n"
+		"\tpop\tbc\n"
+		"\tpop\taf"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
     { "profileenter",
@@ -171,6 +185,12 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
       "\tpush bc\n"
       "\tpush de\n"
       "\tpush hl"
+    },
+    { "popa", 
+      "pop hl\n"
+      "\tpop de\n"
+      "\tpop bc\n"
+      "\tpop af"
     },
     { "di", "di" },
     { "adjustsp", "add sp,-%d" },
@@ -256,6 +276,12 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
       "\tpush bc\n"
       "\tpush de\n"
       "\tpush hl"
+    },
+    { "popa", 
+      "pop hl\n"
+      "\tpop de\n"
+      "\tpop bc\n"
+      "\tpop af"
     },
     { "di", "di" },
     { "adjustsp", "add sp,-%d" },
@@ -370,7 +396,15 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
       		"push af\n"
       		"\tpush\tbc\n"
       		"\tpush\tde\n"
-      		"\tpush\thl"
+      		"\tpush\thl\n"
+		"\tpush\tiy"
+    },
+    { "popa", 
+		"pop\tiy\n"
+		"\tpop\thl\n"
+		"\tpop\tde\n"
+		"\tpop\tbc\n"
+		"\tpop\taf"
     },
     { "adjustsp", "lda sp,(sp%+d)" },
     { "profileenter",

@@ -10340,6 +10340,41 @@ Since the number of interrupts available is chip specific and the interrupt
 \end_inset 
 
  for details on customizing startup.
+\layout Subsection
+
+Z80 Interrupt Service Routines
+\layout Standard
+
+The Z80 uses several different methods for determining the correct interrupt
+ vector depending on the hardware implementation.
+ Therefore, SDCC ignores the optional interrupt number and does not attempt
+ to generate an interrupt vector table.
+\layout Standard
+
+By default, SDCC generates code for a maskable interrupt, which uses an
+ RETI instruction to return from the interrupt.
+ To write an interrupt handler for the non-maskable interrupt, which needs
+ an RETN instruction instead, add the 
+\emph on 
+critical
+\emph default 
+ keyword:
+\layout Verse
+
+
+\family typewriter 
+void nmi_isr (void) critical interrupt
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+...
+ 
+\newline 
+}
 \layout Section
 
 Enabling and Disabling Interrupts

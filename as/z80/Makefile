@@ -35,7 +35,7 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 $(BINS): $(OBJS) $(SLIBOBJS)
-	$(CC) $(LDFLAGS) -o $(BINS) $(OBJS) $(SLIBOBJS)
+	$(CC) -o $(BINS) $(OBJS) $(SLIBOBJS) $(LDFLAGS)
 
 
 $(OBJDIR)/%.o:	%.c

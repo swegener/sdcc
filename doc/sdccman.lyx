@@ -4434,18 +4434,6 @@ The loop control variable does NOT participate in any arithmetic operation
 \layout Itemize
 
 There are NO switch statements in the loop.
-\layout Standard
-
-Note djnz instruction can be used for 8-bit values 
-\emph on 
-only
-\emph default 
-, therefore it is advantageous to declare loop control symbols as 
-\emph on 
-char
-\emph default 
-.
- Ofcourse this may not be possible on all situations.
 \layout Subsubsection
 
 Algebraic Simplifications

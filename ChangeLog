@@ -1,3 +1,32 @@
+2002-08-28  Jesus Calvino-Fraga and Borut Razem <borut.razem@siol.net>
+	* sdcc/sdcc.dsw: added sdcpp, sdcppa, yacc, conf projects
+
+	* sdcc/src/src.dsp, sdcc/src/avr/avr.dsp, sdcc/src/ds390/ds390.dsp,
+	  sdcc/src/mcs51/mcs51.dsp, sdcc/src/pic/pic.dsp, sdcc/src/z80/z80.dsp,
+	  sdcc/src/xa51/xa51.dsp, sdcc/src/avr/avra.dsp,
+	  sdcc/src/ds390/ds390a.dsp, sdcc/src/mcs51/mcs51a.dsp,
+	  sdcc/src/pic/pica.dsp, sdcc/src/z80/z80a.dsp,
+	  sdcc/src/xa51/xa51a.dsp, sdcc/as/as_z80.dsp,
+	  sdcc/as/aslink.dsp, sdcc/as/asx8051.dsp, sdcc/packihx/packihx.dsp:
+	- added Release configuration in VS projects
+	- review of compiler an linker options
+	- VC .exe files are generated in bin_vc directory, not to interfere
+	  with binaries generated from other projects (cygwin, mingw, bcc ...)
+
+	* sdcc/src/yacc.dsp: added
+
+	* sdcc/config.dsp, sdcc/configure_vc.awk, sdcc/sdcc_vc_in.h:
+	added - genarate sdcc_vc.h using sdcc_vc_in.h as template
+	and insert the version number definitions from .version 
+
+	* sdcc/support/cpp2/sdcpp.dsp: added - VC project for sdcpp
+
+	* sdcc/support/cpp2/sdcppa.dsp, sdcc/support/cpp2/auto-host_vc_in.h:
+	added - genarate auto-host.h using auto-host_vc_in.h as template
+
+	* sdcc/sdcc_vc.h,
+	removed from CVS, generated automatically
+
 2002-08-25  Bernhard Held <bernhard@bernhardheld.de>
 	* support/scripts/inc2h.pl: use gputils or gpasm (from Nathan Hurst)
 

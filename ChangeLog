@@ -1,3 +1,9 @@
+2004-12-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added 261.a,b (16 bit rotate) by Stas Sergeev
+	  <stsp AT users.sourceforge.net> with reversed byte order
+	* support/regression/tests/rotate.c: added (ds390 skips some tests)
+
 2004-12-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (genLeftShift, genRightShift): fixed second part of

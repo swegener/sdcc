@@ -1020,6 +1020,7 @@ static void packBits(set *bregs)
 
 
 
+#if 0
 static void bitEQUs(FILE *of, set *bregs)
 {
   regs *breg,*bytereg;
@@ -1075,6 +1076,7 @@ static void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
   }
       
 }
+#endif
 
 void pic16_writeUsedRegs(FILE *of) 
 {

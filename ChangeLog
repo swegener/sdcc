@@ -1,3 +1,8 @@
+2003-06-04  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/pic16/ralloc.c: fix warnings
+	* src/pic16/pcode.c: fix warning
+
 2003-06-10  Scott Dattalo  <scott@dattalo.com>
 
 	 Scott D. for Vangelis Rokas (vrokas@otenet.gr). I (scott) don't

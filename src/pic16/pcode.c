@@ -3877,6 +3877,8 @@ char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
 	}
 	return PCOR2(pcop)->r1->name;
       }
+#else
+      break;
 #endif
     }
   }

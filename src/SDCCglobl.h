@@ -200,6 +200,7 @@ struct options {
     int nopeep    : 1  ; /* no peep hole optimization */
     int asmpeep   : 1  ; /* pass inline assembler thru peep hole */
     int debug     : 1  ; /* generate extra debug info */
+    int nodebug	  : 1  ; /* Generate no debug info. */
     int stackOnData:1  ; /* stack after data segment  */
     int noregparms: 1  ; /* do not pass parameters in registers */
     int c1mode	  : 1  ; /* Act like c1 - no pre-proc, asm or link */

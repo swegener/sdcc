@@ -154,7 +154,7 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    continue;
 	
 	/* print extra debug info if required */
-	if (options.debug || sym->level == 0) {
+	if ((options.debug || sym->level == 0) && !options.nodebug) {
 
 	    cdbSymbol(sym,cdbFile,FALSE,FALSE);
 
@@ -172,7 +172,7 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	/* if is has an absolute address then generate
 	   an equate for this no need to allocate space */
 	if (SPEC_ABSA (sym->etype)) {
-	    if (options.debug || sym->level == 0)
+	    if ((options.debug || sym->level == 0) && !options.nodebug)
 		fprintf (map->oFile," == 0x%04x\n",SPEC_ADDR (sym->etype));	    
 
 	    fprintf (map->oFile, "%s\t=\t0x%04x\n",
@@ -181,7 +181,7 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	}
 	else {
 	    /* allocate space */
-	    if (options.debug || sym->level == 0)
+	    if ((options.debug || sym->level == 0) && !options.nodebug)
 		fprintf(map->oFile,"==.\n");
 	    fprintf (map->oFile, "%s:\n", sym->rname);
 	    fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
@@ -643,7 +643,7 @@ void emitStaticSeg (memmap * map)
 	    addSetHead (&publics, sym);
 
 	/* print extra debug info if required */
-	if (options.debug || sym->level == 0) {
+	if ((options.debug || sym->level == 0) && !options.nodebug) {
 
 	    cdbSymbol(sym,cdbFile,FALSE,FALSE);
 
@@ -662,7 +662,7 @@ void emitStaticSeg (memmap * map)
 	
 	/* if it has an absolute address */
 	if (SPEC_ABSA (sym->etype)) {
-	    if (options.debug || sym->level == 0)
+	    if ((options.debug || sym->level == 0) && !options.nodebug)
 		fprintf(code->oFile," == 0x%04x\n", SPEC_ADDR (sym->etype));
 
 	    fprintf (code->oFile, "%s\t=\t0x%04x\n",
@@ -670,7 +670,7 @@ void emitStaticSeg (memmap * map)
 		     SPEC_ADDR (sym->etype));
 	}
 	else {
-	    if (options.debug || sym->level == 0)
+	    if ((options.debug || sym->level == 0) && !options.nodebug)
 		fprintf(code->oFile," == .\n");	
 
 	    /* if it has an initial value */
@@ -853,7 +853,7 @@ static void emitOverlay(FILE *afile)
 		continue;
 
 	    /* print extra debug info if required */
-	    if (options.debug || sym->level == 0) {
+	    if ((options.debug || sym->level == 0) && !options.nodebug) {
 		
 		cdbSymbol(sym,cdbFile,FALSE,FALSE);
 		
@@ -874,7 +874,7 @@ static void emitOverlay(FILE *afile)
 	       an equate for this no need to allocate space */
 	    if (SPEC_ABSA (sym->etype)) {
 		
-		if (options.debug || sym->level == 0)
+		if ((options.debug || sym->level == 0) && !options.nodebug)
 		    fprintf (afile," == 0x%04x\n",SPEC_ADDR (sym->etype));	    
 
 		fprintf (afile, "%s\t=\t0x%04x\n",
@@ -882,7 +882,7 @@ static void emitOverlay(FILE *afile)
 			 SPEC_ADDR (sym->etype));
 	    }
 	    else {
-		if (options.debug || sym->level == 0)
+		if ((options.debug || sym->level == 0) && !options.nodebug)
 		    fprintf(afile,"==.\n");
 	
 		/* allocate space */

@@ -69,6 +69,7 @@ static void _setDefaultOptions(void)
     options.stackAuto = 1;
     options.mainreturn = 1;
     options.noregparms = 1;
+    options.nodebug = 1;
     /* first the options part */
     options.intlong_rent = 1;
 

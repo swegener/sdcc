@@ -1,3 +1,8 @@
+2003-03-31  Borut Razem <borut.razem@siol.net>
+
+	* src/z80/main.c: link-{port} and as-{port} defined without path
+	* src/src.dsp: support/Util/MySystem.h and src/SDCCutil.h added to project
+
 2003-03-31  Bernhard Held <bernhard@bernhardheld.de>
 
 	* Makefile, src/Makefile.in: add dependencies, so that 'make -j' works

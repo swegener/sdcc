@@ -24,8 +24,6 @@ unsigned long clock(void) {
 
 void startTimer (void) 
 {
-  printf ("\n\rStarting timer 2 test.\n\r");
-
   // initialise timer
   ET2=0; // disable timer interrupts initially
   T2CON=0; // stop, timer mode, autoreload

@@ -243,10 +243,8 @@ int main(void)
     printf ("        should be:   %c\n", 'B');
     printf ("Arr_1_Glob[8]:       %d\n", Arr_1_Glob[8]);
     printf ("        should be:   %d\n", (int)7);
-#if 0
+#if 1
     printf ("Arr_2_Glob[8][7]:    %d\n", Arr_2_Glob[8][7]);
-#else
-    //    printf ("Arr_2_Glob[8][7]:    %d\n", Arr_2_Glob[8][7]);
 #endif
     printf ("        should be:   Number_Of_Runs + 10\n");
     printf ("Ptr_Glob->\n");

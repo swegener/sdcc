@@ -12,6 +12,14 @@ The Z80 port was started by Michael Hope <michaelh@earthling.net>
 Some of the Z80 related files are borrowed from the Gameboy
 Development Kit (GBDK) originally by Pascal Felber.
 
+Notes:
+------
+000123 mlh: You can set the processor type at run time.  Try:
+sdcc -mz80 blah.c
+sdcc -mmcs51 blah.c
+
+The default is the mcs51.
+
 Roadmap:
 --------
 README		- This file

@@ -189,6 +189,10 @@ _setPort (const char *name)
       if (!strcmp (_ports[i]->target, name))
 	{
 	  port = _ports[i];
+	  if (strcmp(name,"ds390")==0) {
+	    options.model=MODEL_FLAT24;
+	    options.stack10bit=1;
+	  }
 	  return 0;
 	}
     }

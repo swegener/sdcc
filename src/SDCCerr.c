@@ -91,7 +91,7 @@ struct  {
 { ERROR  ,"error *** 'extern' variable '%s' cannot be initialised	\n"	      },
 { ERROR  ,"error *** Pre-Processor %s\n"					      },
 { ERROR  ,"error *** _dup call failed\n"                                          },
-{ ERROR  ,"error *** pointer being cast to incompatible type \n"                        },
+{ WARNING,"warning *** pointer being cast to incompatible type \n"                        },
 { WARNING,"warning *** 'while' loop with 'zero' constant.loop eliminated\n"	      },
 { WARNING,"warning *** %s expression has NO side effects.expr eliminated\n"	      },
 { WARNING,"warning *** constant value '%s', out of range.\n"		      },

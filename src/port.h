@@ -214,6 +214,8 @@ typedef struct
     bool ne_neq;		/* transform a != b --> ! (a == b)  */
     bool eq_nne;		/* transform a == b --> ! (a != b)  */
 
+    bool arrayInitializerSuppported;  
+      
 #define PORT_MAGIC 0xAC32
 /** Used at runtime to detect if this structure has been completly filled in. */
     int magic;

@@ -111,6 +111,7 @@ operand;
 #define IC_JTCOND(x) (x)->ulrrcnd.jmpTab.condition
 #define IC_JTLABELS(x) (x)->ulrrcnd.jmpTab.labels
 #define IC_INLINE(x) (x)->inlineAsm
+#define IC_ARRAYILIST(x) (x)->arrayInitList
 
 typedef struct iCode
   {
@@ -171,6 +172,7 @@ typedef struct iCode
     argLabel;
 
     char *inlineAsm;		/* pointer to inline assembler code */
+    literalList *arrayInitList; /* point to array initializer list. */
 
     int lineno;			/* file & lineno for debug information */
     char *filename;
@@ -205,6 +207,7 @@ iCodeTable;
                       x->op == IPOP     ||     \
                       x->op == JUMPTABLE ||    \
                       x->op == RECEIVE  ||     \
+		      x->op == ARRAYINIT ||    \
 		      SKIP_IC1(x)||  \
 		      x->op == SEND         )
 

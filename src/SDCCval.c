@@ -97,6 +97,107 @@ revinit (initList * val)
   return prev;
 }
 
+bool
+convertIListToConstList(initList *src, literalList **lList)
+{
+    initList    *iLoop;
+    literalList *head, *last, *newL;
+    
+    head = last = NULL;
+    
+    if (!src || src->type != INIT_DEEP)
+    {
+	return FALSE;
+    }
+    
+    iLoop =  src->init.deep;
+    
+    while (iLoop)
+    {
+	if (iLoop->type != INIT_NODE)
+	{
+	    return FALSE;
+	}
+	
+	if (!IS_AST_LIT_VALUE(iLoop->init.node))
+	{
+	    return FALSE;
+	}
+	iLoop = iLoop->next;
+    }
+    
+    // We've now established that the initializer list contains only literal values.
+    
+    iLoop = src->init.deep;
+    while (iLoop)
+    {
+	double val = AST_LIT_VALUE(iLoop->init.node);
+	
+	if (last && last->literalValue == val)
+	{
+	    last->count++;
+	}
+	else
+	{
+	    newL = Safe_malloc(sizeof(literalList));
+	    newL->literalValue = val;
+	    newL->count = 1;
+	    newL->next = NULL;
+	    
+	    if (last)
+	    {
+		last->next = newL;
+	    }
+	    else
+	    {
+		head = newL;
+	    }
+	    last = newL;
+	}
+	iLoop = iLoop->next;
+    }
+    
+    if (!head)    
+    {
+	return FALSE;
+    }
+    
+    *lList = head;
+    return TRUE;
+}
+
+literalList *
+copyLiteralList(literalList *src)
+{
+    literalList *head, *prev, *newL;
+    
+    head = prev = NULL;
+    
+    while (src)
+    {
+	newL = Safe_malloc(sizeof(literalList));
+	
+	newL->literalValue = src->literalValue;
+	newL->count = src->count;
+	newL->next = NULL;
+	
+	if (prev)
+	{
+	    prev->next = newL;
+	}
+	else
+	{
+	    head = newL;
+	}
+	prev = newL;
+	src = src->next;
+    }
+    
+    return head;
+}
+
+
+
 /*------------------------------------------------------------------*/
 /* copyIlist - copy initializer list            */
 /*------------------------------------------------------------------*/

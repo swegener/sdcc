@@ -1319,6 +1319,11 @@ main (int argc, char **argv, char **envp)
   setDefaultOptions ();
   parseCmdLine (argc, argv);
 
+  if (getenv("SDCPP"))
+  {
+    _preCmd[0] = getenv("SDCPP");
+  }
+    
   /* if no input then printUsage & exit */
   if ((!options.c1mode && !srcFileName && !nrelFiles) || 
       (options.c1mode && !srcFileName && !options.out_name))

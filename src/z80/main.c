@@ -531,6 +531,7 @@ PORT z80_port =
   1,				/* transform >= to ! < */
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
+  FALSE,                        /* No array initializer support. */	
   PORT_MAGIC
 };
 
@@ -609,5 +610,6 @@ PORT gbz80_port =
   1,				/* transform >= to ! < */
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
+  FALSE,                        /* No array initializer support. */
   PORT_MAGIC
 };

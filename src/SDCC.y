@@ -90,7 +90,7 @@ value *cenum = NULL  ;  /* current enumeration  type chain*/
 %token IFX ADDRESS_OF GET_VALUE_AT_ADDRESS SPIL UNSPIL GETHBIT
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC 
-%token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND
+%token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
 
 %type <yyint>  Interrupt_storage
 %type <sym> identifier  declarator  declarator2 enumerator_list enumerator

@@ -66,6 +66,7 @@ typedef struct ast
     union
       {
 	char *inlineasm;	/* pointer to inline assembler code */
+	literalList *constlist; /* init list for array initializer. */
 	symbol *sym;		/* if block then -> symbols */
 	value *args;		/* if function then args    */
 	/* if switch then switch values */

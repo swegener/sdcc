@@ -109,7 +109,8 @@ iCodeTable codeTable[] =
   {IFX, "if", picIfx, NULL},
   {INLINEASM, "", picInline, NULL},
   {RECEIVE, "recv", picReceive, NULL},
-  {SEND, "send", picGenericOne, NULL}
+  {SEND, "send", picGenericOne, NULL},
+  {ARRAYINIT, "arrayInit", picGenericOne, NULL},
 };
 
 
@@ -608,6 +609,10 @@ copyiCode (iCode * ic)
 
     case INLINEASM:
       IC_INLINE (nic) = IC_INLINE (ic);
+      break;
+
+    case ARRAYINIT:
+      IC_ARRAYILIST(nic) = IC_ARRAYILIST(ic);
       break;
 
     default:
@@ -3008,6 +3013,19 @@ geniCodeInline (ast * tree)
 }
 
 /*-----------------------------------------------------------------*/
+/* geniCodeArrayInit - intermediate code for array initializer     */
+/*-----------------------------------------------------------------*/
+static void 
+geniCodeArrayInit (ast * tree, operand *array)
+{
+  iCode *ic;
+
+  ic = newiCode (ARRAYINIT, array, NULL);
+  IC_ARRAYILIST (ic) = tree->values.constlist;
+  ADDTOCHAIN (ic);
+}
+
+/*-----------------------------------------------------------------*/
 /* Stuff used in ast2iCode to modify geniCodeDerefPtr in some      */
 /* particular case. Ie : assigning or dereferencing array or ptr   */
 /*-----------------------------------------------------------------*/
@@ -3415,6 +3433,10 @@ ast2iCode (ast * tree,int lvl)
     case INLINEASM:
       geniCodeInline (tree);
       return NULL;
+	
+    case ARRAYINIT:
+	geniCodeArrayInit(tree, ast2iCode (tree->left,lvl+1));
+	return NULL;
     }
 
   return NULL;

@@ -9215,6 +9215,106 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* genArrayInit - generates code for address of                       */
+/*-----------------------------------------------------------------*/
+static void
+genArrayInit (iCode * ic)
+{
+    literalList *iLoop;
+    int         ix, count;
+    int         elementSize = 0, eIndex;
+    unsigned    val, lastVal;
+    sym_link    *type;
+    
+    D (emitcode (";", "genArrayInit "););
+
+    aopOp (IC_LEFT(ic), ic, FALSE, FALSE);
+    
+    if (AOP_TYPE(IC_LEFT(ic)) == AOP_IMMD)
+    {
+	// Load immediate value into DPTR.
+	emitcode("mov", "dptr, %s",
+	     aopGet(AOP(IC_LEFT(ic)), 0, TRUE, FALSE, TRUE));
+    }
+    else if (AOP_TYPE(IC_LEFT(ic)) != AOP_DPTR)
+    {
+	werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+		"Unexpected operand to genArrayInit.\n");
+	exit(1);
+    }
+    
+    type = operandType(IC_LEFT(ic));
+    
+    if (type && type->next)
+    {
+	elementSize = getSize(type->next);
+    }
+    else
+    {
+	werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+		                "can't determine element size in genArrayInit.\n");
+	exit(1);
+    }
+    
+    iLoop = IC_ARRAYILIST(ic);
+    lastVal = 0xffff;
+    
+    while (iLoop)
+    {
+	bool firstpass = TRUE;
+	
+	emitcode(";", "store %d x 0x%x to DPTR (element size %d)", 
+		 iLoop->count, (int)iLoop->literalValue, elementSize);
+	
+	ix = iLoop->count;
+	
+	while (ix)
+	{
+	    symbol *tlbl = NULL;
+	    
+	    count = ix > 256 ? 256 : ix;
+	    
+	    if (count > 1)
+	    {
+		tlbl = newiTempLabel (NULL);
+		if (firstpass || (count & 0xff))
+		{
+		    emitcode("mov", "b, #0x%x", count & 0xff);
+		}
+		
+		emitcode ("", "%05d$:", tlbl->key + 100);
+	    }
+	    
+	    firstpass = FALSE;
+		
+	    for (eIndex = 0; eIndex < elementSize; eIndex++)
+	    {
+		val = (((int)iLoop->literalValue) >> (eIndex * 8)) & 0xff;
+		if (val != lastVal)
+		{
+		    emitcode("mov", "a, #0x%x", val);
+		    lastVal = val;
+		}
+		
+		emitcode("movx", "@dptr, a");
+		emitcode("inc", "dptr");
+	    }
+	    
+	    if (count > 1)
+	    {
+		emitcode("djnz", "b, %05d$", tlbl->key + 100);
+	    }
+	    
+	    ix -= count;
+	}
+	
+	iLoop = iLoop->next;
+    }
+    
+    freeAsmop (IC_LEFT(ic), NULL, ic, TRUE);
+}
+
+/*-----------------------------------------------------------------*/
 /* genFarFarAssign - assignment when both are in far space         */
 /*-----------------------------------------------------------------*/
 static void
@@ -9256,7 +9356,7 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
   {
       /* We can use the '390 auto-toggle feature to good effect here. */
       
-      D(emitcode(";","genFarFarAssign ('390 auto-toggle fun)"););
+      D(emitcode(";","genFarFarAssign (390 auto-toggle fun)"););
       emitcode("mov", "dps, #0x21"); 	/* Select DPTR2 & auto-toggle. */
       emitcode ("mov", "dptr,#%s", rSym->rname); 
       /* DP2 = result, DP1 = right, DP1 is current. */
@@ -10047,6 +10147,10 @@ gen390Code (iCode * lic)
 	  addSet (&_G.sendSet, ic);
 	  break;
 
+	case ARRAYINIT:
+	    genArrayInit(ic);
+	    break;
+	    
 	default:
 	  ic = ic;
 	}

@@ -224,7 +224,12 @@ copyAstValues (ast * dest, ast * src)
     case INLINEASM:
       dest->values.inlineasm = Safe_calloc (1, strlen (src->values.inlineasm) + 1);
       strcpy (dest->values.inlineasm, src->values.inlineasm);
+      break;
 
+    case ARRAYINIT:
+	dest->values.constlist = copyLiteralList(src->values.constlist);
+	break;
+	
     case FOR:
       AST_FOR (dest, trueLabel) = copySymbol (AST_FOR (src, trueLabel));
       AST_FOR (dest, continueLabel) = copySymbol (AST_FOR (src, continueLabel));
@@ -832,6 +837,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
   ast *rast = NULL;
   initList *iloop;
   int lcnt = 0, size = 0;
+  literalList *literalL;
 
   /* take care of the special   case  */
   /* array of characters can be init  */
@@ -843,51 +849,77 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 
       return decorateType (resolveSymbols (rast));
 
-  /* not the special case             */
-  if (ilist->type != INIT_DEEP)
+    /* not the special case             */
+    if (ilist->type != INIT_DEEP)
     {
-      werror (E_INIT_STRUCT, "");
-      return NULL;
+	werror (E_INIT_STRUCT, "");
+	return NULL;
     }
 
-  iloop = ilist->init.deep;
-  lcnt = DCL_ELEM (type);
+    iloop = ilist->init.deep;
+    lcnt = DCL_ELEM (type);
 
-  for (;;)
+    if (port->arrayInitializerSuppported && convertIListToConstList(ilist, &literalL))
     {
-      ast *aSym;
-      size++;
+	ast *aSym;
 
-      aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size - 1))));
-      aSym = decorateType (resolveSymbols (aSym));
-      rast = createIval (aSym, type->next, iloop, rast);
-      iloop = (iloop ? iloop->next : NULL);
-      if (!iloop)
-	break;
-      /* if not array limits given & we */
-      /* are out of initialisers then   */
-      if (!DCL_ELEM (type) && !iloop)
-	break;
-
-      /* no of elements given and we    */
-      /* have generated for all of them */
-      if (!--lcnt) {
-	/* if initializers left */
-	if (iloop) {
-	  // there has to be a better way
-	  char *name=sym->opval.val->sym->name;
-	  int lineno=sym->opval.val->sym->lineDef;
-	  werror (W_EXESS_ARRAY_INITIALIZERS, name, lineno);
+	aSym = decorateType (resolveSymbols(sym));
+	
+	rast = newNode(ARRAYINIT, aSym, NULL);
+	rast->values.constlist = literalL;
+	
+	// Make sure size is set to length of initializer list.
+	while (iloop)
+	{
+	    size++;
+	    iloop = iloop->next;
 	}
-	break;
-      }
+	
+	if (lcnt && size > lcnt)
+	{
+	    // Array size was specified, and we have more initializers than needed.
+	    char *name=sym->opval.val->sym->name;
+	    int lineno=sym->opval.val->sym->lineDef;
+	    
+	    werror (W_EXESS_ARRAY_INITIALIZERS, name, lineno);
+	}
+    }
+    else
+    {
+	for (;;)
+	{
+	    ast *aSym;
+	    
+	    aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (++size))));
+	    aSym = decorateType (resolveSymbols (aSym));
+	    rast = createIval (aSym, type->next, iloop, rast);
+	    iloop = (iloop ? iloop->next : NULL);
+	    if (!iloop)
+	    {
+		break;
+	    }
+	    
+	    /* no of elements given and we    */
+	    /* have generated for all of them */
+	    if (!--lcnt) 
+	    {
+		// there has to be a better way
+		char *name=sym->opval.val->sym->name;
+		int lineno=sym->opval.val->sym->lineDef;
+		werror (W_EXESS_ARRAY_INITIALIZERS, name, lineno);
+		
+		break;
+	    }
+	}
     }
 
-  /* if we have not been given a size  */
-  if (!DCL_ELEM (type))
-    DCL_ELEM (type) = size;
+    /* if we have not been given a size  */
+    if (!DCL_ELEM (type))
+    {
+	DCL_ELEM (type) = size;
+    }
 
-  return decorateType (resolveSymbols (rast));
+    return decorateType (resolveSymbols (rast));
 }
 
 
@@ -912,7 +944,6 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
        SPEC_SCLS (iexpr->etype) == S_CODE)
       && IS_ARRAY (iexpr->ftype))
     {
-
       /* for each character generate an assignment */
       /* to the array element */
       char *s = SPEC_CVAL (iexpr->etype).v_char;

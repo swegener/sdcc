@@ -37,6 +37,14 @@ typedef struct value
   }
 value;
 
+typedef struct literalList
+{
+    double    literalValue;
+    unsigned  count;
+    struct literalList *next;
+} literalList;
+
+
 enum
   {
     INIT_NODE,
@@ -104,4 +112,6 @@ value *valForArray (struct ast *);
 value *valForStructElem (struct ast *, struct ast *);
 value *valForCastAggr (struct ast *, sym_link *, struct ast *, int);
 value *valForCastArr (struct ast * , sym_link *);
+bool convertIListToConstList(initList *src, literalList **lList);
+literalList *copyLiteralList(literalList *src);
 #endif

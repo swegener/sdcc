@@ -695,7 +695,6 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      /* kill this one if required */
 	      if (kill)
 		{
-		  printf ("kill ic %d\n", ic->key);
 		  change = 1;
 		  gchange++;
 		  /* eliminate this */

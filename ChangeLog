@@ -1,3 +1,8 @@
+2003-08-28  Bernhard Held <bernhard@bernhardheld.de>
+
+	* device/lib/_startup.c: quick & dirty fix for ds390/ds400;
+	these ports have their own __sdcc_external_start()
+
 2003-08-26  Bernhard Held <bernhard@bernhardheld.de>
 
 	pic patch provided by Slade Rich <slade_rich@yahoo.com>

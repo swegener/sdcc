@@ -27,7 +27,12 @@
    returns a non-zero value then global &
    static variable initialisation will be skipped */
 
+#if !defined(SDCC_ds390) && !defined(SDCC_ds400)
+
 unsigned char _sdcc_external_startup ()
 {
     return 0;
 }
+
+#endif
+

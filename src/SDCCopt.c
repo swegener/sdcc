@@ -148,7 +148,8 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 	{
 	  newic = newiCode (IPUSH, right, NULL);
 	  newic->parmPush = 1;
-	  bytesPushed+=4;
+	  //bytesPushed+=4;
+	  bytesPushed += getSize(operandType(right));
 	}
 
       addiCodeToeBBlock (ebp, newic, ip);
@@ -164,7 +165,8 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 	{
 	  newic = newiCode (IPUSH, left, NULL);
 	  newic->parmPush = 1;
-	  bytesPushed+=4;
+	  //bytesPushed+=4;
+	  bytesPushed += getSize(operandType(left));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -188,6 +190,7 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
   sym_link *type = operandType (IC_RIGHT (ic));
   int linenno = ic->lineno;
   int bwd, su;
+  int bytesPushed=0;
 
   ip = ic->next;
   /* remove it from the iCode */
@@ -236,6 +239,7 @@ found:
 	{
 	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
 	  newic->parmPush = 1;
+	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = linenno;
@@ -245,6 +249,7 @@ found:
   /* make the call */
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
+  newic->parmBytes+=bytesPushed;
   addiCodeToeBBlock (ebp, newic, ip);
   newic->lineno = linenno;
 
@@ -261,6 +266,7 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
   sym_link *type = operandType (IC_LEFT (ic));
   int lineno = ic->lineno;
   int bwd, su;
+  int bytesPushed=0;
 
   ip = ic->next;
   /* remove it from the iCode */
@@ -310,6 +316,7 @@ found:
 	{
 	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
 	  newic->parmPush = 1;
+	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -319,6 +326,7 @@ found:
   /* make the call */
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
+  newic->parmBytes+=bytesPushed;
   addiCodeToeBBlock (ebp, newic, ip);
   newic->lineno = lineno;
 

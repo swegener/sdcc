@@ -807,20 +807,15 @@ picglue ()
   /* now put it all together into the assembler file */
   /* create the assembler file name */
     
-  if (!options.c1mode) {
-    if (noAssemble && fullDstFileName)
-      {
-        sprintf (buffer, fullDstFileName);
-      }
-    else
-      {
-        sprintf (buffer, dstFileName);
-        strcat (buffer, ".asm");
-      }
-  }
-  else {
-    strcpy(buffer, options.out_name);
-  }
+  if ((noAssemble || options.c1mode) && fullDstFileName)
+    {
+      sprintf (buffer, fullDstFileName);
+    }
+  else
+    {
+      sprintf (buffer, dstFileName);
+      strcat (buffer, ".asm");
+    }
 
   if (!(asmFile = fopen (buffer, "w"))) {
     werror (E_FILE_OPEN_ERR, buffer);

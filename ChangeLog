@@ -1,3 +1,16 @@
+2003-01-14  Bernhard Held <bernhard@bernhardheld.de>
+
+	* as/mcs51/lkmem.c: rflag is for DS390
+	* src/SDCCglobl.h: removed out_name and options stackOnData, genericPtr
+	* src/SDCCmain.c (optionsTable, setDefaultOptions): removed --stack-after-data and --generic
+			 (linkEdit): move mem- and map-files the same way as ihx-files
+	* src/z80/main.c (_setDefaultOptions): removed --generic
+	* src/SDCCmain.c (_processC1Arg, parseCmdLine, main): --c1mode works again
+	* src/SDCCglue.c (createInterruptVect, glue): --c1mode works again
+	* src/pic/glue.c (picglue): --c1mode works again
+	* src/pic16/glue.c (pic16glue): --c1mode works again
+	* src/asm.c (printCLine): fix #660034
+
 2003-01-13  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/ds390/peeph.def: fix #123; add 14 rules by Fiorenzo D. Ramaglia <fd.ramaglia@tin.it>, 1 by Frieder

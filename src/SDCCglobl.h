@@ -204,7 +204,6 @@ struct options
     int stackAuto;		/* Stack Automatic  */
     int useXstack;		/* use Xternal Stack */
     int stack10bit;		/* use 10 bit stack (flat24 model only) */
-    int genericPtr;		/* use generic pointers */
     int dump_raw;		/* dump after intermediate code generation */
     int dump_gcse;		/* dump after gcse */
     int dump_loop;		/* dump after loop optimizations */
@@ -224,10 +223,8 @@ struct options
     int nopeep;			/* no peep hole optimization */
     int asmpeep;		/* pass inline assembler thru peep hole */
     int debug;			/* generate extra debug info */
-    int stackOnData;		/* stack after data segment  */
     int c1mode;			/* Act like c1 - no pre-proc, asm or link */
     char *peep_file;		/* additional rules for peep hole */
-    char *out_name;		/* Asm output name for c1 mode */
     int nostdlib;		/* Don't use standard lib files */
     int nostdinc;		/* Don't use standard include files */
     int noRegParams;            /* Disable passing some parameters in registers */

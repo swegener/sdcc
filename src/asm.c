@@ -209,16 +209,25 @@ asm_addTree (const ASM_MAPPINGS * pMappings)
 static FILE *inFile=NULL;
 static char inLineString[1024];
 static int inLineNo=0;
+static char lastSrcFile[PATH_MAX];
 int rewinds=0;
 
 char *printCLine (char *srcFile, int lineno) {
   char *ilsP=inLineString;
+
+  if (inFile) {
+    if (strcmp (lastSrcFile, srcFile) != 0) {
+      fclose (inFile);
+      inFile = NULL;
+    }
+  }
   if (!inFile) {
     inFile=fopen(srcFile, "r");
     if (!inFile) {
       perror ("printCLine");
       exit (1);
     }
+    strcpy (lastSrcFile, srcFile);
   }
   if (lineno<inLineNo) {
     fseek (inFile, 0, SEEK_SET);

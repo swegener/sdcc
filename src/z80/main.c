@@ -333,7 +333,6 @@ _finaliseOptions (void)
 static void
 _setDefaultOptions (void)
 {
-  options.genericPtr = 1;	/* default on */
   options.nopeep = 0;
   options.stackAuto = 1;
   options.mainreturn = 1;

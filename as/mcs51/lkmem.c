@@ -251,9 +251,8 @@ int summary(struct area * areap)
 	}
 
 	/*Report the position of the begining of the stack*/
-	/* TODO find flag for DS390 */
 	fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx)",
-		0 ? "16 bit mode initial s" : "S", Stack.Start, Stack.Start-1);
+		rflag ? "16 bit mode initial s" : "S", Stack.Start, Stack.Start-1);
 
 	/*Check that the stack pointer is landing in a safe place:*/
 	if( (dram[Stack.Start] & 0x8000) == 0x8000 )

@@ -1229,7 +1229,7 @@ createInterruptVect (FILE * vFile)
   /* only if the main function exists */
   if (!(mainf = findSymWithLevel (SymbolTab, mainf)))
     {
-      if (!options.cc_only && !noAssemble)
+      if (!options.cc_only && !noAssemble && !options.c1mode)
 	werror (E_NO_MAIN);
       return;
     }
@@ -1458,22 +1458,15 @@ glue (void)
   /* now put it all together into the assembler file */
   /* create the assembler file name */
 
-  if (!options.c1mode)
+  /* -o option overrides default name? */
+  if ((noAssemble || options.c1mode) && fullDstFileName)
     {
-      /* -o option overrides default name? */
-      if (noAssemble && fullDstFileName)
-        {
-          strcpy (scratchFileName, fullDstFileName);
-        }
-      else
-        {
-          strcpy (scratchFileName, dstFileName);
-      strcat (scratchFileName, port->assembler.file_ext);
-        }
+      strcpy (scratchFileName, fullDstFileName);
     }
   else
     {
-      strcpy (scratchFileName, options.out_name);
+      strcpy (scratchFileName, dstFileName);
+      strcat (scratchFileName, port->assembler.file_ext);
     }
 
   if (!(asmFile = fopen (scratchFileName, "w")))

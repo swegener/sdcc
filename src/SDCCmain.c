@@ -149,7 +149,6 @@ optionsTable[] = {
     { 0,    OPTION_STACK_8BIT,      NULL, "use the 8bit stack for the ds390 (not supported yet)" },
     { 0,    "--stack-10bit",        &options.stack10bit, "use the 10bit stack for ds390 (default)" },
     { 0,    "--xstack",             &options.useXstack, "Use external stack" },
-    { 0,    "--generic",            &options.genericPtr, "All unqualified ptrs converted to '_generic'" },
     { 0,    OPTION_NO_GCSE,         NULL, "Disable the GCSE optimisation" },
     { 0,    OPTION_NO_LOOP_INV,     NULL, "Disable optimisation of invariants" },
     { 0,    OPTION_NO_LOOP_IND,     NULL, NULL },
@@ -188,7 +187,6 @@ optionsTable[] = {
     { 0,    "--peep-asm",           &options.asmpeep, NULL },
     { 0,    "--debug",              &options.debug, "Enable debugging symbol output" },
     { 'v',  OPTION_VERSION,         NULL, "Display sdcc's version" },
-    { 0,    "--stack-after-data",   &options.stackOnData, "initialize the stackpointer with the last byte use in DSEG" },
     { 'E',  "--preprocessonly",     &preProcOnly, "Preprocess only, do not compile" },
     { 0,    "--c1mode",             &options.c1mode, "Act in c1 mode.  The input is preprocessed code, the output is assembly code." },
     { 0,    "--help",               NULL, "Display this help" },
@@ -226,8 +224,6 @@ typedef struct {
 
 static const UNSUPPORTEDOPT 
 unsupportedOptTable[] = {
-    { 'a',  NULL,	"use --stack-auto instead." },
-    { 'g',  NULL,	"use --generic instead" },
     { 'X',  NULL,	"use --xstack-loc instead" },
     { 'x',  NULL,	"use --xstack instead" },
     { 'i',  NULL,	"use --idata-loc instead" },
@@ -492,7 +488,6 @@ setDefaultOptions ()
   options.data_loc = 0;		/* JCF: By default let the linker locate data */
   options.xdata_loc = 0;
   options.idata_loc = 0x80;
-  options.genericPtr = 1;	/* default on */
   options.nopeep = 0;
   options.model = port->general.default_model;
   options.nostdlib = 0;
@@ -549,7 +544,8 @@ processFile (char *s)
 	}
 
       /* the only source file */
-      if (!(srcFile = fopen ((fullSrcFileName = s), "r")))
+      fullSrcFileName = s;
+      if (!(srcFile = fopen (fullSrcFileName, "r")))
 	{
 	  werror (E_FILE_OPEN_ERR, s);
 	  exit (1);
@@ -612,24 +608,6 @@ processFile (char *s)
 
   werror (W_UNKNOWN_FEXT, s);
 
-}
-
-static void
-_processC1Arg (char *s)
-{
-  if (fullSrcFileName)
-    {
-      if (options.out_name)
-	{
-	  werror (W_TOO_MANY_SRC, s);
-	  return;
-	}
-      options.out_name = Safe_strdup (s);
-    }
-  else
-    {
-      processFile (s);
-    }
 }
 
 static void
@@ -1118,13 +1096,13 @@ parseCmdLine (int argc, char **argv)
 		if (argv[i][2] == ' ' || argv[i][2] == '\0')
 		  {
 		    i++;
-                    if (i >= argc) 
+                    if (i >= argc)
                       {
                           /* No argument. */
                           werror(E_ARGUMENT_MISSING, argv[i-1]);
                           break;
                       }
-                    else 
+                    else
                       {
                           rest = argv[i];
                       }
@@ -1150,10 +1128,7 @@ parseCmdLine (int argc, char **argv)
       if (!port->parseOption (&argc, argv, &i))
 	{
 	  /* no option must be a filename */
-	  if (options.c1mode)
-	    _processC1Arg (argv[i]);
-	  else
-	    processFile (argv[i]);
+	   processFile (argv[i]);
 	}
     }
 
@@ -1383,18 +1358,38 @@ linkEdit (char **envp)
   /* -o option overrides default name? */
   if (fullDstFileName)
     {
+      char *p, *q;
       /* the linked file gets the name of the first modul */
       if (fullSrcFileName)
-    {
+        {
           strcpy (scratchFileName, dstFileName);
+          p = strlen (scratchFileName) + scratchFileName;
         }
       else
         {
           strcpy (scratchFileName, relFiles[0]);
-          /* strip ".rel" extension */
-          *strrchr (scratchFileName, '.') = '\0';
+          /* strip "rel" extension */
+          p = strrchr (scratchFileName, '.') + 1;
         }
-      strcat (scratchFileName, options.out_fmt ? ".S19" : ".ihx");
+      strcpy (p, options.out_fmt ? "S19" : "ihx");
+      rename (scratchFileName, fullDstFileName);
+
+      q = strrchr (fullDstFileName, '.');
+      if (q)
+        {
+          /* point after the '.' of the extension */
+          q++;
+        }
+      else
+        {
+          /* no extension: append new extensions */
+          q = strlen (fullDstFileName) + fullDstFileName;
+        }
+      strcpy (p, "map");
+      strcpy (q, "map");
+      rename (scratchFileName, fullDstFileName);
+      strcpy (p, "mem");
+      strcpy (q, "mem");
       rename (scratchFileName, fullDstFileName);
     }
 }
@@ -1504,7 +1499,7 @@ preProcess (char **envp)
       }
 
       setMainValue ("cppextraopts", join(preArgv));
-      
+
       if (preProcOnly)
         {
           if (fullDstFileName)
@@ -1771,7 +1766,7 @@ main (int argc, char **argv, char **envp)
 
   /* if no input then printUsage & exit */
   if ((!options.c1mode && !fullSrcFileName && !nrelFiles) ||
-      (options.c1mode && !fullSrcFileName && !options.out_name))
+      (options.c1mode && !fullSrcFileName))
     {
       printUsage ();
       exit (0);

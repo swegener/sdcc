@@ -3773,7 +3773,7 @@ genMultOneByte (operand * left,
   if (size==1) {
     emitcode ("inc", "a");
   } else {
-    emitcode ("add" "a,#1");
+    emitcode ("add", "a,#1");
     emitcode ("xch", "a,b");
     emitcode ("cpl", "a"); // msb
     emitcode ("addc", "a,#0");

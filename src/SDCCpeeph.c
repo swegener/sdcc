@@ -59,6 +59,115 @@ void  peepRules2pCode(peepRule *);
 /*-----------------------------------------------------------------*/
 /* pcDistance - afinds a label back ward or forward                */
 /*-----------------------------------------------------------------*/
+int
+mcs51_instruction_size(const char *inst)
+{
+	char *op, op1[256], op2[256];
+	int opsize;
+	const char *p;
+
+	while (*inst && isspace(*inst)) inst++;
+
+	#define ISINST(s) (strncmp(inst, (s), sizeof(s)-1) == 0)
+	if (ISINST("lcall")) return 3;
+	if (ISINST("ret")) return 1;
+	if (ISINST("ljmp")) return 3;
+	if (ISINST("sjmp")) return 2;
+	if (ISINST("rlc")) return 1;
+	if (ISINST("rrc")) return 1;
+	if (ISINST("rl")) return 1;
+	if (ISINST("rr")) return 1;
+	if (ISINST("swap")) return 1;
+	if (ISINST("movx")) return 1;
+	if (ISINST("movc")) return 1;
+	if (ISINST("push")) return 2;
+	if (ISINST("pop")) return 2;
+	if (ISINST("jc")) return 2;
+	if (ISINST("jnc")) return 2;
+	if (ISINST("jb")) return 3;
+	if (ISINST("jnb")) return 3;
+	if (ISINST("jbc")) return 3;
+	if (ISINST("jmp")) return 1;	// always jmp @a+dptr
+	if (ISINST("jz")) return 2;
+	if (ISINST("jnz")) return 2;
+	if (ISINST("cjne")) return 3;
+	if (ISINST("mul")) return 1;
+	if (ISINST("div")) return 1;
+	if (ISINST("da")) return 1;
+	if (ISINST("xchd")) return 1;
+	if (ISINST("reti")) return 1;
+	if (ISINST("nop")) return 1;
+	if (ISINST("acall")) return 1;
+	if (ISINST("ajmp")) return 2;
+
+	p = inst;
+	while (*p && isalnum(*p)) p++;
+	for (op = op1, opsize=0; *p && *p != ',' && opsize < sizeof(op1); p++) {
+		if (!isspace(*p)) *op++ = *p, opsize++;
+	}
+	*op = '\0';
+	if (*p == ',') p++;
+	for (op = op2, opsize=0; *p && *p != ',' && opsize < sizeof(op2); p++) {
+		if (!isspace(*p)) *op++ = *p, opsize++;
+	}
+	*op = '\0';
+
+	#define IS_A(s) (*(s) == 'a' && *(s+1) == '\0')
+	#define IS_C(s) (*(s) == 'c' && *(s+1) == '\0')
+	#define IS_Rn(s) (*(s) == 'r' && *(s+1) >= '0' && *(s+1) <= '7')
+	#define IS_atRi(s) (*(s) == '@' && *(s+1) == 'r')
+
+	if (ISINST("mov")) {
+		if (IS_C(op1) || IS_C(op2)) return 2;
+		if (IS_A(op1)) {
+			if (IS_Rn(op2) || IS_atRi(op2)) return 1;
+			return 2;
+		}
+		if (IS_Rn(op1) || IS_atRi(op1)) {
+			if (IS_A(op2)) return 1;
+			return 2;
+		}
+		if (strcmp(op1, "dptr") == 0) return 3;
+		if (IS_A(op2) || IS_Rn(op2) || IS_atRi(op2)) return 2;
+		return 3;
+	}
+	if (ISINST("add") || ISINST("addc") || ISINST("subb") || ISINST("xch")) {
+		if (IS_Rn(op2) || IS_atRi(op2)) return 1;
+		return 2;
+	}
+	if (ISINST("inc") || ISINST("dec")) {
+		if (IS_A(op1) || IS_Rn(op1) || IS_atRi(op1)) return 1;
+		if (strcmp(op1, "dptr") == 0) return 1;
+		return 2;
+	}
+	if (ISINST("anl") || ISINST("orl") || ISINST("xrl")) {
+		if (IS_C(op1)) return 2;
+		if (IS_A(op1)) {
+			if (IS_Rn(op2) || IS_atRi(op2)) return 1;
+			return 2;
+		} else {
+			if (IS_A(op2)) return 2;
+			return 3;
+		}
+	}
+	if (ISINST("clr") || ISINST("setb") || ISINST("cpl")) {
+		if (IS_A(op1) || IS_C(op1)) return 1;
+		return 2;
+	}
+	if (ISINST("djnz")) {
+		if (IS_Rn(op1)) return 2;
+		return 3;
+	}
+
+	if (*inst == 'a' && *(inst+1) == 'r' && *(inst+2) >= '0' && *(inst+2) <= '7' && op1[0] == '=') {
+		/* ignore ar0 = 0x00 type definitions */
+		return 0;
+	}
+
+	fprintf(stderr, "Warning, peephole unrecognized instruction: %s\n", inst);
+	return 3;
+}
+
 int 
 pcDistance (lineNode * cpos, char *lbl, bool back)
 {
@@ -73,9 +182,13 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
       if (pl->line &&
 	  *pl->line != ';' &&
 	  pl->line[strlen (pl->line) - 1] != ':' &&
-	  !pl->isDebug)
-
-	dist++;
+	  !pl->isDebug) {
+	        if (strcmp(port->target,"mcs51") == 0) {
+			dist += mcs51_instruction_size(pl->line);
+		} else {
+			dist += 3;
+		}
+	}
 
       if (strncmp (pl->line, buff, strlen (buff)) == 0)
 	return dist;
@@ -122,6 +235,11 @@ FBYNAME (xramMovcOption)
   return (options.xram_movc && (strcmp(port->target,"mcs51") == 0));
 }
 
+
+
+
+
+
 /*-----------------------------------------------------------------*/
 /* labelInRange - will check to see if label %5 is within range    */
 /*-----------------------------------------------------------------*/
@@ -150,12 +268,8 @@ FBYNAME (labelInRange)
   dist = (pcDistance (currPl, lbl, TRUE) +
 	  pcDistance (currPl, lbl, FALSE));
 
-/*    if (!dist || dist > 45) has produced wrong sjmp */
-  /* 07-Sep-2000 Michael Schmitt */
-  /* FIX for Peephole 132 */
-  /* switch with lots of case can lead to a sjmp with a distance */
-  /* out of the range for sjmp */
-  if (!dist || dist > 43)
+/*    changed to 127, now that pcDistance return actual number of bytes */
+  if (!dist || dist > 127)
     return FALSE;
 
   return TRUE;

@@ -25,6 +25,7 @@
 #define BIN2DATA_DIR          "\\.."
 #define PREFIX2BIN_DIR        "\\bin"
 #define PREFIX2DATA_DIR       ""
+#define BINDIR PREFIX		  "\\bin"
 
 // Obsolete:
 #define SDCC_INCLUDE_DIR      "\\sdcc\\include"

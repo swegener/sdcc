@@ -29,7 +29,7 @@ void ser_interrupt_handler(void) interrupt 4 using 1;
 void ser_putc(unsigned char);
 unsigned char ser_getc(void);
 void ser_printString(char *String);
-short ser_charAvail(void);
+char ser_charAvail(void);
 
 /*********************End of File************************************/
 #endif

@@ -211,7 +211,7 @@ void vwerror (int errNum, va_list marker)
   
   if ( filename && lineno ) {
     fprintf(ErrorOut, "%s(%d):",filename,lineno);
-  } else {
+  } else if (lineno) {
     fprintf(ErrorOut, "at %d:", lineno);
   }
   

@@ -1,3 +1,8 @@
+2004-06-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	device/include/sab80515.h: fixed bug #967492, DAPR is defined at adress 
+	0xd8, but the correct adress is 0xda. Thanks to anonymous for reporting
+
 2004-06-06 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/device.c (pic16_assignConfigWord): fixed bug that

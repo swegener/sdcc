@@ -4328,7 +4328,7 @@ ifxForOp (operand * op, iCode * ic)
 /* hasInc - operand is incremented before any other use            */
 /*-----------------------------------------------------------------*/
 static iCode *
-hasInc (operand *op, iCode *ic)
+hasInc (operand *op, iCode *ic,int osize)
 {
   sym_link *type = operandType(op);
   sym_link *retype = getSpec (type);
@@ -4339,7 +4339,7 @@ hasInc (operand *op, iCode *ic)
   if (!IS_SYMOP(op)) return NULL;
 
   if (IS_BITVAR(retype)||!IS_PTR(type)) return NULL;
-  isize = getSize(type->next);
+  if (osize != (isize = getSize(type->next))) return NULL;
   while (lic) {
     /* if operand of the form op = op + <sizeof *op> */
     if (lic->op == '+' && isOperandEqual(IC_LEFT(lic),op) &&
@@ -8949,12 +8949,12 @@ gen51Code (iCode * lic)
 	  break;
 
 	case GET_VALUE_AT_ADDRESS:
-	  genPointerGet (ic, hasInc(IC_LEFT(ic),ic));
+	  genPointerGet (ic, hasInc(IC_LEFT(ic),ic,getSize(operandType(IC_LEFT(ic)))));
 	  break;
 
 	case '=':
 	  if (POINTER_SET (ic))
-	    genPointerSet (ic, hasInc (IC_RESULT(ic),ic));
+	    genPointerSet (ic, hasInc (IC_RESULT(ic),ic,getSize(operandType(IC_RIGHT(ic)))));
 	  else
 	    genAssign (ic);
 	  break;

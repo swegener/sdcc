@@ -65,7 +65,7 @@ where_memory(cl_mem *mem, bool cs, class cl_sim *sim)
   while (start < mem->size-len)
     {
       t_addr tmp= start;
-      found= TRUE;
+      found= DD_TRUE;
       for (i= 0; found && (i<len); i++)
 	found= str[i] == (cs?mem->get(start+i):toupper(mem->get(start+i)));
       if (found)
@@ -87,15 +87,15 @@ where_memory(cl_mem *mem, bool cs, class cl_sim *sim)
 bool
 cmd_where_iram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
-  where_memory(uc->mem(MEM_IRAM), FALSE, sim);
-  return(FALSE);
+  where_memory(uc->mem(MEM_IRAM), DD_FALSE, sim);
+  return(DD_FALSE);
 }
 
 bool
 cmd_Where_iram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
-  where_memory(uc->mem(MEM_IRAM), TRUE, sim);
-  return(FALSE);
+  where_memory(uc->mem(MEM_IRAM), DD_TRUE, sim);
+  return(DD_FALSE);
 }
 
 
@@ -107,16 +107,16 @@ bool
 cmd_where_xram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   uc->eram2xram/*FIXME*/();
-  where_memory(uc->mem(MEM_XRAM), FALSE, sim);
-  return(FALSE);
+  where_memory(uc->mem(MEM_XRAM), DD_FALSE, sim);
+  return(DD_FALSE);
 }
 
 bool
 cmd_Where_xram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   uc->eram2xram/*FIXME*/();
-  where_memory(uc->mem(MEM_XRAM), TRUE, sim);
-  return(FALSE);
+  where_memory(uc->mem(MEM_XRAM), DD_TRUE, sim);
+  return(DD_FALSE);
 }
 
 
@@ -127,15 +127,15 @@ cmd_Where_xram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 bool
 cmd_where_code(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
-  where_memory(uc->mem(MEM_ROM), FALSE, sim);
-  return(FALSE);
+  where_memory(uc->mem(MEM_ROM), DD_FALSE, sim);
+  return(DD_FALSE);
 }
 
 bool
 cmd_Where_code(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
-  where_memory(uc->mem(MEM_ROM), TRUE, sim);
-  return(FALSE);
+  where_memory(uc->mem(MEM_ROM), DD_TRUE, sim);
+  return(DD_FALSE);
 }
 
 

@@ -58,7 +58,7 @@ cl_it_src::cl_it_src(uchar Iie_mask,
     name= strdup(Iname);
   else
     name= strdup("unknown");
-  active= TRUE;
+  active= DD_TRUE;
 }
 
 cl_it_src::~cl_it_src(void)
@@ -81,13 +81,13 @@ cl_it_src::set_active_status(bool Aactive)
 void
 cl_it_src::activate(void)
 {
-  set_active_status(TRUE);
+  set_active_status(DD_TRUE);
 }
 
 void
 cl_it_src::deactivate(void)
 {
-  set_active_status(FALSE);
+  set_active_status(DD_FALSE);
 }
 
 

@@ -101,9 +101,9 @@ cl_bool_opt::set_value(char *s)
       if (c == '1' ||
 	  c == 'T' ||
 	  c == 'Y')
-	*(bool *)option= TRUE;
+	*(bool *)option= DD_TRUE;
       else
-	*(bool *)option= FALSE;
+	*(bool *)option= DD_FALSE;
     }
 };
 

@@ -50,7 +50,7 @@ cmd_go(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   t_addr start= uc->PC;
   long stop= -1;
   class cl_brk *b;
-  bool brk_at_stop= FALSE;
+  bool brk_at_stop= DD_FALSE;
 
   if (sim->state & SIM_GO)
     {
@@ -77,11 +77,11 @@ cmd_go(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       if (start == (t_addr)stop)
 	{
 	  fprintf(sim->cmd_out(), "Addresses must be different.\n");
-	  return(FALSE);
+	  return(DD_FALSE);
 	}
       if ((b= uc->fbrk_at(stop)))
 	{
-	  brk_at_stop= TRUE;
+	  brk_at_stop= DD_TRUE;
 	  b->cnt= 1;
 	}
       else
@@ -101,7 +101,7 @@ cmd_go(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       uc->fbrk->del_bp(stop);*/
   /*fprintf(sim->cmd_out(), "%d\n", uc->result);
     uc->print_disass(uc->PC);*/
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -110,7 +110,7 @@ cmd_stop(char *cmd, class t_uc51 *uc, class cl_sim *sim)
 {
   sim->stop(resUSER);
   uc->print_disass(uc->PC, sim->cmd->actual_console);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -139,7 +139,7 @@ cmd_step(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       uc->do_inst(1);
       dump_step(uc, sim);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -177,7 +177,7 @@ cmd_next(char *cmd, class t_uc51 *uc, class cl_sim *sim)
 	uc->do_inst(1);
       dump_step(uc, sim);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -194,7 +194,7 @@ cmd_pc(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       uc->print_disass(uc->PC, sim->cmd->actual_console);
-      return(FALSE);
+      return(DD_FALSE);
     }
   pc= strtol(s, &p, 0);
   if (p &&
@@ -212,7 +212,7 @@ cmd_pc(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       uc->PC= pc;
       uc->print_disass(uc->PC, sim->cmd->actual_console);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 

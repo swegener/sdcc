@@ -116,21 +116,24 @@ dep:
 putcopyright:
 	'put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
 
+start:
+	date '+%Y.%m.%d-%H:%M' >.start
+
 newer: distclean
-	@if [ -f start ]; then \
+	@if [ -f .start ]; then \
 	  tar cvf - \
-	    `find . -newer start -type f -print` |\
-	  gzip -9c >ucsim-newer-`date '+%Y.%m.%d-%H:%M'`.tgz; \
+	    `find . -newer .start -type f -print` |\
+	  gzip -9c >ucsim-newer-`cat .start`_`date '+%Y.%m.%d-%H:%M'`_`hostname`.tgz; \
 	else \
-	  echo "start file not found.\n"; \
+	  echo ".start file not found.\n"; \
 	  exit 1; \
 	fi
 
 print-newer:
-	@if [ -f start ]; then \
-	  find . -newer start -type f -print ;\
+	@if [ -f .start ]; then \
+	  find . -newer .start -type f -print ;\
 	else \
-	  echo "start file not found.\n" ;\
+	  echo ".start file not found.\n" ;\
 	  exit 1 ;\
 	fi
 

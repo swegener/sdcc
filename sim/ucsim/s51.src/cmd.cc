@@ -72,7 +72,7 @@ cmd_help(char *cmd, class cl_uc *uc, class cl_sim *sim)
       class cl_cmd *cmd= (class cl_cmd *)(sim->cmdset->at(i));
       sim->cmd->printf("%s\n", cmd->short_help);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -99,7 +99,7 @@ cmd_get_option(char *cmd, class cl_uc *uc, class cl_sim *sim)
 	  fprintf(sim->cmd_out(), " %s\n", o->help);
 	}
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -117,12 +117,12 @@ cmd_set_option(char *cmd, class cl_uc *uc, class cl_sim *sim)
   if ((id= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Name of option has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Value has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   for (i= 0; i < uc->options->count; i++)
     {
@@ -133,7 +133,7 @@ cmd_set_option(char *cmd, class cl_uc *uc, class cl_sim *sim)
 	  break;
 	}
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -143,99 +143,99 @@ cmd_set_option(char *cmd, class cl_uc *uc, class cl_sim *sim)
 
 struct cmd_entry cmd_table[]=
 {
-  {"g" , cmd_go, FALSE,
+  {"g" , cmd_go, DD_FALSE,
    "g [start [stop]]   Go"},
 
-  {"stop", cmd_stop, FALSE,
+  {"stop", cmd_stop, DD_FALSE,
    "stop               Stop"},
 
-  {"pc", cmd_pc, FALSE,
+  {"pc", cmd_pc, DD_FALSE,
    "pc [address]       Get/set content of PC"},
 
-  {"s" , cmd_step, TRUE,
+  {"s" , cmd_step, DD_TRUE,
    "s [step]           Step"},
 
-  {"n" , cmd_next, TRUE,
+  {"n" , cmd_next, DD_TRUE,
    "n [step]           Next"},
 
-  {"bse", cmd_brk_sete, FALSE,
+  {"bse", cmd_brk_sete, DD_FALSE,
    "bse wi|ri|wx|rx|ws|rs|rc f|d addr [hit]\n"
    "                   Set EVENT Breakpoint"},
 
-  {"bde", cmd_brk_dele, FALSE,
+  {"bde", cmd_brk_dele, DD_FALSE,
    "bde wi|ri|wx|rx|ws|rs|rc addr\n"
    "                   Delete EVENT Breakpoint"},
   
-  {"ba", cmd_brk_delall, FALSE,
+  {"ba", cmd_brk_delall, DD_FALSE,
    "ba                 Delete all breakpoints"},
 
-  {"dis", cmd_disass, TRUE,
+  {"dis", cmd_disass, DD_TRUE,
    "dis [start [offset [lines]]]\n"
    "                   Disassemble code"},
 
-  {"dp", cmd_dump_port, FALSE,
+  {"dp", cmd_dump_port, DD_FALSE,
    "dp                 Dump ports"},
 
-  {"ds", cmd_dump_sfr, FALSE,
+  {"ds", cmd_dump_sfr, DD_FALSE,
    "ds [addr...]       Dump SFR"},
 
-  {"db", cmd_dump_bit, TRUE,
+  {"db", cmd_dump_bit, DD_TRUE,
    "db addr...         Dump bit"},
 
-  {"si", cmd_set_iram, FALSE,
+  {"si", cmd_set_iram, DD_FALSE,
    "si addr data...    Set Internal RAM"},
 
-  {"sx", cmd_set_xram, FALSE,
+  {"sx", cmd_set_xram, DD_FALSE,
    "sx addr data...    Set External RAM"},
 
-  {"sc", cmd_set_code, FALSE,
+  {"sc", cmd_set_code, DD_FALSE,
    "sc addr data...    Set code (ROM)"},
   
-  {"ss", cmd_set_sfr, FALSE,
+  {"ss", cmd_set_sfr, DD_FALSE,
    "ss addr data...    Set SFR area"},
       
-  {"sb", cmd_set_bit, FALSE,
+  {"sb", cmd_set_bit, DD_FALSE,
    "sb addr data...    Set bit"},
 
-  {"sp", cmd_set_port, FALSE,
+  {"sp", cmd_set_port, DD_FALSE,
    "sp port data       Set port pins"},
 
-  {"fi", cmd_fill_iram, FALSE,
+  {"fi", cmd_fill_iram, DD_FALSE,
    "fi start stop data Fill IRAM area with `data'"},
 
-  {"fx", cmd_fill_xram, FALSE,
+  {"fx", cmd_fill_xram, DD_FALSE,
    "fx start stop data Fill XRAM area with `data'"},
        
-  {"fs", cmd_fill_sfr, FALSE,
+  {"fs", cmd_fill_sfr, DD_FALSE,
    "fs start stop data Fill SFR area with `data'"},
 	
-  {"fc", cmd_fill_code, FALSE,
+  {"fc", cmd_fill_code, DD_FALSE,
    "fc start stop data Fill ROM area with `data'"},
 
-  {"wi", cmd_where_iram, FALSE,
+  {"wi", cmd_where_iram, DD_FALSE,
    "wi,Wi string       Search for `string' in IRAM (Wi case sensitive)"},
-  {"Wi", cmd_Where_iram, FALSE, NULL},
+  {"Wi", cmd_Where_iram, DD_FALSE, NULL},
 
-  {"wx", cmd_where_xram, FALSE,
+  {"wx", cmd_where_xram, DD_FALSE,
    "wx,Wx string       Search for `string' in XRAM (Wx case sensitive)"},
-  {"Wx", cmd_Where_xram, FALSE, NULL},
+  {"Wx", cmd_Where_xram, DD_FALSE, NULL},
 
-  {"wc", cmd_where_code, FALSE,
+  {"wc", cmd_where_code, DD_FALSE,
    "wc,Wc string       Search for `string' in ROM (Wc case sensitive)"},
-  {"Wc", cmd_Where_code, FALSE, NULL},
+  {"Wc", cmd_Where_code, DD_FALSE, NULL},
 	  
-  {"sopt", cmd_set_option, FALSE,
+  {"sopt", cmd_set_option, DD_FALSE,
    "sopt opt value     Set value of option"},
 
-  {"gopt", cmd_get_option, FALSE,
+  {"gopt", cmd_get_option, DD_FALSE,
    "gopt [opt]         Get value of option(s)"},
 	    
-  {"show", cmd_show, FALSE,
+  {"show", cmd_show, DD_FALSE,
    "show c|w           Show licensing information"},
       
-  {"h" , cmd_help, FALSE,
+  {"h" , cmd_help, DD_FALSE,
    "h,?                Help about commands"},
-  {"?" , cmd_help, FALSE, NULL},
+  {"?" , cmd_help, DD_FALSE, NULL},
   
   {NULL, NULL}
 };

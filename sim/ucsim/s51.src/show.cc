@@ -329,7 +329,7 @@ cmd_show(char *cmd, class cl_uc *uc, class cl_sim *sim)
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Parameter is not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   if (*s == 'c')
     {
@@ -339,7 +339,7 @@ cmd_show(char *cmd, class cl_uc *uc, class cl_sim *sim)
     fprintf(sim->cmd_out(), "%s\n", warranty);
   else
     fprintf(sim->cmd_out(), "Unknown parameter.\n");
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 

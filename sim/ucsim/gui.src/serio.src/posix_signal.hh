@@ -4,11 +4,7 @@
  * Tim Hurman - t.hurman@virgin.net                                           *
  * Last edited on 01th Oct 1999                                               *
  ******************************************************************************/
-#if !defined(sun)
-/* Solaris doesn't like redefining this. */
 typedef void(*SIG_PF)(int);
-#endif
-
 class SigHandler
 {
 	public:

@@ -53,7 +53,7 @@ cl_break_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
   if (params[0] == 0)
     {
       con->printf("Address is missing.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   addr= (params[0])->get_address();
   if (params[1])

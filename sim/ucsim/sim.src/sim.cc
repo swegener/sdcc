@@ -94,10 +94,9 @@ cl_sim::init(void)
 	}
       char *prompt;
       if (arg_avail('P'))
-	/*FIXME: putc('\0', f)*/;
+	cmd->all_print("\0", 1);
       else
-	cmd->all_printf("%s", arg_avail('P')?"\0":
-			((prompt= get_sarg(0, "prompt"))?prompt:"> "));
+	cmd->all_printf("%s", (prompt= get_sarg(0, "prompt"))?prompt:"> ") ;
     }
   return(0);
 }

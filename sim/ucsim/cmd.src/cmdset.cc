@@ -111,7 +111,7 @@ cl_state_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 int
 cl_file_cmd::do_work(class cl_cmdline *cmdline, class cl_console *con)
 {
-  char *fname;
+  char *fname= 0;
   long l;
   
   if ((cmdline->param(0) == 0) ||

@@ -280,7 +280,7 @@ t_uc51::inst_reti(uchar code)
   proc_write_sp(*aof_SP);
   PC= h*256 + l;
 
-  was_reti= TRUE;
+  was_reti= DD_TRUE;
   class it_level *il= (class it_level *)(it_levels->top());
   if (il &&
       il->level >= 0)
@@ -503,6 +503,7 @@ t_uc51::inst_djnz_addr_addr(uchar code)
   
   addr = get_direct(fetch(), &event_at.wi, &event_at.ws);
   jaddr= fetch();
+  tick(1);
   if (--(*addr))
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
   return(resGO);
@@ -522,6 +523,7 @@ t_uc51::inst_djnz_rn_addr(uchar code)
   
   reg  = get_reg(code & 0x07, &event_at.wi);
   jaddr= fetch();
+  tick(1);
   if (--(*reg))
     PC= (PC + (signed char)jaddr) & (EROM_SIZE-1);
   return(resGO);

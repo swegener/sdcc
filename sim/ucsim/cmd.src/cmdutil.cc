@@ -147,7 +147,7 @@ interpret_bitname(char *name, class cl_uc *uc,
 	    {
 	      dot--;
 	      *dot= '.';
-	      return(FALSE);
+	      return(DD_FALSE);
 	    }
 	}
       else
@@ -155,12 +155,12 @@ interpret_bitname(char *name, class cl_uc *uc,
       if ((*celladdr < 0x20) ||
 	  ((*celladdr > 0x2f) && (*celladdr < 0x80)) ||
 	  ((*celladdr > 0x7f) && (*celladdr & 0x07)))
-	return(FALSE);
+	return(DD_FALSE);
       bitnum= strtol(dot, &p, 0);
       if ((p && *p) ||
 	  (bitnum < 0) ||
 	  (bitnum > 7))
-	return(FALSE);
+	return(DD_FALSE);
       if (*celladdr > 0x7f)
 	*bitaddr= *celladdr + bitnum;
       else
@@ -175,7 +175,7 @@ interpret_bitname(char *name, class cl_uc *uc,
 	  *bitaddr= strtol(name, &p, 0);
 	  if ((p && *p) ||
 	      (*bitaddr > 0xff))
-	    return(FALSE);
+	    return(DD_FALSE);
 	}
       else
 	*bitaddr= ne->addr;
@@ -189,7 +189,7 @@ interpret_bitname(char *name, class cl_uc *uc,
   *bitmask= BIT_MASK(*bitaddr);
   // making symbolic name
   if (!symname)
-    return(TRUE);
+    return(DD_TRUE);
   i= 0;
   while (uc->bit_tbl()[i].name &&
 	 (uc->bit_tbl()[i].addr != *bitaddr))
@@ -198,7 +198,7 @@ interpret_bitname(char *name, class cl_uc *uc,
     {
       sym= strdup(uc->bit_tbl()[i].name);
       *symname= sym;
-      return(TRUE);
+      return(DD_TRUE);
     }
   i= 0;
   while (uc->sfr_tbl()[i].name &&
@@ -216,7 +216,7 @@ interpret_bitname(char *name, class cl_uc *uc,
   sprintf(bitnumstr, "%1d", *bitaddr & 0x07);
   strcat(sym, bitnumstr);
   *symname= sym;
-  return(TRUE);
+  return(DD_TRUE);
 }
 
 

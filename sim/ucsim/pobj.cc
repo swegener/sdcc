@@ -404,7 +404,7 @@ cl_list::set_limit(t_index alimit)
 cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta):
   cl_list(alimit, adelta)
 {
-  Duplicates= FALSE;
+  Duplicates= DD_FALSE;
 }
 
 
@@ -474,7 +474,7 @@ cl_sorted_list::search(void *key, t_index &index)
 {
   t_index l  = 0;
   t_index h  = count - 1;
-  bool   res= FALSE;
+  bool    res= DD_FALSE;
   
   while (l <= h)
     {
@@ -486,7 +486,7 @@ cl_sorted_list::search(void *key, t_index &index)
 	  h= i - 1;
 	  if (c == 0)
 	    {
-	      res= TRUE;
+	      res= DD_TRUE;
 	      if (!Duplicates)
 		l= i;
 	    }
@@ -511,7 +511,7 @@ cl_sorted_list::search(void *key, t_index &index)
 cl_strings::cl_strings(t_index alimit, t_index adelta):
   cl_sorted_list(alimit, adelta)
 {
-  Duplicates= TRUE;
+  Duplicates= DD_TRUE;
 }
 
 
@@ -578,7 +578,7 @@ bool
 cl_ustrings::search(void *key, t_index& index)
 {
   t_index i    = 0;
-  bool    found= FALSE;
+  bool    found= DD_FALSE;
   void    *Actual;
 
   if ((count) && key)

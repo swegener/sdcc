@@ -72,7 +72,7 @@ cl_51cons::interpret(char *cmd)
 {
   int i;
   char *c, *s;
-  bool repeat= FALSE, retval= FALSE;
+  bool repeat= DD_FALSE, retval= DD_FALSE;
   
   if (*cmd)
     {
@@ -83,11 +83,11 @@ cl_51cons::interpret(char *cmd)
     }
   else
     if (last_command == NULL)
-      return(FALSE);
+      return(DD_FALSE);
     else
       {
 	c= strdup(last_command);
-	repeat= TRUE;
+	repeat= DD_TRUE;
       }
   i= 0;
   s= strtok(c, delimiters);
@@ -124,7 +124,7 @@ cl_51cons::old_command(class cl_cmdline *cmdline)
   if (cmdline->name == 0 ||
       *(cmdline->name) == '\0' ||
       *(cmdline->name) == '\n')
-    return(TRUE);
+    return(DD_TRUE);
   while ((cmd_table[i].name != NULL) &&
 	 /*(strstr(c, cmd_table[i].name) != c)*/
 	 (strcmp(cmdline->name, cmd_table[i].name) != 0))

@@ -96,7 +96,7 @@ cmd_disass(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   uint realstart;
 
   if (!uc->there_is_inst())
-    return(FALSE);
+    return(DD_FALSE);
   if ((s= strtok(NULL, delimiters)) != NULL)
     start= strtol(s, NULL, 0);
   else
@@ -131,7 +131,7 @@ cmd_disass(char *cmd, class t_uc51 *uc, class cl_sim *sim)
     }
 
   disass_last_stop= realstart;
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -206,7 +206,7 @@ cmd_dump_port(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   print_bin(data, 8, sim->cmd_out());
   sim->cmd->printf(" 0x%02x %3d %c\n", data, data, isprint(data)?data:'.');
 
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -244,7 +244,7 @@ cmd_dump_sfr(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   else
     // dump all
     dump_memory(uc->mem(MEM_SFR), &start, 255, 16, sim->cmd_out(), sim);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -262,20 +262,20 @@ cmd_dump_bit(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       sim->cmd->printf("Address has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   while (s)
     {
       if (!interpret_bitname(s, uc, &cell, &addr, &bitaddr, &bitmask, &sym))
 	{
 	  sim->cmd->printf("Bad address %s\n", s);
-	  return(FALSE);
+	  return(DD_FALSE);
 	}
       sim->cmd->printf("%06x %6s %c\n", addr, sym, (*cell & bitmask)?'1':'0');
       free(sym);
       s= strtok(NULL, delimiters);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 

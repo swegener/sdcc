@@ -70,7 +70,7 @@ t_uc51::t_uc51(int Itype, int Itech, class cl_sim *asim):
   technology= Itech;
 
   debug= asim->get_iarg('V', 0);
-  stop_at_it= FALSE;
+  stop_at_it= DD_FALSE;
   options->add(new cl_bool_opt(&debug, "verbose", "Verbose flag."));
   options->add(new cl_bool_opt(&stop_at_it, "stopit",
 			       "Stop if interrupt accepted."));
@@ -443,7 +443,7 @@ t_uc51::reset(void)
 
   result= resGO;
 
-  was_reti= FALSE;
+  was_reti= DD_FALSE;
 
   s_tr_t1    = 0;
   s_rec_t1   = 0;
@@ -451,8 +451,8 @@ t_uc51::reset(void)
   s_rec_tick = 0;
   s_in       = 0;
   s_out      = 0;
-  s_sending  = FALSE;
-  s_receiving= FALSE;
+  s_sending  = DD_FALSE;
+  s_receiving= DD_FALSE;
   s_rec_bit  = 0;
   s_tr_bit   = 0;
 }
@@ -655,13 +655,13 @@ t_uc51::proc_write(uchar *addr)
   if (addr == &((sfr->umem8)[SBUF]))
     {
       s_out= sfr->get(SBUF);
-      s_sending= TRUE;
+      s_sending= DD_TRUE;
       s_tr_bit = 0;
       s_tr_tick= 0;
       s_tr_t1  = 0;
     }
   if (addr == &((sfr->umem8)[IE]))
-    was_reti= TRUE;
+    was_reti= DD_TRUE;
 }
 
 void
@@ -884,7 +884,7 @@ t_uc51::do_inst(int step)
 	step--;
       if (state == stGO)
 	{
-	  was_reti= FALSE;
+	  was_reti= DD_FALSE;
 	  pre_inst();
 	  result= exec_inst();
 	  post_inst();
@@ -1002,7 +1002,7 @@ t_uc51::set_p_flag(void)
   int i;
   uchar uc;
 
-  p = FALSE;
+  p = DD_FALSE;
   uc= sfr->get(ACC);
   for (i= 0; i < 8; i++)
     {
@@ -1109,7 +1109,7 @@ t_uc51::do_serial(int cycles)
   if (s_sending &&
       (s_tr_bit >= bits))
     {
-      s_sending= FALSE;
+      s_sending= DD_FALSE;
       sfr->set_bit1(SCON, bmTI);
       if (serial_out)
 	{
@@ -1129,7 +1129,7 @@ t_uc51::do_serial(int cycles)
       if (i > 0 &&
       	  FD_ISSET(fileno(serial_in), &set))
 	{
-	  s_receiving= TRUE;
+	  s_receiving= DD_TRUE;
 	  s_rec_bit= 0;
 	  s_rec_tick= s_rec_t1= 0;
 	}
@@ -1143,7 +1143,7 @@ t_uc51::do_serial(int cycles)
 	  sfr->set(SBUF, s_in);
 	  received(c);
 	}
-      s_receiving= FALSE;
+      s_receiving= DD_FALSE;
       s_rec_bit-= bits;
     }
   return(resGO);
@@ -1390,7 +1390,7 @@ t_uc51::do_interrupt(void)
 
   if (was_reti)
     {
-      was_reti= FALSE;
+      was_reti= DD_FALSE;
       return(resGO);
     }
   if (!((ie= sfr->get(IE)) & bmEA))

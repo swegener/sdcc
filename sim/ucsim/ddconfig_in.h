@@ -28,9 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef DDCONFIG_HEADER
 #define DDCONFIG_HEADER
 
-#define TRUE  1
-#define FALSE 0
-#define bool  int
+#define DD_TRUE  1
+#define DD_FALSE 0
+#define bool     int
 
 #undef STDC_HEADERS
 #undef HAVE_GETOPT_H

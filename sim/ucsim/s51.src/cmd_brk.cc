@@ -104,12 +104,12 @@ cmd_brk_sete(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   if ((id= strtok(NULL, delimiters)) == NULL)
     {
       sim->cmd->printf("Event has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       sim->cmd->printf("Permanency has not given\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   switch (*s)
     {
@@ -121,12 +121,12 @@ cmd_brk_sete(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       break;
     default:
       sim->cmd->printf("Unknow permanency\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       sim->cmd->printf("Address has not given\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   addr= (uint)strtol(s, NULL, 0);
   if ((s= strtok(NULL, delimiters)) != NULL)
@@ -152,7 +152,7 @@ cmd_brk_sete(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       if (b)
 	uc->ebrk->add_bp(b);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -176,7 +176,7 @@ cmd_brk_delf(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       else
 	uc->fbrk->del_bp(addr);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }*/
 
 
@@ -193,7 +193,7 @@ cmd_brk_dele(char *cmd, class t_uc51 *uc, class cl_sim *sim)
   if ((id= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Event has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   if ((s= strtok(NULL, delimiters)) == NULL)
     fprintf(sim->cmd_out(), "Address has not given.\n");
@@ -205,7 +205,7 @@ cmd_brk_dele(char *cmd, class t_uc51 *uc, class cl_sim *sim)
       else
 	uc->rm_ebrk(addr, id);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -223,7 +223,7 @@ cmd_brk_delall(char *cmd, class t_uc51 *uc, class cl_sim *sim)
     }
   while (uc->ebrk->count)
     uc->ebrk->free_at(0);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -257,7 +257,7 @@ cmd_brk_lst(char *cmd, class t_uc51 *uc, class cl_sim *sim)
 	      eb->hit, eb->cnt,
 	      eb->addr, eb->id);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }*/
 
 

@@ -163,7 +163,7 @@ public:
   virtual char *read_line(void);
   virtual int  proc_input(void);
   virtual bool interpret(char *cmd);
-  virtual bool old_command(class cl_cmdline *cmdline) { return(FALSE); }
+  virtual bool old_command(class cl_cmdline *cmdline) { return(DD_FALSE); }
 };
 
 #ifdef SOCKET_AVAIL
@@ -214,6 +214,7 @@ public:
   void set_fd_set(void);
 
   int all_printf(char *format, ...);	// print to all consoles
+  int all_print(char *string, int length);
   int printf(char *format, ...);	// print to actual_console
   int debug(char *format, ...);		// print consoles with debug flag set
   int flag_printf(int iflags, char *format, ...);

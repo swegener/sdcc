@@ -95,7 +95,7 @@ cl_memloc::write(class cl_mem *mem, long addr, ulong *val)
 cl_memloc_coll::cl_memloc_coll(void):
   cl_sorted_list(2, 2)
 {
-  Duplicates= FALSE;
+  Duplicates= DD_FALSE;
 }
 
 void *

@@ -154,7 +154,7 @@ bool
 cmd_set_iram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   set_memory(uc->mem(MEM_IRAM), 0, uc, NULL, sim);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -168,7 +168,7 @@ cmd_set_xram(char *cmd, class cl_uc *uc, class cl_sim *sim)
   uc->eram2xram();
   set_memory(uc->mem(MEM_XRAM), 0, uc, NULL, sim);
   uc->xram2eram();
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -180,7 +180,7 @@ bool
 cmd_set_code(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   set_memory(uc->mem(MEM_ROM), 0, uc, NULL, sim);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -192,7 +192,7 @@ bool
 cmd_set_sfr(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   set_memory(uc->mem(MEM_SFR), SFR_START, uc, uc->sfr_tbl(), sim);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -210,25 +210,25 @@ cmd_set_bit(char *cmd, class cl_uc *uc, class cl_sim *sim)
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Address has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   if (!interpret_bitname(s, uc, &cell, &addr, &bitaddr, &bitmask, NULL))
     {
       fprintf(sim->cmd_out(), "Bad address %s\n", s);
-      return(FALSE);
+      return(DD_FALSE);
     }
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Data has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   while (s)
     {
       if (!isdigit(*s))
 	{
 	  fprintf(sim->cmd_out(), "Bad data %s\n", s);
-	  return(FALSE);
+	  return(DD_FALSE);
 	}
       if (*s == '0')
 	*cell&= ~bitmask;
@@ -238,7 +238,7 @@ cmd_set_bit(char *cmd, class cl_uc *uc, class cl_sim *sim)
       bitmask&= 0xff;
       s= strtok(NULL, delimiters);
     }
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -255,29 +255,29 @@ cmd_set_port(char *cmd, class cl_uc *uc, class cl_sim *sim)
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Port number has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   port= strtol(s, &p, 0);
   if ((p && *p) ||
       (port > 3))
     {
       fprintf(sim->cmd_out(), "Port number %s is wrong.\n", s);
-      return(FALSE);
+      return(DD_FALSE);
     }
 
   if ((s= strtok(NULL, delimiters)) == NULL)
     {
       fprintf(sim->cmd_out(), "Date has not given.\n");
-      return(FALSE);
+      return(DD_FALSE);
     }
   data= strtol(s, &p, 0);
   if (p && *p)
     {
       fprintf(sim->cmd_out(), "Data %s is wrong.\n", s);
-      return(FALSE);
+      return(DD_FALSE);
     }
   uc->port_pins[port]= data;
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -340,7 +340,7 @@ bool
 cmd_fill_iram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   fill_memory(uc->MEM(MEM_IRAM), uc->get_mem_size(MEM_IRAM), 0, uc, sim);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -353,7 +353,7 @@ cmd_fill_xram(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   fill_memory(uc->MEM(MEM_XRAM), uc->get_mem_size(MEM_XRAM), 0, uc, sim);
   uc->xram2eram/*FIXME*/();
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -365,7 +365,7 @@ bool
 cmd_fill_sfr(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   fill_memory(uc->MEM(MEM_SFR), uc->get_mem_size(MEM_SFR), SFR_START, uc, sim);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 
@@ -377,7 +377,7 @@ bool
 cmd_fill_code(char *cmd, class cl_uc *uc, class cl_sim *sim)
 {
   fill_memory(uc->MEM(MEM_ROM), EROM_SIZE, 0, uc, sim);
-  return(FALSE);
+  return(DD_FALSE);
 }
 
 

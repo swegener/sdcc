@@ -151,7 +151,7 @@ cl_uc::init(void)
     }
   ebrk= new brk_coll(2, 2, (class cl_rom *)mem(MEM_ROM));
   fbrk= new brk_coll(2, 2, (class cl_rom *)mem(MEM_ROM));
-  fbrk->Duplicates= FALSE;
+  fbrk->Duplicates= DD_FALSE;
   mk_hw_elements();
   reset();
   return(0);
@@ -295,7 +295,7 @@ cl_uc::mem(enum mem_class type)
   return((class cl_mem *)(mems->at(type)));
 }
 
-uchar *
+TYPE_UBYTE *
 cl_uc::MEM(enum mem_class type)
 {
   class cl_mem *m;
@@ -316,7 +316,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
   char s2[3];
   long l= 0;
 
-  *ok= FALSE;
+  *ok= DD_FALSE;
   while (bytes)
     {
       if (fscanf(f, "%2c", &s2[0]) == EOF)
@@ -325,7 +325,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
       l= l*256 + strtol(s2, NULL, 16);
       bytes--;
     }
-  *ok= TRUE;
+  *ok= DD_TRUE;
   return(l);
 }
 
@@ -365,7 +365,7 @@ cl_uc::read_hex_file(const char *name)
       }
 
   //memset(inst_map, '\0', sizeof(inst_map));
-  ok= TRUE;
+  ok= DD_TRUE;
   while (ok &&
 	 rtyp != 1)
     {
@@ -538,7 +538,7 @@ cl_uc::register_hw_write(enum mem_class type, long addr, class cl_hw *hw)
 class cl_hw *
 cl_uc::get_hw(enum hw_cath cath, int *idx)
 {
-  class cl_hw *hw;
+  class cl_hw *hw= 0;
   int i= 0;
 
   if (idx)

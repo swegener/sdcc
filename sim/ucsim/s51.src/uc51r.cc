@@ -144,7 +144,7 @@ t_uc51r::do_timers(int cycles)
 int
 t_uc51r::do_timer2(int cycles)
 {
-  bool nocount= FALSE;
+  bool nocount= DD_FALSE;
   uint t2mod= get_mem(MEM_SFR, T2MOD);
   uint t2con= get_mem(MEM_SFR, T2CON);
   uint p1= get_mem(MEM_SFR, P1);
@@ -162,7 +162,7 @@ t_uc51r::do_timer2(int cycles)
 
   /* Determining nr of input clocks */
   if (!(t2con & bmTR2))
-    nocount= TRUE; // Timer OFF
+    nocount= DD_TRUE; // Timer OFF
   else
     if (t2con & bmC_T2)
       {
@@ -171,7 +171,7 @@ t_uc51r::do_timer2(int cycles)
 	    !(p1 & port_pins[1] & bmT2))
 	  cycles= 1;
 	else
-	  nocount= TRUE;
+	  nocount= DD_TRUE;
       }
   /* Counting */
   while (cycles--)

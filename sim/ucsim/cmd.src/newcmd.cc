@@ -549,6 +549,7 @@ cl_console::cl_console(char *fin, char *fout, class cl_sim *asim):
     if (f= fopen(fout, "w+"), out= f?f:stdout, !f)
       fprintf(stderr, "Can't open `%s': %s\n", fout, strerror(errno));
   prompt= 0;
+  flags= CONS_NONE;
 }
 
 cl_console::cl_console(FILE *fin, FILE *fout, class cl_sim *asim):
@@ -558,6 +559,7 @@ cl_console::cl_console(FILE *fin, FILE *fout, class cl_sim *asim):
   sim= asim;
   in = fin;
   out= fout;
+  flags= CONS_NONE;
 }
 
 /*
@@ -657,7 +659,7 @@ cl_console::print_prompt(void)
   if (sim->arg_avail('P'))
     putc('\0', out);
   else
-    fprintf(out, "%s", prompt?prompt:
+    fprintf(out, "%s", (prompt && prompt[0])?prompt:
 	    ((p= sim->get_sarg(0, "prompt"))?p:"> "));
   fflush(out);
 }
@@ -880,24 +882,16 @@ cl_commander::init(void)
   if (!sim)
     return(1);
   if (sim->arg_avail('c'))
-    {
-      add_console(mk_console(sim->get_sarg('c', 0),
-			     sim->get_sarg('c', 0), sim));
-    }
+    add_console(mk_console(sim->get_sarg('c', 0),
+			   sim->get_sarg('c', 0), sim));
 #ifdef SOCKET_AVAIL
   if (sim->arg_avail('Z'))
-    {
-      add_console(mk_console(sim->get_iarg(0, "Zport"), sim));
-    }
+    add_console(mk_console(sim->get_iarg(0, "Zport"), sim));
   if (sim->arg_avail('r'))
-    {
-      add_console(mk_console(sim->get_iarg('r', 0), sim));
-    }
+    add_console(mk_console(sim->get_iarg('r', 0), sim));
 #endif
   if (cons->get_count() == 0)
-    {
-      add_console(mk_console(stdin, stdout, sim));
-    }
+    add_console(mk_console(stdin, stdout, sim));
   return(0);
 }
 
@@ -984,6 +978,23 @@ cl_commander::all_printf(char *format, ...)
 	}
     }
   return(ret);
+}
+
+int
+cl_commander::all_print(char *string, int length)
+{
+  int i;
+  
+  for (i= 0; i < cons->count; i++)
+    {
+      class cl_console *c= (class cl_console*)(cons->at(i));
+      if (c->out)
+	{
+	  for (int j= 0; j < length; j++)
+	    putc(string[j], c->out);
+	}
+    }
+  return(0);
 }
 
 /*

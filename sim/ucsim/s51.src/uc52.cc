@@ -103,7 +103,7 @@ t_uc52::do_timers(int cycles)
 int
 t_uc52::do_timer2(int cycles)
 {
-  bool nocount= FALSE;
+  bool nocount= DD_FALSE;
   uint t2con= get_mem(MEM_SFR, T2CON);
 
   exf2it->activate();
@@ -116,7 +116,7 @@ t_uc52::do_timer2(int cycles)
 
   /* Determining nr of input clocks */
   if (!(t2con & bmTR2))
-    nocount= TRUE; // Timer OFF
+    nocount= DD_TRUE; // Timer OFF
   else
     if (t2con & bmC_T2)
       {
@@ -125,7 +125,7 @@ t_uc52::do_timer2(int cycles)
 	    !(get_mem(MEM_SFR, P1) & port_pins[1] & bmT2))
 	  cycles= 1;
 	else
-	  nocount= TRUE;
+	  nocount= DD_TRUE;
       }
   /* Counting */
   while (cycles--)
@@ -245,7 +245,7 @@ t_uc52::do_t2_reload(int *cycles, bool nocount)
       !(get_mem(MEM_SFR, P1) & port_pins[1] & bmT2EX) &&
       (get_mem(MEM_SFR, T2CON) & bmEXEN2))
     {
-      ext2= TRUE;
+      ext2= DD_TRUE;
       mem(MEM_SFR)->set_bit1(T2CON, bmEXF2);
       prev_p1&= ~bmT2EX; // Falling edge has been handled
     }

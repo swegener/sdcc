@@ -110,7 +110,7 @@ public:
   virtual void write_mem(enum mem_class type, long addr, ulong val);
   virtual void set_mem(enum mem_class type, long addr, ulong val);
   virtual class cl_mem *mem(enum mem_class type);
-  virtual uchar *MEM(enum mem_class type);
+  virtual TYPE_UBYTE *MEM(enum mem_class type);
 
   // file handling
   virtual long read_hex_file(const char *name);

@@ -4,7 +4,11 @@
 	(geniCodeLogicAndOr): added in order to fix bug #905492,
 	(ast2iCode): fixed bug #905492
 	* support/regression/tests/bug-905492.c: added
-        
+	* src/SDCCast.c (decorateType): don't decorate/process parms twice,
+	(processParms): fixed bug #927659: don't copy parms, this will clear
+	decorated flag
+	* support/regression/tests/bug-927659.c: added
+
 2004-03-29 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (addCast): don't cast float to char

@@ -770,17 +770,14 @@ processParms (ast *func,
 	}
       
       if (newType)
-	{
-	  /* cast required; change this op to a cast. */
-	  ast *parmCopy = resolveSymbols (copyAst (*actParm));
-
-	  (*actParm)->type = EX_OP;
-	  (*actParm)->opval.op = CAST;
-	  (*actParm)->left = newType;
-	  (*actParm)->right = parmCopy;
-	  (*actParm)->decorated = 0; /* force typechecking */
-	  decorateType (*actParm, RESULT_TYPE_NONE);
-	}
+        {
+          /* cast required; change this op to a cast. */
+          (*actParm)->decorated = 0;
+           *actParm = newNode (CAST, newType, *actParm);
+          (*actParm)->lineno = (*actParm)->right->lineno;
+          
+          decorateType (*actParm, RESULT_TYPE_NONE);
+        }
       return 0;
     } /* vararg */
 
@@ -4121,29 +4118,34 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  goto errorTreeReturn;
 	}
 
-      {
-	sym_link *functype;      
-	parmNumber = 1;
+      /* if there are parms, make sure that
+         parms are decorate / process / reverse only once */
+      if (!tree->right ||
+          !tree->right->decorated)
+        {
+          sym_link *functype;      
+          parmNumber = 1;
 
-	if (IS_CODEPTR(LTYPE(tree)))
-	  functype = LTYPE (tree)->next;
-	else
-	  functype = LTYPE (tree);
+          if (IS_CODEPTR(LTYPE(tree)))
+            functype = LTYPE (tree)->next;
+          else
+            functype = LTYPE (tree);
 
-	if (processParms (tree->left, FUNC_ARGS(functype),
-			  &tree->right, &parmNumber, TRUE)) {
-	  goto errorTreeReturn;
+          if (processParms (tree->left, FUNC_ARGS(functype),
+                            &tree->right, &parmNumber, TRUE))
+            {
+              goto errorTreeReturn;
+            }
+        
+          if ((options.stackAuto || IFFUNC_ISREENT (functype)) && 
+             !IFFUNC_ISBUILTIN(functype))
+            {
+              reverseParms (tree->right);
+            }
+
+           TTYPE (tree) = functype->next;
+           TETYPE (tree) = getSpec (TTYPE (tree));
         }
-
-	if ((options.stackAuto || IFFUNC_ISREENT (functype)) && 
-	    !IFFUNC_ISBUILTIN(functype))
-	  {
-	    reverseParms (tree->right);
-	  }
-
-	TTYPE (tree) = functype->next;
-	TETYPE (tree) = getSpec (TTYPE (tree));
-      }
       return tree;
 
       /*------------------------------------------------------------------*/

@@ -11,7 +11,7 @@
  */
 
 #include <sys/types.h>
-#include <iostream.h>
+#include <iostream>
 #include <sys/wait.h>   /* header for waitpid() and various macros */
 #include <signal.h>     /* header for signal functions */
 #include <stdlib.h>
@@ -51,7 +51,7 @@ int SigHandler::SetSignal(int SIGNAL, SIG_PF ACTION)
 	/* set the signal handler */
 	if(sigaction(SIGNAL, &act, NULL) < 0)
 	{
-		cerr << "sigaction(): " << strerror(errno) << "\n";
+		std::cerr << "sigaction(): " << strerror(errno) << "\n";
 		exit(-1);
 	}
 
@@ -74,7 +74,7 @@ int SigHandler::BlockSignal(int SIGNAL)
 	/* block it */
 	if(sigprocmask(SIG_BLOCK, &set, NULL) < 0)
 	{
-		cerr << "sigprocmask(): " << strerror(errno) << "\n";
+		std::cerr << "sigprocmask(): " << strerror(errno) << "\n";
 		exit(-1);
 	}
 
@@ -97,7 +97,7 @@ int SigHandler::UnBlockSignal(int SIGNAL)
 	/* block it */
 	if(sigprocmask(SIG_UNBLOCK, &set, NULL) < 0)
 	{
-		cerr << "sigprocmask(): " << strerror(errno) << "\n";
+		std::cerr << "sigprocmask(): " << strerror(errno) << "\n";
 		exit(-1);
 	}
 

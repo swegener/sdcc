@@ -3,7 +3,7 @@
  * fileio.cc - file input and output                                          *
  ******************************************************************************/
 #include <sys/types.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -18,28 +18,28 @@ FileIO::FileIO()
 	// make the input fifo
 	if(mkfifo(DEF_INFILE, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH) == -1) {
 		if(errno != EEXIST) {
-			cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
+			std::cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
 			exit(-1);
 		}
 	}
 
 	// the input fifo - non blocking
 	if ((fdin = open(DEF_INFILE, O_RDONLY|O_NONBLOCK)) == -1) {
-		cerr << "open(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
+		std::cerr << "open(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
 		exit(-1);
 	}
 
 	// make the output fifo
 	if(mkfifo(DEF_OUTFILE, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH) == -1) {
 		if(errno != EEXIST) {
-			cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
+			std::cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
 			exit(-1);
 		}
 	}
 
 	// the output fifo
 	if ((fdout = open(DEF_OUTFILE, O_RDWR|O_NONBLOCK)) == -1) {
-		cerr << "open(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
+		std::cerr << "open(): Error number " << errno << " occourred: " << strerror(errno) << "\n";
 		exit(-1);
 	}
 }
@@ -49,28 +49,28 @@ FileIO::FileIO(char *infile, char *outfile)
 	// make the input fifo
 	if(mkfifo(infile, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH) == -1) {
 		if(errno != EEXIST) {
-			cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno);
+			std::cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno);
 			exit(-1);
 		}
 	}
 
 	// the input fifo - non blocking
 	if ((fdin = open(infile, O_RDONLY|O_NONBLOCK)) == -1) {
-		cerr << "open(): Error number " << errno << " occourred: " << strerror(errno);
+		std::cerr << "open(): Error number " << errno << " occourred: " << strerror(errno);
 		exit(-1);
 	}
 
 	// make the output fifo
 	if(mkfifo(outfile, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH) == -1) {
 		if(errno != EEXIST) {
-			cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno);
+			std::cerr << "mkfifo(): Error number " << errno << " occourred: " << strerror(errno);
 			exit(-1);
 		}
 	}
 
 	// the output fifo
 	if ((fdout = open(outfile, O_RDWR|O_NONBLOCK)) == -1) {
-		cerr << "open(): Error number " << errno << " occourred: " << strerror(errno);
+		std::cerr << "open(): Error number " << errno << " occourred: " << strerror(errno);
 		exit(-1);
 	}
 }
@@ -88,7 +88,7 @@ int FileIO::SendByte(char b)
 
 	if((ret = write(fdout, &b, 1)) != 1)
 	{
-		cerr << "write(): Error number " << errno << " occourred: " << strerror(errno);
+		std::cerr << "write(): Error number " << errno << " occourred: " << strerror(errno);
 		exit(-1);
 	}
 
@@ -104,7 +104,7 @@ int FileIO::RecvByte(char *b)
 
 	if((ret == -1) && (errno != EAGAIN))
 	{
-		cerr << "read(): Error number " << errno << " occourred: " << strerror(errno);
+		std::cerr << "read(): Error number " << errno << " occourred: " << strerror(errno);
 		exit(-1);
 	}
 
@@ -118,7 +118,7 @@ int FileIO::SendStr(char *str)
 
 	if((ret = write(fdout, str, strlen(str))) != (int)strlen(str))
 	{
-		cerr << "write(): Error number " << errno << " occourred: " << strerror(errno);
+		std::cerr << "write(): Error number " << errno << " occourred: " << strerror(errno);
 		exit(-1);
 	}
 
@@ -135,7 +135,7 @@ int FileIO::RecvStr(char *str)
 
 	if((ret == -1) && (errno != EAGAIN))
 	{
-		cerr << "read(): Error number " << errno << " occourred: " << strerror(errno);
+		std::cerr << "read(): Error number " << errno << " occourred: " << strerror(errno);
 		exit(-1);
 	}
 

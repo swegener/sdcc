@@ -1,3 +1,16 @@
+2003-11-03 Bernhard Held <bernhard@bernhardheld.de>
+
+	Use headers defined in the C[++] standards:
+	* sim/ucsim/gui.src/serio.src/fileio.cc
+	* sim/ucsim/gui.src/serio.src/frontend.cc
+	* sim/ucsim/gui.src/serio.src/main.cc
+	* sim/ucsim/gui.src/serio.src/posix_signal.cc
+	* support/Util/NewAlloc.c
+	* as/hc08/lklibr.c
+	* as/mcs51/lklibr.c
+	* as/z80/aslist.c
+	* as/z80/assym.c
+
 2003-11-03  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* Added MSVC projects for hc08 assembler and linker:

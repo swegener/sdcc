@@ -16,12 +16,14 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#include <stdlib.h>
 #if defined(__APPLE__) && defined(__MACH__)
 #include <sys/types.h>
 #include <sys/malloc.h>
 #else
 #include <malloc.h>
 #endif
+
 
 #include "asm.h"
 

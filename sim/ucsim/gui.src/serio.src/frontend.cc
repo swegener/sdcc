@@ -3,7 +3,7 @@
  * frontend.cc - the ncurses frontend                                         *
  ******************************************************************************/
 #include <sys/types.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>

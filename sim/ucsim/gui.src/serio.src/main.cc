@@ -3,7 +3,7 @@
  * main.cc - the main stuff                                                   *
  ******************************************************************************/
 #include <sys/types.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -30,11 +30,11 @@ void HandleSig(int info)
 // usage
 void PrintUsage(char *progname)
 {
-cout << "Usage: " << progname << " [-i <filename>] [-o <filename>] [-h]\n";
-cout << "-i <filename>\t<filename> is the pipe to the controllers' serial input\n";
-cout << "-o <filename>\t<filename> is the pipe to the controllers' serial output\n";
-cout << "-h\t\tshow the help\n";
-cout << "\nTim Hurman - t.hurman@virgin.net\n";
+std::cout << "Usage: " << progname << " [-i <filename>] [-o <filename>] [-h]\n";
+std::cout << "-i <filename>\t<filename> is the pipe to the controllers' serial input\n";
+std::cout << "-o <filename>\t<filename> is the pipe to the controllers' serial output\n";
+std::cout << "-h\t\tshow the help\n";
+std::cout << "\nTim Hurman - t.hurman@virgin.net\n";
 exit(0);
 }
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 		errflg++;
 		break;
 	default:
-		cerr << "Invalid or unknown switch\n";
+		std::cerr << "Invalid or unknown switch\n";
 		errflg++;
 		break;
 	}
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 
 		if(string[0] != 0)
 			fobj->SendByte(string[0]);
-		
+
 		if(fobj->RecvStr(string) > 0)
 			view->AddStrOutWin(string);
 

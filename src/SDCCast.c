@@ -3933,7 +3933,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
     case ':':
       /* if they don't match we have a problem */
-      if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
+      if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) &&
+          (compareType (RTYPE (tree), LTYPE (tree)) == 0))
         {
           werror (E_TYPE_MISMATCH, "conditional operator", " ");
           goto errorTreeReturn;

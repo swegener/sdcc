@@ -1,3 +1,7 @@
+2005-02-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (decorateType): fixed bug 1124787
+
 2004-02-20 Hubert Sack <sack AT digiplan.de>
 	committed by Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

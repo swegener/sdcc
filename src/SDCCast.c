@@ -708,7 +708,7 @@ processParms (ast * func,
     }
 
   /* if defined parameters ended but actual has not & */
-  /* stackAuto                */
+  /* reentrant */
   if (!defParm && actParm &&
       (options.stackAuto || IFFUNC_ISREENT (func->ftype)))
     return 0;

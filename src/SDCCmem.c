@@ -370,6 +370,7 @@ allocGlobal (symbol * sym)
     {
       /* set the output class */
       SPEC_OCLS (sym->etype) = port->mem.default_globl_map;
+      // jwk: we need to set SPEC_SCLS now !!!!
       /* generate the symbol  */
       allocIntoSeg (sym);
       return;

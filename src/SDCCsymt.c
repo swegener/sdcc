@@ -1452,6 +1452,7 @@ compareType (sym_link * dest, sym_link * src)
 	    int res=compareType (dest, val->type);
 	    Safe_free(val->type);
 	    Safe_free(val);
+	    //return res ? -1 : 0;
 	    return res;
 	  }
 	  if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
@@ -1560,6 +1561,11 @@ aggregateToPointer (value * val)
 	  DCL_TYPE (val->type) = PPOINTER;
 	  break;
 	case S_FIXED:
+	  if (SPEC_OCLS(val->etype)) {
+	    DCL_TYPE(val->type)=PTR_TYPE(SPEC_OCLS(val->etype));
+	  }
+	  break;
+
 	  if (TARGET_IS_DS390)
 	    {
 	      /* The AUTO and REGISTER classes should probably

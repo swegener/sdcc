@@ -381,16 +381,19 @@ allocGlobal (symbol * sym)
     }
 
   /* if it is fixed, then allocate depending on the  */
-  /* current memory model,same for automatics        */
+  /* current memory model, same for automatics        */
   if (SPEC_SCLS (sym->etype) == S_FIXED ||
-      SPEC_SCLS (sym->etype) == S_AUTO)
-    {
+      SPEC_SCLS (sym->etype) == S_AUTO) {
+    if (port->mem.default_globl_map != xdata) {
       /* set the output class */
       SPEC_OCLS (sym->etype) = port->mem.default_globl_map;
       /* generate the symbol  */
       allocIntoSeg (sym);
       return;
+    } else {
+      SPEC_SCLS (sym->etype) = S_XDATA;
     }
+  }
 
   /* if code change to constant */
   if (SPEC_SCLS (sym->etype) == S_CODE) {

@@ -272,14 +272,14 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  if (ival) {
 	    // set ival's lineno to where the symbol was defined
 	    setAstLineno (ival, lineno=sym->lineDef);
-	    // check if this is a constant expression
-	    if (constExprTree(ival)) {
-	      allocInfo = 0;
-	      eBBlockFromiCode (iCodeFromAst (ival));
-	      allocInfo = 1;
-	    } else {
+	    // check if this is not a constant expression
+	    if (!constExprTree(ival)) {
 	      werror (E_CONST_EXPECTED, "found expression");
+	      // but try to do it anyway
 	    }
+	    allocInfo = 0;
+	    eBBlockFromiCode (iCodeFromAst (ival));
+	    allocInfo = 1;
 	  }
 #endif
 	}	  

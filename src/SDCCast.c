@@ -1170,6 +1170,12 @@ bool constExprTree (ast *cexpr) {
 	// a function's address will never change
 	return TRUE;
       }
+      if (IS_AST_SYM_VALUE(cexpr) && 
+	  IN_CODESPACE(SPEC_OCLS(AST_SYMBOL(cexpr)->etype))) {
+	// a symbol in code space will never change
+	// This is only for the 'char *s="hallo"' case and will have to leave
+	return TRUE;
+      }
       return FALSE;
     case EX_LINK:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -1177,6 +1183,7 @@ bool constExprTree (ast *cexpr) {
       return FALSE;
     case EX_OP:
       if (cexpr->opval.op==ARRAYINIT) {
+	fprintf (stderr, "skipping arrayinit\n");
 	// this is a list of literals
 	return TRUE;
       }

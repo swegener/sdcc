@@ -72,7 +72,7 @@ static int GpCodeSequenceNumber = 1;
 /*                      Forward declarations                    */
 /****************************************************************/
 
-static void unlink(pCode *pc);
+static void unlinkPC(pCode *pc);
 static void genericAnalyze(pCode *pc);
 static void AnalyzeGOTO(pCode *pc);
 static void AnalyzeSKIP(pCode *pc);
@@ -803,7 +803,7 @@ void printpBlock(FILE *of, pBlock *pb)
 /*                                                                 */
 /*-----------------------------------------------------------------*/
 
-static void unlink(pCode *pc)
+static void unlinkPC(pCode *pc)
 {
   if(pc  && pc->prev && pc->next) {
 
@@ -813,7 +813,7 @@ static void unlink(pCode *pc)
 }
 static void genericDestruct(pCode *pc)
 {
-  unlink(pc);
+  unlinkPC(pc);
 
   fprintf(stderr,"warning, calling default pCode destructor\n");
   free(pc);

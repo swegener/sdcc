@@ -3,5 +3,5 @@ clean:
 	rm -f .[a-z]*~ \#*
 	rm -f packihx
 
-distclean: clean
+distclean realclean: clean
 	rm -f config.*

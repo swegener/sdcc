@@ -109,8 +109,7 @@ __fail(const char *szMsg, const char *szCond, const char *szFile, int line)
 int 
 main(void)
 {
-  // remove the next volatile and mcs51 will jump out of range
-    volatile TESTFUNP *cases;
+    TESTFUNP *cases;
     int numCases = 0;
 
     __printf("--- Running: %s\n", getSuiteName());

@@ -1,3 +1,7 @@
+2003-09-21  Bernhard Held <bernhard@bernhardheld.de>
+
+	* device/lib/_fsmul.c: replaced (1<<31) by (1ul<<31)
+
 2003-09-19  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (loadDptrFromOperand, genFarPointerGet,
@@ -15,7 +19,7 @@
 2003-09-18  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	*link/z80/lklibr.c, as/mcs51/lklibr.c: Fixed Linux segfaults when
-	trying to fclose a FILE* that was already closed.  
+	trying to fclose a FILE* that was already closed.
 
 2003-09-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
@@ -23,6 +27,7 @@
 	of const struct should be treated as if const themselves)
 
 2003-09-18  Bernhard Held <bernhard@bernhardheld.de>
+
 	* src/SDCCval.c (valPlus, valMinus): fixed bug #808337
 
 2003-07-06  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>

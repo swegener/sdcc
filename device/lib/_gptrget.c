@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
 
-  _gptrget.c :- get value for a generic pointer               
+  _gptrget.c :- get value for a generic pointer
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
@@ -8,19 +8,19 @@
    under the terms of the GNU Library General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU Library General Public License for more details.
-   
+
    You should have received a copy of the GNU Library General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 unsigned char _gptrget ()
@@ -30,24 +30,27 @@ unsigned char _gptrget ()
 	xch    a,r0
 	push   acc
     ;
-    ;   depending on the pointer type
+    ;   depending on the pointer type acc. to SDCCsymt.h
     ;
         mov     a,b
-        jz      00001$
+        jz      00001$	; 0 near
 	dec     a
-	jz      00002$
+	jz      00002$	; 1 far
         dec     a
-        jz      00003$
+        jz      00003$	; 2 code
 	dec     a
 	jz      00004$
+	dec     a	; 4 skip generic pointer
+	dec     a
+	jz      00001$	; 5 idata
     ;
-    ;   any other value for type 
+    ;   any other value for type
     ;   return xFF
 	mov     a,#0xff
 	sjmp    00005$
     ;
     ;   Pointer to data space
-    ;   
+    ;
  00001$:
 	mov     r0,dpl     ; use only low order address
 	mov     a,@r0
@@ -60,9 +63,9 @@ unsigned char _gptrget ()
         sjmp    00005$
 ;
 ;   pointer to code area
-;   
+;
  00003$:
-	clr     a
+	; clr     a  is already 0
         movc    a,@a+dptr
         sjmp    00005$
 ;
@@ -74,10 +77,10 @@ unsigned char _gptrget ()
 ;
 ;   restore and return
 ;
- 00005$:	       
-        mov     r0,a	
+ 00005$:
+        mov     r0,a
         pop     acc
 	xch     a,r0
      _endasm ;
-	
+
 }

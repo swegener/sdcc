@@ -31,21 +31,24 @@ unsigned char _gptrput ()
 	xch      a,r0
 	push     acc
     ;
-    ;   depending on the pointer type
+    ;   depending on the pointer type acc. to SDCCsymt.h
     ;
         mov     a,b
-	jz      00001$
+	jz      00001$	; 0 near
         dec     a
-        jz      00002$
+        jz      00002$	; 1 far
         dec     a
-        jz      00003$
+        jz      00003$	; 2 code
         dec     a
         jz      00004$
+	dec	a	; 4 skip generic pointer
+	dec	a
+	jz	00001$	; 5 idata
 	pop     acc
 	sjmp    00005$
 ;
 ;       store into near space
-;       
+;
  00001$:
 	pop     acc
 	mov     r0,dpl
@@ -65,7 +68,7 @@ unsigned char _gptrput ()
 	pop     acc
 	mov     r0,dpl
 	movx    @r0,a
- 00005$:       
+ 00005$:
 	xch     a,r0
 	pop     acc
 	xch     a,r0

@@ -628,7 +628,12 @@ int getConfigWord(int address)
 *-----------------------------------------------------------------*/
 void setDefMaxRam(void)
 {
-	setMaxRAM(pic->defMaxRAMaddrs); // Max RAM has not been included, so use default setting
+	unsigned i;
+	setMaxRAM(pic->defMaxRAMaddrs); /* Max RAM has not been included, so use default setting */
+	/* Validate full memory range for use by general purpose RAM */
+	for (i=pic->defMaxRAMaddrs; i--; ) {
+		finalMapping[i].isValid = 1;
+	}
 }
 
 /*-----------------------------------------------------------------*

@@ -211,7 +211,6 @@ void buildCmdLine(char *into, const char **cmds,
 	from = *cmds;
 	cmds++;
 
-	//printf ("%s\n", from);
 	/* See if it has a '$' anywhere - if not, just copy */
 	if ((p = strchr(from, '$'))) {
 	    strncat(into, from, p - from);
@@ -236,7 +235,6 @@ void buildCmdLine(char *into, const char **cmds,
 		const char **tmp = list;
 		if (tmp) {
 		    while (*tmp) {
-		        //printf ("list: %s\n", *tmp);
 			strcat(into, *tmp);
 			strcat(into, " ");
 			tmp++;
@@ -248,7 +246,7 @@ void buildCmdLine(char *into, const char **cmds,
 		assert(0);
 	    }
 	}
-	strcat(into, from); // this include the ".asm" from "$1.asm"
+	strcat(into, from); // this includes the ".asm" from "$1.asm"
 	strcat(into, " ");
     }
 }
@@ -1138,43 +1136,69 @@ int   parseCmdLine ( int argc, char **argv )
 /* my_system - will call a program with arguments                  */
 /*-----------------------------------------------------------------*/
 
+#if defined(_MSC_VER)
+
+char *try_dir[]= {NULL}; // TODO : Fill in some default search list
+
+#else
+
+//char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
+char *try_dir[]= {NULL};
+
+#endif
+
 #ifdef USE_SYSTEM_SYSTEM_CALLS
 int my_system (const char *cmd)
 {    
+  int argsStart, e, i=0;
+  char *cmdLine=NULL;
+
+  argsStart=strstr(cmd, " ")-cmd;
+  
+  // try to find the command in predefined path's
+  while (try_dir[i]) {
+    cmdLine = (char*)malloc(strlen(try_dir[i])+strlen(cmd)+10);
+    strcpy(cmdLine, try_dir[i]); // the path
+    strcat(cmdLine, "/");
+    strncat(cmdLine, cmd, argsStart); // the command
 #if NATIVE_WIN32
-  /* Mung slashes into backslashes to keep WIndoze happy. */
-  {
-    char *r;
-    r = cmd;
-    
-    while (*r)
-      {
-	if (*r == '/')
-	  {
-	    *r = '\\';
-	  }
+    strcat(cmdLine, ".exe");
+    /* Mung slashes into backslashes to keep WIndoze happy. */
+    {
+      char *r=cmdLine;
+      while (*r) {
+	if (*r == '/') {
+	  *r = '\\';
+	}
 	r++;
       }
-  }
-#endif
-
-    //printf ("my_system(%s)\n",cmd);
-    if (verboseExec) {
-      printf ("+ %s\n", cmd);
     }
-    return (system(cmd));
+#endif
+    if (access(cmdLine, X_OK) == 0) {
+      // the arguments
+      strcat(cmdLine, cmd+argsStart);
+      break;
+    }
+    free(cmdLine);
+    cmdLine=NULL;
+    i++;
+  }
+  
+  if (verboseExec) {
+    printf ("+ %s\n", cmdLine ? cmdLine : cmd);
+  }
+  
+  if (cmdLine) {
+    // command found in predefined path
+    e=system(cmdLine);
+    free(cmdLine);
+  } else {
+    // trust on $PATH
+    e=system(cmd);
+  }
+  return e;
 }
 #else
-#if defined(_MSC_VER)
-
-char *try_dir[]= {NULL};			// TODO : Fill in some default search list
-
-#else
-
-char *try_dir[]= {SRCDIR "/bin",PREFIX "/bin", NULL};
-
-#endif
-
 int my_system (const char *cmd, char **cmd_argv)
 {    
     char *dir, *got= NULL; int i= 0;
@@ -1353,8 +1377,9 @@ static void linkEdit (char **envp)
 
 #ifdef USE_SYSTEM_SYSTEM_CALLS
     buildCmdLine(buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
-    // ignore linker errors for now, not tested
-    my_system(buffer);
+    if (my_system(buffer)) {
+      exit(1);
+    }
 #else
     buildCmdLine(buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
     if (my_system(argv[0], argv)) {
@@ -1381,7 +1406,6 @@ static void assemble (char **envp)
 #ifdef USE_SYSTEM_SYSTEM_CALLS
     buildCmdLine(buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
     if (my_system(buffer)) {
-      fprintf (stderr, "sdcc: aborted while assembling, look above for messages (if any :)\n");
       exit(1);
     }
 #else
@@ -1460,7 +1484,9 @@ static int preProcess (char **envp)
 #ifdef USE_SYSTEM_SYSTEM_CALLS
 	buildCmdLine(buffer, _preCmd, fullSrcFileName, 
 		      preOutName, srcFileName, preArgv);
-	my_system(buffer);
+	if (my_system(buffer)) {
+	  exit(1);
+	}
 #else
 	buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
 		      preOutName, srcFileName, preArgv);

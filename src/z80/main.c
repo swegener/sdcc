@@ -574,6 +574,7 @@ PORT z80_port =
   _mangleSupportFunctionName,
   _hasNativeMulFor,
   TRUE,
+  TRUE,				/* little endian */
   0,				/* leave lt */
   0,				/* leave gt */
   1,				/* transform <= to ! > */
@@ -670,6 +671,7 @@ PORT gbz80_port =
   _mangleSupportFunctionName,
   _hasNativeMulFor,
   TRUE,
+  TRUE,				/* little endian */
   0,				/* leave lt */
   0,				/* leave gt */
   1,				/* transform <= to ! > */

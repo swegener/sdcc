@@ -291,6 +291,7 @@ PORT xa51_port =
   NULL, // getMangledFunctionName()
   NULL, // hasNativeMulFor()
   TRUE, // use_dw_for_init
+  TRUE,				/* little endian */
   0,				/* leave lt */
   0,				/* leave gt */
   1,				/* transform <= to ! > */

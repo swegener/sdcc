@@ -581,11 +581,17 @@ _printPointerType (FILE * oFile, const char *name)
 {
   if (options.model == MODEL_FLAT24)
     {
-      fprintf (oFile, "\t.byte %s,(%s >> 8),(%s >> 16)", name, name, name);
+      if (port->little_endian)
+        fprintf (oFile, "\t.byte %s,(%s >> 8),(%s >> 16)", name, name, name);
+      else
+        fprintf (oFile, "\t.byte (%s >> 16),(%s >> 8),%s", name, name, name);
     }
   else
     {
-      fprintf (oFile, "\t.byte %s,(%s >> 8)", name, name);
+      if (port->little_endian)
+        fprintf (oFile, "\t.byte %s,(%s >> 8)", name, name);
+      else
+        fprintf (oFile, "\t.byte (%s >> 8),%s", name, name);
     }
 }
 
@@ -643,18 +649,25 @@ printIvalType (symbol *sym, sym_link * type, initList * ilist, FILE * oFile)
 	case 2:
 		if (port->use_dw_for_init)
 			tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
-		else
+		else if (port->little_endian)
 			fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
+		else
+			fprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
 		break;
 	case 4:
 		if (!val) {
 			tfprintf (oFile, "\t!dw !constword\n", 0);
 			tfprintf (oFile, "\t!dw !constword\n", 0);
 		}
-		else {
+		else if (port->little_endian) {
 			fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
 				 aopLiteral (val, 0), aopLiteral (val, 1),
 				 aopLiteral (val, 2), aopLiteral (val, 3));
+		}
+		else {
+			fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+				 aopLiteral (val, 3), aopLiteral (val, 2),
+				 aopLiteral (val, 1), aopLiteral (val, 0));
 		}
 		break;
 	}
@@ -701,7 +714,7 @@ void printIvalBitFields(symbol **sym, initList **ilist, FILE * oFile)
 	case 2:
 		tfprintf (oFile, "\t!dw !constword\n",ival);
 		break;
-	case 4:
+	case 4: /* EEP: why is this db and not dw? */
 		tfprintf (oFile, "\t!db  !constword,!constword\n",
 			 (ival >> 8) & 0xffff, (ival & 0xffff));
 		break;
@@ -951,30 +964,48 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 	case 2:
 	  if (port->use_dw_for_init)
 	    tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, size));
-	  else
+	  else if (port->little_endian)
 	    tfprintf (oFile, "\t.byte %s,%s\n",
 		      aopLiteral (val, 0), aopLiteral (val, 1));
+	  else
+	    tfprintf (oFile, "\t.byte %s,%s\n",
+		      aopLiteral (val, 1), aopLiteral (val, 0));
 	  break;
 	case 3:
 	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
 	    // non-zero mcs51 generic pointer
 	    werror (E_LITERAL_GENERIC);
 	  }
-	  fprintf (oFile, "\t.byte %s,%s,%s\n",
-		   aopLiteral (val, 0), 
-		   aopLiteral (val, 1),
-		   aopLiteral (val, 2));
+	  if (port->little_endian) {
+	    fprintf (oFile, "\t.byte %s,%s,%s\n",
+	 	     aopLiteral (val, 0), 
+		     aopLiteral (val, 1),
+		     aopLiteral (val, 2));
+	  } else {
+	    fprintf (oFile, "\t.byte %s,%s,%s\n",
+	 	     aopLiteral (val, 2), 
+		     aopLiteral (val, 1),
+		     aopLiteral (val, 0));
+	  }
 	  break;
 	case 4:
 	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
 	    // non-zero ds390 generic pointer
 	    werror (E_LITERAL_GENERIC);
 	  }
-	  fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
-		   aopLiteral (val, 0), 
-		   aopLiteral (val, 1), 
-		   aopLiteral (val, 2),
-		   aopLiteral (val, 3));
+	  if (port->little_endian) {
+	    fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+		     aopLiteral (val, 0), 
+		     aopLiteral (val, 1), 
+		     aopLiteral (val, 2),
+		     aopLiteral (val, 3));
+	  } else {
+	    fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
+		     aopLiteral (val, 3), 
+		     aopLiteral (val, 2), 
+		     aopLiteral (val, 1),
+		     aopLiteral (val, 0));
+	  }
 	  break;
 	default:
 	  assert (0);
@@ -1033,12 +1064,22 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 	case 2:
 	  if (port->use_dw_for_init)
 	    tfprintf (oFile, "\t!dws\n", aopLiteralLong (val, 0, 2));
-	  else
+	  else if (port->little_endian)
 	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1));
+	  else
+	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
 	  break;
 	case 3: // how about '390??
-	  fprintf (oFile, "\t.byte %s,%s,#0x%d\n",
-		   aopLiteral (val, 0), aopLiteral (val, 1), GPTYPE_CODE);
+	  if (port->little_endian)
+	    {
+	      fprintf (oFile, "\t.byte %s,%s,#0x%d\n",
+		       aopLiteral (val, 0), aopLiteral (val, 1), GPTYPE_CODE);
+	    }
+	  else
+	    {
+	      fprintf (oFile, "\t.byte %s,%s,#0x%d\n",
+		       aopLiteral (val, 1), aopLiteral (val, 0), GPTYPE_CODE);
+	    }
 	}
       return;
     }

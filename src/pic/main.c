@@ -424,6 +424,7 @@ PORT pic_port =
   NULL,
   _hasNativeMulFor,
   FALSE,
+  TRUE,				/* little endian */
   0,				/* leave lt */
   0,				/* leave gt */
   1,				/* transform <= to ! > */

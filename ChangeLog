@@ -2,6 +2,19 @@
 
 	* src/z80/ralloc.c (joinPushes): made compatible with new signedness
 
+	Changes to support big endian targets:
+
+	* src/ports.h
+	* src/SDCCglue.c
+	* src/avr/main.c
+	* src/ds390/main.c
+	* src/izt/i186.c
+	* src/mcs51/main.c
+	* src/pic/main.c
+	* src/pic16/main.c
+	* src/xa51/main.c
+	* src/z80/main.c
+
 2003-08-06  Bernhard Held <bernhard@bernhardheld.de>
 
 	* src/SDCCval.c (cheapestVal): changed behaviour to the same as constVal()

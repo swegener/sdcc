@@ -305,6 +305,7 @@ PORT mcs51_port =
   NULL,
   NULL,
   FALSE,
+  TRUE,				/* little endian */
   0,				/* leave lt */
   0,				/* leave gt */
   1,				/* transform <= to ! > */

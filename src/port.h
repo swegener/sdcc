@@ -17,6 +17,7 @@
 #define TARGET_ID_PIC16	   7
 #define TARGET_ID_XA51     9
 #define TARGET_ID_DS400	   10
+#define TARGET_ID_HC08     11
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -30,6 +31,7 @@
 #define TARGET_IS_PIC   (port->id==TARGET_ID_PIC)
 #define TARGET_IS_PIC16	(port->id==TARGET_ID_PIC16)
 #define TARGET_IS_XA51 (port->id==TARGET_ID_XA51)
+#define TARGET_IS_HC08 (port->id==TARGET_ID_HC08)
 
 #define MAX_BUILTIN_ARGS	16
 /* definition of builtin functions */
@@ -251,6 +253,11 @@ typedef struct
      */
     bool use_dw_for_init;
 
+    /** TRUE for targets with little endian byte ordering, FALSE for
+        targets with big endian byte ordering.
+     */
+    bool little_endian;
+
     /* condition transformations */
     bool lt_nge;		/* transform (a < b)  to !(a >= b)  */
     bool gt_nle;		/* transform (a > b)  to !(a <= b)  */
@@ -302,6 +309,9 @@ extern PORT xa51_port;
 #endif
 #if !OPT_DISABLE_DS400
 extern PORT ds400_port;
+#endif
+#if !OPT_DISABLE_HC08
+extern PORT hc08_port;
 #endif
 
 #endif /* PORT_INCLUDE*/

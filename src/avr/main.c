@@ -156,7 +156,8 @@ PORT avr_port = {
          glue,
 	 TRUE,			/* Emit glue around main */
 	 MODEL_LARGE | MODEL_SMALL,
-	 MODEL_SMALL},
+	 MODEL_SMALL
+	},
 	{
 	 _asmCmd,
          NULL,
@@ -221,6 +222,7 @@ PORT avr_port = {
 	NULL,
         NULL,
 	FALSE,
+	TRUE,			/* little endian */
 	0,			/* leave lt */
 	1,			/* transform gt ==> not le */
 	0,			/* leave le */

@@ -4189,7 +4189,6 @@ genAnd (iCode * ic, iCode * ifx)
   int bytelit = 0;
   char buffer[10];
 
-  catchMe();
   aopOp ((left = IC_LEFT (ic)), ic, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);

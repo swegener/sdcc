@@ -11,6 +11,7 @@ the GPL license. e-mail: salvador@inti.gov.ar, set@computer.org
 ***************************************************************************/
 
 #ifndef __DJGPP__
+#ifndef __MINGW32__
 
 #include <unistd.h>
 #include <sys/wait.h>
@@ -63,4 +64,5 @@ int spawnvp(int mode, const char *path, char *const argv[])
     wait(&pStatus);
  return 0;
 }
+#endif
 #endif

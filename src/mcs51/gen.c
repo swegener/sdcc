@@ -1890,7 +1890,7 @@ static void
 genCall (iCode * ic)
 {
   sym_link *dtype;
-  bool restoreBank = FALSE;
+//  bool restoreBank = FALSE;
   bool swapBanks = FALSE;
 
   D(emitcode(";", "genCall"));
@@ -1927,16 +1927,17 @@ genCall (iCode * ic)
   dtype = operandType (IC_LEFT (ic));
   if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
-      IFFUNC_ISISR (currFunc->type))
+       !IFFUNC_ISISR (dtype))
   {
-      if (!ic->bankSaved) 
-      {
-           /* This is unexpected; the bank should have been saved in
-            * genFunction.
-            */
-    	   saveRBank (FUNC_REGBANK (dtype), ic, FALSE);
-    	   restoreBank = TRUE;
-      }
+//      if (!ic->bankSaved) 
+//      {
+//           /* This is unexpected; the bank should have been saved in
+//            * genFunction.
+//            */
+//    	   saveRBank (FUNC_REGBANK (dtype), ic, FALSE);
+//    	   restoreBank = TRUE;
+//      }
+      // need caution message to user here
       swapBanks = TRUE;  
   } 
     
@@ -1998,20 +1999,21 @@ genCall (iCode * ic)
   if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
     unsaveRegisters (ic);
 
-  /* if register bank was saved then pop them */
-  if (restoreBank)
-    unsaveRBank (FUNC_REGBANK (dtype), ic, FALSE);
+//  /* if register bank was saved then pop them */
+//  if (restoreBank)
+//    unsaveRBank (FUNC_REGBANK (dtype), ic, FALSE);
 }
 
 /*-----------------------------------------------------------------*/
-/* genPcall - generates a call by pointer statement                */
+/* -10l - generates a call by pointer statement                */
 /*-----------------------------------------------------------------*/
 static void
 genPcall (iCode * ic)
 {
   sym_link *dtype;
   symbol *rlbl = newiTempLabel (NULL);
-  bool restoreBank=FALSE;
+//  bool restoreBank=FALSE;
+  bool swapBanks = FALSE;
 
   D(emitcode(";", "genPCall"));
 
@@ -2019,15 +2021,18 @@ genPcall (iCode * ic)
   if (!ic->regsSaved)
     saveRegisters (ic);
 
-  /* if we are calling a function that is not using
+  /* if we are calling a not _naked function that is not using
      the same register bank then we need to save the
      destination registers on the stack */
   dtype = operandType (IC_LEFT (ic))->next;
-  if (currFunc && dtype && !FUNC_ISNAKED(dtype) &&
-      IFFUNC_ISISR (currFunc->type) &&
-      (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype))) {
-    saveRBank (FUNC_REGBANK (dtype), ic, TRUE);
-    restoreBank=TRUE;
+  if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
+      (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
+      !IFFUNC_ISISR (dtype))
+  {
+//    saveRBank (FUNC_REGBANK (dtype), ic, TRUE);
+//    restoreBank=TRUE;
+      swapBanks = TRUE;
+      // need caution message to user here
   }
 
   /* push the return address on to the stack */
@@ -2069,9 +2074,22 @@ genPcall (iCode * ic)
       _G.sendSet = NULL;
     }
 
+  if (swapBanks)
+  {
+        emitcode ("mov", "psw,#0x%02x", 
+           ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+  }
+
+  /* make the call */
   emitcode ("ret", "");
   emitcode ("", "%05d$:", (rlbl->key + 100));
 
+
+  if (swapBanks)
+  {
+       emitcode ("mov", "psw,#0x%02x", 
+          ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
+  }
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
@@ -2106,9 +2124,9 @@ genPcall (iCode * ic)
 
     }
 
-  /* if register bank was saved then unsave them */
-  if (restoreBank)
-    unsaveRBank (FUNC_REGBANK (dtype), ic, TRUE);
+//  /* if register bank was saved then unsave them */
+//  if (restoreBank)
+//    unsaveRBank (FUNC_REGBANK (dtype), ic, TRUE);
 
   /* if we hade saved some registers then
      unsave them */
@@ -2380,7 +2398,7 @@ genFunction (iCode * ic)
     }
 
   /* set the register bank to the desired value */
-  if ((FUNC_REGBANK (sym->type) || IFFUNC_ISISR (sym->type))
+  if (( /* FUNC_REGBANK (sym->type) || */ IFFUNC_ISISR (sym->type))
    && !switchedPSW)
     {
       emitcode ("push", "psw");
@@ -2510,9 +2528,9 @@ genEndFunction (iCode * ic)
     }
 
   /* restore the register bank  */
-  if (FUNC_REGBANK (sym->type) || IFFUNC_ISISR (sym->type))
+  if ( /* FUNC_REGBANK (sym->type) || */ IFFUNC_ISISR (sym->type))
   {
-    if (!FUNC_REGBANK (sym->type) || !IFFUNC_ISISR (sym->type)
+    if (/* !FUNC_REGBANK (sym->type) || */ !IFFUNC_ISISR (sym->type)
      || !options.useXstack)
     {
         /* Special case of ISR using non-zero bank with useXstack

@@ -254,7 +254,7 @@ static void output_float (float f, unsigned char reqWidth,
 
 /*--------------------------------------------------------------------------*/
 
-int vsprintf (const char *buf, char *format, va_list ap)
+int vsprintf (const char *buf, const char *format, va_list ap)
 {
   static bit            left_justify;
   static bit            zero_padding;

@@ -22,7 +22,7 @@ STATIC void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(ch
     (*emitter)(_hex[u%base], pData);
 }
 
-STATIC void _printf(char *format, void (*emitter)(char, void *), void *pData, va_list va)
+STATIC void _printf(const char *format, void (*emitter)(char, void *), void *pData, va_list va)
 {
     while (*format) {
 	if (*format == '%') {

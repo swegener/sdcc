@@ -2082,12 +2082,8 @@ decorateType (ast * tree)
       {
 	sym_link *ltc = (tree->right ? RTYPE (tree) : LTYPE (tree));
 	COPYTYPE (TTYPE (tree), TETYPE (tree), ltc);
-	if (!tree->initMode) {
-	  if ((IS_SPEC(TETYPE(tree)) && IS_CONSTANT (TETYPE (tree))) ||
-	      (IS_PTR(TTYPE(tree)) && DCL_PTR_CONST(TTYPE(tree)))) {
+	if (!tree->initMode && IS_CONSTANT(TETYPE(tree)))
 	  werror (E_CODE_WRITE, "++/--");
-	  }
-	}
 
 	if (tree->right)
 	  RLVAL (tree) = 1;
@@ -3115,10 +3111,8 @@ decorateType (ast * tree)
       RRVAL (tree) = 1;
       LLVAL (tree) = 1;
       if (!tree->initMode ) {
-	if ((IS_SPEC(LETYPE(tree)) && IS_CONSTANT (LETYPE (tree))) ||
-	    (IS_PTR(LTYPE(tree)) && DCL_PTR_CONST(LTYPE(tree)))) {
+	if ((IS_SPEC(LETYPE(tree)) && IS_CONSTANT (LETYPE (tree))))
 	  werror (E_CODE_WRITE, " ");
-	}
       }
       if (LRVAL (tree))
 	{

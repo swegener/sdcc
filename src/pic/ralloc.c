@@ -1440,7 +1440,7 @@ liveRangesWith (bitVect * lrs, int (func) (symbol *, eBBlock *, iCode *),
 		if (!bitVectBitValue (lrs, i))
 			continue;
 		
-			/* if we don't find it in the live range 
+		/* if we don't find it in the live range 
 		hash table we are in serious trouble */
 		if (!(sym = hTabItemWithKey (liveRanges, i)))
 		{
@@ -2023,7 +2023,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		if (sym->liveTo > ic->seq)
 			continue;
 		
-			/* if it was spilt on stack then we can 
+		/* if it was spilt on stack then we can 
 		mark the stack spil location as free */
 		if (sym->isspilt)
 		{
@@ -2038,9 +2038,9 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		if (!bitVectBitValue (_G.regAssigned, sym->key))
 			continue;
 		
-			/* special case check if this is an IFX &
-			the privious one was a pop and the 
-			previous one was not spilt then keep track
+		/* special case check if this is an IFX &
+		the privious one was a pop and the 
+		previous one was not spilt then keep track
 		of the symbol */
 		if (ic->op == IFX && ic->prev &&
 			ic->prev->op == IPOP &&
@@ -2269,7 +2269,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				IS_TRUE_SYMOP (IC_RESULT (ic)))
 				OP_SYMBOL (IC_RESULT (ic))->allocreq = 1;
 			
-				/* take away registers from live
+			/* take away registers from live
 			ranges that end at this instruction */
 			deassignLRs (ic, ebbs[i]);
 			
@@ -2282,7 +2282,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				(IC_RESULT (ic) && POINTER_SET (ic)))
 				continue;
 			
-				/* now we need to allocate registers
+			/* now we need to allocate registers
 			only for the result */
 			if (IC_RESULT (ic))
 			{
@@ -2301,8 +2301,8 @@ serialRegAssign (eBBlock ** ebbs, int count)
 					sym->liveTo <= ic->seq)
 					continue;
 				
-					/* if some liverange has been spilt at the block level
-					and this one live beyond this block then spil this
+				/* if some liverange has been spilt at the block level
+				and this one live beyond this block then spil this
 				to be safe */
 				if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
 				{
@@ -2346,7 +2346,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 							continue;
 						}
 					} else {
-					/* if none of the liveRanges have a spillLocation then better
+						/* if none of the liveRanges have a spillLocation then better
 						to spill this one than anything else already assigned to registers */
 						if (liveRangesWith(spillable,noSpilLoc,ebbs[i],ic)) {
 							/* if this is local to this block then we might find a block spil */
@@ -2361,7 +2361,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				if (ic->op == RECEIVE)
 					debugLog ("When I get clever, I'll optimize the receive logic\n");
 				
-					/* if we need ptr regs for the right side
+				/* if we need ptr regs for the right side
 				then mark it */
 				if (POINTER_GET (ic) && getSize (OP_SYMBOL (IC_LEFT (ic))->type)
 					<= (unsigned) PTRSIZE)
@@ -2382,7 +2382,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 					else
 						sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
 					
-						/* if the allocation failed which means
+					/* if the allocation failed which means
 					this was spilt then break */
 					if (!sym->regs[j])
 						break;
@@ -2409,42 +2409,42 @@ serialRegAssign (eBBlock ** ebbs, int count)
 					ptrRegSet = 0;
 				}
 				
+			}
 		}
-	}
 	}
 
     /* Check for and fix any problems with uninitialized operands */
     for (i = 0; i < count; i++)
-      {
-	iCode *ic;
+	{
+		iCode *ic;
 
-	if (ebbs[i]->noPath &&
-	    (ebbs[i]->entryLabel != entryLabel &&
-	     ebbs[i]->entryLabel != returnLabel))
-	    continue;
+		if (ebbs[i]->noPath &&
+			(ebbs[i]->entryLabel != entryLabel &&
+			 ebbs[i]->entryLabel != returnLabel))
+			continue;
 
-	for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	  {
-	    if (SKIP_IC2 (ic))
-	      continue;
+		for (ic = ebbs[i]->sch; ic; ic = ic->next)
+		{
+			if (SKIP_IC2 (ic))
+			  continue;
 
-	    if (ic->op == IFX)
-	      {
-	        verifyRegsAssigned (IC_COND (ic), ic);
-	        continue;
-	      }
+			if (ic->op == IFX)
+			{
+				verifyRegsAssigned (IC_COND (ic), ic);
+				continue;
+			}
 
-	    if (ic->op == JUMPTABLE)
-	      {
-	        verifyRegsAssigned (IC_JTCOND (ic), ic);
-	        continue;
-	      }
+			if (ic->op == JUMPTABLE)
+			{
+				verifyRegsAssigned (IC_JTCOND (ic), ic);
+				continue;
+			}
 
-	    verifyRegsAssigned (IC_RESULT (ic), ic);
-	    verifyRegsAssigned (IC_LEFT (ic), ic);
-	    verifyRegsAssigned (IC_RIGHT (ic), ic);
-          }
-      }    
+			verifyRegsAssigned (IC_RESULT (ic), ic);
+			verifyRegsAssigned (IC_LEFT (ic), ic);
+			verifyRegsAssigned (IC_RIGHT (ic), ic);
+		}
+	}
 
 }
 
@@ -2700,14 +2700,14 @@ regTypeNum ()
 	/* for each live range do */
 	for (sym = hTabFirstItem (liveRanges, &k); sym;
 	sym = hTabNextItem (liveRanges, &k)) {
-		
+
 		debugLog ("  %d - %s\n", __LINE__, sym->rname);
 		
 		/* if used zero times then no registers needed */
 		if ((sym->liveTo - sym->liveFrom) == 0)
 			continue;
-		
-		
+
+
 		/* if the live range is a temporary */
 		if (sym->isitmp) {
 			
@@ -2717,7 +2717,7 @@ regTypeNum ()
 			if (sym->regType == REG_CND)
 				continue;
 			
-				/* if used in return only then we don't 
+			/* if used in return only then we don't 
 			need registers */
 			if (sym->accuse) {
 				if (IS_AGGREGATE (sym->type) || sym->isptr)
@@ -2804,7 +2804,7 @@ regTypeNum ()
 			/* registers for true symbols we will */
 			/* see how things go                  */
 			sym->nRegs = 0;
-  }
+	}
   
 }
 DEFSETFUNC (markRegFree)
@@ -3024,7 +3024,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	for (dic = ic->prev; dic; dic = dic->prev)
 	{
 		
-	/* if there is a function call and this is
+		/* if there is a function call and this is
 		a parameter & not my parameter then don't pack it */
 		if ((dic->op == CALL || dic->op == PCALL) &&
 			(OP_SYMBOL (IC_RESULT (ic))->_isparm &&
@@ -3089,8 +3089,8 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	if (!dic)
 		return 0;			/* did not find */
 	
-							/* if the result is on stack or iaccess then it must be
-	the same atleast one of the operands */
+	/* if the result is on stack or iaccess then it must be
+	the same at least one of the operands */
 	if (OP_SYMBOL (IC_RESULT (ic))->onStack ||
 		OP_SYMBOL (IC_RESULT (ic))->iaccess)
 	{
@@ -3725,6 +3725,7 @@ void isData(sym_link *sl)
 	}
 	
 }
+
 /*-----------------------------------------------------------------*/
 /* packRegisters - does some transformations to reduce register    */
 /*                   pressure                                      */
@@ -3798,7 +3799,46 @@ packRegisters (eBBlock * ebp)
 			debugLog ("  %d - Pointer set\n", __LINE__);
 		
 		
-			/* if this is an itemp & result of a address of a true sym 
+		/* Look for two subsequent iCodes with */
+		/*   iTemp := _c;         */
+		/*   _c = iTemp & op;     */
+		/* and replace them by    */
+		/*   iTemp := _c;         */
+		/*   _c = _c & op;        */
+		if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^') &&
+			ic->prev &&
+			ic->prev->op == '=' &&
+			IS_ITEMP (IC_LEFT (ic)) &&
+			IC_LEFT (ic) == IC_RESULT (ic->prev) &&
+			isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
+        {
+			iCode* ic_prev = ic->prev;
+			symbol* prev_result_sym = OP_SYMBOL (IC_RESULT (ic_prev));
+			
+			ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
+			if (IC_RESULT (ic_prev) != IC_RIGHT (ic))
+            {
+				bitVectUnSetBit (OP_USES (IC_RESULT (ic_prev)), ic->key);
+				if (/*IS_ITEMP (IC_RESULT (ic_prev)) && */
+					prev_result_sym->liveTo == ic->seq)
+                {
+					prev_result_sym->liveTo = ic_prev->seq;
+                }
+            }
+			bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+			
+			bitVectSetBit (ic->rlive, IC_RESULT (ic)->key);
+			
+			if (bitVectIsZero (OP_USES (IC_RESULT (ic_prev))))
+            {
+				bitVectUnSetBit (ic->rlive, IC_RESULT (ic)->key);
+				bitVectUnSetBit (OP_DEFS (IC_RESULT (ic_prev)), ic_prev->key);
+				remiCodeFromeBBlock (ebp, ic_prev);
+				hTabDeleteItem (&iCodehTab, ic_prev->key, ic_prev, DELETE_ITEM, NULL);
+            }
+        }
+		
+		/* if this is an itemp & result of a address of a true sym 
 		then mark this as rematerialisable   */
 		if (ic->op == ADDRESS_OF &&
 			IS_ITEMP (IC_RESULT (ic)) &&
@@ -3864,7 +3904,7 @@ packRegisters (eBBlock * ebp)
 		
 		if (!SKIP_IC2 (ic))
 		{
-		/* if we are using a symbol on the stack
+			/* if we are using a symbol on the stack
 			then we should say pic14_ptrRegReq */
 			if (ic->op == IFX && IS_SYMOP (IC_COND (ic)))
 				pic14_ptrRegReq += ((OP_SYMBOL (IC_COND (ic))->onStack ||
@@ -3943,10 +3983,10 @@ packRegisters (eBBlock * ebp)
 			packRegsForOneuse (ic, IC_LEFT (ic), ebp);
 		
 		
-			/* if this is cast for intergral promotion then
-			check if only use of  the definition of the 
-			operand being casted/ if yes then replace
-			the result of that arithmetic operation with 
+		/* if this is cast for intergral promotion then
+		check if only use of  the definition of the 
+		operand being casted/ if yes then replace
+		the result of that arithmetic operation with 
 		this result and get rid of the cast */
 		if (ic->op == CAST) {
 			
@@ -3977,7 +4017,7 @@ packRegisters (eBBlock * ebp)
 				}
 			} else {
 				
-			/* if the type from and type to are the same
+				/* if the type from and type to are the same
 				then if this is the only use then packit */
 				if (compareType (operandType (IC_RIGHT (ic)),
 					operandType (IC_LEFT (ic))) == 1) {
@@ -4115,7 +4155,7 @@ pic14_assignRegisters (eBBlock ** ebbs, int count)
 	if (options.dump_pack)
 		dumpEbbsToFileExt (DUMP_PACK, ebbs, count);
 	
-		/* first determine for each live range the number of 
+	/* first determine for each live range the number of 
 	registers & the type of registers required for each */
 	regTypeNum ();
 	

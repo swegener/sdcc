@@ -3800,6 +3800,45 @@ pic16_packRegisters (eBBlock * ebp)
 	debugLog ("  %d - Pointer set\n", __LINE__);
 
 
+		/* Look for two subsequent iCodes with */
+		/*   iTemp := _c;         */
+		/*   _c = iTemp & op;     */
+		/* and replace them by    */
+		/*   iTemp := _c;         */
+		/*   _c = _c & op;        */
+		if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^') &&
+			ic->prev &&
+			ic->prev->op == '=' &&
+			IS_ITEMP (IC_LEFT (ic)) &&
+			IC_LEFT (ic) == IC_RESULT (ic->prev) &&
+			isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
+        {
+			iCode* ic_prev = ic->prev;
+			symbol* prev_result_sym = OP_SYMBOL (IC_RESULT (ic_prev));
+			
+			ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
+			if (IC_RESULT (ic_prev) != IC_RIGHT (ic))
+            {
+				bitVectUnSetBit (OP_USES (IC_RESULT (ic_prev)), ic->key);
+				if (/*IS_ITEMP (IC_RESULT (ic_prev)) && */
+					prev_result_sym->liveTo == ic->seq)
+                {
+					prev_result_sym->liveTo = ic_prev->seq;
+                }
+            }
+			bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+			
+			bitVectSetBit (ic->rlive, IC_RESULT (ic)->key);
+			
+			if (bitVectIsZero (OP_USES (IC_RESULT (ic_prev))))
+            {
+				bitVectUnSetBit (ic->rlive, IC_RESULT (ic)->key);
+				bitVectUnSetBit (OP_DEFS (IC_RESULT (ic_prev)), ic_prev->key);
+				remiCodeFromeBBlock (ebp, ic_prev);
+				hTabDeleteItem (&iCodehTab, ic_prev->key, ic_prev, DELETE_ITEM, NULL);
+            }
+        }
+		
     /* if this is an itemp & result of a address of a true sym 
        then mark this as rematerialisable   */
     if (ic->op == ADDRESS_OF &&

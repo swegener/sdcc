@@ -9,8 +9,8 @@ extern bit be;
 extern code ce;
 extern data de;
 extern xdata xe;
-xdata at 0x1234 abs;
 extern xdata xee;
+xdata at 0x1234 abs;
 
 void main(void) {
   puts ("Hello world.\n\r");

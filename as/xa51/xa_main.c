@@ -286,15 +286,15 @@ void print_symbol_table()
     fprintf(sym_fp, " Line %d\n", p->line_def);
 #else
     if (p->issfr) {
-      fprintf (sym_fp, "%-5s", "SFR");
+      fprintf (sym_fp, "%-7s", "SFR");
     } else if (p->isbit && !p->area) {
-      fprintf (sym_fp, "%-5s", "SBIT");
+      fprintf (sym_fp, "%-7s", "SBIT");
     } else if (p->mode=='=') {
-      fprintf (sym_fp,"ABS");
+      fprintf (sym_fp,"ABS    ");
     } else if (!p->isdef) {
-      fprintf (sym_fp,"EXTRN");
+      fprintf (sym_fp,"EXTRN  ");
     } else {
-      fprintf (sym_fp, "%-5s", areaToString(p->area));
+      fprintf (sym_fp, "%-7s", areaToString(p->area));
     }
     fprintf (sym_fp, " 0x%04x (%5d)", p->value, p->value);
     fprintf (sym_fp, " %s", p->isdef ? "D" : "-");
@@ -382,6 +382,17 @@ struct symbol *is_ref(char *thename) {
     p = p->next;
   }
   return NULL;
+}
+
+int is_abs(char *thename) {
+  struct symbol *p;
+  p = sym_list;
+  while (p != NULL) {
+    if (strcasecmp(thename, p->name)==0) 
+      return p->mode == '=';
+    p = p->next;
+  }
+  return 0;
 }
 
 /* this routine is used to dump a group of bytes to the output */

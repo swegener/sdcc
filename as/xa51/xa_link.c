@@ -14,7 +14,9 @@
 
 /* This is a cheap hack. The xa51 has a couple of ways to scramble
    relocation info into it's opcode that the standard linker can't
-   handle. No hash or qsort yet.
+   handle, not to mention word allignment. 
+
+   No hash or qsort yet.
 
    The relocatable format looks like the known one, BUT ISN'T.
 
@@ -50,13 +52,17 @@ enum {
   GSINIT=1,
   CSEG,
   XINIT,
-  GSFINAL, // here goes the final output
+
+  // here goes the final output and should be used by the assembler
+  GSFINAL,
 
   // these are only for storage
   BSEG,
   DSEG,
   XSEG,
   XISEG,
+
+  // that's all
   MAX_SEGMENTS
 };
 
@@ -455,7 +461,6 @@ void readModule(char *module, int isLib) {
       }
     currentLine++;
   }
-  // that's all for now, thanks for watching */
   fclose (relModule);
 }
 
@@ -595,8 +600,9 @@ int relocate() {
 	  int rel8 = symbol->address-(reference->pc & ~1);
 	  if (rel8<-256 || rel8>256) {
 	    fprintf (stderr,
-		     "rel8 target for %s is out of range in module %s\n",
-		     reference->name, reference->module->name);
+		     "rel8 target for %s is out of range in module %s:%d\n",
+		     reference->name, reference->module->name, 
+		     reference->lineno);
 	    fatalErrors++;
 	  }
 	  gsfinalImage[reference->address]=rel8/2;
@@ -606,8 +612,9 @@ int relocate() {
 	  int rel16 = symbol->address-(reference->pc & ~1);
 	  if (rel16<-65536 || rel16>65534) {
 	    fprintf (stderr, 
-		     "rel16 target for %s is out of range in module %s\n",
-		     reference->name, reference->module->name);
+		     "rel16 target for %s is out of range in module %s:%d\n",
+		     reference->name, reference->module->name,
+		     reference->lineno);
 	    fatalErrors++;
 	  }
 	  gsfinalImage[reference->address]=(rel16/2)>>8;
@@ -667,7 +674,6 @@ int scanLibraries(int unresolved) {
   for (nlp=0; nlp<nlibPaths; nlp++) {
     for (nlf=0; nlf<nlibFiles; nlf++) {
       sprintf (libFiles, "%s/%s.lib", libraryPaths[nlp], libraryFiles[nlf]);
-      //fprintf (stderr, "  %s\n", libFiles);
       if ((lfs=fopen(libFiles,"r"))==NULL) {
 	continue;
       }
@@ -675,15 +681,13 @@ int scanLibraries(int unresolved) {
 	// remove trailing \n
 	line[strlen(line)-1]='\0';
 	sprintf (libFile, "%s/%s", libraryPaths[nlp], line);
-	//fprintf (stderr, "    %s\n", libFile);
-	if ((lf=fopen(libFile,"r"))==0) {
+	if ((lf=fopen(libFile,"r"))==NULL) {
 	  continue;
 	}
 	while (fgets(line, 132, lf)) {
 	  int dummy; // we need this to get the right count of the next sscanf
 	  if (sscanf(line, "S %[^ ] Def%04x", symName, &dummy)==2) {
 	    if (isUnresolved(symName, 1)) {
-	      //fprintf (stderr, "%s:%s\n", libFile, symName);
 	      readModule(libFile,1);
 	      if (resolved++ == unresolved) {
 		// we are done
@@ -792,7 +796,6 @@ int main(int argc, char **argv) {
   addToDefs("s_XISEG", 0, 0);
   addToDefs("l_XISEG", segments[XISEG]._size, 1);
 
-#if 1
   // mark the resolved references
   resolve();
 
@@ -816,7 +819,6 @@ int main(int argc, char **argv) {
   if (unresolved==0) {
     writeModule(outFileName);
   }
-#endif
 
   // the modules
   fprintf (mapOut, "Modules:\n");

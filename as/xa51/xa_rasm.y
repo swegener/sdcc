@@ -167,7 +167,9 @@ line:          linesymbol ':' linenosym {
 			MEM_POS += $3;
 		}
              | linenosym {
-			MEM_POS += $1;
+                        if (!is_abs(symbol_name)) {
+			  MEM_POS += $1;
+			}
 		}
 
 linenosym:     directive EOL {

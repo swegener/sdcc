@@ -205,23 +205,23 @@ static asmop *aopForSym(symbol *sym,
       switch (size) 
 	{
 	case 1:
-	  emitcode ("mov.b", "r0l,[%s]", getStackOffset(sym->stack));
+	  emitcode ("mov.b", "r0l,[%s] ;aopForSym:stack:1", getStackOffset(sym->stack));
 	  sprintf (aop->name[0], "r0l");
 	  return aop;
 	case 2:
-	  emitcode ("mov.w", "r0,[%s]", getStackOffset(sym->stack));
+	  emitcode ("mov.w", "r0,[%s] ;aopForSym:stack:2", getStackOffset(sym->stack));
 	  sprintf (aop->name[0], "r0");
 	  return aop;
 	case 3:
-	  emitcode ("mov.w", "r0,[%s]", getStackOffset(sym->stack));
+	  emitcode ("mov.w", "r0,[%s] ;aopForSym:stack:3", getStackOffset(sym->stack));
 	  sprintf (aop->name[0], "r0");
-	  emitcode ("mov.b", "r1l,[%s]", getStackOffset(sym->stack+2));
+	  emitcode ("mov.b", "r1l,[%s] ;aopForSym:stack:3", getStackOffset(sym->stack+2));
 	  sprintf (aop->name[1], "r1l");
 	  return aop;
 	case 4:
-	  emitcode ("mov.w", "r0,[%s]", getStackOffset(sym->stack));
+	  emitcode ("mov.w", "r0,[%s] ;aopForSym:stack:4", getStackOffset(sym->stack));
 	  sprintf (aop->name[0], "r0");
-	  emitcode ("mov.w", "r1,[%s]", getStackOffset(sym->stack+2));
+	  emitcode ("mov.w", "r1,[%s] ;aopForSym:stack:4", getStackOffset(sym->stack+2));
 	  sprintf (aop->name[1], "r1");
 	  return aop;
 	}
@@ -949,7 +949,7 @@ static void genPlus (iCode * ic) {
   aopOp(left, !aopIsPtr(result), !aopIsDir(result));
   aopOp(right, !aopIsPtr(result), !aopIsDir(result));
 
-  // special case for * = * + char, needs a closer look
+  // special case for "* = * + char", needs a closer look
   // heck, this shouldn't have come here but bug-223113 does
   if (size==3 && AOP_SIZE(right)==1) {
     emitcode ("mov", "r1l,%s", AOP_NAME(right)[0]);
@@ -960,7 +960,7 @@ static void genPlus (iCode * ic) {
     return;
   }
 
-  // special case for (whatever)* = (whatever)** + char, needs a closer look
+  // special case for "xdata * = xdata * + char", needs a closer look
   // heck, this shouldn't have come here but bug-441448 does
   if (size==2 && AOP_SIZE(right)==1) {
     emitcode ("mov", "r1l,%s", AOP_NAME(right)[0]);
@@ -996,9 +996,62 @@ static void genPlus (iCode * ic) {
 /* genMinus - generates code for subtraction                       */
 /*-----------------------------------------------------------------*/
 static void genMinus (iCode * ic) {
-  printIc (0, "genMinus", ic, 1,1,1);
-}
+  operand *result=IC_RESULT(ic), *left=IC_LEFT(ic), *right=IC_RIGHT(ic);
+  int size;
+  char *instr;
 
+  printIc (0, "genMinus", ic, 1,1,1);
+
+  size=aopOp(result, TRUE, TRUE);
+
+  /* if left is a literal, then exchange them */
+  if (IS_LITERAL(operandType(left))) {
+    operand *tmp = right;
+    right = left;
+    left = tmp;
+  }
+    
+  if (aopIsBit(result)) {
+    if (IS_LITERAL(operandType(right))) {
+      if (operandLitValue(right)) {
+	emitcode ("clr", AOP_NAME(result)[0]);
+	return;
+      }
+      aopOp(left, TRUE, TRUE);
+      emitcode ("mov", "%s,%s", AOP_NAME(result)[0], toBoolean(left));
+      return;
+    }
+    bailOut("genPlus: unfinished genPlus bit");
+  }
+  
+  if (isOperandEqual(result,left)) {
+    left->aop=result->aop;
+  } else {
+    aopOp(left, !aopIsPtr(result), !aopIsDir(result));
+  }
+  aopOp(right, !aopIsPtr(result), !aopIsDir(result));
+
+  if (size>1) {
+    instr="sub.w";
+  } else {
+    instr="sub.b";
+  }
+  if (!aopEqual(result->aop, left->aop, 0)) {
+    emitcode ("mov", "%s,%s", AOP_NAME(result)[0], AOP_NAME(left)[0]);
+  }
+  emitcode (instr, "%s,%s", AOP_NAME(result)[0], AOP_NAME(right)[0]);
+  if (size>2) {
+    if (!aopEqual(result->aop, left->aop, 1)) {
+      emitcode ("mov", "%s,%s", AOP_NAME(result)[1], AOP_NAME(left)[1]);
+    }
+    if (size==3) {
+      // generic pointer
+    } else {
+      emitcode ("subb.w", "%s,%s", AOP_NAME(result)[1], AOP_NAME(right)[1]);
+    }
+  }
+  return;
+}
 
 /*-----------------------------------------------------------------*/
 /* genMult - generates code for multiplication                     */

@@ -60,10 +60,10 @@ time_t time(time_t *timeptr) {
 
 static _CODE char monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
 
-static _CODE char *month[]={"Jan","Feb","Mar","Apr","May","Jun",
-		 "Jul","Aug","Sep","Oct","Nov","Dec"};
+_CODE char * _CODE __month[]={"Jan","Feb","Mar","Apr","May","Jun",
+			      "Jul","Aug","Sep","Oct","Nov","Dec"};
 
-static _CODE char *day[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+_CODE char * _CODE __day[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
 static char ascTimeBuffer[32];
 
@@ -90,7 +90,7 @@ static void CheckTime(struct tm *timeptr) {
 char *asctime(struct tm *timeptr) {
   CheckTime(timeptr);
   sprintf (ascTimeBuffer, "%s %s %2d %02d:%02d:%02d %04d\n",
-	   day[timeptr->tm_wday], month[timeptr->tm_mon], timeptr->tm_mday,
+	   __day[timeptr->tm_wday], __month[timeptr->tm_mon], timeptr->tm_mday,
 	   timeptr->tm_hour, timeptr->tm_min, timeptr->tm_sec, 
 	   timeptr->tm_year+1900);
   return ascTimeBuffer;

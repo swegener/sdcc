@@ -31,7 +31,7 @@ int printf (const char *format, ...) reentrant
   int done;
 
   va_start (arg, format);
-  done = vprintf ((char *)0,format, arg);
+  done = vprintf (format, arg);
   va_end (arg);
 
   return done;

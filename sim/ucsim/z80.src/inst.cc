@@ -1248,8 +1248,8 @@ cl_z80::inst_pop(t_mem code)
       regs.SP+=2;
     break;
     case 0xF1: // POP AF
-      regs.A = get1(regs.SP++);
       regs.F = get1(regs.SP++);
+      regs.A = get1(regs.SP++);
     break;
     default:
       return(resINV_INST);

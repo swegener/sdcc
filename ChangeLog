@@ -1,3 +1,10 @@
+2003-03-30  Scott Dattalo  <scott@dattalo.com>
+
+	* src/pic/gen.c: Commit patch from Steve Tell <tell@telltronics.org> that fixes
+	  a nested for loop bug in the PIC port
+	* src/regression/nestfor.c: new regression test file Steve wrote to test nested
+	  for loops
+
 2003-03-29  Bernhard Held <bernhard@bernhardheld.de>
 
 	* support/Util/dbuf.h: remove C++ stuff to make it portable

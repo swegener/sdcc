@@ -4086,6 +4086,7 @@ static void genCmp (operand *left,operand *right,
 	    genSkipc(&rFalseIfx);
 	    break;
 	  }
+	  if(ifx) ifx->generated = 1;
 	} else {
 	  /* unsigned comparisons to a literal byte */
 
@@ -4093,10 +4094,12 @@ static void genCmp (operand *left,operand *right,
 	  case 0:
 	    emitpcode(POC_MOVFW, popGet(AOP(right),0));
 	    genSkipz2(&rFalseIfx,0);
+	    if(ifx) ifx->generated = 1;
 	    break;
 	  case 0x7f:
 	    rFalseIfx.condition ^= 1;
 	    genSkipCond(&rFalseIfx,right,0,7);
+	    if(ifx) ifx->generated = 1;
 	    break;
 
 	  default:
@@ -4104,17 +4107,20 @@ static void genCmp (operand *left,operand *right,
 	    emitpcode(POC_SUBFW, popGet(AOP(right),0));
 	    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	    rFalseIfx.condition ^= 1;
-	    if (AOP_TYPE(result) == AOP_CRY)
+	    if (AOP_TYPE(result) == AOP_CRY) {
 	      genSkipc(&rFalseIfx);
-	    else {
+	      if(ifx) ifx->generated = 1;
+	    } else {
+	      DEBUGpic14_emitcode ("; ***","%s  %d RFIfx.cond=%d",__FUNCTION__,__LINE__, rFalseIfx.condition);
 	      emitpcode(POC_CLRF, popGet(AOP(result),0));
 	      emitpcode(POC_RLF, popGet(AOP(result),0));
+	      emitpcode(POC_MOVLW, popGetLit(0x01));
+	      emitpcode(POC_XORWF, popGet(AOP(result),0));
 	    }	      
 	    break;
 	  }
 	}
 
-	if(ifx) ifx->generated = 1;
 	//goto check_carry;
 	return;
 

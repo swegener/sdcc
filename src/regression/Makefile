@@ -77,6 +77,7 @@ SRC = b.c \
 	compare5.c \
 	compare6.c \
 	for.c \
+	nestfor.c \
 	or1.c \
 	rotate1.c \
 	rotate2.c \

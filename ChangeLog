@@ -1,3 +1,9 @@
+2003-07-06  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    * support/librarian/sdcclib.c: sdcc librarian.
+	* as/mcs51/aslink.h, as/mcs51/lklib.c: Support for libraries created
+	with sdcclib.
+
 2003-07-03  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
 	* as/mcs51/lkmain.c: properly handle extensions in function afile.

@@ -1,5 +1,5 @@
 # Simple weekly tarball generator
-CVSROOT = :pserver:anonymous@cvs.sdcc.sourceforge.net
+CVSROOT = :pserver:anonymous@cvs.sdcc.sourceforge.net:/cvsroot/sdcc
 CVSOPTS = -z6
 DATE = `date +%Y%m%d`
 WWWROOT = /home/michaelh/www
@@ -10,6 +10,7 @@ REVISION = 1
 all: _sdcc
 
 _sdcc:
+	mkdir -p $(SNAP)
 	cd /tmp; \
 	mkdir -p sdcc-$(DATE); \
 	cd sdcc-$(DATE); \

@@ -252,21 +252,6 @@ newAsmop (short type)
   return aop;
 }
 
-static void
-genSetDPTR (int n)
-{
-  if (!n)
-    {
-      emitcode (";", "Select standard DPTR");
-      emitcode ("mov", "dps, #0x00");
-    }
-  else
-    {
-      emitcode (";", "Select alternate DPTR");
-      emitcode ("mov", "dps, #0x01");
-    }
-}
-
 /*-----------------------------------------------------------------*/
 /* pointerCode - returns the code for a pointer type               */
 /*-----------------------------------------------------------------*/
@@ -779,13 +764,6 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
       return rs;
 
     case AOP_DPTR:
-    case AOP_DPTR2:
-
-      if (aop->type == AOP_DPTR2)
-	{
-	  genSetDPTR (1);
-	}
-
       while (offset > aop->coff)
 	{
 	  emitcode ("inc", "dptr");
@@ -808,12 +786,6 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
 	{
 	  emitcode ("movx", "a,@dptr");
 	}
-
-      if (aop->type == AOP_DPTR2)
-	{
-	  genSetDPTR (0);
-	}
-
       return (dname ? "acc" : "a");
 
 
@@ -929,13 +901,6 @@ aopPut (asmop * aop, char *s, int offset)
       break;
 
     case AOP_DPTR:
-    case AOP_DPTR2:
-
-      if (aop->type == AOP_DPTR2)
-	{
-	  genSetDPTR (1);
-	}
-
       if (aop->code)
 	{
 	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -961,11 +926,6 @@ aopPut (asmop * aop, char *s, int offset)
       MOVA (s);
 
       emitcode ("movx", "@dptr,a");
-
-      if (aop->type == AOP_DPTR2)
-	{
-	  genSetDPTR (0);
-	}
       break;
 
     case AOP_R0:
@@ -1111,7 +1071,6 @@ pointToEnd (asmop * aop)
 static void
 reAdjustPreg (asmop * aop)
 {
-  aop->coff = 0;
   if ((aop->coff==0) || aop->size <= 1)
     return;
 
@@ -1123,24 +1082,13 @@ reAdjustPreg (asmop * aop)
 	emitcode ("dec", "%s", aop->aopu.aop_ptr->name);
       break;
     case AOP_DPTR:
-    case AOP_DPTR2:
-      if (aop->type == AOP_DPTR2)
-	{
-	  genSetDPTR (1);
-	}
       while (aop->coff--)
 	{
 	  emitcode ("lcall", "__decdptr");
 	}
-
-      if (aop->type == AOP_DPTR2)
-	{
-	  genSetDPTR (0);
-	}
       break;
-
     }
-
+  aop->coff = 0;
 }
 
 #define AOP(op) op->aop
@@ -1150,8 +1098,7 @@ reAdjustPreg (asmop * aop)
                        AOP_TYPE(x) == AOP_R0))
 
 #define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY ||  \
-                        AOP_TYPE(x) == AOP_DPTR || AOP_TYPE(x) == AOP_DPTR2 || \
-                         AOP(x)->paged))
+                        AOP_TYPE(x) == AOP_DPTR || AOP(x)->paged))
 
 #define AOP_INPREG(x) (x && (x->type == AOP_REG &&                        \
                       (x->aopu.aop_reg[0] == mcs51_regWithIdx(R0_IDX) || \
@@ -4242,6 +4189,7 @@ genAnd (iCode * ic, iCode * ifx)
   int bytelit = 0;
   char buffer[10];
 
+  catchMe();
   aopOp ((left = IC_LEFT (ic)), ic, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);
@@ -7847,8 +7795,7 @@ genAssign (iCode * ic)
   aopOp (right, ic, FALSE);
 
   /* special case both in far space */
-  if ((AOP_TYPE (right) == AOP_DPTR ||
-       AOP_TYPE (right) == AOP_DPTR2) &&
+  if (AOP_TYPE (right) == AOP_DPTR &&
       IS_TRUE_SYMOP (result) &&
       isOperandInFarSpace (result))
     {

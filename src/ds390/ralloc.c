@@ -2026,17 +2026,17 @@ isBitwiseOptimizable (iCode * ic)
   /* bitwise operations are considered optimizable
      under the following conditions (Jean-Louis VERN) 
 
-     x & lit   <== jwk: should be x && lit
+     x & lit
      bit & bit
      bit & x
      bit ^ bit
      bit ^ x
-     x   ^ lit <== jwk: should be x ^^ lit
-     x   | lit <== jwk: should be x || lit
+     x   ^ lit
+     x   | lit
      bit | bit
      bit | x
    */
-  if ( /* jwk IS_LITERAL (rtype) || */
+  if ( IS_LITERAL (rtype) ||
       (IS_BITVAR (ltype) && IN_BITSPACE (SPEC_OCLS (ltype))))
     return TRUE;
   else
@@ -2329,6 +2329,7 @@ packRegisters (eBBlock * ebp)
 	    }
 	}
 
+#if 0
       /* if the condition of an if instruction
          is defined in the previous instruction then
          mark the itemp as a conditional */
@@ -2342,6 +2343,22 @@ packRegisters (eBBlock * ebp)
 	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
 	  continue;
 	}
+#else
+      /* if the condition of an if instruction
+         is defined in the previous instruction and
+	 this is the only usage then
+         mark the itemp as a conditional */
+      if ((IS_CONDITIONAL (ic) ||
+	   (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic))) &&
+	  ic->next && ic->next->op == IFX &&
+	  bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
+	  isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
+	  OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
+	{
+	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
+	  continue;
+	}
+#endif
 
       /* reduce for support function calls */
       if (ic->supportRtn || ic->op == '+' || ic->op == '-')

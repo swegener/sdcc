@@ -196,7 +196,7 @@ public:
   /* Following fields and virtual methods defined in uc51 I don't have
      energy to redesign them:-( */
 public:
-  uchar port_pins[4];	// Port pins
+  uchar port_pins[6];	// Port pins; 0...5 for DS390
 public:
   virtual void proc_write(uchar *addr) {}
   virtual void set_p_flag(void) {}

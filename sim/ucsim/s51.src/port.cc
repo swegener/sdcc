@@ -44,6 +44,8 @@ cl_port::init(void)
     case 1: sfr= P1; break;
     case 2: sfr= P2; break;
     case 3: sfr= P3; break;
+    case 4: sfr= P4; break;
+    case 5: sfr= P5; break;
     default: sfr= P0; return(1);
     }
   return(0);

@@ -29,11 +29,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // Bernhard's ToDo list:
 
-// - add sfr-descriptions to s51.src/glob.cc
 // - implement math accelerator
 // - consider ACON bits
-// - proc_write_sp (*aof_SP); insert this at the appropriate places
+// - proc_write_sp (*aof_SP) / resSTACK_OV / event_at: insert this at the appropriate places
 // - buy some memory to run s51 with 2*4 Meg ROM/XRAM
+
+// strcpy (mem(MEM_ROM) ->addr_format, "0x%06x");
+// strcpy (mem(MEM_XRAM)->addr_format, "0x%06x");
+
 
 #include "ddconfig.h"
 
@@ -319,20 +322,52 @@ t_uc390::t_uc390 (int Itype, int Itech, class cl_sim *asim):
 {
   if (Itype == CPU_DS390F)
     {
-      printf ("FLAT24 MODE SET, warning: experimental code\n");
+      printf ("24-bit flat mode, warning: lots of sfr-functions not implemented!\n> ");
       flat24_flag = 1;
     }
 }
 
-  // strcpy (mem(MEM_ROM) ->addr_format, "0x%06x");
-  // strcpy (mem(MEM_XRAM)->addr_format, "0x%06x");
+/*
+ * Setting up SFR area to reset value
+ */
+
+void
+t_uc390::clear_sfr(void)
+{
+  int i;
+
+  for (i = 0; i < SFR_SIZE; i++)
+    sfr->set(i, 0);
+	/* SFR   value */
+  sfr->set(0x80, 0xff); /* P4     */
+  sfr->set(0x81, 0x07); /* SP     */
+  sfr->set(0x86, 0x04); /* DPS    */
+  sfr->set(0x90, 0xff); /* P1     */
+  sfr->set(0x92, 0xbf); /* P4CNT  */
+  sfr->set(0x9b, 0xfc); /* ESP    */
+  if (flat24_flag)
+    sfr->set(ACON, 0xfa); /* ACON; AM1 set: 24-bit flat */
+  else
+    sfr->set(ACON, 0xf8); /* ACON   */
+  sfr->set(0xa0, 0xff); /* P2     */
+  sfr->set(0xa1, 0xff); /* P5     */
+  sfr->set(0xa3, 0x09); /* COC    */
+  sfr->set(0xb0, 0xff); /* P3     */
+  sfr->set(0xb8, 0x80); /* IP     */
+  sfr->set(0xc5, 0x10); /* STATUS */
+  sfr->set(0xc6, 0x10); /* MCON   */
+  sfr->set(0xc7, 0xff); /* TA     */
+  sfr->set(0xc9, 0xe4); /* T2MOD  */
+  sfr->set(0xd2, 0x2f); /* MCNT1  */
+  sfr->set(0xe3, 0x09); /* C1C    */
+
+  prev_p1 = port_pins[1] & sfr->get(P1);
+  prev_p3 = port_pins[3] & sfr->get(P3);
+}
 
 t_addr
 t_uc390::get_mem_size (enum mem_class type)
 {
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (!flat24_flag)
-    return t_uc52::get_mem_size (type);
   switch (type)
     {
       case MEM_ROM:
@@ -355,24 +390,23 @@ t_uc390::get_mem_size (enum mem_class type)
 ulong
 t_uc390::read_mem(enum mem_class type, t_mem addr)
 {
-  //if ((sfr->get (ACON) & 0x3) == 2)
 
   if (type == MEM_XRAM &&
-      flat24_flag &&
-      addr >= 0x400000)
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
       type = MEM_IXRAM;
     }
-  return t_uc51::read_mem (type, addr);
+  return t_uc51::read_mem (type, addr); /* 24 bit */
 }
 
 ulong
 t_uc390::get_mem (enum mem_class type, t_addr addr)
 {
   if (type == MEM_XRAM &&
-      flat24_flag &&
-      addr >= 0x400000)
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
       type = MEM_IXRAM;
@@ -384,8 +418,8 @@ void
 t_uc390::write_mem (enum mem_class type, t_addr addr, t_mem val)
 {
   if (type == MEM_XRAM &&
-      flat24_flag &&
-      addr >= 0x400000)
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
       type = MEM_IXRAM;
@@ -397,8 +431,8 @@ void
 t_uc390::set_mem (enum mem_class type, t_addr addr, t_mem val)
 {
   if (type == MEM_XRAM &&
-      flat24_flag &&
-      addr >= 0x400000)
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
       type = MEM_IXRAM;
@@ -470,30 +504,6 @@ t_uc390::pop_byte (int *Pres)
 }
 
 /*
- * 0x05 2 12 INC addr
- *____________________________________________________________________________
- *
- */
-int
-t_uc390::inst_inc_addr (uchar code)
-{
-  uchar *addr;
-
-  addr = get_direct (fetch (), &event_at.wi, &event_at.ws);
-
-  /* mask off the 2Hex bit adjacent to the 1H bit which selects
-     which DPTR we use.  This is a feature of 80C390.
-     You can do INC DPS and it only effects bit 1. */
-  if (code == DPS)
-    (*addr) ^= 1;  /* just toggle */
-  else
-    (*addr)++;
-
-  proc_write (addr);
-  return resGO;
-}
-
-/*
  * 0xa3 1 24 INC DPTR
  *____________________________________________________________________________
  *
@@ -521,22 +531,20 @@ t_uc390::inst_inc_dptr (uchar code)
     }
 
   dptr = sfr->get (ph) * 256 + sfr->get (pl);
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     dptr += sfr->get (px) *256*256;
   if (dps & 0x80) /* decr set */
     dptr--;
   else
     dptr++;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     sfr->set (px, (dptr >> 16) & 0xff);
   sfr->set (event_at.ws = ph, (dptr >> 8) & 0xff);
   sfr->set (pl, dptr & 0xff);
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, (dps ^ 1));  /* toggle dual-dptr switch */
+    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
   tick (1);
   return resGO;
 }
@@ -569,8 +577,7 @@ t_uc390::inst_jmp_$a_dptr (uchar code)
   PC = (sfr->get (ph) * 256 + sfr->get (pl) +
       read_mem (MEM_SFR, ACC)) &
       (EROM_SIZE - 1);
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     PC += sfr->get (px) * 256*256;
 
   tick (1);
@@ -602,14 +609,13 @@ t_uc390::inst_mov_dptr_$data (uchar code)
       px = DPX;
     }
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     sfr->set (px, fetch ());
   sfr->set (event_at.ws = ph, fetch ());
   sfr->set (pl, fetch ());
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, (dps ^ 1));  /* toggle dual-dptr switch */
+    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -641,8 +647,7 @@ t_uc390::inst_movc_a_$a_dptr (uchar code)
       px = DPX;
     }
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     sfr->set (ACC, get_mem (MEM_ROM,
               event_at.rc =
               (sfr->get (px) * 256*256 + sfr->get (ph) * 256 + sfr->get (pl) +
@@ -653,7 +658,7 @@ t_uc390::inst_movc_a_$a_dptr (uchar code)
               sfr->get (ACC)) & (EROM_SIZE-1)));
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, (dps ^ 1));  /* toggle dual-dptr switch */
+    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -723,8 +728,7 @@ t_uc390::inst_movx_a_$dptr (uchar code)
       px = DPX;
     }
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     sfr->set (event_at.ws = ACC,
               get_mem (MEM_XRAM,
               event_at.rx = sfr->get (px) * 256*256 + sfr->get (ph) * 256 + sfr->get (pl)));
@@ -734,7 +738,7 @@ t_uc390::inst_movx_a_$dptr (uchar code)
              event_at.rx = sfr->get (ph) * 256 + sfr->get (pl)));
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, (dps ^ 1));  /* toggle dual-dptr switch */
+    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -765,8 +769,7 @@ t_uc390::inst_movx_$dptr_a (uchar code)
       px = DPX;
     }
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     set_mem (MEM_XRAM,
              event_at.wx = sfr->get (px) * 256*256 + sfr->get (ph) * 256 + sfr->get (pl),
              sfr->get (event_at.rs = ACC));
@@ -776,7 +779,7 @@ t_uc390::inst_movx_$dptr_a (uchar code)
              sfr->get (event_at.rs = ACC));
 
   if (dps & 0x20)                      /* auto-switch dptr */
-    sfr->set (DPS, (dps ^ 1));  /* toggle dual-dptr switch */
+    sfr->set (DPS, dps ^ 1);    /* toggle dual-dptr switch */
 
   tick (1);
   return resGO;
@@ -793,8 +796,7 @@ t_uc390::inst_ajmp_addr (uchar code)
 {
   uchar x, h, l;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
       x = (code >> 5) & 0x07;
       h = fetch ();
@@ -822,8 +824,7 @@ t_uc390::inst_ljmp (uchar code)
 {
   uchar x, h, l;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
       x = fetch ();
       h = fetch ();
@@ -852,8 +853,7 @@ t_uc390::inst_acall_addr (uchar code)
   uchar x, h, l, *sp, *aof_SP;
   int res;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
       x = (code >> 5) & 0x07;
       h = fetch ();
@@ -909,8 +909,7 @@ t_uc390::inst_lcall (uchar code, uint addr)
 
   if (!addr)
     { /* this is a normal lcall */
-      //if ((sfr->get (ACON) & 0x3) == 2)
-      if (flat24_flag)
+     if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
         x = fetch ();
       h = fetch ();
       l = fetch ();
@@ -920,8 +919,7 @@ t_uc390::inst_lcall (uchar code, uint addr)
   res = push_byte ( PC       & 0xff); /* push low byte  */
   res = push_byte ((PC >> 8) & 0xff); /* push high byte */
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
       res = push_byte ((PC >> 16) & 0xff); /* push x byte */
       if (addr)
@@ -951,16 +949,14 @@ t_uc390::inst_ret (uchar code)
   uchar x = 0, h, l;
   int res;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     x = pop_byte (&res);
   h = pop_byte (&res);
   l = pop_byte (&res);
 
   tick (1);
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
       tick (1);
       PC = x * 256*256 + h * 256 + l;
@@ -983,16 +979,13 @@ t_uc390::inst_reti (uchar code)
   uchar x = 0, h, l;
   int res;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     x = pop_byte (&res);
   h = pop_byte (&res);
   l = pop_byte (&res);
   tick (1);
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
       tick (1);
       PC = x * 256*256 + h * 256 + l;
@@ -1013,18 +1006,154 @@ t_uc390::inst_reti (uchar code)
 }
 
 /*
+ * Processing write operation to IRAM
+ *
+ * It starts serial transmition if address is in SFR and it is
+ * SBUF. Effect on IE is also checked.
+ */
+
+void
+t_uc390::proc_write(uchar *addr)
+{
+  if (addr == &((sfr->umem8)[SBUF]))
+    {
+      s_out= sfr->get(SBUF);
+      s_sending= DD_TRUE;
+      s_tr_bit = 0;
+      s_tr_tick= 0;
+      s_tr_t1  = 0;
+    }
+  else if (addr == &((sfr->umem8)[IE]))
+    was_reti= DD_TRUE;
+  else if (addr == &((sfr->umem8)[DPS]))
+    {
+      *addr &= 0xe5;
+      *addr |= 0x04;
+    }
+  else if (addr == &((sfr->umem8)[EXIF]))
+    {
+    }
+  else if (addr == &((sfr->umem8)[P4CNT]))
+    {
+      ;
+    }
+  else if (addr == &((sfr->umem8)[ACON]))
+    {
+      *addr |= 0xf8;
+      /* lockout: IDM1:IDM0 and SA can't be set at the same time */
+      if (((sfr->umem8)[MCON] & 0xc0) == 0xc0) /* IDM1 and IDM0 set? */
+        *addr &= ~0x04; /* lockout SA */
+    }
+  else if (addr == &((sfr->umem8)[P5CNT]))
+    {
+      ;
+    }
+  else if (addr == &((sfr->umem8)[C0C]))
+    {
+      ;
+    }
+  else if (addr == &((sfr->umem8)[PMR]))
+    {
+      *addr |= 0x03;
+      // todo: check previous state
+      if ((*addr & 0xd0) == 0x90) /* CD1:CD0 set to 10, CTM set */
+        {
+	  ctm_ticks = ticks->ticks;
+	  (sfr->umem8)[EXIF] &= ~0x08; /* clear CKRDY */
+        }
+      else
+        ctm_ticks = 0;
+    }
+  else if (addr == &((sfr->umem8)[MCON]))
+    {
+      *addr |= 0x10;
+      /* lockout: IDM1:IDM0 and SA can't be set at the same time */
+      if (((sfr->umem8)[ACON] & 0x04) == 0x04) /* SA set? */
+        *addr &= ~0xc0; /* lockout IDM1:IDM0 */
+    }
+  else if (addr == &((sfr->umem8)[TA]))
+    {
+      if (*addr == 0x55)
+        {
+	  timed_access_ticks = ticks->ticks;
+	  timed_access_state = 1;
+        }
+      else if (*addr == 0xaa &&
+               timed_access_state == 1 &&
+	       timed_access_ticks == ticks->ticks + 1)
+        {
+	  timed_access_ticks = ticks->ticks;
+	  timed_access_state = 2;
+        }
+      else
+        timed_access_state = 0;
+    }
+  else if (addr == &((sfr->umem8)[T2MOD]))
+    *addr |= 0xe0;
+  else if (addr == &((sfr->umem8)[COR]))
+    {
+      ;
+    }
+  else if (addr == &((sfr->umem8)[WDCON]))
+    {
+      ;
+    }
+  else if (addr == &((sfr->umem8)[C1C]))
+    {
+      ;
+    }
+  else if (addr == &((sfr->umem8)[MCNT1]))
+    *addr |= 0x0f;
+}
+
+
+/*
+ * Reading IRAM or SFR, but if address points to a port, it reads
+ * port pins instead of port latches
+ */
+
+uchar
+t_uc390::read(uchar *addr)
+{
+  //if (addr == &(MEM(MEM_SFR)[P1]))
+  if (addr == &(sfr->umem8[P1]))
+    return get_mem (MEM_SFR, P1) & port_pins[1];
+  //if (addr == &(MEM(MEM_SFR)[P2]))
+  else if (addr == &(sfr->umem8[P2]))
+    return get_mem (MEM_SFR, P2) & port_pins[2];
+  //if (addr == &(MEM(MEM_SFR)[P3]))
+  else if (addr == &(sfr->umem8[P3]))
+    return get_mem (MEM_SFR, P3) & port_pins[3];
+  //if (addr == &(MEM(MEM_SFR)[P4]))
+  else if (addr == &(sfr->umem8[P4]))
+    return get_mem (MEM_SFR, P4) & port_pins[4];
+  //if (addr == &(MEM(MEM_SFR)[P5]))
+  else if (addr == &(sfr->umem8[P5]))
+    return get_mem (MEM_SFR, P5) & port_pins[5];
+  else if (addr == &(sfr->umem8[EXIF]))
+    if (ctm_ticks &&
+        ticks->ticks >= ctm_ticks + 65535)
+      {
+        *addr |= 0x08; /* set CKRDY */
+	ctm_ticks = 0;
+      }
+  return *addr;
+}
+
+
+/*
  * Disassembling an instruction
  */
 
 struct dis_entry *
 t_uc390::dis_tbl (void)
 {
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (!flat24_flag)
+  if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
+    return disass_390f;
+  else
     return disass_51;
     //t_uc51::dis_tbl ();
 
-  return disass_390f;
 }
 
 char *
@@ -1034,8 +1163,7 @@ t_uc390::disass (t_addr addr, char *sep)
   char *buf, *p, *b, *t;
   t_mem code;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (!flat24_flag)
+  if (! (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     return t_uc51::disass (addr, sep);
   code = get_mem (MEM_ROM, addr);
 
@@ -1143,13 +1271,12 @@ t_uc390::disass (t_addr addr, char *sep)
 }
 
 void
-t_uc390::print_regs(class cl_console *con)
+t_uc390::print_regs (class cl_console *con)
 {
   t_addr start;
   uchar data;
 
-  //if ((sfr->get (ACON) & 0x3) == 2)
-  if (!flat24_flag)
+  if (! (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       t_uc51::print_regs (con);
       return;

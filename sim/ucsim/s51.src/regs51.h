@@ -61,14 +61,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define AUXR	0x8e /* Auxiliary Register */
 #define AUXR1	0xa2 /* Secondary Aux Register */
 
+#define P4      0x80
 #define DPXL	0x84 /* */
 #define DPL1	0x84 /* 2nd Data Pointer Low byte */
 #define DPH1	0x85 /* 2nd Data Pointer High byte */
 #define DPS	0x86 /* DPS 1H=DPTR is DPL1/DPH1,... */
+#define EXIF    0x91 /* */
+#define P4CNT   0x92 /* */
 #define DPX     0x93 /* Data Pointer HHigh byte */
 #define DPX1    0x95 /* Data Pointer HHigh byte */
-#define ESP     0x9B /* Extended Stack Pointer */
-#define ACON    0x9D /* */
+#define ESP     0x9b /* Extended Stack Pointer */
+#define ACON    0x9d /* */
+#define P5      0xa1
+#define P5CNT   0xa2 /* */
+#define C0C     0xa3 /* */
 #define WDTRST	0xa6 /* */
 #define IE0	0xa8 /* */
 #define SADDR	0xa9 /* */
@@ -77,7 +83,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define IPL0	0xb8 /* */
 #define SADEN	0xb9 /* */
 #define SPH	0xbd /* */
+#define PMR	0xc4 /* */
+#define MCON    0xc6 /* */
+#define TA      0xc7 /* */
 #define T2MOD	0xc9 /* */
+#define COR     0xce /* */
 #define PSW1	0xd1 /* */
 #define MCNT0   0xd1
 #define MCNT1   0xd2
@@ -85,12 +95,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MB      0xd4 /* MB register from math accelerator */
 #define MC      0xd5 /* MC register from math accelerator */
 #define CCON	0xd8 /* */
+#define WDCON	0xd8 /* */
 #define CMOD	0xd9 /* */
 #define CCAPM0	0xda /* */
 #define CCAPM1	0xdb /* */
 #define CCAPM2	0xdc /* */
 #define CCAPM3	0xdd /* */
 #define CCAPM4	0xde /* */
+#define C1C     0xe3 /* */
 #define CL	0xe9 /* */
 #define CCAP0L	0xea /* */
 #define CCAP1L	0xeb /* */

@@ -2185,10 +2185,13 @@ genCall (iCode * ic)
 	    {
 	      char *l = aopGet (AOP (IC_LEFT (sic)), offset,
 				FALSE, FALSE, TRUE);
-	      if (strcmp (l, fReturn[offset]))
-		emitcode ("mov", "%s,%s",
+	      if (strcmp (l, fReturn[offset])) {
+		genSetDPTR(0);
+		_flushLazyDPS();
+		emitcode ("mov", "%s,%s ;jwk lazy genCall",
 			  fReturn[offset],
 			  l);
+	      }
 	      offset++;
 	    }
 	  _endLazyDPSEvaluation ();
@@ -7853,6 +7856,8 @@ genGenPointerGet (operand * left,
   sym_link *retype = getSpec (operandType (result));
   sym_link *letype = getSpec (operandType (left));
 
+  D (emitcode (";", "genGenPointerGet "); );
+
   aopOp (left, ic, FALSE, TRUE);
 
   /* if the operand is already in dptr
@@ -7868,10 +7873,27 @@ genGenPointerGet (operand * left,
       else
 	{			/* we need to get it byte by byte */
 	  _startLazyDPSEvaluation ();
-	  emitcode ("mov", "dpl,%s", aopGet (AOP (left), 0, FALSE, FALSE, TRUE));
-	  emitcode ("mov", "dph,%s", aopGet (AOP (left), 1, FALSE, FALSE, TRUE));
-	  emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
-	  emitcode ("mov", "b,%s", aopGet (AOP (left), 3, FALSE, FALSE, TRUE));
+	  if (AOP(left)->type==AOP_DPTR2) {
+	    char *l;
+	    l=aopGet(AOP(left),0,FALSE,FALSE,TRUE);
+	    genSetDPTR(0);
+	    _flushLazyDPS();
+	    emitcode ("mov", "dpl,%s", l);
+	    l=aopGet(AOP(left),1,FALSE,FALSE,TRUE);
+	    genSetDPTR(0);
+	    _flushLazyDPS();
+	    emitcode ("mov", "dph,%s", l);
+	    l=aopGet(AOP(left),2,FALSE,FALSE,TRUE);
+	    genSetDPTR(0);
+	    _flushLazyDPS();
+	    emitcode ("mov", "dpx,%s", l);
+	    emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
+	  } else {
+	    emitcode ("mov", "dpl,%s", aopGet (AOP(left),0,FALSE,FALSE,TRUE));
+	    emitcode ("mov", "dph,%s", aopGet (AOP(left),1,FALSE,FALSE,TRUE));
+	    emitcode ("mov", "dpx,%s", aopGet (AOP(left),2,FALSE,FALSE,TRUE));
+	    emitcode ("mov", "b,%s", aopGet (AOP(left),3,FALSE,FALSE,TRUE));
+	  }
 	  _endLazyDPSEvaluation ();
 	}
     }
@@ -9228,7 +9250,6 @@ gen390Code (iCode * lic)
   /* if debug information required */
   if (options.debug && currFunc)
     {
-      //jwk if (currFunc) {
       cdbSymbol (currFunc, cdbFile, FALSE, TRUE);
       _G.debugLine = 1;
       if (IS_STATIC (currFunc->etype))

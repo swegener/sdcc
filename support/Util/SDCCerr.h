@@ -154,9 +154,13 @@ SDCCERR - SDCC Standard error handler
 #define  W_INT_TO_GEN_PTR_CAST 136	/* Converting integer type to generic pointer. */
 #define  W_ESC_SEQ_OOR_FOR_CHAR 137     /* Escape sequence of of range for char */
 #define  E_INVALID_HEX 138              /* \x used with no following hex digits */
+#define  W_FUNCPTR_IN_USING_ISR	139	/* Call via function pointer in ISR with using attribute. */
+#define  E_NO_SUCH_BANK		140	/* 'using' attribute specifies non-existant register bank. */
 
 /** Describes the maximum error level that will be logged.  Any level
-    includes all of the levels listed after it.
+ *  includes all of the levels listed after it.
+ *
+ *
  */
 enum _ERROR_LOG_LEVEL {
     /** Everything.  Currently the same as PEDANTIC. */
@@ -164,10 +168,12 @@ enum _ERROR_LOG_LEVEL {
     /** All warnings, including those considered 'reasonable to use,
         on occasion, in clean programs' (man 3 gcc). */
     ERROR_LEVEL_PEDANTIC,
+    /** 'informational' warnings */
+    ERROR_LEVEL_INFO,
     /** Most warnings. */
-    ERROR_LEVEL_WARNINGS,
+    ERROR_LEVEL_WARNING,
     /** Errors only. */
-    ERROR_LEVEL_ERRORS
+    ERROR_LEVEL_ERROR
 };
 
 typedef enum _ERROR_LOG_LEVEL ERROR_LOG_LEVEL;

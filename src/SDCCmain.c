@@ -880,7 +880,7 @@ parseCmdLine (int argc, char **argv)
           
           if (strcmp (argv[i] +1, OPTION_LESS_PEDANTIC) == 0) 
               {
-                  setErrorLogLevel(ERROR_LEVEL_WARNINGS);
+                  setErrorLogLevel(ERROR_LEVEL_WARNING);
                   continue;
               }
 

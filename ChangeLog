@@ -1,6 +1,7 @@
 2003-07-19  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
         * device/include/regc515c.h: fixed #758477
+        * device/lib/_gptrget.c: saving some cycles in generic pointer get
         
 2003-07-18  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 

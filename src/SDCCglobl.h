@@ -244,6 +244,7 @@ struct options
     int printSearchDirs;        /* display the directories in the compiler's search path */
     int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
     int use_stdout;             /* send errors to stdout instead of stderr */
+    int no_std_crt0;            /*For the z80/gbz80 do not link default crt0.o*/
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */

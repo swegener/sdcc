@@ -5198,6 +5198,73 @@ status Collapsed
 ).
 \layout Subsubsection
 
+Z80 Options
+\begin_inset LatexCommand \index{Options Z80}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Z80 options}
+
+\end_inset 
+
+
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-callee-saves-bc
+\series default 
+
+\begin_inset LatexCommand \index{-\/-callee-saves-bc}
+
+\end_inset 
+
+
+\size large 
+\emph on 
+ 
+\size default 
+\emph default 
+Force a called function to always save BC.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-std-crt0
+\series default 
+
+\begin_inset LatexCommand \index{-\/-no-std-crt0}
+
+\end_inset 
+
+ When linking, skip the standard crt0.o object file.
+ You must provide your own crt0.o for your system when linking.
+ 
+\layout Subsubsection
+
 Optimization Options
 \begin_inset LatexCommand \index{Options optimization}
 

@@ -182,7 +182,7 @@ optionsTable[] = {
     { 0,    OPTION_PEEP_FILE,       NULL, "<file> use this extra peep-hole file" },
     { 0,    OPTION_LIB_PATH,        NULL, "<path> use this path to search for libraries" },
     { 0,    "--int-long-reent",     &options.intlong_rent, "Use reenterant calls on the int and long support functions" },
-    { 0,    "--float-reent",        &options.float_rent, "Use reenterant calls on the floar support functions" },
+    { 0,    "--float-reent",        &options.float_rent, "Use reenterant calls on the float support functions" },
     { 0,    OPTION_OUT_FMT_IHX,     NULL, NULL },
     { 0,    "--out-fmt-s19",        &options.out_fmt, NULL },
     { 0,    "--cyclomatic",         &options.cyclomatic, NULL },
@@ -225,6 +225,9 @@ optionsTable[] = {
     { 0,    OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
     { 0,    OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
     { 0,    OPTION_USE_STDOUT, &options.use_stdout, "send errors to stdout instead of stderr"},
+#if !OPT_DISABLE_Z80 || !OPT_DISABLE_GBZ80
+    { 0,    "--no-std-crt0", &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
+#endif
     /* End of options */
 #if 0 /* 10jun03 !OPT_DISABLE_PIC16 */
     { 0,    "--no-movff",	    &options.no_movff, "disable generating MOVFF opcode in PIC16 port"},
@@ -1481,7 +1484,7 @@ linkEdit (char **envp)
   /*For the z80 and gbz80 ports, try to find where crt0.o is...
   It is very important for this file to be first on the linking proccess
   so the areas are set in the correct order, expecially _GSINIT*/
-  if (TARGET_IS_Z80 || TARGET_IS_GBZ80) /*For the z80, gbz80*/
+  if ((TARGET_IS_Z80 || TARGET_IS_GBZ80) && !options.no_std_crt0) /*For the z80, gbz80*/
   {
       char crt0path[PATH_MAX];
       FILE * crt0fp;

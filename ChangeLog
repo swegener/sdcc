@@ -1,3 +1,7 @@
+2003-07-13  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
+
+    * src/SDCCmain.c, src/SDCCglobl.h: added option --no-std-crt0
+
 2003-07-12  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
 
     * sdcc.dsw, all.dsp, link/z80/linkgbz80.dsp, as/z80/as-gbz80.dsp:

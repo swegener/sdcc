@@ -304,7 +304,7 @@ cl_uc::MEM(enum mem_class type)
     //FIXME
 {printf("TROUBLE\n");    return(0);
 }
-  return((TYPE_UBYTE *)(m->mem));
+  return((uchar *)(m->mem));
 }
 
 

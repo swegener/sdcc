@@ -4,6 +4,36 @@ A random set of notes about sdcc and how it works.
 
 Sandeep:
 --------
+The Register Allocation story.
+
+Before I get into this there are a few important fields
+on the iCode & oprtand data structures that need to be
+addressed.
+
+iCode.
+-----
+	->key  -  is an unique number assigned to this
+                  iCode when this icode is allocated.
+
+        ->seq  - sequence number of the iCode given in
+	         acesnding order of execution.
+
+operand.
+-------
+	->key  - unique number for an operand when operand
+                 is allocated.
+
+OP_LIVEFROM(op) - sequence number of the iCode where it was
+                  first defined. Computed in SDCClrange.c
+
+OP_LIVETO(op)   - sequence number of the iCode where it is
+                  last used. Computed in SDCClrange.c
+
+
+                 
+
+Sandeep:
+--------
 Adding memory maps for AVR, setup default map for
 local & global variables in port.h will be initialised
 by the _<port>_finaliseOptions() [good functions]..some

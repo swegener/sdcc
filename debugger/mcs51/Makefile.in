@@ -62,6 +62,8 @@ install: all installdirs
 # --------------------------------
 uninstall:
 	rm -f $(bindir)/sdcdb
+	rm -f $(bindir)/sdcdb.el
+	rm -f $(bindir)/sdcdbsrc.el
 
 
 # Performing self-test

@@ -2802,7 +2802,7 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   int i;
 
   setToNull ((void *) &_G.funcrUsed);
-  //setToNull ((void *) &_G.regAssigned);
+  setToNull ((void *) &_G.regAssigned);
   setToNull ((void *) &_G.totRegAssigned);
   mcs51_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
   mcs51_nRegs = 8;
@@ -2823,8 +2823,8 @@ mcs51_assignRegisters (eBBlock ** ebbs, int count)
   serialRegAssign (ebbs, count);
 
   freeAllRegs ();
-  //setToNull ((void *) &_G.regAssigned);
-  //setToNull ((void *) &_G.totRegAssigned);
+  setToNull ((void *) &_G.regAssigned);
+  setToNull ((void *) &_G.totRegAssigned);
   fillGaps();
 
   /* if stack was extended then tell the user */

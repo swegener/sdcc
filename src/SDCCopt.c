@@ -879,6 +879,18 @@ killDeadCode (eBBlock ** ebbs, int count)
 	      if (IC_RESULT (ic) && isOperandVolatile (IC_RESULT (ic), FALSE))
 		continue;
 
+	      /* We also cannot remove the iCode, when an operand is volatile.       */
+	      /* Even read access can cause side effects on some hardware registers! */
+
+	      /* if the left operand is volatile then continue */
+	      if (IC_LEFT(ic) && isOperandVolatile (IC_LEFT (ic), TRUE))
+		continue;
+
+	      /* if the right operand is volatile then continue */
+	      if (IC_RIGHT(ic) && isOperandVolatile (IC_RIGHT (ic), TRUE))
+		continue;
+
+
 	      /* if the result is a temp & isaddr then skip */
 	      if (IC_RESULT (ic) && POINTER_SET (ic))
 		continue;

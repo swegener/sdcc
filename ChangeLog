@@ -1,5 +1,10 @@
 2005-01-22 Daniel Winkler <post AT danielwinkler.de>
 
+	* src/SDCCopt.c (killDeadCode): do not throw iCodes away if one
+	  of the operands is volatile. Fixes #1020220
+
+2005-01-22 Daniel Winkler <post AT danielwinkler.de>
+
 	* src/pic16/pcoderegs.c (pCodeOptime2pCodes): reenabled optimization
 	* (OptimizeRegUsage): make sure that there is really no other flow where
 	  the first pCode is used

@@ -2059,7 +2059,7 @@ addCast (ast *tree, RESULT_TYPE resultType, bool upcast)
 	upCasted = TRUE;
 	break;
       case RESULT_TYPE_CHAR:
-	if (getSize (tree->etype) <= 1)
+	if (IS_CHAR (tree->etype))
 	  return tree;
 	newLink = newCharLink();
 	break;

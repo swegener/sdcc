@@ -1,3 +1,13 @@
+2004-03-07 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (addCast): fixed bug #908454 by promoting bits to char
+	* src/SDCCicode.c (usualBinaryConversions): op needs int type
+	(geniCodeCast): cosmetic, don't preserve bit storage class
+	(geniCodeLeftShift): added promotion
+	(geniCodeLogic): fixed regression
+	* src/SDCCsymt.c (computeTypeOr): accept bits too
+	(compareType): 2nd part of fix for bug #908454, needed for bitfields
+
 2004-03-07  Borut Razem <borut.razem AT siol.net>
 
 	* support/Util/findme.c: alloca() replaced with malloc()/free() pair

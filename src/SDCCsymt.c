@@ -1595,7 +1595,8 @@ static sym_link *
 computeTypeOr (sym_link * etype1, sym_link * etype2, sym_link * reType)
 {
   /* sanity check */
-  assert (IS_CHAR (etype1) && IS_CHAR (etype2));
+  assert (   (IS_CHAR (etype1) || IS_BIT (etype1))
+          && (IS_CHAR (etype2) || IS_BIT (etype2)));
 
   if (SPEC_USIGN (etype1) == SPEC_USIGN (etype2))
     {
@@ -1904,7 +1905,12 @@ compareType (sym_link * dest, sym_link * src)
     {
       if (SPEC_USIGN (dest) == SPEC_USIGN (src) &&
 	  IS_INTEGRAL (dest) && IS_INTEGRAL (src) &&
-	  getSize (dest) == getSize (src))
+	  /* I would prefer
+	  bitsForType (dest) == bitsForType (src))
+	     instead of the next two lines, but the regression tests fail with
+	     them; I guess it's a problem with replaceCheaperOp  */
+	  getSize (dest) == getSize (src) &&
+	  !(!IS_BIT (dest) && IS_BIT (src)))
 	return 1;
       else if (IS_ARITHMETIC (dest) && IS_ARITHMETIC (src))
 	return -1;

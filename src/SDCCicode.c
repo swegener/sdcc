@@ -1766,67 +1766,13 @@ usualUnaryConversions (operand * op)
 
 static sym_link *
 usualBinaryConversions (operand ** op1, operand ** op2,
-                        RESULT_TYPE resultType, char op)
+                        RESULT_TYPE resultType, int op)
 {
   sym_link *ctype;
   sym_link *rtype = operandType (*op2);
   sym_link *ltype = operandType (*op1);
 
-#define OLDONEBYTEOPS 1
-
-#ifdef OLDONEBYTEOPS  
-  bool oldOneByteOps = FALSE;
-  static bool saidHello = FALSE;
-  
-  if (strcmp (port->target, "pic14") == 0)
-    oldOneByteOps = TRUE;
-  if (getenv ("SDCC_NEWONEBYTEOPS"))
-    {
-      if (!saidHello)
-        {
-	  fprintf (stderr, "Override: oldOneByteOps = FALSE\n");
-	  saidHello = TRUE;
-	}
-      oldOneByteOps = FALSE;
-    }
-  else if (getenv ("SDCC_OLDONEBYTEOPS"))
-    {
-      if (!saidHello)
-        {
-          fprintf (stderr, "Override: oldOneByteOps = TRUE\n");
-	  saidHello = TRUE;
-	}
-      oldOneByteOps = TRUE;
-    }
-
-
-  if (   oldOneByteOps
-      && (   (IS_CHAR (getSpec (ltype)) && !IS_UNSIGNED (getSpec (ltype)))
-	  || (IS_CHAR (getSpec (rtype)) && !IS_UNSIGNED (getSpec (rtype)))))
-    /* one or two signed char operands: promote to int */
-    resultType = RESULT_TYPE_INT;
-#endif
-  
   ctype = computeType (ltype, rtype, resultType, op);
-
-#ifdef OLDONEBYTEOPS
-
-  if (oldOneByteOps)
-    {
-      if (   op == '*'
-          && IS_CHAR (getSpec (ltype)) && IS_UNSIGNED (getSpec (ltype))
-	  && IS_CHAR (getSpec (rtype)) && IS_UNSIGNED (getSpec (rtype)))
-	  {
-	    /* two unsigned char operands and Mult: no promotion */
-	    return ctype;
-	  }
-      *op1 = geniCodeCast (ctype, *op1, TRUE);
-      *op2 = geniCodeCast (ctype, *op2, TRUE);
-
-      return ctype;
-    }
-
-#endif
 
   switch (op)
     {
@@ -2034,7 +1980,8 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   /* preserve the storage class & output class */
   /* of the original variable                  */
   restype = getSpec (operandType (IC_RESULT (ic)));
-  if (!IS_LITERAL(opetype))
+  if (!IS_LITERAL(opetype) &&
+      !IS_BIT(opetype))
       SPEC_SCLS (restype) = SPEC_SCLS (opetype);
   SPEC_OCLS (restype) = SPEC_OCLS (opetype);
 
@@ -2840,12 +2787,15 @@ geniCodeUnaryMinus (operand * op)
 /* geniCodeLeftShift - gen i code for left shift                   */
 /*-----------------------------------------------------------------*/
 operand *
-geniCodeLeftShift (operand * left, operand * right)
+geniCodeLeftShift (operand * left, operand * right, RESULT_TYPE resultType)
 {
   iCode *ic;
+  sym_link *resType;
 
   ic = newiCode (LEFT_OP, left, right);
-  IC_RESULT (ic) = newiTempOperand (operandType (left), 0);
+
+  resType = usualBinaryConversions (&left, &right, resultType, LEFT_OP);
+  IC_RESULT (ic) = newiTempOperand (resType, 0);
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);
 }
@@ -2926,7 +2876,7 @@ geniCodeLogic (operand * left, operand * right, int op)
         }
     }
 
-  ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_NONE, ' ');
+  ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_NOPROM, 0);
 
   ic = newiCode (op, left, right);
   IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);
@@ -3916,7 +3866,8 @@ ast2iCode (ast * tree,int lvl)
 
     case LEFT_OP:
       return geniCodeLeftShift (geniCodeRValue (left, FALSE),
-				geniCodeRValue (right, FALSE));
+				geniCodeRValue (right, FALSE),
+				getResultTypeFromType (tree->ftype));
 
     case RIGHT_OP:
       return geniCodeRightShift (geniCodeRValue (left, FALSE),
@@ -4065,7 +4016,9 @@ ast2iCode (ast * tree,int lvl)
 	geniCodeAssign (left,
 		geniCodeLeftShift (geniCodeRValue (operandFromOperand (left)
 						   ,FALSE),
-				   geniCodeRValue (right, FALSE)), 0);
+				   geniCodeRValue (right, FALSE),
+				   getResultTypeFromType (tree->ftype)),
+			0);
     case RIGHT_ASSIGN:
       return
 	geniCodeAssign (left,

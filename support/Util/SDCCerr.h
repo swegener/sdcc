@@ -188,6 +188,7 @@ SDCCERR - SDCC Standard error handler
 #define W_SAVE_RESTORE 170          /* unmatched #pragma SAVE and #pragma RESTORE */
 #define E_INVALID_CRITICAL 171	    /* operation invalid in critical sequence */
 #define E_NOT_ALLOWED 172	    /* %s not allowed here */
+#define E_BAD_TAG 173               /* '%s' is not a %s tag */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.

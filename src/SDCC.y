@@ -727,13 +727,26 @@ sfr_attributes
    ;
 
 struct_or_union_specifier
-   : struct_or_union opt_stag '{' struct_declaration_list '}'
+   : struct_or_union opt_stag
+        {
+           if (!$2->type)
+             {
+               $2->type = $1;
+             }
+           else
+             {
+               if ($2->type != $1)
+                 werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
+             }
+
+	}
+           '{' struct_declaration_list '}'
         {
            structdef *sdef ;
 	   symbol *sym, *dsym;
 
 	   // check for errors in structure members
-	   for (sym=$4; sym; sym=sym->next) {
+	   for (sym=$5; sym; sym=sym->next) {
 	     if (IS_ABSOLUTE(sym->etype)) {
 	       werrorfl(filename, sym->lineDef, E_NOT_ALLOWED, "'at'");
 	       SPEC_ABSA(sym->etype) = 0;
@@ -752,7 +765,7 @@ struct_or_union_specifier
 
            /* Create a structdef   */	   
            sdef = $2 ;
-           sdef->fields   = reverseSyms($4) ;   /* link the fields */
+           sdef->fields   = reverseSyms($5) ;   /* link the fields */
            sdef->size  = compStructSize($1,sdef);   /* update size of  */
 
            /* Create the specifier */
@@ -764,7 +777,17 @@ struct_or_union_specifier
          {
             $$ = newLink(SPECIFIER) ;
             SPEC_NOUN($$) = V_STRUCT;
-            SPEC_STRUCT($$) = $2 ;
+            SPEC_STRUCT($$) = $2;
+
+           if (!$2->type)
+             {
+               $2->type = $1;
+             }
+           else
+             {
+               if ($2->type != $1)
+                 werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
+             }
          }
    ;
 

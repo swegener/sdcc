@@ -401,6 +401,8 @@ struct
     "not allowed in a critical section" },
 { E_NOT_ALLOWED, ERROR_LEVEL_ERROR,
     "%s not allowed here" },
+{ E_BAD_TAG, ERROR_LEVEL_ERROR,
+    "'%s' is not a %s tag" },
 };
 
 /*

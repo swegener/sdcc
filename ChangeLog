@@ -1,3 +1,10 @@
+2003-12-31 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCC.y (struct_or_union_specifier),
+	* support/Util/SDCCerr.c,
+	* support/Util/SDCCerr.h: verify that struct & union tags are used
+	as declared.
+
 2003-12-29 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCglobl.h: missing from yesterday's commits

@@ -4014,10 +4014,10 @@ pCodeOp *pic16_newpCodeOpLit(int lit)
   pcop->type = PO_LITERAL;
 
   pcop->name = NULL;
-  if(lit>=0)
-    sprintf(s,"0x%02hhx", lit);
-  else
-    sprintf(s, "%i", lit);
+  //if(lit>=0)
+    sprintf(s,"0x%02hhx", (unsigned char)lit);
+  //else
+  //  sprintf(s, "%i", lit);
   
   if(s)
     pcop->name = Safe_strdup(s);
@@ -4040,11 +4040,11 @@ pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2)
   pcop->type = PO_LITERAL;
 
   pcop->name = NULL;
-  if(lit>=0) {
-    sprintf(s,"0x%02x, %s", lit, tb);
+  //if(lit>=0) {
+    sprintf(s,"0x%02x, %s", (unsigned char)lit, tb);
     if(s)
       pcop->name = Safe_strdup(s);
-  }
+  //}
 
   ((pCodeOpLit2 *)pcop)->lit = lit;
   ((pCodeOpLit2 *)pcop)->arg2 = arg2;
@@ -7386,7 +7386,7 @@ void pic16_OptimizeJumps ()
   } // for (pb)
   
   // emit some statistics concerning goto-optimization
-  // (maybe this should be moved to the general statistics?)
+#if 0
   if (pic16_debug_verbose || pic16_pcode_verbose) {
     fprintf (stderr, "optimize-goto:\n"
 	     "\t%5d GOTO->BRA; (%d GOTOs too far)\n"
@@ -7396,6 +7396,7 @@ void pic16_OptimizeJumps ()
 	     "\t%5d chained GOTOs resolved\n",
 	     opt, toofar, opt_cond, cond_toofar, opt_reorder, opt_gotonext, opt_gotochain);
   } // if
+#endif
   //fprintf (stderr, "%s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__);
 }
 

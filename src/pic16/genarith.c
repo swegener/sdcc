@@ -790,11 +790,15 @@ void pic16_genPlus (iCode *ic)
 				pic16_emitpcode(POC_XORWF, pic16_popGet(AOP(result),0));
 			}
 		} else {
+			unsigned long lit = (unsigned long)floatFromVal (AOP(right)->aopu.aop_lit);
 			size = pic16_getDataSize(result);
 			while (size--) {
-				MOVA(pic16_aopGet(AOP(right),offset,FALSE,FALSE));  
-				pic16_emitcode("addc","a,#00  ;%d",__LINE__);
-				pic16_aopPut(AOP(result),"a",offset++);
+				pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), offset));
+				pic16_emitpcode (POC_MOVLW, pic16_popGetLit ((lit >> (8*offset)) & 0xFF));
+				pic16_emitpcode (POC_ADDWFC, pic16_popGet(AOP(result), offset++));
+				//MOVA(pic16_aopGet(AOP(right),offset,FALSE,FALSE));  
+				//pic16_emitcode("addc","a,#00  ;%d",__LINE__);
+				//pic16_aopPut(AOP(result),"a",offset++);
       			}
 		}
 	goto release ;

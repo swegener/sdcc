@@ -47,6 +47,17 @@
 #include "device.h"
 #include "main.h"
 
+/* Set the following to 1 to enable the slower/bigger
+ * but more robust generic shifting routine (which also
+ * operates correctly with negative shift values). */
+#define USE_GENERIC_SIGNED_SHIFT 1
+
+/* Set the following to 1 to enable the new
+ * stripped down genCmp version.
+ * This version should be easier to understand,
+ * more reliable and (sigh) slighly slower. */
+#define USE_SIMPLE_GENCMP 1
+
 extern void pic16_genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 extern void pic16_genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 void pic16_genMult8X8_8 (operand *, operand *,operand *);
@@ -65,7 +76,9 @@ static pCodeOp *pic16_popRegFromIdx(int rIdx);
 
 int pic16_labelOffset=0;
 extern int pic16_debug_verbose;
+#if !(USE_GENERIC_SIGNED_SHIFT)
 static int optimized_for_speed = 0;
+#endif
 /*
   hack hack
 
@@ -1518,7 +1531,6 @@ char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	  DEBUGpic16_emitcode(";","%s offset %d",pcop->name,PCOI(pcop)->offset);
 	  //sprintf(s,"(%s+0x%02x)", pcop->name,PCOI(aop->aopu.pcop)->offset);
 	  if (offset) {
-	    pic16_emitpcomment ("; =!= %s:%d: changed from %s to (%s + %d)", __FUNCTION__, __LINE__, pcop->name, pcop->name, offset);
 	    sprintf(s,"(%s + %d)", pcop->name, offset);
 	  } else {
 	    sprintf(s,"%s", pcop->name);
@@ -2364,6 +2376,7 @@ void popaopidx(asmop *aop, int offset, int index)
       pic16_testStackOverflow();
 }
 
+#if !(USE_GENERIC_SIGNED_SHIFT)
 /*-----------------------------------------------------------------*/
 /* reAdjustPreg - points a register back to where it should        */
 /*-----------------------------------------------------------------*/
@@ -2402,7 +2415,7 @@ static void reAdjustPreg (asmop *aop)
     }   
 
 }
-
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -4533,7 +4546,7 @@ static void genIfxJump (iCode *ic, char *jval)
 	if(strcmp(jval,"a") == 0)
 	  emitSKPZ;
 	else if (strcmp(jval,"c") == 0)
-	  emitSKPC;
+	  emitSKPNC;
 	else {
 	  DEBUGpic16_emitcode ("; ***","%d - assuming %s is in bit space",__LINE__,jval);	  
 	  pic16_emitpcode(POC_BTFSC,  pic16_newpCodeOpBit(jval,-1,1, PO_GPR_REGISTER));
@@ -4548,7 +4561,7 @@ static void genIfxJump (iCode *ic, char *jval)
 	if(strcmp(jval,"a") == 0)
 	  emitSKPNZ;
 	else if (strcmp(jval,"c") == 0)
-	  emitSKPNC;
+	  emitSKPC;
 	else {
 	  DEBUGpic16_emitcode ("; ***","%d - assuming %s is in bit space",__LINE__,jval);	  
 	  pic16_emitpcode(POC_BTFSS,  pic16_newpCodeOpBit(jval,-1,1, PO_GPR_REGISTER));
@@ -4638,6 +4651,7 @@ static void genSkipc(resolvedIfx *rifx)
   rifx->generated = 1;
 }
 
+#if !(USE_SIMPLE_GENCMP)
 /*-----------------------------------------------------------------*/
 /* genSkipz2                                                       */
 /*-----------------------------------------------------------------*/
@@ -4656,6 +4670,7 @@ static void genSkipz2(resolvedIfx *rifx, int invert_condition)
   pic16_emitpcode(POC_GOTO,pic16_popGetLabel(rifx->lbl->key));
   rifx->generated = 1;
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -4684,6 +4699,7 @@ static void genSkipz(iCode *ifx, int condition)
 }
 #endif
 
+#if !(USE_SIMPLE_GENCMP)
 /*-----------------------------------------------------------------*/
 /* genSkipCond                                                     */
 /*-----------------------------------------------------------------*/
@@ -4701,6 +4717,7 @@ static void genSkipCond(resolvedIfx *rifx,operand *op, int offset, int bit)
   pic16_emitpcode(POC_GOTO,pic16_popGetLabel(rifx->lbl->key));
   rifx->generated = 1;
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -4731,10 +4748,243 @@ static int genChkZeroes(operand *op, int lit,  int size)
 }
 #endif
 
+#define DEBUGpc(fmt,...)  DEBUGpic16_emitcode("; =:=", "%s:%s:%d: " fmt, __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define isAOP_LIT(x)      (AOP_TYPE(x) == AOP_LIT)
+#define isAOP_REGlike(x)  (AOP_TYPE(x) == AOP_REG || AOP_TYPE(x) == AOP_DIR || AOP_TYPE(x) == AOP_PCODE || AOP_TYPE(x) == AOP_STA)
+
+/*-----------------------------------------------------------------*/
+/* mov2w_regOrLit :- move to WREG either the offset's byte from    */
+/*                  aop (if it's NOT a literal) or from lit (if    */
+/*                  aop is a literal)                              */
+/*-----------------------------------------------------------------*/
+void mov2w_regOrLit (asmop *aop, unsigned long lit, int offset) {
+  if (aop->type == AOP_LIT) {
+    pic16_emitpcode (POC_MOVLW, pic16_popGetLit(lit >> (offset*8)));
+  } else {
+    pic16_emitpcode (POC_MOVFW, pic16_popGet (aop, offset));
+  }
+}
+
 /*-----------------------------------------------------------------*/
 /* genCmp :- greater or less than comparison                       */
 /*-----------------------------------------------------------------*/
-#if 1
+
+#if USE_SIMPLE_GENCMP
+
+/* genCmp performs a left < right comparison, stores
+ * the outcome in result (if != NULL) and generates
+ * control flow code for the ifx (if != NULL).
+ *
+ * This version leaves in sequences like
+ * "B[CS]F STATUS,0; BTFS[CS] STATUS,0"
+ * which should be optmized by the peephole
+ * optimizer - RN 2005-01-01 */
+static void genCmp (operand *left,operand *right,
+                    operand *result, iCode *ifx, int sign)
+{
+  resolvedIfx rIfx;
+  int size;
+  int offs;
+  symbol *templbl;
+  operand *dummy;
+  unsigned long lit;
+  unsigned long mask;
+  int performedLt;
+
+  FENTRY;
+  
+  assert (AOP_SIZE(left) == AOP_SIZE(right));
+  assert (left && right);
+
+  size = AOP_SIZE(right) - 1;
+  mask = (0x100UL << (size*8)) - 1;
+  // in the end CARRY holds "left < right" (performedLt == 1) or "left >= right" (performedLt == 0)
+  performedLt = 1;
+  templbl = NULL;
+  lit = 0;
+  
+  resolveIfx (&rIfx, ifx);
+
+  /**********************************************************************
+   * handle bits - bit compares are promoted to int compares seemingly! *
+   **********************************************************************/
+#if 0
+  // THIS IS COMPLETELY UNTESTED!
+  if (AOP_TYPE(left) == AOP_CRY && AOP_TYPE(right) == AOP_CRY) {
+    pCodeOp *pcleft = pic16_popGet(AOP(left), 0);
+    pCodeOp *pcright = pic16_popGet(AOP(right), 0);
+    assert (pcleft->type == PO_GPR_BIT && pcright->type == PO_GPR_BIT);
+
+    emitSETC;
+    // 1 < {0,1} is false --> clear C by skipping the next instruction
+    //pic16_emitpcode (POC_BTFSS, pic16_popCopyGPR2Bit (AOP(left),0), PCORB(pcleft)->bit);
+    pic16_emitpcode (POC_BTFSS, pic16_popGet (AOP(left), 0));
+    // {0,1} < 0 is false --> clear C by NOT skipping the next instruction
+    pic16_emitpcode (POC_BTFSS, pic16_popCopyGPR2Bit (pic16_popGet(AOP(right),0), PCORB(pcright)->bit));
+    emitCLRC; // only skipped for left=0 && right=1
+
+    goto correct_result_in_carry;
+  } // if
+#endif
+
+  /*************************************************
+   * make sure that left is register (or the like) *
+   *************************************************/
+  if (!isAOP_REGlike(left)) {
+    DEBUGpc ("swapping arguments (AOP_TYPEs %d/%d)", AOP_TYPE(left), AOP_TYPE(right));
+    assert (isAOP_LIT(left));
+    assert (isAOP_REGlike(right));
+    // swap left and right
+    // left < right <==> right > left <==> (right >= left + 1)
+    lit = (unsigned long)floatFromVal(AOP(left)->aopu.aop_lit);
+
+    if ( (!sign && (lit & mask) == mask) || (sign && (lit & mask) == (mask >> 1)) ) {
+      // MAXVALUE < right? always false
+      if (performedLt) emitCLRC; else emitSETC;
+      goto correct_result_in_carry;
+    } // if
+
+    // This fails for lit = 0xFF (unsigned) AND lit = 0x7F (signed),
+    // that's we handled it above.
+    lit++;
+
+    dummy = left;
+    left = right;
+    right = dummy;
+
+    performedLt ^= 1; // instead of "left < right" we check for "right >= left+1"
+  } else if (isAOP_LIT(right)) {
+    lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+  } // if
+
+  assert (isAOP_REGlike(left)); // left must be register or the like
+  assert (isAOP_REGlike(right) || isAOP_LIT(right)); // right may be register-like or a literal
+
+  /*************************************************
+   * special cases go here                         *
+   *************************************************/
+
+  if (isAOP_LIT(right)) {
+    if (!sign) {
+      // unsigned comparison to a literal
+      DEBUGpc ("unsigned compare: left %s lit(0x%X=%lu), size=%d", performedLt ? "<" : ">=", lit, lit, size+1);
+      if (lit == 0) {
+	// unsigned left < 0? always false
+	if (performedLt) emitCLRC; else emitSETC;
+	goto correct_result_in_carry;
+      }
+    } else {
+      // signed comparison to a literal
+      DEBUGpc ("signed compare: left %s lit(0x%X=%ld), size=%d, mask=%x", performedLt ? "<" : ">=", lit, lit, size+1, mask);
+      if ((lit & mask) == ((0x80 << (size*8)) & mask)) {
+	// signed left < 0x80000000? always false
+	if (performedLt) emitCLRC; else emitSETC;
+	goto correct_result_in_carry;
+      } else if (lit == 0) {
+	// compare left < 0; set CARRY if SIGNBIT(left) is set
+	if (performedLt) emitSETC; else emitCLRC;
+	pic16_emitpcode (POC_BTFSS, pic16_popCopyGPR2Bit(pic16_popGet (AOP(left), size), 7));
+	if (performedLt) emitCLRC; else emitSETC;
+	goto correct_result_in_carry;
+      }
+    } // if (!sign)
+  } // right is literal
+
+  /*************************************************
+   * perform a general case comparison             *
+   * make sure we get CARRY==1 <==> left >= right  *
+   *************************************************/
+  // compare most significant bytes
+  //DEBUGpc ("comparing bytes at offset %d", size);
+  if (!sign) {
+    // unsigned comparison
+    mov2w_regOrLit (AOP(right), lit, size);
+    pic16_emitpcode (POC_SUBFW, pic16_popGet (AOP(left), size));
+  } else {
+    // signed comparison
+    // (add 2^n to both operands then perform an unsigned comparison)
+    if (isAOP_LIT(right)) {
+      // left >= LIT <-> LIT-left <= 0 <-> LIT-left == 0 OR !(LIT-left >= 0)
+      unsigned char litbyte = (lit >> (8*size)) & 0xFF;
+
+      if (litbyte == 0x80) {
+	// left >= 0x80 -- always true, but more bytes to come
+	pic16_mov2w (AOP(left), size);
+	pic16_emitpcode (POC_XORLW, pic16_popGetLit (0x80)); // set ZERO flag
+	emitSETC;
+      } else {
+	// left >= LIT <-> left + (-LIT) >= 0 <-> left + (0x100-LIT) >= 0x100
+	pic16_mov2w (AOP(left), size);
+	pic16_emitpcode (POC_ADDLW, pic16_popGetLit (0x80));
+	pic16_emitpcode (POC_ADDLW, pic16_popGetLit ((0x100 - (litbyte + 0x80)) & 0x00FF));
+      } // if
+    } else {
+      pCodeOp *pctemp = pic16_popCopyReg(&pic16_pc_prodl);
+      //pCodeOp *pctemp = pic16_popGetTempReg(1);
+      pic16_mov2w (AOP(left), size);
+      pic16_emitpcode (POC_ADDLW, pic16_popGetLit (0x80));
+      pic16_emitpcode (POC_MOVWF, pctemp);
+      pic16_mov2w (AOP(right), size);
+      pic16_emitpcode (POC_ADDLW, pic16_popGetLit (0x80));
+      pic16_emitpcode (POC_SUBFW, pctemp);
+      //pic16_popReleaseTempReg(pctemp, 1);
+    }
+  } // if (!sign)
+
+  // compare remaining bytes (treat as unsigned case from above)
+  templbl = newiTempLabel ( NULL );
+  offs = size;
+  while (offs--) {
+    //DEBUGpc ("comparing bytes at offset %d", offs);
+    pic16_emitpcode (POC_BNZ, pic16_popGetLabel (templbl->key));
+    mov2w_regOrLit (AOP(right), lit, offs);
+    pic16_emitpcode (POC_SUBFW, pic16_popGet (AOP(left), offs));
+  } // while (offs)
+  pic16_emitpLabel (templbl->key);
+  goto result_in_carry;
+
+result_in_carry:
+  
+  /****************************************************
+   * now CARRY contains the result of the comparison: *
+   * SUBWF sets CARRY iff                             *
+   * F-W >= 0 <==> F >= W <==> !(F < W)               *
+   * (F=left, W=right)
+   ****************************************************/
+
+  if (performedLt) {
+    if (result && AOP_TYPE(result) != AOP_CRY) {
+      // value will be stored
+      emitTOGC;
+    } else {
+      // value wil only be used in the following genSkipc()
+      rIfx.condition ^= 1;
+    }
+  } // if
+
+correct_result_in_carry:
+
+  // assign result to variable (if neccessary)
+  if (result && AOP_TYPE(result) != AOP_CRY) {
+    //DEBUGpc ("assign result");
+    size = AOP_SIZE(result);
+    while (size--) {
+      pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), size));
+    } // while
+    pic16_emitpcode (POC_RLCF, pic16_popGet (AOP(result), 0));
+  } // if (result)
+
+  // perform conditional jump
+  // genSkipc branches to rifx->label if (rifx->condition != CARRY)
+  if (ifx) {
+    //DEBUGpc ("generate control flow");
+    rIfx.condition ^= 1;
+    genSkipc (&rIfx);
+    ifx->generated = 1;
+  } // if
+}
+
+#elif 1
 		/* { */
       /* original code */
 static void genCmp (operand *left,operand *right,
@@ -9362,7 +9612,7 @@ void pic16_genLeftShiftLiteral (operand *left,
                                  operand *result,
                                  iCode *ic)
 {    
-    int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
+    int shCount = (int) abs(floatFromVal (AOP(right)->aopu.aop_lit));
     int size;
 
     FENTRY;
@@ -9437,6 +9687,8 @@ static void genMultiAsm( PIC_OPCODE poc, operand *reg, int size, int endian)
   }
 
 }
+
+#if !(USE_GENERIC_SIGNED_SHIFT)
 /*-----------------------------------------------------------------*/
 /* genLeftShift - generates code for left shifting                 */
 /*-----------------------------------------------------------------*/
@@ -9618,7 +9870,7 @@ static void genLeftShift (iCode *ic)
   pic16_freeAsmop(left,NULL,ic,TRUE);
   pic16_freeAsmop(result,NULL,ic,TRUE);
 }
-
+#endif
 
 
 #if 0
@@ -9970,7 +10222,7 @@ static void genRightShiftLiteral (operand *left,
                                   iCode *ic,
                                   int sign)
 {    
-  int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
+  int shCount = (int) abs(floatFromVal (AOP(right)->aopu.aop_lit));
   int lsize,res_size;
 
   pic16_freeAsmop(right,NULL,ic,TRUE);
@@ -10042,6 +10294,7 @@ static void genRightShiftLiteral (operand *left,
   pic16_freeAsmop(result,NULL,ic,TRUE);
 }
 
+#if !(USE_GENERIC_SIGNED_SHIFT)
 /*-----------------------------------------------------------------*/
 /* genSignedRightShift - right shift of signed number              */
 /*-----------------------------------------------------------------*/
@@ -10182,7 +10435,10 @@ static void genSignedRightShift (iCode *ic)
   pic16_freeAsmop(result,NULL,ic,TRUE);
   pic16_freeAsmop(right,NULL,ic,TRUE);
 }
+#endif
 
+#if !(USE_GENERIC_SIGNED_SHIFT)
+#warning This implementation of genRightShift() is incomplete!
 /*-----------------------------------------------------------------*/
 /* genRightShift - generate code for right shifting                */
 /*-----------------------------------------------------------------*/
@@ -10299,6 +10555,145 @@ release:
     pic16_freeAsmop (right,NULL,ic,TRUE);
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
+#endif
+
+#if (USE_GENERIC_SIGNED_SHIFT)
+/*-----------------------------------------------------------------*/
+/* genGenericShift - generates code for left or right shifting     */
+/*-----------------------------------------------------------------*/
+static void genGenericShift (iCode *ic, int isShiftLeft) {
+  operand *left,*right, *result;
+  int offset;
+  int sign, signedCount;
+  symbol *label_complete, *label_loop_pos, *label_loop_neg, *label_negative;
+  PIC_OPCODE pos_shift, neg_shift;
+
+  FENTRY;
+
+  right = IC_RIGHT(ic);
+  left  = IC_LEFT(ic);
+  result = IC_RESULT(ic);
+
+  pic16_aopOp(right,ic,FALSE);
+  pic16_aopOp(left,ic,FALSE);
+  pic16_aopOp(result,ic,FALSE);
+
+  sign = !SPEC_USIGN(operandType (left));
+  signedCount = !SPEC_USIGN(operandType (right));
+
+  /* if the shift count is known then do it 
+     as efficiently as possible */
+  if (AOP_TYPE(right) == AOP_LIT) {
+    long lit = (long)floatFromVal(AOP(right)->aopu.aop_lit);
+    if (signedCount && lit < 0) { lit = -lit; isShiftLeft = !isShiftLeft; }
+    // we should modify right->aopu.aop_lit here!
+    // Instead we use abs(shCount) in genXXXShiftLiteral()...
+    // lit > 8*size is handled in pic16_genXXXShiftLiteral()
+    if (isShiftLeft)
+      pic16_genLeftShiftLiteral (left,right,result,ic);
+    else
+      genRightShiftLiteral (left,right,result,ic, sign);
+
+    goto release;
+  } // if (right is literal)
+
+  /* shift count is unknown then we have to form a loop.
+   * Note: we take only the lower order byte since shifting
+   * more than 32 bits make no sense anyway, ( the
+   * largest size of an object can be only 32 bits )
+   * Note: we perform arithmetic shifts if the left operand is
+   * signed and we do an (effective) right shift, i. e. we
+   * shift in the sign bit from the left. */
+  
+  assert (AOP_SIZE(result) == AOP_SIZE(left));
+
+  label_complete = newiTempLabel ( NULL );
+  label_loop_pos = newiTempLabel ( NULL );
+  label_loop_neg = NULL;
+  label_negative = NULL;
+  pos_shift = isShiftLeft ? POC_RLCF : POC_RRCF;
+  neg_shift = isShiftLeft ? POC_RRCF : POC_RLCF;
+
+  if (signedCount) {
+    // additional labels needed
+    label_loop_neg = newiTempLabel ( NULL );
+    label_negative = newiTempLabel ( NULL );
+  } // if
+
+  // copy source to result
+  for (offset=0; offset < AOP_SIZE(result); offset++) {
+    mov2f (AOP(result),AOP(left), offset);
+  } // for
+
+  pic16_mov2w (AOP(right), 0);
+  pic16_emitpcode (POC_BZ, pic16_popGetLabel (label_complete->key));
+  if (signedCount) pic16_emitpcode (POC_BN, pic16_popGetLabel (label_negative->key));
+  
+#if 0
+  // perform a shift by one (shift count is positive)
+  // cycles used for shifting {unsigned,signed} values on n bytes by [unsigned,signed] shift count c>0:
+  // 2n+[2,3]+({1,3}+n+3)c-2+[0,2]=({4,6}+n)c+2n+[0,3]		({5,7}c+[2,5] / {6,8}c+[4, 7] / {8,10}c+[ 8,11])
+  pic16_emitpLabel (label_loop_pos->key);
+  emitCLRC;
+  if (sign && (pos_shift == POC_RRCF)) {
+    pic16_emitpcode (POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), AOP_SIZE(result)-1), 7));
+    emitSETC;
+  } // if
+  genMultiAsm (pos_shift, result, AOP_SIZE(result), pos_shift == POC_RRCF);
+  pic16_emitpcode (POC_DECFSZ, pic16_popCopyReg (&pic16_pc_wreg));
+  pic16_emitpcode (POC_BRA, pic16_popGetLabel (label_loop_pos->key));
+#else
+  // perform a shift by one (shift count is positive)
+  // cycles used for shifting {unsigned,signed} values on n bytes by [unsigned,signed] shift count c>0:
+  // 2n+[2,3]+2+({0,2}+n+3)c-1+[0,2]=({3,5}+n)c+2n+[3,6]	({4,6}c+[5,8] / {5,7}c+[7,10] / {7, 9}c+[11,14])
+  // This variant is slower for 0<c<3, equally fast for c==3, and faster for 3<c.
+  pic16_emitpcode (POC_NEGF, pic16_popCopyReg (&pic16_pc_wreg));
+  emitCLRC;
+  pic16_emitpLabel (label_loop_pos->key);
+  if (sign && (pos_shift == POC_RRCF)) {
+    pic16_emitpcode (POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), AOP_SIZE(result)-1), 7));
+    emitSETC;
+  } // if
+  genMultiAsm (pos_shift, result, AOP_SIZE(result), pos_shift == POC_RRCF);
+  //pic16_emitpcode (POC_INCF, pic16_popCopyReg (&pic16_pc_wreg)); // gpsim does not like this...
+  pic16_emitpcode (POC_ADDLW, pic16_popGetLit (0x01));
+  pic16_emitpcode (POC_BNC, pic16_popGetLabel (label_loop_pos->key));
+#endif
+
+  if (signedCount) {
+    pic16_emitpcode (POC_BRA, pic16_popGetLabel (label_complete->key));
+
+    pic16_emitpLabel (label_negative->key);
+    // perform a shift by -1 (shift count is negative)
+    // 2n+4+1+({0,2}+n+3)*c-1=({3,5}+n)c+2n+4			({4,6}c+6 / {5,7}c+8 / {7,9}c+12)
+    emitCLRC;
+    pic16_emitpLabel (label_loop_neg->key);
+    if (sign && (neg_shift == POC_RRCF)) {
+      pic16_emitpcode (POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), AOP_SIZE(result)-1), 7));
+      emitSETC;
+    } // if
+    genMultiAsm (neg_shift, result, AOP_SIZE(result), neg_shift == POC_RRCF);
+    //pic16_emitpcode (POC_INCF, pic16_popCopyReg (&pic16_pc_wreg)); // gpsim does not like this...
+    pic16_emitpcode (POC_ADDLW, pic16_popGetLit (0x01));
+    pic16_emitpcode (POC_BNC, pic16_popGetLabel (label_loop_neg->key));
+  } // if (signedCount)
+
+  pic16_emitpLabel (label_complete->key);
+
+release:
+  pic16_freeAsmop (right,NULL,ic,TRUE);
+  pic16_freeAsmop(left,NULL,ic,TRUE);
+  pic16_freeAsmop(result,NULL,ic,TRUE);
+}
+
+static void genLeftShift (iCode *ic) {
+  genGenericShift (ic, 1);
+}
+
+static void genRightShift (iCode *ic) {
+  genGenericShift (ic, 0);
+}
+#endif
 
 
 void pic16_loadFSR0(operand *op)
@@ -12019,7 +12414,7 @@ static void genIfx (iCode *ic, iCode *popIc)
     /* if the condition is  a bit variable */
     if (isbit && IS_ITEMP(cond) && 
         SPIL_LOC(cond)) {
-      genIfxJump(ic,SPIL_LOC(cond)->rname);
+      genIfxJump(ic,"c");
       DEBUGpic16_emitcode ("; isbit  SPIL_LOC","%s",SPIL_LOC(cond)->rname);
     } else {
       if (isbit && !IS_ITEMP(cond))

@@ -42,24 +42,7 @@
     software-hoarding!  
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h" 
-#include "SDCChasht.h"
-#include "SDCCbitv.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCClabel.h"
-#include "SDCCBBlock.h"
-#include "SDCCloop.h"
-#include "SDCCcse.h"
-#include "SDCCcflow.h"
-#include "SDCCdflow.h"
-#include "SDCClrange.h"
-#include "ralloc.h"
+#include "z80.h"
 
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
@@ -80,12 +63,18 @@ int ptrRegReq = 0; /* one byte pointer register required */
 bitVect *funcrUsed = NULL; /* registers used in a function */
 int stackExtend = 0;
 int dataExtend  = 0;
+int _nRegs;
 
 /** Set to help debug register pressure related problems */
 #define DEBUG_FAKE_EXTRA_REGS	0
 
-static regs regsZ80[] = 
-{
+static regs _gbz80_regs[] = {
+    { REG_GPR, C_IDX , "b", 1 },
+    { REG_GPR, B_IDX , "c", 1 },
+    { REG_CND, CND_IDX, "c", 1}
+};
+
+static regs _z80_regs[] = {
     { REG_GPR, C_IDX , "c", 1 },
     { REG_GPR, B_IDX , "b", 1 },
     { REG_GPR, E_IDX , "e", 1 },
@@ -105,8 +94,11 @@ static regs regsZ80[] =
     { REG_CND, CND_IDX, "c", 1}
 };
 
+regs *regsZ80;
+
 /** Number of usable registers (all but C) */
-#define MAX_REGS ((sizeof(regsZ80)/sizeof(regs))-1)
+#define Z80_MAX_REGS ((sizeof(_z80_regs)/sizeof(_z80_regs[0]))-1)
+#define GBZ80_MAX_REGS ((sizeof(_gbz80_regs)/sizeof(_gbz80_regs[0]))-1)
 
 static void spillThis (symbol *);
 
@@ -120,7 +112,7 @@ static regs *allocReg (short type)
 {
     int i;
 
-    for ( i = 0 ; i < MAX_REGS ; i++ ) {
+    for ( i = 0 ; i < _nRegs ; i++ ) {
 	/* For now we allocate from any free */
 	if (regsZ80[i].isFree ) {
 	    regsZ80[i].isFree = 0;
@@ -139,7 +131,7 @@ regs *regWithIdx (int idx)
 {
     int i;
     
-    for (i=0;i < MAX_REGS;i++)
+    for (i=0;i < _nRegs;i++)
 	if (regsZ80[i].rIdx == idx)
 	    return &regsZ80[i];
 
@@ -164,7 +156,7 @@ static int nFreeRegs (int type)
     int i;
     int nfr=0;
     
-    for (i = 0 ; i < MAX_REGS; i++ ) {
+    for (i = 0 ; i < _nRegs; i++ ) {
 	/* For now only one reg type */
 	if (regsZ80[i].isFree)
 	    nfr++;
@@ -867,7 +859,7 @@ bool tryAllocatingRegPair(symbol *sym)
 {
     int i;
     assert(sym->nRegs == 2);
-    for ( i = 0 ; i < MAX_REGS ; i+=2 ) {
+    for ( i = 0 ; i < _nRegs ; i+=2 ) {
 	if ((regsZ80[i].isFree)&&(regsZ80[i+1].isFree)) {
 	    regsZ80[i].isFree = 0;
 	    sym->regs[0] = &regsZ80[i];
@@ -1037,7 +1029,7 @@ bitVect *rUmaskForOp (operand *op)
     if (sym->isspilt || !sym->nRegs)
 	return NULL;
 
-    rumask = newBitVect(MAX_REGS);
+    rumask = newBitVect(_nRegs);
 
     for (j = 0; j < sym->nRegs; j++) {
 	rumask = bitVectSetBit(rumask,
@@ -1051,7 +1043,7 @@ bitVect *rUmaskForOp (operand *op)
  */
 bitVect *regsUsedIniCode (iCode *ic)
 {
-    bitVect *rmask = newBitVect(MAX_REGS);
+    bitVect *rmask = newBitVect(_nRegs);
 
     /* do the special cases first */
     if (ic->op == IFX ) {
@@ -1117,7 +1109,7 @@ static void createRegMask (eBBlock **ebbs, int count)
 	    /* now create the register mask for those 
 	       registers that are in use : this is a
 	       super set of ic->rUsed */
-	    ic->rMask = newBitVect(MAX_REGS+1);
+	    ic->rMask = newBitVect(_nRegs+1);
 
 	    /* for all live Ranges alive at this point */
 	    for (j = 1; j < ic->rlive->size; j++ ) {
@@ -1234,7 +1226,7 @@ static void freeAllRegs()
 {
     int i;
 
-    for (i=0;i< MAX_REGS;i++ )
+    for (i=0;i< _nRegs;i++ )
 	regsZ80[i].isFree = 1;
 }
 
@@ -2047,25 +2039,27 @@ static void packRegisters (eBBlock *ebp)
 	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);	
 #endif
 
-	/* if pointer set & left has a size more than
+	if (!IS_GB) {
+	    /* if pointer set & left has a size more than
 	   one and right is not in far space */
-	if (POINTER_SET(ic)                    &&
-	    /* MLH: no such thing.
-	       !isOperandInFarSpace(IC_RIGHT(ic)) && */
-	    !OP_SYMBOL(IC_RESULT(ic))->remat   &&
-	    !IS_OP_RUONLY(IC_RIGHT(ic))        &&
-	    getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 )
+	    if (POINTER_SET(ic)                    &&
+		/* MLH: no such thing.
+		   !isOperandInFarSpace(IC_RIGHT(ic)) && */
+		!OP_SYMBOL(IC_RESULT(ic))->remat   &&
+		!IS_OP_RUONLY(IC_RIGHT(ic))        &&
+		getSize(aggrToPtr(operandType(IC_RESULT(ic)),FALSE)) > 1 )
 
-	    packRegsForOneuse (ic,IC_RESULT(ic),ebp);
+		packRegsForOneuse (ic,IC_RESULT(ic),ebp);
 
-	/* if pointer get */
-	if (POINTER_GET(ic)                    &&
-	    /* MLH: dont have far space
-	       !isOperandInFarSpace(IC_RESULT(ic))&& */
-	    !OP_SYMBOL(IC_LEFT(ic))->remat     &&
-	    !IS_OP_RUONLY(IC_RESULT(ic))         &&
-	    getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 )
-	    packRegsForOneuse (ic,IC_LEFT(ic),ebp);
+	    /* if pointer get */
+	    if (POINTER_GET(ic)                    &&
+		/* MLH: dont have far space
+		   !isOperandInFarSpace(IC_RESULT(ic))&& */
+		!OP_SYMBOL(IC_LEFT(ic))->remat     &&
+		!IS_OP_RUONLY(IC_RESULT(ic))         &&
+		getSize(aggrToPtr(operandType(IC_LEFT(ic)),FALSE)) > 1 )
+		packRegsForOneuse (ic,IC_LEFT(ic),ebp);
+	}
 
 	/* pack registers for accumulator use, when the result of an
 	   arithmetic or bit wise operation has only one use, that use is
@@ -2105,6 +2099,16 @@ void z80_assignRegisters (eBBlock **ebbs, int count)
 
     setToNull((void *)&funcrUsed);
     ptrRegReq = stackExtend = dataExtend = 0;
+
+    if (IS_GB) {
+	/* DE is required for the code gen. */
+	_nRegs = GBZ80_MAX_REGS;
+	regsZ80 = _gbz80_regs;
+    }
+    else {
+	_nRegs = Z80_MAX_REGS;
+	regsZ80 = _z80_regs;
+    }
 
     /* change assignments this will remove some
        live ranges reducing some register pressure */

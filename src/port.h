@@ -83,6 +83,11 @@ typedef struct {
 	int nativebelow;
     } muldiv;
 
+    /** Called once the processor target has been selected.
+	First chance to initalise and set any port specific varibles.
+	'port' is set before calling this.  May be NULL.
+    */
+    void (*init)(void);
     /** Parses one option + its arguments */
     bool (*parseOption)(int *pargc, char **argv, int *i);
     /** Called after all the options have been parsed. */
@@ -114,4 +119,3 @@ typedef struct {
 extern PORT *port;
 
 #endif
-

@@ -1,3 +1,10 @@
+/** @file z80/gbz80.c
+    Extra bits ontop of the z80 port to target the Gameboy's Z80 like
+    processor.
+
+    Michael Hope <michaelh@earthling.net> 2000
+*/
+
 #include "z80.h"
 
 static char _defaultRules[] =
@@ -5,25 +12,23 @@ static char _defaultRules[] =
 #include "peeph.rul"
 };
 
-Z80_OPTS z80_opts;
+static char *_gbz80_keywords[] = { NULL };
 
-static char *_z80_keywords[] = { NULL };
-
-static void _z80_init(void)
-{
-    z80_opts.sub = SUB_Z80;
-}
-
-static bool _z80_parseOptions(int *pargc, char **argv, int *i)
+static bool _gbz80_parseOptions(int *pargc, char **argv, int *i)
 {
     return FALSE;
 }
 
-static void _z80_finaliseOptions(void)
+static void _gbz80_init(void)
+{
+    z80_opts.sub = SUB_GBZ80;
+}
+
+static void _gbz80_finaliseOptions(void)
 {
 }
 
-static void _z80_setDefaultOptions(void)
+static void _gbz80_setDefaultOptions(void)
 {    
     options.genericPtr = 1;   /* default on */
     options.nopeep    = 0;
@@ -42,7 +47,7 @@ static void _z80_setDefaultOptions(void)
     optimize.loopInduction = 0;
 }
 
-static const char *_z80_getRegName(struct regs *reg)
+static const char *_gbz80_getRegName(struct regs *reg)
 {
     if (reg)
 	return reg->name;
@@ -57,17 +62,17 @@ static const char *_z80_getRegName(struct regs *reg)
     MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] = {
-    "link-z80", "-nf", "$1", NULL
+    "link-gb", "-nf", "$1", NULL
 };
 
 static const char *_asmCmd[] = {
-    "as-z80", "-plosgff", "$1.o", "$1.asm", NULL
+    "as-gb", "-plosgff", "$1.o", "$1.asm", NULL
 };
 
 /* Globals */
-PORT z80_port = {
-    "z80",
-    "Zilog Z80",		/* Target name */
+PORT gbz80_port = {
+    "gbz80",
+    "Gameboy Z80-like",		/* Target name */
     {	
 	_asmCmd,
 	"-plosgff",		/* Options with debug */
@@ -96,20 +101,19 @@ PORT z80_port = {
 	"_OVERLAY"
     },
     { 
-	-1, 0, 0, 8, 0
+	-1, 0, 0, 4, 0
     },
     /* Z80 has no native mul/div commands */
     {  
 	0
     },
-    _z80_init,
-    _z80_parseOptions,
-    _z80_finaliseOptions,
-    _z80_setDefaultOptions,
+    _gbz80_init,
+    _gbz80_parseOptions,
+    _gbz80_finaliseOptions,
+    _gbz80_setDefaultOptions,
     z80_assignRegisters,
-    _z80_getRegName,
-    _z80_keywords,
+    _gbz80_getRegName,
+    _gbz80_keywords,
     0,	/* no assembler preamble */
     0,	/* no local IVT generation code */
 };
-

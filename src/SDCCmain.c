@@ -123,12 +123,14 @@ static const char *_preCmd[] = {
 
 extern PORT mcs51_port;
 extern PORT z80_port;
+extern PORT gbz80_port;
 
 PORT *port;
 
 static PORT *_ports[] = {
     &mcs51_port,
-    &z80_port
+    &z80_port,
+    &gbz80_port
 };
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
@@ -1208,6 +1210,10 @@ int main ( int argc, char **argv , char **envp)
     /*printVersionInfo ();*/
 
     _findPort(argc, argv);
+    /* Initalise the port. */
+    if (port->init)
+	port->init();
+    
     setDefaultOptions();
     parseCmdLine(argc,argv);
 
@@ -1216,6 +1222,7 @@ int main ( int argc, char **argv , char **envp)
 	printUsage();
 	exit(0);
     }
+
 	
     if (srcFileName)
 	preProcess(envp) ;

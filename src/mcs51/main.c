@@ -174,6 +174,7 @@ PORT mcs51_port = {
     {
 	1
     },
+    NULL,
     _mcs51_parseOptions,
     _mcs51_finaliseOptions,
     _mcs51_setDefaultOptions,

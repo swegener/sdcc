@@ -60,9 +60,11 @@ typedef struct regs
     unsigned isFree :1;  /* is currently unassigned  */    
 } regs;
 
-extern regs regsZ80[];
+extern regs *regsZ80;
 
 void   assignRegisters (eBBlock **, int );
 regs  *regWithIdx (int);
+
+void z80_assignRegisters (eBBlock **ebbs, int count);
 
 #endif

@@ -582,6 +582,7 @@ rlivePoint (eBBlock ** ebbs, int count)
 		    ic->rlive = bitVectSetBit (ic->rlive, lrange->key);
 		}
 	    }
+#if 0
 	    /* overlapping live ranges should be eliminated */
 	    if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
 		if (SPIL_LOC(IC_RIGHT(ic)) == SPIL_LOC(IC_RESULT(ic))   && /* left & right share the same spil location */
@@ -592,6 +593,7 @@ rlivePoint (eBBlock ** ebbs, int count)
 		    SPIL_LOC(IC_RIGHT(ic)) = NULL; /* then cannot share */
 		}
 	    }
+#endif
 	}
     }
 }

@@ -1541,6 +1541,7 @@ inCalleeSaveList (char *s)
 {
   int i;
 
+  if (options.all_callee_saves) return 1;
   for (i = 0; options.calleeSaves[i]; i++)
     if (strcmp (options.calleeSaves[i], s) == 0)
       return 1;

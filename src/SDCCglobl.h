@@ -229,7 +229,7 @@ struct options
     int useAccelerator;		/* use ds390 Arithmetic Accelerator */
     char *calleeSaves[128];	/* list of functions using callee save */
     char *excludeRegs[32];	/* registers excluded from saving */
-
+    int all_callee_saves; 	/* callee saves for all functions */
     /* starting address of the segments */
     int xstack_loc;		/* initial location of external stack */
     int stack_loc;		/* initial value of internal stack pointer */

@@ -1381,7 +1381,7 @@ int getpCode(char *mnem,unsigned dest)
   while(pci) {
 
     if(STRCASECMP(pci->mnemonic, mnem) == 0) {
-      if((pci->num_ops <= 1) || (pci->isModReg == dest))
+      if((pci->num_ops <= 1) || (pci->isModReg == dest) || (pci->isBitInst))
 	return(pci->op);
     }
 
@@ -2106,6 +2106,9 @@ pCodeOp *newpCodeOpBit(char *s, int bit, int inBitSpace)
   PCORB(pcop)->bit = bit;
   PCORB(pcop)->inBitSpace = inBitSpace;
 
+  /* pCodeOpBit is derived from pCodeOpReg. We need to init this too */
+  PCOR(pcop)->r = NULL;
+  PCOR(pcop)->rIdx = 0;
   return pcop;
 }
 
@@ -2133,7 +2136,6 @@ pCodeOp *newpCodeOpReg(int rIdx)
 
     if(PCOR(pcop)->r)
       PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
-    //fprintf(stderr, "newpcodeOpReg - rIdx = %d\n", PCOR(pcop)->r->rIdx);
   }
 
   pcop->type = PCOR(pcop)->r->pc_type;
@@ -2175,6 +2177,10 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
     pcop = newpCodeOpLabel(NULL,-1);
     break;
   case PO_GPR_TEMP:
+    pcop = newpCodeOpReg(-1);
+    break;
+
+  case PO_GPR_REGISTER:
     pcop = newpCodeOpReg(-1);
     break;
 

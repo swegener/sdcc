@@ -201,7 +201,8 @@ typedef enum {
   ALT_MNEM1A,
   ALT_MNEM1B,
   ALT_MNEM2,
-  ALT_MNEM2A
+  ALT_MNEM2A,
+  ALT_MNEM3
 } altPatterns;
 
 static char alt_comment[]   = { PCP_COMMENT, 0};
@@ -213,6 +214,7 @@ static char alt_mnem1a[]    = { PCP_STR, PCP_WILDVAR, 0};
 static char alt_mnem1b[]    = { PCP_STR, PCP_NUMBER, 0};
 static char alt_mnem2[]     = { PCP_STR, PCP_STR, PCP_COMMA, PCP_STR, 0};
 static char alt_mnem2a[]    = { PCP_STR, PCP_WILDVAR, PCP_COMMA, PCP_STR, 0};
+static char alt_mnem3[]     = { PCP_STR, PCP_STR, PCP_COMMA, PCP_NUMBER, 0};
 
 static void * cvt_altpat_label(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_comment(void *pp,pCodeWildBlock *pcwb);
@@ -223,10 +225,12 @@ static void * cvt_altpat_mnem1a(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem1b(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem2(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb);
+static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb);
 
 pcPattern altArr[] = {
   {ALT_LABEL,        alt_label,  cvt_altpat_label},
   {ALT_COMMENT,      alt_comment,cvt_altpat_comment},
+  {ALT_MNEM3,        alt_mnem3,  cvt_altpat_mnem3},
   {ALT_MNEM2A,       alt_mnem2a, cvt_altpat_mnem2a},
   {ALT_MNEM2,        alt_mnem2,  cvt_altpat_mnem2},
   {ALT_MNEM1B,       alt_mnem1b, cvt_altpat_mnem1b},
@@ -646,6 +650,65 @@ static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb)
 
 }
 
+
+/*-----------------------------------------------------------------*/
+/* cvt_altpat_mem3 -  convert assembly line type to a pCode        */
+/*                    This rule is for bsf/bcf type instructions   */
+/*                                                                 */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - register                                               */
+/*  pp[2] - comma                                                  */
+/*  pp[3] - number                                                 */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb)
+{
+  parsedPattern *p = pp;
+  int opcode;
+  int dest;  // or could be bit position in the register
+
+  pCodeInstruction *pci=NULL;
+  pCodeOp *pcosubtype=NULL;
+
+  dest = cvt_extract_destination(&p[3]);
+
+  DFPRINTF((stderr,"altpat_mnem3 %s var %s bit (%d)\n",
+	  p->pct[0].tok.s,
+	  p[1].pct[0].tok.s,
+	  p[3].pct[0].tok.n));
+
+
+  opcode = getpCode(p->pct[0].tok.s,0);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+
+  if(pic14Mnemonics[opcode]->isBitInst) {
+    //pcosubtype = cvt_extract_status(p[1].pct[0].tok.s, p[3].pct[0].tok.s);
+
+    //if(pcosubtype == NULL) {
+    pcosubtype = newpCodeOpBit(p[1].pct[0].tok.s,p[3].pct[0].tok.n,0);
+    //}
+  } else
+    pcosubtype = newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
+
+  if(pcosubtype == NULL) {
+    fprintf(stderr, "Bad operand\n");
+    return NULL;
+  }
+
+  pci = PCI(newpCode(opcode, pcosubtype));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+  return pci;
+
+}
+
 /*-----------------------------------------------------------------*/
 /* tokenizeLineNode - Convert a string (of char's) that was parsed */
 /*                    by SDCCpeeph.c into a string of tokens.      */
@@ -758,7 +821,7 @@ static void tokenizeLineNode(char *ln)
 
 void dump1Token(pCodeTokens tt)
 {
-#ifdef PCODE_DEBUG
+
   switch(tt) {
   case PCT_SPACE:
     fprintf(stderr, " space ");
@@ -794,7 +857,7 @@ void dump1Token(pCodeTokens tt)
     fprintf(stderr, " null ");
 
   }
-#endif
+
 }
 
 
@@ -900,18 +963,21 @@ int advTokIdx(int *v, int amt)
 
 int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
 {
-  unsigned i;
   pCode *pc;
   int error = 0;
 
   if(!tokIdx)
     return error;
 
-  for(i=0; i<=tokIdx; i++)
-    dump1Token(tokArr[i].tt);
 #ifdef PCODE_DEBUG
-  fputc('\n',stderr);
+  {
+    unsigned i;
+    for(i=0; i<=tokIdx; i++)
+      dump1Token(tokArr[i].tt);
+    fputc('\n',stderr);
+  }
 #endif
+
   {
     int lparsedPatIdx=0;
     int lpcpIdx;
@@ -1130,7 +1196,12 @@ void  peepRuleBlock2pCodeBlock(  lineNode *ln, pCodeWildBlock *pcwb)
     tokenizeLineNode(ln->line);
     
     if(parseTokens(pcwb,NULL)) {
+      int i;
       fprintf(stderr,"ERROR assembling line:\n%s\n",ln->line);
+      fprintf(stderr,"Tokens:\n");
+      for(i=0; i<5; i++)
+	dump1Token(tokArr[i].tt);
+      fputc('\n',stderr);
       exit (1);
     }
   }

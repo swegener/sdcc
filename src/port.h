@@ -236,6 +236,9 @@ typedef struct
     int (*genIVT) (FILE * of, symbol ** intTable, int intCount);
 
     void (*genXINIT) (FILE * of);
+    
+    /* Write port specific startup code */
+    void (*genInitStartup) (FILE * of);
 
     /* parameter passing in register related functions */
     void (*reset_regparms) ();	/* reset the register count */

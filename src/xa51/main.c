@@ -314,6 +314,7 @@ PORT xa51_port =
   _xa51_genAssemblerEnd,
   _xa51_genIVT,
   _xa51_genXINIT,
+  NULL, 			/* genInitStartup */
   _xa51_reset_regparm,
   _xa51_regparm,
   NULL, // process_pragma()

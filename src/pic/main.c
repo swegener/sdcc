@@ -466,6 +466,7 @@ PORT pic_port =
 	NULL,				/* no genAssemblerEnd */
 	_pic14_genIVT,
 	NULL, // _pic14_genXINIT
+	NULL, 				/* genInitStartup */
 	_pic14_reset_regparm,
 	_pic14_regparm,
 	_process_pragma,				/* process a pragma */

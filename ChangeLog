@@ -1,3 +1,40 @@
+2004-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCglue.c (emitMaps): allow public sfr variables
+	* src/SDCCglue.c (initialComments): include compiler build date
+	with compiler version and put the timestamp of the generated
+	assembly file on a serperate line to be less confusing.
+	* src/port.h: added genInitStartup hook
+	* src/avr/main.c,
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/pic/main.c,
+	* src/pic16/main.c,
+	* src/xa51/main.c,
+	* src/z80/main.c: genInitStartup initialize as NULL (default to
+	historical behaviour)
+	* src/SDCCglue.c (glue): _sdcc_gsinit_startup is now port specific.
+	* src/mcs51/main.c: (_mcs51_genInitStartup, _mcs51_genExtraAreas,
+	_mcs51_genXINIT, _mcs51_genRAMCLEAR): link initialization code from the
+	library instead of hard coding it into the compiler.
+	* support/regression/ports/mcs51-stack-auto/spec.mk,
+	* src/SDCCmain.c (linkEdit): added mcs51.lib to the link libraries
+	* device/lib/mcs51/Makefile,
+	* device/lib/small/Makefile,
+	* device/lib/large/Makefile,
+	* device/lib/mcs51/crtpagesfr.asm,
+	* device/lib/mcs51/crtstart.asm,
+	* device/lib/mcs51/crtxclear.asm,
+	* device/lib/mcs51/crtxinit.asm,
+	* device/lib/mcs51/crtclear.asm,
+	* device/lib/mcs51/crtxstack.asm: move most of the mcs51 C runtime
+	startup/initialization out of src/SDCCglue.c and src/mcs51/main.c
+	and into user configurable files.
+	* device/lib/clean.mk: clean mcs51 directory too
+	* support/regression/tests/longlit.c: added static to T1 declaration
+	* doc/sdccman.lyx: documented _PAGESFR sfr for customizing pdata
+	accesses in the initialization code
+
 2004-03-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/include/mc68hc908qy.h: corrected declarations of FLBPR and

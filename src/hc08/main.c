@@ -412,6 +412,7 @@ PORT hc08_port =
   NULL,				/* no genAssemblerEnd */
   _hc08_genIVT,
   _hc08_genXINIT,
+  NULL, 			/* genInitStartup */
   _hc08_reset_regparm,
   _hc08_regparm,
   NULL,				/* process_pragma */

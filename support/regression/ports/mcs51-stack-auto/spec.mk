@@ -6,7 +6,8 @@ LIBSRCDIR = ../../device/lib
 LIBDIR    = gen/$(PORT)/lib
 
 LIBSDCCFLAGS+=--stack-auto --int-long-reent --float-reent
-SDCCFLAGS   +=$(LIBSDCCFLAGS) --nostdlib -L$(LIBDIR) -llibsdcc -llibint -lliblong -llibfloat
+SDCCFLAGS   +=$(LIBSDCCFLAGS) --nostdlib -L$(LIBDIR) -llibsdcc -llibint \
+              -lliblong -llibfloat -lmcs51
 
 # copy support.c
 $(PORTS_DIR)/$(PORT)/%.c: $(PORTS_DIR)/mcs51/%.c
@@ -51,5 +52,7 @@ $(LIBDIR)/%.rel: $(LIBSRCDIR)/%.c
 
 .PHONY: lib-files
 lib-files:
+	make -C $(LIBSRCDIR)/mcs51 all
+	cp $(LIBSRCDIR)/mcs51/*.rel $(LIBSRCDIR)/mcs51/mcs51.lib $(LIBDIR)
 	echo $(MODULES) | tr ' ' '\n' > $(LIBDIR)/libsdcc.lib
 	touch $(LIBDIR)/libfloat.lib $(LIBDIR)/libint.lib $(LIBDIR)/liblong.lib

@@ -636,6 +636,7 @@ PORT z80_port =
   NULL,				/* no genAssemblerEnd */
   0,				/* no local IVT generation code */
   0,                            /* no genXINIT code */
+  NULL, 			/* genInitStartup */
   _reset_regparm,
   _reg_parm,
   _process_pragma,
@@ -736,6 +737,7 @@ PORT gbz80_port =
   NULL,				/* no genAssemblerEnd */
   0,				/* no local IVT generation code */
   0,                            /* no genXINIT code */
+  NULL, 			/* genInitStartup */
   _reset_regparm,
   _reg_parm,
   _process_pragma,

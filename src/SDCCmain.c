@@ -1488,7 +1488,11 @@ linkEdit (char **envp)
             }
 #endif
 #endif
-          if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80
+          if (TARGET_IS_MCS51)
+	    {
+              fprintf (lnkfile, "-l mcs51\n");
+	    }
+	  if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80
             || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
             { /*Why the z80 port is not using the standard libraries?*/
               fprintf (lnkfile, "-l %s\n", STD_LIB);

@@ -880,6 +880,7 @@ PORT ds390_port =
   NULL,				/* no genAssemblerEnd */
   _ds390_genIVT,
   _ds390_genXINIT,
+  NULL, 			/* genInitStartup */
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,
@@ -1178,6 +1179,7 @@ PORT tininative_port =
   _tininative_genAssemblerEnd,
   _tininative_genIVT,
   NULL,
+  NULL, 			/* genInitStartup */
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,
@@ -1391,6 +1393,7 @@ PORT ds400_port =
   NULL,				/* no genAssemblerEnd */
   _ds400_genIVT,
   _ds390_genXINIT,
+  NULL, 			/* genInitStartup */
   _ds390_reset_regparm,
   _ds390_regparm,
   NULL,

@@ -1076,16 +1076,23 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
 	  break;
 	case 3: // how about '390??
+	  fprintf (oFile, "; generic printIvalPtr\n");
 	  if (port->little_endian)
 	    {
-	      fprintf (oFile, "\t.byte %s,%s,%s\n",
-		       aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2));
+	      fprintf (oFile, "\t.byte %s,%s",
+		       aopLiteral (val, 0), aopLiteral (val, 1));
 	    }
 	  else
 	    {
-	      fprintf (oFile, "\t.byte %s,%s,%s\n",
-		       aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
+	      fprintf (oFile, "\t.byte %s,%s",
+		       aopLiteral (val, 1), aopLiteral (val, 0));
 	    }
+	  if (IS_GENPTR (val->type))
+	    fprintf (oFile, ",%s\n", aopLiteral (val, 2));
+	  else if (IS_PTR (val->type))
+	    fprintf (oFile, ",#%x\n", pointerTypeToGPByte (DCL_TYPE (val->type), NULL, NULL));
+	  else
+	    fprintf (oFile, ",%s\n", aopLiteral (val, 2));
 	}
       return;
     }
@@ -1281,6 +1288,9 @@ emitStaticSeg (memmap * map, FILE * out)
 void 
 emitMaps (void)
 {
+  int publicsfr = TARGET_IS_MCS51; /* Ideally, this should be true for all  */
+                                   /* ports but let's be conservative - EEP */
+  
   inInitMode++;
   /* no special considerations for the following
      data, idata & bit & xdata */
@@ -1291,8 +1301,8 @@ emitMaps (void)
   if (port->genXINIT) {
     emitRegularMap (xidata, TRUE, TRUE);
   }
-  emitRegularMap (sfr, FALSE, FALSE);
-  emitRegularMap (sfrbit, FALSE, FALSE);
+  emitRegularMap (sfr, publicsfr, FALSE);
+  emitRegularMap (sfrbit, publicsfr, FALSE);
   emitRegularMap (home, TRUE, FALSE);
   emitRegularMap (code, TRUE, FALSE);
 
@@ -1392,7 +1402,8 @@ initialComments (FILE * afile)
   time_t t;
   time (&t);
   fprintf (afile, "%s", iComments1);
-  fprintf (afile, "; Version " SDCC_VERSION_STR " %s\n", asctime (localtime (&t)));
+  fprintf (afile, "; Version " SDCC_VERSION_STR " (%s)\n", __DATE__);
+  fprintf (afile, "; This file generated %s", asctime (localtime (&t)));
   fprintf (afile, "%s", iComments2);
 }
 
@@ -1797,38 +1808,46 @@ glue (void)
 
   if (mainf && IFFUNC_HASBODY(mainf->type))
     {
-      fprintf (asmFile, "__sdcc_gsinit_startup:\n");
-      /* if external stack is specified then the
-         higher order byte of the xdatalocation is
-         going into P2 and the lower order going into
-         spx */
-      if (options.useXstack)
-	{
-	  fprintf (asmFile, "\tmov\tP2,#0x%02x\n",
-		   (((unsigned int) options.xdata_loc) >> 8) & 0xff);
-	  fprintf (asmFile, "\tmov\t_spx,#0x%02x\n",
-		   (unsigned int) options.xdata_loc & 0xff);
+      if (port->genInitStartup)
+        {
+	   port->genInitStartup(asmFile);
 	}
+      else
+        {
+          fprintf (asmFile, "__sdcc_gsinit_startup:\n");
+          /* if external stack is specified then the
+             higher order byte of the xdatalocation is
+             going into P2 and the lower order going into
+             spx */
+          if (options.useXstack)
+	    {
+	      fprintf (asmFile, "\tmov\tP2,#0x%02x\n",
+		       (((unsigned int) options.xdata_loc) >> 8) & 0xff);
+	      fprintf (asmFile, "\tmov\t_spx,#0x%02x\n",
+		       (unsigned int) options.xdata_loc & 0xff);
+	    }
 
-	// This should probably be a port option, but I'm being lazy.
-	// on the 400, the firmware boot loader gives us a valid stack
-	// (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
-	if (!TARGET_IS_DS400)
-	{
-	    /* initialise the stack pointer.  JCF: aslink takes care of the location */
-	    fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");	/* MOF */
+          // This should probably be a port option, but I'm being lazy.
+          // on the 400, the firmware boot loader gives us a valid stack
+          // (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
+          if (!TARGET_IS_DS400)
+	    {
+	      /* initialise the stack pointer.  JCF: aslink takes care of the location */
+	      fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");	/* MOF */
+	    }
+
+          fprintf (asmFile, "\tlcall\t__sdcc_external_startup\n");
+          fprintf (asmFile, "\tmov\ta,dpl\n");
+          fprintf (asmFile, "\tjz\t__sdcc_init_data\n");
+          fprintf (asmFile, "\tljmp\t__sdcc_program_startup\n");
+          fprintf (asmFile, "__sdcc_init_data:\n");
+
+          // if the port can copy the XINIT segment to XISEG
+          if (port->genXINIT)
+	    {
+	      port->genXINIT(asmFile);
+            }
 	}
-
-      fprintf (asmFile, "\tlcall\t__sdcc_external_startup\n");
-      fprintf (asmFile, "\tmov\ta,dpl\n");
-      fprintf (asmFile, "\tjz\t__sdcc_init_data\n");
-      fprintf (asmFile, "\tljmp\t__sdcc_program_startup\n");
-      fprintf (asmFile, "__sdcc_init_data:\n");
-
-      // if the port can copy the XINIT segment to XISEG
-      if (port->genXINIT) {
-	port->genXINIT(asmFile);
-      }
 
     }
   copyFile (asmFile, statsg->oFile);

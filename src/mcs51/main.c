@@ -145,6 +145,7 @@ _mcs51_genAssemblerPreamble (FILE * of)
 	for (i=0; i < 8 ; i++ )
 	    fprintf (of,"b1_%d = 0x%x \n",i,8+i);
     }
+  
 }
 
 /* Generate interrupt vector table. */
@@ -154,52 +155,49 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
   return FALSE;
 }
 
-/* Generate code to clear XSEG and idata memory. 
-   This clears XSEG, DSEG, BSEG, OSEG, SSEG */
-static void _mcs51_genRAMCLEAR (FILE * of) {
-  fprintf (of, ";	_mcs51_genRAMCLEAR() start\n");
-  fprintf (of, "	mov	r0,#l_XSEG\n");
-  fprintf (of, "	mov	a,r0\n");
-  fprintf (of, "	orl	a,#(l_XSEG >> 8)\n");
-  fprintf (of, "	jz	00005$\n");
-  fprintf (of, "	mov	r1,#((l_XSEG + 255) >> 8)\n");
-  fprintf (of, "	mov	dptr,#s_XSEG\n");
-  fprintf (of, "	clr     a\n");
-  fprintf (of, "00004$:	movx	@dptr,a\n");
-  fprintf (of, "	inc	dptr\n");
-  fprintf (of, "	djnz	r0,00004$\n");
-  fprintf (of, "	djnz	r1,00004$\n");
-  /* r0 is zero now. Clearing 256 byte assuming 128 byte devices don't mind */
-  fprintf (of, "00005$:	mov	@r0,a\n");   
-  fprintf (of, "	djnz	r0,00005$\n");
-  fprintf (of, ";	_mcs51_genRAMCLEAR() end\n");
+static void	  
+_mcs51_genExtraAreas(FILE *of, bool hasMain)
+{
+  tfprintf (of, "\t!area\n", port->mem.code_name);
+  tfprintf (of, "\t!area\n", "GSINIT0 (CODE)");
+  tfprintf (of, "\t!area\n", "GSINIT1 (CODE)");
+  tfprintf (of, "\t!area\n", "GSINIT2 (CODE)");
+  tfprintf (of, "\t!area\n", "GSINIT3 (CODE)");
+  tfprintf (of, "\t!area\n", "GSINIT4 (CODE)");
+  tfprintf (of, "\t!area\n", "GSINIT5 (CODE)");
 }
+
+static void
+_mcs51_genInitStartup (FILE *of)
+{
+  tfprintf (of, "\t!global\n", "__sdcc_gsinit_startup");
+  tfprintf (of, "\t!global\n", "__sdcc_program_startup");
+  tfprintf (of, "\t!global\n", "__start__stack");
+  
+  if (options.useXstack)
+    {
+      tfprintf (of, "\t!global\n", "__sdcc_init_xstack");
+      tfprintf (of, "\t!global\n", "__start__xstack");
+      fprintf (of, "__start__xstack = 0x%04x", options.xdata_loc);
+    }
+
+  // if the port can copy the XINIT segment to XISEG
+  if (port->genXINIT)
+    {
+      port->genXINIT(of);
+    }
+  
+  if (!getenv("SDCC_NOGENRAMCLEAR"))
+    tfprintf (of, "\t!global\n", "__mcs51_genRAMCLEAR");
+}
+
 
 /* Generate code to copy XINIT to XISEG */
 static void _mcs51_genXINIT (FILE * of) {
-  fprintf (of, ";	_mcs51_genXINIT() start\n");
-  fprintf (of, "	mov	r1,#l_XINIT\n");
-  fprintf (of, "	mov	a,r1\n");
-  fprintf (of, "	orl	a,#(l_XINIT >> 8)\n");
-  fprintf (of, "	jz	00003$\n");
-  fprintf (of, "	mov	r2,#((l_XINIT+255) >> 8)\n");
-  fprintf (of, "	mov	dptr,#s_XINIT\n");
-  fprintf (of, "	mov	r0,#s_XISEG\n");
-  fprintf (of, "	mov	p2,#(s_XISEG >> 8)\n");
-  fprintf (of, "00001$:	clr	a\n");
-  fprintf (of, "	movc	a,@a+dptr\n");
-  fprintf (of, "	movx	@r0,a\n");
-  fprintf (of, "	inc	dptr\n");
-  fprintf (of, "	inc	r0\n");
-  fprintf (of, "	cjne	r0,#0,00002$\n");
-  fprintf (of, "	inc	p2\n");
-  fprintf (of, "00002$:	djnz	r1,00001$\n");
-  fprintf (of, "	djnz	r2,00001$\n");
-  fprintf (of, "	mov	p2,#0xFF\n");
-  fprintf (of, "00003$:\n");
-  fprintf (of, ";	_mcs51_genXINIT() end\n");
+  tfprintf (of, "\t!global\n", "__mcs51_genXINIT");
   
-  if (!getenv("SDCC_NOGENRAMCLEAR")) _mcs51_genRAMCLEAR (of);
+  if (!getenv("SDCC_NOGENRAMCLEAR"))
+    tfprintf (of, "\t!global\n", "__mcs51_genXRAMCLEAR");
 }
 
 
@@ -706,7 +704,7 @@ PORT mcs51_port =
     NULL,
     1
   },
-  { NULL, NULL },
+  { _mcs51_genExtraAreas, NULL },
   {
     +1, 0, 4, 1, 1, 0
   },
@@ -727,6 +725,7 @@ PORT mcs51_port =
   NULL,				/* no genAssemblerEnd */
   _mcs51_genIVT,
   _mcs51_genXINIT,
+  _mcs51_genInitStartup,
   _mcs51_reset_regparm,
   _mcs51_regparm,
   NULL,

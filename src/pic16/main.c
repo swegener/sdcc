@@ -819,6 +819,7 @@ PORT pic16_port =
   NULL,				/* no genAssemblerEnd */
   _pic16_genIVT,
   NULL, // _pic16_genXINIT
+  NULL, 			/* genInitStartup */
   _pic16_reset_regparm,
   _pic16_regparm,
   _process_pragma,				/* process a pragma */

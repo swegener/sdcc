@@ -240,6 +240,7 @@ PORT avr_port = {
 	NULL,				/* no genAssemblerEnd */
 	_avr_genIVT,
 	NULL, // _avr_genXINIT
+	NULL,			/* genInitStartup */
 	_avr_reset_regparm,
 	_avr_regparm,
         NULL,

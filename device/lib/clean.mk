@@ -10,6 +10,7 @@ clean:
 	for model in $(MODELS); do \
 	  find $$model -maxdepth 1 -type f ! -name Makefile -exec rm {} \; ; \
 	done
+	make -C mcs51 clean
 	make -C ds390 clean
 	make -C z80 clean
 	make -C gbz80 clean

@@ -261,13 +261,6 @@ extern char *libFiles[128];
 extern int nlibFiles;
 extern bool verboseExec ;
 
-/*
-   void buildCmdLine(char *into, char **args, const char **cmds, 
-   const char *p1, const char *p2, 
-   const char *p3, const char **list);
-   int my_system (const char *cmd, char **cmd_argv);
- */
-
 void parseWithComma (char **, char *);
 
 /** Creates a temporary file a'la tmpfile which avoids the bugs
@@ -310,5 +303,10 @@ struct _dumpFiles {
 };
 
 extern struct _dumpFiles dumpFiles[];
+
+/* Buffer which can be used to hold a file name; assume it will
+ * be trashed by any function call within SDCC.
+ */
+extern char scratchFileName[FILENAME_MAX];
 
 #endif

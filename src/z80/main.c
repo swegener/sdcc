@@ -158,10 +158,10 @@ _gbz80_rgblink (void)
     sz = "a";
 
   /* first we need to create the <filename>.lnk file */
-  sprintf (buffer, "%s.lnk", sz);
-  if (!(lnkfile = fopen (buffer, "w")))
+  sprintf (scratchFileName, "%s.lnk", sz);
+  if (!(lnkfile = fopen (scratchFileName, "w")))
     {
-      werror (E_FILE_OPEN_ERR, buffer);
+      werror (E_FILE_OPEN_ERR, scratchFileName);
       exit (1);
     }
 

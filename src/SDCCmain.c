@@ -75,6 +75,9 @@ int nrelFiles = 0;
 bool verboseExec = FALSE;
 char *preOutName;
 
+// Globally accessible scratch buffer for file names.
+char scratchFileName[FILENAME_MAX];
+
 // In MSC VC6 default search path for exe's to path for this
 
 char DefaultExePath[128];
@@ -695,7 +698,6 @@ int
 parseCmdLine (int argc, char **argv)
 {
   int i;
-  char cdbfnbuf[50];
 
   /* go thru all whole command line */
   for (i = 1; i < argc; i++)
@@ -994,9 +996,9 @@ parseCmdLine (int argc, char **argv)
   /* if debug option is set the open the cdbFile */
   if (!options.nodebug && srcFileName)
     {
-      sprintf (cdbfnbuf, "%s.cdb", srcFileName);
-      if ((cdbFile = fopen (cdbfnbuf, "w")) == NULL)
-	werror (E_FILE_OPEN_ERR, cdbfnbuf);
+      sprintf (scratchFileName, "%s.cdb", srcFileName);
+      if ((cdbFile = fopen (scratchFileName, "w")) == NULL)
+	werror (E_FILE_OPEN_ERR, scratchFileName);
       else
 	{
 	  /* add a module record */
@@ -1020,10 +1022,10 @@ linkEdit (char **envp)
     srcFileName = "temp";
 
   /* first we need to create the <filename>.lnk file */
-  sprintf (buffer, "%s.lnk", srcFileName);
-  if (!(lnkfile = fopen (buffer, "w")))
+  sprintf (scratchFileName, "%s.lnk", srcFileName);
+  if (!(lnkfile = fopen (scratchFileName, "w")))
     {
-      werror (E_FILE_OPEN_ERR, buffer);
+      werror (E_FILE_OPEN_ERR, scratchFileName);
       exit (1);
     }
 
@@ -1235,7 +1237,9 @@ preProcess (char **envp)
 	}
 
       if (preProcOnly)
+      {
 	exit (0);
+      }
     }
   else
     {

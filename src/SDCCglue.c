@@ -1305,17 +1305,17 @@ glue ()
 
   if (!options.c1mode)
     {
-      sprintf (buffer, srcFileName);
-      strcat (buffer, port->assembler.file_ext);
+      sprintf (scratchFileName, srcFileName);
+      strcat (scratchFileName, port->assembler.file_ext);
     }
   else
     {
-      strcpy (buffer, options.out_name);
+      strcpy (scratchFileName, options.out_name);
     }
 
-  if (!(asmFile = fopen (buffer, "w")))
+  if (!(asmFile = fopen (scratchFileName, "w")))
     {
-      werror (E_FILE_OPEN_ERR, buffer);
+      werror (E_FILE_OPEN_ERR, scratchFileName);
       exit (1);
     }
 

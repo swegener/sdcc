@@ -103,16 +103,13 @@ FILE *appendDumpFile (int id) {
 
   if (!dumpFilesPtr->filePtr) {
     // not used before, create it
-    strcpy (buffer, srcFileName);
-    strcat (buffer, dumpFilesPtr->ext);
-    if (!(dumpFilesPtr->filePtr = fopen (buffer, "w"))) {
-      werror (E_FILE_OPEN_ERR, buffer);
+    strcpy (scratchFileName, srcFileName);
+    strcat (scratchFileName, dumpFilesPtr->ext);
+    if (!(dumpFilesPtr->filePtr = fopen (scratchFileName, "w"))) {
+      werror (E_FILE_OPEN_ERR, scratchFileName);
       exit (1);
     }
-    //dprintf ("created: %s\n", buffer);
-  } else {
-    //dprintf ("appended: %s%s\n", srcFileName, dumpFilesPtr->ext);
-  }
+  } 
   return dumpFilesPtr->filePtr;
 }
 

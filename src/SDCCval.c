@@ -1457,18 +1457,17 @@ valCastLiteral (sym_link * dtype, double fval)
 int 
 getNelements (sym_link * type, initList * ilist)
 {
-  sym_link *etype = getSpec (type);
   int i;
 
   if (!ilist)
     return 0;
 
-  while (ilist->type == INIT_DEEP)
+  if (ilist->type == INIT_DEEP)
     ilist = ilist->init.deep;
 
   /* if type is a character array and there is only one
      (string) initialiser then get the length of the string */
-  if (IS_ARRAY (type) && IS_CHAR (etype) && !ilist->next)
+  if (IS_ARRAY (type) && IS_CHAR (type->next) && !ilist->next)
     {
       ast *iast = ilist->init.node;
       value *v = (iast->type == EX_VALUE ? iast->opval.val : NULL);
@@ -1491,7 +1490,6 @@ getNelements (sym_link * type, initList * ilist)
       i++;
       ilist = ilist->next;
     }
-
   return i;
 }
 

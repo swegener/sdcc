@@ -1,3 +1,7 @@
+2003-01-04    <johan@balder>
+
+	* src/SDCCval.c (getNelements): fixed the initialized array of structures
+
 2002-12-29  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>
         * as/mcs51/Makefile.bcc: fixed typo lkomf51.o -> lkaomf51.o
 

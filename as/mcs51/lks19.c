@@ -11,9 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#if !defined(_MSC_VER)
-//#include <alloc.h>
-//#endif
 #include "aslink.h"
 
 /*)Module	lks19.c
@@ -118,7 +115,7 @@ s19(i)
 				chksum += rtval[i];
 			}
 		}
-		fprintf(ofp, "%02X\n", (-chksum-1) & 0xff);
+		fprintf(ofp, "%02X\n", (0-chksum-1) & 0xff);
 	} else {
 		fprintf(ofp, "S9030000FC\n");
 	}

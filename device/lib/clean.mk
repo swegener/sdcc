@@ -14,6 +14,7 @@ clean:
 	make -C z80 clean
 	make -C gbz80 clean
 	make -C hc08 clean
+	make -C pic16 clean
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

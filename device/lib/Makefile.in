@@ -150,7 +150,7 @@ include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08
+all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08 model-pic16
 
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
@@ -200,6 +200,15 @@ model-hc08:
 objects-hc08: build-dir $(HC08OBJECTS) port-specific-objects clean_intermediate
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
+model-pic16:
+	if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
+	  $(MAKE) MODELFLAGS="-mpic16" PORT=pic16 OEXT=.lib objects-pic16; \
+	  fi
+
+objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
+	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
+
+
 build-dir: $(PORTDIR)
 
 $(PORTDIR):
@@ -211,11 +220,20 @@ port-specific-objects:
 	  cp -f $(PORT)/*.lib $(PORT)/*$(OEXT) $(PORTDIR); \
 	fi
 
+port-specific-objects-pic16:
+	if [ -d $(PORT) ]; then \
+	  $(MAKE) -C $(PORT); \
+	  cp -f $(PORT)/*.lib $(PORT)/*$(OEXT) $(PORTDIR); \
+	fi
+
 lib-files:
 	cp *.lib $(PORTDIR)
 
 clean_intermediate:
 	rm -f $(PORTDIR)/*.lst $(PORTDIR)/*.sym
+
+clean_intermediate-pic16:
+	$(MAKE) -C $(PORT) clean-intermediate
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
@@ -250,6 +268,7 @@ installdirs:
 	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
 	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400	
 	[ -d $(sdcc_libdir)/hc08 ] || mkdir -p $(sdcc_libdir)/hc08	
+	[ -f $(sdcc_libdir)/pic16 ] || mkdir -p $(sdcc_libdir)/pic16
 	mkdir -p $(sdcc_libdir)/src
 
 # Creating dependencies

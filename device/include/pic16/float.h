@@ -28,6 +28,7 @@
 #ifndef __FLOAT_H
 #define __FLOAT_H 1
 
+#include <sdcc-lib.h>
 #include <limits.h>
 
 #define FLT_RADIX       2
@@ -52,32 +53,28 @@
 #define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
 
 
-#if 1
-#define reentrant
+float __uchar2fs (unsigned char) _FS_REENTRANT;
+float __schar2fs (signed char) _FS_REENTRANT;
+float __uint2fs (unsigned int) _FS_REENTRANT;
+float __sint2fs (signed int) _FS_REENTRANT;
+float __ulong2fs (unsigned long) _FS_REENTRANT;
+float __slong2fs (signed long) _FS_REENTRANT;
+unsigned char __fs2uchar (float) _FS_REENTRANT;
+signed char __fs2schar (float) _FS_REENTRANT;
+unsigned int __fs2uint (float) _FS_REENTRANT;
+signed int __fs2sint (float) _FS_REENTRANT;
+unsigned long __fs2ulong (float) _FS_REENTRANT;
+signed long __fs2slong (float) _FS_REENTRANT;
 
-float __uchar2fs (unsigned char) reentrant;
-float __schar2fs (signed char) reentrant;
-float __uint2fs (unsigned int) reentrant;
-float __sint2fs (signed int) reentrant;
-float __ulong2fs (unsigned long) reentrant;
-float __slong2fs (signed long) reentrant;
-unsigned char __fs2uchar (float) reentrant;
-signed char __fs2schar (float) reentrant;
-unsigned int __fs2uint (float) reentrant;
-signed int __fs2sint (float) reentrant;
-unsigned long __fs2ulong (float) reentrant;
-signed long __fs2slong (float) reentrant;
+float __fsadd (float, float) _FS_REENTRANT;
+float __fssub (float, float) _FS_REENTRANT;
+float __fsmul (float, float) _FS_REENTRANT;
+float __fsdiv (float, float) _FS_REENTRANT;
 
-float __fsadd (float, float) reentrant;
-float __fssub (float, float) reentrant;
-float __fsmul (float, float) reentrant;
-float __fsdiv (float, float) reentrant;
-
-char __fslt (float, float) reentrant;
-char __fseq (float, float) reentrant;
-char __fsgt (float, float) reentrant;
-
-#endif
+char __fslt (float, float) _FS_REENTRANT;
+char __fseq (float, float) _FS_REENTRANT;
+char __fsneq (float, float) _FS_REENTRANT;
+char __fsgt (float, float) _FS_REENTRANT;
 
 #endif
 

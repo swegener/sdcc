@@ -1228,6 +1228,7 @@ replace {
         inc     dptr
 }
 
+// char indexed access to: char code table[] = {4,3,2,1}; 
 replace {
         add     a,#%1
         mov     dpl,a
@@ -1239,6 +1240,34 @@ replace {
 } by {
         ;       Peephole 186.d  optimized movc sequence
         mov     dptr,#%1
+        movc    a,@a+dptr
+}
+
+// char indexed access to: int code table[] = {4,3,2,1}; 
+replace {
+        mov     b,#0x02
+        mul     ab
+        add     a,#%2
+        mov     dpl,a
+        mov     a,b
+        addc    a,#(%2 >> 8)
+        mov     dph,a
+        clr     a
+        movc    a,@a+dptr
+        mov     %3,a
+        mov     a,#0x01
+        movc    a,@a+dptr
+} by {
+        ;       Peephole 186.e  optimized movc sequence (b, dptr differ)
+	add	a,acc
+        mov     b,a
+        mov	dptr,#%2
+	jnc	.+3
+	inc	dph
+        movc    a,@a+dptr
+        mov     %3,a
+        mov     a,b
+	inc	a
         movc    a,@a+dptr
 }
 

@@ -2073,7 +2073,7 @@ replace {
         sjmp    %1
 %2:
         mov     %3,%4
-%5:
+%1:
         ret
 } by {
         ; Peephole 237a  removed sjmp to ret
@@ -2088,17 +2088,17 @@ replace {
         sjmp    %1
 %2:
         mov     %3,%4
-        mov     dpl,%6
-        mov     dph,%7
-%5:
+        mov     dpl,%5
+        mov     dph,%6
+%1:
         ret
 } by {
         ; Peephole 237b  removed sjmp to ret
         ret
 %2:
         mov     %3,%4
-        mov     dpl,%6
-        mov     dph,%7
+        mov     dpl,%5
+        mov     dph,%6
 %1:
         ret
 }

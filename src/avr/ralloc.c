@@ -1617,11 +1617,12 @@ createRegMask (eBBlock ** ebbs, int count)
 				/* for all the registers allocated to it */
 				for (k = 0; k < sym->nRegs; k++) {
 					if (sym->regs[k]) {
-						ic->rMask = bitVectSetBit (ic-> rMask, sym->regs[k]->rIdx);
+						int rIdx = sym->regs[k]->rIdx;
+						ic->rMask = bitVectSetBit (ic-> rMask,rIdx);
 						/* special case for X & Z registers */
-						if (k == R26_IDX || k == R27_IDX) 
+						if (rIdx == R26_IDX || rIdx == R27_IDX) 
 							ic->rMask = bitVectSetBit (ic->rMask, X_IDX);
-						if (k == R30_IDX || k == R31_IDX) 
+						if (rIdx == R30_IDX || rIdx == R31_IDX) 
 							ic->rMask = bitVectSetBit (ic->rMask, Z_IDX);
 					}
 				}

@@ -18,7 +18,7 @@
 
 // All that has to be included and / or defined is done here
 
-#include "../inc/hardware_describtion.h"
+#include "../inc/hardware_description.h"
 
 // END INCLUDES & DEFINES ===========================================
 
@@ -129,7 +129,7 @@ volatile xdata static unsigned char SERIAL_VIA_INTERRUPT_BUSY;
 #endif
 // The Siemens CPU C515A has a build in Baudrategenerator, therefore we use it instead
 // of timer 1 this gives a better resolution
-#define BAUDRATEGENENATOR_USED
+
 #define BAUDRATEGENRELOADVALUE (1024-(2*CPUCLKHZ/64/BAUDRATE))
 #define TIMER1MODE2RELOADVALUE  (256-(2*CPUCLKHZ/32/12/BAUDRATE))
 

@@ -48,6 +48,10 @@
 // disable the above three lines and enable the next one if polling method is used
 //#define SERIAL_VIA_POLLING
 
+// The Siemens CPU C515A has a build in Baudrategenerator, therefore we use it instead
+// of timer 1 this gives a better resolution
+#define BAUDRATEGENENATOR_USED
+
 // to measure time and delays we include a 1msec timer
 #define USE_SYSTEM_TIMER
 

@@ -8,38 +8,38 @@ RM              = rm -f
 CFLAGS          = --debug --stack-after-data --model-large
 LDFLAGS         = --debug --stack-after-data
 
-COBJECTS        = startup_code.rel \
-                  cpu_c515a.rel
+COBJECTS        =	startup_code.rel \
+			cpu_c515a.rel
 
 CSOURCES        = $(patsubst %.rel,%.c,$(COBJECTS))
 
 .SUFFIXES: .rel
 
 .c.rel:
-        $(SDCC) $(CFLAGS) -c $<
+	$(SDCC) $(CFLAGS) -c $<
 
 all: startup
-        $(SDCC) $(LDFLAGS) $(COBJECTS)
+	$(SDCC) $(LDFLAGS) $(COBJECTS)
 
 c: $(COBJECTS)
 
 startup: $(COBJECTS)
 
 clean:
-        $(RM) *.lst
-        $(RM) *.asm
-        $(RM) *.bak
-        $(RM) *.rst
-        $(RM) *.sym
-        $(RM) *.hex
-        $(RM) *.map
+	$(RM) *.lst
+	$(RM) *.asm
+	$(RM) *.bak
+	$(RM) *.rst
+	$(RM) *.sym
+	$(RM) *.hex
+	$(RM) *.map
 
-include Makefile.dep
+include makefile.dep
 
-dep: Makefile.dep
+dep: makefile.dep
 
-Makefile.dep: $(CSOURCES)
-        rm -f Makefile.dep
-        for csrc in $(CSOURCES) ;do\
-          $(SDCC) -MM $$csrc >>Makefile.dep ;\
-        done
+makefile.dep: $(CSOURCES)
+	rm -f makefile.dep
+	for csrc in $(CSOURCES) ;do\
+	$(SDCC) -MM $$csrc >>makefile.dep ;\
+	done

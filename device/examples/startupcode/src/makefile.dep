@@ -1,0 +1,5 @@
+startup_code.rel: startup_code.c ../inc/startup_code.h \
+  ../inc/..\inc\hardware_description.h ../inc/..\inc\c515a.h \
+  ../inc/..\inc\cpu_c515a.h
+cpu_c515a.rel: cpu_c515a.c ../inc/hardware_description.h \
+  ../inc/..\inc\c515a.h ../inc/..\inc\cpu_c515a.h

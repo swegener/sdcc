@@ -9510,29 +9510,32 @@ genGenPointerGet (operand * left,
 
   /* if bit then unpack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
+  {
     genUnpackBits (result, "dptr", GPOINTER);
+  }
   else
     {
-      size = AOP_SIZE (result);
-      offset = 0;
+	size = AOP_SIZE (result);
+	offset = 0;
 
-      while (size--)
+	while (size--)
 	{
-// Whoops; uncooked experimental code which was accidentally committed.
-// Kevin should either finish cooking this or yank it soon.
-#if 0
 	    if (size)
 	    {
-		emitcode("push", "b");
+		// Get two bytes at a time, results in _AP & A.
+		// dptr will be incremented ONCE by __gptrgetWord.
+		//
+		// Note: any change here must be coordinated
+		// with the implementation of __gptrgetWord
+		// in device/lib/_gptrget.c
 		emitcode ("lcall", "__gptrgetWord");
-		aopPut (AOP (result), "b", offset++);
+		aopPut (AOP (result), DP2_RESULT_REG, offset++);
 		aopPut (AOP (result), "a", offset++);
-		emitcode("pop", "b");
 		size--;
 	    }
 	    else
-#endif		
 	    {
+		// Only one byte to get.
 		emitcode ("lcall", "__gptrget");
 		aopPut (AOP (result), "a", offset++);
 	    }

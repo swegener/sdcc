@@ -84,3 +84,79 @@ unsigned char _gptrget ()
      _endasm ;
 
 }
+
+#ifdef SDCC_ds390
+unsigned int _gptrgetWord ()
+{
+    _asm
+    ;
+    ;   depending on the pointer type acc. to SDCCsymt.h
+    ;
+        mov     a,b
+        jz      00001$	; 0 near
+	dec     a
+	jz      00002$	; 1 far
+        dec     a
+        jz      00003$	; 2 code
+	dec     a
+	jz      00004$
+	dec     a	; 4 skip generic pointer
+	dec     a
+	jz      00001$	; 5 idata
+    ;
+    ;   any other value for type
+    ;   return xFF
+	mov     a,#0xff
+	sjmp    00006$
+    ;
+    ;   Pointer to data space
+    ;
+ 00001$:
+        push 	ar0
+	mov     r0,dpl     ; use only low order address
+	mov     _ap,@r0
+	inc	r0
+	mov	a,@r0
+	inc     dpl
+        sjmp    00005$
+    ;
+    ;   pointer to xternal data
+    ;
+ 00002$:
+        movx    a,@dptr
+	mov	_ap,a
+	inc     dptr
+	movx    a,@dptr
+        sjmp    00006$
+;
+;   pointer to code area
+;
+ 00003$:
+	; clr     a  is already 0
+        movc    a,@a+dptr
+	mov     _ap,a
+	clr	a
+	inc 	dptr
+	movc 	a,@a+dptr
+        sjmp    00006$
+;
+;   pointer to xternal stack
+;
+ 00004$:
+    	push 	ar0
+	mov     r0,dpl
+        movx    a,@r0
+	mov 	_ap,a
+	inc 	r0
+	movx    a,@r0
+	inc 	dpl
+;
+;   restore and return
+;
+00005$:
+    pop ar0
+00006$:	
+     _endasm ;
+
+}
+#endif

@@ -31,7 +31,7 @@ union uu {
 
 unsigned int _muluint (unsigned int a, unsigned int b) 
 {
-#ifdef SDCC_MODEL_LARGE    
+#if defined(SDCC_MODEL_LARGE) || defined (SDCC_MODEL_FLAT24)
 	union uu _xdata *x;
 	union uu _xdata *y; 
 	union uu t;

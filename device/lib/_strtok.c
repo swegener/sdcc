@@ -24,7 +24,7 @@
 #include "string.h" 
 #define NULL (void *)0
 
-#ifdef SDCC_MODEL_LARGE
+#if defined(SDCC_MODEL_LARGE) || defined (SDCC_MODEL_FLAT24)
 #pragma NOINDUCTION
 #pragma NOINVARIANT
 #endif

@@ -32,7 +32,7 @@ union bil {
         unsigned long l;
         struct { unsigned char b0; unsigned int i12; unsigned char b3;} bi;
 } ;
-#ifdef SDCC_MODEL_LARGE
+#if defined(SDCC_MODEL_LARGE) || defined (SDCC_MODEL_FLAT24)
 #define bcast(x) ((union bil _xdata  *)&(x))
 #else
 #define bcast(x) ((union bil _near *)&(x))

@@ -1895,6 +1895,7 @@ packRegsDPTRuse (iCode * lic, operand * op, eBBlock * ebp)
     iCode *ic, *dic;
     sym_link *type, *etype;
     
+    if (!IS_SYMOP(op)) return NULL;
     if (OP_SYMBOL(op)->remat) return NULL; 
 
     /* first check if any overlapping liverange has already been

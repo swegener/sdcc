@@ -794,10 +794,6 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
   char *s = buffer;
   char *rs;
 
-#if 0
-  if (aop->size != 2 && aop->type != AOP_HL)
-    return NULL;
-#endif
   /* depending on type */
   switch (aop->type)
     {
@@ -809,9 +805,9 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 	tsprintf (s, "!hashedstr + %d", aop->aopu.aop_immd, offset);
       else
 	tsprintf (s, "%s + %d", aop->aopu.aop_immd, offset);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+
+      return gc_strdup(s);
+
     case AOP_LIT:
       {
 	value *val = aop->aopu.aop_lit;
@@ -822,14 +818,24 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 	    unsigned long v = (unsigned long) floatFromVal (val);
 
 	    if (offset == 2)
-	      v >>= 16;
+              {
+                v >>= 16;
+              }
+            else if (offset == 0)
+              {
+                // OK
+              }
+            else 
+              {
+                wassertl(0, "Encountered an invalid offset while fetching a literal");
+              }
 
 	    if (with_hash)
 	      tsprintf (buffer, "!immedword", v);
 	    else
 	      tsprintf (buffer, "!constword", v);
-	    rs = Safe_calloc (1, strlen (buffer) + 1);
-	    return strcpy (rs, buffer);
+
+            return gc_strdup(buffer);
 	  }
 	else
 	  {
@@ -938,7 +944,7 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
 {
   const char *l;
   const char *pair = _pairs[pairId].name;
-  l = aopGetLitWordLong (left, 0, FALSE);
+  l = aopGetLitWordLong (left, offset, FALSE);
   wassert (l && pair);
 
   if (isPtr (pair))
@@ -980,10 +986,7 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
       _G.pairs[pairId].offset = offset;
     }
   /* Both a lit on the right and a true symbol on the left */
-  if (offset)
-    emit2 ("ld %s,!hashedstr + %u", pair, l, offset);
-  else
-    emit2 ("ld %s,!hashedstr", pair, l);
+  emit2 ("ld %s,!hashedstr", pair, l);
 }
 
 static void
@@ -1796,42 +1799,6 @@ genIpush (iCode * ic)
   if (!ic->parmPush)
     {
       wassertl(0, "Encountered an unsupported spill push.");
-#if 0
-      /* and the item is spilt then do nothing */
-      if (OP_SYMBOL (IC_LEFT (ic))->isspilt)
-	return;
-
-      aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
-      size = AOP_SIZE (IC_LEFT (ic));
-      /* push it on the stack */
-      if (isPair (AOP (IC_LEFT (ic))))
-	{
-	  emit2 ("push %s", getPairName (AOP (IC_LEFT (ic))));
-	  _G.stack.pushed += 2;
-	}
-      else
-	{
-	  offset = size;
-	  while (size--)
-	    {
-	      /* Simple for now - load into A and PUSH AF */
-	      if (AOP (IC_LEFT (ic))->type == AOP_IY)
-		{
-		  char *l = aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE);
-		  wassert (l);
-		  emit2 ("ld a,(%s)", l);
-		}
-	      else
-		{
-		  l = aopGet (AOP (IC_LEFT (ic)), --offset, FALSE);
-		  emit2 ("ld a,%s", l);
-		}
-	      emit2 ("push af");
-	      emit2 ("inc sp");
-	      _G.stack.pushed++;
-	    }
-	}
-#endif
       return;
     }
 
@@ -4308,47 +4275,48 @@ genRLC (iCode * ic)
 static void
 shiftR2Left2Result (operand * left, int offl,
 		    operand * result, int offr,
-		    int shCount, int sign)
+		    int shCount, int is_signed)
 {
+  int size = 2;
+  int offset = 0;
+  symbol *tlbl, *tlbl1;
+  const char *l;
+
   movLeft2Result (left, offl, result, offr, 0);
   movLeft2Result (left, offl + 1, result, offr + 1, 0);
 
-  if (sign)
+  /*  if (AOP(result)->type == AOP_REG) { */
+  
+  tlbl = newiTempLabel (NULL);
+  tlbl1 = newiTempLabel (NULL);
+  
+  /* Left is already in result - so now do the shift */
+  if (shCount > 1)
     {
-      wassert (0);
+      emit2 ("ld a,!immedbyte+1", shCount);
+      emit2 ("!shortjp !tlabel", tlbl1->key + 100);
+      emitLabel (tlbl->key + 100);
     }
-  else
+  
+  offset = 0;
+  while (size--)
     {
-      /*  if (AOP(result)->type == AOP_REG) { */
-      int size = 2;
-      int offset = 0;
-      symbol *tlbl, *tlbl1;
-      const char *l;
-
-      tlbl = newiTempLabel (NULL);
-      tlbl1 = newiTempLabel (NULL);
-
-      /* Left is already in result - so now do the shift */
-      if (shCount > 1)
-	{
-	  emit2 ("ld a,!immedbyte+1", shCount);
-	  emit2 ("!shortjp !tlabel", tlbl1->key + 100);
-	  emitLabel (tlbl->key + 100);
-	}
-
-      emit2 ("or a,a");
-      offset = size;
-      while (size--)
-	{
-	  l = aopGet (AOP (result), --offset, FALSE);
-	  emit2 ("rr %s", l);
-	}
-      if (shCount > 1)
-	{
-	  emitLabel (tlbl1->key + 100);
-	  emit2 ("dec a");
-	  emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
-	}
+      l = aopGet (AOP (result), size, FALSE);
+      if (offset == 0)
+        {
+          emit2 ("%s %s", is_signed ? "sra" : "srl", l);
+        }
+      else
+        {
+          emit2 ("rr %s", l);
+        }
+      offset++;
+    }
+  if (shCount > 1)
+    {
+      emitLabel (tlbl1->key + 100);
+      emit2 ("dec a");
+      emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
     }
 }
 
@@ -4392,8 +4360,11 @@ shiftL2Left2Result (operand * left, int offl,
     emit2 ("or a,a");
     while (size--)
       {
-	l = aopGet (AOP (result), offset++, FALSE);
+	l = aopGet (AOP (result), offset, FALSE);
+
 	emit2 ("rl %s", l);
+
+        offset++;
       }
     if (shCount > 1)
       {
@@ -4681,7 +4652,9 @@ genLeftShift (iCode * ic)
   emit2 ("!shortjp !tlabel", tlbl1->key + 100);
   emitLabel (tlbl->key + 100);
   l = aopGet (AOP (result), offset, FALSE);
+
   emit2 ("or a,a");
+
   while (size--)
     {
       l = aopGet (AOP (result), offset++, FALSE);
@@ -4699,7 +4672,7 @@ genLeftShift (iCode * ic)
 /* genrshOne - left shift two bytes by known amount != 0           */
 /*-----------------------------------------------------------------*/
 static void
-genrshOne (operand * result, operand * left, int shCount)
+genrshOne (operand * result, operand * left, int shCount, int is_signed)
 {
   /* Errk */
   int size = AOP_SIZE (result);
@@ -4709,19 +4682,24 @@ genrshOne (operand * result, operand * left, int shCount)
   wassert (shCount < 8);
 
   l = aopGet (AOP (left), 0, FALSE);
+
+  emit2 ("or a,a");
+
   if (AOP (result)->type == AOP_REG)
     {
       aopPut (AOP (result), l, 0);
       l = aopGet (AOP (result), 0, FALSE);
       while (shCount--)
-	emit2 ("srl %s", l);
+        {
+          emit2 ("%s %s", is_signed ? "sra" : "srl", l);
+        }
     }
   else
     {
       _moveA (l);
       while (shCount--)
 	{
-	  emit2 ("srl a");
+	  emit2 ("%s a", is_signed ? "sra" : "srl");
 	}
       aopPut (AOP (result), "a", 0);
     }
@@ -4803,7 +4781,8 @@ static void
 genRightShiftLiteral (operand * left,
 		      operand * right,
 		      operand * result,
-		      iCode * ic)
+		      iCode * ic,
+                      int sign)
 {
   int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
   int size;
@@ -4832,17 +4811,17 @@ genRightShiftLiteral (operand * left,
       switch (size)
 	{
 	case 1:
-	  genrshOne (result, left, shCount);
+	  genrshOne (result, left, shCount, sign);
 	  break;
 	case 2:
 	  /* PENDING: sign support */
-	  genrshTwo (result, left, shCount, FALSE);
+	  genrshTwo (result, left, shCount, sign);
 	  break;
 	case 4:
-	  wassert (0);
+	  wassertl (0, "Asked to shift right a long which should be a function call");
 	  break;
 	default:
-	  wassert (0);
+	  wassertl (0, "Entered default case in right shift delegate");
 	}
     }
   freeAsmop (left, NULL, ic);
@@ -4886,7 +4865,7 @@ genRightShift (iCode * ic)
      as efficiently as possible */
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      genRightShiftLiteral (left, right, result, ic);
+      genRightShiftLiteral (left, right, result, ic, is_signed);
       return;
     }
 
@@ -4925,14 +4904,13 @@ genRightShift (iCode * ic)
       l = aopGet (AOP (result), offset--, FALSE);
       if (first)
 	{
-	  if (is_signed)
-	    emit2 ("sra %s", l);
-	  else
-	    emit2 ("srl %s", l);
+          emit2 ("%s %s", is_signed ? "sra" : "srl", l);
 	  first = 0;
 	}
       else
-	emit2 ("rr %s", l);
+        {
+          emit2 ("rr %s", l);
+        }
     }
   emitLabel (tlbl1->key + 100);
   emit2 ("dec a");

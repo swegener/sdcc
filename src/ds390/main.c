@@ -248,7 +248,7 @@ PORT ds390_port =
   },
     /* ds390 has an 8 bit mul */
   {
-    1, 0
+    1, -1
   },
   "_",
   _ds390_init,

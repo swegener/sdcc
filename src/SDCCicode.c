@@ -1632,7 +1632,7 @@ geniCodeMultiply (operand * left, operand * right,int resultIsInt)
      if port has 1 byte muldiv */
   if (p2 && !IS_FLOAT (letype) &&
       !((resultIsInt) && (getSize (resType) != getSize (ltype)) && 
-	(port->muldiv.native_below == 1)))
+	(port->support.muldiv == 1)))
     {
       if ((resultIsInt) && (getSize (resType) != getSize (ltype)))
 	{

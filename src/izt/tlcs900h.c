@@ -181,7 +181,7 @@ PORT tlcs900h_port =
   },
     /* tlcs900h has an 16 bit mul */
   {
-    2, 0
+    2, -1
   },
   "_",
   _tlcs900h_init,

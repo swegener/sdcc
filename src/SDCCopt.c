@@ -340,6 +340,14 @@ convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
 		func = __muldiv[1][bwd][su];
 	      else if (op == '%')
 		func = __muldiv[2][bwd][su];
+              else if (op == RRC)
+		func = __rlrr[1][bwd][su];
+              else if (op == RLC)
+		func = __rlrr[0][bwd][su];
+              else if (op == RIGHT_OP)
+		func = __rlrr[1][bwd][su];
+              else if (op == LEFT_OP)
+		func = __rlrr[0][bwd][su];
 	      else
 		assert (0);
 	      goto found;
@@ -373,32 +381,36 @@ found:
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
-
     }
   else
     {
-
       /* compiled as reentrant then push */
       /* push right */
       if (IS_REGPARM (func->args->next->etype))
-	newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+        }
       else
 	{
 	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
 	  newic->parmPush = 1;
-	  bytesPushed += getSize(type);
+
+	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
       /* insert push left */
       if (IS_REGPARM (func->args->etype))
-	newic = newiCode (SEND, IC_LEFT (ic), NULL);
+        {
+          newic = newiCode (SEND, IC_LEFT (ic), NULL);
+        }
       else
 	{
 	  newic = newiCode (IPUSH, IC_LEFT (ic), NULL);
 	  newic->parmPush = 1;
-	  bytesPushed += getSize(type);
+
+	  bytesPushed += getSize(operandType(IC_LEFT(ic)));
 	}
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
@@ -452,11 +464,22 @@ convertToFcall (eBBlock ** ebbs, int count)
 	  /* if long / int mult or divide or mod */
 	  if (ic->op == '*' || ic->op == '/' || ic->op == '%')
 	    {
-
 	      sym_link *type = operandType (IC_LEFT (ic));
-	      if (IS_INTEGRAL (type) && getSize (type) > port->muldiv.native_below)
-		convilong (ic, ebbs[i], type, ic->op);
+	      if (IS_INTEGRAL (type) && getSize (type) > port->support.muldiv)
+                {
+                  convilong (ic, ebbs[i], type, ic->op);
+                }
 	    }
+          
+          if (ic->op == RRC || ic->op == RLC || ic->op == LEFT_OP || ic->op == RIGHT_OP)
+            {
+	      sym_link *type = operandType (IC_LEFT (ic));
+
+	      if (IS_INTEGRAL (type) && getSize (type) > port->support.shift && port->support.shift >= 0)
+                {
+                  convilong (ic, ebbs[i], type, ic->op);
+                }
+            }
 	}
     }
 }

@@ -188,7 +188,7 @@ PORT mcs51_port =
   },
     /* mcs51 has an 8 bit mul */
   {
-    1, 0
+    1, -1
   },
   "_",
   _mcs51_init,

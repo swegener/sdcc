@@ -511,7 +511,7 @@ PORT z80_port =
   },
     /* Z80 has no native mul/div commands */
   {
-    0, 0
+    0, 2
   },
   "_",
   _z80_init,

@@ -272,7 +272,7 @@ PORT pic_port =
   },
     /* pic14 has an 8 bit mul */
   {
-    1, 0
+    1, -1
   },
   "_",
   _pic14_init,

@@ -2261,24 +2261,10 @@ symbol *__muldiv[3][3][2];
 sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
 symbol *__conv[2][3][2];
+/* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
+symbol *__rlrr[2][3][2];
 
 sym_link *floatType;
-
-static void 
-_makeRegParam (symbol * sym)
-{
-  value *val;
-
-  val = sym->args;		/* loop thru all the arguments   */
-
-  /* reset regparm for the port */
-  (*port->reset_regparms) ();
-  while (val)
-    {
-      SPEC_REGPARM (val->etype) = 1;
-      val = val->next;
-    }
-}
 
 static char *
 _mangleFunctionName(char *in)
@@ -2311,8 +2297,12 @@ initCSupport ()
   {
     "s", "u"
   };
+  const char *srlrr[] =
+  {
+    "rl", "rr"
+  };
 
-  int bwd, su, muldivmod, tofrom;
+  int bwd, su, muldivmod, tofrom, rlrr;
 
   floatType = newFloatLink ();
 
@@ -2381,8 +2371,22 @@ initCSupport ()
 		       sbwd[bwd]);
               __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
 	      SPEC_NONBANKED (__muldiv[muldivmod][bwd][su]->etype) = 1;
-	      if (bwd < port->muldiv.force_reg_param_below)
-		_makeRegParam (__muldiv[muldivmod][bwd][su]);
+	    }
+	}
+    }
+
+  for (rlrr = 0; rlrr < 2; rlrr++)
+    {
+      for (bwd = 0; bwd < 3; bwd++)
+	{
+	  for (su = 0; su < 2; su++)
+	    {
+	      sprintf (buffer, "_%s%s%s",
+		       srlrr[rlrr],
+		       ssu[su],
+		       sbwd[bwd]);
+              __rlrr[rlrr][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[0][0], 2, options.intlong_rent);
+	      SPEC_NONBANKED (__rlrr[rlrr][bwd][su]->etype) = 1;
 	    }
 	}
     }

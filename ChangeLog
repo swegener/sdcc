@@ -1,3 +1,8 @@
+2004-06-29 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCglue.c (printChar): fixed bug #973350, patch provided by
+	Phuah Yee Keat <yk.phuah AT nestac.com>
+
 2004-06-28 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* src/pic16/glue.c (pic16createInterruptVect): function now emits

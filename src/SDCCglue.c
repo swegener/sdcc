@@ -526,7 +526,7 @@ void
 printChar (FILE * ofile, char *s, int plen)
 {
   int i;
-  int len = strlen (s);
+  int len = plen;
   int pplen = 0;
   char buf[100];
   char *p = buf;

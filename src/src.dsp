@@ -261,6 +261,10 @@ SOURCE=..\support\Util\dbuf.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\support\Util\MySystem.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\support\Util\newalloc.h
 # End Source File
 # Begin Source File
@@ -346,6 +350,10 @@ SOURCE=.\SDCCset.h
 # Begin Source File
 
 SOURCE=.\SDCCsymt.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCutil.h
 # End Source File
 # Begin Source File
 

@@ -20,6 +20,9 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 #include <string.h>
 #define _POSIX_
 #include <limits.h>
+#if !defined(__BORLANDC__) && !defined(_MSC_VER)
+#include <unistd.h>
+#endif
 
 char ProgName[PATH_MAX];
 char LibName[PATH_MAX];
@@ -58,7 +61,7 @@ void GetNameFromPath(char * path, char * name)
 
 void ChangeExtension(char * path, char * ext)
 {
-	int i, j;
+	int i;
 
 	for(i=0; path[i]!=0; i++);
 	for(; (path[i]!='.')&&(path[i]!='\\')&&(path[i]!='/')&&(i>=0); i--);
@@ -86,7 +89,6 @@ void CleanLine(char * buff)
 
 int set_options (char * opt)
 {
-	char temp[255];
 	int rvalue=0, unknown=0;
 	static char Help[] =
 	"Usage: %s [-options] library relfile\n\n"

@@ -1,5 +1,5 @@
-#CC = sdcc
-CC = /home/johan/sdcc/bin/sdcc
+CC = sdcc
+#CC = /home/johan/sdcc/bin/sdcc
 
 MFLAGS = -mds390
 LFLAGS = --xram-loc 0x180080 --code-loc 0x10000 -Wl-r

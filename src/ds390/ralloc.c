@@ -2123,7 +2123,7 @@ packRegsDPTRuse (operand * op)
 	    (!isOperandInFarSpace(IC_RIGHT(ic)) || 
 	     isOperandInReg(IC_RIGHT(ic)))) continue ;
 
-	/* special case */
+	/* special cases  */
 	/* pointerGet */
 	if (POINTER_GET(ic) && !isOperandEqual(IC_LEFT(ic),op) &&
 	    getSize(operandType(IC_LEFT(ic))) > 1 ) return NULL ;
@@ -2132,8 +2132,9 @@ packRegsDPTRuse (operand * op)
 	if (POINTER_SET(ic) && !isOperandEqual(IC_RESULT(ic),op) &&
 	    getSize(operandType(IC_RESULT(ic))) > 1 ) return NULL;
 
-	/* conditionals can destroy 'b' */
-	if (IS_CONDITIONAL(ic) && getSize(operandType(op)) > 3) return NULL;
+	/* conditionals can destroy 'b' - make sure B wont be used in this one*/
+	if ((IS_CONDITIONAL(ic) || ic->op == '*' || ic->op == '/' ) && 
+	    getSize(operandType(op)) > 3) return NULL;
 
 	/* general case */
 	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && 

@@ -1661,7 +1661,7 @@ computeTypeOr (sym_link * etype1, sym_link * etype2, sym_link * reType)
 /*------------------------------------------------------------------*/
 sym_link *
 computeType (sym_link * type1, sym_link * type2,
-             RESULT_TYPE resultType, char op)
+             RESULT_TYPE resultType, int op)
 {
   sym_link *rType;
   sym_link *reType;
@@ -1733,6 +1733,7 @@ computeType (sym_link * type1, sym_link * type2,
 	break;
       case RESULT_TYPE_INT:
       case RESULT_TYPE_NONE:
+      case RESULT_TYPE_OTHER:
 	if (IS_BIT (reType))
 	  {
 	    SPEC_NOUN (reType) = V_CHAR;
@@ -1759,7 +1760,16 @@ computeType (sym_link * type1, sym_link * type2,
 		SPEC_USIGN (reType) = 1;
 		return rType;
 	      }
-	    else
+	    else if (op == '*')
+	      {
+		SPEC_NOUN (reType) = V_INT;
+		SPEC_USIGN (reType) = 0;
+		return rType;
+	      }
+	    /* TODO: should be in SDCCast.c */
+	    else if (   op == '/'
+		     && (   !SPEC_USIGN (etype1)
+			 || !SPEC_USIGN (etype2)))
 	      {
 		SPEC_NOUN (reType) = V_INT;
 		SPEC_USIGN (reType) = 0;

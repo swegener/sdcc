@@ -513,7 +513,6 @@ typedef enum
   RESULT_TYPE_INT,
   RESULT_TYPE_OTHER,	/* operands will be promoted to int */
   RESULT_TYPE_IFX,
-  RESULT_TYPE_NOPROM,	/* operands will be promoted to int */
 } RESULT_TYPE;
 
 /* forward definitions for the symbol table related functions */
@@ -555,7 +554,7 @@ int funcInChain (sym_link *);
 void addSymChain (symbol *);
 sym_link *structElemType (sym_link *, value *);
 symbol *getStructElement (structdef *, symbol *);
-sym_link *computeType (sym_link *, sym_link *, RESULT_TYPE, char);
+sym_link *computeType (sym_link *, sym_link *, RESULT_TYPE, int);
 void processFuncArgs (symbol *);
 int isSymbolEqual (symbol *, symbol *);
 int powof2 (TYPE_UDWORD);

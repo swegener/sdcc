@@ -1,6 +1,14 @@
 2004-03-09 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/time.c (mktime): fixed bug reported by Bert Thomas
+	* sdcc.spec: updated and split sdcc into 3 rpms
+	* src/SDCCast.c (decorateType): &|^ don't need addCast(); addCast() is
+	needed for literals of LEFT_OP and '+'
+	* src/SDCCicode.c (geniCodeLogic): I must have been braindead when I
+	introduced RESULT_TYPE_NOPROM
+	* src/SDCCsymt.c (computeType): op is int; added RESULT_TYPE_OTHER;
+	limited promotion to int only for '*'
+	* src/SDCCsymt.h (computeType): op is int, removed RESULT_TYPE_NOPROM
 
 2004-03-09 Hans Dorn <hjdorn AT users.sourceforge.net>
 

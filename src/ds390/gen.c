@@ -7605,9 +7605,9 @@ static void genJumpTab (iCode *ic)
     /* get the condition into accumulator */
     l = aopGet(AOP(IC_JTCOND(ic)),0,FALSE,FALSE);
     MOVA(l);
-    /* multiply by three */
+    /* multiply by four! */
     emitcode("add","a,acc");
-    emitcode("add","a,%s",aopGet(AOP(IC_JTCOND(ic)),0,FALSE,FALSE));
+    emitcode("add","a,acc");
     freeAsmop(IC_JTCOND(ic),NULL,ic,TRUE);
 
     jtab = newiTempLabel(NULL);

@@ -550,7 +550,17 @@ storage_class_specifier
    ;
 
 Interrupt_storage
-   : INTERRUPT CONSTANT  { $$ = (int) floatFromVal($2) ;  }
+   : INTERRUPT { $$ = INTNO_UNSPEC ; }
+   | INTERRUPT CONSTANT
+        { int intno = (int) floatFromVal($2);
+          if ((intno >= 0) && (intno <= INTNO_MAX))
+            $$ = intno;
+          else
+            {
+              werror(E_INT_BAD_INTNO, intno);
+              $$ = INTNO_UNSPEC;
+            }
+        }
    ;
 
 type_specifier

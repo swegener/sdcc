@@ -35,7 +35,7 @@
 #include <unistd.h>
 #endif
 
-symbol *interrupts[256];
+symbol *interrupts[INTNO_MAX+1];
 
 void printIval (symbol *, sym_link *, initList *, FILE *);
 set *publics = NULL;		/* public variables */

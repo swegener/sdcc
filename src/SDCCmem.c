@@ -325,9 +325,9 @@ allocGlobal (symbol * sym)
       SPEC_OCLS (sym->etype) = code;
       /* if this is an interrupt service routine
          then put it in the interrupt service array */
-      if (FUNC_ISISR (sym->type) && !options.noiv)
+      if (FUNC_ISISR (sym->type) && !options.noiv
+          && (FUNC_INTNO (sym->type) != INTNO_UNSPEC))
 	{
-
 	  if (interrupts[FUNC_INTNO (sym->type)])
 	    werror (E_INT_DEFINED,
 		    FUNC_INTNO (sym->type),

@@ -389,6 +389,8 @@ struct
     "integer overflow in expression" },
 { W_USELESS_DECL, ERROR_LEVEL_WARNING,
     "useless declaration (possible use of keyword as variable name)" },
+{ E_INT_BAD_INTNO, ERROR_LEVEL_ERROR,
+    "interrupt number '%u' is not valid" },
 };
 
 /*

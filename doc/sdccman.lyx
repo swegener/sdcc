@@ -7394,7 +7394,7 @@ void timer_isr (void) interrupt 1 using 1
 }
 \layout Standard
 
-The number following the 
+The optional number following the 
 \emph on 
 interrupt
 \begin_inset LatexCommand \index{interrupt}
@@ -7404,8 +7404,8 @@ interrupt
 
 \emph default 
  keyword is the interrupt number this routine will service.
- The compiler will insert a call to this routine in the interrupt vector
- table for the interrupt number specified.
+ When present, the compiler will insert a call to this routine in the
+ interrupt vector table for the interrupt number specified.
  The 
 \emph on 
 using
@@ -11295,9 +11295,10 @@ will generate the following code:
 \SpecialChar ~
 \SpecialChar ~
  mov\SpecialChar ~
+\SpecialChar ~
  a,(_gint + 1) 
 \newline 
-000C 33\SpecialChar ~
+000C 23\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -11323,13 +11324,12 @@ will generate the following code:
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- rlc\SpecialChar ~
+ rl\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
  a 
 \newline 
-000D E4\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
+000D 54 01\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -11352,13 +11352,10 @@ will generate the following code:
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- clr\SpecialChar ~
- a 
+ andl\SpecialChar ~
+ a,#0x01 
 \newline 
-000E 13\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
+000F F5*02\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -11381,33 +11378,8 @@ will generate the following code:
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
- rrc\SpecialChar ~
- a 
-\newline 
-000F F5*02\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
- 66\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
  mov\SpecialChar ~
+\SpecialChar ~
  _foo_hob_1_1,a
 \layout Standard
 

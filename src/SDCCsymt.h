@@ -30,6 +30,9 @@
 #include "SDCChasht.h"
 #include "SDCCglobl.h"
 
+#define INTNO_MAX 255			/* maximum allowed interrupt number */
+#define INTNO_UNSPEC (INTNO_MAX+1)	/* interrupt number unspecified */
+
 enum {
     TYPEOF_INT=1,
     TYPEOF_SHORT,

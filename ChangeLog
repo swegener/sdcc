@@ -1,3 +1,30 @@
+2004-01-14 Vangelis Rokas <vrokas@otenet.gr>
+
+	Documenting changes from previous commits.
+	* configure.in (version 1.56),
+	* configure: initially I've added AC_CONFIG_SUBDIRS(device/lib/pic16)
+	when generating output files to configure the pic16 library,
+	but now I've commented it out, since gputils aren't installed in the
+	SF compile farm, so library won't compile
+
+	* device/lib/Makefile.in (version 1.56): initially I've added in
+	target 'all' the prerequestive 'model-pic16' so it compiled the
+	pic16 library, but now I've commented it out for the same reasons
+	above,
+	* added targets 'model-pic16' and 'objects-pic16' to compile the
+	library
+	* added target 'port-specific-objects-pic16' to handle the
+	generated libraries and copy them into the build/ directory
+	* added target 'clean-intermediate-pic16' to clean intermediate
+	files into pic16 directory
+	* in target 'installdirs' added line to create directory pic16 in
+	the installation path
+	
+	* device/include/Makefile.in (version 1.11): in target 'install'
+	added lines to copy all header files to installation path,
+	* in target 'installdirs' added line create directory for pic16
+	headers in the installation path 
+
 2004-01-13 Klaus Flittner <klaus_flittner@gmx.de>
 
 	* src/ds390/gen.c (genCall): fixed a double use of acc and b after

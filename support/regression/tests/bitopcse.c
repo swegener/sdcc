@@ -7,12 +7,15 @@
 /* This is not only a regression test, the focus of this test
    is more on the generated code (volatile!). */
 
-
 #define _{type}
 
-#if defined(_bit)
+#if defined(_bit) && !defined(PORT_HOST)
 #  define MASK 1
 #  define idata
+#elif defined(_bit) && defined(PORT_HOST)
+#  define MASK 0xffffffff
+#  define idata
+#  define bit int
 #elif defined(_char)
 #  define MASK 0xff
 #elif defined(_short)
@@ -24,11 +27,11 @@
 #endif
 
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
-# define idata
-# define code
+#  define idata
+#  define code
 #endif
 
-/* the variable 'mask' is only define to see if MASK is correctly set up */
+/* the variable 'mask' is only defined to see if MASK is correctly set up */
 code unsigned long mask = MASK;
 
       volatile          {type}  v;
@@ -47,7 +50,7 @@ testcse(void)
    b = 0xeb;
   ub = 0xbe;
    v = 0x33;
-  uv = 0xab;
+  uv = 0x7b;
 
    a0   =    0 & b;
    a1   =    0 & v;
@@ -99,19 +102,19 @@ testcse(void)
    ASSERT( a0  ==  0);
    ASSERT( a1  ==  0);
    ASSERT( a2  ==  b);
-#if defined(_bit)
+#if defined(_bit) && !defined(PORT_HOST)
    ASSERT( a3  == 1);
 #else
    ASSERT( a3  == ({type}) 0x33);
 #endif
    ASSERT(ua0  == ub);
-#if defined(_bit)
+#if defined(_bit) && !defined(PORT_HOST)
    ASSERT(ua1  == 1);
 #else
-   ASSERT(ua1  == ({type}) 0xab);
+   ASSERT(ua1  == ({type}) 0x7b);
 #endif
    ASSERT( a4  ==  b);
-#if defined(_bit)
+#if defined(_bit) && !defined(PORT_HOST)
    ASSERT( a5  == 1);
 #else
    ASSERT( a5  == ({type}) 0x33);

@@ -869,6 +869,8 @@ updateSpillLocation (iCode * ic)
       if (!IC_RIGHT (ic)->noSpilLoc &&
 	  !IS_VOLATILE (setype) &&
 	  !IN_FARSPACE (SPEC_OCLS (setype)) &&
+          /* PENDING */
+          !TARGET_IS_Z80 &&
 	  !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
 
 	SPIL_LOC (IC_RIGHT (ic)) =
@@ -886,6 +888,8 @@ updateSpillLocation (iCode * ic)
       if (!IC_RIGHT (ic)->noSpilLoc &&
 	  !IS_VOLATILE (setype) &&
 	  !IN_FARSPACE (SPEC_OCLS (setype)) &&
+          /* PENDING */
+          !TARGET_IS_Z80 &&
 	  !OTHERS_PARM (OP_SYMBOL (IC_RESULT (ic))))
 
 	SPIL_LOC (IC_RIGHT (ic)) =

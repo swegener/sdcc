@@ -71,28 +71,22 @@ enum
 #define DISABLE_PACKREGSFORSUPPORT	1
 #define DISABLE_PACKREGSFORACCUSE	1
 
-/*-----------------------------------------------------------------*/
-/* At this point we start getting processor specific although      */
-/* some routines are non-processor specific & can be reused when   */
-/* targetting other processors. The decision for this will have    */
-/* to be made on a routine by routine basis                        */
-/* routines used to pack registers are most definitely not reusable */
-/* since the pack the registers depending strictly on the MCU      */
-/*-----------------------------------------------------------------*/
-
-bitVect *spiltSet = NULL;
-set *stackSpil = NULL;
-bitVect *regAssigned = NULL;
-short blockSpil = 0;
-int slocNum = 0;
 extern void genZ80Code (iCode *);
-bitVect *funcrUsed = NULL;	/* registers used in a function */
-int stackExtend = 0;
-int dataExtend = 0;
-int _nRegs;
 
-/** Set to help debug register pressure related problems */
-#define DEBUG_FAKE_EXTRA_REGS	0
+/** Local static variables */
+static struct
+{
+  bitVect *spiltSet;
+  set *stackSpil;
+  bitVect *regAssigned;
+  short blockSpil;
+  int slocNum;
+  /* registers used in a function */
+  bitVect *funcrUsed;
+  int stackExtend;
+  int dataExtend;
+  int nRegs;
+} _G;
 
 static regs _gbz80_regs[] =
 {
@@ -107,16 +101,6 @@ static regs _z80_regs[] =
   {REG_GPR, B_IDX, "b", 1},
   {REG_GPR, E_IDX, "e", 1},
   {REG_GPR, D_IDX, "d", 1},
-#if DEBUG_FAKE_EXTRA_REGS
-  {REG_GPR, M_IDX, "m", 1},
-  {REG_GPR, N_IDX, "n", 1},
-  {REG_GPR, O_IDX, "o", 1},
-  {REG_GPR, P_IDX, "p", 1},
-  {REG_GPR, Q_IDX, "q", 1},
-  {REG_GPR, R_IDX, "r", 1},
-  {REG_GPR, S_IDX, "s", 1},
-  {REG_GPR, T_IDX, "t", 1},
-#endif
   {REG_CND, CND_IDX, "c", 1}
 };
 
@@ -139,15 +123,16 @@ allocReg (short type)
 {
   int i;
 
-  for (i = 0; i < _nRegs; i++)
+  for (i = 0; i < _G.nRegs; i++)
     {
       /* For now we allocate from any free */
       if (regsZ80[i].isFree)
 	{
 	  regsZ80[i].isFree = 0;
 	  if (currFunc)
-	    currFunc->regsUsed =
-	      bitVectSetBit (currFunc->regsUsed, i);
+            {
+              currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, i);
+            }
 	  D (D_ALLOC, ("allocReg: alloced %p\n", &regsZ80[i]));
 	  return &regsZ80[i];
 	}
@@ -163,12 +148,15 @@ regWithIdx (int idx)
 {
   int i;
 
-  for (i = 0; i < _nRegs; i++)
-    if (regsZ80[i].rIdx == idx)
-      return &regsZ80[i];
+  for (i = 0; i < _G.nRegs; i++)
+    {
+      if (regsZ80[i].rIdx == idx)
+        {
+          return &regsZ80[i];
+        }
+    }
 
-  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	  "regWithIdx not found");
+  wassertl (0, "regWithIdx not found");
   exit (1);
 }
 
@@ -191,11 +179,13 @@ nFreeRegs (int type)
   int i;
   int nfr = 0;
 
-  for (i = 0; i < _nRegs; i++)
+  for (i = 0; i < _G.nRegs; i++)
     {
       /* For now only one reg type */
       if (regsZ80[i].isFree)
-	nfr++;
+        {
+          nfr++;
+        }
     }
   return nfr;
 }
@@ -209,7 +199,9 @@ nfreeRegsType (int type)
   if (type == REG_PTR)
     {
       if ((nfr = nFreeRegs (type)) == 0)
-	return nFreeRegs (REG_GPR);
+        {
+          return nFreeRegs (REG_GPR);
+        }
     }
 
   return nFreeRegs (type);
@@ -261,13 +253,13 @@ computeSpillable (iCode * ic)
 
   spillable = bitVectCopy (ic->rlive);
   spillable =
-    bitVectCplAnd (spillable, spiltSet);	/* those already spilt */
+    bitVectCplAnd (spillable, _G.spiltSet);	/* those already spilt */
   spillable =
     bitVectCplAnd (spillable, ic->uses);	/* used in this one */
   bitVectUnSetBit (spillable, ic->defKey);
-  spillable = bitVectIntersect (spillable, regAssigned);
-  return spillable;
+  spillable = bitVectIntersect (spillable, _G.regAssigned);
 
+  return spillable;
 }
 
 /*-----------------------------------------------------------------*/
@@ -310,7 +302,7 @@ allLRs (symbol * sym, eBBlock * ebp, iCode * ic)
 
 /** liveRangesWith - applies function to a given set of live range 
  */
-set *
+static set *
 liveRangesWith (bitVect * lrs, int (func) (symbol *, eBBlock *, iCode *),
 		eBBlock * ebp, iCode * ic)
 {
@@ -330,13 +322,14 @@ liveRangesWith (bitVect * lrs, int (func) (symbol *, eBBlock *, iCode *),
          hash table we are in serious trouble */
       if (!(sym = hTabItemWithKey (liveRanges, i)))
 	{
-	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		  "liveRangesWith could not find liveRange");
+          wassertl (0, "liveRangesWith could not find liveRange");
 	  exit (1);
 	}
 
-      if (func (sym, ebp, ic) && bitVectBitValue (regAssigned, sym->key))
-	addSetHead (&rset, sym);
+      if (func (sym, ebp, ic) && bitVectBitValue (_G.regAssigned, sym->key))
+        {
+          addSetHead (&rset, sym);
+        }
     }
 
   return rset;
@@ -345,7 +338,7 @@ liveRangesWith (bitVect * lrs, int (func) (symbol *, eBBlock *, iCode *),
 
 /** leastUsedLR - given a set determines which is the least used 
  */
-symbol *
+static symbol *
 leastUsedLR (set * sset)
 {
   symbol *sym = NULL, *lsym = NULL;
@@ -385,9 +378,14 @@ noOverLap (set * itmpStack, symbol * fsym)
   for (sym = setFirstItem (itmpStack); sym;
        sym = setNextItem (itmpStack))
     {
-      if (sym->liveTo > fsym->liveFrom)
-	return 0;
-
+            // if sym starts before (or on) our end point
+            // and ends after (or on) our start point, 
+            // it is an overlap.
+	    if (sym->liveFrom <= fsym->liveTo &&
+		sym->liveTo   >= fsym->liveFrom)
+	    {
+	    	return 0;
+	    }
     }
   return 1;
 }
@@ -423,7 +421,7 @@ DEFSETFUNC (isFree)
 /*-----------------------------------------------------------------*/
 /* createStackSpil - create a location on the stack to spil        */
 /*-----------------------------------------------------------------*/
-symbol *
+static symbol *
 createStackSpil (symbol * sym)
 {
   symbol *sloc = NULL;
@@ -432,7 +430,7 @@ createStackSpil (symbol * sym)
 
   /* first go try and find a free one that is already 
      existing on the stack */
-  if (applyToSet (stackSpil, isFree, &sloc, sym))
+  if (applyToSet (_G.stackSpil, isFree, &sloc, sym))
     {
       /* found a free one : just update & return */
       sym->usl.spillLoc = sloc;
@@ -447,7 +445,7 @@ createStackSpil (symbol * sym)
      we need to allocate this on the stack : this is really a
      hack!! but cannot think of anything better at this time */
 
-  sprintf (buffer, "sloc%d", slocNum++);
+  sprintf (buffer, "sloc%d", _G.slocNum++);
   sloc = newiTemp (buffer);
 
   /* set the type to the spilling symbol */
@@ -455,13 +453,6 @@ createStackSpil (symbol * sym)
   sloc->etype = getSpec (sloc->type);
   SPEC_SCLS (sloc->etype) = S_AUTO;
 
-  /* we don't allow it to be allocated`
-     onto the external stack since : so we
-     temporarily turn it off ; we also
-     turn off memory model to prevent
-     the spil from going to the external storage
-     and turn off overlaying 
-   */
   allocLocal (sloc);
 
   sloc->isref = 1;		/* to prevent compiler warning */
@@ -470,13 +461,15 @@ createStackSpil (symbol * sym)
   if (IN_STACK (sloc->etype))
     {
       currFunc->stack += getSize (sloc->type);
-      stackExtend += getSize (sloc->type);
+      _G.stackExtend += getSize (sloc->type);
     }
   else
-    dataExtend += getSize (sloc->type);
+    {
+      _G.dataExtend += getSize (sloc->type);
+    }
 
   /* add it to the stackSpil set */
-  addSetHead (&stackSpil, sloc);
+  addSetHead (&_G.stackSpil, sloc);
   sym->usl.spillLoc = sloc;
   sym->stackSpil = 1;
 
@@ -486,33 +479,6 @@ createStackSpil (symbol * sym)
 
   D (D_ALLOC, ("createStackSpil: created new\n"));
   return sym;
-}
-
-/*-----------------------------------------------------------------*/
-/* isSpiltOnStack - returns true if the spil location is on stack  */
-/*-----------------------------------------------------------------*/
-bool 
-isSpiltOnStack (symbol * sym)
-{
-  sym_link *etype;
-
-  if (!sym)
-    return FALSE;
-
-  if (!sym->isspilt)
-    return FALSE;
-
-/*     if (sym->stackSpil) */
-/*      return TRUE; */
-
-  if (!sym->usl.spillLoc)
-    return FALSE;
-
-  etype = getSpec (sym->usl.spillLoc->type);
-  if (IN_STACK (etype))
-    return TRUE;
-
-  return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -529,13 +495,15 @@ spillThis (symbol * sym)
      we are okay, else we need to create a spillLocation
      for it */
   if (!(sym->remat || sym->usl.spillLoc))
-    createStackSpil (sym);
+    {
+      createStackSpil (sym);
+    }
 
   /* mark it has spilt & put it in the spilt set */
   sym->isspilt = 1;
-  spiltSet = bitVectSetBit (spiltSet, sym->key);
+  _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
 
-  bitVectUnSetBit (regAssigned, sym->key);
+  bitVectUnSetBit (_G.regAssigned, sym->key);
 
   for (i = 0; i < sym->nRegs; i++)
     {
@@ -546,13 +514,71 @@ spillThis (symbol * sym)
 	}
     }
 
-  /* if spilt on stack then free up r0 & r1 
-     if they could have been assigned to some
-     LIVE ranges */
   if (sym->usl.spillLoc && !sym->remat)
-    sym->usl.spillLoc->allocreq = 1;
+    {
+      sym->usl.spillLoc->allocreq = 1;
+    }
   return;
 }
+
+#if DISABLED
+/*-----------------------------------------------------------------*/
+/* allDefsOutOfRange - all definitions are out of a range          */
+/*-----------------------------------------------------------------*/
+static bool
+allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
+{
+  int i;
+
+  if (!defs)
+    return TRUE;
+
+  for (i = 0; i < defs->size; i++)
+    {
+      iCode *ic;
+
+      if (bitVectBitValue (defs, i) &&
+	  (ic = hTabItemWithKey (iCodehTab, i)) &&
+	  (ic->seq >= fseq && ic->seq <= toseq))
+
+	return FALSE;
+
+    }
+
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* hasSpilLocnoUptr - will return 1 if the symbol has spil location */
+/*                    but is not used as a pointer                 */
+/*-----------------------------------------------------------------*/
+static int
+hasSpilLocnoUptr (symbol * sym, eBBlock * ebp, iCode * ic)
+{
+  return ((sym->usl.spillLoc && !sym->uptr) ? 1 : 0);
+}
+
+/*-----------------------------------------------------------------*/
+/* notUsedInBlock - not used in this block                         */
+/*-----------------------------------------------------------------*/
+static int
+notUsedInBlock (symbol * sym, eBBlock * ebp, iCode * ic)
+{
+  return (!bitVectBitsInCommon (sym->defs, ebp->usesDefs) &&
+	  allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq));
+/*     return (!bitVectBitsInCommon(sym->defs,ebp->usesDefs)); */
+}
+
+/*-----------------------------------------------------------------*/
+/* notUsedInRemaining - not used or defined in remain of the block */
+/*-----------------------------------------------------------------*/
+static int
+notUsedInRemaining (symbol * sym, eBBlock * ebp, iCode * ic)
+{
+  return ((usedInRemaining (operandFromSymbol (sym), ic) ? 0 : 1) &&
+	  allDefsOutOfRange (sym->defs, ebp->fSeq, ebp->lSeq));
+}
+#endif
 
 /** Select a iTemp to spil : rather a simple procedure.
  */
@@ -595,13 +621,14 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
       /* check if there are any live ranges allocated
          to registers that are not used in this block */
-      if (!blockSpil && (selectS = liveRangesWith (lrcs, notUsedInBlock, ebp, ic)))
+      if (!_G.blockSpil && (selectS = liveRangesWith (lrcs, notUsedInBlock, ebp, ic)))
 	{
 	  sym = leastUsedLR (selectS);
 	  /* if this is not rematerializable */
 	  if (!sym->remat)
 	    {
-	      blockSpil++;
+	      _G.blockSpil++;
+              wassertl (0, "Attempted to do an unsupported block spill");
 	      sym->blockSpil = 1;
 	    }
 	  return sym;
@@ -609,15 +636,16 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
       /* check if there are any live ranges that not
          used in the remainder of the block */
-      if (!blockSpil && (selectS = liveRangesWith (lrcs, notUsedInRemaining, ebp, ic)))
+      if (!_G.blockSpil && (selectS = liveRangesWith (lrcs, notUsedInRemaining, ebp, ic)))
 	{
 	  sym = leastUsedLR (selectS);
-	  if (sym != ForSym)
+	  if (sym != forSym)
 	    {
 	      if (!sym->remat)
 		{
+                  wassertl (0, "Attempted to do an unsupported remain spill");
 		  sym->remainSpil = 1;
-		  blockSpil++;
+		  _G.blockSpil++;
 		}
 	      return sym;
 	    }
@@ -679,16 +707,19 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 
   /* mark it as spilt */
   ssym->isspilt = 1;
-  spiltSet = bitVectSetBit (spiltSet, ssym->key);
+  _G.spiltSet = bitVectSetBit (_G.spiltSet, ssym->key);
 
   /* mark it as not register assigned &
      take it away from the set */
-  bitVectUnSetBit (regAssigned, ssym->key);
+  bitVectUnSetBit (_G.regAssigned, ssym->key);
 
   /* mark the registers as free */
   for (i = 0; i < ssym->nRegs; i++)
     if (ssym->regs[i])
       freeReg (ssym->regs[i]);
+
+  wassertl (ssym->blockSpil == 0, "Encountered a sym with a block spill");
+  wassertl (ssym->remainSpil == 0, "Encountered a sym with a remain spill");
 #if 0
   /* if spilt on stack then free up r0 & r1 
      if they could have been assigned to as gprs */
@@ -808,7 +839,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 	  continue;
 	}
 
-      if (!bitVectBitValue (regAssigned, sym->key))
+      if (!bitVectBitValue (_G.regAssigned, sym->key))
 	continue;
 
       /* special case check if this is an IFX &
@@ -827,7 +858,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 	{
 	  int i = 0;
 
-	  bitVectUnSetBit (regAssigned, sym->key);
+	  bitVectUnSetBit (_G.regAssigned, sym->key);
 
 	  /* if the result of this one needs registers
 	     and does not have it then assign it right
@@ -846,7 +877,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 	      result->nRegs &&	/* which needs registers */
 	      !result->isspilt &&	/* and does not already have them */
 	      !result->remat &&
-	      !bitVectBitValue (regAssigned, result->key) &&
+	      !bitVectBitValue (_G.regAssigned, result->key) &&
 	  /* the number of free regs + number of regs in this LR
 	     can accomodate the what result Needs */
 	      ((nfreeRegsType (result->regType) +
@@ -870,7 +901,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		    }
 		}
 
-	      regAssigned = bitVectSetBit (regAssigned, result->key);
+	      _G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
 	    }
 
 	  /* free the remaining */
@@ -902,11 +933,11 @@ reassignLR (operand * op)
 
   /* not spilt any more */
   sym->isspilt = sym->blockSpil = sym->remainSpil = 0;
-  bitVectUnSetBit (spiltSet, sym->key);
+  bitVectUnSetBit (_G.spiltSet, sym->key);
 
-  regAssigned = bitVectSetBit (regAssigned, sym->key);
+  _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
 
-  blockSpil--;
+  _G.blockSpil--;
 
   for (i = 0; i < sym->nRegs; i++)
     sym->regs[i]->isFree = 0;
@@ -972,7 +1003,7 @@ tryAllocatingRegPair (symbol * sym)
 {
   int i;
   wassert (sym->nRegs == 2);
-  for (i = 0; i < _nRegs; i += 2)
+  for (i = 0; i < _G.nRegs; i += 2)
     {
       if ((regsZ80[i].isFree) && (regsZ80[i + 1].isFree))
 	{
@@ -1060,7 +1091,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	         or will not live beyond this instructions */
 	      if (!sym->nRegs ||
 		  sym->isspilt ||
-		  bitVectBitValue (regAssigned, sym->key) ||
+		  bitVectBitValue (_G.regAssigned, sym->key) ||
 		  sym->liveTo <= ic->seq)
 		{
 		  D (D_ALLOC, ("serialRegAssign: wont live long enough.\n"));
@@ -1070,7 +1101,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      /* if some liverange has been spilt at the block level
 	         and this one live beyond this block then spil this
 	         to be safe */
-	      if (blockSpil && sym->liveTo > ebbs[i]->lSeq)
+	      if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
 		{
 		  D (D_ALLOC, ("serialRegAssign: \"spilling to be safe.\"\n"));
 		  spillThis (sym);
@@ -1113,7 +1144,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 	      }
 
 	      /* else we assign registers to it */
-	      regAssigned = bitVectSetBit (regAssigned, sym->key);
+	      _G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
 
 	      /* Special case:  Try to fit into a reg pair if
 	         available */
@@ -1174,7 +1205,7 @@ rUmaskForOp (operand * op)
   if (sym->isspilt || !sym->nRegs)
     return NULL;
 
-  rumask = newBitVect (_nRegs);
+  rumask = newBitVect (_G.nRegs);
 
   for (j = 0; j < sym->nRegs; j++)
     {
@@ -1195,7 +1226,7 @@ z80_rUmaskForOp (operand * op)
 bitVect *
 regsUsedIniCode (iCode * ic)
 {
-  bitVect *rmask = newBitVect (_nRegs);
+  bitVect *rmask = newBitVect (_G.nRegs);
 
   /* do the special cases first */
   if (ic->op == IFX)
@@ -1261,12 +1292,12 @@ createRegMask (eBBlock ** ebbs, int count)
 	  /* first mark the registers used in this
 	     instruction */
 	  ic->rUsed = regsUsedIniCode (ic);
-	  funcrUsed = bitVectUnion (funcrUsed, ic->rUsed);
+	  _G.funcrUsed = bitVectUnion (_G.funcrUsed, ic->rUsed);
 
 	  /* now create the register mask for those 
 	     registers that are in use : this is a
 	     super set of ic->rUsed */
-	  ic->rMask = newBitVect (_nRegs + 1);
+	  ic->rMask = newBitVect (_G.nRegs + 1);
 
 	  /* for all live Ranges alive at this point */
 	  for (j = 1; j < ic->rlive->size; j++)
@@ -1407,7 +1438,7 @@ freeAllRegs ()
 
   D (D_ALLOC, ("freeAllRegs: running.\n"));
 
-  for (i = 0; i < _nRegs; i++)
+  for (i = 0; i < _G.nRegs; i++)
     regsZ80[i].isFree = 1;
 }
 
@@ -1431,12 +1462,12 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   D (D_ALLOC, ("packRegsForAssign: running on ic %p\n", ic));
 
-  if (
-  /*      !IS_TRUE_SYMOP(IC_RESULT(ic)) || */
-       !IS_ITEMP (IC_RIGHT (ic)) ||
-       OP_LIVETO (IC_RIGHT (ic)) > ic->seq ||
-       OP_SYMBOL (IC_RIGHT (ic))->isind)
-    return 0;
+  if (!IS_ITEMP (IC_RIGHT (ic)) ||
+      OP_SYMBOL (IC_RIGHT (ic))->isind ||
+      OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
+    {
+      return 0;
+    }
 
 #if 0
   /* if the true symbol is defined in far space or on stack
@@ -1541,6 +1572,7 @@ pack:
     }
 
   remiCodeFromeBBlock (ebp, ic);
+  // PENDING: Check vs mcs51
   return 1;
 }
 
@@ -1652,6 +1684,7 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 	IC_RIGHT (dic)->operand.symOperand;
       IC_LEFT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
       remiCodeFromeBBlock (ebp, dic);
+      // PENDING: Check vs mcs51
       change++;
     }
 
@@ -1676,6 +1709,7 @@ right:
       IC_RIGHT (ic)->key = IC_RIGHT (dic)->operand.symOperand->key;
 
       remiCodeFromeBBlock (ebp, dic);
+      // PENDING: vs mcs51
       change++;
     }
 
@@ -1693,6 +1727,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   bitVect *uses;
   iCode *dic, *sic;
 
+  // PENDING: Disable
   D (D_ALLOC, ("packRegsForOneUse: running on ic %p\n", ic));
 
   /* if returning a literal then do nothing */
@@ -1946,6 +1981,8 @@ packRegsForAccUse (iCode * ic)
       IC_LEFT (uic)->key != IC_RESULT (ic)->key)
     return;
 
+  // See mcs51 ralloc for reasoning
+#if 0
   /* if one of them is a literal then we can */
   if ((IC_LEFT (uic) && IS_OP_LITERAL (IC_LEFT (uic))) ||
       (IC_RIGHT (uic) && IS_OP_LITERAL (IC_RIGHT (uic))))
@@ -1953,6 +1990,7 @@ packRegsForAccUse (iCode * ic)
       goto accuse;
       return;
     }
+#endif
 
 /** This is confusing :)  Guess for now */
   if (IC_LEFT (uic)->key == IC_RESULT (ic)->key &&
@@ -2488,6 +2526,7 @@ packRegisters (eBBlock * ebp)
 	     ic->op == '^') &&
 	    isBitwiseOptimizable (ic))) &&
 	  ic->next && ic->next->op == IFX &&
+	  bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
 	  isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
 	  OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
 	{
@@ -2512,9 +2551,10 @@ packRegisters (eBBlock * ebp)
 #endif
       /* if pointer set & left has a size more than
          one and right is not in far space */
-      if (POINTER_SET (ic) &&
-      /* MLH: no such thing.
-         !isOperandInFarSpace(IC_RIGHT(ic)) && */
+      if (!DISABLE_PACK_ONE_USE &&
+          POINTER_SET (ic) &&
+          /* MLH: no such thing.
+             !isOperandInFarSpace(IC_RIGHT(ic)) && */
 	  !OP_SYMBOL (IC_RESULT (ic))->remat &&
 	  !IS_OP_RUONLY (IC_RIGHT (ic)) &&
 	  getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
@@ -2575,18 +2615,18 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
 
   D (D_ALLOC, ("\n-> z80_assignRegisters: entered.\n"));
 
-  setToNull ((void *) &funcrUsed);
-  stackExtend = dataExtend = 0;
+  setToNull ((void *) &_G.funcrUsed);
+  _G.stackExtend = _G.dataExtend = 0;
 
   if (IS_GB)
     {
       /* DE is required for the code gen. */
-      _nRegs = GBZ80_MAX_REGS;
+      _G.nRegs = GBZ80_MAX_REGS;
       regsZ80 = _gbz80_regs;
     }
   else
     {
-      _nRegs = Z80_MAX_REGS;
+      _G.nRegs = Z80_MAX_REGS;
       regsZ80 = _z80_regs;
     }
 
@@ -2606,18 +2646,18 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
   serialRegAssign (ebbs, count);
 
   /* if stack was extended then tell the user */
-  if (stackExtend)
+  if (_G.stackExtend)
     {
 /*      werror(W_TOOMANY_SPILS,"stack", */
-/*             stackExtend,currFunc->name,""); */
-      stackExtend = 0;
+/*             _G.stackExtend,currFunc->name,""); */
+      _G.stackExtend = 0;
     }
 
-  if (dataExtend)
+  if (_G.dataExtend)
     {
 /*      werror(W_TOOMANY_SPILS,"data space", */
-/*             dataExtend,currFunc->name,""); */
-      dataExtend = 0;
+/*             _G.dataExtend,currFunc->name,""); */
+      _G.dataExtend = 0;
     }
 
   if (options.dump_rassgn)
@@ -2636,10 +2676,10 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
   genZ80Code (ic);
 
   /* free up any stackSpil locations allocated */
-  applyToSet (stackSpil, deallocStackSpil);
-  slocNum = 0;
-  setToNull ((void **) &stackSpil);
-  setToNull ((void **) &spiltSet);
+  applyToSet (_G.stackSpil, deallocStackSpil);
+  _G.slocNum = 0;
+  setToNull ((void **) &_G.stackSpil);
+  setToNull ((void **) &_G.spiltSet);
   /* mark all registers as free */
   freeAllRegs ();
 

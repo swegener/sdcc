@@ -284,7 +284,7 @@ _setDefaultOptions (void)
   optimize.label3 = 1;
   optimize.label4 = 1;
   optimize.loopInvariant = 1;
-  optimize.loopInduction = 0;
+  optimize.loopInduction = 1;
 }
 
 /* Mangaling format:

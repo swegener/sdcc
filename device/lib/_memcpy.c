@@ -26,6 +26,8 @@
 
 #define NULL (void *)0
 
+#pragma NOINDUCTION
+
 void _generic * memcpy (
 	void _generic * dst,
 	void _generic * src,

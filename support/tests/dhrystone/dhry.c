@@ -149,7 +149,7 @@ int main(void)
 
     /* 32766 is the highest value for a 16 bitter */
 #if DEBUG
-    Number_Of_Runs = 3;
+    Number_Of_Runs = 3000;
 #else
     Number_Of_Runs = 32766;
 #endif    

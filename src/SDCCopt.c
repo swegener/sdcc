@@ -840,7 +840,6 @@ eBBlockFromiCode (iCode * ic)
      subexpression once more */
   if (lchange || kchange)
     {
-
       computeDataFlow (ebbs, saveCount);
       change += cseAllBlocks (ebbs, saveCount);
       if (options.dump_loop)
@@ -856,7 +855,6 @@ eBBlockFromiCode (iCode * ic)
 	dumpEbbsToFileExt (DUMP_LOOPD, ebbs, count);
 
     }
-
 
   /* sort it back by block number */
   qsort (ebbs, saveCount, sizeof (eBBlock *), bbNumCompare);

@@ -6,7 +6,7 @@ PROC = z80
 CC = $(TOPDIR)/bin/sdcc
 
 # -DNOENUM is here to make the results more predictable
-CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM -V -m$(PROC) --profile
+CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM -V -m$(PROC) --profile --dumpall --stack-auto
 
 OBJ = dhry.o
 

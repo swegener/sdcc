@@ -32,6 +32,8 @@ int strcmp (
 	)
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
+#pragma NOINDUCTION
+
 	char ret = 0 ;
         char _generic *src = asrc;
         char _generic *dst = adst;

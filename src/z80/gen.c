@@ -5594,7 +5594,7 @@ genZ80Code (iCode * lic)
 
       if (cln != ic->lineno)
 	{
-	  emitDebug ("; %s %d", ic->filename, ic->lineno);
+	  emit2 ("; %s %d", ic->filename, ic->lineno);
 	  cln = ic->lineno;
 	}
       /* if the result is marked as

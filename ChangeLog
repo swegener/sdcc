@@ -1,3 +1,7 @@
+2004-08-02 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/glue.c Disabled "WARNING: function 'main' undefined" when -S option is used.
+
 2004-08-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCClrange.c (rlivePoint): fixed bug 988568, thanks to anonymous

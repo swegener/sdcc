@@ -2086,6 +2086,7 @@ decorateType (ast * tree)
       case UPOINTER:
       case ARRAY:
       case FUNCTION:
+      	break;
       }
 
       return tree;

@@ -1,3 +1,11 @@
+2003-09-04  Vangelis Rokas <vrokas@otenet.gr>
+	* Top header beautifications in src/pic16 directory:
+	  device.c, device.h, gen.c, gen.h, genarith.c, glue.c, pcode.c,
+	  pcodeflow.c, pcodeflow.h, pcode.h, pcodepeep.c, pcoderegs.c,
+	  pcoderegs.h, ralloc.c, ralloc.h
+	* main.c: added top header and GPL license notice
+	* pcode.c: fixed the if-conditional warning
+ 
 2003-09-04  Bernhard Held <bernhard@bernhardheld.de>
 
 	* device/lib/_mullong.c: replaced int by short for gcc

@@ -73,6 +73,7 @@ static struct
     short debugLine;
     short nRegsSaved;
     set *sendSet;
+    iCode *current_iCode;
   }
 _G;
 
@@ -132,7 +133,6 @@ emitcode (char *inst, const char *fmt,...)
 
   while (isspace (*lbp))
     lbp++;
-//  printf ("%s\n", lb); // EEP - debugging
   
   if (lbp && *lbp)
     lineCurr = (lineCurr ?
@@ -140,6 +140,8 @@ emitcode (char *inst, const char *fmt,...)
 		(lineHead = newLineNode (lb)));
   lineCurr->isInline = _G.inLine;
   lineCurr->isDebug = _G.debugLine;
+  lineCurr->ic = _G.current_iCode;
+  lineCurr->isComment = (*lbp==';');
   va_end (ap);
 }
 
@@ -8949,7 +8951,8 @@ gen51Code (iCode * lic)
 
   for (ic = lic; ic; ic = ic->next)
     {
-
+      _G.current_iCode = ic;
+      
       if (ic->lineno && cln != ic->lineno)
 	{
 	  if (options.debug)
@@ -9177,6 +9180,7 @@ gen51Code (iCode * lic)
 	}
     }
 
+  _G.current_iCode = NULL;
 
   /* now we are ready to call the
      peep hole optimizer */

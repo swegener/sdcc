@@ -48,6 +48,7 @@ static int hashSymbolName (const char *name);
 static void buildLabelRefCountHash (lineNode * head);
 
 static bool matchLine (char *, char *, hTab **);
+bool isLabelDefinition (const char *line, const char **start, int *len);
 
 #define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
 	lineNode *head, const char *cmdLine)
@@ -623,6 +624,169 @@ FBYNAME (labelRefCount)
   return rc;
 }
 
+/* Within the context of the lines currPl through endPl, determine
+** if the variable var contains a symbol that is volatile. Returns
+** TRUE only if it is certain that this was not volatile (the symbol
+** was found and not volatile, or var was a constant or CPU register).
+** Returns FALSE if the symbol was found and volatile, the symbol was
+** not found, or var was a indirect/pointer addressing mode.
+*/
+static bool
+notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
+{
+  char symname[SDCC_NAME_MAX + 1];
+  char *p = symname;
+  char *vp = var;
+  lineNode *cl;
+  operand *op;
+  iCode *last_ic;
+
+  /* Can't tell if indirect accesses are volatile or not, so
+  ** assume they are, just to be safe.
+  */
+  if (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
+    {
+      if (*var=='@')
+        return FALSE;
+    }
+  if (TARGET_IS_Z80 || TARGET_IS_GBZ80)
+    {
+      if (strstr(var,"(bc)"))
+        return FALSE;
+      if (strstr(var,"(de)"))
+        return FALSE;
+      if (strstr(var,"(hl)"))
+        return FALSE;
+      if (strstr(var,"(ix"))
+        return FALSE;
+      if (strstr(var,"(iy"))
+        return FALSE;
+    }
+
+  /* Extract a symbol name from the variable */
+  while (*vp && (*vp!='_'))
+    vp++;
+  while (*vp && (isalnum(*vp) || *vp=='_'))
+    *p++ = *vp++;
+  *p='\0';
+
+  if (!symname[0])
+    {
+      /* Nothing resembling a symbol name was found, so it can't
+         be volatile
+      */
+      return TRUE;
+    }
+
+  last_ic = NULL;
+  for (cl = currPl; cl!=endPl->next; cl = cl->next)
+  {
+    if (cl->ic && (cl->ic!=last_ic))
+      {
+        last_ic = cl->ic;
+        op = IC_LEFT (cl->ic);
+        if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+          return !op->isvolatile;
+        op = IC_RIGHT (cl->ic);
+        if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+          return !op->isvolatile;
+        op = IC_RESULT (cl->ic);
+        if (IS_SYMOP (op) && !strcmp(OP_SYMBOL (op)->rname,symname) )
+          return !op->isvolatile;
+      }
+  }
+  
+  /* Couldn't find the symbol for some reason. Assume volatile. */
+  return FALSE;
+}
+
+/*  notVolatile:
+ *
+ *  This rule restriction has two different behaviours depending on
+ *  the number of parameters given.
+ *
+ *    if notVolatile                 (no parameters given)
+ *       The rule is applied only if none of the iCodes originating
+ *       the matched pattern reference a volatile operand.
+ *
+ *    if notVolatile %1 ...          (one or more parameters given)
+ *       The rule is applied if the parameters are not expressions
+ *       containing volatile symbols and are not pointer accesses.
+ *
+ */
+FBYNAME (notVolatile)
+{
+  int varNumber;
+  char *var;
+  bool notvol;
+  char *digitend;
+  lineNode *cl;
+  operand *op;
+
+  if (!cmdLine)
+    {
+      /* If no parameters given, just scan the iCodes for volatile operands */
+      for (cl = currPl; cl!=endPl->next; cl = cl->next)
+      {
+        if (cl->ic)
+          {
+            op = IC_LEFT (cl->ic);
+            if (IS_SYMOP (op) && op->isvolatile)
+              return FALSE;
+            op = IC_RIGHT (cl->ic);
+            if (IS_SYMOP (op) && op->isvolatile)
+              return FALSE;
+            op = IC_RESULT (cl->ic);
+            if (IS_SYMOP (op) && op->isvolatile)
+              return FALSE;
+          }
+      }
+      return TRUE;
+    }
+
+  /* There were parameters; check the volatility of each */
+  while (*cmdLine && isspace(*cmdLine))
+    cmdLine++;
+  while (*cmdLine)
+    {
+      if (*cmdLine!='%')
+        goto error;
+      cmdLine++;
+      if (!isdigit(*cmdLine))
+        goto error;
+      varNumber = strtol(cmdLine, &digitend, 10);
+      cmdLine = digitend;
+      while (*cmdLine && isspace(*cmdLine))
+        cmdLine++;
+
+      var = hTabItemWithKey (vars, varNumber);
+
+      if (var)
+        {
+          notvol = notVolatileVariable (var, currPl, endPl);
+          if (!notvol)
+            return FALSE;
+        }
+      else
+	{
+	  fprintf (stderr, "*** internal error: var %d not bound"
+		   " in peephole notVolatile rule.\n",
+		   varNumber);
+	  return FALSE;
+	}
+    }
+
+  return TRUE;
+    
+    
+error:
+  fprintf (stderr,
+           "*** internal error: notVolatile peephole restriction"
+           " malformed: %s\n", cmdLine);
+  return FALSE;
+}
+    
+
 /*-----------------------------------------------------------------*/
 /* callFuncByName - calls a function as defined in the table       */
 /*-----------------------------------------------------------------*/
@@ -695,6 +859,9 @@ callFuncByName (char *fname,
     },
     {
       "24bitModeAndPortDS390", flat24bitModeAndPortDS390
+    },
+    {
+      "notVolatile", notVolatile
     }
   };
   int 	i;
@@ -717,8 +884,6 @@ callFuncByName (char *fname,
 	}
     }
     
-    Safe_free(cmdCopy);
-    
     if (rc == -1)
     {
 	fprintf (stderr, 
@@ -729,6 +894,8 @@ callFuncByName (char *fname,
 	// a bad rule and refuse it.
 	rc = FALSE;
     }
+
+    Safe_free(cmdCopy);
     
   return rc;
 }
@@ -739,11 +906,27 @@ callFuncByName (char *fname,
 void 
 printLine (lineNode * head, FILE * of)
 {
+  iCode *last_ic = NULL;
+  bool debug_iCode_tracking = (getenv("DEBUG_ICODE_TRACKING")!=NULL);
+  
   if (!of)
     of = stdout;
 
   while (head)
     {
+      if (head->ic!=last_ic)
+        {
+          last_ic = head->ic;
+          if (debug_iCode_tracking)
+            {
+              if (head->ic)
+                fprintf (of, "; block = %d, seq = %d\n",
+                         head->ic->block, head->ic->seq);
+              else
+                fprintf (of, "; iCode lost\n");
+            }
+        }
+        
       /* don't indent comments & labels */
       if (head->line &&
 	  (*head->line == ';' ||
@@ -804,6 +987,7 @@ newLineNode (char *line)
 
   pl = Safe_alloc ( sizeof (lineNode));
   pl->line = Safe_strdup (line);
+  pl->ic = NULL;
   return pl;
 }
 
@@ -877,6 +1061,12 @@ getPeepLine (lineNode ** head, char **bpp)
 	*head = currL = newLineNode (lines);
       else
 	currL = connectLine (currL, newLineNode (lines));
+
+      lp = lines;
+      while (*lp && isspace(*lp))
+        lp++;
+      if (*lp==';')
+        currL->isComment = 1;
     }
 
   *bpp = bp;
@@ -1064,7 +1254,7 @@ matchLine (char *s, char *d, hTab ** vars)
 	d++;
 
       /* if the destination is a var */
-      if (*d == '%' && isdigit (*(d + 1)))
+      if (*d == '%' && isdigit (*(d + 1)) && vars)
 	{
 	  char *v = hTabItemWithKey (*vars, keyForVar (d + 1));
 	  /* if the variable is already bound
@@ -1180,6 +1370,193 @@ matchRule (lineNode * pl,
     return FALSE;
 }
 
+static void
+reassociate_ic_down (lineNode *shead, lineNode *stail,
+                     lineNode *rhead, lineNode *rtail)
+{
+  lineNode *csl;	/* current source line */
+  lineNode *crl;	/* current replacement line */
+
+  csl = shead;
+  crl = rhead;
+  while (1)
+    {
+      /* skip over any comments */
+      while (csl!=stail->next && csl->isComment)
+        csl = csl->next;
+      while (crl!=rtail->next && crl->isComment)
+        crl = crl->next;
+
+      /* quit if we reach the end */
+      if ((csl==stail->next) || (crl==rtail->next) || crl->ic)
+        break;
+
+      if (matchLine(csl->line,crl->line,NULL))
+        {
+          crl->ic = csl->ic;
+          csl = csl->next;
+          crl = crl->next;
+        }
+      else
+        break;
+    }
+}
+
+static void
+reassociate_ic_up (lineNode *shead, lineNode *stail,
+                   lineNode *rhead, lineNode *rtail)
+{
+  lineNode *csl;	/* current source line */
+  lineNode *crl;	/* current replacement line */
+
+  csl = stail;
+  crl = rtail;
+  while (1)
+    {
+      /* skip over any comments */
+      while (csl!=shead->prev && csl->isComment)
+        csl = csl->prev;
+      while (crl!=rhead->prev && crl->isComment)
+        crl = crl->prev;
+
+      /* quit if we reach the end */
+      if ((csl==shead->prev) || (crl==rhead->prev) || crl->ic)
+        break;
+
+      if (matchLine(csl->line,crl->line,NULL))
+        {
+          crl->ic = csl->ic;
+          csl = csl->prev;
+          crl = crl->prev;
+        }
+      else
+        break;
+    }
+}
+
+/*------------------------------------------------------------------*/
+/* reassociate_ic - reassociate replacement lines with origin iCode */
+/*------------------------------------------------------------------*/
+static void
+reassociate_ic (lineNode *shead, lineNode *stail,
+                lineNode *rhead, lineNode *rtail)
+{
+  lineNode *csl;	/* current source line */
+  lineNode *crl;	/* current replacement line */
+  bool single_iCode;
+  iCode *ic;
+  
+  /* Check to see if all the source lines (excluding comments) came
+  ** for the same iCode
+  */
+  ic = NULL;
+  for (csl=shead;csl!=stail->next;csl=csl->next)
+    if (csl->ic && !csl->isComment)
+      {
+        ic = csl->ic;
+        break;
+      }
+  single_iCode = (ic!=NULL);
+  for (csl=shead;csl!=stail->next;csl=csl->next)
+    if ((csl->ic != ic) && !csl->isComment)
+      {
+        /* More than one iCode was found. However, if it's just the
+        ** last line with the different iCode and it was not changed
+        ** in the replacement, everything else must be the first iCode.
+        */
+        if ((csl==stail) && matchLine (stail->line, rtail->line, NULL))
+          {
+            rtail->ic = stail->ic;
+            for (crl=rhead;crl!=rtail;crl=crl->next)
+              crl->ic = ic;
+            return;
+          }
+            
+        single_iCode = FALSE;
+        break;
+      }
+  
+  /* If all of the source lines came from the same iCode, then so have
+  ** all of the replacement lines too.
+  */
+  if (single_iCode)
+    {
+      for (crl=rhead;crl!=rtail->next;crl=crl->next)
+        crl->ic = ic;
+      return;
+    }
+  
+  /* The source lines span iCodes, so we may end up with replacement
+  ** lines that we don't know which iCode(s) to associate with. Do the
+  ** best we can by using the following strategies:
+  **    1) Start at the top and scan down. As long as the source line
+  **       matches the replacement line, they have the same iCode.
+  **    2) Start at the bottom and scan up. As long as the source line
+  **       matches the replacement line, they have the same iCode.
+  **    3) For any label in the source, look for a matching label in
+  **       the replacment. If found, they have the same iCode. From
+  **       these matching labels, scan down for additional matching
+  **       lines; if found, they also have the same iCode.
+  */
+
+  /* Strategy #1: Start at the top and scan down for matches
+  */
+  reassociate_ic_down(shead,stail,rhead,rtail);
+  
+  /* Strategy #2: Start at the bottom and scan up for matches
+  */
+  reassociate_ic_up(shead,stail,rhead,rtail);
+
+  /* Strategy #3: Try to match labels
+  */
+  csl = shead;
+  while (1)
+    {
+      const char *labelStart;
+      int labelLength;
+      
+      /* skip over any comments */
+      while (csl!=stail->next && csl->isComment)
+        csl = csl->next;
+      if (csl==stail->next)
+        break;
+
+      if (isLabelDefinition(csl->line, &labelStart, &labelLength))
+        {
+          /* found a source line label; look for it in the replacment lines */
+          crl = rhead;
+          while (1)
+            {
+              while (crl!=rtail->next && crl->isComment)
+                crl = crl->next;
+              if (crl==rtail->next)
+                break;
+              if (matchLine(csl->line, crl->line, NULL))
+                {
+                  reassociate_ic_down(csl,stail,crl,rtail);
+                  break;
+                }
+              else
+                crl = crl->next;
+            }
+        }
+      csl = csl->next;
+    }
+  
+  /* Try to assign a meaningful iCode to any comment that is missing
+     one. Since they are comments, it's ok to make mistakes; we are just
+     trying to improve continuity to simplify other tests.
+  */
+  ic = NULL;
+  for (crl=rtail;crl!=rhead->prev;crl=crl->prev)
+    {
+      if (!crl->ic && ic && crl->isComment)
+        crl->ic = ic;
+      ic = crl->ic;
+    }
+}
+
+                  
 /*-----------------------------------------------------------------*/
 /* replaceRule - does replacement of a matching pattern            */
 /*-----------------------------------------------------------------*/
@@ -1202,6 +1579,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
 	  pl = (pl ? connectLine (pl, newLineNode (cl->line)) :
 		(comment = newLineNode (cl->line)));
 	  pl->isDebug = cl->isDebug;
+	  pl->isComment = cl->isComment || (*cl->line == ';');
 	}
     }
   cl = NULL;
@@ -1244,6 +1622,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
 	cl = connectLine (cl, newLineNode (lb));
       else
 	lhead = cl = newLineNode (lb);
+      cl->isComment = pl->isComment;
     }
 
   /* add the comments if any to the head of list */
@@ -1257,6 +1636,9 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
 	lhead->prev = lc;
       lhead = comment;
     }
+
+  /* determine which iCodes the replacment lines relate to */
+  reassociate_ic(*shead,stail,lhead,cl);
 
   /* now we need to connect / replace the original chain */
   /* if there is a prev then change it */

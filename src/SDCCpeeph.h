@@ -31,6 +31,7 @@
 typedef struct lineNode
   {
     char *line;
+    iCode *ic;
     unsigned int isInline:1;
     unsigned int isComment:1;
     unsigned int isDebug:1;

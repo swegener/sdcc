@@ -901,6 +901,7 @@ updateSpillLocation (iCode * ic, int induction)
 		/* special case for inductions */
 		if (induction && 
 		    OP_SYMBOL(IC_RIGHT(ic))->isreqv && 
+		    !OP_SYMBOL(IC_RESULT (ic))->noSpilLoc &&
 		    !SPIL_LOC(IC_RESULT(ic))) {
 			SPIL_LOC (IC_RESULT (ic)) = SPIL_LOC (IC_RIGHT (ic));
 		}

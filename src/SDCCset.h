@@ -80,5 +80,6 @@ void *setFirstItem (set *);
 void *setNextItem (set *);
 void setToNull (void **);
 set *reverseSet (set *);
+void deleteSet(set **s);
 
 #endif

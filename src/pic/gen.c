@@ -65,7 +65,7 @@ extern void genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 void genMult8X8_8 (operand *, operand *,operand *);
 
 static int labelOffset=0;
-static int debug_verbose=1;
+extern int debug_verbose;
 static int optimized_for_speed = 0;
 
 /* max_key keeps track of the largest label number used in 
@@ -399,15 +399,17 @@ static void resolveIfx(resolvedIfx *resIfx, iCode *ifx)
   if(!resIfx) 
     return;
 
-  DEBUGpic14_emitcode("; ***","%s %d",__FUNCTION__,__LINE__);
+  //  DEBUGpic14_emitcode("; ***","%s %d",__FUNCTION__,__LINE__);
 
   resIfx->condition = 1;    /* assume that the ifx is true */
   resIfx->generated = 0;    /* indicate that the ifx has not been used */
 
   if(!ifx) {
     resIfx->lbl = newiTempLabel(NULL);  /* oops, there is no ifx. so create a label */
+/*
     DEBUGpic14_emitcode("; ***","%s %d null ifx creating new label key =%d",
 			__FUNCTION__,__LINE__,resIfx->lbl->key);
+*/
   } else {
     if(IC_TRUE(ifx)) {
       resIfx->lbl = IC_TRUE(ifx);
@@ -415,13 +417,15 @@ static void resolveIfx(resolvedIfx *resIfx, iCode *ifx)
       resIfx->lbl = IC_FALSE(ifx);
       resIfx->condition = 0;
     }
+/*
     if(IC_TRUE(ifx)) 
       DEBUGpic14_emitcode("; ***","ifx true is non-null");
     if(IC_FALSE(ifx)) 
       DEBUGpic14_emitcode("; ***","ifx false is non-null");
+*/
   }
 
-  DEBUGpic14_emitcode("; ***","%s lbl->key=%d, (lab offset=%d)",__FUNCTION__,resIfx->lbl->key,labelOffset);
+  //  DEBUGpic14_emitcode("; ***","%s lbl->key=%d, (lab offset=%d)",__FUNCTION__,resIfx->lbl->key,labelOffset);
 
 }
 /*-----------------------------------------------------------------*/
@@ -2602,17 +2606,17 @@ static void genPcall (iCode *ic)
 /*-----------------------------------------------------------------*/
 static int resultRemat (iCode *ic)
 {
-    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    if (SKIP_IC(ic) || ic->op == IFX)
-        return 0;
-
-    if (IC_RESULT(ic) && IS_ITEMP(IC_RESULT(ic))) {
-        symbol *sym = OP_SYMBOL(IC_RESULT(ic));
-        if (sym->remat && !POINTER_SET(ic)) 
-            return 1;
-    }
-
+  //    DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  if (SKIP_IC(ic) || ic->op == IFX)
     return 0;
+
+  if (IC_RESULT(ic) && IS_ITEMP(IC_RESULT(ic))) {
+    symbol *sym = OP_SYMBOL(IC_RESULT(ic));
+    if (sym->remat && !POINTER_SET(ic)) 
+      return 1;
+  }
+
+  return 0;
 }
 
 #if defined(__BORLANDC__) || defined(_MSC_VER)
@@ -3746,11 +3750,12 @@ static void genCmp (operand *left,operand *right,
   //  resolvedIfx rTrueIfx;
   symbol *truelbl;
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+/*
   if(ifx) {
     DEBUGpic14_emitcode ("; ***","true ifx is %s",((IC_TRUE(ifx) == NULL) ? "false" : "true"));
     DEBUGpic14_emitcode ("; ***","false ifx is %s",((IC_FALSE(ifx) == NULL) ? "false" : "true"));
   }
-
+*/
 
   resolveIfx(&rFalseIfx,ifx);
   truelbl  = newiTempLabel(NULL);
@@ -3764,10 +3769,8 @@ static void genCmp (operand *left,operand *right,
     unsigned long mask = (0x100 << (8*(size-1))) - 1;
     lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
 #ifdef _swapp
-    DEBUGpic14_emitcode ("; ***","%d swapping left&right, lit =0x%x",__LINE__,lit);
-    lit = (lit - 1) & mask;
-    DEBUGpic14_emitcode ("; ***","%d swapping left&right, lit =0x%x, mask 0x%x",__LINE__,lit,mask);
 
+    lit = (lit - 1) & mask;
     right = left;
     left = tmp;
     rFalseIfx.condition ^= 1;
@@ -7885,7 +7888,7 @@ static void genUnpackBits (operand *result, char *rname, int ptype)
     return ;
 }
 
-
+#if 0
 /*-----------------------------------------------------------------*/
 /* genDataPointerGet - generates code when ptr offset is known     */
 /*-----------------------------------------------------------------*/
@@ -7920,7 +7923,7 @@ static void genDataPointerGet (operand *left,
   freeAsmop(left,NULL,ic,TRUE);
   freeAsmop(result,NULL,ic,TRUE);
 }
-
+#endif
 /*-----------------------------------------------------------------*/
 /* genNearPointerGet - pic14_emitcode for near pointer fetch             */
 /*-----------------------------------------------------------------*/
@@ -7929,11 +7932,11 @@ static void genNearPointerGet (operand *left,
 			       iCode *ic)
 {
     asmop *aop = NULL;
-    regs *preg = NULL ;
+    //regs *preg = NULL ;
     char *rname ;
     sym_link *rtype, *retype;
     sym_link *ltype = operandType(left);    
-    char buffer[80];
+    //char buffer[80];
 
     DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 

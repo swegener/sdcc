@@ -576,3 +576,30 @@ setToNull (void **item)
   Safe_free (*item);
   *item = NULL;
 }
+
+/*-----------------------------------------------------------------*/
+/* deleteSet - will throw away the entire list                     */
+/*  note - setToNull doesn't actually throw away the whole list.   */
+/*         Instead it only throws away the first item.             */
+/*-----------------------------------------------------------------*/
+void deleteSet(set **s)
+{
+  set *curr;
+  set *next;
+
+  if(!s || !*s)
+    return;
+
+  curr = *s;
+  next = curr->next;
+  while (next) {
+    Safe_free (curr);
+    curr = next;
+    next = next->next;
+  }
+
+  Safe_free (curr);
+
+  *s = NULL;
+}
+

@@ -75,11 +75,13 @@ static pBlock *pb_dead_pcodes = NULL;
 /* Hardcoded flags to change the behavior of the PIC port */
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
+int debug_verbose = 0;                /* Set true to inundate .asm file */
 
 static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
 
 extern void RemoveUnusedRegisters(void);
+extern void RegsUnMapLiveRanges(void);
 extern void BuildFlowTree(pBlock *pb);
 extern void pCodeRegOptimizeRegUsage(void);
 
@@ -1762,19 +1764,22 @@ pCode *newpCodeFunction(char *mod,char *f)
 /*-----------------------------------------------------------------*/
 /* newpCodeFlow                                                    */
 /*-----------------------------------------------------------------*/
-
 void destructpCodeFlow(pCode *pc)
 {
   if(!pc || !isPCFL(pc))
     return;
 
-  if(PCFL(pc)->uses)
-    free(PCFL(pc)->uses);
 /*
   if(PCFL(pc)->from)
   if(PCFL(pc)->to)
 */
+  unlinkpCode(pc);
+
+  deleteSet(&PCFL(pc)->registers);
+  deleteSet(&PCFL(pc)->from);
+  deleteSet(&PCFL(pc)->to);
   free(pc);
+
 }
 
 pCode *newpCodeFlow(void )
@@ -1786,7 +1791,6 @@ pCode *newpCodeFlow(void )
 
   pcflow->pc.type = PC_FLOW;
   pcflow->pc.prev = pcflow->pc.next = NULL;
-  //pcflow->pc.from = pcflow->pc.to = pcflow->pc.label = NULL;
   pcflow->pc.pb = NULL;
 
   //  pcflow->pc.analyze = genericAnalyze;
@@ -1794,9 +1798,6 @@ pCode *newpCodeFlow(void )
   pcflow->pc.print = genericPrint;
 
   pcflow->pc.seq = GpcFlowSeq++;
-
-  pcflow->nuses = 7;
-  pcflow->uses = Safe_calloc(pcflow->nuses, sizeof(set *));
 
   pcflow->from = pcflow->to = NULL;
 
@@ -2631,9 +2632,11 @@ static void genericPrint(FILE *of, pCode *pc)
       fprintf(of,"%s",str);
 
       /* Debug */
-      fprintf(of, "\t;key=%03x",pc->seq);
-      if(PCI(pc)->pcflow)
-	fprintf(of,",flow seq=%03x",PCI(pc)->pcflow->pc.seq);
+      if(debug_verbose) {
+	fprintf(of, "\t;key=%03x",pc->seq);
+	if(PCI(pc)->pcflow)
+	  fprintf(of,",flow seq=%03x",PCI(pc)->pcflow->pc.seq);
+      }
     }
 #if 0
     {
@@ -2675,7 +2678,8 @@ static void genericPrint(FILE *of, pCode *pc)
     break;
 
   case PC_FLOW:
-    fprintf(of,";<>Start of new flow, seq=%d\n",pc->seq);
+    if(debug_verbose)
+      fprintf(of,";<>Start of new flow, seq=%d\n",pc->seq);
     break;
 
   case PC_CSOURCE:
@@ -3150,7 +3154,9 @@ regs * getRegFromInstruction(pCode *pc)
   switch(PCI(pc)->pcop->type) {
   case PO_INDF:
   case PO_FSR:
-    return typeRegWithIdx (PCOR(PCI(pc)->pcop)->rIdx, REG_SFR, 0);
+    return PCOR(PCI(pc)->pcop)->r;
+
+    //    return typeRegWithIdx (PCOR(PCI(pc)->pcop)->rIdx, REG_SFR, 0);
 
   case PO_BIT:
   case PO_GPR_TEMP:
@@ -3255,7 +3261,8 @@ void AnalyzepBlock(pBlock *pb)
 
 void InsertpFlow(pCode *pc, pCode **pflow)
 {
-  PCFL(*pflow)->end = pc;
+  if(*pflow)
+    PCFL(*pflow)->end = pc;
 
   if(!pc || !pc->next)
     return;
@@ -3276,7 +3283,7 @@ void BuildFlow(pBlock *pb)
 {
   pCode *pc;
   pCode *last_pci=NULL;
-  pCode *pflow;
+  pCode *pflow=NULL;
   int seq = 0;
 
   if(!pb)
@@ -3285,11 +3292,13 @@ void BuildFlow(pBlock *pb)
   //fprintf (stderr,"build flow start seq %d  ",GpcFlowSeq);
   /* Insert a pCodeFlow object at the beginning of a pBlock */
 
-  pflow = newpCodeFlow();    /* Create a new Flow object */
-  pflow->next = pb->pcHead;  /* Make the current head the next object */
-  pb->pcHead->prev = pflow;  /* let the current head point back to the flow object */
-  pb->pcHead = pflow;        /* Make the Flow object the head */
-  pflow->pb = pb;
+  InsertpFlow(pb->pcHead, &pflow);
+
+  //pflow = newpCodeFlow();    /* Create a new Flow object */
+  //pflow->next = pb->pcHead;  /* Make the current head the next object */
+  //pb->pcHead->prev = pflow;  /* let the current head point back to the flow object */
+  //pb->pcHead = pflow;        /* Make the Flow object the head */
+  //pflow->pb = pb;
 
   for( pc = findNextInstruction(pb->pcHead);
        pc != NULL;
@@ -3347,7 +3356,8 @@ void BuildFlow(pBlock *pb)
   }
 
   //fprintf (stderr,",end seq %d",GpcFlowSeq);
-  PCFL(pflow)->end = pb->pcTail;
+  if(pflow)
+    PCFL(pflow)->end = pb->pcTail;
 }
 
 /*-------------------------------------------------------------------*/
@@ -3359,26 +3369,30 @@ void BuildFlow(pBlock *pb)
 /*-----------------------------------------------------------------*/
 void unBuildFlow(pBlock *pb)
 {
-  pCode *pc;
+  pCode *pc,*pcnext;
 
   if(!pb)
     return;
 
   pc = pb->pcHead;
+
   while(pc) {
-    pCode *pcn = pc->next;
+    pcnext = pc->next;
 
     if(isPCI(pc)) {
-      pc->seq = 0;
-      PCI(pc)->pcflow = NULL;
-      pc = pcn;
-    } else if(isPCFL(pc)) {
-      unlinkpCode(pc);
-      pc->destruct(pc);
-    } else 
-      pc = pcn;
 
+      pc->seq = 0;
+      if(PCI(pc)->pcflow) {
+	//free(PCI(pc)->pcflow);
+	PCI(pc)->pcflow = NULL;
+      }
+
+    } else if(isPCFL(pc) )
+      pc->destruct(pc);
+
+    pc = pcnext;
   }
+
 
 }
 
@@ -4138,6 +4152,9 @@ int OptimizepBlock(pBlock *pb)
 */
 
   pc = findNextInstruction(pb->pcHead);
+  if(!pc)
+    return 0;
+
   pcprev = pc->prev;
   do {
 
@@ -4560,18 +4577,31 @@ void mergepBlocks(char dbName)
 }
 
 /*-----------------------------------------------------------------*/
-/* AnalyzeBanking - Called after the memory addresses have been    */
-/*                  assigned to the registers.                     */
+/* AnalyzeFlow - Examine the flow of the code and optimize         */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
-void AnalyzeBanking(void)
+
+void AnalyzeFlow(void)
 {
+  static int times_called=0;
 
   pBlock *pb;
 
   if(!the_pFile)
     return;
 
+
+  /* if this is not the first time this function has been called,
+     then clean up old flow information */
+  if(times_called++) {
+    for(pb = the_pFile->pbHead; pb; pb = pb->next)
+      unBuildFlow(pb);
+
+    RegsUnMapLiveRanges();
+
+  }
+
+  GpcFlowSeq = 1;
 
   /* Phase 2 - Flow Analysis - Register Banking
    *
@@ -4620,15 +4650,6 @@ void AnalyzeBanking(void)
    */
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
-    BanksUsedFlow(pb);
-
-  /* Phase x - Flow Analysis - Used Banks
-   *
-   * In this phase, the individual flow blocks are examined
-   * to determine the Register Banks they use
-   */
-
-  for(pb = the_pFile->pbHead; pb; pb = pb->next)
     FixBankFlow(pb);
 
 
@@ -4641,6 +4662,7 @@ void AnalyzeBanking(void)
   pCodeRegOptimizeRegUsage();
 
   OptimizepCode('*');
+
 
 /*
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
@@ -4656,6 +4678,7 @@ void AnalyzeBanking(void)
       FillFlow(PCFL(pcflow));
     }
   }
+
 /*
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
     pCode *pcflow;
@@ -4667,6 +4690,29 @@ void AnalyzeBanking(void)
     }
   }
 */
+}
+
+/*-----------------------------------------------------------------*/
+/* AnalyzeBanking - Called after the memory addresses have been    */
+/*                  assigned to the registers.                     */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+
+void AnalyzeBanking(void)
+{
+  pBlock  *pb;
+
+  /* Phase x - Flow Analysis - Used Banks
+   *
+   * In this phase, the individual flow blocks are examined
+   * to determine the Register Banks they use
+   */
+
+  AnalyzeFlow();
+  AnalyzeFlow();
+
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    BanksUsedFlow(pb);
 }
 
 /*-----------------------------------------------------------------*/

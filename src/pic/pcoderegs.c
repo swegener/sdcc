@@ -206,20 +206,22 @@ void pCodeRegMapLiveRanges(pBlock *pb)
     pCodeRegMapLiveRangesInFlow(PCFL(pcflow));
   }
 
-
+#if 0
   for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
        pcflow != NULL;
        pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
 
     regs *r = setFirstItem(PCFL(pcflow)->registers);
-    //fprintf(stderr,"flow seq %d\n", pcflow->seq);
+    fprintf(stderr,"flow seq %d\n", pcflow->seq);
+
     while (r) {
-      //fprintf(stderr, "  %s\n",r->name);
+      fprintf(stderr, "  %s\n",r->name);
       r = setNextItem(PCFL(pcflow)->registers);
 
     }
 
   }
+#endif
 
 //  dbg_dumpregusage();
 
@@ -279,10 +281,6 @@ void  RemoveRegsFromSet(set *regset)
     reg = regset->item;
     regset = regset->next;
 
-/*
-  for (reg = setFirstItem(regset) ; reg ;
-       reg = setNextItem(regset)) {
-*/
     used = elementsInSet(reg->reglives.usedpCodes);
 
     if(used <= 1) {
@@ -365,7 +363,7 @@ void RemoveUnusedRegisters(void)
 /*-----------------------------------------------------------------*
  *
  *-----------------------------------------------------------------*/
-static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg)
+static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int can_free)
 {
   if(!reg)
     return;
@@ -377,8 +375,10 @@ static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg)
     Remove1pcode(pc2, reg);
     deleteSetItem (&(PCFL(pcflow)->registers), reg);
 
-    reg->isFree = 1;
-    reg->wasUsed = 0;
+    if(can_free) {
+      reg->isFree = 1;
+      reg->wasUsed = 0;
+    }
 
   }
 
@@ -410,6 +410,127 @@ int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
 }
 
 /*-----------------------------------------------------------------*
+ * void pCodeOptime2pCodes(pCode *pc1, pCode *pc2) 
+ *
+ * ADHOC pattern checking 
+ * Now look for specific sequences that are easy to optimize.
+ * Many of these sequences are characteristic of the compiler
+ * (i.e. it'd probably be a waste of time to apply these adhoc
+ * checks to hand written assembly.)
+ * 
+ *
+ *-----------------------------------------------------------------*/
+void pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int can_free)
+{
+  pCode *pct1, *pct2;
+  regs  *reg1, *reg2;
+
+  if(pc2->seq < pc1->seq) {
+    pct1 = pc2;
+    pc2 = pc1;
+    pc1 = pct1;
+  }
+
+
+  if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_MOVFW) ){
+
+    /*
+      clrf  reg
+      stuff...
+      movf  reg,w
+
+      can be replaced with
+
+      stuff...
+      movlw 0
+    */
+
+    pCode *newpc;
+    //fprintf(stderr, "   CLRF/MOVFW. instruction after MOVFW is:\n");
+    pct1 = findNextInstruction(pc2->next);
+    //t->print(stderr,t);
+
+    if(PCI(pct1)->op == POC_MOVWF) {
+      newpc = newpCode(POC_CLRF, PCI(pct1)->pcop);
+      pct1->destruct(pct1);
+    } else {
+      newpc = newpCode(POC_MOVLW, newpCodeOpLit(0));
+    }
+
+    pCodeInsertAfter(pc2, newpc);
+    PCI(newpc)->pcflow = PCFL(pcfl_used);
+    newpc->seq = pc2->seq;
+
+    Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+    total_registers_saved++;  // debugging stats.
+
+  } else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){
+    //fprintf(stderr, "   CLRF/IORFW.\n");
+
+    Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+    total_registers_saved++;  // debugging stats.
+
+  }  else if(PCI(pc1)->op == POC_MOVWF) {
+
+    pct2 = findNextInstruction(pc2->next);
+
+    if(PCI(pc2)->op == POC_MOVFW) {
+      //fprintf(stderr, "   MOVWF/MOVFW. instruction after MOVFW is:\n");
+      //pct2->print(stderr,pct2);
+
+      if(PCI(pct2)->op == POC_MOVWF) {
+	reg2 = getRegFromInstruction(pct2);
+	if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
+	  pct2->seq = pc1->seq;
+	  unlinkpCode(pct2);
+	  pCodeInsertAfter(pc1,pct2);
+	  Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+	  total_registers_saved++;  // debugging stats.
+	  return;
+	}
+/*
+	fprintf(stderr, " couldn't optimize\n");
+	if(reg2)
+	  fprintf(stderr, " %s is used in range\n",reg2->name);
+	else
+	  fprintf(stderr, " reg2 is NULL\n");
+*/
+      }
+    }
+
+    pct1 = findPrevInstruction(pc1->prev);
+    if(pct1 && 
+       (PCI(pct1)->pcflow == PCI(pc1)->pcflow) && 
+       (PCI(pct1)->op == POC_MOVFW)) {
+
+      reg1 = getRegFromInstruction(pct1);
+      if(reg1 && !regUsedinRange(pc1,pc2,reg1)) {
+	//fprintf(stderr, "   MOVF/MOVFW. \n");
+	/*
+	  movf   reg1,w
+	  movwf  reg
+
+	  stuff...
+	  opcode reg,w
+	*/
+	pct2 = newpCode(PCI(pc2)->op, PCI(pct1)->pcop);
+	pCodeInsertAfter(pc2, pct2);
+	PCI(pct2)->pcflow = PCFL(pcfl_used);
+	pct2->seq = pc2->seq;
+
+	Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
+	Remove2pcodes(pcfl_used, pct1, NULL, reg1, 0);
+	total_registers_saved++;  // debugging stats.
+
+      }
+    }
+
+
+  }
+
+}
+
+/*-----------------------------------------------------------------*
  * void pCodeRegOptimeRegUsage(pBlock *pb) 
  *-----------------------------------------------------------------*/
 void OptimizeRegUsage(set *fregs)
@@ -419,7 +540,7 @@ void OptimizeRegUsage(set *fregs)
 
 
   while(fregs) {
-      pCode *pcfl_used, *pcfl_assigned;
+    pCode *pcfl_used, *pcfl_assigned;
 
     /* Step through the set by directly accessing the 'next' pointer.
      * We could also step through by using the set API, but the 
@@ -446,9 +567,6 @@ void OptimizeRegUsage(set *fregs)
        */
 
       pCode *pc1, *pc2;
-      pCode *pct1, *pct2; /* two temporaries */
-      regs  *reg1, *reg2;
-
 /*
       fprintf (stderr, "OptimizeRegUsage: %s  addr=0x%03x rIdx=0x%03x type=%d used=%d\n",
 	       reg->name,
@@ -469,117 +587,12 @@ void OptimizeRegUsage(set *fregs)
 	if(pcfl_used->seq == pcfl_assigned->seq) {
 
 	  //fprintf(stderr, "  and used in same flow\n");
-	  if(pc2->seq < pc1->seq) {
-	    pct1 = pc2;
-	    pc2 = pc1;
-	    pc1 = pct1;
-	  }
 
-	  //pc1->print(stderr,pc1);
-	  //pc2->print(stderr,pc2);
-
-
-	  /* ADHOC pattern checking 
-	   * Now look for specific sequences that are easy to optimize.
-	   * Many of these sequences are characteristic of the compiler
-	   * (i.e. it'd probably be a waste of time to apply these adhoc
-	   * checks to hand written assembly.)
-	   * 
-	   */
-	  if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_MOVFW) ){
-
-	    /*
-	         clrf  reg
-		 stuff...
-		 movf  reg,w
-
-		 can be replaced with
-
-		 stuff...
-		 movlw 0
-	    */
-
-	    pCode *newpc;
-	    //fprintf(stderr, "   CLRF/MOVFW. instruction after MOVFW is:\n");
-	    pct1 = findNextInstruction(pc2->next);
-	    //t->print(stderr,t);
-
-	    if(PCI(pct1)->op == POC_MOVWF) {
-	      newpc = newpCode(POC_CLRF, PCI(pct1)->pcop);
-	      pct1->destruct(pct1);
-	    } else {
-	      newpc = newpCode(POC_MOVLW, newpCodeOpLit(0));
-	    }
-
-	    pCodeInsertAfter(pc2, newpc);
-	    PCI(newpc)->pcflow = PCFL(pcfl_used);
-	    newpc->seq = pc2->seq;
-
-	    Remove2pcodes(pcfl_used, pc1, pc2, reg);
-	    total_registers_saved++;  // debugging stats.
-
-	  } else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){
-	    //fprintf(stderr, "   CLRF/IORWF.\n");
-
-	    Remove2pcodes(pcfl_used, pc1, pc2, reg);
-	    total_registers_saved++;  // debugging stats.
-
-	  }  else if(PCI(pc1)->op == POC_MOVWF) {
-
-	    pct2 = findNextInstruction(pc2->next);
-
-	    if(PCI(pc2)->op == POC_MOVFW) {
-	      //fprintf(stderr, "   MOVWF/MOVFW. instruction after MOVFW is:\n");
-	      // t->print(stderr,t);
-
-	      if(PCI(pct2)->op == POC_MOVWF) {
-		reg2 = getRegFromInstruction(pct2);
-		if(reg2 && !regUsedinRange(pc1,pc2,reg2)) {
-		  pct2->seq = pc1->seq;
-		  unlinkpCode(pct2);
-		  pCodeInsertAfter(pc1,pct2);
-		  Remove2pcodes(pcfl_used, pc1, pc2, reg);
-		  total_registers_saved++;  // debugging stats.
-		  continue;
-		}
-	      }
-	    }
-
-	    pct1 = findPrevInstruction(pc1->prev);
-	    if(pct1 && 
-	       (PCI(pct1)->pcflow == PCI(pc1)->pcflow) && 
-	       (PCI(pct1)->op == POC_MOVFW)) {
-
-	      reg1 = getRegFromInstruction(pct1);
-	      if(reg1 && !regUsedinRange(pc1,pc2,reg1)) {
-		//fprintf(stderr, "   MOVF/MOVFW. \n");
-	      /*
-		movf   reg1,w
-		movwf  reg
-
-		stuff...
-		opcode reg,w
-	      */
-		pct2 = newpCode(PCI(pc2)->op, PCI(pct1)->pcop);
-		pCodeInsertAfter(pc2, pct2);
-		PCI(pct2)->pcflow = PCFL(pcfl_used);
-		pct2->seq = pc2->seq;
-
-		Remove2pcodes(pcfl_used, pc1, pc2, reg);
-		Remove2pcodes(pcfl_used, pct1, NULL, reg1);
-		total_registers_saved++;  // debugging stats.
-
-	      }
-	    }
-
-
-	  }
+	  pCodeOptime2pCodes(pc1, pc2, pcfl_used, reg, 1);
 
 	} else {
 	  // fprintf(stderr, "  and used in different flows\n");
 
-	  //pc1->print(stderr,pc1);
-	  //pc2->print(stderr,pc2);
 	}
 
       } else if(pcfl_used) {
@@ -590,10 +603,12 @@ void OptimizeRegUsage(set *fregs)
 
       } else {
 	//fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
-	Remove2pcodes(pcfl_assigned, pc1, pc2, reg);
+	Remove2pcodes(pcfl_assigned, pc1, pc2, reg, 1);
 	total_registers_saved++;  // debugging stats.
       }
     } else {
+
+      /* register has been used either once, or more than twice */
 
       if(used && !pcfl_used && pcfl_assigned) {
 	pCode *pc;
@@ -619,8 +634,11 @@ void OptimizeRegUsage(set *fregs)
 	reg->wasUsed = 0;
 
 	total_registers_saved++;  // debugging stats.
-      }
+      } else if(used > 2) {
 
+	/* examine the number of times this register is used */
+
+      }
     }
 
   }
@@ -634,6 +652,7 @@ void pCodeRegOptimizeRegUsage(void)
 
   int passes = 4;
   int saved = 0;
+  int t = total_registers_saved;
 
   do {
     saved = total_registers_saved;
@@ -648,6 +667,11 @@ void pCodeRegOptimizeRegUsage(void)
 
 
   } while( passes-- && (total_registers_saved != saved));
+
+  if(total_registers_saved == t) 
+    fprintf(stderr, "No registers saved on this pass\n");
+
+
 /*
   fprintf(stderr,"dynamically allocated regs:\n");
   dbg_regusage(dynAllocRegs);
@@ -656,6 +680,38 @@ void pCodeRegOptimizeRegUsage(void)
   fprintf(stderr,"direct regs:\n");
   dbg_regusage(dynDirectRegs);
 */
+}
 
+
+/*-----------------------------------------------------------------*
+ * void RegsUnMapLiveRanges(set *regset)
+ *
+ *-----------------------------------------------------------------*/
+void  RegsSetUnMapLiveRanges(set *regset)
+{
+  regs *reg;
+
+  while(regset) {
+    reg = regset->item;
+    regset = regset->next;
+
+    
+    deleteSet(&reg->reglives.usedpCodes);
+    deleteSet(&reg->reglives.usedpFlows);
+    deleteSet(&reg->reglives.assignedpFlows);
+
+  }
+
+}
+
+void  RegsUnMapLiveRanges(void)
+{
+
+  RegsSetUnMapLiveRanges(dynAllocRegs);
+  RegsSetUnMapLiveRanges(dynStackRegs);
+  RegsSetUnMapLiveRanges(dynDirectRegs);
+  RegsSetUnMapLiveRanges(dynProcessorRegs);
+  RegsSetUnMapLiveRanges(dynDirectBitRegs);
+  RegsSetUnMapLiveRanges(dynInternalRegs);
 
 }

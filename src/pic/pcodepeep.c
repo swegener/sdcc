@@ -2002,7 +2002,7 @@ int pCodePeepMatchRule(pCode *pc)
 	pcin->prev = pc->prev;
 
 
-      //#if 0
+#if 0
       {
 	/*     DEBUG    */
 	/* Converted the deleted pCodes into comments */
@@ -2034,7 +2034,7 @@ int pCodePeepMatchRule(pCode *pc)
 	if(pc_cline2)
 	  pc_cline2->pc.next = NULL;
       }
-      //#endif
+#endif
 
       if(pcin)
 	pCodeDeleteChain(pc,pcin);

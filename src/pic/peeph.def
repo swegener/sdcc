@@ -237,3 +237,13 @@ replace restart {
 	movwf	%1
 	iorwf	%2,w
 }
+
+replace restart {
+	movf	%1,w
+	movwf	%2
+	movf	%2,w
+} by {
+	; peep 9c - Removed redundant move
+	movf	%1,w
+	movwf	%2
+}

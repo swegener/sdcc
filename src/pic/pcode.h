@@ -441,11 +441,11 @@ typedef struct pCodeFlow
   pCode *end;   /* Last pCode in this flow. Note that
 		   the first pCode is pc.next */
 
-  set **uses;   /* map the pCode instruction inCond and outCond conditions 
+  /*  set **uses;   * map the pCode instruction inCond and outCond conditions 
 		 * in this array of set's. The reason we allocate an 
 		 * array of pointers instead of declaring each type of 
 		 * usage is because there are port dependent usage definitions */
-  int nuses;    /* number of uses sets */
+  //int nuses;    /* number of uses sets */
 
   set *from;    /* flow blocks that can send control to this flow block */
   set *to;      /* flow blocks to which this one can send control */

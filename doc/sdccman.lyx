@@ -3266,10 +3266,18 @@ sourcefile.rel - Object file created by the assembler, input to Linkage editor
 \newline 
 sourcefile.map - The memory map for the load module, created by the Linker
 \newline 
+sourcefile.mem - A file with a summary of the memory ussage
+\newline 
 sourcefile.ihx - The load module in Intel hex format (you can select the
  Motorola S19 format with ---out-fmt-s19)
 \newline 
+sourcefile.adb - An intermediate file containing debug information needed
+ to create the .cdb file (with ---debug) 
+\newline 
 sourcefile.cdb - An optional file (with ---debug) containing debug information
+\newline 
+sourcefile. - (no extension) An optional AOMF51 file containing debug
+ information (with ---debug)
 \newline 
 sourcefile.dump* - Dump file to debug the compiler it self (with ---dumpall)
  (see section 

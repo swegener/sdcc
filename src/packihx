@@ -1,0 +1,161 @@
+#!/usr/local/bin/perl -w
+
+# Quick & dirty perl hack to pack an Intel Hex format output file.
+# Will consolidate lines up to $outChunk bytes per line.
+
+use integer;
+
+# 16 bytes per line is default.
+$outChunk = 16;
+
+$nextOffset = 0;
+$pendingData = "";
+$pendingDataStart = 0;
+$pendingDataCount = 0;
+$lastExtendedOffset = 0;
+
+while (<>)
+{
+    if (/:([\dABCDEFabcdef]{2})([\dABCDEFabcdef]{4})(\d\d)(.*)([\dABCDEFabcdef]{2})/)
+    {
+	# $1 = record len; $2 = offset; $3 = record type; $4 = data; $5 = checksum.
+	$recordLen = hex $1;
+	$recordOffset = hex $2;
+
+	# Sanity checks...
+	if ((length $4) % 2 == 1)
+	{
+	    print STDERR "packihx: odd data length $4 in line $.\n";
+	    exit -1;
+	}
+	if ((length $4) / 2 != $recordLen)
+	{
+	    print STDERR "packihx: data len mismatch in line $.: $1 != len $4\n";
+	    exit -1;
+	}
+	if (checksum("$1$2$3$4") != hex $5)
+	{
+	    print STDERR "packihx: bad checksum in line $.: ";
+	    printf STDERR "wanted %02X, got %s\n", checksum("$1$2$3$4"), $5;
+	    exit -1;
+	}
+
+	if ($3 != 0)
+	{
+	    # If this is an extended data offset record, and it
+ 	    # matches the expected extended data offset, then
+	    # we can simply discard it.
+	    if (($3 == 4) && ($recordLen == 2))
+	    {
+		my $extendedOffset = hex $4;
+		if ($extendedOffset == $lastExtendedOffset)
+		{
+		    next;
+		}
+		$lastExtendedOffset = $extendedOffset;
+	    }
+	    # Not a data record. Flush anything pending, then write this
+	    # line as is.
+	    &flush_pending_data;
+	    $pendingDataStart = 0;
+	    $nextOffset = 0;
+            print;
+	}
+	else
+	{
+	    # If this isn't contigous with the last record, 
+ 	    # flush anything pending and start collecting anew.
+	    if ($recordOffset != $nextOffset)
+	    {
+		&flush_pending_data;
+		$pendingDataStart = $recordOffset;
+		$nextOffset = $pendingDataStart;
+	    }
+
+	    # Append this data onto the pending data.
+	    $pendingData .= $4;
+	    $pendingDataCount += $recordLen;
+	    $nextOffset += $recordLen;
+
+	    # If we'va accumulated at least an outChunk
+	    # worth of data, write it out.
+	    while ($pendingDataCount >= $outChunk)
+	    {
+		&write_pending_line($outChunk);
+	    }
+	}	    
+    }
+    else
+    {
+	print STDERR "packihx: don't recognize line $.: $_";
+	exit -1;
+    }
+}
+&flush_pending_data;
+
+exit 0;
+
+# Write all buffered data.
+sub flush_pending_data
+{
+    while ($pendingDataCount > $outChunk)
+    {
+	&write_pending_line($outChunk);
+    }
+    if ($pendingDataCount)
+    {
+	&write_pending_line($pendingDataCount);
+    }
+}
+
+# Write a given number of bytes of buffered output.
+sub write_pending_line
+{   
+    my $lineLen = shift(@_);
+
+    if ($lineLen > $pendingDataCount)
+    {
+	print STDERR "packihx: internal error: asked to write $lineLen bytes ";
+	print STDERR "with only $pendingDataCount bytes buffered.\n";
+	exit -1;
+    }
+
+    my $data = substr $pendingData, 0, $lineLen * 2;
+    my $toWrite = sprintf "%02X%04X00%s", $lineLen, $pendingDataStart, $data;
+
+    my $cks = checksum($toWrite);
+
+    printf ":%s%02X\n", $toWrite, $cks;
+
+    $pendingDataStart += $lineLen;
+    $pendingDataCount -= $lineLen;  
+    $pendingData = substr $pendingData, $lineLen * 2;
+}
+
+# Generate a IHX checksum.
+sub checksum
+{
+   my $line = shift(@_);
+   my $offset = 0;
+   my $cks = 0;
+   
+   while ($offset < length $line)
+   {
+       my $byte = substr $line, $offset, 2;
+       $cks += hex $byte;
+       $offset += 2;
+   }
+
+   if ($offset != length $line)
+   {
+	print STDERR "packihx: checksum: got odd number of bytes... I hate that";
+	exit -1;
+   }
+
+   $cks &= 0xff;
+   if ($cks)
+   {
+	$cks = 0x100 - $cks;
+   }
+   return $cks;
+}

@@ -46,9 +46,10 @@ int pic16_getpCodePeepCommand(char *cmd);
 void pic16_pBlockMergeLabels(pBlock *pb);
 char *pCode2str(char *str, int size, pCode *pc);
 char *pic16_get_op( pCodeOp *pcop,char *buf,int buf_size);
+pCodeOp *pic16_popCombine2(pCodeOp *, pCodeOp *, int);
 
 extern pCodeInstruction *pic16Mnemonics[];
-
+static int parsing_peeps=1;
 
 #define IS_PCCOMMENT(x) ( x && (x->type==PC_COMMENT))
 
@@ -203,7 +204,10 @@ typedef enum {
   ALT_MNEM1B,
   ALT_MNEM2,
   ALT_MNEM2A,
-  ALT_MNEM3
+  ALT_MNEM2B,
+  ALT_MNEM3,
+  ALT_MNEM4,
+  ALT_MNEM4a
 } altPatterns;
 
 static char alt_comment[]   = { PCP_COMMENT, 0};
@@ -215,7 +219,10 @@ static char alt_mnem1a[]    = { PCP_STR, PCP_WILDVAR, 0};
 static char alt_mnem1b[]    = { PCP_STR, PCP_NUMBER, 0};
 static char alt_mnem2[]     = { PCP_STR, PCP_STR, PCP_COMMA, PCP_STR, 0};
 static char alt_mnem2a[]    = { PCP_STR, PCP_WILDVAR, PCP_COMMA, PCP_STR, 0};
+//static char alt_mnem2b[]    = { PCP_STR, PCP_WILDVAR, PCP_COMMA, PCP_WILDVAR, 0};
 static char alt_mnem3[]     = { PCP_STR, PCP_STR, PCP_COMMA, PCP_NUMBER, 0};
+static char alt_mnem4[]	    = { PCP_STR, PCP_NUMBER, PCP_COMMA, PCP_STR, 0};	// for lfsr 0 , name
+static char alt_mnem4a[]    = { PCP_STR, PCP_NUMBER, PCP_COMMA, PCP_NUMBER, 0}; // for lfsr 0 , value
 
 static void * cvt_altpat_label(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_comment(void *pp,pCodeWildBlock *pcwb);
@@ -226,12 +233,19 @@ static void * cvt_altpat_mnem1a(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem1b(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem2(void *pp,pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb);
+//static void * cvt_altpat_mnem2b(void *pp, pCodeWildBlock *pcwb);
 static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb);
+static void * cvt_altpat_mnem4(void *pp, pCodeWildBlock *pcwb);
+static void * cvt_altpat_mnem4a(void *pp, pCodeWildBlock *pcwb);
 
+/* NOTE: Order is important in the following table */
 static pcPattern altArr[] = {
   {ALT_LABEL,        alt_label,  cvt_altpat_label},
   {ALT_COMMENT,      alt_comment,cvt_altpat_comment},
+  {ALT_MNEM4a,       alt_mnem4a, cvt_altpat_mnem4a},
+  {ALT_MNEM4,        alt_mnem4,  cvt_altpat_mnem4},
   {ALT_MNEM3,        alt_mnem3,  cvt_altpat_mnem3},
+//  {ALT_MNEM2B,       alt_mnem2b, cvt_altpat_mnem2b},
   {ALT_MNEM2A,       alt_mnem2a, cvt_altpat_mnem2a},
   {ALT_MNEM2,        alt_mnem2,  cvt_altpat_mnem2},
   {ALT_MNEM1B,       alt_mnem1b, cvt_altpat_mnem1b},
@@ -434,8 +448,10 @@ static void * cvt_altpat_mnem1(void *pp,pCodeWildBlock *pcwb)
 
   if(pic16Mnemonics[opcode]->isBitInst)
     pcosubtype = pic16_newpCodeOp(p[1].pct[0].tok.s,PO_BIT);
-  else
-    pcosubtype = pic16_newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
+  else {
+//	fprintf(stderr, "%s:%d tok.s= %s\n", __FILE__, __LINE__, p[1].pct[0].tok.s);
+    pcosubtype = pic16_newpCodeOp(p[1].pct[0].tok.s,PO_STR);	//GPR_REGISTER);
+  }
 
 
   pci = PCI(pic16_newpCode(opcode, pcosubtype));
@@ -567,7 +583,6 @@ static void * cvt_altpat_mnem2(void *pp,pCodeWildBlock *pcwb)
 	  p[3].pct[0].tok.s,
 	  dest));
 
-
   opcode = pic16_getpCode(p->pct[0].tok.s,dest);
   if(opcode < 0) {
     fprintf(stderr, "Bad mnemonic\n");
@@ -582,7 +597,14 @@ static void * cvt_altpat_mnem2(void *pp,pCodeWildBlock *pcwb)
     }
       
   } else
+  if(pic16Mnemonics[opcode]->is2MemOp) {
+  	/* support for movff instruction */
+  	pcosubtype = pic16_popCombine2(
+  		pic16_newpCodeOp(p[1].pct[0].tok.s, PO_GPR_REGISTER),
+  		pic16_newpCodeOp(p[3].pct[0].tok.s, PO_GPR_REGISTER), 0);
+  } else
     pcosubtype = pic16_newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
+ 
 
 
   pci = PCI(pic16_newpCode(opcode,pcosubtype));
@@ -637,6 +659,13 @@ static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb)
   if(pic16Mnemonics[opcode]->isBitInst)
     pcosubtype = pic16_newpCodeOp(NULL,PO_BIT);
   else
+  if(pic16Mnemonics[opcode]->is2MemOp) {
+	return NULL;
+  	/* support for movff instruction */
+  	pcosubtype = pic16_popCombine2(
+  		pic16_newpCodeOp(p[1].pct[0].tok.s, PO_GPR_REGISTER),
+  		pic16_newpCodeOp(p[3].pct[0].tok.s, PO_GPR_REGISTER), 0);
+  } else
     pcosubtype = pic16_newpCodeOp(NULL,PO_GPR_REGISTER);
 
 
@@ -656,6 +685,70 @@ static void * cvt_altpat_mnem2a(void *pp,pCodeWildBlock *pcwb)
   return pci;
 
 }
+
+#if 0
+/*-----------------------------------------------------------------*/
+/* cvt_altpat_mem2b - convert assembly line type to a pCode        */
+/*                    instruction with 2 wild operands             */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - wild var                                               */
+/*  pp[2] - comma                                                  */
+/*  pp[3] - wild var                                               */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem2b(void *pp,pCodeWildBlock *pcwb)
+{
+  parsedPattern *p = pp;
+  int opcode;
+  int dest;
+
+  pCodeInstruction *pci=NULL;
+  pCodeOp *pcosubtype;
+
+  if(!pcwb) {
+    fprintf(stderr,"ERROR %s:%d - can't assemble line\n",__FILE__,__LINE__);
+    return NULL;
+  }
+
+  dest = cvt_extract_destination(&p[3]);
+
+  DFPRINTF((stderr,"altpat_mnem2b %s src %d dst (%d)\n",
+	  p->pct[0].tok.s,
+	  p[1].pct[1].tok.n,
+	  p[3].pct[1].tok.n));
+
+
+  opcode = pic16_getpCode(p->pct[0].tok.s,dest);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+
+  if(pic16Mnemonics[opcode]->is2MemOp) {
+  	/* support for movff instruction */
+  	pcosubtype = pic16_popCombine2(
+  		pic16_newpCodeOp(NULL, PO_GPR_REGISTER),
+  		pic16_newpCodeOp(NULL, PO_GPR_REGISTER), 0);
+  } else pcosubtype = NULL;
+
+  pci = PCI(pic16_newpCode(opcode,
+		     pic16_newpCodeOpWild(p[1].pct[1].tok.n, pcwb, pcosubtype)));
+
+  /* Save the index of the maximum wildcard variable */
+  //if(p[1].pct[1].tok.n > sMaxWildVar)
+  //  sMaxWildVar = p[1].pct[1].tok.n;
+
+  if(p[1].pct[1].tok.n > pcwb->nvars)
+    pcwb->nvars = p[1].pct[1].tok.n;
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+  return pci;
+
+}
+#endif
 
 
 /*-----------------------------------------------------------------*/
@@ -701,6 +794,110 @@ static void * cvt_altpat_mnem3(void *pp,pCodeWildBlock *pcwb)
     //}
   } else
     pcosubtype = pic16_newpCodeOp(p[1].pct[0].tok.s,PO_GPR_REGISTER);
+
+  if(pcosubtype == NULL) {
+    fprintf(stderr, "Bad operand\n");
+    return NULL;
+  }
+
+  pci = PCI(pic16_newpCode(opcode, pcosubtype));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+  return pci;
+
+}
+
+/*-----------------------------------------------------------------*/
+/* cvt_altpat_mem4 -  convert assembly line type to a pCode        */
+/*                    This rule is for lfsr instruction            */
+/*                                                                 */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - number                                                 */
+/*  pp[2] - comma                                                  */
+/*  pp[3] - source                                                 */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem4(void *pp, pCodeWildBlock *pcwb)
+{
+  parsedPattern *p = pp;
+  int opcode;
+  int dest;  // or could be bit position in the register
+
+  pCodeInstruction *pci=NULL;
+  pCodeOp *pcosubtype=NULL;
+
+  dest = cvt_extract_destination(&p[3]);
+
+  DFPRINTF((stderr,"altpat_mnem4 %s fsr %d source %s\n",
+	  p->pct[0].tok.s,
+	  p[1].pct[0].tok.n,
+	  p[3].pct[0].tok.s));
+
+  opcode = pic16_getpCode(p->pct[0].tok.s,0);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+  DFPRINTF((stderr, "Found mnemonic opcode= %d\n", opcode));
+
+  if(pic16Mnemonics[opcode]->is2LitOp) {
+    pcosubtype = pic16_newpCodeOpLit2(p[1].pct[0].tok.n, pic16_newpCodeOp(p[3].pct[0].tok.s, PO_STR));
+  }
+
+  if(pcosubtype == NULL) {
+    fprintf(stderr, "Bad operand\n");
+    return NULL;
+  }
+
+  pci = PCI(pic16_newpCode(opcode, pcosubtype));
+
+  if(!pci)
+    fprintf(stderr,"couldn't find mnemonic\n");
+
+  return pci;
+
+}
+
+/*-----------------------------------------------------------------*/
+/* cvt_altpat_mem4a -  convert assembly line type to a pCode       */
+/*                    This rule is for lfsr instruction            */
+/*                                                                 */
+/*                                                                 */
+/*  pp[0] - mnem                                                   */
+/*  pp[1] - number                                                 */
+/*  pp[2] - comma                                                  */
+/*  pp[3] - value                                                  */
+/*                                                                 */
+/*-----------------------------------------------------------------*/
+static void * cvt_altpat_mnem4a(void *pp, pCodeWildBlock *pcwb)
+{
+  parsedPattern *p = pp;
+  int opcode;
+  int dest;  // or could be bit position in the register
+
+  pCodeInstruction *pci=NULL;
+  pCodeOp *pcosubtype=NULL;
+
+  dest = cvt_extract_destination(&p[3]);
+
+  DFPRINTF((stderr,"altpat_mnem4a %s fsr %d value 0x%02x\n",
+	  p->pct[0].tok.s,
+	  p[1].pct[0].tok.n,
+	  p[3].pct[0].tok.n));
+
+  opcode = pic16_getpCode(p->pct[0].tok.s,0);
+  if(opcode < 0) {
+    fprintf(stderr, "Bad mnemonic\n");
+    return NULL;
+  }
+  DFPRINTF((stderr, "Found mnemonic opcode= %d\n", opcode));
+
+  if(pic16Mnemonics[opcode]->is2LitOp) {
+    pcosubtype = pic16_newpCodeOpLit2(p[1].pct[0].tok.n, pic16_newpCodeOpLit(p[3].pct[0].tok.n));
+  }
 
   if(pcosubtype == NULL) {
     fprintf(stderr, "Bad operand\n");
@@ -785,12 +982,12 @@ static void tokenizeLineNode(char *ln)
       break;
 
 
-    default:
-      if(isalpha(*ln) || (*ln == '_') ) {
+    default:				// hack to allow : goto $
+      if(isalpha(*ln) || (*ln == '_')  || (!parsing_peeps && (*ln == '$'))) {
 	char buffer[50];
 	int i=0;
 
-	while( (isalpha(*ln)  ||  isdigit(*ln) || (*ln == '_')) && i<49)
+	while( (isalpha(*ln)  ||  isdigit(*ln) || (*ln == '_') || (*ln == '$')) && i<49)
 	  buffer[i++] = *ln++;
 
 	ln--;
@@ -800,10 +997,12 @@ static void tokenizeLineNode(char *ln)
 	tokArr[tokIdx++].tt = PCT_STRING;
 
       } else {
-	fprintf(stderr, "Error while parsing peep rules (check peeph.def)\n");
-	fprintf(stderr, "Line: %s\n",lnstart);
-	fprintf(stderr, "Token: '%c'\n",*ln);
-	exit(1);
+	if(parsing_peeps) {
+		fprintf(stderr, "Error while parsing peep rules (check peeph.def)\n");
+		fprintf(stderr, "Line: %s\n",lnstart);
+		fprintf(stderr, "Token: '%c'\n",*ln);
+		exit(1);
+	}
       }
     }
 
@@ -915,11 +1114,11 @@ static int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
   while(i < max_tokens) {
 
     if(*pct == 0) {
-      //DFPRINTF((stderr,"matched\n"));
+	DFPRINTF((stderr,"matched\n"));
       return i;
     }
 
-    //dump1Token(*pat); DFPRINTF((stderr,"\n"));
+//	dump1Token(*pat); DFPRINTF((stderr,"\n"));
 
     if( !pat || !pat->pcp )
       return 0;
@@ -927,7 +1126,7 @@ static int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
     if (pat->pcp->pt != *pct)  
       return 0;
 
-    //DFPRINTF((stderr," pct=%d\n",*pct));
+	DFPRINTF((stderr," pct=%d\n",*pct));
     pct++;
     pat++;
     i++;
@@ -1122,7 +1321,7 @@ static int parseTokens(pCodeWildBlock *pcwb, pCode **pcret)
 	  parsedPatArr[lparsedPatIdx].pct = &tokArr[ltokIdx];
 	  lparsedPatIdx++;
 
-	  //dump1Token(tokArr[ltokIdx].tt);
+//		dump1Token(tokArr[ltokIdx].tt);
 
 	  if(advTokIdx(&ltokIdx, strlen(pcpArr[lpcpIdx].tokens) ) ) {
 	    DFPRINTF((stderr," reached end \n"));
@@ -1216,9 +1415,10 @@ static void  peepRuleBlock2pCodeBlock(  lineNode *ln, pCodeWildBlock *pcwb)
 }
 
 /*-----------------------------------------------------------------*/
-/*                                                                 */
+/* pic16_AssembleLine - parse line and return the pCode equivalent */
+/*                      peeps=1 if parsing peep rules, 0 otherwise */
 /*-----------------------------------------------------------------*/
-pCode *pic16_AssembleLine(char *line)
+pCode *pic16_AssembleLine(char *line, int peeps)
 {
   pCode *pc=NULL;
 
@@ -1227,11 +1427,18 @@ pCode *pic16_AssembleLine(char *line)
     return NULL;
   }
 
+  parsing_peeps = peeps;
+
   tokenizeLineNode(line);
     
   if(parseTokens(NULL,&pc))
     fprintf(stderr, "WARNING: unable to assemble line:\n%s\n",line);
+  else {
+  	DFPRINTF((stderr, "pc= %p\n", pc));
+//	if(pc)pc->print(stderr, pc);
+  }
 
+  parsing_peeps = 1;
   return pc;
 
 }
@@ -1708,14 +1915,37 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 	    return pCodeOpCompare(PCI(pcs)->pcop, peepBlock->target.wildpCodeOps[index]);
 	  }
 
-	  {
+	  if(PCI(pcs)->pcop) {
 	    char *n;
 
 	    switch(PCI(pcs)->pcop->type) {
 	    case PO_GPR_TEMP:
 	    case PO_FSR0:
 	      //case PO_INDF0:
-	      n = PCOR(PCI(pcs)->pcop)->r->name;
+		n = PCOR(PCI(pcs)->pcop)->r->name;
+
+	      break;
+	    default:
+	      n = PCI(pcs)->pcop->name;
+	    }
+
+	    if(peepBlock->target.vars[index])
+	      return  (strcmp(peepBlock->target.vars[index],n) == 0);
+	    else {
+	      DFPRINTF((stderr,"first time for a variable: %d, %s\n",index,n));
+	      peepBlock->target.vars[index] = n;
+	      return 1;
+	    }
+	  }
+	  
+	  if(PCI(pcs)->is2MemOp) {
+	    char *n;
+
+	    switch(PCOP(PCOR2(PCI(pcs))->pcop2)->type) {
+	    case PO_GPR_TEMP:
+	    case PO_FSR0:
+	      //case PO_INDF0:
+		n = PCOR(PCOR2(PCI(pcs))->pcop2)->r->name;
 
 	      break;
 	    default:
@@ -2110,7 +2340,7 @@ int pic16_pCodePeepMatchRule(pCode *pc)
 	 inefficient code with the optimized version */
 #ifdef PCODE_DEBUG
       DFPRINTF((stderr, "Found a pcode peep match:\nRule:\n"));
-      printpCodeString(stderr,peepBlock->target.pb->pcHead,10);
+//      printpCodeString(stderr,peepBlock->target.pb->pcHead,10);
       DFPRINTF((stderr,"first thing matched\n"));
       pc->print(stderr,pc);
       if(pcin) {

@@ -29,6 +29,7 @@
 #include "ralloc.h"
 #include "pcode.h"
 #include "gen.h"
+#include "device.h"
 
 #if defined(__BORLANDC__) || defined(_MSC_VER)
 #define STRCASECMP stricmp
@@ -79,9 +80,11 @@ static hTab  *dynDirectRegNames= NULL;
 
 set *pic16_rel_udata=NULL;
 set *pic16_fix_udata=NULL;
+set *pic16_equ_data=NULL;
 
+set *pic16_builtin_functions=NULL;
 
-static int dynrIdx=0x20;
+static int dynrIdx=0x10;		//0x20;		// starting temporary register rIdx
 static int rDirectIdx=0;
 
 int pic16_nRegs = 128;   // = sizeof (regspic16) / sizeof (regs);
@@ -93,7 +96,7 @@ int pic16_Gstack_base_addr=0; /* The starting address of registers that
 
 
 static void spillThis (symbol *);
-static int debug = 1;
+int pic16_ralloc_debug = 0;
 static FILE *debugF = NULL;
 /*-----------------------------------------------------------------*/
 /* debugLog - open a file for debugging information                */
@@ -108,7 +111,7 @@ debugLog (char *fmt,...)
   //char *bufferP=buffer;
   va_list ap;
 
-  if (!debug || !dstFileName)
+  if (!pic16_ralloc_debug || !dstFileName)
     return;
 
 
@@ -149,8 +152,10 @@ debugLog (char *fmt,...)
 static void
 debugNewLine (void)
 {
-  if (debugF)
-    fputc ('\n', debugF);
+	if(!pic16_ralloc_debug)return;
+	
+	if (debugF)
+		fputc ('\n', debugF);
 }
 /*-----------------------------------------------------------------*/
 /* debugLogClose - closes the debug log file (if opened)           */
@@ -158,244 +163,142 @@ debugNewLine (void)
 static void
 debugLogClose (void)
 {
-  if (debugF)
-    {
-      fclose (debugF);
-      debugF = NULL;
-    }
+	if (debugF) {
+		fclose (debugF);
+		debugF = NULL;
+	}
 }
+
 #define AOP(op) op->aop
 
 static char *
 debugAopGet (char *str, operand * op)
 {
-  if (str)
-    debugLog (str);
+	if(!pic16_ralloc_debug)return NULL;
 
-  printOperand (op, debugF);
-  debugNewLine ();
+	if (str)
+		debugLog (str);
+
+	printOperand (op, debugF);
+	debugNewLine ();
 
   return NULL;
-
 }
 
 static char *
 decodeOp (unsigned int op)
 {
+	if (op < 128 && op > ' ') {
+		buffer[0] = (op & 0xff);
+		buffer[1] = 0;
+	  return buffer;
+	}
 
-  if (op < 128 && op > ' ')
-    {
-      buffer[0] = (op & 0xff);
-      buffer[1] = 0;
-      return buffer;
-    }
+	switch (op) {
+		case IDENTIFIER:	return "IDENTIFIER";
+		case TYPE_NAME:		return "TYPE_NAME";
+		case CONSTANT:		return "CONSTANT";
+		case STRING_LITERAL:	return "STRING_LITERAL";
+		case SIZEOF:		return "SIZEOF";
+		case PTR_OP:		return "PTR_OP";
+		case INC_OP:		return "INC_OP";
+		case DEC_OP:		return "DEC_OP";
+		case LEFT_OP:		return "LEFT_OP";
+		case RIGHT_OP:		return "RIGHT_OP";
+		case LE_OP:		return "LE_OP";
+		case GE_OP:		return "GE_OP";
+		case EQ_OP:		return "EQ_OP";
+		case NE_OP:		return "NE_OP";
+		case AND_OP:		return "AND_OP";
+		case OR_OP:		return "OR_OP";
+		case MUL_ASSIGN:	return "MUL_ASSIGN";
+		case DIV_ASSIGN:	return "DIV_ASSIGN";
+		case MOD_ASSIGN:	return "MOD_ASSIGN";
+		case ADD_ASSIGN:	return "ADD_ASSIGN";
+		case SUB_ASSIGN:	return "SUB_ASSIGN";
+		case LEFT_ASSIGN:	return "LEFT_ASSIGN";
+		case RIGHT_ASSIGN:	return "RIGHT_ASSIGN";
+		case AND_ASSIGN:	return "AND_ASSIGN";
+		case XOR_ASSIGN:	return "XOR_ASSIGN";
+		case OR_ASSIGN:		return "OR_ASSIGN";
+		case TYPEDEF:		return "TYPEDEF";
+		case EXTERN:		return "EXTERN";
+		case STATIC:		return "STATIC";
+		case AUTO:		return "AUTO";
+		case REGISTER:		return "REGISTER";
+		case CODE:		return "CODE";
+		case EEPROM:		return "EEPROM";
+		case INTERRUPT:		return "INTERRUPT";
+		case SFR:		return "SFR";
+		case AT:		return "AT";
+		case SBIT:		return "SBIT";
+		case REENTRANT:		return "REENTRANT";
+		case USING:		return "USING";
+		case XDATA:		return "XDATA";
+		case DATA:		return "DATA";
+		case IDATA:		return "IDATA";
+		case PDATA:		return "PDATA";
+		case VAR_ARGS:		return "VAR_ARGS";
+		case CRITICAL:		return "CRITICAL";
+		case NONBANKED:		return "NONBANKED";
+		case BANKED:		return "BANKED";
+		case CHAR:		return "CHAR";
+		case SHORT:		return "SHORT";
+		case INT:		return "INT";
+		case LONG:		return "LONG";
+		case SIGNED:		return "SIGNED";
+		case UNSIGNED:		return "UNSIGNED";
+		case FLOAT:		return "FLOAT";
+		case DOUBLE:		return "DOUBLE";
+		case CONST:		return "CONST";
+		case VOLATILE:		return "VOLATILE";
+		case VOID:		return "VOID";
+		case BIT:		return "BIT";
+		case STRUCT:		return "STRUCT";
+		case UNION:		return "UNION";
+		case ENUM:		return "ENUM";
+		case ELIPSIS:		return "ELIPSIS";
+		case RANGE:		return "RANGE";
+		case FAR:		return "FAR";
+		case CASE:		return "CASE";
+		case DEFAULT:		return "DEFAULT";
+		case IF:		return "IF";
+		case ELSE:		return "ELSE";
+		case SWITCH:		return "SWITCH";
+		case WHILE:		return "WHILE";
+		case DO:		return "DO";
+		case FOR:		return "FOR";
+		case GOTO:		return "GOTO";
+		case CONTINUE:		return "CONTINUE";
+		case BREAK:		return "BREAK";
+		case RETURN:		return "RETURN";
+		case INLINEASM:		return "INLINEASM";
+		case IFX:		return "IFX";
+		case ADDRESS_OF:	return "ADDRESS_OF";
+		case GET_VALUE_AT_ADDRESS:	return "GET_VALUE_AT_ADDRESS";
+		case SPIL:		return "SPIL";
+		case UNSPIL:		return "UNSPIL";
+		case GETHBIT:		return "GETHBIT";
+		case BITWISEAND:	return "BITWISEAND";
+		case UNARYMINUS:	return "UNARYMINUS";
+		case IPUSH:		return "IPUSH";
+		case IPOP:		return "IPOP";
+		case PCALL:		return "PCALL";
+		case ENDFUNCTION:	return "ENDFUNCTION";
+		case JUMPTABLE:		return "JUMPTABLE";
+		case RRC:		return "RRC";
+		case RLC:		return "RLC";
+		case CAST:		return "CAST";
+		case CALL:		return "CALL";
+		case PARAM:		return "PARAM  ";
+		case NULLOP:		return "NULLOP";
+		case BLOCK:		return "BLOCK";
+		case LABEL:		return "LABEL";
+		case RECEIVE:		return "RECEIVE";
+		case SEND:		return "SEND";
+	}
+	sprintf (buffer, "unkown op %d %c", op, op & 0xff);
 
-  switch (op)
-    {
-    case IDENTIFIER:
-      return "IDENTIFIER";
-    case TYPE_NAME:
-      return "TYPE_NAME";
-    case CONSTANT:
-      return "CONSTANT";
-    case STRING_LITERAL:
-      return "STRING_LITERAL";
-    case SIZEOF:
-      return "SIZEOF";
-    case PTR_OP:
-      return "PTR_OP";
-    case INC_OP:
-      return "INC_OP";
-    case DEC_OP:
-      return "DEC_OP";
-    case LEFT_OP:
-      return "LEFT_OP";
-    case RIGHT_OP:
-      return "RIGHT_OP";
-    case LE_OP:
-      return "LE_OP";
-    case GE_OP:
-      return "GE_OP";
-    case EQ_OP:
-      return "EQ_OP";
-    case NE_OP:
-      return "NE_OP";
-    case AND_OP:
-      return "AND_OP";
-    case OR_OP:
-      return "OR_OP";
-    case MUL_ASSIGN:
-      return "MUL_ASSIGN";
-    case DIV_ASSIGN:
-      return "DIV_ASSIGN";
-    case MOD_ASSIGN:
-      return "MOD_ASSIGN";
-    case ADD_ASSIGN:
-      return "ADD_ASSIGN";
-    case SUB_ASSIGN:
-      return "SUB_ASSIGN";
-    case LEFT_ASSIGN:
-      return "LEFT_ASSIGN";
-    case RIGHT_ASSIGN:
-      return "RIGHT_ASSIGN";
-    case AND_ASSIGN:
-      return "AND_ASSIGN";
-    case XOR_ASSIGN:
-      return "XOR_ASSIGN";
-    case OR_ASSIGN:
-      return "OR_ASSIGN";
-    case TYPEDEF:
-      return "TYPEDEF";
-    case EXTERN:
-      return "EXTERN";
-    case STATIC:
-      return "STATIC";
-    case AUTO:
-      return "AUTO";
-    case REGISTER:
-      return "REGISTER";
-    case CODE:
-      return "CODE";
-    case EEPROM:
-      return "EEPROM";
-    case INTERRUPT:
-      return "INTERRUPT";
-    case SFR:
-      return "SFR";
-    case AT:
-      return "AT";
-    case SBIT:
-      return "SBIT";
-    case REENTRANT:
-      return "REENTRANT";
-    case USING:
-      return "USING";
-    case XDATA:
-      return "XDATA";
-    case DATA:
-      return "DATA";
-    case IDATA:
-      return "IDATA";
-    case PDATA:
-      return "PDATA";
-    case VAR_ARGS:
-      return "VAR_ARGS";
-    case CRITICAL:
-      return "CRITICAL";
-    case NONBANKED:
-      return "NONBANKED";
-    case BANKED:
-      return "BANKED";
-    case CHAR:
-      return "CHAR";
-    case SHORT:
-      return "SHORT";
-    case INT:
-      return "INT";
-    case LONG:
-      return "LONG";
-    case SIGNED:
-      return "SIGNED";
-    case UNSIGNED:
-      return "UNSIGNED";
-    case FLOAT:
-      return "FLOAT";
-    case DOUBLE:
-      return "DOUBLE";
-    case CONST:
-      return "CONST";
-    case VOLATILE:
-      return "VOLATILE";
-    case VOID:
-      return "VOID";
-    case BIT:
-      return "BIT";
-    case STRUCT:
-      return "STRUCT";
-    case UNION:
-      return "UNION";
-    case ENUM:
-      return "ENUM";
-    case ELIPSIS:
-      return "ELIPSIS";
-    case RANGE:
-      return "RANGE";
-    case FAR:
-      return "FAR";
-    case CASE:
-      return "CASE";
-    case DEFAULT:
-      return "DEFAULT";
-    case IF:
-      return "IF";
-    case ELSE:
-      return "ELSE";
-    case SWITCH:
-      return "SWITCH";
-    case WHILE:
-      return "WHILE";
-    case DO:
-      return "DO";
-    case FOR:
-      return "FOR";
-    case GOTO:
-      return "GOTO";
-    case CONTINUE:
-      return "CONTINUE";
-    case BREAK:
-      return "BREAK";
-    case RETURN:
-      return "RETURN";
-    case INLINEASM:
-      return "INLINEASM";
-    case IFX:
-      return "IFX";
-    case ADDRESS_OF:
-      return "ADDRESS_OF";
-    case GET_VALUE_AT_ADDRESS:
-      return "GET_VALUE_AT_ADDRESS";
-    case SPIL:
-      return "SPIL";
-    case UNSPIL:
-      return "UNSPIL";
-    case GETHBIT:
-      return "GETHBIT";
-    case BITWISEAND:
-      return "BITWISEAND";
-    case UNARYMINUS:
-      return "UNARYMINUS";
-    case IPUSH:
-      return "IPUSH";
-    case IPOP:
-      return "IPOP";
-    case PCALL:
-      return "PCALL";
-    case ENDFUNCTION:
-      return "ENDFUNCTION";
-    case JUMPTABLE:
-      return "JUMPTABLE";
-    case RRC:
-      return "RRC";
-    case RLC:
-      return "RLC";
-    case CAST:
-      return "CAST";
-    case CALL:
-      return "CALL";
-    case PARAM:
-      return "PARAM  ";
-    case NULLOP:
-      return "NULLOP";
-    case BLOCK:
-      return "BLOCK";
-    case LABEL:
-      return "LABEL";
-    case RECEIVE:
-      return "RECEIVE";
-    case SEND:
-      return "SEND";
-    }
-  sprintf (buffer, "unkown op %d %c", op, op & 0xff);
   return buffer;
 }
 /*-----------------------------------------------------------------*/
@@ -403,18 +306,14 @@ decodeOp (unsigned int op)
 static char *
 debugLogRegType (short type)
 {
+	if(!pic16_ralloc_debug)return NULL;
+	switch (type) {
+		case REG_GPR: return "REG_GPR";
+		case REG_PTR: return "REG_PTR";
+		case REG_CND: return "REG_CND";
+	}
+	sprintf (buffer, "unknown reg type %d", type);
 
-  switch (type)
-    {
-    case REG_GPR:
-      return "REG_GPR";
-    case REG_PTR:
-      return "REG_PTR";
-    case REG_CND:
-      return "REG_CND";
-    }
-
-  sprintf (buffer, "unknown reg type %d", type);
   return buffer;
 }
 
@@ -459,6 +358,7 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 	}
 
 //	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
+
 	dReg->isFree = 0;
 	dReg->wasUsed = 1;
 
@@ -516,8 +416,12 @@ regFindFree (set *dRegs)
   for (dReg = setFirstItem(dRegs) ; dReg ; 
        dReg = setNextItem(dRegs)) {
 
-    if(dReg->isFree)
+//	fprintf(stderr, "%s:%d checking register %s (%p) [rIdx: 0x%02x] if free= %d\n",
+//		__FILE__, __LINE__, dReg->name, dReg, dReg->rIdx, dReg->isFree);
+
+    if(dReg->isFree) {
       return dReg;
+    }
   }
 
   return NULL;
@@ -560,7 +464,7 @@ pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 {
   regs * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias, NULL);
 
-//  fprintf(stderr,"pic16_allocInternalRegister %s addr =0x%x\n",name,rIdx);
+//  fprintf(stderr,"%s:%d: %s	%s addr =0x%x\n",__FILE__, __LINE__, __FUNCTION__, name, rIdx);
 
   if(reg) {
     reg->wasUsed = 0;
@@ -575,12 +479,42 @@ pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 static regs *
 allocReg (short type)
 {
+  regs * reg=NULL;
+  
+#if 0
+  if(dynrIdx > pic16_nRegs)
+  	return NULL;
+#endif
 
-  debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
-  //fprintf(stderr,"allocReg\n");
+#if STACK_SUPPORT
+	if(USE_STACK) {
+		/* try to reuse some unused registers */
+		reg = regFindFree( pic16_dynAllocRegs );
+	}
+#endif
 
+	if(!reg) {
+		reg = newReg(REG_GPR, PO_GPR_TEMP, dynrIdx++, NULL, 1, 0, NULL);
+		addSet(&pic16_dynAllocRegs, reg);
+	}
+	reg->isFree=0;
 
-  return addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0, NULL));
+	debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
+
+//	fprintf(stderr,"%s:%d: %s\t%s addr= 0x%x\trIdx= 0x%02x isFree: %d\n",
+//		__FILE__, __LINE__, __FUNCTION__, reg->name, reg->address, reg->rIdx, reg->isFree);
+
+	if(reg) {
+		reg->accessBank = 1;	/* this is a temporary register alloc in accessBank */
+		reg->isLocal = 1;	/* this is a local frame register */
+	}
+	
+#if STACK_SUPPORT
+	if (currFunc)
+		currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, reg->rIdx);
+#endif
+ 
+  return (reg);		// addSet(&pic16_dynAllocRegs,reg);
 
 }
 
@@ -707,6 +641,12 @@ pic16_allocDirReg (operand *op )
     /* Register wasn't found in hash, so let's create
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
+    if(IN_CODESPACE( SPEC_OCLS( OP_SYM_ETYPE(op)))) {
+	if(pic16_debug_verbose)
+		    	fprintf(stderr, "%s:%d symbol %s in codespace\n", __FILE__, __LINE__,
+		    		OP_SYMBOL(op)->name);
+    	return NULL;
+    }
     if(!IS_CONFIG_ADDRESS(address)) {
       //fprintf(stderr,"%s:allocating new reg %s\n",__FUNCTION__, name);
 
@@ -730,15 +670,6 @@ pic16_allocDirReg (operand *op )
     } else {
       debugLog ("  -- %s is declared at address 0x30000x\n",name);
       fprintf(stderr, "  -- %s is declared at address 0x30000x\n",name);
-
-/*
-	fprintf(stderr, "  setting config word to %x\n", 
-		  (int) floatFromVal (op->operand.valOperand));	//IC_RIGHT(ic)->operand.valOperand));
-
-	pic16_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
-				(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
-*/
-
 
       return NULL;
     }
@@ -905,7 +836,7 @@ pic16_findFreeReg(short type)
   case REG_GPR:
     if((dReg = regFindFree(pic16_dynAllocRegs)) != NULL)
       return dReg;
-    return addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0, NULL));
+    return allocReg( REG_GPR );		//addSet(&pic16_dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0, NULL));
 
   case REG_STK:
 
@@ -928,6 +859,7 @@ static void
 freeReg (regs * reg)
 {
 	debugLog ("%s\n", __FUNCTION__);
+//	fprintf(stderr, "%s:%d register %s (%p) is freed\n", __FILE__, __LINE__, reg->name, reg);
 	reg->isFree = 1;
 }
 
@@ -938,20 +870,27 @@ freeReg (regs * reg)
 static int
 nFreeRegs (int type)
 {
+  regs *reg;
+  int nfr=0;
+
+
+		/* although I fixed the register allocation/freeing scheme
+		 * the for loop below doesn't give valid results. I do not
+		 * know why yet. -- VR 10-Jan-2003 */
+		 
+	return 100;
+
+
   /* dynamically allocate as many as we need and worry about
    * fitting them into a PIC later */
 
-  return 100;
-#if 0
-  int i;
-  int nfr = 0;
-
   debugLog ("%s\n", __FUNCTION__);
-  for (i = 0; i < pic16_nRegs; i++)
-    if (regspic16[i].isFree && regspic16[i].type == type)
-      nfr++;
+
+	for(reg = setFirstItem(pic16_dynAllocRegs); reg; reg=setNextItem(pic16_dynAllocRegs))
+		if((reg->type == type) && reg->isFree)nfr++;
+
+	fprintf(stderr, "%s:%d # of free registers= %d\n", __FILE__, __LINE__, nfr);
   return nfr;
-#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -988,8 +927,9 @@ static void writeSetUsedRegs(FILE *of, set *dRegs)
 
 extern void pic16_groupRegistersInSection(set *regset);
 
-extern void pic16_dump_map(void);
-extern void pic16_dump_section(FILE *of, char *sname, set *section, int fix);
+extern void pic16_dump_equates(FILE *of, set *equs);
+//extern void pic16_dump_map(void);
+extern void pic16_dump_section(FILE *of, set *section, int fix);
 
 
 static void packBits(set *bregs)
@@ -1142,9 +1082,11 @@ void pic16_writeUsedRegs(FILE *of)
 //	pic16_dump_map();
 //	pic16_dump_cblock(of);
 
-	pic16_dump_section(of, "ud1", pic16_rel_udata, 0);
-	pic16_dump_section(of, "ud2", pic16_fix_udata, 1);
-
+	pic16_dump_equates(of, pic16_equ_data);
+	
+	pic16_dump_section(of, pic16_rel_udata, 0);
+	pic16_dump_section(of, pic16_fix_udata, 1);
+	
 #if 0
 	bitEQUs(of,pic16_dynDirectBitRegs);
 	aliasEQUs(of,pic16_dynAllocRegs,0);
@@ -2607,17 +2549,10 @@ DEFSETFUNC (pic16_deallocReg)
 void
 pic16_freeAllRegs ()
 {
-  //  int i;
-
   debugLog ("%s\n", __FUNCTION__);
 
   applyToSet(pic16_dynAllocRegs,markRegFree);
   applyToSet(pic16_dynStackRegs,markRegFree);
-
-/*
-  for (i = 0; i < pic16_nRegs; i++)
-    regspic16[i].isFree = 1;
-*/
 }
 
 /*-----------------------------------------------------------------*/
@@ -2625,20 +2560,9 @@ pic16_freeAllRegs ()
 void
 pic16_deallocateAllRegs ()
 {
-  //  int i;
-
   debugLog ("%s\n", __FUNCTION__);
 
   applyToSet(pic16_dynAllocRegs,pic16_deallocReg);
-
-/*
-  for (i = 0; i < pic16_nRegs; i++) {
-    if(regspic16[i].pc_type == PO_GPR_TEMP) {
-      regspic16[i].isFree = 1;
-      regspic16[i].wasUsed = 0;
-    }
-  }
-*/
 }
 
 
@@ -2804,6 +2728,15 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	return 0;
 
     }
+
+#if 0
+	if(ic->op == CALL || ic->op == PCALL) {
+		addSet(&pic16_builtin_functions, OP_SYMBOL( IC_LEFT(ic)));
+		debugLog ("%d This is a call, function: %s\n", __LINE__, OP_SYMBOL(IC_LEFT(ic))->name);
+		return 0;
+	}
+#endif
+
   /* find the definition of iTempNN scanning backwards if we find a 
      a use of the true symbol before we find the definition then 
      we cannot pack */
@@ -2820,6 +2753,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	  dic = NULL;
 	  break;
 	}
+
 
       if (SKIP_IC2 (dic))
 	continue;
@@ -3510,10 +3444,11 @@ packForPush (iCode * ic, eBBlock * ebp)
 
 static void printSymType(char * str, sym_link *sl)
 {
-  debugLog ("    %s Symbol type: ",str);
-  printTypeChain( sl, debugF);
-  debugLog ("\n");
-
+	if(!pic16_ralloc_debug)return;
+	
+	debugLog ("    %s Symbol type: ",str);
+	printTypeChain( sl, debugF);
+	debugLog ("\n");
 }
 
 /*-----------------------------------------------------------------*/
@@ -3525,35 +3460,33 @@ static void isData(sym_link *sl)
 {
   FILE *of = stderr;
 
-  if(!sl)
-    return;
-
-  if(debugF)
-    of = debugF;
-
-  for ( ; sl; sl=sl->next) {
-    if(!IS_DECL(sl) ) {
-      switch (SPEC_SCLS(sl)) {
+	if(!pic16_ralloc_debug)return;
 	
-      case S_DATA: fprintf (of, "data "); break;
-      case S_XDATA: fprintf (of, "xdata "); break;
-      case S_SFR: fprintf (of, "sfr "); break;
-      case S_SBIT: fprintf (of, "sbit "); break;
-      case S_CODE: fprintf (of, "code "); break;
-      case S_IDATA: fprintf (of, "idata "); break;
-      case S_PDATA: fprintf (of, "pdata "); break;
-      case S_LITERAL: fprintf (of, "literal "); break;
-      case S_STACK: fprintf (of, "stack "); break;
-      case S_XSTACK: fprintf (of, "xstack "); break;
-      case S_BIT: fprintf (of, "bit "); break;
-      case S_EEPROM: fprintf (of, "eeprom "); break;
-      default: break;
-      }
+	if(!sl)return;
 
-    }
+	if(debugF)
+		of = debugF;
 
-  }
-    
+	for ( ; sl; sl=sl->next) {
+		if(!IS_DECL(sl) ) {
+			switch (SPEC_SCLS(sl)) {
+				case S_DATA: fprintf (of, "data "); break;
+				case S_XDATA: fprintf (of, "xdata "); break;
+				case S_SFR: fprintf (of, "sfr "); break;
+				case S_SBIT: fprintf (of, "sbit "); break;
+				case S_CODE: fprintf (of, "code "); break;
+				case S_IDATA: fprintf (of, "idata "); break;
+				case S_PDATA: fprintf (of, "pdata "); break;
+				case S_LITERAL: fprintf (of, "literal "); break;
+				case S_STACK: fprintf (of, "stack "); break;
+				case S_XSTACK: fprintf (of, "xstack "); break;
+				case S_BIT: fprintf (of, "bit "); break;
+				case S_EEPROM: fprintf (of, "eeprom "); break;
+				default: break;
+			}
+
+		}
+	}
 }
 
 /*--------------------------------------------------------------------*/
@@ -3606,7 +3539,7 @@ pic16_packRegisters (eBBlock * ebp)
       sym_link *etype = getSpec (operandType (IC_LEFT (ic)));
 
       debugAopGet ("x  left:", IC_LEFT (ic));
-#if 1
+#if 0
       if(IS_PTR_CONST(OP_SYMBOL(IC_LEFT(ic))->type))
 #else
       if(IS_CODEPTR(OP_SYMBOL(IC_LEFT(ic))->type))
@@ -3892,7 +3825,7 @@ dumpEbbsToDebug (eBBlock ** ebbs, int count)
 {
   int i;
 
-  if (!debug || !debugF)
+  if (!pic16_ralloc_debug || !debugF)
     return;
 
   for (i = 0; i < count; i++)
@@ -3982,6 +3915,8 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);
 
+  //pic16_freeAllRegs();
+
   /* if stack was extended then tell the user */
   if (_G.stackExtend)
     {
@@ -4022,7 +3957,7 @@ pic16_assignRegisters (eBBlock ** ebbs, int count)
   setToNull ((void *) &_G.stackSpil);
   setToNull ((void *) &_G.spiltSet);
   /* mark all registers as free */
-  //pic16_freeAllRegs ();
+  pic16_freeAllRegs ();
 
   debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
   debugLogClose ();

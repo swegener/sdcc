@@ -63,6 +63,7 @@ static char *_pic16_keywords[] =
   "_xdata",
   "_pdata",
   "_idata",
+  "_naked",
   NULL
 };
 
@@ -117,10 +118,13 @@ _pic16_regparm (sym_link * l)
 }
 
 
+set *absSymSet;
+
 static int
 _process_pragma(const char *sz)
 {
   static const char *WHITE = " \t";
+  
   char	*ptr = strtok((char *)sz, WHITE);
 
 	if (startsWith (ptr, "maxram")) {
@@ -143,9 +147,29 @@ _process_pragma(const char *sz)
 //	  	fprintf(stderr, "Initializing stack pointer to 0x%x\n", (int)floatFromVal(constVal(stackPos)));
 		stackPosVal = constVal( stackPosS );
 		stackPos = (unsigned int)floatFromVal( stackPosVal );
-	}
 
-  return 0;
+	  return 0;
+	}
+	
+	if(startsWith(ptr, "code")) {
+	  char *symname = strtok((char *)NULL, WHITE);
+	  char *location = strtok((char *)NULL, WHITE);
+	  absSym *absS;
+	  value *addr;
+
+		absS = Safe_calloc(1, sizeof(absSym));
+		absS->name = Safe_strdup( symname );
+		addr = constVal( location );
+		absS->address = (unsigned int)floatFromVal( addr );
+
+		addSet(&absSymSet, absS);
+		fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
+			__FILE__, __LINE__, symname, absS->address);
+
+	  return 0;
+	}	  
+
+  return 1;
 }
 
 #define REP_UDATA	"--preplace-udata-with="
@@ -172,6 +196,8 @@ _process_pragma(const char *sz)
 
 
 extern int pic16_debug_verbose;
+extern int pic16_ralloc_debug;
+extern int pic16_pcode_verbose;
 
 OPTION pic16_optionsTable[]= {
 	{ 0,	"--pgen-banksel",	&pic16_options.gen_banksel,	"generate BANKSEL assembler directives"},
@@ -183,6 +209,9 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	STACK_MODEL,	NULL,	"use stack model 'small' (default) or 'large'"},
 
 	{ 0,	"--debug-xtra",		&pic16_debug_verbose,	"show more debug info in assembly output"},
+	{ 0,	"--debug-ralloc",	&pic16_ralloc_debug,	"dump register allocator debug file *.d"},
+	{ 0,	"--pcode-verbose",	&pic16_pcode_verbose,	"dump pcode related info"},
+		
 	{ 0,	REP_UDATA,	NULL,	"Place udata variables at another section: udata_acs, udata_ovr, udata_shr"},
 
 #if 0
@@ -375,6 +404,8 @@ _pic16_finaliseOptions (void)
 	port->mem.default_local_map = data;
 	port->mem.default_globl_map = data;
 
+	options.all_callee_saves = 1;		// always callee saves
+
 	setMainValue("mcu", pic16_processor_base_name() );
 	addSet(&preArgvSet, Safe_strdup("-DMCU={mcu}"));
 }
@@ -473,10 +504,10 @@ _pic16_getRegName (struct regs *reg)
 }
 
 
-#if 0
+#if 1
 static  char *_pic16_mangleFunctionName(char *sz)
 {
-	fprintf(stderr, "mangled function name: %s\n", sz);
+//	fprintf(stderr, "mangled function name: %s\n", sz);
 
   return sz;
 }
@@ -736,7 +767,7 @@ PORT pic16_port =
   _pic16_reset_regparm,
   _pic16_regparm,
   _process_pragma,				/* process a pragma */
-  NULL,				//_pic16_mangleFunctionName,				/* mangles function name */
+  _pic16_mangleFunctionName,				/* mangles function name */
   _hasNativeMulFor,
   hasExtBitOp,			/* hasExtBitOp */
   oclsExpense,			/* oclsExpense */

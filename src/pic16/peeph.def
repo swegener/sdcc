@@ -287,6 +287,8 @@ replace restart {
 
 
 // From: Vangelis Rokas (vrokas@otenet.gr)
+// movff peeps are disabled for the moment
+// until support is added in the pcodepeeph.c
 
 //replace {
 //	movf	%1,w
@@ -323,10 +325,10 @@ replace restart {
 //	movwf	%3
 //}
 
-replace {
-	movff	%1,%2
-} by {
-	;	peep xxx - test peep to see if peep rules can handle movff
-	movf	%1,w
-	movwf	%2
-}
+//replace {
+//	movff	%1,%2
+//} by {
+//	;	peep xxx - test peep to see if peep rules can handle movff
+//	movf	%1,w
+//	movwf	%2
+//}

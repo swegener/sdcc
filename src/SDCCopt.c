@@ -176,6 +176,20 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->lineno = lineno;
   newic->parmBytes+=bytesPushed;
+
+  if(TARGET_IS_PIC16) {
+	/* normally these functions aren't marked external, so we can use their
+	 * _extern field to marked as already added to symbol table */
+
+	if(!SPEC_EXTR(func->etype)) {
+	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+		
+		SPEC_EXTR(func->etype) = 1;
+		seg = SPEC_OCLS( func->etype );
+		addSet(&seg->syms, func);
+	}
+  }
+
   addiCodeToeBBlock (ebp, newic, ip);
 }
 
@@ -250,9 +264,22 @@ found:
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->parmBytes+=bytesPushed;
+
+  if(TARGET_IS_PIC16) {
+	/* normally these functions aren't marked external, so we can use their
+	 * _extern field to marked as already added to symbol table */
+
+	if(!SPEC_EXTR(func->etype)) {
+	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+		
+		SPEC_EXTR(func->etype) = 1;
+		seg = SPEC_OCLS( func->etype );
+		addSet(&seg->syms, func);
+	}
+  }
+
   addiCodeToeBBlock (ebp, newic, ip);
   newic->lineno = linenno;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -327,9 +354,22 @@ found:
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->parmBytes+=bytesPushed;
+
+  if(TARGET_IS_PIC16) {
+	/* normally these functions aren't marked external, so we can use their
+	 * _extern field to marked as already added to symbol table */
+
+	if(!SPEC_EXTR(func->etype)) {
+	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+		
+		SPEC_EXTR(func->etype) = 1;
+		seg = SPEC_OCLS( func->etype );
+		addSet(&seg->syms, func);
+	}
+  }
+
   addiCodeToeBBlock (ebp, newic, ip);
   newic->lineno = lineno;
-
 }
 
 extern operand *geniCodeRValue (operand *, bool);
@@ -477,6 +517,20 @@ found:
   IC_RESULT (newic) = IC_RESULT (ic);
   newic->lineno = lineno;
   newic->parmBytes+=bytesPushed; // to clear the stack after the call
+
+  if(TARGET_IS_PIC16) {
+	/* normally these functions aren't marked external, so we can use their
+	 * _extern field to marked as already added to symbol table */
+
+	if(!SPEC_EXTR(func->etype)) {
+	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+		
+		SPEC_EXTR(func->etype) = 1;
+		seg = SPEC_OCLS( func->etype );
+		addSet(&seg->syms, func);
+	}
+  }
+
   addiCodeToeBBlock (ebp, newic, ip);
 }
 

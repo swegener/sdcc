@@ -77,6 +77,7 @@ typedef struct regs
     unsigned isBitField:1;      /* True if reg is type bit OR is holder for several bits */
     unsigned isEmitted:1;       /* True if the reg has been written to a .asm file */
     unsigned accessBank:1;	/* True if the reg is explicit placed in access bank */
+    unsigned isLocal:1;		/* True if the reg is allocated in function's local frame */
     unsigned address;           /* reg's address if isFixed | isMapped is true */
     unsigned size;              /* 0 for byte, 1 for int, 4 for long */
     unsigned alias;             /* Alias mask if register appears in multiple banks */
@@ -102,8 +103,11 @@ extern set *pic16_dynDirectRegs;
 extern set *pic16_dynDirectBitRegs;
 extern set *pic16_dynInternalRegs;
 
+extern set *pic16_builtin_functions;
+
 extern set *pic16_rel_udata;
 extern set *pic16_fix_udata;
+extern set *pic16_equ_data;
 
 regs *pic16_regWithIdx (int);
 regs *pic16_dirregWithName (char *name );
@@ -133,6 +137,7 @@ regs *pic16_allocRegByName (char *name, int size );
 #define IDX_FSR2H	0xfda
 #define IDX_POSTINC1	0xfe6
 #define IDX_POSTDEC1	0xfe5
+#define IDX_PREINC1	0xfe4
 #define IDX_PREINC2	0xfdc
 #define IDX_PLUSW2	0xfdb
 

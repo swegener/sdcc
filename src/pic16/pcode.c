@@ -26,6 +26,7 @@
 #include "newalloc.h"
 
 
+#include "main.h"
 #include "pcode.h"
 #include "pcodeflow.h"
 #include "ralloc.h"
@@ -52,12 +53,12 @@ static peepCommand peepCommands[] = {
 
 
 // Eventually this will go into device dependent files:
-pCodeOpReg pic16_pc_status    = {{PO_STATUS,  "_STATUS"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_status    = {{PO_STATUS,  "STATUS"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_indf0     = {{PO_INDF0,   "INDF0"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_fsr0      = {{PO_FSR0,    "FSR0"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_intcon    = {{PO_INTCON,  "_INTCON"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_intcon    = {{PO_INTCON,  "INTCON"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_pcl       = {{PO_PCL,     "PCL"}, -1, NULL,0,NULL};
-pCodeOpReg pic16_pc_pclath    = {{PO_PCLATH,  "_PCLATH"}, -1, NULL,0,NULL};
+pCodeOpReg pic16_pc_pclath    = {{PO_PCLATH,  "PCLATH"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_wreg      = {{PO_WREG,    "WREG"}, -1, NULL,0,NULL};
 pCodeOpReg pic16_pc_bsr       = {{PO_BSR,     "BSR"}, -1, NULL,0,NULL};
 
@@ -66,6 +67,7 @@ pCodeOpReg pic16_pc_fsr1h	= {{PO_FSR0,	"FSR1H"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr2l	= {{PO_FSR0,	"FSR2L"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_fsr2h	= {{PO_FSR0,	"FSR2H"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_postinc1	= {{PO_FSR0,	"POSTINC1"}, -1, NULL, 0, NULL};
+pCodeOpReg pic16_pc_preinc1	= {{PO_FSR0,	"PREINC1"}, -1, NULL, 0, NULL};
 
 pCodeOpReg pic16_pc_plusw2	= {{PO_FSR0,	"PLUSW2"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_preinc2	= {{PO_FSR0,	"PREINC1"}, -1, NULL, 0, NULL};
@@ -88,6 +90,8 @@ static pBlock *pb_dead_pcodes = NULL;
 static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
 int pic16_debug_verbose = 0;                /* Set true to inundate .asm file */
+
+int pic16_pcode_verbose = 0;
 
 //static int GpCodeSequenceNumber = 1;
 static int GpcFlowSeq = 1;
@@ -2539,22 +2543,24 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_initStack(0xfff, 8);
 	pic16_init_pic(port->processor);
 
-	pic16_pc_status.r = pic16_allocProcessorRegister(IDX_STATUS,"_STATUS", PO_STATUS, 0x00);
-	pic16_pc_pcl.r = pic16_allocProcessorRegister(IDX_PCL,"_PCL", PO_PCL, 0x80);
-	pic16_pc_pclath.r = pic16_allocProcessorRegister(IDX_PCLATH,"_PCLATH", PO_PCLATH, 0x80);
-	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"_FSR0", PO_FSR0, 0x80);
-	pic16_pc_indf0.r = pic16_allocProcessorRegister(IDX_INDF0,"_INDF0", PO_INDF0, 0x80);
-	pic16_pc_intcon.r = pic16_allocProcessorRegister(IDX_INTCON,"_INTCON", PO_INTCON, 0x80);
-	pic16_pc_wreg.r = pic16_allocProcessorRegister(IDX_WREG,"_WREG", PO_WREG, 0x80);
+	pic16_pc_status.r = pic16_allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x80);
+	pic16_pc_pcl.r = pic16_allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
+	pic16_pc_pclath.r = pic16_allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x80);
+	pic16_pc_fsr0.r = pic16_allocProcessorRegister(IDX_FSR0,"FSR0", PO_FSR0, 0x80);
+	pic16_pc_indf0.r = pic16_allocProcessorRegister(IDX_INDF0,"INDF0", PO_INDF0, 0x80);
+	pic16_pc_intcon.r = pic16_allocProcessorRegister(IDX_INTCON,"INTCON", PO_INTCON, 0x80);
+	pic16_pc_wreg.r = pic16_allocProcessorRegister(IDX_WREG,"WREG", PO_WREG, 0x80);
 
-	pic16_pc_fsr1l.r = pic16_allocProcessorRegister(IDX_FSR1L, "_FSR1L", PO_FSR0, 0x80);
-	pic16_pc_fsr1h.r = pic16_allocProcessorRegister(IDX_FSR1H, "_FSR1H", PO_FSR0, 0x80);
-	pic16_pc_fsr2l.r = pic16_allocProcessorRegister(IDX_FSR2L, "_FSR2L", PO_FSR0, 0x80);
-	pic16_pc_fsr2h.r = pic16_allocProcessorRegister(IDX_FSR2H, "_FSR2H", PO_FSR0, 0x80);
-	pic16_pc_postinc1.r = pic16_allocProcessorRegister(IDX_POSTINC1, "_POSTINC1", PO_FSR0, 0x80);
-	pic16_pc_postdec1.r = pic16_allocProcessorRegister(IDX_POSTDEC1, "_POSTDEC1", PO_FSR0, 0x80);
-	pic16_pc_preinc2.r = pic16_allocProcessorRegister(IDX_PREINC2, "_PREINC2", PO_FSR0, 0x80);
-	pic16_pc_plusw2.r = pic16_allocProcessorRegister(IDX_PLUSW2, "_PLUSW2", PO_FSR0, 0x80);
+	pic16_pc_fsr1l.r = pic16_allocProcessorRegister(IDX_FSR1L, "FSR1L", PO_FSR0, 0x80);
+	pic16_pc_fsr1h.r = pic16_allocProcessorRegister(IDX_FSR1H, "FSR1H", PO_FSR0, 0x80);
+	pic16_pc_fsr2l.r = pic16_allocProcessorRegister(IDX_FSR2L, "FSR2L", PO_FSR0, 0x80);
+	pic16_pc_fsr2h.r = pic16_allocProcessorRegister(IDX_FSR2H, "FSR2H", PO_FSR0, 0x80);
+	pic16_pc_postinc1.r = pic16_allocProcessorRegister(IDX_POSTINC1, "POSTINC1", PO_FSR0, 0x80);
+	pic16_pc_postdec1.r = pic16_allocProcessorRegister(IDX_POSTDEC1, "POSTDEC1", PO_FSR0, 0x80);
+	pic16_pc_preinc1.r = pic16_allocProcessorRegister(IDX_PREINC1, "PREINC1", PO_FSR0, 0x80);
+	
+	pic16_pc_preinc2.r = pic16_allocProcessorRegister(IDX_PREINC2, "PREINC2", PO_FSR0, 0x80);
+	pic16_pc_plusw2.r = pic16_allocProcessorRegister(IDX_PLUSW2, "PLUSW2", PO_FSR0, 0x80);
 	
 	pic16_pc_status.rIdx = IDX_STATUS;
 	pic16_pc_fsr0.rIdx = IDX_FSR0;
@@ -2569,6 +2575,7 @@ void  pic16_pCodeInitRegisters(void)
 	pic16_pc_fsr2h.rIdx = IDX_FSR2H;
 	pic16_pc_postinc1.rIdx = IDX_POSTINC1;
 	pic16_pc_postdec1.rIdx = IDX_POSTDEC1;
+	pic16_pc_preinc1.rIdx = IDX_PREINC1;
 	pic16_pc_preinc2.rIdx = IDX_PREINC2;
 	pic16_pc_plusw2.rIdx = IDX_PLUSW2;
 	
@@ -2741,9 +2748,13 @@ int pic16_getpCode(char *mnem,unsigned dest)
   while(pci) {
 
     if(STRCASECMP(pci->mnemonic, mnem) == 0) {
-      if((pci->num_ops <= 1) || (pci->isModReg == dest) || (pci->isBitInst) ||
-         (pci->num_ops <= 2 && pci->isAccess) ||
-         (pci->num_ops <= 2 && pci->isFastCall))
+      if((pci->num_ops <= 1)
+      	|| (pci->isModReg == dest)
+      	|| (pci->isBitInst)
+      	|| (pci->num_ops <= 2 && pci->isAccess)
+      	|| (pci->num_ops <= 2 && pci->isFastCall)
+      	|| (pci->num_ops <= 2 && pci->is2MemOp)
+      	|| (pci->num_ops <= 2 && pci->is2LitOp) )
 	return(pci->op);
     }
 
@@ -2828,6 +2839,14 @@ void pic16_pBlockConvert2ISR(pBlock *pb)
   pb->dbName = 'I';
 }
 
+void pic16_pBlockConvert2Absolute(pBlock *pb)
+{
+	if(!pb)return;
+	if(pb->cmemmap)pb->cmemmap = NULL;
+	
+	pb->dbName = 'A';
+}
+  
 /*-----------------------------------------------------------------*/
 /* pic16_movepBlock2Head - given the dbname of a pBlock, move all  */
 /*                   instances to the front of the doubly linked   */
@@ -3121,7 +3140,6 @@ pCode *pic16_newpCodeFunction(char *mod,char *f)
   pCodeFunction *pcf;
 
   pcf = Safe_calloc(1,sizeof(pCodeFunction));
-  //_ALLOC(pcf,sizeof(pCodeFunction));
 
   pcf->pc.type = PC_FUNCTION;
   pcf->pc.prev = pcf->pc.next = NULL;
@@ -3135,14 +3153,12 @@ pCode *pic16_newpCodeFunction(char *mod,char *f)
   pcf->ncalled = 0;
 
   if(mod) {
-    //_ALLOC_ATOMIC(pcf->modname,strlen(mod)+1);
     pcf->modname = Safe_calloc(1,strlen(mod)+1);
     strcpy(pcf->modname,mod);
   } else
     pcf->modname = NULL;
 
   if(f) {
-    //_ALLOC_ATOMIC(pcf->fname,strlen(f)+1);
     pcf->fname = Safe_calloc(1,strlen(f)+1);
     strcpy(pcf->fname,f);
   } else
@@ -3266,10 +3282,10 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
 {
   pCodeAsmDir *pcad;
   va_list ap;
-  char buffer[256];		// how long can a directive be?!
+  char buffer[512];
   char *lbp=buffer;
   
-	pcad = Safe_alloc(/*1, */sizeof(pCodeAsmDir));
+	pcad = Safe_calloc(1, sizeof(pCodeAsmDir));
 	pcad->pc.type = PC_ASMDIR;
 	pcad->pc.prev = pcad->pc.next = NULL;
 	pcad->pc.pb = NULL;
@@ -3278,11 +3294,15 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
 	pcad->pc.print = genericPrint;
 
 	if(asdir && *asdir) {
+		
+		while(isspace(*asdir))asdir++;	// strip any white space from the beginning
+		
 		pcad->directive = Safe_strdup( asdir );
 	}
 	
 	va_start(ap, argfmt);
 	
+	memset(buffer, 0, sizeof(buffer));
 	if(argfmt && *argfmt)
 		vsprintf(buffer, argfmt, ap);
 	
@@ -3444,24 +3464,25 @@ pCodeOp *pic16_newpCodeOpLit(int lit)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *pic16_newpCodeOpLit2(int lit, int lit2)
+pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2)
 {
-  char *s = buffer;
+  char *s = buffer, tbuf[256], *tb=tbuf;
   pCodeOp *pcop;
 
 
+  tb = pic16_get_op(arg2, NULL, 0);
   pcop = Safe_calloc(1,sizeof(pCodeOpLit2) );
   pcop->type = PO_LITERAL;
 
   pcop->name = NULL;
-  if(lit>=0 && lit2>=0) {
-    sprintf(s,"0x%02x,0x%02x",lit, lit2);
+  if(lit>=0) {
+    sprintf(s,"0x%02x, %s",lit, tb);
     if(s)
       pcop->name = Safe_strdup(s);
   }
 
   ((pCodeOpLit2 *)pcop)->lit = lit;
-  ((pCodeOpLit2 *)pcop)->lit2 = lit2;
+  ((pCodeOpLit2 *)pcop)->arg2 = arg2;
 
   return pcop;
 }
@@ -3480,10 +3501,11 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
 		PCOI(pcop)->r = r;
 		
 		if(r) {
-//			fprintf(stderr, " pic16_newpCodeOpImmd reg %s exists\n",name);
+			fprintf(stderr, "%s:%d %s reg %s exists\n",__FILE__, __LINE__, __FUNCTION__, name);
 			PCOI(pcop)->rIdx = r->rIdx;
 		} else {
-			fprintf(stderr, " pic16_newpCodeOpImmd reg %s doesn't exist\n",name);
+			fprintf(stderr, "%s:%d %s reg %s doesn't exist\n",
+				__FILE__, __LINE__, __FUNCTION__, name);
 			PCOI(pcop)->rIdx = -1;
 		}
 //			fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);
@@ -3585,12 +3607,16 @@ pCodeOp *pic16_newpCodeOpReg(int rIdx)
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
 {
   pCodeOp *pcop;
+  regs *r;
 
   pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
-  PCOR(pcop)->r = pic16_allocRegByName(name, 1);
+  PCOR(pcop)->r = r = pic16_allocRegByName(name, 1);
   PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
   pcop->type = PCOR(pcop)->r->pc_type;
   pcop->name = PCOR(pcop)->r->name;
+
+  fprintf(stderr, "%s:%d %s allocates register %s rIdx:0x%02x\n",
+  	__FILE__, __LINE__, __FUNCTION__, r->name, r->rIdx);
 
   return pcop;
 }
@@ -3799,15 +3825,36 @@ void pic16_printpBlock(FILE *of, pBlock *pb)
 {
   pCode *pc;
 
-  if(!pb)
-    return;
+	if(!pb)return;
 
-  if(!of)
-    of = stderr;
+	if(!of)of=stderr;
 
-  for(pc = pb->pcHead; pc; pc = pc->next)
-    printpCode(of,pc);
+#if 0
+	if(pb->dbName == 'A') {
+	  absSym *ab;
 
+		PCF(pb->pcHead)->
+		for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet))
+			if(strcmp(ab->name, 
+//		fprintf(of, "%s\tcode\t%d"
+	}
+#endif
+
+	for(pc = pb->pcHead; pc; pc = pc->next) {
+		if(isPCF(pc) && PCF(pc)->fname) {
+			fprintf(of, "S_%s_%s\tcode", PCF(pc)->modname, PCF(pc)->fname);
+			if(pb->dbName == 'A') {
+			  absSym *ab;
+				for(ab=setFirstItem(absSymSet); ab; ab=setNextItem(absSymSet))
+					if(strcmp(ab->name, PCF(pc)->fname)) {
+						fprintf(of, "\t0X%06X", ab->address);
+						break;
+					}
+			}
+			fprintf(of, "\n");
+		}
+		printpCode(of,pc);
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -3876,6 +3923,9 @@ static void genericDestruct(pCode *pc)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
+/* modifiers for constant immediate */
+const char *immdmod[3]={"LOW", "HIGH", "UPPER"};
+
 char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
   regs *r;
@@ -3911,32 +3961,67 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 
 
     case PO_IMMEDIATE:
-      s = buffer;
+	s = buffer;
 
-      if(PCOI(pcop)->_const) {
-
-	if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
-	  SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
-			pcop->name,
-			PCOI(pcop)->index,
-			8 * PCOI(pcop)->offset );
-	} else
-	  SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
-      } else {
-      
-	if( PCOI(pcop)->index) { // && PCOI(pcc->pcop)->offset<4) {
-	  SAFE_snprintf(&s,&size,"(%s + %d)",
-			pcop->name,
-			PCOI(pcop)->index );
+	if(PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
+		if(PCOI(pcop)->index) {
+			SAFE_snprintf(&s,&size, "%s(%s + %d)",
+				immdmod[ PCOI(pcop)->offset ],
+				pcop->name,
+				PCOI(pcop)->index);
+		} else {
+			SAFE_snprintf(&s,&size,"%s(%s)",
+				immdmod[ PCOI(pcop)->offset ],
+				pcop->name);
+		}
 	} else {
-	  if(PCOI(pcop)->offset)
-	    SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
-	  else
-	    SAFE_snprintf(&s,&size,"%s",pcop->name);
+		if(PCOI(pcop)->index) {
+			SAFE_snprintf(&s,&size, "%s(%s + %d)",
+				immdmod[ 0 ],
+				pcop->name,
+				PCOI(pcop)->index);
+		} else {
+			SAFE_snprintf(&s,&size, "%s(%s)",
+				immdmod[ 0 ],
+				pcop->name);
+		}
 	}
-      }
+		
+#if 0
+	if(PCOI(pcop)->_const) {
+		if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
+			if(PCOI(pcop)->index) {
+				SAFE_snprintf(&s,&size,"%s(%s + %d)",
+					immdmod[ PCOI(pcop)->offset ],
+					pcop->name,
+					PCOI(pcop)->index);
+			} else {
+				SAFE_snprintf(&s,&size,"%s(%s)",
+					immdmod[ PCOI(pcop)->offset ],
+					pcop->name);
+			}
 
-      return buffer;
+		} else {
+			if(PCOI(pcop)->index)
+				SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
+			else
+				SAFE_snprintf(&s,&size,"LOW(%s)",pcop->name);
+		}
+	} else {
+		if( PCOI(pcop)->index) { // && PCOI(pcc->pcop)->offset<4) 
+			SAFE_snprintf(&s,&size,"(%s + %d)",
+				pcop->name,
+				PCOI(pcop)->index );
+		} else {
+			if(PCOI(pcop)->offset)
+				SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
+			else
+				SAFE_snprintf(&s,&size,"(%s)",pcop->name);
+		}
+	}
+#endif
+
+	return buffer;
 
     case PO_DIR:
       s = buffer;
@@ -4104,11 +4189,13 @@ static char *pic16_pCode2str(char *str, size_t size, pCode *pc)
   char *s = str;
   regs *r;
 
-	if(PCI(pc)->pci_magic != PCI_MAGIC) {
-		fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s\n",
-			__FILE__, __LINE__, PCI(pc)->mnemonic);
+#if 0
+	if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
+		fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s, magic is %x (defaut: %x)\n",
+			__FILE__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pci_magic, PCI_MAGIC);
 		exit(-1);
 	}
+#endif
 
   switch(pc->type) {
 
@@ -4118,7 +4205,7 @@ static char *pic16_pCode2str(char *str, size_t size, pCode *pc)
     if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
 
 	if(PCI(pc)->is2MemOp) {
-		SAFE_snprintf(&s,&size, "%s,%s", 
+		SAFE_snprintf(&s,&size, "%s, %s", 
 		pic16_get_op(PCOP(PCI(pc)->pcop), NULL, 0),
 		pic16_get_op2(PCOP(PCI(pc)->pcop), NULL, 0));
 		break;
@@ -4193,7 +4280,7 @@ static char *pic16_pCode2str(char *str, size_t size, pCode *pc)
     SAFE_snprintf(&s,&size,";\t--FLOW change\n");
     break;
   case PC_CSOURCE:
-    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
     break;
   case PC_ASMDIR:
   	SAFE_snprintf(&s,&size,"\t%s\t%s\n", PCAD(pc)->directive, PCAD(pc)->arg?PCAD(pc)->arg:"");
@@ -4278,7 +4365,7 @@ static void genericPrint(FILE *of, pCode *pc)
     break;
 
   case PC_CSOURCE:
-    fprintf(of,";#CSRC\t%s %d\n;  %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    fprintf(of,";#CSRC\t%s %d\t\t%s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
     break;
   case PC_ASMDIR:
 	{
@@ -4309,27 +4396,42 @@ static void pCodePrintFunction(FILE *of, pCode *pc)
   if(!pc || !of)
     return;
 
+#if 0
   if( ((pCodeFunction *)pc)->modname) 
     fprintf(of,"F_%s",((pCodeFunction *)pc)->modname);
+#endif
 
   if(PCF(pc)->fname) {
     pBranch *exits = PCF(pc)->to;
     int i=0;
-    fprintf(of,"%s\t;Function start\n",PCF(pc)->fname);
+    fprintf(of,"%s", PCF(pc)->fname);
+    
+//    	if(pic16_pcode_verbose)
+    		fprintf(of, "\t;Function start");
+    
+    fprintf(of, "\n");
+    
     while(exits) {
       i++;
       exits = exits->next;
     }
     //if(i) i--;
-    fprintf(of,"; %d exit point%c\n",i, ((i==1) ? ' ':'s'));
+
+	if(pic16_pcode_verbose)
+		fprintf(of,"; %d exit point%c\n",i, ((i==1) ? ' ':'s'));
     
-  }else {
-    if((PCF(pc)->from && 
-	PCF(pc)->from->pc->type == PC_FUNCTION &&
-	PCF(PCF(pc)->from->pc)->fname) )
-      fprintf(of,"; exit point of %s\n",PCF(PCF(pc)->from->pc)->fname);
-    else
-      fprintf(of,"; exit point [can't find entry point]\n");
+  } else {
+	if((PCF(pc)->from && 
+		PCF(pc)->from->pc->type == PC_FUNCTION &&
+		PCF(PCF(pc)->from->pc)->fname) ) {
+
+		if(pic16_pcode_verbose)
+			fprintf(of,"; exit point of %s\n",PCF(PCF(pc)->from->pc)->fname);
+	} else {
+		if(pic16_pcode_verbose)
+			fprintf(of,"; exit point [can't find entry point]\n");
+	}
+	fprintf(of, "\n");
   }
 }
 /*-----------------------------------------------------------------*/
@@ -5279,9 +5381,14 @@ static void LinkFlow(pBlock *pb)
       //pc->print(stderr,pc);
 
       if(!(pcol && isPCOLAB(pcol))) {
-	if((PCI(pc)->op != POC_RETLW) && (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL) && (PCI(pc)->op != POC_RETFIE) ) {
-	  pc->print(stderr,pc);
-	  fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
+	if((PCI(pc)->op != POC_RETLW)
+		&& (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL) && (PCI(pc)->op != POC_RETFIE) ) {
+	
+		/* continue if label is '$' which assembler knows how to parse */
+		if(((PCI(pc)->pcop->type == PO_STR) && !strcmp(PCI(pc)->pcop->name, "$")))continue;
+
+		pc->print(stderr,pc);
+		fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
 	}
 	continue;
       }
@@ -6360,6 +6467,8 @@ static void pBlockStats(FILE *of, pBlock *pb)
   pCode *pc;
   regs  *r;
 
+	if(!pic16_pcode_verbose)return;
+	
   fprintf(of,";***\n;  pBlock Stats: dbName = %c\n;***\n",getpBlock_dbName(pb));
 
   // for now just print the first element of each set

@@ -339,8 +339,26 @@ void pic16_dump_map(void)
 }
 #endif
 
+extern char *iComments2;
 
-void pic16_dump_section(FILE *of, char *sname, set *section, int fix)
+void pic16_dump_equates(FILE *of, set *equs)
+{
+  regs *r;
+
+	r = setFirstItem(equs);
+	if(!r)return;
+	
+	fprintf(of, "%s", iComments2);
+	fprintf(of, ";\tEquates to used internal registers\n");
+	fprintf(of, "%s", iComments2);
+	
+	for(; r; r = setNextItem(equs)) {
+		fprintf(of, "%s\tequ\t0x%02x\n", r->name, r->address);
+	}
+}
+
+
+void pic16_dump_section(FILE *of, set *section, int fix)
 {
   static int abs_section_no=0;
   regs *r, *rprev;
@@ -552,11 +570,18 @@ void pic16_groupRegistersInSection(set *regset)
 	for(reg=setFirstItem(regset); reg; reg = setNextItem(regset)) {
 		if(reg->wasUsed
 			&& !(reg->regop && SPEC_EXTR(OP_SYM_ETYPE(reg->regop)))) {
-			if(reg->isFixed)
+
+			if(reg->alias) {
+				checkAddReg(&pic16_equ_data, reg);
+			} else
+			if(reg->isFixed) {
 				checkAddReg(&pic16_fix_udata, reg);
-		
-			if(!reg->isFixed)
+			} else
+			if(!reg->isFixed) {
+//				fprintf(stderr, "%s:%d adding symbol %s in relocatable udata section\n",
+//					__FILE__, __LINE__, reg->name);
 				checkAddReg(&pic16_rel_udata, reg);
+			}
 		}
 	}
 }

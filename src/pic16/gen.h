@@ -163,12 +163,13 @@ pCodeOp *pic16_popGetLabel(unsigned int key);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *pic16_popGetLit(unsigned int lit);
-pCodeOp *pic16_popGetLit2(unsigned int lit, unsigned int lit2);
+pCodeOp *pic16_popGetLit2(unsigned int lit, pCodeOp *arg2);
 pCodeOp *popGetWithString(char *str);
 pCodeOp *pic16_popGet (asmop *aop, int offset);//, bool bit16, bool dname);
 pCodeOp *pic16_popGetTempReg(void);
 void pic16_popReleaseTempReg(pCodeOp *pcop);
 
+pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst, int noalloc);
 
 void pic16_aopPut (asmop *aop, char *s, int offset);
 void pic16_outAcc(operand *result);

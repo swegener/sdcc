@@ -819,6 +819,8 @@ void pic16_pCodeRegOptimizeRegUsage(int level)
   } while( passes && ((total_registers_saved != saved) || (passes==OPT_PASSES-1)) );
 
   if(total_registers_saved == t) 
+
+  if(pic16_debug_verbose)
     fprintf(stderr, "No registers saved on this pass\n");
 
 

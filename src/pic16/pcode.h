@@ -364,7 +364,7 @@ typedef struct pCodeOpLit2
 {
   pCodeOp pcop;
   int lit;
-  int lit2;
+  pCodeOp *arg2;
 } pCodeOpLit2;
 
 
@@ -910,11 +910,12 @@ void pic16_AssignRegBanks(void);
 void pic16_printCallTree(FILE *of);
 void pCodePeepInit(void);
 void pic16_pBlockConvert2ISR(pBlock *pb);
+void pic16_pBlockConvert2Absolute(pBlock *pb);
 
 pCodeOp *pic16_newpCodeOpLabel(char *name, int key);
 pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space);
 pCodeOp *pic16_newpCodeOpLit(int lit);
-pCodeOp *pic16_newpCodeOpLit2(int lit, int lit2);
+pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2);
 pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace);
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name);
 pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE p);
@@ -927,7 +928,7 @@ struct regs * pic16_getRegFromInstruction(pCode *pc);
 struct regs * pic16_getRegFromInstruction2(pCode *pc);
 
 extern void pic16_pcode_test(void);
-
+extern int pic16_debug_verbose;
 /*-----------------------------------------------------------------*
  * pCode objects.
  *-----------------------------------------------------------------*/
@@ -945,6 +946,7 @@ extern pCodeOpReg pic16_pc_fsr2l;
 extern pCodeOpReg pic16_pc_fsr2h;
 extern pCodeOpReg pic16_pc_postinc1;
 extern pCodeOpReg pic16_pc_postdec1;
+extern pCodeOpReg pic16_pc_preinc1;
 extern pCodeOpReg pic16_pc_preinc2;
 extern pCodeOpReg pic16_pc_plusw2;
 

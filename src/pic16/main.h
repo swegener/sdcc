@@ -27,4 +27,12 @@ typedef struct {
 	unsigned int addr_udatashr;
 } pic16_sectioninfo_t;
 
+typedef struct absSym {
+	char *name;
+	unsigned int address;
+} absSym;
+
+extern set *absSymSet;
+
+
 #endif

@@ -1,3 +1,52 @@
+2004-01-11 Vangelis Rokas <vrokas@otenet.gr>
+	
+	SDCC source changes:
+	* src/SDCCopt.c (cntToFcall, cnvToFloatCast, cnvFromFloatCast,
+	convilong): modified to inform the pic16 port that builtin functions
+	are external
+	
+	PIC16 PORT specific changes:
+	* src/pic16/device.c pic16_dump_equates() added,
+	processor registers declared internally by the port are emitted in
+	the translation as equates,
+	* src/pic16/gen.c: inline code is passed unprocessed to the
+	translation,
+	* (pic16_popGetLit2): fnuction modified to take second operand as
+	pCodeOp pointer and not as literal,
+	* (popRegFromIdx): prefixed with pic16_,
+	* (pic16_popCombine2): modified to receive already allocated pCode
+	operands,
+	* (pic16_pushpCodeOpReg, pic16_poppCodeOpReg): added
+	* (genFunction): initializes local stack frame and pushes on stack
+	all the registers used by this function,
+	* (genEndFunction): restores all registers from stack and restores
+	stack frame,
+	* src/pic16/glue.c (pic16emitRegularMap): various changes and
+	improvements,
+	* (pic16glue): changed the program startup sequence,
+	* added new dbName code 'A' for functions placed in absolute section
+	* src/pic16/main.c: added function attribute _naked,
+	* added pragma 'code' to place a fnuction at an absolute address,
+	* added command line arguments --debug-ralloc and --pcode-verbose,
+	* (_pic16_finiliseOptions): options.all_callee_saves is set by default
+	* src/pic16/pcode.c (pic16_pBlockConvert2Absolute) added,
+	* (pic16_newpCodeOpLit2): modified to take the second operand as
+	pCodeOp pointer,
+	* (pic16_printpBlock): modified to emit each function in a separate
+	section,
+	* (pic16_get_op): modified to use the gpasm modifiers LOW,HIGH and
+	UPPER for immediate operands,
+	* src/pic16/pcodepeeph.c: added peephole support for the LFSR
+	instruction,
+	* src/pic16/peeph.def: all peepholes with movff are commented out,
+	because there is a problem in the pcode peep optimizer,
+	* src/pic16/ralloc.c: the register allocator can now reuse local
+	function symbols for another function. This saves register usage.
+	* src/pic16/ralloc.h: added flag isLocal in structure regs,
+
+	Added file src/pic16/NOTES with information about program writing on
+	the current port version.
+
 2004-01-11 Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* src/mcs51/peephole.def: added peepholes 177.c,d (redundant moves)

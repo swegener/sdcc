@@ -118,7 +118,7 @@ struct
 { W_TRUNCATION, ERROR_LEVEL_WARNING,
    "high order truncation might occur" },
 { E_CODE_WRITE, ERROR_LEVEL_ERROR,
-   "Attempt to assign value to a constant variable %s" },
+   "Attempt to assign value to a constant variable (%s)" },
 { E_LVALUE_CONST, ERROR_LEVEL_ERROR,
    "Lvalue specifies constant object" },
 { E_ILLEGAL_ADDR, ERROR_LEVEL_ERROR,

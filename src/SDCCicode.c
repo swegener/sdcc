@@ -47,8 +47,8 @@ symbol *entryLabel;		/* function entry  label */
 /* forward definition of some functions */
 operand *geniCodeDivision (operand *, operand *);
 operand *geniCodeAssign (operand *, operand *, int);
-operand *geniCodeArray (operand *, operand *,int);
-operand *geniCodeArray2Ptr (operand *);
+static operand *geniCodeArray (operand *, operand *,int);
+static operand *geniCodeArray2Ptr (operand *);
 operand *geniCodeRValue (operand *, bool);
 operand *geniCodeDerefPtr (operand *,int);
 int isLvaluereq(int lvl);
@@ -2292,7 +2292,7 @@ aggrToPtr (sym_link * type, bool force)
 /*-----------------------------------------------------------------*/
 /* geniCodeArray2Ptr - array to pointer                            */
 /*-----------------------------------------------------------------*/
-operand *
+static operand *
 geniCodeArray2Ptr (operand * op)
 {
   sym_link *optype = operandType (op);
@@ -2309,8 +2309,8 @@ geniCodeArray2Ptr (operand * op)
 /*-----------------------------------------------------------------*/
 /* geniCodeArray - array access                                    */
 /*-----------------------------------------------------------------*/
-operand *
-geniCodeArray (operand * left, operand * right,int lvl)
+static operand *
+geniCodeArray (operand * left, operand * right, int lvl)
 {
   iCode *ic;
   operand *size;
@@ -2335,14 +2335,17 @@ geniCodeArray (operand * left, operand * right,int lvl)
   if (indexUnsigned)
     SPEC_USIGN (getSpec (operandType (right))) = 1;
   /* we can check for limits here */
+  /* already done in SDCCast.c
   if (isOperandLiteral (right) &&
       IS_ARRAY (ltype) &&
       DCL_ELEM (ltype) &&
       (operandLitValue (right) / getSize (ltype->next)) >= DCL_ELEM (ltype))
     {
-      werror (E_ARRAY_BOUND);
-      right = operandFromLit (0);
+      werror (W_IDX_OUT_OF_BOUNDS,
+	      (int) operandLitValue (right) / getSize (ltype->next),
+	      DCL_ELEM (ltype));
     }
+  */
 
   ic = newiCode ('+', left, right);
 
@@ -3517,7 +3520,7 @@ geniCodeInline (ast * tree)
 /*-----------------------------------------------------------------*/
 /* geniCodeArrayInit - intermediate code for array initializer     */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 geniCodeArrayInit (ast * tree, operand *array)
 {
   iCode *ic;

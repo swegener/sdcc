@@ -39,7 +39,7 @@ SDCCERR - SDCC Standard error handler
 #define W_STACK_OVERFLOW  21        /* stack overflow       */
 #define E_NEED_ARRAY_PTR  22        /* array or pointer reqd*/
 #define E_IDX_NOT_INT     23        /* index not an integer */
-#define E_ARRAY_BOUND     24        /* array limit exceeded */
+#define W_IDX_OUT_OF_BOUNDS 24      /* array index out of bounds */
 #define E_STRUCT_UNION    25        /* struct,union expected*/
 #define E_NOT_MEMBER      26        /* !struct/union member */
 #define E_PTR_REQD        27        /* pointer required     */

@@ -223,6 +223,7 @@ void addSymToBlock (symbol *, ast *);
 void freeStringSymbol(symbol *);
 DEFSETFUNC(resetParmKey);
 int astErrors(ast *);
+RESULT_TYPE getResultTypeFromType (sym_link *);
 
 // exported variables 
 extern set *operKeyReset;

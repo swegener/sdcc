@@ -644,24 +644,28 @@ reverseParms (ast * ptree)
 /* processParms  - makes sure the parameters are okay and do some  */
 /*                 processing with them                            */
 /*-----------------------------------------------------------------*/
-int 
-processParms (ast * func,
+static int
+processParms (ast *func,
 	      value *defParm,
-	      ast * actParm,
-	      int *parmNumber, // unused, although updated
+	      ast *actParm,
+	      int *parmNumber, /* unused, although updated */
 	      bool rightmost)
 {
+  RESULT_TYPE resultType;
+  
   /* if none of them exist */
   if (!defParm && !actParm)
     return 0;
 
-  if (defParm) {
-    if (getenv("DEBUG_SANITY")) {
-      fprintf (stderr, "processParms: %s ", defParm->name);
+  if (defParm)
+    {
+      if (getenv("DEBUG_SANITY"))
+        {
+          fprintf (stderr, "processParms: %s ", defParm->name);
+        }
+      /* make sure the type is complete and sane */
+      checkTypeSanity(defParm->etype, defParm->name);
     }
-    /* make sure the type is complete and sane */
-    checkTypeSanity(defParm->etype, defParm->name);
-  }
 
   /* if the function is being called via a pointer &   */
   /* it has not been defined a reentrant then we cannot */
@@ -676,8 +680,8 @@ processParms (ast * func,
   /* exist and this is not defined as a variable arg   */
   if (!defParm && actParm && !IFFUNC_HASVARARGS(func->ftype))
     {
-      //if (func->type==EX_VALUE && func->opval.val->sym->undefined)
-      //  return 1; /* Already gave them an undefined function error */
+      /* if (func->type==EX_VALUE && func->opval.val->sym->undefined) */
+      /*  return 1; *//* Already gave them an undefined function error */
       werror (E_TOO_MANY_PARMS);
       return 1;
     }
@@ -689,10 +693,40 @@ processParms (ast * func,
       return 1;
     }
 
-  if (IS_VOID(actParm->ftype)) {
-    werror (E_VOID_VALUE_USED);
-    return 1;
-  }
+  /* if this is a PARAM node then match left & right */
+  if (actParm->type == EX_OP && actParm->opval.op == PARAM)
+    {
+      actParm->decorated = 1;
+      return (processParms (func, defParm,
+			    actParm->left,  parmNumber, FALSE) ||
+	      processParms (func, defParm ? defParm->next : NULL,
+			    actParm->right, parmNumber, rightmost));
+    }
+  else if (defParm) /* not vararg */
+    {
+      /* If we have found a value node by following only right-hand links,
+       * then we know that there are no more values after us.
+       *
+       * Therefore, if there are more defined parameters, the caller didn't
+       * supply enough.
+       */
+      if (rightmost && defParm->next)
+	{
+	  werror (E_TOO_FEW_PARMS);
+	  return 1;
+	}
+    }
+
+  /* decorate parameter */
+  resultType = defParm ? getResultTypeFromType (defParm->etype) :
+                         RESULT_TYPE_NONE;
+  actParm = decorateType (actParm, resultType);
+
+  if (IS_VOID(actParm->ftype))
+    {
+      werror (E_VOID_VALUE_USED);
+      return 1;
+    }
 
   /* If this is a varargs function... */
   if (!defParm && actParm && IFFUNC_HASVARARGS(func->ftype))
@@ -708,25 +742,12 @@ processParms (ast * func,
 	}
 
       ftype = actParm->ftype;
-          
-      /* If it's a small integer, upcast to int. */
+
+      /* If it's a char, upcast to int. */
       if (IS_INTEGRAL (ftype)
 	  && (getSize (ftype) < (unsigned) INTSIZE))
 	{
-	  if (IS_AST_OP(actParm) &&
-	      (actParm->opval.op == LEFT_OP ||
-	       actParm->opval.op == '*' ||
-	       actParm->opval.op == '+' ||
-	       actParm->opval.op == '-') &&
-	      actParm->right) {
-	    // we should cast an operand instead of the result
-	    actParm->decorated = 0;
-	    actParm->left = newNode( CAST, newAst_LINK(newIntLink()),
-					 actParm->left);
-	    actParm = decorateType(actParm, RESULT_CHECK);
-	  } else {
-	    newType = newAst_LINK(INTTYPE);
-	  }
+	  newType = newAst_LINK(INTTYPE);  
 	}
 
       if (IS_PTR(ftype) && !IS_GENPTR(ftype))
@@ -740,24 +761,21 @@ processParms (ast * func,
 	  newType = newAst_LINK (copyLinkChain (ftype));
 	  DCL_TYPE (newType->opval.lnk) = port->unqualified_pointer;
 	}
+      
       if (newType)
 	{
 	  /* cast required; change this op to a cast. */
-	  ast *parmCopy = decorateType(resolveSymbols (copyAst (actParm)), RESULT_CHECK);
+	  ast *parmCopy = resolveSymbols (copyAst (actParm));
 
 	  actParm->type = EX_OP;
 	  actParm->opval.op = CAST;
 	  actParm->left = newType;
 	  actParm->right = parmCopy;
-	  decorateType (actParm, RESULT_CHECK);
-	}
-      else if (actParm->type == EX_OP && actParm->opval.op == PARAM)
-	{
-	  return (processParms (func, NULL, actParm->left, parmNumber, FALSE) ||
-	  processParms (func, NULL, actParm->right, parmNumber, rightmost));
+	  actParm->decorated = 0; /* force typechecking */
+	  decorateType (actParm, RESULT_TYPE_NONE);
 	}
       return 0;
-    }
+    } /* vararg */
 
   /* if defined parameters ended but actual has not & */
   /* reentrant */
@@ -766,48 +784,30 @@ processParms (ast * func,
     return 0;
 
   resolveSymbols (actParm);
-  /* if this is a PARAM node then match left & right */
-  if (actParm->type == EX_OP && actParm->opval.op == PARAM)
-    {
-      return (processParms (func, defParm, actParm->left, parmNumber, FALSE) ||
-	      processParms (func, defParm->next, actParm->right, parmNumber, rightmost));
-    }
-  else
-    {
-      /* If we have found a value node by following only right-hand links,
-       * then we know that there are no more values after us.
-       *
-       * Therefore, if there are more defined parameters, the caller didn't
-       * supply enough.
-       */
-      if (rightmost && defParm->next)
-	{
-	  werror (E_TOO_FEW_PARMS);
-	  return 1;
-	}
-    }
-
+  
   /* the parameter type must be at least castable */
-  if (compareType (defParm->type, actParm->ftype) == 0) {
-    werror (E_INCOMPAT_TYPES);
-    printFromToType (actParm->ftype, defParm->type);
-    return 1;
-  }
+  if (compareType (defParm->type, actParm->ftype) == 0)
+    {
+      werror (E_INCOMPAT_TYPES);
+      printFromToType (actParm->ftype, defParm->type);
+      return 1;
+    }
 
   /* if the parameter is castable then add the cast */
   if (compareType (defParm->type, actParm->ftype) < 0)
     {
-      ast *pTree = decorateType(resolveSymbols (copyAst (actParm)), RESULT_CHECK);
+      ast *pTree;
 
+      resultType = getResultTypeFromType (defParm->etype);
+      pTree = resolveSymbols (copyAst (actParm));
+      
       /* now change the current one to a cast */
       actParm->type = EX_OP;
       actParm->opval.op = CAST;
       actParm->left = newAst_LINK (defParm->type);
       actParm->right = pTree;
-      actParm->etype = defParm->etype;
-      actParm->ftype = defParm->type;
-      actParm->decorated=0; /* force typechecking */
-      decorateType (actParm, RESULT_CHECK);
+      actParm->decorated = 0; /* force typechecking */
+      decorateType (actParm, resultType);
     }
 
   /* make a copy and change the regparm type to the defined parm */
@@ -817,6 +817,7 @@ processParms (ast * func,
   (*parmNumber)++;
   return 0;
 }
+
 /*-----------------------------------------------------------------*/
 /* createIvalType - generates ival for basic types                 */
 /*-----------------------------------------------------------------*/
@@ -1105,7 +1106,7 @@ gatherAutoInit (symbol * autoChain)
 
       /* resolve the symbols in the ival */
       if (sym->ival)
-	resolveIvalSym (sym->ival);
+	resolveIvalSym (sym->ival, sym->type);
 
       /* if this is a static variable & has an */
       /* initial value the code needs to be lifted */
@@ -2007,7 +2008,7 @@ searchLitOp (ast *tree, ast **parent, const char *ops)
 /*-----------------------------------------------------------------*/
 /* getResultFromType                                               */
 /*-----------------------------------------------------------------*/
-static RESULT_TYPE
+RESULT_TYPE
 getResultTypeFromType (sym_link *type)
 {
   /* type = getSpec (type); */
@@ -2026,8 +2027,8 @@ getResultTypeFromType (sym_link *type)
 /*-----------------------------------------------------------------*/
 /* addCast - adds casts to a type specified by RESULT_TYPE         */
 /*-----------------------------------------------------------------*/
-static void
-addCast (ast **tree, RESULT_TYPE resultType, bool upcast)
+static ast *
+addCast (ast *tree, RESULT_TYPE resultType, bool upcast)
 {
   sym_link *newLink;
   bool upCasted = FALSE;
@@ -2037,19 +2038,19 @@ addCast (ast **tree, RESULT_TYPE resultType, bool upcast)
       case RESULT_TYPE_NONE:
 	/* char: promote to int */
 	if (!upcast ||
-	    getSize ((*tree)->etype) >= INTSIZE)
-	  return;
+	    getSize (tree->etype) >= INTSIZE)
+	  return tree;
 	newLink = newIntLink();
 	upCasted = TRUE;
 	break;
       case RESULT_TYPE_CHAR:
-	if (getSize ((*tree)->etype) <= 1)
-	  return;
+	if (getSize (tree->etype) <= 1)
+	  return tree;
 	newLink = newCharLink();
 	break;
       case RESULT_TYPE_INT:
 #if 0
-	if (getSize ((*tree)->etype) > INTSIZE)
+	if (getSize (tree->etype) > INTSIZE)
           {
             /* warn ("Loosing significant digits"); */
 	    return;
@@ -2057,30 +2058,30 @@ addCast (ast **tree, RESULT_TYPE resultType, bool upcast)
 #endif
 	/* char: promote to int */
 	if (!upcast ||
-	    getSize ((*tree)->etype) >= INTSIZE)
-	  return;
+	    getSize (tree->etype) >= INTSIZE)
+	  return tree;
 	newLink = newIntLink();
 	upCasted = TRUE;
 	break;
       case RESULT_TYPE_OTHER:
 	if (!upcast)
-	  return;
+	  return tree;
         /* return type is long, float: promote char to int */
-	if (getSize ((*tree)->etype) >= INTSIZE)
-	  return;
+	if (getSize (tree->etype) >= INTSIZE)
+	  return tree;
 	newLink = newIntLink();
 	upCasted = TRUE;
 	break;
       default:
-	return;
+	return tree;
     }
-  (*tree)->decorated = 0;
-  *tree = newNode (CAST, newAst_LINK (newLink), *tree);
+  tree->decorated = 0;
+  tree = newNode (CAST, newAst_LINK (newLink), tree);
   /* keep unsigned type during cast to smaller type,
      but not when promoting from char to int */
   if (!upCasted)
-    SPEC_USIGN ((*tree)->left->opval.lnk) = IS_UNSIGNED ((*tree)->right->etype) ? 1 : 0;
-  *tree = decorateType (*tree, resultType);
+    SPEC_USIGN (tree->left->opval.lnk) = IS_UNSIGNED (tree->right->etype) ? 1 : 0;
+  return decorateType (tree, resultType);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2118,15 +2119,21 @@ getLeftResultType (ast *tree, RESULT_TYPE resultType)
     {
       case '=':
       case CAST:
-	if (IS_PTR (tree->left->ftype))
+	if (IS_PTR (LTYPE (tree)))
 	  return RESULT_TYPE_NONE;
 	else
-	  return getResultTypeFromType (tree->left->etype);
+	  return getResultTypeFromType (LETYPE (tree));
       case RETURN:
 	if (IS_PTR (currFunc->type->next))
 	  return RESULT_TYPE_NONE;
 	else
 	  return getResultTypeFromType (currFunc->type->next);
+      case '[':
+	if (!IS_ARRAY (LTYPE (tree)))
+	  return resultType;
+	if (DCL_ELEM (LTYPE (tree)) > 0 && DCL_ELEM (LTYPE (tree)) <= 256)
+	  return RESULT_TYPE_CHAR;
+	return resultType;
       default:
 	return resultType;
     }
@@ -2264,23 +2271,44 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
     /* Before decorating the left branch we've to decide in dependence
        upon tree->opval.op, if resultType can be propagated */
-    if (getenv ("SDCC_NEWTYPEFLOW"))
-      resultTypeProp = resultTypePropagate (tree, resultType);
-    else
-      resultTypeProp = RESULT_TYPE_NONE; /* provide initialization */
+    resultTypeProp = resultTypePropagate (tree, resultType);
 
     dtl = decorateType (tree->left, resultTypeProp);
+
+    /* if an array node, we may need to swap branches */
+    if (tree->opval.op == '[')
+      {
+        /* determine which is the array & which the index */
+        if ((IS_ARRAY (RTYPE (tree)) || IS_PTR (RTYPE (tree))) &&
+	    IS_INTEGRAL (LTYPE (tree)))
+	  {
+	    ast *tempTree = tree->left;
+	    tree->left = tree->right;
+	    tree->right = tempTree;
+	  }
+      }
 
     /* After decorating the left branch there's type information available
        in tree->left->?type. If the op is e.g. '=' we extract the type
        information from there and propagate it to the right branch. */
-    if (getenv ("SDCC_NEWTYPEFLOW"))
-      resultTypeProp = getLeftResultType (tree, resultTypeProp);
+    resultTypeProp = getLeftResultType (tree, resultTypeProp);
     
-    /* delay right side for '?' operator since conditional macro expansions
-       might rely on this */
-    dtr = tree->opval.op == '?' ? tree->right :
-                                  decorateType (tree->right, resultTypeProp);
+    switch (tree->opval.op)
+      {
+        case '?':
+	  /* delay right side for '?' operator since conditional macro
+	     expansions might rely on this */
+	  dtr = tree->right;
+	  break;
+	case CALL: 
+	  /* decorate right side for CALL (parameter list) in processParms();
+	     there is resultType available */
+	  dtr = tree->right;
+	  break;
+	default:     
+	  dtr = decorateType (tree->right, resultTypeProp);
+	  break;
+      }
 
     /* this is to take care of situations
        when the tree gets rewritten */
@@ -2290,29 +2318,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       tree->right = dtr;
     if ((dtl && dtl->isError) || (dtr && dtr->isError))
       return tree;
-
-    if (!getenv ("SDCC_NEWTYPEFLOW"))
-      {
-        if (IS_AST_OP(tree) &&
-	    (tree->opval.op == CAST || tree->opval.op == '=') &&
-	    (getSize(LTYPE(tree)) > getSize(RTYPE(tree))) &&
-	    (getSize(RTYPE(tree)) < (unsigned) INTSIZE)) {
-          /* this is a cast/assign to a bigger type */
-	  if (IS_AST_OP(tree->right) &&
-	      IS_INTEGRAL(tree->right->ftype) &&
-	      (tree->right->opval.op == LEFT_OP ||
-	       tree->right->opval.op == '*' ||
-	       tree->right->opval.op == '+' ||
-	       tree->right->opval.op == '-') &&
-	       tree->right->right) {
-	    /* we should cast an operand instead of the result */
-	    tree->right->decorated = 0;
-	    tree->right->left = newNode( CAST, newAst_LINK(newIntLink()),
-				         tree->right->left);
-	    tree->right = decorateType(tree->right, RESULT_CHECK);
-          }
-        }
-      }
   }
 
   /* depending on type of operator do */
@@ -2324,15 +2329,6 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	/*        array node          */
 	/*----------------------------*/
     case '[':
-
-      /* determine which is the array & which the index */
-      if ((IS_ARRAY (RTYPE (tree)) || IS_PTR (RTYPE (tree))) && IS_INTEGRAL (LTYPE (tree)))
-	{
-
-	  ast *tempTree = tree->left;
-	  tree->left = tree->right;
-	  tree->right = tempTree;
-	}
 
       /* first check if this is a array or a pointer */
       if ((!IS_ARRAY (LTYPE (tree))) && (!IS_PTR (LTYPE (tree))))
@@ -2354,6 +2350,17 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	  werror (E_LVALUE_REQUIRED, "array access");
 	  goto errorTreeReturn;
 	}
+
+      if (IS_LITERAL (RTYPE (tree)))
+	{
+	  int arrayIndex = (int) floatFromVal (valFromType (RETYPE (tree)));
+	  int arraySize = DCL_ELEM (LTYPE (tree));
+	  if (arraySize && arrayIndex >= arraySize)
+	    {
+	      werror (W_IDX_OUT_OF_BOUNDS, arrayIndex, arraySize);
+	    }
+	}
+
       RRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
       return tree;
@@ -2530,11 +2537,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	      return decorateType (otree, RESULT_CHECK);
 	  }
 
-	  if (getenv ("SDCC_NEWTYPEFLOW"))
-	    {
-	      addCast (&tree->left,  resultType, FALSE);
-	      addCast (&tree->right, resultType, FALSE);
-	    }
+	  tree->left  = addCast (tree->left,  resultType, FALSE);
+	  tree->right = addCast (tree->right, resultType, FALSE);
 	  TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), FALSE);
 	  TETYPE (tree) = getSpec (TTYPE (tree));
 
@@ -2748,11 +2752,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      if (getenv ("SDCC_NEWTYPEFLOW"))
-        {
-          addCast (&tree->left,  resultType, FALSE);
-          addCast (&tree->right, resultType, FALSE);
-        }
+      tree->left  = addCast (tree->left,  resultType, FALSE);
+      tree->right = addCast (tree->right, resultType, FALSE);
       TETYPE (tree) = getSpec (TTYPE (tree) =
 			       computeType (LTYPE (tree),
 					    RTYPE (tree),
@@ -2963,20 +2964,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      if (!getenv ("SDCC_NEWTYPEFLOW"))
-        TETYPE (tree) = getSpec (TTYPE (tree) =
-				 computeType (LTYPE (tree),
-					      RTYPE (tree),
-					      TRUE));
-      else
-	{
-          addCast (&tree->left,  resultType, FALSE);
-          addCast (&tree->right, resultType, FALSE);
-	  TETYPE (tree) = getSpec (TTYPE (tree) =
+      tree->left  = addCast (tree->left,  resultType, FALSE);
+      tree->right = addCast (tree->right, resultType, FALSE);
+      TETYPE (tree) = getSpec (TTYPE (tree) =
 				   computeType (LTYPE (tree),
 					        RTYPE (tree),
 		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
-	}
       
       return tree;
 
@@ -3105,20 +3098,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 LTYPE (tree));
       else
-        if (!getenv ("SDCC_NEWTYPEFLOW"))
+	{
+	  tree->left  = addCast (tree->left,  resultType, TRUE);
+          tree->right = addCast (tree->right, resultType, TRUE);
           TETYPE (tree) = getSpec (TTYPE (tree) =
-				   computeType (LTYPE (tree),
-					        RTYPE (tree),
-					        FALSE));
-	else
-          {
-	    addCast (&tree->left,  resultType, TRUE);
-            addCast (&tree->right, resultType, TRUE);
-            TETYPE (tree) = getSpec (TTYPE (tree) =
 				     computeType (LTYPE (tree),
 					          RTYPE (tree),
 		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
-	   }
+	}
 	
       return tree;
 
@@ -3216,20 +3203,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 	TETYPE (tree) = getSpec (TTYPE (tree) =
 				 LTYPE (tree));
       else
-        if (!getenv ("SDCC_NEWTYPEFLOW"))
-          TETYPE (tree) = getSpec (TTYPE (tree) =
-				   computeType (LTYPE (tree),
-					        RTYPE (tree),
-					        FALSE));
-	else
-	  {
-	    addCast (&tree->left,  resultType, TRUE);
-	    addCast (&tree->right, resultType, TRUE);
-	    TETYPE (tree) = getSpec (TTYPE (tree) =
+	{
+	  tree->left  = addCast (tree->left,  resultType, TRUE);
+	  tree->right = addCast (tree->right, resultType, TRUE);
+	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				     computeType (LTYPE (tree),
 					          RTYPE (tree),
 		               resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
-	  }
+	}
 
       LRVAL (tree) = RRVAL (tree) = 1;
 
@@ -3372,20 +3353,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       LRVAL (tree) = RRVAL (tree) = 1;
       if (tree->opval.op == LEFT_OP)
 	{
-	  if (!getenv ("SDCC_NEWTYPEFLOW"))
-	    /* promote char to int */
-	    TETYPE (tree) = getSpec (TTYPE (tree) =
-				     computeType (LTYPE (tree),
-						  LTYPE (tree), /* no, not RTYPE! */
-						  TRUE));
-	  else
-	    {
-	      addCast (&tree->left,  resultType, TRUE);
-	      TETYPE (tree) = getSpec (TTYPE (tree) =
+	  tree->left = addCast (tree->left, resultType, TRUE);
+	  TETYPE (tree) = getSpec (TTYPE (tree) =
 				       computeType (LTYPE (tree),
 					            RTYPE (tree),
 			       resultType == RESULT_TYPE_CHAR ? FALSE : TRUE));
-	    }
 	}
       else /* RIGHT_OP */
 	{
@@ -4179,6 +4151,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 					  AST_FOR (tree, loopExpr),
 					  tree->left), RESULT_CHECK);
       }
+    case PARAM:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+	      "node PARAM shouldn't be processed here");
+	      /* but in processParams() */
+      return tree;
     default:
       TTYPE (tree) = TETYPE (tree) = NULL;
       return tree;

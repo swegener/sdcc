@@ -500,7 +500,7 @@ pic14emitStaticSeg (memmap * map)
 
 	      fprintf (code->oFile, "%s:\n", sym->rname);
 	      noAlloc++;
-	      resolveIvalSym (sym->ival);
+	      resolveIvalSym (sym->ival, sym->type);
 	      //printIval (sym, sym->type, sym->ival, code->oFile);
 	      pb = newpCodeChain(NULL, 'P',newpCodeCharP("; Starting pCode block for Ival"));
 	      addpBlock(pb);

@@ -1,3 +1,24 @@
+2004-01-31 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (processParams): added new type flow and restructured
+	(gatherAutoInit): added new type flow
+	(addCast): cosmetic changes
+	(getLeftResultType): added new type flow for array indices, patch
+	provided by Stas, see FR #877103
+	(decorateType): SDCC_NEWTYPEFLOW removed, new type flow is now standard;
+	array index patch by Stas
+	* src/SDCCast.h: added prototype getResultTypeFromType()
+	* src/SDCCval.h,
+	* src/SDCCval.c (resolveIvalSym) (resolveIvalSym),
+	* src/pic/glue.c (pic14emitStaticSeg),
+	* src/pic16/glue.c (pic16emitStaticSeg),
+	* src/SDCCglue.c (emitRegularMap) (emitStaticSeg): added new type flow
+	for initialization of symbols
+	* src/SDCCicode.c (geniCodeArray): removed warning W_ARRAY_BOUND
+	* support/Util/SDCCerr.h:
+	* support/Util/SDCCerr.c: replaced W_ARRAY_BOUND by W_IDX_OUT_OF_BOUNDS
+	* .version: bumped version number to 2.3.8
+
 2004-01-30 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/regression/tests/libmullong.c: fixed for 64 bit hosts

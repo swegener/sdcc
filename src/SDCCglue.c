@@ -294,7 +294,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
           else
             DCL_PTR_CONST (newSym->type) = 1;
 	  SPEC_STAT(newSym->etype)=1;
-	  resolveIvalSym(newSym->ival);
+	  resolveIvalSym(newSym->ival, newSym->type);
 
 	  // add it to the "XINIT (CODE)" segment
 	  addSet(&xinit->syms, newSym);
@@ -1243,7 +1243,7 @@ emitStaticSeg (memmap * map, FILE * out)
 	    {
 	      fprintf (out, "%s:\n", sym->rname);
 	      noAlloc++;
-	      resolveIvalSym (sym->ival);
+	      resolveIvalSym (sym->ival, sym->type);
 	      printIval (sym, sym->type, sym->ival, out);
 	      noAlloc--;
 	      /* if sym is a simple string and sym->ival is a string, 

@@ -542,7 +542,7 @@ pic16emitStaticSeg (memmap * map)
 
 	      fprintf (code->oFile, "%s:\n", sym->rname);
 	      noAlloc++;
-	      resolveIvalSym (sym->ival);
+	      resolveIvalSym (sym->ival, sym->type);
 	      //printIval (sym, sym->type, sym->ival, code->oFile);
 	      pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block for Ival"));
 	      pic16_addpBlock(pb);

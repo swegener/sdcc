@@ -5,8 +5,8 @@
 UCZ80 = $(SDCC_DIR)/bin/sz80
 #UCZ80 = $(SDCC_DIR)/bin/s51
 
-SDCCFLAGS +=-mz80 --lesspedantic --profile -DREENTRANT=
-#SDCCFLAGS +=--lesspedantic -DREENTRANT=reentrant
+SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
+#SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
 
 #OBJEXT = .o
 EXEEXT = .ihx

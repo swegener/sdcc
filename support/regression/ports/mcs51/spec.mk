@@ -8,7 +8,7 @@ S51B = $(SDCC_DIR)/bin/s51
 
 S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=--lesspedantic -DREENTRANT=reentrant
+SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
 
 OBJEXT = .rel
 EXEEXT = .ihx

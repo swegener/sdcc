@@ -6,7 +6,7 @@ SXA_B = $(SDCC_DIR)/bin/sxa
 
 SXA = $(shell if [ -f $(SXA_A) ]; then echo $(SXA_A); else echo $(SXA_B); fi)
 
-SDCCFLAGS +=-mxa51 --lesspedantic -DREENTRANT=
+SDCCFLAGS +=-mxa51 --less-pedantic -DREENTRANT=
 
 OBJEXT = .rel
 EXEEXT = .hex

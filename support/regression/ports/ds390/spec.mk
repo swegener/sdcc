@@ -6,7 +6,7 @@ S51B = $(SDCC_DIR)/bin/s51
 
 S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=-mds390 --lesspedantic -DREENTRANT=reentrant -Wl-r
+SDCCFLAGS +=-mds390 --less-pedantic -DREENTRANT=reentrant -Wl-r
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -22,7 +22,7 @@ EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJ
 
 $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT): fwk/lib/testfwk.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
-	
+
 # run simulator with 25 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`

@@ -1527,9 +1527,9 @@ void pushTypeCastToLeaves(sym_link *type, ast *node, ast **parentPtr)
         /* We're at a leaf; if it's a value, apply the typecast */
         if (node->type == EX_VALUE && IS_INTEGRAL(TTYPE(node)))
         {
-            *parentPtr = newNode(CAST,
-			         newAst_LINK(copyLinkChain(type)),
-		                 node);
+            *parentPtr = decorateType(newNode(CAST,
+			                      newAst_LINK(copyLinkChain(type)),
+		                 	      node));
 	}
     }
     else
@@ -1562,7 +1562,7 @@ void propAsgType(ast *tree)
     	return;
     }
     
-    if (getSize(LTYPE(tree)) != getSize(RTYPE(tree)))
+    if (getSize(LTYPE(tree)) > getSize(RTYPE(tree)))
     {
         pushTypeCastToLeaves(LTYPE(tree), tree->right, &(tree->right));
     }
@@ -2756,7 +2756,6 @@ ast *decorateType (ast *tree)
 				     tree->right));
 	    }
 	}
-	pushTypeCastToLeaves(currFunc->type->next, tree->right, &(tree->right));
 	
 	RRVAL(tree) = 1;
 	return tree;

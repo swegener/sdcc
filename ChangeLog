@@ -1,3 +1,7 @@
+2003-09-13  Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/z80/gen.c (genXor): Fixed bug #805445
+
 2003-09-12  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Fixed bug #621531 (const & volatile confusion in the type chain).

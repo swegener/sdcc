@@ -5202,7 +5202,7 @@ genXor (iCode * ic, iCode * ifx)
 		  _moveA (aopGet (AOP (right), offset, FALSE));
 		  emit2 ("xor a,%s",
 			    aopGet (AOP (left), offset, FALSE));
-		  aopPut (AOP (result), "a", 0);
+		  aopPut (AOP (result), "a", offset);
 		}
 	    }
 	}

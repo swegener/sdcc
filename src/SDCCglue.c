@@ -26,10 +26,14 @@
 #include "asm.h"
 #include <time.h>
 
+#ifndef __BORLANDC__
 // This is a bit messy because we define link ourself
 #define link NoLiNk
 #include <unistd.h>
 #undef link
+#else
+// No unistd.h in Borland C++
+#endif
 
 symbol *interrupts[256];
 

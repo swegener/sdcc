@@ -282,5 +282,5 @@ operand *newiTempFromOp( operand *);
 /* declaration of exported variables                               */
 /*-----------------------------------------------------------------*/
 extern char *filename;
-int lineno;
+extern int lineno;
 #endif

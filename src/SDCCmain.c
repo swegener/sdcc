@@ -32,9 +32,15 @@
 #endif
 
 // This is a bit messy because we define link ourself
+#ifndef __BORLANDC__
 #define link NoLiNk
 #include <unistd.h>
 #undef link
+#else
+// No unistd.h in Borland C++
+extern int access(const char *, int);
+#define X_OK 1
+#endif
 
 //REMOVE ME!!!
 extern int yyparse();

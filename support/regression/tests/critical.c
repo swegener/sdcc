@@ -17,6 +17,7 @@ typedef union
 
 //must be at least 2 bytes big and volatile
 volatile big global_var = { 0 };
+int y;
 
 unsigned int get_global (void) critical
 {
@@ -52,6 +53,10 @@ testCritical(void)
   }
   //check the interrupt has run at all
   ASSERT(x.a != 0);
+
+  critical y = 0;
+  //check the interrupts are still enabled
+  ASSERT(EA);
 #else
   ASSERT(1);
 #endif

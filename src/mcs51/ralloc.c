@@ -866,7 +866,7 @@ tryAgain:
 }
 
 /*-----------------------------------------------------------------*/
-/* getRegPtrNoSpil - get it cannot split                           */
+/* getRegPtrNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
 static regs *getRegPtrNoSpil()
 {
@@ -887,7 +887,7 @@ static regs *getRegPtrNoSpil()
 }
 
 /*-----------------------------------------------------------------*/
-/* getRegGprNoSpil - get it cannot split                           */
+/* getRegGprNoSpil - get it cannot be spilt                           */
 /*-----------------------------------------------------------------*/
 static regs *getRegGprNoSpil()
 {
@@ -1054,8 +1054,8 @@ reassignLR (operand * op)
 static int
 willCauseSpill (int nr, int rt)
 {
-  /* first check if there are any avlb registers
-     of te type required */
+  /* first check if there are any available registers
+     of the type required */
   if (rt == REG_PTR)
     {
       /* special case for pointer type
@@ -1064,6 +1064,11 @@ willCauseSpill (int nr, int rt)
       if (nFreeRegs (rt) >= nr)
         return 0;
       if (nFreeRegs (REG_GPR) >= nr)
+        return 0;
+    }
+  else if (rt == REG_BIT)
+    {
+      if (nFreeRegs (rt) >= nr)
         return 0;
     }
   else
@@ -1217,7 +1222,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                 int j;
                 int ptrRegSet = 0;
 
-                /* Make sure any spill location is definately allocated */
+                /* Make sure any spill location is definitely allocated */
                 if (sym->isspilt && !sym->remat && sym->usl.spillLoc &&
                     !sym->usl.spillLoc->allocreq)
                   {
@@ -1457,7 +1462,7 @@ static void fillGaps()
               }
           }
 
-        D(printf("Atemping fillGaps on %s: [",sym->name));
+        D(printf("Attempting fillGaps on %s: [",sym->name));
         /* THERE IS HOPE !!!! */
         for (i=0; i < sym->nRegs ; i++ ) {
             if (sym->regType == REG_PTR)
@@ -1825,13 +1830,12 @@ regTypeNum (eBBlock *ebbs)
             }
 
           /* determine the type of register required */
-          if (sym->nRegs == 1 &&
-              IS_PTR (sym->type) &&
-              sym->uptr)
+          if (sym->nRegs == 1 && IS_PTR (sym->type) && sym->uptr)
             sym->regType = REG_PTR;
+          else if (IS_BIT(sym->type))
+            sym->regType = REG_BIT;
           else
             sym->regType = REG_GPR;
-
         }
       else
         /* for the first run we don't provide */

@@ -211,9 +211,7 @@ iCodeTable;
                       x->op == LABEL        ||    \
                       x->op == FUNCTION     ||    \
                       x->op == INLINEASM    ||    \
-                      x->op == ENDFUNCTION  ||    \
-                      x->op == CRITICAL     ||    \
-                      x->op == ENDCRITICAL  )
+                      x->op == ENDFUNCTION  )
 
 #define SKIP_IC1(x)  (x->op == CALL         ||    \
                       SKIP_IC2(x) )
@@ -225,6 +223,8 @@ iCodeTable;
                       x->op == RECEIVE      ||    \
                       x->op == ARRAYINIT    ||    \
                       SKIP_IC1(x)           ||    \
+                      x->op == CRITICAL     ||    \
+                      x->op == ENDCRITICAL  ||    \
                       x->op == SEND         )
 
 #define SKIP_IC3(x) (SKIP_IC2(x)            ||    \

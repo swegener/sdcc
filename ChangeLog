@@ -1,8 +1,16 @@
+2005-03-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.h: moved CRITICAL and ENDCRITICAL from SKIP_IC2 to SKIP_IC
+	* src/mcs51/ralloc.c (willCauseSpill): added check for REG_BIT type,
+	  (regTypeNum): set REG_BIT type if necessary
+	* src/mcs51/ralloc.h: added define REG_BIT, used to fix bug 1144613
+	* support/regression/tests/critical.c: check bug 1144613
+
 2005-03-02 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genRightShiftLiteral): fixed bug #1154256
 
-2004-02-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2005-02-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/avr/ralloc.c (serialRegAssign),
 	* src/ds390/ralloc.c (serialRegAssign),
@@ -17,13 +25,13 @@
 
 	* src/SDCCast.c (decorateType): fixed bug 1124787
 
-2004-02-20 Hubert Sack <sack AT digiplan.de>
+2005-02-20 Hubert Sack <sack AT digiplan.de>
 	committed by Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added peepholes 3.h-k and 132.a-f from
 	patch #1121755
 
-2004-02-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+2005-02-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/SDCCpeeph.def: new keyword "labelRefCountChange" which allows peepholes
 	to keep the correct label reference count when adding/removing references
@@ -85,7 +93,7 @@
 
 	* src/pic/gen.c : Fix for bugs #1080519 & #1115662.
 
-2004-02-03 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-02-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/c8051f120.h: added declarations for sbit port 2,3&4
 
@@ -97,7 +105,7 @@
 	* (genPackBits): improved accessing full bytes, implemented for GPOINTERs
 	* device/include/pic16/{stddef.h,stdbool.h}: added
 
-2004-02-02 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-02-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/c8051f040.h: added define CPT2_PAGE
 
@@ -107,28 +115,28 @@
 	* src/pic16/Makefile.bcc : Do not use this file but added file graph.c as it
 	 appeared to be required
 
-2004-01-31 Borut Razem <borut.razem AT siol.net>
+2005-01-31 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added include/asm/ds390, include/asm/mcs51,
 	  include/mcs51 and include/z80 directories to the package
 
-2004-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2005-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genFunction): fixed bug #1112752
 
-2004-01-30 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+2005-01-30 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: adapted peephole 258.x to changed gen.c (genAnd)
 
-2004-01-29 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+2005-01-29 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/gen.c (genAnd): accessing LSB/MSB by rotating acc
 
-2004-01-29 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-01-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/Makefile.in: create/copy mcs51 and z80 include subdirs
 
-2004-01-27 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-01-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/c8051fxxx.h: removed these 6 files
 	* device/include/mcs51/c8051fxxx.h: added these 11 new files
@@ -142,11 +150,11 @@
 	* src/pic16/glue.c (emitStatistics): beautified
 	* device/lib/pic16/libm/Makefile: added include path
 
-2004-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2005-01-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/gen.c (aopPut): fixed bug #1103902
 
-2004-01-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2005-01-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/lib/expf.c: fixed bug #1095792
 
@@ -236,7 +244,7 @@
 	* src/pic16/pcoderegs.c (pCodeOptime2pCodes): disabled optimization
 	  to fix #1106967 (pCode->seq are not set up correctly)
 
-2004-01-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2005-01-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCglue.c (glue): make sure code area is declared before the
 	static initialization area.

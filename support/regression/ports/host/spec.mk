@@ -1,5 +1,5 @@
 # Port specification for compiling on the host machines version of gcc
-SDCC = $(shell which gcc > /dev/null || which cc)
+SDCC = $(shell ( sh -c "gcc --version" 2>&1 ) > /dev/null  && echo gcc || echo cc)
 SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -DREENTRANT=
 
 EXEEXT = .bin

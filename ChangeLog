@@ -1,3 +1,11 @@
+2004-09-07 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: updated section on switch statements, added
+	section about semaphore locking
+	* doc/Makefile: added option -info for latex2html
+	* device/lib/_gptrget.c,
+	* device/lib/_gptrput.c: __XPAGE instead of P2 in outcommented code
+
 2004-09-06 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/device.h,

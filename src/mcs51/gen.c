@@ -230,17 +230,26 @@ getFreePtr (iCode * ic, asmop ** aopp, bool result)
       (*aopp)->type = AOP_R1;
       return mcs51_regWithIdx (R1_IDX);
     }
-
 endOfWorld:
-  /* I said end of world but not quite end of world yet */
-  /* if this is a result then we can push it on the stack */
-  if (result)
-    {
-      (*aopp)->type = AOP_STK;
-      return NULL;
+  /* I said end of world, but not quite end of world yet */
+  if (result) {
+    /* we can push it on the stack */
+    (*aopp)->type = AOP_STK;
+    return NULL;
+  } else {
+    /* in the case that result AND left AND right needs a pointer reg
+       we can safely use the result's */
+    if (bitVectBitValue (mcs51_rUmaskForOp(IC_RESULT(ic)), R0_IDX)) {
+      (*aopp)->type = AOP_R0;
+      return mcs51_regWithIdx (R0_IDX);
     }
+    if (bitVectBitValue (mcs51_rUmaskForOp(IC_RESULT(ic)), R1_IDX)) {
+      (*aopp)->type = AOP_R1;
+      return mcs51_regWithIdx (R1_IDX);
+    }
+  }
 
-  /* other wise this is true end of the world */
+  /* now this is REALLY the end of the world */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 	  "getFreePtr should never reach here");
   exit (1);

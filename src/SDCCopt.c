@@ -609,9 +609,9 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 		  IS_TRUE_SYMOP (IC_COND (ic)) &&
                   isLocalWithoutDef (OP_SYMBOL (IC_COND (ic))))
 		{
-		  werror (W_LOCAL_NOINIT,
-			  OP_SYMBOL (IC_COND (ic))->name,
-			  ic->filename, ic->lineno);
+		  werrorfl (ic->filename, ic->lineno,
+			  W_LOCAL_NOINIT,
+			  OP_SYMBOL (IC_COND (ic))->name);
 		  OP_REQV (IC_COND (ic)) = NULL;
 		  OP_SYMBOL (IC_COND (ic))->allocreq = 1;
 		}
@@ -632,9 +632,9 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 		  IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
                   isLocalWithoutDef (OP_SYMBOL (IC_JTCOND (ic))))
 		{
-		  werror (W_LOCAL_NOINIT,
-			  OP_SYMBOL (IC_JTCOND (ic))->name,
-			  ic->filename, ic->lineno);
+		  werrorfl (ic->filename, ic->lineno,
+			  W_LOCAL_NOINIT,
+			  OP_SYMBOL (IC_JTCOND (ic))->name);
 		  OP_REQV (IC_JTCOND (ic)) = NULL;
 		  OP_SYMBOL (IC_JTCOND (ic))->allocreq = 1;
 		}
@@ -675,9 +675,9 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 	      IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
 	      isLocalWithoutDef (OP_SYMBOL (IC_RIGHT (ic))))
 	    {
-	      werror (W_LOCAL_NOINIT,
-		      OP_SYMBOL (IC_RIGHT (ic))->name,
-		      ic->filename, ic->lineno);
+	      werrorfl (ic->filename, ic->lineno,
+		        W_LOCAL_NOINIT,
+		        OP_SYMBOL (IC_RIGHT (ic))->name);
 	      OP_REQV (IC_RIGHT (ic)) = NULL;
 	      OP_SYMBOL (IC_RIGHT (ic))->allocreq = 1;
 	    }
@@ -696,9 +696,9 @@ replaceRegEqv (eBBlock ** ebbs, int count)
 	      IS_TRUE_SYMOP (IC_LEFT (ic)) &&
 	      isLocalWithoutDef (OP_SYMBOL (IC_LEFT (ic))))
 	    {
-	      werror (W_LOCAL_NOINIT,
-		      OP_SYMBOL (IC_LEFT (ic))->name,
-		      ic->filename, ic->lineno);
+	      werrorfl (ic->filename, ic->lineno,
+		        W_LOCAL_NOINIT,
+		        OP_SYMBOL (IC_LEFT (ic))->name);
 	      OP_REQV (IC_LEFT (ic)) = NULL;
 	      OP_SYMBOL (IC_LEFT (ic))->allocreq = 1;
 	    }
@@ -1060,7 +1060,8 @@ eBBlockFromiCode (iCode * ic)
 	     bp; 
 	     bp=setNextItem(ebbs[saveCount-1]->predList)) {
 	  if (bp->ech->op != RETURN) {
-	    werror (W_VOID_FUNC, currFunc->name);
+	    werrorfl (bp->ech->filename, bp->ech->lineno,
+		      W_VOID_FUNC, currFunc->name);
 	  }
 	}
       }

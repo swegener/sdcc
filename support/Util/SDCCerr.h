@@ -187,6 +187,7 @@ SDCCERR - SDCC Standard error handler
 #define E_FUNC_ATTR 169             /* function attribute without function */
 #define W_SAVE_RESTORE 170          /* unmatched #pragma SAVE and #pragma RESTORE */
 #define E_INVALID_CRITICAL 171	    /* operation invalid in critical sequence */
+#define E_NOT_ALLOWED 172	    /* %s not allowed here */
 
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.
@@ -241,6 +242,16 @@ werror - Output a standard eror message with variable number of arguements
 */
 
 void	werror (int errNum, ... ) ;
+
+/*
+-------------------------------------------------------------------------------
+werrorfl - Output a standard eror message with variable number of arguements.
+           Use a specified filename and line number instead of the default.
+
+-------------------------------------------------------------------------------
+*/
+
+void werrorfl (char *newFilename, int newLineno, int errNum, ...) ;
 
 /*
 -------------------------------------------------------------------------------

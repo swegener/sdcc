@@ -221,7 +221,7 @@ struct
 { E_TERMINATING, ERROR_LEVEL_ERROR,
    "Compiler Terminating , contact author with source" },
 { W_LOCAL_NOINIT, ERROR_LEVEL_WARNING,
-   "'auto' variable '%s' may be used before initialization at %s(%d)" },
+   "'auto' variable '%s' may be used before initialization" },
 { W_NO_REFERENCE, ERROR_LEVEL_WARNING,
    "in function %s unreferenced %s : '%s'" },
 { E_OP_UNKNOWN_SIZE, ERROR_LEVEL_ERROR,
@@ -274,7 +274,7 @@ struct
 { W_FUNC_TOO_LARGE, ERROR_LEVEL_WARNING,
    "function '%s' too large for global optimization" },
 { W_CONTROL_FLOW, ERROR_LEVEL_PEDANTIC,
-   "conditional flow changed by optimizer '%s(%d)':so said EVELYN the modified DOG" },
+   "conditional flow changed by optimizer: so said EVELYN the modified DOG" },
 { W_PTR_TYPE_INVALID, ERROR_LEVEL_WARNING,
    "invalid type specifier for pointer type; specifier ignored" },
 { W_IMPLICIT_FUNC, ERROR_LEVEL_WARNING,
@@ -306,7 +306,7 @@ struct
 { W_CONST_RANGE, ERROR_LEVEL_WARNING,
    "constant is out of range %s" },
 { W_CODE_UNREACH, ERROR_LEVEL_PEDANTIC,
-   "unreachable code %s(%d)" },
+   "unreachable code" },
 { E_NONPTR2_GENPTR, ERROR_LEVEL_ERROR,
    "non-pointer type cast to generic pointer" },
 { W_POSSBUG, ERROR_LEVEL_WARNING,
@@ -350,7 +350,7 @@ struct
 { E_TWO_OR_MORE_STORAGE_CLASSES, ERROR_LEVEL_ERROR,
     "two or more storage classes in declaration for '%s'" },
 { W_EXCESS_INITIALIZERS, ERROR_LEVEL_WARNING,
-    "excess elements in %s initializer after `%s' at line %d" },
+    "excess elements in %s initializer after `%s'" },
 { E_ARGUMENT_MISSING, ERROR_LEVEL_ERROR,
    "Option %s requires an argument." },
 { W_STRAY_BACKSLASH, ERROR_LEVEL_WARNING,
@@ -399,6 +399,8 @@ struct
     "unmatched #pragma SAVE and #pragma RESTORE" },
 { E_INVALID_CRITICAL, ERROR_LEVEL_ERROR,
     "not allowed in a critical section" },
+{ E_NOT_ALLOWED, ERROR_LEVEL_ERROR,
+    "%s not allowed here" },
 };
 
 /*
@@ -493,6 +495,31 @@ void werror (int errNum, ...)
     va_start(marker,errNum);
     vwerror(errNum, marker);
     va_end(marker);
+}
+
+/*
+-------------------------------------------------------------------------------
+werrorfl - Output a standard eror message with variable number of arguements.
+           Use a specified filename and line number instead of the default.
+
+-------------------------------------------------------------------------------
+*/
+
+void werrorfl (char *newFilename, int newLineno, int errNum, ...)
+{
+    char *oldFilename = filename;
+    int oldLineno = lineno;
+
+    filename = newFilename;
+    lineno = newLineno;
+
+    va_list marker;
+    va_start(marker,errNum);
+    vwerror(errNum, marker);
+    va_end(marker);
+
+    filename = oldFilename;
+    lineno = oldLineno;
 }
 
 

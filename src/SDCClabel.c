@@ -103,7 +103,7 @@ deleteIfx (iCode * loop, int key)
 {
   if (!options.lessPedantic)
     {
-      werror (W_CONTROL_FLOW, loop->filename, loop->lineno);
+      werrorfl (loop->filename, loop->lineno, W_CONTROL_FLOW);
     }
   hTabDeleteItem (&labelRef, key, loop, DELETE_ITEM, NULL);
 	      

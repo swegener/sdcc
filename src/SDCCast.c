@@ -429,7 +429,8 @@ resolveSymbols (ast * tree)
 			       tree->trueLabel->name)))
 	    tree->trueLabel = csym;
 	  else
-	    werror (E_LABEL_UNDEF, tree->trueLabel->name);
+	    werrorfl (tree->filename, tree->lineno, E_LABEL_UNDEF,
+		      tree->trueLabel->name);
 	}
 
       if (tree->falseLabel)
@@ -439,7 +440,8 @@ resolveSymbols (ast * tree)
 			       tree->falseLabel->name)))
 	    tree->falseLabel = csym;
 	  else
-	    werror (E_LABEL_UNDEF, tree->falseLabel->name);
+	    werrorfl (tree->filename, tree->lineno, E_LABEL_UNDEF,
+		      tree->falseLabel->name);
 	}
 
     }
@@ -454,7 +456,8 @@ resolveSymbols (ast * tree)
 			      tree->opval.val->sym->name);
 
       if (!csym)
-	werror (E_LABEL_UNDEF, tree->opval.val->sym->name);
+	werrorfl (tree->filename, tree->lineno, E_LABEL_UNDEF,
+		  tree->opval.val->sym->name);
       else
 	tree->opval.val->sym = csym;
 
@@ -493,7 +496,9 @@ resolveSymbols (ast * tree)
 		tree->opval.val->sym->etype = newIntLink ();
 	      tree->opval.val->etype = tree->opval.val->etype;
 	      tree->opval.val->type = tree->opval.val->sym->type;
-	      werror (W_IMPLICIT_FUNC, tree->opval.val->sym->name);
+	      werrorfl (tree->filename, tree->lineno, W_IMPLICIT_FUNC,
+			tree->opval.val->sym->name);
+	      //tree->opval.val->sym->undefined = 1;
 	      allocVariables (tree->opval.val->sym);
 	    }
 	  else
@@ -670,6 +675,8 @@ processParms (ast * func,
   /* exist and this is not defined as a variable arg   */
   if (!defParm && actParm && !IFFUNC_HASVARARGS(func->ftype))
     {
+      //if (func->type==EX_VALUE && func->opval.val->sym->undefined)
+      //  return 1; /* Already gave them an undefined function error */
       werror (E_TOO_MANY_PARMS);
       return 1;
     }
@@ -857,8 +864,9 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
     }
 
   if (iloop) {
-    werror (W_EXCESS_INITIALIZERS, "struct", 
-	    sym->opval.val->sym->name, sym->opval.val->sym->lineDef);
+    werrorfl (filename, sym->opval.val->sym->lineDef,
+	      W_EXCESS_INITIALIZERS, "struct", 
+	      sym->opval.val->sym->name);
   }
 
   return rast;
@@ -918,7 +926,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 	    char *name=sym->opval.val->sym->name;
 	    int lineno=sym->opval.val->sym->lineDef;
 	    
-	    werror (W_EXCESS_INITIALIZERS, "array", name, lineno);
+	    werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
 	}
     }
     else
@@ -943,7 +951,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 		// there has to be a better way
 		char *name=sym->opval.val->sym->name;
 		int lineno=sym->opval.val->sym->lineDef;
-		werror (W_EXCESS_INITIALIZERS, "array", name, lineno);
+		werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
 		
 		break;
 	    }
@@ -1108,8 +1116,9 @@ gatherAutoInit (symbol * autoChain)
 	    work = initAggregates (sym, sym->ival, NULL);
 	  } else {
 	    if (getNelements(sym->type, sym->ival)>1) {
-	      werror (W_EXCESS_INITIALIZERS, "scalar", 
-		      sym->name, sym->lineDef);
+	      werrorfl (filename, sym->lineDef,
+			W_EXCESS_INITIALIZERS, "scalar", 
+			sym->name);
 	    }
 	    work = newNode ('=', newAst_VALUE (symbolVal (newSym)),
 			    list2expr (sym->ival));
@@ -1143,8 +1152,9 @@ gatherAutoInit (symbol * autoChain)
 	    work = initAggregates (sym, sym->ival, NULL);
 	  } else {
 	    if (getNelements(sym->type, sym->ival)>1) {
-	      werror (W_EXCESS_INITIALIZERS, "scalar", 
-		      sym->name, sym->lineDef);
+	      werrorfl (filename, sym->lineDef,
+			W_EXCESS_INITIALIZERS, "scalar", 
+			sym->name);
 	    }
 	    work = newNode ('=', newAst_VALUE (symbolVal (sym)),
 			    list2expr (sym->ival));
@@ -2089,6 +2099,28 @@ decorateType (ast * tree)
   {
     ast *dtl, *dtr;
 
+    #if 0
+    if (tree->opval.op == NULLOP || tree->opval.op == BLOCK)
+      {
+        if (tree->left && tree->left->type == EX_OPERAND
+	    && (tree->left->opval.op == INC_OP
+		|| tree->left->opval.op == DEC_OP)
+	    && tree->left->left)
+	  {
+	    tree->left->right = tree->left->left;
+	    tree->left->left = NULL;
+	  }
+        if (tree->right && tree->right->type == EX_OPERAND
+	    && (tree->right->opval.op == INC_OP
+		|| tree->right->opval.op == DEC_OP)
+	    && tree->right->left)
+	  {
+	    tree->right->right = tree->right->left;
+	    tree->right->left = NULL;
+	  }
+      }
+    #endif
+    
     dtl = decorateType (tree->left);
     /* delay right side for '?' operator since conditional macro expansions might
        rely on this */

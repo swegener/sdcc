@@ -1424,7 +1424,7 @@ ifxOptimize (iCode * ic, set * cseSet,
       /* the price */
       computeControlFlow (ebbs, count, 1);
       if (!options.lessPedantic) {
-	werror (W_CONTROL_FLOW, ic->filename, ic->lineno);
+	werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
       }
       return;
     }
@@ -1438,7 +1438,7 @@ ifxOptimize (iCode * ic, set * cseSet,
     {
 
       if (!options.lessPedantic) {
-	werror (W_CONTROL_FLOW, ic->filename, ic->lineno);
+	werrorfl (ic->filename, ic->lineno, W_CONTROL_FLOW);
       }
       if (IS_OP_VOLATILE (IC_COND (ic)))
 	{

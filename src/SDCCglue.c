@@ -304,8 +304,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    ival = initAggregates (sym, sym->ival, NULL);
 	  } else {
 	    if (getNelements(sym->type, sym->ival)>1) {
-	      werror (W_EXCESS_INITIALIZERS, "scalar", 
-		      sym->name, sym->lineDef);
+	      werrorfl (filename, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", 
+		      sym->name);
 	    }
 	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
 			    decorateType (resolveSymbols (list2expr (sym->ival))));
@@ -351,7 +351,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       else {
 	int size = getSize (sym->type);
 	if (size==0) {
-	  werror(E_UNKNOWN_SIZE,sym->name);
+	  werrorfl (filename, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
 	}
 	/* allocate space */
 	if (options.debug) {
@@ -492,7 +492,10 @@ initPointer (initList * ilist, sym_link *toType)
 		return val;
 	}
  wrong:
-	werror (E_INCOMPAT_PTYPES);
+	if (expr)
+	  werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
+	else
+	  werror (E_INCOMPAT_PTYPES);
 	return NULL;
 
 }
@@ -738,7 +741,7 @@ printIvalStruct (symbol * sym, sym_link * type,
 
 	sflds = SPEC_STRUCT (type)->fields;
 	if (ilist->type != INIT_DEEP) {
-		werror (E_INIT_STRUCT, sym->name);
+		werrorfl (filename, sym->lineDef, E_INIT_STRUCT, sym->name);
 		return;
 	}
 
@@ -752,7 +755,7 @@ printIvalStruct (symbol * sym, sym_link * type,
 		}
 	}
 	if (iloop) {
-	  werror (W_EXCESS_INITIALIZERS, "struct", sym->name, sym->lineDef);
+	  werrorfl (filename, sym->lineDef, W_EXCESS_INITIALIZERS, "struct", sym->name);
 	}
 	return;
 }
@@ -802,7 +805,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   /* by a string                      */
   if (IS_CHAR (type->next)) {
     if (!IS_LITERAL(list2val(ilist)->etype)) {
-      werror (E_CONST_EXPECTED);
+      werrorfl (filename, ilist->lineno, E_CONST_EXPECTED);
       return;
     }
     if (printIvalChar (type,
@@ -813,7 +816,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   /* not the special case             */
   if (ilist->type != INIT_DEEP)
     {
-      werror (E_INIT_STRUCT, sym->name);
+      werrorfl (filename, ilist->lineno, E_INIT_STRUCT, sym->name);
       return;
     }
 
@@ -822,7 +825,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       printIval (sym, type->next, iloop, oFile);
       
       if (++size > DCL_ELEM(type)) {
-	werror (W_EXCESS_INITIALIZERS, "array", sym->name, sym->lineDef);
+	werrorfl (filename, sym->lineDef, W_EXCESS_INITIALIZERS, "array", sym->name);
 	break;
       }
     }
@@ -861,7 +864,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, FILE * oFile)
 
   if (IS_LITERAL(val->etype)) {
     if (compareType(type,val->etype)==0) {
-      werror (E_INCOMPAT_TYPES);
+      werrorfl (filename, ilist->lineno, E_INCOMPAT_TYPES);
       printFromToType (val->type, type);
     }
     printIvalCharPtr (NULL, type, val, oFile);
@@ -972,7 +975,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 	case 3:
 	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
 	    // non-zero mcs51 generic pointer
-	    werror (E_LITERAL_GENERIC);
+	    werrorfl (filename, sym->lineDef, E_LITERAL_GENERIC);
 	  }
 	  if (port->little_endian) {
 	    fprintf (oFile, "\t.byte %s,%s,%s\n",
@@ -989,7 +992,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, FILE * oFile)
 	case 4:
 	  if (IS_GENPTR(type) && floatFromVal(val)!=0) {
 	    // non-zero ds390 generic pointer
-	    werror (E_LITERAL_GENERIC);
+	    werrorfl (filename, sym->lineDef, E_LITERAL_GENERIC);
 	  }
 	  if (port->little_endian) {
 	    fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
@@ -1047,7 +1050,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 
   /* check the type      */
   if (compareType (type, val->type) == 0) {
-    werror (W_INIT_WRONG);
+    werrorfl (filename, ilist->lineno, W_INIT_WRONG);
     printFromToType (val->type, type);
   }
 
@@ -1117,9 +1120,6 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
   if (!ilist)
     return;
 
-  /* update line number for error msgs */
-  lineno=sym->lineDef;
-
   /* if structure then    */
   if (IS_STRUCT (type))
     {
@@ -1138,8 +1138,8 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
   if (ilist->type!=INIT_NODE) {
       // or a 1-element list
     if (ilist->init.deep->next) {
-      werror (W_EXCESS_INITIALIZERS, "scalar", 
-	      sym->name, sym->lineDef);
+      werrorfl (filename, sym->lineDef, W_EXCESS_INITIALIZERS, "scalar", 
+	      sym->name);
     } else {
       ilist=ilist->init.deep;
     }
@@ -1155,7 +1155,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 	IS_PTR(type) && DCL_TYPE(type)==CPOINTER) {
       // no sweat
     } else {
-      werror (E_TYPE_MISMATCH, "assignment", " ");
+      werrorfl (filename, ilist->lineno, E_TYPE_MISMATCH, "assignment", " ");
       printFromToType(itype, type);
     }
   }
@@ -1254,7 +1254,7 @@ emitStaticSeg (memmap * map, FILE * out)
 	      int size = getSize (sym->type);
 	      
 	      if (size==0) {
-		  werror(E_UNKNOWN_SIZE,sym->name);
+		  werrorfl (filename, sym->lineDef, E_UNKNOWN_SIZE,sym->name);
 	      }
 	      fprintf (out, "%s:\n", sym->rname);
 	      /* special case for character strings */
@@ -1503,7 +1503,7 @@ emitOverlay (FILE * afile)
 	      int size = getSize(sym->type);
 
 	      if (size==0) {
-		  werror(E_UNKNOWN_SIZE,sym->name);
+		  werrorfl (filename, sym->lineDef, E_UNKNOWN_SIZE);
 	      }	      
 	      if (options.debug)
 		  fprintf (afile, "==.\n");

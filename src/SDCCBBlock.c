@@ -734,7 +734,7 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
           while (ic);
           if (foundNonlabel && ic)
             {
-	      werror (W_CODE_UNREACH, ic->filename, ic->lineno);
+	      werrorfl (ic->filename, ic->lineno, W_CODE_UNREACH);
               continue;
             }
 	}

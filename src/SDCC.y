@@ -227,7 +227,6 @@ function_body
    | declaration_list compound_statement
          {
             werror(E_OLD_STYLE,($1 ? $1->name: "")) ;
-	    fprintf(stderr, "case 1\n");
 	    exit(1);
          }
    ;
@@ -713,11 +712,19 @@ struct_or_union_specifier
            structdef *sdef ;
 	   symbol *sym, *dsym;
 
-	   // check for duplicate structure members
+	   // check for errors in structure members
 	   for (sym=$4; sym; sym=sym->next) {
+	     if (IS_ABSOLUTE(sym->etype)) {
+	       werrorfl(filename, sym->lineDef, E_NOT_ALLOWED, "'at'");
+	       SPEC_ABSA(sym->etype) = 0;
+	     }
+	     if (IS_SPEC(sym->etype) && SPEC_SCLS(sym->etype)) {
+	       werrorfl(filename, sym->lineDef, E_NOT_ALLOWED, "storage class");
+	       SPEC_SCLS(sym->etype) = 0;
+	     }
 	     for (dsym=sym->next; dsym; dsym=dsym->next) {
 	       if (strcmp(sym->name, dsym->name)==0) {
-		 werror(E_DUPLICATE_MEMBER, 
+		 werrorfl(filename, sym->lineDef, E_DUPLICATE_MEMBER, 
 			$1==STRUCT ? "struct" : "union", sym->name);
 	       }
 	     }
@@ -785,17 +792,18 @@ struct_declaration
            /* add this type to all the symbols */
            symbol *sym ;
            for ( sym = $2 ; sym != NULL ; sym = sym->next ) {
+	       sym_link *btype = copyLinkChain($1);
 	       
 	       /* make the symbol one level up */
 	       sym->level-- ;
 
-	       pointerTypes(sym->type,copyLinkChain($1));
+	       pointerTypes(sym->type,btype);
 	       if (!sym->type) {
-		   sym->type = copyLinkChain($1);
+		   sym->type = btype;
 		   sym->etype = getSpec(sym->type);
 	       }
 	       else
-		 addDecl (sym,0,copyLinkChain($1));
+		 addDecl (sym,0,btype);
 	       /* make sure the type is complete and sane */
 	       checkTypeSanity(sym->etype, sym->name);
 	   }
@@ -853,7 +861,7 @@ enum_specifier
 	   for (sym=$3; sym; sym=sym->next) {
 	     for (dsym=sym->next; dsym; dsym=dsym->next) {
 	       if (strcmp(sym->name, dsym->name)==0) {
-		 werror(E_DUPLICATE_MEMBER, "enum", sym->name);
+		 werrorfl(filename, sym->lineDef, E_DUPLICATE_MEMBER, "enum", sym->name);
 		 _error++;
 	       }
 	     }
@@ -1051,7 +1059,6 @@ function_declarator2
    | declarator2 '(' parameter_identifier_list ')'
          {	   
 	   werror(E_OLD_STYLE,$1->name) ;	  
-	   fprintf(stderr, "case 2\n");
 	   /* assume it returns an int */
 	   $1->type = $1->etype = newIntLink();
 	   $$ = $1 ;

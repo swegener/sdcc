@@ -1,3 +1,22 @@
+2003-12-18 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* support/Util/SDCCerr.h,
+	* support/Util/SDCCerr.c (E_NOT_ALLOWED),
+	* src/SDCC.y (struct_declaration, struct_or_union_specifier): complain
+	about storage class and 'at' used inside struct or union
+	* src/SDCCBBlock.c (iCodeFromeBBlock),
+	* src/SDCCcse.c (ifxOptimize),
+	* src/SDCCglue.c (emitRegularMap, initPointer, printIvalStruct,
+	printIvalArray, printiValFuncPtr, printIvalCharPtr, printIvalPtr,
+	printIval, emitStaticSeg, emitOverlay),
+	* src/SDCClabel.c (deleteIfx),
+	* src/SDCCopt.c (replaceRegEqv, eBBlockFromiCode),
+	* src/SDCCast.c (resolveSymbols, createIvalStruct, createIvalArray,
+	gatherAutoInit, processParms),
+	* support/Util/SDCCerr.h,
+	* support/Util/SDCCerr.c (werrorfl): Support for better error location
+	reporting for post-parse errors.
+
 2003-12-16 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCval.c (valPlus, valMinus, valShift): fixed some problems with

@@ -578,7 +578,7 @@ double   floatFromVal ( value *val )
     if (!val)
 	return 0;
 
-    if (SPEC_SCLS(val->etype) != S_LITERAL) {
+    if (val->etype && SPEC_SCLS(val->etype) != S_LITERAL) {
 	werror(E_CONST_EXPECTED,val->name);
 	return 0;
     }

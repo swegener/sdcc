@@ -3,6 +3,7 @@
 static char _defaultRules[] =
 {
 #include "peeph.rul"
+#include "peeph-z80.rul"
 };
 
 Z80_OPTS z80_opts;

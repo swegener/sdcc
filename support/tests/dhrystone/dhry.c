@@ -195,6 +195,7 @@ int main(void)
 	DPRINTF(("Looping.\n"));
     } /* loop "for Run_Index" */
 
+#if 1
     _printTStates();
 
     printf("Run_Index = %d\n", Run_Index);
@@ -253,11 +254,11 @@ int main(void)
     printf ("Str_2_Loc:           %s\n", Str_2_Loc);
     printf ("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\n");
     printf ("\n");
-
-    printf("Time: %u ticks\n", runTime);
     printf("Dhrystones/s = %u\n", Number_Of_Runs / (runTime/CLOCKS_PER_SEC));
     printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
     _printTStates();
+#endif
+    printf("Time: %u ticks\n", runTime);
 }
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par)

@@ -51,5 +51,28 @@ yacc file. SDCCsymt.c and SDCCval.c havnt really changed in 5 days - must
 be SDCC.y.  Nope, no changes.  diff against 5 days ago shows only intersting
 changes are in SDCCicode.  Same with -14 days.
 
+Michael
+-------
+Next bug is global function parameters not being pushed correctly. i.e
 
+unsigned int counter;
 
+void print(void)
+{
+	printf("Counter is %u\n", counter);
+}
+generates:
+_print::
+	ld hl,#_counter
+	push hl
+	ld hl,#str_1
+	push hl
+	call printf
+	fix, ret
+
+which is more like:
+	printf("Counter is %u\n", &counter);
+	
+First looking in SDCCicode.c for the stuff that generates function calls:
+Probably a bug in geniCodeParams.
+Nope, a bug in my stuff :)

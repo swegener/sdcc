@@ -9,6 +9,7 @@
 
 static char _defaultRules[] =
 {
+#include "peeph.rul"
 #include "peeph-gbz80.rul"
 };
 
@@ -101,7 +102,8 @@ PORT gbz80_port = {
 	"_BSEG",
 	"_RSEG",
 	"_GSINIT",
-	"_OVERLAY"
+	"_OVERLAY",
+	"_GSFINAL"
     },
     { 
 	-1, 0, 0, 4, 0

@@ -649,7 +649,6 @@ link *operandType (operand *op)
     case TYPE :
 	return op->operand.typeOperand ;
     }
-    
     werror (E_INTERNAL_ERROR,__FILE__,__LINE__,
 	    " operand type not known ");
     assert (0) ; /* should never come here */

@@ -44,6 +44,12 @@
 
 #include "z80.h"
 
+enum {
+    DISABLE_PACK_ACC	= 0,
+    DISABLE_PACK_ASSIGN	= 0,
+    LIMITED_PACK_ACC	= 1
+};
+
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
 /* some routines are non-processor specific & can be reused when   */
@@ -59,7 +65,6 @@ bitVect *regAssigned = NULL;
 short blockSpil = 0;
 int slocNum = 0 ;
 extern void genZ80Code(iCode *);
-int ptrRegReq = 0; /* one byte pointer register required */
 bitVect *funcrUsed = NULL; /* registers used in a function */
 int stackExtend = 0;
 int dataExtend  = 0;
@@ -144,7 +149,7 @@ regs *regWithIdx (int idx)
  */
 static void freeReg (regs *reg)
 {
-    assert(!reg->isFree);
+    wassert(!reg->isFree);
     reg->isFree = 1;
 }
 
@@ -373,14 +378,6 @@ DEFSETFUNC(isFree)
 }
 
 /*-----------------------------------------------------------------*/
-/* spillLRWithPtrReg :- will spil those live ranges which use PTR  */
-/*-----------------------------------------------------------------*/
-static void spillLRWithPtrReg (symbol *forSym)
-{
-    /* Always just return */
-}
-
-/*-----------------------------------------------------------------*/
 /* createStackSpil - create a location on the stack to spil        */
 /*-----------------------------------------------------------------*/
 symbol *createStackSpil (symbol *sym)
@@ -476,7 +473,6 @@ static void spillThis (symbol *sym)
        for it */
     if (!(sym->remat || sym->usl.spillLoc)) 
 	createStackSpil (sym);
-    
 
     /* mark it has spilt & put it in the spilt set */
     sym->isspilt = 1;
@@ -484,21 +480,16 @@ static void spillThis (symbol *sym)
        
     bitVectUnSetBit(regAssigned,sym->key);
 
-    for (i = 0 ; i < sym->nRegs ; i++)
-
+    for (i = 0 ; i < sym->nRegs ; i++) {
 	if (sym->regs[i]) {
 	    freeReg(sym->regs[i]);
 	    sym->regs[i] = NULL;
 	}
+    }
     
     /* if spilt on stack then free up r0 & r1 
        if they could have been assigned to some
        LIVE ranges */
-    if (!ptrRegReq && isSpiltOnStack(sym)) {
-	ptrRegReq++ ;
-	spillLRWithPtrReg(sym);
-    }
-
     if (sym->usl.spillLoc && !sym->remat)
 	sym->usl.spillLoc->allocreq = 1;
     return;
@@ -619,7 +610,6 @@ bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
     for (i = 0 ; i < ssym->nRegs ;i++ )
 	if (ssym->regs[i])
 	    freeReg(ssym->regs[i]);
-     
 #if 0
     /* if spilt on stack then free up r0 & r1 
        if they could have been assigned to as gprs */
@@ -671,10 +661,6 @@ regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
     /* try for gpr type */
     if ((reg = allocReg(REG_GPR)))        
 	return reg;    
-
-    if (!ptrRegReq)
-	if ((reg = allocReg(REG_PTR)))
-	    return reg ;
 
     /* we have to spil */
     if (!spilSomething (ic,ebp,sym))
@@ -766,15 +752,23 @@ static void deassignLRs (iCode *ic, eBBlock *ebp)
 		((nfreeRegsType(result->regType) +
 		  sym->nRegs) >= result->nRegs)
 		) {
-		
-		for (i = 0 ; i < max(sym->nRegs,result->nRegs) ; i++)
+		for (i = 0 ; i < max(sym->nRegs,result->nRegs) ; i++) {
 		    if (i < sym->nRegs )
 			result->regs[i] = sym->regs[i] ;
 		    else
 			result->regs[i] = getRegGpr (ic,ebp,result);
+		    
+		    /* if the allocation falied which means
+		       this was spilt then break */
+		    if (!result->regs[i]) {
+			wassert(0);
+			assert(0);
+			break;
+		    }
+		}
 
 		regAssigned = bitVectSetBit(regAssigned,result->key);
-	    }	       		
+	    }       		
 	    
 	    /* free the remaining */
 	    for (; i < sym->nRegs ; i++) {
@@ -783,6 +777,7 @@ static void deassignLRs (iCode *ic, eBBlock *ebp)
 			freeReg(sym->regs[i]);
 		} else
 		    freeReg(sym->regs[i]);
+		//		sym->regs[i] = NULL;
 	    }
 	}
     }
@@ -858,7 +853,7 @@ static void positionRegs (symbol *result, symbol *opsym, int lineno)
 bool tryAllocatingRegPair(symbol *sym)
 {
     int i;
-    assert(sym->nRegs == 2);
+    wassert(sym->nRegs == 2);
     for ( i = 0 ; i < _nRegs ; i+=2 ) {
 	if ((regsZ80[i].isFree)&&(regsZ80[i+1].isFree)) {
 	    regsZ80[i].isFree = 0;
@@ -1751,22 +1746,39 @@ static void packRegsForAccUse (iCode *ic)
 
 bool opPreservesA(iCode *ic, iCode *uic)
 {
+    /* if it is a conditional branch then we definitely can */
+    if (uic->op == IFX  ) 
+	return FALSE;
+
+    if ( uic->op == JUMPTABLE )
+	return FALSE;
+
     /* if the usage has only one operand then we can */
+    /* PENDING: check */
     if (IC_LEFT(uic) == NULL ||
 	IC_RIGHT(uic) == NULL) 
-	return TRUE;
+	return FALSE;
 
+    /* PENDING: check this rule */
     if (getSize(operandType(IC_RESULT(uic))) > 1) {
 	return FALSE;
     }
 
-    if (uic->op != '=' && 
-	!IS_ARITHMETIC_OP(uic) &&
+    /*
+      Bad:
+	!IS_ARITHMETIC_OP(uic) (sub requires A)
+    */
+    if (
+	uic->op != '+' &&
 	!IS_BITWISE_OP(uic)    &&
+	uic->op != '=' && 
 	uic->op != EQ_OP &&
+	/*
 	uic->op != LEFT_OP &&
 	!POINTER_GET(uic) &&
-	uic->op != RIGHT_OP ) {
+	uic->op != RIGHT_OP &&*/
+	1
+	) {
 	return FALSE;
     }
 
@@ -1791,10 +1803,22 @@ bool opPreservesA(iCode *ic, iCode *uic)
 /** Pack registers for acc use.
     When the result of this operation is small and short lived it may
     be able to be stored in the accumelator.
+
+    Note that the 'A preserving' list is currently emperical :)e
  */
 static void packRegsForAccUse2(iCode *ic)
 {
     iCode *uic;
+
+    /* Filter out all but those 'good' commands */
+    if (
+	ic->op != '+' &&
+	!IS_BITWISE_OP(ic)    &&
+	ic->op != '=' && 
+	ic->op != EQ_OP &&
+	ic->op != CAST &&
+	1)
+	return;
 
     /* if + or - then it has to be one byte result.
        MLH: Ok.
@@ -1971,7 +1995,7 @@ static void packRegisters (eBBlock *ebp)
     iCode *ic ;
     int change = 0 ;
     
-    while (1) {
+    while (1 && !DISABLE_PACK_ASSIGN) {
 	change = 0;
 	/* look for assignments of the form */
 	/* iTempNN = TRueSym (someoperation) SomeOperand */
@@ -2079,7 +2103,7 @@ static void packRegisters (eBBlock *ebp)
 	    getSize(operandType(IC_RESULT(ic))) <= 2)
 	    packRegsForAccUse (ic);
 #else
-	if (IS_ITEMP(IC_RESULT(ic)) &&
+	if (!DISABLE_PACK_ACC && IS_ITEMP(IC_RESULT(ic)) &&
 	    getSize(operandType(IC_RESULT(ic))) == 1)
 	    packRegsForAccUse2(ic);
 #endif
@@ -2095,7 +2119,7 @@ void z80_assignRegisters (eBBlock **ebbs, int count)
     int i ;
 
     setToNull((void *)&funcrUsed);
-    ptrRegReq = stackExtend = dataExtend = 0;
+    stackExtend = dataExtend = 0;
 
     if (IS_GB) {
 	/* DE is required for the code gen. */

@@ -2082,15 +2082,19 @@ pCodeOp *newpCodeOpLit(int lit)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space)
+pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space, int is_func)
 {
   pCodeOp *pcop;
 
   pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
   pcop->type = PO_IMMEDIATE;
   if(name) {
-    regs *r = dirregWithName(name);
+    regs *r = NULL;
     pcop->name = Safe_strdup(name);
+
+    if(!is_func) 
+     r = dirregWithName(name);
+
     PCOI(pcop)->r = r;
     if(r) {
       //fprintf(stderr, " newpCodeOpImmd reg %s exists\n",name);
@@ -2107,6 +2111,7 @@ pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space)
   PCOI(pcop)->index = index;
   PCOI(pcop)->offset = offset;
   PCOI(pcop)->_const = code_space;
+  PCOI(pcop)->_function = is_func;
 
   return pcop;
 }

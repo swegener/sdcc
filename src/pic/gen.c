@@ -60,7 +60,7 @@ static int optimized_for_speed = 0;
 static int max_key=0;
 static int GpsuedoStkPtr=0;
 
-pCodeOp *popGetImmd(char *name, unsigned int offset, int index);
+pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func);
 unsigned int pic14aopLiteral (value *val, int offset);
 const char *AopType(short type);
 static iCode *ifxForOp ( operand *op, iCode *ic );
@@ -523,11 +523,19 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 
     /* special case for a function */
     if (IS_FUNC(sym->type)) {   
+
+      sym->aop = aop = newAsmop(AOP_PCODE);
+      aop->aopu.pcop = popGetImmd(sym->rname,0,0,1);
+      PCOI(aop->aopu.pcop)->_const = IN_CODESPACE(space);
+      PCOI(aop->aopu.pcop)->_function = 1;
+      PCOI(aop->aopu.pcop)->index = 0;
+      aop->size = FPTRSIZE; 
+      /*
         sym->aop = aop = newAsmop(AOP_IMMD);    
-        //_ALLOC_ATOMIC(aop->aopu.aop_immd,strlen(sym->rname)+1);
 	aop->aopu.aop_immd = Safe_calloc(1,strlen(sym->rname)+1);
         strcpy(aop->aopu.aop_immd,sym->rname);
         aop->size = FPTRSIZE; 
+      */
 	DEBUGpic14_emitcode(";","%d size = %d, name =%s",__LINE__,aop->size,sym->rname);
         return aop;
     }
@@ -537,7 +545,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
     /* in which case DPTR gets the address */
     sym->aop = aop = newAsmop(AOP_PCODE);
 
-    aop->aopu.pcop = popGetImmd(sym->rname,0,0);
+    aop->aopu.pcop = popGetImmd(sym->rname,0,0,0);
     PCOI(aop->aopu.pcop)->_const = IN_CODESPACE(space);
     PCOI(aop->aopu.pcop)->index = 0;
 
@@ -592,7 +600,7 @@ static asmop *aopForRemat (operand *op) // x symbol *sym)
   }
 
   offset = OP_SYMBOL(IC_LEFT(ic))->offset;
-  aop->aopu.pcop = popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname,0,val);
+  aop->aopu.pcop = popGetImmd(OP_SYMBOL(IC_LEFT(ic))->rname,0,val,0);
   PCOI(aop->aopu.pcop)->_const = IS_PTR_CONST(operandType(op));
   PCOI(aop->aopu.pcop)->index = val;
 
@@ -1216,10 +1224,10 @@ pCodeOp *popGetLit(unsigned int lit)
 /*-----------------------------------------------------------------*/
 /* popGetImmd - asm operator to pcode immediate conversion         */
 /*-----------------------------------------------------------------*/
-pCodeOp *popGetImmd(char *name, unsigned int offset, int index)
+pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func)
 {
 
-  return newpCodeOpImmd(name, offset,index, 0);
+  return newpCodeOpImmd(name, offset,index, 0, is_func);
 }
 
 
@@ -1323,7 +1331,7 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	
     case AOP_IMMD:
       DEBUGpic14_emitcode(";","%d",__LINE__);
-      return popGetImmd(aop->aopu.aop_immd,offset,0);
+      return popGetImmd(aop->aopu.aop_immd,offset,0,0);
 
     case AOP_DIR:
       return popRegFromString(aop->aopu.aop_dir, aop->size, offset);
@@ -1449,7 +1457,7 @@ void aopPut (asmop *aop, char *s, int offset)
 	      emitpcode(POC_CLRF,popGet(aop,offset));
 	      break;
 	    } else
-	      emitpcode(POC_MOVLW,popGetImmd(s,offset,0));
+	      emitpcode(POC_MOVLW,popGetImmd(s,offset,0,0));
 	  }
 
 	  emitpcode(POC_MOVWF,popGet(aop,offset));
@@ -9335,13 +9343,8 @@ static void genAssign (iCode *ic)
 	emitpcode(POC_BTFSS, popGet(AOP(right),0));
 	emitpcode(POC_INCF, popGet(AOP(result),0));
       }
-    } else if (AOP_TYPE(right) == AOP_IMMD) {
-	    DEBUGpic14_emitcode ("; ***","%s  %d AOP_IMMD",__FUNCTION__,__LINE__);
-	    emitpcode(POC_MOVLW, popGet(AOP(right),offset));
-	    emitpcode(POC_MOVWF, popGet(AOP(result),offset));
     } else {
-  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-      emitpcode(POC_MOVFW, popGet(AOP(right),offset));
+      mov2w (AOP(right), offset);
       emitpcode(POC_MOVWF, popGet(AOP(result),offset));
     }
 	    

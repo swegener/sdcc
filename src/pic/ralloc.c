@@ -35,6 +35,9 @@
 #define STRCASECMP strcasecmp
 #endif
 
+/* this should go in SDCCicode.h, but it doesn't. */
+#define IS_REF(op)       (IS_SYMOP(op) && op->operand.symOperand->isref == 1)
+
 /*-----------------------------------------------------------------*/
 /* At this point we start getting processor specific although      */
 /* some routines are non-processor specific & can be reused when   */
@@ -2711,7 +2714,10 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
   if (!IS_ITEMP (IC_RIGHT (ic))) {
     debugLog ("  %d - not packing - right is not temp\n", __LINE__);
-    allocDirReg(IC_RIGHT (ic));
+
+    /* only pack if this is not a function pointer */
+    if (!IS_REF (IC_RIGHT (ic)))
+      allocDirReg(IC_RIGHT (ic));
     return 0;
   }
 

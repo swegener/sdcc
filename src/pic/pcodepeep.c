@@ -1931,6 +1931,7 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
     PCOI(pcopnew)->index = PCOI(pcop)->index;
     PCOI(pcopnew)->offset = PCOI(pcop)->offset;
     PCOI(pcopnew)->_const = PCOI(pcop)->_const;
+    PCOI(pcopnew)->_function = PCOI(pcop)->_function;
     break;
 
   case PO_LITERAL:

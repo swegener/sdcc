@@ -73,12 +73,14 @@ models:
 	done
 
 modelDS390:
-	test -d ds390 || mkdir ds390
-	rm -f ds390/*.lib
-	$(MAKE) CFLAGS="$(CFLAGS) -mds390" objects
-	cd ds390; $(MAKE)
-	cp *.lib ds390
-	mv *.rel *.asm *.cdb ds390
+	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
+		test -d ds390 || mkdir ds390; \
+		rm -f ds390/*.lib; \
+		$(MAKE) CFLAGS="$(CFLAGS) -mds390" objects; \
+		cd ds390; $(MAKE); \
+		cp *.lib ds390; \
+		mv *.rel *.asm *.cdb ds390; \
+	fi
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------

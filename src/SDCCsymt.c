@@ -838,7 +838,6 @@ int   compStructSize (int su, structdef  *sdef )
     /* for the identifiers  */
     loop = sdef->fields ;
     while ( loop ) {
-	int pbvar =0;
 
 	/* create the internal name for this variable */
 	sprintf (loop->rname,"_%s",loop->name);
@@ -856,8 +855,7 @@ int   compStructSize (int su, structdef  *sdef )
 	    /* next byte boundary                     */
 	    if ((SPEC_BLEN(loop->etype)=loop->bitVar) <= (8 - bitOffset))  {
 		SPEC_BSTR(loop->etype) = bitOffset   ;
-		sum += (loop->bitVar / 8)  ;
-		bitOffset += (loop->bitVar % 8);
+		if ((bitOffset += (loop->bitVar % 8)) == 8) sum++;
 	    } 
 	    else  /* does not fit */
 		{
@@ -867,7 +865,7 @@ int   compStructSize (int su, structdef  *sdef )
 		    bitOffset += (loop->bitVar % 8);
 		}
 	    /* if this is the last field then pad */
-	    if (!loop->next && bitOffset) {
+	    if (!loop->next && bitOffset && bitOffset != 8) {
 		bitOffset = 0 ;
 		sum++ ;
 	    }
@@ -881,13 +879,9 @@ int   compStructSize (int su, structdef  *sdef )
 	if (funcInChain(loop->type)) {
 	    processFuncArgs (loop, 1);
 	}
-	pbvar = loop->bitVar;
+
 	loop = loop->next ;
-	/* if this is a bitvar & the previous one was not */
-	if (loop && loop->bitVar && pbvar == 0) {
-		bitOffset = 0;
-		sum++;
-	}
+
 	/* if this is not a bitfield but the */
 	/* previous one was and did not take */
 	/* the whole byte then pad the rest  */

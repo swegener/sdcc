@@ -976,7 +976,7 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
     return;
   if (!map->syms)
     return;
-
+  
   for (sym = setFirstItem (map->syms); sym;
        sym = setNextItem (map->syms))
     {
@@ -985,7 +985,8 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
 	continue;
       if (sym->localof != func)
 	continue;
-      fprintf (of, ";%-25s Allocated to ", sym->name);
+      
+      fprintf (of, ";%-25s Allocated ", sym->name);
 
       /* if assigned to registers */
       if (!sym->allocreq && sym->reqv)
@@ -993,7 +994,7 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
 	  int i;
 
 	  sym = OP_SYMBOL (sym->reqv);
-	  fprintf (of, "registers ");
+	  fprintf (of, "to registers ");
 	  for (i = 0; i < 4 && sym->regs[i]; i++)
 	    fprintf (of, "%s ", port->getRegName (sym->regs[i]));
 	  fprintf (of, "\n");
@@ -1003,12 +1004,12 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
       /* if on stack */
       if (sym->onStack)
 	{
-	  fprintf (of, "stack - offset %d\n", sym->stack);
+	  fprintf (of, "to stack - offset %d\n", sym->stack);
 	  continue;
 	}
 
       /* otherwise give rname */
-      fprintf (of, "in memory with name '%s'\n", sym->rname);
+      fprintf (of, "with name '%s'\n", sym->rname);
     }
 }
 
@@ -1090,7 +1091,7 @@ printAllocInfo (symbol * func, FILE * of)
     
   if (!of)
     of = stdout;
-    
+
   /* must be called after register allocation is complete */
   fprintf (of, ";------------------------------------------------------------\n");
   fprintf (of, ";Allocation info for local variables in function '%s'\n", func->name);
@@ -1104,5 +1105,20 @@ printAllocInfo (symbol * func, FILE * of)
   printAllocInfoSeg (idata, func, of);
   printAllocInfoSeg (sfr, func, of);
   printAllocInfoSeg (sfrbit, func, of);
+  
+  {
+    set *ovrset;
+    set *tempOverlaySyms = overlay->syms;
+    
+    /* search the set of overlay sets for local variables/parameters */
+    for (ovrset = setFirstItem (ovrSetSets); ovrset;
+         ovrset = setNextItem (ovrSetSets))
+      {
+        overlay->syms = ovrset;
+        printAllocInfoSeg (overlay, func, of);
+      }
+    overlay->syms = tempOverlaySyms;
+  }
+  
   fprintf (of, ";------------------------------------------------------------\n");
 }

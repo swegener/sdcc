@@ -2227,10 +2227,13 @@ processFuncArgs (symbol * func)
 	  val->sym->etype = getSpec (val->sym->type);
 	  val->sym->_isparm = 1;
 	  strncpyz (val->sym->rname, val->name, sizeof(val->sym->rname));
+	  #if 0
+	  /* ?? static functions shouldn't imply static parameters - EEP */
 	  if (IS_SPEC(func->etype)) {
 	    SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
 	      SPEC_STAT (func->etype);
 	  }
+	  #endif
 	  addSymChain (val->sym);
 
 	}
@@ -2242,10 +2245,14 @@ processFuncArgs (symbol * func)
 	  val->sym->_isparm = 1;
 	  SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
 	    (options.model != MODEL_SMALL ? xdata : data);
+	  
+	  #if 0
+	  /* ?? static functions shouldn't imply static parameters - EEP */
 	  if (IS_SPEC(func->etype)) {
 	    SPEC_STAT (val->etype) = SPEC_STAT (val->sym->etype) =
 	      SPEC_STAT (func->etype);
 	  }
+	  #endif
 	}
       if (!isinSet(operKeyReset, val->sym)) {
 	addSet (&operKeyReset, val->sym);

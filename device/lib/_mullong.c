@@ -2,24 +2,25 @@
    _mullong.c - routine for multiplication of 32 bit (unsigned) long
 
              Written By -  Jean Louis VERN jlvern@writeme.com (1999)
+             Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU Library General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-
-   This program is distributed in the hope that it will be useful,
+   
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
+   GNU Library General Public License for more details.
+   
+   You should have received a copy of the GNU Library General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
+   
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+   what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
 /* Signed and unsigned multiplication are the same - as long as the output
@@ -41,6 +42,10 @@
 #        define _MULLONG_ASM_SMALL_AUTO
 #      else
 #        define _MULLONG_ASM_SMALL
+#      endif
+#    elif defined(SDCC_MODEL_LARGE)
+#      if !defined(SDCC_STACK_AUTO)
+#        define _MULLONG_ASM_LARGE
 #      endif
 #    endif
 #  endif
@@ -309,7 +314,156 @@ _mullong_dummy (void) _naked
 	_endasm ;
 }
 
-#else // _MULLONG_ASM_SMALL || _MULLONG_ASM_SMALL_AUTO
+
+#elif defined _MULLONG_ASM_LARGE
+
+void
+_mullong_dummy (void) _naked
+{
+	_asm
+
+	__mullong:
+	__mululong:			; obsolete
+	__mulslong:			; obsolete
+
+		.globl __mullong
+		.globl __mululong	; obsolete
+		.globl __mulslong	; obsolete
+
+					; the result c will be stored in r4...r7
+		#define c0 r4
+		#define c1 r5
+		#define c2 r6
+		#define c3 r7
+
+	; c0  a0 * b0
+	; c1  a1 * b0 + a0 * b1
+	; c2  a2 * b0 + a1 * b1 + a0 * b2
+	; c3  a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
+
+		.area XSEG    (XDATA)
+
+	__mullong_PARM_2:
+	__mululong_PARM_2:			; obsolete
+	__mulslong_PARM_2:			; obsolete
+
+		.globl __mullong_PARM_2
+		.globl __mululong_PARM_2	; obsolete
+		.globl __mulslong_PARM_2	; obsolete
+
+		.ds	4
+
+		.area CSEG    (CODE)
+
+					; parameter a comes in a, b, dph, dpl
+		mov	r0,dpl		; save parameter a
+		mov	r1,dph
+		mov	r2,b
+		mov	r3,a
+
+		#define a0 r0
+		#define a1 r1
+		#define a2 r2
+		#define a3 r3
+
+					;	Byte 0
+		mov	b,a0
+		mov	dptr,#__mullong_PARM_2
+		movx	a,@dptr		; b0
+		mul	ab		; a0 * b0
+		mov	c0,a
+		mov	c1,b
+
+					;	Byte 1
+		mov	b,a1
+		movx	a,@dptr		; b0
+		mul	ab		; a1 * b0
+		add	a,c1
+		mov	c1,a
+		clr	a
+		addc	a,b
+		mov	c2,a
+		
+
+		mov	b,a0
+		inc	dptr		; b1
+		movx	a,@dptr
+		mul	ab		; a0 * b1
+		add	a,c1
+		mov	c1,a
+		mov	a,b
+		addc	a,c2
+		mov	c2,a
+		clr	a
+		rlc	a
+		mov	c3,a
+
+					;	Byte 2
+		mov	b,a1
+		movx	a,@dptr		; b1
+		mul	ab		; a1 * b1
+		add	a,c2
+		mov	c2,a
+		mov	a,b
+		addc	a,c3
+		mov	c3,a
+
+		mov	b,a0
+		inc	dptr		; b2
+		movx	a,@dptr
+		mul	ab		; a0 * b2
+		add	a,c2
+		mov	c2,a
+		mov	a,b
+		addc	a,c3
+		mov	c3,a
+
+		mov	b,a2
+		mov	dptr,#__mullong_PARM_2
+		movx	a,@dptr		; b0
+		mul	ab		; a2 * b0
+		add	a,c2
+		mov	c2,a
+		mov	a,b
+		addc	a,c3
+		mov	c3,a
+
+					;	Byte 3
+		mov	b,a3
+		movx	a,@dptr		; b0
+		mul	ab		; a3 * b0
+		add	a,c3
+		mov	c3,a
+
+		mov	b,a2
+		inc	dptr		; b1
+		movx	a,@dptr
+		mul	ab		; a2 * b1
+		add	a,c3
+		mov	c3,a
+
+		mov	b,a1
+		inc	dptr		; b2
+		movx	a,@dptr
+		mul	ab		; a1 * b2
+		add	a,c3
+		mov	c3,a
+
+		mov	b,a0
+		inc	dptr		; b3
+		movx	a,@dptr
+		mul	ab		; a0 * b3
+		add	a,c3
+
+		mov	b,c2
+		mov	dph,c1
+		mov	dpl,c0
+		ret
+
+	_endasm ;
+}
+
+#else // _MULLONG_ASM
 
 struct some_struct {
 	int a ;
@@ -385,4 +539,4 @@ _mulslong (long a, long b)	// obsolete
   _mululong (a, b);
 }
 
-#endif // _MULLONG_ASM_SMALL || _MULLONG_ASM_SMALL_AUTO
+#endif // _MULLONG_ASM

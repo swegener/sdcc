@@ -1456,13 +1456,12 @@ static int packRegsForAssign (iCode *ic,eBBlock *ebp)
 {
     iCode *dic, *sic;
     
-    if (
-/* 	!IS_TRUE_SYMOP(IC_RESULT(ic)) ||	    */
-	!IS_ITEMP(IC_RIGHT(ic))       ||	
-	OP_LIVETO(IC_RIGHT(ic)) > ic->seq ||
-	OP_SYMBOL(IC_RIGHT(ic))->isind)
+    if (!IS_ITEMP(IC_RIGHT(ic))       ||	
+	OP_SYMBOL(IC_RIGHT(ic))->isind ||
+	OP_LIVETO(IC_RIGHT(ic)) > ic->seq) {
 	return 0;
-        
+    }
+	
     /* if the true symbol is defined in far space or on stack
        then we should not since this will increase register pressure */
     if (isOperandInFarSpace(IC_RESULT(ic))) {
@@ -1881,6 +1880,10 @@ static void packRegsForAccUse (iCode *ic)
 	  getSize(operandType(IC_RESULT(ic))) > 1))
 	return ;
 	
+    if (IS_BITWISE_OP(ic) &&
+	getSize(operandType(IC_RESULT(ic))) > 1)
+	return ;
+	    
 	
     /* has only one definition */
     if (bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1)

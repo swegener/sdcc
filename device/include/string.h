@@ -26,10 +26,17 @@
 #ifndef __SDC51_STRING_H
 #define __SDC51_STRING_H 1
 
+#ifndef SDCC_mcs51
+#define _generic
+#define reentrant
+#endif
+
 #define memmove memcpy
 
 #ifdef SDCC_STACK_AUTO
+#ifdef SDCC_mcs51
 #warning Make sure you recompiled _str*.c and _mem*.c library functions as 'reentrant'
+#endif
 
 extern char _generic *strcpy (char _generic *, char _generic *) reentrant ;
 extern char _generic *strncpy(char _generic *, char _generic *,int ) reentrant ;

@@ -827,6 +827,7 @@ algebraicOpts (iCode * ic)
 		  IC_LEFT (ic)->type = TYPE;
 		  setOperandType (IC_LEFT (ic), operandType (IC_RESULT (ic)));
 		}
+	      return;
 	    }
 	}
 

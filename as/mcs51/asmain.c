@@ -917,6 +917,50 @@ loop:
 		}
 		lmode = SLIST;
 		break;
+		
+	case S_FLAT24:
+		if (more())
+		{
+		    getst(id, -1);
+		    
+		    if (!strcmpi(id, "on"))
+		    {
+		    	/* Quick sanity check: size of 
+		    	 * addr_t must be at least 24 bits.
+		    	 */
+		    	if (sizeof(addr_t) < 3)
+		    	{
+		    	    warnBanner();
+		    	    fprintf(stderr,
+		    	    	    "Cannot enable Flat24 mode: "
+		    	    	    "host system must have 24 bit "
+		    	    	    "or greater integers.\n");
+		    	}
+		    	else
+		    	{
+		    	    flat24Mode = 1;
+		    	}
+		    }
+		    else if (!strcmpi(id, "off"))
+		    {
+		        flat24Mode = 0;
+		    }
+		    else
+		    {
+		        qerr();
+		    }
+		}
+		else
+		{
+		    qerr();
+		}
+	        lmode = SLIST;
+	        #if 0
+	        printf("as8051: ds390 flat mode %sabled.\n",
+	        	flat24Mode ? "en" : "dis");
+	        #endif
+	        break;
+	                                                                
 
 	/*
 	 * If not an assembler directive then go to

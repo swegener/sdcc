@@ -130,6 +130,9 @@ char	tb[NTITL];	/*	Title string buffer
 			 */
 char	stb[NSBTL];	/*	Subtitle string buffer
 			 */
+int	flat24Mode;	/* 	non-zero if we are using DS390 24 bit 
+			 *	flat mode (via .flat24 directive). 
+			 */
 
 char	symtbl[] = { "Symbol Table" };
 char	aretbl[] = { "Area Table" };

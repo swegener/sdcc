@@ -390,6 +390,14 @@ int r;
 	register int n;
 
 	if (pass == 2) {
+	
+		if (esp->e_addr > 0xffff)
+		{
+		    warnBanner();
+		    fprintf(stderr,
+		    	    "large constant 0x%x truncated to 16 bits\n",
+		    	    esp->e_addr);
+		}
 		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
 			out_lw(esp->e_addr,0);
 			if (oflag) {
@@ -417,6 +425,18 @@ int r;
 				} else {
 					n = esp->e_base.e_ap->a_ref;
 				}
+				
+				if (IS_C24(r))
+				{
+				    /* If this happens, the linker will
+				     * attempt to process this 16 bit field
+				     * as 24 bits. That would be bad.
+				     */
+				    fprintf(stderr,
+				    	    "***Internal error: C24 out in "
+				    	    "outrw()\n");
+				    rerr();
+				}
 				*relp++ = r;
 				*relp++ = txtp - txt - 2;
 				out_rw(n);
@@ -424,6 +444,98 @@ int r;
 		}
 	}
 	dot.s_addr += 2;
+}
+
+/*)Function	VOID	outr24(esp, r)
+ *
+ *		expr *	esp		pointer to expr structure
+ *		int	r		relocation mode
+ *
+ *	The function outr24() processes 24 bits of generated code
+ *	in either absolute or relocatable format dependent upon
+ *	the data contained in the expr structure esp.  If the
+ *	.REL output is enabled then the appropriate information
+ *	is loaded into the txt and rel buffers.
+ *
+ *	local variables:
+ *		int	n		symbol/area reference number
+ *		int *	relp		pointer to rel array
+ *		int *	txtp		pointer to txt array
+ *
+ *	global variables:
+ *		sym	dot		defined as sym[0]
+ *		int	oflag		-o, generate relocatable output flag
+ *		int	pass		assembler pass number
+ *		
+ *	functions called:
+ *		VOID	aerr()		assubr.c
+ *		VOID	outchk()	asout.c
+ *		VOID	out_l24()	asout.c
+ *		VOID	out_rw()	asout.c
+ *		VOID	out_t24()	asout.c
+ *
+ *	side effects:
+ *		The current assembly address is incremented by 3.
+ */
+
+VOID
+outr24(struct expr *esp, int r)
+{
+	register int n;
+
+	if (pass == 2) {
+		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+			/* This is a constant expression. */
+			out_l24(esp->e_addr,0);
+			if (oflag) {
+				outchk(3, 0);
+				out_t24(esp->e_addr);
+			}
+		} else {
+			/* This is a symbol. */
+			r |= R_WORD | esp->e_rlcf;
+			if (r & R_BYT2) {
+				/* I have no idea what this case is. */
+				rerr();
+				if (r & R_MSB) {
+					out_lw(hibyte(esp->e_addr),r|R_RELOC);
+				} else {
+					out_lw(lobyte(esp->e_addr),r|R_RELOC);
+				}
+			} else {
+				out_l24(esp->e_addr,r|R_RELOC);
+			}
+			if (oflag) {
+				outchk(3, 4);
+				out_t24(esp->e_addr);
+				if (esp->e_flag) {
+					n = esp->e_base.e_sp->s_ref;
+					r |= R_SYM;
+				} else {
+					n = esp->e_base.e_ap->a_ref;
+				}
+				
+				if (r & R_BYTE)
+				{
+				    /* If this occurs, we cannot properly
+				     * code the relocation data with the
+				     * R_C24 flag. This means the linker
+				     * will fail to do the 24 bit relocation.
+				     * Which will suck.
+				     */
+				    fprintf(stderr,
+				    	    "***Internal error: BYTE out in 24 "
+				    	    "bit flat mode unexpected.\n");
+				    rerr();
+				}
+				
+				*relp++ = r | R_C24;
+				*relp++ = txtp - txt - 3;
+				out_rw(n);
+			}
+		}
+	}
+	dot.s_addr += 3;
 }
 
 /*)Function	VOID	outdp(carea, esp)
@@ -963,6 +1075,43 @@ register int n,t;
 	}
 }
 
+/*)Function	VOID	out_l24(n, t)
+ *
+ *		int	n		assembled data
+ *		int	t		relocation type
+ *
+ *	The function out_l24() copies the assembled data and
+ *	its relocation type to the list data buffers.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		int *	cp		pointer to assembler output array cb[]
+ *		int *	cpt		pointer to assembler relocation type
+ *					output array cbt[]
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		Pointers to data and relocation buffers incremented by 3.
+ */
+
+VOID
+out_l24(int n, int t)
+{
+	if (hilo) {
+		out_lb(byte3(n),t ? t|R_HIGH : 0);
+		out_lb(hibyte(n),t);
+		out_lb(lobyte(n),t);
+	} else {
+		out_lb(lobyte(n),t);
+		out_lb(hibyte(n),t);
+		out_lb(byte3(n),t ? t|R_HIGH : 0);
+	}
+}
+
 /*)Function	VOID	out_rw(n)
  *
  *		int	n		data word
@@ -1031,6 +1180,41 @@ register int n;
 	}
 }
 
+/*)Function	VOID	out_t24(n)
+ *
+ *		int	n		data word
+ *
+ *	The function out_t24() outputs the text (T)
+ *	data word as three bytes ordered according to hilo.
+ *
+ *	local variables:
+ *		int *	txtp		pointer to txt array
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		int	lobyte()	asout.c
+ *		int	hibyte()	asout.c
+ *
+ *	side effects:
+ *		Pointer to relocation buffer incremented by 3.
+ */
+
+VOID
+out_t24(int n)
+{
+	if (hilo) {
+		*txtp++ = byte3(n);
+		*txtp++ = hibyte(n);
+		*txtp++ = lobyte(n);
+	} else {
+		*txtp++ = lobyte(n);
+		*txtp++ = hibyte(n);
+		*txtp++ = byte3(n);
+	}
+}
+
 /*)Function	int	lobyte(n)
  *
  *		int	n		data word
@@ -1083,6 +1267,31 @@ hibyte(n)
 	return ((n>>8)&0377);
 }
 
+/*)Function	int	byte3(n)
+ *
+ *		int	n		24 bit data
+ *
+ *	The function byte3() returns the MSB of the
+ *	24 bit integer n.
+ *
+ *	local variables:
+ *		none
+ *
+ *	global variables:
+ *		none
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ */
+int
+byte3(int n)
+{
+	return ((n >> 16) & 0xff);
+}
+
 /*
  * JLH: Output relocatable 11 bit jump/call
  *
@@ -1128,4 +1337,49 @@ int r;
                 }
 	}
 	dot.s_addr += 2;
+}
+
+/*
+ * Output relocatable 19 bit jump/call
+ *
+ * This function is derived from outrw(), adding the parameter for the
+ * 19 bit address.  This form of address is used only in the DS80C390
+ * Flat24 mode.
+ */
+VOID
+outr19(struct expr * esp, int op, int r)
+{
+	register int n;
+
+	if (pass == 2) {
+		if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+                	/* equated absolute destination.  Assume value
+                         * relative to current area */
+                        esp->e_base.e_ap = dot.s_area;
+		}
+
+                /* Relocatable destination.  Build FOUR
+                 * byte output: relocatable 24-bit entity, followed
+                 * by op-code.  Linker will combine them.
+                 * Listing shows only the address.
+                 */
+		r |= R_WORD | esp->e_rlcf;
+                out_l24(esp->e_addr,r|R_RELOC);
+                if (oflag) {
+                        outchk(4, 4);
+                        out_t24(esp->e_addr);
+                        *txtp++ = op;
+                        
+                        if (esp->e_flag) {
+                                n = esp->e_base.e_sp->s_ref;
+                                r |= R_SYM;
+                        } else {
+                                n = esp->e_base.e_ap->a_ref;
+                        }
+                        *relp++ = r;
+                        *relp++ = txtp - txt - 4;
+                        out_rw(n);
+                }
+	}
+	dot.s_addr += 3;
 }

@@ -132,3 +132,36 @@ ihx(i)
 		fprintf(ofp, ":00000001FF\n");
 	}
 }
+
+/*)Function	ihxEntendedLinearAddress(i)
+ *
+ *		addr_t	i		16 bit extended linear address.
+ *
+ *	The function ihxEntendedLinearAddress() writes an extended
+ *	linear address record (type 04) to the output file.
+ *
+ *	local variables:
+ *		addr_t	chksum		byte checksum
+ *
+ *	global variables:
+ *		FILE *	ofp		output file handle
+ *
+ *	functions called:
+ *		int	fprintf()	c_library
+ *
+ *	side effects:
+ *		The data is output to the file defined by ofp.
+ */
+VOID
+ihxEntendedLinearAddress(addr_t a)
+{
+    addr_t 	chksum;
+  
+    /* The checksum is the complement of the bytes in the
+     * record: the 2 is record length, 4 is the extended linear
+     * address record type, plus the two address bytes.
+     */ 
+    chksum = 2 + 4 + (a & 0xff) + ((a >> 8) & 0xff);    
+    
+    fprintf(ofp, ":02000004%04X%02X\n", a & 0xffff, (-chksum) & 0xff);
+}

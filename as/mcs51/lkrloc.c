@@ -47,6 +47,11 @@
  *
  */
 
+/* Global which holds the upper 16 bits of the last 32 bit area adress
+ * output. Useful only for iHex mode.
+ */
+int    lastExtendedAddress;
+
 /*)Function	VOID	reloc(c)
  *
  *			char c		process code
@@ -291,6 +296,10 @@ relr()
 	 */
 	pc = adw_w(a[aindex]->a_addr, 0);
 
+	#if 0
+	printf("area %d base address: 0x%x size: 0x%x rtbase: 0x%x\n", aindex, 
+		a[aindex]->a_addr, a[aindex]->a_size, rtbase);
+	#endif
 	/*
 	 * Do remaining relocations
 	 */
@@ -352,7 +361,7 @@ relr()
 			} else {
 				relv = adb_b(reli, rtp);
 			}
-		} else if (mode & R_J11) {
+		} else if (IS_R_J11(mode)) {
 			/* JLH: 11 bit jump destination for 8051.  Forms
 			/  two byte instruction with op-code bits
 			/  in the MIDDLE!
@@ -376,27 +385,41 @@ relr()
             rtval[rtp] = ((rtval[rtp] & 0x07)<<5) | rtval[rtp+2];
             rtflg[rtp+2] = 0;
 			rtofst += 1;
-		} else {
-			/*
-			 * R_WORD with the R_BYT2 mode is flagged
-			 * as an 'r' error by the assembler,
-			 * but it is processed here anyway.
+		}
+		else if (IS_R_J19(mode)) {
+			/* 19 bit jump destination for DS80C390.  Forms
+			/  three byte instruction with op-code bits
+			/  in the MIDDLE!
+			/  rtp points at 4 byte locus: first three
+			/  will get the instructiion. fourth one
+			/  has raw op-code.
 			 */
-#if 0
-		    /* JLH: R_WORD and R_BYT2 together is now subsumed by R_J11 */
-			if (mode & R_BYT2) {
 	
-				if (mode & R_MSB) {
-					relv = adw_hi(reli, rtp);
-				} else {
-					relv = adw_lo(reli, rtp);
+			/* Calculate absolute destination
+			/  relv must be on same 512K page as pc
+			*/
+			relv = adw_24(reli, rtp);
+
+            if ((relv & ~0x7ffff) != ((pc + rtp - rtofst) & ~0x7ffff)) {
+                    error = 2;
 				}
-			} else {
-				relv = adw_w(reli, rtp);
+
+            /* Merge MSB (byte 0) with op-code, ignoring
+            /  top 5 bits of address.  Then hide the op-code
+            */
+            rtval[rtp] = ((rtval[rtp] & 0x07)<<5) | rtval[rtp+3];
+            rtflg[rtp+3] = 0;
+			rtofst += 1;
+		}		 
+		else if (IS_C24(mode))
+		{
+			/* 24 bit address */
+			relv = adw_24(reli, rtp);
 			}
-#else
+		else
+		{
+			/* 16 bit address. */
 			relv = adw_w(reli, rtp);
-#endif
 		}
 
 		/*
@@ -449,6 +472,50 @@ relr()
 
 	/* JLH: output only if data (beyond two byte address) */
 	if ((oflag == 1) && (rtcnt > 2)) {
+		int extendedAddress = (a[aindex]->a_addr >> 16) & 0xffff;
+		
+		/* Boy, is this a hack: for ABS sections, the
+		 * base address is stored as zero, and the T records
+		 * indicate the offset from zero.
+		 *
+		 * Since T records can only indicate a 16 bit offset, this
+		 * obviously creates a problem for ABS segments located
+		 * above 64K (this is only meaningful in flat24 mode).
+		 *
+		 * However, the size of an ABS area is stored as
+		 * base address + section size (I suspect this is a bug,
+		 * but it's a handy one right now). So the upper 8 bits of
+		 * the 24 bit address are stored in the size record.
+		 * Thus we add it in.
+		 *
+		 * This is another reason why we can't have areas greater
+		 * than 64K yet, even in flat24 mode.
+		 */
+		extendedAddress += ((a[aindex]->a_size) >> 16 & 0xffff);
+		
+		if (extendedAddress != lastExtendedAddress)
+		{
+		
+		    #if 0
+		    printf("output extended linear address record 0x%x\n",
+		    	    extendedAddress);
+		    #endif
+		    
+		    if (rflag)
+		    {
+		    	ihxEntendedLinearAddress(extendedAddress);
+		    }
+		    else if (extendedAddress)
+		    {
+		        /* Not allowed to generate extended address records,
+		         * but one is called for here...
+		         */
+		        fprintf(stderr, 
+		        	"warning: extended linear address encountered; "
+		        	"you probably want the -r flag.\n");
+		    }
+		    lastExtendedAddress = extendedAddress;
+		}
 		ihx(1);
 	} else
 	if ((oflag == 2) && (rtcnt > 2)) {
@@ -828,6 +895,51 @@ register int i;
 		j = v + (rtval[i] & 0xff) + (rtval[i+1] << 8);
 		rtval[i] = j & 0xff;
 		rtval[i+1] = (j >> 8) & 0xff;
+	}
+	return(j);
+}
+
+/*)Function	addr_t		adw_24(v, i)
+ *
+ *		int	v		value to add to word
+ *		int	i		rtval[] index
+ *
+ *	The function adw_w() adds the value of v to the
+ *	24 bit value contained in rtval[i] - rtval[i+2].
+ *	The new value of rtval[i] - rtval[i+2] is returned.
+ *
+ *	local variable:
+ *		addr_t	j		temporary evaluation variable
+ *
+ *	global variables:
+ *		hilo			byte ordering parameter
+ *
+ *	called functions:
+ *		none
+ *
+ *	side effects:
+ *		The word value of rtval[] is changed.
+ *
+ */
+addr_t
+adw_24(addr_t v, int i)
+{
+	register addr_t j;
+
+	if (hilo) {
+		j = v + ((rtval[i] & 0xff) << 16) 
+		      + ((rtval[i+1] & 0xff) << 8)
+		      + (rtval[i+2] & 0xff);
+		rtval[i] = (j >> 16) & 0xff;
+		rtval[i+1] = (j >> 8) & 0xff;
+		rtval[i+2] = j & 0xff;
+	} else {
+		j = v + (rtval[i] & 0xff) 
+		      + ((rtval[i+1] & 0xff) << 8)
+		      + ((rtval[i+2] & 0xff) << 16);
+		rtval[i] = j & 0xff;
+		rtval[i+1] = (j >> 8) & 0xff;
+		rtval[i+2] = (j >> 16) & 0xff;
 	}
 	return(j);
 }

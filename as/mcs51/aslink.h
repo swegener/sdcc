@@ -133,6 +133,13 @@
 #define	R_MSB	0200		/* output high byte */
 
 #define R_J11   (R_WORD|R_BYT2)	/* JLH: 11 bit JMP and CALL (8051) */
+#define R_J19   (R_WORD|R_BYT2|R_MSB) /* 19 bit JMP/CALL (DS80C390) */
+#define R_C24   (R_WORD|R_BYT1|R_MSB) /* 24 bit address (DS80C390) */
+#define R_J19_MASK (R_BYTE|R_BYT2|R_MSB)
+
+#define IS_R_J19(x) (((x) & R_J19_MASK) == R_J19)
+#define IS_R_J11(x) (((x) & R_J19_MASK) == R_J11)
+#define IS_C24(x) (((x) & R_J19_MASK) == R_C24)
 
 /*
  * Global symbol types.
@@ -548,6 +555,8 @@ extern	int	pflag;		/*	print linker command file flag
 				 */
 extern	int	uflag;		/*	Listing relocation flag
 				 */
+extern int 	rflag;		/* 	Extended linear address record flag.
+			 	*/				 
 extern	int	radix;		/*	current number conversion radix:
 				 *	2 (binary), 8 (octal), 10 (decimal),
 				 *	16 (hexadecimal)
@@ -677,6 +686,7 @@ extern	addr_t		adb_b();
 extern	addr_t		adb_hi();
 extern	addr_t		adb_lo();
 extern	addr_t		adw_w();
+extern	addr_t		adw_24(addr_t, int);
 extern	addr_t		adw_hi();
 extern	addr_t		adw_lo();
 extern	addr_t		evword();
@@ -691,6 +701,7 @@ extern	VOID		errdmp();
 extern	VOID		relerp();
 extern	VOID		erpdmp();
 extern	VOID		prntval();
+extern  int		lastExtendedAddress;
 
 /* lklibr.c */
 extern	VOID		addfile();
@@ -706,7 +717,7 @@ extern	VOID		s19();
 
 /* lkihx.c */
 extern	VOID		ihx();
-
+extern	VOID		ihxEntendedLinearAddress(addr_t);
 /* lkstore.c */
 extern char 		*StoreString( char *str );
 
@@ -716,3 +727,4 @@ extern void             DefineNoICE( char *name, addr_t value, int page );
 /* SD added this to change
 	strcmpi --> strcmp (strcmpi NOT ANSI) */
 #define strcmpi strcmp
+

@@ -22,9 +22,12 @@
  *           - prototypes for DefineNoICE_Line
  * 30-Jan-98 JLH:
  *           - add memory space flags to a_flag for 8051
+ *
+ *  3-Feb-00 KV:
+ *	     - add DS80C390 flat mode support.
  */
 
-#define	VERSION	"V01.70 + NoICE + SDCC mods Feb-1999"
+#define	VERSION	"V01.70 + NoICE + SDCC mods + Flat24 Feb-1999"
 
 /*
  * Case Sensitivity Flag
@@ -101,6 +104,10 @@
 #define	dca	area[0]		/* Dca, default code area */
 
 
+/* NB: for Flat24 extentions to work, addr_t must be at least 24
+ * bits. This is checked at runtime when the .flat24 directive 
+ * is processed.
+ */
 typedef	unsigned int addr_t;
 
 /*
@@ -188,6 +195,13 @@ struct	area
 #define	R_MSB	0200		/* high byte */
 
 #define R_J11   (R_WORD|R_BYT2)	/* JLH: 11 bit JMP and CALL (8051) */
+#define R_J19   (R_WORD|R_BYT2|R_MSB) /* 19 bit JMP/CALL (DS80C390) */
+#define R_C24   (R_WORD|R_BYT1|R_MSB) /* 24 bit address (DS80C390) */
+#define R_J19_MASK (R_BYTE|R_BYT2|R_MSB)
+
+#define IS_R_J19(x) (((x) & R_J19_MASK) == R_J19)
+#define IS_R_J11(x) (((x) & R_J19_MASK) == R_J11)
+#define IS_C24(x) (((x) & R_J19_MASK) == R_C24)
 
 /*
  * Listing Control Flags
@@ -283,6 +297,7 @@ struct	sym
 #define	S_ORG		24	/* .org */
 #define	S_MODUL		25	/* .module */
 #define	S_ASCIS		26	/* .ascis */
+#define	S_FLAT24	27      /* .flat24 */
 
 
 /*
@@ -433,6 +448,9 @@ extern	char	tb[NTITL];	/*	Title string buffer
 				 */
 extern	char	stb[NSBTL];	/*	Subtitle string buffer
 				 */
+extern 	int	flat24Mode;	/* 	non-zero if we are using DS390 24 bit 
+			 	 *	flat mode (via .flat24 directive). 
+			 	 */
 extern	char	symtbl[];	/*	string "Symbol Table"
 				 */
 extern	char	aretbl[];	/*	string "Area Table"
@@ -559,6 +577,7 @@ extern	VOID		allglob();
 extern	VOID		aerr();
 extern	VOID		diag();
 extern	VOID		err();
+extern 	VOID 		warnBanner(void);
 extern	char *		geterr();
 extern	VOID		qerr();
 extern	VOID		rerr();
@@ -583,6 +602,7 @@ extern	VOID		slew();
 /* asout.c */
 extern	int		hibyte();
 extern	int		lobyte();
+extern 	int		byte3(int);
 extern	VOID		out();
 extern	VOID		outab();
 extern	VOID		outarea();
@@ -594,12 +614,16 @@ extern	VOID		outchk();
 extern	VOID		outgsd();
 extern	VOID		outrb();
 extern	VOID		outrw();
+extern	VOID		outr24(struct expr *, int);
 extern	VOID		outsym();
 extern	VOID		out_lb();
 extern	VOID		out_lw();
+extern	VOID		out_l24(int, int);
 extern	VOID		out_rw();
 extern	VOID		out_tw();
+extern	VOID		out_t24(int);
 extern	VOID		outr11();	/* JLH */
+extern	VOID		outr19(struct expr *, int, int);
 
 /* asstore.c */
 extern char *StoreString( char *str );

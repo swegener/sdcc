@@ -412,6 +412,7 @@ link()
 		sdp.s_area = NULL;
 		sdp.s_areax = NULL;
 		sdp.s_addr = 0;
+		lastExtendedAddress = -1;
 		break;
 
 	case 'M':
@@ -680,7 +681,10 @@ parse()
 				case 'U':
 					uflag = 1;
 					break;
-
+				case 'r':
+				case 'R':
+					rflag = 1;
+					break;
 				case 'x':
 				case 'X':
 					xflag = 0;

@@ -39,17 +39,39 @@ struct mne *mp;
 		break;
 
 	case S_JMP11:
-        	/* 11 bit destination.  Top 3 bits become the MSBs of
-                /  the op-code.
+		/* ACALL or AJMP. In Flat24 mode, this is a 
+		 * 19 bit destination; in 8051 mode, this is a
+		 * 11 bit destination.
+		 *
+		 * The opcode is merged with the address in a 
+		 * hack-o-matic fashion by the linker.
                 */
 		expr(&e, 0);
+		if (flat24Mode)
+		{
+			outr19(&e, op, R_J19);		
+		}
+		else
+		{
 		outr11(&e, op, R_J11);
+		}
 		break;
 
 	case S_JMP16:
+		/* LCALl or LJMP. In Flat24 mode, this is a 24 bit
+		 * destination; in 8051 mode, this is a 16 bit
+		 * destination.
+		 */
 		expr(&e, 0);
 		outab(op);
+		if (flat24Mode)
+		{
+	 		outr24(&e, 0);
+		}
+		else
+		{
 		outrw(&e, 0);
+		}
 		break;
 
 	case S_ACC:
@@ -367,7 +389,19 @@ struct mne *mp;
 			if (t1 != S_IMMED)
                         	aerr();
 			outab(0x90);
+			
+			/* mov DPTR, #immed: for Flat24 mode, 
+			 * #immed is a 24 bit constant. For 8051,
+			 * it is a 16 bit constant.
+			 */
+			if (flat24Mode)
+			{
+			    outr24(&e1, 0);
+			}
+			else
+			{
 			outrw(&e1, 0);
+			}
                         break;
 
                 default:

@@ -59,6 +59,8 @@ int	pflag;		/*	print linker command file flag
 			 */
 int	uflag;		/*	Listing relocation flag
 			 */
+int 	rflag;		/* 	Extended linear address record flag.
+			 */
 int	radix;		/*	current number conversion radix:
 			 *	2 (binary), 8 (octal), 10 (decimal),
 			 *	16 (hexadecimal)

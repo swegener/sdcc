@@ -38,7 +38,6 @@
 #endif
 
 #ifndef ALLOC
-
 #define  ALLOC(x,sz) if (!(x = GC_malloc(sz)))                          \
          {                                                           \
             fprintf(stderr,"out of virtual memory %s , %d",__FILE__,__LINE__);\

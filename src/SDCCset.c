@@ -22,7 +22,9 @@
     what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#include "common.h"
+#include <stdio.h>
+#include <assert.h>
+#include "SDCCset.h"
 
 /*-----------------------------------------------------------------*/
 /* newSet - will allocate & return a new set entry             */

@@ -22,7 +22,11 @@
     what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#include "common.h"
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+#include "SDCChasht.h"
+
 
 #define DEFAULT_HTAB_SIZE 128
 

@@ -2806,10 +2806,13 @@ pCodeOp *popCopyReg(pCodeOpReg *pc)
 	} else
 		pcor->pcop.name = NULL;
 	
-	pcor->r = pc->r;
-	pcor->rIdx = pc->rIdx;
-	pcor->r->wasUsed=1;
-	
+	if (pcor->pcop.type == PO_IMMEDIATE){
+		PCOL(pcor)->lit = PCOL(pc)->lit;
+	} else {
+		pcor->r = pc->r;
+		pcor->rIdx = pc->rIdx;
+		pcor->r->wasUsed=1;
+	}	
 	//DEBUGpic14_emitcode ("; ***","%s  , copying %s, rIdx=%d",__FUNCTION__,pc->pcop.name,pc->rIdx);
 	
 	return PCOP(pcor);

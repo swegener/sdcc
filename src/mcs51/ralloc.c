@@ -1875,13 +1875,15 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
   /* only upto 2 bytes since we cannot predict
      the usage of b, & acc */
-  if (getSize (operandType (op)) > (fReturnSizeMCS51 - 2) &&
-      ic->op != RETURN &&
+  if (getSize (operandType (op)) > (fReturnSizeMCS51 - 2))
+    return NULL;
+
+  if (ic->op != RETURN &&
       ic->op != SEND &&
       !POINTER_SET (ic) &&
       !POINTER_GET (ic))
     return NULL;
-
+  
   /* this routine will mark the a symbol as used in one 
      instruction use only && if the defintion is local 
      (ie. within the basic block) && has only one definition &&

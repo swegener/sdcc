@@ -42,7 +42,11 @@ static char *_xa51_keywords[] =
   NULL
 };
 
-extern int rewinds;
+/* rewinds declared in asm.c, function printCLine().
+ * Currently commented out.
+ *
+ * extern int rewinds;
+ */
 void   _xa51_genAssemblerEnd (FILE * of)
 {
   //fprintf (stderr, "Did %d rewind%c for c-line in asm comments\n", rewinds,

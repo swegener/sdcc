@@ -43,6 +43,7 @@ AR = ar
 AR_FLAGS = rc
 RANLIB = @RANLIB@
 SHELL = /bin/sh
+STRIP = @STRIP@
 # on sysV, define this as cp.
 INSTALL = @INSTALL@
 # Some systems may be missing symbolic links, regular links, or both.
@@ -86,6 +87,8 @@ includedir = $(local_prefix)/include
 # where the info files go
 exeext = @host_exeext@
 
+transform       = @program_transform_name@
+
 # Top build directory, relative to here.
 top_builddir = .
 
@@ -102,7 +105,8 @@ OBSTACK=obstack.o
 # End of variables for you to override.
 
 install: all
-	$(INSTALL) -s $(TARGET) $(bindir)/sdcpp
+	$(INSTALL) $(TARGET) `echo $(bindir)/sdcpp|sed '$(transform)'`
+	$(STRIP) -s `echo $(bindir)/sdcpp|sed '$(transform)'`
 
 clean:
 	-rm -f $(TARGET) *.o core libcpp.a

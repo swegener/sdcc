@@ -664,10 +664,9 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 		
 		used = elementsInSet(reg->reglives.usedpCodes);
 		if(used == 2) { 
-			
-		/*
-		* In this section, all registers that are used in only in two 
-		* instructions are examined. If possible, they're optimized out.
+			/*
+			In this section, all registers that are used in only in two 
+			instructions are examined. If possible, they're optimized out.
 			*/
 			
 			/*
@@ -680,11 +679,10 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 			pc2 = setNextItem(reg->reglives.usedpCodes);
 			
 			if(pcfl_used && pcfl_assigned) {
-				
-			/* 
-			expected case - the register has been assigned a value and is
-			subsequently used 
-			*/
+				/* 
+				expected case - the register has been assigned a value and is
+				subsequently used 
+				*/
 				
 				//fprintf(stderr," used only twice\n");
 				if(pcfl_used->seq == pcfl_assigned->seq) {
@@ -775,10 +773,9 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 				}
 			}
 		}
-		
-  }
-
+	}
 }
+
 /*-----------------------------------------------------------------*
 * void pCodeRegOptimeRegUsage(pBlock *pb) 
 *-----------------------------------------------------------------*/

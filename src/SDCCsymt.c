@@ -1809,6 +1809,12 @@ processFuncArgs (symbol * func, int ignoreName)
 	{
 	  aggregateToPointer (val);
 	}
+
+      // jwk: this should not be here
+      if (IS_CODEPTR(val->type) && IS_FUNC(val->type->next)) {
+	processFuncArgs (val->sym, ignoreName);
+      }
+
       val = val->next;
       pNum++;
     }

@@ -23,7 +23,7 @@
 
 #include "common.h"
 
-#define ENABLE_MICHAELH_REGPARM_HACK		0
+#define ENABLE_MICHAELH_REGPARM_HACK	0
 
 bucket   *SymbolTab [256]  ;  /* the symbol    table  */
 bucket   *StructTab [256]  ;  /* the structure table  */
@@ -1884,6 +1884,7 @@ symbol *__conv[2][3][2];
 
 link *floatType;
 
+#if ENABLE_MICHAELH_REGPARM_HACK
 static void _makeRegParam(symbol *sym)
 {
     value *val ;
@@ -1898,6 +1899,7 @@ static void _makeRegParam(symbol *sym)
 	val = val->next ;
     }
 }
+#endif
 
 /*-----------------------------------------------------------------*/ 
 /* initCSupport - create functions for C support routines          */

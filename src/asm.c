@@ -146,9 +146,9 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
     { "areadata", ".area %s" },
     { "ascii", ".ascii \"%s\"" },
     { "ds", ".ds %d" },
-    { "db", ".db %d" },
+    { "db", ".db" },
     { "dbs", ".db %s" },
-    { "dw", ".dw %d" },
+    { "dw", ".dw" },
     { "dws", ".dw %s" },
     { "constbyte", "0x%02X" },
     { "constword", "0x%04X" },
@@ -166,6 +166,7 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
       "; ---------------------------------"
     },
     { "functionlabeldef", "%s:" },
+    { "bankimmeds", "0	; PENDING: bank support" },
     { NULL, NULL }
 };
 

@@ -105,30 +105,30 @@
  *	    +-----+-----+-----+-----+-----+-----+-----+-----+
  */
 
-#define	R_WORD	0000		/* 16 bit */
-#define	R_BYTE	0001		/*  8 bit */
+#define	R_WORD	0x00		/* 16 bit */
+#define	R_BYTE	0x01		/*  8 bit */
 
-#define	R_AREA	0000		/* Base type */
-#define	R_SYM	0002
+#define	R_AREA	0x00		/* Base type */
+#define	R_SYM	0x02
 
-#define	R_NORM	0000		/* PC adjust */
-#define	R_PCR	0004
+#define	R_NORM	0x00		/* PC adjust */
+#define	R_PCR	0x04
 
-#define	R_BYT1	0000		/* Byte count for R_BYTE = 1 */
-#define	R_BYT2	0010		/* Byte count for R_BYTE = 2 */
+#define	R_BYT1	0x00		/* Byte count for R_BYTE = 1 */
+#define	R_BYT2	0x08		/* Byte count for R_BYTE = 2 */
 
-#define	R_SGND	0000		/* Signed value */
-#define	R_USGN	0020		/* Unsigned value */
+#define	R_SGND	0x00		/* Signed value */
+#define	R_USGN	0x10		/* Unsigned value */
 
-#define	R_NOPAG	0000		/* Page Mode */
-#define	R_PAG0	0040		/* Page '0' */
-#define	R_PAG	0100		/* Page 'nnn' */
+#define	R_NOPAG	0x00		/* Page Mode */
+#define	R_PAG0	0x20		/* Page '0' */
+#define	R_PAG	0x40		/* Page 'nnn' */
 
 /*
  * Valid for R_BYT2:
  */
-#define	R_LSB	0000		/* output low byte */
-#define	R_MSB	0200		/* output high byte */
+#define	R_LSB	0x00		/* output low byte */
+#define	R_MSB	0x80		/* output high byte */
 
 /*
  * Global symbol types.

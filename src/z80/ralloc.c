@@ -1268,7 +1268,7 @@ static void regTypeNum (void)
 	    /* for the first run we don't provide */
 	    /* registers for true symbols we will */
 	    /* see how things go                  */
-	    D(D_ALLOC, ("regTypeNum: #2 setting num of %p to 0\n", sym, 0)); 
+	    D(D_ALLOC, ("regTypeNum: #2 setting num of %p to 0\n", sym)); 
 	    sym->nRegs = 0;
 	}
     }
@@ -1792,7 +1792,7 @@ static void packRegsForAccUse (iCode *ic)
     /* if one of them is a literal then we can */
     if ((IC_LEFT(uic) && IS_OP_LITERAL(IC_LEFT(uic))) ||
 	(IC_RIGHT(uic) && IS_OP_LITERAL(IC_RIGHT(uic)))) {
-	OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+	goto accuse;
 	return ;
     }
 
@@ -1984,7 +1984,7 @@ static void packRegsForAccUse2(iCode *ic)
 		return;
 	    }
 	} while (!bitVectIsZero(uses));
-	OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+	OP_SYMBOL(IC_RESULT(ic))->accuse = ACCUSE_A;
 	return;
     }
 
@@ -2070,7 +2070,7 @@ static void packRegsForAccUse2(iCode *ic)
     /* if one of them is a literal then we can */
     if ((IC_LEFT(uic) && IS_OP_LITERAL(IC_LEFT(uic))) ||
 	(IC_RIGHT(uic) && IS_OP_LITERAL(IC_RIGHT(uic)))) {
-	OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+	goto accuse;
 	return ;
     }
 
@@ -2087,7 +2087,7 @@ static void packRegsForAccUse2(iCode *ic)
     return ;
  accuse:
     printf("acc ok!\n");
-    OP_SYMBOL(IC_RESULT(ic))->accuse = 1;
+    OP_SYMBOL(IC_RESULT(ic))->accuse = ACCUSE_A;
 }
 
 /** Does some transformations to reduce register pressure.

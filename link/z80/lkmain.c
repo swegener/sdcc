@@ -1,5 +1,4 @@
 /* lkmain.c */
-
 /*
  * (C) Copyright 1989-1995
  * All Rights Reserved

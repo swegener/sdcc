@@ -178,7 +178,7 @@ static int _setPort(const char *name)
     exit(1);
 }
 
-static void _buildCmdLine(char *into, char **args, const char **cmds, 
+void buildCmdLine(char *into, char **args, const char **cmds, 
 			  const char *p1, const char *p2, 
 			  const char *p3, const char **list)
 {
@@ -195,6 +195,8 @@ static void _buildCmdLine(char *into, char **args, const char **cmds,
 	/* See if it has a '$' anywhere - if not, just copy */
 	if ((p = strchr(from, '$'))) {
 	    strncpy(into, from, p - from);
+	    /* NULL terminate it */
+	    into[p-from] = '\0';
 	    from = p+2;
 	    p++;
 	    switch (*p) {
@@ -412,8 +414,9 @@ static void processFile (char *s)
     /* if the extention is type .rel or .r or .REL or .R 
        addtional object file will be passed to the linker */
     if (strcmp(fext,".r") == 0 || strcmp(fext,".rel") == 0 ||
-	strcmp(fext,".R") == 0 || strcmp(fext,".REL") == 0) {
-	
+	strcmp(fext,".R") == 0 || strcmp(fext,".REL") == 0 ||
+	strcmp(fext, port->linker.rel_ext) == 0)
+	{
 	relFiles[nrelFiles++] = s;
 	return ;
     }
@@ -1163,7 +1166,7 @@ static void linkEdit (char **envp)
     fprintf (lnkfile,"\n-e\n");
     fclose(lnkfile);
 
-    _buildCmdLine(buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
+    buildCmdLine(buffer, argv, port->linker.cmd, srcFileName, NULL, NULL, NULL);
 
     /* call the linker */
     if (my_system(argv[0], argv)) {
@@ -1187,7 +1190,7 @@ static void assemble (char **envp)
 {
     char *argv[128];  /* assembler arguments */
 
-    _buildCmdLine(buffer, argv, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
+    buildCmdLine(buffer, argv, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
 
     if (my_system(argv[0], argv)) {
 	perror("Cannot exec assember");
@@ -1245,7 +1248,7 @@ static int preProcess (char **envp)
 	if (!preProcOnly)
 	    preOutName = strdup(tmpnam(NULL));
 
-	_buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
+	buildCmdLine(buffer, argv, _preCmd, fullSrcFileName, 
 		      preOutName, srcFileName, preArgv);
 
 	if (my_system(argv[0], argv)) {
@@ -1343,8 +1346,12 @@ int main ( int argc, char **argv , char **envp)
 	!fatalError      &&
 	!noAssemble      &&
 	!options.c1mode  &&
-	(srcFileName || nrelFiles))
-	linkEdit (envp);
+	(srcFileName || nrelFiles)) {
+	if (port->linker.do_link)
+	    port->linker.do_link();
+	else
+	    linkEdit (envp);
+    }
 
     if (yyin && yyin != stdin)
 	fclose(yyin);

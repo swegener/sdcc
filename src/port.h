@@ -38,6 +38,10 @@ typedef struct {
     struct {
 	/** Command to run (eg link-z80) */
 	const char **cmd;
+	/** If non-null will be used to execute the link. */
+	void (*do_link)(void);
+	/** Extention for object files (.rel, .obj, ...) */
+	const char *rel_ext;
     } linker;
 
     struct {
@@ -89,6 +93,9 @@ typedef struct {
 	int call_overhead;
 	/** Re-enterant space */
 	int reent_overhead;
+	/** 'banked' call overhead.
+	    Mild overlap with bank_overhead */
+	int banked_overhead;
     } stack;
 
     struct {

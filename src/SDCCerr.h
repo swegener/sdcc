@@ -132,4 +132,6 @@
 #define  W_PTR_ASSIGN       129         /* incampatible pointer assignment */
 #define  W_UNKNOWN_MODEL    130		/* Unknown memory model */
 #define  E_UNKNOWN_TARGET   131         /* target not defined   */
+#define	 W_INDIR_BANKED	    132		/* Indirect call to a banked fun */
+
 void werror(int, ...);

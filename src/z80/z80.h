@@ -20,6 +20,6 @@ extern Z80_OPTS z80_opts;
 #define IS_Z80 (z80_opts.sub == SUB_Z80)
 
 enum {
-    ACCUSE_A,
+    ACCUSE_A = 1,
     ACCUSE_HL
 };

@@ -74,11 +74,66 @@ static int _process_pragma(const char *sz)
 	char buffer[128];
 	sprintf(buffer, "%s", sz+5);
 	_chomp(buffer);
+	if (!strcmp(buffer, "BASE")) {
+	    strcpy(buffer, "HOME");
+	}
 	gbz80_port.mem.code_name = gc_strdup(buffer);
 	code->sname = gbz80_port.mem.code_name;
 	return 0;
     }
     return 1;
+}
+
+static const char *_gbz80_rgbasmCmd[] = {
+    "rgbasm", "-o$1.o", "$1.asm", NULL
+};
+
+static const char *_gbz80_rgblinkCmd[] = {
+    "xlink", "-tg", "-n$1.sym", "-m$1.map", "-zFF", "$1.lnk", NULL
+};
+
+static void _gbz80_rgblink(void)
+{
+    FILE *lnkfile;
+    const char *sz;
+    char *argv[128];
+
+    int i;
+    sz = srcFileName;
+    if (!sz)
+	sz = "a";
+
+    /* first we need to create the <filename>.lnk file */
+    sprintf(buffer,"%s.lnk", sz);
+    if (!(lnkfile = fopen(buffer,"w"))) {
+	werror(E_FILE_OPEN_ERR, buffer);
+	exit(1);
+    }
+
+    fprintf(lnkfile, "[Objects]\n");
+
+    if (srcFileName)
+	fprintf(lnkfile, "%s.o\n", sz);
+
+    for (i = 0 ; i < nrelFiles ; i++ )
+	fprintf (lnkfile,"%s\n",relFiles[i]);
+
+    fprintf(lnkfile, "\n[Libraries]\n");
+    /* additional libraries if any */
+    for (i = 0 ; i < nlibFiles; i++)
+	fprintf (lnkfile,"%s\n",libFiles[i]);
+
+
+    fprintf(lnkfile,"\n[Output]\n" "%s.gb",sz);
+
+    fclose(lnkfile);
+
+    buildCmdLine(buffer, argv, port->linker.cmd, sz, NULL, NULL, NULL);
+    /* call the linker */
+    if (my_system(argv[0], argv)) {
+	perror("Cannot exec linker");
+	exit(1);
+    }
 }
 
 static bool _parseOptions(int *pargc, char **argv, int *i)
@@ -103,6 +158,9 @@ static bool _parseOptions(int *pargc, char **argv, int *i)
 	else if (!strncmp(argv[*i], "--asm=", 6)) {
 	    if (!strcmp(argv[*i], "--asm=rgbds")) {
 		asm_addTree(&_rgbds_gb);
+		gbz80_port.assembler.cmd = _gbz80_rgbasmCmd;
+		gbz80_port.linker.cmd = _gbz80_rgblinkCmd;
+		gbz80_port.linker.do_link = _gbz80_rgblink;
 		_G.fsetAsmType = TRUE;
 		return TRUE;
 	    }
@@ -170,7 +228,7 @@ static const char *_z80_linkCmd[] = {
 };
 
 static const char *_z80_asmCmd[] = {
-    "as-z80", "-plosgff", "$1.o", "$1.asm", NULL
+    "as-z80", "-plosgff", "$1.asm", NULL
 };
 
 /** $1 is always the basename.
@@ -200,7 +258,9 @@ PORT z80_port = {
 	"-plosgff",		/* Options without debug */
     },
     {
-	_z80_linkCmd
+	_z80_linkCmd,
+	NULL,
+	".o"
     },
     {
 	_z80_defaultRules
@@ -226,7 +286,7 @@ PORT z80_port = {
 	1
     },
     { 
-	-1, 0, 0, 8, 0
+	-1, 0, 0, 4, 0, 2
     },
     /* Z80 has no native mul/div commands */
     {  
@@ -262,7 +322,9 @@ PORT gbz80_port = {
 	1
     },
     {
-	_gbz80_linkCmd
+	_gbz80_linkCmd,
+	NULL,
+	".o"
     },
     {
 	_gbz80_defaultRules
@@ -288,7 +350,7 @@ PORT gbz80_port = {
 	1
     },
     { 
-	-1, 0, 0, 4, 0
+	-1, 0, 0, 2, 0, 4
     },
     /* gbZ80 has no native mul/div commands */
     {  

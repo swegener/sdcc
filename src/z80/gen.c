@@ -142,7 +142,10 @@ static struct {
     struct {
 	int last;
 	int pushed;
+	int param_offset;
 	int offset;
+	int pushed_bc;
+	int pushed_de;
     } stack;
     int frameId;
 } _G;
@@ -887,13 +890,16 @@ static void setupPair(PAIR_ID pairId, asmop *aop, int offset)
     case AOP_STK: {
 	/* Doesnt include _G.stack.pushed */
 	int abso = aop->aopu.aop_stk + offset + _G.stack.offset;
+	if (aop->aopu.aop_stk > 0) {
+	    abso += _G.stack.param_offset;
+	}
 	assert(pairId == PAIR_HL);
 	/* In some cases we can still inc or dec hl */
 	if (_G.pairs[pairId].last_type == AOP_STK && abs(_G.pairs[pairId].offset - abso) < 3) {
 	    adjustPair(_pairs[pairId].name, &_G.pairs[pairId].offset, abso);
 	}
 	else {
-	    emit2("!ldahlsp", aop->aopu.aop_stk+offset + _G.stack.pushed + _G.stack.offset);
+	    emit2("!ldahlsp", abso +_G.stack.pushed);
 	}
 	_G.pairs[pairId].offset = abso;
 	break;
@@ -931,12 +937,19 @@ static char *aopGet(asmop *aop, int offset, bool bit16)
 	if (bit16) 
 	    tsprintf (s,"!immedwords", aop->aopu.aop_immd);
 	else
-	    if (offset) {
-		wassert(offset == 1);
-		tsprintf(s, "!lsbimmeds", aop->aopu.aop_immd);
-	    }
-	    else
+	    switch (offset) {
+	    case 2:
+		tsprintf(s, "!bankimmeds", aop->aopu.aop_immd);
+		break;
+	    case 1:
 		tsprintf(s, "!msbimmeds", aop->aopu.aop_immd);
+		break;
+	    case 0:
+		tsprintf(s, "!lsbimmeds", aop->aopu.aop_immd);
+		break;
+	    default:
+		wassert(0);
+	    }
 	ALLOC_ATOMIC(rs,strlen(s)+1);
 	strcpy(rs,s);   
 	return rs;
@@ -1607,6 +1620,10 @@ static int _opUsesPair(operand *op, iCode *ic, PAIR_ID pairId)
 static void emitCall(iCode *ic, bool ispcall)
 {
     int pushed_de = 0;
+    link *detype = getSpec(operandType(IC_LEFT(ic)));
+
+    if (IS_BANKED(detype)) 
+	emit2("; call to a banked function");
 
     /* if caller saves & we have not saved then */
     if (!ic->regsSaved) {
@@ -1678,6 +1695,9 @@ static void emitCall(iCode *ic, bool ispcall)
     }
 
     if (ispcall) {
+	if (IS_BANKED(detype)) {
+	    werror(W_INDIR_BANKED);
+	}
 	aopOp(IC_LEFT(ic),ic,FALSE, FALSE);
 
 	if (isLitWord(AOP(IC_LEFT(ic)))) {
@@ -1687,7 +1707,7 @@ static void emitCall(iCode *ic, bool ispcall)
 	else {
 	    symbol *rlbl = newiTempLabel(NULL);
 	    spillPair(PAIR_HL);
-	    emit2("ld hl,#!tlabel", (rlbl->key+100));
+	    emit2("ld hl,!immed!tlabel", (rlbl->key+100));
 	    emitcode("push", "hl");
 	    _G.stack.pushed += 2;
 	    
@@ -1699,11 +1719,18 @@ static void emitCall(iCode *ic, bool ispcall)
 	freeAsmop(IC_LEFT(ic),NULL,ic); 
     }
     else {
-	/* make the call */
 	char *name = OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
 	    OP_SYMBOL(IC_LEFT(ic))->rname :
 	    OP_SYMBOL(IC_LEFT(ic))->name;
-	emitcode("call", "%s", name);
+	if (IS_BANKED(detype)) {
+	    emit2("call banked_call");
+	    emit2("!dws", name);
+	    emit2("!dw !bankimmeds", name);
+	}
+	else {
+	    /* make the call */
+	    emit2("call %s", name);
+	}
     }
     spillCached();
 
@@ -1815,6 +1842,37 @@ static void genFunction (iCode *ic)
     }
     /* PENDING: callee-save etc */
 
+    /* If BC or DE are used, then push */
+    _G.stack.pushed_bc = 0;
+    _G.stack.pushed_de = 0;
+    _G.stack.param_offset = 0;
+    if (sym->regsUsed) {
+	int i;
+	for ( i = 0 ; i < sym->regsUsed->size ; i++) {
+	    if (bitVectBitValue(sym->regsUsed, i)) {
+		switch (i) {
+		case C_IDX:
+		case B_IDX:
+		    _G.stack.pushed_bc = 1;
+		    break;
+		case D_IDX:
+		case E_IDX:
+		    if (IS_Z80)
+			_G.stack.pushed_de = 1;
+		    break;
+		}
+	    }
+	}
+	if (_G.stack.pushed_bc) {
+	    emit2("push bc");
+	    _G.stack.param_offset += 2;
+	}
+	if (_G.stack.pushed_de) {
+	    emit2("push de");
+	    _G.stack.param_offset += 2;
+	}
+    }
+
     /* adjust the stack for the function */
     _G.stack.last = sym->stack;
 
@@ -1857,6 +1915,14 @@ static void genEndFunction (iCode *ic)
 	    emit2("!leavex", _G.stack.offset);
 	else
 	    emit2("!leave");
+
+	if (_G.stack.pushed_de)
+	    emit2("pop de");
+	if (_G.stack.pushed_bc)
+	    emit2("pop bc");
+	/* Both baned and non-banked just ret */
+	emit2("ret");
+	
 	/* PENDING: portability. */
 	emit2("__%s_end:", sym->rname);
     }
@@ -4097,12 +4163,17 @@ static void genAddrOf (iCode *ic)
     if (IS_GB) {
 	if (sym->onStack) {
 	    spillCached();
-	    emit2("!ldahlsp", sym->stack + _G.stack.pushed + _G.stack.offset);
+	    if (sym->stack <= 0) {
+		emit2("!ldahlsp", sym->stack + _G.stack.pushed + _G.stack.offset);
+	    }
+	    else {
+		emit2("!ldahlsp", sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
+	    }
 	    emitcode("ld", "d,h");
 	    emitcode("ld", "e,l");
 	}
 	else {
-	    emitcode("ld", "de,#%s", sym->rname);
+	    emit2("ld de,!hashedstr", sym->rname);
 	}
 	aopPut(AOP(IC_RESULT(ic)), "e", 0);
 	aopPut(AOP(IC_RESULT(ic)), "d", 1);

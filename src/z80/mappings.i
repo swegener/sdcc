@@ -11,18 +11,12 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "ldaspsp", "lda sp,%d(sp)" },
     { "*pair", "(%s)" },
     { "shortjp", "jr" },
-    { "enter", "push bc" },
+    { "enter", "" },
     { "enterx", 
-      "push bc\n"
-      "\tlda sp,-%d(sp)" },
-    { "leave", 
-      "pop bc\n"
-      "\tret"
+      "lda sp,-%d(sp)" },
+    { "leave", ""
     },
-    { "leavex", 
-      "lda sp,%d(sp)\n"
-      "\tpop bc\n"
-      "\tret"
+    { "leavex", "lda sp,%d(sp)"
     },
     { "pusha", 
       "push af\n"
@@ -31,6 +25,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
       "\tpush hl"
     },
     { "adjustsp", "lda sp,-%d(sp)" },
+    { "fileprelude", "" },
     { NULL, NULL }
 };
 
@@ -56,15 +51,11 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
     { "*pair", "(%s)" },
     { "shortjp", "jp" },
     { "enter", 
-		"push bc\n"
-		"\tpush\tde\n"
-		"\tpush\tix\n"
+		"push\tix\n"
 		"\tld\tix,#0\n"
 		"\tadd\tix,sp" },
     { "enterx", 
-      		"push bc\n"
-		"\tpush\tde\n"
-		"\tpush\tix\n"
+		"push\tix\n"
 		"\tld\tix,#0\n"
 		"\tadd\tix,sp\n"
 		"\tld\thl,#-%d\n"
@@ -72,16 +63,10 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 		"\tld\tsp,hl" },
     { "leave", 
 		"pop\tix\n"
-		"\tpop\tde\n"
-      		"\tpop\tbc\n"
-      		"\tret"
     },
     { "leavex", 
 		"ld sp,ix\n"
 		"\tpop\tix\n"
-		"\tpop\tde\n"
-      		"\tpop\tbc\n"
-      		"\tret"
     },
     { "pusha", 
       		"push af\n"
@@ -113,7 +98,12 @@ static const ASM_MAPPING _rgbds_mapping[] = {
       "\tGLOBAL __modschar\n"
       "\tGLOBAL __moduchar\n"
       "\tGLOBAL __modsint\n"
-      "\tGLOBAL __moduint"
+      "\tGLOBAL __moduint\n"
+      "\tGLOBAL __mulslong\n"  
+      "\tGLOBAL __modslong\n"  
+      "\tGLOBAL __divslong\n"  
+      "\tGLOBAL banked_call\n"
+      "\tGLOBAL banked_ret\n"
     },
     { "functionheader", 
       "; ---------------------------------\n"
@@ -128,9 +118,9 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "areadata", "SECTION \"DATA\",BSS" },
     { "ascii", "DB \"%s\"" },
     { "ds", "DS %d" },
-    { "db", "DB %d" },
+    { "db", "DB" },
     { "dbs", "DB %s" },
-    { "dw", "DW %d" },
+    { "dw", "DW" },
     { "dws", "DW %s" },
     { "immed", "" },
     { "constbyte", "$%02X" },
@@ -140,6 +130,7 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "hashedstr", "%s" },
     { "lsbimmeds", "%s & $FF" },
     { "msbimmeds", "%s >> 8" },
+    { "bankimmeds", "BANK(%s)" },
     { "module", "; MODULE %s" },
     { NULL, NULL }
 };
@@ -153,19 +144,12 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
     },
     { "di", "di" },
     { "adjustsp", "add sp,-%d" },
-    { "enter", "push bc" },
-    { "enterx", 
-      "push bc\n"
-      "\tadd sp,-%d"
+    { "enter", "" },
+    { "enterx", "add sp,-%d"
     },
-    { "leave", 
-      "pop bc\n"
-      "\tret"
+    { "leave", ""
     },
-    { "leavex", 
-      "add sp,%d\n"
-      "\tpop bc\n"
-      "\tret"
+    { "leavex", "add sp,%d"
     },
     { "ldahli", "ld a,[hl+]" },
     { "*hl", "[hl]" },
@@ -201,7 +185,9 @@ static const ASM_MAPPING _isas_mapping[] = {
       "\tGLOBAL __modschar\n"
       "\tGLOBAL __moduchar\n"
       "\tGLOBAL __modsint\n"
-      "\tGLOBAL __moduint"
+      "\tGLOBAL __moduint\n"
+      "\tGLOBAL banked_call\n"
+      "\tGLOBAL banked_ret\n"
     },
     { "functionheader", 
       "; ---------------------------------\n"
@@ -216,9 +202,9 @@ static const ASM_MAPPING _isas_mapping[] = {
     { "areadata", "_DATA\tGROUP" },
     { "ascii", "DB \"%s\"" },
     { "ds", "DS %d" },
-    { "db", "DB %d" },
+    { "db", "DB" },
     { "dbs", "DB %s" },
-    { "dw", "DW %d" },
+    { "dw", "DW" },
     { "dws", "DW %s" },
     { "immed", "" },
     { "constbyte", "0x%02X" },
@@ -228,6 +214,7 @@ static const ASM_MAPPING _isas_mapping[] = {
     { "hashedstr", "%s" },
     { "lsbimmeds", "%s & 0xFF" },
     { "msbimmeds", "%s >> 8" },
+    { "bankimmeds", "!%s" },
     { "module", "; MODULE %s" },
     { NULL, NULL }
 };
@@ -241,20 +228,12 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
     },
     { "di", "di" },
     { "adjustsp", "add sp,-%d" },
-    { "enter", "push bc" },
-    { "enterx", 
-      "push bc\n"
-      "\tadd sp,-%d"
+    { "enter", "" },
+    { "enterx", "add sp,-%d"
     },
-    { "leave", 
-      "pop bc\n"
-      "\tret"
+    { "leave", ""
     },
-    { "leavex", 
-      "add sp,%d\n"
-      "\tpop bc\n"
-      "\tret"
-    },
+    { "leavex", "add sp,%d\n" },
     { "ldahli", "ld a,(hli)" },
     { "*hl", "(hl)" },
     { "ldahlsp", "ldhl sp,%d" },

@@ -205,7 +205,9 @@ PORT mcs51_port = {
 	0
     },
     {
-	_linkCmd
+	_linkCmd,
+	NULL,
+	".rel"
     },
     {
 	_defaultRules
@@ -231,7 +233,7 @@ PORT mcs51_port = {
 	1
     },
     { 
-	+1, 1, 4, 1, 1
+	+1, 1, 4, 1, 1, 0
     },
     /* mcs51 has an 8 bit mul */
     {

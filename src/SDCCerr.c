@@ -144,7 +144,8 @@ struct  {
 { WARNING,"warning *** possible code generation error at line %d,\n send source to sandeep.dutta@usa.net\n"},
 { WARNING,"warning *** pointer types incompatible \n" },
 { WARNING,"warning *** unknown memory model at %s : %d\n" },
-{ ERROR  ,"error   *** cannot generate code for target '%s'\n"}
+{ ERROR  ,"error   *** cannot generate code for target '%s'\n"},
+{ WARNING,"warning *** Indirect call to a banked function not implemented.\n"},
 };
 
 /****************************************************************************/

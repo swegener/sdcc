@@ -343,7 +343,7 @@ void printChar (FILE * ofile, char *s, int plen)
 		*p = '\0';
 		if (p != buf) 
 		    tfprintf(ofile, "\t!ascii\n", buf);
-		tfprintf(ofile, "\t!db\n", *s);
+		tfprintf(ofile, "\t!db !constbyte\n", *s);
 		p = buf;
 	    }
 	    else {
@@ -365,7 +365,7 @@ void printChar (FILE * ofile, char *s, int plen)
 	else
 	    len = 0;
     }
-    tfprintf(ofile, "\t!db\n", 0);
+    tfprintf(ofile, "\t!db !constbyte\n", 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -383,7 +383,7 @@ void printIvalType (link * type, initList * ilist, FILE * oFile)
     switch (getSize (type)) {
     case 1:
 	if (!val)
-	    tfprintf(oFile, "\t!db\n", 0);
+	    tfprintf(oFile, "\t!db !constbyte\n", 0);
 	else
 	    tfprintf(oFile, "\t!dbs\n",
 		     aopLiteral (val, 0));
@@ -394,8 +394,8 @@ void printIvalType (link * type, initList * ilist, FILE * oFile)
 	break;
     case 4:
 	if (!val) {
-	    tfprintf (oFile, "\t!dw\n", 0);
-	    tfprintf (oFile, "\t!dw\n", 0);
+	    tfprintf (oFile, "\t!dw !constword\n", 0);
+	    tfprintf (oFile, "\t!dw !constword\n", 0);
 	}
 	else {
 	    fprintf (oFile, "\t.byte %s,%s,%s,%s\n",
@@ -453,7 +453,7 @@ int printIvalChar (link * type, initList * ilist, FILE * oFile, char *s)
 	    
 	    if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) -1))>0)
 		while (remain--)
-		    tfprintf (oFile, "\t!db\n", 0);
+		    tfprintf (oFile, "\t!db !constbyte\n", 0);
 	    
 	    return 1;
 	}
@@ -527,14 +527,14 @@ void printIvalFuncPtr (link * type, initList * ilist, FILE * oFile)
     val = list2val (ilist);
     /* check the types   */
     if ((dLvl = checkType (val->type, type->next)) <= 0) {
-	tfprintf(oFile, "\t!dw\n", 0);
+	tfprintf(oFile, "\t!dw !constword\n", 0);
 	return;
     }
     
     /* now generate the name */
     if (!val->sym) {
         if (port->use_dw_for_init)
-	    tfprintf(oFile, "\t!dw %s\n", val->name);
+	    tfprintf(oFile, "\t!dws\n", val->name);
 	else  
 	    fprintf(oFile, "\t.byte %s,(%s >> 8)\n", val->name,val->name);
     }
@@ -640,7 +640,7 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
     if (IS_LITERAL (val->etype)) {
 	switch (getSize (type)) {
 	case 1:
-	    tfprintf(oFile, "\t!db\n", (unsigned int)floatFromVal(val) & 0xff);
+	    tfprintf(oFile, "\t!db !constbyte\n", (unsigned int)floatFromVal(val) & 0xff);
 	    break;
 	case 2:
 	    tfprintf (oFile, "\t.byte %s,%s\n", aopLiteral(val, 0),aopLiteral(val, 1));

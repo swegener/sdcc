@@ -148,7 +148,9 @@ PORT avr_port = {
 	0
     },
     {
-	_linkCmd
+	_linkCmd, 
+	NULL,
+	".rel"
     },
     {
 	_defaultRules
@@ -174,7 +176,7 @@ PORT avr_port = {
 	0,
     },
     { 
-	-1, 1, 4, 1, 1
+	-1, 1, 4, 1, 1, 0
     },
     /* avr has an 8 bit mul */
     {

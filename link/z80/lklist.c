@@ -753,14 +753,18 @@ VOID lstareatosym(struct area *xp)
 			}
 			i = 0;
 			while (i < nmsym) {
-				if ((strncmp("l__", p[i]->s_id, 3)!=0)&&(strchr(p[i]->s_id,' ')==NULL)) {
+			    	/* no$gmb requires the symbol names to be less than 32 chars long.  Truncate. */
+			    	char name[32];
+				strncpy(name, p[i]->s_id, 31);
+				name[31] = '\0';
+				if ((strncmp("l__", name, 3)!=0)&&(strchr(name,' ')==NULL)) {
 					a0=p[i]->s_addr + p[i]->s_axp->a_addr;
 					if (a0>0x7FFFU) {
 						/* Not inside the ROM, so treat as being in bank zero */
-						fprintf(mfp, "00:%04X %s\n", a0, p[i]->s_id);
+						fprintf(mfp, "00:%04X %s\n", a0, name);
 					}
 					else {
-						fprintf(mfp, "%02X:%04X %s\n", a0/16384, a0, p[i]->s_id  );
+						fprintf(mfp, "%02X:%04X %s\n", a0/16384, a0, name);
 					}
 				}
 				i++;

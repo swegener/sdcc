@@ -162,31 +162,6 @@ dumpLiveRanges (int id, hTab * liveRanges)
 	  fprintf (file, "}{ sir@ %s", sym->usl.spillLoc->rname);
 	}
       fprintf (file, "}");
-
-      /* if assigned to registers */
-      if (sym->nRegs)
-	{
-	  if (sym->isspilt)
-	    {
-	      if (!sym->remat)
-		if (sym->usl.spillLoc)
-		  fprintf (file, "[%s]", (sym->usl.spillLoc->rname[0] ?
-					  sym->usl.spillLoc->rname :
-					  sym->usl.spillLoc->name));
-		else
-		  fprintf (file, "[err]");
-	      else
-		fprintf (file, "[remat]");
-	    }
-	  else
-	    {
-	      int i;
-	      fprintf (file, "[");
-	      for (i = 0; i < sym->nRegs; i++)
-		fprintf (file, "%s ", port->getRegName (sym->regs[i]));
-	      fprintf (file, "]");
-	    }
-	}
       fprintf (file, "\n");
     }
 

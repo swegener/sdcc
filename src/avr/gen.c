@@ -4639,16 +4639,17 @@ genAddrOf (iCode * ic)
 	int size, offset;
 
 	aopOp (IC_RESULT (ic), ic, FALSE);
-
+	assert(AOP_SIZE(IC_RESULT(ic)) >= 2);
 	/* if the operand is on the stack then we
 	   need to get the stack offset of this
 	   variable */
 	if (sym->onStack) {
 		/* if it has an offset then we need to compute it */
 		if (sym->stack) {
-			emitcode ("mov", "a,_bp");
-			emitcode ("add", "a,#0x%02x",
+#if 0
+			if (AOP_ISHIGHREG(AOP(
 				  ((char) sym->stack & 0xff));
+#endif
 			aopPut (AOP (IC_RESULT (ic)), "a", 0);
 		}
 		else {

@@ -545,35 +545,42 @@ markLiveRanges (eBBlock * ebp, eBBlock ** ebbs, int count)
 void 
 rlivePoint (eBBlock ** ebbs, int count)
 {
-  int i;
+	int i;
 
-  /* for all blocks do */
-  for (i = 0; i < count; i++)
-    {
-      iCode *ic;
+	/* for all blocks do */
+	for (i = 0; i < count; i++) {
+		iCode *ic;
 
-      /* for all instruction in the block do */
-      for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	{
-	  symbol *lrange;
-	  int k;
+		/* for all instruction in the block do */
+		for (ic = ebbs[i]->sch; ic; ic = ic->next) {
+			symbol *lrange;
+			int k;
 
-	  ic->rlive = newBitVect (operandKey);
-	  /* for all symbols in the liverange table */
-	  for (lrange = hTabFirstItem (liveRanges, &k); lrange;
-	       lrange = hTabNextItem (liveRanges, &k))
-	    {
+			ic->rlive = newBitVect (operandKey);
+			/* for all symbols in the liverange table */
+			for (lrange = hTabFirstItem (liveRanges, &k); lrange;
+			     lrange = hTabNextItem (liveRanges, &k)) {
 
-	      /* if it is live then add the lrange to ic->rlive */
-	      if (lrange->liveFrom <= ic->seq &&
-		  lrange->liveTo >= ic->seq)
-		{
-		  lrange->isLiveFcall |= (ic->op == CALL || ic->op == PCALL || ic->op == SEND);
-		  ic->rlive = bitVectSetBit (ic->rlive, lrange->key);
+				/* if it is live then add the lrange to ic->rlive */
+				if (lrange->liveFrom <= ic->seq &&
+				    lrange->liveTo >= ic->seq) {
+					lrange->isLiveFcall |= (ic->op == CALL || ic->op == PCALL || ic->op == SEND);
+					ic->rlive = bitVectSetBit (ic->rlive, lrange->key);
+				}
+			}
+			/* overlapping live ranges should be eliminated */
+			if (ASSIGN_ITEMP_TO_ITEMP (ic)) {
+
+				if (SPIL_LOC(IC_RIGHT(ic)) == SPIL_LOC(IC_RESULT(ic)) 	&& /* left & right share the same spil location */
+				    OP_SYMBOL(IC_RESULT(ic))->isreqv 			&& /* left of assign is a register requivalent */
+				    !OP_SYMBOL(IC_RIGHT(ic))->isreqv 			&& /* right side is not */
+				    OP_SYMBOL(IC_RIGHT(ic))->liveTo > ic->key 		&& /* right side live beyond this point */
+				    bitVectnBitsOn(OP_DEFS(IC_RESULT(ic))) > 1 ) 	{  /* left has multiple definitions */
+					SPIL_LOC(IC_RIGHT(ic)) = NULL; /* then cannot share */
+				}
+			}
 		}
-	    }
 	}
-    }
 }
 
 

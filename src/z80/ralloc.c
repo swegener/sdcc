@@ -2602,8 +2602,10 @@ z80_assignRegisters (eBBlock ** ebbs, int count)
       _G.dataExtend = 0;
     }
 
-  if (options.dump_rassgn)
+  if (options.dump_rassgn) {
     dumpEbbsToFileExt (DUMP_RASSGN, ebbs, count);
+    dumpLiveRanges (DUMP_LRANGE, liveRanges);
+  }
 
   /* after that create the register mask
      for each of the instruction */

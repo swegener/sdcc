@@ -1554,6 +1554,7 @@ pack:
     }
         
     remiCodeFromeBBlock(ebp,ic);
+    hTabDeleteItem (&iCodehTab,ic->key,ic,DELETE_ITEM,NULL);
     return 1;
     
 }
@@ -1655,7 +1656,8 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 	IC_LEFT(ic)->operand.symOperand =
 	    IC_RIGHT(dic)->operand.symOperand;
 	IC_LEFT(ic)->key = IC_RIGHT(dic)->operand.symOperand->key;
-	remiCodeFromeBBlock(ebp,dic);	
+	remiCodeFromeBBlock(ebp,dic);
+	hTabDeleteItem (&iCodehTab,dic->key,dic,DELETE_ITEM,NULL);
 	change++;      
     }
     
@@ -1687,6 +1689,7 @@ static int packRegsForSupport (iCode *ic, eBBlock *ebp)
 	IC_RIGHT(ic)->key = IC_RIGHT(dic)->operand.symOperand->key;
 	
 	remiCodeFromeBBlock(ebp,dic);
+	hTabDeleteItem (&iCodehTab,dic->key,dic,DELETE_ITEM,NULL);
 	change ++;
     }
    
@@ -2001,7 +2004,8 @@ static void packForPush(iCode *ic, eBBlock *ebp)
        and the that the definition is an assignment */
     IC_LEFT(ic) = IC_RIGHT(dic);
 
-    remiCodeFromeBBlock(ebp,dic);	
+    remiCodeFromeBBlock(ebp,dic);
+    hTabDeleteItem (&iCodehTab,dic->key,dic,DELETE_ITEM,NULL);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2177,6 +2181,7 @@ static void packRegisters (eBBlock *ebp)
 		    if (IS_ARITHMETIC_OP(dic)) {
 			IC_RESULT(dic) = IC_RESULT(ic);
 			remiCodeFromeBBlock(ebp,ic);
+			hTabDeleteItem (&iCodehTab,ic->key,ic,DELETE_ITEM,NULL);
 			ic = ic->prev;
 		    } else
 			OP_SYMBOL(IC_RIGHT(ic))->ruonly =  0;
@@ -2191,6 +2196,7 @@ static void packRegisters (eBBlock *ebp)
 		    if (dic) {
 			IC_RESULT(dic) = IC_RESULT(ic);
 			remiCodeFromeBBlock(ebp,ic);
+			hTabDeleteItem (&iCodehTab,ic->key,ic,DELETE_ITEM,NULL);
 			ic = ic->prev;
 		    }
 		}

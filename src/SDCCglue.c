@@ -245,16 +245,17 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          it is a global variable */
       if (sym->ival && sym->level == 0)
 	{
-	  if (IS_AGGREGATE (sym->type))
+	  if (IS_AGGREGATE (sym->type)) {
 	    ival = initAggregates (sym, sym->ival, NULL);
-	  else
+	  } else {
 	    ival = newNode ('=', newAst_VALUE (symbolVal (sym)),
 		     decorateType (resolveSymbols (list2expr (sym->ival))));
+	  }
 	  codeOutFile = statsg->oFile;
 	  allocInfo = 0;
 
 	  // set ival's lineno to where the symbol was defined
-	  ival->lineno=sym->lineDef;
+	  if (ival) ival->lineno=sym->lineDef;
 
 	  eBBlockFromiCode (iCodeFromAst (ival));
 	  allocInfo = 1;

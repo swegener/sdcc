@@ -1,3 +1,8 @@
+2004-04-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: output of all of the internal debugging information
+	is now controlled by the D() macro; it is disabled by default
+
 2004-04-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/ralloc.c (serialRegAssign, fillGaps, allocThisReg): try

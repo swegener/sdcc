@@ -1,4 +1,21 @@
-2004-12-25 Paul Stoffregen <paul AT pjrc.com>
+2004-12-27 Paul Stoffregen <paul AT pjrc.com>
+
+	* device/lib/_fs2slong.c: added mcs51 assembly version
+	* device/lib/_fs2sint.c: added mcs51 assembly version
+	* device/lib/_fs2schar.c: added mcs51 assembly version
+	* device/lib/_fs2ulong.c: added mcs51 assembly version
+	* device/lib/_fs2uint.c: added mcs51 assembly version
+	* device/lib/_fs2uchar.c: added mcs51 assembly version
+	* device/lib/_slong2fs.c: added mcs51 assembly version
+	* device/lib/_sint2fs.c: added mcs51 assembly version
+	* device/lib/_schar2fs.c: added mcs51 assembly version
+	* device/lib/_ulong2fs.c: added mcs51 assembly version
+	* device/lib/_uint2fs.c: added mcs51 assembly version
+	* device/lib/_uchar2fs.c: added mcs51 assembly version
+	* device/include/float.h: added #define to select asm vs c
+
+2004-12-26 Paul Stoffregen <paul AT pjrc.com>
+
 	* device/lib/printf_fast.c: improvements to float output
 	* device/include/float.h: add defines for assembly float library
 	* device/lib/_fsget1arg.c: receive 1 float arg

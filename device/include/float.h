@@ -73,6 +73,8 @@ char __fsqt (float, float);
 
 #if defined(SDCC_FLOAT_LIB) && defined(SDCC_mcs51) && !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 
+#define FLOAT_ASM_MCS51
+
 // This adds extra code for proper round-off, in
 // an attempt to match the results from gcc.
 #define FLOAT_FULL_ACCURACY

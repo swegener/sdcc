@@ -1,3 +1,72 @@
+/* Floating point library in optimized assembly for 8051
+ * Copyright (c) 2004, Paul Stoffregen, paul@pjrc.com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+
+#define SDCC_FLOAT_LIB
+#include <float.h>
+
+
+#ifdef FLOAT_ASM_MCS51
+
+// unsigned long __fs2ulong (float x)
+static void dummy(void) _naked
+{
+	_asm
+	.globl	___fs2ulong
+___fs2ulong:
+	mov	r7, #158
+	.globl	fs2ulong_begin
+fs2ulong_begin:
+	lcall	fsgetarg
+	jnb	sign_a, fs2ulong_int
+	ljmp	fs_return_zero
+
+fs2ulong_int:
+	clr	c
+	mov	a, r7
+	subb	a, exp_a
+	jnc	fs2ulong_int_ok
+	// if we get here, x >= 2^32
+	mov	a, #0xFF
+	mov	b, a
+	mov	dph, a
+	mov	dpl, a
+	ret
+
+fs2ulong_int_ok:
+	mov	r1, #0
+	lcall	fs_rshift_a
+
+fs2ulong_done:
+	mov	dpl, r1
+	mov	dph, r2
+	mov	b, r3
+	mov	a, r4
+	ret
+	_endasm;
+}
+
+
+#else
+
+
+
+
 /*
 ** libgcc support for software floating point.
 ** Copyright (C) 1991 by Pipeline Associates, Inc.  All rights reserved.
@@ -16,7 +85,6 @@
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
 
-#include <float.h>
 
 union float_long
 {
@@ -45,6 +113,6 @@ __fs2ulong (float a1)
   return l;
 }
 
-
+#endif
 
 

@@ -1,3 +1,14 @@
+2003-03-13    <johan@balder>
+
+	Hackup const and volatile modifiers in type chains a bit:
+	* src/SDCC.y:1.63
+	* src/SDCCast.c:1.169
+	* src/SDCCglue.c:1.136
+	* src/SDCCicode.c:1.143
+	* src/SDCCsymt.c1.146
+	* src/SDCCsymt.h1.59
+	* src/SDCCval.c:1.63
+
 2003-03-12    <johan@balder>
 
 	* src/SDCCBBlock.h: more LRH debugging junk

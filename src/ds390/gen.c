@@ -7723,8 +7723,33 @@ static void genFarFarAssign (operand *result, operand *right, iCode *ic)
 {
     int size = AOP_SIZE(right);
     int offset = 0;
-    char *l ;
+    char *l;
 
+#ifdef LAZY_DPS_OPT
+    if (size > 1)
+    {
+    	/* This is a net loss for size == 1, but a big gain
+    	 * otherwise.
+    	 */
+    	D(emitcode(";", "genFarFarAssign (improved)"););
+
+    	aopOp(result,ic,TRUE, TRUE);
+
+    	_startLazyDPSEvaluation();
+	while (size--) 
+	{
+	    aopPut(AOP(result),
+		   aopGet(AOP(right),offset,FALSE,FALSE,FALSE),
+		   offset);
+	    offset++;
+	}
+    	_endLazyDPSEvaluation();    
+    	freeAsmop(result,NULL,ic,FALSE);
+    	freeAsmop(right,NULL,ic,FALSE);
+    }
+    else
+#endif
+    {
     D(emitcode(";", "genFarFarAssign "););
 
     /* first push the right side on to the stack */
@@ -7745,7 +7770,7 @@ static void genFarFarAssign (operand *result, operand *right, iCode *ic)
     }
     freeAsmop(result,NULL,ic,FALSE);
     _endLazyDPSEvaluation();
-	
+    }
 }
 
 /*-----------------------------------------------------------------*/

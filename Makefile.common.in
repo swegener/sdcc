@@ -38,7 +38,7 @@ SLIB			= $(PRJDIR)/support/Util
 # Flags
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) -I$(SLIB)
+CPPFLAGS        = $(INCLUDEFLAGS) -I. -I$(PRJDIR) -I$(SLIB)
 CFLAGS          = @CFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
@@ -49,4 +49,6 @@ M_OR_MM         = @M_OR_MM@
 # Library compilation options
 SCC = $(PRJDIR)/src/sdcc
 SAS = $(PRJDIR)/as/$(PORT)/as
-CLEANSPEC = *.lst *.asm *.sym *~ *.cdb
+CLEANSPEC = *.lst *.asm *.sym *~ *.cdb *.dep *.rul
+
+OBJ = $(SOURCES:.c=.o)

@@ -2168,7 +2168,7 @@ sbit at 0xAB ET1	;
 sbit at 0xAC ES0	;
 sbit at 0xAD ES1	;
 sbit at 0xAE EAD	;
-sbit at 0xAF EEA	;
+sbit at 0xAF EA		;
 #endif
 
 #ifdef IE__EA__ES1__ET2__ES__ET1__EX1__ET0__EX0

@@ -218,6 +218,7 @@ PORT ds390_port =
   },
   {
     _asmCmd,
+    NULL,
     "-plosgffc",		/* Options with debug */
     "-plosgff",			/* Options without debug */
     0,
@@ -225,6 +226,7 @@ PORT ds390_port =
   },
   {
     _linkCmd,
+    NULL,
     NULL,
     ".rel"
   },

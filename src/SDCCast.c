@@ -46,7 +46,6 @@ int labelKey = 1;
 #define ALLOCATE 1
 #define DEALLOCATE 2
 
-char buffer[1024];
 int noLineno = 0;
 int noAlloc = 0;
 symbol *currFunc;

@@ -1,6 +1,31 @@
+/*-------------------------------------------------------------------------
+  main.c - Z80 specific definitions.
+
+  Michael Hope <michaelh@juju.net.nz> 2001
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+   In other words, you are welcome to use, share and improve this program.
+   You are forbidden to forbid anyone else to use, share and improve
+   what you give them.   Help stamp out software-hoarding!
+-------------------------------------------------------------------------*/
+
 #include "z80.h"
 #include "MySystem.h"
 #include "BuildCmd.h"
+#include "SDCCutil.h"
 
 static char _z80_defaultRules[] =
 {
@@ -86,28 +111,14 @@ _reg_parm (sym_link * l)
     }
 }
 
-static bool
-_startsWith (const char *sz, const char *key)
-{
-  return !strncmp (sz, key, strlen (key));
-}
-
-static void
-_chomp (char *sz)
-{
-  char *nl;
-  while ((nl = strrchr (sz, '\n')))
-    *nl = '\0';
-}
-
 static int
 _process_pragma (const char *sz)
 {
-  if (_startsWith (sz, "bank="))
+  if (startsWith (sz, "bank="))
     {
       char buffer[128];
       strcpy (buffer, sz + 5);
-      _chomp (buffer);
+      chomp (buffer);
       if (isdigit (buffer[0]))
 	{
 
@@ -122,7 +133,7 @@ _process_pragma (const char *sz)
 	     way. */
 	  char num[128];
 	  strcpy (num, sz + 5);
-	  _chomp (num);
+	  chomp (num);
 
 	  switch (_G.asmType)
 	    {
@@ -256,12 +267,48 @@ _parseOptions (int *pargc, char **argv, int *i)
 }
 
 static void
+_setValues(void)
+{
+  if (options.nostdlib == FALSE)
+    {
+      setMainValue ("z80libspec", "-k{libdir}/{port} -l{port}.lib");
+      setMainValue ("z80crt0", "{libdir}/{port}/crt0{objext}");
+    }
+  else
+    {
+      setMainValue ("z80libspec", "");
+      setMainValue ("z80crt0", "");
+    }
+
+  setMainValue ("z80extralibfiles", joinn (libFiles, nlibFiles));
+  setMainValue ("z80extralibpaths", joinn (libPaths, nlibPaths));
+
+  if (IS_GB)
+    {
+      setMainValue ("z80outputtypeflag", "-z");
+      setMainValue ("z80outext", ".gb");
+    }
+  else
+    {
+      setMainValue ("z80outputtypeflag", "-i");
+      setMainValue ("z80outext", ".ihx");
+    }
+
+  setMainValue ("z80extraobj", joinn (relFiles, nrelFiles));
+  
+  sprintf (buffer, "-b_CODE=0x%04X -b_DATA=0x%04X", options.code_loc, options.data_loc);
+  setMainValue ("z80bases", buffer);
+}
+
+static void
 _finaliseOptions (void)
 {
   port->mem.default_local_map = data;
   port->mem.default_globl_map = data;
   if (_G.asmType == ASM_TYPE_ASXXXX && IS_GB)
     asm_addTree (&_asxxxx_gb);
+
+  _setValues();
 }
 
 static void
@@ -339,155 +386,17 @@ _getRegName (struct regs *reg)
   return "err";
 }
 
-/** $1 is always the basename.
-    $2 is always the output file.
-    $3 varies
-    $l is the list of extra options that should be there somewhere...
-    MUST be terminated with a NULL.
-*/
-static const char *_z80_asmCmd[] =
-{
-    "as-z80", 
-    "-plosgff", 
-    "$1.o", 
-    "$1.asm", 
-    NULL
-};
+#define LINKCMD \
+    "{bindir}/link-{port} -n -c -- {z80bases} -m -j" \
+    " {z80libspec}" \
+    " {z80extralibfiles} {z80extralibpaths}" \
+    " {z80outputtypeflag} {srcfilename}{z80outext}" \
+    " {z80crt0}" \
+    " {srcfilename}{objext}" \
+    " {z80extraobj}" 
 
-static const char *_z80_linkCmd[] =
-{
-    "link-z80", 
-    "-n",                       // Don't echo output
-    "-c",                       // Command line input
-    "--",                       // Again, command line input...
-    "-b_CODE=0x200",            // Code starts at 0x200
-    "-b_DATA=0x8000",           // RAM starts at 0x8000
-    "-j",                       // Output a symbol file as well
-    "-k" SDCC_LIB_DIR "/z80",   // Library path
-    "-lz80.lib",                // Library to use
-    "-i",                       // Output Intel IHX
-    "$1.ihx",                   // Output to
-    SDCC_LIB_DIR "/z80/crt0.o", // Link in crt0 first
-    "$1.o",                     // Actual code
-    NULL
-};
-
-static const char *_gbz80_asmCmd[] =
-{
-    "as-gbz80", 
-    "-plosgff", 
-    "$1.o", 
-    "$1.asm", 
-    NULL
-};
-
-static const char *_gbz80_linkCmd[] =
-{
-    "link-gbz80", 
-    "-n",                       // Don't echo output
-    "-c",                       // Command line input
-    "--",                       // Again, command line input...
-    "-b_CODE=0x200",            // Code starts at 0x200
-    "-b_DATA=0xC000",           // RAM starts at 0xC000
-    "-j",                       // Output a symbol file as well
-    "-k" SDCC_LIB_DIR "/gbz80", // Library path
-    "-lgbz80.lib",              // Library to use
-    "-z",                       // Output Gameboy image
-    "$1.gb",                    // Output to
-    SDCC_LIB_DIR "/gbz80/crt0.o",// Link in crt0 first
-    "$1.o",                     // Actual code
-    NULL
-};
-
-/* sprintf that appends to the string. */
-static void
-_saprintf(char *pinto, const char *format, ...)
-{
-    va_list ap;
-    va_start(ap, format);
-
-    vsprintf(pinto + strlen(pinto), format, ap);
-    va_end(ap);
-}
-
-static void
-_link(const char *portName, const char *portExt, const char *portOutputType)
-{
-    int i;
-    // PENDING
-    char buffer[2048];
-
-    sprintf(buffer, 
-            "link-%s "
-            "-n "                       // Don't echo output
-            "-c "                       // Command line input
-            "-- "                       // Again, command line input...
-            "-b_CODE=0x%04X "           // Code starts at 0x200
-            "-b_DATA=0x%04X "           // RAM starts at 0x8000
-            "-m "			// Map file
-            "-j ",                      // Output a symbol file as well
-            portName,
-            options.code_loc,
-            options.data_loc
-            );
-
-    // Add the standard lib in.
-    if (options.nostdlib == FALSE) {
-        _saprintf(buffer,
-                  "-k" SDCC_LIB_DIR "/%s "    // Library path
-                  "-l%s.lib ",                // Library to use
-                  portName, portName
-                  );
-    }
-
-    // Add in the library paths and libraries
-    for (i = 0; i < nlibFiles; i++) {
-        _saprintf(buffer, "-k%s ", libFiles[i]);
-    }
-    for (i = 0; i < nlibPaths; i++) {
-        _saprintf(buffer, "-l%s ", libPaths[i]);
-    }
-
-    _saprintf(buffer,
-              "-%s "                      // Output type
-              "%s.%s ",                   // Output to
-              portOutputType, srcFileName, portExt
-              );
-
-    if (options.nostdlib == FALSE) {
-        _saprintf(buffer, 
-                  SDCC_LIB_DIR "/%s/crt0.o ", // Link in crt0 first
-                  portName
-                  );
-    }
-
-    _saprintf(buffer,
-              "%s.o ",                    // Actual code
-              srcFileName
-              );
-
-    // Append all the other targets
-    for (i = 0; i < nrelFiles; i++) {
-        _saprintf(buffer, "%s ", relFiles[i]);
-    }
-
-    // Do it.
-    if (my_system (buffer)) {
-        exit(1);
-    }
-}
-
-static void
-_z80_link(void)
-{
-  _link("z80", "ihx", "i");
-}
-
-static void
-_gbz80_link(void)
-{
-  _link("gbz80", "gb", "z");
-}
+#define ASMCMD \
+    "{bindir}/as-{port} -plosgff {srcfilename}{objext} {srcfilename}{asmext}"
 
 /* Globals */
 PORT z80_port =
@@ -501,15 +410,17 @@ PORT z80_port =
     MODEL_SMALL
   },
   {
-    _z80_asmCmd,
+    NULL,
+    ASMCMD,
     "-plosgff",			/* Options with debug */
     "-plosgff",			/* Options without debug */
     0,
     ".asm"
   },
   {
-    _z80_linkCmd,
-    _z80_link,
+    NULL,
+    LINKCMD,
+    NULL,
     ".o"
   },
   {
@@ -580,15 +491,17 @@ PORT gbz80_port =
     MODEL_SMALL
   },
   {
-    _gbz80_asmCmd,
+    NULL,
+    ASMCMD,
     "-plosgff",			/* Options with debug */
     "-plosgff",			/* Options without debug */
     0,
     ".asm"
   },
   {
-    _gbz80_linkCmd,
-    _gbz80_link,
+    NULL,
+    LINKCMD,
+    NULL,
     ".o"
   },
   {

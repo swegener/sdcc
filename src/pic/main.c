@@ -229,6 +229,7 @@ PORT pic_port =
     _asmCmd,
     NULL,
     NULL,
+    NULL,
 	//"-plosgffc",          /* Options with debug */
 	//"-plosgff",           /* Options without debug */
     0,
@@ -236,6 +237,7 @@ PORT pic_port =
   },
   {
     _linkCmd,
+    NULL,
     NULL,
     ".rel"
   },

@@ -55,11 +55,13 @@ typedef struct
     /* assembler related information */
     struct
       {
-/** Command to run and arguments (eg as-z80) */
-	const char **cmd;
-/** Arguments for debug mode.  PENDING: ignored */
+        /** Command to run and arguments (eg as-z80) */
+        const char **cmd;
+        /** Alternate macro based form. */
+        const char *mcmd;
+        /** Arguments for debug mode.  PENDING: ignored */
 	const char *debug_opts;
-/** Arguments for normal assembly mode.  PENDING: ignored */
+        /** Arguments for normal assembly mode.  PENDING: ignored */
 	const char *plain_opts;
 	/* print externs as global */
 	int externGlobal;
@@ -71,11 +73,13 @@ typedef struct
     /* linker related info */
     struct
       {
-/** Command to run (eg link-z80) */
+        /** Command to run (eg link-z80) */
 	const char **cmd;
-/** If non-null will be used to execute the link. */
+        /** Alternate macro based form. */
+        const char *mcmd;
+        /** If non-null will be used to execute the link. */
 	void (*do_link) (void);
-/** Extention for object files (.rel, .obj, ...) */
+        /** Extention for object files (.rel, .obj, ...) */
 	const char *rel_ext;
       }
     linker;

@@ -279,6 +279,7 @@ int
 hTabDeleteByKey (hTab ** h, int key, const void *pkey, int (*compare) (const void *, const void *))
 {
   hashtItem *htip, **htipp;
+  bool found = FALSE;
 
   if (!(*h))
     return 0;
@@ -300,16 +301,22 @@ hTabDeleteByKey (hTab ** h, int key, const void *pkey, int (*compare) (const voi
 	   pkey == htip->pkey)
 	{
 	  *htipp = htip->next;
+          found = TRUE;
 	  break;
 	}
       htipp = &(htip->next);
     }
-  (*h)->nItems--;
 
-  if (!(*h)->nItems)
+  if (found == TRUE)
     {
-      *h = NULL;
+      (*h)->nItems--;
+      
+      if (!(*h)->nItems)
+        {
+          *h = NULL;
+        }
     }
+
   return 1;
 }
 

@@ -28,6 +28,8 @@
 #include "SDCCerr.h"
 #include "BuildCmd.h"
 #include "MySystem.h"
+#include "SDCCmacro.h"
+#include "SDCCutil.h"
 
 #if NATIVE_WIN32
 #include <process.h>
@@ -36,8 +38,12 @@
 #endif
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
+#include <sys/stat.h>
 #include <unistd.h>
 #endif
+
+/** Name of the environment variable checked for other instalations. */
+#define SDCCDIR_NAME "SDCCDIR"
 
 //REMOVE ME!!!
 extern int yyparse ();
@@ -74,6 +80,7 @@ int ds390_jammed = 0;
 
 // Globally accessible scratch buffer for file names.
 char scratchFileName[FILENAME_MAX];
+char buffer[FILENAME_MAX];
 
 // In MSC VC6 default search path for exe's to path for this
 
@@ -226,11 +233,13 @@ unsupportedOptTable[] = {
     { 'Y',  NULL,	"use -I instead" }
 };
 
-static const char *_preCmd[] =
-{
-  "sdcpp", "-Wall", "-lang-c++", "-DSDCC=1",
-  "$l", "$1", "$2", NULL
+static const char *_baseValues[] = {
+  "cpp", "{bindir}/sdcpp",
+  "cppextraopts", "",
+  NULL
 };
+
+static const char *_preCmd = "{cpp} -Wall -lang-c++ -DSDCC=1 {cppextraopts} {fullsrcfilename} {cppoutfilename}";
 
 PORT *port;
 
@@ -302,6 +311,25 @@ _validatePorts (void)
 	}
     }
 }
+
+static void
+_findPort (int argc, char **argv)
+{
+  _validatePorts ();
+
+  while (argc--)
+    {
+      if (!strncmp (*argv, "-m", 2))
+	{
+	  _setPort (*argv + 2);
+	  return;
+	}
+      argv++;
+    }
+  /* Use the first in the list */
+  port = _ports[0];
+}
+
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info        */
 /*-----------------------------------------------------------------*/
@@ -319,6 +347,7 @@ printVersionInfo ()
 #ifdef SDCC_SUB_VERSION_STR
 	   "/" SDCC_SUB_VERSION_STR
 #endif
+           " (" __DATE__ ")"
 #ifdef __CYGWIN__
 	   " (CYGWIN)\n"
 #else
@@ -532,21 +561,6 @@ _processC1Arg (char *s)
     {
       processFile (s);
     }
-}
-
-static void
-_addToList (const char **list, const char *str)
-{
-  /* This is the bad way to do things :) */
-  while (*list)
-    list++;
-  *list = strdup (str);
-  if (!*list)
-    {
-      werror (E_OUT_OF_MEM, __FILE__, 0);
-      exit (1);
-    }
-  *(++list) = NULL;
 }
 
 static void
@@ -945,12 +959,12 @@ parseCmdLine (int argc, char **argv)
 	    case 'M':
 	      {
 		preProcOnly = 1;
-		_addToList (preArgv, "-M");
+		addToList (preArgv, "-M");
 		break;
 	      }
 	    case 'C':
 	      {
-		_addToList (preArgv, "-C");
+		addToList (preArgv, "-C");
 		break;
 	      }
 	    case 'd':
@@ -983,7 +997,7 @@ parseCmdLine (int argc, char **argv)
 		  sOpt = 'I';
 
 		sprintf (buffer, "-%c%s", sOpt, rest);
-		_addToList (preArgv, buffer);
+		addToList (preArgv, buffer);
 	      }
 	      break;
 
@@ -1143,7 +1157,16 @@ linkEdit (char **envp)
   if (options.verbose)
     printf ("sdcc: Calling linker...\n");
 
-  buildCmdLine (buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
+  if (port->linker.cmd)
+    {
+      buildCmdLine (buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
+    }
+  else
+    {
+      printf("Here 1\n");
+      buildCmdLine2 (buffer, port->linker.mcmd);
+    }
+
   if (my_system (buffer))
     {
       exit (1);
@@ -1165,7 +1188,15 @@ linkEdit (char **envp)
 static void
 assemble (char **envp)
 {
-  buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
+  if (port->assembler.cmd)
+    {
+      buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
+    }
+  else
+    {
+      buildCmdLine2 (buffer, port->assembler.mcmd);
+    }
+
   if (my_system (buffer))
     {
       /* either system() or the assembler itself has reported an error
@@ -1175,74 +1206,72 @@ assemble (char **envp)
     }
 }
 
-
-
 /*-----------------------------------------------------------------*/
 /* preProcess - spawns the preprocessor with arguments       */
 /*-----------------------------------------------------------------*/
 static int
 preProcess (char **envp)
 {
-  char procDef[128];
-
   preOutName = NULL;
 
   if (!options.c1mode)
     {
       /* if using external stack define the macro */
       if (options.useXstack)
-	_addToList (preArgv, "-DSDCC_USE_XSTACK");
+	addToList (preArgv, "-DSDCC_USE_XSTACK");
 
       /* set the macro for stack autos  */
       if (options.stackAuto)
-	_addToList (preArgv, "-DSDCC_STACK_AUTO");
+	addToList (preArgv, "-DSDCC_STACK_AUTO");
 
       /* set the macro for stack autos  */
       if (options.stack10bit)
-	_addToList (preArgv, "-DSDCC_STACK_TENBIT");
+	addToList (preArgv, "-DSDCC_STACK_TENBIT");
 
       /* set the macro for large model  */
       switch (options.model)
 	{
 	case MODEL_LARGE:
-	  _addToList (preArgv, "-DSDCC_MODEL_LARGE");
+	  addToList (preArgv, "-DSDCC_MODEL_LARGE");
 	  break;
 	case MODEL_SMALL:
-	  _addToList (preArgv, "-DSDCC_MODEL_SMALL");
+	  addToList (preArgv, "-DSDCC_MODEL_SMALL");
 	  break;
 	case MODEL_COMPACT:
-	  _addToList (preArgv, "-DSDCC_MODEL_COMPACT");
+	  addToList (preArgv, "-DSDCC_MODEL_COMPACT");
 	  break;
 	case MODEL_MEDIUM:
-	  _addToList (preArgv, "-DSDCC_MODEL_MEDIUM");
+	  addToList (preArgv, "-DSDCC_MODEL_MEDIUM");
 	  break;
 	case MODEL_FLAT24:
-	  _addToList (preArgv, "-DSDCC_MODEL_FLAT24");
+	  addToList (preArgv, "-DSDCC_MODEL_FLAT24");
 	  break;
 	default:
 	  werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
 	  break;
 	}
 
+      /* add port (processor information to processor */
+      addToList (preArgv, "-DSDCC_{port}");
+      addToList (preArgv, "-D__{port}");
+
       /* standard include path */
       if (!options.nostdinc) {
-	_addToList (preArgv, "-I" SDCC_INCLUDE_DIR);
+	addToList (preArgv, "-I{includedir}");
       }
 
-      /* add port (processor information to processor */
-      sprintf (procDef, "-DSDCC_%s", port->target);
-      _addToList (preArgv, procDef);
-      sprintf (procDef, "-D__%s", port->target);
-      _addToList (preArgv, procDef);
-
+      setMainValue ("cppextraopts", join(preArgv));
+      
       if (!preProcOnly)
 	preOutName = strdup (tmpnam (NULL));
+
+      setMainValue ("cppoutfilename", preOutName);
 
       if (options.verbose)
 	printf ("sdcc: Calling preprocessor...\n");
 
-      buildCmdLine (buffer, _preCmd, fullSrcFileName,
-		    preOutName, srcFileName, preArgv);
+      buildCmdLine2 (buffer, _preCmd);
+
       if (my_system (buffer))
 	{
           // @FIX: Dario Vecchio 03-05-2001
@@ -1275,22 +1304,144 @@ preProcess (char **envp)
   return 0;
 }
 
-static void
-_findPort (int argc, char **argv)
+static bool
+_setPaths (const char *pprefix)
 {
-  _validatePorts ();
+  /* Logic:
+      Given the prefix and how the directories were layed out at
+      configure time, see if the library and include directories are
+      where expected.  If so, set.
+  */
+  getStringDifference (buffer, PREFIX, SDCC_INCLUDE_DIR);
+  strcpy (scratchFileName, pprefix);
+  strcat (scratchFileName, buffer);
 
-  while (argc--)
+  if (pathExists (scratchFileName))
     {
-      if (!strncmp (*argv, "-m", 2))
-	{
-	  _setPort (*argv + 2);
-	  return;
-	}
-      argv++;
+      setMainValue ("includedir", scratchFileName);
     }
-  /* Use the first in the list */
-  port = _ports[0];
+  else
+    {
+      return FALSE;
+    }
+
+  getStringDifference (buffer, PREFIX, SDCC_LIB_DIR);
+  strcpy (scratchFileName, pprefix);
+  strcat (scratchFileName, buffer);
+
+  if (pathExists (scratchFileName))
+    {
+      setMainValue ("libdir", scratchFileName);
+    }
+  else
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static void
+_discoverPaths (const char *argv0)
+{
+  /* Logic:
+      1.  Try the SDCCDIR environment variable.
+      2.  If (1) fails, and if the argv[0] includes a path, attempt to find the include
+      and library paths with respect to that.  Note that under win32
+      argv[0] is always the full path to the program.
+      3.  If (1) and (2) fail, fall back to the compile time defaults.
+
+      Detecting assumes the same layout as when configured.  If the
+      directories have been further moved about then discovery will
+      fail.
+  */
+
+  /* Some input cases:
+        "c:\fish\sdcc\bin\sdcc"
+        "../bin/sdcc"
+        "/home/fish/bin/sdcc"
+
+      Note that ./sdcc is explicitly not supported as there isn't
+      enough information.
+  */
+  /* bindir is handled differently to the lib and include directories.
+     It's rather unfortunate, but required due to the different
+     install and development layouts.  Logic is different as well.
+     Sigh.
+   */
+  if (strchr (argv0, DIR_SEPARATOR_CHAR))
+    {
+      strcpy (scratchFileName, argv0);
+      *strrchr (scratchFileName, DIR_SEPARATOR_CHAR) = '\0';
+      setMainValue ("bindir", scratchFileName);
+      ExePathList[0] = gc_strdup (scratchFileName);
+    }
+  else if (getenv (SDCCDIR_NAME) != NULL)
+    {
+      getStringDifference (buffer, PREFIX, BINDIR);
+      strcpy (scratchFileName, getenv (SDCCDIR_NAME));
+      strcat (scratchFileName, buffer);
+      setMainValue ("bindir", scratchFileName);
+      ExePathList[0] = gc_strdup (scratchFileName);
+    }
+  else
+    {
+      setMainValue ("bindir", BINDIR);
+      ExePathList[0] = BINDIR;
+    }
+
+  do 
+    {
+      /* Case 1 */
+      if (getenv (SDCCDIR_NAME) != NULL)
+        {
+          if (_setPaths (getenv (SDCCDIR_NAME)))
+            {
+              /* Successfully set. */
+              break;
+            }
+          else
+            {
+              /* Include and lib wern't where expected. */
+            }
+        }
+      /* Case 2 */
+      if (strchr (argv0, DIR_SEPARATOR_CHAR))
+        {
+          char *pbase = getPrefixFromBinPath (argv0);
+
+          if (pbase == NULL)
+            {
+              /* A bad path.  Skip. */
+            }
+          else
+            {
+              if (_setPaths (pbase))
+                {
+                  /* Successfully set. */
+                  break;
+                }
+              else
+                {
+                  /* Include and lib weren't where expected. */
+                }
+            }
+        }
+      /* Case 3 */
+      setMainValue ("includedir", SDCC_INCLUDE_DIR);
+      setMainValue ("libdir", SDCC_LIB_DIR);
+    } while (0);
+}
+
+static void
+initValues (void)
+{
+  populateMainValues (_baseValues);
+  setMainValue ("port", port->target);
+  setMainValue ("fullsrcfilename", fullSrcFileName);
+  setMainValue ("srcfilename", srcFileName);
+  setMainValue ("objext", port->linker.rel_ext);
+  setMainValue ("asmext", port->assembler.file_ext);
 }
 
 /*
@@ -1326,15 +1477,6 @@ main (int argc, char **argv, char **envp)
   // Create a default exe search path from the path to the sdcc command
 
 
-
-  if (strchr (argv[0], DIR_SEPARATOR_CHAR))
-    {
-      strcpy (DefaultExePath, argv[0]);
-      *(strrchr (DefaultExePath, DIR_SEPARATOR_CHAR)) = 0;
-      ExePathList[0] = DefaultExePath;
-    }
-
-
   setDefaultOptions ();
 #ifdef JAMIN_DS390
   if (ds390_jammed) {
@@ -1344,11 +1486,6 @@ main (int argc, char **argv, char **envp)
 #endif
   parseCmdLine (argc, argv);
 
-  if (getenv("SDCPP"))
-  {
-    _preCmd[0] = getenv("SDCPP");
-  }
-    
   /* if no input then printUsage & exit */
   if ((!options.c1mode && !srcFileName && !nrelFiles) || 
       (options.c1mode && !srcFileName && !options.out_name))
@@ -1359,6 +1496,9 @@ main (int argc, char **argv, char **envp)
 
   if (srcFileName)
     {
+      initValues ();
+      _discoverPaths (argv[0]);
+
       preProcess (envp);
 
       initMem ();

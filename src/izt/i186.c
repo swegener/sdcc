@@ -145,11 +145,13 @@ PORT i186_port = {
         _asmCmd,
         NULL,
         NULL,
+        NULL,
         0,
         ".s"
     },
     {
         _linkCmd,
+        NULL,
         NULL,
         ".o"
     },

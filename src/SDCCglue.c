@@ -1573,11 +1573,3 @@ tempfile (void)
   return tmpfile ();
 }
 
-char *
-gc_strdup (const char *s)
-{
-  char *ret;
-  ret = Safe_calloc (1, strlen (s) + 1);
-  strcpy (ret, s);
-  return ret;
-}

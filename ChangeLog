@@ -1,3 +1,32 @@
+2001-09-23  Michael Hope  <michaelh@juju.net.nz>
+	* .version: Updated to 2.3.1
+
+	* src/z80/main.c (z80_port =): Added macro based linker and assembler command line support.
+	Added copyright header.
+
+	* src/SDCCmain.c: Shifted various functions into SDCCutil.c
+	(assemble): Added support for macro based assembler commands.
+	(linkEdit): Added support for macro based linker commands.
+	(preProcess): Changed the pre-processor to use macros.
+	(_setPaths): Added functionality to autodetect the include, lib and bin dir paths.
+	(_discoverPaths): Added support for overriding the install directory using the SDCCDIR env variable.
+
+	* device/lib/z80/crt0.s: Added module name for debugging.
+
+2001-09-20  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/SDCCmain.c (printVersionInfo): Added the build date to the version info.
+
+	* src/SDCChasht.c (hTabDeleteByKey): Fixed delete as it would delete the last item from a bucket even if it wasn't the real one.
+
+	* src/SDCCglue.c: Moved gc_strdup to SDCCutil.c
+
+	* src/Makefile.in: Added SDCCmacro and SDCCutil
+
+2001-09-19  Michael Hope  <michaelh@juju.net.nz>
+
+	* src/SDCCmain.c (printVersionInfo): Added the build date to the version info.
+
 2001-09-16    <johan@FRIJA>
 
 	* support/Util/SDCCerr.c: fixed up the error/warning/info database. I only changed the E_ W_ I_ prefix to what SDCCerr.c says it is.

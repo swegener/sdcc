@@ -144,11 +144,13 @@ PORT tlcs900h_port =
     _asmCmd,
     NULL,
     NULL,
+    NULL,
     0,
     NULL
   },
   {
     _linkCmd,
+    NULL,
     NULL,
     ".o"
   },

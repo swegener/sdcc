@@ -156,12 +156,14 @@ PORT avr_port = {
 	 MODEL_SMALL},
 	{
 	 _asmCmd,
+         NULL,
 	 "-plosgff",		/* Options with debug */
 	 "-plosgff",		/* Options without debug */
 	 0,
 	".s"},
 	{
 	 _linkCmd,
+         NULL,
 	 NULL,
 	 ".rel"},
 	{

@@ -1,5 +1,6 @@
 	;; Generic crt0.s for a Z80
-	.globl	_main
+        .module crt0
+       	.globl	_main
 
 	.area _HEADER (ABS)
 	;; Reset vector

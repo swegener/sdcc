@@ -103,6 +103,9 @@ addSym (bucket ** stab,
   int i;			/* index into the hash Table */
   bucket *bp;			/* temp bucket    *         */
 
+  if (getenv("DEBUG_SANITY")) {
+    fprintf (stderr, "addSym: %s\n", sname);
+  }
   /* Make sure sym is a symbol and not a structdef */
   if (StructTab!=stab) checkTypeSanity(((symbol *)sym)->etype, sname);
 
@@ -456,13 +459,17 @@ void checkTypeSanity(sym_link *dest, char *name) {
   char *noun;
 
   if (!dest) {
-    //printf ("sanity check skipped for %s\n", name);
+    if (getenv("DEBUG_SANITY")) {
+      printf ("sanity check skipped for %s\n", name);
+    }
     return;
   }
 
   noun=nounName(dest);
 
-  //printf ("checking sanity for %s\n", name);
+  if (getenv("DEBUG_SANITY")) {
+    printf ("checking sanity for %s\n", name);
+  }
 
   if ((SPEC_NOUN(dest)==V_CHAR || 
        SPEC_NOUN(dest)==V_FLOAT || 
@@ -479,6 +486,13 @@ void checkTypeSanity(sym_link *dest, char *name) {
     // signed or unsigned for float double or void
     werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
   }
+
+  if (!SPEC_NOUN(dest)) {
+    if (SPEC_SIGNED(dest) || SPEC_USIGN(dest)) {
+      SPEC_NOUN(dest)=V_INT;
+    }
+  }
+
   if (SPEC_SIGNED(dest) && SPEC_USIGN(dest)) {
     // signed AND unsigned 
     werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, name);
@@ -500,6 +514,9 @@ mergeSpec (sym_link * dest, sym_link * src)
   /* we shouldn't redeclare the type */
   if ((SPEC_NOUN (dest) && SPEC_NOUN (src)) && 
       (SPEC_NOUN(dest) != SPEC_NOUN(src))) {
+    if (getenv("DEBUG_SANITY")) {
+      fprintf (stderr, "mergeSpec: ");
+    }
     werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
   }
 

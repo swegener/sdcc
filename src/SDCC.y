@@ -582,13 +582,11 @@ type_specifier2
    | SIGNED {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_NOUN($$) = V_INT   ;
                SPEC_SIGNED($$) = 1     ;
             }
    | UNSIGNED  {
                $$=newLink();
                $$->class = SPECIFIER   ;
-               SPEC_NOUN($$) = V_INT   ;
                SPEC_USIGN($$) = 1      ;
             }
    | VOID   {

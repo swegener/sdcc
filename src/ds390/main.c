@@ -121,6 +121,12 @@ _ds390_finaliseOptions (void)
     fprintf (stderr,
 	     "*** error: ds390 port only supports the 10 bit stack mode.\n");
     }
+    
+    /* generate native code 16*16 mul/div */
+    if (options.useAccelerator) 
+	    port->support.muldiv=2;
+    else 
+	    port->support.muldiv=1;
 
      /* Fixup the memory map for the stack; it is now in
      * far space and requires a FPOINTER to access it.
@@ -162,6 +168,7 @@ _ds390_genAssemblerPreamble (FILE * of)
       fputs ("ma = 0xD3\t\t; ma register unknown to assembler\n", of);
       fputs ("mb = 0xD4\t\t; mb register unknown to assembler\n", of);
       fputs ("mc = 0xD5\t\t; mc register unknown to assembler\n", of);
+      fputs ("F1 = 0xD1\t\t; F1 user flag unknown to assembler\n", of);
 }
 
 /* Generate interrupt vector table. */

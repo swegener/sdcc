@@ -4092,6 +4092,13 @@ static void genMultTwoByte (operand *left, operand *right,
 		right = left;
 		left = t;
 	}
+	/* save EA bit in F1 */
+	lbl = newiTempLabel(NULL);
+	emitcode ("setb","F1");
+	emitcode ("jbc","EA,%05d$",lbl->key+100);
+	emitcode ("clr","F1");
+	emitcode("","%05d$:",lbl->key+100);
+
 	/* load up MB with right */
 	if (!umult) {
 		emitcode("clr","F0");
@@ -4220,6 +4227,12 @@ static void genMultTwoByte (operand *left, operand *right,
 		
 	}
 	freeAsmop (result, NULL, ic, TRUE);
+
+	/* restore EA bit in F1 */
+	lbl = newiTempLabel(NULL);
+	emitcode ("jnb","F1,%05d$",lbl->key+100);
+	emitcode ("setb","EA");
+	emitcode("","%05d$:",lbl->key+100);
 	return ;
 }
 
@@ -4404,6 +4417,13 @@ static void genDivTwoByte (operand *left, operand *right,
 	int umult = SPEC_USIGN(retype) | SPEC_USIGN(letype);
 	symbol *lbl;
 
+	/* save EA bit in F1 */
+	lbl = newiTempLabel(NULL);
+	emitcode ("setb","F1");
+	emitcode ("jbc","EA,%05d$",lbl->key+100);
+	emitcode ("clr","F1");
+	emitcode("","%05d$:",lbl->key+100);
+
 	/* load up MA with left */
 	if (!umult) {
 		emitcode("clr","F0");
@@ -4495,6 +4515,11 @@ static void genDivTwoByte (operand *left, operand *right,
 		aopPut(AOP(result),"a",1);
 	}
 	freeAsmop (result, NULL, ic, TRUE);
+	/* restore EA bit in F1 */
+	lbl = newiTempLabel(NULL);
+	emitcode ("jnb","F1,%05d$",lbl->key+100);
+	emitcode ("setb","EA");
+	emitcode("","%05d$:",lbl->key+100);
 	return ;
 }
 
@@ -4653,6 +4678,13 @@ static void genModTwoByte (operand *left, operand *right,
 	symbol *lbl;
 
 	/* load up MA with left */
+	/* save EA bit in F1 */
+	lbl = newiTempLabel(NULL);
+	emitcode ("setb","F1");
+	emitcode ("jbc","EA,%05d$",lbl->key+100);
+	emitcode ("clr","F1");
+	emitcode("","%05d$:",lbl->key+100);
+
 	if (!umult) {
 		lbl = newiTempLabel(NULL);
 		emitcode ("mov","b,%s",aopGet(AOP(left),0,FALSE,FALSE,TRUE));
@@ -4715,6 +4747,12 @@ static void genModTwoByte (operand *left, operand *right,
 	aopPut(AOP(result),"mb",1);
 	aopPut(AOP(result),"mb",0);
 	freeAsmop (result, NULL, ic, TRUE);
+
+	/* restore EA bit in F1 */
+	lbl = newiTempLabel(NULL);
+	emitcode ("jnb","F1,%05d$",lbl->key+100);
+	emitcode ("setb","EA");
+	emitcode("","%05d$:",lbl->key+100);
 	return ;
 }
 

@@ -14981,6 +14981,49 @@ Linker
 
 \layout Subsection
 
+Pragmas
+\layout Standard
+
+PIC16 port currently supports the following pragmas:
+\layout List
+\labelwidthstring 00.00.0000
+
+stack pragma stack forces the code generator to initialize the stack & frame
+ pointers at a specific address.
+ This is an adhoc solution since gplink does not support yet stack.
+ When the gplink issue is resolved the pragma will be deprecated
+\begin_inset Foot
+collapsed true
+
+\layout Standard
+
+
+\emph on 
+It is important to initialize the stack, otherwise strange things can happen.
+ Stack is not initialized by default because there are some sources that
+ do not require it.
+ (like library sources)
+\end_inset 
+
+.
+\newline 
+If you omit setting the pragma the port emits a warning message before linking.
+ If not initializing the stack is desired ignore the message.
+\layout LyX-Code
+
+Example:
+\layout LyX-Code
+
+\layout LyX-Code
+
+/* initializes stack at RAM address 0x5ff*/
+\layout LyX-Code
+
+#pragma stack 0x5ff
+\layout LyX-Code
+
+\layout Subsection
+
 Header Files
 \layout Standard
 

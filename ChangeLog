@@ -1,6 +1,7 @@
 2004-02-17 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* doc/sdccman.lyx: added more pic16 port documentation
+	* device/include/pic16/: added header pic18fregs.h
 
 2004-02-16 Bernhard Held <bernhard AT bernhardheld.de>
 

@@ -143,6 +143,11 @@ void checkConstantRange(sym_link *ltype, double v, char *msg, int pedantic) {
     pedantic=2;
 #endif
 
+  if (SPEC_NOUN(ltype)==FLOAT) {
+    // anything will do
+    return;
+  }
+
   if (v<0) {
     negative=1;
     // if not pedantic: -1 equals to 0xf..f

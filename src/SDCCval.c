@@ -1039,10 +1039,11 @@ valMult (value * lval, value * rval)
       if (SPEC_LONG (val->type))
         SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) floatFromVal (lval) *
 	                                (TYPE_UDWORD) floatFromVal (rval);
-      else
+      else /* int */
         {
           TYPE_UDWORD ul = (TYPE_UWORD) floatFromVal (lval) *
                            (TYPE_UWORD) floatFromVal (rval);
+
           SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) ul;
           if (!options.lessPedantic)
             {
@@ -1053,7 +1054,10 @@ valMult (value * lval, value * rval)
                 }
               else /* signed result */
                 {
-                  if ((TYPE_DWORD) ul != SPEC_CVAL (val->type).v_int)
+                  TYPE_DWORD l = (TYPE_WORD) floatFromVal (lval) *
+                                 (TYPE_WORD) floatFromVal (rval);
+
+                  if (l != SPEC_CVAL (val->type).v_int)
                     werror (W_INT_OVL);
                 }
             }

@@ -1,3 +1,7 @@
+2003-08-09  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/SDCCval.c (valMult): fixex overflow detection of negativ int
+
 2003-08-07  Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/z80/ralloc.c (joinPushes): made compatible with new signedness

@@ -1,3 +1,7 @@
+2003-01-19  Bernhard Held <bernhard@bernhardheld.de>
+
+        * moved tinitalk to device/examples/ds390
+
 2003-01-14  Bernhard Held <bernhard@bernhardheld.de>
 
 	* as/mcs51/lkmem.c: rflag is for DS390

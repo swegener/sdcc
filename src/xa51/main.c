@@ -149,10 +149,12 @@ _xa51_genAssemblerPreamble (FILE * of)
     fprintf (of, "\t.dw\t__sdcc_gsinit_startup\n");
     fprintf (of, "\n");
     fprintf (of, "__sdcc_gsinit_startup:\n");
-    fprintf (of, "\tmov.b\t_SCR,#0x01\t; page zero mode\n");
+    //fprintf (of, ";\tmov.b\t_SCR,#0x01\t; page zero mode\n");
+    fprintf (of, "\t.db 0x96,0x48,0x40,0x01\n");
     fprintf (of, "\tmov\tr7,#0x%04x\n", options.stack_loc);
     fprintf (of, "\tcall\t_external_startup\n");
     _xa51_genXINIT(of);
+    fprintf (of, "\t.area CSEG\t(CODE)\n");
     fprintf (of, "\tcall\t_main\n");
     fprintf (of, "\treset\t;main should not return\n");
   }

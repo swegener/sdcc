@@ -583,7 +583,8 @@ char * printOp (operand *op) {
   return line;
 }
 
-void printIc (char *op, iCode * ic, bool result, bool left, bool right) {
+void printIc (bool printToStderr, 
+	      char *op, iCode * ic, bool result, bool left, bool right) {
   char line[132];
 
   sprintf (line, "%s(%d)", op, ic->lineno);
@@ -600,6 +601,9 @@ void printIc (char *op, iCode * ic, bool result, bool left, bool right) {
     strcat (line, printOp (IC_RIGHT(ic)));
   }
   emitcode (";", line);
+  if (printToStderr) {
+    fprintf (stderr, "%s\n", line);
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -680,21 +684,21 @@ static int resultRemat (iCode * ic) {
 /* genNot - generate code for ! operation                          */
 /*-----------------------------------------------------------------*/
 static void genNot (iCode * ic) {
-  printIc("genNot:", ic, 1,1,0);
+  printIc (0, "genNot:", ic, 1,1,0);
 }
 
 /*-----------------------------------------------------------------*/
 /* genCpl - generate code for complement                           */
 /*-----------------------------------------------------------------*/
 static void genCpl (iCode * ic) {
-  printIc("genCpl", ic, 1,1,0);
+  printIc (0, "genCpl", ic, 1,1,0);
 }
 
 /*-----------------------------------------------------------------*/
 /* genUminus - unary minus code generation                         */
 /*-----------------------------------------------------------------*/
 static void genUminus (iCode * ic) {
-  printIc("genUminus", ic, 1,1,0);
+  printIc (0, "genUminus", ic, 1,1,0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -703,7 +707,7 @@ static void genUminus (iCode * ic) {
 static void genIpush (iCode * ic) {
   operand *left=IC_LEFT(ic);
 
-  printIc ("genIpush", ic, 0,1,0);
+  printIc (0, "genIpush", ic, 0,1,0);
   aopOp(left,FALSE,FALSE);
 
 
@@ -749,7 +753,7 @@ static void genIpush (iCode * ic) {
 /* genIpop - recover the registers: can happen only for spilling   */
 /*-----------------------------------------------------------------*/
 static void genIpop (iCode * ic) {
-  printIc ("genIpop", ic, 0,1,0);
+  printIc (0, "genIpop", ic, 0,1,0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -838,7 +842,7 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
-  printIc ("genEndFunction", ic, 0,0,0);
+  printIc (0, "genEndFunction", ic, 0,0,0);
 
   if (IFFUNC_ISNAKED(sym->type)) {
       emitcode(";", "naked function: no epilogue.");
@@ -863,9 +867,9 @@ genEndFunction (iCode * ic)
 static void genRet (iCode * ic) {
 
   if (!IC_LEFT(ic)) {
-    printIc ("genRet", ic, 0, 0, 0);
+    printIc (0, "genRet", ic, 0, 0, 0);
   } else {
-    printIc ("genRet", ic, 0, 1, 0);
+    printIc (0, "genRet", ic, 0, 1, 0);
     aopOp(IC_LEFT(ic), TRUE, TRUE);
     switch (AOP_SIZE(IC_LEFT(ic)))
       {
@@ -918,7 +922,7 @@ static void genPlus (iCode * ic) {
   int size;
   char *instr;
 
-  printIc ("genPlus", ic, 1,1,1);
+  printIc (0, "genPlus", ic, 1,1,1);
 
   size=aopOp(result, TRUE, TRUE);
 
@@ -992,7 +996,7 @@ static void genPlus (iCode * ic) {
 /* genMinus - generates code for subtraction                       */
 /*-----------------------------------------------------------------*/
 static void genMinus (iCode * ic) {
-  printIc ("genMinus", ic, 1,1,1);
+  printIc (0, "genMinus", ic, 1,1,1);
 }
 
 
@@ -1000,40 +1004,21 @@ static void genMinus (iCode * ic) {
 /* genMult - generates code for multiplication                     */
 /*-----------------------------------------------------------------*/
 static void genMult (iCode * ic) {
-  printIc ("genMult", ic, 1,1,1);
+  printIc (0, "genMult", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
 /* genDiv - generates code for division                            */
 /*-----------------------------------------------------------------*/
 static void genDiv (iCode * ic) {
-  printIc ("genDiv", ic, 1,1,1);
+  printIc (0, "genDiv", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
 /* genMod - generates code for division                            */
 /*-----------------------------------------------------------------*/
 static void genMod (iCode * ic) {
-  printIc ("genMod", ic, 1,1,1);
-}
-
- /*-----------------------------------------------------------------*/
-/* genCmpGt :- greater than comparison                             */
-/*-----------------------------------------------------------------*/
-static void genCmpGt (iCode * ic) {
-  printIc ("genCmpGt", ic, 1,1,1);
-}
-/*-----------------------------------------------------------------*/
-/* genCmpLt - less than comparisons                                */
-/*-----------------------------------------------------------------*/
-static void genCmpLt (iCode * ic) {
-  printIc ("genCmpLt", ic, 1,1,1);
-}
-/*-----------------------------------------------------------------*/
-/* genCmpEq - generates code for equal to                          */
-/*-----------------------------------------------------------------*/
-static void genCmpEq (iCode * ic) {
-  printIc ("genCmpEq", ic, 1,1,1);
+  printIc (0, "genMod", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1054,6 +1039,80 @@ static iCode *ifxForOp (operand * op, iCode * ic) {
     return ic->next;
   
   return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* genCmp - compares whatever                                      */
+/*-----------------------------------------------------------------*/
+static void genCmp (iCode * ic, char *trueInstr, char *falseInstr) {
+  iCode *ifx=ifxForOp(IC_RESULT(ic),ic);
+  operand *left=IC_LEFT(ic), *right=IC_RIGHT(ic);
+  int size;
+  bool isTrue;
+  char *instr;
+  int jlbl;
+
+  if (!ifx) {
+    bailOut("genCmp: no ifx");
+  } else {
+    ifx->generated=1;
+  }
+
+  size=aopOp(left, TRUE, TRUE);
+  aopOp(right, !aopIsPtr(left), TRUE);
+
+  if (IC_TRUE(ifx)) {
+    isTrue=TRUE;
+    jlbl=IC_TRUE(ifx)->key+100;
+  } else {
+    isTrue=FALSE;
+    jlbl=IC_FALSE(ifx)->key+100;
+  }
+
+  if (size==1) {
+    instr="cmp.b";
+  } else {
+    instr="cmp.w";
+  }
+  emitcode(instr, "%s,%s", AOP_NAME(left)[0], AOP_NAME(right)[0]);
+  emitcode(isTrue ? trueInstr : falseInstr, "%05d$", jlbl);
+  if (size>2) {
+    bailOut("genCmp: size > 2");
+  }
+}
+
+/*-----------------------------------------------------------------*/
+/* genCmpEq :- generates code for equal to                         */
+/*-----------------------------------------------------------------*/
+static void genCmpEq (iCode * ic) {
+  printIc (0, "genCmpEq", ic, 0,1,1);
+  genCmp(ic, "beq", "bne"); // no sign
+}
+
+/*-----------------------------------------------------------------*/
+/* genCmpGt :- greater than comparison                             */
+/*-----------------------------------------------------------------*/
+static void genCmpGt (iCode * ic) {
+  printIc (0, "genCmpGt", ic, 0,1,1);
+  if (SPEC_USIGN(operandType(IC_LEFT(ic))) ||
+      SPEC_USIGN(operandType(IC_RIGHT(ic)))) {
+    genCmp(ic, "bg", "bl"); // unsigned
+  } else {
+    genCmp(ic, "bgt", "ble"); // signed
+  }
+}
+
+/*-----------------------------------------------------------------*/
+/* genCmpLt - less than comparisons                                */
+/*-----------------------------------------------------------------*/
+static void genCmpLt (iCode * ic) {
+  printIc (0, "genCmpLt", ic, 0,1,1);
+  if (SPEC_USIGN(operandType(IC_LEFT(ic))) ||
+      SPEC_USIGN(operandType(IC_RIGHT(ic)))) {
+    genCmp(ic, "bcs", "bcc"); // unsigned
+  } else {
+    genCmp(ic, "blt", "bge"); // signed
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1098,21 +1157,21 @@ static iCode *hasInc (operand *op, iCode *ic, int osize) {
 /* genAndOp - for && operation                                     */
 /*-----------------------------------------------------------------*/
 static void genAndOp (iCode * ic) {
-  printIc ("genAndOp(&&)", ic, 1,1,1);
+  printIc (0, "genAndOp(&&)", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
 /* genOrOp - for || operation                                      */
 /*-----------------------------------------------------------------*/
 static void genOrOp (iCode * ic) {
-  printIc ("genOrOp(||)", ic, 1,1,1);
+  printIc (0, "genOrOp(||)", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
 /* genAnd  - code for and                                            */
 /*-----------------------------------------------------------------*/
 static void genAnd (iCode * ic, iCode * ifx) {
-  printIc ("genAnd", ic, 1,1,1);
+  printIc (0, "genAnd", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1123,7 +1182,7 @@ static void genOr (iCode * ic, iCode * ifx) {
   int size;
   char *instr;
 
-  printIc ("genOr", ic, 1,1,1);
+  printIc (0, "genOr", ic, 1,1,1);
 
   size=aopOp(result, TRUE, TRUE);
 
@@ -1171,7 +1230,7 @@ static void genOr (iCode * ic, iCode * ifx) {
 /* genXor - code for xclusive or                                   */
 /*-----------------------------------------------------------------*/
 static void genXor (iCode * ic, iCode * ifx) {
-  printIc ("genXor", ic, 1,1,1);
+  printIc (0, "genXor", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1179,7 +1238,7 @@ static void genXor (iCode * ic, iCode * ifx) {
 /*-----------------------------------------------------------------*/
 static void genInline (iCode * ic) {
 
-  printIc ("genInline", ic, 0,0,0);
+  printIc (0, "genInline", ic, 0,0,0);
   
   emitcode ("", IC_INLINE(ic));
 }
@@ -1188,35 +1247,35 @@ static void genInline (iCode * ic) {
 /* genRRC - rotate right with carry                                */
 /*-----------------------------------------------------------------*/
 static void genRRC (iCode * ic) {
-  printIc ("genRRC", ic, 1,1,0);
+  printIc (0, "genRRC", ic, 1,1,0);
 }
 
 /*-----------------------------------------------------------------*/
 /* genRLC - generate code for rotate left with carry               */
 /*-----------------------------------------------------------------*/
 static void genRLC (iCode * ic) {
-  printIc ("genRLC", ic, 1,1,0);
+  printIc (0, "genRLC", ic, 1,1,0);
 }
 
 /*-----------------------------------------------------------------*/
 /* genGetHbit - generates code get highest order bit               */
 /*-----------------------------------------------------------------*/
 static void genGetHbit (iCode * ic) {
-  printIc ("genGetHbit", ic, 1,1,0);
+  printIc (0, "genGetHbit", ic, 1,1,0);
 }
 
 /*-----------------------------------------------------------------*/
 /* genLeftShift - generates code for left shifting                 */
 /*-----------------------------------------------------------------*/
 static void genLeftShift (iCode * ic) {
-  printIc ("genLeftShift", ic, 1,1,1);
+  printIc (0, "genLeftShift", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
 /* genRightShift - generate code for right shifting                */
 /*-----------------------------------------------------------------*/
 static void genRightShift (iCode * ic) {
-  printIc ("genRightShift", ic, 1,1,1);
+  printIc (0, "genRightShift", ic, 1,1,1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1229,9 +1288,9 @@ static void genPointerGet (iCode * ic, iCode *pi) {
   int size;
 
   if (pi) {
-    printIc ("genPointerGet pi", ic, 1,1,0);
+    printIc (0, "genPointerGet pi", ic, 1,1,0);
   } else {
-    printIc ("genPointerGet", ic, 1,1,0);
+    printIc (0, "genPointerGet", ic, 1,1,0);
   }
 
   if (!IS_PTR(operandType(left))) {
@@ -1360,7 +1419,7 @@ static void genPointerSet (iCode * ic, iCode *pi) {
   operand *result=IC_RESULT(ic), *right=IC_RIGHT(ic);
   int size;
 
-  printIc ("genPointerSet", ic, 1,0,1);
+  printIc (0, "genPointerSet", ic, 1,0,1);
 
   if (!IS_PTR(operandType(result))) {
     bailOut ("genPointerSet: pointer required");
@@ -1474,7 +1533,7 @@ static void genAddrOf (iCode * ic) {
   int size;
   operand *left=IC_LEFT(ic);
 
-  printIc ("genAddrOf", ic, 1,1,0);
+  printIc (0, "genAddrOf", ic, 1,1,0);
 
   size=aopOp (IC_RESULT(ic), FALSE, TRUE);
 
@@ -1517,7 +1576,7 @@ static void genAssign (iCode * ic) {
   int size;
   char *instr;
 
-  printIc ("genAssign", ic, 1,0,1);
+  printIc (0, "genAssign", ic, 1,0,1);
   
   if (!IS_SYMOP(result)) {
     bailOut("genAssign: result is not a symbol");
@@ -1572,7 +1631,7 @@ static void genAssign (iCode * ic) {
 /* genJumpTab - genrates code for jump table                       */
 /*-----------------------------------------------------------------*/
 static void genJumpTab (iCode * ic) {
-  printIc ("genJumpTab", ic, 0,0,0);
+  printIc (0, "genJumpTab", ic, 0,0,0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1587,7 +1646,7 @@ static void genCast (iCode * ic) {
   sym_link *etype=getSpec(rtype);
   short ptrType, signedness;
 
-  printIc ("genCast", ic, 1,1,1);
+  printIc (0, "genCast", ic, 1,1,1);
 
   aopOp(result, TRUE, TRUE);
   aopOp(right, !aopIsPtr(result), AOP_TYPE(result)!=AOP_DIR);
@@ -1757,7 +1816,7 @@ static bool genDjnz (iCode * ic, iCode * ifx) {
   if (getSize (operandType (IC_RESULT (ic))) > 2)
     return 0;
 
-  printIc ("genDjnz", ic, 1,1,1);
+  printIc (0, "genDjnz", ic, 1,1,1);
 
   /* otherwise we can save BIG */
   lbl = newiTempLabel (NULL);
@@ -1782,7 +1841,7 @@ static bool genDjnz (iCode * ic, iCode * ifx) {
 /* genReceive - generate code for a receive iCode                  */
 /*-----------------------------------------------------------------*/
 static void genReceive (iCode * ic) {
-  printIc ("genReceive", ic, 1,0,0);
+  printIc (0, "genReceive", ic, 1,0,0);
 }
 
 /*-----------------------------------------------------------------*/

@@ -473,14 +473,16 @@ void out(int *byte_list, int num) {
 
 void pad_with_nop()
 {
-	static int nops[] = {NOP_OPCODE, NOP_OPCODE, NOP_OPCODE, NOP_OPCODE};
-	int num;
-
-	last_line_text[0] = '\0';
-
-	for(num=0; (MEM_POS + num) % BRANCH_SPACING; num++) ;
-	if (p3) out(nops, num);
-	MEM_POS += num;
+  static int nops[] = {NOP_OPCODE, NOP_OPCODE, NOP_OPCODE, NOP_OPCODE};
+  int num;
+  
+  last_line_text[0] = '\0';
+  
+  for(num=0; (MEM_POS + num) % BRANCH_SPACING; num++) {
+    sprintf (last_line_text, "\tnop\t; word allignment");
+  }
+  if (p3) out(nops, num);
+  MEM_POS += num;
 }
 
 /* print branch out of bounds error */
@@ -533,9 +535,8 @@ void relPrelude() {
   }
   for (p=sym_list; p; p=p->next) {
     if (p->isdef) {
-      // skip temp labels, sfr and sbit
-      if (p->name[strlen(p->name)-1]!='$' &&
-	  p->area) {
+      // skip temp labels
+      if (p->name[strlen(p->name)-1]!='$') {
 	globals++;
       }
     }

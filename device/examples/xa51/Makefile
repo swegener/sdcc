@@ -2,7 +2,8 @@ CC = sdcc
 
 CFLAGS= -Wa-s 
 MFLAGS= -mxa51
-LFLAGS= --code-loc 0x1000 --xram-loc 0x4000
+#LFLAGS= --code-loc 0x1000 --xram-loc 0x4000
+LFLAGS= --xram-loc 0x4000
 
 all: hello.hex
 

@@ -229,8 +229,8 @@ struct xa_dis_entry disass_xa[]= {
  {1,0xf600,0xff00,' ',2,BPL, REL8            }, //  BPL rel8                   1 1 1 1 0 1 1 0  rel8
  {1,0xfe00,0xff00,' ',2,BR, REL8             }, //  BR rel8                    1 1 1 1 1 1 1 0  rel8
 
- {1,0xc500,0xff00,'l',3,CALL, REL16          }, //  CALL rel16                 1 1 0 0 0 1 0 1  rel16
- {0,0xc600,0xfff8,'l',2,CALL, IREG           }, //  CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
+ {1,0xc500,0xff00,'a',3,CALL, REL16          }, //  CALL rel16                 1 1 0 0 0 1 0 1  rel16
+ {0,0xc600,0xfff8,'a',2,CALL, IREG           }, //  CALL [Rs]                  1 1 0 0 0 1 1 0  0 0 0 0 0 s s s
 
  {0,0xe200,0xf708,' ',4,CJNE, REG_DIRECT_REL8}, //  CJNE Rd, direct, rel8      1 1 1 0 S 0 1 0  d d d d 0 x x x
  {0,0xe300,0xff0f,' ',4,CJNE, REG_DATA8_REL8},  //  CJNE Rd, data8, rel8       1 1 1 0 0 0 1 1  d d d d 0 0 0 0

@@ -1883,8 +1883,6 @@ static void packRegisters (eBBlock * ebp) {
   iCode *ic;
   int change = 0;
   
-  return; // that's it for now
-
   while (1) {
     change = 0;
     
@@ -1899,6 +1897,24 @@ static void packRegisters (eBBlock * ebp) {
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {
+      /* if the condition of an if instruction
+         is defined in the previous instruction and
+	 this is the only usage then
+         mark the itemp as a conditional */
+      if ((IS_CONDITIONAL (ic) ||
+	   (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic)))) {
+	if (ic->next && ic->next->op == IFX &&
+	    bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
+	    isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
+	    OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq) {
+	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
+	  continue;
+	}
+      }
+
+      // that's all for now
+      continue;
+
       /* if this is an itemp & result of an address of a true sym 
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&
@@ -1965,21 +1981,6 @@ static void packRegisters (eBBlock * ebp) {
 
       if (POINTER_GET (ic))
 	OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
-
-      /* if the condition of an if instruction
-         is defined in the previous instruction and
-	 this is the only usage then
-         mark the itemp as a conditional */
-      if ((IS_CONDITIONAL (ic) ||
-	   (IS_BITWISE_OP(ic) && isBitwiseOptimizable (ic))) &&
-	  ic->next && ic->next->op == IFX &&
-	  bitVectnBitsOn (OP_USES(IC_RESULT(ic)))==1 &&
-	  isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
-	  OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
-	{
-	  OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
-	  continue;
-	}
 
       /* reduce for support function calls */
       if (ic->supportRtn || ic->op == '+' || ic->op == '-')

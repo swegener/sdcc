@@ -20,7 +20,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#include <tinibios.h>
+#include <80c51xa.h>
 
 void external_startup(void) {
   return;

@@ -212,7 +212,7 @@ void addToModules (char *name, int isLib) {
   module=calloc(1, sizeof(struct MODULE));
   module->name=strdup(name);
   for (s=0; s<MAX_SEGMENTS; s++) {
-    module->offset[s]=segments[s]._size;
+    module->offset[s]=(segments[s]._size+1)&0xfffffe;
   }
   module->isLib=isLib;
   if (!modules) {
@@ -466,11 +466,6 @@ void writeModule(char *outFileName) {
   unsigned int len;
   unsigned int checksum;
 
-  fprintf (stderr, "writeModule: %s from 0x%04x to 0x%04x\n",
-	   outFileName, 
-	   address,
-	   address+size);
-
   if ((fOut=fopen(outFileName, "w"))==NULL) {
     perror (outFileName);
   }
@@ -522,6 +517,11 @@ int relocate() {
   }
 
   // GSFINAL starts at --code-loc ( -b CSEG = 0x1234 )
+  if (segments[CSEG].start & 1) {
+    fprintf (stderr, "*** error: code doesn't start at "
+	     "an even address: %04x\n", segments[CSEG].start);
+    exit (1);
+  }
   segments[GSFINAL].start=segments[CSEG].start;
   memset(gsfinalImage, 0xff, CODESIZE);
 
@@ -531,6 +531,9 @@ int relocate() {
   memcpy(to, from, segments[GSINIT]._size);
   segments[GSINIT].start=segments[GSFINAL].start;
   segments[GSFINAL]._size += segments[GSINIT]._size;
+  if (segments[GSFINAL]._size & 1) {
+    segments[GSFINAL]._size++;
+  }
     
   // append cseg to gsfinal
   from=csegImage;
@@ -538,6 +541,9 @@ int relocate() {
   memcpy(to, from, segments[CSEG]._size);
   segments[CSEG].start=segments[GSFINAL].start+segments[GSFINAL]._size;
   segments[GSFINAL]._size += segments[CSEG]._size;
+  if (segments[GSFINAL]._size & 1) {
+    segments[GSFINAL]._size++;
+  }
 
   // append xinit to gsfinal
   from=xinitImage;
@@ -545,8 +551,19 @@ int relocate() {
   memcpy(to, from, segments[XINIT]._size);
   segments[XINIT].start=segments[GSFINAL].start+segments[GSFINAL]._size;
   segments[GSFINAL]._size += segments[XINIT]._size;
+  if (segments[GSFINAL]._size & 1) {
+    segments[GSFINAL]._size++;
+  }
 
   // XISEG is located after XSEG
+  if (segments[XSEG].start & 1) {
+    fprintf (stderr, "*** warning: xdata doesn't start at "
+	     "an even address: %04x\n", segments[XSEG].start);
+  }
+  if (segments[XSEG]._size & 1) {
+    segments[XSEG]._size++;
+  }
+  
   segments[XISEG].start=segments[XSEG].start + 
     segments[XSEG]._size;  
 
@@ -598,7 +615,9 @@ int relocate() {
 	  break;
 	}
 	case DIR_70FF:
-	  gsfinalImage[reference->address] = (symbol->address<<4)&0x70;
+	  gsfinalImage[reference->address] = 
+	    (gsfinalImage[reference->address]&~0x70) + 
+	    ((symbol->address>>4)&0x70);
 	  gsfinalImage[reference->address+1] = symbol->address;
 	  break;
 	case ABS_FFFF:

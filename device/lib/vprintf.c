@@ -54,14 +54,15 @@ typedef union
 
 static code char memory_id[] = "IXCP-";
 
-ptr_t output_ptr;
-bit   output_to_string;
-bit   lower_case;
-bit   lsd;
+static ptr_t output_ptr;
+static bit   output_to_string;
+static bit   lower_case;
+static bit   lsd;
 
-data value_t        value;
+/* this one NEEDS to be in data */
+static data value_t value;
 
-unsigned short      radix;
+static xdata unsigned short radix;
 
 /****************************************************************************/
 

@@ -60,6 +60,8 @@
 #define  PCC_LITERAL       (1<<9)
 #define  PCC_REL_ADDR      (1<<10)
 
+#define PCC_STATUS	(PCC_C | PCC_Z | PCC_DC | PCC_OV | PCC_N)
+
 /*------------------------------------------------------------*/
 
 void BuildFlowAncestry(pBlock *pb);

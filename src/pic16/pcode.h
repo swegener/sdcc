@@ -582,6 +582,7 @@ typedef struct pCodeCSource
  contiguous chunk.
 
 **************************************************/
+struct defmap_s; // defined in pcode.c
 
 typedef struct pCodeFlow
 {
@@ -613,6 +614,13 @@ typedef struct pCodeFlow
   int ToConflicts;
 
   set *registers;/* Registers used in this flow */
+
+  struct defmap_s *defmap;	/* chronologically ordered list of definitions performed
+			   in this flow (most recent at the front) */
+  struct defmap_s *in_vals;	/* definitions of all symbols reaching this flow
+  				 * symbols with multiple different definitions are stored
+				 * with an assigned value of 0. */
+  struct defmap_s *out_vals;	/* definitions valid AFTER thie flow */
 
 } pCodeFlow;
 

@@ -89,6 +89,7 @@ typedef struct PIC16_device {
 #define OF_LR_SUPPORT		0x00000001
 #define OF_OPTIMIZE_GOTO	0x00000002
 #define OF_OPTIMIZE_CMP		0x00000004
+#define OF_OPTIMIZE_DF		0x00000008
 
 typedef struct {
   int no_banksel;

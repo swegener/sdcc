@@ -1791,17 +1791,20 @@ pCodeOp *pic16_popCopyReg(pCodeOpReg *pc)
   pCodeOpReg *pcor;
 
   pcor = Safe_calloc(1,sizeof(pCodeOpReg) );
-  pcor->pcop.type = pc->pcop.type;
+  memcpy (pcor, pc, sizeof (pCodeOpReg));
+  pcor->r->wasUsed = 1;
+  
+  //pcor->pcop.type = pc->pcop.type;
   if(pc->pcop.name) {
     if(!(pcor->pcop.name = Safe_strdup(pc->pcop.name)))
       fprintf(stderr,"oops %s %d",__FILE__,__LINE__);
   } else
     pcor->pcop.name = NULL;
 
-  pcor->r = pc->r;
-  pcor->rIdx = pc->rIdx;
-  pcor->r->wasUsed=1;
-  pcor->instance = pc->instance;
+  //pcor->r = pc->r;
+  //pcor->rIdx = pc->rIdx;
+  //pcor->r->wasUsed=1;
+  //pcor->instance = pc->instance;
 
 //  DEBUGpic16_emitcode ("; ***","%s  , copying %s, rIdx=%d",__FUNCTION__,pc->pcop.name,pc->rIdx);
 
@@ -3663,14 +3666,15 @@ static void genFunction (iCode *ic)
          * wrapper segment at vector address. The user should take care for
          * this instead. -- VR */
 
-        if(!IFFUNC_ISNAKED(ftype) && (FUNC_INTNO(sym->type) =! INTNO_UNSPEC)) {
+        if(!IFFUNC_ISNAKED(ftype) && (FUNC_INTNO(sym->type) != INTNO_UNSPEC)) {
           asym = newSymbol(asymname, 0);
           apb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute section"));
           pic16_addpBlock( apb );
 
           pic16_addpCode2pBlock(apb, pic16_newpCodeCharP(";-----------------------------------------"));
           pic16_addpCode2pBlock(apb, pic16_newpCodeFunction(moduleName, asym->name));
-          pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_popGetWithString( sym->rname )));
+          //pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_popGetWithString( sym->rname )));
+          pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_newpCodeOpLabel (sym->rname, 0)));
 		
           /* mark the end of this tiny function */
           pic16_addpCode2pBlock(apb,pic16_newpCodeFunction(NULL,NULL));

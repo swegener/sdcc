@@ -38,6 +38,8 @@
 #define STRCASECMP strcasecmp
 #endif
 
+#define DUMP_DF_GRAPHS 0
+
 /****************************************************************/
 /****************************************************************/
 
@@ -196,6 +198,17 @@ pCodeOp *pic16_popGetLit(int);
 pCodeOp *pic16_popGetWithString(char *);
 extern int inWparamList(char *s);
 
+/** data flow optimization helpers **/
+#if defined (DUMP_DF_GRAPHS) && DUMP_DF_GRAPHS > 0
+static void pic16_vcg_dump (FILE *of, pBlock *pb);
+static void pic16_vcg_dump_default (pBlock *pb);
+#endif
+static int pic16_pCodeIsAlive (pCode *pc);
+static void pic16_df_stats ();
+static void pic16_createDF (pBlock *pb);
+static int pic16_removeUnusedRegistersDF ();
+static void pic16_destructDF (pBlock *pb);
+static void releaseStack ();
 
 /****************************************************************/
 /*                    PIC Instructions                          */
@@ -225,7 +238,7 @@ pCodeInstruction pic16_pciADDWF = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
-  (PCC_REGISTER | PCC_Z), // outCond
+  (PCC_REGISTER | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -253,7 +266,7 @@ pCodeInstruction pic16_pciADDFW = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
-  (PCC_W | PCC_Z), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -281,7 +294,7 @@ pCodeInstruction pic16_pciADDWFC = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_REGISTER | PCC_Z | PCC_DC | PCC_Z | PCC_OV | PCC_N), // outCond
+  (PCC_REGISTER | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -309,7 +322,7 @@ pCodeInstruction pic16_pciADDFWC = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_W | PCC_Z | PCC_DC | PCC_Z | PCC_OV | PCC_N), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -337,7 +350,7 @@ pCodeInstruction pic16_pciADDLW = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
-  (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -421,7 +434,7 @@ pCodeInstruction pic16_pciANDFW = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
-  (PCC_W | PCC_Z) // outCond
+  (PCC_W | PCC_Z | PCC_N) // outCond
 };
 
 pCodeInstruction pic16_pciBC = { // mdubuc - New
@@ -811,7 +824,7 @@ pCodeInstruction pic16_pciBZ = { // mdubuc - New
   0,	// second memory operand
   0,	// second literal operand
   POC_NOP,
-  PCC_Z,   // inCond
+  (PCC_REL_ADDR | PCC_Z),   // inCond
   PCC_NONE, // outCond
   PCI_MAGIC
 };
@@ -896,7 +909,7 @@ pCodeInstruction pic16_pciCOMFW = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,  // inCond
-  PCC_W  , // outCond
+  (PCC_W | PCC_Z | PCC_N) , // outCond
   PCI_MAGIC
 };
 
@@ -923,7 +936,7 @@ pCodeInstruction pic16_pciCLRF = {
   0,	// second memory operand
   0,	// second literal operand
   POC_NOP,
-  PCC_REGISTER, // inCond
+  PCC_NONE, // inCond
   (PCC_REGISTER | PCC_Z), // outCond
   PCI_MAGIC
 };
@@ -1148,7 +1161,7 @@ pCodeInstruction pic16_pciDECF = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
-  PCC_REGISTER   , // outCond
+  (PCC_REGISTER | PCC_STATUS)  , // outCond
   PCI_MAGIC
 };
 
@@ -1176,7 +1189,7 @@ pCodeInstruction pic16_pciDECFW = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
-  PCC_W   , // outCond
+  (PCC_W | PCC_STATUS)  , // outCond
   PCI_MAGIC
 };
 
@@ -1288,7 +1301,7 @@ pCodeInstruction pic16_pciINCF = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
-  (PCC_REGISTER | PCC_C | PCC_DC | PCC_Z | PCC_OV | PCC_N), // outCond
+  (PCC_REGISTER | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -1316,7 +1329,7 @@ pCodeInstruction pic16_pciINCFW = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
-  PCC_W   , // outCond
+  (PCC_W | PCC_STATUS)  , // outCond
   PCI_MAGIC
 };
 
@@ -1539,8 +1552,8 @@ pCodeInstruction pic16_pciLFSR = { // mdubuc - New
   0,	// second memory operand
   1,	// second literal operand
   POC_NOP,
-  (PCC_REGISTER | PCC_LITERAL),
-  PCC_REGISTER, // outCond
+  PCC_LITERAL, // inCond
+  PCC_NONE, // outCond
   PCI_MAGIC
 };
 
@@ -1596,7 +1609,7 @@ pCodeInstruction pic16_pciMOVFW = {
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
-  (PCC_W | PCC_Z), // outCond
+  (PCC_W | PCC_N | PCC_Z), // outCond
   PCI_MAGIC
 };
 
@@ -1624,7 +1637,7 @@ pCodeInstruction pic16_pciMOVFF = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
-  PCC_REGISTER, // outCond
+  PCC_REGISTER2, // outCond
   PCI_MAGIC
 };
 
@@ -1705,8 +1718,8 @@ pCodeInstruction pic16_pciMOVWF = {
   0,	// second memory operand
   0,	// second literal operand
   POC_NOP,
-  PCC_REGISTER,   // inCond
-  PCC_W, // outCond
+  PCC_W,   // inCond
+  PCC_REGISTER, // outCond
   PCI_MAGIC
 };
 
@@ -1733,7 +1746,7 @@ pCodeInstruction pic16_pciMULLW = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
-  PCC_REGISTER, // outCond - PROD
+  PCC_NONE, // outCond - PROD
   PCI_MAGIC
 };
 
@@ -1787,7 +1800,7 @@ pCodeInstruction pic16_pciNEGF = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   PCC_REGISTER, // inCond
-  (PCC_REGISTER | PCC_C | PCC_DC | PCC_OV | PCC_N), // outCond
+  (PCC_REGISTER | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -1887,7 +1900,7 @@ pCodeInstruction pic16_pciRCALL = { // mdubuc - New
   NULL, // C source 
   1,    // num ops
   0,0,  // dest, bit instruction
-  0,0,  // branch, skip
+  1,0,  // branch, skip
   0,    // literal operand
   0,    // RAM access bit
   0,    // fast call/return mode select bit
@@ -2225,7 +2238,7 @@ pCodeInstruction pic16_pciSETF = { // mdubuc - New
   0,	// second memory operand
   0,	// second literal operand
   POC_NOP,
-  PCC_REGISTER,  // inCond
+  PCC_NONE,  // inCond
   PCC_REGISTER  , // outCond
   PCI_MAGIC
 };
@@ -2254,7 +2267,7 @@ pCodeInstruction pic16_pciSUBLW = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
-  (PCC_W | PCC_C | PCC_DC | PCC_Z | PCC_OV | PCC_N), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2282,7 +2295,7 @@ pCodeInstruction pic16_pciSUBFWB = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_W | PCC_C | PCC_DC | PCC_Z | PCC_OV | PCC_N), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2310,7 +2323,7 @@ pCodeInstruction pic16_pciSUBWF = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
-  (PCC_REGISTER | PCC_Z), // outCond
+  (PCC_REGISTER | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2338,7 +2351,7 @@ pCodeInstruction pic16_pciSUBFW = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
-  (PCC_W | PCC_Z | PCC_OV | PCC_N), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2366,7 +2379,7 @@ pCodeInstruction pic16_pciSUBFWB_D1 = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N), // outCond
+  (PCC_REGISTER | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2394,7 +2407,7 @@ pCodeInstruction pic16_pciSUBFWB_D0 = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2422,7 +2435,7 @@ pCodeInstruction pic16_pciSUBWFB_D1 = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_REGISTER | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N), // outCond
+  (PCC_REGISTER | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2450,7 +2463,7 @@ pCodeInstruction pic16_pciSUBWFB_D0 = { // mdubuc - New
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
-  (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_OV | PCC_N), // outCond
+  (PCC_W | PCC_STATUS), // outCond
   PCI_MAGIC
 };
 
@@ -2834,7 +2847,7 @@ pCodeInstruction pic16_pciXORLW = {
   0,	// second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
-  (PCC_W | PCC_Z | PCC_C | PCC_DC | PCC_N), // outCond
+  (PCC_W | PCC_Z | PCC_N), // outCond
   PCI_MAGIC
 };
 
@@ -4647,10 +4660,12 @@ void pic16_printpBlock(FILE *of, pBlock *pb)
 /*                                                                 */
 /*                                                                 */
 /*-----------------------------------------------------------------*/
+pCode * pic16_findNextInstruction(pCode *pci);
+pCode * pic16_findPrevInstruction(pCode *pci);
 
 void pic16_unlinkpCode(pCode *pc)
 {
-
+  pCode *prev;
 
   if(pc) {
 #ifdef PCODE_DEBUG
@@ -4662,6 +4677,17 @@ void pic16_unlinkpCode(pCode *pc)
     if(pc->next)
       pc->next->prev = pc->prev;
 
+    /* move C source line down (or up) */
+    if (isPCI(pc) && PCI(pc)->cline) {
+      prev = pic16_findNextInstruction (pc->next);
+      if (prev && isPCI(prev) && !PCI(prev)->cline) {
+        PCI(prev)->cline = PCI(pc)->cline;
+      } else {
+        prev = pic16_findPrevInstruction (pc->prev);
+        if (prev && isPCI(prev) && !PCI(prev)->cline)
+          PCI(prev)->cline = PCI(pc)->cline;
+      }
+    }
     pc->prev = pc->next = NULL;
   }
 }
@@ -5354,7 +5380,7 @@ static void pBranchLink(pCodeFunction *f, pCodeFunction *t)
   
 }
 
-#if 0
+#if 1
 /*-----------------------------------------------------------------*/
 /* pBranchFind - find the pBranch in a pBranch chain that contains */
 /*               a pCode                                           */
@@ -5384,10 +5410,24 @@ void pic16_pCodeUnlink(pCode *pc)
     fprintf(stderr,"unlinking bad pCode in %s:%d\n",__FILE__,__LINE__);
     exit(1);
   }
+  
+  /* move C source line down (or up) */
+  if (isPCI(pc) && PCI(pc)->cline) {
+    pc1 = pic16_findNextInstruction (pc->next);
+    if (pc1 && isPCI(pc1) && !PCI(pc1)->cline) {
+      PCI(pc1)->cline = PCI(pc)->cline;
+    } else {
+      pc1 = pic16_findPrevInstruction (pc->prev);
+      if (pc1 && isPCI(pc1) && !PCI(pc1)->cline)
+        PCI(pc1)->cline = PCI(pc)->cline;
+    }
+  }
 
   /* first remove the pCode from the chain */
   pc->prev->next = pc->next;
   pc->next->prev = pc->prev;
+
+  pc->prev = pc->next = NULL;
 
   /* Now for the hard part... */
 
@@ -5395,7 +5435,7 @@ void pic16_pCodeUnlink(pCode *pc)
 
   pb1 = PCI(pc)->from;
   while(pb1) {
-    PCI(pc1) = pb1->pc;    /* Get the pCode that branches to the
+    pc1 = pb1->pc;    /* Get the pCode that branches to the
 		       * one we're unlinking */
 
     /* search for the link back to this pCode (the one we're
@@ -5689,6 +5729,82 @@ static void AnalyzeRETURN(pCode *pc)
 
 #endif
 
+/*-------------------------------------------------------------------*/
+/* pic16_getRegFrompCodeOp - extract the register from a pCodeOp     */
+/*                            if one is present. This is the common  */
+/*                            part of pic16_getRegFromInstruction(2) */
+/*-------------------------------------------------------------------*/
+
+regs * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
+  if (!pcop) return NULL;
+  
+  switch(pcop->type) {
+  case PO_PRODL:
+  case PO_PRODH:
+  case PO_INDF0:
+  case PO_FSR0:
+  case PO_W:
+  case PO_WREG:
+  case PO_STATUS:
+  case PO_INTCON:
+  case PO_PCL:
+  case PO_PCLATH:
+  case PO_PCLATU:
+  case PO_BSR:
+    return PCOR(pcop)->r;
+
+  case PO_SFR_REGISTER:
+    //fprintf (stderr, "%s - SFR\n", __FUNCTION__);
+    return PCOR(pcop)->r;
+
+  case PO_BIT:
+  case PO_GPR_TEMP:
+//	fprintf(stderr, "pic16_getRegFromInstruction - bit or temp\n");
+    return PCOR(pcop)->r;
+
+  case PO_IMMEDIATE:
+//    return pic16_dirregWithName(PCOI(pcop)->r->name);
+
+    if(PCOI(pcop)->r)
+      return (PCOI(pcop)->r);
+    else
+      return NULL;
+    
+  case PO_GPR_BIT:
+    return PCOR(pcop)->r;
+
+  case PO_GPR_REGISTER:
+  case PO_DIR:
+//	fprintf(stderr, "pic16_getRegFromInstruction - dir\n");
+    return PCOR(pcop)->r;
+
+  case PO_LITERAL:
+    //fprintf(stderr, "pic16_getRegFromInstruction - literal\n");
+    break;
+
+  case PO_REL_ADDR:
+  case PO_LABEL:
+    //fprintf (stderr, "%s - label or address: %d (%s)\n", __FUNCTION__, pcop->type, dumpPicOptype(pcop->type));
+    break;
+    
+  case PO_CRY:
+  case PO_STR:
+    /* this should never turn up */
+    //fprintf (stderr, "%s - unused pCodeOp->type: %d (%s)\n", __FUNCTION__, pcop->type, dumpPicOptype(pcop->type));
+    break;
+    
+  case PO_WILD:
+    break;
+    
+  default:
+	fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d (%s)\n",pcop->type, dumpPicOptype (pcop->type));
+//	assert( 0 );
+	break;
+  }
+
+  return NULL;
+}
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 regs * pic16_getRegFromInstruction(pCode *pc)
@@ -5706,47 +5822,7 @@ regs * pic16_getRegFromInstruction(pCode *pc)
   	dumpPicOptype( PCI(pc)->pcop->type), PCI(pc)->pcop->type);
 #endif
 
-  switch(PCI(pc)->pcop->type) {
-  case PO_PRODL:
-  case PO_PRODH:
-
-  case PO_INDF0:
-  case PO_FSR0:
-    return PCOR(PCI(pc)->pcop)->r;
-
-  case PO_BIT:
-  case PO_GPR_TEMP:
-//	fprintf(stderr, "pic16_getRegFromInstruction - bit or temp\n");
-    return PCOR(PCI(pc)->pcop)->r;
-
-  case PO_IMMEDIATE:
-//    return pic16_dirregWithName(PCOI(PCI(pc)->pcop)->r->name);
-
-    if(PCOI(PCI(pc)->pcop)->r)
-      return (PCOI(PCI(pc)->pcop)->r);
-    else
-      return NULL;
-    
-  case PO_GPR_BIT:
-    return PCOR(PCI(pc)->pcop)->r;
-
-  case PO_GPR_REGISTER:
-  case PO_DIR:
-//	fprintf(stderr, "pic16_getRegFromInstruction - dir\n");
-    return PCOR(PCI(pc)->pcop)->r;
-
-  case PO_LITERAL:
-    //fprintf(stderr, "pic16_getRegFromInstruction - literal\n");
-    break;
-
-  default:
-//	fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d\n",PCI(pc)->pcop->type);
-//	genericPrint(stderr, pc);
-//	assert( 0 );
-	break;
-  }
-
-  return NULL;
+  return pic16_getRegFrompCodeOp (PCI(pc)->pcop);
 }
 
 /*-------------------------------------------------------------------------------*/
@@ -5768,65 +5844,7 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
   	dumpPicOptype( PCI(pc)->pcop->type), PCI(pc)->pcop->type);
 #endif
 
-/*
- * operands supported in MOVFF:
- *  PO_INF0/PO_FSR0
- *  PO_GPR_TEMP
- *  PO_IMMEDIATE
- *  PO_DIR
- *
- */
-  switch(PCI(pc)->pcop->type) {
-  case PO_PRODL:
-  case PO_PRODH:
-
-  case PO_INDF0:
-  case PO_FSR0:
-    return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
-
-    //    return typeRegWithIdx (PCOR(PCI(pc)->pcop)->rIdx, REG_SFR, 0);
-
-//  case PO_BIT:
-  case PO_GPR_TEMP:
-    //fprintf(stderr, "pic16_getRegFromInstruction2 - bit or temp\n");
-    return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
-
-  case PO_IMMEDIATE:
-#if 0
-//    if(PCOI(PCI(pc)->pcop)->r)
-//      return (PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r);
-
-    //fprintf(stderr, "pic16_getRegFromInstruction2 - immediate\n");
-    return pic16_dirregWithName(PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r->name);
-#endif
-
-    if(PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r)
-      return (PCOI(PCOR2(PCI(pc)->pcop)->pcop2)->r);
-    else
-      return NULL;
-
-
-  case PO_GPR_BIT:
-	break;
-//    return PCOR2(PCI(pc)->pcop)->r;
-
-  case PO_GPR_REGISTER:
-  case PO_DIR:
-    //fprintf(stderr, "pic16_getRegFromInstruction2 - dir\n");
-    return PCOR(PCOR2(PCI(pc)->pcop)->pcop2)->r;
-
-  case PO_LITERAL:
-	break;
-    //fprintf(stderr, "pic16_getRegFromInstruction2 - literal\n");
-
-  default:
-    //fprintf(stderr, "pic16_getRegFromInstruction2 - unknown reg type %d\n",PCI(pc)->pcop->type);
-    //genericPrint(stderr, pc);
-    break;
-  }
-
-  return NULL;
-
+  return pic16_getRegFrompCodeOp (PCOR2(PCI(pc)->pcop)->pcop2);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5948,6 +5966,27 @@ void pic16_BuildFlow(pBlock *pb)
     //fprintf(stderr," build: ");
     //pflow->print(stderr,pflow);
 
+    if (checkLabel(pc)) { 
+
+      /* This instruction marks the beginning of a
+       * new flow segment */
+
+      pc->seq = 0;
+      seq = 1;
+
+      /* If the previous pCode is not a flow object, then 
+       * insert a new flow object. (This check prevents 
+       * two consecutive flow objects from being insert in
+       * the case where a skip instruction preceeds an
+       * instruction containing a label.) */
+
+      if(last_pci && (PCI(last_pci)->pcflow == PCFL(pflow)))
+	InsertpFlow(pic16_findPrevInstruction(pc->prev), &pflow);
+
+      PCI(pc)->pcflow = PCFL(pflow);
+      
+    }
+
     if( PCI(pc)->isSkip) {
 
       /* The two instructions immediately following this one 
@@ -5977,25 +6016,6 @@ void pic16_BuildFlow(pBlock *pb)
       InsertpFlow(pc, &pflow);
       seq = 0;
 
-    } else if (checkLabel(pc)) { 
-
-      /* This instruction marks the beginning of a
-       * new flow segment */
-
-      pc->seq = 0;
-      seq = 1;
-
-      /* If the previous pCode is not a flow object, then 
-       * insert a new flow object. (This check prevents 
-       * two consecutive flow objects from being insert in
-       * the case where a skip instruction preceeds an
-       * instruction containing a label.) */
-
-      if(last_pci && (PCI(last_pci)->pcflow == PCFL(pflow)))
-	InsertpFlow(pic16_findPrevInstruction(pc->prev), &pflow);
-
-      PCI(pc)->pcflow = PCFL(pflow);
-      
     }
     last_pci = pc;
     pc = pc->next;
@@ -6192,6 +6212,39 @@ static void LinkFlow_pCode(pCodeInstruction *from, pCodeInstruction *to)
 
 }
 
+pCode *pic16_getJumptabpCode (pCode *pc) {
+  pCode *pcinf;
+
+  //fprintf (stderr, "%s - start for %p in %p", __FUNCTION__, pc, isPCI(pc) ? PCI(pc)->pcflow : NULL);
+  //pc->print (stderr, pc);
+  pcinf = pc;
+  while (pcinf) {
+    if (isPCI(pcinf) && PCI(pcinf)->op != POC_GOTO) return NULL;
+    if (pcinf->type == PC_INFO && PCINF(pcinf)->type == INF_OPTIMIZATION) {
+      switch (PCOO(PCINF(pcinf)->oper1)->type) {
+      case OPT_JUMPTABLE_BEGIN:
+        /* leading begin of jump table -- in one */
+	pcinf = pic16_findPrevInstruction (pcinf);
+	return pcinf;
+        break;
+	
+      case OPT_JUMPTABLE_END:
+        /* leading end of jumptable -- not in one */
+        return NULL;
+        break;
+	
+      default:
+	/* ignore all other PCInfos */
+        break;
+      }
+    }
+    pcinf = pcinf->prev;
+  }
+
+  /* no PCInfo found -- not in a jumptable */
+  return NULL;
+}
+
 /*-----------------------------------------------------------------*
  * void LinkFlow(pBlock *pb)
  *
@@ -6206,6 +6259,7 @@ static void LinkFlow(pBlock *pb)
   pCode *pc=NULL;
   pCode *pcflow;
   pCode *pct;
+  pCode *jumptab_pre = NULL;
 
   //fprintf(stderr,"linkflow \n");
 
@@ -6238,12 +6292,55 @@ static void LinkFlow(pBlock *pb)
     if(isPCI_BRANCH(pc)) {
       pCodeOpLabel *pcol = PCOLAB(PCI(pc)->pcop);
 
+      /* handle GOTOs in jumptables */
+      if ((jumptab_pre = pic16_getJumptabpCode (pc)) != NULL) {
+	/* link to previous flow */
+	//fprintf (stderr, "linked jumptable GOTO to predecessor %p\n", PCI(jumptab_pre)->pcflow);
+	LinkFlow_pCode (PCI(jumptab_pre), PCI(pc));
+      }
+
+      switch (PCI(pc)->op) {
+      case POC_GOTO:
+      case POC_BRA:
+      case POC_RETURN:
+      case POC_RETLW:
+      case POC_RETFIE:
+	      /* unconditional branches -- do not link to next instruction */
+	      //fprintf (stderr, "%s: flow ended by unconditional branch\n", __FUNCTION__);
+	      break;
+	      
+      case POC_CALL:
+      case POC_RCALL:
+	      /* unconditional calls -- link to next instruction */
+	      //fprintf (stderr, "%s: flow ended by CALL\n", __FUNCTION__);
+	      LinkFlow_pCode(PCI(pc),PCI(pic16_findNextInstruction(pc->next)));
+	      break;
+	      
+      case POC_BC:
+      case POC_BN:
+      case POC_BNC:
+      case POC_BNN:
+      case POC_BNOV:
+      case POC_BNZ:
+      case POC_BOV:
+      case POC_BZ:
+	      /* conditional branches -- also link to next instruction */
+	      //fprintf (stderr, "%s: flow ended by conditional branch\n", __FUNCTION__);
+	      LinkFlow_pCode(PCI(pc),PCI(pic16_findNextInstruction(pc->next)));
+	      break;
+	      
+      default:
+	      fprintf (stderr, "%s: unhandled op %u (%s)\n", __FUNCTION__, PCI(pc)->op , PCI(pc)->mnemonic);
+	      assert (0 && "unhandled branching instruction");
+	      break;
+      }
+
       //fprintf(stderr, "ends with branch\n  ");
       //pc->print(stderr,pc);
 
       if(!(pcol && isPCOLAB(pcol))) {
 	if((PCI(pc)->op != POC_RETLW)
-		&& (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL) && (PCI(pc)->op != POC_RETFIE) ) {
+		&& (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL) && (PCI(pc)->op != POC_RCALL) && (PCI(pc)->op != POC_RETFIE) ) {
 	
 		/* continue if label is '$' which assembler knows how to parse */
 		if(((PCI(pc)->pcop->type == PO_STR) && !strcmp(PCI(pc)->pcop->name, "$")))continue;
@@ -7112,6 +7209,17 @@ int hasNoLabel (pCode *pc)
   return 1;
 }
 
+static void pic16_InsertCommentAfter (pCode *pc, const char *fmt, ...) {
+  char buf[512];
+  va_list va;
+
+  va_start (va, fmt);
+  vsprintf (buf, fmt, va);
+  va_end (va);
+
+  pic16_pCodeInsertAfter (pc, pic16_newpCodeCharP(buf));
+}
+
 /* Replaces the old pCode with the new one, moving the labels,
  * C source line and probably flow information to the new pCode.
  */
@@ -7123,17 +7231,29 @@ void pic16_pCodeReplace (pCode *oldPC, pCode *newPC) {
   PCI(newPC)->label = pic16_pBranchAppend (PCI(oldPC)->label, PCI(newPC)->label);
   PCI(oldPC)->label = NULL;
   
+#if 0
   /* move C source line (if possible) */
   if (PCI(oldPC)->cline && !PCI(newPC)->cline)
     PCI(newPC)->cline = PCI(oldPC)->cline;
+#endif
 
+  /* keep flow information intact */
+  newPC->seq = oldPC->seq;
+  PCI(newPC)->pcflow = PCI(oldPC)->pcflow;
+
+  /* insert a comment stating which pCode has been replaced */
+#if 1
+  if (pic16_pcode_verbose || pic16_debug_verbose) {
+    char pc_str[256];
+    pic16_pCode2str (pc_str, 256, oldPC);
+    pic16_InsertCommentAfter (oldPC->prev, "%s: replaced %s", __FUNCTION__, pc_str);
+  }
+#endif
+  
   /* insert new pCode into pBlock */
   pic16_pCodeInsertAfter (oldPC, newPC);
   pic16_unlinkpCode (oldPC);
   
-  /* TODO: update flow (newPC->from, newPC->to) */
-  PCI(newPC)->pcflow = PCI(oldPC)->pcflow;
-
   /* destruct replaced pCode */
   oldPC->destruct (oldPC);
 }
@@ -7580,6 +7700,21 @@ static void AnalyzeFlow(int level)
     for(pb = the_pFile->pbHead; pb; pb = pb->next)
       LinkFlow(pb);
 
+#if 1
+	if (pic16_options.opt_flags & OF_OPTIMIZE_DF) {
+		for(pb = the_pFile->pbHead; pb; pb = pb->next) {
+			pic16_createDF (pb);
+#if defined (DUMP_DF_GRAPHS) && DUMP_DF_GRAPHS > 0
+			pic16_vcg_dump_default (pb);
+#endif
+			//pic16_destructDF (pb);
+		}
+
+		pic16_df_stats ();
+		if (0) releaseStack (); // releasing is costly...
+	}
+#endif
+
     /* Phase 3 - Flow Analysis - Flow Tree
      *
      * In this phase, the individual flow blocks are examined
@@ -7606,6 +7741,7 @@ static void AnalyzeFlow(int level)
       pic16_pCodeRegMapLiveRanges(pb);
 
     pic16_RemoveUnusedRegisters();
+    pic16_removeUnusedRegistersDF ();
 
   //  for(pb = the_pFile->pbHead; pb; pb = pb->next)
     pic16_pCodeRegOptimizeRegUsage(level);
@@ -9222,3 +9358,2883 @@ void pic16_OptimizeBanksel ()
 }
 
 /*** END of stuff belonging to the BANKSEL optimization ***/
+
+
+
+/*** BEGIN of helpers for pCode dataflow optimizations ***/
+
+typedef unsigned int symbol_t;
+typedef unsigned int valnum_t;
+//typedef unsigned int hash_t;
+
+#ifndef INT_TO_PTR
+#define INT_TO_PTR(x) (((char *) 0) + (x))
+#endif
+
+#ifndef PTR_TO_INT
+#define PTR_TO_INT(x) (((char *)(x)) - ((char *) 0))
+#endif
+
+/* statistics */
+static unsigned int pic16_df_removed_pcodes = 0;
+static unsigned int pic16_df_saved_bytes = 0;
+static unsigned int df_findall_sameflow = 0;
+static unsigned int df_findall_otherflow = 0;
+static unsigned int df_findall_in_vals = 0;
+
+static void pic16_df_stats () {
+  return;
+  if (pic16_debug_verbose || pic16_pcode_verbose) {
+    fprintf (stderr, "PIC16: dataflow analysis removed %u instructions (%u bytes)\n", pic16_df_removed_pcodes, pic16_df_saved_bytes);
+    fprintf (stderr, "findAll: same flow %u (%u in_vals), other flow %u\n", df_findall_sameflow, df_findall_in_vals, df_findall_otherflow);
+    //pic16_df_removed_pcodes = pic16_df_saved_bytes = 0;
+  }
+}
+
+/* Remove a pCode iff possible:
+ * - previous pCode is no SKIP
+ * - pc has no label
+ * Returns 1 iff the pCode has been removed, 0 otherwise. */
+static int pic16_safepCodeUnlink (pCode *pc, char *comment) {
+  pCode *pcprev, *pcnext;
+  char buf[256], *total=NULL;
+  int len;
+  
+  if (!comment) comment = "=DF= pCode removed by pic16_safepCodeUnlink";
+
+  pcprev = pic16_findPrevInstruction (pc->prev);
+  pcnext = pic16_findNextInstruction (pc->next);
+  
+  /* if previous instruction is a skip -- do not remove */
+  if (pcprev && isPCI_SKIP(pcprev)) return 0;
+
+  /* move labels to next instruction (if possible) */
+  if (PCI(pc)->label && !pcnext) return 0;
+
+  if (PCI(pc)->label) {
+    //fprintf (stderr, "%s: moving label(s)\n", __FUNCTION__);
+    //pc->print (stderr, pc);
+    PCI(pcnext)->label = pic16_pBranchAppend (PCI(pc)->label, PCI(pcnext)->label);
+    PCI(pc)->label = NULL;
+  }
+  
+  /* update statistics */
+  pic16_df_removed_pcodes++;
+  if (isPCI(pc)) pic16_df_saved_bytes += PCI(pc)->isize;
+  
+  /* remove the pCode */
+  pic16_pCode2str (buf, 256, pc);
+  //fprintf (stderr, "%s: removing pCode: %s\n", __FUNCTION__, buf);
+  if (0 || pic16_debug_verbose || pic16_pcode_verbose) {
+    len = strlen (buf) + strlen (comment) + 10;
+    total = (char *) Safe_malloc (len);
+    snprintf (total, len, "%s: %s", comment, buf);
+    pic16_pCodeInsertAfter (pc, pic16_newpCodeCharP(total));
+    Safe_free (total);
+  }
+
+  /* actually unlink it from the pBlock -- also remove from to/from lists */
+  pic16_pCodeUnlink (pc);
+
+  /* remove the pCode -- release registers */
+  pc->destruct (pc);
+
+  /* report success */
+  return 1;
+}
+
+
+/* ======================================================================== */
+/* === SYMBOL HANDLING ==================================================== */
+/* ======================================================================== */
+
+static hTab *map_strToSym = NULL;		/** (char *) --> symbol_t */
+static hTab *map_symToStr = NULL;		/** symbol_t -> (char *) */
+static symbol_t nextSymbol = 0x2000;		/** next symbol_t assigned to the next generated symbol */
+
+/** Calculate a hash for a given string.
+ * If len == 0 the string is assumed to be NUL terminated. */
+static hash_t symbolHash (const char *str, unsigned int len) {
+  hash_t hash = 0;
+  if (!len) {
+    while (*str) {
+      hash = (hash << 2) ^ *str;
+      str++;
+    } // while
+  } else {
+    while (len--) {
+      hash = (hash << 2) ^ *str;
+      str++;
+    }
+  }
+  return hash;
+}
+
+/** Return 1 iff strings v1 and v2 are identical. */
+static int symcmp (const void *v1, const void *v2) {
+  return !strcmp ((const char *) v1, (const char *) v2);
+}
+
+/** Return 1 iff pointers v1 and v2 are identical. */
+static int ptrcmp (const void *v1, const void *v2) {
+  return (v1 == v2);
+}
+
+enum {  SPO_WREG=0x1000,
+	SPO_STATUS,
+	SPO_PRODL,
+	SPO_PRODH,
+	SPO_INDF0,
+	SPO_POSTDEC0,
+	SPO_POSTINC0,
+	SPO_PREINC0,
+	SPO_PLUSW0,
+	SPO_INDF1,
+	SPO_POSTDEC1,
+	SPO_POSTINC1,
+	SPO_PREINC1,
+	SPO_PLUSW1,
+	SPO_INDF2,
+	SPO_POSTDEC2,
+	SPO_POSTINC2,
+	SPO_PREINC2,
+	SPO_PLUSW2,
+	SPO_STKPTR,
+	SPO_TOSL,
+	SPO_TOSH,
+	SPO_TOSU,
+	SPO_BSR,
+	SPO_FSR0L,
+	SPO_FSR0H,
+	SPO_FSR1L,
+	SPO_FSR1H,
+	SPO_FSR2L,
+	SPO_FSR2H,
+	SPO_PCL,
+	SPO_PCLATH,
+	SPO_PCLATU,
+	SPO_TABLAT,
+	SPO_TBLPTRL,
+	SPO_TBLPTRH,
+	SPO_TBLPTRU,
+	SPO_LAST
+};
+
+/* Return the unique symbol_t for the given string. */
+static symbol_t symFromStr (const char *str) {
+  hash_t hash;
+  char *res;
+  symbol_t sym;
+
+  if (!map_symToStr) {
+    int i;
+    map_strToSym = newHashTable (128);
+    map_symToStr = newHashTable (128);
+
+    struct { char *name; symbol_t sym; } predefsyms[] = {
+	{"WREG", SPO_WREG},
+	{"STATUS", SPO_STATUS},
+	{"PRODL", SPO_PRODL},
+	{"PRODH", SPO_PRODH},
+	{"INDF0", SPO_INDF0},
+	{"POSTDEC0", SPO_POSTDEC0},
+	{"POSTINC0", SPO_POSTINC0},
+	{"PREINC0", SPO_PREINC0},
+	{"PLUSW0", SPO_PLUSW0},
+	{"INDF1", SPO_INDF1},
+	{"POSTDEC1", SPO_POSTDEC1},
+	{"POSTINC1", SPO_POSTINC1},
+	{"PREINC1", SPO_PREINC1},
+	{"PLUSW1", SPO_PLUSW1},
+	{"INDF2", SPO_INDF2},
+	{"POSTDEC2", SPO_POSTDEC2},
+	{"POSTINC2", SPO_POSTINC2},
+	{"PREINC2", SPO_PREINC2},
+	{"PLUSW2", SPO_PLUSW2},
+	{"STKPTR", SPO_STKPTR},
+	{"TOSL", SPO_TOSL},
+	{"TOSH", SPO_TOSH},
+	{"TOSU", SPO_TOSU},
+	{"BSR", SPO_BSR},
+	{"FSR0L", SPO_FSR0L},
+	{"FSR0H", SPO_FSR0H},
+	{"FSR1L", SPO_FSR1L},
+	{"FSR1H", SPO_FSR1H},
+	{"FSR2L", SPO_FSR2L},
+	{"FSR2H", SPO_FSR2H},
+	{"PCL", SPO_PCL},
+	{"PCLATH", SPO_PCLATH},
+	{"PCLATU", SPO_PCLATU},
+	{"TABLAT", SPO_TABLAT},
+	{"TBLPTRL", SPO_TBLPTRL},
+	{"TBLPTRH", SPO_TBLPTRH},
+	{"TBLPTRU", SPO_TBLPTRU},
+	{NULL, 0}
+    };
+
+    for (i=0; predefsyms[i].name; i++) {
+      char *name;
+
+      /* enter new symbol */
+      sym = predefsyms[i].sym;
+      name = predefsyms[i].name;
+      res = Safe_strdup (name);
+      hash = symbolHash (name, 0);
+
+      hTabAddItemLong (&map_strToSym, hash, res, INT_TO_PTR(sym));
+      hTabAddItemLong (&map_symToStr, sym % map_symToStr->size, INT_TO_PTR(sym), res);
+    } // for i
+  }
+
+  hash = symbolHash (str, 0) % map_strToSym->size;
+  
+  /* find symbol in table */
+  sym = PTR_TO_INT(hTabFindByKey (map_strToSym, hash, str, &symcmp));
+  if (sym) {
+    //fprintf (stderr, "found symbol %u for %s\n", sym, str);
+    return sym;
+  }
+
+  /* enter new symbol */
+  sym = nextSymbol++;
+  res = Safe_strdup (str);
+
+  hTabAddItemLong (&map_strToSym, hash, res, INT_TO_PTR(sym));
+  hTabAddItemLong (&map_symToStr, sym % map_symToStr->size, INT_TO_PTR(sym), res);
+
+  //fprintf (stderr, "created symbol %u for %s\n", sym, res);
+  
+  return sym;
+}
+
+#if 1
+static const char *strFromSym (symbol_t sym) {
+  return (const char *) hTabFindByKey (map_symToStr, sym % map_symToStr->size, INT_TO_PTR(sym), &ptrcmp);
+}
+#endif
+
+/* ======================================================================== */
+/* === DEFINITION MAP HANDLING ============================================ */
+/* ======================================================================== */
+
+/* A defmap provides information about which symbol is defined by which pCode.
+ * The most recent definitions are prepended to the list, so that the most
+ * recent definition can be found by forward scanning the list.
+ * pc2: MOVFF r0x00, r0x01
+ * pc1: INCF r0x01
+ * head --> ("r0x01",pc1,42) --> ("STATUS",pc1,44) --> ("r0x01",pc2,28) --> NULL
+ *
+ * We attach one defmap to each flow object, and each pCode will occur at
+ * least once in its flow's defmap (maybe defining the 0 symbol). This can be
+ * used to find definitions for a pCode in its own defmap that precede pCode.
+ */
+
+typedef struct defmap_s {
+  symbol_t sym;			/** symbol this item refers to */
+  union {
+    struct {
+      unsigned int in_mask:8;	/** mask leaving in accessed bits */
+      unsigned int mask:8;	/** mask leaving in modified bits (if isWrite) */
+      int isRead:1;		/** sym/mask is read */
+      int isWrite:1;		/** sym/mask is written */
+    } access;
+    int accessmethod;
+  };
+  pCode *pc;			/** pCode this symbol is refrenced at */
+  valnum_t in_val;		/** valnum_t of symbol's previous value (the one read at pc) */
+  valnum_t val;			/** new unique number for this value (if isWrite) */
+  struct defmap_s *prev, *next;	/** link to previous an next definition */
+} defmap_t;
+
+static defmap_t *defmap_free = NULL;		/** list of unused defmaps */
+static int defmap_free_count = 0;		/** number of released defmap items */
+
+/* Returns a defmap_t with the specified data; this will be the new list head.
+ * next - pointer to the current list head */
+static defmap_t *newDefmap (symbol_t sym, int in_mask, int mask, int isRead, int isWrite, pCode *pc, valnum_t val, defmap_t *next) {
+  defmap_t *map;
+  
+  if (defmap_free) {
+    map = defmap_free;
+    defmap_free = map->next;
+    --defmap_free_count;
+  } else {
+    map = (defmap_t *) Safe_calloc (1, sizeof (defmap_t));
+  }
+  map->sym = sym;
+  map->access.in_mask = (isRead ? (in_mask ? in_mask : 0xFF) : 0x00);
+  map->access.mask = (isWrite ? (mask ? mask : 0xFF) : 0x00);
+  map->access.isRead = (isRead != 0);
+  map->access.isWrite = (isWrite != 0);
+  map->pc = pc;
+  map->in_val = 0;
+  map->val = (isWrite ? val : 0);
+  map->prev = NULL;
+  map->next = next;
+  if (next) next->prev = map;
+  
+  return map;
+}
+
+/* Returns a copy of the single defmap item. */
+static defmap_t *copyDefmap (defmap_t *map) {
+  defmap_t *res = (defmap_t *) Safe_malloc (sizeof (defmap_t));
+  memcpy (res, map, sizeof (defmap_t));
+  res->next = NULL;
+  res->prev = NULL;
+  return res;
+}
+
+/* Check whether item (or an identical one) is already in the chain and add it if neccessary.
+ * item is copied before insertion into chain and therefore left untouched.
+ * Returns 1 iff the item has been inserted into the list, 0 otherwise. */
+static int defmapAddCopyIfNew (defmap_t **head, defmap_t *item) {
+  defmap_t *dummy;
+  dummy = *head;
+  while (dummy && (dummy->sym != item->sym
+			  || dummy->pc != item->pc
+			  || dummy->accessmethod != item->accessmethod
+			  || dummy->val != item->val
+			  || dummy->in_val != item->in_val)) {
+    dummy = dummy->next;
+  } // while
+
+  /* item already present? */
+  if (dummy) return 0;
+  
+  /* otherwise: insert copy of item */
+  dummy = copyDefmap (item);
+  dummy->next = *head;
+  if (*head) (*head)->prev = dummy;
+  *head = dummy;
+
+  return 1;
+}
+
+/* Releases a defmap. This also removes the map from its chain -- update the head manually! */
+static void deleteDefmap (defmap_t *map) {
+  if (!map) return;
+  
+  /* unlink from chain -- fails for the first item (head is not updated!) */
+  if (map->next) map->next->prev = map->prev;
+  if (map->prev) map->prev->next = map->next;
+
+  /* clear map */
+  memset (map, 0, sizeof (defmap_t));
+
+  /* save for future use */
+  map->next = defmap_free;
+  defmap_free = map;
+  ++defmap_free_count;
+}
+
+/* Release all defmaps referenced from map. */
+static void deleteDefmapChain (defmap_t **_map) {
+  defmap_t *map, *next;
+
+  if (!_map) return;
+
+  map = *_map;
+  
+  /* find list head */
+  while (map && map->prev) map = map->prev;
+
+  /* delete all items */
+  while (map) {
+    next = map->next;
+    deleteDefmap (map);
+    map = next;
+  } // while
+
+  *_map = NULL;
+}
+
+/* Free all defmap items. */
+static void freeDefmap (defmap_t **_map) {
+  defmap_t *next;
+  defmap_t *map;
+
+  if (!_map) return;
+
+  map = (*_map);
+  
+  /* find list head */
+  while (map->prev) map = map->prev;
+
+  /* release all items */
+  while (map) {
+    next = map->next;
+    Safe_free (map);
+    map = next;
+  }
+
+  (*_map) = NULL;
+}
+
+/* Returns the most recent definition for the given symbol preceeding pc.
+ * If no definition is found, NULL is returned. 
+ * If pc == NULL the whole list is scanned. */
+static defmap_t *defmapFindDef (defmap_t *map, symbol_t sym, pCode *pc) {
+  defmap_t *curr = map;
+
+  if (pc) {
+    /* skip all definitions up to pc */
+    while (curr && (curr->pc != pc)) curr = curr->next;
+
+    /* pc not in the list -- scan the whole list for definitions */
+    if (!curr) {
+      fprintf (stderr, "pc %p not found in defmap -- scanning whole list for symbol '%s'\n", pc, strFromSym (sym));
+      curr = map;
+    } else {
+      /* skip all definitions performed by pc */
+      while (curr && (curr->pc == pc)) curr = curr->next;
+    }
+  } // if (pc)
+
+  /* find definition for sym */
+  while (curr && (!curr->access.isWrite || (curr->sym != sym))) {
+    curr = curr->next;
+  }
+
+  return curr;
+}
+
+#if 0
+/* Returns the first use (read) of the given symbol AFTER pc.
+ * If no such use is found, NULL is returned.
+ * If pc == NULL the whole list is scanned. */
+static defmap_t *defmapFindUse (defmap_t *map, symbol_t sym, pCode *pc) {
+  defmap_t *curr = map, *prev = NULL;
+  
+  if (pc) {
+    /* skip all definitions up to pc */
+    while (curr && (curr->pc != pc)) { prev = curr; curr = curr->next; }
+
+    /* pc not in the list -- scan the whole list for definitions */
+    if (!curr) {
+      //fprintf (stderr, "pc %p not found in defmap -- scanning whole list for symbol '%s'\n", pc, strFromSym (sym));
+      curr = prev;
+    }
+  } else {
+    /* find end of list */
+    while (curr && curr->next) curr = curr->next;
+  } // if (pc)
+
+  /* find use of sym (scan list backwards) */
+  while (curr && (!curr->access.isRead || (curr->sym != sym))) curr = curr->prev;
+
+  return curr;
+}
+#endif
+
+/* Return the defmap entry for sym AT pc. 
+ * If none is found, NULL is returned.
+ * If more than one entry is found an assertion is triggered. */
+static defmap_t *defmapCurr (defmap_t *map, symbol_t sym, pCode *pc) {
+  defmap_t *res = NULL;
+
+  /* find entries for pc */
+  while (map && map->pc != pc) map = map->next;
+
+  /* find first entry for sym @ pc */
+  while (map && map->pc == pc && map->sym != sym) map = map->next;
+
+  /* no entry found */
+  if (!map) return NULL;
+
+  /* check for more entries */
+  res = map;
+  map = map->next;
+  while (map && map->pc == pc) {
+    /* more than one entry for sym @ pc found? */
+    assert (map->sym != sym);
+    map = map->next;
+  }
+
+  /* return single entry for sym @ pc */
+  return res;
+}
+
+/* Modifies the definition of sym at pCode to newval.
+ * Returns 0 on success, 1 if no definition of sym in pc has been found.
+ */
+static int defmapUpdate (defmap_t *map, symbol_t sym, pCode *pc, valnum_t newval) {
+  defmap_t *m  = map;
+
+  /* find definitions of pc */
+  while (m && m->pc != pc) m = m->next;
+
+  /* find definition of sym at pc */
+  while (m && m->pc == pc && (!m->access.isWrite || (m->sym != sym))) m = m->next;
+  
+  /* no definition found */
+  if (!m) return 1;
+
+  /* redefine */
+  m->val = newval;
+
+  /* update following uses of sym */
+  while (m && m->pc == pc) m = m->prev;
+  while (m) {
+    if (m->sym == sym) {
+      m->in_val = newval;
+      if (m->access.isWrite) m = NULL;
+    } // if
+    if (m) m = m->prev;
+  } // while
+  
+  return 0;
+}
+
+/* ======================================================================== */
+/* === STACK ROUTINES ===================================================== */
+/* ======================================================================== */
+
+typedef struct stack_s {
+  void *data;
+  struct stack_s *next;
+} stackitem_t;
+
+typedef stackitem_t *stack_t;
+static stackitem_t *free_stackitems = NULL;
+
+/* Create a stack with one item. */
+static stack_t *newStack () {
+  stack_t *s = (stack_t *) Safe_malloc (sizeof (stack_t));
+  *s = NULL;
+  return s;
+}
+
+/* Remove a stack -- its items are only marked free. */
+static void deleteStack (stack_t *s) {
+  stackitem_t *i;
+
+  while (*s) {
+    i = *s;
+    *s = (*s)->next;
+    i->next = free_stackitems;
+    free_stackitems = i;
+  } // while
+  Safe_free (s);
+}
+
+/* Release all stackitems. */
+static void releaseStack () {
+  stackitem_t *i;
+  
+  while (free_stackitems) {
+    i = free_stackitems->next;
+    Safe_free(free_stackitems);
+    free_stackitems = i;
+  } // while
+}
+
+static void stackPush (stack_t *stack, void *data) {
+  stackitem_t *i;
+  
+  if (free_stackitems) {
+    i = free_stackitems;
+    free_stackitems = free_stackitems->next;
+  } else {
+    i = (stackitem_t *) Safe_calloc (1, sizeof (stackitem_t));
+  }
+  i->data = data;
+  i->next = *stack;
+  *stack = i;
+}
+
+static void *stackPop (stack_t *stack) {
+  void *data;
+  stackitem_t *i;
+  
+  if (stack && *stack) {
+    data = (*stack)->data;
+    i = *stack;
+    *stack = (*stack)->next;
+    i->next = free_stackitems;
+    free_stackitems = i;
+    return data;
+  } else {
+    return NULL;
+  }
+}
+
+#if 0
+static int stackContains (stack_t *s, void *data) {
+  stackitem_t *i;
+  if (!s) return 0;
+  i = *s;
+  while (i) {
+    if (i->data == data) return 1;
+    i = i->next;
+  } // while
+
+  /* not found */
+  return 0;
+}
+#endif
+
+static int stackIsEmpty (stack_t *s) {
+  return (*s == NULL);
+}
+
+
+typedef struct {
+  pCodeFlow *flow;
+  defmap_t *lastdef;
+} state_t;
+
+static state_t *newState (pCodeFlow *flow, defmap_t *lastdef) {
+  state_t *s = (state_t *) Safe_calloc (1, sizeof (state_t));
+  s->flow = flow;
+  s->lastdef = lastdef;
+  return s;
+}
+
+static void deleteState (state_t *s) {
+  Safe_free (s);
+}
+
+static int stateIsNew (state_t *state, stack_t *todo, stack_t *done) {
+  stackitem_t *i;
+
+  /* scan working list for state */
+  if (todo) {
+    i = *todo;
+    while (i) {
+      /* is i == state? -- state not new */
+      if ((((state_t *) (i->data))->flow == state->flow) && (((state_t *) (i->data))->lastdef == state->lastdef)) return 0;
+      i = i->next;
+    } // while
+  }
+
+  if (done) {
+    i = *done;
+    while (i) {
+      /* is i == state? -- state not new */
+      if ((((state_t *) (i->data))->flow == state->flow) && (((state_t *) (i->data))->lastdef == state->lastdef)) return 0;
+      i = i->next;
+    } // while
+  }
+
+  /* not found -- state is new */
+  return 1;
+}
+
+static inline valnum_t newValnum ();
+
+const char *pic16_pBlockGetFunctionName (pBlock *pb) {
+  pCode *pc;
+
+  if (!pb) return "<unknown function>";
+
+  pc = pic16_findNextpCode (pb->pcHead, PC_FUNCTION);
+  if (pc && isPCF(pc)) return PCF(pc)->fname;
+  else return "<unknown function>";
+}
+
+static defmap_t *pic16_pBlockAddInval (pBlock *pb, symbol_t sym) {
+  defmap_t *map;
+  pCodeFlow *pcfl;
+
+  pcfl = PCI(pic16_findNextInstruction (pb->pcHead))->pcflow;
+
+  /* find initial value (assigning pc == NULL) */
+  map = PCFL(pcfl)->in_vals;
+  while (map && map->sym != sym) map = map->next;
+
+  /* initial value already present? */
+  if (map) {
+    //fprintf (stderr, "found init value for sym %s (%x): %u\n", strFromSym(sym), sym, map->val);
+    return map;
+  }
+
+  /* create a new initial value */
+  map = newDefmap (sym, 0x00, 0xff, 0, 1, NULL, newValnum(), PCFL(pcfl)->in_vals);
+  PCFL(pcfl)->in_vals = map;
+  //fprintf (stderr, "Created init value for sym %s (%x): %u\n", strFromSym(sym), sym, map->val);
+  return map;
+
+#if 0
+  /* insert map as last item in pcfl's defmap */
+  if (!prev) prev = PCFL(pcfl)->defmap;
+  if (!prev) {
+    PCFL(pcfl)->defmap = map;
+  } else {
+    while (prev->next) prev = prev->next;
+    prev->next = map;
+    map->prev = prev;
+  }
+
+  return map;
+#endif
+}
+
+/* Find all reaching definitions for sym at pc. 
+ * A new (!) list of definitions is returned.
+ * Returns the number of reaching definitions found.
+ * The defining defmap entries are returned in *chain.
+ */
+static int defmapFindAll (symbol_t sym, pCode *pc, defmap_t **chain) {
+  defmap_t *map;
+  defmap_t *res;
+
+  pCodeFlow *curr;
+  pCodeFlowLink *succ;
+  state_t *state;
+  stack_t *todo;	/** stack of state_t */
+  stack_t *done;	/** stack of state_t */
+
+  int firstState, n_defs;
+  
+  assert (pc && isPCI(pc) && PCI(pc)->pcflow);
+  assert (chain);
+
+  /* initialize return list */
+  *chain = NULL;
+
+  /* wildcard symbol? */
+  if (!sym) return 0;
+  
+  //fprintf (stderr, "Searching definition of sym %s(%x) @ pc %p(%p)\n", strFromSym(sym), sym, pc, pc->pb);
+  
+  map = PCI(pc)->pcflow->defmap;
+
+  res = defmapFindDef (map, sym, pc);
+  //if (res) fprintf (stderr, "found def in own flow @ pc %p\n", res->pc);
+
+#define USE_PRECALCED_INVALS 1
+#if USE_PRECALCED_INVALS
+  if (!res && PCI(pc)->pcflow->in_vals) {
+    res = defmapFindDef (PCI(pc)->pcflow->in_vals, sym, NULL);
+    if (res) {
+      //fprintf  (stderr, "found def in init values\n");
+      df_findall_in_vals++;
+    }
+  }
+#endif
+
+  if (res) {
+    // found a single definition (in pc's flow)
+    //fprintf (stderr, "unique definition for %s @ %p found @ %p (val: %x)\n", strFromSym(sym), pc, res->pc, res->val);
+    defmapAddCopyIfNew (chain, res);
+    df_findall_sameflow++;
+    return 1;
+  }
+
+#if USE_PRECALCED_INVALS
+  else {
+    defmapAddCopyIfNew (chain, pic16_pBlockAddInval (pc->pb, sym));
+    return 1;
+  }
+
+#endif
+  
+#define FORWARD_FLOW_ANALYSIS 1
+#if defined FORWARD_FLOW_ANALYSIS && FORWARD_FLOW_ANALYSIS
+  /* no definition found in pc's flow preceeding pc */
+  todo = newStack ();
+  done = newStack ();
+  n_defs = 0; firstState = 1;
+  stackPush (todo, newState (PCI(pic16_findNextInstruction(pc->pb->pcHead))->pcflow, res));
+
+  while (!stackIsEmpty (todo)) {
+    state = (state_t *) stackPop (todo);
+    stackPush (done, state);
+    curr = state->flow;
+    res = state->lastdef;
+    //fprintf (stderr, "searching def of sym %s in pcFlow %p (lastdef %x @ %p)\n", strFromSym(sym), curr, res ? res->val : 0, res ? res->pc : NULL);
+
+    /* there are no definitions BEFORE pc in pc's flow (see above) */
+    if (curr == PCI(pc)->pcflow) {
+      if (!res) {
+	//fprintf (stderr, "symbol %s(%x) might be used uninitialized at %p\n", strFromSym(sym), sym, pc);
+	res = pic16_pBlockAddInval (pc->pb, sym);
+	if (defmapAddCopyIfNew (chain, res)) n_defs++;
+	res = NULL;
+      } else {
+        //fprintf (stderr, "reaching definition for %s @ %p found @ %p (val: %x)\n", strFromSym(sym), pc, res->pc, res->val);
+        if (defmapAddCopyIfNew (chain, res)) n_defs++;
+      }
+    }
+
+    /* save last definition of sym in this flow as initial def in successors */
+    res = defmapFindDef (curr->defmap, sym, NULL);
+    if (!res) res = state->lastdef;
+    
+    /* add successors to working list */
+    state = newState (NULL, NULL);
+    succ = (pCodeFlowLink *) setFirstItem (curr->to);
+    while (succ) {
+      //fprintf (stderr, "  %p --> %p with %x\n", curr, succ->pcflow, res ? res->val : 0);
+      state->flow = succ->pcflow;
+      state->lastdef = res;
+      if (stateIsNew (state, todo, done)) {
+        stackPush (todo, state);
+        state = newState (NULL, NULL);
+      } // if
+      succ = (pCodeFlowLink *) setNextItem (curr->to);
+    } // while
+    deleteState (state);
+  } // while
+
+#else // !FORWARD_FLOW_ANALYSIS 
+
+  /* no definition found in pc's flow preceeding pc */
+  todo = newStack ();
+  done = newStack ();
+  n_defs = 0; firstState = 1;
+  stackPush (todo, newState (PCI(pc)->pcflow, res));
+
+  while (!stackIsEmpty (todo)) {
+    state = (state_t *) stackPop (todo);
+    curr = state->flow;
+
+    if (firstState) {
+      firstState = 0;
+      /* only check predecessor flows */
+    } else {
+      /* get (last) definition of sym in this flow */
+      res = defmapFindDef (curr->defmap, sym, NULL);
+    }
+
+    if (res) {
+      /* definition found */
+      //fprintf (stderr, "reaching definition for %s @ %p found @ %p (val: %x)\n", strFromSym(sym), pc, res->pc, res->val);
+      if (defmapAddCopyIfNew (chain, res)) n_defs++;
+    } else {
+      /* no definition found -- check predecessor flows */
+      state = newState (NULL, NULL);
+      succ = (pCodeFlowLink *) setFirstItem (curr->from);
+
+      /* if no flow predecessor available -- sym might be uninitialized */
+      if (!succ) {
+        //fprintf (stder, "sym %s might be used uninitialized at %p\n", strFromSym (sym), pc);
+        res = newDefmap (sym, 0xff, 0, 1, NULL, 0, *chain);
+	if (defmapAddCopyIfNew (chain, res)) n_defs++;
+	deleteDefmap (res); res = NULL;
+      }
+      
+      while (succ) {
+        //fprintf (stderr, "  %p --> %p with %x\n", curr, succ->pcflow, res ? res->val : 0);
+        state->flow = succ->pcflow;
+        state->lastdef = res;
+        if (stateIsNew (state, todo, done)) {
+          stackPush (todo, state);
+          state = newState (NULL, NULL);
+        } // if
+        succ = (pCodeFlowLink *) setNextItem (curr->from);
+      } // while
+      deleteState (state);
+    }
+  } // while
+
+#endif
+
+  /* clean up done stack */
+  while (!stackIsEmpty(done)) {
+    deleteState ((state_t *) stackPop (done));
+  } // while
+  deleteStack (done);
+
+  /* return number of items in result set */
+  if (n_defs == 0) {
+    //fprintf (stderr, "sym %s might be used uninitialized at %p\n", strFromSym (sym), pc);
+  } else if (n_defs == 1) {
+    assert (*chain);
+    //fprintf (stderr, "sym %s at %p always defined as %x @ %p\n", strFromSym(sym), pc, (*chain)->val, (*chain)->pc);
+  } else if (n_defs > 0) {
+    //fprintf (stderr, "%u definitions for sym %s at %p found:\n", n_defs, strFromSym(sym), pc);
+#if 0
+    res = *chain;
+    while (res) {
+      fprintf (stderr, "  as %4x @ %p\n", res->val, res->pc);
+      res = res->next;
+    } // while
+#endif
+  }
+  //fprintf (stderr, "%u definitions for sym %s at %p found\n", n_defs, strFromSym(sym), pc);
+  df_findall_otherflow++;
+  return n_defs;
+}
+
+/* ======================================================================== */
+/* === VALUE NUMBER HANDLING ============================================== */
+/* ======================================================================== */
+
+static valnum_t nextValnum = 0x1000;
+static hTab *map_symToValnum = NULL;
+
+/** Return a new value number. */
+static inline valnum_t newValnum () {
+  return (nextValnum += 4);
+}
+
+static valnum_t valnumFromStr (const char *str) {
+  symbol_t sym;
+  valnum_t val;
+  void *res;
+  
+  sym = symFromStr (str);
+
+  if (!map_symToValnum) {
+    map_symToValnum = newHashTable (128);
+  } // if
+
+  /* literal already known? */
+  res = hTabFindByKey (map_symToValnum, sym % map_symToValnum->size, INT_TO_PTR(sym), &ptrcmp);
+
+  /* return existing valnum */
+  if (res) return (valnum_t) PTR_TO_INT(res);
+  
+  /* create new valnum */
+  val = newValnum();
+  hTabAddItemLong (&map_symToValnum, sym % map_symToValnum->size, INT_TO_PTR(sym), INT_TO_PTR(val));
+  return val;
+}
+
+/* Create a valnum for a literal. */
+static valnum_t valnumFromLit (unsigned int lit) {
+  return ((valnum_t) 0x100 + (lit & 0x0FF));
+}
+
+/* Return the (positive) literal value represented by val
+ * or -1 iff val is no known literal's valnum. */
+static int litFromValnum (valnum_t val) {
+  if (val >= 0x100 && val < 0x200) {
+    /* valnum is a (known) literal */
+    return val & 0x00FF;
+  } else {
+    /* valnum is not a known literal */
+    return -1;
+  }
+}
+
+#if 0
+/* Sanity check - all flows in a block must be reachable from initial flow. */
+static int verifyAllFlowsReachable (pBlock *pb) {
+  set *reached;
+  set *flowInBlock;
+  set *checked;
+  pCode *pc;
+  pCodeFlow *pcfl;
+  pCodeFlowLink *succ;
+  int res;
+
+  //fprintf (stderr, "%s - started for %s.\n" ,__FUNCTION__, pic16_pBlockGetFunctionName (pb));
+
+  reached = NULL;
+  flowInBlock = NULL;
+  checked = NULL;
+  /* mark initial flow as reached (and "not needs to be reached") */
+  pc = pic16_findNextpCode (pb->pcHead, PC_FLOW);
+  assert (pc);
+  addSetHead (&reached, pc);
+  addSetHead (&checked, pc);
+  
+  /* mark all further flows in block as "need to be reached" */
+  pc = pb->pcHead;
+  do {
+    if (isPCI(pc)) addSetIfnotP (&flowInBlock, PCI(pc)->pcflow);
+    pc = pic16_findNextInstruction (pc->next);
+  } while (pc);
+
+  while (reached && (pcfl = (pCodeFlow *)indexSet (reached, 0)) != NULL) {
+    /* mark as reached and "not need to be reached" */
+    deleteSetItem (&reached, pcfl);
+    //fprintf (stderr, "%s - checking %p\n" ,__FUNCTION__, pcfl);
+    
+    /* flow is no longer considered unreachable */
+    deleteSetItem (&flowInBlock, pcfl);
+
+    for (succ = setFirstItem (pcfl->to); succ; succ = setNextItem (pcfl->to)) {
+      if (!isinSet (checked, succ->pcflow)) {
+	/* flow has never been reached before */
+        addSetHead (&reached, succ->pcflow);
+        addSetHead (&checked, succ->pcflow);
+      } // if
+    } // for succ
+  } // while
+
+  //fprintf (stderr, "%s - finished\n", __FUNCTION__);
+
+  /* by now every flow should have been reached
+   * --> flowInBlock should be empty */
+  res = (flowInBlock == NULL);
+
+#if 1
+  if (flowInBlock) {
+	  fprintf (stderr, "not all flows reached in %s:\n", pic16_pBlockGetFunctionName (pb));
+    while (flowInBlock) {
+      pcfl = indexSet (flowInBlock, 0);
+      fprintf (stderr, "not reached: flow %p\n", pcfl);
+      deleteSetItem (&flowInBlock, pcfl);
+    } // while
+  }
+#endif
+  
+  /* clean up */
+  deleteSet (&reached);
+  deleteSet (&flowInBlock);
+  deleteSet (&checked);
+  
+  /* if we reached every flow, succ is NULL by now... */
+  //assert (res); // will fire on unreachable code...
+  return (res);
+}
+#endif
+
+/* Checks a flow for accesses to sym AFTER pc.
+ * 
+ * Returns -1 if the symbol is read in this flow (before redefinition),
+ * returns 0 if the symbol is redefined in this flow or
+ * returns a mask [0x01 -- 0xFF] indicating the bits still alive after this flow.
+ */
+int pic16_isAliveInFlow (symbol_t sym, int mask, pCodeFlow *pcfl, pCode *pc) {
+  defmap_t *map, *mappc;
+
+  /* find pc or start of definitions */
+  map = pcfl->defmap;
+  while (map && (map->pc != pc) && map->next) map = map->next;
+  /* if we found pc -- ignore it */
+  while (map && map->pc == pc) map = map->prev;
+
+  /* scan list backwards (first definition first) */
+  while (map && mask) {
+//    if (map->sym == sym) {
+      //fprintf (stderr, "%s: accessing sym %s in pc %p/map %p\n", __FUNCTION__, strFromSym(sym), map->pc, map);
+      mappc = map;
+      /* scan list for reads at this pc first */
+      while (map && map->pc == mappc->pc) {
+	/* is the symbol (partially) read? */
+        if ((map->sym == sym) && (map->access.isRead && ((map->access.in_mask & mask) != 0))) {
+	  //if (sym != SPO_STATUS) fprintf (stderr, "%s: symbol %s read at pc %p\n", __FUNCTION__, strFromSym (sym), map->pc);
+	  return -1;
+	}
+	map = map->prev;
+      } // while
+      map = mappc;
+
+      while (map && map->pc == mappc->pc) {
+	/* honor (partial) redefinitions of sym */
+	if ((map->sym == sym) && (map->access.isWrite)) {
+	  mask &= ~map->access.mask;
+	  //if (sym != SPO_STATUS) fprintf (stderr, "%s: symbol %s redefined at pc %p, alive mask: %x\n", __FUNCTION__, strFromSym (sym), map->pc, mask);
+	}
+	map = map->prev;
+      } // while
+//    } // if
+    /* map already points to the first defmap for the next pCode */
+    //map = mappc->prev;
+  } // while
+
+  /* the symbol is not completely redefined in this flow and not accessed -- symbol
+   * is still alive; return the appropriate mask of alive bits */
+  return mask;
+}
+
+/* Check whether a symbol is alive (AFTER pc). */
+static int pic16_isAlive (symbol_t sym, pCode *pc) {
+  int mask, visit;
+  defmap_t *map;
+  stack_t *todo, *done;
+  state_t *state;
+  pCodeFlow *pcfl;
+  pCodeFlowLink *succ;
+
+  mask = 0x00ff;
+  
+  assert (isPCI(pc));
+  pcfl = PCI(pc)->pcflow;
+  map = pcfl->defmap;
+
+  todo = newStack ();
+  done = newStack ();
+  
+  state = newState (pcfl, (defmap_t *) INT_TO_PTR(mask));
+  stackPush (todo, state);
+  visit = 0;
+  
+  while (!stackIsEmpty (todo)) {
+    state = (state_t *) stackPop (todo);
+    pcfl = state->flow;
+    mask = PTR_TO_INT(state->lastdef);
+    if (visit) stackPush (done, state); else deleteState(state);
+    //fprintf (stderr, "%s: checking flow %p for symbol %s (%x)/%x\n", __FUNCTION__, pcfl, strFromSym(sym), sym, mask);
+    // make sure flows like A(i1,i2,pc,i3,...) --> A with pc reading and writing sym are handled correctly!
+    mask = pic16_isAliveInFlow (sym, mask, pcfl, visit == 0 ? pc : NULL);
+    visit++;
+
+    /* symbol is redefined in flow before use -- not alive in this flow (maybe in others?) */
+    if (mask == 0) continue;
+
+    /* symbol is (partially) read before redefinition in flow */
+    if (mask == -1) break;
+
+    /* symbol is neither read nor completely redefined -- check successor flows */
+    for (succ = setFirstItem(pcfl->to); succ; succ = setNextItem (pcfl->to)) {
+      state = newState (succ->pcflow, (defmap_t *) INT_TO_PTR(mask));
+      if (stateIsNew (state, todo, done)) {
+        stackPush (todo, state);
+      } else {
+	deleteState (state);
+      }
+    } // for
+  } // while
+
+  while (!stackIsEmpty (todo)) deleteState ((state_t *) stackPop (todo));
+  while (!stackIsEmpty (done)) deleteState ((state_t *) stackPop (done));
+
+  /* symbol is read in at least one flow -- is alive */
+  if (mask == -1) return 1;
+
+  /* symbol is read in no flow */
+  return 0;
+}
+
+/* Returns whether access to the given symbol has side effects. */
+static int pic16_symIsSpecial (symbol_t sym) {
+  //fprintf (stderr, "%s: sym=%x\n", __FUNCTION__, sym);
+  switch (sym) {
+  case SPO_INDF0:
+  case SPO_PLUSW0:
+  case SPO_POSTINC0:
+  case SPO_POSTDEC0:
+  case SPO_PREINC0:
+  case SPO_INDF1:
+  case SPO_PLUSW1:
+  case SPO_POSTINC1:
+  case SPO_POSTDEC1:
+  case SPO_PREINC1:
+  case SPO_INDF2:
+  case SPO_PLUSW2:
+  case SPO_POSTINC2:
+  case SPO_POSTDEC2:
+  case SPO_PREINC2:
+  case SPO_PCL:
+	  return 1;
+  default:
+	  /* no special effects known */
+	  return 0;
+  } // switch
+
+  return 0;
+}
+
+/* Check whether a register should be considered local (to the current function) or not. */
+static int pic16_regIsLocal (regs *r) {
+  symbol_t sym;
+  if (r) {
+    sym = symFromStr (r->name);
+    switch (sym) {
+    case SPO_WREG:
+    case SPO_FSR0L: // used in ptrget/ptrput
+    case SPO_FSR0H: // ... as well
+    case SPO_FSR1L: // used as stack pointer...
+    case SPO_FSR1H: // ... as well
+    case SPO_FSR2L: // used as frame pointer
+    case SPO_FSR2H: // ... as well
+    case SPO_PRODL: // used to return values from functions
+    case SPO_PRODH: // ... as well
+      /* these registers (and some more...) are considered local */
+      return 1;
+      break;
+    default:
+      /* for unknown regs: check is marked local, leave if not */
+      if (r->isLocal) {
+        return 1;
+      } else {
+        //fprintf (stderr, "%s: non-local reg used: %s\n", __FUNCTION__, r->name);
+        return 0;
+      }
+    } // switch
+  } // if
+
+  /* if in doubt, assume non-local... */
+  return 0;
+}
+
+/* Check all symbols touched by pc whether their newly assigned values are read.
+ * Returns 0 if no symbol is used later on, 1 otherwise. */
+static int pic16_pCodeIsAlive (pCode *pc) {
+  pCodeInstruction *pci;
+  defmap_t *map, *lastpc;
+  regs *checkreg;
+  
+  /* we can only handle PCIs */
+  if (!isPCI(pc)) return 1;
+
+  //pc->print (stderr, pc);
+
+  pci = PCI(pc);
+  assert (pci && pci->pcflow && pci->pcflow->defmap);
+
+  /* NEVER remove instructions with implicit side effects */
+  switch (pci->op) {
+  case POC_TBLRD:
+  case POC_TBLRD_POSTINC:	/* modify TBLPTRx */
+  case POC_TBLRD_POSTDEC:
+  case POC_TBLRD_PREINC:
+  case POC_TBLWT:		/* modify program memory */
+  case POC_TBLWT_POSTINC:	/* modify TBLPTRx */
+  case POC_TBLWT_POSTDEC:
+  case POC_TBLWT_PREINC:
+  case POC_CLRWDT:		/* clear watchdog timer */
+  case POC_PUSH:		/* should be safe to remove though... */
+  case POC_POP:			/* should be safe to remove though... */
+  case POC_CALL:
+  case POC_RCALL:
+  case POC_RETFIE:
+  case POC_RETURN:
+    //fprintf (stderr, "%s: instruction with implicit side effects not removed: %s\n", __FUNCTION__, pci->mnemonic);
+    return 1;
+
+  default:
+    /* no special instruction */
+    break;
+  } // switch
+
+  /* prevent us from removing assignments to non-local variables */
+  checkreg = NULL;
+  if (PCI(pc)->outCond & PCC_REGISTER) checkreg = pic16_getRegFromInstruction (pc);
+  else if (PCI(pc)->outCond & PCC_REGISTER2) checkreg =  pic16_getRegFromInstruction2(pc);
+
+  if ((PCI(pc)->outCond & (PCC_REGISTER | PCC_REGISTER2)) && !checkreg) {
+    /* assignment to DIRECT operand like "BSF (_global + 1),6" */
+    //fprintf (stderr, "%s: assignment to register detected, but register not available!\n", __FUNCTION__);
+    //pc->print (stderr, pc);
+    return 1;
+  }
+  if ((PCI(pc)->outCond & (PCC_REGISTER | PCC_REGISTER2)) && !pic16_regIsLocal (checkreg)) {
+    //fprintf (stderr, "%s: dest-reg not local %s\n", __FUNCTION__, checkreg ? checkreg->name : "<unknown>");
+    return 1;
+  }
+  
+#if 1
+  /* OVERKILL: prevent us from removing reads from non-local variables 
+   * THIS IS HERE TO AVOID PROBLEMS WITH VOLATILE OPERANDS ONLY! 
+   * Once registers get a "isVolatile" field this might be handled more efficiently... */
+  checkreg = NULL;
+  if (PCI(pc)->inCond & PCC_REGISTER) checkreg = pic16_getRegFromInstruction (pc);
+  else if (PCI(pc)->inCond & PCC_REGISTER2) checkreg =  pic16_getRegFromInstruction2(pc);
+
+  if ((PCI(pc)->inCond & (PCC_REGISTER | PCC_REGISTER2)) && !checkreg) {
+    /* read from DIRECT operand like "BTFSS (_global + 1),6" -- might be volatile */
+    //fprintf (stderr, "%s: read from register detected, but register not available!\n", __FUNCTION__);
+    //pc->print (stderr, pc);
+    return 1;
+  }
+  if ((PCI(pc)->inCond & (PCC_REGISTER | PCC_REGISTER2)) && !pic16_regIsLocal (checkreg)) {
+    //fprintf (stderr, "%s: src-reg not local: %s\n", __FUNCTION__, checkreg ? checkreg->name : "<unknown>");
+    return 1;
+  }
+#endif
+  
+  /* now check that the defined symbols are not used */
+  map = pci->pcflow->defmap;
+  
+  /* find items for pc */
+  while (map && map->pc != pc) map = map->next;
+
+  /* no entries found? something is fishy with DF analysis... -- play safe */
+  if (!map) { fprintf (stderr, "%s: defmap not found\n", __FUNCTION__); return 1; }
+
+  /* remember first item assigned to pc for later use */
+  lastpc = map;
+  
+  /* check all symbols being modified by pc */
+  while (map && map->pc == pc) {
+    if (map->sym == 0) { map = map->next; continue; }
+
+    /* keep pc if it references special symbols (like POSTDEC0) */
+#if 0
+    {
+      char buf[256];
+      pic16_pCode2str (buf, 256, pc);
+      fprintf (stderr, "%s: checking for sym %x(%s) at pc %p (%s)\n", __FUNCTION__, map->sym, strFromSym (map->sym), pc, buf);
+    }
+#endif
+    if (pic16_symIsSpecial (map->sym)) {
+      //fprintf (stderr, "%s: special sym\n", __FUNCTION__);
+      return 1;
+    }
+    if (map->access.isWrite) {
+      if (pic16_isAlive (map->sym, pc)) {
+        //fprintf (stderr, "%s(%s): pCode is alive (sym %s still used)\n", __FUNCTION__, pic16_pBlockGetFunctionName (pc->pb),strFromSym (map->sym));
+	return 1;
+      }
+    }
+    map = map->next;
+  } // while
+
+  /* no use for any of the pc-assigned symbols found -- pCode is dead and can be removed */
+#if 0
+  {
+    char buf[256];
+    pic16_pCode2str (buf, 256, pc);
+    fprintf (stderr, "%s: pCode %p (%s) is dead.\n", __FUNCTION__, pc, buf);
+  }
+#endif
+  return 0;
+}
+
+/* Adds implied operands to the list.
+ * sym - operand being accessed in the pCode
+ * list - list to append the operand
+ * isRead - set to 1 iff sym is read in pCode
+ * listRead - set to 1 iff all operands being read are to be listed
+ *
+ * Returns 0 for "normal" operands, 1 for special operands.
+ */
+static int fixupSpecialOperands (symbol_t sym, int in_mask, int mask, pCode *pc, valnum_t val, defmap_t **list, int isRead, int isWrite) {
+  /* check whether accessing REG accesses other REGs as well */
+  switch (sym) {
+  case SPO_INDF0:
+    /* reads FSR0x */
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR0L, 0xff, 0xff, 1, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR0H, 0xff, 0xff, 1, 0, pc, 0, *list);
+    break;
+    
+  case SPO_PLUSW0:
+    /* reads FSR0x and WREG */
+    *list = newDefmap (SPO_WREG, 0xff, 0x00, 1, 0, pc, 0, *list);
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR0L, 0xff, 0xff, 1, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR0H, 0xff, 0xff, 1, 0, pc, 0, *list);
+    break;
+    
+  case SPO_POSTDEC0:
+  case SPO_POSTINC0:
+  case SPO_PREINC0:
+    /* reads/modifies FSR0x */
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR0L, 0xff, 0xff, 1, 1, pc, newValnum (), *list);
+    *list = newDefmap (SPO_FSR0H, 0xff, 0xff, 1, 1, pc, newValnum (), *list);
+    break;
+
+  case SPO_INDF1:
+    /* reads FSR1x */
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR1L, 0xff, 0xff, 1, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR1H, 0xff, 0xff, 1, 0, pc, 0, *list);
+    break;
+    
+  case SPO_PLUSW1:
+    /* reads FSR1x and WREG */
+    *list = newDefmap (SPO_WREG, 0xff, 0x00, 1, 0, pc, 0, *list);
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR1L, 0xff, 0xff, 1, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR1H, 0xff, 0xff, 1, 0, pc, 0, *list);
+    break;
+    
+  case SPO_POSTDEC1:
+  case SPO_POSTINC1:
+  case SPO_PREINC1:
+    /* reads/modifies FSR1x */
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR1L, 0xff, 0xff, 1, 1, pc, newValnum (), *list);
+    *list = newDefmap (SPO_FSR1H, 0xff, 0xff, 1, 1, pc, newValnum (), *list);
+    break;
+
+  case SPO_INDF2:
+    /* reads FSR2x */
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR2L, 0xff, 0xff, 1, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR2H, 0xff, 0xff, 1, 0, pc, 0, *list);
+    break;
+    
+  case SPO_PLUSW2:
+    /* reads FSR2x and WREG */
+    *list = newDefmap (SPO_WREG, 0xff, 0x00, 1, 0, pc, 0, *list);
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR2L, 0xff, 0xff, 1, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR2H, 0xff, 0xff, 1, 0, pc, 0, *list);
+    break;
+    
+  case SPO_POSTDEC2:
+  case SPO_POSTINC2:
+  case SPO_PREINC2:
+    /* reads/modifies FSR2x */
+    *list = newDefmap (sym, 0xff, 0xff, 0, 0, pc, 0, *list);
+    *list = newDefmap (SPO_FSR2L, 0xff, 0xff, 1, 1, pc, newValnum (), *list);
+    *list = newDefmap (SPO_FSR2H, 0xff, 0xff, 1, 1, pc, newValnum (), *list);
+    break;
+
+  case SPO_PCL:
+    /* modifies PCLATH and PCLATU */
+    *list = newDefmap (SPO_PCL, 0xff, 0xff, isRead, isWrite, pc, newValnum (), *list);
+    if (isRead) {
+      /* reading PCL updates PCLATx */
+      *list = newDefmap (SPO_PCLATH, 0xff, 0xff, 0, 1, pc, newValnum (), *list);
+      *list = newDefmap (SPO_PCLATU, 0xff, 0xff, 0, 1, pc, newValnum (), *list);
+    }
+    if (isWrite) {
+      /* writing PCL implicitly reads PCLATx (computed GOTO) */
+      *list = newDefmap (SPO_PCLATH, 0xff, 0xff, 1, 0, pc, 0, *list);
+      *list = newDefmap (SPO_PCLATU, 0xff, 0xff, 1, 0, pc, 0, *list);
+    }
+    break;
+
+  default:
+    *list = newDefmap (sym, in_mask, mask, isRead, isWrite, pc, val, *list);
+    /* nothing special */
+    return 0;
+    break;
+  }
+
+  /* has been a special operand */
+  return 1;
+}
+
+static symbol_t pic16_fsrsym_idx[][2] = {
+    {SPO_FSR0L, SPO_FSR0H},
+    {SPO_FSR1L, SPO_FSR1H},
+    {SPO_FSR2L, SPO_FSR2H}
+};
+  
+/** Prepend list with the reads and definitions performed by pc. */
+static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
+  pCodeInstruction *pci;
+  int cond, inCond, outCond;
+  int mask = 0xff, smask;
+  int isSpecial, isSpecial2;
+  symbol_t sym, sym2;
+  char *name;
+
+  if (isPCAD(pc)) {
+    /* make sure there is at least one entry for each pc (needed by list traversal routines) */
+    /* TODO: mark this defmap node as an ASMDIR -- any values might be read/modified */
+    fprintf (stderr, "ASMDIRs not supported by data flow analysis!\n");
+    list = newDefmap (0, 0xff, 0xff, 0, 0, pc, 0, list);
+    return list;
+  }
+  assert (isPCI(pc));
+  pci = PCI(pc);
+  
+  /* handle bit instructions */
+  if (pci->isBitInst) {
+    assert (pci->pcop->type == PO_GPR_BIT);
+    mask = 1U << (PCORB(PCI(pc)->pcop)->bit);
+  }
+
+  /* handle (additional) implicit arguments */
+  switch (pci->op) {
+  case POC_LFSR:
+    {
+      int lit;
+      valnum_t val;
+      lit = PCOL(pci->pcop)->lit;
+      assert (lit >= 0 && lit < 3);
+      //fprintf (stderr, "LFSR: %s // %s\n", pci->pcop->name, ((pCodeOpLit2 *)(pci->pcop))->arg2->name);
+      val = valnumFromStr (((pCodeOpLit2 *)(pci->pcop))->arg2->name);
+      //fprintf (stderr, "LFSR lit=%u, symval=%4x\n", lit, val);
+      list = newDefmap (pic16_fsrsym_idx[lit][0], 0x00, 0xff, 0, 1, pc, val, list);
+      list = newDefmap (pic16_fsrsym_idx[lit][1], 0x00, 0xff, 0, 1, pc, val+1, list); // val+1 is guaranteed not be used as a valnum...
+    }
+    break;
+
+  case POC_MOVLB: // BSR
+  case POC_BANKSEL: // BSR
+    list = newDefmap (SPO_BSR, 0x00, 0xff, 0, 1, pc, valnumFromStr (pic16_get_op (((pCodeOpLit2 *)(pci->pcop))->arg2, NULL, 0)), list);
+    break;
+
+  case POC_MULWF: // PRODx
+  case POC_MULLW: // PRODx
+    list = newDefmap (SPO_PRODH, 0x00, 0xff, 0, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_PRODL, 0x00, 0xff, 0, 1, pc, newValnum (), list);
+    break;
+
+  case POC_POP: // TOS, STKPTR
+    list = newDefmap (SPO_STKPTR, 0xff, 0xff, 1, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_TOSL, 0x00, 0xff, 0, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_TOSH, 0x00, 0xff, 0, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_TOSU, 0x00, 0xff, 0, 1, pc, newValnum (), list);
+    break;
+    
+  case POC_PUSH: // STKPTR
+    list = newDefmap (SPO_STKPTR, 0xff, 0xff, 1, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_TOSL, 0xff, 0xff, 0, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_TOSH, 0xff, 0xff, 0, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_TOSU, 0xff, 0xff, 0, 1, pc, newValnum (), list);
+    break;
+    
+  case POC_CALL: // return values (and arguments?): WREG, PRODx, FSR0L
+  case POC_RCALL: // return values (and arguments?): WREG, PRODx, FSR0L
+    list = newDefmap (SPO_WREG, 0xff, 0xff, 1, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_PRODL, 0xff, 0xff, 1, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_PRODH, 0xff, 0xff, 1, 1, pc, newValnum (), list);
+    list = newDefmap (SPO_FSR0L, 0xff, 0xff, 1, 1, pc, newValnum (), list);
+    break;
+
+  case POC_RETLW: // return values: WREG, PRODx, FSR0L
+    /* pseudo read on (possible) return values */
+    // WREG is handled below via outCond
+    list = newDefmap (SPO_PRODL, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_PRODH, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR0L, 0xff, 0x00, 1, 0, pc, 0, list);
+    break;
+
+  case POC_RETURN: // return values; WREG, PRODx, FSR0L
+  case POC_RETFIE: // return value: WREG, PRODx, FSR0L
+    /* pseudo read on (possible) return values */
+    list = newDefmap (SPO_WREG, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_PRODL, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_PRODH, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR0L, 0xff, 0x00, 1, 0, pc, 0, list);
+
+    /* caller's stack pointers must be restored */
+    list = newDefmap (SPO_FSR1L, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR1H, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR2L, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_FSR2H, 0xff, 0x00, 1, 0, pc, 0, list);
+    break;
+    
+  case POC_TBLRD:
+    list = newDefmap (SPO_TBLPTRL, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_TBLPTRH, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_TBLPTRU, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_TABLAT, 0x00, 0xff, 0, 1, pc, newValnum(), list);
+    break;
+    
+  case POC_TBLRD_POSTINC:
+  case POC_TBLRD_POSTDEC:
+  case POC_TBLRD_PREINC:
+    list = newDefmap (SPO_TBLPTRL, 0xff, 0xff, 1, 1, pc, newValnum(), list);
+    list = newDefmap (SPO_TBLPTRH, 0xff, 0xff, 1, 1, pc, newValnum(), list);
+    list = newDefmap (SPO_TBLPTRU, 0xff, 0xff, 1, 1, pc, newValnum(), list);
+    list = newDefmap (SPO_TABLAT, 0x00, 0xff, 0, 1, pc, newValnum(), list);
+    break;
+    
+  case POC_TBLWT:
+    list = newDefmap (SPO_TBLPTRL, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_TBLPTRH, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_TBLPTRU, 0xff, 0x00, 1, 0, pc, 0, list);
+    list = newDefmap (SPO_TABLAT, 0xff, 0x00, 1, 0, pc, 0, list);
+    break;
+    
+  case POC_TBLWT_POSTINC:
+  case POC_TBLWT_POSTDEC:
+  case POC_TBLWT_PREINC:
+    list = newDefmap (SPO_TBLPTRL, 0xff, 0xff, 1, 1, pc, newValnum(), list);
+    list = newDefmap (SPO_TBLPTRH, 0xff, 0xff, 1, 1, pc, newValnum(), list);
+    list = newDefmap (SPO_TBLPTRU, 0xff, 0xff, 1, 1, pc, newValnum(), list);
+    list = newDefmap (SPO_TABLAT, 0xff, 0x00, 1, 0, pc, 0, list);
+    break;
+    
+  default:
+    /* many instruction implicitly read BSR... -- THIS IS IGNORED! */
+    break;
+  } // switch
+
+  /* handle explicit arguments */
+  inCond = pci->inCond;
+  outCond = pci->outCond;
+  cond = inCond | outCond;
+  if (cond & PCC_W) {
+    list = newDefmap (symFromStr ("WREG"), mask, mask, inCond & PCC_W, outCond & PCC_W, pc, newValnum (), list);
+  } // if
+
+  /* keep STATUS read BEFORE STATUS write in the list */
+  if (inCond & PCC_STATUS) {
+    smask = 0;
+    if (inCond & PCC_C) smask |= 1U << PIC_C_BIT;
+    if (inCond & PCC_DC) smask |= 1U << PIC_DC_BIT;
+    if (inCond & PCC_Z) smask |= 1U << PIC_Z_BIT;
+    if (inCond & PCC_OV) smask |= 1U << PIC_OV_BIT;
+    if (inCond & PCC_N) smask |= 1U << PIC_N_BIT;
+
+    list = newDefmap (symFromStr ("STATUS"), smask, 0x00, 1, 0, pc, 0, list);
+    //fprintf (stderr, "pc %p: def STATUS & %02x\n", pc, smask);
+  } // if
+  
+  if (outCond & PCC_STATUS) {
+    smask = 0;
+    if (outCond & PCC_C) smask |= 1U << PIC_C_BIT;
+    if (outCond & PCC_DC) smask |= 1U << PIC_DC_BIT;
+    if (outCond & PCC_Z) smask |= 1U << PIC_Z_BIT;
+    if (outCond & PCC_OV) smask |= 1U << PIC_OV_BIT;
+    if (outCond & PCC_N) smask |= 1U << PIC_N_BIT;
+
+    list = newDefmap (symFromStr ("STATUS"), 0x00, smask, 0, 1, pc, newValnum (), list);
+    //fprintf (stderr, "pc %p: def STATUS & %02x\n", pc, smask);
+  } // if
+  
+  isSpecial = isSpecial2 = 0;
+  sym = sym2 = 0;
+  if (cond & PCC_REGISTER) {
+    name = pic16_get_op (pci->pcop, NULL, 0);
+    sym = symFromStr (name);
+    isSpecial = fixupSpecialOperands (sym, mask, mask, pc, newValnum(), &list, inCond & PCC_REGISTER, outCond & PCC_REGISTER);
+    //fprintf (stderr, "pc %p: def REG %s(%x) & %02x\n", pc, name, sym, mask);
+  }
+
+  if (cond & PCC_REGISTER2) {
+    name = pic16_get_op2 (pci->pcop, NULL, 0);
+    sym2 = symFromStr (name);
+    isSpecial2 = fixupSpecialOperands (sym2, mask, mask, pc, newValnum(), &list, inCond & PCC_REGISTER2, outCond & PCC_REGISTER2);
+    //fprintf (stderr, "pc %p: def REG2 %s(%x) & %02x\n", pc, name, sym2, mask);
+  }
+
+ 
+  /* make sure there is at least one entry for each pc (needed by list traversal routines) */
+  list = newDefmap (0, 0x00, 0x00, 0, 0, pc, 0, list);
+  
+  return list;
+}
+
+#if 0
+static void printDefmap (defmap_t *map) {
+  defmap_t *curr;
+
+  curr = map;
+  fprintf (stderr, "defmap @ %p:\n", curr);
+  while (curr) {
+    fprintf (stderr, "%s%s: %4x|%4x / %02x|%02x, sym %s(%x) @ pc %p\n",
+		    curr->access.isRead ? "R" : " ",
+		    curr->access.isWrite ? "W": " ",
+		    curr->in_val, curr->val,
+		    curr->access.in_mask, curr->access.mask,
+		    strFromSym(curr->sym), curr->sym,
+		    curr->pc);
+    curr = curr->next;
+  } // while
+  fprintf (stderr, "<EOL>\n");
+}
+#endif
+
+/* Add "additional" definitions to uniq.
+ * This can be used to merge the in_values and the flow's defmap to create an in_value-list for the flow's successors.
+ * This can also be used to create a uniq (out)list from a flow's defmap by passing *uniq==NULL.
+ *
+ * If symbols defined in additional are not present in uniq, a definition is created.
+ * Otherwise the present definition is altered to reflect the newer assignments.
+ *
+ * flow: <uniq> --> assign1 --> assign2 --> assign3 --> ... --> <uniq'>
+ *       before     `------- noted in additional --------'      after
+ *
+ * I assume that each symbol occurs AT MOST ONCE in uniq.
+ *
+ */
+static int defmapUpdateUniqueSym (defmap_t **uniq, defmap_t *additional) {
+  defmap_t *curr;
+  defmap_t *old;
+  int change = 0;
+
+  //fprintf (stderr, "%s: merging %p & %p\n", __FUNCTION__, *uniq, additional);
+  /* find tail of additional list (holds the first assignment) */
+  curr = additional;
+  while (curr && curr->next) curr = curr->next;
+
+  /* update uniq */
+  do {
+    /* find next assignment in additionals */
+    while (curr && !curr->access.isWrite) curr = curr->prev;
+
+    if (!curr) break;
+
+    /* find item in uniq */
+    old = *uniq;
+    //printDefmap (*uniq);
+    while (old && (old->sym != curr->sym)) old = old->next;
+
+    if (old) {
+      /* definition found -- replace */
+      if (old->val != curr->val) {
+        old->val = curr->val;
+	change++;
+      } // if
+    } else {
+      /* new definition */
+      *uniq = newDefmap (curr->sym, 0x00, 0xff, 0, 1, NULL, curr->val, *uniq);
+      change++;
+    }
+
+    curr = curr->prev;
+  } while (1);
+
+  /* return 0 iff uniq remained unchanged */
+  return change;
+}
+
+/* Creates the in_value list of a flow by (iteratively) merging the out_value
+ * lists of its predecessor flows. 
+ * Initially *combined should be NULL, alt_in will be copied to combined.
+ * If *combined != NULL, combined will be altered:
+ * - for symbols defined in *combined but not in alt_in,
+ *   *combined is altered to 0 (value unknown, either *combined or INIT).
+ * - for symbols defined in alt_in but not in *combined,
+ *   a 0 definition is created (value unknown, either INIT or alt).
+ * - for symbols defined in both, *combined is:
+ *   > left unchanged if *combined->val == alt_in->val or
+ *   > modified to 0 otherwise (value unknown, either alt or *combined).
+ * 
+ * I assume that each symbol occurs AT MOST ONCE in each list!
+ */
+static int defmapCombineFlows (defmap_t **combined, defmap_t *alt_in, pBlock *pb) {
+  defmap_t *curr;
+  defmap_t *old;
+  int change = 0;
+  valnum_t val;
+
+  //fprintf (stderr, "%s: merging %p & %p\n", __FUNCTION__, *combined, alt_in);
+  
+  if (!(*combined)) {
+    return defmapUpdateUniqueSym (combined, alt_in);
+  } // if
+  
+  /* merge the two */
+  curr = alt_in;
+  while (curr) {
+    /* find symbols definition in *combined */
+    old = *combined;
+    while (old && (old->sym != curr->sym)) old = old->next;
+
+    if (old) {
+      /* definition found */
+      if (old->val && (old->val != curr->val)) {
+        old->val = 0; /* value unknown */
+	change++;
+      }
+    } else {
+      /* no definition found -- can be either INIT or alt_in's value */
+      val = pic16_pBlockAddInval (pb, curr->sym)->val;
+      *combined = newDefmap (curr->sym, 0x00, 0xff, 0, 1, NULL, (val == curr->val) ? val : 0, *combined);
+      if (val != curr->val) change++;
+    }
+
+    curr = curr->next;
+  } // while (curr)
+
+  /* update symbols from *combined that are NOT defined in alt_in -- can be either *combined's value or INIT */
+  old = *combined;
+  while (old) {
+    if (old->val != 0) {
+      /* find definition in alt_in */
+      curr = alt_in;
+      while (curr && curr->sym != old->sym) curr = curr->next;
+      if (!curr) {
+        /* symbol defined in *combined only -- can be either INIT or *combined */
+	val = pic16_pBlockAddInval (pb, old->sym)->val;
+	if (old->val != val) {
+	  old->val = 0;
+	  change++;
+	}
+      } // if
+    } // if
+
+    old = old->next;
+  } // while
+
+  return change;
+}
+
+static int defmapCompareUnique (defmap_t *map1, defmap_t *map2) {
+  defmap_t *curr1, *curr2;
+  symbol_t sym;
+  
+  /* identical maps are equal */
+  if (map1 == map2) return 0;
+
+  if (!map1) return -1;
+  if (!map2) return 1;
+
+  //fprintf (stderr, "%s: comparing %p & %p\n", __FUNCTION__, map1, map2);
+  
+  /* check length */
+  curr1 = map1;
+  curr2 = map2;
+  while (curr1 && curr2) {
+    curr1 = curr1->next;
+    curr2 = curr2->next;
+  } // while
+
+  /* one of them longer? */
+  if (curr1) return 1;
+  if (curr2) return -1;
+
+  /* both lists are of equal length -- compare (in O(n^2)) */
+  curr1 = map1;
+  while (curr1) {
+    sym = curr1->sym;
+    curr2 = map2;
+    while (curr2 && curr2->sym != sym) curr2 = curr2->next;
+    if (!curr2) return 1; // symbol not found in curr2
+    if (curr2->val != curr1->val) return 1; // values differ
+
+    /* compare next symbol */
+    curr1 = curr1->next;
+  } // while
+
+  /* no difference found */
+  return 0;
+}
+
+
+/* Prepare a list of all reaching definitions per flow.
+ * This is done using a forward dataflow analysis.
+ */
+static void createReachingDefinitions (pBlock *pb) {
+  defmap_t *out_vals, *in_vals;
+  pCode *pc;
+  pCodeFlow *pcfl;
+  pCodeFlowLink *link;
+  set *todo;
+  set *blacklist;
+
+  /* initialize out_vals to unique'fied defmaps per pCodeFlow */
+  for (pc = pic16_findNextInstruction (pb->pcHead); pc; pc = pic16_findNextInstruction (pc->next)) {
+    if (isPCFL(pc)) {
+      deleteDefmapChain (&PCFL(pc)->in_vals);
+      deleteDefmapChain (&PCFL(pc)->out_vals);
+      defmapUpdateUniqueSym (&PCFL(pc)->out_vals, PCFL(pc)->defmap);
+    } // if
+  } // for
+  
+  pc = pic16_findNextInstruction (pb->pcHead);
+  todo = NULL; blacklist = NULL;
+  addSetHead (&todo, PCI(pc)->pcflow);
+
+  //fprintf (stderr, "%s: function %s()\n", __FUNCTION__, pic16_pBlockGetFunctionName (pb));
+  while (elementsInSet (todo)) {
+    //fprintf (stderr, "%u items in todo-set\n", elementsInSet (todo));
+    pcfl = PCFL(indexSet (todo, 0));
+    deleteSetItem (&todo, pcfl);
+    //fprintf (stderr, "%s: checking %p\n", __FUNCTION__, pcfl);
+    in_vals = NULL;
+    out_vals = NULL;
+
+    if (isinSet (blacklist, pcfl)) {
+	    fprintf (stderr, "ignoring blacklisted flow\n");
+      continue;
+    }
+    
+    /* create in_vals from predecessors out_vals */
+    link = setFirstItem (pcfl->from);
+    while (link) {
+      defmapCombineFlows (&in_vals, link->pcflow->out_vals, pb);
+      link = setNextItem (pcfl->from);
+    } // while
+
+    //printDefmap (in_vals); 
+    //printDefmap (pcfl->in_vals); 
+
+    if (!pcfl->in_vals || !pcfl->out_vals || defmapCompareUnique (in_vals, pcfl->in_vals)) {
+      //fprintf (stderr, "in_vals changed\n");
+      /* in_vals changed -- update out_vals */
+      deleteDefmapChain (&pcfl->in_vals);
+      pcfl->in_vals = in_vals;
+
+      /* create out_val from in_val and defmap */
+      out_vals = NULL;
+      defmapUpdateUniqueSym (&out_vals, in_vals);
+      defmapUpdateUniqueSym (&out_vals, pcfl->defmap);
+
+      /* is out_vals different from pcfl->out_vals */
+      if (!pcfl->out_vals || defmapCompareUnique (out_vals, pcfl->out_vals)) {
+        //fprintf (stderr, "out_vals changed\n");
+        deleteDefmapChain (&pcfl->out_vals);
+        pcfl->out_vals = out_vals;
+
+	if (pcfl->out_vals == NULL && pcfl->in_vals == NULL) {
+	  addSet (&blacklist, pcfl);
+	} // if
+	
+        /* reschedule all successors */
+        link = setFirstItem (pcfl->to);
+        while (link) {
+	  //fprintf (stderr, "  %p --> %p\n", pcfl, link->pcflow);
+          addSetIfnotP (&todo, link->pcflow);
+	  link = setNextItem (pcfl->to);
+        } // while
+      } else {
+        deleteDefmapChain (&out_vals);	      
+      }// if
+    } else {
+      deleteDefmapChain (&in_vals);	    
+    } // if
+  } // while
+}
+
+#if 0
+static void showAllDefs (symbol_t sym, pCode *pc) {
+  defmap_t *map;
+  int count;
+
+  assert (isPCI(pc));
+  count = defmapFindAll (sym, pc, &map);
+
+  fprintf (stderr, "sym %s(%x) @ %p defined as (val@pc): ", strFromSym(sym), sym, pc);
+  while (map) {
+#if 1
+    fprintf (stderr, "(%x @ %p) ", map->val, map->pc);
+#else
+    { char buf[256];
+    pic16_pCode2str (buf, 256, map->pc);
+    fprintf (stderr, "\n    (%x @ %p(%s)) ", map->val, map->pc, buf);
+#endif
+    map = map->next;
+  }
+  deleteDefmapChain (&map);
+}
+#endif
+
+/* safepCodeUnlink and remove pc from defmap. */
+static int pic16_safepCodeRemove (pCode *pc, char *comment) {
+  defmap_t *map, *next, **head;
+  int res, ispci;
+  
+  ispci = isPCI(pc);
+  map = isPCI(pc) ? PCI(pc)->pcflow->defmap : NULL;
+  head = isPCI(pc) ? &PCI(pc)->pcflow->defmap : NULL;
+  res = pic16_safepCodeUnlink (pc, comment);
+
+  if (res && map) {
+    /* remove pc from defmap */
+    while (map) {
+      next = map->next;
+      if (map->pc == pc) {
+        if (!map->prev && head) *head = map->next;
+        deleteDefmap (map);
+      } // if
+      map = next;
+    }
+  }
+
+  return res;
+}
+      
+void pic16_fixDefmap (pCode *pc, pCode *newpc) {
+  defmap_t *map;
+  /* This breaks the defmap chain's references to pCodes... fix it! */
+  map = PCI(pc)->pcflow->defmap;
+
+  while (map && map->pc != pc) map = map->next;
+  
+  while (map && map->pc == pc) {
+    map->pc = newpc;
+    map = map->next;
+  } // while
+}
+
+void defmapReplaceSymRef (pCode *pc, symbol_t sym, symbol_t newsym) {
+  defmap_t *map;
+  if (!isPCI(pc)) return;
+  
+  map = PCI(pc)->pcflow->defmap;
+
+  while (map && map->pc != pc) map = map->next;
+  while (map && map->pc == pc) {
+    if (map->sym == sym) map->sym = newsym;
+    map = map->next;
+  } // while
+}
+
+/* Assign "better" valnums to results. */
+static void assignValnums (pCode *pc) {
+  pCodeInstruction *pci;
+  pCode *newpc;
+  symbol_t sym1, sym2;
+  int cond, isSpecial1, isSpecial2, count, mask, lit;
+  defmap_t *list, *val, *oldval, *dummy;
+  regs *reg1 = NULL, *reg2 = NULL;
+  valnum_t litnum;
+
+  /* only works for pCodeInstructions... */
+  if (!isPCI(pc)) return;
+
+  pci = PCI(pc);
+  cond = pci->inCond | pci->outCond;
+  list = pci->pcflow->defmap;
+  sym1 = sym2 = isSpecial1 = isSpecial2 = 0;
+
+  if (cond & PCC_REGISTER) {
+    sym1 = symFromStr (pic16_get_op (pci->pcop, NULL, 0));
+    reg1 = pic16_getRegFromInstruction (pc);
+    isSpecial1 = pic16_symIsSpecial (sym1);
+  }
+  if (cond & PCC_REGISTER2) {
+    sym2 = symFromStr (pic16_get_op2 (pci->pcop, NULL, 0));
+    reg2 = pic16_getRegFromInstruction (pc);
+    isSpecial2 = pic16_symIsSpecial (sym2);
+  }
+
+  /* determine input values */
+  val = list;
+  while (val && val->pc != pc) val = val->next;
+  //list = val; /* might save some time later... */
+  while (val && val->pc == pc) {
+    val->in_val = 0;
+    if (val->sym != 0 && (1 || val->access.isRead)) {
+      /* get valnum for sym */
+      count = defmapFindAll (val->sym, pc, &oldval);
+      //fprintf (stderr, "%d defs for sym %s\n", count, strFromSym (val->sym));
+      if (count == 1) {
+	if ((val->access.in_mask & oldval->access.mask) == val->access.in_mask) {
+          val->in_val = oldval->val;
+        } else {
+	  val->in_val = 0;
+        }
+      } else if (count == 0) {
+        /* no definition found */
+	val->in_val = 0;
+      } else {
+	/* multiple definition(s) found -- value not known (unless always the same valnum) */
+	assert (oldval);
+	dummy = oldval->next;
+	mask = oldval->access.mask;
+	val->in_val = oldval->val;
+	while (dummy && (dummy->val == val->in_val)) {
+	  mask &= dummy->access.mask;
+	  dummy = dummy->next;
+	} // while
+
+	/* found other values or to restictive mask */
+	if (dummy || ((mask & val->access.in_mask) != val->access.in_mask)) {
+          val->in_val = 0;
+	}
+      }
+      if (count > 0) deleteDefmapChain (&oldval);
+    } // if
+    val = val->next;
+  }
+
+  /* handle valnum assignment */
+  switch (pci->op) {
+  case POC_CLRF: /* modifies STATUS (Z) */
+    if (!isSpecial1 && pic16_regIsLocal (reg1)) {
+      oldval = defmapCurr (list, sym1, pc);
+      if (oldval && (litFromValnum (oldval->in_val) == 0)) {
+        //fprintf (stderr, "%s: REG (%s) already set up correctly (%x)\n", pci->mnemonic, strFromSym(sym1), oldval->in_val);
+	if (!pic16_isAlive (SPO_STATUS, pc)) pic16_safepCodeRemove (pc, "=DF= redundant CLRF removed");
+      }
+      defmapUpdate (list, sym1, pc, valnumFromLit(0));
+    }
+    break;
+
+  case POC_SETF: /* SETF does not touch STATUS */
+    if (!isSpecial1 && pic16_regIsLocal (reg1)) {
+      oldval = defmapCurr (list, sym1, pc);
+      if (oldval && (litFromValnum (oldval->in_val) == 0x00FF)) {
+        //fprintf (stderr, "%s: REG (%s) already set up correctly (%x)\n", pci->mnemonic, strFromSym(sym1), oldval->in_val);
+	pic16_safepCodeRemove (pc, "=DF= redundant SETF removed");
+      }
+      defmapUpdate (list, sym1, pc, valnumFromLit (0x00FF));
+    }
+    break;
+    
+  case POC_MOVLW: /* does not touch STATUS */
+    oldval = defmapCurr (list, SPO_WREG, pc);
+    if (pci->pcop->type == PO_LITERAL) {
+      //fprintf (stderr, "MOVLW: literal %u\n", PCOL(pci->pcop)->lit);
+      litnum = valnumFromLit ((unsigned char)PCOL(pci->pcop)->lit);
+    } else {
+      //fprintf (stderr, "MOVLW: %s\n", pic16_get_op (pci->pcop, NULL, 0));
+      litnum = valnumFromStr (pic16_get_op (pci->pcop, NULL, 0));
+    }
+    if (oldval && oldval->in_val == litnum) {
+      //fprintf (stderr, "%s: W already set up correctly (%x)\n", PCI(pc)->mnemonic, oldval->in_val);
+      pic16_safepCodeRemove (pc, "=DF= redundant MOVLW removed");
+    }
+    defmapUpdate (list, SPO_WREG, pc, litnum);
+    break;
+
+  case POC_ANDLW: /* modifies STATUS (Z,N) */
+  case POC_IORLW: /* modifies STATUS (Z,N) */
+  case POC_XORLW: /* modifies STATUS (Z,N) */
+    /* can be optimized iff WREG contains a known literal (0x100 - 0x1FF) */
+    if (pci->pcop->type == PO_LITERAL) {
+      lit = (unsigned char) PCOL(pci->pcop)->lit;
+      int vallit = -1;
+      val = defmapCurr (list, SPO_WREG, pc);
+      if (val) vallit = litFromValnum (val->in_val);
+      if (vallit != -1) {
+        /* xxxLW <literal>, WREG contains a known literal */
+	fprintf (stderr, "%s 0x%02x, WREG: 0x%x\n", pci->mnemonic, lit, vallit);
+	if (pci->op == POC_ANDLW) {
+	  lit &= vallit;
+	} else if (pci->op == POC_IORLW) {
+	  lit |= vallit;
+	} else if (pci->op == POC_XORLW) {
+	  lit ^= vallit;
+	} else {
+	  assert (0 && "invalid operation");
+	}
+	if (vallit == lit) {
+	  //fprintf (stderr, "%s: W already set up correctly (%x = val %x)\n", pci->mnemonic, vallit, val->in_val);
+	  if (!pic16_isAlive (SPO_STATUS, pc)) pic16_safepCodeRemove (pc, "=DF= redundant ANDLW/IORLW/XORLW removed");
+	}
+	defmapUpdate (list, SPO_WREG, pc, valnumFromLit (lit));
+      } // if
+    }
+    break;
+
+  case POC_LFSR:
+    {
+      /* check if old value matches new value */
+      int lit;
+      int ok = 1;
+      assert (pci->pcop->type == PO_LITERAL);
+      
+      lit = PCOL(pci->pcop)->lit;
+      
+      val = defmapCurr (list, pic16_fsrsym_idx[lit][0], pc);
+      
+      if (val && (val->in_val != 0) && (val->in_val == val->val)) {
+        fprintf (stderr, "FSR%dL already set up correctly at %p (%x)\n", lit, pc, val->val);
+      } else {
+	/* cannot remove this LFSR */
+	ok = 0;      
+      } // if
+      
+      val = defmapCurr (list, pic16_fsrsym_idx[lit][1], pc);
+      if (val && (val->in_val != 0) && (val->in_val == val->val)) {
+        fprintf (stderr, "FSR%dH already set up correctly at %p (%x)\n", lit, pc, val->val);
+      } else {
+	ok = 0;
+      } // if
+
+      if (ok) {
+	pic16_safepCodeRemove (pc, "=DF= redundant LFSR removed");
+      }
+    }
+    break;
+    
+  case POC_MOVWF: /* does not touch flags */
+    /* find value of WREG */
+    val = defmapCurr (list, SPO_WREG, pc);
+    oldval = defmapCurr (list, sym1, pc);
+    if (val) lit = litFromValnum (val->in_val);
+    else lit = -1;
+    //fprintf (stderr, "MOVWF: lit: %i (%x, %x)\n", lit, lit, val->in_val);
+    
+    if ((lit == 0 || lit == 0x0ff) && !pic16_isAlive (SPO_STATUS, pc)) {
+      /* might replace with CLRF/SETF (will possibly make previous MOVLW 0x00/0xff unneccessary --> dead code elimination) */
+      //fprintf (stderr, "replacing MOVWF with CLRF/SETF\n");
+      if (lit == 0) {
+        newpc = pic16_newpCode (POC_CLRF, pic16_pCodeOpCopy (pci->pcop));
+      } else {
+        assert (lit == 0x0ff);
+        newpc = pic16_newpCode (POC_SETF, pic16_pCodeOpCopy (pci->pcop));
+      }
+      if (pic16_debug_verbose || pic16_pcode_verbose) pic16_InsertCommentAfter (pc->prev, "=DF= MOVWF: replaced by CLRF/SETF");
+      pic16_pCodeReplace (pc, newpc);
+      defmapReplaceSymRef (pc, SPO_WREG, 0);
+      pic16_fixDefmap (pc, newpc);
+      pc = newpc;
+	
+      /* This breaks the defmap chain's references to pCodes... fix it! */
+      if (!val->prev) PCI(pc)->pcflow->defmap = val->next;
+      deleteDefmap (val); // delete reference to WREG as in value
+      val = NULL;
+      oldval = PCI(pc)->pcflow->defmap;
+      while (oldval) {
+        if (oldval->pc == pc) oldval->pc = newpc;
+          oldval = oldval->next;
+      } // while
+    } else if (!isSpecial1 && pic16_regIsLocal (reg1) && val && oldval && (val->in_val != 0) && (val->in_val == oldval->in_val)) {
+      //fprintf (stderr, "MOVWF: F (%s) already set up correctly (%x) at %p\n", strFromSym (sym1), oldval->in_val, pc);
+      pic16_safepCodeRemove (pc, "=DF= redundant MOVWF removed");
+    }
+    if (val) defmapUpdate (list, sym1, pc, val->in_val);
+    break;
+    
+  case POC_MOVFW: /* modifies STATUS (Z,N) */
+    /* find value of REG */
+    if (!isSpecial1 && pic16_regIsLocal (reg1)) {
+      val = defmapCurr (list, sym1, pc);
+      oldval = defmapCurr (list, SPO_WREG, pc);
+      if (val && oldval && (val->in_val != 0) && (val->in_val == oldval->in_val)) {
+	//fprintf (stderr, "MOVFW: W already set up correctly (%x) at %p\n", oldval->in_val, pc);
+	if (!pic16_isAlive (SPO_STATUS, pc)) pic16_safepCodeRemove (pc, "=DF= redundant MOVFW removed");
+      }
+      if (val) defmapUpdate (list, SPO_WREG, pc, val->in_val);
+    }
+    break;
+
+  case POC_MOVFF: /* does not touch STATUS */
+    /* find value of REG */
+    val = defmapCurr (list, sym1, pc);
+    oldval = defmapCurr (list, sym2, pc);
+    if (val) lit = litFromValnum (val->in_val);
+    else lit = -1;
+    newpc = NULL;
+    if (!isSpecial1 && pic16_regIsLocal (reg1) && val && oldval && !pic16_isAlive (SPO_STATUS, pc)) {
+      //pc->print (stderr, pc); fprintf (stderr, "lit: %d (%x, %x)\n", lit, lit, val->in_val);
+      if (lit == 0) {
+        newpc = pic16_newpCode (POC_CLRF, PCOR2(pci->pcop)->pcop2);
+      } else if (lit == 0x00ff) {
+	newpc = pic16_newpCode (POC_SETF, PCOR2(pci->pcop)->pcop2);
+      } else {
+        newpc = NULL;
+      }
+      if (newpc) {
+        pic16_InsertCommentAfter (pc->prev, "=DF= MOVFF: replaced by CRLF/SETF");
+        pic16_df_saved_bytes += PCI(pc)->isize - PCI(newpc)->isize;
+        pic16_pCodeReplace (pc, newpc); 
+        defmapReplaceSymRef (pc, sym1, 0);
+        pic16_fixDefmap (pc, newpc);
+        pc = newpc;
+        break; // do not process instruction as MOVFF...
+      }
+    } else if (!isSpecial1 && !isSpecial2 && pic16_regIsLocal (reg1) && pic16_regIsLocal (reg2)) {
+      if (val && oldval && (val->in_val != 0) && (val->in_val == oldval->in_val)) {
+	//fprintf (stderr, "MOVFF: F2 (%s) already set up correctly (%x) at %p\n", strFromSym (sym2), oldval->in_val, pc);
+        pic16_safepCodeRemove (pc, "=DF= redundant MOVFF removed");
+      } else {
+        if (!pic16_isAlive (sym1, pc)) {
+	  defmap_t *copy = NULL;
+          /* If there is another symbol S storing sym1's value we should assign from S thus shortening the liferange of sym1.
+	   * This should help eliminate
+	   *   MOVFF A,B
+	   *   <do something not changing A or using B>
+	   *   MOVFF B,C
+	   *   <B is not alive anymore>
+	   * and turn it into
+	   *   <do something not changing A or using B>
+	   *   MOVFF A,C
+	   */
+
+	  /* scan defmap for symbols storing sym1's value */
+	  while (oldval && (oldval->pc == pc || oldval->in_val != val->in_val)) oldval = oldval->next;
+	  if (oldval && (oldval->sym != sym1) && defmapFindAll (oldval->sym, pc, &copy) == 1) {
+	    /* unique reaching definition for sym found */
+	    if (copy->val && copy->val == val->in_val) {
+	      //fprintf (stderr, "found replacement symbol for %s (val %x) <-- %s (assigned %x @ %p)\n", strFromSym(sym1), val->in_val, strFromSym(copy->sym), copy->val, copy->pc);
+	      if (copy->sym == SPO_WREG) {
+	        newpc = pic16_newpCode (POC_MOVWF, pic16_pCodeOpCopy (PCOR2(pci->pcop)->pcop2));
+	      } else {
+                newpc = pic16_newpCode(POC_MOVFF, pic16_popGet2p(
+//			/*TODO: change to copy->pc's out symbol*/pic16_pCodeOpCopy (pci->pcop),
+			pic16_pCodeOpCopy (PCI(copy->pc)->pcop),
+			pic16_pCodeOpCopy (PCOR2(pci->pcop)->pcop2)));
+	      }
+	      pic16_InsertCommentAfter (pc->prev, "=DF= MOVFF: SRC op %s replaced by %s", strFromSym(sym1), strFromSym(copy->sym));
+	      pic16_df_saved_bytes += PCI(pc)->isize - PCI(newpc)->isize;
+	      pic16_pCodeReplace (pc, newpc); 
+	      assert (val->sym == sym1 && val->access.isRead && !val->access.isWrite);
+	      defmapReplaceSymRef (pc, sym1, copy->sym);
+	      pic16_fixDefmap (pc, newpc);
+	      pc = newpc;
+	    }
+	  }
+	  deleteDefmapChain (&copy);
+	}
+      }
+      if (val) defmapUpdate (list, sym2, pc, val->in_val);
+    }
+    break;
+
+  default:
+    /* cannot optimize */
+    break;
+  } // switch
+}
+
+static void pic16_destructDF (pBlock *pb) {
+  pCode *pc, *next;
+
+  /* remove old defmaps */
+  pc = pic16_findNextInstruction (pb->pcHead);
+  while (pc) {
+    next = pic16_findNextInstruction (pc->next);
+
+    assert (isPCI(pc) || isPCAD(pc));
+    assert (PCI(pc)->pcflow);
+    deleteDefmapChain (&PCI(pc)->pcflow->defmap);
+    deleteDefmapChain (&PCI(pc)->pcflow->in_vals);
+    deleteDefmapChain (&PCI(pc)->pcflow->out_vals);
+    
+    pc = next;
+  } // while
+  
+  if (defmap_free || defmap_free_count) {
+    //fprintf (stderr, "released defmaps: %u -- freeing up memory\n", defmap_free_count);
+    freeDefmap (&defmap_free);
+    defmap_free_count = 0;
+  }
+}
+
+/* Checks whether a pBlock contains ASMDIRs. */
+static int pic16_pBlockHasAsmdirs (pBlock *pb) {
+  pCode *pc;
+
+  pc = pic16_findNextInstruction (pb->pcHead);
+  while (pc) {
+    if (isPCAD(pc)) return 1;
+
+    pc = pic16_findNextInstruction (pc->next);
+  } // while
+
+  /* no PCADs found */
+  return 0;
+}
+
+#if 1
+/* Remove MOVFF r0x??, POSTDEC1 and MOVFF PREINC1, r0x?? for otherwise unused registers. */
+static int pic16_removeUnusedRegistersDF () {
+  pCode *pc, *pc2;
+  pBlock *pb;
+  regs *reg1, *reg2, *reg3;
+  set *seenRegs = NULL;
+  int cond, i;
+  int islocal, change = 0;
+
+  /* no pBlocks? */
+  if (!the_pFile || !the_pFile->pbHead) return 0;
+  
+  for (pb = the_pFile->pbHead; pb; pb = pb->next) {
+    //fprintf (stderr, "%s: examining function %s\n", __FUNCTION__, pic16_pBlockGetFunctionName (pb));
+#if 1
+    /* find set of using pCodes per register */
+    for (pc = pic16_findNextInstruction (pb->pcHead); pc;
+		    pc = pic16_findNextInstruction(pc->next)) {
+
+      cond = PCI(pc)->inCond | PCI(pc)->outCond;
+      reg1 = reg2 = NULL;
+      if (cond & PCC_REGISTER) reg1 = pic16_getRegFromInstruction (pc);
+      if (cond & PCC_REGISTER2) reg2 = pic16_getRegFromInstruction2 (pc);
+
+      if (reg1) {
+	if (!isinSet (seenRegs, reg1)) reg1->reglives.usedpCodes = NULL;
+        addSetIfnotP (&seenRegs, reg1);
+        addSetIfnotP (&reg1->reglives.usedpCodes, pc);
+      }
+      if (reg2) {
+	if (!isinSet (seenRegs, reg2)) reg2->reglives.usedpCodes = NULL;
+	addSetIfnotP (&seenRegs, reg2);
+        addSetIfnotP (&reg2->reglives.usedpCodes, pc);
+      }
+    } // for pc
+#endif
+    for (reg1 = setFirstItem (seenRegs); reg1; reg1 = setNextItem (seenRegs)) {
+      /* may not use pic16_regIsLocal() here -- in interrupt routines
+       * WREG, PRODx, FSR0x must be saved */
+      islocal = (reg1->isLocal || reg1->rIdx == pic16_framepnt_lo->rIdx || reg1->rIdx == pic16_framepnt_hi->rIdx);
+      if (islocal && elementsInSet (reg1->reglives.usedpCodes) == 2) {
+        pc = pc2 = NULL;
+	for (i=0; i < 2; i++) {
+          pc = (pCode *) indexSet(reg1->reglives.usedpCodes, i);
+	  if (!pc2) pc2 = pc;
+	  if (!isPCI(pc) || !PCI(pc)->op == POC_MOVFF) continue;
+	  reg2 = pic16_getRegFromInstruction (pc);
+	  reg3 = pic16_getRegFromInstruction2 (pc);
+	  if (!reg2 || !reg3
+	      || (reg2->rIdx != pic16_stack_preinc->rIdx
+	          && reg3->rIdx != pic16_stack_postdec->rIdx)) break;
+	  if (i == 1) {
+	    /* both pCodes are MOVFF R,POSTDEC1 / MOVFF PREINC1,R */
+	    //fprintf (stderr, "%s: removing local register %s from %s\n", __FUNCTION__, reg1->name, pic16_pBlockGetFunctionName (pb));
+	    pic16_safepCodeRemove (pc, "removed unused local reg IN");
+	    pic16_safepCodeRemove (pc2, "removed unused local reg OUT");
+	  }
+	} // for
+      } // if
+      deleteSet (&reg1->reglives.usedpCodes);
+    } // for reg1
+
+    deleteSet (&seenRegs);
+  } // for pb
+
+  return change;
+}
+#endif
+
+/* Set up pCodeFlow's defmap_ts. 
+ * Needs correctly set up to/from fields. */
+static void pic16_createDF (pBlock *pb) {
+  pCode *pc, *next;
+  int change=0;
+
+  //fprintf (stderr, "creating DF for pb %p (%s)\n", pb, pic16_pBlockGetFunctionName (pb));
+
+  pic16_destructDF (pb);
+
+  /* check pBlock: do not analyze pBlocks with ASMDIRs (for now...) */
+  if (pic16_pBlockHasAsmdirs (pb)) {
+    //fprintf (stderr, "%s: pBlock contains ASMDIRs -- data flow analysis not performed!\n", __FUNCTION__);
+    return;
+  }
+
+  /* integrity check -- we need to reach all flows to guarantee
+   * correct data flow analysis (reaching definitions, aliveness) */
+#if 0
+  if (!verifyAllFlowsReachable (pb)) {
+    fprintf (stderr, "not all flows reachable -- aborting dataflow analysis for %s!\n", pic16_pBlockGetFunctionName (pb));
+    return;
+  }
+#endif
+  
+  /* establish new defmaps */
+  pc = pic16_findNextInstruction (pb->pcHead);
+  while (pc) {
+    next = pic16_findNextInstruction (pc->next);
+
+    assert (PCI(pc)->pcflow);
+    PCI(pc)->pcflow->defmap = createDefmap (pc, PCI(pc)->pcflow->defmap);
+
+    pc = next;
+  } // while
+
+  //fprintf (stderr, "%s: creating reaching definitions...\n", __FUNCTION__);
+  createReachingDefinitions (pb);
+  
+#if 1
+  /* assign better valnums */
+  //fprintf (stderr, "assigning valnums for pb %p\n", pb);
+  pc = pic16_findNextInstruction (pb->pcHead);
+  while (pc) {
+    next = pic16_findNextInstruction (pc->next);
+
+    assert (PCI(pc)->pcflow);
+    assignValnums (pc);
+
+    pc = next;
+  } // while
+#endif
+
+#if 1
+  /* remove dead pCodes */
+  //fprintf (stderr, "removing dead pCodes in %p (%s)\n", pb, pic16_pBlockGetFunctionName (pb));
+  do {
+    change = 0;
+    pc = pic16_findNextInstruction (pb->pcHead);
+    while (pc) {
+      next = pic16_findNextInstruction (pc->next);
+
+      if (isPCI(pc) && !isPCI_BRANCH(pc) && !pic16_pCodeIsAlive (pc)) {
+        change += pic16_safepCodeRemove (pc, "=DF= removed dead pCode");
+      }
+
+      pc = next;
+    } // while
+  } while (change);
+#endif
+}
+
+
+/* ======================================================================= */
+/* === DEPRECATED CONTROL FLOW CREATION ROUTINES ========================= */
+/* ======================================================================= */
+
+#if 0
+
+/* connect pCode f anf t via their to/from pBranches */
+static void pic16_pCodeLink (pCode *f, pCode *t) {
+  pBranch *br;
+  pCodeInstruction *_f, *_t;
+
+  if (!f || !t) return;
+
+#if 0
+  fprintf (stderr, "linking:\n");
+  f->print(stderr, f);
+  f->print(stderr, t);
+#endif
+
+  assert (isPCI(f) || isPCAD(f));
+  assert (isPCI(t) || isPCAD(t));
+  _f = PCI(f);
+  _t = PCI(t);
+  
+  /* define t to be CF successor of f */
+  br = Safe_malloc (sizeof (pBranch));
+  br->pc = t;
+  br->next = NULL;
+  _f->to = pic16_pBranchAppend (_f->to, br);
+
+  /* define f to be CF predecessor of t */
+  br = Safe_malloc (sizeof (pBranch));
+  br->pc = f;
+  br->next = NULL;
+  _t->from = pic16_pBranchAppend (_t->from, br);
+
+  /* also update pcflow information */
+  if (_f->pcflow && _t->pcflow && _f->pcflow != _t->pcflow) {
+    //fprintf (stderr, "creating flow %p --> %p\n", _f->pcflow, _t->pcflow);
+    LinkFlow_pCode (_f, _t);
+  } // if
+}
+
+static void pic16_destructCF (pBlock *pb) {
+  pCode *pc;
+  pBranch *br;
+
+  /* remove old CF information */
+  pc = pb->pcHead;
+  while (pc) {
+    if (isPCI(pc)) {
+      while (PCI(pc)->to) {
+        br = PCI(pc)->to->next;
+        Safe_free (PCI(pc)->to);
+        PCI(pc)->to = br;
+      } // while
+      while (PCI(pc)->from) {
+        br = PCI(pc)->from->next;
+        Safe_free (PCI(pc)->from);
+        PCI(pc)->from = br;
+      }
+    } else if (isPCFL(pc)) {
+      deleteSet (&PCFL(pc)->to);
+      deleteSet (&PCFL(pc)->from);
+    }
+    pc = pc->next;
+  }
+  
+  releaseStack ();
+}
+
+/* Set up pCodeInstruction's to and from pBranches. */
+static void pic16_createCF (pBlock *pb) {
+  pCode *pc;
+  pCode *next, *dest;
+  char *label;
+
+  //fprintf (stderr, "creating CF for %p\n", pb);
+
+  pic16_destructCF (pb);
+
+  /* check pBlock: do not analyze pBlocks with ASMDIRs (for now...) */
+  if (pic16_pBlockHasAsmdirs (pb)) {
+    //fprintf (stderr, "%s: pBlock contains ASMDIRs -- data flow analysis not performed!\n", __FUNCTION__);
+    return;
+  }
+
+  pc = pic16_findNextInstruction(pb->pcHead);
+  while (pc) {
+    next = pic16_findNextInstruction(pc->next);
+    if (isPCI_SKIP(pc)) {
+      pic16_pCodeLink(pc, next);
+      pic16_pCodeLink(pc, pic16_findNextInstruction(next->next));
+    } else if (isPCI_BRANCH(pc)) {
+      // Bcc, BRA, CALL, GOTO
+      if (PCI(pc)->pcop) {
+        switch (PCI(pc)->pcop->type) {
+        case PO_LABEL:
+	  label = PCOLAB(PCI(pc)->pcop)->pcop.name;
+  	  dest = findLabelinpBlock (pc->pb, PCOLAB(PCI(pc)->pcop));
+          break;
+	
+        case PO_STR:
+	  /* needed for GOTO ___irq_handler */
+	  label = PCI(pc)->pcop->name;
+	  dest = NULL;
+	  break;
+
+        default:
+	  assert (0 && "invalid label format");
+	  break;
+        } // switch
+      } else {
+	label = "NO PCOP";
+        dest = NULL;
+      }
+
+      switch (PCI(pc)->op) {
+      case POC_BRA:
+      case POC_GOTO:
+        if (dest != NULL) { 
+          pic16_pCodeLink(pc, dest);
+	} else {
+          //fprintf (stderr, "jump target \"%s\" not found!\n", label);
+	}
+	break;
+      case POC_CALL:
+      case POC_RETURN:
+      case POC_RETFIE:
+        pic16_pCodeLink(pc, next);
+	break;
+      case POC_BC:
+      case POC_BNC:
+      case POC_BZ:
+      case POC_BNZ:
+      case POC_BN:
+      case POC_BNN:
+      case POC_BOV:
+      case POC_BNOV:
+        if (dest != NULL) { 
+          pic16_pCodeLink(pc, dest);
+	} else {
+          //fprintf (stderr, "jump target \"%s\"not found!\n", label);
+	}
+        pic16_pCodeLink(pc, next);
+        break;
+      default:
+	fprintf (stderr, "BRANCH instruction: %s\n", PCI(pc)->mnemonic);
+	assert (0 && "unhandled branch instruction");
+	break;
+      } // switch
+    } else {
+      pic16_pCodeLink (pc, next);
+    }
+    pc = next;
+  } // while
+}
+#endif
+
+/* ======================================================================== */
+/* === VCG DUMPER ROUTINES ================================================ */
+/* ======================================================================== */
+#if defined (DUMP_DF_GRAPHS) && DUMP_DF_GRAPHS > 0
+hTab *dumpedNodes = NULL;
+
+/** Dump VCG header into of. */
+static void pic16_vcg_init (FILE *of) {
+  /* graph defaults */
+  fprintf (of, "graph:{\n");
+  fprintf (of, "title:\"graph1\"\n");
+  fprintf (of, "label:\"graph1\"\n");
+  fprintf (of, "color:white\n");
+  fprintf (of, "textcolor:black\n");
+  fprintf (of, "bordercolor:black\n");
+  fprintf (of, "borderwidth:1\n");
+  fprintf (of, "textmode:center\n");
+
+  fprintf (of, "layoutalgorithm:dfs\n");
+  fprintf (of, "late_edge_labels:yes\n");
+  fprintf (of, "display_edge_labels:yes\n");
+  fprintf (of, "dirty_edge_labels:yes\n");
+  fprintf (of, "finetuning:yes\n");
+  fprintf (of, "ignoresingles:no\n");
+  fprintf (of, "straight_phase:yes\n");
+  fprintf (of, "priority_phase:yes\n");
+  fprintf (of, "manhattan_edges:yes\n");
+  fprintf (of, "smanhattan_edges:no\n");
+  fprintf (of, "nearedges:no\n");
+  fprintf (of, "node_alignment:center\n"); // bottom|top|center
+  fprintf (of, "port_sharing:no\n");
+  fprintf (of, "arrowmode:free\n"); // fixed|free
+  fprintf (of, "crossingphase2:yes\n");
+  fprintf (of, "crossingoptimization:yes\n");
+  fprintf (of, "edges:yes\n");
+  fprintf (of, "nodes:yes\n");
+  fprintf (of, "splines:no\n");
+  
+  /* node defaults */
+  fprintf (of, "node.color:lightyellow\n");
+  fprintf (of, "node.textcolor:black\n");
+  fprintf (of, "node.textmode:center\n");
+  fprintf (of, "node.shape:box\n");
+  fprintf (of, "node.bordercolor:black\n");
+  fprintf (of, "node.borderwidth:1\n");
+
+  /* edge defaults */
+  fprintf (of, "edge.textcolor:black\n");
+  fprintf (of, "edge.color:black\n");
+  fprintf (of, "edge.thickness:1\n");
+  fprintf (of, "edge.arrowcolor:black\n");
+  fprintf (of, "edge.backarrowcolor:black\n");
+  fprintf (of, "edge.arrowsize:15\n");
+  fprintf (of, "edge.backarrowsize:15\n");
+  fprintf (of, "edge.arrowstyle:line\n"); // none|solid|line
+  fprintf (of, "edge.backarrowstyle:none\n"); // none|solid|line
+  fprintf (of, "edge.linestyle:continuous\n"); // continuous|solid|dotted|dashed|invisible
+  
+  fprintf (of, "\n");
+
+  /* prepare data structures */
+  if (dumpedNodes) {
+    hTabDeleteAll (dumpedNodes);
+    dumpedNodes = NULL;
+  }
+  dumpedNodes = newHashTable (128);
+}
+
+/** Dump VCG footer into of. */
+static void pic16_vcg_close (FILE *of) {
+  fprintf (of, "}\n");
+}
+
+#define BUF_SIZE 128
+#define pcTitle(pc) (snprintf (buf, BUF_SIZE, "n_%p, %p/%u", PCODE(pc), isPCI(pc) ? PCI(pc)->pcflow : NULL, PCODE(pc)->seq), &buf[0])
+
+#if 0
+static int ptrcmp (const void *p1, const void *p2) {
+  return p1 == p2;
+}
+#endif
+
+/** Dump a pCode node as VCG to of. */
+static void pic16_vcg_dumpnode (pCode *pc, FILE *of) {
+  char buf[BUF_SIZE];
+
+  if (hTabFindByKey (dumpedNodes, (((char *) pc - (char *) 0)>>2) % 128, pc, ptrcmp)) {
+    // dumped already
+    return;
+  }
+  hTabAddItemLong (&dumpedNodes, (((char *) pc - (char *) 0)>>2) % 128, pc, pc);
+  //fprintf (stderr, "dumping %p\n", pc);
+ 
+  /* only dump pCodeInstructions and Flow nodes */
+  if (!isPCI(pc) && !isPCAD(pc) && !isPCFL(pc)) return;
+    
+  /* emit node */
+  fprintf (of, "node:{");
+  fprintf (of, "title:\"%s\" ", pcTitle(pc));
+  fprintf (of, "label:\"%s\n", pcTitle(pc));
+  if (isPCFL(pc)) {
+    fprintf (of, "<PCFLOW>");
+  } else if (isPCI(pc) || isPCAD(pc)) {
+    pc->print (of, pc);
+  } else {
+    fprintf (of, "<!PCI>");
+  }
+  fprintf (of, "\" ");
+  fprintf (of, "}\n");
+  
+  if (1 && isPCFL(pc)) {
+    defmap_t *map, *prev;
+    unsigned int i;
+    map = PCFL(pc)->defmap;
+    i=0;
+    while (map) {
+      if (map->sym != 0) {
+        i++;
+      
+        /* emit definition node */
+        fprintf (of, "node:{title:\"%s_def%u\" ", pcTitle(pc), i);
+        fprintf (of, "label:\"");
+
+	prev = map;
+	do {
+          fprintf (of, "%s%c%c: val %4x|%4x & %02x|%02x, sym %s", (prev == map) ? "" : "\n", map->access.isRead ? 'R' : ' ', map->access.isWrite ? 'W' : ' ', map->in_val, map->val, map->access.in_mask, map->access.mask, strFromSym (map->sym));
+	  prev = map;
+	  map = map->next;
+	} while (map && prev->pc == map->pc);
+	map = prev;
+	
+        fprintf (of, "\" ");
+      
+        fprintf (of, "color:green ");
+        fprintf (of, "}\n");
+
+        /* emit edge to previous definition */
+        fprintf (of, "edge:{sourcename:\"%s_def%u\" ", pcTitle(pc), i);
+        if (i == 1) {
+          fprintf (of, "targetname:\"%s\" ", pcTitle(pc));
+        } else {
+          fprintf (of, "targetname:\"%s_def%u\" ", pcTitle(pc), i-1);
+        }
+        fprintf (of, "color:green ");
+        fprintf (of, "}\n");
+
+	if (map->pc) {
+	  pic16_vcg_dumpnode (map->pc, of);
+          fprintf (of, "edge:{sourcename:\"%s_def%u\" ", pcTitle(pc), i);
+          fprintf (of, "targetname:\"%s\" linestyle:dashed color:lightgreen}\n", pcTitle(map->pc));
+	}
+      }
+      map = map->next;
+    } // while
+  }
+
+  /* emit additional nodes (e.g. operands) */
+}
+
+/** Dump a pCode's edges (control flow/data flow) as VCG to of. */
+static void pic16_vcg_dumpedges (pCode *pc, FILE *of) {
+  char buf[BUF_SIZE];
+  pCodeInstruction *pci;
+  pBranch *curr;
+  int i;
+  
+  if (1 && isPCFL(pc)) {
+    /* emit edges to flow successors */
+    void *pcfl;
+    //fprintf (stderr, "PCFLOWe @ %p\n", pc);
+    pcfl = setFirstItem (PCFL(pc)->to);
+    while (pcfl) {
+      pcfl = ((pCodeFlowLink *) (pcfl))->pcflow;
+      pic16_vcg_dumpnode (pc, of);
+      pic16_vcg_dumpnode ((pCode *) pcfl, of);
+      fprintf (of, "edge:{sourcename:\"%s\" ", pcTitle(pc));
+      fprintf (of, "targetname:\"%s\" color:lightred linestyle:dashed}\n", pcTitle(pcfl));
+      pcfl = setNextItem (PCFL(pc)->to);
+    } // while
+  } // if
+  
+  if (!isPCI(pc) && !isPCAD(pc)) return;
+
+  pci = PCI(pc);
+  
+  /* emit control flow edges (forward only) */
+  curr = pci->to;
+  i=0;
+  while (curr) {
+    pic16_vcg_dumpnode (curr->pc, of);
+    fprintf (of, "edge:{");
+    fprintf (of, "sourcename:\"%s\" ", pcTitle(pc));
+    fprintf (of, "targetname:\"%s\" ", pcTitle(curr->pc));
+    fprintf (of, "color:red ");
+    fprintf (of, "}\n");
+    curr = curr->next;
+  } // while
+
+#if 1
+  /* dump "flow" edge (link pCode according to pBlock order) */
+  {
+    pCode *pcnext;
+    pcnext = pic16_findNextInstruction (pc->next);
+    if (pcnext) {
+      pic16_vcg_dumpnode (pcnext, of);
+      fprintf (of, "edge:{sourcename:\"%s\" ", pcTitle(pc));
+      fprintf (of, "targetname:\"%s\" color:red linestyle:solid}\n", pcTitle(pcnext));
+    }
+  }
+#endif
+  
+#if 0
+  /* emit flow */
+  if (pci->pcflow) {
+    pic16_vcg_dumpnode (&pci->pcflow->pc, of);
+    fprintf (of, "edge:{sourcename:\"%s\" ", pcTitle(pc));
+    fprintf (of, "targetname:\"%s\" color:lightblue linestyle:dashed}\n", pcTitle (pci->pcflow));
+  }
+#endif
+  
+  /* emit data flow edges (backward only) */
+  /* TODO: gather data flow information... */
+}
+
+static void pic16_vcg_dump (FILE *of, pBlock *pb) {
+  pCode *pc;
+
+  /* check pBlock: do not analyze pBlocks with ASMDIRs (for now...) */
+  if (pic16_pBlockHasAsmdirs (pb)) {
+    //fprintf (stderr, "%s: pBlock contains ASMDIRs -- data flow analysis not performed!\n", __FUNCTION__);
+    return;
+  }
+
+  for (pc=pb->pcHead; pc; pc = pc->next) {
+    pic16_vcg_dumpnode (pc, of);
+  } // for pc
+  
+  for (pc=pb->pcHead; pc; pc = pc->next) {
+    pic16_vcg_dumpedges (pc, of);
+  } // for pc
+}
+
+static void pic16_vcg_dump_default (pBlock *pb) {
+  FILE *of;
+  char buf[BUF_SIZE];
+  pCode *pc;
+
+  /* get function name */
+  pc = pb->pcHead;
+  while (pc && !isPCF(pc)) pc = pc->next;
+  if (pc) {
+    snprintf (buf, BUF_SIZE, "%s_%s.vcg", PCF(pc)->modname, PCF(pc)->fname);
+  } else {
+    snprintf (buf, BUF_SIZE, "pb_%p.vcg", pb);
+  }
+
+  //fprintf (stderr, "now dumping %s\n", buf);
+  of = fopen (buf, "w");
+  pic16_vcg_init (of);
+  pic16_vcg_dump (of, pb);
+  pic16_vcg_close (of);
+  fclose (of);
+}
+#endif
+
+/*** END of helpers for pCode dataflow optimizations ***/

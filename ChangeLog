@@ -1,3 +1,33 @@
+2005-04-05 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_popCopyReg): made copying work for extended
+	  structs as well (using memcpy)
+	* (genFunction): fixed comparison, used pCodeOpLabel to reduce warning
+	  on ISRs (GOTO has no label)
+	* src/pic16/device.h: added OF_OPTIMIZE_DF
+	* src/pic16/main.c: added compiler switch --optimize-df to enable the
+	  new data flow analysis/optimization
+	* src/pic16/pcode.c: added (prototypes for and implementation of)
+	  dataflow analysis functions, fixed pCodeInstructions' inCond and
+	  outCond values, made RCALL a branch instruction
+	* (pic16_unlinkpCode): keep C line if possible
+	* (pic16_pCodeUnlink): removed cast on left side of assignment, have
+	  C line moved if possible
+	* (pic16_getRegFrompCodeOp): NEW, improved version of...
+	* (pic16_getRegFromInstruction,pic16_getRegFromInstruction2): changed
+	  to use new pic16_getRegFrompCodeOp (works for more SFRs)
+	* (pic16_BuildFlow): fixed skip instructions with label (did not start
+	  new flow)
+	* (pic16_getJumptabpCode): NEW, needed in...
+	* (LinkFlow): fixed handling of jumptables, calls and conditional
+	  branches
+	* (pic16_InsertCommentAfter): NEW
+	* (pic16_pCodeReplace): made verbose and flow preserving
+	* (AnalyzeFlow): added call to data flow analysis
+	* src/pic16/pcode.h: added defmaps to pCodeFlow struct
+	* src/pic16/pcodeflow.h: added PCC_STATUS to mean all STATUS bits
+	* src/pic16/ralloc.c (packRegsForAssign): added return 1 in the end
+
 2005-04-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): fixed bug #1105626

@@ -381,6 +381,7 @@ _process_pragma(const char *sz)
 
 #define OPTIMIZE_GOTO   "--optimize-goto"
 #define	OPTIMIZE_CMP	"--optimize-cmp"
+#define	OPTIMIZE_DF	"--optimize-df"
 
 char *alt_asm=NULL;
 char *alt_link=NULL;
@@ -423,6 +424,7 @@ OPTION pic16_optionsTable[]= {
 	{ 0,	"--gstack",	&pic16_options.gstack,	"trace stack pointer push/pop to overflow"},
 	{ 0,    OPTIMIZE_GOTO,  NULL,			"try to use (conditional) BRA instead of GOTO"},
 	{ 0,	OPTIMIZE_CMP,	NULL,			"try to optimize some compares"},
+	{ 0,	OPTIMIZE_DF,	NULL,			"thoroughly analyze data flow (memory and time intensive!)"},
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -522,6 +524,11 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
 
     if(ISOPT(OPTIMIZE_CMP)) {
       pic16_options.opt_flags |= OF_OPTIMIZE_CMP;
+      return TRUE;
+    }
+
+    if (ISOPT(OPTIMIZE_DF)) {
+      pic16_options.opt_flags |= OF_OPTIMIZE_DF;
       return TRUE;
     }
     

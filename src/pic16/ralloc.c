@@ -3203,6 +3203,7 @@ pack:
     debugLog("  %d\n", __LINE__ );
     hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
     OP_DEFS (IC_RESULT (dic)) = bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
+    return 1;
 }
 
 

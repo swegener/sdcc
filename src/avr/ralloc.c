@@ -55,38 +55,38 @@ int avr_ptrRegReq;		/* pointer register required */
 
 /* AVR registers */
 regs regsAVR[] = {
-	{REG_GPR, R0_IDX, REG_GPR, "r0", "r0", "", 0, 0, 0},	/* scratch */
-	{REG_GPR, R1_IDX, REG_GPR, "r1", "r1", "", 0, 0, 0},	/* scratch */
-	{REG_GPR, R2_IDX, REG_GPR, "r2", "r2", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R3_IDX, REG_GPR, "r3", "r3", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R4_IDX, REG_GPR, "r4", "r4", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R5_IDX, REG_GPR, "r5", "r5", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R6_IDX, REG_GPR, "r6", "r6", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R7_IDX, REG_GPR, "r7", "r7", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R8_IDX, REG_GPR, "r8", "r8", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R9_IDX, REG_GPR, "r9", "r9", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R10_IDX, REG_GPR, "r10", "r10", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R11_IDX, REG_GPR, "r11", "r11", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R12_IDX, REG_GPR, "r12", "r12", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R13_IDX, REG_GPR, "r13", "r13", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R14_IDX, REG_GPR, "r14", "r14", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R15_IDX, REG_GPR, "r15", "r15", "", 0, 1, 1},	/* gpr */
-	{REG_GPR, R16_IDX, REG_GPR, "r16", "r16", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R17_IDX, REG_GPR, "r17", "r17", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R18_IDX, REG_GPR, "r18", "r18", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R19_IDX, REG_GPR, "r19", "r19", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R20_IDX, REG_GPR, "r20", "r20", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R21_IDX, REG_GPR, "r21", "r21", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R22_IDX, REG_GPR, "r22", "r22", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R23_IDX, REG_GPR, "r23", "r23", "", 0, 1, 0},	/* parm/gpr */
-	{REG_GPR, R24_IDX, REG_GPR, "r24", "r24", "", 0, 0, 0},	/* scratch  */
-	{REG_GPR, R25_IDX, REG_GPR, "r25", "r25", "", 0, 0, 0},	/* scratch */
-	{REG_GPR, R26_IDX, REG_GPR, "r26", "r26", "", 0, 1, 1},	/* used as pointer reg X */
-	{REG_GPR, R27_IDX, REG_GPR, "r27", "r27", "", 0, 1, 1},	/* used as pointer reg X */
-	{REG_GPR, R28_IDX, REG_GPR, "r28", "r28", "", 0, 1, 0},	/* stack frame Y */
-	{REG_GPR, R29_IDX, REG_GPR, "r29", "r29", "", 0, 1, 0},	/* stack frame Y */
-	{REG_GPR, R30_IDX, REG_GPR, "r30", "r30", "", 0, 1, 1},	/* used as pointer reg Z */
-	{REG_GPR, R31_IDX, REG_GPR, "r31", "r31", "", 0, 1, 1},	/* used as pointer reg Z */
+	{REG_GPR|REG_PAIR, R0_IDX, REG_GPR|REG_PAIR, "r0", "r0", "", 0, 0, 0},	/* scratch */
+	{REG_GPR, R1_IDX, REG_GPR	  , "r1", "r1", "", 0, 0, 0},	/* scratch */
+	{REG_GPR|REG_PAIR, R2_IDX, REG_GPR|REG_PAIR, "r2", "r2", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R3_IDX, REG_GPR	  , "r3", "r3", "", 0, 1, 1},	/* gpr */
+	{REG_GPR|REG_PAIR, R4_IDX, REG_GPR|REG_PAIR, "r4", "r4", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R5_IDX, REG_GPR	  , "r5", "r5", "", 0, 1, 1},	/* gpr */
+	{REG_GPR|REG_PAIR, R6_IDX, REG_GPR|REG_PAIR, "r6", "r6", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R7_IDX, REG_GPR	  , "r7", "r7", "", 0, 1, 1},	/* gpr */
+	{REG_GPR|REG_PAIR, R8_IDX, REG_GPR|REG_PAIR, "r8", "r8", "", 0, 1, 1},	/* gpr */
+	{REG_GPR, R9_IDX, REG_GPR	  , "r9", "r9", "", 0, 1, 1},	/* gpr */
+	{REG_GPR|REG_PAIR, R10_IDX,REG_GPR|REG_PAIR, "r10", "r10","",0, 1, 1},	/* gpr */
+	{REG_GPR, R11_IDX,REG_GPR	  , "r11", "r11","",0, 1, 1},	/* gpr */
+	{REG_GPR|REG_PAIR, R12_IDX,REG_GPR|REG_PAIR, "r12", "r12","",0, 1, 1},	/* gpr */
+	{REG_GPR, R13_IDX,REG_GPR	  , "r13", "r13","",0, 1, 1},	/* gpr */
+	{REG_GPR|REG_PAIR, R14_IDX,REG_GPR|REG_PAIR, "r14", "r14","",0, 1, 1},	/* gpr */
+	{REG_GPR, R15_IDX,REG_GPR	  , "r15", "r15","",0, 1, 1},	/* gpr */
+	{REG_GPR|REG_PAIR, R16_IDX,REG_GPR|REG_PAIR, "r16", "r16","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R17_IDX,REG_GPR	  , "r17", "r17","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR|REG_PAIR, R18_IDX,REG_GPR|REG_PAIR, "r18", "r18","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R19_IDX,REG_GPR	  , "r19", "r19","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR|REG_PAIR, R20_IDX,REG_GPR|REG_PAIR, "r20", "r20","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R21_IDX,REG_GPR	  , "r21", "r21","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR|REG_PAIR, R22_IDX,REG_GPR|REG_PAIR, "r22", "r22","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR, R23_IDX,REG_GPR	  , "r23", "r23","",0, 1, 0},	/* parm/gpr */
+	{REG_GPR|REG_PAIR, R24_IDX,REG_GPR|REG_PAIR, "r24", "r24","",0, 0, 0},	/* scratch  */
+	{REG_GPR, R25_IDX,REG_GPR	  , "r25", "r25","",0, 0, 0},	/* scratch */
+	{REG_GPR|REG_PAIR, R26_IDX,REG_GPR|REG_PAIR, "r26", "r26","",0, 1, 1},	/* used as pointer reg X */
+	{REG_GPR, R27_IDX,REG_GPR	  , "r27", "r27","",0, 1, 1},	/* used as pointer reg X */
+	{REG_GPR|REG_PAIR, R28_IDX,REG_GPR|REG_PAIR, "r28", "r28","",0, 1, 0},	/* stack frame Y */
+	{REG_GPR, R29_IDX,REG_GPR	  , "r29", "r29","",0, 1, 0},	/* stack frame Y */
+	{REG_GPR|REG_PAIR, R30_IDX,REG_GPR|REG_PAIR, "r30", "r30","",0, 1, 1},	/* used as pointer reg Z */
+	{REG_GPR, R31_IDX,REG_GPR	  , "r31", "r31","",0, 1, 1},	/* used as pointer reg Z */
 	{REG_PTR, X_IDX, REG_PTR, "X", "X", "", 0, 1, 0},
 	{REG_PTR, Z_IDX, REG_PTR, "Z", "Z", "", 0, 1, 0},
 };
@@ -114,13 +114,42 @@ allocReg (short type)
 					bitVectSetBit (currFunc->regsUsed, i);
 			return &regsAVR[i];
 		}
+
 		/* other wise look for specific type
 		   of register */
-		if (regsAVR[i].isFree && regsAVR[i].type == type) {
+		if (regsAVR[i].isFree && (regsAVR[i].type & type)) {
 			regsAVR[i].isFree = 0;
 			if (currFunc)
 				currFunc->regsUsed =
 					bitVectSetBit (currFunc->regsUsed, i);
+			return &regsAVR[i];
+		}
+	}
+	return NULL;
+}
+
+/*-----------------------------------------------------------------*/
+/* allocRegPair - allocates register pair of given                 */
+/*-----------------------------------------------------------------*/
+static regs *
+allocRegPair (short type)
+{
+	int i;
+
+	for (i = avr_fReg; i < avr_nRegs; i++) {
+
+		/* look for specific type of register pair */
+		if (regsAVR[i].isFree && (regsAVR[i].type & type) 
+		    && (regsAVR[i].type & REG_PAIR) && regsAVR[i+1].isFree) {
+
+			regsAVR[i].isFree = 0;
+			regsAVR[i+1].isFree = 0;
+			if (currFunc) {
+				currFunc->regsUsed =
+					bitVectSetBit (currFunc->regsUsed, i);
+				currFunc->regsUsed =
+					bitVectSetBit (currFunc->regsUsed, i+1);
+			}
 			return &regsAVR[i];
 		}
 	}
@@ -163,7 +192,7 @@ nFreeRegs (int type)
 	int nfr = 0;
 
 	for (i = avr_fReg; i < avr_nRegs; i++)
-		if (regsAVR[i].isFree && regsAVR[i].type == type)
+		if (regsAVR[i].isFree && regsAVR[i].type & type)
 			nfr++;
 	return nfr;
 }
@@ -753,10 +782,14 @@ getRegPtr (iCode * ic, eBBlock * ebp, symbol * sym)
 
       tryAgain:
 	/* try for a ptr type */
-	if ((reg = allocReg (REG_PTR)))
+	if ((reg = allocReg (REG_PTR|REG_PAIR)))
 		return reg;
 
-	/* try for gpr type */
+	/* try for gpr type / pair */
+	if ((reg = allocReg (REG_GPR|REG_PAIR)))
+		return reg;
+
+	/* try for gpr type  */
 	if ((reg = allocReg (REG_GPR)))
 		return reg;
 
@@ -778,11 +811,11 @@ getRegScr (iCode * ic, eBBlock * ebp, symbol * sym)
 	regs *reg;
 
       tryAgain:
-	/* try for a ptr type */
+
+	/* try for a scratch non-pair */	
 	if ((reg = allocReg (REG_SCR)))
 		return reg;
-
-	/* try for gpr type */
+				
 	if ((reg = allocReg (REG_GPR)))
 		return reg;
 
@@ -799,7 +832,7 @@ getRegScr (iCode * ic, eBBlock * ebp, symbol * sym)
 /* getRegGpr - will try for GPR if not spil                        */
 /*-----------------------------------------------------------------*/
 static regs *
-getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym)
+getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym )
 {
 	regs *reg;
 
@@ -876,7 +909,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		    ic->prev->op == IPOP &&
 		    !ic->prev->parmPush &&
 		    !OP_SYMBOL (IC_LEFT (ic->prev))->isspilt)
-				psym = OP_SYMBOL (IC_LEFT (ic->prev));
+			psym = OP_SYMBOL (IC_LEFT (ic->prev));
 
 		if (sym->nRegs) {
 			int i = 0;
@@ -903,25 +936,17 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 			    !bitVectBitValue (_G.regAssigned, result->key) &&
 			    /* the number of free regs + number of regs in this LR
 			       can accomodate the what result Needs */
-			    ((nfreeRegsType (result->regType) +
-			      sym->nRegs) >= result->nRegs)) {
+			    ((nfreeRegsType (result->regType) + sym->nRegs) >= result->nRegs)) {
 
-				for (i = 0; i < result->nRegs; i++)
-					if (i < sym->nRegs)
-						result->regs[i] =
-							sym->regs[i];
-					else if (result->regType == REG_SCR)
-						result->regs[i] =
-							getRegScr (ic, ebp,
-								   result);
+				for (i = 0; i < result->nRegs; i++) {
+					if (i < sym->nRegs) 
+						result->regs[i] = sym->regs[i];
+					else if (result->regType == REG_SCR) 
+						result->regs[i] = getRegScr (ic, ebp, result);
 					else
-						result->regs[i] =
-							getRegGpr (ic, ebp,
-								   result);
-
-				_G.regAssigned =
-					bitVectSetBit (_G.regAssigned,
-						       result->key);
+						result->regs[i] = getRegGpr (ic, ebp, result);
+				}
+				_G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
 
 			}
 
@@ -931,8 +956,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 					if (!symHasReg (psym, sym->regs[i]))
 						freeReg (sym->regs[i]);
 				}
-				else
-					freeReg (sym->regs[i]);
+				else freeReg (sym->regs[i]);
 			}
 		}
 	}
@@ -993,22 +1017,6 @@ willCauseSpill (int nr, int rt)
 }
 
 /*-----------------------------------------------------------------*/
-/* makeRegPair - if two registers then try to make a pair          */
-/*-----------------------------------------------------------------*/
-static void makeRegPair (operand *op)
-{
-	symbol *opsym = OP_SYMBOL(op);
-
-	if (opsym->isspilt || opsym->nRegs != 2)
-		return;	
-	if ((opsym->regs[0] - opsym->regs[1]) == 1) {
-		regs *tmp = opsym->regs[0];
-		opsym->regs[0] = opsym->regs[1];
-		opsym->regs[1] = tmp;
-	}
-}
-
-/*-----------------------------------------------------------------*/
 /* positionRegs - the allocator can allocate same registers to res- */
 /* ult and operand, if this happens make sure they are in the same */
 /* position as the operand otherwise chaos results                 */
@@ -1040,6 +1048,34 @@ positionRegs (symbol * result, symbol * opsym, int lineno)
 		result->regs[j] = tmp;
 		goto again;
 	}	
+}
+
+/*-----------------------------------------------------------------*/
+/* needsPair - heuristic to determine if a pair would be good      */
+/*-----------------------------------------------------------------*/
+static int needsPair (iCode *ic)
+{
+	symbol *sym = OP_SYMBOL(IC_RESULT(ic));
+	bitVect *uses_defs = 
+		bitVectUnion(OP_USES (IC_RESULT(ic)),OP_DEFS(IC_RESULT(ic)));
+	
+	/* if size is less than 2 then NO */
+	if (sym->nRegs < 2) return 0;
+	/* if type Pointer then YES */
+	if (IS_PTR(sym->type)) return 1;
+	
+	/* go thru the usages of this operand if used with 
+	   a constant then yes */
+	while (!bitVectIsZero(uses_defs)) {
+		int ikey = bitVectFirstBit(uses_defs);
+		iCode *uic = hTabItemWithKey(iCodehTab,ikey);
+		sym_link *otype = NULL; 
+		if (!uic) continue;		
+		otype = (IC_RIGHT(uic) ? operandType(IC_RIGHT(uic)) : NULL);
+		if (otype && IS_LITERAL(otype)) return 1;
+		bitVectUnSetBit(uses_defs,ikey);
+	}
+	return 0;	
 }
 
 /*-----------------------------------------------------------------*/
@@ -1091,7 +1127,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				symbol *sym = OP_SYMBOL (IC_RESULT (ic));
 				bitVect *spillable;
 				int willCS;
-				int j;
+				int j=0;
 
 				/* if it does not need or is spilt 
 				   or is already assigned to registers
@@ -1118,26 +1154,18 @@ serialRegAssign (eBBlock ** ebbs, int count)
 					willCauseSpill (sym->nRegs,
 							sym->regType);
 				spillable = computeSpillable (ic);
-				if (sym->remat ||
-				    (willCS && bitVectIsZero (spillable))) {
-
+				if (sym->remat || (willCS && bitVectIsZero (spillable))) {
 					spillThis (sym);
 					continue;
-
 				}
 
 				/* if it has a spillocation & is used less than
 				   all other live ranges then spill this */
 				if (willCS && sym->usl.spillLoc) {
 
-					symbol *leastUsed =
-						leastUsedLR (liveRangesWith
-							     (spillable,
-							      allLRs,
-							      ebbs[i],
-							      ic));
-					if (leastUsed &&
-					    leastUsed->used > sym->used) {
+					symbol *leastUsed = leastUsedLR (liveRangesWith (spillable,
+											 allLRs, ebbs[i], ic));
+					if (leastUsed && leastUsed->used > sym->used) {
 						spillThis (sym);
 						continue;
 					}
@@ -1145,22 +1173,29 @@ serialRegAssign (eBBlock ** ebbs, int count)
 
 				/* we assign registers to it */
 				_G.regAssigned = bitVectSetBit (_G.regAssigned, sym->key);
-
-				for (j = 0; j < sym->nRegs; j++) {
+				if (needsPair(ic)) {
+					int regtype ;
+					regs *preg;
+					if (sym->regType == REG_PTR) regtype = REG_PTR;
+					else if (sym->regType == REG_SCR) regtype = REG_SCR;
+					else regtype = REG_GPR;
+					preg = allocRegPair(regtype);
+					if (preg) {
+						sym->regs[j++] = preg;
+						sym->regs[j++] = &regsAVR[preg->rIdx+1];
+					}
+				}
+				for (; j < sym->nRegs; j++) {
 					if (sym->regType == REG_PTR)
 						sym->regs[j] = getRegPtr (ic, ebbs[i], sym);
 					else if (sym->regType == REG_SCR)
 						sym->regs[j] = getRegScr (ic, ebbs[i], sym);
 					else
 						sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
-
 					/* if the allocation falied which means
 					   this was spilt then break */
-					if (!sym->regs[j])
-						break;
+					if (!sym->regs[j]) break;
 				}
-				/* make the registers a pair */
-				makeRegPair(IC_RESULT(ic));
 
 				/* if it shares registers with operands make sure
 				   that they are in the same position */
@@ -1168,16 +1203,12 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				    OP_SYMBOL (IC_LEFT (ic))->nRegs
 				    && ic->op != '=')
 					positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-						      OP_SYMBOL (IC_LEFT
-								 (ic)),
-						      ic->lineno);
+						      OP_SYMBOL (IC_LEFT (ic)), ic->lineno);
 				/* do the same for the right operand */
 				if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic))
 				    && OP_SYMBOL (IC_RIGHT (ic))->nRegs)
 					positionRegs (OP_SYMBOL (IC_RESULT (ic)),
-						      OP_SYMBOL (IC_RIGHT
-								 (ic)),
-						      ic->lineno);
+						      OP_SYMBOL (IC_RIGHT (ic)), ic->lineno);
 
 			}
 		}
@@ -1392,9 +1423,7 @@ regTypeNum ()
 			   in "data" space */
 
 			if (bitVectnBitsOn (sym->defs) == 1 &&
-			    (ic = hTabItemWithKey (iCodehTab,
-						   bitVectFirstBit (sym->
-								    defs)))
+			    (ic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym-> defs)))
 			    && POINTER_GET (ic) && !IS_BITVAR (sym->etype)) {
 
 				/* if in data space or idata space then try to
@@ -2169,16 +2198,16 @@ setDefaultRegs (eBBlock ** ebbs, int count)
 		regsAVR[R30_IDX].isFree = regsAVR[R31_IDX].isFree = 1;
 
 	if (!avr_ptrRegReq) {
-		regsAVR[R26_IDX].type =
-			regsAVR[R27_IDX].type =
-			regsAVR[R30_IDX].type =
-			regsAVR[R31_IDX].type = REG_GPR;
+		regsAVR[R26_IDX].type = (regsAVR[R26_IDX].type & ~REG_MASK) | REG_GPR;
+		regsAVR[R27_IDX].type = (regsAVR[R27_IDX].type & ~REG_MASK) | REG_GPR;
+		regsAVR[R28_IDX].type = (regsAVR[R28_IDX].type & ~REG_MASK) | REG_GPR;
+		regsAVR[R29_IDX].type = (regsAVR[R29_IDX].type & ~REG_MASK) | REG_GPR;
 	}
 	else {
-		regsAVR[R26_IDX].type =
-			regsAVR[R27_IDX].type =
-			regsAVR[R30_IDX].type =
-			regsAVR[R31_IDX].type = REG_PTR;
+		regsAVR[R26_IDX].type = (regsAVR[R26_IDX].type & ~REG_MASK) | REG_PTR;
+		regsAVR[R27_IDX].type = (regsAVR[R27_IDX].type & ~REG_MASK) | REG_PTR;
+		regsAVR[R28_IDX].type = (regsAVR[R28_IDX].type & ~REG_MASK) | REG_PTR;
+		regsAVR[R29_IDX].type = (regsAVR[R29_IDX].type & ~REG_MASK) | REG_PTR;
 	}
 
 	/* registers 0-1 / 24-25 used as scratch */
@@ -2190,23 +2219,14 @@ setDefaultRegs (eBBlock ** ebbs, int count)
 	   to do something special 
 	   a) pre-assign registers to parameters RECEIVE
 	   b) mark the remaining parameter regs as free */
+		/* mark the parameter regs as SCRACH */
+	for (i = R16_IDX; i <= R23_IDX; i++) {
+		regsAVR[i].type = (regsAVR[i].type & ~REG_MASK) | REG_SCR;
+		regsAVR[i].isFree = 1;
+	}
 	if (!currFunc->hasFcall) {
-		/* mark the parameter regs as GPR */
-		for (i = R16_IDX; i <= R23_IDX; i++) {
-			regsAVR[i].type = REG_SCR;
-			regsAVR[i].isFree = 1;
-		}
 		preAssignParms (ebbs[0]->sch);
 	}
-	else {
-
-		/* otherwise mark them as free scratch */
-		for (i = R16_IDX; i <= R23_IDX; i++) {
-			regsAVR[i].type = REG_SCR;
-			regsAVR[i].isFree = 1;
-		}
-	}
-
 	/* Y - is not allocated (it is the stack frame) */
 	regsAVR[R28_IDX].isFree = regsAVR[R28_IDX].isFree = 0;
 }

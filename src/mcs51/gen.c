@@ -3620,7 +3620,7 @@ genIfxJump (iCode * ic, char *jval)
 /*-----------------------------------------------------------------*/
 static void
 genCmp (operand * left, operand * right,
-	operand * result, iCode * ifx, int sign)
+	operand * result, iCode * ifx, int sign, iCode *ic)
 {
   int size, offset = 0;
   unsigned long lit = 0L;
@@ -3704,6 +3704,8 @@ genCmp (operand * left, operand * right,
     }
 
 release:
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
     {
       outBitC (result);
@@ -3743,10 +3745,8 @@ genCmpGt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
-  genCmp (right, left, result, ifx, sign);
+  genCmp (right, left, result, ifx, sign,ic);
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -3773,10 +3773,8 @@ genCmpLt (iCode * ic, iCode * ifx)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
-  genCmp (left, right, result, ifx, sign);
+  genCmp (left, right, result, ifx, sign,ic);
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 

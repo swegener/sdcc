@@ -41,8 +41,10 @@ enum
 
 #define REG_PTR 0x01
 #define REG_GPR 0x02
-#define REG_SCR 0x03
-#define REG_CND 0x04
+#define REG_SCR 0x04
+#define REG_CND 0x08
+#define REG_MASK 0x0f
+#define REG_PAIR 0x10
 
 /* definition for the registers */
 typedef struct regs

@@ -537,7 +537,7 @@ sameRegs (asmop * aop1, asmop * aop2)
 static int
 isRegPair (asmop * aop)
 {
-	if (!aop || aop->size != 2)
+	if (!aop || aop->size < 2)
 		return 0;
 	if (aop->type == AOP_X || aop->type == AOP_Z)
 		return 1;
@@ -599,7 +599,7 @@ aopOp (operand * op, iCode * ic, bool result)
 
 
 	/* if the type is a conditional */
-	if (sym->regType == REG_CND) {
+	if (sym->regType & REG_CND) {
 		aop = op->aop = sym->aop = newAsmop (AOP_CRY);
 		aop->size = 0;
 		return;
@@ -1816,7 +1816,7 @@ genLabel (iCode * ic)
 static void
 genGoto (iCode * ic)
 {
-	emitcode ("rjmp", "L%05d:", (IC_LABEL (ic)->key + 100));
+	emitcode ("rjmp", "L%05d", (IC_LABEL (ic)->key + 100));
 }
 
 /*-----------------------------------------------------------------*/
@@ -4014,10 +4014,13 @@ genGenPointerGet (operand * left, operand * result, iCode * ic, iCode *pi)
 	} else {
 		aop = newAsmop(0);
 		getFreePtr(ic,&aop,FALSE,TRUE);
-
-		emitcode ("mov", "r30,%s", aopGet (AOP (left), 0));
-		emitcode ("mov", "r31,%s", aopGet (AOP (left), 1));
-		emitcode ("mov", "r0,%s", aopGet (AOP (left), 2));
+		if (isRegPair(AOP(left))) {
+			emitcode ("movw", "r30,%s", aopGet (AOP (left), 0));
+		} else {
+			emitcode ("mov", "r30,%s", aopGet (AOP (left), 0));
+			emitcode ("mov", "r31,%s", aopGet (AOP (left), 1));
+		}
+		emitcode ("mov", "r24,%s", aopGet (AOP (left), 2));
 		gotFreePtr=1;
 	}
 
@@ -4566,7 +4569,7 @@ genIfx (iCode * ic, iCode * popIc)
 	}
 	ic->generated = 1;
 }
-
+/* here */
 /*-----------------------------------------------------------------*/
 /* genAddrOf - generates code for address of                       */
 /*-----------------------------------------------------------------*/
@@ -4607,7 +4610,7 @@ genAddrOf (iCode * ic)
 		while (size--) {
 			/* Yuck! */
 			if (options.stack10bit && offset == 2) {
-				aopPut (AOP (IC_RESULT (ic)), "#0x40",
+				aopPut (AOP (IC_RESULT (ic)), "0x40",
 					offset++);
 			}
 			else {
@@ -4625,9 +4628,9 @@ genAddrOf (iCode * ic)
 	while (size--) {
 		char s[SDCC_NAME_MAX];
 		if (offset)
-			sprintf (s, "#(%s >> %d)", sym->rname, offset * 8);
+			sprintf (s, "(%s >> %d)", sym->rname, offset * 8);
 		else
-			sprintf (s, "#%s", sym->rname);
+			sprintf (s, "%s", sym->rname);
 		aopPut (AOP (IC_RESULT (ic)), s, offset++);
 	}
 
@@ -4885,10 +4888,10 @@ genCast (iCode * ic)
 				l = one;
 				break;
 			case CPOINTER:
-				l = "#0x02";
+				l = "0x02";
 				break;
 			case PPOINTER:
-				l = "#0x03";
+				l = "0x03";
 				break;
 
 			default:

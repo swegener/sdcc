@@ -2,7 +2,7 @@
 
 TOPDIR = ../../..
 
-SCC = $(TOPDIR)/bin/sdcc -mz80
+SCC = $(TOPDIR)/bin/sdcc -mz80 -v
 SAS = as-z80
 
 OBJ = div.o mul.o putchar.o string.o printf.o

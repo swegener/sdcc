@@ -20,12 +20,16 @@ typedef char * va_list;
 typedef void EMIT(char c, void *pData);
 
 
-static void _printhex(unsigned u, EMIT *emitter, void *pData)
+static void _printn(unsigned u, unsigned base, char issigned, EMIT *emitter, void *pData)
 {
     const char *_hex = "0123456789ABCDEF";
-    if (u >= 0x10)
-	_printhex(u/0x10, emitter, pData);
-    (*emitter)(_hex[u&0x0f], pData);
+    if (issigned && ((int)u < 0)) {
+	(*emitter)('-', pData);
+	u = (unsigned)-((int)u);
+    }
+    if (u >= base)
+	_printn(u/base, base, 0, emitter, pData);
+    (*emitter)(_hex[u%base], pData);
 }
 
 static void _printf(const char *format, EMIT *emitter, void *pData, va_list va)
@@ -39,10 +43,21 @@ static void _printf(const char *format, EMIT *emitter, void *pData, va_list va)
 		break;
 	    }
 	    case 'u':
+		{
+		    unsigned u = va_arg(va, unsigned);
+		    _printn(u, 10, 0, emitter, pData);
+		    break;
+		}
 	    case 'd':
 		{
 		    unsigned u = va_arg(va, unsigned);
-		    _printhex(u, emitter, pData);
+		    _printn(u, 10, 1, emitter, pData);
+		    break;
+		}
+	    case 'x':
+		{
+		    unsigned u = va_arg(va, unsigned);
+		    _printn(u, 16, 0, emitter, pData);
 		    break;
 		}
 	    case 's': 

@@ -914,7 +914,54 @@ static void genCpl (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genUminus (iCode *ic)
 {
-    assert(0);
+    int offset ,size ;
+    link *optype, *rtype;
+
+    /* assign asmops */
+    aopOp(IC_LEFT(ic),ic,FALSE);
+    aopOp(IC_RESULT(ic),ic,TRUE);
+
+    /* if both in bit space then special
+    case */
+    if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY &&
+        AOP_TYPE(IC_LEFT(ic)) == AOP_CRY ) { 
+	assert(0);
+        goto release;
+    } 
+
+    optype = operandType(IC_LEFT(ic));
+    rtype = operandType(IC_RESULT(ic));
+
+    /* if float then do float stuff */
+    if (IS_FLOAT(optype)) {
+	assert(0);
+        goto release;
+    }
+
+    /* otherwise subtract from zero */
+    size = AOP_SIZE(IC_LEFT(ic));
+    offset = 0 ;
+    CLRC ;
+    while(size--) {
+        char *l = aopGet(AOP(IC_LEFT(ic)),offset,FALSE);
+	emitcode("ld", "a,#0");
+	emitcode("sbc","a,%s",l);
+        aopPut(AOP(IC_RESULT(ic)),"a",offset++);
+    }
+
+    /* if any remaining bytes in the result */
+    /* we just need to propagate the sign   */
+    if ((size = (AOP_SIZE(IC_RESULT(ic)) - AOP_SIZE(IC_LEFT(ic))))) {
+        emitcode("rlc","a");
+        emitcode("sbc","a,a");
+        while (size--) 
+            aopPut(AOP(IC_RESULT(ic)),"a",offset++);
+    }       
+
+release:
+    /* release the aops */
+    freeAsmop(IC_LEFT(ic),NULL,ic);
+    freeAsmop(IC_RESULT(ic),NULL,ic);
 }
 
 
@@ -1095,6 +1142,15 @@ static void emitCall (iCode *ic, bool ispcall)
         freeAsmop(IC_RESULT(ic),NULL, ic);
     }
 
+    /* PENDING: mega hack */
+    {
+	char *s = OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
+	    OP_SYMBOL(IC_LEFT(ic))->rname :
+	    OP_SYMBOL(IC_LEFT(ic))->name;
+	if (!strcmp(s, "__mulsint") ||
+	    !strcmp(s, "__divsint"))
+	    IC_LEFT(ic)->parmBytes = 4;
+    }
     /* adjust the stack for parameters if required */
     if (IC_LEFT(ic)->parmBytes) {
 	int i = IC_LEFT(ic)->parmBytes;
@@ -1713,16 +1769,35 @@ static void genCmp (operand *left,operand *right,
                     goto release;
                 }
             }
+	    CLRC;
             while (size--) {
 		/* Do a long subtract */
                 MOVA(aopGet(AOP(left),offset,FALSE));
-		/* PENDING: CRITICAL: support signed cmp's */
-		/* Subtract through, propagating the carry */
-		if (offset==0) {
-		    emitcode("sub","a,%s",aopGet(AOP(right),offset++,FALSE));
+                if (sign && size == 0) {
+		    /* Ugly but hey */
+		    emitcode("push", "af");
+		    emitcode("xor", "a,#0x80");
+		    emitcode("ld", "l,a");
+		    emitcode("pop", "af");
+		    emitcode("ld", "a,l");
+                    if (AOP_TYPE(right) == AOP_LIT){
+                        unsigned long lit = (unsigned long)
+			    floatFromVal(AOP(right)->aopu.aop_lit);
+                        emitcode("sbc","a,#0x%02x",
+				 0x80 ^ (unsigned int)((lit >> (offset*8)) & 0x0FFL));                       
+                    } else {
+			emitcode("push", "af");
+			emitcode("ld", "a,%s",aopGet(AOP(right),offset++,FALSE));
+			emitcode("xor", "a,#0x80");
+			emitcode("ld", "l,a");
+			emitcode("pop", "af");
+                        emitcode("sbc", "a,l");
+                    }
 		}
-		else
+		else {
+		    /* Subtract through, propagating the carry */
 		    emitcode("sbc","a,%s",aopGet(AOP(right),offset++,FALSE));
+		}
             }
         }
     }
@@ -2587,7 +2662,8 @@ static void shiftL2Left2Result (operand *left, int offl,
 	assert(0);
     } else {
 	/* Copy left into result */
-	movLeft2Result(left,offl, result, offr, 0);
+	movLeft2Result(left, offl, result, offr, 0);
+	movLeft2Result(left, offl+1, result, offr+1, 0);
     }
     /* PENDING: for now just see if it'll work. */
     /*if (AOP(result)->type == AOP_REG) { */

@@ -6,6 +6,18 @@
 	.org 	0
 	jp	init
 
+	.org	0x08
+	reti
+	.org	0x10
+	reti
+	.org	0x18
+	reti
+	.org	0x20
+	reti
+	.org	0x28
+	reti
+	.org	0x30
+	reti
 	.org	0x38
 	reti
 	
@@ -23,6 +35,11 @@ init:
 	.area	_DATA
 
 	.area	_CODE
+_getsp::
+	ld	hl,#0
+	add	hl,sp
+	ret
+	
 _exit::
 	;; Exit - special code to the emulator
 	ld	a,#0

@@ -13,8 +13,11 @@ all: dhry
 
 dhry: $(OBJ)
 	$(LD) -n -- -i -j -k$(LIBDIR) -lz80.lib \
-	-b_CODE=0x200 dhry.ihx $(LIBDIR)crt0.o $(OBJ)
+	-b_CODE=0x200 -b_DATA=0xc000 dhry.ihx $(LIBDIR)crt0.o $(OBJ)
 	cat dhry.ihx | ../../makebin/makebin > dhry.rom
+
+native:
+	gcc -g -O2 -DREG= -DNOSTRUCTASSIGN -DNOENUM -o dhry dhry.c
 
 .c.o:
 	$(CC) $(CFLAGS) $<

@@ -1027,7 +1027,7 @@ static void  checkSClass ( symbol *sym )
 	    extern PORT ds390_port;
 	    bool useXdata = (port == &ds390_port) ? options.model : options.useXstack;
 	    SPEC_SCLS(sym->etype) = (useXdata  ?
-				     S_XDATA : S_DATA ) ;
+				     S_XDATA : S_FIXED ) ;
 	}
     }
 }

@@ -869,7 +869,7 @@ static void deassignLRs (iCode *ic, eBBlock *ebp)
 		  sym->nRegs) >= result->nRegs)
 		) {
 		
-		for (i = 0 ; i < max(sym->nRegs,result->nRegs) ; i++)
+		for (i = 0 ; i < result->nRegs ; i++)
 		    if (i < sym->nRegs )
 			result->regs[i] = sym->regs[i] ;
 		    else
@@ -2306,8 +2306,10 @@ void mcs51_assignRegisters (eBBlock **ebbs, int count)
     /* redo that offsets for stacked automatic variables */
     redoStackOffsets ();
 
-    if (options.dump_rassgn)
+    if (options.dump_rassgn) {
 	dumpEbbsToFileExt(".dumprassgn",ebbs,count);
+	dumpLiveRanges(".lrange",liveRanges);
+    }
 
     /* now get back the chain */
     ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs,count));

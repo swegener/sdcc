@@ -853,7 +853,7 @@ static void deassignLRs (iCode *ic, eBBlock *ebp)
 		  sym->nRegs) >= result->nRegs)
 		) {
 		
-		for (i = 0 ; i < max(sym->nRegs,result->nRegs) ; i++)
+		for (i = 0 ; i < result->nRegs ; i++)
 		    if (i < sym->nRegs )
 			result->regs[i] = sym->regs[i] ;
 		    else

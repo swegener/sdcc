@@ -66,6 +66,70 @@ edge *newEdge (eBBlock *from, eBBlock *to)
 }
 
 /*-----------------------------------------------------------------*/
+/* dumpLiveRanges - dump liverange information into a file         */
+/*-----------------------------------------------------------------*/
+void dumpLiveRanges (char *ext,hTab *liveRanges)
+{
+    FILE *file;
+    symbol *sym;
+    int k;
+
+    if (ext) {
+	/* create the file name */
+	strcpy(buffer,srcFileName);
+	strcat(buffer,ext);
+	
+	if (!(file = fopen(buffer,"a+"))) {
+	    werror(E_FILE_OPEN_ERR,buffer);
+	    exit(1);
+	}
+    } else 
+	file = stdout;
+    
+    for (sym = hTabFirstItem(liveRanges,&k); sym ; 
+	 sym = hTabNextItem(liveRanges,&k)) {
+
+	fprintf (file,"%s [k%d lr%d:%d so:%d]{ re%d rm%d}",
+		 (sym->rname[0] ? sym->rname : sym->name), 
+		 sym->key,
+		 sym->liveFrom,sym->liveTo,
+		 sym->stack,
+		 sym->isreqv,sym->remat
+		 );
+	
+	fprintf(file,"{"); printTypeChain(sym->type,file); 
+	if (sym->usl.spillLoc) {
+	    fprintf(file,"}{ sir@ %s",sym->usl.spillLoc->rname);
+	}
+	fprintf(file,"}");
+	
+	/* if assigned to registers */
+	if (sym->nRegs) {
+	    if (sym->isspilt) {
+		if (!sym->remat)
+		    if (sym->usl.spillLoc)
+			fprintf(file,"[%s]",(sym->usl.spillLoc->rname[0] ?
+					     sym->usl.spillLoc->rname :
+					     sym->usl.spillLoc->name));
+		    else
+			fprintf(file,"[err]");
+		else
+		    fprintf(file,"[remat]");
+	    }
+	    else {
+		int i;
+		fprintf(file,"[");
+		for(i=0;i<sym->nRegs;i++)
+		    fprintf(file,"%s ", port->getRegName(sym->regs[i]));
+		fprintf(file,"]");
+	    }
+	}
+	fprintf(file,"\n");
+    }
+	
+    fclose(file);
+}
+/*-----------------------------------------------------------------*/
 /* dumpEbbsToFileExt - writeall the basic blocks to a file         */
 /*-----------------------------------------------------------------*/
 void dumpEbbsToFileExt (char *ext,eBBlock **ebbs, int count)
@@ -73,14 +137,17 @@ void dumpEbbsToFileExt (char *ext,eBBlock **ebbs, int count)
     FILE *of;
     int i;
 
-    /* create the file name */
-    strcpy(buffer,srcFileName);
-    strcat(buffer,ext);
-
-    if (!(of = fopen(buffer,"a+"))) {
-	werror(E_FILE_OPEN_ERR,buffer);
-	exit(1);
-    }
+    if (ext) {
+	/* create the file name */
+	strcpy(buffer,srcFileName);
+	strcat(buffer,ext);
+	
+	if (!(of = fopen(buffer,"a+"))) {
+	    werror(E_FILE_OPEN_ERR,buffer);
+	    exit(1);
+	}
+    } else
+	of = stdout;
 
     for (i=0; i < count ; i++ ) {
 	fprintf(of,"\n----------------------------------------------------------------\n");

@@ -466,7 +466,7 @@ void allocParms ( value  *val )
 		   first, we will remove it from the overlay segment
 		   after the overlay determination has been done */
 		SPEC_OCLS(lval->etype) = SPEC_OCLS(lval->sym->etype) = 
-		    ( options.model  ? port->mem.default_local_map : 
+		    ( options.model ? port->mem.default_local_map : 
 		      (options.noOverlay ? port->mem.default_local_map
 		       :overlay ));
 	    
@@ -534,7 +534,6 @@ void allocLocal ( symbol *sym  )
 
     /* if this is a static variable */
     if ( IS_STATIC (sym->etype)) {
-/* 	SPEC_OCLS(sym->etype) = (options.model ? xdata : data ); */
 	SPEC_OCLS(sym->etype) = port->mem.default_local_map;
 	allocIntoSeg (sym);
         sym->allocreq = 1;

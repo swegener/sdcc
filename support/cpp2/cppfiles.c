@@ -378,6 +378,7 @@ read_include_file (pfile, inc)
 	 SSIZE_MAX to be much smaller than the actual range of the
 	 type.  Use INTTYPE_MAXIMUM unconditionally to ensure this
 	 does not bite us.  */
+#ifndef __BORLANDC__
       if (inc->st.st_size > INTTYPE_MAXIMUM (ssize_t))
 	{
 	  cpp_error (pfile, "%s is too large (%lu > %lu)", inc->name, 
@@ -385,6 +386,7 @@ read_include_file (pfile, inc)
 		     INTTYPE_MAXIMUM(ssize_t));
 	  goto fail;
 	}
+#endif	
       size = inc->st.st_size;
 
       inc->mapped = 0;
@@ -411,7 +413,18 @@ read_include_file (pfile, inc)
 		goto perror_fail;
 	      if (count == 0)
 		{
-		  cpp_warning (pfile, "%s is shorter than expected", inc->name);
+#ifndef __BORLANDC__		    
+		  /* For some reason, even though we opened with O_BINARY, 
+		   * Borland C++ seems to insist on doing CR/LF -> LF 
+		   * translations for us, which results in the file appearing
+		   * shorter than stat told us it should be.
+		   * 
+		   * This sucks, but don't bother throwing a warning.
+		   */
+		  cpp_warning (pfile, "%s is shorter than expected (expected %u, got %u)", 
+			       inc->name, inc->st.st_size, offset);
+#endif		    
+		  inc->st.st_size = offset;
 		  break;
 		}
 	      offset += count;

@@ -21,7 +21,7 @@
 #define HAVE_STRING_H 1
 #define HAVE_SYS_STAT_H 1
 #define HAVE_STDLIB_H 1
-#define ssize_t unsigned int
+#define ssize_t int
 #define __STDC__ 1
 #define alloca(x) calloc(1,(x))
 

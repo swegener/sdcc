@@ -412,6 +412,8 @@ struct
    "sizeof applied to an incomplete type" },
 { E_PREVIOUS_DEF, ERROR_LEVEL_ERROR,
    "previously defined here" },
+{ W_SIZEOF_VOID, ERROR_LEVEL_WARNING,
+   "size of void is zero" },
 };
 
 /*

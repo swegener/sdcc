@@ -2495,6 +2495,8 @@ geniCodePostInc (operand * op)
   geniCodeAssign (rOp, rv, 0, 0);
 
   size = (IS_PTR (rvtype) ? getSize (rvtype->next) : 1);
+  if (size == 0)
+    werror(W_SIZEOF_VOID);
   if (IS_FLOAT (rvtype))
     ic = newiCode ('+', rv, operandFromValue (constFloatVal ("1.0")));
   else
@@ -2530,8 +2532,9 @@ geniCodePreInc (operand * op, bool lvalue)
       return op;
     }
 
-
   size = (IS_PTR (roptype) ? getSize (roptype->next) : 1);
+  if (size == 0)
+    werror(W_SIZEOF_VOID);
   if (IS_FLOAT (roptype))
     ic = newiCode ('+', rop, operandFromValue (constFloatVal ("1.0")));
   else
@@ -2578,6 +2581,8 @@ geniCodePostDec (operand * op)
   geniCodeAssign (rOp, rv, 0, 0);
 
   size = (IS_PTR (rvtype) ? getSize (rvtype->next) : 1);
+  if (size == 0)
+    werror(W_SIZEOF_VOID);
   if (IS_FLOAT (rvtype))
     ic = newiCode ('-', rv, operandFromValue (constFloatVal ("1.0")));
   else
@@ -2613,8 +2618,9 @@ geniCodePreDec (operand * op, bool lvalue)
       return op;
     }
 
-
   size = (IS_PTR (roptype) ? getSize (roptype->next) : 1);
+  if (size == 0)
+    werror(W_SIZEOF_VOID);
   if (IS_FLOAT (roptype))
     ic = newiCode ('-', rop, operandFromValue (constFloatVal ("1.0")));
   else

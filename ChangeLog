@@ -1,3 +1,10 @@
+2004-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (geniCodePostInc, geniCodePreInc, geniCodePostDec,
+	  geniCodePreDec): Fixed bug 904237 by generating a warning
+	* src/SDCCerr.h,
+	* src/SDCCerr.c: added warning W_SIZEOF_VOID
+
 2004-09-09 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/device.c : When no max ram set validate full memory range.

@@ -21,11 +21,9 @@
     You are forbidden to forbid anyone else to use, share and improve
     what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include "SDCCbitv.h"
-#ifndef ALLOC
-#include "SDCCglobl.h"
-#endif
+
+#include "common.h"
+
 int bitVectDefault = 1024;
 
 /* genernal note about a bitvectors:

@@ -23,22 +23,8 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCbitv.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCClabel.h"
-#include "SDCCBBlock.h"
-#include "SDCCloop.h"
-#include "SDCCcse.h"
-#include "SDCCcflow.h"
-#include "SDCCdflow.h"
+
+#include "common.h"
 
 /*-----------------------------------------------------------------*/
 /* ifKilledInBlock - will return 1 if the symbol is redefined in B */

@@ -22,21 +22,7 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCbitv.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCClabel.h"
-#include "SDCCBBlock.h"
-#include "SDCCcflow.h"
-#include "SDCCloop.h"
-#include "SDCCcse.h"
+#include "common.h"
 
 /*-----------------------------------------------------------------*/
 /* newCseDef - new cseDef                                          */

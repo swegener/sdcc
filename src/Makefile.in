@@ -6,7 +6,10 @@ PRJDIR		= ..
 
 include $(PRJDIR)/Makefile.common
 
-LIBS		= $(PORT)/port.a -lgc @LIBS@
+PORTS		= mcs51
+PORT_LIBS	= $(PORTS:%=%/port.a)
+
+LIBS		= -lgc @LIBS@
 LIBDIRS		= -L$(PRJDIR)/support/gc
 
 OBJECTS 	= SDCCy.o SDCClex.o SDCCerr.o SDCChasht.o SDCCmain.o \
@@ -18,13 +21,12 @@ SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
 TARGET		= $(PRJDIR)/bin/sdcc
 
-
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: port checkconf $(PRJDIR)/support/gc/libgc.a $(TARGET)
+all: ports checkconf $(PRJDIR)/support/gc/libgc.a $(TARGET)
 
-port:
-	$(MAKE) -C $(PORT)
+ports:
+	for i in $(PORTS); do $(MAKE) -C $$i; done
 
 $(PRJDIR)/support/gc/libgc.a:
 	cd $(PRJDIR)/support/gc && $(MAKE)
@@ -71,11 +73,13 @@ include clean.mk
 
 # My rules
 # --------
-$(TARGET): $(OBJECTS)
-	$(CC) -o $@ $(OBJECTS) $(LIBDIRS) $(LIBS)
+$(TARGET): $(OBJECTS) $(PORT_LIBS)
+	$(CC) -o $@ $(OBJECTS) $(PORT_LIBS) $(LIBDIRS) $(LIBS)
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+SDCCy.h: SDCCy.c
 
 SDCCy.c: SDCC.y
 	$(YACC) -d -v -o $@ $<

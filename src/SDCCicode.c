@@ -21,15 +21,8 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCicode.h"
-#include "SDCCerr.h"
-#include "SDCCralloc.h"
+
+#include "common.h"
 
 /*-----------------------------------------------------------------*/
 /* global variables       */

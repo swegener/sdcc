@@ -1188,16 +1188,8 @@ static void genFunction (iCode *ic)
 	emitcode("push", "bc");
 	emitcode("push", "de");
 	emitcode("push", "hl");
-    } else {
-	/* if callee-save to be used for this function
-	   then save the registers being used in this function */
-	if (sym->calleeSave) {
-	    /* Handled by ncsv/csv */
-	}
-	else {
-	    assert(0);
-	}
     }
+    /* PENDING: callee-save etc */
 
     /* adjust the stack for the function */
     emitcode("push", "de"); 

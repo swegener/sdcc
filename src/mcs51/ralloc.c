@@ -50,16 +50,22 @@
 /* since the pack the registers depending strictly on the MCU      */
 /*-----------------------------------------------------------------*/
 
-bitVect *spiltSet = NULL ; 
-set *stackSpil = NULL;
-bitVect *regAssigned = NULL;
-short blockSpil = 0;
-int slocNum = 0 ;
 extern void gen51Code(iCode *);
-int ptrRegReq = 0; /* one byte pointer register required */
-bitVect *funcrUsed = NULL; /* registers used in a function */
-int stackExtend = 0;
-int dataExtend  = 0;
+
+/* Global data */
+static struct {
+    bitVect *spiltSet;
+    set *stackSpil;
+    bitVect *regAssigned;
+    short blockSpil;
+    int slocNum;
+    bitVect *funcrUsed; /* registers used in a function */
+    int stackExtend;
+    int dataExtend;
+} _G;
+
+/* Shared with gen.c */
+int mcs51_ptrRegReq; /* one byte pointer register required */
 
 /* 8051 registers */
 regs regs8051[] = 
@@ -80,7 +86,7 @@ regs regs8051[] =
     { REG_GPR  ,X12_IDX,REG_GPR , "x12", "x12",  "xreg", 4, 1 },
     { REG_CND  ,CND_IDX,REG_CND , "C"  , "C"  ,  "xreg", 0, 1 },  
 };
-int nRegs = 13;
+int mcs51_nRegs = 13;
 void spillThis (symbol *);
 
 /*-----------------------------------------------------------------*/
@@ -90,7 +96,7 @@ regs *allocReg (short type)
 {
     int i;
 
-    for ( i = 0 ; i < nRegs ; i++ ) {
+    for ( i = 0 ; i < mcs51_nRegs ; i++ ) {
 
 	/* if type is given as 0 then any
 	   free register will do */
@@ -123,7 +129,7 @@ regs *regWithIdx (int idx)
 {
     int i ;
     
-    for (i=0;i < nRegs;i++)
+    for (i=0;i < mcs51_nRegs;i++)
 	if (regs8051[i].rIdx == idx)
 	    return &regs8051[i];
 
@@ -149,7 +155,7 @@ int nFreeRegs (int type)
     int i;
     int nfr=0;
     
-    for (i = 0 ; i < nRegs; i++ )
+    for (i = 0 ; i < mcs51_nRegs; i++ )
 	if (regs8051[i].isFree && regs8051[i].type == type)
 	    nfr++;
     return nfr;
@@ -210,11 +216,11 @@ bitVect *computeSpillable (iCode *ic)
     
     spillable = bitVectCopy(ic->rlive);
     spillable = 
-	bitVectCplAnd(spillable,spiltSet); /* those already spilt */
+	bitVectCplAnd(spillable,_G.spiltSet); /* those already spilt */
     spillable = 
 	bitVectCplAnd(spillable,ic->uses); /* used in this one */    
     bitVectUnSetBit(spillable,ic->defKey);
-    spillable = bitVectIntersect(spillable,regAssigned);
+    spillable = bitVectIntersect(spillable,_G.regAssigned);
     return spillable;
     
 }
@@ -316,7 +322,7 @@ set *liveRangesWith (bitVect *lrs, int (func)(symbol *,eBBlock *, iCode *),
 	    exit(1);
 	}
 	
-	if (func(sym,ebp,ic) && bitVectBitValue(regAssigned,sym->key))
+	if (func(sym,ebp,ic) && bitVectBitValue(_G.regAssigned,sym->key))
 	    addSetHead(&rset,sym);
     }
 
@@ -409,8 +415,8 @@ void spillLRWithPtrReg (symbol *forSym)
     regs *r0,*r1;
     int k;
 
-    if (!regAssigned ||
-	bitVectIsZero(regAssigned))
+    if (!_G.regAssigned ||
+	bitVectIsZero(_G.regAssigned))
 	return;
 
     r0 = regWithIdx(R0_IDX);
@@ -453,7 +459,7 @@ symbol *createStackSpil (symbol *sym)
 
     /* first go try and find a free one that is already 
        existing on the stack */
-    if (applyToSet(stackSpil,isFree,&sloc, sym)) {
+    if (applyToSet(_G.stackSpil,isFree,&sloc, sym)) {
 	/* found a free one : just update & return */
 	sym->usl.spillLoc = sloc;
 	sym->stackSpil= 1;
@@ -466,7 +472,7 @@ symbol *createStackSpil (symbol *sym)
        we need to allocate this on the stack : this is really a
        hack!! but cannot think of anything better at this time */
 	
-    sprintf(buffer,"sloc%d",slocNum++);
+    sprintf(buffer,"sloc%d",_G.slocNum++);
     sloc = newiTemp(buffer);
 
     /* set the type to the spilling symbol */
@@ -501,12 +507,12 @@ symbol *createStackSpil (symbol *sym)
     /* if it is on the stack then update the stack */
     if (IN_STACK(sloc->etype)) {
 	currFunc->stack += getSize(sloc->type);
-	stackExtend += getSize(sloc->type);
+	_G.stackExtend += getSize(sloc->type);
     } else
-	dataExtend += getSize(sloc->type);
+	_G.dataExtend += getSize(sloc->type);
 
-    /* add it to the stackSpil set */
-    addSetHead(&stackSpil,sloc);
+    /* add it to the _G.stackSpil set */
+    addSetHead(&_G.stackSpil,sloc);
     sym->usl.spillLoc = sloc;
     sym->stackSpil = 1;
     
@@ -529,7 +535,7 @@ bool isSpiltOnStack (symbol *sym)
     if (!sym->isspilt)
 	return FALSE ;
 
-/*     if (sym->stackSpil) */
+/*     if (sym->_G.stackSpil) */
 /* 	return TRUE; */
     
     if (!sym->usl.spillLoc)
@@ -557,9 +563,9 @@ void spillThis (symbol *sym)
 
     /* mark it has spilt & put it in the spilt set */
     sym->isspilt = 1;
-    spiltSet = bitVectSetBit(spiltSet,sym->key);
+    _G.spiltSet = bitVectSetBit(_G.spiltSet,sym->key);
        
-    bitVectUnSetBit(regAssigned,sym->key);
+    bitVectUnSetBit(_G.regAssigned,sym->key);
 
     for (i = 0 ; i < sym->nRegs ; i++)
 
@@ -571,8 +577,8 @@ void spillThis (symbol *sym)
     /* if spilt on stack then free up r0 & r1 
        if they could have been assigned to some
        LIVE ranges */
-    if (!ptrRegReq && isSpiltOnStack(sym)) {
-	ptrRegReq++ ;
+    if (!mcs51_ptrRegReq && isSpiltOnStack(sym)) {
+	mcs51_ptrRegReq++ ;
 	spillLRWithPtrReg(sym);
     }
 
@@ -617,11 +623,11 @@ symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 
 	/* check if there are any live ranges allocated
 	   to registers that are not used in this block */
-	if (!blockSpil && (selectS = liveRangesWith(lrcs,notUsedInBlock,ebp,ic))) {
+	if (!_G.blockSpil && (selectS = liveRangesWith(lrcs,notUsedInBlock,ebp,ic))) {
 	    sym = leastUsedLR(selectS);
 	    /* if this is not rematerializable */
 	    if (!sym->remat) {
-		blockSpil++;
+		_G.blockSpil++;
 		sym->blockSpil = 1;
 	    }
 	    return sym;
@@ -629,11 +635,11 @@ symbol *selectSpil (iCode *ic, eBBlock *ebp, symbol *forSym)
 
 	/* check if there are any live ranges that not
 	   used in the remainder of the block */
-	if (!blockSpil && (selectS = liveRangesWith(lrcs,notUsedInRemaining,ebp,ic))) {
+	if (!_G.blockSpil && (selectS = liveRangesWith(lrcs,notUsedInRemaining,ebp,ic))) {
 	    sym = leastUsedLR (selectS);
 	    if (!sym->remat) {
 		sym->remainSpil = 1;
-		blockSpil++;
+		_G.blockSpil++;
 	    }
 	    return sym;
 	}
@@ -687,11 +693,11 @@ bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
     
     /* mark it as spilt */
     ssym->isspilt = 1;
-    spiltSet = bitVectSetBit(spiltSet,ssym->key);
+    _G.spiltSet = bitVectSetBit(_G.spiltSet,ssym->key);
     
     /* mark it as not register assigned &
        take it away from the set */   
-    bitVectUnSetBit(regAssigned,ssym->key);
+    bitVectUnSetBit(_G.regAssigned,ssym->key);
  
     /* mark the registers as free */    
     for (i = 0 ; i < ssym->nRegs ;i++ )
@@ -700,8 +706,8 @@ bool spilSomething (iCode *ic, eBBlock *ebp, symbol *forSym)
      
     /* if spilt on stack then free up r0 & r1 
        if they could have been assigned to as gprs */
-    if (!ptrRegReq && isSpiltOnStack(ssym) ) {
-	ptrRegReq++ ;
+    if (!mcs51_ptrRegReq && isSpiltOnStack(ssym) ) {
+	mcs51_ptrRegReq++ ;
 	spillLRWithPtrReg(ssym);
     }
 
@@ -774,7 +780,7 @@ regs *getRegGpr (iCode *ic, eBBlock *ebp,symbol *sym)
     if ((reg = allocReg(REG_GPR)))        
 	return reg;    
 
-    if (!ptrRegReq)
+    if (!mcs51_ptrRegReq)
 	if ((reg = allocReg(REG_PTR)))
 	    return reg ;
 
@@ -829,7 +835,7 @@ void deassignLRs (iCode *ic, eBBlock *ebp)
 	    continue ;
 	}
 	
-	if (!bitVectBitValue(regAssigned,sym->key))
+	if (!bitVectBitValue(_G.regAssigned,sym->key))
 	    continue;
 	
 	/* special case check if this is an IFX &
@@ -845,7 +851,7 @@ void deassignLRs (iCode *ic, eBBlock *ebp)
 	if (sym->nRegs) {
 	    int i = 0;
 	    
-	    bitVectUnSetBit(regAssigned,sym->key);
+	    bitVectUnSetBit(_G.regAssigned,sym->key);
 
 	    /* if the result of this one needs registers
 	       and does not have it then assign it right
@@ -865,7 +871,7 @@ void deassignLRs (iCode *ic, eBBlock *ebp)
 		result->nRegs            &&            /* which needs registers */
 		! result->isspilt        &&            /* and does not already have them */
 		! result->remat          &&
-		! bitVectBitValue(regAssigned,result->key) &&
+		! bitVectBitValue(_G.regAssigned,result->key) &&
 		/* the number of free regs + number of regs in this LR
 		   can accomodate the what result Needs */
 		((nfreeRegsType(result->regType) +
@@ -878,7 +884,7 @@ void deassignLRs (iCode *ic, eBBlock *ebp)
 		    else
 			result->regs[i] = getRegGpr (ic,ebp,result);
 
-		regAssigned = bitVectSetBit(regAssigned,result->key);
+		_G.regAssigned = bitVectSetBit(_G.regAssigned,result->key);
 		
 	    }	       		
 	    
@@ -905,11 +911,11 @@ void reassignLR (operand *op)
 
     /* not spilt any more */     
     sym->isspilt = sym->blockSpil  = sym->remainSpil = 0;
-    bitVectUnSetBit(spiltSet,sym->key);
+    bitVectUnSetBit(_G.spiltSet,sym->key);
       
-    regAssigned = bitVectSetBit(regAssigned,sym->key);
+    _G.regAssigned = bitVectSetBit(_G.regAssigned,sym->key);
 
-    blockSpil--;
+    _G.blockSpil--;
 
     for (i=0;i<sym->nRegs;i++)
 	sym->regs[i]->isFree = 0;
@@ -931,7 +937,7 @@ int willCauseSpill ( int nr, int rt)
 	if (nFreeRegs(REG_GPR) >= nr)
 	    return 0;
     } else {
-	if (ptrRegReq) {
+	if (mcs51_ptrRegReq) {
 	    if (nFreeRegs(rt) >= nr)
 		return 0;
 	} else {
@@ -1035,14 +1041,14 @@ void serialRegAssign (eBBlock **ebbs, int count)
 		   or will not live beyond this instructions */
 		if (!sym->nRegs      || 
 		    sym->isspilt     || 
-		    bitVectBitValue(regAssigned,sym->key) ||
+		    bitVectBitValue(_G.regAssigned,sym->key) ||
 		    sym->liveTo <= ic->seq)
 		    continue ;
 
 		/* if some liverange has been spilt at the block level
 		   and this one live beyond this block then spil this
 		   to be safe */
-		if (blockSpil && sym->liveTo > ebbs[i]->lSeq) {
+		if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq) {
 		    spillThis (sym);
 		    continue ;
 		}
@@ -1079,11 +1085,11 @@ void serialRegAssign (eBBlock **ebbs, int count)
 		/* if we need ptr regs for the right side
 		   then mark it */
 		if (POINTER_GET(ic) && getSize(OP_SYMBOL(IC_LEFT(ic))->type) < 2) {
-		    ptrRegReq++;
+		    mcs51_ptrRegReq++;
 		    ptrRegSet = 1;
 		}
 		/* else we assign registers to it */		
-		regAssigned = bitVectSetBit(regAssigned,sym->key);
+		_G.regAssigned = bitVectSetBit(_G.regAssigned,sym->key);
 
 		for (j = 0 ; j < sym->nRegs ;j++ ) {
 		    if (sym->regType == REG_PTR)
@@ -1109,7 +1115,7 @@ void serialRegAssign (eBBlock **ebbs, int count)
 				     OP_SYMBOL(IC_RIGHT(ic)),ic->lineno);
 		
 		if (ptrRegSet) {
-		    ptrRegReq--;
+		    mcs51_ptrRegReq--;
 		    ptrRegSet = 0;
 		}
 				
@@ -1138,7 +1144,7 @@ bitVect *rUmaskForOp (operand *op)
     if (sym->isspilt || !sym->nRegs)
 	return NULL;
 
-    rumask = newBitVect(nRegs);
+    rumask = newBitVect(mcs51_nRegs);
 
     for (j = 0; j < sym->nRegs; j++) {
 	rumask = bitVectSetBit(rumask,
@@ -1153,7 +1159,7 @@ bitVect *rUmaskForOp (operand *op)
 /*-----------------------------------------------------------------*/
 bitVect *regsUsedIniCode (iCode *ic)
 {
-    bitVect *rmask = newBitVect(nRegs);
+    bitVect *rmask = newBitVect(mcs51_nRegs);
 
     /* do the special cases first */
     if (ic->op == IFX ) {
@@ -1215,12 +1221,12 @@ void createRegMask (eBBlock **ebbs, int count)
 	    /* first mark the registers used in this
 	       instruction */
 	    ic->rUsed = regsUsedIniCode(ic);
-	    funcrUsed = bitVectUnion(funcrUsed,ic->rUsed);
+	    _G.funcrUsed = bitVectUnion(_G.funcrUsed,ic->rUsed);
 
 	    /* now create the register mask for those 
 	       registers that are in use : this is a
 	       super set of ic->rUsed */
-	    ic->rMask = newBitVect(nRegs+1);
+	    ic->rMask = newBitVect(mcs51_nRegs+1);
 
 	    /* for all live Ranges alive at this point */
 	    for (j = 1; j < ic->rlive->size; j++ ) {
@@ -1377,7 +1383,7 @@ void freeAllRegs()
 {
     int i;
 
-    for (i=0;i< nRegs;i++ )
+    for (i=0;i< mcs51_nRegs;i++ )
 	regs8051[i].isFree = 1;
 }
 
@@ -2101,23 +2107,23 @@ static void packRegisters (eBBlock *ebp)
 	
 	if (!SKIP_IC2(ic)) {
 	    /* if we are using a symbol on the stack
-	       then we should say ptrRegReq */
+	       then we should say mcs51_ptrRegReq */
 	    if (ic->op == IFX && IS_SYMOP(IC_COND(ic)))
-		ptrRegReq += ((OP_SYMBOL(IC_COND(ic))->onStack ||
+		mcs51_ptrRegReq += ((OP_SYMBOL(IC_COND(ic))->onStack ||
 			       OP_SYMBOL(IC_COND(ic))->iaccess) ? 1 : 0);
 	    else
 		if (ic->op == JUMPTABLE && IS_SYMOP(IC_JTCOND(ic)))
-		    ptrRegReq += ((OP_SYMBOL(IC_JTCOND(ic))->onStack ||
+		    mcs51_ptrRegReq += ((OP_SYMBOL(IC_JTCOND(ic))->onStack ||
 				   OP_SYMBOL(IC_JTCOND(ic))->iaccess) ? 1 : 0);
 		else {
 		    if (IS_SYMOP(IC_LEFT(ic)))
-			ptrRegReq += ((OP_SYMBOL(IC_LEFT(ic))->onStack ||
+			mcs51_ptrRegReq += ((OP_SYMBOL(IC_LEFT(ic))->onStack ||
 				       OP_SYMBOL(IC_LEFT(ic))->iaccess) ? 1 : 0);
 		    if (IS_SYMOP(IC_RIGHT(ic)))
-			ptrRegReq += ((OP_SYMBOL(IC_RIGHT(ic))->onStack ||
+			mcs51_ptrRegReq += ((OP_SYMBOL(IC_RIGHT(ic))->onStack ||
 				       OP_SYMBOL(IC_RIGHT(ic))->iaccess) ? 1 : 0);
 		    if (IS_SYMOP(IC_RESULT(ic)))
-			ptrRegReq += ((OP_SYMBOL(IC_RESULT(ic))->onStack ||
+			mcs51_ptrRegReq += ((OP_SYMBOL(IC_RESULT(ic))->onStack ||
 				       OP_SYMBOL(IC_RESULT(ic))->iaccess) ? 1 : 0);    
 		}
 	}
@@ -2243,19 +2249,19 @@ static void packRegisters (eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
-void assignRegisters (eBBlock **ebbs, int count)
+void mcs51_assignRegisters (eBBlock **ebbs, int count)
 {
     iCode *ic;
     int i ;
 
-    setToNull((void *)&funcrUsed);
-    ptrRegReq = stackExtend = dataExtend = 0;
+    setToNull((void *)&_G.funcrUsed);
+    mcs51_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
     /* if not register extentions then reduce number
        of registers */
     if (options.regExtend)
-	nRegs = 13;
+	mcs51_nRegs = 13;
     else
-	nRegs = 8;
+	mcs51_nRegs = 8;
 
     /* change assignments this will remove some
        live ranges reducing some register pressure */
@@ -2273,16 +2279,16 @@ void assignRegisters (eBBlock **ebbs, int count)
     serialRegAssign(ebbs,count);
 
     /* if stack was extended then tell the user */
-    if (stackExtend) {
+    if (_G.stackExtend) {
 /* 	werror(W_TOOMANY_SPILS,"stack", */
-/* 	       stackExtend,currFunc->name,""); */
-	stackExtend = 0 ;
+/* 	       _G.stackExtend,currFunc->name,""); */
+	_G.stackExtend = 0 ;
     }
 
-    if (dataExtend) {
+    if (_G.dataExtend) {
 /* 	werror(W_TOOMANY_SPILS,"data space", */
-/* 	       dataExtend,currFunc->name,""); */
-	dataExtend = 0 ;
+/* 	       _G.dataExtend,currFunc->name,""); */
+	_G.dataExtend = 0 ;
     }  
 
     /* after that create the register mask
@@ -2301,11 +2307,11 @@ void assignRegisters (eBBlock **ebbs, int count)
 
     gen51Code(ic);
 
-    /* free up any stackSpil locations allocated */   
-    applyToSet(stackSpil,deallocStackSpil);
-    slocNum = 0;
-    setToNull((void **)&stackSpil);
-    setToNull((void **)&spiltSet);
+    /* free up any _G.stackSpil locations allocated */   
+    applyToSet(_G.stackSpil,deallocStackSpil);
+    _G.slocNum = 0;
+    setToNull((void **)&_G.stackSpil);
+    setToNull((void **)&_G.spiltSet);
     /* mark all registers as free */
     freeAllRegs();
 

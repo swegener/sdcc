@@ -25,27 +25,8 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCbitv.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCClabel.h"
-#include "SDCCBBlock.h"
-#include "SDCCloop.h"
-#include "SDCCcse.h"
-#include "SDCCcflow.h"
-#include "SDCCdflow.h"
-#include "SDCClrange.h"
-#include "SDCCralloc.h"
-#include "SDCCptropt.h"
-#include "SDCCopt.h"
 
+#include "common.h"
 
 /*-----------------------------------------------------------------*/
 /* global variables */
@@ -814,7 +795,7 @@ eBBlock **eBBlockFromiCode (iCode *ic)
 	dumpEbbsToFileExt(".dumprange",ebbs,count);
 
     /* allocate registers & generate code */   
-    assignRegisters (ebbs,count);      
+    port->assignRegisters(ebbs,count);      
     
     /* throw away blocks */
     setToNull ((void **)&graphEdges);

@@ -21,14 +21,17 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <ctype.h>
 
+#include "common.h"
+#include <ctype.h>
 #include "spawn.h"
-#include "SDCCglobl.h"
-#include "config.h"
+
+/* This is a bit messy.  We cant include unistd.h as it defines
+   'link' which we also use.
+*/
+int access(const char *path, int mode);
+#define X_OK 1
+int unlink(const char *path);
 
 extern void		initSymt		();
 extern void		initMem			();
@@ -112,6 +115,35 @@ char    *preOutName;
 #define OPTION_HELP         "-help"
 #define OPTION_CALLEE_SAVES "-callee-saves"
 #define OPTION_NOREGPARMS   "-noregparms"
+
+extern PORT mcs51_port;
+extern PORT z80_port;
+
+PORT *port;
+
+static PORT *_ports[] = {
+    &mcs51_port,
+};
+
+#define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
+
+/** Sets the port to the one given by the command line option.
+    @param		The name minus the option (eg 'mcs51')
+    @return 		0 on success.
+*/
+static int _setPort(const char *name)
+{
+    int i;
+    for (i=0; i<NUM_PORTS; i++) {
+	if (!strcmp(_ports[i]->target, name)) {
+	    port = _ports[i];
+	    return 0;
+	}
+    }
+    /* Error - didnt find */
+    return 1;
+}
+
 /*-----------------------------------------------------------------*/
 /* printVersionInfo - prints the version info			   */
 /*-----------------------------------------------------------------*/
@@ -222,6 +254,8 @@ static void setDefaultOptions()
     optimize.label4 = 1;    
     optimize.loopInvariant = 1;
     optimize.loopInduction = 1;
+
+    port->setDefaultOptions();
 }
 
 /*-----------------------------------------------------------------*/
@@ -605,7 +639,8 @@ int   parseCmdLine ( int argc, char **argv )
                 continue;
 	    }
 
-	    werror(W_UNKNOWN_OPTION,argv[i]);
+	    if (!port->parseOption(&argc, argv))
+		werror(W_UNKNOWN_OPTION,argv[i]);
 	}      
 
 	/* these are undocumented options */
@@ -675,7 +710,10 @@ int   parseCmdLine ( int argc, char **argv )
 		break;
 
 	    case 'm':
-		werror(W_UNSUPP_OPTION,"-mL/-mS","use --model-large/--model-small instead");
+		/* Used to select the port */
+		if (_setPort(argv[i] + 2)) {
+		    werror(W_UNSUPP_OPTION,"-m","Unrecognised processor");
+		}
 		break;
 	    
 	    case 'a'	: 
@@ -799,15 +837,16 @@ int   parseCmdLine ( int argc, char **argv )
 		break ;
 
 	    default:
-		werror(W_UNKNOWN_OPTION,argv[i]);		
+		if (!port->parseOption(&argc, argv))
+		    werror(W_UNKNOWN_OPTION,argv[i]);
 	    }
 	    continue ;
 	}
 
-	/* no option must be a filename */
-	processFile(argv[i]);
-
-
+	if (!port->parseOption(&argc, argv)) {
+	    /* no option must be a filename */
+	    processFile(argv[i]);
+	}
     }	
 
     /* set up external stack location if not explicitly specified */
@@ -824,6 +863,7 @@ int   parseCmdLine ( int argc, char **argv )
 	    fprintf(cdbFile,"M:%s\n",moduleName);
 	}
     }
+    port->finaliseOptions();
     return 0;
 }
 
@@ -987,7 +1027,6 @@ static void assemble (char **envp)
     }
 }
 
-
 /*-----------------------------------------------------------------*/
 /* preProcess - spawns the preprocessor with arguments		   */
 /*-----------------------------------------------------------------*/
@@ -1033,6 +1072,21 @@ static int preProcess (char **envp)
     return 0;
 }
 
+static void _findPort(int argc, char **argv)
+{
+    argc--;
+    while (argc) {
+	if (!strncmp(*argv, "-m", 2)) {
+	    _setPort(*argv + 2);
+	    return;
+	}
+	argv++;
+	argc--;
+    }
+    /* Assume mcs51 */
+    port = &mcs51_port;
+}
+
 /* 
  * main routine
  * initialises and calls the parser
@@ -1045,8 +1099,9 @@ int main ( int argc, char **argv , char **envp)
     
     /*printVersionInfo ();*/
 
+    _findPort(argc, argv);
     setDefaultOptions();
-    parseCmdLine (argc,argv);
+    parseCmdLine(argc,argv);
 
     /* if no input then printUsage & exit */
     if (!srcFileName && !nrelFiles) {

@@ -21,19 +21,8 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCbitv.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCCBBlock.h"
 
+#include "common.h"
 
 int eBBNum = 0;
 set *graphEdges = NULL ;  /* list of edges in this flow graph */

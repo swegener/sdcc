@@ -42,45 +42,36 @@
 #endif
 #endif
 
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCbitv.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCClabel.h"
-#include "SDCCBBlock.h"
-#include "SDCCloop.h"
-#include "SDCCcse.h"
-#include "SDCCcflow.h"
-#include "SDCCdflow.h"
-#include "SDCClrange.h"
-#include "SDCCralloc.h"
-#include "SDCCgen51.h"
+#include "common.h"
 #include "SDCCpeeph.h"
+#include "gen.h"
 
 /* this is the down and dirty file with all kinds of 
-kludgy & hacky stuff. This is what it is all about
-CODE GENERATION for a specific MCU . some of the
-routines may be reusable, will have to see */
+   kludgy & hacky stuff. This is what it is all about
+   CODE GENERATION for a specific MCU . some of the
+   routines may be reusable, will have to see */
 
 static char *zero = "#0x00";
 static char *one  = "#0x01";
 static char *spname ;
 static char *fReturn[] = {"dpl","dph","b","a" };
 static char *accUse[] = {"a","b"};
-short r0Pushed = 0;
-short r1Pushed = 0;
-short rbank = -1;
-short accInUse = 0 ;
-short inLine = 0;
-short debugLine = 0;
-short nregssaved = 0;
-extern int ptrRegReq ;
-extern int nRegs;
+
+static short rbank = -1;
+
+static struct {
+    short r0Pushed;
+    short r1Pushed;
+    short accInUse;
+    short inLine;
+    short debugLine;
+    short nRegsSaved;
+    set *sendSet;
+} _G;
+
+extern int mcs51_ptrRegReq ;
+extern int mcs51_nRegs;
 extern FILE *codeOutFile;
-set *sendSet = NULL;
 static void saverbank (int, iCode *,bool);
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
@@ -128,8 +119,8 @@ void emitcode (char *inst,char *fmt, ...)
         lineCurr = (lineCurr ?
                     connectLine(lineCurr,newLineNode(lb)) :
                     (lineHead = newLineNode(lb)));
-    lineCurr->isInline = inLine;
-    lineCurr->isDebug  = debugLine;
+    lineCurr->isInline = _G.inLine;
+    lineCurr->isDebug  = _G.debugLine;
     va_end(ap);
 }
 
@@ -172,10 +163,10 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     /* if r0 not used in this instruction */
     if (!r0iu) {
         /* push it if not already pushed */
-        if (!r0Pushed) {
+        if (!_G.r0Pushed) {
             emitcode ("push","%s",
                       regWithIdx(R0_IDX)->dname);
-            r0Pushed++ ;
+            _G.r0Pushed++ ;
         }
 
         ic->rUsed = bitVectSetBit(ic->rUsed,R0_IDX);
@@ -188,10 +179,10 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
 
     if (!r1iu) {
         /* push it if not already pushed */
-        if (!r1Pushed) {
+        if (!_G.r1Pushed) {
             emitcode ("push","%s",
                       regWithIdx(R1_IDX)->dname);
-            r1Pushed++ ;
+            _G.r1Pushed++ ;
         }
 
         ic->rUsed = bitVectSetBit(ic->rUsed,R1_IDX);
@@ -276,18 +267,18 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 
             if (sym->onStack) {
 
-                    if ( accInUse )
+                    if ( _G.accInUse )
                         emitcode("push","acc");
 
                     emitcode("mov","a,_bp");
                     emitcode("add","a,#0x%02x",
                              ((sym->stack < 0) ?
-			      ((char)(sym->stack - nregssaved )) :
+			      ((char)(sym->stack - _G.nRegsSaved )) :
 			      ((char)sym->stack)) & 0xff);
                     emitcode("mov","%s,a",
                              aop->aopu.aop_ptr->name);
 
-                    if ( accInUse )
+                    if ( _G.accInUse )
                         emitcode("pop","acc");
 
             } else
@@ -595,20 +586,20 @@ static void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
        , AOP_R1 && AOP_STK */
     switch (aop->type) {
         case AOP_R0 :
-            if (r0Pushed ) {
+            if (_G.r0Pushed ) {
                 if (pop) {
                     emitcode ("pop","ar0");     
-                    r0Pushed--;
+                    _G.r0Pushed--;
                 }
             }
             bitVectUnSetBit(ic->rUsed,R0_IDX);
             break;
 
         case AOP_R1 :
-            if (r1Pushed ) {
+            if (_G.r1Pushed ) {
                 if (pop) {
                     emitcode ("pop","ar1");
-                    r1Pushed--;
+                    _G.r1Pushed--;
                 }
             }
             bitVectUnSetBit(ic->rUsed,R1_IDX);          
@@ -637,14 +628,14 @@ static void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
             }
             op->aop = aop;
             freeAsmop(op,NULL,ic,TRUE);
-            if (r0Pushed) {
+            if (_G.r0Pushed) {
                 emitcode("pop","ar0");
-                r0Pushed--;
+                _G.r0Pushed--;
             }
 
-            if (r1Pushed) {
+            if (_G.r1Pushed) {
                 emitcode("pop","ar1");
-                r1Pushed--;
+                _G.r1Pushed--;
             }       
         }
     }
@@ -1353,7 +1344,7 @@ static void saveRegisters(iCode *lic)
 	if (bitVectBitValue(rsave,R0_IDX))
 	    emitcode("mov","b,r0");
 	emitcode("mov","r0,%s",spname);
-	for (i = 0 ; i < nRegs ; i++) {
+	for (i = 0 ; i < mcs51_nRegs ; i++) {
 	    if (bitVectBitValue(rsave,i)) {
 		if (i == R0_IDX)
 		    emitcode("mov","a,b");
@@ -1367,7 +1358,7 @@ static void saveRegisters(iCode *lic)
 	if (bitVectBitValue(rsave,R0_IDX))
 	    emitcode("mov","r0,b");	    
     } else
-	for (i = 0 ; i < nRegs ; i++) {
+	for (i = 0 ; i < mcs51_nRegs ; i++) {
 	    if (bitVectBitValue(rsave,i))
 		emitcode("push","%s",regWithIdx(i)->dname);
 	}
@@ -1395,7 +1386,7 @@ static void unsaveRegisters (iCode *ic)
     
     if (options.useXstack) {
 	emitcode("mov","r0,%s",spname);	
-	for (i =  nRegs ; i >= 0 ; i--) {
+	for (i =  mcs51_nRegs ; i >= 0 ; i--) {
 	    if (bitVectBitValue(rsave,i)) {
 		emitcode("dec","r0");
 		emitcode("movx","a,@r0");
@@ -1410,7 +1401,7 @@ static void unsaveRegisters (iCode *ic)
 	if (bitVectBitValue(rsave,R0_IDX))
 	    emitcode("mov","r0,b");
     } else
-	for (i =  nRegs ; i >= 0 ; i--) {
+	for (i =  mcs51_nRegs ; i >= 0 ; i--) {
 	    if (bitVectBitValue(rsave,i))
 		emitcode("pop","%s",regWithIdx(i)->dname);
 	}
@@ -1593,7 +1584,7 @@ static void unsaverbank (int bank,iCode *ic,bool popPsw)
 	    emitcode ("pop","psw");
     }
 
-    for (i = (nRegs - 1) ; i >= 0 ;i--) {
+    for (i = (mcs51_nRegs - 1) ; i >= 0 ;i--) {
         if (options.useXstack) {       
             emitcode("movx","a,@%s",r->name);
             emitcode("mov","(%s+%d),a",
@@ -1630,7 +1621,7 @@ static void saverbank (int bank, iCode *ic, bool pushPsw)
 
     }
 
-    for (i = 0 ; i < nRegs ;i++) {
+    for (i = 0 ; i < mcs51_nRegs ;i++) {
         if (options.useXstack) {
             emitcode("inc","%s",r->name);
             emitcode("mov","a,(%s+%d)",
@@ -1681,11 +1672,11 @@ static void genCall (iCode *ic)
         saverbank(SPEC_BANK(detype),ic,TRUE);
 
     /* if send set is not empty the assign */
-    if (sendSet) {
+    if (_G.sendSet) {
 	iCode *sic ;
 
-	for (sic = setFirstItem(sendSet) ; sic ; 
-	     sic = setNextItem(sendSet)) {
+	for (sic = setFirstItem(_G.sendSet) ; sic ; 
+	     sic = setNextItem(_G.sendSet)) {
 	    int size, offset = 0;
 	    aopOp(IC_LEFT(sic),sic,FALSE);
 	    size = AOP_SIZE(IC_LEFT(sic));
@@ -1700,7 +1691,7 @@ static void genCall (iCode *ic)
 	    }
 	    freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
 	}
-	sendSet = NULL;
+	_G.sendSet = NULL;
     }
     /* make the call */
     emitcode("lcall","%s",(OP_SYMBOL(IC_LEFT(ic))->rname[0] ?
@@ -1713,9 +1704,9 @@ static void genCall (iCode *ic)
           OP_SYMBOL(IC_RESULT(ic))->spildir )) ||
         IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
 
-        accInUse++;
+        _G.accInUse++;
         aopOp(IC_RESULT(ic),ic,FALSE);
-        accInUse--;
+        _G.accInUse--;
 
 	assignResultValue(IC_RESULT(ic));
 		
@@ -1784,11 +1775,11 @@ static void genPcall (iCode *ic)
     freeAsmop(IC_LEFT(ic),NULL,ic,TRUE); 
 
     /* if send set is not empty the assign */
-    if (sendSet) {
+    if (_G.sendSet) {
 	iCode *sic ;
 
-	for (sic = setFirstItem(sendSet) ; sic ; 
-	     sic = setNextItem(sendSet)) {
+	for (sic = setFirstItem(_G.sendSet) ; sic ; 
+	     sic = setNextItem(_G.sendSet)) {
 	    int size, offset = 0;
 	    aopOp(IC_LEFT(sic),sic,FALSE);
 	    size = AOP_SIZE(IC_LEFT(sic));
@@ -1803,7 +1794,7 @@ static void genPcall (iCode *ic)
 	    }
 	    freeAsmop (IC_LEFT(sic),NULL,sic,TRUE);
 	}
-	sendSet = NULL;
+	_G.sendSet = NULL;
     }
 
     emitcode("ret","");
@@ -1816,9 +1807,9 @@ static void genPcall (iCode *ic)
           OP_SYMBOL(IC_RESULT(ic))->spildir)) ||
         IS_TRUE_SYMOP(IC_RESULT(ic)) ) {
 
-        accInUse++;
+        _G.accInUse++;
         aopOp(IC_RESULT(ic),ic,FALSE);
-        accInUse--;
+        _G.accInUse--;
 	
 	assignResultValue(IC_RESULT(ic));
 
@@ -1896,7 +1887,7 @@ static void genFunction (iCode *ic)
     symbol *sym;
     link *fetype;
 
-    nregssaved = 0;
+    _G.nRegsSaved = 0;
     /* create the function header */
     emitcode(";","-----------------------------------------");
     emitcode(";"," function %s",(sym = OP_SYMBOL(IC_LEFT(ic)))->name);
@@ -1915,7 +1906,7 @@ static void genFunction (iCode *ic)
         int i ;
 
         rbank = SPEC_BANK(fetype);
-        for ( i = 0 ; i < nRegs ; i++ ) {
+        for ( i = 0 ; i < mcs51_nRegs ; i++ ) {
             if (strcmp(regs8051[i].base,"0") == 0)
                 emitcode("","%s = 0x%02x",
                          regs8051[i].dname,
@@ -1957,7 +1948,7 @@ static void genFunction (iCode *ic)
 		    /* save the registers used */
 		    for ( i = 0 ; i < sym->regsUsed->size ; i++) {
 			if (bitVectBitValue(sym->regsUsed,i) ||
-                          (ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
+                          (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
 			    emitcode("push","%s",regWithIdx(i)->dname);			    
 		    }
 		}
@@ -1980,9 +1971,9 @@ static void genFunction (iCode *ic)
 		/* save the registers used */
 		for ( i = 0 ; i < sym->regsUsed->size ; i++) {
 		    if (bitVectBitValue(sym->regsUsed,i) ||
-                      (ptrRegReq && (i == R0_IDX || i == R1_IDX)) ) {
+                      (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) ) {
 			emitcode("push","%s",regWithIdx(i)->dname);
-			nregssaved++;
+			_G.nRegsSaved++;
 		    }
 		}
 	    }
@@ -2091,7 +2082,7 @@ static void genEndFunction (iCode *ic)
 		    /* save the registers used */
 		    for ( i = sym->regsUsed->size ; i >= 0 ; i--) {
 			if (bitVectBitValue(sym->regsUsed,i) ||
-                          (ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
+                          (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
 			    emitcode("pop","%s",regWithIdx(i)->dname);
 		    }
 		}
@@ -2119,7 +2110,7 @@ static void genEndFunction (iCode *ic)
 	/* if debug then send end of function */
 /* 	if (options.debug && currFunc) { */
 	if (currFunc) {
-	    debugLine = 1;
+	    _G.debugLine = 1;
 	    emitcode("","C$%s$%d$%d$%d ==.",
 		     ic->filename,currFunc->lastLine,
 		     ic->level,ic->block); 
@@ -2127,7 +2118,7 @@ static void genEndFunction (iCode *ic)
 		emitcode("","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
 	    else
 		emitcode("","XG$%s$0$0 ==.",currFunc->name);
-	    debugLine = 0;
+	    _G.debugLine = 0;
 	}
 	
         emitcode ("reti","");
@@ -2144,7 +2135,7 @@ static void genEndFunction (iCode *ic)
 		/* save the registers used */
 		for ( i = sym->regsUsed->size ; i >= 0 ; i--) {
 		    if (bitVectBitValue(sym->regsUsed,i) ||
-                      (ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
+                      (mcs51_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
 			emitcode("pop","%s",regWithIdx(i)->dname);
 		}
 	    }
@@ -2154,7 +2145,7 @@ static void genEndFunction (iCode *ic)
 	/* if debug then send end of function */
 /* 	if (options.debug && currFunc) { */
 	if (currFunc) {
-	    debugLine = 1;
+	    _G.debugLine = 1;
 	    emitcode("","C$%s$%d$%d$%d ==.",
 		     ic->filename,currFunc->lastLine,
 		     ic->level,ic->block); 
@@ -2162,7 +2153,7 @@ static void genEndFunction (iCode *ic)
 		emitcode("","XF%s$%s$0$0 ==.",moduleName,currFunc->name); 
 	    else
 		emitcode("","XG$%s$0$0 ==.",currFunc->name);
-	    debugLine = 0;
+	    _G.debugLine = 0;
 	}
 
         emitcode ("ret","");
@@ -4317,7 +4308,7 @@ static void genInline (iCode *ic)
     char *bp = buffer;
     char *bp1= buffer;
     
-    inLine += (!options.asmpeep);
+    _G.inLine += (!options.asmpeep);
     strcpy(buffer,IC_INLINE(ic));
 
     /* emit each line as a code */
@@ -4340,7 +4331,7 @@ static void genInline (iCode *ic)
     if (bp1 != bp)
         emitcode(bp1,"");
     /*     emitcode("",buffer); */
-    inLine -= (!options.asmpeep);
+    _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7124,9 +7115,9 @@ static void genReceive (iCode *ic)
 	}
 	
     } else {
-	accInUse++;
+	_G.accInUse++;
 	aopOp(IC_RESULT(ic),ic,FALSE);  
-	accInUse--;
+	_G.accInUse--;
 	assignResultValue(IC_RESULT(ic));	
     }
 
@@ -7147,12 +7138,12 @@ void gen51Code (iCode *lic)
 /*     if (options.debug && currFunc) { */
     if (currFunc) {
 	cdbSymbol(currFunc,cdbFile,FALSE,TRUE);
-	debugLine = 1;
+	_G.debugLine = 1;
 	if (IS_STATIC(currFunc->etype))
 	    emitcode("","F%s$%s$0$0 ==.",moduleName,currFunc->name); 
 	else
 	    emitcode("","G$%s$0$0 ==.",currFunc->name);
-	debugLine = 0;
+	_G.debugLine = 0;
     }
     /* stack pointer name */
     if (options.useXstack)
@@ -7165,11 +7156,11 @@ void gen51Code (iCode *lic)
 	
 	if ( cln != ic->lineno ) {
 	    if ( options.debug ) {
-		debugLine = 1;
+		_G.debugLine = 1;
 		emitcode("","C$%s$%d$%d$%d ==.",
 			 ic->filename,ic->lineno,
 			 ic->level,ic->block);
-		debugLine = 0;
+		_G.debugLine = 0;
 	    }
 	    emitcode(";","%s %d",ic->filename,ic->lineno);
 	    cln = ic->lineno ;
@@ -7361,7 +7352,7 @@ void gen51Code (iCode *lic)
 	    break;
 	    
 	case SEND:
-	    addSet(&sendSet,ic);
+	    addSet(&_G.sendSet,ic);
 	    break;
 
 	default :

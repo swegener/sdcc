@@ -23,14 +23,8 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include "SDCCglobl.h"
-#include "SDCChasht.h"
-#include "SDCCset.h" 
+#include "common.h"
 #include "SDCCpeeph.h"
-
 
 peepRule *rootRules = NULL;
 peepRule *currRule  = NULL;

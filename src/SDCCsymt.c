@@ -21,14 +21,7 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <string.h>
-#include "SDCCglobl.h"
-#include "SDCCsymt.h"
-#include "SDCCval.h"
-#include "SDCCast.h"
-#include "SDCCy.h"
-#include "SDCCset.h"
+#include "common.h"
 
 bucket   *SymbolTab [256]  ;  /* the symbol    table  */
 bucket   *StructTab [256]  ;  /* the structure table  */

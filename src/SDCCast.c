@@ -22,16 +22,7 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <string.h>
-#include "SDCCglobl.h"
-#include "SDCCast.h"
-#include "SDCCmem.h"
-#include "SDCCy.h"
-#include "SDCChasht.h"
-#include "SDCCicode.h"
-#include "SDCCopt.h"
-
+#include "common.h"
 
 int currLineno  = 0;
 set *astList = NULL ;

@@ -1913,7 +1913,7 @@ void packRegisters (eBBlock *ebp)
 /*-----------------------------------------------------------------*/
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
-void assignRegisters (eBBlock **ebbs, int count)
+void z80_assignRegisters (eBBlock **ebbs, int count)
 {
     iCode *ic;
     int i ;

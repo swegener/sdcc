@@ -1,8 +1,24 @@
-#include "SDCCglobl.h"
+#include "common.h"
 #include "main.h"
 
+void mcs51_assignRegisters (eBBlock **ebbs, int count);
+
+static bool _mcs51_parseOptions(int *pargc, char **argv)
+{
+    return FALSE;
+}
+
+static void _mcs51_finaliseOptions(void)
+{
+}
+
+static void _mcs51_setDefaultOptions(void)
+{    
+}
+
 /* Globals */
-PROCESSOR_CONSTANTS port = {
+PORT mcs51_port = {
+    "mcs51",
     "MCU 8051",			/* Target name */
     {	
 	"asx8051",		/* Assembler executable name */
@@ -23,6 +39,10 @@ PROCESSOR_CONSTANTS port = {
     /* mcs51 has an 8 bit mul */
     {
 	1
-    }
+    },
+    _mcs51_parseOptions,
+    _mcs51_finaliseOptions,
+    _mcs51_setDefaultOptions,
+    mcs51_assignRegisters
 };
 

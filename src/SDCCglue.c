@@ -21,20 +21,9 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-#include <stdio.h>
-#include <string.h>
+
+#include "common.h"
 #include <time.h>
-#include "SDCCglobl.h"
-#include "SDCCsymt.h"
-#include "SDCCmem.h"
-#include "SDCCval.h"
-#include "SDCCast.h"
-#include "SDCChasht.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCCopt.h"
-#include "SDCCy.h"
-#include "SDCCglue.h"
 
 symbol *interrupts[256];
 extern char *aopLiteral (value *, int);

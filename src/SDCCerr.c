@@ -1,9 +1,6 @@
 /* SDCCerr.c - error handling routines */
-#include <stdio.h>
-#include <stdarg.h>
-#include "SDCCglobl.h"
-#include "SDCCmem.h"
-#include "SDCCerr.h"
+
+#include "common.h"
 
 #define ERROR		0
 #define WARNING		1

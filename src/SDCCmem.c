@@ -2,17 +2,7 @@
 /* SDCCmem.c - 8051 memory management routines			   */
 /*-----------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <string.h>
-#include "SDCCglobl.h"
-#include "SDCCsymt.h"
-#include "SDCCmem.h"
-#include "SDCCval.h"
-#include "SDCCast.h"
-#include "SDCChasht.h"
-#include "SDCCset.h"
-#include "SDCCicode.h"
-#include "SDCCopt.h"
+#include "common.h"
 
 /* memory segments */
 memmap  *xstack= NULL ;	 /* xternal stack data	       */

@@ -9,15 +9,6 @@
 #include "common.h"
 #include "asm.h"
 
-#ifdef _WIN32
-   // for O_BINARY in _pipe()
-#  include <fcntl.h>
-#  include <io.h>
-#else
-   // for pipe and close
-#  include <unistd.h>
-#endif
-
 /* A 'token' is like !blah or %24f and is under the programmers
    control. */
 #define MAX_TOKEN_LEN		64
@@ -205,7 +196,7 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
 	int wrlen;
 	wrlen = vsnprintf (buffer, len, newFormat, ap);
 	
-	if (wrlen < 0 || wrlen >= len)
+	if (wrlen < 0 || (size_t)wrlen >= len)
 	{
 	    fprintf(stderr, "Internal error: tvsprintf truncated.\n");
 	}
@@ -259,55 +250,59 @@ asm_addTree (const ASM_MAPPINGS * pMappings)
 /*-----------------------------------------------------------------*/
 /* printILine - return the readable i-code for this ic             */
 /*                                                                 */
-/* iCodePrint wants a file stream so we need a pipe to fool it     */
+/* iCodePrint wants a file stream so we need a temporary file to   */
+/* fool it                                                         */
 /*-----------------------------------------------------------------*/
-static char verbalICode[1024];
-
-char *printILine (iCode *ic) {
-  int filedes[2];
-  FILE *pipeStream;
+char *
+printILine (iCode *ic)
+{
+  static char verbalICode[1024];
+  FILE *tmpFile;
   iCodeTable *icTab=getTableEntry(ic->op);
-  int res;
 
-#ifdef _WIN32
-  res = _pipe(filedes, 256, O_BINARY);
-#else
-  res = pipe(filedes);
-#endif
-  assert(res != -1); // forget it
-  if (res == -1)
-    return "";  // return empty line if pipe creation failed
+  if (INLINEASM == ic->op)
+    return "inline";
 
-  // stuff the pipe with the readable icode
-  pipeStream=fdopen(filedes[1],"w");
-  if (ic->op != INLINEASM)
-    icTab->iCodePrint(pipeStream, ic, icTab->printName);
-  else
-    fprintf(pipeStream, "inline\n");
-  // it really needs an extra push
-  fflush(pipeStream);
-  // now swallow it
-  pipeStream=fdopen(filedes[0],"r");
-  fgets(verbalICode, sizeof(verbalICode), pipeStream);
-  // clean up the mess, we'll return here for all icodes!!
-  assert(!close (filedes[0]));
-  assert(!close (filedes[1]));
-  // kill the trailing NL
-  verbalICode[strlen(verbalICode)-1]='\0';
-  // and throw it up
+  tmpFile = tempfile();
+  assert(NULL != tmpFile);
+  if (NULL == tmpFile)
+    return "";  /* return empty line if temporary file creation failed */
+
+  addSetHead(&tmpfileSet, tmpFile);
+
+  /* stuff the temporary file with the readable icode */
+  icTab->iCodePrint(tmpFile, ic, icTab->printName);
+
+  /* now swallow it */
+  rewind(tmpFile);
+  fgets(verbalICode, sizeof(verbalICode), tmpFile);
+
+  /* clean up the mess, we'll return here for all icodes!!
+   * Actually the temporary file is only closed. It will be
+   * removed by rm_tmpfiles().
+   */
+  assert(!fclose(tmpFile));
+  deleteSetItem(&tmpfileSet, tmpFile);
+
+  /* kill the trailing NL */
+  if ('\n' == verbalICode[strlen(verbalICode) - 1])
+    verbalICode[strlen(verbalICode) - 1] = '\0';
+
+  /* and throw it up */
   return verbalICode;
 }
 
 /*-----------------------------------------------------------------*/
 /* printCLine - return the c-code for this lineno                  */
 /*-----------------------------------------------------------------*/
-static FILE *inFile=NULL;
-static char inLineString[1024];
-static int inLineNo=0;
-static char lastSrcFile[PATH_MAX];
-int rewinds=0;
-
-char *printCLine (char *srcFile, int lineno) {
+/* int rewinds=0; */
+char *
+printCLine (char *srcFile, int lineno)
+{
+  static FILE *inFile=NULL;
+  static char inLineString[1024];
+  static int inLineNo=0;
+  static char lastSrcFile[PATH_MAX];
   char *ilsP=inLineString;
 
   if (inFile) {
@@ -328,7 +323,7 @@ char *printCLine (char *srcFile, int lineno) {
   if (lineno<inLineNo) {
     fseek (inFile, 0, SEEK_SET);
     inLineNo=0;
-    rewinds++;
+    /* rewinds++; */
   }
   while (fgets (inLineString, 1024, inFile)) {
     inLineNo++;

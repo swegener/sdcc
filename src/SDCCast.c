@@ -697,7 +697,7 @@ processParms (ast * func,
       if (newType)
 	{
 	  /* cast required; change this op to a cast. */
-	  ast *parmCopy = resolveSymbols (copyAst (actParm));
+	  ast *parmCopy = decorateType(resolveSymbols (copyAst (actParm)));
 
 	  actParm->type = EX_OP;
 	  actParm->opval.op = CAST;
@@ -751,7 +751,7 @@ processParms (ast * func,
   /* if the parameter is castable then add the cast */
   if (compareType (defParm->type, actParm->ftype) < 0)
     {
-      ast *pTree = resolveSymbols (copyAst (actParm));
+      ast *pTree = decorateType(resolveSymbols (copyAst (actParm)));
 
       /* now change the current one to a cast */
       actParm->type = EX_OP;
@@ -4171,7 +4171,7 @@ createFunction (symbol * name, ast * body)
   body = resolveSymbols (body);	/* resolve the symbols */
   body = decorateType (body);	/* propagateType & do semantic checks */
 
-  ex = newAst_VALUE (symbolVal (name));		/* create name       */
+  ex = newAst_VALUE (symbolVal (name)); /* create name */
   ex = newNode (FUNCTION, ex, body);
   ex->values.args = FUNC_ARGS(name->type);
   ex->decorated=1;

@@ -30,6 +30,9 @@ init:
 	;; Stack at the top of memory.
 	ld	sp,#0xdfff        
 
+        ;; Setup global data
+        call    gsinit
+        
 	;; Use _main instead of main to bypass sdcc's intelligence
 	call	_main
 	jp	_exit

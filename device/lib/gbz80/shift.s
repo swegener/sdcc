@@ -1,85 +1,85 @@
         ;;
 __rrulong_rrx_s::                
-        ld      hl,#2+4
+        ld      hl,#2
         add     hl,sp
-                
-        ld      c,(hl)
-        dec     hl
-        ld      d,(hl)
-        dec     hl
-        ld      e,(hl)
-        dec     hl
-        ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
 
-        ld      a,c
+        ld      e,(hl)
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)
+        inc     hl
+        ld      a,(hl)
+
+        ld      l,c
+        ld      h,b
 1$:
         or      a,a
         ret     z
 
-        rr      d
-        rr      e
         rr      h
         rr      l
+        rr      d
+        rr      e
 
         dec     a
         jp      1$
 
 __rrslong_rrx_s::        
-        ld      hl,#2+4
+        ld      hl,#2
         add     hl,sp
                 
-        ld      c,(hl)
-        dec     hl
-        ld      d,(hl)
-        dec     hl
         ld      e,(hl)
-        dec     hl
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)
+        inc     hl
         ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
 
-        ld      a,c
+        ld      l,c
+        ld      h,b
 1$:
         or      a,a
         ret     z
 
-        sra     d
-        rr      e
-        rr      h
+        sra     h
         rr      l
+        rr      d
+        rr      e
 
         dec     a
         jp      1$
         
 __rlslong_rrx_s::                
 __rlulong_rrx_s::                
-        ld      hl,#2+4
+        ld      hl,#2
         add     hl,sp
         
-        ld      c,(hl)
-        dec     hl
-        ld      d,(hl)
-        dec     hl
         ld      e,(hl)
-        dec     hl
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)
+        inc     hl
         ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
 
-        ld      a,c
+        ld      l,c
+        ld      h,b
 1$:
         or      a,a
         ret     z
 
-        rl      l
-        rl      h
         rl      e
         rl      d
+        rl      l
+        rl      h
 
         dec     a        
         jp      1$

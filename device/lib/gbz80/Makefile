@@ -5,7 +5,8 @@ TOPDIR = ../../..
 SCC = $(TOPDIR)/bin/sdcc -mgbz80
 SAS = $(TOPDIR)/bin/as-gbz80
 
-OBJ = putchar.o string.o printf.o div.o mul.o stubs.o shift.o
+OBJ = div.o mul.o putchar.o printf.o shift.o stubs.o
+
 LIB = gbz80.lib
 CC = $(SCC)
 AS = $(SAS)
@@ -23,4 +24,4 @@ $(LIB): $(OBJ) Makefile _dummy
 _dummy:
 
 clean:
-	rm -f $(OBJ) *~ $(CLEANSPEC) *.dump* *.asm *.lib
+	rm -f *.o *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib

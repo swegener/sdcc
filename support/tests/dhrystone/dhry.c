@@ -52,28 +52,18 @@
 #include <tinibios.h>
 #define clock() ClockTicks()
 #define CLOCKS_PER_SEC 1000
-#undef PRINT_T_STATES
 #define memcpy(d,s,l) memcpyx(d,s,l)
 
-#elif defined(__z80)
+#elif defined(__z80) || defined(__gbz80)
 unsigned int _clock(void);
 
 #define clock _clock
 #define CLOCKS_PER_SEC	100
-#define PRINT_T_STATES	1
 
 #else
 /** For clock() */
 #include <time.h>
 #include <types.h>
-#define PRINT_T_STATES
-#endif
-
-/** Print the number of t-states this program has been executing for.
-    Optional :)
-*/
-#ifdef PRINT_T_STATES
-void _printTStates(void);
 #endif
 
 /** Set to one to print more messages about expected values etc. 
@@ -97,6 +87,10 @@ int             Arr_2_Glob [50] [50];
 
 /* Used instead of malloc() */
 static Rec_Type _r[2];
+
+void mark(void)
+{
+}
 
 void Proc_1 (REG Rec_Pointer Ptr_Val_Par);
 void Proc_2 (One_Fifty *Int_Par_Ref);
@@ -226,10 +220,6 @@ int main(void)
 	DPRINTF(("Looping.\n"));
     } /* loop "for Run_Index" */
 
-#ifdef PRINT_T_STATES    
-    _printTStates();
-#endif    
-
     printf("Run_Index = %d\n", Run_Index);
 
     runTime = clock() - runTime;
@@ -292,6 +282,7 @@ int main(void)
 #endif
 #if 1
     printf("Number of runs: %u.  runTime: %u.\n", Number_Of_Runs, (unsigned)runTime);
+    mark();
     printf("Dhrystones/s = %u\n", (unsigned)((unsigned long)Number_Of_Runs / (runTime/CLOCKS_PER_SEC)));
     printf("MIPS = d/s/1757 = (sigh, need floats...)\n");
 #endif

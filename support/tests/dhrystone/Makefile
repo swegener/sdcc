@@ -15,6 +15,9 @@ all: dhry.bin
 dhry.ihx: dhry.c
 	$(CC) $(CFLAGS) dhry.c
 
+dhry.gb: dhry.c
+	$(CC) $(CFLAGS) dhry.c
+
 dhry.c: dhry.h
 
 dhry.bin: dhry.ihx

@@ -15,8 +15,8 @@ __divschar_rrx_hds::
         
         call    .div8
 
-	ld	l,c
-        ld      h,b
+	ld	e,c
+        ld      d,b
         	
 	ret
 	
@@ -34,9 +34,8 @@ __modschar_rrx_hds::
 
        	call	.div8
 
-	ld	l,e
-        ld      h,d
-        	
+        ;; Already in DE
+        
 	ret
 
 __divsint_rrx_s::        
@@ -59,8 +58,8 @@ __divsint_rrx_hds::
 
 	call	.div16
 
-	ld	l,c
-	ld	h,b
+	ld	e,c
+	ld	d,b
 	
 	ret
 	
@@ -84,8 +83,7 @@ __modsint_rrx_hds::
 
 	call	.div16
 
-	ld	l,e
-	ld	h,d
+        ;; Already in DE
 	
 	ret
 
@@ -103,8 +101,8 @@ __divuchar_rrx_hds::
         ld      c,l
 	call	.divu8
 
-	ld	l,c
-        ld      h,b
+	ld	e,c
+        ld      d,b
         
 	ret
 	
@@ -121,8 +119,7 @@ __moduchar_rrx_hds::
         ld      c,l
 	call	.divu8
 
-	ld	l,e
-        ld      h,d
+        ;; Already in DE
 
         ret
 
@@ -145,8 +142,8 @@ __divuint_rrx_hds::
 	ld	c,l
 	call	.divu16
 
-	ld	l,c
-	ld	h,b
+	ld	e,c
+	ld	d,b
 	
 	ret
 	
@@ -170,8 +167,7 @@ __moduint_rrx_hds::
 
 	call	.divu16
 
-	ld	l,e
-	ld	h,d
+        ;; Already in DE
 	
 	ret
 	

@@ -217,6 +217,42 @@ static struct
 
 static const char *aopGet (asmop * aop, int offset, bool bit16);
 
+static PAIR_ID
+_getTempPairId(void)
+{
+  if (IS_GB)
+    {
+      return PAIR_DE;
+    }
+  else
+    {
+      return PAIR_HL;
+    }
+}
+
+static const char *
+_getTempPairName(void)
+{
+  return _pairs[_getTempPairId()].name;
+}
+
+#if 0
+static const char *
+_getTempPairPart(int idx)
+{
+  wassertl (idx == LSB || idx == MSB16, "Invalid pair offset");
+  
+  if (idx == LSB)
+    {
+      return _pairs[_getTempPairId()].l;
+    }
+  else
+    {
+      return _pairs[_getTempPairId()].h;
+    }
+}
+#endif
+
 static void
 _tidyUp (char *buf)
 {
@@ -1064,18 +1100,21 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, int offset)
         /* we need to get it byte by byte */
         if (pairId == PAIR_HL && IS_GB && requiresHL (aop)) {
             aopGet (aop, offset, FALSE);
-            switch (aop->size) {
+            switch (aop->size - offset) {
             case 1:
                 emit2 ("ld l,!*hl");
                 emit2 ("ld h,!immedbyte", 0);
                             break;
             case 2:
+              // PENDING: Requires that you are only fetching two bytes.
+            case 4:
                 emit2 ("!ldahli");
                 emit2 ("ld h,!*hl");
                 emit2 ("ld l,a");
                 break;
             default:
-                emitDebug ("; WARNING: mlh woosed out.  This code is invalid.");
+              wassertl (0, "Attempted to fetch too much data into HL");
+              break;
             }
         }
         else if (IS_Z80 && aop->type == AOP_IY) {
@@ -1768,8 +1807,7 @@ assignResultValue (operand * oper)
       _push (PAIR_HL);
       aopPut (AOP (oper), _fReturn[0], 0);
       aopPut (AOP (oper), _fReturn[1], 1);
-      emit2 ("pop de");
-      _G.stack.pushed -= 2;
+      _pop (PAIR_DE);
       aopPut (AOP (oper), _fReturn[0], 2);
       aopPut (AOP (oper), _fReturn[1], 3);
     }
@@ -2921,15 +2959,16 @@ genMinusDec (iCode * ic)
 
   /* if increment 16 bits in register */
   if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
-      (size == 2))
+      (size == 2)
+      )
     {
-      fetchPair (PAIR_HL, AOP (IC_RESULT (ic)));
+      fetchPair (_getTempPairId(), AOP (IC_RESULT (ic)));
 
       while (icount--) {
-        emit2 ("dec hl");
+        emit2 ("dec %s", _getTempPairName());
       }
-      aopPut (AOP (IC_RESULT (ic)), "l", LSB);
-      aopPut (AOP (IC_RESULT (ic)), "h", MSB16);
+
+      commitPair (AOP (IC_RESULT (ic)), _getTempPairId());
 
       return TRUE;
     }
@@ -3030,6 +3069,9 @@ genMinus (iCode * ic)
 	    }
 	  else if (size == 4)
 	    {
+              /* Anything could be on the stack, and we can't afford
+                 to setup the base pointer as that may nuke the carry.
+              */
 	      emitDebug ("; WARNING: This sub is probably broken.\n");
 	    }
 	}
@@ -3220,6 +3262,9 @@ genCmp (operand * left, operand * right,
 	}
       else
 	{
+#if 0
+          // PENDING: Doesn't work around zero
+
 	  /* Special cases:
 	     On the GB:
 	     If the left or the right is a lit:
@@ -3259,6 +3304,7 @@ genCmp (operand * left, operand * right,
 	      emit2 ("add hl,%s", _getPairIdName (id));
 	      goto release;
 	    }
+#endif
 	  if (AOP_TYPE (right) == AOP_LIT)
 	    {
 	      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);

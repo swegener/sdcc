@@ -102,4 +102,9 @@ __muluint_rrx_hds::
 2$:
         dec     b
         jr      nz,1$
+
+        ;; Return in DE
+        ld      e,l
+        ld      d,h
+        
         ret

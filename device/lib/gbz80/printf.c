@@ -5,10 +5,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#define STATIC
+
 /* PENDING */
 #define NULL	0
 
-static void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(), void *pData)
+STATIC void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(char, void *), void *pData)
 {
     const char *_hex = "0123456789ABCDEF";
     if (issigned && ((int)u < 0)) {
@@ -20,13 +22,13 @@ static void _printn(unsigned u, unsigned base, char issigned, void (*emitter)(),
     (*emitter)(_hex[u%base], pData);
 }
 
-static void _printf(const char *format, void (*emitter)(), void *pData, va_list va)
+STATIC void _printf(const char *format, void (*emitter)(char, void *), void *pData, va_list va)
 {
     while (*format) {
 	if (*format == '%') {
 	    switch (*++format) {
 	    case 'c': {
-		char c = va_arg(va, char);
+		char c = (char)va_arg(va, int);
 		(*emitter)(c, pData);
 		break;
 	    }
@@ -67,7 +69,7 @@ static void _printf(const char *format, void (*emitter)(), void *pData, va_list 
 
 void putchar(char c);
 
-static void _char_emitter(char c, void *pData)
+STATIC void _char_emitter(char c, void *pData)
 {
     /* PENDING: Make the compiler happy. */
     pData = 0;
@@ -80,7 +82,6 @@ int printf(const char *format, ...)
     va_list va;
     va_start(va, format);
 
-    _printf(format, _char_emitter, NULL, va);
     _printf(format, _char_emitter, NULL, va);
 
     /* PENDING: What to return? */

@@ -383,7 +383,7 @@ static const char *_gbz80_asmCmd[] =
 
 static const char *_gbz80_linkCmd[] =
 {
-    "link-z80", 
+    "link-gbz80", 
     "-n",                       // Don't echo output
     "-c",                       // Command line input
     "--",                       // Again, command line input...
@@ -424,6 +424,7 @@ _link(const char *portName, const char *portExt, const char *portOutputType)
             "-- "                       // Again, command line input...
             "-b_CODE=0x%04X "           // Code starts at 0x200
             "-b_DATA=0x%04X "           // RAM starts at 0x8000
+            "-m "			// Map file
             "-j ",                      // Output a symbol file as well
             portName,
             options.code_loc,

@@ -1,5 +1,7 @@
 2001-09-01  Michael Hope  <michaelh@juju.net.nz>
 
+	* device/lib/gbz80/Makefile: Fixed up all the libraries to pass the regression tests.
+
 	* support/regression/ports/host/spec.mk: Updated to compile with the new type specifiers.
 
 	* device/lib/Makefile.in (Z80SOURCES): Removed old _mululong, _mulslong, and unneeded _mulint.

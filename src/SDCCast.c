@@ -1506,6 +1506,71 @@ ast *reverseLoop (ast *loop, symbol *sym, ast *init, ast *end)
 
 }
 
+#define DEMAND_INTEGER_PROMOTION
+
+#ifdef DEMAND_INTEGER_PROMOTION
+
+/*-----------------------------------------------------------------*/
+/* walk a tree looking for the leaves. Add a typecast to the given */
+/* type to each value leaf node.				   */
+/*-----------------------------------------------------------------*/
+void pushTypeCastToLeaves(sym_link *type, ast *node, ast **parentPtr)
+{
+    if (!node)
+    {
+        /* WTF? We should never get here. */
+        return;
+    }
+    
+    if (!node->left && !node->right)
+    {
+        /* We're at a leaf; if it's a value, apply the typecast */
+        if (node->type == EX_VALUE && IS_INTEGRAL(TTYPE(node)))
+        {
+            *parentPtr = newNode(CAST,
+			         newAst_LINK(copyLinkChain(type)),
+		                 node);
+	}
+    }
+    else
+    {
+    	if (node->left)
+    	{
+    	    pushTypeCastToLeaves(type, node->left, &(node->left));
+    	}
+    	if (node->right)
+    	{
+            pushTypeCastToLeaves(type, node->right, &(node->right));
+    	}
+    }
+}
+
+#endif
+
+/*-----------------------------------------------------------------*/
+/* Given an assignment operation in a tree, determine if the LHS   */
+/* (the result) has a different (integer) type than the RHS.	   */
+/* If so, walk the RHS and add a typecast to the type of the LHS   */
+/* to all leaf nodes.						   */
+/*-----------------------------------------------------------------*/
+void propAsgType(ast *tree)
+{
+#ifdef DEMAND_INTEGER_PROMOTION
+    if (!IS_INTEGRAL(LTYPE(tree)) || !IS_INTEGRAL(RTYPE(tree)))
+    {
+    	/* Nothing to do here... */
+    	return;
+    }
+    
+    if (getSize(LTYPE(tree)) != getSize(RTYPE(tree)))
+    {
+        pushTypeCastToLeaves(LTYPE(tree), tree->right, &(tree->right));
+    }
+#else
+    (void)tree;
+#endif        
+}
+
 /*-----------------------------------------------------------------*/
 /* decorateType - compute type for this tree also does type cheking*/
 /*          this is done bottom up, since type have to flow upwards*/
@@ -2463,6 +2528,9 @@ ast *decorateType (ast *tree)
 	    goto errorTreeReturn ;	
 	}
 	LLVAL(tree) = 1;
+	
+	propAsgType(tree);
+	
 	return tree ;
 
     case AND_ASSIGN:
@@ -2487,6 +2555,9 @@ ast *decorateType (ast *tree)
 	    goto errorTreeReturn ;	
 	}
 	LLVAL(tree) = 1;
+	
+	propAsgType(tree);
+	
 	return tree ;
 	
 	/*------------------------------------------------------------------*/
@@ -2518,6 +2589,9 @@ ast *decorateType (ast *tree)
 	    goto errorTreeReturn ;	
 	}
 	LLVAL(tree) = 1;
+	
+	propAsgType(tree);
+	
 	return tree;
 	
 	/*------------------------------------------------------------------*/
@@ -2556,6 +2630,9 @@ ast *decorateType (ast *tree)
 
 	tree->right = decorateType(newNode('+',copyAst(tree->left),tree->right));
 	tree->opval.op = '=';       
+	
+	propAsgType(tree);
+	
 	return tree;
 	
 	/*------------------------------------------------------------------*/
@@ -2607,6 +2684,8 @@ ast *decorateType (ast *tree)
 	    werror(E_LVALUE_REQUIRED,"=");
 	    goto errorTreeReturn ;	
 	}
+
+        propAsgType(tree);
 
 	return tree ;
 	
@@ -2661,12 +2740,23 @@ ast *decorateType (ast *tree)
 	}
 	
 	/* if there is going to be a casing required then add it */
-	if (checkType(currFunc->type->next,RTYPE(tree)) < 0 ) {
-	    tree->right = 
+	if (checkType(currFunc->type->next,RTYPE(tree)) < 0 ) 
+	{
+#ifdef DEMAND_INTEGER_PROMOTION	
+	    if (IS_INTEGRAL(currFunc->type->next))
+	    {
+	    	pushTypeCastToLeaves(currFunc->type->next, tree->right, &(tree->right));
+	    }
+	    else
+#endif	    
+	    {
+	    	tree->right = 
 		decorateType(newNode(CAST,
 				     newAst_LINK(copyLinkChain(currFunc->type->next)),
 				     tree->right));
+	    }
 	}
+	pushTypeCastToLeaves(currFunc->type->next, tree->right, &(tree->right));
 	
 	RRVAL(tree) = 1;
 	return tree;

@@ -1,7 +1,7 @@
-/** Simple test for increment
+/** Simple test for the mul/div/mod operations.
 
     type: int
-    storage: ,
+    storage: , static
 */
 #include <testfwk.h>
 
@@ -9,6 +9,7 @@ static void
 testMul(void)
 {
 #if SDCC
+    // Disabled as the z80 port is broken
 #else
     volatile {storage} {type} i;
 
@@ -26,6 +27,7 @@ static void
 testDiv(void)
 {
 #if SDCC
+    // Disabled as the z80 port is broken
 #else
     volatile {storage} {type} i;
 

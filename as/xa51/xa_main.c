@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #define printf(x...) fprintf(stderr,x)
 
@@ -33,7 +34,7 @@ extern int yyparse();
 
 /* global variables */
 
-FILE *fhex, *fmem, *list_fp;
+FILE *fhex, *fmem, *list_fp, *sym_fp;
 extern FILE *yyin;
 extern char *yytext;
 extern char last_line_text[];
@@ -201,12 +202,12 @@ void print_symbol_table()
   struct symbol *p;
   p = sym_list;
   while (p != NULL) {
-    printf("Sym in %-5s: %s\n", areaToString(p->area), p->name);
-    printf("  at: 0x%04X (%5d)", p->value, p->value);
-    printf(" Def:%s", p->isdef ? "Yes" : "No ");
-    printf(" Bit:%s", p->isbit ? "Yes" : "No ");
-    printf(" Target:%s", p->istarget ? "Yes" : "No ");
-    printf(" Line %d\n", p->line_def);
+    fprintf(sym_fp, "Sym in %-5s: %s\n", areaToString(p->area), p->name);
+    fprintf(sym_fp, "  at: 0x%04X (%5d)", p->value, p->value);
+    fprintf(sym_fp, " Def:%s", p->isdef ? "Yes" : "No ");
+    fprintf(sym_fp, " Bit:%s", p->isbit ? "Yes" : "No ");
+    fprintf(sym_fp, " Target:%s", p->istarget ? "Yes" : "No ");
+    fprintf(sym_fp, " Line %d\n", p->line_def);
     p = p->next;
   }
 }
@@ -368,7 +369,7 @@ int binary2int(char *str)
 	return (sum);
 }
 
-void print_usage();
+void print_usage(int);
 
 
 /* todo: someday this will allow the user to control where the */
@@ -379,18 +380,87 @@ void print_usage();
 
 void init_areas(void)
 {
-	area[AREA_CSEG].alloc_position = 0;
-	area[AREA_DSEG].alloc_position = 0x30;
-	area[AREA_OSEG].alloc_position = 0x80;
-	area[AREA_ISEG].alloc_position = 0;
-	area[AREA_BSEG].alloc_position = 0;
-	area[AREA_XSEG].alloc_position = 0;
-	area[AREA_XISEG].alloc_position = 0;
-	area[AREA_GSINIT].alloc_position = 0;
-	area[AREA_GSFINAL].alloc_position = 0;
-	area[AREA_HOME].alloc_position = 0;
+  area[AREA_CSEG].start=area[AREA_CSEG].alloc_position = 0;
+  area[AREA_DSEG].start=area[AREA_DSEG].alloc_position = 0x30;
+  area[AREA_OSEG].start=area[AREA_OSEG].alloc_position = 0x80;
+  area[AREA_ISEG].start=area[AREA_ISEG].alloc_position = 0;
+  area[AREA_BSEG].start=area[AREA_BSEG].alloc_position = 0;
+  area[AREA_XSEG].start=area[AREA_XSEG].alloc_position = 0;
+  area[AREA_XISEG].start=area[AREA_XISEG].alloc_position = 0;
+  area[AREA_XINIT].start=area[AREA_XINIT].alloc_position = 0;
+  area[AREA_GSINIT].start=area[AREA_GSINIT].alloc_position = 0;
+  area[AREA_GSFINAL].start=area[AREA_GSFINAL].alloc_position = 0;
+  area[AREA_HOME].alloc_position = 0;
 }
 
+void printVersion() {
+  printf("\nPaul's XA51 Assembler\n");
+  printf("Copyright 1997,2002 Paul Stoffregen\n\n");
+  printf("This program is free software; you can redistribute it\n");
+  printf("and/or modify it under the terms of the GNU General Public\n");
+  printf("License, Version 2, published by the Free Software Foundation\n\n");
+  printf("This program is distributed in the hope that it will be useful,\n");
+  printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
+  printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
+}
+
+char infilename[PATH_MAX];
+char outfilename[PATH_MAX];
+char listfilename[PATH_MAX];
+char symfilename[PATH_MAX];
+//char mapfilename[PATH_MAX];
+
+int verbose=0, createSymbolFile=0;
+
+void process_args(int argc, char **argv) 
+{
+  int i=0;
+
+  if (argc < 2) print_usage(1);
+  
+  while (++i<argc && *argv[i]=='-') {
+    if (strcmp(argv[i], "--version")==0) {
+      printVersion();
+      exit (0);
+    }
+    if (strcmp(argv[i], "--help")==0) {
+      print_usage(0);
+    }
+    if (strcmp(argv[i], "-v")==0) {
+      verbose++;
+      continue;
+    }
+    if (strcmp(argv[i], "-s")==0) {
+      createSymbolFile++;
+      continue;
+    }
+    print_usage(1);
+  }
+
+  if (i!=argc-1) {
+    // only 1 source file for now
+    print_usage(1);
+  }
+
+  strcpy(infilename, argv[i]);
+
+  if (strncasecmp(infilename+strlen(infilename)-3, ".xa", 3)) {
+    fprintf (stderr, "unrecognized input file: \"%s\"\n", argv[i]);
+    print_usage(1);
+  }
+
+  strcpy(outfilename, infilename);
+  outfilename[strlen(outfilename)-3] = '\0';
+  strcpy(listfilename, outfilename);
+  if (createSymbolFile) {
+    strcpy(symfilename, outfilename);
+    strcat(symfilename, ".sym");
+  }
+  //strcpy(mapfilename, outfilename);
+  strcat(outfilename, ".hex");
+  strcat(listfilename, ".lst");
+  //strcat(mapfilename, ".map");
+}
 
 /* pass #1 (p1=1) find all symbol defs and branch target names */
 /* pass #2 (p2=1) align branch targets, evaluate all symbols */
@@ -398,19 +468,8 @@ void init_areas(void)
 
 int main(int argc, char **argv)
 {
-	char infilename[200], outfilename[200], listfilename[200];
+	process_args (argc, argv);
 
-	if (argc < 2) print_usage();
-	strcpy(infilename, argv[1]);
-	if(strlen(infilename) > 3) {
-		if (strncasecmp(infilename+strlen(infilename)-3, ".xa", 3))
-			strcat(infilename, ".xa");
-	} else strcat(infilename, ".xa");
-	strcpy(outfilename, infilename);
-	outfilename[strlen(outfilename)-3] = '\0';
-	strcpy(listfilename, outfilename);
-	strcat(outfilename, ".hex");
-	strcat(listfilename, ".lst");
 	yyin = fopen(infilename, "r");
 	if (yyin == NULL) {
 		fprintf(stderr, "Can't open file '%s'.\n", infilename);
@@ -426,56 +485,65 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Can't write file '%s'.\n", listfilename);
 		exit(1);
 	}
+	if (createSymbolFile) {
+	  sym_fp = fopen(symfilename, "w");
+	  if (sym_fp == NULL) {
+	    fprintf(stderr, "Can't write file '%s'.\n", symfilename);
+	    exit(1);
+	  }
+	}
 
-	/* todo: add a command line option to supress verbose messages */
-	printf("\nPaul's XA51 Assembler\n");
-	printf("Copyright 1997,2002 Paul Stoffregen\n\n");
-	printf("This program is free software; you can redistribute it\n");
-	printf("and/or modify it under the terms of the GNU General Public\n");
-	printf("License, Version 2, published by the Free Software Foundation\n\n");
-	printf("This program is distributed in the hope that it will be useful,\n");
-	printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-	printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-
-
-
-	printf("    Building Symbol Table:\n");
+	if (verbose) printf("Pass 1: Building Symbol Table:\n");
 	p1 = 1;
-	//mem = 0;
 	init_areas();
 	yyparse();
 	flag_targets();
-	print_symbol_table();
+	if (createSymbolFile) print_symbol_table();
 	check_redefine();
+
+	if (verbose) printf("Pass 2: Aligning Branch Targets:\n");
 	p1 = 0;
 	p2 = 1;
 	rewind(yyin);
 	yyrestart(yyin);
 	lineno = 1;
-	printf("    Aligning Branch Targets:\n");
-	//mem = 0;
 	init_areas();
 	yyparse();
-	// print_symbol_table();
+
+	if (verbose) printf("Pass 3: Generating Object Code:\n");
 	p2 = 0;
 	p3 = 1;
 	rewind(yyin);
 	yyrestart(yyin);
 	lineno = 1;
-	printf("    Generating Object Code:\n");
-	//mem = 0;
 	init_areas();
 	yyparse();
+
 	fclose(yyin);
 	hexout(0, 0, 1);  /* flush and close intel hex file output */
 	return 0;
 }
 
 
-void print_usage()
+void print_usage(int fatal)
 {
-	fprintf(stderr, "Usage: xa_asm file\n");
-	fprintf(stderr, "   or  xa_asm file.asm\n");
-	exit(1);
+  FILE *out = fatal ? stderr : stdout;
+
+  fprintf (out, "Usage: xa_asm [-s] [-v] file.xa\n");
+  fprintf (out, "  -v            verbose: show progress\n");
+  fprintf (out, "  -s            create symbol file\n");
+  fprintf (out, "  --version     show version/copyright info and exit\n");
+  fprintf (out, "  --help        show this and exit\n");
+#if 0
+  // some usefull options I can think of.
+  fprintf (out, "  -m            create map file\n");
+  fprintf (out, "  -ss           create symbol file sorted by symbol\n");
+  fprintf (out, "  -sa           create symbol file sorted by segment/address\n");
+  fprintf (out, "  --no-temps    supress temp symbols in map and sym file\n");
+  fprintf (out, "  --code-loc=#  sets the start address of the code\n");
+  fprintf (out, "  --xdata-loc=# sets the start address of the external data\n");
+  fprintf (out, "  --stack-loc=# sets the start address of the stack\n");
+#endif
+  exit(fatal);
 }
 

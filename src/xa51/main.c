@@ -46,8 +46,8 @@ static char *_xa51_keywords[] =
 
 extern int rewinds;
 void   _xa51_genAssemblerEnd () {
-  fprintf (stderr, "Did %d rewind%c for c-line in asm comments\n", rewinds,
-	   rewinds==1 ? '\0' : 's');
+  //fprintf (stderr, "Did %d rewind%c for c-line in asm comments\n", rewinds,
+  //rewinds==1 ? '\0' : 's');
 }
 
 void xa51_assignRegisters (eBBlock ** ebbs, int count);

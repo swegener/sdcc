@@ -44,6 +44,7 @@ struct target {
         struct target *next; };
 
 struct area_struct {
+        int start;
 	int alloc_position;
 };
 

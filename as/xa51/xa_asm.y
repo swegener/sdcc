@@ -40,7 +40,6 @@ extern void yyrestart(FILE *new_file);
 extern char * disasm(int byte, int memory_location);
 extern void hexout(int byte, int memory_location, int end);
 void error(char *s);
-void fatal_error(char *s);
 
 static int bitmask[]={1, 2, 4, 8, 16, 32, 64, 128};
 
@@ -166,8 +165,6 @@ directive:     '.' ORG expr {
 		}
 	     | '.' MODULE WORD {
 			/* ignore module definition */
-	                build_sym_list(lex_sym_name);
-			assign_value(lex_sym_name, 0);
 			$$ = 0;
 		}
 	     | '.' GLOBL WORD {
@@ -1305,11 +1302,6 @@ int yyerror(char *s)
 }
 
 void error(char *s)
-{
-	yyerror(s);
-}
-
-void fatal_error(char *s)
 {
 	yyerror(s);
 	exit(1);

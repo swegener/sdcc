@@ -37,6 +37,7 @@
 /*-----------------------------------------------------------------*/
 
 extern void genXA51Code (iCode *);
+
 #define D(x)
 
 /* Global data */
@@ -166,8 +167,8 @@ static void freeReg (regs * reg, bool silent) {
   }
   
   if (!silent) {
-    fprintf (stderr, "freeReg: (%08x) %s (%s) ", xa51RegsInUse, 
-	     reg->name, reg->sym->name);
+    D(fprintf (stderr, "freeReg: (%08x) %s (%s) ", xa51RegsInUse, 
+	     reg->name, reg->sym->name));
   }
 
   if (reg->isFree || ((xa51RegsInUse&reg->regMask)!=reg->regMask)) {
@@ -178,7 +179,7 @@ static void freeReg (regs * reg, bool silent) {
   xa51RegsInUse &= ~reg->regMask;
   reg->isFree = 1;
   reg->sym = NULL;
-  if (!silent) fprintf (stderr, "(%08x)\n", xa51RegsInUse);
+  if (!silent) D(fprintf (stderr, "(%08x)\n", xa51RegsInUse));
 
   checkRegMask(__FUNCTION__);
 }
@@ -194,10 +195,10 @@ static bool allocReg (short size, short type, symbol *sym,
   checkRegMask(__FUNCTION__);
 
   if (!silent) {
-    fprintf (stderr, "allocReg (%08x) for %s size:%d, type:%s ", 
+    D(fprintf (stderr, "allocReg (%08x) for %s size:%d, type:%s ", 
 	     xa51RegsInUse,
 	     sym->name,
-	     size, regTypeToStr(type));
+	     size, regTypeToStr(type)));
   }
 
   switch (size) 
@@ -216,7 +217,7 @@ static bool allocReg (short size, short type, symbol *sym,
 	    reg->isFree=0; // redundant
 	    reg->sym = sym;
 	    if (!silent) {
-	      fprintf (stderr, "(using gap) %s\n", reg->name);
+	      D(fprintf (stderr, "(using gap) %s\n", reg->name));
 	    }
 	    checkRegMask(__FUNCTION__);
 	    return TRUE;
@@ -233,7 +234,7 @@ static bool allocReg (short size, short type, symbol *sym,
 	  regsXA51[i].isFree = 0; // redundant
 	  regsXA51[i].sym = sym;
 	  if (!silent) {
-	    fprintf (stderr, "%s\n", regsXA51[i].name);
+	    D(fprintf (stderr, "%s\n", regsXA51[i].name));
 	  }
 	  sym->regs[offset]=&regsXA51[i];
 	  checkRegMask(__FUNCTION__);
@@ -241,7 +242,7 @@ static bool allocReg (short size, short type, symbol *sym,
 	}
       }
       if (!silent) {
-	fprintf (stderr, "failed (%08x)\n", xa51RegsInUse);
+	D(fprintf (stderr, "failed (%08x)\n", xa51RegsInUse));
       }
       checkRegMask(__FUNCTION__);
       return FALSE;
@@ -249,25 +250,25 @@ static bool allocReg (short size, short type, symbol *sym,
     case 3:
       // this must be a generic pointer
       if (!silent) {
-	fprintf (stderr, "trying 2+1\n");
+	D(fprintf (stderr, "trying 1+2\n"));
       }
-      // get the pointer part
-      if (allocReg (2, REG_PTR, sym, offset, silent)) {
-	// get the generic part
-	if ((xa51HasGprRegs && allocReg (1, REG_GPR, sym, offset+1, silent)) ||
-	    allocReg (1, REG_PTR, sym, offset+1, silent)) {
+      // get the generic part
+      if ((xa51HasGprRegs && allocReg (1, REG_GPR, sym, offset+1, silent)) ||
+	  allocReg (1, REG_PTR, sym, offset+1, silent)) {
+	// get the pointer part
+	if (allocReg (2, REG_PTR, sym, offset, silent)) {
 	  checkRegMask(__FUNCTION__);
 	  return TRUE;
 	}
-	freeReg(sym->regs[offset], silent);
-	sym->regs[offset]=NULL;
+	freeReg(sym->regs[offset+1], silent);
+	sym->regs[offset+1]=NULL;
       }
       checkRegMask(__FUNCTION__);
       return FALSE;
       break;
     case 4: // this is a dword
       if (!silent) {
-	fprintf (stderr, "trying 2+2\n");
+	D(fprintf (stderr, "trying 2+2\n"));
       }
       if ((xa51HasGprRegs && allocReg (2, REG_GPR, sym, offset, silent)) ||
 	  allocReg (2, REG_PTR, sym, offset, silent)) {
@@ -560,7 +561,7 @@ createStackSpil (symbol * sym)
 
   char slocBuffer[30];
 
-  fprintf (stderr, "  createStackSpil: %s\n", sym->name);
+  D(fprintf (stderr, "  createStackSpil: %s\n", sym->name));
 
   /* first go try and find a free one that is already 
      existing on the stack */
@@ -644,7 +645,7 @@ spillThis (symbol * sym)
 {
   int i;
   
-  fprintf (stderr, "  spillThis: %s\n", sym->name);
+  D(fprintf (stderr, "  spillThis: %s\n", sym->name));
 
   /* if this is rematerializable or has a spillLocation
      we are okay, else we need to create a spillLocation
@@ -776,7 +777,7 @@ spillSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
   /* get something we can spil */
   ssym = selectSpil (ic, ebp, forSym);
 
-  fprintf (stderr, "  spillSomething: spilling %s\n", ssym->name);
+  D(fprintf (stderr, "  spillSomething: spilling %s\n", ssym->name));
 
   /* mark it as spilt */
   ssym->isspilt = ssym->spillA = 1;
@@ -834,9 +835,9 @@ spillSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
 /*-----------------------------------------------------------------*/
 static bool getRegPtr (iCode * ic, eBBlock * ebp, symbol * sym, short offset) {
 
-  fprintf (stderr, "getRegPtr: %s ", sym->name);
-  printTypeChain(sym->type, stderr);
-  fprintf (stderr, "\n");
+  D(fprintf (stderr, "getRegPtr: %s ", sym->name));
+  D(printTypeChain(sym->type, stderr));
+  D(fprintf (stderr, "\n"));
 
 tryAgain:
   /* try for a ptr type */
@@ -862,9 +863,9 @@ tryAgain:
 /*-----------------------------------------------------------------*/
 static bool getRegGpr (iCode * ic, eBBlock * ebp, symbol * sym, short offset) {
 
-  fprintf (stderr, "getRegGpr: %s ", sym->name);
-  printTypeChain(sym->type, stderr);
-  fprintf (stderr, "\n");
+  D(fprintf (stderr, "getRegGpr: %s ", sym->name));
+  D(printTypeChain(sym->type, stderr));
+  D(fprintf (stderr, "\n"));
 
 tryAgain:
   /* try for gpr type */
@@ -945,7 +946,7 @@ static bool willCauseSpill (symbol *sym) {
     }
     return FALSE;
   }
-  fprintf (stderr, "  %s will cause a spill\n", sym->name);
+  D(fprintf (stderr, "  %s will cause a spill\n", sym->name));
   return TRUE;
 }
 
@@ -1405,6 +1406,7 @@ regTypeNum (eBBlock *ebbs)
 	      fprintf (stderr, "allocated more than 4 or 0 registers for type ");
 	      printTypeChain (sym->type, stderr);
 	      fprintf (stderr, "\n");
+	      exit (1);
 	    }
 
 	  /* determine the type of register required */

@@ -1,12 +1,12 @@
 CC = gcc
-CFLAGS = -O2
+CFLAGS = -ggdb -O2
 YACC = bison -y -d
 LEX = flex -i
 LEXLIB = 
 
 xa_asm: xa_main.o xa_asm.tab.o xa_asm.lex.o xa_dasm.o
 	$(CC) -o xa_asm xa_main.o xa_asm.tab.o xa_asm.lex.o xa_dasm.o $(LEXLIB)
-	strip xa_asm
+	#strip xa_asm
 
 xa_asm.lex.o: xa_asm.lex.c xa_asm.tab.h xa_main.h
 	$(CC) $(CFLAGS) -c xa_asm.lex.c

@@ -252,7 +252,7 @@ R[0-7]H		{LIST; yylval = (yytext[1] - '0') * 2 + 1 + BYTE_REG; return REG;}
 			}
 [0-9]+\$		{
 				LIST;
-				/* should print error is base_symbol_name */
+				/* should print error if base_symbol_name */
 				/* is not defined */
 				sprintf(lex_sym_name, "%s:%s",
 					base_symbol_name, yytext);

@@ -33,9 +33,9 @@ enum
     AOP_FAR,
     AOP_CODE,
     AOP_GPTR,
-    AOP_STK, 
+    AOP_STK,
     AOP_IMMD, 
-    AOP_CRY
+    AOP_BIT
   };
 
 /* type asmop : a homogenised type for 

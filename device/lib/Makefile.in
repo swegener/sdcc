@@ -90,6 +90,30 @@ Z80SOURCES      = _atoi.c \
 
 Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)
 
+XA51SOURCES      = _atoi.c _atol.c _schar2fs.c \
+		  _divsint.c _divslong.c _divuint.c \
+		  _divulong.c _fs2schar.c _fs2sint.c _fs2slong.c \
+		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
+		  _fsdiv.c _fseq.c _fsgt.c _fslt.c _fsmul.c \
+		  _fsneq.c _fssub.c \
+		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
+		  _islower.c _isprint.c _ispunct.c _isspace.c \
+		  _isupper.c _isxdigit.c _slong2fs.c _memcmp.c \
+		  _memcpy.c _memset.c _modsint.c _modslong.c \
+		  _moduint.c _modulong.c _mulint.c _mullong.c \
+		  _strchr.c _strcmp.c _strcpy.c \
+		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
+		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+		  _strstr.c _strtok.c _uchar2fs.c _uint2fs.c \
+		  _ulong2fs.c malloc.c puts.c gets.c \
+		  assert.c _strcat.c time.c \
+		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
+		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
+		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
+		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c
+
+XA51OBJECTS      = $(XA51SOURCES:%.c=$(PORTDIR)/%.xa)
+
 OEXT            = .rel
 
 include incl.mk
@@ -111,6 +135,14 @@ model-ds390:
 	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
 	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 objects; \
 	fi
+
+model-xa51:
+	if [ "`grep xa51 ../../ports.build`" = xa51 ]; then \
+	  $(MAKE) MODELFLAGS="-mxa51" PORT=xa51 objects-xa51 OEXT=.xa; \
+	fi
+
+objects-xa51: build-dir $(XA51OBJECTS) port-specific-objects
+	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
 model-z80:
 	if [ "`grep z80 ../../ports.build`" = z80 ]; then \
@@ -201,7 +233,7 @@ include clean.mk
 $(PORTDIR)/%$(OEXT): %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 	mv -f `basename $@` $@
-	mv -f `basename $@ $(OEXT)`.asm $(PORTDIR)
+	-mv -f `basename $@ $(OEXT)`.asm $(PORTDIR)
 
 # Remaking configuration
 # ----------------------

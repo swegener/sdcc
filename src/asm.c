@@ -409,7 +409,7 @@ static const ASM_MAPPING _xa_asm_mapping[] =
   {"hashedstr", "#%s"},
   {"lsbimmeds", "#<%s"},
   {"msbimmeds", "#>%s"},
-  {"module", ".module %s"},
+  {"module", "; .module %s"},
   {"global", ".globl %s"},
   {"fileprelude", ""},
   {"functionheader",

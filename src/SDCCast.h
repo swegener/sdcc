@@ -187,7 +187,6 @@ ast *createBlock (symbol *, ast *);
 ast *createLabel (symbol *, ast *);
 ast *createCase (ast *, ast *, ast *);
 ast *createDefault (ast *, ast *);
-ast *optimizeCompare (ast *);
 ast *forLoopOptForm (ast *);
 ast *argAst (ast *);
 ast *resolveSymbols (ast *);

@@ -24,7 +24,7 @@
 void main (void) {
 
   while(1) {
-    printf ("%s %03bu %03bu %03bu %03bu\n\r", 
+    printf ("% 5.2f %03bu %03bu %03bu %03bu\n\r", 
 	    ReadDS1621(2),
 	    ReadPCF8591(0,0), 
 	    ReadPCF8591(0,1), 

@@ -1,17 +1,12 @@
 #include "i2clole.h"
 #include "ds1621.h"
 
-#if USE_FLOAT // defined in ds1621.h
-static float temperature
-signed char counter, slope;
-float
-#else
-#include <stdio.h>
-static char temperature[10];
-char *
-#endif
 
-ReadDS1621(char address) {
+
+float ReadDS1621(char address) {
+  float temperature;
+  signed char counter, slope;
+
   int id=DS1621_ID + (address<<1);
   
   while (!I2CReset()) {
@@ -30,18 +25,8 @@ ReadDS1621(char address) {
     if (I2CSendReceive(id, 1, 1)) return -999;
   } while ((i2cReceiveBuffer[0]&0x80)==0); // wait for conversion done
 
-
-  // if we did not do this, sdcc thinks i2cReceiveBuffer[0] is still in r3
-  i2cReceiveBuffer[0]=0;
-
   i2cTransmitBuffer[0]=0xaa; // read temperature command
 
-#if !USE_FLOAT
-  if (I2CSendReceive(id, 1, 2)) return -999;
-  sprintf (temperature, "% 3bd.%c", i2cReceiveBuffer[0], 
-	   i2cReceiveBuffer[1]?'5':'0');
-  return temperature;
-#else
   if (I2CSendReceive(id, 1, 1)) return -999;
   temperature=i2cReceiveBuffer[0];
   i2cTransmitBuffer[0]=0xa8; // read counter command
@@ -51,10 +36,8 @@ ReadDS1621(char address) {
   i2cTransmitBuffer[0]=0xa9; // read slope command
   if (I2CSendReceive(id, 1, 1)) return -999;
   slope=i2cReceiveBuffer[0];
-    
-  temperature=(int)temperature - 0.25 +
+  
+  temperature=temperature - 0.25 +
     ((float)slope-(float)counter)/(float)slope;
-    return temperature;
-#endif
-}
-
+  return temperature;
+}  

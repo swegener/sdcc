@@ -302,21 +302,17 @@ int checkCurrFile ( char *s)
     
 void comment()
 {
-	char c, c1;
-
-loop:
-	while ((c = input()) != '*' && c != 0)
-		if ( c == '\n')
-			yylineno++ ;
-
-	if ((c1 = input()) != '/' && c != 0)  {
-		if ( c1 == '\n' )
-			yylineno++ ;
-
-		unput(c1);
-		goto loop;
-   }
-
+  char c, c1;
+  
+ loop:
+  while ((c = input()) != '*' && c)
+    if ( c == '\n')
+      yylineno++ ;
+  
+  if (c && (c1 = input()) != '/') {
+    unput(c1);
+    goto loop;
+  }
 }
    
    
@@ -362,62 +358,62 @@ char strLitBuff[2048]			;
  * to support ANSI hex and octal escape sequences in string liteals 
  */
 
-char *stringLiteral ()
-
-{
-int ch;
-char *str = strLitBuff			;
-
-*str++ = '\"'			;
-/* put into the buffer till we hit the */
-/* first \" */
-
-while (1) 
-  {
-  ch = input()			;
-
-  if (!ch)
-    break	; /* end of input */
-
-  /* if it is a \ then everything allowed */
-
-  if (ch == '\\') 
-    {
-    *str++ = ch     ; /* backslash in place */
-    *str++ = input()		; /* following char in place */
-    continue			;      /* carry on */
+char *stringLiteral () {
+  int ch;
+  char *str = strLitBuff;
+  
+  *str++ = '\"';
+  /* put into the buffer till we hit the first \" */
+  
+  while (1) {
+    ch = input();
+    
+    if (!ch)
+      break; /* end of input */
+    
+    /* if it is a \ then escape char's are allowed */
+    if (ch == '\\') {
+      *str++ = ch; /* backslash in place */
+      *str++=input(); /* get the escape char, no check */
+      continue; /* carry on */
     }
+    
+    /* if new line we have a new line break */
+    if (ch == '\n') {
+      yylineno++;
+      continue;
+    }
+    
+    /* if this is a quote then we have work to do */
+    /* find the next non whitespace character     */
+    /* if that is a double quote then carry on    */
+    if (ch == '\"') {
+      *str++  = ch ; /* Pass end of this string or substring to evaluator */
+      
+      while ((ch = input()) && (isspace(ch) || ch=='\\')) {
+	switch (ch) {
+	case '\\':
+	  werror (W_STRAY_BACKSLASH, filename, yylineno);
+	  break;
+	case '\n':
+	  yylineno++;
+	  break;
+	}
+      }
 
-  /* if new line we have a new line break */
-  if (ch == '\n') 
-    break		;
-
-  /* if this is a quote then we have work to do */
-  /* find the next non whitespace character     */
-  /* if that is a double quote then carry on    */
-
-  if (ch == '\"') 
-    {
-    *str++  = ch ;	/* Pass end of this string or substring to evaluator */
-
-    while ((ch = input()) && isspace(ch)) ;
-
-    if (!ch) 
-      break ; 
-
-    if (ch != '\"') 
-      {
-      unput(ch) ;
-      break ;
+      if (!ch) 
+	break; 
+      
+      if (ch != '\"') {
+	unput(ch) ;
+	break ;
       }
     }
-
-  *str++  = ch;	      /* Put next substring introducer into output string */
+    *str++  = ch; /* Put next substring introducer into output string */
   }  
-
-*str = '\0';
-
-return strLitBuff			;
+  *str = '\0';
+  
+  return strLitBuff;
 }
 
 void doPragma (int op, char *cp)

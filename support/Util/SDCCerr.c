@@ -350,7 +350,9 @@ struct
 { W_EXESS_ARRAY_INITIALIZERS, ERROR_LEVEL_WARNING,
     "excess elements in array initializer after `%s' at line %d" },
 { E_ARGUMENT_MISSING, ERROR_LEVEL_ERROR,
-   "Option %s requires an argument." }
+   "Option %s requires an argument." },
+{ W_STRAY_BACKSLASH, ERROR_LEVEL_WARNING,
+    "stray '\\' in program" },
 };
 
 /*

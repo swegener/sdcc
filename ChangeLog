@@ -1,3 +1,7 @@
+2004-07-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51reg.h: fixed bug 970993
+
 2004-07-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* added lib/calloc.c, lib/free.c, lib/realloc.c, include/stddef.h

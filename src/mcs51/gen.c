@@ -133,7 +133,7 @@ emitcode (char *inst, const char *fmt,...)
 
   while (isspace (*lbp))
     lbp++;
-  
+
   if (lbp && *lbp)
     lineCurr = (lineCurr ?
 		connectLine (lineCurr, newLineNode (lb)) :
@@ -290,12 +290,12 @@ static int
 leftRightUseAcc(iCode *ic)
 {
   int accuse = 0;
-  
+
   if (ic && IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic))
       && OP_SYMBOL (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->accuse)
     accuse = (accuse < OP_SYMBOL (IC_LEFT (ic))->nRegs)
              ? OP_SYMBOL (IC_LEFT (ic))->nRegs : accuse;
-    
+
   if (ic && IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic))
       && OP_SYMBOL (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->accuse)
     accuse = (accuse < OP_SYMBOL (IC_RIGHT (ic))->nRegs)
@@ -730,7 +730,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
     case AOP_STK:
       {
 	int sz = aop->size;
-	int stk = aop->aopu.aop_stk + aop->size;
+	int stk = aop->aopu.aop_stk + aop->size - 1;
 	bitVectUnSetBit (ic->rUsed, R0_IDX);
 	bitVectUnSetBit (ic->rUsed, R1_IDX);
 
@@ -757,16 +757,16 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 	  }
 	op->aop = aop;
 	freeAsmop (op, NULL, ic, TRUE);
-	if (_G.r0Pushed)
-	  {
-	    emitcode ("pop", "ar0");
-	    _G.r0Pushed--;
-	  }
-
 	if (_G.r1Pushed)
 	  {
 	    emitcode ("pop", "ar1");
 	    _G.r1Pushed--;
+	  }
+
+	if (_G.r0Pushed)
+	  {
+	    emitcode ("pop", "ar0");
+	    _G.r0Pushed--;
 	  }
       }
     }
@@ -1997,16 +1997,16 @@ genCall (iCode * ic)
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
        !IFFUNC_ISISR (dtype))
   {
-      swapBanks = TRUE;  
-  } 
-    
+      swapBanks = TRUE;
+  }
+
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
       saveRegisters (ic);
 
   if (swapBanks)
   {
-        emitcode ("mov", "psw,#0x%02x", 
+        emitcode ("mov", "psw,#0x%02x",
            ((FUNC_REGBANK(dtype)) << 3) & 0xff);
   }
 
@@ -2017,14 +2017,14 @@ genCall (iCode * ic)
 
   if (swapBanks)
   {
-       emitcode ("mov", "psw,#0x%02x", 
+       emitcode ("mov", "psw,#0x%02x",
           ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
   }
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-	OP_SYMBOL (IC_RESULT (ic))->accuse || 
+	OP_SYMBOL (IC_RESULT (ic))->accuse ||
 	OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
@@ -3525,7 +3525,7 @@ genMultOneByte (operand * left,
 
   if (SPEC_USIGN(opetype)
       // ignore the sign of left and right, what else can we do?
-      || (SPEC_USIGN(operandType(left)) && 
+      || (SPEC_USIGN(operandType(left)) &&
 	  SPEC_USIGN(operandType(right)))) {
     // just an unsigned 8*8=8/16 multiply
     //emitcode (";","unsigned");
@@ -3577,7 +3577,7 @@ genMultOneByte (operand * left,
     emitcode ("", "%05d$:", lbl->key+100);
   }
   emitcode ("mul", "ab");
-    
+
   lbl=newiTempLabel(NULL);
   emitcode ("jnb", "F0,%05d$", lbl->key+100);
   // only ONE op was negative, we have to do a 8/16-bit two's complement
@@ -3629,7 +3629,7 @@ genMult (iCode * ic)
 #if 0 // one of them can be a sloc shared with the result
     if (AOP_SIZE (left) == 1 && AOP_SIZE (right) == 1)
 #else
-  if (getSize(operandType(left)) == 1 && 
+  if (getSize(operandType(left)) == 1 &&
       getSize(operandType(right)) == 1)
 #endif
     {
@@ -3643,9 +3643,9 @@ genMult (iCode * ic)
   assert (0);
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
 }
 
 /*-----------------------------------------------------------------*/
@@ -3797,8 +3797,8 @@ genDiv (iCode * ic)
   /* should have been converted to function call */
   assert (0);
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -3942,8 +3942,8 @@ genMod (iCode * ic)
   assert (0);
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -4087,8 +4087,8 @@ genCmp (operand * left, operand * right,
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
     {
       outBitC (result);
@@ -4418,8 +4418,8 @@ genCmpEq (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -4518,8 +4518,8 @@ genAndOp (iCode * ic)
       outBitAcc (result);
     }
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -4560,8 +4560,8 @@ genOrOp (iCode * ic)
       outBitAcc (result);
     }
 
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -4939,8 +4939,8 @@ genAnd (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -5215,8 +5215,8 @@ genOr (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -5476,8 +5476,8 @@ genXor (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -6506,7 +6506,7 @@ genLeftShiftLiteral (operand * left,
 	  genlshFour (result, left, shCount);
 	  break;
 	default:
-	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, 
+	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
 		  "*** ack! mystery literal shift!\n");
 	  break;
 	}
@@ -7301,21 +7301,40 @@ genNearPointerGet (operand * left,
       return;
     }
 
-  /* if the value is already in a pointer register
+ /* if the value is already in a pointer register
      then don't need anything more */
   if (!AOP_INPREG (AOP (left)))
     {
-      /* otherwise get a free pointer register */
-      aop = newAsmop (0);
-      preg = getFreePtr (ic, &aop, FALSE);
-      emitcode ("mov", "%s,%s",
-		preg->name,
-		aopGet (AOP (left), 0, FALSE, TRUE));
-      rname = preg->name;
+      if (IS_AOP_PREG (left))
+	{
+	  // Aha, it is a pointer, just in disguise.
+	  rname = aopGet (AOP (left), 0, FALSE, FALSE);
+	  if (*rname != '@')
+	    {
+	      fprintf(stderr, "probable internal error: unexpected rname @ %s:%d\n",
+		      __FILE__, __LINE__);
+	    }
+	  else
+	    {
+	      // Expected case.
+	      emitcode ("mov", "a%s,%s", rname + 1, rname);
+	      rname++;  // skip the '@'.
+	    }
+	}
+      else
+	{
+	  /* otherwise get a free pointer register */
+	  aop = newAsmop (0);
+	  preg = getFreePtr (ic, &aop, FALSE);
+	  emitcode ("mov", "%s,%s",
+		    preg->name,
+		    aopGet (AOP (left), 0, FALSE, TRUE));
+	  rname = preg->name;
+	}
     }
   else
     rname = aopGet (AOP (left), 0, FALSE, FALSE);
-  
+
   //aopOp (result, ic, FALSE);
   aopOp (result, ic, result?TRUE:FALSE);
 
@@ -7353,7 +7372,7 @@ genNearPointerGet (operand * left,
       if (pi) { /* post increment present */
 	aopPut(AOP ( left ),rname,0, isOperandVolatile (left, FALSE));
       }
-      freeAsmop (NULL, aop, ic, TRUE);
+      freeAsmop (NULL, aop, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
     }
   else
     {
@@ -7375,8 +7394,8 @@ genNearPointerGet (operand * left,
     }
 
   /* done */
+  freeAsmop (result, NULL, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
   freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
   if (pi) pi->generated = 1;
 }
 
@@ -7911,7 +7930,7 @@ genNearPointerSet (operand * right,
       genDataPointerSet (right, result, ic);
       return;
     }
-  
+
   /* if the value is already in a pointer register
      then don't need anything more */
   if (!AOP_INPREG (AOP (result)))
@@ -7931,6 +7950,7 @@ genNearPointerSet (operand * right,
 	    else
 	    {
 		// Expected case.
+	        emitcode ("mov", "a%s,%s", rname + 1, rname);
 		rname++;  // skip the '@'.
 	    }
 	}
@@ -7951,7 +7971,7 @@ genNearPointerSet (operand * right,
     }
 
   aopOp (right, ic, FALSE);
-    
+
   /* if bitfield then unpack the bits */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
     genPackBits ((IS_BITVAR (retype) ? retype : letype), right, rname, POINTER);

@@ -1,3 +1,14 @@
+2003-08-31  Bernhard Held <bernhard@bernhardheld.de>
+
+	* src/mcs51/gen.c (freeAsmop): fixed off by one in stack offset (AOP_STK)
+	* src/mcs51/gen.c (genNearPointerSet): added missing opcode for
+	fetching of the pointer
+	* src/mcs51/gen.c (genNearPointerGet): added reuse of PREG,
+	copied from genNearPointerSet()
+	* src/mcs51/gen.c (genNearPointerGet): don't pop r0/r1, if RESULTONSTACK
+	* src/mcs51/gen.c: changed order of freeAsmop(left/right/result)-calls.
+	If they pop r0/r1 they must be called in the opposite order than aopOp().
+
 2003-08-28  Frieder Ferlemann <Frieder.Ferlemann@web.de>
 
 	* doc/sdccman.lyx: reverted tables to those in cvs 1.64

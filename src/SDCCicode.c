@@ -1275,7 +1275,8 @@ operandFromSymbol (symbol * sym)
       !sym->_isparm &&		/* not a parameter  */
       sym->level &&		/* is a local variable */
       !sym->addrtaken &&	/* whose address has not been taken */
-      !sym->reqv &&		/* does not already have a register euivalence */
+      !sym->reqv &&		/* does not already have a reg equivalence */
+      !sym->onStack &&          /* jwk: not on stack */
       !IS_VOLATILE (sym->etype) &&	/* not declared as volatile */
       !IS_STATIC (sym->etype) &&	/* and not declared static  */
       !sym->islbl &&		/* not a label */

@@ -741,27 +741,32 @@ static void fetchLitPair(PAIR_ID pairId, asmop *left, int offset)
 	emitcode("ld", "%s,#%s", pair, l);
 }
 
-static void fetchPair(PAIR_ID pairId, asmop *aop)
+static void fetchPairLong(PAIR_ID pairId, asmop *aop, int offset)
 {
     /* if this is remateriazable */
     if (isLitWord(aop)) {
-	fetchLitPair(pairId, aop, 0);
+	fetchLitPair(pairId, aop, offset);
     }
     else { /* we need to get it byte by byte */
 	if (pairId == PAIR_HL && IS_GB && requiresHL(aop)) {
-	    aopGet(aop, 0, FALSE);
+	    aopGet(aop, offset, FALSE);
 	    emitcode("ld", "a,(hl+)");
 	    emitcode("ld", "h,(hl)");
 	    emitcode("ld", "l,a");
 	}
 	else {
-	    emitcode("ld", "%s,%s", _pairs[pairId].l, aopGet(aop, 0, FALSE));
-	    emitcode("ld", "%s,%s", _pairs[pairId].h, aopGet(aop, 1, FALSE));
+	    emitcode("ld", "%s,%s", _pairs[pairId].l, aopGet(aop, offset, FALSE));
+	    emitcode("ld", "%s,%s", _pairs[pairId].h, aopGet(aop, offset+1, FALSE));
 	}
 	/* PENDING: check? */
 	if (pairId == PAIR_HL)
 	    spillPair(PAIR_HL);
     }
+}
+
+static void fetchPair(PAIR_ID pairId, asmop *aop)
+{
+    fetchPairLong(pairId, aop, 0);
 }
 
 static void fetchHL(asmop *aop)
@@ -1259,14 +1264,29 @@ release:
 /*-----------------------------------------------------------------*/
 void assignResultValue(operand * oper)
 {
-    int offset = 0;
     int size = AOP_SIZE(oper);
+    bool topInA = 0;
 
-    wassert(size <= 2);
+    wassert(size <= 4);
+    topInA = requiresHL(AOP(oper));
 
-    while (size--) {
-	aopPut(AOP(oper),_fReturn[offset],offset);
-	offset++;
+    if (!IS_GB)
+	wassert(size <= 2);
+    if (IS_GB && size == 4 && requiresHL(AOP(oper))) {
+	/* We do it the hard way here. */
+	emitcode("push", "hl");
+	_G.stack.pushed += 2;
+	aopPut(AOP(oper), _fReturn[0], 0);
+	aopPut(AOP(oper), _fReturn[1], 1);
+	emitcode("pop", "de");
+	_G.stack.pushed -= 2;
+	aopPut(AOP(oper), _fReturn[0], 2);
+	aopPut(AOP(oper), _fReturn[1], 3);
+    }
+    else {
+	while (size--) {
+	    aopPut(AOP(oper), _fReturn[size], size);
+	}
     }
 }
 
@@ -1599,16 +1619,11 @@ static void genEndFunction (iCode *ic)
 	}
 	else {
 	    if (_G.stack.offset) {
-		emitcode("ld", "hl,#%d", _G.stack.offset);
-		emitcode("add", "hl,sp");
-		emitcode("ld", "sp,hl");
+		emitcode("lda", "sp,%d(sp)", _G.stack.offset);
 	    }
 	}
 	emitcode("pop", "bc");
 	emitcode("ret", "");
-	emitcode("; Useful for profiling and debugging", "");
-	emitcode(".dw", "%s", sym->rname);
-	emitcode("", "__%s_end:", sym->rname);
     }
     _G.stack.pushed = 0;
     _G.stack.offset = 0;
@@ -1643,11 +1658,17 @@ static void genRet (iCode *ic)
 	}
     }
     else {
-	while (size--) {
-	    l = aopGet(AOP(IC_LEFT(ic)),offset,
-		       FALSE);
-	    if (strcmp(_fReturn[offset],l))
-		emitcode("ld","%s,%s", _fReturn[offset++],l);
+	if (IS_GB && size == 4 && requiresHL(AOP(IC_LEFT(ic)))) {
+	    fetchPair(PAIR_DE, AOP(IC_LEFT(ic)));
+	    fetchPairLong(PAIR_HL, AOP(IC_LEFT(ic)), 2);
+	}
+	else {
+	    while (size--) {
+		l = aopGet(AOP(IC_LEFT(ic)),offset,
+			   FALSE);
+		if (strcmp(_fReturn[offset],l))
+		    emitcode("ld","%s,%s", _fReturn[offset++],l);
+	    }
 	}
     }
     freeAsmop (IC_LEFT(ic),NULL,ic);
@@ -3396,6 +3417,7 @@ static void genLeftShift (iCode *ic)
     freeAsmop(result,NULL,ic);
 }
 
+/*-----------------------------------------------------------------*/
 /* genlshTwo - left shift two bytes by known amount != 0           */
 /*-----------------------------------------------------------------*/
 static void genrshOne (operand *result,operand *left, int shCount)
@@ -3537,7 +3559,26 @@ static void genRightShiftLiteral (operand *left,
 /*-----------------------------------------------------------------*/
 static void genRightShift (iCode *ic)
 {
-    operand *left,*right, *result;
+    operand *right, *left, *result;
+    link *retype ;
+    int size, offset, first = 1;
+    char *l;
+    bool is_signed;
+
+    symbol *tlbl, *tlbl1 ;
+
+    /* if signed then we do it the hard way preserve the
+    sign bit moving it inwards */
+    retype = getSpec(operandType(IC_RESULT(ic)));
+
+    is_signed = !SPEC_USIGN(retype);
+
+    /* signed & unsigned types are treated the same : i.e. the
+    signed is NOT propagated inwards : quoting from the
+    ANSI - standard : "for E1 >> E2, is equivalent to division
+    by 2**E2 if unsigned or if it has a non-negative value,
+    otherwise the result is implementation defined ", MY definition
+    is that the sign does not get propagated */
 
     right = IC_RIGHT(ic);
     left  = IC_LEFT(ic);
@@ -3548,12 +3589,56 @@ static void genRightShift (iCode *ic)
     /* if the shift count is known then do it 
     as efficiently as possible */
     if (AOP_TYPE(right) == AOP_LIT) {
-        genRightShiftLiteral (left,right,result,ic);
-        return ;
+        genRightShiftLiteral(left,right,result,ic);
+        return;
     }
-    else {
-	wassert(0);
+
+    aopOp(left,ic,FALSE);
+    aopOp(result,ic,FALSE);
+
+    /* now move the left to the result if they are not the
+    same */
+    if (!sameRegs(AOP(left),AOP(result)) && 
+        AOP_SIZE(result) > 1) {
+
+        size = AOP_SIZE(result);
+        offset=0;
+        while (size--) {
+            l = aopGet(AOP(left),offset,FALSE);
+	    aopPut(AOP(result),l,offset);
+            offset++;
+        }
     }
+
+    emitcode("ld", "a,%s",aopGet(AOP(right),0,FALSE));
+    emitcode("inc","a");
+    freeAsmop (right, NULL, ic);
+
+    tlbl = newiTempLabel(NULL);
+    tlbl1= newiTempLabel(NULL);
+    size = AOP_SIZE(result);
+    offset = size - 1;
+
+    emitcode(_shortJP, LABEL_STR, tlbl1->key+100);
+    emitcode("", LABEL_STR ":", tlbl->key+100);
+    while (size--) {
+        l = aopGet(AOP(result),offset--,FALSE);
+	if (first) {
+	    if (is_signed)
+		emitcode("sra", "%s", l);
+	    else
+		emitcode("srl", "%s", l);
+	    first = 0;
+	}
+	else
+	    emitcode("rr", "%s", l);
+    }
+    emitcode("", LABEL_STR ":", tlbl1->key+100);
+    emitcode("dec", "a");
+    emitcode(_shortJP, "nz," LABEL_STR, tlbl->key+100);
+
+    freeAsmop(left,NULL,ic);
+    freeAsmop(result,NULL,ic);
 }
 
 /*-----------------------------------------------------------------*/

@@ -144,6 +144,16 @@ static PORT *_ports[] = {
 
 #define NUM_PORTS (sizeof(_ports)/sizeof(_ports[0]))
 
+extern ASM_PORT asxxxx_port;
+extern ASM_PORT rgbds_port;
+
+ASM_PORT *asm_port;
+
+static ASM_PORT *_asm_ports[] = {
+    &asxxxx_port,
+    &rgbds_port
+};
+
 /** Sets the port to the one given by the command line option.
     @param		The name minus the option (eg 'mcs51')
     @return 		0 on success.
@@ -1257,6 +1267,7 @@ static int preProcess (char **envp)
 
 static void _findPort(int argc, char **argv)
 {
+    asm_port = _asm_ports[0];
     argc--;
     while (argc) {
 	if (!strncmp(*argv, "-m", 2)) {

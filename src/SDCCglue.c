@@ -23,6 +23,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "asm.h"
 #include <time.h>
 
 symbol *interrupts[256];
@@ -81,10 +82,7 @@ void copyFile (FILE * dest, FILE * src)
 	    fputc (ch, dest);
 }
 
-/*-----------------------------------------------------------------*/
-/* aopLiteral - string from a literal value                        */
-/*-----------------------------------------------------------------*/
-char *aopLiteral (value *val, int offset)
+char *aopLiteralLong(value *val, int offset, int size)
 {
     char *rs;
     union {
@@ -98,10 +96,23 @@ char *aopLiteral (value *val, int offset)
         unsigned long v = floatFromVal(val);
 
         v >>= (offset * 8);
-        sprintf(buffer,"#0x%02x",((char) v) & 0xff);
+	switch (size) {
+	case 1:
+	    sprintf(buffer,"#0x%02x", (unsigned int)v & 0xff);
+	    break;
+	case 2:
+	    sprintf(buffer,"#0x%04x", (unsigned int)v & 0xffff);
+	    break;
+	default:
+	    /* Hmm.  Too big for now. */
+	    assert(0);
+	}
         ALLOC_ATOMIC(rs,strlen(buffer)+1);
         return strcpy (rs,buffer);
     }
+
+    /* PENDING: For now size must be 1 */
+    assert(size == 1);
 
     /* it is type float */
     fl.f = (float) floatFromVal(val);
@@ -115,6 +126,14 @@ char *aopLiteral (value *val, int offset)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopLiteral - string from a literal value                        */
+/*-----------------------------------------------------------------*/
+char *aopLiteral (value *val, int offset)
+{
+    return aopLiteralLong(val, offset, 1);
+}
+
+/*-----------------------------------------------------------------*/
 /* emitRegularMap - emit code for maps with no special cases       */
 /*-----------------------------------------------------------------*/
 static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
@@ -122,7 +141,7 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
     symbol *sym;
     
     if (addPublics)
-	fprintf (map->oFile, "\t.area\t%s\n", map->sname);
+	asm_printf(map->oFile, asm_port->area, map->sname);
     
     /* print the area name */
     for (sym = setFirstItem (map->syms); sym;
@@ -183,8 +202,8 @@ static void emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	    /* allocate space */
 	    if ((options.debug || sym->level == 0) && !options.nodebug)
 		fprintf(map->oFile,"==.\n");
-	    fprintf (map->oFile, "%s:\n", sym->rname);
-	    fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
+	    asm_printf(map->oFile, asm_port->label, sym->rname);
+	    asm_printf(map->oFile, asm_port->ds, (unsigned int)getSize (sym->type) & 0xffff);
 	}
 	
 	/* if it has a initial value then do it only if
@@ -286,9 +305,41 @@ void printChar (FILE * ofile, char *s, int plen)
     int i;
     int len = strlen (s);
     int pplen = 0;
-    
-    while (len && pplen < plen) {
+    char buf[100];
+    char *p = buf;
 
+    while (len && pplen < plen) {
+	while (i && *s && pplen < plen) {
+	    if (*s < ' ' || *s == '\"') {
+		*p = '\0';
+		if (p != buf) 
+		    asm_printf(ofile, asm_port->ascii, buf);
+		asm_printf(ofile, asm_port->db, *s);
+		p = buf;
+	    }
+	    else {
+		*p = *s;
+		p++;
+	    }
+	    s++;
+	    pplen++;
+	    i--;
+	}
+	if (p != buf) {
+	    *p = '\0';
+	    asm_printf(ofile, asm_port->ascii, buf);
+	}
+	
+	if (len > 60)
+	    len -= 60;
+	else
+	    len = 0;
+    }
+    asm_printf(ofile, asm_port->db, 0);
+#if 0
+    if (pplen < plen)
+	fprintf(ofile,"\t.byte\t0\n");
+	
 	fprintf (ofile, "\t.ascii /");
 	i = 60;
 	while (i && *s && pplen < plen) {
@@ -309,6 +360,7 @@ void printChar (FILE * ofile, char *s, int plen)
     }
     if (pplen < plen)
 	fprintf(ofile,"\t.byte\t0\n");
+#endif
 }
 
 /*-----------------------------------------------------------------*/
@@ -333,13 +385,8 @@ void printIvalType (link * type, initList * ilist, FILE * oFile)
 	break;
 
     case 2:
-	if (!val)
-	    fprintf (oFile, "\t.word 0\n");
-	else
-	    fprintf (oFile, "\t.byte %s,%s\n",
-		     aopLiteral (val, 0), aopLiteral (val, 1));
-	break;
-
+    fprintf(oFile, "\t.word %s\n", aopLiteralLong(val, 0, 2));
+break;
     case 4:
 	if (!val)
 	    fprintf (oFile, "\t.word 0,0\n");
@@ -502,21 +549,49 @@ int printIvalCharPtr (symbol * sym, link * type, value * val, FILE * oFile)
 {
     int size = 0;
     
+    /* PENDING: this is _very_ mcs51 specific, including a magic
+       number... 
+       It's also endin specific.
+    */
     size = getSize (type);
-    
-    if (size == 1)
-	fprintf(oFile,
-	     "\t.byte %s", val->name) ;
-    else
-	fprintf (oFile,
-		 "\t.byte %s,(%s >> 8)",
-		 val->name, val->name);
-   
-    if (size > 2)
-	fprintf (oFile, ",#0x02\n");
-    else
-	fprintf (oFile, "\n");
-    
+
+    if (val->name && strlen(val->name)) {
+	switch (size) {
+	case 1:
+	    fprintf(oFile,
+		    "\t.byte %s\n", val->name) ;
+	    break;
+	case 2:
+	    fprintf(oFile, "\t.word %s\n", val->name);
+	    break;
+	    /* PENDING: probably just 3 */
+	default:
+	    /* PENDING: 0x02 or 0x%02x, CDATA? */
+	    fprintf (oFile,
+		     "\t.byte %s,(%s >> 8),#0x02\n",
+		     val->name, val->name);
+	}
+    }
+    else {
+	switch (size) {
+	case 1:
+	    fprintf(oFile, "\t.byte %s\n", aopLiteral(val, 0));
+	    break;
+	case 2:
+	    fprintf(oFile, "\t.word %s\n", 
+		    aopLiteralLong(val, 0, 2));
+	    break;
+	case 3:
+	    /* PENDING: 0x02 or 0x%02x, CDATA? */
+	    fprintf(oFile, "\t.byte %s,%s,0x02\n",
+		    aopLiteral (val, 0), aopLiteral (val, 1));
+	    break;
+	default:
+	    assert(0);
+	}
+    }
+
+
     if (val->sym && val->sym->isstrlit)
 	addSet (&statsg->syms, val->sym);
     
@@ -559,9 +634,7 @@ void printIvalPtr (symbol * sym, link * type, initList * ilist, FILE * oFile)
 	    fprintf (oFile, "\t.byte 0x%02x\n", ((char) floatFromVal (val)) & 0xff);
 	    break;
 	case 2:
-	    fprintf (oFile, "\t.byte %s,%s\n",
-		     aopLiteral (val, 0), aopLiteral (val, 1));
-	    
+	    fprintf (oFile, "\t.word %s\n", aopLiteralLong(val, 0, 2));
 	    break;
 	case 3:
 	    fprintf (oFile, "\t.byte %s,%s,0x%02x\n",
@@ -690,8 +763,8 @@ void emitStaticSeg (memmap * map)
 		    printChar (code->oFile,
 			       SPEC_CVAL (sym->etype).v_char,
 			       strlen(SPEC_CVAL (sym->etype).v_char)+1);
-		else
-		    fprintf (code->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type)& 0xffff);
+		else 
+		    asm_printf(code->oFile, asm_port->ds, (unsigned int)getSize (sym->type)& 0xffff);
 	    }
 	}
     }
@@ -797,7 +870,7 @@ void printPublics (FILE * afile)
     
     for (sym = setFirstItem (publics); sym;
 	 sym = setNextItem (publics))
-	fprintf (afile, "\t.globl %s\n", sym->rname);
+	asm_printf(afile, asm_port->global, sym->rname);
 }
 
 /*-----------------------------------------------------------------*/
@@ -886,8 +959,8 @@ static void emitOverlay(FILE *afile)
 		    fprintf(afile,"==.\n");
 	
 		/* allocate space */
-		fprintf (afile, "%s:\n", sym->rname);
-		fprintf (afile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
+		asm_printf(afile, asm_port->label, sym->rname);
+		asm_printf(afile, asm_port->ds, (unsigned int)getSize (sym->type) & 0xffff);
 	    }
 	    
 	}
@@ -942,7 +1015,7 @@ void glue ()
     initialComments (asmFile);
     
     /* print module name */
-    fprintf (asmFile, "\t.module %s\n", moduleName);
+    asm_printf(asmFile, asm_port->module, moduleName);
     
     /* Let the port generate any global directives, etc. */
     if (port->genAssemblerPreamble)

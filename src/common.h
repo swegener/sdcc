@@ -22,6 +22,7 @@
 #include "SDCCptropt.h"
 #include "SDCCopt.h"
 
+#include "asm.h"
 #include "port.h"
 #include "config.h"
 

@@ -1,3 +1,7 @@
+2002-02-21    <johan@FRIJA>
+
+	* src/SDCCcse.c: fixed bug #514308
+
 2002-02-20  Sandeep Dutta  <sandeep@ddi.com>
 
 	* src/SDCCloop.c:

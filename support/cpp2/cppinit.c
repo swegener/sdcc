@@ -558,6 +558,8 @@ cpp_create_reader (table, lang)
   s->n__CHAR_UNSIGNED__ = cpp_lookup (pfile, DSC("__CHAR_UNSIGNED__"));
   s->n__VA_ARGS__       = cpp_lookup (pfile, DSC("__VA_ARGS__"));
   s->n__VA_ARGS__->flags |= NODE_DIAGNOSTIC;
+  /* SDCC _asm specific */
+  s->n__asm             = cpp_lookup (pfile, DSC("_asm"));
 
   return pfile;
 }

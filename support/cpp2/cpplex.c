@@ -300,6 +300,57 @@ get_effective_char (buffer)
   return next;
 }
 
+/* SDCC _asm specific */
+/* Skip an _asm ... _endasm block.  We find the end of the comment by
+   seeing _endasm.  Returns non-zero if _asm terminated by EOF, zero
+   otherwise.  */
+static int
+skip_asm_block (pfile)
+     cpp_reader *pfile;
+{
+#define _ENDASM_STR "endasm"
+#define _ENDASM_LEN ((sizeof _ENDASM_STR) - 1)
+
+  cpp_buffer *buffer = pfile->buffer;
+  cppchar_t c = EOF;
+  int prev_space = 0;
+  int ret = 1;
+
+  pfile->state.lexing_comment = 1;
+  while (buffer->cur != buffer->rlimit)
+    {
+      prev_space = is_space(c), c = *buffer->cur++;
+
+    next_char:
+      /* FIXME: For speed, create a new character class of characters
+	 of interest inside block comments.  */
+      if (c == '?' || c == '\\')
+	c = skip_escaped_newlines (buffer, c);
+
+      if (prev_space && c == '_')
+	{
+          if (buffer->cur + _ENDASM_LEN <= buffer->rlimit &&
+            strncmp(buffer->cur, _ENDASM_STR, _ENDASM_LEN) == 0)
+            {
+              buffer->cur += _ENDASM_LEN;
+              ret = 0;
+	      break;
+            }
+	}
+      else if (is_vspace (c))
+	{
+	  prev_space = is_space(c), c = handle_newline (buffer, c);
+	  goto next_char;
+	}
+      else if (c == '\t')
+	adjust_column (pfile);
+    }
+
+  pfile->state.lexing_comment = 0;
+  buffer->read_ahead = EOF;
+  return ret;
+}
+
 /* Skip a C-style block comment.  We find the end of the comment by
    seeing if an asterisk is before every '/' we encounter.  Returns
    non-zero if comment terminated by EOF, zero otherwise.  */
@@ -728,6 +779,35 @@ parse_string (pfile, token, terminator)
   POOL_COMMIT (pool, token->val.str.len + 1);
 }
 
+/* SDCC _asm specific */
+/* The stored comment includes the comment start and any terminator.  */
+static void
+save_asm (pfile, token, from)
+     cpp_reader *pfile;
+     cpp_token *token;
+     const unsigned char *from;
+{
+#define _ASM_STR  "_asm"
+#define _ASM_LEN  ((sizeof _ASM_STR) - 1)
+
+  unsigned char *buffer;
+  unsigned int len;
+
+  len = pfile->buffer->cur - from + _ASM_LEN; /* + _ASM_LEN for the initial '_asm'.  */
+  /* C++ _asm block probably (not definitely) has moved past a new
+     line, which we don't want to save in the comment.  */
+  if (pfile->buffer->read_ahead != EOF)
+    len--;
+  buffer = _cpp_pool_alloc (&pfile->ident_pool, len);
+  
+  token->type = CPP_ASM;
+  token->val.str.len = len;
+  token->val.str.text = buffer;
+
+  memcpy (buffer, _ASM_STR, _ASM_LEN);
+  memcpy (buffer + _ASM_LEN, from, len - _ASM_LEN);
+}
+
 /* The stored comment includes the comment start and any terminator.  */
 static void
 save_comment (pfile, token, from)
@@ -977,6 +1057,18 @@ _cpp_lex_token (pfile, result)
 	      goto make_string;
 	    }
 	}
+      /* SDCC _asm specific */
+      /* handle _asm ... _endasm ;  */
+      else if (result->val.node == pfile->spec_nodes.n__asm)
+        {
+          comment_start = buffer->cur;
+          result->type = CPP_ASM;
+          skip_asm_block (pfile);
+          /* Save the _asm block as a token in its own right.  */
+          save_asm (pfile, result, comment_start);
+          /* Don't do MI optimisation.  */
+          return;
+        }
       /* Convert named operators to their proper types.  */
       else if (result->val.node->flags & NODE_OPERATOR)
 	{

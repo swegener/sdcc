@@ -249,7 +249,9 @@ scan_buffer (pfile)
 	  cpp_output_token (token, print.outf);
 	  print.printed = 1;
 	  if (token->type == CPP_STRING || token->type == CPP_WSTRING
-	      || token->type == CPP_COMMENT)
+            || token->type == CPP_COMMENT
+            /* SDCC _asm specific */
+            || token->type == CPP_ASM)
 	    check_multiline_token (&token->val.str);
 	}
     }

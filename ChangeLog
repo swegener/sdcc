@@ -1,3 +1,11 @@
+2003-10-30  Borut Razem <borut.razem@siol.net>
+
+	* support/cpp2/cpphash.h,
+	* support/cpp2/cpplib.h
+	* support/cpp2/cpplex.c,
+	* support/cpp2/cppmain.c,
+	* support/cpp2/cppinit.c: fixed bug #828015 - Syntax variation for _asm character constants
+
 2003-10-30 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Fixed a number of problems revealed by bug #827883.

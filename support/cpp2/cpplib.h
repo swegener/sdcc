@@ -138,7 +138,10 @@ struct ht;
 \
   TK(CPP_COMMENT,	SPELL_STRING)	/* Only if output comments.  */ \
   TK(CPP_MACRO_ARG,	SPELL_NONE)	/* Macro argument.  */		\
-  OP(CPP_EOF,		"EOL")		/* End of line or file.  */
+  OP(CPP_EOF,		"EOL")		/* End of line or file.  */	\
+\
+  /* SDCC _asm specific */
+  TK(CPP_ASM,		SPELL_STRING)   /* _asm ... _endasm ; */
 
 #define OP(e, s) e,
 #define TK(e, s) e,

@@ -25,10 +25,6 @@
 /* Signed and unsigned multiplication are the same - as long as the output
    has the same precision as the input.
 
-   To do: _muluint and _mulsint should be replaced by _mulint.
-
-   bernhard@bernhardheld.de
-
    Assembler-functions are provided for:
      ds390
      mcs51 small
@@ -56,12 +52,12 @@
 #  endif
 #endif
 
-#ifdef _MULINT_ASM_LARGE
+#if defined(_MULINT_ASM_LARGE)
 
 #pragma SAVE
 #pragma LESS_PEDANTIC
-unsigned int
-_muluint (unsigned int a, unsigned int b)	// in future: _mulint
+int
+_mulint (int a, int b)
 {
   a*b; // hush the compiler
 
@@ -79,7 +75,7 @@ _muluint (unsigned int a, unsigned int b)	// in future: _mulint
 #if defined(SDCC_PARMS_IN_BANK1)
     mov a,b1_0
 #else
-    mov dptr,#__muluint_PARM_2
+    mov dptr,#__mulint_PARM_2
     movx a,@dptr ; lsb_b
 #endif
     mul ab ; lsb_a*lsb_b
@@ -113,28 +109,18 @@ _muluint (unsigned int a, unsigned int b)	// in future: _mulint
 }
 #pragma RESTORE
 
-int
-_mulsint (int a, int b)		// obsolete
-{
-  return _muluint (a, b);
-}
-
-#elif defined _MULINT_ASM_SMALL || defined _MULINT_ASM_SMALL_AUTO
+#elif defined(_MULINT_ASM_SMALL) || defined(_MULINT_ASM_SMALL_AUTO)
 
 #pragma SAVE
 #pragma LESS_PEDANTIC
-unsigned int
+int
 _mulint_dummy (void) _naked
 {
 	_asm
 
 	__mulint:
-	__muluint:				; obsolete
-	__mulsint:				; obsolete
 
 		.globl __mulint
-		.globl __muluint		; obsolete
-		.globl __mulsint		; obsolete
 
 #if !defined(SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
 
@@ -144,21 +130,17 @@ _mulint_dummy (void) _naked
 		.area OSEG    (OVR,DATA)
 #endif
 #if defined(SDCC_PARMS_IN_BANK1)
-	#define bl 	(b1_0)	 
-	#define bh 	(b1_1)	 
+	#define bl 	(b1_0)
+	#define bh 	(b1_1)
 #else
-	#define bl 	(__mulint_PARM_2)	 
-	#define bh 	(__mulint_PARM_2 + 1)	 
+	#define bl 	(__mulint_PARM_2)
+	#define bh 	(__mulint_PARM_2 + 1)
 	__mulint_PARM_2:
-	__muluint_PARM_2:			; obsolete
-	__mulsint_PARM_2:			; obsolete
 
 		.globl __mulint_PARM_2
-		.globl __muluint_PARM_2		; obsolete
-		.globl __mulsint_PARM_2		; obsolete
 
 		.ds	2
-#endif						     
+#endif
 
 		.area CSEG    (CODE)
 
@@ -227,8 +209,8 @@ union uu {
         unsigned int t;
 } ;
 
-unsigned int
-_muluint (unsigned int a, unsigned int b)	// in future: _mulint
+int
+_mulint (int a, int b)
 {
 #if !defined(SDCC_STACK_AUTO) && (defined(SDCC_MODEL_LARGE) || defined(SDCC_ds390))	// still needed for large
 	union uu xdata *x;
@@ -248,12 +230,6 @@ _muluint (unsigned int a, unsigned int b)	// in future: _mulint
         t.s.hi += (x->s.lo * y->s.hi) + (x->s.hi * y->s.lo);
 
        return t.t;
-}
-
-int
-_mulsint (int a, int b)		// obsolete
-{
-  return _muluint (a, b);
 }
 
 #endif

@@ -8,27 +8,23 @@
    under the terms of the GNU Library General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU Library General Public License for more details.
-   
+
    You should have received a copy of the GNU Library General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 /* Signed and unsigned multiplication are the same - as long as the output
    has the same precision as the input.
-
-   To do: _mululong and _mulslong should be replaced by _mullong.
-
-   bernhard@bernhardheld.de
 
    Assembler-functions are provided for:
      mcs51 small
@@ -51,7 +47,7 @@
 #  endif
 #endif
 
-#if defined _MULLONG_ASM_SMALL || defined _MULLONG_ASM_SMALL_AUTO
+#if defined(_MULLONG_ASM_SMALL) || defined(_MULLONG_ASM_SMALL_AUTO)
 
 void
 _mullong_dummy (void) _naked
@@ -59,12 +55,8 @@ _mullong_dummy (void) _naked
 	_asm
 
 	__mullong:
-	__mululong:			; obsolete
-	__mulslong:			; obsolete
 
 		.globl __mullong
-		.globl __mululong	; obsolete
-		.globl __mulslong	; obsolete
 
 					; the result c will be stored in r4...r7
 		#define c0 r4
@@ -96,12 +88,8 @@ _mullong_dummy (void) _naked
 #endif
 
 	__mullong_PARM_2:
-	__mululong_PARM_2:			; obsolete
-	__mulslong_PARM_2:			; obsolete
 
 		.globl __mullong_PARM_2
-		.globl __mululong_PARM_2	; obsolete
-		.globl __mulslong_PARM_2	; obsolete
 
 		.ds	4
 
@@ -133,7 +121,7 @@ _mullong_dummy (void) _naked
 		clr	a
 		addc	a,b
 		mov	c2,a
-		
+
 
 		mov	a,a0
 		mov	b,b1
@@ -239,7 +227,7 @@ _mullong_dummy (void) _naked
 		clr	a
 		addc	a,b
 		mov	c2,a
-		
+
 
 		mov	a,a0
 		mov	b,@r0		; b1
@@ -321,7 +309,7 @@ _mullong_dummy (void) _naked
 }
 
 
-#elif defined _MULLONG_ASM_LARGE
+#elif defined(_MULLONG_ASM_LARGE)
 
 void
 _mullong_dummy (void) _naked
@@ -329,12 +317,8 @@ _mullong_dummy (void) _naked
 	_asm
 
 	__mullong:
-	__mululong:			; obsolete
-	__mulslong:			; obsolete
 
 		.globl __mullong
-		.globl __mululong	; obsolete
-		.globl __mulslong	; obsolete
 
 					; the result c will be stored in r4...r7
 		#define c0 r4
@@ -351,12 +335,8 @@ _mullong_dummy (void) _naked
 		.area XSEG    (XDATA)
 
 	__mullong_PARM_2:
-	__mululong_PARM_2:			; obsolete
-	__mulslong_PARM_2:			; obsolete
 
 		.globl __mullong_PARM_2
-		.globl __mululong_PARM_2	; obsolete
-		.globl __mulslong_PARM_2	; obsolete
 
 		.ds	4
 #endif
@@ -376,7 +356,7 @@ _mullong_dummy (void) _naked
 					;	Byte 0
 		mov	b,a0
 #if defined(SDCC_PARMS_IN_BANK1)
-		mov	a,b1_0		; b0						   
+		mov	a,b1_0		; b0
 #else
 		mov	dptr,#__mullong_PARM_2
 		movx	a,@dptr		; b0
@@ -388,7 +368,7 @@ _mullong_dummy (void) _naked
 					;	Byte 1
 		mov	b,a1
 #if defined(SDCC_PARMS_IN_BANK1)
-		mov	a,b1_0		; b0						   
+		mov	a,b1_0		; b0
 #else
 		movx	a,@dptr		; b0
 #endif
@@ -398,7 +378,7 @@ _mullong_dummy (void) _naked
 		clr	a
 		addc	a,b
 		mov	c2,a
-		
+
 
 		mov	b,a0
 #if defined(SDCC_PARMS_IN_BANK1)
@@ -523,21 +503,21 @@ union bil {
         struct { unsigned char b0; unsigned int i12; unsigned char b3;} bi;
 } ;
 #if defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390)
-#define bcast(x) ((union bil xdata *)&(x))
+#  define bcast(x) ((union bil xdata *)&(x))
 #elif defined(__z80) || defined(__gbz80)
-#define bcast(x) ((union bil *)&(x))
+#  define bcast(x) ((union bil *)&(x))
 #else
-#define bcast(x) ((union bil near  *)&(x))
+#  define bcast(x) ((union bil near  *)&(x))
 #endif
 
 /*
                      3   2   1   0
        X             3   2   1   0
        ----------------------------
-                   0.3 0.2 0.1 0.0 
-               1.3 1.2 1.1 1.0 
-           2.3 2.2 2.1 2.0 
-       3.3 3.2 3.1 3.0 
+                   0.3 0.2 0.1 0.0
+               1.3 1.2 1.1 1.0
+           2.3 2.2 2.1 2.0
+       3.3 3.2 3.1 3.0
        ----------------------------
                   |3.3|1.3|0.2|0.0|   A
                     |2.3|0.3|0.1|     B
@@ -548,8 +528,8 @@ union bil {
                         |3.0|         G
                           |-------> only this side 32 x 32 -> 32
 */
-unsigned long
-_mululong (unsigned long a, unsigned long b)	// in future: _mullong
+long
+_mullong (long a, long b)
 {
         union bil t;
 
@@ -577,12 +557,6 @@ _mululong (unsigned long a, unsigned long b)	// in future: _mullong
         t.l += a;
 
         return t.l + b;
-}
-
-long
-_mulslong (long a, long b)	// obsolete
-{
-  return _mululong (a, b);
 }
 
 #endif // _MULLONG_ASM

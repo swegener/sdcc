@@ -1,5 +1,5 @@
 	;; Originally from GBDK by Pascal Felber.
-	
+
 	.area	_CODE
 
 __mulschar_rrx_s::
@@ -8,13 +8,13 @@ __mulschar_rrx_s::
 
         ld      e,(hl)
         inc     hl
-        ld      l,(hl)                
+        ld      l,(hl)
 
         ;; Fall through
 __mulschar_rrx_hds::
         ;; Need to sign extend before going in.
         ld      c,l
-        
+
         ld      a,l
         rla
         sbc     a,a
@@ -34,20 +34,19 @@ __muluchar_rrx_s::
         ld      e,(hl)
 
         inc     hl
-        ld      c,(hl)                
+        ld      c,(hl)
 
         ;; Clear the top
         xor     a
         ld      d,a
         ld      b,a
-        
-        jp      .mulu16
-        
-__mulsint_rrx_s::
-__muluint_rrx_s::
+
+        jp      .mul16
+
+__mulint_rrx_s::
         ld      hl,#2
         add     hl,sp
-        
+
         ld      e,(hl)
         inc     hl
         ld      d,(hl)
@@ -58,27 +57,25 @@ __muluint_rrx_s::
         ld      l,a
 
         ;; Fall through
-        
+
 __muluchar_rrx_hds::
-__mulsint_rrx_hds::
-__muluint_rrx_hds::
+__mulint_rrx_hds::
 	;; Parameters:
 	;;	HL, DE (left, right irrelivent)
 	ld	b,h
 	ld	c,l
-	
+
 	;; 16-bit multiplication
-	;; 
+	;;
 	;; Entry conditions
 	;;   BC = multiplicand
 	;;   DE = multiplier
-	;; 
+	;;
 	;; Exit conditions
 	;;   DE = less significant word of product
 	;;
 	;; Register used: AF,BC,DE,HL
 .mul16:
-.mulu16:
         ld      hl,#0
         ld      a,b
         ; ld c,c
@@ -88,7 +85,7 @@ __muluint_rrx_hds::
         ;; less.  This is often the case with support address calls.
         or      a
         jp      nz,1$
-        
+
         ld      b,#8
         ld      a,c
 1$:
@@ -99,6 +96,6 @@ __muluint_rrx_hds::
         rla                     ;DLE 27/11/98
         jr      nc,2$
         add     hl,de
-2$:     
+2$:
         djnz    1$
         ret

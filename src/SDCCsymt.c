@@ -2350,13 +2350,14 @@ initCSupport ()
 	}
     }
 
+/*
   for (muldivmod = 0; muldivmod < 3; muldivmod++)
     {
       for (bwd = 0; bwd < 3; bwd++)
 	{
 	  for (su = 0; su < 2; su++)
 	    {
-	      SNPRINTF (buffer, sizeof(buffer), 
+	      SNPRINTF (buffer, sizeof(buffer),
 			"_%s%s%s",
 		       smuldivmod[muldivmod],
 		       ssu[su],
@@ -2367,13 +2368,66 @@ initCSupport ()
 	}
     }
 
+  muluint() and mulsint() resp. mululong() and mulslong() return the same result.
+  Therefore they've been merged into mulint() and mullong().
+*/
+
+  for (bwd = 0; bwd < 3; bwd++)
+    {
+      for (su = 0; su < 2; su++)
+	{
+	  for (muldivmod = 1; muldivmod < 3; muldivmod++)
+	    {
+	      /* div and mod */
+	      SNPRINTF (buffer, sizeof(buffer),
+			"_%s%s%s",
+		       smuldivmod[muldivmod],
+		       ssu[su],
+		       sbwd[bwd]);
+	      __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
+	      FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+	    }
+	}
+    }
+  /* mul only */
+  muldivmod = 0;
+  /* byte */
+  bwd = 0;
+  for (su = 0; su < 2; su++)
+    {
+      /* muluchar and mulschar are still separate functions, because e.g. the z80
+         port is sign/zero-extending to int before calling mulint() */
+      SNPRINTF (buffer, sizeof(buffer),
+		"_%s%s%s",
+		smuldivmod[muldivmod],
+		ssu[su],
+		sbwd[bwd]);
+      __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
+      FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+    }
+  /* signed only */
+  su = 0;
+  /* word and doubleword */
+  for (bwd = 1; bwd < 3; bwd++)
+    {
+      /* mul, int/long */
+      SNPRINTF (buffer, sizeof(buffer),
+		"_%s%s",
+		smuldivmod[muldivmod],
+		sbwd[bwd]);
+      __muldiv[muldivmod][bwd][0] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
+      FUNC_NONBANKED (__muldiv[muldivmod][bwd][0]->type) = 1;
+      /* signed = unsigned */
+      __muldiv[muldivmod][bwd][1] = __muldiv[muldivmod][bwd][0];
+    }
+
   for (rlrr = 0; rlrr < 2; rlrr++)
     {
       for (bwd = 0; bwd < 3; bwd++)
 	{
 	  for (su = 0; su < 2; su++)
 	    {
-	      SNPRINTF (buffer, sizeof(buffer), 
+	      SNPRINTF (buffer, sizeof(buffer),
 			"_%s%s%s",
 		       srlrr[rlrr],
 		       ssu[su],

@@ -1073,7 +1073,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 void 
 printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
 {
-  value *val;
+  sym_link *itype;
   
   if (!ilist)
     return;
@@ -1096,24 +1096,28 @@ printIval (symbol * sym, sym_link * type, initList * ilist, FILE * oFile)
     }
 
   // not an aggregate, ilist must be a node
-  if (ilist->type!=INIT_NODE &&
+  if (ilist->type!=INIT_NODE) {
       // or a 1-element list
-      ilist->init.deep->next) {
-    werror (W_EXCESS_INITIALIZERS, "scalar", 
-	    sym->name, sym->lineDef);
+    if (ilist->init.deep->next) {
+      werror (W_EXCESS_INITIALIZERS, "scalar", 
+	      sym->name, sym->lineDef);
+    } else {
+      ilist=ilist->init.deep;
+    }
   }
 
   // and the type must match
-  val=list2val(ilist);
-  if (compareType(type, val->type)==0) {
+  itype=ilist->init.node->ftype;
+
+  if (compareType(type, itype)==0) {
     // special case for literal strings
-    if (IS_ARRAY (val->type) && IS_CHAR (val->etype) &&
+    if (IS_ARRAY (itype) && IS_CHAR (getSpec(type)) &&
 	// which are really code pointers
 	IS_PTR(type) && DCL_TYPE(type)==CPOINTER) {
       // no sweat
     } else {
       werror (E_TYPE_MISMATCH, "assignment", " ");
-      printFromToType(list2val(ilist)->type, type);
+      printFromToType(itype, type);
     }
   }
 

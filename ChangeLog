@@ -1,3 +1,19 @@
+2004-12-20 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/SDCCast.c (gatherAutoInit): allow pic16 to emit static
+	variables initial values to idata section,
+	* src/SDCCicode.c (geniCodeCall): patch from ### to fix unreferenced
+	variables in some functions. This utilizes parmBytes field of iCode
+	structure to hold the offset of the variable in stack. (might be
+	able to use the stack field too?)
+	* applied patch from Raphael Neider # ### , # ###
+	* src/pic16/glue.c (pic16emitRegularMap): fix to print static
+	variable initial values in idata section,
+	* src/pic16/ralloc.c (pic16_allocDirReg): don't allocate register
+	for static variables with initial value
+	* src/device/lib/pic16/libsdcc/float/ulong2fs.c (__ulong2fs):
+	applied fix in while loop from Raphael Neider.
+
 2004-12-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genCpl): fixed bit=~(char/bit) bugs, added warning

@@ -326,6 +326,8 @@ typedef enum
 {
   OPT_BEGIN,             /* mark beginning of optimization block */
   OPT_END,               /* mark ending of optimization block */
+  OPT_JUMPTABLE_BEGIN,   /* mark beginning of a jumptable */
+  OPT_JUMPTABLE_END      /* mark end of jumptable */
 } OPT_TYPE;
 
 /***********************************************************************

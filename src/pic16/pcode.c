@@ -6907,10 +6907,12 @@ int instrSize (pCode *pc)
  */
 int isLabel (pCode *pc, char *label)
 {
-  if (isPCI(pc) || isPCAD(pc)) {
+  if (!pc) return 0;
+
+  // label attached to the pCode?  
+  if (isPCI(pc) || isPCAD(pc) || isPCW(pc) || pc->type == PC_INFO) {
     pBranch *lab = NULL;
-    if (isPCI(pc)) lab = PCI(pc)->label;
-    else if (isPCAD(pc)) lab = PCAD(pc)->pci.label;
+    lab = PCI(pc)->label;
 
     while (lab) {
       if (isPCL(lab->pc) && strcmp(PCL(lab->pc)->label, label) == 0) {
@@ -6918,12 +6920,23 @@ int isLabel (pCode *pc, char *label)
       }
       lab = lab->next;
     } // while
-  }
+  } // if
+
+  // is inline assembly label?
+  if (isPCAD(pc) && PCAD(pc)->directive == NULL && PCAD(pc)->arg) {
+    // do not compare trailing ':'
+    if (strncmp (PCAD(pc)->arg, label, strlen (label)) == 0) {
+      return 1;
+    }
+  } // if
+  
+  // is pCodeLabel?
   if (isPCL(pc)) {
       if (strcmp(PCL(pc)->label,label) == 0) {
       return 1;
     }
-  }
+  } // if
+  
   // no label/no label attached/wrong label(s)
   return 0;
 }
@@ -6933,7 +6946,7 @@ int isLabel (pCode *pc, char *label)
  * Returns max if the label could not be found or
  * its distance from pc in (-max..+max).
  */
-int findpCodeLabel (pCode *pc, char *label, int max) {
+int findpCodeLabel (pCode *pc, char *label, int max, pCode **target) {
   int dist = instrSize(pc);
   pCode *curr = pc;
 
@@ -6942,7 +6955,10 @@ int findpCodeLabel (pCode *pc, char *label, int max) {
     curr = curr->prev;
     dist += instrSize(curr); // sizeof (instruction)
   } // while
-  if (curr && dist < max) return -dist;
+  if (curr && dist < max) {
+    if (target != NULL) *target = curr;
+    return -dist;
+  }
 
   dist = 0;
   curr = pic16_findNextInstruction (pc->next);
@@ -6951,31 +6967,13 @@ int findpCodeLabel (pCode *pc, char *label, int max) {
     dist += instrSize(curr); // sizeof (instruction)
     curr = curr->next;
   } // while
-  if (curr && dist < max) return dist;
+  if (curr && dist < max) {
+    if (target != NULL) *target = curr;
+    return dist;
+  }
 
+  if (target != NULL) *target = NULL;
   return max;
-}
-
-/* Returns 0 if the pCode pc is known to NOT be in a jumptable.
- * If in doubt (or sure that pc is part of a jumptable), 1 is returned.
- */
-int isJumptable (pCode *pc, pCode *prev, pCode *next)
-{
-  // we might be the last item in a jump table or not in
-  // jumptable at all -- then we don't care
-  if (!next || !isPCI(next) || PCI(next)->op != POC_GOTO)
-    return 0;
-
-  // preceding instruction is a skip instruction (cannot be jumptable)
-  if (prev && isPCI(prev) && (isPCI_SKIP(prev)))
-    return 0;
-
-  // GOTOs within a jumptable are unlabelled...
-  if (next && isPCI(next) && PCI(next)->op == POC_GOTO && PCI(next)->label)
-    return 0;
-  
-  // if in doubt: assume we are in a jumptable
-  return 1;
 }
 
 /* Returns -1 if pc does NOT denote an instruction like
@@ -7036,15 +7034,21 @@ int hasNoLabel (pCode *pc)
   pCode *prev;
   if (!pc) return 1;
 
-  // has labels attached?
-  if (isPCI(pc) && PCI(pc)->label) return 0;
-  
   // are there any label pCodes between pc and the previous instruction?
   prev = pic16_findPrevInstruction (pc->prev);
-  pc = pc->prev;
   while (pc && pc != prev) {
+    // pCode with attached label?
+    if ((isPCI(pc) || isPCAD(pc) || isPCW(pc) || pc->type == PC_INFO)
+	&& PCI(pc)->label) {
+      return 0;
+    }
+    // is inline assembly label?
+    if (isPCAD(pc) && PCAD(pc)->directive == NULL) return 0;
     if (isPCW(pc) && PCW(pc)->label) return 0;
+
+    // pCodeLabel?
     if (isPCL(pc)) return 0;
+
     pc = pc->prev;
   } // if
 
@@ -7052,9 +7056,112 @@ int hasNoLabel (pCode *pc)
   return 1;
 }
 
+/* Replaces the old pCode with the new one, moving the labels,
+ * C source line and probably flow information to the new pCode.
+ */
+void pic16_pCodeReplace (pCode *oldPC, pCode *newPC) {
+  if (!oldPC || !newPC || !isPCI(oldPC) || !isPCI(newPC))
+    return;
+
+  /* first move all labels from old to new */
+  PCI(newPC)->label = pic16_pBranchAppend (PCI(oldPC)->label, PCI(newPC)->label);
+  PCI(oldPC)->label = NULL;
+  
+  /* move C source line (if possible) */
+  if (PCI(oldPC)->cline && !PCI(newPC)->cline)
+    PCI(newPC)->cline = PCI(oldPC)->cline;
+
+  /* insert new pCode into pBlock */
+  pic16_pCodeInsertAfter (oldPC, newPC);
+  pic16_unlinkpCode (oldPC);
+  
+  /* TODO: update flow (newPC->from, newPC->to) */
+  PCI(newPC)->pcflow = PCI(oldPC)->pcflow;
+
+  /* destruct replaced pCode */
+  oldPC->destruct (oldPC);
+}
+
+/* Returns the inverted conditional branch (if any) or NULL.
+ * pcop must be set to the new jump target.
+ */
+pCode *getNegatedBcc (pCode *bcc, pCodeOp *pcop)
+{
+  pCode *newBcc;
+
+  if (!bcc || !isPCI(bcc)) return NULL;
+
+  switch (PCI(bcc)->op) {
+  case POC_BC:   newBcc = pic16_newpCode (POC_BNC , pcop); break;
+  case POC_BZ:   newBcc = pic16_newpCode (POC_BNZ , pcop); break;
+  case POC_BOV:  newBcc = pic16_newpCode (POC_BNOV, pcop); break;
+  case POC_BN:   newBcc = pic16_newpCode (POC_BNN , pcop); break;
+  case POC_BNC:  newBcc = pic16_newpCode (POC_BC  , pcop); break;
+  case POC_BNZ:  newBcc = pic16_newpCode (POC_BZ  , pcop); break;
+  case POC_BNOV: newBcc = pic16_newpCode (POC_BOV , pcop); break;
+  case POC_BNN:  newBcc = pic16_newpCode (POC_BN  , pcop); break;
+  default:
+    newBcc = NULL;
+  }
+  return newBcc;
+}
+
+#define MAX_DIST_GOTO 0x7FFFFFFF
 #define MAX_DIST_BRA 1020
 #define MAX_DIST_BCC 120
-#define IS_GOTO(arg) ((arg) && isPCI(arg) && (PCI(arg)->op == POC_GOTO))
+#define IS_GOTO(arg) ((arg) && isPCI(arg) && (PCI(arg)->op == POC_GOTO || PCI(arg)->op == POC_BRA))
+
+/* Follows GOTO/BRA instructions to their target instructions, stores the
+ * final destination (not a GOTO or BRA instruction) in target and returns
+ * the distance from the original pc to *target.
+ */
+int resolveJumpChain (pCode *pc, pCode **target, pCodeOp **pcop) {
+  pCode *curr = pc;
+  pCode *last = NULL;
+  pCodeOp *lastPCOP = NULL;
+  int dist = 0;
+
+  /* only follow unconditional branches, except for the initial pCode (which may be a conditional branch) */
+  while (curr && isPCI(curr) && (PCI(curr)->op == POC_GOTO || PCI(curr)->op == POC_BRA
+				 || (curr == pc && isConditionalBranch(curr)))) {
+    last = curr;
+    lastPCOP = PCI(curr)->pcop;
+    dist = findpCodeLabel (pc, PCI(curr)->pcop->name, MAX_DIST_GOTO, &curr);
+  } // while
+  
+  if (target) *target = last;
+  if (pcop) *pcop = lastPCOP;
+  return dist;
+}
+
+/* Returns pc if it is not a OPT_JUMPTABLE_BEGIN INFO pCode.
+ * Otherwise the first pCode after the jumptable (after
+ * the OPT_JUMPTABLE_END tag) is returned.
+ */
+pCode *skipJumptables (pCode *pc)
+{
+  if (!pc) return NULL;
+
+  while (pc->type == PC_INFO && PCINF(pc)->type == INF_OPTIMIZATION && PCOO(PCINF(pc)->oper1)->type == OPT_JUMPTABLE_BEGIN) {
+    do {
+      pc = pc->next;
+    } while (pc && (pc->type != PC_INFO || PCINF(pc)->type != INF_OPTIMIZATION
+		    || PCOO(PCINF(pc)->oper1)->type != OPT_JUMPTABLE_END));
+    // skip OPT_END as well
+    if (pc) pc = pc->next;
+  } // while
+
+  return pc;
+}
+
+pCode *pic16_findNextInstructionSkipJumptables (pCode *pc)
+{
+  while (pc && !isPCI(pc) && !isPCAD(pc) && !isPCW(pc)) {
+    pc = skipJumptables (pc->next);
+  } // while
+  
+  return pc;
+}
 
 /* Turn GOTOs into BRAs if distance between GOTO and label
  * is less than 1024 bytes.
@@ -7069,156 +7176,204 @@ void pic16_OptimizeJumps ()
   pCode *pc_prev = NULL;
   pCode *pc_next = NULL;
   pBlock *pb;
+  pCode *target;
+  int change, iteration;
   int isHandled = 0;
-  int opt=0, toofar=0, jumptabs=0, opt_cond = 0, cond_toofar=0, opt_reorder = 0;
+  char *label;
+  int opt=0, toofar=0, opt_cond = 0, cond_toofar=0, opt_reorder = 0, opt_gotonext = 0, opt_gotochain = 0;
   
   if (!the_pFile) return;
   
+  //fprintf (stderr, "%s:%d: %s\n", __FILE__, __LINE__, __FUNCTION__);
+  
   for (pb = the_pFile->pbHead; pb != NULL; pb = pb->next) {
-    pc = pic16_findNextInstruction (pb->pcHead);
+    iteration = 1;
+    int matchedInvertRule = 1;
+    do {
+      //fprintf (stderr, "%s:%d: iterating over pBlock %p\n", __FUNCTION__, __LINE__, pb);
+      change = 0;
+      pc = pic16_findNextInstruction (pb->pcHead);
     
-    while (pc) {
-      pc_next = pic16_findNextInstruction (pc->next);
-      // turn GOTOs into BRAs (if absolute distance to label < 1024)
-      if (IS_GOTO(pc)) {
-	char *label = PCI(pc)->pcop->name;
-	int condBraType = isSkipOnStatus(pc_prev);
-	int dist = findpCodeLabel(pc, label, MAX_DIST_BRA);
-	if (dist < 0) dist = -dist;
-	//fprintf (stderr, "distance: %d (", dist); pc->print(stderr, pc);fprintf (stderr, ")\n");
-	isHandled = 0;
+      while (pc) {
+	pc_next = pic16_findNextInstructionSkipJumptables (pc->next);
+	
 
-	if (condBraType != -1 && hasNoLabel(pc)) {
-	  if (dist < MAX_DIST_BCC) {
-	    pCode *bcc = NULL;
-	    switch (condBraType) {
-	    case 0x00: bcc = pic16_newpCode (POC_BC, PCI(pc)->pcop);break;
-	      // no BDC on DIGIT CARRY available
-	    case 0x02: bcc = pic16_newpCode (POC_BZ, PCI(pc)->pcop);break;
-	    case 0x03: bcc = pic16_newpCode (POC_BOV, PCI(pc)->pcop);break;
-	    case 0x04: bcc = pic16_newpCode (POC_BN, PCI(pc)->pcop);break;
-	    case 0x10: bcc = pic16_newpCode (POC_BNC, PCI(pc)->pcop);break;
-	      // no BNDC on DIGIT CARRY available
-	    case 0x12: bcc = pic16_newpCode (POC_BNZ, PCI(pc)->pcop);break;
-	    case 0x13: bcc = pic16_newpCode (POC_BNOV, PCI(pc)->pcop);break;
-	    case 0x14: bcc = pic16_newpCode (POC_BNN, PCI(pc)->pcop);break;
-	    default:
-	      // no replacement possible
-	      bcc = NULL;
-	      break;
-	    } // switch
-	    if (bcc) {
-	      // ATTENTION: keep labels attached to BTFSx!
-	      // HINT: GOTO is label free (checked above)
-	      isHandled = 1;
-	      PCI(bcc)->label = PCI(pc_prev)->label;
-	      PCI(pc_prev)->label = NULL;
-	      pic16_pCodeInsertAfter (pc, bcc);
-	      pic16_pCodeInsertAfter(pc_prev, pic16_newpCodeCharP("goto-optimization 1"));
-	      pc_prev->destruct(pc_prev);
-	      pc->destruct(pc);
-	      pc = bcc;
-	      opt_cond++;
-	    } // if
-	  } else {
-	    //fprintf (stderr, "(%d, too far for Bcc)\n", dist);
-	    cond_toofar++;
+	/* (1) resolve chained jumps
+	 * Do not perform this until pattern (4) is no longer present! Otherwise we will
+	 * (a) leave dead code in and
+	 * (b) skip over the dead code with an (unneccessary) jump.
+	 */
+	if (!matchedInvertRule && (IS_GOTO(pc) || isConditionalBranch(pc))) {
+	  pCodeOp *lastTargetOp = NULL;
+	  int newDist = resolveJumpChain (pc, &target, &lastTargetOp);
+	  int maxDist = MAX_DIST_BCC;
+	  if (PCI(pc)->op == POC_BRA) maxDist = MAX_DIST_BRA;
+	  if (PCI(pc)->op == POC_GOTO) maxDist = MAX_DIST_GOTO;
+	  
+	  /* be careful NOT to make the jump instruction longer (might break previously shortened jumps!) */
+	  if (lastTargetOp && newDist <= maxDist && lastTargetOp != PCI(pc)->pcop
+	      && strcmp (lastTargetOp->name, PCI(pc)->pcop->name) != 0) {
+	    //fprintf (stderr, "(1) ");pc->print(stderr, pc); fprintf (stderr, " --> %s\n", lastTargetOp->name);
+	    if (pic16_pcode_verbose) { pic16_pCodeInsertAfter (pc->prev, pic16_newpCodeCharP("(1) jump chain resolved")); }
+	    PCI(pc)->pcop->name = lastTargetOp->name;
+	    change++;
+	    opt_gotochain++;
 	  } // if
 	} // if
 
-	if (!isHandled) {
-	  // eliminate the following (common) tripel:
-	  //           <pred.>;
-	  //  labels1: Bcc label2;
-	  //           GOTO somewhere;    ; <-- instruction referenced by pc
-	  //  label2:  <cont.>
-	  // and replace it by
-	  //  labels1: B#(cc) somewhere;  ; #(cc) is the negated condition cc
-	  //  label2:  <cont.>
-	  // ATTENTION: all labels pointing to "Bcc label2" must be attached
-	  //            to <cont.> instead
-	  // ATTENTION: This optimization is only valid if <pred.> is
-	  //            not a skip operation!
-	  // ATTENTION: somewhere must be within MAX_DIST_BCC bytes!
-	  // ATTENTION: no label may be attached to the GOTO instruction!
-	  if (isConditionalBranch(pc_prev)
-	      && (!isPCI_SKIP(pic16_findPrevInstruction(pc_prev->prev)))
-	      && (dist < MAX_DIST_BCC)
-	      && isLabel(pc_next,PCI(pc_prev)->pcop->name)
-	      && hasNoLabel(pc)) {
-	    pCode *newBcc = NULL;
-	    switch (PCI(pc_prev)->op) {
-	    case POC_BC:   newBcc = pic16_newpCode (POC_BNC , PCI(pc)->pcop); break;
-	    case POC_BZ:   newBcc = pic16_newpCode (POC_BNZ , PCI(pc)->pcop); break;
-	    case POC_BOV:  newBcc = pic16_newpCode (POC_BNOV, PCI(pc)->pcop); break;
-	    case POC_BN:   newBcc = pic16_newpCode (POC_BNN , PCI(pc)->pcop); break;
-	    case POC_BNC:  newBcc = pic16_newpCode (POC_BC  , PCI(pc)->pcop); break;
-	    case POC_BNZ:  newBcc = pic16_newpCode (POC_BZ  , PCI(pc)->pcop); break;
-	    case POC_BNOV: newBcc = pic16_newpCode (POC_BOV , PCI(pc)->pcop); break;
-	    case POC_BNN:  newBcc = pic16_newpCode (POC_BN  , PCI(pc)->pcop); break;
-	    default:
-	      newBcc = NULL;
-	    }
-	    
-	    if (newBcc) {
-	      PCI(newBcc)->label = PCI(pc_prev)->label;
+
+	if (IS_GOTO(pc)) {
+	  label = PCI(pc)->pcop->name;
+	  int condBraType = isSkipOnStatus(pc_prev);
+	  int dist = findpCodeLabel(pc, label, MAX_DIST_BRA, &target);
+	  if (dist < 0) dist = -dist;
+	  //fprintf (stderr, "distance: %d (", dist); pc->print(stderr, pc);fprintf (stderr, ")\n");
+	  isHandled = 0;
+	  
+	  
+	  /* (2) remove "GOTO label; label:" */
+	  if (isLabel (pc_next, label)) {
+	    //fprintf (stderr, "(2) GOTO next instruction: ");pc->print(stderr, pc);fprintf (stderr, " --> ");pc_next->print(stderr, pc_next); fprintf(stderr, "\n");
+	    // first remove all preceeding SKIP instructions
+	    while (pc_prev && isPCI_SKIP(pc_prev)) {
+	      // attach labels on this instruction to pc_next
+	      //fprintf (stderr, "(2) preceeding SKIP removed: ");pc_prev->print(stderr, pc_prev);fprintf(stderr, "\n");
+	      PCI(pc_next)->label = pic16_pBranchAppend (PCI(pc_prev)->label, PCI(pc_next)->label);
 	      PCI(pc_prev)->label = NULL;
-	     
-	      pic16_pCodeInsertAfter(pc_prev, newBcc);
-	      pic16_pCodeInsertAfter(pc_prev, pic16_newpCodeCharP("goto-optimization 2"));
-	      pc->destruct(pc);
-	      pc->destruct(pc_prev);
-	      pc = newBcc;
-	      isHandled = 1;
-	      opt_reorder++;
+	      if (pic16_pcode_verbose) { pic16_pCodeInsertAfter (pc->prev, pic16_newpCodeCharP("(2) SKIP removed")); }
+	      pic16_unlinkpCode (pc_prev);
+	      pc_prev = pic16_findPrevInstruction (pc);
+	    } // while
+	    // now remove the redundant goto itself
+	    PCI(pc_next)->label = pic16_pBranchAppend (PCI(pc)->label, PCI(pc_next)->label);
+	    if (pic16_pcode_verbose) { pic16_pCodeInsertAfter (pc, pic16_newpCodeCharP("(2) GOTO next instruction removed")); }
+	    pic16_unlinkpCode (pc);
+	    pc = pic16_findPrevInstruction(pc_next->prev);
+	    isHandled = 1; // do not perform further optimizations
+	    opt_gotonext++;
+	    change++;
+	  } // if
+	  
+	  
+	  /* (3) turn BTFSx STATUS,i; GOTO label into Bcc label if possible */
+	  if (!isHandled && condBraType != -1 && hasNoLabel(pc)) {
+	    if (dist < MAX_DIST_BCC) {
+	      pCode *bcc = NULL;
+	      switch (condBraType) {
+	      case 0x00: bcc = pic16_newpCode (POC_BC, PCI(pc)->pcop);break;
+		// no BDC on DIGIT CARRY available
+	      case 0x02: bcc = pic16_newpCode (POC_BZ, PCI(pc)->pcop);break;
+	      case 0x03: bcc = pic16_newpCode (POC_BOV, PCI(pc)->pcop);break;
+	      case 0x04: bcc = pic16_newpCode (POC_BN, PCI(pc)->pcop);break;
+	      case 0x10: bcc = pic16_newpCode (POC_BNC, PCI(pc)->pcop);break;
+		// no BNDC on DIGIT CARRY available
+	      case 0x12: bcc = pic16_newpCode (POC_BNZ, PCI(pc)->pcop);break;
+	      case 0x13: bcc = pic16_newpCode (POC_BNOV, PCI(pc)->pcop);break;
+	      case 0x14: bcc = pic16_newpCode (POC_BNN, PCI(pc)->pcop);break;
+	      default:
+		// no replacement possible
+		bcc = NULL;
+		break;
+	      } // switch
+	      if (bcc) {
+		// ATTENTION: keep labels attached to BTFSx!
+		// HINT: GOTO is label free (checked above)
+		//fprintf (stderr, "%s:%d: (3) turning %s %s into %s %s\n", __FUNCTION__, __LINE__, PCI(pc)->mnemonic, label, PCI(bcc)->mnemonic, label);
+		isHandled = 1; // do not perform further optimizations
+		if (pic16_pcode_verbose) { pic16_pCodeInsertAfter(pc_prev->prev, pic16_newpCodeCharP("(3) conditional branch introduced")); }
+		pic16_pCodeReplace (pc_prev, bcc);
+		pc->destruct(pc);
+		pc = bcc;
+		opt_cond++;
+		change++;
+	      } // if
+	    } else {
+	      //fprintf (stderr, "(%d, too far for Bcc)\n", dist);
+	      cond_toofar++;
+	    } // if
+	  } // if
+
+	  if (!isHandled) {
+	    // (4) eliminate the following (common) tripel:
+	    //           <pred.>;
+	    //  labels1: Bcc label2;
+	    //           GOTO somewhere;    ; <-- instruction referenced by pc
+	    //  label2:  <cont.>
+	    // and replace it by
+	    //  labels1: B#(cc) somewhere;  ; #(cc) is the negated condition cc
+	    //  label2:  <cont.>
+	    // ATTENTION: all labels pointing to "Bcc label2" must be attached
+	    //            to <cont.> instead
+	    // ATTENTION: This optimization is only valid if <pred.> is
+	    //            not a skip operation!
+	    // ATTENTION: somewhere must be within MAX_DIST_BCC bytes!
+	    // ATTENTION: no label may be attached to the GOTO instruction!
+	    if (isConditionalBranch(pc_prev)
+		&& (!isPCI_SKIP(pic16_findPrevInstruction(pc_prev->prev)))
+		&& (dist < MAX_DIST_BCC)
+		&& isLabel(pc_next,PCI(pc_prev)->pcop->name)
+		&& hasNoLabel(pc)) {
+	      pCode *newBcc = getNegatedBcc (pc_prev, PCI(pc)->pcop);
+	    
+	      if (newBcc) {
+		//fprintf (stderr, "%s:%d: (4) turning %s %s into %s %s\n", __FUNCTION__, __LINE__, PCI(pc)->mnemonic, label, PCI(newBcc)->mnemonic, label);
+		isHandled = 1; // do not perform further optimizations
+		if (pic16_pcode_verbose) { pic16_pCodeInsertAfter(pc_prev->prev, pic16_newpCodeCharP("(4) conditional skipping branch inverted")); }
+		pic16_pCodeReplace (pc_prev, newBcc);
+		pc->destruct(pc);
+		pc = newBcc;
+		opt_reorder++;
+		change++;
+		matchedInvertRule++;
+	      }
 	    }
 	  }
-	}
-
-	if (!isHandled) {
-	  // now just turn GOTO into BRA
-	  if (!isJumptable(pc, pc_prev, pc_next)) {
+	  
+	  /* (5) now just turn GOTO into BRA */ 
+	  if (!isHandled && (PCI(pc)->op == POC_GOTO)) {
 	    if (dist < MAX_DIST_BRA) {
 	      pCode *newBra = pic16_newpCode (POC_BRA, PCI(pc)->pcop);
-	      isHandled = 1;
-	      PCI(newBra)->label = PCI(pc)->label;
-	      pic16_pCodeInsertAfter (pc, newBra);
-	      pic16_pCodeInsertAfter(pc_prev, pic16_newpCodeCharP("goto-optimization 3"));
-	      pc->destruct(pc);
+	      //fprintf (stderr, "%s:%d: (5) turning %s %s into %s %s\n", __FUNCTION__, __LINE__, PCI(pc)->mnemonic, label, PCI(newBra)->mnemonic, label);
+	      if (pic16_pcode_verbose) { pic16_pCodeInsertAfter(pc->prev, pic16_newpCodeCharP("(5) GOTO replaced by BRA")); }
+	      pic16_pCodeReplace (pc, newBra);
 	      pc = newBra;
 	      opt++;
+	      change++;
 	    } else {
 	      //fprintf (stderr, "(%d, too far for BRA)\n", dist);
 	      toofar++;
 	    }
-	  } else {
-	    //fprintf (stderr, "(in jumptable)\n");
-	    jumptabs++;
-	  }
-	} // if (!isHandled)
-      } // if
+	  } // if (!isHandled)
+	} // if
 
-      pc_prev = pc;
-      pc = pc_next;
-    } // while (pc)
+	pc_prev = pc;
+	pc = pc_next;
+      } // while (pc)
+      
+      pBlockRemoveUnusedLabels (pb);
+      
+      // This line enables goto chain resolution!
+      if (matchedInvertRule > 1) matchedInvertRule = 1; else matchedInvertRule = 0;
+
+      iteration++;
+    } while (change); /* fixpoint iteration per pBlock */
   } // for (pb)
   
   // emit some statistics concerning goto-optimization
   // (maybe this should be moved to the general statistics?)
-  fprintf (stderr, "optimize-goto: %d GOTO->BRA; (%d GOTOs too far and "
-	   "%d GOTOs in jumptables ignored); "
-	   "%d BTFSx, GOTO->Bcc (%d too far), %d jumps reordered\n",
-	   opt, toofar, jumptabs, opt_cond, cond_toofar, opt_reorder);
-  /*
-  fprintf (stderr, "saved %d + %d + %d = %d bytes in program memory\n",
-	   (4 - 2) * opt,
-	   (6 - 2) * opt_cond,
-	   (6 - 2) * opt_reorder,
-	   (4 - 2) * opt +  (6 - 2) * opt_cond + (6 - 2) * opt_reorder);
-  */
+  if (pic16_debug_verbose || pic16_pcode_verbose) {
+    fprintf (stderr, "optimize-goto:\n"
+	     "\t%5d GOTO->BRA; (%d GOTOs too far)\n"
+	     "\t%5d BTFSx, GOTO->Bcc (%d too far)\n"
+	     "\t%5d conditional \"skipping\" jumps inverted\n"
+	     "\t%5d GOTOs to next instruction removed\n"
+	     "\t%5d chained GOTOs resolved\n",
+	     opt, toofar, opt_cond, cond_toofar, opt_reorder, opt_gotonext, opt_gotochain);
+  } // if
 }
 
 #undef IS_GOTO
+#undef MAX_DIST_GOTO
 #undef MAX_DIST_BRA
 #undef MAX_DIST_BCC
 

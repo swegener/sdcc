@@ -50,7 +50,7 @@ float __ulong2fs (unsigned long a ) _FS_REENTRANT
   	do {
   		a<<=1;
   		exp--;
-  	} while (a > HIDDEN);
+  	} while (a < HIDDEN);
   }
 
 #if 0

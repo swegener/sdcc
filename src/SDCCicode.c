@@ -3379,6 +3379,8 @@ geniCodeCall (operand * left, ast * parms,int lvl)
 static void 
 geniCodeReceive (value * args)
 {
+  unsigned char paramByteCounter = 0;
+
   /* for all arguments that are passed in registers */
   while (args)
     {
@@ -3419,6 +3421,17 @@ geniCodeReceive (value * args)
 	      first = 0;
 	  }
 	  IC_RESULT (ic) = opr;
+	  
+	  /* misuse of parmBytes (normally used for functions) 
+	   * to save estimated stack position of this argument.
+	   * Normally this should be zero for RECEIVE iCodes.
+	   * No idea if this causes side effects on other ports. - dw
+	   */
+	  ic->parmBytes = paramByteCounter;
+	  
+	  /* what stack position do we have? */
+	  paramByteCounter += getSize (sym->type);
+
 	  ADDTOCHAIN (ic);
 	}
 

@@ -881,7 +881,12 @@ pic16_allocDirReg (operand *op )
 //			fprintf(stderr, "%s:%d adding %s in direct registers\n", __FILE__, __LINE__, reg->name);
 //			addSet(&pic16_dynDirectRegs, reg);
 
-			checkAddReg(&pic16_dynDirectRegs, reg);
+#if 1
+                  if(!(IS_STATIC(OP_SYM_ETYPE(op))
+                      && OP_SYMBOL(op)->ival
+                  ))
+#endif
+                    checkAddReg(&pic16_dynDirectRegs, reg);
 		}
 	
 	} else {

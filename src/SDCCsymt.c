@@ -1485,8 +1485,9 @@ checkSClass (symbol * sym, int isProto)
 
   /* if parameter or local variable then change */
   /* the storage class to reflect where the var will go */
-  if (sym->level && SPEC_SCLS (sym->etype) == S_FIXED &&
-      !IS_STATIC(sym->etype))
+  if (sym->level && SPEC_SCLS (sym->etype) == S_FIXED
+   && !IS_STATIC(sym->etype)
+      )
     {
       if (options.stackAuto || (currFunc && IFFUNC_ISREENT (currFunc->type)))
         {

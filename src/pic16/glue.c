@@ -175,12 +175,20 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		  
 			checkAddSym(&publics, sym);
 		} else
+#if 1
+                        /* new version */
 			if(IS_STATIC(sym->etype)
-				&& !(sym->ival && !sym->level)
-			) {
+				&& !sym->ival) /* && !sym->level*/ {
+#else
+                        /* old version */
+                        if(IS_STATIC(sym->etype)
+                                && !(sym->ival && !sym->level)) {
+#endif
 			  regs *reg;
                           sectSym *ssym;
                           int found=0;
+
+//                            debugf("adding symbol %s\n", sym->name);
 #define SET_IMPLICIT	1
 
 #if SET_IMPLICIT
@@ -191,15 +199,15 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 				reg = pic16_allocDirReg( operandFromSymbol( sym ));
 				
 				if(reg) {
-#if 1
                                   for(ssym=setFirstItem(sectSyms); ssym; ssym=setNextItem(sectSyms)) {
 				    if(!strcmp(ssym->name, reg->name))found=1;
                                   }
-#endif
+
                                   if(!found)
                                     checkAddReg(&pic16_rel_udata, reg);
                                   else
-				    checkAddSym(&publics, sym);
+                                    debugf("Coudld not find %s in pic16_rel_udata. Check!\n", reg->name);
+//				    checkAddSym(&publics, sym);
 
                                 }
 			}
@@ -214,28 +222,9 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			continue;
 		}
 
-#if 0
-		/* print extra debug info if required */
-		if (options.debug || sym->level == 0) {
-			cdbWriteSymbol (sym);	//, cdbFile, FALSE, FALSE);
-
-			if (!sym->level)	/* global */
-				if (IS_STATIC (sym->etype))
-					fprintf (map->oFile, "F%s_", moduleName);		/* scope is file */
-				else
-					fprintf (map->oFile, "G_");	/* scope is global */
-			else
-				/* symbol is local */
-				fprintf (map->oFile, "L%s_", (sym->localof ? sym->localof->name : "-null-"));
-			fprintf (map->oFile, "%s_%d_%d", sym->name, sym->level, sym->block);
-		}
-#endif
-
-
 		/* if is has an absolute address then generate
 		an equate for this no need to allocate space */
 		if (SPEC_ABSA (sym->etype)) {
-//			if (options.debug || sym->level == 0)
 //				fprintf (stderr,"; %s == 0x%04x\t\treqv= %p nRegs= %d\n",
 //					sym->name, SPEC_ADDR (sym->etype), sym->reqv, sym->regType);
 
@@ -343,7 +332,9 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		/* if it has an initial value then do it only if
 			it is a global variable */
 
-		if (sym->ival && sym->level == 0) {
+		if (sym->ival
+		  && ((sym->level == 0)
+		      || IS_STATIC(sym->etype)) ) {
 		  ast *ival = NULL;
 
 #if 0
@@ -1460,6 +1451,8 @@ pic16printPublics (FILE *afile)
 	fprintf (afile, "%s", iComments2);
 
 	for(sym = setFirstItem (publics); sym; sym = setNextItem (publics))
+	  /* sanity check */
+	  if(!IS_STATIC(sym->etype))
 		fprintf(afile, "\tglobal %s\n", sym->rname);
 }
 
@@ -1545,27 +1538,6 @@ pic16emitOverlay (FILE * afile)
 	  if (IS_FUNC (sym->type))
 	    continue;
 
-#if 0
-	  /* print extra debug info if required */
-	  if (options.debug || sym->level == 0)
-	    {
-
-	      cdbSymbol (sym, cdbFile, FALSE, FALSE);
-
-	      if (!sym->level)
-		{		/* global */
-		  if (IS_STATIC (sym->etype))
-		    fprintf (afile, "F%s_", moduleName);	/* scope is file */
-		  else
-		    fprintf (afile, "G_");	/* scope is global */
-		}
-	      else
-		/* symbol is local */
-		fprintf (afile, "L%s_",
-			 (sym->localof ? sym->localof->name : "-null-"));
-	      fprintf (afile, "%s_%d_%d", sym->name, sym->level, sym->block);
-	    }
-#endif
 
 	  /* if is has an absolute address then generate
 	     an equate for this no need to allocate space */

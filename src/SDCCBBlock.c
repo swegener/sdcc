@@ -88,7 +88,9 @@ newEdge (eBBlock * from, eBBlock * to)
 /*-----------------------------------------------------------------*/
 FILE *createDumpFile (int id) {
   struct _dumpFiles *dumpFilesPtr=dumpFiles;
-
+  static int dumpIndex=0;
+  static char dumpIndexStr[32];
+  
   while (dumpFilesPtr->id) {
     if (dumpFilesPtr->id==id)
       break;
@@ -100,15 +102,26 @@ FILE *createDumpFile (int id) {
     exit (1);
   }
 
+  sprintf(dumpIndexStr, ".%d", dumpIndex);
+  dumpIndex++;
+
   if (!dumpFilesPtr->filePtr) {
     // not used before, create it
     strncpyz (scratchFileName, dstFileName, PATH_MAX);
+#if 0
+    strncatz (scratchFileName, dumpIndexStr, PATH_MAX);
+#endif
     strncatz (scratchFileName, dumpFilesPtr->ext, PATH_MAX);
     if (!(dumpFilesPtr->filePtr = fopen (scratchFileName, "w"))) {
       werror (E_FILE_OPEN_ERR, scratchFileName);
       exit (1);
     }
   } 
+
+#if 0
+  fprintf(dumpFilesPtr->filePtr, "Dump file index: %d\n", dumpIndex);
+#endif
+
   return dumpFilesPtr->filePtr;
 }
 

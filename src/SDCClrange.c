@@ -531,6 +531,8 @@ rlivePoint (eBBlock ** ebbs, int count)
 			}
 		    }
 		}
+//                fprintf(stderr, "%s:%d IS_SYMOP left\t", __FILE__, __LINE__);printOperand(IC_LEFT(ic), stderr);
+//                fprintf(stderr, "\n");
 	    }
 
 	  if (IS_SYMOP(IC_RIGHT(ic)))
@@ -543,6 +545,8 @@ rlivePoint (eBBlock ** ebbs, int count)
 	          ic->rlive = bitVectSetBit (ic->rlive, IC_RIGHT(ic)->key);
 	          findNextUse (ebbs[i], ic->next, IC_RIGHT(ic));
 		}
+//                fprintf(stderr, "%s:%d IS_SYMOP right\t", __FILE__, __LINE__);printOperand(IC_RIGHT(ic), stderr);
+//                fprintf(stderr, "\n");
 	    }
 
 	  if (POINTER_SET(ic) && IS_SYMOP(IC_RESULT(ic)))

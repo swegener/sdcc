@@ -777,12 +777,6 @@ struct_declarator_list
 
 struct_declarator
    : declarator 
-     {
-       // if this was a function declarator, remove the symbol args (if any)
-       if (IS_FUNC($1->etype)) {
-	 cleanUpLevel(SymbolTab,NestLevel+1);
-       }
-     }
    | ':' constant_expr  {  
                            $$ = newSymbol (genSymName(NestLevel),NestLevel) ; 
                            $$->bitVar = (int) floatFromVal(constExprValue($2,TRUE));
@@ -927,6 +921,15 @@ declarator2
 	     /* nest level was incremented to take care of the parms  */
 	     NestLevel-- ;
 	     currBlockno--;
+
+	     // if this was a pointer to a function, remove the symbol args
+	     // (if any)
+	     if (IS_PTR($1->type) && IS_FUNC($1->etype)) {
+	       cleanUpLevel(SymbolTab,NestLevel+1);
+	       /* fprintf (stderr, "Removed parm symbols of %s in line %d\n", 
+		  $1->name, yylineno); */
+	     }
+	     
 	     $$ = $1;
          }
    | declarator2 '(' parameter_identifier_list ')'

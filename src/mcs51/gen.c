@@ -1442,7 +1442,6 @@ saveRegisters (iCode * lic)
   int i;
   iCode *ic;
   bitVect *rsave;
-  sym_link *detype;
 
   /* look for call */
   for (ic = lic; ic; ic = ic->next)
@@ -1494,10 +1493,8 @@ saveRegisters (iCode * lic)
 	if (bitVectBitValue (rsave, i))
 	  emitcode ("push", "%s", mcs51_regWithIdx (i)->dname);
       }
-
-  detype = getSpec (operandType (IC_LEFT (ic)));
-
 }
+
 /*-----------------------------------------------------------------*/
 /* unsaveRegisters - pop the pushed registers                      */
 /*-----------------------------------------------------------------*/

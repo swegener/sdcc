@@ -39,6 +39,7 @@
 #ifndef HAVE_RTC
 unsigned char RtcRead(struct tm *timeptr) {
   // no real time hardware 
+  timeptr; // hush the compiler
   return 0;
 }
 #endif

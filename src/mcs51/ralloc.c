@@ -2310,11 +2310,14 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
 static iCode *
 packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 {
-  bitVect *uses;
   iCode *dic, *sic;
 
   /* if returning a literal then do nothing */
-  if (!IS_SYMOP (op))
+  if (!IS_ITEMP (op))
+    return NULL;
+  
+  /* if rematerializable or already return use then do nothing */
+  if (OP_SYMBOL(op)->remat || OP_SYMBOL(op)->ruonly)
     return NULL;
 
   /* only upto 2 bytes since we cannot predict
@@ -2336,9 +2339,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
      that definiion is either a return value from a 
      function or does not contain any variables in
      far space */
-  uses = bitVectCopy (OP_USES (op));
-  bitVectUnSetBit (uses, ic->key);	/* take away this iCode */
-  if (!bitVectIsZero (uses))	/* has other uses */
+  if (bitVectnBitsOn (OP_USES (op)) > 1)
     return NULL;
 
   /* if it has only one defintion */
@@ -2376,29 +2377,46 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 	  OP_SYMBOL (op)->ruonly = 1;
 	  return dic;
 	}
-      dic = dic->next;
     }
-
-
-  /* otherwise check that the definition does
-     not contain any symbols in far space */
-  if (isOperandInFarSpace (IC_LEFT (dic)) ||
-      isOperandInFarSpace (IC_RIGHT (dic)) ||
-      IS_OP_RUONLY (IC_LEFT (ic)) ||
-      IS_OP_RUONLY (IC_RIGHT (ic)))
+  else
     {
-      return NULL;
+      /* otherwise check that the definition does
+         not contain any symbols in far space */
+      if (isOperandInFarSpace (IC_LEFT (dic)) ||
+          isOperandInFarSpace (IC_RIGHT (dic)) ||
+          IS_OP_RUONLY (IC_LEFT (ic)) ||
+          IS_OP_RUONLY (IC_RIGHT (ic)))
+        {
+          return NULL;
+        }
+
+      /* if pointer set then make sure the pointer
+         is one byte */
+      if (POINTER_SET (dic) &&
+          !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
+        return NULL;
+
+      if (POINTER_GET (dic) &&
+          !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
+        return NULL;
     }
+    
+  /* Make sure no overlapping liverange is already assigned to DPTR */
+  if (OP_SYMBOL(op)->clashes)
+    {
+      symbol *sym;
+      int i;
 
-  /* if pointer set then make sure the pointer
-     is one byte */
-  if (POINTER_SET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
-    return NULL;
-
-  if (POINTER_GET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
-    return NULL;
+      for (i = 0 ; i < OP_SYMBOL(op)->clashes->size ; i++ )
+        {
+          if (bitVectBitValue(OP_SYMBOL(op)->clashes,i))
+	    {
+              sym = hTabItemWithKey(liveRanges,i);
+              if (sym->ruonly)
+	        return NULL ;
+            }
+        }
+    }
 
   sic = dic;
 

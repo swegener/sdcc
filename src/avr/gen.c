@@ -475,10 +475,10 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 						   _G.nRegsSaved));
 				}
 				else {
-					emitcode ("subi", "%s,(%d & 0xff)",
+					emitcode ("subi", "%s,<(%d)",
 						  aop->aopu.aop_ptr->name,
 						  sym->stack - _G.nRegsSaved);
-					emitcode ("sbci", "%s,((%d >> 8) & 0xff)",
+					emitcode ("sbci", "%s,>(%d)",
 						  aop->aop_ptr2->name,
 						  sym->stack - _G.nRegsSaved);
 				}
@@ -490,10 +490,10 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 						  sym->stack);
 				}
 				else {
-					emitcode ("subi", "%s,((-%d) & 0xff)",
+					emitcode ("subi", "%s,<(-%d)",
 						  aop->aopu.aop_ptr->name,
 						  sym->stack);
-					emitcode ("sbci", "%s,(((-%d) >> 8) & 0xff))",
+					emitcode ("sbci", "%s,>(-%d)",
 						  aop->aop_ptr2->name,
 						  sym->stack);
 				}
@@ -536,8 +536,8 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 
 	aop->aopu.aop_ptr = getFreePtr (ic, &aop, result, aop->code);
 	aop->size = getSize (sym->type);
-	emitcode ("ldi", "%s,lo8(%s)", aop->aopu.aop_ptr->name, sym->rname);
-	emitcode ("ldi", "%s,hi8(%s)", aop->aop_ptr2);
+	emitcode ("ldi", "%s,<(%s)", aop->aopu.aop_ptr->name, sym->rname);
+	emitcode ("ldi", "%s,>(%s)", aop->aop_ptr2);
 
 	return aop;
 }
@@ -852,10 +852,10 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
 						  stk + 1);
 				}
 				else {
-					emitcode ("subi", "%s,lo8(%d)",
+					emitcode ("subi", "%s,<(%d)",
 						  aop->aopu.aop_ptr->name,
 						  -(stk + 1));
-					emitcode ("sbci", "%s,hi8(%d)",
+					emitcode ("sbci", "%s,>(%d)",
 						  aop->aop_ptr2->name,
 						  -(stk + 1));
 				}
@@ -985,7 +985,7 @@ aopGet (asmop * aop, int offset)
 
 	case AOP_LIT:
 		s = aopLiteral (aop->aopu.aop_lit, offset);
-		emitcode ("ldi", "%s,lo8(%s)",
+		emitcode ("ldi", "%s,<(%s)",
 			  (rs = ((offset & 1) ? "r24" : "r25")), s);
 		return rs;
 
@@ -1409,7 +1409,7 @@ genUminus (iCode * ic)
 		size = AOP_SIZE (IC_LEFT (ic)) - 1;
 		offset = 1;
 		while (size--) {
-			emitcode ("sbci", "%s,lo8(-1)",
+			emitcode ("sbci", "%s,0xff",
 				  aopGet (AOP (IC_RESULT (ic)), offset++));
 		}
 	}
@@ -1582,9 +1582,9 @@ genCall (iCode * ic)
 			emitcode ("sbiw", "r28,%d", ic->parmBytes);
 		}
 		else {
-			emitcode ("subi", "r28,lo8(%d)",
+			emitcode ("subi", "r28,<(%d)",
 				  ic->parmBytes);
-			emitcode ("sbci", "r29,hi8(%d)",
+			emitcode ("sbci", "r29,>(%d)",
 				  ic->parmBytes);
 		}
 	}
@@ -1665,9 +1665,9 @@ genPcall (iCode * ic)
 			emitcode ("sbiw", "r28,%d", ic->parmBytes);
 		}
 		else {
-			emitcode ("subi", "r28,lo8(%d)",
+			emitcode ("subi", "r28,<(%d)",
 				  ic->parmBytes);
-			emitcode ("sbci", "r29,hi8(%d)",
+			emitcode ("sbci", "r29,>(%d)",
 				  ic->parmBytes);
 		}
 	}
@@ -1760,8 +1760,8 @@ genFunction (iCode * ic)
 			emitcode ("sbiw", "r28,%d", sym->stack);
 		}
 		else {
-			emitcode ("subi", "r28,lo8(%d)", sym->stack);
-			emitcode ("sbci", "r29,hi8(%d)", sym->stack);
+			emitcode ("subi", "r28,<(%d)", sym->stack);
+			emitcode ("sbci", "r29,>(%d)", sym->stack);
 		}
 		emitcode ("out", "__SP_L__,r28");
 		emitcode ("out", "__SP_H__,r29");
@@ -1783,8 +1783,8 @@ genEndFunction (iCode * ic)
 			emitcode ("adiw", "r28,%d", sym->stack);
 		}
 		else {
-			emitcode ("subi", "r28,lo8(-%d)", sym->stack);
-			emitcode ("sbci", "r29,hi8(-%d)", sym->stack);
+			emitcode ("subi", "r28,<(-%d)", sym->stack);
+			emitcode ("sbci", "r29,>(-%d)", sym->stack);
 		}
 		emitcode ("out", "__SP_L__,r28");
 		emitcode ("out", "__SP_H__,r29");
@@ -1905,6 +1905,7 @@ static bool
 genPlusIncr (iCode * ic)
 {
 	unsigned int icount;
+	int offset = 0;
 
 	/* will try to generate an increment */
 	/* if the right side is not a literal
@@ -1912,8 +1913,7 @@ genPlusIncr (iCode * ic)
 	if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
 		return FALSE;
 
-	icount =
-		(unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.
+	icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.
 					     aop_lit);
 
 	/* if the sizes are greater than 2 or they are not the same regs
@@ -1930,34 +1930,41 @@ genPlusIncr (iCode * ic)
 				  aopGet (AOP (IC_LEFT (ic)), 0));
 			return TRUE;
 		}
-		emitcode ("subi", "%s,lo8(%d)",
-			  aopGet (AOP (IC_LEFT (ic)), 0), 0-icount);
-		return TRUE;
+		if (AOP_ISHIGHREG( AOP (IC_LEFT (ic)),0)) {
+			emitcode ("subi", "%s,<(%d)",
+				  aopGet (AOP (IC_LEFT (ic)), 0), 0-icount);
+			return TRUE;
+		}
+	}
+
+	for (offset = 0 ; offset < AOP_SIZE(IC_RESULT(ic)) ; offset++) {
+		if (!(AOP_ISHIGHREG(AOP(IC_RESULT(ic)),offset))) return FALSE;
 	}
 
 	if (AOP_SIZE (IC_RESULT (ic)) <= 3) {
 		/* if register pair and starts with 26/30 then adiw */
 		if (isRegPair (AOP (IC_RESULT (ic))) && icount > 0
 		    && icount < 64
-		    && (IS_REGIDX (AOP (IC_RESULT (ic)), R26_IDX)
-			|| IS_REGIDX (AOP (IC_RESULT (ic)), R30_IDX))) {
+		    && (IS_REGIDX (AOP (IC_RESULT (ic)), R26_IDX) || 
+			IS_REGIDX (AOP (IC_RESULT (ic)), R24_IDX) || 
+			IS_REGIDX (AOP (IC_RESULT (ic)), R30_IDX))) {
 			emitcode ("adiw", "%s,%d",
 				  aopGet (AOP (IC_RESULT (ic)), 0), icount);
 			return TRUE;
 		}
 
 		/* use subi */
-		emitcode ("subi", "%s,lo8(%d)",
+		emitcode ("subi", "%s,<(%d)",
 			  aopGet (AOP (IC_RESULT (ic)), 0), 0-icount);
-		emitcode ("sbci", "%s,hi8(%d)",
+		emitcode ("sbci", "%s,>(%d)",
 			  aopGet (AOP (IC_RESULT (ic)), 1), 0-icount);
 		return TRUE;
 	}
 
 	/* for 32 bit longs */
-	emitcode ("subi", "%s,lo8(%d)", aopGet (AOP (IC_RESULT (ic)), 0),
+	emitcode ("subi", "%s,<(%d)", aopGet (AOP (IC_RESULT (ic)), 0),
 		  0-icount);
-	emitcode ("sbci", "%s,hi8(%d)", aopGet (AOP (IC_RESULT (ic)), 1),
+	emitcode ("sbci", "%s,>(%d)", aopGet (AOP (IC_RESULT (ic)), 1),
 		  0-icount);
 	emitcode ("sbci", "%s,hlo8(%d)", aopGet (AOP (IC_RESULT (ic)), 2),
 		  0-icount);
@@ -2043,16 +2050,27 @@ genPlus (iCode * ic)
 				  aopGet (AOP (IC_RIGHT (ic)), offset));
 		}
 		else {
-			if (offset == 0)
-				l = "subi";
-			else
-				l = "sbci";
-
-			emitcode (l, "%s,%s(-%d)",
-				  aopGet (AOP (IC_RESULT (ic)), offset),
-				  larray[offset],
-				  (int) floatFromVal (AOP (IC_RIGHT (ic))->
-						      aopu.aop_lit));
+			if (AOP_ISHIGHREG( AOP( IC_RESULT(ic)),offset)) {
+				if (offset == 0)
+					l = "subi";
+				else
+					l = "sbci";
+				
+				emitcode (l, "%s,%s(-%d)",
+					  aopGet (AOP (IC_RESULT (ic)), offset),
+					  larray[offset],
+					  (int) floatFromVal (AOP (IC_RIGHT (ic))->
+							      aopu.aop_lit));
+			} else {
+				if (offset == 0)
+					l = "add";
+				else
+					l = "adc";
+				
+				emitcode (l, "%s,%s",
+					  aopGet (AOP (IC_RESULT (ic)), offset),
+					  aopGet (AOP (IC_RIGHT (ic)), offset));
+			}
 		}
 		offset++;
 	}
@@ -2074,6 +2092,7 @@ static bool
 genMinusDec (iCode * ic)
 {
 	unsigned int icount;
+	int offset ;
 
 	/* will try to generate an increment */
 	/* if the right side is not a literal
@@ -2099,33 +2118,40 @@ genMinusDec (iCode * ic)
 				  aopGet (AOP (IC_LEFT (ic)), 0));
 			return TRUE;
 		}
-		emitcode ("subi", "%s,lo8(%d)",
-			  aopGet (AOP (IC_LEFT (ic)), 0), icount);
-		return TRUE;
+		if (AOP_ISHIGHREG( AOP ( IC_LEFT(ic)),0)) {
+			emitcode ("subi", "%s,<(%d)",
+				  aopGet (AOP (IC_LEFT (ic)), 0), icount);
+			return TRUE;
+		}
+	}
+
+	for (offset = 0 ; offset < AOP_SIZE(IC_RESULT(ic)) ; offset++) {
+		if (!(AOP_ISHIGHREG(AOP(IC_RESULT(ic)),offset))) return FALSE;
 	}
 
 	if (AOP_SIZE (IC_RESULT (ic)) <= 3) {
 		/* if register pair and starts with 26/30 then adiw */
 		if (isRegPair (AOP (IC_RESULT (ic))) && icount > 0
 		    && icount < 64
-		    && (IS_REGIDX (AOP (IC_RESULT (ic)), R26_IDX)
-			|| IS_REGIDX (AOP (IC_RESULT (ic)), R30_IDX))) {
+		    && (IS_REGIDX (AOP (IC_RESULT (ic)), R26_IDX) || 
+			IS_REGIDX (AOP (IC_RESULT (ic)), R24_IDX) || 
+			IS_REGIDX (AOP (IC_RESULT (ic)), R30_IDX))) {
 			emitcode ("sbiw", "%s,%d",
 				  aopGet (AOP (IC_RESULT (ic)), 0), icount);
 			return TRUE;
 		}
 
 		/* use subi */
-		emitcode ("subi", "%s,lo8(%d)",
+		emitcode ("subi", "%s,<(%d)",
 			  aopGet (AOP (IC_RESULT (ic)), 0), icount);
-		emitcode ("sbci", "%s,hi8(%d)",
+		emitcode ("sbci", "%s,>(%d)",
 			  aopGet (AOP (IC_RESULT (ic)), 1), icount);
 		return TRUE;
 	}
 	/* for 32 bit longs */
-	emitcode ("subi", "%s,lo8(%d)", aopGet (AOP (IC_RESULT (ic)), 0),
+	emitcode ("subi", "%s,<(%d)", aopGet (AOP (IC_RESULT (ic)), 0),
 		  icount);
-	emitcode ("sbci", "%s,hi8(%d)", aopGet (AOP (IC_RESULT (ic)), 1),
+	emitcode ("sbci", "%s,>(%d)", aopGet (AOP (IC_RESULT (ic)), 1),
 		  icount);
 	emitcode ("sbci", "%s,hlo8(%d)", aopGet (AOP (IC_RESULT (ic)), 2),
 		  icount);
@@ -2172,16 +2198,27 @@ genMinus (iCode * ic)
 				  aopGet (AOP (IC_RIGHT (ic)), offset));
 		}
 		else {
-			if (offset == 0)
-				l = "subi";
-			else
-				l = "sbci";
-
-			emitcode (l, "%s,%s(%d)",
-				  aopGet (AOP (IC_RESULT (ic)), offset),
-				  larray[offset],
-				  (int) floatFromVal (AOP (IC_RIGHT (ic))->
-						      aopu.aop_lit));
+			if (AOP_ISHIGHREG(AOP (IC_RESULT (ic)),offset)) {
+				if (offset == 0)
+					l = "subi";
+				else
+					l = "sbci";
+				
+				emitcode (l, "%s,%s(%d)",
+					  aopGet (AOP (IC_RESULT (ic)), offset),
+					  larray[offset],
+					  (int) floatFromVal (AOP (IC_RIGHT (ic))->
+							      aopu.aop_lit));
+			} else {
+				if (offset == 0)
+					l = "sub";
+				else
+					l = "sbc";
+				
+				emitcode (l, "%s,%s",
+					  aopGet (AOP (IC_RESULT (ic)), offset),
+					  aopGet (AOP (IC_RIGHT (ic)), offset));
+			}
 		}
 		offset++;
 	}
@@ -2239,7 +2276,7 @@ genMultOneByte (operand * left, operand * right, operand * result)
 				lbl = newiTempLabel (NULL);
 				emitcode ("ldi", "r24,0");
 				emitcode ("brcc", "L%05d", lbl->key);
-				emitcode ("ldi", "r24,lo8(-1)");
+				emitcode ("ldi", "r24,0xff)");
 				emitcode ("", "L%05d:", lbl->key);
 				while (size--)
 					aopPut (AOP (result), "r24",
@@ -2385,7 +2422,7 @@ genCmp (iCode * ic, iCode * ifx, int br_type)
 	if (ifx) {
 		if (size == 1) {
 			if (AOP_TYPE (right) == AOP_LIT) {
-				emitcode ("cpi", "%s,lo8(%d)",
+				emitcode ("cpi", "%s,<(%d)",
 					  aopGet (AOP (left), 0),
 					  (int)
 					  floatFromVal (AOP (IC_RIGHT (ic))->
@@ -2651,12 +2688,12 @@ genBitWise (iCode * ic, iCode * ifx, int bitop)
 				if (size == 1) {
 					if (eh && AOP_ISHIGHREG(AOP(IC_LEFT(ic)),0)) {
 						emitcode (bopnames_lit[bitop],
-							  "%s,lo8(%d)",
+							  "%s,<(%d)",
 							  aopGet (AOP (IC_LEFT (ic)), 0), lit);
 					}
 					else {
 						MOVR24 (aopGet (AOP (IC_LEFT (ic)), 0));
-						emitcode (bopnames_lit[bitop], "r24,lo8(%d)", lit);
+						emitcode (bopnames_lit[bitop], "r24,<(%d)", lit);
 					}
 					lbl = newiTempLabel (NULL);
 					if (IC_TRUE (ifx)) {
@@ -2672,8 +2709,8 @@ genBitWise (iCode * ic, iCode * ifx, int bitop)
 				else if (size == 2) {
 					emitcode ("mov", "r24,%s", aopGet (AOP (IC_LEFT (ic)), 0));
 					emitcode ("mov", "r25,%s", aopGet (AOP (IC_LEFT (ic)), 1));
-					emitcode (bopnames_lit[bitop], "r24,lo8(%d)", lit);
-					emitcode (bopnames_lit[bitop], "r25,hi8(%d)", lit);
+					emitcode (bopnames_lit[bitop], "r24,<(%d)", lit);
+					emitcode (bopnames_lit[bitop], "r25,>(%d)", lit);
 					emitcode ("sbiw", "r24,0");
 					lbl = newiTempLabel (NULL);
 					if (IC_TRUE (ifx)) {
@@ -2691,14 +2728,14 @@ genBitWise (iCode * ic, iCode * ifx, int bitop)
 					lbl1 = newiTempLabel (NULL);
 					while (size--) {
 						if (eh && AOP_ISHIGHREG(AOP(IC_LEFT(ic)),offset)) {
-							emitcode (bopnames_lit [bitop], "%s,lo8(%d)",
+							emitcode (bopnames_lit [bitop], "%s,<(%d)",
 								  aopGet (AOP (IC_LEFT (ic)), offset),
 								  lit);
 						}
 						else {
 							char *l = aopGet (AOP (IC_LEFT (ic)), offset);
 							MOVR24 (l);
-							emitcode ("andi", "r24,lo8(%d)", lit);
+							emitcode ("andi", "r24,<(%d)", lit);
 						}
 						emitcode ("brne", "L%05d", lbl->key);
 						offset++;
@@ -3015,13 +3052,13 @@ genGetHbit (iCode * ic)
 	if (!sameRegs (AOP (left), AOP (result))) {
 		emitcode ("clr", "%s", aopGet (AOP (result), size - 1));
 		emitcode ("sbrc", "%s,7", aopGet (AOP (left), size - 1));
-		emitcode ("subi", "%s,lo8(-1)",
+		emitcode ("subi", "%s,<(-1)",
 			  aopGet (AOP (result), size - 1));
 	}
 	else {
 		emitcode ("clr", "r0");
 		emitcode ("sbrc", "%s,7", aopGet (AOP (left), size - 1));
-		emitcode ("subi", "r0,lo8(-1)");
+		emitcode ("subi", "r0,<(-1)");
 		aopPut (AOP (result), "r0", 0);
 	}
 	offset = 1;
@@ -3345,7 +3382,7 @@ genShiftRightLit (iCode * ic)
 			}
 		}
 		else {
-			emitcode ("ldi", "r24,lo8(%d)", shCount);
+			emitcode ("ldi", "r24,<(%d)", shCount);
 			tlbl = newiTempLabel (NULL);
 			emitcode ("", "L%05d:", tlbl->key);
 			offset = size - 1;

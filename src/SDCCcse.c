@@ -25,6 +25,7 @@
 #include "common.h"
 #include "newalloc.h"
 
+
 /*-----------------------------------------------------------------*/
 /* newCseDef - new cseDef                                          */
 /*-----------------------------------------------------------------*/
@@ -1485,45 +1486,46 @@ deleteGetPointers (set ** cseSet, set ** pss, operand * op, eBBlock * ebb)
   set *compItems = NULL;
   cseDef *cdp;
   operand *cop;
+  int changes;
 
   /* easy return */
   if (!*cseSet && !*pss)
     return;
 
-  /* first find all items computed from this operand .
+  addSet (&compItems, op);
+  
+  /* Recursively find all items computed from this operand .
      This done fairly simply go thru the list and find
-     those that are computed by arthimetic with this
-     op */
-  for (cdp = setFirstItem (*cseSet); cdp; cdp = setNextItem (*cseSet))
+     those that are computed by arthimetic with these
+     ops */
+  /* Also check for those computed from our computed
+     list . This will take care of situations like
+     iTemp1 = iTemp0 + 8;
+     iTemp2 = iTemp1 + 8; */
+  do
     {
-      if (IS_ARITHMETIC_OP (cdp->diCode))
+      changes = 0;
+      for (cdp = setFirstItem (*cseSet); cdp; cdp = setNextItem (*cseSet))
 	{
-	  if (isOperandEqual (IC_LEFT (cdp->diCode), op) ||
-	      isOperandEqual (IC_RIGHT (cdp->diCode), op))
+	  if (IS_ARITHMETIC_OP (cdp->diCode) || POINTER_GET(cdp->diCode))
 	    {
-	      /* save it in our list of items */
-	      addSet (&compItems, IC_RESULT (cdp->diCode));
-	    }
-	  /* also check for those computed from our computed
-	     list . This will take care of situations like
-	     iTemp1 = iTemp0 + 8;
-	     iTemp2 = iTemp1 + 8; */
-	  if (isinSetWith (compItems, (void*)IC_LEFT (cdp->diCode),
-			   (insetwithFunc)isOperandEqual) ||
-	      isinSetWith (compItems, (void*)IC_RIGHT (cdp->diCode),
-			   (insetwithFunc)isOperandEqual))
-	    {
-	      addSet (&compItems, IC_RESULT (cdp->diCode));
+	      if (isinSetWith (compItems, (void*)IC_LEFT (cdp->diCode),
+			       (insetwithFunc)isOperandEqual) ||
+		  isinSetWith (compItems, (void*)IC_RIGHT (cdp->diCode),
+			       (insetwithFunc)isOperandEqual))
+		{
+		  if (!isinSetWith (compItems, (void*)IC_RESULT (cdp->diCode),
+			            (insetwithFunc)isOperandEqual))
+		    {
+		  addSet (&compItems, IC_RESULT (cdp->diCode));
+		  changes++;
+		    }
+		}
 	    }
 	}
     }
-
-  /* now delete all pointer gets with this op */
-  deleteItemIf (cseSet, ifPointerGet, op);
-  deleteItemIf (pss, ifPointerSet, op);
-
-  /* set the bit vector used by dataFlow computation later */
-  ebb->ptrsSet = bitVectSetBit (ebb->ptrsSet, op->key);
+  while (changes);
+  
   /* now for the computed items */
   for (cop = setFirstItem (compItems); cop; cop = setNextItem (compItems))
     {
@@ -1629,6 +1631,22 @@ static int isSignedOp (iCode *ic)
     }
  }
 
+#if 0
+static void
+dumpCseSet(set *cseSet)
+{
+  while (cseSet)
+    {
+      cseDef *item=cseSet->item;
+      printf("->");
+      printOperand (item->sym, NULL);
+      printf("  ");
+      piCode (item->diCode, NULL);
+      cseSet = cseSet->next;
+    }
+}
+#endif
+
 /*-----------------------------------------------------------------*/
 /* cseBBlock - common subexpression elimination for basic blocks   */
 /*             this is the hackiest kludgiest routine in the whole */
@@ -1711,6 +1729,9 @@ cseBBlock (eBBlock * ebb, int computeOnly,
 	     be done only for global arrays & pointers but at this
 	     point we don't know if globals, so to be safe do all */
 	  deleteItemIf (&cseSet, ifAnyGetPointer);
+          
+          /* can't cache pointer set/get operations across a call */
+          deleteSet (&ptrSetSet);
 	}
 
       /* for pcall & ipush we need to add to the useSet */

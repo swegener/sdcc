@@ -1,3 +1,10 @@
+2003-11-15 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (cseBBlock): fixed bug #527779
+	* src/SDCCcse.c (deleteGetPointers): rewrote so that the set
+	ordering is immaterial.
+	* src/SDCCdflow.c (mergeInExprs): fixed bug #587536
+
 2003-11-14 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 	
 	* src/SDCCicode.c (geniCodeAddressOf): fixed part of bug #840381

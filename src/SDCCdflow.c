@@ -117,6 +117,15 @@ DEFSETFUNC (mergeInExprs)
     }
   else
     {
+      cseDef *expr;
+      
+      /* cseBBlock does a much more thorough analysis than   */
+      /* ifKilledInBlock. Anything that is listed in inExprs */
+      /* but not in outExprs must have been killed somehow.  */
+      for (expr=setFirstItem(ebp->inExprs); expr; expr=setNextItem(ebp->inExprs))
+        if (!isinSet(ebp->outExprs, expr))
+          deleteSetItem (&dest->inExprs, expr);
+          
       /* delete only if killed in this block */
       deleteItemIf (&dest->inExprs, ifKilledInBlock, ebp);
       /* union the ndompset with pointers set in this block */

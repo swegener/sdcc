@@ -1,5 +1,9 @@
 2001-10-01 Bernhard Held <bernhard@bernhardheld.de>
 
+	* src/SDCCglue.c: test, if win32api is available for MINGW
+
+2001-10-01 Bernhard Held <bernhard@bernhardheld.de>
+
 	* src/SDCCsymt.c: no more _modifier in printTypeChain()
 	* support/regression/tests/driverstruct.c: REENTRANT for mcs51
 	* support/regression/ports/gbz80/spec.mk: removed GENERIC

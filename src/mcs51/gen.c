@@ -6958,7 +6958,8 @@ genNearPointerGet (operand * left,
   else
     rname = aopGet (AOP (left), 0, FALSE, FALSE);
   
-  aopOp (result, ic, FALSE);
+  //aopOp (result, ic, FALSE);
+  aopOp (result, ic, result?TRUE:FALSE);
 
   /* if bitfield then unpack the bits */
   if (IS_BITVAR (retype))

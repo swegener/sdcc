@@ -1739,6 +1739,7 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
 	}
     }
 
+  #if 0
   if (srcScls != destScls)
     {
       printf ("level = %d\n", level);
@@ -1747,6 +1748,7 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
       printf ("srcScls = %d, destScls = %d\n",srcScls, destScls);
       return 0;
     }
+  #endif
   
   return 1;
 }

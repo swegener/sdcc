@@ -1,3 +1,8 @@
+2003-11-21 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c (compareTypesExact): disabled debugging output
+	inadvertantly left behind from my 2003-11-12 change
+
 2003-11-20 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Updated headers I neglected to commit yesterday.
@@ -7,7 +12,7 @@
 2003-11-19 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (algebraicOpts): fixed bug #773153
-	* src/SDCClrange.c (rlivePoint): need to mark IC_RESULT used if POINTER_GET op
+	* src/SDCClrange.c (rlivePoint): need to mark IC_RESULT used if POINTER_SET op
 	* src/SDCCopt.c (eBBlockFromiCode),
 	* src/SDCClrange.c (hashiCodeKeys, sequenceiCode, computeLiveRanges): seperated
 	the creation of the key hash table from the sequencing so it can be used

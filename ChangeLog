@@ -1,3 +1,8 @@
+2004-02-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* doc/sdccman.lyx: added details about the HC08 storage classes and
+	interrupts, fixed the register usage info for z80 & gbz80
+
 2004-02-17 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* doc/sdccman.lyx: added more pic16 port documentation

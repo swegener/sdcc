@@ -8881,6 +8881,42 @@ in/out
 \family default 
 .
  If you include the file z180.h this will be set automatically.
+\layout Subsection
+
+HC08 Storage Class
+\begin_inset LatexCommand \index{Storage class}
+
+\end_inset 
+
+ Language Extensions
+\layout Subsubsection
+
+data
+\begin_inset LatexCommand \index{data (mcs51, ds390 storage class)}
+
+\end_inset 
+
+
+\layout Standard
+
+The data storage class declares a variable that resides in the first 256
+ bytes of memory (the direct page).
+ The HC08 is most efficient at accessing variables (especially pointers)
+ stored here.
+\layout Subsubsection
+
+xdata
+\begin_inset LatexCommand \index{xdata (mcs51, ds390 storage class)}
+
+\end_inset 
+
+
+\layout Standard
+
+The xdata storage class declares a variable that can reside anywhere in
+ memory.
+ This is the default if no storage class is specified.
+ 
 \layout Section
 
 Absolute Addressing
@@ -9578,6 +9614,9 @@ Interrupt Service Routines
 \end_inset 
 
 
+\layout Subsection
+
+General Information
 \layout Standard
 
 SDCC allows 
@@ -9639,6 +9678,198 @@ using
  
 \newline 
 
+\layout Standard
+
+Interrupt service routines open the door for some very interesting bugs:
+ 
+\layout Standard
+
+If the interrupt service routines changes variables which are accessed by
+ other functions these variables should be declared 
+\emph on 
+volatile
+\emph default 
+
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+.
+ 
+\layout Standard
+
+If the access to these variables is not 
+\emph on 
+atomic
+\begin_inset LatexCommand \index{atomic access}
+
+\end_inset 
+
+
+\emph default 
+ (i.e.
+ the processor needs more than one instruction for the access and could
+ be interrupted while accessing the variable) the interrupt must disabled
+ during the access to avoid inconsistent data.
+ Access to 16 or 32 bit variables is obviously not atomic on 8 bit CPUs
+ and should be protected by disabling interrupts.
+ You're not automatically on the safe side if you use 8 bit variables though.
+ We need an example here: f.e.
+ on the 8051 the harmless looking 
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family typewriter 
+flags\SpecialChar ~
+|=\SpecialChar ~
+0x80;
+\family default 
+
+\begin_inset Quotes sld
+\end_inset 
+
+ is not atomic if 
+\family typewriter 
+flags
+\family default 
+ resides in xdata.
+ Setting 
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family typewriter 
+flags\SpecialChar ~
+|=\SpecialChar ~
+0x40;
+\family default 
+
+\begin_inset Quotes sld
+\end_inset 
+
+ from within an interrupt routine might get lost if the interrupt occurs
+ at the wrong time.
+ 
+\begin_inset Quotes sld
+\end_inset 
+
+
+\family typewriter 
+counter\SpecialChar ~
++=\SpecialChar ~
+8;
+\family default 
+
+\begin_inset Quotes srd
+\end_inset 
+
+ is not atomic on the 8051 even if 
+\family typewriter 
+counter
+\family default 
+ is located in data memory.
+ Bugs like these are hard to reproduce and can cause a lot of trouble.
+ 
+\layout Standard
+
+A special note here, int (16 bit) and long (32 bit) integer division
+\begin_inset LatexCommand \index{Division}
+
+\end_inset 
+
+, multiplication
+\begin_inset LatexCommand \index{Multiplication}
+
+\end_inset 
+
+ & modulus
+\begin_inset LatexCommand \index{Modulus}
+
+\end_inset 
+
+ and floating-point
+\begin_inset LatexCommand \index{Floating point support}
+
+\end_inset 
+
+ operations are implemented using external support routines developed in
+ ANSI-C.
+ If an interrupt service routine needs to do any of these operations then
+ the support routines (as mentioned in a following section) will have to
+ be recompiled using the
+\emph on 
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
+
+\end_inset 
+
+
+\emph default 
+ option and the source file will need to be compiled using the 
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-int-long-reent
+\emph default 
+
+\begin_inset LatexCommand \index{-\/-int-long-reent}
+
+\end_inset 
+
+ compiler option.
+\layout Standard
+
+Calling other functions from an interrupt service routine is not recommended,
+ avoid it if possible.
+ Note that when some function is called from an interrupt service routine
+ it should be preceded by a #pragma\SpecialChar ~
+nooverlay
+\begin_inset LatexCommand \index{\#pragma nooverlay}
+
+\end_inset 
+
+ if it is not reentrant.
+ Furthermore nonreentrant functions should not be called from the main program
+ while the interrupt service routine might be active.
+ 
+\newline 
+
+\newline 
+Also see section 
+\begin_inset LatexCommand \ref{sub:Overlaying}
+
+\end_inset 
+
+\SpecialChar ~
+about Overlaying and section 
+\begin_inset LatexCommand \ref{sub:Functions-using-private-banks}
+
+\end_inset 
+
+\SpecialChar ~
+about Functions using private register banks.
+\layout Subsection
+
+MCS51/DS390 Interrupt Service Routines
 \layout Standard
 
 Interrupt numbers and the corresponding address & descriptions for the Standard
@@ -9877,195 +10108,23 @@ a, b, dptr
  another function (using another register bank) then the entire register
  bank of the called function will be saved on the stack.
  This scheme is recommended for larger interrupt service routines.
+\layout Subsection
+
+HC08 Interrupt Service Routines
 \layout Standard
 
-Interrupt service routines open the door for some very interesting bugs:
- 
-\layout Standard
-
-If the interrupt service routines changes variables which are accessed by
- other functions these variables should be declared 
-\emph on 
-volatile
-\emph default 
-
-\begin_inset LatexCommand \index{volatile}
+Since the number of interrupts available is chip specific and the interrupt
+ vector table always ends at the last byte of memory, the interrupt numbers
+ corresponds to the interrupt vectors in reverse order of address.
+ For example, interrupt 1 will use the interrupt vector at 0xfffc, interrupt
+ 2 will use the interrupt vector at 0xfffa, and so on.
+ However, interrupt 0 (the reset vector at 0xfffe) is not redefinable in
+ this way; instead see section 
+\begin_inset LatexCommand \ref{sub:Startup-Code}
 
 \end_inset 
 
-.
- 
-\layout Standard
-
-If the access to these variables is not 
-\emph on 
-atomic
-\begin_inset LatexCommand \index{atomic access}
-
-\end_inset 
-
-
-\emph default 
- (i.e.
- the processor needs more than one instruction for the access and could
- be interrupted while accessing the variable) the interrupt must disabled
- during the access to avoid inconsistent data.
- Access to 16 or 32 bit variables is obviously not atomic on 8 bit CPUs
- and should be protected by disabling interrupts.
- You're not automatically on the safe side if you use 8 bit variables though.
- We need an example here: f.e.
- on the 8051 the harmless looking 
-\begin_inset Quotes srd
-\end_inset 
-
-
-\family typewriter 
-flags\SpecialChar ~
-|=\SpecialChar ~
-0x80;
-\family default 
-
-\begin_inset Quotes sld
-\end_inset 
-
- is not atomic if 
-\family typewriter 
-flags
-\family default 
- resides in xdata.
- Setting 
-\begin_inset Quotes srd
-\end_inset 
-
-
-\family typewriter 
-flags\SpecialChar ~
-|=\SpecialChar ~
-0x40;
-\family default 
-
-\begin_inset Quotes sld
-\end_inset 
-
- from within an interrupt routine might get lost if the interrupt occurs
- at the wrong time.
- 
-\begin_inset Quotes sld
-\end_inset 
-
-
-\family typewriter 
-counter\SpecialChar ~
-+=\SpecialChar ~
-8;
-\family default 
-
-\begin_inset Quotes srd
-\end_inset 
-
- is not atomic on the 8051 even if 
-\family typewriter 
-counter
-\family default 
- is located in data memory.
- Bugs like these are hard to reproduce and can cause a lot of trouble.
- 
-\layout Standard
-
-A special note here, int (16 bit) and long (32 bit) integer division
-\begin_inset LatexCommand \index{Division}
-
-\end_inset 
-
-, multiplication
-\begin_inset LatexCommand \index{Multiplication}
-
-\end_inset 
-
- & modulus
-\begin_inset LatexCommand \index{Modulus}
-
-\end_inset 
-
- and floating-point
-\begin_inset LatexCommand \index{Floating point support}
-
-\end_inset 
-
- operations are implemented using external support routines developed in
- ANSI-C.
- If an interrupt service routine needs to do any of these operations then
- the support routines (as mentioned in a following section) will have to
- be recompiled using the
-\emph on 
- -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--stack-auto
-\begin_inset LatexCommand \index{-\/-stack-auto}
-
-\end_inset 
-
-
-\emph default 
- option and the source file will need to be compiled using the 
-\emph on 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--int-long-reent
-\emph default 
-
-\begin_inset LatexCommand \index{-\/-int-long-reent}
-
-\end_inset 
-
- compiler option.
-\layout Standard
-
-Calling other functions from an interrupt service routine is not recommended,
- avoid it if possible.
- Note that when some function is called from an interrupt service routine
- it should be preceded by a #pragma\SpecialChar ~
-nooverlay
-\begin_inset LatexCommand \index{\#pragma nooverlay}
-
-\end_inset 
-
- if it is not reentrant.
- Furthermore nonreentrant functions should not be called from the main program
- while the interrupt service routine might be active.
- 
-\newline 
-
-\newline 
-Also see section 
-\begin_inset LatexCommand \ref{sub:Overlaying}
-
-\end_inset 
-
-\SpecialChar ~
-about Overlaying and section 
-\begin_inset LatexCommand \ref{sub:Functions-using-private-banks}
-
-\end_inset 
-
-\SpecialChar ~
-about Functions using private register banks.
+ for details on customizing startup.
 \layout Section
 
 Enabling and Disabling Interrupts
@@ -14250,17 +14309,18 @@ As always, the code is the authoritative reference - see z80/ralloc.c and
 \end_inset 
 
  frame is similar to that generated by the IAR Z80 compiler.
- IX is used as the base pointer, HL is used as a temporary register, and
- BC and DE are available for holding variables.
- IY is currently unused.
+ IX is used as the base pointer, HL and IY are used as a temporary registers,
+ and BC and DE are available for holding variables.
  Return values
 \begin_inset LatexCommand \index{return value}
 
 \end_inset 
 
- are stored in HL.
- One bad side effect of using IX as the base pointer is that a functions
- stack frame is limited to 127 bytes - this will be fixed in a later version.
+ for the Z80 port are stored in L (one byte), HL (two bytes), or DEHL (four
+ bytes).
+ The gbz80 port use the same set of registers for the return values, but
+ in a different order of significance: E (one byte), DE (two bytes), or
+ HLDE (four bytes).
 \layout Section
 
 The HC08 port
@@ -14271,7 +14331,16 @@ The port to the Motorola HC08
 
 \end_inset 
 
- family has been added in October 2003, thank you Erik!
+ family has been added in October 2003, and is still undergoing some basic
+ development.
+ The code generator is complete, but the register allocation is still quite
+ unoptimized.
+ Some of the SDCC's standard C library functions have embedded non-HC08
+ inline assembly and so are not yet usable.
+\newline 
+
+\newline 
+
 \layout Section
 
 The PIC14 port

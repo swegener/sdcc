@@ -127,15 +127,83 @@ void shift_int_left_15(void)
 /*****************************************************/
 void shift_int_right_1(void)
 {
-
   aint0 >>= 1;
+}
 
+void shift_int_right_2(void)
+{
+  aint0 >>= 2;
+}
+
+void shift_int_right_3(void)
+{
+  aint0 >>= 3;
+}
+
+void shift_int_right_4(void)
+{
+  aint0 >>= 4;
+}
+
+void shift_int_right_5(void)
+{
+  aint0 >>= 5;
+}
+
+void shift_int_right_6(void)
+{
+  aint0 >>= 6;
+}
+
+void shift_int_right_7(void)
+{
+  aint0 >>= 7;
+}
+
+void shift_int_right_8(void)
+{
+  aint0 >>= 8;
+}
+
+void shift_int_right_9(void)
+{
+  aint0 >>= 9;
+}
+
+void shift_int_right_10(void)
+{
+  aint0 >>= 10;
+}
+
+void shift_int_right_11(void)
+{
+  aint0 >>= 11;
+}
+
+void shift_int_right_12(void)
+{
+  aint0 >>= 12;
+}
+
+void shift_int_right_13(void)
+{
+  aint0 >>= 13;
+}
+
+void shift_int_right_14(void)
+{
+  aint0 >>= 14;
+}
+
+void shift_int_right_15(void)
+{
+  aint0 >>= 15;
 }
 
 /*****************************************************/
 void main(void)
 {
-  char i;
+  //char i;
 
   aint0 = 0xabcd;
 
@@ -225,6 +293,97 @@ void main(void)
 
   shift_int_left_15();
   if(aint0 != 0x8000)
+    failures++;
+
+  /***********************/
+  aint0 = 0xabcd;
+
+  shift_int_right_1();
+  if(aint0 != 0x55e6)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_2();
+  if(aint0 != 0x2af3)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_3();
+  if(aint0 != 0x1579)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_4();
+  if(aint0 != 0x0abc)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_5();
+  if(aint0 != 0x055e)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_6();
+  if(aint0 != 0x02af)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_7();
+  if(aint0 != 0x0157)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_8();
+  if(aint0 != 0x00ab)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_9();
+  if(aint0 != 0x0055)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_10();
+  if(aint0 != 0x002a)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_11();
+  if(aint0 != 0x0015)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_12();
+  if(aint0 != 0x000a)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_13();
+  if(aint0 != 0x0005)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_14();
+  if(aint0 != 0x0002)
+    failures++;
+
+  aint0 = 0xabcd;
+
+  shift_int_right_15();
+  if(aint0 != 0x0001)
     failures++;
 
   success=failures;

@@ -169,7 +169,7 @@ _ds390_genAssemblerPreamble (FILE * of)
       fputs ("mb = 0xD4\t\t; mb register unknown to assembler\n", of);
       fputs ("mc = 0xD5\t\t; mc register unknown to assembler\n", of);
       fputs ("F1 = 0xD1\t\t; F1 user flag unknown to assembler\n", of);
-      fputs ("_ESP = 0x9B\t\t; ESP user flag unknown to assembler\n", of);
+      fputs ("esp = 0x9B\t\t; ESP user flag unknown to assembler\n", of);
 }
 
 /* Generate interrupt vector table. */

@@ -1800,15 +1800,23 @@ saveRegisters (iCode * lic)
 
   /* if the registers have been saved already then
      do nothing */
-  if (ic->regsSaved || IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type) ||
-      IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(ic))))
-    return;
+  if (ic->regsSaved || IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(ic)))) return ;
 
-  /* find the registers in use at this time
-     and push them away to safety */
-  rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
-			 ic->rUsed);
-
+  /* special case if DPTR alive across a function call then must save it 
+     even though callee saves */
+  if (IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type)) {
+      int i =0;
+      rsave = newBitVect(ic->rMask->size);
+      for (i = DPL_IDX ; i <= B_IDX ; i++ ) {
+	  if (bitVectBitValue(ic->rMask,i))
+	      rsave = bitVectSetBit(rsave,i);
+      }
+  } else {
+      /* find the registers in use at this time
+	 and push them away to safety */
+      rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+			     ic->rUsed);
+  }
   ic->regsSaved = 1;
   if (options.useXstack)
     {
@@ -1849,11 +1857,20 @@ unsaveRegisters (iCode * ic)
 {
   int i;
   bitVect *rsave;
-  /* find the registers in use at this time
-     and push them away to safety */
-  rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
-			 ic->rUsed);
 
+  if (IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type)) {
+      int i =0;
+      rsave = newBitVect(ic->rMask->size);
+      for (i = DPL_IDX ; i <= B_IDX ; i++ ) {
+	  if (bitVectBitValue(ic->rMask,i))
+	      rsave = bitVectSetBit(rsave,i);
+      }
+  } else {
+      /* find the registers in use at this time
+	 and push them away to safety */
+      rsave = bitVectCplAnd (bitVectCopy (ic->rMask),
+			     ic->rUsed);
+  }
   if (options.useXstack)
     {
       emitcode ("mov", "r0,%s", spname);
@@ -2386,8 +2403,8 @@ genCall (iCode * ic)
 	  emitcode ("subb","a,#0x%02x",ic->parmBytes & 0xff);
 	  emitcode ("mov","sp,a");
 	  emitcode ("mov","a,#0x%02x",(ic->parmBytes >> 8) & 0xff);
-	  emitcode ("subb","a,_ESP");
-	  emitcode ("mov","_ESP,a");	  
+	  emitcode ("subb","a,esp");
+	  emitcode ("mov","esp,a");	  
       } else {
 	  int i;
 	  if (ic->parmBytes > 3) {
@@ -2401,7 +2418,7 @@ genCall (iCode * ic)
   }
 
   /* if we hade saved some registers then unsave them */
-  if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
+  if (ic->regsSaved)
     unsaveRegisters (ic);
 
   /* if register bank was saved then pop them */
@@ -2536,7 +2553,7 @@ genPcall (iCode * ic)
   
   /* if we hade saved some registers then
      unsave them */
-  if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
+  if (ic->regsSaved)
     unsaveRegisters (ic);
 
 }
@@ -2832,7 +2849,7 @@ genFunction (iCode * ic)
 	  emitcode ("push","_bpx");
 	  emitcode ("push","_bpx+1");
 	  emitcode ("mov","_bpx,%s",spname);
-	  emitcode ("mov","_bpx+1,_ESP");
+	  emitcode ("mov","_bpx+1,esp");
 	  emitcode ("anl","_bpx+1,#3");
       } else {
 	  if (options.useXstack) {
@@ -2857,9 +2874,9 @@ genFunction (iCode * ic)
 	  emitcode ("mov","a,sp");
 	  emitcode ("add","a,#0x%02x", ((short) sym->stack & 0xff));
 	  emitcode ("mov","sp,a");
-	  emitcode ("mov","a,_ESP");
+	  emitcode ("mov","a,esp");
 	  emitcode ("addc","a,0x%02x", (((short) sym->stack) >> 8) & 0xff);
-	  emitcode ("mov","_ESP,a");
+	  emitcode ("mov","esp,a");
       } else {
 	  if (i > 256)
 	      werror (W_STACK_OVERFLOW, sym->name);
@@ -2905,7 +2922,7 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISREENT (sym->type) || options.stackAuto) {
       if (options.stack10bit) {
 	  emitcode ("mov", "sp,_bpx", spname);
-	  emitcode ("mov", "_ESP,_bpx+1", spname);
+	  emitcode ("mov", "esp,_bpx+1", spname);
       } else {
 	  emitcode ("mov", "%s,_bp", spname);
       }
@@ -3543,7 +3560,19 @@ genPlus (iCode * ic)
       isOperandLiteral(IC_RIGHT(ic)) && OP_SYMBOL(IC_RESULT(ic))->ruonly) {
       aopOp (IC_RIGHT (ic), ic, TRUE, FALSE);
       size = floatFromVal (AOP (IC_RIGHT(ic))->aopu.aop_lit);
-      while (size--) emitcode ("inc","dptr");
+      if (size <= 9) {
+	  while (size--) emitcode ("inc","dptr");
+      } else {
+	  emitcode ("mov","a,dpl");
+	  emitcode ("add","a,#0x%02x",size & 0xff);
+	  emitcode ("mov","dpl,a");
+	  emitcode ("mov","a,dph");
+	  emitcode ("addc","a,#0x%02x",(size >> 8) & 0xff);
+	  emitcode ("mov","dph,a");
+	  emitcode ("mov","a,dpx");
+	  emitcode ("addc","a,#0x%02x",(size >> 16) & 0xff);
+	  emitcode ("mov","dpx,a");
+      }
       freeAsmop (IC_RIGHT (ic), NULL, ic, FALSE);
       return ;
   }
@@ -8862,7 +8891,7 @@ static void
 genFarPointerGet (operand * left,
 		  operand * result, iCode * ic, iCode *pi)
 {
-  int size, offset;
+    int size, offset, dopi=1;
   sym_link *retype = getSpec (operandType (result));
   sym_link *letype = getSpec (operandType (left));
   D (emitcode (";", "genFarPointerGet");
@@ -8901,6 +8930,7 @@ genFarPointerGet (operand * left,
 		emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
 	      emitcode ("pop", "dph");
 	      emitcode ("pop", "dpl");
+	      dopi =0;
 	    }
 	  _endLazyDPSEvaluation ();
 	}
@@ -8924,14 +8954,14 @@ genFarPointerGet (operand * left,
 	  _flushLazyDPS ();
 
 	  emitcode ("movx", "a,@dptr");
-	  if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
+	  if (size || (dopi && pi && AOP_TYPE (left) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 
 	  aopPut (AOP (result), "a", offset++);
 	}
       _endLazyDPSEvaluation ();
     }
-  if (pi && AOP_TYPE (left) != AOP_IMMD) {
+  if (dopi && pi && AOP_TYPE (left) != AOP_IMMD) {
     aopPut ( AOP (left), "dpl", 0);
     aopPut ( AOP (left), "dph", 1);
     if (options.model == MODEL_FLAT24)
@@ -8955,7 +8985,7 @@ static void
 emitcodePointerGet (operand * left,
 		    operand * result, iCode * ic, iCode *pi)
 {
-  int size, offset;
+  int size, offset, dopi=1;
   sym_link *retype = getSpec (operandType (result));
 
   aopOp (left, ic, FALSE, FALSE);
@@ -8990,6 +9020,7 @@ emitcodePointerGet (operand * left,
 	        emitcode ("mov", "dpx,%s", aopGet (AOP (left), 2, FALSE, FALSE, TRUE));
 	      emitcode ("pop", "dph");
 	      emitcode ("pop", "dpl");
+	      dopi=0;
 	    }
 	  _endLazyDPSEvaluation ();
 	}
@@ -9013,13 +9044,13 @@ emitcodePointerGet (operand * left,
 
 	  emitcode ("clr", "a");
 	  emitcode ("movc", "a,@a+dptr");
-	  if (size || (pi && AOP_TYPE (left) != AOP_IMMD))
+	  if (size || (dopi && pi && AOP_TYPE (left) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 	  aopPut (AOP (result), "a", offset++);
 	}
       _endLazyDPSEvaluation ();
     }
-  if (pi && AOP_TYPE (left) != AOP_IMMD) {
+  if (dopi && pi && AOP_TYPE (left) != AOP_IMMD) {
       aopPut ( AOP (left), "dpl", 0);
       aopPut ( AOP (left), "dph", 1);
       if (options.model == MODEL_FLAT24)
@@ -9606,7 +9637,7 @@ static void
 genFarPointerSet (operand * right,
 		  operand * result, iCode * ic, iCode *pi)
 {
-  int size, offset;
+  int size, offset, dopi=1;
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
@@ -9641,6 +9672,7 @@ genFarPointerSet (operand * right,
 	        emitcode ("mov", "dpx,%s", aopGet (AOP (result), 2, FALSE, FALSE, TRUE));
 	      emitcode ("pop", "dph");
 	      emitcode ("pop", "dpl");
+	      dopi=0;
 	    }
 	  _endLazyDPSEvaluation ();
 	}
@@ -9666,13 +9698,13 @@ genFarPointerSet (operand * right,
 	  _flushLazyDPS ();
 
 	  emitcode ("movx", "@dptr,a");
-	  if (size || (pi && AOP_TYPE (result) != AOP_IMMD))
+	  if (size || (dopi && pi && AOP_TYPE (result) != AOP_IMMD))
 	    emitcode ("inc", "dptr");
 	}
       _endLazyDPSEvaluation ();
     }
 
-  if (pi && AOP_TYPE (result) != AOP_IMMD) {
+  if (dopi && pi && AOP_TYPE (result) != AOP_IMMD) {
       aopPut (AOP(result),"dpl",0);
       aopPut (AOP(result),"dph",1);
       if (options.model == MODEL_FLAT24)
@@ -9897,12 +9929,24 @@ genAddrOf (iCode * ic)
       /* if 10 bit stack */
       if (options.stack10bit) {
 	  /* if it has an offset then we need to compute it */
+      emitcode ("subb", "a,#0x%02x",
+		-((sym->stack < 0) ?
+		  ((short) (sym->stack - _G.nRegsSaved)) :
+		  ((short) sym->stack)) & 0xff);
+      emitcode ("mov","b,a");
+      emitcode ("mov","a,#0x%02x",(-((sym->stack < 0) ?
+				     ((short) (sym->stack - _G.nRegsSaved)) :
+				     ((short) sym->stack)) >> 8) & 0xff);
 	  if (sym->stack) {
 	      emitcode ("mov", "a,_bpx");
-	      emitcode ("add", "a,#0x%02x", ((char) sym->stack & 0xff));
+	      emitcode ("add", "a,#0x%02x", ((sym->stack < 0) ? 
+					     ((char) (sym->stack - _G.nRegsSaved)) :
+					     ((char) sym->stack )) & 0xff);
 	      emitcode ("mov", "b,a");
 	      emitcode ("mov", "a,_bpx+1");
-	      emitcode ("addc","a,#0x%02x", (((short) sym->stack) >> 8) & 0xff);
+	      emitcode ("addc","a,#0x%02x", (((sym->stack < 0) ? 
+					      ((short) (sym->stack - _G.nRegsSaved)) :
+					      ((short) sym->stack )) >> 8) & 0xff);
 	      aopPut (AOP (IC_RESULT (ic)), "b", 0);
 	      aopPut (AOP (IC_RESULT (ic)), "a", 1);
 	      aopPut (AOP (IC_RESULT (ic)), "#0x40", 2);

@@ -5262,6 +5262,12 @@ genRRC (iCode * ic)
   /* move it to the result */
   size = AOP_SIZE (result);
   offset = size - 1;
+  if (size == 1) { /* special case for 1 byte */
+      l = aopGet (AOP (left), offset, FALSE, FALSE);
+      MOVA (l);
+      emitcode ("rr", "a");
+      goto release;
+  }
   CLRC;
   while (size--)
     {
@@ -5279,6 +5285,7 @@ genRRC (iCode * ic)
       MOVA (l);
     }
   emitcode ("mov", "acc.7,c");
+ release:
   aopPut (AOP (result), "a", AOP_SIZE (result) - 1);
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
@@ -5307,6 +5314,10 @@ genRLC (iCode * ic)
     {
       l = aopGet (AOP (left), offset, FALSE, FALSE);
       MOVA (l);
+      if (size == 0) { /* special case for 1 byte */
+	      emitcode("rl","a");
+	      goto release;
+      }
       emitcode ("add", "a,acc");
       if (AOP_SIZE (result) > 1)
 	aopPut (AOP (result), "a", offset++);
@@ -5327,6 +5338,7 @@ genRLC (iCode * ic)
       MOVA (l);
     }
   emitcode ("mov", "acc.0,c");
+ release:
   aopPut (AOP (result), "a", 0);
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);

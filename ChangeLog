@@ -1,3 +1,11 @@
+2003-10-23 Erik Petrich <epetrich@ivorytower.norman.ok.us>
+
+	* src/SDCCmain.c,
+	* sdccconf_in.h: Fixed bug #828387 (--disable-hc08-port didn't work)
+	* src/mcs51/gen.c (gencjneshort),
+	* src/ds390/gen.c (gencjneshort): Made comparison with AOP_IMMD operand
+	more efficient (per Scott Bronson's suggestion)
+
 2003-10-22 Erik Petrich <epetrich@ivorytower.norman.ok.us>
 
 	Extended the semantics of the critical keyword to include

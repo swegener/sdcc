@@ -2292,6 +2292,30 @@ static int packRegsDPTRnuse( operand *op , int dptr)
 	    nfs++;
 	}
 	
+	// Check that no other ops in this range have been assigned to dptr1.
+	// I don't understand why this is not caught by the first check, above.
+	// But it isn't always, see bug 769624.
+	if (IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) &&
+	    (OP_SYMBOL(IC_RESULT(ic))->dptr == 1))
+	{	    
+	    //fprintf(stderr, "dptr1 already in use in live range #1\n");
+	    return 0;
+	}
+	
+	if (IC_LEFT(ic) && IS_SYMOP(IC_LEFT(ic)) &&
+	    (OP_SYMBOL(IC_LEFT(ic))->dptr == 1))
+	{	    
+	    //fprintf(stderr, "dptr1 already in use in live range # 2\n");
+	    return 0;
+	}
+	
+	if (IC_RIGHT(ic) && IS_SYMOP(IC_RIGHT(ic)) &&
+	    (OP_SYMBOL(IC_RIGHT(ic))->dptr == 1))
+	{	    
+	    //fprintf(stderr, "dptr1 already in use in live range # 3\n");
+	    return 0;
+	}	
+	
 	if (nfs && IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) &&
 	    OP_SYMBOL(IC_RESULT(ic))->ruonly) return 0;
 

@@ -4720,6 +4720,9 @@ void AnalyzeBanking(void)
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     BanksUsedFlow(pb);
+  for(pb = the_pFile->pbHead; pb; pb = pb->next)
+    FixRegisterBanking(pb);
+
 }
 
 /*-----------------------------------------------------------------*/

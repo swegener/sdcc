@@ -927,10 +927,6 @@ operandOperation (operand * left, operand * right,
 
   switch (op)
     {
-    case '=':
-      // we need this now because of SDCCcse.c:1.52, it's a regression though
-      retval = right;
-      break;
     case '+':
       retval = operandFromValue (valCastLiteral (type,
 						 operandLitValue (left) +

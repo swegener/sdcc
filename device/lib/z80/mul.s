@@ -32,9 +32,15 @@ __muluchar_rr_s::
         add     hl,sp
 
         ld      e,(hl)
+
         inc     hl
         ld      c,(hl)                
 
+        ;; Clear the top
+        xor     a
+        ld      d,a
+        ld      b,a
+        
         jp      .mulu16
         
 __mulsint_rr_s::

@@ -44,7 +44,6 @@ extern char *filename ;
 extern char *fullSrcFileName ;
 int   yylineno = 1               ;
 void count()                     ;
-void comment();
 int process_pragma(char *);
 #undef yywrap
 
@@ -118,7 +117,6 @@ struct options  save_options  ;
   }
   *asmp++ = '\n' ;
 }
-"/*"	       { comment(); }
 "at"	       { count(); TKEYWORD(AT)  ; }
 "auto"	       { count(); return(AUTO); }
 "bit"	       { count(); TKEYWORD(BIT) ; }
@@ -248,6 +246,7 @@ struct options  save_options  ;
 \\ {
   char ch=input();
   if (ch!='\n') {
+    // that could have been removed by the preprocessor anyway
     werror (W_STRAY_BACKSLASH, column);
     unput(ch);
   }
@@ -307,25 +306,6 @@ int checkCurrFile ( char *s)
     return 0;
 }
     
-void comment()
-{
-  char c, c1;
-  
- loop:
-  while ((c = input()) != '*' && c) {
-    if ( c == '\n') {
-      lineno=++yylineno;
-    }
-  }
-  
-  if (c && (c1 = input()) != '/') {
-    unput(c1);
-    goto loop;
-  }
-}
-   
-   
-
 int column = 0;
 int plineIdx=0;
 
@@ -382,13 +362,10 @@ char *stringLiteral () {
     /* if it is a \ then escape char's are allowed */
     if (ch == '\\') {
       ch=input();
-      if (ch=='\r') {
-	// input() translates \n into \r\n
-	if ((ch=input())!='\n') {
-	  unput (ch);
-	}
+      if (ch=='\n') {
 	/* \<newline> is a continuator */
 	lineno=++yylineno;
+	column=0;
 	continue;
       }
       *str++ = '\\'; /* backslash in place */
@@ -397,14 +374,11 @@ char *stringLiteral () {
     }
     
     /* if new line we have a new line break, which is illegal */
-    if (ch == '\r') {
-      // input() translates \n into \r\n
-      if ((ch=input())!='\n') {
-	unput (ch);
-      }
+    if (ch == '\n') {
       werror (W_NEWLINE_IN_STRING);
       *str++ = '\n';
       lineno=++yylineno;
+      column=0;
       continue;
     }
     
@@ -419,6 +393,9 @@ char *stringLiteral () {
 	  if ((ch=input())!='\n') {
 	    werror (W_STRAY_BACKSLASH, column);
 	    unput(ch);
+	  } else {
+	    lineno=++yylineno;
+	    column=0;
 	  }
 	  break;
 	case '\n':
@@ -429,7 +406,7 @@ char *stringLiteral () {
 
       if (!ch) 
 	break; 
-      
+
       if (ch != '\"') {
 	unput(ch) ;
 	break ;

@@ -1773,9 +1773,9 @@ bool opPreservesA(iCode *ic, iCode *uic)
 	!IS_BITWISE_OP(uic)    &&
 	uic->op != '=' && 
 	uic->op != EQ_OP &&
+	!POINTER_GET(uic) &&
 	/*
 	uic->op != LEFT_OP &&
-	!POINTER_GET(uic) &&
 	uic->op != RIGHT_OP &&*/
 	1
 	) {
@@ -1812,6 +1812,7 @@ static void packRegsForAccUse2(iCode *ic)
 
     /* Filter out all but those 'good' commands */
     if (
+	!POINTER_GET(ic) &&
 	ic->op != '+' &&
 	!IS_BITWISE_OP(ic)    &&
 	ic->op != '=' && 

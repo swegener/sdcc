@@ -5,7 +5,7 @@ PORT = gb
 
 CC = /home/michaelh/projects/gbdk-support/lcc/lcc
 # -DNOENUM is here to make the results more predictable
-CFLAGS = -v --prefix=/home/michaelh/projects/gbdk-current/
+CFLAGS = -Wl-m -mz80/consolez80 -v --prefix=/home/michaelh/projects/gbdk-current/
 CFLAGS += -DREG= -DNOSTRUCTASSIGN -DNOENUM
 LIBDIR = /home/michaelh/projects/gbdk-lib/build/
 LD = link-$(PROC)

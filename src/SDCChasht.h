@@ -28,6 +28,7 @@
 
 #ifdef _NO_GC
 
+#include <stdlib.h>
 #define GC_malloc malloc
 #define GC_free free
 #define GC_realloc realloc

@@ -54,11 +54,11 @@ replace restart {
 %1:
 }
 replace restart {
-%1:
-	jp	%2
-	jp	%3
+	ld	a,%1
+	or	a,%2
+	or	a,a
 } by {
-	; Weird Rule 7
-%1:
-	jp	%2
+	; Rule 8
+	ld	a,%1
+	or	a,%2
 }

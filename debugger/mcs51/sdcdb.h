@@ -269,4 +269,5 @@ extern char contsim;
 char *searchDirsFname (char *);
 char *getNextCmdLine(void );
 void setCmdLine( char * );
+void stopCommandList( void );
 #endif

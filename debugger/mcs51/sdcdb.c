@@ -836,7 +836,7 @@ int interpretCmd (char *s)
 
 static FILE *actualcmdfile=NULL ;
 static char *actualcmds=NULL;
-
+static int   stopcmdlist;
 /*-----------------------------------------------------------------*/
 /* getNextCmdLine get additional lines used by special commands    */
 /*-----------------------------------------------------------------*/
@@ -852,6 +852,11 @@ char *getNextCmdLine()
 void setCmdLine( char *cmds )
 {
     actualcmds = cmds;
+}
+
+void stopCommandList()
+{
+    stopcmdlist = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -882,6 +887,7 @@ static void commandLoop(FILE *cmdfile)
         {
             strcpy(cmdbuff,actualcmds);
             actualcmds = NULL;
+            stopcmdlist= 0;
             for ( line = cmdbuff; *line ; line = s )
             {
                 if ( (s=strchr(line ,'\n')))
@@ -900,6 +906,8 @@ static void commandLoop(FILE *cmdfile)
                     break;
                 }
                 *s = save_ch;
+                if ( stopcmdlist )
+                    break;
             }
         }
     }

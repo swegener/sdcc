@@ -699,7 +699,7 @@ void simGo (unsigned int gaddr)
     unsigned int addr ;
     context *ctxt;
     int rv;
-
+    stopCommandList();
  top:    
     if ( userinterrupt )
     {

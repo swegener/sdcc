@@ -34,7 +34,7 @@
      mcs51 small stack-auto
 */
 
-#if !defined(SDCC_USE_XSTACK) || defined(_SDCC_NO_ASM_LIB_FUNCS)
+#if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(SDCC_mcs51)
 #    if defined(SDCC_MODEL_SMALL)
 #      if defined(SDCC_STACK_AUTO)

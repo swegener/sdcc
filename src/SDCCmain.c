@@ -1529,7 +1529,9 @@ linkEdit (char **envp)
   buildCmdLine (buffer, port->linker.cmd, srcFileName, NULL, NULL, NULL);
   if (my_system (buffer))
     {
-      perror ("Cannot exec linker");
+      /* either system() or the linker itself has reported an error
+	 perror ("Cannot exec linker");
+      */
       exit (1);
     }
 #else
@@ -1562,7 +1564,9 @@ assemble (char **envp)
   buildCmdLine (buffer, port->assembler.cmd, srcFileName, NULL, NULL, asmOptions);
   if (my_system (buffer))
     {
-      perror ("Cannot exec assembler");
+      /* either system() or the assembler itself has reported an error
+	 perror ("Cannot exec assembler");
+      */
       exit (1);
     }
 #else
@@ -1646,7 +1650,9 @@ preProcess (char **envp)
 		    preOutName, srcFileName, preArgv);
       if (my_system (buffer))
 	{
-	  perror ("Cannot exec Preprocessor");
+	  /* either system() or the preprocessor itself has reported an error
+	     perror ("Cannot exec Preprocessor");
+	  */
 	  exit (1);
 	}
 #else

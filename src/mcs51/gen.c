@@ -2184,8 +2184,8 @@ static void genSend(set *sendSet)
     iCode *sic;
     int rb1_count = 0 ;
 
-    for (sic = setFirstItem (_G.sendSet); sic;
-         sic = setNextItem (_G.sendSet)) {
+    for (sic = setFirstItem (sendSet); sic;
+         sic = setNextItem (sendSet)) {
           int size, offset = 0;
           aopOp (IC_LEFT (sic), sic, FALSE);
           size = AOP_SIZE (IC_LEFT (sic));

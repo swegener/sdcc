@@ -1,3 +1,16 @@
+2004-08-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genAnd, genOr, transferAopAop, rmwWithAop): optimized
+	code generation
+	* src/hc08/gen.c (genrshFour, genCpl): fixed bugs
+	* src/hc08/gen.c (genMultOneByte, genDivOneByte, genModOneByte): fixed
+	bugs, ported much of Bernhard's code from mcs51
+	* src/mcs51/gen.c (genSend),
+	* src/hc08/gen.c (genSend): fixed bug with lost SEND iCodes if more
+	than one when calling a reentrant function
+	* device/lib/_mullong.c: defined an alternate struct layout for big
+	endian ports (hc08)
+
 2004-08-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (shiftL2Left2Result): fix for bug-500536 regression

@@ -1120,6 +1120,12 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   int regIdx;
   bool keepreg = FALSE;
 
+  /* ignore transfers at the same byte, unless its volatile */
+  if (srcaop->op && !isOperandVolatile (srcaop->op, FALSE)
+      && dstaop->op && !isOperandVolatile (dstaop->op, FALSE)
+      && operandsEqu(srcaop->op, dstaop->op) && srcofs == dstofs)
+    return;
+      
   if (srcaop->stacked && srcaop->stk_aop[srcofs])
     {
       transferAopAop (srcaop->stk_aop[srcofs], 0, dstaop, dstofs);
@@ -1143,6 +1149,21 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   if ((dstaop->type == AOP_DIR)
       && ((srcaop->type == AOP_DIR) || (srcaop->type == AOP_LIT)) )
     {
+      if (srcaop->type == AOP_LIT)
+        {
+          unsigned long lit;
+          unsigned char bytemask;
+          
+          lit = (unsigned long) floatFromVal (srcaop->aopu.aop_lit);
+          bytemask = (lit >> (srcofs*8)) & 0xff;
+          
+          if (bytemask == 0)
+            {
+              emitcode ("clr", "%s", aopAdrStr(dstaop, dstofs, FALSE));
+              return;
+            }
+        }
+
       emitcode("mov", "%s,%s", aopAdrStr(srcaop, srcofs, FALSE),
                aopAdrStr(dstaop, dstofs, FALSE));
       return;
@@ -1275,7 +1296,7 @@ rmwWithReg (char *rmwop, regs *reg)
 /*--------------------------------------------------------------------------*/
 /* accopWithAop - Emit read/modify/write instruction rmwop with the byte at */
 /*                logical offset loffset of asmop aop.                      */
-/*                Supports: com, dec, inc, lsl, lsr, neg, rol, ror          */
+/*                Supports: com, dec, inc, lsl, lsr, neg, rol, ror, tst     */
 /*--------------------------------------------------------------------------*/
 static void
 rmwWithAop (char *rmwop, asmop *aop, int loffset)
@@ -1297,7 +1318,8 @@ rmwWithAop (char *rmwop, asmop *aop, int loffset)
         needpula = pushRegIfUsed (hc08_reg_a);
 	loadRegFromAop (hc08_reg_a, aop, loffset);
         rmwWithReg (rmwop, hc08_reg_a);
-	storeRegToAop (hc08_reg_a, aop, loffset);
+        if (strcmp ("tst", rmwop))
+	  storeRegToAop (hc08_reg_a, aop, loffset);
         pullOrFreeReg (hc08_reg_a, needpula);
         break;
       case AOP_DUMMY:
@@ -2307,6 +2329,7 @@ genCpl (iCode * ic)
       hc08_useReg (reg);
       storeRegToAop (reg, AOP (IC_RESULT (ic)), offset);
       hc08_freeReg (reg);
+      offset++;
     }
 
   /* release the aops */
@@ -2621,13 +2644,13 @@ static void genSend(set *sendSet)
 {
     iCode *sic;
 
-    for (sic = setFirstItem (_G.sendSet); sic;
-	 sic = setNextItem (_G.sendSet)) {
+    for (sic = setFirstItem (sendSet); sic;
+	 sic = setNextItem (sendSet)) {
 	  int size, offset = 0;
 	  aopOp (IC_LEFT (sic), sic, FALSE);
 	  size = AOP_SIZE (IC_LEFT (sic));
 
-	  if (sic->argreg) {
+          if (sic->argreg) {
 	      offset = size-1;
 	      while (size--) {
 		  transferAopAop( AOP (IC_LEFT (sic)), offset,
@@ -3486,6 +3509,7 @@ genMultOneByte (operand * left,
   symbol *tlbl1, *tlbl2, *tlbl3, *tlbl4;
   int size=AOP_SIZE(result);
   bool negLiteral = FALSE;
+  bool lUnsigned, rUnsigned;
 
   D(emitcode (";     genMultOneByte",""));
 
@@ -3503,12 +3527,31 @@ genMultOneByte (operand * left,
       operand *t = right;
       right = left;
       left = t;
-      //D(emitcode (";", "swapped left and right"));
+    }
+  /* if an operand is in A, make sure it is on the left */
+  if (IS_AOP_A (AOP (right)))
+    {
+      operand *t = right;
+      right = left;
+      left = t;
     }
 
+  lUnsigned = SPEC_USIGN (getSpec (operandType (left)));
+  rUnsigned = SPEC_USIGN (getSpec (operandType (right)));
+  
+  /* lUnsigned  rUnsigned  negLiteral  negate     case */
+  /* false      false      false       odd        3    */
+  /* false      false      true        even       3    */
+  /* false      true       false       odd        3    */
+  /* false      true       true        impossible      */
+  /* true       false      false       odd        3    */
+  /* true       false      true        always     2    */
+  /* true       true       false       never      1    */
+  /* true       true       true        impossible      */
+
+  /* case 1 */
   if (size == 1
-      || (SPEC_USIGN(operandType(left)) &&
-	  SPEC_USIGN(operandType(right))))
+      || (lUnsigned && rUnsigned))
     {
       // just an unsigned 8*8=8/16 multiply
       //D(emitcode (";","unsigned"));
@@ -3525,20 +3568,53 @@ genMultOneByte (operand * left,
 
   // we have to do a signed multiply
 
+  /* case 2 */
+  /* left unsigned, right signed literal -- literal determines sign handling */
+  if (AOP_TYPE(right)==AOP_LIT && lUnsigned && !rUnsigned)
+    {
+      signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
+      
+      loadRegFromAop (hc08_reg_a, AOP (left), 0);
+      if (val < 0)
+        emitcode ("ldx", "#0x%02x", -val);
+      else
+        emitcode ("ldx", "#0x%02x", val);
+          
+      emitcode ("mul", "");
+          
+      if (val < 0)
+        {
+          rmwWithReg ("neg", hc08_reg_a);
+          tlbl4 = newiTempLabel (NULL);
+          emitBranch ("bcc", tlbl4);
+          rmwWithReg ("inc", hc08_reg_x);
+          emitLabel (tlbl4);
+          rmwWithReg ("neg", hc08_reg_x);
+        }
+      
+      hc08_dirtyReg (hc08_reg_xa, FALSE);
+      storeRegToFullAop (hc08_reg_xa, AOP (result), TRUE);
+      hc08_freeReg (hc08_reg_xa);
+      return;
+    }
+  
 
-  //D(emitcode (";", "signed"));
+  /* case 3 */
   adjustStack (-1);
   emitcode ("clr", "1,s");
 
-  tlbl1 = newiTempLabel (NULL);
   loadRegFromAop (hc08_reg_a, AOP (left), 0);
-  emitcode ("tsta","");
-  emitBranch ("bpl", tlbl1);
-  emitcode ("inc", "1,s");
-  rmwWithReg ("neg", hc08_reg_a);
-  emitLabel (tlbl1);
+  if (!lUnsigned)
+    {
+      tlbl1 = newiTempLabel (NULL);
+      emitcode ("tsta","");
+      emitBranch ("bpl", tlbl1);
+      emitcode ("inc", "1,s");
+      rmwWithReg ("neg", hc08_reg_a);
+      emitLabel (tlbl1);
+    }
 
-  if (AOP_TYPE(right)==AOP_LIT)
+  if (AOP_TYPE(right)==AOP_LIT && !rUnsigned)
     {
       signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
       /* AND literal negative */
@@ -3552,13 +3628,16 @@ genMultOneByte (operand * left,
     }
   else
     {
-      tlbl2 = newiTempLabel (NULL);
       loadRegFromAop (hc08_reg_x, AOP (right), 0);
-      emitcode ("tstx", "");
-      emitBranch ("bpl", tlbl2);
-      emitcode ("inc", "1,s");
-      rmwWithReg ("neg", hc08_reg_x);
-      emitLabel (tlbl2);
+      if (!rUnsigned)
+        {
+          tlbl2 = newiTempLabel (NULL);
+          emitcode ("tstx", "");
+          emitBranch ("bpl", tlbl2);
+          emitcode ("inc", "1,s");
+          rmwWithReg ("neg", hc08_reg_x);
+          emitLabel (tlbl2);
+        }
     }
 
   emitcode ("mul", "");
@@ -3566,20 +3645,17 @@ genMultOneByte (operand * left,
 
   tlbl3 = newiTempLabel (NULL);
   emitcode ("dec", "1,s");
-  if (negLiteral)
-    emitBranch ("bne", tlbl3);
-  else
+  if (!lUnsigned && !rUnsigned && negLiteral)
     emitBranch ("beq", tlbl3);
+  else
+    emitBranch ("bne", tlbl3);
 
   rmwWithReg ("neg", hc08_reg_a);
-  if (size>1)
-    {
-      tlbl4 = newiTempLabel (NULL);
-      emitBranch ("bcc", tlbl4);
-      rmwWithReg ("inc", hc08_reg_x);
-      emitLabel (tlbl4);
-      rmwWithReg ("neg", hc08_reg_x);
-    }
+  tlbl4 = newiTempLabel (NULL);
+  emitBranch ("bcc", tlbl4);
+  rmwWithReg ("inc", hc08_reg_x);
+  emitLabel (tlbl4);
+  rmwWithReg ("neg", hc08_reg_x);
 
   emitLabel (tlbl3);
   adjustStack (1);
@@ -3637,22 +3713,25 @@ genDivOneByte (operand * left,
 	       operand * right,
 	       operand * result)
 {
-  sym_link *opetype = operandType (result);
-//  char *l;
-  symbol *tlbl1, *tlbl2, *tlbl3, *tlbl4;
+  symbol *tlbl1, *tlbl2, *tlbl3;
   int size;
-  bool negLiteral = FALSE;
+  int offset = 0;
+  bool lUnsigned, rUnsigned;
+  bool runtimeSign, compiletimeSign;
+  
+  lUnsigned = SPEC_USIGN (getSpec (operandType (left)));
+  rUnsigned = SPEC_USIGN (getSpec (operandType (right)));
 
   D(emitcode (";     genDivOneByte",""));
 
   size = AOP_SIZE (result);
   /* signed or unsigned */
-  if (SPEC_USIGN (opetype))
+  if (lUnsigned && rUnsigned)
     {
       /* unsigned is easy */
       loadRegFromAop (hc08_reg_h, AOP (left), 1);
-      loadRegFromAop (hc08_reg_a, AOP (left), 0);
       loadRegFromAop (hc08_reg_x, AOP (right), 0);
+      loadRegFromAop (hc08_reg_a, AOP (left), 0);
       emitcode ("div", "");
       hc08_dirtyReg (hc08_reg_a, FALSE);
       hc08_dirtyReg (hc08_reg_h, FALSE);
@@ -3665,66 +3744,146 @@ genDivOneByte (operand * left,
 
   /* signed is a little bit more difficult */
 
-  adjustStack (-1);
-  emitcode ("clr", "1,s");
+  /* now sign adjust for both left & right */
 
-  tlbl1 = newiTempLabel (NULL);
-  tlbl2 = newiTempLabel (NULL);
-  loadRegFromAop (hc08_reg_a, AOP (left), 0);
-  loadRegFromAop (hc08_reg_x, AOP (left), 1);
-  emitBranch ("bpl", tlbl1);
-  emitcode ("inc", "1,s");
-  rmwWithReg ("neg", hc08_reg_a);
-  emitBranch ("bcc", tlbl2);
-  rmwWithReg ("inc", hc08_reg_x);
-  emitLabel (tlbl2);
-  rmwWithReg ("neg", hc08_reg_x);
-  transferRegReg (hc08_reg_x, hc08_reg_h, TRUE);
-  emitLabel (tlbl1);
+  /* let's see what's needed: */
+  /* apply negative sign during runtime */
+  runtimeSign = FALSE;
+  /* negative sign from literals */
+  compiletimeSign = FALSE;
 
-  if (AOP_TYPE(right)==AOP_LIT)
+  if (!lUnsigned)
     {
-      signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
-      /* AND literal negative */
-      if (val < 0) {
+      if (AOP_TYPE(left) == AOP_LIT)
+        {
+          /* signed literal */
+          signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+          if (val < 0)
+            compiletimeSign = TRUE;
+        }
+      else
+        /* signed but not literal */
+        runtimeSign = TRUE;
+    }
+
+  if (!rUnsigned)
+    {
+      if (AOP_TYPE(right) == AOP_LIT)
+        {
+          /* signed literal */
+          signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+          if (val < 0)
+            compiletimeSign ^= TRUE;
+        }
+      else
+        /* signed but not literal */
+        runtimeSign = TRUE;
+    }
+
+  /* initialize the runtime sign */
+  if (runtimeSign)
+    {
+      if (compiletimeSign)
+        loadRegFromConst (hc08_reg_x, "#1"); /* set sign flag */
+      else
+        loadRegFromConst (hc08_reg_x, zero); /* reset sign flag */
+      pushReg (hc08_reg_x, TRUE);
+    }
+
+  /* save the signs of the operands */
+  if (AOP_TYPE(right) == AOP_LIT)
+    {
+      signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+
+      if (!rUnsigned && val < 0)
         emitcode ("ldx", "#0x%02x", -val);
-        negLiteral = TRUE;
-      } else {
-        emitcode ("ldx", "#0x%02x", val);
-      }
-      hc08_useReg (hc08_reg_x);
+      else
+        emitcode ("ldx", "#0x%02x", (unsigned char) val);
     }
-  else
+  else /* ! literal */
     {
-      tlbl3 = newiTempLabel (NULL);
       loadRegFromAop (hc08_reg_x, AOP (right), 0);
-      emitBranch ("bpl", tlbl3);
-      emitcode ("inc", "1,s");
-      rmwWithReg ("neg", hc08_reg_x);
-      emitLabel (tlbl3);
+      if (!rUnsigned)
+        {
+          tlbl1 = newiTempLabel (NULL);
+          emitcode ("tstx", "");
+          emitBranch ("bpl", tlbl1);
+          emitcode ("inc", "1,s");
+          rmwWithReg ("neg", hc08_reg_x);
+          emitLabel (tlbl1);
+        }
     }
 
+  if (AOP_TYPE(left) == AOP_LIT)
+    {
+      signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+
+      if (!lUnsigned && val < 0)
+        emitcode ("lda", "#0x%02x", -val);
+      else
+        emitcode ("lda", "#0x%02x", (unsigned char) val);
+    }
+  else /* ! literal */
+    {
+      loadRegFromAop (hc08_reg_a, AOP (left), 0);
+      if (!lUnsigned)
+        {
+          tlbl2 = newiTempLabel (NULL);
+          emitcode ("tsta", "");
+          emitBranch ("bpl", tlbl2);
+          emitcode ("inc", "1,s");
+          rmwWithReg ("neg", hc08_reg_a);
+          emitLabel (tlbl2);
+        }
+    }
+    
+  loadRegFromConst (hc08_reg_h, zero);
   emitcode ("div", "");
   hc08_dirtyReg (hc08_reg_x, FALSE);
   hc08_dirtyReg (hc08_reg_a, FALSE);
   hc08_dirtyReg (hc08_reg_h, FALSE);
-
-  tlbl4 = newiTempLabel (NULL);
-  emitcode ("dec", "1,s");
-  if (negLiteral)
-    emitBranch ("bne", tlbl4);
+  
+  if (runtimeSign || compiletimeSign)
+    {
+      tlbl3 = newiTempLabel (NULL);
+      if (runtimeSign)
+        {
+          pullReg (hc08_reg_x);
+          rmwWithReg ("lsr", hc08_reg_x);
+          rmwWithReg ("ror", hc08_reg_x);
+          emitBranch ("bpl", tlbl3);
+        }
+     
+      rmwWithReg ("neg", hc08_reg_a);
+      if (runtimeSign)
+        emitLabel (tlbl3);
+      
+      storeRegToAop (hc08_reg_a, AOP (result), 0);
+      
+      if (size > 1)
+        {
+          /* msb is 0x00 or 0xff depending on the sign */
+          if (runtimeSign)
+            {
+              rmwWithReg ("lsl", hc08_reg_x);
+              emitcode ("clra", "");
+              emitcode ("sbc", "#0");
+              while (--size)
+                storeRegToAop (hc08_reg_a, AOP (result), ++offset);
+            }
+          else /* compiletimeSign */
+            while (--size)
+              storeConstToAop ("#0xff", AOP (result), ++offset);
+        }
+    }
   else
-    emitBranch ("beq", tlbl4);
-  rmwWithReg ("neg", hc08_reg_a);
+    {
+      storeRegToFullAop (hc08_reg_a, AOP (result), FALSE);
+    }
 
-  emitLabel (tlbl4);
-  adjustStack (1);
-  storeRegToFullAop (hc08_reg_a, AOP (result), TRUE);
   hc08_freeReg (hc08_reg_a);
   hc08_freeReg (hc08_reg_x);
   hc08_freeReg (hc08_reg_h);
-
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -3769,22 +3928,25 @@ genModOneByte (operand * left,
 	       operand * right,
 	       operand * result)
 {
-  sym_link *opetype = operandType (result);
-//  symbol *lbl;
-  symbol *tlbl1, *tlbl2, *tlbl3, *tlbl4;
+  symbol *tlbl1, *tlbl2, *tlbl3;
   int size;
-  bool negLiteral = FALSE;
+  int offset = 0;
+  bool lUnsigned, rUnsigned;
+  bool runtimeSign, compiletimeSign;
+  
+  lUnsigned = SPEC_USIGN (getSpec (operandType (left)));
+  rUnsigned = SPEC_USIGN (getSpec (operandType (right)));
 
   D(emitcode (";     genModOneByte",""));
 
   size = AOP_SIZE (result);
-  /* signed or unsigned */
-  if (SPEC_USIGN (opetype))
+  
+  if (lUnsigned && rUnsigned)
     {
       /* unsigned is easy */
+      loadRegFromAop (hc08_reg_x, AOP (right), 0);
       loadRegFromAop (hc08_reg_h, AOP (left), 1);
       loadRegFromAop (hc08_reg_a, AOP (left), 0);
-      loadRegFromAop (hc08_reg_x, AOP (right), 0);
       emitcode ("div", "");
       hc08_dirtyReg (hc08_reg_a, FALSE);
       hc08_dirtyReg (hc08_reg_h, FALSE);
@@ -3796,67 +3958,116 @@ genModOneByte (operand * left,
     }
 
   /* signed is a little bit more difficult */
-
-  adjustStack (-1);
-  emitcode ("clr", "1,s");
-
-  tlbl1 = newiTempLabel (NULL);
-  tlbl2 = newiTempLabel (NULL);
-  loadRegFromAop (hc08_reg_a, AOP (left), 0);
-  loadRegFromAop (hc08_reg_x, AOP (left), 1);
-  emitBranch ("bpl", tlbl1);
-  emitcode ("inc", "1,s");
-  rmwWithReg ("neg", hc08_reg_a);
-  emitBranch ("bcc", tlbl2);
-  rmwWithReg ("inc", hc08_reg_x);
-  emitLabel (tlbl2);
-  rmwWithReg ("neg", hc08_reg_x);
-  transferRegReg (hc08_reg_x, hc08_reg_h, TRUE);
-  emitLabel (tlbl1);
-
-  if (AOP_TYPE(right)==AOP_LIT)
+  
+  if (AOP_TYPE(right) == AOP_LIT)
     {
-      signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
-      /* AND literal negative */
-      if (val < 0) {
+      signed char val = (char) floatFromVal (AOP (right)->aopu.aop_lit);
+
+      if (!rUnsigned && val < 0)
         emitcode ("ldx", "#0x%02x", -val);
-        negLiteral = TRUE;
-      } else {
-        emitcode ("ldx", "#0x%02x", val);
-      }
-      hc08_useReg (hc08_reg_x);
+      else
+        emitcode ("ldx", "#0x%02x", (unsigned char) val);
     }
-  else
+  else /* ! literal */
     {
-      tlbl3 = newiTempLabel (NULL);
       loadRegFromAop (hc08_reg_x, AOP (right), 0);
-      emitBranch ("bpl", tlbl3);
-      emitcode ("inc", "1,s");
-      rmwWithReg ("neg", hc08_reg_x);
-      emitLabel (tlbl3);
+      if (!rUnsigned)
+        {
+          tlbl1 = newiTempLabel (NULL);
+          emitcode ("tstx", "");
+          emitBranch ("bpl", tlbl1);
+          rmwWithReg ("neg", hc08_reg_x);
+          emitLabel (tlbl1);
+        }
     }
+  
+  /* let's see what's needed: */
+  /* apply negative sign during runtime */
+  runtimeSign = FALSE;
+  /* negative sign from literals */
+  compiletimeSign = FALSE;
 
+  /* sign adjust left side */
+  if (AOP_TYPE(left) == AOP_LIT)
+    {
+      signed char val = (char) floatFromVal (AOP (left)->aopu.aop_lit);
+
+      if (!lUnsigned && val < 0)
+        {
+          compiletimeSign = TRUE; /* set sign flag */
+          emitcode ("lda", "#0x%02x", -val);
+        }
+      else
+        emitcode ("lda", "#0x%02x", (unsigned char) val);
+    }
+  else /* ! literal */
+    {
+      if (lUnsigned)
+        loadRegFromAop (hc08_reg_a, AOP (left), 0);
+      else
+        {
+          runtimeSign = TRUE;
+          adjustStack (-1);
+          emitcode ("clr", "1,s");
+          
+          loadRegFromAop (hc08_reg_a, AOP (left), 0);
+          tlbl2 = newiTempLabel (NULL);
+          emitcode ("tsta", "");
+          emitBranch ("bpl", tlbl2);
+          emitcode ("inc", "1,s");
+          rmwWithReg ("neg", hc08_reg_a);
+          emitLabel (tlbl2);
+        }
+    }
+  
+  loadRegFromConst (hc08_reg_h, zero);
   emitcode ("div", "");
   hc08_dirtyReg (hc08_reg_x, FALSE);
   hc08_dirtyReg (hc08_reg_a, FALSE);
   hc08_dirtyReg (hc08_reg_h, FALSE);
 
-  tlbl4 = newiTempLabel (NULL);
-  transferRegReg (hc08_reg_h, hc08_reg_a, TRUE);
-  emitcode ("dec", "1,s");
-  if (negLiteral)
-    emitBranch ("bne", tlbl4);
+  if (runtimeSign || compiletimeSign)
+    {
+      transferRegReg (hc08_reg_h, hc08_reg_a, TRUE);
+      tlbl3 = newiTempLabel (NULL);
+      if (runtimeSign)
+        {
+          pullReg (hc08_reg_x);
+          rmwWithReg ("lsr", hc08_reg_x);
+          rmwWithReg ("ror", hc08_reg_x);
+          emitBranch ("bpl", tlbl3);
+        }
+     
+      rmwWithReg ("neg", hc08_reg_a);
+      if (runtimeSign)
+        emitLabel (tlbl3);
+      
+      storeRegToAop (hc08_reg_a, AOP (result), 0);
+      
+      if (size > 1)
+        {
+          /* msb is 0x00 or 0xff depending on the sign */
+          if (runtimeSign)
+            {
+              rmwWithReg ("lsl", hc08_reg_x);
+              emitcode ("clra", "");
+              emitcode ("sbc", "#0");
+              while (--size)
+                storeRegToAop (hc08_reg_a, AOP (result), ++offset);
+            }
+          else /* compiletimeSign */
+            while (--size)
+              storeConstToAop ("#0xff", AOP (result), ++offset);
+        }
+    }
   else
-    emitBranch ("beq", tlbl4);
-  rmwWithReg ("neg", hc08_reg_a);
-
-  emitLabel (tlbl4);
-  adjustStack (1);
-  storeRegToFullAop (hc08_reg_a, AOP (result), TRUE);
+    {
+      storeRegToFullAop (hc08_reg_h, AOP (result), FALSE);
+    }
+  
   hc08_freeReg (hc08_reg_a);
   hc08_freeReg (hc08_reg_x);
   hc08_freeReg (hc08_reg_h);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -4596,6 +4807,7 @@ genAnd (iCode * ic, iCode * ifx)
   int size, offset = 0;
   unsigned long lit = 0L;
   unsigned long litinv;
+  unsigned char bytemask;
 
   
 //  int bytelit = 0;
@@ -4624,7 +4836,7 @@ genAnd (iCode * ic, iCode * ifx)
       left = tmp;
     }
 
-  /* if left is accumulator & right is not then exchange them */
+  /* if right is accumulator & left is not then exchange them */
   if (AOP_TYPE (right) == AOP_REG && AOP_TYPE (left) != AOP_REG)
     {
       operand *tmp = right;
@@ -4632,42 +4844,62 @@ genAnd (iCode * ic, iCode * ifx)
       left = tmp;
     }
 
-
+  if (AOP_TYPE (right) == AOP_LIT)
+    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+      
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      symbol *tlbl;
-      wassertl (ifx, "AOP_CPY result without ifx");
+      symbol *tlbl = NULL;
+      wassertl (ifx, "AOP_CRY result without ifx");
       
-      tlbl = newiTempLabel (NULL);
       size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
       offset = 0;
       while (size--)
         {
-          loadRegFromAop (hc08_reg_a, AOP (left), offset);
-          if ((AOP_TYPE (right) == AOP_LIT)
-              && (((lit >> (offset*8)) & 0xff) == 0xff))
-            emitcode ("tsta","");
-          else
-            accopWithAop ("and", AOP (right), offset);
-          hc08_freeReg( hc08_reg_a);      
-          if (size)
-            emitBranch ("bne", tlbl);
+          bytemask = (lit >> (offset*8)) & 0xff;
+          
+          if (AOP_TYPE (right) == AOP_LIT && bytemask == 0)
+            {
+              if (isOperandVolatile (left, FALSE))
+                {
+                  loadRegFromAop (hc08_reg_a, AOP (left), offset);
+                  hc08_freeReg( hc08_reg_a);      
+                }
+            }
+          else if (AOP_TYPE (right) == AOP_LIT && bytemask == 0xff)
+            {
+              rmwWithAop ("tst", AOP (left), offset);
+              if (size)
+                {
+                  if (!tlbl)
+                    tlbl = newiTempLabel (NULL);
+                  emitBranch ("bne", tlbl);
+                }
+            }
           else
             {
-              emitLabel (tlbl);
-              genIfxJump (ifx, "a");
+              loadRegFromAop (hc08_reg_a, AOP (left), offset);
+              accopWithAop ("and", AOP (right), offset);
+              hc08_freeReg( hc08_reg_a);
+              if (size)
+                {
+                  if (!tlbl)
+                    tlbl = newiTempLabel (NULL);
+                  emitBranch ("bne", tlbl);
+                }
             }
           offset++;
         }
+        if (tlbl)
+          emitLabel (tlbl);
+        genIfxJump (ifx, "a");
     }
   
   size = AOP_SIZE (result);
 
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
       litinv = (~lit) & (((unsigned int)0xffffffff) >> (8*(4-size))) ;
-
       if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
           (AOP_TYPE (left) == AOP_DIR) && isLiteralBit(litinv))
         {
@@ -4681,12 +4913,29 @@ genAnd (iCode * ic, iCode * ifx)
   offset = 0;
   while (size--)
     {
-      loadRegFromAop (hc08_reg_a, AOP (left), offset);
-      if ((AOP_TYPE (right) != AOP_LIT)
-          || (((lit >> (offset*8)) & 0xff) != 0xff))
-        accopWithAop ("and", AOP (right), offset);
-      storeRegToAop (hc08_reg_a, AOP (result), offset++);
-      hc08_freeReg( hc08_reg_a);      
+      bytemask = (lit >> (offset*8)) & 0xff;
+      
+      if (AOP_TYPE (right) == AOP_LIT && bytemask == 0)
+        {
+          if (isOperandVolatile (left, FALSE))
+            {
+              loadRegFromAop (hc08_reg_a, AOP (left), offset);
+              hc08_freeReg( hc08_reg_a);      
+            }
+          storeConstToAop (zero, AOP (result), offset);
+        }
+      else if (AOP_TYPE (right) == AOP_LIT && bytemask == 0xff)
+        {
+          transferAopAop (AOP (left), offset, AOP (result), offset);
+        }
+      else
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), offset);
+          accopWithAop ("and", AOP (right), offset);
+          storeRegToAop (hc08_reg_a, AOP (result), offset);
+          hc08_freeReg (hc08_reg_a);      
+        }
+      offset++;
     }
 
 release:
@@ -4704,6 +4953,7 @@ genOr (iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long lit = 0L;
+  unsigned char bytemask;
 
   D(emitcode (";     genOr",""));
 
@@ -4736,32 +4986,47 @@ genOr (iCode * ic, iCode * ifx)
       left = tmp;
     }
 
+  if (AOP_TYPE (right) == AOP_LIT)
+    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+      
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      symbol *tlbl;
-      wassertl (ifx, "AOP_CPY result without ifx");
+      symbol *tlbl = NULL;
+      wassertl (ifx, "AOP_CRY result without ifx");
       
-      tlbl = newiTempLabel (NULL);
       size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
       offset = 0;
       while (size--)
         {
-          loadRegFromAop (hc08_reg_a, AOP (left), offset);
-          if ((AOP_TYPE (right) == AOP_LIT)
-              && (((lit >> (offset*8)) & 0xff) == 0))
-            emitcode ("tsta","");
-          else
-            accopWithAop ("ora", AOP (right), offset);
-          hc08_freeReg( hc08_reg_a);      
-          if (size)
-            emitBranch ("bne", tlbl);
+          bytemask = (lit >> (offset*8)) & 0xff;
+          
+          if (AOP_TYPE (right) == AOP_LIT && bytemask == 0x00)
+            {
+              rmwWithAop ("tst", AOP (left), offset);
+              if (size)
+                {
+                  if (!tlbl)
+                    tlbl = newiTempLabel (NULL);
+                  emitBranch ("bne", tlbl);
+                }
+            }
           else
             {
-              emitLabel (tlbl);
-              genIfxJump (ifx, "a");
+              loadRegFromAop (hc08_reg_a, AOP (left), offset);
+              accopWithAop ("ora", AOP (right), offset);
+              hc08_freeReg( hc08_reg_a);
+              if (size)
+                {
+                  if (!tlbl)
+                    tlbl = newiTempLabel (NULL);
+                  emitBranch ("bne", tlbl);
+                }
             }
           offset++;
         }
+        if (tlbl)
+          emitLabel (tlbl);
+        genIfxJump (ifx, "a");
     }
   
   if (AOP_TYPE (right) == AOP_LIT)
@@ -4782,10 +5047,29 @@ genOr (iCode * ic, iCode * ifx)
   offset = 0;
   while (size--)
     {
-      loadRegFromAop (hc08_reg_a, AOP (left), offset);
-      accopWithAop ("ora", AOP (right), offset);
-      storeRegToAop (hc08_reg_a, AOP (result), offset++);
-      hc08_freeReg( hc08_reg_a);      
+      bytemask = (lit >> (offset*8)) & 0xff;
+      
+      if (AOP_TYPE (right) == AOP_LIT && bytemask == 0xff)
+        {
+          if (isOperandVolatile (left, FALSE))
+            {
+              loadRegFromAop (hc08_reg_a, AOP (left), offset);
+              hc08_freeReg( hc08_reg_a);      
+            }
+          transferAopAop (AOP (right), offset, AOP (result), offset);
+        }
+      else if (AOP_TYPE (right) == AOP_LIT && bytemask == 0)
+        {
+          transferAopAop (AOP (left), offset, AOP (result), offset);
+        }
+      else
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), offset);
+          accopWithAop ("ora", AOP (right), offset);
+          storeRegToAop (hc08_reg_a, AOP (result), offset);
+          hc08_freeReg (hc08_reg_a);      
+        }
+      offset++;
     }
 
 
@@ -6279,7 +6563,7 @@ genrshFour (operand * result, operand * left,
 	  loadRegFromAop (hc08_reg_a, AOP (left), 2);
 	  AccLsh (8-shCount);
 	  accopWithAop ("ora", AOP (result), 1);
-	  storeRegToFullAop (hc08_reg_xa, AOP (result), 1);
+	  storeRegToAop (hc08_reg_a, AOP (result), 1);
 	  loadRegFromAop (hc08_reg_xa, AOP (left), 2);
 	  XAccRsh (shCount, sign);
 	  storeRegToAop (hc08_reg_xa, AOP (result), 2);

@@ -16,7 +16,7 @@ SUBRESULTS_DIR = subresults
 
 GENERATE_CASES = generate-cases.py
 
-ALL_PORTS = $(notdir $(wildcard $(PORTS_DIR)/*))
+ALL_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 test-ports:
 	for i in $(ALL_PORTS); do $(MAKE) inter-port-clean test-port PORT=$$i; done

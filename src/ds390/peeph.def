@@ -1059,6 +1059,15 @@ replace {
         mov  dptr,#0x0000
 }
 
+replace {
+	mov dpl,#%1
+	mov dph,#(%1 >> 8)
+	mov dpx,#(%1 >> 16)
+} by {
+	; Peephole 182b used 24 bit load of DPTR
+	mov dptr,#%1
+}
+
 // saves 2 bytes, ?? cycles.
 replace {
         mov  dpl,#%1

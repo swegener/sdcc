@@ -176,7 +176,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
     {
       symbol *newSym=NULL;
 
-
       /* if extern then add it into the extern list */
       if (IS_EXTERN (sym->etype))
 	{
@@ -236,17 +235,17 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	  // create a new "XINIT (CODE)" symbol, that will be emitted later
 	  newSym=copySymbol (sym);
 	  SPEC_OCLS(newSym->etype)=xinit;
-	  sprintf (newSym->name, "_xinit_%s", sym->name);
-	  sprintf (newSym->rname,"_xinit_%s", sym->rname);
+	  sprintf (newSym->name, "__xinit_%s", sym->name);
+	  sprintf (newSym->rname,"__xinit_%s", sym->rname);
 	  SPEC_CONST(newSym->etype)=1;
-	  //SPEC_STAT(newSym->etype)=1;
-	  addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
-	  
+	  SPEC_STAT(newSym->etype)=1;
+	  //addSym (SymbolTab, newSym, newSym->name, 0, 0, 1);
+	  if (!IS_AGGREGATE(sym->type)) {
+	    resolveIvalSym(newSym->ival);
+	  }
 	  // add it to the "XINIT (CODE)" segment
 	  addSet(&xinit->syms, newSym);
-
-	  //fprintf (stderr, "moved %s from xdata to xidata\n", sym->rname);
-	  
+	  sym->ival=NULL;
 	} else {
 	  if (IS_AGGREGATE (sym->type)) {
 	    ival = initAggregates (sym, sym->ival, NULL);
@@ -287,7 +286,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	/* if the ival is a symbol assigned to an aggregate,
 	   (bug #458099 -> #462479)
 	   we don't need it anymore, so delete it from its segment */
-	if (sym->ival->type == INIT_NODE &&
+	if (sym->ival && sym->ival->type == INIT_NODE &&
 	    IS_AST_SYM_VALUE(sym->ival->init.node) &&
 	    IS_AGGREGATE (sym->type) ) {
 	  symIval=AST_SYMBOL(sym->ival->init.node);
@@ -310,24 +309,20 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		   SPEC_ADDR (sym->etype));
 	}
       else {
-	  if (newSym) {
-	      // this has been moved to another segment
-	  } else {
-	      int size = getSize (sym->type);
-	      if (size==0) {
-		  werror(E_UNKNOWN_SIZE,sym->name);
-	      }
-	      /* allocate space */
-	      if (options.debug) {
-		  fprintf (map->oFile, "==.\n");
-	      }
-	      if (IS_STATIC (sym->etype))
-		  tfprintf (map->oFile, "!slabeldef\n", sym->rname);
-	      else
-		  tfprintf (map->oFile, "!labeldef\n", sym->rname);	      
-	      tfprintf (map->oFile, "\t!ds\n", 
-			(unsigned int)  size & 0xffff);
-	  }
+	int size = getSize (sym->type);
+	if (size==0) {
+	  werror(E_UNKNOWN_SIZE,sym->name);
+	}
+	/* allocate space */
+	if (options.debug) {
+	  fprintf (map->oFile, "==.\n");
+	}
+	if (IS_STATIC (sym->etype))
+	  tfprintf (map->oFile, "!slabeldef\n", sym->rname);
+	else
+	  tfprintf (map->oFile, "!labeldef\n", sym->rname);	      
+	tfprintf (map->oFile, "\t!ds\n", 
+		  (unsigned int)  size & 0xffff);
       }
     }
 }

@@ -3951,63 +3951,6 @@ optimizeCompare (ast * root)
   vright = (root->right->type == EX_VALUE ?
 	    root->right->opval.val : NULL);
 
-  //#define EXPERIMENTAL
-#ifdef EXPERIMENTAL
-  /* if left is unsigned and right is literal */
-  if (vleft && vright && 
-      IS_UNSIGNED(vleft->etype) &&
-      IS_LITERAL(vright->etype)) {
-    double dval=floatFromVal(vright);
-    int op=root->opval.op;
-
-    fprintf (stderr,"op: '");
-    switch (op) {
-    case LE_OP: fprintf (stderr, "<= '"); break;
-    case EQ_OP: fprintf (stderr, "== '"); break;
-    case GE_OP: fprintf (stderr, ">= '"); break;
-    default: fprintf (stderr, "%c '", op); break;
-    }
-    fprintf (stderr, "%f\n", dval);
-
-    switch (op)
-      {
-      case EQ_OP:
-      case LE_OP:
-      case '<':
-	if (dval<0 || (op=='<' && dval==0)) {
-	  // unsigned is never < 0
-	  werror (W_IF_NEVER_TRUE);
-	  optExpr = newAst_VALUE (constVal("0"));
-	  return decorateType (optExpr);
-	}
-	if (dval==0) {
-	  if (op==LE_OP) {
-	    // change this into a cheaper EQ_OP
-	    fprintf (stderr, "warning *** changed '<=' to '==' because of unsigned\n");
-	    root->opval.op=EQ_OP;
-	    return root;
-	  }
-	}
-	break;
-      case GE_OP:
-      case '>':
-	if (dval>0 || (op==GE_OP && dval==0)) {
-	  // unsigned is never < 0
-	  werror (W_IF_ALWAYS_TRUE);
-	  optExpr = newAst_VALUE (constVal("1"));
-	  return decorateType (optExpr);
-	}
-	if (dval==0) {
-	  if (op=='>') {
-	    // change this into a cheaper reversed EQ_OP
-	    fprintf (stderr, "warning *** changed '>' to '!=' because of unsigned\n");
-	    root->opval.op=EQ_OP;
-	  }
-	}
-      }
-  }
-#endif
-
   /* if left is a BITVAR in BITSPACE */
   /* and right is a LITERAL then opt- */
   /* imize else do nothing       */

@@ -14,7 +14,7 @@ BuildRoot: /tmp/sdcc
 SDC is a C compiler for 8051 class and similar microcontrollers.
 The packge includes the compiler, assemblers and linkers, a device
 simulator and a core library. The processors supported (to a varying
-degree) include the 8051, avr, ds390, PIC, i186 and z80.
+degree) include the 8051, avr, ds390, PIC, and z80.
 
 %prep
 %setup -n sdcc

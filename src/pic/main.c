@@ -297,6 +297,7 @@ PORT pic_port =
   "_",
   _pic14_init,
   _pic14_parseOptions,
+  NULL,
   _pic14_finaliseOptions,
   _pic14_setDefaultOptions,
   pic14_assignRegisters,

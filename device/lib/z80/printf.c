@@ -87,3 +87,20 @@ int printf(const char *format, ...)
     /* PENDING: What to return? */
     return 0;
 }
+
+STATIC void _buf_emitter(char c, void *pData)
+{
+  *((*((char **)pData)))++ = c;
+}
+
+int sprintf(char *pInto, const char *format, ...)
+{
+    va_list va;
+    va_start(va, format);
+
+    _printf(format, _buf_emitter, &pInto, va);
+    *pInto++ = '\0';
+
+    /* PENDING: What to return? */
+    return 0;
+}

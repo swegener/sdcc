@@ -205,6 +205,13 @@ static struct
     int pushedBC;
     int pushedDE;
   } stack;
+
+  struct
+  {
+    int pushedBC;
+    int pushedDE;
+  } calleeSaves;
+
   int frameId;
   int receiveOffset;
   bool flushStatics;
@@ -1024,6 +1031,11 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic)
   if (aop->type == AOP_PAIRPTR && IS_Z80 && aop->aopu.aop_pairId == PAIR_DE)
     {
       _pop (aop->aopu.aop_pairId);
+    }
+
+  if (getPairId (aop) == PAIR_HL)
+    {
+      spillPair (PAIR_HL);
     }
 
 dealloc:
@@ -1898,6 +1910,7 @@ movLeft2ResultLong (operand * left, int offl,
           emit2 ("ld a,%s", aopGet (AOP (left), LSB, FALSE));
           emit2 ("ld h,%s", aopGet (AOP (left), MSB16, FALSE));
           emit2 ("ld l,a");
+	  spillPair (PAIR_HL);
         }
       else if ( getPairId ( AOP (result)) == PAIR_IY)
         {
@@ -2847,10 +2860,8 @@ genFunction (iCode * ic)
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   sym_link *ftype;
 
-#if CALLEE_SAVES
   bool bcInUse = FALSE;
   bool deInUse = FALSE;
-#endif
 
   setArea (IFFUNC_NONBANKED (sym->type));
 
@@ -2889,9 +2900,13 @@ genFunction (iCode * ic)
 
   _G.stack.param_offset = 0;
 
-#if CALLEE_SAVES
+  if (z80_opts.calleeSavesBC)
+    {
+      bcInUse = TRUE;
+    }
+
   /* Detect which registers are used. */
-  if (sym->regsUsed)
+  if (IFFUNC_CALLEESAVES(sym->type) && sym->regsUsed)
     {
       int i;
       for (i = 0; i < sym->regsUsed->size; i++)
@@ -2924,7 +2939,7 @@ genFunction (iCode * ic)
       _G.stack.param_offset += 2;
     }
 
-  _G.stack.pushedBC = bcInUse;
+  _G.calleeSaves.pushedBC = bcInUse;
 
   if (deInUse)
     {
@@ -2932,8 +2947,7 @@ genFunction (iCode * ic)
       _G.stack.param_offset += 2;
     }
 
-  _G.stack.pushedDE = deInUse;
-#endif
+  _G.calleeSaves.pushedDE = deInUse;
 
   /* adjust the stack for the function */
   _G.stack.last = sym->stack;
@@ -2979,19 +2993,17 @@ genEndFunction (iCode * ic)
           emit2 ("!leave");
         }
 
-#if CALLEE_SAVES
-      if (_G.stack.pushedDE) 
+      if (_G.calleeSaves.pushedDE) 
         {
           emit2 ("pop de");
-          _G.stack.pushedDE = FALSE;
+          _G.calleeSaves.pushedDE = FALSE;
         }
 
-      if (_G.stack.pushedDE) 
+      if (_G.calleeSaves.pushedBC) 
         {
           emit2 ("pop bc");
-          _G.stack.pushedDE = FALSE;
+          _G.calleeSaves.pushedBC = FALSE;
         }
-#endif
 
       if (options.profile) 
         {
@@ -5371,9 +5383,12 @@ shiftL2Left2Result (operand * left, int offl,
       movLeft2Result (left, offl + 1, result, offr + 1, 0);
     }
 
-  if (shCount == 1 && getPairId (AOP (result)) == PAIR_HL)
+  if (getPairId (AOP (result)) == PAIR_HL)
     {
-      emit2 ("add hl,hl");
+      while (shCount--)
+	{
+	  emit2 ("add hl,hl");
+	}
     }
   else
     {
@@ -5385,34 +5400,56 @@ shiftL2Left2Result (operand * left, int offl,
     tlbl = newiTempLabel (NULL);
     tlbl1 = newiTempLabel (NULL);
 
-    /* Left is already in result - so now do the shift */
-    if (shCount > 1)
+    if (AOP (result)->type == AOP_REG)
       {
-	emit2 ("ld a,!immedbyte+1", shCount);
-	emit2 ("!shortjp !tlabel", tlbl1->key + 100);
-	emitLabel (tlbl->key + 100);
+	while (shCount--)
+	  {
+	    for (offset = 0; offset < size; offset++)
+	      {
+		l = aopGet (AOP (result), offset, FALSE);
+	    
+		if (offset == 0)
+		  {
+		    emit2 ("sla %s", l);
+		  }
+		else
+		  {
+		    emit2 ("rl %s", l);
+		  }
+	      }
+	  }
       }
-
-    while (size--)
+    else
       {
-	l = aopGet (AOP (result), offset, FALSE);
+	/* Left is already in result - so now do the shift */
+	if (shCount > 1)
+	  {
+	    emit2 ("ld a,!immedbyte+1", shCount);
+	    emit2 ("!shortjp !tlabel", tlbl1->key + 100);
+	    emitLabel (tlbl->key + 100);
+	  }
 
-        if (offset == 0)
-          {
-            emit2 ("sla %s", l);
-          }
-        else
-          {
-            emit2 ("rl %s", l);
-          }
-
-        offset++;
-      }
-    if (shCount > 1)
-      {
-	emitLabel (tlbl1->key + 100);
-	emit2 ("dec a");
-	emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+	while (size--)
+	  {
+	    l = aopGet (AOP (result), offset, FALSE);
+	    
+	    if (offset == 0)
+	      {
+		emit2 ("sla %s", l);
+	      }
+	    else
+	      {
+		emit2 ("rl %s", l);
+	      }
+	    
+	    offset++;
+	  }
+	if (shCount > 1)
+	  {
+	    emitLabel (tlbl1->key + 100);
+	    emit2 ("dec a");
+	    emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+	  }
       }
   }
 }
@@ -6030,6 +6067,7 @@ genGenPointerGet (operand * left,
       emit2 ("inc hl");
       emit2 ("ld h,!*hl");
       emit2 ("ld l,a");
+      spillPair (PAIR_HL);
     }
   else if (getPairId (AOP (left)) == PAIR_HL && !isLastUse (ic, left))
     {

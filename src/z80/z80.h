@@ -15,6 +15,7 @@ Z80_SUB_PORT;
 typedef struct
   {
     Z80_SUB_PORT sub;
+    int calleeSavesBC;
   }
 Z80_OPTS;
 

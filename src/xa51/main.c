@@ -271,6 +271,7 @@ PORT xa51_port =
   "_",
   _xa51_init,
   _xa51_parseOptions,
+  NULL,
   _xa51_finaliseOptions,
   _xa51_setDefaultOptions,
   xa51_assignRegisters,

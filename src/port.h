@@ -6,6 +6,7 @@
 #define PORT_INCLUDE
 
 #include "SDCCicode.h"
+#include "SDCCargs.h"
 
 #define TARGET_ID_MCS51    1
 #define TARGET_ID_GBZ80    2
@@ -13,8 +14,6 @@
 #define TARGET_ID_AVR      4
 #define TARGET_ID_DS390    5
 #define TARGET_ID_PIC      6
-#define TARGET_ID_I186     7
-#define TARGET_ID_TLCS900H 8
 #define TARGET_ID_XA51     9
 
 /* Macro to test the target we are compiling for.
@@ -26,8 +25,6 @@
 #define TARGET_IS_AVR (port->id==TARGET_ID_AVR)
 #define TARGET_IS_DS390 (port->id==TARGET_ID_DS390)
 #define TARGET_IS_PIC   (port->id==TARGET_ID_PIC)
-#define TARGET_IS_I186 (port->id==TARGET_ID_I186)
-#define TARGET_IS_TCLS900H (port->id==TARGET_ID_TCLS900H)
 #define TARGET_IS_XA51 (port->id==TARGET_ID_XA51)
 
 #define MAX_BUILTIN_ARGS	16
@@ -187,6 +184,9 @@ typedef struct
     void (*init) (void);
 /** Parses one option + its arguments */
       bool (*parseOption) (int *pargc, char **argv, int *i);
+/** Optional list of automatically parsed options.  Should be
+    implemented to at least show the help text correctly. */
+    OPTION *poptions;
 /** Called after all the options have been parsed. */
     void (*finaliseOptions) (void);
     /** Called after the port has been selected but before any
@@ -277,12 +277,6 @@ extern PORT ds390_port;
 #endif
 #if !OPT_DISABLE_PIC
 extern PORT pic_port;
-#endif
-#if !OPT_DISABLE_I186
-extern PORT i186_port;
-#endif
-#if !OPT_DISABLE_TLCS900H
-extern PORT tlcs900h_port;
 #endif
 #if !OPT_DISABLE_TININative
 extern PORT tininative_port;

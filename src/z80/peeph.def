@@ -201,3 +201,12 @@ replace {
 	ld	e,l
 	ld	d,h
 }
+replace {
+	ld	%1,%2
+	ld	%3,%4
+	ld	%2,%1
+	ld	%4,%3
+} by {
+	ld	%1,%2
+	ld	%3,%4
+}

@@ -30,6 +30,7 @@
 #include "MySystem.h"
 #include "SDCCmacro.h"
 #include "SDCCutil.h"
+#include "SDCCargs.h"
 
 #if NATIVE_WIN32
 #include <process.h>
@@ -115,26 +116,6 @@ char DefaultExePath[128];
 #define OPTION_SHORT_IS_8BITS 	"--short-is-8bits"
 #define OPTION_TINI_LIBID 	"--tini-libid"
 
-/** Table of all options supported by all ports.
-    This table provides:
-      * A reference for all options.
-      * An easy way to maintain help for the options.
-      * Automatic support for setting flags on simple options.
-*/
-typedef struct {
-    /** The short option character e.g. 'h' for -h.  0 for none. */
-    char shortOpt;
-    /** Long option e.g. "--help".  Includes the -- prefix.  NULL for
-        none. */
-    const char *longOpt;
-    /** Pointer to an int that will be incremented every time the
-        option is encountered.  May be NULL.
-    */
-    int *pparameter;
-    /** Help text to go with this option.  May be NULL. */
-    const char *help;
-} OPTION;
-
 static const OPTION 
 optionsTable[] = {
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
@@ -214,7 +195,9 @@ optionsTable[] = {
     { 0,    "--stack-probe",   	    &options.stack_probe,"insert call to function __stack_probe at each function prologue"},
     { 0,    "--tini-libid",   	    NULL,"<nnnn> LibraryID used in -mTININative"},
     { 0,    "--protect-sp-update",  &options.protect_sp_update,"DS390 - will disable interrupts during ESP:SP updates"},
-    { 0,    "--parms-in-bank1",	    &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"}
+    { 0,    "--parms-in-bank1",	    &options.parms_in_bank1,"MCS51/DS390 - use Bank1 for parameter passing"},
+    /* End of options */
+    { 0,    NULL }
 };
 
 /** Table of all unsupported options and help text to display when one
@@ -275,12 +258,6 @@ static PORT *_ports[] =
 #endif
 #if !OPT_DISABLE_PIC
   &pic_port,
-#endif
-#if !OPT_DISABLE_I186
-  &i186_port,
-#endif
-#if !OPT_DISABLE_TLCS900H
-  &tlcs900h_port,
 #endif
 #if !OPT_DISABLE_TININative
   &tininative_port,
@@ -389,6 +366,21 @@ printVersionInfo ()
     );
 }
 
+static void
+printOptions(const OPTION *optionsTable)
+{
+  int i;
+  for (i = 0; optionsTable[i].shortOpt != 0 || optionsTable[i].longOpt != NULL; i++) 
+    {
+      fprintf(stdout, "  %c%c  %-20s  %s\n", 
+	      optionsTable[i].shortOpt !=0 ? '-' : ' ',
+	      optionsTable[i].shortOpt !=0 ? optionsTable[i].shortOpt : ' ',
+	      optionsTable[i].longOpt != NULL ? optionsTable[i].longOpt : "",
+	      optionsTable[i].help != NULL ? optionsTable[i].help : ""
+	      );
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* printUsage - prints command line syntax         */
 /*-----------------------------------------------------------------*/
@@ -402,14 +394,17 @@ printUsage ()
              "Options :-\n"
              );
     
-    for (i = 0; i < LENGTH(optionsTable); i++) {
-        fprintf(stdout, "  %c%c  %-20s  %s\n", 
-                optionsTable[i].shortOpt !=0 ? '-' : ' ',
-                optionsTable[i].shortOpt !=0 ? optionsTable[i].shortOpt : ' ',
-                optionsTable[i].longOpt != NULL ? optionsTable[i].longOpt : "",
-                optionsTable[i].help != NULL ? optionsTable[i].help : ""
-                );
-    }
+    printOptions(optionsTable);
+
+    for (i = 0; i < NUM_PORTS; i++)
+      {
+	if (_ports[i]->poptions != NULL)
+	  {
+	    fprintf (stdout, "\nSpecial options for the %s port:\n", _ports[i]->target);
+	    printOptions (_ports[i]->poptions);
+	  }
+      }
+
     exit (0);
 }
 
@@ -693,13 +688,44 @@ tryHandleUnsupportedOpt(char **argv, int *pi)
 }
 
 static bool
+scanOptionsTable(const OPTION *optionsTable, char shortOpt, const char *longOpt, char **argv, int *pi)
+{
+  int i;
+  for (i = 0; optionsTable[i].shortOpt != 0 || optionsTable[i].longOpt != NULL; i++)
+    {
+      if (optionsTable[i].shortOpt == shortOpt ||
+	  (longOpt && optionsTable[i].longOpt && 
+	   strcmp(optionsTable[i].longOpt, longOpt) == 0))
+	{
+
+	  // If it is a flag then we can handle it here
+	  if (optionsTable[i].pparameter != NULL) 
+	    {
+	      if (optionsTable[i].shortOpt == shortOpt)
+		{
+		  verifyShortOption(argv[*pi]);
+		}
+
+	      (*optionsTable[i].pparameter)++;
+	      return 1;
+	    }
+	  else {
+	    // Not a flag.  Handled manually later.
+	    return 0;
+	  }
+	}
+    }
+  // Didn't find in the table
+  return 0;
+}
+
+static bool
 tryHandleSimpleOpt(char **argv, int *pi)
 {
     if (argv[*pi][0] == '-') 
         {
             const char *longOpt = "";
             char shortOpt = -1;
-            int i;
 
             if (argv[*pi][1] == '-') 
                 {
@@ -711,32 +737,19 @@ tryHandleSimpleOpt(char **argv, int *pi)
                     shortOpt = argv[*pi][1];
                 }
 
-            for (i = 0; i < LENGTH(optionsTable); i++) 
-              {
-                if (optionsTable[i].shortOpt == shortOpt ||
-                    (longOpt && optionsTable[i].longOpt && 
-                     strcmp(optionsTable[i].longOpt, longOpt) == 0))
-                  {
-
-                    // If it is a flag then we can handle it here
-                    if (optionsTable[i].pparameter != NULL) 
-                      {
-                        if (optionsTable[i].shortOpt == shortOpt)
-                          {
-                            verifyShortOption(argv[*pi]);
-                          }
-
-                        (*optionsTable[i].pparameter)++;
-                        return 1;
-                      }
-                    else {
-                      // Not a flag.  Handled manually later.
-                      return 0;
-                    }
-                  }
-              }
-            // Didn't find in the table
-            return 0;
+	    if (scanOptionsTable(optionsTable, shortOpt, longOpt, argv, pi))
+	      {
+		return 1;
+	      }
+	    else if (port && port->poptions &&
+		     scanOptionsTable(port->poptions, shortOpt, longOpt, argv, pi))
+	      {
+		return 1;
+	      }
+	    else
+	      {
+		return 0;
+	      }
         }
     else 
         {

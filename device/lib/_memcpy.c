@@ -40,10 +40,9 @@ void * memcpy (
 
 	char * d = dst;
 	char * s = src;
-	int count = -acount;
+	/* PENDING: Divide first to get around sign problems */
+	int count = -(acount/4);
 
-        count /= 4;
-        
         while (count) {
 		*d++ = *s++;
 		*d++ = *s++;

@@ -1,3 +1,17 @@
+2002-04-15  Michael Hope  <michaelh@vroom>
+
+	* device/lib/z80/printf.c (sprintf): Added.
+
+	* src/z80/ralloc.c (packRegisters): Disabled pack HL use for GB as it's broken.
+
+	* src/z80/peeph.def: Added transpose redundent load rule.
+
+	* src/z80/main.c: Added force callee saves for jaune.
+
+	* src/port.h: Removed the i186 and tlcs-900h ports as they weren't being being developed.
+
+	* src/SDCCmain.c: Pulled the options definition out so that you can add port specific options without changing the main file.
+
 2002-03-28  Johan Knol  <johan@balder>
 
 	* src/SDCCval.c: fixed bug #532436
@@ -35,7 +49,11 @@
 	* src/pic/device.c:
 	Added. device.c is a PIC port hack to accomodate variations
 	in PIC devices.
-	
+
+2002-03-13  Michael Hope  <michaelh@vroom>
+
+	* src/z80/gen.c (genGenPointerGet): Fixed a bug where a pointer in HL is dereferenced into HL but HL is not spilled.  Yeah.
+
 2002-03-04  johanknol  <johanknol@manik>
 
 	* /src/SDCCval.c: fixed
@@ -87,6 +105,7 @@
 
 	* sdcc/src/SDCCcse.c: Better fix for bug # 514308
 
+>>>>>>> 1.105
 2002-03-02    <johan@FRIJA>
 
 	* src/SDCCast.c (decorateType): fixed bug #524708

@@ -36,8 +36,6 @@
 #undef OPT_DISABLE_GBZ80
 #undef OPT_DISABLE_MCS51
 #undef OPT_DISABLE_AVR
-#define OPT_DISABLE_I186      1
-#define OPT_DISABLE_TLCS900H  1
 
 #endif
 

@@ -203,6 +203,7 @@ PORT avr_port = {
 	"_",
 	_avr_init,
 	_avr_parseOptions,
+	NULL,
 	_avr_finaliseOptions,
 	_avr_setDefaultOptions,
 	avr_assignRegisters,

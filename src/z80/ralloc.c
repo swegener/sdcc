@@ -2895,10 +2895,16 @@ packRegisters (eBBlock * ebp)
 
       if (!DISABLE_PACK_HL && IS_ITEMP (IC_RESULT (ic)))
 	{
+	  /* PENDING */
           if (IS_GB)
-            packRegsForHLUse (ic);
+	    {
+	      if (0)
+		packRegsForHLUse (ic);
+	    }
           else
-            packRegsForHLUse3 (ic, IC_RESULT (ic), ebp);
+	    {
+	      packRegsForHLUse3 (ic, IC_RESULT (ic), ebp);
+	    }
 	}
 
       if (!DISABLE_PACK_IY && IS_ITEMP (IC_RESULT (ic)) && IS_Z80)

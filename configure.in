@@ -275,24 +275,6 @@ else
     AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC, 0)
 fi
 
-AC_ARG_ENABLE(i186-port,[  --disable-i186-port     Excludes the I186 port])
-echo izt >>ports.all
-if test "$enable_i186_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_I186, 1)
-else
-    echo izt >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_I186, 0)
-fi
-
-AC_ARG_ENABLE(tlcs900h-port,[  --disable-tlcs900h-port Excludes the TLCS900H port])
-echo izt >>ports.all
-if test "$enable_tlcs900h_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_TLCS900H, 1)
-else
-    echo izt >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_TLCS900H, 0)
-fi
-
 AC_ARG_ENABLE(xa51-port,[  --disable-xa51-port Excludes the XA51 port])
 echo xa51 >>ports.all
 if test "$enable_xa51_port" = "no"; then

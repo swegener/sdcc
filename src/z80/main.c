@@ -41,6 +41,12 @@ static char _gbz80_defaultRules[] =
 
 Z80_OPTS z80_opts;
 
+static OPTION _z80_options[] = 
+  {
+    { 0,   "--callee-saves-bc", &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
+    { 0, NULL }
+  };
+
 typedef enum
   {
     /* Must be first */
@@ -511,6 +517,7 @@ PORT z80_port =
   "_",
   _z80_init,
   _parseOptions,
+  _z80_options,
   _finaliseOptions,
   _setDefaultOptions,
   z80_assignRegisters,
@@ -604,6 +611,7 @@ PORT gbz80_port =
   "_",
   _gbz80_init,
   _parseOptions,
+  _z80_options,
   _finaliseOptions,
   _setDefaultOptions,
   z80_assignRegisters,

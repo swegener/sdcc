@@ -1,7 +1,7 @@
 CC = sdcc
 #CFLAGS = -V
-MFLAGS = --model-small --stack-after-data
-#MFLAGS = --model-large --stack-after-data
+MFLAGS = --model-small --debug
+#MFLAGS = --model-large
 LFLAGS = --xram-loc 0x4000 --code-loc 0x0000
 
 all: clock.bin

@@ -326,6 +326,14 @@ DEFSETFUNC (findCheaperOp)
 	  (*opp)->isaddr = cop->isaddr;
 	}
 
+      if ((*opp)->type==VALUE && 
+	  IS_SYMOP(cop) && 
+	  !IS_SPEC(OP_SYMBOL(cop)->type)) {
+	// this could be a pointer to some space, so we can not
+	*opp=NULL;
+	return 0;
+      }
+
       return 1;
 
     }

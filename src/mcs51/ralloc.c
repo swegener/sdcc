@@ -2003,7 +2003,7 @@ static void packForPush(iCode *ic, eBBlock *ebp)
 				bitVectFirstBit(OP_DEFS(IC_LEFT(ic))))))
 	return ;
 
-    if (dic->op != '=' || POINTER_SET(dic))
+    if (dic->op != '=' || POINTER_SET(dic) || IS_ITEMP(IC_RESULT(dic)))
 	return;
 
     /* we now we know that it has one & only one def & use

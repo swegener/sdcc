@@ -1226,7 +1226,12 @@ bool isConformingBody (ast *pbody, symbol *sym, ast *body)
 		return FALSE;
 	    else
 		return isConformingBody(pbody->left,sym,body) ;
-	} 
+	} else {
+	    if (astHasSymbol(pbody->left,sym) ||
+		astHasSymbol(pbody->right,sym))
+		return FALSE;
+	}
+
 	
 	/*------------------------------------------------------------------*/
     case  '|':

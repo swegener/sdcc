@@ -74,6 +74,7 @@ OPTYPE;
 #define OP_LIVETO(op)      op->operand.symOperand->liveTo
 #define OP_REQV(op)        op->operand.symOperand->reqv
 #define OP_ISLIVE_FCALL(op) (IS_ITEMP(op) && OP_SYMBOL(op)->isLiveFcall)
+#define SYM_SPIL_LOC(sym)  sym->usl.spillLoc
 
 /* typedef for operand */
 typedef struct operand

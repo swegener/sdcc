@@ -2402,8 +2402,8 @@ genCall (iCode * ic)
 	  emitcode ("mov","a,sp");
 	  emitcode ("subb","a,#0x%02x",ic->parmBytes & 0xff);
 	  emitcode ("mov","sp,a");
-	  emitcode ("mov","a,#0x%02x",(ic->parmBytes >> 8) & 0xff);
-	  emitcode ("subb","a,esp");
+	  emitcode ("mov","a,esp");
+	  emitcode ("subb","a,#0x%02x",(ic->parmBytes >> 8) & 0xff);
 	  emitcode ("mov","esp,a");	  
       } else {
 	  int i;

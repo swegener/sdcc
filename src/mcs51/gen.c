@@ -9423,28 +9423,97 @@ release:
 static void
 genJumpTab (iCode * ic)
 {
-  symbol *jtab;
+  symbol *jtab,*jtablo,*jtabhi;
   char *l;
+  unsigned int count;
 
   D(emitcode (";     genJumpTab",""));
 
-  aopOp (IC_JTCOND (ic), ic, FALSE);
-  /* get the condition into accumulator */
-  l = aopGet (AOP (IC_JTCOND (ic)), 0, FALSE, FALSE);
-  MOVA (l);
-  /* multiply by three */
-  emitcode ("add", "a,acc");
-  emitcode ("add", "a,%s", aopGet (AOP (IC_JTCOND (ic)), 0, FALSE, FALSE));
-  freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
+  count = elementsInSet( IC_JTLABELS (ic) );
 
-  jtab = newiTempLabel (NULL);
-  emitcode ("mov", "dptr,#%05d$", jtab->key + 100);
-  emitcode ("jmp", "@a+dptr");
-  emitcode ("", "%05d$:", jtab->key + 100);
-  /* now generate the jump labels */
-  for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
-       jtab = setNextItem (IC_JTLABELS (ic)))
-    emitcode ("ljmp", "%05d$", jtab->key + 100);
+  if( count <= 16 )
+    {
+      /* this algorithm needs 9 cycles and 7 + 3*n bytes 
+         if the switch argument is in an register. 
+         (8 cycles and 6+2*n bytes if peepholes can change ljmp to sjmp) */ 
+      aopOp (IC_JTCOND (ic), ic, FALSE);
+      /* get the condition into accumulator */
+      l = aopGet (AOP (IC_JTCOND (ic)), 0, FALSE, FALSE);
+      MOVA (l);
+      /* multiply by three */
+      emitcode ("add", "a,acc");
+      emitcode ("add", "a,%s", aopGet (AOP (IC_JTCOND (ic)), 0, FALSE, FALSE));
+      freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
+
+      jtab = newiTempLabel (NULL);
+      emitcode ("mov", "dptr,#%05d$", jtab->key + 100);
+      emitcode ("jmp", "@a+dptr");
+      emitcode ("", "%05d$:", jtab->key + 100);
+      /* now generate the jump labels */
+      for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
+           jtab = setNextItem (IC_JTLABELS (ic)))
+        emitcode ("ljmp", "%05d$", jtab->key + 100);
+    }
+  else
+    {
+      /* this algorithm needs 14 cycles and 13 + 2*n bytes 
+         if the switch argument is in an register. 
+         For n>6 this algorithm may be more compact */ 
+      jtablo = newiTempLabel (NULL);
+      jtabhi = newiTempLabel (NULL);
+
+      /* get the condition into accumulator.
+         Using b as temporary storage, if register push/pop is needed */ 
+      aopOp (IC_JTCOND (ic), ic, FALSE);
+      l = aopGet (AOP (IC_JTCOND (ic)), 0, FALSE, FALSE);
+      if ((AOP_TYPE (IC_JTCOND (ic)) == AOP_R0 && _G.r0Pushed) ||
+          (AOP_TYPE (IC_JTCOND (ic)) == AOP_R1 && _G.r1Pushed))
+        {
+          emitcode ("mov", "b,%s", l);
+          l = "b";
+        }
+      freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);            
+      MOVA (l);      
+      if( count <= 112 )
+        {
+          emitcode ("add", "a,#(%05d$-3-.)", jtablo->key + 100);
+          emitcode ("movc", "a,@a+pc");
+          emitcode ("push", "acc");
+
+          MOVA (l);
+          emitcode ("add", "a,#(%05d$-3-.)", jtabhi->key + 100);
+          emitcode ("movc", "a,@a+pc");
+          emitcode ("push", "acc");
+        }
+      else	
+        {
+          /* this scales up to n<=255, but needs two more bytes
+             and changes dptr */
+          emitcode ("mov", "dptr,#%05d$", jtablo->key + 100);
+          emitcode ("movc", "a,@a+dptr");
+          emitcode ("push", "acc");
+
+          MOVA (l);
+          emitcode ("mov", "dptr,#%05d$", jtabhi->key + 100);
+          emitcode ("movc", "a,@a+dptr");
+          emitcode ("push", "acc");
+        }
+
+      emitcode ("ret", "");
+
+      /* now generate jump table, LSB */
+      emitcode ("", "%05d$:", jtablo->key + 100);
+      for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
+           jtab = setNextItem (IC_JTLABELS (ic)))
+        emitcode (".db", "%05d$", jtab->key + 100);
+
+      /* now generate jump table, MSB */
+      emitcode ("", "%05d$:", jtabhi->key + 100);
+      for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab;
+           jtab = setNextItem (IC_JTLABELS (ic)))
+         emitcode (".db", "%05d$>>8", jtab->key + 100);
+    
+    }  
 
 }
 

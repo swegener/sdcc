@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
   vprintf.c - formatted output conversion
- 
+
              Written By - Martijn van Balen aed@iae.nl (1999)
 	     Added %f By - johan.knol@iduna.nl (2000)
 
@@ -8,19 +8,19 @@
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 /* this module uses some global variables instead function parameters, so: */
@@ -37,7 +37,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#define PTR value.p 
+#define PTR value.p
 
 #ifdef SDCC_ds390
 #define NULL_STRING "<NULL>"
@@ -438,7 +438,7 @@ get_conversion_spec:
 	output_char(':');
 	output_char('0');
 	output_char('x');
-	if ((value.byte[2] != 0x00 /* DSEG */) && 
+	if ((value.byte[2] != 0x00 /* DSEG */) &&
 	    (value.byte[2] != 0x03 /* SSEG */))
 	  output_2digits( value.byte[1] );
 	output_2digits( value.byte[0] );
@@ -553,7 +553,7 @@ _endasm;
           lsd = ~lsd;
 	} while( (value.byte[0] != 0) || (value.byte[1] != 0) ||
 		 (value.byte[2] != 0) || (value.byte[3] != 0) );
-	
+
 	if (width == 0)
 	{
 	  // default width. We set it to 1 to output
@@ -563,7 +563,7 @@ _endasm;
 	}
 
 	/* prepend spaces if needed */
-	if (!zero_padding)
+	if (!zero_padding && !left_justify)
 	{
 	  while ( width > length+1 )
 	  {
@@ -596,9 +596,18 @@ _endasm;
 	}
 
 	/* prepend zeroes/spaces if needed */
-	while ( width-- > length )
+	if (!left_justify)
+	  while ( width-- > length )
+	  {
+	    output_char( zero_padding ? '0' : ' ' );
+	  }
+	else
 	{
-	  output_char( zero_padding ? '0' : ' ' );
+	  /* spaces are appended after the digits */
+	  if (width > length)
+	    width -= length;
+	  else
+	    width = 0;
 	}
 
 	/* output the digits */
@@ -623,6 +632,9 @@ _endasm;
 
 	  output_digit( value.byte[4] );
 	}
+	if (left_justify)
+	  while (width-- > 0)
+	    output_char(' ');
       }
     }
     else
@@ -631,7 +643,7 @@ _endasm;
       output_char( c );
     }
   }
-       
+
   // Copy \0 to the end of buf
   // Modified by JB 17/12/99
   if (output_to_string) {

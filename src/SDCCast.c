@@ -864,8 +864,16 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 
       /* no of elements given and we    */
       /* have generated for all of them */
-      if (!--lcnt)
+      if (!--lcnt) {
+	/* if initializers left */
+	if (iloop) {
+	  // there has to be a better way
+	  char *name=sym->opval.val->sym->name;
+	  int lineno=sym->opval.val->sym->lineDef;
+	  werror (W_EXESS_ARRAY_INITIALIZERS, name, lineno);
+	}
 	break;
+      }
     }
 
   /* if we have not been given a size  */

@@ -597,7 +597,7 @@ type_specifier2
    | CONST  {
                $$=newLink();
 	       $$->class = SPECIFIER ;
-	       SPEC_SCLS($$) = S_CONSTANT ;
+	       //SPEC_SCLS($$) = S_CONSTANT ;
 	       SPEC_CONST($$) = 1;
             }
    | VOLATILE  {

@@ -345,6 +345,10 @@ struct
     "both long and short specified for %s '%s'" },
 { E_SIGNED_AND_UNSIGNED_INVALID, ERROR_LEVEL_ERROR,
     "both signed and unsigned specified for %s '%s'" },
+{ E_TWO_OR_MORE_STORAGE_CLASSES, ERROR_LEVEL_ERROR,
+    "two or more storage classes in declaration for '%s'" },
+{ W_EXESS_ARRAY_INITIALIZERS, ERROR_LEVEL_WARNING,
+    "excess elements in array initializer after `%s' at line %d" },
 };
 /*
 -------------------------------------------------------------------------------

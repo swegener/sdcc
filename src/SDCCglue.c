@@ -692,8 +692,13 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 
       /* no of elements given and we    */
       /* have generated for all of them */
-      if (!--lcnt)
+      if (!--lcnt) {
+	/* if initializers left */
+	if (iloop) {
+	  werror (W_EXESS_ARRAY_INITIALIZERS, sym->name, sym->lineDef);
+	}
 	break;
+      }
     }
 
   /* if we have not been given a size  */

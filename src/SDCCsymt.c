@@ -107,7 +107,7 @@ addSym (bucket ** stab,
     fprintf (stderr, "addSym: %s\n", sname);
   }
   /* Make sure sym is a symbol and not a structdef */
-  if (StructTab!=stab) checkTypeSanity(((symbol *)sym)->etype, sname);
+  if (StructTab!=stab) checkTypeSanity((symbol *)sym);
 
   /* the symbols are always added at the head of the list  */
   i = hashKey (sname);
@@ -455,49 +455,55 @@ addDecl (symbol * sym, int type, sym_link * p)
   checkTypeSanity: prevent the user from doing e.g.:
   unsigned float uf;
   ------------------------------------------------------------------*/
-void checkTypeSanity(sym_link *dest, char *name) {
+void checkTypeSanity(symbol *sym) {
   char *noun;
+  sym_link *etype=sym->etype;
+  char *name=sym->name;
 
-  if (!dest) {
+  if (!etype) {
     if (getenv("DEBUG_SANITY")) {
       printf ("sanity check skipped for %s\n", name);
     }
     return;
   }
 
-  noun=nounName(dest);
+  noun=nounName(etype);
 
   if (getenv("DEBUG_SANITY")) {
     printf ("checking sanity for %s\n", name);
   }
 
-  if ((SPEC_NOUN(dest)==V_CHAR || 
-       SPEC_NOUN(dest)==V_FLOAT || 
-       SPEC_NOUN(dest)==V_DOUBLE || 
-       SPEC_NOUN(dest)==V_VOID) &&
-      (SPEC_SHORT(dest) || SPEC_LONG(dest))) {
+  if ((SPEC_NOUN(etype)==V_CHAR || 
+       SPEC_NOUN(etype)==V_FLOAT || 
+       SPEC_NOUN(etype)==V_DOUBLE || 
+       SPEC_NOUN(etype)==V_VOID) &&
+      (SPEC_SHORT(etype) || SPEC_LONG(etype))) {
     // long or short for char float double or void
     werror (E_LONG_OR_SHORT_INVALID, noun, name);
   }
-  if ((SPEC_NOUN(dest)==V_FLOAT || 
-       SPEC_NOUN(dest)==V_DOUBLE || 
-       SPEC_NOUN(dest)==V_VOID) && 
-      (SPEC_SIGNED(dest) || SPEC_USIGN(dest))) {
+  if ((SPEC_NOUN(etype)==V_FLOAT || 
+       SPEC_NOUN(etype)==V_DOUBLE || 
+       SPEC_NOUN(etype)==V_VOID) && 
+      (SPEC_SIGNED(etype) || SPEC_USIGN(etype))) {
     // signed or unsigned for float double or void
     werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
   }
 
-  if (!SPEC_NOUN(dest)) {
-    if (SPEC_SIGNED(dest) || SPEC_USIGN(dest)) {
-      SPEC_NOUN(dest)=V_INT;
+  // special case for "signed" and "unsigned"
+  if (!SPEC_NOUN(etype) && (SPEC_SIGNED(etype) || SPEC_USIGN(etype))) {
+      SPEC_NOUN(etype)=V_INT;
     }
+
+  // special case for const globals
+  if (!SPEC_SCLS(etype) && SPEC_CONST(etype) && sym->level==0) {
+    SPEC_SCLS(etype)=S_CODE;
   }
 
-  if (SPEC_SIGNED(dest) && SPEC_USIGN(dest)) {
+  if (SPEC_SIGNED(etype) && SPEC_USIGN(etype)) {
     // signed AND unsigned 
     werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, name);
   }
-  if (SPEC_SHORT(dest) && SPEC_LONG(dest)) {
+  if (SPEC_SHORT(etype) && SPEC_LONG(etype)) {
     // short AND long
     werror (E_LONG_AND_SHORT_INVALID, noun, name);
   }
@@ -511,26 +517,43 @@ sym_link *
 mergeSpec (sym_link * dest, sym_link * src)
 {
 
-  /* we shouldn't redeclare the type */
-  if ((SPEC_NOUN (dest) && SPEC_NOUN (src)) && 
-      (SPEC_NOUN(dest) != SPEC_NOUN(src))) {
-    if (getenv("DEBUG_SANITY")) {
-      fprintf (stderr, "mergeSpec: ");
+  if (SPEC_NOUN(src)) {
+    if (!SPEC_NOUN(dest)) {
+      SPEC_NOUN(dest)=SPEC_NOUN(src);
+    } else {
+      /* we shouldn't redeclare the type */
+      if (getenv("DEBUG_SANITY")) {
+	fprintf (stderr, "mergeSpec: ");
+	werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
+      }
     }
-    werror(E_TWO_OR_MORE_DATA_TYPES, yylval.yychar);
+  }
+  
+  if (SPEC_SCLS(src)) {
+    /* if destination has no storage class */
+    if (!SPEC_SCLS (dest) || SPEC_SCLS(dest)==S_REGISTER) {
+      SPEC_SCLS (dest) = SPEC_SCLS (src);
+    } else {
+      if (getenv("DEBUG_SANITY")) {
+	fprintf (stderr, "mergeSpec: ");
+      }
+      werror(E_TWO_OR_MORE_STORAGE_CLASSES, yylval.yychar);
+    }
   }
 
-  /* if noun different then src overrides */
-  if (SPEC_NOUN (dest) != SPEC_NOUN (src) && !SPEC_NOUN (dest))
-    SPEC_NOUN (dest) = SPEC_NOUN (src);
-
-  /* if destination has no storage class */
-  if (!SPEC_SCLS (dest) || 
-      ((SPEC_SCLS(dest) == S_CONSTANT || SPEC_SCLS(dest) == S_REGISTER) && 
-       SPEC_SCLS (src)))
-    SPEC_SCLS (dest) = SPEC_SCLS (src);
-  /* special case for const */
   /* copy all the specifications  */
+
+  // we really should do: 
+#if 0
+  if (SPEC_what(src)) {
+    if (SPEC_what(dest)) {
+      werror(W_DUPLICATE_SPEC, "what");
+    }
+    SPEC_what(dst)=SPEC_what(src);
+  }
+#endif
+  // but there are more important thing right now
+  
   SPEC_LONG (dest) |= SPEC_LONG (src);
   SPEC_SHORT (dest) |= SPEC_SHORT (src);
   SPEC_USIGN (dest) |= SPEC_USIGN (src);

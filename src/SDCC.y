@@ -1100,26 +1100,20 @@ abstract_declarator2
    | '(' ')'                        { $$ = NULL;}
    | '(' parameter_type_list ')'    { $$ = NULL;}   
    | abstract_declarator2 '(' ')' {
-     if (getenv("DONT_IGNORE_FUNCTION_SPECIFIERS")) {
-       // this was previously ignored (cvs < 1.37)
+     // $1 must be a pointer to a function
+     sym_link *p=newLink();
+     DCL_TYPE(p) = FUNCTION;
+     $1->next=p;
+   }
+   | abstract_declarator2 '(' parameter_type_list ')' {
+     if (!IS_VOID($3->type)) {
+       // this is nonsense, so let's just burp something
+       werror(E_TOO_FEW_PARMS);
+     } else {
        // $1 must be a pointer to a function
        sym_link *p=newLink();
        DCL_TYPE(p) = FUNCTION;
        $1->next=p;
-     }
-   }
-   | abstract_declarator2 '(' parameter_type_list ')' {
-     if (getenv("DONT_IGNORE_FUNCTION_SPECIFIERS")) {
-       // this was previously ignored (cvs < 1.37)
-       if (!IS_VOID($3->type)) {
-	 // this is nonsense, so let's just burp something
-	 werror(E_TOO_FEW_PARMS);
-       } else {
-	 // $1 must be a pointer to a function
-	 sym_link *p=newLink();
-	 DCL_TYPE(p) = FUNCTION;
-	 $1->next=p;
-       }
      }
    }
 

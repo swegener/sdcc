@@ -10,7 +10,8 @@
 #include "gen.h"
 #include "BuildCmd.h"
 #include "MySystem.h"
-
+#include "../SDCCutil.h"
+extern const char *preArgv[128];	/* pre-processor arguments  */
 static char _defaultRules[] =
 {
 #include "peeph.rul"
@@ -49,6 +50,13 @@ static builtins __ds390_builtins[] = {
     { "__builtin_memcpy_x2x","v",3,{"cx*","cx*","i"}}, /* void __builtin_memcpy_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcpy_c2x","v",3,{"cx*","cp*","i"}}, /* void __builtin_memcpy_c2x (xdata char *,code  char *,int) */
     { "__builtin_memset_x","v",3,{"cx*","c","i"}},     /* void __builtin_memset     (xdata char *,char,int) 	    */
+    /* __builtin_inp - used to read from a memory mapped port, increment first pointer */
+    { "__builtin_inp","v",3,{"cx*","cx*","i"}},        /* void __builtin_inp        (xdata char *,xdata char *,int) */
+    /* __builtin_inp - used to write to a memory mapped port, increment first pointer */
+    { "__builtin_outp","v",3,{"cx*","cx*","i"}},       /* void __builtin_outp       (xdata char *,xdata char *,int) */
+    { "__builtin_swapw","us",1,{"us"}},		       /* unsigned short __builtin_swapw (unsigned short) */
+    { "__builtin_memcmp_x2x","c",3,{"cx*","cx*","i"}}, /* void __builtin_memcmp_x2x (xdata char *,xdata char *,int) */
+    { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
     { NULL , NULL,0, {NULL}} 			   /* mark end of table */
 };    
 void ds390_assignRegisters (eBBlock ** ebbs, int count);
@@ -70,13 +78,32 @@ _ds390_reset_regparm ()
 static int
 _ds390_regparm (sym_link * l)
 {
-  /* for this processor it is simple
-     can pass only the first parameter in a register */
-  if (regParmFlg)
-    return 0;
 
-  regParmFlg = 1;
-  return 1;
+    if (options.parms_in_bank1 == 0) {
+	/* simple can pass only the first parameter in a register */
+	if (regParmFlg)
+	    return 0;
+
+	regParmFlg = 1;
+	return 1;
+    } else {
+	int size = getSize(l);
+	int remain ;
+
+	/* first one goes the usual way to DPTR */
+	if (regParmFlg == 0) {
+	    regParmFlg += 4 ;
+	    return 1;
+	}
+	/* second one onwards goes to RB1_0 thru RB1_7 */
+        remain = regParmFlg - 4;
+	if (size > (8 - remain)) {
+	    regParmFlg = 12 ;
+	    return 0;
+	}
+	regParmFlg += size ;
+	return regParmFlg - size + 1;	
+    }
 }
 
 static bool
@@ -142,6 +169,10 @@ _ds390_finaliseOptions (void)
      */
     istack->fmap = 1;
     istack->ptrType = FPOINTER;
+    options.parms_in_bank1=1;
+    if (options.parms_in_bank1) {
+	addToList (preArgv, "-DSDCC_PARMS_IN_BANK1");
+    }
   }  /* MODEL_FLAT24 */
 }
 
@@ -180,6 +211,11 @@ _ds390_genAssemblerPreamble (FILE * of)
       fputs ("mc = 0xD5\t\t; mc register unknown to assembler\n", of);
       fputs ("F1 = 0xD1\t\t; F1 user flag unknown to assembler\n", of);
       fputs ("esp = 0x9B\t\t; ESP user flag unknown to assembler\n", of);
+      if (options.parms_in_bank1) {
+	  int i ;
+	  for (i=0; i < 8 ; i++ )
+	      fprintf (of,"b1_%d = 0x%x \n",i,8+i);
+      }
 }
 
 /* Generate interrupt vector table. */

@@ -6335,45 +6335,47 @@ static void genXor (iCode *ic, iCode *ifx)
 /*-----------------------------------------------------------------*/
 static void genInline (iCode *ic)
 {
-    char *buffer, *bp, *bp1;
+  char *buffer, *bp, *bp1;
     
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	_G.inLine += (!options.asmpeep);
 
-    _G.inLine += (!options.asmpeep);
+	buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
+	strcpy(buffer,IC_INLINE(ic));
 
-    buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
-    strcpy(buffer,IC_INLINE(ic));
+	/* emit each line as a code */
+	while (*bp) {
+		if (*bp == '\n') {
+			*bp++ = '\0';
+			
+			if(*bp1)
+#if 0
+				pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL));
+#else
+				pic16_addpCode2pBlock(pb, pic16_AssembleLine(bp1, 1));
+#endif
+			bp1 = bp;
+		} else {
+			if (*bp == ':') {
+				bp++;
+				*bp = '\0';
+				bp++;
+				pic16_emitcode(bp1,"");
+				bp1 = bp;
+			} else
+				bp++;
+		}
+	}
 
-    /* emit each line as a code */
-    while (*bp) {
-        if (*bp == '\n') {
-            *bp++ = '\0';
-
-	    if(*bp1)
+	if ((bp1 != bp) && *bp1)
 #if 0
 		pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL));
 #else
-		pic16_addpCode2pBlock(pb, pic16_AssembleLine(bp1, 0));
+		pic16_addpCode2pBlock(pb, pic16_AssembleLine(bp1, 1));
 #endif
-	      				// inline directly, no process
-            bp1 = bp;
-        } else {
-            if (*bp == ':') {
-                bp++;
-                *bp = '\0';
-                bp++;
-                pic16_emitcode(bp1,"");
-                bp1 = bp;
-            } else
-                bp++;
-        }
-    }
-    if ((bp1 != bp) && *bp1)
-      pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(bp1, NULL));		//pic16_AssembleLine(bp1, 0));
 
-    Safe_free(buffer);
-
-    _G.inLine -= (!options.asmpeep);
+	Safe_free(buffer);
+	_G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/

@@ -1,3 +1,7 @@
+2004-02-16 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c (genInline): fixed bug #896482 with inline assembly
+
 2004-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/ralloc.c (packRegsForAssign, reassignAliasedSym): fixed

@@ -48,17 +48,17 @@ int summary(struct area * areap)
 	FILE * of;
 	
 	/*Artifacts used for printing*/
-	char start[8], end[8], size[8], max[8];
-	char format[]="   %-16.16s %-7.7s %-7.7s %-7.7s %-7.7s\n";
+	char start[15], end[15], size[15], max[15];
+	char format[]="   %-16.16s %-8.8s %-8.8s %-8.8s %-8.8s\n";
 	char line[]="---------------------";
 
 	typedef struct
 	{
-		unsigned int Start;
-		unsigned int Size;
-		unsigned int Max;
+		unsigned long Start;
+		unsigned long Size;
+		unsigned long Max;
 		char Name[NCPS];
-		unsigned int flag;
+		unsigned long flag;
 	} _Mem;
 
 	unsigned int dram[0x100];
@@ -77,6 +77,14 @@ int summary(struct area * areap)
 	_Mem Stack={0xff,   0,     1, "STACK",				0x0000};
 	_Mem XRam= {0xffff, 0, 65536, "EXTERNAL RAM",		0x0100};
 	_Mem Rom=  {0xffff, 0, 65536, "ROM/EPROM/FLASH",	0x0200};
+	
+	if(rflag) /*For the DS390*/
+	{
+		XRam.Max=0x1000000; /*24 bits*/
+		XRam.Start=0xffffff;
+		Rom.Max=0x1000000;
+		Rom.Start=0xffffff;
+	}
 
 	if((iram_size<=0)||(iram_size>0x100)) /*Default: 8052 like memory*/
 	{

@@ -1,3 +1,12 @@
+2005-01-24 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/pcode.h: added second memory operand to pCodeOpReg
+	  to enable upcast to pCodeOpReg2 (there is no type tag to
+	  differenciate the two and pic16_popGet2p cast into PCOR2)
+	* src/pic16/main.c (_process_pragma): fixed another malloc bug
+	  (sizeof(sectNames) changed to sizeof(sectName))
+	  Both patches fix segfaults under MinGW.
+
 2005-01-23 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/{device.c,pcode.c}: s/free/Safe_free/g for

@@ -275,7 +275,7 @@ _process_pragma(const char *sz)
 			}
 			
 			if(!found) {
-				snam = Safe_calloc(1, sizeof(sectNames));
+				snam = Safe_calloc(1, sizeof(sectName));
 				snam->name = Safe_strdup( sectname );
 				snam->regsSet = NULL;
 				

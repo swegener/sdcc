@@ -445,6 +445,8 @@ typedef struct pCodeOpReg
   struct regs *r;
   int instance;    // byte # of Multi-byte registers
   struct pBlock *pb;
+
+  pCodeOp *pcop2;	// second memory operand (NEEDED IN gen.c:pic16_popGet2p (pCodeOpReg casted into pCodeOpReg2) 
 } pCodeOpReg;
 
 typedef struct pCodeOpReg2

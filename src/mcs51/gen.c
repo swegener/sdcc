@@ -232,6 +232,20 @@ static asmop *newAsmop (short type)
     return aop;
 }
 
+static void genSetDPTR(int n)
+{
+    if (!n)
+    {
+        emitcode(";", "Select standard DPTR");
+        emitcode("mov", "dps, #0x00");
+    }
+    else
+    {
+        emitcode(";", "Select alternate DPTR");
+        emitcode("mov", "dps, #0x01");
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* pointerCode - returns the code for a pointer type               */
 /*-----------------------------------------------------------------*/
@@ -329,29 +343,16 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
                    ((char)(sym->stack - _G.nRegsSaved )) :
                    ((char)sym->stack)) & 0xff);
         
-        if (/* result */ 1)
-        {
-            emitcode (";", "#switchDPTR(2)");
-        }
-    	emitcode ("mov","dpx,#0x40");
-    	emitcode ("mov","dph,#0x00");
-    	emitcode ("mov", "dpl, a");
-    	if (/* result */ 1)
-    	{
-    	    emitcode (";", "#switchDPTR(1)");
-    	}
+        genSetDPTR(1);
+        emitcode ("mov","dpx1,#0x40");
+        emitcode ("mov","dph1,#0x00");
+        emitcode ("mov","dpl1, a");
+        genSetDPTR(0);
     	
         if ( _G.accInUse )
             emitcode("pop","acc");
             
-        if (/* !result */ 0)
-        {
-    	    sym->aop = aop = newAsmop(AOP_DPTR);
-    	}
-    	else
-    	{
-    	    sym->aop = aop = newAsmop(AOP_DPTR2);
-    	}
+        sym->aop = aop = newAsmop(AOP_DPTR2);
     	aop->size = getSize(sym->type); 
     	return aop;
     }
@@ -772,10 +773,10 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
     case AOP_DPTR:
     case AOP_DPTR2:
     
-    	if (aop->type == AOP_DPTR2)
-    	{
-    	    emitcode (";", "#switchDPTR(2)");
-    	}
+    if (aop->type == AOP_DPTR2)
+    {
+        genSetDPTR(1);
+    }
     
 	while (offset > aop->coff) {
 	    emitcode ("inc","dptr");
@@ -792,13 +793,14 @@ static char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	    emitcode("clr","a");
 	    emitcode("movc","a,@a+dptr");
         }
-	else
+    else {
 	    emitcode("movx","a,@dptr");
+    }
 	    
-    	if (aop->type == AOP_DPTR2)
-    	{
-    	    emitcode (";", "#switchDPTR(1)");
-    	}	    
+    if (aop->type == AOP_DPTR2)
+    {
+        genSetDPTR(0);
+    }
 	    
 	return (dname ? "acc" : "a");
 	
@@ -915,10 +917,10 @@ static void aopPut (asmop *aop, char *s, int offset)
     case AOP_DPTR:
     case AOP_DPTR2:
     
-        if (aop->type == AOP_DPTR2)
-    	{
-    	    emitcode (";", "#switchDPTR(2)");
-    	}
+    if (aop->type == AOP_DPTR2)
+    {
+        genSetDPTR(1);
+    }
     
 	if (aop->code) {
 	    werror(E_INTERNAL_ERROR,__FILE__,__LINE__,
@@ -944,9 +946,9 @@ static void aopPut (asmop *aop, char *s, int offset)
 	emitcode ("movx","@dptr,a");
 	
     if (aop->type == AOP_DPTR2)
-    	{
-    	    emitcode (";", "#switchDPTR(1)");
-    	}	
+    {
+        genSetDPTR(0);
+    }
 	break;
 	
     case AOP_R0:
@@ -1095,14 +1097,16 @@ static void reAdjustPreg (asmop *aop)
         case AOP_DPTR2:
             if (aop->type == AOP_DPTR2)
     	    {
-    	        emitcode (";", "#switchDPTR(2)");
+                genSetDPTR(1);
     	    } 
             while (size--)
+            {
                 emitcode("lcall","__decdptr");
+            }
                 
     	    if (aop->type == AOP_DPTR2)
     	    {
-    	        emitcode (";", "#switchDPTR(1)");
+                genSetDPTR(0);
     	    }                
             break;  
 

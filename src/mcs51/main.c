@@ -118,7 +118,10 @@ static void _mcs51_genAssemblerPreamble(FILE *of)
    {
        fputs(".flat24 on\t\t; 24 bit flat addressing\n", of);
        fputs("dpx = 0x93\t\t; dpx register unknown to assembler\n", of);
-
+       fputs("dps = 0x86\t\t; dps register unknown to assembler\n", of);
+       fputs("dpl1 = 0x84\t\t; dpl1 register unknown to assembler\n", of);
+       fputs("dph1 = 0x85\t\t; dph1 register unknown to assembler\n", of);
+       fputs("dpx1 = 0x95\t\t; dpx1 register unknown to assembler\n", of);
    }
 }
 

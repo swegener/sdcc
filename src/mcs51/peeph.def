@@ -1759,3 +1759,19 @@ replace {
 	mov   dptr,%2
 	movx  @dptr,a
 }
+
+replace {
+        mov     dps, #0x00
+        mov     dps, #0x01
+} by {
+        ; Peephole 220a removed bogus DPS set
+        mov     dps, #0x01
+}
+
+replace {
+        mov     dps, #0x01
+        mov     dps, #0x00
+} by {
+        ; Peephole 220b removed bogus DPS set
+        mov     dps, #0x00
+}

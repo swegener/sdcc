@@ -89,6 +89,7 @@ bool uselessDecl = TRUE;
 %token <yyint> XOR_ASSIGN OR_ASSIGN
 %token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR AT SBIT
 %token REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL NONBANKED BANKED
+%token SHADOWREGS WPARAM
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID BIT
 %token STRUCT UNION ENUM ELIPSIS RANGE FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -209,6 +210,12 @@ function_attributes
 			if (FUNC_BANKED($$)) {
 			    werror(W_BANKED_WITH_NONBANKED);
 			}
+                     }
+   |  SHADOWREGS     {$$ = newLink (SPECIFIER);
+                        FUNC_ISSHADOWREGS($$) = 1;
+                     }
+   |  WPARAM         {$$ = newLink (SPECIFIER);
+                        FUNC_ISWPARAM($$) = 1;
                      }
    |  BANKED         {$$ = newLink (SPECIFIER);
                         FUNC_BANKED($$) = 1;

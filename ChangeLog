@@ -1,3 +1,18 @@
+2005-01-23 Vangelis Rokas <vrokas AT otenet.gr>
+
+	* src/pic16/gen.c: fixed bug #1106975,
+	* src/pic16/gen.c: fixed possible bug #1102572, now during TOS
+	pointer update, INTCON is saved, global interrupts are disabled and
+	restored after updateing TOS.
+	* src/SDCC.y, src/SDCC.lex, src/SDCCsymt.c, src/SDCCsymt.h:
+	* added function attribute 'shadowregs' to take advantage of shadow
+	registers,
+	* added function attribute 'wparam' as an alternative to the wparam
+	pragma,
+	* support/Utils/SDCCerr.[ch]: added error E_SHADOWREGS_NO_ISR when
+	user declares a non-ISR function as 'shadowregs',
+	* doc/sdccman.lyx: updated to reflect recent changes of pic16 port
+
 2005-01-22 Vangelis Rokas <vrokas AT otenet.gr>
 
 	* .version: bumped version number to 2.4.8

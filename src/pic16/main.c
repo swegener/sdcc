@@ -43,29 +43,32 @@ static char _defaultRules[] =
 static char *_pic16_keywords[] =
 {
   "at",
-//  "bit",
   "code",
   "critical",
   "register",
   "data",
   "far",
-//  "idata",
   "interrupt",
   "near",
   "pdata",
   "reentrant",
   "sfr",
-//  "sbit",
   "using",
-//  "xdata",
   "_data",
   "_code",
   "_generic",
   "_near",
-//  "_xdata",
   "_pdata",
-//  "_idata",
   "_naked",
+  "shadowregs",
+  "wparam",
+  
+//  "bit",
+//  "idata",
+//  "sbit",
+//  "xdata",
+//  "_xdata",
+//  "_idata",
   NULL
 };
 

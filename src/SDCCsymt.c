@@ -2293,6 +2293,12 @@ checkFunction (symbol * sym, symbol *csym)
       }
     }
 
+  if (IFFUNC_ISSHADOWREGS(sym->type) && !FUNC_ISISR (sym->type))
+    {
+      werror (E_SHADOWREGS_NO_ISR, sym->name);
+    }
+
+
   for (argCnt=1, acargs = FUNC_ARGS(sym->type); 
        acargs; 
        acargs=acargs->next, argCnt++) {
@@ -2360,6 +2366,17 @@ checkFunction (symbol * sym, symbol *csym)
       //printf("argCnt = %d\n",argCnt);
       werror (E_PREV_DEF_CONFLICT, csym->name, "reentrant");
     }
+
+  if (IFFUNC_ISWPARAM (csym->type) != IFFUNC_ISWPARAM (sym->type))
+    {
+      werror (E_PREV_DEF_CONFLICT, csym->name, "wparam");
+    }
+
+  if (IFFUNC_ISSHADOWREGS (csym->type) != IFFUNC_ISSHADOWREGS (sym->type))
+    {
+      werror (E_PREV_DEF_CONFLICT, csym->name, "shadowregs");
+    }
+  
 
   /* compare expected args with actual args */
   exargs = FUNC_ARGS(csym->type);

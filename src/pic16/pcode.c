@@ -4602,7 +4602,8 @@ void pic16_printpBlock(FILE *of, pBlock *pb)
 //					fprintf(stderr, "%s:%d testing %s <-> %s\n", __FILE__, __LINE__, PCF(pc)->fname, ab->name);
 					if(!strcmp(ab->name, PCF(pc)->fname)) {
 //						fprintf(stderr, "%s:%d address = %x\n", __FILE__, __LINE__, ab->address);
-						fprintf(of, "\t0X%06X", ab->address);
+                                                if(ab->address != -1)
+                                                  fprintf(of, "\t0X%06X", ab->address);
 						break;
 					}
 				}

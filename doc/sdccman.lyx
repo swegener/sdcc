@@ -83,7 +83,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.7
+SDCC 2.4.8
 \size footnotesize 
 
 \newline 
@@ -15383,104 +15383,6 @@ status Collapsed
 /
 \end_inset 
 
--nodefaultlibs do not link default libraries when linking.
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--obanksel=# Set optimization level for inserting BANKSELs.
-\begin_deeper 
-\layout List
-\labelwidthstring 00.00.0000
-
-0 is no optimization
-\layout List
-\labelwidthstring 00.00.0000
-
-1 checks previous used register and if it is the same then does not emit
- BANKSEL, accounts only for labels.
-\layout List
-\labelwidthstring 00.00.0000
-
-2 tries to check the location of (even different) symbols and removes BANKSELs
- if they are in the same bank.
- Important: This will only work properly if the linker script does not have
- sections across bank borders!
-\end_deeper 
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--pomit-config-words Omit the generation of the configuration words.
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--pomit-ivt Omit the generation of the interrupt vectors.
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--pleave-reset-vector Used in conjuction with -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--pomit-ivt, instructs the port NOT to omit the reset vector.
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
 -stack-model=[model] Used in conjuction with the command above.
  Defines the stack model to be used, valid stack models are : 
 \begin_deeper 
@@ -15577,7 +15479,24 @@ status Collapsed
 /
 \end_inset 
 
--call-tree dump call tree in .calltree file
+-mplab-comp MPLAB compatibility option.
+ Currently only suppresses special gpasm directives.
+\layout Subsubsection
+
+Optimization Options
+\layout Standard
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-optimize-goto Try to use (conditional) BRA instead of GOTO
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15591,8 +15510,44 @@ status Collapsed
 /
 \end_inset 
 
--mplab-comp MPLAB compatibility option.
- Currently only suppresses special gpasm directives.
+-obanksel=nn Set optimization level for inserting BANKSELs.
+\newline 
+
+\begin_deeper 
+\layout List
+\labelwidthstring 00.00.0000
+
+0 is no optimization
+\layout List
+\labelwidthstring 00.00.0000
+
+1 checks previous used register and if it is the same then does not emit
+ BANKSEL, accounts only for labels.
+\layout List
+\labelwidthstring 00.00.0000
+
+2 tries to check the location of (even different) symbols and removes BANKSELs
+ if they are in the same bank.
+ Important: This will only work properly if the linker script does not have
+ sections across bank borders!
+\end_deeper 
+\layout Subsubsection
+
+Linking Options
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-nodefaultlibs do not link default libraries when linking
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -15621,20 +15576,6 @@ status Collapsed
 \end_inset 
 
 -no-crt Don't link the default run-time modules
-\layout List
-\labelwidthstring 00.00.0000
-
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--optimize-goto Try to use (conditional) BRA instead of GOTO
 \layout Subsubsection
 
 Debugging Options
@@ -15729,6 +15670,20 @@ status Collapsed
 \end_inset 
 
 -gstack Trace push/pops for stack pointer overflow
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-call-tree dump call tree in .calltree file
 \layout Subsection
 
 Preprocessor Macros
@@ -15992,6 +15947,33 @@ Example:
 \layout LyX-Code
 
 void foo(int x);
+\layout Standard
+
+The same effect with 
+\emph on 
+wparam pragma
+\emph default 
+ can be achieved with the function attribute 
+\emph on 
+wparam
+\emph default 
+.
+ Usage:
+\layout LyX-Code
+
+void func_wparam(int a) wparam
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+...
+\layout LyX-Code
+
+}
+\layout Standard
+
+Limitations of wparam pragma apply for wparam function attribute, too.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -16007,112 +15989,8 @@ Example:
 \layout LyX-Code
 
 #pragma code test_func 0x4000
-\layout List
-\labelwidthstring 00.00.0000
-
-udata pragma udata instructs the compiler to emit code so that linker will
- place a variable at a specific memory bank
 \layout LyX-Code
 
-Example:
-\layout LyX-Code
-
-\layout LyX-Code
-
-/* places variable foo at bank2 */
-\layout LyX-Code
-
-#pragma udata bank2 foo
-\layout LyX-Code
-
-char foo;
-\layout Standard
-
-In order for this pragma to work extra SECTION directives should be added
- in the .lkr script.
- In the following example a sample .lkr file is shown:
-\layout LyX-Code
-
-\layout LyX-Code
-
-// Sample linker script for the PIC18F452 processor
-\layout LyX-Code
-
-LIBPATH .
-\layout LyX-Code
-
-CODEPAGE   NAME=vectors    START=0x0            END=0x29           PROTECTED
-\layout LyX-Code
-
-CODEPAGE   NAME=page       START=0x2A           END=0x7FFF
-\layout LyX-Code
-
-CODEPAGE   NAME=idlocs     START=0x200000       END=0x200007       PROTECTED
-\layout LyX-Code
-
-CODEPAGE   NAME=config     START=0x300000       END=0x30000D       PROTECTED
-\layout LyX-Code
-
-CODEPAGE   NAME=devid      START=0x3FFFFE       END=0x3FFFFF       PROTECTED
-\layout LyX-Code
-
-CODEPAGE   NAME=eedata     START=0xF00000       END=0xF000FF       PROTECTED
-\layout LyX-Code
-
-ACCESSBANK NAME=accessram  START=0x0            END=0x7F
-\layout LyX-Code
-
-\layout LyX-Code
-
-DATABANK   NAME=gpr0       START=0x80           END=0xFF
-\layout LyX-Code
-
-DATABANK   NAME=gpr1       START=0x100          END=0x1FF
-\layout LyX-Code
-
-DATABANK   NAME=gpr2       START=0x200          END=0x2FF
-\layout LyX-Code
-
-DATABANK   NAME=gpr3       START=0x300          END=0x3FF
-\layout LyX-Code
-
-DATABANK   NAME=gpr4       START=0x400          END=0x4FF
-\layout LyX-Code
-
-DATABANK   NAME=gpr5       START=0x500          END=0x5FF
-\layout LyX-Code
-
-ACCESSBANK NAME=accesssfr  START=0xF80          END=0xFFF          PROTECTED
-\layout LyX-Code
-
-\layout LyX-Code
-
-SECTION    NAME=CONFIG     ROM=config
-\layout LyX-Code
-
-\layout LyX-Code
-
-SECTION    NAME=bank0      RAM=gpr0       # these SECTION directives
-\layout LyX-Code
-
-SECTION    NAME=bank1      RAM=gpr1       # should be added to link
-\layout LyX-Code
-
-SECTION    NAME=bank2      RAM=gpr2       # section name 'bank?' with
-\layout LyX-Code
-
-SECTION    NAME=bank3      RAM=gpr3       # a specific DATABANK name
-\layout LyX-Code
-
-SECTION    NAME=bank4      RAM=gpr4
-\layout LyX-Code
-
-SECTION    NAME=bank5      RAM=gpr5
-\layout Standard
-
-The linker will recognise the section name set in the pragma statement and
- will position the variable at the memory bank set with the RAM field at
- the SECTION line in the linker script file.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -16341,6 +16219,112 @@ This feature allows for linking with specific libraries withoug having to
 ignore
 \noun default 
  keyword will reject all modules specified by the library pragma.
+\layout List
+\labelwidthstring 00.00.0000
+
+udata pragma udata instructs the compiler to emit code so that linker will
+ place a variable at a specific memory bank
+\layout LyX-Code
+
+Example:
+\layout LyX-Code
+
+\layout LyX-Code
+
+/* places variable foo at bank2 */
+\layout LyX-Code
+
+#pragma udata bank2 foo
+\layout LyX-Code
+
+char foo;
+\layout Standard
+
+In order for this pragma to work extra SECTION directives should be added
+ in the .lkr script.
+ In the following example a sample .lkr file is shown:
+\layout LyX-Code
+
+\layout LyX-Code
+
+// Sample linker script for the PIC18F452 processor
+\layout LyX-Code
+
+LIBPATH .
+\layout LyX-Code
+
+CODEPAGE   NAME=vectors    START=0x0            END=0x29           PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=page       START=0x2A           END=0x7FFF
+\layout LyX-Code
+
+CODEPAGE   NAME=idlocs     START=0x200000       END=0x200007       PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=config     START=0x300000       END=0x30000D       PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=devid      START=0x3FFFFE       END=0x3FFFFF       PROTECTED
+\layout LyX-Code
+
+CODEPAGE   NAME=eedata     START=0xF00000       END=0xF000FF       PROTECTED
+\layout LyX-Code
+
+ACCESSBANK NAME=accessram  START=0x0            END=0x7F
+\layout LyX-Code
+
+\layout LyX-Code
+
+DATABANK   NAME=gpr0       START=0x80           END=0xFF
+\layout LyX-Code
+
+DATABANK   NAME=gpr1       START=0x100          END=0x1FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr2       START=0x200          END=0x2FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr3       START=0x300          END=0x3FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr4       START=0x400          END=0x4FF
+\layout LyX-Code
+
+DATABANK   NAME=gpr5       START=0x500          END=0x5FF
+\layout LyX-Code
+
+ACCESSBANK NAME=accesssfr  START=0xF80          END=0xFFF          PROTECTED
+\layout LyX-Code
+
+\layout LyX-Code
+
+SECTION    NAME=CONFIG     ROM=config
+\layout LyX-Code
+
+\layout LyX-Code
+
+SECTION    NAME=bank0      RAM=gpr0       # these SECTION directives
+\layout LyX-Code
+
+SECTION    NAME=bank1      RAM=gpr1       # should be added to link
+\layout LyX-Code
+
+SECTION    NAME=bank2      RAM=gpr2       # section name 'bank?' with
+\layout LyX-Code
+
+SECTION    NAME=bank3      RAM=gpr3       # a specific DATABANK name
+\layout LyX-Code
+
+SECTION    NAME=bank4      RAM=gpr4
+\layout LyX-Code
+
+SECTION    NAME=bank5      RAM=gpr5
+\layout Standard
+
+The linker will recognise the section name set in the pragma statement and
+ will position the variable at the memory bank set with the RAM field at
+ the SECTION line in the linker script file.
 \layout Subsection
 
 Header Files
@@ -16435,8 +16419,21 @@ cd device/include
 \layout LyX-Code
 
 su -c 'make install'     # install the headers, you need the root password
+\layout Standard
+
+There exist a special target to build the I/O libraries.
+ This target is not automatically build because it will build the I/O library
+ for 
+\emph on 
+every
+\emph default 
+ supported device.
+ This way building will take quite a lot of time.
+ Users are advised to edit the device/lib/pic16/pics.build file and then
+ execute:
 \layout LyX-Code
 
+make lib-io
 \layout Subsection
 
 Memory Models
@@ -16868,6 +16865,192 @@ on stack, FSR0 points to the beginning
 Interrupts
 \layout Standard
 
+An interrupt servive routine (ISR) is declared using the 
+\emph on 
+interrupt
+\emph default 
+ keyword.
+\layout LyX-Code
+
+void isr(void) interrupt 
+\emph on 
+n
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+...
+\layout LyX-Code
+
+}
+\layout Standard
+
+
+\emph on 
+n
+\emph default 
+ is the interrupt number, which for PIC18F devices can be:
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+n
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Interrupt Vector
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Interrupt Vector Address
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+RESET vector
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0x000000
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+HIGH priority interrupts
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0x000008
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+LOW priority interrupts
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0x000018
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+When generating assembly code for ISR the code generator places a 
+\noun on 
+goto 
+\noun default 
+instruction at the 
+\emph on 
+Interrupt Vector Address
+\emph default 
+ which points at the genetated ISR.
+\layout Standard
+
+
+\emph on 
+n
+\emph default 
+ is possible to be omitted.
+ This way a function is generated similar to an ISR, but it is not assigned
+ to any interrupt.
+\layout Standard
+
 When entering an interrupt, currently the PIC16
 \begin_inset LatexCommand \index{PIC16}
 
@@ -16892,13 +17075,42 @@ FSR0 (FSR0L and FSR0H)
 \layout Standard
 
 These registers are restored upon return from the interrupt routine.
- 
+\layout Subsubsection
+
+Using Shadow Registers
 \layout Standard
 
-When entering a high priority interrupt WREG, STATUS and BSR are not explicit
- saved by software.
- The hardware shadow registers for WREG, STATUS and BSR are used in these
- cases.
+When entering/exiting an ISR, it is possible to take advantage of the PIC18F
+ core shadow registers which hold the values of WREG, STATUS and BSR registers.
+ This can be done by adding the keyword 
+\emph on 
+shadowregs
+\emph default 
+ before the 
+\emph on 
+interrupt
+\emph default 
+ keyword in the function's header.
+\layout LyX-Code
+
+void isr_shadow(void) shadowregs interrupt 1
+\layout LyX-Code
+
+{
+\layout LyX-Code
+
+...
+\layout LyX-Code
+
+}
+\layout Standard
+
+
+\emph on 
+shadowregs
+\emph default 
+ instructs the code generator not to store/restore WREG, STATUS, BSR when
+ entering/exiting the ISR.
 \layout Standard
 
 

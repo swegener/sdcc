@@ -114,6 +114,8 @@ static int checkCurrFile(char *s);
 "near"         { count(); TKEYWORD(DATA); }
 "pdata"        { count(); TKEYWORD(PDATA); }
 "reentrant"    { count(); TKEYWORD(REENTRANT); }
+"shadowregs"   { count(); TKEYWORD(SHADOWREGS); }
+"wparam"       { count(); TKEYWORD(WPARAM); }
 "register"     { count(); return(REGISTER); }
 "return"       { count(); return(RETURN); }
 "sfr"          { count(); TKEYWORD(SFR); }

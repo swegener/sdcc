@@ -218,6 +218,8 @@ typedef struct sym_link
       unsigned reent:1;		/* function is reentrant      */
       unsigned naked:1;		/* naked function	      */
 
+      unsigned shadowregs:1;    /* function uses shadow registers (pic16 port) */
+      unsigned wparam:1;	/* first byte of arguments is passed via WREG (pic16 port) */
       unsigned nonbanked:1;	/* function has the nonbanked attribute */
       unsigned banked:1;	/* function has the banked attribute */
       unsigned critical:1;	/* critical function          */
@@ -360,6 +362,10 @@ extern sym_link *validateLink(sym_link 	*l,
 
 #define FUNC_ISREENT(x) (x->funcAttrs.reent)
 #define IFFUNC_ISREENT(x) (IS_FUNC(x) && FUNC_ISREENT(x))
+#define FUNC_ISSHADOWREGS(x) (x->funcAttrs.shadowregs)
+#define IFFUNC_ISSHADOWREGS(x) (IS_FUNC(x) && FUNC_ISSHADOWREGS(x))
+#define FUNC_ISWPARAM(x) (x->funcAttrs.wparam)
+#define IFFUNC_ISWPARAM(x) (IS_FUNC(x) && FUNC_ISWPARAM(x))
 #define FUNC_ISNAKED(x) (x->funcAttrs.naked)
 #define IFFUNC_ISNAKED(x) (IS_FUNC(x) && FUNC_ISNAKED(x))
 #define FUNC_NONBANKED(x) (x->funcAttrs.nonbanked)

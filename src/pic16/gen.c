@@ -153,7 +153,6 @@ static struct {
     short ipushRegs;
     set *sendSet;
     set *stackRegSet;
-    int interruptvector;
     int usefastretfie;
     bitVect *fregsUsed;
     int stack_lat;			/* stack offset latency */
@@ -3232,7 +3231,7 @@ static void genCall (iCode *ic)
 //	stackParms = psuedoStkPtr;
 //	fprintf(stderr, "%s:%d ic parmBytes = %d\n", __FILE__, __LINE__, ic->parmBytes);
     fname = OP_SYMBOL(IC_LEFT(ic))->rname[0]?OP_SYMBOL(IC_LEFT(ic))->rname:OP_SYMBOL(IC_LEFT(ic))->name;
-    inwparam = inWparamList(OP_SYMBOL(IC_LEFT(ic))->name);
+    inwparam = (inWparamList(OP_SYMBOL(IC_LEFT(ic))->name)) || (FUNC_ISWPARAM(OP_SYM_TYPE(IC_LEFT(ic))));
 
 #if 0
     gpsimDebug_StackDump(__FILE__, __LINE__, fname );
@@ -3436,6 +3435,11 @@ static void genPcall (iCode *ic)
     // push return address
     // push $ on return stack, then replace with retlbl
 
+    /* Thanks to Thorsten Klose for pointing out that the following
+     * snippet should be interrupt safe */
+    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_intcon), pic16_popCopyReg(&pic16_pc_postdec1)));
+    pic16_emitpcode(POC_BCF, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_intcon), 7));
+
     pic16_emitpcodeNULLop(POC_PUSH);
 
     pic16_emitpcode(POC_MOVLW, pic16_popGetImmd(pcop_lbl->name, 0, 0));
@@ -3444,6 +3448,11 @@ static void genPcall (iCode *ic)
     pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_tosh));
     pic16_emitpcode(POC_MOVLW, pic16_popGetImmd(pcop_lbl->name, 2, 0));
     pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_tosu));
+
+
+    /* restore interrupt control register */
+    pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_preinc1));
+    pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_intcon));
 
     /* make the call by writing the pointer into pc */
     pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)),2), pic16_popCopyReg(&pic16_pc_pclatu)));
@@ -3563,6 +3572,10 @@ static void genFunction (iCode *ic)
       char asymname[128];
       pBlock *apb;
 
+
+//        debugf("interrupt number: %hhi\n", FUNC_INTNO(sym->type));
+
+#if 0
         {
           int i, found=-1;
 
@@ -3578,12 +3591,16 @@ static void genFunction (iCode *ic)
             if(found == -1) {
               fprintf(stderr, "PIC16 port: %s:%d: interrupt function but cannot locate symbol (%s)\n",
                             __FILE__, __LINE__, sym->name);
-              assert( 0 );
+//              assert( 0 );
             }
             _G.interruptvector = found;
         }
+#endif
 
-        sprintf(asymname, "ivec_%d_%s", _G.interruptvector, sym->name);
+        if(FUNC_INTNO(sym->type) == 256)
+          sprintf(asymname, "ivec_%s", sym->name);
+        else
+          sprintf(asymname, "ivec_0x%x_%s", FUNC_INTNO(sym->type), sym->name);
         asym = newSymbol(asymname, 0);
 
         apb = pic16_newpCodeChain(NULL, 'A', pic16_newpCodeCharP("; Starting pCode block for absolute section"));
@@ -3602,14 +3619,18 @@ static void genFunction (iCode *ic)
 	    abSym = Safe_calloc(1, sizeof(absSym));
 	    strcpy(abSym->name, asymname);
 
-	    switch( _G.interruptvector ) {
+	    switch( FUNC_INTNO(sym->type) ) {
 	      case 0: abSym->address = 0x000000; break;
               case 1: abSym->address = 0x000008; break;
               case 2: abSym->address = 0x000018; break;
+              
+              default:
+                abSym->address = -1; break;
             }
 
             /* relocate interrupt vectors if needed */
-            abSym->address += pic16_options.ivt_loc;
+            if(abSym->address != -1)
+              abSym->address += pic16_options.ivt_loc;
 
             addSet(&absSymSet, abSym);
         }
@@ -3654,7 +3675,7 @@ static void genFunction (iCode *ic)
         _G.usefastretfie = 1;	/* use shadow registers by default */
         
         /* an ISR should save: WREG, STATUS, BSR, PRODL, PRODH, FSR0L, FSR0H */
-        if(!(_G.interruptvector == 1)) {
+        if(!FUNC_ISSHADOWREGS(sym->type)) {
           /* do not save WREG,STATUS,BSR for high priority interrupts
            * because they are stored in the hardware shadow registers already */
           _G.usefastretfie = 0;
@@ -3702,7 +3723,7 @@ static void genFunction (iCode *ic)
       pic16_emitpcode(POC_DECF, pic16_popCopyReg( pic16_stackpnt_hi ));		//&pic16_pc_fsr1h));
     }
           
-    if(inWparamList(sym->name)) {
+    if(inWparamList(sym->name) || FUNC_ISWPARAM(sym->type)) {
       if(IFFUNC_HASVARARGS(sym->type) || IFFUNC_ISREENT(sym->type))
         _G.useWreg = 0;
       else
@@ -3818,14 +3839,14 @@ static void genEndFunction (iCode *ic)
       pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));
       pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_prodl ));
 
-      if(!(_G.interruptvector == 1)) {
+      if(!FUNC_ISSHADOWREGS(sym->type)) {
         /* do not restore interrupt vector for WREG,STATUS,BSR
          * for high priority interrupt, see genFunction */
 	pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_bsr ));
 	pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_status ));
 	pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_wreg ));
       }
-      _G.interruptvector = 0;		/* sanity check */
+//      _G.interruptvector = 0;		/* sanity check */
 
 
       /* if debug then send end of function */

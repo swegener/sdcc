@@ -1,4 +1,13 @@
+2003-05-28  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
+	* doc/sdccman.lyx: Changes all over, index improved, smaller margins. The manual
+	  is in parts still quite out of date, I did changes as far as I felt makes sense
+	  for a non-native english speaker. 
+	  Please feel free to add to the manual or to correct my changes.
+	* doc/Makefile: undid touching the date of intermediate tex files.
+
 2003-05-26  Frieder Ferlemann <Frieder.Ferlemann@web.de>
+
 	* doc/sdccman.lyx: Manual has an index now
 
 2003-05-24  Jesus Calvino-Fraga <jesusc@ece.ubc.ca>

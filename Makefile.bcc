@@ -1,4 +1,4 @@
-all: as cpp ports sdcc packihx
+all: as cpp ports sdcc packihx cpp2
 
 as:
 	cd as\mcs51
@@ -7,6 +7,11 @@ as:
 
 cpp:
 	cd support\cpp
+	make -f Makefile.bcc
+	cd ..\..
+	
+cpp2:
+	cd support\cpp2
 	make -f Makefile.bcc
 	cd ..\..
 

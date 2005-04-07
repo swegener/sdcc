@@ -8,7 +8,7 @@ S51B = $(SDCC_DIR)/bin/s51
 
 S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
-SDCCFLAGS +=--nostdinc --less-pedantic -DREENTRANT=reentrant
+SDCCFLAGS +=--nostdinc --less-pedantic -DREENTRANT=reentrant -I$(INC_DIR)/mcs51
 LINKFLAGS = --nostdlib
 LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
 LIBDIR = $(SDCC_DIR)/device/lib/build/small

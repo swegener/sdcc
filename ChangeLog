@@ -1,5 +1,9 @@
 2005-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* support/regression/ports/mcs51/spec.mk: added mcs51 include
+
+2005-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/include/8051.h,
 	* device/include/8052.h,
 	* device/include/at89S8252.h,

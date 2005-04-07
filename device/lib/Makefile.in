@@ -14,6 +14,9 @@ CP              = @CP@
 
 PRJDIR		= ../..
 INCDIR		= $(PRJDIR)/device/include
+ifndef PORTINCDIR
+PORTINCDIR	= $(INCDIR)
+endif
 
 CC		= $(PRJDIR)/bin/sdcc
 CPP		= $(PRJDIR)/bin/sdcpp
@@ -34,7 +37,7 @@ lib_dir_suffix  = @lib_dir_suffix@
 
 sdcc_libdir     = $(DESTDIR)$(datadir)/$(lib_dir_suffix)
 
-CPPFLAGS        = -I$(INCDIR)
+CPPFLAGS        = -I$(INCDIR) -I$(PORTINCDIR)
 CFLAGS		= $(MODELFLAGS) --nostdinc
 
 BUILDDIR        = build
@@ -177,32 +180,32 @@ objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 models:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
 	  for model in $(MODELS); do \
-	    $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 model-mcs51-stack-auto:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
 	  for model in $(MODELS); do \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$$model-stack-auto objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$$model-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 model-mcs51-xstack-auto:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
 	  for model in $(MODELS); do \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$$model-xstack-auto objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$$model-xstack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 model-ds390:
 	if [ "`grep ds390 ../../ports.build`" = ds390 ]; then \
-	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 objects; \
+	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-ds400:
 	if [ "`grep ds400 ../../ports.build`" = ds400 ]; then \
-	  $(MAKE) MODELFLAGS="-mds400" PORT=ds400 objects; \
+	  $(MAKE) MODELFLAGS="-mds400" PORT=ds400 PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-xa51:
@@ -309,7 +312,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(SOURCES) $(INCDIR)/*.h
+Makefile.dep: $(SOURCES) $(INCDIR)/*.h $(PORTINCDIR)/*.h
 	rm -f Makefile.dep
 	for i in $(SOURCES); do \
 	  $(CPP) -std=c99 -M $(CPPFLAGS) $$i >$${i}.dep; \

@@ -1,5 +1,9 @@
 2005-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/lib/Makefile.in: updated for port specific include
+
+2005-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* support/regression/ports/mcs51/spec.mk: added mcs51 include
 
 2005-04-07 Maarten Brock <sourceforge.brock AT dse.nl>

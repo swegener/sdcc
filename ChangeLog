@@ -1,3 +1,30 @@
+2005-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/8051.h,
+	* device/include/8052.h,
+	* device/include/at89S8252.h,
+	* device/include/at89c55.h,
+	* device/include/at89x051.h,
+	* device/include/at89x51.h,
+	* device/include/at89x52.h,
+	* device/include/mcs51reg.h,
+	* device/include/reg51.h,
+	* device/include/reg764.h,
+	* device/include/regc515c.h,
+	* device/include/sab80515.h: (re)moved these 12 files
+	* device/include/mcs51/8051.h,
+	* device/include/mcs51/8052.h,
+	* device/include/mcs51/at89S8252.h,
+	* device/include/mcs51/at89c55.h,
+	* device/include/mcs51/at89x051.h,
+	* device/include/mcs51/at89x51.h,
+	* device/include/mcs51/at89x52.h,
+	* device/include/mcs51/mcs51reg.h,
+	* device/include/mcs51/reg51.h,
+	* device/include/mcs51/reg764.h,
+	* device/include/mcs51/regc515c.h,
+	* device/include/mcs51/sab80515.h: and added them here
+
 2005-04-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdarg.h: changed SDCC specific keywords to double

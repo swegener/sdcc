@@ -1493,4 +1493,7 @@ extern __sfr __at 0xfff TOSU;
 #define __IDLOC7	0x200007
 
 
+/* added for USART compatibility with smaller devices */
+#define __MULTIPLE_USARTS 1
+
 #endif

@@ -1,3 +1,9 @@
+2005-04-07 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/usart.h: added compatibility defines for
+	  devices with more than one USART
+	* device/include/pic16/pic18f[68][567]20.h: activated above defines
+
 2005-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/Makefile.in: updated for port specific include

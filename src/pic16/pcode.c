@@ -9643,7 +9643,7 @@ typedef struct defmap_s {
       int isWrite:1;		/** sym/mask is written */
     } access;
     int accessmethod;
-  };
+  } acc;
   pCode *pc;			/** pCode this symbol is refrenced at */
   valnum_t in_val;		/** valnum_t of symbol's previous value (the one read at pc) */
   valnum_t val;			/** new unique number for this value (if isWrite) */
@@ -9666,10 +9666,10 @@ static defmap_t *newDefmap (symbol_t sym, int in_mask, int mask, int isRead, int
     map = (defmap_t *) Safe_calloc (1, sizeof (defmap_t));
   }
   map->sym = sym;
-  map->access.in_mask = (isRead ? (in_mask ? in_mask : 0xFF) : 0x00);
-  map->access.mask = (isWrite ? (mask ? mask : 0xFF) : 0x00);
-  map->access.isRead = (isRead != 0);
-  map->access.isWrite = (isWrite != 0);
+  map->acc.access.in_mask = (isRead ? (in_mask ? in_mask : 0xFF) : 0x00);
+  map->acc.access.mask = (isWrite ? (mask ? mask : 0xFF) : 0x00);
+  map->acc.access.isRead = (isRead != 0);
+  map->acc.access.isWrite = (isWrite != 0);
   map->pc = pc;
   map->in_val = 0;
   map->val = (isWrite ? val : 0);
@@ -9697,7 +9697,7 @@ static int defmapAddCopyIfNew (defmap_t **head, defmap_t *item) {
   dummy = *head;
   while (dummy && (dummy->sym != item->sym
 			  || dummy->pc != item->pc
-			  || dummy->accessmethod != item->accessmethod
+			  || dummy->acc.accessmethod != item->acc.accessmethod
 			  || dummy->val != item->val
 			  || dummy->in_val != item->in_val)) {
     dummy = dummy->next;
@@ -9796,7 +9796,7 @@ static defmap_t *defmapFindDef (defmap_t *map, symbol_t sym, pCode *pc) {
   } // if (pc)
 
   /* find definition for sym */
-  while (curr && (!curr->access.isWrite || (curr->sym != sym))) {
+  while (curr && (!curr->acc.access.isWrite || (curr->sym != sym))) {
     curr = curr->next;
   }
 
@@ -9825,7 +9825,7 @@ static defmap_t *defmapFindUse (defmap_t *map, symbol_t sym, pCode *pc) {
   } // if (pc)
 
   /* find use of sym (scan list backwards) */
-  while (curr && (!curr->access.isRead || (curr->sym != sym))) curr = curr->prev;
+  while (curr && (!curr->acc.access.isRead || (curr->sym != sym))) curr = curr->prev;
 
   return curr;
 }
@@ -9869,7 +9869,7 @@ static int defmapUpdate (defmap_t *map, symbol_t sym, pCode *pc, valnum_t newval
   while (m && m->pc != pc) m = m->next;
 
   /* find definition of sym at pc */
-  while (m && m->pc == pc && (!m->access.isWrite || (m->sym != sym))) m = m->next;
+  while (m && m->pc == pc && (!m->acc.access.isWrite || (m->sym != sym))) m = m->next;
   
   /* no definition found */
   if (!m) return 1;
@@ -9882,7 +9882,7 @@ static int defmapUpdate (defmap_t *map, symbol_t sym, pCode *pc, valnum_t newval
   while (m) {
     if (m->sym == sym) {
       m->in_val = newval;
-      if (m->access.isWrite) m = NULL;
+      if (m->acc.access.isWrite) m = NULL;
     } // if
     if (m) m = m->prev;
   } // while
@@ -10411,7 +10411,7 @@ int pic16_isAliveInFlow (symbol_t sym, int mask, pCodeFlow *pcfl, pCode *pc) {
       /* scan list for reads at this pc first */
       while (map && map->pc == mappc->pc) {
 	/* is the symbol (partially) read? */
-        if ((map->sym == sym) && (map->access.isRead && ((map->access.in_mask & mask) != 0))) {
+        if ((map->sym == sym) && (map->acc.access.isRead && ((map->acc.access.in_mask & mask) != 0))) {
 	  //if (sym != SPO_STATUS) fprintf (stderr, "%s: symbol %s read at pc %p\n", __FUNCTION__, strFromSym (sym), map->pc);
 	  return -1;
 	}
@@ -10421,8 +10421,8 @@ int pic16_isAliveInFlow (symbol_t sym, int mask, pCodeFlow *pcfl, pCode *pc) {
 
       while (map && map->pc == mappc->pc) {
 	/* honor (partial) redefinitions of sym */
-	if ((map->sym == sym) && (map->access.isWrite)) {
-	  mask &= ~map->access.mask;
+	if ((map->sym == sym) && (map->acc.access.isWrite)) {
+	  mask &= ~map->acc.access.mask;
 	  //if (sym != SPO_STATUS) fprintf (stderr, "%s: symbol %s redefined at pc %p, alive mask: %x\n", __FUNCTION__, strFromSym (sym), map->pc, mask);
 	}
 	map = map->prev;
@@ -10662,7 +10662,7 @@ static int pic16_pCodeIsAlive (pCode *pc) {
       //fprintf (stderr, "%s: special sym\n", __FUNCTION__);
       return 1;
     }
-    if (map->access.isWrite) {
+    if (map->acc.access.isWrite) {
       if (pic16_isAlive (map->sym, pc)) {
         //fprintf (stderr, "%s(%s): pCode is alive (sym %s still used)\n", __FUNCTION__, pic16_pBlockGetFunctionName (pc->pb),strFromSym (map->sym));
 	return 1;
@@ -11005,10 +11005,10 @@ static void printDefmap (defmap_t *map) {
   fprintf (stderr, "defmap @ %p:\n", curr);
   while (curr) {
     fprintf (stderr, "%s%s: %4x|%4x / %02x|%02x, sym %s(%x) @ pc %p\n",
-		    curr->access.isRead ? "R" : " ",
-		    curr->access.isWrite ? "W": " ",
+		    curr->acc.access.isRead ? "R" : " ",
+		    curr->acc.access.isWrite ? "W": " ",
 		    curr->in_val, curr->val,
-		    curr->access.in_mask, curr->access.mask,
+		    curr->acc.access.in_mask, curr->acc.access.mask,
 		    strFromSym(curr->sym), curr->sym,
 		    curr->pc);
     curr = curr->next;
@@ -11043,7 +11043,7 @@ static int defmapUpdateUniqueSym (defmap_t **uniq, defmap_t *additional) {
   /* update uniq */
   do {
     /* find next assignment in additionals */
-    while (curr && !curr->access.isWrite) curr = curr->prev;
+    while (curr && !curr->acc.access.isWrite) curr = curr->prev;
 
     if (!curr) break;
 
@@ -11379,12 +11379,12 @@ static void assignValnums (pCode *pc) {
   //list = val; /* might save some time later... */
   while (val && val->pc == pc) {
     val->in_val = 0;
-    if (val->sym != 0 && (1 || val->access.isRead)) {
+    if (val->sym != 0 && (1 || val->acc.access.isRead)) {
       /* get valnum for sym */
       count = defmapFindAll (val->sym, pc, &oldval);
       //fprintf (stderr, "%d defs for sym %s\n", count, strFromSym (val->sym));
       if (count == 1) {
-	if ((val->access.in_mask & oldval->access.mask) == val->access.in_mask) {
+	if ((val->acc.access.in_mask & oldval->acc.access.mask) == val->acc.access.in_mask) {
           val->in_val = oldval->val;
         } else {
 	  val->in_val = 0;
@@ -11396,15 +11396,15 @@ static void assignValnums (pCode *pc) {
 	/* multiple definition(s) found -- value not known (unless always the same valnum) */
 	assert (oldval);
 	dummy = oldval->next;
-	mask = oldval->access.mask;
+	mask = oldval->acc.access.mask;
 	val->in_val = oldval->val;
 	while (dummy && (dummy->val == val->in_val)) {
-	  mask &= dummy->access.mask;
+	  mask &= dummy->acc.access.mask;
 	  dummy = dummy->next;
 	} // while
 
 	/* found other values or to restictive mask */
-	if (dummy || ((mask & val->access.in_mask) != val->access.in_mask)) {
+	if (dummy || ((mask & val->acc.access.in_mask) != val->acc.access.in_mask)) {
           val->in_val = 0;
 	}
       }
@@ -11626,7 +11626,7 @@ static void assignValnums (pCode *pc) {
 	      pic16_InsertCommentAfter (pc->prev, "=DF= MOVFF: SRC op %s replaced by %s", strFromSym(sym1), strFromSym(copy->sym));
 	      pic16_df_saved_bytes += PCI(pc)->isize - PCI(newpc)->isize;
 	      pic16_pCodeReplace (pc, newpc); 
-	      assert (val->sym == sym1 && val->access.isRead && !val->access.isWrite);
+	      assert (val->sym == sym1 && val->acc.access.isRead && !val->acc.access.isWrite);
 	      defmapReplaceSymRef (pc, sym1, copy->sym);
 	      pic16_fixDefmap (pc, newpc);
 	      pc = newpc;
@@ -12111,7 +12111,7 @@ static void pic16_vcg_dumpnode (pCode *pc, FILE *of) {
 
 	prev = map;
 	do {
-          fprintf (of, "%s%c%c: val %4x|%4x & %02x|%02x, sym %s", (prev == map) ? "" : "\n", map->access.isRead ? 'R' : ' ', map->access.isWrite ? 'W' : ' ', map->in_val, map->val, map->access.in_mask, map->access.mask, strFromSym (map->sym));
+          fprintf (of, "%s%c%c: val %4x|%4x & %02x|%02x, sym %s", (prev == map) ? "" : "\n", map->acc.access.isRead ? 'R' : ' ', map->acc.access.isWrite ? 'W' : ' ', map->in_val, map->val, map->acc.access.in_mask, map->acc.access.mask, strFromSym (map->sym));
 	  prev = map;
 	  map = map->next;
 	} while (map && prev->pc == map->pc);

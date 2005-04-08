@@ -1,5 +1,16 @@
 2005-04-08 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/pcode.c: added helpers defmapInsertAfter (insert a new item
+	  into the chain after a given one) and mergeDefmapSymbols (combine
+	  defmap entries for each symbol per pcode)
+	* (createDefmap): have defmap entries merged in the end
+	* (defmapReplaceSymRef): split defmap entries covering two accesses to
+	  a symbol before replacing one access type's symbol, merge symbols in
+	  the end (replacement symbol might already have an entry)
+	* (assignValnums): keep reference to written WREG intact
+
+2005-04-08 Raphael Neider <rneider AT web.de>
+
 	* src/pic16/pcode.c (struct defmap_s): named anonymous union (for
 	  Alpha)
 

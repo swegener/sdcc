@@ -9689,6 +9689,18 @@ static defmap_t *copyDefmap (defmap_t *map) {
   return res;
 }
 
+/* Insert a defmap item after the specified one. */
+static int defmapInsertAfter (defmap_t *ref, defmap_t *newItem) {
+  if (!ref || !newItem) return 1;
+
+  newItem->next = ref->next;
+  newItem->prev = ref;
+  ref->next = newItem;
+  if (newItem->next) newItem->next->prev = newItem;
+  
+  return 0;
+}
+
 /* Check whether item (or an identical one) is already in the chain and add it if neccessary.
  * item is copied before insertion into chain and therefore left untouched.
  * Returns 1 iff the item has been inserted into the list, 0 otherwise. */
@@ -10796,7 +10808,40 @@ static symbol_t pic16_fsrsym_idx[][2] = {
     {SPO_FSR1L, SPO_FSR1H},
     {SPO_FSR2L, SPO_FSR2H}
 };
-  
+
+/* Merge multiple defmap entries for the same symbol for list's pCode. */
+static void mergeDefmapSymbols (defmap_t *list) { 
+  defmap_t *ref, *curr, *temp;
+
+  /* now make sure that each symbol occurs at most once per pc */
+  ref = list;
+  while (ref && (ref->pc == list->pc)) {
+    curr = ref->next;
+    while (curr && (curr->pc == list->pc)) {
+      if (curr->sym == ref->sym) {
+	//fprintf (stderr, "Merging defmap entries for symbol %s\n", strFromSym (ref->sym));
+	/* found a symbol occuring twice... merge the two */
+	if (curr->acc.access.isRead) {
+	  //if (ref->acc.access.isRead) fprintf (stderr, "symbol %s was marked twice as read at pc %p\n", strFromSym (ref->sym), ref->pc);
+	  ref->acc.access.isRead = 1;
+	  ref->acc.access.in_mask |= curr->acc.access.in_mask;
+	}
+	if (curr->acc.access.isWrite) {
+	  //if (ref->acc.access.isWrite) fprintf (stderr, "symbol %s was marked twice as written at pc %p\n", strFromSym (ref->sym), ref->pc);
+	  ref->acc.access.isWrite = 1;
+	  ref->acc.access.mask |= curr->acc.access.mask;
+	}
+	temp = curr;
+	curr = curr->next;
+	deleteDefmap (temp);
+	continue; // do not skip curr!
+      } // if
+      curr = curr->next;
+    } // while
+    ref = ref->next;
+  } // while
+}
+
 /** Prepend list with the reads and definitions performed by pc. */
 static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
   pCodeInstruction *pci;
@@ -10949,7 +10994,7 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
     list = newDefmap (symFromStr ("WREG"), mask, mask, inCond & PCC_W, outCond & PCC_W, pc, newValnum (), list);
   } // if
 
-  /* keep STATUS read BEFORE STATUS write in the list */
+  /* keep STATUS read BEFORE STATUS write in the list (still neccessary?) */
   if (inCond & PCC_STATUS) {
     smask = 0;
     if (inCond & PCC_C) smask |= 1U << PIC_C_BIT;
@@ -10993,6 +11038,8 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
  
   /* make sure there is at least one entry for each pc (needed by list traversal routines) */
   list = newDefmap (0, 0x00, 0x00, 0, 0, pc, 0, list);
+
+  mergeDefmapSymbols (list);
   
   return list;
 }
@@ -11331,17 +11378,44 @@ void pic16_fixDefmap (pCode *pc, pCode *newpc) {
   } // while
 }
 
-void defmapReplaceSymRef (pCode *pc, symbol_t sym, symbol_t newsym) {
-  defmap_t *map;
+/* Replace a defmap entry for sym with newsym for read accesses (isRead == 1) or
+ * write accesses (isRead == 0). */
+void defmapReplaceSymRef (pCode *pc, symbol_t sym, symbol_t newsym, int isRead) {
+  defmap_t *map, *map_start;
+  defmap_t *copy;
   if (!isPCI(pc)) return;
+  if (sym == newsym) return;
   
   map = PCI(pc)->pcflow->defmap;
 
   while (map && map->pc != pc) map = map->next;
+  map_start = map;
   while (map && map->pc == pc) {
-    if (map->sym == sym) map->sym = newsym;
+    if (map->sym == sym) {
+      assert ((isRead && map->acc.access.isRead) || ((!isRead) && (map->acc.access.isWrite)));
+      if (!(map->acc.access.isRead && map->acc.access.isWrite)) {
+	/* only one kind of access handled... this is easy */
+        map->sym = newsym;
+      } else {
+	/* must copy defmap entry before replacing symbol... */
+	copy = copyDefmap (map);
+	if (isRead) {
+	  map->acc.access.isRead = 0;
+	  copy->acc.access.isWrite = 0;
+	} else {
+	  map->acc.access.isWrite = 0;
+	  copy->acc.access.isRead = 0;
+	}
+	copy->sym = newsym;
+	/* insert copy into defmap chain */
+	defmapInsertAfter (map, copy);
+      }
+    }
     map = map->next;
   } // while
+
+  /* as this might introduce multiple defmap entries for newsym... */
+  mergeDefmapSymbols (map_start);
 }
 
 /* Assign "better" valnums to results. */
@@ -11533,14 +11607,18 @@ static void assignValnums (pCode *pc) {
       }
       if (pic16_debug_verbose || pic16_pcode_verbose) pic16_InsertCommentAfter (pc->prev, "=DF= MOVWF: replaced by CLRF/SETF");
       pic16_pCodeReplace (pc, newpc);
-      defmapReplaceSymRef (pc, SPO_WREG, 0);
+      defmapReplaceSymRef (pc, SPO_WREG, 0, 1);
       pic16_fixDefmap (pc, newpc);
       pc = newpc;
 	
       /* This breaks the defmap chain's references to pCodes... fix it! */
       if (!val->prev) PCI(pc)->pcflow->defmap = val->next;
-      deleteDefmap (val); // delete reference to WREG as in value
-      val = NULL;
+      if (!val->acc.access.isWrite) {
+	deleteDefmap (val);	// delete reference to WREG as in value
+	val = NULL;
+      } else {
+	val->acc.access.isRead = 0;	// delete reference to WREG as in value
+      }
       oldval = PCI(pc)->pcflow->defmap;
       while (oldval) {
         if (oldval->pc == pc) oldval->pc = newpc;
@@ -11586,7 +11664,7 @@ static void assignValnums (pCode *pc) {
         pic16_InsertCommentAfter (pc->prev, "=DF= MOVFF: replaced by CRLF/SETF");
         pic16_df_saved_bytes += PCI(pc)->isize - PCI(newpc)->isize;
         pic16_pCodeReplace (pc, newpc); 
-        defmapReplaceSymRef (pc, sym1, 0);
+        defmapReplaceSymRef (pc, sym1, 0, 1);
         pic16_fixDefmap (pc, newpc);
         pc = newpc;
         break; // do not process instruction as MOVFF...
@@ -11627,7 +11705,7 @@ static void assignValnums (pCode *pc) {
 	      pic16_df_saved_bytes += PCI(pc)->isize - PCI(newpc)->isize;
 	      pic16_pCodeReplace (pc, newpc); 
 	      assert (val->sym == sym1 && val->acc.access.isRead && !val->acc.access.isWrite);
-	      defmapReplaceSymRef (pc, sym1, copy->sym);
+	      defmapReplaceSymRef (pc, sym1, copy->sym, 1);
 	      pic16_fixDefmap (pc, newpc);
 	      pc = newpc;
 	    }

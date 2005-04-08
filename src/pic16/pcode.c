@@ -4841,7 +4841,7 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
 {
   regs *r;
-  static char b[50];
+  static char b[128];
   char *s;
   int use_buffer = 1;    // copy the string to the passed buffer pointer
 

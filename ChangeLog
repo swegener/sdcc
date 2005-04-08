@@ -1,3 +1,8 @@
+2005-04-08 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/pcode.c (pic16_get_op2): enlarged size of array b to 128
+	bytes
+
 2005-04-07 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/usart.h: added compatibility defines for

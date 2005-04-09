@@ -1,3 +1,7 @@
+2005-04-09 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added include/hc08/* h to NSIS setup
+
 2005-04-08 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcode.c: added helpers defmapInsertAfter (insert a new item

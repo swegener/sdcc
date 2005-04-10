@@ -1,3 +1,8 @@
+2005-04-10 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/glue.c (printIvalChar): fixed bug when emitting
+	characters arrays of larger size than the declared one.
+
 2005-04-10 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic/gen.c (genInline),

@@ -634,10 +634,10 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
 /* pic16_printIvalChar - generates initital value for character array */
 /*--------------------------------------------------------------------*/
 static int 
-pic16_printIvalChar (sym_link * type, initList * ilist, char *s, char ptype, void *p)
+pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, char ptype, void *p)
 {
   value *val;
-  unsigned int remain;
+  int remain, len;
 
   if(!p)
     return 0;
@@ -653,14 +653,38 @@ pic16_printIvalChar (sym_link * type, initList * ilist, char *s, char ptype, voi
       if(!DCL_ELEM (type))
         DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
 
-      for(remain=0; remain<strlen(SPEC_CVAL(val->etype).v_char)+1; remain++)
-        pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
-      
-      if((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0) {
-        while(remain--) {
+      /* len is 0 if declartion equals initializer,
+       * >0 if declaration greater than initializer
+       * <0 if declaration less than initializer
+       * Strategy: if >0 emit 0x00 for the rest of the length,
+       * if <0 then emit only the length of declaration elements
+       * and warn user
+       */
+      len = DCL_ELEM (type) - (strlen (SPEC_CVAL (val->etype).v_char)+1);
+
+//      fprintf(stderr, "%s:%d len = %i DCL_ELEM(type) = %i SPEC_CVAL-len = %i\n", __FILE__, __LINE__,
+//        len, DCL_ELEM(type), strlen(SPEC_CVAL(val->etype).v_char));
+
+      remain=0;
+      if(len >= 0) {
+        for(remain=0; remain<strlen(SPEC_CVAL(val->etype).v_char)+1; remain++)
+          pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
+
+        len -= remain;
+        while(len--) {
           pic16_emitDB(0x00, ptype, p);
         }
+
+      } else {
+        werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
+
+        for(remain=0; remain<DCL_ELEM (type); remain++)
+          pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
       }
+      
+
+//      if((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0) {
+//      }
       return 1;
     } else return 0;
   } else {
@@ -697,7 +721,7 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       return;
     }
 
-    if(pic16_printIvalChar (type,
+    if(pic16_printIvalChar (sym, type,
 		       (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
 		       SPEC_CVAL (sym->etype).v_char, ptype, p))
       return;

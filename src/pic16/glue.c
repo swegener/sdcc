@@ -670,9 +670,11 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
         for(remain=0; remain<strlen(SPEC_CVAL(val->etype).v_char)+1; remain++)
           pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
 
-        len -= remain;
-        while(len--) {
-          pic16_emitDB(0x00, ptype, p);
+        if(len>0) {
+          len -= remain;
+          while(len--) {
+            pic16_emitDB(0x00, ptype, p);
+          }
         }
 
       } else {

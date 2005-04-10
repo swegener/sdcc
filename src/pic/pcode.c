@@ -2023,6 +2023,49 @@ pCode *newpCodeCSource(int ln, char *f, char *l)
 	return ( (pCode *)pccs);
 	
 }
+
+/*******************************************************************/
+/* pic16_newpCodeAsmDir - create a new pCode Assembler Directive   */
+/*                        added by VR 6-Jun-2003                   */
+/*******************************************************************/
+
+pCode *newpCodeAsmDir(char *asdir, char *argfmt, ...)
+{
+  pCodeAsmDir *pcad;
+  va_list ap;
+  char buffer[512];
+  char *lbp=buffer;
+
+  pcad = Safe_calloc(1, sizeof(pCodeAsmDir));
+  pcad->pci.pc.type = PC_ASMDIR;
+  pcad->pci.pc.prev = pcad->pci.pc.next = NULL;
+  pcad->pci.pc.pb = NULL;
+  pcad->pci.pc.destruct = genericDestruct;
+  pcad->pci.pc.print = genericPrint;
+
+  if(asdir && *asdir) {
+
+    while(isspace(*asdir))asdir++;	// strip any white space from the beginning
+
+    pcad->directive = Safe_strdup( asdir );
+  }
+
+  va_start(ap, argfmt);
+
+  memset(buffer, 0, sizeof(buffer));
+  if(argfmt && *argfmt)
+    vsprintf(buffer, argfmt, ap);
+
+  va_end(ap);
+
+  while(isspace(*lbp))lbp++;
+
+  if(lbp && *lbp)
+    pcad->arg = Safe_strdup( lbp );
+
+  return ((pCode *)pcad);
+}
+
 /*-----------------------------------------------------------------*/
 /* pCodeLabelDestruct - free memory used by a label.               */
 /*-----------------------------------------------------------------*/
@@ -3026,85 +3069,89 @@ static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 }
 
 /*-----------------------------------------------------------------*/
+/* pCode2str - convert a pCode instruction to string               */
 /*-----------------------------------------------------------------*/
 char *pCode2str(char *str, size_t size, pCode *pc)
 {
-	char *s = str;
-	
-	switch(pc->type) {
-		
-	case PC_OPCODE:
-		
-		SAFE_snprintf(&s,&size, "\t%s\t", PCI(pc)->mnemonic);
-		
-		if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
-			
-			if(PCI(pc)->isBitInst) {
-				if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-					char *name = PCI(pc)->pcop->name;
-					if (!name) 
-						name = PCOR(PCI(pc)->pcop)->r->name;
-					if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
-						SAFE_snprintf(&s,&size,"(%s >> 3), (%s & 7)", name, name);
-					else
-						SAFE_snprintf(&s,&size,"%s,%d", name, 
-						(((pCodeOpRegBit *)(PCI(pc)->pcop))->bit)&7);
-				} else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-					SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
-				} else
-					SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op_from_instruction(PCI(pc)));
-				//PCI(pc)->pcop->t.bit );
-			} else {
-				
-				if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-					if( PCI(pc)->num_ops == 2)
-						SAFE_snprintf(&s,&size,"(%s >> 3),%c",get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
-					else
-						SAFE_snprintf(&s,&size,"(1 << (%s & 7))",get_op_from_instruction(PCI(pc)));
-					
-				} else {
-					SAFE_snprintf(&s,&size,"%s",get_op_from_instruction(PCI(pc)));
-					
-					if( PCI(pc)->num_ops == 2)
-						SAFE_snprintf(&s,&size,",%c", ( (PCI(pc)->isModReg) ? 'F':'W'));
-				}
-			}
-			
-		}
-		break;
-		
-	case PC_COMMENT:
-		/* assuming that comment ends with a \n */
-		SAFE_snprintf(&s,&size,";%s", ((pCodeComment *)pc)->comment);
-		break;
-		
-	case PC_INLINE:
-		/* assuming that inline code ends with a \n */
-		SAFE_snprintf(&s,&size,"%s", ((pCodeComment *)pc)->comment);
-		break;
-		
-	case PC_LABEL:
-		SAFE_snprintf(&s,&size,";label=%s, key=%d\n",PCL(pc)->label,PCL(pc)->key);
-		break;
-	case PC_FUNCTION:
-		SAFE_snprintf(&s,&size,";modname=%s,function=%s: id=%d\n",PCF(pc)->modname,PCF(pc)->fname);
-		break;
-	case PC_WILD:
-		SAFE_snprintf(&s,&size,";\tWild opcode: id=%d\n",PCW(pc)->id);
-		break;
-	case PC_FLOW:
-		SAFE_snprintf(&s,&size,";\t--FLOW change\n");
-		break;
-	case PC_CSOURCE:
-		SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
-		break;
-		
-	case PC_BAD:
-		SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
-	}
-	
-	return str;
-	
+  char *s = str;
+
+  switch(pc->type) {
+
+  case PC_OPCODE:
+
+    SAFE_snprintf(&s,&size, "\t%s\t", PCI(pc)->mnemonic);
+
+    if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
+
+      if(PCI(pc)->isBitInst) {
+        if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+          char *name = PCI(pc)->pcop->name;
+          if (!name)
+            name = PCOR(PCI(pc)->pcop)->r->name;
+          if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
+            SAFE_snprintf(&s,&size,"(%s >> 3), (%s & 7)", name, name);
+          else
+            SAFE_snprintf(&s,&size,"%s,%d", name, 
+            (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit)&7);
+        } else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+          SAFE_snprintf(&s,&size,"%s,%d", get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
+      } else
+          SAFE_snprintf(&s,&size,"%s,0 ; ?bug", get_op_from_instruction(PCI(pc)));
+        //PCI(pc)->pcop->t.bit );
+      } else {
+        if(PCI(pc)->pcop->type == PO_GPR_BIT) {
+          if( PCI(pc)->num_ops == 2)
+            SAFE_snprintf(&s,&size,"(%s >> 3),%c",get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
+          else
+            SAFE_snprintf(&s,&size,"(1 << (%s & 7))",get_op_from_instruction(PCI(pc)));
+        } else {
+          SAFE_snprintf(&s,&size,"%s",get_op_from_instruction(PCI(pc)));
+          if( PCI(pc)->num_ops == 2)
+            SAFE_snprintf(&s,&size,",%c", ( (PCI(pc)->isModReg) ? 'F':'W'));
+        }
+      }
+    }
+    break;
+
+  case PC_COMMENT:
+    /* assuming that comment ends with a \n */
+    SAFE_snprintf(&s,&size,";%s", ((pCodeComment *)pc)->comment);
+    break;
+
+  case PC_INLINE:
+    /* assuming that inline code ends with a \n */
+    SAFE_snprintf(&s,&size,"%s", ((pCodeComment *)pc)->comment);
+    break;
+
+  case PC_LABEL:
+    SAFE_snprintf(&s,&size,";label=%s, key=%d\n",PCL(pc)->label,PCL(pc)->key);
+    break;
+  case PC_FUNCTION:
+    SAFE_snprintf(&s,&size,";modname=%s,function=%s: id=%d\n",PCF(pc)->modname,PCF(pc)->fname);
+    break;
+  case PC_WILD:
+    SAFE_snprintf(&s,&size,";\tWild opcode: id=%d\n",PCW(pc)->id);
+    break;
+  case PC_FLOW:
+    SAFE_snprintf(&s,&size,";\t--FLOW change\n");
+    break;
+  case PC_CSOURCE:
+    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    break;
+  case PC_ASMDIR:
+    if(PCAD(pc)->directive) {
+      SAFE_snprintf(&s,&size,"\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
+    } else if(PCAD(pc)->arg) {
+      /* special case to handle inline labels without a tab */
+      SAFE_snprintf(&s,&size,"%s\n", PCAD(pc)->arg);
+    }
+    break;
+
+  case PC_BAD:
+    SAFE_snprintf(&s,&size,";A bad pCode is being used\n");
+  }
+
+  return str;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3112,106 +3159,122 @@ char *pCode2str(char *str, size_t size, pCode *pc)
 /*-----------------------------------------------------------------*/
 static void genericPrint(FILE *of, pCode *pc)
 {
-	
-	if(!pc || !of)
-		return;
-	
-	switch(pc->type) {
-	case PC_COMMENT:
-		fprintf(of,";%s\n", ((pCodeComment *)pc)->comment);
-		break;
-		
-	case PC_INLINE:
-		fprintf(of,"%s\n", ((pCodeComment *)pc)->comment);
-		break;
-		
-	case PC_OPCODE:
-		// If the opcode has a label, print that first
-		{
-			char str[256];
-			pCodeInstruction *pci = PCI(pc);
-			pBranch *pbl = pci->label;
-			while(pbl && pbl->pc) {
-				if(pbl->pc->type == PC_LABEL)
-					pCodePrintLabel(of, pbl->pc);
-				pbl = pbl->next;
-			}
-		
-			if(pci->cline) 
-				genericPrint(of,PCODE(pci->cline));
-		
-			
-			pCode2str(str, 256, pc);
-			
-			fprintf(of,"%s",str);
-			
-			/* Debug */
-			if(debug_verbose) {
-				pCodeOpReg *pcor = PCOR(pci->pcop);
-				fprintf(of, "\t;id=%u,key=%03x",pc->id,pc->seq);
-				if(pci->pcflow)
-					fprintf(of,",flow seq=%03x",pci->pcflow->pc.seq);
-				if (pcor && pcor->pcop.type==PO_GPR_TEMP && !pcor->r->isFixed)
-					fprintf(of,",rIdx=r0x%X",pcor->rIdx);
-			}
-		}
+  if(!pc || !of)
+    return;
+
+  switch(pc->type) {
+  case PC_COMMENT:
+    fprintf(of,";%s\n", ((pCodeComment *)pc)->comment);
+    break;
+
+  case PC_INLINE:
+    fprintf(of,"%s\n", ((pCodeComment *)pc)->comment);
+    break;
+
+  case PC_OPCODE:
+    // If the opcode has a label, print that first
+    {
+      char str[256];
+      pCodeInstruction *pci = PCI(pc);
+      pBranch *pbl = pci->label;
+      while(pbl && pbl->pc) {
+        if(pbl->pc->type == PC_LABEL)
+          pCodePrintLabel(of, pbl->pc);
+        pbl = pbl->next;
+      }
+
+      if(pci->cline)
+        genericPrint(of,PCODE(pci->cline));
+
+
+      pCode2str(str, 256, pc);
+
+      fprintf(of,"%s",str);
+
+      /* Debug */
+      if(debug_verbose) {
+        pCodeOpReg *pcor = PCOR(pci->pcop);
+        fprintf(of, "\t;id=%u,key=%03x",pc->id,pc->seq);
+        if(pci->pcflow)
+          fprintf(of,",flow seq=%03x",pci->pcflow->pc.seq);
+        if (pcor && pcor->pcop.type==PO_GPR_TEMP && !pcor->r->isFixed)
+          fprintf(of,",rIdx=r0x%X",pcor->rIdx);
+      }
+    }
 #if 0
-		{
-			pBranch *dpb = pc->to;   // debug
-			while(dpb) {
-				switch ( dpb->pc->type) {
-				case PC_OPCODE:
-					fprintf(of, "\t;%s", PCI(dpb->pc)->mnemonic);
-					break;
-				case PC_LABEL:
-					fprintf(of, "\t;label %d", PCL(dpb->pc)->key);
-					break;
-				case PC_FUNCTION:
-					fprintf(of, "\t;function %s", ( (PCF(dpb->pc)->fname) ? (PCF(dpb->pc)->fname) : "[END]"));
-					break;
-				case PC_FLOW:
-					fprintf(of, "\t;flow");
-					break;
-				case PC_COMMENT:
-				case PC_WILD:
-					break;
-				}
-				dpb = dpb->next;
-			}
-		}
+    {
+      pBranch *dpb = pc->to;   // debug
+      while(dpb) {
+        switch ( dpb->pc->type) {
+        case PC_OPCODE:
+          fprintf(of, "\t;%s", PCI(dpb->pc)->mnemonic);
+          break;
+        case PC_LABEL:
+          fprintf(of, "\t;label %d", PCL(dpb->pc)->key);
+          break;
+        case PC_FUNCTION:
+          fprintf(of, "\t;function %s", ( (PCF(dpb->pc)->fname) ? (PCF(dpb->pc)->fname) : "[END]"));
+          break;
+        case PC_FLOW:
+          fprintf(of, "\t;flow");
+          break;
+        case PC_COMMENT:
+        case PC_WILD:
+          break;
+        }
+        dpb = dpb->next;
+      }
+    }
 #endif
-		fprintf(of,"\n");
-		break;
-		
-	case PC_WILD:
-		fprintf(of,";\tWild opcode: id=%d\n",PCW(pc)->id);
-		if(PCW(pc)->pci.label)
-			pCodePrintLabel(of, PCW(pc)->pci.label->pc);
-		
-		if(PCW(pc)->operand) {
-			fprintf(of,";\toperand  ");
-			pCodeOpPrint(of,PCW(pc)->operand );
-		}
-		break;
-		
-	case PC_FLOW:
-		if(debug_verbose) {
-			fprintf(of,";<>Start of new flow, seq=0x%x",pc->seq);
-			if(PCFL(pc)->ancestor)
-				fprintf(of," ancestor = 0x%x", PCODE(PCFL(pc)->ancestor)->seq);
-			fprintf(of,"\n");
-			
-		}
-		break;
-		
-	case PC_CSOURCE:
-		fprintf(of,";#CSRC\t%s %d\n;  %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
-		break;
-	case PC_LABEL:
-	default:
-		fprintf(of,"unknown pCode type %d\n",pc->type);
-	}
-	
+    fprintf(of,"\n");
+    break;
+
+  case PC_WILD:
+    fprintf(of,";\tWild opcode: id=%d\n",PCW(pc)->id);
+    if(PCW(pc)->pci.label)
+      pCodePrintLabel(of, PCW(pc)->pci.label->pc);
+    
+    if(PCW(pc)->operand) {
+      fprintf(of,";\toperand  ");
+      pCodeOpPrint(of,PCW(pc)->operand );
+    }
+    break;
+
+  case PC_FLOW:
+    if(debug_verbose) {
+      fprintf(of,";<>Start of new flow, seq=0x%x",pc->seq);
+      if(PCFL(pc)->ancestor)
+        fprintf(of," ancestor = 0x%x", PCODE(PCFL(pc)->ancestor)->seq);
+      fprintf(of,"\n");
+    }
+    break;
+
+  case PC_CSOURCE:
+    fprintf(of,";#CSRC\t%s %d\n;  %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    break;
+
+  case PC_ASMDIR:
+    {
+      pBranch *pbl = PCAD(pc)->pci.label;
+      while(pbl && pbl->pc) {
+        if(pbl->pc->type == PC_LABEL)
+          pCodePrintLabel(of, pbl->pc);
+        pbl = pbl->next;
+      }
+    }
+    if(PCAD(pc)->directive) {
+      fprintf(of, "\t%s%s%s\n", PCAD(pc)->directive, PCAD(pc)->arg?"\t":"", PCAD(pc)->arg?PCAD(pc)->arg:"");
+    } else
+    if(PCAD(pc)->arg) {
+      /* special case to handle inline labels without tab */
+      fprintf(of, "%s\n", PCAD(pc)->arg);
+    }
+    break;
+
+  case PC_LABEL:
+  default:
+    fprintf(of,"unknown pCode type %d\n",pc->type);
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -3265,47 +3328,45 @@ static void pCodePrintLabel(FILE *of, pCode *pc)
 		fprintf(of,";wild card label: id=%d\n",-PCL(pc)->key);
 	
 }
+
 /*-----------------------------------------------------------------*/
 /* unlinkpCodeFromBranch - Search for a label in a pBranch and     */
 /*                         remove it if it is found.               */
 /*-----------------------------------------------------------------*/
 static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
 {
-	pBranch *b, *bprev;
-	
-	
-	bprev = NULL;
-	
-	if(pcl->type == PC_OPCODE)
-		b = PCI(pcl)->label;
-	else {
-		fprintf(stderr, "LINE %d. can't unlink from non opcode\n",__LINE__);
-		exit(1);
-		
-	}
-	
-	//fprintf (stderr, "%s \n",__FUNCTION__);
-	//pcl->print(stderr,pcl);
-	//pc->print(stderr,pc);
-	while(b) {
-		if(b->pc == pc) {
-			//fprintf (stderr, "found label\n");
-			
-			/* Found a label */
-			if(bprev) {
-				bprev->next = b->next;  /* Not first pCode in chain */
-				free(b);
-			} else {
-				pc->destruct(pc);
-				PCI(pcl)->label = b->next;   /* First pCode in chain */
-				free(b);
-			}
-			return;  /* A label can't occur more than once */
-		}
-		bprev = b;
-		b = b->next;
-	}
-	
+  pBranch *b, *bprev;
+
+  bprev = NULL;
+
+  if(pcl->type == PC_OPCODE || pcl->type == PC_INLINE || pcl->type == PC_ASMDIR)
+    b = PCI(pcl)->label;
+  else {
+    fprintf(stderr, "LINE %d. can't unlink from non opcode\n",__LINE__);
+    exit(1);
+  }
+  
+  //fprintf (stderr, "%s \n",__FUNCTION__);
+  //pcl->print(stderr,pcl);
+  //pc->print(stderr,pc);
+  while(b) {
+    if(b->pc == pc) {
+      //fprintf (stderr, "found label\n");
+      
+      /* Found a label */
+      if(bprev) {
+        bprev->next = b->next;  /* Not first pCode in chain */
+        free(b);
+      } else {
+        pc->destruct(pc);
+        PCI(pcl)->label = b->next;   /* First pCode in chain */
+        free(b);
+      }
+      return;  /* A label can't occur more than once */
+    }
+    bprev = b;
+    b = b->next;
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -3465,24 +3526,24 @@ static void genericAnalyze(pCode *pc)
 /*-----------------------------------------------------------------*/
 int compareLabel(pCode *pc, pCodeOpLabel *pcop_label)
 {
-	pBranch *pbr;
-	
-	if(pc->type == PC_LABEL) {
-		if( ((pCodeLabel *)pc)->key ==  pcop_label->key)
-			return TRUE;
-	}
-	if(pc->type == PC_OPCODE) {
-		pbr = PCI(pc)->label;
-		while(pbr) {
-			if(pbr->pc->type == PC_LABEL) {
-				if( ((pCodeLabel *)(pbr->pc))->key ==  pcop_label->key)
-					return TRUE;
-			}
-			pbr = pbr->next;
-		}
-	}
-	
-	return FALSE;
+  pBranch *pbr;
+  
+  if(pc->type == PC_LABEL) {
+    if( ((pCodeLabel *)pc)->key ==  pcop_label->key)
+      return TRUE;
+  }
+  if(pc->type == PC_OPCODE || pc->type == PC_ASMDIR) {
+    pbr = PCI(pc)->label;
+    while(pbr) {
+      if(pbr->pc->type == PC_LABEL) {
+        if( ((pCodeLabel *)(pbr->pc))->key ==  pcop_label->key)
+          return TRUE;
+      }
+      pbr = pbr->next;
+    }
+  }
+  
+  return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3537,7 +3598,7 @@ pCode * findLabel(pCodeOpLabel *pcop_label)
 			return pc;
 	}
 	
-	fprintf(stderr,"Couldn't find label %s", pcop_label->pcop.name);
+	fprintf(stderr,"Couldn't find label %s\n", pcop_label->pcop.name);
 	return NULL;
 }
 
@@ -3587,27 +3648,23 @@ pCode * findPrevpCode(pCode *pc, PC_TYPE pct)
 /*-----------------------------------------------------------------*/
 pCode * findNextInstruction(pCode *pci)
 {
-	pCode *pc = pci;
-	
-	while(pc) {
-		if((pc->type == PC_OPCODE) || (pc->type == PC_WILD)) {
-			/*
-			static unsigned int stop;
-			if (pc->id == 524)
-				stop++; // Place break point here
-			*/
-			return pc;
-		}
-		
+  pCode *pc = pci;
+
+  while(pc) {
+  if((pc->type == PC_OPCODE)
+    || (pc->type == PC_WILD)
+    || (pc->type == PC_ASMDIR))
+      return pc;
+
 #ifdef PCODE_DEBUG
-		fprintf(stderr,"findNextInstruction:  ");
-		printpCode(stderr, pc);
+    fprintf(stderr,"findNextInstruction:  ");
+    printpCode(stderr, pc);
 #endif
-		pc = pc->next;
-	}
-	
-	//fprintf(stderr,"Couldn't find instruction\n");
-	return NULL;
+    pc = pc->next;
+  }
+
+  //fprintf(stderr,"Couldn't find instruction\n");
+  return NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3616,7 +3673,25 @@ pCode * findNextInstruction(pCode *pci)
 /*-----------------------------------------------------------------*/
 pCode * findPrevInstruction(pCode *pci)
 {
-	return findPrevpCode(pci, PC_OPCODE);
+  pCode *pc = pci;
+
+  while(pc) {
+
+    if((pc->type == PC_OPCODE)
+      || (pc->type == PC_WILD)
+      || (pc->type == PC_ASMDIR))
+      return pc;
+      
+
+#ifdef PCODE_DEBUG
+    fprintf(stderr,"pic16_findPrevInstruction:  ");
+    printpCode(stderr, pc);
+#endif
+    pc = pc->prev;
+  }
+
+  //fprintf(stderr,"Couldn't find instruction\n");
+  return NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3625,7 +3700,6 @@ pCode * findPrevInstruction(pCode *pci)
 /*-----------------------------------------------------------------*/
 pCode * findFunctionEnd(pCode *pc)
 {
-	
 	while(pc) {
 		if(pc->type == PC_FUNCTION &&  !(PCF(pc)->fname))
 			return pc;
@@ -4896,19 +4970,18 @@ int OptimizepBlock(pBlock *pb)
 /*-----------------------------------------------------------------*/
 pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
 {
-	pCode *pc;
-	
-	for(pc = pcs; pc; pc = pc->next) {
-		
-		if((pc->type == PC_OPCODE) && 
-			(PCI(pc)->pcop) && 
-			(PCI(pc)->pcop->type == PO_LABEL) &&
-			(PCOLAB(PCI(pc)->pcop)->key == pcl->key))
-			return pc;
-	}
-	
-	
-	return NULL;
+  pCode *pc;
+
+  for(pc = pcs; pc; pc = pc->next) {
+
+    if(((pc->type == PC_OPCODE) || (pc->type == PC_INLINE) || (pc->type == PC_ASMDIR)) &&
+      (PCI(pc)->pcop) && 
+      (PCI(pc)->pcop->type == PO_LABEL) &&
+      (PCOLAB(PCI(pc)->pcop)->key == pcl->key))
+      return pc;
+  }
+
+  return NULL;
 }
 
 /*-----------------------------------------------------------------*/

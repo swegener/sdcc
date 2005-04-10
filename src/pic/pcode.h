@@ -242,6 +242,7 @@ typedef enum
 	PC_WILD,        /* wildcard - an opcode place holder used 
 	                 * in the pCode peep hole optimizer */
 	PC_CSOURCE,     /* C-Source Line  */
+	PC_ASMDIR,      /* Assembler directive */
 	PC_BAD          /* Mark the pCode object as being bad */
 } PC_TYPE;
 
@@ -429,6 +430,7 @@ typedef struct pCodeComment
 
 } pCodeComment;
 
+
 /*************************************************
     pCodeComment
 **************************************************/
@@ -490,6 +492,7 @@ typedef struct pCodeFlow
 
 } pCodeFlow;
 
+
 /*************************************************
   pCodeFlowLink
 
@@ -510,6 +513,7 @@ typedef struct pCodeFlowLink
 	int bank_conflict;    /* records bank conflicts */
 
 } pCodeFlowLink;
+
 
 /*************************************************
     pCodeInstruction
@@ -551,6 +555,19 @@ typedef struct pCodeInstruction
 
 
 /*************************************************
+    pCodeAsmDir
+**************************************************/
+
+typedef struct pCodeAsmDir
+{
+  pCodeInstruction pci;
+  
+  char *directive;
+  char *arg;
+} pCodeAsmDir;
+
+
+/*************************************************
     pCodeLabel
 **************************************************/
 
@@ -563,6 +580,7 @@ typedef struct pCodeLabel
 	int key;
 
 } pCodeLabel;
+
 
 /*************************************************
     pCodeFunction
@@ -762,6 +780,7 @@ typedef struct peepCommand {
 #define PCFLINK(x)((pCodeFlowLink *)(x))
 #define PCW(x)    ((pCodeWild *)(x))
 #define PCCS(x)   ((pCodeCSource *)(x))
+#define PCAD(x)	  ((pCodeAsmDir *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
 //#define PCOB(x)   ((pCodeOpBit *)(x))
@@ -832,6 +851,8 @@ void pBlockConvert2ISR(pBlock *pb);
 void pCodeInsertAfter(pCode *pc1, pCode *pc2);
 void pCodeInsertBefore(pCode *pc1, pCode *pc2);
 void pCodeDeleteChain(pCode *f,pCode *t);
+
+pCode *newpCodeAsmDir(char *asdir, char *argfmt, ...); 
 
 pCodeOp *newpCodeOpLabel(char *name, int key);
 pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space,int is_func);

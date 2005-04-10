@@ -1,3 +1,14 @@
+2005-04-10 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic/gen.c (genInline),
+	  src/pic/pcode.c (newpCodeAsmDir), (pCode2str),
+	  (genericPrint), (unlinkpCodeFromBranch), (compareLabel),
+	  (findNextInstruction), (findPrevInstruction),
+	  (findInstructionUsingLabel),
+	  src/pic/pcode.h: fixed bug #1164907 - Labels not being recognized
+	* src/pic/pcode.c (findLabel): added missing '\n'
+	* src/src.dsp: added SDCCdwarf2.c to the project
+
 2005-04-09 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added include/hc08/* h to NSIS setup

@@ -46,7 +46,6 @@
 extern void genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 extern void genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 void genMult8X8_8 (operand *, operand *,operand *);
-pCode *AssembleLine(char *line);
 extern void printpBlock(FILE *of, pBlock *pb);
 
 static int labelOffset=0;
@@ -5957,40 +5956,44 @@ release :
 /*-----------------------------------------------------------------*/
 static void genInline (iCode *ic)
 {
-	char *buffer, *bp, *bp1;
-	
-	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	
-	_G.inLine += (!options.asmpeep);
-	
-	buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
-	strcpy(buffer,IC_INLINE(ic));
-	
-	/* emit each line as a code */
-	while (*bp) {
-		if (*bp == '\n') {
-			*bp++ = '\0';
-			
-			if(*bp1)
-				addpCode2pBlock(pb,AssembleLine(bp1));
-			bp1 = bp;
-		} else {
-			if (*bp == ':') {
-				bp++;
-				*bp = '\0';
-				bp++;
-				pic14_emitcode(bp1,"");
-				bp1 = bp;
-			} else
-				bp++;
-		}
-	}
-	if ((bp1 != bp) && *bp1)
-		addpCode2pBlock(pb,AssembleLine(bp1));
-	
-	Safe_free(buffer);
-	
-	_G.inLine -= (!options.asmpeep);
+  char *buffer, *bp, *bp1;
+
+  DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+  _G.inLine += (!options.asmpeep);
+
+  buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
+  strcpy(buffer,IC_INLINE(ic));
+
+  /* emit each line as a code */
+  while (*bp) {
+    if (*bp == '\n') {
+      *bp++ = '\0';
+      
+      if(*bp1)
+        addpCode2pBlock(pb, newpCodeAsmDir(bp1, NULL)); // inline directly, no process
+      bp1 = bp;
+    } else {
+      if (*bp == ':') {
+        bp++;
+        *bp = '\0';
+        bp++;
+
+        /* print label, use this special format with NULL directive
+         * to denote that the argument should not be indented with tab */
+        addpCode2pBlock(pb, newpCodeAsmDir(NULL, bp1)); // inline directly, no process
+
+        bp1 = bp;
+      } else
+        bp++;
+    }
+  }
+  if ((bp1 != bp) && *bp1)
+    addpCode2pBlock(pb, newpCodeAsmDir(bp1, NULL)); // inline directly, no process
+
+  Safe_free(buffer);
+
+  _G.inLine -= (!options.asmpeep);
 }
 
 /*-----------------------------------------------------------------*/

@@ -169,6 +169,10 @@ SOURCE=.\SDCCdflow.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\SDCCdwarf2.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\support\Util\sdccerr.c
 # End Source File
 # Begin Source File
@@ -243,10 +247,6 @@ SOURCE=.\SDCCval.c
 
 SOURCE=.\sdccy.c
 # End Source File
-# Begin Source File
-
-SOURCE=.\SDCCdwarf2.c
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -302,6 +302,14 @@ SOURCE=.\SDCCcse.h
 # Begin Source File
 
 SOURCE=.\SDCCdflow.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\SDCCdwarf2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\support\Util\SDCCerr.h
 # End Source File
 # Begin Source File
 
@@ -370,10 +378,6 @@ SOURCE=.\sdccy.h
 # Begin Source File
 
 SOURCE=.\spawn.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\SDCCdwarf2.h
 # End Source File
 # End Group
 # Begin Group "Regression Test"

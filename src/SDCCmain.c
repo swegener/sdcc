@@ -1676,8 +1676,8 @@ linkEdit (char **envp)
           set *tempSet=NULL;
 
           tempSet = appendStrSet(libDirsSet, NULL, DIR_SEPARATOR_STRING);
-          tempSet = appendStrSet(libDirsSet, NULL, c);
-          mergeSets(&tempSet, libPathsSet);
+          tempSet = appendStrSet(tempSet, NULL, c);
+          mergeSets(&tempSet, libDirsSet);
 
           for (s = setFirstItem(tempSet); s != NULL; s = setNextItem(tempSet))
             {

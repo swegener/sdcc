@@ -1,3 +1,7 @@
+2005-04-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (linkEdit): fixed bug with finding crt0.o for z80
+
 2005-04-10 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/glue.c (printIvalChar): fixed bug when emitting

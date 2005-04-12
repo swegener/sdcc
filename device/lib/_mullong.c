@@ -490,6 +490,141 @@ _mullong_dummy (void) _naked
 	_endasm ;
 }
 
+#elif defined(SDCC_USE_XSTACK) && defined(SDCC_STACK_AUTO)
+
+void
+_mullong_dummy (void) _naked
+{
+	_asm
+
+	__mullong:
+
+		.globl __mullong
+
+					; the result c will be stored in r4...r7
+		#define c0 r4
+		#define c1 r5
+		#define c2 r6
+		#define c3 r7
+
+		#define a0 dpl
+		#define a1 dph
+		#define a2 r2
+		#define a3 r3
+
+		#define b0 r1
+
+	; c0  a0 * b0
+	; c1  a1 * b0 + a0 * b1
+	; c2  a2 * b0 + a1 * b1 + a0 * b2
+	; c3  a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
+
+
+					; parameter a comes in a, b, dph, dpl
+		mov	r2,b		; save parameter a
+		mov	r3,a
+
+		mov	a,#-4		;  1  b 4 bytes
+		add	a,_spx		;  1
+		mov	r0,a		;  1  r0 points to b0
+
+					;	Byte 0
+		movx	a,@r0		; b0
+		mov	b0,a		; we need b0 several times
+		inc	r0		; r0 points to b1
+		mov	b,a0
+		mul	ab		; a0 * b0
+		mov	c0,a
+		mov	c1,b
+
+					;	Byte 1
+		mov	a,a1
+		mov	b,b0
+		mul	ab		; a1 * b0
+		add	a,c1
+		mov	c1,a
+		clr	a
+		addc	a,b
+		mov	c2,a
+
+
+		mov	b,a0
+		movx	a,@r0		; b1
+		mul	ab		; a0 * b1
+		add	a,c1
+		mov	c1,a
+		mov	a,b
+		addc	a,c2
+		mov	c2,a
+		clr	a
+		rlc	a
+		mov	c3,a
+
+					;	Byte 2
+		mov	a,a2
+		mov	b,b0
+		mul	ab		; a2 * b0
+		add	a,c2
+		mov	c2,a
+		mov	a,b
+		addc	a,c3
+		mov	c3,a
+
+		mov	b,a1
+		movx	a,@r0		; b1
+		mul	ab		; a1 * b1
+		add	a,c2
+		mov	c2,a
+		mov	a,b
+		addc	a,c3
+		mov	c3,a
+
+		mov	b,a0
+		inc	r0
+		movx	a,@r0		; b2
+		mul	ab		; a0 * b2
+		add	a,c2
+		mov	c2,a
+		mov	a,b
+		addc	a,c3
+		mov	c3,a
+
+					;	Byte 3
+		mov	a,a3
+		mov	b,b0
+		mul	ab		; a3 * b0
+		add	a,c3
+		mov	c3,a
+
+		mov	b,a1
+		movx	a,@r0		; b2
+		mul	ab		; a1 * b2
+		add	a,c3
+		mov	c3,a
+
+		mov	b,a2
+		dec	r0
+		movx	a,@r0		; b1
+		mul	ab		; a2 * b1
+		add	a,c3
+		mov	c3,a
+
+		mov	b,a0
+		inc	r0
+		inc	r0
+		movx	a,@r0		; b3
+		mul	ab		; a0 * b3
+		add	a,c3
+
+		mov	b,c2
+		mov	dph,c1
+		mov	dpl,c0
+
+		ret
+
+	_endasm ;
+}
+
 #else // _MULLONG_ASM
 
 struct some_struct {

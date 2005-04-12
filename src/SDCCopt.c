@@ -561,7 +561,7 @@ convertToFcall (eBBlock ** ebbs, int count)
           if (ic->op == '%' && isOperandLiteral(IC_RIGHT(ic)) &&
               IS_UNSIGNED(operandType(IC_LEFT(ic))))
             {
-              unsigned litVal = abs(operandLitValue(IC_RIGHT(ic)));
+              unsigned litVal = abs((int)operandLitValue(IC_RIGHT(ic)));
 
               // See if literal value is a power of 2.
               while (litVal && !(litVal & 1))
@@ -941,11 +941,6 @@ killDeadCode (ebbIndex * ebbi)
 		  if (ic->op == ADDRESS_OF)
 		    volLeft = FALSE;
               
-		  //if (ic->op == CAST && isOperandVolatile (IC_LEFT (ic), FALSE))
-		  //  {
-		  //    volRight = IS_SYMOP (IC_RIGHT (ic));
-		  //  }
-
 		  if (ic->next && ic->seqPoint == ic->next->seqPoint
 		      && (ic->next->op == '+' || ic->next->op == '-'))
 		    {
@@ -1170,9 +1165,6 @@ eBBlock **
 eBBlockFromiCode (iCode * ic)
 {
   ebbIndex *ebbi = NULL;
-  //eBBlock **ebbs = NULL;
-  //int count = 0;
-  //int saveCount = 0;
   int change = 1;
   int lchange = 0;
   int kchange = 0;
@@ -1182,7 +1174,6 @@ eBBlockFromiCode (iCode * ic)
   if (!ic)
     return NULL;
 
-  //count = 0;
   eBBNum = 0;
 
   /* optimize the chain for labels & gotos 

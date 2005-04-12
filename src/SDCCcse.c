@@ -1535,7 +1535,7 @@ constFold (iCode * ic, set * cseSet)
       ic->op != '-')
     return 0;
 
-  /* this check is a hueristic to prevent live ranges
+  /* this check is a heuristic to prevent live ranges
      from becoming too long */
   if (IS_PTR (operandType (IC_RESULT (ic))))
       return 0;
@@ -1545,7 +1545,7 @@ constFold (iCode * ic, set * cseSet)
     return 0;
 
   /* check if we can find a definition for the
-     right hand side */
+     left hand side */
   if (!(applyToSet (cseSet, diCodeForSym, IC_LEFT (ic), &dic)))
     return 0;
 

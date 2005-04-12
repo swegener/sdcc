@@ -603,14 +603,57 @@ replace {
 	jnc	%1
 }
 
+// applies to: bug-524691.c --model-large: while (uRight - uLeft > 1)
 replace {
 	clr	a
 	rlc	a
-	jnz	%1
+	jnz	%0
 } by {
-	;	Peephole 129	jump optimization
-	jc	%1
+	;	Peephole 129.a	jump optimization
+        jc	%0
 }
+
+// applies to: _fsdiv.c --xstack: if (mant1 < mant2)
+replace {
+	clr	a
+	rlc	a
+        pop	%1
+	jnz	%0
+} by {
+	;	Peephole 129.b	optimized condition
+        pop	%1
+        jc	%0
+} if notVolatile %1
+
+// applies to: time.c --xstack: while((days += (LEAP_YEAR(year) ? 366 : 365)) <= epoch)
+replace {
+	clr	a
+	rlc	a
+        pop	%1
+        pop	%2
+	jnz	%0
+} by {
+	;	Peephole 129.c	optimized condition
+        pop	%1
+        pop	%2
+        jc	%0
+} if notVolatile %1 %2
+
+// applies to: _memmove.c --xstack: if (((int)src < (int)dst) && ((((int)src)+acount) > (int)dst))
+replace {
+	clr	a
+	rlc	a
+        pop	%1
+        pop	%2
+        pop	%3
+	jnz	%0
+} by {
+	;	Peephole 129.d	optimized condition
+        pop	%1
+        pop	%2
+        pop	%3
+        jc	%0
+} if notVolatile %1 %2 %3
 
 replace {
 	mov	r%1,@r%2

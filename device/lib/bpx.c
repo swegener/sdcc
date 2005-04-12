@@ -22,5 +22,8 @@
    You are forbidden to forbid anyone else to use, share and improve
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
-
-data unsigned int bpx ;
+#if defined(SDCC_mcs51)
+  __data unsigned char bpx ;
+#else
+  __data unsigned int bpx ;
+#endif

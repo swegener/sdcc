@@ -1,5 +1,25 @@
 2005-04-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/include/malloc.h: removed redundant __reentrant prototypes
+	* device/lib/_mullong.c: added working xstack variant in asm (C version
+	  doesn't pass regression tests)
+	* device/lib/bpx.c: used __data and made bpx char for mcs51
+	* src/SDCCast.c (decorateType): removed unused GPTYPE_IDATA,
+	  (createFunction): fixed bug with xstackPtr
+	* src/SDCCcse.c: corrected comments
+	* src/SDCCopt.c (convertToFcall): fixed warning in MSVC,
+	  (killDeadCode, eBBlockFromiCode): removed unused code
+	* src/SDCCsymt.h: removed unused GPTYPE_GPTR and GPTYPE_IDATA,
+	  corrected comments
+	* src/mcs51/gen.c (aopForSym, aopPut, toBoolean, unsaveRegisters,
+	  assignResultValue, genCall, genFunction, genEndFunction, genAnd,
+	  genOr, genXor, genAddrOf): fixed several bugs concerning xstack
+	  (genModOneByte): fixed warning in MSVC
+	* src/mcs51/main.c (): added comments
+	* src/mcs51/peeph.def: changed 129 to 129.a, added 129.b, 129.c & 129.d
+
+2005-04-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/SDCCmain.c (linkEdit): oops, changed one line too many
 
 2005-04-11 Maarten Brock <sourceforge.brock AT dse.nl>

@@ -727,10 +727,15 @@ PORT mcs51_port =
   },
   { _mcs51_genExtraAreas, NULL },
   {
-    +1, 0, 4, 1, 1, 0
+    +1,		/* direction (+1 = stack grows up) */
+    0,		/* bank_overhead (switch between register banks) */
+    4,		/* isr_overhead */
+    1,		/* call_overhead (2 for return address - 1 for pre-incrementing push */
+    1,		/* reent_overhead */
+    0		/* banked_overhead (switch between code banks) */
   },
-    /* mcs51 has an 8 bit mul */
   {
+    /* mcs51 has an 8 bit mul */
     1, -1
   },
   {

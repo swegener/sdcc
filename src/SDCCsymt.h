@@ -63,8 +63,6 @@ enum {
 #define GPTYPE_FAR	1
 #define GPTYPE_CODE	2
 #define GPTYPE_XSTACK	3
-#define GPTYPE_GPTR	4 	// Never used?
-#define GPTYPE_IDATA	5
 
 #define HASHTAB_SIZE 256
 
@@ -152,13 +150,13 @@ typedef struct specifier
     int argreg;  	        /* reg no for regparm 	      */
     union
       {				/* Values if constant or enum */
-	TYPE_WORD   v_int;	/* 2 bytes: int and char values        */
-	char       *v_char;	/*          character string           */
-	TYPE_UWORD  v_uint;	/* 2 bytes: unsigned int const value   */
-	TYPE_DWORD  v_long;	/* 4 bytes: long constant value        */
-	TYPE_UDWORD v_ulong;	/* 4 bytes: unsigned long constant val */
+	TYPE_WORD   v_int;	/* 2 bytes: int and char values           */
+	char       *v_char;	/*          character string              */
+	TYPE_UWORD  v_uint;	/* 2 bytes: unsigned int const value      */
+	TYPE_DWORD  v_long;	/* 4 bytes: long constant value           */
+        TYPE_UDWORD v_ulong;    /* 4 bytes: unsigned long constant value  */
 	double      v_float;	/*          floating point constant value */
-	struct symbol *v_enum;	/* ptr 2 enum_list if enum==1 */
+        struct symbol *v_enum;  /* ptr to enum_list if enum==1            */
       }
     const_val;
     struct structdef *v_struct;	/* structure pointer      */
@@ -223,7 +221,7 @@ typedef struct sym_link
       unsigned nonbanked:1;	/* function has the nonbanked attribute */
       unsigned banked:1;	/* function has the banked attribute */
       unsigned critical:1;	/* critical function          */
-      unsigned intrtn:1;	/* this is an interrupt routin */
+      unsigned intrtn:1;        /* this is an interrupt routine */
       unsigned rbank:1;		/* seperate register bank     */
       unsigned intno;		/* 1=Interrupt svc routine    */
       short    regbank;		/* register bank 2b used      */
@@ -281,7 +279,7 @@ typedef struct symbol
     unsigned noSpilLoc:1;	/* cannot be assigned a spil location */
     unsigned isstrlit;		/* is a string literal and it's usage count  */
     unsigned accuse;		/* can be left in the accumulator
-				   On the Z80 accuse is devided into
+                                   On the Z80 accuse is divided into
 				   ACCUSE_A and ACCUSE_HL as the idea
 				   is quite similar.
 				 */
@@ -297,7 +295,7 @@ typedef struct symbol
     struct regs *regs[4];	/* can have at the most 4 registers */
     struct asmop *aop;		/* asmoperand for this symbol */
     struct iCode *fuse;		/* furthest use */
-    struct iCode *rematiCode;	/* rematerialse with which instruction */
+    struct iCode *rematiCode;   /* rematerialise with which instruction */
     struct operand *reqv;	/* register equivalent of a local variable */
     struct symbol *prereqv;	/* symbol before register equiv. substituion */
     struct symbol *psbase;	/* if pseudo symbol, the symbol it is based on */
@@ -313,8 +311,8 @@ typedef struct symbol
     int lineDef;		/* defined line number        */
     char *fileDef;		/* defined filename           */
     int lastLine;		/* for functions the last line */
-    struct sym_link *type;	/* 1st link to declator chain */
-    struct sym_link *etype;	/* last link to declarator chn */
+    struct sym_link *type;      /* 1st link to declarator chain */
+    struct sym_link *etype;     /* last link to declarator chain */
     struct symbol *next;	/* crosslink to next symbol   */
     struct symbol *localof;	/* local variable of which function */
     struct initList *ival;	/* ptr to initializer if any  */

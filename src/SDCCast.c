@@ -3581,10 +3581,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 gptype = GPTYPE_FAR;
                 break;
               case S_DATA:
-                gptype = GPTYPE_NEAR;
-                break;
               case S_IDATA:
-                gptype = GPTYPE_IDATA;
+                gptype = GPTYPE_NEAR;
                 break;
               case S_PDATA:
                 gptype = GPTYPE_XSTACK;
@@ -5351,7 +5349,7 @@ createFunction (symbol * name, ast * body)
 
   /* set the stack pointer */
   stackPtr  = -port->stack.direction * port->stack.call_overhead;
-  xstackPtr = -port->stack.direction * port->stack.call_overhead;
+  xstackPtr = 0;
 
   if (IFFUNC_ISISR (name->type))
     stackPtr -= port->stack.direction * port->stack.isr_overhead;

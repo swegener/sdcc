@@ -1,3 +1,7 @@
+2005-04-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (linkEdit): oops, changed one line too many
+
 2005-04-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c (linkEdit): fixed bug with finding crt0.o for z80

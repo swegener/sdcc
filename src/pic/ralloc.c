@@ -970,6 +970,11 @@ typeRegWithIdx (int idx, int type, int fixed)
 			debugLog ("Found a Stack Register!\n");
 			return dReg;
 		}
+		else {
+		  werror (E_STACK_OUT, "Register");
+                  /* return an existing register just to avoid the SDCC crash */
+		  return regWithIdx ( dynStackRegs, 0x7f, fixed);
+                }
 		break;
 	case REG_SFR:
 		if( (dReg = regWithIdx ( dynProcessorRegs, idx, fixed)) != NULL ) {

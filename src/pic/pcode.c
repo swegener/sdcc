@@ -1344,7 +1344,8 @@ void  pCodeInitRegisters(void)
 	initialized = 1;
 	
 	shareBankAddress = 0x7f; /* FIXME - some PIC ICs like 16C7X which do not have a shared bank need a different approach. */
-	stkSize = 8; // Set pseudo stack size to 8
+//	stkSize = 8; // Set pseudo stack size to 8
+	stkSize = 16; // Set pseudo stack size to 16
 	initStack(shareBankAddress, stkSize); // Putting the pseudo stack in shared memory so all modules use the same register when passing fn parameters
 	init_pic(port->processor);
 	if ((unsigned)shareBankAddress > getMaxRam())

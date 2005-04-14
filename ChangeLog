@@ -1,3 +1,9 @@
+2005-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/z80/stdio.h,
+	* device/include/z80/string.h: removed these highly incomplete files so
+	  SDCC can use the default ones in device/include/
+
 2005-04-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c (genEndFunction): removed unused variable to fix

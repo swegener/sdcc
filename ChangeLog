@@ -1,3 +1,9 @@
+2005-04-14 Borut Razem <borut.razem AT siol.net>
+
+	* src/pic16/gen.c (genInline), src/pic16/main.c (_process_pragma),
+	  src/pic16/device.h: temporarily disabled experimental #inline pragma
+	  for 2.5.0 release
+
 2005-04-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/z80/stdio.h,

@@ -115,7 +115,11 @@ typedef struct {
 extern set *fix_idataSymSet;
 extern set *rel_idataSymSet;
 
+#if 0
+/* This is an experimental code for #pragma inline
+   and is temporarily disabled for 2.5.0 release */
 extern set *asmInlineMap;
+#endif  /* 0 */
 
 typedef struct {
   unsigned long isize;

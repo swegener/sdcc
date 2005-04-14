@@ -8227,7 +8227,6 @@ static void genXor (iCode *ic, iCode *ifx)
 static void genInline (iCode *ic)
 {
   char *buffer, *bp, *bp1;
-  char *cbuf;
     
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -8243,12 +8242,14 @@ static void genInline (iCode *ic)
         }
         bp = bp1 = buffer;
 
-	cbuf = Safe_strdup( buffer );
-
+#if 0
+  /* This is an experimental code for #pragma inline
+     and is temporarily disabled for 2.5.0 release */
         if(asmInlineMap)
         {
           symbol *sym;
           char *s;
+          char *cbuf;
           int cblen;
 
             cbuf = Safe_strdup(buffer);
@@ -8295,6 +8296,7 @@ static void genInline (iCode *ic)
             
             bp = bp1 = buffer;
         }
+#endif  /* 0 */
 
 	/* emit each line as a code */
 	while (*bp) {

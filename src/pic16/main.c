@@ -140,7 +140,11 @@ set *sectNames=NULL;			/* list of section listed in pragma directives */
 set *sectSyms=NULL;			/* list of symbols set in a specific section */
 set *wparamList=NULL;
 
+#if 0
+/* This is an experimental code for #pragma inline
+   and is temporarily disabled for 2.5.0 release */
 set *asmInlineMap=NULL;
+#endif  /* 0 */
 
 struct {
   unsigned ignore: 1;
@@ -339,7 +343,10 @@ _process_pragma(const char *sz)
     
     return 0;
   }
-      
+   
+#if 0
+  /* This is an experimental code for #pragma inline
+     and is temporarily disabled for 2.5.0 release */
   if(startsWith(ptr, "inline")) {
     char *tmp = strtok((char *)NULL, WHITECOMMA);
 
@@ -358,7 +365,8 @@ _process_pragma(const char *sz)
       
       return 0;
   }
-  
+#endif  /* 0 */
+
   return 1;
 }
 

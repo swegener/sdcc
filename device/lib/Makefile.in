@@ -15,7 +15,7 @@ CP              = @CP@
 PRJDIR		= ../..
 INCDIR		= $(PRJDIR)/device/include
 ifndef PORTINCDIR
-PORTINCDIR	= $(INCDIR)
+PORTINCDIR	= $(INCDIR)/mcs51
 endif
 
 CC		= $(PRJDIR)/bin/sdcc

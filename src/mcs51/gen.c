@@ -3058,7 +3058,6 @@ genEndFunction (iCode * ic)
   bitVect  *regsUsed;
   bitVect  *regsUsedPrologue;
   bitVect  *regsUnneeded;
-  int      accIsFree = sym->recvSize < 4;
   int      idx;
 
   _G.currentFunc = NULL;

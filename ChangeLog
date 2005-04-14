@@ -1,3 +1,10 @@
+2005-04-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genEndFunction): removed unused variable to fix
+	gcc warning.
+	* device/lib/Makefile.in: default PORTINCDIR to the mcs51 subdir to
+	fix sdcpp warnings.
+
 2005-04-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/malloc.h: removed redundant __reentrant prototypes

@@ -1,8 +1,8 @@
 2005-04-14 Borut Razem <borut.razem AT siol.net>
 
 	* fixed bug 1045046 - SIGSEGV with really simple code?:
-	  src/pic16/pcode.c (pCodeInitRegisters)- pseudo stack size increased to 16
-	  src/pic16/ralloc.c (typeRegWithIdx) - error message on pseudo stack overflow
+	  src/pic/pcode.c (pCodeInitRegisters)- pseudo stack size increased to 16
+	  src/pic/ralloc.c (typeRegWithIdx) - error message on pseudo stack overflow
 
 2005-04-14 Borut Razem <borut.razem AT siol.net>
 

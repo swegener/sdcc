@@ -1340,6 +1340,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                        this was spilt then break */
                     if (!sym->regs[j])
                       {
+                        int i;
                         for (i=0; i < sym->nRegs ; i++ )
                           sym->regs[i] = NULL;
                         break;

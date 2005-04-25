@@ -1,3 +1,7 @@
+2005-04-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (serialRegAssign): fixed bug 1189609
+
 2005-04-14 Borut Razem <borut.razem AT siol.net>
 
 	* fixed bug 1045046 - SIGSEGV with really simple code?:

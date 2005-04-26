@@ -1,3 +1,10 @@
+2005-04-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* doc/sdccman.lyx: changed version 2.5.0, documented --std-c89,
+	--std-sdcc89, --std-c99, --std-sdcc99, and the corresponding #pragmas, as
+	well as many smaller updates.
+	* .version: changed to version 2.5.0-pre1
+
 2005-04-26 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* src/SDCCmain.c (setIncludePath): added port->target to SDCC_INCLUDE_NAME

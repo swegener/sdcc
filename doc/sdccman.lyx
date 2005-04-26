@@ -83,7 +83,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.4.8
+SDCC 2.5.0
 \size footnotesize 
 
 \newline 
@@ -141,7 +141,8 @@ Sandeep Dutta
 
 \end_inset 
 
-, etc.), Dallas DS80C390 variants, Motorola HC08 and Zilog Z80 based MCUs.
+, etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 and
+ Zilog Z80 based MCUs.
  It can be retargetted for other microprocessors, support for Microchip
  PIC, Atmel AVR is under development.
  The entire source code for the compiler is distributed under GPL.
@@ -371,11 +372,11 @@ This version has numerous bug fixes compared with the previous version.
 \layout Itemize
 
 short is now equivalent to int (16 bits), it used to be equivalent to char
- (8 bits) which is not ANSI compliant
+ (8 bits) which is not ANSI compliant.
 \layout Itemize
 
 the default directory for gcc-builds where include, library and documentation
- files are stored is now in /usr/local/share
+ files are stored is now in /usr/local/share.
 \layout Itemize
 
 char type parameters to vararg functions are casted to int unless explicitly
@@ -408,7 +409,7 @@ status Collapsed
 /
 \end_inset 
 
--regextend has been removed
+-regextend has been removed.
 \layout Itemize
 
 option -
@@ -421,7 +422,7 @@ status Collapsed
 /
 \end_inset 
 
--noregparms has been removed
+-noregparms has been removed.
 \layout Itemize
 
 option -
@@ -434,7 +435,31 @@ status Collapsed
 /
 \end_inset 
 
--stack-after-data has been removed
+-stack-after-data has been removed.
+\layout Itemize
+
+bit and sbit types now consistently behave like the C99 _Bool type with
+ respect to type conversion.
+ The most common incompatibility resulting from this change is related to
+ bit toggling idioms, e.g.:
+\newline 
+
+\family typewriter 
+\SpecialChar ~
+\SpecialChar ~
+bit b;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+b = ~b; /* equivalent to b=1 instead of toggling b */
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+b = !b; /* toggles b */
+\newline 
+
+\family default 
+In previous versions, both forms would have toggled the bit.
 \layout Standard
 
 
@@ -4994,12 +5019,12 @@ Processor Selection Options
 
 
 \series default 
- Generate code for the Motorola HC08
+ Generate code for the Freescale/Motorola HC08
 \begin_inset LatexCommand \index{HC08}
 
 \end_inset 
 
- family of processors (added Oct 2003).
+ family of processors.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -5588,6 +5613,49 @@ status Collapsed
  The provided value should not overlap any other memory areas such as used
  register banks or the data segment and with enough space for the current
  application.
+ The 
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-pack-iram
+\series default 
+\SpecialChar ~
+
+\begin_inset LatexCommand \index{-\/-pack-iram}
+
+\end_inset 
+
+ option (which is now a default setting) will override this setting, so
+ you should also specify the .
+ 
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-pack-iram
+\series default 
+\SpecialChar ~
+
+\begin_inset LatexCommand \index{-\/-no-pack-iram}
+
+\end_inset 
+
+ option if you need to manually place the stack.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -5805,6 +5873,38 @@ The linker output (final object code) is in Motorola S19 format
 
 .
  The format itself is documented in the documentation of srecord.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-out-fmt-elf
+\begin_inset LatexCommand \index{-\/-out-fmt-s19}
+
+\end_inset 
+
+
+\bar under 
+ 
+\series default 
+\bar default 
+The linker output (final object code) is in ELF format
+\begin_inset LatexCommand \index{ELF format}
+
+\end_inset 
+
+.
+ (Currently only supported for the HC08 processors)
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -6065,7 +6165,7 @@ status Collapsed
 \series default 
 \SpecialChar ~
 
-\begin_inset LatexCommand \index{-\/-pack-iram}
+\begin_inset LatexCommand \index{-\/-no-pack-iram}
 
 \end_inset 
 
@@ -7510,6 +7610,102 @@ asmOption[,asmOption]
 
 .
  See file sdcc/as/doc/asxhtm.html for assembler options.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-sdcc89
+\begin_inset LatexCommand \index{-\/-std-sdcc89}
+
+\end_inset 
+
+
+\series default 
+ Generally follow the C89 standard, but allow SDCC features that conflict
+ with the standard (default).
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset 
+
+
+\series default 
+ Follow the C89 standard and disable SDCC features that conflict with the
+ standard.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-sdcc99
+\begin_inset LatexCommand \index{-\/-std-sdcc99}
+
+\end_inset 
+
+
+\series default 
+ Generally follow the C99 standard, but allow SDCC features that conflict
+ with the standard (incomplete support).
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-sdcc99}
+
+\end_inset 
+
+
+\series default 
+ Follow the C99 standard and disable SDCC features that conflict with the
+ standard (incomplete support).
 \layout Subsection
 
 Intermediate Dump Options
@@ -9147,11 +9343,11 @@ HC08 Storage Class
 \layout Subsubsection
 
 data
-\begin_inset LatexCommand \index{data (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{data (hc08 storage class)}
 
 \end_inset 
 
-
+ 
 \layout Standard
 
 The data storage class declares a variable that resides in the first 256
@@ -9161,11 +9357,11 @@ The data storage class declares a variable that resides in the first 256
 \layout Subsubsection
 
 xdata
-\begin_inset LatexCommand \index{xdata (mcs51, ds390 storage class)}
+\begin_inset LatexCommand \index{xdata (hc08 storage class)}
 
 \end_inset 
 
-
+ 
 \layout Standard
 
 The xdata storage class declares a variable that can reside anywhere in
@@ -14421,6 +14617,42 @@ opt_code_balanced
  as long as meeting one goal is not a detriment to the other (this is the
  default).
  
+\layout Itemize
+
+std_sdcc89 
+\begin_inset LatexCommand \index{\#pragma std\_sdcc89}
+
+\end_inset 
+
+- Generally follow the C89 standard, but allow SDCC features that conflict
+ with the standard (default).
+\layout Itemize
+
+std_c89 
+\begin_inset LatexCommand \index{\#pragma std\_c89}
+
+\end_inset 
+
+- Follow the C89 standard and disable SDCC features that conflict with the
+ standard.
+\layout Itemize
+
+std_sdcc99 
+\begin_inset LatexCommand \index{\#pragma std\_sdcc99}
+
+\end_inset 
+
+- Generally follow the C99 standard, but allow SDCC features that conflict
+ with the standard (incomplete support).
+\layout Itemize
+
+std_c99 
+\begin_inset LatexCommand \index{\#pragma std\_c99}
+
+\end_inset 
+
+- Follow the C99 standard and disable SDCC features that conflict with the
+ standard (incomplete support).
 \layout Standard
 
 SDCPP supports the following #pragma directives:
@@ -24091,17 +24323,36 @@ ANSI-Compliance
 Deviations from the compliance:
 \layout Itemize
 
-functions are not always reentrant
+functions are not reentrant
 \begin_inset LatexCommand \index{reentrant}
 
 \end_inset 
 
-.
+ unless explicitly declared as such or the 
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-auto
+\begin_inset LatexCommand \index{-\/-stack-auto}
+
+\end_inset 
+
+
+\series default 
+ command line option is specified.
 \layout Itemize
 
-structures cannot be assigned values directly, cannot be passed as function
- parameters or assigned to each other and cannot be a return value from
- a function, e.g.:
+structures and unions cannot be assigned values directly, cannot be passed
+ as function parameters or assigned to each other and cannot be a return
+ value from a function, e.g.:
 \begin_deeper 
 \layout Verse
 
@@ -24205,6 +24456,44 @@ No support for setjmp
  (for now).
 \layout Itemize
 
+Certain words that are valid identifiers in the standard may be reserved
+ words in SDCC unless the 
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset 
+
+ or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-c99}
+
+\end_inset 
+
+
+\series default 
+ command line options are used.
+\layout Itemize
+
 Old K&R style
 \begin_inset LatexCommand \index{K\&R style}
 
@@ -24231,6 +24520,52 @@ int i,j; /* are valid in ANSI but not valid in SDCC */
 \newline 
 }
 \end_deeper 
+\layout Itemize
+
+Certain words that are valid identifiers in the standard may be reserved
+ words in SDCC unless the 
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-c89
+\begin_inset LatexCommand \index{-\/-std-c89}
+
+\end_inset 
+
+ or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-std-c99
+\begin_inset LatexCommand \index{-\/-std-c99}
+
+\end_inset 
+
+
+\series default 
+ command line options are used.
+ These may include (depending on the selected processor): 'at', 'banked',
+ 'bit', 'code', 'critical', 'data', 'eeprom', 'far', 'flash', 'idata', 'interrup
+t', 'near', 'nonbanked', 'pdata', 'reentrant', 'sbit', 'sfr', 'shadowregs',
+ 'sram', 'using', 'wparam', 'xdata', '_overlay', '_asm', '_endasm', and
+ '_naked'.
+ Compliant equivalents of these keywords are always available in a form
+ that begin with two underscores, f.e.
+ '__data' instead of 'data'.
 \layout Section
 
 Cyclomatic Complexity

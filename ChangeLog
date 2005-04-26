@@ -1,3 +1,11 @@
+2005-04-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug1185672.c: added
+	* src/mcs51/gen.c (aopGetUsesAcc, genCpl, genAnd, genOr, genXor): fixed
+	  bug 1185672
+	* src/mcs51/gen.c (genCall): added comments, made it look safer
+	* src/mcs51/gen.c (genEndFunction): simplified
+
 2005-04-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (serialRegAssign): fixed bug 1189609

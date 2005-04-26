@@ -2062,6 +2062,7 @@ static void
 setIncludePath(void)
 {
   char *p;
+  char *p2=NULL;
   set *tempSet=NULL;
 
   /*
@@ -2086,7 +2087,17 @@ setIncludePath(void)
   mergeSets(&includeDirsSet, tempSet);
 
   if ((p = getenv(SDCC_INCLUDE_NAME)) != NULL)
+  {
     addSetHead(&includeDirsSet, p);
+    p2=Safe_alloc(strlen(p)+strlen(DIR_SEPARATOR_STRING)+strlen(port->target)+1);
+    if(p2!=NULL)
+    {
+        strcpy(p2, p);
+        strcat(p2, DIR_SEPARATOR_STRING);
+        strcat(p2, port->target);
+        addSetHead(&includeDirsSet, p2);
+    }
+  }
 
 #if 0
   if (options.printSearchDirs) {

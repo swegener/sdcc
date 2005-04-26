@@ -1,3 +1,7 @@
+2005-04-26 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* src/SDCCmain.c (setIncludePath): added port->target to SDCC_INCLUDE_NAME
+
 2005-04-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug1185672.c: added

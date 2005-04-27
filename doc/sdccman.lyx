@@ -2,14 +2,12 @@
 \lyxformat 221
 \textclass book
 \begin_preamble
-
-
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
   pdfauthor={SDCC development team},
   pdfsubject={installation, user manual},
-  pdfkeywords={8032, 8051, ansi, c, compiler, CPU, DS390, 
-               embedded, GPL, HC08, manual, mcs51, PIC, Z80},
+  pdfkeywords={8032 8051 ansi c compiler CPU DS390
+               embedded GPL HC08 manual mcs51 microcontroller PIC Z80},
   colorlinks=true,
   linkcolor=blue] {hyperref}
 %
@@ -350,6 +348,11 @@ italic.
 \layout Section
 
 Compatibility with previous versions
+\begin_inset LatexCommand \index{Compatibility with previous versions}
+
+\end_inset 
+
+
 \layout Standard
 
 This version has numerous bug fixes compared with the previous version.
@@ -438,10 +441,40 @@ status Collapsed
 -stack-after-data has been removed.
 \layout Itemize
 
-bit and sbit types now consistently behave like the C99 _Bool type with
- respect to type conversion.
+bit
+\begin_inset LatexCommand \index{bit}
+
+\end_inset 
+
+ and sbit
+\begin_inset LatexCommand \index{sbit}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_sbit}
+
+\end_inset 
+
+ types now consistently behave like the C99 _Bool type with respect to type
+ conversion
+\begin_inset LatexCommand \index{type conversion}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{type promotion}
+
+\end_inset 
+
+.
  The most common incompatibility resulting from this change is related to
- bit toggling idioms, e.g.:
+ bit toggling
+\begin_inset LatexCommand \index{Bit toggling}
+
+\end_inset 
+
+ idioms, e.g.:
 \newline 
 
 \family typewriter 
@@ -3456,16 +3489,11 @@ del /s *.obj *.lib *.rul
  from the sdcc directory.
 \layout Subsection
 
-Windows Install Using a Binary Package
-\begin_inset LatexCommand \label{sub:Windows-Install}
-
-\end_inset 
-
-
+Windows Install Using a ZIP Package
 \layout Enumerate
 
-Download the binary package from 
-\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
+Download the binary zip package from 
+\begin_inset LatexCommand \url{http://sdcc.sf.net/snap.php}
 
 \end_inset 
 
@@ -3489,6 +3517,38 @@ lib for the include and libraries.
 
 Adjust your environment variable PATH to include the location of the bin
  directory or start sdcc using the full path.
+\layout Subsection
+
+Windows Install Using the Setup Program
+\begin_inset LatexCommand \label{sub:Windows-Install}
+
+\end_inset 
+
+
+\layout Standard
+
+Download the setup program 
+\emph on 
+sdcc-x.y.z-setup.exe
+\emph default 
+ for an official release from 
+\newline 
+
+\begin_inset LatexCommand \url{http://sf.net/project/showfiles.php?group_id=599}
+
+\end_inset 
+
+ or a setup program for one of the snapshots 
+\emph on 
+sdcc_yyyymmdd_setup.exe
+\emph default 
+ from 
+\begin_inset LatexCommand \url{http://sdcc.sf.net/snap.php}
+
+\end_inset 
+
+ and execute it.
+ A windows typical installer will guide you through the installation process.
 \layout Section
 
 Building the Documentation
@@ -3513,13 +3573,13 @@ make
  You're invited to make changes and additions to this manual (sdcc/doc/sdccman.ly
 x).
  Using LyX 
-\begin_inset LatexCommand \url{www.lyx.org}
+\begin_inset LatexCommand \url{http://www.lyx.org}
 
 \end_inset 
 
  as editor this is straightforward.
  Prebuilt documentation in html and pdf format is available from 
-\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
+\begin_inset LatexCommand \url{http://sdcc.sf.net/snap.php}
 
 \end_inset 
 
@@ -3541,8 +3601,28 @@ If you should know why please drop us a note
 \end_inset 
 
 .
- You'll find the pdf version at 
-\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/doc/sdccman.pdf}
+ 
+\newline 
+You'll find the pdf version
+\begin_inset LatexCommand \index{PDF version of this document}
+
+\end_inset 
+
+ at 
+\begin_inset LatexCommand \url{http://sdcc.sf.net/doc/sdccman.pdf}
+
+\end_inset 
+
+.
+ 
+\newline 
+A html version
+\begin_inset LatexCommand \index{HTML version of this document}
+
+\end_inset 
+
+ should be online at 
+\begin_inset LatexCommand \url{http://sdcc.sf.net/doc/sdccman.html/index.html}
 
 \end_inset 
 
@@ -3568,7 +3648,7 @@ There are many references pointing away from this documentation.
  Don't let this distract you.
  If there f.e.
  was a reference like 
-\begin_inset LatexCommand \url{www.opencores.org}
+\begin_inset LatexCommand \url{http://www.opencores.org}
 
 \end_inset 
 
@@ -4113,12 +4193,7 @@ S51
 
 \end_inset 
 
- is a freeware, opensource simulator developed by Daniel Drotos (
-\begin_inset LatexCommand \url{mailto:drdani@mazsola.iit.uni-miskolc.hu}
-
-\end_inset 
-
-).
+ is a freeware, opensource simulator developed by Daniel Drotos.
  The simulator is built as part of the build process.
  For more information visit Daniel's web site at: 
 \begin_inset LatexCommand \url{http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51}
@@ -4315,13 +4390,13 @@ objdump
 \family default 
 \shape default 
 
-\begin_inset LatexCommand \index{srecord (tool)}
+\begin_inset LatexCommand \index{srecord (bin, hex, ... tool)}
 
 \end_inset 
 
 ).
  Both formats are documented in the documentation of srecord
-\begin_inset LatexCommand \index{srecord (tool)}
+\begin_inset LatexCommand \index{srecord (bin, hex, ... tool)}
 
 \end_inset 
 
@@ -4368,7 +4443,7 @@ status Collapsed
 \end_inset 
 
 -debug) containing debug information.
- The format is documented in cdbfileformat.pdf.
+ The format is documented in cdbfileformat.pdf
 \layout Itemize
 
 sourcefile.
@@ -5079,13 +5154,13 @@ Processor Selection Options
 \end_inset 
 
  processor (In development, not complete).
- AVR users should probably have a look at avr-gcc 
-\begin_inset LatexCommand \url{ http://savannah.nongnu.org/download/avr-libc/snapshots/}
+ AVR users should probably have a look at winavr 
+\begin_inset LatexCommand \url{http://sourceforge.net/projects/winavr}
 
 \end_inset 
 
- or winavr 
-\begin_inset LatexCommand \url{http://winavr.sourceforge.net}
+ or 
+\begin_inset LatexCommand \url{http://www.avrfreaks.net/index.php?name=PNphpBB2&file=index}
 
 \end_inset 
 
@@ -5634,8 +5709,7 @@ status Collapsed
 \end_inset 
 
  option (which is now a default setting) will override this setting, so
- you should also specify the .
- 
+ you should also specify the 
 \series bold 
 -
 \begin_inset ERT
@@ -5836,7 +5910,7 @@ The linker output (final object code) is in Intel Hex format.
 
  This is the default option.
  The format itself is documented in the documentation of srecord
-\begin_inset LatexCommand \index{srecord (tool)}
+\begin_inset LatexCommand \index{srecord (bin, hex, ... tool)}
 
 \end_inset 
 
@@ -6514,7 +6588,20 @@ status Collapsed
 \series default 
  Will not do global subexpression elimination, this option may be used when
  the compiler creates undesirably large stack/data spaces to store compiler
- temporaries.
+ temporaries (
+\emph on 
+s
+\emph default 
+pill 
+\emph on 
+loc
+\emph default 
+ations, sloc
+\begin_inset LatexCommand \index{sloc (spill location)}
+
+\end_inset 
+
+).
  A warning message will be generated when this happens and the compiler
  will indicate the number of extra bytes it allocated.
  It is recommended that this option NOT be used, #pragma\SpecialChar ~
@@ -6723,7 +6810,12 @@ status Collapsed
 
 \series default 
  Will not memcpy initialized data from code space into xdata space.
- This saves a few bytes in code space if you don't have initialized data.
+ This saves a few bytes in code space if you don't have initialized data
+\begin_inset LatexCommand \index{Variable initialization}
+
+\end_inset 
+
+.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -7485,7 +7577,7 @@ status Collapsed
  (jwk burps: please be more specific here, please!).
  If you want rather more than less warnings you should consider using a
  separate tool dedicated to syntax checking like splint 
-\begin_inset LatexCommand \url{www.splint.org}
+\begin_inset LatexCommand \url{http://www.splint.org}
 
 \end_inset 
 
@@ -7728,7 +7820,7 @@ Intermediate Dump Options
 
 The following options are provided for the purpose of retargetting and debugging
  the compiler.
- These provided a means to dump the intermediate code (iCode
+ They provide a means to dump the intermediate code (iCode
 \begin_inset LatexCommand \index{iCode}
 
 \end_inset 
@@ -8296,8 +8388,18 @@ data
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_data (mcs51, ds390 storage class)}
+
+\end_inset 
+
  / near
 \begin_inset LatexCommand \index{near (storage class)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_near (storage class)}
 
 \end_inset 
 
@@ -8344,8 +8446,18 @@ xdata
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_xdata (mcs51, ds390 storage class)}
+
+\end_inset 
+
  / far
 \begin_inset LatexCommand \index{far (storage class)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_far (storage class)}
 
 \end_inset 
 
@@ -8408,6 +8520,11 @@ idata
 \end_inset 
 
 
+\begin_inset LatexCommand \index{\_\_idata (mcs51, ds390 storage class)}
+
+\end_inset 
+
+
 \layout Standard
 
 Variables declared with this storage class will be allocated into the indirectly
@@ -8462,6 +8579,11 @@ Please note, the first 128 byte of idata physically access the same RAM
 
 pdata
 \begin_inset LatexCommand \index{pdata (mcs51, ds390 storage class)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_pdata (mcs51, ds390 storage class)}
 
 \end_inset 
 
@@ -8579,6 +8701,11 @@ code
 \end_inset 
 
 
+\begin_inset LatexCommand \index{\_\_code}
+
+\end_inset 
+
+
 \layout Standard
 
 'Variables' declared with this storage class will be placed in the code
@@ -8678,6 +8805,11 @@ bit
 \end_inset 
 
 
+\begin_inset LatexCommand \index{\_\_bit}
+
+\end_inset 
+
+
 \layout Standard
 
 This is a data-type and a storage class specifier.
@@ -8736,8 +8868,13 @@ sfr
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_sfr}
+
+\end_inset 
+
  / sbit
-\begin_inset LatexCommand \index{sbit}
+\begin_inset LatexCommand \index{\_\_sbit}
 
 \end_inset 
 
@@ -8776,6 +8913,11 @@ bit
 \family typewriter 
 sfr at
 \begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset 
 
@@ -8937,6 +9079,11 @@ idata
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_idata (mcs51, ds390 storage class)}
+
+\end_inset 
+
 ).
  Furthermore, some chips may have some built in external memory (
 \emph on 
@@ -8947,6 +9094,11 @@ xdata
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_xdata (mcs51, ds390 storage class)}
+
+\end_inset 
+
 ) which should not be confused with the internal, directly addressable RAM
  memory (
 \emph on 
@@ -8954,6 +9106,11 @@ data
 \emph default 
 
 \begin_inset LatexCommand \index{data (mcs51, ds390 storage class)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_data (mcs51, ds390 storage class)}
 
 \end_inset 
 
@@ -8979,8 +9136,31 @@ Normally SDCC will only use the first bank
 \end_inset 
 
  of registers (register bank 0), but it is possible to specify that other
- banks of registers should be used in interrupt
+ banks of registers (keyword 
+\emph on 
+using
+\emph default 
+ 
+\emph on 
+
+\begin_inset LatexCommand \index{using (mcs51, ds390 register bank)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
+
+\end_inset 
+
+
+\emph default 
+) should be used in interrupt
 \begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_interrupt}
 
 \end_inset 
 
@@ -9021,7 +9201,7 @@ status Collapsed
 \end_inset 
 
 -data-loc
-\begin_inset LatexCommand \index{-\/-data-loc<Value>}
+\begin_inset LatexCommand \index{-\/-data-loc <Value>}
 
 \end_inset 
 
@@ -9039,7 +9219,12 @@ status Collapsed
 /
 \end_inset 
 
--iram-size to specify the size of the total internal RAM (
+-iram-size
+\begin_inset LatexCommand \index{-\/-iram-size <Value>}
+
+\end_inset 
+
+ to specify the size of the total internal RAM (
 \emph on 
 data
 \emph default 
@@ -9064,7 +9249,7 @@ status Collapsed
 \end_inset 
 
 -stack-loc
-\begin_inset LatexCommand \index{-\/-stack-loc<Value>}
+\begin_inset LatexCommand \index{-\/-stack-loc <Value>}
 
 \end_inset 
 
@@ -9106,7 +9291,7 @@ status Collapsed
 \end_inset 
 
 -xram-size
-\begin_inset LatexCommand \index{-\/-data-loc}
+\begin_inset LatexCommand \index{-\/-xram-size <Value>}
 
 \end_inset 
 
@@ -9122,7 +9307,7 @@ status Collapsed
 \end_inset 
 
 -code-loc
-\begin_inset LatexCommand \index{-\/-data-loc}
+\begin_inset LatexCommand \index{-\/-code-loc <Value>}
 
 \end_inset 
 
@@ -9137,7 +9322,7 @@ status Collapsed
 \end_inset 
 
 -code-size
-\begin_inset LatexCommand \index{-\/-data-loc}
+\begin_inset LatexCommand \index{-\/-code-size <Value>}
 
 \end_inset 
 
@@ -9177,6 +9362,11 @@ Z80/Z180 Storage Class
 
 sfr
 \begin_inset LatexCommand \index{sfr}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_sfr}
 
 \end_inset 
 
@@ -9240,6 +9430,11 @@ banked sfr
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_sfr}
+
+\end_inset 
+
  (in/out to 16-bit addresses)
 \layout Standard
 
@@ -9254,6 +9449,11 @@ banked
 \family typewriter 
 sfr banked at
 \begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset 
 
@@ -9289,6 +9489,11 @@ out (c),a
 
 sfr
 \begin_inset LatexCommand \index{sfr}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_sfr}
 
 \end_inset 
 
@@ -9347,6 +9552,11 @@ data
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_data (hc08 storage class)}
+
+\end_inset 
+
  
 \layout Standard
 
@@ -9358,6 +9568,11 @@ The data storage class declares a variable that resides in the first 256
 
 xdata
 \begin_inset LatexCommand \index{xdata (hc08 storage class)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_xdata (hc08 storage class)}
 
 \end_inset 
 
@@ -9385,6 +9600,11 @@ at
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_at}
+
+\end_inset 
+
  <address>
 \emph default 
  keyword, in addition to a storage class, e.g.:
@@ -9397,8 +9617,18 @@ xdata
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_xdata (mcs51, ds390 storage class)}
+
+\end_inset 
+
  at
 \begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset 
 
@@ -9525,7 +9755,12 @@ le space.
 
 
 \family typewriter 
-extern volatile bit MOSI;\SpecialChar ~
+extern volatile
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+ bit MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -9673,7 +9908,17 @@ Then, someplace in the code for the first hardware you would use
 
 
 \family typewriter 
-bit at 0x80 MOSI;\SpecialChar ~
+bit at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_at}
+
+\end_inset 
+
+ 0x80 MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -10173,6 +10418,11 @@ interrupt
 \end_inset 
 
 
+\begin_inset LatexCommand \index{\_\_interrupt}
+
+\end_inset 
+
+
 \emph default 
  keyword is the interrupt number this routine will service.
  When present, the compiler will insert a call to this routine in the interrupt
@@ -10184,9 +10434,19 @@ interrupt
 main
 \emph default 
 .
- The 
+ The optional 
 \emph on 
 using
+\begin_inset LatexCommand \index{using (mcs51, ds390 register bank)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
+
+\end_inset 
+
+
 \emph default 
  keyword can be used to tell the compiler to use the specified register
  bank (8051 specific) when generating code for this function.
@@ -10629,6 +10889,11 @@ using
 \end_inset 
 
 
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
+
+\end_inset 
+
+
 \emph default 
  a register bank or with register bank 0 (
 \emph on 
@@ -10736,6 +11001,11 @@ critical
 \family typewriter 
 int foo () critical
 \begin_inset LatexCommand \index{critical}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_critical}
 
 \end_inset 
 
@@ -11081,7 +11351,12 @@ SDCC generates this instruction if the source follows this pattern:
 
 
 \family typewriter 
-volatile bit resource_is_free; 
+volatile
+\begin_inset LatexCommand \index{volatile}
+
+\end_inset 
+
+ bit resource_is_free; 
 \newline 
 
 \newline 
@@ -11146,6 +11421,11 @@ using
 \end_inset 
 
 
+\begin_inset LatexCommand \index{\_\_using (mcs51, ds390 register bank)}
+
+\end_inset 
+
+
 \emph default 
  attribute (which tells the compiler to use a register bank
 \begin_inset LatexCommand \index{register bank (mcs51, ds390)}
@@ -11204,6 +11484,11 @@ interrupt
  function using a non-zero bank will assume that it can trash that register
  bank, and will not save it.
  Since high-priority interrupts
+\begin_inset LatexCommand \index{interrupts}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{interrupt priority}
 
 \end_inset 
@@ -11285,10 +11570,19 @@ _sdcc_external_startup()
 \emph default 
  routine to your program to override the default if you need to setup hardware
  or perform some other critical operation prior to static & global variable
- initialization.
- On some mcs51 variants xdata has to be explicitly enabled before it can
- be accessed or if the watchdog needs to be disabled, this is the place
- to do it.
+ initialization
+\begin_inset LatexCommand \index{Variable initialization}
+
+\end_inset 
+
+.
+ On some mcs51 variants xdata
+\begin_inset LatexCommand \index{xdata (mcs51, ds390 storage class)}
+
+\end_inset 
+
+ memory has to be explicitly enabled before it can be accessed or if the
+ watchdog needs to be disabled, this is the place to do it.
  The startup code clears all internal data memory, 256 bytes by default,
  but from 0 to n-1 if 
 \emph on 
@@ -11303,7 +11597,7 @@ status Collapsed
 \end_inset 
 
 -iram-size
-\begin_inset LatexCommand \index{-\/-iram-size}
+\begin_inset LatexCommand \index{-\/-iram-size <Value>}
 
 \end_inset 
 
@@ -11416,8 +11710,18 @@ unsigned char far
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_far (storage class)}
+
+\end_inset 
+
  at
 \begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_at}
 
 \end_inset 
 
@@ -11506,6 +11810,11 @@ void to_buffer_asm( unsigned char c )
 \SpecialChar ~
 _asm
 \begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset 
 
@@ -11632,7 +11941,17 @@ ret
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-_endasm;
+_endasm
+\begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_endasm}
+
+\end_inset 
+
+;
 \newline 
 } 
 \layout Standard
@@ -11702,6 +12021,11 @@ c; // to avoid warning: unreferenced function argument
 \SpecialChar ~
 _asm
 \begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset 
 
@@ -11888,7 +12212,17 @@ t_b_end$:
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-_endasm;
+_endasm
+\begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_endasm}
+
+\end_inset 
+
+;
 \newline 
 }
 \newline 
@@ -11904,6 +12238,16 @@ collapsed false
 
 The assembler does not like some characters like ':' or ''' in comments.
  You'll find an 100+ pages assembler manual in sdcc/as/doc/asxhtm.html
+\begin_inset LatexCommand \index{asXXXX (as-gbz80, as-hc08, asx8051, as-z80)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{Assembler documentation}
+
+\end_inset 
+
+
 \end_inset 
 
 .
@@ -11914,8 +12258,27 @@ _asm
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_asm}
+
+\end_inset 
+
  ...
- _endasm;
+ _endasm
+\size footnotesize 
+
+\begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_endasm}
+
+\end_inset 
+
+
+\size default 
+;
 \family default 
  keyword pair.
  Specifically it will not know which registers are used and thus register
@@ -11985,6 +12348,11 @@ _naked
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_naked}
+
+\end_inset 
+
 .
  
 \emph default 
@@ -12033,6 +12401,11 @@ void simpleInterrupt(void) interrupt
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_interrupt}
+
+\end_inset 
+
  1
 \newline 
 {
@@ -12057,6 +12430,11 @@ void nakedInterrupt(void) interrupt 2 _naked
 \SpecialChar ~
 _asm
 \begin_inset LatexCommand \index{\_asm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_asm}
 
 \end_inset 
 
@@ -12093,6 +12471,11 @@ reti\SpecialChar ~
 \SpecialChar ~
 _endasm
 \begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset 
 
@@ -12332,6 +12715,11 @@ _asm
 
 \end_inset 
 
+
+\begin_inset LatexCommand \index{\_\_asm}
+
+\end_inset 
+
  
 \newline 
 \SpecialChar ~
@@ -12359,6 +12747,11 @@ b,00001$
 \newline 
 _endasm
 \begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_endasm}
 
 \end_inset 
 
@@ -12438,7 +12831,17 @@ $0003: ;label (can be referenced by inline assembler only)
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-_endasm ; 
+_endasm
+\begin_inset LatexCommand \index{\_endasm}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_endasm}
+
+\end_inset 
+
+ ; 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -13878,11 +14281,19 @@ convert long to floating point number
 \layout Standard
 
 These support routines are developed in ANSI-C so there is room for space
- and speed improvement.
+ and speed improvement
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+The floating point routines for the mcs51 are implemented in assembler
+\end_inset 
+
+.
  Note if all these routines are used simultaneously the data space might
  overflow.
- For serious floating point usage it is recommended that the large model
- be used.
+ For serious floating point usage the large model might be needed.
  Also notice that you don't have to call this routines directly.
  The compiler will use them automatically every time a floating point operation
  is required.
@@ -14002,6 +14413,11 @@ status Collapsed
 If you're short on memory you might want to use 
 \family typewriter 
 printf_small()
+\begin_inset LatexCommand \index{printf\_small()}
+
+\end_inset 
+
+
 \family default 
  
 \emph on 
@@ -14012,12 +14428,35 @@ instead
  printf().
 
 \family default 
- For the mcs51 there is an assembly version 
+ For the mcs51 there additionally are assembly versions 
+\family typewriter 
+printf_tiny()
+\begin_inset LatexCommand \index{printf\_tiny() (mcs51)}
+
+\end_inset 
+
+
+\family default 
+ and 
 \family typewriter 
 printf_fast()
+\begin_inset LatexCommand \index{printf\_fast() (mcs51)}
+
+\end_inset 
+
+ 
 \family default 
- which should fit the requirements of many embedded systems (by unsetting
- #defines it can be customized to 
+and
+\family typewriter 
+ printf_fast_f()
+\begin_inset LatexCommand \index{printf\_fast\_f() (mcs51)}
+
+\end_inset 
+
+
+\family default 
+ which should fit the requirements of many embedded systems (printf_fast()
+ can be customized by unsetting #defines to 
 \emph on 
 not
 \emph default 
@@ -14452,6 +14891,11 @@ none
 .
  See also the related keyword _naked
 \begin_inset LatexCommand \index{\_naked}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_naked}
 
 \end_inset 
 
@@ -15389,7 +15833,7 @@ For assembling you can use either GPUTILS'
 
  gpasm.exe or MPLAB's mpasmwin.exe.
  GPUTILS is available from 
-\begin_inset LatexCommand \url{http://gputils.sourceforge.net/}
+\begin_inset LatexCommand \url{http://sourceforge.net/projects/gputils}
 
 \end_inset 
 
@@ -17036,7 +17480,7 @@ xxxx
 \layout Standard
 
 Libraries are created with gplib which is part of the gputils package 
-\begin_inset LatexCommand \url{http://gputils.sourceforge.net}
+\begin_inset LatexCommand \url{http://sourceforge.net/projects/gputils}
 
 \end_inset 
 
@@ -20363,7 +20807,12 @@ Use the smallest data type to represent your data-value.
  use an 'unsigned char' instead of a 'short' or 'int'.
  Please note, that ANSI C requires both signed and unsigned chars to be
  promoted to 'signed int' before doing any operation.
- This promotion can be omitted, if the result is the same.
+ This promotion
+\begin_inset LatexCommand \index{type promotion}
+
+\end_inset 
+
+ can be omitted, if the result is the same.
  The effect of the promotion rules together with the sign-extension is often
  surprising:
 \begin_deeper 
@@ -21328,7 +21777,7 @@ GNU PIC utilities
 \layout Standard
 
 
-\begin_inset LatexCommand \url{http://gputils.sourceforge.net/}
+\begin_inset LatexCommand \url{http://sourceforge.net/projects/gputils}
 
 \end_inset 
 
@@ -21359,7 +21808,7 @@ PIC programmer
 \layout Standard
 
 
-\begin_inset LatexCommand \url{http://digilander.libero.it/fbradasc/FLP5.html}
+\begin_inset LatexCommand \url{http://freshmeat.net/projects/flp5/}
 
 \end_inset 
 
@@ -21395,7 +21844,7 @@ Formats C source - Master of the white spaces
 \layout Standard
 
 
-\begin_inset LatexCommand \url{http://home.hccnet.nl/d.ingamells/beautify.html}
+\begin_inset LatexCommand \url{http://directory.fsf.org/GNU/indent.html}
 
 \end_inset 
 
@@ -21410,7 +21859,7 @@ Formats C source - Master of the white spaces
 \layout Standard
 
 srecord
-\begin_inset LatexCommand \index{srecord (tool)}
+\begin_inset LatexCommand \index{srecord (bin, hex, ... tool)}
 
 \end_inset 
 
@@ -21431,7 +21880,7 @@ Object file conversion, checksumming, ...
 \layout Standard
 
 
-\begin_inset LatexCommand \url{http://srecord.sourceforge.net/}
+\begin_inset LatexCommand \url{http://sourceforge.net/projects/srecord}
 
 \end_inset 
 
@@ -21696,7 +22145,7 @@ C Reference Card
 \layout Standard
 
 
-\begin_inset LatexCommand \url{http://www.refcards.com/about/c.html}
+\begin_inset LatexCommand \url{http://refcards.com/refcards/c/index.html}
 
 \end_inset 
 
@@ -22159,7 +22608,7 @@ You can follow the status of the cvs version
 
 \size footnotesize 
 
-\begin_inset LatexCommand \htmlurl{http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/sdcc/sdcc/ChangeLog?rev=HEAD&content-type=text/plain}
+\begin_inset LatexCommand \htmlurl{http://cvs.sf.net/cgi-bin/viewcvs.cgi/*checkout*/sdcc/sdcc/ChangeLog?rev=HEAD&content-type=text/plain}
 
 \end_inset 
 
@@ -22210,7 +22659,7 @@ sdcc/device/examples/.
 More examples and libraries are available at
 \emph on 
  The SDCC Open Knowledge Resource 
-\begin_inset LatexCommand \url{http://www.qsl.net/dl9sec/SDCC_OKR.html}
+\begin_inset LatexCommand \url{http://sdccokr.dl9sec.de/}
 
 \end_inset 
 
@@ -23426,8 +23875,13 @@ bound
 \emph default 
 aries.
  It has no effect if a default label is supplied.
- Use of this pragma is dangerous: if the switch argument is not matched
- by a case statement the processor will happily jump into Nirvana.
+ Use of this pragma is dangerous: if the switch
+\begin_inset LatexCommand \index{switch statement}
+
+\end_inset 
+
+ argument is not matched by a case statement the processor will happily
+ jump into Nirvana.
 \layout Subsection
 
 Bit-shifting Operations
@@ -23928,7 +24382,9 @@ The compiler uses a rule based, pattern matching and re-writing mechanism
 copt
 \emph default 
  a peep-hole optimizer by Christopher W.
- Fraser (cwfraser@microsoft.com).
+ Fraser (cwfraser\SpecialChar ~
+@\SpecialChar ~
+microsoft.com).
  A default set of rules are compiled into the compiler, additional rules
  may be added with the 
 \emph on 
@@ -24456,44 +24912,6 @@ No support for setjmp
  (for now).
 \layout Itemize
 
-Certain words that are valid identifiers in the standard may be reserved
- words in SDCC unless the 
-\series bold 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--std-c89
-\begin_inset LatexCommand \index{-\/-std-c89}
-
-\end_inset 
-
- or -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--std-c99
-\begin_inset LatexCommand \index{-\/-std-c99}
-
-\end_inset 
-
-
-\series default 
- command line options are used.
-\layout Itemize
-
 Old K&R style
 \begin_inset LatexCommand \index{K\&R style}
 
@@ -24564,7 +24982,12 @@ t', 'near', 'nonbanked', 'pdata', 'reentrant', 'sbit', 'sfr', 'shadowregs',
  'sram', 'using', 'wparam', 'xdata', '_overlay', '_asm', '_endasm', and
  '_naked'.
  Compliant equivalents of these keywords are always available in a form
- that begin with two underscores, f.e.
+ that begin with two underscores
+\begin_inset LatexCommand \index{\_\_ (prefix for extended keywords)}
+
+\end_inset 
+
+, f.e.
  '__data' instead of 'data'.
 \layout Section
 
@@ -24724,7 +25147,11 @@ The anatomy of the compiler
 
 \shape italic 
 This is an excerpt from an article published in Circuit Cellar Magazine
- in august 2000.
+ in 
+\series bold 
+August 2000
+\series default 
+.
  It's a little outdated (the compiler is much more efficient now and user/develo
 per friendly), but pretty well exposes the guts of it all.
 \shape default 

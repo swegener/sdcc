@@ -1,3 +1,7 @@
+2005-04-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* .version: changed to version 2.5.0
+
 2005-04-27 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: updated weblinks, index and smaller updates

@@ -2,6 +2,7 @@
 \lyxformat 221
 \textclass article
 \begin_preamble
+\pdfoptionpdfminorversion=3
 \usepackage{url}
 \end_preamble
 \language english

@@ -2,6 +2,7 @@
 \lyxformat 221
 \textclass book
 \begin_preamble
+\pdfoptionpdfminorversion=3
 \usepackage[
   pdftitle={SDCC Compiler User Guide},
   pdfauthor={SDCC development team},

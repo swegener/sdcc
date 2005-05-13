@@ -1425,6 +1425,7 @@ linkEdit (char **envp)
   char *segName, *c;
   int system_ret;
   const char *s;
+  char linkerScriptFileName[PATH_MAX];
 
 
   if(port->linker.needLinkerScript)
@@ -1447,11 +1448,11 @@ linkEdit (char **envp)
         }
 
       /* first we need to create the <filename>.lnk file */
-      SNPRINTF (scratchFileName, sizeof(scratchFileName),
+      SNPRINTF (linkerScriptFileName, sizeof(scratchFileName),
         "%s.lnk", dstFileName);
-      if (!(lnkfile = fopen (scratchFileName, "w")))
+      if (!(lnkfile = fopen (linkerScriptFileName, "w")))
         {
-          werror (E_FILE_OPEN_ERR, scratchFileName);
+          werror (E_FILE_OPEN_ERR, linkerScriptFileName);
           exit (1);
         }
 
@@ -1753,7 +1754,7 @@ linkEdit (char **envp)
       char buffer3[PATH_MAX];
       set *tempSet=NULL, *libSet=NULL;
 
-      strcpy(buffer3, dstFileName);
+      strcpy(buffer3, linkerScriptFileName);
       if(TARGET_IS_PIC16) {
 
          /* use $l to set the linker include directories */

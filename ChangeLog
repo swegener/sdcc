@@ -1,3 +1,7 @@
+2005-05-13 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c (linkEdit): fixed bug 1195202
+
 2005-05-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* .version: changed to version 2.5.1; back to bleeding edge development

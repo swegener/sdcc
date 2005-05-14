@@ -111,6 +111,8 @@ static struct answer ** find_answer PARAMS ((cpp_hashnode *,
 					     const struct answer *));
 static void handle_assertion	PARAMS ((cpp_reader *, const char *, int));
 
+extern cpp_output_string (const char *s);
+
 /* This is the table of directive handlers.  It is ordered by
    frequency of occurrence; the numbers at the end are directive
    counts from all the source code I have lying around (egcs and libc
@@ -1285,7 +1287,9 @@ _cpp_do__Pragma (pfile)
     }
 
   buffer = destringize (&string.val.str, &len);
-  run_directive (pfile, T_PRAGMA, BUF_PRAGMA, (char *) buffer, len);
+  buffer[len] = 0;
+  cpp_output_string ("\n#pragma "); cpp_output_string (buffer); cpp_output_string ("\n");
+  //run_directive (pfile, T_PRAGMA, BUF_PRAGMA, (char *) buffer, len);
   free ((PTR) buffer);
 }
 

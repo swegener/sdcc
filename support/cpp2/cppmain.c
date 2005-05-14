@@ -441,6 +441,11 @@ cb_def_pragma (pfile)
   print.lineno++;
 }
 
+void
+cpp_output_string (const char *s) {
+  fputs (s, print.outf);
+}
+
 /* Dump out the hash table.  */
 static int
 dump_macro (pfile, node, v)

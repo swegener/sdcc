@@ -1,3 +1,18 @@
+2005-05-14 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/Makefile.common.in: add --optimize-df to OPT_FLAGS
+	* device/lib/pic16/libc/stdlib/itoa.c (new)
+	* device/lib/pic16/libc/stdlib/Makefile: have itoa.c built
+	* device/lib/pic16/libio/Makefile: exclude subdir according to
+	  ${subdir}.ignore for certain PICs (lacking e.g. i2c)
+	* device/lib/pic16/libio/i2c.ignore (new): pic18f1220 has no I2C support
+	* src/pic16/gen.c (genFunction): prevent annoying warning
+	* src/pic16/pcode.c: renamed stack_t to dynstack_t to prevent
+	  nameclashes on BeOS
+	* support/cpp2/cppmain.c (cpp_output_string): new
+	* support/cpp2/cpplib.c (_cpp_do__Pragma): fixed _Pragma(""),
+	  fixes bug 1116802
+
 2005-05-13 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c (linkEdit): fixed bug 1195202

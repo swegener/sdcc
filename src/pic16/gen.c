@@ -3674,7 +3674,8 @@ static void genFunction (iCode *ic)
           pic16_addpCode2pBlock(apb, pic16_newpCodeCharP(";-----------------------------------------"));
           pic16_addpCode2pBlock(apb, pic16_newpCodeFunction(moduleName, asym->name));
           //pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_popGetWithString( sym->rname )));
-          pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_newpCodeOpLabel (sym->rname, 0)));
+          //pic16_addpCode2pBlock(apb, pic16_newpCode(POC_GOTO, pic16_newpCodeOpLabel (sym->rname, 0)));
+	  pic16_addpCode2pBlock(apb, pic16_newpCodeAsmDir ("GOTO", "%s", sym->rname)); /* this suppresses a warning in LinkFlow */
 		
           /* mark the end of this tiny function */
           pic16_addpCode2pBlock(apb,pic16_newpCodeFunction(NULL,NULL));

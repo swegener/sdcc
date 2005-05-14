@@ -18,6 +18,7 @@ SRCS	= 	atof \
 		atol \
 		calloc \
 		free \
+		itoa \
 		ltoa \
 		malloc \
 		memfree \

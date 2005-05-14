@@ -37,11 +37,14 @@ build-libraries:
 build-processor-library:
 	for dir in $(DIRS) ; do	 \
 		$(MAKE) -C $$dir clean ; \
-		$(MAKE) -C $$dir build-io-lib MCU=18f$(MMCU); \
+		grep $(MMCU) "$${dir}.ignore" > /dev/null 2>&1 || $(MAKE) -C $$dir build-io-lib MCU=18f$(MMCU); \
 	done;
-	gplib -c $(LIB) $(LOBJS)
+	make invoke-gplib
 	mv -v $(LIB) ../bin
-	
+
+# needed so that make updates the list of .o files correctly...
+invoke-gplib:
+	gplib -c $(LIB) $(foreach dir,$(DIRS),$(wildcard $(dir)/*.o))
 
 clean-intermediate:
 	@for dir in $(DIRS) ; do \

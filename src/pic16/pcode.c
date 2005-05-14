@@ -9911,18 +9911,18 @@ typedef struct stack_s {
   struct stack_s *next;
 } stackitem_t;
 
-typedef stackitem_t *stack_t;
+typedef stackitem_t *dynstack_t;
 static stackitem_t *free_stackitems = NULL;
 
 /* Create a stack with one item. */
-static stack_t *newStack () {
-  stack_t *s = (stack_t *) Safe_malloc (sizeof (stack_t));
+static dynstack_t *newStack () {
+  dynstack_t *s = (dynstack_t *) Safe_malloc (sizeof (dynstack_t));
   *s = NULL;
   return s;
 }
 
 /* Remove a stack -- its items are only marked free. */
-static void deleteStack (stack_t *s) {
+static void deleteStack (dynstack_t *s) {
   stackitem_t *i;
 
   while (*s) {
@@ -9945,7 +9945,7 @@ static void releaseStack () {
   } // while
 }
 
-static void stackPush (stack_t *stack, void *data) {
+static void stackPush (dynstack_t *stack, void *data) {
   stackitem_t *i;
   
   if (free_stackitems) {
@@ -9959,7 +9959,7 @@ static void stackPush (stack_t *stack, void *data) {
   *stack = i;
 }
 
-static void *stackPop (stack_t *stack) {
+static void *stackPop (dynstack_t *stack) {
   void *data;
   stackitem_t *i;
   
@@ -9976,7 +9976,7 @@ static void *stackPop (stack_t *stack) {
 }
 
 #if 0
-static int stackContains (stack_t *s, void *data) {
+static int stackContains (dynstack_t *s, void *data) {
   stackitem_t *i;
   if (!s) return 0;
   i = *s;
@@ -9990,7 +9990,7 @@ static int stackContains (stack_t *s, void *data) {
 }
 #endif
 
-static int stackIsEmpty (stack_t *s) {
+static int stackIsEmpty (dynstack_t *s) {
   return (*s == NULL);
 }
 
@@ -10011,7 +10011,7 @@ static void deleteState (state_t *s) {
   Safe_free (s);
 }
 
-static int stateIsNew (state_t *state, stack_t *todo, stack_t *done) {
+static int stateIsNew (state_t *state, dynstack_t *todo, dynstack_t *done) {
   stackitem_t *i;
 
   /* scan working list for state */
@@ -10098,8 +10098,8 @@ static int defmapFindAll (symbol_t sym, pCode *pc, defmap_t **chain) {
   pCodeFlow *curr;
   pCodeFlowLink *succ;
   state_t *state;
-  stack_t *todo;	/** stack of state_t */
-  stack_t *done;	/** stack of state_t */
+  dynstack_t *todo;	/** stack of state_t */
+  dynstack_t *done;	/** stack of state_t */
 
   int firstState, n_defs;
   
@@ -10453,7 +10453,7 @@ int pic16_isAliveInFlow (symbol_t sym, int mask, pCodeFlow *pcfl, pCode *pc) {
 static int pic16_isAlive (symbol_t sym, pCode *pc) {
   int mask, visit;
   defmap_t *map;
-  stack_t *todo, *done;
+  dynstack_t *todo, *done;
   state_t *state;
   pCodeFlow *pcfl;
   pCodeFlowLink *succ;

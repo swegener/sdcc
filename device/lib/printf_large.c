@@ -464,6 +464,10 @@ get_conversion_spec:
 #else
         length = strlen(PTR);
 #endif
+        if ( decimals == -1 )
+        {
+          decimals = length;
+        }
         if ( ( !left_justify ) && (length < width) )
         {
           width -= length;
@@ -474,7 +478,7 @@ get_conversion_spec:
           }
         }
 
-        while ( *PTR )
+        while ( *PTR  && (decimals-- > 0))
         {
           output_char( *PTR++, p );
           charsOutputted++;

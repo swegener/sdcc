@@ -27,5 +27,16 @@ test_sprintf(void)
   sprintf( s, "%04X", 0x8765u );
   ASSERT( 0 == strcmp( s, "8765" ) );
 
+  //and from bug 1193299
+  sprintf( s, "%3.3s", "abcd" );
+  LOG((s));
+  ASSERT( 0 == strcmp( s, "abc" ) );
+  sprintf( s, "%-3.3s", "abcd" );
+  ASSERT( 0 == strcmp( s, "abc" ) );
+  sprintf( s, "%3.3s", "ab" );
+  ASSERT( 0 == strcmp( s, " ab" ) );
+  sprintf( s, "%-3.3s", "ab" );
+  ASSERT( 0 == strcmp( s, "ab " ) );
+
   ASSERT( s[12]==0x12 );
 }

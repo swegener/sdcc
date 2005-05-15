@@ -3,7 +3,12 @@
 \textclass article
 \begin_preamble
 \pdfoptionpdfminorversion=3
-\usepackage{url}
+\usepackage[
+  pdftitle={Proposed Test Suite Design},
+  pdfauthor={Michael Hope},
+  pdfkeywords={c case compiler framework GPL regression SDCC suite test},
+  colorlinks=true,
+  linkcolor=blue] {hyperref}
 \end_preamble
 \language english
 \inputencoding auto
@@ -31,22 +36,19 @@
 \layout Title
 
 Proposed Test Suite Design
-\layout Author
-
-Michael Hope (michaelh@juju.net.nz)
-\layout Date
-
-
 \begin_inset ERT
-status Collapsed
+status Open
 
 \layout Standard
 
 \backslash 
-today{}
+date{2001-07-13}
 \end_inset 
 
 
+\layout Author
+
+Michael Hope (michaelh @ juju.net.nz)
 \layout Abstract
 
 This article describes the goals, requirements, and suggested specification
@@ -480,31 +482,29 @@ I don't know how to do pre-formatted text in LaTeX.
 The following code generates a simple increment test for all combinations
  of the storage classes and all combinations of the data sizes.
  This is a bad example as the optimiser will often remove most of this code.
-\layout Standard
+\newline 
+
+\layout Verse
 
 
 \family typewriter 
 /** Test for increment.
  
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
 type: char, int, long
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
 Z80 port does not fully support longs (4 byte)
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
 type[z80]: char, int
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
 class: 
 \begin_inset Quotes eld
 \end_inset 
@@ -514,39 +514,26 @@ class:
 \end_inset 
 
 , register, static */
-\layout Standard
-
-
-\family typewriter 
+\newline 
+ 
+\newline 
 static void
-\layout Standard
-
-
-\family typewriter 
+\newline 
 testInc{class}{types}(void)
-\layout Standard
-
-
-\family typewriter 
-{
-\layout Standard
-
-
-\family typewriter 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
 {class} {type} i = 0; 
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
 i = i + 1;
-\layout Standard
-
-
-\family typewriter 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
 ASSERT((i == 1));
-\layout Standard
-
-
-\family typewriter 
+\newline 
 }
 \the_end

@@ -3,6 +3,12 @@
 \textclass article
 \begin_preamble
 \pdfoptionpdfminorversion=3
+\usepackage[
+  pdftitle={CDB File Format},
+  pdfauthor={Lenny Story},
+  pdfkeywords={address c compiler debugger format GPL linker record SDCC},
+  colorlinks=true,
+  linkcolor=blue] {hyperref}
 \end_preamble
 \language english
 \inputencoding auto
@@ -30,6 +36,16 @@
 \layout Title
 
 CDB File Format
+\begin_inset ERT
+status Open
+
+\layout Standard
+
+\backslash 
+date{2003-03-21}
+\end_inset 
+
+
 \layout Author
 
 Lenny Story

@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.5.0
+SDCC 2.5.1
 \size footnotesize 
 
 \newline 
@@ -7576,13 +7576,6 @@ status Collapsed
 \end_inset 
 
  (jwk burps: please be more specific here, please!).
- If you want rather more than less warnings you should consider using a
- separate tool dedicated to syntax checking like splint 
-\begin_inset LatexCommand \url{http://www.splint.org}
-
-\end_inset 
-
-.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -7702,7 +7695,7 @@ asmOption[,asmOption]
 \end_inset 
 
 .
- See file sdcc/as/doc/asxhtm.html for assembler options.
+ See file sdcc/as/doc/asxhtm.html for assembler options.cd
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -7799,6 +7792,103 @@ status Collapsed
 \series default 
  Follow the C99 standard and disable SDCC features that conflict with the
  standard (incomplete support).
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+more-pedantic
+\series default 
+ Actually this is 
+\series bold 
+\emph on 
+not
+\series default 
+\emph default 
+ a SDCC compiler option but if you want 
+\emph on 
+more
+\emph default 
+ warnings you can use a separate tool dedicated to syntax checking like
+ splint
+\begin_inset LatexCommand \label{lyx:more-pedantic-SPLINT}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{lint (syntax checking tool)}
+
+\end_inset 
+
+ 
+\begin_inset LatexCommand \url{http://www.splint.org}
+
+\end_inset 
+
+.
+ To make your source files parseable by splint you will have to include
+ 
+\family sans 
+lint.h
+\family default 
+
+\begin_inset LatexCommand \index{splint (syntax checking tool)}
+
+\end_inset 
+
+ in your source file and add brackets around extended keywords (like 
+\family sans 
+
+\begin_inset Quotes sld
+\end_inset 
+
+__at\SpecialChar ~
+
+\series bold 
+(
+\series default 
+0xab
+\series bold 
+)
+\series default 
+
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family default 
+ and 
+\family sans 
+
+\begin_inset Quotes sld
+\end_inset 
+
+__interrupt\SpecialChar ~
+(2)
+\begin_inset Quotes srd
+\end_inset 
+
+
+\family default 
+).
+ 
+\newline 
+Splint has an excellent on line manual at 
+\begin_inset LatexCommand \url{http://www.splint.org/manual/}
+
+\end_inset 
+
+ and it's capabilities go beyond pure syntax checking.
+ You'll need to tell splint the location of SDCC's include files so a typical
+ command line could look like this: 
+\newline 
+
+\family sans 
+splint\SpecialChar ~
+-I\SpecialChar ~
+/usr/local/share/sdcc/include/mcs51/\SpecialChar ~
+\SpecialChar ~
+myprogram.c
 \layout Subsection
 
 Intermediate Dump Options
@@ -8595,7 +8685,7 @@ Paged xdata access is just as straightforward as using the other addressing
  modes of a 8051.
  It is typically located at the start of xdata and has a maximum size of
  256 bytes.
- The following example writes 0x01 to the address pointed to.
+ The following example writes 0x01 to the pdata variable.
  Please note, pdata access physically accesses xdata memory.
  The high byte of the address is determined by port P2 
 \begin_inset LatexCommand \index{P2 (mcs51 sfr)}
@@ -8613,48 +8703,21 @@ Paged xdata access is just as straightforward as using the other addressing
 
 
 \family typewriter 
-pdata unsigned char *test_pdata_ptr;
-\newline 
-
-\newline 
-void main() 
-\newline 
-{ 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-test_pdata_ptr = (pdata *)0xfe; 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-*test_pdata_ptr = 1; 
-\newline 
-} 
+pdata unsigned char test_pdata;
 \layout Standard
 
-Generates the assembly code:
+Writing 0x01 to this variable generates the assembly code:
 \layout Verse
 
 
 \family typewriter 
-75*01 FE\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-mov\SpecialChar ~
- _test_pdata_ptr,#0xFE
-\newline 
-78 FE\SpecialChar ~
+78r00\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-mov\SpecialChar ~
- r0,#0xFE 
+mov r0,#_test_pdata
 \newline 
 74 01\SpecialChar ~
 \SpecialChar ~
@@ -8662,8 +8725,7 @@ mov\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-mov\SpecialChar ~
- a,#0x01
+mov a,#0x01 
 \newline 
 F2\SpecialChar ~
 \SpecialChar ~
@@ -8674,7 +8736,7 @@ F2\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-movx @r0,a 
+movx @r0,a
 \layout Standard
 
 If the -
@@ -21005,7 +21067,7 @@ Tools
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -21687,7 +21749,7 @@ Related open source tools
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -22006,7 +22068,12 @@ splint
 
 \layout Standard
 
-Statically checks c sources (has anyone adapted splint for SDCC?)
+Statically checks c sources (see 
+\begin_inset LatexCommand \ref{lyx:more-pedantic-SPLINT}
+
+\end_inset 
+
+)
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">

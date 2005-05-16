@@ -1,3 +1,9 @@
+2005-05-16 Raphael Neider <rneider AT web.de>
+	* src/pic16/gen.{c,h}: s/mov2f/pic16_mov2f made public
+	* src/pic16/genarith.c (genAddit): fixed bug 1202480
+	* src/pic16/pcode.{c,h} (pic16_newpCodeOpBit_simple): NEW
+	  convenience function for bit access
+
 2005-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c: fixed bug 1193299

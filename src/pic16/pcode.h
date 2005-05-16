@@ -1019,6 +1019,7 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
 pCodeOp *pic16_newpCodeOpLit(int lit);
 pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2);
 pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace, PIC_OPTYPE subt);
+pCodeOp *pic16_newpCodeOpBit_simple (struct asmop *op, int offs, int bit);
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name);
 pCodeOp *pic16_newpCodeOpReg(int rIdx);
 pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE p);

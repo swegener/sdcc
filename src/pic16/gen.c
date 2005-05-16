@@ -68,7 +68,6 @@ extern void pic16_printpBlock(FILE *of, pBlock *pb);
 static asmop *newAsmop (short type);
 static pCodeOp *pic16_popRegFromString(char *str, int size, int offset, operand *op);
 extern pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...);
-static void mov2f(asmop *dst, asmop *src, int offset);
 static void mov2fp(pCodeOp *dst, asmop *src, int offset);
 static pCodeOp *pic16_popRegFromIdx(int rIdx);
 
@@ -2383,7 +2382,7 @@ void pic16_mov2w (asmop *aop, int offset)
     pic16_emitpcode(POC_MOVFW,pic16_popGet(aop,offset));
 }
 
-static void mov2f(asmop *dst, asmop *src, int offset)
+void pic16_mov2f(asmop *dst, asmop *src, int offset)
 {
   if(is_LitAOp(src)) {
     pic16_emitpcode(POC_MOVLW, pic16_popGet(src, offset));
@@ -2791,7 +2790,7 @@ static void genUminusFloat(operand *op,operand *result)
     size = AOP_SIZE(op);
 
     while(size--) {
-      mov2f(AOP(result), AOP(op), offset);
+      pic16_mov2f(AOP(result), AOP(op), offset);
       offset++;
     }
     
@@ -5818,7 +5817,7 @@ static void genCmp (operand *left,operand *right,
       	
       	pctemp = pic16_popGetTempReg(1);
 	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left),size));
-	pic16_emitpcode(POC_MOVWF, pctemp);		//pic16_pic16_popRegFromIdx(pic16_Gstack_base_addr));
+	pic16_emitpcode(POC_MOVWF, pctemp);		//pic16_popRegFromIdx(pic16_Gstack_base_addr));
 	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0x80));
 	pic16_emitpcode(POC_XORWF, pctemp);		//pic16_popRegFromIdx(pic16_Gstack_base_addr));
 	pic16_emitpcode(POC_XORFW, pic16_popGet(AOP(right),size));
@@ -9551,7 +9550,7 @@ static void genLeftShift (iCode *ic)
 #endif
       {
         /* we don't know if left is a literal or a register, take care -- VR */
-        mov2f(AOP(result), AOP(left), offset);
+        pic16_mov2f(AOP(result), AOP(left), offset);
       }
       offset++;
     }
@@ -9583,7 +9582,7 @@ static void genLeftShift (iCode *ic)
 #if 1
       /* this is already done, why change it? */
       if (!pic16_sameRegs(AOP(left),AOP(result))) {
-                mov2f(AOP(result), AOP(left), 0);
+                pic16_mov2f(AOP(result), AOP(left), 0);
       }
 #endif
 
@@ -9734,7 +9733,7 @@ static void genLeftShift (iCode *ic)
       } else {
 
         /* we don't know if left is a literal or a register, take care -- VR */
-        mov2f(AOP(result), AOP(left), offset);
+        pic16_mov2f(AOP(result), AOP(left), offset);
       }
       offset++;
     }
@@ -9763,7 +9762,7 @@ static void genLeftShift (iCode *ic)
 
       tlbl = newiTempLabel(NULL);
       if (!pic16_sameRegs(AOP(left),AOP(result))) {
-                mov2f(AOP(result), AOP(left), 0);
+                pic16_mov2f(AOP(result), AOP(left), 0);
                 
 //		pic16_emitpcode(POC_MOVFW,  pic16_popGet(AOP(left),0));
 //		pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),0));
@@ -10050,7 +10049,7 @@ static void genRightShiftLiteral (operand *left,
   if(shCount == 0){
     assert (res_size <= lsize);
     while (res_size--) {
-      mov2f (AOP(result), AOP(left), res_size);
+      pic16_mov2f (AOP(result), AOP(left), res_size);
     } // for
   }
 
@@ -10429,7 +10428,7 @@ static void genGenericShift (iCode *ic, int isShiftLeft) {
   // (e.g. char c = 0x100 << -3 will become c = 0x00 >> 3 == 0x00 instad of 0x20)
   // This is fine, as it only occurs for left shifting with negative count which is not standardized!
   for (offset=0; offset < min(AOP_SIZE(left), AOP_SIZE(result)); offset++) {
-    mov2f (AOP(result),AOP(left), offset);
+    pic16_mov2f (AOP(result),AOP(left), offset);
   } // for
 
   // if result is longer than left, fill with zeros (or sign)
@@ -13012,7 +13011,7 @@ static void genCast (iCode *ic)
 	    while (size--) {
 	      if(offset < AOP_SIZE(right)) {
                 DEBUGpic16_emitcode("; ***","%s  %d - pointer cast3 ptype = 0x%x",__FUNCTION__,__LINE__, p_type);
-                mov2f(AOP(result), AOP(right), offset);
+                pic16_mov2f(AOP(result), AOP(right), offset);
 /*
 		if ((AOP_TYPE(right) == AOP_PCODE) && 
 		    AOP(right)->aopu.pcop->type == PO_IMMEDIATE) {
@@ -13103,7 +13102,7 @@ static void genCast (iCode *ic)
 
     while (size--) {
       if(!_G.resDirect)
-        mov2f(AOP(result), AOP(right), offset);
+        pic16_mov2f(AOP(result), AOP(right), offset);
       offset++;
     }
 

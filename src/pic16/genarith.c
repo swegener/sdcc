@@ -416,6 +416,7 @@ static void adjustArithmeticResult(iCode *ic)
 }
 #endif
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* genAddlit - generates code for addition                         */
 /*-----------------------------------------------------------------*/
@@ -438,6 +439,7 @@ static void genAddLit2byte (operand *result, int offr, int lit)
   }
 
 }
+#endif
 
 static void emitMOVWF(operand *reg, int offset)
 {
@@ -456,19 +458,90 @@ static void emitMOVWF(operand *reg, int offset)
 static void genAddLit (iCode *ic, int lit)
 {
 
-  int size,same;
-  int lo;
+  int size,sizeL,same;
+  int i, llit;
 
   operand *result;
   operand *left;
+  sym_link *lleft;
 
     FENTRY;
 
 
   left = IC_LEFT(ic);
+  lleft = operandType (left);
   result = IC_RESULT(ic);
   same = pic16_sameRegs(AOP(left), AOP(result));
   size = pic16_getDataSize(result);
+  sizeL = pic16_getDataSize(left);
+  llit = lit;
+
+#define MIN(a,b)	(((a) < (b)) ? (a) : (b))
+  /* move left to result -- possibly sign extend */
+  for (i=0; i < MIN(size, sizeL); i++) {
+    pic16_mov2f (AOP(result), AOP(left), i);
+  } // for i
+#undef MIN
+
+  /* extend to result size */
+  if (IS_UNSIGNED(lleft)) {
+    /* zero-extend */
+    for (i = sizeL; i < size; i++) {
+      pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), i));
+    } // for i
+  } else {
+    /* sign-extend */
+    if (size == sizeL + 1) {
+      pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), sizeL));
+      pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit_simple (AOP(left),sizeL-1,7));
+      pic16_emitpcode (POC_SETF, pic16_popGet (AOP(result), sizeL));
+    } else {
+      pic16_emitpcode (POC_CLRF, pic16_popCopyReg (&pic16_pc_wreg));
+      pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit_simple (AOP(left),sizeL-1,7));
+      pic16_emitpcode (POC_SETF, pic16_popCopyReg (&pic16_pc_wreg));
+      
+      for (i=sizeL; i < size; i++) {
+        pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(result), i));
+      } // for i
+    } // if
+  } // if (SIGNED)
+
+  /* special cases */
+  if (lit == 0) {
+    /* nothing to do */
+  } else if (lit == 1) {
+    switch (size) {
+    case 1:
+      /* handled below */
+      break;
+    case 2:
+      pic16_emitpcode (POC_INFSNZ, pic16_popGet (AOP(result), 0));
+      break;
+    default:
+      assert (size > 2);
+      pic16_emitpcode (POC_INCF, pic16_popGet(AOP(result), 0));
+      for (i=1; i < size-1; i++) {
+        emitSKPNC; /* a jump here saves up to 2(size-2)cycles */
+        pic16_emitpcode (POC_INCF, pic16_popGet(AOP(result), i));
+      } // for i
+      emitSKPNC;
+      break;
+    } // switch
+    
+    pic16_emitpcode (POC_INCF, pic16_popGet (AOP(result), size-1));
+  } else {
+    /* general case */
+
+    /* add literal to result */
+    for (i=0; i < size; i++) {
+      pic16_emitpcode (POC_MOVLW, pic16_popGetLit (llit));
+      llit >>= 8; /* FIXME: arithmetic right shift for signed literals? */
+      pic16_emitpcode (i == 0 ? POC_ADDWF : POC_ADDWFC,
+	pic16_popGet (AOP(result), i));
+    }
+  }
+
+#if 0
 
   if(same) {
 
@@ -739,6 +812,7 @@ static void genAddLit (iCode *ic, int lit)
       }
     }
   }
+#endif
 }
 
 /*-----------------------------------------------------------------*/

@@ -32,6 +32,8 @@
 #include "ralloc.h"
 #include "device.h"
 
+extern char *pic16_aopGet (struct asmop *aop, int offset, bool bit16, bool dname);
+
 #if defined(__BORLANDC__) || defined(_MSC_VER)
 #define STRCASECMP stricmp
 #define inline
@@ -4222,6 +4224,12 @@ pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace, PIC_OPTYPE subt)
 //  fprintf(stderr, "%s:%d %s for reg: %s\treg= %p\n", __FILE__, __LINE__, __FUNCTION__, s, PCOR(pcop)->r);
 //  PCOR(pcop)->rIdx = 0;
   return pcop;
+}
+
+pCodeOp *pic16_newpCodeOpBit_simple (struct asmop *op, int offs, int bit)
+{
+  return pic16_newpCodeOpBit (pic16_aopGet(op,offs,FALSE,FALSE),
+  				bit, 0, PO_GPR_REGISTER);
 }
 
 

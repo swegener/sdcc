@@ -1,3 +1,10 @@
+2005-05-17 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic18f{2550,4331,4455,4520}.h: NEW
+	* device/lib/pic16/libdev/pic18f{2550,4331,4455,4520}.c: NEW
+	* device/lib/pic16/pics.all: added new devices
+	* src/pic16/device.c: added support for pic18f4520
+
 2005-05-16 Raphael Neider <rneider AT web.de>
 	* src/pic16/gen.{c,h}: s/mov2f/pic16_mov2f made public
 	* src/pic16/genarith.c (genAddit): fixed bug 1202480

@@ -1,3 +1,12 @@
+2005-05-18 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libdev/pic18f*.c,
+	* device/include/pic16/pic18f*.h: updated "sfr" and "at X"
+	  keywords to "__sfr" and "__at (X)"
+	* device/include/pic16/pic18fregs.h: added pic18f4520
+	* src/pic16/pcode.c (pic16_pCode2str): fixed (?) bug
+	  #1203088 (MPLAB compatibility)
+
 2005-05-17 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic18f{2550,4331,4455,4520}.h: NEW

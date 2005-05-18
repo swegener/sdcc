@@ -17,7 +17,7 @@
 #ifndef __PIC18F4331_H__
 #define __PIC18F4331_H__ 1
 
-extern __sfr __at 0xF60 DFLTCON;
+extern __sfr __at (0xF60) DFLTCON;
 typedef union {
 	struct {
 		unsigned FLTCK     	: 3;
@@ -28,9 +28,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __DFLTCON_t;
-extern volatile __DFLTCON_t __at 0xF60 DFLTCONbits;
+extern volatile __DFLTCON_t __at (0xF60) DFLTCONbits;
 
-extern __sfr __at 0xF61 CAP3CON;
+extern __sfr __at (0xF61) CAP3CON;
 typedef union {
 	struct {
 		unsigned CAP3M     	: 4;
@@ -40,9 +40,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __CAP3CON_t;
-extern volatile __CAP3CON_t __at 0xF61 CAP3CONbits;
+extern volatile __CAP3CON_t __at (0xF61) CAP3CONbits;
 
-extern __sfr __at 0xF62 CAP2CON;
+extern __sfr __at (0xF62) CAP2CON;
 typedef union {
 	struct {
 		unsigned CAP2M     	: 4;
@@ -52,9 +52,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __CAP2CON_t;
-extern volatile __CAP2CON_t __at 0xF62 CAP2CONbits;
+extern volatile __CAP2CON_t __at (0xF62) CAP2CONbits;
 
-extern __sfr __at 0xF63 CAP1CON;
+extern __sfr __at (0xF63) CAP1CON;
 typedef union {
 	struct {
 		unsigned CAP1M     	: 4;
@@ -64,37 +64,37 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __CAP1CON_t;
-extern volatile __CAP1CON_t __at 0xF63 CAP1CONbits;
+extern volatile __CAP1CON_t __at (0xF63) CAP1CONbits;
 
-extern __sfr __at 0xF64 CAP3BUFL;
+extern __sfr __at (0xF64) CAP3BUFL;
 
-extern __sfr __at 0xF65 CAP3BUFH;
+extern __sfr __at (0xF65) CAP3BUFH;
 
-extern __sfr __at 0xF66 CAP2BUFL;
+extern __sfr __at (0xF66) CAP2BUFL;
 
-extern __sfr __at 0xF67 CAP2BUFH;
+extern __sfr __at (0xF67) CAP2BUFH;
 
-extern __sfr __at 0xF68 CAP1BUFL;
+extern __sfr __at (0xF68) CAP1BUFL;
 
-extern __sfr __at 0xF69 CAP1BUFH;
+extern __sfr __at (0xF69) CAP1BUFH;
 
-extern __sfr __at 0xF6A OVDCONS;
+extern __sfr __at (0xF6A) OVDCONS;
 typedef union {
 	struct {
 		unsigned POUT      	: 8;
 	};
 } __OVDCONS_t;
-extern volatile __OVDCONS_t __at 0xF6A OVDCONSbits;
+extern volatile __OVDCONS_t __at (0xF6A) OVDCONSbits;
 
-extern __sfr __at 0xF6B OVDCOND;
+extern __sfr __at (0xF6B) OVDCOND;
 typedef union {
 	struct {
 		unsigned POVD      	: 8;
 	};
 } __OVDCOND_t;
-extern volatile __OVDCOND_t __at 0xF6B OVDCONDbits;
+extern volatile __OVDCOND_t __at (0xF6B) OVDCONDbits;
 
-extern __sfr __at 0xF6C FLTCONFIG;
+extern __sfr __at (0xF6C) FLTCONFIG;
 typedef union {
 	struct {
 		unsigned FLTAEN    	: 1;
@@ -107,18 +107,18 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __FLTCONFIG_t;
-extern volatile __FLTCONFIG_t __at 0xF6C FLTCONFIGbits;
+extern volatile __FLTCONFIG_t __at (0xF6C) FLTCONFIGbits;
 
-extern __sfr __at 0xF6D DTCON;
+extern __sfr __at (0xF6D) DTCON;
 typedef union {
 	struct {
 		unsigned DTA       	: 6;
 		unsigned DTAPS     	: 2;
 	};
 } __DTCON_t;
-extern volatile __DTCON_t __at 0xF6D DTCONbits;
+extern volatile __DTCON_t __at (0xF6D) DTCONbits;
 
-extern __sfr __at 0xF6E PWMCON1;
+extern __sfr __at (0xF6E) PWMCON1;
 typedef union {
 	struct {
 		unsigned OSYNC     	: 1;
@@ -128,9 +128,9 @@ typedef union {
 		unsigned SEVOPS    	: 4;
 	};
 } __PWMCON1_t;
-extern volatile __PWMCON1_t __at 0xF6E PWMCON1bits;
+extern volatile __PWMCON1_t __at (0xF6E) PWMCON1bits;
 
-extern __sfr __at 0xF6F PWMCON0;
+extern __sfr __at (0xF6F) PWMCON0;
 typedef union {
 	struct {
 		unsigned PMOD      	: 4;
@@ -138,9 +138,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PWMCON0_t;
-extern volatile __PWMCON0_t __at 0xF6F PWMCON0bits;
+extern volatile __PWMCON0_t __at (0xF6F) PWMCON0bits;
 
-extern __sfr __at 0xF70 SEVTCMPH;
+extern __sfr __at (0xF70) SEVTCMPH;
 typedef union {
 	struct {
 		unsigned SEVTCMPH  	: 4;
@@ -150,11 +150,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __SEVTCMPH_t;
-extern volatile __SEVTCMPH_t __at 0xF70 SEVTCMPHbits;
+extern volatile __SEVTCMPH_t __at (0xF70) SEVTCMPHbits;
 
-extern __sfr __at 0xF71 SEVTCMPL;
+extern __sfr __at (0xF71) SEVTCMPL;
 
-extern __sfr __at 0xF72 PDC3H;
+extern __sfr __at (0xF72) PDC3H;
 typedef union {
 	struct {
 		unsigned PDC3H     	: 6;
@@ -162,11 +162,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PDC3H_t;
-extern volatile __PDC3H_t __at 0xF72 PDC3Hbits;
+extern volatile __PDC3H_t __at (0xF72) PDC3Hbits;
 
-extern __sfr __at 0xF73 PDC3L;
+extern __sfr __at (0xF73) PDC3L;
 
-extern __sfr __at 0xF74 PDC2H;
+extern __sfr __at (0xF74) PDC2H;
 typedef union {
 	struct {
 		unsigned PDC2H     	: 6;
@@ -174,11 +174,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PDC2H_t;
-extern volatile __PDC2H_t __at 0xF74 PDC2Hbits;
+extern volatile __PDC2H_t __at (0xF74) PDC2Hbits;
 
-extern __sfr __at 0xF75 PDC2L;
+extern __sfr __at (0xF75) PDC2L;
 
-extern __sfr __at 0xF76 PDC1H;
+extern __sfr __at (0xF76) PDC1H;
 typedef union {
 	struct {
 		unsigned PDC1H     	: 6;
@@ -186,11 +186,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PDC1H_t;
-extern volatile __PDC1H_t __at 0xF76 PDC1Hbits;
+extern volatile __PDC1H_t __at (0xF76) PDC1Hbits;
 
-extern __sfr __at 0xF77 PDC1L;
+extern __sfr __at (0xF77) PDC1L;
 
-extern __sfr __at 0xF78 PDC0H;
+extern __sfr __at (0xF78) PDC0H;
 typedef union {
 	struct {
 		unsigned PDC0H     	: 6;
@@ -198,11 +198,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PDC0H_t;
-extern volatile __PDC0H_t __at 0xF78 PDC0Hbits;
+extern volatile __PDC0H_t __at (0xF78) PDC0Hbits;
 
-extern __sfr __at 0xF79 PDC0L;
+extern __sfr __at (0xF79) PDC0L;
 
-extern __sfr __at 0xF7A PTPERH;
+extern __sfr __at (0xF7A) PTPERH;
 typedef union {
 	struct {
 		unsigned PTPERH    	: 4;
@@ -212,11 +212,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PTPERH_t;
-extern volatile __PTPERH_t __at 0xF7A PTPERHbits;
+extern volatile __PTPERH_t __at (0xF7A) PTPERHbits;
 
-extern __sfr __at 0xF7B PTPERL;
+extern __sfr __at (0xF7B) PTPERL;
 
-extern __sfr __at 0xF7C PTMRH;
+extern __sfr __at (0xF7C) PTMRH;
 typedef union {
 	struct {
 		unsigned PTMRH     	: 4;
@@ -226,11 +226,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PTMRH_t;
-extern volatile __PTMRH_t __at 0xF7C PTMRHbits;
+extern volatile __PTMRH_t __at (0xF7C) PTMRHbits;
 
-extern __sfr __at 0xF7D PTMRL;
+extern __sfr __at (0xF7D) PTMRL;
 
-extern __sfr __at 0xF7E PTCON1;
+extern __sfr __at (0xF7E) PTCON1;
 typedef union {
 	struct {
 		unsigned           	: 1;
@@ -243,9 +243,9 @@ typedef union {
 		unsigned PTEN      	: 1;
 	};
 } __PTCON1_t;
-extern volatile __PTCON1_t __at 0xF7E PTCON1bits;
+extern volatile __PTCON1_t __at (0xF7E) PTCON1bits;
 
-extern __sfr __at 0xF7F PTCON0;
+extern __sfr __at (0xF7F) PTCON0;
 typedef union {
 	struct {
 		unsigned PTMOD     	: 2;
@@ -253,9 +253,9 @@ typedef union {
 		unsigned PTOPS     	: 4;
 	};
 } __PTCON0_t;
-extern volatile __PTCON0_t __at 0xF7F PTCON0bits;
+extern volatile __PTCON0_t __at (0xF7F) PTCON0bits;
 
-extern __sfr __at 0xF80 PORTA;
+extern __sfr __at (0xF80) PORTA;
 typedef union {
 	struct {
 		unsigned RA0       	: 1;
@@ -292,9 +292,9 @@ typedef union {
 		unsigned           	:1;
 	};
 } __PORTA_t;
-extern volatile __PORTA_t __at 0xF80 PORTAbits;
+extern volatile __PORTA_t __at (0xF80) PORTAbits;
 
-extern __sfr __at 0xF81 PORTB;
+extern __sfr __at (0xF81) PORTB;
 typedef union {
 	struct {
 		unsigned RB0       	: 1;
@@ -321,9 +321,9 @@ typedef union {
 		unsigned           	:1;
 	};
 } __PORTB_t;
-extern volatile __PORTB_t __at 0xF81 PORTBbits;
+extern volatile __PORTB_t __at (0xF81) PORTBbits;
 
-extern __sfr __at 0xF82 PORTC;
+extern __sfr __at (0xF82) PORTC;
 typedef union {
 	struct {
 		unsigned RC0       	: 1;
@@ -360,9 +360,9 @@ typedef union {
 		unsigned           	:1;
 	};
 } __PORTC_t;
-extern volatile __PORTC_t __at 0xF82 PORTCbits;
+extern volatile __PORTC_t __at (0xF82) PORTCbits;
 
-extern __sfr __at 0xF83 PORTD;
+extern __sfr __at (0xF83) PORTD;
 typedef union {
 	struct {
 		unsigned RD0       	: 1;
@@ -389,9 +389,9 @@ typedef union {
 		unsigned PWM7      	:1;
 	};
 } __PORTD_t;
-extern volatile __PORTD_t __at 0xF83 PORTDbits;
+extern volatile __PORTD_t __at (0xF83) PORTDbits;
 
-extern __sfr __at 0xF84 PORTE;
+extern __sfr __at (0xF84) PORTE;
 typedef union {
 	struct {
 		unsigned RE0       	: 1;
@@ -418,13 +418,13 @@ typedef union {
 		unsigned           	:1;
 	};
 } __PORTE_t;
-extern volatile __PORTE_t __at 0xF84 PORTEbits;
+extern volatile __PORTE_t __at (0xF84) PORTEbits;
 
-extern __sfr __at 0xF87 TMR5L;
+extern __sfr __at (0xF87) TMR5L;
 
-extern __sfr __at 0xF88 TMR5H;
+extern __sfr __at (0xF88) TMR5H;
 
-extern __sfr __at 0xF89 LATA;
+extern __sfr __at (0xF89) LATA;
 typedef union {
 	struct {
 		unsigned LATA0     	: 1;
@@ -437,9 +437,9 @@ typedef union {
 		unsigned LATA7     	: 1;
 	};
 } __LATA_t;
-extern volatile __LATA_t __at 0xF89 LATAbits;
+extern volatile __LATA_t __at (0xF89) LATAbits;
 
-extern __sfr __at 0xF8A LATB;
+extern __sfr __at (0xF8A) LATB;
 typedef union {
 	struct {
 		unsigned LATB0     	: 1;
@@ -452,9 +452,9 @@ typedef union {
 		unsigned LATB7     	: 1;
 	};
 } __LATB_t;
-extern volatile __LATB_t __at 0xF8A LATBbits;
+extern volatile __LATB_t __at (0xF8A) LATBbits;
 
-extern __sfr __at 0xF8B LATC;
+extern __sfr __at (0xF8B) LATC;
 typedef union {
 	struct {
 		unsigned LATC0     	: 1;
@@ -467,9 +467,9 @@ typedef union {
 		unsigned LATC7     	: 1;
 	};
 } __LATC_t;
-extern volatile __LATC_t __at 0xF8B LATCbits;
+extern volatile __LATC_t __at (0xF8B) LATCbits;
 
-extern __sfr __at 0xF8C LATD;
+extern __sfr __at (0xF8C) LATD;
 typedef union {
 	struct {
 		unsigned LATD0     	: 1;
@@ -482,9 +482,9 @@ typedef union {
 		unsigned LATD7     	: 1;
 	};
 } __LATD_t;
-extern volatile __LATD_t __at 0xF8C LATDbits;
+extern volatile __LATD_t __at (0xF8C) LATDbits;
 
-extern __sfr __at 0xF8D LATE;
+extern __sfr __at (0xF8D) LATE;
 typedef union {
 	struct {
 		unsigned LATE0     	: 1;
@@ -497,13 +497,13 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __LATE_t;
-extern volatile __LATE_t __at 0xF8D LATEbits;
+extern volatile __LATE_t __at (0xF8D) LATEbits;
 
-extern __sfr __at 0xF90 PR5L;
+extern __sfr __at (0xF90) PR5L;
 
-extern __sfr __at 0xF91 PR5H;
+extern __sfr __at (0xF91) PR5H;
 
-extern __sfr __at 0xF92 TRISA;
+extern __sfr __at (0xF92) TRISA;
 typedef union {
 	struct {
 		unsigned TRISA0    	: 1;
@@ -516,9 +516,9 @@ typedef union {
 		unsigned TRISA7    	: 1;
 	};
 } __TRISA_t;
-extern volatile __TRISA_t __at 0xF92 TRISAbits;
+extern volatile __TRISA_t __at (0xF92) TRISAbits;
 
-extern __sfr __at 0xF93 TRISB;
+extern __sfr __at (0xF93) TRISB;
 typedef union {
 	struct {
 		unsigned TRISB0    	: 1;
@@ -531,9 +531,9 @@ typedef union {
 		unsigned TRISB7    	: 1;
 	};
 } __TRISB_t;
-extern volatile __TRISB_t __at 0xF93 TRISBbits;
+extern volatile __TRISB_t __at (0xF93) TRISBbits;
 
-extern __sfr __at 0xF94 TRISC;
+extern __sfr __at (0xF94) TRISC;
 typedef union {
 	struct {
 		unsigned TRISC0    	: 1;
@@ -546,9 +546,9 @@ typedef union {
 		unsigned TRISC7    	: 1;
 	};
 } __TRISC_t;
-extern volatile __TRISC_t __at 0xF94 TRISCbits;
+extern volatile __TRISC_t __at (0xF94) TRISCbits;
 
-extern __sfr __at 0xF95 TRISD;
+extern __sfr __at (0xF95) TRISD;
 typedef union {
 	struct {
 		unsigned TRISD0    	: 1;
@@ -561,9 +561,9 @@ typedef union {
 		unsigned TRISD7    	: 1;
 	};
 } __TRISD_t;
-extern volatile __TRISD_t __at 0xF95 TRISDbits;
+extern volatile __TRISD_t __at (0xF95) TRISDbits;
 
-extern __sfr __at 0xF96 TRISE;
+extern __sfr __at (0xF96) TRISE;
 typedef union {
 	struct {
 		unsigned TRISE0    	: 1;
@@ -576,9 +576,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __TRISE_t;
-extern volatile __TRISE_t __at 0xF96 TRISEbits;
+extern volatile __TRISE_t __at (0xF96) TRISEbits;
 
-extern __sfr __at 0xF99 ADCHS;
+extern __sfr __at (0xF99) ADCHS;
 typedef union {
 	struct {
 		unsigned SASEL     	: 2;
@@ -587,9 +587,9 @@ typedef union {
 		unsigned SDSEL     	: 2;
 	};
 } __ADCHS_t;
-extern volatile __ADCHS_t __at 0xF99 ADCHSbits;
+extern volatile __ADCHS_t __at (0xF99) ADCHSbits;
 
-extern __sfr __at 0xF9A ADCON3;
+extern __sfr __at (0xF9A) ADCON3;
 typedef union {
 	struct {
 		unsigned SSRC      	: 5;
@@ -597,9 +597,9 @@ typedef union {
 		unsigned ADRS      	: 2;
 	};
 } __ADCON3_t;
-extern volatile __ADCON3_t __at 0xF9A ADCON3bits;
+extern volatile __ADCON3_t __at (0xF9A) ADCON3bits;
 
-extern __sfr __at 0xF9B OSCTUNE;
+extern __sfr __at (0xF9B) OSCTUNE;
 typedef union {
 	struct {
 		unsigned TUN       	: 6;
@@ -607,9 +607,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __OSCTUNE_t;
-extern volatile __OSCTUNE_t __at 0xF9B OSCTUNEbits;
+extern volatile __OSCTUNE_t __at (0xF9B) OSCTUNEbits;
 
-extern __sfr __at 0xF9D PIE1;
+extern __sfr __at (0xF9D) PIE1;
 typedef union {
 	struct {
 		unsigned TMR1IE    	: 1;
@@ -622,9 +622,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PIE1_t;
-extern volatile __PIE1_t __at 0xF9D PIE1bits;
+extern volatile __PIE1_t __at (0xF9D) PIE1bits;
 
-extern __sfr __at 0xF9E PIR1;
+extern __sfr __at (0xF9E) PIR1;
 typedef union {
 	struct {
 		unsigned TMR1IF    	: 1;
@@ -637,9 +637,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PIR1_t;
-extern volatile __PIR1_t __at 0xF9E PIR1bits;
+extern volatile __PIR1_t __at (0xF9E) PIR1bits;
 
-extern __sfr __at 0xF9F IPR1;
+extern __sfr __at (0xF9F) IPR1;
 typedef union {
 	struct {
 		unsigned TMR1IP    	: 1;
@@ -652,9 +652,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __IPR1_t;
-extern volatile __IPR1_t __at 0xF9F IPR1bits;
+extern volatile __IPR1_t __at (0xF9F) IPR1bits;
 
-extern __sfr __at 0xFA0 PIE2;
+extern __sfr __at (0xFA0) PIE2;
 typedef union {
 	struct {
 		unsigned CCP2IE    	: 1;
@@ -667,9 +667,9 @@ typedef union {
 		unsigned OSFIE     	: 1;
 	};
 } __PIE2_t;
-extern volatile __PIE2_t __at 0xFA0 PIE2bits;
+extern volatile __PIE2_t __at (0xFA0) PIE2bits;
 
-extern __sfr __at 0xFA1 PIR2;
+extern __sfr __at (0xFA1) PIR2;
 typedef union {
 	struct {
 		unsigned CCP2IF    	: 1;
@@ -682,9 +682,9 @@ typedef union {
 		unsigned OSFIF     	: 1;
 	};
 } __PIR2_t;
-extern volatile __PIR2_t __at 0xFA1 PIR2bits;
+extern volatile __PIR2_t __at (0xFA1) PIR2bits;
 
-extern __sfr __at 0xFA2 IPR2;
+extern __sfr __at (0xFA2) IPR2;
 typedef union {
 	struct {
 		unsigned CCP2IP    	: 1;
@@ -697,9 +697,9 @@ typedef union {
 		unsigned OSFIP     	: 1;
 	};
 } __IPR2_t;
-extern volatile __IPR2_t __at 0xFA2 IPR2bits;
+extern volatile __IPR2_t __at (0xFA2) IPR2bits;
 
-extern __sfr __at 0xFA3 PIE3;
+extern __sfr __at (0xFA3) PIE3;
 typedef union {
 	struct {
 		unsigned TMR5IE    	: 1;
@@ -712,9 +712,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PIE3_t;
-extern volatile __PIE3_t __at 0xFA3 PIE3bits;
+extern volatile __PIE3_t __at (0xFA3) PIE3bits;
 
-extern __sfr __at 0xFA4 PIR3;
+extern __sfr __at (0xFA4) PIR3;
 typedef union {
 	struct {
 		unsigned TMR5IF    	: 1;
@@ -727,9 +727,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PIR3_t;
-extern volatile __PIR3_t __at 0xFA4 PIR3bits;
+extern volatile __PIR3_t __at (0xFA4) PIR3bits;
 
-extern __sfr __at 0xFA5 IPR3;
+extern __sfr __at (0xFA5) IPR3;
 typedef union {
 	struct {
 		unsigned TMR5IP    	: 1;
@@ -742,9 +742,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __IPR3_t;
-extern volatile __IPR3_t __at 0xFA5 IPR3bits;
+extern volatile __IPR3_t __at (0xFA5) IPR3bits;
 
-extern __sfr __at 0xFA6 EECON1;
+extern __sfr __at (0xFA6) EECON1;
 typedef union {
 	struct {
 		unsigned RD        	: 1;
@@ -757,15 +757,15 @@ typedef union {
 		unsigned EEPGD     	: 1;
 	};
 } __EECON1_t;
-extern volatile __EECON1_t __at 0xFA6 EECON1bits;
+extern volatile __EECON1_t __at (0xFA6) EECON1bits;
 
-extern __sfr __at 0xFA7 EECON2;
+extern __sfr __at (0xFA7) EECON2;
 
-extern __sfr __at 0xFA8 EEDATA;
+extern __sfr __at (0xFA8) EEDATA;
 
-extern __sfr __at 0xFA9 EEADR;
+extern __sfr __at (0xFA9) EEADR;
 
-extern __sfr __at 0xFAA BAUDCTL;
+extern __sfr __at (0xFAA) BAUDCTL;
 typedef union {
 	struct {
 		unsigned ABDEN     	: 1;
@@ -778,9 +778,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __BAUDCTL_t;
-extern volatile __BAUDCTL_t __at 0xFAA BAUDCTLbits;
+extern volatile __BAUDCTL_t __at (0xFAA) BAUDCTLbits;
 
-extern __sfr __at 0xFAB RCSTA;
+extern __sfr __at (0xFAB) RCSTA;
 typedef union {
 	struct {
 		unsigned RX9D      	: 1;
@@ -793,9 +793,9 @@ typedef union {
 		unsigned SPEN      	: 1;
 	};
 } __RCSTA_t;
-extern volatile __RCSTA_t __at 0xFAB RCSTAbits;
+extern volatile __RCSTA_t __at (0xFAB) RCSTAbits;
 
-extern __sfr __at 0xFAC TXSTA;
+extern __sfr __at (0xFAC) TXSTA;
 typedef union {
 	struct {
 		unsigned TX9D      	: 1;
@@ -808,17 +808,17 @@ typedef union {
 		unsigned CSRC      	: 1;
 	};
 } __TXSTA_t;
-extern volatile __TXSTA_t __at 0xFAC TXSTAbits;
+extern volatile __TXSTA_t __at (0xFAC) TXSTAbits;
 
-extern __sfr __at 0xFAD TXREG;
+extern __sfr __at (0xFAD) TXREG;
 
-extern __sfr __at 0xFAE RCREG;
+extern __sfr __at (0xFAE) RCREG;
 
-extern __sfr __at 0xFAF SPBRG;
+extern __sfr __at (0xFAF) SPBRG;
 
-extern __sfr __at 0xFB0 SPBRGH;
+extern __sfr __at (0xFB0) SPBRGH;
 
-extern __sfr __at 0xFB6 QEICON;
+extern __sfr __at (0xFB6) QEICON;
 typedef union {
 	struct {
 		unsigned PDEC      	: 2;
@@ -828,9 +828,9 @@ typedef union {
 		unsigned nVELM     	: 1;
 	};
 } __QEICON_t;
-extern volatile __QEICON_t __at 0xFB6 QEICONbits;
+extern volatile __QEICON_t __at (0xFB6) QEICONbits;
 
-extern __sfr __at 0xFB7 T5CON;
+extern __sfr __at (0xFB7) T5CON;
 typedef union {
 	struct {
 		unsigned TMR5ON    	: 1;
@@ -842,9 +842,9 @@ typedef union {
 		unsigned T5SEN     	: 1;
 	};
 } __T5CON_t;
-extern volatile __T5CON_t __at 0xFB7 T5CONbits;
+extern volatile __T5CON_t __at (0xFB7) T5CONbits;
 
-extern __sfr __at 0xFB8 ANSEL0;
+extern __sfr __at (0xFB8) ANSEL0;
 typedef union {
 	struct {
 		unsigned AN0       	: 1;
@@ -857,9 +857,9 @@ typedef union {
 		unsigned AN7       	: 1;
 	};
 } __ANSEL0_t;
-extern volatile __ANSEL0_t __at 0xFB8 ANSEL0bits;
+extern volatile __ANSEL0_t __at (0xFB8) ANSEL0bits;
 
-extern __sfr __at 0xFB9 ANSEL1;
+extern __sfr __at (0xFB9) ANSEL1;
 typedef union {
 	struct {
 		unsigned ANS8      	: 1;
@@ -872,9 +872,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __ANSEL1_t;
-extern volatile __ANSEL1_t __at 0xFB9 ANSEL1bits;
+extern volatile __ANSEL1_t __at (0xFB9) ANSEL1bits;
 
-extern __sfr __at 0xFBA CCP2CON;
+extern __sfr __at (0xFBA) CCP2CON;
 typedef union {
 	struct {
 		unsigned CCP2M     	: 4;
@@ -883,13 +883,13 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __CCP2CON_t;
-extern volatile __CCP2CON_t __at 0xFBA CCP2CONbits;
+extern volatile __CCP2CON_t __at (0xFBA) CCP2CONbits;
 
-extern __sfr __at 0xFBB CCPR2L;
+extern __sfr __at (0xFBB) CCPR2L;
 
-extern __sfr __at 0xFBC CCPR2H;
+extern __sfr __at (0xFBC) CCPR2H;
 
-extern __sfr __at 0xFBD CCP1CON;
+extern __sfr __at (0xFBD) CCP1CON;
 typedef union {
 	struct {
 		unsigned CCP1M     	: 4;
@@ -898,13 +898,13 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __CCP1CON_t;
-extern volatile __CCP1CON_t __at 0xFBD CCP1CONbits;
+extern volatile __CCP1CON_t __at (0xFBD) CCP1CONbits;
 
-extern __sfr __at 0xFBE CCPR1L;
+extern __sfr __at (0xFBE) CCPR1L;
 
-extern __sfr __at 0xFBF CCPR1H;
+extern __sfr __at (0xFBF) CCPR1H;
 
-extern __sfr __at 0xFC0 ADCON2;
+extern __sfr __at (0xFC0) ADCON2;
 typedef union {
 	struct {
 		unsigned ADCS      	: 3;
@@ -912,9 +912,9 @@ typedef union {
 		unsigned ADFM      	: 1;
 	};
 } __ADCON2_t;
-extern volatile __ADCON2_t __at 0xFC0 ADCON2bits;
+extern volatile __ADCON2_t __at (0xFC0) ADCON2bits;
 
-extern __sfr __at 0xFC1 ADCON1;
+extern __sfr __at (0xFC1) ADCON1;
 typedef union {
 	struct {
 		unsigned ADPNT     	: 2;
@@ -925,9 +925,9 @@ typedef union {
 		unsigned VCFG      	: 2;
 	};
 } __ADCON1_t;
-extern volatile __ADCON1_t __at 0xFC1 ADCON1bits;
+extern volatile __ADCON1_t __at (0xFC1) ADCON1bits;
 
-extern __sfr __at 0xFC2 ADCON0;
+extern __sfr __at (0xFC2) ADCON0;
 typedef union {
 	struct {
 		unsigned ADON      	: 1;
@@ -939,13 +939,13 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __ADCON0_t;
-extern volatile __ADCON0_t __at 0xFC2 ADCON0bits;
+extern volatile __ADCON0_t __at (0xFC2) ADCON0bits;
 
-extern __sfr __at 0xFC3 ADRESL;
+extern __sfr __at (0xFC3) ADRESL;
 
-extern __sfr __at 0xFC4 ADRESH;
+extern __sfr __at (0xFC4) ADRESH;
 
-extern __sfr __at 0xFC6 SSPCON;
+extern __sfr __at (0xFC6) SSPCON;
 typedef union {
 	struct {
 		unsigned SSPM      	: 4;
@@ -955,9 +955,9 @@ typedef union {
 		unsigned WCOL      	: 1;
 	};
 } __SSPCON_t;
-extern volatile __SSPCON_t __at 0xFC6 SSPCONbits;
+extern volatile __SSPCON_t __at (0xFC6) SSPCONbits;
 
-extern __sfr __at 0xFC7 SSPSTAT;
+extern __sfr __at (0xFC7) SSPSTAT;
 typedef union {
 	struct {
 		unsigned BF        	: 1;
@@ -970,13 +970,13 @@ typedef union {
 		unsigned SMP       	: 1;
 	};
 } __SSPSTAT_t;
-extern volatile __SSPSTAT_t __at 0xFC7 SSPSTATbits;
+extern volatile __SSPSTAT_t __at (0xFC7) SSPSTATbits;
 
-extern __sfr __at 0xFC8 SSPADD;
+extern __sfr __at (0xFC8) SSPADD;
 
-extern __sfr __at 0xFC9 SSPBUF;
+extern __sfr __at (0xFC9) SSPBUF;
 
-extern __sfr __at 0xFCA T2CON;
+extern __sfr __at (0xFCA) T2CON;
 typedef union {
 	struct {
 		unsigned T2CKPS    	: 2;
@@ -985,13 +985,13 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __T2CON_t;
-extern volatile __T2CON_t __at 0xFCA T2CONbits;
+extern volatile __T2CON_t __at (0xFCA) T2CONbits;
 
-extern __sfr __at 0xFCB PR2;
+extern __sfr __at (0xFCB) PR2;
 
-extern __sfr __at 0xFCC TMR2;
+extern __sfr __at (0xFCC) TMR2;
 
-extern __sfr __at 0xFCD T1CON;
+extern __sfr __at (0xFCD) T1CON;
 typedef union {
 	struct {
 		unsigned TMR1ON    	: 1;
@@ -1003,13 +1003,13 @@ typedef union {
 		unsigned RD16      	: 1;
 	};
 } __T1CON_t;
-extern volatile __T1CON_t __at 0xFCD T1CONbits;
+extern volatile __T1CON_t __at (0xFCD) T1CONbits;
 
-extern __sfr __at 0xFCE TMR1L;
+extern __sfr __at (0xFCE) TMR1L;
 
-extern __sfr __at 0xFCF TMR1H;
+extern __sfr __at (0xFCF) TMR1H;
 
-extern __sfr __at 0xFD0 RCON;
+extern __sfr __at (0xFD0) RCON;
 typedef union {
 	struct {
 		unsigned nBOR      	: 1;
@@ -1022,18 +1022,18 @@ typedef union {
 		unsigned IPEN      	: 1;
 	};
 } __RCON_t;
-extern volatile __RCON_t __at 0xFD0 RCONbits;
+extern volatile __RCON_t __at (0xFD0) RCONbits;
 
-extern __sfr __at 0xFD1 WDTCON;
+extern __sfr __at (0xFD1) WDTCON;
 typedef union {
 	struct {
 		unsigned SWDTEN    	: 1;
 		unsigned WDT       	: 7;
 	};
 } __WDTCON_t;
-extern volatile __WDTCON_t __at 0xFD1 WDTCONbits;
+extern volatile __WDTCON_t __at (0xFD1) WDTCONbits;
 
-extern __sfr __at 0xFD2 LVDCON;
+extern __sfr __at (0xFD2) LVDCON;
 typedef union {
 	struct {
 		unsigned LVDL      	: 4;
@@ -1043,9 +1043,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __LVDCON_t;
-extern volatile __LVDCON_t __at 0xFD2 LVDCONbits;
+extern volatile __LVDCON_t __at (0xFD2) LVDCONbits;
 
-extern __sfr __at 0xFD3 OSCCON;
+extern __sfr __at (0xFD3) OSCCON;
 typedef union {
 	struct {
 		unsigned SCS       	: 2;
@@ -1055,9 +1055,9 @@ typedef union {
 		unsigned IDLEN     	: 1;
 	};
 } __OSCCON_t;
-extern volatile __OSCCON_t __at 0xFD3 OSCCONbits;
+extern volatile __OSCCON_t __at (0xFD3) OSCCONbits;
 
-extern __sfr __at 0xFD5 T0CON;
+extern __sfr __at (0xFD5) T0CON;
 typedef union {
 	struct {
 		unsigned T0PS      	: 4;
@@ -1067,13 +1067,13 @@ typedef union {
 		unsigned TMR0ON    	: 1;
 	};
 } __T0CON_t;
-extern volatile __T0CON_t __at 0xFD5 T0CONbits;
+extern volatile __T0CON_t __at (0xFD5) T0CONbits;
 
-extern __sfr __at 0xFD6 TMR0L;
+extern __sfr __at (0xFD6) TMR0L;
 
-extern __sfr __at 0xFD7 TMR0H;
+extern __sfr __at (0xFD7) TMR0H;
 
-extern __sfr __at 0xFD8 STATUS;
+extern __sfr __at (0xFD8) STATUS;
 typedef union {
 	struct {
 		unsigned C         	: 1;
@@ -1086,11 +1086,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __STATUS_t;
-extern volatile __STATUS_t __at 0xFD8 STATUSbits;
+extern volatile __STATUS_t __at (0xFD8) STATUSbits;
 
-extern __sfr __at 0xFD9 FSR2L;
+extern __sfr __at (0xFD9) FSR2L;
 
-extern __sfr __at 0xFDA FSR2H;
+extern __sfr __at (0xFDA) FSR2H;
 typedef union {
 	struct {
 		unsigned FSR2H     	: 4;
@@ -1100,19 +1100,19 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __FSR2H_t;
-extern volatile __FSR2H_t __at 0xFDA FSR2Hbits;
+extern volatile __FSR2H_t __at (0xFDA) FSR2Hbits;
 
-extern __sfr __at 0xFDB PLUSW2;
+extern __sfr __at (0xFDB) PLUSW2;
 
-extern __sfr __at 0xFDC PREINC2;
+extern __sfr __at (0xFDC) PREINC2;
 
-extern __sfr __at 0xFDD POSTDEC2;
+extern __sfr __at (0xFDD) POSTDEC2;
 
-extern __sfr __at 0xFDE POSTINC2;
+extern __sfr __at (0xFDE) POSTINC2;
 
-extern __sfr __at 0xFDF INDF2;
+extern __sfr __at (0xFDF) INDF2;
 
-extern __sfr __at 0xFE0 BSR;
+extern __sfr __at (0xFE0) BSR;
 typedef union {
 	struct {
 		unsigned BSR       	: 4;
@@ -1122,11 +1122,11 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __BSR_t;
-extern volatile __BSR_t __at 0xFE0 BSRbits;
+extern volatile __BSR_t __at (0xFE0) BSRbits;
 
-extern __sfr __at 0xFE1 FSR1L;
+extern __sfr __at (0xFE1) FSR1L;
 
-extern __sfr __at 0xFE2 FSR1H;
+extern __sfr __at (0xFE2) FSR1H;
 typedef union {
 	struct {
 		unsigned FSR1H     	: 4;
@@ -1136,23 +1136,23 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __FSR1H_t;
-extern volatile __FSR1H_t __at 0xFE2 FSR1Hbits;
+extern volatile __FSR1H_t __at (0xFE2) FSR1Hbits;
 
-extern __sfr __at 0xFE3 PLUSW1;
+extern __sfr __at (0xFE3) PLUSW1;
 
-extern __sfr __at 0xFE4 PREINC1;
+extern __sfr __at (0xFE4) PREINC1;
 
-extern __sfr __at 0xFE5 POSTDEC1;
+extern __sfr __at (0xFE5) POSTDEC1;
 
-extern __sfr __at 0xFE6 POSTINC1;
+extern __sfr __at (0xFE6) POSTINC1;
 
-extern __sfr __at 0xFE7 INDF1;
+extern __sfr __at (0xFE7) INDF1;
 
-extern __sfr __at 0xFE8 WREG;
+extern __sfr __at (0xFE8) WREG;
 
-extern __sfr __at 0xFE9 FSR0L;
+extern __sfr __at (0xFE9) FSR0L;
 
-extern __sfr __at 0xFEA FSR0H;
+extern __sfr __at (0xFEA) FSR0H;
 typedef union {
 	struct {
 		unsigned FSR0H     	: 4;
@@ -1162,19 +1162,19 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __FSR0H_t;
-extern volatile __FSR0H_t __at 0xFEA FSR0Hbits;
+extern volatile __FSR0H_t __at (0xFEA) FSR0Hbits;
 
-extern __sfr __at 0xFEB PLUSW0;
+extern __sfr __at (0xFEB) PLUSW0;
 
-extern __sfr __at 0xFEC PREINC0;
+extern __sfr __at (0xFEC) PREINC0;
 
-extern __sfr __at 0xFED POSTDEC0;
+extern __sfr __at (0xFED) POSTDEC0;
 
-extern __sfr __at 0xFEE POSTINC0;
+extern __sfr __at (0xFEE) POSTINC0;
 
-extern __sfr __at 0xFEF INDF0;
+extern __sfr __at (0xFEF) INDF0;
 
-extern __sfr __at 0xFF0 INTCON3;
+extern __sfr __at (0xFF0) INTCON3;
 typedef union {
 	struct {
 		unsigned INT1IF    	: 1;
@@ -1187,9 +1187,9 @@ typedef union {
 		unsigned INT2IP    	: 1;
 	};
 } __INTCON3_t;
-extern volatile __INTCON3_t __at 0xFF0 INTCON3bits;
+extern volatile __INTCON3_t __at (0xFF0) INTCON3bits;
 
-extern __sfr __at 0xFF1 INTCON2;
+extern __sfr __at (0xFF1) INTCON2;
 typedef union {
 	struct {
 		unsigned RBIP      	: 1;
@@ -1202,9 +1202,9 @@ typedef union {
 		unsigned nRBPU     	: 1;
 	};
 } __INTCON2_t;
-extern volatile __INTCON2_t __at 0xFF1 INTCON2bits;
+extern volatile __INTCON2_t __at (0xFF1) INTCON2bits;
 
-extern __sfr __at 0xFF2 INTCON;
+extern __sfr __at (0xFF2) INTCON;
 typedef union {
 	struct {
 		unsigned RBIF      	: 1;
@@ -1237,19 +1237,19 @@ typedef union {
 		unsigned GIEH      	: 1;
 	};
 } __INTCON_t;
-extern volatile __INTCON_t __at 0xFF2 INTCONbits;
+extern volatile __INTCON_t __at (0xFF2) INTCONbits;
 
-extern __sfr __at 0xFF3 PRODL;
+extern __sfr __at (0xFF3) PRODL;
 
-extern __sfr __at 0xFF4 PRODH;
+extern __sfr __at (0xFF4) PRODH;
 
-extern __sfr __at 0xFF5 TABLAT;
+extern __sfr __at (0xFF5) TABLAT;
 
-extern __sfr __at 0xFF6 TBLPTRL;
+extern __sfr __at (0xFF6) TBLPTRL;
 
-extern __sfr __at 0xFF7 TBLPTRH;
+extern __sfr __at (0xFF7) TBLPTRH;
 
-extern __sfr __at 0xFF8 TBLPTRU;
+extern __sfr __at (0xFF8) TBLPTRU;
 typedef union {
 	struct {
 		unsigned TBLPTRU   	: 5;
@@ -1258,19 +1258,19 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __TBLPTRU_t;
-extern volatile __TBLPTRU_t __at 0xFF8 TBLPTRUbits;
+extern volatile __TBLPTRU_t __at (0xFF8) TBLPTRUbits;
 
-extern __sfr __at 0xFF9 PCL;
+extern __sfr __at (0xFF9) PCL;
 
-extern __sfr __at 0xFFA PCLATH;
+extern __sfr __at (0xFFA) PCLATH;
 typedef union {
 	struct {
 		unsigned PCH       	: 8;
 	};
 } __PCLATH_t;
-extern volatile __PCLATH_t __at 0xFFA PCLATHbits;
+extern volatile __PCLATH_t __at (0xFFA) PCLATHbits;
 
-extern __sfr __at 0xFFB PCLATU;
+extern __sfr __at (0xFFB) PCLATU;
 typedef union {
 	struct {
 		unsigned PCU       	: 5;
@@ -1279,9 +1279,9 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __PCLATU_t;
-extern volatile __PCLATU_t __at 0xFFB PCLATUbits;
+extern volatile __PCLATU_t __at (0xFFB) PCLATUbits;
 
-extern __sfr __at 0xFFC STKPTR;
+extern __sfr __at (0xFFC) STKPTR;
 typedef union {
 	struct {
 		unsigned STKPTR    	: 5;
@@ -1290,13 +1290,13 @@ typedef union {
 		unsigned STKFUL    	: 1;
 	};
 } __STKPTR_t;
-extern volatile __STKPTR_t __at 0xFFC STKPTRbits;
+extern volatile __STKPTR_t __at (0xFFC) STKPTRbits;
 
-extern __sfr __at 0xFFD TOSL;
+extern __sfr __at (0xFFD) TOSL;
 
-extern __sfr __at 0xFFE TOSH;
+extern __sfr __at (0xFFE) TOSH;
 
-extern __sfr __at 0xFFF TOSU;
+extern __sfr __at (0xFFF) TOSU;
 typedef union {
 	struct {
 		unsigned TOSU      	: 5;
@@ -1305,7 +1305,7 @@ typedef union {
 		unsigned           	: 1;
 	};
 } __TOSU_t;
-extern volatile __TOSU_t __at 0xFFF TOSUbits;
+extern volatile __TOSU_t __at (0xFFF) TOSUbits;
 
 /* Configuration register locations */
 #define	CONFIG1H	0x300001

@@ -112,6 +112,10 @@ SOURCE=..\support\Util\NewAlloc.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\support\scripts\resource.rc
+# End Source File
+# Begin Source File
+
 SOURCE=.\SDCC.lex
 
 !IF  "$(CFG)" == "src - Win32 Debug"

@@ -1,3 +1,13 @@
+2005-05-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug1198642.c: new test
+	* src/SDCCicode.c (isOperandEqual): fixed bug 1198642
+	* src/SDCCcse.c (findPrevIc): added comment, please have a look
+	* support/scripts/resource.h,
+	* support/scripts/resource.rc,
+	* src/src.dsp: added sdcc.ico to project as icon for sdcc.exe
+	* support/scripts/sdcc.ico: added 32x32 icon
+
 2005-05-18 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libdev/pic18f*.c,
@@ -31,7 +41,7 @@
 	* device/include/mcs51/8052.h: made parseable with lint
 	* device/include/mcs51/lint.h: added include file for (sp)lint
 	* doc/sdccman.lyx: added doc about use of splint (syntax checking tool)
-	* doc/cdbfileformat.lyx, 
+	* doc/cdbfileformat.lyx,
 	* doc/test_suite_spec.lyx: hardcoded date to the date of last text change
 
 2005-05-14 Raphael Neider <rneider AT web.de>

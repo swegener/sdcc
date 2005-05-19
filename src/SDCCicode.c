@@ -1428,8 +1428,10 @@ isOperandEqual (operand * left, operand * right)
       return isSymbolEqual (left->operand.symOperand,
 			    right->operand.symOperand);
     case VALUE:
-      return (floatFromVal (left->operand.valOperand) ==
-	      floatFromVal (right->operand.valOperand));
+      return (compareType (left->operand.valOperand->type,
+                           right->operand.valOperand->type) &&
+              (floatFromVal (left->operand.valOperand) ==
+               floatFromVal (right->operand.valOperand)))
     case TYPE:
       if (compareType (left->operand.typeOperand,
 		     right->operand.typeOperand) == 1)

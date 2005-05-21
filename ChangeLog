@@ -1,3 +1,7 @@
+2005-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (isOperandEqual): fixed missing ;
+
 2005-05-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug1198642.c: new test

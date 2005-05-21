@@ -190,7 +190,7 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg,
 
 #if 0 // temporary disabled, leaving the warning as a reminder
   if (warnings) {
-    SNPRINTF (message, sizeof(message), "for %s %s in %s", 
+    SNPRINTF (message, sizeof(message), "for %s %s in %s",
 	     IS_UNSIGNED(ltype) ? "unsigned" : "signed",
 	     nounName(ltype), msg);
     werror (W_CONST_RANGE, message);
@@ -204,7 +204,7 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg,
 /*-----------------------------------------------------------------*/
 /* operandName - returns the name of the operand                   */
 /*-----------------------------------------------------------------*/
-int 
+int
 printOperand (operand * op, FILE * file)
 {
   sym_link *opetype;
@@ -240,7 +240,7 @@ printOperand (operand * op, FILE * file)
 	       op->key,
 	       OP_LIVEFROM (op), OP_LIVETO (op),
 	       OP_SYMBOL (op)->stack,
-	       op->isaddr, op->aggr2ptr, OP_SYMBOL (op)->isreqv, 
+	       op->isaddr, op->aggr2ptr, OP_SYMBOL (op)->isreqv,
 	       OP_SYMBOL (op)->remat,OP_SYMBOL(op)->noSpilLoc,
 	       OP_SYMBOL(op)->ruonly,OP_SYMBOL(op)->dptr
 	);
@@ -677,7 +677,7 @@ newiTemp (char *s)
   {
       SNPRINTF (buffer, sizeof(buffer), "iTemp%d", iTempNum++);
   }
-    
+
   itmp = newSymbol (buffer, 1);
   strncpyz (itmp->rname, itmp->name, SDCC_NAME_MAX);
   itmp->isitmp = 1;
@@ -736,7 +736,7 @@ newiTempPreheaderLabel ()
 /*-----------------------------------------------------------------*/
 /* initiCode - initialises some iCode related stuff                */
 /*-----------------------------------------------------------------*/
-void 
+void
 initiCode ()
 {
 
@@ -871,13 +871,13 @@ operandType (operand * op)
 /*-----------------------------------------------------------------*/
 /* isParamterToCall - will return 1 if op is a parameter to args   */
 /*-----------------------------------------------------------------*/
-int 
+int
 isParameterToCall (value * args, operand * op)
 {
   value *tval = args;
 
   wassert (IS_SYMOP(op));
-    
+
   while (tval)
     {
       if (tval->sym &&
@@ -891,7 +891,7 @@ isParameterToCall (value * args, operand * op)
 /*-----------------------------------------------------------------*/
 /* isOperandGlobal   - return 1 if operand is a global variable    */
 /*-----------------------------------------------------------------*/
-int 
+int
 isOperandGlobal (operand * op)
 {
   if (!op)
@@ -913,7 +913,7 @@ isOperandGlobal (operand * op)
 /*-----------------------------------------------------------------*/
 /* isOperandVolatile - return 1 if the operand is volatile         */
 /*-----------------------------------------------------------------*/
-int 
+int
 isOperandVolatile (operand * op, bool chkTemp)
 {
   sym_link *optype;
@@ -923,19 +923,19 @@ isOperandVolatile (operand * op, bool chkTemp)
     return 0;
 
   opetype = getSpec (optype = operandType (op));
-    
-  if (IS_PTR (optype) && DCL_PTR_VOLATILE (optype))   
-    return 1;   
-    
-  if (IS_VOLATILE (opetype))   
-    return 1;   
-  return 0; 
+
+  if (IS_PTR (optype) && DCL_PTR_VOLATILE (optype))
+    return 1;
+
+  if (IS_VOLATILE (opetype))
+    return 1;
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
 /* isOperandLiteral - returns 1 if an operand contains a literal   */
 /*-----------------------------------------------------------------*/
-int 
+int
 isOperandLiteral (operand * op)
 {
   sym_link *opetype;
@@ -954,7 +954,7 @@ isOperandLiteral (operand * op)
 /*-----------------------------------------------------------------*/
 /* isOperandInFarSpace - will return true if operand is in farSpace */
 /*-----------------------------------------------------------------*/
-bool 
+bool
 isOperandInFarSpace (operand * op)
 {
   sym_link *etype;
@@ -982,7 +982,7 @@ isOperandInFarSpace (operand * op)
 /*------------------------------------------------------------------*/
 /* isOperandInDirSpace - will return true if operand is in dirSpace */
 /*------------------------------------------------------------------*/
-bool 
+bool
 isOperandInDirSpace (operand * op)
 {
   sym_link *etype;
@@ -1010,7 +1010,7 @@ isOperandInDirSpace (operand * op)
 /*--------------------------------------------------------------------*/
 /* isOperandInCodeSpace - will return true if operand is in codeSpace */
 /*--------------------------------------------------------------------*/
-bool 
+bool
 isOperandInCodeSpace (operand * op)
 {
   sym_link *etype;
@@ -1040,7 +1040,7 @@ isOperandInCodeSpace (operand * op)
 /*-----------------------------------------------------------------*/
 /* isOperandOnStack - will return true if operand is on stack      */
 /*-----------------------------------------------------------------*/
-bool 
+bool
 isOperandOnStack (operand * op)
 {
   sym_link *etype;
@@ -1064,7 +1064,7 @@ isOperandOnStack (operand * op)
 /* isOclsExpensive - will return true if accesses to an output     */
 /*                   storage class are expensive                   */
 /*-----------------------------------------------------------------*/
-bool 
+bool
 isOclsExpensive (struct memmap *oclass)
 {
   if (port->oclsExpense)
@@ -1083,7 +1083,7 @@ int
 isiCodeInFunctionCall (iCode * ic)
 {
   iCode * lic = ic;
-  
+
   /* Find the next CALL/PCALL */
   while (lic)
     {
@@ -1091,7 +1091,7 @@ isiCodeInFunctionCall (iCode * ic)
         break;
       lic = lic->next;
     }
-  
+
   if (!lic)
     return FALSE;
 
@@ -1105,7 +1105,7 @@ isiCodeInFunctionCall (iCode * ic)
         return TRUE;
       ic = ic->prev;
     }
-  
+
   return FALSE;
 }
 
@@ -1431,7 +1431,7 @@ isOperandEqual (operand * left, operand * right)
       return (compareType (left->operand.valOperand->type,
                            right->operand.valOperand->type) &&
               (floatFromVal (left->operand.valOperand) ==
-               floatFromVal (right->operand.valOperand)))
+               floatFromVal (right->operand.valOperand)));
     case TYPE:
       if (compareType (left->operand.typeOperand,
 		     right->operand.typeOperand) == 1)
@@ -1444,7 +1444,7 @@ isOperandEqual (operand * left, operand * right)
 /*-------------------------------------------------------------------*/
 /* isiCodeEqual - compares two iCodes are equal, returns true if yes */
 /*-------------------------------------------------------------------*/
-int 
+int
 isiCodeEqual (iCode * left, iCode * right)
 {
   /* if the same pointer */
@@ -1477,7 +1477,7 @@ isiCodeEqual (iCode * left, iCode * right)
 	  if (!isSymbolEqual (IC_FALSE (left), IC_FALSE (right)))
 	    return 0;
 	}
-      
+
       return 1;
     }
   return 0;
@@ -1526,7 +1526,7 @@ operandFromOperand (operand * op)
   nop->isLiteral = op->isLiteral;
   nop->usesDefs = op->usesDefs;
   nop->isParm = op->isParm;
-  
+
   switch (nop->type)
     {
     case SYMBOL:
@@ -1610,7 +1610,7 @@ operandFromSymbol (symbol * sym)
       ok &&				/* farspace check */
       !IS_BITVAR (sym->etype)		/* not a bit variable */
     )
-    {                                   
+    {
 
       /* we will use it after all optimizations
          and before liveRange calculation */
@@ -1739,7 +1739,7 @@ operandFromAst (ast * tree,int lvl)
     default:
       assert (0);
     }
-  
+
   /*  Just to keep the compiler happy */
   return (operand *) 0;
 }
@@ -1747,7 +1747,7 @@ operandFromAst (ast * tree,int lvl)
 /*-----------------------------------------------------------------*/
 /* setOperandType - sets the operand's type to the given type      */
 /*-----------------------------------------------------------------*/
-void 
+void
 setOperandType (operand * op, sym_link * type)
 {
   /* depending on the type of operand */
@@ -1868,7 +1868,7 @@ usualBinaryConversions (operand ** op1, operand ** op2,
 
   *op1 = geniCodeCast (ctype, *op1, TRUE);
   *op2 = geniCodeCast (ctype, *op2, TRUE);
-	
+
   return ctype;
 }
 
@@ -1954,7 +1954,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       geniCodeArray2Ptr (op);
       op->isaddr = 0;
     }
-    
+
   /* if the operand is already the desired type then do nothing */
   if (compareType (type, optype) == 1)
     return op;
@@ -2036,7 +2036,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
   }
 
   /* if they are the same size create an assignment */
-  
+
   /* This seems very dangerous to me, since there are several */
   /* optimizations (for example, gcse) that don't notice the  */
   /* cast hidden in this assignement and may simplify an      */
@@ -2257,7 +2257,7 @@ subtractExit:
   if (IS_VOID(ltype->next) || IS_VOID(rtype->next)) {
     return result;
   }
-  
+
   // should we really do this? is this ANSI?
   return geniCodeDivision (result,
 			   operandFromLit (getSize (ltype->next)),
@@ -2753,7 +2753,7 @@ geniCodeAddressOf (operand * op)
       op->isaddr = 0;
       return op;
     }
-  
+
   /* lvalue check already done in decorateType */
   /* this must be a lvalue */
 /*     if (!op->isaddr && !IS_AGGREGATE(optype)) { */
@@ -2786,7 +2786,7 @@ geniCodeAddressOf (operand * op)
 /*-----------------------------------------------------------------*/
 /* setOClass - sets the output class depending on the pointer type */
 /*-----------------------------------------------------------------*/
-void 
+void
 setOClass (sym_link * ptr, sym_link * spec)
 {
   switch (DCL_TYPE (ptr))
@@ -2860,7 +2860,7 @@ geniCodeDerefPtr (operand * op,int lvl)
       /* outputclass needs 2b updated */
       setOClass (optype, retype);
     }
-  
+
   op->isGptr = IS_GENPTR (optype);
 
   op->isaddr = (IS_PTR (rtype) ||
@@ -2961,7 +2961,7 @@ geniCodeLogic (operand * left, operand * right, int op)
             ic = setNextItem (iCodeChain);
         }
       /* if casting literal to generic pointer, then cast to rtype instead */
-      if (ic && (ic->op == CAST) && isOperandLiteral(IC_RIGHT (ic))) 
+      if (ic && (ic->op == CAST) && isOperandLiteral(IC_RIGHT (ic)))
         {
           left = operandFromValue (valCastLiteral (rtype, operandLitValue (IC_RIGHT (ic))));
           ltype = operandType(left);
@@ -2981,7 +2981,7 @@ geniCodeLogic (operand * left, operand * right, int op)
             ic = setNextItem (iCodeChain);
         }
       /* if casting literal to generic pointer, then cast to rtype instead */
-      if (ic && (ic->op == CAST) && isOperandLiteral(IC_RIGHT (ic))) 
+      if (ic && (ic->op == CAST) && isOperandLiteral(IC_RIGHT (ic)))
         {
           right = operandFromValue (valCastLiteral (ltype, operandLitValue (IC_RIGHT (ic))));
           rtype = operandType(right);
@@ -3047,18 +3047,18 @@ geniCodeLogicAndOr (ast *tree, int lvl)
   else /* OR_OP */
     ic = newiCodeCondition (op, trueLabel, NULL);
   ADDTOCHAIN (ic);
-  
+
   /* evaluate right operand */
   condition = ast2iCode (tree->right, lvl + 1);
   op = geniCodeRValue (condition, FALSE);
-  
+
   /* test right operand */
   ic = newiCodeCondition (op, trueLabel, NULL);
   ADDTOCHAIN (ic);
-  
+
   /* store 0 or 1 in result */
   result = newiTempOperand (newCharLink(), 1);
-  
+
   geniCodeLabel (falseLabel);
   geniCodeAssign (result, operandFromLit (0), 0, 0);
   /* generate an unconditional goto */
@@ -3142,7 +3142,7 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
      check if the literal value is within bounds */
   if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype))
     {
-      checkConstantRange(ltype, 
+      checkConstantRange(ltype,
 			 OP_VALUE(right), "= operation", 0);
     }
 
@@ -3205,7 +3205,7 @@ geniCodeDummyRead (operand * op)
 
   if (!IS_VOLATILE(type))
     return;
-    
+
   ic = newiCode (DUMMY_READ_VOLATILE, NULL, op);
   ADDTOCHAIN (ic);
 
@@ -3215,7 +3215,7 @@ geniCodeDummyRead (operand * op)
 /*-----------------------------------------------------------------*/
 /* geniCodeSEParms - generate code for side effecting fcalls       */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 geniCodeSEParms (ast * parms,int lvl)
 {
   if (!parms)
@@ -3238,9 +3238,9 @@ geniCodeSEParms (ast * parms,int lvl)
       IS_ADDRESS_OF_OP (parms->right))
     parms->right->left->lvalue = 1;
 
-  parms->opval.oprnd = 
+  parms->opval.oprnd =
     geniCodeRValue (ast2iCode (parms,lvl+1), FALSE);
-		
+
   parms->type = EX_OPERAND;
   AST_ARGREG(parms) = parms->etype ? SPEC_ARGREG(parms->etype) :
   		SPEC_ARGREG(parms->ftype);
@@ -3250,7 +3250,7 @@ geniCodeSEParms (ast * parms,int lvl)
 /* geniCodeParms - generates parameters                            */
 /*-----------------------------------------------------------------*/
 value *
-geniCodeParms (ast * parms, value *argVals, int *stack, 
+geniCodeParms (ast * parms, value *argVals, int *stack,
 	       sym_link * ftype, int lvl)
 {
   iCode *ic;
@@ -3340,7 +3340,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   sym_link *ftype;
   int stack = 0;
 
-  if (!IS_FUNC(OP_SYMBOL(left)->type) && 
+  if (!IS_FUNC(OP_SYMBOL(left)->type) &&
       !IS_CODEPTR(OP_SYMBOL(left)->type)) {
     werror (E_FUNCTION_EXPECTED);
     return operandFromValue(valueFromLit(0));
@@ -3354,7 +3354,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   ftype = operandType (left);
   if (IS_CODEPTR (ftype))
     ftype = ftype->next;
-    
+
   /* first the parameters */
   geniCodeParms (parms, NULL, &stack, ftype, lvl);
 
@@ -3381,7 +3381,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
 /*-----------------------------------------------------------------*/
 /* geniCodeReceive - generate intermediate code for "receive"      */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 geniCodeReceive (value * args)
 {
   unsigned char paramByteCounter = 0;
@@ -3419,21 +3419,21 @@ geniCodeReceive (value * args)
 		}
 	    }
 
-	  ic = newiCode (RECEIVE, NULL, NULL);	  
+	  ic = newiCode (RECEIVE, NULL, NULL);
 	  ic->argreg = SPEC_ARGREG(args->etype);
 	  if (first) {
 	      currFunc->recvSize = getSize (sym->type);
 	      first = 0;
 	  }
 	  IC_RESULT (ic) = opr;
-	  
-	  /* misuse of parmBytes (normally used for functions) 
+
+	  /* misuse of parmBytes (normally used for functions)
 	   * to save estimated stack position of this argument.
 	   * Normally this should be zero for RECEIVE iCodes.
 	   * No idea if this causes side effects on other ports. - dw
 	   */
 	  ic->parmBytes = paramByteCounter;
-	  
+
 	  /* what stack position do we have? */
 	  paramByteCounter += getSize (sym->type);
 
@@ -3447,7 +3447,7 @@ geniCodeReceive (value * args)
 /*-----------------------------------------------------------------*/
 /* geniCodeFunctionBody - create the function body                 */
 /*-----------------------------------------------------------------*/
-void 
+void
 geniCodeFunctionBody (ast * tree,int lvl)
 {
   iCode *ic;
@@ -3497,7 +3497,7 @@ geniCodeFunctionBody (ast * tree,int lvl)
 /*-----------------------------------------------------------------*/
 /* geniCodeReturn - gen icode for 'return' statement               */
 /*-----------------------------------------------------------------*/
-void 
+void
 geniCodeReturn (operand * op)
 {
   iCode *ic;
@@ -3513,7 +3513,7 @@ geniCodeReturn (operand * op)
 /*-----------------------------------------------------------------*/
 /* geniCodeIfx - generates code for extended if statement          */
 /*-----------------------------------------------------------------*/
-void 
+void
 geniCodeIfx (ast * tree,int lvl)
 {
   iCode *ic;
@@ -3572,7 +3572,7 @@ exit:
 /*-----------------------------------------------------------------*/
 /* geniCodeJumpTable - tries to create a jump table for switch     */
 /*-----------------------------------------------------------------*/
-int 
+int
 geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
 {
   int min, max, cnt = 1;
@@ -3618,7 +3618,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
     case 4: sizeIndex = 2; break;
     default: return 0;
     }
-  
+
   /* Compute the size cost of the range check and subtraction. */
   sizeofMinCost = 0;
   sizeofZeroMinCost = 0;
@@ -3633,7 +3633,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
     }
   if (min)
     sizeofMinCost += port->jumptableCost.sizeofSubtract;
-  
+
   /* If the size cost of handling a non-zero minimum exceeds the */
   /* cost of extending the range down to zero, then it might be */
   /* better to extend the range to zero. */
@@ -3650,7 +3650,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
             sizeofMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
         }
     }
-    
+
   /* Compute the total size cost of a jump table. */
   sizeofJumpTable = (1 + max - min) * port->jumptableCost.sizeofElement
                      + port->jumptableCost.sizeofDispatch
@@ -3664,7 +3664,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
     return 0;
 
   /* The jump table is preferable. */
-  
+
   /* First, a label for the default or missing cases. */
   if (tree->values.switchVals.swDefault)
     {
@@ -3688,7 +3688,7 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
       if (vch && t==i)
         {
           /* Explicit case: make a new label for it. */
-          SNPRINTF (buffer, sizeof(buffer), 
+          SNPRINTF (buffer, sizeof(buffer),
                     "_case_%d_%d",
                     tree->values.switchVals.swNum,
                     i);
@@ -3750,13 +3750,13 @@ geniCodeSwitch (ast * tree,int lvl)
   operand *cond = geniCodeRValue (ast2iCode (tree->left,lvl+1), FALSE);
   value *caseVals = tree->values.switchVals.swVals;
   symbol *trueLabel, *falseLabel;
-      
+
   /* If the condition is a literal, then just jump to the */
   /* appropriate case label. */
   if (IS_LITERAL(getSpec(operandType(cond))))
     {
       int switchVal, caseVal;
-      
+
       switchVal = (int) floatFromVal (cond->operand.valOperand);
       while (caseVals)
         {
@@ -3773,7 +3773,7 @@ geniCodeSwitch (ast * tree,int lvl)
         }
       goto defaultOrBreak;
     }
-  
+
   /* If cond is volatile, it might change while we are trying to */
   /* find the matching case. To avoid this possibility, make a   */
   /* non-volatile copy to use instead. */
@@ -3781,7 +3781,7 @@ geniCodeSwitch (ast * tree,int lvl)
     {
       operand * newcond;
       iCode * ic;
-      
+
       newcond = newiTempOperand (operandType (cond), TRUE);
       newcond->isvolatile = 0;
       ic = newiCode ('=', NULL, cond);
@@ -3834,7 +3834,7 @@ jumpTable:
 /*-----------------------------------------------------------------*/
 /* geniCodeInline - intermediate code for inline assembler         */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 geniCodeInline (ast * tree)
 {
   iCode *ic;
@@ -3864,11 +3864,11 @@ geniCodeArrayInit (ast * tree, operand *array)
   }
   ADDTOCHAIN (ic);
 }
-	
+
 /*-----------------------------------------------------------------*/
 /* geniCodeCritical - intermediate code for a critical statement   */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 geniCodeCritical (ast *tree, int lvl)
 {
   iCode *ic;
@@ -3888,18 +3888,18 @@ geniCodeCritical (ast *tree, int lvl)
 
   /* If op is NULL, the original interrupt state will saved on */
   /* the stack. Otherwise, it will be saved in op. */
-  
+
   /* Generate a save of the current interrupt state & disable */
   ic = newiCode (CRITICAL, NULL, NULL);
   IC_RESULT (ic) = op;
   ADDTOCHAIN (ic);
-  
+
   /* Generate the critical code sequence */
   if (tree->left && tree->left->type == EX_VALUE)
     geniCodeDummyRead (ast2iCode (tree->left,lvl+1));
   else
     ast2iCode (tree->left,lvl+1);
-  
+
   /* Generate a restore of the original interrupt state */
   ic = newiCode (ENDCRITICAL, NULL, op);
   ADDTOCHAIN (ic);
@@ -4245,7 +4245,7 @@ ast2iCode (ast * tree,int lvl)
 	geniCodeAssign (left,
 		geniCodeMultiply (geniCodeRValue (operandFromOperand (left),
 						  FALSE),
-				  geniCodeRValue (right, FALSE), 
+				  geniCodeRValue (right, FALSE),
 				  getResultTypeFromType (tree->ftype)),
 			0, 1);
 
@@ -4376,11 +4376,11 @@ ast2iCode (ast * tree,int lvl)
     case INLINEASM:
       geniCodeInline (tree);
       return NULL;
-	
+
     case ARRAYINIT:
 	geniCodeArrayInit(tree, ast2iCode (tree->left,lvl+1));
 	return NULL;
-    
+
     case CRITICAL:
 	geniCodeCritical (tree, lvl);
     }
@@ -4429,25 +4429,25 @@ static const char *opTypeToStr(OPTYPE op)
       case VALUE: return "value";
       case TYPE: return "type";
     }
-    return "undefined type";    
+    return "undefined type";
 }
 
 
-operand *validateOpType(operand 	*op, 
+operand *validateOpType(operand 	*op,
 			const char 	*macro,
 			const char 	*args,
 			OPTYPE 		type,
-			const char 	*file, 
+			const char 	*file,
 			unsigned 	line)
-{    
+{
     if (op && op->type == type)
     {
 	return op;
     }
-    fprintf(stderr, 
+    fprintf(stderr,
 	    "Internal error: validateOpType failed in %s(%s) @ %s:%u:"
 	    " expected %s, got %s\n",
-	    macro, args, file, line, 
+	    macro, args, file, line,
 	    opTypeToStr(type), op ? opTypeToStr(op->type) : "null op");
     exit(-1);
     return op; // never reached, makes compiler happy.

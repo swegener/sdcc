@@ -231,6 +231,11 @@ _process_pragma(const char *sz)
     absSym *absS;
     value *addr;
 
+      if (!symname || !location) {
+        fprintf (stderr, "%s:%d: #pragma code [symbol] [location] -- symbol or location missing\n", filename, lineno-1);
+        return 1; /* considered an error */
+      }
+
       absS = Safe_calloc(1, sizeof(absSym));
       sprintf(absS->name, "_%s", symname);
     
@@ -258,6 +263,11 @@ _process_pragma(const char *sz)
     sectSym *ssym;
     sectName *snam;
     int found=0;
+    
+      if (!symname || !sectname) {
+        fprintf (stderr, "%s:%d: #pragma udata [section-name] [symbol] -- section-name or symbol missing!\n", filename, lineno-1);
+        return 1; /* considered an error */
+      }
     
       while(symname) {
         ssym = Safe_calloc(1, sizeof(sectSym));

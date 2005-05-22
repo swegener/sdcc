@@ -1,3 +1,11 @@
+2005-05-19 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/main.c (_process_pragma): check for missing
+	  arguments to pragmas code and udata
+	* device/include/pic16/pic18f{2550,4331,4455,4520}.h:
+	  consistency fixes to match other headers (thanks to Jim Paris)
+	* device/lib/pic16/libio/i2c.ignore: 18f4331 provides no I2C
+
 2005-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (isOperandEqual): fixed missing ;
@@ -23,7 +31,7 @@
 
 2005-05-17 Raphael Neider <rneider AT web.de>
 
-	* device/include/pic18f{2550,4331,4455,4520}.h: NEW
+	* device/include/pic16/pic18f{2550,4331,4455,4520}.h: NEW
 	* device/lib/pic16/libdev/pic18f{2550,4331,4455,4520}.c: NEW
 	* device/lib/pic16/pics.all: added new devices
 	* src/pic16/device.c: added support for pic18f4520

@@ -554,6 +554,7 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
     switch( itype ) {
       case FPOINTER:
       case CPOINTER:
+      case GPOINTER:
       case FUNCTION:
         {
           sprintf(buf, "UPPER(%s)", iname);

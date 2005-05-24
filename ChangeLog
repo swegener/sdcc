@@ -1,5 +1,9 @@
 2005-05-24 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/glue.c (pic16_printGPointerType): fixed #1207796
+
+2005-05-24 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic16/pic18f{442,452,458}.h: fixed wrong
 	  TRISE definitions, closes bug #1162453
 
@@ -43,7 +47,7 @@
 
 2005-05-16 Raphael Neider <rneider AT web.de>
 	* src/pic16/gen.{c,h}: s/mov2f/pic16_mov2f made public
-	* src/pic16/genarith.c (genAddit): fixed bug 1202480
+	* src/pic16/genarith.c (genAddLit): fixed bug 1202480
 	* src/pic16/pcode.{c,h} (pic16_newpCodeOpBit_simple): NEW
 	  convenience function for bit access
 

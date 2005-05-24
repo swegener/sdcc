@@ -1,4 +1,9 @@
-2005-05-19 Raphael Neider <rneider AT web.de>
+2005-05-24 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f{442,452,458}.h: fixed wrong
+	  TRISE definitions, closes bug #1162453
+
+2005-05-22 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/main.c (_process_pragma): check for missing
 	  arguments to pragmas code and udata

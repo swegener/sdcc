@@ -341,11 +341,11 @@ extern volatile __TRISDbits_t __at (0xf95) TRISDbits;
 extern __sfr __at (0xf96) TRISE;
 typedef union {
 	struct {
-		unsigned :1;
 		unsigned TRISE0:1;
 		unsigned TRISE1:1;
 		unsigned TRISE2:1;
 		unsigned :1;
+		unsigned PSPMODE:1;
 		unsigned IBOV:1;
 		unsigned OBF:1;
 		unsigned IBF:1;

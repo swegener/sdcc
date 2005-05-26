@@ -648,12 +648,13 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
 #endif
 
   if(!s) {
-    /* length of initializer string (might contain \0, so do not use strlen) */
-    ilen = getNelements (type, ilist);
-
     val = list2val (ilist);
+
     /* if the value is a character string  */
     if(IS_ARRAY (val->type) && IS_CHAR (val->etype)) {
+      /* length of initializer string (might contain \0, so do not use strlen) */
+      ilen = DCL_ELEM(val->type);
+
       if(!DCL_ELEM (type))
         DCL_ELEM (type) = ilen;
 

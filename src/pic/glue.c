@@ -369,7 +369,7 @@ static int
 printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
 {
 	value *val;
-	int remain;
+	int remain, ilen;
 	
 	if(!pb)
 		return 0;
@@ -379,17 +379,22 @@ printIvalChar (sym_link * type, initList * ilist, pBlock *pb, char *s)
 	{
 		
 		val = list2val (ilist);
+
 		/* if the value is a character string  */
 		if (IS_ARRAY (val->type) && IS_CHAR (val->etype))
 		{
+			ilen = DCL_ELEM(val->type);
+
 			if (!DCL_ELEM (type))
-				DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
+				DCL_ELEM (type) = ilen;
+		
+			/* emit string constant */
+			for (remain = 0; remain < ilen; remain++) {
+				addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(SPEC_CVAL(val->etype).v_char[remain])));
+			}
 			
-			//printChar (oFile, SPEC_CVAL (val->etype).v_char, DCL_ELEM (type));
-			//fprintf(stderr, "%s omitting call to printChar\n",__FUNCTION__);
-			addpCode2pBlock(pb,newpCodeCharP(";omitting call to printChar"));
-			
-			if ((remain = (DCL_ELEM (type) - strlen (SPEC_CVAL (val->etype).v_char) - 1)) > 0)
+			/* fill array up to desired size */
+			if ((remain = (DCL_ELEM (type) - ilen)) > 0)
 				while (remain--)
 					//tfprintf (oFile, "\t!db !constbyte\n", 0);
 					addpCode2pBlock(pb,newpCode(POC_RETLW,newpCodeOpLit(0)));

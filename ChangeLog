@@ -1,5 +1,12 @@
 2005-05-26 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/glue.c (pic16_printIvalChar): fixed _constant_ string
+	  initializers with \0, bug #1208187
+	* src/pic/glue.c (printIvalChar): fixed (non- and constant) string
+	  intializers with \0, bug #1208187
+
+2005-05-26 Raphael Neider <rneider AT web.de>
+
 	* src/pic16/glue.c (pic16_printIvalChar): fixed string
 	  initializers with \0, bug #1208187
 	* src/pic16/main.c (_process_pragma): added sanity checks

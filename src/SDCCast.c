@@ -573,7 +573,7 @@ funcOfType (char *name, sym_link * type, sym_link * argType,
     }
 
   /* save it */
-  addSymChain (sym);
+  addSymChain (&sym);
   sym->cdef = 1;
   allocVariables (sym);
   return sym;
@@ -613,7 +613,7 @@ funcOfTypeVarg (char *name, char * rtype, int nArgs , char **atypes)
     }
 
     /* save it */
-    addSymChain (sym);
+    addSymChain (&sym);
     sym->cdef = 1;
     allocVariables (sym);
     return sym;
@@ -1283,7 +1283,7 @@ stringToSymbol (value * val)
   if (noAlloc == 0)
     {
       /* allocate it */
-      addSymChain (sym);
+      addSymChain (&sym);
       allocVariables (sym);
     }
   sym->ival = NULL;
@@ -5341,7 +5341,7 @@ createFunction (symbol * name, ast * body)
     }
   else
     {
-      addSymChain (name);
+      addSymChain (&name);
       allocVariables (name);
     }
   name->lastLine = mylineno;

@@ -1005,10 +1005,11 @@ reverseLink (sym_link * type)
 /* addSymChain - adds a symbol chain to the symboltable             */
 /*------------------------------------------------------------------*/
 void 
-addSymChain (symbol * symHead)
+addSymChain (symbol ** symHead)
 {
-  symbol *sym = symHead;
+  symbol *sym = *symHead;
   symbol *csym = NULL;
+  symbol **symPtrPtr;
   int error = 0;
 
   for (; sym != NULL; sym = sym->next)
@@ -1086,6 +1087,13 @@ addSymChain (symbol * symHead)
         /* delete current entry */
         deleteSym (SymbolTab, csym, csym->name);
         deleteFromSeg(csym);
+        
+        symPtrPtr = symHead;
+        while (*symPtrPtr && *symPtrPtr != csym)
+          symPtrPtr = &(*symPtrPtr)->next;
+        if (*symPtrPtr == csym)
+          *symPtrPtr = csym->next;
+          
       }
       
       /* add new entry */
@@ -2567,7 +2575,7 @@ processFuncArgs (symbol * func)
               SPEC_STAT (func->etype);
           }
           #endif
-          addSymChain (val->sym);
+          addSymChain (&val->sym);
 
         }
       else                      /* symbol name given create synth name */

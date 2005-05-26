@@ -160,7 +160,7 @@ external_definition
 				   	SPEC_EXTR($1->etype) = 1;
 				   }
 			       }
-                               addSymChain ($1);
+                               addSymChain (&$1);
                                allocVariables ($1) ;
 			       cleanUpLevel (SymbolTab,1);
                              }
@@ -983,7 +983,7 @@ enumerator
        SPEC_ENUM($1->etype) = 1;
        $$ = $1 ;
        // do this now, so we can use it for the next enums in the list
-       addSymChain($1);
+       addSymChain(&$1);
      }
    ;
 
@@ -1259,7 +1259,7 @@ parameter_declaration
 		  pointerTypes($2->type,$1);
                   addDecl ($2,0,$1);		  
 		  for (loop=$2;loop;loop->_isparm=1,loop=loop->next);
-		  addSymChain ($2);
+		  addSymChain (&$2);
 		  $$ = symbolVal($2);
 		  ignoreTypedefType = 0;
                }
@@ -1439,10 +1439,10 @@ compound_statement
    : start_block end_block                    { $$ = createBlock(NULL,NULL); }
    | start_block statement_list end_block     { $$ = createBlock(NULL,$2) ;  }
    | start_block 
-          declaration_list                    { addSymChain($2); }
+          declaration_list                    { addSymChain(&$2); }
      end_block                                { $$ = createBlock($2,NULL) ;  }
    | start_block 
-          declaration_list                    {  addSymChain ($2); }
+          declaration_list                    {  addSymChain (&$2); }
           statement_list   
      end_block                                {$$ = createBlock($2,$4)   ;  }
    | error ';'			              { $$ = NULL ; }

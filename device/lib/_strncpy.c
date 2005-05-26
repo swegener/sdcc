@@ -26,11 +26,13 @@
 char *strncpy (
 	char * d,
 	char * s,
-	size_t n ) 
+	size_t n )
 {
 	register char * d1 =  d;
 
-	while ( n-- )
+	while ( n-- && *s )
 		*d++ = *s++ ;
+	while ( n-- )
+		*d++ = '\0' ;
 	return d1;
 }

@@ -1,3 +1,7 @@
+2005-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_strncpy.c: fixed not filling with \0
+
 2005-05-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (funcOfType, funcOfTypeVarg, stringToSymbol,

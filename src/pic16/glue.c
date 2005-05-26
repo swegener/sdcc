@@ -638,7 +638,7 @@ static int
 pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, char ptype, void *p)
 {
   value *val;
-  int remain, len;
+  int remain, len, ilen;
 
   if(!p)
     return 0;
@@ -648,11 +648,14 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
 #endif
 
   if(!s) {
+    /* length of initializer string (might contain \0, so do not use strlen) */
+    ilen = getNelements (type, ilist);
+
     val = list2val (ilist);
     /* if the value is a character string  */
     if(IS_ARRAY (val->type) && IS_CHAR (val->etype)) {
       if(!DCL_ELEM (type))
-        DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
+        DCL_ELEM (type) = ilen;
 
       /* len is 0 if declartion equals initializer,
        * >0 if declaration greater than initializer
@@ -661,23 +664,20 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, char *s, ch
        * if <0 then emit only the length of declaration elements
        * and warn user
        */
-      len = DCL_ELEM (type) - (strlen (SPEC_CVAL (val->etype).v_char)+1);
+      len = DCL_ELEM (type) - ilen;
 
-//      fprintf(stderr, "%s:%d len = %i DCL_ELEM(type) = %i SPEC_CVAL-len = %i\n", __FILE__, __LINE__,
-//        len, DCL_ELEM(type), strlen(SPEC_CVAL(val->etype).v_char));
+//      fprintf(stderr, "%s:%d ilen = %i len = %i DCL_ELEM(type) = %i SPEC_CVAL-len = %i\n", __FILE__, __LINE__,
+//        ilen, len, DCL_ELEM(type), strlen(SPEC_CVAL(val->etype).v_char));
 
-      remain=0;
       if(len >= 0) {
-        for(remain=0; remain<strlen(SPEC_CVAL(val->etype).v_char)+1; remain++)
+        /* emit initializer */
+        for(remain=0; remain<ilen; remain++)
           pic16_emitDB(SPEC_CVAL(val->etype).v_char[ remain ], ptype, p);
 
-        if(len>0) {
-          len -= remain;
+	  /* fill array with 0x00 */
           while(len--) {
             pic16_emitDB(0x00, ptype, p);
           }
-        }
-
       } else {
         werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
 

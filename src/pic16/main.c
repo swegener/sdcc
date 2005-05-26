@@ -187,6 +187,12 @@ _process_pragma(const char *sz)
     regs *reg;
     symbol *sym;
 
+      if (!stackPosS) {
+        fprintf (stderr, "%s:%d: #pragma stack [stack-pos] [stack-length] -- stack-position missing\n", filename, lineno-1);
+
+        return 0; /* considered an error */
+      }
+
       stackPosVal = constVal( stackPosS );
       stackPos = (unsigned int)floatFromVal( stackPosVal );
 
@@ -204,7 +210,32 @@ _process_pragma(const char *sz)
       }
 
 //      fprintf(stderr, "Initializing stack pointer at 0x%x len 0x%x\n", stackPos, stackLen);
-        
+
+      /* check sanity of stack */
+      if ((stackPos >> 8) != ((stackPos+stackLen) >> 8)) {
+        fprintf (stderr, "%s:%u: warning: stack [0x%03X,0x%03X] crosses memory bank boundaries (not fully tested)\n",
+		filename,lineno-1, stackPos, stackPos+stackLen-1);
+      }
+
+      if (pic16) {
+        if (stackPos < pic16->acsSplitOfs) {
+          fprintf (stderr, "%s:%u: warning: stack [0x%03X, 0x%03X] intersects with the access bank [0x000,0x%03x] -- this is highly discouraged!\n",
+		filename, lineno-1, stackPos, stackPos+stackLen-1, pic16->acsSplitOfs);
+        }
+
+        if (stackPos+stackLen > 0xF00 + pic16->acsSplitOfs) {
+          fprintf (stderr, "%s:%u: warning: stack [0x%03X,0x%03X] intersects with special function registers [0x%03X,0xFFF]-- this is highly discouraged!\n",
+		filename, lineno-1, stackPos, stackPos+stackLen-1, 0xF00 + pic16->acsSplitOfs);
+        }
+
+        if (stackPos+stackLen > pic16->RAMsize) {
+          fprintf (stderr, "%s:%u: error: stack [0x%03X,0x%03X] is placed outside available memory [0x000,0x%03X]!\n",
+		filename, lineno-1, stackPos, stackPos+stackLen-1, pic16->RAMsize-1);
+          exit(-1);
+          return 1;	/* considered an error, but this reports "invalid pragma stack"... */
+        }
+      }
+
       reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
       addSet(&pic16_fix_udata, reg);
     
@@ -233,7 +264,8 @@ _process_pragma(const char *sz)
 
       if (!symname || !location) {
         fprintf (stderr, "%s:%d: #pragma code [symbol] [location] -- symbol or location missing\n", filename, lineno-1);
-        return 1; /* considered an error */
+	exit (-1);
+        return 1; /* considered an error, but this reports "invalid pragma code"... */
       }
 
       absS = Safe_calloc(1, sizeof(absSym));
@@ -266,7 +298,8 @@ _process_pragma(const char *sz)
     
       if (!symname || !sectname) {
         fprintf (stderr, "%s:%d: #pragma udata [section-name] [symbol] -- section-name or symbol missing!\n", filename, lineno-1);
-        return 1; /* considered an error */
+	exit (-1);
+        return 1; /* considered an error, but this reports "invalid pragma code"... */
       }
     
       while(symname) {

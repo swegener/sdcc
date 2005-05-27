@@ -1,3 +1,7 @@
+2005-05-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_strncpy.c: fixed the fix
+
 2005-05-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_printIvalChar): fixed _constant_ string
@@ -12,7 +16,7 @@
 	* src/pic16/main.c (_process_pragma): added sanity checks
 	  for stack position and size, emit warnings when appropriate
 
-2005-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-05-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_strncpy.c: fixed not filling with \0
 

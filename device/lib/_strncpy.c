@@ -30,9 +30,14 @@ char *strncpy (
 {
 	register char * d1 =  d;
 
-	while ( n-- && *s )
+	while ( n && *s )
+	{
+		n-- ;
 		*d++ = *s++ ;
+	}
 	while ( n-- )
+	{
 		*d++ = '\0' ;
+	}
 	return d1;
 }

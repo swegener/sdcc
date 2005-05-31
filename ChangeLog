@@ -1,3 +1,9 @@
+2005-05-31 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/{gen.c,genarith.c}: replaced sign-extension
+	  "CLRF, BTFSC <signbit>, DECF/COMF" with side-effect-free
+	  "CLRF, BTFSC <signbit>, SETF"; fixes "long>>9"
+
 2005-05-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_strncpy.c: fixed the fix

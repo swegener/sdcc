@@ -1059,7 +1059,7 @@ void pic16_genPlus (iCode *ic)
 				for(i=size; i< AOP_SIZE(result); i++) {
 					pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),i));
 					pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),size-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-					pic16_emitpcode(POC_COMF, pic16_popGet(AOP(result),i));
+					pic16_emitpcode(POC_SETF, pic16_popGet(AOP(result),i));
 					pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(left),i));
 					pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),i));
 				}
@@ -1103,7 +1103,7 @@ void pic16_genPlus (iCode *ic)
 			    if (!SPEC_USIGN(getSpec(operandType(right)))) {
 			      // right operand is signed
 			      pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),AOP_SIZE(right)-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-			      pic16_emitpcode(POC_COMF, pic16_popCopyReg (&pic16_pc_wreg));
+			      pic16_emitpcode(POC_SETF, pic16_popCopyReg (&pic16_pc_wreg));
 			    }
 			  }
 
@@ -1121,104 +1121,19 @@ void pic16_genPlus (iCode *ic)
 			    if (!SPEC_USIGN(getSpec(operandType(left)))) {
 			      // left operand is signed
 			      pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),AOP_SIZE(left)-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-			      pic16_emitpcode(POC_COMF, pic16_popGet (AOP(result), i));
+			      pic16_emitpcode(POC_SETF, pic16_popGet (AOP(result), i));
 			    }
 			    pic16_emitpcode (POC_ADDWFC, pic16_popGet (AOP(result), i));
 			  }
 			} // for i
 			goto release;
-			
-#if 0
-			// add leftover bytes
-			if (SPEC_USIGN(getSpec(operandType(right)))) {
-				// right is unsigned
-				for(i=size; i< AOP_SIZE(result); i++) {
-					if (pic16_sameRegs(AOP(left), AOP(result)))
-					{
-						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-						pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(left),i));
-					} else { // not same
-						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-						pic16_emitpcode(POC_ADDFWC, pic16_popGet(AOP(left),i));
-						pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
-					}
-				}
-			} else {
-				// right is signed
-				for(i=size; i< AOP_SIZE(result); i++) {
-					if(size < AOP_SIZE(left)) {
-						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-						pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),size-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-						pic16_emitpcode(POC_COMFW, pic16_popCopyReg(&pic16_pc_wreg));
-						if (pic16_sameRegs(AOP(left), AOP(result)))
-						{
-							pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(left),i));
-						} else { // not same
-							pic16_emitpcode(POC_ADDFWC, pic16_popGet(AOP(left),i));
-							pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),i));
-						}
-					} else {
-						pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-						pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result), i));
-					}
-				}
-			}
-			goto release;
-#endif
 		}
 
 	}
 
 	assert( 0 );
-	// TODO: 	anything from here to before "release:" is probably obsolete and should be removed
-	//		when the regression tests are stable
-
-	if (AOP_SIZE(result) > AOP_SIZE(right)) {
-		int sign =  !(SPEC_USIGN(getSpec(operandType(left))) |
-				SPEC_USIGN(getSpec(operandType(right))) );
-
-
-		/* Need to extend result to higher bytes */
-		size = AOP_SIZE(result) - AOP_SIZE(right) - 1;
-
-		/* First grab the carry from the lower bytes */
-		pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),offset));
-		pic16_emitpcode(POC_RLCF,  pic16_popGet(AOP(result),offset));
-
-
-		if(sign) {
-			/* Now this is really horrid. Gotta check the sign of the addends and propogate
-			* to the result */
-
-			pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-			pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(result),offset));
-			pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(right),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-			pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(result),offset));
-
-			/* if chars or ints or being signed extended to longs: */
-			if(size) {
-				pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0));
-				pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(result),offset,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-				pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0xff));
-			}
-		}
-
-		offset++;
-		while(size--) {
-      
-			if(sign)
-				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
-			else
-				pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),offset));
-
-			offset++;
-		}
-	}
-
-
-	//adjustArithmeticResult(ic);
-
-	release:
+	
+release:
 	pic16_freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
 	pic16_freeAsmop(right,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
 	pic16_freeAsmop(result,NULL,ic,TRUE);
@@ -1339,7 +1254,7 @@ void pic16_addSign(operand *result, int offset, int sign)
       if(size == 1) {
 	pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),offset));
 	pic16_emitpcode(POC_BTFSC,pic16_newpCodeOpBit(pic16_aopGet(AOP(result),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-	pic16_emitpcode(POC_DECF, pic16_popGet(AOP(result),offset));
+	pic16_emitpcode(POC_SETF, pic16_popGet(AOP(result),offset));
       } else {
 
 	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0));
@@ -1644,7 +1559,7 @@ void pic16_genMinus (iCode *ic)
 	if (!SPEC_USIGN(operandType(IC_RIGHT(ic)))) {
 	  // signed -- sign extend the right operand
 	  pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_RIGHT(ic)),AOP_SIZE(IC_RIGHT(ic))-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-	  pic16_emitpcode (POC_COMF, pic16_popCopyReg (&pic16_pc_wreg));
+	  pic16_emitpcode (POC_SETF, pic16_popCopyReg (&pic16_pc_wreg));
 	}
       }
       if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
@@ -1659,7 +1574,7 @@ void pic16_genMinus (iCode *ic)
 	  if (!SPEC_USIGN(operandType(IC_LEFT(ic)))) {
 	    // signed -- sign extend the left operand
 	    pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_LEFT(ic)),AOP_SIZE(IC_LEFT(ic))-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-	    pic16_emitpcode (POC_COMF, pic16_popGet(AOP(IC_RESULT(ic)), offset)); // keep CARRY/#BORROW bit intact!
+	    pic16_emitpcode (POC_SETF, pic16_popGet(AOP(IC_RESULT(ic)), offset)); // keep CARRY/#BORROW bit intact!
 	  }
 	  pic16_emitpcode(POC_SUBWFB_D1, pic16_popGet(AOP(IC_RESULT(ic)),offset));
 	}

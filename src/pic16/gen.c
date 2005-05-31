@@ -8695,7 +8695,7 @@ static void shiftR1Left2ResultSigned (operand *left, int offl,
     } else {
       pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),offr));
       pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),offl,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-      pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(result),offr));
+      pic16_emitpcode(POC_SETF,  pic16_popGet(AOP(result),offr));
       pic16_emitpcode(POC_BTFSS, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),offl,FALSE,FALSE),6,0, PO_GPR_REGISTER));
       pic16_emitpcode(POC_BCF,   pic16_newpCodeOpBit(pic16_aopGet(AOP(result),offr,FALSE,FALSE),0,0, PO_GPR_REGISTER));
     }
@@ -8710,7 +8710,7 @@ static void shiftR1Left2ResultSigned (operand *left, int offl,
     } else {
       pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),offr));
       pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(left),offl,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-      pic16_emitpcode(POC_DECF,  pic16_popGet(AOP(result),offr));
+      pic16_emitpcode(POC_SETF,  pic16_popGet(AOP(result),offr));
     }
 
   default:
@@ -9888,7 +9888,7 @@ static void genrshTwo (operand *result,operand *left,
 
     if(sign) {
       pic16_emitpcode(POC_BTFSC,pic16_newpCodeOpBit(pic16_aopGet(AOP(left),LSB,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-      pic16_emitpcode(POC_DECF, pic16_popGet(AOP(result),MSB16));
+      pic16_emitpcode(POC_SETF, pic16_popGet(AOP(result),MSB16));
     }
   }
 
@@ -10059,7 +10059,7 @@ static void genRightShiftLiteral (operand *left,
       pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),LSB));
       if(sign) {
 	pic16_emitpcode(POC_BTFSC,pic16_newpCodeOpBit(pic16_aopGet(AOP(left),lsize-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-	pic16_emitpcode(POC_DECF, pic16_popGet(AOP(result),LSB));
+	pic16_emitpcode(POC_SETF, pic16_popGet(AOP(result),LSB));
       }
     } else {
 
@@ -13119,7 +13119,7 @@ static void genCast (iCode *ic)
 	/* Save one instruction of casting char to int */
 	pic16_emitpcode(POC_CLRF,   pic16_popGet(AOP(result),offset));
 	pic16_emitpcode(POC_BTFSC,  pic16_newpCodeOpBit(pic16_aopGet(AOP(right),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-	pic16_emitpcode(POC_DECF,   pic16_popGet(AOP(result),offset));
+	pic16_emitpcode(POC_SETF,   pic16_popGet(AOP(result),offset));
       } else {
         pic16_emitpcode(POC_CLRF,pic16_popCopyReg(&pic16_pc_wreg));
 

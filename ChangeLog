@@ -1,3 +1,7 @@
+2005-06-02 Slade Rich <slade_rich AT users.sourceforge.net>
+
+	* src/pic/pcode.c : Changed pseudo stack size to 15 to allow WSAVE to be located in shared memory bank.
+
 2005-05-31 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/{gen.c,genarith.c}: replaced sign-extension

@@ -1255,7 +1255,7 @@ unsigned PCodeID(void) {
 	static unsigned int pcodeId = 1; /* unique ID number to be assigned to all pCodes */
 	/*
 	static unsigned int stop;
-	if (pcodeId == 524)
+	if (pcodeId == 1448)
 		stop++; // Place break point here
 	*/
 	return pcodeId++;
@@ -1343,13 +1343,12 @@ void  pCodeInitRegisters(void)
 		return;
 	initialized = 1;
 	
-	shareBankAddress = 0x7f; /* FIXME - some PIC ICs like 16C7X which do not have a shared bank need a different approach. */
-//	stkSize = 8; // Set pseudo stack size to 8
-	stkSize = 16; // Set pseudo stack size to 16
-	initStack(shareBankAddress, stkSize); // Putting the pseudo stack in shared memory so all modules use the same register when passing fn parameters
 	init_pic(port->processor);
-	if ((unsigned)shareBankAddress > getMaxRam())
+	shareBankAddress = 0x7f; /* FIXME - some PIC ICs like 16C7X which do not have a shared bank need a different approach. */
+	if ((unsigned)shareBankAddress > getMaxRam()) /* If total RAM is less than 0x7f as with 16f84 then reduce shareBankAddress to fit */
 		shareBankAddress = (int)getMaxRam();
+	stkSize = 15; /* Set pseudo stack size to 15, on multi memory bank ICs this leaves room for WSAVE (used for interrupts) to fit into the shared portion of the memory bank */
+	initStack(shareBankAddress, stkSize); /* Putting the pseudo stack in shared memory so all modules use the same register when passing fn parameters */
 	
 	pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x180);
 	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
@@ -1365,9 +1364,9 @@ void  pCodeInitRegisters(void)
 	pc_pcl.rIdx = IDX_PCL;
 	pc_pclath.rIdx = IDX_PCLATH;
 	
-	pc_wsave.r = allocInternalRegister(IDX_WSAVE,"WSAVE", PO_GPR_REGISTER, 0x180); /* Interrupt storage for working register - must be same address in all banks ie section SHAREBANK. */
-	pc_ssave.r = allocInternalRegister(IDX_SSAVE,"SSAVE", PO_GPR_REGISTER, 0); /* Interrupt storage for status register. */
-	pc_psave.r = allocInternalRegister(IDX_PSAVE,"PSAVE", PO_GPR_REGISTER, 0); /* Interrupt storage for pclath register. */
+	pc_wsave.r = allocInternalRegister(IDX_WSAVE,pc_wsave.pcop.name,pc_wsave.pcop.type, 0x180); /* Interrupt storage for working register - must be same address in all banks ie section SHAREBANK. */
+	pc_ssave.r = allocInternalRegister(IDX_SSAVE,pc_ssave.pcop.name,pc_ssave.pcop.type, 0); /* Interrupt storage for status register. */
+	pc_psave.r = allocInternalRegister(IDX_PSAVE,pc_psave.pcop.name,pc_psave.pcop.type, 0); /* Interrupt storage for pclath register. */
 	
 	pc_wsave.rIdx = pc_wsave.r->rIdx;
 	pc_ssave.rIdx = pc_ssave.r->rIdx;

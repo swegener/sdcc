@@ -1,3 +1,8 @@
+2005-06-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/include/mcs51/reg764.h: Changed PB0 to PBO as requested by
+	  Marcel Telka in bug #1215704
+
 2005-06-02 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/pcode.c : Changed pseudo stack size to 15 to allow WSAVE to be located in shared memory bank.

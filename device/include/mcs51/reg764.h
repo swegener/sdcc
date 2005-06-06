@@ -142,7 +142,7 @@ __sbit __at 0xB9 PT0  ; // Timer 0 Interrupt Priority
 __sbit __at 0xBA PX1  ; // External Interrupt 1 Priority
 __sbit __at 0xBB PT1  ; // Timer 1 Interrupt Priority
 __sbit __at 0xBC PS   ; // Serial Port Interrupt Priority
-__sbit __at 0xBD PB0  ; // Brownout Interrupt Priority
+__sbit __at 0xBD PBO  ; // Brownout Interrupt Priority
 __sbit __at 0xBE PWD  ; // Watchdog Interrupt Priority
 
 /*  I2CFG */

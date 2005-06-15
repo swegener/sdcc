@@ -1,3 +1,11 @@
+2005-06-15 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/NOTES: moved Vangelis from active developers to people to contact
+	* device/include/pic16/{6520.h,8520.h}: fixed configuration bits
+	* src/pic16/gen.c (): prevent iTemps from being considered to be in CODESPACE,
+	  fixes bug #1221120; for symbols in CODESPACE get number of bytes to read from
+	  OP_SYM_TYPE() instead of OP_SYM_ETYPE()
+
 2005-06-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/include/mcs51/reg764.h: Changed PB0 to PBO as requested by

@@ -1,4 +1,4 @@
-lNOTES file for SDCC pic16 port
+NOTES file for SDCC pic16 port
 $Id$
 
 Current pic16 port status is: Development
@@ -11,10 +11,10 @@ For any questions please ask the current port
 developers.
 
 Current developer:
-Vangelis Rokas	<vrokas AT users.sourceforge.net>
 Raphael Neider	<rneider AT web.de>
 
 Other people to contact:
+Vangelis Rokas	<vrokas AT users.sourceforge.net>
 Scott Dattalo	<scott AT dattalo.com>
 
 ======================================================================

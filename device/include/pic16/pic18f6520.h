@@ -1231,8 +1231,8 @@ extern __sfr __at (0xfff) TOSU;
 #define __CONFIG1H	0x300001
 #define __CONFIG2L	0x300002
 #define __CONFIG2H	0x300003
-#define __CONFIG3L	0x300004
 #define __CONFIG3H	0x300005
+#define __CONFIG4L	0x300006
 #define __CONFIG5L	0x300008
 #define __CONFIG5H	0x300009
 #define __CONFIG6L	0x30000A
@@ -1284,28 +1284,21 @@ extern __sfr __at (0xfff) TOSU;
 #define _WDTPS_1_2_2H	0xF3	/* 1:2 */
 #define _WDTPS_1_1_2H	0xF1	/* 1:1 */
 
-/* External Bus Wait 3L options */
-#define _WAIT_OFF_3L	0xFF	/* Disabled */
-#define _WAIT_ON_3L	0x7F	/* Enabled */
-
 /* CCP2 Mux 3H options */
 #define _CCP2MUX_RC1_3H	0xFF	/* RC1 */
-#define _CCP2MUX_RE7_MICROCONTROLLER__RB3_3H	0xFE	/* RE7(Microcontroller)/RB3 */
+#define _CCP2MUX_RE7_3H	0xFE	/* RE7 */
 
-/* Timer1 OSC 3H options */
-#define _T1OSCMX_LOW_3H	0xFD	/* Low Power */
+/* Low Voltage Program 4L options */
+#define _LVP_ON_4L	0xFF	/* Enabled */
+#define _LVP_OFF_4L	0xFB	/* Disabled */
 
-/* Low Voltage Program 3H options */
-#define _LVP_ON_3H	0xFF	/* Enabled */
-#define _LVP_OFF_3H	0xFB	/* Disabled */
+/* Background Debug 4L options */
+#define _BACKBUG_OFF_4L	0xFF	/* Disabled */
+#define _BACKBUG_ON_4L	0x7F	/* Enabled */
 
-/* Background Debug 3H options */
-#define _BACKBUG_OFF_3H	0xFF	/* Disabled */
-#define _BACKBUG_ON_3H	0x7F	/* Enabled */
-
-/* Stack Overflow Reset 3H options */
-#define _STVR_ON_3H	0xFF	/* Enabled */
-#define _STVR_OFF_3H	0xFE	/* Disabled */
+/* Stack Overflow Reset 4L options */
+#define _STVR_ON_4L	0xFF	/* Enabled */
+#define _STVR_OFF_4L	0xFE	/* Disabled */
 
 /* Code Protect 00800-01FFF 5L options */
 #define _CP_0_OFF_5L	0xFF	/* Disabled */

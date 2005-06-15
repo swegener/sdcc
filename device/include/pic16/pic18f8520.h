@@ -1397,17 +1397,17 @@ extern __sfr __at (0xfff) TOSU;
 /* Timer1 OSC 3H options */
 #define _T1OSCMX_LOW_3H	0xFD	/* Low Power */
 
-/* Low Voltage Program 3H options */
-#define _LVP_ON_3H	0xFF	/* Enabled */
-#define _LVP_OFF_3H	0xFB	/* Disabled */
+/* Low Voltage Program 4L options */
+#define _LVP_ON_4L	0xFF	/* Enabled */
+#define _LVP_OFF_4L	0xFB	/* Disabled */
 
-/* Background Debug 3H options */
-#define _BACKBUG_OFF_3H	0xFF	/* Disabled */
-#define _BACKBUG_ON_3H	0x7F	/* Enabled */
+/* Background Debug 4L options */
+#define _BACKBUG_OFF_4L	0xFF	/* Disabled */
+#define _BACKBUG_ON_4L	0x7F	/* Enabled */
 
-/* Stack Overflow Reset 3H options */
-#define _STVR_ON_3H	0xFF	/* Enabled */
-#define _STVR_OFF_3H	0xFE	/* Disabled */
+/* Stack Overflow Reset 4L options */
+#define _STVR_ON_4L	0xFF	/* Enabled */
+#define _STVR_OFF_4L	0xFE	/* Disabled */
 
 /* Code Protect 00800-01FFF 5L options */
 #define _CP_0_OFF_5L	0xFF	/* Disabled */

@@ -7,6 +7,7 @@
   PIC port   -  Scott Dattalo scott@dattalo.com (2000)
   PIC16 port -  Martin Dubuc m.dubuc@rogers.com (2002)
              -  Vangelis Rokas vrokas@otenet.gr (2003,2004,2005)
+  Bug Fixes  -  Raphael Neider rneider@web.de (2004,2005)
   
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -5054,7 +5055,7 @@ static void genCmp (operand *left,operand *right,
     left = right;
     right = dummy;
 
-    performedLt ^= 1; // instead of "left < right" we check for "right >= left+1"
+    performedLt ^= 1; // instead of "left < right" we check for "right >= left+1, i.e. "right < left+1"
   } else if (isAOP_LIT(right)) {
     lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
   } // if
@@ -12473,16 +12474,21 @@ static void genAssign (iCode *ic)
   if (AOP_TYPE(right) == AOP_REG) {
     DEBUGpic16_emitcode(";   ", "%s:%d assign from register\n", __FUNCTION__, __LINE__);
     while (size--) {
-      
       pic16_emitpcode (POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), offset++));
     } // while
     goto release;
   }
 
+  /* when do we have to read the program memory?
+   * - if right itself is a symbol in code space
+   *   (we don't care what it points to if it's a pointer)
+   * - AND right is not a function (we would want its address)
+   */
   if(AOP_TYPE(right) != AOP_LIT
-  	&& IN_CODESPACE(SPEC_OCLS(OP_SYMBOL(right)->etype))
+  	&& IN_CODESPACE(SPEC_OCLS(OP_SYM_ETYPE(right)))
   	&& !IS_FUNC(OP_SYM_TYPE(right))
-  	) {
+	&& !IS_ITEMP(right))
+  {
   	DEBUGpic16_emitcode(";   ", "%s:%d symbol in code space, take special care\n", __FUNCTION__, __LINE__);
   	fprintf(stderr, "%s:%d symbol %s = [ %s ] is in code space\n", __FILE__, __LINE__, OP_SYMBOL(result)->name, OP_SYMBOL(right)->name);
 
@@ -12505,7 +12511,8 @@ static void genAssign (iCode *ic)
 				pic16_popCopyReg(&pic16_pc_tblptru)));
 	}
 
-	size = min(getSize(OP_SYM_ETYPE(right)), AOP_SIZE(result));
+	/* must fetch 3 bytes for pointers (was OP_SYM_ETYPE before) */
+	size = min(getSize(OP_SYM_TYPE(right)), AOP_SIZE(result));
 	while(size--) {
 		pic16_emitpcodeNULLop(POC_TBLRD_POSTINC);
 		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_tablat),
@@ -12513,7 +12520,9 @@ static void genAssign (iCode *ic)
 		offset++;
 	}
 
-	size = getSize(OP_SYM_ETYPE(right));
+	/* FIXME: for pointers we need to extend differently (according
+	 * to pointer type DATA/CODE/EEPROM/... :*/
+	size = getSize(OP_SYM_TYPE(right));
 	if(AOP_SIZE(result) > size) {
 		size = AOP_SIZE(result) - size;
 		while(size--) {

@@ -867,6 +867,7 @@ cl_hc08::inst_condbranch(t_mem code, bool prefix)
 {
   bool taken;
   signed char ofs;
+  unsigned char maskedP;
   
   if ((code & 0xf0)==0x20) {
     switch ((code>>1) & 7) {
@@ -874,7 +875,7 @@ cl_hc08::inst_condbranch(t_mem code, bool prefix)
         taken = 1;
         break;
       case 1: // BHI
-        taken = (regs.P & BIT_C) || !(regs.P & BIT_Z);
+        taken = !(regs.P & (BIT_C | BIT_Z));
         break;
       case 2: // BCC
         taken = !(regs.P & BIT_C);
@@ -900,11 +901,12 @@ cl_hc08::inst_condbranch(t_mem code, bool prefix)
   else if ((code & 0xf0)==0x90) {
     switch ((code>>1) & 7) {
       case 0: // BGE
-        taken = !(((regs.P & BIT_N)!=0) ^ ((regs.P & BIT_V)!=0));
+        maskedP = regs.P & (BIT_N | BIT_V);
+        taken = !maskedP || (maskedP == (BIT_N | BIT_V));
         break;
-      case 1: // BLT
-        taken = (!(((regs.P & BIT_N)!=0) ^ ((regs.P & BIT_V)!=0)))
-                || (regs.P & BIT_Z);
+      case 1: // BGT
+        maskedP = regs.P & (BIT_N | BIT_V | BIT_Z);
+        taken = !maskedP || (maskedP == (BIT_N | BIT_V));
         break;
       default:
         return(resHALT);

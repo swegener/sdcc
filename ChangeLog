@@ -1,3 +1,14 @@
+2005-06-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/hc08.src/inst.cc (inst_condbranch): fixed simulation of
+	  BGT, BLE, BHI, and BLS instructions
+	* src/hc08/gen.c (outAcc, outBitC, outBitNV, genCmpLt, genCmpGt,
+	  genCmpEq): removed
+	* src/hc08/gen.c (genCmpEQorNE, genCmp, branchopCmp, nameCmp,
+	  negatedCmp, exchangedCmp, genhc08Code): rewrite of comparison handling,
+	  fixes bug #1216342
+	* src/hc08/peeph.def: added rules 2g - 2l for new conditional branches
+        
 2005-06-15 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/NOTES: moved Vangelis from active developers to people to contact

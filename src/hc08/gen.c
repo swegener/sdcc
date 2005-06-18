@@ -2085,67 +2085,6 @@ getDataSize (operand * op)
   return size;
 }
 
-/*-----------------------------------------------------------------*/
-/* outAcc - output Acc                                             */
-/*-----------------------------------------------------------------*/
-static void
-outAcc (operand * result)
-{
-  int size, offset;
-  size = getDataSize (result);
-  if (size)
-    {
-      storeRegToAop (hc08_reg_a, AOP (result), 0);
-      size--;
-      offset = 1;
-      /* unsigned or positive */
-      while (size--)
-	{
-	  storeConstToAop (zero, AOP (result), offset++);
-	}
-    }
-}
-
-/*-----------------------------------------------------------------*/
-/* outBitC - output a bit C                                        */
-/*-----------------------------------------------------------------*/
-static void
-outBitC (operand * result)
-{
-
-#if 0
-  /* if the result is bit */
-  if (AOP_TYPE (result) == AOP_CRY)
-    aopPut (AOP (result), "c", 0);
-  else
-#endif
-    {
-      emitcode ("clra", "");
-      emitcode ("rola", "");
-      outAcc (result);
-    }
-}
-
-/*-----------------------------------------------------------------*/
-/* outBitNV - output a bit N^V                                     */
-/*-----------------------------------------------------------------*/
-static void
-outBitNV (operand * result)
-{
-  symbol *tlbl, *tlbl1;
-
-  tlbl = newiTempLabel (NULL);
-  tlbl1 = newiTempLabel (NULL);
-
-  emitBranch ("blt", tlbl);
-  loadRegFromConst (hc08_reg_a, zero);
-  emitBranch ("bra", tlbl1);
-  emitLabel (tlbl);
-  loadRegFromConst (hc08_reg_a, one);
-  emitLabel (tlbl1);
-  outAcc (result);
-}
-
 
 /*-----------------------------------------------------------------*/
 /* asmopToBool - Emit code to convert an asmop to a boolean.       */
@@ -4174,47 +4113,186 @@ genIfxJump (iCode * ic, char *jval)
   ic->generated = 1;
 }
 
+
 /*-----------------------------------------------------------------*/
-/* genCmp :- greater or less than comparison                       */
+/* exchangedCmp : returns the opcode need if the two operands are  */
+/*                exchanged in a comparison                        */
 /*-----------------------------------------------------------------*/
-static void
-genCmp (operand * left, operand * right,
-	operand * result, iCode * ifx, int sign, iCode *ic)
+static int
+exchangedCmp (int opcode)
 {
+  switch (opcode)
+    {
+    case '<':
+      return '>';
+    case '>':
+      return '<';
+    case LE_OP:
+      return GE_OP;
+    case GE_OP:
+      return LE_OP;
+    case NE_OP:
+      return NE_OP;
+    case EQ_OP:
+      return EQ_OP;
+    default:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+		  "opcode not a comparison");
+    }
+  return EQ_OP; /* shouldn't happen, but need to return something */
+}
+
+/*------------------------------------------------------------------*/
+/* negatedCmp : returns the equivalent opcode for when a comparison */
+/*              if not true                                         */
+/*------------------------------------------------------------------*/
+static int
+negatedCmp (int opcode)
+{
+  switch (opcode)
+    {
+    case '<':
+      return GE_OP;
+    case '>':
+      return LE_OP;
+    case LE_OP:
+      return '>';
+    case GE_OP:
+      return '<';
+    case NE_OP:
+      return EQ_OP;
+    case EQ_OP:
+      return NE_OP;
+    default:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+		  "opcode not a comparison");
+    }
+  return EQ_OP; /* shouldn't happen, but need to return something */
+}
+
+/* compile only if the debugging macro D is enabled */
+#if (D(1) -0)
+static char *
+nameCmp (int opcode)
+{
+  switch (opcode)
+    {
+    case '<':
+      return "<";
+    case '>':
+      return ">";
+    case LE_OP:
+      return "<=";
+    case GE_OP:
+      return ">=";
+    case NE_OP:
+      return "!=";
+    case EQ_OP:
+      return "==";
+    default:
+      return "invalid";
+    }
+}
+#endif
+
+/*------------------------------------------------------------------*/
+/* branchInstCmp : returns the conditional branch instruction that  */
+/*                 will branch if the comparison is true            */
+/*------------------------------------------------------------------*/
+static char *
+branchInstCmp (int opcode, int sign)
+{
+  switch (opcode)
+    {
+    case '<':
+      if (sign)
+        return "blt";
+      else
+        return "bcs";	/* same as blo */
+    case '>':
+      if (sign)
+        return "bgt";
+      else
+        return "bhi";
+    case LE_OP:
+      if (sign)
+        return "ble";
+      else
+        return "bls";
+    case GE_OP:
+      if (sign)
+        return "bge";
+      else
+        return "bcc";	/* same as bhs */
+    case NE_OP:
+      return "bne";
+    case EQ_OP:
+      return "beq";
+    default:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+		  "opcode not a comparison");
+    }
+  return "brn";
+}
+
+
+/*------------------------------------------------------------------*/
+/* genCmp :- greater or less than (and maybe with equal) comparison */
+/*------------------------------------------------------------------*/
+static void
+genCmp (iCode * ic, iCode * ifx)
+{  
+  operand *left, *right, *result;
+  sym_link *letype, *retype;
+  int sign, opcode;
   int size, offset = 0;
   unsigned long lit = 0L;
   char *sub;
-  bool needpula = FALSE;
+  symbol *jlbl = NULL;
 
-  D(emitcode (";     genCmp",""));
+  opcode = ic->op;
 
-  /* subtract right from left if at the
-     end the carry flag is set then we know that
-     left is greater than right */
-  size = max (AOP_SIZE (left), AOP_SIZE (right));
+  D(emitcode (";     genCmp", "(%s)",nameCmp (opcode)));
 
-  if (AOP_TYPE (right) == AOP_LIT)
+  result = IC_RESULT (ic);
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+
+  letype = getSpec (operandType (left));
+  retype = getSpec (operandType (right));
+  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
+  /* assign the amsops */
+  aopOp (left, ic, FALSE);
+  aopOp (right, ic, FALSE);
+  aopOp (result, ic, TRUE);
+
+  /* need register operand on left, prefer literal operand on right */
+  if ((AOP_TYPE (right) == AOP_REG) || AOP_TYPE (left) == AOP_LIT)
     {
-      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
-      /* optimize if(x < 0) or if(x >= 0) */
-      if (lit == 0L)
-	{
-	  if (!sign)
-	    {
-	      CLRC;
-	    }
-	  else
-	    {
-  	      loadRegFromAop (hc08_reg_a, AOP (left), AOP_SIZE (left) -1);
-	      emitcode ("rola", "");
-	      hc08_useReg (hc08_reg_a);
-  	    }
-	  sign = 0;
-          goto release;
-	}
+      operand *temp = left;
+      left = right;
+      right = temp;
+      opcode = exchangedCmp (opcode);
     }
 
-  if ((size==2)
+  if (ifx)
+    {
+      if (IC_TRUE (ifx))
+        {
+          jlbl = IC_TRUE (ifx);
+          opcode = negatedCmp (opcode);
+        }
+      else
+        {
+          /* false label is present */
+          jlbl = IC_FALSE (ifx);
+        }
+    }
+      
+  size = max (AOP_SIZE (left), AOP_SIZE (right));
+  
+  if ((size == 2)
+      && ((AOP_TYPE (left) == AOP_DIR) && (AOP_SIZE (left) == 2))
       && ((AOP_TYPE (right) == AOP_LIT) || 
           ((AOP_TYPE (right) == AOP_DIR) && (AOP_SIZE (right) == 2)) )
       && hc08_reg_hx->isFree)
@@ -4222,231 +4300,231 @@ genCmp (operand * left, operand * right,
       loadRegFromAop (hc08_reg_hx, AOP (left), 0);
       emitcode ("cphx","%s", aopAdrStr (AOP (right), 1, TRUE));
       hc08_freeReg (hc08_reg_hx);
-      goto release;
-    }
-
-  offset = 0;
-  if (size==1)
-    sub="cmp";
-  else
-    sub="sub";
-  while (size--)
-    {
-      loadRegFromAop (hc08_reg_a, AOP (left), offset);
-      accopWithAop (sub, AOP (right), offset);
-      hc08_freeReg (hc08_reg_a);
-      offset++;
-      sub="sbc";
-    }
-
-release:
-  freeAsmop (right, NULL, ic, TRUE);
-  freeAsmop (left, NULL, ic, TRUE);
-  if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
-    {
-      outBitC (result);
     }
   else
     {
-      /* if the result is used in the next
-         ifx conditional branch then generate
-         code a little differently */
-      if (ifx)
-        {
-          pullOrFreeReg(hc08_reg_a,needpula);
-	  genIfxJump (ifx, sign ? "s" : "c");
-        }
+      offset = 0;
+      if (size == 1)
+        sub = "cmp";
       else
-        if (!sign)
-	  outBitC (result);
-	else
-	  outBitNV (result);
-        pullOrFreeReg(hc08_reg_a,needpula);
-    }
-}
-
-/*-----------------------------------------------------------------*/
-/* genCmpGt :- greater than comparison                             */
-/*-----------------------------------------------------------------*/
-static void
-genCmpGt (iCode * ic, iCode * ifx)
-{
-  operand *left, *right, *result;
-  sym_link *letype, *retype;
-  int sign;
-
-  D(emitcode (";     genCmpGt",""));
-
-  result = IC_RESULT (ic);
-  left = IC_LEFT (ic);
-  right = IC_RIGHT (ic);
-
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
-  /* assign the amsops */
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
-
-  genCmp (right, left, result, ifx, sign,ic);
-
-  freeAsmop (result, NULL, ic, TRUE);
-}
-
-/*-----------------------------------------------------------------*/
-/* genCmpLt - less than comparisons                                */
-/*-----------------------------------------------------------------*/
-static void
-genCmpLt (iCode * ic, iCode * ifx)
-{
-  operand *left, *right, *result;
-  sym_link *letype, *retype;
-  int sign;
-
-  D(emitcode (";     genCmpLt",""));
-
-  result = IC_RESULT (ic);
-  left = IC_LEFT (ic);
-  right = IC_RIGHT (ic);
-
-  letype = getSpec (operandType (left));
-  retype = getSpec (operandType (right));
-  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
-
-  /* assign the amsops */
-  aopOp (left, ic, FALSE);
-  aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
-
-  genCmp (left, right, result, ifx, sign,ic);
-
-  freeAsmop (result, NULL, ic, TRUE);
-}
-
-/*-----------------------------------------------------------------*/
-/*  - compare and branch if not equal                    */
-/*-----------------------------------------------------------------*/
-static void
-gencbneshort (operand * left, operand * right, symbol * lbl)
-{
-  int size = max (AOP_SIZE (left), AOP_SIZE (right));
-  int offset = 0;
-  unsigned long lit = 0L;
-
-  /* if the left side is a literal or
-     if the right is in a pointer register and left
-     is not */
-  if (AOP_TYPE (left) == AOP_LIT)
-    {
-      operand *t = right;
-      right = left;
-      left = t;
-    }
-  if (AOP_TYPE (right) == AOP_LIT)
-    lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
-
-  while (size--)
-    {
-      loadRegFromAop (hc08_reg_a, AOP (left), offset);
-      accopWithAop ("cmp", AOP (right), offset);
-      hc08_useReg (hc08_reg_a);
-      hc08_freeReg (hc08_reg_a);
-      emitBranch ("bne", lbl);
-      offset++;
-    }
-
-}
-
-/*-----------------------------------------------------------------*/
-/* gencjne - compare and jump if not equal                         */
-/*-----------------------------------------------------------------*/
-static void
-gencjne (operand * left, operand * right, symbol * lbl)
-{
-  symbol *tlbl = newiTempLabel (NULL);
-
-  gencbneshort (left, right, lbl);
-
-  loadRegFromConst (hc08_reg_a, one);
-  emitBranch ("bra", tlbl);
-  emitLabel (lbl);
-  loadRegFromConst (hc08_reg_a, zero);
-  emitLabel (tlbl);
-
-  hc08_useReg(hc08_reg_a);
-  hc08_freeReg(hc08_reg_a);
-}
-
-/*-----------------------------------------------------------------*/
-/* genCmpEq - generates code for equal to                          */
-/*-----------------------------------------------------------------*/
-static void
-genCmpEq (iCode * ic, iCode * ifx)
-{
-  operand *left, *right, *result;
-
-  D(emitcode (";     genCmpEq",""));
-
-  aopOp ((left = IC_LEFT (ic)), ic, FALSE);
-  aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
-  aopOp ((result = IC_RESULT (ic)), ic, TRUE);
-
-  /* if literal, literal on the right or
-     if the right is in a pointer register and left
-     is not */
-  if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
-    {
-      operand *t = IC_RIGHT (ic);
-      IC_RIGHT (ic) = IC_LEFT (ic);
-      IC_LEFT (ic) = t;
-    }
-
-  if (ifx && !AOP_SIZE (result))
-    {
-      symbol *tlbl;
-      tlbl = newiTempLabel (NULL);
-      gencbneshort (left, right, tlbl);
-      if (IC_TRUE (ifx))
         {
-          emitBranch ("jmp", IC_TRUE (ifx));
-          emitLabel (tlbl);
+          sub = "sub";
+        
+          /* These conditions depend on the Z flag bit, but Z is */
+          /* only valid for the last byte of the comparison, not */
+          /* the whole value. So exchange the operands to get a  */
+          /* comparison that doesn't depend on Z. (This is safe  */
+          /* to do here since ralloc won't assign multi-byte     */
+          /* operands to registers for comparisons)              */
+          if ((opcode == '>') || (opcode == LE_OP))
+            {
+              operand *temp = left;
+              left = right;
+              right = temp;
+              opcode = exchangedCmp (opcode);
+            }
+          
+          if ((AOP_TYPE (right) == AOP_LIT) && !isOperandVolatile (left, FALSE))
+            {
+              lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+              while ((size > 1) && (((lit >> (8*offset)) & 0xff) == 0))
+                {
+                  offset++;
+                  size--;
+                }
+            }
         }
-      else
-	{
-	  symbol *lbl = newiTempLabel (NULL);
-          emitBranch ("bra", lbl);
-          emitLabel (tlbl);
-          emitBranch ("jmp", IC_FALSE (ifx));
-          emitLabel (lbl);
-	}
-      
-      /* mark the icode as generated */
-      ifx->generated = 1;
-      goto release;
+      while (size--)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), offset);
+          accopWithAop (sub, AOP (right), offset);
+          hc08_freeReg (hc08_reg_a);
+          offset++;
+          sub = "sbc";
+        }
     }
+  freeAsmop (right, NULL, ic, FALSE);
+  freeAsmop (left, NULL, ic, FALSE);
 
-  gencjne (left, right, newiTempLabel (NULL));
-  if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
-    {
-      storeRegToAop (hc08_reg_a, AOP (result), 0);
-      goto release;
-    }
   if (ifx)
     {
-      genIfxJump (ifx, "a");
-      goto release;
-    }
-  /* if the result is used in an arithmetic operation
-     then put the result in place */
-  if (AOP_TYPE (result) != AOP_CRY)
-    outAcc (result);
+      symbol *tlbl = newiTempLabel (NULL);
+      char *inst;
 
-release:
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
+      freeAsmop (result, NULL, ic, TRUE);      
+      
+      inst = branchInstCmp (opcode, sign);
+      emitBranch (inst, tlbl);
+      emitBranch ("jmp", jlbl);
+      emitLabel (tlbl);
+
+      /* mark the icode as generated */
+      ifx->generated = 1;
+    }
+  else
+    {
+      symbol *tlbl1 = newiTempLabel (NULL);
+      symbol *tlbl2 = newiTempLabel (NULL);
+      
+      emitBranch (branchInstCmp (opcode, sign), tlbl1);
+      loadRegFromConst (hc08_reg_a, zero);
+      emitBranch ("bra", tlbl2);
+      emitLabel (tlbl1);
+      loadRegFromConst (hc08_reg_a, one);
+      emitLabel (tlbl2);
+      storeRegToFullAop (hc08_reg_a, AOP(result), FALSE);
+      freeAsmop (result, NULL, ic, TRUE);      
+    }
+        
 }
+
+/*-----------------------------------------------------------------*/
+/* genCmpEQorNE - equal or not equal comparison                    */
+/*-----------------------------------------------------------------*/
+static void
+genCmpEQorNE (iCode * ic, iCode * ifx)
+{  
+  operand *left, *right, *result;
+  sym_link *letype, *retype;
+  int sign, opcode;
+  int size, offset = 0;
+  char *sub;
+  symbol *jlbl = NULL;
+  symbol *tlbl_NE = NULL;
+  symbol *tlbl_EQ = NULL;
+ 
+  opcode = ic->op;
+
+  D(emitcode (";     genCmpEQorNE", "(%s)",nameCmp (opcode)));
+
+  result = IC_RESULT (ic);
+  left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
+
+  letype = getSpec (operandType (left));
+  retype = getSpec (operandType (right));
+  sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
+  /* assign the amsops */
+  aopOp (left, ic, FALSE);
+  aopOp (right, ic, FALSE);
+  aopOp (result, ic, TRUE);
+  
+  /* need register operand on left, prefer literal operand on right */
+  if ((AOP_TYPE (right) == AOP_REG) || AOP_TYPE (left) == AOP_LIT)
+    {
+      operand *temp = left;
+      left = right;
+      right = temp;
+      opcode = exchangedCmp (opcode);
+    }
+
+  if (ifx)
+    {
+      if (IC_TRUE (ifx))
+        {
+          jlbl = IC_TRUE (ifx);
+          opcode = negatedCmp (opcode);
+        }
+      else
+        {
+          /* false label is present */
+          jlbl = IC_FALSE (ifx);
+        }
+    }
+      
+  size = max (AOP_SIZE (left), AOP_SIZE (right));
+  
+  if ((size == 2)
+      && ((AOP_TYPE (left) == AOP_DIR) && (AOP_SIZE (left) == 2))
+      && ((AOP_TYPE (right) == AOP_LIT) || 
+          ((AOP_TYPE (right) == AOP_DIR) && (AOP_SIZE (right) == 2)) )
+      && hc08_reg_hx->isFree)
+    {
+      loadRegFromAop (hc08_reg_hx, AOP (left), 0);
+      emitcode ("cphx","%s", aopAdrStr (AOP (right), 1, TRUE));
+      hc08_freeReg (hc08_reg_hx);
+    }
+  else
+    {
+      offset = 0;
+      sub = "cmp";
+      while (size--)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), offset);
+          accopWithAop (sub, AOP (right), offset);
+          if (size)
+            {
+              if (!tlbl_NE)
+                tlbl_NE = newiTempLabel (NULL);
+              emitBranch ("bne", tlbl_NE);
+            }
+          hc08_freeReg (hc08_reg_a);
+          offset++;
+        }
+    }
+  freeAsmop (right, NULL, ic, FALSE);
+  freeAsmop (left, NULL, ic, FALSE);
+
+  if (ifx)
+    {
+      freeAsmop (result, NULL, ic, TRUE);      
+      
+      if (opcode == EQ_OP)
+        {
+          if (!tlbl_EQ)
+            tlbl_EQ = newiTempLabel (NULL);
+          emitBranch ("beq", tlbl_EQ);
+          if (tlbl_NE)
+            emitLabel (tlbl_NE);
+          emitBranch ("jmp", jlbl);
+          emitLabel (tlbl_EQ);
+        }
+      else
+        {
+          if (!tlbl_NE)
+            tlbl_NE = newiTempLabel (NULL);
+          emitBranch ("bne", tlbl_NE);
+          emitBranch ("jmp", jlbl);
+          emitLabel (tlbl_NE);
+        }
+
+      /* mark the icode as generated */
+      ifx->generated = 1;
+    }
+  else
+    {
+      symbol *tlbl = newiTempLabel (NULL);
+      
+      if (opcode == EQ_OP)
+        {
+          if (!tlbl_EQ)
+            tlbl_EQ = newiTempLabel (NULL);
+          emitBranch ("beq", tlbl_EQ);
+          if (tlbl_NE)
+            emitLabel (tlbl_NE);
+          loadRegFromConst (hc08_reg_a, zero);
+          emitBranch ("bra", tlbl);
+          emitLabel (tlbl_EQ);
+          loadRegFromConst (hc08_reg_a, one);
+        }
+      else
+        {
+          if (!tlbl_NE)
+            tlbl_NE = newiTempLabel (NULL);
+          emitBranch ("bne", tlbl_NE);
+          loadRegFromConst (hc08_reg_a, zero);
+          emitBranch ("bra", tlbl);
+          emitLabel (tlbl_NE);
+          loadRegFromConst (hc08_reg_a, one);
+        }
+      
+      emitLabel (tlbl);
+      storeRegToFullAop (hc08_reg_a, AOP(result), FALSE);
+      freeAsmop (result, NULL, ic, TRUE);      
+    }
+        
+}
+
 
 /*-----------------------------------------------------------------*/
 /* ifxForOp - returns the icode containing the ifx for operand     */
@@ -7667,7 +7745,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genJumpTab - genrates code for jump table                       */
+/* genJumpTab - generates code for jump table                       */
 /*-----------------------------------------------------------------*/
 static void
 genJumpTab (iCode * ic)
@@ -8289,26 +8367,16 @@ genhc08Code (iCode * lic)
 	  break;
 
 	case '>':
-	  genCmpGt (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
 	case '<':
-	  genCmpLt (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
 	case LE_OP:
 	case GE_OP:
-	case NE_OP:
+          genCmp (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
 
-	  /* note these two are xlated by algebraic equivalence
-	     during parsing SDCC.y */
-	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		  "got '>=' or '<=' shouldn't have come here");
-	  break;
-
+        case NE_OP:
 	case EQ_OP:
-	  genCmpEq (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
+          genCmpEQorNE (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
 
 	case AND_OP:
 	  genAndOp (ic);

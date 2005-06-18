@@ -87,6 +87,66 @@ replace {
 } if labelInRange
 
 replace {
+	bls	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2g	- eliminated bra
+	bhi	%5
+%1:
+} if labelInRange
+
+replace {
+	bhi	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2h	- eliminated bra
+	bls	%5
+%1:
+} if labelInRange
+
+replace {
+	ble	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2i	- eliminated bra
+	bgt	%5
+%1:
+
+} if labelInRange
+replace {
+	bgt	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2j	- eliminated bra
+	ble	%5
+%1:
+} if labelInRange
+
+replace {
+	bge	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2k	- eliminated bra
+	blt	%5
+%1:
+} if labelInRange
+
+replace {
+	blt	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2l	- eliminated bra
+	bge	%5
+%1:
+} if labelInRange
+
+replace {
 	jmp	%5
 } by {
 	; Peephole 3	- shortened jmp to bra

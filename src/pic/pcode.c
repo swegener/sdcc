@@ -2439,6 +2439,7 @@ pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
 void pCodeConstString(char *name, char *value)
 {
 	pBlock *pb;
+	unsigned i;
 	
 	//  fprintf(stderr, " %s  %s  %s\n",__FUNCTION__,name,value);
 	
@@ -2450,6 +2451,15 @@ void pCodeConstString(char *name, char *value)
 	addpBlock(pb);
 	
 	sprintf(buffer,"; %s = %s",name,value);
+	for (i=strlen(buffer); i--; ) {
+		unsigned char c = buffer[i];
+		if (c=='\r' || c=='\n') {
+			memmove(buffer+i+1,buffer+i,strlen(buffer)-i+1);
+			buffer[i] = '\\';
+			if (c=='\r') buffer[i+1] = 'r';
+			else if (c=='\n') buffer[i+1] = 'n';
+		}
+	}
 	
 	addpCode2pBlock(pb,newpCodeCharP(buffer));
 	addpCode2pBlock(pb,newpCodeLabel(name,-1));

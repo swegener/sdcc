@@ -46,6 +46,7 @@
 #define LVDIF   0x2
 #define BCLIF   0x3
 #define EEIF    0x4
+#define USBIF	0x5
 
 /* interrupt testing arguments */
 #define SIG_RB          _INTCON, RBIF
@@ -66,6 +67,7 @@
 #define SIG_RC          _PIR1, RCIF
 #define SIG_TX          _PIR1, TXIF
 #define SIG_MSSP        _PIR1, SSPIF
+#define SIG_USB		_PIR2, USBIF
 
 
 #define DEF_ABSVECTOR(vecno, name)      \

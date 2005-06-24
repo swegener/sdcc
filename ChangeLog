@@ -1,5 +1,12 @@
 2005-06-24 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic16/libdev/pic18f[68][567]20.c:
+	  corrected typos...
+	* device/include/pic16/signal.h: added USBIF
+	  and SIG_USB
+
+2005-06-24 Raphael Neider <rneider AT web.de>
+
 	* device/lib/pic16/libdev/pic18f2455.c,
 	  device/include/pic16/pic18f2455.h: NEW
 	* device/include/pic16/pic18fregs.h,

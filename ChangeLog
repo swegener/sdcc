@@ -1,3 +1,15 @@
+2005-06-24 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libdev/pic18f2455.c,
+	  device/include/pic16/pic18f2455.h: NEW
+	* device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/pics.all,
+	  src/pic/device.c: added 18f2455
+	* device/lib/pic16/libdev/pic18f[68][567]20.c,
+	  device/include/pic16/{pic18f[68][567].h,usart.h}:
+	  replaced MULTIPLE_USARTS define with more relaible
+	  compatibility sfrs (for USART access)
+
 2005-06-20 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/pcode.c : Fixed problem when a string constant contains a "\r\n" 

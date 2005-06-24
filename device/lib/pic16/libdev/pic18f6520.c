@@ -274,4 +274,13 @@ __sfr __at (0xffd) TOSL;
 __sfr __at (0xffe) TOSH;
 __sfr __at (0xfff) TOSU;
 
+/* for compatibility reasons */
+__sfr __at (0xfab) RCSTA;
+volatile __RCSTA1bits_t __at (0xfab) RCSTAbits;
 
+__sfr __at (0xfac) TXSTA;
+volatile __TXSTA1bits_t __at (0xfac) TXSTAbits;
+
+__sfr __at (0xfad) TXREG;
+__sfr __at (0xfae) RCREG;
+__sfr __at (0xfaf) SPBRG;

@@ -46,26 +46,6 @@
 #define USART_SYNCH_MODE  0xff
 #define USART_ASYNCH_MODE 0xfe
 
-#if defined(__MULTIPLE_USARTS) && __MULTIPLE_USARTS > 0
-/* added for USART compatibility with smaller devices */
-#define RCREG		RCREG1
-#define TXREG		TXREG1
-#define RCSTA		RCSTA1
-#define TXSTA		TXSTA1
-#define RCSTAbits	RCSTA1bits
-#define TXSTAbits	TXSTA1bits
-#define SPBRG		SPBRG1
-
-/* and now for use in inline assembly */
-#define _RCREG		_RCREG1
-#define _TXREG		_TXREG1
-#define _RCSTA		_RCSTA1
-#define _TXSTA		_TXSTA1
-#define _RCSTAbits	_RCSTA1bits
-#define _TXSTAbits	_TXSTA1bits
-#define _SPBRG		_SPBRG1
-#endif
-
 /* status bits */
 union USART
 {

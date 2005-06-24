@@ -850,6 +850,16 @@ extern volatile __TXSTA1bits_t __at (0xfac) TXSTA1bits;
 extern __sfr __at (0xfad) TXREG1;
 extern __sfr __at (0xfae) RCREG1;
 extern __sfr __at (0xfaf) SPBRG1;
+
+/* for compatibility reasons */
+extern __sfr __at (0xfab) RCSTA;
+extern volatile __RCSTA1bits_t __at (0xfab) RCSTAbits;
+extern __sfr __at (0xfac) TXSTA;
+extern volatile __TXSTA1bits_t __at (0xfac) TXSTAbits;
+extern __sfr __at (0xfad) TXREG;
+extern __sfr __at (0xfae) RCREG;
+extern __sfr __at (0xfaf) SPBRG;
+
 extern __sfr __at (0xfb0) PSPCON;
 typedef union {
 	struct {
@@ -1538,8 +1548,5 @@ extern __sfr __at (0xfff) TOSU;
 #define __IDLOC6	0x200006
 #define __IDLOC7	0x200007
 
-
-/* added for USART compatibility with smaller devices */
-#define __MULTIPLE_USARTS 1
 
 #endif

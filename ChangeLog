@@ -1,3 +1,7 @@
+2005-06-25 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/lib/mcs51/p89v51rd2.h, device/lib/mcs51/at89s53.h: added. 
+
 2005-06-24 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libdev/pic18f[68][567]20.c:

@@ -614,6 +614,7 @@ PORT z80_port =
     "HOME",
     NULL, /* xidata */
     NULL, /* xinit */
+    NULL, /* const_name */
     NULL,
     NULL,
     1
@@ -730,6 +731,7 @@ PORT gbz80_port =
     "HOME",
     NULL, /* xidata */
     NULL, /* xinit */
+    NULL, /* const_name */
     NULL,
     NULL,
     1

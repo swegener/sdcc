@@ -1,6 +1,58 @@
+2005-06-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/asexpr.c (expr): disabled warning "not in .flat24 mode",
+	  fixed old K&R prototypes
+	* as/mcs51/asout.c (outrb): always output as if generating 24bit addresses
+	* device/lib/_gptrget.c,
+	* device/lib/_gptrgetc.c,
+	* device/lib/_gptrput.c: changed versions for new memory indicator values,
+	  also new versions for small generic pointers and banked generic pointers
+	* src/port.h: added const_name
+	* src/SDCC.lex: added keywords sfr16, __sfr16, sfr32, __sfr32
+	* src/SDCC.y: added tokens SFR16, SFR32 and their sfr_attributes
+	* src/SDCCcse.c (findPrevIc): check all associative operators
+	* src/SDCCglue.c (emitMaps): use CONST_NAME if defined
+	* src/SDCCicode.h: added macro IS_ASSOCIATIVE
+	* src/SDCCmem.c: updated comments,
+	  set far-space to 0 for pdata, results in optimized code
+	* src/SDCCmem.h: added macro CONST_NAME
+	* src/SDCCsymt.h: renumerated generic pointer types GPTYPE_... thereby
+	  moving the info into the highest bits, see also gptrget/gptrput
+	* src/src.dsp: added sdcc.ico to project files
+	* src/avr/gen.c (genCast): fixed bug 0x%d
+	* src/avr/main.c (avr_port): added "CONST (CODE)" for const_name
+	* src/ds390/gen.c (aopForRemat, adjustArithmeticResult): disconnected direct
+	  relation between ptr_type and DCL_TYPE,
+	  (genCast): fixed bug 0x%d
+	* src/ds390/main.c (ds390_port, tininative_port, ds400_port): added "CONST
+	  (CODE)" for const_name
+	* src/hc08/gen.c (genCast): fixed bug 0x%d
+	* src/hc08/main.c (_hc08_genAssemblerPreamble): added .area ...const_name,
+	  (hc08_port): added "CONST (CODE)" for const_name
+	* src/mcs51/gen.c (aopForSym): optimized pushing ACC,
+	  (aopForRemat, adjustArithmeticResult): disconnected direct relation
+	  between ptr_type and DCL_TYPE,
+	  (aopGetUsesAcc, aopGet, aopPut): changed first parameter from asmop* to
+	  operand* and took AOP() inside function so sfr-ness can be checked,
+	  (all over): repaired calls to aopGetUsesAcc, aopGet, aopPut to comply with
+	  new prototype,
+	  (genFunction, genEndFunction): optimized stack setup,
+	  (genMinus): optimized for literals with ending zeroes (in bytes),
+	  (genCast): fixed bug 0x%d
+	* src/mcs51/main.c (_mcs51_keywords): added sfr16 and sfr32,
+	  (mcs51_port): added "CONST (CODE)" for const_name
+	* src/mcs51/peeph.def: made rule 226 more generic
+	* src/pic/main.c (pic_port): added "CONST (CODE)" for const_name
+	* src/pic16/main.c (pic16_port): added "CONST (CODE)" for const_name
+	* src/xa51/main.c (xa51_port): added "CONST (CODE)" for const_name
+	* src/z80/main.c (z80_port): added NULL for const_name,
+	  (gbz80_port): added NULL for const_name
+	* support/regression/tests/bug663539.c,
+	* support/regression/tests/sfr16.c: new tests
+
 2005-06-25 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* device/include/mcs51/p89v51rd2.h, device/include/mcs51/at89s53.h: added. 
+	* device/include/mcs51/p89v51rd2.h, device/include/mcs51/at89s53.h: added.
 
 2005-06-24 Raphael Neider <rneider AT web.de>
 
@@ -23,7 +75,7 @@
 
 2005-06-20 Slade Rich <slade_rich AT users.sourceforge.net>
 
-	* src/pic/pcode.c : Fixed problem when a string constant contains a "\r\n" 
+	* src/pic/pcode.c : Fixed problem when a string constant contains a "\r\n"
 	  and the output asm file line is printed on two lines.
 
 2005-06-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
@@ -36,7 +88,7 @@
 	  negatedCmp, exchangedCmp, genhc08Code): rewrite of comparison handling,
 	  fixes bug #1216342
 	* src/hc08/peeph.def: added rules 2g - 2l for new conditional branches
-        
+
 2005-06-15 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/NOTES: moved Vangelis from active developers to people to contact
@@ -52,7 +104,8 @@
 
 2005-06-02 Slade Rich <slade_rich AT users.sourceforge.net>
 
-	* src/pic/pcode.c : Changed pseudo stack size to 15 to allow WSAVE to be located in shared memory bank.
+	* src/pic/pcode.c : Changed pseudo stack size to 15 to allow WSAVE to be
+	  located in shared memory bank.
 
 2005-05-31 Raphael Neider <rneider AT web.de>
 

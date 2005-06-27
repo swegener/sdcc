@@ -58,11 +58,11 @@ enum {
     TYPEOF_EEPPOINTER
 };
 
-// values for first byte of generic pointer.
-#define GPTYPE_NEAR	0
-#define GPTYPE_FAR	1
-#define GPTYPE_CODE	2
-#define GPTYPE_XSTACK	3
+// values for first byte (or 3 most significant bits) of generic pointer.
+#define GPTYPE_FAR       0x00
+#define GPTYPE_NEAR      0x40
+#define GPTYPE_XSTACK    0x60
+#define GPTYPE_CODE      0x80
 
 #define HASHTAB_SIZE 256
 

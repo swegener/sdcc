@@ -741,11 +741,7 @@ aopForRemat (symbol * sym)
               sym_link *from_type = operandType(IC_RIGHT(ic));
               aop->aopu.aop_immd.from_cast_remat = 1;
               ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-              ptr_type = DCL_TYPE(from_type);
-              if (ptr_type == IPOINTER) {
-                // bug #481053
-                ptr_type = POINTER;
-              }
+              ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type), NULL, NULL);
               continue ;
       } else break;
 
@@ -4007,7 +4003,7 @@ adjustArithmeticResult (iCode * ic)
     {
       char buff[5];
       SNPRINTF (buff, sizeof(buff),
-                "#%d", pointerCode (getSpec (operandType (IC_LEFT (ic)))));
+                "#%d", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
       aopPut (AOP (IC_RESULT (ic)), buff, GPTRSIZE - 1);
     }
 }
@@ -11725,7 +11721,7 @@ genCast (iCode * ic)
                     exit(1);
                 }
 
-                SNPRINTF(gpValStr, sizeof(gpValStr), "#0x%d", gpVal);
+                SNPRINTF(gpValStr, sizeof(gpValStr), "#0x%x", gpVal);
                 aopPut (AOP (result), gpValStr, GPTRSIZE - 1);
             }
           goto release;

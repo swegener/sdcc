@@ -129,9 +129,9 @@ typedef struct
 	int short_size;
 	int int_size;
 	int long_size;
-	int ptr_size;
-	int fptr_size;
-	int gptr_size;
+	int ptr_size;       //near
+	int fptr_size;      //far
+	int gptr_size;      //generic
 	int bit_size;
 	int float_size;
 	int max_base_size;
@@ -156,6 +156,7 @@ typedef struct
 	const char *home_name;
 	const char *xidata_name; // initialized xdata
 	const char *xinit_name; // a code copy of xidata
+	const char *const_name; // const data (code or not)
 	struct memmap *default_local_map; // default location for auto vars
 	struct memmap *default_globl_map; // default location for globl vars
 	int code_ro;		/* code space read-only 1=yes */

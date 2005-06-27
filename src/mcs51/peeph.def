@@ -2210,18 +2210,18 @@ replace {
 
 replace {
 	clr	a
-	movx	@dptr,a
-	inc	dptr
-	movx	@dptr,a
-	inc	dptr
+	movx	@%1,a
+	inc	%1
+	movx	@%1,a
+	inc	%1
 	clr	a
 } by {
 	;	Peephole 226	removed unnecessary clr
 	clr	a
-	movx	@dptr,a
-	inc	dptr
-	movx	@dptr,a
-	inc	dptr
+	movx	@%1,a
+	inc	%1
+	movx	@%1,a
+	inc	%1
 }
 
 replace {

@@ -151,6 +151,10 @@ _?"_asm"         {
 "return"       { count(); return(RETURN); }
 "sfr"          { count(); TKEYWORDSDCC(SFR); }
 "__sfr"        { count(); TKEYWORD(SFR); }
+"sfr16"        { count(); TKEYWORDSDCC(SFR16); }
+"__sfr16"      { count(); TKEYWORD(SFR16); }
+"sfr32"        { count(); TKEYWORDSDCC(SFR32); }
+"__sfr32"      { count(); TKEYWORD(SFR32); }
 "sbit"         { count(); TKEYWORDSDCC(SBIT); }
 "__sbit"       { count(); TKEYWORD(SBIT); }
 "short"        { count(); return(SHORT); }

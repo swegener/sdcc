@@ -492,7 +492,7 @@ DEFSETFUNC (findPrevIc)
   /* if iCodes are not the same */
   /* see the operands maybe interchanged */
   if (ic->op == cdp->diCode->op &&
-      (ic->op == '+' || ic->op == '*') && // MB: why not check for &, &&, |, ||, ^ ???
+      IS_ASSOCIATIVE(ic) &&
       isOperandEqual (IC_LEFT (ic), IC_RIGHT (cdp->diCode)) &&
       isOperandEqual (IC_RIGHT (ic), IC_LEFT (cdp->diCode)))
     {

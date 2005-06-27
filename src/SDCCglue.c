@@ -1330,6 +1330,9 @@ emitMaps (void)
   emitRegularMap (home, TRUE, FALSE);
   emitRegularMap (code, TRUE, FALSE);
 
+  if (CONST_NAME) {
+    tfprintf (code->oFile, "\t!area\n", CONST_NAME);
+  }
   emitStaticSeg (statsg, code->oFile);
   if (port->genXINIT) {
     tfprintf (code->oFile, "\t!area\n", xinit->sname);

@@ -1078,6 +1078,7 @@ PORT pic16_port =
     "HOME    (CODE)",	// home
     NULL,			// xidata
     NULL,			// xinit
+    "CONST   (CODE)",		// const_name - const data (code or not)
     NULL,			// default location for auto vars
     NULL,			// default location for global vars
     1				// code is read only 1=yes

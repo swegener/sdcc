@@ -446,6 +446,7 @@ PORT pic_port =
 		"HOME	 (CODE)",
 		NULL, // xidata
 		NULL, // xinit
+		"CONST   (CODE)",		// const_name - const data (code or not)
 		NULL,
 		NULL,
 		1        // code is read only

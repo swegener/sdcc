@@ -89,7 +89,7 @@ initMem ()
      PAGED          -   YES
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'A'
      POINTER-TYPE   -   FPOINTER
    */
@@ -101,7 +101,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'B'
      POINTER-TYPE   -   POINTER
    */
@@ -118,7 +118,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   YES
+     CODE-ACCESS    -   YES
      DEBUG-NAME     -   'C'
      POINTER-TYPE   -   CPOINTER
    */
@@ -130,7 +130,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   YES
+     CODE-ACCESS    -   YES
      DEBUG-NAME     -   'C'
      POINTER-TYPE   -   CPOINTER
    */
@@ -142,7 +142,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   YES
+     CODE-ACCESS    -   YES
      DEBUG-NAME     -   'D'
      POINTER-TYPE   -   CPOINTER
    */
@@ -154,7 +154,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'E'
      POINTER-TYPE   -   POINTER
    */
@@ -166,7 +166,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'E'
      POINTER-TYPE   -   POINTER
    */
@@ -178,16 +178,16 @@ initMem ()
 
   /* Xternal paged segment ;   
      SFRSPACE       -   NO
-     FAR-SPACE      -   YES
+     FAR-SPACE      -   NO
      PAGED          -   YES
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO 
+     CODE-ACCESS    -   NO 
      DEBUG-NAME     -   'P'
      POINTER-TYPE   -   PPOINTER
    */
   if (PDATA_NAME) {
-    pdata = allocMap (0, 1, 1, 0, 0, 0, options.xstack_loc, PDATA_NAME, 'P', PPOINTER);
+    pdata = allocMap (0, 0, 1, 0, 0, 0, options.xstack_loc, PDATA_NAME, 'P', PPOINTER);
   } else {
     pdata = NULL;
   }
@@ -198,7 +198,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'F'
      POINTER-TYPE   -   FPOINTER
    */
@@ -212,7 +212,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'G'
      POINTER-TYPE   -   IPOINTER
    */
@@ -223,13 +223,13 @@ initMem ()
     idata=NULL;
   }
 
-  /* Static segment (code for variables );
+  /* Bit space ;
      SFRSPACE       -   NO
      FAR-SPACE      -   NO
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   YES
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'H'
      POINTER-TYPE   -  _NONE_
    */
@@ -241,7 +241,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'I'
      POINTER-TYPE   -   _NONE_
    */
@@ -253,7 +253,7 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   ' '
      POINTER-TYPE   -   _NONE_
    */
@@ -265,19 +265,19 @@ initMem ()
      PAGED          -   NO
      DIRECT-ACCESS  -   YES
      BIT-ACCESS     -   YES
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'J'
      POINTER-TYPE   -   _NONE_
    */
   sfrbit = allocMap (1, 0, 0, 1, 1, 0, 0, REG_NAME, 'J', 0);
 
-  /* EEPROM bit space
+  /* EEPROM space
      SFRSPACE       -   NO
      FAR-SPACE      -   YES
      PAGED          -   NO
      DIRECT-ACCESS  -   NO
      BIT-ACCESS     -   NO
-     CODE-ACESS     -   NO
+     CODE-ACCESS    -   NO
      DEBUG-NAME     -   'K'
      POINTER-TYPE   -   EEPPOINTER
    */

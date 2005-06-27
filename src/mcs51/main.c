@@ -30,6 +30,8 @@ static char *_mcs51_keywords[] =
   "pdata",
   "reentrant",
   "sfr",
+  "sfr16",
+  "sfr32",
   "sbit",
   "using",
   "xdata",
@@ -706,21 +708,22 @@ PORT mcs51_port =
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
   {
-    "XSTK    (PAG,XDATA)",
-    "STACK   (DATA)",
-    "CSEG    (CODE)",
-    "DSEG    (DATA)",
-    "ISEG    (DATA)",
-    "PSEG    (PAG,XDATA)",
-    "XSEG    (XDATA)",
-    "BSEG    (BIT)",
-    "RSEG    (DATA)",
-    "GSINIT  (CODE)",
-    "OSEG    (OVR,DATA)",
-    "GSFINAL (CODE)",
-    "HOME    (CODE)",
-    "XISEG   (XDATA)", // initialized xdata
-    "XINIT   (CODE)", // a code copy of xiseg
+    "XSTK    (PAG,XDATA)",	// xstack_name
+    "STACK   (DATA)",		// istack_name
+    "CSEG    (CODE)",		// code_name
+    "DSEG    (DATA)",		// data_name
+    "ISEG    (DATA)",		// idata_name
+    "PSEG    (PAG,XDATA)",	// pdata_name
+    "XSEG    (XDATA)",		// xdata_name
+    "BSEG    (BIT)",		// bit_name
+    "RSEG    (DATA)",		// reg_name
+    "GSINIT  (CODE)",		// static_name
+    "OSEG    (OVR,DATA)",	// overlay_name
+    "GSFINAL (CODE)",		// post_static_name
+    "HOME    (CODE)",		// home_name
+    "XISEG   (XDATA)",		// xidata_name - initialized xdata   initialized xdata
+    "XINIT   (CODE)",		// xinit_name - a code copy of xiseg
+    "CONST   (CODE)",		// const_name - const data (code or not)
     NULL,
     NULL,
     1

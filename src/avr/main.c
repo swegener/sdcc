@@ -217,6 +217,7 @@ PORT avr_port = {
 	 "HOME",
 	 NULL, // initialized xdata
 	 NULL, // a code copy of xiseg
+	 "CONST   (CODE)",		// const_name - const data (code or not)
 	 NULL,
 	 NULL,
 	 0,

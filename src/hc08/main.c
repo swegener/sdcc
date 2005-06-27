@@ -169,6 +169,7 @@ _hc08_genAssemblerPreamble (FILE * of)
   fprintf (of, "\t.area %s\n",port->mem.static_name);
   fprintf (of, "\t.area %s\n",port->mem.post_static_name);
   fprintf (of, "\t.area %s\n",port->mem.xinit_name);
+  fprintf (of, "\t.area %s\n",port->mem.const_name);
   fprintf (of, "\t.area %s\n",port->mem.data_name);
   fprintf (of, "\t.area %s\n",port->mem.overlay_name);
   fprintf (of, "\t.area %s\n",port->mem.bit_name);
@@ -433,6 +434,7 @@ PORT hc08_port =
     "HOME (CODE)",
     "XISEG", // initialized xdata
     "XINIT", // a code copy of xiseg
+    "CONST   (CODE)", // const_name - const data (code or not)
     NULL,
     NULL,
     1

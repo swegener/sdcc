@@ -7894,7 +7894,7 @@ genCast (iCode * ic)
 		    exit(1);
 		}
 	    
-		sprintf(gpValStr, "#0x%d", gpVal);
+		sprintf(gpValStr, "#0x%x", gpVal);
 		aopPut (AOP (result), gpValStr, GPTRSIZE - 1);
 	    }	    
 #endif

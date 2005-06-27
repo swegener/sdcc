@@ -26,6 +26,60 @@
 
 /* the  return value is expected to be in acc, and not in the standard
  * location dpl. Therefore we choose return type void here: */
+
+#if 1
+
+void
+_gptrgetc (char *gptr) _naked
+{
+/* This is the new version with pointers up to 16 bits.
+   B cannot be trashed */
+
+    gptr; /* hush the compiler */
+
+    _asm
+    ;   save values passed
+    ;
+    ;   depending on the pointer type acc. to SDCCsymt.h
+    ;
+    	jb		_B_7,codeptr$        ; >0x80 code		; 3
+    	jnb		_B_6,xdataptr$       ; <0x40 far		; 3
+
+        mov     dph,r0 ; save r0 independant of regbank	; 2
+        mov     r0,dpl ; use only low order address		; 2
+
+    	jb		_B_5,pdataptr$       ; >0x60 pdata		; 3
+    ;
+    ;   Pointer to data space
+    ;
+        mov     a,@r0									; 1
+        mov     r0,dph ; restore r0						; 2
+        mov     dph,#0 ; restore dph					; 2
+        ret												; 1
+    ;
+    ;   pointer to external stack or pdata
+    ;
+ pdataptr$:
+        movx    a,@r0									; 1
+        mov     r0,dph ; restore r0						; 2
+        mov     dph,#0 ; restore dph					; 2
+        ret												; 1
+;
+;   pointer to xternal data
+;   pointer to code area
+;
+ codeptr$:
+ xdataptr$:
+        clr     a										; 1
+        movc    a,@a+dptr								; 1
+        ret												; 1
+        												;===
+        												;28 bytes
+     _endasm ;
+}
+
+#else
+
 void
 _gptrgetc (char *gptr) _naked
 {
@@ -85,3 +139,4 @@ _gptrgetc (char *gptr) _naked
      _endasm ;
 
 }
+#endif

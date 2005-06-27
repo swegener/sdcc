@@ -256,6 +256,14 @@ iCodeTable;
                                 x->op == '|'        || \
                                 x->op == '^'))
 
+#define IS_ASSOCIATIVE(x) (x && (x->op == EQ_OP      || \
+                                 x->op == NE_OP      || \
+                                 x->op == '+'        || \
+                                 x->op == '*'        || \
+                                 x->op == BITWISEAND || \
+                                 x->op == '|'        || \
+                                 x->op == '^'))
+
 #define ASSIGNMENT(ic) ( ic && ic->op == '=')
 
 #define ASSIGN_SYM_TO_ITEMP(ic) (ic && ic->op == '=' && \

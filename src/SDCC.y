@@ -87,9 +87,9 @@ bool uselessDecl = TRUE;
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token <yyint> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <yyint> XOR_ASSIGN OR_ASSIGN
-%token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR AT SBIT
-%token REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL NONBANKED BANKED
-%token SHADOWREGS WPARAM
+%token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32
+%token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
+%token NONBANKED BANKED SHADOWREGS WPARAM
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID BIT
 %token STRUCT UNION ENUM ELIPSIS RANGE FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -734,6 +734,29 @@ sfr_attributes
                SPEC_SCLS($$)    = S_SFR ;
                SPEC_USIGN($$)   = 1 ;
 	       ignoreTypedefType = 1;
+            }
+   ;
+
+sfr_attributes
+   : SFR16  {
+               $$ = newLink(SPECIFIER) ;
+               FUNC_REGBANK($$) = 0;
+               SPEC_NOUN($$)    = V_INT;
+               SPEC_SCLS($$)    = S_SFR;
+               SPEC_USIGN($$)   = 1 ;
+               ignoreTypedefType = 1;
+            }
+   ;
+
+sfr_attributes
+   : SFR32  {
+               $$ = newLink(SPECIFIER) ;
+               FUNC_REGBANK($$) = 0;
+               SPEC_NOUN($$)    = V_INT;
+               SPEC_SCLS($$)    = S_SFR;
+               SPEC_LONG($$)    = 1;
+               SPEC_USIGN($$)   = 1;
+               ignoreTypedefType = 1;
             }
    ;
 

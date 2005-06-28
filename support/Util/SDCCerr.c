@@ -415,7 +415,9 @@ struct
 { W_COMPLEMENT, ERROR_LEVEL_WARNING,
    "using ~ on bit/bool/unsigned char variables can give unexpected results due to promotion to int" },
 { E_SHADOWREGS_NO_ISR, ERROR_LEVEL_ERROR,
-   "ISR function attribute 'shadowregs' following non-ISR function `%s'" },
+   "ISR function attribute 'shadowregs' following non-ISR function '%s'" },
+{ W_SFR_ABSRANGE, ERROR_LEVEL_WARNING,
+   "absolute address for sfr '%s' probably out of range." },
 };
 
 /*

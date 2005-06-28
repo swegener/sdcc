@@ -39,10 +39,7 @@ void _ltoa(long value, char* string, unsigned char radix)
 {
   if (value < 0 && radix == 10) {
     *string++ = '-';
-    _ultoa(-value, string, radix);
+    value = -value;
   }
-  else {
-    _ultoa(value, string, radix);
-  }
+  _ultoa(value, string, radix);
 }
-

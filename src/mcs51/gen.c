@@ -3496,6 +3496,7 @@ genPlusIncr (iCode * ic)
   /* if increment >=16 bits in register or direct space */
   if ((AOP_TYPE(IC_LEFT(ic)) == AOP_REG || AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
+      !isOperandVolatile (IC_RESULT (ic), FALSE) &&
       (size > 1) &&
       (icount == 1))
     {

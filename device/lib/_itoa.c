@@ -40,10 +40,7 @@ void _itoa(int value, char* string, unsigned char radix)
 {
   if (value < 0 && radix == 10) {
     *string++ = '-';
-    _uitoa(-value, string, radix);
+    value = -value;
   }
-  else {
-    _uitoa(value, string, radix);
-  }
+  _uitoa(value, string, radix);
 }
-

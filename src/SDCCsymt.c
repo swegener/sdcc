@@ -1373,6 +1373,26 @@ checkSClass (symbol * sym, int isProto)
     if (IS_ABSOLUTE (sym->etype))
       SPEC_VOLATILE (sym->etype) = 1;
   
+  if (TARGET_IS_MCS51 &&
+      IS_ABSOLUTE (sym->etype) &&
+      SPEC_SCLS (sym->etype) == S_SFR)
+    {
+      int n, size;
+      unsigned addr;
+
+      if (SPEC_NOUN (sym->etype) == V_CHAR)
+        size = 8;
+      else if (SPEC_LONG (sym->etype) == 0)
+        size = 16;
+      else
+        size = 32;
+
+      addr = SPEC_ADDR (sym->etype);
+      for (n=0; n<size; n+=8)
+        if (((addr >> n) & 0xFF) < 0x80)
+          werror (W_SFR_ABSRANGE, sym->name);
+    }
+
   /* If code memory is read only, then pointers to code memory */
   /* implicitly point to constants -- make this explicit       */
   t = sym->type;

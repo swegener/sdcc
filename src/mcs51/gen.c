@@ -3573,6 +3573,29 @@ genPlusIncr (iCode * ic)
       return TRUE;
     }
 
+  /* if result is dptr */
+  if ((AOP_TYPE (IC_RESULT (ic)) == AOP_STR) &&
+      (AOP_SIZE (IC_RESULT (ic)) == 2) &&
+      !strncmp(AOP (IC_RESULT (ic))->aopu.aop_str[0], "dpl", 4) &&
+      !strncmp(AOP (IC_RESULT (ic))->aopu.aop_str[1], "dph", 4))
+    {
+      if (aopGetUsesAcc (IC_LEFT (ic), 0))
+        return FALSE;
+
+      if (icount > 9)
+        return FALSE;
+
+      if ((AOP_TYPE (IC_LEFT (ic)) != AOP_DIR) && (icount > 5))
+        return FALSE;
+
+      aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), 0, FALSE, FALSE), 0, FALSE);
+      aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), 1, FALSE, FALSE), 1, FALSE);
+      while (icount--)
+        emitcode ("inc", "dptr");
+
+      return TRUE;
+    }
+
   /* if the sizes are greater than 1 then we cannot */
   if (AOP_SIZE (IC_RESULT (ic)) > 1 ||
       AOP_SIZE (IC_LEFT (ic)) > 1)

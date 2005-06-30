@@ -1,3 +1,9 @@
+2005-06-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: documented sfr16/sfr32,
+	  added example for using storage class with function pointers
+	* src/mcs51/gen.c (genPlusIncr): optimized small offsets from dptr
+
 2005-06-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_gptrget.c: also push/pop _PSBANK, added # to 0x03

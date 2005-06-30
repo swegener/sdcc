@@ -8936,6 +8936,26 @@ sfr
 
 \end_inset 
 
+ / sfr16
+\begin_inset LatexCommand \index{sfr16}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_sfr16}
+
+\end_inset 
+
+ / sfr32
+\begin_inset LatexCommand \index{sfr32}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_sfr32}
+
+\end_inset 
+
  / sbit
 \begin_inset LatexCommand \index{\_\_sbit}
 
@@ -8946,10 +8966,10 @@ sfr
 
 Like the bit keyword, 
 \emph on 
-sfr / sbit 
+sfr / sfr16 / sfr32 / sbit 
 \emph default 
-signifies both a data-type and storage class, they are used to describe
- the 
+signify both a data-type and storage class, they are used to describe the
+ 
 \emph on 
 s
 \emph default 
@@ -8987,6 +9007,23 @@ sfr at
  0x80 P0;\SpecialChar ~
  /* special function register P0 at location 0x80 */
 \newline 
+/* 16 bit special function register combination for timer 0 */
+\newline 
+/* with the high byte at location 0x8C and the low byte at location 0x8A
+ */
+\newline 
+sfr16 at
+\begin_inset LatexCommand \index{at}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{\_\_at}
+
+\end_inset 
+
+ 0x8C8A TMR0;
+\newline 
 sbit at 0xd7 CY; /* CY (Carry Flag
 \begin_inset LatexCommand \index{Flags}
 
@@ -9006,6 +9043,19 @@ Special function registers which are located on an address dividable by
  sbit
 \emph default 
  addresses a specific bit within these sfr.
+\newline 
+16 Bit and 32 bit special function register combinations which require a
+ certain access order are better not declared using 
+\emph on 
+sfr16
+\emph default 
+ or 
+\emph on 
+sfr32.
+
+\emph default 
+ Allthough SDCC usually accesses them Least Significant Byte (LSB) first,
+ this is not guaranteed.
 \layout Subsubsection
 
 Pointers
@@ -9063,6 +9113,13 @@ code unsigned char * code p;
  */
 \newline 
 char * xdata p;
+\newline 
+
+\newline 
+/* the following is a function pointer physically located in data space
+ */
+\newline 
+char (* data fp)(void);
 \layout Standard
 
 Well you get the idea.

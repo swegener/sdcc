@@ -29,10 +29,14 @@
 #include "pcode.h"
 #include "gen.h"
 
+
 #if defined(__BORLANDC__) || defined(_MSC_VER)
 #define STRCASECMP stricmp
+#define FENTRY2			1 ? (void)0 : printf 
 #else
 #define STRCASECMP strcasecmp
+//#define FENTRY2(fmt,...)	do { fprintf (stderr, "%s:%d: called.\n", __FUNCTION__, __LINE__); fprintf (stderr, fmt, ## __VA_ARGS__); } while (0)
+#define FENTRY2			1 ? (void)0 : printf 
 #endif
 
 /* this should go in SDCCicode.h, but it doesn't. */
@@ -1604,6 +1608,8 @@ createStackSpil (symbol * sym)
 	
 	char slocBuffer[30];
 	debugLog ("%s\n", __FUNCTION__);
+
+	FENTRY2("called.");
 	
 	/* first go try and find a free one that is already 
 	existing on the stack */
@@ -1687,6 +1693,8 @@ isSpiltOnStack (symbol * sym)
 	sym_link *etype;
 	
 	debugLog ("%s\n", __FUNCTION__);
+	FENTRY2("called.");
+	
 	if (!sym)
 		return FALSE;
 	
@@ -1714,6 +1722,7 @@ spillThis (symbol * sym)
 {
 	int i;
 	debugLog ("%s : %s\n", __FUNCTION__, sym->rname);
+	FENTRY2("sym: %s, spillLoc:%p (%s)\n", sym->rname, sym->usl.spillLoc, sym->usl.spillLoc ? sym->usl.spillLoc->rname : "<unknown>");
 	
 	/* if this is rematerializable or has a spillLocation
 	we are okay, else we need to create a spillLocation
@@ -1729,25 +1738,27 @@ spillThis (symbol * sym)
 	bitVectUnSetBit (_G.regAssigned, sym->key);
 	
 	for (i = 0; i < sym->nRegs; i++)
-		
+	{
 		if (sym->regs[i])
 		{
 			freeReg (sym->regs[i]);
 			sym->regs[i] = NULL;
 		}
+	}
 		
-		/* if spilt on stack then free up r0 & r1 
-		if they could have been assigned to some
-		LIVE ranges */
-		if (!pic14_ptrRegReq && isSpiltOnStack (sym))
-		{
-			pic14_ptrRegReq++;
-			spillLRWithPtrReg (sym);
-		}
+	/* if spilt on stack then free up r0 & r1 
+	if they could have been assigned to some
+	LIVE ranges */
+	if (!pic14_ptrRegReq && isSpiltOnStack (sym))
+	{
+		pic14_ptrRegReq++;
+		spillLRWithPtrReg (sym);
+	}
 		
-		if (sym->usl.spillLoc && !sym->remat)
-			sym->usl.spillLoc->allocreq = 1;
-		return;
+	if (sym->usl.spillLoc && !sym->remat)
+		sym->usl.spillLoc->allocreq = 1;
+	
+	return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1761,13 +1772,14 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 	symbol *sym;
 	
 	debugLog ("%s\n", __FUNCTION__);
+	FENTRY2("called.");
 	/* get the spillable live ranges */
 	lrcs = computeSpillable (ic);
-	
+
+
 	/* get all live ranges that are rematerizable */
 	if ((selectS = liveRangesWith (lrcs, rematable, ebp, ic)))
 	{
-		
 		/* return the least used of these */
 		return leastUsedLR (selectS);
 	}
@@ -1837,7 +1849,7 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 		sym->usl.spillLoc->allocreq = 1;
 		return sym;
 	}
-	
+
 	/* couldn't find then we need to create a spil
 	location on the stack , for which one? the least
 	used ofcourse */
@@ -2606,7 +2618,8 @@ createRegMask (eBBlock ** ebbs, int count)
 		}
 	}
 }
-
+#if 0
+/* This was the active version */
 /*-----------------------------------------------------------------*/
 /* rematStr - returns the rematerialized string for a remat var    */
 /*-----------------------------------------------------------------*/
@@ -2647,8 +2660,10 @@ rematStr (symbol * sym)
 	//printf ("ralloc.c:%d %s\n", __LINE__,buffer);
 	return psym;
 }
+#endif
 
 #if 0
+/* deprecated version */
 /*-----------------------------------------------------------------*/
 /* rematStr - returns the rematerialized string for a remat var    */
 /*-----------------------------------------------------------------*/
@@ -2706,7 +2721,7 @@ regTypeNum ()
 {
 	symbol *sym;
 	int k;
-	iCode *ic;
+	//iCode *ic;
 	
 	debugLog ("%s\n", __FUNCTION__);
 	/* for each live range do */
@@ -2752,6 +2767,7 @@ regTypeNum ()
 			pointer we are getting is rematerializable and
 			in "data" space */
 			
+#if 0
 			if (bitVectnBitsOn (sym->defs) == 1 &&
 			    (ic = hTabItemWithKey (iCodehTab,
 						   bitVectFirstBit (sym->defs))) &&
@@ -2781,6 +2797,7 @@ regTypeNum ()
 				allocate pointer register */
 				
 			}
+#endif
 			
 			/* if not then we require registers */
 			sym->nRegs = ((IS_AGGREGATE (sym->type) || sym->isptr) ?

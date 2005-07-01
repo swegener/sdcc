@@ -2966,7 +2966,6 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 			
 		case PO_IMMEDIATE:
 			s = buffer;
-			
 			if(PCOI(pcop)->_const) {
 				
 				if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
@@ -2986,21 +2985,21 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 				} else
 					SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
 			} else {
-				
-				if( PCOI(pcop)->index) { // && PCOI(pcc->pcop)->offset<4) {
+				if( !PCOI(pcop)->offset) { // && PCOI(pcc->pcop)->offset<4) {
 					SAFE_snprintf(&s,&size,"(%s + %d)",
 						pcop->name,
-						PCOI(pcop)->index );
+						PCOI(pcop)->index);
 				} else {
 					switch(PCOI(pcop)->offset) {
 					case 0:
-						SAFE_snprintf(&s,&size,"%s",pcop->name);
+						SAFE_snprintf(&s,&size,"(%s + %d)",pcop->name, PCOI(pcop)->index);
 						break;
 					case 1:
-						SAFE_snprintf(&s,&size,"high %s",pcop->name);
+						SAFE_snprintf(&s,&size,"high (%s + %d)",pcop->name, PCOI(pcop)->index);
 						break;
 					default:
-						SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
+						SAFE_snprintf(&s,&size,"((%s + %d) >> %d)&0xff",pcop->name, PCOI(pcop)->index, 8*PCOI(pcop)->offset);
+						break;
 					}
 				}
 			}

@@ -42,7 +42,6 @@
 #include "pcode.h"
 #include "gen.h"
 
-
 extern void genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 extern void genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 void genMult8X8_8 (operand *, operand *,operand *);
@@ -63,7 +62,7 @@ pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func);
 unsigned int pic14aopLiteral (value *val, int offset);
 const char *AopType(short type);
 
-#define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0xff)
+#define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0x00ff)
 
 /* this is the down and dirty file with all kinds of 
 kludgy & hacky stuff. This is what it is all about
@@ -177,7 +176,7 @@ void DEBUGpic14_emitcode (char *inst,char *fmt, ...)
 	char lb[INITIAL_INLINEASM];  
 	char *lbp = lb;
 	
-	if(!debug_verbose)
+	if(!debug_verbose && !options.debug)
 		return;
 	
 	va_start(ap,fmt);   
@@ -205,6 +204,42 @@ void DEBUGpic14_emitcode (char *inst,char *fmt, ...)
 	va_end(ap);
 }
 
+static void Safe_vsnprintf (char *buf, size_t size, const char *fmt, va_list ap)
+{
+#if defined (HAVE_VSNPRINTF)
+  vsnprintf (buf, size, fmt, ap);
+#elif defined (HAVE_VSPRINTF)
+  vsprintf (buf, size, fmt, ap);
+  if (strlen (buf) >= size)
+  {
+    fprintf (stderr, "Safe_vsnprintf: buffer (size %u) has overflown\n", size);
+  }
+#elif defined (HAVE_SNPRINTF)
+  snprintf (buf, size, "vs(n)printf required");
+#elif defined (HAVE_SRINTF)
+  sprintf (buf, "vs(n)printf required");
+  if (strlen (buf) >= size)
+  {
+    fprintf (stderr, "Safe_vsnprintf: buffer (size %u) has overflown\n", size);
+  }
+#else
+  assert ( !"neither vsnprintf nor vsprintf is present -- unable to proceed" );
+#endif
+}
+
+void emitpComment (const char *fmt, ...)
+{
+  va_list va;
+  char buffer[4096];
+  
+  va_start (va, fmt);
+  if (pb) {
+    Safe_vsnprintf (buffer, 4096, fmt, va);
+    //fprintf (stderr, "%s\n" ,buffer);
+    addpCode2pBlock (pb, newpCodeCharP (buffer));
+  }
+  va_end (va);
+}
 
 void emitpLabel(int key)
 {
@@ -1316,6 +1351,8 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	//DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* offset is greater than
 	size then zero */
+
+	assert (offset >= 0 && offset < aop->size);
 	
 	if (offset > (aop->size - 1) &&
 		aop->type != AOP_LIT)
@@ -1398,11 +1435,28 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 		*/
 		
 	case AOP_PCODE:
-		DEBUGpic14_emitcode(";","popGet AOP_PCODE (%s) %d %s",pCodeOpType(aop->aopu.pcop),
+		pcop = NULL;
+		DEBUGpic14_emitcode(";","popGet AOP_PCODE (%s + %i) %d %s",pCodeOpType(aop->aopu.pcop), offset,
 			__LINE__, 
 			((aop->aopu.pcop->name)? (aop->aopu.pcop->name) : "no name"));
-		pcop = pCodeOpCopy(aop->aopu.pcop);
-		PCOI(pcop)->offset = offset;
+		emitpComment ("popGet; name %s, offset: %i\n", aop->aopu.pcop->name, offset);
+		switch (aop->aopu.pcop->type)
+		{
+		case PO_IMMEDIATE:
+		  pcop = pCodeOpCopy (aop->aopu.pcop);
+		  /* usually we want to access the memory at "<symbol> + offset" (using ->index),
+		   * but sometimes we want to access the high byte of the symbol's address (using ->offset) */
+		  PCOI(pcop)->index += offset;
+		  //PCOI(pcop)->offset = 0;
+		  break;
+		case PO_DIR:
+		  pcop = pCodeOpCopy (aop->aopu.pcop);
+		  PCOR(pcop)->instance = offset;
+		  break;
+		default:
+		  assert ( !"unhandled pCode type" );
+		  break;
+		} // switch
 		return pcop;
 	}
 	
@@ -1410,6 +1464,27 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 		"popGet got unsupported aop->type");
 	exit(0);
 }
+
+/*-----------------------------------------------------------------*/
+/* popGetAddr - access the low/high word of a symbol (immediate)   */
+/*              (for non-PO_IMMEDIATEs this is the same as poGet)  */
+/*-----------------------------------------------------------------*/
+pCodeOp *popGetAddr (asmop *aop, int offset)
+{
+  if (aop->type == AOP_PCODE && aop->aopu.pcop->type == PO_IMMEDIATE)
+  {
+    pCodeOp *pcop = aop->aopu.pcop;
+    emitpComment ("popGet; name %s, offset: %i\n", pcop->name, offset);
+    pcop = pCodeOpCopy (pcop);
+    /* usually we want to access the memory at "<symbol> + offset" (using ->index),
+     * but sometimes we want to access the high byte of the symbol's address (using ->offset) */
+    PCOI(pcop)->offset += offset;
+    return pcop;
+  } else {
+    return popGet (aop, offset);
+  }
+}
+
 /*-----------------------------------------------------------------*/
 /* aopPut - puts a string for a aop 							   */
 /*-----------------------------------------------------------------*/
@@ -1815,6 +1890,8 @@ static void genNot (iCode *ic)
 {
 	symbol *tlbl;
 	int size;
+
+	FENTRY;
 	
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* assign asmOps to operand & result */
@@ -1864,6 +1941,7 @@ static void genCpl (iCode *ic)
 	operand *left, *result;
 	int size, offset=0;  
 	
+	FENTRY;
 	
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp((left = IC_LEFT(ic)),ic,FALSE);
@@ -1907,6 +1985,8 @@ static void genUminusFloat(operand *op,operand *result)
 	int size ,offset =0 ;
 	char *l;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* for this we just need to flip the 
 	first it then copy the rest in place */
@@ -1934,6 +2014,7 @@ static void genUminus (iCode *ic)
 	int size, i;
 	sym_link *optype, *rtype;
 	
+	FENTRY;
 	
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* assign asmops */
@@ -1995,6 +2076,8 @@ static void saveRegisters(iCode *lic)
 	bitVect *rsave;
 	sym_link *dtype;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* look for call */
 	for (ic = lic ; ic ; ic = ic->next) 
@@ -2057,6 +2140,8 @@ static void unsaveRegisters (iCode *ic)
 	int i;
 	bitVect *rsave;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* find the registers in use at this time 
 	and push them away to safety */
@@ -2116,6 +2201,8 @@ static void assignResultValue(operand * oper)
 {
 	int size = AOP_SIZE(oper);
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	DEBUGpic14_AopType(__LINE__,oper,NULL,NULL);
@@ -2133,6 +2220,7 @@ static void assignResultValue(operand * oper)
 /*-----------------------------------------------------------------*/
 static void genIpush (iCode *ic)
 {
+	FENTRY;
 	
 	DEBUGpic14_emitcode ("; ***","%s  %d - WARNING no code generated",__FUNCTION__,__LINE__);
 #if 0
@@ -2194,6 +2282,8 @@ static void genIpush (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genIpop (iCode *ic)
 {
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d - WARNING no code generated",__FUNCTION__,__LINE__);
 #if 0
 	int size,offset ;
@@ -2219,6 +2309,8 @@ static void genIpop (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void unsaverbank (int bank,iCode *ic,bool popPsw)
 {
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d - WARNING no code generated",__FUNCTION__,__LINE__);
 #if 0
 	int i;
@@ -2267,6 +2359,8 @@ static void unsaverbank (int bank,iCode *ic,bool popPsw)
 /*-----------------------------------------------------------------*/
 static void saverbank (int bank, iCode *ic, bool pushPsw)
 {
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d - WARNING no code generated",__FUNCTION__,__LINE__);
 #if 0
 	int i;
@@ -2320,6 +2414,8 @@ static void genCall (iCode *ic)
 	unsigned char *name;
 	int isExtern;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	/* if caller saves & we have not saved then */
@@ -2454,6 +2550,8 @@ static void genPcall (iCode *ic)
 	pCodeOp *pcop;
 	operand *left;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* if caller saves & we have not saved then */
 	if (!ic->regsSaved)
@@ -2544,6 +2642,8 @@ static void genPcall (iCode *ic)
 static int resultRemat (iCode *ic)
 {
 	//	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+	FENTRY;
+
 	if (SKIP_IC(ic) || ic->op == IFX)
 		return 0;
 	
@@ -2593,6 +2693,8 @@ static void genFunction (iCode *ic)
 	symbol *sym;
 	sym_link *ftype;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d curr label offset=%dprevious max_key=%d ",__FUNCTION__,__LINE__,labelOffset,max_key);
 	
 	labelOffset += (max_key+4);
@@ -2780,6 +2882,8 @@ static void genEndFunction (iCode *ic)
 {
 	symbol *sym = OP_SYMBOL(IC_LEFT(ic));
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	if (IFFUNC_ISREENT(sym->type) || options.stackAuto)
@@ -2927,6 +3031,8 @@ static void genRet (iCode *ic)
 {
 	int size,offset = 0 , pushed = 0;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* if we have no return value then
 	just generate the "ret" */
@@ -2954,7 +3060,7 @@ static void genRet (iCode *ic)
 					AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE) ||
 					( (AOP(IC_LEFT(ic))->type) == AOP_IMMD) ||
 					( (AOP(IC_LEFT(ic))->type) == AOP_LIT) ) {
-					emitpcode(POC_MOVLW, popGet(AOP(IC_LEFT(ic)),offset));
+					emitpcode(POC_MOVLW, popGetAddr(AOP(IC_LEFT(ic)),offset));
 				}else {
 					emitpcode(POC_MOVFW, popGet(AOP(IC_LEFT(ic)),offset));
 				}
@@ -2994,6 +3100,8 @@ jumpret:
 /*-----------------------------------------------------------------*/
 static void genLabel (iCode *ic)
 {
+	FENTRY;
+
 	/* special case never generate */
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if (IC_LABEL(ic) == entryLabel)
@@ -3009,6 +3117,8 @@ static void genLabel (iCode *ic)
 //tsd
 static void genGoto (iCode *ic)
 {
+	FENTRY;
+
 	emitpcode(POC_GOTO,popGetLabel(IC_LABEL(ic)->key));
 	pic14_emitcode ("goto","_%05d_DS_",(IC_LABEL(ic)->key+100)+labelOffset);
 }
@@ -3021,6 +3131,7 @@ static void genMultbits (operand *left,
 						 operand *right, 
 						 operand *result)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	if(!pic14_sameRegs(AOP(result),AOP(right)))
@@ -3044,6 +3155,8 @@ static void genMultOneByte (operand *left,
 	
 	// symbol *lbl ;
 	int size,offset;
+	
+	FENTRY;
 	
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	DEBUGpic14_AopType(__LINE__,left,right,result);
@@ -3148,6 +3261,8 @@ static void genMult (iCode *ic)
 	operand *right = IC_RIGHT(ic);
 	operand *result= IC_RESULT(ic);	
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* assign the amsops */
 	aopOp (left,ic,FALSE);
@@ -3192,6 +3307,8 @@ static void genDivbits (operand *left,
 	
 	char *l;
 	
+	FENTRY;
+
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* the result must be bit */	  
 	pic14_emitcode("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE));
@@ -3216,6 +3333,7 @@ static void genDivOneByte (operand *left,
 	symbol *lbl ;
 	int size,offset;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	size = AOP_SIZE(result) - 1;
 	offset = 1;
@@ -3297,6 +3415,7 @@ static void genDiv (iCode *ic)
 	operand *right = IC_RIGHT(ic);
 	operand *result= IC_RESULT(ic);	
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* assign the amsops */
 	aopOp (left,ic,FALSE);
@@ -3336,6 +3455,7 @@ static void genModbits (operand *left,
 	
 	char *l;
 	
+	FENTRY;
 	/* the result must be bit */	  
 	pic14_emitcode("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE));
 	l = aopGet(AOP(left),0,FALSE,FALSE);
@@ -3359,6 +3479,7 @@ static void genModOneByte (operand *left,
 	char *l ;
 	symbol *lbl ;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* signed or unsigned */
 	if (SPEC_USIGN(opetype)) {
@@ -3431,6 +3552,7 @@ static void genMod (iCode *ic)
 	operand *right = IC_RIGHT(ic);
 	operand *result= IC_RESULT(ic);  
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* assign the amsops */
 	aopOp (left,ic,FALSE);
@@ -3470,6 +3592,7 @@ note: May need to add parameter to indicate when a variable is in bit space.
 static void genIfxJump (iCode *ic, char *jval)
 {
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* if true label then we jump if condition
 	supplied is true */
@@ -3514,6 +3637,7 @@ static void genIfxJump (iCode *ic, char *jval)
 /*-----------------------------------------------------------------*/
 static void genSkip(iCode *ifx,int status_bit)
 {
+	FENTRY;
 	if(!ifx)
 		return;
 	
@@ -3564,6 +3688,7 @@ static void genSkip(iCode *ifx,int status_bit)
 /*-----------------------------------------------------------------*/
 static void genSkipc(resolvedIfx *rifx)
 {
+	FENTRY;
 	if(!rifx)
 		return;
 	
@@ -3581,6 +3706,7 @@ static void genSkipc(resolvedIfx *rifx)
 /*-----------------------------------------------------------------*/
 static void genSkipz2(resolvedIfx *rifx, int invert_condition)
 {
+	FENTRY;
 	if(!rifx)
 		return;
 	
@@ -3598,6 +3724,7 @@ static void genSkipz2(resolvedIfx *rifx, int invert_condition)
 /*-----------------------------------------------------------------*/
 static void genSkipz(iCode *ifx, int condition)
 {
+	FENTRY;
 	if(!ifx)
 		return;
 	
@@ -3622,6 +3749,7 @@ static void genSkipz(iCode *ifx, int condition)
 /*-----------------------------------------------------------------*/
 static void genSkipCond(resolvedIfx *rifx,operand *op, int offset, int bit)
 {
+	FENTRY;
 	if(!rifx)
 		return;
 	
@@ -3675,6 +3803,8 @@ static void genCmp (operand *left,operand *right,
 	resolvedIfx rFalseIfx;
 	//  resolvedIfx rTrueIfx;
 	symbol *truelbl;
+
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/*
 	if(ifx) {
@@ -4333,6 +4463,7 @@ static void genCmpGt (iCode *ic, iCode *ifx)
 	sym_link *letype , *retype;
 	int sign ;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	left = IC_LEFT(ic);
 	right= IC_RIGHT(ic);
@@ -4362,6 +4493,7 @@ static void genCmpLt (iCode *ic, iCode *ifx)
 	sym_link *letype , *retype;
 	int sign ;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	left = IC_LEFT(ic);
 	right= IC_RIGHT(ic);
@@ -4390,12 +4522,14 @@ static void genc16bit2lit(operand *op, int lit, int offset)
 {
 	int i;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d, lit = %d",__FUNCTION__,__LINE__,lit);
 	if( (lit&0xff) == 0) 
 		i=1;
 	else
 		i=0;
 	
+	emitpComment ("lit: %i, byte: %i, offset: %i, i: %i\n", lit, BYTEofLONG(lit,i), offset, i);
 	switch( BYTEofLONG(lit,i)) { 
 	case 0:
 		emitpcode(POC_MOVFW,popGet(AOP(op),offset+i));
@@ -4413,6 +4547,7 @@ static void genc16bit2lit(operand *op, int lit, int offset)
 	
 	i ^= 1;
 	
+	emitpComment ("lit: %i, byte: %i, offset: %i, i: %i\n", lit, BYTEofLONG(lit,i), offset, i);
 	switch( BYTEofLONG(lit,i)) { 
 	case 0:
 		emitpcode(POC_IORFW,popGet(AOP(op),offset+i));
@@ -4447,6 +4582,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 	symbol *lbl;
 	
 	unsigned long lit = 0L;
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	DEBUGpic14_AopType(__LINE__,left,right,result);
 	if(result)
@@ -4659,6 +4795,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
 	unsigned long lit = 0L;
 	int size,offset=0;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	if(ifx)
@@ -4952,6 +5089,7 @@ release:
 /*-----------------------------------------------------------------*/
 static iCode *ifxForOp ( operand *op, iCode *ic )
 {
+	FENTRY;
 	/* if true symbol then needs to be assigned */
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if (IS_TRUE_SYMOP(op))
@@ -4998,6 +5136,7 @@ static void genAndOp (iCode *ic)
 	operand *left,*right, *result;
 	/*     symbol *tlbl; */
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* note here that && operations that are in an
 	if statement are taken away by backPatchLabels
@@ -5049,6 +5188,7 @@ static void genOrOp (iCode *ic)
 	/* note here that || operations that are in an
 	if statement are taken away by backPatchLabels
 	only those used in arthmetic operations remain */
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp((left=IC_LEFT(ic)),ic,FALSE);
 	aopOp((right=IC_RIGHT(ic)),ic,FALSE);
@@ -5098,6 +5238,7 @@ static int isLiteralBit(unsigned long lit)
 		0x10000000L,0x20000000L,0x40000000L,0x80000000L};
 	int idx;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	for(idx = 0; idx < 32; idx++)
 		if(lit == pw[idx])
@@ -5110,6 +5251,7 @@ static int isLiteralBit(unsigned long lit)
 /*-----------------------------------------------------------------*/
 static void continueIfTrue (iCode *ic)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(IC_TRUE(ic))
 		pic14_emitcode("ljmp","%05d_DS_",IC_TRUE(ic)->key+100);
@@ -5121,6 +5263,7 @@ static void continueIfTrue (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void jumpIfTrue (iCode *ic)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(!IC_TRUE(ic))
 		pic14_emitcode("ljmp","%05d_DS_",IC_FALSE(ic)->key+100);
@@ -5132,6 +5275,7 @@ static void jumpIfTrue (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void jmpTrueOrFalse (iCode *ic, symbol *tlbl)
 {
+	FENTRY;
 	// ugly but optimized by peephole
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(IC_TRUE(ic)){
@@ -5159,7 +5303,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 	int bytelit = 0;
 	resolvedIfx rIfx;
 	
-	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp((left = IC_LEFT(ic)),ic,FALSE);
 	aopOp((right= IC_RIGHT(ic)),ic,FALSE);
@@ -5423,6 +5567,7 @@ static void genOr (iCode *ic, iCode *ifx)
 	int size, offset=0;
 	unsigned long lit = 0L;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	aopOp((left = IC_LEFT(ic)),ic,FALSE);
@@ -5717,6 +5862,7 @@ static void genXor (iCode *ic, iCode *ifx)
 	int size, offset=0;
 	unsigned long lit = 0L;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	aopOp((left = IC_LEFT(ic)),ic,FALSE);
@@ -5958,6 +6104,7 @@ static void genInline (iCode *ic)
 {
   char *buffer, *bp, *bp1;
 
+  FENTRY;
   DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
   _G.inLine += (!options.asmpeep);
@@ -6004,6 +6151,7 @@ static void genRRC (iCode *ic)
 	operand *left , *result ;
 	int size, offset = 0, same;
 	
+	FENTRY;
 	/* rotate right with carry */
 	left = IC_LEFT(ic);
 	result=IC_RESULT(ic);
@@ -6046,6 +6194,7 @@ static void genRLC (iCode *ic)
 	int size, offset = 0;
 	int same;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* rotate right with carry */
 	left = IC_LEFT(ic);
@@ -6093,6 +6242,7 @@ static void genGetHbit (iCode *ic)
 	aopOp (left,ic,FALSE);
 	aopOp (result,ic,FALSE);
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* get the highest order byte into a */
 	MOVA(aopGet(AOP(left),AOP_SIZE(left) - 1,FALSE,FALSE));
@@ -6116,6 +6266,7 @@ static void genGetHbit (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void AccRol (operand *op,int offset,int shCount)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	shCount &= 0x0007;              // shCount : 0..7
 	switch(shCount){
@@ -6165,6 +6316,7 @@ static void AccRol (operand *op,int offset,int shCount)
 /*-----------------------------------------------------------------*/
 static void AccLsh (operand *op,int offset,int shCount)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(shCount != 0){
 		/*
@@ -6199,6 +6351,7 @@ static void AccLsh (operand *op,int offset,int shCount)
 /*-----------------------------------------------------------------*/
 static void AccRsh (operand *op,int offset,int shCount)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(shCount != 0){
 		if(shCount == 1){
@@ -6253,6 +6406,7 @@ static void shiftR1Left2ResultSigned (operand *left, int offl,
 {
 	int same;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	same = ((left == result) || (AOP(left) == AOP(result))) && (offl == offr);
@@ -6364,6 +6518,7 @@ static void shiftR1Left2Result (operand *left, int offl,
 {
 	int same;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	same = ((left == result) || (AOP(left) == AOP(result))) && (offl == offr);
@@ -6457,6 +6612,7 @@ static void shiftL1Left2Result (operand *left, int offl,
 	int same;
 	
 	//    char *l;
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	same = ((left == result) || (AOP(left) == AOP(result))) && (offl==offr);
@@ -6528,6 +6684,7 @@ static void movLeft2Result (operand *left, int offl,
 							operand *result, int offr)
 {
 	char *l;
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(!pic14_sameRegs(AOP(left),AOP(result)) || (offl != offr)){
 		l = aopGet(AOP(left),offl,FALSE,FALSE);
@@ -6548,7 +6705,7 @@ static void movLeft2Result (operand *left, int offl,
 static void shiftL2Left2Result (operand *left, int offl,
 								operand *result, int offr, int shCount)
 {
-	
+	FENTRY;
 	
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
@@ -6678,6 +6835,7 @@ static void shiftR2Left2Result (operand *left, int offl,
 {
 	int same=0;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	same = pic14_sameRegs(AOP(result), AOP(left));
 	
@@ -6827,6 +6985,7 @@ static void shiftR2Left2Result (operand *left, int offl,
 static void shiftLLeftOrResult (operand *left, int offl,
 								operand *result, int offr, int shCount)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
 	/* shift left accumulator */
@@ -6843,6 +7002,7 @@ static void shiftLLeftOrResult (operand *left, int offl,
 static void shiftRLeftOrResult (operand *left, int offl,
 								operand *result, int offr, int shCount)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	MOVA(aopGet(AOP(left),offl,FALSE,FALSE));
 	/* shift right accumulator */
@@ -6858,6 +7018,7 @@ static void shiftRLeftOrResult (operand *left, int offl,
 /*-----------------------------------------------------------------*/
 static void genlshOne (operand *result, operand *left, int shCount)
 {       
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	shiftL1Left2Result(left, LSB, result, LSB, shCount);
 }
@@ -6869,6 +7030,7 @@ static void genlshTwo (operand *result,operand *left, int shCount)
 {
 	int size;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	size = pic14_getDataSize(result);
 	
@@ -6903,6 +7065,7 @@ static void shiftLLong (operand *left, operand *result, int offr )
 	char *l;
 	int size = AOP_SIZE(result);
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(size >= LSB+offr){
 		l = aopGet(AOP(left),LSB,FALSE,FALSE);
@@ -6963,6 +7126,7 @@ static void genlshFour (operand *result, operand *left, int shCount)
 {
 	int size;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	size = AOP_SIZE(result);
 	
@@ -7050,6 +7214,7 @@ static void genLeftShiftLiteral (operand *left,
 	int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
 	int size;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	freeAsmop(right,NULL,ic,TRUE);
 	
@@ -7103,6 +7268,7 @@ static void genMultiAsm( PIC_OPCODE poc, operand *reg, int size, int endian)
 	
 	int offset = 0;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	if(!reg)
@@ -7133,6 +7299,7 @@ static void genLeftShift (iCode *ic)
 	symbol *tlbl , *tlbl1;
 	pCodeOp *pctemp;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	right = IC_RIGHT(ic);
@@ -7303,6 +7470,7 @@ release:
 static void genrshOne (operand *result, operand *left,
 					   int shCount, int sign)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	shiftR1Left2Result(left, LSB, result, LSB, shCount, sign);
 }
@@ -7313,6 +7481,7 @@ static void genrshOne (operand *result, operand *left,
 static void genrshTwo (operand *result,operand *left,
 					   int shCount, int sign)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* if shCount >= 8 */
 	if (shCount >= 8) {
@@ -7343,6 +7512,7 @@ static void genrshTwo (operand *result,operand *left,
 static void shiftRLong (operand *left, int offl,
 						operand *result, int sign)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(!sign)
 		pic14_emitcode("clr","c");
@@ -7376,6 +7546,7 @@ static void shiftRLong (operand *left, int offl,
 static void genrshFour (operand *result, operand *left,
 						int shCount, int sign)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* if shifting more that 3 bytes */
 	if(shCount >= 24 ) {
@@ -7441,6 +7612,7 @@ static void genRightShiftLiteral (operand *left,
 	int shCount = (int) floatFromVal (AOP(right)->aopu.aop_lit);
 	int lsize,res_size;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	freeAsmop(right,NULL,ic,TRUE);
 	
@@ -7524,6 +7696,7 @@ static void genSignedRightShift (iCode *ic)
 	
 	/* we do it the hard way put the shift count in b
 	and loop thru preserving the sign */
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	right = IC_RIGHT(ic);
@@ -7660,6 +7833,7 @@ static void genRightShift (iCode *ic)
 	char *l;
 	symbol *tlbl, *tlbl1 ;
 	
+	FENTRY;
 	/* if signed then we do it the hard way preserve the
 	sign bit moving it inwards */
 	retype = getSpec(operandType(IC_RESULT(ic)));
@@ -7779,6 +7953,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 	int blen;             /* bitfield length */
 	int bstr;             /* bitfield starting bit within byte */
 
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	etype = getSpec(operandType(result));
 	rsize = getSize (operandType (result));
@@ -7910,17 +8085,17 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 	return ;
 }
 
-#if 0
+#if 1
 /*-----------------------------------------------------------------*/
 /* genDataPointerGet - generates code when ptr offset is known     */
 /*-----------------------------------------------------------------*/
 static void genDataPointerGet (operand *left, 
-							   operand *result, 
-							   iCode *ic)
+	operand *result, 
+	iCode *ic)
 {
 	int size , offset = 0;
-	
-	
+		
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	
@@ -7928,16 +8103,20 @@ static void genDataPointerGet (operand *left,
 	* address, but different types. for the pic code, we could omit
 	* the following
 	*/
-	
 	aopOp(result,ic,TRUE);
+	
+	if (pic14_sameRegs (AOP(left), AOP(result)))
+		return;
 	
 	DEBUGpic14_AopType(__LINE__,left,NULL,result);
 	
-	emitpcode(POC_MOVFW, popGet(AOP(left),0));
+	//emitpcode(POC_MOVFW, popGet(AOP(left),0));
 	
 	size = AOP_SIZE(result);
+	if (size > AOP_SIZE(left)) size = AOP_SIZE(left);
 	
 	while (size--) {
+		emitpcode(POC_MOVFW, popGet(AOP(left),offset));
 		emitpcode(POC_MOVWF, popGet(AOP(result),offset));
 		offset++;
 	}
@@ -7959,7 +8138,7 @@ static void genNearPointerGet (operand *left,
 	sym_link *retype= getSpec(rtype);      /* bitfield type information */
 	int direct = 0;
 
-	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	
@@ -7972,7 +8151,7 @@ static void genNearPointerGet (operand *left,
 	if (AOP_TYPE(left) == AOP_PCODE &&  //AOP_TYPE(left) == AOP_IMMD &&
 		!IS_BITVAR(retype)         &&
 		DCL_TYPE(ltype) == POINTER) {
-		//genDataPointerGet (left,result,ic);
+		genDataPointerGet (left,result,ic);
 		return ;
 	}
 	
@@ -8063,6 +8242,7 @@ static void genPagedPointerGet (operand *left,
 	char *rname ;
 	sym_link *rtype, *retype;    
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	rtype = operandType(result);
@@ -8141,6 +8321,7 @@ static void genFarPointerGet (operand *left,
 	int size, offset ;
 	sym_link *retype = getSpec(operandType(result));
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	aopOp(left,ic,FALSE);
@@ -8242,6 +8423,7 @@ static void genGenPointerGet (operand *left,
 	int size, offset ;
 	sym_link *retype = getSpec(operandType(result));
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp(left,ic,FALSE);
 	aopOp(result,ic,FALSE);
@@ -8298,6 +8480,7 @@ static void genConstPointerGet (operand *left,
 	PIC_OPCODE poc;
 	pCodeOp *pcop;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp(left,ic,FALSE);
 	aopOp(result,ic,FALSE);
@@ -8338,6 +8521,7 @@ static void genPointerGet (iCode *ic)
 	sym_link *type, *etype;
 	int p_type;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	left = IC_LEFT(ic);
@@ -8422,7 +8606,8 @@ static void genPointerGet (iCode *ic)
 static void
 emitPtrByteGet (char *rname, int p_type, bool preserveAinB)
 {
-	switch (p_type)
+    FENTRY;
+    switch (p_type)
     {
     case IPOINTER:
     case POINTER:
@@ -8471,7 +8656,8 @@ emitPtrByteGet (char *rname, int p_type, bool preserveAinB)
 static void
 emitPtrByteSet (char *rname, int p_type, char *src)
 {
-	switch (p_type)
+    FENTRY;
+    switch (p_type)
     {
     case IPOINTER:
     case POINTER:
@@ -8513,7 +8699,8 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,char *rna
 	int bstr;             /* bitfield starting bit within byte */
 	int litval;           /* source literal value (if AOP_LIT) */
 	unsigned char mask;   /* bitmask within current byte */
-	
+
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	blen = SPEC_BLEN (etype);
@@ -8670,6 +8857,7 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,char *rna
 /* SetIrp - Set IRP bit                                            */
 /*-----------------------------------------------------------------*/
 void SetIrp(operand *result) {
+	FENTRY;
 	if (AOP_TYPE(result) == AOP_LIT) {
 		unsigned lit = (unsigned)operandLitValue(result);
 		emitpcode((lit&0x100)?POC_BSF:POC_BCF, popCopyGPR2Bit(PCOP(&pc_status),PIC_IRP_BIT));
@@ -8691,12 +8879,13 @@ void SetIrp(operand *result) {
 /* genDataPointerSet - remat pointer to data space                 */
 /*-----------------------------------------------------------------*/
 static void genDataPointerSet(operand *right,
-							  operand *result,
-							  iCode *ic)
+	operand *result,
+	iCode *ic)
 {
 	int size, offset = 0 ;
 	char *l, buffer[256];
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp(right,ic,FALSE);
 	
@@ -8712,9 +8901,10 @@ static void genDataPointerSet(operand *right,
 	
 	// tsd, was l+1 - the underline `_' prefix was being stripped
 	while (size--) {
+		emitpComment ("%s:%u: size=%i, offset=%i", __FILE__,__LINE__, size, offset);
 		if (offset) {
 			sprintf(buffer,"(%s + %d)",l,offset);
-			fprintf(stderr,"oops  %s\n",buffer);
+			fprintf(stderr,"%s:%i: oops  %s (%i, AOP_LIT=%i)\n",__FILE__,__LINE__,buffer, AOP_TYPE(right), AOP_LIT);
 		} else
 			sprintf(buffer,"%s",l);
 		
@@ -8723,13 +8913,13 @@ static void genDataPointerSet(operand *right,
 			lit = lit >> (8*offset);
 			if(lit&0xff) {
 				emitpcode(POC_MOVLW, popGetLit(lit&0xff));
-				emitpcode(POC_MOVWF, popGet(AOP(result),0));
+				emitpcode(POC_MOVWF, popGet(AOP(result),offset));
 			} else {
-				emitpcode(POC_CLRF, popGet(AOP(result),0));
+				emitpcode(POC_CLRF, popGet(AOP(result),offset));
 			}
 		} else {
 			emitpcode(POC_MOVFW, popGet(AOP(right),offset));
-			emitpcode(POC_MOVWF, popGet(AOP(result),0));
+			emitpcode(POC_MOVWF, popGet(AOP(result),offset));
 		}
 		
 		offset++;
@@ -8753,6 +8943,7 @@ static void genNearPointerSet (operand *right,
 	int direct = 0;
 	
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp(result,ic,FALSE);
 	
@@ -8864,6 +9055,7 @@ static void genPagedPointerSet (operand *right,
 	char *rname , *l;
 	sym_link *retype;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	retype= getSpec(operandType(right));
@@ -8942,6 +9134,7 @@ static void genFarPointerSet (operand *right,
 	int size, offset ;
 	sym_link *retype = getSpec(operandType(right));
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp(result,ic,FALSE);
 	
@@ -8993,6 +9186,7 @@ static void genGenPointerSet (operand *right,
 	sym_link *retype = getSpec(operandType(right));
 	sym_link *letype = getSpec (ptype);
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	aopOp(result,ic,FALSE);
@@ -9058,6 +9252,7 @@ static void genPointerSet (iCode *ic)
 	sym_link *type, *etype;
 	int p_type;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	right = IC_RIGHT(ic);
@@ -9126,6 +9321,7 @@ static void genIfx (iCode *ic, iCode *popIc)
 	operand *cond = IC_COND(ic);
 	int isbit =0;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	aopOp(cond,ic,FALSE);
@@ -9166,6 +9362,7 @@ static void genAddrOf (iCode *ic)
 	operand *right, *result, *left;
 	int size, offset ;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	
@@ -9238,6 +9435,7 @@ static void genAssign (iCode *ic)
 	result = IC_RESULT(ic);
 	right  = IC_RIGHT(ic) ;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	/* if they are the same */
@@ -9361,6 +9559,7 @@ static void genJumpTab (iCode *ic)
 	symbol *jtab;
 	char *l;
 	
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	aopOp(IC_JTCOND(ic),ic,FALSE);
@@ -9410,6 +9609,7 @@ iCode tree, I'm going to not be using this routine :(.
 */
 static int genMixedOperation (iCode *ic)
 {
+	FENTRY;
 #if 0
 	operand *result = IC_RESULT(ic);
 	sym_link *ctype = operandType(IC_LEFT(ic));
@@ -9539,6 +9739,7 @@ static void genCast (iCode *ic)
 	operand *right = IC_RIGHT(ic);
 	int size, offset ;
 	
+	FENTRY;
 	DEBUGpic14_emitcode("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* if they are equivalent then do nothing */
 	if (operandsEqu(IC_RESULT(ic),IC_RIGHT(ic)))
@@ -9626,9 +9827,9 @@ static void genCast (iCode *ic)
 			DEBUGpic14_emitcode ("; ***","%d - result is const pointer",__LINE__);
 		
 		if ((AOP_TYPE(right) == AOP_PCODE) && AOP(right)->aopu.pcop->type == PO_IMMEDIATE) {
-			emitpcode(POC_MOVLW, popGet(AOP(right),0));
+			emitpcode(POC_MOVLW, popGetAddr(AOP(right),0));
 			emitpcode(POC_MOVWF, popGet(AOP(result),0));
-			emitpcode(POC_MOVLW, popGet(AOP(right),1));
+			emitpcode(POC_MOVLW, popGetAddr(AOP(right),1));
 			emitpcode(POC_MOVWF, popGet(AOP(result),1));
 			if(AOP_SIZE(result) <2)
 				fprintf(stderr,"%d -- result is not big enough to hold a ptr\n",__LINE__);
@@ -9695,7 +9896,7 @@ static void genCast (iCode *ic)
 					DEBUGpic14_emitcode("; ***","%s  %d - pointer cast3",__FUNCTION__,__LINE__);
 					if ((AOP_TYPE(right) == AOP_PCODE) && 
 						AOP(right)->aopu.pcop->type == PO_IMMEDIATE) {
-						emitpcode(POC_MOVLW, popGet(AOP(right),offset));
+						emitpcode(POC_MOVLW, popGetAddr(AOP(right),offset));
 						emitpcode(POC_MOVWF, popGet(AOP(result),offset));
 					} else { 
 						aopPut(AOP(result),
@@ -9809,6 +10010,7 @@ release:
 static int genDjnz (iCode *ic, iCode *ifx)
 {
 	symbol *lbl, *lbl1;
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	if (!ifx)
@@ -9870,6 +10072,7 @@ static int genDjnz (iCode *ic, iCode *ifx)
 /*-----------------------------------------------------------------*/
 static void genReceive (iCode *ic)
 {
+	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
 	if (isOperandInFarSpace(IC_RESULT(ic)) &&
@@ -9907,6 +10110,7 @@ static void genReceive (iCode *ic)
 static void
 genDummyRead (iCode * ic)
 {
+	FENTRY;
 	pic14_emitcode ("; genDummyRead","");
 	pic14_emitcode ("; not implemented","");
 	
@@ -9930,6 +10134,7 @@ void genpic14Code (iCode *lic)
 	iCode *ic;
 	int cln = 0;
 	
+	FENTRY;
 	lineHead = lineCurr = NULL;
 	
 	pb = newpCodeChain(GcurMemmap,0,newpCodeCharP("; Starting pCode block"));
@@ -9945,28 +10150,20 @@ void genpic14Code (iCode *lic)
 	
 	for (ic = lic ; ic ; ic = ic->next ) {
 		
-		DEBUGpic14_emitcode(";ic","");
-		if ( cln != ic->lineno ) {
-			if ( options.debug ) {
-				debugFile->writeCLine (ic);
-			}
-			/*
-			pic14_emitcode("#CSRC","%s %d",FileBaseName(ic->filename),ic->lineno);
-			pic14_emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno, 
-			printCLine(ic->filename, ic->lineno));
-			*/
-			if (!options.noCcodeInAsm) {
-				addpCode2pBlock(pb,
-					newpCodeCSource(ic->lineno, 
-					ic->filename, 
-					printCLine(ic->filename, ic->lineno)));
-			}
-			
-			cln = ic->lineno ;
+		//DEBUGpic14_emitcode(";ic","");
+		//fprintf (stderr, "in ic loop\n");
+		//pic14_emitcode ("", ";\t%s:%d: %s", ic->filename,
+		//ic->lineno, printCLine(ic->filename, ic->lineno));
+		
+		if (!options.noCcodeInAsm && (cln != ic->lineno)) {
+		  cln = ic->lineno;
+		  //fprintf (stderr, "%s\n", printCLine (ic->filename, ic->lineno));
+		  emitpComment ("[C-SRC] %s:%d: %s", ic->filename, cln, printCLine (ic->filename, cln));
 		}
 		
-		// if you want printILine too, look at ../mcs51/gen.c, i don't understand this :)
-		
+		if (options.iCodeInAsm) {
+		  emitpComment ("[ICODE] %s:%d: %s", ic->filename, ic->lineno, printILine (ic));
+		}
 		/* if the result is marked as
 		spilt and rematerializable or code for
 		this has already been generated then

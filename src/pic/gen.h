@@ -26,6 +26,15 @@
 #ifndef SDCCGENPIC14_H
 #define SDCCGENPIC14_H
 
+#define FENTRY do { \
+	/*fprintf (stderr, "%s:%u:%s: *{*\n", __FILE__, __LINE__, __FUNCTION__);*/	\
+	emitpComment ("; %s:%u:%s *{*\n", __FILE__, __LINE__, __FUNCTION__);	\
+} while (0)
+#define FEXIT do { \
+	/*fprintf (stderr, "%s:%u:%s: *}*\n", __FILE__, __LINE__, __FUNCTION__);*/	\
+	emitpComment ("; %s:%u:%s *}*\n", __FILE__, __LINE__, __FUNCTION__);	\
+} while (0)
+
 struct pCodeOp;
 
 enum
@@ -136,6 +145,7 @@ extern unsigned fReturnSizePic;
 
 int pic14_getDataSize(operand *op);
 void emitpcode(PIC_OPCODE poc, pCodeOp *pcop);
+void emitpComment (const char *fmt, ...);
 void emitpLabel(int key);
 void pic14_emitcode (char *inst,char *fmt, ...);
 void DEBUGpic14_emitcode (char *inst,char *fmt, ...);
@@ -162,6 +172,7 @@ pCodeOp *popGetLit(unsigned int lit);
 pCodeOp *popGetWithString(char *str, int isExtern);
 pCodeOp *popRegFromString(char *str, int size, int offset);
 pCodeOp *popGet (asmop *aop, int offset);//, bool bit16, bool dname);
+pCodeOp *popGetAddr (asmop *aop, int offset);
 pCodeOp *popGetTempReg(void);
 void popReleaseTempReg(pCodeOp *pcop);
 

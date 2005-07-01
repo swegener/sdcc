@@ -1,3 +1,30 @@
+2005-07-01 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.h: added prototypes emitpComment, popGetAddr and
+	  debugging .asm-output macros FENRY + FEXIT
+	* src/pic/gen.c (Safe_vsnprintf): NEW, is there a more generic
+	  way... I wonder...
+	* (emitpComment): NEW, printf to pCode
+	* (popGet): added assert on too large offsets, fixed PO_IMMEDIATE's
+	  offset handling
+	* (popGetAddr): NEW, variant of popGet to access an immediates
+	  high(er) bytes instead of the n'th byte of memory they reference,
+	  replaced popGet with popGetAddr where neccessary
+	* (genDataPointerGet): reactivated and fixed implementation
+	* (genNearPointerGet): enabled call to genDataPointerGet, fixes array-
+	  accesses
+	* (genDataPointerSet): fixed multibyte assignments
+	* (genpic14Code): fixed --i-code-in-asm handling
+	* src/pic/genarith.c: fixed PO_IMMEDIATE issue using popGetAddr,
+	* (genPlus): fixed index-out-of-bounds error
+	* src/pic/pcode.c (get_op): fixed PO_IMMEDIATE's index/offset handling
+	* src/pic/ralloc.c: added debugging output macro FENTRY2
+	* (spillThis): fixed indentation, enbraced for-body for clarity
+	* (rematStr): commented out as now unused
+	* (regTypeNum): commented out special spill case (overwrites
+	  arbitrary values)
+	* fixes bugs #1229346, #1216476 (both arrays) and #1115667 (SIGSEGV)
+
 2005-06-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: documented sfr16/sfr32,
@@ -84,7 +111,7 @@
 	  device/include/pic16/pic18f2455.h: NEW
 	* device/include/pic16/pic18fregs.h,
 	  device/lib/pic16/pics.all,
-	  src/pic/device.c: added 18f2455
+	  src/pic16/device.c: added 18f2455
 	* device/lib/pic16/libdev/pic18f[68][567]20.c,
 	  device/include/pic16/{pic18f[68][567].h,usart.h}:
 	  replaced MULTIPLE_USARTS define with more relaible

@@ -1,5 +1,13 @@
 2005-07-04 Raphael Neider <rneider AT web.de>
 
+	* src/pic/gen.c (genPointerGet): handle pointers to CONST values
+	  like CODE pointers, fixes #1115683
+	* src/pic/pcode.c (DoBankSelect): forget LastRegIdx during function
+	  call, fixes bugs #1232211, #1228110,
+	  fixed wrong casts to pCodeFlow from pCodeInstructions
+
+2005-07-04 Raphael Neider <rneider AT web.de>
+
 	* src/pic/gen.c (popGet): changed assert to allow for
 	  bit operands
 	* (popGetAddr): changed signature to provide

@@ -8827,7 +8827,7 @@ static void genPointerGet (iCode *ic)
 		break;
 		
 	case GPOINTER:
-		if (IS_CODEPTR(type) || IS_PTR_CONST(type))
+		if (IS_CODEPTR(type) || IS_PTR_CONST(type) || SPEC_CONST(etype))
 			genConstPointerGet (left,result,ic);
 		else
 			genGenPointerGet (left,result,ic);

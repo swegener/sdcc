@@ -4515,9 +4515,11 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 		}
 	}
 	
+#if 1
 	if (LastRegIdx == reg->rIdx) // If this is the same register as last time then it is in same bank
 		return cur_bank;
 	LastRegIdx = reg->rIdx;
+#endif
 	
 	if (reg->isFixed) {
 		bank = REG_BANK(reg);
@@ -4628,6 +4630,7 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 	
 	if (isCALL(pc)) {
 		pCode *pcf = findFunction(get_op_from_instruction(PCI(pc)));
+		LastRegIdx = -1; /* do not know which register is touched in the called function... */
 		if (pcf && isPCF(pcf)) {
 			pCode *pcfr;
 			int rbank = 'U'; // Undetermined
@@ -4637,9 +4640,9 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 				if (isPCI(pcfr)) {
 					if ((PCI(pcfr)->op==POC_RETURN) || (PCI(pcfr)->op==POC_RETLW)) {
 						if (rbank == 'U')
-							rbank = PCFL(pcfr)->lastBank;
+							rbank = PCI(pcfr)->pcflow->lastBank;
 						else
-							if (rbank != PCFL(pcfr)->lastBank)
+							if (rbank != PCI(pcfr)->pcflow->lastBank)
 								return -1; // Unknown bank - multiple returns with different banks
 					}
 				}
@@ -4651,6 +4654,8 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 			/* Extern functions may use registers in different bank - must call banksel */
 			return -1; /* Unknown bank */
 		}
+		/* play safe... */
+		return -1;
 	}
 	
 	if ((isPCI(pc)) && (PCI(pc)->op == POC_BANKSEL)) {

@@ -26,13 +26,19 @@
 #ifndef SDCCGENPIC14_H
 #define SDCCGENPIC14_H
 
-#define FENTRY do { \
+extern int debug_verbose;
+
+#define FENTRY do { 									\
 	/*fprintf (stderr, "%s:%u:%s: *{*\n", __FILE__, __LINE__, __FUNCTION__);*/	\
-	emitpComment ("; %s:%u:%s *{*\n", __FILE__, __LINE__, __FUNCTION__);	\
+	if (options.debug || debug_verbose) {						\
+		emitpComment ("; %s:%u:%s *{*", __FILE__, __LINE__, __FUNCTION__);	\
+	}										\
 } while (0)
-#define FEXIT do { \
+#define FEXIT do { 									\
 	/*fprintf (stderr, "%s:%u:%s: *}*\n", __FILE__, __LINE__, __FUNCTION__);*/	\
-	emitpComment ("; %s:%u:%s *}*\n", __FILE__, __LINE__, __FUNCTION__);	\
+	if (options.debug || debug.verbose) {						\
+		emitpComment ("; %s:%u:%s *}*", __FILE__, __LINE__, __FUNCTION__);	\
+	}										\
 } while (0)
 
 struct pCodeOp;
@@ -172,7 +178,7 @@ pCodeOp *popGetLit(unsigned int lit);
 pCodeOp *popGetWithString(char *str, int isExtern);
 pCodeOp *popRegFromString(char *str, int size, int offset);
 pCodeOp *popGet (asmop *aop, int offset);//, bool bit16, bool dname);
-pCodeOp *popGetAddr (asmop *aop, int offset);
+pCodeOp *popGetAddr (asmop *aop, int offset, int index);
 pCodeOp *popGetTempReg(void);
 void popReleaseTempReg(pCodeOp *pcop);
 
@@ -186,6 +192,7 @@ void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
 void mov2w (asmop *aop, int offset);
 const char *pCodeOpType(  pCodeOp *pcop);
 
-
+int aop_isLitLike (asmop *aop);
+int op_isLitLike (operand *op);
 
 #endif

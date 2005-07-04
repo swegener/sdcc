@@ -5,23 +5,23 @@
 	Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 	Added Pic Port T.scott Dattalo scott@dattalo.com (2000)
 	
-	  This program is free software; you can redistribute it and/or modify it
-	  under the terms of the GNU General Public License as published by the
-	  Free Software Foundation; either version 2, or (at your option) any
-	  later version.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 	  
-		This program is distributed in the hope that it will be useful,
-		but WITHOUT ANY WARRANTY; without even the implied warranty of
-		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-		GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 		
-		  You should have received a copy of the GNU General Public License
-		  along with this program; if not, write to the Free Software
-		  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 		  
-			In other words, you are welcome to use, share and improve this program.
-			You are forbidden to forbid anyone else to use, share and improve
-			what you give them.   Help stamp out software-hoarding!  
+  In other words, you are welcome to use, share and improve this program.
+  You are forbidden to forbid anyone else to use, share and improve
+  what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
 #include "common.h"
@@ -193,208 +193,107 @@ static char *
 
 	switch (op)
 	{
-	case IDENTIFIER:
-		return "IDENTIFIER";
-	case TYPE_NAME:
-		return "TYPE_NAME";
-	case CONSTANT:
-		return "CONSTANT";
-	case STRING_LITERAL:
-		return "STRING_LITERAL";
-	case SIZEOF:
-		return "SIZEOF";
-	case PTR_OP:
-		return "PTR_OP";
-	case INC_OP:
-		return "INC_OP";
-	case DEC_OP:
-		return "DEC_OP";
-	case LEFT_OP:
-		return "LEFT_OP";
-	case RIGHT_OP:
-		return "RIGHT_OP";
-	case LE_OP:
-		return "LE_OP";
-	case GE_OP:
-		return "GE_OP";
-	case EQ_OP:
-		return "EQ_OP";
-	case NE_OP:
-		return "NE_OP";
-	case AND_OP:
-		return "AND_OP";
-	case OR_OP:
-		return "OR_OP";
-	case MUL_ASSIGN:
-		return "MUL_ASSIGN";
-	case DIV_ASSIGN:
-		return "DIV_ASSIGN";
-	case MOD_ASSIGN:
-		return "MOD_ASSIGN";
-	case ADD_ASSIGN:
-		return "ADD_ASSIGN";
-	case SUB_ASSIGN:
-		return "SUB_ASSIGN";
-	case LEFT_ASSIGN:
-		return "LEFT_ASSIGN";
-	case RIGHT_ASSIGN:
-		return "RIGHT_ASSIGN";
-	case AND_ASSIGN:
-		return "AND_ASSIGN";
-	case XOR_ASSIGN:
-		return "XOR_ASSIGN";
-	case OR_ASSIGN:
-		return "OR_ASSIGN";
-	case TYPEDEF:
-		return "TYPEDEF";
-	case EXTERN:
-		return "EXTERN";
-	case STATIC:
-		return "STATIC";
-	case AUTO:
-		return "AUTO";
-	case REGISTER:
-		return "REGISTER";
-	case CODE:
-		return "CODE";
-	case EEPROM:
-		return "EEPROM";
-	case INTERRUPT:
-		return "INTERRUPT";
-	case SFR:
-		return "SFR";
-	case AT:
-		return "AT";
-	case SBIT:
-		return "SBIT";
-	case REENTRANT:
-		return "REENTRANT";
-	case USING:
-		return "USING";
-	case XDATA:
-		return "XDATA";
-	case DATA:
-		return "DATA";
-	case IDATA:
-		return "IDATA";
-	case PDATA:
-		return "PDATA";
-	case VAR_ARGS:
-		return "VAR_ARGS";
-	case CRITICAL:
-		return "CRITICAL";
-	case NONBANKED:
-		return "NONBANKED";
-	case BANKED:
-		return "BANKED";
-	case CHAR:
-		return "CHAR";
-	case SHORT:
-		return "SHORT";
-	case INT:
-		return "INT";
-	case LONG:
-		return "LONG";
-	case SIGNED:
-		return "SIGNED";
-	case UNSIGNED:
-		return "UNSIGNED";
-	case FLOAT:
-		return "FLOAT";
-	case DOUBLE:
-		return "DOUBLE";
-	case CONST:
-		return "CONST";
-	case VOLATILE:
-		return "VOLATILE";
-	case VOID:
-		return "VOID";
-	case BIT:
-		return "BIT";
-	case STRUCT:
-		return "STRUCT";
-	case UNION:
-		return "UNION";
-	case ENUM:
-		return "ENUM";
-	case ELIPSIS:
-		return "ELIPSIS";
-	case RANGE:
-		return "RANGE";
-	case FAR:
-		return "FAR";
-	case CASE:
-		return "CASE";
-	case DEFAULT:
-		return "DEFAULT";
-	case IF:
-		return "IF";
-	case ELSE:
-		return "ELSE";
-	case SWITCH:
-		return "SWITCH";
-	case WHILE:
-		return "WHILE";
-	case DO:
-		return "DO";
-	case FOR:
-		return "FOR";
-	case GOTO:
-		return "GOTO";
-	case CONTINUE:
-		return "CONTINUE";
-	case BREAK:
-		return "BREAK";
-	case RETURN:
-		return "RETURN";
-	case INLINEASM:
-		return "INLINEASM";
-	case IFX:
-		return "IFX";
-	case ADDRESS_OF:
-		return "ADDRESS_OF";
-	case GET_VALUE_AT_ADDRESS:
-		return "GET_VALUE_AT_ADDRESS";
-	case SPIL:
-		return "SPIL";
-	case UNSPIL:
-		return "UNSPIL";
-	case GETHBIT:
-		return "GETHBIT";
-	case BITWISEAND:
-		return "BITWISEAND";
-	case UNARYMINUS:
-		return "UNARYMINUS";
-	case IPUSH:
-		return "IPUSH";
-	case IPOP:
-		return "IPOP";
-	case PCALL:
-		return "PCALL";
-	case ENDFUNCTION:
-		return "ENDFUNCTION";
-	case JUMPTABLE:
-		return "JUMPTABLE";
-	case RRC:
-		return "RRC";
-	case RLC:
-		return "RLC";
-	case CAST:
-		return "CAST";
-	case CALL:
-		return "CALL";
-	case PARAM:
-		return "PARAM  ";
-	case NULLOP:
-		return "NULLOP";
-	case BLOCK:
-		return "BLOCK";
-	case LABEL:
-		return "LABEL";
-	case RECEIVE:
-		return "RECEIVE";
-	case SEND:
-		return "SEND";
+	case IDENTIFIER:		return "IDENTIFIER";
+	case TYPE_NAME:			return "TYPE_NAME";
+	case CONSTANT:			return "CONSTANT";
+	case STRING_LITERAL:		return "STRING_LITERAL";
+	case SIZEOF:			return "SIZEOF";
+	case PTR_OP:			return "PTR_OP";
+	case INC_OP:			return "INC_OP";
+	case DEC_OP:			return "DEC_OP";
+	case LEFT_OP:			return "LEFT_OP";
+	case RIGHT_OP:			return "RIGHT_OP";
+	case LE_OP:			return "LE_OP";
+	case GE_OP:			return "GE_OP";
+	case EQ_OP:			return "EQ_OP";
+	case NE_OP:			return "NE_OP";
+	case AND_OP:			return "AND_OP";
+	case OR_OP:			return "OR_OP";
+	case MUL_ASSIGN:		return "MUL_ASSIGN";
+	case DIV_ASSIGN:		return "DIV_ASSIGN";
+	case MOD_ASSIGN:		return "MOD_ASSIGN";
+	case ADD_ASSIGN:		return "ADD_ASSIGN";
+	case SUB_ASSIGN:		return "SUB_ASSIGN";
+	case LEFT_ASSIGN:		return "LEFT_ASSIGN";
+	case RIGHT_ASSIGN:		return "RIGHT_ASSIGN";
+	case AND_ASSIGN:		return "AND_ASSIGN";
+	case XOR_ASSIGN:		return "XOR_ASSIGN";
+	case OR_ASSIGN:			return "OR_ASSIGN";
+	case TYPEDEF:			return "TYPEDEF";
+	case EXTERN:			return "EXTERN";
+	case STATIC:			return "STATIC";
+	case AUTO:			return "AUTO";
+	case REGISTER:			return "REGISTER";
+	case CODE:			return "CODE";
+	case EEPROM:			return "EEPROM";
+	case INTERRUPT:			return "INTERRUPT";
+	case SFR:			return "SFR";
+	case AT:			return "AT";
+	case SBIT:			return "SBIT";
+	case REENTRANT:			return "REENTRANT";
+	case USING:			return "USING";
+	case XDATA:			return "XDATA";
+	case DATA:			return "DATA";
+	case IDATA:			return "IDATA";
+	case PDATA:			return "PDATA";
+	case VAR_ARGS:			return "VAR_ARGS";
+	case CRITICAL:			return "CRITICAL";
+	case NONBANKED:			return "NONBANKED";
+	case BANKED:			return "BANKED";
+	case CHAR:			return "CHAR";
+	case SHORT:			return "SHORT";
+	case INT:			return "INT";
+	case LONG:			return "LONG";
+	case SIGNED:			return "SIGNED";
+	case UNSIGNED:			return "UNSIGNED";
+	case FLOAT:			return "FLOAT";
+	case DOUBLE:			return "DOUBLE";
+	case CONST:			return "CONST";
+	case VOLATILE:			return "VOLATILE";
+	case VOID:			return "VOID";
+	case BIT:			return "BIT";
+	case STRUCT:			return "STRUCT";
+	case UNION:			return "UNION";
+	case ENUM:			return "ENUM";
+	case ELIPSIS:			return "ELIPSIS";
+	case RANGE:			return "RANGE";
+	case FAR:			return "FAR";
+	case CASE:			return "CASE";
+	case DEFAULT:			return "DEFAULT";
+	case IF:			return "IF";
+	case ELSE:			return "ELSE";
+	case SWITCH:			return "SWITCH";
+	case WHILE:			return "WHILE";
+	case DO:			return "DO";
+	case FOR:			return "FOR";
+	case GOTO:			return "GOTO";
+	case CONTINUE:			return "CONTINUE";
+	case BREAK:			return "BREAK";
+	case RETURN:			return "RETURN";
+	case INLINEASM:			return "INLINEASM";
+	case IFX:			return "IFX";
+	case ADDRESS_OF:		return "ADDRESS_OF";
+	case GET_VALUE_AT_ADDRESS:	return "GET_VALUE_AT_ADDRESS";
+	case SPIL:			return "SPIL";
+	case UNSPIL:			return "UNSPIL";
+	case GETHBIT:			return "GETHBIT";
+	case BITWISEAND:		return "BITWISEAND";
+	case UNARYMINUS:		return "UNARYMINUS";
+	case IPUSH:			return "IPUSH";
+	case IPOP:			return "IPOP";
+	case PCALL:			return "PCALL";
+	case ENDFUNCTION:		return "ENDFUNCTION";
+	case JUMPTABLE:			return "JUMPTABLE";
+	case RRC:			return "RRC";
+	case RLC:			return "RLC";
+	case CAST:			return "CAST";
+	case CALL:			return "CALL";
+	case PARAM:			return "PARAM  ";
+	case NULLOP:			return "NULLOP";
+	case BLOCK:			return "BLOCK";
+	case LABEL:			return "LABEL";
+	case RECEIVE:			return "RECEIVE";
+	case SEND:			return "SEND";
 	}
 	sprintf (buffer, "unknown op %d %c", op, op & 0xff);
 	return buffer;
@@ -407,12 +306,9 @@ debugLogRegType (short type)
 	
 	switch (type)
 	{
-	case REG_GPR:
-		return "REG_GPR";
-	case REG_PTR:
-		return "REG_PTR";
-	case REG_CND:
-		return "REG_CND";
+	case REG_GPR:	return "REG_GPR";
+	case REG_PTR:	return "REG_PTR";
+	case REG_CND:	return "REG_CND";
 	}
 	
 	sprintf (buffer, "unknown reg type %d", type);
@@ -456,7 +352,6 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 		sprintf(buffer,"r0x%02X", dReg->rIdx);
 		dReg->name = Safe_strdup(buffer);
 	}
-	//fprintf(stderr,"newReg: %s, rIdx = 0x%02x\n",dReg->name,rIdx);
 	dReg->isFree = 0;
 	dReg->wasUsed = 1;
 	if (type == REG_SFR)
@@ -628,12 +523,20 @@ allocInternalRegister(int rIdx, char * name, short po_type, int alias)
 static regs *
 allocReg (short type)
 {
+	regs *reg;
 	
 	debugLog ("%s of type %s\n", __FUNCTION__, debugLogRegType (type));
 	//fprintf(stderr,"allocReg\n");
 	
+	reg = pic14_findFreeReg (type);
+
+	reg->isFree = 0;
+	reg->wasUsed = 1;
+
+	return reg;
 	
-	return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
+	
+	//return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
 	
 }
 
@@ -1998,7 +1901,7 @@ tryAgain:
 			if (sym->regs[j])
 				sym->regs[j]->isFree = 0;
 			
-				/* this looks like an infinite loop but 
+			/* this looks like an infinite loop but 
 			in really selectSpil will abort  */
 			goto tryAgain;
 }
@@ -2039,6 +1942,13 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		/* if it does not end here */
 		if (sym->liveTo > ic->seq)
 			continue;
+	
+		/* HACK: result and addr must be disjoint for POINTER_GET */
+		if (sym->liveTo == ic->seq && POINTER_GET(ic))
+		{
+			//piCode (ic, stderr); fprintf (stderr, " -- registers NOT deallocated\n");
+			continue;
+		}
 		
 		/* if it was spilt on stack then we can 
 		mark the stack spil location as free */
@@ -2054,7 +1964,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		
 		if (!bitVectBitValue (_G.regAssigned, sym->key))
 			continue;
-		
 		/* special case check if this is an IFX &
 		the privious one was a pop and the 
 		previous one was not spilt then keep track
@@ -2062,6 +1971,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		if (ic->op == IFX && ic->prev &&
 			ic->prev->op == IPOP &&
 			!ic->prev->parmPush &&
+			IS_SYMOP(IC_LEFT (ic->prev)) &&
 			!OP_SYMBOL (IC_LEFT (ic->prev))->isspilt)
 			psym = OP_SYMBOL (IC_LEFT (ic->prev));
 		
@@ -2082,6 +1992,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 				ic->op == IPOP ||
 				ic->op == RETURN ||
 				POINTER_SET (ic)) &&
+				IS_SYMOP (IC_RESULT (ic)) &&
 				(result = OP_SYMBOL (IC_RESULT (ic))) &&	/* has a result */
 				result->liveTo > ic->seq &&	/* and will live beyond this */
 				result->liveTo <= ebp->lSeq &&	/* does not go beyond this block */
@@ -2108,7 +2019,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 					_G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
 					
 			}
-			
+
 			/* free the remaining */
 			for (; i < sym->nRegs; i++)
 			{
@@ -2273,7 +2184,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
 		/* of all instructions do */
 		for (ic = ebbs[i]->sch; ic; ic = ic->next)
 		{
-			
 			debugLog ("  op: %s\n", decodeOp (ic->op));
 			
 			/* if this is an ipop that means some live
@@ -2301,7 +2211,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 			
 			/* now we need to allocate registers
 			only for the result */
-			if (IC_RESULT (ic))
+			if (IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)))
 			{
 				symbol *sym = OP_SYMBOL (IC_RESULT (ic));
 				bitVect *spillable;
@@ -2387,8 +2297,10 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				
 				/* if we need ptr regs for the right side
 				then mark it */
-				if (POINTER_GET (ic) && getSize (OP_SYMBOL (IC_LEFT (ic))->type)
-					<= (unsigned) PTRSIZE)
+				if (POINTER_GET (ic)
+					&& IS_SYMOP(IC_LEFT(ic))
+					&& getSize (OP_SYMBOL (IC_LEFT (ic))->type)
+						<= (unsigned) PTRSIZE)
 				{
 					pic14_ptrRegReq++;
 					ptrRegSet = 1;
@@ -2416,11 +2328,13 @@ serialRegAssign (eBBlock ** ebbs, int count)
 				/* if it shares registers with operands make sure
 				that they are in the same position */
 				if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) &&
+					IS_SYMOP(IC_RESULT(ic)) &&
 					OP_SYMBOL (IC_LEFT (ic))->nRegs && ic->op != '=')
 					positionRegs (OP_SYMBOL (IC_RESULT (ic)),
 					OP_SYMBOL (IC_LEFT (ic)), ic->lineno);
 				/* do the same for the right operand */
 				if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) &&
+					IS_SYMOP(IC_RESULT(ic)) &&
 					OP_SYMBOL (IC_RIGHT (ic))->nRegs && ic->op != '=')
 					positionRegs (OP_SYMBOL (IC_RESULT (ic)),
 					OP_SYMBOL (IC_RIGHT (ic)), ic->lineno);
@@ -3918,13 +3832,13 @@ packRegisters (eBBlock * ebp)
 		}
 		
 		/* mark the pointer usages */
-		if (POINTER_SET (ic))
+		if (POINTER_SET (ic) && IS_SYMOP(IC_RESULT(ic)))
 		{
 			OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 			debugLog ("  marking as a pointer (set) =>");
 			debugAopGet ("  result:", IC_RESULT (ic));
 		}
-		if (POINTER_GET (ic))
+		if (POINTER_GET (ic) && IS_SYMOP(IC_LEFT(ic)))
 		{
 			OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 			debugLog ("  marking as a pointer (get) =>");
@@ -3996,6 +3910,7 @@ packRegisters (eBBlock * ebp)
 		one and right is not in far space */
 		if (POINTER_SET (ic) &&
 			!isOperandInFarSpace (IC_RIGHT (ic)) &&
+			IS_SYMOP(IC_RESULT(ic)) &&
 			!OP_SYMBOL (IC_RESULT (ic))->remat &&
 			!IS_OP_RUONLY (IC_RIGHT (ic)) &&
 			getSize (aggrToPtr (operandType (IC_RESULT (ic)), FALSE)) > 1)
@@ -4005,6 +3920,7 @@ packRegisters (eBBlock * ebp)
 		/* if pointer get */
 		if (POINTER_GET (ic) &&
 			!isOperandInFarSpace (IC_RESULT (ic)) &&
+			IS_SYMOP(IC_LEFT(ic)) &&
 			!OP_SYMBOL (IC_LEFT (ic))->remat &&
 			!IS_OP_RUONLY (IC_RESULT (ic)) &&
 			getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)

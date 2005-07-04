@@ -82,6 +82,11 @@ int debug_verbose = 0;                /* Set true to inundate .asm file */
 // static int GpCodeSequenceNumber = 1;
 int GpcFlowSeq = 1;
 
+/* statistics (code size estimation) */
+static unsigned int pcode_insns = 0;
+static unsigned int pcode_doubles = 0;
+
+
 unsigned maxIdx; /* This keeps track of the maximum register index for call tree register reuse */
 unsigned peakIdx; /* This keeps track of the peak register index for call tree register reuse */
 
@@ -1639,7 +1644,7 @@ void copypCode(FILE *of, char dbName)
 	
 	if(!of || !the_pFile)
 		return;
-	
+
 	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 		if(getpBlock_dbName(pb) == dbName) {
 			pBlockStats(of,pb);
@@ -1649,6 +1654,21 @@ void copypCode(FILE *of, char dbName)
 	}
 	
 }
+
+void resetpCodeStatistics (void)
+{
+  pcode_insns = pcode_doubles = 0;
+}
+
+void dumppCodeStatistics (FILE *of)
+{
+	/* dump statistics */
+	fprintf (of, "\n");
+	fprintf (of, ";\tcode size estimation:\n");
+	fprintf (of, ";\t%5u+%5u = %5u instructions (%5u byte)\n", pcode_insns, pcode_doubles, pcode_insns + pcode_doubles, 2*(pcode_insns + 2*pcode_doubles));
+	fprintf (of, "\n");
+}
+
 void pcode_test(void)
 {
 	
@@ -1994,7 +2014,7 @@ pCodeFlowLink *newpCodeFlowLink(pCodeFlow *pcflow)
 /* newpCodeCSource - create a new pCode Source Symbol              */
 /*-----------------------------------------------------------------*/
 
-pCode *newpCodeCSource(int ln, char *f, char *l)
+pCode *newpCodeCSource(int ln, char *f, const char *l)
 {
 	
 	pCodeCSource *pccs;
@@ -2610,9 +2630,19 @@ void printpBlock(FILE *of, pBlock *pb)
 	if(!of)
 		of = stderr;
 	
-	for(pc = pb->pcHead; pc; pc = pc->next)
+	for(pc = pb->pcHead; pc; pc = pc->next) {
 		printpCode(of,pc);
-	
+
+		if (isPCI(pc))
+		{
+			if (isPCI(pc) && (PCI(pc)->op == POC_PAGESEL || PCI(pc)->op == POC_BANKSEL)) {
+				pcode_doubles++;
+			} else {
+				pcode_insns++;
+			}
+		}
+	} // for
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -2968,22 +2998,24 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 			s = buffer;
 			if(PCOI(pcop)->_const) {
 				
-				if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
+				if( PCOI(pcop)->offset >= 0 && PCOI(pcop)->offset<4) {
 					switch(PCOI(pcop)->offset) {
 					case 0:
-						SAFE_snprintf(&s,&size,"low %s",pcop->name);
+						SAFE_snprintf(&s,&size,"low (%s+%d)",pcop->name, PCOI(pcop)->index);
 						break;
 					case 1:
-						SAFE_snprintf(&s,&size,"high %s",pcop->name);
+						SAFE_snprintf(&s,&size,"high (%s+%d)",pcop->name, PCOI(pcop)->index);
 						break;
 					default:
+						fprintf (stderr, "PO_IMMEDIATE/_const/offset=%d\n", PCOI(pcop)->offset);
+						assert ( !"offset too large" );
 						SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
 							pcop->name,
 							PCOI(pcop)->index,
 							8 * PCOI(pcop)->offset );
 					}
 				} else
-					SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
+					SAFE_snprintf(&s,&size,"LOW (%s+%d)",pcop->name,PCOI(pcop)->index);
 			} else {
 				if( !PCOI(pcop)->offset) { // && PCOI(pcc->pcop)->offset<4) {
 					SAFE_snprintf(&s,&size,"(%s + %d)",
@@ -2998,6 +3030,8 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 						SAFE_snprintf(&s,&size,"high (%s + %d)",pcop->name, PCOI(pcop)->index);
 						break;
 					default:
+						fprintf (stderr, "PO_IMMEDIATE/mutable/offset=%d\n", PCOI(pcop)->offset);
+						assert ( !"offset too large" );
 						SAFE_snprintf(&s,&size,"((%s + %d) >> %d)&0xff",pcop->name, PCOI(pcop)->index, 8*PCOI(pcop)->offset);
 						break;
 					}

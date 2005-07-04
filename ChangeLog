@@ -1,7 +1,49 @@
+2005-07-04 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (popGet): changed assert to allow for
+	  bit operands
+	* (popGetAddr): changed signature to provide
+	  an additional index, patched all call sites
+	* (genCmpEq): handle literal-like operands correctly
+	* (genAddrOf): added sanity checks on __code/__data pointers
+	* (genAssign): added handling of symbols from __code section
+	* (gencjne): do not generate code for comparisons whose result
+	  is neither stored nor used, fixes bug #1171114
+	* (AccLsh, AccRsh): operate on operand instead of WREG
+	* (shift{Left,Right}_Left2ResultLit): NEW, size independant
+	  replacement for Shift{LR}{12}Left2Result; shift (byte/int/long)
+	  by known count
+	* rewrote complete shift-by-literal logic, commented unused
+	  functions out
+	* (genConstPointerGet): get multiple bytes (if result size > 1),
+	  fixed handling of non-immediate addresses
+	* (genPointerGet): handle CODE pointers like CONST pointers
+	* (genpic14Code): insert C-SRC lines as Cource-pCodes
+	* ({aop,op}_isLitLike): NEW, single place to decide whether an
+	  operand is to be treated as a literal or not
+	* (mov2w,genPcall,genCmpEq),
+	  src/pic/genarith.c: use aop_isLitLike() to decide between
+	  literal/register contents
+	* (addSign): added missing offset
+	* src/pic/gen.h: remove newline after FENTRY/FEXIT comments,
+	  only emit comment in debug-mode,
+	  use {aop,op}_isLitLike throughout the file
+	* src/pic/glue.c: fix initializers for pointers (work in progress)
+	* src/pic/pcode.c (get_op): honor index on _const symbols
+	* ({reset,dump}pCodeStatistics): NEW, estimate code size
+	* (dumppBlock): added pCode size estimation
+	* src/pic/ralloc.c (deassignLRs,serialRegAssign,packRegisters):
+	  check for IS_SYMOP before OP_SYMBOL'ing
+	* fixed indentation, compacted switch-statements
+	* (allocReg): find free register and allocate it instead of
+	  allocating new registers all the time
+	* (deassignLRs): prevent POINTER_GET's from being assigned the same
+	  registers as its operands (necessary only for multibyte GETs)
+
 2005-07-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.h: added prototypes emitpComment, popGetAddr and
-	  debugging .asm-output macros FENRY + FEXIT
+	  debugging .asm-output macros FENTRY + FEXIT
 	* src/pic/gen.c (Safe_vsnprintf): NEW, is there a more generic
 	  way... I wonder...
 	* (emitpComment): NEW, printf to pCode

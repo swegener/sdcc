@@ -831,7 +831,7 @@ pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char 
 pCode *newpCodeInlineP(char *cP);            // Create a new pCode given a char *
 pCode *newpCodeFunction(char *g, char *f,int); // Create a new function
 pCode *newpCodeLabel(char *name,int key);    // Create a new label given a key
-pCode *newpCodeCSource(int ln, char *f, char *l); // Create a new symbol line 
+pCode *newpCodeCSource(int ln, char *f, const char *l); // Create a new symbol line 
 pCode *findNextInstruction(pCode *pci);
 pCode *findNextpCode(pCode *pc, PC_TYPE pct);
 pCode *pCodeInstructionCopy(pCodeInstruction *pci,int invert);
@@ -867,6 +867,8 @@ int isPCinFlow(pCode *pc, pCode *pcflow);
 struct regs * getRegFromInstruction(pCode *pc);
 
 extern void pcode_test(void);
+void resetpCodeStatistics (void);
+void dumppCodeStatistics (FILE *of);
 
 /*-----------------------------------------------------------------*
  * pCode objects.

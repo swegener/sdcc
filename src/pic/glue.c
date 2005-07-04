@@ -27,6 +27,7 @@
 #include "ralloc.h"
 #include "pcode.h"
 #include "newalloc.h"
+#include "gen.h"
 
 
 #ifdef WORDS_BIGENDIAN
@@ -424,7 +425,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 {
 	initList *iloop;
 	unsigned size = 0;
-	
+
 	if(!pb)
 		return;
 	if (ilist) {
@@ -475,6 +476,89 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
 }
 
 /*-----------------------------------------------------------------*/
+/* printIvalPtr - generates code for initial value of pointers     */
+/*-----------------------------------------------------------------*/
+extern value *initPointer (initList *, sym_link *toType);
+
+static void 
+printIvalPtr (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
+{
+	value *val;
+	
+	if (!ilist || !pb)
+		return;
+	
+	fprintf (stderr, "FIXME: initializers for pointers...\n");
+	printTypeChain (type, stderr);
+	
+	fprintf (stderr, "symbol: %s, DCL_TYPE():%d, DCL_ELEM():%d, IS_ARRAY():%d", sym->rname, DCL_TYPE(type), DCL_ELEM(type), IS_ARRAY(type));
+	fprintf (stderr, "ilist: type=%d (INIT_DEEP=%d, INIT_NODE=%d)\n", ilist->type, INIT_DEEP, INIT_NODE);
+
+	if (ilist && (ilist->type == INIT_DEEP))
+	  ilist = ilist->init.deep;
+	
+	/* function pointers */
+	if (IS_FUNC (type->next))
+	{
+		assert ( !"function pointers not yet handled" );
+		//printIvalFuncPtr (type, ilist, pb);
+	}
+
+	if (!(val = initPointer (ilist, type)))
+		return;
+	
+	if (IS_CHAR (type->next))
+	{
+		if (printIvalChar (type, ilist, pb, NULL)) return;
+	}
+
+	/* check the type */
+	if (compareType (type, val->type) == 0)
+	{
+		werrorfl (ilist->filename, ilist->lineno, W_INIT_WRONG);
+		printFromToType (val->type, type);
+	}
+
+	if (IS_LITERAL (val->etype))
+	{
+		switch (getSize (type))
+		{
+		case 1:
+			fprintf (stderr, "BYTE: %i\n", (unsigned char)floatFromVal (val) & 0x00FF);
+			break;
+		case 2:
+			fprintf (stderr, "WORD: %i\n", (unsigned int)floatFromVal (val) & 0x00FFFF);
+			break;
+		case 3: /* gneric pointers */
+			assert ( !"generic pointers not yet handled" );
+		case 4:
+			fprintf (stderr, "LONG: %i\n", (unsigned int)floatFromVal (val) & 0x0000FFFFFFFF);
+			break;
+		default:
+			assert ( !"invaild size of value -- aborting" );
+		} // switch
+
+		return;
+	} // if (IS_LITERAL)
+
+	/* now handle symbolic values */
+	switch (getSize (type))
+	{
+	case 1:
+		fprintf (stderr, "BYTE: %s", val->name);
+		break;
+	case 2:
+		fprintf (stderr, "WORD: %s", val->name);
+		break;
+	case 4:
+		fprintf (stderr, "LONG: %s", val->name);
+		break;
+	default:
+		assert ( !"invalid size of (symbolic) value -- aborting" );
+	} // switch
+}
+
+/*-----------------------------------------------------------------*/
 /* printIval - generates code for initial value                    */
 /*-----------------------------------------------------------------*/
 static void 
@@ -486,31 +570,31 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
 	/* if structure then    */
 	if (IS_STRUCT (type))
 	{
-		//fprintf(stderr,"%s struct\n",__FUNCTION__);
+		//fprintf(stderr,"%s struct: %s\n",__FUNCTION__, sym->rname);
 		printIvalStruct (sym, type, ilist, pb);
-		return;
-	}
-	
-	/* if this is a pointer */
-	if (IS_PTR (type))
-	{
-		//fprintf(stderr,"%s pointer\n",__FUNCTION__);
-		//printIvalPtr (sym, type, ilist, oFile);
 		return;
 	}
 	
 	/* if this is an array   */
 	if (IS_ARRAY (type))
 	{
-		//fprintf(stderr,"%s array\n",__FUNCTION__);
+		//fprintf(stderr,"%s array: %s\n",__FUNCTION__, sym->rname);
 		printIvalArray (sym, type, ilist, pb);
+		return;
+	}
+	
+	/* if this is a pointer */
+	if (IS_PTR (type))
+	{
+		//fprintf(stderr,"%s pointer: %s\n",__FUNCTION__, sym->rname);
+		printIvalPtr (sym, type, ilist, pb);
 		return;
 	}
 	
 	/* if type is SPECIFIER */
 	if (IS_SPEC (type))
 	{
-		//fprintf(stderr,"%s spec\n",__FUNCTION__);
+		//fprintf(stderr,"%s spec %s\n",__FUNCTION__, sym->rname);
 		printIvalType (sym, type, ilist, pb);
 		return;
 	}
@@ -933,6 +1017,9 @@ picglue ()
 		werror (E_FILE_OPEN_ERR, buffer);
 		exit (1);
 	}
+
+	/* prepare statistics */
+	resetpCodeStatistics ();
 	
 	/* initial comments */
 	pic14initialComments (asmFile);
@@ -1019,7 +1106,7 @@ picglue ()
 	fprintf (asmFile, "; bit data\n");
 	fprintf (asmFile, "%s", iComments2);
 	copyFile (asmFile, bit->oFile);
-	
+
 	/* copy the interrupt vector table */
 	if (mainf && IFFUNC_HASBODY(mainf->type)) {
 		copyFile (asmFile, vFile);
@@ -1070,6 +1157,8 @@ picglue ()
 	
 	/* unknown */
 	copypCode(asmFile, 'P');
+
+	dumppCodeStatistics (asmFile);
 	
 	fprintf (asmFile,"\tend\n");
 	

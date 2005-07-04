@@ -1024,11 +1024,9 @@ void genPlus (iCode *ic)
 				else {
 					PIC_OPCODE poc = POC_ADDFW;
 					
-					if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && (
-						(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL) || 
-						(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE)))
+					if (op_isLitLike (IC_LEFT (ic)))
 						poc = POC_ADDLW;
-					emitpcode(poc, popGetAddr(AOP(IC_LEFT(ic)),0));
+					emitpcode(poc, popGetAddr(AOP(IC_LEFT(ic)),0,0));
 					if ( AOP_TYPE(IC_RESULT(ic)) != AOP_ACC)
 						emitpcode(POC_MOVWF,popGet(AOP(IC_RESULT(ic)),0));
 				}
@@ -1041,14 +1039,13 @@ void genPlus (iCode *ic)
 		
 		if(size){
 			if (pic14_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic)))) {
-				if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && (
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL) || 
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE))) {
+				if (op_isLitLike (IC_LEFT(ic)))
+				{
 					while(size--){
 						emitpcode(POC_MOVFW,   popGet(AOP(IC_RIGHT(ic)),offset));
 						emitSKPNC;
 						emitpcode(POC_INCFSZW, popGet(AOP(IC_RIGHT(ic)),offset));
-						emitpcode(POC_ADDLW,   popGetAddr(AOP(IC_LEFT(ic)),offset));
+						emitpcode(POC_ADDLW,   popGetAddr(AOP(IC_LEFT(ic)),offset,0));
 						emitpcode(POC_MOVWF,   popGet(AOP(IC_RESULT(ic)),offset));
 						offset++;
 					}
@@ -1063,13 +1060,11 @@ void genPlus (iCode *ic)
 				}
 			} else {
 				PIC_OPCODE poc = POC_MOVFW;
-				if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && (
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL) || 
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE)))
+				if (op_isLitLike (IC_LEFT(ic)))
 					poc = POC_MOVLW;
 				while(size--){
 					if (!pic14_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
-						emitpcode(poc, popGetAddr(AOP(IC_LEFT(ic)),offset));
+						emitpcode(poc, popGetAddr(AOP(IC_LEFT(ic)),offset,0));
 						emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset));
 					}
 					emitpcode(POC_MOVFW,   popGet(AOP(IC_RIGHT(ic)),offset));
@@ -1094,12 +1089,10 @@ void genPlus (iCode *ic)
 		if (AOP_SIZE(IC_LEFT(ic)) > AOP_SIZE(IC_RIGHT(ic))) { 
 			int leftsize = AOP_SIZE(IC_LEFT(ic)) - AOP_SIZE(IC_RIGHT(ic));
 			PIC_OPCODE poc = POC_MOVFW;
-			if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && (
-				(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL) || 
-				(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE)))
+			if (op_isLitLike (IC_LEFT(ic)))
 				poc = POC_MOVLW;
 			while(leftsize-- > 0) {
-				emitpcode(poc, popGetAddr(AOP(IC_LEFT(ic)),offset));
+				emitpcode(poc, popGetAddr(AOP(IC_LEFT(ic)),offset,0));
 				emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset));
 				emitSKPNC;
 				emitpcode(POC_INCF, popGet(AOP(IC_RESULT(ic)),offset));
@@ -1281,8 +1274,7 @@ void addSign(operand *result, int offset, int sign)
 				emitpcode(POC_BTFSC, newpCodeOpBit(aopGet(AOP(result),offset-1,FALSE,FALSE),7,0));
 				emitpcode(POC_MOVLW, popGetLit(0xff));
 				while(size--)
-					emitpcode(POC_MOVWF, popGet(AOP(result),size));
-				
+					emitpcode(POC_MOVWF, popGet(AOP(result),offset+size));
 			}
 		} else
 			while(size--)
@@ -1616,28 +1608,23 @@ void genMinus (iCode *ic)
 		if(size){
 			if (pic14_sameRegs(AOP(IC_RIGHT(ic)), AOP(IC_RESULT(ic)))) {
 				int lit = 0;
-				if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && (
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL) || 
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE))) {
+				if (op_isLitLike (IC_LEFT(ic)))
 					lit = 1;
-				}
 				while(size--){
 					emitpcode(POC_MOVFW,   popGet(AOP(IC_RIGHT(ic)),offset));
 					emitSKPC;
 					emitpcode(POC_INCFW, popGet(AOP(IC_RIGHT(ic)),offset));
-					emitpcode(lit?POC_SUBLW:POC_SUBFW,   popGetAddr(AOP(IC_LEFT(ic)),offset));
+					emitpcode(lit?POC_SUBLW:POC_SUBFW,   popGetAddr(AOP(IC_LEFT(ic)),offset,0));
 					emitpcode(POC_MOVWF,   popGet(AOP(IC_RESULT(ic)),offset));
 					offset++;
 				}
 			} else {
 				PIC_OPCODE poc = POC_MOVFW;
-				if ((AOP_TYPE(IC_LEFT(ic)) == AOP_PCODE) && (
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_LITERAL) || 
-					(AOP(IC_LEFT(ic))->aopu.pcop->type == PO_IMMEDIATE)))
+				if (op_isLitLike (IC_LEFT(ic)))
 					poc = POC_MOVLW;
 				while(size--){
 					if (!pic14_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
-						emitpcode(poc,  popGetAddr(AOP(IC_LEFT(ic)),offset));
+						emitpcode(poc,  popGetAddr(AOP(IC_LEFT(ic)),offset,0));
 						emitpcode(POC_MOVWF,  popGet(AOP(IC_RESULT(ic)),offset));
 					}
 					emitpcode(POC_MOVFW,  popGet(AOP(IC_RIGHT(ic)),offset));

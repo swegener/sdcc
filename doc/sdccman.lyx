@@ -19850,7 +19850,7 @@ foo.ihx - the Intel hex format
  object file.
 \layout Section
 
-Command Line Options.
+Command Line Options
 \layout Itemize
 
 -
@@ -19917,15 +19917,15 @@ status Collapsed
 -k <port number> passed to simulator see the simulator docs for details.
 \layout Section
 
-Debugger Commands.
+Debugger Commands
 \layout Standard
 
 As mentioned earlier the command interface for the debugger has been deliberatel
 y kept as close the GNU debugger gdb, as possible.
  This will help the integration with existing graphical user interfaces
  (like ddd, xxgdb or xemacs) existing for the GNU debugger.
- If you use a graphical user interface for the debugger you can skip the
- next sections.
+ If you use a graphical user interface for the debugger you can skip this
+ section.
 \layout Subsubsection*
 
 break [line | file:line | function | file:function]
@@ -20068,6 +20068,126 @@ quit
  My name is Bobby Brown"
 \layout Section
 
+Interfacing with DDD
+\layout Standard
+
+Figure 
+\begin_inset LatexCommand \ref{fig:ddd_screenshot}
+
+\end_inset 
+
+ shows a debugging session with DDD
+\begin_inset LatexCommand \index{DDD (debugger)}
+
+\end_inset 
+
+ (Unix only) on a simulated 8032.
+ The debugger allows setting of breakpoints, displaying and changing variables,
+ single stepping through C and assembler code.
+ 
+\layout Standard
+
+
+\begin_inset Note
+collapsed false
+
+\layout Standard
+
+The screenshot was converted from png to eps with:
+\layout Standard
+
+bmeps -c -e8f -p3 ddd_example.png >ddd_example.eps
+\layout Standard
+
+Which produces a pretty compact eps file which is free from compression
+ artifacts.
+ 
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement htbp
+wide false
+collapsed false
+
+\layout Standard
+\align center 
+
+\begin_inset Graphics
+	filename figures/ddd_example.eps
+	display color
+	width 100text%
+	rotateOrigin center
+
+\end_inset 
+
+
+\layout Caption
+
+
+\begin_inset LatexCommand \label{fig:ddd_screenshot}
+
+\end_inset 
+
+Debugging session with DDD on a simulated 8032.
+ Debugging might not run as smoothly as the screenshot suggests
+.
+\end_inset 
+
+
+\layout Standard
+
+Insiders familiar with the gdb commands (previous section) can enter them
+ in the lowermost frame of the screenshot.
+ The source was compiled with 
+\family sans 
+\series bold 
+
+\newline 
+
+\newline 
+sdcc -
+\family default 
+\series default 
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+
+\family sans 
+\series bold 
+-debug ddd_example.c
+\family default 
+\series default 
+ 
+\family sans 
+\series bold 
+
+\newline 
+
+\family default 
+\series default 
+
+\newline 
+and DDD was invoked with 
+\family sans 
+\series bold 
+
+\newline 
+
+\newline 
+ddd -debugger 'sdcdb -cpu 8032 ddd_example'
+\layout Section
+
 Interfacing with XEmacs
 \begin_inset LatexCommand \index{XEmacs}
 
@@ -20078,7 +20198,7 @@ Interfacing with XEmacs
 
 \end_inset 
 
-.
+
 \layout Standard
 
 Two files (in emacs lisp) are provided for the interfacing with XEmacs,

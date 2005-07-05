@@ -1,3 +1,8 @@
+2005-07-05 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: added section about debugging with ddd
+	* doc/figures/ddd_example.eps: screenshot of debugging session
+
 2005-07-04 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (genPointerGet): handle pointers to CONST values

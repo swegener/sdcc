@@ -159,4 +159,9 @@ __sfr __at (0xC0) WDTC;		//Watchdog Timer Control (Reset value 0x00).
 
 __sfr __at (0x85) WDTD;		//Watchdog Timer Data/Reload. 
 
+__sfr __at (0xC9) T2MOD;	//Timer 2 mode control
+	#define DCEN  0x01 		//Down count enable bit
+	#define T2OE  0x02		//Timer 2 Output Enable bit.
+	#define ENT2  0x20		//No description???
+
 #endif /*REG_P89V51RD2_H*/

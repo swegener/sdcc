@@ -20069,80 +20069,45 @@ quit
 \layout Section
 
 Interfacing with DDD
+\layout Comment
+
+The screenshot was converted from png to eps with: 
+\begin_inset Quotes sld
+\end_inset 
+
+bmeps -c -e8f -p3 ddd_example.png >ddd_example.eps
+\begin_inset Quotes srd
+\end_inset 
+
+ which produces a pretty compact eps file which is free from compression
+ artifacts.
+\layout Comment
+
+The screenshot was included in sdccman.lyx cvs version 1.120 but later removed
+ as this broke the build system on Sourceforge (pdf-file was broken).
 \layout Standard
 
-Figure 
-\begin_inset LatexCommand \ref{fig:ddd_screenshot}
+The .eps File 
+\size footnotesize 
+
+\begin_inset LatexCommand \url{http://cvs.sourceforge.net/viewcvs.py/*checkout*/sdcc/sdcc/doc/figures/ddd_example.eps}
 
 \end_inset 
 
- shows a debugging session with DDD
+
+\size default 
+ shows a screenshot of a debugging session with DDD
 \begin_inset LatexCommand \index{DDD (debugger)}
 
 \end_inset 
 
  (Unix only) on a simulated 8032.
+ The debugging session might not run as smoothly as the screenshot suggests.
  The debugger allows setting of breakpoints, displaying and changing variables,
  single stepping through C and assembler code.
  
-\layout Standard
-
-
-\begin_inset Note
-collapsed false
-
-\layout Standard
-
-The screenshot was converted from png to eps with:
-\layout Standard
-
-bmeps -c -e8f -p3 ddd_example.png >ddd_example.eps
-\layout Standard
-
-Which produces a pretty compact eps file which is free from compression
- artifacts.
- 
-\end_inset 
-
-
-\layout Standard
-
-
-\begin_inset Float figure
-placement htbp
-wide false
-collapsed false
-
-\layout Standard
-\align center 
-
-\begin_inset Graphics
-	filename figures/ddd_example.eps
-	display color
-	width 100text%
-	rotateOrigin center
-
-\end_inset 
-
-
-\layout Caption
-
-
-\begin_inset LatexCommand \label{fig:ddd_screenshot}
-
-\end_inset 
-
-Debugging session with DDD on a simulated 8032.
- Debugging might not run as smoothly as the screenshot suggests
-.
-\end_inset 
-
-
-\layout Standard
-
-Insiders familiar with the gdb commands (previous section) can enter them
- in the lowermost frame of the screenshot.
- The source was compiled with 
+\newline 
+The source was compiled with 
 \family sans 
 \series bold 
 

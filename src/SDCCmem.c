@@ -694,6 +694,14 @@ allocLocal (symbol * sym)
       return;
     }
 
+  if (SPEC_SCLS (sym->etype) == S_PDATA)
+    {
+      SPEC_OCLS (sym->etype) = pdata;
+      sym->iaccess = 1;
+      allocIntoSeg (sym);
+      return;
+    }
+
   /* if this is a function then assign code space    */
   if (IS_FUNC (sym->type))
     {

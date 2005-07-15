@@ -1,3 +1,7 @@
+2005-07-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmem.c: fixed bug 1238386
+
 2005-07-12 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added labelrefcounting for peepholes

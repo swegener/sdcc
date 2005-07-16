@@ -829,8 +829,10 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       if (IS_OP_LITERAL (IC_LEFT (ic)) &&
           operandLitValue (IC_LEFT (ic)) == 0.0)
         {
-          if (compareType (operandType (IC_RESULT (ic)),
-                           operandType (IC_RIGHT (ic)))<0)
+          int typematch;
+          typematch = compareType (operandType (IC_RESULT (ic)),
+                                   operandType (IC_RIGHT (ic)));
+          if (typematch<0)
             {
               ic->op = CAST;
               IC_LEFT (ic) = operandFromLink (operandType (IC_RESULT (ic)));
@@ -839,6 +841,12 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             {
               ic->op = '=';
               IC_LEFT (ic) = NULL;
+              if (typematch==0)
+                {
+                  /* for completely different types, preserve the source type */
+                  IC_RIGHT (ic) = operandFromOperand (IC_RIGHT (ic));
+                  setOperandType (IC_RIGHT (ic), operandType (IC_RESULT (ic)));
+                }
             }
           SET_ISADDR (IC_RESULT (ic), 0);
           SET_ISADDR (IC_RIGHT (ic), 0);
@@ -847,8 +855,10 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
           operandLitValue (IC_RIGHT (ic)) == 0.0)
         {
-          if (compareType (operandType (IC_RESULT (ic)),
-                           operandType (IC_LEFT (ic)))<0)
+          int typematch;
+          typematch = compareType (operandType (IC_RESULT (ic)),
+                                   operandType (IC_LEFT (ic)));
+          if (typematch<0)
             {
               ic->op = CAST;
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -859,6 +869,12 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               ic->op = '=';
               IC_RIGHT (ic) = IC_LEFT (ic);
               IC_LEFT (ic) = NULL;
+              if (typematch==0)
+                {
+                  /* for completely different types, preserve the source type */
+                  IC_RIGHT (ic) = operandFromOperand (IC_RIGHT (ic));
+                  setOperandType (IC_RIGHT (ic), operandType (IC_RESULT (ic)));
+                }
             }
           SET_ISADDR (IC_RIGHT (ic), 0);
           SET_ISADDR (IC_RESULT (ic), 0);

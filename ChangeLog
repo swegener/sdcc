@@ -1,3 +1,9 @@
+2005-07-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (algebraicOpts): fixed loss of volatility
+	  for fields at offset 0 of a struct or union as reported
+	  on 2005-07-07 in the developer mailing list.
+
 2005-07-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmem.c: fixed bug 1238386

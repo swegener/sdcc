@@ -818,7 +818,7 @@ getSize (sym_link * p)
     case FPOINTER:
     case CPOINTER:
     case FUNCTION:
-      return (FPTRSIZE);
+      return (IFFUNC_BANKED (p) ? GPTRSIZE : FPTRSIZE);
     case GPOINTER:
       return (GPTRSIZE);
 
@@ -1545,13 +1545,14 @@ changePointer (sym_link * p)
 
   /* go thru the chain of declarations   */
   /* if we find a pointer to a function  */
-  /* unconditionally change it to a ptr  */
-  /* to code area                        */
+  /* change it to a ptr to code area     */
+  /* unless the function is banked.      */
   for (; p; p = p->next)
     {
       if (!IS_SPEC (p) && DCL_TYPE (p) == UPOINTER)
         DCL_TYPE (p) = port->unqualified_pointer;
       if (IS_PTR (p) && IS_FUNC (p->next))
+        if (!IFFUNC_BANKED(p->next))
         DCL_TYPE (p) = CPOINTER;
     }
 }
@@ -1914,6 +1915,16 @@ compareType (sym_link * dest, sym_link * src)
     {
       if (IS_DECL (src))
         {
+          /* banked function pointer */
+          if (IS_GENPTR (dest) && IS_GENPTR (src))
+            {
+              if (IS_FUNC (src->next) && IS_VOID(dest->next))
+                return -1;
+              if (IS_FUNC (dest->next) && IS_VOID(src->next))
+                return -1;
+              return compareType (dest->next, src->next);
+            }
+
           if (DCL_TYPE (src) == DCL_TYPE (dest)) {
             if (IS_FUNC(src)) {
               //checkFunction(src,dest);

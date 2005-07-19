@@ -418,6 +418,8 @@ struct
    "ISR function attribute 'shadowregs' following non-ISR function '%s'" },
 { W_SFR_ABSRANGE, ERROR_LEVEL_WARNING,
    "absolute address for sfr '%s' probably out of range." },
+{ E_BANKED_WITH_CALLEESAVES, ERROR_LEVEL_ERROR,
+   "Both banked and callee-saves cannot be used together." },
 };
 
 /*

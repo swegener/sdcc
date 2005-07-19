@@ -139,6 +139,8 @@ char buffer[PATH_MAX * 2];
 #define OPTION_STD_C99          "--std-c99"
 #define OPTION_STD_SDCC89       "--std-sdcc89"
 #define OPTION_STD_SDCC99       "--std-sdcc99"
+#define OPTION_CODE_SEG         "--codeseg"
+#define OPTION_CONST_SEG        "--constseg"
 
 static const OPTION
 optionsTable[] = {
@@ -215,6 +217,8 @@ optionsTable[] = {
     { 0,    "--no-std-crt0", &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
 #endif
     { 0,    OPTION_SHORT_IS_8BITS,  NULL, "Make short 8 bits (for old times sake)" },
+    { 0,    OPTION_CODE_SEG,        NULL, "<name> use this name for the code segment" },
+    { 0,    OPTION_CONST_SEG,       NULL, "<name> use this name for the const segment" },
     
     { 0,    NULL,                   NULL, "Optimization options"},
     { 0,    "--nooverlay",          &options.noOverlay, "Disable overlaying leaf function auto variables" },
@@ -558,6 +562,8 @@ setDefaultOptions (void)
   options.shortis8bits = 0;
   options.std_sdcc = 1;         /* enable SDCC language extensions */
   options.std_c99 = 0;          /* default to C89 until more C99 support */
+  options.code_seg = CODE_NAME;   /* default to CSEG for generated code */
+  options.const_seg = CONST_NAME; /* default to CONST for generated code */
 
   options.stack10bit=0;
 
@@ -1116,6 +1122,18 @@ parseCmdLine (int argc, char **argv)
               continue;
             }
 
+          if (strcmp (argv[i], OPTION_CODE_SEG) == 0)
+            {
+              options.code_seg = getStringArg(OPTION_CODE_SEG, argv, &i, argc);
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_CONST_SEG) == 0)
+            {
+              options.const_seg = getStringArg(OPTION_CONST_SEG, argv, &i, argc);
+              continue;
+            }
+
           if (!port->parseOption (&argc, argv, &i))
             {
               werror (W_UNKNOWN_OPTION, argv[i]);
@@ -1500,7 +1518,7 @@ linkEdit (char **envp)
         {
 
           /* code segment start */
-          WRITE_SEG_LOC (CODE_NAME, options.code_loc);
+          WRITE_SEG_LOC (HOME_NAME, options.code_loc);
 
           /* data segment start. If zero, the linker chooses
              the best place for data */

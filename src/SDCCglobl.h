@@ -171,7 +171,8 @@ enum
     MODEL_MEDIUM = 4,
     MODEL_LARGE = 8,
     MODEL_FLAT24 = 16,
-    MODEL_PAGE0 = 32 /* for the xa51 port */
+    MODEL_PAGE0 = 32, /* for the xa51 port */
+    MODEL_HUGE = 64 /* for banked support */
   };
 
 /* overlay segment name and the functions
@@ -250,9 +251,11 @@ struct options
     int printSearchDirs;        /* display the directories in the compiler's search path */
     int vc_err_style;           /* errors and warnings are compatible with Micro$oft visual studio */
     int use_stdout;             /* send errors to stdout instead of stderr */
-    int no_std_crt0;            /*For the z80/gbz80 do not link default crt0.o*/
-    int std_c99;		/* enable C99 keywords/constructs */
-    int std_sdcc;		/* enable SDCC extensions to C */
+    int no_std_crt0;            /* for the z80/gbz80 do not link default crt0.o*/
+    int std_c99;                /* enable C99 keywords/constructs */
+    int std_sdcc;               /* enable SDCC extensions to C */
+    const char *code_seg;       /* segment name to use instead of CSEG */
+    const char *const_seg;      /* segment name to use instead of CONST */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */
@@ -260,7 +263,7 @@ struct options
   };
 
 /* forward definition for variables accessed globally */
-extern int noAssemble;         /* no assembly, stop after code generation */
+extern int noAssemble;          /* no assembly, stop after code generation */
 extern char *yytext;
 extern char *currFname;
 extern char *fullSrcFileName;   /* full name for the source file; */

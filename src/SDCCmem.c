@@ -310,6 +310,58 @@ void deleteFromSeg(symbol *sym)
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* allocDefault - assigns the output segment based on SCLASS       */
+/*-----------------------------------------------------------------*/
+bool
+allocDefault (symbol * sym)
+{
+  switch (SPEC_SCLS (sym->etype))
+    {
+    case S_SFR:
+      SPEC_OCLS (sym->etype) = sfr;
+      break;
+    case S_SBIT:
+      SPEC_OCLS (sym->etype) = sfrbit;
+      break;
+    case S_CODE:
+      if (sym->_isparm)
+        return FALSE;
+      /* if code change to constant */
+      SPEC_OCLS (sym->etype) = statsg;
+      break;
+    case S_XDATA:
+      // should we move this to the initialized data segment?
+      if (port->genXINIT &&
+          sym->ival && (sym->level==0) && !SPEC_ABSA(sym->etype)) {
+        SPEC_OCLS(sym->etype) = xidata;
+      } else {
+        SPEC_OCLS (sym->etype) = xdata;
+      }
+      break;
+    case S_DATA:
+      SPEC_OCLS (sym->etype) = data;
+      break;
+    case S_IDATA:
+      SPEC_OCLS (sym->etype) = idata;
+      sym->iaccess = 1;
+      break;
+    case S_PDATA:
+      SPEC_OCLS (sym->etype) = pdata;
+      sym->iaccess = 1;
+      break;
+    case S_BIT:
+      SPEC_OCLS (sym->etype) = bit;
+      break;
+    case S_EEPROM:
+      SPEC_OCLS (sym->etype) = eeprom;
+      break;
+    default:
+      return FALSE;
+    }
+  allocIntoSeg (sym);
+  return TRUE;
+}
 
 /*-----------------------------------------------------------------*/
 /* allocGlobal - assigns the output segment to a global var       */
@@ -363,29 +415,9 @@ allocGlobal (symbol * sym)
       return;
     }
 
-  /* if this is a  SFR or SBIT */
-  if (SPEC_SCLS (sym->etype) == S_SFR ||
-      SPEC_SCLS (sym->etype) == S_SBIT)
-    {
-
-      SPEC_OCLS (sym->etype) =
-        (SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
-
-      allocIntoSeg (sym);
-      return;
-    }
-
   /* if this is a bit variable and no storage class */
   if (SPEC_NOUN (sym->etype) == V_BIT
-      && SPEC_SCLS (sym->etype) == S_BIT)
-    {
-      SPEC_OCLS (sym->etype) = bit;
-      allocIntoSeg (sym);
-      return;
-    }
-
-  /* if bit storage class */
-  if (SPEC_SCLS (sym->etype) == S_SBIT)
+      /*&& SPEC_SCLS (sym->etype) == S_BIT*/)
     {
       SPEC_OCLS (sym->etype) = bit;
       allocIntoSeg (sym);
@@ -396,16 +428,6 @@ allocGlobal (symbol * sym)
   /* register storage class ignored changed to FIXED */
   if (SPEC_SCLS (sym->etype) == S_REGISTER)
     SPEC_SCLS (sym->etype) = S_FIXED;
-
-  /* if data specified then  */
-  if (SPEC_SCLS (sym->etype) == S_DATA)
-    {
-      /* set the output class */
-      SPEC_OCLS (sym->etype) = data;
-      /* generate the symbol  */
-      allocIntoSeg (sym);
-      return;
-    }
 
   /* if it is fixed, then allocate depending on the  */
   /* current memory model, same for automatics        */
@@ -423,49 +445,7 @@ allocGlobal (symbol * sym)
     }
   }
 
-  /* if code change to constant */
-  if (SPEC_SCLS (sym->etype) == S_CODE) {
-    SPEC_OCLS (sym->etype) = statsg;
-    allocIntoSeg (sym);
-    return;
-  }
-
-  if (SPEC_SCLS (sym->etype) == S_XDATA)
-    {
-      // should we move this to the initialized data segment?
-      if (port->genXINIT &&
-          sym->ival && (sym->level==0) && !SPEC_ABSA(sym->etype)) {
-        SPEC_OCLS(sym->etype)=xidata;
-      } else {
-        SPEC_OCLS (sym->etype) = xdata;
-      }
-      allocIntoSeg (sym);
-      return;
-    }
-
-  if (SPEC_SCLS (sym->etype) == S_IDATA)
-    {
-      SPEC_OCLS (sym->etype) = idata;
-      sym->iaccess = 1;
-      allocIntoSeg (sym);
-      return;
-    }
-
-  if (SPEC_SCLS (sym->etype) == S_PDATA)
-    {
-      SPEC_OCLS (sym->etype) = pdata;
-      sym->iaccess = 1;
-      allocIntoSeg (sym);
-      return;
-    }
-
-  if (SPEC_SCLS (sym->etype) == S_EEPROM)
-    {
-      SPEC_OCLS (sym->etype) = eeprom;
-      allocIntoSeg (sym);
-      return;
-    }
-
+  allocDefault (sym);
   return;
 }
 
@@ -544,12 +524,13 @@ allocParms (value * val)
                     "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);
           strncpyz (lval->name, lval->sym->rname, sizeof(lval->name));
 
-          /* if declared in external storage */
-          if (SPEC_SCLS (lval->etype) == S_XDATA)
-            SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
-          else if (SPEC_SCLS (lval->etype) == S_BIT)
-            SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = bit;
-          else
+          /* if declared in specific storage */
+          if (allocDefault (lval->sym))
+            {
+              SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype);
+              continue;
+            }
+
             /* otherwise depending on the memory model
                note here that we put it into the overlay segment
                first, we will remove it from the overlay segment
@@ -673,50 +654,11 @@ allocLocal (symbol * sym)
   }
 
   /* else depending on the storage class specified */
-  if (SPEC_SCLS (sym->etype) == S_XDATA)
-    {
-      SPEC_OCLS (sym->etype) = xdata;
-      allocIntoSeg (sym);
-      return;
-    }
-
-  if (SPEC_SCLS (sym->etype) == S_CODE && !sym->_isparm) {
-    SPEC_OCLS (sym->etype) = statsg;
-    allocIntoSeg (sym);
-    return;
-  }
-
-  if (SPEC_SCLS (sym->etype) == S_IDATA)
-    {
-      SPEC_OCLS (sym->etype) = idata;
-      sym->iaccess = 1;
-      allocIntoSeg (sym);
-      return;
-    }
-
-  if (SPEC_SCLS (sym->etype) == S_PDATA)
-    {
-      SPEC_OCLS (sym->etype) = pdata;
-      sym->iaccess = 1;
-      allocIntoSeg (sym);
-      return;
-    }
 
   /* if this is a function then assign code space    */
   if (IS_FUNC (sym->type))
     {
       SPEC_OCLS (sym->etype) = code;
-      return;
-    }
-
-  /* if this is a  SFR or SBIT */
-  if (SPEC_SCLS (sym->etype) == S_SFR ||
-      SPEC_SCLS (sym->etype) == S_SBIT)
-    {
-      SPEC_OCLS (sym->etype) =
-        (SPEC_SCLS (sym->etype) == S_SFR ? sfr : sfrbit);
-
-      allocIntoSeg (sym);
       return;
     }
 
@@ -736,10 +678,8 @@ allocLocal (symbol * sym)
       return;
     }
 
-  if (SPEC_SCLS (sym->etype) == S_EEPROM)
+  if (allocDefault (sym))
     {
-      SPEC_OCLS (sym->etype) = eeprom;
-      allocIntoSeg (sym);
       return;
     }
 

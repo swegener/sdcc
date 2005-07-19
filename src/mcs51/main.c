@@ -19,6 +19,7 @@ static char _defaultRules[] =
 static char *_mcs51_keywords[] =
 {
   "at",
+  "banked",
   "bit",
   "code",
   "critical",
@@ -181,13 +182,16 @@ _mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 static void
 _mcs51_genExtraAreas(FILE *of, bool hasMain)
 {
-  tfprintf (of, "\t!area\n", port->mem.code_name);
+  tfprintf (of, "\t!area\n", HOME_NAME);
   tfprintf (of, "\t!area\n", "GSINIT0 (CODE)");
   tfprintf (of, "\t!area\n", "GSINIT1 (CODE)");
   tfprintf (of, "\t!area\n", "GSINIT2 (CODE)");
   tfprintf (of, "\t!area\n", "GSINIT3 (CODE)");
   tfprintf (of, "\t!area\n", "GSINIT4 (CODE)");
   tfprintf (of, "\t!area\n", "GSINIT5 (CODE)");
+  tfprintf (of, "\t!area\n", STATIC_NAME);
+  tfprintf (of, "\t!area\n", port->mem.post_static_name);
+  tfprintf (of, "\t!area\n", CODE_NAME);
 }
 
 static void

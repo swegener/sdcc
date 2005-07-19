@@ -3341,7 +3341,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   int stack = 0;
 
   if (!IS_FUNC(OP_SYMBOL(left)->type) &&
-      !IS_CODEPTR(OP_SYMBOL(left)->type)) {
+      !IS_FUNCPTR(OP_SYMBOL(left)->type)) {
     werror (E_FUNCTION_EXPECTED);
     return operandFromValue(valueFromLit(0));
   }
@@ -3352,7 +3352,7 @@ geniCodeCall (operand * left, ast * parms,int lvl)
   geniCodeSEParms (parms,lvl);
 
   ftype = operandType (left);
-  if (IS_CODEPTR (ftype))
+  if (IS_FUNCPTR (ftype))
     ftype = ftype->next;
 
   /* first the parameters */

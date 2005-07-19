@@ -164,10 +164,11 @@ _hc08_genAssemblerPreamble (FILE * of)
   symbol *mainExists=newSymbol("main", 0);
   mainExists->block=0;
 
-  fprintf (of, "\t.area %s\n",port->mem.code_name);
+  fprintf (of, "\t.area %s\n",HOME_NAME);
   fprintf (of, "\t.area GSINIT0 (CODE)\n");
   fprintf (of, "\t.area %s\n",port->mem.static_name);
   fprintf (of, "\t.area %s\n",port->mem.post_static_name);
+  fprintf (of, "\t.area %s\n",CODE_NAME);
   fprintf (of, "\t.area %s\n",port->mem.xinit_name);
   fprintf (of, "\t.area %s\n",port->mem.const_name);
   fprintf (of, "\t.area %s\n",port->mem.data_name);

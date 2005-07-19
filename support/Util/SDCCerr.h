@@ -198,6 +198,7 @@ SDCCERR - SDCC Standard error handler
 #define W_COMPLEMENT                  180 /* ~bit can give unexpected results */
 #define E_SHADOWREGS_NO_ISR           181 /* shadowregs keyword following non-ISR function */
 #define W_SFR_ABSRANGE                182 /* sfr at address out of range */
+#define E_BANKED_WITH_CALLEESAVES     183 /* banked and callee-saves mixed */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

@@ -198,6 +198,7 @@ lkparea(char *id)
 
     ap = areap;
     axp = (struct areax *) new (sizeof(struct areax));
+    axp->a_addr = -1; /* default: no address yet */
     while (ap) {
         if (symeq(id, ap->a_id)) {
             taxp = ap->a_axp;
@@ -381,7 +382,7 @@ lnkarea()
         /*JCF: Since area BSEG is defined just before BSEG_BYTES, use the bit size of BSEG
         to compute the byte size of BSEG_BYTES: */
         if (!strcmp(ap->a_id, "BSEG")) {
-            ap->a_ap->a_axp->a_size=(ap->a_addr/8)+((ap->a_size+7)/8); /*Bits to bytes*/
+            ap->a_ap->a_axp->a_size += ((ap->a_addr + ap->a_size + 7)/8); /*Bits to bytes*/
         }
         else if (!strcmp(ap->a_id, "REG_BANK_0")) ta[0]=ap;
         else if (!strcmp(ap->a_id, "REG_BANK_1")) ta[1]=ap;
@@ -484,6 +485,7 @@ lnksect(register struct area *tap)
 
 void lnksect2 (struct area *tap, int rloc);
 char idatamap[256];
+long codemap[2048];
 
 /*Modified version of the functions for packing variables in internal data memory*/
 VOID lnkarea2 (void)
@@ -497,6 +499,7 @@ VOID lnkarea2 (void)
     struct sym *sp_dseg_s=NULL, *sp_dseg_l=NULL;
 
     for(j=0; j<256; j++) idatamap[j]=' ';
+    memset(codemap, 0, sizeof(codemap));
 
     ap = areap;
     while (ap)
@@ -552,7 +555,7 @@ VOID lnkarea2 (void)
         to compute the byte size of BSEG_BYTES: */
         if (!strcmp(ap->a_id, "BSEG"))
         {
-            ap->a_ap->a_axp->a_size=(ap->a_addr/8)+((ap->a_size+7)/8); /*Bits to bytes*/
+                ap->a_ap->a_axp->a_size = ((ap->a_addr + ap->a_size + 7)/8); /*Bits to bytes*/
         }
         else if (!strcmp(ap->a_id, "DSEG"))
         {
@@ -801,7 +804,7 @@ void lnksect2 (struct area *tap, int rloc)
             {
                 if(taxp->a_size!=0)
                 {
-                    for(j=0x20+taxp->a_addr; j<((int)(0x20+taxp->a_addr+taxp->a_size)); j++)
+                    for(j=addr; j<((int)(addr+taxp->a_size)); j++)
                         idatamap[j]=fchar;
                 }
 
@@ -815,6 +818,32 @@ void lnksect2 (struct area *tap, int rloc)
                 if(!strcmp(tap->a_id, "XSTK") && (taxp->a_size == 1))
                 {
                     taxp->a_size = 256-(addr & 0xFF);
+                }
+                //should find next unused address now!!!
+                //but let's first just warn for overlaps
+                if (rloc == 1)
+                {
+                    int a = addr;
+                    int i = addr >> 5;
+                    int j = (addr + taxp->a_size) >> 5;
+                    long mask = -(1 << (addr & 0x1F));
+
+                    while (i < j)
+                    {
+                        if (codemap[i] & mask)
+                        {
+                            fprintf(stderr, "memory overlap near 0x%X for %s\n", a, tap->a_id);
+                        }
+                        codemap[i++] |= mask;
+                        mask = 0xFFFFFFFF;
+                        a += 32;
+                    }
+                    mask &= (1 << ((addr + taxp->a_size) & 0x1F)) - 1;
+                    if (codemap[i] & mask)
+                    {
+                        fprintf(stderr, "memory overlap near 0x%X for %s\n", a, tap->a_id);
+                    }
+                    codemap[i] |= mask;
                 }
                 taxp->a_addr = addr;
                 addr += taxp->a_size;

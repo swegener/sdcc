@@ -1,3 +1,49 @@
+2005-07-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/lkarea.c (lnkarea, lnkarea2): improved BSEG size calculation,
+	  (lnksect2): generate warnings for memory overlap
+	* src/SDCC.lex (doPragma, process_pragma): added pragma's codeseg and
+	  constseg to set the name of these segments so you can instruct the linker
+	  to place them in banks
+	* src/SDCCast.c (decorateType): use new macro IS_FUNCPTR()
+	* src/SDCCglobl.h: added MODEL_HUGE to enum,
+	  added code_seg and const_seg to options
+	* src/SDCCglue.c (emitMaps): use options.const_seg,
+	  (createInterruptVect): put interrupt vectors in segment HOME,
+	  (glue): put HOME before static segment and put the main glue in HOME,
+	  (glue): use options.code_seg
+	* src/SDCCicode.c (geniCodeCall): use new macro IS_FUNCPTR()
+	* src/SDCCmain.c: added option --codeseg and --constseg to set the name of
+	  these segments so you can instruct the linker to place them in banks
+	  (linkEdit): use code_loc for HOME segment which should be the first
+	  segment in code memory now
+	* src/SDCCmem.c: fixed more stuff like bug 1238386
+	* src/SDCCsymt.c (getSize): use generic pointer size for banked functions,
+	  (changePointer): don't change function pointers to code pointers for
+	  banked functions,
+	  (compareType): added exceptional check for banked function pointers
+	* src/SDCCsymt.h: changed IFFUNC_ISBANKEDCALL, added IS_FUNCPTR
+	* src/hc08/main.c (_hc08_genAssemblerPreamble): put HOME first, put CSEG
+	  after static in code memory
+	* src/mcs51/gen.c: added aopLiteralLong prototype,
+	  (aopForSym): use getSize for functions,
+	  (genCall): generate banked calls over one trampoline __sdcc_banked_call
+	  in HOME with lsb of address in r0, msb in r1 and bank in r2, use
+	  -Wl-bBANKSEG=0xbbaaaa option to set the address (aaaa) and bank (bb) of
+	  the segment,
+	  (genPcall): use call for literal function pointers and generate banked
+	  calls over the one trampoline so there's only one place for the user to
+	  modify according to his/hers hardware,
+	  (genEndFunction): jump to __sdcc_banked_ret in HOME for banked functions,
+	  (genPlusIncr): moved check icount>4 beyond inc dptr optimization
+	* src/mcs51/main.c: added keyword banked,
+	  (_mcs51_genExtraAreas): put HOME first followed by GSINIT, STATIC and CSEG
+	* support/Util/SDCCerr.c,
+	* support/Util/SDCCerr.h: added E_BANKED_WITH_CALLEESAVES, registers are
+	  needed for passing the bank and address to the trampoline
+	* device/lib/mcs51/crtbank.asm: added for bankswitching
+	* device/lib/mcs51/Makefile: added crtbank
+
 2005-07-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (algebraicOpts): fixed loss of volatility

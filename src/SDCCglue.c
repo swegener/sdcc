@@ -1330,8 +1330,8 @@ emitMaps (void)
   emitRegularMap (home, TRUE, FALSE);
   emitRegularMap (code, TRUE, FALSE);
 
-  if (CONST_NAME) {
-    tfprintf (code->oFile, "\t!area\n", CONST_NAME);
+  if (options.const_seg) {
+    tfprintf (code->oFile, "\t!area\n", options.const_seg);
   }
   emitStaticSeg (statsg, code->oFile);
   if (port->genXINIT) {
@@ -1378,7 +1378,7 @@ createInterruptVect (FILE * vFile)
       return;
     }
 
-  tfprintf (vFile, "\t!areacode\n", CODE_NAME);
+  tfprintf (vFile, "\t!areacode\n", HOME_NAME);
   fprintf (vFile, "__interrupt_vect:\n");
 
 
@@ -1816,7 +1816,7 @@ glue (void)
    * the post_static_name area will immediately follow the static_name
    * area.
    */
-  tfprintf (asmFile, "\t!area\n", port->mem.code_name);
+  tfprintf (asmFile, "\t!area\n", port->mem.home_name);
   tfprintf (asmFile, "\t!area\n", port->mem.static_name);       /* MOF */
   tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
   tfprintf (asmFile, "\t!area\n", port->mem.static_name);
@@ -1884,15 +1884,10 @@ glue (void)
   tfprintf (asmFile, "\t!areahome\n", HOME_NAME);
   copyFile (asmFile, home->oFile);
 
-  /* copy over code */
-  fprintf (asmFile, "%s", iComments2);
-  fprintf (asmFile, "; code\n");
-  fprintf (asmFile, "%s", iComments2);
-  tfprintf (asmFile, "\t!areacode\n", CODE_NAME);
   if (mainf && IFFUNC_HASBODY(mainf->type))
     {
 
-      /* entry point @ start of CSEG */
+      /* entry point @ start of HOME */
       fprintf (asmFile, "__sdcc_program_startup:\n");
 
       /* put in jump or call to main */
@@ -1908,6 +1903,11 @@ glue (void)
           fprintf (asmFile, "\tsjmp .\n");
         }
     }
+  /* copy over code */
+  fprintf (asmFile, "%s", iComments2);
+  fprintf (asmFile, "; code\n");
+  fprintf (asmFile, "%s", iComments2);
+  tfprintf (asmFile, "\t!areacode\n", options.code_seg);
   copyFile (asmFile, code->oFile);
 
   if (port->genAssemblerEnd) {

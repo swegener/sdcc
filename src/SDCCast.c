@@ -4178,8 +4178,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* require a function or pointer to function */
-      if (!IS_FUNC (LTYPE (tree))
-          && !(IS_CODEPTR (LTYPE (tree)) && IS_FUNC (LTYPE (tree)->next)))
+      if (!IS_FUNC (LTYPE (tree)) && !IS_FUNCPTR (LTYPE (tree)))
         {
           werrorfl (tree->filename, tree->lineno, E_FUNCTION_EXPECTED);
           goto errorTreeReturn;
@@ -4193,7 +4192,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           sym_link *functype;      
           parmNumber = 1;
 
-          if (IS_CODEPTR(LTYPE(tree)))
+          if (IS_FUNCPTR (LTYPE (tree)))
             functype = LTYPE (tree)->next;
           else
             functype = LTYPE (tree);

@@ -44,6 +44,7 @@
 #include "gen.h"
 
 char *aopLiteral (value * val, int offset);
+char *aopLiteralLong (value * val, int offset, int size);
 extern int allocInfo;
 
 /* this is the down and dirty file with all kinds of
@@ -598,7 +599,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_IMMD);
       aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (sym->rname) + 1);
       strcpy (aop->aopu.aop_immd.aop_immd1, sym->rname);
-      aop->size = FPTRSIZE;
+      aop->size = getSize (sym->type);
       return aop;
     }
 
@@ -2044,9 +2045,11 @@ pushSide (operand * oper, int size)
           emitcode ("push", "acc");
         }
       else
+        {
           emitcode ("push", "%s", l);
         }
     }
+}
 
 /*-----------------------------------------------------------------*/
 /* assignResultValue - also indicates if acc is in use afterwards  */
@@ -2427,9 +2430,30 @@ genCall (iCode * ic)
   }
 
   /* make the call */
-  emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
-                            OP_SYMBOL (IC_LEFT (ic))->rname :
-                            OP_SYMBOL (IC_LEFT (ic))->name));
+  if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+    {
+      if (IFFUNC_CALLEESAVES(dtype))
+        {
+          werror (E_BANKED_WITH_CALLEESAVES);
+        }
+      else
+        {
+          char *l = (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                     OP_SYMBOL (IC_LEFT (ic))->rname :
+                     OP_SYMBOL (IC_LEFT (ic))->name);
+
+          emitcode ("mov", "r0,#%s", l);
+          emitcode ("mov", "r1,#(%s >> 8)", l);
+          emitcode ("mov", "r2,#(%s >> 16)", l);
+          emitcode ("lcall", "__sdcc_banked_call");
+        }
+    }
+  else
+    {
+      emitcode ("lcall", "%s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
+                                OP_SYMBOL (IC_LEFT (ic))->rname :
+                                OP_SYMBOL (IC_LEFT (ic))->name));
+    }
 
   if (swapBanks)
   {
@@ -2510,6 +2534,7 @@ static void
 genPcall (iCode * ic)
 {
   sym_link *dtype;
+  sym_link *etype;
   symbol *rlbl = newiTempLabel (NULL);
 //  bool restoreBank=FALSE;
   bool swapBanks = FALSE;
@@ -2534,37 +2559,121 @@ genPcall (iCode * ic)
       // need caution message to user here
   }
 
-  /* push the return address on to the stack */
-  emitcode ("mov", "a,#%05d$", (rlbl->key + 100));
-  emitcode ("push", "acc");
-  emitcode ("mov", "a,#(%05d$ >> 8)", (rlbl->key + 100));
-  emitcode ("push", "acc");
-
-  /* now push the calling address */
-  aopOp (IC_LEFT (ic), ic, FALSE);
-
-  pushSide (IC_LEFT (ic), FPTRSIZE);
-
-  freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
-
-  /* if send set is not empty the assign */
-  if (_G.sendSet)
+  etype = getSpec(dtype);
+  if (IS_LITERAL(etype))
     {
-        genSend(reverseSet(_G.sendSet));
-        _G.sendSet = NULL;
-    }
+      /* if send set is not empty then assign */
+      if (_G.sendSet)
+        {
+          genSend(reverseSet(_G.sendSet));
+          _G.sendSet = NULL;
+        }
 
-  if (swapBanks)
-  {
-        emitcode ("mov", "psw,#0x%02x",
+      if (swapBanks)
+        {
+          emitcode ("mov", "psw,#0x%02x",
            ((FUNC_REGBANK(dtype)) << 3) & 0xff);
-  }
+        }
 
-  /* make the call */
-  emitcode ("ret", "");
-  emitcode ("", "%05d$:", (rlbl->key + 100));
+      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+        {
+          if (IFFUNC_CALLEESAVES(dtype))
+            {
+              werror (E_BANKED_WITH_CALLEESAVES);
+            }
+          else
+            {
+              char *l = aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 0, 2);
 
+              emitcode ("mov", "r0,#%s", l);
+              emitcode ("mov", "r1,#(%s >> 8)", l);
+              emitcode ("mov", "r2,#(%s >> 16)", l);
+              emitcode ("lcall", "__sdcc_banked_call");
+            }
+        }
+      else
+        {
+          emitcode ("lcall", "%s", aopLiteralLong (OP_VALUE (IC_LEFT (ic)), 0, 2));
+        }
+    }
+  else
+    {
+      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+        {
+          if (IFFUNC_CALLEESAVES(dtype))
+            {
+              werror (E_BANKED_WITH_CALLEESAVES);
+            }
+          else
+            {
+              aopOp (IC_LEFT (ic), ic, FALSE);
 
+              if (!swapBanks)
+                {
+                  emitcode ("mov", "ar0,%s", aopGet(IC_LEFT (ic), 0, FALSE, FALSE));
+                  emitcode ("mov", "ar1,%s", aopGet(IC_LEFT (ic), 1, FALSE, FALSE));
+                  emitcode ("mov", "ar2,%s", aopGet(IC_LEFT (ic), 2, FALSE, FALSE));
+                }
+              else
+                {
+                  int reg = ((FUNC_REGBANK(dtype)) << 3) & 0xff;
+                  emitcode ("mov", "0x%02x,%s", reg++, aopGet(IC_LEFT (ic), 0, FALSE, FALSE));
+                  emitcode ("mov", "0x%02x,%s", reg++, aopGet(IC_LEFT (ic), 1, FALSE, FALSE));
+                  emitcode ("mov", "0x%02x,%s", reg,   aopGet(IC_LEFT (ic), 2, FALSE, FALSE));
+                }
+
+              freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
+
+              /* if send set is not empty then assign */
+              if (_G.sendSet)
+                {
+                  genSend(reverseSet(_G.sendSet));
+                  _G.sendSet = NULL;
+                }
+
+              if (swapBanks)
+                {
+                  emitcode ("mov", "psw,#0x%02x",
+                   ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+                }
+
+              /* make the call */
+              emitcode ("lcall", "__sdcc_banked_call");
+            }
+        }
+      else
+        {
+          /* push the return address on to the stack */
+          emitcode ("mov", "a,#%05d$", (rlbl->key + 100));
+          emitcode ("push", "acc");
+          emitcode ("mov", "a,#(%05d$ >> 8)", (rlbl->key + 100));
+          emitcode ("push", "acc");
+
+          /* now push the calling address */
+          aopOp (IC_LEFT (ic), ic, FALSE);
+
+          pushSide (IC_LEFT (ic), FPTRSIZE);
+
+          freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
+
+          /* if send set is not empty the assign */
+          if (_G.sendSet)
+            {
+              genSend(reverseSet(_G.sendSet));
+              _G.sendSet = NULL;
+            }
+
+          if (swapBanks)
+            {
+              emitcode ("mov", "psw,#0x%02x",
+               ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+            }
+
+          /* make the call */
+          emitcode ("ret", "");
+          emitcode ("", "%05d$:", (rlbl->key + 100));
+        }
+    }
   if (swapBanks)
   {
        emitcode ("mov", "psw,#0x%02x",
@@ -3256,7 +3365,14 @@ genEndFunction (iCode * ic)
           debugFile->writeEndFunction (currFunc, ic, 1);
         }
 
-      emitcode ("ret", "");
+      if (IFFUNC_ISBANKEDCALL (sym->type) && !SPEC_STAT(getSpec(sym->type)))
+        {
+          emitcode ("ljmp", "__sdcc_banked_ret");
+        }
+      else
+        {
+          emitcode ("ret", "");
+        }
     }
 
   if (!port->peep.getRegsRead || !port->peep.getRegsWritten || options.nopeep)
@@ -3486,10 +3602,7 @@ genPlusIncr (iCode * ic)
   if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
     return FALSE;
 
-  /* if the literal value of the right hand side
-     is greater than 4 then it is not worth it */
-  if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
-    return FALSE;
+  icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
   D(emitcode (";     genPlusIncr",""));
 
@@ -3595,6 +3708,11 @@ genPlusIncr (iCode * ic)
 
       return TRUE;
     }
+
+  /* if the literal value of the right hand side
+     is greater than 4 then it is not worth it */
+  if (icount > 4)
+    return FALSE;
 
   /* if the sizes are greater than 1 then we cannot */
   if (AOP_SIZE (IC_RESULT (ic)) > 1 ||

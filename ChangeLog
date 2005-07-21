@@ -1,3 +1,10 @@
+2005-07-21 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (aopOp): do not generate AOP_ACC operands as pic14
+	  architecture cannot handle them efficiently, fixes bug #1235003
+	* src/pic16/device.c (pic16_dump_{u,i}section,pic16_dump_int_registers):
+	  check for empty sets before using them (fixes bug #1232190)
+
 2005-07-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/lkarea.c (lnkarea, lnkarea2): improved BSEG size calculation,

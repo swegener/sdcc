@@ -77,7 +77,7 @@ char *fReturnpic14[] = {"temp1","temp2","temp3","temp4" };
 unsigned fReturnSizePic = 4; /* shared with ralloc.c */
 static char **fReturn = fReturnpic14;
 
-static char *accUse[] = {"a","b"};
+//static char *accUse[] = {"a","b"};
 
 //static short rbank = -1;
 
@@ -853,6 +853,10 @@ void aopOp (operand *op, iCode *ic, bool result)
 			return;
 		}
 		
+#if 0
+		/* WREG is not usable as an ordinary operand with PIC architecture,
+		 * one might introduce a scratch register that can be used to make
+		 * WREG accesible as an operand... disable WREG for now */
 		if (sym->accuse) {
 			int i;
 			aop = op->aop = sym->aop = newAsmop(AOP_ACC);
@@ -862,6 +866,7 @@ void aopOp (operand *op, iCode *ic, bool result)
 			DEBUGpic14_emitcode(";","%d size=%d",__LINE__,aop->size);
 			return;  
 		}
+#endif
 		
 		if (sym->ruonly ) {
 			if(sym->isptr) {	// && sym->uptr 

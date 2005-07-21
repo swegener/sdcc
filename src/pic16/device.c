@@ -681,6 +681,7 @@ void pic16_dump_usection(FILE *of, set *section, int fix)
   regs *r1;
 
 	/* put all symbols in an array */
+	if (!elementsInSet(section)) return;
 	rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
 	r = rlist[0]; i = 0;
 	for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {
@@ -779,6 +780,7 @@ void pic16_dump_isection(FILE *of, set *section, int fix)
   symbol **slist;
 
 	/* put all symbols in an array */
+	if (!elementsInSet(section)) return;
 	slist = Safe_calloc(elementsInSet(section), sizeof(symbol *));
 	s = slist[0]; i = 0;
 	for(sprev = setFirstItem(section); sprev; sprev = setNextItem(section)) {
@@ -863,6 +865,7 @@ void pic16_dump_int_registers(FILE *of, set *section)
   regs **rlist;
 
 	/* put all symbols in an array */
+	if (!elementsInSet(section)) return;
 	rlist = Safe_calloc(elementsInSet(section), sizeof(regs *));
 	r = rlist[0]; i = 0;
 	for(rprev = setFirstItem(section); rprev; rprev = setNextItem(section)) {

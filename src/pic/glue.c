@@ -100,6 +100,36 @@ int pic14aopLiteral (value *val, int offset)
 	
 }
 
+/* set of already emitted symbols; we store only pointers to the emitted
+ * symbol names so these MUST NO BE CHANGED afterwards... */
+static set *symbolsEmitted = NULL;
+
+/*-------------------------------------------------------------------*/
+/* emitSymbolToFile - write a symbol definition only if it is not    */
+/*                    already present                                */
+/*-------------------------------------------------------------------*/
+void
+emitSymbolToFile (FILE *of, const char *name, int size)
+{
+	const char *sym;
+	
+	/* check whether the symbol is already defined */
+	for (sym = (const char *) setFirstItem (symbolsEmitted);
+		sym;
+		sym = (const char *) setNextItem (symbolsEmitted))
+	{
+		if (!strcmp (sym, name))
+		{
+			//fprintf (stderr, "%s: already emitted: %s\n", __FUNCTION__, name);
+			return;
+		}
+	} // for
+	
+	/* new symbol -- define it */
+	//fprintf (stderr, "%s: emitting %s (%d)\n", __FUNCTION__, name, size);
+	fprintf (of, "%s\tres\t%d\n", name, size);
+	addSet (&symbolsEmitted, (void *) name);
+}
 
 /*-----------------------------------------------------------------*/
 /* emitRegularMap - emit code for maps with no special cases       */
@@ -188,7 +218,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			}
 			else
 			{
-				fprintf (map->oFile, "%s\tres\t%d\n", sym->rname,getSize (sym->type) & 0xffff);
+				emitSymbolToFile (map->oFile, sym->rname, getSize (sym->type) & 0xffff);
 				/*
 				{
 				int i, size;

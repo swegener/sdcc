@@ -1,3 +1,22 @@
+2005-07-22 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (dump_sfr): replaced register declaration with
+	  call to emitSymbolToFile() to avoid duplicate symbols
+	* (assignRelocatableRegisters): do not declare external symbols
+	* src/pic/ralloc.c (allocNewDirReg): fixed to get size of arrays
+	  right (take size of type, not etype)
+	* (allocDirReg): fixed call to allocNewDirReg() to pass OP_SYM_TYPE
+	* (writeUsedRegs): also dump dynDirectRegs (e.g. local variables)
+	* (packRegsForAccUse): disabled assignment of WREG as
+	  the result reg to prevent occurence of just fixed #1235003,
+	  fixes #1242954
+	* src/pic/glue.c (emitSymbolToFile): NEW, central place to declare
+	  symbols (avoids duplicate symbols in .asm file)
+	* (pic14emitRegularMap): use emitSymbolToFile()
+	* src/pic/gen.c (aopOp): fixed spillLocation handling
+	* (gen{Unp,P}ackBits): fixed acquiring bit-operands
+	* (genDataPointerSet): removed unneccessary variables/output
+
 2005-07-22 Maarten Brock <sourceforge.brock AT dse.nl>
 	* as/mcs51/lkarea.c: enlarged codemap for banked memory
 	* device/lib/mcs51/crtbank.asm: added # to 0x0F

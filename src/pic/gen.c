@@ -900,23 +900,27 @@ void aopOp (operand *op, iCode *ic, bool result)
 		}
 		
 		/* else spill location	*/
-		if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
-			/* force a new aop if sizes differ */
-			sym->usl.spillLoc->aop = NULL;
+		if (sym->usl.spillLoc)
+		{
+			if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
+			{
+				/* force a new aop if sizes differ */
+				sym->usl.spillLoc->aop = NULL;
+			}
+			DEBUGpic14_emitcode(";","%s %d %s sym->rname = %s, offset %d",
+				__FUNCTION__,__LINE__,
+				sym->usl.spillLoc->rname,
+				sym->rname, sym->usl.spillLoc->offset);
+		
+			sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
+			//aop->aopu.pcop = popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
+			aop->aopu.pcop = popRegFromString(sym->usl.spillLoc->rname, 
+				getSize(sym->type), 
+				sym->usl.spillLoc->offset);
+			aop->size = getSize(sym->type);
+		
+			return;
 		}
-		DEBUGpic14_emitcode(";","%s %d %s sym->rname = %s, offset %d",
-			__FUNCTION__,__LINE__,
-			sym->usl.spillLoc->rname,
-			sym->rname, sym->usl.spillLoc->offset);
-		
-		sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
-		//aop->aopu.pcop = popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
-		aop->aopu.pcop = popRegFromString(sym->usl.spillLoc->rname, 
-			getSize(sym->type), 
-			sym->usl.spillLoc->offset);
-		aop->size = getSize(sym->type);
-		
-		return;
 	}
 	
 	{
@@ -8164,7 +8168,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 			resolvedIfx rIfx;
 			resolveIfx(&rIfx,ifx);
 			if (ptype == -1) /* direct */
-				pcop = newpCodeOpBit(AOP(left)->aopu.pcop->name,bstr,0);
+				pcop = newpCodeOpBit(aopGet (AOP(left),0,FALSE,FALSE),bstr,0);
 			else
 				pcop = newpCodeOpBit(pc_indf.pcop.name,bstr,0);
 			emitpcode((rIfx.condition) ? POC_BTFSC : POC_BTFSS,pcop);
@@ -8172,21 +8176,30 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 			ifx->generated=1;
 		} else {
 			pCodeOp *pcop;
+			
 			if (ptype == -1) /* direct */
-				pcop = newpCodeOpBit(AOP(left)->aopu.pcop->name,bstr,0);
+				pcop = newpCodeOpBit(aopGet (AOP(left),0,FALSE,FALSE),bstr,0);
 			else
 				pcop = newpCodeOpBit(pc_indf.pcop.name,bstr,0);
 			emitpcode(POC_BTFSC,pcop);
-			emitpcode(POC_BSF,newpCodeOpBit(AOP(result)->aopu.pcop->name,bstr,0));
-
+			emitpcode(POC_BSF,newpCodeOpBit(aopGet(AOP(result), 0,FALSE,FALSE),bstr,0));
 			if (ptype == -1) /* direct */
-				pcop = newpCodeOpBit(AOP(left)->aopu.pcop->name,bstr,0);
+				pcop = newpCodeOpBit(aopGet(AOP(left),0,FALSE,FALSE),bstr,0);
 			else
 				pcop = newpCodeOpBit(pc_indf.pcop.name,bstr,0);
 			emitpcode(POC_BTFSS,pcop);
-			emitpcode(POC_BCF,newpCodeOpBit(AOP(result)->aopu.pcop->name,bstr,0));
+			emitpcode(POC_BCF,newpCodeOpBit(aopGet(AOP(result),0,FALSE,FALSE),bstr,0));
 		}
 		return;
+	}
+
+	{
+	  static int has_warned=0;
+	  if (!has_warned)
+	  {
+	    fprintf (stderr, "%s: bitfields with more than 1 bit are probably broken...", __FUNCTION__);
+	    has_warned=1;
+	  }
 	}
 
 	/* read the first byte  */
@@ -8968,7 +8981,7 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,char *rna
 				if (p_type == -1) {
 					pCodeOp *pcop;
 					if (AOP(result)->type == AOP_PCODE)
-						pcop = newpCodeOpBit(AOP(result)->aopu.pcop->name,bstr,0);
+						pcop = newpCodeOpBit(aopGet(AOP(result),0,FALSE,FALSE),bstr,0);
 					else
 						pcop = popGet(AOP(result),0);
 					emitpcode(lit?POC_BSF:POC_BCF,pcop);
@@ -9130,13 +9143,12 @@ static void genDataPointerSet(operand *right,
 	iCode *ic)
 {
 	int size, offset = 0 ;
-	char *l, buffer[256];
 	
 	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	aopOp(right,ic,FALSE);
+	aopOp(result,ic,FALSE);
 	
-	l = aopGet(AOP(result),0,FALSE,TRUE);
 	size = AOP_SIZE(right);
 	/*
 	if ( AOP_TYPE(result) == AOP_PCODE) {
@@ -9149,11 +9161,6 @@ static void genDataPointerSet(operand *right,
 	// tsd, was l+1 - the underline `_' prefix was being stripped
 	while (size--) {
 		emitpComment ("%s:%u: size=%i, offset=%i", __FILE__,__LINE__, size, offset);
-		if (offset) {
-			sprintf(buffer,"(%s + %d)",l,offset);
-			fprintf(stderr,"%s:%i: oops  %s (%i, AOP_LIT=%i)\n",__FILE__,__LINE__,buffer, AOP_TYPE(right), AOP_LIT);
-		} else
-			sprintf(buffer,"%s",l);
 		
 		if (AOP_TYPE(right) == AOP_LIT) {
 			unsigned int lit = (unsigned int) floatFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);

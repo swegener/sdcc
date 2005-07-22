@@ -371,7 +371,7 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 	dReg->reglives.assignedpFlows = newSet();
 	
 	hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
-	
+
 	return dReg;
 }
 
@@ -586,10 +586,11 @@ allocNewDirReg (sym_link *symlnk,const char *name)
 {
 	regs *reg;
 	int address = 0;
+	sym_link *spec = getSpec (symlnk);
 	
 	/* if this is at an absolute address, then get the address. */
-	if (SPEC_ABSA (symlnk) ) {
-		address = SPEC_ADDR (symlnk);
+	if (SPEC_ABSA (spec) ) {
+		address = SPEC_ADDR (spec);
 		//fprintf(stderr,"reg %s is at an absolute address: 0x%03x\n",name,address);
 	}
 	
@@ -602,7 +603,7 @@ allocNewDirReg (sym_link *symlnk,const char *name)
 	} else {
 		int idx;
 		if (address) {
-			if (IS_BITVAR (symlnk))
+			if (IS_BITVAR (spec))
 				idx = address >> 3;
 			else
 				idx = address;
@@ -612,20 +613,20 @@ allocNewDirReg (sym_link *symlnk,const char *name)
 		reg = newReg(REG_GPR, PO_DIR, idx, (char*)name,getSize (symlnk),0 );
 		debugLog ("  -- added %s to hash, size = %d\n", (char*)name,reg->size);
 		
-		if (SPEC_ABSA (symlnk) ) {
+		if (SPEC_ABSA (spec) ) {
 			reg->type = REG_SFR;
 		}
 		
-		if (IS_BITVAR (symlnk)) {
+		if (IS_BITVAR (spec)) {
 			addSet(&dynDirectBitRegs, reg);
 			reg->isBitField = 1;
 		} else
 			addSet(&dynDirectRegs, reg);
 		
-		if (!IS_STATIC (symlnk)) {
+		if (!IS_STATIC (spec)) {
 			reg->isPublic = 1;
 		}
-		if (IS_EXTERN (symlnk)) {
+		if (IS_EXTERN (spec)) {
 			reg->isExtern = 1;
 		}
 		
@@ -765,7 +766,7 @@ allocDirReg (operand *op )
 			debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
 		}
 	} else {
-		allocNewDirReg (OP_SYM_ETYPE(op),name);
+		allocNewDirReg (OP_SYM_TYPE(op),name);
 	}
 	
 	return reg;
@@ -796,7 +797,7 @@ allocRegByName (char *name, int size)
 		/* Register wasn't found in hash, so let's create
 		* a new one and put it in the hash table AND in the 
 		* dynDirectRegNames set */
-		//fprintf (stderr,"%s symbol name %s\n", __FUNCTION__,name);
+		//fprintf (stderr,"%s symbol name %s, size:%d\n", __FUNCTION__,name,size);
 		reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0 );
 		for (sym = setFirstItem(sfr->syms); sym; sym = setNextItem(sfr->syms)) {
 			if (strcmp(reg->name+1,sym->name)==0) {
@@ -1184,6 +1185,7 @@ void writeUsedRegs(FILE *of)
 	assignRelocatableRegisters(dynAllocRegs,0);
 	assignRelocatableRegisters(dynStackRegs,0);
 	
+	assignRelocatableRegisters(dynDirectRegs,0);
 	/*
 	assignRelocatableRegisters(dynDirectRegs,0);
 	printf("assignRelocatableRegisters(dynDirectRegs,0);\n");
@@ -3407,10 +3409,22 @@ isBitwiseOptimizable (iCode * ic)
 static void
 packRegsForAccUse (iCode * ic)
 {
-	iCode *uic;
+	//iCode *uic;
 	
 	debugLog ("%s\n", __FUNCTION__);
+
+	/* result too large for WREG? */
+	if (getSize (operandType (IC_RESULT (ic))) > 1)
+	  return;
 	
+	/* We have to make sure that OP_SYMBOL(IC_RESULT(ic))
+	 * is never used as an operand to an instruction that
+	 * cannot have WREG as an operand (e.g. BTFSx cannot
+	 * operate on WREG...
+	 * For now, store all results into proper registers. */
+	return;
+
+#if 0
 	/* if this is an aggregate, e.g. a one byte char array */
 	if (IS_AGGREGATE(operandType(IC_RESULT(ic)))) {
 		return;
@@ -3547,8 +3561,7 @@ packRegsForAccUse (iCode * ic)
 accuse:
 	debugLog ("%s - Yes we are using the accumulator\n", __FUNCTION__);
 	OP_SYMBOL (IC_RESULT (ic))->accuse = 1;
-	
-	
+#endif	
 }
 
 /*-----------------------------------------------------------------*/

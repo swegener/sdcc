@@ -102,6 +102,8 @@ AssignedMemory *finalMapping=NULL;
 
 static unsigned int config_word = DEFAULT_CONFIG_WORD;
 
+extern void emitSymbolToFile (FILE *of, const char *name, int size);
+
 void addMemRange(memRange *r, int type)
 {
 	int i;
@@ -270,9 +272,12 @@ void dump_sfr(FILE *of)
 									finalMapping[start].reg->address+i);
 							}
 						} else {
+							emitSymbolToFile (of, finalMapping[start].reg->name, finalMapping[start].reg->size);
+#if 0
 							fprintf(of,"%s\tres\t%i\n",
 								finalMapping[start].reg->name, 
 								finalMapping[start].reg->size);
+#endif
 						}
 						finalMapping[start].reg->isEmitted = 1;
 					}
@@ -564,9 +569,9 @@ void assignRelocatableRegisters(set *regset, int used)
 	for (reg = setFirstItem(regset) ; reg ; 
 	reg = setNextItem(regset)) {
 		
-		//fprintf(stdout,"assigning %s isFixed=%d, wasUsed=%d\n",reg->name,reg->isFixed,reg->wasUsed);
+		//fprintf(stdout,"assigning %s (%d) isFixed=%d, wasUsed=%d\n",reg->name,reg->size,reg->isFixed,reg->wasUsed);
 		
-		if((!reg->isFixed) && ( used || reg->wasUsed)) {
+		if((!reg->isExtern) && (!reg->isFixed) && ( used || reg->wasUsed)) {
 			/* If register have been reused then shall not print it a second time. */
 			set *s;
 			int done = 0;

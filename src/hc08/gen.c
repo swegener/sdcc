@@ -3440,13 +3440,22 @@ genMinus (iCode * ic)
 
   leftOp = AOP(IC_LEFT(ic));
   rightOp = AOP(IC_RIGHT(ic));
-
   sub = "sub";
   offset = 0;
+
+  if (IS_AOP_A (rightOp))
+    {
+      loadRegFromAop ( hc08_reg_a, rightOp, offset);
+      accopWithAop (sub, leftOp, offset);
+      accopWithMisc ("nega", "");
+      storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), offset++);
+      goto release;
+    }
+
   while (size--)
     {
       loadRegFromAop ( hc08_reg_a, leftOp, offset);
-      accopWithAop(sub, rightOp, offset);
+      accopWithAop (sub, rightOp, offset);
       storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), offset++);
       sub = "sbc";
     }
@@ -3913,11 +3922,10 @@ genModOneByte (operand * left,
       loadRegFromAop (hc08_reg_h, AOP (left), 1);
       loadRegFromAop (hc08_reg_a, AOP (left), 0);
       emitcode ("div", "");
-      hc08_dirtyReg (hc08_reg_a, FALSE);
-      hc08_dirtyReg (hc08_reg_h, FALSE);
-      storeRegToFullAop (hc08_reg_h, AOP (result), FALSE);
       hc08_freeReg (hc08_reg_a);
       hc08_freeReg (hc08_reg_x);
+      hc08_dirtyReg (hc08_reg_h, FALSE);
+      storeRegToFullAop (hc08_reg_h, AOP (result), FALSE);
       hc08_freeReg (hc08_reg_h);
       return;
     }
@@ -3987,8 +3995,8 @@ genModOneByte (operand * left,
   
   loadRegFromConst (hc08_reg_h, zero);
   emitcode ("div", "");
-  hc08_dirtyReg (hc08_reg_x, FALSE);
-  hc08_dirtyReg (hc08_reg_a, FALSE);
+  hc08_freeReg (hc08_reg_a);
+  hc08_freeReg (hc08_reg_x);
   hc08_dirtyReg (hc08_reg_h, FALSE);
 
   if (runtimeSign || compiletimeSign)

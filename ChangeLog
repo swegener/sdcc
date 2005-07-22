@@ -1,3 +1,8 @@
+2005-07-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genMinus): fixed bug #1241835,
+	  (genModOneByte): removed needless psha/pula
+
 2005-07-22 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCmain.c (linkEdit): initialized linkerScriptFileName,

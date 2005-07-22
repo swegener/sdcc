@@ -485,7 +485,7 @@ lnksect(register struct area *tap)
 
 void lnksect2 (struct area *tap, int rloc);
 char idatamap[256];
-long codemap[2048];
+long codemap[524288];
 
 /*Modified version of the functions for packing variables in internal data memory*/
 VOID lnkarea2 (void)

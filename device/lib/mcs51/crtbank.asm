@@ -58,7 +58,7 @@ __sdcc_banked_call::
 	mov	a,r1
 	push	acc		;push MSB address
 	mov	a,r2		;get new bank
-	anl	a,0x0F		;remove storage class indicator
+	anl	a,#0x0F		;remove storage class indicator
 	anl	_PSBANK,#0xF0
 	orl	_PSBANK,a	;select bank
 	xch	a,r0		;restore Acc

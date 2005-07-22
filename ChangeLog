@@ -1,3 +1,7 @@
+2005-07-22 Maarten Brock <sourceforge.brock AT dse.nl>
+	* as/mcs51/lkarea.c: enlarged codemap for banked memory
+	* device/lib/mcs51/crtbank.asm: added # to 0x0F
+
 2005-07-21 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (aopOp): do not generate AOP_ACC operands as pic14

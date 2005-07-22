@@ -434,7 +434,7 @@ static void resolveIfx(resolvedIfx *resIfx, iCode *ifx)
 	resIfx->generated = 0;	/* indicate that the ifx has not been used */
 	
 	if(!ifx) {
-		resIfx->lbl = newiTempLabel(NULL);	/* oops, there is no ifx. so create a label */
+		resIfx->lbl = NULL; /* this is wrong: newiTempLabel(NULL);	/ * oops, there is no ifx. so create a label */
 											/*
 											DEBUGpic14_emitcode("; ***","%s %d null ifx creating new label key =%d",
 											__FUNCTION__,__LINE__,resIfx->lbl->key);
@@ -3705,11 +3705,12 @@ static void genSkipc(resolvedIfx *rifx)
 		return;
 	
 	if(rifx->condition)
-		emitSKPC;
-	else
 		emitSKPNC;
+	else
+		emitSKPC;
 	
 	emitpcode(POC_GOTO,popGetLabel(rifx->lbl->key));
+	emitpComment ("%s:%u: created from rifx:%p", __FUNCTION__, __LINE__, rifx);
 	rifx->generated = 1;
 }
 
@@ -3756,6 +3757,8 @@ static void genSkipz(iCode *ifx, int condition)
 		pic14_emitcode("goto","_%05d_DS_",IC_FALSE(ifx)->key+100+labelOffset);
 	
 }
+
+#if 0
 /*-----------------------------------------------------------------*/
 /* genSkipCond                                                     */
 /*-----------------------------------------------------------------*/
@@ -3774,6 +3777,7 @@ static void genSkipCond(resolvedIfx *rifx,operand *op, int offset, int bit)
 	emitpcode(POC_GOTO,popGetLabel(rifx->lbl->key));
 	rifx->generated = 1;
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -3803,6 +3807,241 @@ static int genChkZeroes(operand *op, int lit,  int size)
 	return (flag==0);
 }
 #endif
+
+
+#define isAOP_REGlike(x)  (AOP_TYPE(x) == AOP_REG || AOP_TYPE(x) == AOP_DIR || AOP_TYPE(x) == AOP_PCODE)
+#define isAOP_LIT(x)      (AOP_TYPE(x) == AOP_LIT)
+#define DEBUGpc           emitpComment
+
+/*-----------------------------------------------------------------*/
+/* mov2w_regOrLit :- move to WREG either the offset's byte from    */
+/*                  aop (if it's NOT a literal) or from lit (if    */
+/*                  aop is a literal)                              */
+/*-----------------------------------------------------------------*/
+void pic14_mov2w_regOrLit (asmop *aop, unsigned long lit, int offset) {
+  if (aop->type == AOP_LIT) {
+    emitpcode (POC_MOVLW, popGetLit((lit >> (offset*8)) & 0x00FF));
+  } else {
+    emitpcode (POC_MOVFW, popGet (aop, offset));
+  }
+}
+
+/* genCmp performs a left < right comparison, stores
+ * the outcome in result (if != NULL) and generates
+ * control flow code for the ifx (if != NULL).
+ *
+ * This version leaves in sequences like
+ * "B[CS]F STATUS,0; BTFS[CS] STATUS,0"
+ * which should be optmized by the peephole
+ * optimizer - RN 2005-01-01 */
+static void genCmp (operand *left,operand *right,
+                    operand *result, iCode *ifx, int sign)
+{
+  resolvedIfx rIfx;
+  int size;
+  int offs;
+  symbol *templbl;
+  operand *dummy;
+  unsigned long lit;
+  unsigned long mask;
+  int performedLt;
+  int invert_result = 0;
+
+  FENTRY;
+  
+  assert (AOP_SIZE(left) == AOP_SIZE(right));
+  assert (left && right);
+
+  size = AOP_SIZE(right) - 1;
+  mask = (0x100UL << (size*8)) - 1;
+  // in the end CARRY holds "left < right" (performedLt == 1) or "left >= right" (performedLt == 0)
+  performedLt = 1;
+  templbl = NULL;
+  lit = 0;
+  
+  resolveIfx (&rIfx, ifx);
+
+  /**********************************************************************
+   * handle bits - bit compares are promoted to int compares seemingly! *
+   **********************************************************************/
+#if 0
+  // THIS IS COMPLETELY UNTESTED!
+  if (AOP_TYPE(left) == AOP_CRY && AOP_TYPE(right) == AOP_CRY) {
+    pCodeOp *pcleft = pic16_popGet(AOP(left), 0);
+    pCodeOp *pcright = pic16_popGet(AOP(right), 0);
+    assert (pcleft->type == PO_GPR_BIT && pcright->type == PO_GPR_BIT);
+
+    emitSETC;
+    // 1 < {0,1} is false --> clear C by skipping the next instruction
+    //pic16_emitpcode (POC_BTFSS, pic16_popCopyGPR2Bit (AOP(left),0), PCORB(pcleft)->bit);
+    pic16_emitpcode (POC_BTFSS, pic16_popGet (AOP(left), 0));
+    // {0,1} < 0 is false --> clear C by NOT skipping the next instruction
+    pic16_emitpcode (POC_BTFSS, pic16_popCopyGPR2Bit (pic16_popGet(AOP(right),0), PCORB(pcright)->bit));
+    emitCLRC; // only skipped for left=0 && right=1
+
+    goto correct_result_in_carry;
+  } // if
+#endif
+
+  /*************************************************
+   * make sure that left is register (or the like) *
+   *************************************************/
+  if (!isAOP_REGlike(left)) {
+    DEBUGpc ("swapping arguments (AOP_TYPEs %d/%d)", AOP_TYPE(left), AOP_TYPE(right));
+    assert (isAOP_LIT(left));
+    assert (isAOP_REGlike(right));
+    // swap left and right
+    // left < right <==> right > left <==> (right >= left + 1)
+    lit = (unsigned long)floatFromVal(AOP(left)->aopu.aop_lit);
+
+    if ( (!sign && (lit & mask) == mask) || (sign && (lit & mask) == (mask >> 1)) ) {
+      // MAXVALUE < right? always false
+      if (performedLt) emitCLRC; else emitSETC;
+      goto correct_result_in_carry;
+    } // if
+
+    // This fails for lit = 0xFF (unsigned) AND lit = 0x7F (signed),
+    // that's why we handled it above.
+    lit++;
+
+    dummy = left;
+    left = right;
+    right = dummy;
+
+    performedLt ^= 1; // instead of "left < right" we check for "right >= left+1, i.e. "right < left+1"
+  } else if (isAOP_LIT(right)) {
+    lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+  } // if
+
+  assert (isAOP_REGlike(left)); // left must be register or the like
+  assert (isAOP_REGlike(right) || isAOP_LIT(right)); // right may be register-like or a literal
+
+  /*************************************************
+   * special cases go here                         *
+   *************************************************/
+
+  if (isAOP_LIT(right)) {
+    if (!sign) {
+      // unsigned comparison to a literal
+      DEBUGpc ("unsigned compare: left %s lit(0x%X=%lu), size=%d", performedLt ? "<" : ">=", lit, lit, size+1);
+      if (lit == 0) {
+	// unsigned left < 0? always false
+	if (performedLt) emitCLRC; else emitSETC;
+	goto correct_result_in_carry;
+      }
+    } else {
+      // signed comparison to a literal
+      DEBUGpc ("signed compare: left %s lit(0x%X=%ld), size=%d, mask=%x", performedLt ? "<" : ">=", lit, lit, size+1, mask);
+      if ((lit & mask) == ((0x80 << (size*8)) & mask)) {
+	// signed left < 0x80000000? always false
+	if (performedLt) emitCLRC; else emitSETC;
+	goto correct_result_in_carry;
+      } else if (lit == 0) {
+	// compare left < 0; set CARRY if SIGNBIT(left) is set
+	if (performedLt) emitSETC; else emitCLRC;
+	emitpcode (POC_BTFSS, newpCodeOpBit (aopGet (AOP(left), size, FALSE, FALSE), 7, 0));
+	if (performedLt) emitCLRC; else emitSETC;
+	goto correct_result_in_carry;
+      }
+    } // if (!sign)
+  } // right is literal
+
+  /*************************************************
+   * perform a general case comparison             *
+   * make sure we get CARRY==1 <==> left >= right  *
+   *************************************************/
+  // compare most significant bytes
+  //DEBUGpc ("comparing bytes at offset %d", size);
+  if (!sign) {
+    // unsigned comparison
+    pic14_mov2w_regOrLit (AOP(right), lit, size);
+    emitpcode (POC_SUBFW, popGet (AOP(left), size));
+  } else {
+    // signed comparison
+    // (add 2^n to both operands then perform an unsigned comparison)
+    if (isAOP_LIT(right)) {
+      // left >= LIT <-> LIT-left <= 0 <-> LIT-left == 0 OR !(LIT-left >= 0)
+      unsigned char litbyte = (lit >> (8*size)) & 0xFF;
+
+      if (litbyte == 0x80) {
+	// left >= 0x80 -- always true, but more bytes to come
+	mov2w (AOP(left), size);
+	emitpcode (POC_XORLW, popGetLit (0x80)); // set ZERO flag
+	emitSETC;
+      } else {
+	// left >= LIT <-> left + (-LIT) >= 0 <-> left + (0x100-LIT) >= 0x100
+	mov2w (AOP(left), size);
+	emitpcode (POC_ADDLW, popGetLit (0x80));
+	emitpcode (POC_ADDLW, popGetLit ((0x100 - (litbyte + 0x80)) & 0x00FF));
+      } // if
+    } else {
+      pCodeOp *pctemp = popGetTempReg();
+      mov2w (AOP(left), size);
+      emitpcode (POC_ADDLW, popGetLit (0x80));
+      emitpcode (POC_MOVWF, pctemp);
+      mov2w (AOP(right), size);
+      emitpcode (POC_ADDLW, popGetLit (0x80));
+      emitpcode (POC_SUBFW, pctemp);
+      popReleaseTempReg(pctemp);
+    }
+  } // if (!sign)
+
+  // compare remaining bytes (treat as unsigned case from above)
+  templbl = newiTempLabel ( NULL );
+  offs = size;
+  while (offs--) {
+    //DEBUGpc ("comparing bytes at offset %d", offs);
+    emitSKPZ;
+    emitpcode (POC_GOTO, popGetLabel (templbl->key));
+    pic14_mov2w_regOrLit (AOP(right), lit, offs);
+    emitpcode (POC_SUBFW, popGet (AOP(left), offs));
+  } // while (offs)
+  emitpLabel (templbl->key);
+  goto result_in_carry;
+
+result_in_carry:
+  
+  /****************************************************
+   * now CARRY contains the result of the comparison: *
+   * SUBWF sets CARRY iff                             *
+   * F-W >= 0 <==> F >= W <==> !(F < W)               *
+   * (F=left, W=right)                                *
+   ****************************************************/
+
+  if (performedLt) {
+    invert_result = 1;
+    // value will be used in the following genSkipc()
+    rIfx.condition ^= 1;
+  } // if
+
+correct_result_in_carry:
+
+  // assign result to variable (if neccessary)
+  if (result && AOP_TYPE(result) != AOP_CRY) {
+    //DEBUGpc ("assign result");
+    size = AOP_SIZE(result);
+    while (size--) {
+      emitpcode (POC_CLRF, popGet (AOP(result), size));
+    } // while
+    if (invert_result) {
+      emitSKPC;
+      emitpcode (POC_BSF, newpCodeOpBit (aopGet (AOP(result), 0, FALSE, FALSE), 0, 0));
+    } else {
+      emitpcode (POC_RLF, popGet (AOP(result), 0));
+    }
+  } // if (result)
+
+  // perform conditional jump
+  if (ifx) {
+    //DEBUGpc ("generate control flow");
+    genSkipc (&rIfx);
+    ifx->generated = 1;
+  } // if
+}
+
+
+#if 0
+/* OLD VERSION -- BUGGY, DO NOT USE */
 
 /*-----------------------------------------------------------------*/
 /* genCmp :- greater or less than comparison                       */
@@ -3905,7 +4144,7 @@ static void genCmp (operand *left,operand *right,
 					} else {
 						emitpcode(POC_ADDLW, popGetLit(0x80));
 						emitpcode(POC_ADDLW, popGetLit(i^0x80));
-						genSkipc(&rFalseIfx);
+						genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 					}
 					
 				} else {
@@ -3913,7 +4152,7 @@ static void genCmp (operand *left,operand *right,
 						genSkipz2(&rFalseIfx,1);
 					} else {
 						emitpcode(POC_ADDLW, popGetLit(i));
-						genSkipc(&rFalseIfx);
+						genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 					}
 				}
 				
@@ -3964,7 +4203,7 @@ static void genCmp (operand *left,operand *right,
 						emitSKPNZ;
 					}
 					
-					genSkipc(&rFalseIfx);
+					genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 					emitpLabel(truelbl->key);
 					if(ifx) ifx->generated = 1;
 					return;
@@ -3980,7 +4219,7 @@ static void genCmp (operand *left,operand *right,
 						emitpcode(POC_MOVFW, popGet(AOP(left),size));
 						emitpcode(POC_ADDLW, popGetLit( 0x80));
 						emitpcode(POC_ADDLW, popGetLit(0x100-i));
-						genSkipc(&rFalseIfx);
+						genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 						
 						
 						if(ifx) ifx->generated = 1;
@@ -3996,7 +4235,7 @@ static void genCmp (operand *left,operand *right,
 						emitpcode(POC_MOVFW, popGet(AOP(left),size));
 						emitpcode(POC_ADDLW, popGetLit( 0x80));
 						emitpcode(POC_ADDLW, popGetLit(0x100-i));
-						genSkipc(&rFalseIfx);
+						genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 						
 						
 						if(ifx) ifx->generated = 1;
@@ -4044,7 +4283,7 @@ static void genCmp (operand *left,operand *right,
 					emitpcode(POC_SUBFW, popGet(AOP(left),size));
 				}
 				//rFalseIfx.condition ^= 1;
-				genSkipc(&rFalseIfx);
+				genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 				
 				emitpLabel(truelbl->key);
 				
@@ -4082,7 +4321,7 @@ static void genCmp (operand *left,operand *right,
 
 		emitpLabel(lbl->key);
 		//if(emitFinalCheck)
-		genSkipc(&rFalseIfx);
+		genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 		if(sign)
 			emitpLabel(truelbl->key);
 
@@ -4147,7 +4386,7 @@ static void genCmp (operand *left,operand *right,
 						emitpcode(POC_ADDLW, popGetLit(0x80));
 						emitpcode(POC_ADDLW, popGetLit(((0-(lit+1)) & 0xff) ^ 0x80));
 						rFalseIfx.condition ^= 1;
-						genSkipc(&rFalseIfx);
+						genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 						break;
 					}
 					if(ifx) ifx->generated = 1;
@@ -4171,7 +4410,7 @@ static void genCmp (operand *left,operand *right,
 						DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 						rFalseIfx.condition ^= 1;
 						if (AOP_TYPE(result) == AOP_CRY) {
-							genSkipc(&rFalseIfx);
+							genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 							if(ifx) ifx->generated = 1;
 						} else {
 							DEBUGpic14_emitcode ("; ***","%s  %d RFIfx.cond=%d",__FUNCTION__,__LINE__, rFalseIfx.condition);
@@ -4241,7 +4480,7 @@ static void genCmp (operand *left,operand *right,
 						emitpcode(POC_ADDLW, popGetLit( 0x80));
 						emitpcode(POC_ADDLW, popGetLit(0x100-i));
 						rFalseIfx.condition ^= 1;
-						genSkipc(&rFalseIfx);
+						genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 						
 						
 						if(ifx) ifx->generated = 1;
@@ -4293,7 +4532,7 @@ static void genCmp (operand *left,operand *right,
 					}
 					rFalseIfx.condition ^= 1;
 					//rFalseIfx.condition = 1;
-					genSkipc(&rFalseIfx);
+					genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 					
 					emitpLabel(truelbl->key);
 					
@@ -4335,7 +4574,7 @@ static void genCmp (operand *left,operand *right,
 							emitpcode(POC_SUBFW, popGet(AOP(right),0));
 							
 							rFalseIfx.condition ^= 1;
-							genSkipc(&rFalseIfx);
+							genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 						}
 						
 						emitpLabel(truelbl->key);
@@ -4371,7 +4610,7 @@ static void genCmp (operand *left,operand *right,
 					emitpLabel(lbl->key);
 					
 					rFalseIfx.condition ^= 1;
-					genSkipc(&rFalseIfx);
+					genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 				}
 				
 				if(sign)
@@ -4405,7 +4644,7 @@ static void genCmp (operand *left,operand *right,
 				emitpcode(POC_ADDLW, popGetLit(0x80));
 				
 				DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-				genSkipc(&rFalseIfx);
+				genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 				
 				if(ifx) ifx->generated = 1;
 				return;
@@ -4439,9 +4678,9 @@ static void genCmp (operand *left,operand *right,
 			emitpcode(POC_CLRF, popGet(AOP(result),0));
 			emitpcode(POC_RLF, popGet(AOP(result),0));
 		} else {
-			genSkipc(&rFalseIfx);
+			genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 		}       
-		//genSkipc(&rFalseIfx);
+		//genSkipc(&rFalseIfx); assert ( !"genSkipc should have inverse logic" );
 		if(ifx) ifx->generated = 1;
 		
 		return;
@@ -4465,6 +4704,7 @@ static void genCmp (operand *left,operand *right,
 	}
 	
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genCmpGt :- greater than comparison                             */
@@ -7518,6 +7758,8 @@ static void genLeftShift (iCode *ic)
 	more that 32 bits make no sense anyway, ( the
 	largest size of an object can be only 32 bits ) */  
 	
+	/* this code fails for RIGHT == RESULT */
+	assert (!pic14_sameRegs (AOP(right), AOP(result)));
 	
 	/* now move the left to the result if they are not the
 	same */
@@ -7565,10 +7807,7 @@ static void genLeftShift (iCode *ic)
 			
 			tlbl = newiTempLabel(NULL);
 			if (!pic14_sameRegs(AOP(left),AOP(result))) {
-				if (AOP_TYPE(left) == AOP_LIT)
-					emitpcode(POC_MOVLW,  popGetLit(lit));
-				else
-					emitpcode(POC_MOVFW,  popGet(AOP(left),0));
+				mov2w (AOP(left), 0);
 				emitpcode(POC_MOVWF,  popGet(AOP(result),0));
 			}
 			

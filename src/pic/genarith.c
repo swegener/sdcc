@@ -1093,9 +1093,11 @@ void genPlus (iCode *ic)
 				poc = POC_MOVLW;
 			while(leftsize-- > 0) {
 				emitpcode(poc, popGetAddr(AOP(IC_LEFT(ic)),offset,0));
-				emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset));
 				emitSKPNC;
-				emitpcode(POC_INCF, popGet(AOP(IC_RESULT(ic)),offset));
+				emitpcode(POC_ADDLW, popGetLit(0x01));
+				emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),offset));
+				//emitSKPNC;
+				//emitpcode(POC_INCF, popGet(AOP(IC_RESULT(ic)),offset)); /* INCF does not update Carry! */
 				offset++;
 				if (size)
 					size--;

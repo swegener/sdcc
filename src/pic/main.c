@@ -379,7 +379,7 @@ MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] =
 {
-	"gplink", "-o $2", "\"$1.o\"", "$l", NULL
+	"gplink", "$l", "-o \"$2\"", "\"$1\"", "$3", NULL
 };
 
 static const char *_asmCmd[] =

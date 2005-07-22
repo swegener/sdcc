@@ -1,5 +1,22 @@
 2005-07-22 Raphael Neider <rneider AT web.de>
 
+	* src/SDCCmain.c (linkEdit): initialized linkerScriptFileName,
+	  have PIC14 handled like PIC16, fixes broken pic14 linker calls
+	* src/pic/gen.c (resolveIfx): do not "invent" labels
+	* (genSkipc): changed to positive logic
+	* (genSkipCond): removed as no longer needed
+	* (pic14_mov2w_regOrLit,genCmp): NEW, replacement for buggy version,
+	  backport from PIC16
+	* (genLeftShift): check operands are in different registers
+	* src/pic/genarith.c (genPlus): replaced INCF with ADDLW as
+	  INCF does not update CARRY...
+	* src/pic/main.c: fixed _linkCmd
+	* src/pic/pcode.c (unlinkpCode): added inactive code
+	* src/pic/ralloc.c (deassignLRs): keep arguments to shift operations
+	  alive (do not assign result and operand overlapping registers)
+
+2005-07-22 Raphael Neider <rneider AT web.de>
+
 	* src/pic/device.c (dump_sfr): replaced register declaration with
 	  call to emitSymbolToFile() to avoid duplicate symbols
 	* (assignRelocatableRegisters): do not declare external symbols

@@ -1945,8 +1945,8 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		if (sym->liveTo > ic->seq)
 			continue;
 	
-		/* HACK: result and addr must be disjoint for POINTER_GET */
-		if (sym->liveTo == ic->seq && POINTER_GET(ic))
+		/* HACK: result and operand must be disjoint for POINTER_GET/LEFT_OP/RIGHT_OP */
+		if (sym->liveTo == ic->seq && (POINTER_GET(ic) || ic->op == LEFT_OP || ic->op == RIGHT_OP))
 		{
 			//piCode (ic, stderr); fprintf (stderr, " -- registers NOT deallocated\n");
 			continue;

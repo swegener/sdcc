@@ -124,6 +124,8 @@ pBlock *newpBlock(void);
 pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
 void pCodeRegMapLiveRanges(pBlock *pb);
 
+pBranch * pBranchAppend(pBranch *h, pBranch *n);
+
 
 /****************************************************************/
 /*                    PIC Instructions                          */
@@ -2666,7 +2668,20 @@ void unlinkpCode(pCode *pc)
 			pc->prev->next = pc->next;
 		if(pc->next)
 			pc->next->prev = pc->prev;
-		
+
+#if 0
+		/* RN: I believe this should be right here, but this did not
+		 *     cure the bug I was hunting... */
+		/* must keep labels -- attach to following instruction */
+		if (isPCI(pc) && PCI(pc)->label && pc->next)
+		{
+		  pCodeInstruction *pcnext = PCI(findNextInstruction (pc->next));
+		  if (pcnext)
+		  {
+		    pBranchAppend (pcnext->label, PCI(pc)->label);
+		  }
+		}
+#endif
 		pc->prev = pc->next = NULL;
 	}
 }

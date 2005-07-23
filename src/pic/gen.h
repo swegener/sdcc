@@ -150,7 +150,8 @@ extern unsigned fReturnSizePic;
 #define emitSETDC   emitpcode(POC_BSF,  popCopyGPR2Bit(PCOP(&pc_status),PIC_DC_BIT))
 
 int pic14_getDataSize(operand *op);
-void emitpcode(PIC_OPCODE poc, pCodeOp *pcop);
+void emitpcode_real(PIC_OPCODE poc, pCodeOp *pcop);
+#define emitpcode(poc,pcop)	do { if (options.debug || debug_verbose) { emitpComment (" >>> %s:%d:%s", __FILE__, __LINE__, __FUNCTION__); } emitpcode_real(poc,pcop); } while(0)
 void emitpComment (const char *fmt, ...);
 void emitpLabel(int key);
 void pic14_emitcode (char *inst,char *fmt, ...);

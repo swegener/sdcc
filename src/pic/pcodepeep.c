@@ -1491,7 +1491,7 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip)
 			if(PCI(pc)->inCond & cond) {
 				if (contIfSkip) {
 					/* If previous instruction is a skip then continue search as condiction is not certain */
-					pCode *pcp = findPrevInstruction(pc);
+					pCode *pcp = findPrevInstruction(pc->prev);
 					if (pcp && !isPCI_SKIP(pcp)) {
 						return 1;
 					}
@@ -1502,7 +1502,7 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip)
 			if(PCI(pc)->outCond & cond) {
 				if (contIfSkip) {
 					/* If previous instruction is a skip then continue search as condiction is not certain */
-					pCode *pcp = findPrevInstruction(pc);
+					pCode *pcp = findPrevInstruction(pc->prev);
 					if (pcp && !isPCI_SKIP(pcp)) {
 						return -1;
 					}

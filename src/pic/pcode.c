@@ -5797,7 +5797,7 @@ void AnalyzepCode(char dbName)
 				pBlockMergeLabels(pb);
 				AnalyzepBlock(pb);
 			} else {
-				DFPRINTF((stderr," skipping block analysis dbName=%c blockname=%c\n",dbName,getpBlock_dbName));
+				DFPRINTF((stderr," skipping block analysis dbName=%c blockname=%c\n",dbName,getpBlock_dbName(pb)));
 			}
 		}
 		

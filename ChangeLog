@@ -1,3 +1,22 @@
+2005-07-23 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.h: added emitpcode macro for debugging
+	* src/pic/gen.c (emitpcode): renamed to emitpcode_real
+	  and replace by macro adding debug information on demand
+	* (genNot): fixed to C semantics (!0 = 1; !x = 0 iff x != 0)
+	* (gencjne): tried to fix; replaced with correct (slower) code
+	* (gen{Unp,P}ackBits): fixed single bit access
+	* src/pic/pcode.c (AnalyzepCode): fixed DFPRINTF argument
+	* src/pic/pcodepeep.c (pCodeSearchCondition): fixed finding
+	  previous instruction
+	* src/pic/pcoderegs.c (regIsSpecial): NEW, check whether a
+	  register has to be handled with care (forbidding movement
+	  of assignments/uses, removing assignments completely, ...)
+	* (pCodeOptime2pCodes): make use of regIsSpecial
+	* added lots of debugging output (commented out)
+	* src/pic/rallloc.c (deassignLRs): prevent operand registers
+	  from being reused as result UNLESS it is known to work
+
 2005-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/Util/dbuf.h: include <stddef.h> for size_t

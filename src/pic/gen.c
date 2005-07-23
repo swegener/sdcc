@@ -246,7 +246,10 @@ void emitpLabel(int key)
 	addpCode2pBlock(pb,newpCodeLabel(NULL,key+100+labelOffset));
 }
 
-void emitpcode(PIC_OPCODE poc, pCodeOp *pcop)
+/* gen.h defines a macro emitpcode that should be used to call emitpcode
+ * as this allows for easy debugging (ever asked the question: where was
+ * this instruction geenrated? Here is the answer... */
+void emitpcode_real(PIC_OPCODE poc, pCodeOp *pcop)
 {
 	if(pcop)
 		addpCode2pBlock(pb,newpCode(poc,pcop));
@@ -1900,7 +1903,7 @@ void pic14_toBoolean(operand *oper)
 /*-----------------------------------------------------------------*/
 static void genNot (iCode *ic)
 {
-	symbol *tlbl;
+	//symbol *tlbl;
 	int size;
 
 	FENTRY;
@@ -1924,19 +1927,20 @@ static void genNot (iCode *ic)
 		goto release;
 	}
 	
+	assert (!pic14_sameRegs (AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))));
 	size = AOP_SIZE(IC_LEFT(ic));
-	if(size == 1) {
-		emitpcode(POC_COMFW,popGet(AOP(IC_LEFT(ic)),0));
-		emitpcode(POC_ANDLW,popGetLit(1));
-		emitpcode(POC_MOVWF,popGet(AOP(IC_RESULT(ic)),0));
-		goto release;
+	emitpcode(POC_CLRF,popGet(AOP(IC_RESULT(ic)),0));
+	mov2w (AOP(IC_LEFT(ic)),0);
+	while (--size > 0)
+	{
+	  if (aop_isLitLike (AOP(IC_LEFT(ic))))
+	    emitpcode (POC_IORLW, popGetAddr (AOP(IC_LEFT(ic)), size, 0));
+	  else
+	    emitpcode (POC_IORFW, popGet (AOP(IC_LEFT(ic)), size));
 	}
-	pic14_toBoolean(IC_LEFT(ic));
-	
-	tlbl = newiTempLabel(NULL);
-	pic14_emitcode("cjne","a,#0x01,%05d_DS_",tlbl->key+100);
-	pic14_emitcode("","%05d_DS_:",tlbl->key+100);
-	pic14_outBitC(IC_RESULT(ic));
+	emitSKPNZ;
+	emitpcode(POC_INCF,popGet(AOP(IC_RESULT(ic)),0));
+	goto release;
 	
 release:	
 	/* release the aops */
@@ -4824,14 +4828,12 @@ static void genc16bit2lit(operand *op, int lit, int offset)
 /*-----------------------------------------------------------------*/
 static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 {
-	int size = max(AOP_SIZE(left),AOP_SIZE(right));
+	int size = min(AOP_SIZE(left),AOP_SIZE(right));
 	int offset = 0;
-	int res_offset = 0;  /* the result may be a different size then left or right */
-	int res_size = AOP_SIZE(result);
-	resolvedIfx rIfx;
+	//resolvedIfx rIfx;
 	symbol *lbl;
 	
-	unsigned long lit = 0L;
+	//unsigned long lit = 0L;
 	FENTRY;
 	if (!ifx && (!result || AOP_TYPE(result) == AOP_CRY)) {
 	  emitpComment ("gencjne: no ifx, no (real) result -- comparison ignored");
@@ -4839,10 +4841,48 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 	}
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	DEBUGpic14_AopType(__LINE__,left,right,result);
+	
+	assert (!pic14_sameRegs (AOP(left), AOP(result)));
+	assert (!pic14_sameRegs (AOP(right), AOP(result)));
+	if (AOP_SIZE(result)) {
+	  for (offset = 0; offset < AOP_SIZE(result); offset++)
+	    emitpcode (POC_CLRF, popGet (AOP(result), offset));
+	}
+	
+	assert (AOP_SIZE(left) == AOP_SIZE(right));
+	//resolveIfx(&rIfx,ifx);
+	lbl = newiTempLabel (NULL);
+	while (size--)
+	{
+	  mov2w (AOP(right),size);
+	  emitpcode (POC_XORFW, popGet (AOP(left), size));
+	  if (size)
+	  {
+	    emitSKPZ;
+	    emitpcode (POC_GOTO, popGetLabel (lbl->key));
+	  }
+	} // while
+	emitpLabel (lbl->key);
+	if (AOP_SIZE(result)) {
+	  emitSKPNZ;
+	  emitpcode (POC_INCF, popGet (AOP(result), 0));
+	} else {
+	  assert (ifx);
+	  genSkipz (ifx, NULL != IC_TRUE(ifx));
+	  ifx->generated = 1;
+	}
+	return;
+#if 0	
 	if(result)
+	{
 		DEBUGpic14_emitcode ("; ***","%s  %d result is not null",__FUNCTION__,__LINE__);
-	resolveIfx(&rIfx,ifx);
-	lbl =  newiTempLabel(NULL);
+		assert (!pic14_sameRegs (AOP(result), AOP(left)));
+		assert (!pic14_sameRegs (AOP(result), AOP(right)));
+		for (offset=0; offset < AOP_SIZE(result); offset++)
+		{
+			emitpcode (POC_CLRF, popGet (AOP(result), offset));
+		} // for offset
+	}
 	
 	
 	/* if the left side is a literal or 
@@ -4867,6 +4907,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 			emitpcode(POC_GOTO,popGetLabel(lbl->key));
 			break;
 		default:
+			offset = 0;
 			while (size--) {
 				if(lit & 0xff) {
 					emitpcode(POC_MOVFW,popGet(AOP(left),offset));
@@ -4878,8 +4919,6 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 				emitSKPNZ;
 				emitpcode(POC_GOTO,popGetLabel(lbl->key));
 				offset++;
-				if(res_offset < res_size-1)
-					res_offset++;
 				lit >>= 8;
 			}
 			break;
@@ -4895,11 +4934,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 		//int lbl_key = (rIfx.condition) ? rIfx.lbl->key : lbl->key;
 		int lbl_key = lbl->key;
 		
-		if(result) {
-			if (AOP_TYPE(result) != AOP_CRY)
-				emitpcode(POC_CLRF,popGet(AOP(result),res_offset));
-			//emitpcode(POC_INCF,popGet(AOP(result),res_offset));
-		}else {
+		if(!result) {
 			DEBUGpic14_emitcode ("; ***","%s  %d -- ERROR",__FUNCTION__,__LINE__);
 			fprintf(stderr, "%s  %d error - expecting result to be non_null\n",
 				__FUNCTION__,__LINE__);
@@ -4913,6 +4948,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 		/*       emitpcode(POC_GOTO,popGetLabel(lbl->key)); */
 		/*       break; */
 		/*     default: */
+		offset = 0;
 		while (size--) {
 			int emit_skip=1;
 			if((AOP_TYPE(left) == AOP_DIR) && 
@@ -4929,8 +4965,8 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 					break;
 				case 1:
 					emitpcode(POC_DECFSZW,popGet(AOP(left),offset));
-					emitpcode(POC_INCF,popGet(AOP(result),res_offset));
-					//emitpcode(POC_GOTO,popGetLabel(lbl->key));
+					//emitpcode(POC_INCF,popGet(AOP(result),res_offset));
+					emitpcode(POC_GOTO,popGetLabel(lbl->key));
 					emit_skip=0;
 					break;
 				case 0xff:
@@ -4965,21 +5001,19 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 					else
 						emitSKPNZ;
 					emitpcode(POC_GOTO,popGetLabel(lbl_key));
-					//emitpcode(POC_INCF,popGet(AOP(result),res_offset));
 				}
 				if(ifx)
 					ifx->generated=1;
 			}
 			emit_skip++;
 			offset++;
-			if(res_offset < res_size-1)
-				res_offset++;
 		}
 		/*       break; */
 		/*     } */
 	} else if(AOP_TYPE(right) == AOP_REG &&
 		AOP_TYPE(left) != AOP_DIR){
-		
+
+		offset = 0;
 		while(size--) {
 			emitpcode(POC_MOVFW,popGet(AOP(left),offset));
 			emitpcode(POC_XORFW,popGet(AOP(right),offset));
@@ -4990,12 +5024,11 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 				emitSKPZ;
 			emitpcode(POC_GOTO,popGetLabel(rIfx.lbl->key));
 			offset++;
-			if(res_offset < res_size-1)
-				res_offset++;
 		}
 		
 	}else{
 		/* right is a pointer reg need both a & b */
+		offset = 0;
 		while(size--) {
 			char *l = aopGet(AOP(left),offset,FALSE,FALSE);
 			if(strcmp(l,"b"))
@@ -5006,7 +5039,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 		}
 	}
 	
-	emitpcode(POC_INCF,popGet(AOP(result),res_offset));
+	emitpcode(POC_INCF,popGet(AOP(result),0));
 	if(!rIfx.condition)
 		emitpcode(POC_GOTO,popGetLabel(rIfx.lbl->key));
 	
@@ -5016,6 +5049,7 @@ static void gencjne(operand *left, operand *right, operand *result, iCode *ifx)
 	
 	if(ifx)
 		ifx->generated = 1;
+#endif
 }
 
 #if 0
@@ -8415,19 +8449,16 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 			ifx->generated=1;
 		} else {
 			pCodeOp *pcop;
-			
+			int i;
+			assert (!pic14_sameRegs (AOP(result), AOP(left)));
+			for (i=0; i < AOP_SIZE(result); i++)
+				emitpcode (POC_CLRF, popGet (AOP(result), i));
 			if (ptype == -1) /* direct */
 				pcop = newpCodeOpBit(aopGet (AOP(left),0,FALSE,FALSE),bstr,0);
 			else
 				pcop = newpCodeOpBit(pc_indf.pcop.name,bstr,0);
 			emitpcode(POC_BTFSC,pcop);
-			emitpcode(POC_BSF,newpCodeOpBit(aopGet(AOP(result), 0,FALSE,FALSE),bstr,0));
-			if (ptype == -1) /* direct */
-				pcop = newpCodeOpBit(aopGet(AOP(left),0,FALSE,FALSE),bstr,0);
-			else
-				pcop = newpCodeOpBit(pc_indf.pcop.name,bstr,0);
-			emitpcode(POC_BTFSS,pcop);
-			emitpcode(POC_BCF,newpCodeOpBit(aopGet(AOP(result),0,FALSE,FALSE),bstr,0));
+			emitpcode(POC_BSF,newpCodeOpBit(aopGet(AOP(result),0,FALSE,FALSE),0,0));
 		}
 		return;
 	}
@@ -9246,11 +9277,12 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,char *rna
 			if (blen==1) {
 				if (p_type == -1) {
 					/* Note more efficient code, of pre clearing bit then only setting it if required, can only be done if it is known that the result is not a SFR */
-					emitpcode(POC_RLF,popGet(AOP(right),0));
+					emitpcode(POC_RRFW,popGet(AOP(right),0));
 					emitSKPC;
-					emitpcode(POC_BCF,popGet(AOP(result),0));
+					emitpcode(POC_BCF,newpCodeOpBit (aopGet(AOP(result), 0, FALSE, FALSE), bstr, 0));
 					emitSKPNC;
-					emitpcode(POC_BSF,popGet(AOP(result),0));
+					emitpcode(POC_BSF,newpCodeOpBit (aopGet(AOP(result), 0, FALSE, FALSE), bstr, 0));
+					return;
 				} else if (p_type!=GPOINTER) {
 					/* Case with a bitfield length == 1 and no generic pointer
 					*/

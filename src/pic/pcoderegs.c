@@ -240,7 +240,7 @@ static void Remove1pcode(pCode *pc, regs *reg, int debug_code)
 	
 	if(!reg || !pc)
 		return;
-	
+
 	deleteSetItem (&(reg->reglives.usedpCodes),pc);
 	
 	if(PCI(pc)->label) {
@@ -386,6 +386,11 @@ static void Remove2pcodes(pCode *pcflow, pCode *pc1, pCode *pc2, regs *reg, int 
 	static int debug_code=99;
 	if(!reg)
 		return;
+#if 0
+	fprintf (stderr, "%s:%d(%s): %d (reg:%s)\n", __FILE__, __LINE__, __FUNCTION__, debug_code, reg ? reg->name : "???");
+	printpCode (stderr, pc1);
+	printpCode (stderr, pc2);
+#endif
 	
 	//fprintf(stderr,"%s\n",__FUNCTION__);
 	if(pc1)
@@ -428,6 +433,15 @@ int regUsedinRange(pCode *pc1, pCode *pc2, regs *reg)
 	} while (pc1 && (pc1 != pc2)) ;
 	
 	return 0;
+}
+
+int regIsSpecial (regs *reg, int mayBeGlobal)
+{
+  if (!reg) return 0;
+
+  if (reg->type == REG_SFR || reg->type == REG_STK || (!mayBeGlobal && (reg->isPublic || reg->isExtern))) return 1;
+
+  return 0;
 }
 
 /*-----------------------------------------------------------------*
@@ -499,6 +513,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 			PCI(newpc)->pcflow = PCFL(pcfl_used);
 			newpc->seq = pc2->seq;
 			
+			//fprintf (stderr, "%s:%d(%s): Remove2pcodes (CLRF reg, ..., MOVF reg,W)\n", __FILE__, __LINE__, __FUNCTION__);
 			Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
 			total_registers_saved++;  // debugging stats.
 		}
@@ -513,6 +528,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 			PCI(pct2)->pcflow = PCFL(pcfl_used);
 			pCodeInsertAfter(pc1,pct2);
 		}
+		//fprintf (stderr, "%s:%d(%s): Remove2pcodes (CLRF/IORFW)\n", __FILE__, __LINE__, __FUNCTION__);
 		Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
 		total_registers_saved++;  // debugging stats.
 		
@@ -541,7 +557,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 				*/
 				reg2 = getRegFromInstruction(pct2);
 				/* Check reg2 is not used for something else before it is loaded with reg */
-				if (reg2 && !regUsedinRange(pc1,pc2,reg2)) {
+				if (reg2 && !regIsSpecial (reg2, 1) && !regUsedinRange(pc1,pc2,reg2)) {
 					pCode *pct3 = findNextInstruction(pct2->next);
 					/* Check following instructions are not relying on the use of W or the Z flag condiction */
 					if ((pCodeSearchCondition(pct3,PCC_Z,0) < 1) || (pCodeSearchCondition(pct3,PCC_W,0) < 1)) {
@@ -550,10 +566,13 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 						unlinkpCode(pct2);
 						pCodeInsertBefore(pc1,pct2);
 						if(regUsedinRange(pct2,0,reg))
+						{
+							//fprintf (stderr, "%s:%d(%s): Remove2pcodes IF (MOVWF reg, ..., MOVW reg,W  MOVWF reg2)\n", __FILE__, __LINE__, __FUNCTION__);
 							Remove2pcodes(pcfl_used, pc2, NULL, reg, can_free);
-						else
+						} else {
+							//fprintf (stderr, "%s:%d(%s): Remove2pcodes ELSE (MOVWF reg, ..., MOVW reg,W  MOVWF reg2)\n", __FILE__, __LINE__, __FUNCTION__);
 							Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
-						
+						}
 						total_registers_saved++;  // debugging stats.
 						return 1;
 					}
@@ -568,7 +587,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 				(PCI(pc2)->op == POC_MOVFW)) {
 				
 				reg1 = getRegFromInstruction(pct1);
-				if(reg1 && !regUsedinRange(pc1,pc2,reg1)) {
+				if(reg1 && !regIsSpecial (reg1, 0) && !regUsedinRange(pc1,pc2,reg1)) {
 					DFPRINTF((stderr, "   optimising MOVF reg1,W MOVWF reg ... MOVF reg,W\n"));
 					/*
 					Change:
@@ -598,6 +617,7 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 					pct2->seq = pc2->seq;
 					
 					if(can_free) {
+						//fprintf (stderr, "%s:%d(%s): Remove2pcodes CANFREE (MOVF reg1,W; MOVWF reg2; MOVF reg2,W)\n", __FILE__, __LINE__, __FUNCTION__);
 						Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
 					} else {
 					/* If we're not freeing the register then that means (probably)
@@ -605,9 +625,11 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 						unlinkpCode(pc1);
 						pCodeInsertAfter(pct2, pc1);
 						
+						//fprintf (stderr, "%s:%d(%s): Remove2pcodes ELSE (MOVF reg1,W; MOVWF reg2; MOVF reg2,W)\n", __FILE__, __LINE__, __FUNCTION__);
 						Remove2pcodes(pcfl_used, pc2, NULL, reg, can_free);
 					}
 					
+					//fprintf (stderr, "%s:%d(%s): Remove2pcodes ALWAYS (MOVF reg1,W; MOVWF reg2; MOVF reg2,W)\n", __FILE__, __LINE__, __FUNCTION__);
 					Remove2pcodes(pcfl_used, pct1, NULL, reg1, 0);
 					total_registers_saved++;  // debugging stats.
 					
@@ -692,7 +714,7 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 				fprintf(stderr,"WARNING %s: reg %s used without being assigned\n",__FUNCTION__,reg->name);
 				
 			} else {
-				fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
+				//fprintf(stderr,"WARNING %s.1: reg %s assigned without being used\n",__FUNCTION__,reg->name);
 				Remove2pcodes(pcfl_assigned, pc1, pc2, reg, 1);
 				total_registers_saved++;  // debugging stats.
 			}
@@ -703,7 +725,7 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 			if(used && !pcfl_used && pcfl_assigned) {
 				pCode *pc;
 				
-				fprintf(stderr,"WARNING %s: reg %s assigned without being used\n",__FUNCTION__,reg->name);
+				//fprintf(stderr,"WARNING %s.2: reg %s assigned without being used\n",__FUNCTION__,reg->name);
 				
 				pc = setFirstItem(reg->reglives.usedpCodes);
 				while(pc) {

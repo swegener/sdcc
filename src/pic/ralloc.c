@@ -1944,14 +1944,36 @@ deassignLRs (iCode * ic, eBBlock * ebp)
 		/* if it does not end here */
 		if (sym->liveTo > ic->seq)
 			continue;
-	
-		/* HACK: result and operand must be disjoint for POINTER_GET/LEFT_OP/RIGHT_OP */
-		if (sym->liveTo == ic->seq && (POINTER_GET(ic) || ic->op == LEFT_OP || ic->op == RIGHT_OP))
+
+		/* Prevent the result from being assigned the same registers as (one)
+		 * operand as many genXXX-functions fail otherwise.
+		 * POINTER_GET(ic) || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == NOT
+		 * are known to fail. */
+		if (sym->liveTo == ic->seq && IC_RESULT(ic))
 		{
-			//piCode (ic, stderr); fprintf (stderr, " -- registers NOT deallocated\n");
-			continue;
+			switch (ic->op)
+			{
+			case '=':	/* assignment */
+			case BITWISEAND: /* bitwise AND */
+			case '|':	/* bitwise OR */
+			case '^':	/* bitwise XOR */
+			case '~':	/* bitwise negate */
+			case RLC:	/* rotate through carry */
+			case RRC:
+			case UNARYMINUS:
+			case '+':	/* addition */
+			case '-':	/* subtraction */
+			  /* go ahead, these are safe to use with
+			   * non-disjoint register sets */
+			  break;
+
+			default:
+				/* do not release operand registers */
+				//fprintf (stderr, "%s:%u: operand not freed: ", __FILE__, __LINE__); piCode (ic, stderr); fprintf (stderr, "\n");
+				continue;
+			} // switch
 		}
-		
+	
 		/* if it was spilt on stack then we can 
 		mark the stack spil location as free */
 		if (sym->isspilt)

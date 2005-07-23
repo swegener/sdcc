@@ -1,3 +1,8 @@
+2005-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/Util/dbuf.h: include <stddef.h> for size_t
+	* .version: changed to version 2.5.2
+
 2005-07-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCloop.c (loopInvariants): fixed bug #1234048
@@ -44,6 +49,7 @@
 	* (genDataPointerSet): removed unneccessary variables/output
 
 2005-07-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* as/mcs51/lkarea.c: enlarged codemap for banked memory
 	* device/lib/mcs51/crtbank.asm: added # to 0x0F
 

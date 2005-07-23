@@ -28,6 +28,8 @@
 #ifndef __DBUF_H
 #define __DBUF_H
 
+#include <stddef.h>
+
 struct dbuf_s {
   size_t alloc;   /* size of allocated buffer in bytes */
   size_t len;     /* actual size of the buffer in bytes */

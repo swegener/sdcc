@@ -569,6 +569,10 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
 	      for (sBlock = setFirstItem (lSet); sBlock;
 		   sBlock = setNextItem (lSet))
 		{
+                  iCode *ic2;
+                  int used;
+                  int defDominates;
+
 		  /* if this is the block make sure the definition */
 		  /* reaches the end of the block */
 		  if (sBlock == lBlock)
@@ -579,25 +583,48 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
 		  else if (bitVectBitsInCommon (sBlock->defSet, OP_DEFS (IC_RESULT (ic))))
 		    break;
 
-                  if (IC_RESULT(ic))
+                  /* Check that this definition is not assigned */
+                  /* any other value in this block. Also check */
+                  /* that any usage in the block is dominated by */
+                  /* by this definition. */
+                  defDominates = bitVectBitValue (sBlock->domVect, lBlock->bbnum);
+                  used = 0;
+                  for (ic2 = sBlock->sch; ic2; ic2 = ic2->next)
                     {
-                      iCode *ic2;
-                      /* check that this definition is not assigned */
-                      /* any other value in this block */
-                      for (ic2 = sBlock->sch; ic2; ic2 = ic2->next)
+                      if (ic2->op == IFX)
                         {
+                          if (isOperandEqual (IC_RESULT (ic), IC_COND (ic2)))
+                            used = 1;
+                        }
+                      else if (ic2->op == JUMPTABLE)
+                        {
+                          if (isOperandEqual (IC_RESULT (ic), IC_JTCOND (ic2)))
+                            used = 1;
+                        }
+                      else
+                        {
+                          if (IC_LEFT (ic2) && isOperandEqual (IC_RESULT (ic), IC_LEFT (ic2)))
+                            used = 1;
+                          if (IC_RIGHT (ic2) && isOperandEqual (IC_RESULT (ic), IC_RIGHT (ic2)))
+                            used = 1;
                           if ((ic != ic2) && (isOperandEqual(IC_RESULT(ic), IC_RESULT(ic2))))
                             break;
+                          /* If used before this definition, might not be invariant */
+                          if ((ic == ic2) && used)
+                            break;
                         }
-                      if (ic2) /* found another definition */
+                      if (used && !defDominates)
                         break;
                     }
+                  if (ic2) /* found another definition or a usage before the definition */
+                    break;
 		}
 
 	      if (sBlock)
 		continue;	/* another definition present in the block */
+              
 
-	      /* now check if it exists in the in of this block */
+              /* now check if it exists in the in of this block */
 	      /* if not then it was killed before this instruction */
 	      if (!bitVectBitValue (lBlock->inDefs, ic->key))
 		continue;

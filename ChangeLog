@@ -1,3 +1,7 @@
+2005-07-23 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/mcs51/at89c51ed2.h: added.
+
 2005-07-23 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.h: added emitpcode macro for debugging

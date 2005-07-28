@@ -728,8 +728,9 @@ operandsEqu (operand * op1, operand * op2)
     return TRUE;
 
   /* if they have the same rname */
-  if (sym1->rname[0] && sym2->rname[0]
-      && strcmp (sym1->rname, sym2->rname) == 0)
+  if (sym1->rname[0] && sym2->rname[0] &&
+      strcmp (sym1->rname, sym2->rname) == 0 &&
+      !(IS_PARM (op2) && IS_ITEMP (op1)))
     return TRUE;
 
   /* if left is a tmp & right is not */

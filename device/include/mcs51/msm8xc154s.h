@@ -43,4 +43,12 @@ __sbit __at (0xfc)	IZC;	/* 10kO pull-up resistor control */
 __sbit __at (0xfd)	SERR;	/* Serial port reception flag */
 __sbit __at (0xfe)	T32;	/* interconnect T0 and T1 to 32bit timer/counter */
 
+/* Bits in IP (0xb8) */
+__sbit __at (0xbd)	PT2;	/* Interrupt priority bit for timer interrupt 2 */
+__sbit __at (0xbf)	PCT;	/* Priority interrupt circuit control bit */
+
+/* Bits in PCON (0x87) */
+#define RPD 0x20            /* Bit used to specify cancellation of CPU power down mode */
+#define HPD 0x40            /* The hard power down setting mode is enabled when this bit is set to "1". */
+
 #endif

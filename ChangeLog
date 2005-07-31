@@ -1,3 +1,8 @@
+2005-07-31 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libdev/pic18f458.c,
+	  device/include/pic16/pic18f458.h: added missing T0CONbits
+
 2005-07-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/msm8xc154s.h: added, thanks to Matthias Arndt

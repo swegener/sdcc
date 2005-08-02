@@ -1,3 +1,8 @@
+2005-08-02 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genPackBits): removed deprecated warning
+	* (genGenPointerSet): fixed bitfield detection
+
 2005-08-02 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/msm8xc154s.h: Removed PT2 definition, now in 8052.h.

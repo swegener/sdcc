@@ -11505,7 +11505,7 @@ static void genPackBits (sym_link    *etype , operand *result,
 				  pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
 				}
 				
-				// warnings will be emitted below
+				// warnings will be emitted below (if desired)
 				//pic16_emitpcomment ("; =?= genPackBits, GPOINTER...");
                                 //werror(W_POSSBUG2, __FILE__, __LINE__);
 			        break;
@@ -11550,7 +11550,7 @@ static void genPackBits (sym_link    *etype , operand *result,
 				
 				// this should work in all cases (as soon as gptrget/gptrput work on EEPROM and PROGRAM MEMORY)
 				//pic16_emitpcomment ("; =?= genPackBits, GPOINTER access");
-                                werror(W_POSSBUG2, __FILE__, __LINE__);
+                                //werror(W_POSSBUG2, __FILE__, __LINE__);
 				break;
 
 			default:
@@ -12104,7 +12104,7 @@ static void genGenPointerSet (operand *right,
                               operand *result, iCode *ic)
 {
   int size;
-  sym_link *retype = getSpec(operandType(right));
+  sym_link *retype = getSpec(operandType(result));
 
     DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
@@ -12172,6 +12172,7 @@ static void genPointerSet (iCode *ic)
     move it to the correct pointer register */
     type = operandType(result);
     etype = getSpec(type);
+    
     /* if left is of type of pointer then it is simple */
     if (IS_PTR(type) && !IS_FUNC(type->next)) {
         p_type = DCL_TYPE(type);

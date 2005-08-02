@@ -1,3 +1,8 @@
+2005-08-02 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/Makefile.in: pic16 libraries build enabled since
+	  gputils-0.13.2 are now localy installed at sourceforge's compile farm
+
 2005-08-02 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genPackBits): removed deprecated warning

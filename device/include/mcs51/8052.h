@@ -42,8 +42,11 @@ __sfr __at (0xCB) RCAP2H  ;
 __sfr __at (0xCC) TL2     ;
 __sfr __at (0xCD) TH2     ;
 
-/*  IE   */
-__sbit __at (0xAD) ET2  ; /* Enable timer2 interrupt */
+/*  IE  */
+__sbit __at (0xAD) ET2    ; /* Enable timer2 interrupt */
+
+/*  IP  */
+__sbit __at 0xBD PT2      ; /* T2 interrupt priority bit */
 
 /* T2CON bits */
 __sbit __at (0xC8) T2CON_0 ;

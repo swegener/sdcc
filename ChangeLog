@@ -1,3 +1,7 @@
+2005-08-02 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/mcs51/msm8xc154s.h: Removed PT2 definition, now in 8052.h.
+
 2005-07-31 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libdev/pic18f458.c,

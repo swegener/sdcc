@@ -44,7 +44,6 @@ __sbit __at (0xfd)	SERR;	/* Serial port reception flag */
 __sbit __at (0xfe)	T32;	/* interconnect T0 and T1 to 32bit timer/counter */
 
 /* Bits in IP (0xb8) */
-__sbit __at (0xbd)	PT2;	/* Interrupt priority bit for timer interrupt 2 */
 __sbit __at (0xbf)	PCT;	/* Priority interrupt circuit control bit */
 
 /* Bits in PCON (0x87) */

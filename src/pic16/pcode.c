@@ -9610,7 +9610,7 @@ static symbol_t symFromStr (const char *str) {
   /* find symbol in table */
   sym = PTR_TO_INT(hTabFindByKey (map_strToSym, hash, str, &symcmp));
   if (sym) {
-    //fprintf (stderr, "found symbol %u for %s\n", sym, str);
+    //fprintf (stderr, "found symbol %x for %s\n", sym, str);
     return sym;
   }
 
@@ -9621,7 +9621,7 @@ static symbol_t symFromStr (const char *str) {
   hTabAddItemLong (&map_strToSym, hash, res, INT_TO_PTR(sym));
   hTabAddItemLong (&map_symToStr, sym % map_symToStr->size, INT_TO_PTR(sym), res);
 
-  //fprintf (stderr, "created symbol %u for %s\n", sym, res);
+  //fprintf (stderr, "created symbol %x for %s\n", sym, res);
   
   return sym;
 }
@@ -10321,6 +10321,7 @@ static valnum_t valnumFromStr (const char *str) {
   /* create new valnum */
   val = newValnum();
   hTabAddItemLong (&map_symToValnum, sym % map_symToValnum->size, INT_TO_PTR(sym), INT_TO_PTR(val));
+  //fprintf (stderr, "NEW VALNUM %x for symbol %s\n", val, str);
   return val;
 }
 
@@ -10890,8 +10891,8 @@ static defmap_t *createDefmap (pCode *pc, defmap_t *list) {
       valnum_t val;
       lit = PCOL(pci->pcop)->lit;
       assert (lit >= 0 && lit < 3);
-      //fprintf (stderr, "LFSR: %s // %s\n", pci->pcop->name, ((pCodeOpLit2 *)(pci->pcop))->arg2->name);
-      val = valnumFromStr (((pCodeOpLit2 *)(pci->pcop))->arg2->name);
+      //fprintf (stderr, "LFSR: %s // %s\n", pci->pcop->name, pic16_get_op(((pCodeOpLit2 *)(pci->pcop))->arg2, NULL, 0));
+      val = valnumFromStr (pic16_get_op(((pCodeOpLit2 *)(pci->pcop))->arg2, NULL, 0));
       //fprintf (stderr, "LFSR lit=%u, symval=%4x\n", lit, val);
       list = newDefmap (pic16_fsrsym_idx[lit][0], 0x00, 0xff, 0, 1, pc, val, list);
       list = newDefmap (pic16_fsrsym_idx[lit][1], 0x00, 0xff, 0, 1, pc, val+1, list); // val+1 is guaranteed not be used as a valnum...
@@ -11553,7 +11554,7 @@ static void assignValnums (pCode *pc) {
       if (val) vallit = litFromValnum (val->in_val);
       if (vallit != -1) {
         /* xxxLW <literal>, WREG contains a known literal */
-	fprintf (stderr, "%s 0x%02x, WREG: 0x%x\n", pci->mnemonic, lit, vallit);
+	//fprintf (stderr, "%s 0x%02x, WREG: 0x%x\n", pci->mnemonic, lit, vallit);
 	if (pci->op == POC_ANDLW) {
 	  lit &= vallit;
 	} else if (pci->op == POC_IORLW) {
@@ -11584,7 +11585,7 @@ static void assignValnums (pCode *pc) {
       val = defmapCurr (list, pic16_fsrsym_idx[lit][0], pc);
       
       if (val && (val->in_val != 0) && (val->in_val == val->val)) {
-        fprintf (stderr, "FSR%dL already set up correctly at %p (%x)\n", lit, pc, val->val);
+        //fprintf (stderr, "FSR%dL already set up correctly at %p (%x)\n", lit, pc, val->val);
       } else {
 	/* cannot remove this LFSR */
 	ok = 0;      
@@ -11592,7 +11593,7 @@ static void assignValnums (pCode *pc) {
       
       val = defmapCurr (list, pic16_fsrsym_idx[lit][1], pc);
       if (val && (val->in_val != 0) && (val->in_val == val->val)) {
-        fprintf (stderr, "FSR%dH already set up correctly at %p (%x)\n", lit, pc, val->val);
+        //fprintf (stderr, "FSR%dH already set up correctly at %p (%x)\n", lit, pc, val->val);
       } else {
 	ok = 0;
       } // if

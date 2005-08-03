@@ -1,3 +1,19 @@
+2005-08-03 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_derefPtr): NEW, single place
+	  to get/set values via pointers
+	* (genUnpackBits,genPackBits): changed detection of
+	  ptr->bitfield vs. sym.bitfield, fixed access via generic
+	  pointers, removed dead (wrong) code for multibyte bitfields
+	* (genNearPointerGet, genGenPointerGet): removed useless code,
+	  fixed bitfield detection, fixes #1250594
+	* (genNearPointerSet): removed useless code
+	* src/pic16/gen.h: renamed pic16_emitpcode to pic16_emitpcode_real
+	  and introduced macro pic16_emitpcode that conditionally emits
+	  the origin of the following pCode (useful for debugging SDCC)
+	* src/pic16/pcode.c: changed (and disabled) some debug outputs
+	* (createDefmap): fixed handling of LFSR for --optimize-df
+
 2005-08-02 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in: pic16 libraries build enabled since

@@ -1,3 +1,9 @@
+2005-08-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/mcs51/at89c51ed2.h, device/include/mcs51/p89v51rd2.h,
+	  device/include/mcs51/at89s53.h: changed to GNU Lesser General Public
+	  License
+
 2005-08-04 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in: pic16 libraries build 2nd try - enable running

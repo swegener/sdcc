@@ -3,6 +3,7 @@
 	* configure.in: pic16 libraries build 2nd try - enable running
 	  configure in device/lib/pic16
 	* configure: regenerated from configure.in
+	* device/lib/Makefile.in: create $(PORT)/bin directory
 
 2005-08-03 Raphael Neider <rneider AT web.de>
 

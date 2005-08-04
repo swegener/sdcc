@@ -1,3 +1,9 @@
+2005-08-04 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in: pic16 libraries build 2nd try - enable running
+	  configure in device/lib/pic16
+	* configure: regenerated from configure.in
+
 2005-08-03 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_derefPtr): NEW, single place

@@ -256,7 +256,7 @@ port-specific-objects:
 
 port-specific-objects-pic16:
 	if [ -d $(PORT) ]; then \
-	  mkdir -p $(PORT)/bin \
+	  mkdir -p $(PORT)/bin; \
 	  $(MAKE) -C $(PORT); \
 	  cp -f $(PORT)/bin/*.* $(PORTDIR); \
 	fi

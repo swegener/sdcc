@@ -232,6 +232,13 @@ Section "SDCC HC08 library"
   File "${DEV_ROOT}\lib\hc08\*.lib"
 SectionEnd
 
+Section "SDCC PIC16 library"
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\pic16"
+  File "${DEV_ROOT}\lib\pic16\*.o"
+  File "${DEV_ROOT}\lib\pic16\*.lib"
+SectionEnd
+
 Section "SDCC library sources"
   SectionIn 1
   SetOutPath "$INSTDIR\lib\src\ds390\examples"
@@ -360,6 +367,9 @@ Section Uninstall
 
   Delete "$INSTDIR\lib\src\*.c"
 
+  Delete "$INSTDIR\lib\pic16\*.o"
+  Delete "$INSTDIR\lib\pic16\*.lib"
+
   Delete "$INSTDIR\lib\hc08\*.rel"
   Delete "$INSTDIR\lib\hc08\*.asm"
   Delete "$INSTDIR\lib\hc08\*.lib"
@@ -418,6 +428,7 @@ Section Uninstall
   RMDir "$INSTDIR\lib\src\hc08"
   RMDir "$INSTDIR\lib\src"
 
+  RMDir "$INSTDIR\lib\pic16"
   RMDir "$INSTDIR\lib\z80"
   RMDir "$INSTDIR\lib\small"
   RMDir "$INSTDIR\lib\large"

@@ -3,6 +3,11 @@
 	* src/pic16/gen.c (pic16_aopGet): fixed handling of offsets in
 	  AOP_PCODE operands, fixes multibyte union-bitfield-accesses
 
+2005-08-05 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/Makefile.in: added missing ';'
+	* configure: removed ^M characters
+
 2005-08-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/at89c51ed2.h, device/include/mcs51/p89v51rd2.h,

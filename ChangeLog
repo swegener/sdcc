@@ -1,3 +1,8 @@
+2005-08-05 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_aopGet): fixed handling of offsets in
+	  AOP_PCODE operands, fixes multibyte union-bitfield-accesses
+
 2005-08-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/mcs51/at89c51ed2.h, device/include/mcs51/p89v51rd2.h,

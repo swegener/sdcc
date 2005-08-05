@@ -1584,9 +1584,9 @@ char *pic16_aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	  DEBUGpic16_emitcode(";","%s offset %d",pcop->name,PCOI(pcop)->offset);
 	  //sprintf(s,"(%s+0x%02x)", pcop->name,PCOI(aop->aopu.pcop)->offset);
 	  if (offset) {
-	    sprintf(s,"(%s + %d)", pcop->name, offset);
+	    sprintf(s,"(%s + %d)", pic16_get_op (pcop, NULL, 0), offset);
 	  } else {
-	    sprintf(s,"%s", pcop->name);
+	    sprintf(s,"%s", pic16_get_op (pcop, NULL, 0));
 	  }
 	} else
 	  sprintf(s,"0x%02x", PCOI(aop->aopu.pcop)->offset);
@@ -7471,7 +7471,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 	      bp -= 8;
 	      ofs++;
 	    }
-	
+
 	  pic16_emitpcode(((rIfx.condition) ? POC_BTFSC : POC_BTFSS),
 		    pic16_newpCodeOpBit(pic16_aopGet(AOP(left),ofs,FALSE,FALSE),bp,0, PO_GPR_REGISTER));
 

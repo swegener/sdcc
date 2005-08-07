@@ -32,14 +32,15 @@ unsigned int memfree(void)
 {
   _malloc_rec _MALLOC_SPEC *pHeap;
   unsigned int hsize=0;
+  unsigned char bLen;
   
   pHeap = (_malloc_rec _MALLOC_SPEC *)&heap;
   
-  while(pHeap->datum) {
+  while ((bLen = pHeap->bits.count)) {
     if(!pHeap->bits.alloc)
-      hsize += pHeap->bits.count;
+      hsize += bLen - 1;
     
-    pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + pHeap->bits.count);
+    pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + bLen);
   }
   
   return (hsize);

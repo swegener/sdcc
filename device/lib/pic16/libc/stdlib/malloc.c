@@ -88,7 +88,7 @@ unsigned char _MALLOC_SPEC *malloc(unsigned char len)
           /* otherwise proceed with next block */
           goto do_continue;
 
-        pHeap = temp;
+        //pHeap = temp; /* temp == pHeap */
         bLen = pHeap->bits.count;
       }
 
@@ -109,7 +109,6 @@ unsigned char _MALLOC_SPEC *malloc(unsigned char len)
 
 do_continue:
       pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + bLen);
-	//pHeap->bits.count);
     }
 
 do_end:

@@ -1,3 +1,42 @@
+2005-08-07 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genrshTwo): fixed sign extension
+	* src/pic16/device.c: added pic18f2320, 4220 and 4320
+	* device/include/pic16/pic18f2220.h: changed some bit definitions,
+	  added T0CONbits
+	* device/include/pic16/pic18f4220.h: NEW, header for
+	  pic18f4220 and pic18f4320
+	* device/include/pic16/pic18fregs.h: added new devices,
+	  embraced Nop(), ClrWdt(), Sleep() and Reset() with do {} while(0)
+	* device/include/pic16/signal.h: resolved name clashes
+	  on bit definitions, added DEF_HANDLER2(sig1,sig2,handler)
+	  to also allow testing for interrupt enable bits, added
+	  comments on how to use the macros
+	* device/lib/pic16/libdev/pic18f2220.c: added T0CONbits
+	* device/lib/pic16/libdev/pic18f{2320,4220,4320}.c: NEW,
+	  register definitions for the devices
+	* device/lib/pic16/pics.all: added new devices
+	* device/lib/pic16/libc/stdlib/calloc.c: fixed zeroing
+	  allocated memory
+	* device/lib/pic16/libc/stdlib/memfree: do not count
+	  the block header as free memory
+	* device/lib/pic16/libc/stdlib/memmisc.c (_initHeap):
+	  simplified and added missing end-of-blocklist-marker
+	  (reported by Peter Onion, fixes #1252814)
+	* (_mergeHeapBlock): fixed loop condition
+	* device/lib/pic16/libc/stdlib/realloc.c: return NULL for
+	  len==0, restructured code
+	* device/lib/pic16/libc/stdlib/{malloc,memfreemax}.c: cleaned
+	  up a bit, reduced bitfield accesses, prevent endless loops
+	  in case of heap corruption
+	* device/lib/pic16/libc/stdlib/x_ftoa.c: disabled
+	  "unreferenced arguments/must return a value" warnings
+	* device/lib/pic16/libio/usart/ubaud.c (usart_baud):
+	  replaced BAUDREG with SPBRG
+	* device/lib/pic16/libsdcc/lregs/{lrrest.c,lrst.c},
+	  device/lib/pic16/debug/gstack/gstack.c: replaced
+	  _naked, _asm, _endasm with __naked, __asm, __endasm
+
 2005-08-05 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_aopGet): fixed handling of offsets in

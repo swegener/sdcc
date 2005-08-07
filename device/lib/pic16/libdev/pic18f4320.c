@@ -1,6 +1,6 @@
 
 /*
- * pic18f2220.c - PIC18F2220 Device Library Source
+ * pic18f4320.c - PIC18F4320 Device Library Source
  *
  * This file is part of the GNU PIC Library.
  *
@@ -12,7 +12,7 @@
  *
  */
 
-#include <pic18f2220.h>
+#include <pic18f4220.h>
 
 __sfr __at (0xf80) PORTA;
 volatile __PORTAbits_t __at (0xf80) PORTAbits;
@@ -23,6 +23,12 @@ volatile __PORTBbits_t __at (0xf81) PORTBbits;
 __sfr __at (0xf82) PORTC;
 volatile __PORTCbits_t __at (0xf82) PORTCbits;
 
+__sfr __at (0xf83) PORTD;
+volatile __PORTDbits_t __at (0xf83) PORTDbits;
+
+__sfr __at (0xf84) PORTE;
+volatile __PORTEbits_t __at (0xf84) PORTEbits;
+
 __sfr __at (0xf89) LATA;
 volatile __LATAbits_t __at (0xf89) LATAbits;
 
@@ -31,6 +37,12 @@ volatile __LATBbits_t __at (0xf8a) LATBbits;
 
 __sfr __at (0xf8b) LATC;
 volatile __LATCbits_t __at (0xf8b) LATCbits;
+
+__sfr __at (0xf8c) LATD;
+volatile __LATDbits_t __at (0xf8c) LATDbits;
+
+__sfr __at (0xf8d) LATE;
+volatile __LATEbits_t __at (0xf8d) LATEbits;
 
 __sfr __at (0xf92) TRISA;
 volatile __TRISAbits_t __at (0xf92) TRISAbits;
@@ -87,6 +99,15 @@ volatile __CMCONbits_t __at (0xfb4) CMCONbits;
 
 __sfr __at (0xfb5) CVRCON;
 volatile __CVRCONbits_t __at (0xfb5) CVRCONbits;
+
+__sfr __at (0xfba) CCP2CON;
+volatile __CCP2CONbits_t __at (0xfba) CCP2CONbits;
+
+__sfr __at (0xfb7) PWM1CON;
+volatile __PWM1CONbits_t __at (0xfb7) PWM1CONbits;
+
+__sfr __at (0xfb6) ECCPAS;
+volatile __ECCPASbits_t __at (0xfb6) ECCPASbits;
 
 __sfr __at (0xfba) CCP2CON;
 volatile __CCP2CONbits_t __at (0xfba) CCP2CONbits;

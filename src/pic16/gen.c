@@ -9886,12 +9886,7 @@ static void genrshTwo (operand *result,operand *left,
     else
       movLeft2Result(left, MSB16, result, LSB);
 
-    pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),MSB16));
-
-    if(sign) {
-      pic16_emitpcode(POC_BTFSC,pic16_newpCodeOpBit(pic16_aopGet(AOP(left),LSB,FALSE,FALSE),7,0, PO_GPR_REGISTER));
-      pic16_emitpcode(POC_SETF, pic16_popGet(AOP(result),MSB16));
-    }
+    pic16_addSign (result, 1, sign);
   }
 
   /*  1 <= shCount <= 7 */

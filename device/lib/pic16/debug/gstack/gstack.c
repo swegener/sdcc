@@ -59,9 +59,9 @@ char _gstack_succ_str[]="Stack ok\n";
 
 
 static
-void _gstack_overflow_default(void) _naked
+void _gstack_overflow_default(void) __naked
 {
-  _asm
+  __asm
     lfsr	0, __gstack_fail_str
 ;    incf	_FSR0L, f
 
@@ -74,15 +74,15 @@ void _gstack_overflow_default(void) _naked
 @00:
     goto	@00
     
-  _endasm ;
+  __endasm ;
 }
 
 void (* _gstack_overflow)(void)=_gstack_overflow_default;
 
     
-void _gstack_init(void) _naked
+void _gstack_init(void) __naked
 {
-  _asm
+  __asm
     
     movlw	LOW(_stack)
     movwf	__gstack_begin
@@ -111,13 +111,13 @@ void _gstack_init(void) _naked
     movwf	__init_ok
     
     return;    
-  _endasm ;
+  __endasm ;
 }
 
 
-void _gstack_test(void) _naked
+void _gstack_test(void) __naked
 {
-  _asm
+  __asm
     movff	_WREG, __wreg_store
     movff	_STATUS, __status_store
 
@@ -195,5 +195,5 @@ ret_lab:
     
     return
     
-    _endasm ;
+    __endasm ;
 }

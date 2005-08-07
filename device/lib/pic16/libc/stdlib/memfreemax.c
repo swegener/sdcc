@@ -31,17 +31,20 @@ extern unsigned char _MALLOC_SPEC *heap;
 unsigned int memfreemax(void)
 {
   _malloc_rec _MALLOC_SPEC *pHeap;
-  unsigned int maxSize=0;
+  unsigned char maxSize = 1;
+  unsigned char bLen;
 
     pHeap = (_malloc_rec _MALLOC_SPEC *)&heap;
     
-    while(pHeap->datum) {
-      if(!pHeap->bits.alloc
-        && pHeap->bits.count > maxSize)
-          maxSize = pHeap->bits.count;
+    while ((bLen = pHeap->bits.count)) {
+      if(!pHeap->bits.alloc && (bLen > maxSize))
+          maxSize = bLen;
       
-      pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + pHeap->bits.count);
+      pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + bLen);
     }
 
+  /* do not count the block header */
+  --maxSize;
+  
   return (maxSize);
 }

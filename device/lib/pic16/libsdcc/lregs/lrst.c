@@ -33,14 +33,14 @@ extern POSTDEC1;
 extern POSTINC0;
 extern WREG;
 
-void _lr_store(void) _naked
+void _lr_store(void) __naked
 {
-  _asm
+  __asm
 loop:
     movff	_POSTINC0, _POSTDEC1
     decfsz	_WREG, f
     bra		loop
     
     return
-  _endasm;
+  __endasm;
 }

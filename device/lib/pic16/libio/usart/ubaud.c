@@ -32,5 +32,5 @@
 
 void usart_baud(unsigned char baudconfig) __wparam
 {
-    BAUDREG = baudconfig;
+    SPBRG = baudconfig;
 }

@@ -34,37 +34,24 @@ unsigned char _MALLOC_SPEC *realloc(unsigned char _MALLOC_SPEC *mblock, unsigned
   _malloc_rec _MALLOC_SPEC *temp;
   unsigned char bLen;			/* size of block  */
 
-    if(len >= MAX_BLOCK_SIZE)
-      return ((unsigned char _MALLOC_SPEC *)0);
+  if(len >= MAX_BLOCK_SIZE)
+    return ((unsigned char _MALLOC_SPEC *)0);
 
-    /* if mblock is NULL, then same as malloc */
-    if(!mblock)
-      return (malloc(len));
+  /* if mblock is NULL, then same as malloc */
+  if(!mblock)
+    return (malloc(len));
 
-    /* if len is 0, */
-    if(len == 0) {
-      free(mblock);
-      return (malloc(0));
-    }
-    
-    len++;		/* increase to count header too */
+  /* if len is 0 */
+  if(len == 0) {
+    free(mblock);
+    return ((unsigned char _MALLOC_SPEC *)0);
+  }
+  
+  pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)mblock - 1);
+  bLen = pHeap->bits.count;
 
-    pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)mblock - 1);
-    bLen = pHeap->bits.count;
-
-    /* new size is same as old, return pointer */
-    if(bLen == len)return (mblock);
-
-    if(bLen > len) {
-      /* new segment is smaller than the old one, that's easy! */
-      pHeap->bits.count = len;
-      temp = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + len);
-      temp->bits.alloc = 0;
-      temp->bits.count = bLen - len;
-
-      return ((unsigned char _MALLOC_SPEC *)((unsigned int)pHeap + 1));
-    }
-
+  /* block too small for len bytes + 1 byte header <===> bLen < len + 1 <===> blen <= len */
+  if (bLen <= len) {
     /* so, new segment has size bigger than the old one, we can return a
      * valid pointer only when after the block there is an empty block that
      * can be merged to produce a new block of the requested size, otherwise
@@ -76,20 +63,19 @@ unsigned char _MALLOC_SPEC *realloc(unsigned char _MALLOC_SPEC *mblock, unsigned
       return ((unsigned char _MALLOC_SPEC *)0);
     }
 
-    pHeap = temp;
+    //pHeap = temp; /* temp == pHeap */
     bLen = pHeap->bits.count;
-    
-    /* allocate by filling the fields */
+  }
+
+  len++; /* increase to also count the header */
+  
+  if(bLen > len) {
+    /* new segment is smaller than the old one (or the merged one), that's easy! */
     pHeap->bits.count = len;
-    pHeap->bits.alloc = 1;
+    temp = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + len);
+    temp->bits.alloc = 0;
+    temp->bits.count = bLen - len;
+  }
 
-    if(bLen > len) {
-      /* if current block size is greater than the requested one,
-       * create a new empty block at the end of the newly allocated */
-      temp = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + len);
-      temp->bits.count = bLen - len;
-      temp->bits.alloc = 0;
-    }
-
-  return ((unsigned char _MALLOC_SPEC *)((unsigned int)pHeap + 1));
+  return (mblock);
 }

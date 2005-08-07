@@ -33,27 +33,28 @@ void _initHeap(unsigned char _MALLOC_SPEC *dheap, unsigned int heapsize)
   int bsize;
   
     pHeap = (_malloc_rec _MALLOC_SPEC *)dheap;
+    if (heapsize == 0) return;
+    /* we need one byte as the end of block list marker */
+    heapsize--;
     
-    while(hsize < heapsize-1) {
-
+    while (hsize < heapsize) {
       /* a guess of the next block size */
-      bsize = (heapsize - hsize);
-      if(bsize > MAX_BLOCK_SIZE)bsize = MAX_BLOCK_SIZE;
-      else bsize--;
-      
-      if(bsize < 0)return;
+      bsize = (heapsize - hsize); /* thus: bsize > 0 */
+      if(bsize > MAX_BLOCK_SIZE) bsize = MAX_BLOCK_SIZE;
       
       /* now we can create the block */
       pHeap->datum = bsize;
       pHeap = (_malloc_rec _MALLOC_SPEC *)((unsigned int)pHeap + bsize);
 
       hsize += bsize;
-      if(!bsize)break;
     }
+
+    /* mark end of block list */
+    pHeap->datum = 0;
 }
 
 /* search heap starting from sBlock for a block of size bSize, merging
- * adjacent blocks if ne necessery */
+ * adjacent blocks if necessery */
 _malloc_rec _MALLOC_SPEC *_mergeHeapBlock(_malloc_rec _MALLOC_SPEC *sBlock, unsigned char bSize)
 {
   _malloc_rec _MALLOC_SPEC *temp;
@@ -67,7 +68,7 @@ _malloc_rec _MALLOC_SPEC *_mergeHeapBlock(_malloc_rec _MALLOC_SPEC *sBlock, unsi
      * blocks to make it fit */
     temp = (_malloc_rec _MALLOC_SPEC *)((unsigned int)sBlock + bLen);	//sBlock->bits.count);
     eLen = bLen;
-    while((temp->datum) && (!temp->bits.alloc) && (eLen < bSize)) {
+    while((temp->datum) && (!temp->bits.alloc) && (eLen <= bSize)) {
       eLen += (dat=temp->bits.count);
       temp = (_malloc_rec _MALLOC_SPEC *)((unsigned int)temp + dat);
     }

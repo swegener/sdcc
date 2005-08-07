@@ -33,14 +33,14 @@ extern PREINC1;
 extern POSTDEC0;
 extern WREG;
 
-void _lr_restore(void) _naked
+void _lr_restore(void) __naked
 {
-  _asm
+  __asm
 loop:
     movff	_PREINC1, _POSTDEC0
     decfsz	_WREG, f
     bra		loop
     
     return
-  _endasm;
+  __endasm;
 }

@@ -1,6 +1,6 @@
 
 /*
- * pic18f2220.c - PIC18F2220 Device Library Source
+ * pic18f2320.c - PIC18F2320 Device Library Source
  *
  * This file is part of the GNU PIC Library.
  *

@@ -1,6 +1,6 @@
 
 /*
- * pic18f2220.h - PIC18F2220 Device Library Header
+ * pic18f4220.h - PIC18F4220 Device Library Header
  *
  * This file is part of the GNU PIC Library.
  *
@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef __PIC18F2220_H__
-#define __PIC18F2220_H__
+#ifndef __PIC18F4220_H__
+#define __PIC18F4220_H__
 
 extern __sfr __at (0xf80) PORTA;
 typedef union {
@@ -140,6 +140,84 @@ typedef union {
 
 extern volatile __PORTCbits_t __at (0xf82) PORTCbits;
 
+extern __sfr __at (0xf83) PORTD;
+typedef union {
+	struct {
+		unsigned RD0:1;
+		unsigned RD1:1;
+		unsigned RD2:1;
+		unsigned RD3:1;
+		unsigned RD4:1;
+		unsigned RD5:1;
+		unsigned RD6:1;
+		unsigned RD7:1;
+	};
+
+	struct {
+		unsigned PSP0:1;
+		unsigned PSP1:1;
+		unsigned PSP2:1;
+		unsigned PSP3:1;
+		unsigned PSP4:1;
+		unsigned PSP5:1;
+		unsigned PSP6:1;
+		unsigned PSP7:1;
+	};
+
+	struct {
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned P1B:1;
+		unsigned P1C:1;
+		unsigned P1D:1;
+	};
+
+} __PORTDbits_t;
+
+extern volatile __PORTDbits_t __at (0xf83) PORTDbits;
+
+extern __sfr __at (0xf84) PORTE;
+typedef union {
+	struct {
+		unsigned RE0:1;
+		unsigned RE1:1;
+		unsigned RE2:1;
+		unsigned RE3:1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+	};
+
+	struct {
+		unsigned AN5:1;
+		unsigned AN6:1;
+		unsigned AN7:1;
+		unsigned MCLR:1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+	};
+
+	struct {
+		unsigned RD:1;
+		unsigned WR:1;
+		unsigned CS:1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+	};
+
+} __PORTEbits_t;
+
+extern volatile __PORTEbits_t __at (0xf84) PORTEbits;
+
 extern __sfr __at (0xf89) LATA;
 typedef union {
 	struct {
@@ -188,6 +266,38 @@ typedef union {
 
 extern volatile __LATCbits_t __at (0xf8b) LATCbits;
 
+extern __sfr __at (0xf8c) LATD;
+typedef union {
+	struct {
+		unsigned LATD0:1;
+		unsigned LATD1:1;
+		unsigned LATD2:1;
+		unsigned LATD3:1;
+		unsigned LATD4:1;
+		unsigned LATD5:1;
+		unsigned LATD6:1;
+		unsigned LATD7:1;
+	};
+} __LATDbits_t;
+
+extern volatile __LATDbits_t __at (0xf8c) LATDbits;
+
+extern __sfr __at (0xf8d) LATE;
+typedef union {
+	struct {
+		unsigned LATE0:1;
+		unsigned LATE1:1;
+		unsigned LATE2:1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+		unsigned :1;
+	};
+} __LATEbits_t;
+
+extern volatile __LATEbits_t __at (0xf8d) LATEbits;
+
 extern __sfr __at (0xf92) TRISA;
 typedef union {
 	struct {
@@ -235,6 +345,38 @@ typedef union {
 } __TRISCbits_t;
 
 extern volatile __TRISCbits_t __at (0xf94) TRISCbits;
+
+extern __sfr __at (0xf95) TRISD;
+typedef union {
+	struct {
+		unsigned TRISD0:1;
+		unsigned TRISD1:1;
+		unsigned TRISD2:1;
+		unsigned TRISD3:1;
+		unsigned TRISD4:1;
+		unsigned TRISD5:1;
+		unsigned TRISD6:1;
+		unsigned TRISD7:1;
+	};
+} __TRISDbits_t;
+
+extern volatile __TRISDbits_t __at (0xf95) TRISDbits;
+
+extern __sfr __at (0xf96) TRISE;
+typedef union {
+	struct {
+		unsigned TRISE0:1;
+		unsigned TRISE1:1;
+		unsigned TRISE2:1;
+		unsigned :1;
+		unsigned PSPMODE:1;
+		unsigned IBOV:1;
+		unsigned OBF:1;
+		unsigned IBF:1;
+	};
+} __TRISEbits_t;
+
+extern volatile __TRISEbits_t __at (0xf96) TRISEbits;
 
 extern __sfr __at (0xf9b) OSCTUNE;
 typedef union {
@@ -464,16 +606,6 @@ typedef union {
 		unsigned :1;
 		unsigned :1;
 	};
-	struct {
-		unsigned :1;
-		unsigned :1;
-		unsigned :1;
-		unsigned :1;
-		unsigned DC2B0:1;
-		unsigned DC2B1:1;
-		unsigned :1;
-		unsigned :1;
-	};
 } __CCP2CONbits_t;
 
 extern volatile __CCP2CONbits_t __at (0xfba) CCP2CONbits;
@@ -487,24 +619,46 @@ typedef union {
 		unsigned CCP1M1:1;
 		unsigned CCP1M2:1;
 		unsigned CCP1M3:1;
-		unsigned DCCP1Y:1;
-		unsigned DCCP1X:1;
-		unsigned :1;
-		unsigned :1;
-	};
-	struct {
-		unsigned :1;
-		unsigned :1;
-		unsigned :1;
-		unsigned :1;
 		unsigned DC1B0:1;
 		unsigned DC1B1:1;
-		unsigned :1;
-		unsigned :1;
+		unsigned P1M0:1;
+		unsigned P1M1:1;
 	};
 } __CCP1CONbits_t;
 
 extern volatile __CCP1CONbits_t __at (0xfbd) CCP1CONbits;
+
+extern __sfr __at (0xfb7) PWM1CON;
+typedef union {
+	struct {
+		unsigned PDC0:1;
+		unsigned PDC1:1;
+		unsigned PDC2:1;
+		unsigned PDC3:1;
+		unsigned PDC4:1;
+		unsigned PDC5:1;
+		unsigned PDC6:1;
+		unsigned PRSEN:1;
+	};
+} __PWM1CONbits_t;
+
+extern volatile __PWM1CONbits_t __at (0xfb7) PWM1CONbits;
+
+extern __sfr __at (0xfb6) ECCPAS;
+typedef union {
+	struct {
+		unsigned PSSBD0:1;
+		unsigned PSSBD1:1;
+		unsigned PSSAC0:1;
+		unsigned PSSAC1:1;
+		unsigned ECCPAS0:1;
+		unsigned ECCPAS1:1;
+		unsigned ECCPAS2:1;
+		unsigned ECCPASE:1;
+	};
+} __ECCPASbits_t;
+
+extern volatile __ECCPASbits_t __at (0xfb6) ECCPASbits;
 
 extern __sfr __at (0xfbe) CCPR1L;
 extern __sfr __at (0xfbf) CCPR1H;

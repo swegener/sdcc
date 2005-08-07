@@ -47,11 +47,13 @@ extern FSR2H;
 #define _vv0x03	0x03
 #define _vv0x04	0x04
 
+/* do not warn about unreferenced arguments/missing return values */
+#pragma save
+#pragma disable_warning 59
+#pragma disable_warning 85
+
 char x_cnvint_wrap(unsigned long num, __data char *buffer)
 {
-  num;
-  buffer;
-  
   __asm
     movff	_vv0x00, _POSTDEC1
     movff	_vv0x01, _POSTDEC1
@@ -124,7 +126,7 @@ char x_cnvfrac_wrap(unsigned long num, __data char *buffer, unsigned char prec)
     movff	_PREINC1, _vv0x00
   __endasm ;
 }
-
+#pragma restore
 
 
 union float_long {

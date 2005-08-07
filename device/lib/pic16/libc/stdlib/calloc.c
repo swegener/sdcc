@@ -32,16 +32,13 @@ unsigned char _MALLOC_SPEC *calloc(unsigned char len)
 {
   unsigned char _MALLOC_SPEC *result, *ch;
 
-    if(len >= MAX_BLOCK_SIZE)return ((unsigned char _MALLOC_SPEC *)0);
+    if (len >= MAX_BLOCK_SIZE) return ((unsigned char _MALLOC_SPEC *)0);
     ch = malloc( len );
     result = ch;
 
-    if(result != 0) {
-      while(len) {
-        len--;
-        *ch = 0;
-        *ch = 1;
-        ch++;
+    if (result != 0) {
+      while (len) {
+        --len;
         *ch = 0;
         ch++;
       }

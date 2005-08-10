@@ -1,5 +1,10 @@
 2005-08-10 Raphael Neider <rneider AT web.de>
 
+	* device/lib/Makefile.in: fixed copying pic16 libraries (broken by
+	  my last commit)
+
+2005-08-10 Raphael Neider <rneider AT web.de>
+
 	* src/*.c, src/pic16/{gen.c,glue.c,main.c}: applied Vangelis
 	  Rokas' patch to add the new fixed point type "__fixed16x16"
 	* device/lib/pic16/libsdcc/fixed16x16: added Vangelis' support

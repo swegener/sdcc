@@ -2384,6 +2384,16 @@ dwTagFromType (sym_link * type, dwtag * parent)
 						    getSize (type)));
 		  dwAddTagChild (dwRootTag, tp);
 		  break;
+
+		case V_FIXED16X16:
+		  tp = dwNewTag (DW_TAG_base_type);
+		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
+						    DW_ATE_float));
+		  dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "fixed16x16"));
+		  dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
+						    getSize (type)));
+		  dwAddTagChild (dwRootTag, tp);
+		  break;
 		
 		case V_CHAR:
 		  tp = dwNewTag (DW_TAG_base_type);

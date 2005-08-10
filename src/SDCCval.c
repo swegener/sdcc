@@ -333,7 +333,7 @@ static value *cheapestVal (value *val) {
   TYPE_DWORD  sval=0;
   TYPE_UDWORD uval=0;
 
-  if (IS_FLOAT(val->type) || IS_CHAR(val->type))
+  if (IS_FLOAT(val->type) || IS_FIXED(val->type) || IS_CHAR(val->type))
     return val;
 
   if (SPEC_LONG(val->type)) {
@@ -384,7 +384,7 @@ static value *cheapestVal (value *val) {
 
 static value *cheapestVal (value *val)
 {
-  if (IS_FLOAT (val->type) || IS_CHAR (val->type))
+  if (IS_FLOAT (val->type) || IS_FIXED (val->type) || IS_CHAR (val->type))
     return val;
 
   /* - signed/unsigned must not be changed.
@@ -458,6 +458,29 @@ constFloatVal (char *s)
   SPEC_SCLS (val->type) = S_LITERAL;
   SPEC_CVAL (val->type).v_float = sval;
 
+  return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* constFixed16x16Val - converts a FIXED16X16 constant to value    */
+/*-----------------------------------------------------------------*/
+value *
+constFixed16x16Val (char *s)
+{
+  value *val = newValue ();
+  double sval;
+
+  if (sscanf (s, "%lf", &sval) != 1)
+    {
+      werror (E_INVALID_FLOAT_CONST, s);
+      return constVal ("0");
+    }
+
+  val->type = val->etype = newLink (SPECIFIER);
+  SPEC_NOUN (val->type) = V_FLOAT;
+  SPEC_SCLS (val->type) = S_LITERAL;
+  SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble ( sval );
+ 
   return val;
 }
 
@@ -951,6 +974,9 @@ floatFromVal (value * val)
   if (SPEC_NOUN (val->etype) == V_FLOAT)
     return (double) SPEC_CVAL (val->etype).v_float;
 
+  if (SPEC_NOUN (val->etype) == V_FIXED16X16)
+    return (double) doubleFromFixed16x16( SPEC_CVAL (val->etype).v_fixed16x16 );
+
   if (SPEC_LONG (val->etype))
     {
       if (SPEC_USIGN (val->etype))
@@ -996,6 +1022,8 @@ valUnaryPM (value * val)
   /* depending on type */
   if (SPEC_NOUN (val->etype) == V_FLOAT)
     SPEC_CVAL (val->etype).v_float = -1.0 * SPEC_CVAL (val->etype).v_float;
+  if (SPEC_NOUN (val->etype) == V_FIXED16X16)
+    SPEC_CVAL (val->etype).v_fixed16x16 = -SPEC_CVAL (val->etype).v_fixed16x16;
   else
     {
       if (SPEC_LONG (val->etype))
@@ -1096,6 +1124,9 @@ valMult (value * lval, value * rval)
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) * floatFromVal (rval);
+  else
+  if (IS_FIXED16X16 (val->type))
+    SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble(floatFromVal (lval) * floatFromVal (rval));
       /* signed and unsigned mul are the same, as long as the precision of the
          result isn't bigger than the precision of the operands. */
   else if (SPEC_LONG (val->type))
@@ -1146,6 +1177,9 @@ valDiv (value * lval, value * rval)
 
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) / floatFromVal (rval);
+  else
+  if (IS_FIXED16X16 (val->type))
+    SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble( floatFromVal (lval) / floatFromVal (rval) );
   else if (SPEC_LONG (val->type))
     {
       if (SPEC_USIGN (val->type))
@@ -1222,6 +1256,9 @@ valPlus (value * lval, value * rval)
   
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) + floatFromVal (rval);
+  else
+  if (IS_FIXED16X16 (val->type))
+    SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble( floatFromVal (lval) + floatFromVal (rval) );
   else  if (SPEC_LONG (val->type))
     {
       if (SPEC_USIGN (val->type))
@@ -1261,6 +1298,9 @@ valMinus (value * lval, value * rval)
   
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) - floatFromVal (rval);
+  else
+  if (IS_FIXED16X16 (val->type))
+    SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble( floatFromVal (lval) - floatFromVal (rval) );
   else  if (SPEC_LONG (val->type))
     {
       if (SPEC_USIGN (val->type))
@@ -1381,6 +1421,12 @@ valCompare (value * lval, value * rval, int ctype)
 	  SPEC_CVAL (val->type).v_int = floatFromVal (lval) == floatFromVal (rval);
 	}
       else
+      if (SPEC_NOUN(lval->type) == V_FIXED16X16 ||
+	  SPEC_NOUN(rval->type) == V_FIXED16X16)
+	{
+	  SPEC_CVAL (val->type).v_int = floatFromVal (lval) == floatFromVal (rval);
+	}
+      else
 	{
 	  /* integrals: ignore signedness */
 	  TYPE_UDWORD l, r;
@@ -1404,6 +1450,12 @@ valCompare (value * lval, value * rval, int ctype)
     case NE_OP:
       if (SPEC_NOUN(lval->type) == V_FLOAT ||
 	  SPEC_NOUN(rval->type) == V_FLOAT)
+	{
+	  SPEC_CVAL (val->type).v_int = floatFromVal (lval) != floatFromVal (rval);
+	}
+      else
+      if (SPEC_NOUN(lval->type) == V_FIXED16X16 ||
+	  SPEC_NOUN(rval->type) == V_FIXED16X16)
 	{
 	  SPEC_CVAL (val->type).v_int = floatFromVal (lval) != floatFromVal (rval);
 	}
@@ -1578,6 +1630,8 @@ valCastLiteral (sym_link * dtype, double fval)
 
   if (SPEC_NOUN (val->etype) == V_FLOAT)
       SPEC_CVAL (val->etype).v_float = fval;
+  else if (SPEC_NOUN (val->etype) == V_FIXED16X16)
+      SPEC_CVAL (val->etype).v_fixed16x16 = fixed16x16FromDouble( fval );
   else if (SPEC_NOUN (val->etype) == V_BIT ||
            SPEC_NOUN (val->etype) == V_SBIT)
     SPEC_CVAL (val->etype).v_uint = l ? 1 : 0;

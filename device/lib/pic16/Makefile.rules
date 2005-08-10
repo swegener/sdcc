@@ -1,0 +1,58 @@
+###########################################################
+### Makefile.rules for the GNU PIC Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The GNU PIC Library was originally designed and
+### implemented by
+###	Vangelis Rokas <vrokas@otenet.gr>
+###
+### It is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See COPYING for details.
+###
+### $Id$
+###
+
+# update dependencies
+$(topsrcdir)/$(builddir)/%.d : %.c
+	@echo "[  CPP  ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+	$(Q)$(CPP) $CPPFLAGS) -o "$@" "$<";
+
+# assemble
+$(topsrcdir)/$(builddir)/%.o : %.S
+	@echo "[  AS   ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+	$(Q)$(AS) $(ASFLAGS) -o "$@" -c "$<";
+
+# compile
+$(topsrcdir)/$(builddir)/%.o : %.c
+	@echo "[  CC   ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+	$(Q)$(CC) $(CFLAGS) -o "$@" -c "$<";
+
+# create library
+ifneq (,$(strip $(LIB_O)))
+%.lib : $(LIB_O)
+	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== $(patsubst $(topsrcdir)/$(builddir)/%,%,$^)";
+	$(Q)$(RM) "$@"; $(LIB) $(LIBFLAGS) "$@" $^;
+else
+%.lib : force
+	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== **/*.o";
+	$(Q)$(RM) "$@"; LIB_O=`find "$(topsrcdir)/$(builddir)" -name "*.o"`; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O};
+endif
+
+.PHONY : builddir recurse force
+
+# create builddir
+builddir : force
+	$(Q)[ -d "$(topsrcdir)/$(builddir)" ] || $(MKDIR) "$(topsrcdir)/$(builddir)";
+
+# build sub-directories
+recurse : force
+	$(Q)for DIR in $(SUBDIRS) . ; do \
+		[ "$${DIR}" = "." ] || $(GREP) "^$${ARCH}$$" "$${DIR}.ignore" &> /dev/null || $(MAKE) -C "$${DIR}" builddir="$(builddir)/$${DIR}" $(MAKECMDGOALS) || exit 1; \
+	done
+
+# target to force remaking of (seemingly) independent targets
+force :

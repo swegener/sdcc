@@ -1,60 +1,43 @@
-#
-# Makefile - toplevel makefile that builds everything
-#
-# This file is part of the GNU PIC Library.
-#
-# January, 2004
-# The GNU PIC Library is maintained by,
-# 	Vangelis Rokas <vrokas@otenet.gr>
-#
-# $Id$
-#
-#
+###########################################################
+### Makefile for the GNU PIC Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The GNU PIC Library was originally designed and
+### implemented by
+###	Vangelis Rokas <vrokas@otenet.gr>
+###
+### It is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See COPYING for details.
+###
+### $Id$
+###
 
+topsrcdir = .
 
-include ./Makefile.common
+include $(topsrcdir)/Makefile.common
 
+SUBDIRS	   = debug libc libdev libio libm libsdcc startup
+builddir   = build
+installdir = bin
+export installdir
 
-DIRS	=	startup \
-		libdev	\
-		libsdcc	\
-		libc \
-		libm \
-		debug
-		
-#		libio 
+C_SRC = $(wildcard *.c)
+S_SRC = $(wildcard *.S)
+OBJS = $(C_SRC:.c=.o) $(S_SRC:.S=.o)
 
+.PHONY : all clean clean-intermediate recurse
 
-all: build-all-libraries
+all : install
 
-build-all-libraries:
-	@for temp in $(DIRS) ; do \
-		$(MAKE) -C $$temp MODELFLAGS=$(MODELFLAGS) ; \
-	done
+install : builddir recurse
 
+clean : recurse
+	$(Q)-$(RMDIR) "$(topsrcdir)/$(builddir)";
 
-lib-io:
-	$(MAKE) -C libio MODELFLAGS=$(MODELFLAGS)
+clean-intermediate : recurse
 
-clean: all-clean
-	$(RM) -f bin/*.*
-
-
-
-all-clean:
-	@for temp in $(DIRS) ; do \
-		$(MAKE) -C $$temp clean ; \
-	done
-
-clean-intermediate:
-	@for temp in $(DIRS) ; do \
-		$(MAKE) -C $$temp clean-intermediate ; \
-	done
-
-
-dep: all-dep
-
-all-dep:
-	for temp in $(DIRS) ; do \
-		$(MAKE) -C $$temp dep ; \
-	done
+include $(topsrcdir)/Makefile.rules

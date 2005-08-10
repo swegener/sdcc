@@ -2830,10 +2830,14 @@ static void genUminus (iCode *ic)
     optype = operandType(IC_LEFT(ic));
     rtype = operandType(IC_RESULT(ic));
 
+
     /* if float then do float stuff */
-    if (IS_FLOAT(optype)) {
-      genUminusFloat(IC_LEFT(ic),IC_RESULT(ic));
-      goto release;
+    if (IS_FLOAT(optype) || IS_FIXED(optype)) {
+      if(IS_FIXED(optype))
+        debugf("implement fixed16x16 type\n", 0);
+	
+	genUminusFloat(IC_LEFT(ic),IC_RESULT(ic));
+	goto release;
     }
 
     /* otherwise subtract from zero by taking the 2's complement */
@@ -12351,17 +12355,22 @@ static void genAssign (iCode *ic)
   offset = 0 ;
 
   if(AOP_TYPE(right) == AOP_LIT) {
-	if(!IS_FLOAT(operandType( right )))
+	if(!(IS_FLOAT(operandType( right )) || IS_FIXED(operandType(right))))
 		lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-	else {
+	else{
 	   union {
 	      unsigned long lit_int;
 	      float lit_float;
 	    } info;
 	
+
+	      if(IS_FIXED16X16(operandType(right))) {
+	        lit = (unsigned long)fixed16x16FromDouble( floatFromVal( AOP(right)->aopu.aop_lit));
+              } else {
 		/* take care if literal is a float */
 		info.lit_float = floatFromVal(AOP(right)->aopu.aop_lit);
 		lit = info.lit_int;
+              }
 	}
   }
 

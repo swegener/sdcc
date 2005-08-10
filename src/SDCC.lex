@@ -122,6 +122,8 @@ _?"_asm"         {
 "eeprom"       { count(); TKEYWORDSDCC(EEPROM); }
 "__eeprom"     { count(); TKEYWORD(EEPROM); }
 "float"        { count(); return(FLOAT); }
+"fixed16x16"   { count(); TKEYWORDSDCC(FIXED16X16); }
+"__fixed16x16"   { count(); TKEYWORD(FIXED16X16); }
 "flash"        { count(); TKEYWORDSDCC(CODE); }
 "__flash"      { count(); TKEYWORD(CODE); }
 "for"          { count(); return(FOR); }

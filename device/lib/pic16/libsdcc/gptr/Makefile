@@ -1,36 +1,5 @@
-#
-# Makefile - Makefile to build pic16 generic pointer support library
-#
-# This file is part of the GNU PIC Library.
-#
-# January, 2004
-# The GNU PIC Library is maintained by,
-# 	Vangelis Rokas <vrokas@otenet.gr>
-#
-# $Id$
-#
-#
+topsrcdir=../..
 
+SUBDIRS = 
 
-SRCS	=	gptrget1 \
-		gptrget2 \
-		gptrget3 \
-		gptrget4 \
-		gptrput1 \
-		gptrput2 \
-		gptrput3 \
-		gptrput4
-
-
-include ../Makefile.rules
-
-#OFILES	+= gptrcommon.o
-
-
-all: build-library
-
-#gptrcommon.o: gptrcommon.S
-#	$(AS) -c $< -o $@
-
-build-library: $(OFILES)
-#	@$(CP) -v $(OFILES) ../../bin
+include $(topsrcdir)/Makefile.subdir

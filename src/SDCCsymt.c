@@ -47,6 +47,7 @@ char *nounName(sym_link *sl) {
       return "int";
     }
     case V_FLOAT: return "float";
+    case V_FIXED16X16: return "fixed16x16";
     case V_CHAR: return "char";
     case V_VOID: return "void";
     case V_STRUCT: return "struct";
@@ -541,6 +542,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
 
   if ((SPEC_NOUN(etype)==V_CHAR || 
        SPEC_NOUN(etype)==V_FLOAT || 
+       SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE || 
        SPEC_NOUN(etype)==V_VOID) &&
       (etype->select.s._short || SPEC_LONG(etype))) {
@@ -548,6 +550,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
     werror (E_LONG_OR_SHORT_INVALID, noun, name);
   }
   if ((SPEC_NOUN(etype)==V_FLOAT || 
+       SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE || 
        SPEC_NOUN(etype)==V_VOID) && 
       (etype->select.s._signed || SPEC_USIGN(etype))) {
@@ -736,6 +739,20 @@ newFloatLink ()
 }
 
 /*------------------------------------------------------------------*/
+/* newFixed16x16Link - a new Float type                                  */
+/*------------------------------------------------------------------*/
+sym_link *
+newFixed16x16Link ()
+{
+  sym_link *p;
+
+  p = newLink (SPECIFIER);
+  SPEC_NOUN (p) = V_FIXED16X16;
+
+  return p;
+}
+
+/*------------------------------------------------------------------*/
 /* newLongLink() - new long type                                    */
 /*------------------------------------------------------------------*/
 sym_link *
@@ -781,6 +798,8 @@ getSize (sym_link * p)
           return (IS_LONG (p) ? LONGSIZE : INTSIZE);
         case V_FLOAT:
           return FLOATSIZE;
+        case V_FIXED16X16:
+          return (4);
         case V_CHAR:
           return CHARSIZE;
         case V_VOID:
@@ -871,6 +890,8 @@ bitsForType (sym_link * p)
           return (IS_LONG (p) ? LONGSIZE * 8 : INTSIZE * 8);
         case V_FLOAT:
           return FLOATSIZE * 8;
+        case V_FIXED16X16:
+          return (32);
         case V_CHAR:
           return CHARSIZE * 8;
         case V_VOID:
@@ -1729,6 +1750,15 @@ computeType (sym_link * type1, sym_link * type2,
   /* and can be cast to one another                */
   /* which ever is greater in size */
   if (IS_FLOAT (etype1) || IS_FLOAT (etype2))
+    rType = newFloatLink ();
+  else
+    /* if both are fixed16x16 then result is float */
+  if (IS_FIXED16X16(etype1) && IS_FIXED16X16(etype2))
+    rType = newFixed16x16Link();
+  else
+  if (IS_FIXED16X16(etype1) && IS_FLOAT (etype2))
+    rType = newFloatLink ();
+  if (IS_FLOAT (etype1) && IS_FIXED16X16 (etype2) )
     rType = newFloatLink ();
   else
     /* if both are bitvars choose the larger one */
@@ -2804,6 +2834,10 @@ printTypeChain (sym_link * start, FILE * of)
               fprintf (of, "float");
               break;
 
+            case V_FIXED16X16:
+              fprintf (of, "fixed16x16");
+              break;
+
             case V_STRUCT:
               fprintf (of, "struct %s", SPEC_STRUCT (type)->tag);
               break;
@@ -2975,6 +3009,10 @@ printTypeChainRaw (sym_link * start, FILE * of)
               fprintf (of, "float");
               break;
 
+            case V_FIXED16X16:
+              fprintf (of, "fixed16x16");
+              break;
+
             case V_STRUCT:
               fprintf (of, "struct %s", SPEC_STRUCT (type)->tag);
               break;
@@ -3044,16 +3082,30 @@ symbol *__fslteq;
 symbol *__fsgt;
 symbol *__fsgteq;
 
+symbol *__fps16x16_add;
+symbol *__fps16x16_sub;
+symbol *__fps16x16_mul;
+symbol *__fps16x16_div;
+symbol *__fps16x16_eq;
+symbol *__fps16x16_neq;
+symbol *__fps16x16_lt;
+symbol *__fps16x16_lteq;
+symbol *__fps16x16_gt;
+symbol *__fps16x16_gteq;
+
 /* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 symbol *__muldiv[3][3][2];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
 sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
 symbol *__conv[2][3][2];
+/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/FLOAT, SIGNED/USIGNED */
+symbol *__fp16x16conv[2][4][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 symbol *__rlrr[2][3][2];
 
 sym_link *floatType;
+sym_link *fixed16x16Type;
 
 static char *
 _mangleFunctionName(char *in)
@@ -3075,6 +3127,7 @@ _mangleFunctionName(char *in)
 /*                      'i' - int                                  */
 /*                      'l' - long                                 */
 /*                      'f' - float                                */
+/*                      'q' - fixed16x16                           */
 /*                      'v' - void                                 */
 /*                      '*' - pointer - default (GPOINTER)         */
 /* modifiers -          'u' - unsigned                             */
@@ -3117,6 +3170,10 @@ sym_link *typeFromStr (char *s)
         case 'f':
             r->class = SPECIFIER;
             SPEC_NOUN(r) = V_FLOAT;
+            break;
+        case 'q':
+            r->class = SPECIFIER;
+            SPEC_NOUN(r) = V_FIXED16X16;
             break;
         case 'v':
             r->class = SPECIFIER;
@@ -3183,7 +3240,11 @@ initCSupport ()
   };
   const char *sbwd[] =
   {
-    "char", "int", "long"
+    "char", "int", "long", "fixed16x16",
+  };
+  const char *fp16x16sbwd[] =
+  {
+    "char", "int", "long", "float",
   };
   const char *ssu[] =
   {
@@ -3202,6 +3263,7 @@ initCSupport ()
   }
 
   floatType = newFloatLink ();
+  fixed16x16Type = newFixed16x16Link ();
 
   for (bwd = 0; bwd < 3; bwd++)
     {
@@ -3236,6 +3298,18 @@ initCSupport ()
   __fsgt = funcOfType ("__fsgt", CHARTYPE, floatType, 2, options.float_rent);
   __fsgteq = funcOfType ("__fsgteq", CHARTYPE, floatType, 2, options.float_rent);
 
+  __fps16x16_add = funcOfType ("__fps16x16_add", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_sub = funcOfType ("__fps16x16_sub", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_mul = funcOfType ("__fps16x16_mul", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_div = funcOfType ("__fps16x16_div", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_eq = funcOfType ("__fps16x16_eq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_neq = funcOfType ("__fps16x16_neq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_lt = funcOfType ("__fps16x16_lt", CHARTYPE, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_lteq = funcOfType ("__fps16x16_lteq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_gt = funcOfType ("__fps16x16_gt", CHARTYPE, fixed16x16Type, 2, options.float_rent);
+  __fps16x16_gteq = funcOfType ("__fps16x16_gteq", CHARTYPE, fixed16x16Type, 2, options.float_rent);
+
+
   for (tofrom = 0; tofrom < 2; tofrom++)
     {
       for (bwd = 0; bwd < 3; bwd++)
@@ -3251,6 +3325,32 @@ initCSupport ()
                 {
                   SNPRINTF (buffer, sizeof(buffer), "__%s%s2fs", ssu[su], sbwd[bwd]);
                   __conv[tofrom][bwd][su] = funcOfType (buffer, floatType, __multypes[bwd][su], 1, options.float_rent);
+                }
+            }
+        }
+    }
+
+  for (tofrom = 0; tofrom < 2; tofrom++)
+    {
+      for (bwd = 0; bwd < 4; bwd++)
+        {
+          for (su = 0; su < 2; su++)
+            {
+              if (tofrom)
+                {
+                  SNPRINTF (buffer, sizeof(buffer), "__fps16x162%s%s", ssu[su], fp16x16sbwd[bwd]);
+                  if(bwd == 3) {
+                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, floatType, fixed16x16Type, 1, options.float_rent);
+                  } else
+                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, __multypes[bwd][su], fixed16x16Type, 1, options.float_rent);
+                }
+              else
+                {
+                  SNPRINTF (buffer, sizeof(buffer), "__%s%s2fps16x16", ssu[su], fp16x16sbwd[bwd]);
+                  if(bwd == 3) {
+                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, floatType, 1, options.float_rent);
+                  } else
+                    __fp16x16conv[tofrom][bwd][su] = funcOfType (buffer, fixed16x16Type, __multypes[bwd][su], 1, options.float_rent);
                 }
             }
         }

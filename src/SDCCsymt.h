@@ -41,6 +41,7 @@ enum {
     TYPEOF_CHAR,
     TYPEOF_LONG,
     TYPEOF_FLOAT,
+    TYPEOF_FIXED16X16,
     TYPEOF_BIT,
     TYPEOF_BITFIELD,
     TYPEOF_SBIT,
@@ -93,6 +94,7 @@ typedef enum
   {
     V_INT = 1,
     V_FLOAT,
+    V_FIXED16X16,
     V_CHAR,
     V_VOID,
     V_STRUCT,
@@ -156,7 +158,8 @@ typedef struct specifier
 	TYPE_DWORD  v_long;	/* 4 bytes: long constant value           */
         TYPE_UDWORD v_ulong;    /* 4 bytes: unsigned long constant value  */
 	double      v_float;	/*          floating point constant value */
-        struct symbol *v_enum;  /* ptr to enum_list if enum==1            */
+	TYPE_UDWORD v_fixed16x16; /* 4 bytes: fixed floating point constant value */
+	struct symbol *v_enum;	/* ptr 2 enum_list if enum==1 */
       }
     const_val;
     struct structdef *v_struct;	/* structure pointer      */
@@ -467,7 +470,9 @@ extern sym_link *validateLink(sym_link 	*l,
 #define IS_BIT(x) (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
                                   x->select.s.noun == V_SBIT ))
 #define IS_FLOAT(x)  (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
-#define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x))
+#define IS_FIXED16X16(x)  (IS_SPEC(x) && x->select.s.noun == V_FIXED16X16)
+#define IS_FIXED(x) (IS_FIXED16X16(x))
+#define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x) || IS_FIXED(x))
 #define IS_AGGREGATE(x) (IS_ARRAY(x) || IS_STRUCT(x))
 #define IS_LITERAL(x)   (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
 #define IS_CODE(x)      (IS_SPEC(x)  && SPEC_SCLS(x) == S_CODE)
@@ -493,12 +498,25 @@ extern symbol *__fslteq;
 extern symbol *__fsgt;
 extern symbol *__fsgteq;
 
+extern symbol *__fps16x16_add;
+extern symbol *__fps16x16_sub;
+extern symbol *__fps16x16_mul;
+extern symbol *__fps16x16_div;
+extern symbol *__fps16x16_eq;
+extern symbol *__fps16x16_neq;
+extern symbol *__fps16x16_lt;
+extern symbol *__fps16x16_lteq;
+extern symbol *__fps16x16_gt;
+extern symbol *__fps16x16_gteq;
+
 /* Dims: mul/div/mod, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 extern symbol *__muldiv[3][3][2];
 /* Dims: BYTE/WORD/DWORD SIGNED/UNSIGNED */
 extern sym_link *__multypes[3][2];
 /* Dims: to/from float, BYTE/WORD/DWORD, SIGNED/USIGNED */
 extern symbol *__conv[2][3][2];
+/* Dims: to/from fixed16x16, BYTE/WORD/DWORD/FLOAT, SIGNED/USIGNED */
+extern symbol *__fp16x16conv[2][4][2];
 /* Dims: shift left/shift right, BYTE/WORD/DWORD, SIGNED/UNSIGNED */
 extern symbol *__rlrr[2][3][2];
 
@@ -509,8 +527,8 @@ extern symbol *__rlrr[2][3][2];
 #define LONGTYPE	__multypes[2][0]
 #define ULONGTYPE	__multypes[2][1]
 
-
 extern sym_link *floatType;
+extern sym_link *fixed16x16Type;
 
 #include "SDCCval.h"
 

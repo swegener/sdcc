@@ -22,6 +22,8 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <math.h>
+
 #ifdef _WIN32
 #include <ctype.h>
 #include <windows.h>
@@ -296,6 +298,55 @@ const char *getBuildNumber(void)
   return (SDCC_BUILD_NUMBER);
 }
 
+/*-----------------------------------------------------------------*/
+/* doubleFromFixed16x16 - convert a fixed16x16 to double           */
+/*-----------------------------------------------------------------*/
+double doubleFromFixed16x16(TYPE_UDWORD value)
+{
+#if 0
+  /* This version is incorrect negative values. */
+  double tmp=0, exp=2;
+
+    tmp = (value & 0xffff0000) >> 16;
+    
+    while(value) {
+      value &= 0xffff;
+      if(value & 0x8000)tmp += 1/exp;
+      exp *= 2;
+      value <<= 1;
+    }
+  
+  return (tmp);
+#else
+  return ((double)(value * 1.0) / (double)(1UL << 16));
+#endif
+}
+
+TYPE_UDWORD fixed16x16FromDouble(double value)
+{
+#if 0
+  /* This version is incorrect negative values. */
+  unsigned int tmp=0, pos=16;
+  TYPE_UDWORD res;
+
+    tmp = floor( value );
+    res = tmp << 16;
+    value -= tmp;
+    
+    tmp = 0;
+    while(pos--) {
+      value *= 2;
+      if(value >= 1.0)tmp |= (1 << pos);
+      value -= floor( value );
+    }
+  
+    res |= tmp;
+
+  return (res);
+#else
+  return  (TYPE_UDWORD)(value * (double)(1UL << 16));
+#endif
+}
 
 
 #if defined(HAVE_VSNPRINTF) || defined(HAVE_VSPRINTF)

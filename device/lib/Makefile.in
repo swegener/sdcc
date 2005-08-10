@@ -237,7 +237,7 @@ objects-hc08: build-dir $(HC08OBJECTS) port-specific-objects clean_intermediate
 model-pic16:
 	if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
 	  $(MAKE) MODELFLAGS="-mpic16" PORT=pic16 OEXT=.lib objects-pic16; \
-	  fi
+	fi
 
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
@@ -258,7 +258,7 @@ port-specific-objects-pic16:
 	if [ -d $(PORT) ]; then \
 	  mkdir -p $(PORT)/bin; \
 	  $(MAKE) -C $(PORT); \
-	  cp -f $(PORT)/bin/*.* $(PORTDIR); \
+	  cp -f $(PORT)/bin/* $(PORTDIR); \
 	fi
 
 lib-files:

@@ -67,39 +67,77 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
 
-  switch (ic->op)
-    {
-    case '+':
-      func = __fsadd;
-      break;
-    case '-':
-      func = __fssub;
-      break;
-    case '/':
-      func = __fsdiv;
-      break;
-    case '*':
-      func = __fsmul;
-      break;
-    case EQ_OP:
-      func = __fseq;
-      break;
-    case NE_OP:
-      func = __fsneq;
-      break;
-    case '<':
-      func = __fslt;
-      break;
-    case '>':
-      func = __fsgt;
-      break;
-    case LE_OP:
-      func = __fslteq;
-      break;
-    case GE_OP:
-      func = __fsgteq;
-      break;
-    }
+  if(IS_FLOAT(operandType( IC_RIGHT( ic ) ))) {
+    switch (ic->op)
+      {
+      case '+':
+        func = __fsadd;
+        break;
+      case '-':
+        func = __fssub;
+        break;
+      case '/':
+        func = __fsdiv;
+        break;
+      case '*':
+        func = __fsmul;
+        break;
+      case EQ_OP:
+        func = __fseq;
+        break;
+      case NE_OP:
+        func = __fsneq;
+        break;
+      case '<':
+        func = __fslt;
+        break;
+      case '>':
+        func = __fsgt;
+        break;
+      case LE_OP:
+        func = __fslteq;
+        break;
+      case GE_OP:
+        func = __fsgteq;
+        break;
+      }
+  } else
+  if(IS_FIXED16X16 (operandType (IC_RIGHT(ic)))) {
+    switch (ic->op)
+      {
+      case '+':
+        func = __fps16x16_add;
+        break;
+      case '-':
+        func = __fps16x16_sub;
+        break;
+      case '/':
+        func = __fps16x16_div;
+        break;
+      case '*':
+        func = __fps16x16_mul;
+        break;
+      case EQ_OP:
+        func = __fps16x16_eq;
+        break;
+      case NE_OP:
+        func = __fps16x16_neq;
+        break;
+      case '<':
+        func = __fps16x16_lt;
+        break;
+      case '>':
+        func = __fps16x16_gt;
+        break;
+      case LE_OP:
+        func = __fps16x16_lteq;
+        break;
+      case GE_OP:
+        func = __fps16x16_gteq;
+        break;
+      }
+  }
+  
 
   /* if float support routines NOT compiled as reentrant */
   if (!options.float_rent)
@@ -224,6 +262,104 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
 	    }
 	}
     }
+
+  if(compareType (type, fixed16x16Type) == 1) {
+    func = __fp16x16conv[0][3][0];
+    goto found;
+  }
+
+  assert (0);
+found:
+
+  /* if float support routines NOT compiled as reentrant */
+  if (!options.float_rent)
+    {
+      /* first one */
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) 
+	    {
+		newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+		newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	    }
+      else
+	{
+	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+	}
+      addiCodeToeBBlock (ebp, newic, ip);
+      newic->lineno = linenno;
+
+    }
+  else
+    {
+      /* push the left */
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	}
+      else
+	{
+	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+	  newic->parmPush = 1;
+	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+	}
+      addiCodeToeBBlock (ebp, newic, ip);
+      newic->lineno = linenno;
+
+    }
+
+  /* make the call */
+  newic = newiCode (CALL, operandFromSymbol (func), NULL);
+  IC_RESULT (newic) = IC_RESULT (ic);
+  newic->parmBytes+=bytesPushed;
+  ebp->hasFcall = 1;
+  if (currFunc)
+    FUNC_HASFCALL (currFunc->type) = 1;
+
+  if(TARGET_IS_PIC16) {
+	/* normally these functions aren't marked external, so we can use their
+	 * _extern field to marked as already added to symbol table */
+
+	if(!SPEC_EXTR(func->etype)) {
+	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+		
+		SPEC_EXTR(func->etype) = 1;
+		seg = SPEC_OCLS( func->etype );
+		addSet(&seg->syms, func);
+	}
+  }
+
+  addiCodeToeBBlock (ebp, newic, ip);
+  newic->lineno = linenno;
+}
+
+/*----------------------------------------------------------------------*/
+/* cnvToFixed16x16Cast - converts casts to fixed16x16 to function calls */
+/*----------------------------------------------------------------------*/
+static void 
+cnvToFixed16x16Cast (iCode * ic, eBBlock * ebp)
+{
+  iCode *ip, *newic;
+  symbol *func = NULL;
+  sym_link *type = operandType (IC_RIGHT (ic));
+  int linenno = ic->lineno;
+  int bwd, su;
+  int bytesPushed=0;
+
+  ip = ic->next;
+  /* remove it from the iCode */
+  remiCodeFromeBBlock (ebp, ic);
+  /* depending on the type */
+  for (bwd = 0; bwd < 3; bwd++)
+    {
+      for (su = 0; su < 2; su++)
+	{
+	  if (compareType (type, __multypes[bwd][su]) == 1)
+	    {
+	      func = __fp16x16conv[0][bwd][su];
+	      goto found;
+	    }
+	}
+    }
   assert (0);
 found:
 
@@ -317,6 +453,106 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
 	    }
 	}
     }
+  assert (0);
+found:
+
+  /* if float support routines NOT compiled as reentrant */
+  if (!options.float_rent)
+    {
+      /* first one */
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	}
+      else
+	{
+	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
+	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+	}
+      addiCodeToeBBlock (ebp, newic, ip);
+      newic->lineno = lineno;
+
+    }
+  else
+    {
+
+      /* push the left */
+	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+	}
+      else
+	{
+	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+	  newic->parmPush = 1;
+	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+	}
+      addiCodeToeBBlock (ebp, newic, ip);
+      newic->lineno = lineno;
+
+    }
+
+  /* make the call */
+  newic = newiCode (CALL, operandFromSymbol (func), NULL);
+  IC_RESULT (newic) = IC_RESULT (ic);
+  newic->parmBytes+=bytesPushed;
+  ebp->hasFcall = 1;
+  if (currFunc)
+    FUNC_HASFCALL (currFunc->type) = 1;
+
+  if(TARGET_IS_PIC16) {
+	/* normally these functions aren't marked external, so we can use their
+	 * _extern field to marked as already added to symbol table */
+
+	if(!SPEC_EXTR(func->etype)) {
+	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+		
+		SPEC_EXTR(func->etype) = 1;
+		seg = SPEC_OCLS( func->etype );
+		addSet(&seg->syms, func);
+	}
+  }
+
+  addiCodeToeBBlock (ebp, newic, ip);
+  newic->lineno = lineno;
+}
+
+/*--------------------------------------------------------------------------*/
+/* cnvFromFixed16x16Cast - converts casts from fixed16x16 to function calls */
+/*--------------------------------------------------------------------------*/
+static void 
+cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
+{
+  iCode *ip, *newic;
+  symbol *func = NULL;
+  sym_link *type = operandType (IC_LEFT (ic));
+  int lineno = ic->lineno;
+  int bwd, su;
+  int bytesPushed=0;
+
+  ip = ic->next;
+  /* remove it from the iCode */
+  remiCodeFromeBBlock (ebp, ic);
+
+  /* depending on the type */
+  for (bwd = 0; bwd < 3; bwd++)
+    {
+      for (su = 0; su < 2; su++)
+	{
+	  if (compareType (type, __multypes[bwd][su]) == 1)
+	    {
+	      func = __fp16x16conv[1][bwd][su];
+	      goto found;
+	    }
+	}
+    }
+    
+  if (compareType (type, floatType) == 1)
+    {
+      func = __fp16x16conv[1][3][0];
+      goto found;
+    }
+    
   assert (0);
 found:
 
@@ -541,7 +777,8 @@ convertToFcall (eBBlock ** ebbs, int count)
 	     converted to function calls */
 	  if ((IS_CONDITIONAL (ic) ||
 	       IS_ARITHMETIC_OP (ic)) &&
-	      (IS_FLOAT (operandType (IC_RIGHT (ic)))))
+	      (IS_FLOAT (operandType (IC_RIGHT (ic)))
+	        || IS_FIXED( operandType (IC_RIGHT (ic)))))
 	    {
 
 	      cnvToFcall (ic, ebbs[i]);
@@ -554,6 +791,10 @@ convertToFcall (eBBlock ** ebbs, int count)
 		cnvFromFloatCast (ic, ebbs[i]);
 	      else if (IS_FLOAT (operandType (IC_LEFT (ic))))
 		cnvToFloatCast (ic, ebbs[i]);
+	      if (IS_FIXED16X16 (operandType (IC_RIGHT (ic))))
+		cnvFromFixed16x16Cast (ic, ebbs[i]);
+	      else if (IS_FIXED16X16 (operandType (IC_LEFT (ic))))
+		cnvToFixed16x16Cast (ic, ebbs[i]);
 	    }
 
           // Easy special case which avoids function call: modulo by a literal power

@@ -1,102 +1,35 @@
-#
-# Makefile  - Makefile to build device libraries
-#
-# This file is part of the GNU PIC Library.
-#
-# January, 2004
-# The GNU PIC Library is maintained by,
-# 	Vangelis Rokas <vrokas@otenet.gr>
-#
-# $Id$
-#
-#
+###########################################################
+### Makefile for the GNU PIC Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The GNU PIC Library was originally designed and
+### implemented by
+###	Vangelis Rokas <vrokas@otenet.gr>
+###
+### It is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See COPYING for details.
+###
+### $Id$
+###
 
-include ../Makefile.common
+topsrcdir=..
 
-# The SDCC project directory
-PRJDIR	= ../../../..
+SUBDIRS = 
+MKLIB	= device_libs
+C_FILES = $(wildcard *.c)
+TARGETS = $(OBJS:.o=.lib)
 
-# headers directory
-INCDIR	= $(PRJDIR)/device/include
+# allow invoking make without arguments (otherwise
+# [...]/devicelibs would be the default target)
+suball : all
 
+.PHONY : $(topsrcdir)/$(builddir)/device_libs 
 
-# MCUs to build
-MCUS	= $(shell cat ../pics.build)
+$(topsrcdir)/$(builddir)/device_libs :
+	$(Q)$(foreach dev,$(C_FILES:.c=),make $(topsrcdir)/$(builddir)/$(dev).lib LIB_O=$(topsrcdir)/$(builddir)/$(dev).o;)
 
-# Supported devices
-DEVS	= $(patsubst	%,18f%,$(MCUS))
-
-#DEVS	= 	18f242 \
-#		18f248 \
-#		18f252 \
-#		18f258 \
-#		18f442 \
-#		18f448 \
-#		18f452 \
-#		18f458 \
-#		18f1220 \
-#		18f2220 \
-#		18f6520 \
-#		18f6620 \
-#		18f6680 \
-#		18f6720 \
-#		18f8520 \
-#		18f8620 \
-#		18f8680 \
-#		18f8720
-
-
-# pic16 port specific headers
-PIC16_INCDIR	= $(INCDIR)/pic16
-
-CFLAGS	= -I$(PIC16_INCDIR)
-
-#COMPILE_FLAGS	= --pomit-config-words --pomit-ivt --denable-peeps --optimize-goto --obanksel=2
-COMPILE_FLAGS	+= $(MODELFLAGS) --nostdinc
-
-
-CFILES	= $(patsubst %,pic%.c, $(DEVS))
-OFILES	= $(patsubst %.c,%.o,$(CFILES))
-LFILES	= $(patsubst %.c,%.lib,$(CFILES))
-
-PFILE	= $(patsubst pic%.c,%,$<)
-LFILE	= $(patsubst %.c,%.lib,$<)
-
-
-.c.o:
-	$(CC) -p$(PFILE) $(CFLAGS) $(COMPILE_FLAGS) -c $<
-
-%.lib: %.o
-	$(AR) -c $@ $<
-	
-all: make-lib
-
-make-lib: $(LFILES) clean-intermediate-no-asm
-	@$(MV) -v $(LFILES) ../bin
-	
-$(LFILES): $(OFILES)
-
-$(OFILES): $(CFILES)
-
-
-clean-intermediate:
-	$(RM) -f *.lst *.asm *.dump*
-
-clean-intermediate-no-asm:
-	$(RM) -f *.lst *.dump*
-	
-clean: clean-intermediate
-	$(RM) -f *.o
-
-real-clean: clean
-	$(RM) -f .depend
-
-dep .depend:
-	rm -f .depend
-	for temp in $(CFILES); do		\
-		$(CPP) $(MM) $(CFLAGS) $$temp > .tmpdepend;	\
-		$(SED) s/.rel/.o/g .tmpdepend >> .depend;	\
-		$(RM) -f .tmpdepend;	\
-	done
-	
-include .depend
+include $(topsrcdir)/Makefile.subdir

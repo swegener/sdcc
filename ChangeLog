@@ -1,3 +1,14 @@
+2005-08-10 Raphael Neider <rneider AT web.de>
+
+	* src/*.c, src/pic16/{gen.c,glue.c,main.c}: applied Vangelis
+	  Rokas' patch to add the new fixed point type "__fixed16x16"
+	* device/lib/pic16/libsdcc/fixed16x16: added Vangelis' support
+	  functions for __fixed16x16 arithmetics
+	* device/lib/pic16: reimplemented the build system to support
+	  a separate build directory, better handling of libio (create
+	  the library in a separate subdir for each architecture) and
+	  easier configuration (centralized in Makefile.common)
+
 2005-08-07 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genrshTwo): fixed sign extension

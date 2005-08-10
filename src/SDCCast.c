@@ -2098,7 +2098,8 @@ addCast (ast *tree, RESULT_TYPE resultType, bool upcast)
         break;
       case RESULT_TYPE_CHAR:
         if (IS_CHAR (tree->etype) ||
-            IS_FLOAT(tree->etype))
+            IS_FLOAT(tree->etype) ||
+            IS_FIXED(tree->etype))
           return tree;
         newLink = newCharLink();
         break;
@@ -3876,6 +3877,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                     break;
                 case V_FLOAT:
                     typeofv = TYPEOF_FLOAT;
+                    break;
+                case V_FIXED16X16:
+                    typeofv = TYPEOF_FIXED16X16;
                     break;
                 case V_CHAR:
                     typeofv = TYPEOF_CHAR;

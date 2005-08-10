@@ -109,6 +109,7 @@ struct ast *list2expr (initList *);
 void resolveIvalSym (initList *, sym_link *);
 value *valFromType (sym_link *);
 value *constFloatVal (char *);
+value *constFixed16x16Val (char *);
 int getNelements (sym_link *, initList *);
 value *valForArray (struct ast *);
 value *valForStructElem (struct ast *, struct ast *);

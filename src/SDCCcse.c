@@ -818,7 +818,8 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
     case '+':
       /* if adding the same thing change to left shift by 1 */
       if (IC_LEFT (ic)->key == IC_RIGHT (ic)->key &&
-          !IS_FLOAT (operandType (IC_RESULT (ic))))
+          !(IS_FLOAT (operandType (IC_RESULT (ic)))
+            || IS_FIXED(operandType (IC_RESULT (ic)))))
         {
           ic->op = LEFT_OP;
           IC_RIGHT (ic) = operandFromLit (1);

@@ -1,71 +1,45 @@
-#
-# Makefile - Makefile to build pic16 support libraries
-#
-# This file is part of the GNU PIC Library.
-#
-# January, 2004
-# The GNU PIC Library is maintained by,
-# 	Vangelis Rokas <vrokas@otenet.gr>
-#
-# $Id$
-#
-#
+###########################################################
+### Makefile for the GNU PIC Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The GNU PIC Library was originally designed and
+### implemented by
+###	Vangelis Rokas <vrokas@otenet.gr>
+###
+### It is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See COPYING for details.
+###
+### $Id$
+###
 
-MCUS	= $(shell cat ../pics.build)
+topsrcdir=..
 
-PROCESSORS	= $(MCUS)
+SUBDIRS = adc i2c usart
 
+ifeq ($(origin IO_ARCH),undefined)
+include $(topsrcdir)/Makefile.common
 
-DIRS	= adc i2c usart
-
-LOBJS	= $(patsubst %,%/*.o,$(DIRS))
-
-# library name example libio18f8720.lib
-LIB	= libio18f$(MMCU).lib
-
-all: build-libraries
-
-make-target: build-libraries
-
-build-libraries:
-	for proc in $(PROCESSORS) ; do \
-		echo "Building libraries for processor pic18f $$proc" ; \
-		$(MAKE) -C . build-processor-library MMCU=$$proc ;  \
-	done ;
-
-# Should have externally specified PROC
-build-processor-library:
-	for dir in $(DIRS) ; do	 \
-		$(MAKE) -C $$dir clean ; \
-		grep $(MMCU) "$${dir}.ignore" > /dev/null 2>&1 || $(MAKE) -C $$dir build-io-lib MCU=18f$(MMCU); \
-	done;
-	make invoke-gplib
-	mv -v $(LIB) ../bin
-
-# needed so that make updates the list of .o files correctly...
-invoke-gplib:
-	gplib -c $(LIB) $(foreach dir,$(DIRS),$(wildcard $(dir)/*.o))
-
-clean-intermediate:
-	@for dir in $(DIRS) ; do \
-		$(MAKE) -C $$dir clean-intermediate ; \
-	done ;
-	
-clean:
-	for dir in $(DIRS) ; do \
-		$(MAKE) -C $$dir clean;	\
-	done ;
-	rm -fv $(LIB)
-
-
-real-clean: clean
-	find -name *.adb -print | xargs -- rm -fv ;
-	find -name *.p -print | xargs -- rm -fv ;
-	find -name *.d -print | xargs -- rm -fv ;
-	find -name *.dump* -print | xargs -- rm -fv ;
-	
-
-dep:
-	for dir in $(DIRS) ; do \
-		$(MAKE) -C $$dir dep; \
+all clean clean-intermediate install : builddir
+	$(Q)cat $(topsrcdir)/pics.build \
+		| $(SED) -e "s,[ \t]*#.*$$,," \
+		| $(GREP) -v "^[ \t]*$$" \
+		| while read arch; do \
+			[ "x$${arch}" = "x" ] \
+			|| MKLIB=libio18f$${arch}.lib $(MAKE) builddir=$(builddir)/$${arch} ARCH=$${arch} IO_ARCH=$${arch} $(MAKECMDGOALS) \
+			|| exit 1; \
 	done
+
+include $(topsrcdir)/Makefile.rules
+
+else
+
+include $(topsrcdir)/Makefile.subdir
+
+# prevent library to be build in $(SUBDIRS) as well
+unexport MKLIB
+
+endif

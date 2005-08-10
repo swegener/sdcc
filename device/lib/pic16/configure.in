@@ -15,7 +15,7 @@
 AC_PREREQ(2.57)
 AC_INIT
 
-#AC_DEFUN(AC_CONFIG_SRCDIR)
+AC_DEFUN(AC_CONFIG_SRCDIR)
 #AC_DEFUN(AC_CONFIG_FILES)
 
 # Checks for programs.
@@ -23,11 +23,16 @@ AC_CHECK_PROG(GPASM,	gpasm,	gpasm, :)
 AC_CHECK_PROG(GPLINK,	gplink,	gplink, :)
 AC_CHECK_PROG(GPLIB,	gplib,	gplib, :)
 
-AC_CHECK_PROG(RM,	rm,	rm, :)
+AC_CHECK_PROG(RM,	rm,	[rm -f], :)
 AC_CHECK_PROG(CP,	cp,	cp, :)
 AC_CHECK_PROG(MV,	mv,	mv, :)
 AC_CHECK_PROG(LS,	ls,	ls, :)
 AC_CHECK_PROG(SED,	sed,	sed, :)
+AC_PROG_EGREP
+AC_CHECK_PROG(MKDIR,	mkdir,	[mkdir -p], :)
+AC_CHECK_PROG(RMDIR,	rmdir,	rmdir, :)
+
+AC_PROG_MAKE_SET
 
 # Checks for libraries.
 
@@ -37,7 +42,7 @@ AC_CHECK_PROG(SED,	sed,	sed, :)
 
 # Checks for library functions.
 
-cp pics.all pics.build
+$CP pics.all pics.build
 
 AC_CONFIG_FILES([Makefile.common])
 AC_OUTPUT

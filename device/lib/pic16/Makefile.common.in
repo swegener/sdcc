@@ -1,39 +1,93 @@
-#
-# Makefile.common - common variables makefile
-#
-# This file is part of the GNU PIC Library.
-#
-# January, 2004
-# The GNU PIC Library is maintained by,
-# 	Vangelis Rokas <vrokas@otenet.gr>
-#
-# $Id$
-#
-#
+###########################################################
+### Makefile.common.in for the GNU PIC Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The GNU PIC Library was originally designed and
+### implemented by
+###	Vangelis Rokas <vrokas@otenet.gr>
+###
+### It is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See COPYING for details.
+###
+### $Id$
+###
 
-CC	= $(PRJDIR)/bin/sdcc
-CPP	= $(PRJDIR)/bin/sdcpp
+#################################################
+### verboseness
+#Q	?= 		# be verbose
+Q	?= @		# be quiet
+# be really quiet (suppress "Entering/Leaving directory...")
+MAKEFLAGS := $(filter-out -s,$(MAKEFLAGS)) -s
 
+#################################################
+### compiler switches
+ARCH   ?= 452		# might be overwritten in libio
+
+CFLAGS ?=
+CFLAGS += -mpic16 -p18f$(ARCH)
+CFLAGS += --std-c99
+CFLAGS += -I. -I$(topsrcdir)/../../include/pic16
+
+#################################################
+### optimization flags
+CFLAGS += --fommit-frame-pointer
+CFLAGS += --obanksel=9
+CFLAGS += --denable-peeps
+CFLAGS += --optimize-goto
+CFLAGS += --optimize-cmp
+CFLAGS += --optimize-df
+
+#################################################
+### debugging PIC16 port
+#CFLAGS += --debug-ralloc
+#CFLAGS += --debug-xtra
+#CFLAGS += --pcode-verbose
+CFLAGS += --i-code-in-asm
+
+#################################################
+### debugging SDCC's optimizations
+#CFLAGS += --nooverlay
+#CFLAGS += --nogcse
+#CFLAGS += --nolabelopt
+#CFLAGS += --noinvariant
+#CFLAGS += --noinduction
+#CFLAGS += --nojtbound
+#CFLAGS += --noloopreverse
+
+#################################################
+### assembler switches
+ASFLAGS ?=
+ASFLAGS += -pp18f$(ARCH)
+ASFLAGS += -I$(topsrcdir)/../../include/pic16
+
+#################################################
+### linker switches
+LDFLAGS ?=
+LDFLAGS += -m -l -w
+
+#################################################
+### librarian switches
+LIBFLAGS ?=
+LIBFLAGS += -c
+
+#################################################
+### programs to use
+CPP	= $(topsrcdir)/../../../bin/sdcpp
+CC	= $(topsrcdir)/../../../bin/sdcc
 AS	= @GPASM@
 LD	= @GPLINK@
-AR	= @GPLIB@
+LIB	= @GPLIB@
 
-RM	= @RM@
-CP	= @CP@
-MV	= @MV@
-LS	= @LS@
-SED	= @SED@
+SED	?= @SED@
+GREP	?= @EGREP@
 
-# Quick+dirty fix: this should be defined elsewhere,
-# but it's needed for `make clean`; Bernhard
-MM = -MM
+MKDIR	?= @MKDIR@
+RMDIR	?= @RMDIR@
+CP	?= @CP@
+MV	?= @MV@
+RM	?= @RM@
 
-CSTD    = --std-c99
-
-MODELFLAGS      = -mpic16
-
-OPT_FLAGS	+= --denable-peeps
-OPT_FLAGS	+= --obanksel=9
-OPT_FLAGS	+= --optimize-goto
-OPT_FLAGS	+= --optimize-df
-OPT_FLAGS	+= --i-code-in-asm

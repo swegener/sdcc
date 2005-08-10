@@ -95,9 +95,15 @@ int pic16aopLiteral (value *val, int offset)
 
   /* if it is a float then it gets tricky */
   /* otherwise it is fairly simple */
-  if (!IS_FLOAT(val->type)) {
+  if (!(IS_FLOAT(val->type) || IS_FIXED(val->type))) {
     unsigned long v = (unsigned long) floatFromVal(val);
 
+    return ( (v >> (offset * 8)) & 0xff);
+  }
+
+  if(IS_FIXED16X16(val->type)) {
+    unsigned long v = (unsigned long)fixed16x16FromDouble( floatFromVal( val ) );
+    
     return ( (v >> (offset * 8)) & 0xff);
   }
 

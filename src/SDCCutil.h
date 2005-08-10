@@ -88,6 +88,12 @@ char *strncatz(char *dest, const char *src, size_t n);
 /* return SDCC build number */
 const char *getBuildNumber(void);
 
+/* convert a fixed16x16 type to double */
+double doubleFromFixed16x16(TYPE_UDWORD value);
+
+/* convert a double type to fixed16x16 */
+TYPE_UDWORD fixed16x16FromDouble(double value);
+
 /* snprintf, by hook or by crook. */
 size_t SDCCsnprintf(char *, size_t, const char *, ...);
 

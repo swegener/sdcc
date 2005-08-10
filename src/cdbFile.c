@@ -439,6 +439,7 @@ void cdbTypeInfo (sym_link * type)
 	    case V_CHAR: fprintf (cdbFilePtr, "SC"); break;
 	    case V_VOID: fprintf (cdbFilePtr, "SV"); break;
 	    case V_FLOAT: fprintf (cdbFilePtr, "SF"); break;
+	    case V_FIXED16X16: fprintf(cdbFilePtr, "SQ"); break;
 	    case V_STRUCT: 
 	      fprintf (cdbFilePtr, "ST%s", SPEC_STRUCT (type)->tag); 
 	      break;

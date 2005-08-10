@@ -171,6 +171,11 @@ void checkConstantRange(sym_link *ltype, value *val, char *msg,
     return;
   }
 
+  if (IS_FIXED(ltype)) {
+    // anything will do
+    return;
+  }
+
   if (!IS_UNSIGNED(val->type) && v<0) {
     negative=1;
     if (IS_UNSIGNED(ltype) && (pedantic>1)) {
@@ -225,6 +230,8 @@ printOperand (operand * op, FILE * file)
       opetype = getSpec (operandType (op));
       if (IS_FLOAT (opetype))
 	fprintf (file, "%g {", SPEC_CVAL (opetype).v_float);
+      if (IS_FIXED16X16 (opetype))
+        fprintf (file, "%g {", doubleFromFixed16x16(SPEC_CVAL (opetype).v_fixed16x16));
       else
 	fprintf (file, "0x%x {", (unsigned) floatFromVal (op->operand.valOperand));
       printTypeChain (operandType (op), file);
@@ -1296,6 +1303,13 @@ operandOperation (operand * left, operand * right,
 				   operandLitValue (right));
 	}
       else
+      if (IS_FIXED16X16 (let) ||
+          IS_FIXED16X16 (ret))
+	{
+	  retval = operandFromLit (operandLitValue (left) ==
+				   operandLitValue (right));
+	}
+      else
 	{
 	  /* this op doesn't care about signedness */
 	  TYPE_UDWORD l, r;
@@ -2048,6 +2062,8 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
       !IS_BITFIELD (type) &&
       !IS_FLOAT (type) &&
       !IS_FLOAT (optype) &&
+      !IS_FIXED (type) &&
+      !IS_FIXED (optype) &&
       ((IS_SPEC (type) && IS_SPEC (optype)) ||
        (!IS_SPEC (type) && !IS_SPEC (optype))))
     {
@@ -2135,7 +2151,7 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
   /* code generated for 1 byte * 1 byte literal = 2 bytes result is more
      efficient in most cases than 2 bytes result = 2 bytes << literal
      if port has 1 byte muldiv */
-  if (p2 && !IS_FLOAT (letype)
+  if (p2 && !IS_FLOAT (letype) && !IS_FIXED (letype)
       && !((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype))
            && (port->support.muldiv == 1))
       && strcmp (port->target, "pic16") != 0  /* don't shift for pic */
@@ -2184,6 +2200,7 @@ geniCodeDivision (operand * left, operand * right, RESULT_TYPE resultType)
      right shift */
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
+      !IS_FIXED (letype) &&
       IS_UNSIGNED(letype) &&
       (p2 = powof2 ((TYPE_UDWORD)
 		    floatFromVal (right->operand.valOperand)))) {
@@ -2308,7 +2325,8 @@ geniCodeSubtract (operand * left, operand * right, RESULT_TYPE resultType)
   IC_RESULT (ic)->isaddr = (isarray ? 1 : 0);
 
   /* if left or right is a float */
-  if (IS_FLOAT (ltype) || IS_FLOAT (rtype))
+  if (IS_FLOAT (ltype) || IS_FLOAT (rtype)
+      || IS_FIXED (ltype) || IS_FIXED (rtype))
     ic->supportRtn = 1;
 
   ADDTOCHAIN (ic);
@@ -2378,7 +2396,8 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
 
   /* if left or right is a float then support
      routine */
-  if (IS_FLOAT (ltype) || IS_FLOAT (rtype))
+  if (IS_FLOAT (ltype) || IS_FLOAT (rtype)
+      || IS_FIXED (ltype) || IS_FIXED (rtype))
     ic->supportRtn = 1;
 
   ADDTOCHAIN (ic);
@@ -2581,6 +2600,9 @@ geniCodePostInc (operand * op)
   if (IS_FLOAT (rvtype))
     ic = newiCode ('+', rv, operandFromValue (constFloatVal ("1.0")));
   else
+  if (IS_FIXED16X16 (rvtype))
+    ic = newiCode ('+', rv, operandFromValue (constFixed16x16Val ("1.0")));
+  else
     ic = newiCode ('+', rv, operandFromLit (size));
 
   IC_RESULT (ic) = result = newiTempOperand (rvtype, 0);
@@ -2618,6 +2640,9 @@ geniCodePreInc (operand * op, bool lvalue)
     werror(W_SIZEOF_VOID);
   if (IS_FLOAT (roptype))
     ic = newiCode ('+', rop, operandFromValue (constFloatVal ("1.0")));
+  else
+  if (IS_FIXED16X16 (roptype))
+    ic = newiCode ('+', rop, operandFromValue (constFixed16x16Val ("1.0")));
   else
     ic = newiCode ('+', rop, operandFromLit (size));
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);
@@ -2667,6 +2692,9 @@ geniCodePostDec (operand * op)
   if (IS_FLOAT (rvtype))
     ic = newiCode ('-', rv, operandFromValue (constFloatVal ("1.0")));
   else
+  if (IS_FIXED16X16 (rvtype))
+    ic = newiCode ('-', rv, operandFromValue (constFixed16x16Val ("1.0")));
+  else
     ic = newiCode ('-', rv, operandFromLit (size));
 
   IC_RESULT (ic) = result = newiTempOperand (rvtype, 0);
@@ -2704,6 +2732,9 @@ geniCodePreDec (operand * op, bool lvalue)
     werror(W_SIZEOF_VOID);
   if (IS_FLOAT (roptype))
     ic = newiCode ('-', rop, operandFromValue (constFloatVal ("1.0")));
+  else
+  if (IS_FIXED16X16 (roptype))
+    ic = newiCode ('-', rop, operandFromValue (constFixed16x16Val ("1.0")));
   else
     ic = newiCode ('-', rop, operandFromLit (size));
   IC_RESULT (ic) = result = newiTempOperand (roptype, 0);
@@ -2867,7 +2898,8 @@ geniCodeDerefPtr (operand * op,int lvl)
 		IS_STRUCT (rtype) ||
 		IS_INT (rtype) ||
 		IS_CHAR (rtype) ||
-		IS_FLOAT (rtype));
+		IS_FLOAT (rtype) ||
+		IS_FIXED (rtype));
 
   if (!isLvaluereq(lvl))
     op = geniCodeRValue (op, TRUE);
@@ -3002,6 +3034,10 @@ geniCodeLogic (operand * left, operand * right, int op)
       op != AND_OP &&
       op != OR_OP)
    ic->supportRtn = 1;
+
+  /* if comparing a fixed type use support functions */
+  if (IS_FIXED(ctype))
+    ic->supportRtn = 1;
 
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);

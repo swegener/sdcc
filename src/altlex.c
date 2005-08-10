@@ -843,6 +843,7 @@ yylex (void)
       ENTRY (SIGNED);
       ENTRY (UNSIGNED);
       ENTRY (FLOAT);
+      ENTRY (FIXED16X16);
       ENTRY (DOUBLE);
       ENTRY (CONST);
       ENTRY (VOLATILE);
@@ -1042,6 +1043,7 @@ altlex_runtests (void)
   TEST (altlex_testparse ("enum") == ENUM);
   TEST (altlex_testparse ("extern") == EXTERN);
   TEST (altlex_testparse ("float") == FLOAT);
+  TEST (altlex_testparse ("fixed16x16") == FIXED16X16);
   TEST (altlex_testparse ("for") == FOR);
   TEST (altlex_testparse ("goto") == GOTO);
   TEST (altlex_testparse ("if") == IF);

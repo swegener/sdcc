@@ -62,6 +62,7 @@ static char *_pic16_keywords[] =
   "_naked",
   "shadowregs",
   "wparam",
+  "fixed16x16",
   
 //  "bit",
 //  "idata",

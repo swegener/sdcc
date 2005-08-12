@@ -21,7 +21,7 @@
 #Q	?= 		# be verbose
 Q	?= @		# be quiet
 # be really quiet (suppress "Entering/Leaving directory...")
-MAKEFLAGS := $(filter-out -s,$(MAKEFLAGS)) -s
+#MAKEFLAGS := $(filter-out -s,$(MAKEFLAGS)) -s
 
 #################################################
 ### compiler switches

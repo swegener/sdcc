@@ -544,7 +544,7 @@ void _pic16_printPointerType (const char *name, char ptype, void *p)
 void pic16_printPointerType (const char *name, char ptype, void *p)
 {
   _pic16_printPointerType (name, ptype, p);
-  pic16_flushDB(ptype, p);
+  //pic16_flushDB(ptype, p); /* breaks char* const arr[] = {&c, &c, &c}; */
 }
 
 /*-----------------------------------------------------------------*/
@@ -576,7 +576,7 @@ void pic16_printGPointerType (const char *iname, const unsigned int itype,
         assert( 0 );
     }
 
-    pic16_flushDB(ptype, p);
+    //pic16_flushDB(ptype, p); /* might break char* const arr[] = {...}; */
 }
 
 
@@ -1300,7 +1300,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      
 	      pic16_addpCode2pBlock(pb,pcf);
 	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
-//	      fprintf(stderr, "%s:%d [1] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
+	      //fprintf(stderr, "%s:%d [1] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
 	      pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
 
@@ -1350,10 +1350,9 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      	
 	      	didcode++;
 	      }
-                            
-//	      fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
 
 	      pic16_addpCode2pBlock(pb,pic16_newpCodeLabel(sym->rname,-1));
+	      //fprintf(stderr, "%s:%d [2] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
 	      pic16_printIval(sym, sym->type, sym->ival, 'p', (void *)pb);
               pic16_flushDB('p', (void *)pb);
 	      noAlloc--;
@@ -1599,17 +1598,20 @@ pic16emitOverlay (FILE * afile)
 
 void emitStatistics(FILE *asmFile)
 {
-  unsigned long isize, udsize;
+  unsigned long isize, udsize, ramsize;
   statistics.isize = pic16_countInstructions();
   isize = (statistics.isize >= 0) ? statistics.isize : 0;
   udsize = (statistics.udsize >= 0) ? statistics.udsize : 0;
+  ramsize = pic16 ? pic16->RAMsize : 0x200;
+  ramsize -= 256; /* ignore access bank and SFRs */
+  if (ramsize == 0) ramsize = 64; /* prevent division by zero (below) */
 	
   fprintf (asmFile, "\n\n; Statistics:\n");
-  fprintf (asmFile, "; code size:\t%5ld (0x%04lx) bytes (%3.2f%%)\n;           \t%5ld (0x%04lx) words\n",
-    isize, isize, (isize*100.0)/(128 << 10),
+  fprintf (asmFile, "; code size:\t%5ld (0x%04lx) bytes (%5.2f%%)\n;           \t%5ld (0x%04lx) words\n",
+    isize, isize, (isize*100.0)/(128UL << 10),
     isize>>1, isize>>1);
-  fprintf (asmFile, "; udata size:\t%5ld (0x%04lx) bytes (%3.2f%%)\n",
-    udsize, udsize, (udsize*100.0) / ((pic16 ? pic16->RAMsize : 0x200) -256));
+  fprintf (asmFile, "; udata size:\t%5ld (0x%04lx) bytes (%5.2f%%)\n",
+    udsize, udsize, (udsize*100.0) / (1.0 * ramsize));
   fprintf (asmFile, "; access size:\t%5ld (0x%04lx) bytes\n",
     statistics.intsize, statistics.intsize);
 

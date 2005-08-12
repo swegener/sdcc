@@ -4385,12 +4385,18 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
   return pcop;
 }
 
-#define DB_ITEMS_PER_LINE	8
+/* This is a multiple of two as gpasm pads DB directives to even length,
+ * thus the data would be interleaved with \0 bytes...
+ * This is a multiple of three in order to have arrays of 3-byte pointers
+ * continuously in memory (without 0-padding at the lines' end).
+ * This is rather 12 than 6 in order not to split up 4-byte data types
+ * in arrays right in the middle of a 4-byte word. */
+#define DB_ITEMS_PER_LINE	12
 
 typedef struct DBdata
   {
     int count;
-    char buffer[256];
+    char buffer[512];
   } DBdata;
 
 struct DBdata DBd;
@@ -4470,7 +4476,7 @@ void pic16_emitDS(char *s, char ptype, void *p)
 //	fprintf(stderr, "%s:%d DBbuffer: '%s'\n", __FILE__, __LINE__, DBd.buffer);
 
 	DBd.count++;	//=strlen(s);
-	if (DBd.count>=16)
+	if (DBd.count>=DB_ITEMS_PER_LINE)
 		pic16_flushDB(ptype, p);
 }
 
@@ -4480,11 +4486,26 @@ void pic16_emitDS(char *s, char ptype, void *p)
 void pic16_pCodeConstString(char *name, char *value)
 {
   pBlock *pb;
-
-  //  fprintf(stderr, " %s  %s  %s\n",__FUNCTION__,name,value);
+  char *item;
+  static set *emittedSymbols = NULL;
 
   if(!name || !value)
     return;
+
+  /* keep track of emitted symbols to avoid multiple definition of str_<nr> */
+  if (emittedSymbols) {
+    /* scan set for name */
+    for (item = setFirstItem (emittedSymbols); item; item = setNextItem (emittedSymbols))
+    {
+      if (!strcmp (item,name)) {
+        //fprintf (stderr, "%s already emitted\n", name);
+        return;
+      } // if
+    } // for
+  } // if
+  addSet (&emittedSymbols, Safe_strdup (name));
+
+  //fprintf(stderr, " %s  %s  %s\n",__FUNCTION__,name,value);
 
   pb = pic16_newpCodeChain(NULL, 'P',pic16_newpCodeCharP("; Starting pCode block"));
 

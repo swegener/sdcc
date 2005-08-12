@@ -255,7 +255,7 @@ port-specific-objects:
 	fi
 
 port-specific-objects-pic16:
-	if [ -d $(PORT) ]; then \
+	-if [ -d $(PORT) ]; then \
 	  mkdir -p $(PORT)/bin; \
 	  $(MAKE) -C $(PORT); \
 	  cp -f $(PORT)/bin/*.o $(PORT)/bin/*.lib $(PORTDIR); \

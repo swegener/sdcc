@@ -960,7 +960,7 @@ pic16_allocRegByName (char *name, int size, operand *op)
      * a new one and put it in the hash table AND in the 
      * dynDirectRegNames set */
 
-	fprintf (stderr,"%s:%d symbol name %s\tregop= %p\n", __FUNCTION__, __LINE__, name, op);
+	//fprintf (stderr,"%s:%d symbol name %s\tregop= %p\n", __FUNCTION__, __LINE__, name, op);
 
     reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0, op);
 

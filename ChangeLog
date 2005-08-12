@@ -1,3 +1,21 @@
+2005-08-12 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/glue.c (pic16_print(G)PointerType): do not flush
+	  db-statements in order to allow for arrays of pointers in code
+	  sections to be placed without interspersed 0-padding, fixes
+	  bug #1256215
+	* (emitStatistics): fixed division by zero for pic18f1220
+	* src/pic16/pcode.c: buffer (up to) 12 DB directives to allow for
+	  unpadded writing of 8-bit, 16-bit, 24-bit and 32-bit values
+	* (pic16_emitDS): respect DB_ITEMS_PER_LINE
+	* (pic16_pCodeConstString): keep track of already emitted string
+	  literals to prevent "duplicate definitions of symbol _str_NR"
+	* src/pic16/ralloc.c (pic16_allocRegByName): removed not so helpful
+	  debug message
+	* device/lib/Makefile.in: ignore failing PIC16 library builds
+	* device/lib/pic16/Makefile: do not build if gputils are missing
+	* device/lib/pic16/Makefile.common.in: do not enforce MAKEFLAGS=-s
+
 2005-08-10 Raphael Neider <rneider AT web.de>
 
 	* device/lib/Makefile.in: fixed copying pic16 libraries (broken by

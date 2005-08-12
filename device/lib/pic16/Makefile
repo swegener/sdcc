@@ -20,6 +20,13 @@ topsrcdir = .
 
 include $(topsrcdir)/Makefile.common
 
+ifeq (:,$(findstring :,$(LD) $(AS) $(LIB)))
+
+all % : 
+	@echo "gputils not found -- PIC16 library not built!"
+
+else
+
 SUBDIRS	   = debug libc libdev libio libm libsdcc startup
 builddir   = build
 installdir = bin
@@ -41,3 +48,5 @@ clean : recurse
 clean-intermediate : recurse
 
 include $(topsrcdir)/Makefile.rules
+
+endif

@@ -37,22 +37,26 @@ ifneq (,$(strip $(LIB_O)))
 	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== $(patsubst $(topsrcdir)/$(builddir)/%,%,$^)";
 	$(Q)$(RM) "$@"; $(LIB) $(LIBFLAGS) "$@" $^;
 else
-%.lib : force
+%.lib : recurse
 	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== **/*.o";
 	$(Q)$(RM) "$@"; LIB_O=`find "$(topsrcdir)/$(builddir)" -name "*.o"`; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O};
 endif
 
-.PHONY : builddir recurse force
-
-# create builddir
-builddir : force
-	$(Q)[ -d "$(topsrcdir)/$(builddir)" ] || $(MKDIR) "$(topsrcdir)/$(builddir)";
+.PHONY : recurse force
 
 # build sub-directories
+ifneq (,$(strip $(SUBDIRS)))
 recurse : force
-	$(Q)for DIR in $(SUBDIRS) . ; do \
-		[ "$${DIR}" = "." ] || $(GREP) "^$${ARCH}$$" "$${DIR}.ignore" &> /dev/null || $(MAKE) -C "$${DIR}" builddir="$(builddir)/$${DIR}" $(MAKECMDGOALS) || exit 1; \
+	$(Q)+for DIR in $(SUBDIRS) ; do \
+		$(GREP) "^$${ARCH}$$" "$${DIR}.ignore" &> /dev/null || ( \
+			[ -d "$(topsrcdir)/$(builddir)/$${DIR}" ] || $(MKDIR) "$(topsrcdir)/$(builddir)/$${DIR}"; \
+			$(MAKE) -C "$${DIR}" builddir="$(builddir)/$${DIR}" $(MAKECMDGOALS); \
+		) || exit 1; \
 	done
+else
+recurse :
+	@# nothing to do
+endif
 
 # target to force remaking of (seemingly) independent targets
 force :

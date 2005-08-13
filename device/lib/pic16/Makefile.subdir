@@ -37,29 +37,31 @@ LIB_LIB =
 #TARGETS ?= $(OBJS)
 endif
 
+.PHONY : all install clean clean-intermediate
+
 all : install
 
 ifneq (,$(strip $(TARGETS)))
-# usually install $(LIB_LIB) or $(OBJS)
-install : builddir recurse $(OBJS) $(LIB_LIB)
-	@[ -d "$(topsrcdir)/$(installdir)" ] || $(MKDIR) "$(topsrcdir)/$(installdir)";
+# usually install $(LIB_LIB) or $(OBJS), race condition in "[ -d x ] || mkdir x"
+install : recurse $(OBJS) $(LIB_LIB)
+	@[ -d "$(topsrcdir)/$(installdir)" ] || ( $(MKDIR) "$(topsrcdir)/$(installdir)" || true );
 	@echo "[INSTALL] $(patsubst $(topsrcdir)/$(builddir)/%,%,$(TARGETS))";
 	$(Q)$(CP) $(TARGETS) "$(topsrcdir)/$(installdir)"
 else
 # used in subdirs like libc/ctype whose files
 # are contained in a parent's library
-install : builddir recurse $(OBJS) $(LIB_LIB)
+install : recurse $(OBJS) $(LIB_LIB)
 endif
 
 clean : recurse
 	@-echo "dummy" > .dummy
-	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym hex,$(OBJS:.o=.$(suf)))
+	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym,$(OBJS:.o=.$(suf)))
 	@-echo "dummy" > .dummy
 	$(Q)-$(RM) .dummy $(OBJS) $(LIB_LIB)
 	$(Q)-[ ! -d "$(topsrcdir)/$(builddir)" ] || $(RMDIR) "$(topsrcdir)/$(builddir)"
 
 clean-intermediate : recurse
 	@-echo "dummy" > .dummy
-	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym hex,$(OBJS:.o=.$(suf)))
+	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym,$(OBJS:.o=.$(suf)))
 	
 include $(topsrcdir)/Makefile.rules

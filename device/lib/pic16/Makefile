@@ -22,6 +22,8 @@ include $(topsrcdir)/Makefile.common
 
 ifeq (:,$(findstring :,$(LD) $(AS) $(LIB)))
 
+.PHONY : all
+
 all % : 
 	@echo "gputils not found -- PIC16 library not built!"
 
@@ -36,11 +38,11 @@ C_SRC = $(wildcard *.c)
 S_SRC = $(wildcard *.S)
 OBJS = $(C_SRC:.c=.o) $(S_SRC:.S=.o)
 
-.PHONY : all clean clean-intermediate recurse
+.PHONY : all clean clean-intermediate install
 
 all : install
 
-install : builddir recurse
+install : recurse
 
 clean : recurse
 	$(Q)-$(RMDIR) "$(topsrcdir)/$(builddir)";

@@ -23,13 +23,19 @@ SUBDIRS = adc i2c usart
 ifeq ($(origin IO_ARCH),undefined)
 include $(topsrcdir)/Makefile.common
 
-all clean clean-intermediate install : builddir
-	$(Q)cat $(topsrcdir)/pics.build \
+.PHONY : all clean clean-intermediate install
+
+# I create $(builddir)/$${arch} right here in order to prevent 
+# the sub-make's `builddir´ rules from aborting if another sub-make
+# already created the above directory (happened on Alpha).
+all clean clean-intermediate install :
+	$(Q)+cat $(topsrcdir)/pics.build \
 		| $(SED) -e "s,[ \t]*#.*$$,," \
 		| $(GREP) -v "^[ \t]*$$" \
 		| while read arch; do \
 			[ "x$${arch}" = "x" ] \
-			|| MKLIB=libio18f$${arch}.lib $(MAKE) builddir=$(builddir)/$${arch} ARCH=$${arch} IO_ARCH=$${arch} $(MAKECMDGOALS) \
+			|| ( [ -d "$(builddir)/$${arch}" ] || $(MKDIR) "$(builddir)/$${arch}"; \
+				$(MAKE) MKLIB=libio18f$${arch}.lib builddir=$(builddir)/$${arch} ARCH=$${arch} IO_ARCH=$${arch} $(MAKECMDGOALS); ) \
 			|| exit 1; \
 	done
 

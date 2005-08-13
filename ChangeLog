@@ -1,3 +1,19 @@
+2005-08-13 Raphael Neider <rneider AT web.de>
+
+	* device/lib/Makefile.in (port-specific-objects-pic16):
+	  revert to cp $(PORT)/bin/*.* $(PORTDIR)
+	* device/lib/pic16/Makefile: added .PHONY targets, removed builddir
+	  dependency
+	* device/lib/pic16/Makefile.rules: build subdirs before creating
+	  the library, removed builddir rule, create $(builddir) early in
+	  recurse rule, use empty recurse rule for leaf directories
+	* device/lib/pic16/Makefile.subdir: added phony targets, ignore
+	  mkdir errors (race condition), removed duplicate suffix "hex"
+	  from clean rules
+	* device/lib/pic16/libdev/Makefile: recursive make via + and $(MAKE)
+	* device/lib/pic16/libio/Makefile: create sub-make's builddir early,
+	  prevents mkdir -p from aborting on Alpha
+	
 2005-08-12 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_print(G)PointerType): do not flush

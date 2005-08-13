@@ -1,5 +1,10 @@
 2005-08-13 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic16/Makefile.subdir: weakened clean-intermediate rule
+	  as it might be executed DURING a build (parallel make is wonderful)
+
+2005-08-13 Raphael Neider <rneider AT web.de>
+
 	* device/lib/Makefile.in (port-specific-objects-pic16):
 	  revert to cp $(PORT)/bin/*.* $(PORTDIR)
 	* device/lib/pic16/Makefile: added .PHONY targets, removed builddir

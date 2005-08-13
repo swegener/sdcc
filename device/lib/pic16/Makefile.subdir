@@ -62,6 +62,6 @@ clean : recurse
 
 clean-intermediate : recurse
 	@-echo "dummy" > .dummy
-	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym,$(OBJS:.o=.$(suf)))
+	$(Q)-$(RM) .dummy $(foreach suf,p lst hex cod sym,$(OBJS:.o=.$(suf)))
 	
 include $(topsrcdir)/Makefile.rules

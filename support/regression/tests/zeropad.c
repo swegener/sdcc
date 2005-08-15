@@ -6,10 +6,10 @@
 #define STORAGE {storage}
 #endif
 
-#if defined __GNUC__
-  #define FLEXARRAY (__GNUC__ >= 3)
-  //since g fails on GCC 2.95.4 on alpha and I don't know how to detect alpha...
-  #define TEST_G    (__GNUC__ >= 3)
+#if defined (__GNUC__) && defined (__alpha__) && (__GNUC__ < 3)
+  /* since g fails on GCC 2.95.4 on alpha... */
+  #define FLEXARRAY 0
+  #define TEST_G    0
 #else
   #define FLEXARRAY 1
   #define TEST_G    1

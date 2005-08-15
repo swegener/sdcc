@@ -26,8 +26,8 @@
 #endif
 
 #if SIZE == 32
-// long is 64 bits on GCC 2.95.4 on alpha and I don't know how to detect alpha...
-#  if defined (__GNUC__) && (__GNUC__ < 3)
+/* long is 64 bits on 64 bit mabhines */
+#  if defined (__alpha__) || defined (__x86_64__)
 #    define TYPE unsigned int
 #  else
 #    define TYPE unsigned long

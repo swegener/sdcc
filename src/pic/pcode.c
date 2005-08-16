@@ -3194,7 +3194,8 @@ char *pCode2str(char *str, size_t size, pCode *pc)
     SAFE_snprintf(&s,&size,";\t--FLOW change\n");
     break;
   case PC_CSOURCE:
-    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+//    SAFE_snprintf(&s,&size,";#CSRC\t%s %d\n; %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    SAFE_snprintf(&s,&size,"%s\t.line\t%d; \"%s\"\t%s\n",(options.debug?"":";"),PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
     break;
   case PC_ASMDIR:
     if(PCAD(pc)->directive) {
@@ -3308,7 +3309,8 @@ static void genericPrint(FILE *of, pCode *pc)
     break;
 
   case PC_CSOURCE:
-    fprintf(of,";#CSRC\t%s %d\n;  %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+//    fprintf(of,";#CSRC\t%s %d\n;  %s\n", PCCS(pc)->file_name, PCCS(pc)->line_number, PCCS(pc)->line);
+    fprintf(of,"%s\t.line\t%d; \"%s\"\t%s\n", (options.debug?"":";"), PCCS(pc)->line_number, PCCS(pc)->file_name, PCCS(pc)->line);
     break;
 
   case PC_ASMDIR:

@@ -60,6 +60,7 @@ _gptrget (char *gptr) _naked
     ;   Pointer to data space
     ;
         mov     a,@r0                                   ; 1
+ dataptrrestore$:
         mov     r0,dph ; restore r0                     ; 2
         mov     dph,#0 ; restore dph                    ; 2
         ret                                             ; 1
@@ -68,9 +69,7 @@ _gptrget (char *gptr) _naked
     ;
  pdataptr$:
         movx    a,@r0                                   ; 1
-        mov     r0,dph ; restore r0                     ; 2
-        mov     dph,#0 ; restore dph                    ; 2
-        ret                                             ; 1
+        sjmp    dataptrrestore$                         ; 2
     ;
     ;   pointer to code area
     ;
@@ -97,7 +96,7 @@ _gptrget (char *gptr) _naked
         movx    a,@dptr                                 ; 1
         ret                                             ; 1
                                                         ;===
-                                                        ;47 bytes
+                                                        ;44 bytes
      _endasm ;
 }
 
@@ -184,6 +183,7 @@ _gptrget (char *gptr) _naked
     ;   Pointer to data space
     ;
         mov     a,@r0                                   ; 1
+ dataptrrestore$:
         mov     r0,dph ; restore r0                     ; 2
         mov     dph,#0 ; restore dph                    ; 2
         ret                                             ; 1
@@ -192,9 +192,7 @@ _gptrget (char *gptr) _naked
     ;
  pdataptr$:
         movx    a,@r0                                   ; 1
-        mov     r0,dph ; restore r0                     ; 2
-        mov     dph,#0 ; restore dph                    ; 2
-        ret                                             ; 1
+        sjmp    dataptrrestore$                         ; 2
     ;
     ;   pointer to code area, max 16 bits
     ;
@@ -209,7 +207,7 @@ _gptrget (char *gptr) _naked
         movx    a,@dptr                                 ; 1
         ret                                             ; 1
                                                         ;===
-                                                        ;30 bytes
+                                                        ;27 bytes
      _endasm ;
 }
 

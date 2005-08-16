@@ -47,41 +47,43 @@ _gptrput (char *gptr, char c) _naked
     ;
     ;   depending on the pointer type according to SDCCsymt.h
     ;
-    	jb		_B_7,codeptr$        ; >0x80 code		; 3
-    	jnb		_B_6,xdataptr$       ; <0x40 far		; 3
+        jb      _B_7,codeptr$        ; >0x80 code       ; 3
+        jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
 
-        mov     dph,r0 ; save r0 independant of regbank	; 2
-        mov     r0,dpl ; use only low order address		; 2
+        mov     dph,r0 ; save r0 independant of regbank ; 2
+        mov     r0,dpl ; use only low order address     ; 2
 
-    	jb		_B_5,pdataptr$       ; >0x60 pdata		; 3
+        jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
     ;
     ;   store into near/idata space
     ;
-        mov     @r0,a									; 1
-        mov     r0,dph ; restore r0						; 2
-        mov     dph,#0 ; restore dph					; 2
+        mov     @r0,a                                   ; 1
+ dataptrrestore$:
+        mov     r0,dph ; restore r0                     ; 2
+        mov     dph,#0 ; restore dph                    ; 2
 
  codeptr$:
-        ret												; 1
+        ret                                             ; 1
     ;
     ;   store into external stack/pdata space
     ;
  pdataptr$:
-        movx    @r0,a									; 1
-        mov     r0,dph ; restore r0						; 2
-        mov     dph,#0 ; restore dph					; 2
-        ret												; 1
+        movx    @r0,a                                   ; 1
+        sjmp    dataptrrestore$                         ; 2
+        mov     r0,dph ; restore r0                     ; 2
+        mov     dph,#0 ; restore dph                    ; 2
+        ret                                             ; 1
     ;
     ;   store into far space
     ;
  xdataptr$:
- 		mov		_P3,b									; 3
+        mov     _P3,b                                   ; 3
 
-        movx    @dptr,a									; 1
-        ret												; 1
+        movx    @dptr,a                                 ; 1
+        ret                                             ; 1
 
-        												;===
-														;30 bytes
+                                                        ;===
+                                                        ;27 bytes
 _endasm;
 }
 
@@ -99,38 +101,38 @@ _gptrput (char *gptr, char c) _naked
     ;
     ;   depending on the pointer type according to SDCCsymt.h
     ;
-    	mov		b,dph									; 3
-    	jb		_B_7,codeptr$        ; >0x80 code		; 3
-    	jnb		_B_6,xdataptr$       ; <0x40 far		; 3
+        mov     b,dph                                   ; 3
+        jb      _B_7,codeptr$        ; >0x80 code       ; 3
+        jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
 
-        mov     b,r0   ; save r0 independant of regbank	; 2
-        mov     r0,dpl ; use only low order address		; 2
+        mov     b,r0   ; save r0 independant of regbank ; 2
+        mov     r0,dpl ; use only low order address     ; 2
 
-    	jb		_B_5,pdataptr$       ; >0x60 pdata		; 3
+        jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
     ;
     ;   store into near/idata space
     ;
-        mov     @r0,a									; 1
-        mov     r0,b   ; restore r0						; 2
+        mov     @r0,a                                   ; 1
+ dataptrrestore$:
+        mov     r0,b   ; restore r0                     ; 2
 
  codeptr$:
-        ret												; 1
+        ret                                             ; 1
     ;
     ;   store into external stack/pdata space
     ;
  pdataptr$:
-        movx    @r0,a									; 1
-        mov     r0,b   ; restore r0						; 2
-        ret												; 1
+        movx    @r0,a                                   ; 1
+        sjmp    dataptrrestore$                         ; 2
     ;
     ;   store into far space, max 14 bits
     ;
  xdataptr$:
- 	; 0 <= dptr <= 0x3FFF
-        movx    @dptr,a									; 1
-        ret												; 1
-        												;===
-														;26 bytes
+    ; 0 <= dptr <= 0x3FFF
+        movx    @dptr,a                                 ; 1
+        ret                                             ; 1
+                                                        ;===
+                                                        ;25 bytes
     _endasm;
 }
 
@@ -148,39 +150,38 @@ _gptrput (char *gptr, char c) _naked
     ;
     ;   depending on the pointer type according to SDCCsymt.h
     ;
-    	jb		_B_7,codeptr$        ; >0x80 code		; 3
-    	jnb		_B_6,xdataptr$       ; <0x40 far		; 3
+        jb      _B_7,codeptr$        ; >0x80 code       ; 3
+        jnb     _B_6,xdataptr$       ; <0x40 far        ; 3
 
-        mov     dph,r0 ; save r0 independant of regbank	; 2
-        mov     r0,dpl ; use only low order address		; 2
+        mov     dph,r0 ; save r0 independant of regbank ; 2
+        mov     r0,dpl ; use only low order address     ; 2
 
-    	jb		_B_5,pdataptr$       ; >0x60 pdata		; 3
+        jb      _B_5,pdataptr$       ; >0x60 pdata      ; 3
     ;
     ;   store into near/idata space
     ;
-        mov     @r0,a									; 1
-        mov     r0,dph ; restore r0						; 2
-        mov     dph,#0 ; restore dph					; 2
+        mov     @r0,a                                   ; 1
+ dataptrrestore$:
+        mov     r0,dph ; restore r0                     ; 2
+        mov     dph,#0 ; restore dph                    ; 2
 
  codeptr$:
-        ret												; 1
+        ret                                             ; 1
     ;
     ;   store into external stack/pdata space
     ;
  pdataptr$:
-        movx    @r0,a									; 1
-        mov     r0,dph ; restore r0						; 2
-        mov     dph,#0 ; restore dph					; 2
-        ret												; 1
+        movx    @r0,a                                   ; 1
+        sjmp    dataptrrestore$                         ; 2
     ;
     ;   store into far space
     ;
  xdataptr$:
-        movx    @dptr,a									; 1
-        ret												; 1
+        movx    @dptr,a                                 ; 1
+        ret                                             ; 1
 
-        												;===
-														;27 bytes
+                                                        ;===
+                                                        ;24 bytes
 _endasm;
 }
 
@@ -195,40 +196,40 @@ _gptrput (char *gptr, char c) _naked
 
     _asm
         ar0 = 0x00
-        push     acc									; 2
+        push     acc                                    ; 2
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
-        mov     a,b										; 2
-        jz      00001$  ; 0 near						; 2
-        dec     a										; 1
-        jz      00002$  ; 1 far							; 2
-        dec     a										; 1
-        jz      00003$  ; 2 code						; 2
-        dec     a										; 1
-        jz      00004$  ; 3 pdata						; 2
-        dec     a       ; 4 skip generic pointer		; 1
-        dec     a										; 1
-        jz      00001$  ; 5 idata						; 2
+        mov     a,b                                     ; 2
+        jz      00001$  ; 0 near                        ; 2
+        dec     a                                       ; 1
+        jz      00002$  ; 1 far                         ; 2
+        dec     a                                       ; 1
+        jz      00003$  ; 2 code                        ; 2
+        dec     a                                       ; 1
+        jz      00004$  ; 3 pdata                       ; 2
+        dec     a       ; 4 skip generic pointer        ; 1
+        dec     a                                       ; 1
+        jz      00001$  ; 5 idata                       ; 2
 
  00003$:
-        pop     acc    ; do nothing						; 2
-        ret												; 1
+        pop     acc    ; do nothing                     ; 2
+        ret                                             ; 1
 ;
 ;       store into near space
 ;
  00001$:
-        pop     acc										; 2
-        push    ar0										; 2
-        mov     r0,dpl									; 2
-        mov     @r0,a									; 1
-        pop     ar0										; 2
-        ret												; 1
+        pop     acc                                     ; 2
+        push    ar0                                     ; 2
+        mov     r0,dpl                                  ; 2
+        mov     @r0,a                                   ; 1
+        pop     ar0                                     ; 2
+        ret                                             ; 1
 
  00002$:
-        pop     acc										; 2
-        movx    @dptr,a									; 1
-        ret												; 1
+        pop     acc                                     ; 2
+        movx    @dptr,a                                 ; 1
+        ret                                             ; 1
 
  00004$:
 #if USE_PDATA_PAGING_REGISTER
@@ -236,15 +237,15 @@ _gptrput (char *gptr, char c) _naked
         mov     dph,__XPAGE     ; __XPAGE (usually p2) holds high byte for pdata access
         movx    @dptr,a
 #else
-        pop     acc										; 2
-        push    ar0										; 2
-        mov     r0,dpl									; 2
-        movx    @r0,a									; 1
-        pop     ar0										; 2
+        pop     acc                                     ; 2
+        push    ar0                                     ; 2
+        mov     r0,dpl                                  ; 2
+        movx    @r0,a                                   ; 1
+        pop     ar0                                     ; 2
 #endif
-        ret												; 1
-        												;===
-        												;46 bytes
+        ret                                             ; 1
+                                                        ;===
+                                                        ;46 bytes
 _endasm;
 }
 #endif
@@ -260,13 +261,13 @@ _gptrputWord ()
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
-    	jb		_B_7,00013$           ; >0x80 code
-    	jnb		_B_6,00012$           ; <0x40 far
+        jb      _B_7,00013$           ; >0x80 code
+        jnb     _B_6,00012$           ; <0x40 far
 
         mov     dph,r0 ; save r0 independant of regbank
         mov     r0,dpl ; use only low order address
 
-    	jb		_B_5,00014$           ; >0x60 pdata
+        jb      _B_5,00014$           ; >0x60 pdata
 ;
 ;       store into near space
 ;

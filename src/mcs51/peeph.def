@@ -126,7 +126,7 @@ replace {
 	clr	a
 	mov	%1,a
 	mov	%2,a
-	;	Peephole 3.h	changed mov %3,#0x00 to %3,a
+	;	Peephole 3.h	changed mov %3,#0x00 to ...,a
 	mov	%3,a
 }
 
@@ -141,7 +141,7 @@ replace {
 	mov	%1,a
 	mov	%2,a
 	mov	%3,a
-	;	Peephole 3.i	changed mov %4,#0x00 to %4,a
+	;	Peephole 3.i	changed mov %4,#0x00 to ...,a
 	mov	%4,a
 }
 
@@ -158,7 +158,7 @@ replace {
 	mov	%2,a
 	mov	%3,a
 	mov	%4,a
-	;	Peephole 3.j	changed mov %5,#0x00 to %5,a
+	;	Peephole 3.j	changed mov %5,#0x00 to ...,a
 	mov	%5,a
 }
 
@@ -177,7 +177,7 @@ replace {
 	mov %3,a
 	mov %4,a
 	mov %5,a
-	;	Peephole 3.k	changed mov %6,#0x00 to %6,a
+	;	Peephole 3.k	changed mov %6,#0x00 to ...,a
 	mov %6,a
 }
 
@@ -187,9 +187,9 @@ replace {
 	mov	a,%1
 	movx	@dptr,a
 } by {
-	;	Peephole 100	removed redundant mov
 	mov	%1,a
 	mov	dptr,#%2
+	;	Peephole 100	removed redundant mov
 	movx	@dptr,a
 } if notVolatile %1
 
@@ -200,10 +200,10 @@ replace {
 	mov	a,%1
 	movx	@dptr,a
 } by {
-	;	Peephole 101	removed redundant mov
 	mov	a,%1
 	movx	@dptr,a
 	inc	dptr
+	;	Peephole 101	removed redundant mov
 	movx	@dptr,a
 } if notVolatile %1
 
@@ -266,8 +266,8 @@ replace {
 	mov	%1,a
 	mov	a,%1
 } by {
-	;	Peephole 105	removed redundant mov
 	mov	%1,a
+;	Peephole 105	removed redundant mov
 } if notVolatile %1
 
 replace {
@@ -275,9 +275,9 @@ replace {
 	clr	c
 	mov	a,%1
 } by {
-	;	Peephole 106	removed redundant mov
 	mov	%1,a
 	clr	c
+	;	Peephole 106	removed redundant mov
 } if notVolatile %1
 
 replace {
@@ -398,8 +398,8 @@ replace {
 	sjmp	%3
 %2:
 } by {
-	;	Peephole 115.b	jump optimization
 	mov	%1,a
+	;	Peephole 115.b	jump optimization
 	jz	%3
 %2:
 } labelRefCountChange(%2 -1)
@@ -754,8 +754,8 @@ replace {
 	mov	r%4,%2
 	mov	@r%4,ar%3
 } by {
-	;	Peephole 133	removed redundant moves
 	mov	r%1,%2
+	;	Peephole 133	removed redundant moves
 	inc	@r%1
 	mov	ar%3,@r%1
 } if notVolatile
@@ -767,8 +767,8 @@ replace {
 	mov	r%4,%2
 	mov	@r%4,ar%3
 } by {
-	;	Peephole 134	removed redundant moves
 	mov	r%1,%2
+	;	Peephole 134	removed redundant moves
 	dec	@r%1
 	mov	ar%3,@r%1
 } if notVolatile
@@ -778,8 +778,8 @@ replace {
 	mov	a,r%2
 	orl	a,r%1
 } by {
-	;	Peephole 135	removed redundant mov
 	mov	r%1,a
+	;	Peephole 135	removed redundant mov
 	orl	a,r%2
 }
 
@@ -789,10 +789,10 @@ replace {
 	mov	dph,%3
 	mov	a,%1
 } by {
-	;	Peephole 136	removed redundant moves
 	mov	%1,a
 	mov	dpl,%2
 	mov	dph,%3
+	;	Peephole 136	removed redundant move
 } if notVolatile %1
 
 // WTF? Doesn't look sensible to me...
@@ -1046,6 +1046,7 @@ replace {
 	ret
 }
 
+// peephole 213.a might revert this
 replace {
 	mov	%1,#%2
 	xrl	%1,#0x80
@@ -1119,9 +1120,9 @@ replace {
 	mov	%3,%1
 	mov	%2,%1
 } by {
-	;	Peephole 166	removed redundant mov
 	mov	%1,%2
 	mov	%3,%1
+	;	Peephole 166	removed redundant mov
 } if notVolatile %1 %2
 
 replace {
@@ -1220,8 +1221,8 @@ replace {
 	subb	a,#0x01
 	mov	%2,a
 } by {
-	;	Peephole 174.a	optimized decrement (acc not set to %2, flags undefined)
 	mov	r%1,%2
+	;	Peephole 174.a	optimized decrement (acc not set to %2, flags undefined)
 	dec	%2
 }
 
@@ -1231,8 +1232,8 @@ replace {
 	add	a,#0x01
 	mov	%2,a
 } by {
-	;	Peephole 174.b	optimized increment (acc not set to %2, flags undefined)
 	mov	r%1,%2
+	;	Peephole 174.b	optimized increment (acc not set to %2, flags undefined)
 	inc	%2
 }
 
@@ -1251,8 +1252,8 @@ replace {
 	mov  %1,%2
 	mov  %2,%1
 } by {
-	;	Peephole 177.a	removed redundant mov
 	mov  %1,%2
+	;	Peephole 177.a	removed redundant mov
 } if notVolatile %1 %2
 
 // applies to f.e. scott-add.asm (--model-large)
@@ -1260,8 +1261,8 @@ replace {
 	mov	r%1,a
 	mov	a,ar%1
 } by {
-	;	Peephole 177.b	removed redundant mov
 	mov	r%1,a
+	;	Peephole 177.b	removed redundant mov
 }
 
 // applies to f.e. bug-408972.c
@@ -1280,9 +1281,9 @@ replace restart {
 	mov	%3,%4
 	mov	%2,%1
 } by {
-	;	Peephole 177.d	removed redundant move
 	mov	%1,%2
 	mov	%3,%4
+	;	Peephole 177.d	removed redundant move
 } if notVolatile(%1 %2),operandsNotRelated(%1 %3)
 
 // applies to f.e. bug-607243.c
@@ -1350,10 +1351,10 @@ replace {
 	movx	@dptr,a
 	mov	dptr,%1
 } by {
-	;	Peephole 180.a	removed redundant mov to dptr
 	mov	dptr,%1
 	mov	a,%2
 	movx	@dptr,a
+	;	Peephole 180.a	removed redundant mov to dptr
 }
 
 // volatile xdata char t; t=0x01; t=0x03; t=0x01;
@@ -1365,12 +1366,12 @@ replace {
 	movx	@dptr,a
 	mov	dptr,%1
 } by {
-	;	Peephole 180.b	removed redundant mov to dptr
 	mov	dptr,%1
 	mov	a,%2
 	movx	@dptr,a
 	mov	a,%3
 	movx	@dptr,a
+	;	Peephole 180.b	removed redundant mov to dptr
 }
 
 // saving 1 byte, 0 cycles
@@ -1425,7 +1426,7 @@ replace {
 	anl	%1,#%3
 } by {
 	;	Peephole 183	avoided anl during execution
-	anl	%1,#(%2 & %3)
+	anl	%1,#(%2&%3)
 }
 
 replace {
@@ -1556,8 +1557,8 @@ replace {
 	mul	ab
 	add	a,#%2
 	mov	dpl,a
-	mov	a,b
-	addc	a,#(%2 >> 8)
+	mov	a,#(%2 >> 8)
+	addc	a,b
 	mov	dph,a
 	clr	a
 	movc	a,@a+dptr
@@ -1607,9 +1608,9 @@ replace {
 	mov	a,#0x0f
 	anl	a,%1
 } by {
-	;	Peephole 189	removed redundant mov and anl
 	anl	a,#0x0f
 	mov	%1,a
+	;	Peephole 189	removed redundant mov and anl
 } if notVolatile %1
 
 // rules 190 & 191 need to be in order
@@ -1618,9 +1619,9 @@ replace {
 	lcall	__gptrput
 	mov	a,%1
 } by {
-	;	Peephole 190	removed redundant mov
 	mov	a,%1
 	lcall	__gptrput
+	;	Peephole 190	removed redundant mov
 } if notVolatile %1
 
 replace {
@@ -1630,19 +1631,19 @@ replace {
 	mov	b,%4
 	mov	a,%1
 } by {
-	;	Peephole 191	removed redundant mov
 	mov	%1,a
 	mov	dpl,%2
 	mov	dph,%3
 	mov	b,%4
+	;	Peephole 191	removed redundant mov
 } if notVolatile %1
 
 replace {
 	mov	r%1,a
 	mov	@r%2,ar%1
 } by {
-	;	Peephole 192	used a instead of ar%1 as source
 	mov	r%1,a
+	;	Peephole 192	used a instead of ar%1 as source
 	mov	@r%2,a
 }
 
@@ -2004,6 +2005,7 @@ replace {
 	inc	r%1
 }
 
+// reverts peephole 159?
 replace {
 	mov	%1,#(( %2 >> 8 ) ^ 0x80)
 } by {
@@ -2026,8 +2028,8 @@ replace	 {
 	mov	a,%2
 	add	a,%1
 } by {
-	;	Peephole 214	reduced some extra moves
 	mov	%1,a
+	;	Peephole 214	reduced some extra moves
 	add	a,%2
 } if operandsNotSame
 
@@ -2049,9 +2051,9 @@ replace {
 	dec	r%1
 	mov	@r%1,a
 } by {
-	;	Peephole 216.a	simplified clear (2bytes)
 	mov	r%1,%2
 	clr	a
+	;	Peephole 216.a	simplified clear (2 bytes)
 	mov	@r%1,a
 	inc	r%1
 	mov	@r%1,a
@@ -2068,9 +2070,9 @@ replace {
 	dec	r%1
 	mov	@r%1,a
 } by {
-	;	Peephole 216.b	simplified clear (3bytes)
 	mov	r%1,%2
 	clr	a
+	;	Peephole 216.b	simplified clear (3 bytes)
 	mov	@r%1,a
 	inc	r%1
 	mov	@r%1,a
@@ -2092,9 +2094,9 @@ replace {
 	dec	r%1
 	mov	@r%1,a
 } by {
-	;	Peephole 216.c	simplified clear (4bytes)
 	mov	r%1,%2
 	clr	a
+	;	Peephole 216.c	simplified clear (4 bytes)
 	mov	@r%1,a
 	inc	r%1
 	mov	@r%1,a
@@ -2127,12 +2129,12 @@ replace {
 	clr	a
 	movx	@dptr,a
 } by {
-	;	Peephole 219.b	removed redundant clear
 	clr	a
 	movx	@dptr,a
 	mov	dptr,%1
 	movx	@dptr,a
 	mov	dptr,%2
+	;	Peephole 219.b	removed redundant clear
 	movx	@dptr,a
 }
 
@@ -2177,9 +2179,9 @@ replace {
 	mov	dpl,%1
 	mov	dph,%2
 } by {
-	;	Peephole 223.a	removed redundant dph/dpl moves
 	mov	%1,dpl
 	mov	%2,dph
+	;	Peephole 223.a	removed redundant dph/dpl moves
 } if notVolatile %1 %2
 
 replace {
@@ -2188,9 +2190,9 @@ replace {
 	mov	dpl,%1
 	mov	dph,(%1 + 1)
 } by {
-	;	Peephole 223.b	removed redundant dph/dpl moves
 	mov	%1,dpl
 	mov	(%1 + 1),dph
+	;	Peephole 223.b	removed redundant dph/dpl moves
 } if notVolatile %1
 
 replace {
@@ -2201,12 +2203,12 @@ replace {
 	mov	b,%4
 	mov	a,%1
 } by {
+	mov	a,%1
+	movx	@dptr,a
+	mov	dpl,%2
+	mov	dph,%3
+	mov	b,%4
 	;	Peephole 225	removed redundant move to acc
-	mov	a,%1
-	movx	@dptr,a
-	mov	dpl,%2
-	mov	dph,%3
-	mov	b,%4
 } if notVolatile %1
 
 replace {
@@ -2217,12 +2219,12 @@ replace {
 	inc	%1
 	clr	a
 } by {
+	clr	a
+	movx	@%1,a
+	inc	%1
+	movx	@%1,a
+	inc	%1
 	;	Peephole 226	removed unnecessary clr
-	clr	a
-	movx	@%1,a
-	inc	%1
-	movx	@%1,a
-	inc	%1
 }
 
 replace {
@@ -2239,9 +2241,9 @@ replace {
 	lcall	__decdptr
 	movx	@dptr,a
 } by {
+	mov	dptr,#%1
+	clr	a
 	;	Peephole 227.a	replaced inefficient 32 bit clear
-	mov	dptr,#%1
-	clr	a
 	movx	@dptr,a
 	inc	dptr
 	movx	@dptr,a
@@ -2267,8 +2269,8 @@ replace {
 	mov	a,#%2
 	movx	@dptr,a
 } by {
+	mov	dptr,#%1
 	;	Peephole 227.b	replaced inefficient 32 constant
-	mov	dptr,#%1
 	mov	a,#%2
 	movx	@dptr,a
 	inc	dptr
@@ -2289,9 +2291,9 @@ replace {
 	lcall	__decdptr
 	movx	@dptr,a
 } by {
+	mov	dptr,#%1
+	clr	a
 	;	Peephole 227.c	replaced inefficient 16 bit clear
-	mov	dptr,#%1
-	clr	a
 	movx	@dptr,a
 	inc	dptr
 	movx	@dptr,a
@@ -2307,8 +2309,8 @@ replace {
 	mov	a,#%2
 	movx	@dptr,a
 } by {
-	;	Peephole 227.d	replaced inefficient 16 bit constant
 	mov	dptr,#%1
+	;	Peephole 227.d	replaced inefficient 16 bit constant
 	mov	a,#%2
 	movx	@dptr,a
 	inc	dptr
@@ -2735,9 +2737,9 @@ replace {
 %1:
 	jz	%4
 } by {
-	;	Peephole 242.a	avoided branch jnz to jz
 	jnz	%1
 	mov	%2,%3
+	;	Peephole 242.a	avoided branch jnz to jz
 	jz	%4
 %1:
 } if labelRefCount %1 1
@@ -2750,10 +2752,10 @@ replace {
 %1:
 	jz	%4
 } by {
-	;	Peephole 242.b	avoided branch jnz to jz
 	jnz	%1
 	mov	%2,%3
 	orl	a,%5
+	;	Peephole 242.b	avoided branch jnz to jz
 	jz	%4
 %1:
 } if labelRefCount %1 1
@@ -2768,12 +2770,12 @@ replace {
 %1:
 	jz	%4
 } by {
-	;	Peephole 242.c	avoided branch jnz to jz
 	jnz	%1
 	mov	%2,%3
 	orl	a,%5
 	orl	a,%6
 	orl	a,%7
+	;	Peephole 242.c	avoided branch jnz to jz
 	jz	%4
 %1:
 } if labelRefCount %1 1
@@ -2819,8 +2821,8 @@ replace {
 	mov	r%1,a
 	mov	dpl,r%1
 } by {
-	;	Peephole 244.c	loading dpl from a instead of r%1
 	mov	r%1,a
+	;	Peephole 244.c	loading dpl from a instead of r%1
 	mov	dpl,a
 }
 
@@ -2828,8 +2830,8 @@ replace {
 	mov	r%1,a
 	mov	dph,r%1
 } by {
-	;	Peephole 244.d	loading dph from a instead of r%1
 	mov	r%1,a
+	;	Peephole 244.d	loading dph from a instead of r%1
 	mov	dph,a
 }
 
@@ -2901,9 +2903,9 @@ replace {
 	anl	a,#%3
 	movx	@dptr,a
 } by {
-	;	Peephole 246.a	combined clr/clr
 	mov	dptr,#%1
 	movx	a,@dptr
+	;	Peephole 246.a	combined clr/clr
 	anl	a,#%2&%3
 	movx	@dptr,a
 } if notVolatile %1
@@ -2918,9 +2920,9 @@ replace {
 	orl	a,#%3
 	movx	@dptr,a
 } by {
-	;	Peephole 246.b	combined set/set
 	mov	dptr,#%1
 	movx	a,@dptr
+	;	Peephole 246.b	combined set/set
 	orl	a,#%2|%3
 	movx	@dptr,a
 } if notVolatile %1
@@ -2935,10 +2937,10 @@ replace {
 	anl	a,#%3
 	movx	@dptr,a
 } by {
-	;	Peephole 246.c	combined set/clr
 	mov	dptr,#%1
 	movx	a,@dptr
 	orl	a,#%2
+	;	Peephole 246.c	combined set/clr
 	anl	a,#%3
 	movx	@dptr,a
 } if notVolatile %1
@@ -2953,10 +2955,10 @@ replace {
 	orl	a,#%3
 	movx	@dptr,a
 } by {
-	;	Peephole 246.d	combined clr/set
 	mov	dptr,#%1
 	movx	a,@dptr
 	anl	a,#%2
+	;	Peephole 246.d	combined clr/set
 	orl	a,#%3
 	movx	@dptr,a
 } if notVolatile %1
@@ -2972,10 +2974,10 @@ replace {
 	anl	a,#%4
 	movx	@dptr,a
 } by {
-	;	Peephole 246.e	combined set/clr/clr
 	mov	dptr,#%1
 	movx	a,@dptr
 	orl	a,#%2
+	;	Peephole 246.e	combined set/clr/clr
 	anl	a,#%3&%4
 	movx	@dptr,a
 } if notVolatile %1
@@ -2991,11 +2993,11 @@ replace {
 	orl	a,#%4
 	movx	@dptr,a
 } by {
-	;	Peephole 246.f	combined set/clr/set
 	mov	dptr,#%1
 	movx	a,@dptr
 	orl	a,#%2
 	anl	a,#%3
+	;	Peephole 246.f	combined set/clr/set
 	orl	a,#%4
 	movx	@dptr,a
 } if notVolatile %1
@@ -3011,11 +3013,11 @@ replace {
 	anl	a,#%4
 	movx	@dptr,a
 } by {
+	mov	dptr,#%1
+	movx	a,@dptr
+	anl	a,#%2
+	orl	a,#%3
 	;	Peephole 246.g	combined clr/set/clr
-	mov	dptr,#%1
-	movx	a,@dptr
-	anl	a,#%2
-	orl	a,#%3
 	anl	a,#%4
 	movx	@dptr,a
 } if notVolatile %1
@@ -3031,10 +3033,10 @@ replace {
 	orl	a,#%4
 	movx	@dptr,a
 } by {
-	;	Peephole 246.h	combined clr/set/set
 	mov	dptr,#%1
 	movx	a,@dptr
 	anl	a,#%2
+	;	Peephole 246.h	combined clr/set/set
 	orl	a,#%3|%4
 	movx	@dptr,a
 } if notVolatile %1
@@ -3053,9 +3055,9 @@ replace {
 	anl	a,#%3
 	mov	@r%5,a
 } by {
-	;	Peephole 247.a	combined clr/clr
 	mov	r%5,#%1
 	mov	a,@r%5
+	;	Peephole 247.a	combined clr/clr
 	anl	a,#%2&%3
 	mov	@r%5,a
 } if notVolatile %1
@@ -3070,9 +3072,9 @@ replace {
 	orl	a,#%3
 	mov	@r%5,a
 } by {
-	;	Peephole 247.b	combined set/set
 	mov	r%5,#%1
 	mov	a,@r%5
+	;	Peephole 247.b	combined set/set
 	orl	a,#%2|%3
 	mov	@r%5,a
 } if notVolatile %1
@@ -3087,10 +3089,10 @@ replace {
 	anl	a,#%3
 	mov	@r%5,a
 } by {
-	;	Peephole 247.c	combined set/clr
 	mov	r%5,#%1
 	mov	a,@r%5
 	orl	a,#%2
+	;	Peephole 247.c	combined set/clr
 	anl	a,#%3
 	mov	@r%5,a
 } if notVolatile %1
@@ -3105,10 +3107,10 @@ replace {
 	orl	a,#%3
 	mov	@r%5,a
 } by {
-	;	Peephole 247.d	combined clr/set
 	mov	r%5,#%1
 	mov	a,@r%5
 	anl	a,#%2
+	;	Peephole 247.d	combined clr/set
 	orl	a,#%3
 	mov	@r%5,a
 } if notVolatile %1
@@ -3124,10 +3126,10 @@ replace {
 	anl	a,#%4
 	mov	@r%5,a
 } by {
-	;	Peephole 247.e	combined set/clr/clr
 	mov	r%5,#%1
 	mov	a,@r%5
 	orl	a,#%2
+	;	Peephole 247.e	combined set/clr/clr
 	anl	a,#%3&%4
 	mov	@r%5,a
 } if notVolatile %1
@@ -3143,11 +3145,11 @@ replace {
 	orl	a,#%4
 	mov	@r%5,a
 } by {
-	;	Peephole 247.f	combined set/clr/set
 	mov	r%5,#%1
 	mov	a,@r%5
 	orl	a,#%2
 	anl	a,#%3
+	;	Peephole 247.f	combined set/clr/set
 	orl	a,#%4
 	mov	@r%5,a
 } if notVolatile %1
@@ -3163,11 +3165,11 @@ replace {
 	anl	a,#%4
 	mov	@r%5,a
 } by {
-	;	Peephole 247.g	combined clr/set/clr
 	mov	r%5,#%1
 	mov	a,@r%5
 	anl	a,#%2
 	orl	a,#%3
+	;	Peephole 247.g	combined clr/set/clr
 	anl	a,#%4
 	mov	@r%5,a
 } if notVolatile %1
@@ -3183,10 +3185,10 @@ replace {
 	orl	a,#%4
 	mov	@r%5,a
 } by {
-	;	Peephole 247.h	combined clr/set/set
 	mov	r%5,#%1
 	mov	a,@r%5
 	anl	a,#%2
+	;	Peephole 247.h	combined clr/set/set
 	orl	a,#%3|%4
 	mov	@r%5,a
 } if notVolatile %1
@@ -3204,10 +3206,10 @@ replace {
 	orl	a,r%2
 	movx	@dptr,a
 } by {
-	;	Peephole 248.a	optimized or to xdata
 	mov	dptr,%1
 	movx	a,@dptr
 	mov	r%2,a
+	;	Peephole 248.a	optimized or to xdata
 	orl	a,%3
 	movx	@dptr,a
 }
@@ -3222,10 +3224,10 @@ replace {
 	anl	a,r%2
 	movx	@dptr,a
 } by {
-	;	Peephole 248.b	optimized and to xdata
 	mov	dptr,%1
 	movx	a,@dptr
 	mov	r%2,a
+	;	Peephole 248.b	optimized and to xdata
 	anl	a,%3
 	movx	@dptr,a
 }
@@ -3240,10 +3242,10 @@ replace {
 	xrl	a,r%2
 	movx	@dptr,a
 } by {
-	;	Peephole 248.c	optimized xor to xdata
 	mov	dptr,%1
 	movx	a,@dptr
 	mov	r%2,a
+	;	Peephole 248.c	optimized xor to xdata
 	xrl	a,%3
 	movx	@dptr,a
 }
@@ -3268,9 +3270,9 @@ replace {
 	orl	a,%5
 	movx	@dptr,a
 } by {
-	;	Peephole 248.d	optimized or/and/or to volatile xdata
 	mov	dptr,%1
 	movx	a,@dptr
+	;	Peephole 248.d	optimized or/and/or to volatile xdata
 	orl	a,%3
 	movx	@dptr,a
 	movx	a,@dptr
@@ -3302,9 +3304,9 @@ replace {
 	anl	a,%5
 	movx	@dptr,a
 } by {
-	;	Peephole 248.e	optimized and/or/and to volatile xdata
 	mov	dptr,%1
 	movx	a,@dptr
+	;	Peephole 248.e	optimized and/or/and to volatile xdata
 	anl	a,%3
 	movx	@dptr,a
 	movx	a,@dptr
@@ -3330,9 +3332,9 @@ replace {
 	anl	a,%4
 	movx	@dptr,a
 } by {
-	;	Peephole 248.f	optimized or/and to volatile xdata
 	mov	dptr,%1
 	movx	a,@dptr
+	;	Peephole 248.f	optimized or/and to volatile xdata
 	orl	a,%3
 	movx	@dptr,a
 	movx	a,@dptr
@@ -3355,9 +3357,9 @@ replace {
 	orl	a,%4
 	movx	@dptr,a
 } by {
-	;	Peephole 248.g	optimized and/or to volatile xdata
 	mov	dptr,%1
 	movx	a,@dptr
+	;	Peephole 248.g	optimized and/or to volatile xdata
 	anl	a,%3
 	movx	@dptr,a
 	movx	a,@dptr
@@ -3380,9 +3382,9 @@ replace {
 	xrl	a,%4
 	movx	@dptr,a
 } by {
-	;	Peephole 248.h	optimized xor/xor to volatile xdata
 	mov	dptr,%1
 	movx	a,@dptr
+	;	Peephole 248.h	optimized xor/xor to volatile xdata
 	xrl	a,%3
 	movx	@dptr,a
 	movx	a,@dptr
@@ -3410,11 +3412,11 @@ replace {
 	orl	a,%5
 	movx	@dptr,a
 } by {
-	;	Peephole 248.i	optimized or/and/or to xdata bitfield
 	mov	dptr,%1
 	movx	a,@dptr
 	orl	a,%3
 	movx	@dptr,a
+	;	Peephole 248.i	optimized or/and/or to xdata bitfield
 	movx	a,@dptr
 	anl	a,%4
 	movx	@dptr,a
@@ -3439,11 +3441,11 @@ replace {
 	anl	a,%5
 	movx	@dptr,a
 } by {
-	;	Peephole 248.j	optimized and/or/and to xdata bitfield
 	mov	dptr,%1
 	movx	a,@dptr
 	anl	a,%3
 	movx	@dptr,a
+	;	Peephole 248.j	optimized and/or/and to xdata bitfield
 	movx	a,@dptr
 	orl	a,%4
 	movx	@dptr,a
@@ -3463,11 +3465,11 @@ replace {
 	anl	a,%4
 	movx	@dptr,a
 } by {
-	;	Peephole 248.k	optimized or/and to xdata bitfield
 	mov	dptr,%1
 	movx	a,@dptr
 	orl	a,%3
 	movx	@dptr,a
+	;	Peephole 248.k	optimized or/and to xdata bitfield
 	movx	a,@dptr
 	anl	a,%4
 	movx	@dptr,a
@@ -3484,11 +3486,11 @@ replace {
 	orl	a,%4
 	movx	@dptr,a
 } by {
-	;	Peephole 248.l	optimized and/or to xdata bitfield
 	mov	dptr,%1
 	movx	a,@dptr
 	anl	a,%3
 	movx	@dptr,a
+	;	Peephole 248.l	optimized and/or to xdata bitfield
 	movx	a,@dptr
 	orl	a,%4
 	movx	@dptr,a
@@ -3505,11 +3507,11 @@ replace {
 	xrl	a,%4
 	movx	@dptr,a
 } by {
-	;	Peephole 248.m	optimized xor/xor to xdata bitfield
 	mov	dptr,%1
 	movx	a,@dptr
 	xrl	a,%3
 	movx	@dptr,a
+	;	Peephole 248.m	optimized xor/xor to xdata bitfield
 	movx	a,@dptr
 	xrl	a,%4
 	movx	@dptr,a
@@ -3637,8 +3639,8 @@ replace {
 	mov	a,%1
 	add	a,acc
 } by {
-	;	Peephole 254	optimized left shift
 	mov	a,%1
+	;	Peephole 254	optimized left shift
 	add	a,%1
 } if notVolatile %1
 
@@ -3674,9 +3676,9 @@ replace {
 %2:
 	clr	c
 } by {
-	;	Peephole 256.a	removed redundant clr c
 	jc	%1
 %2:
+	;	Peephole 256.a	removed redundant clr c
 } if labelRefCount %2 0
 
 // applies to f.e. logf.c
@@ -3685,9 +3687,9 @@ replace {
 %2:
 	clr	a
 } by {
-	;	Peephole 256.b	removed redundant clr a
 	jnz	%1
 %2:
+	;	Peephole 256.b	removed redundant clr a
 } if labelRefCount %2 0
 
 // applies to f.e. bug-905492.c
@@ -3696,9 +3698,9 @@ replace {
 %2:
 	mov	%3,#0x00
 } by {
-	;	Peephole 256.c	loading %3 with zero from a
 	jnz	%1
 %2:
+	;	Peephole 256.c	loading %3 with zero from a
 	mov	%3,a
 } if labelRefCount %2 0
 
@@ -3709,10 +3711,10 @@ replace {
 	mov	%4,%5
 	mov	%3,#0x00
 } by {
-	;	Peephole 256.d	loading %3 with zero from a
 	jnz	%1
 %2:
 	mov	%4,%5
+	;	Peephole 256.d	loading %3 with zero from a
 	mov	%3,a
 } if labelRefCount(%2 0),operandsNotRelated('a' %4)
 
@@ -3723,11 +3725,11 @@ replace {
 	mov	%6,%7
 	mov	%3,#0x00
 } by {
-	;	Peephole 256.e	loading %3 with zero from a
 	jnz	%1
 %2:
 	mov	%4,%5
 	mov	%6,%7
+	;	Peephole 256.e	loading %3 with zero from a
 	mov	%3,a
 } if labelRefCount(%2 0),operandsNotRelated('a' %4 %6)
 
@@ -3739,12 +3741,12 @@ replace {
 	mov	%8,%9
 	mov	%3,#0x00
 } by {
-	;	Peephole 256.f	loading %2 with zero from a
 	jnz	%1
 %2:
 	mov	%4,%5
 	mov	%6,%7
 	mov	%8,%9
+	;	Peephole 256.f	loading %2 with zero from a
 	mov	%3,a
 } if labelRefCount(%2 0),operandsNotRelated('a' %4 %6 %8)
 
@@ -3771,8 +3773,8 @@ replace {
 	orl	%1,#0x01
 %3:
 } by {
-	;	Peephole 258.a	optimized bitbanging
 	mov	a,%1
+	;	Peephole 258.a	optimized bitbanging
 	mov	c,%2
 	addc	a,%1
 	mov	%1,a
@@ -3790,8 +3792,8 @@ replace {
 	orl	ar%1,#0x01
 %3:
 } by {
-	;	Peephole 258.b	optimized bitbanging
 	mov	a,r%1
+	;	Peephole 258.b	optimized bitbanging
 	mov	c,%2
 	addc	a,r%1
 	mov	r%1,a
@@ -3810,8 +3812,8 @@ replace {
 	orl	%1,#0x80
 %3:
 } by {
-	;	Peephole 258.c	optimized bitbanging
 	mov	a,%1
+	;	Peephole 258.c	optimized bitbanging
 	mov	c,%2
 	rrc	a
 	mov	%1,a
@@ -3830,8 +3832,8 @@ replace {
 	orl	ar%1,#0x80
 %3:
 } by {
-	;	Peephole 258.d	optimized bitbanging
 	mov	a,r%1
+	;	Peephole 258.d	optimized bitbanging
 	mov	c,%2
 	rrc	a
 	mov	r%1,a
@@ -3849,8 +3851,8 @@ replace {
 	add	a,%1
 	mov	%1,a
 } by {
-	;	Peephole 258.e	optimized bitbanging
 	mov	a,%1
+	;	Peephole 258.e	optimized bitbanging
 	add	a,%1
 	mov	%2,c
 	mov	%1,a
@@ -3866,8 +3868,8 @@ replace {
 	rrc	a
 	mov	%1,a
 } by {
-	;	Peephole 258.f	optimized bitbanging
 	mov	a,%1
+	;	Peephole 258.f	optimized bitbanging
 	clr	c
 	rrc	a
 	mov	%2,c
@@ -4387,9 +4389,9 @@ replace {
 	mov	acc.0,c
 	mov	%1,a
 } by {
-	;	Peephole 261.a	optimized left rol
 	mov	a,%1
 	rlc	a
+	;	Peephole 261.a	optimized left rol
 	xch	a,%2
 	rlc	a
 	xch	a,%2
@@ -4409,9 +4411,9 @@ replace {
 	mov	acc.7,c
 	mov	%1,a
 } by {
-	;	Peephole 261.b	optimized right rol
 	mov	a,%1
 	rrc	a
+	;	Peephole 261.b	optimized right rol
 	xch	a,%2
 	rrc	a
 	xch	a,%2

@@ -1,3 +1,12 @@
+2005-08-16 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/_gptrget.c,
+	* device/lib/_gptrput.c: slightly shorter
+	* doc/sdccman.lyx: incremented version
+	* src/mcs51/peeph.def: moved peephole comments to the line of first
+	  change to better keep line correlation, reanimated 186.e
+	* src/mcs51/peeph.def: renamed similar peepholes by using suffixes
+
 2005-08-16 Slade Rich <slade_rich AT users.sourceforge.net>
 
 	* src/pic/pcode.c : Pasted ".line" assembly directives patch from

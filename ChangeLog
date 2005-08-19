@@ -1,3 +1,7 @@
+2005-08-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/peeph.def: updated comments
+
 2005-08-16 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/_gptrget.c,
@@ -39,7 +43,7 @@
 	* device/lib/pic16/libdev/Makefile: recursive make via + and $(MAKE)
 	* device/lib/pic16/libio/Makefile: create sub-make's builddir early,
 	  prevents mkdir -p from aborting on Alpha
-	
+
 2005-08-12 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_print(G)PointerType): do not flush

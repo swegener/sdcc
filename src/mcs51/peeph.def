@@ -900,25 +900,25 @@ replace {
 	add	a,%2
 }
 
-// what are #147-#149 for?
+// 147: Fix compiler output to comply with 8051 instruction set.
 replace {
 	orl	r%1,a
 } by {
-	;	Peephole 147	changed target address mode r%1 to ar%1
+	;	Peephole 147.a	changed target address mode r%1 to ar%1
 	orl	ar%1,a
 }
 
 replace {
 	anl	r%1,a
 } by {
-	;	Peephole 148	changed target address mode r%1 to ar%1
+	;	Peephole 147.b	changed target address mode r%1 to ar%1
 	anl	ar%1,a
 }
 
 replace {
 	xrl	r%1,a
 } by {
-	;	Peephole 149	changed target address mode r%1 to ar%1
+	;	Peephole 147.c	changed target address mode r%1 to ar%1
 	xrl	ar%1,a
 }
 
@@ -2005,7 +2005,7 @@ replace {
 	inc	r%1
 }
 
-// reverts peephole 159?
+// reverts peephole 159? asx8051 cannot handle, too complex?
 replace {
 	mov	%1,#(( %2 >> 8 ) ^ 0x80)
 } by {

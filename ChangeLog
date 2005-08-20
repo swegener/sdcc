@@ -1,7 +1,9 @@
 2005-08-20 Borut Razem <borut.razem AT siol.net>
 
 	* configure, configure.in: added tests for libsocket and libnsl libraries,
-	  requred by sdcdb on sparc-solaris
+	  requred by sdcdb on sparc-solaris; generate support/regression/Makefile
+	  from support/regression/Makefile.in
+	* support/regression/Makefile.in: added
 	* device/lib/pic16/Makefile.common.in: force make to use bash shell
 	* sim/ucsim/libtool: regenerated on sparc-solaris
 	* sim/ucsim/avr.src/Makefile.in, sim/ucsim/hc08.src/Makefile.in,

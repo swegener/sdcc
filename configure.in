@@ -665,6 +665,7 @@ as/hc08/Makefile
 device/include/Makefile
 device/lib/Makefile
 debugger/mcs51/Makefile
+support/regression/Makefile
 Makefile.common:Makefile.common.in
 ])
 AC_OUTPUT

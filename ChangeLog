@@ -1,3 +1,15 @@
+2005-08-20 Borut Razem <borut.razem AT siol.net>
+
+	* configure, configure.in: added tests for libsocket and libnsl libraries,
+	  requred by sdcdb on sparc-solaris
+	* device/lib/pic16/Makefile.common.in: force make to use bash shell
+	* sim/ucsim/libtool: regenerated on sparc-solaris
+	* sim/ucsim/avr.src/Makefile.in, sim/ucsim/hc08.src/Makefile.in,
+	  sim/ucsim/s51.src/Makefile.in, sim/ucsim/xa.src/Makefile.in,
+	  sim/ucsim/z80.src/Makefile.in: removed GNU ld specific linker options 
+	  -Wl,--start-group and -Wl,--end-group to enable ucsim compilation on
+	  sparc-solaris, which doesn't use GNU ld linker
+
 2005-08-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peeph.def: updated comments

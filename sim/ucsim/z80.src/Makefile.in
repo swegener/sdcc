@@ -25,8 +25,7 @@ PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
 EXEEXT		= @EXEEXT@
 
-LIBS		= @LIBS@ -L$(PRJDIR) -Wl,--start-group -lutil -lcmd -lsim -lguiucsim -Wl,--end-group
-
+LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lguiucsim -lcmd -lsim
 DL		= @DL@
 dl_ok		= @dl_ok@
 

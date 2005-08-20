@@ -15,7 +15,7 @@ CP              = @CP@
 ifeq ($(shell uname -s),SunOS)
 CP_U	= $(CP)
 else
-CP_U	= $(CP) -p
+CP_U	= $(CP) -u
 endif
 
 PRJDIR		= ../..

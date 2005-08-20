@@ -9,6 +9,8 @@
 	  sim/ucsim/z80.src/Makefile.in: removed GNU ld specific linker options 
 	  -Wl,--start-group and -Wl,--end-group to enable ucsim compilation on
 	  sparc-solaris, which doesn't use GNU ld linker
+	* device/lib/Makefile.in: cp on sparc-solaris (SunOS) does not support -u option
+	* as/Makefile: find on sparc-solaris does not support -maxdepth option
 
 2005-08-19 Maarten Brock <sourceforge.brock AT dse.nl>
 

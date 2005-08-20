@@ -7326,7 +7326,7 @@ subdirs="$subdirs sim/ucsim"
 subdirs="$subdirs device/lib/pic16"
 
 
-                                                                                ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile as/mcs51/Makefile as/hc08/Makefile device/include/Makefile device/lib/Makefile debugger/mcs51/Makefile Makefile.common:Makefile.common.in"
+                                                                                          ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile as/mcs51/Makefile as/hc08/Makefile device/include/Makefile device/lib/Makefile debugger/mcs51/Makefile support/regression/Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7859,6 +7859,7 @@ do
   "device/include/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/include/Makefile" ;;
   "device/lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
   "debugger/mcs51/Makefile" ) CONFIG_FILES="$CONFIG_FILES debugger/mcs51/Makefile" ;;
+  "support/regression/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/regression/Makefile" ;;
   "Makefile.common" ) CONFIG_FILES="$CONFIG_FILES Makefile.common:Makefile.common.in" ;;
   "sdccconf.h" ) CONFIG_HEADERS="$CONFIG_HEADERS sdccconf.h:sdccconf_in.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

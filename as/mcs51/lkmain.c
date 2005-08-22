@@ -92,7 +92,7 @@ void Areas51 (void)
 
     char * rel2[]={
         "XH",
-        "H B areas 0 global symbols",
+        "H C areas 0 global symbols",
         "A _CODE size 0 flags 0",       /*Each .rel has one, so...*/
         "A REG_BANK_0 size 0 flags 4",  /*Register banks are overlayable*/
         "A REG_BANK_1 size 0 flags 4",
@@ -100,6 +100,7 @@ void Areas51 (void)
         "A REG_BANK_3 size 0 flags 4",
         "A BSEG size 0 flags 80",       /*BSEG must be just before BITS*/
         "A BSEG_BYTES size 0 flags 0",  /*Size will be obtained from BSEG in lnkarea()*/
+        "A BIT_BANK size 0 flags 4",    /*Bit register bank is overlayable*/
         "A DSEG size 0 flags 0",
         "A OSEG size 0 flags 4",
         "A ISEG size 0 flags 0",

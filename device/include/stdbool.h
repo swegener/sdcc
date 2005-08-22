@@ -28,8 +28,7 @@
 #define false 0
 #define __bool_true_false_are_defined 1
 
-#if defined (SDCC_STACK_AUTO) || defined (SDCC_hc08) || defined (SDCC_z80)
- //as long as bit/bool cannot be used reentrant
+#if defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80)
  #define BOOL char
 #else
  #define BOOL __bit

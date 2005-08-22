@@ -64,6 +64,7 @@ char *moduleName;               /* module name is same as module name base, but 
                                 /* non-alphanumeric characters replaced with underscore */
 int currRegBank = 0;
 int RegBankUsed[4] = {1, 0, 0, 0}; /*JCF: Reg Bank 0 used by default*/
+int BitBankUsed;                /* MB: overlayable bit bank */
 struct optimize optimize;
 struct options options;
 int preProcOnly = 0;
@@ -76,7 +77,7 @@ set *libPathsSet = NULL;
 set *relFilesSet = NULL;
 set *dataDirsSet = NULL;        /* list of data search directories */
 set *includeDirsSet = NULL;     /* list of include search directories */
-set *userIncDirsSet = NULL;	/* list of user include directories */
+set *userIncDirsSet = NULL;     /* list of user include directories */
 set *libDirsSet = NULL;         /* list of lib search directories */
 
 /* uncomment JAMIN_DS390 to always override and use ds390 port
@@ -175,8 +176,8 @@ optionsTable[] = {
     { 0,    OPTION_STD_SDCC89,      NULL, "Use C89 standard with SDCC extensions (default)" },
     { 0,    OPTION_STD_C99,         NULL, "Use C99 standard only (incomplete)" },
     { 0,    OPTION_STD_SDCC99,      NULL, "Use C99 standard with SDCC extensions (incomplete)" },
-    
-    { 0,    NULL,                   NULL, "Code generation options"},    
+
+    { 0,    NULL,                   NULL, "Code generation options"},
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
     { 'p',  NULL,                   NULL, "Select port specific processor e.g. -mpic14 -p16f84" },
     { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
@@ -219,7 +220,7 @@ optionsTable[] = {
     { 0,    OPTION_SHORT_IS_8BITS,  NULL, "Make short 8 bits (for old times sake)" },
     { 0,    OPTION_CODE_SEG,        NULL, "<name> use this name for the code segment" },
     { 0,    OPTION_CONST_SEG,       NULL, "<name> use this name for the const segment" },
-    
+
     { 0,    NULL,                   NULL, "Optimization options"},
     { 0,    "--nooverlay",          &options.noOverlay, "Disable overlaying leaf function auto variables" },
     { 0,    OPTION_NO_GCSE,         NULL, "Disable the GCSE optimisation" },
@@ -234,7 +235,7 @@ optionsTable[] = {
     { 0,    OPTION_PEEP_FILE,       NULL, "<file> use this extra peephole file" },
     { 0,    OPTION_OPT_CODE_SPEED,  NULL, "Optimize for code speed rather than size" },
     { 0,    OPTION_OPT_CODE_SIZE,   NULL, "Optimize for code size rather than speed" },
-        
+
     { 0,    NULL,                   NULL, "Internal debugging options"},
     { 0,    "--dumpraw",            &options.dump_raw, "Dump the internal structure after the initial parse" },
     { 0,    "--dumpgcse",           &options.dump_gcse, NULL },
@@ -246,7 +247,7 @@ optionsTable[] = {
     { 0,    "--dumptree",           &options.dump_tree, "dump front-end AST before generating iCode" },
     { 0,    OPTION_DUMP_ALL,        NULL, "Dump the internal structure at all stages" },
     { 0,    OPTION_ICODE_IN_ASM,    &options.iCodeInAsm, "include i-code as comments in the asm file"},
-    
+
     { 0,    NULL,                   NULL, "Linker options" },
     { 'l',  NULL,                   NULL, "Include the given library in the link" },
     { 'L',  NULL,                   NULL, "Add the next field to the library search path" },
@@ -267,7 +268,7 @@ optionsTable[] = {
     { 0,    OPTION_PACK_IRAM,       NULL,"MCS51/DS390 - Tells the linker to pack variables in internal ram (default)"},
     { 0,    OPTION_NO_PACK_IRAM,    &options.no_pack_iram,"MCS51/DS390 - Tells the linker not to pack variables in internal ram"},
 #endif
-    
+
     /* End of options */
     { 0,    NULL }
 };
@@ -1100,7 +1101,7 @@ parseCmdLine (int argc, char **argv)
               options.std_sdcc = 0;
               continue;
             }
-          
+
           if (strcmp (argv[i], OPTION_STD_C99) == 0)
             {
               options.std_c99 = 1;
@@ -1114,7 +1115,7 @@ parseCmdLine (int argc, char **argv)
               options.std_sdcc = 1;
               continue;
             }
-          
+
           if (strcmp (argv[i], OPTION_STD_SDCC99) == 0)
             {
               options.std_c99 = 1;

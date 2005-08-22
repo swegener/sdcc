@@ -2148,6 +2148,9 @@ resultTypePropagate (ast *tree, RESULT_TYPE resultType)
 {
   switch (tree->opval.op)
     {
+      case AND_OP:
+      case OR_OP:
+        return resultType;
       case '=':
       case '?':
       case ':':
@@ -3402,7 +3405,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           return tree;
         }
       LRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BIT) ? newBoolLink() :newCharLink();
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -3417,7 +3420,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       return tree;
 
     case GETHBIT:
-      TTYPE (tree) = TETYPE (tree) = newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BIT) ? newBoolLink() :newCharLink();
       return tree;
 
     case LEFT_OP:
@@ -3735,7 +3738,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           return tree;
         }
       LRVAL (tree) = RRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BIT) ? newBoolLink() :newCharLink();
       return tree;
 
       /*------------------------------------------------------------------*/

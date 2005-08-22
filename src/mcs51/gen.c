@@ -81,7 +81,7 @@ static unsigned short rbank = -1;
 
 #define SYM_BP(sym)   (SPEC_OCLS (sym->etype)->paged ? "_bpx" : "_bp")
 
-#define R0INB	_G.bu.bs.r0InB
+#define R0INB   _G.bu.bs.r0InB
 #define R1INB	_G.bu.bs.r1InB
 #define OPINB	_G.bu.bs.OpInB
 #define BINUSE	_G.bu.BInUse
@@ -111,7 +111,8 @@ static struct
 _G;
 
 static char *rb1regs[] = {
-    "b1_0","b1_1","b1_2","b1_3","b1_4","b1_5","b1_6","b1_7"
+    "b1_0","b1_1","b1_2","b1_3","b1_4","b1_5","b1_6","b1_7",
+    "b0",  "b1",  "b2",  "b3",  "b4",  "b5",  "b6",  "b7"
 };
 
 extern int mcs51_ptrRegReq;
@@ -205,6 +206,24 @@ mova (const char *x)
 }
 
 /*-----------------------------------------------------------------*/
+/* movc - moves specified value into the carry                     */
+/*-----------------------------------------------------------------*/
+static void
+movc (const char *s)
+{
+  if (s == zero)
+    CLRC;
+  else if (s == one)
+    SETC;
+  else if (strcmp (s, "c"))
+    {/* it's not in carry already */
+      MOVA (s);
+      /* set C, if a >= 1 */
+      emitcode ("add", "a,#0xff");
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* pushB - saves register B if necessary                           */
 /*-----------------------------------------------------------------*/
 static bool
@@ -239,6 +258,42 @@ popB (bool pushedB)
     {
       OPINB--;
     }
+}
+
+/*-----------------------------------------------------------------*/
+/* pushReg - saves register                                        */
+/*-----------------------------------------------------------------*/
+static bool
+pushReg (int index, bool bits_pushed)
+{
+  regs * reg = mcs51_regWithIdx (index);
+  if (reg->type == REG_BIT)
+    {
+      if (!bits_pushed)
+        emitcode ("push", "%s", reg->base);
+      return TRUE;
+    }
+  else
+    emitcode ("push", "%s", reg->dname);
+  return bits_pushed;
+}
+
+/*-----------------------------------------------------------------*/
+/* popReg - restores register                                      */
+/*-----------------------------------------------------------------*/
+static bool
+popReg (int index, bool bits_popped)
+{
+  regs * reg = mcs51_regWithIdx (index);
+  if (reg->type == REG_BIT)
+    {
+      if (!bits_popped)
+        emitcode ("pop", "%s", reg->base);
+      return TRUE;
+    }
+  else
+    emitcode ("pop", "%s", reg->dname);
+  return bits_popped;
 }
 
 /*-----------------------------------------------------------------*/
@@ -761,8 +816,10 @@ sameRegs (asmop * aop1, asmop * aop2)
   if (aop1 == aop2)
     return TRUE;
 
-  if (aop1->type != AOP_REG ||
-      aop2->type != AOP_REG)
+  if (aop1->type != AOP_REG && aop1->type != AOP_CRY)
+    return FALSE;
+
+  if (aop1->type != aop2->type)
     return FALSE;
 
   if (aop1->size != aop2->size)
@@ -886,6 +943,16 @@ aopOp (operand * op, iCode * ic, bool result)
       /* else must be a dummy iTemp */
       sym->aop = op->aop = aop = newAsmop (AOP_DUMMY);
       aop->size = getSize (sym->type);
+      return;
+    }
+
+  /* if the type is a bit register */
+  if (sym->regType == REG_BIT)
+    {
+      sym->aop = op->aop = aop = newAsmop (AOP_CRY);
+      aop->size = sym->nRegs;//1???
+      aop->aopu.aop_reg[0] = sym->regs[0];
+      aop->aopu.aop_dir = sym->regs[0]->name;
       return;
     }
 
@@ -1450,7 +1517,7 @@ aopPut (operand * result, const char *s, int offset, bool bvolatile)
             emitcode ("setb", "%s", aop->aopu.aop_dir);
           else if (!strcmp (s, "c"))
             emitcode ("mov", "%s,c", aop->aopu.aop_dir);
-          else
+          else if (strcmp (s, aop->aopu.aop_dir))
             {
               MOVA (s);
               /* set C, if a >= 1 */
@@ -1918,8 +1985,15 @@ saveRegisters (iCode * lic)
 
       if (count == 1)
         {
-          i = bitVectFirstBit (rsave);
-          emitcode ("mov", "a,%s", mcs51_regWithIdx (i)->name);
+          regs * reg = mcs51_regWithIdx (bitVectFirstBit (rsave));
+          if (reg->type == REG_BIT)
+            {
+              emitcode ("mov", "a,%s", reg->base);
+            }
+          else
+            {
+              emitcode ("mov", "a,%s", reg->name);
+            }
           emitcode ("mov", "r0,%s", spname);
           emitcode ("inc", "%s", spname);// allocate before use
           emitcode ("movx", "@r0,a");
@@ -1928,6 +2002,17 @@ saveRegisters (iCode * lic)
         }
       else if (count != 0)
         {
+          bitVect *rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), rsave);
+          int nBits = bitVectnBitsOn (rsavebits);
+
+          if (nBits != 0)
+            {
+              count = count - nBits + 1;
+              /* remove all but the first bits as they are pushed all at once */
+              rsave = bitVectCplAnd (rsave, rsavebits);
+              rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
+            }
+
           if (bitVectBitValue (rsave, R0_IDX))
             {
               emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
@@ -1940,14 +2025,19 @@ saveRegisters (iCode * lic)
             {
               if (bitVectBitValue (rsave, i))
                 {
+                  regs * reg = mcs51_regWithIdx (i);
                   if (i == R0_IDX)
                     {
                       emitcode ("pop", "acc");
                       emitcode ("push", "acc");
                     }
+                  else if (reg->type == REG_BIT)
+                    {
+                      emitcode ("mov", "a,%s", reg->base);
+                    }
                   else
                     {
-                      emitcode ("mov", "a,%s", mcs51_regWithIdx (i)->name);
+                      emitcode ("mov", "a,%s", reg->name);
                     }
                   emitcode ("movx", "@r0,a");
                   if (--count)
@@ -1963,10 +2053,15 @@ saveRegisters (iCode * lic)
         }
     }
   else
+    {
+      bool bits_pushed = FALSE;
     for (i = 0; i < mcs51_nRegs; i++)
       {
         if (bitVectBitValue (rsave, i))
-          emitcode ("push", "%s", mcs51_regWithIdx (i)->dname);
+            {
+              bits_pushed = pushReg (i, bits_pushed);
+            }
+        }
       }
 }
 
@@ -1990,26 +2085,53 @@ unsaveRegisters (iCode * ic)
 
       if (count == 1)
         {
+          regs * reg = mcs51_regWithIdx (bitVectFirstBit (rsave));
           emitcode ("mov", "r0,%s", spname);
           emitcode ("dec", "r0");
           emitcode ("movx", "a,@r0");
-          i = bitVectFirstBit (rsave);
-          emitcode ("mov", "%s,a", mcs51_regWithIdx (i)->name);
+          if (reg->type == REG_BIT)
+            {
+              emitcode ("mov", "%s,a", reg->base);
+            }
+          else
+            {
+              emitcode ("mov", "%s,a", reg->name);
+            }
           emitcode ("dec", "%s", spname);
         }
       else if (count != 0)
         {
+          bitVect *rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), rsave);
+          int nBits = bitVectnBitsOn (rsavebits);
+
+          if (nBits != 0)
+            {
+              count = count - nBits + 1;
+              /* remove all but the first bits as they are popped all at once */
+              rsave = bitVectCplAnd (rsave, rsavebits);
+              rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
+            }
+
           emitcode ("mov", "r0,%s", spname);
           for (i = mcs51_nRegs; i >= 0; i--)
             {
               if (bitVectBitValue (rsave, i))
                 {
+                  regs * reg = mcs51_regWithIdx (i);
                   emitcode ("dec", "r0");
                   emitcode ("movx", "a,@r0");
-                  if (i != R0_IDX)
-                    emitcode ("mov", "%s,a", mcs51_regWithIdx (i)->name);
+                  if (i == R0_IDX)
+                    {
+                      emitcode ("push", "acc");
+                    }
+                  else if (reg->type == REG_BIT)
+                    {
+                      emitcode ("mov", "%s,a", reg->base);
+                    }
                   else
-                    emitcode ("push", "acc");
+                    {
+                      emitcode ("mov", "%s,a", reg->name);
+                    }
                 }
             }
           emitcode ("mov", "%s,r0", spname);
@@ -2020,10 +2142,15 @@ unsaveRegisters (iCode * ic)
         }
     }
   else
+    {
+      bool bits_popped = FALSE;
     for (i = mcs51_nRegs; i >= 0; i--)
       {
         if (bitVectBitValue (rsave, i))
-          emitcode ("pop", "%s", mcs51_regWithIdx (i)->dname);
+            {
+              bits_popped = popReg (i, bits_popped);
+            }
+        }
       }
 }
 
@@ -2056,11 +2183,17 @@ pushSide (operand * oper, int size)
 /* assignResultValue - also indicates if acc is in use afterwards  */
 /*-----------------------------------------------------------------*/
 static bool
-assignResultValue (operand * oper)
+assignResultValue (operand * oper, operand * func)
 {
   int offset = 0;
   int size = AOP_SIZE (oper);
   bool accuse = FALSE;
+
+  if (func && IS_BIT (OP_SYM_ETYPE (func)))
+    {
+      outBitC (oper);
+      return FALSE;
+    }
 
   while (size--)
     {
@@ -2123,6 +2256,7 @@ genIpush (iCode * ic)
 {
   int size, offset = 0;
   char *l;
+  char *prev = "";
 
   D(emitcode (";     genIpush",""));
 
@@ -2151,7 +2285,7 @@ genIpush (iCode * ic)
       return;
     }
 
-  /* this is a paramter push: in this case we call
+  /* this is a parameter push: in this case we call
      the routine to find the call and save those
      registers that need to be saved */
   saveRegisters (ic);
@@ -2177,11 +2311,15 @@ genIpush (iCode * ic)
           AOP_TYPE (IC_LEFT (ic)) != AOP_DIR &&
           strcmp (l, "a"))
         {
+          if (strcmp (l, prev) || *l == '@')
           MOVA (l);
           emitcode ("push", "acc");
         }
       else
+        {
           emitcode ("push", "%s", l);
+        }
+      prev = l;
     }
 
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
@@ -2355,27 +2493,78 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
 static void genSend(set *sendSet)
 {
     iCode *sic;
-    int rb1_count = 0 ;
+  int bit_count = 0;
 
+  /* first we do all bit parameters */
     for (sic = setFirstItem (sendSet); sic;
-         sic = setNextItem (sendSet)) {
+       sic = setNextItem (sendSet))
+    {
+      aopOp (IC_LEFT (sic), sic, FALSE);
+
+      if (sic->argreg > 12)
+        {
+          int bit = sic->argreg-13;
+
+          /* if left is a literal then
+             we know what the value is */
+          if (AOP_TYPE (IC_LEFT (sic)) == AOP_LIT)
+            {
+              if (((int) operandLitValue (IC_LEFT (sic))))
+                  emitcode ("setb", "b[%d]", bit);
+              else
+                  emitcode ("clr", "b[%d]", bit);
+            }
+          else if (AOP_TYPE (IC_LEFT (sic)) == AOP_CRY)
+            {
+              char *l = AOP (IC_LEFT (sic))->aopu.aop_dir;
+                if (strcmp (l, "c"))
+                    emitcode ("mov", "c,%s", l);
+                emitcode ("mov", "b[%d],c", bit);
+            }
+          else
+            {
+              /* we need to or */
+              toBoolean (IC_LEFT (sic));
+              /* set C, if a >= 1 */
+              emitcode ("add", "a,#0xff");
+              emitcode ("mov", "b[%d],c", bit);
+            }
+          bit_count++;
+        }
+      freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
+    }
+
+  if (bit_count)
+    {
+      saveRegisters (setFirstItem (sendSet));
+      emitcode ("mov", "bits,b");
+    }
+
+  /* then we do all other parameters */
+  for (sic = setFirstItem (sendSet); sic;
+       sic = setNextItem (sendSet))
+    {
           int size, offset = 0;
           aopOp (IC_LEFT (sic), sic, FALSE);
           size = AOP_SIZE (IC_LEFT (sic));
 
-          if (sic->argreg == 1) {
-              while (size--) {
-                  char *l = aopGet (IC_LEFT (sic), offset,
-                                    FALSE, FALSE);
+      if (sic->argreg == 1)
+        {
+          while (size--)
+            {
+              char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
                   if (strcmp (l, fReturn[offset]))
                       emitcode ("mov", "%s,%s", fReturn[offset], l);
                   offset++;
               }
-              rb1_count = 0;
-          } else {
-              while (size--) {
-                  emitcode ("mov","b1_%d,%s",rb1_count++,
-                            aopGet (IC_LEFT (sic), offset++,FALSE, FALSE));
+        }
+      else if (sic->argreg <= 12)
+        {
+          while (size--)
+            {
+              emitcode ("mov","%s,%s", rb1regs[sic->argreg+offset-5],
+                        aopGet (IC_LEFT (sic), offset,FALSE, FALSE));
+              offset++;
               }
           }
           freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
@@ -2393,6 +2582,7 @@ genCall (iCode * ic)
   bool swapBanks = FALSE;
   bool accuse = FALSE;
   bool accPushed = FALSE;
+  bool resultInF0 = FALSE;
 
   D(emitcode(";     genCall",""));
 
@@ -2458,12 +2648,24 @@ genCall (iCode * ic)
 
   if (swapBanks)
   {
-       emitcode ("mov", "psw,#0x%02x",
-          ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
-  }
+      /* if result is in carry */
+      if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
+        {
+          emitcode ("anl", "psw,#0xE7");
+          if (FUNC_REGBANK(currFunc->type))
+            emitcode ("orl", "psw,#0x%02x",
+                ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
+        }
+      else
+        {
+           emitcode ("mov", "psw,#0x%02x",
+               ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
+        }
+    }
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
+       !IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
         OP_SYMBOL (IC_RESULT (ic))->accuse ||
         OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
@@ -2474,7 +2676,7 @@ genCall (iCode * ic)
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
 
-      accuse = assignResultValue (IC_RESULT (ic));
+      accuse = assignResultValue (IC_RESULT (ic), IC_LEFT (ic));
 
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
     }
@@ -2489,6 +2691,12 @@ genCall (iCode * ic)
             {
               emitcode ("push", "acc");
               accPushed = TRUE;
+            }
+          if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))) &&
+              IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))))
+            {
+              emitcode ("mov", "F0,c");
+              resultInF0 = TRUE;
             }
 
           emitcode ("mov", "a,%s", spname);
@@ -2508,7 +2716,7 @@ genCall (iCode * ic)
           emitcode ("dec", "%s", spname);
     }
 
-  /* if we hade saved some registers then unsave them */
+  /* if we had saved some registers then unsave them */
   if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
     {
       if (accuse && !accPushed && options.useXstack)
@@ -2523,6 +2731,16 @@ genCall (iCode * ic)
 //  /* if register bank was saved then pop them */
 //  if (restoreBank)
 //    unsaveRBank (FUNC_REGBANK (dtype), ic, FALSE);
+
+  if (IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))))
+    {
+      if (resultInF0)
+          emitcode ("mov", "c,F0");
+
+      aopOp (IC_RESULT (ic), ic, FALSE);
+      assignResultValue (IC_RESULT (ic), IC_LEFT (ic));
+      freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+    }
 
   if (accPushed)
     emitcode ("pop", "acc");
@@ -2692,7 +2910,7 @@ genPcall (iCode * ic)
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
 
-      assignResultValue (IC_RESULT (ic));
+      assignResultValue (IC_RESULT (ic), IC_LEFT (ic));
 
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
     }
@@ -2810,15 +3028,18 @@ genFunction (iCode * ic)
       rbank = FUNC_REGBANK (ftype);
       for (i = 0; i < mcs51_nRegs; i++)
         {
-          if (strcmp (regs8051[i].base, "0") == 0)
-            emitcode ("", "%s = 0x%02x",
-                      regs8051[i].dname,
-                      8 * rbank + regs8051[i].offset);
-          else
-            emitcode ("", "%s = %s + 0x%02x",
-                      regs8051[i].dname,
-                      regs8051[i].base,
-                      8 * rbank + regs8051[i].offset);
+          if (regs8051[i].type != REG_BIT)
+            {
+              if (strcmp (regs8051[i].base, "0") == 0)
+                emitcode ("", "%s = 0x%02x",
+                          regs8051[i].dname,
+                          8 * rbank + regs8051[i].offset);
+              else
+                emitcode ("", "%s = %s + 0x%02x",
+                          regs8051[i].dname,
+                          regs8051[i].base,
+                          8 * rbank + regs8051[i].offset);
+            }
         }
     }
 
@@ -2851,11 +3072,12 @@ genFunction (iCode * ic)
               /* if any registers used */
               if (sym->regsUsed)
                 {
+                  bool bits_pushed = FALSE;
                   /* save the registers used */
                   for (i = 0; i < sym->regsUsed->size; i++)
                     {
                       if (bitVectBitValue (sym->regsUsed, i))
-                        emitcode ("push", "%s", mcs51_regWithIdx (i)->dname);
+                        bits_pushed = pushReg (i, bits_pushed);
                     }
                 }
             }
@@ -2987,6 +3209,7 @@ genFunction (iCode * ic)
           /* if any registers used */
           if (sym->regsUsed)
             {
+              bool bits_pushed = FALSE;
               /* save the registers used */
               for (i = 0; i < sym->regsUsed->size; i++)
                 {
@@ -2995,7 +3218,7 @@ genFunction (iCode * ic)
                       /* remember one saved register for later usage */
                       if (calleesaves_saved_register < 0)
                         calleesaves_saved_register = i;
-                      emitcode ("push", "%s", mcs51_regWithIdx (i)->dname);
+                      bits_pushed = pushReg (i, bits_pushed);
                       _G.nRegsSaved++;
                     }
                 }
@@ -3207,8 +3430,18 @@ genEndFunction (iCode * ic)
 
   if (IFFUNC_ISCRITICAL (sym->type))
     {
-      emitcode ("pop", "psw"); /* restore ea via c in psw */
-      emitcode ("mov", "ea,c");
+      if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
+        {
+          emitcode ("rlc", "a");   /* save c in a */
+          emitcode ("pop", "psw"); /* restore ea via c in psw */
+          emitcode ("mov", "ea,c");
+          emitcode ("rrc", "a");   /* restore c from a */
+        }
+      else
+        {
+          emitcode ("pop", "psw"); /* restore ea via c in psw */
+          emitcode ("mov", "ea,c");
+        }
     }
 
   if ((IFFUNC_ISREENT (sym->type) || options.stackAuto))
@@ -3269,11 +3502,12 @@ genEndFunction (iCode * ic)
               /* if any registers used */
               if (sym->regsUsed)
                 {
+                  bool bits_popped = FALSE;
                   /* save the registers used */
                   for (i = sym->regsUsed->size; i >= 0; i--)
                     {
                       if (bitVectBitValue (sym->regsUsed, i))
-                        emitcode ("pop", "%s", mcs51_regWithIdx (i)->dname);
+                        bits_popped = popReg (i, bits_popped);
                     }
                 }
             }
@@ -3491,6 +3725,13 @@ genRet (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE);
   size = AOP_SIZE (IC_LEFT (ic));
 
+
+  if (IS_BIT(_G.currentFunc->etype))
+    {
+      movc (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
+      size = 0;
+    }
+
   while (size--)
     {
       char *l;
@@ -3511,16 +3752,13 @@ genRet (iCode * ic)
         }
     }
 
-  if (pushed)
+  while (pushed)
     {
-      while (pushed)
-        {
-          pushed--;
-          if (strcmp (fReturn[pushed], "a"))
-            emitcode ("pop", fReturn[pushed]);
-          else
-            emitcode ("pop", "acc");
-        }
+      pushed--;
+      if (strcmp (fReturn[pushed], "a"))
+        emitcode ("pop", fReturn[pushed]);
+      else
+        emitcode ("pop", "acc");
     }
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 
@@ -9803,6 +10041,7 @@ genIfx (iCode * ic, iCode * popIc)
 {
   operand *cond = IC_COND (ic);
   int isbit = 0;
+  char *dup = NULL;
 
   D(emitcode (";     genIfx",""));
 
@@ -9812,8 +10051,12 @@ genIfx (iCode * ic, iCode * popIc)
   if (AOP_TYPE (cond) != AOP_CRY)
     toBoolean (cond);
   else
-    isbit = 1;
-  /* the result is now in the accumulator */
+    {
+      isbit = 1;
+      if (AOP(cond)->aopu.aop_dir)
+        dup = Safe_strdup(AOP(cond)->aopu.aop_dir);
+    }
+  /* the result is now in the accumulator or a directly addressable bit */
   freeAsmop (cond, NULL, ic, TRUE);
 
   /* if there was something to be popped then do it */
@@ -9821,7 +10064,9 @@ genIfx (iCode * ic, iCode * popIc)
     genIpop (popIc);
 
   /* if the condition is a bit variable */
-  if (isbit && IS_ITEMP (cond) && SPIL_LOC (cond))
+  if (isbit && dup)
+    genIfxJump(ic, dup, NULL, NULL, NULL);
+  else if (isbit && IS_ITEMP (cond) && SPIL_LOC (cond))
     genIfxJump (ic, SPIL_LOC (cond)->rname, NULL, NULL, NULL);
   else if (isbit && !IS_ITEMP (cond))
     genIfxJump (ic, OP_SYMBOL (cond)->rname, NULL, NULL, NULL);
@@ -10422,6 +10667,7 @@ genReceive (iCode * ic)
 {
     int size = getSize (operandType (IC_RESULT (ic)));
     int offset = 0;
+
   D(emitcode (";     genReceive",""));
 
   if (ic->argreg == 1) { /* first parameter */
@@ -10487,7 +10733,7 @@ genReceive (iCode * ic)
           _G.accInUse++;
           aopOp (IC_RESULT (ic), ic, FALSE);
           _G.accInUse--;
-          assignResultValue (IC_RESULT (ic));
+          assignResultValue (IC_RESULT (ic), NULL);
       }
   } else { /* second receive onwards */
       int rb1off ;

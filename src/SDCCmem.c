@@ -663,9 +663,9 @@ allocLocal (symbol * sym)
     }
 
   /* if this is a bit variable and no storage class */
-  if (SPEC_NOUN (sym->etype) == V_BIT
-      && (SPEC_SCLS (sym->etype) == S_BIT))
+  if (SPEC_NOUN (sym->etype) == V_BIT)
     {
+      SPEC_SCLS (sym->etype) = S_BIT;
       SPEC_OCLS (sym->etype) = bit;
       allocIntoSeg (sym);
       return;

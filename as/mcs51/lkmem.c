@@ -143,7 +143,11 @@ int summary(struct area * areap)
         }
         else if (EQ(xp->a_id, "BSEG_BYTES"))
         {
-            Ram[4].Size=xp->a_size;
+            Ram[4].Size+=xp->a_size;
+        }
+        else if (EQ(xp->a_id, "BIT_BANK"))
+        {
+            Ram[4].Size+=xp->a_size;
         }
 
         else if(xp->a_flag & A_CODE)
@@ -479,7 +483,7 @@ int summary2(struct area * areap)
         if(j%16==0) fprintf(of, "\n0x%02x:|", j);
         fprintf(of, "%c|", idatamap[j]);
     }
-    fprintf(of, "\n0-3:Reg Banks, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack\n");
+    fprintf(of, "\n0-3:Reg Banks, T:Bit regs, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack\n");
 
     for(j=0; j<256; j++)
     {

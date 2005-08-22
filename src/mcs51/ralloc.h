@@ -31,6 +31,8 @@ enum
   {
     R2_IDX = 0, R3_IDX, R4_IDX, R5_IDX,
     R6_IDX, R7_IDX, R0_IDX,  R1_IDX,
+    B0_IDX, B1_IDX, B2_IDX,  B3_IDX,
+    B4_IDX, B5_IDX, B6_IDX,  B7_IDX,
     X8_IDX, X9_IDX, X10_IDX, X11_IDX,
     X12_IDX, CND_IDX,
     DPL_IDX, DPH_IDX, B_IDX, A_IDX,
@@ -61,5 +63,6 @@ extern regs regs8051[];
 regs *mcs51_regWithIdx (int);
 
 bitVect *mcs51_rUmaskForOp (operand * op);
+bitVect *mcs51_allBitregs (void);
 
 #endif

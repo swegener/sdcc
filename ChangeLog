@@ -1,3 +1,82 @@
+2005-08-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/asdata.c: changed ctype['['] to BINOP
+	* as/mcs51/asexpr.c (expr): added case '[' for bit access in bdata,
+	  (term): abused bit 15 of s_addr to indicate bit-addressable bytes,
+	  (oprio): set priority for '['
+	* as/mcs51/aslink.h: added define R_BIT, and prototypes for adb_bit
+	   and adb_24_bit
+	* as/mcs51/asm.h: added defines R_BIT and S_BIT
+	* as/mcs51/lkarea.c (lnksect2): use T for seg BIT_BANK and overlay it
+	* as/mcs51/lkdata.c: changed ctype['['] to BINOP
+	* as/mcs51/lkmain.c (Areas51): rel2 contains 12 (=C) areas now,
+	  added overlayable BIT_BANK area
+	* as/mcs51/lkmem.c (summary): add BIT_BANK to BSEG_BYTES in the report,
+	  (summary2): explain 'T' in legenda
+	* as/mcs51/lkrloc.c: replaced old K&R style,
+	  (relr): added R_BIT processing,
+	  (errmsg): added "Bit-addressable relocation error",
+	  (adb_bit): added for converting from byte- to bit-addressable space,
+	  (adb_24_bit): added for converting from byte- to bit-addressable space
+	* device/include/stdbool.h: changed BOOL to __bit for mcs51 as it can be
+	   used in reentrant functions now even as return value
+	* device/lib/_gptrput.c (_gptrput): removed obsolete code
+	* src/SDCCast.c (resultTypePropagate): also propagate AND_OP and OR_OP,
+	  (decorateType): case '!', GETHBIT, AND_OP, OR_OP: result in bool or char
+	* src/SDCCglobl.h: added indicator BitBankUsed
+	* src/SDCCglue.c (glue): emit area BIT_BANK with byte 'bits' and equ's for
+	   the bit registers b0-b7
+	* src/SDCCicode.c (operandFromSymbol): removed IS_BITVAR check,
+	  (geniCodeCast): fixed bug 1263853,
+	  (geniCodeLogicAndOr): put result in bool or char,
+	  (geniCodeReceive): added parameter func for accessing the return type,
+	  (geniCodeFunctionBody): pass func to geniCodeReceive
+	* src/SDCCmain.c: added indicator BitBankUsed
+	* src/SDCCmem.c (allocLocal): explicitly set sclass for V_BIT
+	* src/SDCCsymt.c (newBoolLink): added for creating a bool/bit,
+	  (checkSClass): don't put automatic bool/bit on stack,
+	  (checkFunction): removed check on function cannot return bit
+	* src/SDCCsymt.h: added newBoolLink prototype
+	* src/mcs51/gen.c (rb1regs): added bit registers,
+	  (movc): created for assigning to carry,
+	  (pushReg, popReg): created for pushing registers,
+	  (sameRegs): check both AOP_REG and AOP_CRY types,
+	  (aopOp): handle bit registers,
+	  (aopPut): optimization no self-assign,
+	  (saveRegisters): push reg->base (bits) only once for bit registers,
+	   and use pushReg,
+	  (unsaveRegisters): pop reg->base only once and use popReg,
+	  (assignResultValue): added parameter func and return in carry for bits,
+	  (genIpush): optimization no reload in A if not changed,
+	  (genSend): bit parameters in reentrant functions are passed in bit
+	   registers by first assigning to bits in B, then save registers and
+	   copy B to bits,
+	  (genCall): handle returning in Carry properly, save it in F0 if needed,
+	  (genPcall): updated assignResultValue call, this is not safe yet for bit
+	   returning function !!!
+	  (genFunction): don't generate equ's for bit registers and use pushReg,
+	  (genEndFunction): take care of bit returning functions and use popReg,
+	  (genRet): return bit in Carry,
+	  (genIfx): optimize bit registers and other directly addressable bits,
+	  (genReceive): updated assignResultValue call
+	* src/mcs51/main.c (_mcs51_reset_regparm): added regBitParmFlg,
+	  (_mcs51_regparm): allow passing of upto 8 bit parameters in bit
+	   registers when using stack-auto
+	* src/mcs51/ralloc.c (_G): added allBitregs,
+	  (regs8051): added the bit registers,
+	  (createStackSpil): use macro IS_BIT,
+	  (getRegBit): added to allocate a bit register, else spill,
+	  (getRegBitNoSpil): added to allocate a bit register, else a gpr,
+	  (updateRegUsage): factored out to ease stepping while debugging,
+	  (serialRegAssign): use updateRegUsage, only spill bits if necessary,
+	   also allocate bit registers,
+	  (fillGaps): handle bit registers,
+	  (findAllBitregs): added to create bit vector with all bit registers,
+	  (mcs51_allBitregs): returns this bit vector,
+	  (mcs51_assignRegisters): when using stack-auto use bit registers for
+	   passing parameters and creating local variables
+	* src/mcs51/ralloc.h: added B0_IDX..B7_IDX and prototype mcs51_allBitregs
+
 2005-08-22 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in: replaced find option -or with -o
@@ -18,7 +97,7 @@
 	* sim/ucsim/libtool: regenerated on sparc-solaris
 	* sim/ucsim/avr.src/Makefile.in, sim/ucsim/hc08.src/Makefile.in,
 	  sim/ucsim/s51.src/Makefile.in, sim/ucsim/xa.src/Makefile.in,
-	  sim/ucsim/z80.src/Makefile.in: removed GNU ld specific linker options 
+	  sim/ucsim/z80.src/Makefile.in: removed GNU ld specific linker options
 	  -Wl,--start-group and -Wl,--end-group to enable ucsim compilation on
 	  sparc-solaris, which doesn't use GNU ld linker
 	* device/lib/Makefile.in: cp on sparc-solaris (SunOS) does not support -u option

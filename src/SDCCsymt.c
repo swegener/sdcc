@@ -782,6 +782,20 @@ newIntLink ()
 }
 
 /*------------------------------------------------------------------*/
+/* newBoolLink() - creates an bool type                             */
+/*------------------------------------------------------------------*/
+sym_link *
+newBoolLink ()
+{
+  sym_link *p;
+
+  p = newLink (SPECIFIER);
+  SPEC_NOUN (p) = V_BIT;
+
+  return p;
+}
+
+/*------------------------------------------------------------------*/
 /* getSize - returns size of a type chain in bits                   */
 /*------------------------------------------------------------------*/
 unsigned int 
@@ -1478,16 +1492,18 @@ checkSClass (symbol * sym, int isProto)
 
   /* if this is an automatic symbol */
   if (sym->level && (options.stackAuto || reentrant)) {
-    if ((SPEC_SCLS (sym->etype) == S_AUTO ||
-         SPEC_SCLS (sym->etype) == S_FIXED ||
-         SPEC_SCLS (sym->etype) == S_REGISTER ||
-         SPEC_SCLS (sym->etype) == S_STACK ||
-         SPEC_SCLS (sym->etype) == S_XSTACK)) {
-      SPEC_SCLS (sym->etype) = S_AUTO;
-    } else {
-      /* storage class may only be specified for statics */
-      if (!IS_STATIC(sym->etype)) {
-        werror (E_AUTO_ASSUMED, sym->name);
+    if (SPEC_SCLS (sym->etype) != S_BIT) {
+      if ((SPEC_SCLS (sym->etype) == S_AUTO ||
+           SPEC_SCLS (sym->etype) == S_FIXED ||
+           SPEC_SCLS (sym->etype) == S_REGISTER ||
+           SPEC_SCLS (sym->etype) == S_STACK ||
+           SPEC_SCLS (sym->etype) == S_XSTACK)) {
+        SPEC_SCLS (sym->etype) = S_AUTO;
+      } else {
+        /* storage class may only be specified for statics */
+        if (!IS_STATIC(sym->etype)) {
+          werror (E_AUTO_ASSUMED, sym->name);
+        }
       }
     }
   }
@@ -2338,13 +2354,6 @@ checkFunction (symbol * sym, symbol *csym)
   if (IS_AGGREGATE (sym->type->next))
     {
       werror (E_FUNC_AGGR, sym->name);
-      return 0;
-    }
-
-  /* function cannot return bit */
-  if (IS_BITVAR (sym->type->next))
-    {
-      werror (E_FUNC_BIT, sym->name);
       return 0;
     }
 

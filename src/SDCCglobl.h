@@ -288,6 +288,7 @@ extern int reentrant;           /* /X flag has been sent     SDCC.y */
 extern char buffer[PATH_MAX * 2];/* general buffer           SDCCmain.c   */
 extern int currRegBank;         /* register bank being used  SDCCgens.c   */
 extern int RegBankUsed[4];      /* JCF: register banks used  SDCCmain.c   */
+extern int BitBankUsed;         /* MB: overlayable bit bank  SDCCmain.c   */
 extern struct symbol *currFunc; /* current function    SDCCgens.c */
 extern int cNestLevel;          /* block nest level  SDCCval.c      */
 extern int currBlockno;         /* sequentail block number */

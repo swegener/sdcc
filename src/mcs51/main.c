@@ -53,6 +53,7 @@ static char *_mcs51_keywords[] =
 void mcs51_assignRegisters (ebbIndex *);
 
 static int regParmFlg = 0;      /* determine if we can register a parameter */
+static int regBitParmFlg = 0;   /* determine if we can register a bit parameter */
 
 static void
 _mcs51_init (void)
@@ -64,13 +65,20 @@ static void
 _mcs51_reset_regparm (void)
 {
   regParmFlg = 0;
+  regBitParmFlg = 0;
 }
 
 static int
 _mcs51_regparm (sym_link * l)
 {
-    if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
+    if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT)) {
+        /* bit parameters go to b0 thru b7 */
+        if (options.stackAuto && (regBitParmFlg < 8)) {
+            regBitParmFlg++;
+            return 12 + regBitParmFlg;
+        }
         return 0;
+    }
     if (options.parms_in_bank1 == 0) {
         /* simple can pass only the first parameter in a register */
         if (regParmFlg)
@@ -712,7 +720,7 @@ PORT mcs51_port =
     1, 2, 2, 4, 1, 2, 3, 1, 4, 4
   },
   {
-    "XSTK    (PAG,XDATA)",	// xstack_name
+    "XSTK    (PAG,XDATA)",      // xstack_name
     "STACK   (DATA)",		// istack_name
     "CSEG    (CODE)",		// code_name
     "DSEG    (DATA)",		// data_name

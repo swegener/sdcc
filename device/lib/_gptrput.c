@@ -70,9 +70,6 @@ _gptrput (char *gptr, char c) _naked
  pdataptr$:
         movx    @r0,a                                   ; 1
         sjmp    dataptrrestore$                         ; 2
-        mov     r0,dph ; restore r0                     ; 2
-        mov     dph,#0 ; restore dph                    ; 2
-        ret                                             ; 1
     ;
     ;   store into far space
     ;

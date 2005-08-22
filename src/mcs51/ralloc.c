@@ -51,6 +51,7 @@ static struct
     bitVect *funcrUsed;         /* registers used in a function */
     int stackExtend;
     int dataExtend;
+    bitVect *allBitregs;        /* all bit registers */
   }
 _G;
 
@@ -69,6 +70,14 @@ regs regs8051[] =
   {REG_GPR, R7_IDX,  REG_GPR, "r7",  "ar7", "0",    7, 1},
   {REG_PTR, R0_IDX,  REG_PTR, "r0",  "ar0", "0",    0, 1},
   {REG_PTR, R1_IDX,  REG_PTR, "r1",  "ar1", "0",    1, 1},
+  {REG_BIT, B0_IDX,  REG_BIT, "b0",  "b0",  "bits", 0, 1},
+  {REG_BIT, B1_IDX,  REG_BIT, "b1",  "b1",  "bits", 1, 1},
+  {REG_BIT, B2_IDX,  REG_BIT, "b2",  "b2",  "bits", 2, 1},
+  {REG_BIT, B3_IDX,  REG_BIT, "b3",  "b3",  "bits", 3, 1},
+  {REG_BIT, B4_IDX,  REG_BIT, "b4",  "b4",  "bits", 4, 1},
+  {REG_BIT, B5_IDX,  REG_BIT, "b5",  "b5",  "bits", 5, 1},
+  {REG_BIT, B6_IDX,  REG_BIT, "b6",  "b6",  "bits", 6, 1},
+  {REG_BIT, B7_IDX,  REG_BIT, "b7",  "b7",  "bits", 7, 1},
   {REG_GPR, X8_IDX,  REG_GPR, "x8",  "x8",  "xreg", 0, 1},
   {REG_GPR, X9_IDX,  REG_GPR, "x9",  "x9",  "xreg", 1, 1},
   {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 1},
@@ -80,7 +89,7 @@ regs regs8051[] =
   {0,       B_IDX,   0,       "b",   "b",   "0xf0", 0, 0},
   {0,       A_IDX,   0,       "a",   "acc", "0xe0", 0, 0},
 };
-int mcs51_nRegs = 17;
+int mcs51_nRegs = 16;
 static void spillThis (symbol *);
 static void freeAllRegs ();
 
@@ -505,7 +514,7 @@ createStackSpil (symbol * sym)
   /* set the type to the spilling symbol */
   sloc->type = copyLinkChain (sym->type);
   sloc->etype = getSpec (sloc->type);
-  if (SPEC_SCLS (sloc->etype) != S_BIT)
+  if (!IS_BIT (sloc->etype))
     {
       SPEC_SCLS (sloc->etype) = S_DATA;
     }
@@ -866,6 +875,21 @@ tryAgain:
 }
 
 /*-----------------------------------------------------------------*/
+/* getRegBit - will try for Bit if not spill this                  */
+/*-----------------------------------------------------------------*/
+static regs *getRegBit (symbol * sym)
+{
+  regs *reg;
+
+  /* try for a bit type */
+  if ((reg = allocReg (REG_BIT)))
+    return reg;
+
+  spillThis (sym);
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* getRegPtrNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
 static regs *getRegPtrNoSpil()
@@ -907,6 +931,27 @@ static regs *getRegGprNoSpil()
 }
 
 /*-----------------------------------------------------------------*/
+/* getRegBitNoSpil - get it cannot be spilt                        */
+/*-----------------------------------------------------------------*/
+static regs *getRegBitNoSpil()
+{
+  regs *reg;
+
+  /* try for a ptr type */
+  if ((reg = allocReg (REG_BIT)))
+    return reg;
+
+  /* try for gpr type */
+  if ((reg = allocReg (REG_GPR)))
+    return reg;
+
+  assert(0);
+
+  /* just to make the compiler happy */
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* symHasReg - symbol has a given register                         */
 /*-----------------------------------------------------------------*/
 static bool
@@ -919,6 +964,28 @@ symHasReg (symbol * sym, regs * reg)
       return TRUE;
 
   return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* updateRegUsage -  update the registers in use at the start of   */
+/*                   this icode                                    */
+/*-----------------------------------------------------------------*/
+static void
+updateRegUsage (iCode * ic)
+{
+  int reg;
+
+  for (reg=0; reg<mcs51_nRegs; reg++)
+    {
+      if (regs8051[reg].isFree)
+        {
+          ic->riu &= ~(1<<regs8051[reg].offset);
+        }
+      else
+        {
+          ic->riu |= (1<<regs8051[reg].offset);
+        }
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1178,18 +1245,8 @@ serialRegAssign (eBBlock ** ebbs, int count)
       /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-#if 1
-            int reg;
+            updateRegUsage(ic);
 
-            // update the registers in use at the start of this icode
-            for (reg=0; reg<mcs51_nRegs; reg++) {
-              if (regs8051[reg].isFree) {
-                ic->riu &= ~(1<<regs8051[reg].offset);
-              } else {
-                ic->riu |= (1<<regs8051[reg].offset);
-              }
-            }
-#endif
             /* if this is an ipop that means some live
                range will have to be assigned again */
             if (ic->op == IPOP)
@@ -1246,10 +1303,11 @@ serialRegAssign (eBBlock ** ebbs, int count)
                     continue;
                 }
 
+                willCS = willCauseSpill (sym->nRegs, sym->regType);
                 /* if this is a bit variable then don't use precious registers
                    along with expensive bit-to-char conversions but just spill
                    it */
-                if (SPEC_NOUN(sym->etype) == V_BIT) {
+                if (willCS && SPEC_NOUN(sym->etype) == V_BIT) {
                     spillThis (sym);
                     continue;
                 }
@@ -1258,7 +1316,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
                    a spill and there is nothing to spill
                    or this one is rematerializable then
                    spill this one */
-                willCS = willCauseSpill (sym->nRegs, sym->regType);
                 spillable = computeSpillable (ic);
                 if (sym->remat || (willCS && bitVectIsZero (spillable))) {
                     spillThis (sym);
@@ -1323,13 +1380,15 @@ serialRegAssign (eBBlock ** ebbs, int count)
                     sym->regs[j] = NULL;
                     if (sym->regType == REG_PTR)
                         sym->regs[j] = getRegPtr (ic, ebbs[i], sym);
+                    else if (sym->regType == REG_BIT)
+                        sym->regs[j] = getRegBit (sym);
                     else
                       {
                         if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)))
                           {
                             symbol * right = OP_SYMBOL (IC_RIGHT (ic));
 
-                            if (right->regs[j])
+                            if (right->regs[j] && (right->regType != REG_BIT))
                               sym->regs[j] = allocThisReg (right->regs[j]);
                           }
                         if (!sym->regs[j])
@@ -1468,6 +1527,8 @@ static void fillGaps()
         for (i=0; i < sym->nRegs ; i++ ) {
             if (sym->regType == REG_PTR)
                 sym->regs[i] = getRegPtrNoSpil ();
+            else if (sym->regType == REG_BIT)
+                sym->regs[i] = getRegBitNoSpil ();
             else
               {
                 sym->regs[i] = NULL;
@@ -1574,6 +1635,33 @@ static void fillGaps()
         sym->usl.spillLoc->allocreq--;
         freeAllRegs();
     }
+}
+
+/*-----------------------------------------------------------------*/
+/* findAllBitregs :- returns bit vector of all bit registers       */
+/*-----------------------------------------------------------------*/
+static bitVect *
+findAllBitregs (void)
+{
+  bitVect *rmask = newBitVect (mcs51_nRegs);
+  int j;
+
+  for (j = 0; j < mcs51_nRegs; j++)
+    {
+      if (regs8051[j].type == REG_BIT)
+        rmask = bitVectSetBit (rmask, regs8051[j].rIdx);
+    }
+
+  return rmask;
+}
+
+/*-----------------------------------------------------------------*/
+/* mcs51_allBitregs :- returns bit vector of all bit registers     */
+/*-----------------------------------------------------------------*/
+bitVect *
+mcs51_allBitregs (void)
+{
+  return _G.allBitregs;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2365,7 +2453,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   /* this routine will mark the a symbol as used in one
      instruction use only && if the defintion is local
      (ie. within the basic block) && has only one definition &&
-     that definiion is either a return value from a
+     that definition is either a return value from a
      function or does not contain any variables in
      far space */
   if (bitVectnBitsOn (OP_USES (op)) > 1)
@@ -3144,7 +3232,17 @@ mcs51_assignRegisters (ebbIndex * ebbi)
   setToNull ((void *) &_G.regAssigned);
   setToNull ((void *) &_G.totRegAssigned);
   mcs51_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
+  if (options.stackAuto)
+    {
+      mcs51_nRegs = 16;
+      BitBankUsed = 1;
+    }
+  else
+    {
   mcs51_nRegs = 8;
+    }
+  _G.allBitregs = findAllBitregs ();
+
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */

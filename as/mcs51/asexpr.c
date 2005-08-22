@@ -1,4 +1,4 @@
-        /* asexpr.c */
+/* asexpr.c */
 
 /*
  * (C) Copyright 1989-1995
@@ -88,7 +88,7 @@ expr(register struct expr *esp, int n)
         term(esp);
         while (ctype[c = getnb()] & BINOP) {
                 /*
-                 * Handle binary operators + - * / & | % ^ << >>
+                 * Handle binary operators + - * / & | % ^ << >> [
                  */
                 if ((p = oprio(c)) <= n)
                         break;
@@ -217,6 +217,21 @@ expr(register struct expr *esp, int n)
                             abscheck(esp);
                             esp->e_addr >>= re.e_addr;
                             break;
+                        case '[':
+                            /* MB added [ for bit access in bdata */
+                            abscheck(&re);
+                            if (getnb() != ']')
+                                qerr();
+
+                            /* if the left is a relative address then */
+                            if (esp->e_base.e_ap) {
+                                esp->e_addr |= (re.e_addr | 0x80) << 8;
+                                break;
+                            }
+                            else if ((esp->e_addr & 0x87) == 0x80) {
+                                esp->e_addr |= re.e_addr;
+                                break;
+                            }
 
                        default:
                            qerr();
@@ -505,6 +520,11 @@ term(register struct expr *esp)
                         esp->e_mode = sp->s_type;
                         esp->e_addr = sp->s_addr;
                         esp->e_base.e_ap = sp->s_area;
+                        /* MB: abused bit 15 of s_addr to indicate bit-addressable bytes */
+                        if ((sp->s_addr & 0x8000) && sp->s_area &&
+                            (!strcmp(sp->s_area->a_id, "BSEG_BYTES") || !strcmp(sp->s_area->a_id, "BIT_BANK"))) {
+                                esp->e_rlcf |= R_BIT | R_BYT2;
+                        }
                 }
                 return;
         }
@@ -658,6 +678,8 @@ is_abs (register struct expr *esp)
 int
 oprio(register int c)
 {
+        if (c == '[')
+                return (12);
         if (c == '*' || c == '/' || c == '%')
                 return (10);
         if (c == '+' || c == '-')

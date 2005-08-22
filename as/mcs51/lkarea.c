@@ -647,6 +647,8 @@ void lnksect2 (struct area *tap, int rloc)
             fchar='3';
         else if(!strcmp(tap->a_id, "BSEG_BYTES"))
             fchar='B';
+        else if(!strcmp(tap->a_id, "BIT_BANK"))
+            fchar='T';
         else
             fchar=' ';/*???*/
     }
@@ -737,6 +739,69 @@ void lnksect2 (struct area *tap, int rloc)
                }
 
                 for(j=0; j<ramlimit; j++)
+                {
+                    if (idatamap[j]==fchar)
+                    {
+                        addr=j;
+                        tap->a_addr=addr;
+                        taxp->a_addr=addr;
+                        break;
+                    }
+                }
+            }
+            else if (fchar=='T') /*Bit addressable bytes in internal RAM*/
+            {
+                /*Find the size of the space currently used for this areax overlay*/
+                for(j=0x20, size=0; j<0x30; j++)
+                    if(idatamap[j]==fchar) size++;
+
+                /*If more space required, release the previously allocated areax in
+                internal RAM and search for a bigger one*/
+                if((int)taxp->a_size>size)
+                {
+                    size=(int)taxp->a_size;
+
+                    for(j=0x20; j<0x30; j++)
+                        if(idatamap[j]==fchar) idatamap[j]=' ';
+
+                    /*Search for a space large enough in data memory for this overlay areax*/
+                    for(j=0x20, k=0; j<0x30; j++)
+                    {
+                        if(idatamap[j]==' ')
+                            k++;
+                        else
+                            k=0;
+                        if(k==(int)taxp->a_size) break;
+                    }
+
+                    if(k==(int)taxp->a_size)
+                    {
+                        taxp->a_addr = j-k+1;
+                        if(addr<(unsigned int)0x30)
+                        {
+                            for(j=0x2F; (j>=0x20)&&(idatamap[j]==' '); j--);
+                            if(j>=0x20) addr=j+1;
+                        }
+                    }
+
+                    /*Mark the memory used for overlay*/
+                    if(k==(int)taxp->a_size)
+                    {
+                        for(j=taxp->a_addr; (j<(int)(taxp->a_addr+taxp->a_size)) && (j<0x30); j++)
+                            idatamap[j]=fchar;
+
+                        /*Set the new size of the data memory area*/
+                        size=ramlimit-addr;
+                    }
+                    else /*Couldn't find a chunk big enough: report the problem.*/
+                    {
+                        tap->a_unaloc=taxp->a_size;
+                        fprintf(stderr, ErrMsg, taxp->a_size, taxp->a_size>1?"s":"", tap->a_id);
+                        lkerr++;
+                    }
+                }
+
+                for(j=0x20; j<0x30; j++)
                 {
                     if (idatamap[j]==fchar)
                     {

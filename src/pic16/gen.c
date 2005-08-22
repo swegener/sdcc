@@ -3003,7 +3003,7 @@ static void pushSide(operand * oper, int size)
 
 void pic16_loadFromReturn(operand *op, int offset, pCodeOp *src)
 {
-  if(AOP(op)->aopu.pcop->type == PO_IMMEDIATE) {
+  if((AOP(op)->type == AOP_PCODE) && (AOP(op)->aopu.pcop->type == PO_IMMEDIATE)) {
     pic16_emitpcode(POC_MOVFW, src);
     pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(op), offset));
   } else {

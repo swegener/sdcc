@@ -1,3 +1,8 @@
+2005-08-22 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_loadFromReturn): added check for AOP_PCODE,
+	  fixes #1265442 (crash on Solaris)
+
 2005-08-20 Borut Razem <borut.razem AT siol.net>
 
 	* configure, configure.in: added tests for libsocket and libnsl libraries,

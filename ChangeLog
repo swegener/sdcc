@@ -1,3 +1,8 @@
+2005-08-23 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCopt.c (convertToFcall): fixed modulus with divisors 1 and
+	ffffffffu
+
 2005-08-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/aslink.h: completed lkrloc.c prototypes

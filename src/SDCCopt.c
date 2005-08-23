@@ -802,8 +802,16 @@ convertToFcall (eBBlock ** ebbs, int count)
           if (ic->op == '%' && isOperandLiteral(IC_RIGHT(ic)) &&
               IS_UNSIGNED(operandType(IC_LEFT(ic))))
             {
-              unsigned litVal = abs((int)operandLitValue(IC_RIGHT(ic)));
+              unsigned litVal = fabs(operandLitValue(IC_RIGHT(ic)));
 
+              /* modulo by 1: no remainder */
+              if (litVal == 1)
+                {
+                  ic->op = '=';
+                  IC_RIGHT (ic) = operandFromLit(0);
+                  IC_LEFT (ic) = NULL;
+                  continue;
+                }
               // See if literal value is a power of 2.
               while (litVal && !(litVal & 1))
                 {

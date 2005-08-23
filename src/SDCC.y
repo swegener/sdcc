@@ -602,59 +602,59 @@ type_specifier
    ;
 
 type_specifier2
-   : CHAR   {
-               $$=newLink(SPECIFIER);
-               SPEC_NOUN($$) = V_CHAR  ;
-	       ignoreTypedefType = 1;
-            }
-   | SHORT  {
-               $$=newLink(SPECIFIER);
-	       $$->select.s._short = 1 ;
-	       ignoreTypedefType = 1;
-            }
-   | INT    {
-               $$=newLink(SPECIFIER);
-               SPEC_NOUN($$) = V_INT   ;
-	       ignoreTypedefType = 1;
-            }
-   | LONG   {
-               $$=newLink(SPECIFIER);
-	       SPEC_LONG($$) = 1       ;
-	       ignoreTypedefType = 1;
-            }
-   | SIGNED {
-               $$=newLink(SPECIFIER);
-               $$->select.s._signed = 1;
-	       ignoreTypedefType = 1;
-            }
+   : CHAR      {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_CHAR  ;
+                  ignoreTypedefType = 1;
+               }
+   | SHORT     {
+                  $$=newLink(SPECIFIER);
+                  SPEC_SHORT($$) = 1 ;
+                  ignoreTypedefType = 1;
+               }
+   | INT       {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_INT   ;
+                  ignoreTypedefType = 1;
+               }
+   | LONG      {
+                  $$=newLink(SPECIFIER);
+                  SPEC_LONG($$) = 1       ;
+                  ignoreTypedefType = 1;
+               }
+   | SIGNED    {
+                  $$=newLink(SPECIFIER);
+                  $$->select.s.b_signed = 1;
+                  ignoreTypedefType = 1;
+               }
    | UNSIGNED  {
-               $$=newLink(SPECIFIER);
-               SPEC_USIGN($$) = 1      ;
-	       ignoreTypedefType = 1;
-            }
-   | VOID   {
-               $$=newLink(SPECIFIER);
-               SPEC_NOUN($$) = V_VOID  ;
-	       ignoreTypedefType = 1;
-            }
-   | CONST  {
-               $$=newLink(SPECIFIER);
-	       SPEC_CONST($$) = 1;
-            }
+                  $$=newLink(SPECIFIER);
+                  SPEC_USIGN($$) = 1      ;
+                  ignoreTypedefType = 1;
+               }
+   | VOID      {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_VOID  ;
+                  ignoreTypedefType = 1;
+               }
+   | CONST     {
+                  $$=newLink(SPECIFIER);
+                  SPEC_CONST($$) = 1;
+               }
    | VOLATILE  {
-               $$=newLink(SPECIFIER);
-	       SPEC_VOLATILE($$) = 1 ;
-            }
-   | FLOAT  {
-               $$=newLink(SPECIFIER);
-	       SPEC_NOUN($$) = V_FLOAT;
-	       ignoreTypedefType = 1;
-            }
-   | FIXED16X16  {
-               $$=newLink(SPECIFIER);
-	       SPEC_NOUN($$) = V_FIXED16X16;
-	       ignoreTypedefType = 1;
-            }
+                  $$=newLink(SPECIFIER);
+                  SPEC_VOLATILE($$) = 1 ;
+               }
+   | FLOAT     {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_FLOAT;
+                  ignoreTypedefType = 1;
+               }
+   | FIXED16X16 {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_FIXED16X16;
+                  ignoreTypedefType = 1;
+               }
    | XDATA     {
                   $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_XDATA  ;
@@ -663,7 +663,7 @@ type_specifier2
                   $$ = newLink (SPECIFIER) ;
                   SPEC_SCLS($$) = S_CODE ;                 
                }
-   | EEPROM      {
+   | EEPROM    {
                   $$ = newLink (SPECIFIER) ;
                   SPEC_SCLS($$) = S_EEPROM ;
                }
@@ -679,19 +679,19 @@ type_specifier2
                   $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_PDATA  ;
                }
-   | BIT    {
-               $$=newLink(SPECIFIER);
-               SPEC_NOUN($$) = V_BIT   ;
-	       SPEC_SCLS($$) = S_BIT   ;
-	       SPEC_BLEN($$) = 1;
-	       SPEC_BSTR($$) = 0;
-	       ignoreTypedefType = 1;
-            }
+   | BIT       {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_BIT   ;
+                  SPEC_SCLS($$) = S_BIT   ;
+                  SPEC_BLEN($$) = 1;
+                  SPEC_BSTR($$) = 0;
+                  ignoreTypedefType = 1;
+               }
 
    | struct_or_union_specifier  {
                                    uselessDecl = FALSE;
                                    $$ = $1 ;
-	                           ignoreTypedefType = 1;
+                                   ignoreTypedefType = 1;
                                 }
    | enum_specifier     {                           
                            cenum = NULL ;
@@ -705,7 +705,7 @@ type_specifier2
             sym_link   *p  ;
             sym = findSym(TypedefTab,NULL,$1) ;
             $$ = p = copyLinkChain(sym->type);
-	    SPEC_TYPEDEF(getSpec(p)) = 0;
+            SPEC_TYPEDEF(getSpec(p)) = 0;
             ignoreTypedefType = 1;
          }
    | sfr_reg_bit
@@ -716,9 +716,9 @@ sfr_reg_bit
                $$ = newLink(SPECIFIER) ;
                SPEC_NOUN($$) = V_SBIT;
                SPEC_SCLS($$) = S_SBIT;
-	       SPEC_BLEN($$) = 1;
-	       SPEC_BSTR($$) = 0;
-	       ignoreTypedefType = 1;
+               SPEC_BLEN($$) = 1;
+               SPEC_BSTR($$) = 0;
+               ignoreTypedefType = 1;
             }
    |  sfr_attributes
    ;
@@ -730,7 +730,7 @@ sfr_attributes
                SPEC_NOUN($$)    = V_CHAR;
                SPEC_SCLS($$)    = S_SFR ;
                SPEC_USIGN($$)   = 1 ;
-	       ignoreTypedefType = 1;
+               ignoreTypedefType = 1;
             }
    | SFR BANKED {
                $$ = newLink(SPECIFIER) ;
@@ -738,7 +738,7 @@ sfr_attributes
                SPEC_NOUN($$)    = V_CHAR;
                SPEC_SCLS($$)    = S_SFR ;
                SPEC_USIGN($$)   = 1 ;
-	       ignoreTypedefType = 1;
+               ignoreTypedefType = 1;
             }
    ;
 

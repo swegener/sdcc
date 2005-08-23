@@ -532,7 +532,7 @@ value *constVal (char *s)
   }
 
   /* Setup the flags first */
-  /* set the _long flag if 'lL' is found */
+  /* set the b_long flag if 'lL' is found */
   if (strchr (s, 'l') || strchr (s, 'L')) {
     SPEC_NOUN (val->type) = V_INT;
     SPEC_LONG (val->type) = 1;

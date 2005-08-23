@@ -133,18 +133,18 @@ typedef struct specifier
     NOUN noun;                          /* CHAR INT STRUCTURE LABEL   */
     STORAGE_CLASS sclass;               /* REGISTER,AUTO,FIX,CONSTANT */
     struct memmap *oclass;              /* output storage class       */
-    unsigned _long:1;                   /* 1=long                     */
-    unsigned _short:1;                  /* 1=short int                */
-    unsigned _unsigned:1;               /* 1=unsigned, 0=signed       */
-    unsigned _signed:1;                 /* just for sanity checks only*/
-    unsigned _static:1;                 /* 1=static keyword found     */
-    unsigned _extern:1;                 /* 1=extern found             */
-    unsigned _absadr:1;                 /* absolute address specfied  */
-    unsigned _volatile:1;               /* is marked as volatile      */
-    unsigned _const:1;                  /* is a constant              */
-    unsigned _typedef:1;                /* is typedefed               */
-    unsigned _isregparm:1;              /* is the first parameter     */
-    unsigned _isenum:1;                 /* is an enumerated type      */
+    unsigned b_long:1;                  /* 1=long                     */
+    unsigned b_short:1;                 /* 1=short int                */
+    unsigned b_unsigned:1;              /* 1=unsigned, 0=signed       */
+    unsigned b_signed:1;                /* just for sanity checks only*/
+    unsigned b_static:1;                /* 1=static keyword found     */
+    unsigned b_extern:1;                /* 1=extern found             */
+    unsigned b_absadr:1;                /* absolute address specfied  */
+    unsigned b_volatile:1;              /* is marked as volatile      */
+    unsigned b_const:1;                 /* is a constant              */
+    unsigned b_typedef:1;               /* is typedefed               */
+    unsigned b_isregparm:1;             /* is the first parameter     */
+    unsigned b_isenum:1;                /* is an enumerated type      */
     unsigned _addr;                     /* address of symbol          */
     unsigned _stack;                    /* stack offset for stacked v */
     unsigned _bitStart;                 /* bit start position         */
@@ -389,16 +389,16 @@ extern sym_link *validateLink(sym_link  *l,
   IFFUNC_BANKED(x)))
 
 #define SPEC_NOUN(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.noun
-#define SPEC_LONG(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s._long
-#define SPEC_SHORT(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s._short
-#define SPEC_USIGN(x) validateLink(x, "SPEC_USIGN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._unsigned
+#define SPEC_LONG(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_long
+#define SPEC_SHORT(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_short
+#define SPEC_USIGN(x) validateLink(x, "SPEC_USIGN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_unsigned
 #define SPEC_SCLS(x) validateLink(x, "SPEC_SCLS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.sclass
-#define SPEC_ENUM(x) validateLink(x, "SPEC_ENUM", #x, SPECIFIER, __FILE__, __LINE__)->select.s._isenum
+#define SPEC_ENUM(x) validateLink(x, "SPEC_ENUM", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_isenum
 #define SPEC_OCLS(x) validateLink(x, "SPEC_OCLS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.oclass
-#define SPEC_STAT(x) validateLink(x, "SPEC_STAT", #x, SPECIFIER, __FILE__, __LINE__)->select.s._static
-#define SPEC_EXTR(x) validateLink(x, "SPEC_EXTR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._extern
+#define SPEC_STAT(x) validateLink(x, "SPEC_STAT", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_static
+#define SPEC_EXTR(x) validateLink(x, "SPEC_EXTR", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_extern
 #define SPEC_CODE(x) validateLink(x, "SPEC_CODE", #x, SPECIFIER, __FILE__, __LINE__)->select.s._codesg
-#define SPEC_ABSA(x) validateLink(x, "SPEC_ABSA", #x, SPECIFIER, __FILE__, __LINE__)->select.s._absadr
+#define SPEC_ABSA(x) validateLink(x, "SPEC_ABSA", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_absadr
 #define SPEC_BANK(x) validateLink(x, "SPEC_BANK", #x, SPECIFIER, __FILE__, __LINE__)->select.s._regbank
 #define SPEC_ADDR(x) validateLink(x, "SPEC_ADDR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._addr
 #define SPEC_STAK(x) validateLink(x, "SPEC_STAK", #x, SPECIFIER, __FILE__, __LINE__)->select.s._stack
@@ -412,11 +412,11 @@ extern sym_link *validateLink(sym_link  *l,
  * _bitStart field instead of defining a new field.
  */
 #define SPEC_ISR_SAVED_BANKS(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitStart
-#define SPEC_VOLATILE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._volatile
-#define SPEC_CONST(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._const
+#define SPEC_VOLATILE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_volatile
+#define SPEC_CONST(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_const
 #define SPEC_STRUCT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.v_struct
-#define SPEC_TYPEDEF(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._typedef
-#define SPEC_REGPARM(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._isregparm
+#define SPEC_TYPEDEF(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_typedef
+#define SPEC_REGPARM(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_isregparm
 #define SPEC_ARGREG(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.argreg
 
 /* type check macros */
@@ -438,25 +438,25 @@ extern sym_link *validateLink(sym_link  *l,
 #define IS_GENPTR(x) (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
 #define IS_FUNCPTR(x) (IS_DECL(x) && (DCL_TYPE(x) == CPOINTER || DCL_TYPE(x) == GPOINTER) && IS_FUNC(x->next))
 #define IS_FUNC(x)   (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
-#define IS_LONG(x)   (IS_SPEC(x) && x->select.s._long)
-#define IS_UNSIGNED(x) (IS_SPEC(x) && x->select.s._unsigned)
-#define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s._typedef)
+#define IS_LONG(x)   (IS_SPEC(x) && x->select.s.b_long)
+#define IS_UNSIGNED(x) (IS_SPEC(x) && x->select.s.b_unsigned)
+#define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s.b_typedef)
 #define IS_CONSTANT(x)  (!x ? 0 : \
                            IS_SPEC(x) ? \
-                           x->select.s._const : \
+                           x->select.s.b_const : \
                            x->select.d.ptr_const)
 #define IS_STRUCT(x) (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
-#define IS_ABSOLUTE(x)  (IS_SPEC(x) && x->select.s._absadr )
+#define IS_ABSOLUTE(x)  (IS_SPEC(x) && x->select.s.b_absadr )
 #define IS_REGISTER(x)  (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
 #define IS_RENT(x)   (IS_SPEC(x) && x->select.s._reent )
 #define IS_STATIC(x) (IS_SPEC(x) && SPEC_STAT(x))
 #define IS_INT(x)    (IS_SPEC(x) && x->select.s.noun == V_INT)
 #define IS_VOID(x)   (IS_SPEC(x) && x->select.s.noun == V_VOID)
 #define IS_CHAR(x)   (IS_SPEC(x) && x->select.s.noun == V_CHAR)
-#define IS_EXTERN(x)    (IS_SPEC(x) && x->select.s._extern)
+#define IS_EXTERN(x)    (IS_SPEC(x) && x->select.s.b_extern)
 #define IS_VOLATILE(x)  (!x ? 0 : \
                            IS_SPEC(x) ? \
-                           x->select.s._volatile : \
+                           x->select.s.b_volatile : \
                            x->select.d.ptr_volatile)
 #define IS_INTEGRAL(x) (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
                                        x->select.s.noun == V_CHAR || \

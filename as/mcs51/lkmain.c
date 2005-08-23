@@ -509,7 +509,7 @@ lkexit(int i)
 VOID
 link_main()
 {
-    register int c;
+    register char c;
 
     if ((c=endline()) == 0) { return; }
     switch (c) {

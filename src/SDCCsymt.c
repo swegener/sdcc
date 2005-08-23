@@ -43,7 +43,7 @@ char *nounName(sym_link *sl) {
     {
     case V_INT: {
       if (SPEC_LONG(sl)) return "long";
-      if (sl->select.s._short) return "short";
+      if (SPEC_SHORT(sl)) return "short";
       return "int";
     }
     case V_FLOAT: return "float";
@@ -545,7 +545,7 @@ void checkTypeSanity(sym_link *etype, char *name) {
        SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE || 
        SPEC_NOUN(etype)==V_VOID) &&
-      (etype->select.s._short || SPEC_LONG(etype))) {
+      (SPEC_SHORT(etype) || SPEC_LONG(etype))) {
     // long or short for char float double or void
     werror (E_LONG_OR_SHORT_INVALID, noun, name);
   }
@@ -553,15 +553,15 @@ void checkTypeSanity(sym_link *etype, char *name) {
        SPEC_NOUN(etype)==V_FIXED16X16 ||
        SPEC_NOUN(etype)==V_DOUBLE || 
        SPEC_NOUN(etype)==V_VOID) && 
-      (etype->select.s._signed || SPEC_USIGN(etype))) {
+      (etype->select.s.b_signed || SPEC_USIGN(etype))) {
     // signed or unsigned for float double or void
     werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
   }
 
   // special case for "short"
-  if (etype->select.s._short) {
+  if (SPEC_SHORT(etype)) {
     SPEC_NOUN(etype) = options.shortis8bits ? V_CHAR : V_INT;
-    etype->select.s._short = 0;
+    SPEC_SHORT(etype) = 0;
   }
 
   /* if no noun e.g. 
@@ -575,15 +575,15 @@ void checkTypeSanity(sym_link *etype, char *name) {
   /* a "plain" int bitfield is unsigned */
   if (SPEC_NOUN(etype)==V_BIT ||
       SPEC_NOUN(etype)==V_SBIT) {
-    if (!etype->select.s._signed)
+    if (!etype->select.s.b_signed)
       SPEC_USIGN(etype) = 1;
   }
 
-  if (etype->select.s._signed && SPEC_USIGN(etype)) {
+  if (etype->select.s.b_signed && SPEC_USIGN(etype)) {
     // signed AND unsigned 
     werror (E_SIGNED_AND_UNSIGNED_INVALID, noun, name);
   }
-  if (etype->select.s._short && SPEC_LONG(etype)) {
+  if (SPEC_SHORT(etype) && SPEC_LONG(etype)) {
     // short AND long
     werror (E_LONG_AND_SHORT_INVALID, noun, name);
   }
@@ -645,9 +645,9 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   // but there are more important thing right now
 
   SPEC_LONG (dest) |= SPEC_LONG (src);
-  dest->select.s._short|=src->select.s._short;
+  SPEC_SHORT(dest) |= SPEC_SHORT(src);
   SPEC_USIGN (dest) |= SPEC_USIGN (src);
-  dest->select.s._signed|=src->select.s._signed;
+  dest->select.s.b_signed|=src->select.s.b_signed;
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
   SPEC_CONST(dest) |= SPEC_CONST (src);
@@ -1814,7 +1814,7 @@ computeType (sym_link * type1, sym_link * type2,
   reType = getSpec (rType);
 
   /* avoid conflicting types */
-  reType->select.s._signed = 0;
+  reType->select.s.b_signed = 0;
 
   /* if result is a literal then make not so */
   if (IS_LITERAL (reType))

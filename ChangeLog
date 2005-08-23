@@ -1,3 +1,14 @@
+2005-08-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/aslink.h: completed lkrloc.c prototypes
+	* as/mcs51/lkmain.c (link_main): fixed warning
+	* device/include/stdbool.h: ds390 has no advanced bit support yet
+	* src/SDCC.y: use SPEC_SHORT and renamed _signed to b_signed
+	* src/SDCCsymt.c: use SPEC_SHORT and renamed _signed to b_signed
+	* src/SDCCsymt.h (struct specifier): renamed _xxx bitfields to b_xxx
+	  and updated their macros
+	* src/SDCCval.c (constVal): updated comment for renamed b_long
+
 2005-08-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/asdata.c: changed ctype['['] to BINOP

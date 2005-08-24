@@ -8,7 +8,9 @@ clean:
 	rm -f *.dump*
 	rm -rf build
 	for model in $(MODELS); do \
-	  find $$model -maxdepth 1 -type f ! -name Makefile -exec rm {} \; ; \
+	  if [ -d $$model ]; then \
+	    cd $$model && for name in *; do if [ -f $$name -a $$name != Makefile ]; then rm $$name; fi; done; \
+	  fi; \
 	done
 	make -C mcs51 clean
 	make -C ds390 clean

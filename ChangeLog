@@ -1,3 +1,7 @@
+2005-08-24 Borut Razem <borut.razem AT siol.net>
+
+	* clean.mk, device/lib/clean.mk: find on sparc-solaris does not support -maxdepth option
+
 2005-08-23 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCopt.c (convertToFcall): fixed modulus with divisors 1 and

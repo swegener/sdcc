@@ -12,6 +12,7 @@ CPP		= @CPP@
 CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
+STRIP		= @STRIP@
 
 PRJDIR		= ..
 
@@ -64,7 +65,8 @@ all: checkconf otherlibs avr.src
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s savr$(EXEEXT) $(DESTDIR)$(bindir)
+	$(INSTALL) savr$(EXEEXT) $(DESTDIR)$(bindir)/savr$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/savr$(EXEEXT)
 
 
 # Deleting all the installed files

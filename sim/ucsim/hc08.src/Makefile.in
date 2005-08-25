@@ -12,6 +12,7 @@ CPP		= @CPP@
 CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
+STRIP		= @STRIP@
 
 PRJDIR		= ..
 
@@ -66,7 +67,8 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s shc08$(EXEEXT) $(DESTDIR)$(bindir)
+	$(INSTALL) shc08$(EXEEXT) $(DESTDIR)$(bindir)/shc08$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/shc08$(EXEEXT)
 
 
 # Deleting all the installed files

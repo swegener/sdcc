@@ -4,6 +4,7 @@ SHELL		= /bin/sh
 CXX		= @CXX@
 CXXCPP		= @CXXCPP@
 INSTALL		= @INSTALL@
+STRIP		= @STRIP@
 CP		= /bin/cp
 
 PRJDIR		= ../..
@@ -50,7 +51,8 @@ endif
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s serialview$(EXEEXT) $(DESTDIR)$(bindir)
+	$(INSTALL) serialview$(EXEEXT) $(DESTDIR)$(bindir)/serialview$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/serialview$(EXEEXT)
 
 
 # Deleting all the installed files

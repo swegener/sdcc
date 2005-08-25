@@ -68,7 +68,8 @@ all: checkconf otherlibs s51.src
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) -s s51$(EXEEXT) $(DESTDIR)$(bindir)
+	$(INSTALL) s51$(EXEEXT) $(DESTDIR)$(bindir)/s51$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/s51$(EXEEXT)
 
 
 # Deleting all the installed files

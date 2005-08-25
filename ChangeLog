@@ -1,3 +1,12 @@
+2005-08-25 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/gui.src/serio.src/Makefile.in,
+	  sim/ucsim/s51.src/Makefile.in, sim/ucsim/avr.src/Makefile.in,
+	  sim/ucsim/z80.src/Makefile.in, sim/ucsim/hc08.src/Makefile.in,
+	  sim/ucsim/xa.src/Makefile.in: install -s changed to 2 steps:
+	  install and strip, since the strip at /usr/ccs/bin should be used
+	  on solaris
+
 2005-08-24 Borut Razem <borut.razem AT siol.net>
 
 	* clean.mk, device/lib/clean.mk: find on sparc-solaris does not support -maxdepth option

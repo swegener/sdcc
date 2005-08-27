@@ -1,3 +1,9 @@
+2005-08-27 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/Makefile.in: cp on sparc-solaris (SunOS) and on
+	ppc-osx (Darwin) does not support -u option. It seems that it is
+	supported only on Linux - GNU cp
+
 2005-08-25 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/gui.src/serio.src/Makefile.in,

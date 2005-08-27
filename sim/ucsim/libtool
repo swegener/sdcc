@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 # libtool - Provide generalized library-building support services.
 # Generated automatically by  (GNU  0.5.4)
@@ -35,10 +35,10 @@ if test "X${CDPATH+set}" = Xset; then CDPATH=:; export CDPATH; fi
 
 # ### BEGIN LIBTOOL CONFIG
 
-# Libtool was configured on host sparc-solaris1:
+# Libtool was configured on host toto.private.network:
 
 # Shell to use when invoking shell scripts.
-SHELL="/bin/bash"
+SHELL="/bin/sh"
 
 # Whether or not to build shared libraries.
 build_libtool_libs=yes
@@ -47,14 +47,14 @@ build_libtool_libs=yes
 build_old_libs=yes
 
 # Whether or not to add -lc for building shared libraries.
-build_libtool_need_lc=yes
+build_libtool_need_lc=no
 
 # Whether or not to optimize for fast installation.
-fast_install=needless
+fast_install=yes
 
 # The host system.
 host_alias=
-host=sparc-sun-solaris2.9
+host=x86_64-unknown-linux-gnu
 
 # An echo program that does not interpret backslashes.
 echo="echo"
@@ -70,19 +70,19 @@ CC="gcc"
 with_gcc=yes
 
 # The linker used to build libraries.
-LD="/usr/ccs/bin/ld"
+LD="/usr/bin/ld"
 
 # Whether we need hard or soft links.
 LN_S="ln -s"
 
 # A BSD-compatible nm program.
-NM="/usr/local/bin/nm -B"
+NM="/usr/bin/nm -B"
 
 # A symbol stripping program
 STRIP=strip
 
 # Used to examine libraries when file_magic_cmd begins "file"
-MAGIC_CMD=file
+MAGIC_CMD=/usr/bin/file
 
 # Used on cygwin: DLL creation program.
 DLLTOOL="dlltool"
@@ -147,10 +147,10 @@ link_static_flag="-static"
 no_builtin_flag=" -fno-builtin"
 
 # Compiler flag to allow reflexive dlopens.
-export_dynamic_flag_spec=""
+export_dynamic_flag_spec="\${wl}--export-dynamic"
 
 # Compiler flag to generate shared objects directly from archives.
-whole_archive_flag_spec="-z allextract\$convenience -z defaultextract"
+whole_archive_flag_spec="\${wl}--whole-archive\$convenience \${wl}--no-whole-archive"
 
 # Compiler flag to generate thread-safe objects.
 thread_safe_flag_spec=""
@@ -181,10 +181,9 @@ old_archive_from_new_cmds=""
 old_archive_from_expsyms_cmds=""
 
 # Commands used to build and install a shared archive.
-archive_cmds="\$LD -G\${allow_undefined_flag} -h \$soname -o \$lib \$libobjs \$deplibs \$linker_flags"
-archive_expsym_cmds="\$echo \\\"{ global:\\\" > \$lib.exp~cat \$export_symbols | sed -e \\\"s/\\\\(.*\\\\)/\\\\1;/\\\" >> \$lib.exp~\$echo \\\"local: *; };\\\" >> \$lib.exp~
-		\$LD -G\${allow_undefined_flag} -M \$lib.exp -h \$soname -o \$lib \$libobjs \$deplibs \$linker_flags~\$rm \$lib.exp"
-postinstall_cmds="chmod +x \$lib"
+archive_cmds="\$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-soname \$wl\$soname -o \$lib"
+archive_expsym_cmds="\$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-soname \$wl\$soname \${wl}-retain-symbols-file \$wl\$export_symbols -o \$lib"
+postinstall_cmds=""
 postuninstall_cmds=""
 
 # Commands to strip libraries.
@@ -192,7 +191,7 @@ old_striplib="strip --strip-debug"
 striplib="strip --strip-unneeded"
 
 # Method to check whether dependent libraries are shared objects.
-deplibs_check_method="pass_all"
+deplibs_check_method="file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )"
 
 # Command to use when deplibs_check_method == file_magic.
 file_magic_cmd="\$MAGIC_CMD"
@@ -201,10 +200,10 @@ file_magic_cmd="\$MAGIC_CMD"
 allow_undefined_flag=""
 
 # Flag that forces no undefined symbols.
-no_undefined_flag=" -z defs"
+no_undefined_flag=""
 
 # Commands used to finish a libtool library installation in a directory.
-finish_cmds=""
+finish_cmds="PATH=\\\"\\\$PATH:/sbin\\\" ldconfig -n \$libdir"
 
 # Same as above, but a single script fragment to be evaled but not shown.
 finish_eval=""
@@ -219,13 +218,13 @@ global_symbol_to_cdecl="sed -n -e 's/^. .* \\(.*\\)\$/extern char \\1;/p'"
 global_symbol_to_c_name_address="sed -n -e 's/^: \\([^ ]*\\) \$/  {\\\"\\1\\\", (lt_ptr) 0},/p' -e 's/^[BCDEGRST] \\([^ ]*\\) \\([^ ]*\\)\$/  {\"\\2\", (lt_ptr) \\&\\2},/p'"
 
 # This is the shared library runtime path variable.
-runpath_var=
+runpath_var=LD_RUN_PATH
 
 # This is the shared library path variable.
 shlibpath_var=LD_LIBRARY_PATH
 
 # Is shlibpath searched before the hard-coded library search path?
-shlibpath_overrides_runpath=yes
+shlibpath_overrides_runpath=no
 
 # How to hardcode a shared library path into an executable.
 hardcode_action=immediate
@@ -235,7 +234,7 @@ hardcode_into_libs=yes
 
 # Flag to hardcode $libdir into a binary during linking.
 # This must work even if $libdir does not exist.
-hardcode_libdir_flag_spec="-R\$libdir"
+hardcode_libdir_flag_spec="\${wl}--rpath \${wl}\$libdir"
 
 # Whether we need a single -rpath flag with a separated argument.
 hardcode_libdir_separator=""
@@ -250,14 +249,14 @@ hardcode_minus_L=no
 
 # Set to yes if using SHLIBPATH_VAR=DIR during linking hardcodes DIR into
 # the resulting binary.
-hardcode_shlibpath_var=no
+hardcode_shlibpath_var=unsupported
 
 # Variables whose values should be saved in libtool wrapper scripts and
 # restored at relink time.
-variables_saved_for_relink="PATH LD_LIBRARY_PATH  GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH"
+variables_saved_for_relink="PATH LD_LIBRARY_PATH LD_RUN_PATH GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH"
 
 # Whether libtool must link a program against all its dependency libraries.
-link_all_deplibs=yes
+link_all_deplibs=unknown
 
 # Compile-time system search path for libraries
 sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib"

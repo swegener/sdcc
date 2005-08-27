@@ -12,10 +12,10 @@ CPP		= @CPP@
 INSTALL		= @INSTALL@
 CP              = @CP@
 
-ifeq ($(shell uname -s),SunOS)
-CP_U	= $(CP)
-else
+ifeq ($(shell uname -s),Linux)
 CP_U	= $(CP) -u
+else
+CP_U	= $(CP)
 endif
 
 PRJDIR		= ../..

@@ -70,7 +70,7 @@ _xa51_reset_regparm (void)
 }
 
 static int
-_xa51_regparm (sym_link * l)
+_xa51_regparm (sym_link * l, bool reentrant)
 {
   return 0; // for now
   /* for this processor it is simple

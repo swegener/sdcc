@@ -1,8 +1,15 @@
 /** Function pointer tests.
 
-    type: char, int, long
+    type: BOOL, char, int, long
  */
 #include <testfwk.h>
+#include <stdbool.h>
+
+#ifndef BOOL
+#define BOOL	bool
+#endif
+
+#define TYPE_{type}
 
 /* Must use a typedef as there is no way of adding the code modifier
    on the z80.
@@ -10,9 +17,11 @@
 typedef void (*NOARGFUNPTR)(void);
 typedef void (*ONEARGFUNPTR)({type}) REENTRANT;
 typedef long int (*FOURARGFUNPTR)(char, char, long int, long int) REENTRANT;
+typedef {type} (*TYPEFUNPTR)({type}, {type}) REENTRANT;
 
 int count;
 FOURARGFUNPTR fafp;
+TYPEFUNPTR tfp;
 
 void
 incCount(void)
@@ -75,6 +84,13 @@ callViaPtr3Ansi(void (*fptr)(void))
   fptr();
 }
 
+{type} f_ret({type} arg1, {type} arg2) REENTRANT
+{
+  {type} local;
+  local = !arg1;
+  return (local & arg2);
+}
+
 
 
 void
@@ -86,7 +102,7 @@ testFunPtr(void)
   callViaPtr(incCount);
   ASSERT(count == 1);
   callViaPtr2(incBy, 7);
-  ASSERT(count == 8);
+  ASSERT(count == 8 || count == 2);
 
   ASSERT((*fafp)(0, 0x55, 0x12345678, 0x9abcdef0) == 0);
   ASSERT((*fafp)(1, 0x55, 0x12345678, 0x9abcdef0) == 0x55);
@@ -103,11 +119,22 @@ testFunPtrAnsi(void)
   callViaPtrAnsi(incCount);
   ASSERT(count == 1);
   callViaPtr2Ansi(incBy, 7);
-  ASSERT(count == 8);
+  ASSERT(count == 8 || count == 2);
 
   ASSERT(fafp(0, 0x55, 0x12345678, 0x9abcdef0) == 0);
   ASSERT(fafp(1, 0x55, 0x12345678, 0x9abcdef0) == 0x55);
   ASSERT(fafp(2, 0x55, 0x12345678, 0x9abcdef0) == 0x12345678);
   ASSERT(fafp(3, 0x55, 0x12345678, 0x9abcdef0) == 0x9abcdef0);
+}
+
+void
+testFunPtrReturn(void)
+{
+  tfp = f_ret;
+
+  ASSERT(tfp(0, 0) == 0);
+  ASSERT(tfp(0, 1) == 1);
+  ASSERT(tfp(1, 0) == 0);
+  ASSERT(tfp(1, 1) == 0);
 }
 

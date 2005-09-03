@@ -984,6 +984,7 @@ updateRegUsage (iCode * ic)
       else
         {
           ic->riu |= (1<<regs8051[reg].offset);
+          BitBankUsed |= (reg >= 8);
         }
     }
 }
@@ -3232,10 +3233,9 @@ mcs51_assignRegisters (ebbIndex * ebbi)
   setToNull ((void *) &_G.regAssigned);
   setToNull ((void *) &_G.totRegAssigned);
   mcs51_ptrRegReq = _G.stackExtend = _G.dataExtend = 0;
-  if (options.stackAuto)
+  if ((currFunc && IFFUNC_ISREENT (currFunc->type)) || options.stackAuto)
     {
       mcs51_nRegs = 16;
-      BitBankUsed = 1;
     }
   else
     {

@@ -3110,7 +3110,7 @@ geniCodeLogicAndOr (ast *tree, int lvl)
 }
 
 /*-----------------------------------------------------------------*/
-/* geniCodeUnary - for a a generic unary operation                 */
+/* geniCodeUnary - for a generic unary operation                   */
 /*-----------------------------------------------------------------*/
 operand *
 geniCodeUnary (operand * op, int oper)
@@ -3426,7 +3426,6 @@ geniCodeReceive (value * args, operand * func)
   /* for all arguments that are passed in registers */
   while (args)
     {
-      int first = 1;
       if (IS_REGPARM (args->etype))
         {
           operand *opr = operandFromValue (args);
@@ -3458,9 +3457,8 @@ geniCodeReceive (value * args, operand * func)
 
           ic = newiCode (RECEIVE, func, NULL);
           ic->argreg = SPEC_ARGREG(args->etype);
-          if (first) {
+          if (ic->argreg == 1) {
               currFunc->recvSize = getSize (sym->type);
-              first = 0;
           }
           IC_RESULT (ic) = opr;
 
@@ -4222,6 +4220,15 @@ ast2iCode (ast * tree,int lvl)
 #endif
 
     case '~':
+      {
+        sym_link *ltype = operandType (left);
+        operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
+        if ((SPEC_NOUN(ltype) == V_CHAR) && IS_UNSIGNED(ltype))
+          {
+            setOperandType (op, INTTYPE);
+          }
+        return op;
+      }
     case RRC:
     case RLC:
     case SWAP:

@@ -1745,14 +1745,23 @@ genNot (iCode * ic)
   /* if in bit space then a special case */
   if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
     {
-      emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
-      emitcode ("cpl", "c");
-      outBitC (IC_RESULT (ic));
+      /* if left==result then cpl bit */
+      if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))))
+        {
+          emitcode ("cpl", "%s", IC_LEFT (ic)->aop->aopu.aop_dir);
+        }
+      else
+        {
+          emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
+          emitcode ("cpl", "c");
+          outBitC (IC_RESULT (ic));
+        }
       goto release;
     }
 
   toBoolean (IC_LEFT (ic));
 
+  /* set C, if a == 0 */
   tlbl = newiTempLabel (NULL);
   emitcode ("cjne", "a,#0x01,%05d$", tlbl->key + 100);
   emitcode ("", "%05d$:", tlbl->key + 100);
@@ -2530,6 +2539,7 @@ static void genSend(set *sendSet)
               emitcode ("mov", "b[%d],c", bit);
             }
           bit_count++;
+          BitBankUsed = 1;
         }
       freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
     }
@@ -2572,12 +2582,32 @@ static void genSend(set *sendSet)
 }
 
 /*-----------------------------------------------------------------*/
+/* selectRegBank - emit code to select the register bank           */
+/*-----------------------------------------------------------------*/
+static void
+selectRegBank (short bank, bool keepFlags)
+{
+  /* if f.e. result is in carry */
+  if (keepFlags)
+    {
+      emitcode ("anl", "psw,#0xE7");
+      if (bank)
+        emitcode ("orl", "psw,#0x%02x", (bank << 3) & 0xff);
+    }
+  else
+    {
+      emitcode ("mov", "psw,#0x%02x", (bank << 3) & 0xff);
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genCall - generates a call statement                            */
 /*-----------------------------------------------------------------*/
 static void
 genCall (iCode * ic)
 {
   sym_link *dtype;
+  sym_link *etype;
 //  bool restoreBank = FALSE;
   bool swapBanks = FALSE;
   bool accuse = FALSE;
@@ -2587,6 +2617,7 @@ genCall (iCode * ic)
   D(emitcode(";     genCall",""));
 
   dtype = operandType (IC_LEFT (ic));
+  etype = getSpec(dtype);
   /* if send set is not empty then assign */
   if (_G.sendSet)
     {
@@ -2602,7 +2633,6 @@ genCall (iCode * ic)
   /* if we are calling a not _naked function that is not using
      the same register bank then we need to save the
      destination registers on the stack */
-  dtype = operandType (IC_LEFT (ic));
   if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
        !IFFUNC_ISISR (dtype))
@@ -2647,20 +2677,8 @@ genCall (iCode * ic)
     }
 
   if (swapBanks)
-  {
-      /* if result is in carry */
-      if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
-        {
-          emitcode ("anl", "psw,#0xE7");
-          if (FUNC_REGBANK(currFunc->type))
-            emitcode ("orl", "psw,#0x%02x",
-                ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
-        }
-      else
-        {
-           emitcode ("mov", "psw,#0x%02x",
-               ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
-        }
+    {
+      selectRegBank (FUNC_REGBANK(currFunc->type), IS_BIT (etype));
     }
 
   /* if we need assign a result value */
@@ -2757,9 +2775,12 @@ genPcall (iCode * ic)
   symbol *rlbl = newiTempLabel (NULL);
 //  bool restoreBank=FALSE;
   bool swapBanks = FALSE;
+  bool resultInF0 = FALSE;
 
   D(emitcode(";     genPCall",""));
 
+  dtype = operandType (IC_LEFT (ic))->next;
+  etype = getSpec(dtype);
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     saveRegisters (ic);
@@ -2767,18 +2788,16 @@ genPcall (iCode * ic)
   /* if we are calling a not _naked function that is not using
      the same register bank then we need to save the
      destination registers on the stack */
-  dtype = operandType (IC_LEFT (ic))->next;
   if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
       !IFFUNC_ISISR (dtype))
-  {
+   {
 //    saveRBank (FUNC_REGBANK (dtype), ic, TRUE);
 //    restoreBank=TRUE;
       swapBanks = TRUE;
       // need caution message to user here
-  }
+    }
 
-  etype = getSpec(dtype);
   if (IS_LITERAL(etype))
     {
       /* if send set is not empty then assign */
@@ -2894,13 +2913,13 @@ genPcall (iCode * ic)
         }
     }
   if (swapBanks)
-  {
-       emitcode ("mov", "psw,#0x%02x",
-          ((FUNC_REGBANK(currFunc->type)) << 3) & 0xff);
-  }
+    {
+      selectRegBank (FUNC_REGBANK(currFunc->type), IS_BIT (etype));
+    }
 
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
+       !IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
         OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
@@ -2915,13 +2934,19 @@ genPcall (iCode * ic)
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
     }
 
-  /* adjust the stack for parameters if
-     required */
+  /* adjust the stack for parameters if required */
   if (ic->parmBytes)
     {
       int i;
       if (ic->parmBytes > 3)
         {
+          if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))) &&
+              IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))))
+            {
+              emitcode ("mov", "F0,c");
+              resultInF0 = TRUE;
+            }
+
           emitcode ("mov", "a,%s", spname);
           emitcode ("add", "a,#0x%02x", (-ic->parmBytes) & 0xff);
           emitcode ("mov", "%s,a", spname);
@@ -2936,10 +2961,19 @@ genPcall (iCode * ic)
 //  if (restoreBank)
 //    unsaveRBank (FUNC_REGBANK (dtype), ic, TRUE);
 
-  /* if we hade saved some registers then
-     unsave them */
+  /* if we had saved some registers then unsave them */
   if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
     unsaveRegisters (ic);
+
+  if (IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))))
+    {
+      if (resultInF0)
+          emitcode ("mov", "c,F0");
+
+      aopOp (IC_RESULT (ic), ic, FALSE);
+      assignResultValue (IC_RESULT (ic), IC_LEFT (ic));
+      freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -10670,11 +10704,12 @@ genReceive (iCode * ic)
 
   D(emitcode (";     genReceive",""));
 
-  if (ic->argreg == 1) { /* first parameter */
+  if (ic->argreg == 1)
+    { /* first parameter */
       if (isOperandInFarSpace (IC_RESULT (ic)) &&
           (OP_SYMBOL (IC_RESULT (ic))->isspilt ||
-           IS_TRUE_SYMOP (IC_RESULT (ic)))) {
-
+           IS_TRUE_SYMOP (IC_RESULT (ic))))
+        {
           regs *tempRegs[4];
           int receivingA = 0;
           int roffset = 0;
@@ -10716,33 +10751,48 @@ genReceive (iCode * ic)
             }
 
           offset = fReturnSizeMCS51 - size;
-          while (size--) {
+          while (size--)
+            {
               emitcode ("push", "%s", (strcmp (fReturn[fReturnSizeMCS51 - offset - 1], "a") ?
                                        fReturn[fReturnSizeMCS51 - offset - 1] : "acc"));
               offset++;
-          }
+            }
           aopOp (IC_RESULT (ic), ic, FALSE);
           size = AOP_SIZE (IC_RESULT (ic));
           offset = 0;
-          while (size--) {
+          while (size--)
+            {
               emitcode ("pop", "acc");
               aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
-          }
-
-      } else {
+            }
+        }
+      else
+        {
           _G.accInUse++;
           aopOp (IC_RESULT (ic), ic, FALSE);
           _G.accInUse--;
           assignResultValue (IC_RESULT (ic), NULL);
-      }
-  } else { /* second receive onwards */
+        }
+    }
+  else if (ic->argreg > 12)
+    { /* bit parameters */
+      if (OP_SYMBOL (IC_RESULT (ic))->regs[0]->rIdx != ic->argreg-5)
+        {
+          aopOp (IC_RESULT (ic), ic, FALSE);
+          emitcode ("mov", "c,%s", rb1regs[ic->argreg-5]);
+          outBitC(IC_RESULT (ic));
+        }
+    }
+  else
+    { /* other parameters */
       int rb1off ;
       aopOp (IC_RESULT (ic), ic, FALSE);
       rb1off = ic->argreg;
-      while (size--) {
+      while (size--)
+        {
           aopPut (IC_RESULT (ic), rb1regs[rb1off++ -5], offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
-      }
-  }
+        }
+    }
 
 release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);

@@ -119,7 +119,7 @@ _reset_regparm (void)
 }
 
 static int
-_reg_parm (sym_link * l)
+_reg_parm (sym_link * l, bool reentrant)
 {
   if (options.noRegParams) 
     {

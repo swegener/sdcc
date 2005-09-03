@@ -116,7 +116,7 @@ _pic16_reset_regparm (void)
 }
 
 static int
-_pic16_regparm (sym_link * l)
+_pic16_regparm (sym_link * l, bool reentrant)
 {
   /* force all parameters via SEND/RECEIVE */
   if(0 /*pic16_options.ip_stack*/) {

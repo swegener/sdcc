@@ -69,11 +69,11 @@ _mcs51_reset_regparm (void)
 }
 
 static int
-_mcs51_regparm (sym_link * l)
+_mcs51_regparm (sym_link * l, bool reentrant)
 {
     if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT)) {
         /* bit parameters go to b0 thru b7 */
-        if (options.stackAuto && (regBitParmFlg < 8)) {
+        if (reentrant && (regBitParmFlg < 8)) {
             regBitParmFlg++;
             return 12 + regBitParmFlg;
         }

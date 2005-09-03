@@ -68,7 +68,7 @@ _hc08_reset_regparm (void)
 }
 
 static int
-_hc08_regparm (sym_link * l)
+_hc08_regparm (sym_link * l, bool reentrant)
 {
   int size = getSize(l);
     

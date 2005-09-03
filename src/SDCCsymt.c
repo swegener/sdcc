@@ -1521,6 +1521,7 @@ checkSClass (symbol * sym, int isProto)
   /* arrays & pointers cannot be defined for bits   */
   /* SBITS or SFRs or BIT                           */
   if ((IS_ARRAY (sym->type) || IS_PTR (sym->type)) &&
+      !IS_FUNCPTR (sym->type) &&
       (SPEC_NOUN (sym->etype) == V_BIT ||
        SPEC_NOUN (sym->etype) == V_SBIT ||
        SPEC_NOUN (sym->etype) == V_BITFIELD ||
@@ -2587,7 +2588,7 @@ processFuncArgs (symbol * func)
          the function does not have VA_ARG
          and as port dictates */
       if (!IFFUNC_HASVARARGS(funcType) &&
-          (argreg = (*port->reg_parm) (val->type)))
+          (argreg = (*port->reg_parm) (val->type, FUNC_ISREENT(funcType))))
         {
           SPEC_REGPARM (val->etype) = 1;
           SPEC_ARGREG(val->etype) = argreg;

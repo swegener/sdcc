@@ -71,7 +71,7 @@ _pic14_reset_regparm (void)
 }
 
 static int
-_pic14_regparm (sym_link * l)
+_pic14_regparm (sym_link * l, bool reentrant)
 {
 /* for this processor it is simple
 	can pass only the first parameter in a register */

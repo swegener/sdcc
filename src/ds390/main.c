@@ -76,7 +76,7 @@ _ds390_reset_regparm (void)
 }
 
 static int
-_ds390_regparm (sym_link * l)
+_ds390_regparm (sym_link * l, bool reentrant)
 {
     if (IS_SPEC(l) && (SPEC_NOUN(l) == V_BIT))
         return 0;

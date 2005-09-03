@@ -416,10 +416,10 @@ allocGlobal (symbol * sym)
     }
 
   /* if this is a bit variable and no storage class */
-  if (SPEC_NOUN (sym->etype) == V_BIT
-      /*&& SPEC_SCLS (sym->etype) == S_BIT*/)
+  if (IS_SPEC(sym->type) && SPEC_NOUN (sym->type) == V_BIT)
+      /*&& SPEC_SCLS (sym->etype) == S_BIT*/
     {
-      SPEC_OCLS (sym->etype) = bit;
+      SPEC_OCLS (sym->type) = bit;
       allocIntoSeg (sym);
       return;
     }
@@ -663,10 +663,10 @@ allocLocal (symbol * sym)
     }
 
   /* if this is a bit variable and no storage class */
-  if (SPEC_NOUN (sym->etype) == V_BIT)
+  if (IS_SPEC(sym->type) && SPEC_NOUN (sym->type) == V_BIT)
     {
-      SPEC_SCLS (sym->etype) = S_BIT;
-      SPEC_OCLS (sym->etype) = bit;
+      SPEC_SCLS (sym->type) = S_BIT;
+      SPEC_OCLS (sym->type) = bit;
       allocIntoSeg (sym);
       return;
     }

@@ -1,3 +1,41 @@
+2005-09-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version: changed to version 2.5.3
+	* doc/sdccman.lyx: changed version to 2.5.3,
+	  documented --codeseg and --constseg and pragma codeseg and constseg,
+	  documented bit parameters (reentrant) and bit returning
+	* src/SDCCicode.c (geniCodeReceive): fixed (possible) bug generating
+	   currFunc->recvSize, but is this ok for all ports?
+	  (ast2iCode): result of ~ on unsigned char must be cast to int for
+	   bool to work
+	* src/SDCCmem.c (allocGlobal, allocLocal): don't put bit returning
+	  function pointers in bit space
+	* src/SDCCsymt.c (checkSClass): allow bit returning function pointers,
+	  (processFuncArgs): call port.reg_parm() with reentrancy info
+	* src/port.h,
+	* src/avr/main.c,
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/pic/main.c,
+	* src/pic16/main.c,
+	* src/xa51/main.c,
+	* src/z80/main.c: port.reg_parm prototype extended with
+	  "bool reentrant" parameter
+	* src/mcs51/main.c (_mcs51_regparm): use parameter reentrant instead of
+	  options.stackAuto for allocating bit register parameters
+	* src/mcs51/gen.c (genNot): optimized complementing direct bit,
+	  (genSend): set BitBankUsed if it is,
+	  (selectRegBank): factored out of genCall for use in genPcall,
+	  (genCall): removed redundant dtype assignmen, use selectRegBank,
+	  (genPcall): handle returning in Carry properly, save in F0 if needed,
+	  (genReceive): handle bit register parameters
+	* src/mcs51/ralloc.c (updateRegUsage): update BitBankUsed along the way,
+	  (mcs51_assignRegisters): enable bit registers for all reentrant
+	   functions and don't set BitBankUsed unconditionally
+	* src/mcs51/peeph.def (177.d): fixed bug if %2==%3
+	* support/regression/tests/bitvars.c: enable tests for SDCC_STACK_AUTO
+	* support/regression/tests/funptrs.c: added tests for BOOL and for return
+
 2005-08-27 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/Makefile.in: cp on sparc-solaris (SunOS) and on

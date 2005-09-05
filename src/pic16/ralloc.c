@@ -927,8 +927,8 @@ pic16_allocDirReg (operand *op )
 		reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
 
 		/* work around for user defined registers in access bank */
-		if((reg->address>= 0x00 && reg->address < 0x80)
-			|| (reg->address >= 0xf80 && reg->address <= 0xfff))
+		if((reg->address>= 0x00 && reg->address < pic16->acsSplitOfs)
+			|| (reg->address >= (0xf00 + pic16->acsSplitOfs) && reg->address <= 0xfff))
 			reg->accessBank = 1;
 		
 		debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);

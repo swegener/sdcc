@@ -1,5 +1,10 @@
 2005-09-05 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/ralloc.c (pic16_allocDirReg): use device specific
+	  access bank splitpoint
+
+2005-09-05 Raphael Neider <rneider AT web.de>
+
 	* device/lib/pic16/libc/Makefile: added (missing) string to SUBDIRS
 
 2005-09-03 Maarten Brock <sourceforge.brock AT dse.nl>

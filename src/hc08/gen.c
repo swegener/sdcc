@@ -162,7 +162,7 @@ emitcode (char *inst, char *fmt,...)
   else
     vsprintf (lb, fmt, ap);
 
-  while (isspace (*lbp))
+  while (isspace ((unsigned char)*lbp))
     lbp++;
 
   if (lbp && *lbp)
@@ -5340,7 +5340,7 @@ emitinline (iCode * ic, char *inlin)
       if (*inlin == '_')
         {
           symname = ++inlin;
-          while (isalnum(*inlin) || (*inlin == '_'))
+          while (isalnum((unsigned char)*inlin) || (*inlin == '_'))
             inlin++;
           c = *inlin;
           *inlin = '\0';

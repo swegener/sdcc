@@ -1,3 +1,50 @@
+2005-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/hc08/lkaomf51.c (OutputName): made name unsigned char,
+	  (hex2dec): made hex_digit unsigned char, removed ascii dependance
+	* as/mcs51/lkaomf51.c (OutputName): made name unsigned char,
+	  (hex2dec): made hex_digit unsigned char, removed ascii dependance
+	* as/mcs51/lkarea.c (lnkarea2): sort absolute areas to the front
+	* packihx/packihx.c (hexDigit): made c unsigned char
+	* as/mcs51/lklibr.c (fndsym),
+	* link/z80/lkgb.c (gb),
+	* link/z80/lklibr.c (fndsym),
+	* link/z80/lkrloc.c (relr),
+	* sim/ucsim/libltdl/ltdl.c (load_deplibs, try_dlopen),
+	* src/SDCC.lex (checkCurrFile, process_pragma),
+	* src/SDCCglue.c (spacesToUnderscores),
+	* src/SDCCmain.c (setParseWithComma, processFile),
+	* src/asm.c (tvsprintf, printCLine),
+	* src/avr/gen.c (emitcode, aopPut),
+	* src/ds390/gen.c (emitcode),
+	* src/hc08/gen.c (emitcode, emitinline),
+	* src/mcs51/gen.c (emitcode, genInline),
+	* src/pic/pcodepeep.c (cvt_extract_destination, cvt_extract_status,
+	  tokenizeLineNode),
+	* src/pic/ralloc.c (debugLog),
+	* src/pic16/pcodepeep.c (cvt_extract_destination, cvt_extract_status,
+	  tokenizeLineNode),
+	* src/pic16/ralloc.c (debugLog),
+	* src/z80/main.c (_process_pragma):
+	   made all ctype.h function calls safe
+	* src/SDCCopt.c: include math.h for fabs
+	* src/SDCCpeeph.c: added macros ISCHARDIGIT, ISCHARSPACE and ISCHARALNUM
+	  and used them throughout the code to make ctype.h function calls safe
+	* src/ds390/main.c (asmLineNodeFromLineNode),
+	* src/mcs51/main.c (asmLineNodeFromLineNode): made p unsigned char*
+	* src/pic/gen.c (DEBUGpic14_emitcode, pic14_emitcode): made lbp
+	   unsigned char*
+	* src/pic/pcode.c (mnem2key): made mnem unsigned char*,
+	  (newpCodeAsmDir): made ctype.h function calls safe
+	* src/pic16/gen.c (pic16_emitpcomment, DEBUGpic16_emitcode,
+	  pic16_emitcode):  made lbp unsigned char*
+	* src/pic16/pcode.c (mnem2key): made mnem unsigned char*,
+	  (pic16_newpCodeAsmDir): made ctype.h function calls safe
+	* src/xa51/gen.c (emitcode),
+	* src/z80/gen.c (_emit2): made lbp unsigned char*
+	* support/Util/MySystem.c (split_command): made cmd_line and p unsigned
+	   char*
+
 2005-09-05 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/ralloc.c (pic16_allocDirReg): use device specific

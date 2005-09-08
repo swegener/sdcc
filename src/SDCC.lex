@@ -284,7 +284,7 @@ static int checkCurrFile (char *s)
 
     /* get the line number */
     lNum = strtol(s, &tptr, 10);
-    if (tptr == s || !isspace(*tptr))
+    if (tptr == s || !isspace((unsigned char)*tptr))
       return 0;
     s = tptr;
 
@@ -783,16 +783,16 @@ static int process_pragma(char *s)
   s += PRAGMA_LEN;
 
   /* look for the directive */
-  while(isspace(*s))
+  while(isspace((unsigned char)*s))
     s++;
 
   cp = s;
   /* look for the end of the directive */
-  while ((!isspace(*s)) && (*s != '\n'))
+  while ((!isspace((unsigned char)*s)) && (*s != '\n'))
     s++ ;
 
   /* skip separating whitespace */
-  while (isspace(*s) && (*s != '\n'))
+  while (isspace((unsigned char)*s) && (*s != '\n'))
     s++;
 
   /* First give the port a chance */

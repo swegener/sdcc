@@ -530,12 +530,12 @@ setParseWithComma (set **dest, char *src)
   int length;
 
   /* skip the initial white spaces */
-  while (isspace(*src))
+  while (isspace((unsigned char)*src))
     src++;
 
   /* skip the trailing white spaces */
   length = strlen(src);
-  while (length && isspace(src[length-1]))
+  while (length && isspace((unsigned char)src[length-1]))
     src[--length] = '\0';
 
   for (p = strtok(src, ","); p != NULL; p = strtok(NULL, ","))
@@ -549,10 +549,10 @@ static void
 setDefaultOptions (void)
 {
   /* first the options part */
-  options.stack_loc = 0;        /* stack pointer initialised to 0 */
-  options.xstack_loc = 0;       /* xternal stack starts at 0 */
-  options.code_loc = 0;         /* code starts at 0 */
-  options.data_loc = 0;         /* JCF: By default let the linker locate data */
+  options.stack_loc = 0;          /* stack pointer initialised to 0 */
+  options.xstack_loc = 0;         /* xternal stack starts at 0 */
+  options.code_loc = 0;           /* code starts at 0 */
+  options.data_loc = 0;           /* JCF: By default let the linker locate data */
   options.xdata_loc = 0;
   options.idata_loc = 0x80;
   options.nopeep = 0;
@@ -561,8 +561,8 @@ setDefaultOptions (void)
   options.nostdinc = 0;
   options.verbose = 0;
   options.shortis8bits = 0;
-  options.std_sdcc = 1;         /* enable SDCC language extensions */
-  options.std_c99 = 0;          /* default to C89 until more C99 support */
+  options.std_sdcc = 1;           /* enable SDCC language extensions */
+  options.std_c99 = 0;            /* default to C89 until more C99 support */
   options.code_seg = CODE_NAME;   /* default to CSEG for generated code */
   options.const_seg = CONST_NAME; /* default to CONST for generated code */
 
@@ -660,7 +660,7 @@ processFile (char *s)
       moduleName = Safe_strdup ( fext );
 
       for (fext = moduleName; *fext; fext++)
-        if (!isalnum (*fext))
+        if (!isalnum ((unsigned char)*fext))
           *fext = '_';
       return;
     }

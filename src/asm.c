@@ -11,7 +11,7 @@
 
 /* A 'token' is like !blah or %24f and is under the programmers
    control. */
-#define MAX_TOKEN_LEN		64
+#define MAX_TOKEN_LEN           64
 
 static hTab *_h;
 
@@ -27,10 +27,10 @@ FileBaseName (char *fileFullName)
   while (*fileFullName)
     {
       if ((*fileFullName == '/') || (*fileFullName == '\\') || (*fileFullName == ':'))
-	{
-	  p = fileFullName;
-	  p++;
-	}
+        {
+          p = fileFullName;
+          p++;
+        }
       fileFullName++;
     }
   return p;
@@ -53,7 +53,7 @@ _appendAt (char *at, char *onto, const char *sz, size_t *max)
   return at + strlen (at);
 }
 
-void 
+void
 tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
 {
   // Under Linux PPC va_list is a structure instead of a primitive type,
@@ -67,14 +67,14 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
 
   // This is acheived by expanding the tokens and zero arg formats into
   // one big format string, which is passed to the native printf.
-  static int 	count;
-  char 		noTokens[INITIAL_INLINEASM];
-  char 		newFormat[INITIAL_INLINEASM];
-  char 		*pInto = noTokens;
-  size_t 	pIntoLen = sizeof(noTokens);
-  char 		*p;
-  char 		token[MAX_TOKEN_LEN];
-  const char 	*sz = format;
+  static int    count;
+  char          noTokens[INITIAL_INLINEASM];
+  char          newFormat[INITIAL_INLINEASM];
+  char          *pInto = noTokens;
+  size_t        pIntoLen = sizeof(noTokens);
+  char          *p;
+  char          token[MAX_TOKEN_LEN];
+  const char    *sz = format;
 
   // NULL terminate it to let strlen work.
   *pInto = '\0';
@@ -83,42 +83,42 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
   while (pIntoLen && *sz)
     {
       if (*sz == '!')
-	{
-	  /* Start of a token.  Search until the first
-	     [non alpha, *] and call it a token. */
-	  const char *t;
-	  p = token;
-	  sz++;
-	  while (isalpha (*sz) || *sz == '*')
-	    {
-	      *p++ = *sz++;
-	    }
-	  *p = '\0';
-	  /* Now find the token in the token list */
-	  if ((t = _findMapping (token)))
-	    {
-	      pInto = _appendAt (pInto, noTokens, t, &pIntoLen);
-	    }
-	  else
-	    {
-	      fprintf (stderr, "Cant find token \"%s\"\n", token);
-	      wassert (0);
-	    }
-	}
+        {
+          /* Start of a token.  Search until the first
+             [non alpha, *] and call it a token. */
+          const char *t;
+          p = token;
+          sz++;
+          while (isalpha ((unsigned char)*sz) || *sz == '*')
+            {
+              *p++ = *sz++;
+            }
+          *p = '\0';
+          /* Now find the token in the token list */
+          if ((t = _findMapping (token)))
+            {
+              pInto = _appendAt (pInto, noTokens, t, &pIntoLen);
+            }
+          else
+            {
+              fprintf (stderr, "Cant find token \"%s\"\n", token);
+              wassert (0);
+            }
+        }
       else
         {
           *pInto++ = *sz++;
-	  pIntoLen--;
+          pIntoLen--;
         }
     }
 
   if (!pIntoLen)
   {
       fprintf(stderr,
-		"Internal error: tvsprintf overflowed on pass one.\n");
+                "Internal error: tvsprintf overflowed on pass one.\n");
       // Might as well go on...
   }
-    
+
   *pInto = '\0';
 
   /* Second pass: Expand any macros that we own */
@@ -129,89 +129,89 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
   while (pIntoLen && *sz)
     {
       if (*sz == '%')
-	{
-	  // See if its one that we handle.
-	  sz++;
-	  switch (*sz)
-	    {
-	    case 'C':
-	      // Code segment name.
-	      pInto = _appendAt (pInto, newFormat, CODE_NAME, &pIntoLen);
+        {
+          // See if its one that we handle.
+          sz++;
+          switch (*sz)
+            {
+            case 'C':
+              // Code segment name.
+              pInto = _appendAt (pInto, newFormat, CODE_NAME, &pIntoLen);
               sz++;
-	      break;
-	    case 'F':
-	      // Source file name.
-	      pInto = _appendAt (pInto, newFormat, fullSrcFileName, &pIntoLen);
+              break;
+            case 'F':
+              // Source file name.
+              pInto = _appendAt (pInto, newFormat, fullSrcFileName, &pIntoLen);
               sz++;
-	      break;
+              break;
             case 'N':
               // Current function name.
               pInto = _appendAt (pInto, newFormat, currFunc->rname, &pIntoLen);
               sz++;
               break;
-	    case 'I':
-	      {
-		// Unique ID.
-		char id[20];
-		SNPRINTF (id, sizeof(id), "%u", ++count);
-		pInto = _appendAt (pInto, newFormat, id, &pIntoLen);
+            case 'I':
+              {
+                // Unique ID.
+                char id[20];
+                SNPRINTF (id, sizeof(id), "%u", ++count);
+                pInto = _appendAt (pInto, newFormat, id, &pIntoLen);
                 sz++;
-		break;
-	      }
-	    default:
-	      // Not one of ours.  Copy until the end.
-	      *pInto++ = '%';
-	      pIntoLen--;
-	      while (pIntoLen && !isalpha (*sz))
-		{
-		  *pInto++ = *sz++;
-		  pIntoLen--;
-		}
-		if (pIntoLen)
-		{
-		    *pInto++ = *sz++;
-		    pIntoLen--;
-		}
-	    }
-	}
+                break;
+              }
+            default:
+              // Not one of ours.  Copy until the end.
+              *pInto++ = '%';
+              pIntoLen--;
+              while (pIntoLen && !isalpha ((unsigned char)*sz))
+                {
+                  *pInto++ = *sz++;
+                  pIntoLen--;
+                }
+                if (pIntoLen)
+                {
+                    *pInto++ = *sz++;
+                    pIntoLen--;
+                }
+            }
+        }
       else
-	{
-	  *pInto++ = *sz++;
-	  pIntoLen--;
-	}
+        {
+          *pInto++ = *sz++;
+          pIntoLen--;
+        }
     }
 
   if (!pIntoLen)
   {
       fprintf(stderr,
-		"Internal error: tvsprintf overflowed on pass two.\n");
+                "Internal error: tvsprintf overflowed on pass two.\n");
       // Might as well go on...
-  }    
-    
+  }
+
   *pInto = '\0';
 
   // Now do the actual printing
 #if defined(HAVE_VSNPRINTF)
     {
-	int wrlen;
-	wrlen = vsnprintf (buffer, len, newFormat, ap);
-	
-	if (wrlen < 0 || (size_t)wrlen >= len)
-	{
-	    fprintf(stderr, "Internal error: tvsprintf truncated.\n");
-	}
+        int wrlen;
+        wrlen = vsnprintf (buffer, len, newFormat, ap);
+
+        if (wrlen < 0 || (size_t)wrlen >= len)
+        {
+            fprintf(stderr, "Internal error: tvsprintf truncated.\n");
+        }
     }
-    
-#else    
+
+#else
     vsprintf (buffer, newFormat, ap);
     if (strlen(buffer) >= len)
     {
-	fprintf(stderr, "Internal error: tvsprintf overflowed.\n");
+        fprintf(stderr, "Internal error: tvsprintf overflowed.\n");
     }
-#endif    
+#endif
 }
 
-void 
+void
 tfprintf (FILE * fp, const char *szFormat,...)
 {
   va_list ap;
@@ -223,7 +223,7 @@ tfprintf (FILE * fp, const char *szFormat,...)
   fputs (buffer, fp);
 }
 
-void 
+void
 tsprintf (char *buffer, size_t len, const char *szFormat,...)
 {
   va_list ap;
@@ -232,7 +232,7 @@ tsprintf (char *buffer, size_t len, const char *szFormat,...)
   va_end(ap);
 }
 
-void 
+void
 asm_addTree (const ASM_MAPPINGS * pMappings)
 {
   const ASM_MAPPING *pMap;
@@ -333,7 +333,7 @@ printCLine (char *srcFile, int lineno)
       break;
     }
   }
-  while (isspace ((int)*ilsP))
+  while (isspace ((unsigned char)*ilsP))
     ilsP++;
 
   return ilsP;
@@ -374,7 +374,7 @@ static const ASM_MAPPING _asxxxx_mapping[] =
    "; ---------------------------------"
   },
   {"functionlabeldef", "%s:"},
-  {"bankimmeds", "0	; PENDING: bank support"},
+  {"bankimmeds", "0     ; PENDING: bank support"},
   {"los","(%s & 0xFF)"},
   {"his","(%s >> 8)"},
   {"hihis","(%s >> 16)"},
@@ -427,7 +427,7 @@ static const ASM_MAPPING _gas_mapping[] =
    "; ---------------------------------"
   },
   {"functionlabeldef", "%s:"},
-  {"bankimmeds", "0	; PENDING: bank support"},  
+  {"bankimmeds", "0     ; PENDING: bank support"},
   {NULL, NULL}
 };
 
@@ -466,7 +466,7 @@ static const ASM_MAPPING _a390_mapping[] =
    "; ---------------------------------"
   },
   {"functionlabeldef", "%s:"},
-  {"bankimmeds", "0	; PENDING: bank support"},  
+  {"bankimmeds", "0     ; PENDING: bank support"},
   {"los","(%s & 0FFh)"},
   {"his","((%s / 256) & 0FFh)"},
   {"hihis","((%s / 65536) & 0FFh)"},
@@ -518,7 +518,7 @@ static const ASM_MAPPING _xa_asm_mapping[] =
    "; ---------------------------------"
   },
   {"functionlabeldef", "%s:"},
-  {"bankimmeds", "0	; PENDING: bank support"},  
+  {"bankimmeds", "0     ; PENDING: bank support"},
   {"los","(%s & 0FFh)"},
   {"his","((%s / 256) & 0FFh)"},
   {"hihis","((%s / 65536) & 0FFh)"},

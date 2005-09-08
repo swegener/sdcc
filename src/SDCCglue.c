@@ -1562,7 +1562,7 @@ spacesToUnderscores (char *dest, const char *src, size_t len)
 
   --len;
   for (p = dest, i = 0; *src != '\0' && i < len; ++src, ++i) {
-    *p++ = isspace(*src) ? '_' : *src;
+    *p++ = isspace((unsigned char)*src) ? '_' : *src;
   }
   *p = '\0';
 
@@ -1694,7 +1694,7 @@ glue (void)
     {
       /* copy the sbit segment */
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; special function bits \n");
+      fprintf (asmFile, "; special function bits\n");
       fprintf (asmFile, "%s", iComments2);
       copyFile (asmFile, sfrbit->oFile);
   
@@ -1702,16 +1702,16 @@ glue (void)
       if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
       {
          fprintf (asmFile, "%s", iComments2);
-         fprintf (asmFile, "; overlayable register banks \n");
+         fprintf (asmFile, "; overlayable register banks\n");
          fprintf (asmFile, "%s", iComments2);
          if(RegBankUsed[0])
-            fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
+           fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
          if(RegBankUsed[1]||options.parms_in_bank1)
-            fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
+           fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
          if(RegBankUsed[2])
-            fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
+           fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
          if(RegBankUsed[3])
-            fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
+           fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
       }
       if(BitBankUsed)
       {

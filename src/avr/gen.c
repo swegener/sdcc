@@ -249,7 +249,7 @@ emitcode (char *inst, char *fmt, ...)
 	else
 		vsprintf (lb, fmt, ap);
 
-	while (isspace (*lbp))
+	while (isspace ((unsigned char)*lbp))
 		lbp++;
 
 	if (lbp && *lbp)
@@ -1041,7 +1041,7 @@ aopPut (asmop * aop, char *s, int offset)
 		break;
 
 	case AOP_REG:
-		if (toupper (*s) != 'R') {
+		if (toupper ((unsigned char)*s) != 'R') {
 			if (s == zero) {
 				emitcode ("clr", "%s",
 					  aop->aopu.aop_reg[offset]->name);
@@ -1109,7 +1109,7 @@ aopPut (asmop * aop, char *s, int offset)
 
 	case AOP_CRY:
 		/* if used only for a condition code check */
-		assert (toupper (*s) == 'R');
+		assert (toupper ((unsigned char)*s) == 'R');
 		if (offset == 0) {
 			emitcode ("xrl", "r0,r0");
 			emitcode ("cpi", "%s,0", s);

@@ -134,7 +134,7 @@ static void
 
 	fprintf (debugF, "%s", buffer);
 	/*
-	while (isspace(*bufferP)) bufferP++;
+	while (isspace((unsigned char)*bufferP)) bufferP++;
 
 	if (bufferP && *bufferP) 
 		lineCurr = (lineCurr ?

@@ -174,7 +174,7 @@ void DEBUGpic14_emitcode (char *inst,char *fmt, ...)
 {
 	va_list ap;
 	char lb[INITIAL_INLINEASM];  
-	char *lbp = lb;
+	unsigned char *lbp = lb;
 	
 	if(!debug_verbose && !options.debug)
 		return;
@@ -272,7 +272,7 @@ void pic14_emitcode (char *inst,char *fmt, ...)
 {
 	va_list ap;
 	char lb[INITIAL_INLINEASM];  
-	char *lbp = lb;
+	unsigned char *lbp = lb;
 	
 	va_start(ap,fmt);   
 	

@@ -95,11 +95,11 @@ VOID gb(int in)
     /* EOF */
     if(cart_name[0] == 0 && linkp->f_idp != NULL) {
       for(i = strlen(linkp->f_idp);
-	  i > 0 && (isalnum(linkp->f_idp[i-1]) || linkp->f_idp[i-1] == '.');
+	  i > 0 && (isalnum((unsigned char)linkp->f_idp[i-1]) || linkp->f_idp[i-1] == '.');
 	  i--)
 	;
       for(pos = 0; pos < 16 && linkp->f_idp[i] != '.'; pos++, i++)
-	cart_name[pos] = toupper(linkp->f_idp[i]);
+	cart_name[pos] = toupper((unsigned char)linkp->f_idp[i]);
       if(pos < 16)
 	cart_name[pos] = 0;
     }

@@ -723,8 +723,8 @@ int fndsym( char *name )
 
                     _fullpath(absPath1, FirstFound->libspc, PATH_MAX);
                     _fullpath(absPath2, ThisLibr->libspc, PATH_MAX);
-                    for(j=0; absPath1[j]!=0; j++) absPath1[j]=tolower(absPath1[j]);
-                    for(j=0; absPath2[j]!=0; j++) absPath2[j]=tolower(absPath2[j]);
+                    for(j=0; absPath1[j]!=0; j++) absPath1[j]=tolower((unsigned char)absPath1[j]);
+                    for(j=0; absPath2[j]!=0; j++) absPath2[j]=tolower((unsigned char)absPath2[j]);
 #else
                     realpath(FirstFound->libspc, absPath1);
                     realpath(ThisLibr->libspc, absPath2);

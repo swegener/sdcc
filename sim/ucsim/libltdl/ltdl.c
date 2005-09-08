@@ -89,7 +89,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 #if HAVE_ASSERT_H
 #  include <assert.h>
 #else
-#  define assert(arg)	((void) 0)
+#  define assert(arg)   ((void) 0)
 #endif
 
 #include "ltdl.h"
@@ -105,13 +105,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 
 
 #ifdef DLL_EXPORT
-#  define LT_GLOBAL_DATA	__declspec(dllexport)
+#  define LT_GLOBAL_DATA        __declspec(dllexport)
 #else
 #  define LT_GLOBAL_DATA
 #endif
 
 /* fopen() mode flags for reading a text file */
-#undef	LT_READTEXT_MODE
+#undef  LT_READTEXT_MODE
 #ifdef __WINDOWS__
 #  define LT_READTEXT_MODE "rt"
 #else
@@ -126,24 +126,24 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 
 /* Standard libltdl search path environment variable name  */
 #undef  LTDL_SEARCHPATH_VAR
-#define LTDL_SEARCHPATH_VAR	"LTDL_LIBRARY_PATH"
+#define LTDL_SEARCHPATH_VAR     "LTDL_LIBRARY_PATH"
 
 /* Standard libtool archive file extension.  */
 #undef  LTDL_ARCHIVE_EXT
-#define LTDL_ARCHIVE_EXT	".la"
+#define LTDL_ARCHIVE_EXT        ".la"
 
 /* max. filename length */
 #ifndef LT_FILENAME_MAX
-#  define LT_FILENAME_MAX	1024
+#  define LT_FILENAME_MAX       1024
 #endif
 
 /* This is the maximum symbol size that won't require malloc/free */
-#undef	LT_SYMBOL_LENGTH
-#define LT_SYMBOL_LENGTH	128
+#undef  LT_SYMBOL_LENGTH
+#define LT_SYMBOL_LENGTH        128
 
 /* This accounts for the _LTX_ separator */
-#undef	LT_SYMBOL_OVERHEAD
-#define LT_SYMBOL_OVERHEAD	5
+#undef  LT_SYMBOL_OVERHEAD
+#define LT_SYMBOL_OVERHEAD      5
 
 
 
@@ -154,47 +154,47 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 /* These are the functions used internally.  In addition to making
    use of the associated function pointers above, they also perform
    error handling.  */
-static char   *lt_estrdup	LT_PARAMS((const char *str));
-static lt_ptr lt_emalloc	LT_PARAMS((size_t size));
-static lt_ptr lt_erealloc	LT_PARAMS((lt_ptr addr, size_t size));
+static char   *lt_estrdup       LT_PARAMS((const char *str));
+static lt_ptr lt_emalloc        LT_PARAMS((size_t size));
+static lt_ptr lt_erealloc       LT_PARAMS((lt_ptr addr, size_t size));
 
-static lt_ptr rpl_realloc	LT_PARAMS((lt_ptr ptr, size_t size));
+static lt_ptr rpl_realloc       LT_PARAMS((lt_ptr ptr, size_t size));
 
 /* These are the pointers that can be changed by the caller:  */
-LT_GLOBAL_DATA lt_ptr (*lt_dlmalloc)	LT_PARAMS((size_t size))
- 			= (lt_ptr (*) LT_PARAMS((size_t))) malloc;
-LT_GLOBAL_DATA lt_ptr (*lt_dlrealloc)	LT_PARAMS((lt_ptr ptr, size_t size))
- 			= (lt_ptr (*) LT_PARAMS((lt_ptr, size_t))) rpl_realloc;
-LT_GLOBAL_DATA void   (*lt_dlfree)	LT_PARAMS((lt_ptr ptr))
- 			= (void (*) LT_PARAMS((lt_ptr))) free;
+LT_GLOBAL_DATA lt_ptr (*lt_dlmalloc)    LT_PARAMS((size_t size))
+                        = (lt_ptr (*) LT_PARAMS((size_t))) malloc;
+LT_GLOBAL_DATA lt_ptr (*lt_dlrealloc)   LT_PARAMS((lt_ptr ptr, size_t size))
+                        = (lt_ptr (*) LT_PARAMS((lt_ptr, size_t))) rpl_realloc;
+LT_GLOBAL_DATA void   (*lt_dlfree)      LT_PARAMS((lt_ptr ptr))
+                        = (void (*) LT_PARAMS((lt_ptr))) free;
 
 /* The following macros reduce the amount of typing needed to cast
    assigned memory.  */
 #if WITH_DMALLOC
 
-#define LT_DLMALLOC(tp, n)	((tp *) xmalloc ((n) * sizeof(tp)))
-#define LT_DLREALLOC(tp, p, n)	((tp *) xrealloc ((p), (n) * sizeof(tp)))
-#define LT_DLFREE(p)						\
-	LT_STMT_START { if (p) (p) = (xfree (p), (lt_ptr) 0); } LT_STMT_END
+#define LT_DLMALLOC(tp, n)      ((tp *) xmalloc ((n) * sizeof(tp)))
+#define LT_DLREALLOC(tp, p, n)  ((tp *) xrealloc ((p), (n) * sizeof(tp)))
+#define LT_DLFREE(p)                                            \
+        LT_STMT_START { if (p) (p) = (xfree (p), (lt_ptr) 0); } LT_STMT_END
 
-#define LT_EMALLOC(tp, n)	((tp *) xmalloc ((n) * sizeof(tp)))
-#define LT_EREALLOC(tp, p, n)	((tp *) xrealloc ((p), (n) * sizeof(tp)))
+#define LT_EMALLOC(tp, n)       ((tp *) xmalloc ((n) * sizeof(tp)))
+#define LT_EREALLOC(tp, p, n)   ((tp *) xrealloc ((p), (n) * sizeof(tp)))
 
 #else
 
-#define LT_DLMALLOC(tp, n)	((tp *) lt_dlmalloc ((n) * sizeof(tp)))
-#define LT_DLREALLOC(tp, p, n)	((tp *) rpl_realloc ((p), (n) * sizeof(tp)))
-#define LT_DLFREE(p)						\
-	LT_STMT_START { if (p) (p) = (lt_dlfree (p), (lt_ptr) 0); } LT_STMT_END
+#define LT_DLMALLOC(tp, n)      ((tp *) lt_dlmalloc ((n) * sizeof(tp)))
+#define LT_DLREALLOC(tp, p, n)  ((tp *) rpl_realloc ((p), (n) * sizeof(tp)))
+#define LT_DLFREE(p)                                            \
+        LT_STMT_START { if (p) (p) = (lt_dlfree (p), (lt_ptr) 0); } LT_STMT_END
 
-#define LT_EMALLOC(tp, n)	((tp *) lt_emalloc ((n) * sizeof(tp)))
-#define LT_EREALLOC(tp, p, n)	((tp *) lt_erealloc ((p), (n) * sizeof(tp)))
+#define LT_EMALLOC(tp, n)       ((tp *) lt_emalloc ((n) * sizeof(tp)))
+#define LT_EREALLOC(tp, p, n)   ((tp *) lt_erealloc ((p), (n) * sizeof(tp)))
 
 #endif
 
-#define LT_DLMEM_REASSIGN(p, q)			LT_STMT_START {	\
-	if ((p) != (q)) { if (p) lt_dlfree (p); (p) = (q); (q) = 0; }	\
-						} LT_STMT_END
+#define LT_DLMEM_REASSIGN(p, q)                 LT_STMT_START { \
+        if ((p) != (q)) { if (p) lt_dlfree (p); (p) = (q); (q) = 0; }   \
+                                                } LT_STMT_END
 
 
 /* --- REPLACEMENT FUNCTIONS --- */
@@ -215,9 +215,9 @@ strdup(str)
     {
       tmp = LT_DLMALLOC (char, 1+ strlen (str));
       if (tmp)
-	{
-	  strcpy(tmp, str);
-	}
+        {
+          strcpy(tmp, str);
+        }
     }
 
   return tmp;
@@ -246,7 +246,7 @@ strcmp (str1, str2)
   for (;*str1 && *str2; ++str1, ++str2)
     {
       if (*str1 != *str2)
-	break;
+        break;
     }
 
   return (int)(*str1 - *str2);
@@ -299,9 +299,9 @@ strrchr(str, ch)
   for (p = str; *p != LT_EOS_CHAR; ++p)
     {
       if (*p == (char) ch)
-	{
-	  q = p;
-	}
+        {
+          q = p;
+        }
     }
 
   return q;
@@ -313,11 +313,11 @@ strrchr(str, ch)
 /* NOTE:  Neither bcopy nor the memcpy implementation below can
           reliably handle copying in overlapping areas of memory.  Use
           memmove (for which there is a fallback implmentation below)
-	  if you need that behaviour.  */
+          if you need that behaviour.  */
 #if ! HAVE_MEMCPY
 
 #  if HAVE_BCOPY
-#    define memcpy(dest, src, size)	bcopy (src, dest, size)
+#    define memcpy(dest, src, size)     bcopy (src, dest, size)
 #  else
 #    define memcpy rpl_memcpy
 
@@ -358,12 +358,12 @@ memmove (dest, src, size)
   if (dest < src)
     for (i = 0; i < size; ++i)
       {
-	dest[i] = src[i];
+        dest[i] = src[i];
       }
   else if (dest > src)
     for (i = size -1; i >= 0; --i)
       {
-	dest[i] = src[i];
+        dest[i] = src[i];
       }
 
   return dest;
@@ -391,9 +391,9 @@ realloc (ptr, size)
     {
       /* For zero or less bytes, free the original memory */
       if (ptr != 0)
-	{
-	  lt_dlfree (ptr);
-	}
+        {
+          lt_dlfree (ptr);
+        }
 
       return (lt_ptr) 0;
     }
@@ -408,13 +408,13 @@ realloc (ptr, size)
       lt_ptr mem = lt_dlmalloc (size);
 
       if (mem)
-	{
-	  memcpy (mem, ptr, size);
-	  lt_dlfree (ptr);
-	}
+        {
+          memcpy (mem, ptr, size);
+          lt_dlfree (ptr);
+        }
 
       /* Note that the contents of PTR are not damaged if there is
-	 insufficient memory to realloc.  */
+         insufficient memory to realloc.  */
       return mem;
     }
 }
@@ -424,7 +424,7 @@ realloc (ptr, size)
 #  define argz_append rpl_argz_append
 
 static error_t argz_append LT_PARAMS((char **pargz, size_t *pargz_len,
-					const char *buf, size_t buf_len));
+                                        const char *buf, size_t buf_len));
 
 static error_t
 argz_append (pargz, pargz_len, buf, buf_len)
@@ -466,7 +466,7 @@ argz_append (pargz, pargz_len, buf, buf_len)
 #  define argz_create_sep rpl_argz_create_sep
 
 static error_t argz_create_sep LT_PARAMS((const char *str, int delim,
-					    char **pargz, size_t *pargz_len));
+                                            char **pargz, size_t *pargz_len));
 
 static error_t
 argz_create_sep (str, delim, pargz, pargz_len)
@@ -492,22 +492,22 @@ argz_create_sep (str, delim, pargz, pargz_len)
 
       argz = LT_DLMALLOC (char, argz_len);
       if (!argz)
-	return ENOMEM;
+        return ENOMEM;
 
       for (p = str, q = argz; *p != LT_EOS_CHAR; ++p)
-	{
-	  if (*p == delim)
-	    {
-	      /* Ignore leading delimiters, and fold consecutive
-		 delimiters in STR into a single '\0' in ARGZ.  */
-	      if ((q > argz) && (q[-1] != LT_EOS_CHAR))
-		*q++ = LT_EOS_CHAR;
-	      else
-		--argz_len;
-	    }
-	  else
-	    *q++ = *p;
-	}
+        {
+          if (*p == delim)
+            {
+              /* Ignore leading delimiters, and fold consecutive
+                 delimiters in STR into a single '\0' in ARGZ.  */
+              if ((q > argz) && (q[-1] != LT_EOS_CHAR))
+                *q++ = LT_EOS_CHAR;
+              else
+                --argz_len;
+            }
+          else
+            *q++ = *p;
+        }
       /* Copy terminating LT_EOS_CHAR.  */
       *q = *p;
     }
@@ -529,7 +529,7 @@ argz_create_sep (str, delim, pargz, pargz_len)
 #  define argz_insert rpl_argz_insert
 
 static error_t argz_insert LT_PARAMS((char **pargz, size_t *pargz_len,
-					char *before, const char *entry));
+                                        char *before, const char *entry));
 
 static error_t
 argz_insert (pargz, pargz_len, before, entry)
@@ -545,7 +545,7 @@ argz_insert (pargz, pargz_len, before, entry)
   /* Either PARGZ/PARGZ_LEN is empty and BEFORE is NULL,
      or BEFORE points into an address within the ARGZ vector.  */
   assert ((!*pargz && !*pargz_len && !before)
-	  || ((*pargz <= before) && (before < (*pargz + *pargz_len))));
+          || ((*pargz <= before) && (before < (*pargz + *pargz_len))));
 
   /* No BEFORE address indicates ENTRY should be inserted after the
      current last element.  */
@@ -559,10 +559,10 @@ argz_insert (pargz, pargz_len, before, entry)
     --before;
 
   {
-    size_t entry_len	= 1+ LT_STRLEN (entry);
-    size_t argz_len	= *pargz_len + entry_len;
-    size_t offset	= before - *pargz;
-    char   *argz	= LT_DLREALLOC (char, *pargz, argz_len);
+    size_t entry_len    = 1+ LT_STRLEN (entry);
+    size_t argz_len     = *pargz_len + entry_len;
+    size_t offset       = before - *pargz;
+    char   *argz        = LT_DLREALLOC (char, *pargz, argz_len);
 
     if (!argz)
       return ENOMEM;
@@ -591,7 +591,7 @@ argz_insert (pargz, pargz_len, before, entry)
 #  define argz_next rpl_argz_next
 
 static char *argz_next LT_PARAMS((char *argz, size_t argz_len,
-				    const char *entry));
+                                    const char *entry));
 
 static char *
 argz_next (argz, argz_len, entry)
@@ -604,28 +604,28 @@ argz_next (argz, argz_len, entry)
   if (entry)
     {
       /* Either ARGZ/ARGZ_LEN is empty, or ENTRY points into an address
-	 within the ARGZ vector.  */
+         within the ARGZ vector.  */
       assert ((!argz && !argz_len)
-	      || ((argz <= entry) && (entry < (argz + argz_len))));
+              || ((argz <= entry) && (entry < (argz + argz_len))));
 
       /* Move to the char immediately after the terminating
-	 '\0' of ENTRY.  */
+         '\0' of ENTRY.  */
       entry = 1+ strchr (entry, LT_EOS_CHAR);
 
       /* Return either the new ENTRY, or else NULL if ARGZ is
-	 exhausted.  */
+         exhausted.  */
       return (entry >= argz + argz_len) ? 0 : (char *) entry;
     }
   else
     {
       /* This should probably be flagged as a programmer error,
-	 since starting an argz_next loop with the iterator set
-	 to ARGZ is safer.  To preserve semantics, handle the NULL
-	 case by returning the start of ARGZ (if any).  */
+         since starting an argz_next loop with the iterator set
+         to ARGZ is safer.  To preserve semantics, handle the NULL
+         case by returning the start of ARGZ (if any).  */
       if (argz_len > 0)
-	return argz;
+        return argz;
       else
-	return 0;
+        return 0;
     }
 }
 #endif /* !HAVE_ARGZ_NEXT */
@@ -636,7 +636,7 @@ argz_next (argz, argz_len, entry)
 #  define argz_stringify rpl_argz_stringify
 
 static void argz_stringify LT_PARAMS((char *argz, size_t argz_len,
-				       int sep));
+                                       int sep));
 
 static void
 argz_stringify (argz, argz_len, sep)
@@ -648,12 +648,12 @@ argz_stringify (argz, argz_len, sep)
 
   if (sep)
     {
-      --argz_len;		/* don't stringify the terminating EOS */
+      --argz_len;               /* don't stringify the terminating EOS */
       while (--argz_len > 0)
-	{
-	  if (argz[argz_len] == LT_EOS_CHAR)
-	    argz[argz_len] = sep;
-	}
+        {
+          if (argz[argz_len] == LT_EOS_CHAR)
+            argz[argz_len] = sep;
+        }
     }
 }
 #endif /* !HAVE_ARGZ_STRINGIFY */
@@ -666,8 +666,8 @@ argz_stringify (argz, argz_len, sep)
 
 /* This type is used for the array of caller data sets in each handler. */
 typedef struct {
-  lt_dlcaller_id	key;
-  lt_ptr		data;
+  lt_dlcaller_id        key;
+  lt_ptr                data;
 } lt_caller_data;
 
 
@@ -681,7 +681,7 @@ typedef struct {
 
 static const char *lt_dlerror_strings[] =
   {
-#define LT_ERROR(name, diagnostic)	(diagnostic),
+#define LT_ERROR(name, diagnostic)      (diagnostic),
     lt_dlerror_table
 #undef LT_ERROR
 
@@ -691,25 +691,25 @@ static const char *lt_dlerror_strings[] =
 /* This structure is used for the list of registered loaders. */
 struct lt_dlloader {
   struct lt_dlloader   *next;
-  const char	       *loader_name;	/* identifying name for each loader */
-  const char	       *sym_prefix;	/* prefix for symbols */
+  const char           *loader_name;    /* identifying name for each loader */
+  const char           *sym_prefix;     /* prefix for symbols */
   lt_module_open       *module_open;
   lt_module_close      *module_close;
-  lt_find_sym	       *find_sym;
+  lt_find_sym          *find_sym;
   lt_dlloader_exit     *dlloader_exit;
-  lt_user_data		dlloader_data;
+  lt_user_data          dlloader_data;
 };
 
 struct lt_dlhandle_struct {
   struct lt_dlhandle_struct   *next;
-  lt_dlloader	       *loader;		/* dlopening interface */
-  lt_dlinfo		info;
-  int			depcount;	/* number of dependencies */
-  lt_dlhandle	       *deplibs;	/* dependencies */
-  lt_module		module;		/* system module handle */
-  lt_ptr		system;		/* system specific data */
-  lt_caller_data       *caller_data;	/* per caller associated data */
-  int			flags;		/* various boolean stats */
+  lt_dlloader          *loader;         /* dlopening interface */
+  lt_dlinfo             info;
+  int                   depcount;       /* number of dependencies */
+  lt_dlhandle          *deplibs;        /* dependencies */
+  lt_module             module;         /* system module handle */
+  lt_ptr                system;         /* system specific data */
+  lt_caller_data       *caller_data;    /* per caller associated data */
+  int                   flags;          /* various boolean stats */
 };
 
 /* Various boolean flags can be stored in the flags field of an
@@ -717,21 +717,21 @@ struct lt_dlhandle_struct {
 #define LT_DLGET_FLAG(handle, flag) (((handle)->flags & (flag)) == (flag))
 #define LT_DLSET_FLAG(handle, flag) ((handle)->flags |= (flag))
 
-#define LT_DLRESIDENT_FLAG	    (0x01 << 0)
+#define LT_DLRESIDENT_FLAG          (0x01 << 0)
 /* ...add more flags here... */
 
 #define LT_DLIS_RESIDENT(handle)    LT_DLGET_FLAG(handle, LT_DLRESIDENT_FLAG)
 
 
-#define LT_DLSTRERROR(name)	lt_dlerror_strings[LT_CONC(LT_ERROR_,name)]
+#define LT_DLSTRERROR(name)     lt_dlerror_strings[LT_CONC(LT_ERROR_,name)]
 
-static	const char	objdir[]		= LTDL_OBJDIR;
-static	const char	archive_ext[]		= LTDL_ARCHIVE_EXT;
-#ifdef	LTDL_SHLIB_EXT
-static	const char	shlib_ext[]		= LTDL_SHLIB_EXT;
+static  const char      objdir[]                = LTDL_OBJDIR;
+static  const char      archive_ext[]           = LTDL_ARCHIVE_EXT;
+#ifdef  LTDL_SHLIB_EXT
+static  const char      shlib_ext[]             = LTDL_SHLIB_EXT;
 #endif
-#ifdef	LTDL_SYSSEARCHPATH
-static	const char	sys_search_path[]	= LTDL_SYSSEARCHPATH;
+#ifdef  LTDL_SYSSEARCHPATH
+static  const char      sys_search_path[]       = LTDL_SYSSEARCHPATH;
 #endif
 
 
@@ -745,28 +745,28 @@ static	const char	sys_search_path[]	= LTDL_SYSSEARCHPATH;
    ensure that the stored error message from the last error is not
    accidentally erased if the current function doesn't generate an
    error of its own.  */
-#define LT_DLMUTEX_LOCK()			LT_STMT_START {	\
-	if (lt_dlmutex_lock_func) (*lt_dlmutex_lock_func)();	\
-						} LT_STMT_END
-#define LT_DLMUTEX_UNLOCK()			LT_STMT_START { \
-	if (lt_dlmutex_unlock_func) (*lt_dlmutex_unlock_func)();\
-						} LT_STMT_END
-#define LT_DLMUTEX_SETERROR(errormsg)		LT_STMT_START {	\
-	if (lt_dlmutex_seterror_func)				\
-		(*lt_dlmutex_seterror_func) (errormsg);		\
-	else 	lt_dllast_error = (errormsg);	} LT_STMT_END
-#define LT_DLMUTEX_GETERROR(errormsg)		LT_STMT_START {	\
-	if (lt_dlmutex_seterror_func)				\
-		(errormsg) = (*lt_dlmutex_geterror_func) ();	\
-	else	(errormsg) = lt_dllast_error;	} LT_STMT_END
+#define LT_DLMUTEX_LOCK()                       LT_STMT_START { \
+        if (lt_dlmutex_lock_func) (*lt_dlmutex_lock_func)();    \
+                                                } LT_STMT_END
+#define LT_DLMUTEX_UNLOCK()                     LT_STMT_START { \
+        if (lt_dlmutex_unlock_func) (*lt_dlmutex_unlock_func)();\
+                                                } LT_STMT_END
+#define LT_DLMUTEX_SETERROR(errormsg)           LT_STMT_START { \
+        if (lt_dlmutex_seterror_func)                           \
+                (*lt_dlmutex_seterror_func) (errormsg);         \
+        else    lt_dllast_error = (errormsg);   } LT_STMT_END
+#define LT_DLMUTEX_GETERROR(errormsg)           LT_STMT_START { \
+        if (lt_dlmutex_seterror_func)                           \
+                (errormsg) = (*lt_dlmutex_geterror_func) ();    \
+        else    (errormsg) = lt_dllast_error;   } LT_STMT_END
 
 /* The mutex functions stored here are global, and are necessarily the
    same for all threads that wish to share access to libltdl.  */
-static	lt_dlmutex_lock	    *lt_dlmutex_lock_func     = 0;
-static	lt_dlmutex_unlock   *lt_dlmutex_unlock_func   = 0;
-static	lt_dlmutex_seterror *lt_dlmutex_seterror_func = 0;
-static	lt_dlmutex_geterror *lt_dlmutex_geterror_func = 0;
-static	const char	    *lt_dllast_error	      = 0;
+static  lt_dlmutex_lock     *lt_dlmutex_lock_func     = 0;
+static  lt_dlmutex_unlock   *lt_dlmutex_unlock_func   = 0;
+static  lt_dlmutex_seterror *lt_dlmutex_seterror_func = 0;
+static  lt_dlmutex_geterror *lt_dlmutex_geterror_func = 0;
+static  const char          *lt_dllast_error          = 0;
 
 
 /* Either set or reset the mutex functions.  Either all the arguments must
@@ -781,7 +781,7 @@ lt_dlmutex_register (lock, unlock, seterror, geterror)
      lt_dlmutex_geterror *geterror;
 {
   lt_dlmutex_unlock *old_unlock = unlock;
-  int		     errors	= 0;
+  int                errors     = 0;
 
   /* Lock using the old lock() callback, if any.  */
   LT_DLMUTEX_LOCK ();
@@ -815,15 +815,15 @@ lt_dlmutex_register (lock, unlock, seterror, geterror)
 /* --- ERROR HANDLING --- */
 
 
-static	const char    **user_error_strings	= 0;
-static	int		errorcount		= LT_ERROR_MAX;
+static  const char    **user_error_strings      = 0;
+static  int             errorcount              = LT_ERROR_MAX;
 
 int
 lt_dladderror (diagnostic)
      const char *diagnostic;
 {
-  int		errindex = 0;
-  int		result	 = -1;
+  int           errindex = 0;
+  int           result   = -1;
   const char  **temp     = (const char **) 0;
 
   assert (diagnostic);
@@ -834,9 +834,9 @@ lt_dladderror (diagnostic)
   temp = LT_EREALLOC (const char *, user_error_strings, 1 + errindex);
   if (temp)
     {
-      user_error_strings		= temp;
-      user_error_strings[errindex]	= diagnostic;
-      result				= errorcount++;
+      user_error_strings                = temp;
+      user_error_strings[errindex]      = diagnostic;
+      result                            = errorcount++;
     }
 
   LT_DLMUTEX_UNLOCK ();
@@ -848,7 +848,7 @@ int
 lt_dlseterror (errindex)
      int errindex;
 {
-  int		errors	 = 0;
+  int           errors   = 0;
 
   LT_DLMUTEX_LOCK ();
 
@@ -928,44 +928,44 @@ lt_estrdup (str)
 #endif
 
 #ifdef RTLD_GLOBAL
-#  define LT_GLOBAL		RTLD_GLOBAL
+#  define LT_GLOBAL             RTLD_GLOBAL
 #else
 #  ifdef DL_GLOBAL
-#    define LT_GLOBAL		DL_GLOBAL
+#    define LT_GLOBAL           DL_GLOBAL
 #  endif
 #endif /* !RTLD_GLOBAL */
 #ifndef LT_GLOBAL
-#  define LT_GLOBAL		0
+#  define LT_GLOBAL             0
 #endif /* !LT_GLOBAL */
 
 /* We may have to define LT_LAZY_OR_NOW in the command line if we
    find out it does not work in some platform. */
 #ifndef LT_LAZY_OR_NOW
 #  ifdef RTLD_LAZY
-#    define LT_LAZY_OR_NOW	RTLD_LAZY
+#    define LT_LAZY_OR_NOW      RTLD_LAZY
 #  else
 #    ifdef DL_LAZY
-#      define LT_LAZY_OR_NOW	DL_LAZY
+#      define LT_LAZY_OR_NOW    DL_LAZY
 #    endif
 #  endif /* !RTLD_LAZY */
 #endif
 #ifndef LT_LAZY_OR_NOW
 #  ifdef RTLD_NOW
-#    define LT_LAZY_OR_NOW	RTLD_NOW
+#    define LT_LAZY_OR_NOW      RTLD_NOW
 #  else
 #    ifdef DL_NOW
-#      define LT_LAZY_OR_NOW	DL_NOW
+#      define LT_LAZY_OR_NOW    DL_NOW
 #    endif
 #  endif /* !RTLD_NOW */
 #endif
 #ifndef LT_LAZY_OR_NOW
-#  define LT_LAZY_OR_NOW	0
+#  define LT_LAZY_OR_NOW        0
 #endif /* !LT_LAZY_OR_NOW */
 
 #if HAVE_DLERROR
-#  define DLERROR(arg)	dlerror ()
+#  define DLERROR(arg)  dlerror ()
 #else
-#  define DLERROR(arg)	LT_DLSTRERROR (arg)
+#  define DLERROR(arg)  LT_DLSTRERROR (arg)
 #endif
 
 static lt_module
@@ -1047,37 +1047,37 @@ static struct lt_user_dlloader sys_dl =
  * BIND_DEFERRED   - Delay code symbol resolution until actual reference.
  *
  * Optionally:
- * BIND_FIRST	   - Place the library at the head of the symbol search
- * 		     order.
+ * BIND_FIRST      - Place the library at the head of the symbol search
+ *                   order.
  * BIND_NONFATAL   - The default BIND_IMMEDIATE behavior is to treat all
- * 		     unsatisfied symbols as fatal.  This flag allows
- * 		     binding of unsatisfied code symbols to be deferred
- * 		     until use.
- *		     [Perl: For certain libraries, like DCE, deferred
- *		     binding often causes run time problems. Adding
- *		     BIND_NONFATAL to BIND_IMMEDIATE still allows
- *		     unresolved references in situations like this.]
- * BIND_NOSTART	   - Do not call the initializer for the shared library
- *		     when the library is loaded, nor on a future call to
- *		     shl_unload().
- * BIND_VERBOSE	   - Print verbose messages concerning possible
- *		     unsatisfied symbols.
+ *                   unsatisfied symbols as fatal.  This flag allows
+ *                   binding of unsatisfied code symbols to be deferred
+ *                   until use.
+ *                   [Perl: For certain libraries, like DCE, deferred
+ *                   binding often causes run time problems. Adding
+ *                   BIND_NONFATAL to BIND_IMMEDIATE still allows
+ *                   unresolved references in situations like this.]
+ * BIND_NOSTART    - Do not call the initializer for the shared library
+ *                   when the library is loaded, nor on a future call to
+ *                   shl_unload().
+ * BIND_VERBOSE    - Print verbose messages concerning possible
+ *                   unsatisfied symbols.
  *
  * hp9000s700/hp9000s800:
  * BIND_RESTRICTED - Restrict symbols visible by the library to those
- *		     present at library load time.
- * DYNAMIC_PATH	   - Allow the loader to dynamically search for the
- *		     library specified by the path argument.
+ *                   present at library load time.
+ * DYNAMIC_PATH    - Allow the loader to dynamically search for the
+ *                   library specified by the path argument.
  */
 
-#ifndef	DYNAMIC_PATH
-#  define DYNAMIC_PATH		0
+#ifndef DYNAMIC_PATH
+#  define DYNAMIC_PATH          0
 #endif
-#ifndef	BIND_RESTRICTED
-#  define BIND_RESTRICTED	0
+#ifndef BIND_RESTRICTED
+#  define BIND_RESTRICTED       0
 #endif
 
-#define	LT_BIND_FLAGS	(BIND_IMMEDIATE | BIND_NONFATAL | DYNAMIC_PATH)
+#define LT_BIND_FLAGS   (BIND_IMMEDIATE | BIND_NONFATAL | DYNAMIC_PATH)
 
 static lt_module
 sys_shl_open (loader_data, filename)
@@ -1106,9 +1106,9 @@ sys_shl_open (loader_data, filename)
       module = shl_load (filename, LT_BIND_FLAGS, 0L);
 
       if (!module)
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (CANNOT_OPEN));
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (CANNOT_OPEN));
+        }
     }
 
   return module;
@@ -1146,9 +1146,9 @@ sys_shl_sym (loader_data, module, symbol)
   else if (!shl_findsym((shl_t*) &module, symbol, TYPE_UNDEFINED, &address))
     {
       if (!address)
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (SYMBOL_NOT_FOUND));
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (SYMBOL_NOT_FOUND));
+        }
     }
 
   return address;
@@ -1179,12 +1179,12 @@ sys_wll_open (loader_data, filename)
      lt_user_data loader_data;
      const char *filename;
 {
-  lt_dlhandle	cur;
-  lt_module	module	   = 0;
+  lt_dlhandle   cur;
+  lt_module     module     = 0;
   const char   *errormsg   = 0;
-  char	       *searchname = 0;
-  char	       *ext;
-  char		self_name_buf[MAX_PATH];
+  char         *searchname = 0;
+  char         *ext;
+  char          self_name_buf[MAX_PATH];
 
   if (!filename)
     {
@@ -1206,10 +1206,10 @@ sys_wll_open (loader_data, filename)
   else
     {
       /* Append a `.' to stop Windows from adding an
-	 implicit `.dll' extension. */
+         implicit `.dll' extension. */
       searchname = LT_EMALLOC (char, 2+ LT_STRLEN (filename));
       if (searchname)
-	sprintf (searchname, "%s.", filename);
+        sprintf (searchname, "%s.", filename);
     }
   if (!searchname)
     return 0;
@@ -1238,15 +1238,15 @@ sys_wll_open (loader_data, filename)
   while (cur)
     {
       if (!cur->module)
-	{
-	  cur = 0;
-	  break;
-	}
+        {
+          cur = 0;
+          break;
+        }
 
       if (cur->module == module)
-	{
-	  break;
-	}
+        {
+          break;
+        }
 
       cur = cur->next;
   }
@@ -1266,7 +1266,7 @@ sys_wll_close (loader_data, module)
      lt_user_data loader_data;
      lt_module module;
 {
-  int	      errors   = 0;
+  int         errors   = 0;
 
   if (FreeLibrary(module) == 0)
     {
@@ -1327,7 +1327,7 @@ sys_bedl_open (loader_data, filename)
       image_info info;
       int32 cookie = 0;
       if (get_next_image_info (0, &cookie, &info) == B_OK)
-	image = load_add_on (info.name);
+        image = load_add_on (info.name);
     }
 
   if (image <= 0)
@@ -1463,11 +1463,11 @@ static struct lt_user_dlloader sys_dld = {
 typedef struct lt_dlsymlists_t
 {
   struct lt_dlsymlists_t       *next;
-  const lt_dlsymlist	       *syms;
+  const lt_dlsymlist           *syms;
 } lt_dlsymlists_t;
 
-static	const lt_dlsymlist     *default_preloaded_symbols	= 0;
-static	lt_dlsymlists_t	       *preloaded_symbols		= 0;
+static  const lt_dlsymlist     *default_preloaded_symbols       = 0;
+static  lt_dlsymlists_t        *preloaded_symbols               = 0;
 
 static int
 presym_init (loader_data)
@@ -1498,7 +1498,7 @@ presym_free_symlists ()
   lists = preloaded_symbols;
   while (lists)
     {
-      lt_dlsymlists_t	*tmp = lists;
+      lt_dlsymlists_t   *tmp = lists;
 
       lists = lists->next;
       LT_DLFREE (tmp);
@@ -1524,7 +1524,7 @@ presym_add_symlist (preloaded)
 {
   lt_dlsymlists_t *tmp;
   lt_dlsymlists_t *lists;
-  int		   errors   = 0;
+  int              errors   = 0;
 
   LT_DLMUTEX_LOCK ();
 
@@ -1532,9 +1532,9 @@ presym_add_symlist (preloaded)
   while (lists)
     {
       if (lists->syms == preloaded)
-	{
-	  goto done;
-	}
+        {
+          goto done;
+        }
       lists = lists->next;
     }
 
@@ -1562,7 +1562,7 @@ presym_open (loader_data, filename)
      const char *filename;
 {
   lt_dlsymlists_t *lists;
-  lt_module	   module = (lt_module) 0;
+  lt_module        module = (lt_module) 0;
 
   LT_DLMUTEX_LOCK ();
   lists = preloaded_symbols;
@@ -1587,14 +1587,14 @@ presym_open (loader_data, filename)
       const lt_dlsymlist *syms = lists->syms;
 
       while (syms->name)
-	{
-	  if (!syms->address && strcmp(syms->name, filename) == 0)
-	    {
-	      module = (lt_module) syms;
-	      goto done;
-	    }
-	  ++syms;
-	}
+        {
+          if (!syms->address && strcmp(syms->name, filename) == 0)
+            {
+              module = (lt_module) syms;
+              goto done;
+            }
+          ++syms;
+        }
 
       lists = lists->next;
     }
@@ -1628,9 +1628,9 @@ presym_sym (loader_data, module, symbol)
   while (syms->address)
     {
       if (strcmp(syms->name, symbol) == 0)
-	{
-	  return syms->address;
-	}
+        {
+          return syms->address;
+        }
 
     ++syms;
   }
@@ -1652,79 +1652,79 @@ static struct lt_user_dlloader presym = {
 
 
 /* The type of a function used at each iteration of  foreach_dirinpath().  */
-typedef int	foreach_callback_func LT_PARAMS((char *filename, lt_ptr data1,
-						 lt_ptr data2));
+typedef int     foreach_callback_func LT_PARAMS((char *filename, lt_ptr data1,
+                                                 lt_ptr data2));
 
-static	int	foreach_dirinpath     LT_PARAMS((const char *search_path,
-						 const char *base_name,
-						 foreach_callback_func *func,
-						 lt_ptr data1, lt_ptr data2));
+static  int     foreach_dirinpath     LT_PARAMS((const char *search_path,
+                                                 const char *base_name,
+                                                 foreach_callback_func *func,
+                                                 lt_ptr data1, lt_ptr data2));
 
-static	int	find_file_callback    LT_PARAMS((char *filename, lt_ptr data,
-						 lt_ptr ignored));
-static	int	find_handle_callback  LT_PARAMS((char *filename, lt_ptr data,
-						 lt_ptr ignored));
-static	int	foreachfile_callback  LT_PARAMS((char *filename, lt_ptr data1,
-						 lt_ptr data2));
+static  int     find_file_callback    LT_PARAMS((char *filename, lt_ptr data,
+                                                 lt_ptr ignored));
+static  int     find_handle_callback  LT_PARAMS((char *filename, lt_ptr data,
+                                                 lt_ptr ignored));
+static  int     foreachfile_callback  LT_PARAMS((char *filename, lt_ptr data1,
+                                                 lt_ptr data2));
 
 
-static	int     canonicalize_path     LT_PARAMS((const char *path,
-						 char **pcanonical));
-static	int	argzize_path 	      LT_PARAMS((const char *path,
-						 char **pargz,
-						 size_t *pargz_len));
-static	FILE   *find_file	      LT_PARAMS((const char *search_path,
-						 const char *base_name,
-						 char **pdir));
-static	lt_dlhandle *find_handle      LT_PARAMS((const char *search_path,
-						 const char *base_name,
-						 lt_dlhandle *handle));
-static	int	find_module	      LT_PARAMS((lt_dlhandle *handle,
-						 const char *dir,
-						 const char *libdir,
-						 const char *dlname,
-						 const char *old_name,
-						 int installed));
-static	int	free_vars	      LT_PARAMS((char *dlname, char *oldname,
-						 char *libdir, char *deplibs));
-static	int	load_deplibs	      LT_PARAMS((lt_dlhandle handle,
-						 char *deplibs));
-static	int	trim		      LT_PARAMS((char **dest,
-						 const char *str));
-static	int	try_dlopen	      LT_PARAMS((lt_dlhandle *handle,
-						 const char *filename));
-static	int	tryall_dlopen	      LT_PARAMS((lt_dlhandle *handle,
-						 const char *filename));
-static	int	unload_deplibs	      LT_PARAMS((lt_dlhandle handle));
-static	int	lt_argz_insert	      LT_PARAMS((char **pargz,
-						 size_t *pargz_len,
-						 char *before,
-						 const char *entry));
-static	int	lt_argz_insertinorder LT_PARAMS((char **pargz,
-						 size_t *pargz_len,
-						 const char *entry));
-static	int	lt_argz_insertdir     LT_PARAMS((char **pargz,
-						 size_t *pargz_len,
-						 const char *dirnam,
-						 struct dirent *dp));
-static	int	lt_dlpath_insertdir   LT_PARAMS((char **ppath,
-						 char *before,
-						 const char *dir));
-static	int	list_files_by_dir     LT_PARAMS((const char *dirnam,
-						 char **pargz,
-						 size_t *pargz_len));
-static	int	file_not_found	      LT_PARAMS((void));
+static  int     canonicalize_path     LT_PARAMS((const char *path,
+                                                 char **pcanonical));
+static  int     argzize_path          LT_PARAMS((const char *path,
+                                                 char **pargz,
+                                                 size_t *pargz_len));
+static  FILE   *find_file             LT_PARAMS((const char *search_path,
+                                                 const char *base_name,
+                                                 char **pdir));
+static  lt_dlhandle *find_handle      LT_PARAMS((const char *search_path,
+                                                 const char *base_name,
+                                                 lt_dlhandle *handle));
+static  int     find_module           LT_PARAMS((lt_dlhandle *handle,
+                                                 const char *dir,
+                                                 const char *libdir,
+                                                 const char *dlname,
+                                                 const char *old_name,
+                                                 int installed));
+static  int     free_vars             LT_PARAMS((char *dlname, char *oldname,
+                                                 char *libdir, char *deplibs));
+static  int     load_deplibs          LT_PARAMS((lt_dlhandle handle,
+                                                 char *deplibs));
+static  int     trim                  LT_PARAMS((char **dest,
+                                                 const char *str));
+static  int     try_dlopen            LT_PARAMS((lt_dlhandle *handle,
+                                                 const char *filename));
+static  int     tryall_dlopen         LT_PARAMS((lt_dlhandle *handle,
+                                                 const char *filename));
+static  int     unload_deplibs        LT_PARAMS((lt_dlhandle handle));
+static  int     lt_argz_insert        LT_PARAMS((char **pargz,
+                                                 size_t *pargz_len,
+                                                 char *before,
+                                                 const char *entry));
+static  int     lt_argz_insertinorder LT_PARAMS((char **pargz,
+                                                 size_t *pargz_len,
+                                                 const char *entry));
+static  int     lt_argz_insertdir     LT_PARAMS((char **pargz,
+                                                 size_t *pargz_len,
+                                                 const char *dirnam,
+                                                 struct dirent *dp));
+static  int     lt_dlpath_insertdir   LT_PARAMS((char **ppath,
+                                                 char *before,
+                                                 const char *dir));
+static  int     list_files_by_dir     LT_PARAMS((const char *dirnam,
+                                                 char **pargz,
+                                                 size_t *pargz_len));
+static  int     file_not_found        LT_PARAMS((void));
 
-static	char	       *user_search_path= 0;
-static	lt_dlloader    *loaders		= 0;
-static	lt_dlhandle	handles 	= 0;
-static	int		initialized 	= 0;
+static  char           *user_search_path= 0;
+static  lt_dlloader    *loaders         = 0;
+static  lt_dlhandle     handles         = 0;
+static  int             initialized     = 0;
 
 /* Initialize libltdl. */
 int
 lt_dlinit ()
 {
-  int	      errors   = 0;
+  int         errors   = 0;
 
   LT_DLMUTEX_LOCK ();
 
@@ -1752,15 +1752,15 @@ lt_dlinit ()
       errors += lt_dlloader_add (lt_dlloader_next (0), &presym, "dlpreload");
 
       if (presym_init (presym.dlloader_data))
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (INIT_LOADER));
-	  ++errors;
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (INIT_LOADER));
+          ++errors;
+        }
       else if (errors != 0)
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (DLOPEN_NOT_SUPPORTED));
-	  ++errors;
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (DLOPEN_NOT_SUPPORTED));
+          ++errors;
+        }
     }
 
   LT_DLMUTEX_UNLOCK ();
@@ -1784,9 +1784,9 @@ lt_dlpreload (preloaded)
 
       LT_DLMUTEX_LOCK ();
       if (default_preloaded_symbols)
-	{
-	  errors = lt_dlpreload (default_preloaded_symbols);
-	}
+        {
+          errors = lt_dlpreload (default_preloaded_symbols);
+        }
       LT_DLMUTEX_UNLOCK ();
     }
 
@@ -1808,7 +1808,7 @@ lt_dlexit ()
 {
   /* shut down libltdl */
   lt_dlloader *loader;
-  int	       errors   = 0;
+  int          errors   = 0;
 
   LT_DLMUTEX_LOCK ();
   loader = loaders;
@@ -1823,50 +1823,50 @@ lt_dlexit ()
   /* shut down only at last call. */
   if (--initialized == 0)
     {
-      int	level;
+      int       level;
 
       while (handles && LT_DLIS_RESIDENT (handles))
-	{
-	  handles = handles->next;
-	}
+        {
+          handles = handles->next;
+        }
 
       /* close all modules */
       for (level = 1; handles; ++level)
-	{
-	  lt_dlhandle cur = handles;
-	  int saw_nonresident = 0;
+        {
+          lt_dlhandle cur = handles;
+          int saw_nonresident = 0;
 
-	  while (cur)
-	    {
-	      lt_dlhandle tmp = cur;
-	      cur = cur->next;
-	      if (!LT_DLIS_RESIDENT (tmp))
-		saw_nonresident = 1;
-	      if (!LT_DLIS_RESIDENT (tmp) && tmp->info.ref_count <= level)
-		{
-		  if (lt_dlclose (tmp))
-		    {
-		      ++errors;
-		    }
-		}
-	    }
-	  /* done if only resident modules are left */
-	  if (!saw_nonresident)
-	    break;
-	}
+          while (cur)
+            {
+              lt_dlhandle tmp = cur;
+              cur = cur->next;
+              if (!LT_DLIS_RESIDENT (tmp))
+                saw_nonresident = 1;
+              if (!LT_DLIS_RESIDENT (tmp) && tmp->info.ref_count <= level)
+                {
+                  if (lt_dlclose (tmp))
+                    {
+                      ++errors;
+                    }
+                }
+            }
+          /* done if only resident modules are left */
+          if (!saw_nonresident)
+            break;
+        }
 
       /* close all loaders */
       while (loader)
-	{
-	  lt_dlloader *next = loader->next;
-	  lt_user_data data = loader->dlloader_data;
-	  if (loader->dlloader_exit && loader->dlloader_exit (data))
-	    {
-	      ++errors;
-	    }
+        {
+          lt_dlloader *next = loader->next;
+          lt_user_data data = loader->dlloader_data;
+          if (loader->dlloader_exit && loader->dlloader_exit (data))
+            {
+              ++errors;
+            }
 
-	  LT_DLMEM_REASSIGN (loader, next);
-	}
+          LT_DLMEM_REASSIGN (loader, next);
+        }
       loaders = 0;
     }
 
@@ -1880,15 +1880,15 @@ tryall_dlopen (handle, filename)
      lt_dlhandle *handle;
      const char *filename;
 {
-  lt_dlhandle	 cur;
+  lt_dlhandle    cur;
   lt_dlloader   *loader;
-  const char	*saved_error;
-  int		 errors		= 0;
+  const char    *saved_error;
+  int            errors         = 0;
 
   LT_DLMUTEX_GETERROR (saved_error);
   LT_DLMUTEX_LOCK ();
 
-  cur	 = handles;
+  cur    = handles;
   loader = loaders;
 
   /* check whether the module was already opened */
@@ -1896,15 +1896,15 @@ tryall_dlopen (handle, filename)
     {
       /* try to dlopen the program itself? */
       if (!cur->info.filename && !filename)
-	{
-	  break;
-	}
+        {
+          break;
+        }
 
       if (cur->info.filename && filename
-	  && strcmp (cur->info.filename, filename) == 0)
-	{
-	  break;
-	}
+          && strcmp (cur->info.filename, filename) == 0)
+        {
+          break;
+        }
 
       cur = cur->next;
     }
@@ -1921,10 +1921,10 @@ tryall_dlopen (handle, filename)
     {
       cur->info.filename = lt_estrdup (filename);
       if (!cur->info.filename)
-	{
-	  ++errors;
-	  goto done;
-	}
+        {
+          ++errors;
+          goto done;
+        }
     }
   else
     {
@@ -1938,9 +1938,9 @@ tryall_dlopen (handle, filename)
       cur->module = loader->module_open (data, filename);
 
       if (cur->module != 0)
-	{
-	  break;
-	}
+        {
+          break;
+        }
       loader = loader->next;
     }
 
@@ -1951,7 +1951,7 @@ tryall_dlopen (handle, filename)
       goto done;
     }
 
-  cur->loader	= loader;
+  cur->loader   = loader;
   LT_DLMUTEX_SETERROR (saved_error);
 
  done:
@@ -1967,10 +1967,10 @@ tryall_dlopen_module (handle, prefix, dirname, dlname)
      const char *dirname;
      const char *dlname;
 {
-  int      error	= 0;
-  char     *filename	= 0;
-  size_t   filename_len	= 0;
-  size_t   dirname_len	= LT_STRLEN (dirname);
+  int      error        = 0;
+  char     *filename    = 0;
+  size_t   filename_len = 0;
+  size_t   dirname_len  = LT_STRLEN (dirname);
 
   assert (handle);
   assert (dirname);
@@ -1999,7 +1999,7 @@ tryall_dlopen_module (handle, prefix, dirname, dlname)
   if (prefix)
     {
       error += tryall_dlopen_module (handle,
-				     (const char *) 0, prefix, filename);
+                                     (const char *) 0, prefix, filename);
     }
   else if (tryall_dlopen (handle, filename) != 0)
     {
@@ -2032,24 +2032,24 @@ find_module (handle, dir, libdir, dlname, old_name, installed)
     {
       /* try to open the installed module */
       if (installed && libdir)
-	{
-	  if (tryall_dlopen_module (handle,
-				    (const char *) 0, libdir, dlname) == 0)
-	    return 0;
-	}
+        {
+          if (tryall_dlopen_module (handle,
+                                    (const char *) 0, libdir, dlname) == 0)
+            return 0;
+        }
 
       /* try to open the not-installed module */
       if (!installed)
-	{
-	  if (tryall_dlopen_module (handle, dir, objdir, dlname) == 0)
-	    return 0;
-	}
+        {
+          if (tryall_dlopen_module (handle, dir, objdir, dlname) == 0)
+            return 0;
+        }
 
       /* maybe it was moved to another directory */
       {
-	  if (tryall_dlopen_module (handle,
-				    (const char *) 0, dir, dlname) == 0)
-	    return 0;
+          if (tryall_dlopen_module (handle,
+                                    (const char *) 0, dir, dlname) == 0)
+            return 0;
       }
     }
 
@@ -2076,38 +2076,38 @@ canonicalize_path (path, pcanonical)
     size_t src;
     for (src = 0; path[src] != LT_EOS_CHAR; ++src)
       {
-	/* Path separators are not copied to the beginning or end of
-	   the destination, or if another separator would follow
-	   immediately.  */
-	if (path[src] == LT_PATHSEP_CHAR)
-	  {
-	    if ((dest == 0)
-		|| (path[1+ src] == LT_PATHSEP_CHAR)
-		|| (path[1+ src] == LT_EOS_CHAR))
-	      continue;
-	  }
+        /* Path separators are not copied to the beginning or end of
+           the destination, or if another separator would follow
+           immediately.  */
+        if (path[src] == LT_PATHSEP_CHAR)
+          {
+            if ((dest == 0)
+                || (path[1+ src] == LT_PATHSEP_CHAR)
+                || (path[1+ src] == LT_EOS_CHAR))
+              continue;
+          }
 
-	/* Anything other than a directory separator is copied verbatim.  */
-	if ((path[src] != '/')
+        /* Anything other than a directory separator is copied verbatim.  */
+        if ((path[src] != '/')
 #ifdef LT_DIRSEP_CHAR
-	    && (path[src] != LT_DIRSEP_CHAR)
+            && (path[src] != LT_DIRSEP_CHAR)
 #endif
-	    )
-	  {
-	    canonical[dest++] = path[src];
-	  }
-	/* Directory separators are converted and copied only if they are
-	   not at the end of a path -- i.e. before a path separator or
-	   NULL terminator.  */
-	else if ((path[1+ src] != LT_PATHSEP_CHAR)
-		 && (path[1+ src] != LT_EOS_CHAR)
+            )
+          {
+            canonical[dest++] = path[src];
+          }
+        /* Directory separators are converted and copied only if they are
+           not at the end of a path -- i.e. before a path separator or
+           NULL terminator.  */
+        else if ((path[1+ src] != LT_PATHSEP_CHAR)
+                 && (path[1+ src] != LT_EOS_CHAR)
 #ifdef LT_DIRSEP_CHAR
-		 && (path[1+ src] != LT_DIRSEP_CHAR)
+                 && (path[1+ src] != LT_DIRSEP_CHAR)
 #endif
-		 && (path[1+ src] != '/'))
-	  {
-	    canonical[dest++] = '/';
-	  }
+                 && (path[1+ src] != '/'))
+          {
+            canonical[dest++] = '/';
+          }
       }
 
     /* Add an end-of-string marker at the end.  */
@@ -2135,14 +2135,14 @@ argzize_path (path, pargz, pargz_len)
   if ((error = argz_create_sep (path, LT_PATHSEP_CHAR, pargz, pargz_len)))
     {
       switch (error)
-	{
-	case ENOMEM:
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (NO_MEMORY));
-	  break;
-	default:
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (UNKNOWN));
-	  break;
-	}
+        {
+        case ENOMEM:
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (NO_MEMORY));
+          break;
+        default:
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (UNKNOWN));
+          break;
+        }
 
       return 1;
     }
@@ -2162,13 +2162,13 @@ foreach_dirinpath (search_path, base_name, func, data1, data2)
      lt_ptr data1;
      lt_ptr data2;
 {
-  int	 result		= 0;
-  int	 filenamesize	= 0;
-  size_t lenbase	= LT_STRLEN (base_name);
-  size_t argz_len	= 0;
-  char *argz		= 0;
-  char *filename	= 0;
-  char *canonical	= 0;
+  int    result         = 0;
+  int    filenamesize   = 0;
+  size_t lenbase        = LT_STRLEN (base_name);
+  size_t argz_len       = 0;
+  char *argz            = 0;
+  char *filename        = 0;
+  char *canonical       = 0;
 
   LT_DLMUTEX_LOCK ();
 
@@ -2188,29 +2188,29 @@ foreach_dirinpath (search_path, base_name, func, data1, data2)
     char *dir_name = 0;
     while ((dir_name = argz_next (argz, argz_len, dir_name)))
       {
-	size_t lendir = LT_STRLEN (dir_name);
+        size_t lendir = LT_STRLEN (dir_name);
 
-	if (lendir +1 +lenbase >= filenamesize)
-	{
-	  LT_DLFREE (filename);
-	  filenamesize	= lendir +1 +lenbase +1; /* "/d" + '/' + "f" + '\0' */
-	  filename	= LT_EMALLOC (char, filenamesize);
-	  if (!filename)
-	    goto cleanup;
-	}
+        if (lendir +1 +lenbase >= filenamesize)
+        {
+          LT_DLFREE (filename);
+          filenamesize  = lendir +1 +lenbase +1; /* "/d" + '/' + "f" + '\0' */
+          filename      = LT_EMALLOC (char, filenamesize);
+          if (!filename)
+            goto cleanup;
+        }
 
-	strncpy (filename, dir_name, lendir);
-	if (base_name && *base_name)
-	  {
-	    if (filename[lendir -1] != '/')
-	      filename[lendir++] = '/';
-	    strcpy (filename +lendir, base_name);
-	  }
+        strncpy (filename, dir_name, lendir);
+        if (base_name && *base_name)
+          {
+            if (filename[lendir -1] != '/')
+              filename[lendir++] = '/';
+            strcpy (filename +lendir, base_name);
+          }
 
-	if ((result = (*func) (filename, data1, data2)))
-	  {
-	    break;
-	  }
+        if ((result = (*func) (filename, data1, data2)))
+          {
+            break;
+          }
       }
   }
 
@@ -2233,9 +2233,9 @@ find_file_callback (filename, data1, data2)
      lt_ptr data1;
      lt_ptr data2;
 {
-  char	     **pdir	= (char **) data1;
-  FILE	     **pfile	= (FILE **) data2;
-  int	     is_done	= 0;
+  char       **pdir     = (char **) data1;
+  FILE       **pfile    = (FILE **) data2;
+  int        is_done    = 0;
 
   assert (filename && *filename);
   assert (pdir);
@@ -2246,7 +2246,7 @@ find_file_callback (filename, data1, data2)
       char *dirend = strrchr (filename, '/');
 
       if (dirend > filename)
-	*dirend   = LT_EOS_CHAR;
+        *dirend   = LT_EOS_CHAR;
 
       LT_DLFREE (*pdir);
       *pdir   = lt_estrdup (filename);
@@ -2275,8 +2275,8 @@ find_handle_callback (filename, data, ignored)
      lt_ptr data;
      lt_ptr ignored;
 {
-  lt_dlhandle  *handle	= (lt_dlhandle *) data;
-  int		found	= access (filename, R_OK);
+  lt_dlhandle  *handle  = (lt_dlhandle *) data;
+  int           found   = access (filename, R_OK);
 
   /* Bail out if file cannot be read...  */
   if (!found)
@@ -2302,7 +2302,7 @@ find_handle (search_path, base_name, handle)
     return 0;
 
   if (!foreach_dirinpath (search_path, base_name, find_handle_callback,
-			  handle, 0))
+                          handle, 0))
     return 0;
 
   return handle;
@@ -2314,12 +2314,12 @@ load_deplibs (handle, deplibs)
      char *deplibs;
 {
 #if LTDL_DLOPEN_DEPLIBS
-  char	*p, *save_search_path = 0;
+  char  *p, *save_search_path = 0;
   int   depcount = 0;
-  int	i;
-  char	**names = 0;
+  int   i;
+  char  **names = 0;
 #endif
-  int	errors = 0;
+  int   errors = 0;
 
   handle->depcount = 0;
 
@@ -2335,7 +2335,7 @@ load_deplibs (handle, deplibs)
     {
       save_search_path = lt_estrdup (user_search_path);
       if (!save_search_path)
-	goto cleanup;
+        goto cleanup;
     }
 
   /* extract search paths and count deplibs */
@@ -2343,34 +2343,34 @@ load_deplibs (handle, deplibs)
   while (*p)
     {
       if (!isspace ((int) *p))
-	{
-	  char *end = p+1;
-	  while (*end && !isspace((int) *end))
-	    {
-	      ++end;
-	    }
+        {
+          char *end = p+1;
+          while (*end && !isspace((int) *end))
+            {
+              ++end;
+            }
 
-	  if (strncmp(p, "-L", 2) == 0 || strncmp(p, "-R", 2) == 0)
-	    {
-	      char save = *end;
-	      *end = 0; /* set a temporary string terminator */
-	      if (lt_dladdsearchdir(p+2))
-		{
-		  goto cleanup;
-		}
-	      *end = save;
-	    }
-	  else
-	    {
-	      ++depcount;
-	    }
+          if (strncmp(p, "-L", 2) == 0 || strncmp(p, "-R", 2) == 0)
+            {
+              char save = *end;
+              *end = 0; /* set a temporary string terminator */
+              if (lt_dladdsearchdir(p+2))
+                {
+                  goto cleanup;
+                }
+              *end = save;
+            }
+          else
+            {
+              ++depcount;
+            }
 
-	  p = end;
-	}
+          p = end;
+        }
       else
-	{
-	  ++p;
-	}
+        {
+          ++p;
+        }
     }
 
   /* restore the old search path */
@@ -2394,41 +2394,41 @@ load_deplibs (handle, deplibs)
   p = deplibs;
   while (*p)
     {
-      if (isspace ((int) *p))
-	{
-	  ++p;
-	}
+      if (isspace ((unsigned char) *p))
+        {
+          ++p;
+        }
       else
-	{
-	  char *end = p+1;
-	  while (*end && !isspace ((int) *end))
-	    {
-	      ++end;
-	    }
+        {
+          char *end = p+1;
+          while (*end && !isspace ((unsigned char) *end))
+            {
+              ++end;
+            }
 
-	  if (strncmp(p, "-L", 2) != 0 && strncmp(p, "-R", 2) != 0)
-	    {
-	      char *name;
-	      char save = *end;
-	      *end = 0; /* set a temporary string terminator */
-	      if (strncmp(p, "-l", 2) == 0)
-		{
-		  size_t name_len = 3+ /* "lib" */ LT_STRLEN (p + 2);
-		  name = LT_EMALLOC (char, 1+ name_len);
-		  if (name)
-		    sprintf (name, "lib%s", p+2);
-		}
-	      else
-		name = lt_estrdup(p);
+          if (strncmp(p, "-L", 2) != 0 && strncmp(p, "-R", 2) != 0)
+            {
+              char *name;
+              char save = *end;
+              *end = 0; /* set a temporary string terminator */
+              if (strncmp(p, "-l", 2) == 0)
+                {
+                  size_t name_len = 3+ /* "lib" */ LT_STRLEN (p + 2);
+                  name = LT_EMALLOC (char, 1+ name_len);
+                  if (name)
+                    sprintf (name, "lib%s", p+2);
+                }
+              else
+                name = lt_estrdup(p);
 
-	      if (!name)
-		goto cleanup_names;
+              if (!name)
+                goto cleanup_names;
 
-	      names[depcount++] = name;
-	      *end = save;
-	    }
-	  p = end;
-	}
+              names[depcount++] = name;
+              *end = save;
+            }
+          p = end;
+        }
     }
 
   /* load the deplibs (in reverse order)
@@ -2438,23 +2438,23 @@ load_deplibs (handle, deplibs)
      later on if the loaded module cannot resolve all of its symbols.  */
   if (depcount)
     {
-      int	j = 0;
+      int       j = 0;
 
       handle->deplibs = (lt_dlhandle*) LT_EMALLOC (lt_dlhandle *, depcount);
       if (!handle->deplibs)
-	goto cleanup;
+        goto cleanup;
 
       for (i = 0; i < depcount; ++i)
-	{
-	  handle->deplibs[j] = lt_dlopenext(names[depcount-1-i]);
-	  if (handle->deplibs[j])
-	    {
-	      ++j;
-	    }
-	}
+        {
+          handle->deplibs[j] = lt_dlopenext(names[depcount-1-i]);
+          if (handle->deplibs[j])
+            {
+              ++j;
+            }
+        }
 
-      handle->depcount	= j;	/* Number of successfully loaded deplibs */
-      errors		= 0;
+      handle->depcount  = j;    /* Number of successfully loaded deplibs */
+      errors            = 0;
     }
 
  cleanup_names:
@@ -2480,12 +2480,12 @@ unload_deplibs (handle)
   if (handle->depcount)
     {
       for (i = 0; i < handle->depcount; ++i)
-	{
-	  if (!LT_DLIS_RESIDENT (handle->deplibs[i]))
-	    {
-	      errors += lt_dlclose (handle->deplibs[i]);
-	    }
-	}
+        {
+          if (!LT_DLIS_RESIDENT (handle->deplibs[i]))
+            {
+              errors += lt_dlclose (handle->deplibs[i]);
+            }
+        }
     }
 
   return errors;
@@ -2499,7 +2499,7 @@ trim (dest, str)
   /* remove the leading and trailing "'" from str
      and store the result in dest */
   const char *end   = strrchr (str, '\'');
-  size_t len	    = LT_STRLEN (str);
+  size_t len        = LT_STRLEN (str);
   char *tmp;
 
   LT_DLFREE (*dest);
@@ -2508,7 +2508,7 @@ trim (dest, str)
     {
       tmp = LT_EMALLOC (char, end - str);
       if (!tmp)
-	return 1;
+        return 1;
 
       strncpy(tmp, &str[1], (end - str) - 1);
       tmp[len-3] = LT_EOS_CHAR;
@@ -2542,14 +2542,14 @@ try_dlopen (phandle, filename)
      lt_dlhandle *phandle;
      const char *filename;
 {
-  const char *	ext		= 0;
-  const char *	saved_error	= 0;
-  char *	canonical	= 0;
-  char *	base_name	= 0;
-  char *	dir		= 0;
-  char *	name		= 0;
-  int		errors		= 0;
-  lt_dlhandle	newhandle;
+  const char *  ext             = 0;
+  const char *  saved_error     = 0;
+  char *        canonical       = 0;
+  char *        base_name       = 0;
+  char *        dir             = 0;
+  char *        name            = 0;
+  int           errors          = 0;
+  lt_dlhandle   newhandle;
 
   assert (phandle);
   assert (*phandle == 0);
@@ -2561,19 +2561,19 @@ try_dlopen (phandle, filename)
     {
       *phandle = (lt_dlhandle) LT_EMALLOC (struct lt_dlhandle_struct, 1);
       if (*phandle == 0)
-	return 1;
+        return 1;
 
       memset (*phandle, 0, sizeof(struct lt_dlhandle_struct));
-      newhandle	= *phandle;
+      newhandle = *phandle;
 
       /* lt_dlclose()ing yourself is very bad!  Disallow it.  */
       LT_DLSET_FLAG (*phandle, LT_DLRESIDENT_FLAG);
 
       if (tryall_dlopen (&newhandle, 0) != 0)
-	{
-	  LT_DLFREE (*phandle);
-	  return 1;
-	}
+        {
+          LT_DLFREE (*phandle);
+          return 1;
+        }
 
       goto register_handle;
     }
@@ -2597,10 +2597,10 @@ try_dlopen (phandle, filename)
 
       dir = LT_EMALLOC (char, 1+ dirlen);
       if (!dir)
-	{
-	  ++errors;
-	  goto cleanup;
-	}
+        {
+          ++errors;
+          goto cleanup;
+        }
 
       strncpy (dir, canonical, dirlen);
       dir[dirlen] = LT_EOS_CHAR;
@@ -2617,41 +2617,41 @@ try_dlopen (phandle, filename)
   if (ext && strcmp (ext, archive_ext) == 0)
     {
       /* this seems to be a libtool module */
-      FILE *	file	 = 0;
-      char *	dlname	 = 0;
-      char *	old_name = 0;
-      char *	libdir	 = 0;
-      char *	deplibs	 = 0;
-      char *    line	 = 0;
-      size_t	line_len;
+      FILE *    file     = 0;
+      char *    dlname   = 0;
+      char *    old_name = 0;
+      char *    libdir   = 0;
+      char *    deplibs  = 0;
+      char *    line     = 0;
+      size_t    line_len;
 
       /* if we can't find the installed flag, it is probably an
-	 installed libtool archive, produced with an old version
-	 of libtool */
-      int	installed = 1;
+         installed libtool archive, produced with an old version
+         of libtool */
+      int       installed = 1;
 
       /* extract the module name from the file name */
       name = LT_EMALLOC (char, ext - base_name + 1);
       if (!name)
-	{
-	  ++errors;
-	  goto cleanup;
-	}
+        {
+          ++errors;
+          goto cleanup;
+        }
 
       /* canonicalize the module name */
       {
         size_t i;
         for (i = 0; i < ext - base_name; ++i)
-	  {
-	    if (isalnum ((int)(base_name[i])))
-	      {
-	        name[i] = base_name[i];
-	      }
-	    else
-	      {
-	        name[i] = '_';
-	      }
-	  }
+          {
+            if (isalnum ((unsigned char)(base_name[i])))
+              {
+                name[i] = base_name[i];
+              }
+            else
+              {
+                name[i] = '_';
+              }
+          }
         name[ext - base_name] = LT_EOS_CHAR;
       }
 
@@ -2660,146 +2660,146 @@ try_dlopen (phandle, filename)
          prescribed paths.  Otherwise (or in any case if the module was not
          yet found) try opening just the module name as passed.  */
       if (!dir)
-	{
-	  const char *search_path;
+        {
+          const char *search_path;
 
-	  LT_DLMUTEX_LOCK ();
-	  search_path = user_search_path;
-	  if (search_path)
-	    file = find_file (user_search_path, base_name, &dir);
-	  LT_DLMUTEX_UNLOCK ();
+          LT_DLMUTEX_LOCK ();
+          search_path = user_search_path;
+          if (search_path)
+            file = find_file (user_search_path, base_name, &dir);
+          LT_DLMUTEX_UNLOCK ();
 
-	  if (!file)
-	    {
-	      search_path = getenv (LTDL_SEARCHPATH_VAR);
-	      if (search_path)
-		file = find_file (search_path, base_name, &dir);
-	    }
+          if (!file)
+            {
+              search_path = getenv (LTDL_SEARCHPATH_VAR);
+              if (search_path)
+                file = find_file (search_path, base_name, &dir);
+            }
 
 #ifdef LTDL_SHLIBPATH_VAR
-	  if (!file)
-	    {
-	      search_path = getenv (LTDL_SHLIBPATH_VAR);
-	      if (search_path)
-		file = find_file (search_path, base_name, &dir);
-	    }
+          if (!file)
+            {
+              search_path = getenv (LTDL_SHLIBPATH_VAR);
+              if (search_path)
+                file = find_file (search_path, base_name, &dir);
+            }
 #endif
 #ifdef LTDL_SYSSEARCHPATH
-	  if (!file && sys_search_path)
-	    {
-	      file = find_file (sys_search_path, base_name, &dir);
-	    }
+          if (!file && sys_search_path)
+            {
+              file = find_file (sys_search_path, base_name, &dir);
+            }
 #endif
-	}
+        }
       if (!file)
-	{
-	  file = fopen (filename, LT_READTEXT_MODE);
-	}
+        {
+          file = fopen (filename, LT_READTEXT_MODE);
+        }
 
       /* If we didn't find the file by now, it really isn't there.  Set
-	 the status flag, and bail out.  */
+         the status flag, and bail out.  */
       if (!file)
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (FILE_NOT_FOUND));
-	  ++errors;
-	  goto cleanup;
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (FILE_NOT_FOUND));
+          ++errors;
+          goto cleanup;
+        }
 
       line_len = LT_FILENAME_MAX;
       line = LT_EMALLOC (char, line_len);
       if (!line)
-	{
-	  fclose (file);
-	  ++errors;
-	  goto cleanup;
-	}
+        {
+          fclose (file);
+          ++errors;
+          goto cleanup;
+        }
 
       /* read the .la file */
       while (!feof (file))
-	{
-	  if (!fgets (line, (int) line_len, file))
-	    {
-	      break;
-	    }
+        {
+          if (!fgets (line, (int) line_len, file))
+            {
+              break;
+            }
 
-	  /* Handle the case where we occasionally need to read a line
-	     that is longer than the initial buffer size.  */
-	  while (line[LT_STRLEN(line) -1] != '\n')
-	    {
-	      line = LT_DLREALLOC (char, line, line_len *2);
-	      if (!fgets (&line[line_len -1], (int) line_len +1, file))
-		{
-		  break;
-		}
-	      line_len *= 2;
-	    }
+          /* Handle the case where we occasionally need to read a line
+             that is longer than the initial buffer size.  */
+          while (line[LT_STRLEN(line) -1] != '\n')
+            {
+              line = LT_DLREALLOC (char, line, line_len *2);
+              if (!fgets (&line[line_len -1], (int) line_len +1, file))
+                {
+                  break;
+                }
+              line_len *= 2;
+            }
 
-	  if (line[0] == '\n' || line[0] == '#')
-	    {
-	      continue;
-	    }
+          if (line[0] == '\n' || line[0] == '#')
+            {
+              continue;
+            }
 
 #undef  STR_DLNAME
-#define STR_DLNAME	"dlname="
-	  if (strncmp (line, STR_DLNAME, sizeof (STR_DLNAME) - 1) == 0)
-	    {
-	      errors += trim (&dlname, &line[sizeof (STR_DLNAME) - 1]);
-	    }
+#define STR_DLNAME      "dlname="
+          if (strncmp (line, STR_DLNAME, sizeof (STR_DLNAME) - 1) == 0)
+            {
+              errors += trim (&dlname, &line[sizeof (STR_DLNAME) - 1]);
+            }
 
 #undef  STR_OLD_LIBRARY
-#define STR_OLD_LIBRARY	"old_library="
-	  else if (strncmp (line, STR_OLD_LIBRARY,
-			    sizeof (STR_OLD_LIBRARY) - 1) == 0)
-	    {
-	      errors += trim (&old_name, &line[sizeof (STR_OLD_LIBRARY) - 1]);
-	    }
+#define STR_OLD_LIBRARY "old_library="
+          else if (strncmp (line, STR_OLD_LIBRARY,
+                            sizeof (STR_OLD_LIBRARY) - 1) == 0)
+            {
+              errors += trim (&old_name, &line[sizeof (STR_OLD_LIBRARY) - 1]);
+            }
 #undef  STR_LIBDIR
-#define STR_LIBDIR	"libdir="
-	  else if (strncmp (line, STR_LIBDIR, sizeof (STR_LIBDIR) - 1) == 0)
-	    {
-	      errors += trim (&libdir, &line[sizeof(STR_LIBDIR) - 1]);
-	    }
+#define STR_LIBDIR      "libdir="
+          else if (strncmp (line, STR_LIBDIR, sizeof (STR_LIBDIR) - 1) == 0)
+            {
+              errors += trim (&libdir, &line[sizeof(STR_LIBDIR) - 1]);
+            }
 
 #undef  STR_DL_DEPLIBS
-#define STR_DL_DEPLIBS	"dependency_libs="
-	  else if (strncmp (line, STR_DL_DEPLIBS,
-			    sizeof (STR_DL_DEPLIBS) - 1) == 0)
-	    {
-	      errors += trim (&deplibs, &line[sizeof (STR_DL_DEPLIBS) - 1]);
-	    }
-	  else if (strcmp (line, "installed=yes\n") == 0)
-	    {
-	      installed = 1;
-	    }
-	  else if (strcmp (line, "installed=no\n") == 0)
-	    {
-	      installed = 0;
-	    }
+#define STR_DL_DEPLIBS  "dependency_libs="
+          else if (strncmp (line, STR_DL_DEPLIBS,
+                            sizeof (STR_DL_DEPLIBS) - 1) == 0)
+            {
+              errors += trim (&deplibs, &line[sizeof (STR_DL_DEPLIBS) - 1]);
+            }
+          else if (strcmp (line, "installed=yes\n") == 0)
+            {
+              installed = 1;
+            }
+          else if (strcmp (line, "installed=no\n") == 0)
+            {
+              installed = 0;
+            }
 
 #undef  STR_LIBRARY_NAMES
 #define STR_LIBRARY_NAMES "library_names="
-	  else if (! dlname && strncmp (line, STR_LIBRARY_NAMES,
-					sizeof (STR_LIBRARY_NAMES) - 1) == 0)
-	    {
-	      char *last_libname;
-	      errors += trim (&dlname, &line[sizeof (STR_LIBRARY_NAMES) - 1]);
-	      if (!errors
-		  && dlname
-		  && (last_libname = strrchr (dlname, ' ')) != 0)
-		{
-		  last_libname = lt_estrdup (last_libname + 1);
-		  if (!last_libname)
-		    {
-		      ++errors;
-		      goto cleanup;
-		    }
-		  LT_DLMEM_REASSIGN (dlname, last_libname);
-		}
-	    }
+          else if (! dlname && strncmp (line, STR_LIBRARY_NAMES,
+                                        sizeof (STR_LIBRARY_NAMES) - 1) == 0)
+            {
+              char *last_libname;
+              errors += trim (&dlname, &line[sizeof (STR_LIBRARY_NAMES) - 1]);
+              if (!errors
+                  && dlname
+                  && (last_libname = strrchr (dlname, ' ')) != 0)
+                {
+                  last_libname = lt_estrdup (last_libname + 1);
+                  if (!last_libname)
+                    {
+                      ++errors;
+                      goto cleanup;
+                    }
+                  LT_DLMEM_REASSIGN (dlname, last_libname);
+                }
+            }
 
-	  if (errors)
-	    break;
-	}
+          if (errors)
+            break;
+        }
 
       fclose (file);
       LT_DLFREE (line);
@@ -2807,83 +2807,83 @@ try_dlopen (phandle, filename)
       /* allocate the handle */
       *phandle = (lt_dlhandle) LT_EMALLOC (struct lt_dlhandle_struct, 1);
       if (*phandle == 0)
-	++errors;
+        ++errors;
 
       if (errors)
-	{
-	  free_vars (dlname, old_name, libdir, deplibs);
-	  LT_DLFREE (*phandle);
-	  goto cleanup;
-	}
+        {
+          free_vars (dlname, old_name, libdir, deplibs);
+          LT_DLFREE (*phandle);
+          goto cleanup;
+        }
 
       assert (*phandle);
 
       memset (*phandle, 0, sizeof(struct lt_dlhandle_struct));
       if (load_deplibs (*phandle, deplibs) == 0)
-	{
-	  newhandle = *phandle;
-	  /* find_module may replace newhandle */
-	  if (find_module (&newhandle, dir, libdir, dlname, old_name, installed))
-	    {
-	      unload_deplibs (*phandle);
-	      ++errors;
-	    }
-	}
+        {
+          newhandle = *phandle;
+          /* find_module may replace newhandle */
+          if (find_module (&newhandle, dir, libdir, dlname, old_name, installed))
+            {
+              unload_deplibs (*phandle);
+              ++errors;
+            }
+        }
       else
-	{
-	  ++errors;
-	}
+        {
+          ++errors;
+        }
 
       free_vars (dlname, old_name, libdir, deplibs);
       if (errors)
-	{
-	  LT_DLFREE (*phandle);
-	  goto cleanup;
-	}
+        {
+          LT_DLFREE (*phandle);
+          goto cleanup;
+        }
 
       if (*phandle != newhandle)
-	{
-	  unload_deplibs (*phandle);
-	}
+        {
+          unload_deplibs (*phandle);
+        }
     }
   else
     {
       /* not a libtool module */
       *phandle = (lt_dlhandle) LT_EMALLOC (struct lt_dlhandle_struct, 1);
       if (*phandle == 0)
-	{
-	  ++errors;
-	  goto cleanup;
-	}
+        {
+          ++errors;
+          goto cleanup;
+        }
 
       memset (*phandle, 0, sizeof (struct lt_dlhandle_struct));
       newhandle = *phandle;
 
       /* If the module has no directory name component, try to find it
-	 first in user_search_path and then other prescribed paths.
-	 Otherwise (or in any case if the module was not yet found) try
-	 opening just the module name as passed.  */
+         first in user_search_path and then other prescribed paths.
+         Otherwise (or in any case if the module was not yet found) try
+         opening just the module name as passed.  */
       if ((dir || (!find_handle (user_search_path, base_name, &newhandle)
-		   && !find_handle (getenv (LTDL_SEARCHPATH_VAR), base_name,
-				    &newhandle)
+                   && !find_handle (getenv (LTDL_SEARCHPATH_VAR), base_name,
+                                    &newhandle)
 #ifdef LTDL_SHLIBPATH_VAR
-		   && !find_handle (getenv (LTDL_SHLIBPATH_VAR), base_name,
-				    &newhandle)
+                   && !find_handle (getenv (LTDL_SHLIBPATH_VAR), base_name,
+                                    &newhandle)
 #endif
 #ifdef LTDL_SYSSEARCHPATH
-		   && !find_handle (sys_search_path, base_name, &newhandle)
+                   && !find_handle (sys_search_path, base_name, &newhandle)
 #endif
-		   )))
-	{
-	  tryall_dlopen (&newhandle, filename);
-	}
+                   )))
+        {
+          tryall_dlopen (&newhandle, filename);
+        }
 
       if (!newhandle)
-	{
-	  LT_DLFREE (*phandle);
-	  ++errors;
-	  goto cleanup;
-	}
+        {
+          LT_DLFREE (*phandle);
+          ++errors;
+          goto cleanup;
+        }
     }
 
  register_handle:
@@ -2891,12 +2891,12 @@ try_dlopen (phandle, filename)
 
   if ((*phandle)->info.ref_count == 0)
     {
-      (*phandle)->info.ref_count	= 1;
+      (*phandle)->info.ref_count        = 1;
       LT_DLMEM_REASSIGN ((*phandle)->info.name, name);
 
       LT_DLMUTEX_LOCK ();
-      (*phandle)->next		= handles;
-      handles			= *phandle;
+      (*phandle)->next          = handles;
+      handles                   = *phandle;
       LT_DLMUTEX_UNLOCK ();
     }
 
@@ -2946,11 +2946,11 @@ lt_dlhandle
 lt_dlopenext (filename)
      const char *filename;
 {
-  lt_dlhandle	handle		= 0;
-  char *	tmp		= 0;
-  char *	ext		= 0;
-  size_t	len;
-  int		errors		= 0;
+  lt_dlhandle   handle          = 0;
+  char *        tmp             = 0;
+  char *        ext             = 0;
+  size_t        len;
+  int           errors          = 0;
 
   if (!filename)
     {
@@ -2966,7 +2966,7 @@ lt_dlopenext (filename)
      to try appending additional extensions.  */
   if (ext && ((strcmp (ext, archive_ext) == 0)
 #ifdef LTDL_SHLIB_EXT
-	      || (strcmp (ext, shlib_ext) == 0)
+              || (strcmp (ext, shlib_ext) == 0)
 #endif
       ))
     {
@@ -3000,7 +3000,7 @@ lt_dlopenext (filename)
       LT_DLFREE (tmp);
       tmp = LT_EMALLOC (char, len + LT_STRLEN (shlib_ext) + 1);
       if (!tmp)
-	return 0;
+        return 0;
 
       strcpy (tmp, filename);
     }
@@ -3041,14 +3041,14 @@ lt_argz_insert (pargz, pargz_len, before, entry)
   if ((error = argz_insert (pargz, pargz_len, before, entry)))
     {
       switch (error)
-	{
-	case ENOMEM:
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (NO_MEMORY));
-	  break;
-	default:
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (UNKNOWN));
-	  break;
-	}
+        {
+        case ENOMEM:
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (NO_MEMORY));
+          break;
+        default:
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (UNKNOWN));
+          break;
+        }
       return 1;
     }
 
@@ -3070,10 +3070,10 @@ lt_argz_insertinorder (pargz, pargz_len, entry)
   if (*pargz)
     while ((before = argz_next (*pargz, *pargz_len, before)))
       {
-	int cmp = strcmp (entry, before);
+        int cmp = strcmp (entry, before);
 
-	if (cmp < 0)  break;
-	if (cmp == 0) return 0;	/* No duplicates! */
+        if (cmp < 0)  break;
+        if (cmp == 0) return 0; /* No duplicates! */
       }
 
   return lt_argz_insert (pargz, pargz_len, before, entry);
@@ -3086,12 +3086,12 @@ lt_argz_insertdir (pargz, pargz_len, dirnam, dp)
      const char *dirnam;
      struct dirent *dp;
 {
-  char   *buf	    = 0;
+  char   *buf       = 0;
   size_t buf_len    = 0;
-  char   *end	    = 0;
+  char   *end       = 0;
   size_t end_offset = 0;
   size_t dir_len    = 0;
-  int    errors	    = 0;
+  int    errors     = 0;
 
   assert (pargz);
   assert (pargz_len);
@@ -3105,7 +3105,7 @@ lt_argz_insertdir (pargz, pargz_len, dirnam, dp)
     char *p;
     for (p = end; p -1 > dp->d_name; --p)
       if (strchr (".0123456789", p[-1]) == 0)
-	break;
+        break;
 
     if (*p == '.')
       end = p;
@@ -3116,16 +3116,16 @@ lt_argz_insertdir (pargz, pargz_len, dirnam, dp)
     char *p;
     for (p = end -1; p > dp->d_name; --p)
       if (*p == '.')
-	{
-	  end = p;
-	  break;
-	}
+        {
+          end = p;
+          break;
+        }
   }
 
   /* Prepend the directory name.  */
-  end_offset	= end - dp->d_name;
-  buf_len	= dir_len + 1+ end_offset;
-  buf		= LT_EMALLOC (char, 1+ buf_len);
+  end_offset    = end - dp->d_name;
+  buf_len       = dir_len + 1+ end_offset;
+  buf           = LT_EMALLOC (char, 1+ buf_len);
   if (!buf)
     return ++errors;
 
@@ -3151,8 +3151,8 @@ list_files_by_dir (dirnam, pargz, pargz_len)
      char **pargz;
      size_t *pargz_len;
 {
-  DIR	*dirp	  = 0;
-  int    errors	  = 0;
+  DIR   *dirp     = 0;
+  int    errors   = 0;
 
   assert (dirnam && *dirnam);
   assert (pargz);
@@ -3162,15 +3162,15 @@ list_files_by_dir (dirnam, pargz, pargz_len)
   dirp = opendir (dirnam);
   if (dirp)
     {
-      struct dirent *dp	= 0;
+      struct dirent *dp = 0;
 
       while ((dp = readdir (dirp)))
-	if (dp->d_name[0] != '.')
-	  if (lt_argz_insertdir (pargz, pargz_len, dirnam, dp))
-	    {
-	      ++errors;
-	      break;
-	    }
+        if (dp->d_name[0] != '.')
+          if (lt_argz_insertdir (pargz, pargz_len, dirnam, dp))
+            {
+              ++errors;
+              break;
+            }
 
       closedir (dirp);
     }
@@ -3190,9 +3190,9 @@ foreachfile_callback (dirname, data1, data2)
      lt_ptr data2;
 {
   int (*func) LT_PARAMS((const char *filename, lt_ptr data))
-	= (int (*) LT_PARAMS((const char *filename, lt_ptr data))) data1;
+        = (int (*) LT_PARAMS((const char *filename, lt_ptr data))) data1;
 
-  int	  is_done  = 0;
+  int     is_done  = 0;
   char   *argz     = 0;
   size_t  argz_len = 0;
 
@@ -3205,7 +3205,7 @@ foreachfile_callback (dirname, data1, data2)
     char *filename = 0;
     while ((filename = argz_next (argz, argz_len, filename)))
       if ((is_done = (*func) (filename, data2)))
-	break;
+        break;
   }
 
  cleanup:
@@ -3232,34 +3232,34 @@ lt_dlforeachfile (search_path, func, data)
   if (search_path)
     {
       /* If a specific path was passed, search only the directories
-	 listed in it.  */
+         listed in it.  */
       is_done = foreach_dirinpath (search_path, 0,
-				   foreachfile_callback, func, data);
+                                   foreachfile_callback, func, data);
     }
   else
     {
       /* Otherwise search the default paths.  */
       is_done = foreach_dirinpath (user_search_path, 0,
-				   foreachfile_callback, func, data);
+                                   foreachfile_callback, func, data);
       if (!is_done)
-	{
-	  is_done = foreach_dirinpath (getenv("LTDL_LIBRARY_PATH"), 0,
-				       foreachfile_callback, func, data);
-	}
+        {
+          is_done = foreach_dirinpath (getenv("LTDL_LIBRARY_PATH"), 0,
+                                       foreachfile_callback, func, data);
+        }
 
 #ifdef LTDL_SHLIBPATH_VAR
       if (!is_done)
-	{
-	  is_done = foreach_dirinpath (getenv(LTDL_SHLIBPATH_VAR), 0,
-				       foreachfile_callback, func, data);
-	}
+        {
+          is_done = foreach_dirinpath (getenv(LTDL_SHLIBPATH_VAR), 0,
+                                       foreachfile_callback, func, data);
+        }
 #endif
 #ifdef LTDL_SYSSEARCHPATH
       if (!is_done)
-	{
-	  is_done = foreach_dirinpath (getenv(LTDL_SYSSEARCHPATH), 0,
-				       foreachfile_callback, func, data);
-	}
+        {
+          is_done = foreach_dirinpath (getenv(LTDL_SYSSEARCHPATH), 0,
+                                       foreachfile_callback, func, data);
+        }
 #endif
     }
 
@@ -3301,13 +3301,13 @@ lt_dlclose (handle)
       lt_user_data data = handle->loader->dlloader_data;
 
       if (handle != handles)
-	{
-	  last->next = handle->next;
-	}
+        {
+          last->next = handle->next;
+        }
       else
-	{
-	  handles = handle->next;
-	}
+        {
+          handles = handle->next;
+        }
 
       errors += handle->loader->module_close (data, handle->module);
       errors += unload_deplibs(handle);
@@ -3340,8 +3340,8 @@ lt_dlsym (handle, symbol)
      const char *symbol;
 {
   size_t lensym;
-  char	lsym[LT_SYMBOL_LENGTH];
-  char	*sym;
+  char  lsym[LT_SYMBOL_LENGTH];
+  char  *sym;
   lt_ptr address;
   lt_user_data data;
 
@@ -3358,7 +3358,7 @@ lt_dlsym (handle, symbol)
     }
 
   lensym = LT_STRLEN (symbol) + LT_STRLEN (handle->loader->sym_prefix)
-					+ LT_STRLEN (handle->info.name);
+                                        + LT_STRLEN (handle->info.name);
 
   if (lensym + LT_SYMBOL_OVERHEAD < LT_SYMBOL_LENGTH)
     {
@@ -3368,10 +3368,10 @@ lt_dlsym (handle, symbol)
     {
       sym = LT_EMALLOC (char, lensym + LT_SYMBOL_OVERHEAD + 1);
       if (!sym)
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (BUFFER_OVERFLOW));
-	  return 0;
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (BUFFER_OVERFLOW));
+          return 0;
+        }
     }
 
   data = handle->loader->dlloader_data;
@@ -3383,14 +3383,14 @@ lt_dlsym (handle, symbol)
 
       /* this is a libtool module */
       if (handle->loader->sym_prefix)
-	{
-	  strcpy(sym, handle->loader->sym_prefix);
-	  strcat(sym, handle->info.name);
-	}
+        {
+          strcpy(sym, handle->loader->sym_prefix);
+          strcat(sym, handle->info.name);
+        }
       else
-	{
-	  strcpy(sym, handle->info.name);
-	}
+        {
+          strcpy(sym, handle->info.name);
+        }
 
       strcat(sym, "_LTX_");
       strcat(sym, symbol);
@@ -3398,13 +3398,13 @@ lt_dlsym (handle, symbol)
       /* try "modulename_LTX_symbol" */
       address = handle->loader->find_sym (data, handle->module, sym);
       if (address)
-	{
-	  if (sym != lsym)
-	    {
-	      LT_DLFREE (sym);
-	    }
-	  return address;
-	}
+        {
+          if (sym != lsym)
+            {
+              LT_DLFREE (sym);
+            }
+          return address;
+        }
       LT_DLMUTEX_SETERROR (saved_error);
     }
 
@@ -3445,10 +3445,10 @@ lt_dlpath_insertdir (ppath, before, dir)
      char *before;
      const char *dir;
 {
-  int    errors		= 0;
-  char  *canonical	= 0;
-  char  *argz		= 0;
-  size_t argz_len	= 0;
+  int    errors         = 0;
+  char  *canonical      = 0;
+  char  *argz           = 0;
+  size_t argz_len       = 0;
 
   assert (ppath);
   assert (dir && *dir);
@@ -3464,12 +3464,12 @@ lt_dlpath_insertdir (ppath, before, dir)
   /* If *PPATH is empty, set it to DIR.  */
   if (*ppath == 0)
     {
-      assert (!before);		/* BEFORE cannot be set without PPATH.  */
-      assert (dir);		/* Without DIR, don't call this function!  */
+      assert (!before);         /* BEFORE cannot be set without PPATH.  */
+      assert (dir);             /* Without DIR, don't call this function!  */
 
       *ppath = lt_estrdup (dir);
       if (*ppath == 0)
-	++errors;
+        ++errors;
 
       return errors;
     }
@@ -3521,7 +3521,7 @@ lt_dladdsearchdir (search_dir)
     {
       LT_DLMUTEX_LOCK ();
       if (lt_dlpath_insertdir (&user_search_path, 0, search_dir) != 0)
-	++errors;
+        ++errors;
       LT_DLMUTEX_UNLOCK ();
     }
 
@@ -3539,12 +3539,12 @@ lt_dlinsertsearchdir (before, search_dir)
     {
       LT_DLMUTEX_LOCK ();
       if ((before < user_search_path)
-	  || (before >= user_search_path + LT_STRLEN (user_search_path)))
-	{
-	  LT_DLMUTEX_UNLOCK ();
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (INVALID_POSITION));
-	  return 1;
-	}
+          || (before >= user_search_path + LT_STRLEN (user_search_path)))
+        {
+          LT_DLMUTEX_UNLOCK ();
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (INVALID_POSITION));
+          return 1;
+        }
       LT_DLMUTEX_UNLOCK ();
     }
 
@@ -3552,10 +3552,10 @@ lt_dlinsertsearchdir (before, search_dir)
     {
       LT_DLMUTEX_LOCK ();
       if (lt_dlpath_insertdir (&user_search_path,
-			       (char *) before, search_dir) != 0)
-	{
-	  ++errors;
-	}
+                               (char *) before, search_dir) != 0)
+        {
+          ++errors;
+        }
       LT_DLMUTEX_UNLOCK ();
     }
 
@@ -3566,7 +3566,7 @@ int
 lt_dlsetsearchpath (search_path)
      const char *search_path;
 {
-  int   errors	    = 0;
+  int   errors      = 0;
 
   LT_DLMUTEX_LOCK ();
   LT_DLFREE (user_search_path);
@@ -3617,7 +3617,7 @@ lt_dlmakeresident (handle)
 }
 
 int
-lt_dlisresident	(handle)
+lt_dlisresident (handle)
      lt_dlhandle handle;
 {
   if (!handle)
@@ -3671,10 +3671,10 @@ lt_dlforeach (func, data)
 
       cur = cur->next;
       if ((*func) (tmp, data))
-	{
-	  ++errors;
-	  break;
-	}
+        {
+          ++errors;
+          break;
+        }
     }
 
   LT_DLMUTEX_UNLOCK ();
@@ -3716,10 +3716,10 @@ lt_dlcaller_set_data (key, handle, data)
   for (i = 0; i < n_elements; ++i)
     {
       if (handle->caller_data[i].key == key)
-	{
-	  stale = handle->caller_data[i].data;
-	  break;
-	}
+        {
+          stale = handle->caller_data[i].data;
+          break;
+        }
     }
 
   /* Ensure that there is enough room in this handle's caller_data
@@ -3727,13 +3727,13 @@ lt_dlcaller_set_data (key, handle, data)
   if (i == n_elements)
     {
       lt_caller_data *temp
-	= LT_DLREALLOC (lt_caller_data, handle->caller_data, 2+ n_elements);
+        = LT_DLREALLOC (lt_caller_data, handle->caller_data, 2+ n_elements);
 
       if (!temp)
-	{
-	  stale = 0;
-	  goto done;
-	}
+        {
+          stale = 0;
+          goto done;
+        }
 
       handle->caller_data = temp;
 
@@ -3766,11 +3766,11 @@ lt_dlcaller_get_data  (key, handle)
     int i;
     for (i = 0; handle->caller_data[i].key; ++i)
       {
-	if (handle->caller_data[i].key == key)
-	  {
-	    result = handle->caller_data[i].data;
-	    break;
-	  }
+        if (handle->caller_data[i].key == key)
+          {
+            result = handle->caller_data[i].data;
+            break;
+          }
       }
   }
 
@@ -3793,7 +3793,7 @@ lt_dlloader_add (place, dlloader, loader_name)
   int errors = 0;
   lt_dlloader *node = 0, *ptr = 0;
 
-  if ((dlloader == 0)	/* diagnose null parameters */
+  if ((dlloader == 0)   /* diagnose null parameters */
       || (dlloader->module_open == 0)
       || (dlloader->module_close == 0)
       || (dlloader->find_sym == 0))
@@ -3807,14 +3807,14 @@ lt_dlloader_add (place, dlloader, loader_name)
   if (!node)
     return 1;
 
-  node->next		= 0;
-  node->loader_name	= loader_name;
-  node->sym_prefix	= dlloader->sym_prefix;
-  node->dlloader_exit	= dlloader->dlloader_exit;
-  node->module_open	= dlloader->module_open;
-  node->module_close	= dlloader->module_close;
-  node->find_sym	= dlloader->find_sym;
-  node->dlloader_data	= dlloader->dlloader_data;
+  node->next            = 0;
+  node->loader_name     = loader_name;
+  node->sym_prefix      = dlloader->sym_prefix;
+  node->dlloader_exit   = dlloader->dlloader_exit;
+  node->module_open     = dlloader->module_open;
+  node->module_close    = dlloader->module_close;
+  node->find_sym        = dlloader->find_sym;
+  node->dlloader_data   = dlloader->dlloader_data;
 
   LT_DLMUTEX_LOCK ();
   if (!loaders)
@@ -3825,11 +3825,11 @@ lt_dlloader_add (place, dlloader, loader_name)
   else if (!place)
     {
       /* If PLACE is not set, add NODE to the end of the
-	 LOADERS list. */
+         LOADERS list. */
       for (ptr = loaders; ptr->next; ptr = ptr->next)
-	{
-	  /*NOWORK*/;
-	}
+        {
+          /*NOWORK*/;
+        }
 
       ptr->next = node;
     }
@@ -3843,21 +3843,21 @@ lt_dlloader_add (place, dlloader, loader_name)
     {
       /* Find the node immediately preceding PLACE. */
       for (ptr = loaders; ptr->next != place; ptr = ptr->next)
-	{
-	  /*NOWORK*/;
-	}
+        {
+          /*NOWORK*/;
+        }
 
       if (ptr->next != place)
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (INVALID_LOADER));
-	  ++errors;
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (INVALID_LOADER));
+          ++errors;
+        }
       else
-	{
-	  /* Insert NODE between PTR and PLACE. */
-	  node->next = place;
-	  ptr->next  = node;
-	}
+        {
+          /* Insert NODE between PTR and PLACE. */
+          node->next = place;
+          ptr->next  = node;
+        }
     }
 
   LT_DLMUTEX_UNLOCK ();
@@ -3885,11 +3885,11 @@ lt_dlloader_remove (loader_name)
   for  (handle = handles; handle; handle = handle->next)
     {
       if (handle->loader == place)
-	{
-	  LT_DLMUTEX_SETERROR (LT_DLSTRERROR (REMOVE_LOADER));
-	  ++errors;
-	  goto done;
-	}
+        {
+          LT_DLMUTEX_SETERROR (LT_DLSTRERROR (REMOVE_LOADER));
+          ++errors;
+          goto done;
+        }
     }
 
   if (place == loaders)
@@ -3902,12 +3902,12 @@ lt_dlloader_remove (loader_name)
       /* Find the loader before the one being removed. */
       lt_dlloader *prev;
       for (prev = loaders; prev->next; prev = prev->next)
-	{
-	  if (!strcmp (prev->next->loader_name, loader_name))
-	    {
-	      break;
-	    }
-	}
+        {
+          if (!strcmp (prev->next->loader_name, loader_name))
+            {
+              break;
+            }
+        }
 
       place = prev->next;
       prev->next = prev->next->next;
@@ -3989,9 +3989,9 @@ lt_dlloader_find (loader_name)
   for (place = loaders; place; place = place->next)
     {
       if (strcmp (place->loader_name, loader_name) == 0)
-	{
-	  break;
-	}
+        {
+          break;
+        }
     }
   LT_DLMUTEX_UNLOCK ();
 

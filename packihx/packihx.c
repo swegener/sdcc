@@ -46,7 +46,7 @@ int outlineno = 0;
 /* Convert hex digit to numeric value 0 - 15; assumes input is a 
  * valid digit (i.e. passes isxdigit()).
  */
-static Uint8 hexDigit(const char c)
+static Uint8 hexDigit(const unsigned char c)
 {
     if (isdigit(c))
     {

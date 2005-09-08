@@ -166,7 +166,7 @@ emitcode (char *inst, const char *fmt,...)
       tvsprintf (lb, sizeof(lb), fmt, ap);
     }
 
-  while (isspace (*lbp))
+  while (isspace ((unsigned char)*lbp))
     {
       lbp++;
     }
@@ -742,7 +742,7 @@ aopForRemat (symbol * sym)
               aop->aopu.aop_immd.from_cast_remat = 1;
               ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
               ptr_type = pointerTypeToGPByte (DCL_TYPE(from_type), NULL, NULL);
-              continue ;
+              continue;
       } else break;
 
       ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
@@ -1932,10 +1932,10 @@ genCpl (iCode * ic)
           */
           werror(W_COMPLEMENT);
           emitcode ("setb", "%s", IC_RESULT (ic)->aop->aopu.aop_dir);
-      goto release;
-    }
-    tlbl=newiTempLabel(NULL);
-      l = aopGet (AOP (IC_LEFT (ic)), offset++, FALSE, FALSE,NULL);
+          goto release;
+        }
+      tlbl=newiTempLabel(NULL);
+      l = aopGet (AOP (IC_LEFT (ic)), offset++, FALSE, FALSE, NULL);
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC ||
           AOP_TYPE (IC_LEFT (ic)) == AOP_REG ||
           IS_AOP_PREG (IC_LEFT (ic)))
@@ -1947,10 +1947,10 @@ genCpl (iCode * ic)
           MOVA (l);
           emitcode ("cjne", "a,#0xFF,%05d$", tlbl->key + 100);
         }
-    emitcode ("", "%05d$:", tlbl->key+100);
-    outBitC (IC_RESULT(ic));
-    goto release;
-  }
+      emitcode ("", "%05d$:", tlbl->key+100);
+      outBitC (IC_RESULT(ic));
+      goto release;
+    }
 
   size = AOP_SIZE (IC_RESULT (ic));
   _startLazyDPSEvaluation ();
@@ -1985,7 +1985,7 @@ genUminusFloat (operand * op, operand * result)
   size = AOP_SIZE (op) - 1;
 
   while (size--)
-  {
+    {
       aopPut (AOP (result),
               aopGet (AOP (op), offset, FALSE, FALSE, NULL),
               offset);

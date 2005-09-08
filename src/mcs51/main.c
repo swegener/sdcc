@@ -52,7 +52,7 @@ static char *_mcs51_keywords[] =
 
 void mcs51_assignRegisters (ebbIndex *);
 
-static int regParmFlg = 0;      /* determine if we can register a parameter */
+static int regParmFlg = 0;      /* determine if we can register a parameter     */
 static int regBitParmFlg = 0;   /* determine if we can register a bit parameter */
 
 static void
@@ -574,7 +574,7 @@ asmLineNodeFromLineNode (lineNode *ln)
   asmLineNode *aln = newAsmLineNode();
   char *op, op1[256], op2[256];
   int opsize;
-  const char *p;
+  const unsigned char *p;
   char inst[8];
   mcs51opcodedata *opdat;
 
@@ -721,33 +721,33 @@ PORT mcs51_port =
   },
   {
     "XSTK    (PAG,XDATA)",      // xstack_name
-    "STACK   (DATA)",		// istack_name
-    "CSEG    (CODE)",		// code_name
-    "DSEG    (DATA)",		// data_name
-    "ISEG    (DATA)",		// idata_name
-    "PSEG    (PAG,XDATA)",	// pdata_name
-    "XSEG    (XDATA)",		// xdata_name
-    "BSEG    (BIT)",		// bit_name
-    "RSEG    (DATA)",		// reg_name
-    "GSINIT  (CODE)",		// static_name
-    "OSEG    (OVR,DATA)",	// overlay_name
-    "GSFINAL (CODE)",		// post_static_name
-    "HOME    (CODE)",		// home_name
-    "XISEG   (XDATA)",		// xidata_name - initialized xdata   initialized xdata
-    "XINIT   (CODE)",		// xinit_name - a code copy of xiseg
-    "CONST   (CODE)",		// const_name - const data (code or not)
+    "STACK   (DATA)",           // istack_name
+    "CSEG    (CODE)",           // code_name
+    "DSEG    (DATA)",           // data_name
+    "ISEG    (DATA)",           // idata_name
+    "PSEG    (PAG,XDATA)",      // pdata_name
+    "XSEG    (XDATA)",          // xdata_name
+    "BSEG    (BIT)",            // bit_name
+    "RSEG    (DATA)",           // reg_name
+    "GSINIT  (CODE)",           // static_name
+    "OSEG    (OVR,DATA)",       // overlay_name
+    "GSFINAL (CODE)",           // post_static_name
+    "HOME    (CODE)",           // home_name
+    "XISEG   (XDATA)",          // xidata_name - initialized xdata   initialized xdata
+    "XINIT   (CODE)",           // xinit_name - a code copy of xiseg
+    "CONST   (CODE)",           // const_name - const data (code or not)
     NULL,
     NULL,
     1
   },
   { _mcs51_genExtraAreas, NULL },
   {
-    +1,		/* direction (+1 = stack grows up) */
-    0,		/* bank_overhead (switch between register banks) */
-    4,		/* isr_overhead */
-    1,		/* call_overhead (2 for return address - 1 for pre-incrementing push */
-    1,		/* reent_overhead */
-    0		/* banked_overhead (switch between code banks) */
+    +1,         /* direction (+1 = stack grows up) */
+    0,          /* bank_overhead (switch between register banks) */
+    4,          /* isr_overhead */
+    1,          /* call_overhead (2 for return address - 1 for pre-incrementing push */
+    1,          /* reent_overhead */
+    0           /* banked_overhead (switch between code banks) */
   },
   {
     /* mcs51 has an 8 bit mul */

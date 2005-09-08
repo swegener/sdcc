@@ -151,7 +151,7 @@ _process_pragma (const char *sz)
     strncpy (buffer, sz + 5, sizeof (buffer));
     buffer[sizeof (buffer) - 1 ] = '\0';
     chomp (buffer);
-    if (isdigit (buffer[0]))
+    if (isdigit ((unsigned char)buffer[0]))
     {
 
     }
@@ -159,7 +159,7 @@ _process_pragma (const char *sz)
     {
       strcpy (buffer, "HOME");
     }
-    if (isdigit (buffer[0]))
+    if (isdigit ((unsigned char)buffer[0]))
     {
 	  /* Arg was a bank number.  Handle in an ASM independent
 	     way. */

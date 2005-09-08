@@ -3113,7 +3113,7 @@ void  pic16_pCodeInitRegisters(void)
 /*                                                                 */
 /*-----------------------------------------------------------------*/
 
-int mnem2key(char const *mnem)
+int mnem2key(unsigned char const *mnem)
 {
   int key = 0;
 
@@ -3856,7 +3856,7 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
 
 	if(asdir && *asdir) {
 		
-		while(isspace(*asdir))asdir++;	// strip any white space from the beginning
+		while(isspace((unsigned char)*asdir))asdir++;	// strip any white space from the beginning
 		
 		pcad->directive = Safe_strdup( asdir );
 	}
@@ -3869,7 +3869,7 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
 	
 	va_end(ap);
 	
-	while(isspace(*lbp))lbp++;
+	while(isspace((unsigned char)*lbp))lbp++;
 	
 	if(lbp && *lbp)
 		pcad->arg = Safe_strdup( lbp );

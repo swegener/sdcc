@@ -495,11 +495,28 @@ VOID lnkarea2 (void)
     char temp[NCPS];
     struct sym *sp;
     int j;
-    struct area *dseg_ap=NULL;
+    struct area *dseg_ap = NULL;
+    struct area *abs_ap = NULL;
     struct sym *sp_dseg_s=NULL, *sp_dseg_l=NULL;
 
     for(j=0; j<256; j++) idatamap[j]=' ';
     memset(codemap, 0, sizeof(codemap));
+
+    /* first sort all absolute areas to the front */
+    ap = areap;
+    /* no need to check first area, it's in front anyway */
+    while (ap && ap->a_ap)
+    {
+        if (ap->a_ap->a_flag & A_ABS)
+        {/* next area is absolute, move it to front,
+            reversed sequence is no problem for absolutes */
+            abs_ap = ap->a_ap;
+            ap->a_ap = abs_ap->a_ap;
+            abs_ap->a_ap = areap;
+            areap = abs_ap;
+        }
+        ap = ap->a_ap;
+    }
 
     ap = areap;
     while (ap)
@@ -555,7 +572,7 @@ VOID lnkarea2 (void)
         to compute the byte size of BSEG_BYTES: */
         if (!strcmp(ap->a_id, "BSEG"))
         {
-                ap->a_ap->a_axp->a_size = ((ap->a_addr + ap->a_size + 7)/8); /*Bits to bytes*/
+            ap->a_ap->a_axp->a_size = ((ap->a_addr + ap->a_size + 7)/8); /*Bits to bytes*/
         }
         else if (!strcmp(ap->a_id, "DSEG"))
         {
@@ -736,7 +753,7 @@ void lnksect2 (struct area *tap, int rloc)
                         fprintf(stderr, ErrMsg, taxp->a_size, taxp->a_size>1?"s":"", tap->a_id);
                         lkerr++;
                     }
-               }
+                }
 
                 for(j=0; j<ramlimit; j++)
                 {

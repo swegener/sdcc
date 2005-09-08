@@ -45,9 +45,9 @@ set *binPathSet = NULL; /* set of binary paths */
  */
 
 static void
-split_command(const char *cmd_line, char **command, char **params)
+split_command(const unsigned char *cmd_line, char **command, char **params)
 {
-  const char *p, *cmd_start;
+  const unsigned char *p, *cmd_start;
   char delim;
   char *str;
   unsigned len;

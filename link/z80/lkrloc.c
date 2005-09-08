@@ -295,7 +295,7 @@ relr()
 #ifdef GAMEBOY
 	{
 		char *s = strrchr(a[aindex]->a_bap->a_id, '_');
-		if(s != NULL && isdigit(s[1]))
+		if(s != NULL && isdigit((unsigned char)s[1]))
 			current_rom_bank = atoi(s+1);
 		else
 			current_rom_bank = 0;

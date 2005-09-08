@@ -463,7 +463,7 @@ _emit2 (const char *inst, const char *fmt,...)
 {
   va_list ap;
   char lb[INITIAL_INLINEASM];
-  char *lbp = lb;
+  unsigned char *lbp = lb;
 
   va_start (ap, fmt);
 
@@ -2914,7 +2914,7 @@ emitCall (iCode * ic, bool ispcall)
     }
   spillCached ();
 
-  /* Mark the regsiters as restored. */
+  /* Mark the registers as restored. */
   _G.saves.saved = FALSE;
 
   /* if we need assign a result value */

@@ -97,7 +97,7 @@ void bailOut (char *mesg) {
 static void emitcode (char *inst, char *fmt,...) {
   va_list ap;
   char lb[INITIAL_INLINEASM];
-  char *lbp = lb;
+  unsigned char *lbp = lb;
 
   va_start (ap, fmt);
 
@@ -112,7 +112,7 @@ static void emitcode (char *inst, char *fmt,...) {
   else
     vsprintf (lb, fmt, ap);
 
-  while (isspace ((int)*lbp))
+  while (isspace (*lbp))
     lbp++;
 
   if (lbp && *lbp)

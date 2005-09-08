@@ -1,9 +1,9 @@
 /*-------------------------------------------------------------------------
   SDCCopt.c - calls all the optimizations routines and does some of the
               hackier transformations, these include translating iCodes
-	      to function calls and replacing local variables with their
-	      register equivalents etc. Also contains the driver routine
-	      for dead code elimination
+              to function calls and replacing local variables with their
+              register equivalents etc. Also contains the driver routine
+              for dead code elimination
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
@@ -11,21 +11,22 @@
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+#include <math.h>
 #include "common.h"
 
 /*-----------------------------------------------------------------*/
@@ -38,7 +39,7 @@ char flowChanged = 0;
 /*-----------------------------------------------------------------*/
 /* printSymName - prints the symbol names                          */
 /*-----------------------------------------------------------------*/
-int 
+int
 printSymName (void *vsym)
 {
   symbol *sym = vsym;
@@ -49,7 +50,7 @@ printSymName (void *vsym)
 /*-----------------------------------------------------------------*/
 /* cnvToFcall - does the actual conversion to function call        */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 cnvToFcall (iCode * ic, eBBlock * ebp)
 {
   iCode *ip;
@@ -60,7 +61,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   int lineno = ic->lineno;
   int bytesPushed=0;
 
-  ip = ic->next;		/* insertion point */
+  ip = ic->next;                /* insertion point */
   /* remove it from the iCode */
   remiCodeFromeBBlock (ebp, ic);
 
@@ -145,30 +146,30 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 
       /* first one */
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-	{
-	  newic = newiCode (SEND, IC_LEFT (ic), NULL);
-	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        {
+          newic = newiCode (SEND, IC_LEFT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_LEFT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
-	}
+        {
+          newic = newiCode ('=', NULL, IC_LEFT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+        }
 
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
       /* second one */
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
-	{
-	  newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
-	}
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
+        }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type)->next);
-	}
+        {
+          newic = newiCode ('=', NULL, IC_RIGHT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type)->next);
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -178,34 +179,34 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 
       /* push right */
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
-	{
-	  newic = newiCode (SEND, right, NULL);
-	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
-	}
+        {
+          newic = newiCode (SEND, right, NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
+        }
       else
-	{
-	  newic = newiCode (IPUSH, right, NULL);
-	  newic->parmPush = 1;
-	  //bytesPushed+=4;
-	  bytesPushed += getSize(operandType(right));
-	}
+        {
+          newic = newiCode (IPUSH, right, NULL);
+          newic->parmPush = 1;
+          //bytesPushed+=4;
+          bytesPushed += getSize(operandType(right));
+        }
 
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
       /* insert push left */
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
-	{
-	  newic = newiCode (SEND, left, NULL);
-	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        {
+          newic = newiCode (SEND, left, NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode (IPUSH, left, NULL);
-	  newic->parmPush = 1;
-	  //bytesPushed+=4;
-	  bytesPushed += getSize(operandType(left));
-	}
+        {
+          newic = newiCode (IPUSH, left, NULL);
+          newic->parmPush = 1;
+          //bytesPushed+=4;
+          bytesPushed += getSize(operandType(left));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
     }
@@ -217,18 +218,18 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   ebp->hasFcall = 1;
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
-    
-  if(TARGET_IS_PIC16) {
-	/* normally these functions aren't marked external, so we can use their
-	 * _extern field to marked as already added to symbol table */
 
-	if(!SPEC_EXTR(func->etype)) {
-	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
-		
-		SPEC_EXTR(func->etype) = 1;
-		seg = SPEC_OCLS( func->etype );
-		addSet(&seg->syms, func);
-	}
+  if(TARGET_IS_PIC16) {
+        /* normally these functions aren't marked external, so we can use their
+         * _extern field to marked as already added to symbol table */
+
+        if(!SPEC_EXTR(func->etype)) {
+            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+
+                SPEC_EXTR(func->etype) = 1;
+                seg = SPEC_OCLS( func->etype );
+                addSet(&seg->syms, func);
+        }
   }
 
   addiCodeToeBBlock (ebp, newic, ip);
@@ -237,7 +238,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
 /*-----------------------------------------------------------------*/
 /* cnvToFloatCast - converts casts to floats to function calls     */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 cnvToFloatCast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
@@ -254,13 +255,13 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
   for (bwd = 0; bwd < 3; bwd++)
     {
       for (su = 0; su < 2; su++)
-	{
-	  if (compareType (type, __multypes[bwd][su]) == 1)
-	    {
-	      func = __conv[0][bwd][su];
-	      goto found;
-	    }
-	}
+        {
+          if (compareType (type, __multypes[bwd][su]) == 1)
+            {
+              func = __conv[0][bwd][su];
+              goto found;
+            }
+        }
     }
 
   if(compareType (type, fixed16x16Type) == 1) {
@@ -275,16 +276,16 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) 
-	    {
-		newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-		newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	    }
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) 
+        {
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
-	}
+        {
+          newic = newiCode ('=', NULL, IC_RIGHT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = linenno;
 
@@ -292,16 +293,16 @@ found:
   else
     {
       /* push the left */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+      if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+        newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+        newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+      }
       else
-	{
-	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
-	  newic->parmPush = 1;
-	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
-	}
+      {
+        newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+        newic->parmPush = 1;
+        bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+      }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = linenno;
 
@@ -367,16 +368,16 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) 
-	    {
-		newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-		newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	    }
+        if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
+            {
+                newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+                newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+            }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
-	}
+        {
+          newic = newiCode ('=', NULL, IC_RIGHT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = linenno;
 
@@ -384,16 +385,16 @@ found:
   else
     {
       /* push the left */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
-	  newic->parmPush = 1;
-	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
-	}
+        {
+          newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+          newic->parmPush = 1;
+          bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = linenno;
 
@@ -408,16 +409,16 @@ found:
     FUNC_HASFCALL (currFunc->type) = 1;
 
   if(TARGET_IS_PIC16) {
-	/* normally these functions aren't marked external, so we can use their
-	 * _extern field to marked as already added to symbol table */
+        /* normally these functions aren't marked external, so we can use their
+         * _extern field to marked as already added to symbol table */
 
-	if(!SPEC_EXTR(func->etype)) {
-	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
-		
-		SPEC_EXTR(func->etype) = 1;
-		seg = SPEC_OCLS( func->etype );
-		addSet(&seg->syms, func);
-	}
+        if(!SPEC_EXTR(func->etype)) {
+            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+
+                SPEC_EXTR(func->etype) = 1;
+                seg = SPEC_OCLS( func->etype );
+                addSet(&seg->syms, func);
+        }
   }
 
   addiCodeToeBBlock (ebp, newic, ip);
@@ -427,7 +428,7 @@ found:
 /*-----------------------------------------------------------------*/
 /* cnvFromFloatCast - converts casts From floats to function calls */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 cnvFromFloatCast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
@@ -445,13 +446,13 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
   for (bwd = 0; bwd < 3; bwd++)
     {
       for (su = 0; su < 2; su++)
-	{
-	  if (compareType (type, __multypes[bwd][su]) == 1)
-	    {
-	      func = __conv[1][bwd][su];
-	      goto found;
-	    }
-	}
+        {
+          if (compareType (type, __multypes[bwd][su]) == 1)
+            {
+              func = __conv[1][bwd][su];
+              goto found;
+            }
+        }
     }
   assert (0);
 found:
@@ -460,15 +461,15 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
-	}
+        {
+          newic = newiCode ('=', NULL, IC_RIGHT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -477,16 +478,16 @@ found:
     {
 
       /* push the left */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
-	  newic->parmPush = 1;
-	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
-	}
+        {
+          newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+          newic->parmPush = 1;
+          bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -501,16 +502,16 @@ found:
     FUNC_HASFCALL (currFunc->type) = 1;
 
   if(TARGET_IS_PIC16) {
-	/* normally these functions aren't marked external, so we can use their
-	 * _extern field to marked as already added to symbol table */
+        /* normally these functions aren't marked external, so we can use their
+         * _extern field to marked as already added to symbol table */
 
-	if(!SPEC_EXTR(func->etype)) {
-	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
-		
-		SPEC_EXTR(func->etype) = 1;
-		seg = SPEC_OCLS( func->etype );
-		addSet(&seg->syms, func);
-	}
+        if(!SPEC_EXTR(func->etype)) {
+            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+
+                SPEC_EXTR(func->etype) = 1;
+                seg = SPEC_OCLS( func->etype );
+                addSet(&seg->syms, func);
+        }
   }
 
   addiCodeToeBBlock (ebp, newic, ip);
@@ -538,13 +539,13 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
   for (bwd = 0; bwd < 3; bwd++)
     {
       for (su = 0; su < 2; su++)
-	{
-	  if (compareType (type, __multypes[bwd][su]) == 1)
-	    {
-	      func = __fp16x16conv[1][bwd][su];
-	      goto found;
-	    }
-	}
+        {
+          if (compareType (type, __multypes[bwd][su]) == 1)
+            {
+              func = __fp16x16conv[1][bwd][su];
+              goto found;
+            }
+        }
     }
     
   if (compareType (type, floatType) == 1)
@@ -560,15 +561,15 @@ found:
   if (!options.float_rent)
     {
       /* first one */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
-	}
+        {
+          newic = newiCode ('=', NULL, IC_RIGHT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -577,16 +578,16 @@ found:
     {
 
       /* push the left */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-	    newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+            newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
-	  newic->parmPush = 1;
-	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
-	}
+        {
+          newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+          newic->parmPush = 1;
+          bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -622,7 +623,7 @@ extern operand *geniCodeRValue (operand *, bool);
 /*-----------------------------------------------------------------*/
 /* convilong - converts int or long mults or divs to fcalls        */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
 {
   symbol *func = NULL;
@@ -633,34 +634,34 @@ convilong (iCode * ic, eBBlock * ebp, sym_link * type, int op)
   int su;
   int bytesPushed=0;
 
-  remiCodeFromeBBlock (ebp, ic);    
-    
+  remiCodeFromeBBlock (ebp, ic);
+
   /* depending on the type */
   for (bwd = 0; bwd < 3; bwd++)
     {
       for (su = 0; su < 2; su++)
-	{
-	  if (compareType (type, __multypes[bwd][su]) == 1)
-	    {
-	      if (op == '*')
-		func = __muldiv[0][bwd][su];
-	      else if (op == '/')
-		func = __muldiv[1][bwd][su];
-	      else if (op == '%')
-		func = __muldiv[2][bwd][su];
+        {
+          if (compareType (type, __multypes[bwd][su]) == 1)
+            {
+              if (op == '*')
+                func = __muldiv[0][bwd][su];
+              else if (op == '/')
+                func = __muldiv[1][bwd][su];
+              else if (op == '%')
+                func = __muldiv[2][bwd][su];
               else if (op == RRC)
-		func = __rlrr[1][bwd][su];
+                func = __rlrr[1][bwd][su];
               else if (op == RLC)
-		func = __rlrr[0][bwd][su];
+                func = __rlrr[0][bwd][su];
               else if (op == RIGHT_OP)
-		func = __rlrr[1][bwd][su];
+                func = __rlrr[1][bwd][su];
               else if (op == LEFT_OP)
-		func = __rlrr[0][bwd][su];
-	      else
-		assert (0);
-	      goto found;
-	    }
-	}
+                func = __rlrr[0][bwd][su];
+              else
+                assert (0);
+              goto found;
+            }
+        }
     }
   assert (0);
 found:
@@ -668,28 +669,28 @@ found:
   if (!options.intlong_rent)
     {
       /* first one */
-	if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
-	    newic = newiCode (SEND, IC_LEFT (ic), NULL);
-	    newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
-	}
+        if (IS_REGPARM (FUNC_ARGS(func->type)->etype)) {
+            newic = newiCode (SEND, IC_LEFT (ic), NULL);
+            newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+        }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_LEFT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
-	}
+        {
+          newic = newiCode ('=', NULL, IC_LEFT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
       /* second one */
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype)) {
-	  newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
+          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
       }
       else
-	{
-	  newic = newiCode ('=', NULL, IC_RIGHT (ic));
-	  IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type)->next);
-	}
+        {
+          newic = newiCode ('=', NULL, IC_RIGHT (ic));
+          IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type)->next);
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -701,15 +702,15 @@ found:
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
         {
           newic = newiCode (SEND, IC_RIGHT (ic), NULL);
-	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
         }
       else
-	{
-	  newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
-	  newic->parmPush = 1;
+        {
+          newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
+          newic->parmPush = 1;
 
-	  bytesPushed += getSize(operandType(IC_RIGHT(ic)));
-	}
+          bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -717,15 +718,15 @@ found:
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
         {
           newic = newiCode (SEND, IC_LEFT (ic), NULL);
-	  newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
+          newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
-	{
-	  newic = newiCode (IPUSH, IC_LEFT (ic), NULL);
-	  newic->parmPush = 1;
+        {
+          newic = newiCode (IPUSH, IC_LEFT (ic), NULL);
+          newic->parmPush = 1;
 
-	  bytesPushed += getSize(operandType(IC_LEFT(ic)));
-	}
+          bytesPushed += getSize(operandType(IC_LEFT(ic)));
+        }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
 
@@ -741,16 +742,16 @@ found:
     FUNC_HASFCALL (currFunc->type) = 1;
 
   if(TARGET_IS_PIC16) {
-	/* normally these functions aren't marked external, so we can use their
-	 * _extern field to marked as already added to symbol table */
+        /* normally these functions aren't marked external, so we can use their
+         * _extern field to marked as already added to symbol table */
 
-	if(!SPEC_EXTR(func->etype)) {
-	    memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
-		
-		SPEC_EXTR(func->etype) = 1;
-		seg = SPEC_OCLS( func->etype );
-		addSet(&seg->syms, func);
-	}
+        if(!SPEC_EXTR(func->etype)) {
+            memmap *seg = SPEC_OCLS(OP_SYMBOL(IC_LEFT(newic))->etype);
+
+                SPEC_EXTR(func->etype) = 1;
+                seg = SPEC_OCLS( func->etype );
+                addSet(&seg->syms, func);
+        }
   }
 
   addiCodeToeBBlock (ebp, newic, ip);
@@ -759,7 +760,7 @@ found:
 /*-----------------------------------------------------------------*/
 /* convertToFcall - converts some operations to fcalls             */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 convertToFcall (eBBlock ** ebbs, int count)
 {
   int i;
@@ -771,31 +772,31 @@ convertToFcall (eBBlock ** ebbs, int count)
 
       /* for all instructions in the block do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	{
+        {
 
-	  /* floating point operations are
-	     converted to function calls */
-	  if ((IS_CONDITIONAL (ic) ||
-	       IS_ARITHMETIC_OP (ic)) &&
+          /* floating point operations are
+             converted to function calls */
+          if ((IS_CONDITIONAL (ic) ||
+               IS_ARITHMETIC_OP (ic)) &&
 	      (IS_FLOAT (operandType (IC_RIGHT (ic)))
 	        || IS_FIXED( operandType (IC_RIGHT (ic)))))
-	    {
+            {
 
-	      cnvToFcall (ic, ebbs[i]);
-	    }
+              cnvToFcall (ic, ebbs[i]);
+            }
 
-	  /* casting is a little different */
-	  if (ic->op == CAST)
-	    {
-	      if (IS_FLOAT (operandType (IC_RIGHT (ic))))
-		cnvFromFloatCast (ic, ebbs[i]);
-	      else if (IS_FLOAT (operandType (IC_LEFT (ic))))
-		cnvToFloatCast (ic, ebbs[i]);
+          /* casting is a little different */
+          if (ic->op == CAST)
+            {
+              if (IS_FLOAT (operandType (IC_RIGHT (ic))))
+                cnvFromFloatCast (ic, ebbs[i]);
+              else if (IS_FLOAT (operandType (IC_LEFT (ic))))
+                cnvToFloatCast (ic, ebbs[i]);
 	      if (IS_FIXED16X16 (operandType (IC_RIGHT (ic))))
 		cnvFromFixed16x16Cast (ic, ebbs[i]);
 	      else if (IS_FIXED16X16 (operandType (IC_LEFT (ic))))
 		cnvToFixed16x16Cast (ic, ebbs[i]);
-	    }
+            }
 
           // Easy special case which avoids function call: modulo by a literal power
           // of two can be replaced by a bitwise AND.
@@ -831,12 +832,12 @@ convertToFcall (eBBlock ** ebbs, int count)
                 }
             }
 
-	  /* if long / int mult or divide or mod */
-	  if (ic->op == '*' || ic->op == '/' || ic->op == '%')
-	    {
-	      sym_link *leftType = operandType (IC_LEFT (ic));
+          /* if long / int mult or divide or mod */
+          if (ic->op == '*' || ic->op == '/' || ic->op == '%')
+            {
+              sym_link *leftType = operandType (IC_LEFT (ic));
 
-	      if (IS_INTEGRAL (leftType) && getSize (leftType) > port->support.muldiv)
+              if (IS_INTEGRAL (leftType) && getSize (leftType) > port->support.muldiv)
                 {
                   sym_link *rightType = operandType (IC_RIGHT (ic));
 
@@ -850,18 +851,18 @@ convertToFcall (eBBlock ** ebbs, int count)
                       convilong (ic, ebbs[i], leftType, ic->op);
                     }
                 }
-	    }
-          
+            }
+
           if (ic->op == RRC || ic->op == RLC || ic->op == LEFT_OP || ic->op == RIGHT_OP)
             {
-	      sym_link *type = operandType (IC_LEFT (ic));
+              sym_link *type = operandType (IC_LEFT (ic));
 
-	      if (IS_INTEGRAL (type) && getSize (type) > port->support.shift && port->support.shift >= 0)
+              if (IS_INTEGRAL (type) && getSize (type) > port->support.shift && port->support.shift >= 0)
                 {
                   convilong (ic, ebbs[i], type, ic->op);
                 }
             }
-	}
+        }
     }
 }
 
@@ -874,26 +875,26 @@ isLocalWithoutDef (symbol * sym)
 {
   if (!IS_AUTO (sym))
     return 0;
-  
+
   if (IS_VOLATILE (sym->type))
     return 0;
-  
+
   if (sym->_isparm)
     return 0;
-  
+
   if (IS_AGGREGATE (sym->type))
     return 0;
-  
+
   if (sym->addrtaken)
     return 0;
-  
+
   return !sym->defs;
 }
 
 /*-----------------------------------------------------------------*/
 /* replaceRegEqv - replace all local variables with their reqv     */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 replaceRegEqv (ebbIndex * ebbi)
 {
   eBBlock ** ebbs = ebbi->bbOrder;
@@ -912,121 +913,121 @@ replaceRegEqv (ebbIndex * ebbi)
       iCode *ic;
 
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	{
+        {
 
-	  if (SKIP_IC2 (ic))
-	    continue;
+          if (SKIP_IC2 (ic))
+            continue;
 
-	  if (ic->op == IFX)
-	    {
-	      if (IC_COND (ic) &&
-		  IS_TRUE_SYMOP (IC_COND (ic)) &&
+          if (ic->op == IFX)
+            {
+              if (IC_COND (ic) &&
+                  IS_TRUE_SYMOP (IC_COND (ic)) &&
                   isLocalWithoutDef (OP_SYMBOL (IC_COND (ic))))
-		{
-		  werrorfl (ic->filename, ic->lineno,
-			  W_LOCAL_NOINIT,
-			  OP_SYMBOL (IC_COND (ic))->name);
-		  OP_REQV (IC_COND (ic)) = NULL;
-		  OP_SYMBOL (IC_COND (ic))->allocreq = 1;
-		}
-	      
-	      if (IS_TRUE_SYMOP (IC_COND (ic)) &&
-		  OP_REQV (IC_COND (ic)))
-		IC_COND (ic) = opFromOpWithDU (OP_REQV (IC_COND (ic)),
-					     OP_SYMBOL (IC_COND (ic))->defs,
-					    OP_SYMBOL (IC_COND (ic))->uses);
+                {
+                  werrorfl (ic->filename, ic->lineno,
+                          W_LOCAL_NOINIT,
+                          OP_SYMBOL (IC_COND (ic))->name);
+                  OP_REQV (IC_COND (ic)) = NULL;
+                  OP_SYMBOL (IC_COND (ic))->allocreq = 1;
+                }
 
-	      continue;
-	    }
+              if (IS_TRUE_SYMOP (IC_COND (ic)) &&
+                  OP_REQV (IC_COND (ic)))
+                IC_COND (ic) = opFromOpWithDU (OP_REQV (IC_COND (ic)),
+                                             OP_SYMBOL (IC_COND (ic))->defs,
+                                            OP_SYMBOL (IC_COND (ic))->uses);
 
-	  
-	  if (ic->op == JUMPTABLE)
-	    {
-	      if (IC_JTCOND (ic) &&
-		  IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
+              continue;
+            }
+
+
+          if (ic->op == JUMPTABLE)
+            {
+              if (IC_JTCOND (ic) &&
+                  IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
                   isLocalWithoutDef (OP_SYMBOL (IC_JTCOND (ic))))
-		{
-		  werrorfl (ic->filename, ic->lineno,
-			  W_LOCAL_NOINIT,
-			  OP_SYMBOL (IC_JTCOND (ic))->name);
-		  OP_REQV (IC_JTCOND (ic)) = NULL;
-		  OP_SYMBOL (IC_JTCOND (ic))->allocreq = 1;
-		}
-	      
-	      if (IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
-		  OP_REQV (IC_JTCOND (ic)))
-		IC_JTCOND (ic) = opFromOpWithDU (OP_REQV (IC_JTCOND (ic)),
-					   OP_SYMBOL (IC_JTCOND (ic))->defs,
-					  OP_SYMBOL (IC_JTCOND (ic))->uses);
-	      continue;
-	    }
+                {
+                  werrorfl (ic->filename, ic->lineno,
+                          W_LOCAL_NOINIT,
+                          OP_SYMBOL (IC_JTCOND (ic))->name);
+                  OP_REQV (IC_JTCOND (ic)) = NULL;
+                  OP_SYMBOL (IC_JTCOND (ic))->allocreq = 1;
+                }
 
-	  if (ic->op == RECEIVE)
-	    {
-	      if (OP_SYMBOL (IC_RESULT (ic))->addrtaken)
-		OP_SYMBOL (IC_RESULT (ic))->isspilt = 1;
-	    }
+              if (IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
+                  OP_REQV (IC_JTCOND (ic)))
+                IC_JTCOND (ic) = opFromOpWithDU (OP_REQV (IC_JTCOND (ic)),
+                                           OP_SYMBOL (IC_JTCOND (ic))->defs,
+                                          OP_SYMBOL (IC_JTCOND (ic))->uses);
+              continue;
+            }
 
-	  /* general case */
-	  if (IC_RESULT (ic) &&
-	      IS_TRUE_SYMOP (IC_RESULT (ic)) &&
-	      OP_REQV (IC_RESULT (ic)))
-	    {
-	      if (POINTER_SET (ic))
-		{
-		  IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
-					   OP_SYMBOL (IC_RESULT (ic))->defs,
-					  OP_SYMBOL (IC_RESULT (ic))->uses);
-		  IC_RESULT (ic)->isaddr = 1;
-		}
-	      else
-		IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
-					   OP_SYMBOL (IC_RESULT (ic))->defs,
-					  OP_SYMBOL (IC_RESULT (ic))->uses);
-	    }
+          if (ic->op == RECEIVE)
+            {
+              if (OP_SYMBOL (IC_RESULT (ic))->addrtaken)
+                OP_SYMBOL (IC_RESULT (ic))->isspilt = 1;
+            }
 
-	  if (IC_RIGHT (ic) &&
-	      IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
-	      isLocalWithoutDef (OP_SYMBOL (IC_RIGHT (ic))))
-	    {
-	      werrorfl (ic->filename, ic->lineno,
-		        W_LOCAL_NOINIT,
-		        OP_SYMBOL (IC_RIGHT (ic))->name);
-	      OP_REQV (IC_RIGHT (ic)) = NULL;
-	      OP_SYMBOL (IC_RIGHT (ic))->allocreq = 1;
-	    }
-	  
-	  if (IC_RIGHT (ic) &&
-	      IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
-	      OP_REQV (IC_RIGHT (ic)))
-	    {
-	      IC_RIGHT (ic) = opFromOpWithDU (OP_REQV (IC_RIGHT (ic)),
-					    OP_SYMBOL (IC_RIGHT (ic))->defs,
-					   OP_SYMBOL (IC_RIGHT (ic))->uses);
-	      IC_RIGHT (ic)->isaddr = 0;
-	    }
+          /* general case */
+          if (IC_RESULT (ic) &&
+              IS_TRUE_SYMOP (IC_RESULT (ic)) &&
+              OP_REQV (IC_RESULT (ic)))
+            {
+              if (POINTER_SET (ic))
+                {
+                  IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
+                                           OP_SYMBOL (IC_RESULT (ic))->defs,
+                                          OP_SYMBOL (IC_RESULT (ic))->uses);
+                  IC_RESULT (ic)->isaddr = 1;
+                }
+              else
+                IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
+                                           OP_SYMBOL (IC_RESULT (ic))->defs,
+                                          OP_SYMBOL (IC_RESULT (ic))->uses);
+            }
 
-	  if (IC_LEFT (ic) &&
-	      IS_TRUE_SYMOP (IC_LEFT (ic)) &&
-	      isLocalWithoutDef (OP_SYMBOL (IC_LEFT (ic))))
-	    {
-	      werrorfl (ic->filename, ic->lineno,
-		        W_LOCAL_NOINIT,
-		        OP_SYMBOL (IC_LEFT (ic))->name);
-	      OP_REQV (IC_LEFT (ic)) = NULL;
-	      OP_SYMBOL (IC_LEFT (ic))->allocreq = 1;
-	    }
-            
-	  if (IC_LEFT (ic) &&
-	      IS_TRUE_SYMOP (IC_LEFT (ic)) &&
-	      OP_REQV (IC_LEFT (ic)))
-	    {
-	      IC_LEFT (ic) = opFromOpWithDU (OP_REQV (IC_LEFT (ic)),
-					     OP_SYMBOL (IC_LEFT (ic))->defs,
-					     OP_SYMBOL (IC_LEFT (ic))->uses);
-	      IC_LEFT (ic)->isaddr = 0;
-	    }
-	}
+          if (IC_RIGHT (ic) &&
+              IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
+              isLocalWithoutDef (OP_SYMBOL (IC_RIGHT (ic))))
+            {
+              werrorfl (ic->filename, ic->lineno,
+                        W_LOCAL_NOINIT,
+                        OP_SYMBOL (IC_RIGHT (ic))->name);
+              OP_REQV (IC_RIGHT (ic)) = NULL;
+              OP_SYMBOL (IC_RIGHT (ic))->allocreq = 1;
+            }
+
+          if (IC_RIGHT (ic) &&
+              IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
+              OP_REQV (IC_RIGHT (ic)))
+            {
+              IC_RIGHT (ic) = opFromOpWithDU (OP_REQV (IC_RIGHT (ic)),
+                                            OP_SYMBOL (IC_RIGHT (ic))->defs,
+                                           OP_SYMBOL (IC_RIGHT (ic))->uses);
+              IC_RIGHT (ic)->isaddr = 0;
+            }
+
+          if (IC_LEFT (ic) &&
+              IS_TRUE_SYMOP (IC_LEFT (ic)) &&
+              isLocalWithoutDef (OP_SYMBOL (IC_LEFT (ic))))
+            {
+              werrorfl (ic->filename, ic->lineno,
+                        W_LOCAL_NOINIT,
+                        OP_SYMBOL (IC_LEFT (ic))->name);
+              OP_REQV (IC_LEFT (ic)) = NULL;
+              OP_SYMBOL (IC_LEFT (ic))->allocreq = 1;
+            }
+
+          if (IC_LEFT (ic) &&
+              IS_TRUE_SYMOP (IC_LEFT (ic)) &&
+              OP_REQV (IC_LEFT (ic)))
+            {
+              IC_LEFT (ic) = opFromOpWithDU (OP_REQV (IC_LEFT (ic)),
+                                             OP_SYMBOL (IC_LEFT (ic))->defs,
+                                             OP_SYMBOL (IC_LEFT (ic))->uses);
+              IC_LEFT (ic)->isaddr = 0;
+            }
+        }
     }
 }
 
@@ -1038,47 +1039,47 @@ findReqv (symbol * prereqv, eBBlock ** ebbs, int count)
 {
   int i;
   iCode * ic;
-  
+
   /* for all blocks do */
   for (i=0; i<count; i++)
     {
       /* for all instructions in the block do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	{
-	  if (ic->op == IFX)
-	    {
-	      if (IS_ITEMP (IC_COND (ic))
-		  && OP_SYMBOL (IC_COND (ic))->prereqv == prereqv)
-		return IC_COND (ic);
-	    }
-	  else if (ic->op == JUMPTABLE)
-	    {
-	      if (IS_ITEMP (IC_JTCOND (ic))
-		  && OP_SYMBOL (IC_JTCOND (ic))->prereqv == prereqv)
-		return IC_JTCOND (ic);
-	    }
-	  else
-	    {
-	      if (IS_ITEMP (IC_LEFT (ic))
-		  && OP_SYMBOL (IC_LEFT (ic))->prereqv == prereqv)
-		return IC_LEFT (ic);
-	      if (IS_ITEMP (IC_RIGHT (ic))
-		  && OP_SYMBOL (IC_RIGHT (ic))->prereqv == prereqv)
-		return IC_RIGHT (ic);
-	      if (IS_ITEMP (IC_RESULT (ic))
-		  && OP_SYMBOL (IC_RESULT (ic))->prereqv == prereqv)
-		return IC_RESULT (ic);
-	    }
-	}
+        {
+          if (ic->op == IFX)
+            {
+              if (IS_ITEMP (IC_COND (ic))
+                  && OP_SYMBOL (IC_COND (ic))->prereqv == prereqv)
+                return IC_COND (ic);
+            }
+          else if (ic->op == JUMPTABLE)
+            {
+              if (IS_ITEMP (IC_JTCOND (ic))
+                  && OP_SYMBOL (IC_JTCOND (ic))->prereqv == prereqv)
+                return IC_JTCOND (ic);
+            }
+          else
+            {
+              if (IS_ITEMP (IC_LEFT (ic))
+                  && OP_SYMBOL (IC_LEFT (ic))->prereqv == prereqv)
+                return IC_LEFT (ic);
+              if (IS_ITEMP (IC_RIGHT (ic))
+                  && OP_SYMBOL (IC_RIGHT (ic))->prereqv == prereqv)
+                return IC_RIGHT (ic);
+              if (IS_ITEMP (IC_RESULT (ic))
+                  && OP_SYMBOL (IC_RESULT (ic))->prereqv == prereqv)
+                return IC_RESULT (ic);
+            }
+        }
     }
-  
+
   return NULL;
 }
 
 /*-----------------------------------------------------------------*/
 /* killDeadCode - eliminates dead assignments                      */
 /*-----------------------------------------------------------------*/
-int 
+int
 killDeadCode (ebbIndex * ebbi)
 {
   eBBlock ** ebbs = ebbi->dfOrder;
@@ -1107,182 +1108,182 @@ killDeadCode (ebbIndex * ebbi)
       change = 0;
       /* for all blocks do */
       for (i = 0; i < count; i++)
-	{
-	  iCode *ic;
+        {
+          iCode *ic;
 
-	  /* for all instructions in the block do */
-	  for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	    {
-	      int kill, j;
-	      kill = 0;
+          /* for all instructions in the block do */
+          for (ic = ebbs[i]->sch; ic; ic = ic->next)
+            {
+              int kill, j;
+              kill = 0;
 
-	      if (SKIP_IC (ic) ||
-		  ic->op == IFX ||
-		  ic->op == RETURN ||
+              if (SKIP_IC (ic) ||
+                  ic->op == IFX ||
+                  ic->op == RETURN ||
                   ic->op == DUMMY_READ_VOLATILE ||
                   ic->op == CRITICAL ||
                   ic->op == ENDCRITICAL)
-		continue;
-
-	      /* Since both IFX & JUMPTABLE (in SKIP_IC) have been tested for */
-	      /* it is now safe to assume IC_LEFT, IC_RIGHT, & IC_RESULT are  */
-	      /* valid. */
-
-	      /* if the result is volatile then continue */
-	      if (IC_RESULT (ic) && isOperandVolatile (IC_RESULT (ic), FALSE))
-		continue;
-
-	      /* if the result is a temp & isaddr then skip */
-	      if (IC_RESULT (ic) && POINTER_SET (ic))
-		continue;
-              
-              if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next)
-	          && !SPIL_LOC (IC_RESULT (ic)))
                 continue;
 
-	      /* if the result is used in the remainder of the */
-	      /* block then skip */
-	      if (usedInRemaining (IC_RESULT (ic), ic->next))
-		continue;
+              /* Since both IFX & JUMPTABLE (in SKIP_IC) have been tested for */
+              /* it is now safe to assume IC_LEFT, IC_RIGHT, & IC_RESULT are  */
+              /* valid. */
 
-	      /* does this definition reach the end of the block 
-	         or the usage is zero then we can kill */
-	      if (!bitVectBitValue (ebbs[i]->outDefs, ic->key))
-		kill = 1;	/* if not we can kill it */
-	      else
-		{
-		  /* if this is a global variable or function parameter */
-		  /* we cannot kill anyway             */
-		  if (isOperandGlobal (IC_RESULT (ic)) ||
-		      (OP_SYMBOL (IC_RESULT (ic))->_isparm &&
-		       !OP_SYMBOL (IC_RESULT (ic))->ismyparm))
-		    continue;
+              /* if the result is volatile then continue */
+              if (IC_RESULT (ic) && isOperandVolatile (IC_RESULT (ic), FALSE))
+                continue;
 
-		  /* if we are sure there are no usages */
-		  if (bitVectIsZero (OP_USES (IC_RESULT (ic))))
-		    {
-		      kill = 1;
-		      goto kill;
-		    }
+              /* if the result is a temp & isaddr then skip */
+              if (IC_RESULT (ic) && POINTER_SET (ic))
+                continue;
 
-		  /* reset visited flag */
-		  for (j = 0; j < count; ebbs[j++]->visited = 0);
+              if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next)
+                  && !SPIL_LOC (IC_RESULT (ic)))
+                continue;
 
-		  /* find out if this definition is alive */
-		  if (applyToSet (ebbs[i]->succList,
-				  isDefAlive,
-				  ic))
-		    continue;
+              /* if the result is used in the remainder of the */
+              /* block then skip */
+              if (usedInRemaining (IC_RESULT (ic), ic->next))
+                continue;
 
-		  kill = 1;
+              /* does this definition reach the end of the block
+                 or the usage is zero then we can kill */
+              if (!bitVectBitValue (ebbs[i]->outDefs, ic->key))
+                kill = 1;       /* if not we can kill it */
+              else
+                {
+                  /* if this is a global variable or function parameter */
+                  /* we cannot kill anyway             */
+                  if (isOperandGlobal (IC_RESULT (ic)) ||
+                      (OP_SYMBOL (IC_RESULT (ic))->_isparm &&
+                       !OP_SYMBOL (IC_RESULT (ic))->ismyparm))
+                    continue;
+
+                  /* if we are sure there are no usages */
+                  if (bitVectIsZero (OP_USES (IC_RESULT (ic))))
+                    {
+                      kill = 1;
+                      goto kill;
+                    }
+
+                  /* reset visited flag */
+                  for (j = 0; j < count; ebbs[j++]->visited = 0);
+
+                  /* find out if this definition is alive */
+                  if (applyToSet (ebbs[i]->succList,
+                                  isDefAlive,
+                                  ic))
+                    continue;
+
+                  kill = 1;
                 }
 
-	    kill:
-	      /* kill this one if required */
-	      if (kill)
-		{
-		  bool volLeft = IS_SYMOP (IC_LEFT (ic))
-				 && isOperandVolatile (IC_LEFT (ic), FALSE);
-		  bool volRight = IS_SYMOP (IC_RIGHT (ic)) 
-				  && isOperandVolatile (IC_RIGHT (ic), FALSE);
+            kill:
+              /* kill this one if required */
+              if (kill)
+                {
+                  bool volLeft = IS_SYMOP (IC_LEFT (ic))
+                                 && isOperandVolatile (IC_LEFT (ic), FALSE);
+                  bool volRight = IS_SYMOP (IC_RIGHT (ic))
+                                  && isOperandVolatile (IC_RIGHT (ic), FALSE);
 
-		  /* a dead address-of operation should die, even if volatile */
-		  if (ic->op == ADDRESS_OF)
-		    volLeft = FALSE;
-              
-		  if (ic->next && ic->seqPoint == ic->next->seqPoint
-		      && (ic->next->op == '+' || ic->next->op == '-'))
-		    {
-		      if (isOperandEqual (IC_LEFT(ic), IC_LEFT(ic->next))
-		          || isOperandEqual (IC_LEFT(ic), IC_RIGHT(ic->next)))
-		        volLeft = FALSE;
-		      if (isOperandEqual (IC_RIGHT(ic), IC_LEFT(ic->next))
-		          || isOperandEqual (IC_RIGHT(ic), IC_RIGHT(ic->next)))
-		        volRight = FALSE;
-		    }
-		  
-		  if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
-		    {
-		      if (SPIL_LOC (IC_RESULT (ic)))
-			{
-			  IC_RESULT (ic) = newiTempFromOp (IC_RESULT (ic));
-			  SPIL_LOC (IC_RESULT (ic)) = NULL;
-			}
-		      continue;
-		    }
-		                  
-		  change = 1;
-		  gchange++;
-		  
-		  /* now delete from defUseSet */
-		  deleteItemIf (&ebbs[i]->outExprs, ifDiCodeIsX, ic);
-		  bitVectUnSetBit (ebbs[i]->outDefs, ic->key);
+                  /* a dead address-of operation should die, even if volatile */
+                  if (ic->op == ADDRESS_OF)
+                    volLeft = FALSE;
 
-		  /* and defset of the block */
-		  bitVectUnSetBit (ebbs[i]->defSet, ic->key);
+                  if (ic->next && ic->seqPoint == ic->next->seqPoint
+                      && (ic->next->op == '+' || ic->next->op == '-'))
+                    {
+                      if (isOperandEqual (IC_LEFT(ic), IC_LEFT(ic->next))
+                          || isOperandEqual (IC_LEFT(ic), IC_RIGHT(ic->next)))
+                        volLeft = FALSE;
+                      if (isOperandEqual (IC_RIGHT(ic), IC_LEFT(ic->next))
+                          || isOperandEqual (IC_RIGHT(ic), IC_RIGHT(ic->next)))
+                        volRight = FALSE;
+                    }
 
-		  /* If this is the last of a register equivalent, */
-		  /* look for a successor register equivalent. */
-		  bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-		  if (IS_ITEMP (IC_RESULT (ic))
-		      && OP_SYMBOL (IC_RESULT (ic))->isreqv
-		      && bitVectIsZero (OP_DEFS (IC_RESULT (ic))))
-		    {
-		      symbol * resultsym = OP_SYMBOL (IC_RESULT (ic));
-		      symbol * prereqv = resultsym->prereqv;
-		      
+                  if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
+                    {
+                      if (SPIL_LOC (IC_RESULT (ic)))
+                        {
+                          IC_RESULT (ic) = newiTempFromOp (IC_RESULT (ic));
+                          SPIL_LOC (IC_RESULT (ic)) = NULL;
+                        }
+                      continue;
+                    }
+
+                  change = 1;
+                  gchange++;
+
+                  /* now delete from defUseSet */
+                  deleteItemIf (&ebbs[i]->outExprs, ifDiCodeIsX, ic);
+                  bitVectUnSetBit (ebbs[i]->outDefs, ic->key);
+
+                  /* and defset of the block */
+                  bitVectUnSetBit (ebbs[i]->defSet, ic->key);
+
+                  /* If this is the last of a register equivalent, */
+                  /* look for a successor register equivalent. */
+                  bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+                  if (IS_ITEMP (IC_RESULT (ic))
+                      && OP_SYMBOL (IC_RESULT (ic))->isreqv
+                      && bitVectIsZero (OP_DEFS (IC_RESULT (ic))))
+                    {
+                      symbol * resultsym = OP_SYMBOL (IC_RESULT (ic));
+                      symbol * prereqv = resultsym->prereqv;
+
 		      if (prereqv && prereqv->reqv && (OP_SYMBOL (prereqv->reqv) == resultsym))
-			{
-			  operand * newreqv;
+                        {
+                          operand * newreqv;
 
-			  IC_RESULT (ic) = NULL;
-			  newreqv = findReqv (prereqv, ebbs, count);
-			  if (newreqv)
-			    {
-			      prereqv->reqv = newreqv;
-			    }
-			}
-		    }
+                          IC_RESULT (ic) = NULL;
+                          newreqv = findReqv (prereqv, ebbs, count);
+                          if (newreqv)
+                            {
+                              prereqv->reqv = newreqv;
+                            }
+                        }
+                    }
 
-		  /* delete the result */
-		  IC_RESULT (ic) = NULL;
-		  
-		  if (volLeft || volRight)
-		    {
-		      /* something is volatile, so keep the iCode */
-		      /* and change the operator instead */
-		      ic->op = DUMMY_READ_VOLATILE;
+                  /* delete the result */
+                  IC_RESULT (ic) = NULL;
 
-		      /* keep only the volatile operands */      
-		      if (!volLeft)
-			IC_LEFT (ic) = NULL;
-		      if (!volRight)
-			IC_RIGHT (ic) = NULL;
-		    }
-		  else
-		    {
-		      /* nothing is volatile, eliminate the iCode */
-		      remiCodeFromeBBlock (ebbs[i], ic);
+                  if (volLeft || volRight)
+                    {
+                      /* something is volatile, so keep the iCode */
+                      /* and change the operator instead */
+                      ic->op = DUMMY_READ_VOLATILE;
 
-		      /* for the left & right remove the usage */
-		      if (IS_SYMOP (IC_LEFT (ic)))
-			bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+                      /* keep only the volatile operands */
+                      if (!volLeft)
+                        IC_LEFT (ic) = NULL;
+                      if (!volRight)
+                        IC_RIGHT (ic) = NULL;
+                    }
+                  else
+                    {
+                      /* nothing is volatile, eliminate the iCode */
+                      remiCodeFromeBBlock (ebbs[i], ic);
 
-		      if (IS_SYMOP (IC_RIGHT (ic)))
-			bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-		    }
-		}
+                      /* for the left & right remove the usage */
+                      if (IS_SYMOP (IC_LEFT (ic)))
+                        bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
 
-	    }			/* end of all instructions */
+                      if (IS_SYMOP (IC_RIGHT (ic)))
+                        bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+                    }
+                }
 
-	  if (!ebbs[i]->sch && !ebbs[i]->noPath)
+            }                   /* end of all instructions */
+
+          if (!ebbs[i]->sch && !ebbs[i]->noPath)
 	    disconBBlock (ebbs[i], ebbi);
 
-	}			/* end of for all blocks */
+        }                       /* end of for all blocks */
 
       if (!change)
-	break;
-    }				/* end of while(1) */
+        break;
+    }                           /* end of while(1) */
 
   return gchange;
 }
@@ -1290,7 +1291,7 @@ killDeadCode (ebbIndex * ebbi)
 /*-----------------------------------------------------------------*/
 /* printCyclomatic - prints the cyclomatic information             */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 printCyclomatic (eBBlock ** ebbs, int count)
 {
   int nEdges = elementsInSet (graphEdges);
@@ -1307,7 +1308,7 @@ printCyclomatic (eBBlock ** ebbs, int count)
 /* discardDeadParamReceives - remove any RECEIVE opcodes which     */
 /* refer to dead variables.                                        */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 discardDeadParamReceives (eBBlock ** ebbs, int count)
 {
   int i;
@@ -1317,22 +1318,22 @@ discardDeadParamReceives (eBBlock ** ebbs, int count)
   for (i = 0; i < count; i++)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	{
-	  if (ic->op == RECEIVE)
-	    {
-	      if (IC_RESULT (ic) && OP_SYMBOL (IC_RESULT (ic))
-		  && !OP_SYMBOL (IC_RESULT (ic))->used)
-		{
+        {
+          if (ic->op == RECEIVE)
+            {
+              if (IC_RESULT (ic) && OP_SYMBOL (IC_RESULT (ic))
+                  && !OP_SYMBOL (IC_RESULT (ic))->used)
+                {
 #if 0
-		  fprintf (stderr, "discarding dead receive for %s\n",
-			   OP_SYMBOL (IC_RESULT (ic))->name);
+                  fprintf (stderr, "discarding dead receive for %s\n",
+                           OP_SYMBOL (IC_RESULT (ic))->name);
 #endif
-		  dummyIcode.next = ic->next;
-		  remiCodeFromeBBlock (ebbs[i], ic);
-		  ic = &dummyIcode;
-		}
-	    }
-	}
+                  dummyIcode.next = ic->next;
+                  remiCodeFromeBBlock (ebbs[i], ic);
+                  ic = &dummyIcode;
+                }
+            }
+        }
     }
 }
 
@@ -1343,7 +1344,7 @@ discardDeadParamReceives (eBBlock ** ebbs, int count)
 /* char and long are the same, the cast can be safely performed in */
 /* a single step.                                                  */
 /*-----------------------------------------------------------------*/
-static void 
+static void
 optimizeCastCast (eBBlock ** ebbs, int count)
 {
   int i;
@@ -1357,52 +1358,52 @@ optimizeCastCast (eBBlock ** ebbs, int count)
   for (i = 0; i < count; i++)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
-	{
-	  
-	  if (ic->op == CAST && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
-	    {
-	      type1 = operandType (IC_RIGHT (ic));
-	      type2 = operandType (IC_RESULT (ic));
+        {
 
-	      /* Look only for a cast from an integer type to an */
-	      /* integer type that has no loss of bits */
-	      if (!IS_INTEGRAL (type1) || !IS_INTEGRAL (type2))
-	        continue;
-	      if (getSize (type2) < getSize (type1))
-	        continue;
-	      
-	      /* There must be only one use of this first result */
-	      if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
-	        continue;
-	      
-	      /* This use must be a second cast */
-	      uic = hTabItemWithKey (iCodehTab,
-			bitVectFirstBit (OP_USES (IC_RESULT (ic))));
-	      if (!uic || uic->op != CAST)
-	        continue;
-  
-	      /* It must be a cast to another integer type that */
-	      /* has no loss of bits */
-	      type3 = operandType (IC_RESULT (uic));
-	      if (!IS_INTEGRAL (type3))
-		 continue;
-	      if (getSize (type3) < getSize (type2))
-		 continue;
-	      
-	      /* The signedness between the first and last types */
-	      /* must match */
-	      if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
-		 continue;
+          if (ic->op == CAST && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+            {
+              type1 = operandType (IC_RIGHT (ic));
+              type2 = operandType (IC_RESULT (ic));
 
-	      /* Change the first cast to a simple assignment and */
-	      /* let the second cast do all the work */
-	      ic->op = '=';
-	      IC_LEFT (ic) = NULL;
-	      sym = OP_SYMBOL (IC_RESULT (ic));
-	      sym->type = copyLinkChain (type1);
-	      sym->etype = getSpec (sym->type);
-	    }
-	}
+              /* Look only for a cast from an integer type to an */
+              /* integer type that has no loss of bits */
+              if (!IS_INTEGRAL (type1) || !IS_INTEGRAL (type2))
+                continue;
+              if (getSize (type2) < getSize (type1))
+                continue;
+
+              /* There must be only one use of this first result */
+              if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
+                continue;
+
+              /* This use must be a second cast */
+              uic = hTabItemWithKey (iCodehTab,
+                        bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+              if (!uic || uic->op != CAST)
+                continue;
+
+              /* It must be a cast to another integer type that */
+              /* has no loss of bits */
+              type3 = operandType (IC_RESULT (uic));
+              if (!IS_INTEGRAL (type3))
+                 continue;
+              if (getSize (type3) < getSize (type2))
+                 continue;
+
+              /* The signedness between the first and last types */
+              /* must match */
+              if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
+                 continue;
+
+              /* Change the first cast to a simple assignment and */
+              /* let the second cast do all the work */
+              ic->op = '=';
+              IC_LEFT (ic) = NULL;
+              sym = OP_SYMBOL (IC_RESULT (ic));
+              sym->type = copyLinkChain (type1);
+              sym->etype = getSpec (sym->type);
+            }
+        }
     }
 }
 
@@ -1425,20 +1426,20 @@ eBBlockFromiCode (iCode * ic)
 
   eBBNum = 0;
 
-  /* optimize the chain for labels & gotos 
+  /* optimize the chain for labels & gotos
      this will eliminate redundant labels and
      will change jump to jumps by jumps */
   ic = iCodeLabelOptimize (ic);
 
   /* break it down into basic blocks */
   ebbi = iCodeBreakDown (ic);
-  
+
   /* hash the iCode keys so that we can quickly index */
   /* them in the rest of the optimization steps */
   setToNull ((void *) &iCodehTab);
   iCodehTab = newHashTable (iCodeKey);
   hashiCodeKeys (ebbi->bbOrder, ebbi->count);
-  
+
   /* compute the control flow */
   computeControlFlow (ebbi);
 
@@ -1448,7 +1449,7 @@ eBBlockFromiCode (iCode * ic)
 
   /* replace the local variables with their
      register equivalents : the liveRange computation
-     along with the register allocation will determine
+     along with the register allocation will determine 
      if it finally stays in the registers */
   replaceRegEqv (ebbi);
 
@@ -1460,7 +1461,7 @@ eBBlockFromiCode (iCode * ic)
     dumpEbbsToFileExt (DUMP_RAW1, ebbi);
 
   optimizeCastCast (ebbi->bbOrder, ebbi->count);
-    
+
   /* do common subexpression elimination for each block */
   change = cseAllBlocks (ebbi, FALSE);
 
@@ -1498,7 +1499,7 @@ eBBlockFromiCode (iCode * ic)
   if (options.dump_loop)
     dumpEbbsToFileExt (DUMP_LOOP, ebbi);
 
-  /* recompute the data flow and apply global cse again 
+  /* recompute the data flow and apply global cse again
      if loops optimizations or dead code caused a change:
      loops will brings out of the loop which then may be
      available for use in the later blocks: dead code
@@ -1532,16 +1533,16 @@ eBBlockFromiCode (iCode * ic)
       // the user is on his own with naked functions...
       if (!IS_VOID(currFunc->etype)
        && !FUNC_ISNAKED(currFunc->type)) {
-	eBBlock *bp;
-	// make sure all predecessors of the last block end in a return
+        eBBlock *bp;
+        // make sure all predecessors of the last block end in a return
 	for (bp=setFirstItem(ebbi->bbOrder[ebbi->count-1]->predList); 
-	     bp; 
+             bp;
 	     bp=setNextItem(ebbi->bbOrder[ebbi->count-1]->predList)) {
-	  if (bp->ech->op != RETURN) {
-	    werrorfl (bp->ech->filename, bp->ech->lineno,
-		      W_VOID_FUNC, currFunc->name);
-	  }
-	}
+          if (bp->ech->op != RETURN) {
+            werrorfl (bp->ech->filename, bp->ech->lineno,
+                      W_VOID_FUNC, currFunc->name);
+          }
+        }
       }
     }
   }
@@ -1551,7 +1552,7 @@ eBBlockFromiCode (iCode * ic)
     printCyclomatic (ebbi->bbOrder, ebbi->count);
 
   /* convert operations with support routines
-     written in C to function calls : Iam doing
+     written in C to function calls : I am doing
      this at this point since I want all the
      operations to be as they are for optimzations */
   convertToFcall (ebbi->bbOrder, ebbi->count);
@@ -1572,7 +1573,7 @@ eBBlockFromiCode (iCode * ic)
 
   /* throw away blocks */
   setToNull ((void *) &graphEdges);
-  
+
   return NULL;
 }
 

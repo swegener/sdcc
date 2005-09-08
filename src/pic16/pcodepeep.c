@@ -276,7 +276,7 @@ static int cvt_extract_destination(parsedPattern *pp)
 
     // just check first letter for now
 
-    if(toupper(*pp->pct[0].tok.s) == 'F')
+    if(toupper((unsigned char)*pp->pct[0].tok.s) == 'F')
       return 1;
 
   } else if (pp->pct[0].tt == PCT_NUMBER) {
@@ -307,14 +307,14 @@ static pCodeOp *cvt_extract_status(char *reg, char *bit)
 
   if(len == 1) {
     // check C,Z
-    if(toupper(*bit) == 'C')
+    if(toupper((unsigned char)*bit) == 'C')
       return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status,PIC_C_BIT));
-    if(toupper(*bit) == 'Z')
+    if(toupper((unsigned char)*bit) == 'Z')
       return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status,PIC_Z_BIT));
   }
 
   // Check DC
-  if(len ==2 && toupper(bit[0]) == 'D' && toupper(bit[1]) == 'C')
+  if(len ==2 && toupper((unsigned char)bit[0]) == 'D' && toupper((unsigned char)bit[1]) == 'C')
     return PCOP(pic16_popCopyGPR2Bit(&pic16_pc_status,PIC_DC_BIT));
 
   return NULL;
@@ -962,15 +962,15 @@ static void tokenizeLineNode(char *ln)
 //	fprintf(stderr, "%s:%d: processing %s\n", __FILE__, __LINE__, ln); 
 
   while(*ln) {
-    if(isspace(*ln)) {
+    if(isspace((unsigned char)*ln)) {
       // add a SPACE token and eat the extra spaces.
       tokArr[tokIdx++].tt = PCT_SPACE;
-      while (isspace (*ln))
+      while (isspace ((unsigned char)*ln))
 	ln++;
       continue;
     }
 
-    if(isdigit(*ln)) {
+    if(isdigit((unsigned char)*ln)) {
 
       tokArr[tokIdx].tt = PCT_NUMBER;
       tokArr[tokIdx++].tok.n = strtol(ln, &ln, 0);
@@ -1003,11 +1003,11 @@ static void tokenizeLineNode(char *ln)
 
 
     default:				// hack to allow : goto $
-      if(isalpha(*ln) || (*ln == '_')  || (!parsing_peeps && (*ln == '$'))) {
+      if(isalpha((unsigned char)*ln) || (*ln == '_')  || (!parsing_peeps && (*ln == '$'))) {
 	char buffer[50];
 	int i=0;
 
-	while( (isalpha(*ln)  ||  isdigit(*ln) || (*ln == '_') || (*ln == '$')) && i<49)
+	while( (isalpha((unsigned char)*ln) || isdigit((unsigned char)*ln) || (*ln == '_') || (*ln == '$')) && i<49)
 	  buffer[i++] = *ln++;
 
 	ln--;

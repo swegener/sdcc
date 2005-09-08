@@ -203,7 +203,7 @@ void OutputWord(int value)
 	OutputByte((unsigned char)(value/0x100));
 }
 
-void OutputName(char * name)
+void OutputName(unsigned char * name)
 {
 	int k;
 	OutputByte((unsigned char)strlen(name));
@@ -869,12 +869,12 @@ void CollectInfoFromCDB(void)
 	fclose(CDBin);
 }
 
-int hex2dec (char hex_digit)
+int hex2dec (unsigned char hex_digit)
 {
-   int j;
-   j=toupper(hex_digit)-'0';
-   if (j>9) j -= 7;
-   return j;
+   if (isdigit(hex_digit))
+      return hex_digit-'0';
+   else
+      return toupper(hex_digit)-'A'+10;
 }
 
 unsigned char GetByte(char * buffer)

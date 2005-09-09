@@ -1,5 +1,9 @@
 2005-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/mcs51/peeph.def (241.x): fixed bug when comparing generic pointers
+
+2005-09-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* as/hc08/lkaomf51.c (OutputName): made name unsigned char,
 	  (hex2dec): made hex_digit unsigned char, removed ascii dependance
 	* as/mcs51/lkaomf51.c (OutputName): made name unsigned char,

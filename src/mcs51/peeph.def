@@ -2602,133 +2602,180 @@ replace restart {
 	addc	a,%1
 }
 
-// peepholes 241.a to 241.c and 241.d to 241.f need to be in order
+// peepholes 241.a to 241.d and 241.e to 241.h need to be in order
 replace {
-	cjne	r%1,#%2,%3
-	cjne	r%4,#%5,%3
-	cjne	r%6,#%7,%3
-	cjne	r%8,#%9,%3
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
+	cjne	r%6,#%7,%0
+	cjne	r%8,#%9,%0
 	mov	a,#0x01
-	sjmp	%10
-%3:
+	sjmp	%1
+%0:
 	clr	a
-%10:
+%1:
 } by {
 	;	Peephole 241.a	optimized compare
 	clr	a
-	cjne	r%1,#%2,%3
-	cjne	r%4,#%5,%3
-	cjne	r%6,#%7,%3
-	cjne	r%8,#%9,%3
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
+	cjne	r%6,#%7,%0
+	cjne	r%8,#%9,%0
 	inc	a
-%3:
-%10:
-} labelRefCountChange(%10 -1)
+%0:
+%1:
+} labelRefCountChange(%1 -1)
 
-// applies to f.e. time.c
+// applies to generic pointer compare
 replace {
-	cjne	r%1,#%2,%3
-	cjne	r%4,#%5,%3
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
+	cjne	r%6,#%7,%0
 	mov	a,#0x01
-	sjmp	%6
-%3:
+	sjmp	%1
+%0:
 	clr	a
-%6:
+%1:
 } by {
 	;	Peephole 241.b	optimized compare
 	clr	a
-	cjne	r%1,#%2,%3
-	cjne	r%4,#%5,%3
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
+	cjne	r%6,#%7,%0
 	inc	a
-%3:
-%6:
-} labelRefCountChange(%6 -1)
+%0:
+%1:
+} labelRefCountChange(%1 -1)
 
-// applies to f.e. malloc.c
+// applies to f.e. time.c
 replace {
-	cjne	r%1,#%2,%3
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
 	mov	a,#0x01
-	sjmp	%4
-%3:
+	sjmp	%1
+%0:
 	clr	a
-%4:
+%1:
 } by {
 	;	Peephole 241.c	optimized compare
 	clr	a
-	cjne	r%1,#%2,%3
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
 	inc	a
-%3:
-%4:
-} labelRefCountChange(%4 -1)
+%0:
+%1:
+} labelRefCountChange(%1 -1)
+
+// applies to f.e. malloc.c
+replace {
+	cjne	r%2,#%3,%0
+	mov	a,#0x01
+	sjmp	%1
+%0:
+	clr	a
+%1:
+} by {
+	;	Peephole 241.d	optimized compare
+	clr	a
+	cjne	r%2,#%3,%0
+	inc	a
+%0:
+%1:
+} labelRefCountChange(%1 -1)
 
 // applies to f.e. j = (k!=0x1000);
 // with volatile idata long k;
 replace {
-	cjne	@r%1,#%2,%3
-	inc	r%1
-	cjne	@r%1,#%4,%3
-	inc	r%1
-	cjne	@r%1,#%5,%3
-	inc	r%1
-	cjne	@r%1,#%6,%3
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
+	inc	r%0
+	cjne	@r%0,#%5,%1
+	inc	r%0
+	cjne	@r%0,#%6,%1
 	mov	a,#0x01
-	sjmp	%7
-%3:
+	sjmp	%2
+%1:
 	clr	a
-%7:
+%2:
 } by {
-	;	Peephole 241.d	optimized compare
+	;	Peephole 241.e	optimized compare
 	clr	a
-	cjne	@r%1,#%2,%3
-	inc	r%1
-	cjne	@r%1,#%4,%3
-	inc	r%1
-	cjne	@r%1,#%5,%3
-	inc	r%1
-	cjne	@r%1,#%6,%3
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
+	inc	r%0
+	cjne	@r%0,#%5,%1
+	inc	r%0
+	cjne	@r%0,#%6,%1
 	inc	a
-%3:
-%7:
-} labelRefCountChange(%7 -1)
+%1:
+%2:
+} labelRefCountChange(%2 -1)
+
+// applies to f.e. j = (p!=NULL);
+// with volatile idata char *p;
+replace {
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
+	inc	r%0
+	cjne	@r%0,#%5,%1
+	mov	a,#0x01
+	sjmp	%2
+%1:
+	clr	a
+%2:
+} by {
+	;	Peephole 241.f	optimized compare
+	clr	a
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
+	inc	r%0
+	cjne	@r%0,#%5,%1
+	inc	a
+%1:
+%2:
+} labelRefCountChange(%2 -1)
 
 // applies to f.e. j = (k!=0x1000);
 // with volatile idata int k;
 replace {
-	cjne	@r%1,#%2,%3
-	inc	r%1
-	cjne	@r%1,#%4,%3
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
 	mov	a,#0x01
-	sjmp	%7
-%3:
+	sjmp	%2
+%1:
 	clr	a
-%7:
+%2:
 } by {
-	;	Peephole 241.e	optimized compare
+	;	Peephole 241.g	optimized compare
 	clr	a
-	cjne	@r%1,#%2,%3
-	inc	r%1
-	cjne	@r%1,#%4,%3
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
 	inc	a
-%3:
-%7:
-} labelRefCountChange(%7 -1)
+%1:
+%2:
+} labelRefCountChange(%2 -1)
 
 // applies to f.e. vprintf.asm (--stack-auto)
 replace {
-	cjne	@r%1,#%2,%3
+	cjne	@r%0,#%3,%1
 	mov	a,#0x01
-	sjmp	%7
-%3:
+	sjmp	%2
+%1:
 	clr	a
-%7:
+%2:
 } by {
-	;	Peephole 241.f	optimized compare
+	;	Peephole 241.h	optimized compare
 	clr	a
-	cjne	@r%1,#%2,%3
+	cjne	@r%0,#%3,%1
 	inc	a
-%3:
-%7:
-} labelRefCountChange(%7 -1)
+%1:
+%2:
+} labelRefCountChange(%2 -1)
 
 // applies to f.e. scott-bool1.c
 replace {
@@ -3876,16 +3923,16 @@ replace {
 	mov	%1,a
 } if notVolatile %1
 
-// Peepholes 259.x rely on the correct labelRefCount. Otherwise they are 
+// Peepholes 259.x rely on the correct labelRefCount. Otherwise they are
 // not compatible with peepholes 250.x
-// Peepholes 250.x add jumps to a previously unused label. If the 
+// Peepholes 250.x add jumps to a previously unused label. If the
 // labelRefCount is not increased, peepholes 259.x are (mistakenly) applied.
 // (Mail on sdcc-devel 2004-10-25)
 //
 // applies to f.e. vprintf.c
 replace {
 	sjmp	%1
-%2:	
+%2:
 	ret
 } by {
 	sjmp	%1
@@ -3896,7 +3943,7 @@ replace {
 // applies to f.e. gets.c
 replace {
 	ljmp	%1
-%2:	
+%2:
 	ret
 } by {
 	ljmp	%1

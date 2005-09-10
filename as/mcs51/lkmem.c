@@ -406,16 +406,17 @@ int summary2(struct area * areap)
     typedef struct
     {
         unsigned long Start;
+        unsigned long End;
         unsigned long Size;
         unsigned long Max;
         char Name[NCPS];
         unsigned long flag;
     } _Mem;
 
-    _Mem Stack={0xff,   0,     1, "STACK",           0x0000};
-    _Mem Paged={0xff,   0,   256, "PAGED EXT. RAM",  A_PAG};
-    _Mem XRam= {0xffff, 0, 65536, "EXTERNAL RAM",    0x0100};
-    _Mem Rom=  {0xffff, 0, 65536, "ROM/EPROM/FLASH", 0x0200};
+    _Mem Stack={0xff,   0, 0,     1, "STACK",           0x0000};
+    _Mem Paged={0xff,   0, 0,   256, "PAGED EXT. RAM",  A_PAG};
+    _Mem XRam= {0xffff, 0, 0, 65536, "EXTERNAL RAM",    0x0100};
+    _Mem Rom=  {0xffff, 0, 0, 65536, "ROM/EPROM/FLASH", 0x0200};
 
     if(rflag) /*For the DS390*/
     {
@@ -439,40 +440,55 @@ int summary2(struct area * areap)
         {
             if(xp->a_size)
             {
-                Rom.Size+=xp->a_size;
-                if(xp->a_addr<Rom.Start) Rom.Start=xp->a_addr;
+                Rom.Size += xp->a_size;
+                if(xp->a_addr < Rom.Start)
+                    Rom.Start = xp->a_addr;
+                if(xp->a_addr + xp->a_size > Rom.End)
+                    Rom.End = xp->a_addr + xp->a_size;
             }
         }
 
         else if (EQ(xp->a_id, "SSEG"))
         {
-            Stack.Size+=xp->a_size;
-            if(xp->a_addr<Stack.Start) Stack.Start=xp->a_addr;
+            Stack.Size += xp->a_size;
+            if(xp->a_addr < Stack.Start)
+                Stack.Start = xp->a_addr;
+            if(xp->a_addr + xp->a_size > Stack.End)
+                Stack.End = xp->a_addr + xp->a_size;
         }
 
         else if (EQ(xp->a_id, "PSEG"))
         {
-            Paged.Size+=xp->a_size;
-            if(xp->a_addr<Paged.Start) Paged.Start=xp->a_addr;
+            Paged.Size += xp->a_size;
+            if(xp->a_addr < Paged.Start)
+                Paged.Start = xp->a_addr;
+            if(xp->a_addr + xp->a_size > Paged.End)
+                Paged.End = xp->a_addr + xp->a_size;
         }
 
         else if (EQ(xp->a_id, "XSTK"))
         {
             xstack_xp = xp;
-            Paged.Size+=xp->a_size;
-            if(xp->a_addr<Paged.Start) Paged.Start=xp->a_addr;
+            Paged.Size += xp->a_size;
+            if(xp->a_addr < Paged.Start)
+                Paged.Start = xp->a_addr;
+            if(xp->a_addr + xp->a_size > Paged.End)
+                Paged.End = xp->a_addr + xp->a_size;
         }
 
         else if(xp->a_flag & A_XDATA)
         {
             if(xp->a_size)
             {
-                XRam.Size+=xp->a_size;
-                if(xp->a_addr<XRam.Start) XRam.Start=xp->a_addr;
+                XRam.Size += xp->a_size;
+                if(xp->a_addr < XRam.Start)
+                    XRam.Start = xp->a_addr;
+                if(xp->a_addr + xp->a_size > XRam.End)
+                    XRam.End = xp->a_addr + xp->a_size;
             }
         }
 
-        xp=xp->a_ap;
+        xp = xp->a_ap;
     }
 
     /*Report the Ram totals*/
@@ -542,7 +558,7 @@ int summary2(struct area * areap)
     else
     {
         sprintf(start, "0x%04lx", Paged.Start);
-        sprintf(end,  "0x%04lx", Paged.Size+Paged.Start-1);
+        sprintf(end,  "0x%04lx", Paged.End-1);
     }
     sprintf(size, "%5lu", Paged.Size);
     sprintf(max, "%5lu", xram_size<0 ? Paged.Max : xram_size<256 ? xram_size : 256);
@@ -557,7 +573,7 @@ int summary2(struct area * areap)
     else
     {
         sprintf(start, "0x%04lx", XRam.Start);
-        sprintf(end,  "0x%04lx", XRam.Size+XRam.Start-1);
+        sprintf(end,  "0x%04lx", XRam.End-1);
     }
     sprintf(size, "%5lu", XRam.Size);
     sprintf(max, "%5lu", xram_size<0?XRam.Max:xram_size);
@@ -572,20 +588,20 @@ int summary2(struct area * areap)
     else
     {
         sprintf(start, "0x%04lx", Rom.Start);
-        sprintf(end,  "0x%04lx", Rom.Size+Rom.Start-1);
+        sprintf(end,  "0x%04lx", Rom.End-1);
     }
     sprintf(size, "%5lu", Rom.Size);
     sprintf(max, "%5lu", code_size<0?Rom.Max:code_size);
     fprintf(of, format, Rom.Name, start, end, size, max);
 
     /*Report any excess:*/
-    if( ((XRam.Start+XRam.Size)>XRam.Max) ||
+    if( ((XRam.End) > XRam.Max) ||
         (((int)XRam.Size>xram_size)&&(xram_size>=0)) )
     {
         sprintf(buff, "Insufficient EXTERNAL RAM memory.\n");
         REPORT_ERROR(buff, 1);
     }
-    if( ((Rom.Start+Rom.Size)>Rom.Max) ||
+    if( ((Rom.End) > Rom.Max) ||
         (((int)Rom.Size>code_size)&&(code_size>=0)) )
     {
         sprintf(buff, "Insufficient ROM/EPROM/FLASH memory.\n");

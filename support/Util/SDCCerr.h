@@ -199,6 +199,7 @@ SDCCERR - SDCC Standard error handler
 #define E_SHADOWREGS_NO_ISR           181 /* shadowregs keyword following non-ISR function */
 #define W_SFR_ABSRANGE                182 /* sfr at address out of range */
 #define E_BANKED_WITH_CALLEESAVES     183 /* banked and callee-saves mixed */
+#define W_INVALID_INT_CONST           184 /* invalid integer literal string */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

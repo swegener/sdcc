@@ -420,6 +420,8 @@ struct
    "absolute address for sfr '%s' probably out of range." },
 { E_BANKED_WITH_CALLEESAVES, ERROR_LEVEL_ERROR,
    "Both banked and callee-saves cannot be used together." },
+{ W_INVALID_INT_CONST, ERROR_LEVEL_WARNING,
+   "integer constant '%s' out of range, truncated to %.0lf." },
 };
 
 /*

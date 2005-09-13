@@ -1,3 +1,9 @@
+2005-09-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCval.c (constVal): fixed bug 730366
+	* support/Util/SDCCerr.c,
+	* support/Util/SDCCerr.h: added warning W_INVALID_INT_CONST
+
 2005-09-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/lkmem.c (summary2): fixed report for absolute areas (bug 1210220)

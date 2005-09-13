@@ -27,6 +27,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <errno.h>
 #include "newalloc.h"
 
 int cNestLevel;
@@ -103,16 +104,16 @@ convertIListToConstList(initList *src, literalList **lList)
 {
     initList    *iLoop;
     literalList *head, *last, *newL;
-    
+
     head = last = NULL;
-    
+
     if (!src || src->type != INIT_DEEP)
     {
-	return FALSE;
+        return FALSE;
     }
-    
+
     iLoop =  src->init.deep;
-    
+
     while (iLoop)
     {
 	if (iLoop->type != INIT_NODE)
@@ -144,7 +145,7 @@ convertIListToConstList(initList *src, literalList **lList)
 	    newL->literalValue = val;
 	    newL->count = 1;
 	    newL->next = NULL;
-	    
+
 	    if (last)
 	    {
 		last->next = newL;
@@ -157,12 +158,12 @@ convertIListToConstList(initList *src, literalList **lList)
 	}
 	iLoop = iLoop->next;
     }
-    
-    if (!head)    
+
+    if (!head)
     {
 	return FALSE;
     }
-    
+
     *lList = head;
     return TRUE;
 }
@@ -171,17 +172,17 @@ literalList *
 copyLiteralList(literalList *src)
 {
     literalList *head, *prev, *newL;
-    
+
     head = prev = NULL;
-    
+
     while (src)
     {
 	newL = Safe_alloc(sizeof(literalList));
-	
+
 	newL->literalValue = src->literalValue;
 	newL->count = src->count;
 	newL->next = NULL;
-	
+
 	if (prev)
 	{
 	    prev->next = newL;
@@ -193,7 +194,7 @@ copyLiteralList(literalList *src)
 	prev = newL;
 	src = src->next;
     }
-    
+
     return head;
 }
 
@@ -480,7 +481,7 @@ constFixed16x16Val (char *s)
   SPEC_NOUN (val->type) = V_FLOAT;
   SPEC_SCLS (val->type) = S_LITERAL;
   SPEC_CVAL (val->type).v_fixed16x16 = fixed16x16FromDouble ( sval );
- 
+
   return val;
 }
 
@@ -491,8 +492,6 @@ value *constVal (char *s)
 {
   value *val;
   short hex = 0, octal = 0;
-  char scanFmt[10];
-  int scI = 0;
   double dval;
 
   val = newValue ();		/* alloc space for value   */
@@ -509,26 +508,16 @@ value *constVal (char *s)
   if (!hex && *s == '0' && *(s + 1))
     octal = 1;
 
-  /* create the scan string */
-  scanFmt[scI++] = '%';
-
-  scanFmt[scI++] = 'l';
-
-  if (octal)
-    scanFmt[scI++] = 'o';
-  else if (hex)
-    scanFmt[scI++] = 'x';
-  else
-    scanFmt[scI++] = 'f';
-
-  scanFmt[scI++] = '\0';
-
-  if (octal || hex) {
+  errno = 0;
+  if (hex || octal) {
     unsigned long sval;
-    sscanf (s, scanFmt, &sval);
+    sval = strtoul (s, NULL, 0);
     dval=sval;
+    if (errno) {
+      werror (W_INVALID_INT_CONST, s, dval);
+    }
   } else {
-    sscanf (s, scanFmt, &dval);
+    sscanf (s, "%lf", &dval);
   }
 
   /* Setup the flags first */
@@ -577,6 +566,20 @@ value *constVal (char *s)
     }
   }
 
+  /* check for out of range */
+  if (dval<-2147483648.0) {
+    dval = LONG_MIN;
+    werror (W_INVALID_INT_CONST, s, dval);
+  }
+  if (dval>2147483647.0 && !SPEC_USIGN (val->type)) {
+    dval = LONG_MAX;
+    werror (W_INVALID_INT_CONST, s, dval);
+  }
+  if (dval>4294967295.0) {
+    dval = ULONG_MAX;
+    werror (W_INVALID_INT_CONST, s, dval);
+  }
+
   if (SPEC_LONG (val->type))
     {
       if (SPEC_USIGN (val->type))
@@ -615,9 +618,9 @@ unsigned char hexEscape(char **src)
 
   (*src)++ ;	/* Skip over the 'x' */
   s = *src ;	/* Save for error detection */
-  
+
   value = strtol (*src, src, 16);
-  
+
   if (s == *src) {
       // no valid hex found
       werror(E_INVALID_HEX);
@@ -655,9 +658,9 @@ unsigned char octalEscape (char **str) {
   return value;
 }
 
-/*! 
+/*!
   /fn int copyStr (char *dest, char *src)
-  
+
   Copies a source string to a dest buffer interpreting escape sequences
   and special characters
 
@@ -667,7 +670,7 @@ unsigned char octalEscape (char **str) {
 
 */
 
-int 
+int
 copyStr (char *dest, char *src)
 
 {
@@ -716,7 +719,7 @@ copyStr (char *dest, char *src)
 	      src-- ;
 	      break;
 
-	    case 'x': 
+	    case 'x':
 	      *dest++ = hexEscape(&src) ;
 	      src-- ;
 	      break ;
@@ -1253,7 +1256,7 @@ valPlus (value * lval, value * rval)
 					RESULT_TYPE_INT,
 					'+');
   SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
-  
+
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) + floatFromVal (rval);
   else
@@ -1295,7 +1298,7 @@ valMinus (value * lval, value * rval)
 					RESULT_TYPE_INT,
 					'-');
   SPEC_SCLS (val->etype) = S_LITERAL; /* will remain literal */
-  
+
   if (IS_FLOAT (val->type))
     SPEC_CVAL (val->type).v_float = floatFromVal (lval) - floatFromVal (rval);
   else
@@ -1565,7 +1568,7 @@ valBitwise (value * lval, value * rval, int op)
 	}
       break;
     }
-    
+
   return cheapestVal(val);
 }
 

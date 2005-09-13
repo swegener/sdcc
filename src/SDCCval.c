@@ -514,6 +514,7 @@ value *constVal (char *s)
     sval = strtoul (s, NULL, 0);
     dval=sval;
     if (errno) {
+      dval = 4294967295.0;
       werror (W_INVALID_INT_CONST, s, dval);
     }
   } else {
@@ -568,15 +569,15 @@ value *constVal (char *s)
 
   /* check for out of range */
   if (dval<-2147483648.0) {
-    dval = LONG_MIN;
+    dval = -2147483648.0;
     werror (W_INVALID_INT_CONST, s, dval);
   }
   if (dval>2147483647.0 && !SPEC_USIGN (val->type)) {
-    dval = LONG_MAX;
+    dval = 2147483647.0;
     werror (W_INVALID_INT_CONST, s, dval);
   }
   if (dval>4294967295.0) {
-    dval = ULONG_MAX;
+    dval = 4294967295.0;
     werror (W_INVALID_INT_CONST, s, dval);
   }
 

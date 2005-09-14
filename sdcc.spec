@@ -8,7 +8,7 @@ License:       GPL
 Group:         Applications/Engineering
 Summary:       Small Device C Compiler
 Requires:      sdcc-common
-Version:       2.4.0
+Version:       2.5.3
 Release:       1
 Source:        %{name}-%{version}.tar.bz2
 URL:           http://sdcc.sourceforge.net/

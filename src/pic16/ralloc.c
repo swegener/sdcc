@@ -371,9 +371,10 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 		dReg->name = Safe_strdup(name);
 	else {
 		sprintf(buffer,"r0x%02X", dReg->rIdx);
-		if(type == REG_STK)
+		if(type == REG_STK) {
 			*buffer = 's';
-			dReg->name = Safe_strdup(buffer);
+		}
+		dReg->name = Safe_strdup(buffer);
 	}
 
 
@@ -392,7 +393,7 @@ regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alia
 	}
 
 #if NEWREG_DEBUG
-	fprintf(stderr,"newReg: %s, rIdx = 0x%02x\taccess= %d\tregop= %p\n",dReg->name,rIdx, dReg->accessBank, refop);
+	fprintf(stderr,"newReg @ %p: %s, rIdx = 0x%02x\taccess= %d\tregop= %p\n",dReg, dReg->name,rIdx, dReg->accessBank, refop);
 #endif
 	dReg->size = size;
 	dReg->alias = alias;

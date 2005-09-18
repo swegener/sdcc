@@ -10972,6 +10972,10 @@ static void genPagedPointerGet (operand *left,
 	
 }
 
+#if 0
+/* This code is not adjusted to PIC16 and fails utterly.
+ * On the other hand: PIC16 does not support xdata (the only mem FPOINTERs are used for) anyway... */
+
 /*-----------------------------------------------------------------*/
 /* genFarPointerGet - gget value from far space                    */
 /*-----------------------------------------------------------------*/
@@ -11021,6 +11025,7 @@ static void genFarPointerGet (operand *left,
 
     pic16_freeAsmop(result,NULL,ic,TRUE);
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*/
@@ -11313,6 +11318,7 @@ static void genPointerGet (iCode *ic)
     the pointer values */
     switch (p_type) {
       case POINTER:	
+      case FPOINTER:
       case IPOINTER:
 	genNearPointerGet (left,result,ic);
 	break;
@@ -11321,9 +11327,13 @@ static void genPointerGet (iCode *ic)
 	genPagedPointerGet(left,result,ic);
 	break;
 
+#if 0
+      /* PICs do not support FAR pointers... */
+      /* MUST move them somewhere; handle FPOINTERs like POINTERS or like GPOINTERs?!? */
       case FPOINTER:
 	genFarPointerGet (left,result,ic);
 	break;
+#endif
 
       case CPOINTER:
 	genConstPointerGet (left,result,ic);
@@ -11825,6 +11835,10 @@ static void genPagedPointerSet (operand *right,
 	
 }
 
+#if 0
+/* This code is not adjusted to PIC16 and fails utterly...
+ * On the other hand: PIC16 has no xdata anyway (the only memory FPOINTERs are use for) */
+
 /*-----------------------------------------------------------------*/
 /* genFarPointerSet - set value from far space                     */
 /*-----------------------------------------------------------------*/
@@ -11874,6 +11888,7 @@ static void genFarPointerSet (operand *right,
 
     pic16_freeAsmop(right,NULL,ic,TRUE);
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* genGenPointerSet - set value from generic pointer space         */
@@ -12102,6 +12117,7 @@ static void genPointerSet (iCode *ic)
     the pointer values */
     switch (p_type) {
       case POINTER:
+      case FPOINTER:
       case IPOINTER:
         genNearPointerSet (right,result,ic);
         break;
@@ -12110,9 +12126,12 @@ static void genPointerSet (iCode *ic)
         genPagedPointerSet (right,result,ic);
 	break;
 
+#if 0
+      /* MUST move them somewhere; handle FPOINTERs like POINTERS or like GPOINTERs?!? */
       case FPOINTER:
         genFarPointerSet (right,result,ic);
         break;
+#endif
         
       case GPOINTER:
         genGenPointerSet (right,result,ic);

@@ -1,3 +1,12 @@
+2005-09-18 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genFarPointerGet,genFarPointerSet): removed
+	  as these are now unused,
+	  (genPointerGet,genPointerSet): handle FPOINTERs like POINTERs
+	* src/pic16/pcode.c (pic16_symIsSpecial): assume REG_TMPs to be
+	  local, avoids uninitialized pointer dereference on r->name
+	* src/pic16/ralloc.c (newReg): fixed indentation
+
 2005-09-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCval.c (constVal): fixed bug 730366

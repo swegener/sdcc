@@ -10578,6 +10578,8 @@ static int pic16_symIsSpecial (symbol_t sym) {
 static int pic16_regIsLocal (regs *r) {
   symbol_t sym;
   if (r) {
+    if (r->type == REG_TMP) return 1;
+
     sym = symFromStr (r->name);
     switch (sym) {
     case SPO_WREG:

@@ -72,6 +72,9 @@ volatile __T3CONbits_t __at (0xfb1) T3CONbits;
 
 __sfr __at (0xfb2) TMR3L;
 __sfr __at (0xfb3) TMR3H;
+__sfr __at (0xfb6) ECCPAS;
+volatile __ECCPASbits_t __at (0xfb6) ECCPASbits;
+
 __sfr __at (0xfbd) CCP1CON;
 volatile __CCP1CONbits_t __at (0xfbd) CCP1CONbits;
 

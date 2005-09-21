@@ -1,3 +1,16 @@
+2005-09-21 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f1220.h,
+	  device/lib/pic16/libdev/pic18f1220.c: added ECCPAS sfr and bitfield
+	* device/lib/pic16/Makefile.rules: added missing opening paren
+	* src/pic16/gen.c (pic16_genNot,pic16_genCpl): removed as these
+	  are provided in genutils.c,
+	  (genUminusFloat,genUminus,genCmpEq): added asserts on different
+	  operand/result sizes,
+	  (genCmp): assert on NULL pointers first, then check deref'ed values
+	* src/pic16/genutils.c (pic16_genCpl): fixed for different operand/
+	  result size
+
 2005-09-18 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genFarPointerGet,genFarPointerSet): removed

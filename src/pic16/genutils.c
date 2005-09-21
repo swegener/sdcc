@@ -155,6 +155,8 @@ void pic16_genCpl (iCode *ic)
     } 
 
     size = AOP_SIZE(IC_RESULT(ic));
+    if (size >= AOP_SIZE(IC_LEFT(ic))) size = AOP_SIZE(IC_LEFT(ic));
+    
     while (size--) {
       if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
         pic16_emitpcode(POC_COMF,  pic16_popGet(AOP(IC_LEFT(ic)), offset));
@@ -164,6 +166,34 @@ void pic16_genCpl (iCode *ic)
       }
       offset++;
     }
+
+    /* handle implicit upcast */
+    size = AOP_SIZE(IC_RESULT(ic));
+    if (offset < size)
+    {
+      if (SPEC_USIGN(operandType(IC_LEFT(ic)))) {
+	while (offset < size) {
+	  pic16_emitpcode(POC_SETF, pic16_popGet(AOP(IC_RESULT(ic)), offset));
+	  offset++;
+	} // while
+      } else {
+	if ((offset + 1) == size) {
+	  /* just one byte to fix */
+	  pic16_emitpcode(POC_SETF, pic16_popGet(AOP(IC_RESULT(ic)), offset));
+	  pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_RESULT(ic)),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
+	  pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(IC_RESULT(ic)), offset));
+	} else {
+	  /* two or more byte to adjust */
+	  pic16_emitpcode(POC_SETF, pic16_popCopyReg( &pic16_pc_wreg ));
+	  pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit(pic16_aopGet(AOP(IC_RESULT(ic)),offset-1,FALSE,FALSE),7,0, PO_GPR_REGISTER));
+	  pic16_emitpcode(POC_CLRF, pic16_popCopyReg( &pic16_pc_wreg ));
+	  while (offset < size) {
+	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)), offset));
+	    offset++;
+	  } // while
+	} // if
+      }
+    } // if
 
 release:
     /* release the aops */

@@ -2678,108 +2678,6 @@ void pic16_toBoolean(operand *oper)
     }
 }
 
-
-#if !defined(GEN_Not)
-/*-----------------------------------------------------------------*/
-/* genNot - generate code for ! operation                          */
-/*-----------------------------------------------------------------*/
-static void pic16_genNot (iCode *ic)
-{
-  symbol *tlbl;
-  int size;
-
-  FENTRY;
-  /* assign asmOps to operand & result */
-  pic16_aopOp (IC_LEFT(ic),ic,FALSE);
-  pic16_aopOp (IC_RESULT(ic),ic,TRUE);
-
-  DEBUGpic16_pic16_AopType(__LINE__,IC_LEFT(ic),NULL,IC_RESULT(ic));
-  /* if in bit space then a special case */
-  if (AOP_TYPE(IC_LEFT(ic)) == AOP_CRY) {
-    if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY) {
-      pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(IC_LEFT(ic)),0));
-      pic16_emitpcode(POC_XORWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
-    } else {
-      pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(IC_RESULT(ic)),0));
-      pic16_emitpcode(POC_BTFSS,pic16_popGet(AOP(IC_LEFT(ic)),0));
-      pic16_emitpcode(POC_INCF,pic16_popGet(AOP(IC_RESULT(ic)),0));
-    }
-    goto release;
-  }
-
-  size = AOP_SIZE(IC_LEFT(ic));
-  if(size == 1) {
-    pic16_emitpcode(POC_COMFW,pic16_popGet(AOP(IC_LEFT(ic)),0));
-    pic16_emitpcode(POC_ANDLW,pic16_popGetLit(1));
-    pic16_emitpcode(POC_MOVWF,pic16_popGet(AOP(IC_RESULT(ic)),0));
-    goto release;
-  }
-  pic16_toBoolean(IC_LEFT(ic));
-
-  tlbl = newiTempLabel(NULL);
-  pic16_emitcode("cjne","a,#0x01,%05d_DS_",tlbl->key+100);
-  pic16_emitcode("","%05d_DS_:",tlbl->key+100);
-  pic16_outBitC(IC_RESULT(ic));
-
- release:    
-  /* release the aops */
-  pic16_freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? 0 : 1));
-  pic16_freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
-}
-#endif
-
-
-#if !defined(GEN_Cpl)
-/*-----------------------------------------------------------------*/
-/* genCpl - generate code for complement                           */
-/*-----------------------------------------------------------------*/
-static void pic16_genCpl (iCode *ic)
-{
-  int offset = 0;
-  int size ;
-
-    FENTRY;
-    /* assign asmOps to operand & result */
-    pic16_aopOp (IC_LEFT(ic),ic,FALSE);
-    pic16_aopOp (IC_RESULT(ic),ic,TRUE);
-
-    /* if both are in bit space then 
-    a special case */
-    if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY &&
-        AOP_TYPE(IC_LEFT(ic)) == AOP_CRY ) { 
-
-        pic16_emitcode("mov","c,%s",IC_LEFT(ic)->aop->aopu.aop_dir); 
-        pic16_emitcode("cpl","c"); 
-        pic16_emitcode("mov","%s,c",IC_RESULT(ic)->aop->aopu.aop_dir); 
-        goto release; 
-    } 
-
-    size = AOP_SIZE(IC_RESULT(ic));
-    while (size--) {
-/*
-        char *l = pic16_aopGet(AOP(IC_LEFT(ic)),offset,FALSE,FALSE);
-        MOVA(l);       
-        pic16_emitcode("cpl","a");
-        pic16_aopPut(AOP(IC_RESULT(ic)),"a",offset++);
-*/
-	if (pic16_sameRegs(AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic))) ) {
-	      pic16_emitpcode(POC_COMF,  pic16_popGet(AOP(IC_LEFT(ic)), offset));
-	} else {
-		pic16_emitpcode(POC_COMFW, pic16_popGet(AOP(IC_LEFT(ic)),offset));
-		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(IC_RESULT(ic)),offset));
-	}
-	offset++;
-
-    }
-
-
-release:
-    /* release the aops */
-    pic16_freeAsmop(IC_LEFT(ic),NULL,ic,(RESULTONSTACK(ic) ? 0 : 1));
-    pic16_freeAsmop(IC_RESULT(ic),NULL,ic,TRUE);
-}
-#endif
-
 /*-----------------------------------------------------------------*/
 /* genUminusFloat - unary minus for floating points                */
 /*-----------------------------------------------------------------*/
@@ -2791,6 +2689,7 @@ static void genUminusFloat(operand *op,operand *result)
     /* for this we just need to flip the 
     first it then copy the rest in place */
     size = AOP_SIZE(op);
+    assert( size == AOP_SIZE(result) );
 
     while(size--) {
       pic16_mov2f(AOP(result), AOP(op), offset);
@@ -2842,6 +2741,7 @@ static void genUminus (iCode *ic)
 
     /* otherwise subtract from zero by taking the 2's complement */
     size = AOP_SIZE(IC_LEFT(ic));
+    assert( size == AOP_SIZE(IC_RESULT(ic)) );
     label = newiTempLabel ( NULL );
     
     if (pic16_sameRegs (AOP(IC_LEFT(ic)), AOP(IC_RESULT(ic)))) {
@@ -4998,8 +4898,8 @@ static void genCmp (operand *left,operand *right,
 
   FENTRY;
   
-  assert (AOP_SIZE(left) == AOP_SIZE(right));
   assert (left && right);
+  assert (AOP_SIZE(left) == AOP_SIZE(right));
 
   size = AOP_SIZE(right) - 1;
   mask = (0x100UL << (size*8)) - 1;
@@ -6723,6 +6623,7 @@ static void genCmpEq (iCode *ic, iCode *ifx)
         pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),i));
     }
 
+  assert( AOP_SIZE(left) == AOP_SIZE(right) );
   for(i=0; i < AOP_SIZE(left); i++)
     {
       if(AOP_TYPE(left) != AOP_ACC)

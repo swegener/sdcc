@@ -325,6 +325,22 @@ extern volatile __T3CONbits_t __at (0xfb1) T3CONbits;
 
 extern __sfr __at (0xfb2) TMR3L;
 extern __sfr __at (0xfb3) TMR3H;
+extern __sfr __at (0xfb6) ECCPAS;
+typedef union {
+	struct {
+		unsigned PSSBD0:1;
+		unsigned PSSBD1:1;
+		unsigned PSSAC0:1;
+		unsigned PSSAC1:1;
+		unsigned ECCPAS0:1;
+		unsigned ECCPAS1:1;
+		unsigned ECCPAS2:1;
+		unsigned ECCPASE:1;
+	};
+} __ECCPASbits_t;
+
+extern volatile __ECCPASbits_t __at (0xfb6) ECCPASbits;
+
 extern __sfr __at (0xfbd) CCP1CON;
 typedef union {
 	struct {

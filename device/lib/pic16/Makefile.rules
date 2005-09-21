@@ -19,7 +19,7 @@
 # update dependencies
 $(topsrcdir)/$(builddir)/%.d : %.c
 	@echo "[  CPP  ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
-	$(Q)$(CPP) $CPPFLAGS) -o "$@" "$<";
+	$(Q)$(CPP) $(CPPFLAGS) -o "$@" "$<";
 
 # assemble
 $(topsrcdir)/$(builddir)/%.o : %.S

@@ -67,4 +67,7 @@ testSub(void)
   
   result = left-right;
   ASSERT(result == (-39+20));
+
+  result = left-(signed)0x1200;
+  ASSERT(result == ({type})(-39-(signed)0x1200));
 }

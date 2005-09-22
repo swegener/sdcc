@@ -4314,7 +4314,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genMinusDec :- does subtraction with deccrement if possible     */
+/* genMinusDec :- does subtraction with decrement if possible      */
 /*-----------------------------------------------------------------*/
 static bool
 genMinusDec (iCode * ic)
@@ -4527,22 +4527,35 @@ genMinus (iCode * ic)
 
       while (size--)
         {
-          if (useCarry || ((lit >> (offset * 8)) & 0x0FFL)) {
+          if (useCarry || ((lit >> (offset * 8)) & 0x0FFL))
+            {
             MOVA (aopGet (IC_LEFT (ic), offset, FALSE, FALSE));
-            if (!offset && !size && lit== (unsigned long) -1) {
-              emitcode ("dec", "a");
-            } else if (!useCarry) {
-              /* first add without previous c */
-              emitcode ("add", "a,#0x%02x",
-                        (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
-              useCarry = TRUE;
-            } else {
-              emitcode ("addc", "a,#0x%02x",
-                        (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+              if (!offset && !size && lit== (unsigned long) -1)
+                {
+                  emitcode ("dec", "a");
+                }
+              else if (!useCarry)
+                {
+                  /* first add without previous c */
+                  emitcode ("add", "a,#0x%02x",
+                            (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+                  useCarry = TRUE;
+                }
+              else
+                {
+                  emitcode ("addc", "a,#0x%02x",
+                            (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+                }
+              aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
             }
-            aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
-            } else {
+          else
+            {
               /* no need to add zeroes */
+              if (!sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))
+                {
+                  aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), offset, FALSE, FALSE),
+                          offset, isOperandVolatile (IC_RESULT (ic), FALSE));
+                }
               offset++;
             }
         }

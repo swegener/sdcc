@@ -313,7 +313,8 @@ ac_subdirs_all="$ac_subdirs_all support/cpp2"
 ac_subdirs_all="$ac_subdirs_all packihx"
 ac_subdirs_all="$ac_subdirs_all sim/ucsim"
 ac_subdirs_all="$ac_subdirs_all device/lib/pic16"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP CP_U LYX LATEX LATEX2HTML PDFLATEX DVIPDF EGREP M_OR_MM sdccconf_h_dir_separator include_dir_suffix lib_dir_suffix docdir OPT_ENABLE_UCSIM OPT_ENABLE_DEVICE_LIB_BUILD OPT_ENABLE_PACKIHX subdirs LIBOBJS LTLIBOBJS'
+ac_subdirs_all="$ac_subdirs_all device/lib/pic"
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP LYX LATEX LATEX2HTML PDFLATEX DVIPDF EGREP M_OR_MM sdccconf_h_dir_separator include_dir_suffix lib_dir_suffix docdir OPT_ENABLE_UCSIM OPT_ENABLE_DEVICE_LIB_BUILD OPT_ENABLE_PACKIHX subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3605,41 +3606,6 @@ CP=$ac_cv_prog_CP
 if test -n "$CP"; then
   echo "$as_me:$LINENO: result: $CP" >&5
 echo "${ECHO_T}$CP" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-# Extract the first word of "'cp -u'", so it can be a program name with args.
-set dummy 'cp -u'; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_CP_U+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$CP_U"; then
-  ac_cv_prog_CP_U="$CP_U" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CP_U=":"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-CP_U=$ac_cv_prog_CP_U
-if test -n "$CP_U"; then
-  echo "$as_me:$LINENO: result: $CP_U" >&5
-echo "${ECHO_T}$CP_U" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
@@ -7860,6 +7826,10 @@ subdirs="$subdirs sim/ucsim"
 subdirs="$subdirs device/lib/pic16"
 
 
+
+subdirs="$subdirs device/lib/pic"
+
+
                                                                                           ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile as/mcs51/Makefile as/hc08/Makefile device/include/Makefile device/lib/Makefile debugger/mcs51/Makefile support/regression/Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
@@ -8510,7 +8480,6 @@ s,@AUTOCONF@,$AUTOCONF,;t t
 s,@STRIP@,$STRIP,;t t
 s,@AS@,$AS,;t t
 s,@CP@,$CP,;t t
-s,@CP_U@,$CP_U,;t t
 s,@LYX@,$LYX,;t t
 s,@LATEX@,$LATEX,;t t
 s,@LATEX2HTML@,$LATEX2HTML,;t t

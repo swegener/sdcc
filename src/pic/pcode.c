@@ -2793,13 +2793,53 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 		return NULL;
 	
 	switch(pcop->type) { 
+	case PO_NONE:
+	case PO_STR:
+		pcopnew = Safe_calloc (1, sizeof (pCodeOp));
+		memcpy (pcopnew, pcop, sizeof (pCodeOp));
+		break;
+		
+	case PO_W:
+	case PO_STATUS:
+	case PO_FSR:
+	case PO_INDF:
+	case PO_INTCON:
+	case PO_GPR_REGISTER:
+	case PO_GPR_TEMP:
+	case PO_GPR_POINTER:
+	case PO_SFR_REGISTER:
+	case PO_PCL:
+	case PO_PCLATH:
+	case PO_DIR:
+		//DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
+		pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
+		memcpy (pcopnew, pcop, sizeof (pCodeOpReg));
+		DFPRINTF((stderr," register index %d\n", PCOR(pcop)->r->rIdx));
+		break;
+
+	case PO_LITERAL:
+		//DFPRINTF((stderr,"pCodeOpCopy lit\n"));
+		pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
+		memcpy (pcopnew, pcop, sizeof (pCodeOpLit));
+		break;
+		
+	case PO_IMMEDIATE:
+		pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
+		memcpy (pcopnew, pcop, sizeof (pCodeOpImmd));
+		break;
+		
+	case PO_GPR_BIT:
 	case PO_CRY:
 	case PO_BIT:
 		//DFPRINTF((stderr,"pCodeOpCopy bit\n"));
 		pcopnew = Safe_calloc(1,sizeof(pCodeOpRegBit) );
-		PCORB(pcopnew)->bit = PCORB(pcop)->bit;
-		PCORB(pcopnew)->inBitSpace = PCORB(pcop)->inBitSpace;
-		
+		memcpy (pcopnew, pcop, sizeof (pCodeOpRegBit));
+		break;
+
+	case PO_LABEL:
+		//DFPRINTF((stderr,"pCodeOpCopy label\n"));
+		pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
+		memcpy (pcopnew, pcop, sizeof(pCodeOpLabel));
 		break;
 		
 	case PO_WILD:
@@ -2817,72 +2857,12 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 		
 		return pcopnew;
 		break;
-		
-	case PO_LABEL:
-		//DFPRINTF((stderr,"pCodeOpCopy label\n"));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
-		PCOLAB(pcopnew)->key =  PCOLAB(pcop)->key;
+
+	default:
+		assert ( !"unhandled pCodeOp type copied" );
 		break;
-		
-	case PO_IMMEDIATE:
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
-		PCOI(pcopnew)->index = PCOI(pcop)->index;
-		PCOI(pcopnew)->offset = PCOI(pcop)->offset;
-		PCOI(pcopnew)->_const = PCOI(pcop)->_const;
-		PCOI(pcopnew)->_function = PCOI(pcop)->_function;
-		break;
-		
-	case PO_LITERAL:
-		//DFPRINTF((stderr,"pCodeOpCopy lit\n"));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
-		PCOL(pcopnew)->lit = PCOL(pcop)->lit;
-		break;
-		
-	case PO_GPR_BIT:
-		
-		pcopnew = newpCodeOpBit(pcop->name, PCORB(pcop)->bit,PCORB(pcop)->inBitSpace);
-		PCOR(pcopnew)->r = PCOR(pcop)->r;
-		PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-		DFPRINTF((stderr," pCodeOpCopy Bit -register index\n"));
-		return pcopnew;
-		break;
-		
-	case PO_GPR_POINTER:
-	case PO_GPR_REGISTER:
-	case PO_GPR_TEMP:
-	case PO_FSR:
-	case PO_INDF:
-		//DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-		PCOR(pcopnew)->r = PCOR(pcop)->r;
-		PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-		PCOR(pcopnew)->instance = PCOR(pcop)->instance;
-		DFPRINTF((stderr," register index %d\n", PCOR(pcop)->r->rIdx));
-		break;
-		
-	case PO_DIR:
-		//fprintf(stderr,"pCodeOpCopy PO_DIR\n");
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-		PCOR(pcopnew)->r = PCOR(pcop)->r;
-		PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-		PCOR(pcopnew)->instance = PCOR(pcop)->instance;
-		break;
-	case PO_STATUS:
-		DFPRINTF((stderr,"pCodeOpCopy PO_STATUS\n"));
-	case PO_SFR_REGISTER:
-	case PO_STR:
-	case PO_NONE:
-	case PO_W:
-	case PO_INTCON:
-	case PO_PCL:
-	case PO_PCLATH:
-		
-		//DFPRINTF((stderr,"pCodeOpCopy register type %d\n", pcop->type));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOp) );
-		
-	}
+	} // switch
 	
-	pcopnew->type = pcop->type;
 	if(pcop->name)
 		pcopnew->name = Safe_strdup(pcop->name);
 	else

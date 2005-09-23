@@ -314,7 +314,13 @@ value *val;
 		return FALSE;
 	}
 	
-	return TRUE;
+	/* multiply chars in-place */
+	if (getSize(left) == 1 && getSize(right) == 1)
+		return TRUE;
+	
+	/* use library functions for more complex maths */
+	return FALSE;
+
 	/*
 	if ( IS_LITERAL (left))
 	{

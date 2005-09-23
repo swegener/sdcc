@@ -3303,9 +3303,12 @@ static void genMult (iCode *ic)
 	}
 	
 	pic14_emitcode("multiply ","sizes are greater than 2... need to insert proper algor.");
-	
+
+	assert( AOP_SIZE(left) == AOP_SIZE(right) );
+	assert( AOP_SIZE(result) >= AOP_SIZE(left) );
+
 	/* should have been converted to function call */
-	//assert(0) ;
+	assert(0) ;
 	
 release :
 	freeAsmop(left,NULL,ic,(RESULTONSTACK(ic) ? FALSE : TRUE));
@@ -10929,7 +10932,9 @@ void genpic14Code (iCode *lic)
 			break;
 			
 		default :
+			fprintf(stderr, "UNHANDLED iCode: "); piCode(ic, stderr);
 			ic = ic;
+			break;
 		}
 	}
 

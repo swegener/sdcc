@@ -1,0 +1,63 @@
+###########################################################
+### Makefile.subdir for the SDCC/PIC14 Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The library is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See GPL for details.
+###
+### $Id$
+###
+
+include $(topsrcdir)/Makefile.common
+
+SUBDIRS ?= 
+MKLIB	?= 
+
+# fallback: if builddir is not specified via the command line...
+builddir ?= build/$(patsubst $(shell cd $(topsrcdir); pwd)/%,%,$(CURDIR))
+
+C_SRC	?= $(wildcard *.c)
+S_SRC	?= $(wildcard *.S)
+OBJS	?= $(addprefix $(topsrcdir)/$(builddir)/,$(C_SRC:.c=.o) $(S_SRC:.S=.o))
+LIB_O	?= $(OBJS)
+
+ifneq (,$(strip $(MKLIB)))
+LIB_LIB = $(topsrcdir)/$(builddir)/$(MKLIB)
+TARGETS ?= $(LIB_LIB)
+else
+LIB_LIB = 
+#TARGETS ?= $(OBJS)
+endif
+
+.PHONY : all install clean clean-intermediate
+
+all : install
+
+ifneq (,$(strip $(TARGETS)))
+# usually install $(LIB_LIB) or $(OBJS), race condition in "[ -d x ] || mkdir x"
+install : recurse $(OBJS) $(LIB_LIB)
+	@[ -d "$(topsrcdir)/$(installdir)" ] || ( $(MKDIR) "$(topsrcdir)/$(installdir)" || true );
+	@echo "[INSTALL] $(patsubst $(topsrcdir)/$(builddir)/%,%,$(TARGETS))";
+	$(Q)$(CP) $(TARGETS) "$(topsrcdir)/$(installdir)"
+else
+# used in subdirs like libc/ctype whose files
+# are contained in a parent's library
+install : recurse $(OBJS) $(LIB_LIB)
+endif
+
+clean : recurse
+	@-echo "dummy" > .dummy
+	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym,$(OBJS:.o=.$(suf)))
+	@-echo "dummy" > .dummy
+	$(Q)-$(RM) .dummy $(OBJS) $(LIB_LIB)
+	$(Q)-[ ! -d "$(topsrcdir)/$(builddir)" ] || $(RMDIR) "$(topsrcdir)/$(builddir)"
+
+clean-intermediate : recurse
+	@-echo "dummy" > .dummy
+	$(Q)-$(RM) .dummy $(foreach suf,p lst hex cod sym,$(OBJS:.o=.$(suf)))
+	
+include $(topsrcdir)/Makefile.rules

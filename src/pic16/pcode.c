@@ -9415,6 +9415,9 @@ typedef unsigned int valnum_t;
 #define PTR_TO_INT(x) (((char *)(x)) - ((char *) 0))
 #endif
 
+static int pic16_regIsLocal (regs *r);
+static int pic16_safepCodeRemove (pCode *pc, char *comment);
+
 /* statistics */
 static unsigned int pic16_df_removed_pcodes = 0;
 static unsigned int pic16_df_saved_bytes = 0;
@@ -9445,11 +9448,16 @@ static int pic16_safepCodeUnlink (pCode *pc, char *comment) {
   pcprev = pic16_findPrevInstruction (pc->prev);
   pcnext = pic16_findNextInstruction (pc->next);
   
-  /* if previous instruction is a skip -- do not remove */
-  if (pcprev && isPCI_SKIP(pcprev)) return 0;
-
   /* move labels to next instruction (if possible) */
   if (PCI(pc)->label && !pcnext) return 0;
+
+  /* if previous instruction is a skip -- do not remove */
+  if (pcprev && isPCI_SKIP(pcprev)) {
+    if (!pic16_safepCodeUnlink (pcprev, "=DF= removed now unused SKIP")) {
+      /* preceeding SKIP could not be removed -- keep this instruction! */
+      return 0;
+    }
+  }
 
   if (PCI(pc)->label) {
     //fprintf (stderr, "%s: moving label(s)\n", __FUNCTION__);
@@ -11942,166 +11950,6 @@ static void pic16_createDF (pBlock *pb) {
   } while (change);
 #endif
 }
-
-
-/* ======================================================================= */
-/* === DEPRECATED CONTROL FLOW CREATION ROUTINES ========================= */
-/* ======================================================================= */
-
-#if 0
-
-/* connect pCode f anf t via their to/from pBranches */
-static void pic16_pCodeLink (pCode *f, pCode *t) {
-  pBranch *br;
-  pCodeInstruction *_f, *_t;
-
-  if (!f || !t) return;
-
-#if 0
-  fprintf (stderr, "linking:\n");
-  f->print(stderr, f);
-  f->print(stderr, t);
-#endif
-
-  assert (isPCI(f) || isPCAD(f));
-  assert (isPCI(t) || isPCAD(t));
-  _f = PCI(f);
-  _t = PCI(t);
-  
-  /* define t to be CF successor of f */
-  br = Safe_malloc (sizeof (pBranch));
-  br->pc = t;
-  br->next = NULL;
-  _f->to = pic16_pBranchAppend (_f->to, br);
-
-  /* define f to be CF predecessor of t */
-  br = Safe_malloc (sizeof (pBranch));
-  br->pc = f;
-  br->next = NULL;
-  _t->from = pic16_pBranchAppend (_t->from, br);
-
-  /* also update pcflow information */
-  if (_f->pcflow && _t->pcflow && _f->pcflow != _t->pcflow) {
-    //fprintf (stderr, "creating flow %p --> %p\n", _f->pcflow, _t->pcflow);
-    LinkFlow_pCode (_f, _t);
-  } // if
-}
-
-static void pic16_destructCF (pBlock *pb) {
-  pCode *pc;
-  pBranch *br;
-
-  /* remove old CF information */
-  pc = pb->pcHead;
-  while (pc) {
-    if (isPCI(pc)) {
-      while (PCI(pc)->to) {
-        br = PCI(pc)->to->next;
-        Safe_free (PCI(pc)->to);
-        PCI(pc)->to = br;
-      } // while
-      while (PCI(pc)->from) {
-        br = PCI(pc)->from->next;
-        Safe_free (PCI(pc)->from);
-        PCI(pc)->from = br;
-      }
-    } else if (isPCFL(pc)) {
-      deleteSet (&PCFL(pc)->to);
-      deleteSet (&PCFL(pc)->from);
-    }
-    pc = pc->next;
-  }
-  
-  releaseStack ();
-}
-
-/* Set up pCodeInstruction's to and from pBranches. */
-static void pic16_createCF (pBlock *pb) {
-  pCode *pc;
-  pCode *next, *dest;
-  char *label;
-
-  //fprintf (stderr, "creating CF for %p\n", pb);
-
-  pic16_destructCF (pb);
-
-  /* check pBlock: do not analyze pBlocks with ASMDIRs (for now...) */
-  if (pic16_pBlockHasAsmdirs (pb)) {
-    //fprintf (stderr, "%s: pBlock contains ASMDIRs -- data flow analysis not performed!\n", __FUNCTION__);
-    return;
-  }
-
-  pc = pic16_findNextInstruction(pb->pcHead);
-  while (pc) {
-    next = pic16_findNextInstruction(pc->next);
-    if (isPCI_SKIP(pc)) {
-      pic16_pCodeLink(pc, next);
-      pic16_pCodeLink(pc, pic16_findNextInstruction(next->next));
-    } else if (isPCI_BRANCH(pc)) {
-      // Bcc, BRA, CALL, GOTO
-      if (PCI(pc)->pcop) {
-        switch (PCI(pc)->pcop->type) {
-        case PO_LABEL:
-	  label = PCOLAB(PCI(pc)->pcop)->pcop.name;
-  	  dest = findLabelinpBlock (pc->pb, PCOLAB(PCI(pc)->pcop));
-          break;
-	
-        case PO_STR:
-	  /* needed for GOTO ___irq_handler */
-	  label = PCI(pc)->pcop->name;
-	  dest = NULL;
-	  break;
-
-        default:
-	  assert (0 && "invalid label format");
-	  break;
-        } // switch
-      } else {
-	label = "NO PCOP";
-        dest = NULL;
-      }
-
-      switch (PCI(pc)->op) {
-      case POC_BRA:
-      case POC_GOTO:
-        if (dest != NULL) { 
-          pic16_pCodeLink(pc, dest);
-	} else {
-          //fprintf (stderr, "jump target \"%s\" not found!\n", label);
-	}
-	break;
-      case POC_CALL:
-      case POC_RETURN:
-      case POC_RETFIE:
-        pic16_pCodeLink(pc, next);
-	break;
-      case POC_BC:
-      case POC_BNC:
-      case POC_BZ:
-      case POC_BNZ:
-      case POC_BN:
-      case POC_BNN:
-      case POC_BOV:
-      case POC_BNOV:
-        if (dest != NULL) { 
-          pic16_pCodeLink(pc, dest);
-	} else {
-          //fprintf (stderr, "jump target \"%s\"not found!\n", label);
-	}
-        pic16_pCodeLink(pc, next);
-        break;
-      default:
-	fprintf (stderr, "BRANCH instruction: %s\n", PCI(pc)->mnemonic);
-	assert (0 && "unhandled branch instruction");
-	break;
-      } // switch
-    } else {
-      pic16_pCodeLink (pc, next);
-    }
-    pc = next;
-  } // while
-}
-#endif
 
 /* ======================================================================== */
 /* === VCG DUMPER ROUTINES ================================================ */

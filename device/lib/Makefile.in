@@ -176,7 +176,7 @@ include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08 model-pic16
+all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08 model-pic16 model-pic14
 
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
@@ -248,6 +248,11 @@ model-pic16:
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
+# yes, we do reuse the objects-pic16 for pic14
+model-pic14:
+	if [ "`grep pic ../../ports.build | grep -v pic16`" = pic ]; then \
+	  $(MAKE) MODELFLAGS="-mpic14" PORT=pic OEXT=.lib objects-pic16; \
+	fi
 
 build-dir: $(PORTDIR)
 

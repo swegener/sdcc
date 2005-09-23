@@ -1,0 +1,85 @@
+###########################################################
+### Makefile.common.in for the SDCC/PIC14 Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The library is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See GPL for details.
+###
+### $Id$
+###
+
+SHELL = bash
+
+#################################################
+### verboseness
+#Q	?= 		# be verbose
+Q	?= @		# be quiet
+# be really quiet (suppress "Entering/Leaving directory...")
+#MAKEFLAGS := $(filter-out -s,$(MAKEFLAGS)) -s
+
+#################################################
+### compiler switches
+ARCH   ?= 877		# might be overwritten in libio
+
+CFLAGS ?=
+CFLAGS += -mpic14 -p16f$(ARCH)
+CFLAGS += --std-c99
+CFLAGS += -I. -I$(topsrcdir)/../../include/pic
+
+#################################################
+### optimization flags
+
+#################################################
+### debugging PIC14 port
+#CFLAGS += --debug-ralloc
+#CFLAGS += --debug-xtra
+#CFLAGS += --pcode-verbose
+CFLAGS += --i-code-in-asm
+
+#################################################
+### debugging SDCC's optimizations
+#CFLAGS += --nooverlay
+#CFLAGS += --nogcse
+#CFLAGS += --nolabelopt
+#CFLAGS += --noinvariant
+#CFLAGS += --noinduction
+#CFLAGS += --nojtbound
+#CFLAGS += --noloopreverse
+
+#################################################
+### assembler switches
+ASFLAGS ?=
+ASFLAGS += -pp16f$(ARCH)
+ASFLAGS += -I$(topsrcdir)/../../include/pic
+
+#################################################
+### linker switches
+LDFLAGS ?=
+LDFLAGS += -m -l -w
+
+#################################################
+### librarian switches
+LIBFLAGS ?=
+LIBFLAGS += -c
+
+#################################################
+### programs to use
+CPP	= $(topsrcdir)/../../../bin/sdcpp
+CC	= $(topsrcdir)/../../../bin/sdcc
+AS	= @GPASM@
+LD	= @GPLINK@
+LIB	= @GPLIB@
+
+SED	?= @SED@
+GREP	?= @EGREP@
+
+MKDIR	?= @MKDIR@
+RMDIR	?= @RMDIR@
+CP	?= @CP@
+MV	?= @MV@
+RM	?= @RM@
+

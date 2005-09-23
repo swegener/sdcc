@@ -1,3 +1,25 @@
+2005-09-23 Raphael Neider <rneider AT web.de>
+
+	* configure.in, configure: have device/lib/pic configured
+	* device/lib/Makefile.in: added model-pic14
+	* device/lib/clean.mk: added pic/ to clean rule
+	* device/lib/pic: added rudimentary pic14 library providing support
+	  functions for multiplication/division/generic pointer access
+	* src/SDCCopt.c (convilong): mark support functions as extern
+	  for pic14 port as well
+	* src/pic/gen.c (genMult): added assertions,
+	  (genpic14Code): emit warning on unhandled iCodes
+	* src/pic/main.c (_hasNativeMulFor): return true only for 8x8 bit
+	* src/pic/pcode.c (pCodeOpCopy),
+	* src/pic16/pcodepeep.c (pic16_pCodeOpCopy): fixed handling of various
+	  pCodeOpReg-subtypes (PO_{STATUS,INTCON,PCL,PCLATH,PCLATU,BSR,
+	  SFR_REGISTER}), made safe for future extensions
+	* src/pic16/pcode.c (pic16_safepCodeUnlink): allow for removal of
+	  instructions even if preceeded by SKIP instructions (also remove
+	  them); removed unused code
+	* src/pic16/pcode.h: added arg2 to pCodeOpLit to match pCodeOpLit2,
+	  prevents leaving parts of the structure uninitialized after copying
+
 2005-09-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genMinus): fix for undetected bug introduced 3 months

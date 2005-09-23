@@ -741,7 +741,7 @@ found:
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
 
-  if(TARGET_IS_PIC16) {
+  if(TARGET_IS_PIC || TARGET_IS_PIC16) {
         /* normally these functions aren't marked external, so we can use their
          * _extern field to marked as already added to symbol table */
 

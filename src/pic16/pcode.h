@@ -411,6 +411,7 @@ typedef struct pCodeOpLit
 {
   pCodeOp pcop;
   int lit;
+  pCodeOp *arg2;	/* needed as pCodeOpLit and pCodeOpLit2 are not separable via their type (PO_LITERAL) */
 } pCodeOpLit;
 
 typedef struct pCodeOpLit2

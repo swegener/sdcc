@@ -2181,13 +2181,58 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
     return NULL;
 
   switch(pcop->type) { 
+  case PO_NONE:
+  case PO_STR:
+  case PO_REL_ADDR:
+  	pcopnew = Safe_calloc(1, sizeof (pCodeOp));
+	memcpy(pcopnew, pcop, sizeof (pCodeOp));
+	break;
+
+  case PO_W:
+  case PO_WREG:
+  case PO_STATUS:
+  case PO_BSR:
+  case PO_FSR0:
+  case PO_INDF0:
+  case PO_INTCON:
+  case PO_GPR_REGISTER:
+  case PO_GPR_TEMP:
+  case PO_SFR_REGISTER:
+  case PO_PCL:
+  case PO_PCLATH:
+  case PO_PCLATU:
+  case PO_PRODL:
+  case PO_PRODH:
+  case PO_DIR:
+    //DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
+    /* XXX: might also be pCodeOpReg2 -- that's why the two structs are identical */
+    pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
+    memcpy (pcopnew, pcop, sizeof(pCodeOpReg));
+    break;
+    
+  case PO_LITERAL:
+    //DFPRINTF((stderr,"pCodeOpCopy lit\n"));
+    /* XXX: might also be pCodeOpLit2, that's why the two structs are identical... */
+    pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
+    memcpy (pcopnew, pcop, sizeof(pCodeOpLit));
+    break;
+
+  case PO_IMMEDIATE:
+    pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
+    memcpy (pcopnew, pcop, sizeof(pCodeOpImmd));
+    break;
+    
+  case PO_GPR_BIT:
   case PO_CRY:
   case PO_BIT:
-    //DFPRINTF((stderr,"pCodeOpCopy bit\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpRegBit) );
-    PCORB(pcopnew)->bit = PCORB(pcop)->bit;
-    PCORB(pcopnew)->inBitSpace = PCORB(pcop)->inBitSpace;
+    pcopnew = Safe_calloc(1, sizeof (pCodeOpRegBit));
+    memcpy (pcopnew, pcop, sizeof (pCodeOpRegBit));
+    break;
 
+  case PO_LABEL:
+    //DFPRINTF((stderr,"pCodeOpCopy label\n"));
+    pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
+    memcpy (pcopnew, pcop, sizeof (pCodeOpLabel));
     break;
 
   case PO_WILD:
@@ -2202,87 +2247,14 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
       pcopnew->name = Safe_strdup(PCOW(pcop)->pcwb->vars[PCOW(pcop)->id]);
       //DFPRINTF((stderr,"copied a wild op named %s\n",pcopnew->name));
     }
-
     return pcopnew;
     break;
 
-  case PO_LABEL:
-    //DFPRINTF((stderr,"pCodeOpCopy label\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
-    PCOLAB(pcopnew)->key =  PCOLAB(pcop)->key;
-    break;
+  default:
+    assert ( !"unhandled pCodeOp type copied" );
+  } // switch
 
-  case PO_IMMEDIATE:
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
-    PCOI(pcopnew)->index = PCOI(pcop)->index;
-    PCOI(pcopnew)->offset = PCOI(pcop)->offset;
-    PCOI(pcopnew)->_const = PCOI(pcop)->_const;
-    break;
-
-  case PO_LITERAL:
-    //DFPRINTF((stderr,"pCodeOpCopy lit\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
-    PCOL(pcopnew)->lit = PCOL(pcop)->lit;
-    break;
-
-#if 0 // mdubuc - To add
-  case PO_REL_ADDR:
-    break;
-#endif
-
-  case PO_GPR_BIT:
-
-    pcopnew = pic16_newpCodeOpBit(pcop->name, PCORB(pcop)->bit,PCORB(pcop)->inBitSpace, PO_GPR_REGISTER);
-    PCOR(pcopnew)->r = PCOR(pcop)->r;
-    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-    DFPRINTF((stderr," pCodeOpCopy Bit -register index\n"));
-    return pcopnew;
-    break;
-
-  case PO_GPR_REGISTER:
-  case PO_GPR_TEMP:
-  case PO_FSR0:
-  case PO_INDF0:
-  case PO_WREG: // moved from below
-  case PO_PRODL: // moved from below
-  case PO_PRODH: // moved from below
-    //DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-    PCOR(pcopnew)->r = PCOR(pcop)->r;
-    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-    PCOR(pcopnew)->instance = PCOR(pcop)->instance;
-    DFPRINTF((stderr," register index %d\n", PCOR(pcop)->r->rIdx));
-    break;
-
-  case PO_DIR:
-    //fprintf(stderr,"pCodeOpCopy PO_DIR\n");
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-    PCOR(pcopnew)->r = PCOR(pcop)->r;
-    PCOR(pcopnew)->rIdx = PCOR(pcop)->rIdx;
-    PCOR(pcopnew)->instance = PCOR(pcop)->instance;
-    break;
-  case PO_STATUS:
-    DFPRINTF((stderr,"pCodeOpCopy PO_STATUS\n"));
-  case PO_BSR:
-    DFPRINTF((stderr,"pCodeOpCopy PO_BSR\n"));
-  case PO_SFR_REGISTER:
-  case PO_STR:
-  case PO_NONE:
-  case PO_W:
-  //case PO_WREG: // moved up
-  case PO_INTCON:
-  case PO_PCL:
-  case PO_PCLATH:
-  case PO_PCLATU:
-  //case PO_PRODL: // moved up
-  //case PO_PRODH: // moved up
-  case PO_REL_ADDR:
-    //DFPRINTF((stderr,"pCodeOpCopy register type %d\n", pcop->type));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOp) );
-
-  }
-
-  pcopnew->type = pcop->type;
+  /* strdup pcop->name (prevent access to shared but released memory) */
   if(pcop->name)
     pcopnew->name = Safe_strdup(pcop->name);
   else

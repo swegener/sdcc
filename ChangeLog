@@ -1,5 +1,7 @@
 2005-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* doc/sdccman.lyx: updated Highest Order Bit documentation,
+	  documented Any Order Bit, Higher Order Byte and Higher Order Word
 	* src/SDCC.y: added tokens GETABIT, GETBYTE, GETWORD
 	* src/SDCCast.c (optimizeGetHbit): updated to also accept bool=expr&(1<<n),
 	  (optimizeGetAbit): new, to get any bit, not only the high bit,

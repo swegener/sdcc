@@ -1752,6 +1752,9 @@ static int isSignedOp (iCode *ic)
     case RRC:
     case RLC:
     case GETHBIT:
+    case GETABIT:
+    case GETBYTE:
+    case GETWORD:
     case RIGHT_OP:
     case CAST:
     case ARRAYINIT:

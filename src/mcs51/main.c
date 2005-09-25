@@ -264,6 +264,9 @@ hasExtBitOp (int op, int size)
   if (op == RRC
       || op == RLC
       || op == GETHBIT
+      || op == GETABIT
+      || op == GETBYTE
+      || op == GETWORD
       || (op == SWAP && size <= 2)
      )
     return TRUE;

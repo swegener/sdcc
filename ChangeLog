@@ -1,3 +1,27 @@
+2005-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y: added tokens GETABIT, GETBYTE, GETWORD
+	* src/SDCCast.c (optimizeGetHbit): updated to also accept bool=expr&(1<<n),
+	  (optimizeGetAbit): new, to get any bit, not only the high bit,
+	  (optimizeGetByte): new, to get a byte from a (long) int: expr>>(8*n),
+	  (optimizeGetWord): new, to get a word from a long int: expr>>(8*n),
+	  (isConformingBody): also check GETABIT, GETBYTE, GETWORD,
+	  (decorateType): '&': also try GETABIT, GETBYTE, GETWORD optimization,
+	    RIGHT_OP: also try GETBYTE, GETWORD optimization,
+	    GETABIT, GETBYTE, GETWORD: decorate them,
+	  (isShiftRightLitVal, isBitAndPowOf2): new helper functions,
+	  (ast_print): added GETABIT, GETBYTE, GETWORD
+	* src/SDCCcse.c (isSignedOp): added GETABIT, GETBYTE, GETWORD
+	* src/SDCCicode.c (codeTable): added GETABIT, GETBYTE, GETWORD,
+	  (geniCodeBinary): new generic binary icode,
+	  (ast2iCode): added GETABIT, GETBYTE, GETWORD
+	* src/port.h: updated comment for PORT.hasExtBitOp
+	* src/mcs51/gen.c (genGetAbit): new, to get any single bit,
+	  (genGetByte): new, to get a single byte,
+	  (genGetWord): new, to get a word from a long,
+	  (gen51Code): added GETABIT, GETBYTE, GETWORD
+	* src/mcs51/main.c (hasExtBitOp): added GETABIT, GETBYTE, GETWORD
+
 2005-09-23 Raphael Neider <rneider AT web.de>
 
 	* configure.in, configure: have device/lib/pic configured

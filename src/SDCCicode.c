@@ -80,6 +80,9 @@ iCodeTable codeTable[] =
   {RRC, "rrc", picGenericOne, NULL},
   {RLC, "rlc", picGenericOne, NULL},
   {GETHBIT, "ghbit", picGenericOne, NULL},
+  {GETABIT, "gabit", picGenericOne, NULL},
+  {GETBYTE, "gbyte", picGenericOne, NULL},
+  {GETWORD, "gword", picGenericOne, NULL},
   {UNARYMINUS, "-", picGenericOne, NULL},
   {IPUSH, "push", picGenericOne, NULL},
   {IPOP, "pop", picGenericOne, NULL},
@@ -3123,6 +3126,19 @@ geniCodeUnary (operand * op, int oper)
 }
 
 /*-----------------------------------------------------------------*/
+/* geniCodeBinary - for a generic binary operation                 */
+/*-----------------------------------------------------------------*/
+operand *
+geniCodeBinary (operand * left, operand * right, int oper)
+{
+  iCode *ic = newiCode (oper, left, right);
+
+  IC_RESULT (ic) = newiTempOperand (operandType (left), 0);
+  ADDTOCHAIN (ic);
+  return IC_RESULT (ic);
+}
+
+/*-----------------------------------------------------------------*/
 /* geniCodeConditional - geniCode for '?' ':' operation            */
 /*-----------------------------------------------------------------*/
 operand *
@@ -4239,6 +4255,16 @@ ast2iCode (ast * tree,int lvl)
       {
         operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
         setOperandType (op, UCHARTYPE);
+        return op;
+      }
+    case GETABIT:
+    case GETBYTE:
+    case GETWORD:
+      {
+        operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
+                                      geniCodeRValue (right, FALSE),
+                                      tree->opval.op);
+        setOperandType (op, (tree->opval.op == GETWORD) ? UINTTYPE : UCHARTYPE);
         return op;
       }
     case AND_OP:

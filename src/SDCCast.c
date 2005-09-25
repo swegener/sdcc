@@ -55,7 +55,10 @@ static ast *createIvalCharPtr (ast *, sym_link *, ast *);
 static ast *optimizeCompare (ast *);
 ast *optimizeRRCRLC (ast *);
 ast *optimizeSWAP (ast *);
-ast *optimizeGetHbit (ast *);
+ast *optimizeGetHbit (ast *, RESULT_TYPE);
+ast *optimizeGetAbit (ast *, RESULT_TYPE);
+ast *optimizeGetByte (ast *, RESULT_TYPE);
+ast *optimizeGetWord (ast *, RESULT_TYPE);
 ast *backPatchLabels (ast *, symbol *, symbol *);
 void PA(ast *t);
 int inInitMode = 0;
@@ -1756,6 +1759,9 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     case '%':
     case LEFT_OP:
     case RIGHT_OP:
+    case GETABIT:
+    case GETBYTE:
+    case GETWORD:
 
       if (IS_AST_SYM_VALUE (pbody->left) &&
           isSymbolEqual (AST_SYMBOL (pbody->left), sym))
@@ -2600,7 +2606,34 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           /* see if this is a GETHBIT operation if yes
              then return that */
           {
-            ast *otree = optimizeGetHbit (tree);
+            ast *otree = optimizeGetHbit (tree, resultType);
+
+            if (otree != tree)
+              return decorateType (otree, RESULT_TYPE_NONE);
+          }
+
+          /* see if this is a GETABIT operation if yes
+             then return that */
+          {
+            ast *otree = optimizeGetAbit (tree, resultType);
+
+            if (otree != tree)
+              return decorateType (otree, RESULT_TYPE_NONE);
+          }
+
+          /* see if this is a GETBYTE operation if yes
+             then return that */
+          {
+            ast *otree = optimizeGetByte (tree, resultType);
+
+            if (otree != tree)
+              return decorateType (otree, RESULT_TYPE_NONE);
+          }
+
+          /* see if this is a GETWORD operation if yes
+             then return that */
+          {
+            ast *otree = optimizeGetWord (tree, resultType);
 
             if (otree != tree)
               return decorateType (otree, RESULT_TYPE_NONE);
@@ -3420,7 +3453,16 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       return tree;
 
     case GETHBIT:
+    case GETABIT:
       TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BIT) ? newBoolLink() :newCharLink();
+      return tree;
+
+    case GETBYTE:
+      TTYPE (tree) = TETYPE (tree) = newCharLink();
+      return tree;
+
+    case GETWORD:
+      TTYPE (tree) = TETYPE (tree) = newIntLink();
       return tree;
 
     case LEFT_OP:
@@ -3453,6 +3495,24 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                    tree->opval.val->type);
           return tree;
         }
+
+      /* see if this is a GETBYTE operation if yes
+         then return that */
+      {
+        ast *otree = optimizeGetByte (tree, resultType);
+
+        if (otree != tree)
+          return decorateType (otree, RESULT_TYPE_NONE);
+      }
+
+      /* see if this is a GETWORD operation if yes
+         then return that */
+      {
+        ast *otree = optimizeGetWord (tree, resultType);
+
+        if (otree != tree)
+          return decorateType (otree, RESULT_TYPE_NONE);
+      }
 
       LRVAL (tree) = RRVAL (tree) = 1;
       if (tree->opval.op == LEFT_OP)
@@ -4870,41 +4930,202 @@ createWhile (symbol * trueLabel, symbol * continueLabel,
 }
 
 /*-----------------------------------------------------------------*/
+/* isShiftRightLitVal _BitAndLitVal - helper function              */
+/*-----------------------------------------------------------------*/
+static ast *
+isShiftRightLitVal_BitAndLitVal (ast * tree)
+{
+  /* if this is not a bit and */
+  if (!IS_BITAND (tree))
+    return NULL;
+
+  /* will look for tree of the form
+     ( expr >> litval2) & litval1 */
+  if (!IS_AST_LIT_VALUE (tree->right))
+    return NULL;
+
+  if (!IS_RIGHT_OP (tree->left))
+    return NULL;
+
+  if (!IS_AST_LIT_VALUE (tree->left->right))
+    return NULL;
+
+  return tree->left->left;
+}
+
+/*-----------------------------------------------------------------*/
+/* isBitAndPowOf2 - helper function                                */
+/*-----------------------------------------------------------------*/
+static int
+isBitAndPow2 (ast * tree)
+{
+  int p2;
+
+  /* if this is not a bit and */
+  if (!IS_BITAND (tree))
+    return -1;
+
+  /* will look for tree of the form
+     ( expr & (1 << litval) */
+  if (!IS_AST_LIT_VALUE (tree->right))
+    return -1;
+
+  if (AST_LIT_VALUE (tree->right) == 1)
+    return 0;
+  p2 = powof2 ((TYPE_UDWORD)AST_LIT_VALUE (tree->right));
+  if (!p2)
+    return -1;
+
+  return p2;
+}
+
+/*-----------------------------------------------------------------*/
 /* optimizeGetHbit - get highest order bit of the expression       */
 /*-----------------------------------------------------------------*/
 ast *
-optimizeGetHbit (ast * tree)
+optimizeGetHbit (ast * tree, RESULT_TYPE resultType)
 {
   int i, j;
-  /* if this is not a bit and */
-  if (!IS_BITAND (tree))
+  ast * expr;
+
+  expr = isShiftRightLitVal_BitAndLitVal(tree);
+  if (expr)
+    {
+      if ((AST_LIT_VALUE (tree->right) != 1) ||
+          ((i = (int) AST_LIT_VALUE (tree->left->right)) !=
+          (j = (getSize (TTYPE (expr)) * 8 - 1))))
+        expr = NULL;
+    }
+  if (!expr && (resultType == RESULT_TYPE_BIT))
+    {
+      expr = tree->left;
+      if (isBitAndPow2 (tree) != getSize (TTYPE (expr)) * 8 - 1)
+        expr = NULL;
+    }
+  if (!expr)
     return tree;
 
-  /* will look for tree of the form
-     ( expr >> ((sizeof expr) -1) ) & 1 */
-  if (!IS_AST_LIT_VALUE (tree->right))
-    return tree;
-
-  if (AST_LIT_VALUE (tree->right) != 1)
-    return tree;
-
-  if (!IS_RIGHT_OP (tree->left))
-    return tree;
-
-  if (!IS_AST_LIT_VALUE (tree->left->right))
-    return tree;
-
-  if ((i = (int) AST_LIT_VALUE (tree->left->right)) !=
-      (j = (getSize (TTYPE (tree->left->left)) * 8 - 1)))
-    return tree;
-      
   /* make sure the port supports GETHBIT */
   if (port->hasExtBitOp
-      && !port->hasExtBitOp(GETHBIT, getSize (TTYPE (tree->left->left))))
+      && !port->hasExtBitOp(GETHBIT, getSize (TTYPE (expr))))
     return tree;
 
-  return decorateType (newNode (GETHBIT, tree->left->left, NULL), RESULT_TYPE_NONE);
+  return decorateType (newNode (GETHBIT, expr, NULL), RESULT_TYPE_NONE);
+}
 
+/*-----------------------------------------------------------------*/
+/* optimizeGetAbit - get a single bit of the expression            */
+/*-----------------------------------------------------------------*/
+ast *
+optimizeGetAbit (ast * tree, RESULT_TYPE resultType)
+{
+  ast * expr;
+  ast * count = NULL;
+
+  expr = isShiftRightLitVal_BitAndLitVal(tree);
+  if (expr)
+    {
+  if (AST_LIT_VALUE (tree->right) != 1)
+        expr = NULL;
+      count = tree->left->right;
+    }
+  if (!expr && (resultType == RESULT_TYPE_BIT))
+    {
+      int p2 = isBitAndPow2 (tree);
+      if (p2 >= 0)
+        {
+          expr = tree->left;
+          count = newAst_VALUE (valueFromLit (p2));
+        }
+    }
+  if (!expr)
+    return tree;
+
+  /* make sure the port supports GETABIT */
+  if (port->hasExtBitOp
+      && !port->hasExtBitOp(GETABIT, getSize (TTYPE (expr))))
+    return tree;
+
+  return decorateType (newNode (GETABIT, expr, count), RESULT_TYPE_NONE);
+
+}
+
+/*-----------------------------------------------------------------*/
+/* optimizeGetByte - get a byte of the expression                  */
+/*-----------------------------------------------------------------*/
+ast *
+optimizeGetByte (ast * tree, RESULT_TYPE resultType)
+{
+  unsigned int i = 0;
+  ast * expr;
+  ast * count = NULL;
+
+  expr = isShiftRightLitVal_BitAndLitVal(tree);
+  if (expr)
+    {
+      i = (unsigned int) AST_LIT_VALUE (tree->left->right);
+      count = tree->left->right;
+      if (AST_LIT_VALUE (tree->right) != 0xFF)
+        expr = NULL;
+    }
+  if (!expr && resultType == RESULT_TYPE_CHAR)
+    {
+      /* if this is a right shift over a multiple of 8 */
+      if (IS_RIGHT_OP (tree) && IS_AST_LIT_VALUE (tree->right))
+        {
+          i = (unsigned int) AST_LIT_VALUE (tree->right);
+          count = tree->right;
+            expr = tree->left;
+        }
+    }
+  if (!expr || (i == 0) || (i % 8) || (i >= getSize (TTYPE (expr)) * 8))
+    return tree;
+      
+  /* make sure the port supports GETBYTE */
+  if (port->hasExtBitOp
+      && !port->hasExtBitOp(GETBYTE, getSize (TTYPE (expr))))
+    return tree;
+
+  return decorateType (newNode (GETBYTE, expr, count), RESULT_TYPE_NONE);
+}
+
+/*-----------------------------------------------------------------*/
+/* optimizeGetWord - get two bytes of the expression               */
+/*-----------------------------------------------------------------*/
+ast *
+optimizeGetWord (ast * tree, RESULT_TYPE resultType)
+{
+  unsigned int i;
+  ast * expr;
+  ast * count = NULL;
+
+  expr = isShiftRightLitVal_BitAndLitVal(tree);
+  if (expr)
+    {
+      i = (unsigned int) AST_LIT_VALUE (tree->left->right);
+      count = tree->left->right;
+      if (AST_LIT_VALUE (tree->right) != 0xFFFF)
+        expr = NULL;
+    }      
+  if (!expr && resultType == RESULT_TYPE_INT)
+    {
+      /* if this is a right shift over a multiple of 8 */
+      if (IS_RIGHT_OP (tree) && IS_AST_LIT_VALUE (tree->right))
+        {
+          i = (unsigned int) AST_LIT_VALUE (tree->right);
+          count = tree->right;
+            expr = tree->left;
+        }
+    }
+  if (!expr || (i == 0) || (i % 8) || (i >= (getSize (TTYPE (expr))-1) * 8))
+    return tree;
+      
+  /* make sure the port supports GETWORD */
+  if (port->hasExtBitOp
+      && !port->hasExtBitOp(GETWORD, getSize (TTYPE (expr))))
+    return tree;
+
+  return decorateType (newNode (GETWORD, expr, count), RESULT_TYPE_NONE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5130,7 +5351,7 @@ optimizeSWAP (ast * root)
 }
 
 /*-----------------------------------------------------------------*/
-/* optimizeCompare - otimizes compares for bit variables     */
+/* optimizeCompare - optimizes compares for bit variables          */
 /*-----------------------------------------------------------------*/
 static ast *
 optimizeCompare (ast * root)
@@ -5830,6 +6051,27 @@ void ast_print (ast * tree, FILE *outfile, int indent)
                 printTypeChain(tree->ftype,outfile);
                 fprintf(outfile,")\n");
                 ast_print(tree->left,outfile,indent+2);
+                return ;
+        case GETABIT:
+                fprintf(outfile,"GETABIT (%p) type (",tree);
+                printTypeChain(tree->ftype,outfile);
+                fprintf(outfile,")\n");
+                ast_print(tree->left,outfile,indent+2);
+                ast_print(tree->right,outfile,indent+2);
+                return ;
+        case GETBYTE:
+                fprintf(outfile,"GETBYTE (%p) type (",tree);
+                printTypeChain(tree->ftype,outfile);
+                fprintf(outfile,")\n");
+                ast_print(tree->left,outfile,indent+2);
+                ast_print(tree->right,outfile,indent+2);
+                return ;
+        case GETWORD:
+                fprintf(outfile,"GETWORD (%p) type (",tree);
+                printTypeChain(tree->ftype,outfile);
+                fprintf(outfile,")\n");
+                ast_print(tree->left,outfile,indent+2);
+                ast_print(tree->right,outfile,indent+2);
                 return ;
         case LEFT_OP:
                 fprintf(outfile,"LEFT_SHIFT (%p) type (",tree);

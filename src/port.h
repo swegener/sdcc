@@ -294,7 +294,7 @@ typedef struct
     bool (*hasNativeMulFor) (iCode *ic, sym_link *left, sym_link *right);
 
     /** Returns true if the port has implemented certain bit
-        manipulation iCodes (RRC, RLC, SWAP, GETHBIT)
+        manipulation iCodes (RRC, RLC, SWAP, GETHBIT, GETABIT, GETBYTE, GETWORD)
     */
     bool (*hasExtBitOp) (int op, int size);
 

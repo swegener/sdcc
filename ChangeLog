@@ -1,3 +1,8 @@
+2005-09-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (operandOperation): added GETABIT, GETBYTE, GETWORD and
+	  GETHBIT
+
 2005-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: updated Highest Order Bit documentation,

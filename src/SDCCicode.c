@@ -1392,6 +1392,23 @@ operandOperation (operand * left, operand * right,
                                  (i >> 1));
       }
       break;
+    case GETABIT:
+      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
+                                (TYPE_UDWORD)operandLitValue(right)) & 1);
+      break;
+    case GETBYTE:
+      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
+                                (TYPE_UDWORD)operandLitValue(right)) & 0xFF);
+      break;
+    case GETWORD:
+      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
+                                (TYPE_UDWORD)operandLitValue(right)) & 0xFFFF);
+      break;
+
+    case GETHBIT:
+      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
+                                ((getSize (let) * 8) - 1)) & 1);
+      break;
 
     case UNARYMINUS:
       retval = operandFromValue (valCastLiteral (type,

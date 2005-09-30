@@ -1,3 +1,9 @@
+2005-09-30 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/device.c (Pics16[]): moved device descriptions to devices.inc
+	* src/pic16/devices.inc: NEW, provides device descriptions
+	* src/pic16/gen.c (genInline): fixed handling of ';'-comments
+
 2005-09-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (operandOperation): added GETABIT, GETBYTE, GETWORD and

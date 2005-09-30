@@ -8223,6 +8223,11 @@ static void genInline (iCode *ic)
 				 * to denote that the argument should not be indented with tab */
 				pic16_addpCode2pBlock(pb, pic16_newpCodeAsmDir(NULL, bp1)); // inline directly, no process
 				bp1 = bp;
+			} if (*bp == ';') {
+				/* advance to end of line (prevent splitting of comments at ':' */
+				while (*bp && *bp != '\n') {
+					bp++;
+				} // while
 			} else
 				bp++;
 		}

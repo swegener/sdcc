@@ -161,7 +161,7 @@ extern void pic16_BuildFlowTree(pBlock *pb);
 extern void pic16_pCodeRegOptimizeRegUsage(int level);
 extern int pic16_picIsInitialized(void);
 extern void SAFE_snprintf(char **str, size_t *size, const char *format, ...);
-extern int mnem2key(char const *mnem);
+extern int mnem2key(unsigned char const *mnem);
 
 /****************************************************************/
 /*                      Forward declarations                    */

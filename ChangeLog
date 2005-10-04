@@ -1,3 +1,9 @@
+2005-10-04 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18fregs.h, src/pic16/devices.inc,
+	  device/lib/pic16/pics.all: added pic18f1320
+	* src/pic16/pcode.c (mnem2key): fixed prototype's argument mismatch
+
 2005-09-30 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/device.c (Pics16[]): moved device descriptions to devices.inc

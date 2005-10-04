@@ -43,6 +43,9 @@
 #elif defined(pic18f1220)
 #  include <pic18f1220.h>
 
+#elif defined(pic18f1320)
+# include <pic18f1220.h>	/* Yes, it's 1220.h */
+
 #elif defined(pic18f2220)
 #  include <pic18f2220.h>
 #elif defined(pic18f2320)

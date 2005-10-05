@@ -1,3 +1,8 @@
+2005-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y (AT): fixed bug with sfr32 addresses when built with GCC
+	* support/regression/tests/sfr16.c: added test for the sfr32 bug
+
 2005-10-04 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18fregs.h, src/pic16/devices.inc,

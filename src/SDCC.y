@@ -597,7 +597,7 @@ type_specifier
 	   /* add this to the storage class specifier  */
            SPEC_ABSA($1) = 1;   /* set the absolute addr flag */
            /* now get the abs addr from value */
-           SPEC_ADDR($1) = (int) floatFromVal(constExprValue($3,TRUE)) ;
+           SPEC_ADDR($1) = (unsigned) floatFromVal(constExprValue($3,TRUE)) ;
         }
    ;
 

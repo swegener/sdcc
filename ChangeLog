@@ -1,3 +1,8 @@
+2005-10-11 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libio/i2c.ignore: added 1320, fixes broken builds
+	* device/lib/pic16/libdev/pic18f1320.c: added 1320's device library
+
 2005-10-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.y (AT): fixed bug with sfr32 addresses when built with GCC

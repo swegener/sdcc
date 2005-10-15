@@ -45,7 +45,7 @@ int strcmp (
 #else
 	register int ret = 0 ;
 
-	while( ! (ret = *asrc - *adst) && *adst)
+	while( ! (ret = *(unsigned char *)asrc - *(unsigned char *)adst) && *adst)
 		++asrc, ++adst;
 
 	if ( ret < 0 )

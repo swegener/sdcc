@@ -1,3 +1,7 @@
+2005-10-15 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/lib/_strcmp.c: Fixed bug 1326457
+
 2005-10-11 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libio/i2c.ignore: added 1320, fixes broken builds

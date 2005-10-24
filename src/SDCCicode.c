@@ -4253,15 +4253,6 @@ ast2iCode (ast * tree,int lvl)
 #endif
 
     case '~':
-      {
-        sym_link *ltype = operandType (left);
-        operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
-        if ((SPEC_NOUN(ltype) == V_CHAR) && IS_UNSIGNED(ltype))
-          {
-            setOperandType (op, INTTYPE);
-          }
-        return op;
-      }
     case RRC:
     case RLC:
     case SWAP:

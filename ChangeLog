@@ -1,3 +1,8 @@
+2005-10-24 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCicode.c (ast2iCode): reverted to 1.224 because of regression:
+	all chars are promoted to int; promotion should be handled in SDCCast.c
+
 2005-10-15 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/lib/_strcmp.c: Fixed bug 1326457

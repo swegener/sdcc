@@ -3422,9 +3422,23 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
           return addCast (tree, resultType, TRUE);
         }
-      if (getSize (tree->left->etype) < INTSIZE)
-        werror(W_COMPLEMENT);
-      tree->left = addCast (tree->left, resultType, TRUE);
+
+      if (resultType == RESULT_TYPE_BIT &&
+          IS_UNSIGNED (tree->left->etype) &&
+          getSize (tree->left->etype) < INTSIZE)
+        {
+          /* promotion rules are responsible for this strange result:
+             bit -> int -> ~int -> bit
+             uchar -> int -> ~int -> bit
+          */
+          werror(W_COMPLEMENT);
+
+          /* optimize bit-result, even if we optimize a buggy source */
+          tree->type = EX_VALUE;
+          tree->opval.val = constVal ("1");
+        }
+      else
+        tree->left = addCast (tree->left, resultType, TRUE);
       LRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));
       return tree;
@@ -5110,7 +5124,7 @@ optimizeGetByte (ast * tree, RESULT_TYPE resultType)
 ast *
 optimizeGetWord (ast * tree, RESULT_TYPE resultType)
 {
-  unsigned int i;
+  unsigned int i = 0;
   ast * expr;
   ast * count = NULL;
 

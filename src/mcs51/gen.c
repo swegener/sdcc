@@ -1803,7 +1803,6 @@ genCpl (iCode * ic)
              bit -> int -> ~int -> bit
              uchar -> int -> ~int -> bit
           */
-          werror(W_COMPLEMENT);
           emitcode ("setb", "%s", IC_RESULT (ic)->aop->aopu.aop_dir);
           goto release;
         }

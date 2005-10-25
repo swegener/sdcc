@@ -2,7 +2,10 @@
 
 	* src/SDCCast.c (addCast): added promotion for bit variables
 	(decorateType): emit W_COMPLEMENT before the problem vanishes behind
-	promotion casts
+	promotion casts + optimisation
+	(optimizeGetWord): fix warning 'i' might be used uninitialized
+	* src/mcs51/gen.c (genCpl): removed W_COMPLEMENT
+	* src/ds390/gen.c (genCpl): removed W_COMPLEMENT
 
 2005-10-24 Bernhard Held <bernhard AT bernhardheld.de>
 

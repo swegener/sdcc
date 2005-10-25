@@ -2087,7 +2087,7 @@ getResultTypeFromType (sym_link *type)
 /* addCast - adds casts to a type specified by RESULT_TYPE         */
 /*-----------------------------------------------------------------*/
 static ast *
-addCast (ast *tree, RESULT_TYPE resultType, bool upcast)
+addCast (ast *tree, RESULT_TYPE resultType, bool promote)
 {
   sym_link *newLink;
   bool upCasted = FALSE;
@@ -2095,9 +2095,22 @@ addCast (ast *tree, RESULT_TYPE resultType, bool upcast)
   switch (resultType)
     {
       case RESULT_TYPE_NONE:
-        /* char: promote to int */
-        if (!upcast ||
+        /* if thing smaller than int must be promoted to int */
+        if (!promote ||
             getSize (tree->etype) >= INTSIZE)
+          /* promotion not necessary or already an int */
+          return tree;
+        /* char and bits: promote to int */
+        newLink = newIntLink();
+        upCasted = TRUE;
+        break;
+      case RESULT_TYPE_BIT:
+        if (!promote ||
+            /* already an int */
+            bitsForType (tree->etype) >= 16 ||
+            /* bit to bit operation: don't promote, the code generators
+               hopefully know everything about promotion rules */
+            bitsForType (tree->etype) == 1)
           return tree;
         newLink = newIntLink();
         upCasted = TRUE;
@@ -2118,14 +2131,14 @@ addCast (ast *tree, RESULT_TYPE resultType, bool upcast)
           }
 #endif
         /* char: promote to int */
-        if (!upcast ||
+        if (!promote ||
             getSize (tree->etype) >= INTSIZE)
           return tree;
         newLink = newIntLink();
         upCasted = TRUE;
         break;
       case RESULT_TYPE_OTHER:
-        if (!upcast)
+        if (!promote)
           return tree;
         /* return type is long, float: promote char to int */
         if (getSize (tree->etype) >= INTSIZE)
@@ -3409,6 +3422,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
           return addCast (tree, resultType, TRUE);
         }
+      if (getSize (tree->left->etype) < INTSIZE)
+        werror(W_COMPLEMENT);
       tree->left = addCast (tree->left, resultType, TRUE);
       LRVAL (tree) = 1;
       COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree));

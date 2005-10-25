@@ -1,3 +1,9 @@
+2005-10-25 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (addCast): added promotion for bit variables
+	(decorateType): emit W_COMPLEMENT before the problem vanishes behind
+	promotion casts
+
 2005-10-24 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCicode.c (ast2iCode): reverted to 1.224 because of regression:

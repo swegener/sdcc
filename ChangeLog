@@ -4,6 +4,7 @@
 	carry must be complemented too
 	* src/mcs51/peeph.def: addded rule 262 to remove double cpl c, which
 	could be emitted by genMinus
+	* src/SDCCval.c (constVal): fixed bug 1305065
 
 2005-10-25 Bernhard Held <bernhard AT bernhardheld.de>
 

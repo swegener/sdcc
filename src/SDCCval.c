@@ -522,47 +522,47 @@ value *constVal (char *s)
   }
 
   /* Setup the flags first */
-  /* set the b_long flag if 'lL' is found */
-  if (strchr (s, 'l') || strchr (s, 'L')) {
-    SPEC_NOUN (val->type) = V_INT;
-    SPEC_LONG (val->type) = 1;
-  }
-
   /* set the unsigned flag if 'uU' is found */
   if (strchr (s, 'u') || strchr (s, 'U')) {
     SPEC_USIGN (val->type) = 1;
   }
 
-  if (dval<0) { // "-28u" will still be signed and negative
-    if (dval<-128) { // check if we have to promote to int
-      SPEC_NOUN (val->type) = V_INT;
-    }
-    if (dval<-32768) { // check if we have to promote to long int
-      SPEC_LONG (val->type) = 1;
-    }
-  } else { // >=0
-    if (dval>0xff ||	/* check if we have to promote to int */
-        SPEC_USIGN (val->type)) { /* if it's unsigned, we can't use unsigned
-				     char. After an integral promotion it will
-				     be a signed int; this certainly isn't what
-				     the programer wants */
-      SPEC_NOUN (val->type) = V_INT;
-    }
-    else { /* store char's always as unsigned; this helps other optimizations */
-      SPEC_USIGN (val->type) = 1;
-    }
-    if (dval>0xffff && SPEC_USIGN (val->type)) { // check if we have to promote to long
-      SPEC_LONG (val->type) = 1;
-    }
-    else if (dval>0x7fff && !SPEC_USIGN (val->type)) { // check if we have to promote to long int
-      if ((hex || octal) && /* hex or octal constants may be stored in unsigned type */
-          dval<=0xffff) {
-        SPEC_USIGN (val->type) = 1;
-      } else {
+  /* set the b_long flag if 'lL' is found */
+  if (strchr (s, 'l') || strchr (s, 'L')) {
+    SPEC_NOUN (val->type) = V_INT;
+    SPEC_LONG (val->type) = 1;
+  } else {
+    if (dval<0) { // "-28u" will still be signed and negative
+      if (dval<-128) { // check if we have to promote to int
+        SPEC_NOUN (val->type) = V_INT;
+      }
+      if (dval<-32768) { // check if we have to promote to long int
         SPEC_LONG (val->type) = 1;
-        if (dval>0x7fffffff) {
+      }
+    } else { // >=0
+      if (dval>0xff ||	/* check if we have to promote to int */
+          SPEC_USIGN (val->type)) { /* if it's unsigned, we can't use unsigned
+  				     char. After an integral promotion it will
+  				     be a signed int; this certainly isn't what
+  				     the programer wants */
+        SPEC_NOUN (val->type) = V_INT;
+      }
+      else { /* store char's always as unsigned; this helps other optimizations */
+        SPEC_USIGN (val->type) = 1;
+      }
+      if (dval>0xffff && SPEC_USIGN (val->type)) { // check if we have to promote to long
+        SPEC_LONG (val->type) = 1;
+      }
+      else if (dval>0x7fff && !SPEC_USIGN (val->type)) { // check if we have to promote to long int
+        if ((hex || octal) && /* hex or octal constants may be stored in unsigned type */
+            dval<=0xffff) {
           SPEC_USIGN (val->type) = 1;
-	}
+        } else {
+          SPEC_LONG (val->type) = 1;
+          if (dval>0x7fffffff) {
+            SPEC_USIGN (val->type) = 1;
+  	  }
+        }
       }
     }
   }

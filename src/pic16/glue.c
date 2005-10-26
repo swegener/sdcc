@@ -1251,7 +1251,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
         }
 
 	/* if it is "extern" then do nothing */
-	if (IS_EXTERN (sym->etype) && !SPEC_ABSA(sym->etype)) {
+	if (IS_EXTERN (sym->etype)/* && !SPEC_ABSA(sym->etype)*/) {
 		checkAddSym(&externs, sym);
 	  continue;
 	}
@@ -1323,6 +1323,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 
 		pic16_pCodeConstString(sym->rname , SPEC_CVAL (sym->etype).v_char);
 	      } else {
+	        fprintf (stderr, "%s:%u(%s): do not know how to intialize symbol %s\n", __FILE__, __LINE__, __FUNCTION__, sym->rname);
 	      	assert(0);
 	      }
 	    }

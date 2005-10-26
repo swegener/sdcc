@@ -5028,6 +5028,7 @@ static void genCmp (operand *left,operand *right,
 	pic16_emitpcode (POC_ADDLW, pic16_popGetLit ((0x100 - (litbyte + 0x80)) & 0x00FF));
       } // if
     } else {
+      /* using PRODL as a temporary register here */
       pCodeOp *pctemp = pic16_popCopyReg(&pic16_pc_prodl);
       //pCodeOp *pctemp = pic16_popGetTempReg(1);
       pic16_mov2w (AOP(left), size);
@@ -5982,6 +5983,7 @@ static void genCmp (operand *left, operand *right,
         /* signed compare */
         DEBUGpic16_emitcode ("; ***","%s: %d: signed compare", __FUNCTION__, __LINE__);
 
+        /* using PRODL:PRODH as a temporary register here */
         pct = pic16_popCopyReg(&pic16_pc_prodl);
         pct2 = pic16_popCopyReg(&pic16_pc_prodh);
         tlbl = newiTempLabel( NULL );
@@ -10510,6 +10512,9 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 
     lbstr = SPEC_BSTR( letype );
 
+    DEBUGpic16_emitcode ("; ***","%s  %d - reading %s bitfield int %s destination",__FUNCTION__,__LINE__,
+    	SPEC_USIGN(OP_SYM_ETYPE(left)) ? "an unsigned" : "a signed", SPEC_USIGN(OP_SYM_TYPE(result)) ? "an unsigned" : "a signed");
+    
 #if 1
     if((blen == 1) && (bstr < 8)) {
       /* it is a single bit, so use the appropriate bit instructions */
@@ -10523,14 +10528,23 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
         pic16_emitpcode(POC_BTFSC,
               pic16_popCopyGPR2Bit(pic16_popGet(AOP(left), 0), bstr));
       } else {
+        /* this code does only handle __data pointers correctly */
+        assert (IS_DATA_PTR(operandType(left)));
 	pic16_loadFSR0 (left, 0);
         pic16_emitpcode(POC_BTFSC,
               pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
       }
-	
-      pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_wreg));
 
-      pic16_emitpcode(POC_MOVWF, pic16_popGet( AOP(result), 0 ));      
+      if (SPEC_USIGN(OP_SYM_ETYPE(left))) {
+        /* unsigned bitfields result in either 0 or 1 */
+        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_wreg));
+      } else {
+        /* signed bitfields result in either 0 or -1 */
+        pic16_emitpcode(POC_DECF, pic16_popCopyReg(&pic16_pc_wreg));
+      }
+      pic16_emitpcode(POC_MOVWF, pic16_popGet( AOP(result), 0 ));
+      
+      pic16_addSign (result, 1, !SPEC_USIGN(OP_SYM_TYPE(result)));
       return;
     }
 
@@ -10566,7 +10580,17 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 		pic16_emitpcode(POC_ANDLW, pic16_popGetLit(((unsigned char) -1)>>(8 - SPEC_BLEN(etype))));
 */
 
+		/* extend signed bitfields to 8 bits */
+		if (!SPEC_USIGN(OP_SYM_ETYPE(left)) && (bstr + blen < 8))
+		{
+			assert (blen + bstr > 0);
+			pic16_emitpcode(POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr + blen - 1));
+			pic16_emitpcode(POC_IORLW, pic16_popGetLit(0xFF << (bstr + blen)));
+		}
+
 		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
+
+		pic16_addSign (result, 1, !SPEC_USIGN(OP_SYM_TYPE(result)));
 	  return ;
 	}
 
@@ -12365,6 +12389,16 @@ static void genAssign (iCode *ic)
 	goto release;
   }
 
+  if (AOP_TYPE(right) == AOP_LIT && IS_SYMOP(result) && IS_GENPTR(OP_SYM_TYPE(result)))
+  {
+    /* Arrg -- a literal is cast into a generic pointer: how shall we decide which TAG
+     *         to assign (__data, __code, __eeprom, ???)??? */
+    fprintf (stderr, "%s:%u(%s): creating generic pointer from literal defaults to __data TYPE*.\n\tPlease explicitly cast to (__data|__code) TYPE* in line %u if neccessary!\n",
+    	__FILE__, __LINE__, __FUNCTION__, ic->lineno);
+    /* assume __data space */
+    lit = (lit & 0x00ffff) | 0x800000;
+    //exit (-1);
+  }
 
 
 #if 0
@@ -12737,6 +12771,77 @@ static void genCast (iCode *ic)
 	  && IS_BITFIELD(getSpec(rtype))) {
 	  DEBUGpic16_emitcode("***", "%d casting a bit to another bit", __LINE__);
         }
+	
+	/* port from pic14 to cope with generic pointers */
+	if (IS_PTR(restype))
+	{
+	  operand *result = IC_RESULT(ic);
+	  //operand *left = IC_LEFT(ic);
+	  operand *right = IC_RIGHT(ic);
+	  int tag = 0xff;
+	  
+	  /* copy common part */
+	  int max, size = AOP_SIZE(result);
+	  if (size > AOP_SIZE(right)) size = AOP_SIZE(right);
+	  DEBUGpic16_emitcode("; ***","%s  %d",__FUNCTION__,__LINE__);
+
+	  /* warn if we discard generic opinter tag */
+	  if (!IS_GENPTR(restype) && IS_GENPTR(rtype) && (AOP_SIZE(result) < AOP_SIZE(right)))
+	  {
+	    //fprintf (stderr, "%s:%u: discarding generic pointer type tag\n", __FUNCTION__, __LINE__);
+	  } // if
+
+	  max = size;
+	  while (size--)
+	  {
+	    pic16_mov2w (AOP(right), size);
+	    pic16_emitpcode(POC_MOVWF, pic16_popGet (AOP(result), size));
+	  } // while
+	  pic16_addSign(result, max, 0);
+
+	  /* upcast into generic pointer type? */
+	  if (IS_GENPTR(restype) && !IS_GENPTR(rtype))
+	  {
+	    //fprintf (stderr, "%s:%u: must determine pointer type (IS_PTR: %d, DCL_TYPE: %d)\n", __FUNCTION__, __LINE__, IS_PTR(rtype), IS_PTR(rtype) ? DCL_TYPE(rtype) : 0);
+	    if (IS_PTR(rtype))
+	    {
+	      switch (DCL_TYPE(rtype))
+	      {
+	      case POINTER:	/* __data */
+	      case FPOINTER:	/* __data */
+		assert (AOP_SIZE(right) == 2);
+		tag = 0x80;
+		break;
+
+	      case CPOINTER:	/* __code */
+		assert (AOP_SIZE(right) == 2);
+		tag = 0x00;
+		break;
+		
+	      case GPOINTER:	/* unknown destination, __data or __code */
+		assert (AOP_SIZE(right) == 3);
+		/* tag taken from right operand */
+		break;
+		
+	      default:
+		assert (!"unhandled pointer type");
+	      } // switch
+	    } else {
+	      /* convert other values into pointers to __data space */
+	      fprintf (stderr, "%s:%u(%s): creating generic pointer from non-pointer type -- assuming __data space\n", __FILE__, __LINE__, __FUNCTION__);
+	      tag = 0x80;
+	    }
+
+	    assert (AOP_SIZE(result) == 3);
+	    if (tag == 0) {
+	      pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result), 2));
+	    } else {
+	      pic16_emitpcode(POC_MOVLW, pic16_popGetLit(tag));
+	      pic16_emitpcode(POC_MOVWF, pic16_popGet (AOP(result), 2));
+	    }
+	  } // if
+	  goto release;
+	}
 
 	/* if they are the same size : or less */
 	if (AOP_SIZE(result) <= AOP_SIZE(right)) {

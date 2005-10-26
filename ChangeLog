@@ -1,3 +1,14 @@
+2005-10-26 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCsymt.c (compStructSize): allow signed bitfields for PIC ports
+	* src/pic16/gen.c (genUnpackBits): support signed bitfields,
+	  (genAssign): emit warning when casting literals to generic pointer
+	    type, also applies when taking the address of a fixed variable,
+	  (genCast): improved casting to generic pointers
+	* src/pic16/glue.c (pic16emitStaticSeg): fixed(?) handling of fixed
+	  extern variables, added verbose error message
+	* device/include/pic16/{string.h,errno.h}: added #pragma library c
+	
 2005-10-26 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/mcs51/gen.c (genMinus): fixed bug 1270906: reverse subtraction,

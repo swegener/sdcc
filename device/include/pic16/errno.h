@@ -27,6 +27,9 @@
 #ifndef _PIC16_ERRNO_H
 #define _PIC16_ERRNO_H
 
+/* link with C library */
+#pragma library c
+
 extern int errno;
 
 /* Error Codes: */

@@ -32,6 +32,8 @@
 
 #define _STRING_SPEC	__data
 
+#pragma library c
+
 #ifndef NULL
 # define NULL (void *)0
 #endif

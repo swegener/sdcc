@@ -4468,6 +4468,13 @@ replace {
 	mov	%1,a
 }
 
+replace {
+	cpl	c
+	cpl	c
+} by {
+	;	Peephole 262	removed redundant cpl c
+}
+
 // should be one of the last peepholes
 replace{
 %1:

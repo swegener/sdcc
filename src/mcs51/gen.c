@@ -4581,13 +4581,17 @@ genMinus (iCode * ic)
               emitcode ("subb", "a,b");
               popB (pushedB);
             } else {
+              /* reverse subtraction with 2's complement */
+              if (offset == 0)
+                emitcode( "setb", "c");
+               else
+                emitcode( "cpl", "c");
               wassertl(!aopGetUsesAcc(leftOp, offset), "accumulator clash");
               MOVA (aopGet(rightOp, offset, FALSE, TRUE));
-              if (offset == 0) {
-                emitcode( "setb", "c");
-              }
               emitcode("subb", "a,%s", aopGet(leftOp, offset, FALSE, TRUE));
               emitcode("cpl", "a");
+              if (size) /* skip if last byte */
+                emitcode( "cpl", "c");
             }
           } else {
             MOVA (aopGet (leftOp, offset, FALSE, FALSE));

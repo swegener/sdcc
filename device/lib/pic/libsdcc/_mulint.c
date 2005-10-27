@@ -36,12 +36,12 @@ _mulint (int a, int b)
   /* check all bits in a byte */
   for (i = 0; i < 8u; i++) {
     /* check all bytes in operand (generic code, optimized by the compiler) */
-    if (a & 0x0001) result += b;
-    if (sizeof (int) > 1 && (a & 0x00000100)) result += (b << 8);
-    if (sizeof (int) > 2 && (a & 0x00010000)) result += (b << 16);
-    if (sizeof (int) > 3 && (a & 0x01000000)) result += (b << 24);
-    a = ((unsigned int)(a)) >> 1;
-    b <<= 1;
+    if (a & 0x0001u) result += b;
+    if (sizeof (a) > 1 && (a & 0x00000100ul)) result += (b << 8u);
+    if (sizeof (a) > 2 && (a & 0x00010000ul)) result += (b << 16u);
+    if (sizeof (a) > 3 && (a & 0x01000000ul)) result += (b << 24u);
+    a = ((unsigned int)a) >> 1u;
+    b <<= 1u;
   } // for i
 
   return result;

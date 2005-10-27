@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.5.3
+SDCC 2.5.5
 \size footnotesize 
 
 \newline 
@@ -16103,7 +16103,7 @@ $(PRJ).hex: $(OBJS)
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-gplink -m -s $(PRJ).lkr -o $(PRJ).hex $(OBJS)
+gplink -m -s $(PRJ).lkr -o $(PRJ).hex $(OBJS) libsdcc.lib
 \layout Standard
 
 Here is a 
@@ -16149,7 +16149,7 @@ $(PRJ).hex: $(OBJS)
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-mplink /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS)
+mplink /v $(PRJ).lkr /m $(PRJ).map /o $(PRJ).hex $(OBJS) libsdcc.lib
 \layout Standard
 
 Please note that indentations within a
@@ -16157,6 +16157,131 @@ Please note that indentations within a
  Makefile
 \family default 
  have to be done with a tabulator character.
+\layout Subsection
+
+Command-line options
+\layout Standard
+
+Besides the switches common to all SDCC backends, the PIC14 port accepts
+ the following options (for an updated list see sdcc -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-help):
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-debug-extra emit debug info in assembly output
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-no-pcode-opt disable (slightly faulty) optimization on pCode
+\layout Subsection
+
+The library
+\layout Subsubsection
+
+error: missing definition for symbol 
+\begin_inset Quotes sld
+\end_inset 
+
+__gptrget1
+\begin_inset Quotes srd
+\end_inset 
+
+
+\layout Standard
+
+The PIC14 port uses library routines to provide more complex operations
+ like multiplication, division/modulus and (generic) pointer dereferencing.
+ In order to add these routines to your project, you must link with PIC14's
+ 
+\family typewriter 
+libsdcc.lib
+\family default 
+.
+ For single source file projects this is done automatically, more complex
+ projects must add 
+\family typewriter 
+libsdcc.lib
+\family default 
+ to the linker's arguments.
+ Make sure you also add an include path for the library (using the -I switch
+ to the linker)!
+\layout Subsubsection
+
+Processor mismatch in file 
+\begin_inset Quotes sld
+\end_inset 
+
+XXX
+\begin_inset Quotes srd
+\end_inset 
+
+.
+\layout Standard
+
+This warning can usually be ignored due to the very good compatibility amongst
+ 14 bit PIC devices.
+\layout Standard
+
+You might also consider recompiling the library for your specific device
+ by changing the ARCH=p16f877 (default target) entry in 
+\family typewriter 
+device/lib/pic/Makefile.in
+\family default 
+ and 
+\family typewriter 
+device/lib/pic/Makefile
+\family default 
+ to reflect your device.
+ This might even improve performance for smaller devices as unneccesary
+ BANKSELs migth be removed.
+\layout Subsection
+
+Known bugs
+\layout Subsubsection
+
+initialized data
+\layout Standard
+
+Currently, data can only be initialized if it resides in the source file
+ together with 
+\emph on 
+main()
+\emph default 
+.
+ Data in other source files will silently 
+\series bold 
+not
+\series default 
+ be initialized.
 \layout Section
 
 The PIC16
@@ -16619,6 +16744,20 @@ status Collapsed
 \end_inset 
 
 -optimize-cmp Try to optimize some compares.
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-optimize-df Analyze the dataflow of the generated code and improve it.
 \layout List
 \labelwidthstring 00.00.0000
 

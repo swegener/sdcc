@@ -24,6 +24,7 @@
 #include "newalloc.h"
 
 
+#include "main.h"
 #include "pcode.h"
 #include "ralloc.h"
 #include "device.h"
@@ -33,6 +34,9 @@
 #else
 #define STRCASECMP strcasecmp
 #endif
+
+extern int Gstack_base_addr;
+extern int Gstack_size;
 
 static PIC_device Pics[] = {
 	{
@@ -102,7 +106,8 @@ AssignedMemory *finalMapping=NULL;
 
 static unsigned int config_word = DEFAULT_CONFIG_WORD;
 
-extern void emitSymbolToFile (FILE *of, const char *name, int size);
+extern int is_shared (regs *reg);
+extern void emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize);
 
 void addMemRange(memRange *r, int type)
 {
@@ -195,6 +200,16 @@ int REGallBanks(regs *reg)
 /*-----------------------------------------------------------------*
 *-----------------------------------------------------------------*/
 
+int isSFR(int address)
+{
+	
+	if( (address > pic->maxRAMaddress) || !finalMapping[address].isSFR)
+		return 0;
+	
+	return 1;
+	
+}
+
 /*
 *  dump_map -- debug stuff
 */
@@ -220,11 +235,12 @@ void dump_map(void)
 
 void dump_sfr(FILE *of)
 {
-	
+#if 0
 	int start=-1;
-	int addr=0;
 	int bank_base;
 	static int udata_flag=0;
+#endif
+	int addr=0;
 	
 	//dump_map();   /* display the register map */
 	//fprintf(stdout,";dump_sfr  \n");
@@ -233,8 +249,27 @@ void dump_sfr(FILE *of)
 		return;
 	}
 	
-	do {
+	for (addr = 0; addr <= pic->maxRAMaddress; addr++)
+	{
+		regs *reg = finalMapping[addr].reg;
 		
+		if (reg && !reg->isEmitted)
+		{
+		  if (pic14_options.isLibrarySource && is_shared (reg))
+		  {
+		    /* rely on external declarations for the non-fixed stack */
+		    fprintf (of, "\textern\t%s\n", reg->name);
+		  } else {
+		    emitSymbolToFile (of, reg->name, "udata", reg->size, reg->isFixed ? reg->address : -1, 0, is_shared (reg));
+		  }
+		  
+		  reg->isEmitted = 1;
+		}
+	} // for
+
+#if 0
+	do {
+
 		if(finalMapping[addr].reg && !finalMapping[addr].reg->isEmitted) {
 			
 			if(start<0)
@@ -291,8 +326,9 @@ void dump_sfr(FILE *of)
 		addr++;
 		
 	} while(addr <= pic->maxRAMaddress);
-	
-	
+
+
+#endif
 }
 
 /*-----------------------------------------------------------------*
@@ -420,16 +456,6 @@ char *processor_base_name(void)
 	return pic->name[0];
 }
 
-int isSFR(int address)
-{
-	
-	if( (address > pic->maxRAMaddress) || !finalMapping[address].isSFR)
-		return 0;
-	
-	return 1;
-	
-}
-
 /*-----------------------------------------------------------------*
 *-----------------------------------------------------------------*/
 int validAddress(int address, int reg_size)
@@ -441,7 +467,8 @@ int validAddress(int address, int reg_size)
 		return 0;
 	}
 	//  fprintf(stderr, "validAddress: Checking 0x%04x\n",address);
-	if(address > pic->maxRAMaddress)
+	assert (reg_size > 0);
+	if(address + (reg_size - 1) > pic->maxRAMaddress)
 		return 0;
 	
 	for (i=0; i<reg_size; i++)
@@ -518,8 +545,8 @@ int assignRegister(regs *reg, int start_address)
 			return reg->address;
 		}
 		
-		//fprintf(stderr, "WARNING: Ignoring Out of Range register assignment at fixed address %d, %s\n",
-		//    reg->address, reg->name);
+		fprintf(stderr, "WARNING: Ignoring Out of Range register assignment at fixed address %d, %s\n",
+		    reg->address, reg->name);
 		
 	} else {
 		
@@ -637,7 +664,7 @@ void setDefMaxRam(void)
 	unsigned i;
 	setMaxRAM(pic->defMaxRAMaddrs); /* Max RAM has not been included, so use default setting */
 	/* Validate full memory range for use by general purpose RAM */
-	for (i=pic->defMaxRAMaddrs; i--; ) {
+	for (i=0; i <= pic->defMaxRAMaddrs; i++) {
 		finalMapping[i].bank = (i>>7);
 		finalMapping[i].isValid = 1;
 	}

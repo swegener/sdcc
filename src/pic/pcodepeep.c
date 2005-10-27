@@ -2100,9 +2100,10 @@ int pCodePeepMatchRule(pCode *pc)
 			/* We have just replaced the inefficient code with the rule.
 			* Now, we need to re-add the C-source symbols if there are any */
 			pc = pcprev;
-			while(pc_cline ) {
+			while(pc && pc_cline ) {
 				
 				pc =  findNextInstruction(pc->next);
+				if (!pc) break;
 				PCI(pc)->cline = pc_cline;
 				pc_cline = PCCS(pc_cline->pc.next);
 				
@@ -2111,13 +2112,14 @@ int pCodePeepMatchRule(pCode *pc)
 			/* Copy C code comments to new code. */
 			pc = pcprev->next;
 			if (pc) {
-				for (; pcout!=pcin; pcout=pcout->next) {
+				for (; pc && pcout!=pcin; pcout=pcout->next) {
 					if (pcout->type==PC_OPCODE && PCI(pcout)->cline) {
 						while (pc->type!=PC_OPCODE || PCI(pc)->cline) {
 							pc = pc->next;
 							if (!pc)
 								break;
 						}
+						if (!pc) break;
 						PCI(pc)->cline = PCI(pcout)->cline;
 					}
 				}

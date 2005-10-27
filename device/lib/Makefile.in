@@ -248,7 +248,7 @@ model-pic16:
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
 	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
-# yes, we do reuse the objects-pic16 for pic14
+# yes, we do reuse the *-pic16 rules for pic14
 model-pic14:
 	if [ "`grep pic ../../ports.build | grep -v pic16`" = pic ]; then \
 	  $(MAKE) MODELFLAGS="-mpic14" PORT=pic OEXT=.lib objects-pic16; \
@@ -315,6 +315,7 @@ installdirs:
 	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400
 	[ -d $(sdcc_libdir)/hc08 ] || mkdir -p $(sdcc_libdir)/hc08
 	[ -d $(sdcc_libdir)/pic16 ] || mkdir -p $(sdcc_libdir)/pic16
+	[ -d $(sdcc_libdir)/pic ] || mkdir -p $(sdcc_libdir)/pic
 	mkdir -p $(sdcc_libdir)/src
 
 # Creating dependencies

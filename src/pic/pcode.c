@@ -71,11 +71,10 @@ static hTab *pic14MnemonicsHash = NULL;
 static hTab *pic14pCodePeepCommandsHash = NULL;
 
 
-static pFile *the_pFile = NULL;
+pFile *the_pFile = NULL;
 static pBlock *pb_dead_pcodes = NULL;
 
 /* Hardcoded flags to change the behavior of the PIC port */
-static int peepOptimizing = 1;        /* run the peephole optimizer if nonzero */
 static int functionInlining = 1;      /* inline functions if nonzero */
 int debug_verbose = 0;                /* Set true to inundate .asm file */
 
@@ -150,7 +149,7 @@ pCodeInstruction pciADDWF = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
-		(PCC_REGISTER | PCC_Z) // outCond
+		(PCC_REGISTER | PCC_C | PCC_DC | PCC_Z) // outCond
 };
 
 pCodeInstruction pciADDFW = {
@@ -172,7 +171,7 @@ pCodeInstruction pciADDFW = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
-		(PCC_W | PCC_Z) // outCond
+		(PCC_W | PCC_C | PCC_DC | PCC_Z) // outCond
 };
 
 pCodeInstruction pciADDLW = {
@@ -281,8 +280,8 @@ pCodeInstruction pciBCF = {
 		0,0,  // branch, skip
 		0,    // literal operand
 		POC_BSF,
-		(PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
-		PCC_REGISTER // outCond
+		(PCC_REGISTER | PCC_EXAMINE_PCOP),	// inCond
+		(PCC_REGISTER | PCC_EXAMINE_PCOP)	// outCond
 };
 
 pCodeInstruction pciBSF = {
@@ -303,8 +302,8 @@ pCodeInstruction pciBSF = {
 		0,0,  // branch, skip
 		0,    // literal operand
 		POC_BCF,
-		(PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
-		(PCC_REGISTER | PCC_EXAMINE_PCOP) // outCond
+		(PCC_REGISTER | PCC_EXAMINE_PCOP),	// inCond
+		(PCC_REGISTER | PCC_EXAMINE_PCOP)	// outCond
 };
 
 pCodeInstruction pciBTFSC = {
@@ -325,8 +324,8 @@ pCodeInstruction pciBTFSC = {
 		1,1,  // branch, skip
 		0,    // literal operand
 		POC_BTFSS,
-		(PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
-		PCC_EXAMINE_PCOP // outCond
+		(PCC_REGISTER | PCC_EXAMINE_PCOP),	// inCond
+		PCC_NONE // outCond
 };
 
 pCodeInstruction pciBTFSS = {
@@ -348,7 +347,7 @@ pCodeInstruction pciBTFSS = {
 		0,    // literal operand
 		POC_BTFSC,
 		(PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
-		PCC_EXAMINE_PCOP // outCond
+		PCC_NONE // outCond
 };
 
 pCodeInstruction pciCALL = {
@@ -369,8 +368,8 @@ pCodeInstruction pciCALL = {
 		1,0,  // branch, skip
 		0,    // literal operand
 		POC_NOP,
-		PCC_NONE, // inCond
-		PCC_NONE  // outCond
+		(PCC_NONE | PCC_W), // inCond, reads argument from WREG
+		(PCC_NONE | PCC_W | PCC_C | PCC_DC | PCC_Z)  // outCond, flags are destroyed by called function
 };
 
 pCodeInstruction pciCOMF = {
@@ -392,7 +391,7 @@ pCodeInstruction pciCOMF = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,  // inCond
-		PCC_REGISTER   // outCond
+		PCC_REGISTER | PCC_Z  // outCond
 };
 
 pCodeInstruction pciCOMFW = {
@@ -414,7 +413,7 @@ pCodeInstruction pciCOMFW = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,  // inCond
-		PCC_W   // outCond
+		PCC_W | PCC_Z  // outCond
 };
 
 pCodeInstruction pciCLRF = {
@@ -436,7 +435,7 @@ pCodeInstruction pciCLRF = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
-		PCC_REGISTER  // outCond
+		PCC_REGISTER | PCC_Z // outCond
 };
 
 pCodeInstruction pciCLRW = {
@@ -458,7 +457,7 @@ pCodeInstruction pciCLRW = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
-		PCC_W  // outCond
+		PCC_W | PCC_Z  // outCond
 };
 
 pCodeInstruction pciCLRWDT = {
@@ -502,7 +501,7 @@ pCodeInstruction pciDECF = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
-		PCC_REGISTER    // outCond
+		PCC_REGISTER | PCC_Z   // outCond
 };
 
 pCodeInstruction pciDECFW = {
@@ -524,7 +523,7 @@ pCodeInstruction pciDECFW = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
-		PCC_W    // outCond
+		PCC_W | PCC_Z   // outCond
 };
 
 pCodeInstruction pciDECFSZ = {
@@ -612,7 +611,7 @@ pCodeInstruction pciINCF = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
-		PCC_REGISTER    // outCond
+		PCC_REGISTER | PCC_Z   // outCond
 };
 
 pCodeInstruction pciINCFW = {
@@ -634,7 +633,7 @@ pCodeInstruction pciINCFW = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
-		PCC_W    // outCond
+		PCC_W | PCC_Z   // outCond
 };
 
 pCodeInstruction pciINCFSZ = {
@@ -874,7 +873,7 @@ pCodeInstruction pciRETFIE = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_NONE,   // inCond
-		PCC_NONE // outCond (not true... affects the GIE bit too)
+		(PCC_NONE | PCC_C | PCC_DC | PCC_Z) // outCond (not true... affects the GIE bit too), STATUS bit are retored
 };
 
 pCodeInstruction pciRETLW = {
@@ -896,7 +895,7 @@ pCodeInstruction pciRETLW = {
 		1,    // literal operand
 		POC_NOP,
 		PCC_LITERAL,   // inCond
-		PCC_W // outCond
+		(PCC_W| PCC_C | PCC_DC | PCC_Z) // outCond, STATUS bits are irrelevant after RETLW
 };
 
 pCodeInstruction pciRETURN = {
@@ -917,8 +916,8 @@ pCodeInstruction pciRETURN = {
 		1,0,  // branch, skip
 		0,    // literal operand
 		POC_NOP,
-		PCC_NONE,   // inCond
-		PCC_NONE // outCond
+		PCC_NONE | PCC_W,   // inCond, return value is possibly present in W
+		(PCC_NONE | PCC_C | PCC_DC | PCC_Z) // outCond, STATUS bits are irrelevant after RETURN
 };
 
 pCodeInstruction pciRLF = {
@@ -940,7 +939,7 @@ pCodeInstruction pciRLF = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER),   // inCond
-		(PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
+		(PCC_REGISTER | PCC_C ) // outCond
 };
 
 pCodeInstruction pciRLFW = {
@@ -962,7 +961,7 @@ pCodeInstruction pciRLFW = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER),   // inCond
-		(PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+		(PCC_W | PCC_C) // outCond
 };
 
 pCodeInstruction pciRRF = {
@@ -984,7 +983,7 @@ pCodeInstruction pciRRF = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER),   // inCond
-		(PCC_REGISTER | PCC_Z | PCC_C | PCC_DC) // outCond
+		(PCC_REGISTER | PCC_C) // outCond
 };
 
 pCodeInstruction pciRRFW = {
@@ -1006,7 +1005,7 @@ pCodeInstruction pciRRFW = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER),   // inCond
-		(PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+		(PCC_W | PCC_C) // outCond
 };
 
 pCodeInstruction pciSUBWF = {
@@ -1028,7 +1027,7 @@ pCodeInstruction pciSUBWF = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
-		(PCC_REGISTER | PCC_Z) // outCond
+		(PCC_REGISTER | PCC_C | PCC_DC | PCC_Z) // outCond
 };
 
 pCodeInstruction pciSUBFW = {
@@ -1050,7 +1049,7 @@ pCodeInstruction pciSUBFW = {
 		0,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
-		(PCC_W | PCC_Z) // outCond
+		(PCC_W | PCC_C | PCC_DC | PCC_Z) // outCond
 };
 
 pCodeInstruction pciSUBLW = {
@@ -1137,8 +1136,8 @@ pCodeInstruction pciTRIS = {
 		0,0,  // branch, skip
 		0,    // literal operand
 		POC_NOP,
-		PCC_NONE,   // inCond
-		PCC_REGISTER // outCond
+		PCC_NONE,   // inCond /* FIXME: what's TRIS doing? */
+		PCC_REGISTER // outCond	/* FIXME: what's TIS doing */
 };
 
 pCodeInstruction pciXORWF = {
@@ -1204,7 +1203,7 @@ pCodeInstruction pciXORLW = {
 		1,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_LITERAL),   // inCond
-		(PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
+		(PCC_W | PCC_Z) // outCond
 };
 
 
@@ -1227,7 +1226,7 @@ pCodeInstruction pciBANKSEL = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
-		PCC_REGISTER  // outCond
+		PCC_NONE  // outCond
 };
 
 pCodeInstruction pciPAGESEL = {
@@ -1249,7 +1248,7 @@ pCodeInstruction pciPAGESEL = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
-		PCC_REGISTER  // outCond
+		PCC_NONE  // outCond
 };
 
 pCodeInstruction *pic14Mnemonics[MAX_PIC14MNEMONICS];
@@ -1724,16 +1723,17 @@ static int RegCond(pCodeOp *pcop)
 		char *name = pcop->name;
 		if (!name) 
 			name = PCOR(pcop)->r->name;
-		//      if (strcmp(name, pc_status.pcop.name) != 0) { <<< This breaks the peep 2 optimisation
-		switch(PCORB(pcop)->bit) {
-		case PIC_C_BIT:
-			return PCC_C;
-		case PIC_DC_BIT:
-			return PCC_DC;
-		case PIC_Z_BIT:
-			return PCC_Z;
+		if (strcmp(name, pc_status.pcop.name) == 0)
+		{
+			switch(PCORB(pcop)->bit) {
+			case PIC_C_BIT:
+				return PCC_C;
+			case PIC_DC_BIT:
+				return PCC_DC;
+			case PIC_Z_BIT:
+				return PCC_Z;
+			}
 		}
-		//    }
 	}
 	
 	return 0;
@@ -2227,12 +2227,12 @@ pCodeOp *newpCodeOpLit(int lit)
 	
 	pcop->name = NULL;
 	if(lit>=0) {
-		sprintf(s,"0x%02x",lit);
+		sprintf(s,"0x%02x", (unsigned char)lit);
 		if(s)
 			pcop->name = Safe_strdup(s);
 	}
 	
-	((pCodeOpLit *)pcop)->lit = lit;
+	((pCodeOpLit *)pcop)->lit = (unsigned char)lit;
 	
 	return pcop;
 }
@@ -3012,7 +3012,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 				} else
 					SAFE_snprintf(&s,&size,"LOW (%s+%d)",pcop->name,PCOI(pcop)->index);
 			} else {
-				if( !PCOI(pcop)->offset) { // && PCOI(pcc->pcop)->offset<4) {
+				if( !PCOI(pcop)->offset) { // && PCOI(pcc->pcop)->offset<4) 
 					SAFE_snprintf(&s,&size,"(%s + %d)",
 						pcop->name,
 						PCOI(pcop)->index);
@@ -3056,7 +3056,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 					SAFE_snprintf(&s,&size,"%s",pcop->name);
 			}
 			return buffer;
-			
+
 		case PO_GPR_BIT:
 			if(PCOR(pcop)->r) {
 				if(use_buffer) {
@@ -3078,9 +3078,8 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 		}
 	}
 
-	printf("PIC port internal warning: (%s:%d) %s not found\n",
-	  __FUNCTION__,
-	  __LINE__,
+	printf("PIC port internal warning: (%s:%d(%s)) %s not found\n",
+	  __FILE__, __LINE__, __FUNCTION__,
 	  pCodeOpType(pcop));
 
 	return "NO operand";
@@ -3233,7 +3232,7 @@ static void genericPrint(FILE *of, pCode *pc)
       /* Debug */
       if(debug_verbose) {
         pCodeOpReg *pcor = PCOR(pci->pcop);
-        fprintf(of, "\t;id=%u,key=%03x",pc->id,pc->seq);
+        fprintf(of, "\t;id=%u,key=%03x,inCond:%x,outCond:%x",pc->id,pc->seq, pci->inCond, pci->outCond);
         if(pci->pcflow)
           fprintf(of,",flow seq=%03x",pci->pcflow->pc.seq);
         if (pcor && pcor->pcop.type==PO_GPR_TEMP && !pcor->r->isFixed)
@@ -3284,6 +3283,23 @@ static void genericPrint(FILE *of, pCode *pc)
       fprintf(of,";<>Start of new flow, seq=0x%x",pc->seq);
       if(PCFL(pc)->ancestor)
         fprintf(of," ancestor = 0x%x", PCODE(PCFL(pc)->ancestor)->seq);
+      fprintf(of,"\n");
+      fprintf(of,";  from: ");
+      {
+        pCodeFlowLink *link;
+        for (link = setFirstItem(PCFL(pc)->from); link; link = setNextItem (PCFL(pc)->from))
+	{
+	  fprintf(of,"%03x ",link->pcflow->pc.seq);
+	}
+      }
+      fprintf(of,"; to: ");
+      {
+        pCodeFlowLink *link;
+        for (link = setFirstItem(PCFL(pc)->to); link; link = setNextItem (PCFL(pc)->to))
+	{
+	  fprintf(of,"%03x ",link->pcflow->pc.seq);
+	}
+      }
       fprintf(of,"\n");
     }
     break;
@@ -3801,34 +3817,33 @@ regs * getRegFromInstruction(pCode *pc)
 		return NULL;
 	
 	switch(PCI(pc)->pcop->type) {
-	case PO_INDF:
+	case PO_STATUS:
 	case PO_FSR:
-		return PCOR(PCI(pc)->pcop)->r;
-
+	case PO_INDF:
+	case PO_INTCON:
 	case PO_BIT:
 	case PO_GPR_TEMP:
+	case PO_SFR_REGISTER:
+	case PO_PCL:
+	case PO_PCLATH:
 		return PCOR(PCI(pc)->pcop)->r;
+	
+	case PO_GPR_REGISTER:
+	case PO_GPR_BIT:
+	case PO_DIR:
+		r = PCOR(PCI(pc)->pcop)->r;
+		if (r)
+			return r;
+		return dirregWithName(PCI(pc)->pcop->name);
+		
+	case PO_LITERAL:
+		break;
 		
 	case PO_IMMEDIATE:
 		r = PCOI(PCI(pc)->pcop)->r;
 		if (r)
 			return r;
 		return dirregWithName(PCI(pc)->pcop->name);
-		
-	case PO_GPR_BIT:
-		r = PCOR(PCI(pc)->pcop)->r;
-		if (r)
-			return r;
-		return dirregWithName(PCI(pc)->pcop->name);
-		
-	case PO_GPR_REGISTER:
-	case PO_DIR:
-		r = PCOR(PCI(pc)->pcop)->r;
-		if (r)
-			return r;
-		return dirregWithName(PCI(pc)->pcop->name);
-	case PO_LITERAL:
-		break;
 		
 	default:
 		break;
@@ -3956,12 +3971,35 @@ void BuildFlow(pBlock *pb)
 		//fprintf(stderr," build: ");
 		//pflow->print(stderr,pflow);
 		
-		if( PCI(pc)->isSkip) {
+		if (checkLabel(pc)) { 
+			
+		/* This instruction marks the beginning of a
+			* new flow segment */
+			
+			pc->seq = 0;
+			seq = 1;
+			
+			/* If the previous pCode is not a flow object, then 
+			* insert a new flow object. (This check prevents 
+			* two consecutive flow objects from being insert in
+			* the case where a skip instruction preceeds an
+			* instruction containing a label.) */
+
+			last_pci = findPrevInstruction (pc->prev);
+			
+			if(last_pci && (PCI(last_pci)->pcflow == PCFL(pflow)))
+				InsertpFlow(last_pci, &pflow);
+			
+			PCI(pc)->pcflow = PCFL(pflow);
+			
+		}
+
+		if(isPCI_SKIP(pc)) {
 			
 		/* The two instructions immediately following this one 
 			* mark the beginning of a new flow segment */
 			
-			while(pc && PCI(pc)->isSkip) {
+			while(pc && isPCI_SKIP(pc)) {
 				
 				PCI(pc)->pcflow = PCFL(pflow);
 				pc->seq = seq-1;
@@ -3980,31 +4018,13 @@ void BuildFlow(pBlock *pb)
 			pc->seq = 0;
 			InsertpFlow(pc, &pflow);
 			
-		} else if ( PCI(pc)->isBranch && !checkLabel(findNextInstruction(pc->next)))  {
+		} else if ( isPCI_BRANCH(pc) && !checkLabel(findNextInstruction(pc->next)))  {
 			
 			InsertpFlow(pc, &pflow);
 			seq = 0;
 			
-		} else if (checkLabel(pc)) { 
-			
-		/* This instruction marks the beginning of a
-			* new flow segment */
-			
-			pc->seq = 0;
-			seq = 1;
-			
-			/* If the previous pCode is not a flow object, then 
-			* insert a new flow object. (This check prevents 
-			* two consecutive flow objects from being insert in
-			* the case where a skip instruction preceeds an
-			* instruction containing a label.) */
-			
-			if(last_pci && (PCI(last_pci)->pcflow == PCFL(pflow)))
-				InsertpFlow(findPrevInstruction(pc->prev), &pflow);
-			
-			PCI(pc)->pcflow = PCFL(pflow);
-			
 		}
+		
 		last_pci = pc;
 		pc = pc->next;
 	}
@@ -4264,7 +4284,8 @@ void LinkFlow(pBlock *pb)
 		
 		//FillFlow(PCFL(pcflow));
 		
-		pc = PCFL(pcflow)->end;
+		/* find last instruction in flow */
+		pc = findPrevInstruction (PCFL(pcflow)->end);
 		
 		//fprintf(stderr, "LinkFlow - flow block (seq=%d) ", pcflow->seq);
 		if(isPCI_SKIP(pc)) {
@@ -4282,7 +4303,7 @@ void LinkFlow(pBlock *pb)
 			
 			//fprintf(stderr, "ends with branch\n  ");
 			//pc->print(stderr,pc);
-			
+
 			if(!(pcol && isPCOLAB(pcol))) {
 				if((PCI(pc)->op != POC_RETLW) && (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL) && (PCI(pc)->op != POC_RETFIE) ) {
 					pc->print(stderr,pc);
@@ -4298,7 +4319,8 @@ void LinkFlow(pBlock *pb)
 				__FUNCTION__,pcol->key,((PCOP(pcol)->name)?PCOP(pcol)->name:"-"));
 			//fprintf(stderr,"newpCodeOpLabel: key=%d, name=%s\n",key,((s)?s:""));
 			
-			continue;
+			/* link CALLs to next instruction */
+			if (PCI(pc)->op != POC_CALL) continue;
 		}
 		
 		if(isPCI(pc)) {
@@ -4311,12 +4333,12 @@ void LinkFlow(pBlock *pb)
 		}
 		
 		if(pc) {
-			//fprintf(stderr, "ends with unknown\n");
-			//pc->print(stderr,pc);
+			fprintf(stderr, "ends with unknown\n");
+			pc->print(stderr,pc);
 			continue;
 		}
 		
-		//fprintf(stderr, "ends with nothing: ERROR\n");
+		fprintf(stderr, "ends with nothing: ERROR\n");
 		
 	}
 }
@@ -4428,11 +4450,32 @@ static void BanksUsedFlow(pBlock *pb)
 }
 */
 
+void pCodeReplace (pCode *old, pCode *new)
+{
+	pCodeInsertAfter (old, new);
+
+	/* special handling for pCodeInstructions */
+	if (isPCI(new) && isPCI(old))
+	{
+		assert (!PCI(new)->from && !PCI(new)->to && !PCI(new)->label && /*!PCI(new)->pcflow && */!PCI(new)->cline);
+		PCI(new)->from = PCI(old)->from;
+		PCI(new)->to = PCI(old)->to;
+		PCI(new)->label = PCI(old)->label;
+		PCI(new)->pcflow = PCI(old)->pcflow;
+		PCI(new)->cline = PCI(old)->cline;
+	} // if
+
+	old->destruct (old);
+}
+
 /*-----------------------------------------------------------------*/
 /* Inserts a new pCodeInstruction before an existing one           */
 /*-----------------------------------------------------------------*/
 static void insertPCodeInstruction(pCodeInstruction *pci, pCodeInstruction *new_pci)
 {
+	pCode *pcprev;
+
+	pcprev = findPrevInstruction(pci->pc.prev);
 	
 	pCodeInsertAfter(pci->pc.prev, &new_pci->pc);
 	
@@ -4452,7 +4495,21 @@ static void insertPCodeInstruction(pCodeInstruction *pci, pCodeInstruction *new_
 	
 	/* The new instruction has the same pcflow block */
 	new_pci->pcflow = pci->pcflow;
-	
+
+	/* Arrrrg: is pci's previous instruction is a skip, we need to
+	 * change that into a jump (over pci and the new instruction) ... */
+	if (pcprev && isPCI_SKIP(pcprev))
+	{
+		symbol *lbl = newiTempLabel (NULL);
+		pCode *label = newpCodeLabel (NULL, lbl->key);
+		pCode *jump = newpCode(POC_GOTO, newpCodeOpLabel(NULL, lbl->key));
+
+		pCodeInsertAfter (pcprev, jump);
+
+		pCodeReplace (pcprev, pCodeInstructionCopy (PCI(pcprev), 1));
+		pcprev = NULL;
+		pCodeInsertAfter((pCode*)pci, label);
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -4491,7 +4548,7 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 /* Therefore banksel is only called for external registers or the  */
 /* first time a local register is encountered.                     */
 /*-----------------------------------------------------------------*/
-static int LastRegIdx; /* If the previous register is the same one again then no need to change bank. */
+static int LastRegIdx = -1; /* If the previous register is the same one again then no need to change bank. */
 static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 {
 	int bank;
@@ -4669,11 +4726,12 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 			* not a skip type instruction */
 			pcprev = findPrevpCode(pc->prev, PC_OPCODE);
 			
-			if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
+			/* This approach does not honor the presence of labels at this instruction... */
+			//if(!pcprev || (pcprev && !isPCI_SKIP(pcprev))) {
 				cur_bank = BankSelect(PCI(pc),cur_bank,reg);
-			} else {
-				cur_bank = BankSelect(PCI(pcprev),cur_bank,reg);
-			}
+			//} else {
+			//	cur_bank = BankSelect(PCI(pcprev),cur_bank,reg);
+			//}
 			if (!PCI(pc)->pcflow)
 				fprintf(stderr,"PCI ID=%d missing flow pointer ???\n",pc->id);
 			else
@@ -4975,7 +5033,7 @@ int OptimizepBlock(pBlock *pb)
 	pCode *pc, *pcprev;
 	int matches =0;
 	
-	if(!pb || !peepOptimizing)
+	if(!pb || options.nopeep)
 		return 0;
 	
 	DFPRINTF((stderr," Optimizing pBlock: %c\n",getpBlock_dbName(pb)));
@@ -5488,8 +5546,7 @@ void AnalyzeFlow(int level)
 	
 	OptimizepCode('*');
 	
-	
-	/*
+	/*	
 	for(pb = the_pFile->pbHead; pb; pb = pb->next)
 	DumpFlow(pb);
 	*/
@@ -5527,10 +5584,12 @@ void AnalyzeFlow(int level)
 void AnalyzeBanking(void)
 {
 	pBlock  *pb;
-	
+
 	if(!picIsInitialized()) {
 		setDefMaxRam(); // Max RAM has not been included, so use default setting
 	}
+	
+	if (!the_pFile) return;
 	
 	/* Phase x - Flow Analysis - Used Banks
 	*
@@ -5652,6 +5711,7 @@ void ReuseReg(void)
 {
 	pBlock  *pb;
 	InitReuseReg();
+	if (!the_pFile) return;
 	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 		/* Non static functions can be called from other modules so their registers must reassign */
 		if (pb->function_entries&&(PCF(setFirstItem(pb->function_entries))->isPublic||!pb->visited))

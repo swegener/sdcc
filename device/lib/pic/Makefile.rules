@@ -20,7 +20,9 @@ $(topsrcdir)/$(builddir)/%.d : %.c
 # assemble
 $(topsrcdir)/$(builddir)/%.o : %.S
 	@echo "[  AS   ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
-	$(Q)$(AS) $(ASFLAGS) -o "$@" -c "$<";
+	$(Q)$(CPP) $(CPPFLAGS) -P -o "$*.Spp" "$<";
+	$(Q)$(AS) $(ASFLAGS) -o "$@" -c "$*.Spp";
+	$(Q)$(RM) "$*.Spp";
 
 # compile
 $(topsrcdir)/$(builddir)/%.o : %.c

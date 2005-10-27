@@ -523,6 +523,8 @@ static void genAddLit (iCode *ic, int lit)
 	result = IC_RESULT(ic);
 	same = pic14_sameRegs(AOP(left), AOP(result));
 	size = pic14_getDataSize(result);
+	if (size > pic14_getDataSize(left))
+		size = pic14_getDataSize(left);
 	
 	if(same) {
 		
@@ -831,6 +833,11 @@ static void genAddLit (iCode *ic, int lit)
 			}
 		}
 	}
+
+	size = pic14_getDataSize(result);
+	if (size > pic14_getDataSize(left))
+		size = pic14_getDataSize(left);
+	addSign(result, size, 0);
 }
 
 /*-----------------------------------------------------------------*/

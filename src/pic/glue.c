@@ -28,6 +28,7 @@
 #include "pcode.h"
 #include "newalloc.h"
 #include "gen.h"
+#include "main.h"
 
 
 #ifdef WORDS_BIGENDIAN
@@ -100,6 +101,21 @@ int pic14aopLiteral (value *val, int offset)
 	
 }
 
+/* Check whether the given reg is shared amongst all .o files of a project.
+ * This is true for the pseudo stack and WSAVE, SSAVE and PSAVE. */
+int is_shared_address (int addr)
+{
+  return ((addr > Gstack_base_addr - 18)
+  	&& (addr <= Gstack_base_addr));
+}
+
+int
+is_shared (regs *reg)
+{
+	if (!reg) return 0;
+	return is_shared_address (reg->address);
+}
+
 /* set of already emitted symbols; we store only pointers to the emitted
  * symbol names so these MUST NO BE CHANGED afterwards... */
 static set *symbolsEmitted = NULL;
@@ -109,9 +125,10 @@ static set *symbolsEmitted = NULL;
 /*                    already present                                */
 /*-------------------------------------------------------------------*/
 void
-emitSymbolToFile (FILE *of, const char *name, int size)
+emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize)
 {
 	const char *sym;
+	static unsigned int sec_idx = 0;
 	
 	/* check whether the symbol is already defined */
 	for (sym = (const char *) setFirstItem (symbolsEmitted);
@@ -127,7 +144,34 @@ emitSymbolToFile (FILE *of, const char *name, int size)
 	
 	/* new symbol -- define it */
 	//fprintf (stderr, "%s: emitting %s (%d)\n", __FUNCTION__, name, size);
-	fprintf (of, "%s\tres\t%d\n", name, size);
+	if (useEQU)
+	  fprintf (of, "%s\tEQU\t0x%04x\n", name, addr);
+	else
+	{
+	  /* we place each symbol into a section of its own to allow the linker
+	   * to distribute the data into all available memory banks */
+	  if (!section_type) section_type = "udata";
+	  if (addr != -1)
+	  {
+	    /* workaround gpasm bug with symbols being EQUated and placed in absolute sections */
+	    if (is_shared_address (addr))
+	    {
+	      if (globalize) fprintf (of, "\tglobal\t%s\n", name);
+	      fprintf (of, "udata_%s_%u\t%s\t0x%04x\n", moduleName, sec_idx++, section_type, addr);
+	      fprintf (of, "%s\tres\t%d\n", name, size);
+	    }
+	    else
+	    {
+	      /* EQUs cannot be exported... */
+	      fprintf (of, "%s\tEQU\t0x%04x\n", name, addr);
+	    }
+	  } else {
+	    if (globalize) fprintf (of, "\tglobal\t%s\n", name);
+	    fprintf (of, "udata_%s_%u\t%s\n", moduleName, sec_idx++, section_type);
+	    fprintf (of, "%s\tres\t%d\n", name, size);
+	  }
+	}
+	
 	addSet (&symbolsEmitted, (void *) name);
 }
 
@@ -218,7 +262,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			}
 			else
 			{
-				emitSymbolToFile (map->oFile, sym->rname, getSize (sym->type) & 0xffff);
+				emitSymbolToFile (map->oFile, sym->rname, NULL, getSize (sym->type) & 0xffff, -1, 0, 0);
 				/*
 				{
 				int i, size;
@@ -965,7 +1009,20 @@ picglue ()
 	
 	addSetHead(&tmpfileSet,ovrFile);
 	pCodeInitRegisters();
-	
+
+	/* check for main() */
+	mainf = newSymbol ("main", 0);
+	mainf->block = 0;
+	mainf = findSymWithLevel (SymbolTab, mainf);
+
+	if (!mainf || !IFFUNC_HASBODY(mainf->type))
+	{
+		/* main missing -- import stack from main module */
+		//fprintf (stderr, "main() missing -- assuming we are NOT the main module\n");
+		pic14_options.isLibrarySource = 1;
+	}
+
+#if 0
 	if (mainf && IFFUNC_HASBODY(mainf->type)) {
 		
 		pBlock *pb = newpCodeChain(NULL,'X',newpCodeCharP("; Starting pCode block"));
@@ -988,7 +1045,7 @@ picglue ()
 			
 		}
 	}
-	
+#endif	
 	
 	/* At this point we've got all the code in the form of pCode structures */
 	/* Now it needs to be rearranged into the order it should be placed in the */
@@ -1144,14 +1201,15 @@ picglue ()
 		fprintf (asmFile, "%s", iComments2);
 		fprintf (asmFile, "; interrupt and initialization code\n");
 		fprintf (asmFile, "%s", iComments2);
-		fprintf (asmFile, "code_init\t%s\t0x4\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
+		fprintf (asmFile, "code_interrupt\t%s\t0x4\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
 		
 		/* interrupt service routine */
-		fprintf (asmFile, "__sdcc_interrupt:\n");
+		fprintf (asmFile, "__sdcc_interrupt\n");
 		copypCode(asmFile, 'I');
 		
 		/* initialize data memory */
-		fprintf (asmFile,"__sdcc_gsinit_startup:\n");
+		fprintf (asmFile, "code_init\t%s\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
+		fprintf (asmFile,"__sdcc_gsinit_startup\n");
 		/* FIXME: This is temporary.  The idata section should be used.  If 
 		not, we could add a special feature to the linker.  This will 
 		work in the mean time.  Put all initalized data in main.c */

@@ -88,7 +88,8 @@ static int rDirectIdx=0;
 int pic14_nRegs = 128;   // = sizeof (regspic14) / sizeof (regs);
 
 int Gstack_base_addr=0; /* The starting address of registers that
-* are used to pass and return parameters */
+			 * are used to pass and return parameters */
+int Gstack_size = 0;
 
 
 
@@ -478,13 +479,17 @@ void initStack(int base_address, int size)
 	int i;
 	
 	Gstack_base_addr = base_address;
-	//fprintf(stderr,"initStack");
+	Gstack_size = size;
+	//fprintf(stderr,"initStack [base:0x%02x, size:%d]\n", base_address, size);
 	
 	for(i = 0; i<size; i++) {
-		regs *r = newReg(REG_STK, PO_GPR_TEMP,base_address,NULL,1,0);
+		char buffer[16];
+		SNPRINTF(&buffer[0], 16, "STK%02d", i);
+		regs *r = newReg(REG_STK, PO_GPR_TEMP,base_address,buffer,1,0);
 		r->address = base_address; // Pseudo stack needs a fixed location that can be known by all modules
 		r->isFixed = 1;
-		r->name[0] = 's';
+		r->isPublic = 1;
+		//r->name[0] = 's';
 		r->alias = 0x180; // Using shared memory for pseudo stack
 		addSet(&dynStackRegs,r);
 		base_address--;

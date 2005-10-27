@@ -9,6 +9,8 @@
 #include "ralloc.h"
 #include "device.h"
 #include "SDCCutil.h"
+#include "SDCCmacro.h"
+#include "MySystem.h"
 #include "glue.h"
 //#include "gen.h"
 
@@ -47,6 +49,15 @@ static char *_pic14_keywords[] =
 	NULL
 };
 
+pic14_options_t pic14_options;
+
+extern int debug_verbose;	/* from pcode.c */
+static OPTION _pic14_poptions[] = {
+	{ 0 , "--debug-xtra", &debug_verbose, "show more debug info in assembly output" },
+	{ 0 , "--no-pcode-opt", &pic14_options.disable_df, "disable (slightly faulty) optimization on pCode" },
+	{ 0 , NULL, NULL, NULL }
+};
+
 void  pCodeInitRegisters(void);
 
 void pic14_assignRegisters (ebbIndex *);
@@ -62,6 +73,7 @@ _pic14_init (void)
 {
 	asm_addTree (&asm_asxxxx_mapping);
 	pCodeInitRegisters();
+	memset (&pic14_options, 0, sizeof (pic14_options));
 }
 
 static void
@@ -171,7 +183,7 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
 		}
 		return 1;
 	}
-	
+
 	return FALSE;
 }
 
@@ -307,7 +319,7 @@ sym_link *test = NULL;
 value *val;
 	*/
 	
-	fprintf(stderr,"checking for native mult\n");
+	//fprintf(stderr,"checking for native mult\n");
 	
 	if ( ic->op != '*')
 	{
@@ -394,6 +406,68 @@ static const char *_asmCmd[] =
 		
 };
 
+extern set *libFilesSet;
+extern set *libDirsSet;
+extern set *libPathsSet;
+extern set *includeDirsSet;
+extern set *userIncDirsSet;
+extern set *dataDirsSetSet;
+extern set *relFilesSet;
+extern set *linkOptionsSet;
+
+static void _pic14_do_link ()
+{
+  hTab *linkValues=NULL;
+  char lfrm[256];
+  char *lcmd;
+  char temp[128];
+  set *tSet=NULL;
+  int ret;
+  
+  /*
+   * link command format:
+   * {linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}
+   *
+   */
+
+  sprintf(lfrm, "{linker} {incdirs} {sysincdirs} {lflags} -o {outfile} {user_ofile} {spec_ofiles} {ofiles} {libs}");
+
+  shash_add(&linkValues, "linker", "gplink");
+
+  /* LIBRARY SEARCH DIRS */
+  mergeSets(&tSet, libPathsSet);
+  mergeSets(&tSet, libDirsSet);
+  shash_add(&linkValues, "incdirs", joinStrSet(appendStrSet(tSet, "-I\"", "\"")));
+
+  SNPRINTF (&temp[0], 128, "%cpic\"", DIR_SEPARATOR_CHAR);
+  joinStrSet(appendStrSet(libDirsSet, "-I\"", &temp[0]));
+  shash_add(&linkValues, "sysincdirs", joinStrSet(appendStrSet(libDirsSet, "-I\"", &temp[0])));
+  
+  shash_add(&linkValues, "lflags", joinStrSet(linkOptionsSet));
+
+  shash_add(&linkValues, "outfile", dstFileName);
+
+  if(fullSrcFileName) {
+    sprintf(temp, "%s.o", dstFileName);
+    shash_add(&linkValues, "user_ofile", temp);
+  }
+
+  shash_add(&linkValues, "ofiles", joinStrSet(relFilesSet));
+
+  /* LIBRARIES */
+  addSet(&libFilesSet, "libsdcc.lib");
+  shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
+
+  lcmd = msprintf(linkValues, lfrm);
+
+  ret = my_system( lcmd );
+
+  Safe_free( lcmd );
+
+  if(ret)
+    exit(1);
+}
+
 /* Globals */
 PORT pic_port =
 {
@@ -421,7 +495,7 @@ PORT pic_port =
 	{
 		_linkCmd,
 		NULL,
-		NULL,
+		_pic14_do_link,		/* own do link function */
 		".o",
 		0
 	},
@@ -430,7 +504,7 @@ PORT pic_port =
 	},
 	{
 		/* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */
-		1, 2, 2, 4, 2, 2, 2, 1, 4, 4
+		1, 2, 2, 4, 2, 2, 3, 1, 4, 4
 		/* TSD - I changed the size of gptr from 3 to 1. However, it should be
 		   2 so that we can accomodate the PIC's with 4 register banks (like the
 		   16f877)
@@ -481,7 +555,7 @@ PORT pic_port =
 	"_",
 	_pic14_init,
 	_pic14_parseOptions,
-	NULL,
+	_pic14_poptions,
 	NULL,
 	_pic14_finaliseOptions,
 	_pic14_setDefaultOptions,

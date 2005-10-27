@@ -1,3 +1,100 @@
+2005-10-27 Raphael Neider <rneider AT web.de>
+
+	* .version: changed version to 2.5.4
+	* doc/sdccman.lyx: changed version to 2.5.4, added some remarks to PIC14
+	* device/lib/pic/libsdcc/{_mulint.c,_mullong.c}: use unsigned literals,
+	  (_divschar.c,divuchar.c,_mulchar.c,_modschar.c,_moduchar): NEW,
+	    arithmetics support routines
+	* device/lib/pic/Makefile.rules: have assembler sources preprocessed
+	* device/lib/Makefile.in: also create installdir for pic
+	
+	* src/SDCCopt.c (cnvToFcall): mark support routines `extern' for
+	  pic14 port as well
+	* src/pic/device.c (dump_sfr): rewritten to delegate register
+	  placement to the linker (use `extern sym' rather than sym EQU addr),
+	  (validAddress): fixed to check last specified address
+	* src/pic/gen.c (aopForSym): added code to deal with array (useless?),
+	  (popGetLit): truncate literal value to 8 bit,
+	  (popGet): moved assert to more appropriate place
+	  (popGetExternal): create pCode operand from and mark the according
+	    symbol as being `extern'
+	  (popGetAddr): added sanity check on immediate's offset, provide
+	    GPOINTER tag on demand
+	  (aopPut): fixed for immediates,
+	  (mov2w_op): move operand's address or contents to WREG (depending on
+	    operand type), safer variant of mov2w,
+	  (movwf,call_libraryfunc): NEW, handy abbreviations,
+	  (get_argument_pcop,get_return_val_pcop,pass_argument,
+	  get_returnvalue): interface for accessing function parameters and
+	    return values,
+	  (assignResultValuei,genRet): use new parameter/return value interface
+	  (pic14_getDataSize): back to old version handling generic pointers,
+	  (pic14_toBoolean,genNot,genCpl,genCmpEq,genOrOp): heavily rewritten,
+	    provided implementation and/or fixed old one,
+	  (genMultOneByte,genDivOneByte,genModOneByte): implemented as library
+	    calls, removed legacy 8051 reference code
+	  (AccLsh,AccRsh): rewritten and fixed to deal with signed operands
+	  (loadSignToC): NEW, move the operands sign bit to CARRY,
+	  (genGenericShift): NEW, replaces genLeftShift, genRightShift and
+	    genRightShiftSigned, accepts negative shift counts,
+	  (setup_fsr): load FSR and adjust IRP (indirect memory access),
+	  (emitPtrByteGet,emitPtrByteSet): rewritten, now works with
+	    generic pointers, __data pointers and __code pointers,
+	  (genUnpackBits,genPackBits): rewritten to work with generic pointers
+	    and signed bitfields, limit bitfields to 8 bit,
+	  (genDataPointerGet): fixed number of bytes read,
+	  (genGenPointerGet,genConstPointerGet): fixed bitfield access,
+	  (genPointerGet,genPointerSet): fixed handling of __code pointers,
+	    pointers to constant data are no longer assumed to point to __code
+	    space, removed invalid pointer types,
+	  (bitpatternFromVal): retrieve the PICs representation of an integer
+	    or float literal,
+	  (genDataPointerSet): fixed assigning to po_immediate operands,
+	  (genGenPointerSet): implemented as library call,
+	  (genIfx): fixed incorrect condition,
+	  (genAddrOf): limit generic pointers' addresses to 2 bytes,
+	    provide GPOINTER tag according to destination's storage class,
+	  (genCast): added code to handle casting to generic pointers, added
+	    sign-/zero extension of the result
+	  (aop_isLitLike,op_isLitLike): fixed handling of immediates
+	* src/pic/gen.h: added macros to access IRP bit in STATUS register
+	* src/pic/genarith.c (genAddLit): use min(result's,left's) size, sign
+	  extend the result
+	* src/pic/glue.c (is_shared_address,is_shared): check whether a given
+	  address/register resides in the shared banks
+	  (emitSymbolToFile): improved to handle global and `pinned' symbols,
+	    put all variables into separate sections (have the linker arrange
+	    them)
+	  (picglue): put init code and interrupt handlers in separate sections
+	* src/pic/main.c: added port specific options table, modified to PORT
+	  structure to make GPOINTERs 3 byte, added pic14_options
+	  (_pic14_do_link): private linking routine (update paths to libraries,
+	    add libsdcc.lib by default)
+	* src/pic/main.h: declare pic14_options
+	* src/pic/pcode.c: fixed instructions i/o relations,
+	  (RegCond): reverted to correct version,
+	  (newpCodeOpLit): truncate literals to 8 bit,
+	  (genericPrint): added debug output,
+	  (getRegFromInstruction): fixed for various operand types, simplified
+	  (BuildFlow): fixed broken handling of isntructions with labels
+	  (LinkFlow): start at last instruction in flow (skip trailing comments),
+	    pass the flow on to the next instruction after CALL
+	  (pCodeReplace): NEW, replace a pCode and move meta data to the new one
+	  (insertPCodeInstruction): fixed inserting after a skip instruction,
+	  (DoBankSelect): fixed for labeled instructions
+	  (OptimizepBlock): honor --nopeep switch
+	  (AnalyzeFlow,ReuseReg): prevent crash on source files with no function
+	* src/pic/pcodepeep.c (pCodePeepMatchRule): prevent NULL pointer accesses
+	* src/pic/pcoderegs.c (regIsLocal): NEW, check visibility of a register
+	  (pCodeOptime2pCodes): allow disabling this optimization via
+	    --no-pcode-opt due seldomly occuring bugs, fixed some conditions
+	    but is still buggy), started implementation of a dataflow based
+	    pCode optimization (CSE + dead code elimination)
+	  (pCodeRegMapLiveRangesInFlow): removed bogus inCond
+	* src/pic/ralloc.c (initStack): renamed stack registers to STK%d, the new
+	  names are independant of the stack location and therefore portable across
+	  devices
+
 2005-10-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/ralloc.c (bitType): added to detect bit variables,

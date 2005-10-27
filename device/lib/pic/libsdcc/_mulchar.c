@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------
-   _mullong.c : routine for 32 bit multiplication
+   _mulchar.c : routine for 8 bit multiplication
 
   	Written By	Raphael Neider, rneider@web.de (2005)
 
@@ -27,20 +27,20 @@
 #pragma save
 #pragma disable_warning 126 /* unreachable code */
 #pragma disable_warning 116 /* left shifting more than size of object */
-long
-_mullong (long a, long b)
+char
+_mulchar (char a, char b)
 {
-  long result = 0;
+  char result = 0;
   unsigned char i;
 
   /* check all bits in a byte */
   for (i = 0; i < 8u; i++) {
     /* check all bytes in operand (generic code, optimized by the compiler) */
-    if (a & 0x0001u) result += b;
+    if (a & (unsigned char)0x0001u) result += b;
     if (sizeof (a) > 1 && (a & 0x00000100ul)) result += (b << 8u);
     if (sizeof (a) > 2 && (a & 0x00010000ul)) result += (b << 16u);
     if (sizeof (a) > 3 && (a & 0x01000000ul)) result += (b << 24u);
-    a = ((unsigned long)a) >> 1u;
+    a = ((unsigned char)a) >> 1u;
     b <<= 1u;
   } // for i
 

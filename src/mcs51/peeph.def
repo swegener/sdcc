@@ -44,7 +44,7 @@ replace {
 	mov	%1,a
 }
 
-replace {
+replace restart {
 // saving 1 byte, loosing 1 cycle but maybe allowing peephole 3.b to start
 	mov	%1,#0x00
 	mov	%2,#0x00
@@ -4473,6 +4473,33 @@ replace {
 	cpl	c
 } by {
 	;	Peephole 262	removed redundant cpl c
+}
+
+replace {
+	mov	%1,#%2
+	inc	%1
+	inc	%1
+	inc	%1
+} by {
+	;	Peephole 263.a	optimized loading const
+	mov	%1,#(%2 + 3)
+}
+
+replace {
+	mov	%1,#%2
+	inc	%1
+	inc	%1
+} by {
+	;	Peephole 263.b	optimized loading const
+	mov	%1,#(%2 + 2)
+}
+
+replace {
+	mov	%1,#%2
+	inc	%1
+} by {
+	;	Peephole 263.c	optimized loading const
+	mov	%1,#(%2 + 1)
 }
 
 // should be one of the last peepholes

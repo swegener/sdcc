@@ -248,6 +248,15 @@ computeSpillable (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* bitType - will return 1 if the symbol has type REG_BIT          */
+/*-----------------------------------------------------------------*/
+static int
+bitType (symbol * sym, eBBlock * ebp, iCode * ic)
+{
+  return (sym->regType == REG_BIT ? 1 : 0);
+}
+
+/*-----------------------------------------------------------------*/
 /* noSpilLoc - return true if a variable has no spil location      */
 /*-----------------------------------------------------------------*/
 static int
@@ -266,7 +275,7 @@ hasSpilLoc (symbol * sym, eBBlock * ebp, iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* directSpilLoc - will return 1 if the splilocation is in direct  */
+/* directSpilLoc - will return 1 if the spillocation is in direct  */
 /*-----------------------------------------------------------------*/
 static int
 directSpilLoc (symbol * sym, eBBlock * ebp, iCode * ic)
@@ -369,7 +378,7 @@ leastUsedLR (set * sset)
     {
 
       /* if usage is the same then prefer
-         the spill the smaller of the two */
+         to spill the smaller of the two */
       if (lsym->used == sym->used)
         if (getSize (lsym->type) < getSize (sym->type))
           sym = lsym;
@@ -645,10 +654,20 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
   /* get the spillable live ranges */
   lrcs = computeSpillable (ic);
 
-  /* get all live ranges that are rematerizable */
+  /* remove incompatible registers */
+  if ((forSym->regType == REG_PTR) || (forSym->regType == REG_GPR))
+    {
+      selectS = liveRangesWith (lrcs, bitType, ebp, ic);
+      
+      for (sym = setFirstItem (selectS); sym; sym = setNextItem (selectS))
+    {
+          bitVectUnSetBit (lrcs, sym->key);
+        }
+    }
+
+  /* get all live ranges that are rematerializable */
   if ((selectS = liveRangesWith (lrcs, rematable, ebp, ic)))
     {
-
       /* return the least used of these */
       return leastUsedLR (selectS);
     }
@@ -670,7 +689,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
   /* if the symbol is local to the block then */
   if (forSym->liveTo < ebp->lSeq)
     {
-
       /* check if there are any live ranges allocated
          to registers that are not used in this block */
       if (!_G.blockSpil && (selectS = liveRangesWith (lrcs, notUsedInBlock, ebp, ic)))
@@ -707,7 +725,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
   /* find live ranges with spillocation && not used as pointers */
   if ((selectS = liveRangesWith (lrcs, hasSpilLocnoUptr, ebp, ic)))
     {
-
       sym = leastUsedLR (selectS);
       /* mark this as allocation required */
       sym->usl.spillLoc->allocreq++;
@@ -717,7 +734,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
   /* find live ranges with spillocation */
   if ((selectS = liveRangesWith (lrcs, hasSpilLoc, ebp, ic)))
     {
-
       sym = leastUsedLR (selectS);
       sym->usl.spillLoc->allocreq++;
       return sym;
@@ -728,7 +744,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
      used ofcourse */
   if ((selectS = liveRangesWith (lrcs, noSpilLoc, ebp, ic)))
     {
-
       /* return a created spil location */
       sym = createStackSpil (leastUsedLR (selectS));
       sym->usl.spillLoc->allocreq++;

@@ -1,3 +1,11 @@
+2005-10-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (bitType): added to detect bit variables,
+	  (selectSpil): fixed bug 1337835 by not spilling bit variables
+	* support/regression/tests/bug1337835.c: added test for this bug
+	* src/mcs51/peeph.def: restart after rule 3.c,
+	  addded rules 263.x to optimize loading constants
+
 2005-10-26 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCsymt.c (compStructSize): allow signed bitfields for PIC ports
@@ -8,7 +16,7 @@
 	* src/pic16/glue.c (pic16emitStaticSeg): fixed(?) handling of fixed
 	  extern variables, added verbose error message
 	* device/include/pic16/{string.h,errno.h}: added #pragma library c
-	
+
 2005-10-26 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/mcs51/gen.c (genMinus): fixed bug 1270906: reverse subtraction,

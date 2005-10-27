@@ -989,6 +989,34 @@ isOperandInFarSpace (operand * op)
   return (IN_FARSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
 }
 
+/*-----------------------------------------------------------------*/
+/* isOperandInPagedSpace - return true if operand is in pagedSpace */
+/*-----------------------------------------------------------------*/
+bool
+isOperandInPagedSpace (operand * op)
+{
+  sym_link *etype;
+
+  if (!op)
+    return FALSE;
+
+  if (!IS_SYMOP (op))
+    return FALSE;
+
+  if (!IS_TRUE_SYMOP (op))
+    {
+      if (SPIL_LOC (op))
+        etype = SPIL_LOC (op)->etype;
+      else
+        return FALSE;
+    }
+  else
+    {
+      etype = getSpec (operandType (op));
+    }
+  return (IN_PAGEDSPACE (SPEC_OCLS (etype)) ? TRUE : FALSE);
+}
+
 /*------------------------------------------------------------------*/
 /* isOperandInDirSpace - will return true if operand is in dirSpace */
 /*------------------------------------------------------------------*/

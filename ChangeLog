@@ -1,3 +1,17 @@
+2005-10-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (getTempRegs): return 0 if not enough registers found,
+	  (aopPutUsesAcc): added to predict accumulator use,
+	  (assignResultValue): save acc if necessary,
+	  (genMinusDec): store result if indirectly addressed,
+	  (genDivOneByte):  save acc if necessary,
+	  (movLeft2Result): bugfix if left already in acc,
+	  (genAnd, genOr, genXor, shiftL2Left2Result, shiftR2Left2Result): pay more
+	    attention to accumulator use (esp. pdata),
+	  (genReceive): receive pdata correctly
+	* src/SDCCicode.c (isOperandInPagedSpace): added to detect pdata operands
+	* src/SDCCicode.h: added isOperandInPagedSpace prototype
+
 2005-10-27 Raphael Neider <rneider AT web.de>
 
 	* doc/sdccman.lyx: corrected version (should be 2.5.4 not 2.5.5)
@@ -11,7 +25,7 @@
 	    arithmetics support routines
 	* device/lib/pic/Makefile.rules: have assembler sources preprocessed
 	* device/lib/Makefile.in: also create installdir for pic
-	
+
 	* src/SDCCopt.c (cnvToFcall): mark support routines `extern' for
 	  pic14 port as well
 	* src/pic/device.c (dump_sfr): rewritten to delegate register

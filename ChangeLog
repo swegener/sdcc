@@ -1,5 +1,9 @@
 2005-10-27 Raphael Neider <rneider AT web.de>
 
+	* doc/sdccman.lyx: corrected version (should be 2.5.4 not 2.5.5)
+
+2005-10-27 Raphael Neider <rneider AT web.de>
+
 	* .version: changed version to 2.5.4
 	* doc/sdccman.lyx: changed version to 2.5.4, added some remarks to PIC14
 	* device/lib/pic/libsdcc/{_mulint.c,_mullong.c}: use unsigned literals,

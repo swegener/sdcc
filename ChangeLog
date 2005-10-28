@@ -1,3 +1,8 @@
+2005-10-28 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/p16f_common.inc: added common declarations
+	* src/pic/ralloc.c (initStack): moved regs *r to block start for Alpha
+
 2005-10-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (getTempRegs): return 0 if not enough registers found,

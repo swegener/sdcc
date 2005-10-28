@@ -484,7 +484,7 @@ void initStack(int base_address, int size)
 	
 	for(i = 0; i<size; i++) {
 		char buffer[16];
-        regs *r;
+		regs *r;
 		SNPRINTF(&buffer[0], 16, "STK%02d", i);
 		r = newReg(REG_STK, PO_GPR_TEMP,base_address,buffer,1,0);
 		r->address = base_address; // Pseudo stack needs a fixed location that can be known by all modules

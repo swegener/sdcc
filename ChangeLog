@@ -1,3 +1,8 @@
+2005-10-28 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCsymt.c (compStructSize): make bitfields without (un)signed
+	specifier unsigned
+
 2005-10-28 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/p16f_common.inc: added common declarations

@@ -2,6 +2,7 @@
 
 	* src/SDCCsymt.c (compStructSize): make bitfields without (un)signed
 	specifier unsigned
+	* device/lib/time.c (mktime): fixed bug 1334315
 
 2005-10-28 Raphael Neider <rneider AT web.de>
 

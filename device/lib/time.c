@@ -198,7 +198,7 @@ time_t mktime(struct tm *timeptr) {
     }
 
     seconds+= (timeptr->tm_mday-1)*60*60*24L;
-    seconds+= timeptr->tm_hour*60*60;
+    seconds+= timeptr->tm_hour*60*60L;
     seconds+= timeptr->tm_min*60;
     seconds+= timeptr->tm_sec;
     return seconds;

@@ -2198,7 +2198,7 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
   /* code generated for 1 byte * 1 byte literal = 2 bytes result is more
      efficient in most cases than 2 bytes result = 2 bytes << literal
      if port has 1 byte muldiv */
-  if (p2 && !IS_FLOAT (letype) && !IS_FIXED (letype)
+  if ((p2 > 0) && !IS_FLOAT (letype) && !IS_FIXED (letype)
       && !((resultType == RESULT_TYPE_INT) && (getSize (resType) != getSize (ltype))
            && (port->support.muldiv == 1))
       && strcmp (port->target, "pic16") != 0  /* don't shift for pic */
@@ -2249,8 +2249,8 @@ geniCodeDivision (operand * left, operand * right, RESULT_TYPE resultType)
       !IS_FLOAT (letype) &&
       !IS_FIXED (letype) &&
       IS_UNSIGNED(letype) &&
-      (p2 = powof2 ((TYPE_UDWORD)
-                    floatFromVal (right->operand.valOperand)))) {
+      ((p2 = powof2 ((TYPE_UDWORD)
+                    floatFromVal (right->operand.valOperand))) > 0)) {
     ic = newiCode (RIGHT_OP, left, operandFromLit (p2)); /* right shift */
   }
   else
@@ -2861,6 +2861,7 @@ geniCodeAddressOf (operand * op)
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);
 }
+
 /*-----------------------------------------------------------------*/
 /* setOClass - sets the output class depending on the pointer type */
 /*-----------------------------------------------------------------*/

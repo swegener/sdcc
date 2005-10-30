@@ -1,1 +1,1 @@
-MODELS		= small large
+MODELS		= small medium large

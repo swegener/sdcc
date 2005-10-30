@@ -1233,11 +1233,11 @@ compStructSize (int su, structdef * sdef)
 
             /* change it to a unsigned bit */
             SPEC_NOUN (loop->etype) = V_BITFIELD;
-	    if (TARGET_IS_PIC16 || TARGET_IS_PIC) {
+	        if (TARGET_IS_PIC16 || TARGET_IS_PIC) {
 	        /* PIC users requested signed bitfields as well */
             } else {
                 SPEC_USIGN (loop->etype) = 1;
-	    }
+	        }
             SPEC_BLEN (loop->etype) = loop->bitVar;
 
             if (loop->bitVar == BITVAR_PAD) {
@@ -2663,7 +2663,7 @@ processFuncArgs (symbol * func)
             SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) = bit;
           else
             SPEC_OCLS (val->etype) = SPEC_OCLS (val->sym->etype) =
-              (options.model != MODEL_SMALL ? xdata : data);
+              port->mem.default_local_map;
           
           #if 0
           /* ?? static functions shouldn't imply static parameters - EEP */
@@ -2673,6 +2673,8 @@ processFuncArgs (symbol * func)
           }
           #endif
         }
+      if (SPEC_OCLS (val->sym->etype) == pdata)
+        val->sym->iaccess = 1;
       if (!isinSet(operKeyReset, val->sym)) {
         addSet (&operKeyReset, val->sym);
         applyToSet (operKeyReset, resetParmKey);
@@ -3081,7 +3083,7 @@ powof2 (TYPE_UDWORD num)
     }
 
   if (n1s > 1 || nshifts == 0)
-    return 0;
+    return -1;
   return nshifts - 1;
 }
 

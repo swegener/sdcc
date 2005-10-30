@@ -87,6 +87,9 @@ test-gbz80:
 test-mcs51:
 	$(MAKE) test-port PORT=mcs51
 
+test-mcs51-medium:
+	$(MAKE) test-port PORT=mcs51-medium
+
 test-mcs51-large:
 	$(MAKE) test-port PORT=mcs51-large
 

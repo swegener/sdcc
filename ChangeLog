@@ -1,3 +1,31 @@
+2005-10-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/medium/Makefile: added for new memory model medium
+	* device/include/asm/mcs51/features.h: updated for medium/pdata
+	* device/include/mcs51/c8051f120.h: added sfr16/sfr32 definitions,
+	  added Multiply & Accumulate sbit's and MAC0_PAGE define
+	* device/include/mcs51/c8051f300.h: added sfr16 definitions
+	* device/include/mcs51/c8051f310.h: added sfr16 definitions
+	* device/lib/_mullong.c: update for medium model
+	* device/lib/incl.mk: added medium model
+	* src/SDCCast.c (isBitAndPow2): simplified using updated powof2
+	* src/SDCCicode.c (geniCodeMultiply, geniCodeDivision): use updated powof2
+	* src/SDCCmain.c (optionsTable, linkEdit): enabled medium model
+	* src/SDCCmem.c (allocIntoSeg): set iaccess for pdata symbols,
+	  (allocParms): set SCLS and OCLS to pdata for medium model
+	* src/SDCCsymt.c (processFuncArgs): use default_local_map and set iaccess
+	  for pdata,
+	  (powof2): return <0 if not power of 2
+	* src/avr/gen.c (genBitWise): use updated powof2
+	* src/mcs51/gen.c (genMinusDec): use acc if necessary,
+	  (shiftR2Left2Result): small optimization in setup, save acc when storing,
+	  (shiftLLeftOrResult): use B if necessary
+	* src/mcs51/main.c (_mcs51_finaliseOptions, mcs51_port): added medium model
+	* src/mcs51/peeph.def: renamed 226 to 226.b, added 226.a
+	* src/pic/main.c (_pic14_do_link): made void parameter list explicit
+	* support/regression/Makefile.in: added test-mcs51-medium
+	* support/regression/ports/mcs51-medium/spec.mk: added to test medium model
+
 2005-10-28 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCsymt.c (compStructSize): make bitfields without (un)signed

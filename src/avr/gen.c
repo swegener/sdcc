@@ -2679,7 +2679,7 @@ genBitWise (iCode * ic, iCode * ifx, int bitop)
 				(int) floatFromVal (AOP (right)->aopu.
 						    aop_lit);
 			int p2 = powof2 (lit);
-			if (bitop == AVR_AND && p2) {	/* right side is a power of 2 */
+			if (bitop == AVR_AND && (p2 >= 0)) {	/* right side is a power of 2 */
 				l = aopGet (AOP (left), p2 / 8);
 				if (IC_TRUE (ifx)) {
 					emitcode ("sbrc", "%s,%d", l,

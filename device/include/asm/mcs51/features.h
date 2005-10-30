@@ -24,6 +24,8 @@
   #endif
 #elif defined(SDCC_MODEL_SMALL)
   #define _AUTOMEM data
+#elif defined(SDCC_MODEL_MEDIUM)
+  #define _AUTOMEM pdata
 #else
   #define _AUTOMEM xdata
 #endif
@@ -39,6 +41,8 @@
 */
 #if defined(SDCC_MODEL_SMALL)
   #define _STATMEM data
+#elif defined(SDCC_MODEL_MEDIUM)
+  #define _STATMEM pdata
 #else
   #define _STATMEM xdata
 #endif

@@ -21,7 +21,7 @@ static char _defaultRules[] =
 	""
 };
 
-/* list of key words used by msc51 */
+/* list of key words used by pic14 */
 static char *_pic14_keywords[] =
 {
 	"at",
@@ -415,7 +415,7 @@ extern set *dataDirsSetSet;
 extern set *relFilesSet;
 extern set *linkOptionsSet;
 
-static void _pic14_do_link ()
+static void _pic14_do_link (void)
 {
   hTab *linkValues=NULL;
   char lfrm[256];

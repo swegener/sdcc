@@ -649,7 +649,7 @@ union bil {
 } ;
 #endif
 
-#if defined(SDCC_USE_XSTACK)
+#if defined(SDCC_USE_XSTACK) || defined(SDCC_MODEL_MEDIUM)
 #  define bcast(x) ((union bil pdata *)&(x))
 #elif (defined(SDCC_MODEL_LARGE) || defined (SDCC_ds390) || defined (SDCC_ds400)) && !defined(SDCC_STACK_AUTO)
 #  define bcast(x) ((union bil xdata *)&(x))
@@ -710,27 +710,22 @@ _mullong (long a, long b)
 {
         union bil t;
 
-        t.i.hi = bcast(a)->b.b0 * bcast(b)->b.b2;       // A
-        t.i.lo = bcast(a)->b.b0 * bcast(b)->b.b0;       // A
-        t.b.b3 += bcast(a)->b.b3 *
-                                  bcast(b)->b.b0;       // G
-        t.b.b3 += bcast(a)->b.b2 *
-                                  bcast(b)->b.b1;       // F
-        t.i.hi += bcast(a)->b.b2 * bcast(b)->b.b0;      // E <- b lost in .lst
+        t.i.hi = bcast(a)->b.b0 * bcast(b)->b.b2;           // A
+        t.i.lo = bcast(a)->b.b0 * bcast(b)->b.b0;           // A
+        t.b.b3 += bcast(a)->b.b3 * bcast(b)->b.b0;          // G
+        t.b.b3 += bcast(a)->b.b2 * bcast(b)->b.b1;          // F
+        t.i.hi += bcast(a)->b.b2 * bcast(b)->b.b0;          // E <- b lost in .lst
         // bcast(a)->i.hi is free !
-        t.i.hi += bcast(a)->b.b1 * bcast(b)->b.b1;      // D <- b lost in .lst
+        t.i.hi += bcast(a)->b.b1 * bcast(b)->b.b1;          // D <- b lost in .lst
 
-        bcast(a)->bi.b3 = bcast(a)->b.b1 *
-                                          bcast(b)->b.b2;
-        bcast(a)->bi.i12 = bcast(a)->b.b1 *
-                           bcast(b)->b.b0;              // C
+        bcast(a)->bi.b3 = bcast(a)->b.b1 * bcast(b)->b.b2;  // C
+        bcast(a)->bi.i12 = bcast(a)->b.b1 * bcast(b)->b.b0; // C
 
-        bcast(b)->bi.b3 = bcast(a)->b.b0 *
-                                          bcast(b)->b.b3;
-        bcast(b)->bi.i12 = bcast(a)->b.b0 *
-                           bcast(b)->b.b1;              // B
-        bcast(b)->bi.b0 = 0;                            // B
-        bcast(a)->bi.b0 = 0;                            // C
+        bcast(b)->bi.b3 = bcast(a)->b.b0 * bcast(b)->b.b3;  // B
+        bcast(b)->bi.i12 = bcast(a)->b.b0 * bcast(b)->b.b1; // B
+
+        bcast(b)->bi.b0 = 0;                                // B
+        bcast(a)->bi.b0 = 0;                                // C
         t.l += a;
 
         return t.l + b;

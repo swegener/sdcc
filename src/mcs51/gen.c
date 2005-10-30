@@ -4471,9 +4471,20 @@ genMinusDec (iCode * ic)
      same */
   if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))))
     {
+      char *l;
+
+      if (aopGetUsesAcc (IC_LEFT (ic), 0))
+        {
+          MOVA (aopGet (IC_RESULT (ic), 0, FALSE, FALSE));
+          l = "a";
+        }
+      else
+        {
+          l = aopGet (IC_RESULT (ic), 0, FALSE, FALSE);
+        }
 
       while (icount--)
-        emitcode ("dec", "%s", aopGet (IC_RESULT (ic), 0, FALSE, FALSE));
+        emitcode ("dec", "%s", l);
 
       if (AOP_NEEDSACC (IC_RESULT (ic)))
         aopPut (IC_RESULT (ic), "a", 0, isOperandVolatile (IC_RESULT (ic), FALSE));
@@ -8205,9 +8216,8 @@ shiftR2Left2Result (operand * left, int offl,
       movLeft2Result (left, offl, result, offr, 0);
       pushedB = pushB ();
       usedB = TRUE;
-      emitcode ("mov", "b,%s", aopGet (left, offl + MSB16, FALSE, FALSE));
-      MOVA (aopGet (result, offr, FALSE, FALSE));
-      emitcode ("xch", "a,b");
+      emitcode ("mov", "b,%s", aopGet (result, offr, FALSE, FALSE));
+      MOVA (aopGet (left, offl + MSB16, FALSE, FALSE));
       x = "b";
     }
   else
@@ -8223,7 +8233,9 @@ shiftR2Left2Result (operand * left, int offl,
     AccAXRsh (x, shCount);
   if (usedB)
     {
-      aopPut (result, "b", offr, isOperandVolatile (result, FALSE));
+      emitcode ("xch", "a,b");
+      aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+      emitcode ("xch", "a,b");
       popB (pushedB);
     }
   if (getDataSize (result) > 1)
@@ -8241,7 +8253,16 @@ shiftLLeftOrResult (operand * left, int offl,
   /* shift left accumulator */
   AccLsh (shCount);
   /* or with result */
-  emitcode ("orl", "a,%s", aopGet (result, offr, FALSE, FALSE));
+  if (aopGetUsesAcc (result, offr))
+    {
+      emitcode ("xch", "a,b");
+      MOVA (aopGet (result, offr, FALSE, FALSE));
+      emitcode ("orl", "a,b");
+    }
+  else
+    {
+      emitcode ("orl", "a,%s", aopGet (result, offr, FALSE, FALSE));
+    }
   /* back to result */
   aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
 }

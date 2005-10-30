@@ -2215,6 +2215,18 @@ replace {
 	clr	a
 	movx	@%1,a
 	inc	%1
+	clr	a
+} by {
+	clr	a
+	movx	@%1,a
+	inc	%1
+	;	Peephole 226.a	removed unnecessary clr
+}
+
+replace {
+	clr	a
+	movx	@%1,a
+	inc	%1
 	movx	@%1,a
 	inc	%1
 	clr	a
@@ -2224,7 +2236,7 @@ replace {
 	inc	%1
 	movx	@%1,a
 	inc	%1
-	;	Peephole 226	removed unnecessary clr
+	;	Peephole 226.b	removed unnecessary clr
 }
 
 replace {

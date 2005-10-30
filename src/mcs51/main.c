@@ -122,14 +122,27 @@ _mcs51_finaliseOptions (void)
     port->genXINIT=0;
   }
 
-  if (options.model == MODEL_LARGE) {
-      port->mem.default_local_map = xdata;
-      port->mem.default_globl_map = xdata;
-    }
-  else
+  switch (options.model)
     {
+    case MODEL_SMALL:
       port->mem.default_local_map = data;
       port->mem.default_globl_map = data;
+      port->s.gptr_size = 3;
+      break;
+    case MODEL_MEDIUM:
+      port->mem.default_local_map = pdata;
+      port->mem.default_globl_map = pdata;
+      port->s.gptr_size = 3;
+      break;
+    case MODEL_LARGE:
+      port->mem.default_local_map = xdata;
+      port->mem.default_globl_map = xdata;
+      port->s.gptr_size = 3;
+      break;
+    default:
+      port->mem.default_local_map = data;
+      port->mem.default_globl_map = data;
+      break;
     }
 
   if (options.parms_in_bank1) {
@@ -693,7 +706,7 @@ PORT mcs51_port =
   {
     glue,
     TRUE,                       /* Emit glue around main */
-    MODEL_SMALL | MODEL_LARGE,
+    MODEL_SMALL | MODEL_MEDIUM | MODEL_LARGE,
     MODEL_SMALL
   },
   {

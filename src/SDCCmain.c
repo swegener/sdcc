@@ -181,7 +181,7 @@ optionsTable[] = {
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
     { 'p',  NULL,                   NULL, "Select port specific processor e.g. -mpic14 -p16f84" },
     { 0,    OPTION_LARGE_MODEL,     NULL, "external data space is used" },
-    { 0,    OPTION_MEDIUM_MODEL,    NULL, "not supported" },
+    { 0,    OPTION_MEDIUM_MODEL,    NULL, "external paged data space is used" },
     { 0,    OPTION_SMALL_MODEL,     NULL, "internal data space is used (default)" },
 #if !OPT_DISABLE_DS390
     { 0,    OPTION_FLAT24_MODEL,    NULL, "use the flat24 model for the ds390 (default)" },
@@ -1580,6 +1580,9 @@ linkEdit (char **envp)
                 {
                 case MODEL_SMALL:
                   c = "small";
+                  break;
+                case MODEL_MEDIUM:
+                  c = "medium";
                   break;
                 case MODEL_LARGE:
                   c = "large";

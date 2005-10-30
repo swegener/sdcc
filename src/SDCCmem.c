@@ -296,6 +296,8 @@ allocIntoSeg (symbol * sym)
 {
   memmap *segment = SPEC_OCLS (sym->etype);
   addSet (&segment->syms, sym);
+  if (segment == pdata)
+    sym->iaccess = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -531,20 +533,27 @@ allocParms (value * val)
               continue;
             }
 
-            /* otherwise depending on the memory model
-               note here that we put it into the overlay segment
-               first, we will remove it from the overlay segment
-               after the overlay determination has been done */
+            /* otherwise depending on the memory model */
+            SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
+              port->mem.default_local_map;
             if (options.model == MODEL_SMALL)
               {
-                SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
-                  (options.noOverlay ? port->mem.default_local_map
-                   : overlay);
+                /* note here that we put it into the overlay segment
+                   first, we will remove it from the overlay segment
+                   after the overlay determination has been done */
+                if (!options.noOverlay)
+                  {
+                    SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
+                      overlay;
+                  }
+              }
+            else if (options.model == MODEL_MEDIUM)
+              {
+                SPEC_SCLS (lval->etype) = S_PDATA;
               }
             else
               {
                 SPEC_SCLS (lval->etype) = S_XDATA;
-                SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xdata;
               }
           allocIntoSeg (lval->sym);
         }

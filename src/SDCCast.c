@@ -2775,7 +2775,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*  bitwise or                */
       /*----------------------------*/
     case '|':
-      /* if the rewrite succeeds then don't go any furthur */
+      /* if the rewrite succeeds then don't go any further */
       {
         ast *wtree = optimizeRRCRLC (tree);
         if (wtree != tree)
@@ -4988,8 +4988,6 @@ isShiftRightLitVal_BitAndLitVal (ast * tree)
 static int
 isBitAndPow2 (ast * tree)
 {
-  int p2;
-
   /* if this is not a bit and */
   if (!IS_BITAND (tree))
     return -1;
@@ -4999,13 +4997,7 @@ isBitAndPow2 (ast * tree)
   if (!IS_AST_LIT_VALUE (tree->right))
     return -1;
 
-  if (AST_LIT_VALUE (tree->right) == 1)
-    return 0;
-  p2 = powof2 ((TYPE_UDWORD)AST_LIT_VALUE (tree->right));
-  if (!p2)
-    return -1;
-
-  return p2;
+  return powof2 ((TYPE_UDWORD)AST_LIT_VALUE (tree->right));
 }
 
 /*-----------------------------------------------------------------*/
@@ -6034,7 +6026,7 @@ void ast_print (ast * tree, FILE *outfile, int indent)
                 return;
                 /*------------------------------------------------------------------*/
                 /*----------------------------*/
-                /*    compliment              */
+                /*    complement              */
                 /*----------------------------*/
         case '~':
                 fprintf(outfile,"COMPL (%p) type (",tree);

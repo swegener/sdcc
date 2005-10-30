@@ -6056,6 +6056,33 @@ status Collapsed
 /
 \end_inset 
 
+-model-medium
+\begin_inset LatexCommand \index{-\/-model-medium}
+
+\end_inset 
+
+
+\series default 
+ Generate code for Medium model programs, see section Memory Models for
+ more details.
+ If this option is used all source files in the project have to be compiled
+ with this option.
+ It must also be used when invoking the linker.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
 -model-large
 \begin_inset LatexCommand \index{-\/-model-large}
 
@@ -8770,6 +8797,11 @@ Paged xdata access is just as straightforward as using the other addressing
 \end_inset 
 
 ).
+ This is the 
+\series bold 
+default
+\series default 
+ storage class for the Medium Memory model, e.g.:
 \layout Verse
 
 
@@ -14731,12 +14763,12 @@ MCS51 Memory Models
 
 \layout Subsubsection
 
-Small and Large
+Small, Medium and Large
 \layout Standard
 
-SDCC allows two memory models for MCS51 code, 
+SDCC allows three memory models for MCS51 code, 
 \shape slanted 
-small
+small, medium
 \shape default 
  and 
 \shape slanted 
@@ -14748,16 +14780,15 @@ large
 never
 \emph default 
  be combined together or the results would be unpredictable.
- The library routines supplied with the compiler are compiled as both small
- and large.
- The compiled library modules are contained in separate directories as small
- and large so that you can link to either set.
- 
+ The library routines supplied with the compiler are compiled as small,
+ medium and large.
+ The compiled library modules are contained in separate directories as small,
+ medium and large so that you can link to the appropriate set.
 \layout Standard
 
-When the large model is used all variables declared without a storage class
- will be allocated into the external ram, this includes all parameters and
- local variables (for non-reentrant
+When the medium or large model is used all variables declared without a
+ storage class will be allocated into the external ram, this includes all
+ parameters and local variables (for non-reentrant
 \begin_inset LatexCommand \index{reentrant}
 
 \end_inset 
@@ -15425,7 +15456,7 @@ The compiler creates the following #defines
 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="10" columns="2">
+<lyxtabular version="3" rows="11" columns="2">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
@@ -15615,6 +15646,43 @@ status Collapsed
 \end_inset 
 
 -model-small
+\emph default 
+ is used
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+SDCC_MODEL_MEDIUM
+\begin_inset LatexCommand \index{SDCC\_MODEL\_MEDIUM}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+when 
+\emph on 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-model-medium
 \emph default 
  is used
 \end_inset 
@@ -25728,7 +25796,7 @@ not
 \emph default 
  be recognized.
  They are standard C expressions, so I heartily recommend these be the only
- way to get the highest order bit, (it is portable).
+ way to get the higher order byte/word, (it is portable).
  Of course it will be recognized even if it is embedded in other expressions,
  e.g.:
 \layout Verse
@@ -26249,6 +26317,18 @@ struct s rets;
 return rets;/* is invalid in SDCC although allowed in ANSI */ 
 \newline 
 }
+\end_deeper 
+\layout Itemize
+
+initialization of structure arrays must be fully braced.
+\begin_deeper 
+\layout Verse
+
+
+\family typewriter 
+struct s { char x } a[] = {1, 2}; /* invalid in SDCC */
+\newline 
+struct s { char x } a[] = {{1}, {2}}; /* OK */
 \end_deeper 
 \layout Itemize
 

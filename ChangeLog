@@ -8,6 +8,7 @@
 	* device/include/mcs51/c8051f310.h: added sfr16 definitions
 	* device/lib/_mullong.c: update for medium model
 	* device/lib/incl.mk: added medium model
+	* doc/sdccman.lyx: documented medium model
 	* src/SDCCast.c (isBitAndPow2): simplified using updated powof2
 	* src/SDCCicode.c (geniCodeMultiply, geniCodeDivision): use updated powof2
 	* src/SDCCmain.c (optionsTable, linkEdit): enabled medium model

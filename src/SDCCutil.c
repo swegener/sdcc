@@ -138,7 +138,7 @@ getBinPath(const char *prel)
     return path;
   }
   /* not enough info in prel; do it with module name */
-  else if (0 != GetModuleFileName(NULL, path, sizeof path) != 0 &&
+  else if (0 != GetModuleFileName(NULL, path, sizeof path) &&
     NULL != (p = strrchr(path, DIR_SEPARATOR_CHAR))) {
     *p = '\0';
     return path;

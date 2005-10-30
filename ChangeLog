@@ -1,3 +1,7 @@
+2005-10-30 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCutil.c: corrected double comparison typo
+
 2005-10-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/medium/Makefile: added for new memory model medium

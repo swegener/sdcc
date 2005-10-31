@@ -1,3 +1,8 @@
+2005-10-31 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/generate-cases.py: escape backslashes in {testcase}:
+	  WIN32 backslash path delimiters should be escaped when used in C strings
+
 2005-10-30 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCutil.c: corrected double comparison typo

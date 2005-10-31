@@ -80,7 +80,7 @@ class InstanceGenerator:
         if len(keys) == 0:
             # End of the recursion.
             # Set the runtime substitutions.
-            trans['testcase'] = basepath
+            trans['testcase'] = re.sub(r'\\', r'\\\\', basepath)
             # Create the instance from the template
             T = TemplateDocument(self.tmpname)
             T.substitutions = trans

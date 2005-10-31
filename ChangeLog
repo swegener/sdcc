@@ -2,6 +2,8 @@
 
 	* support/regression/generate-cases.py: escape backslashes in {testcase}:
 	  WIN32 backslash path delimiters should be escaped when used in C strings
+	* support/regression/tests/bitfields.c: exclude failing assertions for
+	  __CYGWIN32__ and __MINGW32__ hosts
 
 2005-10-30 Borut Razem <borut.razem AT siol.net>
 

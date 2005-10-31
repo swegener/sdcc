@@ -1233,11 +1233,11 @@ compStructSize (int su, structdef * sdef)
 
             /* change it to a unsigned bit */
             SPEC_NOUN (loop->etype) = V_BITFIELD;
-	        if (TARGET_IS_PIC16 || TARGET_IS_PIC) {
-	        /* PIC users requested signed bitfields as well */
-            } else {
-                SPEC_USIGN (loop->etype) = 1;
-	        }
+            /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
+            /* a "plain" int bitfield is unsigned */
+            if (!loop->etype->select.s.b_signed)
+              SPEC_USIGN(loop->etype) = 1;
+
             SPEC_BLEN (loop->etype) = loop->bitVar;
 
             if (loop->bitVar == BITVAR_PAD) {

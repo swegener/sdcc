@@ -1,3 +1,8 @@
+2005-11-01 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/app.cc, sim/ucsim/cmd.src/cmdutil.cc, sim/ucsim/cmd.src/newcmd.cc:
+	  enabled sockets on WIN32
+
 2005-10-31 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/generate-cases.py: escape backslashes in {testcase}:

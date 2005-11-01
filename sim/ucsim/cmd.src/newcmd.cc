@@ -32,7 +32,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdarg.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#ifdef HAVE_SYS_SOCKET_H
+#ifdef _WIN32
+# include <winsock23.h>
+# define SOCKET_AVAIL
+#elif defined HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -42,7 +45,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #if FD_HEADER_OK
 # include HEADER_FD
 #endif
-#include <unistd.h>
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 #include "i_string.h"
 
 #include "cmdlexcl.h"

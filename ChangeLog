@@ -2,6 +2,7 @@
 
 	* sim/ucsim/app.cc, sim/ucsim/cmd.src/cmdutil.cc, sim/ucsim/cmd.src/newcmd.cc:
 	  enabled sockets on WIN32
+	* sim/ucsim/cmd.src/newcmd.cc: fixed bug with uninitialized varaibles
 
 2005-10-31 Borut Razem <borut.razem AT siol.net>
 

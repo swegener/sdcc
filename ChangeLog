@@ -1,6 +1,7 @@
 2005-11-02 Borut Razem <borut.razem AT siol.net>
 
-	* sim/ucsim/cmd.src/cmdutil.cc: corrected typo - #include <winsock2.h>
+	* sim/ucsim/cmd.src/cmdutil.cc, sim/ucsim/cmd.src/newcmd.cc:
+	  corrected typo - #include <winsock2.h>
 
 2005-11-02 Maarten Brock <sourceforge.brock AT dse.nl>
 

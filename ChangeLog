@@ -1,8 +1,13 @@
+2005-11-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/asm.c (printILine): always close tmpFile, thanks Beau E. Cox,
+	  (_asxxxx_mapping): added org directive for future enhancements
+
 2005-11-01 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/app.cc, sim/ucsim/cmd.src/cmdutil.cc, sim/ucsim/cmd.src/newcmd.cc:
 	  enabled sockets on WIN32
-	* sim/ucsim/cmd.src/newcmd.cc: fixed bug with uninitialized varaibles
+	* sim/ucsim/cmd.src/newcmd.cc: fixed bug with uninitialized variables
 
 2005-10-31 Borut Razem <borut.razem AT siol.net>
 

@@ -259,6 +259,7 @@ printILine (iCode *ic)
   static char verbalICode[1024];
   FILE *tmpFile;
   iCodeTable *icTab=getTableEntry(ic->op);
+  int ret;
 
   if (INLINEASM == ic->op)
     return "inline";
@@ -281,7 +282,8 @@ printILine (iCode *ic)
    * Actually the temporary file is only closed. It will be
    * removed by rm_tmpfiles().
    */
-  assert(!fclose(tmpFile));
+  ret = fclose(tmpFile);
+  assert(!ret);
   deleteSetItem(&tmpfileSet, tmpFile);
 
   /* kill the trailing NL */
@@ -388,6 +390,7 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   {"hihil","(%05d$ >> 16)"},
   {"hihihil","(%05d$ >> 24)"},
   {"equ","="},
+  {"org", ".org %04X"},
   {NULL, NULL}
 };
 

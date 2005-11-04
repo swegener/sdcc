@@ -94,7 +94,9 @@ COMMAND_DO_WORK_APP(cl_conf_objects_cmd)
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };*/
-  conf_objects_cmd_print_node(con, 0, /*application*/&error_class_base);
+  class cl_error *cl_error_base = new cl_error();
+  conf_objects_cmd_print_node(con, 0, /*application*/cl_error_base->get_class());
+  delete cl_error_base;
   return(DD_FALSE);
 }
 

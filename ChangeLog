@@ -1,3 +1,12 @@
+2005-11-04 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/cmd.src/error.cc, sim/ucsim/cmd.src/errorcl.h,
+	  sim/ucsim/sim.src/stack.cc, sim/ucsim/sim.src/stackcl.h,
+	  sim/ucsim/sim.src/uc.cc, sim/ucsim/sim.src/uccl.h,
+	  sim/ucsim/sim.src/mem.cc, sim/ucsim/sim.src/memcl.h,
+	  sim/ucsim/cmd.src/cmdconf.cc: dynamic construction of cl_error_class
+	  and derivates to resolve the initialization problem on OSX
+
 2005-11-02 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/cmdutil.cc, sim/ucsim/cmd.src/newcmd.cc:

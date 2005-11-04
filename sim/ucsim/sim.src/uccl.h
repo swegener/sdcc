@@ -245,11 +245,13 @@ public:
 
 #include "errorcl.h"
 
-ERROR_CLASS_DECL(unknown_code): public cl_error
+class cl_error_unknown_code: public cl_error
 {
- protected:
+private:
+  static class cl_error_class *error_unknown_code_class;
+protected:
   class cl_uc *uc;
- public:
+public:
   cl_error_unknown_code(class cl_uc *the_uc);
 
   virtual void print(class cl_commander *c);

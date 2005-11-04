@@ -1855,13 +1855,14 @@ cl_uc::check_events(void)
  *----------------------------------------------------------------------------
  */
 
-ERROR_CLASS_DEF_PARENT_ON(err_error, unknown_code, "unknown_code",
-			  error_class_base, ERROR_ON);
+class cl_error_class *cl_error_unknown_code::error_unknown_code_class;
 
 cl_error_unknown_code::cl_error_unknown_code(class cl_uc *the_uc)
 {
   uc= the_uc;
-  classification= &error_unknown_code_class;
+  if (NULL == error_unknown_code_class)
+    error_unknown_code_class= new cl_error_class(err_error, "unknown_code", classification, ERROR_OFF);
+  classification= error_unknown_code_class;
 }
 
 void

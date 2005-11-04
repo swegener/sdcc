@@ -44,17 +44,6 @@ enum error_on_off {
 
 const int err_stop= (err_unknown|err_error);
 
-#define ERROR_CLASS_DECL(NAME) \
-extern class cl_error_class error_##NAME##_class;\
-class cl_error_##NAME
-
-#define ERROR_CLASS_DEF_PARENT(TYPE,NAME,CLASS_NAME,PARENT) \
-class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME, &(PARENT))
-
-#define ERROR_CLASS_DEF_PARENT_ON(TYPE,NAME,CLASS_NAME,PARENT,ON) \
-class cl_error_class error_##NAME##_class(TYPE, CLASS_NAME, &(PARENT), ON)
-
-
 extern class cl_list *registered_errors;
 
 class cl_error_class: public cl_base
@@ -64,14 +53,11 @@ protected:
   //char *name;
   enum error_on_off on;
 public:
-  cl_error_class(enum error_type typ, char *aname);
   cl_error_class(enum error_type typ, char *aname,
-		 enum error_on_off be_on);
-  cl_error_class(enum error_type typ, char *aname,
-		 class cl_error_class *parent);
+		 enum error_on_off be_on= ERROR_PARENT);
   cl_error_class(enum error_type typ, char *aname,
 		 class cl_error_class *parent,
-		 enum error_on_off be_on);
+		 enum error_on_off be_on= ERROR_PARENT);
   
   enum error_on_off get_on(void) { return(on); }
   void set_on(enum error_on_off val);
@@ -81,13 +67,12 @@ public:
   //char *get_name(void);
 };
 
-extern class cl_error_class error_class_base;
-
-
 class cl_commander; //forward
 
 class cl_error: public cl_base
 {
+private:
+  static class cl_error_class *error_class_base;
 protected:
   class cl_error_class *classification;
 public:
@@ -97,7 +82,7 @@ public:
   cl_error(void);
   virtual ~cl_error(void);
   virtual int init(void);
- 
+
 public:
   virtual enum error_type get_type(void);
   virtual enum error_on_off get_on(void);

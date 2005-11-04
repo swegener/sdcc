@@ -1376,27 +1376,29 @@ cl_decoder_list::compare(void *key1, void *key2)
  */
 
 /* All of memory errors */
-ERROR_CLASS_DEF_PARENT_ON(err_error, mem, "memory",
-			  error_class_base, ERROR_ON);
+
+class cl_error_class *cl_error_mem::error_mem_class;
 
 cl_error_mem::cl_error_mem(class cl_memory *amem, t_addr aaddr)
 {
   mem= amem;
   addr= aaddr;
-  classification= &error_mem_class;
+  if (NULL == error_mem_class)
+    error_mem_class= new cl_error_class(err_error, "memory", classification, ERROR_OFF);
+  classification= error_mem_class;
 }
 
 /* Invalid address in memory access */
-ERROR_CLASS_DEF_PARENT(err_error,
-		       mem_invalid_address,
-		       "invalid_address",
-		       error_mem_class);
+
+class cl_error_class *cl_error_mem_invalid_address::error_mem_invalid_address_class;
 
 cl_error_mem_invalid_address::
 cl_error_mem_invalid_address(class cl_memory *amem, t_addr aaddr):
   cl_error_mem(amem, aaddr)
 {
-  classification= &error_mem_invalid_address_class;
+  if (NULL == error_mem_invalid_address_class)
+    error_mem_invalid_address_class= new cl_error_class(err_error, "invalid_address", classification);
+  classification= error_mem_invalid_address_class;
 }
 
 void
@@ -1409,16 +1411,16 @@ cl_error_mem_invalid_address::print(class cl_commander *c)
 }
 
 /* Non-decoded address space access */
-ERROR_CLASS_DEF_PARENT(err_error,
-		       mem_non_decoded,
-		       "non_decoded",
-		       error_mem_class);
+
+class cl_error_class *cl_error_mem_non_decoded::error_mem_non_decoded_class;
 
 cl_error_mem_non_decoded::
 cl_error_mem_non_decoded(class cl_memory *amem, t_addr aaddr):
   cl_error_mem(amem, aaddr)
 {
-  classification= &error_mem_non_decoded_class;
+  if (NULL == error_mem_non_decoded_class)
+    error_mem_non_decoded_class= new cl_error_class(err_error, "non_decoded", classification);
+  classification= error_mem_non_decoded_class;
 }
 
 void

@@ -45,26 +45,13 @@ struct id_element error_on_off_names[]= {
   { 0		, 0 }
 };
 
-class cl_error_class error_class_base(err_error, "non-classified", ERROR_ON);
-
 class cl_list *registered_errors= NIL;
 
 /*
  */
 
-cl_error_class::cl_error_class(enum error_type typ, char *aname):
-  cl_base()
-{
-  type= typ;
-  on= ERROR_PARENT;
-  set_name(aname, "not-known");
-  if (!registered_errors)
-    registered_errors= new cl_list(2, 2, "registered errors");
-  registered_errors->add(this);
-}
-
 cl_error_class::cl_error_class(enum error_type typ, char *aname,
-			       enum error_on_off be_on):
+			       enum error_on_off be_on/* = ERROR_PARENT*/):
   cl_base()
 {
   type= typ;
@@ -76,22 +63,8 @@ cl_error_class::cl_error_class(enum error_type typ, char *aname,
 }
 
 cl_error_class::cl_error_class(enum error_type typ, char *aname,
-			       class cl_error_class *parent):
-  cl_base()
-{
-  type= typ;
-  on= ERROR_PARENT;
-  set_name(aname, "not-known");
-  if (!registered_errors)
-    registered_errors= new cl_list(2, 2, "registered errors");
-  registered_errors->add(this);
-  if (parent)
-    parent->add_child(this);
-}
-
-cl_error_class::cl_error_class(enum error_type typ, char *aname,
 			       class cl_error_class *parent,
-			       enum error_on_off be_on):
+			       enum error_on_off be_on/* = ERROR_PARENT*/):
   cl_base()
 {
   type= typ;
@@ -157,11 +130,15 @@ cl_error_class::get_type_name()
 /*
  */
 
+class cl_error_class *cl_error::error_class_base;
+
 cl_error::cl_error(void):
   cl_base()
 {
+  if (NULL == error_class_base)
+    error_class_base = new cl_error_class(err_error, "non-classified", ERROR_ON);
   //type= err_unknown;
-  classification= 0;
+  classification= error_class_base;
 }
 
 cl_error::~cl_error(void)

@@ -48,6 +48,8 @@
 #include "hwcl.h"
 
 
+static class cl_mem_error_registry mem_error_registry;
+
 /*
  *                                                3rd version of memory system
  */
@@ -1378,28 +1380,20 @@ cl_decoder_list::compare(void *key1, void *key2)
 
 /* All of memory errors */
 
-class cl_error_class *cl_error_mem::error_mem_class;
-
 cl_error_mem::cl_error_mem(class cl_memory *amem, t_addr aaddr)
 {
   mem= amem;
   addr= aaddr;
-  if (NULL == error_mem_class)
-    error_mem_class= new cl_error_class(err_error, "memory", classification, ERROR_OFF);
-  classification= error_mem_class;
+  classification= mem_error_registry.find("memory");
 }
 
 /* Invalid address in memory access */
-
-class cl_error_class *cl_error_mem_invalid_address::error_mem_invalid_address_class;
 
 cl_error_mem_invalid_address::
 cl_error_mem_invalid_address(class cl_memory *amem, t_addr aaddr):
   cl_error_mem(amem, aaddr)
 {
-  if (NULL == error_mem_invalid_address_class)
-    error_mem_invalid_address_class= new cl_error_class(err_error, "invalid_address", classification);
-  classification= error_mem_invalid_address_class;
+  classification= mem_error_registry.find("invalid_address");
 }
 
 void
@@ -1413,15 +1407,11 @@ cl_error_mem_invalid_address::print(class cl_commander *c)
 
 /* Non-decoded address space access */
 
-class cl_error_class *cl_error_mem_non_decoded::error_mem_non_decoded_class;
-
 cl_error_mem_non_decoded::
 cl_error_mem_non_decoded(class cl_memory *amem, t_addr aaddr):
   cl_error_mem(amem, aaddr)
 {
-  if (NULL == error_mem_non_decoded_class)
-    error_mem_non_decoded_class= new cl_error_class(err_error, "non_decoded", classification);
-  classification= error_mem_non_decoded_class;
+  classification= mem_error_registry.find("non_decoded");
 }
 
 void
@@ -1431,6 +1421,14 @@ cl_error_mem_non_decoded::print(class cl_commander *c)
   cmd_fprintf(f, "%s: access of non-decoded address ", get_type_name());
   cmd_fprintf(f, mem->addr_format, addr);
   cmd_fprintf(f, " in memory %s.\n", mem->get_name());
+}
+
+cl_mem_error_registry::cl_mem_error_registry(void)
+{
+  class cl_error_class *prev = mem_error_registry.find("non-classified");
+  prev = register_error(new cl_error_class(err_error, "memory", prev, ERROR_OFF));
+  prev = register_error(new cl_error_class(err_error, "invalid_address", prev));
+  prev = register_error(new cl_error_class(err_error, "non_decoded", prev));
 }
 
 

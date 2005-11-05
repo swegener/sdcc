@@ -45,7 +45,9 @@ struct id_element error_on_off_names[]= {
   { 0		, 0 }
 };
 
-class cl_list *registered_errors= NIL;
+static class cl_error_registry error_registry;
+
+class cl_list *cl_error_registry::registered_errors= NIL;
 
 /*
  */
@@ -57,9 +59,6 @@ cl_error_class::cl_error_class(enum error_type typ, char *aname,
   type= typ;
   on= be_on;
   set_name(aname, "not-known");
-  if (!registered_errors)
-    registered_errors= new cl_list(2, 2, "registered errors");
-  registered_errors->add(this);
 }
 
 cl_error_class::cl_error_class(enum error_type typ, char *aname,
@@ -70,9 +69,6 @@ cl_error_class::cl_error_class(enum error_type typ, char *aname,
   type= typ;
   on= be_on;
   set_name(aname, "not-known");
-  if (!registered_errors)
-    registered_errors= new cl_list(2, 2, "registered errors");
-  registered_errors->add(this);
   if (parent)
     parent->add_child(this);
 }
@@ -130,15 +126,10 @@ cl_error_class::get_type_name()
 /*
  */
 
-class cl_error_class *cl_error::error_class_base;
-
 cl_error::cl_error(void):
   cl_base()
 {
-  if (NULL == error_class_base)
-    error_class_base = new cl_error_class(err_error, "non-classified", ERROR_ON);
-  //type= err_unknown;
-  classification= error_class_base;
+  classification= error_registry.find("non-classified");
 }
 
 cl_error::~cl_error(void)
@@ -186,6 +177,12 @@ cl_error::get_type_name()
 {
   enum error_type type= get_type();
   return(get_id_string(error_type_names, type, "untyped"));
+}
+
+cl_error_registry::cl_error_registry(void)
+{
+  if (NULL == error_registry.find("non-classified"))
+    register_error(new cl_error_class(err_error, "non-classified", ERROR_ON));
 }
 
 

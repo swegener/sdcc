@@ -247,8 +247,6 @@ public:
 
 class cl_error_unknown_code: public cl_error
 {
-private:
-  static class cl_error_class *error_unknown_code_class;
 protected:
   class cl_uc *uc;
 public:
@@ -257,7 +255,13 @@ public:
   virtual void print(class cl_commander *c);
 };
 
+class cl_uc_error_registry: public cl_error_registry
+{
+public:
+  cl_uc_error_registry(void);
+};
 
 #endif
+
 
 /* End of uccl.h */

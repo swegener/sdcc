@@ -30,6 +30,8 @@
 #ifndef ERRORCL_HEADER
 #define ERRORCL_HEADER
 
+#include <string.h>
+
 // prj
 #include "pobjcl.h"
 #include "stypes.h"
@@ -43,8 +45,6 @@ enum error_on_off {
 };
 
 const int err_stop= (err_unknown|err_error);
-
-extern class cl_list *registered_errors;
 
 class cl_error_class: public cl_base
 {
@@ -67,12 +67,42 @@ public:
   //char *get_name(void);
 };
 
+class cl_error_registry
+{
+public:
+  cl_error_registry(void);
+  class cl_error_class *find(char *type_name)
+  {
+    if (NIL == registered_errors)
+      return NIL;
+    return static_cast<class cl_error_class *>(registered_errors->first_that(compare, static_cast<void *>(type_name)));
+  }
+  static class cl_list *get_list(void)
+  {
+    return registered_errors;
+  }
+
+protected:
+  class cl_error_class *register_error(class cl_error_class *error_class)
+  {
+    if (!registered_errors)
+      registered_errors= new cl_list(2, 2, "registered errors");
+    registered_errors->add(error_class);
+    return error_class;
+  }
+
+private:
+  static class cl_list *registered_errors;
+  static int compare(void *obj1, void *obj2)
+  {
+    return (static_cast<class cl_base *>(obj1))->is_named(static_cast<char *>(obj2));
+  }
+};
+
 class cl_commander; //forward
 
 class cl_error: public cl_base
 {
-private:
-  static class cl_error_class *error_class_base;
 protected:
   class cl_error_class *classification;
 public:
@@ -93,7 +123,7 @@ public:
   virtual char *get_type_name();
 };
 
-
 #endif
+
 
 /* End of sim.src/errorcl.h */

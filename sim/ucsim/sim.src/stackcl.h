@@ -173,8 +173,6 @@ public:
 /*
  * All kind of stack errors
  */
-//extern class cl_error_class error_stack_class;
-//class cl_error_stack: public cl_error
 class cl_error_stack: public cl_error
 {
 private:
@@ -188,16 +186,12 @@ public:
  */
 class cl_error_stack_tracker: public cl_error_stack
 {
-private:
-  static class cl_error_class *error_stack_tracker_class;
 public:
   cl_error_stack_tracker(void);
 };
 
 class cl_error_stack_tracker_wrong_handle: public cl_error_stack_tracker
 {
-private:
-  static class cl_error_class *error_stack_tracker_wrong_handle_class;
 public:
   bool write_operation;
 public:
@@ -208,8 +202,6 @@ public:
 
 class cl_error_stack_tracker_empty: public cl_error_stack_tracker
 {
-private:
-  static class cl_error_class *error_stack_tracker_empty_class;
 protected:
   class cl_stack_op *operation;
 public:
@@ -221,8 +213,6 @@ public:
 
 class cl_error_stack_tracker_unmatch: public cl_error_stack_tracker
 {
-private:
-  static class cl_error_class *error_stack_tracker_unmatch_class;
 protected:
   class cl_stack_op *top, *operation;
 public:
@@ -235,8 +225,6 @@ public:
 
 class cl_error_stack_tracker_inconsistent: public cl_error_stack_tracker
 {
-private:
-  static class cl_error_class *error_stack_tracker_inconsistent_class;
 protected:
   class cl_stack_op *operation;
   int unread_data_size;
@@ -248,7 +236,13 @@ public:
   virtual void print(class cl_commander *c);
 };
 
+class cl_stack_error_registry: public cl_error_registry
+{
+public:
+  cl_stack_error_registry(void);
+};
 
 #endif
+
 
 /* End of sim.src/stackcl.h */

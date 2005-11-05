@@ -34,6 +34,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stackcl.h"
 
 
+static class cl_stack_error_registry stack_error_registry;
+
 cl_stack_op::cl_stack_op(enum stack_op op,
 			 t_addr iPC,
 			 t_addr iSP_before, t_addr iSP_after):
@@ -420,39 +422,25 @@ cl_stack_pop::match(class cl_stack_op *op)
  * Stack Errors
  */
 
-class cl_error_class *cl_error_stack::error_stack_class;
-
 cl_error_stack::cl_error_stack(void)
 {
-  if (NULL == error_stack_class)
-    error_stack_class= new cl_error_class(err_error, "stack", classification, ERROR_OFF);
-  classification= error_stack_class;
+  classification = stack_error_registry.find("stack");
 }
 
 /* Stack Tracker Errors */
 
-class cl_error_class *cl_error_stack_tracker::error_stack_tracker_class;
-
 cl_error_stack_tracker::cl_error_stack_tracker(void)
 {
-//  cl_error_class *error_stack_tracker_class = new cl_error_class(err_error, "stack_tracker", error_stack_class, ERROR_OFF);
-//  classification= &error_stack_tracker_class;
-  if (NULL == error_stack_tracker_class)
-    error_stack_tracker_class= new cl_error_class(err_error, "stack_tracker", classification);
-  classification= error_stack_tracker_class;
+  classification = stack_error_registry.find("stack_tracker");
 }
 
 /* Stack Tracker: wrong handle */
-
-class cl_error_class *cl_error_stack_tracker_wrong_handle::error_stack_tracker_wrong_handle_class;
 
 cl_error_stack_tracker_wrong_handle::cl_error_stack_tracker_wrong_handle(bool write_op):
   cl_error_stack_tracker()
 {
   write_operation= write_op;
-  if (NULL == error_stack_tracker_wrong_handle_class)
-    error_stack_tracker_wrong_handle_class= new cl_error_class(err_error, "stack_tracker_wrong_handle", classification);
-  classification= error_stack_tracker_wrong_handle_class;
+  classification = stack_error_registry.find("stack_tracker_wrong_handle");
 }
 
 void
@@ -464,16 +452,12 @@ cl_error_stack_tracker_wrong_handle::print(class cl_commander *c)
 
 /* Stack Tracker: operation on empty stack */
 
-class cl_error_class *cl_error_stack_tracker_empty::error_stack_tracker_empty_class;
-
 cl_error_stack_tracker_empty::
 cl_error_stack_tracker_empty(class cl_stack_op *op):
   cl_error_stack_tracker()
 {
   operation= op->mk_copy();
-  if (NULL == error_stack_tracker_empty_class)
-    error_stack_tracker_empty_class= new cl_error_class(err_error, "operation_on_empty_stack", classification);
-  classification= error_stack_tracker_empty_class;
+  classification = stack_error_registry.find("operation_on_empty_stack");
 }
 
 cl_error_stack_tracker_empty::~cl_error_stack_tracker_empty(void)
@@ -492,17 +476,13 @@ cl_error_stack_tracker_empty::print(class cl_commander *c)
 
 /* Stack Tracker: operation on empty stack */
 
-class cl_error_class *cl_error_stack_tracker_unmatch::error_stack_tracker_unmatch_class;
-
 cl_error_stack_tracker_unmatch::
 cl_error_stack_tracker_unmatch(class cl_stack_op *Top, class cl_stack_op *op):
   cl_error_stack_tracker()
 {
   top= Top->mk_copy();
   operation= op->mk_copy();
-  if (NULL == error_stack_tracker_unmatch_class)
-    error_stack_tracker_unmatch_class= new cl_error_class(err_warning, "stack_operation_unmatched_to_top_of_stack", classification);
-  classification= error_stack_tracker_unmatch_class;
+  classification = stack_error_registry.find("stack_operation_unmatched_to_top_of_stack");
 }
 
 cl_error_stack_tracker_unmatch::~cl_error_stack_tracker_unmatch(void)
@@ -523,17 +503,13 @@ cl_error_stack_tracker_unmatch::print(class cl_commander *c)
 
 /* Stack Tracker: stack is inconsistent */
 
-class cl_error_class *cl_error_stack_tracker_inconsistent::error_stack_tracker_inconsistent_class;
-
 cl_error_stack_tracker_inconsistent::
 cl_error_stack_tracker_inconsistent(class cl_stack_op *op,
                                    int the_unread_data_size)
 {
   operation= op->mk_copy();
   unread_data_size= the_unread_data_size;
-  if (NULL == error_stack_tracker_inconsistent_class)
-    error_stack_tracker_inconsistent_class= new cl_error_class(err_warning, "stack_looks_corrupted", classification);
-  classification= error_stack_tracker_inconsistent_class;
+  classification = stack_error_registry.find("stack_looks_corrupted");
 }
 
 cl_error_stack_tracker_inconsistent::~cl_error_stack_tracker_inconsistent(void)
@@ -547,6 +523,17 @@ cl_error_stack_tracker_inconsistent::print(class cl_commander *c)
   c->dd_printf("%s(0x%06"_A_"x): %d byte(s) unread from the stack\n",
 	       get_type_name(), operation->get_pc(),
 	       unread_data_size);
+}
+
+cl_stack_error_registry::cl_stack_error_registry(void)
+{
+  class cl_error_class *prev = stack_error_registry.find("non-classified");
+  prev = register_error(new cl_error_class(err_error, "stack", prev, ERROR_OFF));
+  prev = register_error(new cl_error_class(err_error, "stack_tracker", prev));
+  prev = register_error(new cl_error_class(err_error, "stack_tracker_wrong_handle", prev));
+  prev = register_error(new cl_error_class(err_error, "operation_on_empty_stack", prev));
+  prev = register_error(new cl_error_class(err_warning, "stack_operation_unmatched_to_top_of_stack", prev));
+  prev = register_error(new cl_error_class(err_warning, "stack_looks_corrupted", prev));
 }
 
 

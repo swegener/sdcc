@@ -259,6 +259,7 @@ COMMAND_DO_WORK_APP(cl_set_error_cmd)
   else
     con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
+  class cl_list *registered_errors = cl_error_registry::get_list();
   if (error_name &&
       value &&
       registered_errors)

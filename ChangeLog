@@ -1,3 +1,12 @@
+2005-11-06 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/error.cc, sim/ucsim/errorcl.h,
+	  sim/ucsim/sim.src/stack.cc, sim/ucsim/sim.src/stackcl.h,
+	  sim/ucsim/sim.src/uc.cc, sim/ucsim/sim.src/uccl.h,
+	  sim/ucsim/sim.src/mem.cc, sim/ucsim/sim.src/memcl.h,
+	  sim/ucsim/cmd.src/set.cc, sim/ucsim/cmd.src/show.cc:
+	  dynamic construction of cl_error_class and derivates - 2.nd try
+
 2005-11-05 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/sim.src/error.cc: fixed uninitialized class member variable

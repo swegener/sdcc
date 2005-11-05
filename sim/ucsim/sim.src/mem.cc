@@ -430,6 +430,7 @@ cl_memory_cell::cl_memory_cell(void):
   flags= CELL_NON_DECODED;
   width= 8;
   *data= 0;
+  operators= NULL;
 
 #ifdef STATISTIC
   nuof_writes= nuof_reads= 0;

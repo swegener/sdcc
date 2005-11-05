@@ -1,6 +1,11 @@
+2005-11-05 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/sim.src/error.cc: fixed uninitialized class member variable
+	  bug, which caused Bus Errors on sparc solaris
+
 2005-11-04 Borut Razem <borut.razem AT siol.net>
 
-	* sim/ucsim/cmd.src/error.cc, sim/ucsim/cmd.src/errorcl.h,
+	* sim/ucsim/error.cc, sim/ucsim/errorcl.h,
 	  sim/ucsim/sim.src/stack.cc, sim/ucsim/sim.src/stackcl.h,
 	  sim/ucsim/sim.src/uc.cc, sim/ucsim/sim.src/uccl.h,
 	  sim/ucsim/sim.src/mem.cc, sim/ucsim/sim.src/memcl.h,

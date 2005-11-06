@@ -2412,7 +2412,7 @@ static void
 saveRBank (int bank, iCode * ic, bool pushPsw)
 {
   int i;
-  int count = mcs51_nRegs + (pushPsw ? 1 : 0);
+  int count = 8 + ((mcs51_nRegs > 8) ? 1 : 0) + (pushPsw ? 1 : 0);
   asmop *aop = NULL;
   regs *r = NULL;
 
@@ -2435,7 +2435,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
       emitcode ("mov", "%s,a", spname);
     }
 
-  for (i = 0; i < mcs51_nRegs; i++)
+  for (i = 0; i < 8; i++)
     {
       if (options.useXstack)
         {
@@ -2448,6 +2448,22 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
       else
         emitcode ("push", "(%s+%d)",
                   regs8051[i].base, 8 * bank + regs8051[i].offset);
+    }
+
+  if (mcs51_nRegs > 8)
+    {
+      if (options.useXstack)
+        {
+          emitcode ("mov", "a,bits");
+          emitcode ("movx", "@%s,a", r->name);
+          if (--count)
+            emitcode ("inc", "%s", r->name);
+        }
+      else
+        {
+          emitcode ("push", "bits");
+        }
+      BitBankUsed = 1;
     }
 
   if (pushPsw)
@@ -2516,7 +2532,21 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
         }
     }
 
-  for (i = (mcs51_nRegs - 1); i >= 0; i--)
+  if (mcs51_nRegs > 8)
+    {
+      if (options.useXstack)
+        {
+          emitcode ("dec", "%s", r->name);
+          emitcode ("movx", "a,@%s", r->name);
+          emitcode ("mov", "bits,a");
+        }
+      else
+        {
+          emitcode ("pop", "bits");
+        }
+    }
+
+  for (i = 7; i >= 0; i--)
     {
       if (options.useXstack)
         {
@@ -8714,7 +8744,7 @@ static void
 shiftRLong (operand * left, int offl,
             operand * result, int sign)
 {
-  int isSameRegs=sameRegs(AOP(left),AOP(result));
+  int isSameRegs = sameRegs (AOP (left), AOP (result));
 
   if (isSameRegs && offl>1) {
     // we are in big trouble, but this shouldn't happen

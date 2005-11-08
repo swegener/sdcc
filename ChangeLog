@@ -1,5 +1,9 @@
 2005-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCval.c (valUnaryPM): fixed bug 1350699
+
+2005-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* support/regression/tests/bug1348008.c: added
 	* src/mcs51/gen.c (saveRBank, unsaveRBank): fixed bug 1348008
 	* support/regression/tests/bug1337835.c: updated comment

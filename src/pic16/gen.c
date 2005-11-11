@@ -59,6 +59,10 @@
  * more reliable and (sigh) slighly slower. */
 #define USE_SIMPLE_GENCMP 1
 
+/* The PIC port(s) do not need to distinguish between POINTER and FPOINTER. */
+#define PIC_IS_DATA_PTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
+#define PIC_IS_FARPTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
+
 extern void pic16_genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 extern void pic16_genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 void pic16_genMult8X8_8 (operand *, operand *,operand *);
@@ -10449,6 +10453,17 @@ void pic16_loadFSR0(operand *op, int lit)
 /*----------------------------------------------------------------*/
 static void pic16_derefPtr (operand *ptr, int p_type, int doWrite, int *fsr0_setup)
 {
+  if (!IS_PTR(operandType(ptr)))
+  {
+    if (doWrite) pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(ptr), 0));
+    else pic16_mov2w (AOP(ptr), 0);
+    return;
+  }
+
+  //assert (IS_DECL(operandType(ptr)) && (p_type == DCL_TYPE(operandType(ptr))));
+  /* We might determine pointer type right here: */
+  p_type = DCL_TYPE(operandType(ptr));
+
   switch (p_type) {
     case FPOINTER:
     case POINTER:
@@ -10500,107 +10515,105 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
   sym_link *etype, *letype;
   int blen=0, bstr=0;
   int lbstr;
+  int same;
+  pCodeOp *op;
 
-    DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-    etype = getSpec(operandType(result));
-    letype = getSpec(operandType(left));
-    
-//    if(IS_BITFIELD(etype)) {
-      blen = SPEC_BLEN(etype);
-      bstr = SPEC_BSTR(etype);
-//    }
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  etype = getSpec(operandType(result));
+  letype = getSpec(operandType(left));
 
-    lbstr = SPEC_BSTR( letype );
+  //    if(IS_BITFIELD(etype)) {
+  blen = SPEC_BLEN(etype);
+  bstr = SPEC_BSTR(etype);
+  //    }
 
-    DEBUGpic16_emitcode ("; ***","%s  %d - reading %s bitfield int %s destination",__FUNCTION__,__LINE__,
-    	SPEC_USIGN(OP_SYM_ETYPE(left)) ? "an unsigned" : "a signed", SPEC_USIGN(OP_SYM_TYPE(result)) ? "an unsigned" : "a signed");
-    
+  lbstr = SPEC_BSTR( letype );
+
+  DEBUGpic16_emitcode ("; ***","%s  %d - reading %s bitfield int %s destination",__FUNCTION__,__LINE__,
+      SPEC_USIGN(OP_SYM_ETYPE(left)) ? "an unsigned" : "a signed", SPEC_USIGN(OP_SYM_TYPE(result)) ? "an unsigned" : "a signed");
+
 #if 1
-    if((blen == 1) && (bstr < 8)) {
-      /* it is a single bit, so use the appropriate bit instructions */
-      DEBUGpic16_emitcode (";","%s %d optimize bit read",__FUNCTION__,__LINE__);
+  if((blen == 1) && (bstr < 8)
+      && (!IS_PTR(operandType(left)) || PIC_IS_DATA_PTR(operandType(left)))) {
+    /* it is a single bit, so use the appropriate bit instructions */
+    DEBUGpic16_emitcode (";","%s %d optimize bit read",__FUNCTION__,__LINE__);
 
-      pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-      
-      // distinguish (p->bitfield) and p.bitfield, remat seems to work...
-      if(!IS_PTR(operandType(left))/* && OP_SYMBOL(left)->remat && (ptype == POINTER)*/) {
-        /* workaround to reduce the extra lfsr instruction */
-        pic16_emitpcode(POC_BTFSC,
-              pic16_popCopyGPR2Bit(pic16_popGet(AOP(left), 0), bstr));
-      } else {
-        /* this code does only handle __data pointers correctly */
-        assert (IS_DATA_PTR(operandType(left)));
-	pic16_loadFSR0 (left, 0);
-        pic16_emitpcode(POC_BTFSC,
-              pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
-      }
+    same = pic16_sameRegs(AOP(left),AOP(result));
+    op = (same ? pic16_popCopyReg(&pic16_pc_wreg) : pic16_popGet (AOP(result),0));
+    pic16_emitpcode(POC_CLRF, op);
 
-      if (SPEC_USIGN(OP_SYM_ETYPE(left))) {
-        /* unsigned bitfields result in either 0 or 1 */
-        pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_wreg));
-      } else {
-        /* signed bitfields result in either 0 or -1 */
-        pic16_emitpcode(POC_DECF, pic16_popCopyReg(&pic16_pc_wreg));
-      }
-      pic16_emitpcode(POC_MOVWF, pic16_popGet( AOP(result), 0 ));
-      
-      pic16_addSign (result, 1, !SPEC_USIGN(OP_SYM_TYPE(result)));
-      return;
+    if(!IS_PTR(operandType(left))) {
+      /* workaround to reduce the extra lfsr instruction */
+      pic16_emitpcode(POC_BTFSC,
+	  pic16_popCopyGPR2Bit(pic16_popGet(AOP(left), 0), bstr));
+    } else {
+      assert (PIC_IS_DATA_PTR (operandType(left)));
+      pic16_loadFSR0 (left, 0);
+      pic16_emitpcode(POC_BTFSC,
+	  pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
     }
+
+    if (SPEC_USIGN(OP_SYM_ETYPE(left))) {
+      /* unsigned bitfields result in either 0 or 1 */
+      pic16_emitpcode(POC_INCF, op);
+    } else {
+      /* signed bitfields result in either 0 or -1 */
+      pic16_emitpcode(POC_DECF, op);
+    }
+    if (same) {
+      pic16_emitpcode(POC_MOVWF, pic16_popGet( AOP(result), 0 ));
+    }
+
+    pic16_addSign (result, 1, !SPEC_USIGN(OP_SYM_TYPE(result)));
+    return;
+  }
 
 #endif
 
-        /* the following call to pic16_loadFSR0 is temporary until
-         * optimization to handle single bit assignments is added
-         * to the function. Until then use the old safe way! -- VR */
+  if (!IS_PTR(operandType(left)) /*OP_SYMBOL(left)->remat*/) {
+    // access symbol directly
+    pic16_mov2w (AOP(left), 0);
+  } else {
+    pic16_derefPtr (left, ptype, 0, NULL);
+  }
 
-    if (!IS_PTR(operandType(left)) /*OP_SYMBOL(left)->remat*/) {
-	// access symbol directly
-	pic16_mov2w (AOP(left), 0);
-    } else {
-      pic16_derefPtr (left, ptype, 0, NULL);
+  /* if we have bitdisplacement then it fits   */
+  /* into this byte completely or if length is */
+  /* less than a byte                          */
+  if ((shCnt = SPEC_BSTR(etype)) || (SPEC_BLEN(etype) <= 8))  {
+
+    /* shift right acc */
+    AccRsh(shCnt, 0);
+
+    pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
+	  (((unsigned char) -1)>>(8 - SPEC_BLEN(etype))) & SRMask[ shCnt ]));
+
+    /* VR -- normally I would use the following, but since we use the hack,
+     * to avoid the masking from AccRsh, why not mask it right now? */
+
+    /*
+       pic16_emitpcode(POC_ANDLW, pic16_popGetLit(((unsigned char) -1)>>(8 - SPEC_BLEN(etype))));
+     */
+
+    /* extend signed bitfields to 8 bits */
+    if (!SPEC_USIGN(OP_SYM_ETYPE(left)) && (bstr + blen < 8))
+    {
+      assert (blen + bstr > 0);
+      pic16_emitpcode(POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr + blen - 1));
+      pic16_emitpcode(POC_IORLW, pic16_popGetLit(0xFF << (bstr + blen)));
     }
 
-	/* if we have bitdisplacement then it fits   */
-	/* into this byte completely or if length is */
-	/* less than a byte                          */
-	if ((shCnt = SPEC_BSTR(etype)) || 
-		(SPEC_BLEN(etype) <= 8))  {
+    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
 
-		/* shift right acc */
-		AccRsh(shCnt, 0);
-
-		pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
-			(((unsigned char) -1)>>(8 - SPEC_BLEN(etype))) & SRMask[ shCnt ]));
-
-/* VR -- normally I would use the following, but since we use the hack,
- * to avoid the masking from AccRsh, why not mask it right now? */
-
-/*
-		pic16_emitpcode(POC_ANDLW, pic16_popGetLit(((unsigned char) -1)>>(8 - SPEC_BLEN(etype))));
-*/
-
-		/* extend signed bitfields to 8 bits */
-		if (!SPEC_USIGN(OP_SYM_ETYPE(left)) && (bstr + blen < 8))
-		{
-			assert (blen + bstr > 0);
-			pic16_emitpcode(POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr + blen - 1));
-			pic16_emitpcode(POC_IORLW, pic16_popGetLit(0xFF << (bstr + blen)));
-		}
-
-		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
-
-		pic16_addSign (result, 1, !SPEC_USIGN(OP_SYM_TYPE(result)));
-	  return ;
-	}
-
-
-
-	fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
-	fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
-	exit(-1);
-
+    pic16_addSign (result, 1, !SPEC_USIGN(OP_SYM_TYPE(result)));
     return ;
+  }
+
+  fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
+  fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
+  exit(-1);
+
+  return ;
 }
 
 
@@ -11299,222 +11312,227 @@ static void genPackBits (sym_link    *etype , operand *result,
   int blen, bstr ;   
   sym_link *retype;
 
-	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	blen = SPEC_BLEN(etype);
-	bstr = SPEC_BSTR(etype);
+  DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
+  blen = SPEC_BLEN(etype);
+  bstr = SPEC_BSTR(etype);
 
-	retype = getSpec(operandType(right));
+  retype = getSpec(operandType(right));
 
-	if(AOP_TYPE(right) == AOP_LIT) {
-		if((blen == 1) && (bstr < 8)) {
-		  unsigned long lit;
-			/* it is a single bit, so use the appropriate bit instructions */
+  if(AOP_TYPE(right) == AOP_LIT) {
+    if((blen == 1) && (bstr < 8)) {
+      unsigned long lit;
+      /* it is a single bit, so use the appropriate bit instructions */
 
-			DEBUGpic16_emitcode (";","%s %d optimize bit assignment",__FUNCTION__,__LINE__);
+      DEBUGpic16_emitcode (";","%s %d optimize bit assignment",__FUNCTION__,__LINE__);
 
-			lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-//			pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
-			if(OP_SYMBOL(result)->remat && (p_type == POINTER) && (result)) {
-				/* workaround to reduce the extra lfsr instruction */
-				if(lit) {
-					pic16_emitpcode(POC_BSF,
-						pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), 0), bstr));
-				} else {
-					pic16_emitpcode(POC_BCF,
-						pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), 0), bstr));
-				}
-			} else {
-                                pic16_loadFSR0(result, 0);
-				if(lit) {
-					pic16_emitpcode(POC_BSF,
-						pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
-				} else {
-					pic16_emitpcode(POC_BCF,
-						pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
-				}
-			}
-	
-		  return;
-		}
-                /* move literal to W */
-		pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right), 0));
-		offset++;
-	} else
-	if(IS_BITFIELD(retype) 
-	  && (AOP_TYPE(right) == AOP_REG || AOP_TYPE(right) == AOP_DIR)
-	  && (blen == 1)) {
-	  int rblen, rbstr;
+      lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+      //			pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
+      if(!IS_PTR(operandType(result))) {
+	/* workaround to reduce the extra lfsr instruction */
+	if(lit) {
+	  pic16_emitpcode(POC_BSF,
+	      pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), 0), bstr));
+	} else {
+	  pic16_emitpcode(POC_BCF,
+	      pic16_popCopyGPR2Bit(pic16_popGet(AOP(result), 0), bstr));
+	}
+      } else {
+	if (PIC_IS_DATA_PTR(operandType(result))) {
+	  pic16_loadFSR0(result, 0);
+	  pic16_emitpcode(lit ? POC_BSF : POC_BCF,
+	      pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_indf0), bstr));
+	} else {
+	  /* get old value */
+	  pic16_derefPtr (result, p_type, 0, NULL);
+	  pic16_emitpcode(lit ? POC_BSF : POC_BCF,
+	      pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr));
+	  /* write back new value */
+	  pic16_derefPtr (result, p_type, 1, NULL);
+	}
+      }
 
-	    rblen = SPEC_BLEN( retype );
-	    rbstr = SPEC_BSTR( retype );
-	    
+      return;
+    }
+    /* move literal to W */
+    pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right), 0));
+    offset++;
+  } else
+    if(IS_BITFIELD(retype) 
+	&& (AOP_TYPE(right) == AOP_REG || AOP_TYPE(right) == AOP_DIR)
+	&& (blen == 1)) {
+      int rblen, rbstr;
 
-            if(IS_BITFIELD(etype)) {
-              pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(result), 0));
-              pic16_emitpcode(POC_BCF, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr));
-            } else {
-              pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
-            }
-            
-	    pic16_emitpcode(POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popGet(AOP(right), 0), rbstr));
-	    
-	    if(IS_BITFIELD(etype)) {
-	      pic16_emitpcode(POC_BSF, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr));
-            } else {
-              pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_wreg));
-            }
+      rblen = SPEC_BLEN( retype );
+      rbstr = SPEC_BSTR( retype );
 
-            pic16_emitpcode(POC_MOVWF, pic16_popGet( AOP(result), 0));
-            
-            return;
-        } else {
-          /* move right to W */
-          pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right), offset++));
-        }
 
-	/* if the bit length is less than or   */
-	/* it exactly fits a byte then         */
-	if((shCnt=SPEC_BSTR(etype))
-		|| SPEC_BLEN(etype) <= 8 )  {
-		int fsr0_setup = 0;
+      if(IS_BITFIELD(etype)) {
+	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(result), 0));
+	pic16_emitpcode(POC_BCF, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr));
+      } else {
+	pic16_emitpcode(POC_CLRF, pic16_popCopyReg(&pic16_pc_wreg));
+      }
 
-		if (blen != 8 || bstr != 0) {
-		  // we need to combine the value with the old value
-		  pic16_emitpcode(POC_ANDLW, pic16_popGetLit((1U << blen)-1));
+      pic16_emitpcode(POC_BTFSC, pic16_popCopyGPR2Bit(pic16_popGet(AOP(right), 0), rbstr));
 
-	  DEBUGpic16_emitcode(";", "shCnt = %d SPEC_BSTR(etype) = %d:%d", shCnt,
-	        SPEC_BSTR(etype), SPEC_BLEN(etype));
-	        
-		  /* shift left acc */
-		  AccLsh(shCnt);
+      if(IS_BITFIELD(etype)) {
+	pic16_emitpcode(POC_BSF, pic16_popCopyGPR2Bit(pic16_popCopyReg(&pic16_pc_wreg), bstr));
+      } else {
+	pic16_emitpcode(POC_INCF, pic16_popCopyReg(&pic16_pc_wreg));
+      }
 
-		  /* using PRODH as a temporary register here */
-		  pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodh));
+      pic16_emitpcode(POC_MOVWF, pic16_popGet( AOP(result), 0));
 
-		  if (IS_SYMOP(result) && !IS_PTR(operandType (result))/*OP_SYMBOL(result)->remat*/) {
-		    /* access symbol directly */
-		    pic16_mov2w (AOP(result), 0);
-		  } else {
-		    /* get old value */
-		    pic16_derefPtr (result, p_type, 0, &fsr0_setup);
-		  }
+      return;
+    } else {
+      /* move right to W */
+      pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(right), offset++));
+    }
+
+  /* if the bit length is less than or   */
+  /* it exactly fits a byte then         */
+  if((shCnt=SPEC_BSTR(etype))
+      || SPEC_BLEN(etype) <= 8 )  {
+    int fsr0_setup = 0;
+
+    if (blen != 8 || bstr != 0) {
+      // we need to combine the value with the old value
+      pic16_emitpcode(POC_ANDLW, pic16_popGetLit((1U << blen)-1));
+
+      DEBUGpic16_emitcode(";", "shCnt = %d SPEC_BSTR(etype) = %d:%d", shCnt,
+	  SPEC_BSTR(etype), SPEC_BLEN(etype));
+
+      /* shift left acc */
+      AccLsh(shCnt);
+
+      /* using PRODH as a temporary register here */
+      pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodh));
+
+      if (IS_SYMOP(result) && !IS_PTR(operandType (result))/*OP_SYMBOL(result)->remat*/) {
+	/* access symbol directly */
+	pic16_mov2w (AOP(result), 0);
+      } else {
+	/* get old value */
+	pic16_derefPtr (result, p_type, 0, &fsr0_setup);
+      }
 #if 1
-		  pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
-			(unsigned char)((unsigned char)(0xff << (blen+bstr)) |
-					(unsigned char)(0xff >> (8-bstr))) ));
-		  pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodh));
-		} // if (blen != 8 || bstr != 0)
+      pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
+	    (unsigned char)((unsigned char)(0xff << (blen+bstr)) |
+			    (unsigned char)(0xff >> (8-bstr))) ));
+      pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodh));
+    } // if (blen != 8 || bstr != 0)
 
-		/* write new value back */
-	        if (IS_SYMOP(result) & !IS_PTR(operandType(result))) {
-		  pic16_emitpcode (POC_MOVWF, pic16_popGet(AOP(result),0));
-	        } else {
-		  pic16_derefPtr (result, p_type, 1, &fsr0_setup);
-	       }
+    /* write new value back */
+    if (IS_SYMOP(result) & !IS_PTR(operandType(result))) {
+      pic16_emitpcode (POC_MOVWF, pic16_popGet(AOP(result),0));
+    } else {
+      pic16_derefPtr (result, p_type, 1, &fsr0_setup);
+    }
 #endif
 
-	  return;
-	}
+    return;
+  }
 
 
 #if 0
-	fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
-	fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
-	exit(-1);
+  fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
+  fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
+  exit(-1);
 #endif
 
 
-    pic16_loadFSR0(result, 0);			// load FSR0 with address of result
-    rLen = SPEC_BLEN(etype)-8;
-    
-    /* now generate for lengths greater than one byte */
-    while (1) {
-        rLen -= 8 ;
-        if (rLen <= 0 ) {
-          mov2fp(pic16_popCopyReg(&pic16_pc_prodh), AOP(right), offset);
-          break ;
-        }
+  pic16_loadFSR0(result, 0);			// load FSR0 with address of result
+  rLen = SPEC_BLEN(etype)-8;
 
-        switch (p_type) {
-            case POINTER:
-                  pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postinc0));
-                break;
-
-/*
-            case FPOINTER:
-                MOVA(l);
-                pic16_emitcode("movx","@dptr,a");
-                break;
-
-            case GPOINTER:
-                MOVA(l);
-                DEBUGpic16_emitcode(";lcall","__gptrput");
-                break;  
-*/
-          default:
-            assert(0);
-        }   
-
-
-        pic16_mov2w(AOP(right), offset++);
+  /* now generate for lengths greater than one byte */
+  while (1) {
+    rLen -= 8 ;
+    if (rLen <= 0 ) {
+      mov2fp(pic16_popCopyReg(&pic16_pc_prodh), AOP(right), offset);
+      break ;
     }
-
-    /* last last was not complete */
-    if (rLen)   {
-        /* save the byte & read byte */
-        switch (p_type) {
-            case POINTER:
-//                pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodl));
-                pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
-                break;
-
-/*
-            case FPOINTER:
-                pic16_emitcode ("mov","b,a");
-                pic16_emitcode("movx","a,@dptr");
-                break;
-
-            case GPOINTER:
-                pic16_emitcode ("push","b");
-                pic16_emitcode ("push","acc");
-                pic16_emitcode ("lcall","__gptrget");
-                pic16_emitcode ("pop","b");
-                break;
-*/
-            default:
-              assert(0);
-        }
-        DEBUGpic16_emitcode(";", "rLen = %i", rLen);
-        pic16_emitpcode(POC_ANDLW, pic16_popGetLit((unsigned char)-1 << -rLen));
-        pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodh));
-//        pic16_emitcode ("anl","a,#0x%02x",((unsigned char)-1 << -rLen) );
-//        pic16_emitcode ("orl","a,b");
-    }
-
-//    if (p_type == GPOINTER)
-//        pic16_emitcode("pop","b");
 
     switch (p_type) {
-
       case POINTER:
-        pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_indf0));
-//	pic16_emitcode("mov","@%s,a",rname);
+	pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_postinc0));
 	break;
-/*
-      case FPOINTER:
-	pic16_emitcode("movx","@dptr,a");
-	break;
-	
-      case GPOINTER:
-	DEBUGpic16_emitcode(";lcall","__gptrput");
-	break;   		
-*/
+
+	/*
+	   case FPOINTER:
+	   MOVA(l);
+	   pic16_emitcode("movx","@dptr,a");
+	   break;
+
+	   case GPOINTER:
+	   MOVA(l);
+	   DEBUGpic16_emitcode(";lcall","__gptrput");
+	   break;  
+	 */
       default:
-        assert(0);
+	assert(0);
+    }   
+
+
+    pic16_mov2w(AOP(right), offset++);
+  }
+
+  /* last last was not complete */
+  if (rLen)   {
+    /* save the byte & read byte */
+    switch (p_type) {
+      case POINTER:
+	//                pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodl));
+	pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
+	break;
+
+	/*
+	   case FPOINTER:
+	   pic16_emitcode ("mov","b,a");
+	   pic16_emitcode("movx","a,@dptr");
+	   break;
+
+	   case GPOINTER:
+	   pic16_emitcode ("push","b");
+	   pic16_emitcode ("push","acc");
+	   pic16_emitcode ("lcall","__gptrget");
+	   pic16_emitcode ("pop","b");
+	   break;
+	 */
+      default:
+	assert(0);
     }
-    
-//    pic16_freeAsmop(right, NULL, ic, TRUE);
+    DEBUGpic16_emitcode(";", "rLen = %i", rLen);
+    pic16_emitpcode(POC_ANDLW, pic16_popGetLit((unsigned char)-1 << -rLen));
+    pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodh));
+    //        pic16_emitcode ("anl","a,#0x%02x",((unsigned char)-1 << -rLen) );
+    //        pic16_emitcode ("orl","a,b");
+  }
+
+  //    if (p_type == GPOINTER)
+  //        pic16_emitcode("pop","b");
+
+  switch (p_type) {
+
+    case POINTER:
+      pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_indf0));
+      //	pic16_emitcode("mov","@%s,a",rname);
+      break;
+      /*
+	 case FPOINTER:
+	 pic16_emitcode("movx","@dptr,a");
+	 break;
+
+	 case GPOINTER:
+	 DEBUGpic16_emitcode(";lcall","__gptrput");
+	 break;   		
+       */
+    default:
+      assert(0);
+  }
+
+  //    pic16_freeAsmop(right, NULL, ic, TRUE);
 }
+
 /*-----------------------------------------------------------------*/
 /* genDataPointerSet - remat pointer to data space                 */
 /*-----------------------------------------------------------------*/

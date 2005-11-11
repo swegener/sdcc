@@ -48,6 +48,10 @@
 #define GPTRTAG_DATA	0x00
 #define GPTRTAG_CODE	0x80
 
+/* The PIC port(s) need not differentiate between POINTER and FPOINTER. */
+#define PIC_IS_DATA_PTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
+#define PIC_IS_FARPTR(x)	(PIC_IS_DATA_PTR(x))
+
 extern void genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 extern void genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 void genMult8X8_8 (operand *, operand *,operand *);
@@ -8450,6 +8454,7 @@ emitPtrByteGet (operand *src, int p_type, bool alreadyAddressed)
     switch (p_type)
     {
     case POINTER:
+    case FPOINTER:
       if (!alreadyAddressed) setup_fsr (src);
       emitpcode(POC_MOVFW, popCopyReg (&pc_fsr));
       break;
@@ -8491,6 +8496,7 @@ emitPtrByteSet (operand *dst, int p_type, bool alreadyAddressed)
     switch (p_type)
     {
     case POINTER:
+    case FPOINTER:
       if (!alreadyAddressed) setup_fsr (dst);
       emitpcode(POC_MOVWF, popCopyReg (&pc_fsr));
       break;
@@ -8559,6 +8565,7 @@ static void genUnpackBits (operand *result, operand *left, int ptype, iCode *ifx
         break;
 	
       case POINTER:
+      case FPOINTER:
       case GPOINTER:
       case CPOINTER:
         emitPtrByteGet (left, ptype, FALSE);
@@ -8596,6 +8603,7 @@ static void genUnpackBits (operand *result, operand *left, int ptype, iCode *ifx
       break;
       
     case POINTER:
+    case FPOINTER:
     case GPOINTER:
     case CPOINTER:
       emitPtrByteGet (left, ptype, FALSE);
@@ -8692,7 +8700,7 @@ static void genNearPointerGet (operand *left,
 	lower 128 bytes of space */
 	if (AOP_TYPE(left) == AOP_PCODE &&  //AOP_TYPE(left) == AOP_IMMD &&
 		!IS_BITVAR(retype)         &&
-		DCL_TYPE(ltype) == POINTER) {
+		PIC_IS_DATA_PTR(ltype)) {
 		genDataPointerGet (left,result,ic);
 		return ;
 	}
@@ -9126,6 +9134,7 @@ static void genPointerGet (iCode *ic)
 	switch (p_type) {
 		
 	case POINTER: 
+	case FPOINTER:
 	//case IPOINTER:
 		genNearPointerGet (left,result,ic);
 		break;
@@ -9192,6 +9201,7 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,int p_typ
 	  break;
 	
 	case POINTER:
+	case FPOINTER:
 	  setup_fsr (result);
 	  emitpcode(lit?POC_BSF:POC_BCF,newpCodeOpBit(PCOP(&pc_indf)->name,bstr,0));
 	  break;
@@ -9231,6 +9241,7 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,int p_typ
 	  break;
 	
 	case POINTER:
+	case FPOINTER:
 	case GPOINTER:
 	  emitPtrByteGet(result, p_type, FALSE);
 	  if ((litval|mask) != 0x00ff)
@@ -9267,6 +9278,7 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,int p_typ
 	  break;
 	
 	case POINTER:
+	case FPOINTER:
 	case GPOINTER:
 	  emitPtrByteGet (result, p_type, FALSE);
 	  emitpcode(POC_BTFSS, newpCodeOpBit (aopGet(AOP(right), 0, FALSE, FALSE), bstr, 0));
@@ -9308,6 +9320,7 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,int p_typ
 	  break;
 	
 	case POINTER:
+	case FPOINTER:
 	case GPOINTER:
 	  emitPtrByteGet (result, p_type, FALSE);
 	  emitpcode(POC_ANDLW, popGetLit (mask));
@@ -9449,7 +9462,7 @@ static void genNearPointerSet (operand *right,
 	in data space & not a bit variable */
 	//if (AOP_TYPE(result) == AOP_IMMD &&
 	if (AOP_TYPE(result) == AOP_PCODE &&
-		DCL_TYPE(ptype) == POINTER   &&
+		PIC_IS_DATA_PTR(ptype) &&
 		!IS_BITVAR (retype) &&
 		!IS_BITVAR (letype)) {
 		genDataPointerSet (right,result,ic);
@@ -9774,6 +9787,7 @@ static void genPointerSet (iCode *ic)
 	switch (p_type) {
 		
 	case POINTER:
+	case FPOINTER:
 	//case IPOINTER:
 		genNearPointerSet (right,result,ic);
 		break;

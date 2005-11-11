@@ -1,3 +1,11 @@
+2005-11-11 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c: handle FPOINTERS like POINTERS everywhere
+	* src/pic16/gen.c (pic16_derefPtr): now works for non-pointers as well,
+	  compute pointer's type from operand,
+	  (genUnpackBits,genPackBits): handle FPOINTERS correctly, re-indented,
+	  improved single bit reads, fixes bug #1353379
+
 2005-11-09 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added lib/pic to the package

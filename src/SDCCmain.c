@@ -999,14 +999,14 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_XRAM_SIZE) == 0)
             {
-              options.xram_size = getIntArg(OPTION_IRAM_SIZE, argv, &i, argc);
+              options.xram_size = getIntArg(OPTION_XRAM_SIZE, argv, &i, argc);
               options.xram_size_set = TRUE;
               continue;
             }
 
           if (strcmp (argv[i], OPTION_CODE_SIZE) == 0)
             {
-              options.code_size = getIntArg(OPTION_IRAM_SIZE, argv, &i, argc);
+              options.code_size = getIntArg(OPTION_CODE_SIZE, argv, &i, argc);
               continue;
             }
 

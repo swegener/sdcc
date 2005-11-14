@@ -1,3 +1,7 @@
+2005-11-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (parseCmdLine): fixed bug 1356800, thanks rsudjian
+
 2005-11-11 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c: handle FPOINTERS like POINTERS everywhere
@@ -10,7 +14,7 @@
 
 	* support/scripts/sdcc.nsi: added lib/pic to the package
 
-2005-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-11-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCval.c (valUnaryPM): fixed bug 1350699
 
@@ -70,7 +74,7 @@
 
 	* src/SDCCutil.c: corrected double comparison typo
 
-2005-10-27 Maarten Brock <sourceforge.brock AT dse.nl>
+2005-10-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/medium/Makefile: added for new memory model medium
 	* device/include/asm/mcs51/features.h: updated for medium/pdata

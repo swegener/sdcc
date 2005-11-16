@@ -9837,11 +9837,29 @@ static void genIfx (iCode *ic, iCode *popIc)
 	
 	if (isbit)
 	{
-		assert (!"genIfx not implemented for bit variables...");
+		/* This assumes that CARRY is set iff cond is true */
+		if (IC_TRUE(ic))
+		{
+			assert (!IC_FALSE(ic));
+			emitSKPNC;
+			emitpcode(POC_GOTO, popGetLabel(IC_TRUE(ic)->key));
+		} else {
+			assert (IC_FALSE(ic));
+			emitSKPC;
+			emitpcode(POC_GOTO, popGetLabel(IC_FALSE(ic)->key));
+		}
+		{
+			static int hasWarned = 0;
+			if (!hasWarned)
+			{
+				fprintf (stderr, "WARNING: using untested code for %s:%u -- please check the .asm output and report bugs.\n", ic->filename, ic->lineno);
+				hasWarned = 1;
+			}
+		}
 	}
 	else
 	{
-		/* now Z if set iff !cond */
+		/* now Z is set iff !cond */
 		if (IC_TRUE(ic))
 		{
 			assert (!IC_FALSE(ic));

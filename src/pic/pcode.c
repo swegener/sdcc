@@ -4286,6 +4286,7 @@ void LinkFlow(pBlock *pb)
 		
 		/* find last instruction in flow */
 		pc = findPrevInstruction (PCFL(pcflow)->end);
+		if (!pc) continue;
 		
 		//fprintf(stderr, "LinkFlow - flow block (seq=%d) ", pcflow->seq);
 		if(isPCI_SKIP(pc)) {

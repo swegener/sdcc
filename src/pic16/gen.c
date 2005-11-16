@@ -62,6 +62,16 @@
 /* The PIC port(s) do not need to distinguish between POINTER and FPOINTER. */
 #define PIC_IS_DATA_PTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
 #define PIC_IS_FARPTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
+#define PIC_IS_TAGGED(x)	(IS_GENPTR(x) || IS_CODEPTR(x))
+
+/* If you change these, you also have to update the library files
+ * device/lib/pic16/libsdcc/gptr{get,put}{1,2,3,4}.c */
+#define GPTR_TAG_DATA	0x80
+#define GPTR_TAG_EEPROM	0x40
+#define GPTR_TAG_CODE	0x00	/* must be 0 becaue of UPPER(sym)==0 */
+
+/* Wrapper to execute `code' at most once. */
+#define PERFORM_ONCE(id,code)	do { static char id = 0; if (!id) { id = 1; code } } while (0)
 
 extern void pic16_genUMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
 extern void pic16_genSMult8X8_16 (operand *, operand *,operand *,pCodeOpReg *);
@@ -2401,6 +2411,20 @@ void pic16_mov2f(asmop *dst, asmop *src, int offset)
   }
 }
 
+static void pic16_movLit2f(pCodeOp *pc, int lit)
+{
+  if (0 == (lit & 0x00ff))
+  {
+    pic16_emitpcode (POC_CLRF, pc);
+  } else if (0xff == (lit & 0x00ff))
+  {
+    pic16_emitpcode (POC_SETF, pc);
+  } else {
+    pic16_emitpcode (POC_MOVLW, pic16_popGetLit (lit & 0x00ff));
+    if (pc->type != PO_WREG) pic16_emitpcode (POC_MOVWF, pc);
+  }
+}
+
 static void mov2fp(pCodeOp *dst, asmop *src, int offset)
 {
   if(is_LitAOp(src)) {
@@ -3913,12 +3937,7 @@ void pic16_storeForReturn(iCode *ic, /*operand *op,*/ int offset, pCodeOp *dest)
     }
 
     if(is_LitOp(op)) {
-      if(/*(OP_LIVETO(op) <= ic->seq) &&*/ (lit == 0)) {
-        pic16_emitpcode(POC_CLRF, dest);
-      } else {
-        pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(op), offset));
-        if(dest->type != PO_WREG)pic16_emitpcode(POC_MOVWF, dest);
-      }
+      pic16_movLit2f(dest, lit);
     } else {
       if(dest->type == PO_WREG && (offset == 0)) {
         pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(op), offset));
@@ -11580,12 +11599,7 @@ static void genDataPointerSet(operand *right,
                     }
 
                     lit = lit >> (8*offset);
-                    if(lit&0xff) {
-                      pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit&0xff));
-                      pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset)); // pstch 8
-                    } else {
-                      pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),offset)); // patch 8
-                    }
+		    pic16_movLit2f(pic16_popGet(AOP(result),offset), lit);
                 } else {
                   pic16_mov2w(AOP(right), offset);
                   pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset)); // patch 8
@@ -12245,6 +12259,7 @@ static void genFarFarAssign (operand *result, operand *right, iCode *ic)
 static void genAssign (iCode *ic)
 {
   operand *result, *right;
+  sym_link *restype, *rtype;
   int size, offset,know_W;
   unsigned long lit = 0L;
 
@@ -12319,26 +12334,51 @@ static void genAssign (iCode *ic)
   /* bit variables done */
   /* general case */
   size = AOP_SIZE(result);
+  restype = operandType(result);
+  rtype = operandType(right);
   offset = 0 ;
 
   if(AOP_TYPE(right) == AOP_LIT) {
-	if(!(IS_FLOAT(operandType( right )) || IS_FIXED(operandType(right))))
-		lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-	else{
-	   union {
-	      unsigned long lit_int;
-	      float lit_float;
-	    } info;
-	
+    if(!(IS_FLOAT(operandType( right )) || IS_FIXED(operandType(right))))
+    {
+      lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
 
-	      if(IS_FIXED16X16(operandType(right))) {
-	        lit = (unsigned long)fixed16x16FromDouble( floatFromVal( AOP(right)->aopu.aop_lit));
-              } else {
-		/* take care if literal is a float */
-		info.lit_float = floatFromVal(AOP(right)->aopu.aop_lit);
-		lit = info.lit_int;
-              }
+      /* patch tag for literals that are cast to pointers */
+      if (IS_CODEPTR(restype)) {
+	//fprintf (stderr, "%s:%u: INFO: `(__code*)literal'\n", ic->filename, ic->lineno);
+	lit = (lit & 0x00ffff) | (GPTR_TAG_CODE << 16);
+      } else {
+	if (IS_GENPTR(restype))
+	{
+	  if (IS_CODEPTR(rtype)) {
+	    //fprintf (stderr, "%s:%u: INFO: `(generic*)(literal __code*)'\n", ic->filename, ic->lineno);
+	    lit = (lit & 0x00ffff) | (GPTR_TAG_CODE << 16);
+	  } else if (PIC_IS_DATA_PTR(rtype)) {
+	    //fprintf (stderr, "%s:%u: INFO: `(generic*)(literal __data*)'\n", ic->filename, ic->lineno);
+	    lit = (lit & 0x00ffff) | (GPTR_TAG_DATA << 16);
+	  } else if (!IS_PTR(rtype) || IS_GENPTR(rtype)) {
+	    //fprintf (stderr, "%s:%u: INFO: `(generic*)literal' -- accepting specified tag %02x\n", ic->filename, ic->lineno, (unsigned char)(lit >> 16));
+	  } else if (IS_PTR(rtype)) {
+	    fprintf (stderr, "%s:%u: WARNING: `(generic*)literal' -- assuming __data space\n", ic->filename, ic->lineno);
+	    lit = (lit & 0x00ffff) | (GPTR_TAG_DATA << 16);
+	  }
 	}
+      }
+    } else {
+      union {
+	unsigned long lit_int;
+	float lit_float;
+      } info;
+
+
+      if(IS_FIXED16X16(operandType(right))) {
+	lit = (unsigned long)fixed16x16FromDouble( floatFromVal( AOP(right)->aopu.aop_lit));
+      } else {
+	/* take care if literal is a float */
+	info.lit_float = floatFromVal(AOP(right)->aopu.aop_lit);
+	lit = info.lit_int;
+      }
+    }
   }
 
 //  fprintf(stderr, "%s:%d: assigning value 0x%04lx (%d:%d)\n", __FUNCTION__, __LINE__, lit,
@@ -12407,18 +12447,6 @@ static void genAssign (iCode *ic)
 	goto release;
   }
 
-  if (AOP_TYPE(right) == AOP_LIT && IS_SYMOP(result) && IS_GENPTR(OP_SYM_TYPE(result)))
-  {
-    /* Arrg -- a literal is cast into a generic pointer: how shall we decide which TAG
-     *         to assign (__data, __code, __eeprom, ???)??? */
-    fprintf (stderr, "%s:%u(%s): creating generic pointer from literal defaults to __data TYPE*.\n\tPlease explicitly cast to (__data|__code) TYPE* in line %u if neccessary!\n",
-    	__FILE__, __LINE__, __FUNCTION__, ic->lineno);
-    /* assume __data space */
-    lit = (lit & 0x00ffff) | 0x800000;
-    //exit (-1);
-  }
-
-
 #if 0
 /* VR - What is this?! */
   if( AOP_TYPE(right) == AOP_DIR  && (AOP_TYPE(result) == AOP_REG) && size==1)  {
@@ -12439,7 +12467,7 @@ static void genAssign (iCode *ic)
 
   know_W=-1;
   while (size--) {
-  DEBUGpic16_emitcode ("; ***","%s  %d size %d",__FUNCTION__,__LINE__, size);
+    DEBUGpic16_emitcode ("; ***","%s  %d size %d",__FUNCTION__,__LINE__, size);
     if(AOP_TYPE(right) == AOP_LIT) {
       if(lit&0xff) {
 	if(know_W != (lit&0xff))
@@ -12474,7 +12502,7 @@ static void genAssign (iCode *ic)
  release:
   pic16_freeAsmop (right,NULL,ic,FALSE);
   pic16_freeAsmop (result,NULL,ic,TRUE);
-}   
+} 
 
 /*-----------------------------------------------------------------*/
 /* genJumpTab - generates code for jump table                       */
@@ -12791,23 +12819,17 @@ static void genCast (iCode *ic)
         }
 	
 	/* port from pic14 to cope with generic pointers */
-	if (IS_PTR(restype))
+	if (PIC_IS_TAGGED(restype))
 	{
 	  operand *result = IC_RESULT(ic);
 	  //operand *left = IC_LEFT(ic);
 	  operand *right = IC_RIGHT(ic);
 	  int tag = 0xff;
-	  
+
 	  /* copy common part */
 	  int max, size = AOP_SIZE(result);
 	  if (size > AOP_SIZE(right)) size = AOP_SIZE(right);
 	  DEBUGpic16_emitcode("; ***","%s  %d",__FUNCTION__,__LINE__);
-
-	  /* warn if we discard generic opinter tag */
-	  if (!IS_GENPTR(restype) && IS_GENPTR(rtype) && (AOP_SIZE(result) < AOP_SIZE(right)))
-	  {
-	    //fprintf (stderr, "%s:%u: discarding generic pointer type tag\n", __FUNCTION__, __LINE__);
-	  } // if
 
 	  max = size;
 	  while (size--)
@@ -12815,48 +12837,51 @@ static void genCast (iCode *ic)
 	    pic16_mov2w (AOP(right), size);
 	    pic16_emitpcode(POC_MOVWF, pic16_popGet (AOP(result), size));
 	  } // while
-	  pic16_addSign(result, max, 0);
 
 	  /* upcast into generic pointer type? */
-	  if (IS_GENPTR(restype) && !IS_GENPTR(rtype))
+	  if (IS_GENPTR(restype)
+	      && !PIC_IS_TAGGED(rtype)
+	      && (AOP_SIZE(result) > max))
 	  {
-	    //fprintf (stderr, "%s:%u: must determine pointer type (IS_PTR: %d, DCL_TYPE: %d)\n", __FUNCTION__, __LINE__, IS_PTR(rtype), IS_PTR(rtype) ? DCL_TYPE(rtype) : 0);
-	    if (IS_PTR(rtype))
-	    {
-	      switch (DCL_TYPE(rtype))
-	      {
-	      case POINTER:	/* __data */
-	      case FPOINTER:	/* __data */
-		assert (AOP_SIZE(right) == 2);
-		tag = 0x80;
-		break;
-
-	      case CPOINTER:	/* __code */
-		assert (AOP_SIZE(right) == 2);
-		tag = 0x00;
-		break;
-		
-	      case GPOINTER:	/* unknown destination, __data or __code */
-		assert (AOP_SIZE(right) == 3);
-		/* tag taken from right operand */
-		break;
-		
-	      default:
-		assert (!"unhandled pointer type");
-	      } // switch
+	    /* determine appropriate tag for right */
+	    if (PIC_IS_DATA_PTR(rtype))
+	      tag = GPTR_TAG_DATA;
+	    else if (IS_CODEPTR(rtype))
+	      tag = GPTR_TAG_CODE;
+	    else if (PIC_IS_DATA_PTR(ctype)) {
+	      //fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(__data*)(non-pointer)'\n", ic->filename, ic->lineno);
+	      tag = GPTR_TAG_DATA;
+	    } else if (IS_CODEPTR(ctype)) {
+	      //fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(__code*)(non-pointer)'\n", ic->filename, ic->lineno);
+	      tag = GPTR_TAG_CODE;
+	    } else if (IS_PTR(rtype)) {
+	      PERFORM_ONCE(weirdcast,
+	      fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(unknown*)' -- assumimg __data space\n", ic->filename, ic->lineno);
+	      );
+	      tag = GPTR_TAG_DATA;
 	    } else {
-	      /* convert other values into pointers to __data space */
-	      fprintf (stderr, "%s:%u(%s): creating generic pointer from non-pointer type -- assuming __data space\n", __FILE__, __LINE__, __FUNCTION__);
-	      tag = 0x80;
+	      PERFORM_ONCE(weirdcast,
+	      fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(non-pointer)' -- assumimg __data space\n", ic->filename, ic->lineno);
+	      );
+	      tag = GPTR_TAG_DATA;
 	    }
 
 	    assert (AOP_SIZE(result) == 3);
-	    if (tag == 0) {
-	      pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result), 2));
-	    } else {
-	      pic16_emitpcode(POC_MOVLW, pic16_popGetLit(tag));
-	      pic16_emitpcode(POC_MOVWF, pic16_popGet (AOP(result), 2));
-	    }
+	    /* zero-extend address... */
+	    for (size = max; size < AOP_SIZE(result)-1; size++)
+	      pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),size));
+	    /* ...and add tag */
+	    pic16_movLit2f(pic16_popGet(AOP(result), AOP_SIZE(result)-1), tag);
+	  } else if (IS_CODEPTR(restype) && AOP_SIZE(result) > max) {
+	    //fprintf (stderr, "%s:%u: INFO: code pointer\n", ic->filename, ic->lineno);
+	    for (size = max; size < AOP_SIZE(result)-1; size++)
+	      pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result), size));
+	    /* add __code tag */
+	    pic16_movLit2f (pic16_popGet(AOP(result), AOP_SIZE(result)-1), GPTR_TAG_CODE);
+	  } else if (AOP_SIZE(result) > max) {
+	    /* extend non-pointers */
+	    //fprintf (stderr, "%s:%u: zero-extending value cast to pointer\n", ic->filename, ic->lineno);
+	    pic16_addSign(result, max, 0);
 	  } // if
 	  goto release;
 	}
@@ -12996,19 +13021,14 @@ static void genCast (iCode *ic)
 	    switch (p_type) {
 	    case IPOINTER:
 	    case POINTER:
-	        pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0x80));
-	        pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), GPTRSIZE - 1));
-//		pic16_emitpcode(POC_CLRF,pic16_popGet(AOP(result),GPTRSIZE - 1));
+	    case FPOINTER:
+	        pic16_movLit2f(pic16_popGet(AOP(result), GPTRSIZE-1), GPTR_TAG_DATA);
 		break;
 
 	    case CPOINTER:
 	        pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), GPTRSIZE-1));
 	        break;
 
-	    case FPOINTER:
-	      pic16_emitcode(";BUG!? ","%d",__LINE__);
-		l = one;
-		break;
 	    case PPOINTER:
 	      pic16_emitcode(";BUG!? ","%d",__LINE__);
 		l = "#0x03";
@@ -13016,9 +13036,8 @@ static void genCast (iCode *ic)
 
             case GPOINTER:
 		if (GPTRSIZE > AOP_SIZE(right)) {
-		  // assume data pointer... THIS MIGHT BE WRONG!
-	          pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0x80));
-	          pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), GPTRSIZE - 1));
+		  // assume __data pointer... THIS MIGHT BE WRONG!
+	          pic16_movLit2f(pic16_popGet(AOP(result), GPTRSIZE-1), GPTR_TAG_DATA);
 		} else {
 		  pic16_emitpcode(POC_MOVFF, pic16_popGet2(AOP(right), AOP(result), GPTRSIZE-1));
 		}

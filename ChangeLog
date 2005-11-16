@@ -1,3 +1,13 @@
+2005-11-16 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (LinkFlow): handle empty flows correctly,
+	  fixes #1357221
+	* src/pic/gen.c (genIfx): implemented for CARRY bit
+	* src/pic16/gen.c (genAssign,genCast): fixed assigning/casting
+	  to generic pointers, fixes #1357332,
+	  (pic16_movLit2f): NEW,
+	  (pic16_storeForReturn,genDataPointerSet): use pic16_movLit2f
+
 2005-11-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c (parseCmdLine): fixed bug 1356800, thanks rsudjian

@@ -211,7 +211,7 @@ static int output_float (float f, unsigned char reqWidth,
 
   // split the float
   integerPart=f;
-  decimalPart=f-integerPart;
+  decimalPart=f-(float)integerPart;
 
   // fill the buffer with the integerPart (in reversed order!)
   while (integerPart) {
@@ -235,7 +235,7 @@ static int output_float (float f, unsigned char reqWidth,
       // truncate the float
       integerPart=decimalPart;
       fpBuffer[fpBD++]='0' + integerPart;
-      decimalPart-=integerPart;
+      decimalPart-=(float)integerPart;
     } while (--i);
   }
 

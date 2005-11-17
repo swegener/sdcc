@@ -1,3 +1,8 @@
+2005-11-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/lib/printf_large.c: Temporary patch for bug 1358192: 
+	  printf("%f"...) sets fraction to zero. 
+
 2005-11-16 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (LinkFlow): handle empty flows correctly,

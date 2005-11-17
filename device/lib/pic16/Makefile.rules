@@ -18,28 +18,38 @@
 
 # update dependencies
 $(topsrcdir)/$(builddir)/%.d : %.c
+ifndef SILENT
 	@echo "[  CPP  ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+endif
 	$(Q)$(CPP) $(CPPFLAGS) -o "$@" "$<";
 
 # assemble
 $(topsrcdir)/$(builddir)/%.o : %.S
+ifndef SILENT
 	@echo "[  AS   ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+endif
 	$(Q)$(AS) $(ASFLAGS) -o "$@" -c "$<";
 
 # compile
 $(topsrcdir)/$(builddir)/%.o : %.c
+ifndef SILENT
 	@echo "[  CC   ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+endif
 	$(Q)$(CC) $(CFLAGS) -o "$@" -c "$<";
 
 # create library
 ifneq (,$(strip $(LIB_O)))
 %.lib : $(LIB_O)
+ifndef SILENT
 	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== $(patsubst $(topsrcdir)/$(builddir)/%,%,$^)";
+endif
 	$(Q)$(RM) "$@"; $(LIB) $(LIBFLAGS) "$@" $^;
 else
 %.lib : recurse
+ifndef SILENT
 	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== **/*.o";
-	$(Q)$(RM) "$@"; LIB_O=`find "$(topsrcdir)/$(builddir)" -name "*.o"`; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O};
+endif
+	$(Q)$(RM) "$@"; LIB_O=`find "$(topsrcdir)/$(builddir)" -name "*.o"`; echo $${LIB_O}; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O};
 endif
 
 .PHONY : recurse force

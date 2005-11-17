@@ -245,6 +245,7 @@ status Collapsed
 \newline 
 SDCC also comes with a companion source level debugger SDCDB, the debugger
  currently uses ucSim a freeware simulator for 8051 and other micro-controllers.
+ SDCDB and ucSim are currently not available on Win32 platforms.
  
 \newline 
 
@@ -4120,9 +4121,11 @@ link-gbz80 - The Z80 and GameBoy Z80 linkers.
 \layout Itemize
 
 s51 - The ucSim 8051 simulator.
+ Not available on Win32 platforms.
 \layout Itemize
 
 sdcdb - The source debugger.
+ Not available on Win32 platforms.
 \layout Itemize
 
 packihx - A tool to pack (compress) Intel hex files.
@@ -4206,6 +4209,7 @@ S51
 .
  It currently supports the core mcs51, the Dallas DS80C390 and the Phillips
  XA51 family.
+ S51 is currently not available on Win32 platfors.
 \layout Subsection
 
 sdcdb - Source Level Debugger
@@ -4229,7 +4233,7 @@ Sdcdb
 \end_inset 
 
 , but can be easily changed to use other simulators.
- 
+ Sdcdb is currently not available on Win32 platfors.
 \layout Chapter
 
 Using SDCC
@@ -20054,7 +20058,7 @@ on, which also builds and installs the debugger in the target directory
  specified during configuration.
  The debugger allows you debug BOTH at the C source and at the ASM source
  level.
- Sdcdb is available on Unix platforms only.
+ Sdcdb is currently not available on Win32 platforms.
 \layout Section
 
 Compiling for Debugging

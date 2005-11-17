@@ -5,6 +5,8 @@
 	  verbose - used for nightly snapshot build
 	* doc/sdccman.lyx: documented that SDCDB and ucSim are currently not
 	  available on Win32 platforms.
+	* sdcc/device/lib/Makefile.in: added library sources for mcs51, small,
+	  medium, large, pic and pic16
 
 2005-11-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 

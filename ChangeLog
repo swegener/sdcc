@@ -1,3 +1,9 @@
+2005-11-18 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/device/lib/Makefile.in: remove all unnecessary files
+	* device/lib/pic/Makefile.rules, device/lib/pic16/Makefile.subdir:
+	  introduced SILENT option to make building of pic16 libraries less
+
 2005-11-18 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/lib/modff.c, device/lib/ceilf.c, device/lib/floorf.c:

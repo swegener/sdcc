@@ -41,7 +41,9 @@ ifneq (,$(strip $(TARGETS)))
 # usually install $(LIB_LIB) or $(OBJS), race condition in "[ -d x ] || mkdir x"
 install : recurse $(OBJS) $(LIB_LIB)
 	@[ -d "$(topsrcdir)/$(installdir)" ] || ( $(MKDIR) "$(topsrcdir)/$(installdir)" || true );
+ifndef SILENT
 	@echo "[INSTALL] $(patsubst $(topsrcdir)/$(builddir)/%,%,$(TARGETS))";
+endif
 	$(Q)$(CP) $(TARGETS) "$(topsrcdir)/$(installdir)"
 else
 # used in subdirs like libc/ctype whose files

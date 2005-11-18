@@ -24,6 +24,7 @@ float ceilf(float x) _FLOAT_FUNC_REENTRANT
 {
     long r;
     r=x;
+    if(r==0x80000000) r=0; //-0?
     if (r<0)
         return r;
     else

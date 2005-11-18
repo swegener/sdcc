@@ -22,6 +22,9 @@
 
 float modff(float x, float * y)
 {
-    *y=((int)x);
+    long r;
+    r=x;
+    if(r==0x80000000) r=0; //-0?
+    *y=r;
     return (x-*y);
 }

@@ -85,6 +85,13 @@ struct {
 } size3a_bf;
 
 
+struct {
+  signed int s0_7  : 7;
+  signed int s7_1  : 1;
+  signed int s8_9  : 9;
+} s_bf;
+
+
 void
 testBitfieldSizeof(void)
 {
@@ -255,6 +262,11 @@ testBitfieldsMultibitLiteral(void)
   ASSERT(size2c_bf.b0==0);
   ASSERT(size2c_bf.b1==0x1f);
 
+  size2c_bf.b0 = 0xff;	/* should truncate to 0x0f */
+  size2c_bf.b1 = 0xff;	/* should truncate to 0x1f */
+  ASSERT(size2c_bf.b0==0x0f);
+  ASSERT(size2c_bf.b1==0x1f);
+
   size2d_bf.b0 = 0xffff; /* should truncate to 0x0fff */
   size2d_bf.b1 = 0;
   ASSERT(size2d_bf.b0==0x0fff);
@@ -263,6 +275,11 @@ testBitfieldsMultibitLiteral(void)
   size2d_bf.b1 = 0xffff; /* should truncate to 0x07 */
   size2d_bf.b0 = 0;
   ASSERT(size2d_bf.b0==0);
+  ASSERT(size2d_bf.b1==0x07);
+
+  size2d_bf.b0 = 0xffff; /* should truncate to 0x0fff */
+  size2d_bf.b1 = 0xffff; /* should truncate to 0x07 */
+  ASSERT(size2d_bf.b0==0x0fff);
   ASSERT(size2d_bf.b1==0x07);
 
   size2d_bf.b0 = 0x0321;
@@ -321,18 +338,43 @@ testBitfieldsMultibit(void)
 void
 testBitfields(void)
 {
-#if 0 // not yet
-  c_bitfield.c0_3 = 2;
-  c_bitfield.c3_5 = 3;
-  ASSERT(*(char *)(&c_bitfield) == (2 + (3<<3)) );
+  c_bf.c0_3 = 2;
+  c_bf.c3_5 = 3;
+  ASSERT(*(char *)(&c_bf) == (2 + (3<<3)) );
 
-  i_bitfield.i0_7 = 23;
-  i_bitfield.i7_9 = 234;
-  ASSERT(*(int *)(&i_bitfield) == (23 + (234<<7)) );
+#if 0 // not yet
+  i_bf.i0_7 = 23;
+  i_bf.i7_9 = 234;
+  ASSERT(*(int *)(&i_bf) == (23 + (234<<7)) );
 
   l_bitfield.l0_7 = 23;
   l_bitfield.l7_10 = 234;
   l_bitfield.l17_15 = 2345;
-  ASSERT(*(long *)(&l_bitfield) == (23 + (234<<7) + (2345<<17)) );
+  ASSERT(*(long *)(&l_bf) == (23 + (234<<7) + (2345<<17)) );
+#endif
+}
+
+void
+testSignedBitfields(void)
+{
+#if !defined(SDCC_hc08) && !defined(SDCC_z80) && !defined(SDCC_gbz80)
+  s_bf.s0_7 =   0xf0;
+  s_bf.s7_1 =      1;
+  s_bf.s8_9 = 0xfff8;
+  ASSERT(s_bf.s0_7 == -16);
+  ASSERT(s_bf.s7_1 == - 1);
+  ASSERT(s_bf.s8_9 == - 8);
+  ASSERT(s_bf.s0_7 < 0);
+  ASSERT(s_bf.s7_1 < 0);
+  ASSERT(s_bf.s8_9 < 0);
+
+  s_bf.s0_7 =   0x3f;
+  s_bf.s7_1 =      2;
+  s_bf.s8_9 = 0x00ff;
+  ASSERT(s_bf.s0_7 == 0x3f);
+  ASSERT(s_bf.s7_1 ==    0);
+  ASSERT(s_bf.s8_9 == 0xff);
+  ASSERT(s_bf.s0_7 > 0);
+  ASSERT(s_bf.s8_9 > 0);
 #endif
 }

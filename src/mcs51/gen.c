@@ -9305,7 +9305,7 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
   if (blen < 8)
     {
       emitPtrByteGet (rname, ptype, FALSE);
-      AccRsh (bstr);
+      AccRol (8 - bstr);
       emitcode ("anl", "a,#0x%02x", ((unsigned char) -1) >> (8 - blen));
       if (!SPEC_USIGN (etype))
         {
@@ -9340,7 +9340,7 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
           /* signed bitfield */
           symbol *tlbl = newiTempLabel (NULL);
 
-          emitcode ("jnb", "acc.%d,%05d$", blen - 1, tlbl->key + 100);
+          emitcode ("jnb", "acc.%d,%05d$", rlen - 1, tlbl->key + 100);
           emitcode ("orl", "a,#0x%02x", (unsigned char) (0xff << rlen));
           emitcode ("", "%05d$:", tlbl->key + 100);
         }
@@ -10866,8 +10866,8 @@ genCast (iCode * ic)
 
   /* if the result is a bit (and not a bitfield) */
   // if (AOP_TYPE (result) == AOP_CRY)
-  if (IS_BITVAR (OP_SYMBOL (result)->type)
-      && !IS_BITFIELD (OP_SYMBOL (result)->type) )
+  if (IS_BIT (OP_SYMBOL (result)->type))
+    /* not for bitfields */
     {
       /* if the right size is a literal then
          we know what the value is */

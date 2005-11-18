@@ -148,7 +148,7 @@ void ReplaceOpWithCheaperOp(operand **op, operand *cop) {
           IS_SYMOP((*op)) ? OP_SYMBOL((*op))->name : "!SYM",
           IS_SYMOP(cop) ? OP_SYMBOL(cop)->name : "!SYM");
   // if op is a register equivalent
-  if (IS_ITEMP(cop) && OP_SYMBOL((*op))->isreqv) {
+  if (IS_ITEMP(cop) && IS_SYMOP((*op)) && OP_SYMBOL((*op))->isreqv) {
     operand **rop = &OP_SYMBOL((*op))->usl.spillLoc->reqv;
     if (isOperandEqual(*rop, *op)) {
       printf ("true");

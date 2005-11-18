@@ -9658,8 +9658,17 @@ genUnpackBits (operand * result, char *rname, int ptype)
   if (blen < 8)
     {
       emitPtrByteGet (rname, ptype, FALSE);
-      AccRsh (bstr);
+      AccRol (8 - bstr);
       emitcode ("anl", "a,#!constbyte", ((unsigned char) -1) >> (8 - blen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emitcode ("jnb", "acc.%d,%05d$", blen - 1, tlbl->key + 100);
+          emitcode ("orl", "a,#0x%02x", (unsigned char) (0xff << blen));
+          emitcode ("", "%05d$:", tlbl->key + 100);
+        }
       aopPut (AOP (result), "a", offset++);
       goto finish;
     }
@@ -9679,15 +9688,36 @@ genUnpackBits (operand * result, char *rname, int ptype)
     {
       emitPtrByteGet (rname, ptype, FALSE);
       emitcode ("anl", "a,#!constbyte", ((unsigned char) -1) >> (8-rlen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emitcode ("jnb", "acc.%d,%05d$", rlen - 1, tlbl->key + 100);
+          emitcode ("orl", "a,#0x%02x", (unsigned char) (0xff << rlen));
+          emitcode ("", "%05d$:", tlbl->key + 100);
+        }
       aopPut (AOP (result), "a", offset++);
     }
 
 finish:
   if (offset < rsize)
     {
+      char *source;
+
+      if (SPEC_USIGN (etype))
+        source = zero;
+      else
+        {
+          /* signed bitfield: sign extension with 0x00 or 0xff */
+          emitcode ("rlc", "a");
+          emitcode ("subb", "a,acc");
+
+          source = "a";
+        }
       rsize -= offset;
       while (rsize--)
-        aopPut (AOP (result), zero, offset++);
+        aopPut (AOP (result), source, offset++);
     }
 }
 

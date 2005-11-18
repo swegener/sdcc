@@ -1,3 +1,13 @@
+2005-11-18 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCcse.c (ReplaceOpWithCheaperOp): minor fix for debugging only
+	* src/mcs51/gen.c (genUnpackBits): better code and a fix,
+	(genCast) cosmetic change
+	* src/ds390/gen.c (genUnpackBits, ): ported from mcs51
+	* src/ds390/ralloc.c (packRegsForAssign): ported fix for bitfields
+	from mcs51
+	* support/regression/tests/bitfields (testSignedBitfields): added
+
 2005-11-18 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/device/lib/Makefile.in: remove all unnecessary files

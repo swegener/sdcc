@@ -233,7 +233,7 @@ printOperand (operand * op, FILE * file)
       opetype = getSpec (operandType (op));
       if (IS_FLOAT (opetype))
         fprintf (file, "%g {", SPEC_CVAL (opetype).v_float);
-      if (IS_FIXED16X16 (opetype))
+      else if (IS_FIXED16X16 (opetype))
         fprintf (file, "%g {", doubleFromFixed16x16(SPEC_CVAL (opetype).v_fixed16x16));
       else
         fprintf (file, "0x%x {", (unsigned) floatFromVal (op->operand.valOperand));
@@ -1327,15 +1327,12 @@ operandOperation (operand * left, operand * right,
                                  (TYPE_UDWORD) operandLitValue (right));
       break;
     case EQ_OP:
-      if (IS_FLOAT (let) ||
-          IS_FLOAT (ret))
+      if (IS_FLOAT (let) || IS_FLOAT (ret))
         {
           retval = operandFromLit (operandLitValue (left) ==
                                    operandLitValue (right));
         }
-      else
-      if (IS_FIXED16X16 (let) ||
-          IS_FIXED16X16 (ret))
+      else if (IS_FIXED16X16 (let) || IS_FIXED16X16 (ret))
         {
           retval = operandFromLit (operandLitValue (left) ==
                                    operandLitValue (right));
@@ -2646,8 +2643,7 @@ geniCodePostInc (operand * op)
     werror(W_SIZEOF_VOID);
   if (IS_FLOAT (rvtype))
     ic = newiCode ('+', rv, operandFromValue (constFloatVal ("1.0")));
-  else
-  if (IS_FIXED16X16 (rvtype))
+  else if (IS_FIXED16X16 (rvtype))
     ic = newiCode ('+', rv, operandFromValue (constFixed16x16Val ("1.0")));
   else
     ic = newiCode ('+', rv, operandFromLit (size));
@@ -2687,8 +2683,7 @@ geniCodePreInc (operand * op, bool lvalue)
     werror(W_SIZEOF_VOID);
   if (IS_FLOAT (roptype))
     ic = newiCode ('+', rop, operandFromValue (constFloatVal ("1.0")));
-  else
-  if (IS_FIXED16X16 (roptype))
+  else if (IS_FIXED16X16 (roptype))
     ic = newiCode ('+', rop, operandFromValue (constFixed16x16Val ("1.0")));
   else
     ic = newiCode ('+', rop, operandFromLit (size));
@@ -2738,8 +2733,7 @@ geniCodePostDec (operand * op)
     werror(W_SIZEOF_VOID);
   if (IS_FLOAT (rvtype))
     ic = newiCode ('-', rv, operandFromValue (constFloatVal ("1.0")));
-  else
-  if (IS_FIXED16X16 (rvtype))
+  else if (IS_FIXED16X16 (rvtype))
     ic = newiCode ('-', rv, operandFromValue (constFixed16x16Val ("1.0")));
   else
     ic = newiCode ('-', rv, operandFromLit (size));
@@ -2779,8 +2773,7 @@ geniCodePreDec (operand * op, bool lvalue)
     werror(W_SIZEOF_VOID);
   if (IS_FLOAT (roptype))
     ic = newiCode ('-', rop, operandFromValue (constFloatVal ("1.0")));
-  else
-  if (IS_FIXED16X16 (roptype))
+  else if (IS_FIXED16X16 (roptype))
     ic = newiCode ('-', rop, operandFromValue (constFixed16x16Val ("1.0")));
   else
     ic = newiCode ('-', rop, operandFromLit (size));

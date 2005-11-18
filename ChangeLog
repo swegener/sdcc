@@ -1,3 +1,7 @@
+2005-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (printOperand): added missing else
+
 2005-11-18 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCsymt.c (computeType): fixed bug 1358192: added missing else,
@@ -8,7 +12,7 @@
 2005-11-17 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/Makefile.rules, device/lib/pic16/Makefile.subdir:
-	  itroduced SILENT option to make building of pic16 libraries less
+	  introduced SILENT option to make building of pic16 libraries less
 	  verbose - used for nightly snapshot build
 	* doc/sdccman.lyx: documented that SDCDB and ucSim are currently not
 	  available on Win32 platforms.
@@ -17,8 +21,8 @@
 
 2005-11-16 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* device/lib/printf_large.c: Temporary patch for bug 1358192: 
-	  printf("%f"...) sets fraction to zero. 
+	* device/lib/printf_large.c: Temporary patch for bug 1358192:
+	  printf("%f"...) sets fraction to zero.
 
 2005-11-16 Raphael Neider <rneider AT web.de>
 

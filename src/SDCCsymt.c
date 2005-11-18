@@ -1772,24 +1772,20 @@ computeType (sym_link * type1, sym_link * type2,
   /* which ever is greater in size */
   if (IS_FLOAT (etype1) || IS_FLOAT (etype2))
     rType = newFloatLink ();
-  else
-    /* if both are fixed16x16 then result is float */
-  if (IS_FIXED16X16(etype1) && IS_FIXED16X16(etype2))
+  /* if both are fixed16x16 then result is float */
+  else if (IS_FIXED16X16(etype1) && IS_FIXED16X16(etype2))
     rType = newFixed16x16Link();
-  else
-  if (IS_FIXED16X16(etype1) && IS_FLOAT (etype2))
+  else if (IS_FIXED16X16(etype1) && IS_FLOAT (etype2))
     rType = newFloatLink ();
-  if (IS_FLOAT (etype1) && IS_FIXED16X16 (etype2) )
+  else if (IS_FLOAT (etype1) && IS_FIXED16X16 (etype2) )
     rType = newFloatLink ();
-  else
-    /* if both are bitvars choose the larger one */
-  if (IS_BITVAR (etype1) && IS_BITVAR (etype2))
-    {
-      rType = SPEC_BLEN (etype1) >= SPEC_BLEN (etype2) ?
-                copyLinkChain (type1) : copyLinkChain (type1);
-    }
-    /* if only one of them is a bit variable
-       then the other one prevails */
+            
+  /* if both are bitvars choose the larger one */
+  else if (IS_BITVAR (etype1) && IS_BITVAR (etype2))
+    rType = SPEC_BLEN (etype1) >= SPEC_BLEN (etype2) ?
+            copyLinkChain (type1) : copyLinkChain (type1);
+                          
+  /* if only one of them is a bit variable then the other one prevails */
   else if (IS_BITVAR (etype1) && !IS_BITVAR (etype2))
     {
       rType = copyLinkChain (type2);
@@ -1804,10 +1800,9 @@ computeType (sym_link * type1, sym_link * type2,
       if (getSize (etype2) > 1)
         SPEC_NOUN (getSpec (rType)) = V_INT;
     }
-  else
-    /* if one of them is a pointer or array then that
-       prevails */
-  if (IS_PTR (type1) || IS_ARRAY (type1))
+  /* if one of them is a pointer or array then that
+     prevails */
+  else if (IS_PTR (type1) || IS_ARRAY (type1))
     rType = copyLinkChain (type1);
   else if (IS_PTR (type2) || IS_ARRAY (type2))
     rType = copyLinkChain (type2);

@@ -1,3 +1,8 @@
+2005-10-28 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCsymt.c (computeType): fixed bug 1358192: added missing else,
+	reformatted for	better readability
+
 2005-11-17 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/Makefile.rules, device/lib/pic16/Makefile.subdir:

@@ -1,3 +1,9 @@
+2005-11-18 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/lib/modff.c, device/lib/ceilf.c, device/lib/floorf.c:
+	  Now they work properly with floats between -1.0 and 0.0
+	* device/lib/printf_large.c: Removed temporary patch for bug 1358192
+
 2005-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (printOperand): added missing else

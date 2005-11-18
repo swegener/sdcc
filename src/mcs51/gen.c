@@ -9307,6 +9307,15 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
       emitPtrByteGet (rname, ptype, FALSE);
       AccRsh (bstr);
       emitcode ("anl", "a,#0x%02x", ((unsigned char) -1) >> (8 - blen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emitcode ("jnb", "acc.%d,%05d$", blen - 1, tlbl->key + 100);
+          emitcode ("orl", "a,#0x%02x", (unsigned char) (0xff << blen));
+          emitcode ("", "%05d$:", tlbl->key + 100);
+        }
       aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
       goto finish;
     }
@@ -9326,6 +9335,15 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
     {
       emitPtrByteGet (rname, ptype, FALSE);
       emitcode ("anl", "a,#0x%02x", ((unsigned char) -1) >> (8-rlen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emitcode ("jnb", "acc.%d,%05d$", blen - 1, tlbl->key + 100);
+          emitcode ("orl", "a,#0x%02x", (unsigned char) (0xff << rlen));
+          emitcode ("", "%05d$:", tlbl->key + 100);
+        }
       aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
     }
 

@@ -1,7 +1,9 @@
-2005-10-28 Bernhard Held <bernhard AT bernhardheld.de>
+2005-11-18 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCsymt.c (computeType): fixed bug 1358192: added missing else,
 	reformatted for	better readability
+	* src/mcs51/gen.c (genUnpackBits): initial, incomplete support for
+	signed bitfields
 
 2005-11-17 Borut Razem <borut.razem AT siol.net>
 

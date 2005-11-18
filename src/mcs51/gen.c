@@ -9350,9 +9350,21 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
 finish:
   if (offset < rsize)
     {
+      char *source;
+
+      if (SPEC_USIGN (etype))
+        source = zero;
+      else
+        {
+          /* signed bitfield: sign extension with 0x00 or 0xff */
+          emitcode ("rlc", "a");
+          emitcode ("subb", "a,acc");
+
+          source = "a";
+        }
       rsize -= offset;
       while (rsize--)
-        aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, source, offset++, isOperandVolatile (result, FALSE));
     }
 }
 

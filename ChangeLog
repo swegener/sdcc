@@ -1,3 +1,13 @@
+2005-11-19 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/lib/_fs2slong.c, device/lib/_fs2sint.c, device/lib/_fs2char.c:
+	  Properly convert floats between -1.0 and 0.0 to long, int, and char
+	  types (max integer value of negative floats tends to zero).
+	* device/lib/modff.c, device/lib/ceilf.c, device/lib/floorf.c:
+	  Removed changes made so to work properly with floats between
+	  -1.0 and 0.0, as the problem is fixed in _fs2slong.c, _fs2sint.c,
+	  and _fs2char.c
+
 2005-11-18 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCcse.c (ReplaceOpWithCheaperOp): minor fix for debugging only

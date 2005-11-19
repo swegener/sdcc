@@ -41,7 +41,7 @@ fs2sint_neg:
 	jnb	acc.7, fs2sint_maxval_neg
 	ret
 fs2sint_maxval_neg:
-	mov	dptr, #0x8000
+	mov	dptr, #0x0000
 	ret
 fs2sint_pos:
 	jnz	fs2sint_maxval_pos

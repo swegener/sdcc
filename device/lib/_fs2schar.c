@@ -45,7 +45,7 @@ fs2schar_neg:
 	jnb	acc.7, fs2schar_maxval_neg
 	ret
 fs2schar_maxval_neg:
-	mov	dpl, #0x80
+	mov	dpl, #0x00
 	ret
 fs2schar_pos:
 	jnz	fs2schar_maxval_pos

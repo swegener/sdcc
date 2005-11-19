@@ -70,7 +70,6 @@ fs2slong_maxval_neg:
 	mov	dpl, a
 	mov	dph, a
 	mov	b, a
-	mov	a, #0x80
 	ret
 fs2slong_maxval_pos:
 	mov	a, #0xFF

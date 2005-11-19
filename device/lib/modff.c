@@ -22,9 +22,6 @@
 
 float modff(float x, float * y)
 {
-    long r;
-    r=x;
-    if(r==0x80000000) r=0; //-0?
-    *y=r;
+    *y=(long)x;
     return (x-*y);
 }

@@ -1,3 +1,8 @@
+2005-11-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added missing "if"s as noted by Hubert Sack.
+	  (the missing "if"s prohibited removal of redundant labels)
+
 2005-11-19 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/lib/_fs2slong.c, device/lib/_fs2sint.c, device/lib/_fs2char.c:

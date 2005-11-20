@@ -286,7 +286,7 @@ replace {
 } by {
 	;	Peephole 107	removed redundant ljmp
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	jc	%1
@@ -402,7 +402,7 @@ replace {
 	;	Peephole 115.b	jump optimization
 	jz	%3
 %2:
-} labelRefCountChange(%2 -1)
+} if labelRefCountChange(%2 -1)
 
 replace {
 	clr	a
@@ -1063,7 +1063,7 @@ replace {
 	;	Peephole 160.a	removed sjmp by inverse jump logic
 	jc	%2
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	jc	%1
@@ -1073,7 +1073,7 @@ replace {
 	;	Peephole 160.b	removed sjmp by inverse jump logic
 	jnc	%2
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	jnz	%1
@@ -1083,7 +1083,7 @@ replace {
 	;	Peephole 160.c	removed sjmp by inverse jump logic
 	jz	%2
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	jz	%1
@@ -1093,7 +1093,7 @@ replace {
 	;	Peephole 160.d	removed sjmp by inverse jump logic
 	jnz	%2
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	jnb	%3,%1
@@ -1103,7 +1103,7 @@ replace {
 	;	Peephole 160.e	removed sjmp by inverse jump logic
 	jb	%3,%2
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	jb	%3,%1
@@ -1113,7 +1113,7 @@ replace {
 	;	Peephole 160.f	removed sjmp by inverse jump logic
 	jnb	%3,%2
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	mov	%1,%2
@@ -1142,7 +1142,7 @@ replace {
 	;	Peephole 168	jump optimization
 	jb	%1,%3
 %2:
-} labelRefCountChange(%2 -1)
+} if labelRefCountChange(%2 -1)
 
 replace {
 	jb	%1,%2
@@ -1152,7 +1152,7 @@ replace {
 	;	Peephole 169	jump optimization
 	jnb	%1,%3
 %2:
-} labelRefCountChange(%2 -1)
+} if labelRefCountChange(%2 -1)
 
 replace {
 	clr	a
@@ -1893,7 +1893,7 @@ replace {
 } by {
 	;	Peephole 200.a	removed redundant sjmp
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	sjmp	%1
@@ -1903,7 +1903,7 @@ replace {
 	;	Peephole 200.b	removed redundant sjmp
 %2:
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	push	acc
@@ -2494,7 +2494,7 @@ replace {
 	mov	%3,%4
 %1:
 	ret
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace {
 	sjmp	%1
@@ -2513,7 +2513,7 @@ replace {
 	mov	dph,%6
 %1:
 	ret
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 // applies to f.e. device/lib/log10f.c
 replace {
@@ -2635,7 +2635,7 @@ replace {
 	inc	a
 %0:
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 // applies to generic pointer compare
 replace {
@@ -2656,7 +2656,7 @@ replace {
 	inc	a
 %0:
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 // applies to f.e. time.c
 replace {
@@ -2675,7 +2675,7 @@ replace {
 	inc	a
 %0:
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 // applies to f.e. malloc.c
 replace {
@@ -2692,7 +2692,7 @@ replace {
 	inc	a
 %0:
 %1:
-} labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 // applies to f.e. j = (k!=0x1000);
 // with volatile idata long k;
@@ -2722,7 +2722,7 @@ replace {
 	inc	a
 %1:
 %2:
-} labelRefCountChange(%2 -1)
+} if labelRefCountChange(%2 -1)
 
 // applies to f.e. j = (p!=NULL);
 // with volatile idata char *p;
@@ -2748,7 +2748,7 @@ replace {
 	inc	a
 %1:
 %2:
-} labelRefCountChange(%2 -1)
+} if labelRefCountChange(%2 -1)
 
 // applies to f.e. j = (k!=0x1000);
 // with volatile idata int k;
@@ -2770,7 +2770,7 @@ replace {
 	inc	a
 %1:
 %2:
-} labelRefCountChange(%2 -1)
+} if labelRefCountChange(%2 -1)
 
 // applies to f.e. vprintf.asm (--stack-auto)
 replace {
@@ -2787,7 +2787,7 @@ replace {
 	inc	a
 %1:
 %2:
-} labelRefCountChange(%2 -1)
+} if labelRefCountChange(%2 -1)
 
 // applies to f.e. scott-bool1.c
 replace {
@@ -3858,7 +3858,7 @@ replace {
 	mov	r%1,a
 %4:
 %3:
-} labelRefCountChange(%3 -1)
+} if labelRefCountChange(%3 -1)
 
 // in_byte>>=1; if(in_bit) in_byte|=0x80;
 replace {
@@ -3898,7 +3898,7 @@ replace {
 	mov	r%1,a
 %4:
 %3:
-} labelRefCountChange(%3 -1)
+} if labelRefCountChange(%3 -1)
 
 // out_bit=out_byte&0x80; out_byte<<=1;
 // helps f.e. writing data on a 3-wire (SPI) bus

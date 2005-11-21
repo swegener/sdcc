@@ -31,6 +31,18 @@ static void dummy(void) _naked
 	.globl	___fs2schar
 ___fs2schar:
 	lcall	___fs2slong
+	push acc
+	jnz fs2schar_not_zero
+	mov a, dpl
+	jnz fs2schar_not_zero
+	mov a, dph
+	jnz fs2schar_not_zero
+	mov a, b
+	jnz fs2schar_not_zero
+	pop acc
+	ret
+fs2schar_not_zero:
+    pop acc
 	jnb	sign_a, fs2schar_pos
 fs2schar_neg:
 	cpl	a
@@ -45,7 +57,7 @@ fs2schar_neg:
 	jnb	acc.7, fs2schar_maxval_neg
 	ret
 fs2schar_maxval_neg:
-	mov	dpl, #0x00
+	mov	dpl, #0x80
 	ret
 fs2schar_pos:
 	jnz	fs2schar_maxval_pos

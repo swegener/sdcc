@@ -30,6 +30,18 @@ static void dummy(void) _naked
 	.globl	___fs2sint
 ___fs2sint:
 	lcall	___fs2slong
+	push acc
+	jnz fs2sint_not_zero
+	mov a, dpl
+	jnz fs2sint_not_zero
+	mov a, dph
+	jnz fs2sint_not_zero
+	mov a, b
+	jnz fs2sint_not_zero
+	pop acc
+	ret
+fs2sint_not_zero:
+    pop acc
 	jnb	sign_a, fs2sint_pos
 fs2sint_neg:
 	cpl	a
@@ -41,7 +53,7 @@ fs2sint_neg:
 	jnb	acc.7, fs2sint_maxval_neg
 	ret
 fs2sint_maxval_neg:
-	mov	dptr, #0x0000
+	mov	dptr, #0x8000
 	ret
 fs2sint_pos:
 	jnz	fs2sint_maxval_pos

@@ -1,3 +1,9 @@
+2005-11-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_fs2schar.c,
+	* device/lib/_fs2sint.c,
+	* device/lib/_fs2slong.c: optimized inline asm
+
 2005-11-21 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/lib/_fs2slong.c, device/lib/_fs2sint.c, device/lib/_fs2char.c:

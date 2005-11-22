@@ -31,18 +31,15 @@ static void dummy(void) _naked
 	.globl	___fs2schar
 ___fs2schar:
 	lcall	___fs2slong
-	push acc
 	jnz fs2schar_not_zero
 	mov a, dpl
-	jnz fs2schar_not_zero
-	mov a, dph
-	jnz fs2schar_not_zero
-	mov a, b
-	jnz fs2schar_not_zero
-	pop acc
+	orl a, dph
+	orl a, b
+	jnz fs2schar_clr_a
 	ret
+fs2schar_clr_a:
+	clr a
 fs2schar_not_zero:
-    pop acc
 	jnb	sign_a, fs2schar_pos
 fs2schar_neg:
 	cpl	a
@@ -83,7 +80,7 @@ signed char __fs2schar (float f) {
   signed long sl=__fs2slong(f);
   if (sl>=CHAR_MAX)
     return CHAR_MAX;
-  if (sl<=CHAR_MIN) 
+  if (sl<=CHAR_MIN)
     return -CHAR_MIN;
   return sl;
 }

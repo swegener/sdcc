@@ -55,18 +55,15 @@ fs2slong_neg:
 	cpl	a
 	addc	a, #0
 	//Check for zero
-	push acc
 	jnz fs2slong_not_zero
 	mov a, dpl
-	jnz fs2slong_not_zero
-	mov a, dph
-	jnz fs2slong_not_zero
-	mov a, b
-	jnz fs2slong_not_zero
-    pop acc
-    ret
+	orl a, dph
+	orl a, b
+	jnz fs2slong_clr_a
+	ret
+fs2slong_clr_a:
+	clr a
 fs2slong_not_zero:
-	pop acc
 	jnb acc.7, fs2slong_maxval_neg  // x < -0x80000000
 	ret
 fs2slong_pos:

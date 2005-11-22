@@ -30,18 +30,15 @@ static void dummy(void) _naked
 	.globl	___fs2sint
 ___fs2sint:
 	lcall	___fs2slong
-	push acc
 	jnz fs2sint_not_zero
 	mov a, dpl
-	jnz fs2sint_not_zero
-	mov a, dph
-	jnz fs2sint_not_zero
-	mov a, b
-	jnz fs2sint_not_zero
-	pop acc
+	orl a, dph
+	orl a, b
+	jnz fs2sint_clr_a
 	ret
+fs2sint_clr_a:
+	clr a
 fs2sint_not_zero:
-    pop acc
 	jnb	sign_a, fs2sint_pos
 fs2sint_neg:
 	cpl	a
@@ -78,7 +75,7 @@ signed int __fs2sint (float f) {
   signed long sl=__fs2slong(f);
   if (sl>=INT_MAX)
     return INT_MAX;
-  if (sl<=INT_MIN) 
+  if (sl<=INT_MIN)
     return -INT_MIN;
   return sl;
 }

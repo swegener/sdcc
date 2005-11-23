@@ -1030,8 +1030,12 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       if (size>symsize)
         {
           if (size>(symsize+1))
-            werrorfl (iexpr->filename, iexpr->lineno, W_EXCESS_INITIALIZERS,
-                      "string", sym->opval.val->sym->name);
+            {
+              char *name = (IS_AST_SYM_VALUE(sym)) ? AST_SYMBOL(sym)->name : "";
+
+              werrorfl (iexpr->filename, iexpr->lineno, W_EXCESS_INITIALIZERS,
+                        "string", name);
+            }
           size = symsize;
         }
 

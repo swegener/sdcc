@@ -1644,6 +1644,7 @@ copyLinkChain (sym_link * p)
   while (curr)
     {
       memcpy (loop, curr, sizeof (sym_link));   /* copy it */
+if (getenv ("SDCCCOPYSTRUCT")) // this breaks regression test bug-221220??
       if (IS_STRUCT (loop))
         SPEC_STRUCT (loop) = copyStruct (SPEC_STRUCT (loop));
       loop->next = (curr->next ? newLink (curr->next->class) : (void *) NULL);

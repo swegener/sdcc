@@ -991,7 +991,6 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
     /* if we have not been given a size  */
     if (!DCL_ELEM (type))
     {
-        /* but this still updates the typedef instead of the instance ! see bug 770487 */
         DCL_ELEM (type) = size;
     }
 

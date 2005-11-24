@@ -1,3 +1,9 @@
+2005-11-24 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCsymt.c (copyLinkChain): fixed bug 770487, copy structdef
+	and fields-list too
+	* src/SDCCast.c (createIvalArray): removed obsolete comment
+
 2005-11-24 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/device/lib/Makefile.in: remove all unnecessary files, 2nd try...

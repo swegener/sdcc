@@ -329,6 +329,20 @@ newStruct (char *tag)
 }
   
 /*------------------------------------------------------------------*/
+/* copyStruct - copies a structdef including the fields-list        */
+/*------------------------------------------------------------------*/
+static structdef *
+copyStruct (structdef *src)
+{
+  structdef *dest;
+
+  dest = newStruct ("");
+  memcpy (dest, src, sizeof (structdef));
+  dest->fields = copySymbolChain (src->fields);
+  return dest;
+}
+  
+/*------------------------------------------------------------------*/
 /* sclsFromPtr - Return the storage class a pointer points into.    */
 /*               S_FIXED is returned for generic pointers or other  */
 /*               unexpected cases                                   */
@@ -1630,6 +1644,8 @@ copyLinkChain (sym_link * p)
   while (curr)
     {
       memcpy (loop, curr, sizeof (sym_link));   /* copy it */
+      if (IS_STRUCT (loop))
+        SPEC_STRUCT (loop) = copyStruct (SPEC_STRUCT (loop));
       loop->next = (curr->next ? newLink (curr->next->class) : (void *) NULL);
       loop = loop->next;
       curr = curr->next;

@@ -286,7 +286,16 @@ clean_intermediate-pic16:
 install: all installdirs
 	$(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
 	$(CP_U) -r ds390 ds400 mcs51 small medium large gbz80 z80 hc08 pic pic16 *.c $(sdcc_libdir)/src
-	find $(sdcc_libdir)/src \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o -name '*.lst' -o -name '*.asm' -o -name 'CVS' \) -exec rm -r {} \;
+	for srcdir in ds390 ds400 small medium large gbz80 z80 hc08 pic pic16; do \
+	  find $(sdcc_libdir)/src/$$srcdir \
+	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
+	    -name '*.lst' -o -name '*.asm' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
+	    -exec rm -r {} \; \
+	done
+	find $(sdcc_libdir)/src/mcs51 \
+	  \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
+	  -name '*.lst' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
+	  -exec rm -r {} \; \
 
 # Deleting all the installed files
 # --------------------------------
@@ -308,8 +317,8 @@ installcheck:
 installdirs:
 	[ -d $(sdcc_libdir) ] || mkdir -p $(sdcc_libdir)
 	for model in $(MODELS); do \
-	 [ -d $(sdcc_libdir)/$$model ] || \
-	 mkdir -p $(sdcc_libdir)/$$model; \
+	  [ -d $(sdcc_libdir)/$$model ] || \
+	  mkdir -p $(sdcc_libdir)/$$model; \
 	done
 	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
 	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400

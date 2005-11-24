@@ -6,7 +6,8 @@
 
 2005-11-24 Borut Razem <borut.razem AT siol.net>
 
-	* sdcc/device/lib/Makefile.in: remove all unnecessary files, 2nd try...
+	* sdcc/device/lib/Makefile.in: remove all unnecessary files, 2nd try...,
+	  added missing device/lib/mcs51/crt*.asm sources
 
 2005-11-23 Bernhard Held <bernhard AT bernhardheld.de>
 

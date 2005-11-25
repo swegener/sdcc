@@ -290,12 +290,12 @@ install: all installdirs
 	  find $(sdcc_libdir)/src/$$srcdir \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	    -name '*.lst' -o -name '*.asm' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
-	    -exec rm -r {} \; \
+	    -exec rm -r {} \; ; \
 	done
 	find $(sdcc_libdir)/src/mcs51 \
 	  \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	  -name '*.lst' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
-	  -exec rm -r {} \; \
+	  -exec rm -r {} \;
 
 # Deleting all the installed files
 # --------------------------------

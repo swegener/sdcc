@@ -176,7 +176,7 @@ include incl.mk
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf models model-ds390 model-ds400 model-z80 model-gbz80 model-hc08 model-pic16 model-pic14
+all: checkconf models small-mcs51-stack-auto model-ds390 model-ds400 model-z80 model-gbz80 model-hc08 model-pic16 model-pic14
 
 objects: build-dir $(OBJECTS) port-specific-objects lib-files clean_intermediate
 
@@ -185,6 +185,11 @@ models:
 	  for model in $(MODELS); do \
 	    $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
+	fi
+
+small-mcs51-stack-auto:
+	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
+	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-mcs51-stack-auto:
@@ -320,11 +325,9 @@ installdirs:
 	  [ -d $(sdcc_libdir)/$$model ] || \
 	  mkdir -p $(sdcc_libdir)/$$model; \
 	done
-	[ -d $(sdcc_libdir)/ds390 ] || mkdir -p $(sdcc_libdir)/ds390
-	[ -d $(sdcc_libdir)/ds400 ] || mkdir -p $(sdcc_libdir)/ds400
-	[ -d $(sdcc_libdir)/hc08 ] || mkdir -p $(sdcc_libdir)/hc08
-	[ -d $(sdcc_libdir)/pic16 ] || mkdir -p $(sdcc_libdir)/pic16
-	[ -d $(sdcc_libdir)/pic ] || mkdir -p $(sdcc_libdir)/pic
+	for libdir in small-stack-auto ds390 ds400 hc08 pic16 pic; do \
+	  [ -d $(sdcc_libdir)/$$libdir ] || mkdir -p $(sdcc_libdir)/$$libdir; \
+	done
 	mkdir -p $(sdcc_libdir)/src
 
 # Creating dependencies

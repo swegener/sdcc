@@ -287,12 +287,12 @@ install: all installdirs
 	$(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
 	$(CP_U) -r ds390 ds400 mcs51 small medium large gbz80 z80 hc08 pic pic16 *.c $(sdcc_libdir)/src
 	for srcdir in ds390 ds400 small medium large gbz80 z80 hc08 pic pic16; do \
-	  find $(sdcc_libdir)/src/$$srcdir \
+	  find $(sdcc_libdir)/src/$$srcdir -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	    -name '*.lst' -o -name '*.asm' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
 	    -exec rm -r {} \; ; \
 	done
-	find $(sdcc_libdir)/src/mcs51 \
+	find $(sdcc_libdir)/src/mcs51 -depth \
 	  \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	  -name '*.lst' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
 	  -exec rm -r {} \;

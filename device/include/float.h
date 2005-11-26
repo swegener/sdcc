@@ -68,7 +68,7 @@ float __fsdiv (float, float);
 
 char __fslt (float, float);
 char __fseq (float, float);
-char __fsqt (float, float);
+char __fsgt (float, float);
 
 
 #if defined(SDCC_FLOAT_LIB) && defined(SDCC_mcs51) && !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)

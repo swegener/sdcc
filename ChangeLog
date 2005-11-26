@@ -1,3 +1,7 @@
+2005-11-26 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
+
+	* device/include/float.h: Corrected typo in prototype of __fsgt
+
 2005-11-25 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/device/lib/Makefile.in, sdcc/device/lib/incl.mk:

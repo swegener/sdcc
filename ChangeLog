@@ -1,3 +1,9 @@
+2005-11-26 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added small-stack-auto libraries,
+	  added missing device/lib/mcs51/crt*.asm, pic and pic16 sources,
+	  added pic and pic16 libraries
+
 2005-11-26 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	* device/include/float.h: Corrected typo in prototype of __fsgt

@@ -27,6 +27,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
    It's quite straightforward, but should be treated as opaque.  */
 
 struct deps;
+struct cpp_reader;
 
 /* Create a deps buffer.  */
 extern struct deps *deps_init	PARAMS ((void));
@@ -40,7 +41,7 @@ extern void deps_add_target	PARAMS ((struct deps *, const char *, int));
 
 /* Sets the default target if none has been given already.  An empty
    string as the default target in interpreted as stdin.  */
-extern void deps_add_default_target PARAMS ((struct deps *, const char *));
+extern void deps_add_default_target PARAMS ((struct cpp_reader *, const char *));
 
 /* Add a dependency (appears on the right side of the colon) to the
    deps list.  Dependencies will be printed in the order that they

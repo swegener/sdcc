@@ -23,6 +23,8 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "config.h"
 #include "system.h"
 #include "mkdeps.h"
+#include "cpplib.h"
+#include "cpphash.h"
 
 /* Keep this structure local to this file, so clients don't find it
    easy to start making assumptions.  */
@@ -176,33 +178,49 @@ deps_add_target (d, t, quote)
    string as the default target in interpreted as stdin.  The string
    is quoted for MAKE.  */
 void
-deps_add_default_target (d, tgt)
-     struct deps *d;
-     const char *tgt;
+deps_add_default_target (pfile, tgt)
+    cpp_reader *pfile;
+    const char *tgt;
 {
   /* Only if we have no targets.  */
-  if (d->ntargets)
+  if (pfile->deps->ntargets)
     return;
 
   if (tgt[0] == '\0')
-    deps_add_target (d, "-", 1);
+    deps_add_target (pfile->deps, "-", 1);
   else
     {
 #ifndef TARGET_OBJECT_SUFFIX
 # define TARGET_OBJECT_SUFFIX ".o"
 #endif
       char *start = lbasename (tgt);
-      char *o = (char *) alloca (strlen (start) + strlen (TARGET_OBJECT_SUFFIX) + 1);
+      char *o;
       char *suffix;
 
+      if (NULL == CPP_OPTION (pfile, obj_ext))
+        {
+        printf("obj_ext = --NULL--\n");
+        CPP_OPTION (pfile, obj_ext) = TARGET_OBJECT_SUFFIX;
+        }
+      else if (CPP_OPTION (pfile, obj_ext)[0] != '.')
+        {
+          char *t = (char *) alloca (strlen (CPP_OPTION (pfile, obj_ext)) + 2);
+          t[0] = '.';
+          strcpy (&t[1], CPP_OPTION (pfile, obj_ext));
+          CPP_OPTION (pfile, obj_ext) = t;
+          printf("obj_ext = %s\n", CPP_OPTION (pfile, obj_ext));
+        }
+
+      o = (char *) alloca (strlen (start) + strlen (CPP_OPTION (pfile, obj_ext)) + 1);
+
       strcpy (o, start);
-      
+
       suffix = strrchr (o, '.');
       if (!suffix)
         suffix = o + strlen (o);
-      strcpy (suffix, TARGET_OBJECT_SUFFIX);
-      
-      deps_add_target (d, o, 1);
+      strcpy (suffix, CPP_OPTION (pfile, obj_ext));
+
+      deps_add_target (pfile->deps, o, 1);
     }
 }
 

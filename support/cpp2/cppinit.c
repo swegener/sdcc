@@ -943,7 +943,7 @@ cpp_start_read (pfile, fname)
 
   if (CPP_OPTION (pfile, print_deps))
     /* Set the default target (if there is none already).  */
-    deps_add_default_target (pfile->deps, fname);
+    deps_add_default_target (pfile, fname);
 
   /* Open the main input file.  This must be done early, so we have a
      buffer to stand on.  */
@@ -1116,6 +1116,8 @@ new_pending_directive (pend, text, handler)
   DEF_OPT("nostdinc",                 0,      OPT_nostdinc)                   \
   DEF_OPT("nostdinc++",               0,      OPT_nostdincplusplus)           \
   DEF_OPT("o",                        no_fil, OPT_o)                          \
+  /* SDCC specific */                                                         \
+  DEF_OPT("obj-ext=",                 no_arg, OPT_obj_ext)                    \
   DEF_OPT("pedantic",                 0,      OPT_pedantic)                   \
   DEF_OPT("pedantic-errors",          0,      OPT_pedantic_errors)            \
   DEF_OPT("remap",                    0,      OPT_remap)                      \
@@ -1664,7 +1666,11 @@ cpp_handle_option (pfile, argc, argv)
 	  else if (!strcmp (argv[i], "-Wno-system-headers"))
 	    CPP_OPTION (pfile, warn_system_headers) = 0;
 	  break;
- 	}
+	/* SDCC specific */
+	case OPT_obj_ext:
+	  CPP_OPTION (pfile, obj_ext) = arg;
+	  break;
+	}
     }
   return i + 1;
 }
@@ -1868,9 +1874,14 @@ Switches:\n\
   -MG                       Treat missing header file as generated files\n\
 "), stdout);
   fputs (_("\
-  -MP			    Generate phony targets for all headers\n\
+  -MP                       Generate phony targets for all headers\n\
   -MQ <target>              Add a MAKE-quoted target\n\
   -MT <target>              Add an unquoted target\n\
+"), stdout);
+  /* SDCC specific */
+  fputs (_("\
+  -obj-ext=<extension>      Define object file externion, used for generation\n\
+                            of make dependencies\n\
 "), stdout);
   fputs (_("\
   -D<macro>                 Define a <macro> with string '1' as its value\n\

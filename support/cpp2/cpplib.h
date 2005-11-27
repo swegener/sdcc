@@ -396,6 +396,10 @@ struct cpp_options
   /* SDCC _asm specific
      switch _asm block preprocessing on / off */
   unsigned char preproc_asm;
+
+  /* SDCC specific
+     object file exetnsion */
+  const char *obj_ext;
 };
 
 /* This structure is passed to the call back when changing file.  */

@@ -413,7 +413,7 @@ _findPort (int argc, char **argv)
     }
 
   /* Use the first in the list */
-        port = _ports[0];
+  port = _ports[0];
 }
 
 /* search through the command line options for the processor */
@@ -1955,6 +1955,16 @@ preProcess (char **envp)
       const char *s;
       set *inclList = NULL;
 
+      if (NULL != port->linker.rel_ext)
+        {
+#define OBJ_EXT_STR     "-obj-ext="
+#define OBJ_EXT_LEN     ((sizeof OBJ_EXT_STR) - 1)
+          char *buf = Safe_alloc(strlen(port->linker.rel_ext) + (OBJ_EXT_LEN + 1));
+          strcpy(buf, OBJ_EXT_STR);
+          strcpy(&buf[OBJ_EXT_LEN], port->linker.rel_ext);
+          addSet(&preArgvSet, buf);
+        }
+
       /* if using external stack define the macro */
       if (options.useXstack)
         addSet(&preArgvSet, Safe_strdup("-DSDCC_USE_XSTACK"));
@@ -2025,7 +2035,6 @@ preProcess (char **envp)
 
       if (options.verbose)
         printf ("sdcc: Calling preprocessor...\n");
-
       buildCmdLine2 (buffer, sizeof(buffer), _preCmd);
 
       if (preProcOnly) {
@@ -2325,7 +2334,7 @@ main (int argc, char **argv, char **envp)
 #ifdef JAMIN_DS390
   if (strcmp(port->target, "mcs51") == 0) {
     printf("DS390 jammed in A\n");
-          _setPort ("ds390");
+    _setPort ("ds390");
     ds390_jammed = 1;
   }
 #endif

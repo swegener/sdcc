@@ -1,6 +1,10 @@
 2005-11-27 Borut Razem <borut.razem AT siol.net>
 
-	*support/cpp2/, 
+	* support/cpp2/cppinit.c, support/cpp2/cpplib.h, support/cpp2/mkdeps.c,
+	  support/cpp2/mkdeps.h: added command line option
+	  -obj-ext=<extension> to SDCPP to define object file externion, used
+	  for generation of make dependencies (-M)
+	* src/SDCCmain.c: pass -obj-ext=<extension> to SDCPP
 
 2005-11-26 Borut Razem <borut.razem AT siol.net>
 

@@ -196,26 +196,28 @@ deps_add_default_target (pfile, tgt)
       char *start = lbasename (tgt);
       char *o;
       char *suffix;
+      const char *obj_ext;
 
       if (NULL == CPP_OPTION (pfile, obj_ext))
-        CPP_OPTION (pfile, obj_ext) = TARGET_OBJECT_SUFFIX;
+        obj_ext = TARGET_OBJECT_SUFFIX;
       else if (CPP_OPTION (pfile, obj_ext)[0] != '.')
         {
-          char *t = (char *) alloca (strlen (CPP_OPTION (pfile, obj_ext)) + 2);
+          char *t = alloca (strlen (CPP_OPTION (pfile, obj_ext)) + 2);
           t[0] = '.';
           strcpy (&t[1], CPP_OPTION (pfile, obj_ext));
-          CPP_OPTION (pfile, obj_ext) = t;
-          printf("obj_ext = %s\n", CPP_OPTION (pfile, obj_ext));
+          obj_ext = t;
         }
+      else
+        obj_ext = CPP_OPTION (pfile, obj_ext);
 
-      o = (char *) alloca (strlen (start) + strlen (CPP_OPTION (pfile, obj_ext)) + 1);
+      o = (char *) alloca (strlen (start) + strlen (obj_ext) + 1);
 
       strcpy (o, start);
 
       suffix = strrchr (o, '.');
       if (!suffix)
         suffix = o + strlen (o);
-      strcpy (suffix, CPP_OPTION (pfile, obj_ext));
+      strcpy (suffix, obj_ext);
 
       deps_add_target (pfile->deps, o, 1);
     }

@@ -1880,7 +1880,7 @@ Switches:\n\
 "), stdout);
   /* SDCC specific */
   fputs (_("\
-  -obj-ext=<extension>      Define object file externion, used for generation\n\
+  -obj-ext=<extension>      Define object file extension, used for generation\n\
                             of make dependencies\n\
 "), stdout);
   fputs (_("\

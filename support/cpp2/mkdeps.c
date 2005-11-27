@@ -198,10 +198,7 @@ deps_add_default_target (pfile, tgt)
       char *suffix;
 
       if (NULL == CPP_OPTION (pfile, obj_ext))
-        {
-        printf("obj_ext = --NULL--\n");
         CPP_OPTION (pfile, obj_ext) = TARGET_OBJECT_SUFFIX;
-        }
       else if (CPP_OPTION (pfile, obj_ext)[0] != '.')
         {
           char *t = (char *) alloca (strlen (CPP_OPTION (pfile, obj_ext)) + 2);

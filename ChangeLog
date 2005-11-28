@@ -1,3 +1,8 @@
+2005-11-28 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/include/mcs51/at89c51snd1c.h: added file submitted by 
+	  Weston T. Schmidt <schmidtw AT users.sourceforge.net>, patch #1368001
+
 2005-11-27 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2/cppinit.c, support/cpp2/cpplib.h, support/cpp2/mkdeps.c,

@@ -424,6 +424,14 @@ struct
    "integer constant '%s' out of range, truncated to %.0lf." },
 { W_CMP_SU_CHAR, ERROR_LEVEL_PEDANTIC,
    "comparison of 'signed char' with 'unsigned char' requires promotion to int" },
+{ W_INVALID_FLEXARRAY, ERROR_LEVEL_WARNING,
+   "invalid use of structure with flexible array member" },
+{ W_C89_NO_FLEXARRAY, ERROR_LEVEL_PEDANTIC,
+   "ISO C90 does not support flexible array members" },
+{ E_FLEXARRAY_NOTATEND, ERROR_LEVEL_ERROR,
+   "flexible array member not at end of struct" },
+{ E_FLEXARRAY_INEMPTYSTRCT, ERROR_LEVEL_ERROR,
+   "flexible array in otherwise empty struct" },
 };
 
 /*

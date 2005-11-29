@@ -201,6 +201,10 @@ SDCCERR - SDCC Standard error handler
 #define E_BANKED_WITH_CALLEESAVES     183 /* banked and callee-saves mixed */
 #define W_INVALID_INT_CONST           184 /* invalid integer literal string */
 #define W_CMP_SU_CHAR                 185 /* comparison of 'signed char' with 'unsigned char' requires promotion to int */
+#define W_INVALID_FLEXARRAY           186 /* invalid use of structure with flexible array member */
+#define W_C89_NO_FLEXARRAY            187 /* ISO C90 does not support flexible array members */
+#define E_FLEXARRAY_NOTATEND          188 /* flexible array member not at end of struct */
+#define E_FLEXARRAY_INEMPTYSTRCT      189 /* flexible array in otherwise empty struct */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

@@ -86,6 +86,8 @@ typedef struct structdef
     struct symbol *fields;              /* pointer to fields     */
     unsigned size;                      /* sizeof the table in bytes  */
     int type;                           /* STRUCT or UNION */
+    bool b_flexArrayMember;             /* has got an flexible array member,
+                                           only needed for syntax checks */
   }
 structdef;
 
@@ -185,7 +187,8 @@ DECLARATOR_TYPE;
 typedef struct declarator
   {
     DECLARATOR_TYPE dcl_type;           /* POINTER,ARRAY or FUNCTION  */
-    unsigned int num_elem;              /* # of elems if type==array  */
+    unsigned int num_elem;              /* # of elems if type==array, */
+                                        /* always 0 for flexible arrays */
     unsigned ptr_const:1;               /* pointer is constant        */
     unsigned ptr_volatile:1;            /* pointer is volatile        */
     struct sym_link *tspec;             /* pointer type specifier     */
@@ -246,6 +249,11 @@ typedef struct symbol
     short level;                        /* declration lev,fld offset */
     short block;                        /* sequential block # of defintion */
     int key;
+    unsigned flexArrayLength;           /* if the symbol specifies a struct
+    with a "flexible array member", then the additional length in bytes for
+    the "fam" is stored here. Because the lenght can be different from symbol
+    to symbol AND v_struct isn't copied in copyLinkChain(), it's located here
+    in the symbol and not in v_struct or the declarator */
     unsigned implicit:1;                /* implicit flag                     */
     unsigned undefined:1;               /* undefined variable                */
     unsigned _isparm:1;                 /* is a parameter          */
@@ -568,7 +576,6 @@ value *checkStructIval (symbol *, value *);
 value *checkArrayIval (sym_link *, value *);
 value *checkIval (sym_link *, value *);
 unsigned int getSize (sym_link *);
-unsigned int getAllocSize (sym_link *);
 unsigned int bitsForType (sym_link *);
 sym_link *newIntLink ();
 sym_link *newCharLink ();

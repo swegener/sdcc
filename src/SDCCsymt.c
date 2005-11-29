@@ -329,20 +329,6 @@ newStruct (char *tag)
 }
   
 /*------------------------------------------------------------------*/
-/* copyStruct - copies a structdef including the fields-list        */
-/*------------------------------------------------------------------*/
-static structdef *
-copyStruct (structdef *src)
-{
-  structdef *dest;
-
-  dest = newStruct ("");
-  memcpy (dest, src, sizeof (structdef));
-  dest->fields = copySymbolChain (src->fields);
-  return dest;
-}
-  
-/*------------------------------------------------------------------*/
 /* sclsFromPtr - Return the storage class a pointer points into.    */
 /*               S_FIXED is returned for generic pointers or other  */
 /*               unexpected cases                                   */
@@ -810,7 +796,7 @@ newBoolLink ()
 }
 
 /*------------------------------------------------------------------*/
-/* getSize - returns size of a type chain in bits                   */
+/* getSize - returns size of a type chain in bytes                  */
 /*------------------------------------------------------------------*/
 unsigned int 
 getSize (sym_link * p)
@@ -874,29 +860,41 @@ getSize (sym_link * p)
     }
 }
 
-/*---------------------------------------------------------------------*/
-/* getAllocSize - returns size of a type chain in bytes for allocation */
-/*---------------------------------------------------------------------*/
-unsigned int
-getAllocSize (sym_link *p)
+/*------------------------------------------------------------------*/
+/* checkStructFlexArray - check tree behind a struct                */
+/*------------------------------------------------------------------*/
+static bool
+checkStructFlexArray (symbol *sym, sym_link *p)
 {
-  if (IS_STRUCT (p) && SPEC_STRUCT (p)->type == STRUCT)
+  /* if nothing return FALSE */
+  if (!p)
+    return FALSE;
+
+  if (IS_SPEC (p))
     {
-      /* if this is a struct specifier then  */
-      /* calculate the size as it could end  */
-      /* with an array of unspecified length */
-      symbol *sflds = SPEC_STRUCT (p)->fields;
-
-      while (sflds && sflds->next)
-        sflds = sflds->next;
-
-      if (sflds && !IS_BITFIELD (sflds->type))
-        return sflds->offset + getAllocSize (sflds->type);
-      else
-        return SPEC_STRUCT (p)->size;
+      /* (nested) struct with flexible array member? */
+      if (IS_STRUCT (p) && SPEC_STRUCT (p)->b_flexArrayMember)
+        {
+          werror (W_INVALID_FLEXARRAY);
+          return FALSE;
+        }
+      return FALSE;
     }
-  else
-    return getSize (p);
+
+  /* this is a declarator */
+  if (IS_ARRAY (p))
+    {
+      /* flexible array member? */
+      if (!DCL_ELEM(p))
+        {
+          if (!options.std_c99)
+            werror (W_C89_NO_FLEXARRAY);
+          return TRUE;
+        }
+      /* walk tree */
+      return checkStructFlexArray (sym, p->next);
+    }
+  return FALSE;
 }
 
 /*------------------------------------------------------------------*/
@@ -1306,6 +1304,21 @@ compStructSize (int su, structdef * sdef)
             loop->offset = sum;
             checkDecl (loop, 1);
             sum += getSize (loop->type);
+
+            /* search for "flexibel array members" */
+            /* and do some syntax checks */
+            if (   su == STRUCT
+                && checkStructFlexArray (loop, loop->type))
+              {
+                /* found a "flexible array member" */
+                sdef->b_flexArrayMember = TRUE;
+                /* is another struct-member following? */
+                if (loop->next)
+                  werror (E_FLEXARRAY_NOTATEND);
+                /* is it the first struct-member? */
+                else if (loop == sdef->fields)
+                  werror (E_FLEXARRAY_INEMPTYSTRCT);
+              }
         }
 
         loop = loop->next;
@@ -1639,14 +1652,12 @@ copyLinkChain (sym_link * p)
 {
   sym_link *head, *curr, *loop;
 
+  /* note: v_struct and v_struct->fields are not copied! */
   curr = p;
   head = loop = (curr ? newLink (p->class) : (void *) NULL);
   while (curr)
     {
       memcpy (loop, curr, sizeof (sym_link));   /* copy it */
-if (getenv ("SDCCCOPYSTRUCT")) // this breaks regression test bug-221220??
-      if (IS_STRUCT (loop))
-        SPEC_STRUCT (loop) = copyStruct (SPEC_STRUCT (loop));
       loop->next = (curr->next ? newLink (curr->next->class) : (void *) NULL);
       loop = loop->next;
       curr = curr->next;

@@ -50,8 +50,8 @@ int labelKey = 1;
 int noLineno = 0;
 int noAlloc = 0;
 symbol *currFunc=NULL;
-static ast *createIval (ast *, sym_link *, initList *, ast *);
-static ast *createIvalCharPtr (ast *, sym_link *, ast *);
+static ast *createIval (ast *, sym_link *, initList *, ast *, ast *);
+static ast *createIvalCharPtr (ast *, sym_link *, ast *, ast *);
 static ast *optimizeCompare (ast *);
 ast *optimizeRRCRLC (ast *);
 ast *optimizeSWAP (ast *);
@@ -864,7 +864,7 @@ createIvalType (ast * sym, sym_link * type, initList * ilist)
 /* createIvalStruct - generates initial value for structures       */
 /*-----------------------------------------------------------------*/
 static ast *
-createIvalStruct (ast * sym, sym_link * type, initList * ilist)
+createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
 {
   ast *rast = NULL;
   ast *lAst;
@@ -888,7 +888,10 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
       sflds->implicit = 1;
       lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
       lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
-      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast)), RESULT_TYPE_NONE);
+      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type,
+                                                       iloop, rast, rootValue)),
+                           RESULT_TYPE_NONE);
+
     }
 
   if (iloop) {
@@ -905,7 +908,7 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist)
 /* createIvalArray - generates code for array initialization       */
 /*-----------------------------------------------------------------*/
 static ast *
-createIvalArray (ast * sym, sym_link * type, initList * ilist)
+createIvalArray (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
 {
   ast *rast = NULL;
   initList *iloop;
@@ -918,83 +921,88 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
   if (IS_CHAR (type->next))
     if ((rast = createIvalCharPtr (sym,
                                    type,
-                        decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE))))
+                        decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE),
+                                   rootValue)))
 
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 
-    /* not the special case             */
-    if (ilist->type != INIT_DEEP)
-    {
-        werror (E_INIT_STRUCT, "");
-        return NULL;
-    }
+  /* not the special case             */
+  if (ilist->type != INIT_DEEP)
+  {
+      werror (E_INIT_STRUCT, "");
+      return NULL;
+  }
 
-    iloop = ilist->init.deep;
-    lcnt = DCL_ELEM (type);
+  iloop = ilist->init.deep;
+  lcnt = DCL_ELEM (type);
 
-    if (port->arrayInitializerSuppported && convertIListToConstList(ilist, &literalL))
-    {
-        ast *aSym;
+  if (port->arrayInitializerSuppported && convertIListToConstList(ilist, &literalL))
+  {
+      ast *aSym;
 
-        aSym = decorateType (resolveSymbols(sym), RESULT_TYPE_NONE);
-        
-        rast = newNode(ARRAYINIT, aSym, NULL);
-        rast->values.constlist = literalL;
-        
-        // Make sure size is set to length of initializer list.
-        while (iloop)
-        {
-            size++;
-            iloop = iloop->next;
-        }
-        
-        if (lcnt && size > lcnt)
-        {
-            // Array size was specified, and we have more initializers than needed.
-            char *name=sym->opval.val->sym->name;
-            int lineno=sym->opval.val->sym->lineDef;
-            char *filename=sym->opval.val->sym->fileDef;
-            
-            werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
-        }
-    }
-    else
-    {
-        for (;;)
-        {
-            ast *aSym;
-            
-            aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size++))));
-            aSym = decorateType (resolveSymbols (aSym), RESULT_TYPE_NONE);
-            rast = createIval (aSym, type->next, iloop, rast);
-            iloop = (iloop ? iloop->next : NULL);
-            if (!iloop)
-            {
-                break;
-            }
-            
-            /* no of elements given and we    */
-            /* have generated for all of them */
-            if (!--lcnt) 
-            {
-                // is this a better way? at least it won't crash
-                char *name = (IS_AST_SYM_VALUE(sym)) ? AST_SYMBOL(sym)->name : "";
-                int lineno = iloop->lineno;
-                char *filename = iloop->filename;
-                werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
-                
-                break;
-            }
-        }
-    }
+      aSym = decorateType (resolveSymbols(sym), RESULT_TYPE_NONE);
+      
+      rast = newNode(ARRAYINIT, aSym, NULL);
+      rast->values.constlist = literalL;
+      
+      // Make sure size is set to length of initializer list.
+      while (iloop)
+      {
+          size++;
+          iloop = iloop->next;
+      }
+      
+      if (lcnt && size > lcnt)
+      {
+          // Array size was specified, and we have more initializers than needed.
+          char *name=sym->opval.val->sym->name;
+          int lineno=sym->opval.val->sym->lineDef;
+          char *filename=sym->opval.val->sym->fileDef;
+          
+          werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
+      }
+  }
+  else
+  {
+      for (;;)
+      {
+          ast *aSym;
+          
+          aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (size++))));
+          aSym = decorateType (resolveSymbols (aSym), RESULT_TYPE_NONE);
+          rast = createIval (aSym, type->next, iloop, rast, rootValue);
+          iloop = (iloop ? iloop->next : NULL);
+          if (!iloop)
+          {
+              break;
+          }
+          
+          /* no of elements given and we    */
+          /* have generated for all of them */
+          if (!--lcnt) 
+          {
+              // is this a better way? at least it won't crash
+              char *name = (IS_AST_SYM_VALUE(sym)) ? AST_SYMBOL(sym)->name : "";
+              int lineno = iloop->lineno;
+              char *filename = iloop->filename;
+              werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
+              
+              break;
+          }
+      }
+  }
 
-    /* if we have not been given a size  */
-    if (!DCL_ELEM (type))
+  /* if we have not been given a size  */
+  if (!DCL_ELEM (type))
     {
+      /* check, if it's a flexible array */
+      if (IS_STRUCT (AST_VALUE (rootValue)->type))
+        AST_SYMBOL(rootValue)->flexArrayLength = size * getSize (type->next);
+      else
         DCL_ELEM (type) = size;
     }
 
-    return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
+  return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 }
 
 
@@ -1002,9 +1010,10 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist)
 /* createIvalCharPtr - generates initial values for char pointers  */
 /*-----------------------------------------------------------------*/
 static ast *
-createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
+createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast *rootVal)
 {
   ast *rast = NULL;
+  unsigned size = 0;
 
   /* if this is a pointer & right is a literal array then */
   /* just assignment will do                              */
@@ -1023,10 +1032,10 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       /* to the array element */
       char *s = SPEC_CVAL (iexpr->etype).v_char;
       int i = 0;
-      int size = getSize (iexpr->ftype);
       int symsize = getSize (type);
-      
-      if (size>symsize)
+
+      size = getSize (iexpr->ftype);
+      if (symsize && size>symsize)
         {
           if (size>(symsize+1))
             {
@@ -1052,6 +1061,16 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
       // now WE don't need iexpr's symbol anymore
       freeStringSymbol(AST_SYMBOL(iexpr));
 
+      /* if we have not been given a size  */
+      if (!DCL_ELEM (type))
+        {
+          /* check, if it's a flexible array */
+          if (IS_STRUCT (AST_VALUE (rootVal)->type))
+            AST_SYMBOL(rootVal)->flexArrayLength = size * getSize (type->next);
+          else
+            DCL_ELEM (type) = size;
+        }
+
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
     }
 
@@ -1062,7 +1081,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr)
 /* createIvalPtr - generates initial value for pointers            */
 /*-----------------------------------------------------------------*/
 static ast *
-createIvalPtr (ast * sym, sym_link * type, initList * ilist)
+createIvalPtr (ast * sym, sym_link * type, initList * ilist, ast *rootVal)
 {
   ast *rast;
   ast *iexpr;
@@ -1075,7 +1094,7 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist)
 
   /* if character pointer */
   if (IS_CHAR (type->next))
-    if ((rast = createIvalCharPtr (sym, type, iexpr)))
+    if ((rast = createIvalCharPtr (sym, type, iexpr, rootVal)))
       return rast;
 
   return newNode ('=', sym, iexpr);
@@ -1085,7 +1104,7 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist)
 /* createIval - generates code for initial value                   */
 /*-----------------------------------------------------------------*/
 static ast *
-createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
+createIval (ast * sym, sym_link * type, initList * ilist, ast * wid, ast *rootValue)
 {
   ast *rast = NULL;
 
@@ -1094,15 +1113,15 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
 
   /* if structure then    */
   if (IS_STRUCT (type))
-    rast = createIvalStruct (sym, type, ilist);
+    rast = createIvalStruct (sym, type, ilist, rootValue);
   else
     /* if this is a pointer */
   if (IS_PTR (type))
-    rast = createIvalPtr (sym, type, ilist);
+    rast = createIvalPtr (sym, type, ilist, rootValue);
   else
     /* if this is an array   */
   if (IS_ARRAY (type))
-    rast = createIvalArray (sym, type, ilist);
+    rast = createIvalArray (sym, type, ilist, rootValue);
   else
     /* if type is SPECIFIER */
   if (IS_SPEC (type))
@@ -1118,7 +1137,8 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid)
 /* initAggregates - initialises aggregate variables with initv     */
 /*-----------------------------------------------------------------*/
 ast * initAggregates (symbol * sym, initList * ival, ast * wid) {
-  return createIval (newAst_VALUE (symbolVal (sym)), sym->type, ival, wid);
+  ast *newAst = newAst_VALUE (symbolVal (sym));
+  return createIval (newAst, sym->type, ival, wid, newAst);
 }
 
 /*-----------------------------------------------------------------*/

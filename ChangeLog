@@ -1,5 +1,28 @@
 2005-11-29 Bernhard Held <bernhard AT bernhardheld.de>
 
+	* src/SDCCast.c (createIvalStruct, createIvalArray, createIvalPtr,
+	createIval): implement symbol independant "flexible array member",
+	(createIvalCharPtr): implemented flexible array initialisation with a
+	string
+	* src/SDCCsymt.c (copyStruct): removed,
+	(getSize): fixed misleading comment,
+	(getAllocSize): removed, the additional allocation size is now in
+	sym->flexArrayLength,
+	(checkStructFlexArray): new, syntax checks for flexible array members,
+	(compStructSize): added syntax checks for "flexible array members"
+	(copyStruct): removed,
+	(copyLinkChain): removed inefficient fix for bug 770487
+	* src/SDCCglue.c (emitRegularMap): getAllocSize has been removed
+	* src/SDCCsymt.h: added structdef.b_flexArrayMember and
+	symbol->flexArrayLength
+	* src/SDCCerr.c,
+	* src/SDCCerr.h: added W_INVALID_FLEXARRAY, W_C89_NO_FLEXARRAY,
+	E_FLEXARRAY_NOTATEND and E_FLEXARRAY_INEMPTYSTRCT
+	* support/regression/tests/structflexarray.c: added
+	* support/valdiag/tests/structflexiblearray.c: added
+
+2005-11-29 Bernhard Held <bernhard AT bernhardheld.de>
+
 	* src/SDCCast.c (decorateType): fixed bug 1368489
 	* support/Util/SDCCerr.c,
 	* support/Util/SDCCerr.h: added warning W_CMP_SU_CHAR

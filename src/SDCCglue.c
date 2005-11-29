@@ -361,7 +361,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                    SPEC_ADDR (sym->etype));
         }
       else {
-        int size = getAllocSize (sym->type);
+        int size = getSize (sym->type) + sym->flexArrayLength;
         if (size==0) {
           werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
         }

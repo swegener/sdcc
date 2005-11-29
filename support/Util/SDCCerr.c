@@ -422,6 +422,8 @@ struct
    "Both banked and callee-saves cannot be used together." },
 { W_INVALID_INT_CONST, ERROR_LEVEL_WARNING,
    "integer constant '%s' out of range, truncated to %.0lf." },
+{ W_CMP_SU_CHAR, ERROR_LEVEL_PEDANTIC,
+   "comparison of 'signed char' with 'unsigned char' requires promotion to int" },
 };
 
 /*

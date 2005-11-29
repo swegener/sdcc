@@ -200,6 +200,7 @@ SDCCERR - SDCC Standard error handler
 #define W_SFR_ABSRANGE                182 /* sfr at address out of range */
 #define E_BANKED_WITH_CALLEESAVES     183 /* banked and callee-saves mixed */
 #define W_INVALID_INT_CONST           184 /* invalid integer literal string */
+#define W_CMP_SU_CHAR                 185 /* comparison of 'signed char' with 'unsigned char' requires promotion to int */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

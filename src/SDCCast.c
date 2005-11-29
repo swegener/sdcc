@@ -3932,6 +3932,16 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                    tree->opval.val->type);
           return tree;
         }
+      /* if one is 'signed char ' and the other one is 'unsigned char' */
+      /* it's necessary to promote to int */
+      if (IS_CHAR (RTYPE (tree)) && IS_CHAR (LTYPE (tree)) &&
+          (IS_UNSIGNED (RTYPE (tree)) != IS_UNSIGNED (LTYPE (tree))))
+        {
+          werror (W_CMP_SU_CHAR);
+          tree->left  = addCast (tree->left , RESULT_TYPE_INT, TRUE);
+          tree->right = addCast (tree->right, RESULT_TYPE_INT, TRUE);
+        }
+
       LRVAL (tree) = RRVAL (tree) = 1;
       TTYPE (tree) = TETYPE (tree) = newCharLink ();
       return tree;

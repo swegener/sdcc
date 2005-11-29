@@ -186,3 +186,20 @@ testComplement(void)
   ASSERT(~ (char)          0x80 == (short) 0x007f); ASSERT(~ (char)          0x80 > 0);
   ASSERT(~ (unsigned char) 0x80 == (short) 0xff7f); ASSERT(~ (unsigned char) 0x80 < 0);
 }
+
+void
+testComp(void)
+{
+  {attrL}   signed char  c;
+  {attrR} unsigned char uc;
+
+   c = 0x80; /* -128 */
+  uc = 0x80; /* +128 */
+
+  ASSERT(!(c == uc));
+  ASSERT(  c != uc );
+  ASSERT(  c <  uc );
+  ASSERT(  c <= uc );
+  ASSERT(!(c >  uc));
+  ASSERT(!(c >= uc));
+}

@@ -3957,9 +3957,30 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_CHAR (RTYPE (tree)) && IS_CHAR (LTYPE (tree)) &&
           (IS_UNSIGNED (RTYPE (tree)) != IS_UNSIGNED (LTYPE (tree))))
         {
-          werror (W_CMP_SU_CHAR);
-          tree->left  = addCast (tree->left , RESULT_TYPE_INT, TRUE);
-          tree->right = addCast (tree->right, RESULT_TYPE_INT, TRUE);
+          /* Literals are 'optimized' to 'unsigned char'. Try to figure out,
+             if it's possible to use a 'signed char' */
+
+              /* is left a 'unsigned char'? */
+          if (IS_LITERAL (RTYPE (tree)) && IS_UNSIGNED (RTYPE (tree)) &&
+              /* the value range of a 'unsigned char' is 0...255;
+                 if the actual value is < 128 it can be changed to signed */
+              (int) floatFromVal (valFromType (RETYPE (tree))) < 128)
+            {
+              /* now we've got 2 'signed char'! */
+              SPEC_USIGN (RETYPE (tree)) = 0;
+            }
+                   /* same test for the left operand: */
+          else if (IS_LITERAL (LTYPE (tree)) && IS_UNSIGNED (LTYPE (tree)) &&
+              (int) floatFromVal (valFromType (LETYPE (tree))) < 128)
+            {
+              SPEC_USIGN (LETYPE (tree)) = 0;
+            }
+          else
+            {
+              werror (W_CMP_SU_CHAR);
+              tree->left  = addCast (tree->left , RESULT_TYPE_INT, TRUE);
+              tree->right = addCast (tree->right, RESULT_TYPE_INT, TRUE);
+            }
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;

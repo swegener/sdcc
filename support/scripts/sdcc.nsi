@@ -51,7 +51,7 @@
 
 !include "MUI.nsh"
 
-SetCompressor lzma
+SetCompressor /SOLID lzma
 
 !define SDCC_ROOT "."
 

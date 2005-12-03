@@ -1,3 +1,8 @@
+2005-12-03 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added /SOLID option to "SetCompressor lzma"
+	  command since the NSIS was upgraded to version 2.11 on CF x86-linux2
+
 2005-11-29 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (createIvalStruct, createIvalArray, createIvalPtr,

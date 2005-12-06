@@ -65,7 +65,7 @@ SOURCE=.\sdcc_vc_in.h
 
 !IF  "$(CFG)" == "config - Win32 Release"
 
-USERDEP__SDCC_=".version"	
+USERDEP__SDCC_=".version"	"configure_vc.awk"	
 # Begin Custom Build
 InputPath=.\sdcc_vc_in.h
 
@@ -76,6 +76,7 @@ InputPath=.\sdcc_vc_in.h
 
 !ELSEIF  "$(CFG)" == "config - Win32 Debug"
 
+USERDEP__SDCC_=".version"	"configure_vc.awk"	
 # Begin Custom Build
 InputPath=.\sdcc_vc_in.h
 

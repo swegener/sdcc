@@ -38,5 +38,12 @@ test_sprintf(void)
   sprintf( s, "%-3.3s", "ab" );
   ASSERT( 0 == strcmp( s, "ab " ) );
 
+  //and from bug 1358192
+#if defined(SDCC__ds390)
+  sprintf( s, "%f", 10.1 );
+  LOG((s));
+  ASSERT( 0 == strcmp( s, "10.100000" ) );
+#endif
+
   ASSERT( s[12]==0x12 );
 }

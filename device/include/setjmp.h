@@ -25,9 +25,33 @@
 #ifndef SDCC_SETJMP_H
 #define SDCC_SETJMP_H
 
-typedef unsigned char jmp_buf[3];
+#define SP_SIZE		1
 
-int setjmp (unsigned char *);
-int longjmp(unsigned char *, int);
+#ifdef SDCC_STACK_AUTO
+#define BP_SIZE		SP_SIZE
+#else
+#define BP_SIZE		0
+#endif
+
+#ifdef SDCC_USE_XSTACK
+#define SPX_SIZE	1
+#else
+#define SPX_SIZE	0
+#endif
+
+#define BPX_SIZE	SPX_SIZE
+
+#define RET_SIZE	2
+
+typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];
+
+int setjmp (jmp_buf);
+int longjmp(jmp_buf, int);
+
+#undef RET_SIZE
+#undef SP_SIZE
+#undef BP_SIZE
+#undef SPX_SIZE
+#undef BPX_SIZE
 
 #endif

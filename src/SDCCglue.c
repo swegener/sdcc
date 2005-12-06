@@ -790,21 +790,29 @@ printIvalStruct (symbol * sym, sym_link * type,
 /* printIvalChar - generates initital value for character array    */
 /*-----------------------------------------------------------------*/
 int 
-printIvalChar (sym_link * type, initList * ilist, FILE * oFile, char *s)
+printIvalChar (symbol * sym, sym_link * type, initList * ilist, FILE * oFile, char *s)
 {
   value *val;
+  unsigned int size = DCL_ELEM (type);
 
   if (!s)
     {
-
       val = list2val (ilist);
       /* if the value is a character string  */
       if (IS_ARRAY (val->type) && IS_CHAR (val->etype))
         {
-          if (!DCL_ELEM (type))
-            DCL_ELEM (type) = strlen (SPEC_CVAL (val->etype).v_char) + 1;
+          if (!size)
+            {
+              /* we have not been given a size, but now we know it */
+              size = strlen (SPEC_CVAL (val->etype).v_char) + 1;
+              /* but first check, if it's a flexible array */
+              if (sym && IS_STRUCT (sym->type))
+                sym->flexArrayLength = size;
+              else
+                DCL_ELEM (type) = size;
+            }
 
-          printChar (oFile, SPEC_CVAL (val->etype).v_char, DCL_ELEM (type));
+          printChar (oFile, SPEC_CVAL (val->etype).v_char, size);
 
           return 1;
         }
@@ -835,7 +843,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
         werrorfl (ilist->filename, ilist->lineno, E_CONST_EXPECTED);
         return;
       }
-      if (printIvalChar (type,
+      if (printIvalChar (sym, type,
                          (ilist->type == INIT_DEEP ? ilist->init.deep : ilist),
                          oFile, SPEC_CVAL (sym->etype).v_char))
         return;
@@ -864,8 +872,12 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
       }
     }
   } else {
-    // we have not been given a size, but we now know it
-    DCL_ELEM (type) = size;
+    /* we have not been given a size, but now we know it */
+    /* but first check, if it's a flexible array */
+    if (IS_STRUCT (sym->type))
+      sym->flexArrayLength = size * getSize (type->next);
+    else
+      DCL_ELEM (type) = size;
   }
 
   return;

@@ -1,3 +1,19 @@
+2005-12-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* config.dsp: added dependency on .version and configure_vc.awk
+	* device/include/setjmp.h: updated for --stack-auto and --xstack
+	* device/include/mcs51/at89c51snd1c.h: corrected line endings
+	* device/include/mcs51/XC866.h: added, thanks Llewellyn van Zyl
+	* device/lib/_setjmp.c: updated for --stack-auto and --xstack
+	* device/lib/libsdcc.lib: added _setjmp
+	* src/SDCCast.c (createIvalCharPtr): fixed warnings,
+	  (decorateType): fixed bug 1372851,
+	  (optimizeGetHbit): fixed warning
+	* src/SDCCglue.c (printIvalChar, printIvalArray): adapted for flexible
+	  array initialisation
+	* support/regression/tests/bug1057979.c: added test for bug 1358192
+	* support/regression/tests/setjmp.c: added, test for setjmp/longjmp
+
 2005-12-03 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added /SOLID option to "SetCompressor lzma"
@@ -34,7 +50,7 @@
 
 2005-11-28 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-	* device/include/mcs51/at89c51snd1c.h: added file submitted by 
+	* device/include/mcs51/at89c51snd1c.h: added file submitted by
 	  Weston T. Schmidt <schmidtw AT users.sourceforge.net>, patch #1368001
 
 2005-11-27 Borut Razem <borut.razem AT siol.net>

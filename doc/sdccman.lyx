@@ -5752,6 +5752,61 @@ status Collapsed
 /
 \end_inset 
 
+-xstack-loc
+\series default 
+
+\begin_inset LatexCommand \index{-\/-xstack-loc <Value>}
+
+\end_inset 
+
+\SpecialChar ~
+<Value> By default the external stack
+\begin_inset LatexCommand \index{xstack}
+
+\end_inset 
+
+ is placed after the pdata segment.
+ Using this option the xstack can be placed anywhere in the external memory
+ space of the 8051.
+ The value entered can be in Hexadecimal or Decimal format, e.g.
+ -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-xstack-loc 0x8000 or -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-loc 32768.
+ The provided value should not overlap any other memory areas such as the
+ pdata or xdata segment and with enough space for the current application.
+\layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
 -data-loc
 \series default 
 
@@ -10887,7 +10942,13 @@ nooverlay
  if it is not reentrant.
  Furthermore nonreentrant functions should not be called from the main program
  while the interrupt service routine might be active.
- 
+ They also must not be called from low priority interrupt service routines
+ while a high priority interrupt service routine might be active. You could use
+ semaphores or make the function
+\emph on 
+ critical
+\emph default 
+ if all parameters are passed in registers.
 \newline 
 
 \newline 
@@ -26362,19 +26423,6 @@ struct s { char x } a[] = {{1}, {2}}; /* OK */
 not supported.
 \layout Itemize
 
-No support for setjmp
-\begin_inset LatexCommand \index{setjmp (not supported)}
-
-\end_inset 
-
- and longjmp
-\begin_inset LatexCommand \index{longjmp (not supported)}
-
-\end_inset 
-
- (for now).
-\layout Itemize
-
 Old K&R style
 \begin_inset LatexCommand \index{K\&R style}
 
@@ -26400,6 +26448,26 @@ int i,j; /* are valid in ANSI but not valid in SDCC */
  
 \newline 
 }
+\end_deeper 
+\layout Itemize
+
+Most enhancements in C99 are not supported, f.e.:
+\begin_deeper 
+\layout Verse
+
+
+\family typewriter 
+\series bold 
+inline
+\series default 
+ int increment (int a) { return a+1; } /* is invalid in SDCC although allowed
+ in C99 */
+\newline 
+for (
+\series bold 
+int
+\series default 
+ i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
 \end_deeper 
 \layout Itemize
 

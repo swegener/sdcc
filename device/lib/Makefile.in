@@ -49,7 +49,9 @@ CFLAGS		= $(MODELFLAGS) --nostdinc
 BUILDDIR        = build
 # Default
 PORT            = z80
+ifndef PORTDIR
 PORTDIR         = $(BUILDDIR)/$(PORT)
+endif
 
 SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
 		  _decdptr.c _divsint.c _divslong.c _divuint.c \
@@ -189,20 +191,20 @@ models:
 
 small-mcs51-stack-auto:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
-	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small PORTDIR=$(BUILDDIR)/small-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-mcs51-stack-auto:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
 	  for model in $(MODELS); do \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$$model-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$$model PORTDIR=$(BUILDDIR)/$$model-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 model-mcs51-xstack-auto:
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
 	  for model in $(MODELS); do \
-	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$$model-xstack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$$model PORTDIR=$(BUILDDIR)/$$model-xstack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 

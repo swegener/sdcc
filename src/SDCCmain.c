@@ -1579,13 +1579,22 @@ linkEdit (char **envp)
               switch (options.model)
                 {
                 case MODEL_SMALL:
-                  c = "small";
+                  if (options.stackAuto)
+                    c = "small-stack-auto";
+                  else
+                    c = "small";
                   break;
                 case MODEL_MEDIUM:
-                  c = "medium";
+                  if (options.stackAuto)
+                    c = "medium-stack-auto";
+                  else
+                    c = "medium";
                   break;
                 case MODEL_LARGE:
-                  c = "large";
+                  if (options.stackAuto)
+                    c = "large-stack-auto";
+                  else
+                    c = "large";
                   break;
                 case MODEL_FLAT24:
                   /* c = "flat24"; */

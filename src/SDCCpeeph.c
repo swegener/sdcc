@@ -1318,7 +1318,7 @@ readRules (char *bp)
 {
   char restart = 0;
   char lines[MAX_PATTERN_LEN];
-  char *lp;
+  char *lp, *rp;
   lineNode *match;
   lineNode *replace;
   lineNode *currL = NULL;
@@ -1374,6 +1374,9 @@ top:
   EXPECT_CHR (bp, '{', "expected '{'\n");
   bp++;
 
+  /* save char position (needed for generating error msg) */
+  rp = bp;
+
   SKIP_SPACE (bp, "unexpected end of rule\n");
   getPeepLine (&replace, &bp);
 
@@ -1403,7 +1406,33 @@ top:
       newPeepRule (match, replace, lines, restart);
     }
   else
-    newPeepRule (match, replace, NULL, restart);
+    {  
+      if (*bp && strncmp (bp, "replace", 7))
+        {
+          /* not the start of a new peeprule, so "if" should be here */
+          
+          char strbuff[1000];
+          char *cp;
+          
+          /* go to the start of the line following "{" of the "by" token */
+          while (*rp && (*rp == '\n'))
+            rp++;
+            
+          /* copy text of rule starting with line after "by {" */
+          cp = strbuff;
+          while (*rp && (rp < bp) && ((cp - strbuff) < sizeof(strbuff)))
+              *cp++ = *rp++;
+
+          /* and now the rest of the line */
+          while (*rp && (*rp != '\n') && ((cp - strbuff) < sizeof(strbuff)))
+            *cp++ = *rp++;
+
+          *cp = '\0';
+          fprintf (stderr, "%s\nexpected '} if ...'\n", strbuff);
+          return;
+        }
+      newPeepRule (match, replace, NULL, restart);
+    }    
   goto top;
 
 }

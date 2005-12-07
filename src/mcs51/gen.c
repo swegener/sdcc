@@ -3584,7 +3584,7 @@ genEndFunction (iCode * ic)
   /* restore the register bank  */
   if ( /* FUNC_REGBANK (sym->type) || */ IFFUNC_ISISR (sym->type))
   {
-    if (/* !FUNC_REGBANK (sym->type) || */ !IFFUNC_ISISR (sym->type)
+    if (!FUNC_REGBANK (sym->type) || !IFFUNC_ISISR (sym->type)
      || !options.useXstack)
     {
         /* Special case of ISR using non-zero bank with useXstack

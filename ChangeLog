@@ -1,3 +1,34 @@
+2005-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/Makefile.in: fixed to enable port-specific-objects
+	* device/lib/ds390/i2c390.c (BitOutI2C): optimized by making bout unsigned
+	  char, thanks Hubert Sack
+	* doc/sdccman.lyx: documented --xstack-loc,
+	  elaborated a bit more on interrupts and pitfalls,
+	  removed "setjmp/longjmp unsupported",
+	  documented some unsupported C99 features
+	* src/SDCCmain.c (linkEdit): adapted default lib path for --stack-auto
+	* src/SDCCpeeph.c (readRules): inserted patch 1367130 for finding missing
+	  if, thanks Hubert Sack
+	* src/mcs51/gen.c (genEndFunction): enabled "pop psw" for regbank 0 isr
+	* support/regression/Makefile.in: test-mcs51-stack-auto no longer needs to
+	  make make_library
+	* support/regression/get_ticks.py: new, get cpu cycles and code size, so
+	  regression tests can report resource usage (rfe 700441)
+	* support/regression/collate-results.py: report resource usage
+	* support/regression/ports/ds390/spec.mk,
+	* support/regression/ports/hc08/spec.mk,
+	* support/regression/ports/mcs51/spec.mk,
+	* support/regression/ports/ucz80/spec.mk: run sim output through get_ticks
+	* support/regression/ports/ds390/uCsim.cmd,
+	* support/regression/ports/hc08/uCsim.cmd,
+	* support/regression/ports/mcs51/uCsim.cmd,
+	* support/regression/ports/ucz80/uCsim.cmd: inserted "state" to report time
+	* support/regression/ports/mcs51-stack-auto/spec.mk: no need to build the
+	  library, use the default one
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: inserted rules for
+	  building the library
+
 2005-12-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* config.dsp: added dependency on .version and configure_vc.awk

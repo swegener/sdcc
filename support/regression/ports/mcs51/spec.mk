@@ -35,8 +35,9 @@ $(PORTS_DIR)/$(PORT)/fwk.lib:
 # run simulator with 30 seconds timeout
 %.out: %$(EXEEXT) fwk/lib/timeout
 	mkdir -p `dirname $@`
-	-fwk/lib/timeout 30 $(S51) -t32 -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/mcs51/uCsim.cmd >/dev/null \
+	-fwk/lib/timeout 30 $(S51) -t32 -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/mcs51/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
+	python get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true
 
 fwk/lib/timeout: fwk/lib/timeout.c

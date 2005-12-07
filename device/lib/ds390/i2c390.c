@@ -1,9 +1,9 @@
-/* This implemenation is based on an example I once grabbed from 
+/* This implemenation is based on an example I once grabbed from
    the Philips bbs.
-   Don't know who wrote it, but is has been hacked so heavely, he/she wouldn't
+   Don't know who wrote it, but is has been hacked so heavily, he/she wouldn't
    recogize it anyway */
 
-//#define DEBUG_I2C ==> DON'T DO THIS IS A LIBRARY <==
+//#define DEBUG_I2C ==> DON'T DO THIS, THIS IS A LIBRARY <==
 
 #ifdef DEBUG_I2C
 #include <stdio.h>
@@ -91,7 +91,7 @@ char I2CStop(void)
   I2CDelay(I2CDELAY);
   SDA_HIGH;        /* ...and then SDA up -> stop condition. */
   I2CDelay(I2CDELAY);
-  
+
   return (SCL_IN && SDA_IN);  /* Both will be up, if everything is fine */
 }
 
@@ -101,26 +101,26 @@ char I2CStop(void)
  * Returns 0 on success, 1 if we lose arbitration.
  */
 
-char BitOutI2C(char bout)
+char BitOutI2C(unsigned char bout)
 {
   SDA_OUT(bout);              /* Put data out on SDA */
   I2CDelay(I2CDELAY);
-  SCL_HIGH;                    /* Let SCL go up */
-  while(!SCL_IN)            /* Wait until all other devices are ready */
+  SCL_HIGH;                   /* Let SCL go up */
+  while(!SCL_IN)              /* Wait until all other devices are ready */
     {
       // should do a timeout here
     }
-  
-  if (SDA_IN != bout)       /* Arbitration lost, release bus and return */
+
+  if (SDA_IN != bout)         /* Arbitration lost, release bus and return */
     {
-      SDA_HIGH;                /* Should be up anyway, but make sure */
+      SDA_HIGH;               /* Should be up anyway, but make sure */
       i2cError = I2CERR_LOST;
       I2CDumpError(i2cError);
       return 1;
     }
   I2CDelay(I2CDELAY);
   SCL_LOW;                    /* Pull SCL back down */
-  I2CDelay(I2CDELAY);                
+  I2CDelay(I2CDELAY);
   return 0;                   /* OK */
 }
 
@@ -132,16 +132,16 @@ char BitOutI2C(char bout)
 char BitInI2C(void)
 {
   char bin;
-  
+
   // SDA is opencollector, so:
   SDA_HIGH;
-  
-  SCL_HIGH;                    /* Let SCL go up */
-  while(!SCL_IN)            /* Wait for other devices */
+
+  SCL_HIGH;                   /* Let SCL go up */
+  while(!SCL_IN)              /* Wait for other devices */
     {
       // should do a timeout here
     }
-  bin = SDA_IN;             /* Read in data */
+  bin = SDA_IN;               /* Read in data */
   I2CDelay(I2CDELAY);
   SCL_LOW;                    /* Pull SCL back up */
   I2CDelay(I2CDELAY);
@@ -159,7 +159,7 @@ char BitInI2C(void)
 char ByteOutI2C(char dat)
 {
   char bit_count;
-  
+
   bit_count = 8;
   while(bit_count) {
     if (dat & 0x80) {
@@ -176,7 +176,7 @@ char ByteOutI2C(char dat)
     dat <<= 1;
     bit_count--;
   }
-  
+
   if (BitInI2C()) {
     i2cError = I2CERR_NAK;
     I2CDumpError(i2cError);
@@ -196,17 +196,17 @@ char ByteOutI2C(char dat)
 char I2CByteIn(char ack)
 {
   char bit_count, byte_in;
-  
+
   bit_count = 8;
   byte_in = 0;
-  
+
   while(bit_count)
     {
       byte_in <<= 1;
       if (BitInI2C()) byte_in |= 0x01;
       bit_count--;
     }
-  
+
   BitOutI2C(ack);
   SDA_HIGH;             /* Added 18-Jul-95 - thanks to Ray Bellis */
  return byte_in;
@@ -221,10 +221,10 @@ char I2CByteIn(char ack)
 char I2CSendStop(char addr, char count, char send_stop)
 {
   char byteptr, byte_out;
-  
+
   if (I2CStart()) return 1;
   i2cError = 0;
-  
+
   byte_out = addr & 0xfe;     /* Ensure that it's a write address */
   count++;                    /* Include slave address to byte count */
   byteptr = 0;
@@ -239,7 +239,7 @@ char I2CSendStop(char addr, char count, char send_stop)
       byteptr++;
       count--;
     }
-  
+
   if (send_stop) I2CStop();
   return 0;
 }
@@ -253,19 +253,19 @@ char I2CSendStop(char addr, char count, char send_stop)
 char i2c_recv(char addr, char count)
 {
   char byteptr, byte_in;
-  
+
   if (I2CStart()) return 1;
   i2cError = 0;
   byteptr = 0;
-  
+
   byte_in = addr | 0x01;
-  
+
   if (ByteOutI2C(byte_in))
     {
       if (i2cError == I2CERR_NAK) I2CStop();
       return i2cError;
     }
-  
+
   while(count)
     {
       count-=1;
@@ -277,9 +277,9 @@ char i2c_recv(char addr, char count)
       i2cReceiveBuffer[byteptr] = byte_in;
       byteptr++;
     }
-  
+
   I2CStop();
-  
+
   return (i2cError ? 1 : 0);
 }
 
@@ -297,15 +297,15 @@ char I2CSendReceive(char addr, char tx_count, char rx_count)
     {
      /* If send fails, abort but don't send a stop condition if we lost
 	 arbitration */
-      
+
       if (i2cError != I2CERR_LOST) I2CStop();
       return 1;
     }
-  
+
   SDA_HIGH; /* One of these may be low now, in which case the next */
   SCL_HIGH; /* start condition wouldn't be detected so make */
   I2CDelay(I2CDELAY); /*   sure that they're up and wait for one delay slot */
-  
+
   if (i2c_recv((char)(addr|0x01), rx_count)) return 1;
   return (i2cError ? 1 : 0);
 }

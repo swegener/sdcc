@@ -1,3 +1,10 @@
+2005-12-08 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c: renamed is_shared to pic14_is_shared
+	* src/pic/gen.c (genIfx): re-enabled handling of sbits
+	* src/pic/glue.c (emitSymbolToFile): added workaround for sbits,
+	  (is_valid_identifier): added for above workaround
+
 2005-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/Makefile.in: fixed to enable port-specific-objects

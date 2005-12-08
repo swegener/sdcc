@@ -103,17 +103,45 @@ int pic14aopLiteral (value *val, int offset)
 
 /* Check whether the given reg is shared amongst all .o files of a project.
  * This is true for the pseudo stack and WSAVE, SSAVE and PSAVE. */
-int is_shared_address (int addr)
+static int
+is_shared_address (int addr)
 {
   return ((addr > Gstack_base_addr - 18)
   	&& (addr <= Gstack_base_addr));
 }
 
 int
-is_shared (regs *reg)
+pic14_is_shared (regs *reg)
 {
 	if (!reg) return 0;
 	return is_shared_address (reg->address);
+}
+
+static int
+is_valid_identifier( const char *name )
+{
+  char a;
+  if (!name) return 0;
+  a = *name;
+  
+  /* only accept [a-zA-Z_][a-zA-Z0-9_] */
+  if (!((a >= 'a' && a <= 'z')
+  	|| (a >= 'A' && a <= 'z')
+	|| (a == '_')))
+    return 0;
+
+  name++;
+  while ((a = *name++))
+  {
+    if (!((a >= 'a' && a <= 'z')
+    	|| (a >= 'A' && a <= 'Z')
+	|| (a >= '0' && a <= '9')
+	|| (a == '_')))
+      return 0;
+  } // while
+
+  /* valid identifier */
+  return 1;
 }
 
 /* set of already emitted symbols; we store only pointers to the emitted
@@ -129,6 +157,16 @@ emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size
 {
 	const char *sym;
 	static unsigned int sec_idx = 0;
+
+	/* workaround: variables declared via `sbit' result in a numeric
+	 * identifier (0xHH), EQU'ing them is invalid, so just ignore it.
+	 * sbit is heavily used in the inc2h-generated header files!
+	 */
+	if (!is_valid_identifier(name))
+	{
+	  //fprintf( stderr, "%s:%s:%u: ignored symbol: %s\n", __FILE__, __FUNCTION__, __LINE__, name );
+	  return;
+	}
 	
 	/* check whether the symbol is already defined */
 	for (sym = (const char *) setFirstItem (symbolsEmitted);

@@ -106,7 +106,7 @@ AssignedMemory *finalMapping=NULL;
 
 static unsigned int config_word = DEFAULT_CONFIG_WORD;
 
-extern int is_shared (regs *reg);
+extern int pic14_is_shared (regs *reg);
 extern void emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize);
 
 void addMemRange(memRange *r, int type)
@@ -255,12 +255,12 @@ void dump_sfr(FILE *of)
 		
 		if (reg && !reg->isEmitted)
 		{
-		  if (pic14_options.isLibrarySource && is_shared (reg))
+		  if (pic14_options.isLibrarySource && pic14_is_shared (reg))
 		  {
 		    /* rely on external declarations for the non-fixed stack */
 		    fprintf (of, "\textern\t%s\n", reg->name);
 		  } else {
-		    emitSymbolToFile (of, reg->name, "udata", reg->size, reg->isFixed ? reg->address : -1, 0, is_shared (reg));
+		    emitSymbolToFile (of, reg->name, "udata", reg->size, reg->isFixed ? reg->address : -1, 0, pic14_is_shared (reg));
 		  }
 		  
 		  reg->isEmitted = 1;

@@ -9828,8 +9828,6 @@ static void genIfx (iCode *ic, iCode *popIc)
 		pic14_toBoolean(cond);
 	else
 		isbit = 1;
-	/* the result is now in the accumulator */
-	freeAsmop(cond,NULL,ic,TRUE);
 	
 	/* if there was something to be popped then do it */
 	if (popIc)
@@ -9841,13 +9839,16 @@ static void genIfx (iCode *ic, iCode *popIc)
 		if (IC_TRUE(ic))
 		{
 			assert (!IC_FALSE(ic));
-			emitSKPNC;
+			emitpcode(POC_BTFSC, popGet(AOP(cond), 0));
+			//emitSKPNC;
 			emitpcode(POC_GOTO, popGetLabel(IC_TRUE(ic)->key));
 		} else {
 			assert (IC_FALSE(ic));
-			emitSKPC;
+			emitpcode(POC_BTFSS, popGet(AOP(cond), 0));
+			//emitSKPC;
 			emitpcode(POC_GOTO, popGetLabel(IC_FALSE(ic)->key));
 		}
+		if (0)
 		{
 			static int hasWarned = 0;
 			if (!hasWarned)
@@ -9873,6 +9874,8 @@ static void genIfx (iCode *ic, iCode *popIc)
 	
 	ic->generated = 1;
 	
+	/* the result is now in the accumulator */
+	freeAsmop(cond,NULL,ic,TRUE);
 }
 
 /*-----------------------------------------------------------------*/

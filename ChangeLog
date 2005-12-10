@@ -2,6 +2,7 @@
 
 	* src/SDCCcse.c (findCheaperOp): fixed bug 1376320, copy signedness to
 	replacing literals
+	* support/regression/tests/bug-1376320.c: added
 
 2005-12-08 Raphael Neider <rneider AT web.de>
 

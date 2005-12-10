@@ -1,3 +1,8 @@
+2005-12-10 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCcse.c (findCheaperOp): fixed bug 1376320, copy signedness to
+	replacing literals
+
 2005-12-08 Raphael Neider <rneider AT web.de>
 
 	* src/pic/device.c: renamed is_shared to pic14_is_shared

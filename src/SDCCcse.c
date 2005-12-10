@@ -144,9 +144,11 @@ pcseDef (void *item, va_list ap)
 
 void ReplaceOpWithCheaperOp(operand **op, operand *cop) {
 #ifdef RANGEHUNT
-  printf ("ReplaceOpWithCheaperOp %s with %s: ",
-          IS_SYMOP((*op)) ? OP_SYMBOL((*op))->name : "!SYM",
-          IS_SYMOP(cop) ? OP_SYMBOL(cop)->name : "!SYM");
+  printf ("ReplaceOpWithCheaperOp\n\t");
+  printOperand (*op, stdout);
+  printf ("\nwith\t");
+  printOperand (cop, stdout);
+
   // if op is a register equivalent
   if (IS_ITEMP(cop) && IS_SYMOP((*op)) && OP_SYMBOL((*op))->isreqv) {
     operand **rop = &OP_SYMBOL((*op))->usl.spillLoc->reqv;
@@ -414,6 +416,15 @@ DEFSETFUNC (findCheaperOp)
           *opp = operandFromOperand (*opp);
           (*opp)->isaddr = cop->isaddr;
         }
+
+      /* copy signedness to literal operands */
+      if (IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp))
+          && isOperandLiteral(*opp)
+          && SPEC_NOUN(operandType(*opp)) == SPEC_NOUN(operandType(cop))
+          && SPEC_USIGN(operandType(*opp)) != SPEC_USIGN(operandType(cop)))
+      {
+          SPEC_USIGN(operandType(*opp)) = SPEC_USIGN(operandType(cop));
+      }
 
       if (IS_SPEC(operandType (cop)) && IS_SPEC(operandType (*opp)) &&
           SPEC_NOUN(operandType(cop)) != SPEC_NOUN(operandType(*opp)))

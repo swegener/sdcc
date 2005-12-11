@@ -3264,12 +3264,16 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
       isOperandGlobal (left))
     {
       symbol *sym = NULL;
+      operand *newRight;
 
       if (IS_TRUE_SYMOP (right))
         sym = OP_SYMBOL (right);
       ic = newiCode ('=', NULL, right);
-      IC_RESULT (ic) = right = newiTempOperand (ltype, 0);
-      SPIL_LOC (right) = sym;
+      IC_RESULT (ic) = newRight = newiTempOperand (ltype, 0);
+      /* avoid double fetch from volatile right, see bug 1369874 */
+      if (!isOperandVolatile (right, FALSE))
+        SPIL_LOC (newRight) = sym;
+      right = newRight;
       ADDTOCHAIN (ic);
     }
 

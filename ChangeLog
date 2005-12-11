@@ -1,5 +1,10 @@
 2005-12-10 Bernhard Held <bernhard AT bernhardheld.de>
 
+	* src/SDCCicode.c (fgeniCodeAssign): fixed bug 11369874, don't use
+	volatile variables as spill location
+
+2005-12-10 Bernhard Held <bernhard AT bernhardheld.de>
+
 	* src/SDCCcse.c (findCheaperOp): fixed bug 1376320, copy signedness to
 	replacing literals
 	* support/regression/tests/bug-1376320.c: added

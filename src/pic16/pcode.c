@@ -9451,6 +9451,42 @@ static int pic16_safepCodeUnlink (pCode *pc, char *comment) {
   /* move labels to next instruction (if possible) */
   if (PCI(pc)->label && !pcnext) return 0;
 
+  /* if this is a SKIP with side-effects -- do not remove */
+  /* XXX: might try to replace this one with the side-effect only version */
+  if (isPCI_SKIP(pc)
+  	&& ((PCI(pc)->outCond & (PCC_REGISTER | PCC_W)) != 0))
+  {
+    pCode *newpc;
+    switch (PCI(pc)->op)
+    {
+    case POC_INCFSZ:
+    case POC_INFSNZ:
+      newpc = pic16_newpCode(POC_INCF, pic16_pCodeOpCopy( PCI(pc)->pcop ) );
+      pic16_pCodeReplace( pc, newpc );
+      return 1;
+      break;
+    case POC_INCFSZW:
+      newpc = pic16_newpCode(POC_INCFW, pic16_pCodeOpCopy( PCI(pc)->pcop ) );
+      pic16_pCodeReplace( pc, newpc );
+      return 1;
+      break;
+    case POC_DECFSZ:
+    case POC_DCFSNZ:
+      newpc = pic16_newpCode(POC_INCF, pic16_pCodeOpCopy( PCI(pc)->pcop ) );
+      pic16_pCodeReplace( pc, newpc );
+      return 1;
+      break;
+    case POC_DECFSZW:
+      newpc = pic16_newpCode(POC_INCF, pic16_pCodeOpCopy( PCI(pc)->pcop ) );
+      pic16_pCodeReplace( pc, newpc );
+      return 1;
+      break;
+    default:
+      return 0;
+    }
+    return 0;
+  }
+
   /* if previous instruction is a skip -- do not remove */
   if (pcprev && isPCI_SKIP(pcprev)) {
     if (!pic16_safepCodeUnlink (pcprev, "=DF= removed now unused SKIP")) {
@@ -10700,7 +10736,12 @@ static int pic16_pCodeIsAlive (pCode *pc) {
   while (map && map->pc != pc) map = map->next;
 
   /* no entries found? something is fishy with DF analysis... -- play safe */
-  if (!map) { fprintf (stderr, "%s: defmap not found\n", __FUNCTION__); return 1; }
+  if (!map) {
+    if (pic16_pcode_verbose) {
+      fprintf (stderr, "%s: defmap not found\n", __FUNCTION__);
+    }
+    return 1;
+  }
 
   /* remember first item assigned to pc for later use */
   lastpc = map;

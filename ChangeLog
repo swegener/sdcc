@@ -1,3 +1,18 @@
+2005-12-18 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c: added IS_DIRECT macro for "direct" operands,
+	  (genUnpackBits): improved code for direct operands,
+	  (genPackBits): improved code for literal assignment to bitfields
+	    and for direct destination operands (no FSR indirection),
+	    prevented redundant AND, fixes #1362800,
+	  (AccLsh): added parameter to disable masking of the result
+	* src/pic16/pcode.c (pic16_safepCodeUnlink): fixed to work with
+	  skip instructions with side-effects (like incfsz),
+	  (pic16_pCodeIsAlive): suppress verbose output unless pcode_verbose,
+	* src/pic16/pcoderegs.c (RemoveRegsFromSet): removed annoying warning
+	* device/lib/pic16/Makefile.common.in: added --asm=@GPASM@ to CC,
+	  fixes #1375263
+
 2005-12-10 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCicode.c (fgeniCodeAssign): fixed bug 11369874, don't use

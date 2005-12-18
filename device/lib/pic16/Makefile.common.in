@@ -79,7 +79,7 @@ LIBFLAGS += -c
 #################################################
 ### programs to use
 CPP	= $(topsrcdir)/../../../bin/sdcpp
-CC	= $(topsrcdir)/../../../bin/sdcc
+CC	= $(topsrcdir)/../../../bin/sdcc --asm=@GPASM@
 AS	= @GPASM@
 LD	= @GPLINK@
 LIB	= @GPLIB@

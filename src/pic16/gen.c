@@ -63,6 +63,7 @@
 #define PIC_IS_DATA_PTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
 #define PIC_IS_FARPTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
 #define PIC_IS_TAGGED(x)	(IS_GENPTR(x) || IS_CODEPTR(x))
+#define IS_DIRECT(op)		((AOP_TYPE(op) == AOP_PCODE) && (AOP(op)->aopu.pcop->type == PO_DIR))
 
 /* If you change these, you also have to update the library files
  * device/lib/pic16/libsdcc/gptr{get,put}{1,2,3,4}.c */
@@ -8433,7 +8434,7 @@ static void AccRol (int shCount)
 /*-----------------------------------------------------------------*/
 /* AccLsh - left shift accumulator by known count                  */
 /*-----------------------------------------------------------------*/
-static void AccLsh (int shCount)
+static void AccLsh (int shCount, int doMask)
 {
 	DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	switch(shCount){
@@ -8466,8 +8467,10 @@ static void AccLsh (int shCount)
 			pic16_emitpcode(POC_RRNCFW,pic16_popCopyReg(&pic16_pc_wreg));
 			break;
 	}
-
-	pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SLMask[shCount]));
+	if (doMask) {
+		/* no masking is required in genPackBits */
+		pic16_emitpcode(POC_ANDLW,pic16_popGetLit(SLMask[shCount]));
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -8764,7 +8767,7 @@ static void shiftL1Left2Result (operand *left, int offl,
     //    l = pic16_aopGet(AOP(left),offl,FALSE,FALSE);
     //    MOVA(l);
     /* shift left accumulator */
-    //AccLsh(shCount); // don't comment out just yet...
+    //AccLsh(shCount, 1); // don't comment out just yet...
   //    pic16_aopPut(AOP(result),"a",offr);
 
   switch(shCount) {
@@ -9135,7 +9138,7 @@ static void shiftLLeftOrResult (operand *left, int offl,
 
     pic16_emitpcode(POC_MOVFW,pic16_popGet(AOP(left),offl));
     /* shift left accumulator */
-    AccLsh(shCount);
+    AccLsh(shCount, 1);
     /* or with result */
     /* back to result */
     pic16_emitpcode(POC_IORWF,pic16_popGet(AOP(result),offr));
@@ -10553,7 +10556,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 
 #if 1
   if((blen == 1) && (bstr < 8)
-      && (!IS_PTR(operandType(left)) || PIC_IS_DATA_PTR(operandType(left)))) {
+      && (!IS_PTR(operandType(left)) || IS_DIRECT(left) || PIC_IS_DATA_PTR(operandType(left)))) {
     /* it is a single bit, so use the appropriate bit instructions */
     DEBUGpic16_emitcode (";","%s %d optimize bit read",__FUNCTION__,__LINE__);
 
@@ -10561,7 +10564,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
     op = (same ? pic16_popCopyReg(&pic16_pc_wreg) : pic16_popGet (AOP(result),0));
     pic16_emitpcode(POC_CLRF, op);
 
-    if(!IS_PTR(operandType(left))) {
+    if(!IS_PTR(operandType(left)) || IS_DIRECT(left)) {
       /* workaround to reduce the extra lfsr instruction */
       pic16_emitpcode(POC_BTFSC,
 	  pic16_popCopyGPR2Bit(pic16_popGet(AOP(left), 0), bstr));
@@ -10589,7 +10592,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 
 #endif
 
-  if (!IS_PTR(operandType(left)) /*OP_SYMBOL(left)->remat*/) {
+  if (!IS_PTR(operandType(left)) || IS_DIRECT(left)) {
     // access symbol directly
     pic16_mov2w (AOP(left), 0);
   } else {
@@ -11329,6 +11332,8 @@ static void genPackBits (sym_link    *etype , operand *result,
   int offset = 0  ;
   int rLen = 0 ;
   int blen, bstr ;   
+  int shifted_and_masked = 0;
+  unsigned long lit = (unsigned long)-1;
   sym_link *retype;
 
   DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
@@ -11338,15 +11343,14 @@ static void genPackBits (sym_link    *etype , operand *result,
   retype = getSpec(operandType(right));
 
   if(AOP_TYPE(right) == AOP_LIT) {
+    lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
+    
     if((blen == 1) && (bstr < 8)) {
-      unsigned long lit;
       /* it is a single bit, so use the appropriate bit instructions */
 
       DEBUGpic16_emitcode (";","%s %d optimize bit assignment",__FUNCTION__,__LINE__);
 
-      lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-      //			pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_indf0));
-      if(!IS_PTR(operandType(result))) {
+      if(!IS_PTR(operandType(result)) || IS_DIRECT(result)) {
 	/* workaround to reduce the extra lfsr instruction */
 	if(lit) {
 	  pic16_emitpcode(POC_BSF,
@@ -11372,18 +11376,20 @@ static void genPackBits (sym_link    *etype , operand *result,
 
       return;
     }
-    /* move literal to W */
-    pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right), 0));
+    /* IORLW below is more efficient */
+    //pic16_emitpcode(POC_MOVLW, pic16_popGetLit((lit & ((1UL << blen) - 1)) << bstr));
+    lit = (lit & ((1UL << blen) - 1)) << bstr;
+    shifted_and_masked = 1;
     offset++;
   } else
-    if(IS_BITFIELD(retype) 
+    if (IS_DIRECT(result) && !IS_PTR(operandType(result))
+    	&& IS_BITFIELD(retype) 
 	&& (AOP_TYPE(right) == AOP_REG || AOP_TYPE(right) == AOP_DIR)
 	&& (blen == 1)) {
       int rblen, rbstr;
 
       rblen = SPEC_BLEN( retype );
       rbstr = SPEC_BSTR( retype );
-
 
       if(IS_BITFIELD(etype)) {
 	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(result), 0));
@@ -11416,18 +11422,22 @@ static void genPackBits (sym_link    *etype , operand *result,
 
     if (blen != 8 || bstr != 0) {
       // we need to combine the value with the old value
-      pic16_emitpcode(POC_ANDLW, pic16_popGetLit((1U << blen)-1));
+      if(!shifted_and_masked)
+      {
+	pic16_emitpcode(POC_ANDLW, pic16_popGetLit((1U << blen)-1));
 
-      DEBUGpic16_emitcode(";", "shCnt = %d SPEC_BSTR(etype) = %d:%d", shCnt,
-	  SPEC_BSTR(etype), SPEC_BLEN(etype));
+	DEBUGpic16_emitcode(";", "shCnt = %d SPEC_BSTR(etype) = %d:%d", shCnt,
+	    SPEC_BSTR(etype), SPEC_BLEN(etype));
 
-      /* shift left acc */
-      AccLsh(shCnt);
+	/* shift left acc, do NOT mask the result again */
+	AccLsh(shCnt, 0);
 
-      /* using PRODH as a temporary register here */
-      pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodh));
+	/* using PRODH as a temporary register here */
+	pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_prodh));
+      }
 
-      if (IS_SYMOP(result) && !IS_PTR(operandType (result))/*OP_SYMBOL(result)->remat*/) {
+      if ((IS_SYMOP(result) && !IS_PTR(operandType (result)))
+      	|| IS_DIRECT(result)) {
 	/* access symbol directly */
 	pic16_mov2w (AOP(result), 0);
       } else {
@@ -11438,11 +11448,18 @@ static void genPackBits (sym_link    *etype , operand *result,
       pic16_emitpcode(POC_ANDLW, pic16_popGetLit(
 	    (unsigned char)((unsigned char)(0xff << (blen+bstr)) |
 			    (unsigned char)(0xff >> (8-bstr))) ));
-      pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodh));
+      if (!shifted_and_masked) {
+        pic16_emitpcode(POC_IORFW, pic16_popCopyReg(&pic16_pc_prodh));
+      } else {
+        /* We have the shifted and masked (literal) right value in `lit' */
+        if (lit != 0)
+	  pic16_emitpcode(POC_IORLW, pic16_popGetLit(lit));
+      }
     } // if (blen != 8 || bstr != 0)
 
     /* write new value back */
-    if (IS_SYMOP(result) & !IS_PTR(operandType(result))) {
+    if ((IS_SYMOP(result) && !IS_PTR(operandType(result)))
+    	|| IS_DIRECT(result)) {
       pic16_emitpcode (POC_MOVWF, pic16_popGet(AOP(result),0));
     } else {
       pic16_derefPtr (result, p_type, 1, &fsr0_setup);

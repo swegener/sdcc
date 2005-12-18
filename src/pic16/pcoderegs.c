@@ -361,12 +361,6 @@ static void  RemoveRegsFromSet(set *regset)
 	    fprintf(stderr,"reg %s, type =%d\n",r->name, r->type);
 	  }
 
-
-	  pc->print(stderr, pc);
-
-	  fprintf(stderr,"%s:%d: removing reg %s because it is used only once\n",__FILE__, __LINE__, reg->name);
-
-
 	  Remove1pcode(pc, reg);
 	  /*
 	    pic16_unlinkpCode(pc);

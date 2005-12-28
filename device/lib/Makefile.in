@@ -44,7 +44,7 @@ lib_dir_suffix  = @lib_dir_suffix@
 sdcc_libdir     = $(DESTDIR)$(datadir)/$(lib_dir_suffix)
 
 CPPFLAGS        = -I$(INCDIR) -I$(PORTINCDIR)
-CFLAGS		= $(MODELFLAGS) --nostdinc
+CFLAGS		= $(MODELFLAGS) --nostdinc --std-sdcc99
 
 BUILDDIR        = build
 # Default

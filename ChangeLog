@@ -1,3 +1,7 @@
+2005-12-28 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/Makefile.in: added --std-sdcc99 to CFLAGS
+
 2005-12-18 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c: added IS_DIRECT macro for "direct" operands,
@@ -13,9 +17,9 @@
 	* device/lib/pic16/Makefile.common.in: added --asm=@GPASM@ to CC,
 	  fixes #1375263
 
-2005-12-10 Bernhard Held <bernhard AT bernhardheld.de>
+2005-12-11 Bernhard Held <bernhard AT bernhardheld.de>
 
-	* src/SDCCicode.c (fgeniCodeAssign): fixed bug 11369874, don't use
+	* src/SDCCicode.c (geniCodeAssign): fixed bug 11369874, don't use
 	volatile variables as spill location
 
 2005-12-10 Bernhard Held <bernhard AT bernhardheld.de>

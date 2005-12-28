@@ -11391,11 +11391,21 @@ gen51Code (iCode * lic)
         char regsInUse[80];
         int i;
 
+        #if 0
         for (i=0; i<8; i++) {
           sprintf (&regsInUse[i],
-                   "%c", ic->riu & (1<<i) ? i+'0' : '-');
-        }
+                   "%c", ic->riu & (1<<i) ? i+'0' : '-'); /* show riu */
         regsInUse[i]=0;
+        #else
+        strcpy (regsInUse, "--------");
+        for (i=0; i < 8; i++) {
+          if (bitVectBitValue (ic->rMask, i))
+            {
+              int offset = regs8051[i].offset;
+              regsInUse[offset] = offset + '0'; /* show rMask */
+            }
+        #endif
+        }
         emitcode("", "; [%s] ic:%d: %s", regsInUse, ic->seq, printILine(ic));
       }
       /* if the result is marked as

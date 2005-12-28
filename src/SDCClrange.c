@@ -50,7 +50,7 @@ hashiCodeKeys (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* sequenceiCode - creates a sequence number for the iCode & add   */
 /*-----------------------------------------------------------------*/
-void
+static void
 sequenceiCode (eBBlock ** ebbs, int count)
 {
   int i;
@@ -74,7 +74,8 @@ sequenceiCode (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* setFromRange - sets the from range of a given operand           */
 /*-----------------------------------------------------------------*/
-void
+#if 0
+static void
 setFromRange (operand * op, int from)
 {
   /* only for compiler defined temporaries */
@@ -90,6 +91,7 @@ setFromRange (operand * op, int from)
       OP_LIVEFROM (op) > from)
     OP_LIVEFROM (op) = from;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* setToRange - set the range to for an operand                    */
@@ -118,7 +120,7 @@ setToRange (operand * op, int to, bool check)
 /*-----------------------------------------------------------------*/
 /* setFromRange - sets the from range of a given operand           */
 /*-----------------------------------------------------------------*/
-void
+static void
 setLiveFrom (symbol * sym, int from)
 {
   if (!sym->liveFrom || sym->liveFrom > from)
@@ -128,7 +130,7 @@ setLiveFrom (symbol * sym, int from)
 /*-----------------------------------------------------------------*/
 /* setToRange - set the range to for an operand                    */
 /*-----------------------------------------------------------------*/
-void
+static void
 setLiveTo (symbol * sym, int to)
 {
   if (!sym->liveTo || sym->liveTo < to)
@@ -138,7 +140,7 @@ setLiveTo (symbol * sym, int to)
 /*-----------------------------------------------------------------*/
 /* markLiveRanges - for each operand mark the liveFrom & liveTo    */
 /*-----------------------------------------------------------------*/
-void
+static void
 markLiveRanges (eBBlock ** ebbs, int count)
 {
   int i, key;
@@ -172,7 +174,7 @@ markLiveRanges (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* markAlive - marks the operand as alive between sic and eic      */
 /*-----------------------------------------------------------------*/
-void
+static void
 markAlive (iCode * sic, iCode * eic, int key)
 {
   iCode *dic;
@@ -187,7 +189,7 @@ markAlive (iCode * sic, iCode * eic, int key)
 /* findNextUseSym - finds the next use of the symbol and marks it  */
 /*                  alive in between                               */
 /*-----------------------------------------------------------------*/
-int
+static int
 findNextUseSym (eBBlock *ebp, iCode *ic, symbol * sym)
 {
   int retval = 0;
@@ -299,7 +301,7 @@ check_successors:
 /* findNextUse - finds the next use of the operand and marks it    */
 /*               alive in between                                  */
 /*-----------------------------------------------------------------*/
-int
+static int
 findNextUse (eBBlock *ebp, iCode *ic, operand *op)
 {
   if (op->isaddr)
@@ -313,7 +315,8 @@ findNextUse (eBBlock *ebp, iCode *ic, operand *op)
 /*-----------------------------------------------------------------*/
 /* unvisitBlocks - clears visited in all blocks                    */
 /*-----------------------------------------------------------------*/
-void unvisitBlocks (eBBlock ** ebbs, int count)
+static void
+unvisitBlocks (eBBlock ** ebbs, int count)
 {
   int i;
 
@@ -322,105 +325,139 @@ void unvisitBlocks (eBBlock ** ebbs, int count)
 }
 
 /*------------------------------------------------------------------*/
-/* findRecursiveSucc - build a bit vector of recursive successors   */
+/* markWholeLoop - mark the symbol 'key' alive in all blocks        */
+/*                 included by the outermost loop                   */
 /*------------------------------------------------------------------*/
-DEFSETFUNC (findRecursiveSucc)
+static void
+markWholeLoop (eBBlock *ebp, int key)
 {
-  eBBlock *ebp = item;
-  V_ARG (bitVect *, succVect);
-  
-  if (ebp->visited)
-    return 0;
-  
+  eBBlock *ebpi;
+
+  /* avoid endless loops */
   ebp->visited = 1;
-  bitVectSetBit (succVect, ebp->bbnum);
-  applyToSet (ebp->succList, findRecursiveSucc, succVect);
-  return 0;
-}
 
-
-/*------------------------------------------------------------------*/
-/* findRecursivePred - build a bit vector of recursive predecessors */
-/*------------------------------------------------------------------*/
-DEFSETFUNC (findRecursivePred)
-{
-  eBBlock *ebp = item;
-  V_ARG (bitVect *, predVect);
-  
-  if (ebp->visited)
-    return 0;
-  
-  ebp->visited = 1;
-  bitVectSetBit (predVect, ebp->bbnum);
-  applyToSet (ebp->predList, findRecursivePred, predVect);
-  return 0;
-}
-
-
-/*------------------------------------------------------------------*/
-/* findPrevUse - handle degenerate case of a symbol used prior to   */
-/*               findNextUse() marking any definition.              */
-/*------------------------------------------------------------------*/
-void
-findPrevUse (eBBlock *ebp, iCode *ic, operand *op, eBBlock **ebbs, int count)
-{
-  int i;
-  bitVect * succVect;
-  bitVect * predVect;
-  eBBlock * pred;
-
-  /* If liveness is already known, then a previous call to findNextUse() */
-  /* has already taken care of everything. */
-  if (ic && bitVectBitValue(ic->rlive, op->key))
-    return;
-
-  if (!ic)
+  /* recurse through all predecessors */
+  for (ebpi = setFirstItem (ebp->predList);
+       ebpi;
+       ebpi = setNextItem (ebp->predList))
     {
-      /* We are at the start of a block. If the operand is alive at the */
-      /* end of all predecessors, then a previous call to findNextUse() */
-      /* has already taken care of everything. */
-      
-      pred = setFirstItem (ebp->predList);
-      for (; pred; pred = setNextItem (ebp->predList))
-        if (pred->ech && !bitVectBitValue(pred->ech->rlive, op->key))
-          break;
-      
-      if (!pred)
-        return;
+      if (ebpi->visited)
+        continue;
+      /* is the predecessor still in the loop? */
+      if (ebpi->depth == 0)
+        continue;
+      markWholeLoop (ebpi, key);
     }
+
+  /* recurse through all successors */
+  for (ebpi = setFirstItem (ebp->succList);
+       ebpi;
+       ebpi = setNextItem (ebp->succList))
+    {
+      if (ebpi->visited)
+        continue;
+      if (ebpi->depth == 0)
+        continue;
+      markWholeLoop (ebpi, key);
+    }
+
+  markAlive (ebp->sch, ebp->ech, key);
+}
+
+/*------------------------------------------------------------------*/
+/* findPrevUseSym - search for a previous definition of a symbol in */
+/*                  - the previous icodes                           */
+/*                  - all branches of predecessors                  */
+/*------------------------------------------------------------------*/
+static bool
+findPrevUseSym  (eBBlock *ebp, iCode *ic, symbol * sym)
+{
+  eBBlock * pred;
+  iCode * uic;
+
+  if (ebp->visited)
+    {
+     /* already visited: this branch must have been succesfull, */
+     /* because otherwise the search would have been aborted. */
+      return TRUE;
+    }
+  ebp->visited = 1;
+
+  /* search backward in the current block */
+  for (uic = ic; uic; uic = uic->prev)
+    {
+      if (!POINTER_SET (uic) && IS_ITEMP (IC_RESULT (uic)))
+        {
+          if (IC_RESULT (uic)->key == sym->key)
+            {
+              /* Ok, found a definition */
+              return TRUE;
+            }
+        }
+    }
+
+  /* There's no definition in this bblock, */
+  /* let's have a look at all predecessors. */
+  pred = setFirstItem (ebp->predList);
+  if (!pred)
+    {
+      /* no more predecessors and nothing found yet :-( */
+      return FALSE;
+    }
+  for (; pred; pred = setNextItem (ebp->predList))
+    {
+      /* recurse into all predecessors */
+      if (!findPrevUseSym (pred, pred->ech, sym))
+        {
+          /* found nothing: abort */
+          return FALSE;
+        }
+    }
+
+  /* Success! Went through all branches with no abort: */
+  /* all branches end with a definition */
+  return TRUE;
+}
+
+/*------------------------------------------------------------------*/
+/* findPrevUse - search for a previous definition of an operand     */
+/*                  If there's no definition let's:                 */
+/*                  - emit a warning                                */
+/*                  - fix the life range, if the symbol is used in  */
+/*                    a loop                                        */
+/*------------------------------------------------------------------*/
+static void
+findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
+             eBBlock ** ebbs, int count,
+             bool emitWarnings)
+{
+  unvisitBlocks (ebbs, count);
 
   if (op->isaddr)
     OP_SYMBOL (op)->isptr = 1;
-
   OP_SYMBOL (op)->key = op->key;
 
-  /* Otherwise, it appears that this symbol was used prior to definition.     */
-  /* Just fix the live range; we'll deal with a diagnostic message elsewhere. */
-  /* If the symbol use was in a loop, we need to extend the live range to the */
-  /* outermost loop. */
-  unvisitBlocks (ebbs, count);
-  succVect = newBitVect (count);
-  applyToSet (ebp->succList, findRecursiveSucc, succVect);
-  unvisitBlocks (ebbs, count);
-  predVect = newBitVect (count);
-  applyToSet (ebp->predList, findRecursivePred, predVect);
-
-  /* Blocks that are both recursively predecessors and successors are in */
-  /* a loop with the current iCode. Mark the operand as alive in them.   */
-  for (i = 0; i < count; i++)
+  /* There must be a definition in each branch of predecessors */
+  if (!findPrevUseSym (ebp, ic->prev, OP_SYMBOL(op)))
     {
-      if (bitVectBitValue(succVect, i) && bitVectBitValue(predVect, i))
-        markAlive (ebbs[i]->sch, ebbs[i]->ech, op->key);
+      /* computeLiveRanges() is called twice */
+      if (!emitWarnings)
+        werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
+                  OP_SYMBOL (op)->prereqv);
+      /* is this block part of a loop? */
+      if (ebp->depth != 0)
+        {
+          /* extend the life range to the outermost loop */
+          unvisitBlocks(ebbs, count);
+          markWholeLoop (ebp, op->key);
+        }
     }
-
-  freeBitVect (succVect);
-  freeBitVect (predVect);
 }
 
 /*-----------------------------------------------------------------*/
 /* incUsed - increment a symbol's usage count                      */
 /*-----------------------------------------------------------------*/
-void
+static void
 incUsed (iCode *ic, operand *op)
 {
   if (ic->depth)
@@ -432,7 +469,7 @@ incUsed (iCode *ic, operand *op)
 /*-----------------------------------------------------------------*/
 /* rliveClear - clears the rlive bitVectors                        */
 /*-----------------------------------------------------------------*/
-void
+static void
 rliveClear (eBBlock ** ebbs, int count)
 {
   int i;
@@ -454,8 +491,8 @@ rliveClear (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* rlivePoint - for each point compute the ranges that are alive   */
 /*-----------------------------------------------------------------*/
-void
-rlivePoint (eBBlock ** ebbs, int count)
+static void
+rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 {
   int i, key;
   eBBlock *succ;
@@ -483,7 +520,7 @@ rlivePoint (eBBlock ** ebbs, int count)
 	      if (!IS_ITEMP(IC_JTCOND(ic)))
 	        continue;
 
-	      findPrevUse (ebbs[i], ic->prev, IC_JTCOND(ic), ebbs, count);
+	      findPrevUse (ebbs[i], ic, IC_JTCOND(ic), ebbs, count, emitWarnings);
 	      unvisitBlocks(ebbs, count);
 	      ic->rlive = bitVectSetBit (ic->rlive, IC_JTCOND(ic)->key);
 	      findNextUse (ebbs[i], ic->next, IC_JTCOND(ic));
@@ -498,7 +535,7 @@ rlivePoint (eBBlock ** ebbs, int count)
 	      if (!IS_ITEMP(IC_COND(ic)))
 	        continue;
 
-	      findPrevUse (ebbs[i], ic->prev, IC_COND(ic), ebbs, count);
+	      findPrevUse (ebbs[i], ic, IC_COND(ic), ebbs, count, emitWarnings);
 	      unvisitBlocks (ebbs, count);
 	      ic->rlive = bitVectSetBit (ic->rlive, IC_COND(ic)->key);
 	      findNextUse (ebbs[i], ic->next, IC_COND(ic));
@@ -511,8 +548,7 @@ rlivePoint (eBBlock ** ebbs, int count)
 	      incUsed (ic, IC_LEFT(ic));
 	      if (IS_ITEMP(IC_LEFT(ic)))
 	        {
-
-	          findPrevUse (ebbs[i], ic->prev, IC_LEFT(ic), ebbs, count);
+	          findPrevUse (ebbs[i], ic, IC_LEFT(ic), ebbs, count, emitWarnings);
 	          unvisitBlocks(ebbs, count);
 	          ic->rlive = bitVectSetBit (ic->rlive, IC_LEFT(ic)->key);
 	          findNextUse (ebbs[i], ic->next, IC_LEFT(ic));
@@ -531,8 +567,6 @@ rlivePoint (eBBlock ** ebbs, int count)
 			}
 		    }
 		}
-//                fprintf(stderr, "%s:%d IS_SYMOP left\t", __FILE__, __LINE__);printOperand(IC_LEFT(ic), stderr);
-//                fprintf(stderr, "\n");
 	    }
 
 	  if (IS_SYMOP(IC_RIGHT(ic)))
@@ -540,13 +574,11 @@ rlivePoint (eBBlock ** ebbs, int count)
 	      incUsed (ic, IC_RIGHT(ic));
 	      if (IS_ITEMP(IC_RIGHT(ic)))
 	        {
-	          findPrevUse (ebbs[i], ic->prev, IC_RIGHT(ic), ebbs, count);
+	          findPrevUse (ebbs[i], ic, IC_RIGHT(ic), ebbs, count, emitWarnings);
 	          unvisitBlocks(ebbs, count);
 	          ic->rlive = bitVectSetBit (ic->rlive, IC_RIGHT(ic)->key);
 	          findNextUse (ebbs[i], ic->next, IC_RIGHT(ic));
 		}
-//                fprintf(stderr, "%s:%d IS_SYMOP right\t", __FILE__, __LINE__);printOperand(IC_RIGHT(ic), stderr);
-//                fprintf(stderr, "\n");
 	    }
 
 	  if (POINTER_SET(ic) && IS_SYMOP(IC_RESULT(ic)))
@@ -556,7 +588,7 @@ rlivePoint (eBBlock ** ebbs, int count)
 	    {
 	      if (POINTER_SET(ic))
 	        {
-	          findPrevUse (ebbs[i], ic->prev, IC_RESULT(ic), ebbs, count);
+	          findPrevUse (ebbs[i], ic, IC_RESULT(ic), ebbs, count, emitWarnings);
 		}
 	      unvisitBlocks(ebbs, count);
 	      ic->rlive = bitVectSetBit (ic->rlive, IC_RESULT(ic)->key);
@@ -730,7 +762,7 @@ notUsedInBlock (symbol * sym, eBBlock * ebp, iCode *ic)
 /*-----------------------------------------------------------------*/
 /* adjustIChain - correct the sch and ech pointers                 */
 /*-----------------------------------------------------------------*/
-void
+static void
 adjustIChain (eBBlock ** ebbs, int count)
 {
   int i;
@@ -762,7 +794,7 @@ adjustIChain (eBBlock ** ebbs, int count)
 /* computeLiveRanges - computes the live ranges for variables      */
 /*-----------------------------------------------------------------*/
 void
-computeLiveRanges (eBBlock ** ebbs, int count)
+computeLiveRanges (eBBlock ** ebbs, int count, bool emitWarnings)
 {
   /* first look through all blocks and adjust the
      sch and ech pointers */
@@ -781,7 +813,7 @@ computeLiveRanges (eBBlock ** ebbs, int count)
 
   /* mark the ranges live for each point */
   setToNull ((void *) &liveRanges);
-  rlivePoint (ebbs, count);
+  rlivePoint (ebbs, count, emitWarnings);
 
   /* mark the from & to live ranges for variables used */
   markLiveRanges (ebbs, count);
@@ -815,6 +847,43 @@ recomputeLiveRanges (eBBlock ** ebbs, int count)
     }
 
   /* do the LR computation again */
-  computeLiveRanges (ebbs, count);
+  computeLiveRanges (ebbs, count, FALSE);
 }
 
+/*-----------------------------------------------------------------*/
+/* dump icode->rlive in all blocks                                 */
+/*-----------------------------------------------------------------*/
+#if 0
+void
+dumpIcRlive (eBBlock ** ebbs, int count)
+{
+  int i, j;
+  iCode *ic;
+
+  /* for all blocks do */
+  for (i = 0; i < count; i++)
+    {
+      printf ("bb %d %s alive symbols:\n", i, ebbs[i]->entryLabel->name);
+      /* for all instructions in this block do */
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          printf ("\tic->key %d\n", ic->key);
+
+          if (!ic->rlive)
+            continue;
+          /* for all live Ranges alive at this point */
+          for (j = 1; j < ic->rlive->size; j++)
+            {
+              symbol *sym;
+
+              if (!bitVectBitValue (ic->rlive, j))
+                continue;
+
+              /* find the live range we are interested in */
+              if ((sym = hTabItemWithKey (liveRanges, j)))
+                printf ("\t\tsym->key %2d: %s\n", sym->key, sym->rname[0] ? sym->rname : sym->name);
+            }
+        }
+    }
+}
+#endif

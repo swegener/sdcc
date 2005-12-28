@@ -1,6 +1,29 @@
 2005-12-28 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/Makefile.in: added --std-sdcc99 to CFLAGS
+	* src/mcs51/gen.c (gen51Code): show final register usage after
+	fillGaps in asm with --i-code-in-asm
+	* src/SDCClrange.c (sequenceiCode, setLiveFrom, setLiveTo,
+	markLiveRanges, markAlive, findNextUseSym, findNextUse, unvisitBlocks,
+	incUsed, rliveClear, adjustIChain): made static,
+	(setFromRange): excluded because it's unused,
+	(findPrevUseSym, markWholeLoop): added,
+	(findPrevUse): rewritten; fixes bug 895992; now a complete search
+	through	all branches of predecessors enables sdcc to emit the warning
+	W_LOCAL_NOINIT, marking of outermost loop was incomplete,
+	(rlivePoint): made static, added parameter emitWarnings which is only
+	true during the first run out of two,
+	(findRecursiveSucc, findRecursivePred): removed,
+	(computeLiveRanges): made static, added parameter emitWarnings,
+	(dumpIcRlive): added for debugging only
+	* src/SDCClrange.h: added boolean parameter to computeLiveRanges(),
+	removed prototype of setFromRange()
+	* src/SDCCopt.c (eBBlockFromiCode): added new parameter emitWarnings
+	in call of computeLiveRanges()
+	* support/regression/tests/bug-895992.c: added
+	* support/regression/tests/bug-971834.c: added
+	* support/valdiag/tests/bug-895992.c: added
+	* support/valdiag/tests/bug-971834.c: added
 
 2005-12-18 Raphael Neider <rneider AT web.de>
 

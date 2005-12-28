@@ -1558,7 +1558,7 @@ eBBlockFromiCode (iCode * ic)
   convertToFcall (ebbi->bbOrder, ebbi->count);
 
   /* compute the live ranges */
-  computeLiveRanges (ebbi->bbOrder, ebbi->count);
+  computeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);
 
   if (options.dump_range)
     dumpEbbsToFileExt (DUMP_RANGE, ebbi);

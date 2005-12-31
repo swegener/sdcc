@@ -326,100 +326,49 @@ symbolVal (symbol * sym)
   return val;
 }
 
-#if defined(REDUCE_LITERALS)
 /*--------------------------------------------------------------------*/
 /* cheapestVal - convert a val to the cheapest as possible value      */
 /*--------------------------------------------------------------------*/
-static value *cheapestVal (value *val) {
-  TYPE_DWORD  sval=0;
-  TYPE_UDWORD uval=0;
-
-  if (IS_FLOAT(val->type) || IS_FIXED(val->type) || IS_CHAR(val->type))
-    return val;
-
-  if (SPEC_LONG(val->type)) {
-    if (SPEC_USIGN(val->type)) {
-      uval=SPEC_CVAL(val->type).v_ulong;
-    } else {
-      sval=SPEC_CVAL(val->type).v_long;
-    }
-  } else {
-    if (SPEC_USIGN(val->type)) {
-      uval=SPEC_CVAL(val->type).v_uint;
-    } else {
-      sval=SPEC_CVAL(val->type).v_int;
-    }
-  }
-
-  if (SPEC_USIGN(val->type)) {
-    if (uval<=0xffff) {
-      SPEC_LONG(val->type)=0;
-      SPEC_CVAL(val->type).v_uint = (TYPE_UWORD)uval;
-      if (uval<=0xff) {
-        SPEC_NOUN(val->type)=V_CHAR;
-      }
-    }
-  } else { // not unsigned
-    if (sval<0) {
-      if (sval>=-32768) {
-        SPEC_LONG(val->type)=0;
-        SPEC_CVAL(val->type).v_int = (TYPE_WORD)sval;
-        if (sval>=-128) {
-          SPEC_NOUN(val->type)=V_CHAR;
-        }
-      }
-    } else { // sval>=0
-      if (sval<=32767) {
-        SPEC_LONG(val->type)=0;
-        SPEC_CVAL(val->type).v_int = (TYPE_WORD)sval;
-        if (sval<=127) {
-          SPEC_NOUN(val->type)=V_CHAR;
-        }
-      }
-    }
-  }
-  return val;
-}
-
-#else
-
-static value *cheapestVal (value *val)
+static value *
+cheapestVal (value *val)
 {
   if (IS_FLOAT (val->type) || IS_FIXED (val->type) || IS_CHAR (val->type))
     return val;
 
-  /* - signed/unsigned must not be changed.
-     - long must not be changed.
+  /* long must not be changed */
+  if (SPEC_LONG(val->type))
+    return val;
 
-     the only possible reduction is from signed int to signed char,
+  /* only int can be reduced */
+  if (!IS_INT(val->type))
+    return val;
+
+  /* unsigned must not be changed */
+  if (SPEC_USIGN(val->type))
+    return val;
+
+  /* the only possible reduction is from signed int to (un)signed char,
      because it's automatically promoted back to signed int.
 
      a reduction from unsigned int to unsigned char is a bug,
      because an _unsigned_ char is promoted to _signed_ int! */
-  if (IS_INT(val->type) &&
-      !SPEC_USIGN(val->type) &&
-      !SPEC_LONG(val->type) &&
-      SPEC_CVAL(val->type).v_int >= -128 &&
-      SPEC_CVAL(val->type).v_int <     0)
-
+  if (SPEC_CVAL(val->type).v_int < -128 ||
+      SPEC_CVAL(val->type).v_int >  255)
     {
-      SPEC_NOUN(val->type) = V_CHAR;
+      /* not in the range of (un)signed char */
+      return val;
     }
+
+  SPEC_NOUN(val->type) = V_CHAR;
+
   /* 'unsigned char' promotes to 'signed int', so that we can
      reduce it the other way */
-  if (IS_INT(val->type) &&
-      !SPEC_USIGN(val->type) &&
-      !SPEC_LONG(val->type) &&
-      SPEC_CVAL(val->type).v_int >=   0 &&
-      SPEC_CVAL(val->type).v_int <= 255)
-
+  if (SPEC_CVAL(val->type).v_int >= 0)
     {
-      SPEC_NOUN(val->type) = V_CHAR;
       SPEC_USIGN(val->type) = 1;
     }
   return (val);
 }
-#endif
 
 /*-----------------------------------------------------------------*/
 /* valueFromLit - creates a value from a literal                   */
@@ -1043,16 +992,16 @@ valUnaryPM (value * val)
             SPEC_CVAL (val->etype).v_uint = 0-SPEC_CVAL (val->etype).v_uint;
           else
             SPEC_CVAL (val->etype).v_int = -SPEC_CVAL (val->etype).v_int;
+
+          if (SPEC_NOUN(val->etype) == V_CHAR)
+            {
+              /* promote to 'signed int', cheapestVal() might reduce it again */
+              SPEC_USIGN(val->etype) = 0;
+              SPEC_NOUN(val->etype) = V_INT;
+            }
+          return cheapestVal (val);
         }
     }
-  // -(unsigned 3) now really is signed
-  SPEC_USIGN(val->etype)=0;
-  // -(unsigned char)135 now really is an int
-  if (SPEC_NOUN(val->etype) == V_CHAR) {
-    if (SPEC_CVAL(val->etype).v_int < -128) {
-      SPEC_NOUN(val->etype) = V_INT;
-    }
-  }
   return val;
 }
 
@@ -1076,13 +1025,15 @@ valComplement (value * val)
         SPEC_CVAL (val->etype).v_uint = ~SPEC_CVAL (val->etype).v_uint;
       else
         SPEC_CVAL (val->etype).v_int = ~SPEC_CVAL (val->etype).v_int;
+
       if (SPEC_NOUN(val->etype) == V_CHAR)
-        if (   SPEC_CVAL(val->etype).v_int < -128
-            || SPEC_CVAL(val->etype).v_int >  127)
+        {
+          /* promote to 'signed int', cheapestVal() might reduce it again */
+          SPEC_USIGN(val->etype) = 0;
           SPEC_NOUN(val->etype) = V_INT;
+        }
+      return cheapestVal (val);
     }
-  // ~(unsigned 3) now really is signed
-  SPEC_USIGN(val->etype)=0;
   return val;
 }
 
@@ -1106,6 +1057,14 @@ valNot (value * val)
         SPEC_CVAL (val->etype).v_uint = !SPEC_CVAL (val->etype).v_uint;
       else
         SPEC_CVAL (val->etype).v_int = !SPEC_CVAL (val->etype).v_int;
+
+      if (SPEC_NOUN(val->etype) == V_CHAR)
+        {
+          /* promote to 'signed int', cheapestVal() might reduce it again */
+          SPEC_USIGN(val->etype) = 0;
+          SPEC_NOUN(val->etype) = V_INT;
+        }
+      return cheapestVal (val);
     }
   return val;
 }

@@ -1,3 +1,16 @@
+2005-12-31 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (decorateType): fix promotion of unary minus
+	* src/SDCCsymt.c (computeType): beautified
+	* src/SDCCval.c (cheapestVal): beautified, old non-Ansi version removed,
+	(valUnaryPM, valComplement, valNot): fix sign and promotion
+	* support/regression/tests/uminus.c: speedup by removing superflous
+	test case 'int'
+	* support/regression/tests/onebyte.c: added promotion and signedness
+	tests for unary minus
+	* support/regressions/tests/bug-477927.c: disable warning about
+	uninitialized variables
+
 2005-12-28 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/Makefile.in: added --std-sdcc99 to CFLAGS

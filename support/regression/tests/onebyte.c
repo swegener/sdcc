@@ -203,3 +203,28 @@ testComp(void)
   ASSERT(!(c >  uc));
   ASSERT(!(c >= uc));
 }
+
+void
+testUMinus(void)
+{
+    signed char  {attrL} sc;
+  unsigned char  {attrL} uc;
+  unsigned int   {attrL} us;
+  unsigned long  {attrL} ul;
+
+  ASSERT (-(53ul) > 0);
+  ul = 53;
+  ASSERT (-ul > 0);
+
+  ASSERT (-(53u ) > 0);
+  us = 53;
+  ASSERT (-us > 0);
+
+  ASSERT (-( 250 ) == -250);
+  uc = 250;
+  ASSERT (-uc == -250);
+
+  ASSERT (-(-128 ) ==  128);
+  sc = -128;
+  ASSERT (-sc == 128);
+}

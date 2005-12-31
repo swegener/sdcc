@@ -1,7 +1,7 @@
 /* Test unary minus
 
-    lefttype: int, char, short, long
-    resulttype: int, char, short, long
+    lefttype: char, short, long
+    resulttype: char, short, long
     storage: static,
     attr: volatile,
  */
@@ -20,7 +20,6 @@ testUMinus(void)
 
   left = -76;
   result = -left;
-  
+
   ASSERT(result == 76);
 }
-

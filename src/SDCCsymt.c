@@ -1880,28 +1880,34 @@ computeType (sym_link * type1, sym_link * type2,
           }
         else if (IS_CHAR (reType))
           {
-            if (op == '|' || op == '^')
-              return computeTypeOr (etype1, etype2, reType);
-            else if (   op == '&'
-                     && SPEC_USIGN (etype1) != SPEC_USIGN (etype2))
+            /* promotion of some special cases */
+            switch (op)
               {
-                SPEC_USIGN (reType) = 1;
-                return rType;
-              }
-            else if (op == '*')
-              {
-                SPEC_NOUN (reType) = V_INT;
-                SPEC_USIGN (reType) = 0;
-                return rType;
-              }
-            /* TODO: should be in SDCCast.c */
-            else if (   op == '/'
-                     && (   !SPEC_USIGN (etype1)
-                         || !SPEC_USIGN (etype2)))
-              {
-                SPEC_NOUN (reType) = V_INT;
-                SPEC_USIGN (reType) = 0;
-                return rType;
+                case '|':
+                case '^':
+                  return computeTypeOr (etype1, etype2, reType);
+                case '&':
+                  if (SPEC_USIGN (etype1) != SPEC_USIGN (etype2))
+                    {
+                      SPEC_USIGN (reType) = 1;
+                      return rType;
+                    }
+                  break;
+                case '*':
+                  SPEC_NOUN (reType) = V_INT;
+                  SPEC_USIGN (reType) = 0;
+                  return rType;
+                case '/':
+                  /* if both are unsigned char then no promotion required */
+                  if (!(SPEC_USIGN (etype1) && SPEC_USIGN (etype2)))
+                    {
+                      SPEC_NOUN (reType) = V_INT;
+                      SPEC_USIGN (reType) = 0;
+                      return rType;
+                    }
+                  break;
+                default:
+                  break;
               }
           }
         break;

@@ -3287,11 +3287,15 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               tree->opval.val = valUnaryPM (valFromType (LETYPE (tree)));
               tree->left = NULL;
               TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
-              SPEC_USIGN(TETYPE(tree)) = 0;
               return tree;
             }
+          tree->left  = addCast (tree->left, resultType, TRUE);
+          TETYPE (tree) = getSpec (TTYPE (tree) =
+                                     computeType (LTYPE (tree),
+                                                  NULL,
+                                                  resultType,
+                                                  tree->opval.op));
           LRVAL (tree) = 1;
-          TETYPE(tree) = getSpec (TTYPE (tree) = LTYPE (tree));
           return tree;
         }
 

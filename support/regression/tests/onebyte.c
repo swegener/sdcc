@@ -185,10 +185,15 @@ testComplement(void)
   uc = 0x80;  r16 = ~uc; ASSERT(r16 == (short) 0xff7f); ASSERT(~uc < 0);
   ASSERT(~ (char)          0x80 == (short) 0x007f); ASSERT(~ (char)          0x80 > 0);
   ASSERT(~ (unsigned char) 0x80 == (short) 0xff7f); ASSERT(~ (unsigned char) 0x80 < 0);
+
+  ASSERT(~ 1   < 0);
+  ASSERT(~ 1u  > 0);
+  ASSERT(~ 1l  < 0);
+  ASSERT(~ 1ul > 0);
 }
 
 void
-testComp(void)
+testCompare(void)
 {
   {attrL}   signed char  c;
   {attrR} unsigned char uc;
@@ -209,22 +214,30 @@ testUMinus(void)
 {
     signed char  {attrL} sc;
   unsigned char  {attrL} uc;
-  unsigned int   {attrL} us;
+    signed int   {attrL} si;
+  unsigned int   {attrL} ui;
+    signed long  {attrL} sl;
   unsigned long  {attrL} ul;
 
-  ASSERT (-(53ul) > 0);
+  ASSERT(-(53l ) < 0);
+  ASSERT(-(53ul) > 0);
   ul = 53;
-  ASSERT (-ul > 0);
+  ASSERT(-ul > 0);
+  sl = 53;
+  ASSERT(-sl < 0);
 
-  ASSERT (-(53u ) > 0);
-  us = 53;
-  ASSERT (-us > 0);
+  ASSERT(-(53  ) < 0);
+  ASSERT(-(53u ) > 0);
+  ui = 53;
+  ASSERT(-ui > 0);
+  si = 53;
+  ASSERT(-si < 0);
 
-  ASSERT (-( 250 ) == -250);
+  ASSERT(-( 250 ) == -250);
   uc = 250;
-  ASSERT (-uc == -250);
+  ASSERT(-uc == -250);
 
-  ASSERT (-(-128 ) ==  128);
+  ASSERT(-(-128 ) ==  128);
   sc = -128;
-  ASSERT (-sc == 128);
+  ASSERT(-sc == 128);
 }

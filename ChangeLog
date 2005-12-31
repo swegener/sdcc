@@ -3,13 +3,15 @@
 	* src/SDCCast.c (decorateType): fix promotion of unary minus
 	* src/SDCCsymt.c (computeType): beautified
 	* src/SDCCval.c (cheapestVal): beautified, old non-Ansi version removed,
-	(valUnaryPM, valComplement, valNot): fix sign and promotion
+	(valUnaryPM, valComplement): fix sign and promotion,
+	(valNot): ANSI: result type is int (SDCC: unsigned char)
 	* support/regression/tests/uminus.c: speedup by removing superflous
 	test case 'int'
 	* support/regression/tests/onebyte.c: added promotion and signedness
 	tests for unary minus
 	* support/regressions/tests/bug-477927.c: disable warning about
 	uninitialized variables
+	* support/regression/tests/not.c: added
 
 2005-12-28 Bernhard Held <bernhard AT bernhardheld.de>
 

@@ -327,20 +327,17 @@ symbolVal (symbol * sym)
 }
 
 /*--------------------------------------------------------------------*/
-/* cheapestVal - convert a val to the cheapest as possible value      */
+/* cheapestVal - try to reduce 'signed int' to 'char'                 */
 /*--------------------------------------------------------------------*/
 static value *
 cheapestVal (value *val)
 {
-  if (IS_FLOAT (val->type) || IS_FIXED (val->type) || IS_CHAR (val->type))
+  /* only int can be reduced */
+  if (!IS_INT(val->type))
     return val;
 
   /* long must not be changed */
   if (SPEC_LONG(val->type))
-    return val;
-
-  /* only int can be reduced */
-  if (!IS_INT(val->type))
     return val;
 
   /* unsigned must not be changed */
@@ -1058,14 +1055,12 @@ valNot (value * val)
       else
         SPEC_CVAL (val->etype).v_int = !SPEC_CVAL (val->etype).v_int;
 
-      if (SPEC_NOUN(val->etype) == V_CHAR)
-        {
-          /* promote to 'signed int', cheapestVal() might reduce it again */
-          SPEC_USIGN(val->etype) = 0;
-          SPEC_NOUN(val->etype) = V_INT;
-        }
-      return cheapestVal (val);
     }
+  /* ANSI: result type is int, value is 0 or 1 */
+  /* sdcc will hold this in an 'unsigned char' */
+  SPEC_USIGN(val->etype) = 1;
+  SPEC_LONG (val->etype) = 0;
+  SPEC_NOUN(val->etype) = V_CHAR;
   return val;
 }
 

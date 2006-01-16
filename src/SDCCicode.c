@@ -3635,8 +3635,6 @@ geniCodeIfx (ast * tree,int lvl)
         {
           if (tree->falseLabel)
             geniCodeGoto (tree->falseLabel);
-          else
-            assert (0);
         }
       goto exit;
     }

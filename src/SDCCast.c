@@ -59,7 +59,7 @@ ast *optimizeGetHbit (ast *, RESULT_TYPE);
 ast *optimizeGetAbit (ast *, RESULT_TYPE);
 ast *optimizeGetByte (ast *, RESULT_TYPE);
 ast *optimizeGetWord (ast *, RESULT_TYPE);
-ast *backPatchLabels (ast *, symbol *, symbol *);
+static ast *backPatchLabels (ast *, symbol *, symbol *);
 void PA(ast *t);
 int inInitMode = 0;
 memmap *GcurMemmap=NULL;  /* points to the memmap that's currently active */
@@ -4519,11 +4519,12 @@ sizeofOp (sym_link * type)
 #define IS_IFX(ex) (ex->type == EX_OP && ex->opval.op == IFX )
 #define IS_LT(ex)  (ex->type == EX_OP && ex->opval.op == '<' )
 #define IS_GT(ex)  (ex->type == EX_OP && ex->opval.op == '>')
+#define IS_NULLOP(ex) (ex->type == EX_OP && ex->opval.op == NULLOP)
 
 /*-----------------------------------------------------------------*/
 /* backPatchLabels - change and or not operators to flow control    */
 /*-----------------------------------------------------------------*/
-ast *
+static ast *
 backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
 {
 
@@ -4588,25 +4589,18 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
   /* change not */
   if (IS_NOT (tree))
     {
-      int wasnot = IS_NOT (tree->left);
+      /* call with exchanged labels */
       tree->left = backPatchLabels (tree->left, falseLabel, trueLabel);
 
-      /* if the left is already a IFX */
+      /* if left isn't already a IFX */
       if (!IS_IFX (tree->left))
-        tree->left = newNode (IFX, tree->left, NULL);
-
-      if (wasnot)
         {
-          tree->left->trueLabel = trueLabel;
-          tree->left->falseLabel = falseLabel;
-        }
-      else
-        {
+          tree->left = newNode (IFX, tree->left, NULL);
           tree->left->trueLabel = falseLabel;
           tree->left->falseLabel = trueLabel;
         }
       return tree->left;
-    }
+     }
 
   if (IS_IFX (tree))
     {

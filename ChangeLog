@@ -18,6 +18,8 @@
 	loopOptimizations, addressTaken, findDefInRegion, hasIncomingDefs,
 	findLoopEndSeq
 	* support/regression/tests/bug-136564.c: added
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: added
+	--std-sdcc99 to LIBSDCCFLAGS
 
 2006-01-16 Bernhard Held <bernhard AT bernhardheld.de>
 

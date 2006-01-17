@@ -7,7 +7,7 @@ include $(PORTS_DIR)/mcs51/spec.mk
 LIBSRCDIR = ../../device/lib
 LIBDIR    = gen/$(PORT)/lib
 
-LIBSDCCFLAGS+=--stack-auto --xstack
+LIBSDCCFLAGS+=--std-sdcc99 --stack-auto --xstack
 SDCCFLAGS   +=$(LIBSDCCFLAGS)
 
 # copy support.c

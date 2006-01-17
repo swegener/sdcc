@@ -725,14 +725,15 @@ newiTempLabel (char *s)
 }
 
 /*-----------------------------------------------------------------*/
-/* newiTempPreheaderLabel - creates a new preheader label          */
+/* newiTempLoopHeaderLabel - creates a new loop header label       */
 /*-----------------------------------------------------------------*/
 symbol *
-newiTempPreheaderLabel ()
+newiTempLoopHeaderLabel (bool pre)
 {
   symbol *itmplbl;
 
-  SNPRINTF (buffer, sizeof(buffer), "preHeaderLbl%d", iTempLblNum++);
+  SNPRINTF (buffer, sizeof(buffer), pre ? "preHeaderLbl%d" : LOOPEXITLBL "%d",
+            iTempLblNum++);
   itmplbl = newSymbol (buffer, 1);
 
   itmplbl->isitmp = 1;

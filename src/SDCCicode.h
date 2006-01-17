@@ -318,7 +318,8 @@ int isParameterToCall (value *, operand *);
 iCode *newiCodeLabelGoto (int, symbol *);
 symbol *newiTemp (char *);
 symbol *newiTempLabel (char *);
-symbol *newiTempPreheaderLabel ();
+#define LOOPEXITLBL "loopExitLbl"
+symbol *newiTempLoopHeaderLabel (bool);
 iCode *newiCode (int, operand *, operand *);
 sym_link *operandType (operand *);
 operand *operandFromValue (value *);

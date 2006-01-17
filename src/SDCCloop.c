@@ -33,7 +33,7 @@ STACK_DCL (regionStack, eBBlock *, MAX_NEST_LEVEL * 10);
 /*-----------------------------------------------------------------*/
 /* newInduction - creates a new induction variable                 */
 /*-----------------------------------------------------------------*/
-induction *
+static induction *
 newInduction (operand * sym, unsigned int op,
 	      long constVal, iCode * ic, operand * asym)
 {
@@ -53,7 +53,7 @@ newInduction (operand * sym, unsigned int op,
 /*-----------------------------------------------------------------*/
 /* newRegion - allocate & returns a loop structure                 */
 /*-----------------------------------------------------------------*/
-region *
+static region *
 newRegion ()
 {
   region *lp;
@@ -64,9 +64,11 @@ newRegion ()
 }
 
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* pinduction - prints induction                                   */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (pinduction)
 {
   induction *ip = item;
@@ -83,6 +85,7 @@ DEFSETFUNC (pinduction)
 /*-----------------------------------------------------------------*/
 /* pregion - prints loop information                                */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (pregion)
 {
   region *lp = item;
@@ -99,10 +102,12 @@ DEFSETFUNC (pregion)
   printf ("\n");
   return 0;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* backEdges - returns a list of back edges                        */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (backEdges)
 {
   edge *ep = item;
@@ -144,7 +149,6 @@ intersectLoopSucc (set * lexits, eBBlock ** ebbs)
   return succVect;
 }
 
-
 /*-----------------------------------------------------------------*/
 /* loopInsert will insert a block into the loop set                */
 /*-----------------------------------------------------------------*/
@@ -161,6 +165,7 @@ loopInsert (set ** regionSet, eBBlock * block)
 /*-----------------------------------------------------------------*/
 /* insertIntoLoop - insert item into loop                          */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (insertIntoLoop)
 {
   eBBlock *ebp = item;
@@ -173,6 +178,7 @@ DEFSETFUNC (insertIntoLoop)
 /*-----------------------------------------------------------------*/
 /* isNotInBlocks - will return 1 if not is blocks                  */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (isNotInBlocks)
 {
   eBBlock *ebp = item;
@@ -184,11 +190,12 @@ DEFSETFUNC (isNotInBlocks)
   return 0;
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* hasIncomingDefs - has definitions coming into the loop. i.e.    */
 /* check to see if the preheaders outDefs has any definitions      */
 /*-----------------------------------------------------------------*/
-int
+static int
 hasIncomingDefs (region * lreg, operand * op)
 {
   eBBlock *preHdr = lreg->entry->preHeader;
@@ -202,7 +209,7 @@ hasIncomingDefs (region * lreg, operand * op)
 /* findLoopEndSeq - will return the sequence number of the last    */
 /* iCode with the maximum dfNumber in the region                   */
 /*-----------------------------------------------------------------*/
-int
+static int
 findLoopEndSeq (region * lreg)
 {
   eBBlock *block;
@@ -217,11 +224,13 @@ findLoopEndSeq (region * lreg)
 
   return lblock->lSeq;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* addToExitsMarkDepth - will add the the exitSet all blocks that  */
 /* have exits, will also update the depth field in the blocks      */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (addToExitsMarkDepth)
 {
   eBBlock *ebp = item;
@@ -254,6 +263,7 @@ DEFSETFUNC (addToExitsMarkDepth)
 /*-----------------------------------------------------------------*/
 /* createLoop - will create a set of region                        */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (createLoop)
 {
   edge *ep = item;
@@ -287,6 +297,7 @@ DEFSETFUNC (createLoop)
 /*-----------------------------------------------------------------*/
 /* dominatedBy - will return 1 if item is dominated by block       */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (dominatedBy)
 {
   eBBlock *ebp = item;
@@ -298,6 +309,7 @@ DEFSETFUNC (dominatedBy)
 /*-----------------------------------------------------------------*/
 /* addDefInExprs - adds an expression into the inexpressions       */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (addDefInExprs)
 {
   eBBlock *ebp = item;
@@ -312,7 +324,7 @@ DEFSETFUNC (addDefInExprs)
 /*-----------------------------------------------------------------*/
 /* assignmentsToSym - for a set of blocks determine # time assigned */
 /*-----------------------------------------------------------------*/
-int
+static int
 assignmentsToSym (set * sset, operand * sym)
 {
   eBBlock *ebp;
@@ -322,13 +334,11 @@ assignmentsToSym (set * sset, operand * sym)
   for (ebp = setFirstItem (blocks); ebp;
        ebp = setNextItem (blocks))
     {
-
       /* get all the definitions for this symbol
          in this block */
       bitVect *defs = bitVectIntersect (ebp->ldefs, OP_DEFS (sym));
       assigns += bitVectnBitsOn (defs);
       setToNull ((void *) &defs);
-
     }
 
   return assigns;
@@ -338,7 +348,7 @@ assignmentsToSym (set * sset, operand * sym)
 /*-----------------------------------------------------------------*/
 /* isOperandInvariant - determines if an operand is an invariant   */
 /*-----------------------------------------------------------------*/
-int
+static int
 isOperandInvariant (operand * op, region * theLoop, set * lInvars)
 {
   int opin = 0;
@@ -373,6 +383,7 @@ isOperandInvariant (operand * op, region * theLoop, set * lInvars)
 /*-----------------------------------------------------------------*/
 /* pointerAssigned - will return 1 if pointer set found            */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (pointerAssigned)
 {
   eBBlock *ebp = item;
@@ -399,6 +410,7 @@ DEFSETFUNC (pointerAssigned)
 /*-----------------------------------------------------------------*/
 /* hasNonPtrUse - returns true if operand has non pointer usage    */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (hasNonPtrUse)
 {
   eBBlock *ebp = item;
@@ -415,7 +427,7 @@ DEFSETFUNC (hasNonPtrUse)
 /*-----------------------------------------------------------------*/
 /* loopInvariants - takes loop invariants out of region            */
 /*-----------------------------------------------------------------*/
-int
+static int
 loopInvariants (region * theLoop, ebbIndex * ebbi)
 {
   eBBlock ** ebbs = ebbi->dfOrder;
@@ -697,7 +709,7 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
 /*-----------------------------------------------------------------*/
 /* addressTaken - returns true if the symbol is found in the addrof */
 /*-----------------------------------------------------------------*/
-int
+static int
 addressTaken (set * sset, operand * sym)
 {
   set *loop;
@@ -723,6 +735,7 @@ addressTaken (set * sset, operand * sym)
 /*-----------------------------------------------------------------*/
 /* findInduction :- returns 1 & the item if the induction is found */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (findInduction)
 {
   induction *ip = item;
@@ -741,7 +754,7 @@ DEFSETFUNC (findInduction)
 /*-----------------------------------------------------------------*/
 /* findDefInRegion - finds the definition within the region        */
 /*-----------------------------------------------------------------*/
-iCode *
+static iCode *
 findDefInRegion (set * regBlocks, operand * defOp, eBBlock ** owner)
 {
   eBBlock *lBlock;
@@ -771,10 +784,190 @@ findDefInRegion (set * regBlocks, operand * defOp, eBBlock ** owner)
 }
 
 /*-----------------------------------------------------------------*/
+/* addPostLoopBlock - add a ebblock before the successors of the   */
+/*                    loop exits                                   */
+/*-----------------------------------------------------------------*/
+static void
+addPostLoopBlock (region *loopReg, ebbIndex *ebbi, iCode *ic)
+{
+  bitVect *loopSuccs;
+  int i;
+
+  /* if the number of exits is greater than one then 
+     we use another trick: we will create an intersection
+     of succesors of the exits, then take those that are not
+     part of the loop and have dfNumber greater loop entry (eblock),
+     insert a new predecessor postLoopBlk before them and add
+     a copy of ic in the new block. The postLoopBlk in between
+     is necessary, because the old successors of the loop exits can
+     be successors of other blocks too: see bug-136564. */
+
+  /* loopSuccs now contains intersection
+      of all the loops successors */
+  loopSuccs = intersectLoopSucc (loopReg->exits, ebbi->dfOrder);
+  if (!loopSuccs)
+    return;
+
+  for (i = 0; i < loopSuccs->size; i++)
+    {
+      eBBlock *eblock = NULL;
+      eBBlock *postLoopBlk;
+      iCode *newic;
+      int j;
+
+      if (!bitVectBitValue (loopSuccs, i))
+        continue;
+
+      /* Need to search for bbnum == i since ebbi->dfOrder is
+         sorted by dfnum; a direct index won't do.  */
+      for (j = 0; j < ebbi->count; j++)
+        if (ebbi->dfOrder[j]->bbnum == i)
+          {
+            eblock = ebbi->dfOrder[j];
+            break;
+          }
+      assert(eblock);
+
+      /* if the successor does not belong to the loop
+          and will be executed after the loop : then
+          add a definition to the block */
+      if (isinSet (loopReg->regBlocks, eblock))
+        continue;
+      if (eblock->dfnum <= loopReg->entry->dfnum)
+        continue;
+
+      /* look for an existing loopExitBlock */
+      if (strncmp (LOOPEXITLBL,
+                    eblock->entryLabel->name,
+                    sizeof(LOOPEXITLBL) - 1) == 0)
+        {
+          /* reuse the existing one */
+          postLoopBlk = eblock;
+        }
+      else
+        {
+          /* create and insert a new eBBlock.
+              Damn, that's messy ... */
+          int i;
+          set *oldPredList;
+          eBBlock *ebpi;
+
+          postLoopBlk = neweBBlock();
+
+          /* create a loopExit-label */
+          postLoopBlk->entryLabel = newiTempLoopHeaderLabel (0);
+
+          /* increase bbnum for all blocks after
+              (and including) eblock */
+          for (i = 0; i < ebbi->count; i++)
+            {
+              if (ebbi->bbOrder[i]->bbnum >= eblock->bbnum)
+                ++ebbi->bbOrder[i]->bbnum;
+            }
+          /* insert postLoopBlk before bbnum */
+          postLoopBlk->bbnum = eblock->bbnum - 1;
+
+          ++ebbi->count;
+
+          /* these arrays need one more block, which ... */
+          ebbi->bbOrder = Safe_realloc (ebbi->bbOrder,
+                                        (ebbi->count + 1) * sizeof(eBBlock *));
+          /* ... must be initialized with 0 */
+          ebbi->bbOrder[ebbi->count] = NULL;
+          /* move the blocks up ... */
+          memmove (&ebbi->bbOrder[postLoopBlk->bbnum + 1],
+                   &ebbi->bbOrder[postLoopBlk->bbnum],
+                   (ebbi->count - postLoopBlk->bbnum - 1) * sizeof(eBBlock *));
+          /* ... and insert postLoopBlk */
+          ebbi->bbOrder[postLoopBlk->bbnum] = postLoopBlk;
+
+          /* just add postLoopBlk at the end of dfOrder,
+              computeControlFlow() will compute the new dfnum */
+          ebbi->dfOrder = Safe_realloc (ebbi->dfOrder,
+                                        (ebbi->count + 1) * sizeof(eBBlock *));
+          ebbi->dfOrder[ebbi->count] = NULL;
+          ebbi->dfOrder[ebbi->count - 1] = postLoopBlk;
+
+          /* copy loop information from eblock to postLoopBlk */
+          if (eblock->partOfLoop)
+            {
+              postLoopBlk->partOfLoop = eblock->partOfLoop;
+              /* add postLoopBlk to loop region */
+              addSetHead (&postLoopBlk->partOfLoop->regBlocks, postLoopBlk);
+            }
+
+          /* go through loop exits and replace the old exit block eblock
+              with the new postLoopBlk */
+          for (ebpi = setFirstItem (loopReg->exits);
+               ebpi;
+               ebpi = setNextItem (loopReg->exits))
+            {
+              /* replace old label with new label */
+              replaceLabel (ebpi, eblock->entryLabel, postLoopBlk->entryLabel);
+            }
+
+          /* now eblock is replaced by postLoopBlk.
+             It's possible, that eblock has an immediate predecessor
+             (with ebpi->bbnum + 1 == eblock->bbnum), which isn't part of the
+             loop. This predecessor must stay predecessor of eblock, not of
+             postLoopBlk. But now postLoopBlk is in between, therefore a GOTO
+             from this predecessor to eblock must be appended.
+             Example: bug-136564.c */
+
+          /* take all predecessors and subtract the loop exits */
+          oldPredList = subtractFromSet (eblock->predList,
+                                         loopReg->exits,
+                                         THROW_NONE);
+          for (ebpi = setFirstItem (oldPredList);
+               ebpi;
+               ebpi = setNextItem (oldPredList))
+            {
+              /* Is it an immediate predecessor (without GOTO)?
+                 All other predecessors end with a
+                 GOTO, IF, IFX or JUMPTABLE: nothing to to do */
+              if (ebpi->bbnum + 1 == postLoopBlk->bbnum)
+                {
+                  /* insert goto to old predecessor of eblock */
+                  newic = newiCodeLabelGoto (GOTO, eblock->entryLabel);
+                  addiCodeToeBBlock (ebpi, newic, NULL);
+                  break; /* got it, only one is possible */
+                }
+            }
+
+          /* set the label */
+          postLoopBlk->sch =
+          postLoopBlk->ech = newiCodeLabelGoto (LABEL, postLoopBlk->entryLabel);
+        }
+
+      /* create the definition in postLoopBlk */
+      newic = newiCode ('=', NULL, operandFromOperand (IC_RIGHT (ic)));
+      IC_RESULT (newic) = operandFromOperand (IC_RESULT (ic));
+      /* maintain data flow */
+      OP_DEFS(IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)),
+                                                  newic->key);
+      OP_USES(IC_RIGHT (newic)) = bitVectSetBit (OP_USES (IC_RIGHT (newic)),
+                                                 newic->key);
+
+      /* and add it */
+      addiCodeToeBBlock (postLoopBlk, newic, NULL);
+      postLoopBlk->sch->lineno =
+      postLoopBlk->ech->lineno = eblock->sch->lineno;
+
+      /* outDefs is needed by computeControlFlow(), anything
+         else will be set up by computeControlFlow() */
+      postLoopBlk->outDefs = bitVectSetBit (postLoopBlk->outDefs, newic->key);
+    } /* for (i = 0; i < loopSuccs->size; i++) */
+
+  /* the postLoopBlk and the induction significantly
+      changed the control flow, recompute it */
+  computeControlFlow (ebbi);
+}
+
+/*-----------------------------------------------------------------*/
 /* basicInduction - finds the basic induction variables in a loop  */
 /*-----------------------------------------------------------------*/
-set *
-basicInduction (region * loopReg, eBBlock ** ebbs, int count)
+static set *
+basicInduction (region * loopReg, ebbIndex * ebbi)
 {
   eBBlock *lBlock;
   set *indVars = NULL;
@@ -916,94 +1109,27 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 
 	  /* replace the inducted variable by the iTemp */
 	  replaceSymBySym (loopReg->regBlocks, IC_RESULT (ic), IC_RIGHT (ic));
+          /* ic should now be moved to the exit block(s) */
 
-	  /* if it has only one exit then remove it from here
-	     and put it in the exit block */
-	  nexits = elementsInSet (loopReg->exits);
-	  if (nexits == 1)
-	    {
-	      eBBlock *exit = setFirstItem (loopReg->exits);
-	      /* if it is the same block then there is no
-	         need to move it about */
-	      if (exit != lBlock)
-		{
-		  iCode *saveic = ic->prev;
-		  /* remove it */
-		  remiCodeFromeBBlock (lBlock, ic);
-		  /* clear the definition */
-		  bitVectUnSetBit (lBlock->defSet, ic->key);
-		  /* add it to the exit */
-		  addiCodeToeBBlock (exit, ic, NULL);
-		  /* set the definition bit */
-		  exit->defSet = bitVectSetBit (exit->defSet, ic->key);
-		  ic = saveic;
-		}
-	    }
+          nexits = elementsInSet (loopReg->exits);
+          if (nexits == 0)
+            {
+              /* this is a endless loop without exits: there's
+                 no need to restore the inducted variable */
+              iCode *saveic = ic->prev;
 
-	  /* if the number of exits is greater than one then
-	     we use another trick ; we will create an intersection
-	     of succesors of the exits, then take those that are not
-	     part of the loop and have dfNumber greater loop entry
-	     and insert a new definition in them */
-	  if (nexits > 1)
-	    {
-
-	      bitVect *loopSuccs = intersectLoopSucc (loopReg->exits, ebbs);
-
-	      /* loopSuccs now contains intersection
-	         of all the loops successors */
-	      if (loopSuccs)
-		{
-		  int i;
-		  for (i = 0; i < loopSuccs->size; i++)
-		    {
-		      if (bitVectBitValue (loopSuccs, i))
-			{
-
-			  eBBlock *eblock = NULL;
-			  int j;
-
-			  /* Need to search for bbnum == i since ebbs is  */
-			  /* sorted by dfnum; a direct index won't do.  */
-			  for (j=0; j<count; j++)
-			    if (ebbs[j]->bbnum == i)
-			      {
-			        eblock = ebbs[j];
-				break;
-			      }
-			  assert(eblock);
-
-			  /* if the successor does not belong to the loop
-			     and will be executed after the loop : then
-			     add a definition to the block */
-			  if (!isinSet (loopReg->regBlocks, eblock) &&
-			      eblock->dfnum > loopReg->entry->dfnum)
-			    {
-			      /* create the definition */
-			      iCode *newic = newiCode ('=', NULL,
-					operandFromOperand (IC_RIGHT (ic)));
-			      IC_RESULT (newic) = operandFromOperand (IC_RESULT (ic));
-			      OP_DEFS(IC_RESULT (newic))=
-				bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
-			      OP_USES(IC_RIGHT (newic))=
-				bitVectSetBit (OP_USES (IC_RIGHT (newic)), newic->key);
-			      /* and add it */
-			      if (eblock->sch && eblock->sch->op == LABEL)
-				addiCodeToeBBlock (eblock, newic, eblock->sch->next);
-			      else
-				addiCodeToeBBlock (eblock, newic, eblock->sch);
-			      /* set the definition bit */
-			      eblock->defSet = bitVectSetBit (eblock->defSet, ic->key);
-			    }
-			}
-		    }
-		}
-	    }
-
-	  addSet (&indVars, ip);
-	}
-
-    }				/* end of all blocks for basic induction variables */
+              /* ic will be removed by killDeadCode() too,
+                 but it's a nice to see a clean dumploop now. */
+              remiCodeFromeBBlock (lBlock, ic);
+              /* clear the definition */
+              bitVectUnSetBit (lBlock->defSet, ic->key);
+              ic = saveic;
+            }
+          else
+            addPostLoopBlock (loopReg, ebbi, ic);
+          addSet (&indVars, ip);
+        } /* for ic */
+    }     /* end of all blocks for basic induction variables */
 
   return indVars;
 }
@@ -1011,11 +1137,9 @@ basicInduction (region * loopReg, eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* loopInduction - remove induction variables from a loop          */
 /*-----------------------------------------------------------------*/
-int
+static int
 loopInduction (region * loopReg, ebbIndex * ebbi)
 {
-  eBBlock ** ebbs = ebbi->dfOrder;
-  int count = ebbi->count;
   int change = 0;
   eBBlock *lBlock, *owner, *lastBlock = NULL;
   set *indVars = NULL;
@@ -1025,7 +1149,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
     return 0;
 
   /* we first determine the basic Induction variables */
-  basicInd = setFromSet (indVars = basicInduction (loopReg, ebbs, count));
+  basicInd = setFromSet (indVars = basicInduction (loopReg, ebbi));
 
   /* find other induction variables : by other we mean definitions of */
   /* the form x := y (* | / ) <constant> .. we will move  this one to */
@@ -1121,7 +1245,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
           ic->op = '=';
           IC_LEFT (ic) = NULL;
           IC_RIGHT (ic) = IC_RESULT (ic);
-          
+
           /* Insert an update of the induction variable just before */
           /* the update of the basic induction variable. */
           indIc = newiCode (ip->op,
@@ -1132,7 +1256,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
           dic = findDefInRegion (setFromSet (loopReg->regBlocks), aSym, &owner);
           assert (dic);
 	  addiCodeToeBBlock (owner, indIc, dic);
-          
+
 	}
     }
 
@@ -1149,7 +1273,6 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
 	   ip;
 	   ip = setNextItem (indVars))
 	{
-
 	  indVect = bitVectSetBit (indVect, ip->ic->key);
 	  ip->ic->lineno = preHdr->ech->lineno;
 	  if (!icFirst)
@@ -1185,6 +1308,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
 /*-----------------------------------------------------------------*/
 /* mergeRegions - will merge region with same entry point           */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (mergeRegions)
 {
   region *theLoop = item;
@@ -1217,6 +1341,7 @@ DEFSETFUNC (mergeRegions)
 /*-----------------------------------------------------------------*/
 /* ifMerged - return 1 if the merge flag is 1                      */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (ifMerged)
 {
   region *lp = item;
@@ -1227,6 +1352,7 @@ DEFSETFUNC (ifMerged)
 /*-----------------------------------------------------------------*/
 /* mergeInnerLoops - will merge into body when entry is present    */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (mergeInnerLoops)
 {
   region *theLoop = item;

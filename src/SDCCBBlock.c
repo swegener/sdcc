@@ -243,6 +243,15 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
       bitVectDebugOn (ebbs[i]->ldefs, of);
       fprintf (of, "\npointers Set bitvector :");
       bitVectDebugOn (ebbs[i]->ptrsSet, of);
+#if 0
+      fprintf (of, "\nin coming definitions :");
+      bitVectDebugOn (ebbs[i]->inDefs, of);
+      fprintf (of, "\nout going definitions :");
+      bitVectDebugOn (ebbs[i]->outDefs, of);
+      fprintf (of, "\ndefines used :");
+      bitVectDebugOn (ebbs[i]->usesDefs, of);
+#endif
+
       if (ebbs[i]->isLastInLoop) {
 	      fprintf (of, "\nInductions Set bitvector :");
 	      bitVectDebugOn (ebbs[i]->linds, of);
@@ -572,7 +581,7 @@ iCodeBreakDown (iCode * ic)
 	      otherPathsPresent (ebbs, destBlock))
 	    {
 
-	      symbol *preHeaderLabel = newiTempPreheaderLabel ();
+	      symbol *preHeaderLabel  = newiTempLoopHeaderLabel (1);
 	      int i, j;
 	      eBBlock *pBlock;
 

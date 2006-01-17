@@ -51,14 +51,7 @@ typedef struct induction
   }
 induction;
 
-DEFSETFUNC (backEdges);
-DEFSETFUNC (pregion);
-DEFSETFUNC (pinduction);
 int loopOptimizations (hTab *, ebbIndex *);
-int addressTaken (set *, operand *);
 hTab *createLoopRegions (ebbIndex *);
-iCode *findDefInRegion (set *, operand *, eBBlock **);
-int hasIncomingDefs (region *, operand *);
-int findLoopEndSeq (region *);
 
 #endif

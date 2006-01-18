@@ -4519,7 +4519,6 @@ sizeofOp (sym_link * type)
 #define IS_IFX(ex) (ex->type == EX_OP && ex->opval.op == IFX )
 #define IS_LT(ex)  (ex->type == EX_OP && ex->opval.op == '<' )
 #define IS_GT(ex)  (ex->type == EX_OP && ex->opval.op == '>')
-#define IS_NULLOP(ex) (ex->type == EX_OP && ex->opval.op == NULLOP)
 
 /*-----------------------------------------------------------------*/
 /* backPatchLabels - change and or not operators to flow control    */

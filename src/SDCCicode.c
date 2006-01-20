@@ -2410,11 +2410,7 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
           size  = operandFromLit (getSize (ltype->next));
           SPEC_USIGN (getSpec (operandType (size))) = 1;
           indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
-          right = geniCodeMultiply (right,
-                                    size,
-                                    (getArraySizePtr(left) >= INTSIZE) ?
-                                      RESULT_TYPE_INT :
-                                      RESULT_TYPE_CHAR);
+          right = geniCodeMultiply (right, size, resultType);
           /* Even if right is a 'unsigned char',
              the result will be a 'signed int' due to the promotion rules.
              It doesn't make sense when accessing arrays, so let's fix it here: */
@@ -2513,6 +2509,14 @@ geniCodeArray (operand * left, operand * right, int lvl)
   operand *size;
   sym_link *ltype = operandType (left);
   bool indexUnsigned;
+  RESULT_TYPE resultType;
+
+  resultType = (getArraySizePtr(left) >= INTSIZE) ? RESULT_TYPE_INT : RESULT_TYPE_CHAR;
+  if (DCL_ELEM (ltype))
+    {
+      if (DCL_ELEM (ltype) * getSize (ltype->next) <= 255)
+        resultType = RESULT_TYPE_CHAR;
+    }
 
   if (IS_PTR (ltype))
     {
@@ -2521,22 +2525,13 @@ geniCodeArray (operand * left, operand * right, int lvl)
           left = geniCodeRValue (left, FALSE);
         }
 
-      return geniCodeDerefPtr (geniCodeAdd (left,
-                                            right,
-                                            (getArraySizePtr(left) >= INTSIZE) ?
-                                              RESULT_TYPE_INT :
-                                              RESULT_TYPE_CHAR,
-                                            lvl),
+      return geniCodeDerefPtr (geniCodeAdd (left, right, resultType, lvl),
                                lvl);
     }
   size = operandFromLit (getSize (ltype->next));
   SPEC_USIGN (getSpec (operandType (size))) = 1;
   indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
-  right = geniCodeMultiply (right,
-                            size,
-                            (getArraySizePtr(left) >= INTSIZE) ?
-                              RESULT_TYPE_INT :
-                              RESULT_TYPE_CHAR);
+  right = geniCodeMultiply (right, size, resultType);
   /* Even if right is a 'unsigned char', the result will be a 'signed int' due to the promotion rules.
      It doesn't make sense when accessing arrays, so let's fix it here: */
   if (indexUnsigned)

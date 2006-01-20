@@ -1,3 +1,9 @@
+2006-01-20 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCicode.c (geniCodeAdd, geniCodeArray): use char for array
+	offset if possible
+	* src/SDCCast.c (getLeftResultType): 255 fits in char, not 256
+
 2006-01-18 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (backPatchLabels): fixed bug #1408066: made it

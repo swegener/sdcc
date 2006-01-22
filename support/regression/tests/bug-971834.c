@@ -13,7 +13,6 @@ unsigned char ttt[] = {0xff, 1};
 unsigned char b;
 
 #if !defined(PORT_HOST)
-#  pragma save
 #  pragma disable_warning 84
 #endif
 
@@ -39,9 +38,6 @@ unsigned char orsh1 (void)
     }
   return b;
 }
-#if !defined(PORT_HOST)
-#  pragma restore
-#endif
 
 void
 testLR(void)

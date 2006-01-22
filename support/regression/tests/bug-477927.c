@@ -30,7 +30,6 @@ spoil(UBYTE ignored)
 UBYTE accu[2];
 
 #if !defined(PORT_HOST)
-#  pragma save
 #  pragma disable_warning 84
 #endif
 
@@ -49,7 +48,3 @@ testLoopInit(void)
   }
   while(t != 3);
 }
-
-#if !defined(PORT_HOST)
-#  pragma restore
-#endif

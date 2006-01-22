@@ -24,7 +24,6 @@ wait (void)
 }
 
 #if !defined(PORT_HOST)
-#  pragma save
 #  pragma disable_warning 84
 #endif
 
@@ -53,7 +52,3 @@ testLR(void)
 
   ASSERT(loops == p0);
 }
-
-#if !defined(PORT_HOST)
-#  pragma restore
-#endif

@@ -2569,6 +2569,22 @@ void cdbStructBlock (int block)
 }
 
 /*-----------------------------------------------------------------*/
+/* processFuncPtrArgs - does some processing with args of func ptrs*/
+/*-----------------------------------------------------------------*/
+void 
+processFuncPtrArgs (sym_link * funcType)
+{
+  value *val = FUNC_ARGS(funcType);
+
+  /* if it is void then remove parameters */
+  if (val && IS_VOID (val->type))
+    {
+      FUNC_ARGS(funcType) = NULL;
+      return;
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* processFuncArgs - does some processing with function args       */
 /*-----------------------------------------------------------------*/
 void 

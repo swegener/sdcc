@@ -1373,12 +1373,17 @@ abstract_declarator2
 	   
        FUNC_HASVARARGS(p) = IS_VARG($4);
        FUNC_ARGS(p) = reverseVal($4);
-	     
+
        /* nest level was incremented to take care of the parms  */
        NestLevel-- ;
        currBlockno--;
-       p->next = $1;
-       $$ = p;
+       if (!$1) {
+         /* ((void (code *) (void)) 0) () */
+         $1=newLink(DECLARATOR);
+         DCL_TYPE($1)=CPOINTER;
+         $$ = $1;
+       }
+       $1->next=p;
 
        // remove the symbol args (if any)
        cleanUpLevel(SymbolTab,NestLevel+1);

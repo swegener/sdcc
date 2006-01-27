@@ -1,3 +1,13 @@
+2006-01-27 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCC.y: fixed bug #716242, exchanged pointer and function
+	declarator in the symbol chain
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c (processFuncPtrArgs): added, removes "(void)"
+	parameter list for function pointers
+	* src/SDCCast.c (decorateType): added call of processFuncPtrArgs()
+	* support/regression/tests/bug-716242.c: added
+
 2006-01-20 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCicode.c (geniCodeAdd, geniCodeArray): use char for array

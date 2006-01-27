@@ -4348,7 +4348,10 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           parmNumber = 1;
 
           if (IS_FUNCPTR (LTYPE (tree)))
-            functype = LTYPE (tree)->next;
+            {
+              functype = LTYPE (tree)->next;
+              processFuncPtrArgs (functype);
+            }
           else
             functype = LTYPE (tree);
 

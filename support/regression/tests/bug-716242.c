@@ -23,7 +23,11 @@ void g (int (*h) (int))
 
 void f1()
 {
+#if defined(SDCC_ds390)
+  p = (void code *) mul2;
+#else
   p = (void *) mul2;
+#endif
   g ((int (*) (int)) p);
 }
 

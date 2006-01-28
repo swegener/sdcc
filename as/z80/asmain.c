@@ -135,7 +135,7 @@
  *		VOID	diag()		assubr.c
  *		VOID	err()		assubr.c
  *		int	fprintf()	c-library
- *		int	getline()	aslex.c
+ *		int	as_getline()	aslex.c
  *		VOID	list()		aslist.c
  *		VOID	lstsym()	aslist.c
  *		VOID	minit()		___mch.c
@@ -311,7 +311,7 @@ main(int argc, char **argv)
 		dot.s_area = &dca;
 		symp = &dot;
 		minit();
-		while (getline()) {
+		while (as_getline()) {
 			cp = cb;
 			cpt = cbt;
 			ep = eb;

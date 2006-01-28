@@ -116,7 +116,7 @@ void Areas51 (void)
  *
  *	The function main() evaluates the command line arguments to
  *	determine if the linker parameters are to input through 'stdin'
- *	or read from a command file.  The functiond getline() and parse()
+ *	or read from a command file.  The functiond as_getline() and parse()
  *	are to input and evaluate the linker parameters.  The linking process
  *	proceeds by making the first pass through each .rel file in the order
  *	presented to the linker.  At the end of the first pass the setbase(),
@@ -170,7 +170,7 @@ void Areas51 (void)
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		int	getline()	lklex.c
+ *		int	as_getline()	lklex.c
  *		VOID	library()	lklibr.c
  *		VOID	link_main()	lkmain.c
  *		VOID	lkexit()	lkmain.c
@@ -252,7 +252,7 @@ char *argv[];
 	filep = startp;
 	while (1) {
 		ip = ib;
-		if (getline() == 0)
+		if (as_getline() == 0)
 			break;
 		if (pflag && sfp != stdin)
 			fprintf(stdout, "%s\n", ip);
@@ -287,7 +287,7 @@ char *argv[];
 		
 		Areas51(); /*JCF: Create the default 8051 areas in the right order*/
 
-		while (getline()) {
+		while (as_getline()) {
 			ip = ib;
 
                         /* pass any "magic comments" to NoICE output */

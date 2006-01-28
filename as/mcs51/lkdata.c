@@ -122,7 +122,7 @@ long    code_size=-1;   /*      code size
 struct  lfile   *filep; /*      The pointers (lfile *) filep,
                          *      (lfile *) cfp, and (FILE *) sfp
                          *      are used in conjunction with
-                         *      the routine getline() to read
+                         *      the routine as_getline() to read
                          *      asmlnk commands from
                          *      (1) the standard input or
                          *      (2) or a command file

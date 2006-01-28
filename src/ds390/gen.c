@@ -2190,7 +2190,8 @@ unsaveRegisters (iCode * ic)
 {
   bitVect *rsave;
 
-  if (IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type)) {
+  if (IS_SYMOP(IC_LEFT (ic)) &&
+      IFFUNC_CALLEESAVES(OP_SYMBOL (IC_LEFT (ic))->type)) {
       int i;
       rsave = newBitVect(ic->rMask->size);
       for (i = DPL_IDX ; i <= B_IDX ; i++ ) {

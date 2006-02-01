@@ -1,3 +1,31 @@
+2006-02-01 Borut Razem <borut.razem AT siol.net>
+
+	* src/regression/add.c, src/regression/add2.c, src/regression/add3.c,
+	  src/regression/add4.c, src/regression/and1.c, src/regression/and2.c,
+	  src/regression/arrays.c, src/regression/b.c, src/regression/bank1.c,
+	  src/regression/bool1.c, src/regression/bool2.c,
+	  src/regression/bool3.c, src/regression/call1.c,
+	  src/regression/compare.c, src/regression/compare10.c,
+	  src/regression/compare2.c, src/regression/compare3.c,
+	  src/regression/compare4.c, src/regression/compare5.c,
+	  src/regression/compare6.c, src/regression/compare7.c,
+	  src/regression/compare8.c, src/regression/compare9.c,
+	  src/regression/configword.c, src/regression/for.c,
+	  src/regression/inline.c, src/regression/mult1.c,
+	  src/regression/nestfor.c, src/regression/or1.c,
+	  src/regression/pointer1.c, src/regression/ptrfunc.c,
+	  src/regression/rotate1.c, src/regression/rotate2.c,
+	  src/regression/rotate3.c, src/regression/rotate4.c,
+	  src/regression/rotate5.c, src/regression/rotate6.c,
+	  src/regression/rotate7.c, src/regression/string1.c,
+	  src/regression/struct1.c, src/regression/sub.c,
+	  src/regression/sub2.c, src/regression/switch1.c,
+	  src/regression/while.c, src/regression/xor.c,
+	  src/regression/create_stc, src/regression/simulate,
+	  src/regression/rt.sh, src/regression/Makefile: reenabled Scott's PIC14
+	  regression tests
+	* src/regression/gpsim_assert.h: added
+
 2006-01-28 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/ds390/gen.c (unsaveRegisters): fixed literal function pointer

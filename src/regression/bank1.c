@@ -1,5 +1,4 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 
 unsigned char success=0;
 unsigned char failures=0;
@@ -15,11 +14,12 @@ unsigned char uchar0 = 0xa5;
 data at 0xa0 unsigned char  uc_bank1_temp=0x42;
 data at 0xa2 unsigned int  ui_bank1_temp=0;
 
-void done()
+void
+done()
 {
-
   dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void main(void)

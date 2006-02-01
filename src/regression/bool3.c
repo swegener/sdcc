@@ -1,13 +1,10 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 
 
 /* Compound comparisons */
 
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 bit bit0 = 0;
 bit bit1 = 0;
@@ -18,14 +15,12 @@ unsigned char uc1 = 0;
 unsigned long uL0 = 0;
 unsigned long uL1 = 0;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
-
-
 
 void compound_compare_uc(void)
 {
@@ -68,6 +63,5 @@ void main(void)
   uc0 = 0xff;
   compound_compare_uc_lit();
 
-  success = failures;
   done();
 }

@@ -1,5 +1,4 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 // Compound comparisons
 
 unsigned char success = 0;
@@ -17,11 +16,11 @@ char long0 = 0;
 char long1 = 0;
 
 void
-done ()
+done()
 {
-  dummy++;
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
-
 
 void c_char(void)
 {

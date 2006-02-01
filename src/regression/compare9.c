@@ -1,5 +1,5 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
+#include "pic16f877.h"
 // Signed comparisons of the form:  (variable<=LIT)
 //
 // This regression test exercises all of the boundary
@@ -8,40 +8,13 @@
 // and each one has an astonishing capability of failing
 // a boundary condition.
 
-unsigned char success = 0;
 unsigned char failures = 0;
-unsigned char dummy = 0;
 unsigned char result = 0;
 
 int int0 = 0;
 int int1 = 0;
 signed char char0 = 0;
 signed char char1 = 0;
-
-/* copied from 16f877.inc file supplied with gpasm */
-
-#define _CP_ALL          0x0FCF
-#define _CP_HALF         0x1FDF
-#define _CP_UPPER_256    0x2FEF
-#define _CP_OFF          0x3FFF
-#define _DEBUG_ON        0x37FF
-#define _DEBUG_OFF       0x3FFF
-#define _WRT_ENABLE_ON   0x3FFF
-#define _WRT_ENABLE_OFF  0x3DFF
-#define _CPD_ON          0x3EFF
-#define _CPD_OFF         0x3FFF
-#define _LVP_ON          0x3FFF
-#define _LVP_OFF         0x3F7F
-#define _BODEN_ON        0x3FFF
-#define _BODEN_OFF       0x3FBF
-#define _PWRTE_OFF       0x3FFF
-#define _PWRTE_ON        0x3FF7
-#define _WDT_ON          0x3FFF
-#define _WDT_OFF         0x3FFB
-#define _LP_OSC          0x3FFC
-#define _XT_OSC          0x3FFD
-#define _HS_OSC          0x3FFE
-#define _RC_OSC          0x3FFF
 
 /* *** NOTE ***  This particular test takes quite a while to run 
  * ~ 10,000,000 instruction cycles. (2.5 seconds on a 20Mhz PIC).
@@ -50,14 +23,14 @@ signed char char1 = 0;
 
 typedef unsigned int word;
 
-word at 0x2007  CONFIG = _WDT_OFF & _PWRTE_ON;
+word at 0x2007  CONFIG = wdt_off & pwrte_on;
 
 void
-done ()
+done()
 {
-  dummy++;
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
-
 
 void c_char_lte_lit1(unsigned char expected_result)
 {
@@ -325,6 +298,5 @@ main (void)
   int_compare1();
   int_compare2();
 
-  success = failures;
   done ();
 }

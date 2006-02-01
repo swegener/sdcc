@@ -1,5 +1,4 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 
 // Addition tests - mostly int's
 
@@ -8,9 +7,7 @@
 #define SUPPORT_BIT_TYPES 1
 
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 
 char char0 = 0;
@@ -41,11 +38,11 @@ bit bit11 = 0;
 #endif
 
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void add_char2char(void)
@@ -217,6 +214,5 @@ void main(void)
   add_lit2long();
   add_lit2ulong();
 
-  success = failures;
   done();
 }

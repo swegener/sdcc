@@ -1,18 +1,15 @@
-#define __16F873
-#include "p16f873.h"
-unsigned char success=0;
+#include "gpsim_assert.h"
 unsigned char failures=0;
-unsigned char dummy=0;
 
 unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 unsigned char achar2 = 0;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void xor_chars_0_1(void)
@@ -55,6 +52,5 @@ void main(void)
   achar0 = achar1;
   xor_if();
 
-  success = failures;
   done();
 }

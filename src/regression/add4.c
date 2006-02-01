@@ -1,9 +1,6 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 
-unsigned char success = 0;
 unsigned char failures = 0;
-unsigned char dummy = 0;
 
 //bit bit0 = 0;
 int int0 = 0;
@@ -21,13 +18,11 @@ int *iP0=NULL;
 int *iP1=NULL;
 
 void
-done ()
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
-
 
 /* pointer to char arithmetic */
 
@@ -83,6 +78,5 @@ void main(void)
   iP0 = &int0;
   pi_add();
 
-  success = failures;
   done();
 }

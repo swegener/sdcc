@@ -1,11 +1,8 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 
 // Pointer tests
 
-unsigned char success = 0;
 unsigned char failures = 0;
-unsigned char dummy = 0;
 
 bit bit0 = 0;
 unsigned int aint0 = 0;
@@ -17,11 +14,10 @@ unsigned char *acharP = 0;
 char buff[10];
 
 void
-done ()
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void
@@ -136,6 +132,5 @@ main (void)
   achar0 = 5;
   f4(&achar0, achar0);
 
-  success = failures;
   done ();
 }

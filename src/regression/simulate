@@ -7,15 +7,20 @@ if [ $# -lt 2 ] ; then
   exit 1
 fi
 
+if [ "$GPSIM_PATH" != "" ] ; then
+  PATH=$GPSIM_PATH:$PATH
+fi
 
 GPSIM_SCRIPT=$1
 LOGFILE=$2
-touch $2
-echo "Test $GPSIM_SCRIPT" >> $LOGFILE
-gpsim --cli -c $GPSIM_SCRIPT $2> test
-grep "failures " test | grep "= 0x0"
-if [ $? -eq 0 ] ; then
-  echo "PASSED" >> $LOGFILE
-else
-  echo "FAILED" >> $LOGFILE
-fi
+echo "Test $GPSIM_SCRIPT" | tee -a $LOGFILE
+gpsim --cli -c $GPSIM_SCRIPT | tee -a $LOGFILE |\
+sed -n -e '/running\.\.\./,$ {
+/^ *Message:/ {
+s/^ *Message:\(.*\)$/\1/p
+q
+}
+}
+$ a\
+FAILED
+' | tee -a $LOGFILE

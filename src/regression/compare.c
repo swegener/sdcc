@@ -1,5 +1,4 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 /*
 
    PIC PORT Test code
@@ -14,9 +13,7 @@
 bit bit0 = 0;
 bit bit1 = 0;
 
-unsigned char success = 0;
 unsigned char failures = 0;
-unsigned char dummy = 0;
 
 unsigned char achar0 = 0;
 unsigned char achar1 = 0;
@@ -27,11 +24,10 @@ char schar0 = 0;
 char schar1 = 0;
 
 void
-done ()
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 /* achar0 should be zero */
@@ -189,6 +185,5 @@ main (void)
   aint0 = 0;
   compare_int_to_int1 ();
 
-  success = failures;
   done ();
 }

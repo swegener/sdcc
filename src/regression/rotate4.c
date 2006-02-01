@@ -1,10 +1,7 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 // rotate bytes left and right by a constant.
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 bit bit0 = 0;
 unsigned int uint0 = 0;
@@ -13,11 +10,11 @@ unsigned char uchar0 = 0;
 unsigned char uchar1 = 0;
 unsigned char uchar2 = 0;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void check(void)
@@ -223,6 +220,5 @@ void main(void)
   uchar0 = 0x80;
   rotate_right_7();
 
-  success=failures;
   done();
 }

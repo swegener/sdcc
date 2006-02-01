@@ -1,6 +1,5 @@
-#define __16F873
-#include "p16f873.h"
-//#include "p16c84.h"
+#include "gpsim_assert.h"
+
 // Addition tests
 
 /* bit types are not ANSI - so provide a way of disabling bit types
@@ -11,9 +10,7 @@
  * (like bitx = bity + bitz;) */
 #define SUPPORT_BIT_ARITHMETIC 1
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 #if SUPPORT_BIT_TYPES
 
@@ -40,11 +37,11 @@ unsigned char achar2 = 0;
 unsigned char achar3 = 0;
 unsigned char *acharP = 0;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void add_lit2uchar(void)
@@ -95,8 +92,6 @@ void add_uchar2uchar(void)
 
 void add_uchar2uchar2(void)
 {
-
-
   achar0++;
   achar0 = achar0 + 1;
   achar0 = achar0 + 2;
@@ -115,13 +110,11 @@ void add_uchar2uchar2(void)
   achar3 = achar2 + achar1 + achar0;
   if(achar3 != 92)
     failures++;
-
 }
 
 #if SUPPORT_BIT_TYPES
 void add_bits(void)
 {
-
   bit1 = bit0;
 
   bit0 = 1;
@@ -147,9 +140,9 @@ void add_bits(void)
 
 /* add_bit2uchar(void) - assumes bit0 = 1, achar0 = 7  */
 
+#if SUPPORT_BIT_TYPES
 void add_bit2uchar(void)
 {
-
   achar0 += bit0;
 
   if(achar0 != 8)
@@ -157,33 +150,34 @@ void add_bit2uchar(void)
 
   if(achar0 == bit0)
     failures++;
-
 }
 
 void add_bit2uint(void)
 {
-
   if(aint0 != bit11)
     failures++;
 
   aint0 += bit0;
   if(aint0!=1)
     failures++;
-
 }
+#endif
+
 void main(void)
 {
-
   add_lit2uchar();
+  ASSERT(_failures == 0);
 
   achar0=16;
   achar1=0;
   add_uchar2uchar();
+  ASSERT(_failures == 0);
 
 
   achar0 = 0;
   achar1 = 32;
   add_uchar2uchar2();
+  ASSERT(_failures == 0);
 
 #if SUPPORT_BIT_TYPES
   add_bits();
@@ -191,8 +185,7 @@ void main(void)
   add_bit2uchar();
   add_bit2uint();
 #endif
+  ASSERT(_failures == 0);
 
-
-  success = failures;
   done();
 }

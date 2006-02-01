@@ -1,8 +1,5 @@
-#define __16F873
-#include "p16f873.h"
-//#include "p16c84.h"
+#include "gpsim_assert.h"
 
-unsigned char success = 0;
 unsigned char failures = 0;
 unsigned char dummy = 0;
 
@@ -13,14 +10,11 @@ unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 
 void
-done ()
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
-
-
 
 void
 char_lt_char (void)
@@ -365,6 +359,5 @@ main (void)
   int_lte_lit_else ();
   int_gte_lit_else ();
 
-  success = failures;
   done ();
 }

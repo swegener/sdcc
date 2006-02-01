@@ -1,10 +1,6 @@
-#define __16F873
-#include "p16f873.h"
-//#include "p16c84.h"
+#include "gpsim_assert.h"
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 bit bit0 = 0;
 unsigned int aint0 = 0;
@@ -12,11 +8,11 @@ unsigned int aint1 = 0;
 unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void bool_or1(void)
@@ -134,6 +130,5 @@ void main(void)
   bool_or_lit1();
   bool_and_lit1();
 
-  success = failures;
   done();
 }

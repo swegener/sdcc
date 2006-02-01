@@ -1,11 +1,8 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 /* configword.c - illustrates how the configuration word can
  * be assigned */
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 /* copied from 16f877.inc file supplied with gpasm */
 
@@ -40,16 +37,16 @@ word at 0x2007  CONFIG = _WDT_OFF & _PWRTE_ON;
 /* to do -- write a test that puts the PIC to sleep,
  * and verify that the WDT wakes it up */
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
+
 void main(void)
 {
   dummy = 0;
 
-  success = failures;
   done();
 }

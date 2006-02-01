@@ -1,8 +1,5 @@
-#define __16F873
-#include "p16f873.h"
-unsigned char success=0;
+#include "gpsim_assert.h"
 unsigned char failures=0;
-unsigned char dummy=0;
 //unsigned bit bit1;
 
 typedef unsigned char byte;
@@ -13,11 +10,11 @@ const byte arr[] = { 1,2,8,9,0 };
 
 bit at 0x30 B1;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void  isr(void) interrupt 1 using 1
@@ -56,6 +53,5 @@ void main(void)
 
   lcd1("str");
   B1=0;
-  success = failures;
   done();
 }

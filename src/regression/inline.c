@@ -1,23 +1,17 @@
-#define __16F873
-#include "p16f873.h"
-unsigned char success=0;
+#include "gpsim_assert.h"
+#include "pic16f877.h"
+
+#pragma preproc_asm -
+
 unsigned char failures=0;
-unsigned char dummy=0;
 
 unsigned char test_tris=0;
 
-#define PORTA_ADR  5
-#define PORTB_ADR  6
-#define TRISA_ADR  0x85
-#define TRISB_ADR  0x86
-
-data at TRISA_ADR unsigned char  TRISA;
-
-void done(void)
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void
@@ -39,8 +33,6 @@ delay_1ms(void)
 
 void main(void)
 {
-  dummy = 0;
-
   TRISA = 0x0f;
 
   _asm
@@ -53,6 +45,5 @@ void main(void)
   if(test_tris != 0x0f)
     failures++;
 
-  success = failures;
   done();
 }

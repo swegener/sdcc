@@ -1,6 +1,4 @@
-#define __16F873
-#include "p16f873.h"
-//#include "p16c84.h"
+#include "gpsim_assert.h"
 // Addition tests
 
 /* bit types are not ANSI - so provide a way of disabling bit types
@@ -11,9 +9,7 @@
  * (like bitx = bity + bitz;) */
 #define SUPPORT_BIT_ARITHMETIC 1
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 #if SUPPORT_BIT_TYPES
 
@@ -39,11 +35,11 @@ char char1 = 0;
 char char2 = 0;
 
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void sub_int1(void)
@@ -172,6 +168,5 @@ void main(void)
   int1 = 9;
   sub_compound_int();
 
-  success = failures;
   done();
 }

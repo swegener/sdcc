@@ -1,5 +1,4 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 //
 // compare4.c
 // regression testing program for comparing signed chars and ints
@@ -7,9 +6,7 @@
 
 //#define  COMPARE_OUT_OF_RANGE 1
 
-unsigned char success = 0;
 unsigned char failures = 0;
-unsigned char dummy = 0;
 
 bit bit0 = 0;
 int int0 = 0;
@@ -18,11 +15,10 @@ char char0 = 0;
 char char1 = 0;
 
 void
-done ()
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 // compare to 0
@@ -318,6 +314,5 @@ main (void)
   char1 = -3;
   c_c0gtc1();
 
-  success = failures;
   done ();
 }

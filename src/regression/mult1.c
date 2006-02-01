@@ -1,11 +1,8 @@
-#define __16F873
-#include "p16f873.h"
+#include "gpsim_assert.h"
 
 #define TESTLIT 0x05
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 
 signed char c1,c2,c3;
@@ -14,11 +11,11 @@ unsigned char uc1,uc2,uc3;
 unsigned int ui1,ui2,ui3;
 signed int i1,i2;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void m1(void)
@@ -109,6 +106,5 @@ void main(void)
 
   //m3(TESTLIT);
 
-  success = failures;
   done();
 }

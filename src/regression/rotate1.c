@@ -1,10 +1,6 @@
-#define __16F873
-#include "p16f873.h"
-// Shift bytes left and right by a constant.
+#include "gpsim_assert.h"
 
-unsigned char success=0;
 unsigned char failures=0;
-unsigned char dummy=0;
 
 bit bit0 = 0;
 unsigned int aint0 = 0;
@@ -13,11 +9,11 @@ unsigned char achar0 = 0;
 unsigned char achar1 = 0;
 unsigned char achar2 = 0;
 
-void done()
+void
+done()
 {
-
-  dummy++;
-
+  ASSERT(MANGLE(failures) == 0);
+  PASSED();
 }
 
 void check(void)
@@ -208,6 +204,5 @@ void main(void)
   achar0 = 0x80;
   shift_right_7();
 
-  success=failures;
   done();
 }

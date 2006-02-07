@@ -485,7 +485,7 @@ extern	char	ccase[];	/*	an array of characters which
 extern	struct	lfile	*filep;	/*	The pointers (lfile *) filep,
 				 *	(lfile *) cfp, and (FILE *) sfp
 				 *	are used in conjunction with
-				 *	the routine getline() to read
+				 *	the routine lk_getline() to read
 				 *	asmlnk commands from
 				 *	(1) the standard input or
 				 *	(2) or a command file
@@ -649,7 +649,7 @@ extern	char		endline();
 extern	char		get();
 extern	VOID		getfid();
 extern	VOID		getid();
-extern	int		getline();
+extern	int		lk_getline();
 extern	int		getmap();
 extern	char		getnb();
 extern	int		more();

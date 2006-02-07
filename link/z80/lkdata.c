@@ -102,7 +102,7 @@ int	gcntr;		/*	LST file relocation active
 struct	lfile	*filep;	/*	The pointers (lfile *) filep,
 			 *	(lfile *) cfp, and (FILE *) sfp
 			 *	are used in conjunction with
-			 *	the routine getline() to read
+			 *	the routine lk_getline() to read
 			 *	asmlnk commands from
 			 *	(1) the standard input or
 			 *	(2) or a command file

@@ -83,7 +83,7 @@ void Timer(int action, char * message)
  *
  *	The function main() evaluates the command line arguments to
  *	determine if the linker parameters are to input through 'stdin'
- *	or read from a command file.  The functiond getline() and parse()
+ *	or read from a command file.  The functiond lk_getline() and parse()
  *	are to input and evaluate the linker parameters.  The linking process
  *	proceeds by making the first pass through each .rel file in the order
  *	presented to the linker.  At the end of the first pass the setbase(),
@@ -137,7 +137,7 @@ void Timer(int action, char * message)
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		int	getline()	lklex.c
+ *		int	lk_getline()	lklex.c
  *		VOID	library()	lklibr.c
  *		VOID	link()		lkmain.c
  *		VOID	lkexit()	lkmain.c
@@ -285,7 +285,7 @@ char *argv[];
 	filep = startp;
 	while (1) {
 		ip = ib;					
-		if (getline() == 0)
+		if (lk_getline() == 0)
 			break;
 		if (pflag && sfp != stdin)
 			fprintf(stdout, "%s\n", ip);
@@ -328,7 +328,7 @@ char *argv[];
 		hp = NULL;
 		radix = 10;
 
-		while (getline()) {
+		while (lk_getline()) {
 			ip = ib;
 			link();
 		}

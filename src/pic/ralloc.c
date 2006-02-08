@@ -335,6 +335,7 @@ static int regname2key(char const *name)
 	
 }
 
+static regs *regWithIdx (set *dRegs, int idx, int fixed);
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
@@ -342,6 +343,20 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 {
 	
 	regs *dReg;
+
+	/* check whether a matching register already exists */
+	dReg = dirregWithName( name );
+	if (dReg) {
+	  //printf( "%s: already present: %s\n", __FUNCTION__, name );
+	  return (dReg);
+	}
+	dReg = regWithIdx( dynDirectRegs, rIdx, 0 );
+	if (!dReg) dReg = regWithIdx( dynDirectRegs, rIdx, 1 );
+	if (dReg)
+	{
+	  //printf(  "%s: already present %s (idx:%d/%x)", __FUNCTION__, name, rIdx, rIdx );
+	  return (dReg);
+	}
 	
 	dReg = Safe_calloc(1,sizeof(regs));
 	dReg->type = type;

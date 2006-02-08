@@ -161,11 +161,21 @@ void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 	
 	pc = findNextInstruction(pcfl->pc.next);
 	
-	while(isPCinFlow(pc,PCODE(pcfl))) {
-		
-		
+	while(pc && !isPCFL(pc)) {
+		while (pc && !isPCI(pc) && !isPCFL(pc))
+		{
+			pc = pc->next;
+		} // while
+		if (!pc || isPCFL(pc)) continue;
+		assert( isPCI(pc) );
+
 		reg = getRegFromInstruction(pc);
-		
+		#if 0
+		pc->print(stderr, pc);
+		fprintf( stderr, "--> reg %p (%s,%u), inCond/outCond: %x/%x\n",
+			reg, reg ? reg->name : "(null)", reg ? reg->rIdx : -1,
+			PCI(pc)->inCond, PCI(pc)->outCond );
+		#endif
 		if(reg) {
 		/*
 		fprintf(stderr, "flow seq %d, inst seq %d  %s  ",PCODE(pcfl)->seq,pc->seq,reg->name);
@@ -185,10 +195,11 @@ void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 		}
 		
 		
-		pc = findNextInstruction(pc->next);
+		//pc = findNextInstruction(pc->next);
+		pc = pc->next;
 		
 	}
-	
+
 }
 
 /*-----------------------------------------------------------------*
@@ -358,6 +369,33 @@ void  RemoveRegsFromSet(set *regset)
 		
 	}
 }
+
+void RegsUnMapLiveRanges(void);
+extern pFile *the_pFile;
+void pic14_ReMapLiveRanges(void)
+{
+	pBlock *pb;
+	if (!the_pFile) return;
+	RegsUnMapLiveRanges();
+	for (pb = the_pFile->pbHead; pb; pb = pb->next)
+	{
+	#if 0
+		pCode *pc = findNextpCode(pb->pcHead, PC_FLOW);
+		if (pc) {
+			pc->print( stderr, pc );
+		} else {
+			fprintf( stderr, "unnamed pBlock\n");
+		}
+		pc = findNextInstruction(pb->pcHead);
+		while (pc) {
+		  pc->print( stderr, pc );
+		  pc = findNextInstruction(pc->next);;
+		}
+	#endif	
+		pCodeRegMapLiveRanges(pb);
+	} // for
+}
+
 /*-----------------------------------------------------------------*
 * void RemoveUnusedRegisters(void)
 *
@@ -365,6 +403,7 @@ void  RemoveRegsFromSet(set *regset)
 void RemoveUnusedRegisters(void)
 {
 	/* First, get rid of registers that are used only one time */
+	pic14_ReMapLiveRanges();
 	
 	//RemoveRegsFromSet(dynInternalRegs);
 	RemoveRegsFromSet(dynAllocRegs);
@@ -1202,7 +1241,7 @@ static int pCodeRemove (pCode *pc, const char *comment)
 		if (reg && reg->type == REG_SFR && reg->pc_type != PO_STATUS) return result;
 	}
 
-	/* MUST SUCEED FROM NOW ON (or ervert the changes done since NOW ;-)) */
+	/* MUST SUCEED FROM NOW ON (or revert the changes done since NOW ;-)) */
 	
 	/* fix flow */
 	if (PCI(pc)->pcflow && PCI(pc)->pcflow->end == pc)
@@ -1399,6 +1438,7 @@ static void replace_PCI (pCodeInstruction *pc, pCodeInstruction *newpc, char *co
   pCodeInsertAfter (&pc->pc, &newpc->pc);
 
   /* FIXME: replacing pc will break the liverange maps (usedpCodes, ...) */
+  pCodeRegMapLiveRanges( pc->pBlock ); /*FIXME:UNTESTED*/
   
   if (comment)
   {

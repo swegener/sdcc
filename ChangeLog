@@ -1,3 +1,19 @@
+2006-02-08 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (pciTRIS): fixed typo,
+	  (BuildFlow,LinkFlow_pCode): added (disabled) debug output,
+	  (LinkFlow): fixed handling of flows that end in a call,
+	  (ReuseReg): perform safety check earlier
+	* src/pic/pcoderegs.c (pCodeRegMapLiveRangesInFlow): fixed
+	    to work with flows at the beginning of a pBlock,
+	    fixes #1426557 (Symbol not previously defined),
+	  (pic14_ReMapLiveRanges): NEW, destroy and rebuild register
+	    usage information
+	  (RemoveUnusedRegisters): update register usage info
+	* src/pic/ralloc.c (newReg): prevent duplicate registers from being
+	    created, reuse existing ones instead
+	* src/pic/gen.c (genPcall): fixed #1424719
+
 2006-02-01 Borut Razem <borut.razem AT siol.net>
 
 	* src/regression/add.c, src/regression/add2.c, src/regression/add3.c,

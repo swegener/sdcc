@@ -2766,7 +2766,7 @@ static void genPcall (iCode *ic)
 	*/
 	emitpcode(POC_CALL,popGetLabel(albl->key));
 	pcop = popGetLabel(blbl->key);
-	emitpcode(POC_PAGESEL,popGetWithString(pcop->name,0)); /* Must restore PCLATH before goto, without destroying W */
+	emitpcode(POC_PAGESEL,pcop); /* Must restore PCLATH before goto, without destroying W */
 	emitpcode(POC_GOTO,pcop);
 	emitpLabel(albl->key);
 	

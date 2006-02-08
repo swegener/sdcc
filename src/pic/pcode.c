@@ -1137,7 +1137,7 @@ pCodeInstruction pciTRIS = {
 		0,    // literal operand
 		POC_NOP,
 		PCC_NONE,   // inCond /* FIXME: what's TRIS doing? */
-		PCC_REGISTER // outCond	/* FIXME: what's TIS doing */
+		PCC_REGISTER // outCond	/* FIXME: what's TRIS doing */
 };
 
 pCodeInstruction pciXORWF = {
@@ -3969,6 +3969,7 @@ void BuildFlow(pBlock *pb)
 		PCI(pc)->pcflow = PCFL(pflow);
 		
 		//fprintf(stderr," build: ");
+		//pc->print(stderr, pc);
 		//pflow->print(stderr,pflow);
 		
 		if (checkLabel(pc)) { 
@@ -4243,7 +4244,17 @@ static void FillFlow(pCodeFlow *pcflow)
 void LinkFlow_pCode(pCodeInstruction *from, pCodeInstruction *to)
 {
 	pCodeFlowLink *fromLink, *toLink;
-	
+#if 0
+	fprintf(stderr, "%s: linking ", __FUNCTION__ );
+	if (from) from->pc.print(stderr, &from->pc);
+	else fprintf(stderr, "(null)");
+	fprintf(stderr, " -(%u)-> with -(%u)-> ",
+		from && from->pcflow ? from->pcflow->pc.seq : 0,
+		to && to->pcflow ? to->pcflow->pc.seq : 0);
+	if (to) to->pc.print(stderr, &to->pc);
+	else fprintf(stderr, "(null)");
+#endif
+
 	if(!from || !to || !to->pcflow || !from->pcflow)
 		return;
 	
@@ -4286,9 +4297,14 @@ void LinkFlow(pBlock *pb)
 		
 		/* find last instruction in flow */
 		pc = findPrevInstruction (PCFL(pcflow)->end);
-		if (!pc) continue;
+		if (!pc) {
+			fprintf(stderr, "%s: flow without end (%u)?\n",
+			__FUNCTION__, pcflow->seq );
+			continue;
+		}
 		
 		//fprintf(stderr, "LinkFlow - flow block (seq=%d) ", pcflow->seq);
+		//pc->print(stderr, pc);
 		if(isPCI_SKIP(pc)) {
 			//fprintf(stderr, "ends with skip\n");
 			//pc->print(stderr,pc);
@@ -4306,20 +4322,23 @@ void LinkFlow(pBlock *pb)
 			//pc->print(stderr,pc);
 
 			if(!(pcol && isPCOLAB(pcol))) {
-				if((PCI(pc)->op != POC_RETLW) && (PCI(pc)->op != POC_RETURN) && (PCI(pc)->op != POC_CALL) && (PCI(pc)->op != POC_RETFIE) ) {
+				if((PCI(pc)->op != POC_RETLW)
+					&& (PCI(pc)->op != POC_RETURN)
+					&& (PCI(pc)->op != POC_CALL)
+					&& (PCI(pc)->op != POC_RETFIE) )
+				{
 					pc->print(stderr,pc);
 					fprintf(stderr, "ERROR: %s, branch instruction doesn't have label\n",__FUNCTION__);
 				}
-				continue;
+			} else {
+			
+				if( (pct = findLabelinpBlock(pb,pcol)) != NULL)
+					LinkFlow_pCode(PCI(pc),PCI(pct));
+				else
+					fprintf(stderr, "ERROR: %s, couldn't find label. key=%d,lab=%s\n",
+					__FUNCTION__,pcol->key,((PCOP(pcol)->name)?PCOP(pcol)->name:"-"));
+				//fprintf(stderr,"newpCodeOpLabel: key=%d, name=%s\n",key,((s)?s:""));
 			}
-			
-			if( (pct = findLabelinpBlock(pb,pcol)) != NULL)
-				LinkFlow_pCode(PCI(pc),PCI(pct));
-			else
-				fprintf(stderr, "ERROR: %s, couldn't find label. key=%d,lab=%s\n",
-				__FUNCTION__,pcol->key,((PCOP(pcol)->name)?PCOP(pcol)->name:"-"));
-			//fprintf(stderr,"newpCodeOpLabel: key=%d, name=%s\n",key,((s)?s:""));
-			
 			/* link CALLs to next instruction */
 			if (PCI(pc)->op != POC_CALL) continue;
 		}
@@ -4334,8 +4353,8 @@ void LinkFlow(pBlock *pb)
 		}
 		
 		if(pc) {
-			fprintf(stderr, "ends with unknown\n");
-			pc->print(stderr,pc);
+			//fprintf(stderr, "ends with unknown\n");
+			//pc->print(stderr,pc);
 			continue;
 		}
 		
@@ -5711,8 +5730,8 @@ static unsigned register_reassign(pBlock *pb, unsigned idx)
 void ReuseReg(void)
 {
 	pBlock  *pb;
-	InitReuseReg();
 	if (!the_pFile) return;
+	InitReuseReg();
 	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 		/* Non static functions can be called from other modules so their registers must reassign */
 		if (pb->function_entries&&(PCF(setFirstItem(pb->function_entries))->isPublic||!pb->visited))

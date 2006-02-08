@@ -221,7 +221,7 @@ SOURCE=".\bin_vc\link-gbz80.exe"
 # Begin Custom Build
 InputPath=".\bin_vc\link-gbz80.exe"
 
-".\bin\link-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"bin\link-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-gbz80.exe  bin /y > nul
 
 # End Custom Build
@@ -232,7 +232,7 @@ InputPath=".\bin_vc\link-gbz80.exe"
 # Begin Custom Build
 InputPath=".\bin_vc\link-gbz80.exe"
 
-".\bin\link-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"bin\link-gbz80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-gbz80.exe  bin /y > nul
 
 # End Custom Build
@@ -249,7 +249,7 @@ SOURCE=".\bin_vc\link-hc08.exe"
 # Begin Custom Build
 InputPath=".\bin_vc\link-hc08.exe"
 
-".\bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-hc08.exe  bin /y > nul
 
 # End Custom Build
@@ -260,7 +260,7 @@ InputPath=".\bin_vc\link-hc08.exe"
 # Begin Custom Build
 InputPath=".\bin_vc\link-hc08.exe"
 
-".\bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"bin\link-hc08.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-hc08.exe  bin /y > nul
 
 # End Custom Build
@@ -278,7 +278,7 @@ SOURCE=".\bin_vc\link-z80.exe"
 # Begin Custom Build
 InputPath=".\bin_vc\link-z80.exe"
 
-".\bin\link-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"bin\link-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-z80.exe  bin /y > nul
 
 # End Custom Build
@@ -289,7 +289,7 @@ InputPath=".\bin_vc\link-z80.exe"
 # Begin Custom Build
 InputPath=".\bin_vc\link-z80.exe"
 
-".\bin\link-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"bin\link-z80.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\link-z80.exe  bin /y > nul
 
 # End Custom Build
@@ -405,7 +405,7 @@ InputPath=.\bin_vc\sdcpp.exe
 # Begin Custom Build
 InputPath=.\bin_vc\sdcpp.exe
 
-".bin\sdcpp.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+"bin\sdcpp.exe" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy bin_vc\sdcpp.exe  bin /y > nul
 
 # End Custom Build

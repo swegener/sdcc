@@ -38,11 +38,19 @@ test_sprintf(void)
   sprintf( s, "%-3.3s", "ab" );
   ASSERT( 0 == strcmp( s, "ab " ) );
 
+#if defined(SDCC__ds390) || defined(PORT_HOST)
   //and from bug 1358192
-#if defined(SDCC__ds390)
   sprintf( s, "%f", 10.1 );
   LOG((s));
   ASSERT( 0 == strcmp( s, "10.100000" ) );
+
+  //and from bug 1388703
+  sprintf( s, "%4.1f", 1.36 );
+  LOG((s));
+  ASSERT( 0 == strcmp( s, " 1.4" ) );
+  sprintf( s, "%4.1f", -1.37 );
+  LOG((s));
+  ASSERT( 0 == strcmp( s, "-1.4" ) );
 #endif
 
   ASSERT( s[12]==0x12 );

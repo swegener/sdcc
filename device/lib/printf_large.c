@@ -165,7 +165,7 @@ static int output_float (float f, unsigned char reqWidth,
                          BOOL left, BOOL zero, BOOL sign, BOOL space)
 #endif
 {
-  char negative=0;
+  BOOL negative=0;
   unsigned long integerPart;
   float decimalPart;
   char fpBuffer[128];
@@ -229,14 +229,19 @@ static int output_float (float f, unsigned char reqWidth,
 
   // fill buffer with the decimalPart (in normal order)
   fpBD=fpBI;
-  if (i=reqDecimals /* that's an assignment */) {
-    do {
+
+  for (i=reqDecimals; i>1; i--) {
       decimalPart *= 10.0;
       // truncate the float
       integerPart=decimalPart;
       fpBuffer[fpBD++]='0' + integerPart;
       decimalPart-=integerPart;
-    } while (--i);
+  }
+  if (i) {
+    decimalPart *= 10.0;
+    // truncate the float
+    integerPart = decimalPart + 0.5;
+    fpBuffer[fpBD++] = '0' + integerPart;
   }
 
   minWidth=fpBI; // we need at least these

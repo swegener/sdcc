@@ -1,3 +1,16 @@
+2006-02-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: forgot -I(...)/mcs51
+	* all.dsp: corrected several bin paths
+	* device/include/mcs51/c8051f120.h,
+	* device/include/mcs51/c8051f300.h,
+	* device/include/mcs51/c8051f310.h: used () with __at and renamed IDLE,STOP
+	  to PCON_IDLE,PCON_STOP
+	* device/include/mcs51/c8051f320.h: see above, also added sfr16 definitions
+	* device/lib/printf_large.c (output_float): fixed bug 1388703
+	* support/regression/tests/bug1057979.c: added test for bug 1388703
+
+
 2006-02-08 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (pciTRIS): fixed typo,
@@ -84,7 +97,7 @@
 2006-01-18 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (backPatchLabels): fixed bug #1408066: made it
-	inifinitely recurseable, added static	
+	inifinitely recurseable, added static
 	* support/regression/tests/bug-1408066.c: added
 
 2006-01-17 Bernhard Held <bernhard AT bernhardheld.de>

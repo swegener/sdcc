@@ -52,7 +52,7 @@ $(LIBDIR):
 	mkdir -p $(LIBDIR)
 
 $(LIBDIR)/%.rel: $(LIBSRCDIR)/%.c
-	-$(SDCC) -I../../device/include $(LIBSDCCFLAGS) -c $< -o $@
+	-$(SDCC) -I../../device/include -I../../device/include/mcs51 $(LIBSDCCFLAGS) -c $< -o $@
 
 .PHONY: lib-files
 lib-files:

@@ -1,3 +1,7 @@
+2006-02-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/fwk/lib/timeout.c: include <stdlib.h> for exit()
+
 2006-02-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/mcs51-xstack-auto/spec.mk: forgot -I(...)/mcs51

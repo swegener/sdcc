@@ -27,7 +27,7 @@
 #include <sdcc-lib.h>
 
 #if _SDCC_MANGLES_SUPPORT_FUNS
-unsigned unsigned _divuint (unsigned a, unsigned b);
+unsigned unsigned _divuint (unsigned x, unsigned y);
 #endif
 
 /*   Assembler-functions are provided for:
@@ -54,53 +54,53 @@ _divsint_dummy (void) _naked
 {
 	_asm
 
-		#define a0	dpl
-		#define a1	dph
+		#define xl	dpl
+		#define xh	dph
 
 		.globl __divsint
 
 		// _divsint_PARM_2 shares the same memory with _divuint_PARM_2
 		// and is defined in _divuint.c
 #if defined(SDCC_PARMS_IN_BANK1)
-		#define b0      (b1_0)
-		#define b1      (b1_1)
+		#define yl      (b1_0)
+		#define yh      (b1_1)
 #else
-		#define b0      (__divsint_PARM_2)
-		#define b1      (__divsint_PARM_2 + 1)
+		#define yl      (__divsint_PARM_2)
+		#define yh      (__divsint_PARM_2 + 1)
 #endif
 	__divsint:
-					; a1 in dph
-					; b1 in (__divsint_PARM_2 + 1)
+					; xh in dph
+					; yh in (__divsint_PARM_2 + 1)
 
 		clr	F0 		; Flag 0 in PSW
 					; available to user for general purpose
-		mov	a,a1
+		mov	a,xh
 		jnb	acc.7,a_not_negative
 
 		setb	F0
 
 		clr	a
 		clr	c
-		subb	a,a0
-		mov	a0,a
+		subb	a,xl
+		mov	xl,a
 		clr	a
-		subb	a,a1
-		mov	a1,a
+		subb	a,xh
+		mov	xh,a
 
 	a_not_negative:
 
-		mov	a,b1
+		mov	a,yh
 		jnb	acc.7,b_not_negative
 
 		cpl	F0
 
 		clr	a
 		clr	c
-		subb	a,b0
-		mov	b0,a
+		subb	a,yl
+		mov	yl,a
 		clr	a
-		subb	a,b1
-		mov	b1,a
+		subb	a,yh
+		mov	yh,a
 
 	b_not_negative:
 
@@ -110,11 +110,11 @@ _divsint_dummy (void) _naked
 
 		clr	a
 		clr	c
-		subb	a,a0
-		mov	a0,a
+		subb	a,xl
+		mov	xl,a
 		clr	a
-		subb	a,a1
-		mov	a1,a
+		subb	a,xh
+		mov	xh,a
 
 	not_negative:
 		ret
@@ -129,11 +129,8 @@ _divsint_dummy (void) _naked
 {
 	_asm
 
-		#define a0	dpl
-		#define a1	dph
-
-		ar0 = 0			; BUG register set is not considered
-		ar1 = 1
+		#define xl	dpl
+		#define xh	dph
 
 		.globl __divsint
 
@@ -141,25 +138,25 @@ _divsint_dummy (void) _naked
 
 		clr	F0 		; Flag 0 in PSW
 					; available to user for general purpose
-		mov	a,a1
+		mov	a,xh
 		jnb	acc.7,a_not_negative
 
 		setb	F0
 
 		clr	a
 		clr	c
-		subb	a,a0
-		mov	a0,a
+		subb	a,xl
+		mov	xl,a
 		clr	a
-		subb	a,a1
-		mov	a1,a
+		subb	a,xh
+		mov	xh,a
 
 	a_not_negative:
 
 		mov	a,sp
 		add	a,#-2		; 2 bytes return address
-		mov	r0,a		; r0 points to b1
-		mov	a,@r0		; b1
+		mov	r0,a		; r0 points to yh
+		mov	a,@r0		; a = yh
 
 		jnb	acc.7,b_not_negative
 
@@ -169,18 +166,18 @@ _divsint_dummy (void) _naked
 
 		clr	a
 		clr	c
-		subb	a,@r0		; b0
+		subb	a,@r0		; yl
 		mov	@r0,a
 		clr	a
 		inc	r0
-		subb	a,@r0		; b1
-		mov	@r0,a
+		subb	a,@r0		; a = yh
 
 	b_not_negative:
 
-		mov	ar1,@r0		; b1
+		mov	r1,a		; yh
 		dec	r0
-		mov	ar0,@r0		; b0
+		mov	a,@r0		; yl
+		mov	r0,a
 
 		lcall	__divint
 
@@ -188,11 +185,11 @@ _divsint_dummy (void) _naked
 
 		clr	a
 		clr	c
-		subb	a,a0
-		mov	a0,a
+		subb	a,xl
+		mov	xl,a
 		clr	a
-		subb	a,a1
-		mov	a1,a
+		subb	a,xh
+		mov	xh,a
 
 	not_negative:
 		ret
@@ -203,13 +200,13 @@ _divsint_dummy (void) _naked
 #else  // _DIVSINT_ASM_
 
 int
-_divsint (int a, int b)
+_divsint (int x, int y)
 {
   register int r;
 
-  r = _divuint((a < 0 ? -a : a),
-               (b < 0 ? -b : b));
-  if ( (a < 0) ^ (b < 0))
+  r = _divuint((x < 0 ? -x : x),
+               (y < 0 ? -y : y));
+  if ( (x < 0) ^ (y < 0))
     return -r;
   else
     return r;

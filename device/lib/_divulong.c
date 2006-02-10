@@ -54,10 +54,10 @@ _divlong_dummy (void) _naked
 
 		#define count   r2
 
-		#define a0	dpl
-		#define a1	dph
-		#define a2	b
-		#define a3	r3
+		#define x0	dpl
+		#define x1	dph
+		#define x2	b
+		#define x3	r3
 
 		#define reste0	r4
 		#define reste1	r5
@@ -80,18 +80,18 @@ _divlong_dummy (void) _naked
 
 		.area CSEG    (CODE)
 
-		#define b0      (__divulong_PARM_2)
-		#define b1      (__divulong_PARM_2 + 1)
-		#define b2      (__divulong_PARM_2 + 2)
-		#define b3      (__divulong_PARM_2 + 3)
+		#define y0      (__divulong_PARM_2)
+		#define y1      (__divulong_PARM_2 + 1)
+		#define y2      (__divulong_PARM_2 + 2)
+		#define y3      (__divulong_PARM_2 + 3)
 #else
-		#define b0      (b1_0)
-		#define b1      (b1_1)
-		#define b2      (b1_2)
-		#define b3      (b1_3)
+		#define y0      (b1_0)
+		#define y1      (b1_1)
+		#define y2      (b1_2)
+		#define y3      (b1_3)
 #endif // !SDCC_PARMS_IN_BANK1
-					; parameter a comes in a, b, dph, dpl
-		mov	a3,a		; save parameter a3
+					; parameter x comes in a, b, dph, dpl
+		mov	x3,a		; save parameter x3
 
 		mov	count,#32
 		clr	a
@@ -102,36 +102,36 @@ _divlong_dummy (void) _naked
 
 	; optimization  loop in lp0 until the first bit is shifted into rest
 
-	lp0:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
+	lp0:	mov	a,x0		; x <<= 1
+		add	a,x0
+		mov	x0,a
+		mov	a,x1
 		rlc	a
-		mov	a1,a
-		mov	a,a2
+		mov	x1,a
+		mov	a,x2
 		rlc	a
-		mov	a2,a
-		mov	a,a3
+		mov	x2,a
+		mov	a,x3
 		rlc	a
-		mov	a3,a
+		mov	x3,a
 
 		jc	in_lp
 		djnz	count,lp0
 
 		sjmp	exit
 
-	loop:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
+	loop:	mov	a,x0		; x <<= 1
+		add	a,x0
+		mov	x0,a
+		mov	a,x1
 		rlc	a
-		mov	a1,a
-		mov	a,a2
+		mov	x1,a
+		mov	a,x2
 		rlc	a
-		mov	a2,a
-		mov	a,a3
+		mov	x2,a
+		mov	a,x3
 		rlc	a
-		mov	a3,a
+		mov	x3,a
 
 	in_lp:	mov	a,reste0	; reste <<= 1
 		rlc	a		;   feed in carry
@@ -146,37 +146,37 @@ _divlong_dummy (void) _naked
 		rlc	a
 		mov	reste3,a
 
-		mov	a,reste0	; reste - b
-		subb	a,b0		; carry is always clear here, because
+		mov	a,reste0	; reste - y
+		subb	a,y0		; carry is always clear here, because
 					; reste <<= 1 never overflows
 		mov	a,reste1
-		subb	a,b1
+		subb	a,y1
 		mov	a,reste2
-		subb	a,b2
+		subb	a,y2
 		mov	a,reste3
-		subb	a,b3
+		subb	a,y3
 
-		jc	minus		; reste >= b?
+		jc	minus		; reste >= y?
 
-					; -> yes;  reste -= b;
+					; -> yes;  reste -= y;
 		mov	a,reste0
-		subb	a,b0		; carry is always clear here (jc)
+		subb	a,y0		; carry is always clear here (jc)
 		mov	reste0,a
 		mov	a,reste1
-		subb	a,b1
+		subb	a,y1
 		mov	reste1,a
 		mov	a,reste2
-		subb	a,b2
+		subb	a,y2
 		mov	reste2,a
 		mov	a,reste3
-		subb	a,b3
+		subb	a,y3
 		mov	reste3,a
 
-		orl	a0,#1
+		orl	x0,#1
 
 	minus:	djnz	count,loop	; -> no
 
-	exit:	mov	a,a3		; prepare the return value
+	exit:	mov	a,x3		; prepare the return value
 		ret
 
 	_endasm ;
@@ -195,10 +195,10 @@ _divlong_dummy (void) _naked
 
 		#define count   r2
 
-		#define a0	dpl
-		#define a1	dph
-		#define a2	b
-		#define a3	r3
+		#define x0	dpl
+		#define x1	dph
+		#define x2	b
+		#define x3	r3
 
 		#define reste0	r4
 		#define reste1	r5
@@ -207,22 +207,20 @@ _divlong_dummy (void) _naked
 
 		.globl __divlong	; entry point for __divslong
 
-		#define b0	r1
+		#define y0	r1
 
-		ar0 = 0			; BUG register set is not considered
-		ar1 = 1
-
-					; parameter a comes in a, b, dph, dpl
-		mov	a3,a		; save parameter a3
+					; parameter x comes in a, b, dph, dpl
+		mov	x3,a		; save parameter x3
 
 		mov	a,sp
-		add	a,#-2-3		; 2 bytes return address, 3 bytes param b
-		mov	r0,a		; r0 points to b0
+		add	a,#-2-3		; 2 bytes return address, 3 bytes param y
+		mov	r0,a		; r0 points to y0
 
 	__divlong:			; entry point for __divslong
 
-		mov	ar1,@r0		; load b0
-		inc	r0		; r0 points to b1
+		mov	a,@r0		; load y0
+		mov	r1,a
+		inc	r0		; r0 points to y1
 
 		mov	count,#32
 		clr	a
@@ -233,36 +231,36 @@ _divlong_dummy (void) _naked
 
 	; optimization  loop in lp0 until the first bit is shifted into rest
 
-	lp0:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
+	lp0:	mov	a,x0		; x <<= 1
+		add	a,x0
+		mov	x0,a
+		mov	a,x1
 		rlc	a
-		mov	a1,a
-		mov	a,a2
+		mov	x1,a
+		mov	a,x2
 		rlc	a
-		mov	a2,a
-		mov	a,a3
+		mov	x2,a
+		mov	a,x3
 		rlc	a
-		mov	a3,a
+		mov	x3,a
 
 		jc	in_lp
 		djnz	count,lp0
 
 		sjmp	exit
 
-	loop:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
+	loop:	mov	a,x0		; x <<= 1
+		add	a,x0
+		mov	x0,a
+		mov	a,x1
 		rlc	a
-		mov	a1,a
-		mov	a,a2
+		mov	x1,a
+		mov	a,x2
 		rlc	a
-		mov	a2,a
-		mov	a,a3
+		mov	x2,a
+		mov	a,x3
 		rlc	a
-		mov	a3,a
+		mov	x3,a
 
 	in_lp:	mov	a,reste0	; reste <<= 1
 		rlc	a		;   feed in carry
@@ -277,45 +275,45 @@ _divlong_dummy (void) _naked
 		rlc	a
 		mov	reste3,a
 
-		mov	a,reste0	; reste - b
-		subb	a,b0		; carry is always clear here, because
+		mov	a,reste0	; reste - y
+		subb	a,y0		; carry is always clear here, because
 					; reste <<= 1 never overflows
 		mov	a,reste1
-		subb	a,@r0		; b1
+		subb	a,@r0		; y1
 		mov	a,reste2
 		inc	r0
-		subb	a,@r0		; b2
+		subb	a,@r0		; y2
 		mov	a,reste3
 		inc	r0
-		subb	a,@r0		; b3
+		subb	a,@r0		; y3
 		dec	r0
 		dec	r0
 
-		jc	minus		; reste >= b?
+		jc	minus		; reste >= y?
 
-					; -> yes;  reste -= b;
+					; -> yes;  reste -= y;
 		mov	a,reste0
-		subb	a,b0		; carry is always clear here (jc)
+		subb	a,y0		; carry is always clear here (jc)
 		mov	reste0,a
 		mov	a,reste1
-		subb	a,@r0		; b1
+		subb	a,@r0		; y1
 		mov	reste1,a
 		mov	a,reste2
 		inc	r0
-		subb	a,@r0		; b2
+		subb	a,@r0		; y2
 		mov	reste2,a
 		mov	a,reste3
 		inc	r0
-		subb	a,@r0		; b3
+		subb	a,@r0		; y3
 		mov	reste3,a
 		dec	r0
 		dec	r0
 
-		orl	a0,#1
+		orl	x0,#1
 
 	minus:	djnz	count,loop	; -> no
 
-	exit:	mov	a,a3		; prepare the return value
+	exit:	mov	a,x3		; prepare the return value
 		ret
 
 	_endasm ;
@@ -326,7 +324,7 @@ _divlong_dummy (void) _naked
 #define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
 
 unsigned long
-_divulong (unsigned long a, unsigned long b)
+_divulong (unsigned long x, unsigned long y)
 {
   unsigned long reste = 0L;
   unsigned char count = 32;
@@ -334,22 +332,22 @@ _divulong (unsigned long a, unsigned long b)
 
   do
   {
-    // reste: a <- 0;
-    c = MSB_SET(a);
-    a <<= 1;
+    // reste: x <- 0;
+    c = MSB_SET(x);
+    x <<= 1;
     reste <<= 1;
     if (c)
       reste |= 1L;
 
-    if (reste >= b)
+    if (reste >= y)
     {
-      reste -= b;
-      // a <- (result = 1)
-      a |= 1L;
+      reste -= y;
+      // x <- (result = 1)
+      x |= 1L;
     }
   }
   while (--count);
-  return a;
+  return x;
 }
 
 #endif // _DIVULONG_ASM

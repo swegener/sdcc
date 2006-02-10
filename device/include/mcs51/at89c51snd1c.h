@@ -593,8 +593,8 @@ __sbit __at (0x98) RI     ;
 /* Interrupt numbers: address = (number * 8) + 3 */
 #define IE0_VECTOR      0   /* 0x03 External Interrupt 0 */
 #define TF0_VECTOR      1   /* 0x0b Timer 0 */
-#define IE1_VECTOR      2   /* 0x13 External Interrupt 0 */
-#define TF1_VECTOR      3   /* 0x1b Timer 0 */
+#define IE1_VECTOR      2   /* 0x13 External Interrupt 1 */
+#define TF1_VECTOR      3   /* 0x1b Timer 1 */
 #define SIO_VECTOR      4   /* 0x23 Serial port */
 #define MP3_VECTOR      5   /* 0x2b MP3 Decoder */
 #define AUDIO_VECTOR    6   /* 0x33 Audio Interface */

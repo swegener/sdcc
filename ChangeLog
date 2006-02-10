@@ -1,3 +1,15 @@
+2006-02-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89c51snd1c.h: updated comments, see patch 1428901
+	* device/include/mcs51/c8051f330.h,
+	* device/include/mcs51/c8051f350.h: used () with __at, renamed IDLE,STOP to
+	  PCON_IDLE,PCON_STOP and added sfr16 definitions
+	* device/lib/_divsint.c,
+	* device/lib/_divuint.c,
+	* device/lib/_divulong.c,
+	* device/lib/_divulong.c: renamed a,b to x,y to avoid confusion, fixed
+	  register bank bug for small stackauto
+
 2006-02-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/fwk/lib/timeout.c: include <stdlib.h> for exit()

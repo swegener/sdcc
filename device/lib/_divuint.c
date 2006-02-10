@@ -55,37 +55,39 @@ _divuint_dummy (void) _naked
 		#define count   r2
 		#define reste_l r3
 		#define reste_h r4
-		#define al      dpl
-		#define ah      dph
+		#define xl      dpl
+		#define xh      dph
 
-#if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
-
-		ar0 = 0			; BUG register set is not considered
-		ar1 = 1
+#if defined(SDCC_PARMS_IN_BANK1)
+		#define yl      (b1_0)
+		#define yh      (b1_1)
+#else // SDCC_PARMS_IN_BANK1
+  #if defined(SDCC_STACK_AUTO)
 
 		.globl __divint
 
 		mov	a,sp
 		add	a,#-2		; 2 bytes return address
-		mov	r0,a		; r0 points to bh
-		mov	ar1,@r0		; load bh
+		mov	r0,a		; r0 points to yh
+		mov	a,@r0		; load yh
+		mov	r1,a
 		dec	r0
-		mov	ar0,@r0		; load bl
+		mov	a,@r0		; load yl
+		mov	r0,a
 
-		#define bl      r0
-		#define bh      r1
+		#define yl      r0
+		#define yh      r1
 
 	__divint:			; entry point for __divsint
 
 
-#else // SDCC_STACK_AUTO
+  #else // SDCC_STACK_AUTO
 
-#if !defined(SDCC_PARMS_IN_BANK1)
-#if defined(SDCC_NOOVERLAY)
+    #if defined(SDCC_NOOVERLAY)
 		.area DSEG    (DATA)
-#else
+    #else
 		.area OSEG    (OVR,DATA)
-#endif
+    #endif
 
 		.globl __divuint_PARM_2
 		.globl __divsint_PARM_2
@@ -95,27 +97,24 @@ _divuint_dummy (void) _naked
 		.ds	2
 
 		.area CSEG    (CODE)
-#endif // !SDCC_PARMS_IN_BANK1
-#if defined(SDCC_PARMS_IN_BANK1)
-		#define bl      (b1_0)
-		#define bh      (b1_1)
-#else
-		#define bl      (__divuint_PARM_2)
-		#define bh      (__divuint_PARM_2 + 1)
+
+		#define yl      (__divuint_PARM_2)
+		#define yh      (__divuint_PARM_2 + 1)
+
+  #endif // SDCC_STACK_AUTO
 #endif // SDCC_PARMS_IN_BANK1
-#endif // SDCC_STACK_AUTO
 
 		mov	count,#16
 		clr	a
 		mov	reste_l,a
 		mov	reste_h,a
 
-	loop:	mov	a,al		; a <<= 1
+	loop:	mov	a,xl		; x <<= 1
 		add	a,acc
-		mov	al,a
-		mov	a,ah
+		mov	xl,a
+		mov	a,xh
 		rlc	a
-		mov	ah,a
+		mov	xh,a
 
 		mov	a,reste_l	; reste <<= 1
 		rlc	a		;   feed in carry
@@ -124,18 +123,18 @@ _divuint_dummy (void) _naked
 		rlc	a
 		mov	reste_h,a
 
-		mov	a,reste_l	; reste - b
-		subb	a,bl		; here carry is always clear, because
+		mov	a,reste_l	; reste - y
+		subb	a,yl		; here carry is always clear, because
 					; reste <<= 1 never overflows
 		mov	b,a
 		mov	a,reste_h
-		subb	a,bh
+		subb	a,yh
 
-		jc	smaller		; reste >= b?
+		jc	smaller		; reste >= y?
 
-		mov	reste_h,a	; -> yes;  reste = reste - b;
+		mov	reste_h,a	; -> yes;  reste = reste - y;
 		mov	reste_l,b
-		orl	al,#1
+		orl	xl,#1
 	smaller:			; -> no
 		djnz	count,loop
 		ret
@@ -148,7 +147,7 @@ _divuint_dummy (void) _naked
 #define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
 
 unsigned int
-_divuint (unsigned int a, unsigned int b)
+_divuint (unsigned int x, unsigned int y)
 {
   unsigned int reste = 0;
   unsigned char count = 16;
@@ -156,22 +155,22 @@ _divuint (unsigned int a, unsigned int b)
 
   do
   {
-    // reste: a <- 0;
-    c = MSB_SET(a);
-    a <<= 1;
+    // reste: x <- 0;
+    c = MSB_SET(x);
+    x <<= 1;
     reste <<= 1;
     if (c)
       reste |= 1;
 
-    if (reste >= b)
+    if (reste >= y)
     {
-      reste -= b;
-      // a <- (result = 1)
-      a |= 1;
+      reste -= y;
+      // x <- (result = 1)
+      x |= 1;
     }
   }
   while (--count);
-  return a;
+  return x;
 }
 
 #endif  // defined _DIVUINT_ASM_SMALL || defined _DIVUINT_ASM_SMALL_AUTO

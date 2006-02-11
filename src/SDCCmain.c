@@ -376,7 +376,6 @@ static void
 _setProcessor (char *_processor)
 {
   port->processor = _processor;
-  fprintf(stderr,"Processor: %s\n",_processor);
 }
 
 static void
@@ -2090,13 +2089,6 @@ setBinPaths(const char *argv0)
     SNPRINTF(buf, sizeof buf, "%s" PREFIX2BIN_DIR, p);
     addSetHead(&binPathSet, Safe_strdup(buf));
   }
-
-#if 0
-  if (options.printSearchDirs) {
-    printf("programs:\n");
-    fputStrSet(stdout, binPathSet);
-  }
-#endif
 }
 
 /* Set system include path */
@@ -2140,13 +2132,6 @@ setIncludePath(void)
         addSetHead(&includeDirsSet, p2);
     }
   }
-
-#if 0
-  if (options.printSearchDirs) {
-    printf("includedir:\n");
-    fputStrSet(stdout, includeDirsSet);
-  }
-#endif
 }
 
 /* Set system lib path */
@@ -2171,13 +2156,6 @@ setLibPath(void)
 
   if ((p = getenv(SDCC_LIB_NAME)) != NULL)
     addSetHead(&libDirsSet, p);
-
-#if 0
-  if (options.printSearchDirs) {
-    printf("libdir:\n");
-    fputStrSet(stdout, libDirsSet);
-  }
-#endif
 }
 
 /* Set data path */
@@ -2212,13 +2190,6 @@ setDataPaths(const char *argv0)
   }
 #else
   addSet(&dataDirsSet, Safe_strdup(DATADIR));
-#endif
-
-#if 0
-  if (options.printSearchDirs) {
-    printf("datadir:\n");
-    fputStrSet(stdout, dataDirsSet);
-  }
 #endif
 
   setIncludePath();
@@ -2361,7 +2332,11 @@ main (int argc, char **argv, char **envp)
     options.stack10bit=0;
   }
 #endif
+
   parseCmdLine (argc, argv);
+
+  if (options.verbose && NULL != port->processor)
+    printf("Processor: %s\n", port->processor);
 
   initValues ();
 
@@ -2444,6 +2419,9 @@ main (int argc, char **argv, char **envp)
       !options.c1mode &&
       (fullSrcFileName || peekSet(relFilesSet) != NULL))
     {
+      if (options.verbose)
+        printf ("sdcc: Calling linker...\n");
+
       if (port->linker.do_link)
         port->linker.do_link ();
       else

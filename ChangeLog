@@ -1,3 +1,9 @@
+2006-02-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (printIvalStruct): fixed bug 1426356 union initializer
+	* support/regression/tests/bug1426356.c: added
+	* support/regression/tests/bitfields.c: removed 2 tests
+
 2006-02-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/at89c51snd1c.h: updated comments, see patch 1428901

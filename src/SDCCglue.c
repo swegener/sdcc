@@ -773,11 +773,16 @@ printIvalStruct (symbol * sym, sym_link * type,
     iloop = ilist->init.deep;
   }
 
-  for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
-    if (IS_BITFIELD(sflds->type)) {
-      printIvalBitFields(&sflds,&iloop,oFile);
-    } else {
-      printIval (sym, sflds->type, iloop, oFile);
+  if (SPEC_STRUCT (type)->type == UNION) {
+    printIval (sym, sflds->type, iloop, oFile);
+    iloop = iloop->next;
+  } else {
+    for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
+      if (IS_BITFIELD(sflds->type)) {
+        printIvalBitFields(&sflds,&iloop,oFile);
+      } else {
+        printIval (sym, sflds->type, iloop, oFile);
+      }
     }
   }
   if (iloop) {

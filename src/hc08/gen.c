@@ -6912,22 +6912,38 @@ genUnpackBits (operand * result, iCode *ifx)
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
 
+  if (ifx && blen <= 8)
+    {
+      emitcode ("lda", ",x");
+      hc08_dirtyReg (hc08_reg_a, FALSE);
+      if (blen < 8)
+        {
+          emitcode ("and", "#0x%02x",
+                    (((unsigned char) -1) >> (8 - blen)) << bstr);
+        }
+      genIfxJump (ifx, "a");
+      return;
+    }
+  wassert (!ifx);
+
   /* If the bitfield length is less than a byte */
   if (blen < 8)
     {
       emitcode ("lda", ",x");
       hc08_dirtyReg (hc08_reg_a, FALSE);
-      if (!ifx)
+      AccRsh (bstr, FALSE);
+      emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8 - blen));
+      if (!SPEC_USIGN (etype))
         {
-          AccRsh (bstr, FALSE);
-          emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8 - blen));
-          storeRegToAop (hc08_reg_a, AOP (result), offset++);
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emitcode ("bit", "#0x%02x", 1<<(blen - 1));
+          emitcode ("beq", "%05d$", tlbl->key + 100);
+          emitcode ("ora", "#0x%02x", (unsigned char) (0xff << blen));
+          emitLabel (tlbl);
         }
-      else
-        {
-          emitcode ("and", "#0x%02x",
-                    (((unsigned char) -1) >> (8 - blen)) << bstr);
-        }
+      storeRegToAop (hc08_reg_a, AOP (result), offset++);
       goto finish;
     }
 
@@ -6937,8 +6953,7 @@ genUnpackBits (operand * result, iCode *ifx)
     {
       emitcode ("lda", ",x");
       hc08_dirtyReg (hc08_reg_a, FALSE);
-      if (!ifx)
-        storeRegToAop (hc08_reg_a, AOP (result), offset);
+      storeRegToAop (hc08_reg_a, AOP (result), offset);
       offset++;
       if (rlen>8)
         emitcode ("aix", "#1");
@@ -6949,6 +6964,16 @@ genUnpackBits (operand * result, iCode *ifx)
     {
       emitcode ("lda", ",x");
       emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8-rlen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emitcode ("bit", "#0x%02x", 1<<(rlen - 1));
+          emitcode ("beq", "%05d$", tlbl->key + 100);
+          emitcode ("ora", "#0x%02x", (unsigned char) (0xff << rlen));
+          emitLabel (tlbl);
+        }
       storeRegToAop (hc08_reg_a, AOP (result), offset++);
     }
 
@@ -6956,13 +6981,21 @@ finish:
   if (offset < rsize)
     {
       rsize -= offset;
-      while (rsize--)
-        storeConstToAop (zero, AOP (result), offset++);
-    }
+      if (SPEC_USIGN (etype))
+        {
+          while (rsize--)
+            storeConstToAop (zero, AOP (result), offset++);
+        }
+      else
+        {
+          /* signed bitfield: sign extension with 0x00 or 0xff */
+          emitcode ("rola", "");
+          emitcode ("clra", "");
+          emitcode ("sbc", zero);
   
-  if (ifx && !ifx->generated)
-    {
-      genIfxJump (ifx, "a");
+          while (rsize--)
+            storeRegToAop (hc08_reg_a, AOP (result), offset++);
+        }
     }
 }
 
@@ -7010,7 +7043,10 @@ genUnpackBitsImmed (operand * left,
           emitcode ("brclr", "#%d,%s,%05d$",
                     bstr, aopAdrStr (derefaop, 0, FALSE),
                     (tlbl->key + 100));
-          rmwWithReg ("inc", hc08_reg_a);
+          if (SPEC_USIGN (etype))
+            rmwWithReg ("inc", hc08_reg_a);
+          else
+            rmwWithReg ("dec", hc08_reg_a);
           emitLabel (tlbl);
           storeRegToAop (hc08_reg_a, AOP (result), offset);
           hc08_freeReg (hc08_reg_a);
@@ -7053,6 +7089,16 @@ genUnpackBitsImmed (operand * left,
           AccRsh (bstr, FALSE);
           emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8 - blen));
           hc08_dirtyReg (hc08_reg_a, FALSE);
+          if (!SPEC_USIGN (etype))
+            {
+              /* signed bitfield */
+              symbol *tlbl = newiTempLabel (NULL);
+
+              emitcode ("bit", "#0x%02x", 1<<(blen - 1));
+              emitcode ("beq", "%05d$", tlbl->key + 100);
+              emitcode ("ora", "#0x%02x", (unsigned char) (0xff << blen));
+              emitLabel (tlbl);
+            }
           storeRegToAop (hc08_reg_a, AOP (result), offset);
         }
       else
@@ -7082,6 +7128,16 @@ genUnpackBitsImmed (operand * left,
     {
       loadRegFromAop (hc08_reg_a, derefaop, size-offset-1);
       emitcode ("and", "#0x%02x", ((unsigned char) -1) >> (8-rlen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emitcode ("bit", "#0x%02x", 1<<(rlen - 1));
+          emitcode ("beq", "%05d$", tlbl->key + 100);
+          emitcode ("ora", "#0x%02x", (unsigned char) (0xff << rlen));
+          emitLabel (tlbl);
+        }
       storeRegToAop (hc08_reg_a, AOP (result), offset++);
     }
 
@@ -7089,8 +7145,21 @@ finish:
   if (offset < rsize)
     {
       rsize -= offset;
-      while (rsize--)
-        storeConstToAop (zero, AOP (result), offset++);
+      if (SPEC_USIGN (etype))
+        {
+          while (rsize--)
+            storeConstToAop (zero, AOP (result), offset++);
+        }
+      else
+        {
+          /* signed bitfield: sign extension with 0x00 or 0xff */
+          emitcode ("rola", "");
+          emitcode ("clra", "");
+          emitcode ("sbc", zero);
+
+          while (rsize--)
+            storeRegToAop (hc08_reg_a, AOP (result), offset++);
+        }
     }
   
   freeAsmop (NULL, derefaop, ic, TRUE);

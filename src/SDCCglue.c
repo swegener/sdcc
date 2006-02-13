@@ -836,6 +836,7 @@ void
 printIvalArray (symbol * sym, sym_link * type, initList * ilist,
                 FILE * oFile)
 {
+  value *val;
   initList *iloop;
   unsigned int size = 0;
 
@@ -844,7 +845,12 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist,
     /* array of characters can be init  */
     /* by a string                      */
     if (IS_CHAR (type->next)) {
-      if (!IS_LITERAL(list2val(ilist)->etype)) {
+      val = list2val(ilist);
+      if (!val) {
+        werrorfl (ilist->filename, ilist->lineno, E_INIT_STRUCT, sym->name);
+        return;
+      }
+      if (!IS_LITERAL(val->etype)) {
         werrorfl (ilist->filename, ilist->lineno, E_CONST_EXPECTED);
         return;
       }

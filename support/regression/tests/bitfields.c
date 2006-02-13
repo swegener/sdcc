@@ -131,16 +131,16 @@ testBitfieldSizeof(void)
 void
 testBitfieldsSingleBitLiteral(void)
 {
-  size2b_bf.b0 = 0; 
-  size2b_bf.b1 = 0; 
-  size2b_bf.b2 = 0; 
-  size2b_bf.b3 = 0; 
-  size2b_bf.b4 = 0; 
-  size2b_bf.b5 = 0; 
-  size2b_bf.b6 = 0; 
-  size2b_bf.b7 = 0; 
-  size2b_bf.b8 = 0; 
-  size2b_bf.b9 = 0; 
+  size2b_bf.b0 = 0;
+  size2b_bf.b1 = 0;
+  size2b_bf.b2 = 0;
+  size2b_bf.b3 = 0;
+  size2b_bf.b4 = 0;
+  size2b_bf.b5 = 0;
+  size2b_bf.b6 = 0;
+  size2b_bf.b7 = 0;
+  size2b_bf.b8 = 0;
+  size2b_bf.b9 = 0;
 
   /* make sure modulo 2 truncation works */
   size2b_bf.b0 = 0x3fe;
@@ -186,16 +186,16 @@ testBitfieldsSingleBit(void)
   volatile unsigned char c;
 
   c = 0;
-  size2b_bf.b0 = c; 
-  size2b_bf.b1 = c; 
-  size2b_bf.b2 = c; 
-  size2b_bf.b3 = c; 
-  size2b_bf.b4 = c; 
-  size2b_bf.b5 = c; 
-  size2b_bf.b6 = c; 
-  size2b_bf.b7 = c; 
-  size2b_bf.b8 = c; 
-  size2b_bf.b9 = c; 
+  size2b_bf.b0 = c;
+  size2b_bf.b1 = c;
+  size2b_bf.b2 = c;
+  size2b_bf.b3 = c;
+  size2b_bf.b4 = c;
+  size2b_bf.b5 = c;
+  size2b_bf.b6 = c;
+  size2b_bf.b7 = c;
+  size2b_bf.b8 = c;
+  size2b_bf.b9 = c;
 
   /* make sure modulo 2 truncation works */
   c = 0xfe;
@@ -287,7 +287,7 @@ testBitfieldsMultibit(void)
   volatile int allones = 0xffff;
   volatile int zero = 0;
   volatile int x;
-  
+
   size2c_bf.b0 = allones;	/* should truncate to 0x0f */
   size2c_bf.b1 = zero;
   ASSERT(size2c_bf.b0==0x0f);
@@ -345,7 +345,6 @@ testBitfields(void)
 void
 testSignedBitfields(void)
 {
-#if !defined(SDCC_hc08)
   s_bf.s0_7 =   0xf0;
   s_bf.s7_1 =      1;
   s_bf.s8_9 = 0xfff8;
@@ -364,5 +363,4 @@ testSignedBitfields(void)
   ASSERT(s_bf.s8_9 == 0xff);
   ASSERT(s_bf.s0_7 > 0);
   ASSERT(s_bf.s8_9 > 0);
-#endif
 }

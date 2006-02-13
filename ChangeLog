@@ -1,7 +1,14 @@
+2006-02-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (constExprValue): return NULL if not a value
+	* src/SDCCglue.c (printIvalArray): fixed bug 1225568
+	* src/hc08/gen.c(genUnpackBits, genUnpackBitsImmed): fixed bug 1019480
+	* support/regression/tests/bitfields.c: enabled signed bitfield for all
+
 2006-02-13 Borut Razem <borut.razem AT siol.net>
 
 	* src/regression/ptrarg.c: added, fails due to bug #1430967
-	* src/regression/Makefiel: ptrarg.c added, ...
+	* src/regression/Makefile: ptrarg.c added, ...
 
 2006-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

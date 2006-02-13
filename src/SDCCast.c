@@ -1467,8 +1467,11 @@ constExprValue (ast * cexpr, int check)
     }
 
   /* return the value */
-  return cexpr->opval.val;
-
+  if (IS_AST_VALUE (cexpr))
+    {
+      return cexpr->opval.val;
+    }
+   return NULL;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2250,7 +2253,7 @@ getLeftResultType (ast *tree, RESULT_TYPE resultType)
 /*--------------------------------------------------------------------*/
 /* decorateType - compute type for this tree, also does type checking.*/
 /* This is done bottom up, since type has to flow upwards.            */
-/* resultType flows top-down and forces e.g. char-arithmetik, if the  */
+/* resultType flows top-down and forces e.g. char-arithmetic, if the  */
 /* result is a char and the operand(s) are int's.                     */
 /* It also does constant folding, and parameter checking.             */
 /*--------------------------------------------------------------------*/
@@ -5220,12 +5223,12 @@ optimizeRRCRLC (ast * root)
      into a RRC operation
      note : by 7 I mean (number of bits required to hold the
      variable -1 ) */
-  /* if the root operations is not a | operation the not */
+  /* if the root operation is not a | operation then not */
   if (!IS_BITOR (root))
     return root;
 
   /* I have to think of a better way to match patterns this sucks */
-  /* that aside let start looking for the first case : I use a the
+  /* that aside let's start looking for the first case : I use a
      negative check a lot to improve the efficiency */
   /* (?expr << 1) | (?expr >> 7) */
   if (IS_LEFT_OP (root->left) &&
@@ -5383,7 +5386,7 @@ optimizeSWAP (ast * root)
      into a SWAP : operation ..
      note : by 4 I mean (number of bits required to hold the
      variable /2 ) */
-  /* if the root operations is not a | operation the not */
+  /* if the root operation is not a | operation then not */
   if (!IS_BITOR (root))
     return root;
 

@@ -1,3 +1,8 @@
+2006-02-13 Borut Razem <borut.razem AT siol.net>
+
+	* src/regression/ptrarg.c: added, fails due to bug #1430967
+	* src/regression/Makefiel: ptrarg.c added, ...
+
 2006-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/gen.c (genUnpackBits): fixed bug 1019480

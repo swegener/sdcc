@@ -345,7 +345,7 @@ testBitfields(void)
 void
 testSignedBitfields(void)
 {
-#if !defined(SDCC_hc08) && !defined(SDCC_z80) && !defined(SDCC_gbz80)
+#if !defined(SDCC_hc08)
   s_bf.s0_7 =   0xf0;
   s_bf.s7_1 =      1;
   s_bf.s8_9 = 0xfff8;

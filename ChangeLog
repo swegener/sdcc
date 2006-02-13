@@ -1,3 +1,8 @@
+2006-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/gen.c (genUnpackBits): fixed bug 1019480
+	* support/regression/tests/bitfields.c: enabled signed bitfield for z80
+
 2006-02-11 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c: Added "sdcc: Calling linker..." if --verbose,

@@ -5268,7 +5268,7 @@ genOr (iCode * ic, iCode * ifx)
         {
           wassertl (0, "Result is assigned to a bit");
         }
-      /* PENDING: Modeled after the AND code which is inefficent. */
+      /* PENDING: Modeled after the AND code which is inefficient. */
       while (sizel--)
         {
           bytelit = (lit >> (offset * 8)) & 0x0FFL;
@@ -6395,8 +6395,18 @@ genUnpackBits (operand * result, int pair)
   if (blen < 8)
     {
       emit2 ("ld a,!*pair", _pairs[pair].name);
-      AccRsh (bstr);
+      AccRol (8 - bstr);
       emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (8 - blen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emit2 ("bit %d,a", blen - 1);
+          emit2 ("jp z,!tlabel", tlbl->key + 100);
+          emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
+	  emitLabel (tlbl->key + 100);
+        }
       aopPut (AOP (result), "a", offset++);
       goto finish;
     }
@@ -6411,6 +6421,16 @@ genUnpackBits (operand * result, int pair)
       emit2 ("ld l,a");
       emit2 ("ld a,h");
       emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (16 - blen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emit2 ("bit %d,a", blen - 1);
+          emit2 ("jp z,!tlabel", tlbl->key + 100);
+          emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
+	  emitLabel (tlbl->key + 100);
+        }
       emit2 ("ld h,a");
       spillPair (PAIR_HL);
       return;
@@ -6434,15 +6454,37 @@ genUnpackBits (operand * result, int pair)
     {
       emit2 ("ld a,!*pair", _pairs[pair].name);
       emit2 ("and a,!immedbyte", ((unsigned char) -1) >> (8 - rlen));
+      if (!SPEC_USIGN (etype))
+        {
+          /* signed bitfield */
+          symbol *tlbl = newiTempLabel (NULL);
+
+          emit2 ("bit %d,a", rlen - 1);
+          emit2 ("jp z,!tlabel", tlbl->key + 100);
+          emit2 ("or a,!immedbyte", (unsigned char) (0xff << rlen));
+	  emitLabel (tlbl->key + 100);
+        }
       aopPut (AOP (result), "a", offset++);
     }
 
 finish:
   if (offset < rsize)
     {
+      char *source;
+
+      if (SPEC_USIGN (etype))
+        source = "!zero";
+      else
+        {
+          /* signed bitfield: sign extension with 0x00 or 0xff */
+          emit2 ("rla");
+          emit2 ("sbc a,a");
+
+          source = "a";
+        }
       rsize -= offset;
       while (rsize--)
-	aopPut (AOP (result), "!zero", offset++);
+	aopPut (AOP (result), source, offset++);
     }
 }
 

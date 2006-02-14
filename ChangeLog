@@ -1,3 +1,8 @@
+2006-02-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/hc08/mc68hc908gp32.h,
+	* device/include/hc08/mc68hc908jb8.h: removed AWUL, added PTA6 & PTA7
+
 2006-02-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c (constExprValue): return NULL if not a value

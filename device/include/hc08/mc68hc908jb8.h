@@ -1,29 +1,29 @@
 /*-------------------------------------------------------------------------
   Register Declarations for Motorola MC68HC908JB8
-  
+
   Copyright (c) 2004, Bjorn Bringert <bjorn@bringert.net>
 
   Based on mc68hc908qy.h,
    Written By - Erik Petrich
     epetrich@users.sourceforge.net (2003)
-    
+
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #ifndef _MC68HC908JB8_H
@@ -53,7 +53,7 @@ struct __hc08_bits
   unsigned int bit6:1;
   unsigned int bit7:1;
 };
-  
+
 
 _VOLDATA _UINT8 __at 0x00 PTA;     /* Port A Data Register */
   #define PTA0 ((struct __hc08_bits *)(&PTA))->bit0
@@ -62,8 +62,9 @@ _VOLDATA _UINT8 __at 0x00 PTA;     /* Port A Data Register */
   #define PTA3 ((struct __hc08_bits *)(&PTA))->bit3
   #define PTA4 ((struct __hc08_bits *)(&PTA))->bit4
   #define PTA5 ((struct __hc08_bits *)(&PTA))->bit5
-  #define AWUL ((struct __hc08_bits *)(&PTA))->bit6
-  
+  #define PTA6 ((struct __hc08_bits *)(&PTA))->bit6
+  #define PTA7 ((struct __hc08_bits *)(&PTA))->bit7
+
 _VOLDATA _UINT8 __at 0x01 PTB;     /* Port B Data Register */
   #define PTB0 ((struct __hc08_bits *)(&PTB))->bit0
   #define PTB1 ((struct __hc08_bits *)(&PTB))->bit1

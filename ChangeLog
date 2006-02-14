@@ -1,5 +1,10 @@
 2006-02-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/mcs51/gen.c (genPlus, genMinus, genMult, genGetAbit, genGetByte,
+	  genGetWord): fixed bug 1409955
+
+2006-02-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/include/hc08/mc68hc908gp32.h,
 	* device/include/hc08/mc68hc908jb8.h: removed AWUL, added PTA6 & PTA7
 

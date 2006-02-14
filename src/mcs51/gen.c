@@ -4385,8 +4385,8 @@ genPlus (iCode * ic)
   adjustArithmeticResult (ic);
 
 release:
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (IC_RIGHT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
 }
 
@@ -4701,8 +4701,8 @@ genMinus (iCode * ic)
   adjustArithmeticResult (ic);
 
 release:
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (IC_RIGHT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
 }
 
@@ -4969,9 +4969,9 @@ genMult (iCode * ic)
   assert (0);
 
 release:
-  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7474,7 +7474,6 @@ genGetHbit (iCode * ic)
       outAcc (result);
     }
 
-
   freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
@@ -7546,8 +7545,8 @@ genGetAbit (iCode * ic)
       outAcc (result);
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -7575,8 +7574,8 @@ genGetByte (iCode * ic)
           0,
           isOperandVolatile (result, FALSE));
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
 
@@ -7608,8 +7607,8 @@ genGetWord (iCode * ic)
           1,
           isOperandVolatile (result, FALSE));
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
 }
 

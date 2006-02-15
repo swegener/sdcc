@@ -80,6 +80,14 @@
 	    created, reuse existing ones instead
 	* src/pic/gen.c (genPcall): fixed #1424719
 
+2006-02-07 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* link/z80/lkmain.c,
+	* link/z80/lklex.c,
+	* link/z80/lkdata.c,
+	* link/z80/aslink.h: fixed build on current cygwin:
+	replaced getline() by lk_getline()
+
 2006-02-01 Borut Razem <borut.razem AT siol.net>
 
 	* src/regression/add.c, src/regression/add2.c, src/regression/add3.c,

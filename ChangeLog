@@ -1,3 +1,14 @@
+2006-02-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89s8253.h: new, thanks to Krzysztof Polomka
+	* device/include/mcs51/at89S8252.h: fixed, thanks to Krzysztof Polomka
+	* device/include/mcs51/c8051f326.h,
+	* device/include/mcs51/c8051f340.h: new SiLabs mcu's
+	* device/include/mcs51/c8051f000.h,
+	* device/include/mcs51/c8051f018.h,
+	* device/include/mcs51/c8051f020.h: used () with __at, renamed IDLE,STOP to
+	  PCON_IDLE,PCON_STOP and added sfr16 definitions
+
 2006-02-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genPlus, genMinus, genMult, genGetAbit, genGetByte,

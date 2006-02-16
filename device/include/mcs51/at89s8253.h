@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-  Register Declarations for ATMEL 89S8252 and 89LS8252 Processors
+  Register Declarations for ATMEL 89S8253 Processors
 
-   Written By - Dipl.-Ing. (FH) Michael Schmitt
+   Written By - Krzysztof Polomka <del_p@op.pl>
+
+    based on at89S8252.h By - Dipl.-Ing. (FH) Michael Schmitt
     mschmitt@mainz-online.de
     michael.schmitt@t-online.de
 
@@ -12,9 +14,6 @@
 
     based on reg51.h by Sandeep Dutta sandeep.dutta@usa.net
     KEIL C compatible definitions are included
-
-    Bug-Fix Feb 16 2006
-      by Krzysztof Polomka <del_p@op.pl>
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -35,8 +34,8 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#ifndef AT89S8252_H
-#define AT89S8252_H
+#ifndef AT89S8253_H
+#define AT89S8253_H
 
 /* BYTE addressable registers */
 __sfr __at (0x80) P0          ;
@@ -45,9 +44,9 @@ __sfr __at (0x82) DPL         ;
 __sfr __at (0x82) DP0L        ; /* as called by Atmel */
 __sfr __at (0x83) DPH         ;
 __sfr __at (0x83) DP0H        ; /* as called by Atmel */
-__sfr __at (0x84) DP1L        ; /* at89S8252 specific register */
-__sfr __at (0x85) DP1H        ; /* at89S8252 specific register */
-__sfr __at (0x86) SPDR        ; /* at89S8252 specific register */
+__sfr __at (0x84) DP1L        ; /* at89S8253 specific register */
+__sfr __at (0x85) DP1H        ; /* at89S8253 specific register */
+__sfr __at (0x86) SPDR        ; /* at89S8253 specific register */
 __sfr __at (0x87) PCON        ;
 __sfr __at (0x88) TCON        ;
 __sfr __at (0x89) TMOD        ;
@@ -55,15 +54,22 @@ __sfr __at (0x8A) TL0         ;
 __sfr __at (0x8B) TL1         ;
 __sfr __at (0x8C) TH0         ;
 __sfr __at (0x8D) TH1         ;
+__sfr __at (0x8E) AUXR        ; /* at89S8253 specific register */
+__sfr __at (0x8F) CLKREG      ; /* at89S8253 specific register */
 __sfr __at (0x90) P1          ;
-__sfr __at (0x96) WMCON       ; /* at89S8252 specific register */
+__sfr __at (0x96) EECON       ; /* at89S8253 specific register */
 __sfr __at (0x98) SCON        ;
 __sfr __at (0x99) SBUF        ;
 __sfr __at (0xA0) P2          ;
+__sfr __at (0xA6) WDTRST      ; /* at89S8253 specific register */
+__sfr __at (0xA7) WDTCON      ; /* at89S8253 specific register */
 __sfr __at (0xA8) IE          ;
-__sfr __at (0xAA) SPSR        ; /* at89S8252 specific register */
+__sfr __at (0xA9) SADDR       ; /* at89S8253 specific register */
+__sfr __at (0xAA) SPSR        ; /* at89S8253 specific register */
 __sfr __at (0xB0) P3          ;
+__sfr __at (0xB7) IPH         ; /* at89S8253 specific register */
 __sfr __at (0xB8) IP          ;
+__sfr __at (0xB9) SADEN       ; /* at89S8253 specific register */
 __sfr __at (0xC8) T2CON       ;
 __sfr __at (0xC9) T2MOD       ;
 __sfr __at (0xCA) RCAP2L      ;
@@ -71,7 +77,7 @@ __sfr __at (0xCB) RCAP2H      ;
 __sfr __at (0xCC) TL2         ;
 __sfr __at (0xCD) TH2         ;
 __sfr __at (0xD0) PSW         ;
-__sfr __at (0xD5) SPCR        ; /* at89S8252 specific register */
+__sfr __at (0xD5) SPCR        ; /* at89S8253 specific register */
 __sfr __at (0xE0) ACC         ;
 __sfr __at (0xE0) A           ;
 __sfr __at (0xF0) B           ;
@@ -278,15 +284,23 @@ __sbit __at (0xF7) BREG_F7    ;
 #define DCEN_           0x01
 #define T2OE_           0x02
 
-/* WMCON bits */
-#define WMCON_WDTEN     0x01
-#define WMCON_WDTRST    0x02
-#define WMCON_DPS       0x04
-#define WMCON_EEMEN     0x08
-#define WMCON_EEMWE     0x10
-#define WMCON_PS0       0x20
-#define WMCON_PS1       0x40
-#define WMCON_PS2       0x80
+/* EECON bits */
+#define EECON_WRTINH    0x01
+#define EECON_RDY       0x02
+#define EECON_DPS       0x04
+#define EECON_EEMEN     0x08
+#define EECON_EEMWE     0x10
+#define EECON_EELD      0x20
+
+/* WDTCON bits */
+#define WDTCON_WDTEN    0x01
+#define WDTCON_WSWRST   0x02
+#define WDTCON_HWDT     0x04
+#define WDTCON_DISRTO   0x08
+#define WDTCON_WDIDLE   0x10
+#define WDTCON_PS0      0x20
+#define WDTCON_PS1      0x40
+#define WDTCON_PS2      0x80
 
 /* SPCR-SPI bits */
 #define SPCR_SPR0       0x01
@@ -299,6 +313,9 @@ __sbit __at (0xF7) BREG_F7    ;
 #define SPCR_SPIE       0x80
 
 /* SPSR-SPI bits */
+#define SPSR_ENH        0x01
+#define SPSR_DISSO      0x02
+#define SPSR_LDEN       0x20
 #define SPSR_WCOL       0x40
 #define SPSR_SPIF       0x80
 
@@ -312,6 +329,14 @@ __sbit __at (0xF7) BREG_F7    ;
 #define SPDR_SPD6       0x40
 #define SPDR_SPD7       0x80
 
+/* IPH bits */
+#define IPH_PX0H        0x01
+#define IPH_PT0H        0x02
+#define IPH_PX1H        0x04
+#define IPH_PT1H        0x08
+#define IPH_PSH         0x10
+#define IPH_PT2H        0x20
+
 /* Interrupt numbers: address = (number * 8) + 3 */
 #define IE0_VECTOR      0       /* 0x03 external interrupt 0 */
 #define EX0_VECTOR      0       /* 0x03 external interrupt 0 */
@@ -323,11 +348,17 @@ __sbit __at (0xF7) BREG_F7    ;
 #define TF2_VECTOR      5       /* 0x2B timer 2 */
 #define EX2_VECTOR      5       /* 0x2B external interrupt 2 */
 
+/* AUXR bits */
+#define AUXR_DISALE          0x01
+#define AUXR_INTEL_PWD_EXIT  0x02
+
+/* CLKREG bits */
+#define CLKREG_X2         0x01
 
 /* This is one of the addons coming from Bernd Krueger-Knauber   */
 
 /* ALE (0x8E) Bit Values */
-__sfr __at 0x8E ALE;     	/* at89S8252 specific register */
+__sfr __at (0x8E) ALE;      /* at89S8252 specific register */
 
 /* Macro to enable and disable the toggling of the ALE-pin (EMV) */
 

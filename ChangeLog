@@ -1,3 +1,8 @@
+2006-02-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/tests/array.c: added, contains check for #1434401
+	* src/mcs51/peeph.def: disabled 186.d as temporary fix for #1434401
+
 2006-02-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/at89s8253.h: new, thanks to Krzysztof Polomka

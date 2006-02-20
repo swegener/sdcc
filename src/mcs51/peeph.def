@@ -1536,20 +1536,21 @@ replace {
 	inc	dptr
 }
 
-// char indexed access to: char code table[] = {4,3,2,1};
-replace {
-	add	a,#%1
-	mov	dpl,a
-	clr	a
-	addc	a,#(%1 >> 8)
-	mov	dph,a
-	clr	a
-	movc	a,@a+dptr
-} by {
-	;	Peephole 186.d	optimized movc sequence
-	mov	dptr,#%1
-	movc	a,@a+dptr
-}
+// disabled due to bug #1434401
+//// char indexed access to: char code table[] = {4,3,2,1};
+//replace {
+//	add	a,#%1
+//	mov	dpl,a
+//	clr	a
+//	addc	a,#(%1 >> 8)
+//	mov	dph,a
+//	clr	a
+//	movc	a,@a+dptr
+//} by {
+//	;	Peephole 186.d	optimized movc sequence
+//	mov	dptr,#%1
+//	movc	a,@a+dptr
+//}
 
 // char indexed access to: int code table[] = {4,3,2,1};
 replace {

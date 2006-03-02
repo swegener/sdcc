@@ -3473,11 +3473,11 @@ static void genPcall (iCode *ic)
     pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_intcon));
 
     /* make the call by writing the pointer into pc */
-    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)),2), pic16_popCopyReg(&pic16_pc_pclatu)));
-    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(IC_LEFT(ic)),1), pic16_popCopyReg(&pic16_pc_pclath)));
+    mov2fp(pic16_popCopyReg(&pic16_pc_pclatu), AOP(IC_LEFT(ic)), 2);
+    mov2fp(pic16_popCopyReg(&pic16_pc_pclath), AOP(IC_LEFT(ic)), 1);
 
     // note: MOVFF to PCL not allowed
-    pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(IC_LEFT(ic)),0));
+    pic16_mov2w(AOP(IC_LEFT(ic)), 0);
     pic16_emitpcode(POC_MOVWF, pic16_popCopyReg(&pic16_pc_pcl));
 
 
@@ -10504,9 +10504,9 @@ static void pic16_derefPtr (operand *ptr, int p_type, int doWrite, int *fsr0_set
       if (AOP(ptr)->aopu.aop_reg[2]) {
         if (doWrite) pic16_emitpcode (POC_MOVWF, pic16_popCopyReg(pic16_stack_postdec));
 	// prepare call to __gptrget1, this is actually genGenPointerGet(result, WREG, ?ic?)
-	pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(ptr),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
-	pic16_emitpcode (POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(ptr),1), pic16_popCopyReg(&pic16_pc_prodl)));
-	pic16_emitpcode (POC_MOVFW, pic16_popGet(AOP(ptr),2));
+	mov2fp(pic16_popCopyReg(&pic16_pc_fsr0l), AOP(ptr), 0);
+	mov2fp(pic16_popCopyReg(&pic16_pc_prodl), AOP(ptr), 1);
+	pic16_mov2w(AOP(ptr), 2);
 	pic16_callGenericPointerRW(doWrite, 1);
       } else {
 	// data pointer (just 2 byte given)
@@ -11157,10 +11157,9 @@ static void genGenPointerGet (operand *left,
     } else { /* we need to get it byte by byte */
 
       /* set up WREG:PRODL:FSR0L with address from left */
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
-      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),1), pic16_popCopyReg(&pic16_pc_prodl)));
-      pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 2));
-      
+      mov2fp(pic16_popCopyReg(&pic16_pc_fsr0l), AOP(left), 0);
+      mov2fp(pic16_popCopyReg(&pic16_pc_prodl), AOP(left), 1);
+      pic16_mov2w(AOP(left), 2);
       pic16_callGenericPointerRW(0, size);
       
       assignResultValue(result, 1);
@@ -11207,9 +11206,9 @@ static void genConstPointerGet (operand *left,
       pic16_emitpcode(POC_MOVLW,pic16_popGet(AOP(left),2));
       pic16_emitpcode(POC_MOVWF,pic16_popCopyReg(&pic16_pc_tblptru));
   } else {
-    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),0), pic16_popCopyReg(&pic16_pc_tblptrl)));
-    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),1), pic16_popCopyReg(&pic16_pc_tblptrh)));
-    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(left),2), pic16_popCopyReg(&pic16_pc_tblptru)));
+    mov2fp(pic16_popCopyReg(&pic16_pc_tblptrl), AOP(left), 0);
+    mov2fp(pic16_popCopyReg(&pic16_pc_tblptrh), AOP(left), 1);
+    mov2fp(pic16_popCopyReg(&pic16_pc_tblptru), AOP(left), 2);
   }
 
   while(size--) {

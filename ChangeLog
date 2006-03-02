@@ -1,3 +1,17 @@
+2006-03-01 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genPcall,pic16_derefPtr,genGenPointerGet,
+	  genConstPointerGet): use safe way of generating MOVFF to cover
+	    literals as well as registers, fixes bug #1440527
+	* src/pic16/glue.c (pic16_printIvalBitFields): prevent NULL pointer
+	    dereference
+	  (pic16_printIvalUnion,pic16_isUnion): NEW, handle initialized unions
+	    more correctly, fixes bug #1232186
+	  (pic16_printIval): use pic16_printIvalUnion() for initialized unions
+	* src/pic16/main.c (_pic16_linkEdit): reorder linker arguments to make
+	    gplink guess the correct processor in more cases, applied patch
+	    from Till Riedel attached to and fixing bug #1436552
+
 2006-02-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* support/regression/tests/array.c: added, contains check for #1434401

@@ -639,6 +639,11 @@ extern set *linkOptionsSet;
 char *msprintf(hTab *pvals, const char *pformat, ...);
 int my_system(const char *cmd);
 
+/* forward declarations */   
+extern const char *pic16_linkCmd[];
+extern const char *pic16_asmCmd[];
+extern set *asmOptionsSet;
+  
 /* custom function to link objects */
 static void _pic16_linkEdit(void)
 {
@@ -655,9 +660,9 @@ static void _pic16_linkEdit(void)
   	 *
   	 */
   	 
-  	sprintf(lfrm, "{linker} {incdirs} {lflags} -o {outfile} {user_ofile} {spec_ofiles} {ofiles} {libs}");
-  	   	 
-  	shash_add(&linkValues, "linker", "gplink");
+  	sprintf(lfrm, "{linker} {incdirs} {lflags} -o {outfile} {user_ofile} {ofiles} {spec_ofiles} {libs}");
+
+  	shash_add(&linkValues, "linker", pic16_linkCmd[0]);
 
   	mergeSets(&tSet, libDirsSet);
   	mergeSets(&tSet, libPathsSet);
@@ -706,11 +711,6 @@ static void _pic16_linkEdit(void)
   		exit(1);
 }
 
-
-/* forward declarations */
-extern const char *pic16_linkCmd[];
-extern const char *pic16_asmCmd[];
-extern set *asmOptionsSet;
 
 static void
 _pic16_finaliseOptions (void)

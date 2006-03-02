@@ -809,6 +809,7 @@ void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *
     i <<= SPEC_BSTR (lsym->etype);
     ival |= i;
     if (! ( lsym->next &&
+          (lilist && lilist->next) &&
           (IS_BITFIELD(lsym->next->type)) &&
           (SPEC_BSTR(lsym->next->etype)))) break;
     lsym = lsym->next;
@@ -877,6 +878,55 @@ void pic16_printIvalStruct (symbol * sym, sym_link * type,
     werrorfl (sym->fileDef, sym->lineDef, W_EXCESS_INITIALIZERS, "struct", sym->name);
   }
   return;
+}
+
+/*-----------------------------------------------------------------*/
+/* printIvalUnion - generates initial value for unions             */
+/*-----------------------------------------------------------------*/
+void pic16_printIvalUnion (symbol * sym, sym_link * type,
+                 initList * ilist, char ptype, void *p)
+{
+  //symbol *sflds;
+  initList *iloop = NULL;
+  int i, size;
+
+
+#if DEBUG_PRINTIVAL
+  fprintf(stderr, "%s\n",__FUNCTION__);
+#endif
+
+  iloop = ilist;
+  i = 0;
+  while (iloop)
+  {
+    i++;
+    iloop = iloop->next;
+  } // while
+
+  size = -1;
+  if (type) size = SPEC_STRUCT(type)->size;
+
+  if (i == 1 && size >= 0 && size <= sizeof(long))
+  {
+    unsigned long val = (unsigned long)floatFromVal(list2val(ilist));
+    while (size--)
+    {
+      pic16_emitDB(val, ptype, p);
+      val >>= 8;
+    } // while
+    return;
+  } // if
+
+  fprintf( stderr, "INCOMPLETE SUPPORT FOR INITIALIZED union---FALLING BACK TO struct\n" );
+  fprintf( stderr, "This is a bug. Please file a bug-report with your source attached.\n" );
+  pic16_printIvalStruct( sym, type, ilist, ptype, p );
+}
+
+static int
+pic16_isUnion( symbol *sym, sym_link *type )
+{
+  if (type && SPEC_STRUCT(type)->type == UNION) return 1;
+  return 0;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1127,8 +1177,14 @@ void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptyp
   /* if structure then */
   if (IS_STRUCT (type))
     {
-//      fprintf(stderr,"%s struct\n",__FUNCTION__);
-      pic16_printIvalStruct (sym, type, ilist, ptype, p);
+      if (pic16_isUnion(sym, type))
+        {
+          //fprintf(stderr,"%s union\n",__FUNCTION__);
+          pic16_printIvalUnion (sym, type, ilist, ptype, p);
+	} else {
+          //fprintf(stderr,"%s struct\n",__FUNCTION__);
+          pic16_printIvalStruct (sym, type, ilist, ptype, p);
+        }
       return;
     }
 

@@ -7,12 +7,6 @@
 #include <tinibios.h> /* main() must see the ISR declarations */
 #endif
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
-#define _REENTRANT
-#else
-#define _REENTRANT reentrant
-#endif
-
 #if defined(SDCC_mcs51)
 /* until changed, isr's must have a prototype in the module containing main */
 void T2_isr (void) interrupt 5;
@@ -23,11 +17,13 @@ void T2_isr (void) interrupt 5;
 */
 //#define BROKEN_DIV_MOD		1
 
-void _putchar(char c);
-void _exitEmu(void);
+extern void _putchar(char c);
+extern void _initEmu(void);
+extern void _exitEmu(void);
 
 #if BROKEN_DIV_MOD
-int __div(int num, int denom)
+static int
+__div(int num, int denom)
 {
     int q = 0;
     while (num >= denom) {
@@ -37,7 +33,8 @@ int __div(int num, int denom)
     return q;
 }
 
-int __mod(int num, int denom)
+static int
+__mod(int num, int denom)
 {
     while (num >= denom) {
         num -= denom;
@@ -45,101 +42,120 @@ int __mod(int num, int denom)
     return num;
 }
 #else
-int __div(int num, int denom)
-{
-    return num/denom;
-}
-
-int __mod(int num, int denom)
-{
-    return num%denom;
-}
+#define __div(num, denom) ((num) / (denom))
+#define __mod(num, denom) ((num) % (denom))
 #endif
 
-static void _printn(int n) _REENTRANT
+static void
+_prints(const char *s)
 {
-    int rem;
+  char c;
 
-    if (n < 0) {
-        _putchar('-');
-        n = -n;
-    }
-
-    rem = __mod(n, 10);
-    if (rem != n) {
-        _printn(__div(n, 10));
-    }
-    _putchar('0' + rem);
+  while ('\0' != (c = *s)) {
+    _putchar(c);
+    ++s;
+  }
 }
 
-void __printf(const char *szFormat, ...) REENTRANT
+static void
+_printn(int n)
 {
-    va_list ap;
-    va_start(ap, szFormat);
+  if (0 == n) {
+    _putchar('0');
+  }
+  else {
+    char buf[6];
+    char *p = &buf[sizeof(buf) - 1];
+    char neg = 0;
 
-    while (*szFormat) {
-        if (*szFormat == '%') {
-            switch (*++szFormat) {
-            case 's': {
-                char *sz = va_arg(ap, char *);
-                while (*sz) {
-                    _putchar(*sz++);
-                }
-                break;
-            }
-            case 'u': {
-                int i = va_arg(ap, int);
-                _printn(i);
-                break;
-            }
-            case '%':
-                _putchar('%');
-                break;
-            default:
-                break;
-            }
-        }
-        else {
-            _putchar(*szFormat);
-        }
-        szFormat++;
+    buf[sizeof(buf) - 1] = '\0';
+
+    if (0 > n) {
+      n = -n;
+      neg = 1;
     }
-    va_end(ap);
+  
+    while (0 != n) {
+      *--p = '0' + __mod(n, 10);
+      n = __div(n, 10);
+    }
+
+    if (neg)
+      _putchar('-');
+
+    _prints(p);
+  }
 }
 
-int __numTests;
-int __numFailures;
+void
+__printf(const char *szFormat, ...)
+{
+  va_list ap;
+  va_start(ap, szFormat);
+
+  while (*szFormat) {
+    if (*szFormat == '%') {
+      switch (*++szFormat) {
+      case 's': {
+        char *sz = va_arg(ap, char *);
+        _prints(sz);
+        break;
+      }
+      case 'u': {
+        int i = va_arg(ap, int);
+        _printn(i);
+        break;
+      }
+      case '%':
+        _putchar('%');
+        break;
+      default:
+        break;
+      }
+    }
+    else {
+      _putchar(*szFormat);
+    }
+    szFormat++;
+  }
+  va_end(ap);
+}
+
+int __numTests = 0;
+static int __numFailures = 0;
 
 void
 __fail(const char *szMsg, const char *szCond, const char *szFile, int line)
 {
-    __printf("--- FAIL: \"%s\" on %s at %s:%u\n", szMsg, szCond, szFile, line);
-    __numFailures++;
+  __printf("--- FAIL: \"%s\" on %s at %s:%u\n", szMsg, szCond, szFile, line);
+  __numFailures++;
 }
 
 int
 main(void)
 {
-    TESTFUNP *cases;
-    int numCases = 0;
+  TESTFUNP *cases;
+  int numCases = 0;
 
-    __printf("--- Running: %s\n", getSuiteName());
+  _initEmu();
 
-    cases = suite();
+  __printf("--- Running: %s\n", getSuiteName());
 
-    while (*cases) {
-        __printf("Running %u\n", numCases);
-        (*cases)();
-        cases++;
-        numCases++;
-    }
+  cases = suite();
 
-    __printf("--- Summary: %u/%u/%u: %u failed of %u tests in %u cases.\n",
-           __numFailures, __numTests, numCases,
-           __numFailures, __numTests, numCases
-           );
+  while (*cases) {
+    __printf("Running %u\n", numCases);
+    (*cases)();
+    cases++;
+    numCases++;
+  }
 
-    _exitEmu();
+  __printf("--- Summary: %u/%u/%u: %u failed of %u tests in %u cases.\n",
+     __numFailures, __numTests, numCases,
+     __numFailures, __numTests, numCases
+     );
 
-    return 0;
+  _exitEmu();
+
+  return 0;
 }

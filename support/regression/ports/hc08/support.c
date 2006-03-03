@@ -9,6 +9,11 @@ _putchar(unsigned char c)
 }
 
 void
+_initEmu(void)
+{
+}
+
+void
 _exitEmu(void)
 {
   _asm

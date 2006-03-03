@@ -37,6 +37,11 @@ _putchar (char c)
 }
 
 void
+_initEmu (void)
+{
+}
+
+void
 _exitEmu (void)
 {
   _asm

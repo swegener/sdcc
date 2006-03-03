@@ -28,6 +28,11 @@ _putchar (char c)
 }
 
 void
+_initEmu (void)
+{
+}
+
+void
 _exitEmu (void)
 {
   while (!TI) /* wait for the last character to be transmitted */

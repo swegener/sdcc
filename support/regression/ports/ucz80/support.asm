@@ -5,5 +5,8 @@
 __putchar::
         jp      _putchar
 
+__initEmu::
+        ret
+
 __exitEmu::
         jp      _exit

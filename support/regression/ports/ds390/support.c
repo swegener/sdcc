@@ -31,6 +31,11 @@ _putchar (char c)
 }
 
 void
+_initEmu (void)
+{
+}
+
+void
 _exitEmu (void)
 {
   Serial0PutChar (' '); /* wait for the last character to be transmitted */

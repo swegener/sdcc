@@ -1,3 +1,22 @@
+2006-03-02 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/fwk/lib/testfwk.c,
+	  support/regression/fwk/include/testfwk.h: introduced function
+	  _prints(), nonrecursive _printn(), call _initEmu() from main()
+	* support/regression/ports/gbz80/support.asm,
+	  support/regression/ports/ucz80/support.asm,
+	  support/regression/ports/z80/support.asm,
+	  support/regression/ports/ds390/support.c,
+	  support/regression/ports/hc08/support.c,
+	  support/regression/ports/host/support.c,
+	  support/regression/ports/mcs51/support.c,
+	  support/regression/ports/xa51/support.c: added empty _initEmu()
+	  function
+	* support/regression/ports/pic16/gpsim.cmd,
+	  support/regression/ports/pic16/spec.mk,
+	  support/regression/ports/pic16/support.c,
+	  support/regression/Makefile.in: added pic16 regression test
+
 2006-03-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genPcall,pic16_derefPtr,genGenPointerGet,

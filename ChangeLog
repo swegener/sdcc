@@ -1,4 +1,12 @@
-2006-03-02 Borut Razem <borut.razem AT siol.net>
+2006-03-04 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/hc08/spec.mk: remove *.asm in traget
+	  _clean
+	* support/regression/tests/bug-524697.c: decreased array size for
+	  mcs51 to fit into the internal RAM
+	* support/regression/Makefile.in: a little bit more verbose
+
+2006-03-03 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/fwk/lib/testfwk.c,
 	  support/regression/fwk/include/testfwk.h: introduced function

@@ -115,6 +115,10 @@ test-hc08:
 test-xa51:
 	$(MAKE) test-port PORT=xa51
 
+# Helper rule for testing the pic16 port only(use gpsim simulator)
+test-pic16:
+	$(MAKE) test-port PORT=pic16
+
 ### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) test-port PORT=host
@@ -178,9 +182,11 @@ $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 # have been run.
 port-results: port-dirs $(PORT_RESULTS)
 	echo Summary for \'$(PORT)\': `cat $(PORT_RESULTS) | python collate-results.py`
+	echo
 
 port-dirs:
 	mkdir -p $(PORT_CASES_DIR) $(PORT_RESULTS_DIR)
+	echo Running $(PORT) regression tests
 
 test-port: port-results
 

@@ -2,9 +2,15 @@
  */
 #include <testfwk.h>
 
+#if defined(SDCC_mcs51)
+#define SZ_SIZE 89
+#else
+#define SZ_SIZE 90
+#endif
+
 typedef struct _Foo
 {
-  char sz[90];
+  char sz[SZ_SIZE];
 } Foo;
 
 typedef struct _Bar

@@ -40,5 +40,5 @@ $(PORTS_DIR)/$(PORT)/%$(OBJEXT): fwk/lib/%.c
 fwk/lib/timeout: fwk/lib/timeout.c
 
 _clean:
-	rm -f ports/$(PORT)/testfwk.asm ports/$(PORT)/*.lst ports/$(PORT)/*.rel ports/$(PORT)/*.sym
+	rm -f ports/$(PORT)/*.asm ports/$(PORT)/*.lst ports/$(PORT)/*.rel ports/$(PORT)/*.sym
 

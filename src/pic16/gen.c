@@ -3398,7 +3398,7 @@ static void genCall (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genPcall (iCode *ic)
 {
-  sym_link *ftype;
+  sym_link *fntype;
   int stackParms=0;
   symbol *retlbl = newiTempLabel(NULL);
   pCodeOp *pcop_lbl = pic16_popGetLabel(retlbl->key);

@@ -1,5 +1,6 @@
 2006-03-06 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
+	* src/pic16/gen.c (genPcall): fixed bug #1443644
 	* src/pic16/device.h (struct pic16_options_t): added 'int CATregs' flag
 	which dumps before the function entry point a data byte which represents
 	the number of the local variables used by the specified function, added

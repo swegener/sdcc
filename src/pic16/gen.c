@@ -3398,14 +3398,13 @@ static void genCall (iCode *ic)
 /*-----------------------------------------------------------------*/
 static void genPcall (iCode *ic)
 {
-  sym_link *ftype, *fntype;
+  sym_link *ftype;
   int stackParms=0;
   symbol *retlbl = newiTempLabel(NULL);
   pCodeOp *pcop_lbl = pic16_popGetLabel(retlbl->key);
   
     FENTRY;
 
-    ftype = OP_SYM_TYPE(IC_LEFT(ic));
     fntype = operandType( IC_LEFT(ic) )->next;
 
     /* if send set is not empty the assign */

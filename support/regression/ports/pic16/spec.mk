@@ -1,4 +1,4 @@
-# Port specification for the pic16 port running with uCsim
+# Port specification for the pic16 port running with gpsim
 
 # path to gpsim
 ifdef GPSIM_PATH
@@ -7,9 +7,9 @@ else
   GPSIM := gpsim
 endif
 
-SDCCFLAGS += -mpic16 -I$(SDCC_DIR)/device/include/pic16 --nostdinc --less-pedantic -Wl,-t255 -DREENTRANT=reentrant
+SDCCFLAGS += -mpic16 -pp18f452 -I$(SDCC_DIR)/device/include/pic16 --nostdinc --less-pedantic -Wl,-t255 -Wl,-q -DREENTRANT=reentrant
 LINKFLAGS = --nostdlib
-LINKFLAGS += libsdcc.lib libc18f.lib
+LINKFLAGS += libsdcc.lib libc18f.lib libm18f.lib
 LIBDIR = $(SDCC_DIR)/device/lib/build/pic16
 
 OBJEXT = .o

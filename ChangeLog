@@ -1,3 +1,8 @@
+2006-03-06 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/pic16/spec.mk: link with libm18f.lib,
+	  made the linker quiet
+
 2006-03-06 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/gen.c (genPcall): fixed bug #1443644

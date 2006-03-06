@@ -86,6 +86,23 @@ struct regs;
 #endif
 
 
+#ifdef WORDS_BIGENDIAN
+  #define _ENDIAN(x)  (3-x)
+#else
+  #define _ENDIAN(x)  (x)
+#endif
+
+
+#define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
+
+
+/***********************************************************************
+ * Extended Instruction Set/Indexed Literal Offset Mode                *
+ * Set this macro to enable code generation with the extended          *
+ * instruction set and the new Indexed Literal Offset Mode             *
+ ***********************************************************************/
+#define XINST   1
+
 /***********************************************************************
  *  PIC status bits - this will move into device dependent headers
  ***********************************************************************/

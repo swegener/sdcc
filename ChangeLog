@@ -1,3 +1,31 @@
+2006-03-06 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/device.h (struct pic16_options_t): added 'int CATregs' flag
+	which dumps before the function entry point a data byte which represents
+	the number of the local variables used by the specified function, added
+	'xinst' for initial support for Extended Instruction Support,
+	* src/pic16/gen.c (aopForSym, pic16_aopGet): beautifications,
+	(pic16_testStackOverflow): do not prefix GSTACK_TEST_NAME with
+	port->fun_prefix anymore (may change later),
+	(genFunction, genEndFunction): do not store/restore local registers for
+	_main (this should take care the --main-return command line option in
+	the future),
+	(genOr): removed some legacy pic-port instructions,
+	* src/pic16/genarith.c (genAddLit): re-enabled old code because
+	performing operations with SFR's causes data to be written more than
+	once to each SFR. Perhaps SFRs should be handled in special cases...
+	* src/pic16/glue.c: macros BIG_ENDIAN and BYTE_IN_LONG are moved to
+	pcode.h
+	* src/pic16/main.c (_process_pragma): stack bound checking did not take
+	into account for stack starting position,
+	(struct OPTIONS pic16_optionsTable): added command line argument
+	--extended or -y for Extended Instruction Support,
+	* src/pic16/ralloc.c (pic16_decodeOp): added case for FUNCTION,
+	(deassignLRs): *** perhaps the most important change, old 'for' code
+	(comented out for reference), didn't account for some registers which
+	were left marked 'not free' after a pointer operation. The change
+	reduces register usage a lot in some cases
+
 2006-03-04 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/hc08/spec.mk: remove *.asm in traget

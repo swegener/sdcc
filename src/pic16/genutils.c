@@ -448,6 +448,25 @@ void pic16_DumpOp(char *prefix, operand *op)
 
 }
 
+void pic16_DumpOpX(FILE *fp, char *prefix, operand *op)
+{
+  if(!op)return;
+    
+  fprintf(fp, "%s [", prefix);
+  fprintf(fp, "%s", IS_SYMOP(op)?"S":" ");
+  fprintf(fp, "%s", IS_VALOP(op)?"V":" ");
+  fprintf(fp, "%s", IS_TYPOP(op)?"T":" ");
+  fprintf(fp, "] ");
+
+  fprintf(fp, "isaddr:%d,", op->isaddr);
+  fprintf(fp, "isvolatile:%d,", op->isvolatile);
+  fprintf(fp, "isGlobal:%d,", op->isGlobal);
+  fprintf(fp, "isPtr:%d,", op->isPtr);
+  fprintf(fp, "isParm:%d,", op->isParm);
+  fprintf(fp, "isLit:%d\n", op->isLiteral);
+}  
+    
+
 void _debugf(char *f, int l, char *frm, ...)
 {
   va_list ap;

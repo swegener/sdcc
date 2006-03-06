@@ -107,7 +107,10 @@ typedef struct {
   unsigned long opt_flags;
   int gstack;
   unsigned int debgen;
+  int CATregs;
 } pic16_options_t;
+
+extern int xinst;
 
 #define STACK_MODEL_SMALL	(pic16_options.stack_model == 0)
 #define STACK_MODEL_LARGE	(pic16_options.stack_model == 1)

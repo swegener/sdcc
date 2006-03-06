@@ -35,13 +35,6 @@
 #include <string.h>
 
 
-#ifdef WORDS_BIGENDIAN
-  #define _ENDIAN(x)  (3-x)
-#else
-  #define _ENDIAN(x)  (x)
-#endif
-
-#define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
 
 extern symbol *interrupts[256];
 void pic16_printIval (symbol * sym, sym_link * type, initList * ilist, char ptype, void *p);
@@ -818,19 +811,19 @@ void pic16_printIvalBitFields(symbol **sym, initList **ilist, char ptype, void *
   switch (size) {
   case 1:
 	pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
-        break;
+	break;
 
   case 2:
 	pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
 	pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
-        break;
+    break;
 
   case 4: /* EEP: why is this db and not dw? */
 	pic16_emitDB(BYTE_IN_LONG(ival, 0), ptype, p);
 	pic16_emitDB(BYTE_IN_LONG(ival, 1), ptype, p);
 	pic16_emitDB(BYTE_IN_LONG(ival, 2), ptype, p);
 	pic16_emitDB(BYTE_IN_LONG(ival, 3), ptype, p);
-        break;
+    break;
   default:
 	/* VR - only 1,2,4 size long can be handled???? Why? */
   	fprintf(stderr, "%s:%d: unhandled case. Contact author.\n", __FILE__, __LINE__);
@@ -1516,13 +1509,16 @@ pic16initialComments (FILE * afile)
 {
 	initialComments (afile);
 	fprintf (afile, "; PIC16 port for the Microchip 16-bit core micros\n");
+	if(xinst)
+	  fprintf (afile, "; * Extended Instruction Set\n");
+	  
 	if(pic16_mplab_comp)
-		fprintf(afile, "; MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
+		fprintf(afile, "; * MPLAB/MPASM/MPASMWIN/MPLINK compatibility mode enabled\n");
 	fprintf (afile, iComments2);
 
 	if(options.debug) {
-		fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]\"\n",
-				SDCC_VERSION_STR, getBuildNumber() );
+		fprintf (afile, "\n\t.ident \"SDCC version %s #%s [pic16 port]%s\"\n",
+				SDCC_VERSION_STR, getBuildNumber(), (!xinst?"":" {extended}") );
 	}
 }
 

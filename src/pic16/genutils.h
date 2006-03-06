@@ -52,6 +52,7 @@ void pic16_DumpPcodeOp(char *prefix, pCodeOp *pcop);
 void pic16_DumpAop(char *prefix, asmop *aop);
 void pic16_DumpSymbol(char *prefix, symbol *sym);
 void pic16_DumpOp(char *prefix, operand *op);
+void pic16_DumpOpX(FILE *fp, char *prefix, operand *op);
 
 pCodeOp *pic16_popGetWithString(char *str);
 void pic16_callGenericPointerRW(int rw, int size);

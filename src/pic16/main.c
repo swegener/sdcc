@@ -62,6 +62,9 @@ static char *_pic16_keywords[] =
   "_naked",
   "shadowregs",
   "wparam",
+  "prodlp",
+  "prodhp",
+  "fsr0lp",
   "fixed16x16",
   
 //  "bit",
@@ -75,6 +78,8 @@ static char *_pic16_keywords[] =
 
 
 pic16_sectioninfo_t pic16_sectioninfo;
+
+int xinst=0;
 
 
 extern char *pic16_processor_base_name(void);
@@ -206,14 +211,10 @@ _process_pragma(const char *sz)
         stackLen = 64;
         fprintf(stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
                 filename, lineno-1, stackLen, stackLen);
-                        
-//      fprintf(stderr, "%s:%d setting stack to default size %d\n", __FILE__, __LINE__, stackLen);
       }
 
-//      fprintf(stderr, "Initializing stack pointer at 0x%x len 0x%x\n", stackPos, stackLen);
-
       /* check sanity of stack */
-      if ((stackPos >> 8) != ((stackPos+stackLen) >> 8)) {
+      if ((stackPos >> 8) != ((stackPos+stackLen-1) >> 8)) {
         fprintf (stderr, "%s:%u: warning: stack [0x%03X,0x%03X] crosses memory bank boundaries (not fully tested)\n",
 		filename,lineno-1, stackPos, stackPos+stackLen-1);
       }
@@ -477,6 +478,10 @@ OPTION pic16_optionsTable[]= {
 	{ 0,    OPTIMIZE_GOTO,  NULL,			"try to use (conditional) BRA instead of GOTO"},
 	{ 0,	OPTIMIZE_CMP,	NULL,			"try to optimize some compares"},
 	{ 0,	OPTIMIZE_DF,	NULL,			"thoroughly analyze data flow (memory and time intensive!)"},
+	{ 0,    "--num-func-alloc-regs", &pic16_options.CATregs, "dump number of temporary registers allocated for each function"},
+#if XINST
+	{ 'y',  "--extended",   &xinst, "enable Extended Instruction Set/Literal Offset Addressing mode"},
+#endif
 	{ 0,	NULL,		NULL,	NULL}
 	};
 
@@ -648,9 +653,9 @@ extern set *asmOptionsSet;
 static void _pic16_linkEdit(void)
 {
   hTab *linkValues=NULL;
-  char lfrm[256];
+  char lfrm[1024];
   char *lcmd;
-  char temp[128];
+  char temp[1024];
   set *tSet=NULL;
   int ret;
   
@@ -659,7 +664,6 @@ static void _pic16_linkEdit(void)
   	 * {linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}
   	 *
   	 */
-  	 
   	sprintf(lfrm, "{linker} {incdirs} {lflags} -o {outfile} {user_ofile} {ofiles} {spec_ofiles} {libs}");
 
   	shash_add(&linkValues, "linker", pic16_linkCmd[0]);
@@ -826,6 +830,7 @@ _pic16_setDefaultOptions (void)
   pic16_options.ip_stack = 1;		/* set to 1 to enable ipop/ipush for stack */
   pic16_options.gstack = 0;
   pic16_options.debgen = 0;
+  pic16_options.CATregs = 0;
 }
 
 static const char *

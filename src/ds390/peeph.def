@@ -11,7 +11,7 @@
 //        push %1
 //} by {
 //        ; Peephole 2     removed pop %1 push %1 (not push pop)
-//        mov  %2,%3 
+//        mov  %2,%3
 //}
 
 //
@@ -164,7 +164,7 @@ replace {
         clr  c
         mov  a,%1
 } by {
-        ; Peephole 106   removed redundant mov 
+        ; Peephole 106   removed redundant mov
         mov  %1,a
         clr  c
 }
@@ -276,7 +276,7 @@ replace {
 %3:
         jnz  %4
 } by {
-        ; Peephole 115   jump optimization 
+        ; Peephole 115   jump optimization
         cjne %1,%2,%3
         sjmp %4
 %3:
@@ -490,22 +490,22 @@ replace {
         jc   %1
 }
 
-replace { 
+replace {
         mov  r%1,@r%2
 } by {
         ; Peephole 130   changed target address mode r%1 to ar%1
         mov  ar%1,@r%2
 }
 
-replace { 
+replace {
         mov  a,%1
         subb a,#0x01
         mov  %2,a
         mov  %1,%2
 } by {
         ; Peephole 131   optimized decrement (not caring for c)
-        dec  %1         
-        mov  %2,%1      
+        dec  %1
+        mov  %2,%1
 }
 
 replace {
@@ -661,7 +661,7 @@ replace {
         clr  c
         addc a,%1
 } by {
-        ; Peephole 145   changed to add without carry  
+        ; Peephole 145   changed to add without carry
         add  a,%1
 }
 
@@ -1141,13 +1141,13 @@ replace {
 }
 
 replace {
-        add  a,#%1
-        mov  dpl,a
-        clr  a
-        addc a,#(%1 >> 8)
-        mov  dph,a
-        clr  a
-        movc a,@a+dptr
+	add  a,#%1
+	mov  dpl,a
+	clr  a
+	addc a,#(%1 >> 8)
+	mov  dph,a
+	clr  a
+	movc a,@a+dptr
 	mov  %2,a
 	inc  dptr
 	clr  a
@@ -1158,32 +1158,33 @@ replace {
 	movc a,@a+dptr
 	mov  %4,a
 	inc  dptr
-	clr  a	
+	clr  a
 } by {
-        ; Peephole 186.a   optimized movc sequence
-        mov  dptr,#%1
+	; Peephole 186.a   optimized movc sequence
+	mov  dptr,#%1
 	mov  b,acc
-        movc a,@a+dptr
+	movc a,@a+dptr
 	mov  %2,a
 	mov  acc,b
-	inc  dptr	
+	inc  dptr
 	movc a,@a+dptr
 	mov  %3,a
 	mov  acc,b
 	inc  dptr
+	movc a,@a+dptr
 	mov  %4,a
 	mov  acc,b
 	inc  dptr
 }
 
 replace {
-        add  a,#%1
-        mov  dpl,a
-        clr  a
-        addc a,#(%1 >> 8)
-        mov  dph,a
-        clr  a
-        movc a,@a+dptr
+	add  a,#%1
+	mov  dpl,a
+	clr  a
+	addc a,#(%1 >> 8)
+	mov  dph,a
+	clr  a
+	movc a,@a+dptr
 	mov  %2,a
 	inc  dptr
 	clr  a
@@ -1192,53 +1193,55 @@ replace {
 	inc  dptr
 	clr  a
 } by {
-        ; Peephole 186.b   optimized movc sequence
-        mov  dptr,#%1
+	; Peephole 186.b   optimized movc sequence
+	mov  dptr,#%1
 	mov  b,acc
-        movc a,@a+dptr
+	movc a,@a+dptr
 	mov  %2,a
 	mov  acc,b
-	inc  dptr	
+	inc  dptr
 	movc a,@a+dptr
 	mov  %3,a
 	mov  acc,b
-	inc  dptr	
+	inc  dptr
 }
 
 replace {
-        add  a,#%1
-        mov  dpl,a
-        clr  a
-        addc a,#(%1 >> 8)
-        mov  dph,a
-        clr  a
-        movc a,@a+dptr
+	add  a,#%1
+	mov  dpl,a
+	clr  a
+	addc a,#(%1 >> 8)
+	mov  dph,a
+	clr  a
+	movc a,@a+dptr
 	mov  %2,a
 	inc  dptr
 	clr  a
 } by {
-        ; Peephole 186.c   optimized movc sequence
-        mov  dptr,#%1
+	; Peephole 186.c   optimized movc sequence
+	mov  dptr,#%1
 	mov  b,acc
-        movc a,@a+dptr
+	movc a,@a+dptr
 	mov  %2,a
 	mov  acc,b
 	inc  dptr
 }
 
-replace {
-        add  a,#%1
-        mov  dpl,a
-        clr  a
-        addc a,#(%1 >> 8)
-        mov  dph,a
-        clr  a
-        movc a,@a+dptr
-} by {
-        ; Peephole 186   optimized movc sequence
-        mov  dptr,#%1
-        movc a,@a+dptr
-}
+// disabled due to bug #1434401
+//// char indexed access to: char code table[] = {4,3,2,1};
+//replace {
+//	add  a,#%1
+//	mov  dpl,a
+//	clr  a
+//	addc a,#(%1 >> 8)
+//	mov  dph,a
+//	clr  a
+//	movc a,@a+dptr
+//} by {
+//	; Peephole 186.d  optimized movc sequence
+//	mov  dptr,#%1
+//	movc a,@a+dptr
+//}
 
 replace {
         mov  r%1,%2
@@ -1480,14 +1483,14 @@ replace {
         cjne %5,%6,%3
         sjmp %7
 %3:
-        sjmp %8 
+        sjmp %8
 } by {
         ; Peephole 197.a optimized misc jump sequence
         jnz  %8
         mov  a,%4
         cjne %5,%6,%8
         sjmp %7
-;%3:     
+;%3:
 } if labelRefCount %3 2
 
 replace {
@@ -1667,8 +1670,8 @@ replace restart {
         push ar%1
         pop  ar%1
 } by {
-        ; Peephole 211   removed redundant push r%1 pop r%1  
-} 
+        ; Peephole 211   removed redundant push r%1 pop r%1
+}
 
 replace {
 	mov  a,_bp
@@ -1698,7 +1701,7 @@ replace {
 
 replace {
 	mov  %1,#(( %2 + %3 >> 8 ) ^ 0x80)
-} by {	
+} by {
 	; Peephole 213.c inserted fix
 	mov  %1,#((%2 + %3) >> 8)
 	xrl  %1,#0x80
@@ -1711,7 +1714,7 @@ replace  {
 } by {
 	; Peephole 214 reduced some extra movs
 	mov  %1,a
-	add  a,%2	
+	add  a,%2
 } if operandsNotSame
 
 replace {
@@ -1990,22 +1993,23 @@ replace {
 }
 
 
-replace {
-	add	a,#%2
-	mov	dpl,a
-	clr  a
-	addc	a,#(%2 >> 8)
-	mov	dph,a
-	clr  a
-	addc	a,#(%2 >> 16)
-	mov	dpx,a
-	clr	a
-	movc	a,@a+dptr
-} by {
-	; Peephole 227.a movc optimize
-	mov	dptr,#%2
-	movc	a,@a+dptr
-}
+// disabled due to bug #1434401
+//replace {
+//	add	a,#%2
+//	mov	dpl,a
+//	clr  a
+//	addc	a,#(%2 >> 8)
+//	mov	dph,a
+//	clr  a
+//	addc	a,#(%2 >> 16)
+//	mov	dpx,a
+//	clr	a
+//	movc	a,@a+dptr
+//} by {
+//	; Peephole 227.a movc optimize
+//	mov	dptr,#%2
+//	movc	a,@a+dptr
+//}
 
 replace {
 	mov	r%1,%2
@@ -2068,7 +2072,7 @@ replace {
 	mov	dpx,r%3
 	movx	a,@dptr
 	mov  	r%4,a
-	add  	a,#0x01	
+	add  	a,#0x01
 	mov  	r%5,a
 	mov  	dpl,r%1
 	mov  	dph,r%2
@@ -2081,7 +2085,7 @@ replace {
 	mov	dpx,r%3
 	movx	a,@dptr
 	mov  	r%4,a
-	add  	a,#0x01	
+	add  	a,#0x01
 	mov  	r%5,a
 	movx	@dptr,a
 }
@@ -2131,7 +2135,7 @@ replace {
 	mov  	r%4,a
 	movx	@dptr,a
 }
-	
+
 replace {
 	mov	r%1,dpl
 	mov	r%2,dph
@@ -2168,7 +2172,7 @@ replace {
         mov     r%4,a
         movx    @dptr,a
 }
-	
+
 replace {
         mov     dpl,r%1
         mov     dph,r%2
@@ -2215,7 +2219,7 @@ replace {
 	inc	dptr
 	mov	dps,#0
 }
-	
+
 replace {
 	mov	ar%1,r%2
 	mov	ar%3,r%1
@@ -2281,7 +2285,7 @@ replace {
 	inc	dps
 	mov	dptr,#%1
 	dec	dps
-} 
+}
 
 // 14 rules by Fiorenzo D. Ramaglia <fd.ramaglia@tin.it>
 
@@ -2423,7 +2427,7 @@ replace {
         mov     %2,%10
         mov     %3,%11
         mov     %4,%12
-        
+
         mov     %5,%13
         mov     %6,%14
         mov     %7,%15
@@ -2438,7 +2442,7 @@ replace {
         mov     %2,%10
         mov     %3,%11
         mov     %4,%12
-        
+
         mov     %5,%13
         mov     %6,%14
         mov     %7,%15
@@ -2452,7 +2456,7 @@ replace {
         mov     %2,%6
         mov     %3,%7
         mov     %4,%8
-        
+
         mov     %5,%1
         mov     %6,%2
         mov     %7,%3
@@ -2468,7 +2472,7 @@ replace {
 replace {
         mov     %1,%5
         mov     %2,%6
-        
+
         mov     %3,%7
         mov     %4,%8
 
@@ -2477,7 +2481,7 @@ replace {
 } by {
         mov     %1,%5
         mov     %2,%6
-        
+
         mov     %3,%7
         mov     %4,%8
         ;       Peephole 238.c  removed 2 redundant moves
@@ -2497,7 +2501,7 @@ replace {
         mov     %2,%5
         mov     %3,%6
         ;       Peephole 238.d  removed 3 redundant moves
-} if operandsNotSame6 %1 %2 %3 %4 %5 %6 
+} if operandsNotSame6 %1 %2 %3 %4 %5 %6
 
 // applies to f.e. ser_ir.asm
 replace {
@@ -2523,10 +2527,10 @@ replace {
         cjne    r%6,#%7,%3
         cjne    r%8,#%9,%3
         mov     a,#0x01
-        sjmp    %10      
-%3:     
+        sjmp    %10
+%3:
         clr     a
-%10:     
+%10:
 } by {
         ;       Peephole 241.a  optimized compare
         clr     a
@@ -2537,17 +2541,17 @@ replace {
         inc     a
 %3:
 %10:
-} 
+}
 
 // applies to f.e. time.c
 replace {
         cjne    r%1,#%2,%3
         cjne    r%4,#%5,%3
         mov     a,#0x01
-        sjmp    %6      
-%3:     
+        sjmp    %6
+%3:
         clr     a
-%6:     
+%6:
 } by {
         ;       Peephole 241.b  optimized compare
         clr     a
@@ -2556,16 +2560,16 @@ replace {
         inc     a
 %3:
 %6:
-} 
+}
 
 // applies to f.e. malloc.c
 replace {
         cjne    r%1,#%2,%3
         mov     a,#0x01
         sjmp    %4
-%3:     
+%3:
         clr     a
-%4:     
+%4:
 } by {
         ;       Peephole 241.c  optimized compare
         clr     a
@@ -2573,23 +2577,23 @@ replace {
         inc     a
 %3:
 %4:
-} 
+}
 
-// applies to f.e. j = (k!=0x1000); 
+// applies to f.e. j = (k!=0x1000);
 // with volatile idata long k;
 replace {
         cjne    @r%1,#%2,%3
-	inc	r%1	
+	inc	r%1
         cjne    @r%1,#%4,%3
-	inc	r%1	
+	inc	r%1
         cjne    @r%1,#%5,%3
-	inc	r%1	
+	inc	r%1
         cjne    @r%1,#%6,%3
         mov     a,#0x01
-        sjmp    %7      
-%3:     
+        sjmp    %7
+%3:
         clr     a
-%7:     
+%7:
 } by {
         ;       Peephole 241.d  optimized compare
         clr     a
@@ -2603,19 +2607,19 @@ replace {
         inc     a
 %3:
 %7:
-} 
+}
 
-// applies to f.e. j = (k!=0x1000); 
+// applies to f.e. j = (k!=0x1000);
 // with volatile idata int k;
 replace {
         cjne    @r%1,#%2,%3
-	inc	r%1	
+	inc	r%1
         cjne    @r%1,#%4,%3
         mov     a,#0x01
-        sjmp    %7      
-%3:     
+        sjmp    %7
+%3:
         clr     a
-%7:     
+%7:
 } by {
         ;       Peephole 241.e  optimized compare
         clr     a
@@ -2625,16 +2629,16 @@ replace {
         inc     a
 %3:
 %7:
-} 
+}
 
 // applies to f.e. vprintf.asm (--stack-auto)
 replace {
         cjne    @r%1,#%2,%3
         mov     a,#0x01
         sjmp    %7
-%3:     
+%3:
         clr     a
-%7:     
+%7:
 } by {
         ;       Peephole 241.f  optimized compare
         clr     a
@@ -2642,7 +2646,7 @@ replace {
         inc     a
 %3:
 %7:
-} 
+}
 
 // applies to f.e. scott-bool1.c
 replace {

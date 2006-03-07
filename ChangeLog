@@ -1,3 +1,9 @@
+2006-03-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/c8051f410.h: new SiLabs mcu
+	* src/ds390/peeph.def: disabled 186.d and 227.a as fix for #1434401
+	* support/regression/tests/array.c: added parenthesis, made arrays unsigned
+
 2006-03-06 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/pic16/spec.mk: link with libm18f.lib,
@@ -28,7 +34,7 @@
 	--extended or -y for Extended Instruction Support,
 	* src/pic16/ralloc.c (pic16_decodeOp): added case for FUNCTION,
 	(deassignLRs): *** perhaps the most important change, old 'for' code
-	(comented out for reference), didn't account for some registers which
+	(commented out for reference), didn't account for some registers which
 	were left marked 'not free' after a pointer operation. The change
 	reduces register usage a lot in some cases
 

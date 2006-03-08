@@ -34,4 +34,9 @@ const char *getSuiteName(void);
 # define pdata data
 #endif
 
+#if defined(SDCC_pic16)
+# define idata data
+# define xdata data
+#endif
+
 #endif

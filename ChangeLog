@@ -1,3 +1,8 @@
+2006-03-08 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/fwk/include/testfwk.h: added defines for xdata, idata
+	  for pic16
+
 2006-03-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug1409955.c: new, added

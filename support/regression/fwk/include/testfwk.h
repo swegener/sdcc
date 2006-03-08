@@ -22,4 +22,16 @@ const char *getSuiteName(void);
 
 #define UNUSED(_a)  if (_a) { }
 
+#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
+# define idata
+# define pdata
+# define xdata
+# define code
+#endif
+
+#if defined(SDCC_hc08)
+# define idata data
+# define pdata data
+#endif
+
 #endif

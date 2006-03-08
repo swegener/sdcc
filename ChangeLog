@@ -1,3 +1,26 @@
+2006-03-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug1409955.c: new, added
+	* src/mcs51/gen.h: changed asmop.freed:1 to asmop.allocated for tracking
+	* src/mcs51/gen.c (newAsmop): set asmop.allocated to 1,
+	  (aopForSym, aopOp): increment asmop.allocated if reused,
+	  (freeAsmop): decrement asmop.allocated and check for zero instead of
+	  using asmop.freed,
+	  (freeForBranchAsmop): use asmop.allocated instead of asmop.freed,
+	  (genNot, genCpl, genUminus, genMinus, genMult, genDiv, genMod, genCmpGt,
+	   genCmpLt, genAndOp, genOrOp, genAnd, genOr, genXor, genRRC, genRLC,
+	   genGetHbit, genGetAbit, genGetByte, genGetWord, genSwap,
+	   genLeftShiftLiteral, genLeftShift, genRightShiftLiteral,
+	   genSignedRightShift, genRightShift, genDataPointerGet,
+	   genPagedPointerGet, genFarPointerGet, genCodePointerGet,
+	   genGenPointerGet, genDataPointerSet, genAssign, genCast): free asmop's
+	    in reverse order from allocation,
+	  (genPlus, genCmpEq): free asmop's in reverse order from allocation and
+	    added swappedLR to keep track
+	* support/regression/fwk/include/testfwk.h: added defines for xdata, idata,
+	  pdata & code for GCC, z80, gbz80 & hc08
+	* support/regression/tests/zeropad.c: moved defines to testfwk.h
+
 2006-03-08 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/main.c (_hasNativeMulFor): fixed bug #1444425

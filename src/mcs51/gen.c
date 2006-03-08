@@ -472,6 +472,7 @@ newAsmop (short type)
 
   aop = Safe_calloc (1, sizeof (asmop));
   aop->type = type;
+  aop->allocated = 1;
   return aop;
 }
 
@@ -568,7 +569,10 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 
   /* if already has one */
   if (sym->aop)
-    return sym->aop;
+    {
+	  sym->aop->allocated++;
+      return sym->aop;
+    }
 
   /* assign depending on the storage class */
   /* if it is on the stack or indirectly addressable */
@@ -856,13 +860,17 @@ aopOp (operand * op, iCode * ic, bool result)
     }
 
   /* if already has a asmop then continue */
-  if (op->aop )
-    return;
+  if (op->aop)
+    {
+	  op->aop->allocated++;
+      return;
+    }
 
   /* if the underlying symbol has a aop */
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
     {
       op->aop = OP_SYMBOL (op)->aop;
+	  op->aop->allocated++;
       return;
     }
 
@@ -979,13 +987,13 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
   if (!aop)
     return;
 
-  if (aop->freed)
+  aop->allocated--;
+
+  if (aop->allocated)
     goto dealloc;
 
-  aop->freed = 1;
-
-  /* depending on the asmop type only three cases need work AOP_RO
-     , AOP_R1 && AOP_STK */
+  /* depending on the asmop type only three cases need work
+     AOP_R0, AOP_R1 & AOP_STK */
   switch (aop->type)
     {
     case AOP_R0:
@@ -1098,7 +1106,7 @@ freeForBranchAsmop (operand * op)
   if (!aop)
     return;
 
-  if (aop->freed)
+  if (!aop->allocated)
     return;
 
   switch (aop->type)
@@ -1809,8 +1817,8 @@ genNot (iCode * ic)
 
 release:
   /* release the aops */
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
 }
 
 
@@ -1877,8 +1885,8 @@ genCpl (iCode * ic)
 
 release:
   /* release the aops */
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
 }
 
 /*-----------------------------------------------------------------*/
@@ -1987,8 +1995,8 @@ genUminus (iCode * ic)
 
 release:
   /* release the aops */
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? 0 : 1));
 }
 
 /*-----------------------------------------------------------------*/
@@ -4229,6 +4237,7 @@ genPlus (iCode * ic)
   int size, offset = 0;
   int skip_bytes = 0;
   char *add = "add";
+  bool swappedLR = FALSE;
   operand *leftOp, *rightOp;
   operand * op;
 
@@ -4250,6 +4259,7 @@ genPlus (iCode * ic)
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);
       IC_LEFT (ic) = t;
+	  swappedLR = TRUE;
     }
 
   /* if both left & right are in bit
@@ -4294,7 +4304,7 @@ genPlus (iCode * ic)
   size = getDataSize (IC_RESULT (ic));
   leftOp = IC_LEFT(ic);
   rightOp = IC_RIGHT(ic);
-  op=IC_LEFT(ic);
+  op = IC_LEFT(ic);
 
   /* if this is an add for an array access
      at a 256 byte boundary */
@@ -4385,9 +4395,17 @@ genPlus (iCode * ic)
   adjustArithmeticResult (ic);
 
 release:
-  freeAsmop (IC_RIGHT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
+  if (!swappedLR)
+    {
+      freeAsmop (IC_RIGHT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+    }
+  else
+    {
+      freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (IC_RIGHT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -4701,9 +4719,9 @@ genMinus (iCode * ic)
   adjustArithmeticResult (ic);
 
 release:
+  freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
   freeAsmop (IC_RIGHT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
 }
 
 
@@ -4969,9 +4987,9 @@ genMult (iCode * ic)
   assert (0);
 
 release:
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5255,9 +5273,9 @@ genDiv (iCode * ic)
   /* should have been converted to function call */
   assert (0);
 release:
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5526,9 +5544,9 @@ genMod (iCode * ic)
   assert (0);
 
 release:
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5727,9 +5745,9 @@ genCmpGt (iCode * ic, iCode * ifx)
   sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
            (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
   /* assign the amsops */
+  aopOp (result, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
 
   genCmp (right, left, result, ifx, sign, ic);
 
@@ -5757,9 +5775,9 @@ genCmpLt (iCode * ic, iCode * ifx)
   sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
            (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
   /* assign the amsops */
+  aopOp (result, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
-  aopOp (result, ic, TRUE);
 
   genCmp (left, right, result, ifx, sign, ic);
 
@@ -5869,6 +5887,7 @@ gencjne (operand * left, operand * right, symbol * lbl)
 static void
 genCmpEq (iCode * ic, iCode * ifx)
 {
+  bool swappedLR = FALSE;
   operand *left, *right, *result;
 
   D(emitcode (";     genCmpEq",""));
@@ -5886,6 +5905,7 @@ genCmpEq (iCode * ic, iCode * ifx)
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);
       IC_LEFT (ic) = t;
+	  swappedLR = TRUE;
     }
 
   if (ifx && !AOP_SIZE (result))
@@ -6037,9 +6057,17 @@ genCmpEq (iCode * ic, iCode * ifx)
     }
 
 release:
-  freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (result, NULL, ic, TRUE);
+  if (!swappedLR)
+    {
+      freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+    }
+  else
+    {
+      freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+      freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -6137,9 +6165,9 @@ genAndOp (iCode * ic)
       outBitAcc (result);
     }
 
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 
@@ -6179,9 +6207,9 @@ genOrOp (iCode * ic)
       outBitAcc (result);
     }
 
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6651,9 +6679,9 @@ genAnd (iCode * ic, iCode * ifx)
     }
 
 release:
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6983,9 +7011,9 @@ genOr (iCode * ic, iCode * ifx)
     }
 
 release:
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7290,9 +7318,9 @@ genXor (iCode * ic, iCode * ifx)
     }
 
 release:
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7386,8 +7414,8 @@ genRRC (iCode * ic)
   emitcode ("mov", "acc.7,c");
  release:
   aopPut (result, "a", AOP_SIZE (result) - 1, isOperandVolatile (result, FALSE));
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7441,8 +7469,8 @@ genRLC (iCode * ic)
   emitcode ("mov", "acc.0,c");
  release:
   aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7474,8 +7502,8 @@ genGetHbit (iCode * ic)
       outAcc (result);
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7545,9 +7573,9 @@ genGetAbit (iCode * ic)
       outAcc (result);
     }
 
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7574,9 +7602,9 @@ genGetByte (iCode * ic)
           0,
           isOperandVolatile (result, FALSE));
 
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7607,9 +7635,9 @@ genGetWord (iCode * ic)
           1,
           isOperandVolatile (result, FALSE));
 
+  freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7674,8 +7702,8 @@ genSwap (iCode * ic)
       wassertl(FALSE, "unsupported SWAP operand size");
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 
@@ -8583,8 +8611,8 @@ genLeftShiftLiteral (operand * left,
           break;
         }
     }
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8693,8 +8721,8 @@ genLeftShift (iCode * ic)
   emitcode ("djnz", "b,%05d$", tlbl->key + 100);
   popB (pushedB);
 release:
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8933,8 +8961,8 @@ genRightShiftLiteral (operand * left,
           break;
         }
     }
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9044,8 +9072,8 @@ genSignedRightShift (iCode * ic)
   popB (pushedB);
 
 release:
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9169,8 +9197,8 @@ genRightShift (iCode * ic)
   popB (pushedB);
 
 release:
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9396,8 +9424,8 @@ genDataPointerGet (operand * left,
       aopPut (result, buffer, offset++, isOperandVolatile (result, FALSE));
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9633,10 +9661,9 @@ genPagedPointerGet (operand * left,
     }
 
   /* done */
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
   if (pi) pi->generated = 1;
-
 }
 
 /*--------------------------------------------------------------------*/
@@ -9747,8 +9774,8 @@ genFarPointerGet (operand * left,
       genIfxJump (ifx, "a", left, NULL, result);
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9809,8 +9836,8 @@ genCodePointerGet (operand * left,
       genIfxJump (ifx, "a", left, NULL, result);
     }
 
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -9861,9 +9888,8 @@ genGenPointerGet (operand * left,
       genIfxJump (ifx, "a", left, NULL, result);
     }
 
-
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (left, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -10097,8 +10123,8 @@ genDataPointerSet (operand * right,
                 aopGet (right, offset++, FALSE, FALSE));
     }
 
-  freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -10321,8 +10347,6 @@ genPagedPointerSet (operand * right,
   if (pi) pi->generated = 1;
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
-
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -10621,7 +10645,6 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
       aopPut (result, "a", --offset, isOperandVolatile (result, FALSE));
     }
   freeAsmop (result, NULL, ic, FALSE);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -10736,8 +10759,8 @@ genAssign (iCode * ic)
     }
 
 release:
-  freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -11021,9 +11044,8 @@ genCast (iCode * ic)
   /* we are done hurray !!!! */
 
 release:
-  freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
-
+  freeAsmop (right, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/

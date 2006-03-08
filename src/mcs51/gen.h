@@ -59,7 +59,7 @@ typedef struct asmop
     short size;			/* total size */
     unsigned code:1;		/* is in Code space */
     unsigned paged:1;		/* in paged memory  */
-    unsigned freed:1;		/* already freed    */
+    unsigned short allocated;	/* number of times allocated */
     union
       {
 	value *aop_lit;		/* if literal */

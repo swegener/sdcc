@@ -20,18 +20,6 @@
 typedef unsigned int size_t;
 #define offsetof(s,m)   (size_t)&(((s *)0)->m)
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
-# define idata
-# define pdata
-# define xdata
-# define code
-#endif
-
-#if defined(SDCC_hc08)
-# define idata data
-# define pdata data
-#endif
-
 const char *string1 = "\x00\x01";
 const char string2[] = "\x00\x01";
 

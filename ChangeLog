@@ -1,3 +1,7 @@
+2006-03-08 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/main.c (_hasNativeMulFor): fixed bug #1444425
+
 2006-03-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/c8051f410.h: new SiLabs mcu

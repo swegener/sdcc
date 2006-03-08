@@ -920,13 +920,17 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 	/* multiplication is fixed */
 	/* support mul for char/int/long */
 	if((ic->op == '*')
-	  && (getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 2))return TRUE;
+	  && (IS_SYMOP(IC_LEFT(ic)))
+	  && (getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 2))
+	    return TRUE;
 #endif
 
 #if 0
 	/* support div for char/int/long */
-	if((getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 0)
-		&& (ic->op == '/'))return TRUE;
+	if((ic->op == '/')
+	  && (IS_SYMOP(IC_LEFT(ic)))
+	  && (getSize(OP_SYMBOL(IC_LEFT(ic))->type ) < 0))
+	    return TRUE;
 #endif
 	
   return FALSE;

@@ -10,20 +10,24 @@
 #define _{type}
 
 
+#if defined(_bit) || defined(SDCC_hc08)
+#  define _data
+#else
+#  define _data idata
+#endif
+
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80) || defined(SDCC_hc08)
 #  define NO_BIT_TYPE
 #endif
 
 #if defined(_bit) && !defined(NO_BIT_TYPE)
 #  define MASK 1
-#  define idata
 #elif defined(_bit) && defined(NO_BIT_TYPE)
 #  if defined(PORT_HOST)
 #    define MASK 0xffffffff
 #  else
 #    define MASK 0xffff
 #  endif
-#  define idata
 #  define bit int
 #elif defined(_char)
 #  define MASK 0xff
@@ -35,23 +39,18 @@
 #  warning Unknown type
 #endif
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80) || defined(SDCC_hc08)
-#  define idata
-#  define code
-#endif
-
 /* the variable 'mask' is only defined to see if MASK is correctly set up */
-code unsigned long mask = MASK;
+const unsigned long mask = MASK;
 
       volatile          {type}  v;
       volatile unsigned {type} uv;
 /* an array would be nicer, but an array of bits isn't possible */
-idata                   {type}  a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 ,
-			        a10, a11, a12, a13, a14, a15, a16, a17, a18, a19,
-				a20;
-idata          unsigned {type} ua0, ua1, ua2, ua3, ua4, ua5, ua6;
-idata                   {type}  b;
-idata volatile unsigned {type} ub = 0xbe;
+_data                   {type}  a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 ,
+                                a10, a11, a12, a13, a14, a15, a16, a17, a18, a19,
+                                a20;
+_data          unsigned {type} ua0, ua1, ua2, ua3, ua4, ua5, ua6;
+_data                   {type}  b;
+_data volatile unsigned {type} ub = 0xbe;
 
 void
 testcse(void)

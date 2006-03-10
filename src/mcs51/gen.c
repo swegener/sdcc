@@ -810,6 +810,24 @@ operandsEqu (operand * op1, operand * op2)
 }
 
 /*-----------------------------------------------------------------*/
+/* sameReg - two asmops have the same register at given offsets    */
+/*-----------------------------------------------------------------*/
+static bool
+sameReg (asmop * aop1, int off1, asmop * aop2, int off2)
+{
+  if (aop1->type != AOP_REG && aop1->type != AOP_CRY)
+    return FALSE;
+
+  if (aop1->type != aop2->type)
+    return FALSE;
+
+  if (aop1->aopu.aop_reg[off1] != aop2->aopu.aop_reg[off2])
+    return FALSE;
+
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
 /* sameRegs - two asmops have the same registers                   */
 /*-----------------------------------------------------------------*/
 static bool
@@ -830,8 +848,7 @@ sameRegs (asmop * aop1, asmop * aop2)
     return FALSE;
 
   for (i = 0; i < aop1->size; i++)
-    if (aop1->aopu.aop_reg[i] !=
-        aop2->aopu.aop_reg[i])
+    if (aop1->aopu.aop_reg[i] != aop2->aopu.aop_reg[i])
       return FALSE;
 
   return TRUE;
@@ -2593,11 +2610,11 @@ static void genSend(set *sendSet)
   for (sic = setFirstItem (sendSet); sic;
        sic = setNextItem (sendSet))
     {
-      aopOp (IC_LEFT (sic), sic, FALSE);
-
       if (sic->argreg > 12)
         {
           int bit = sic->argreg-13;
+
+          aopOp (IC_LEFT (sic), sic, FALSE);
 
           /* if left is a literal then
              we know what the value is */
@@ -2625,8 +2642,9 @@ static void genSend(set *sendSet)
             }
           bit_count++;
           BitBankUsed = 1;
+
+          freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
         }
-      freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
     }
 
   if (bit_count)
@@ -2639,30 +2657,33 @@ static void genSend(set *sendSet)
   for (sic = setFirstItem (sendSet); sic;
        sic = setNextItem (sendSet))
     {
-      int size, offset = 0;
-      aopOp (IC_LEFT (sic), sic, FALSE);
-      size = AOP_SIZE (IC_LEFT (sic));
+      if (sic->argreg <= 12)
+        {
+          int size, offset = 0;
+          aopOp (IC_LEFT (sic), sic, FALSE);
+          size = AOP_SIZE (IC_LEFT (sic));
 
-      if (sic->argreg == 1)
-        {
-          while (size--)
+          if (sic->argreg == 1)
             {
-              char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
-              if (strcmp (l, fReturn[offset]))
-                  emitcode ("mov", "%s,%s", fReturn[offset], l);
-              offset++;
+              while (size--)
+                {
+                  char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
+                  if (strcmp (l, fReturn[offset]))
+                      emitcode ("mov", "%s,%s", fReturn[offset], l);
+                  offset++;
+                }
             }
-        }
-      else if (sic->argreg <= 12)
-        {
-          while (size--)
+          else
             {
-              emitcode ("mov","%s,%s", rb1regs[sic->argreg+offset-5],
-                        aopGet (IC_LEFT (sic), offset,FALSE, FALSE));
-              offset++;
+              while (size--)
+                {
+                  emitcode ("mov","%s,%s", rb1regs[sic->argreg+offset-5],
+                            aopGet (IC_LEFT (sic), offset,FALSE, FALSE));
+                  offset++;
+                }
             }
+          freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
         }
-      freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);
     }
 }
 
@@ -8771,59 +8792,89 @@ static void
 shiftRLong (operand * left, int offl,
             operand * result, int sign)
 {
-  int isSameRegs = sameRegs (AOP (left), AOP (result));
+  bool useSameRegs = regsInCommon (left, result);
 
-  if (isSameRegs && offl>1) {
-    // we are in big trouble, but this shouldn't happen
-    werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
-  }
+  if (useSameRegs && offl>1)
+    {
+      // we are in big trouble, but this shouldn't happen
+      werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
+    }
 
   MOVA (aopGet (left, MSB32, FALSE, FALSE));
 
-  if (offl==MSB16) {
-    // shift is > 8
-    if (sign) {
-      emitcode ("rlc", "a");
-      emitcode ("subb", "a,acc");
-      if (isSameRegs)
-        emitcode ("xch", "a,%s", aopGet (left, MSB32, FALSE, FALSE));
-      else {
-        aopPut (result, "a", MSB32, isOperandVolatile (result, FALSE));
-        MOVA (aopGet (left, MSB32, FALSE, FALSE));
-      }
-    } else {
-      aopPut (result, zero, MSB32, isOperandVolatile (result, FALSE));
-    }
-  }
-
-  if (!sign) {
-    emitcode ("clr", "c");
-  } else {
-    emitcode ("mov", "c,acc.7");
-  }
-
-  emitcode ("rrc", "a");
-
-  if (isSameRegs && offl==MSB16) {
-    emitcode ("xch", "a,%s",aopGet (left, MSB24, FALSE, FALSE));
-  } else {
-    aopPut (result, "a", MSB32-offl, isOperandVolatile (result, FALSE));
-    MOVA (aopGet (left, MSB24, FALSE, FALSE));
-  }
-
-  emitcode ("rrc", "a");
-  if (isSameRegs && offl==1) {
-    emitcode ("xch", "a,%s",aopGet (left, MSB16, FALSE, FALSE));
-  } else {
-    aopPut (result, "a", MSB24-offl, isOperandVolatile (result, FALSE));
-    MOVA (aopGet (left, MSB16, FALSE, FALSE));
-  }
-  emitcode ("rrc", "a");
-  aopPut (result, "a", MSB16 - offl, isOperandVolatile (result, FALSE));
-
-  if (offl == LSB)
+  if (offl==MSB16)
     {
-      MOVA (aopGet (left, LSB, FALSE, FALSE));
+      // shift is > 8
+      if (sign)
+	    {
+          emitcode ("rlc", "a");
+          emitcode ("subb", "a,acc");
+          if (useSameRegs && sameReg (AOP (left), MSB32, AOP (result), MSB32))
+		    {
+              emitcode ("xch", "a,%s", aopGet (left, MSB32, FALSE, FALSE));
+		    }
+          else
+		    {
+              aopPut (result, "a", MSB32, isOperandVolatile (result, FALSE));
+              MOVA (aopGet (left, MSB32, FALSE, FALSE));
+		    }
+	    }
+	  else
+	    {
+          aopPut (result, zero, MSB32, isOperandVolatile (result, FALSE));
+	    }
+    }
+
+  if (!sign)
+    {
+      emitcode ("clr", "c");
+    }
+  else
+    {
+      emitcode ("mov", "c,acc.7");
+    }
+
+  emitcode ("rrc", "a");
+
+  if (useSameRegs && offl==MSB16 &&
+      sameReg (AOP (left), MSB24, AOP (result), MSB32-offl))
+    {
+      emitcode ("xch", "a,%s",aopGet (left, MSB24, FALSE, FALSE));
+    }
+  else
+    {
+      aopPut (result, "a", MSB32-offl, isOperandVolatile (result, FALSE));
+      MOVA (aopGet (left, MSB24, FALSE, FALSE));
+    }
+
+  emitcode ("rrc", "a");
+  if (useSameRegs && offl==1 &&
+      sameReg (AOP (left), MSB16, AOP (result), MSB24-offl))
+    {
+      emitcode ("xch", "a,%s",aopGet (left, MSB16, FALSE, FALSE));
+    }
+  else
+    {
+      aopPut (result, "a", MSB24-offl, isOperandVolatile (result, FALSE));
+      MOVA (aopGet (left, MSB16, FALSE, FALSE));
+    }
+  emitcode ("rrc", "a");
+  if (offl != LSB)
+    {
+      aopPut (result, "a", MSB16 - offl, isOperandVolatile (result, FALSE));
+    }
+  else
+    {
+      if (useSameRegs &&
+          sameReg (AOP (left), LSB, AOP (result), MSB16-offl))
+        {
+          emitcode ("xch", "a,%s",aopGet (left, LSB, FALSE, FALSE));
+        }
+      else
+        {
+          aopPut (result, "a", MSB16 - offl, isOperandVolatile (result, FALSE));
+          MOVA (aopGet (left, LSB, FALSE, FALSE));
+	    }
       emitcode ("rrc", "a");
       aopPut (result, "a", LSB, isOperandVolatile (result, FALSE));
     }

@@ -3057,7 +3057,7 @@ geniCodeLogic (operand * left, operand * right, int op)
         }
     }
 
-  ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_NONE, 0);
+  ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_BIT, 0);
 
   ic = newiCode (op, left, right);
   IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);

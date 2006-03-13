@@ -1,3 +1,8 @@
+2006-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (geniCodeLogic),
+	* src/SDCCast.c (decorateType): applied patch by Bernhard for rfe 1422617
+
 2006-03-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (sameReg): new, checks if two aop regs are the same,

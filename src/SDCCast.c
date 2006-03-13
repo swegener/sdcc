@@ -3992,7 +3992,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = newCharLink ();
+      TTYPE (tree) = TETYPE (tree) = newBoolLink ();
       return tree;
 
       /*------------------------------------------------------------------*/

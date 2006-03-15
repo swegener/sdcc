@@ -1280,12 +1280,24 @@ compStructSize (int su, structdef * sdef)
                     bitOffset += loop->bitVar;
                 } 
                 else {
-                    /* does not fit; need to realign first */
-                    sum++;
-                    loop->offset = (su == UNION ? sum = 0 : sum);
-                    bitOffset = 0;
-                    SPEC_BSTR (loop->etype) = bitOffset;
-                    bitOffset += loop->bitVar;
+					if( TARGET_IS_PIC16 && getenv("PIC16_PACKED_BITFIELDS") ) {
+						/* if PIC16 && enviroment variable is set, then
+						 * tightly pack bitfields, this means that when a
+						 * bitfield goes beyond byte alignment, do not
+						 * automatically start allocatint from next byte,
+						 * but also use the available bits first */
+						fprintf(stderr, ": packing bitfields in structures\n");
+						SPEC_BSTR (loop->etype) = bitOffset;
+						bitOffset += loop->bitVar;
+						loop->offset = (su == UNION ? sum = 0 : sum);
+					} else {
+						/* does not fit; need to realign first */
+	                    sum++;
+    	                loop->offset = (su == UNION ? sum = 0 : sum);
+        	            bitOffset = 0;
+            	        SPEC_BSTR (loop->etype) = bitOffset;
+                	    bitOffset += loop->bitVar;
+                	}
                 }
                 while (bitOffset>8) {
                     bitOffset -= 8;

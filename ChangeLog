@@ -1,3 +1,31 @@
+2006-03-14 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/.version: increased version number to 2.5.5
+	* src/SDCCmain.c (linkEdit): do not test for PIC16 target since, PIC16
+	linking is done manually in pic16 port's _linkEdit,
+	* src/SDCCsymt.c (compStructSize): for target PIC16 and shell variable
+	PIC16_PACKED_BITFIELDS, compact bitfield structures as much as possible,
+	* src/pic16/gen.c (aopForSym): when direct register name is WREG then
+	allocate asmop as AOP_ACC,
+	(aopForRemat): added parameter 'bool result' in function declaration,
+	(pic16_aopGet): return AOP_ACC when accessing WREG,
+	(pic16_popGetTempReg): minor modification,
+	(pic16_popRegFromIdx): first try with 'pic16_regWithIdx' then with
+	'pic16_allocWithIdx',
+	(genPcall): removed ftype, usage of OP_SYM_TYPE asserted error when
+	calling function in absolute addresses,
+	(genAssign): take into account AOP_ACC asmop,
+	* src/pic16/pcode.c (pic16_newpCodeOpReg): minor modifications,
+	* src/pic16/pcoderegs.c: some debug functions and lines added,
+	* src/pic16/ralloc.c (decodeRegType): added but commented out,
+	* (pic16_typeRegWithIdx): search 'pic16_dynInternalRegs' for given
+	register too,
+	* (pic16_findFreeReg, pic16_findFreeRegNext): allocate new register via
+	call to allocReg, not by manually allocating a new one,
+	(pic16_assignRegisters): now before going through the register
+	allocating functions mark all registers as free. This eliminates some
+	side effects resulting from peephole parser done earlier in the backbone
+
 2006-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (geniCodeLogic),

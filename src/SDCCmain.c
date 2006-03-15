@@ -1786,7 +1786,7 @@ linkEdit (char **envp)
       set *tempSet=NULL, *libSet=NULL;
 
       strcpy(buffer3, linkerScriptFileName);
-      if(TARGET_IS_PIC16 || TARGET_IS_PIC) {
+      if(/*TARGET_IS_PIC16 ||*/ TARGET_IS_PIC) {
 
          /* use $l to set the linker include directories */
          tempSet = appendStrSet(libDirsSet, "-I\"", "\"");

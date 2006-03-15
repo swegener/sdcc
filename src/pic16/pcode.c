@@ -4244,26 +4244,28 @@ pCodeOp *pic16_newpCodeOpBit_simple (struct asmop *op, int offs, int bit)
 pCodeOp *pic16_newpCodeOpReg(int rIdx)
 {
   pCodeOp *pcop;
+  regs *r;
 
   pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
 
   pcop->name = NULL;
 
   if(rIdx >= 0) {
-    PCOR(pcop)->rIdx = rIdx;
-    PCOR(pcop)->r = pic16_regWithIdx(rIdx);
+	r = pic16_regWithIdx(rIdx);
+	if(!r)
+		r = pic16_allocWithIdx(rIdx);
   } else {
-    PCOR(pcop)->r = pic16_findFreeReg(REG_GPR);
+    r = pic16_findFreeReg(REG_GPR);
 
-    if(PCOR(pcop)->r)
-      PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
-    else {
+    if(!r) {
     	fprintf(stderr, "%s:%d Could not find a free GPR register\n",
 	    	__FUNCTION__, __LINE__);
 	exit(-1);
     }
   }
 
+  PCOR(pcop)->rIdx = rIdx;
+  PCOR(pcop)->r = r;
   pcop->type = PCOR(pcop)->r->pc_type;
 
   return pcop;
@@ -5932,7 +5934,7 @@ static void AnalyzepBlock(pBlock *pb)
       }
       if(PCI(pc)->pcop->type == PO_GPR_REGISTER) {
 	if(PCOR(PCI(pc)->pcop)->r) {
-	  pic16_allocWithIdx (PCOR(PCI(pc)->pcop)->r->rIdx);
+	  pic16_allocWithIdx(PCOR(PCI(pc)->pcop)->r->rIdx);			/* FIXME! - VR */
 	  DFPRINTF((stderr,"found register in pblock: reg 0x%x\n",PCOR(PCI(pc)->pcop)->r->rIdx));
 	} else {
 	  if(PCI(pc)->pcop->name)

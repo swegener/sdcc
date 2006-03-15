@@ -37,6 +37,11 @@
 #include "pcoderegs.h"
 #include "pcodeflow.h"
 
+
+#define DEBUG_REMOVE1PCODE	0
+#define HAVE_DBGREGUSAGE	0
+
+
 extern void pic16_pCodeInsertAfter(pCode *pc1, pCode *pc2);
 extern pCode * pic16_findPrevInstruction(pCode *pci);
 extern pBranch * pic16_pBranchAppend(pBranch *h, pBranch *n);
@@ -66,7 +71,8 @@ void AddRegToFlow(regs *reg, pCodeFlow *pcfl)
 /*-----------------------------------------------------------------*
  * 
  *-----------------------------------------------------------------*/
-#if 0
+
+#if HAVE_DBGREGUSAGE
 static void dbg_regusage(set *fregs)
 {
   regs *reg;
@@ -119,13 +125,13 @@ static void dbg_regusage(set *fregs)
     }
   }
 }
-#endif
 
 /*-----------------------------------------------------------------*
  * 
  *-----------------------------------------------------------------*/
-#if 0
-static void dbg_dumpregusage(void)
+
+//static
+void dbg_dumpregusage(void)
 {
 
   fprintf(stderr,"***  Register Usage  ***\n");
@@ -187,7 +193,9 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
       if(PCC_REGISTER & PCI(pc)->outCond)
 	addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
 
-      addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+	addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+
+//    reg->wasUsed=1;
 
 #if 1
 	/* check to see if this pCode has 2 memory operands,
@@ -205,6 +213,8 @@ static void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 					addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
 			
 				addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+				
+//				reg->wasUsed=1;
 			}
 	}
 #endif
@@ -254,7 +264,9 @@ void pic16_pCodeRegMapLiveRanges(pBlock *pb)
   }
 #endif
 
-//  dbg_dumpregusage();
+#if HAVE_DBGREGUSAGE
+  dbg_dumpregusage();
+#endif
 
 }
 
@@ -271,7 +283,7 @@ static void Remove1pcode(pCode *pc, regs *reg)
 
   deleteSetItem (&(reg->reglives.usedpCodes),pc);
 
-#if 0
+#if DEBUG_REMOVE1PCODE
   fprintf(stderr,"removing instruction:\n");
   pc->print(stderr,pc);
 #endif
@@ -289,10 +301,12 @@ static void Remove1pcode(pCode *pc, regs *reg)
 
     if(pcn) {
       if(PCI(pcn)->cline) {
-#if 0
+
+#if DEBUG_REMOVE1PCODE
 	fprintf(stderr, "source line has been optimized completely out\n");
 	pc->print(stderr,pc);
 #endif
+
       } else {
 	PCI(pcn)->cline = PCI(pc)->cline;
       }
@@ -324,7 +338,7 @@ static void  RemoveRegsFromSet(set *regset)
 
       if(used == 0) {
 
-//	fprintf(stderr,"%s:%d: getting rid of reg %s\n",__FILE__, __LINE__, reg->name);
+//  fprintf(stderr,"%s:%d: getting rid of reg %s\n",__FILE__, __LINE__, reg->name);
 
 	reg->isFree = 1;
 	reg->wasUsed = 0;

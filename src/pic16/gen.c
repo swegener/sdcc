@@ -856,7 +856,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
 			aop->size = getSize(sym->type);		/* should always be 1 */
 			assert(aop->size == 1);
 			DEBUGpic16_emitcode(";","%d sym->rname (AOP_ACC) = %s, size = %d",__LINE__,sym->rname,aop->size);
-			reutn (aop);
+			return (aop);
 		} else {
 			sym->aop = aop = newAsmop (AOP_DIR);
 	        aop->aopu.aop_dir = sym->rname ;
@@ -2031,8 +2031,8 @@ pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst, int noalloc)
 /*-----------------------------------------------------------------*/
 pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 {
-  //char *s = buffer ;
-  char *rs;
+//  char *s = buffer ;
+//  char *rs;
   pCodeOp *pcop;
 
 	FENTRY2;
@@ -2092,7 +2092,7 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 
 				PCOR(pcop)->instance = offset;
 				pcop->type = PCOR(pcop)->r->pc_type;
-				DEBUGpic16_emitcode(";","%d register idx = %d name =%s",__LINE__,rIdx,rs);
+//				DEBUGpic16_emitcode(";","%d register idx = %d name =%s",__LINE__,rIdx,rs);
 				return pcop;
 
 
@@ -2131,8 +2131,8 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 	pcop->type = PCOR(pcop)->r->pc_type;
 	
 	DEBUGpic16_emitcode(";*+*", "%d\tAOP_REG type = %s", __LINE__, dumpPicOptype(pcop->type));
-	rs = aop->aopu.aop_reg[offset]->name;
-	DEBUGpic16_emitcode(";","%d register idx = %d name = %s",__LINE__,rIdx,rs);
+//	rs = aop->aopu.aop_reg[offset]->name;
+//	DEBUGpic16_emitcode(";","%d register idx = %d name = %s",__LINE__,rIdx,rs);
 	return pcop;
       }
 

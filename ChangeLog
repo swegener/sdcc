@@ -1,3 +1,11 @@
+2006-03-16 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/genarith.c (genAddLit): simplified and fixed case where
+	  the left operand is shorter than the result (c* = lit-c* + int),
+	  fixes bug #1450796
+	* src/pic16/gen.c (genRightShift): check IS_SYMOP before accessing
+	  OP_SYMBOL
+
 2006-03-14 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/.version: increased version number to 2.5.5

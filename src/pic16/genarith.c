@@ -654,7 +654,6 @@ static void genAddLit (iCode *ic, int lit)
 
 	} 
       } 
-    }
 
 */
     }
@@ -716,30 +715,21 @@ static void genAddLit (iCode *ic, int lit)
       //pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),0,FALSE,FALSE));
       emitMOVWF(result,0);
       while(--size) {
-      
 	lit >>= 8;
-	if(lit & 0xff) {
-	  if(clear_carry) {
-	    /* The ls byte of the lit must've been zero - that 
-	       means we don't have to deal with carry */
-
-	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
-	    pic16_emitpcode(POC_ADDFW,  pic16_popGet(AOP(left),offset));
-	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
-
-	    clear_carry = 0;
-
-	  } else {
-	    pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
-	    pic16_emitpcode(POC_ADDFWC, pic16_popGet(AOP(left),offset));
-	    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
-	  }
-
+	pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0xff));
+	if (offset < AOP_SIZE(left)) {
+	  pic16_emitpcode(clear_carry ? POC_ADDFW : POC_ADDFWC, pic16_popGet(AOP(left),offset));
+	  pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset));
 	} else {
-	  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),offset));
-	  pic16_mov2w(AOP(left),offset);
-	  pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result),offset));
+	  pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result),offset));
+	  if (!SPEC_USIGN(operandType(IC_LEFT(ic)))) {
+	    /* sign-extend left (in result) */
+            pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit_simple(AOP(left),AOP_SIZE(left)-1,7));
+	    pic16_emitpcode(POC_SETF, pic16_popGet(AOP(result),offset));
+	  }
+	  pic16_emitpcode(clear_carry ? POC_ADDWF : POC_ADDWFC, pic16_popGet(AOP(result),offset));
 	}
+	clear_carry = 0;
 	offset++;
       }
     }

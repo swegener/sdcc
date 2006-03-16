@@ -10511,10 +10511,10 @@ static void genRightShift (iCode *ic) {
 /* load FSR0 with address of/from op according to is_LitOp() or if lit is 1 */
 void pic16_loadFSR0(operand *op, int lit)
 {
-  if(OP_SYMBOL(op)->remat || is_LitOp( op )) {
+  if((IS_SYMOP(op) && OP_SYMBOL(op)->remat) || is_LitOp( op )) {
     pic16_emitpcode(POC_LFSR, pic16_popGetLit2(0, pic16_popGet(AOP(op), 0)));
   } else {
-    assert (!OP_SYMBOL(op)->remat);
+    assert (!IS_SYMOP(op) || !OP_SYMBOL(op)->remat);
     // set up FSR0 with address of result
     pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(op),0), pic16_popCopyReg(&pic16_pc_fsr0l)));
     pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(op),1), pic16_popCopyReg(&pic16_pc_fsr0h)));

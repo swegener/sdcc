@@ -124,7 +124,7 @@ public:
   cl_console(int portnumber, class cl_app *the_app);
 #endif
   virtual ~cl_console(void);
-  virtual class cl_console *cl_console::clone_for_exec(char *fin);
+  virtual class cl_console *clone_for_exec(char *fin);
   virtual int init(void);
 
   virtual bool accept_last(void);

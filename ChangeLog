@@ -1,3 +1,10 @@
+2006-03-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* sim/ucsim/cmd.src/newcmdcl.h: applied patch fixing GCC 4.1 build
+	submitted by the Debian SDCC maintainer Aurelien Jarno: 
+	"Credits goes to Martin Michlmayr, who rebuilt the whole Debian
+	archive with gcc 4.1 on mips and wrote the patch"
+
 2006-03-16 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/genarith.c (genAddLit): simplified and fixed case where

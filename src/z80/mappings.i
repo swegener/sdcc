@@ -7,6 +7,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "functionlabeldef", "%s:" },
     { "*hl", "(hl)" },
     { "di", "di" },
+    { "ei", "ei" },
     { "ldahli", "ld a,(hl+)" },
     { "ldahlsp", "lda hl,%d(sp)" },
     { "ldaspsp", "lda sp,%d(sp)" },
@@ -64,6 +65,7 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
     { "*iyx", "%d(iy)" },
     { "*hl", "(hl)" },
     { "di", "di" },
+    { "ei", "ei" },
     { "ldahli", 
 		"ld a,(hl)\n"
 		"\tinc\thl" },
@@ -193,6 +195,7 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
       "\tpop af"
     },
     { "di", "di" },
+    { "ei", "ei" },
     { "adjustsp", "add sp,-%d" },
     { "enter", "" },
     { "enterx", "add sp,-%d"
@@ -284,6 +287,7 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
       "\tpop af"
     },
     { "di", "di" },
+    { "ei", "ei" },
     { "adjustsp", "add sp,-%d" },
     { "enter", "" },
     { "enterx", "add sp,-%d"
@@ -361,6 +365,7 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
     { "*iyx", "(iy%+d)" },
     { "*hl", "(hl)" },
     { "di", "di" },
+    { "ei", "ei" },
     { "ldahli", 
 		"ld a,(hl)\n"
 		"\tinc\thl" },

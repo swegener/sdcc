@@ -1,7 +1,17 @@
+2006-03-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/gen.c (genFunction, genEndFunction): fixed bug 1160666,
+	  implemented patch 1120823 Thanks to Willy De la Court (normal
+	  interrupts need an interrupt number now if they are made critical),
+	  and enabled nesting of critical functions though not for gbz80
+	  (genCritical, genEndCritical): added functions
+	  (genZ80Code): added cases for CRITICAL and ENDCRITICAL
+	* src/z80/mappings.i: added "ei" to all mappings
+
 2006-03-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* sim/ucsim/cmd.src/newcmdcl.h: applied patch fixing GCC 4.1 build
-	submitted by the Debian SDCC maintainer Aurelien Jarno: 
+	submitted by the Debian SDCC maintainer Aurelien Jarno:
 	"Credits goes to Martin Michlmayr, who rebuilt the whole Debian
 	archive with gcc 4.1 on mips and wrote the patch"
 

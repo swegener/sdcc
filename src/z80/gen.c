@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
   gen.c - Z80 specific code generator.
-     
+
   Michael Hope <michaelh@juju.net.nz> 2000
   Based on the mcs51 generator -
       Sandeep Dutta . sandeep.dutta@usa.net (1998)
@@ -50,22 +50,22 @@
    No asm strings
    Includes long mul/div in code
   2. Optimised memcpy for acc use       32102 102 226B
-  3. Optimised strcpy for acc use	27819 117 2237
+  3. Optimised strcpy for acc use       27819 117 2237
   3a Optimised memcpy fun
-  4. Optimised strcmp fun		21999 149 2294
-  5. Optimised strcmp further		21660 151 228C
-  6. Optimised memcpy by unroling	20885 157 2201
-  7. After turning loop induction on	19862 165 236D
-  8. Same as 7 but with more info	
-  9. With asm optimised strings		17030 192 2223
+  4. Optimised strcmp fun               21999 149 2294
+  5. Optimised strcmp further           21660 151 228C
+  6. Optimised memcpy by unroling       20885 157 2201
+  7. After turning loop induction on    19862 165 236D
+  8. Same as 7 but with more info
+  9. With asm optimised strings         17030 192 2223
 
   10 and below are with asm strings off.
 
-  10 Mucho optimisations		13562 201 1FCC
+  10 Mucho optimisations                13562 201 1FCC
 
   Apparent advantage of turning on regparams:
   1.  Cost of push
-        Decent case is push of a constant 
+        Decent case is push of a constant
           - ld hl,#n; push hl: (10+11)*nargs
   2.  Cost of pull from stack
         Using asm with ld hl, etc
@@ -74,8 +74,8 @@
   3.  Cost of fixing stack
           - pop hl*nargs
             10*nargs
-  
-  So cost is (10+11+7+6+7+10)*nargs+10+11 
+
+  So cost is (10+11+7+6+7+10)*nargs+10+11
       = 51*nargs+21
       = 123 for mul, div, strcmp, strcpy
   Saving of (98298+32766+32766+32766)*123 = 24181308
@@ -121,7 +121,7 @@
    area.  ix-0 is the top most local variable.
 */
 
-enum 
+enum
 {
   /* Set to enable debugging trace statements in the output assembly code. */
   DISABLE_DEBUG = 0
@@ -175,9 +175,9 @@ static struct
 };
 
 // PENDING
-#define ACC_NAME	_pairs[PAIR_AF].h
+#define ACC_NAME        _pairs[PAIR_AF].h
 
-enum 
+enum
   {
     LSB,
     MSB16,
@@ -187,18 +187,18 @@ enum
 
 /** Code generator persistent data.
  */
-static struct 
+static struct
 {
   /** Used to optimised setting up of a pair by remebering what it
       contains and adjusting instead of reloading where possible.
   */
-  struct 
+  struct
   {
     AOP_TYPE last_type;
     const char *base;
     int offset;
   } pairs[NUM_PAIRS];
-  struct 
+  struct
   {
     int last;
     int pushed;
@@ -222,7 +222,7 @@ static struct
   const char *lastFunctionName;
   iCode *current_iCode;
   bool preserveCarry;
-  
+
   set *sendSet;
 
   struct
@@ -231,7 +231,7 @@ static struct
     bool saved;
   } saves;
 
-  struct 
+  struct
   {
     lineNode *head;
     lineNode *current;
@@ -333,9 +333,9 @@ static bool
 isPairInUseNotInRet(PAIR_ID id, iCode *ic)
 {
   bitVect *rInUse;
-  
+
   rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), ic->rUsed);
-  
+
   if (id == PAIR_DE)
     {
       return bitVectBitValue (rInUse, D_IDX) || bitVectBitValue(rInUse, E_IDX);
@@ -362,7 +362,7 @@ getFreePairId (iCode *ic)
     {
       return PAIR_INVALID;
     }
-}         
+}
 
 static void
 _tidyUp (char *buf)
@@ -407,8 +407,8 @@ _vemit2 (const char *szFormat, va_list ap)
 
   _tidyUp (buffer);
   _G.lines.current = (_G.lines.current ?
-	      connectLine (_G.lines.current, _newLineNode (buffer)) :
-	      (_G.lines.head = _newLineNode (buffer)));
+              connectLine (_G.lines.current, _newLineNode (buffer)) :
+              (_G.lines.head = _newLineNode (buffer)));
 
   _G.lines.current->isInline = _G.lines.isInline;
   _G.lines.current->isDebug = _G.lines.isDebug;
@@ -492,11 +492,11 @@ _emit2 (const char *inst, const char *fmt,...)
 static void
 _emitMove(const char *to, const char *from)
 {
-  if (STRCASECMP(to, from) != 0) 
+  if (STRCASECMP(to, from) != 0)
     {
       emit2("ld %s,%s", to, from);
     }
-  else 
+  else
     {
       // Optimise it out.
       // Could leave this to the peephole, but sometimes the peephole is inhibited.
@@ -509,7 +509,7 @@ aopDump(const char *plabel, asmop *aop)
   int i;
   char regbuf[9];
   char *rbp = regbuf;
-  
+
   emitDebug("; Dump of %s: type %s size %u", plabel, aopNames[aop->type], aop->size);
   switch (aop->type)
     {
@@ -525,7 +525,7 @@ aopDump(const char *plabel, asmop *aop)
       break;
     case AOP_PAIRPTR:
       emitDebug(";  pairptr = (%s)", _pairs[aop->aopu.aop_pairId].name);
-        
+
     default:
       /* No information. */
       break;
@@ -551,17 +551,17 @@ getPairName (asmop * aop)
   if (aop->type == AOP_REG)
     {
       switch (aop->aopu.aop_reg[0]->rIdx)
-	{
-	case C_IDX:
-	  return "bc";
-	  break;
-	case E_IDX:
-	  return "de";
-	  break;
-	case L_IDX:
-	  return "hl";
-	  break;
-	}
+        {
+        case C_IDX:
+          return "bc";
+          break;
+        case E_IDX:
+          return "de";
+          break;
+        case L_IDX:
+          return "hl";
+          break;
+        }
     }
   else if (aop->type == AOP_STR || aop->type == AOP_HLREG)
     {
@@ -584,22 +584,22 @@ getPairId (asmop * aop)
   if (aop->size == 2)
     {
       if (aop->type == AOP_REG)
-	{
-	  if ((aop->aopu.aop_reg[0]->rIdx == C_IDX) && (aop->aopu.aop_reg[1]->rIdx == B_IDX))
-	    {
-	      return PAIR_BC;
-	    }
-	  if ((aop->aopu.aop_reg[0]->rIdx == E_IDX) && (aop->aopu.aop_reg[1]->rIdx == D_IDX))
-	    {
-	      return PAIR_DE;
-	    }
-	  if ((aop->aopu.aop_reg[0]->rIdx == L_IDX) && (aop->aopu.aop_reg[1]->rIdx == H_IDX))
-	    {
-	      return PAIR_HL;
-	    }
-	}
+        {
+          if ((aop->aopu.aop_reg[0]->rIdx == C_IDX) && (aop->aopu.aop_reg[1]->rIdx == B_IDX))
+            {
+              return PAIR_BC;
+            }
+          if ((aop->aopu.aop_reg[0]->rIdx == E_IDX) && (aop->aopu.aop_reg[1]->rIdx == D_IDX))
+            {
+              return PAIR_DE;
+            }
+          if ((aop->aopu.aop_reg[0]->rIdx == L_IDX) && (aop->aopu.aop_reg[1]->rIdx == H_IDX))
+            {
+              return PAIR_HL;
+            }
+        }
       else if (aop->type == AOP_STR || aop->type == AOP_HLREG)
-	{
+        {
           int i;
           for (i = 0; i < NUM_PAIRS; i++)
             {
@@ -661,7 +661,7 @@ spillPair (PAIR_ID pairId)
 /* Given a register name, spill the pair (if any) the register is part of */
 static void
 spillPairReg (const char *regname)
-{      
+{
   if (strlen(regname)==1)
     {
       switch (*regname)
@@ -813,7 +813,7 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool requires_a)
         sym->aop = aop = newAsmop (AOP_SFR);
         aop->aopu.aop_dir = sym->rname;
         aop->size = getSize (sym->type);
-	  emitDebug ("; AOP_SFR for %s", sym->rname);
+          emitDebug ("; AOP_SFR for %s", sym->rname);
         return aop;
       }
     }
@@ -867,14 +867,14 @@ aopForRemat (symbol * sym)
     {
       /* if plus or minus print the right hand side */
       if (ic->op == '+' || ic->op == '-')
-	{
-	  /* PENDING: for re-target */
-	  sprintf (s, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)),
-		   ic->op);
-	  s += strlen (s);
-	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-	  continue;
-	}
+        {
+          /* PENDING: for re-target */
+          sprintf (s, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)),
+                   ic->op);
+          s += strlen (s);
+          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+          continue;
+        }
       /* we reached the end */
       sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
       break;
@@ -907,16 +907,16 @@ regsInCommon (operand * op1, operand * op2)
     {
       int j;
       if (!sym1->regs[i])
-	continue;
+        continue;
 
       for (j = 0; j < sym2->nRegs; j++)
-	{
-	  if (!sym2->regs[j])
-	    continue;
+        {
+          if (!sym2->regs[j])
+            continue;
 
-	  if (sym2->regs[j] == sym1->regs[i])
-	    return TRUE;
-	}
+          if (sym2->regs[j] == sym1->regs[i])
+            return TRUE;
+        }
     }
 
   return FALSE;
@@ -992,7 +992,7 @@ sameRegs (asmop * aop1, asmop * aop2)
 
   for (i = 0; i < aop1->size; i++)
     if (aop1->aopu.aop_reg[i] !=
-	aop2->aopu.aop_reg[i])
+        aop2->aopu.aop_reg[i])
       return FALSE;
 
   return TRUE;
@@ -1075,69 +1075,69 @@ aopOp (operand * op, iCode * ic, bool result, bool requires_a)
     {
       /* rematerialize it NOW */
       if (sym->remat)
-	{
-	  sym->aop = op->aop = aop =
-	    aopForRemat (sym);
-	  aop->size = getSize (sym->type);
-	  return;
-	}
+        {
+          sym->aop = op->aop = aop =
+            aopForRemat (sym);
+          aop->size = getSize (sym->type);
+          return;
+        }
 
       if (sym->ruonly)
-	{
-	  int i;
-	  aop = op->aop = sym->aop = newAsmop (AOP_STR);
-	  aop->size = getSize (sym->type);
-	  for (i = 0; i < 4; i++)
-	    aop->aopu.aop_str[i] = _fReturn[i];
-	  return;
-	}
+        {
+          int i;
+          aop = op->aop = sym->aop = newAsmop (AOP_STR);
+          aop->size = getSize (sym->type);
+          for (i = 0; i < 4; i++)
+            aop->aopu.aop_str[i] = _fReturn[i];
+          return;
+        }
 
       if (sym->accuse)
-	{
-	  if (sym->accuse == ACCUSE_A)
-	    {
-	      aop = op->aop = sym->aop = newAsmop (AOP_ACC);
-	      aop->size = getSize (sym->type);
+        {
+          if (sym->accuse == ACCUSE_A)
+            {
+              aop = op->aop = sym->aop = newAsmop (AOP_ACC);
+              aop->size = getSize (sym->type);
               wassertl(aop->size == 1, "Internal error: Caching in A, but too big to fit in A");
 
               aop->aopu.aop_str[0] = _pairs[PAIR_AF].h;
-	    }
-	  else if (sym->accuse == ACCUSE_SCRATCH)
-	    {
-	      aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
-	      aop->size = getSize (sym->type);
+            }
+          else if (sym->accuse == ACCUSE_SCRATCH)
+            {
+              aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
+              aop->size = getSize (sym->type);
               wassertl(aop->size <= 2, "Internal error: Caching in HL, but too big to fit in HL");
               aop->aopu.aop_str[0] = _pairs[PAIR_HL].l;
               aop->aopu.aop_str[1] = _pairs[PAIR_HL].h;
-	    }
+            }
           else if (sym->accuse == ACCUSE_IY)
             {
-	      aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
-	      aop->size = getSize (sym->type);
+              aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
+              aop->size = getSize (sym->type);
               wassertl(aop->size <= 2, "Internal error: Caching in IY, but too big to fit in IY");
               aop->aopu.aop_str[0] = _pairs[PAIR_IY].l;
               aop->aopu.aop_str[1] = _pairs[PAIR_IY].h;
             }
-	  else 
+          else
               {
                   wassertl (0, "Marked as being allocated into A or HL but is actually in neither");
               }
-	  return;
-	}
+          return;
+        }
 
       if (sym->usl.spillLoc)
         {
-	  if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
+          if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
             {
-	      /* force a new aop if sizes differ */
-	      sym->usl.spillLoc->aop = NULL;
-	    }
-	  sym->aop = op->aop = aop =
-		     aopForSym (ic, sym->usl.spillLoc, result, requires_a);
-	  aop->size = getSize (sym->type);
-	  return;
+              /* force a new aop if sizes differ */
+              sym->usl.spillLoc->aop = NULL;
+            }
+          sym->aop = op->aop = aop =
+                     aopForSym (ic, sym->usl.spillLoc, result, requires_a);
+          aop->size = getSize (sym->type);
+          return;
         }
-      
+
       /* else must be a dummy iTemp */
       sym->aop = op->aop = aop = newAsmop (AOP_DUMMY);
       aop->size = getSize (sym->type);
@@ -1188,12 +1188,12 @@ dealloc:
     {
       op->aop = NULL;
       if (IS_SYMOP (op))
-	{
-	  OP_SYMBOL (op)->aop = NULL;
-	  /* if the symbol has a spill */
-	  if (SPIL_LOC (op))
-	    SPIL_LOC (op)->aop = NULL;
-	}
+        {
+          OP_SYMBOL (op)->aop = NULL;
+          /* if the symbol has a spill */
+          if (SPIL_LOC (op))
+            SPIL_LOC (op)->aop = NULL;
+        }
     }
 
 }
@@ -1225,31 +1225,31 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
       /* PENDING: for re-target */
       if (with_hash)
         {
-          tsprintf (buffer, sizeof(buffer), 
-		    "!hashedstr + %d", aop->aopu.aop_immd, offset);
+          tsprintf (buffer, sizeof(buffer),
+                    "!hashedstr + %d", aop->aopu.aop_immd, offset);
         }
       else if (offset == 0)
         {
           tsprintf (buffer, sizeof(buffer),
-		    "%s", aop->aopu.aop_immd);
+                    "%s", aop->aopu.aop_immd);
         }
       else
         {
-          tsprintf (buffer, sizeof(buffer), 
-		    "%s + %d", aop->aopu.aop_immd, offset);
+          tsprintf (buffer, sizeof(buffer),
+                    "%s + %d", aop->aopu.aop_immd, offset);
         }
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
     case AOP_LIT:
       {
-	value *val = aop->aopu.aop_lit;
-	/* if it is a float then it gets tricky */
-	/* otherwise it is fairly simple */
-	if (!IS_FLOAT (val->type))
-	  {
-	    unsigned long v = (unsigned long) floatFromVal (val);
+        value *val = aop->aopu.aop_lit;
+        /* if it is a float then it gets tricky */
+        /* otherwise it is fairly simple */
+        if (!IS_FLOAT (val->type))
+          {
+            unsigned long v = (unsigned long) floatFromVal (val);
 
-	    if (offset == 2)
+            if (offset == 2)
               {
                 v >>= 16;
               }
@@ -1257,20 +1257,20 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
               {
                 // OK
               }
-            else 
+            else
               {
                 wassertl(0, "Encountered an invalid offset while fetching a literal");
               }
 
-	    if (with_hash)
-	      tsprintf (buffer, sizeof(buffer), "!immedword", v);
-	    else
-	      tsprintf (buffer, sizeof(buffer), "!constword", v);
+            if (with_hash)
+              tsprintf (buffer, sizeof(buffer), "!immedword", v);
+            else
+              tsprintf (buffer, sizeof(buffer), "!constword", v);
 
             return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
-	  }
-	else
-	  {
+          }
+        else
+          {
             union {
               float f;
               unsigned char c[4];
@@ -1286,13 +1286,13 @@ aopGetLitWordLong (asmop * aop, int offset, bool with_hash)
 #else
             i = fl.c[offset] | (fl.c[offset+1]<<8);
 #endif
-	    if (with_hash)
-	      tsprintf (buffer, sizeof(buffer), "!immedword", i);
-	    else
-	      tsprintf (buffer, sizeof(buffer), "!constword", i);
+            if (with_hash)
+              tsprintf (buffer, sizeof(buffer), "!immedword", i);
+            else
+              tsprintf (buffer, sizeof(buffer), "!constword", i);
 
             return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
-	  }
+          }
       }
     default:
       return NULL;
@@ -1369,23 +1369,23 @@ fetchLitPair (PAIR_ID pairId, asmop * left, int offset)
   if (isPtr (pair))
     {
       if (pairId == PAIR_HL || pairId == PAIR_IY)
-	{
-	  if (_G.pairs[pairId].last_type == left->type)
-	    {
-	      if (_G.pairs[pairId].base && !strcmp (_G.pairs[pairId].base, base))
-		{
-		  if (pairId == PAIR_HL && abs (_G.pairs[pairId].offset - offset) < 3)
-		    {
-		      adjustPair (pair, &_G.pairs[pairId].offset, offset);
-		      return;
-		    }
-		  if (pairId == PAIR_IY && (offset >= INT8MIN && offset <= INT8MAX))
-		    {
-		      return;
-		    }
-		}
-	    }
-	}
+        {
+          if (_G.pairs[pairId].last_type == left->type)
+            {
+              if (_G.pairs[pairId].base && !strcmp (_G.pairs[pairId].base, base))
+                {
+                  if (pairId == PAIR_HL && abs (_G.pairs[pairId].offset - offset) < 3)
+                    {
+                      adjustPair (pair, &_G.pairs[pairId].offset, offset);
+                      return;
+                    }
+                  if (pairId == PAIR_IY && (offset >= INT8MIN && offset <= INT8MAX))
+                    {
+                      return;
+                    }
+                }
+            }
+        }
       _G.pairs[pairId].last_type = left->type;
       _G.pairs[pairId].base = traceAlloc(&_G.trace.aops, Safe_strdup (base));
       _G.pairs[pairId].offset = offset;
@@ -1429,7 +1429,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
     if (isLitWord (aop)) {
         fetchLitPair (pairId, aop, offset);
     }
-    else 
+    else
       {
         if (getPairId (aop) == pairId)
           {
@@ -1493,7 +1493,7 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, iCode *ic, int offset)
             emit2("push %s", _pairs[getPairId(aop)].name);
             emit2("pop %s", _pairs[pairId].name);
           }
-        else 
+        else
           {
             emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
             emit2 ("ld %s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
@@ -1526,7 +1526,7 @@ setupPairFromSP (PAIR_ID id, int offset)
       _push (PAIR_AF);
       offset += 2;
     }
-  
+
   if (offset < INT8MIN || offset > INT8MAX)
     {
       emit2 ("ld hl,!immedword", offset);
@@ -1556,7 +1556,7 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
 
     case AOP_HL:
       wassertl (pairId == PAIR_HL, "AOP_HL must be in HL");
-      
+
       fetchLitPair (pairId, aop, offset);
       _G.pairs[pairId].offset = offset;
       break;
@@ -1566,7 +1566,7 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
       wassertl (pairId == PAIR_IY || pairId == PAIR_HL, "The Z80 extended stack must be in IY or HL");
 
       {
-	int offset = aop->aopu.aop_stk + _G.stack.offset;
+        int offset = aop->aopu.aop_stk + _G.stack.offset;
 
         if (_G.pairs[pairId].last_type == aop->type &&
             _G.pairs[pairId].offset == offset)
@@ -1591,25 +1591,25 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
 
     case AOP_STK:
       {
-	/* Doesnt include _G.stack.pushed */
-	int abso = aop->aopu.aop_stk + offset + _G.stack.offset;
+        /* Doesnt include _G.stack.pushed */
+        int abso = aop->aopu.aop_stk + offset + _G.stack.offset;
 
-	if (aop->aopu.aop_stk > 0)
-	  {
-	    abso += _G.stack.param_offset;
-	  }
-	assert (pairId == PAIR_HL);
-	/* In some cases we can still inc or dec hl */
-	if (_G.pairs[pairId].last_type == AOP_STK && abs (_G.pairs[pairId].offset - abso) < 3)
-	  {
-	    adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, abso);
-	  }
-	else
-	  {
+        if (aop->aopu.aop_stk > 0)
+          {
+            abso += _G.stack.param_offset;
+          }
+        assert (pairId == PAIR_HL);
+        /* In some cases we can still inc or dec hl */
+        if (_G.pairs[pairId].last_type == AOP_STK && abs (_G.pairs[pairId].offset - abso) < 3)
+          {
+            adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, abso);
+          }
+        else
+          {
             setupPairFromSP (PAIR_HL, abso + _G.stack.pushed);
-	  }
-	_G.pairs[pairId].offset = abso;
-	break;
+          }
+        _G.pairs[pairId].offset = abso;
+        break;
       }
 
     case AOP_PAIRPTR:
@@ -1617,7 +1617,7 @@ setupPair (PAIR_ID pairId, asmop * aop, int offset)
         genMovePairPair(aop->aopu.aop_pairId, pairId);
       adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, offset);
       break;
-      
+
     default:
       wassert (0);
     }
@@ -1642,7 +1642,7 @@ aopGet (asmop * aop, int offset, bool bit16)
   /* offset is greater than size then zero */
   /* PENDING: this seems a bit screwed in some pointer cases. */
   if (offset > (aop->size - 1) &&
-      aop->type != AOP_LIT) 
+      aop->type != AOP_LIT)
     {
       tsprintf (buffer, sizeof(buffer), "!zero");
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
@@ -1654,26 +1654,26 @@ aopGet (asmop * aop, int offset, bool bit16)
     case AOP_DUMMY:
       tsprintf (buffer, sizeof(buffer), "!zero");
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
-    
+
     case AOP_IMMD:
       /* PENDING: re-target */
       if (bit16)
-	tsprintf (buffer, sizeof(buffer), "!immedwords", aop->aopu.aop_immd);
+        tsprintf (buffer, sizeof(buffer), "!immedwords", aop->aopu.aop_immd);
       else
-	switch (offset)
-	  {
-	  case 2:
-	    tsprintf (buffer, sizeof(buffer), "!bankimmeds", aop->aopu.aop_immd);
-	    break;
-	  case 1:
-	    tsprintf (buffer, sizeof(buffer), "!msbimmeds", aop->aopu.aop_immd);
-	    break;
-	  case 0:
-	    tsprintf (buffer, sizeof(buffer), "!lsbimmeds", aop->aopu.aop_immd);
-	    break;
-	  default:
-	    wassertl (0, "Fetching from beyond the limits of an immediate value.");
-	  }
+        switch (offset)
+          {
+          case 2:
+            tsprintf (buffer, sizeof(buffer), "!bankimmeds", aop->aopu.aop_immd);
+            break;
+          case 1:
+            tsprintf (buffer, sizeof(buffer), "!msbimmeds", aop->aopu.aop_immd);
+            break;
+          case 0:
+            tsprintf (buffer, sizeof(buffer), "!lsbimmeds", aop->aopu.aop_immd);
+            break;
+          default:
+            wassertl (0, "Fetching from beyond the limits of an immediate value.");
+          }
 
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
@@ -1697,9 +1697,9 @@ aopGet (asmop * aop, int offset, bool bit16)
       { /*.p.t.20030716 handling for i/o port read access for Z80 */
         if( aop->paged )
         { /* banked mode */
-	  /* reg A goes to address bits 15-8 during "in a,(x)" instruction */
-	  emit2( "ld a,!msbimmeds", aop->aopu.aop_dir);
-	  emit2( "in a,(!lsbimmeds)", aop->aopu.aop_dir);
+          /* reg A goes to address bits 15-8 during "in a,(x)" instruction */
+          emit2( "ld a,!msbimmeds", aop->aopu.aop_dir);
+          emit2( "in a,(!lsbimmeds)", aop->aopu.aop_dir);
         }
         else if( z80_opts.port_mode == 180 )
         { /* z180 in0/out0 mode */
@@ -1709,7 +1709,7 @@ aopGet (asmop * aop, int offset, bool bit16)
         { /* 8 bit mode */
           emit2( "in a,(%s)", aop->aopu.aop_dir );
         }
-        
+
         SNPRINTF (buffer, sizeof(buffer), "a");
 
         return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
@@ -1741,17 +1741,17 @@ aopGet (asmop * aop, int offset, bool bit16)
 
     case AOP_STK:
       if (IS_GB)
-	{
-	  setupPair (PAIR_HL, aop, offset);
-	  tsprintf (buffer, sizeof(buffer), "!*hl");
-	}
+        {
+          setupPair (PAIR_HL, aop, offset);
+          tsprintf (buffer, sizeof(buffer), "!*hl");
+        }
       else
-	{
-	  if (aop->aopu.aop_stk >= 0)
-	    offset += _G.stack.param_offset;
-	  tsprintf (buffer, sizeof(buffer),
-		    "!*ixx", aop->aopu.aop_stk + offset);
-	}
+        {
+          if (aop->aopu.aop_stk >= 0)
+            offset += _G.stack.param_offset;
+          tsprintf (buffer, sizeof(buffer),
+                    "!*ixx", aop->aopu.aop_stk + offset);
+        }
 
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
@@ -1760,9 +1760,9 @@ aopGet (asmop * aop, int offset, bool bit16)
 
     case AOP_ACC:
       if (!offset)
-	{
-	  return "a";
-	}
+        {
+          return "a";
+        }
       else
         {
           tsprintf(buffer, sizeof(buffer), "!zero");
@@ -1779,11 +1779,11 @@ aopGet (asmop * aop, int offset, bool bit16)
     case AOP_SIMPLELIT:
       {
         unsigned long v = aop->aopu.aop_simplelit;
-        
+
         v >>= (offset * 8);
-        tsprintf (buffer, sizeof(buffer), 
-		  "!immedbyte", (unsigned int) v & 0xff);
-        
+        tsprintf (buffer, sizeof(buffer),
+                  "!immedbyte", (unsigned int) v & 0xff);
+
         return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
       }
     case AOP_STR:
@@ -1793,14 +1793,14 @@ aopGet (asmop * aop, int offset, bool bit16)
     case AOP_PAIRPTR:
       setupPair (aop->aopu.aop_pairId, aop, offset);
       if (aop->aopu.aop_pairId==PAIR_IX)
-        SNPRINTF (buffer, sizeof(buffer), 
-		  "!*ixx", 0);
+        SNPRINTF (buffer, sizeof(buffer),
+                  "!*ixx", 0);
       else if (aop->aopu.aop_pairId==PAIR_IY)
-        SNPRINTF (buffer, sizeof(buffer), 
-		  "!*iyx", 0);
+        SNPRINTF (buffer, sizeof(buffer),
+                  "!*iyx", 0);
       else
-        SNPRINTF (buffer, sizeof(buffer), 
-		  "(%s)", _pairs[aop->aopu.aop_pairId].name);
+        SNPRINTF (buffer, sizeof(buffer),
+                  "(%s)", _pairs[aop->aopu.aop_pairId].name);
 
       return traceAlloc(&_G.trace.aops, Safe_strdup(buffer));
 
@@ -1853,7 +1853,7 @@ aopPut (asmop * aop, const char *s, int offset)
   if (aop->size && offset > (aop->size - 1))
     {
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	      "aopPut got offset > aop->size");
+              "aopPut got offset > aop->size");
       exit (0);
     }
 
@@ -1868,12 +1868,12 @@ aopPut (asmop * aop, const char *s, int offset)
     case AOP_DUMMY:
       _moveA (s);  /* in case s is volatile */
       break;
-      
+
     case AOP_DIR:
       /* Direct.  Hmmm. */
       wassert (IS_GB);
       if (strcmp (s, "a"))
-	emit2 ("ld a,%s", s);
+        emit2 ("ld a,%s", s);
       emit2 ("ld (%s+%d),a", aop->aopu.aop_dir, offset);
       break;
 
@@ -1899,10 +1899,10 @@ aopPut (asmop * aop, const char *s, int offset)
                   emit2( "ld a,%s", s );
                   s = "a";
                 }
-              
+
               emit2( "ld bc,#%s", aop->aopu.aop_dir );
               emit2( "out (c),%s", s );
-        
+
               if( aop->bcInUse )
                 emit2( "pop bc"    );
               else
@@ -1923,21 +1923,21 @@ aopPut (asmop * aop, const char *s, int offset)
 
     case AOP_REG:
       if (!strcmp (s, "!*hl"))
-	emit2 ("ld %s,!*hl", aop->aopu.aop_reg[offset]->name);
+        emit2 ("ld %s,!*hl", aop->aopu.aop_reg[offset]->name);
       else
-	emit2 ("ld %s,%s",
-	       aop->aopu.aop_reg[offset]->name, s);
+        emit2 ("ld %s,%s",
+               aop->aopu.aop_reg[offset]->name, s);
       spillPairReg(aop->aopu.aop_reg[offset]->name);
       break;
 
     case AOP_IY:
       wassert (!IS_GB);
       if (!canAssignToPtr (s))
-	{
-	  emit2 ("ld a,%s", s);
+        {
+          emit2 ("ld a,%s", s);
           setupPair (PAIR_IY, aop, offset);
-	  emit2 ("ld !*iyx,a", offset);
-	}
+          emit2 ("ld !*iyx,a", offset);
+        }
       else
         {
           setupPair (PAIR_IY, aop, offset);
@@ -1949,10 +1949,10 @@ aopPut (asmop * aop, const char *s, int offset)
       wassert (IS_GB);
       /* PENDING: for re-target */
       if (!strcmp (s, "!*hl") || !strcmp (s, "(hl)") || !strcmp (s, "[hl]"))
-	{
-	  emit2 ("ld a,!*hl");
-	  s = "a";
-	}
+        {
+          emit2 ("ld a,!*hl");
+          s = "a";
+        }
       setupPair (PAIR_HL, aop, offset);
 
       emit2 ("ld !*hl,%s", s);
@@ -1961,11 +1961,11 @@ aopPut (asmop * aop, const char *s, int offset)
     case AOP_EXSTK:
       wassert (!IS_GB);
       if (!canAssignToPtr (s))
-	{
-	  emit2 ("ld a,%s", s);
+        {
+          emit2 ("ld a,%s", s);
           setupPair (PAIR_IY, aop, offset);
-	  emit2 ("ld !*iyx,a", offset);
-	}
+          emit2 ("ld !*iyx,a", offset);
+        }
       else
         {
           setupPair (PAIR_IY, aop, offset);
@@ -1975,77 +1975,77 @@ aopPut (asmop * aop, const char *s, int offset)
 
     case AOP_STK:
       if (IS_GB)
-	{
-	  /* PENDING: re-target */
-	  if (!strcmp (s, "!*hl") || !strcmp (s, "(hl)") || !strcmp (s, "[hl]"))
-	    {
-	      emit2 ("ld a,!*hl");
-	      s = "a";
-	    }
-	  setupPair (PAIR_HL, aop, offset);
-	  if (!canAssignToPtr (s))
-	    {
-	      emit2 ("ld a,%s", s);
-	      emit2 ("ld !*hl,a");
-	    }
-	  else
-	    emit2 ("ld !*hl,%s", s);
-	}
+        {
+          /* PENDING: re-target */
+          if (!strcmp (s, "!*hl") || !strcmp (s, "(hl)") || !strcmp (s, "[hl]"))
+            {
+              emit2 ("ld a,!*hl");
+              s = "a";
+            }
+          setupPair (PAIR_HL, aop, offset);
+          if (!canAssignToPtr (s))
+            {
+              emit2 ("ld a,%s", s);
+              emit2 ("ld !*hl,a");
+            }
+          else
+            emit2 ("ld !*hl,%s", s);
+        }
       else
-	{
-	  if (aop->aopu.aop_stk >= 0)
-	    offset += _G.stack.param_offset;
-	  if (!canAssignToPtr (s))
-	    {
-	      emit2 ("ld a,%s", s);
-	      emit2 ("ld !*ixx,a", aop->aopu.aop_stk + offset);
-	    }
-	  else
+        {
+          if (aop->aopu.aop_stk >= 0)
+            offset += _G.stack.param_offset;
+          if (!canAssignToPtr (s))
+            {
+              emit2 ("ld a,%s", s);
+              emit2 ("ld !*ixx,a", aop->aopu.aop_stk + offset);
+            }
+          else
             {
               emit2 ("ld !*ixx,%s", aop->aopu.aop_stk + offset, s);
             }
-	}
+        }
       break;
 
     case AOP_CRY:
       /* if bit variable */
       if (!aop->aopu.aop_dir)
-	{
-	  emit2 ("ld a,!zero");
-	  emit2 ("rla");
-	}
+        {
+          emit2 ("ld a,!zero");
+          emit2 ("rla");
+        }
       else
-	{
-	  /* In bit space but not in C - cant happen */
-	  wassertl (0, "Tried to write into a bit variable");
-	}
+        {
+          /* In bit space but not in C - cant happen */
+          wassertl (0, "Tried to write into a bit variable");
+        }
       break;
 
     case AOP_STR:
       aop->coff = offset;
       if (strcmp (aop->aopu.aop_str[offset], s))
-	{
-	  emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
-	}
+        {
+          emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
+        }
       spillPairReg(aop->aopu.aop_str[offset]);
       break;
 
     case AOP_ACC:
       aop->coff = offset;
       if (!offset && (strcmp (s, "acc") == 0))
-	break;
+        break;
       if (offset > 0)
-	{
+        {
           wassertl (0, "Tried to access past the end of A");
-	}
+        }
       else
-	{
-	  if (strcmp (aop->aopu.aop_str[offset], s))
-	    {
-	      emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
-	      spillPairReg(aop->aopu.aop_str[offset]);
-	    }
-	}
+        {
+          if (strcmp (aop->aopu.aop_str[offset], s))
+            {
+              emit2 ("ld %s,%s", aop->aopu.aop_str[offset], s);
+              spillPairReg(aop->aopu.aop_str[offset]);
+            }
+        }
       break;
 
     case AOP_HLREG:
@@ -2066,7 +2066,7 @@ aopPut (asmop * aop, const char *s, int offset)
 
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	      "aopPut got unsupported aop->type");
+              "aopPut got unsupported aop->type");
       exit (0);
     }
 }
@@ -2126,7 +2126,7 @@ getDataSize (operand * op)
 /*-----------------------------------------------------------------*/
 static void
 movLeft2Result (operand * left, int offl,
-		operand * result, int offr, int sign)
+                operand * result, int offr, int sign)
 {
   const char *l;
 
@@ -2135,23 +2135,23 @@ movLeft2Result (operand * left, int offl,
       l = aopGet (AOP (left), offl, FALSE);
 
       if (!sign)
-	{
-	  aopPut (AOP (result), l, offr);
-	}
+        {
+          aopPut (AOP (result), l, offr);
+        }
       else
-	{
+        {
           if (getDataSize (left) == offl + 1)
             {
               emit2 ("ld a,%s", l);
               aopPut (AOP (result), "a", offr);
             }
-	}
+        }
     }
 }
 
 static void
 movLeft2ResultLong (operand * left, int offl,
-		operand * result, int offr, int sign,
+                operand * result, int offr, int sign,
                 int size)
 {
   if (size == 1)
@@ -2168,12 +2168,12 @@ movLeft2ResultLong (operand * left, int offl,
           emit2 ("ld a,%s", aopGet (AOP (left), LSB, FALSE));
           emit2 ("ld h,%s", aopGet (AOP (left), MSB16, FALSE));
           emit2 ("ld l,a");
-	  spillPair (PAIR_HL);
+          spillPair (PAIR_HL);
         }
       else if ( getPairId ( AOP (result)) == PAIR_IY)
         {
           PAIR_ID id = getPairId (AOP (left));
-          if (id != PAIR_INVALID) 
+          if (id != PAIR_INVALID)
             {
               emit2("push %s", _pairs[id].name);
               emit2("pop iy");
@@ -2206,9 +2206,9 @@ outAcc (operand * result)
       offset = 1;
       /* unsigned or positive */
       while (size--)
-	{
-	  aopPut (AOP (result), "!zero", offset++);
-	}
+        {
+          aopPut (AOP (result), "!zero", offset++);
+        }
     }
 }
 
@@ -2227,7 +2227,7 @@ outBitCLong (operand * result, bool swap_sense)
       emit2 ("ld a,!zero");
       emit2 ("rla");
       if (swap_sense)
-	emit2 ("xor a,!immedbyte", 1);
+        emit2 ("xor a,!immedbyte", 1);
       outAcc (result);
     }
 }
@@ -2251,15 +2251,15 @@ _toBoolean (operand * oper)
       emit2 ("ld a,%s", aopGet (AOP (oper), offset++, FALSE));
       size--;
       while (size--)
-	emit2 ("or a,%s", aopGet (AOP (oper), offset++, FALSE));
+        emit2 ("or a,%s", aopGet (AOP (oper), offset++, FALSE));
     }
   else
     {
       if (AOP (oper)->type != AOP_ACC)
-	{
-	  _clearCarry();
-	  emit2 ("or a,%s", aopGet (AOP (oper), 0, FALSE));
-	}
+        {
+          _clearCarry();
+          emit2 ("or a,%s", aopGet (AOP (oper), 0, FALSE));
+        }
     }
 }
 
@@ -2472,7 +2472,7 @@ genUminus (iCode * ic)
       emit2 ("rlc a");
       emit2 ("sbc a,a");
       while (size--)
-	aopPut (AOP (IC_RESULT (ic)), "a", offset++);
+        aopPut (AOP (IC_RESULT (ic)), "a", offset++);
     }
 
 release:
@@ -2506,9 +2506,9 @@ assignResultValue (operand * oper)
   else
     {
       while (size--)
-	{
-	  aopPut (AOP (oper), _fReturn[size], size);
-	}
+        {
+          aopPut (AOP (oper), _fReturn[size], size);
+        }
     }
 }
 
@@ -2549,7 +2549,7 @@ _saveRegsForCall(iCode *ic, int sendSetSize)
       o Compute if DE and/or BC are used to hold the result value
       o If (DE is used, or in the send set) and is not used in the result, push.
       o If BC is used and is not in the result, push
-      o 
+      o
       o If DE is used in the send set, fetch
       o If HL is used in the send set, fetch
       o Call
@@ -2561,7 +2561,7 @@ _saveRegsForCall(iCode *ic, int sendSetSize)
     bool bcInRet = FALSE, deInRet = FALSE;
     bitVect *rInUse;
 
-    rInUse = bitVectCplAnd (bitVectCopy (ic->rMask), 
+    rInUse = bitVectCplAnd (bitVectCopy (ic->rMask),
                             z80_rUmaskForOp (IC_RESULT(ic)));
 
     deInUse = bitVectBitValue (rInUse, D_IDX) || bitVectBitValue(rInUse, E_IDX);
@@ -2612,7 +2612,7 @@ genIpush (iCode * ic)
     */
     int nAddSets = 0;
     iCode *walk = ic->next;
-    
+
     while (walk) {
       if (walk->op == SEND) {
         nAddSets++;
@@ -2645,43 +2645,43 @@ genIpush (iCode * ic)
   else
     {
       if (size == 2)
-	{
-	  fetchHL (AOP (IC_LEFT (ic)));
-	  emit2 ("push hl");
-	  spillPair (PAIR_HL);
-	  _G.stack.pushed += 2;
-	  goto release;
-	}
+        {
+          fetchHL (AOP (IC_LEFT (ic)));
+          emit2 ("push hl");
+          spillPair (PAIR_HL);
+          _G.stack.pushed += 2;
+          goto release;
+        }
       if (size == 4)
-	{
-	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
-	  emit2 ("push hl");
-	  spillPair (PAIR_HL);
-	  _G.stack.pushed += 2;
-	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
-	  emit2 ("push hl");
-	  spillPair (PAIR_HL);
-	  _G.stack.pushed += 2;
-	  goto release;
-	}
+        {
+          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
+          emit2 ("push hl");
+          spillPair (PAIR_HL);
+          _G.stack.pushed += 2;
+          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
+          emit2 ("push hl");
+          spillPair (PAIR_HL);
+          _G.stack.pushed += 2;
+          goto release;
+        }
       offset = size;
       while (size--)
-	{
-	  if (AOP (IC_LEFT (ic))->type == AOP_IY)
-	    {
-	      char *l = aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE);
-	      wassert (l);
-	      emit2 ("ld a,(%s)", l);
-	    }
-	  else
-	    {
-	      l = aopGet (AOP (IC_LEFT (ic)), --offset, FALSE);
-	      emit2 ("ld a,%s", l);
-	    }
-	  emit2 ("push af");
-	  emit2 ("inc sp");
-	  _G.stack.pushed++;
-	}
+        {
+          if (AOP (IC_LEFT (ic))->type == AOP_IY)
+            {
+              char *l = aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE);
+              wassert (l);
+              emit2 ("ld a,(%s)", l);
+            }
+          else
+            {
+              l = aopGet (AOP (IC_LEFT (ic)), --offset, FALSE);
+              emit2 ("ld a,%s", l);
+            }
+          emit2 ("push af");
+          emit2 ("inc sp");
+          _G.stack.pushed++;
+        }
     }
 release:
   freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -2710,12 +2710,12 @@ genIpop (iCode * ic)
   else
     {
       while (size--)
-	{
-	  emit2 ("dec sp");
-	  emit2 ("pop hl");
-	  spillPair (PAIR_HL);
-	  aopPut (AOP (IC_LEFT (ic)), "l", offset--);
-	}
+        {
+          emit2 ("dec sp");
+          emit2 ("pop hl");
+          spillPair (PAIR_HL);
+          aopPut (AOP (IC_LEFT (ic)), "l", offset--);
+        }
     }
 
   freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -2764,28 +2764,28 @@ _opUsesPair (operand * op, iCode * ic, PAIR_ID pairId)
     {
       int i;
       for (i = 0; i < aop->size; i++)
-	{
-	  if (pairId == PAIR_DE)
-	    {
-	      emitDebug ("; name %s", aop->aopu.aop_reg[i]->name);
-	      if (!strcmp (aop->aopu.aop_reg[i]->name, "e"))
-		ret++;
-	      if (!strcmp (aop->aopu.aop_reg[i]->name, "d"))
-		ret++;
-	    }
+        {
+          if (pairId == PAIR_DE)
+            {
+              emitDebug ("; name %s", aop->aopu.aop_reg[i]->name);
+              if (!strcmp (aop->aopu.aop_reg[i]->name, "e"))
+                ret++;
+              if (!strcmp (aop->aopu.aop_reg[i]->name, "d"))
+                ret++;
+            }
           else if (pairId == PAIR_BC)
             {
-	      emitDebug ("; name %s", aop->aopu.aop_reg[i]->name);
-	      if (!strcmp (aop->aopu.aop_reg[i]->name, "c"))
-		ret++;
-	      if (!strcmp (aop->aopu.aop_reg[i]->name, "b"))
-		ret++;
+              emitDebug ("; name %s", aop->aopu.aop_reg[i]->name);
+              if (!strcmp (aop->aopu.aop_reg[i]->name, "c"))
+                ret++;
+              if (!strcmp (aop->aopu.aop_reg[i]->name, "b"))
+                ret++;
             }
-	  else
-	    {
-	      wassert (0);
-	    }
-	}
+          else
+            {
+              wassert (0);
+            }
+        }
     }
 
   freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -2871,28 +2871,28 @@ emitCall (iCode * ic, bool ispcall)
   if (ispcall)
     {
       if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
-	{
-	  werror (W_INDIR_BANKED);
-	}
+        {
+          werror (W_INDIR_BANKED);
+        }
       aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
 
       if (isLitWord (AOP (IC_LEFT (ic))))
-	{
-	  emit2 ("call %s", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
-	}
+        {
+          emit2 ("call %s", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
+        }
       else
-	{
-	  symbol *rlbl = newiTempLabel (NULL);
-	  spillPair (PAIR_HL);
-	  emit2 ("ld hl,!immed!tlabel", (rlbl->key + 100));
-	  emit2 ("push hl");
-	  _G.stack.pushed += 2;
+        {
+          symbol *rlbl = newiTempLabel (NULL);
+          spillPair (PAIR_HL);
+          emit2 ("ld hl,!immed!tlabel", (rlbl->key + 100));
+          emit2 ("push hl");
+          _G.stack.pushed += 2;
 
-	  fetchHL (AOP (IC_LEFT (ic)));
-	  emit2 ("jp !*hl");
-	  emit2 ("!tlabeldef", (rlbl->key + 100));
-	  _G.stack.pushed -= 2;
-	}
+          fetchHL (AOP (IC_LEFT (ic)));
+          emit2 ("jp !*hl");
+          emit2 ("!tlabeldef", (rlbl->key + 100));
+          _G.stack.pushed -= 2;
+        }
       freeAsmop (IC_LEFT (ic), NULL, ic);
     }
   else
@@ -2901,16 +2901,16 @@ emitCall (iCode * ic, bool ispcall)
       OP_SYMBOL (IC_LEFT (ic))->rname :
       OP_SYMBOL (IC_LEFT (ic))->name;
       if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
-	{
-	  emit2 ("call banked_call");
-	  emit2 ("!dws", name);
-	  emit2 ("!dw !bankimmeds", name);
-	}
+        {
+          emit2 ("call banked_call");
+          emit2 ("!dws", name);
+          emit2 ("!dw !bankimmeds", name);
+        }
       else
-	{
-	  /* make the call */
-	  emit2 ("call %s", name);
-	}
+        {
+          /* make the call */
+          emit2 ("call %s", name);
+        }
     }
   spillCached ();
 
@@ -2920,7 +2920,7 @@ emitCall (iCode * ic, bool ispcall)
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-	OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
+        OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
 
@@ -2938,31 +2938,31 @@ emitCall (iCode * ic, bool ispcall)
 
       _G.stack.pushed -= i;
       if (IS_GB)
-	{
-	  emit2 ("!ldaspsp", i);
-	}
+        {
+          emit2 ("!ldaspsp", i);
+        }
       else
-	{
-	  spillCached ();
-	  if (i > 8)
-	    {
-	      emit2 ("ld iy,!immedword", i);
-	      emit2 ("add iy,sp");
-	      emit2 ("ld sp,iy");
-	    }
-	  else
-	    {
-	      while (i > 1)
-		{
-		  emit2 ("pop af");
-		  i -= 2;
-		}
-	      if (i)
+        {
+          spillCached ();
+          if (i > 8)
+            {
+              emit2 ("ld iy,!immedword", i);
+              emit2 ("add iy,sp");
+              emit2 ("ld sp,iy");
+            }
+          else
+            {
+              while (i > 1)
+                {
+                  emit2 ("pop af");
+                  i -= 2;
+                }
+              if (i)
                 {
                   emit2 ("inc sp");
                 }
-	    }
-	}
+            }
+        }
     }
 
   spillCached ();
@@ -2982,7 +2982,7 @@ emitCall (iCode * ic, bool ispcall)
       eInRet = FALSE;
     }
 
-  if (_G.stack.pushedDE) 
+  if (_G.stack.pushedDE)
     {
       if (dInRet && eInRet)
         {
@@ -3007,8 +3007,8 @@ emitCall (iCode * ic, bool ispcall)
         }
       _G.stack.pushedDE = FALSE;
     }
-  
-  if (_G.stack.pushedBC) 
+
+  if (_G.stack.pushedBC)
     {
       if (bInRet && cInRet)
         {
@@ -3066,7 +3066,7 @@ resultRemat (iCode * ic)
     {
       symbol *sym = OP_SYMBOL (IC_RESULT (ic));
       if (sym->remat && !POINTER_SET (ic))
-	return 1;
+        return 1;
     }
 
   return 0;
@@ -3081,7 +3081,7 @@ static void
 genFunction (iCode * ic)
 {
   bool stackParm;
-  
+
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   sym_link *ftype;
 
@@ -3090,14 +3090,14 @@ genFunction (iCode * ic)
 
   setArea (IFFUNC_NONBANKED (sym->type));
 
-  /* PENDING: Reset the receive offset as it doesn't seem to get reset anywhere
-     else.
+  /* PENDING: Reset the receive offset as it
+     doesn't seem to get reset anywhere else.
   */
   _G.receiveOffset = 0;
 
   /* Record the last function name for debugging. */
   _G.lastFunctionName = sym->rname;
-  
+
   /* Create the function header */
   emit2 ("!functionheader", sym->name);
   if (!IS_STATIC(sym->etype))
@@ -3107,28 +3107,51 @@ genFunction (iCode * ic)
     }
   emit2 ("!functionlabeldef", sym->rname);
 
-  if (options.profile) 
-    {
-      emit2 ("!profileenter");
-    }
-
   ftype = operandType (IC_LEFT (ic));
 
-  /* if this is an interrupt service routine then save all potentially used registers. */
+  if (IFFUNC_ISNAKED(ftype))
+    {
+      emitDebug("; naked function: no prologue.");
+      return;
+    }
+
+  /* if this is an interrupt service routine
+     then save all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
     {
-      if (!FUNC_ISNAKED( sym->type ))
+      /* If critical function then turn interrupts off */
+      /* except when no interrupt number is given then it implies the NMI handler */
+      if (IFFUNC_ISCRITICAL (sym->type) && (FUNC_INTNO(sym->type) != INTNO_UNSPEC))
         {
-          emit2 ("!pusha");
-	}
+          emit2 ("!di");
+        }
+
+      emit2 ("!pusha");
     }
   else
     {
-      /* if critical function then turn interrupts off */
+      /* This is a non-ISR function.
+         If critical function then turn interrupts off */
       if (IFFUNC_ISCRITICAL (sym->type))
         {
-          emit2 ("!di");
-	}
+          if (IS_GB)
+            {
+              emit2 ("!di");
+            }
+          else
+            {
+              //get interrupt enable flag IFF2 into P/O
+              emit2 ("ld a,i");
+              emit2 ("!di");
+              //save P/O flag
+              emit2 ("push af");
+            }
+        }
+    }
+
+  if (options.profile)
+    {
+      emit2 ("!profileenter");
     }
 
   /* PENDING: callee-save etc */
@@ -3145,30 +3168,30 @@ genFunction (iCode * ic)
     {
       int i;
       for (i = 0; i < sym->regsUsed->size; i++)
-	{
-	  if (bitVectBitValue (sym->regsUsed, i))
-	    {
-	      switch (i)
-		{
-		case C_IDX:
-		case B_IDX:
+        {
+          if (bitVectBitValue (sym->regsUsed, i))
+            {
+              switch (i)
+                {
+                case C_IDX:
+                case B_IDX:
                   bcInUse = TRUE;
-		  break;
-		case D_IDX:
-		case E_IDX:
-		  if (IS_Z80) {
+                  break;
+                case D_IDX:
+                case E_IDX:
+                  if (IS_Z80) {
                     deInUse = TRUE;
                   }
                   else {
                     /* Other systems use DE as a temporary. */
                   }
-		  break;
-		}
-	    }
-	}
+                  break;
+                }
+            }
+        }
     }
 
-  if (bcInUse) 
+  if (bcInUse)
     {
       emit2 ("push bc");
       _G.stack.param_offset += 2;
@@ -3186,7 +3209,7 @@ genFunction (iCode * ic)
 
   /* adjust the stack for the function */
   _G.stack.last = sym->stack;
-  
+
   stackParm = FALSE;
   for (sym = setFirstItem (istack->syms); sym;
        sym = setNextItem (istack->syms))
@@ -3198,7 +3221,7 @@ genFunction (iCode * ic)
         }
     }
   sym = OP_SYMBOL (IC_LEFT (ic));
-  
+
   _G.omitFramePtr = options.ommitFramePtr;
   if (IS_Z80 && !stackParm && !sym->stack)
     {
@@ -3212,7 +3235,7 @@ genFunction (iCode * ic)
     emit2 ("!enterxl", sym->stack);
   else if (sym->stack)
     emit2 ("!enterx", sym->stack);
-  else if( !FUNC_ISNAKED( sym->type )) /*.p.t.20030716 - now supporting Naked funcitons */
+  else
     emit2 ("!enter");
 
   _G.stack.offset = sym->stack;
@@ -3226,6 +3249,11 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
 
+  if (IFFUNC_ISNAKED(sym->type))
+  {
+      emitDebug("; naked function: no epilogue.");
+      return;
+  }
 
   /* PENDING: calleeSave */
   if (IS_Z80 && _G.omitFramePtr)
@@ -3241,52 +3269,74 @@ genEndFunction (iCode * ic)
     {
       emit2 ("!leavex", _G.stack.offset);
     }
-  else if( !FUNC_ISNAKED( sym->type )) /*.p.t.20030716 - now supporting Naked funcitons */
+  else
     {
       emit2 ("!leave");
     }
-      
-  if (_G.calleeSaves.pushedDE) 
+
+  if (_G.calleeSaves.pushedDE)
     {
       emit2 ("pop de");
       _G.calleeSaves.pushedDE = FALSE;
     }
 
-  if (_G.calleeSaves.pushedBC) 
+  if (_G.calleeSaves.pushedBC)
     {
       emit2 ("pop bc");
       _G.calleeSaves.pushedBC = FALSE;
     }
 
-  if (options.profile) 
+  if (options.profile)
     {
       emit2 ("!profileexit");
     }
 
-  /* if this is an interrupt service routine then restore all potentially used registers. */
+  /* if this is an interrupt service routine
+     then save all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
     {
-      if (!FUNC_ISNAKED( sym->type ))
+      emit2 ("!popa");
+
+      /* If critical function then turn interrupts back on */
+      /* except when no interrupt number is given then it implies the NMI handler */
+      if (IFFUNC_ISCRITICAL (sym->type) && (FUNC_INTNO(sym->type) != INTNO_UNSPEC))
         {
-          emit2 ("!popa");
+          emit2 ("!ei");
         }
     }
   else
     {
-      /* if critical function then turn interrupts back on */
+      /* This is a non-ISR function.
+         If critical function then turn interrupts back on */
       if (IFFUNC_ISCRITICAL (sym->type))
-        emit2 ("!ei");
+        {
+          if (IS_GB)
+            {
+              emit2 ("!ei");
+            }
+          else
+            {
+              symbol *tlbl = newiTempLabel (NULL);
+              //restore P/O flag
+              emit2 ("pop af");
+              //parity odd <==> P/O=0 <==> interrupt enable flag IFF2 was 0 <==>
+              //don't enable interrupts as they were off before
+              emit2 ("jp po,!tlabel", tlbl->key + 100);
+              emit2 ("!ei");
+              emit2 ("!tlabeldef", (tlbl->key + 100));
+            }
+        }
     }
 
   if (options.debug && currFunc)
     {
       debugFile->writeEndFunction (currFunc, ic, 1);
     }
-      
+
   if (IFFUNC_ISISR (sym->type))
     {
       /* "critical interrupt" is used to imply NMI handler */
-      if (IS_Z80 && IFFUNC_ISCRITICAL (sym->type))
+      if (IS_Z80 && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO(sym->type) == INTNO_UNSPEC)
         emit2 ("retn");
       else
         emit2 ("reti");
@@ -3296,13 +3346,13 @@ genEndFunction (iCode * ic)
       /* Both banked and non-banked just ret */
       emit2 ("ret");
     }
-      
+
   if (!IS_STATIC(sym->etype))
     {
       sprintf (buffer, "%s_end", sym->rname);
       emit2 ("!labeldef", buffer);
     }
-  
+
   _G.flushStatics = 1;
   _G.stack.pushed = 0;
   _G.stack.offset = 0;
@@ -3331,17 +3381,17 @@ genRet (iCode * ic)
 
   aopDump("IC_LEFT", AOP(IC_LEFT(ic)));
 
-  #if 0  
+  #if 0
   if ((size == 2) && ((l = aopGetWord (AOP (IC_LEFT (ic)), 0))))
     {
       if (IS_GB)
-	{
-	  emit2 ("ld de,%s", l);
-	}
+        {
+          emit2 ("ld de,%s", l);
+        }
       else
-	{
-	  emit2 ("ld hl,%s", l);
-	}
+        {
+          emit2 ("ld hl,%s", l);
+        }
     }
   #endif
   if (size==2)
@@ -3351,21 +3401,21 @@ genRet (iCode * ic)
   else
     {
       if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))))
-	{
-	  fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
-	  fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
-	}
+        {
+          fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
+          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 2);
+        }
       else
-	{
-	  while (size--)
-	    {
-	      l = aopGet (AOP (IC_LEFT (ic)), offset,
-			  FALSE);
-	      if (strcmp (_fReturn[offset], l))
-		emit2 ("ld %s,%s", _fReturn[offset], l);
+        {
+          while (size--)
+            {
+              l = aopGet (AOP (IC_LEFT (ic)), offset,
+                          FALSE);
+              if (strcmp (_fReturn[offset], l))
+                emit2 ("ld %s,%s", _fReturn[offset], l);
               offset++;
-	    }
-	}
+            }
+        }
     }
   freeAsmop (IC_LEFT (ic), NULL, ic);
 
@@ -3373,7 +3423,7 @@ jumpret:
   /* generate a jump to the return label
      if the next is not the return statement */
   if (!(ic->next && ic->next->op == LABEL &&
-	IC_LABEL (ic->next) == returnLabel))
+        IC_LABEL (ic->next) == returnLabel))
 
     emit2 ("jp !tlabel", returnLabel->key + 100);
 }
@@ -3424,12 +3474,12 @@ genPlusIncr (iCode * ic)
   if (resultId != PAIR_INVALID)
     {
       if (isLitWord (AOP (IC_LEFT (ic))))
-	{
+        {
           fetchLitPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)), icount);
-	  return TRUE;
-	}
+          return TRUE;
+        }
       if (isPair (AOP (IC_LEFT (ic))) && resultId == PAIR_HL && icount > 2)
-	{
+        {
           if (getPairId (AOP (IC_LEFT (ic))) == PAIR_HL)
             {
               PAIR_ID freep = getFreePairId (ic);
@@ -3446,20 +3496,20 @@ genPlusIncr (iCode * ic)
               emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
               return TRUE;
             }
-	}
+        }
       if (icount > 5)
-	return FALSE;
+        return FALSE;
       /* Inc a pair */
       if (!sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))))
-	{
-	  if (icount > 2)
-	    return FALSE;
-	  movLeft2ResultLong (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0, 2);
-	}
+        {
+          if (icount > 2)
+            return FALSE;
+          movLeft2ResultLong (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0, 2);
+        }
       while (icount--)
-	{
-	  emit2 ("inc %s", getPairName (AOP (IC_RESULT (ic))));
-	}
+        {
+          emit2 ("inc %s", getPairName (AOP (IC_RESULT (ic))));
+        }
       return TRUE;
     }
 
@@ -3485,13 +3535,13 @@ genPlusIncr (iCode * ic)
       symbol *tlbl = NULL;
       tlbl = newiTempLabel (NULL);
       while (size--)
-	{
-	  emit2 ("inc %s", aopGet (AOP (IC_RESULT (ic)), offset++, FALSE));
-	  if (size)
-	    {
-	      emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
-	    }
-	}
+        {
+          emit2 ("inc %s", aopGet (AOP (IC_RESULT (ic)), offset++, FALSE));
+          if (size)
+            {
+              emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+            }
+        }
       emitLabel (tlbl->key + 100);
       return TRUE;
     }
@@ -3570,7 +3620,7 @@ shiftIntoPair (int idx, asmop *aop)
   wassertl (IS_Z80, "Only implemented for the Z80");
   //  wassertl (aop->type == AOP_EXSTK, "Only implemented for EXSTK");
 
-  switch (idx) 
+  switch (idx)
     {
     case 0:
       id = PAIR_HL;
@@ -3602,7 +3652,7 @@ shiftIntoPair (int idx, asmop *aop)
   _G.pairs[id].last_type = aop->type;
 }
 
-static void 
+static void
 setupToPreserveCarry (asmop *result, asmop *left, asmop *right)
 {
   wassert (left && right);
@@ -3698,14 +3748,14 @@ genPlus (iCode * ic)
 
       if (AOP_TYPE(IC_LEFT(ic)) == AOP_LIT && AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT &&
           left && right)
-	{
-	  /* It's a pair */
-	  /* PENDING: fix */
-	  char buffer[100];
-	  sprintf (buffer, "#(%s + %s)", left, right);
-	  emit2 ("ld %s,%s", getPairName (AOP (IC_RESULT (ic))), buffer);
-	  goto release;
-	}
+        {
+          /* It's a pair */
+          /* PENDING: fix */
+          char buffer[100];
+          sprintf (buffer, "#(%s + %s)", left, right);
+          emit2 ("ld %s,%s", getPairName (AOP (IC_RESULT (ic))), buffer);
+          goto release;
+        }
     }
 
   if ((isPair (AOP (IC_RIGHT (ic))) || isPair (AOP (IC_LEFT (ic)))) && getPairId (AOP (IC_RESULT (ic))) == PAIR_HL)
@@ -3715,7 +3765,7 @@ genPlus (iCode * ic)
       PAIR_ID right = getPairId (AOP (IC_RIGHT (ic)));
 
       spillPair (PAIR_HL);
-      
+
       if (left == PAIR_HL && right != PAIR_INVALID)
         {
           emit2 ("add hl,%s", _pairs[right].name);
@@ -3733,7 +3783,7 @@ genPlus (iCode * ic)
           goto release;
         }
       else if (left != PAIR_INVALID && left != PAIR_HL)
-        { 
+        {
           fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
           emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
           goto release;
@@ -3784,36 +3834,36 @@ genPlus (iCode * ic)
   if (IS_GB)
     {
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_STK ||
-	  AOP_TYPE (IC_RIGHT (ic)) == AOP_STK ||
-	  AOP_TYPE (IC_RESULT (ic)) == AOP_STK)
-	{
-	  if ((AOP_SIZE (IC_LEFT (ic)) == 2 ||
-	       AOP_SIZE (IC_RIGHT (ic)) == 2) &&
-	      (AOP_SIZE (IC_LEFT (ic)) <= 2 &&
-	       AOP_SIZE (IC_RIGHT (ic)) <= 2))
-	    {
-	      if (getPairId (AOP (IC_RIGHT (ic))) == PAIR_BC)
-		{
-		  /* Swap left and right */
-		  operand *t = IC_RIGHT (ic);
-		  IC_RIGHT (ic) = IC_LEFT (ic);
-		  IC_LEFT (ic) = t;
-		}
-	      if (getPairId (AOP (IC_LEFT (ic))) == PAIR_BC)
-		{
-		  fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
-		  emit2 ("add hl,bc");
-		}
-	      else
-		{
-		  fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
-		  fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
-		  emit2 ("add hl,de");
-		}
-	      commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
-	      goto release;
-	    }
-	}
+          AOP_TYPE (IC_RIGHT (ic)) == AOP_STK ||
+          AOP_TYPE (IC_RESULT (ic)) == AOP_STK)
+        {
+          if ((AOP_SIZE (IC_LEFT (ic)) == 2 ||
+               AOP_SIZE (IC_RIGHT (ic)) == 2) &&
+              (AOP_SIZE (IC_LEFT (ic)) <= 2 &&
+               AOP_SIZE (IC_RIGHT (ic)) <= 2))
+            {
+              if (getPairId (AOP (IC_RIGHT (ic))) == PAIR_BC)
+                {
+                  /* Swap left and right */
+                  operand *t = IC_RIGHT (ic);
+                  IC_RIGHT (ic) = IC_LEFT (ic);
+                  IC_LEFT (ic) = t;
+                }
+              if (getPairId (AOP (IC_LEFT (ic))) == PAIR_BC)
+                {
+                  fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+                  emit2 ("add hl,bc");
+                }
+              else
+                {
+                  fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
+                  fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+                  emit2 ("add hl,de");
+                }
+              commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
+              goto release;
+            }
+        }
       if (size == 4)
         {
           /* Be paranoid on the GB with 4 byte variables due to how C
@@ -3823,31 +3873,31 @@ genPlus (iCode * ic)
           goto release;
         }
     }
-  
+
   setupToPreserveCarry (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   while (size--)
     {
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_ACC)
-	{
-	  _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
-	  if (offset == 0)
-	    emit2 ("add a,%s",
-		   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
-	  else
-	    emit2 ("adc a,%s",
-		   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
-	}
+        {
+          _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
+          if (offset == 0)
+            emit2 ("add a,%s",
+                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+          else
+            emit2 ("adc a,%s",
+                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+        }
       else
-	{
-	  _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
-	  if (offset == 0)
-	    emit2 ("add a,%s",
-		   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
-	  else
-	    emit2 ("adc a,%s",
-		   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
-	}
+        {
+          _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
+          if (offset == 0)
+            emit2 ("add a,%s",
+                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+          else
+            emit2 ("adc a,%s",
+                   aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+        }
       aopPut (AOP (IC_RESULT (ic)), "a", offset++);
     }
 
@@ -3885,7 +3935,7 @@ genMinusDec (iCode * ic)
       (size > 1) && isPair (AOP (IC_RESULT (ic))))
     {
       while (icount--)
-	emit2 ("dec %s", getPairName (AOP (IC_RESULT (ic))));
+        emit2 ("dec %s", getPairName (AOP (IC_RESULT (ic))));
       return TRUE;
     }
 
@@ -3894,7 +3944,7 @@ genMinusDec (iCode * ic)
     {
       movLeft2ResultLong (IC_LEFT (ic), 0, IC_RESULT (ic), 0, 0, 2);
       while (icount--)
-	emit2 ("dec %s", getPairName (AOP (IC_RESULT (ic))));
+        emit2 ("dec %s", getPairName (AOP (IC_RESULT (ic))));
       return TRUE;
     }
 
@@ -3925,7 +3975,7 @@ genMinusDec (iCode * ic)
   if (sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))))
     {
       while (icount--)
-	emit2 ("dec %s", aopGet (AOP (IC_RESULT (ic)), 0, FALSE));
+        emit2 ("dec %s", aopGet (AOP (IC_RESULT (ic)), 0, FALSE));
       return TRUE;
     }
 
@@ -3973,45 +4023,45 @@ genMinus (iCode * ic)
   if (IS_GB)
     {
       if (AOP_TYPE (IC_LEFT (ic)) == AOP_STK ||
-	  AOP_TYPE (IC_RIGHT (ic)) == AOP_STK ||
-	  AOP_TYPE (IC_RESULT (ic)) == AOP_STK)
-	{
-	  if ((AOP_SIZE (IC_LEFT (ic)) == 2 ||
-	       AOP_SIZE (IC_RIGHT (ic)) == 2) &&
-	      (AOP_SIZE (IC_LEFT (ic)) <= 2 &&
-	       AOP_SIZE (IC_RIGHT (ic)) <= 2))
-	    {
-	      PAIR_ID left = getPairId (AOP (IC_LEFT (ic)));
-	      PAIR_ID right = getPairId (AOP (IC_RIGHT (ic)));
+          AOP_TYPE (IC_RIGHT (ic)) == AOP_STK ||
+          AOP_TYPE (IC_RESULT (ic)) == AOP_STK)
+        {
+          if ((AOP_SIZE (IC_LEFT (ic)) == 2 ||
+               AOP_SIZE (IC_RIGHT (ic)) == 2) &&
+              (AOP_SIZE (IC_LEFT (ic)) <= 2 &&
+               AOP_SIZE (IC_RIGHT (ic)) <= 2))
+            {
+              PAIR_ID left = getPairId (AOP (IC_LEFT (ic)));
+              PAIR_ID right = getPairId (AOP (IC_RIGHT (ic)));
 
-	      if (left == PAIR_INVALID && right == PAIR_INVALID)
-		{
-		  left = PAIR_DE;
-		  right = PAIR_HL;
-		}
-	      else if (right == PAIR_INVALID)
-		right = PAIR_DE;
-	      else if (left == PAIR_INVALID)
-		left = PAIR_DE;
+              if (left == PAIR_INVALID && right == PAIR_INVALID)
+                {
+                  left = PAIR_DE;
+                  right = PAIR_HL;
+                }
+              else if (right == PAIR_INVALID)
+                right = PAIR_DE;
+              else if (left == PAIR_INVALID)
+                left = PAIR_DE;
 
-	      fetchPair (left, AOP (IC_LEFT (ic)));
-	      /* Order is important.  Right may be HL */
-	      fetchPair (right, AOP (IC_RIGHT (ic)));
+              fetchPair (left, AOP (IC_LEFT (ic)));
+              /* Order is important.  Right may be HL */
+              fetchPair (right, AOP (IC_RIGHT (ic)));
 
-	      emit2 ("ld a,%s", _pairs[left].l);
-	      emit2 ("sub a,%s", _pairs[right].l);
-	      emit2 ("ld e,a");
-	      emit2 ("ld a,%s", _pairs[left].h);
-	      emit2 ("sbc a,%s", _pairs[right].h);
+              emit2 ("ld a,%s", _pairs[left].l);
+              emit2 ("sub a,%s", _pairs[right].l);
+              emit2 ("ld e,a");
+              emit2 ("ld a,%s", _pairs[left].h);
+              emit2 ("sbc a,%s", _pairs[right].h);
 
               if ( AOP_SIZE (IC_RESULT (ic)) > 1)
                 {
                   aopPut (AOP (IC_RESULT (ic)), "a", 1);
                 }
-	      aopPut (AOP (IC_RESULT (ic)), "e", 0);
-	      goto release;
-	    }
-	}
+              aopPut (AOP (IC_RESULT (ic)), "e", 0);
+              goto release;
+            }
+        }
       if (size == 4)
         {
           /* Be paranoid on the GB with 4 byte variables due to how C
@@ -4029,22 +4079,22 @@ genMinus (iCode * ic)
     {
       _moveA (aopGet (AOP (IC_LEFT (ic)), offset, FALSE));
       if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
-	{
-	  if (!offset)
-	    emit2 ("sub a,%s",
-		      aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
-	  else
-	    emit2 ("sbc a,%s",
-		      aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
-	}
+        {
+          if (!offset)
+            emit2 ("sub a,%s",
+                      aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+          else
+            emit2 ("sbc a,%s",
+                      aopGet (AOP (IC_RIGHT (ic)), offset, FALSE));
+        }
       else
-	{
-	  /* first add without previous c */
-	  if (!offset)
-	    emit2 ("add a,!immedbyte", (unsigned int) (lit & 0x0FFL));
-	  else
-	    emit2 ("adc a,!immedbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
-	}
+        {
+          /* first add without previous c */
+          if (!offset)
+            emit2 ("add a,!immedbyte", (unsigned int) (lit & 0x0FFL));
+          else
+            emit2 ("adc a,!immedbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+        }
       aopPut (AOP (IC_RESULT (ic)), "a", offset++);
     }
 
@@ -4078,7 +4128,7 @@ genMult (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
-  
+
   byteResult =  (AOP_SIZE (IC_RESULT (ic)) == 1);
 
   if (AOP_SIZE (IC_LEFT (ic)) > 2 ||
@@ -4116,7 +4166,7 @@ genMult (iCode * ic)
           emit2 ("rlc a");
           emit2 ("sbc a,a");
           emit2 ("ld d,a");
-	}
+        }
     }
   else
     {
@@ -4139,7 +4189,7 @@ genMult (iCode * ic)
             {
               emit2 ("ld l,e");
               if (!byteResult)
-	        emit2 ("ld h,d");
+                emit2 ("ld h,d");
             }
           else
             {
@@ -4203,60 +4253,60 @@ genIfxJump (iCode * ic, char *jval)
     {
       jlbl = IC_TRUE (ic);
       if (!strcmp (jval, "a"))
-	{
-	  inst = "nz";
-	}
+        {
+          inst = "nz";
+        }
       else if (!strcmp (jval, "c"))
-	{
-	  inst = "c";
-	}
+        {
+          inst = "c";
+        }
       else if (!strcmp (jval, "nc"))
-	{
-	  inst = "nc";
-	}
+        {
+          inst = "nc";
+        }
       else if (!strcmp (jval, "m"))
-	{
-	  inst = "m";
-	}
+        {
+          inst = "m";
+        }
       else if (!strcmp (jval, "p"))
-	{
-	  inst = "p";
-	}
+        {
+          inst = "p";
+        }
       else
-	{
-	  /* The buffer contains the bit on A that we should test */
-	  inst = "nz";
-	}
+        {
+          /* The buffer contains the bit on A that we should test */
+          inst = "nz";
+        }
     }
   else
     {
       /* false label is present */
       jlbl = IC_FALSE (ic);
       if (!strcmp (jval, "a"))
-	{
-	  inst = "z";
-	}
+        {
+          inst = "z";
+        }
       else if (!strcmp (jval, "c"))
-	{
-	  inst = "nc";
-	}
+        {
+          inst = "nc";
+        }
       else if (!strcmp (jval, "nc"))
-	{
-	  inst = "c";
-	}
+        {
+          inst = "c";
+        }
       else if (!strcmp (jval, "m"))
-	{
-	  inst = "p";
-	}
+        {
+          inst = "p";
+        }
       else if (!strcmp (jval, "p"))
-	{
-	  inst = "m";
-	}
+        {
+          inst = "m";
+        }
       else
-	{
-	  /* The buffer contains the bit on A that we should test */
-	  inst = "z";
-	}
+        {
+          /* The buffer contains the bit on A that we should test */
+          inst = "z";
+        }
     }
   /* Z80 can do a conditional long jump */
   if (!strcmp (jval, "a"))
@@ -4296,17 +4346,17 @@ _getPairIdName (PAIR_ID id)
 #if OLD
       /* if unsigned char cmp with lit, just compare */
       if ((size == 1) &&
-	  (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR))
-	{
-	  emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
-	  if (sign)
-	    {
-	      emit2 ("xor a,!immedbyte", 0x80);
-	      emit2 ("cp %s^!constbyte", aopGet (AOP (right), offset, FALSE), 0x80);
-	    }
-	  else
-	    emit2 ("cp %s", aopGet (AOP (right), offset, FALSE));
-	}
+          (AOP_TYPE (right) == AOP_LIT && AOP_TYPE (left) != AOP_DIR))
+        {
+          emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
+          if (sign)
+            {
+              emit2 ("xor a,!immedbyte", 0x80);
+              emit2 ("cp %s^!constbyte", aopGet (AOP (right), offset, FALSE), 0x80);
+            }
+          else
+            emit2 ("cp %s", aopGet (AOP (right), offset, FALSE));
+        }
       else if (size == 4 && IS_GB && requiresHL(AOP(right)) && requiresHL(AOP(left)))
         {
           // On the Gameboy we can't afford to adjust HL as it may trash the carry.
@@ -4338,7 +4388,7 @@ _getPairIdName (PAIR_ID id)
                   emit2 ("ld a,(de)");
                   emit2 ("%s a,(hl)", offset == 0 ? "sub" : "sbc");
                 }
-              
+
               if (size != 0)
                 {
                   emit2 ("inc hl");
@@ -4375,7 +4425,7 @@ _getPairIdName (PAIR_ID id)
                   emit2 ("ld a,(hl)");
                   emit2 ("%s a,%d(iy)", offset == 0 ? "sub" : "sbc", offset);
                 }
-              
+
               if (size != 0)
                 {
                   emit2 ("inc hl");
@@ -4386,87 +4436,87 @@ _getPairIdName (PAIR_ID id)
           spillPair (PAIR_IY);
         }
       else
-	{
-	  if (AOP_TYPE (right) == AOP_LIT)
-	    {
-	      lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
-	      /* optimize if(x < 0) or if(x >= 0) */
-	      if (lit == 0L)
-		{
-		  if (!sign)
-		    {
-		      /* No sign so it's always false */
-		      _clearCarry();
-		    }
-		  else
-		    {
-		      /* Just load in the top most bit */
-		      _moveA (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
-		      if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
-			{
-			  genIfxJump (ifx, "7");
-			  return;
-			}
-		      else
-			emit2 ("rlc a");
-		    }
-		  goto release;
-		}
-	    }
-          
-	  if (sign)
-	    {
-	      /* First setup h and l contaning the top most bytes XORed */
-	      bool fDidXor = FALSE;
-	      if (AOP_TYPE (left) == AOP_LIT)
-		{
-		  unsigned long lit = (unsigned long)
-		  floatFromVal (AOP (left)->aopu.aop_lit);
-		  emit2 ("ld %s,!immedbyte", _fTmp[0],
-			 0x80 ^ (unsigned int) ((lit >> ((size - 1) * 8)) & 0x0FFL));
-		}
-	      else
-		{
-		  emit2 ("ld a,%s", aopGet (AOP (left), size - 1, FALSE));
-		  emit2 ("xor a,!immedbyte", 0x80);
-		  emit2 ("ld %s,a", _fTmp[0]);
-		  fDidXor = TRUE;
-		}
-	      if (AOP_TYPE (right) == AOP_LIT)
-		{
-		  unsigned long lit = (unsigned long)
-		  floatFromVal (AOP (right)->aopu.aop_lit);
-		  emit2 ("ld %s,!immedbyte", _fTmp[1],
-			 0x80 ^ (unsigned int) ((lit >> ((size - 1) * 8)) & 0x0FFL));
-		}
-	      else
-		{
-		  emit2 ("ld a,%s", aopGet (AOP (right), size - 1, FALSE));
-		  emit2 ("xor a,!immedbyte", 0x80);
-		  emit2 ("ld %s,a", _fTmp[1]);
-		  fDidXor = TRUE;
-		}
-	    }
-	  while (size--)
-	    {
-	      /* Do a long subtract */
-	      if (!sign || size)
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		}
-	      if (sign && size == 0)
-		{
-		  emit2 ("ld a,%s", _fTmp[0]);
-		  emit2 ("%s a,%s", offset == 0 ? "sub" : "sbc", _fTmp[1]);
-		}
-	      else
-		{
-		  /* Subtract through, propagating the carry */
-		  emit2 ("%s a,%s", offset == 0 ? "sub" : "sbc", aopGet (AOP (right), offset, FALSE));
-		  offset++;
-		}
-	    }
-	}
+        {
+          if (AOP_TYPE (right) == AOP_LIT)
+            {
+              lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
+              /* optimize if(x < 0) or if(x >= 0) */
+              if (lit == 0L)
+                {
+                  if (!sign)
+                    {
+                      /* No sign so it's always false */
+                      _clearCarry();
+                    }
+                  else
+                    {
+                      /* Just load in the top most bit */
+                      _moveA (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE));
+                      if (!(AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result)) && ifx)
+                        {
+                          genIfxJump (ifx, "7");
+                          return;
+                        }
+                      else
+                        emit2 ("rlc a");
+                    }
+                  goto release;
+                }
+            }
+
+          if (sign)
+            {
+              /* First setup h and l contaning the top most bytes XORed */
+              bool fDidXor = FALSE;
+              if (AOP_TYPE (left) == AOP_LIT)
+                {
+                  unsigned long lit = (unsigned long)
+                  floatFromVal (AOP (left)->aopu.aop_lit);
+                  emit2 ("ld %s,!immedbyte", _fTmp[0],
+                         0x80 ^ (unsigned int) ((lit >> ((size - 1) * 8)) & 0x0FFL));
+                }
+              else
+                {
+                  emit2 ("ld a,%s", aopGet (AOP (left), size - 1, FALSE));
+                  emit2 ("xor a,!immedbyte", 0x80);
+                  emit2 ("ld %s,a", _fTmp[0]);
+                  fDidXor = TRUE;
+                }
+              if (AOP_TYPE (right) == AOP_LIT)
+                {
+                  unsigned long lit = (unsigned long)
+                  floatFromVal (AOP (right)->aopu.aop_lit);
+                  emit2 ("ld %s,!immedbyte", _fTmp[1],
+                         0x80 ^ (unsigned int) ((lit >> ((size - 1) * 8)) & 0x0FFL));
+                }
+              else
+                {
+                  emit2 ("ld a,%s", aopGet (AOP (right), size - 1, FALSE));
+                  emit2 ("xor a,!immedbyte", 0x80);
+                  emit2 ("ld %s,a", _fTmp[1]);
+                  fDidXor = TRUE;
+                }
+            }
+          while (size--)
+            {
+              /* Do a long subtract */
+              if (!sign || size)
+                {
+                  _moveA (aopGet (AOP (left), offset, FALSE));
+                }
+              if (sign && size == 0)
+                {
+                  emit2 ("ld a,%s", _fTmp[0]);
+                  emit2 ("%s a,%s", offset == 0 ? "sub" : "sbc", _fTmp[1]);
+                }
+              else
+                {
+                  /* Subtract through, propagating the carry */
+                  emit2 ("%s a,%s", offset == 0 ? "sub" : "sbc", aopGet (AOP (right), offset, FALSE));
+                  offset++;
+                }
+            }
+        }
     }
 #endif
 
@@ -4474,7 +4524,7 @@ _getPairIdName (PAIR_ID id)
  */
 static void
 genCmp (operand * left, operand * right,
-	operand * result, iCode * ifx, int sign)
+        operand * result, iCode * ifx, int sign)
 {
   int size, offset = 0;
   unsigned long lit = 0L;
@@ -4505,7 +4555,7 @@ genCmp (operand * left, operand * right,
             {
               emit2 ("ld a,(de)");
               emit2 ("%s a,(hl)", offset == 0 ? "sub" : "sbc");
-              
+
               if (size != 0)
                 {
                   emit2 ("inc hl");
@@ -4539,7 +4589,7 @@ genCmp (operand * left, operand * right,
                     }
                   else
                     {
-                      if (!sign) 
+                      if (!sign)
                         {
                           emit2 ("rlc a");
                         }
@@ -4697,67 +4747,67 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
       AOP_TYPE (left) != AOP_DIR)
     {
       if (lit == 0)
-	{
-	  emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
-	  if (size > 1)
-	    {
-	      while (--size)
-		{
-		  emit2 ("or a,%s", aopGet (AOP (left), ++offset, FALSE));
-		}
-	    }
-	  else
-	    {
-	      emit2 ("or a,a");
-	    }
-	  emit2 ("jp nz,!tlabel", lbl->key + 100);
-	}
+        {
+          emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
+          if (size > 1)
+            {
+              while (--size)
+                {
+                  emit2 ("or a,%s", aopGet (AOP (left), ++offset, FALSE));
+                }
+            }
+          else
+            {
+              emit2 ("or a,a");
+            }
+          emit2 ("jp nz,!tlabel", lbl->key + 100);
+        }
       else
-	{
-	  while (size--)
-	    {
-	      emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
-	      if ((AOP_TYPE (right) == AOP_LIT) && lit == 0)
-		emit2 ("or a,a");
-	      else
-		emit2 ("cp a,%s", aopGet (AOP (right), offset, FALSE));
-	      emit2 ("jp nz,!tlabel", lbl->key + 100);
-	      offset++;
-	    }
-	}
+        {
+          while (size--)
+            {
+              emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
+              if ((AOP_TYPE (right) == AOP_LIT) && lit == 0)
+                emit2 ("or a,a");
+              else
+                emit2 ("cp a,%s", aopGet (AOP (right), offset, FALSE));
+              emit2 ("jp nz,!tlabel", lbl->key + 100);
+              offset++;
+            }
+        }
     }
   /* if the right side is in a register or in direct space or
      if the left is a pointer register & right is not */
   else if (AOP_TYPE (right) == AOP_REG ||
-	   AOP_TYPE (right) == AOP_DIR ||
-	   (AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT))
+           AOP_TYPE (right) == AOP_DIR ||
+           (AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT))
     {
       while (size--)
-	{
-	  _moveA (aopGet (AOP (left), offset, FALSE));
-	  if ((AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) &&
-	      ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
-	    /* PENDING */
-	    emit2 ("jp nz,!tlabel", lbl->key + 100);
-	  else
-	    {
-	      emit2 ("cp %s", aopGet (AOP (right), offset, FALSE));
-	      emit2 ("jp nz,!tlabel", lbl->key + 100);
-	    }
-	  offset++;
-	}
+        {
+          _moveA (aopGet (AOP (left), offset, FALSE));
+          if ((AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) &&
+              ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
+            /* PENDING */
+            emit2 ("jp nz,!tlabel", lbl->key + 100);
+          else
+            {
+              emit2 ("cp %s", aopGet (AOP (right), offset, FALSE));
+              emit2 ("jp nz,!tlabel", lbl->key + 100);
+            }
+          offset++;
+        }
     }
   else
     {
       /* right is a pointer reg need both a & b */
       /* PENDING: is this required? */
       while (size--)
-	{
-	  _moveA (aopGet (AOP (right), offset, FALSE));
-	  emit2 ("cp %s", aopGet (AOP (left), offset, FALSE));
-	  emit2 ("!shortjp nz,!tlabel", lbl->key + 100);
-	  offset++;
-	}
+        {
+          _moveA (aopGet (AOP (right), offset, FALSE));
+          emit2 ("cp %s", aopGet (AOP (left), offset, FALSE));
+          emit2 ("!shortjp nz,!tlabel", lbl->key + 100);
+          offset++;
+        }
     }
 }
 
@@ -4808,29 +4858,29 @@ genCmpEq (iCode * ic, iCode * ifx)
       symbol *tlbl;
       /* if they are both bit variables */
       if (AOP_TYPE (left) == AOP_CRY &&
-	  ((AOP_TYPE (right) == AOP_CRY) || (AOP_TYPE (right) == AOP_LIT)))
-	{
-	  wassertl (0, "Tried to compare two bits");
-	}
+          ((AOP_TYPE (right) == AOP_CRY) || (AOP_TYPE (right) == AOP_LIT)))
+        {
+          wassertl (0, "Tried to compare two bits");
+        }
       else
-	{
-	  tlbl = newiTempLabel (NULL);
-	  gencjneshort (left, right, tlbl);
-	  if (IC_TRUE (ifx))
-	    {
-	      emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
-	      emitLabel (tlbl->key + 100);
-	    }
-	  else
-	    {
-	      /* PENDING: do this better */
-	      symbol *lbl = newiTempLabel (NULL);
-	      emit2 ("!shortjp !tlabel", lbl->key + 100);
-	      emitLabel (tlbl->key + 100);
-	      emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
-	      emitLabel (lbl->key + 100);
-	    }
-	}
+        {
+          tlbl = newiTempLabel (NULL);
+          gencjneshort (left, right, tlbl);
+          if (IC_TRUE (ifx))
+            {
+              emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
+              emitLabel (tlbl->key + 100);
+            }
+          else
+            {
+              /* PENDING: do this better */
+              symbol *lbl = newiTempLabel (NULL);
+              emit2 ("!shortjp !tlabel", lbl->key + 100);
+              emitLabel (tlbl->key + 100);
+              emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
+              emitLabel (lbl->key + 100);
+            }
+        }
       /* mark the icode as generated */
       ifx->generated = 1;
       goto release;
@@ -4845,25 +4895,25 @@ genCmpEq (iCode * ic, iCode * ifx)
   else
     {
       emitDebug(";4");
-      
+
       gencjne (left, right, newiTempLabel (NULL));
       if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
-	{
-	  wassert (0);
-	}
+        {
+          wassert (0);
+        }
       if (ifx)
-	{
+        {
           emitDebug(";5");
-	  genIfxJump (ifx, "a");
-	  goto release;
-	}
+          genIfxJump (ifx, "a");
+          goto release;
+        }
       /* if the result is used in an arithmetic operation
          then put the result in place */
       if (AOP_TYPE (result) != AOP_CRY)
-	{
+        {
           emitDebug(";6");
-	  outAcc (result);
-	}
+          outAcc (result);
+        }
       /* leave the result in acc */
     }
 
@@ -5094,7 +5144,7 @@ genAnd (iCode * ic, iCode * ifx)
                 }
               emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
             }
-	      offset++;
+              offset++;
         }
       // bit = left & literal
       if (size)
@@ -5119,82 +5169,82 @@ genAnd (iCode * ic, iCode * ifx)
   if (sameRegs (AOP (result), AOP (left)))
     {
       for (; size--; offset++)
-	{
-	  if (AOP_TYPE (right) == AOP_LIT)
-	    {
-	      if ((bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL)) == 0x0FF)
-		continue;
-	      else
-		{
-		  if (bytelit == 0)
-		    aopPut (AOP (result), "!zero", offset);
-		  else
-		    {
-		      _moveA (aopGet (AOP (left), offset, FALSE));
-		      emit2 ("and a,%s",
-				aopGet (AOP (right), offset, FALSE));
-		      aopPut (AOP (left), "a", offset);
-		    }
-		}
+        {
+          if (AOP_TYPE (right) == AOP_LIT)
+            {
+              if ((bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL)) == 0x0FF)
+                continue;
+              else
+                {
+                  if (bytelit == 0)
+                    aopPut (AOP (result), "!zero", offset);
+                  else
+                    {
+                      _moveA (aopGet (AOP (left), offset, FALSE));
+                      emit2 ("and a,%s",
+                                aopGet (AOP (right), offset, FALSE));
+                      aopPut (AOP (left), "a", offset);
+                    }
+                }
 
-	    }
-	  else
-	    {
-	      if (AOP_TYPE (left) == AOP_ACC)
-		{
-		  wassertl (0, "Tried to perform an AND where the left operand is allocated into A");
-		}
-	      else
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		  emit2 ("and a,%s",
-			    aopGet (AOP (right), offset, FALSE));
-		  aopPut (AOP (left), "a", offset);
-		}
-	    }
-	}
+            }
+          else
+            {
+              if (AOP_TYPE (left) == AOP_ACC)
+                {
+                  wassertl (0, "Tried to perform an AND where the left operand is allocated into A");
+                }
+              else
+                {
+                  _moveA (aopGet (AOP (left), offset, FALSE));
+                  emit2 ("and a,%s",
+                            aopGet (AOP (right), offset, FALSE));
+                  aopPut (AOP (left), "a", offset);
+                }
+            }
+        }
     }
   else
     {
       // left & result in different registers
       if (AOP_TYPE (result) == AOP_CRY)
-	{
-	  wassertl (0, "Tried to AND where the result is in carry");
-	}
+        {
+          wassertl (0, "Tried to AND where the result is in carry");
+        }
       else
-	{
-	  for (; (size--); offset++)
-	    {
-	      // normal case
-	      // result = left & right
-	      if (AOP_TYPE (right) == AOP_LIT)
-		{
-		  if ((bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL)) == 0x0FF)
-		    {
-		      aopPut (AOP (result),
-			      aopGet (AOP (left), offset, FALSE),
-			      offset);
-		      continue;
-		    }
-		  else if (bytelit == 0)
-		    {
-		      aopPut (AOP (result), "!zero", offset);
-		      continue;
-		    }
-		}
-	      // faster than result <- left, anl result,right
-	      // and better if result is SFR
-	      if (AOP_TYPE (left) == AOP_ACC)
-		emit2 ("and a,%s", aopGet (AOP (right), offset, FALSE));
-	      else
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		  emit2 ("and a,%s",
-			    aopGet (AOP (right), offset, FALSE));
-		}
-	      aopPut (AOP (result), "a", offset);
-	    }
-	}
+        {
+          for (; (size--); offset++)
+            {
+              // normal case
+              // result = left & right
+              if (AOP_TYPE (right) == AOP_LIT)
+                {
+                  if ((bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL)) == 0x0FF)
+                    {
+                      aopPut (AOP (result),
+                              aopGet (AOP (left), offset, FALSE),
+                              offset);
+                      continue;
+                    }
+                  else if (bytelit == 0)
+                    {
+                      aopPut (AOP (result), "!zero", offset);
+                      continue;
+                    }
+                }
+              // faster than result <- left, anl result,right
+              // and better if result is SFR
+              if (AOP_TYPE (left) == AOP_ACC)
+                emit2 ("and a,%s", aopGet (AOP (right), offset, FALSE));
+              else
+                {
+                  _moveA (aopGet (AOP (left), offset, FALSE));
+                  emit2 ("and a,%s",
+                            aopGet (AOP (right), offset, FALSE));
+                }
+              aopPut (AOP (result), "a", offset);
+            }
+        }
 
     }
 
@@ -5291,70 +5341,70 @@ genOr (iCode * ic, iCode * ifx)
   if (sameRegs (AOP (result), AOP (left)))
     {
       for (; size--; offset++)
-	{
-	  if (AOP_TYPE (right) == AOP_LIT)
-	    {
-	      if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
-		continue;
-	      else
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		  emit2 ("or a,%s",
-			    aopGet (AOP (right), offset, FALSE));
-		  aopPut (AOP (result), "a", offset);
-		}
-	    }
-	  else
-	    {
-	      if (AOP_TYPE (left) == AOP_ACC)
-		emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
-	      else
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		  emit2 ("or a,%s",
-			    aopGet (AOP (right), offset, FALSE));
-		  aopPut (AOP (result), "a", offset);
-		}
-	    }
-	}
+        {
+          if (AOP_TYPE (right) == AOP_LIT)
+            {
+              if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
+                continue;
+              else
+                {
+                  _moveA (aopGet (AOP (left), offset, FALSE));
+                  emit2 ("or a,%s",
+                            aopGet (AOP (right), offset, FALSE));
+                  aopPut (AOP (result), "a", offset);
+                }
+            }
+          else
+            {
+              if (AOP_TYPE (left) == AOP_ACC)
+                emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
+              else
+                {
+                  _moveA (aopGet (AOP (left), offset, FALSE));
+                  emit2 ("or a,%s",
+                            aopGet (AOP (right), offset, FALSE));
+                  aopPut (AOP (result), "a", offset);
+                }
+            }
+        }
     }
   else
     {
       // left & result in different registers
       if (AOP_TYPE (result) == AOP_CRY)
-	{
-	  wassertl (0, "Result of OR is in a bit");
-	}
+        {
+          wassertl (0, "Result of OR is in a bit");
+        }
       else
-	for (; (size--); offset++)
-	  {
-	    // normal case
-	    // result = left & right
-	    if (AOP_TYPE (right) == AOP_LIT)
-	      {
-		if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
-		  {
-		    aopPut (AOP (result),
-			    aopGet (AOP (left), offset, FALSE),
-			    offset);
-		    continue;
-		  }
-	      }
-	    // faster than result <- left, anl result,right
-	    // and better if result is SFR
-	    if (AOP_TYPE (left) == AOP_ACC)
-	      emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
-	    else
-	      {
-		_moveA (aopGet (AOP (left), offset, FALSE));
-		emit2 ("or a,%s",
-			  aopGet (AOP (right), offset, FALSE));
-	      }
-	    aopPut (AOP (result), "a", offset);
-	    /* PENDING: something weird is going on here.  Add exception. */
-	    if (AOP_TYPE (result) == AOP_ACC)
-	      break;
-	  }
+        for (; (size--); offset++)
+          {
+            // normal case
+            // result = left & right
+            if (AOP_TYPE (right) == AOP_LIT)
+              {
+                if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
+                  {
+                    aopPut (AOP (result),
+                            aopGet (AOP (left), offset, FALSE),
+                            offset);
+                    continue;
+                  }
+              }
+            // faster than result <- left, anl result,right
+            // and better if result is SFR
+            if (AOP_TYPE (left) == AOP_ACC)
+              emit2 ("or a,%s", aopGet (AOP (right), offset, FALSE));
+            else
+              {
+                _moveA (aopGet (AOP (left), offset, FALSE));
+                emit2 ("or a,%s",
+                          aopGet (AOP (right), offset, FALSE));
+              }
+            aopPut (AOP (result), "a", offset);
+            /* PENDING: something weird is going on here.  Add exception. */
+            if (AOP_TYPE (result) == AOP_ACC)
+              break;
+          }
     }
 
 release:
@@ -5449,71 +5499,71 @@ genXor (iCode * ic, iCode * ifx)
   if (sameRegs (AOP (result), AOP (left)))
     {
       for (; size--; offset++)
-	{
-	  if (AOP_TYPE (right) == AOP_LIT)
-	    {
-	      if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
-		continue;
-	      else
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		  emit2 ("xor a,%s",
-			    aopGet (AOP (right), offset, FALSE));
-		  aopPut (AOP (result), "a", offset);
-		}
-	    }
-	  else
-	    {
-	      if (AOP_TYPE (left) == AOP_ACC)
+        {
+          if (AOP_TYPE (right) == AOP_LIT)
+            {
+              if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
+                continue;
+              else
+                {
+                  _moveA (aopGet (AOP (left), offset, FALSE));
+                  emit2 ("xor a,%s",
+                            aopGet (AOP (right), offset, FALSE));
+                  aopPut (AOP (result), "a", offset);
+                }
+            }
+          else
+            {
+              if (AOP_TYPE (left) == AOP_ACC)
                 {
                   emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
                 }
-	      else
-		{
-		  _moveA (aopGet (AOP (left), offset, FALSE));
-		  emit2 ("xor a,%s",
-			    aopGet (AOP (right), offset, FALSE));
-		  aopPut (AOP (result), "a", offset);
-		}
-	    }
-	}
+              else
+                {
+                  _moveA (aopGet (AOP (left), offset, FALSE));
+                  emit2 ("xor a,%s",
+                            aopGet (AOP (right), offset, FALSE));
+                  aopPut (AOP (result), "a", offset);
+                }
+            }
+        }
     }
   else
     {
       // left & result in different registers
       if (AOP_TYPE (result) == AOP_CRY)
-	{
-	  wassertl (0, "Result of XOR is in a bit");
-	}
+        {
+          wassertl (0, "Result of XOR is in a bit");
+        }
       else
-	for (; (size--); offset++)
-	  {
-	    // normal case
-	    // result = left & right
-	    if (AOP_TYPE (right) == AOP_LIT)
-	      {
-		if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
-		  {
-		    aopPut (AOP (result),
-			    aopGet (AOP (left), offset, FALSE),
-			    offset);
-		    continue;
-		  }
-	      }
-	    // faster than result <- left, anl result,right
-	    // and better if result is SFR
-	    if (AOP_TYPE (left) == AOP_ACC) 
+        for (; (size--); offset++)
+          {
+            // normal case
+            // result = left & right
+            if (AOP_TYPE (right) == AOP_LIT)
+              {
+                if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
+                  {
+                    aopPut (AOP (result),
+                            aopGet (AOP (left), offset, FALSE),
+                            offset);
+                    continue;
+                  }
+              }
+            // faster than result <- left, anl result,right
+            // and better if result is SFR
+            if (AOP_TYPE (left) == AOP_ACC)
               {
                 emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
               }
-	    else
-	      {
-		_moveA (aopGet (AOP (left), offset, FALSE));
-		emit2 ("xor a,%s",
-			  aopGet (AOP (right), offset, FALSE));
-	      }
-	    aopPut (AOP (result), "a", offset);
-	  }
+            else
+              {
+                _moveA (aopGet (AOP (left), offset, FALSE));
+                emit2 ("xor a,%s",
+                          aopGet (AOP (right), offset, FALSE));
+              }
+            aopPut (AOP (result), "a", offset);
+          }
     }
 
 release:
@@ -5539,24 +5589,24 @@ genInline (iCode * ic)
   while (*bp)
     {
       if (*bp == '\n')
-	{
-	  *bp++ = '\0';
-	  emit2 (bp1);
-	  bp1 = bp;
-	}
+        {
+          *bp++ = '\0';
+          emit2 (bp1);
+          bp1 = bp;
+        }
       else
-	{
-	  if (*bp == ':')
-	    {
-	      bp++;
-	      *bp = '\0';
-	      bp++;
-	      emit2 (bp1);
-	      bp1 = bp;
-	    }
-	  else
-	    bp++;
-	}
+        {
+          if (*bp == ':')
+            {
+              bp++;
+              *bp = '\0';
+              bp++;
+              emit2 (bp1);
+              bp1 = bp;
+            }
+          else
+            bp++;
+        }
     }
   if (bp1 != bp)
     emit2 (bp1);
@@ -5640,8 +5690,8 @@ emitRsh2 (asmop *aop, int size, int is_signed)
 /*-----------------------------------------------------------------*/
 static void
 shiftR2Left2Result (operand * left, int offl,
-		    operand * result, int offr,
-		    int shCount, int is_signed)
+                    operand * result, int offr,
+                    int shCount, int is_signed)
 {
   int size = 2;
   symbol *tlbl, *tlbl1;
@@ -5650,7 +5700,7 @@ shiftR2Left2Result (operand * left, int offl,
   movLeft2Result (left, offl + 1, result, offr + 1, 0);
 
   /*  if (AOP(result)->type == AOP_REG) { */
-  
+
   tlbl = newiTempLabel (NULL);
   tlbl1 = newiTempLabel (NULL);
 
@@ -5681,7 +5731,7 @@ shiftR2Left2Result (operand * left, int offl,
 /*-----------------------------------------------------------------*/
 static void
 shiftL2Left2Result (operand * left, int offl,
-		    operand * result, int offr, int shCount)
+                    operand * result, int offr, int shCount)
 {
   if (sameRegs (AOP (result), AOP (left)) &&
       ((offl + MSB16) == offr))
@@ -5698,9 +5748,9 @@ shiftL2Left2Result (operand * left, int offl,
   if (getPairId (AOP (result)) == PAIR_HL)
     {
       while (shCount--)
-	{
-	  emit2 ("add hl,hl");
-	}
+        {
+          emit2 ("add hl,hl");
+        }
     }
   else
     {
@@ -5714,54 +5764,54 @@ shiftL2Left2Result (operand * left, int offl,
 
     if (AOP (result)->type == AOP_REG)
       {
-	while (shCount--)
-	  {
-	    for (offset = 0; offset < size; offset++)
-	      {
-		l = aopGet (AOP (result), offset, FALSE);
-	    
-		if (offset == 0)
-		  {
-		    emit2 ("sla %s", l);
-		  }
-		else
-		  {
-		    emit2 ("rl %s", l);
-		  }
-	      }
-	  }
+        while (shCount--)
+          {
+            for (offset = 0; offset < size; offset++)
+              {
+                l = aopGet (AOP (result), offset, FALSE);
+
+                if (offset == 0)
+                  {
+                    emit2 ("sla %s", l);
+                  }
+                else
+                  {
+                    emit2 ("rl %s", l);
+                  }
+              }
+          }
       }
     else
       {
-	/* Left is already in result - so now do the shift */
-	if (shCount > 1)
-	  {
-	    emit2 ("ld a,!immedbyte+1", shCount);
-	    emit2 ("!shortjp !tlabel", tlbl1->key + 100);
-	    emitLabel (tlbl->key + 100);
-	  }
+        /* Left is already in result - so now do the shift */
+        if (shCount > 1)
+          {
+            emit2 ("ld a,!immedbyte+1", shCount);
+            emit2 ("!shortjp !tlabel", tlbl1->key + 100);
+            emitLabel (tlbl->key + 100);
+          }
 
-	while (size--)
-	  {
-	    l = aopGet (AOP (result), offset, FALSE);
-	    
-	    if (offset == 0)
-	      {
-		emit2 ("sla %s", l);
-	      }
-	    else
-	      {
-		emit2 ("rl %s", l);
-	      }
-	    
-	    offset++;
-	  }
-	if (shCount > 1)
-	  {
-	    emitLabel (tlbl1->key + 100);
-	    emit2 ("dec a");
-	    emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
-	  }
+        while (size--)
+          {
+            l = aopGet (AOP (result), offset, FALSE);
+
+            if (offset == 0)
+              {
+                emit2 ("sla %s", l);
+              }
+            else
+              {
+                emit2 ("rl %s", l);
+              }
+
+            offset++;
+          }
+        if (shCount > 1)
+          {
+            emitLabel (tlbl1->key + 100);
+            emit2 ("dec a");
+            emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+          }
       }
   }
 }
@@ -5772,7 +5822,7 @@ shiftL2Left2Result (operand * left, int offl,
 static void
 AccRol (int shCount)
 {
-  shCount &= 0x0007;		// shCount : 0..7
+  shCount &= 0x0007;            // shCount : 0..7
 
 #if 0
   switch (shCount)
@@ -5863,21 +5913,21 @@ AccLsh (int shCount)
   if (shCount != 0)
     {
       if (shCount == 1)
-	{
-	  emit2 ("add a,a");
-	}
+        {
+          emit2 ("add a,a");
+        }
       else if (shCount == 2)
-	{
-	  emit2 ("add a,a");
-	  emit2 ("add a,a");
-	}
+        {
+          emit2 ("add a,a");
+          emit2 ("add a,a");
+        }
       else
-	{
-	  /* rotate left accumulator */
-	  AccRol (shCount);
-	  /* and kill the lower order bits */
-	  emit2 ("and a,!immedbyte", SLMask[shCount]);
-	}
+        {
+          /* rotate left accumulator */
+          AccRol (shCount);
+          /* and kill the lower order bits */
+          emit2 ("and a,!immedbyte", SLMask[shCount]);
+        }
     }
 }
 
@@ -5886,7 +5936,7 @@ AccLsh (int shCount)
 /*-----------------------------------------------------------------*/
 static void
 shiftL1Left2Result (operand * left, int offl,
-		    operand * result, int offr, int shCount)
+                    operand * result, int offr, int shCount)
 {
   const char *l;
   l = aopGet (AOP (left), offl, FALSE);
@@ -5912,35 +5962,35 @@ genlshTwo (operand * result, operand * left, int shCount)
     {
       shCount -= 8;
       if (size > 1)
-	{
-	  if (shCount)
-	    {
-	      movLeft2Result (left, LSB, result, MSB16, 0);
-	      aopPut (AOP (result), "!zero", 0);
-	      shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-	    }
-	  else
-	    {
-	      movLeft2Result (left, LSB, result, MSB16, 0);
-	      aopPut (AOP (result), "!zero", 0);
-	    }
-	}
+        {
+          if (shCount)
+            {
+              movLeft2Result (left, LSB, result, MSB16, 0);
+              aopPut (AOP (result), "!zero", 0);
+              shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+            }
+          else
+            {
+              movLeft2Result (left, LSB, result, MSB16, 0);
+              aopPut (AOP (result), "!zero", 0);
+            }
+        }
       else
-	{
-	  aopPut (AOP (result), "!zero", LSB);
-	}
+        {
+          aopPut (AOP (result), "!zero", LSB);
+        }
     }
   /*  1 <= shCount <= 7 */
   else
     {
       if (size == 1)
-	{
-	  wassert (0);
-	}
+        {
+          wassert (0);
+        }
       else
-	{
-	  shiftL2Left2Result (left, LSB, result, LSB, shCount);
-	}
+        {
+          shiftL2Left2Result (left, LSB, result, LSB, shCount);
+        }
     }
 }
 
@@ -5958,9 +6008,9 @@ genlshOne (operand * result, operand * left, int shCount)
 /*-----------------------------------------------------------------*/
 static void
 genLeftShiftLiteral (operand * left,
-		     operand * right,
-		     operand * result,
-		     iCode * ic)
+                     operand * right,
+                     operand * result,
+                     iCode * ic)
 {
   int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
   int size;
@@ -5978,7 +6028,7 @@ genLeftShiftLiteral (operand * left,
       wassert (0);
     }
 
-  else if (shCount >= (size * 8)) 
+  else if (shCount >= (size * 8))
     {
       while (size--)
         {
@@ -5988,19 +6038,19 @@ genLeftShiftLiteral (operand * left,
   else
     {
       switch (size)
-	{
-	case 1:
-	  genlshOne (result, left, shCount);
-	  break;
-	case 2:
-	  genlshTwo (result, left, shCount);
-	  break;
-	case 4:
-	  wassertl (0, "Shifting of longs is currently unsupported");
-	  break;
-	default:
-	  wassert (0);
-	}
+        {
+        case 1:
+          genlshOne (result, left, shCount);
+          break;
+        case 2:
+          genlshTwo (result, left, shCount);
+          break;
+        case 4:
+          wassertl (0, "Shifting of longs is currently unsupported");
+          break;
+        default:
+          wassert (0);
+        }
     }
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -6043,7 +6093,7 @@ genLeftShift (iCode * ic)
 
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
      _push (PAIR_AF);
-  
+
   /* now move the left to the result if they are not the
      same */
 
@@ -6053,11 +6103,11 @@ genLeftShift (iCode * ic)
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)
-	{
-	  l = aopGet (AOP (left), offset, FALSE);
-	  aopPut (AOP (result), l, offset);
-	  offset++;
-	}
+        {
+          l = aopGet (AOP (left), offset, FALSE);
+          aopPut (AOP (result), l, offset);
+          offset++;
+        }
     }
 
   tlbl = newiTempLabel (NULL);
@@ -6067,7 +6117,7 @@ genLeftShift (iCode * ic)
 
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
      _pop (PAIR_AF);
-  
+
   emit2 ("!shortjp !tlabel", tlbl1->key + 100);
   emitLabel (tlbl->key + 100);
   l = aopGet (AOP (result), offset, FALSE);
@@ -6122,9 +6172,9 @@ genrshOne (operand * result, operand * left, int shCount, int is_signed)
     {
       _moveA (l);
       while (shCount--)
-	{
-	  emit2 ("%s a", is_signed ? "sra" : "srl");
-	}
+        {
+          emit2 ("%s a", is_signed ? "sra" : "srl");
+        }
       aopPut (AOP (result), "a", 0);
     }
 }
@@ -6154,16 +6204,16 @@ AccRsh (int shCount)
 /*-----------------------------------------------------------------*/
 static void
 shiftR1Left2Result (operand * left, int offl,
-		    operand * result, int offr,
-		    int shCount, int sign)
+                    operand * result, int offr,
+                    int shCount, int sign)
 {
   _moveA (aopGet (AOP (left), offl, FALSE));
   if (sign)
     {
       while (shCount--)
-	{
-	  emit2 ("%s a", sign ? "sra" : "srl");
-	}
+        {
+          emit2 ("%s a", sign ? "sra" : "srl");
+        }
     }
   else
     {
@@ -6177,21 +6227,21 @@ shiftR1Left2Result (operand * left, int offl,
 /*-----------------------------------------------------------------*/
 static void
 genrshTwo (operand * result, operand * left,
-	   int shCount, int sign)
+           int shCount, int sign)
 {
   /* if shCount >= 8 */
   if (shCount >= 8)
     {
       shCount -= 8;
       if (shCount)
-	{
-	  shiftR1Left2Result (left, MSB16, result, LSB,
-			      shCount, sign);
-	}
+        {
+          shiftR1Left2Result (left, MSB16, result, LSB,
+                              shCount, sign);
+        }
       else
-	{
-	  movLeft2Result (left, MSB16, result, LSB, sign);
-	}
+        {
+          movLeft2Result (left, MSB16, result, LSB, sign);
+        }
       if (sign)
         {
           /* Sign extend the result */
@@ -6218,9 +6268,9 @@ genrshTwo (operand * result, operand * left,
 /*-----------------------------------------------------------------*/
 static void
 genRightShiftLiteral (operand * left,
-		      operand * right,
-		      operand * result,
-		      iCode * ic,
+                      operand * right,
+                      operand * result,
+                      iCode * ic,
                       int sign)
 {
   int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
@@ -6255,19 +6305,19 @@ genRightShiftLiteral (operand * left,
   else
     {
       switch (size)
-	{
-	case 1:
-	  genrshOne (result, left, shCount, sign);
-	  break;
-	case 2:
-	  genrshTwo (result, left, shCount, sign);
-	  break;
-	case 4:
-	  wassertl (0, "Asked to shift right a long which should be a function call");
-	  break;
-	default:
-	  wassertl (0, "Entered default case in right shift delegate");
-	}
+        {
+        case 1:
+          genrshOne (result, left, shCount, sign);
+          break;
+        case 2:
+          genrshTwo (result, left, shCount, sign);
+          break;
+        case 4:
+          wassertl (0, "Asked to shift right a long which should be a function call");
+          break;
+        default:
+          wassertl (0, "Entered default case in right shift delegate");
+        }
     }
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -6323,7 +6373,7 @@ genRightShift (iCode * ic)
 
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
      _push (PAIR_AF);
-  
+
   /* now move the left to the result if they are not the
      same */
   if (!sameRegs (AOP (left), AOP (result)))
@@ -6332,18 +6382,18 @@ genRightShift (iCode * ic)
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)
-	{
-	  l = aopGet (AOP (left), offset, FALSE);
-	  aopPut (AOP (result), l, offset);
-	  offset++;
-	}
+        {
+          l = aopGet (AOP (left), offset, FALSE);
+          aopPut (AOP (result), l, offset);
+          offset++;
+        }
     }
 
   tlbl = newiTempLabel (NULL);
   tlbl1 = newiTempLabel (NULL);
   size = AOP_SIZE (result);
   offset = size - 1;
-  
+
   if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
      _pop (PAIR_AF);
 
@@ -6353,10 +6403,10 @@ genRightShift (iCode * ic)
     {
       l = aopGet (AOP (result), offset--, FALSE);
       if (first)
-	{
+        {
           emit2 ("%s %s", is_signed ? "sra" : "srl", l);
-	  first = 0;
-	}
+          first = 0;
+        }
       else
         {
           emit2 ("rr %s", l);
@@ -6377,12 +6427,12 @@ genRightShift (iCode * ic)
 static void
 genUnpackBits (operand * result, int pair)
 {
-  int offset = 0;	/* result byte offset */
-  int rsize;		/* result size */
-  int rlen = 0;		/* remaining bitfield length */
-  sym_link *etype;	/* bitfield type information */
-  int blen;		/* bitfield length */
-  int bstr;		/* bitfield starting bit within byte */
+  int offset = 0;       /* result byte offset */
+  int rsize;            /* result size */
+  int rlen = 0;         /* remaining bitfield length */
+  sym_link *etype;      /* bitfield type information */
+  int blen;             /* bitfield length */
+  int bstr;             /* bitfield starting bit within byte */
 
   emitDebug ("; genUnpackBits");
 
@@ -6405,7 +6455,7 @@ genUnpackBits (operand * result, int pair)
           emit2 ("bit %d,a", blen - 1);
           emit2 ("jp z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
-	  emitLabel (tlbl->key + 100);
+          emitLabel (tlbl->key + 100);
         }
       aopPut (AOP (result), "a", offset++);
       goto finish;
@@ -6429,7 +6479,7 @@ genUnpackBits (operand * result, int pair)
           emit2 ("bit %d,a", blen - 1);
           emit2 ("jp z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
-	  emitLabel (tlbl->key + 100);
+          emitLabel (tlbl->key + 100);
         }
       emit2 ("ld h,a");
       spillPair (PAIR_HL);
@@ -6462,7 +6512,7 @@ genUnpackBits (operand * result, int pair)
           emit2 ("bit %d,a", rlen - 1);
           emit2 ("jp z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << rlen));
-	  emitLabel (tlbl->key + 100);
+          emitLabel (tlbl->key + 100);
         }
       aopPut (AOP (result), "a", offset++);
     }
@@ -6484,7 +6534,7 @@ finish:
         }
       rsize -= offset;
       while (rsize--)
-	aopPut (AOP (result), source, offset++);
+        aopPut (AOP (result), source, offset++);
     }
 }
 
@@ -6493,7 +6543,7 @@ finish:
 /*-----------------------------------------------------------------*/
 static void
 genGenPointerGet (operand * left,
-		  operand * result, iCode * ic)
+                  operand * result, iCode * ic)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
@@ -6511,16 +6561,16 @@ genGenPointerGet (operand * left,
     {
       /* Just do it */
       if (isPtrPair (AOP (left)))
-	{
-	  tsprintf (buffer, sizeof(buffer), 
-		    "!*pair", getPairName (AOP (left)));
-	  aopPut (AOP (result), buffer, 0);
-	}
+        {
+          tsprintf (buffer, sizeof(buffer),
+                    "!*pair", getPairName (AOP (left)));
+          aopPut (AOP (result), buffer, 0);
+        }
       else
-	{
-	  emit2 ("ld a,!*pair", getPairName (AOP (left)));
-	  aopPut (AOP (result), "a", 0);
-	}
+        {
+          emit2 ("ld a,!*pair", getPairName (AOP (left)));
+          aopPut (AOP (result), "a", 0);
+        }
       freeAsmop (left, NULL, ic);
       goto release;
     }
@@ -6529,14 +6579,14 @@ genGenPointerGet (operand * left,
     {
       /* Just do it */
       offset = 0;
-      while (size--) 
+      while (size--)
         {
           char at[20];
           tsprintf (at, sizeof(at), "!*iyx", offset);
           aopPut (AOP (result), at, offset);
           offset++;
         }
- 
+
       freeAsmop (left, NULL, ic);
       goto release;
     }
@@ -6568,23 +6618,23 @@ genGenPointerGet (operand * left,
       offset = 0;
 
       while (size--)
-	{
-	  /* PENDING: make this better */
-	  if (!IS_GB && AOP_TYPE (result) == AOP_REG)
-	    {
-	      aopPut (AOP (result), "!*hl", offset++);
-	    }
-	  else
-	    {
-	      emit2 ("ld a,!*pair", _pairs[pair].name);
-	      aopPut (AOP (result), "a", offset++);
-	    }
-	  if (size)
-	    {
-	      emit2 ("inc %s", _pairs[pair].name);
-	      _G.pairs[pair].offset++;
-	    }
-	}
+        {
+          /* PENDING: make this better */
+          if (!IS_GB && AOP_TYPE (result) == AOP_REG)
+            {
+              aopPut (AOP (result), "!*hl", offset++);
+            }
+          else
+            {
+              emit2 ("ld a,!*pair", _pairs[pair].name);
+              aopPut (AOP (result), "a", offset++);
+            }
+          if (size)
+            {
+              emit2 ("inc %s", _pairs[pair].name);
+              _G.pairs[pair].offset++;
+            }
+        }
       /* Fixup HL back down */
       for (size = AOP_SIZE (result)-1; size; size--)
         {
@@ -6597,24 +6647,24 @@ genGenPointerGet (operand * left,
       offset = 0;
 
       while (size--)
-	{
-	  /* PENDING: make this better */
-	  if (!IS_GB && 
+        {
+          /* PENDING: make this better */
+          if (!IS_GB &&
               (AOP_TYPE (result) == AOP_REG || AOP_TYPE (result) == AOP_HLREG))
-	    {
-	      aopPut (AOP (result), "!*hl", offset++);
-	    }
-	  else
-	    {
-	      emit2 ("ld a,!*pair", _pairs[pair].name);
-	      aopPut (AOP (result), "a", offset++);
-	    }
-	  if (size)
-	    {
-	      emit2 ("inc %s", _pairs[pair].name);
-	      _G.pairs[pair].offset++;
-	    }
-	}
+            {
+              aopPut (AOP (result), "!*hl", offset++);
+            }
+          else
+            {
+              emit2 ("ld a,!*pair", _pairs[pair].name);
+              aopPut (AOP (result), "a", offset++);
+            }
+          if (size)
+            {
+              emit2 ("inc %s", _pairs[pair].name);
+              _G.pairs[pair].offset++;
+            }
+        }
     }
 
   freeAsmop (left, NULL, ic);
@@ -6657,18 +6707,18 @@ isRegOrLit (asmop * aop)
 /*-----------------------------------------------------------------*/
 static void
 genPackBits (sym_link * etype,
-	     operand * right,
-	     int pair,
-	     iCode *ic)
+             operand * right,
+             int pair,
+             iCode *ic)
 {
-  int offset = 0;	/* source byte offset */
-  int rlen = 0;		/* remaining bitfield length */
-  int blen;		/* bitfield length */
-  int bstr;		/* bitfield starting bit within byte */
-  int litval;		/* source literal value (if AOP_LIT) */
-  unsigned char mask;	/* bitmask within current byte */
-  int extraPair;	/* a tempory register */
-  bool needPopExtra=0;	/* need to restore original value of temp reg */
+  int offset = 0;       /* source byte offset */
+  int rlen = 0;         /* remaining bitfield length */
+  int blen;             /* bitfield length */
+  int bstr;             /* bitfield starting bit within byte */
+  int litval;           /* source literal value (if AOP_LIT) */
+  unsigned char mask;   /* bitmask within current byte */
+  int extraPair;        /* a tempory register */
+  bool needPopExtra=0;  /* need to restore original value of temp reg */
 
   emitDebug (";     genPackBits","");
 
@@ -6679,7 +6729,7 @@ genPackBits (sym_link * etype,
   if (blen < 8)
     {
       mask = ((unsigned char) (0xFF << (blen + bstr)) |
-	      (unsigned char) (0xFF >> (8 - bstr)));
+              (unsigned char) (0xFF >> (8 - bstr)));
 
       if (AOP_TYPE (right) == AOP_LIT)
         {
@@ -6745,7 +6795,7 @@ genPackBits (sym_link * etype,
   if (rlen)
     {
       mask = (((unsigned char) -1 << rlen) & 0xff);
-      
+
       if (AOP_TYPE (right) == AOP_LIT)
         {
           /* Case with partial byte and literal source
@@ -6799,14 +6849,14 @@ genPackBits (sym_link * etype,
 /*-----------------------------------------------------------------*/
 static void
 genGenPointerSet (operand * right,
-		  operand * result, iCode * ic)
+                  operand * result, iCode * ic)
 {
   int size, offset;
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
   PAIR_ID pairId = PAIR_HL;
   bool isBitvar;
-  
+
   aopOp (result, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
 
@@ -6825,24 +6875,24 @@ genGenPointerSet (operand * right,
       const char *l = aopGet (AOP (right), 0, FALSE);
       const char *pair = getPairName (AOP (result));
       if (canAssignToPtr (l) && isPtr (pair))
-	{
-	  emit2 ("ld !*pair,%s", pair, l);
-	}
+        {
+          emit2 ("ld !*pair,%s", pair, l);
+        }
       else
-	{
-	  _moveA (l);
-	  emit2 ("ld !*pair,a", pair);
-	}
+        {
+          _moveA (l);
+          emit2 ("ld !*pair,a", pair);
+        }
       goto release;
     }
-  
+
   if ( getPairId( AOP (result)) == PAIR_IY && !isBitvar)
     {
       /* Just do it */
       const char *l = aopGet (AOP (right), 0, FALSE);
 
       offset = 0;
-      while (size--) 
+      while (size--)
         {
           if (canAssignToPtr (l))
             {
@@ -6863,24 +6913,24 @@ genGenPointerSet (operand * right,
       offset = 0;
 
       while (size--)
-	{
-	  const char *l = aopGet (AOP (right), offset, FALSE);
-	  if (isRegOrLit (AOP (right)) && !IS_GB)
-	    {
-	      emit2 ("ld !*pair,%s", _pairs[PAIR_HL].name, l);
-	    }
-	  else
-	    {
-	      _moveA (l);
-	      emit2 ("ld !*pair,a", _pairs[PAIR_HL].name);
-	    }
-	  if (size)
-	    {
-	      emit2 ("inc %s", _pairs[PAIR_HL].name);
-	      _G.pairs[PAIR_HL].offset++;
-	    }
-	  offset++;
-	}
+        {
+          const char *l = aopGet (AOP (right), offset, FALSE);
+          if (isRegOrLit (AOP (right)) && !IS_GB)
+            {
+              emit2 ("ld !*pair,%s", _pairs[PAIR_HL].name, l);
+            }
+          else
+            {
+              _moveA (l);
+              emit2 ("ld !*pair,a", _pairs[PAIR_HL].name);
+            }
+          if (size)
+            {
+              emit2 ("inc %s", _pairs[PAIR_HL].name);
+              _G.pairs[PAIR_HL].offset++;
+            }
+          offset++;
+        }
 
       /* Fixup HL back down */
       for (size = AOP_SIZE (right)-1; size; size--)
@@ -6911,24 +6961,24 @@ genGenPointerSet (operand * right,
       offset = 0;
 
       while (size--)
-	{
-	  const char *l = aopGet (AOP (right), offset, FALSE);
-	  if (isRegOrLit (AOP (right)) && !IS_GB)
-	    {
-	      emit2 ("ld !*pair,%s", _pairs[pairId].name, l);
-	    }
-	  else
-	    {
-	      _moveA (l);
-	      emit2 ("ld !*pair,a", _pairs[pairId].name);
-	    }
-	  if (size)
-	    {
-	      emit2 ("inc %s", _pairs[pairId].name);
-	      _G.pairs[pairId].offset++;
-	    }
-	  offset++;
-	}
+        {
+          const char *l = aopGet (AOP (right), offset, FALSE);
+          if (isRegOrLit (AOP (right)) && !IS_GB)
+            {
+              emit2 ("ld !*pair,%s", _pairs[pairId].name, l);
+            }
+          else
+            {
+              _moveA (l);
+              emit2 ("ld !*pair,a", _pairs[pairId].name);
+            }
+          if (size)
+            {
+              emit2 ("inc %s", _pairs[pairId].name);
+              _G.pairs[pairId].offset++;
+            }
+          offset++;
+        }
     }
 release:
   freeAsmop (right, NULL, ic);
@@ -7005,40 +7055,40 @@ genAddrOf (iCode * ic)
   if (IS_GB)
     {
       if (sym->onStack)
-	{
-	  spillCached ();
-	  if (sym->stack <= 0)
-	    {
+        {
+          spillCached ();
+          if (sym->stack <= 0)
+            {
               setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset);
-	    }
-	  else
-	    {
+            }
+          else
+            {
               setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
-	    }
+            }
           commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
-	}
+        }
       else
-	{
-	  emit2 ("ld de,!hashedstr", sym->rname);
+        {
+          emit2 ("ld de,!hashedstr", sym->rname);
           commitPair (AOP (IC_RESULT (ic)), PAIR_DE);
-	}
+        }
     }
   else
     {
       spillCached ();
       if (sym->onStack)
-	{
-	  /* if it has an offset  then we need to compute it */
-	  if (sym->stack > 0)
-	    emit2 ("ld hl,!immedword", sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
-	  else
-	    emit2 ("ld hl,!immedword", sym->stack + _G.stack.pushed + _G.stack.offset);
-	  emit2 ("add hl,sp");
-	}
+        {
+          /* if it has an offset  then we need to compute it */
+          if (sym->stack > 0)
+            emit2 ("ld hl,!immedword", sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
+          else
+            emit2 ("ld hl,!immedword", sym->stack + _G.stack.pushed + _G.stack.offset);
+          emit2 ("add hl,sp");
+        }
       else
-	{
-	  emit2 ("ld hl,!hashedstr", sym->rname);
-	}
+        {
+          emit2 ("ld hl,!hashedstr", sym->rname);
+        }
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL);
     }
   freeAsmop (IC_RESULT (ic), NULL, ic);
@@ -7094,10 +7144,10 @@ genAssign (iCode * ic)
       fetchPairLong (getPairId (AOP (result)), AOP (right), ic, LSB);
     }
   else if ((size > 1) &&
-	   (AOP_TYPE (result) != AOP_REG) &&
-	   (AOP_TYPE (right) == AOP_LIT) &&
-	   !IS_FLOAT (operandType (right)) &&
-	   (lit < 256L))
+           (AOP_TYPE (result) != AOP_REG) &&
+           (AOP_TYPE (right) == AOP_LIT) &&
+           !IS_FLOAT (operandType (right)) &&
+           (lit < 256L))
     {
       bool fXored = FALSE;
       offset = 0;
@@ -7105,29 +7155,29 @@ genAssign (iCode * ic)
          Done this way so that we can use the cached copy of 0
          in A for a fast clear */
       while (size--)
-	{
-	  if ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0)
-	    {
-	      if (!fXored && size > 1)
-		{
-		  emit2 ("xor a,a");
-		  fXored = TRUE;
-		}
-	      if (fXored)
-		{
-		  aopPut (AOP (result), "a", offset);
-		}
-	      else
-		{
-		  aopPut (AOP (result), "!zero", offset);
-		}
-	    }
-	  else
-	    aopPut (AOP (result),
-		    aopGet (AOP (right), offset, FALSE),
-		    offset);
-	  offset++;
-	}
+        {
+          if ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0)
+            {
+              if (!fXored && size > 1)
+                {
+                  emit2 ("xor a,a");
+                  fXored = TRUE;
+                }
+              if (fXored)
+                {
+                  aopPut (AOP (result), "a", offset);
+                }
+              else
+                {
+                  aopPut (AOP (result), "!zero", offset);
+                }
+            }
+          else
+            aopPut (AOP (result),
+                    aopGet (AOP (right), offset, FALSE),
+                    offset);
+          offset++;
+        }
     }
   else if (size == 2 && AOP_TYPE (right) == AOP_IY)
     {
@@ -7168,19 +7218,19 @@ genAssign (iCode * ic)
   else
     {
       while (size--)
-	{
-	  /* PENDING: do this check better */
-	  if (IS_GB && requiresHL (AOP (right)) && requiresHL (AOP (result)))
-	    {
-	      _moveA (aopGet (AOP (right), offset, FALSE));
-	      aopPut (AOP (result), "a", offset);
-	    }
-	  else
-	    aopPut (AOP (result),
-		    aopGet (AOP (right), offset, FALSE),
-		    offset);
-	  offset++;
-	}
+        {
+          /* PENDING: do this check better */
+          if (IS_GB && requiresHL (AOP (right)) && requiresHL (AOP (result)))
+            {
+              _moveA (aopGet (AOP (right), offset, FALSE));
+              aopPut (AOP (result), "a", offset);
+            }
+          else
+            aopPut (AOP (result),
+                    aopGet (AOP (right), offset, FALSE),
+                    offset);
+          offset++;
+        }
     }
 
 release:
@@ -7251,18 +7301,18 @@ genCast (iCode * ic)
 
       /* if they are in the same place */
       if (sameRegs (AOP (right), AOP (result)))
-	goto release;
+        goto release;
 
       /* if they in different places then copy */
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)
-	{
-	  aopPut (AOP (result),
-		  aopGet (AOP (right), offset, FALSE),
-		  offset);
-	  offset++;
-	}
+        {
+          aopPut (AOP (result),
+                  aopGet (AOP (right), offset, FALSE),
+                  offset);
+          offset++;
+        }
       goto release;
     }
 
@@ -7274,8 +7324,8 @@ genCast (iCode * ic)
   while (size--)
     {
       aopPut (AOP (result),
-	      aopGet (AOP (right), offset, FALSE),
-	      offset);
+              aopGet (AOP (right), offset, FALSE),
+              offset);
       offset++;
     }
 
@@ -7285,18 +7335,18 @@ genCast (iCode * ic)
   if (!IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE(right)==AOP_CRY)
     {
       while (size--)
-	aopPut (AOP (result), "!zero", offset++);
+        aopPut (AOP (result), "!zero", offset++);
     }
   else
     {
       /* we need to extend the sign :{ */
         const char *l = aopGet (AOP (right), AOP_SIZE (right) - 1,
-			FALSE);
+                        FALSE);
       _moveA (l);
       emit2 ("rla ");
       emit2 ("sbc a,a");
       while (size--)
-	aopPut (AOP (result), "a", offset++);
+        aopPut (AOP (result), "a", offset++);
     }
 
 release:
@@ -7327,7 +7377,7 @@ genReceive (iCode * ic)
 
         for (i = 0; i < size; i++) {
             aopPut(AOP(IC_RESULT(ic)), _fReceive[_G.receiveOffset++], i);
-	}
+        }
     }
 
   freeAsmop (IC_RESULT (ic), NULL, ic);
@@ -7346,36 +7396,107 @@ genDummyRead (iCode * ic)
   if (op && IS_SYMOP (op))
     {
       aopOp (op, ic, FALSE, FALSE);
-  
+
       /* general case */
       size = AOP_SIZE (op);
       offset = 0;
 
       while (size--)
-	{
-	  _moveA (aopGet (AOP (op), offset, FALSE));
-	  offset++;
-	}
+        {
+          _moveA (aopGet (AOP (op), offset, FALSE));
+          offset++;
+        }
 
       freeAsmop (op, NULL, ic);
     }
-  
+
   op = IC_LEFT (ic);
   if (op && IS_SYMOP (op))
     {
       aopOp (op, ic, FALSE, FALSE);
-  
+
       /* general case */
       size = AOP_SIZE (op);
       offset = 0;
 
       while (size--)
-	{
-	  _moveA (aopGet (AOP (op), offset, FALSE));
-	  offset++;
-	}
+        {
+          _moveA (aopGet (AOP (op), offset, FALSE));
+          offset++;
+        }
 
       freeAsmop (op, NULL, ic);
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* genCritical - generate code for start of a critical sequence    */
+/*-----------------------------------------------------------------*/
+static void
+genCritical (iCode *ic)
+{
+  symbol *tlbl = newiTempLabel (NULL);
+
+  if (IS_GB)
+    {
+      emit2 ("!di");
+    }
+  else if (IC_RESULT (ic))
+    {
+      aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+      aopPut (AOP (IC_RESULT (ic)), "!zero", 0);
+      //get interrupt enable flag IFF2 into P/O
+      emit2 ("ld a,i");
+      //disable interrupt
+      emit2 ("!di");
+      //parity odd <==> P/O=0 <==> interrupt enable flag IFF2=0
+      emit2 ("jp po,!tlabel", tlbl->key + 100);
+      aopPut (AOP (IC_RESULT (ic)), "!one", 0);
+      emit2 ("!tlabeldef", (tlbl->key + 100));
+      freeAsmop (IC_RESULT (ic), NULL, ic);
+    }
+  else
+    {
+      //get interrupt enable flag IFF2 into P/O
+      emit2 ("ld a,i");
+      //disable interrupt
+      emit2 ("!di");
+      //save P/O flag
+      emit2 ("push af");
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* genEndCritical - generate code for end of a critical sequence   */
+/*-----------------------------------------------------------------*/
+static void
+genEndCritical (iCode *ic)
+{
+  symbol *tlbl = newiTempLabel (NULL);
+
+  if (IS_GB)
+    {
+      emit2 ("!ei");
+    }
+  else if (IC_RIGHT (ic))
+    {
+      aopOp (IC_RIGHT (ic), ic, FALSE, TRUE);
+      _toBoolean (IC_RIGHT (ic));
+      //don't enable interrupts if they were off before
+      emit2 ("!shortjp z,!tlabel", tlbl->key + 100);
+      emit2 ("!ei");
+      emitLabel (tlbl->key + 100);
+      freeAsmop (IC_RIGHT (ic), NULL, ic);
+    }
+  else
+    {
+      //restore P/O flag
+      emit2 ("pop af");
+      //parity odd <==> P/O=0 <==> interrupt enable flag IFF2 was 0 <==>
+      //don't enable interrupts as they were off before
+      emit2 ("jp po,!tlabel", tlbl->key + 100);
+      emit2 ("!ei");
+      emit2 ("!tlabeldef", (tlbl->key + 100));
     }
 }
 
@@ -7394,7 +7515,7 @@ typedef struct
 
 
 /** Flushes a byte chunker by writing out all in the buffer and
-    reseting. 
+    reseting.
 */
 static void
 _dbFlush(DBEMITCTX *self)
@@ -7455,9 +7576,9 @@ _rleCommit(RLECTX *self)
     {
       DBEMITCTX db;
       memset(&db, 0, sizeof(db));
-          
+
       emit2(".db %u", self->pos);
-      
+
       for (i = 0; i < self->pos; i++)
         {
           _dbEmit(&db, self->buffer[i]);
@@ -7567,9 +7688,9 @@ genArrayInit (iCode * ic)
 
   fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
   emit2 ("call __initrleblock");
-    
+
   type = operandType(IC_LEFT(ic));
-    
+
   if (type && type->next)
     {
       if (IS_SPEC(type->next) || IS_PTR(type->next))
@@ -7582,7 +7703,7 @@ genArrayInit (iCode * ic)
         }
       else
         {
-	  printTypeChainRaw (type, NULL);
+          printTypeChainRaw (type, NULL);
           wassertl (0, "Can't determine element size in genArrayInit.");
         }
     }
@@ -7613,7 +7734,7 @@ genArrayInit (iCode * ic)
               _rleAppend(&rle, val);
             }
         }
-	
+
       iLoop = iLoop->next;
     }
 
@@ -7652,27 +7773,27 @@ _swap (PAIR_ID one, PAIR_ID two)
    Note: Have ex de,hl
 
    Combinations:
-     hl = hl		=> unity, fine
+     hl = hl            => unity, fine
      bc = bc
      de = de
 
-     hl = hl		hl = hl, swap de <=> bc
+     hl = hl            hl = hl, swap de <=> bc
      bc = de
      de = bc
 
-     hl = bc		Worst case
+     hl = bc            Worst case
      bc = de
      de = hl
-     
-     hl = bc		de = de, swap bc <=> hl
+
+     hl = bc            de = de, swap bc <=> hl
      bc = hl
      de = de
 
-     hl = de		Worst case
+     hl = de            Worst case
      bc = hl
      de = bc
 
-     hl = de		bc = bc, swap hl <=> de
+     hl = de            bc = bc, swap hl <=> de
      bc = bc
      de = hl
 
@@ -7689,7 +7810,7 @@ _swap (PAIR_ID one, PAIR_ID two)
 
    So how do we detect the cases?
    How about a 3x3 matrix?
-   	source
+        source
    dest x x x x
         x x x x
         x x x x (Fourth for iTemp/other)
@@ -7725,7 +7846,7 @@ setupForBuiltin3 (iCode *ic, int nparams, operand **pparams)
     }
 
   /* Count the number of unity or iTemp assigns. */
-  for (i = 0; i < 3; i++) 
+  for (i = 0; i < 3; i++)
     {
       if (ids[dest[i]][dest[i]] == TRUE || ids[dest[i]][PAIR_INVALID] == TRUE)
         {
@@ -7862,7 +7983,7 @@ genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-	OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
+        OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
@@ -7875,7 +7996,7 @@ genBuiltInMemcpy (iCode *ic, int nParams, operand **pparams)
 
 /*-----------------------------------------------------------------*/
 /* genBuiltIn - calls the appropriate function to  generating code */
-/* for a built in function 					   */
+/* for a built in function                                         */
 /*-----------------------------------------------------------------*/
 static void genBuiltIn (iCode *ic)
 {
@@ -7890,17 +8011,17 @@ static void genBuiltIn (iCode *ic)
     /* which function is it */
     bif = OP_SYMBOL(IC_LEFT(bi_iCode));
 
-    if (strcmp(bif->name,"__builtin_strcpy")==0) 
+    if (strcmp(bif->name,"__builtin_strcpy")==0)
       {
-	genBuiltInStrcpy(bi_iCode, nbi_parms, bi_parms);
-      } 
-    else if (strcmp(bif->name,"__builtin_memcpy")==0) 
+        genBuiltInStrcpy(bi_iCode, nbi_parms, bi_parms);
+      }
+    else if (strcmp(bif->name,"__builtin_memcpy")==0)
       {
-	genBuiltInMemcpy(bi_iCode, nbi_parms, bi_parms);
-      } 
-    else 
+        genBuiltInMemcpy(bi_iCode, nbi_parms, bi_parms);
+      }
+    else
       {
-	wassertl (0, "Unknown builtin function encountered");
+        wassertl (0, "Unknown builtin function encountered");
       }
 }
 
@@ -7926,7 +8047,7 @@ genZ80Code (iCode * lic)
     }
 
   _G.lines.head = _G.lines.current = NULL;
-  
+
   /* if debug information required */
   if (options.debug && currFunc)
     {
@@ -7938,257 +8059,259 @@ genZ80Code (iCode * lic)
       _G.current_iCode = ic;
 
       if (ic->lineno && cln != ic->lineno)
-	{
-	  if (options.debug)
-	    {
-	      debugFile->writeCLine (ic);
-	    }
-	  if (!options.noCcodeInAsm) {
-	    emit2 (";%s:%d: %s", ic->filename, ic->lineno,
-		   printCLine(ic->filename, ic->lineno));
-	  }
-	  cln = ic->lineno;
-	}
-      if (options.iCodeInAsm) {
-	emit2 (";ic:%d: %s", ic->key, printILine(ic));
-      }
+        {
+          if (options.debug)
+            {
+              debugFile->writeCLine (ic);
+            }
+          if (!options.noCcodeInAsm)
+            {
+              emit2 (";%s:%d: %s", ic->filename, ic->lineno,
+                     printCLine(ic->filename, ic->lineno));
+            }
+          cln = ic->lineno;
+        }
+      if (options.iCodeInAsm)
+        {
+          emit2 (";ic:%d: %s", ic->key, printILine(ic));
+        }
       /* if the result is marked as
          spilt and rematerializable or code for
          this has already been generated then
          do nothing */
       if (resultRemat (ic) || ic->generated)
-	continue;
+        continue;
 
       /* depending on the operation */
       switch (ic->op)
-	{
-	case '!':
-	  emitDebug ("; genNot");
-	  genNot (ic);
-	  break;
-
-	case '~':
-	  emitDebug ("; genCpl");
-	  genCpl (ic);
-	  break;
-
-	case UNARYMINUS:
-	  emitDebug ("; genUminus");
-	  genUminus (ic);
-	  break;
-
-	case IPUSH:
-	  emitDebug ("; genIpush");
-	  genIpush (ic);
-	  break;
-
-	case IPOP:
-	  /* IPOP happens only when trying to restore a
-	     spilt live range, if there is an ifx statement
-	     following this pop then the if statement might
-	     be using some of the registers being popped which
-	     would destory the contents of the register so
-	     we need to check for this condition and handle it */
-	  if (ic->next &&
-	      ic->next->op == IFX &&
-	      regsInCommon (IC_LEFT (ic), IC_COND (ic->next)))
-	    {
-              emitDebug ("; genIfx");
-	      genIfx (ic->next, ic);
-	    }
-	  else
-	    {
-	      emitDebug ("; genIpop");
-	      genIpop (ic);
-	    }
-	  break;
-
-	case CALL:
-	  emitDebug ("; genCall");
-	  genCall (ic);
-	  break;
-
-	case PCALL:
-	  emitDebug ("; genPcall");
-	  genPcall (ic);
-	  break;
-
-	case FUNCTION:
-	  emitDebug ("; genFunction");
-	  genFunction (ic);
-	  break;
-
-	case ENDFUNCTION:
-	  emitDebug ("; genEndFunction");
-	  genEndFunction (ic);
-	  break;
-
-	case RETURN:
-	  emitDebug ("; genRet");
-	  genRet (ic);
-	  break;
-
-	case LABEL:
-	  emitDebug ("; genLabel");
-	  genLabel (ic);
-	  break;
-
-	case GOTO:
-	  emitDebug ("; genGoto");
-	  genGoto (ic);
-	  break;
-
-	case '+':
-	  emitDebug ("; genPlus");
-	  genPlus (ic);
-	  break;
-
-	case '-':
-	  emitDebug ("; genMinus");
-	  genMinus (ic);
-	  break;
-
-	case '*':
-	  emitDebug ("; genMult");
-	  genMult (ic);
-	  break;
-
-	case '/':
-	  emitDebug ("; genDiv");
-	  genDiv (ic);
-	  break;
-
-	case '%':
-	  emitDebug ("; genMod");
-	  genMod (ic);
-	  break;
-
-	case '>':
-	  emitDebug ("; genCmpGt");
-	  genCmpGt (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
-	case '<':
-	  emitDebug ("; genCmpLt");
-	  genCmpLt (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
-	case LE_OP:
-	case GE_OP:
-	case NE_OP:
-
-	  /* note these two are xlated by algebraic equivalence
-	     during parsing SDCC.y */
-	  werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-		  "got '>=' or '<=' shouldn't have come here");
-	  break;
-
-	case EQ_OP:
-	  emitDebug ("; genCmpEq");
-	  genCmpEq (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
-	case AND_OP:
-	  emitDebug ("; genAndOp");
-	  genAndOp (ic);
-	  break;
-
-	case OR_OP:
-	  emitDebug ("; genOrOp");
-	  genOrOp (ic);
-	  break;
-
-	case '^':
-	  emitDebug ("; genXor");
-	  genXor (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
-	case '|':
-	  emitDebug ("; genOr");
-	  genOr (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
-	case BITWISEAND:
-	  emitDebug ("; genAnd");
-	  genAnd (ic, ifxForOp (IC_RESULT (ic), ic));
-	  break;
-
-	case INLINEASM:
-	  emitDebug ("; genInline");
-	  genInline (ic);
-	  break;
-
-	case RRC:
-	  emitDebug ("; genRRC");
-	  genRRC (ic);
-	  break;
-
-	case RLC:
-	  emitDebug ("; genRLC");
-	  genRLC (ic);
-	  break;
-
-	case GETHBIT:
-	  emitDebug ("; genGetHBIT");
-	  genGetHbit (ic);
+        {
+        case '!':
+          emitDebug ("; genNot");
+          genNot (ic);
           break;
 
-	case LEFT_OP:
-	  emitDebug ("; genLeftShift");
-	  genLeftShift (ic);
-	  break;
+        case '~':
+          emitDebug ("; genCpl");
+          genCpl (ic);
+          break;
 
-	case RIGHT_OP:
-	  emitDebug ("; genRightShift");
-	  genRightShift (ic);
-	  break;
+        case UNARYMINUS:
+          emitDebug ("; genUminus");
+          genUminus (ic);
+          break;
 
-	case GET_VALUE_AT_ADDRESS:
-	  emitDebug ("; genPointerGet");
-	  genPointerGet (ic);
-	  break;
+        case IPUSH:
+          emitDebug ("; genIpush");
+          genIpush (ic);
+          break;
 
-	case '=':
+        case IPOP:
+          /* IPOP happens only when trying to restore a
+             spilt live range, if there is an ifx statement
+             following this pop then the if statement might
+             be using some of the registers being popped which
+             would destory the contents of the register so
+             we need to check for this condition and handle it */
+          if (ic->next &&
+              ic->next->op == IFX &&
+              regsInCommon (IC_LEFT (ic), IC_COND (ic->next)))
+            {
+              emitDebug ("; genIfx");
+              genIfx (ic->next, ic);
+            }
+          else
+            {
+              emitDebug ("; genIpop");
+              genIpop (ic);
+            }
+          break;
 
-	  if (POINTER_SET (ic))
-	    {
-	      emitDebug ("; genAssign (pointer)");
-	      genPointerSet (ic);
-	    }
-	  else
-	    {
-	      emitDebug ("; genAssign");
-	      genAssign (ic);
-	    }
-	  break;
+        case CALL:
+          emitDebug ("; genCall");
+          genCall (ic);
+          break;
 
-	case IFX:
+        case PCALL:
+          emitDebug ("; genPcall");
+          genPcall (ic);
+          break;
+
+        case FUNCTION:
+          emitDebug ("; genFunction");
+          genFunction (ic);
+          break;
+
+        case ENDFUNCTION:
+          emitDebug ("; genEndFunction");
+          genEndFunction (ic);
+          break;
+
+        case RETURN:
+          emitDebug ("; genRet");
+          genRet (ic);
+          break;
+
+        case LABEL:
+          emitDebug ("; genLabel");
+          genLabel (ic);
+          break;
+
+        case GOTO:
+          emitDebug ("; genGoto");
+          genGoto (ic);
+          break;
+
+        case '+':
+          emitDebug ("; genPlus");
+          genPlus (ic);
+          break;
+
+        case '-':
+          emitDebug ("; genMinus");
+          genMinus (ic);
+          break;
+
+        case '*':
+          emitDebug ("; genMult");
+          genMult (ic);
+          break;
+
+        case '/':
+          emitDebug ("; genDiv");
+          genDiv (ic);
+          break;
+
+        case '%':
+          emitDebug ("; genMod");
+          genMod (ic);
+          break;
+
+        case '>':
+          emitDebug ("; genCmpGt");
+          genCmpGt (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
+
+        case '<':
+          emitDebug ("; genCmpLt");
+          genCmpLt (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
+
+        case LE_OP:
+        case GE_OP:
+        case NE_OP:
+
+          /* note these two are xlated by algebraic equivalence
+             during parsing SDCC.y */
+          werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+                  "got '>=' or '<=' shouldn't have come here");
+          break;
+
+        case EQ_OP:
+          emitDebug ("; genCmpEq");
+          genCmpEq (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
+
+        case AND_OP:
+          emitDebug ("; genAndOp");
+          genAndOp (ic);
+          break;
+
+        case OR_OP:
+          emitDebug ("; genOrOp");
+          genOrOp (ic);
+          break;
+
+        case '^':
+          emitDebug ("; genXor");
+          genXor (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
+
+        case '|':
+          emitDebug ("; genOr");
+          genOr (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
+
+        case BITWISEAND:
+          emitDebug ("; genAnd");
+          genAnd (ic, ifxForOp (IC_RESULT (ic), ic));
+          break;
+
+        case INLINEASM:
+          emitDebug ("; genInline");
+          genInline (ic);
+          break;
+
+        case RRC:
+          emitDebug ("; genRRC");
+          genRRC (ic);
+          break;
+
+        case RLC:
+          emitDebug ("; genRLC");
+          genRLC (ic);
+          break;
+
+        case GETHBIT:
+          emitDebug ("; genGetHBIT");
+          genGetHbit (ic);
+          break;
+
+        case LEFT_OP:
+          emitDebug ("; genLeftShift");
+          genLeftShift (ic);
+          break;
+
+        case RIGHT_OP:
+          emitDebug ("; genRightShift");
+          genRightShift (ic);
+          break;
+
+        case GET_VALUE_AT_ADDRESS:
+          emitDebug ("; genPointerGet");
+          genPointerGet (ic);
+          break;
+
+        case '=':
+
+          if (POINTER_SET (ic))
+            {
+              emitDebug ("; genAssign (pointer)");
+              genPointerSet (ic);
+            }
+          else
+            {
+              emitDebug ("; genAssign");
+              genAssign (ic);
+            }
+          break;
+
+        case IFX:
           emitDebug ("; genIfx");
-	  genIfx (ic, NULL);
-	  break;
+          genIfx (ic, NULL);
+          break;
 
-	case ADDRESS_OF:
-	  emitDebug ("; genAddrOf");
-	  genAddrOf (ic);
-	  break;
+        case ADDRESS_OF:
+          emitDebug ("; genAddrOf");
+          genAddrOf (ic);
+          break;
 
-	case JUMPTABLE:
-	  emitDebug ("; genJumpTab");
-	  genJumpTab (ic);
-	  break;
+        case JUMPTABLE:
+          emitDebug ("; genJumpTab");
+          genJumpTab (ic);
+          break;
 
-	case CAST:
-	  emitDebug ("; genCast");
-	  genCast (ic);
-	  break;
+        case CAST:
+          emitDebug ("; genCast");
+          genCast (ic);
+          break;
 
-	case RECEIVE:
-	  emitDebug ("; genReceive");
-	  genReceive (ic);
-	  break;
+        case RECEIVE:
+          emitDebug ("; genReceive");
+          genReceive (ic);
+          break;
 
-	case SEND:
-	  if (ic->builtinSEND)
+        case SEND:
+          if (ic->builtinSEND)
             {
               emitDebug ("; genBuiltIn");
               genBuiltIn(ic);
@@ -8198,21 +8321,31 @@ genZ80Code (iCode * lic)
               emitDebug ("; addSet");
               addSet (&_G.sendSet, ic);
             }
-	  break;
+          break;
 
-	case ARRAYINIT:
-	  emitDebug ("; genArrayInit");
+        case ARRAYINIT:
+          emitDebug ("; genArrayInit");
           genArrayInit(ic);
           break;
 
-	case DUMMY_READ_VOLATILE:
-	  emitDebug ("; genDummyRead");
-	  genDummyRead (ic);
-	  break;
+        case DUMMY_READ_VOLATILE:
+          emitDebug ("; genDummyRead");
+          genDummyRead (ic);
+          break;
 
-	default:
-	  ic = ic;
-	}
+        case CRITICAL:
+          emitDebug ("; genCritical");
+          genCritical (ic);
+          break;
+
+        case ENDCRITICAL:
+          emitDebug ("; genEndCritical");
+          genEndCritical (ic);
+          break;
+
+        default:
+          ic = ic;
+        }
     }
 
 
@@ -8230,8 +8363,8 @@ genZ80Code (iCode * lic)
     printLine (_G.lines.head, codeOutFile);
     if (_G.flushStatics)
       {
-	flushStatics ();
-	_G.flushStatics = 0;
+        flushStatics ();
+        _G.flushStatics = 0;
       }
     codeOutFile = fp;
   }
@@ -8250,9 +8383,9 @@ _isPairUsed (iCode * ic, PAIR_ID pairId)
     {
     case PAIR_DE:
       if (bitVectBitValue (ic->rMask, D_IDX))
-	ret++;
+        ret++;
       if (bitVectBitValue (ic->rMask, E_IDX))
-	ret++;
+        ret++;
       break;
     default:
       wassert (0);

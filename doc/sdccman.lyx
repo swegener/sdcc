@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.5.4
+SDCC 2.5.5
 \size footnotesize 
 
 \newline 
@@ -3677,11 +3677,30 @@ ate
 a
 \emph default 
 rray
-\begin_inset LatexCommand \index{fpga (field programmable gate array)}
+\begin_inset LatexCommand \index{FPGA (field programmable gate array)}
 
 \end_inset 
 
 
+\begin_inset Quotes srd
+\end_inset 
+
+ or 
+\begin_inset LatexCommand \url{http://sf.net/projects/fpgac}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{FpgaC ((subset of) C to FPGA compiler)}
+
+\end_inset 
+
+ 
+\begin_inset Quotes sld
+\end_inset 
+
+have you ever heard of an open source compiler that compiles a subset of
+ C for an FPGA?
 \begin_inset Quotes srd
 \end_inset 
 
@@ -10943,8 +10962,8 @@ nooverlay
  Furthermore nonreentrant functions should not be called from the main program
  while the interrupt service routine might be active.
  They also must not be called from low priority interrupt service routines
- while a high priority interrupt service routine might be active. You could use
- semaphores or make the function
+ while a high priority interrupt service routine might be active.
+ You could use semaphores or make the function
 \emph on 
  critical
 \emph default 
@@ -23340,6 +23359,132 @@ The pic port uses a different set of regression tests, you'll find them
 sdcc/src/regression
 \shape default 
 .
+\layout Section
+
+Use of SDCC in Education
+\layout Standard
+
+In short: 
+\emph on 
+highly
+\emph default 
+ encouraged
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+the phrase "use in education" might evoke the association "
+\emph on 
+only
+\emph default 
+ fit for use in education".
+ This connotation is not intended but nevertheless risked as the licensing
+ of SDCC makes it difficult to offer educational discounts
+\end_inset 
+
+.
+ If your rationales are to:
+\layout Enumerate
+
+give students a chance to understand the 
+\emph on 
+complete
+\emph default 
+ steps of code generation
+\layout Enumerate
+
+have a curriculum that can be extended for years.
+ Then you could use an fpga board as target and your curriculum will seamlessly
+ extend from logic synthesis (
+\begin_inset LatexCommand \url[http://www.opencores.org]{opencores.org}
+
+\end_inset 
+
+, 
+\begin_inset LatexCommand \url[Oregano]{http://www.oregano.at/ip/ip01.htm}
+
+\end_inset 
+
+), over assembly programming, to C to FPGA compilers (
+\begin_inset LatexCommand \url[FPGAC]{http://fpgac.sf.net}
+
+\end_inset 
+
+) and to C.
+\layout Enumerate
+
+be able to insert excursions about skills like using a revision control
+ system, submitting/applying patches, using a type-setting (as opposed to
+ word-processing) engine LyX/LaTeX, using 
+\begin_inset LatexCommand \url[SourceForge]{http://www.sf.net}
+
+\end_inset 
+
+, following some 
+\begin_inset LatexCommand \url[netiquette]{http://en.wikipedia.org/wiki/Netiquette}
+
+\end_inset 
+
+, understanding BSD/LGPL/GPL/Proprietary licensing, growth models of Open
+ Source Software, CPU simulation, compiler regression tests
+\begin_inset LatexCommand \index{Regression test}
+
+\end_inset 
+
+.
+ 
+\newline 
+And if there should be a shortage of ideas then you can always point students
+ to the ever-growing feature request list 
+\begin_inset LatexCommand \htmlurl{http://sourceforge.net/tracker/?group_id=599&atid=350599}
+
+\end_inset 
+
+.
+\layout Enumerate
+
+not tie students to a specific host platform and instead allow them to use
+ a host platform of 
+\emph on 
+their
+\emph default 
+ choice (among them Alpha, i386, i386_64, MacOs, Mips, Sparc, Windows and
+ eventually 
+\begin_inset LatexCommand \url[OLPC]{http://wiki.laptop.org/wiki/One_Laptop_per_Child}
+
+\end_inset 
+
+)
+\layout Enumerate
+
+not encourage students to use illegal copies of educational software
+\layout Enumerate
+
+be immune to licensing/availability/price changes of the chosen tool chain
+\layout Enumerate
+
+be able to change to a new target platform without having to adopt a new
+ tool chain
+\layout Enumerate
+
+have complete control over and insight into the tool chain
+\layout Enumerate
+
+make your students aware about the pros and cons of open source software
+ development
+\layout Enumerate
+
+give back to the public as you are probably at least partially publically
+ funded
+\layout Enumerate
+
+give students a chance to publically prove their skills and to possibly
+ see a world wide impact
+\layout Standard
+
+then SDCC is probably among the first choices.
+ Well, probably SDCC might be the only choice.
 \layout Chapter
 \pagebreak_top 
 SDCC Technical Data

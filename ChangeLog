@@ -1,5 +1,6 @@
 2006-03-28 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
+	* doc/sdccman.lyx: added paragraph "Use of SDCC in Education"
 	* src/mcs51/peeph.def: disabled rule 132.e fixing bug #1453093
 
 2006-03-23 Maarten Brock <sourceforge.brock AT dse.nl>

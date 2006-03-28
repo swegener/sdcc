@@ -722,17 +722,18 @@ replace {
 	mov	%3,c
 } if operandsNotRelated('0x00' %2)
 
-replace {
-	clr	c
-	mov	a,%1
-	subb	a,#%2
-	jnc	%5
-} by {
-	;	Peephole 132.e	optimized genCmpLt by inverse logic (carry differs)
-	mov	a,#0x100 - %2
-	add	a,%1
-	jc	%5
-} if operandsNotRelated('0x00' %2)
+//This peephole caused bug #1453093
+//replace {
+//	clr	c
+//	mov	a,%1
+//	subb	a,#%2
+//	jnc	%5
+//} by {
+//	;	Peephole 132.e	optimized genCmpLt by inverse logic (carry differs)
+//	mov	a,#0x100 - %2
+//	add	a,%1
+//	jc	%5
+//} if operandsNotRelated('0x00' %2)
 
 replace {
 	clr	c

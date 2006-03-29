@@ -1,9 +1,15 @@
+2006-03-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCpeeph.c (operandsLiteral): new, added,
+	  (callFuncByName): inserted operandsLiteral
+	* src/mcs51/peeph.def: reenabled 132.e, added extra check to 132.x
+
 2006-03-28 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: added paragraph "Use of SDCC in Education"
 	* src/mcs51/peeph.def: disabled rule 132.e fixing bug #1453093
 
-2006-03-23 Maarten Brock <sourceforge.brock AT dse.nl>
+2006-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/gen.c (genFunction, genEndFunction): fixed bug 1160666,
 	  implemented patch 1120823 Thanks to Willy De la Court (normal

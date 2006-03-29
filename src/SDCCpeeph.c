@@ -963,6 +963,39 @@ FBYNAME (operandsNotRelated)
 }
 
 
+/*-------------------------------------------------------------------*/
+/* operandsLiteral - returns true of the condition's operands are    */
+/* literals.                                                         */
+/*-------------------------------------------------------------------*/
+FBYNAME (operandsLiteral)
+{
+  set *operands;
+  const char *op;
+
+  operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+    {
+      fprintf (stderr,
+               "*** internal error: operandsLiteral peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  for (op = setFirstItem (operands); op; op = setNextItem (operands))
+    {
+      if (!isdigit(*op))
+        {
+          deleteSet (&operands);
+          return FALSE;
+        }
+    }
+
+  deleteSet (&operands);
+  return TRUE;
+}
+
+
 /*-----------------------------------------------------------------*/
 /* callFuncByName - calls a function as defined in the table       */
 /*-----------------------------------------------------------------*/
@@ -1045,6 +1078,9 @@ callFuncByName (char *fname,
     },
     {
       "operandsNotRelated", operandsNotRelated
+    },
+    {
+      "operandsLiteral", operandsLiteral
     },
     {
       "labelRefCountChange", labelRefCountChange

@@ -1,3 +1,8 @@
+2006-03-30 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: reverted to version 1.129 of december as my latest
+	changes seem to cause (trigger?) problems with the build system.
+
 2006-03-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCpeeph.c (operandsLiteral): new, added,

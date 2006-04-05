@@ -2719,6 +2719,7 @@ genCall (iCode * ic)
   bool accuse = FALSE;
   bool accPushed = FALSE;
   bool resultInF0 = FALSE;
+  bool assignResultGenerated = FALSE;
 
   D(emitcode(";     genCall",""));
 
@@ -2801,6 +2802,7 @@ genCall (iCode * ic)
       _G.accInUse--;
 
       accuse = assignResultValue (IC_RESULT (ic), IC_LEFT (ic));
+      assignResultGenerated = TRUE;
 
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
     }
@@ -2817,7 +2819,8 @@ genCall (iCode * ic)
               accPushed = TRUE;
             }
           if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))) &&
-              IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))))
+              IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) &&
+              !assignResultGenerated)
             {
               emitcode ("mov", "F0,c");
               resultInF0 = TRUE;
@@ -2856,7 +2859,7 @@ genCall (iCode * ic)
 //  if (restoreBank)
 //    unsaveRBank (FUNC_REGBANK (dtype), ic, FALSE);
 
-  if (IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))))
+  if (IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) && !assignResultGenerated)
     {
       if (resultInF0)
           emitcode ("mov", "c,F0");

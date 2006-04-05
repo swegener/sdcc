@@ -1,5 +1,11 @@
 2006-04-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCpeeph.c (initPeepHole): implemented RFE 1460196, when both
+	  --no-peep and --peep-file <file> are used don't use default rules but
+	  do use the <file>
+
+2006-04-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/mcs51/gen.c (genCall): fixed bug 1457608
 
 2006-03-30 Frieder Ferlemann <Frieder.Ferlemann AT web.de>

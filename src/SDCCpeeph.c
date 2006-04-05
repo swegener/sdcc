@@ -2279,13 +2279,18 @@ initPeepHole ()
   char *s;
 
   /* read in the default rules */
-  readRules (port->peep.default_rules);
+  if (!options.nopeep)
+    {
+      readRules (port->peep.default_rules);
+    }
 
   /* if we have any additional file read it too */
   if (options.peep_file)
     {
       readRules (s = readFileIntoBuffer (options.peep_file));
       setToNull ((void *) &s);
+      /* override nopeep setting, default rules have not been read */
+      options.nopeep = 0;
     }
 
 

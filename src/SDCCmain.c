@@ -306,7 +306,7 @@ static const char *_baseValues[] = {
   NULL
 };
 
-static const char *_preCmd = "{cpp} -nostdinc -Wall -std=c99 -DSDCC=1 {cppextraopts} \"{fullsrcfilename}\" \"{cppoutfilename}\"";
+static const char *_preCmd = "{cpp} -nostdinc -Wall -std=c99 {cppextraopts} \"{fullsrcfilename}\" \"{cppoutfilename}\"";
 
 PORT *port;
 
@@ -2014,6 +2014,14 @@ preProcess (char **envp)
           werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
           break;
         }
+
+      /* add SDCC version number */
+      {
+        char buf[20];
+        SNPRINTF(buf, sizeof(buf), "-DSDCC=%d%d%d",
+                 SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
+        addSet(&preArgvSet, Safe_strdup(buf));
+      }
 
       /* add port (processor information to processor */
       addSet(&preArgvSet, Safe_strdup("-DSDCC_{port}"));

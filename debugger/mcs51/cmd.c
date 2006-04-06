@@ -1954,7 +1954,7 @@ static void infoRegisters( int all, context *ctxt)
     val = simGetValue (0x82,'I',2);
     fprintf(stdout,"DPTR: 0x%04X %d\n",val,val);
     val = simGetValue (0x81,'I',1);
-    fprintf(stdout,"SP  : 0x%02X\n",val);
+    fprintf(stdout,"SP  : 0x%02X (0x%04X)\n",val,simGetValue (val-1,'B',2));
     fprintf(stdout,"PSW : 0x%02X | CY : %c | AC : %c | OV : %c | P : %c\n",
             i,(i&0x80)?'1':'0',(i&0x40)?'1':'0',(i&4)?'1':'0',(i&1)?'1':'0');
     if ( all )

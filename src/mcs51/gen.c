@@ -10836,15 +10836,24 @@ genJumpTab (iCode * ic)
       /* this algorithm needs 9 cycles and 7 + 3*n bytes
          if the switch argument is in a register.
          (8 cycles and 6+2*n bytes if peepholes can change ljmp to sjmp) */
-      /* (MB) What if peephole converts ljmp to sjmp or ret ???
-         How will multiply by three be updated ???*/
+      /* Peephole may not convert ljmp to sjmp or ret
+         labelIsReturnOnly & labelInRange must check
+         currPl->ic->op != JUMPTABLE */
       aopOp (IC_JTCOND (ic), ic, FALSE);
       /* get the condition into accumulator */
       l = aopGet (IC_JTCOND (ic), 0, FALSE, FALSE);
       MOVA (l);
       /* multiply by three */
-      emitcode ("add", "a,acc");
-      emitcode ("add", "a,%s", aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
+      if (aopGetUsesAcc (IC_JTCOND (ic), 0))
+        {
+          emitcode ("mov", "b,#3");
+          emitcode ("mul", "ab");
+        }
+      else
+        {
+          emitcode ("add", "a,acc");
+          emitcode ("add", "a,%s", aopGet (IC_JTCOND (ic), 0, FALSE, FALSE));
+        }
       freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
 
       jtab = newiTempLabel (NULL);

@@ -1,3 +1,9 @@
+2006-04-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCpeeph.c (labelIsReturnOnly): fixed bug 1464657
+	* src/mcs51/gen.c (genJumpTab): fixed bug in medium model
+	* support/regression/bug1464657.c: added, new test
+
 2006-04-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c (preProcess): implemented RFE 1449908, define SDCC as the

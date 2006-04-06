@@ -360,4 +360,24 @@ __sbit __at (0xFF) SPIF        ;  /* SPI0CN.7 - SPI0 INTERRUPT FLAG             
 #define CP0AE             0x20    /* XBR0                                */
 #define CP0AOEN           0x20    /* XBR0                                */
 
+/* Interrupts */
+
+#define INT_EXT0          0       // External Interrupt 0
+#define INT_TIMER0        1       // Timer0 Overflow
+#define INT_EXT1          2       // External Interrupt 1
+#define INT_TIMER1        3       // Timer1 Overflow
+#define INT_UART0         4       // Serial Port 0
+#define INT_TIMER2        5       // Timer2 Overflow
+#define INT_SPI0          6       // Serial Peripheral Interface 0
+#define INT_SMBUS0        7       // SMBus0 Interface
+#define INT_RTC0          8       // RTC0 Interface
+#define INT_ADC0_WINDOW   9       // ADC0 Window Comparison
+#define INT_ADC0_EOC      10      // ADC0 End Of Conversion
+#define INT_PCA0          11      // PCA0 Peripheral
+#define INT_COMPARATOR0   12      // Comparator0
+#define INT_COMPARATOR1   13      // Comparator1
+#define INT_TIMER3        14      // Timer3 Overflow
+#define INT_VREG_DROPOUT  15      // VREG dropout
+#define INT_PORT_MATCH    16      // Port Match
+
 #endif

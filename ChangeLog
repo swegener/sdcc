@@ -1,3 +1,9 @@
+2006-04-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/c8051f410.h: added interrupt numbers,
+	* device/include/mcs51/c8051f200.h: old SiLabs mcu completes the list,
+	  thanks to Charles Olds
+
 2006-04-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* debugger/mcs51/cmd.c (infoRegisters): show return address on stack

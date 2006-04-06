@@ -134,6 +134,7 @@ static void
 	vsprintf (buffer, fmt, ap);
 
 	fprintf (debugF, "%s", buffer);
+	//if (options.verbose) fprintf (stderr, "%s: %s", __FUNCTION__, buffer);
 	/*
 	while (isspace((unsigned char)*bufferP)) bufferP++;
 
@@ -369,7 +370,7 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 		dReg->name = Safe_strdup(buffer);
 	}
 	dReg->isFree = 0;
-	dReg->wasUsed = 1;
+	dReg->wasUsed = 0;
 	if (type == REG_SFR)
 		dReg->isFixed = 1;
 	else
@@ -386,7 +387,9 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 	dReg->reglives.usedpFlows = newSet();
 	dReg->reglives.assignedpFlows = newSet();
 	
-	hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
+	hTabAddItem(&dynDirectRegNames, regname2key(dReg->name), dReg);
+	debugLog( "%s: Created register %s (%p).\n",
+		__FUNCTION__, dReg->name, __builtin_return_address(0) );
 
 	return dReg;
 }
@@ -486,7 +489,7 @@ regFindFree (set *dRegs)
 	return NULL;
 }
 /*-----------------------------------------------------------------*/
-/* initStack - allocate registers for a psuedo stack               */
+/* initStack - allocate registers for a pseudo stack               */
 /*-----------------------------------------------------------------*/
 void initStack(int base_address, int size)
 {
@@ -596,7 +599,7 @@ dirregWithName (char *name)
 int IS_CONFIG_ADDRESS(int address)
 {
 	
-	return address == 0x2007;
+	return address == 0x2007 || address == 0x2008;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2740,7 +2743,7 @@ regTypeNum ()
 					
 					debugLog ("  %d - \n", __LINE__);
 				
-					/* create a psuedo symbol & force a spil */
+					/* create a pseudo symbol & force a spil */
 					//X symbol *psym = newSymbol (rematStr (OP_SYMBOL (IC_LEFT (ic))), 1);
 					psym = rematStr (OP_SYMBOL (IC_LEFT (ic)));
 					psym->type = sym->type;

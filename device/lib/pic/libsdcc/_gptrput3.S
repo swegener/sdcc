@@ -56,13 +56,13 @@ __gptrput3:
 __dataptrput3:
 	setup_fsr
 	movf	STK04, W	; get LSB(val)
-	movwf	INDF
+	movwf	_INDF
 	inc_fsr
 	movf	STK03, W	; get 2nd byte of val
-	movwf	INDF
+	movwf	_INDF
 	inc_fsr
 	movf	STK02, W	; get MSB(val)
-	movwf	INDF
+	movwf	_INDF
 	return
 
 	END

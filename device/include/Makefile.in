@@ -44,6 +44,10 @@ install: all installdirs
 	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
 		$(CP) mcs51/*.h $(sdcc_includedir)/mcs51 ; \
 	fi
+	if [ "`grep '^pic$$' ../../ports.build`" = pic ]; then \
+		$(CP) pic/*.h $(sdcc_includedir)/pic ; \
+		$(CP) pic/pic14devices.txt $(sdcc_includedir)/pic ; \
+	fi
 	if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
 		$(CP) pic16/*.h $(sdcc_includedir)/pic16 ; \
 	fi
@@ -77,6 +81,7 @@ installcheck:
 installdirs:
 	[ -d $(sdcc_includedir) ] || mkdir -p $(sdcc_includedir)
 	[ -d $(sdcc_includedir)/mcs51 ] || mkdir -p $(sdcc_includedir)/mcs51
+	[ -d $(sdcc_includedir)/pic ] || mkdir -p $(sdcc_includedir)/pic
 	[ -d $(sdcc_includedir)/pic16 ] || mkdir -p $(sdcc_includedir)/pic16
 	[ -d $(sdcc_includedir)/z80 ] || mkdir -p $(sdcc_includedir)/z80
 	[ -d $(sdcc_includedir)/hc08 ] || mkdir -p $(sdcc_includedir)/hc08

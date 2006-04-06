@@ -58,7 +58,7 @@ __gptrput1:
 __dataptrput1:
 	setup_fsr
 	movf	STK02, W	; get LSB(val)
-	movwf	INDF		; store LSB
+	movwf	_INDF		; store LSB
 	return
 
 	END

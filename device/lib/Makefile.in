@@ -253,7 +253,7 @@ model-pic16:
 	fi
 
 objects-pic16: build-dir port-specific-objects-pic16 clean_intermediate-pic16
-	cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
+	-cd $(PORTDIR); ls *$(OEXT) > $(PORT).lib
 
 # yes, we do reuse the *-pic16 rules for pic14
 model-pic14:

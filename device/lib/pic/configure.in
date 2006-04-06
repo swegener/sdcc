@@ -43,6 +43,6 @@ AC_PROG_MAKE_SET
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-
-AC_CONFIG_FILES([Makefile.common])
+AC_CONFIG_FILES([Makefile.common
+	libdev/Makefile])
 AC_OUTPUT

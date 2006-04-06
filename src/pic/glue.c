@@ -70,6 +70,9 @@ extern void printPublics (FILE * afile);
 extern void printChar (FILE * ofile, char *s, int plen);
 void  pCodeInitRegisters(void);
 int getConfigWord(int address);
+int getHasSecondConfigReg(void);
+int pic14_getSharebankSize(void);
+int pic14_getSharebankAddress(void);
 
 char *udata_section_name=0;		// FIXME Temporary fix to change udata section name -- VR
 
@@ -191,11 +194,15 @@ emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size
 	  if (!section_type) section_type = "udata";
 	  if (addr != -1)
 	  {
+	    /* absolute symbols are handled in pic14_constructAbsMap */
+	    /* do nothing */
+#if 0
 	    /* workaround gpasm bug with symbols being EQUated and placed in absolute sections */
-	    if (is_shared_address (addr))
+	    if (1 || !is_shared_address (addr))
 	    {
 	      if (globalize) fprintf (of, "\tglobal\t%s\n", name);
-	      fprintf (of, "udata_%s_%u\t%s\t0x%04x\n", moduleName, sec_idx++, section_type, addr);
+	      fprintf (of, "udata_%s_%u\t%s\t0x%04x\n", moduleName,
+	          sec_idx++, "udata_ovr", addr);
 	      fprintf (of, "%s\tres\t%d\n", name, size);
 	    }
 	    else
@@ -203,14 +210,117 @@ emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size
 	      /* EQUs cannot be exported... */
 	      fprintf (of, "%s\tEQU\t0x%04x\n", name, addr);
 	    }
+#endif
 	  } else {
 	    if (globalize) fprintf (of, "\tglobal\t%s\n", name);
-	    fprintf (of, "udata_%s_%u\t%s\n", moduleName, sec_idx++, section_type);
+	    fprintf (of, "udata_%s_%u\t%s\n", moduleName,
+	          sec_idx++, section_type);
 	    fprintf (of, "%s\tres\t%d\n", name, size);
 	  }
 	}
-	
+
+	//if (options.verbose) fprintf (stderr, "%s: emitted %s\n", __FUNCTION__, name);
 	addSet (&symbolsEmitted, (void *) name);
+}
+
+#define IS_DEFINED_HERE(sym)	(!IS_EXTERN(sym->etype))
+static void
+pic14_constructAbsMap (FILE *ofile)
+{
+  memmap *maps[] = { data, sfr, NULL };
+  int i;
+  hTab *ht = NULL;
+  symbol *sym;
+  set *aliases;
+  int addr, min=-1, max=-1;
+  int size;
+
+  for (i=0; maps[i] != NULL; i++)
+  {
+    for (sym = (symbol *)setFirstItem (maps[i]->syms);
+	sym; sym = setNextItem (maps[i]->syms))
+    {
+      if (IS_DEFINED_HERE(sym) && SPEC_ABSA(sym->etype))
+      {
+	addr = SPEC_ADDR(sym->etype);
+	if (max == -1 || addr > max) max = addr;
+	if (min == -1 || addr < min) min = addr;
+	//fprintf (stderr, "%s: sym %s @ 0x%x\n", __FUNCTION__, sym->name, addr);
+	aliases = hTabItemWithKey (ht, addr);
+	if (aliases) {
+	  /* May not use addSetHead, as we cannot update the
+	   * list's head in the hastable `ht'. */
+	  addSet (&aliases, sym);
+#if 0
+	  fprintf( stderr, "%s: now %d aliases for %s @ 0x%x\n",
+	      __FUNCTION__, elementsInSet(aliases), sym->name, addr);
+#endif
+	} else {
+	  addSet (&aliases, sym);
+	  hTabAddItem (&ht, addr, aliases);
+	} // if
+      } // if
+    } // for sym
+  } // for i
+
+  /* now emit definitions for all absolute symbols */
+  fprintf (ofile, "%s", iComments2);
+  fprintf (ofile, "; absolute symbol definitions\n");
+  fprintf (ofile, "%s", iComments2);
+  for (addr=min; addr <= max; addr++)
+  {
+    size = 1;
+    aliases = hTabItemWithKey (ht, addr);
+    if (aliases && elementsInSet(aliases)) {
+      fprintf (ofile, "udata_abs_%s_%x\tudata_ovr\t0x%04x",
+	  moduleName, addr, addr);
+      for (sym = setFirstItem (aliases); sym;
+	  sym = setNextItem (aliases))
+      {
+        /* emit STATUS as well as _STATUS, required for SFRs only */
+	fprintf (ofile, "\n%s", sym->name);
+	fprintf (ofile, "\n%s", sym->rname);
+	if (getSize(sym->type) > size) {
+	  size = getSize(sym->type);
+	}
+      } // for
+      fprintf (ofile, "\tres\t%d\n", size);
+    } // if
+  } // for i
+
+  /* also emit STK symbols
+   * XXX: This is ugly and fails as soon as devices start to get
+   *      differently sized sharebanks, since STK12 will be
+   *      required by larger devices but only up to STK03 might
+   *      be defined using smaller devices. */
+  fprintf (ofile, "\n");
+  if (!pic14_options.isLibrarySource)
+  {
+    fprintf (ofile, "\tglobal PSAVE\n");
+    fprintf (ofile, "\tglobal SSAVE\n");
+    fprintf (ofile, "\tglobal WSAVE\n");
+    for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
+      fprintf (ofile, "\tglobal STK%02d\n", i);
+    } // for i
+    fprintf (ofile, "sharebank udata_ovr 0x%04x\n",
+	  pic14_getSharebankAddress() - pic14_getSharebankSize() + 1);
+    fprintf (ofile, "PSAVE\tres 1\n");
+    fprintf (ofile, "SSAVE\tres 1\n");
+    fprintf (ofile, "WSAVE\tres 1\n");
+    /* fill rest of sharebank with stack STKxx .. STK00 */
+    for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
+      fprintf (ofile, "STK%02d\tres 1\n", i);
+    } // for i
+  } else {
+    /* declare STKxx as extern for all files
+     * except the one containing main() */
+    fprintf (ofile, "\textern PSAVE\n");
+    fprintf (ofile, "\textern SSAVE\n");
+    fprintf (ofile, "\textern WSAVE\n");
+    for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
+      fprintf (ofile, "\textern STK%02d\n", i);
+    } // for i
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -245,13 +355,16 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			!sym->allocreq && sym->level)
 			continue;
 		
-			/* if global variable & not static or extern
+		/* if global variable & not static or extern
 		and addPublics allowed then add it to the public set */
 		if ((sym->level == 0 ||
 			(sym->_isparm && !IS_REGPARM (sym->etype))) &&
 			addPublics &&
 			!IS_STATIC (sym->etype))
+		{
+			//fprintf( stderr, "%s: made public %s\n", __FUNCTION__, sym->name );
 			addSetHead (&publics, sym);
+		}
 		
 		// PIC code allocates its own registers - so ignore parameter variable generated by processFuncArgs()
 		if (sym->_isparm)
@@ -275,10 +388,13 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 				fprintf (map->oFile, "%s_%d_%d", sym->name, sym->level, sym->block);
 		}
 #endif
+		/* absolute symbols are handled in pic14_constructAbsMap */
+		if (SPEC_ABSA(sym->etype) && IS_DEFINED_HERE(sym))
+			continue;
 		
 		/* if it has an absolute address then generate
 		an equate for this no need to allocate space */
-		if (SPEC_ABSA (sym->etype))
+		if (0 && SPEC_ABSA (sym->etype))
 		{
 			//if (options.debug || sym->level == 0)
 			//fprintf (map->oFile,"; == 0x%04x\n",SPEC_ADDR (sym->etype));
@@ -300,7 +416,15 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			}
 			else
 			{
-				emitSymbolToFile (map->oFile, sym->rname, NULL, getSize (sym->type) & 0xffff, -1, 0, 0);
+				emitSymbolToFile (map->oFile,
+					sym->rname, 
+					NULL,
+					getSize (sym->type) & 0xffff,
+					SPEC_ABSA(sym->etype)
+						? SPEC_ADDR(sym->etype)
+						: -1,
+					0,
+					0);
 				/*
 				{
 				int i, size;
@@ -816,13 +940,14 @@ pic14emitStaticSeg (memmap * map)
 static void
 pic14emitMaps ()
 {
+	pic14_constructAbsMap (sfr->oFile);
 /* no special considerations for the following
 	data, idata & bit & xdata */
 	pic14emitRegularMap (data, TRUE, TRUE);
 	pic14emitRegularMap (idata, TRUE, TRUE);
 	pic14emitRegularMap (bit, TRUE, FALSE);
 	pic14emitRegularMap (xdata, TRUE, TRUE);
-	pic14emitRegularMap (sfr, FALSE, FALSE);
+	pic14emitRegularMap (sfr, TRUE, FALSE);
 	pic14emitRegularMap (sfrbit, FALSE, FALSE);
 	pic14emitRegularMap (code, TRUE, FALSE);
 	pic14emitStaticSeg (statsg);
@@ -860,7 +985,13 @@ pic14createInterruptVect (FILE * vFile)
 	fprintf (vFile, "%s", iComments2);
 	fprintf (vFile, "; config word \n");
 	fprintf (vFile, "%s", iComments2);
-	fprintf (vFile, "\t__config 0x%x\n", getConfigWord(0x2007));
+	if (getHasSecondConfigReg())
+	{
+		fprintf (vFile, "\t__config _CONFIG1, 0x%x\n", getConfigWord(0x2007));
+		fprintf (vFile, "\t__config _CONFIG2, 0x%x\n", getConfigWord(0x2008));
+	}
+	else
+		fprintf (vFile, "\t__config 0x%x\n", getConfigWord(0x2007));
 	
 	fprintf (vFile, "%s", iComments2);
 	fprintf (vFile, "; reset vector \n");
@@ -920,7 +1051,8 @@ pic14printPublics (FILE * afile)
 				fprintf (afile, "\tglobal %s\n", sym->rname);
 		} else {
 			/* Absolute variables are defines in the asm file as equates and thus can not be made global. */
-			if (!SPEC_ABSA (sym->etype))
+			/* Not any longer! */
+			//if (!SPEC_ABSA (sym->etype))
 				fprintf (afile, "\tglobal %s\n", sym->rname);
 		}
 	}

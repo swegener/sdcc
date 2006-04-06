@@ -1,3 +1,46 @@
+2006-04-06 Raphael Neider <rneider AT web.de>
+
+	* .version: bumped version to 2.5.6 (pic14 ABI changed)
+	* src/SDCCmain.c: add -DSDCC_PROCESSOR=<id> for pic14 port
+	* src/pic/glue.c (emitSymbolToFile,pic14_constructAbsMap,
+	  pic14emitRegularMap,pic14emitMaps): moved output for absolute symbols to
+	    pic14_constructAbsMap
+	  (pic14printPublics): declare absolute global symbols as global
+	  (pic14createInterruptVect), 
+	* src/pic/ralloc.c (IS_CONFIG_ADDRESS): support second config word,
+	  (newReg): assume new registers unused, use correct name in
+	    hashtable (reg->name instead of name), more debugLog output
+	* src/pic/device.h (PIC_device): added fields for verbose output
+	* src/pic/device.c: moved device definition to pic14devices.txt,
+	    added routines for runtime parsing of pic14devices.txt,
+	    added support for second config word
+	* src/pic/main.c (_process_pragma): removed #pragma maxram,
+	  (_pic14_keywords): no longer accept "bit" and "sbit" keywords
+	  (_pic14_initPaths): add search paths with "pic" suffix (not "pic14")
+	  (_pic14_parseOptions): moved pCodeInitRegisters here
+	  (_pic14_do_link): add "pic$(ARCH).lib" to linker arguments
+	* src/pic/pcode.c (AnalyzeBanking): bail out on unset processor,
+	  (pCodeInitRegisters): rewrapped comments, perpared new approach to
+	    handling the pseudo stack
+	* device/lib/Makefile.in: ignore failures in objects-pic16,
+	* device/lib/pic/{configure,configure.in,Makefile}: added libdev/
+	* device/lib/pic/NEWS: document new dependency on picXXX.lib
+	* device/lib/pic/Makefile.subdir,
+	* device/lib/pic16/Makefile.subdir: improved clean rules
+	* device/lib/pic/libdev/: NEW, pic14 device libraries
+	* device/lib/pic/libsdcc/_gptr{get,put}{1,2,3,4}.S: use _X not X
+	* device/lib/pic/libsdcc/macros.inc: use _X not X, declare default SFRs
+	* device/include/Makefile.in: create subdir and install pic14 headers
+	* device/include/pic/p16f_common.inc: removed unused declarations
+	* device/include/pic/pic16*.h: added header files for 100+ 14 bit
+	    PICs from inc2h.pl v1.6,
+	    replaced BIT_AT macros with struct declarations
+	* device/include/pic/pic14devices.txt: definition of supported devices,
+	    all above improvements contributed by Zik Saleeba, thanks
+	* support/scripts/inc2h.pl: removed BIT_AT, replaced with structs
+	* support/scripts/sdcc.nsi: also install pic14 device libraries and
+	    headers
+
 2006-04-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/c8051f410.h: added interrupt numbers,

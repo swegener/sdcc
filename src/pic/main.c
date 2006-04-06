@@ -25,7 +25,7 @@ static char _defaultRules[] =
 static char *_pic14_keywords[] =
 {
 	"at",
-	"bit",
+	//"bit",
 	"code",
 	"critical",
 	"data",
@@ -36,7 +36,7 @@ static char *_pic14_keywords[] =
 	"pdata",
 	"reentrant",
 	"sfr",
-	"sbit",
+	//"sbit",
 	"using",
 	"xdata",
 	"_data",
@@ -72,7 +72,6 @@ static void
 _pic14_init (void)
 {
 	asm_addTree (&asm_asxxxx_mapping);
-	pCodeInitRegisters();
 	memset (&pic14_options, 0, sizeof (pic14_options));
 }
 
@@ -142,17 +141,7 @@ _process_pragma(const char *sz)
 		
 		return 0;
 	} else if (startsWith (ptr, "maxram")) {
-		char *maxRAM = strtok((char *)NULL, WHITE);
-		
-		if (maxRAM != (char *)NULL) {
-			int	maxRAMaddress;
-			value 	*maxRAMVal;
-			
-			maxRAMVal = constVal(maxRAM);
-			maxRAMaddress = (int)floatFromVal(maxRAMVal);
-			setMaxRAM(maxRAMaddress);
-		}
-		
+		// not used any more - comes from device config file pic14devices.txt instead
 		return 0;
 	}
 	return 1;
@@ -187,9 +176,42 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
 	return FALSE;
 }
 
+extern set *dataDirsSet;
+extern set *includeDirsSet;
+/* pic14 port uses include/pic and lib/pic instead of
+ * include/pic14 and lib/pic14 as indicated by SDCCmain.c's
+ * setIncludePaths routine. */
+static void
+_pic14_initPaths (void)
+{
+  char *p;
+  char *p2=NULL;
+  set *tempSet=NULL;
+
+  if (options.nostdinc)
+      return;
+
+  tempSet = appendStrSet(dataDirsSet, NULL, INCLUDE_DIR_SUFFIX DIR_SEPARATOR_STRING "pic");
+  mergeSets(&includeDirsSet, tempSet);
+
+  if ((p = getenv(SDCC_INCLUDE_NAME)) != NULL)
+  {
+    addSetHead(&includeDirsSet, p);
+    p2=Safe_alloc(strlen(p)+strlen(DIR_SEPARATOR_STRING)+strlen("pic")+1);
+    if(p2!=NULL)
+    {
+        strcpy(p2, p);
+        strcat(p2, DIR_SEPARATOR_STRING);
+        strcat(p2, "pic");
+        addSetHead(&includeDirsSet, p2);
+    }
+  }
+}
+
 static void
 _pic14_finaliseOptions (void)
 {
+	pCodeInitRegisters();
 	
 	port->mem.default_local_map = data;
 	port->mem.default_globl_map = data;
@@ -456,6 +478,8 @@ static void _pic14_do_link (void)
 
   /* LIBRARIES */
   addSet(&libFilesSet, "libsdcc.lib");
+  SNPRINTF(&temp[0], 128, "pic%s.lib", port->processor);
+  addSet(&libFilesSet, temp);
   shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
 
   lcmd = msprintf(linkValues, lfrm);
@@ -556,7 +580,7 @@ PORT pic_port =
 	_pic14_init,
 	_pic14_parseOptions,
 	_pic14_poptions,
-	NULL,
+	_pic14_initPaths,
 	_pic14_finaliseOptions,
 	_pic14_setDefaultOptions,
 	pic14_assignRegisters,

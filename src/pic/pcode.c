@@ -1350,11 +1350,18 @@ void  pCodeInitRegisters(void)
 	initialized = 1;
 	
 	init_pic(port->processor);
-	shareBankAddress = 0x7f; /* FIXME - some PIC ICs like 16C7X which do not have a shared bank need a different approach. */
-	if ((unsigned)shareBankAddress > getMaxRam()) /* If total RAM is less than 0x7f as with 16f84 then reduce shareBankAddress to fit */
-		shareBankAddress = (int)getMaxRam();
-	stkSize = 15; /* Set pseudo stack size to 15, on multi memory bank ICs this leaves room for WSAVE (used for interrupts) to fit into the shared portion of the memory bank */
-	initStack(shareBankAddress, stkSize); /* Putting the pseudo stack in shared memory so all modules use the same register when passing fn parameters */
+	/* FIXME - some PIC ICs like 16C7X which do not have a shared bank
+	 * need a different approach.
+	 * The fixed address might not be needed anyway, possibly the
+	 * linker will assign udata_shr sections correctly... */
+	shareBankAddress = pic14_getSharebankAddress();
+	/* Set pseudo stack size to SHAREBANKSIZE - 3.
+	 * On multi memory bank ICs this leaves room for WSAVE/SSAVE/PSAVE
+	 * (used for interrupts) to fit into the shared portion of the
+	 * memory bank */
+	stkSize = pic14_getSharebankSize()-3;
+	/* Putting the pseudo stack in shared memory so all modules use the same register when passing fn parameters */
+	initStack(shareBankAddress, stkSize);
 	
 	pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x180);
 	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
@@ -5606,7 +5613,8 @@ void AnalyzeBanking(void)
 	pBlock  *pb;
 
 	if(!picIsInitialized()) {
-		setDefMaxRam(); // Max RAM has not been included, so use default setting
+		werror(E_FILE_OPEN_ERR, "no memory size is known for this processor");
+		exit(1);
 	}
 	
 	if (!the_pFile) return;

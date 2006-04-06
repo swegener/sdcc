@@ -168,6 +168,10 @@ Section "SDCC include files"
   File "${DEV_ROOT}\include\hc08\*.h"
   SetOutPath "$INSTDIR\include\mcs51"
   File "${DEV_ROOT}\include\mcs51\*.h"
+  SetOutPath "$INSTDIR\include\pic"
+  File "${DEV_ROOT}\include\pic\*.h"
+  File "${DEV_ROOT}\include\pic\*.txt"
+  File "${DEV_ROOT}\include\pic\*.inc"
   SetOutPath "$INSTDIR\include\pic16"
   File "${DEV_ROOT}\include\pic16\*.h"
   SetOutPath "$INSTDIR\include\z80"
@@ -249,6 +253,7 @@ SectionEnd
 Section "SDCC PIC library"
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic"
+  File "${DEV_ROOT}\lib\pic\*.o"
   File "${DEV_ROOT}\lib\pic\*.lib"
 SectionEnd
 
@@ -317,6 +322,12 @@ Section "SDCC library sources"
   File "${DEV_ROOT}\lib\src\pic\libsdcc\*.S"
   File "${DEV_ROOT}\lib\src\pic\libsdcc\*.inc"
   File "${DEV_ROOT}\lib\src\pic\libsdcc\Makefile"
+  
+  SetOutPath "$INSTDIR\lib\src\pic\libdev"
+  File "${DEV_ROOT}\lib\src\pic\libdev\*.c"
+  File "${DEV_ROOT}\lib\src\pic\libdev\*.S"
+  File "${DEV_ROOT}\lib\src\pic\libdev\*.inc"
+  File "${DEV_ROOT}\lib\src\pic\libdev\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic16"
   File "${DEV_ROOT}\lib\src\pic16\configure"
@@ -529,6 +540,7 @@ Section Uninstall
 
   Delete "$INSTDIR\lib\src\*.c"
 
+  Delete "$INSTDIR\lib\pic\*.o"
   Delete "$INSTDIR\lib\pic\*.lib"
 
   Delete "$INSTDIR\lib\pic16\*.o"
@@ -568,6 +580,9 @@ Section Uninstall
   Delete "$INSTDIR\include\asm\ds390\*.h"
   Delete "$INSTDIR\include\asm\default\*.h"
   Delete "$INSTDIR\include\z80\*.h"
+  Delete "$INSTDIR\include\pic\*.h"
+  Delete "$INSTDIR\include\pic\*.txt"
+  Delete "$INSTDIR\include\pic\*.inc"
   Delete "$INSTDIR\include\pic16\*.h"
   Delete "$INSTDIR\include\mcs51\*.h"
   Delete "$INSTDIR\include\hc08\*.h"
@@ -618,6 +633,7 @@ Section Uninstall
   RMDir "$INSTDIR\include\asm\default"
   RMDir "$INSTDIR\include\asm"
   RMDir "$INSTDIR\include\z80"
+  RMDir "$INSTDIR\include\pic"
   RMDir "$INSTDIR\include\pic16"
   RMDir "$INSTDIR\include\mcs51"
   RMDir "$INSTDIR\include\hc08"

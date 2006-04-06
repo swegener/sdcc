@@ -58,28 +58,28 @@ __gptrget3:
 
 __dataptrget3:
 	setup_fsr
-	movf	INDF, W
+	movf	_INDF, W
 	movwf	STK01		; LSB in STK01
 	inc_fsr
-	movf	INDF, W
+	movf	_INDF, W
 	movwf	STK00		; 2nd byte in STK00
 	inc_fsr
-	movf	INDF, W		; MSB in WREG
+	movf	_INDF, W	; MSB in WREG
 	return
 
 __codeptrget3:
 	pagesel	__codeptrget1	; might reside in different page
 	call	__codeptrget1
 	movwf	STK02		; temporarily store LSB
-	incfsz	STK01,F		; increment low address byte
-	decf	STK00,F		; undo increment of high address byte if low byte did not overflow
-	incf	STK00,F		; increment high address byte
+	incfsz	STK01,F	; increment low address byte
+	decf	STK00,F	; undo increment of high address byte if low byte did not overflow
+	incf	STK00,F	; increment high address byte
 	pagesel	__codeptrget1	; might reside in different page
 	call	__codeptrget1
 	movwf	STK03		; temporarily store 2nd byte
-	incfsz	STK01,F		; increment low address byte
-	decf	STK00,F		; undo increment of high address byte if low byte did not overflow
-	incf	STK00,F		; increment high address byte
+	incfsz	STK01,F	; increment low address byte
+	decf	STK00,F	; undo increment of high address byte if low byte did not overflow
+	incf	STK00,F	; increment high address byte
 	pagesel	__codeptrget1	; might reside in different page
 	call	__codeptrget1
 	movwf	STK04		; temporarily store MSB

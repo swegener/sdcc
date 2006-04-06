@@ -58,15 +58,15 @@ __gptrget1:
 
 __dataptrget1:
 	setup_fsr
-	movf	INDF, W
+	movf	_INDF, W
 	return
 
 __codeptrget1:
 	; call the RETLW instruction at the given address
 	movf	STK00, W
-	movwf	PCLATH
+	movwf	_PCLATH
 	movf	STK01, W
-	movwf	PCL
+	movwf	_PCL
 	return	; should never be executed...
 
 	END

@@ -2027,6 +2027,12 @@ preProcess (char **envp)
       addSet(&preArgvSet, Safe_strdup("-DSDCC_{port}"));
       addSet(&preArgvSet, Safe_strdup("-D__{port}"));
 
+      if (port && port->processor && TARGET_IS_PIC) {
+        char proc[512];
+	SNPRINTF(&proc[0], 512, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
+	addSet(&preArgvSet, Safe_strdup(proc));
+      }
+
       /* standard include path */
       if (!options.nostdinc) {
         inclList = appendStrSet(includeDirsSet, "-I\"", "\"");

@@ -83,6 +83,12 @@ typedef struct PIC_device {
 	int defMaxRAMaddrs;         /* default maximum value for a data address */
 	int bankMask;               /* Bitmask that is ANDed with address to extract banking bits */
 	//  int hasAliasedRAM:1;        /* True if there are bank independent registers */
+	int hasSecondConfigReg;     /* True if there is a second configuration register */
+	
+	int programMemSize;         /* program memory size in words - for device listing only */
+	int dataMemSize;            /* data (RAM) memory size in bytes - for device listing only */
+	int eepromMemSize;          /* EEPROM memory size in bytes - for device listing only */
+	int ioPins;                 /* number of I/O pins - for device listing only */
 
 } PIC_device;
 
@@ -102,5 +108,8 @@ void addMemRange(memRange *r, int type);
 void setMaxRAM(int size);
 void setDefMaxRam(void);
 unsigned getMaxRam(void);
+int getHasSecondConfigReg(void);
+int pic14_getSharebankSize(void);
+int pic14_getSharebankAddress(void);
 
 #endif  /* __DEVICE_H__ */

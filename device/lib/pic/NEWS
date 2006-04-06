@@ -1,3 +1,10 @@
+--- 2006-03-21  Raphael Neider
+
+Added device specific SFR definitions in libdev/.
+From now on all projects should be linked not only with
+libsdcc.lib but also with pic$(ARCH).lib where ARCH is
+something like p16f877.
+
 --- 2005-10-27  Raphael Neider
 
 Generic pointer support routines and additional arithmetic halpers

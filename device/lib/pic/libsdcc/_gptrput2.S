@@ -56,10 +56,10 @@ __gptrput2:
 __dataptrput2:
 	setup_fsr
 	movf	STK03, W	; get LSB(val)
-	movwf	INDF
+	movwf	_INDF
 	inc_fsr
 	movf	STK02, W	; get MSB(val)
-	movwf	INDF
+	movwf	_INDF
 	return
 
 	END

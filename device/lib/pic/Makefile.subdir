@@ -56,6 +56,8 @@ clean : recurse
 	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym,$(OBJS:.o=.$(suf)))
 	@-echo "dummy" > .dummy
 	$(Q)-$(RM) .dummy $(OBJS) $(LIB_LIB)
+	$(Q)-$(RM) $(TARGETS)
+	$(Q)-$(RM) $(addprefix $(topsrcdir)/$(installdir)/,$(notdir $(TARGETS)))
 	$(Q)-[ ! -d "$(topsrcdir)/$(builddir)" ] || $(RMDIR) "$(topsrcdir)/$(builddir)"
 
 clean-intermediate : recurse

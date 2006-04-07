@@ -388,9 +388,13 @@ static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, i
 	dReg->reglives.assignedpFlows = newSet();
 	
 	hTabAddItem(&dynDirectRegNames, regname2key(dReg->name), dReg);
+#ifdef __GNUC__
 	debugLog( "%s: Created register %s (%p).\n",
 		__FUNCTION__, dReg->name, __builtin_return_address(0) );
-
+#else
+	debugLog( "%s: Created register %s.\n",
+		__FUNCTION__, dReg->name);
+#endif
 	return dReg;
 }
 

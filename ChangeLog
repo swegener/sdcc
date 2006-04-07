@@ -1,3 +1,8 @@
+2006-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version: bumped version to 2.5.6
+	* src/pic/ralloc.c (newReg): MSVC doesn't support __builtin_return_address
+
 2006-04-06 Raphael Neider <rneider AT web.de>
 
 	* .version: bumped version to 2.5.6 (pic14 ABI changed)
@@ -6,7 +11,7 @@
 	  pic14emitRegularMap,pic14emitMaps): moved output for absolute symbols to
 	    pic14_constructAbsMap
 	  (pic14printPublics): declare absolute global symbols as global
-	  (pic14createInterruptVect), 
+	  (pic14createInterruptVect),
 	* src/pic/ralloc.c (IS_CONFIG_ADDRESS): support second config word,
 	  (newReg): assume new registers unused, use correct name in
 	    hashtable (reg->name instead of name), more debugLog output

@@ -1,3 +1,7 @@
+2006-04-07 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/SDCC.y: allow using brackets here: "__interrupt (1) __using (1)"
+
 2006-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* .version: bumped version to 2.5.6

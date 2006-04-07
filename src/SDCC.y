@@ -186,9 +186,9 @@ function_attribute
    ;
 
 function_attributes
-   :  USING CONSTANT {
+   :  USING constant_expr {
                         $$ = newLink(SPECIFIER) ;
-			FUNC_REGBANK($$) = (int) floatFromVal($2);
+			FUNC_REGBANK($$) = (int) floatFromVal(constExprValue($2,TRUE));
                      }
    |  REENTRANT      {  $$ = newLink (SPECIFIER);
 			FUNC_ISREENT($$)=1;
@@ -578,8 +578,8 @@ storage_class_specifier
 
 Interrupt_storage
    : INTERRUPT { $$ = INTNO_UNSPEC ; }
-   | INTERRUPT CONSTANT
-        { int intno = (int) floatFromVal($2);
+   | INTERRUPT constant_expr
+        { int intno = (int) floatFromVal(constExprValue($2,TRUE));
           if ((intno >= 0) && (intno <= INTNO_MAX))
             $$ = intno;
           else

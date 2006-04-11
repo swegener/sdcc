@@ -1,5 +1,11 @@
 2006-04-11 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/gen.c (getFreePtr, pic16_popRegFromString),
+	* src/pic16/ralloc.c (pic16_allocregWithName): removed debug output
+	* src/pic16/pcode.c (assignValnums): fixed #1460578
+
+2006-04-11 Raphael Neider <rneider AT web.de>
+
 	* device/lib/pic/libdev/*.c,
 	* device/include/pic/*.h: replaced sfr and data with __sfr and __data,
 	  fixes #1468739, enables compilation in --std-c99 mode

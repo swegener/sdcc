@@ -11759,8 +11759,10 @@ static void assignValnums (pCode *pc) {
         pc = newpc;
         break; // do not process instruction as MOVFF...
       }
-    } else if (!isSpecial1 && !isSpecial2 && pic16_regIsLocal (reg1) && pic16_regIsLocal (reg2)) {
-      if (val && oldval && (val->in_val != 0) && (val->in_val == oldval->in_val)) {
+    } else if (!isSpecial1 && !isSpecial2
+    		&& pic16_regIsLocal (reg1) && pic16_regIsLocal (reg2)
+		&& val && oldval && (val->in_val != 0)) {
+      if (val->in_val == oldval->in_val) {
 	//fprintf (stderr, "MOVFF: F2 (%s) already set up correctly (%x) at %p\n", strFromSym (sym2), oldval->in_val, pc);
         pic16_safepCodeRemove (pc, "=DF= redundant MOVFF removed");
       } else {
@@ -11786,9 +11788,33 @@ static void assignValnums (pCode *pc) {
 	      if (copy->sym == SPO_WREG) {
 	        newpc = pic16_newpCode (POC_MOVWF, pic16_pCodeOpCopy (PCOR2(pci->pcop)->pcop2));
 	      } else {
+		pCodeOp *pcop = NULL;
+		/* the code below fails if we try to replace
+		 *   MOVFF PRODL, r0x03
+		 *   MOVFF r0x03, PCLATU
+		 * with
+		 *   MOVFF PRODL, PCLATU
+		 * as copy(PRODL) contains has pc==NULL, by name fails...
+		 */
+	        if (!copy->pc || !PCI(copy->pc)->pcop) break;
+		
+		if (copy->pc && PCI(copy->pc)->pcop)
+		  pcop = PCI(copy->pc)->pcop;
+#if 0
+		/* This code is broken--see above. */
+		else
+		{
+		  const char *symname = strFromSym(copy->sym);
+		  
+		  assert( symname );
+	          pic16_InsertCommentAfter (pc->prev, "BUG-ME");
+	          pic16_InsertCommentAfter (pc->prev, "=DF= MOVFF: newpCodeOpregFromStr(%s)", (char *)symname);
+		  //pcop = pic16_newpCodeOpRegFromStr((char *)symname);
+		}
+#endif
+		assert( pcop );
                 newpc = pic16_newpCode(POC_MOVFF, pic16_popGet2p(
-//			/*TODO: change to copy->pc's out symbol*/pic16_pCodeOpCopy (pci->pcop),
-			pic16_pCodeOpCopy (PCI(copy->pc)->pcop),
+			pcop,
 			pic16_pCodeOpCopy (PCOR2(pci->pcop)->pcop2)));
 	      }
 	      pic16_InsertCommentAfter (pc->prev, "=DF= MOVFF: SRC op %s replaced by %s", strFromSym(sym1), strFromSym(copy->sym));

@@ -663,7 +663,7 @@ pic16_allocregWithName (char *name)
 
   hkey = regname2key(name);
 
-	fprintf(stderr, "%s:%d: name = %s\thash = %d\n", __FUNCTION__, __LINE__, name, hkey);
+  //fprintf(stderr, "%s:%d: name = %s\thash = %d\n", __FUNCTION__, __LINE__, name, hkey);
 
   reg = hTabFirstItemWK(dynAllocRegNames, hkey);
 

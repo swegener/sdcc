@@ -410,7 +410,7 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     bool fsr0iu = FALSE, fsr0ou;
     bool fsr2iu = FALSE, fsr2ou;
     
-    fprintf(stderr, "%s:%d: getting free ptr from ic = %c result: %d\n", __FUNCTION__, __LINE__, ic->op, result);
+    //fprintf(stderr, "%s:%s:%d: getting free ptr from ic = %c result: %d\n", __FILE__,  __FUNCTION__, __LINE__, ic->op, result);
 
     
     fsr2iu = bitVectBitValue(ic->rUsed, IDX_FSR2);
@@ -428,7 +428,7 @@ static regs *getFreePtr (iCode *ic, asmop **aopp, bool result)
     	ic->rUsed = bitVectSetBit(ic->rUsed, IDX_FSR0);
     	(*aopp)->type = AOP_FSR0;
 
-    	fprintf(stderr, "%s:%d returning plain FSR0\n", __FILE__, __LINE__);
+    	//fprintf(stderr, "%s:%d returning plain FSR0\n", __FILE__, __LINE__);
     	
       return ((*aopp)->aopu.aop_ptr = pic16_regWithIdx(IDX_FSR0));
     }
@@ -1938,7 +1938,7 @@ static pCodeOp *pic16_popRegFromString(char *str, int size, int offset, operand 
 //		__FUNCTION__, __LINE__, str, size, offset);
 
     PCOR(pcop)->r = pic16_allocRegByName (pcop->name,size, op);
-    fprintf(stderr, "%s:%d: WARNING: need to allocate new register by name -> %s\n", __FILE__, __LINE__, str);
+    //fprintf(stderr, "%s:%d: WARNING: need to allocate new register by name -> %s\n", __FILE__, __LINE__, str);
 
   }
   PCOR(pcop)->instance = offset;

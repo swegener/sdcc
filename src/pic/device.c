@@ -240,7 +240,7 @@ static PIC_device *find_device(char *pic_name)
 		!pic_file && dir;
 		dir = setNextItem(includeDirsSet))
 	{
-	  fprintf( stderr, "searching1 %s\n", dir );
+	  //fprintf( stderr, "searching1 %s\n", dir );
 	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
 	  pic_file = fopen( filename, "rt" );
 	  if (pic_file) break;
@@ -249,7 +249,7 @@ static PIC_device *find_device(char *pic_name)
 		!pic_file && dir;
 		dir = setNextItem(userIncDirsSet))
 	{
-	  fprintf( stderr, "searching2 %s\n", dir );
+	  //fprintf( stderr, "searching2 %s\n", dir );
 	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
 	  pic_file = fopen( filename, "rt" );
 	  if (pic_file) break;
@@ -258,7 +258,7 @@ static PIC_device *find_device(char *pic_name)
 		!pic_file && dir;
 		dir = setNextItem(libDirsSet))
 	{
-	  fprintf( stderr, "searching3 %s\n", dir );
+	  //fprintf( stderr, "searching3 %s\n", dir );
 	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
 	  pic_file = fopen( filename, "rt" );
 	  if (pic_file) break;
@@ -267,7 +267,7 @@ static PIC_device *find_device(char *pic_name)
 		!pic_file && dir;
 		dir = setNextItem(libPathsSet))
 	{
-	  fprintf( stderr, "searching4 %s\n", dir );
+	  //fprintf( stderr, "searching4 %s\n", dir );
 	  SNPRINTF(&filename[0], len, "%s%s%s", dir, DIR_SEPARATOR_STRING, DEVICE_FILE_NAME);
 	  pic_file = fopen( filename, "rt" );
 	  if (pic_file) break;
@@ -650,7 +650,7 @@ void dump_sfr(FILE *of)
 void list_valid_pics(int ncols, int list_alias)
 {
 	int col=0,longest;
-	int i,j,k;
+	int i,j,k,l;
 	int max_alias = 1;
 	
 	if (num_of_supported_PICS == 0)
@@ -671,7 +671,7 @@ void list_valid_pics(int ncols, int list_alias)
 		}
 	}
 	
-#if 0
+#if 1
 	/* heading */
 	fprintf(stderr, "\nPIC14 processors and their characteristics:\n\n");
 	fprintf(stderr, " processor");

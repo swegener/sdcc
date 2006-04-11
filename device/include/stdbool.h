@@ -21,14 +21,14 @@
 #ifndef __SDC51_STDBOOL_H
 #define __SDC51_STDBOOL_H 1
 
-#define _Bool __bit
+#define _Bool BOOL
 
-#define bool _Bool
+#define bool BOOL
 #define true 1
 #define false 0
 #define __bool_true_false_are_defined 1
 
-#if defined (SDCC_ds390) || defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80)
+#if defined (SDCC_ds390) || defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80) || defined (SDCC_pic14) || defined (SDCC_pic16)
  #define BOOL char
 #else
  #define BOOL __bit

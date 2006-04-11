@@ -1,3 +1,9 @@
+2006-04-11 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (find_device): removed debug output
+	  (list_valid_pics): enabled verbose listing of supported devices
+	* device/include/stdbool.h: define bool as char for pic14/16 as well
+
 2006-04-07 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/SDCC.y: allow using brackets here: "__interrupt (1) __using (1)"

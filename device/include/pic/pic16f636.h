@@ -154,57 +154,57 @@
 
 //----- Register Files------------------------------------------------------
 //Bank 0
-extern data __at (INDF_ADDR) volatile char      INDF;
-extern sfr  __at (TMR0_ADDR)                    TMR0;
-extern data __at (PCL_ADDR) volatile char       PCL;
-extern sfr  __at (STATUS_ADDR)                  STATUS;
-extern sfr  __at (FSR_ADDR)                     FSR;
-extern sfr  __at (PORTA_ADDR)                   PORTA;
+extern __data __at (INDF_ADDR) volatile char      INDF;
+extern __sfr  __at (TMR0_ADDR)                    TMR0;
+extern __data __at (PCL_ADDR) volatile char       PCL;
+extern __sfr  __at (STATUS_ADDR)                  STATUS;
+extern __sfr  __at (FSR_ADDR)                     FSR;
+extern __sfr  __at (PORTA_ADDR)                   PORTA;
 
-extern sfr  __at (PORTC_ADDR)                   PORTC;
+extern __sfr  __at (PORTC_ADDR)                   PORTC;
 
-extern sfr  __at (PCLATH_ADDR)                  PCLATH;
-extern sfr  __at (INTCON_ADDR)                  INTCON;
-extern sfr  __at (PIR1_ADDR)                    PIR1;
+extern __sfr  __at (PCLATH_ADDR)                  PCLATH;
+extern __sfr  __at (INTCON_ADDR)                  INTCON;
+extern __sfr  __at (PIR1_ADDR)                    PIR1;
 
-extern sfr  __at (TMR1L_ADDR)                   TMR1L;		
-extern sfr  __at (TMR1H_ADDR)                   TMR1H;		
-extern sfr  __at (T1CON_ADDR)                   T1CON;		
+extern __sfr  __at (TMR1L_ADDR)                   TMR1L;		
+extern __sfr  __at (TMR1H_ADDR)                   TMR1H;		
+extern __sfr  __at (T1CON_ADDR)                   T1CON;		
 
-extern sfr  __at (WDTCON_ADDR)                  WDTCON;
-extern sfr  __at (CMCON0_ADDR)                  CMCON0;		
-extern sfr  __at (CMCON1_ADDR)                  CMCON1;		
+extern __sfr  __at (WDTCON_ADDR)                  WDTCON;
+extern __sfr  __at (CMCON0_ADDR)                  CMCON0;		
+extern __sfr  __at (CMCON1_ADDR)                  CMCON1;		
 
 //Bank 1
-extern sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+extern __sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
 
-extern sfr  __at (TRISA_ADDR)                   TRISA;
-extern sfr  __at (TRISC_ADDR)                   TRISC;
+extern __sfr  __at (TRISA_ADDR)                   TRISA;
+extern __sfr  __at (TRISC_ADDR)                   TRISC;
 
-extern sfr  __at (PIE1_ADDR)                    PIE1;
+extern __sfr  __at (PIE1_ADDR)                    PIE1;
 
-extern sfr  __at (PCON_ADDR)                    PCON;
-extern sfr  __at (OSCCON_ADDR)                  OSCCON;
-extern sfr  __at (OSCTUNE_ADDR)                 OSCTUNE;
+extern __sfr  __at (PCON_ADDR)                    PCON;
+extern __sfr  __at (OSCCON_ADDR)                  OSCCON;
+extern __sfr  __at (OSCTUNE_ADDR)                 OSCTUNE;
 
-extern sfr  __at (LVDCON_ADDR)                  LVDCON;
-extern sfr  __at (WPUDA_ADDR)                   WPUDA;
-extern sfr  __at (IOCA_ADDR)                    IOCA;
-extern sfr  __at (WDA_ADDR)                     WDA;
+extern __sfr  __at (LVDCON_ADDR)                  LVDCON;
+extern __sfr  __at (WPUDA_ADDR)                   WPUDA;
+extern __sfr  __at (IOCA_ADDR)                    IOCA;
+extern __sfr  __at (WDA_ADDR)                     WDA;
 
-extern sfr  __at (VRCON_ADDR)                   VRCON;
-extern sfr  __at (EEDAT_ADDR)                   EEDAT;	
-extern sfr  __at (EEDATA_ADDR)                  EEDATA;	
-extern sfr  __at (EEADR_ADDR)                   EEADR;	
-extern sfr  __at (EECON1_ADDR)                  EECON1;
-extern sfr  __at (EECON2_ADDR)                  EECON2;
+extern __sfr  __at (VRCON_ADDR)                   VRCON;
+extern __sfr  __at (EEDAT_ADDR)                   EEDAT;	
+extern __sfr  __at (EEDATA_ADDR)                  EEDATA;	
+extern __sfr  __at (EEADR_ADDR)                   EEADR;	
+extern __sfr  __at (EECON1_ADDR)                  EECON1;
+extern __sfr  __at (EECON2_ADDR)                  EECON2;
 
 //Bank 2
-extern sfr  __at (CRCON_ADDR)                   CRCON;
-extern sfr  __at (CRDAT0_ADDR)                  CRDAT0;
-extern sfr  __at (CRDAT1_ADDR)                  CRDAT1;
-extern sfr  __at (CRDAT2_ADDR)                  CRDAT2;
-extern sfr  __at (CRDAT3_ADDR)                  CRDAT3;
+extern __sfr  __at (CRCON_ADDR)                   CRCON;
+extern __sfr  __at (CRDAT0_ADDR)                  CRDAT0;
+extern __sfr  __at (CRDAT1_ADDR)                  CRDAT1;
+extern __sfr  __at (CRDAT2_ADDR)                  CRDAT2;
+extern __sfr  __at (CRDAT3_ADDR)                  CRDAT3;
 
 //----- STATUS Bits --------------------------------------------------------
 

@@ -1,5 +1,12 @@
 2006-04-11 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic/libdev/*.c,
+	* device/include/pic/*.h: replaced sfr and data with __sfr and __data,
+	  fixes #1468739, enables compilation in --std-c99 mode
+	* support/scripts/inc2h.pl: emit __sfr/__data instead of sfr/data
+
+2006-04-11 Raphael Neider <rneider AT web.de>
+
 	* src/pic/device.c (find_device): removed debug output
 	  (list_valid_pics): enabled verbose listing of supported devices
 	* device/include/stdbool.h: define bool as char for pic14/16 as well

@@ -219,8 +219,8 @@ while (<HEADER>) {
 	    } else {
 		$addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $value);
 	    }
-	    $body .= sprintf("extern sfr  __at %-30s $name;$rest\n", "(${name}_ADDR)" );
-	    $c_head .= sprintf("sfr  __at %-30s $name;\n", "(${name}_ADDR)");
+	    $body .= sprintf("extern __sfr  __at %-30s $name;$rest\n", "(${name}_ADDR)" );
+	    $c_head .= sprintf("__sfr  __at %-30s $name;\n", "(${name}_ADDR)");
 	    $addr{"p$processor", "$name"} = "0x$value";
 	} elsif ($type eq 'volatile') {
 	    #
@@ -230,8 +230,8 @@ while (<HEADER>) {
 	    $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
 				. "SFR %s\t// %s\n",
 				$name, $name, $bitmask, $name);
-	    $body .= sprintf("extern data __at %-30s $name;$rest\n", "(${name}_ADDR) volatile char");
-	    $c_head .= sprintf("data __at %-30s $name;\n", "(${name}_ADDR) volatile char");
+	    $body .= sprintf("extern __data __at %-30s $name;$rest\n", "(${name}_ADDR) volatile char");
+	    $c_head .= sprintf("__data __at %-30s $name;\n", "(${name}_ADDR) volatile char");
 	    if (defined $addr{"p$processor", "$name"}) {
 		$addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
 	    } else {

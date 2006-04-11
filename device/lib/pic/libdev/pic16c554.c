@@ -5,19 +5,19 @@
  */
 #include <pic16c554.h>
 
-data __at (INDF_ADDR) volatile char      INDF;
-sfr  __at (TMR0_ADDR)                    TMR0;
-data __at (PCL_ADDR) volatile char       PCL;
-sfr  __at (STATUS_ADDR)                  STATUS;
-sfr  __at (FSR_ADDR)                     FSR;
-sfr  __at (PORTA_ADDR)                   PORTA;
-sfr  __at (PORTB_ADDR)                   PORTB;
-sfr  __at (PCLATH_ADDR)                  PCLATH;
-sfr  __at (INTCON_ADDR)                  INTCON;
-sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
-sfr  __at (TRISA_ADDR)                   TRISA;
-sfr  __at (TRISB_ADDR)                   TRISB;
-sfr  __at (PCON_ADDR)                    PCON;
+__data __at (INDF_ADDR) volatile char      INDF;
+__sfr  __at (TMR0_ADDR)                    TMR0;
+__data __at (PCL_ADDR) volatile char       PCL;
+__sfr  __at (STATUS_ADDR)                  STATUS;
+__sfr  __at (FSR_ADDR)                     FSR;
+__sfr  __at (PORTA_ADDR)                   PORTA;
+__sfr  __at (PORTB_ADDR)                   PORTB;
+__sfr  __at (PCLATH_ADDR)                  PCLATH;
+__sfr  __at (INTCON_ADDR)                  INTCON;
+__sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+__sfr  __at (TRISA_ADDR)                   TRISA;
+__sfr  __at (TRISB_ADDR)                   TRISB;
+__sfr  __at (PCON_ADDR)                    PCON;
 
 // 
 // bitfield definitions

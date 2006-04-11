@@ -5,15 +5,15 @@
  */
 #include <pic16f505.h>
 
-data __at (INDF_ADDR) volatile char      INDF;
-sfr  __at (TMR0_ADDR)                    TMR0;
-data __at (PCL_ADDR) volatile char       PCL;
-sfr  __at (STATUS_ADDR)                  STATUS;
-sfr  __at (FSR_ADDR)                     FSR;
-sfr  __at (OSCCAL_ADDR)                  OSCCAL;
-sfr  __at (PORTB_ADDR)                   PORTB;
-sfr  __at (PORTC_ADDR)                   PORTC;
-sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+__data __at (INDF_ADDR) volatile char      INDF;
+__sfr  __at (TMR0_ADDR)                    TMR0;
+__data __at (PCL_ADDR) volatile char       PCL;
+__sfr  __at (STATUS_ADDR)                  STATUS;
+__sfr  __at (FSR_ADDR)                     FSR;
+__sfr  __at (OSCCAL_ADDR)                  OSCCAL;
+__sfr  __at (PORTB_ADDR)                   PORTB;
+__sfr  __at (PORTC_ADDR)                   PORTC;
+__sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
 
 // 
 // bitfield definitions

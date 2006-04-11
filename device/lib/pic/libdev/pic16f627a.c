@@ -5,41 +5,41 @@
  */
 #include <pic16f627a.h>
 
-data __at (INDF_ADDR) volatile char      INDF;
-sfr  __at (TMR0_ADDR)                    TMR0;
-data __at (PCL_ADDR) volatile char       PCL;
-sfr  __at (STATUS_ADDR)                  STATUS;
-sfr  __at (FSR_ADDR)                     FSR;
-sfr  __at (PORTA_ADDR)                   PORTA;
-sfr  __at (PORTB_ADDR)                   PORTB;
-sfr  __at (PCLATH_ADDR)                  PCLATH;
-sfr  __at (INTCON_ADDR)                  INTCON;
-sfr  __at (PIR1_ADDR)                    PIR1;
-sfr  __at (TMR1L_ADDR)                   TMR1L;
-sfr  __at (TMR1H_ADDR)                   TMR1H;
-sfr  __at (T1CON_ADDR)                   T1CON;
-sfr  __at (TMR2_ADDR)                    TMR2;
-sfr  __at (T2CON_ADDR)                   T2CON;
-sfr  __at (CCPR1L_ADDR)                  CCPR1L;
-sfr  __at (CCPR1H_ADDR)                  CCPR1H;
-sfr  __at (CCP1CON_ADDR)                 CCP1CON;
-sfr  __at (RCSTA_ADDR)                   RCSTA;
-sfr  __at (TXREG_ADDR)                   TXREG;
-sfr  __at (RCREG_ADDR)                   RCREG;
-sfr  __at (CMCON_ADDR)                   CMCON;
-sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
-sfr  __at (TRISA_ADDR)                   TRISA;
-sfr  __at (TRISB_ADDR)                   TRISB;
-sfr  __at (PIE1_ADDR)                    PIE1;
-sfr  __at (PCON_ADDR)                    PCON;
-sfr  __at (PR2_ADDR)                     PR2;
-sfr  __at (TXSTA_ADDR)                   TXSTA;
-sfr  __at (SPBRG_ADDR)                   SPBRG;
-sfr  __at (EEDATA_ADDR)                  EEDATA;
-sfr  __at (EEADR_ADDR)                   EEADR;
-sfr  __at (EECON1_ADDR)                  EECON1;
-sfr  __at (EECON2_ADDR)                  EECON2;
-sfr  __at (VRCON_ADDR)                   VRCON;
+__data __at (INDF_ADDR) volatile char      INDF;
+__sfr  __at (TMR0_ADDR)                    TMR0;
+__data __at (PCL_ADDR) volatile char       PCL;
+__sfr  __at (STATUS_ADDR)                  STATUS;
+__sfr  __at (FSR_ADDR)                     FSR;
+__sfr  __at (PORTA_ADDR)                   PORTA;
+__sfr  __at (PORTB_ADDR)                   PORTB;
+__sfr  __at (PCLATH_ADDR)                  PCLATH;
+__sfr  __at (INTCON_ADDR)                  INTCON;
+__sfr  __at (PIR1_ADDR)                    PIR1;
+__sfr  __at (TMR1L_ADDR)                   TMR1L;
+__sfr  __at (TMR1H_ADDR)                   TMR1H;
+__sfr  __at (T1CON_ADDR)                   T1CON;
+__sfr  __at (TMR2_ADDR)                    TMR2;
+__sfr  __at (T2CON_ADDR)                   T2CON;
+__sfr  __at (CCPR1L_ADDR)                  CCPR1L;
+__sfr  __at (CCPR1H_ADDR)                  CCPR1H;
+__sfr  __at (CCP1CON_ADDR)                 CCP1CON;
+__sfr  __at (RCSTA_ADDR)                   RCSTA;
+__sfr  __at (TXREG_ADDR)                   TXREG;
+__sfr  __at (RCREG_ADDR)                   RCREG;
+__sfr  __at (CMCON_ADDR)                   CMCON;
+__sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+__sfr  __at (TRISA_ADDR)                   TRISA;
+__sfr  __at (TRISB_ADDR)                   TRISB;
+__sfr  __at (PIE1_ADDR)                    PIE1;
+__sfr  __at (PCON_ADDR)                    PCON;
+__sfr  __at (PR2_ADDR)                     PR2;
+__sfr  __at (TXSTA_ADDR)                   TXSTA;
+__sfr  __at (SPBRG_ADDR)                   SPBRG;
+__sfr  __at (EEDATA_ADDR)                  EEDATA;
+__sfr  __at (EEADR_ADDR)                   EEADR;
+__sfr  __at (EECON1_ADDR)                  EECON1;
+__sfr  __at (EECON2_ADDR)                  EECON2;
+__sfr  __at (VRCON_ADDR)                   VRCON;
 
 // 
 // bitfield definitions

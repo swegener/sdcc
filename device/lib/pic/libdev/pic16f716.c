@@ -5,37 +5,37 @@
  */
 #include <pic16f716.h>
 
-data __at (INDF_ADDR) volatile char      INDF;
-sfr  __at (TMR0_ADDR)                    TMR0;
-data __at (PCL_ADDR) volatile char       PCL;
-sfr  __at (STATUS_ADDR)                  STATUS;
-sfr  __at (FSR_ADDR)                     FSR;
-sfr  __at (PORTA_ADDR)                   PORTA;
-sfr  __at (PORTB_ADDR)                   PORTB;
-sfr  __at (DATACCP_ADDR)                 DATACCP;
-sfr  __at (PCLATH_ADDR)                  PCLATH;
-sfr  __at (INTCON_ADDR)                  INTCON;
-sfr  __at (PIR1_ADDR)                    PIR1;
-sfr  __at (TMR1L_ADDR)                   TMR1L;
-sfr  __at (TMR1H_ADDR)                   TMR1H;
-sfr  __at (T1CON_ADDR)                   T1CON;
-sfr  __at (TMR2_ADDR)                    TMR2;
-sfr  __at (T2CON_ADDR)                   T2CON;
-sfr  __at (CCPR1L_ADDR)                  CCPR1L;
-sfr  __at (CCPR1H_ADDR)                  CCPR1H;
-sfr  __at (CCP1CON_ADDR)                 CCP1CON;
-sfr  __at (PWM1CON_ADDR)                 PWM1CON;
-sfr  __at (ECCPAS_ADDR)                  ECCPAS;
-sfr  __at (ADRES_ADDR)                   ADRES;
-sfr  __at (ADCON0_ADDR)                  ADCON0;
-sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
-sfr  __at (TRISA_ADDR)                   TRISA;
-sfr  __at (TRISB_ADDR)                   TRISB;
-sfr  __at (TRISCP_ADDR)                  TRISCP;
-sfr  __at (PIE1_ADDR)                    PIE1;
-sfr  __at (PCON_ADDR)                    PCON;
-sfr  __at (PR2_ADDR)                     PR2;
-sfr  __at (ADCON1_ADDR)                  ADCON1;
+__data __at (INDF_ADDR) volatile char      INDF;
+__sfr  __at (TMR0_ADDR)                    TMR0;
+__data __at (PCL_ADDR) volatile char       PCL;
+__sfr  __at (STATUS_ADDR)                  STATUS;
+__sfr  __at (FSR_ADDR)                     FSR;
+__sfr  __at (PORTA_ADDR)                   PORTA;
+__sfr  __at (PORTB_ADDR)                   PORTB;
+__sfr  __at (DATACCP_ADDR)                 DATACCP;
+__sfr  __at (PCLATH_ADDR)                  PCLATH;
+__sfr  __at (INTCON_ADDR)                  INTCON;
+__sfr  __at (PIR1_ADDR)                    PIR1;
+__sfr  __at (TMR1L_ADDR)                   TMR1L;
+__sfr  __at (TMR1H_ADDR)                   TMR1H;
+__sfr  __at (T1CON_ADDR)                   T1CON;
+__sfr  __at (TMR2_ADDR)                    TMR2;
+__sfr  __at (T2CON_ADDR)                   T2CON;
+__sfr  __at (CCPR1L_ADDR)                  CCPR1L;
+__sfr  __at (CCPR1H_ADDR)                  CCPR1H;
+__sfr  __at (CCP1CON_ADDR)                 CCP1CON;
+__sfr  __at (PWM1CON_ADDR)                 PWM1CON;
+__sfr  __at (ECCPAS_ADDR)                  ECCPAS;
+__sfr  __at (ADRES_ADDR)                   ADRES;
+__sfr  __at (ADCON0_ADDR)                  ADCON0;
+__sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+__sfr  __at (TRISA_ADDR)                   TRISA;
+__sfr  __at (TRISB_ADDR)                   TRISB;
+__sfr  __at (TRISCP_ADDR)                  TRISCP;
+__sfr  __at (PIE1_ADDR)                    PIE1;
+__sfr  __at (PCON_ADDR)                    PCON;
+__sfr  __at (PR2_ADDR)                     PR2;
+__sfr  __at (ADCON1_ADDR)                  ADCON1;
 
 // 
 // bitfield definitions

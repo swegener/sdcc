@@ -100,15 +100,15 @@
 
 //----- Register Files -----------------------------------------------------
 
-extern data __at (INDF_ADDR) volatile char      INDF;
-extern sfr  __at (TMR0_ADDR)                    TMR0;
-extern data __at (PCL_ADDR) volatile char       PCL;
-extern sfr  __at (STATUS_ADDR)                  STATUS;
-extern sfr  __at (FSR_ADDR)                     FSR;
-extern sfr  __at (OSCCAL_ADDR)                  OSCCAL;
-extern sfr  __at (PORTB_ADDR)                   PORTB;
-extern sfr  __at (PORTC_ADDR)                   PORTC;
-extern sfr  __at (OPTION_REG_ADDR)              OPTION_REG; // not verified
+extern __data __at (INDF_ADDR) volatile char      INDF;
+extern __sfr  __at (TMR0_ADDR)                    TMR0;
+extern __data __at (PCL_ADDR) volatile char       PCL;
+extern __sfr  __at (STATUS_ADDR)                  STATUS;
+extern __sfr  __at (FSR_ADDR)                     FSR;
+extern __sfr  __at (OSCCAL_ADDR)                  OSCCAL;
+extern __sfr  __at (PORTB_ADDR)                   PORTB;
+extern __sfr  __at (PORTC_ADDR)                   PORTC;
+extern __sfr  __at (OPTION_REG_ADDR)              OPTION_REG; // not verified
 
 //----- STATUS Bits --------------------------------------------------------
 

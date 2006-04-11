@@ -5,23 +5,23 @@
  */
 #include <pic16c433.h>
 
-data __at (INDF_ADDR) volatile char      INDF;
-sfr  __at (TMR0_ADDR)                    TMR0;
-data __at (PCL_ADDR) volatile char       PCL;
-sfr  __at (STATUS_ADDR)                  STATUS;
-sfr  __at (FSR_ADDR)                     FSR;
-sfr  __at (GPIO_ADDR)                    GPIO;
-sfr  __at (PCLATH_ADDR)                  PCLATH;
-sfr  __at (INTCON_ADDR)                  INTCON;
-sfr  __at (PIR1_ADDR)                    PIR1;
-sfr  __at (ADRES_ADDR)                   ADRES;
-sfr  __at (ADCON0_ADDR)                  ADCON0;
-sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
-sfr  __at (TRISIO_ADDR)                  TRISIO;
-sfr  __at (PIE1_ADDR)                    PIE1;
-sfr  __at (PCON_ADDR)                    PCON;
-sfr  __at (OSCCAL_ADDR)                  OSCCAL;
-sfr  __at (ADCON1_ADDR)                  ADCON1;
+__data __at (INDF_ADDR) volatile char      INDF;
+__sfr  __at (TMR0_ADDR)                    TMR0;
+__data __at (PCL_ADDR) volatile char       PCL;
+__sfr  __at (STATUS_ADDR)                  STATUS;
+__sfr  __at (FSR_ADDR)                     FSR;
+__sfr  __at (GPIO_ADDR)                    GPIO;
+__sfr  __at (PCLATH_ADDR)                  PCLATH;
+__sfr  __at (INTCON_ADDR)                  INTCON;
+__sfr  __at (PIR1_ADDR)                    PIR1;
+__sfr  __at (ADRES_ADDR)                   ADRES;
+__sfr  __at (ADCON0_ADDR)                  ADCON0;
+__sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+__sfr  __at (TRISIO_ADDR)                  TRISIO;
+__sfr  __at (PIE1_ADDR)                    PIE1;
+__sfr  __at (PCON_ADDR)                    PCON;
+__sfr  __at (OSCCAL_ADDR)                  OSCCAL;
+__sfr  __at (ADCON1_ADDR)                  ADCON1;
 
 // 
 // bitfield definitions

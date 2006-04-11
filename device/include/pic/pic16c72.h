@@ -147,40 +147,40 @@
 
 //----- Register Files------------------------------------------------------
 
-extern data __at (INDF_ADDR) volatile char      INDF;
-extern sfr  __at (TMR0_ADDR)                    TMR0;
-extern data __at (PCL_ADDR) volatile char       PCL;
-extern sfr  __at (STATUS_ADDR)                  STATUS;
-extern sfr  __at (FSR_ADDR)                     FSR;
-extern sfr  __at (PORTA_ADDR)                   PORTA;
-extern sfr  __at (PORTB_ADDR)                   PORTB;
-extern sfr  __at (PORTC_ADDR)                   PORTC;
-extern sfr  __at (PCLATH_ADDR)                  PCLATH;
-extern sfr  __at (INTCON_ADDR)                  INTCON;
-extern sfr  __at (PIR1_ADDR)                    PIR1;
-extern sfr  __at (TMR1L_ADDR)                   TMR1L;
-extern sfr  __at (TMR1H_ADDR)                   TMR1H;
-extern sfr  __at (T1CON_ADDR)                   T1CON;
-extern sfr  __at (TMR2_ADDR)                    TMR2;
-extern sfr  __at (T2CON_ADDR)                   T2CON;
-extern sfr  __at (SSPBUF_ADDR)                  SSPBUF;
-extern sfr  __at (SSPCON_ADDR)                  SSPCON;
-extern sfr  __at (CCPR1L_ADDR)                  CCPR1L;
-extern sfr  __at (CCPR1H_ADDR)                  CCPR1H;
-extern sfr  __at (CCP1CON_ADDR)                 CCP1CON;
-extern sfr  __at (ADRES_ADDR)                   ADRES;
-extern sfr  __at (ADCON0_ADDR)                  ADCON0;
+extern __data __at (INDF_ADDR) volatile char      INDF;
+extern __sfr  __at (TMR0_ADDR)                    TMR0;
+extern __data __at (PCL_ADDR) volatile char       PCL;
+extern __sfr  __at (STATUS_ADDR)                  STATUS;
+extern __sfr  __at (FSR_ADDR)                     FSR;
+extern __sfr  __at (PORTA_ADDR)                   PORTA;
+extern __sfr  __at (PORTB_ADDR)                   PORTB;
+extern __sfr  __at (PORTC_ADDR)                   PORTC;
+extern __sfr  __at (PCLATH_ADDR)                  PCLATH;
+extern __sfr  __at (INTCON_ADDR)                  INTCON;
+extern __sfr  __at (PIR1_ADDR)                    PIR1;
+extern __sfr  __at (TMR1L_ADDR)                   TMR1L;
+extern __sfr  __at (TMR1H_ADDR)                   TMR1H;
+extern __sfr  __at (T1CON_ADDR)                   T1CON;
+extern __sfr  __at (TMR2_ADDR)                    TMR2;
+extern __sfr  __at (T2CON_ADDR)                   T2CON;
+extern __sfr  __at (SSPBUF_ADDR)                  SSPBUF;
+extern __sfr  __at (SSPCON_ADDR)                  SSPCON;
+extern __sfr  __at (CCPR1L_ADDR)                  CCPR1L;
+extern __sfr  __at (CCPR1H_ADDR)                  CCPR1H;
+extern __sfr  __at (CCP1CON_ADDR)                 CCP1CON;
+extern __sfr  __at (ADRES_ADDR)                   ADRES;
+extern __sfr  __at (ADCON0_ADDR)                  ADCON0;
 
-extern sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
-extern sfr  __at (TRISA_ADDR)                   TRISA;
-extern sfr  __at (TRISB_ADDR)                   TRISB;
-extern sfr  __at (TRISC_ADDR)                   TRISC;
-extern sfr  __at (PIE1_ADDR)                    PIE1;
-extern sfr  __at (PCON_ADDR)                    PCON;
-extern sfr  __at (PR2_ADDR)                     PR2;
-extern sfr  __at (SSPADD_ADDR)                  SSPADD;
-extern sfr  __at (SSPSTAT_ADDR)                 SSPSTAT;
-extern sfr  __at (ADCON1_ADDR)                  ADCON1;
+extern __sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+extern __sfr  __at (TRISA_ADDR)                   TRISA;
+extern __sfr  __at (TRISB_ADDR)                   TRISB;
+extern __sfr  __at (TRISC_ADDR)                   TRISC;
+extern __sfr  __at (PIE1_ADDR)                    PIE1;
+extern __sfr  __at (PCON_ADDR)                    PCON;
+extern __sfr  __at (PR2_ADDR)                     PR2;
+extern __sfr  __at (SSPADD_ADDR)                  SSPADD;
+extern __sfr  __at (SSPSTAT_ADDR)                 SSPSTAT;
+extern __sfr  __at (ADCON1_ADDR)                  ADCON1;
 
 //----- STATUS Bits --------------------------------------------------------
 

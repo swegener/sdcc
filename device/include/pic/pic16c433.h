@@ -114,24 +114,24 @@
 
 //----- Register Files------------------------------------------------------
 
-extern data __at (INDF_ADDR) volatile char      INDF;
-extern sfr  __at (TMR0_ADDR)                    TMR0;
-extern data __at (PCL_ADDR) volatile char       PCL;
-extern sfr  __at (STATUS_ADDR)                  STATUS;
-extern sfr  __at (FSR_ADDR)                     FSR;
-extern sfr  __at (GPIO_ADDR)                    GPIO;
-extern sfr  __at (PCLATH_ADDR)                  PCLATH;
-extern sfr  __at (INTCON_ADDR)                  INTCON;
-extern sfr  __at (PIR1_ADDR)                    PIR1;
-extern sfr  __at (ADRES_ADDR)                   ADRES;
-extern sfr  __at (ADCON0_ADDR)                  ADCON0;
+extern __data __at (INDF_ADDR) volatile char      INDF;
+extern __sfr  __at (TMR0_ADDR)                    TMR0;
+extern __data __at (PCL_ADDR) volatile char       PCL;
+extern __sfr  __at (STATUS_ADDR)                  STATUS;
+extern __sfr  __at (FSR_ADDR)                     FSR;
+extern __sfr  __at (GPIO_ADDR)                    GPIO;
+extern __sfr  __at (PCLATH_ADDR)                  PCLATH;
+extern __sfr  __at (INTCON_ADDR)                  INTCON;
+extern __sfr  __at (PIR1_ADDR)                    PIR1;
+extern __sfr  __at (ADRES_ADDR)                   ADRES;
+extern __sfr  __at (ADCON0_ADDR)                  ADCON0;
 
-extern sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
-extern sfr  __at (TRISIO_ADDR)                  TRISIO;
-extern sfr  __at (PIE1_ADDR)                    PIE1;
-extern sfr  __at (PCON_ADDR)                    PCON;
-extern sfr  __at (OSCCAL_ADDR)                  OSCCAL;
-extern sfr  __at (ADCON1_ADDR)                  ADCON1;
+extern __sfr  __at (OPTION_REG_ADDR)              OPTION_REG;
+extern __sfr  __at (TRISIO_ADDR)                  TRISIO;
+extern __sfr  __at (PIE1_ADDR)                    PIE1;
+extern __sfr  __at (PCON_ADDR)                    PCON;
+extern __sfr  __at (OSCCAL_ADDR)                  OSCCAL;
+extern __sfr  __at (ADCON1_ADDR)                  ADCON1;
 
 //----- STATUS Bits --------------------------------------------------------
 

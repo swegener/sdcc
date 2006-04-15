@@ -68,8 +68,8 @@ class InstanceGenerator:
         self.functions = []
         # Emit the suite wrapper into a temporary file
         self.tmpname = tempfile.mktemp()
-        (self.basename, self.ext) = re.split(r'\.', self.inname)
-        self.ext = '.' + self.ext
+        (self.dirname, self.filename) = os.path.split(self.inname)
+        (self.basename, self.ext) = os.path.splitext (self.filename)
 
     def permute(self, basepath, keys, trans = {}):
         """Permutes across all of the names.  For each value, recursivly creates
@@ -171,7 +171,7 @@ class InstanceGenerator:
         createdir(outdir)
 
         # Generate
-        self.permute(os.path.join(outdir, os.path.basename(self.basename)), self.replacements.keys())
+        self.permute(os.path.join(outdir, self.basename), self.replacements.keys())
 
         # Remove the temporary file
         os.remove(self.tmpname)

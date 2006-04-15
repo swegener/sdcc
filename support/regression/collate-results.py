@@ -15,6 +15,9 @@ tests = 0
 bytes = 0
 ticks = 0
 
+# hack for valdiag
+name = ""
+
 for line in lines:
     if (re.search(r'^--- Running', line)):
         name = line

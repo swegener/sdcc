@@ -267,7 +267,7 @@ int addfile(char * path, char * libfil)
         That way putting 'path' and 'libfil' together will result into the original filepath
         as contained in 'str'.*/
         int j;
-        path = (char *) new (strlen(str));
+        path = (char *) new (strlen(str) + 1);
         strcpy(path, str);
         for(j=strlen(path)-1; j>=0; j--)
         {

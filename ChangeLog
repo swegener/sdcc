@@ -1,3 +1,7 @@
+2006-04-17 Borut Razem <borut.razem AT siol.net>
+
+	* device/include/Makefile.in: added pic/*.inc to the installation
+
 2006-04-15 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/regression/collate-results.py: fixed output in case of

@@ -253,7 +253,6 @@ SectionEnd
 Section "SDCC PIC library"
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic"
-  File "${DEV_ROOT}\lib\pic\*.o"
   File "${DEV_ROOT}\lib\pic\*.lib"
 SectionEnd
 
@@ -325,8 +324,6 @@ Section "SDCC library sources"
   
   SetOutPath "$INSTDIR\lib\src\pic\libdev"
   File "${DEV_ROOT}\lib\src\pic\libdev\*.c"
-  File "${DEV_ROOT}\lib\src\pic\libdev\*.S"
-  File "${DEV_ROOT}\lib\src\pic\libdev\*.inc"
   File "${DEV_ROOT}\lib\src\pic\libdev\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic16"

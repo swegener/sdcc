@@ -14,7 +14,7 @@ print ""
 FS="[ \t.]"
 }
 
-/Revision/ { printf "#define SDCC_BUILD_NUMBER\t\"%s\"\n", $3 }
+/Revision/ { printf "#define SDCC_BUILD_NUMBER\t\"%s\"\n", $2 }
 
 END {
 print ""

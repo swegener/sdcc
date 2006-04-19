@@ -1,5 +1,14 @@
 2006-04-19 Borut Razem <borut.razem AT siol.net>
 
+	* src/version.awk: adapted for svn
+	* /asxxxx/asxhtml/*.gif: set property svn:mime-type to image/gif
+	  sim/ucsim/doc/*.gif: set property svn:mime-type to image/gif
+	  sim/ucsim/doc/*.jpg: set property svn:mime-type to image/jpeg
+	  /binutils-avr/etc/*.vi, *.jin: removed all properties
+	  support/scripts/sdcc.ico: set property svn:mime-type to image/x-icon
+
+2006-04-19 Borut Razem <borut.razem AT siol.net>
+
 	* CVS to Subversion migration completed
 
 2006-04-18 Borut Razem <borut.razem AT siol.net>

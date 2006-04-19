@@ -1,3 +1,7 @@
+2006-04-19 Borut Razem <borut.razem AT siol.net>
+
+	* CVS to Subversion migration completed
+
 2006-04-18 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: removed unexisting ${DEV_ROOT}\lib\pic\*.o,

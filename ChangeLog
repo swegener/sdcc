@@ -1,5 +1,10 @@
 2006-04-19 Borut Razem <borut.razem AT siol.net>
 
+	* doc/sdccman.lyx, */Makefile, */Makefile.in:
+	  references to CVS replaced with Subversion
+
+2006-04-19 Borut Razem <borut.razem AT siol.net>
+
 	* src/version.awk: adapted for svn
 	* /asxxxx/asxhtml/*.gif: set property svn:mime-type to image/gif
 	  sim/ucsim/doc/*.gif: set property svn:mime-type to image/gif

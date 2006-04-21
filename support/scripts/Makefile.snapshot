@@ -1,6 +1,5 @@
 # Simple weekly tarball generator
-CVSROOT = :pserver:anonymous@cvs.sdcc.sourceforge.net:/cvsroot/sdcc
-CVSOPTS = -z6
+SVNROOT = https://svn.sourceforge.net/svnroot/sdcc/trunk/sdcc
 DATE = `date +%Y%m%d`
 WWWROOT = /home/michaelh/www
 SNAP = $(WWWROOT)/snapshots
@@ -14,7 +13,7 @@ _sdcc:
 	cd /tmp; \
 	mkdir -p sdcc-$(DATE); \
 	cd sdcc-$(DATE); \
-	cvs $(CVSOPTS) -d$(CVSROOT) checkout sdcc; \
+	svn co $(CVSROOT) sdcc; \
 	tar czf $(SNAP)/sdcc-$(DATE)-$(REVISION).tar.gz sdcc; \
 	tar cIf $(SNAP)/sdcc-$(DATE)-$(REVISION).tar.bz2 sdcc
 	cd $(SNAP); \

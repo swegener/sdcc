@@ -91,7 +91,7 @@ $Date$
 $Revision$
 \layout Comment
 
-The above strings enclosed in $ are automatically updated by cvs
+The above strings enclosed in $ are automatically updated by Subversion
 \layout Standard
 
 
@@ -537,7 +537,8 @@ The SDCC home page at
  Some of the other tools (simulator and assembler) included with SDCC contain
  their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
- is available directly by anonymous CVS on cvs.sdcc.sourceforge.net.
+ is available directly from Subversion on https://svn.sourceforge.net/svnroot/sdcc
+/trunk/sdcc.
 \layout Section
 
 Wishes for the future
@@ -2924,7 +2925,7 @@ Building SDCC on Linux
 \series medium 
 Download the source package
 \series default 
- either from the SDCC CVS repository or from the nightly snapshots
+ either from the SDCC Subversion repository or from the nightly snapshots
 \series medium 
 , it will be named something like sdcc
 \series default 
@@ -3128,7 +3129,7 @@ less ; not really needed for building SDCC, but you'll miss it sooner or
  later
 \layout Itemize
 
-cvs ; only if you use CVS access
+svn ; only if you use Subversion access
 \layout Standard
 
 If you want to develop something you'll need:
@@ -3236,7 +3237,7 @@ Building SDCC Using Microsoft Visual C++ 6.0/NET (MSVC)
 \series medium 
 Download the source package
 \series default 
- either from the SDCC CVS repository or from the 
+ either from the SDCC Subversion repository or from the 
 \begin_inset LatexCommand \url[nightly snapshots]{http://sdcc.sourceforge.net/snap.php}
 
 \end_inset 
@@ -3269,8 +3270,8 @@ bin before running SDCC.
 \newline 
 WARNING: Visual studio is very picky with line terminations; it expects
  the 0x0d, 0x0a DOS style line endings, not the 0x0a Unix style line endings.
- When using the CVS repository it's easiest to configure the cvs client
- to convert automatically for you.
+ When using the Subversion repository it's easiest to configure the svn
+ client to convert automatically for you.
  If however you are getting a message such as "This makefile was not generated
  by Developer Studio etc.
  etc.
@@ -22972,7 +22973,7 @@ The SDCC project is hosted on the SDCC sourceforge site at
 
 \end_inset 
 
- area and cvs code repository
+ area and Subversion code repository
 \begin_inset LatexCommand \index{cvs code repository}
 
 \end_inset 
@@ -23190,7 +23191,7 @@ Traffic on sdcc-devel and sdcc-user is about 100 mails/month each not counting
 ChangeLog
 \layout Standard
 
-You can follow the status of the cvs version
+You can follow the status of the Subversion version
 \begin_inset LatexCommand \index{version}
 
 \end_inset 
@@ -23205,7 +23206,7 @@ You can follow the status of the cvs version
 
 \size footnotesize 
 
-\begin_inset LatexCommand \htmlurl{http://cvs.sf.net/cgi-bin/viewcvs.cgi/*checkout*/sdcc/sdcc/ChangeLog?rev=HEAD&content-type=text/plain}
+\begin_inset LatexCommand \htmlurl{http://svn.sourceforge.net/viewcvs.cgi/*checkout*/sdcc/trunk/sdcc/ChangeLog}
 
 \end_inset 
 

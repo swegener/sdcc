@@ -1,4 +1,4 @@
-# Dummy Makefile to get around CVS
+# Dummy Makefile to get around Subversion
 all:
 	$(MAKE) -C ../mcs51 all
 	cp ../mcs51/*.rel ../mcs51/*.lib .

@@ -17,7 +17,7 @@ install:
 	if [ -f $(MANUAL).pdf             ]; then cp -rf $(MANUAL).pdf  $(DESTDIR)$(docdir); fi
 	if [ -f $(TSS).pdf                ]; then cp -rf $(TSS).pdf     $(DESTDIR)$(docdir); fi
 	if [ -f $(CDB).pdf                ]; then cp -rf $(CDB).pdf     $(DESTDIR)$(docdir); fi
-	rm -rf `find $(DESTDIR)$(docdir) -name CVS -type d`
+	rm -rf `find $(DESTDIR)$(docdir) -name .svn -type d`
 	rm -f $(DESTDIR)$(docdir)/*/WARNINGS $(DESTDIR)$(docdir)/*/*.pl $(DESTDIR)$(docdir)/*/images.*
 
 uninstall:

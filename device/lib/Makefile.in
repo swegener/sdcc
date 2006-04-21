@@ -296,12 +296,12 @@ install: all installdirs
 	for srcdir in $(MODELS) ds390 ds400 gbz80 z80 hc08 pic pic16; do \
 	  find $(sdcc_libdir)/src/$$srcdir -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
-	    -name '*.lst' -o -name '*.asm' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
+	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'build' -o -name 'bin' \) \
 	    -exec rm -r {} \; ; \
 	done
 	find $(sdcc_libdir)/src/mcs51 -depth \
 	  \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
-	  -name '*.lst' -o -name 'CVS' -o -name 'build' -o -name 'bin' \) \
+	  -name '*.lst' -o -name '.svn' -o -name 'build' -o -name 'bin' \) \
 	  -exec rm -r {} \;
 
 # Deleting all the installed files

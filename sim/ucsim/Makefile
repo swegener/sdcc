@@ -152,7 +152,7 @@ print-newer:
 
 new_files:
 	diff -rNu $$HOME/clean-source/sdcc/sim/ucsim .|\
-	grep '^diff' | grep -v CVS | awk '{print $$4}'
+	grep '^diff' | grep -v "\.svn" | awk '{print $$4}'
 
 lines:
 	@find . \( -name '*.[ch]' -o -name '*.cc' -o -name '*.hh' \) \

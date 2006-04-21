@@ -15,8 +15,8 @@
 # one of the library files should cause all to re-run
 
 # Dependancies:
-#   * The sdcc-extra package, available from CVS.
-#       o cvs -d cvs.sdcc.sourceforge.net:/cvsroot/sdcc co sdcc-extra
+#   * The sdcc-extra package, available from Subversion.
+#       o  svn co https://svn.sourceforge.net/svnroot/sdcc/trunk/sdcc-extra sdcc-extra
 #       o Provides the emulators
 #   * The gbdk-lib package from gbdk.
 #       o cvs -d cvs.gbdk.sourceforge.net:/cvsroot/gbdk co gbdk-lib
@@ -62,10 +62,10 @@ GENERATE_CASES = generate-cases.py
 # Each directory under ports/ is used as a port name.  Each port is tested.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out CVS xa51 ucz80 gbz80 pic16,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out .svn xa51 ucz80 gbz80 pic16,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
-CLEAN_PORTS = $(filter-out CVS,$(notdir $(wildcard $(PORTS_DIR)/*)))
+CLEAN_PORTS = $(filter-out .svn,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 MAKE_LIBRARY =
 

@@ -56,7 +56,7 @@ install: all installdirs
 	if [ "`grep hc08 ../../ports.build`" = hc08 ]; then \
 		$(CP) hc08/*.h $(sdcc_includedir)/hc08 ; \
 	fi
-	rm -rf `find $(sdcc_includedir) -type d -name 'CVS'`
+	rm -rf `find $(sdcc_includedir) -type d -name '.svn'`
 
 
 # Deleting all the installed files

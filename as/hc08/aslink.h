@@ -690,7 +690,7 @@ extern	VOID		chop_crlf();
 /* lkarea.c */
 extern	VOID		lkparea();
 extern	VOID		lnkarea();
-extern	VOID		lnksect();
+extern  Addr_T          lnksect(struct area *tap);
 extern	VOID		newarea();
 
 /* lkhead.c */

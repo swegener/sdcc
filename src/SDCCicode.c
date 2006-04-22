@@ -1839,7 +1839,7 @@ setOperandType (operand * op, sym_link * type)
 /*-----------------------------------------------------------------*/
 /* Get size in byte of ptr need to access an array                 */
 /*-----------------------------------------------------------------*/
-static int
+static unsigned int
 getArraySizePtr (operand * op)
 {
   sym_link *ltype = operandType(op);
@@ -2843,7 +2843,7 @@ geniCodeAddressOf (operand * op)
       return op;
     }
 
-  /* other wise make this of the type coming in */
+  /* otherwise make this of the type coming in */
   ic = newiCode (ADDRESS_OF, op, NULL);
   IC_RESULT (ic) = newiTempOperand (p, 1);
   IC_RESULT (ic)->isaddr = 0;

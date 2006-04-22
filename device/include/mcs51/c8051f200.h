@@ -53,6 +53,7 @@ __sfr __at (0xA8) IE           ;  /* Interrupt Enable                           
 __sfr __at (0xAD) SWCINT       ;  /* SOFTWARE-Controlled Interrupt FLAGS               */
 __sfr __at (0xAD) PRT1IF       ;  /* SOFTWARE-Controlled Interrupt FLAGS (LEGACY NAME) */
 __sfr __at (0xAF) EMI0CN       ;  /* EXTERNAL MEMORY INTERFACE Control (F206/F226/F236)*/
+__sfr __at (0xAF) _XPAGE       ;  /* XDATA/PDATA PAGE                                  */
 __sfr __at (0xB0) P3           ;  /* PORT 3                                            */
 __sfr __at (0xB1) OSCXCN       ;  /* EXTERNAL OSCILLATOR Control                       */
 __sfr __at (0xB2) OSCICN       ;  /* INTERNAL OSCILLATOR Control                       */
@@ -63,7 +64,7 @@ __sfr __at (0xBB) AMX0SL       ;  /* ADC 0 MUX CHANNEL SELECTION    (Not on F230
 __sfr __at (0xBC) ADC0CF       ;  /* ADC 0 Configuration            (Not on F230/1/6)  */
 __sfr __at (0xBE) ADC0L        ;  /* ADC 0 Data LOW                 ( F206 only )      */
 __sfr __at (0xBF) ADC0H        ;  /* ADC 0 Data High                                   */
-__sfr __at (0xC4) ADC0GTL      ;  /* ADC 0 GREATER-THAN Register LOW( F206 only )      */                             ( F206 only )      */
+__sfr __at (0xC4) ADC0GTL      ;  /* ADC 0 GREATER-THAN Register LOW( F206 only )      */
 __sfr __at (0xC5) ADC0GTH      ;  /* ADC 0 GREATER-THAN Register    (Not on F230/1/6)  */
 __sfr __at (0xC6) ADC0LTL      ;  /* ADC 0 LESS-THAN Register LOW   ( F206 only )      */
 __sfr __at (0xC7) ADC0LTH      ;  /* ADC 0 LESS-THAN Register       (Not on F230/1/6)  */

@@ -74,7 +74,7 @@ typedef struct
 
 int numlinenum=0;
 _linenum * linenum=NULL;
-
+#if 0
 typedef struct
 {
 	char * name;
@@ -102,7 +102,7 @@ _UsageType UsageType[]=
 	{"BSEG",		4},
 	{"",			5} /*A typeless number?*/
 };
-
+#endif
 char * UsageTypeName[]={"CODE", "XDATA", "DATA", "IDATA", "BIT", "NUMBER"};
 int AddNumber;
 unsigned char * ihxBuff=NULL;

@@ -145,6 +145,7 @@ struct  area
         struct  area *a_ap;             /* Area link */
         char    a_id[NCPS];             /* Area Name */
         int     a_ref;                  /* Ref. number */
+        Addr_T  a_addr;                 /* Area address */
         Addr_T  a_size;                 /* Area size */
         Addr_T  a_fuzz;                 /* Area fuzz */
         int     a_flag;                 /* Area flags */
@@ -296,6 +297,7 @@ struct  sym
         struct  area *s_area;           /* Area line, 0 if absolute */
         int     s_ref;                  /* Ref. number */
         Addr_T  s_addr;                 /* Address */
+        Addr_T  s_org;                  /* Start Address if absolute */
 };
 
 #define S_GBL           01              /* Global */

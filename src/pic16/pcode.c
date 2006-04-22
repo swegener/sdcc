@@ -4440,7 +4440,7 @@ void pic16_flushDB(char ptype, void *p)
 /*-----------------------------------------------------------------*/
 /*    Add "DB" directives to a pBlock                              */
 /*-----------------------------------------------------------------*/
-void pic16_emitDB(char c, char ptype, void *p)
+void pic16_emitDB(int c, char ptype, void *p)
 {
   int l;
 

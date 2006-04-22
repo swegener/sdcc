@@ -127,7 +127,7 @@ typedef struct
       {
 	int char_size;
 	int short_size;
-	int int_size;
+        unsigned int int_size;
 	int long_size;
 	int ptr_size;       //near
 	int fptr_size;      //far

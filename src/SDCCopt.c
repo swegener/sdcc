@@ -778,8 +778,8 @@ convertToFcall (eBBlock ** ebbs, int count)
              converted to function calls */
           if ((IS_CONDITIONAL (ic) ||
                IS_ARITHMETIC_OP (ic)) &&
-	      (IS_FLOAT (operandType (IC_RIGHT (ic)))
-	        || IS_FIXED( operandType (IC_RIGHT (ic)))))
+              (IS_FLOAT (operandType (IC_RIGHT (ic))) ||
+               IS_FIXED( operandType (IC_RIGHT (ic)))))
             {
 
               cnvToFcall (ic, ebbs[i]);
@@ -803,7 +803,7 @@ convertToFcall (eBBlock ** ebbs, int count)
           if (ic->op == '%' && isOperandLiteral(IC_RIGHT(ic)) &&
               IS_UNSIGNED(operandType(IC_LEFT(ic))))
             {
-              unsigned litVal = fabs(operandLitValue(IC_RIGHT(ic)));
+              unsigned litVal = abs((unsigned)operandLitValue(IC_RIGHT(ic)));
 
               /* modulo by 1: no remainder */
               if (litVal == 1)

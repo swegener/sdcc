@@ -1822,7 +1822,7 @@ void pic16_popReleaseTempReg(pCodeOp *pcop, int lock)
 /*-----------------------------------------------------------------*/
 /* pic16_popGetLabel - create a new pCodeOp of type PO_LABEL             */
 /*-----------------------------------------------------------------*/
-pCodeOp *pic16_popGetLabel(unsigned int key)
+pCodeOp *pic16_popGetLabel(int key)
 {
 
   DEBUGpic16_emitcode ("; ***","%s  key=%d, label offset %d",__FUNCTION__,key, pic16_labelOffset);
@@ -9409,7 +9409,7 @@ void pic16_genLeftShiftLiteral (operand *left,
                                  operand *result,
                                  iCode *ic)
 {    
-    int shCount = (int) abs(floatFromVal (AOP(right)->aopu.aop_lit));
+    int shCount = abs((int)floatFromVal (AOP(right)->aopu.aop_lit));
     int size;
 
     FENTRY;
@@ -10014,7 +10014,7 @@ static void genRightShiftLiteral (operand *left,
                                   iCode *ic,
                                   int sign)
 {    
-  int shCount = (int) abs(floatFromVal (AOP(right)->aopu.aop_lit));
+  int shCount = abs((int)floatFromVal (AOP(right)->aopu.aop_lit));
   int lsize,res_size;
 
   pic16_freeAsmop(right,NULL,ic,TRUE);

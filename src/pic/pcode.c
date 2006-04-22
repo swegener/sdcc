@@ -1337,7 +1337,7 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 
 extern  void initStack(int base_address, int size);
 extern regs *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
-extern regs *allocInternalRegister(int rIdx, char * name, short po_type, int alias);
+extern regs *allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias);
 extern void init_pic(char *);
 
 void  pCodeInitRegisters(void)

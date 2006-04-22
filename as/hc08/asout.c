@@ -1004,7 +1004,7 @@ register struct area *ap;
 			putc(c, ofp);
 	}
 	if (xflag == 0) {
-		fprintf(ofp, " size %X flags %X\n", ap->a_size, ap->a_flag);
+		fprintf(ofp, " size %X flags %X addr %X\n", ap->a_size, ap->a_flag, ap->a_addr);
 	} else
 	if (xflag == 1) {
 		fprintf(ofp, " size %o flags %o\n", ap->a_size, ap->a_flag);

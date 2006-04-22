@@ -909,9 +909,9 @@ struct_declarator_list
 struct_declarator
    : declarator 
    | ':' constant_expr  {
-                           int bitsize;
+                           unsigned int bitsize;
                            $$ = newSymbol (genSymName(NestLevel),NestLevel) ; 
-                           bitsize= (int) floatFromVal(constExprValue($2,TRUE));
+                           bitsize= (unsigned int) floatFromVal(constExprValue($2,TRUE));
                            if (bitsize > (port->s.int_size * 8)) {
                              bitsize = port->s.int_size * 8;
                              werror(E_BITFLD_SIZE, bitsize);
@@ -922,8 +922,8 @@ struct_declarator
                         }                        
    | declarator ':' constant_expr 
                         {
-                          int bitsize;
-                          bitsize= (int) floatFromVal(constExprValue($3,TRUE));
+                          unsigned int bitsize;
+                          bitsize= (unsigned int) floatFromVal(constExprValue($3,TRUE));
                           if (bitsize > (port->s.int_size * 8)) {
                             bitsize = port->s.int_size * 8;
                             werror(E_BITFLD_SIZE, bitsize);

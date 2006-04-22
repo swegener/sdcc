@@ -8,7 +8,7 @@
  * 721 Berkeley St.
  * Kent, Ohio  44240
  *
- * 28-Oct-97 JLH: 
+ * 28-Oct-97 JLH:
  *	     - add proto for StoreString
  *	     - change s_id from [NCPS] to pointer
  *	     - change m_id from [NCPS] to pointer
@@ -121,7 +121,7 @@
 
 
 /* NB: for Flat24 extentions to work, Addr_T must be at least 24
- * bits. This is checked at runtime when the .flat24 directive 
+ * bits. This is checked at runtime when the .flat24 directive
  * is processed.
  */
 typedef	unsigned int Addr_T;
@@ -145,6 +145,7 @@ struct	area
 	struct	area *a_ap;	/* Area link */
 	char	a_id[NCPS];	/* Area Name */
 	int	a_ref;		/* Ref. number */
+	Addr_T  a_addr;         /* Area address */
 	Addr_T	a_size;		/* Area size */
 	Addr_T	a_fuzz;		/* Area fuzz */
 	int	a_flag;		/* Area flags */
@@ -213,7 +214,7 @@ struct	area
 #define	R_LSB	0x00		/* low byte */
 #define	R_MSB	0x80		/* high byte */
 
-#define R_BYT3	0x100		/* if R_BYTE is set, this is a 
+#define R_BYT3	0x100		/* if R_BYTE is set, this is a
 				 * 3 byte address, of which
 				 * the linker must select one byte.
 				 */
@@ -295,6 +296,7 @@ struct	sym
 	struct	area *s_area;	/* Area line, 0 if absolute */
 	int	s_ref;		/* Ref. number */
 	Addr_T	s_addr;		/* Address */
+	Addr_T  s_org;          /* Start Address if absolute */
 };
 
 #define	S_GBL		01	/* Global */
@@ -483,10 +485,10 @@ extern	char	tb[NTITL];	/*	Title string buffer
 				 */
 extern	char	stb[NSBTL];	/*	Subtitle string buffer
 				 */
-extern  char	optsdcc[NINPUT];	/*	sdcc compile options 
+extern  char	optsdcc[NINPUT];	/*	sdcc compile options
 			 */
-extern 	int	flat24Mode;	/* 	non-zero if we are using DS390 24 bit 
-			 	 *	flat mode (via .flat24 directive). 
+extern 	int	flat24Mode;	/* 	non-zero if we are using DS390 24 bit
+			 	 *	flat mode (via .flat24 directive).
 			 	 */
 extern	char	symtbl[];	/*	string "Symbol Table"
 				 */
@@ -508,7 +510,7 @@ extern	unsigned char	ctype[128];	/*	array of character types, one per
 				 *	ASCII character
 				 */
 
-extern	char	ccase[128];	/* an array of characters which 
+extern	char	ccase[128];	/* an array of characters which
 				 * perform the case translation function
 				 */
 /*

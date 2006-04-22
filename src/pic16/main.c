@@ -100,7 +100,6 @@ extern set *libFilesSet;
 /* for an unknowned reason. - EEP */
 void pic16_emitDebuggerSymbol (char *);
  
-extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
 extern void pic16_emitConfigRegs(FILE *of);
 extern void pic16_emitIDRegs(FILE *of);
 

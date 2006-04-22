@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.5.5
+SDCC 2.5.6
 \size footnotesize 
 
 \newline 
@@ -6972,7 +6972,7 @@ status Collapsed
 
 
 \series default 
- Disable peep-hole optimization.
+ Disable peep-hole optimization with built-in rules.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -11259,10 +11259,10 @@ The Z80 uses several different methods for determining the correct interrupt
  to generate an interrupt vector table.
 \layout Standard
 
-By default, SDCC generates code for a maskable interrupt, which uses an
- RETI instruction to return from the interrupt.
+By default, SDCC generates code for a maskable interrupt, which uses a RETI
+ instruction to return from the interrupt.
  To write an interrupt handler for the non-maskable interrupt, which needs
- an RETN instruction instead, add the 
+ a RETN instruction instead, add the 
 \emph on 
 critical
 \emph default 
@@ -11283,6 +11283,16 @@ void nmi_isr (void) critical interrupt
  
 \newline 
 }
+\layout Standard
+
+However if you need to create a non-interruptable interrupt service routine
+ you would also require the 
+\emph on 
+critical
+\emph default 
+ keyword.
+ To distinguish between this and an nmi_isr you must provide an interrupt
+ number.
 \layout Section
 
 Enabling and Disabling Interrupts
@@ -15586,7 +15596,9 @@ SDCC
 
 \layout Standard
 
-this Symbol is always defined
+this Symbol is always defined.
+ Since version 2.5.6 it's this version number as an int (ex.
+ 256)
 \end_inset 
 </cell>
 </row>

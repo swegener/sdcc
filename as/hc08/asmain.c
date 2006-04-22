@@ -556,7 +556,7 @@ loop:
 		goto loop;
 	}
 	/*
-	 * If the first character is a letter then assume a lable,
+	 * If the first character is a letter then assume a label,
 	 * symbol, assembler directive, or assembler mnemonic is
 	 * being processed.
 	 */
@@ -906,7 +906,7 @@ loop:
 	case S_ORG:
 		if (dot.s_area->a_flag & A_ABS) {
 			outall();
-			laddr = dot.s_addr = absexpr();
+			laddr = dot.s_addr = dot.s_org = absexpr();
 		} else {
 			err('o');
 		}
@@ -960,8 +960,8 @@ loop:
 			}
 		}
 		*p = 0;
-		if (++incfil == MAXINC ||
-		   (ifp[incfil] = fopen(fn, "r")) == NULL) {
+		if ((++incfil == MAXINC) ||
+		    (ifp[incfil] = fopen(fn, "r")) == NULL) {
 			--incfil;
 			err('i');
 		} else {
@@ -1164,7 +1164,11 @@ register struct area *nap;
 	  if (oap->a_size < dot.s_addr) {
 	    oap->a_size = dot.s_addr;
 	  }
+	} else if (oap->a_flag & A_ABS) {
+	  oap->a_addr = dot.s_org;
+	  oap->a_size = dot.s_addr - dot.s_org;
 	} else {
+	  oap->a_addr = 0;
 	  oap->a_size = dot.s_addr;
 	}
 	if (nap->a_flag & A_OVR) {

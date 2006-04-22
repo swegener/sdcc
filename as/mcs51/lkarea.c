@@ -138,6 +138,11 @@ newarea()
 /*      } */
     }
     /*
+     * Evaluate area address
+     */
+    skip(-1);
+    axp->a_addr = eval();
+    /*
      * Place pointer in header area list
      */
     if (headp == NULL) {
@@ -483,20 +488,22 @@ lnksect(register struct area *tap)
     }
 }
 
-void lnksect2 (struct area *tap, int rloc);
+Addr_T lnksect2 (struct area *tap, int rloc);
 char idatamap[256];
-long codemap[524288];
+unsigned long codemap[524288];
 
 /*Modified version of the functions for packing variables in internal data memory*/
 VOID lnkarea2 (void)
 {
     Addr_T rloc[4]={0, 0, 0, 0};
+    Addr_T gs_size = 0;
     int  locIndex;
     char temp[NCPS];
     struct sym *sp;
     int j;
     struct area *dseg_ap = NULL;
     struct area *abs_ap = NULL;
+    struct area *gs0_ap = NULL;
     struct sym *sp_dseg_s=NULL, *sp_dseg_l=NULL;
 
     for(j=0; j<256; j++) idatamap[j]=' ';
@@ -518,6 +525,33 @@ VOID lnkarea2 (void)
         ap = ap->a_ap;
     }
 
+    /* next accumulate all GSINITx/GSFINAL area sizes
+       into GSINIT so they stay together */
+    ap = areap;
+    while (ap)
+    {
+        if (!strncmp(ap->a_id, "GS", 2))
+        {/* GSxxxxx area */
+            if (ap->a_size == 0)
+            {
+                axp = ap->a_axp;
+                while (axp)
+                {
+                    ap->a_size += axp->a_size;
+                    axp = axp->a_axp;
+                }
+            }
+            gs_size += ap->a_size;
+            if (!strcmp(ap->a_id, "GSINIT0"))
+            {/* GSINIT0 area */
+                gs0_ap = ap;
+            }
+        }
+        ap = ap->a_ap;
+    }
+    if (gs0_ap)
+        gs0_ap->a_size = gs_size;
+
     ap = areap;
     while (ap)
     {
@@ -527,7 +561,7 @@ VOID lnkarea2 (void)
         else if (ap->a_flag & A_BIT)   locIndex = 3;
         else locIndex = 0;
 
-        if (ap->a_flag&A_ABS) /* Absolute sections */
+        if (ap->a_flag & A_ABS) /* Absolute sections */
         {
             lnksect2(ap, locIndex);
         }
@@ -535,12 +569,11 @@ VOID lnkarea2 (void)
         {
             if (ap->a_type == 0)
             {
-                ap->a_addr=rloc[locIndex];
-                ap->a_type=1;
+                ap->a_addr = rloc[locIndex];
+                ap->a_type = 1;
             }
 
-            lnksect2(ap, locIndex);
-            rloc[locIndex] = ap->a_addr + ap->a_size;
+            rloc[locIndex] = lnksect2(ap, locIndex);
         }
 
         /*
@@ -604,12 +637,91 @@ VOID lnkarea2 (void)
 #endif
 }
 
-void lnksect2 (struct area *tap, int rloc)
+static
+Addr_T find_empty_space(Addr_T start, Addr_T size)
+{
+    int i, j, k;
+    unsigned long mask, b;
+
+    while (1)
+    {
+        Addr_T a = start;
+        i = start >> 5;
+        j = (start + size) >> 5;
+        mask = -(1 << (start & 0x1F));
+
+        while (i < j)
+        {
+            if (codemap[i] & mask)
+            {
+                k = 32;
+                for (b=0x80000000; b!=0; b>>=1, k--)
+                {
+                    if (codemap[i] & b)
+                      break;
+                }
+                start = a + k;
+                break;
+            }
+            i++;
+            mask = 0xFFFFFFFF;
+            a += 32;
+        }
+        if (start > a)
+          continue;
+
+        mask &= (1 << ((start + size) & 0x1F)) - 1;
+        if (codemap[i] & mask)
+        {
+            k = 32;
+            for (b=0x80000000; b!=0; b>>=1, k--)
+            {
+                if (codemap[i] & b)
+                  break;
+            }
+            start = (a & ~0x1F) + k;
+        }
+        if (start <= a)
+          break;
+    }
+    return start;
+}
+
+static
+Addr_T allocate_space(Addr_T start, Addr_T size, char* id)
+{
+    int i, j;
+    unsigned long mask;
+    Addr_T a = start;
+    i = start >> 5;
+    j = (start + size) >> 5;
+    mask = -(1 << (start & 0x1F));
+
+    while (i < j)
+    {
+        if (codemap[i] & mask)
+        {
+            fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
+        }
+        codemap[i++] |= mask;
+        mask = 0xFFFFFFFF;
+        a += 32;
+    }
+    mask &= (1 << ((start + size) & 0x1F)) - 1;
+    if (codemap[i] & mask)
+    {
+        fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
+    }
+    codemap[i] |= mask;
+    return start;
+}
+
+Addr_T lnksect2 (struct area *tap, int rloc)
 {
     register Addr_T size, addr;
     register struct areax *taxp;
     int j, k, ramlimit;
-    char fchar, dchar='a';
+    char fchar=' ', dchar='a';
     char ErrMsg[]="?ASlink-Error-Could not get %d consecutive byte%s"
                   " in internal RAM for area %s.\n";
 
@@ -644,7 +756,7 @@ void lnksect2 (struct area *tap, int rloc)
     taxp = tap->a_axp;
 
     /*Use a letter to identify each area in the internal RAM layout map*/
-    if(rloc==0)
+    if (rloc==0)
     {
         /**/ if(!strcmp(tap->a_id, "DSEG"))
             fchar='D'; /*It will be converted to letters 'a' to 'z' later for each areax*/
@@ -669,9 +781,15 @@ void lnksect2 (struct area *tap, int rloc)
         else
             fchar=' ';/*???*/
     }
-    else
+    else if (rloc==1)
     {
-        fchar=' ';
+        /**/ if(!strcmp(tap->a_id, "GSINIT"))
+            fchar='G';
+    }
+    else if (rloc==2)
+    {
+        /**/ if(!strcmp(tap->a_id, "XSTK"))
+            fchar='K';
     }
 
     if (tap->a_flag&A_OVR) /* Overlayed sections */
@@ -837,8 +955,25 @@ void lnksect2 (struct area *tap, int rloc)
             taxp = taxp->a_axp;
         }
     }
+    else if (tap->a_flag & A_ABS) /* Absolute sections */
+    {
+        while (taxp)
+        {
+            if (rloc == 1)
+            {
+                allocate_space(taxp->a_addr, taxp->a_size, tap->a_id);
+            }
+            taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */
+            size += taxp->a_size;
+            taxp = taxp->a_axp;
+        }
+    }
     else /* Concatenated sections */
     {
+        if ((rloc == 1) && tap->a_size)
+        {
+            addr = find_empty_space(addr, tap->a_size);
+        }
         while (taxp)
         {
             if( (fchar=='D') || (fchar=='I') )
@@ -897,35 +1032,15 @@ void lnksect2 (struct area *tap, int rloc)
             }
             else /*For concatenated BIT, CODE, and XRAM areax's*/
             {
-                if(!strcmp(tap->a_id, "XSTK") && (taxp->a_size == 1))
+                if((fchar=='K') && (taxp->a_size == 1))
                 {
                     taxp->a_size = 256-(addr & 0xFF);
                 }
-                //should find next unused address now!!!
-                //but let's first just warn for overlaps
-                if (rloc == 1)
+                //find next unused address now
+                if ((rloc == 1) && taxp->a_size)
                 {
-                    int a = addr;
-                    int i = addr >> 5;
-                    int j = (addr + taxp->a_size) >> 5;
-                    long mask = -(1 << (addr & 0x1F));
-
-                    while (i < j)
-                    {
-                        if (codemap[i] & mask)
-                        {
-                            fprintf(stderr, "memory overlap near 0x%X for %s\n", a, tap->a_id);
-                        }
-                        codemap[i++] |= mask;
-                        mask = 0xFFFFFFFF;
-                        a += 32;
-                    }
-                    mask &= (1 << ((addr + taxp->a_size) & 0x1F)) - 1;
-                    if (codemap[i] & mask)
-                    {
-                        fprintf(stderr, "memory overlap near 0x%X for %s\n", a, tap->a_id);
-                    }
-                    codemap[i] |= mask;
+                    addr = find_empty_space(addr, taxp->a_size);
+                    allocate_space(addr, taxp->a_size, tap->a_id);
                 }
                 taxp->a_addr = addr;
                 addr += taxp->a_size;
@@ -949,4 +1064,5 @@ void lnksect2 (struct area *tap, int rloc)
         "\n?ASlink-Warning-Paged Area %8s Boundary Error\n", tap->a_id);
         lkerr++;
     }
+    return addr;
 }

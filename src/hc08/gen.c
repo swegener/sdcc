@@ -1173,7 +1173,7 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
       if (srcaop->type == AOP_LIT)
         {
           unsigned long lit;
-          unsigned char bytemask;
+          unsigned long bytemask;
           
           lit = (unsigned long) floatFromVal (srcaop->aopu.aop_lit);
           bytemask = (lit >> (srcofs*8)) & 0xff;
@@ -3325,7 +3325,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genMinusDec :- does subtraction with deccrement if possible     */
+/* genMinusDec :- does subtraction with decrement if possible      */
 /*-----------------------------------------------------------------*/
 static bool
 genMinusDec (iCode * ic)
@@ -3546,7 +3546,7 @@ genMultOneByte (operand * left,
   /* left unsigned, right signed literal -- literal determines sign handling */
   if (AOP_TYPE(right)==AOP_LIT && lUnsigned && !rUnsigned)
     {
-      signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
+      signed char val=(signed char)floatFromVal (AOP (right)->aopu.aop_lit);
       
       loadRegFromAop (hc08_reg_a, AOP (left), 0);
       if (val < 0)
@@ -3590,7 +3590,7 @@ genMultOneByte (operand * left,
 
   if (AOP_TYPE(right)==AOP_LIT && !rUnsigned)
     {
-      signed char val=floatFromVal (AOP (right)->aopu.aop_lit);
+      signed char val=(signed char)floatFromVal (AOP (right)->aopu.aop_lit);
       /* AND literal negative */
       if (val < 0) {
         emitcode ("ldx", "#0x%02x", -val);

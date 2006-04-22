@@ -1,3 +1,72 @@
+2006-04-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/asx8051.dsp: added mcs51/strcmpi.h
+	* as/hc08/as_hc08.dsp: added asm.h, m6808.h, strcmpi.h
+	* as/hc08/aslink.h: updated lnksect prototype
+	* as/hc08/asm.h,
+	* as/mcs51/asm.h: added a_addr to struct area and s_org to struct sym
+	* as/hc08/asmain.c,
+	* as/mcs51/asmain.c (asmbl): init dot.s_org for S_ORG,
+	  (newdot): handle A_ABS
+	* as/hc08/asout.c,
+	* as/mcs51/asout.c (outarea): output address
+	* as/hc08/lkaomf51.c,
+	* as/mcs51/lkaomf51.c: disabled unused array UsageType
+	* as/hc08/m08pst.c,
+	* as/mcs51/i51pst.c,
+	* as/z80/z80pst.c: "ABS" is not A_OVR
+	* as/hc08/lkarea.c (newarea): read a_addr,
+	  (lnkarea): added codemap array, sort absolute areas to the front,
+	   combine all GSINITx/GSFINAL,
+	  (find_empty_space, allocate_space): new functions,
+	  (lnksect): return next address, handle absolute sections
+	* as/mcs51/lkarea.c (newarea): read a_addr,
+	  lnksect2 prototype changed,
+	  (lnkarea2): define codemap unsigned, combine all GSINITx/GSFINAL,
+	  (find_empty_space, allocate_space): new, factored out of lnksect2,
+	  (lnksect2): return next address, handle absolute sections
+	* as/hc08/lkhead.c,
+	* as/mcs51/lkhead.c (newhead): head is absolute but not overlay
+	* as/hc08/lklibr.c (addfile, fndsym),
+	* as/mcs51/lklibr.c (addfile, buildlibraryindex, fndsym): prevent
+	  index out of range and detect both '\' and '/'
+	* device/include/mcs51/c8051f200.h: added _XPAGE, removed bad comment
+	* device/include/stdbool.h: removed SDCC_ds390 from check to pass
+	  regression tests (ds390 cannot return bool yet)
+	* doc/sdccman.lyx: changed version number, document changed --no-peep,
+	  document critical interrupts on z80, document changed SDCC define
+	* src/asm.c (_asxxxx_mapping): fixed .org directive,
+	  (_a390_mapping): added .org directive
+	* src/hc08/gen.c (transferAopAop): made bytemask log to fix warning,
+	  (genMultOneByte): fixed warnings
+	* src/hc08/hc08.dsp: lowered warning level to 2 to suppress pedantic
+	  ones
+	* src/pic16/device.c: removed newReg prototype, removed BYTE_IN_LONG
+	* src/pic16/gen.c (pic16_popGetLabel): made parameter key signed,
+	  (pic16_genLeftShiftLiteral, genRightShiftLiteral): fixed warnings
+	* src/pic16/gen.h: changed prototype for pic16_popGetLabel
+	* src/pic16/main.c: removed newReg prototype
+	* src/pic16/pcode.c,
+	* src/pic16/pcode.h (pic16_emitDB): changed parameter c to int to fix
+	  warnings
+	* src/pic16/pic16.dsp: lowered warning level to 2 to suppress pedantic
+	  ones
+	* src/pic16/ralloc.c
+	* src/pic16/ralloc.h (newReg): changed type to int and size to unsigned
+	  to fix warnings
+	* src/pic/pcode.c (allocInternalRegister): changed parameter optype
+	  from short to PIC_OPTYPE
+	* src/pic/pic.dsp: lowered warning level to 2 to suppress pedantic ones
+	* src/pic/ralloc.c (newReg, allocInternalRegister): changed parameter
+	  optype from short to PIC_OPTYPE
+	* src/port.h: made int_size unsigned to fix warnings
+	* src/SDCC.y: fixed warning on MSVC
+	* src/SDCCicode.c (getArraySizePtr): return unsigned int
+	* src/SDCCopt.c (convertToFcall): fixed warnings
+	* src/SDCCsymt.h: removed double prototype for genSymName
+	* src/xa51/ralloc.c (allocReg): made size unsigned int, type int and
+	  offset int to fix warnings
+
 2006-04-22 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx, */Makefile, */Makefile.in:

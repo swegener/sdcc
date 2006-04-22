@@ -374,7 +374,7 @@ static int regname2key(char const *name)
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop)
+regs* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int alias, operand *refop)
 {
 
   regs *dReg;

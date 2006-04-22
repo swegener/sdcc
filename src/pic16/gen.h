@@ -181,7 +181,7 @@ void pic16_genLeftShiftLiteral (operand *left, operand *right, operand *result, 
 pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst);
 void pic16_emitpcomment (char *fmt, ...);
 
-pCodeOp *pic16_popGetLabel(unsigned int key);
+pCodeOp *pic16_popGetLabel(int key);
 pCodeOp *pic16_popCopyReg(pCodeOpReg *pc);
 pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *pic16_popGetLit(int lit);

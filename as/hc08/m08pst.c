@@ -25,7 +25,7 @@ struct	mne	mne[] = {
     {	NULL,	"CON",		S_ATYP,		0,	A_CON	},
     {	NULL,	"OVR",		S_ATYP,		0,	A_OVR	},
     {	NULL,	"REL",		S_ATYP,		0,	A_REL	},
-    {	NULL,	"ABS",		S_ATYP,		0,	A_ABS|A_OVR	},
+    {	NULL,	"ABS",		S_ATYP,		0,	A_ABS	},
     {	NULL,	"NOPAG",	S_ATYP,		0,	A_NOPAG	},
     {	NULL,	"PAG",		S_ATYP,		0,	A_PAG	},
     {	NULL,	"CODE",		S_ATYP,		0,	A_CODE	},

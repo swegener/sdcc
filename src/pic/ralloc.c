@@ -340,7 +340,7 @@ static regs *regWithIdx (set *dRegs, int idx, int fixed);
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-static regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias)
+static regs* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int size, int alias)
 {
 	
 	regs *dReg;
@@ -533,7 +533,7 @@ allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 *-----------------------------------------------------------------*/
 
 regs *
-allocInternalRegister(int rIdx, char * name, short po_type, int alias)
+allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias)
 {
 	regs * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias);
 	

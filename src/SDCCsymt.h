@@ -246,8 +246,8 @@ typedef struct symbol
     char name[SDCC_SYMNAME_MAX + 1];    /* Input Variable Name     */
     char rname[SDCC_NAME_MAX + 1];      /* internal name           */
 
-    short level;                        /* declration lev,fld offset */
-    short block;                        /* sequential block # of defintion */
+    short level;                        /* declaration lev,fld offset */
+    short block;                        /* sequential block # of definition */
     int key;
     unsigned flexArrayLength;           /* if the symbol specifies a struct
     with a "flexible array member", then the additional length in bytes for
@@ -566,7 +566,6 @@ void printSymChain (symbol *, int);
 void printStruct (structdef *, int);
 char *genSymName (int);
 sym_link *getSpec (sym_link *);
-char *genSymName (int);
 int compStructSize (int, structdef *);
 sym_link *copyLinkChain (sym_link *);
 int checkDecl (symbol *, int);

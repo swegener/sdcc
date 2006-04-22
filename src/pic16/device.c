@@ -59,8 +59,6 @@ PIC16_device *pic16=NULL;
 unsigned int stackPos = 0;
 unsigned int stackLen = 0;
 
-extern regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
-
 void pic16_setMaxRAM(int size)
 {
 	pic16->maxRAMaddress = size;
@@ -377,8 +375,6 @@ void pic16_dump_int_registers(FILE *of, set *section)
 #else
   #define _ENDIAN(x)  (x)
 #endif
-
-#define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
 
 
 /*-----------------------------------------------------------------*

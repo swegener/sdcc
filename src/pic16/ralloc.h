@@ -125,7 +125,7 @@ regs *pic16_allocDirReg (operand *op );
 regs *pic16_allocRegByName (char *name, int size, operand *op);
 extern char *pic16_decodeOp(unsigned int op);
 
-regs* newReg(short type, short pc_type, int rIdx, char *name, int size, int alias, operand *refop);
+regs* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int alias, operand *refop);
 
 /* Define register address that are constant across PIC16 family */
 #define IDX_TMR0    0xfd6

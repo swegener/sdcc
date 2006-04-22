@@ -390,7 +390,7 @@ static const ASM_MAPPING _asxxxx_mapping[] =
   {"hihil","(%05d$ >> 16)"},
   {"hihihil","(%05d$ >> 24)"},
   {"equ","="},
-  {"org", ".org %04X"},
+  {"org", ".org 0x%04X"},
   {NULL, NULL}
 };
 
@@ -483,6 +483,7 @@ static const ASM_MAPPING _a390_mapping[] =
   {"hihil","((L%05d / 65536) & 0FFh)"},
   {"hihihil","((L%09d / 16777216) & 0FFh)"},
   {"equ"," equ"},
+  {"org", ".org 0x%04X"},
   {NULL, NULL}
 };
 

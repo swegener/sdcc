@@ -158,6 +158,10 @@ SOURCE=.\mcs51\asm.h
 
 SOURCE=.\mcs51\i8051.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\mcs51\strcmpi.h
+# End Source File
 # End Group
 # End Target
 # End Project

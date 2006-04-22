@@ -10,6 +10,8 @@ BUILD = $(TOPDIR)/build/sdcc
 SDCCLIB = $(BUILD)
 CVSFLAGS = -z5
 CVS = cvs
+SVNFLAGS =
+SVN = svn
 DIR = .
 VER = 2.2.1
 # Used as a branch name.
@@ -24,7 +26,7 @@ COMPILE_MODE = linux-mingw32
 SDCC_OR_GBDK = sdcc
 
 ROOT_GBDK = :pserver:anonymous@cvs.gbdk.sourceforge.net:/cvsroot/gbdk
-ROOT_SDCC = :pserver:anonymous@cvs.sdcc.sourceforge.net:/cvsroot/sdcc
+ROOT_SDCC = https://svn.sourceforge.net/svnroot/sdcc
 
 ifeq ($(COMPILE_MODE),linux-linux)
 # For Linux
@@ -62,15 +64,16 @@ clean:
 	rm -rf $(BUILD) gbdk-lib gbdk-support sdcc logged_in
 
 update: logged_in
-	cd $(DIR); cvs $(CVSFLAGS) -d$(ROOT_SDCC) co -r sdcc-$(SHORTVER) sdcc
+	cd $(DIR); svn $(SVNFLAGS) co $(ROOT_SDCC)/branches/sdcc-$(SHORTVER)/sdcc sdcc
 	cd $(DIR); cvs $(CVSFLAGS) -d$(ROOT_GBDK) co -r sdcc-$(SHORTVER) gbdk-lib
 	cd $(DIR); cvs $(CVSFLAGS) -d$(ROOT_GBDK) co -r sdcc-$(SHORTVER) gbdk-support
 
 _sdcc: sdcc-bin sdcc-misc sdcc-lib sdcc-doc
 
 tidy:
-	rm -rf `find $(BUILD) -name "CVS"`
-	rm -rf `find $(BUILD)/lib -name "*.asm"`
+	find $(BUILD) -name "CVS" -exec rm -rf \;
+	find $(BUILD) -name ".svn" -exec rm -rf \;
+	find $(BUILD)/lib -name "*.asm" -exec rm -rf \;
 	-$(TNP)strip $(BUILD)/bin/*
 
 sdcc-bin: sdcc/sdccconf.h

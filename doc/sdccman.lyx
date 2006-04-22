@@ -20478,7 +20478,7 @@ The screenshot was included in sdccman.lyx cvs version 1.120 but later removed
 The .eps File 
 \size footnotesize 
 
-\begin_inset LatexCommand \url{http://cvs.sourceforge.net/viewcvs.py/*checkout*/sdcc/sdcc/doc/figures/ddd_example.eps}
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewcvs.cgi/*checkout*/sdcc/trunk/sdcc/doc/figures/ddd_example.eps}
 
 \end_inset 
 
@@ -22974,7 +22974,7 @@ The SDCC project is hosted on the SDCC sourceforge site at
 \end_inset 
 
  area and Subversion code repository
-\begin_inset LatexCommand \index{cvs code repository}
+\begin_inset LatexCommand \index{Subversion code repository}
 
 \end_inset 
 
@@ -23201,7 +23201,7 @@ You can follow the status of the Subversion version
 
 \end_inset 
 
- in the cvs-repository
+ in the Subversion repository
 \newline 
 
 \size footnotesize 

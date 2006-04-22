@@ -1,6 +1,6 @@
 # sdcc.nsi - NSIS installer script for SDCC
 #
-# Copyright (c) 2003,2004 Borut Razem
+# Copyright (c) 2003-2006 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -29,8 +29,8 @@
 #   to a clean directory (the option to create directories should be enambled).
 #   A sub directory sdcc is created (referenced as PKGDIR in continuation).
 # - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
-#   (this file) from the sdcc CVS snapshot to the PKGDIR directory
-# - copy file COPYING from the sdcc CVS snapshot to the PKGDIR directory,
+#   (this file) from the sdcc Subversion snapshot to the PKGDIR directory
+# - copy file COPYING from the sdcc Subversion snapshot to the PKGDIR directory,
 #   rename it to COPYING.TXT and convert file COPYING to DOS format:
 #   unix2dos COPYING.TXT
 # - run NSIS installer from PKGDIR directory:

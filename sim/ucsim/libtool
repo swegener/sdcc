@@ -35,7 +35,7 @@ if test "X${CDPATH+set}" = Xset; then CDPATH=:; export CDPATH; fi
 
 # ### BEGIN LIBTOOL CONFIG
 
-# Libtool was configured on host toto.private.network:
+# Libtool was configured on host toto:
 
 # Shell to use when invoking shell scripts.
 SHELL="/bin/sh"
@@ -47,14 +47,14 @@ build_libtool_libs=yes
 build_old_libs=yes
 
 # Whether or not to add -lc for building shared libraries.
-build_libtool_need_lc=no
+build_libtool_need_lc=yes
 
 # Whether or not to optimize for fast installation.
 fast_install=yes
 
 # The host system.
 host_alias=
-host=x86_64-unknown-linux-gnu
+host=i686-pc-cygwin
 
 # An echo program that does not interpret backslashes.
 echo="echo"
@@ -70,7 +70,7 @@ CC="gcc"
 with_gcc=yes
 
 # The linker used to build libraries.
-LD="/usr/bin/ld"
+LD="/usr/i686-pc-cygwin/bin/ld.exe"
 
 # Whether we need hard or soft links.
 LN_S="ln -s"
@@ -82,7 +82,7 @@ NM="/usr/bin/nm -B"
 STRIP=strip
 
 # Used to examine libraries when file_magic_cmd begins "file"
-MAGIC_CMD=/usr/bin/file
+MAGIC_CMD=file
 
 # Used on cygwin: DLL creation program.
 DLLTOOL="dlltool"
@@ -113,7 +113,7 @@ libext="a"
 exeext=""
 
 # Additional compiler flags for building library objects.
-pic_flag=" -fPIC"
+pic_flag=" -DDLL_EXPORT"
 pic_mode=default
 
 # Does compiler simultaneously support -c and -o options?
@@ -150,23 +150,23 @@ no_builtin_flag=" -fno-builtin"
 export_dynamic_flag_spec="\${wl}--export-dynamic"
 
 # Compiler flag to generate shared objects directly from archives.
-whole_archive_flag_spec="\${wl}--whole-archive\$convenience \${wl}--no-whole-archive"
+whole_archive_flag_spec=""
 
 # Compiler flag to generate thread-safe objects.
 thread_safe_flag_spec=""
 
 # Library versioning type.
-version_type=linux
+version_type=windows
 
 # Format of library name prefix.
 libname_spec="lib\$name"
 
 # List of archive names.  First name is the real one, the rest are links.
 # The last name is the one that the linker finds with -lNAME.
-library_names_spec="\${libname}\${release}.so\$versuffix \${libname}\${release}.so\$major \$libname.so"
+library_names_spec="\$libname.dll.a"
 
 # The coded name of the library, if different from the real name.
-soname_spec="\${libname}\${release}.so\$major"
+soname_spec="\`echo \${libname} | sed -e s/^lib/cyg/\`\`echo \${release} | sed -e s/[.]/-/g\`\${versuffix}.dll"
 
 # Commands used to build and install an old-style archive.
 RANLIB="ranlib"
@@ -178,38 +178,62 @@ old_postuninstall_cmds=""
 old_archive_from_new_cmds=""
 
 # Create a temporary old-style archive to link instead of a shared archive.
-old_archive_from_expsyms_cmds=""
+old_archive_from_expsyms_cmds="\$DLLTOOL --as=\$AS --dllname \$soname --def \$output_objdir/\$soname-def --output-lib \$output_objdir/\$newlib"
 
 # Commands used to build and install a shared archive.
-archive_cmds="\$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-soname \$wl\$soname -o \$lib"
-archive_expsym_cmds="\$CC -shared \$libobjs \$deplibs \$compiler_flags \${wl}-soname \$wl\$soname \${wl}-retain-symbols-file \$wl\$export_symbols -o \$lib"
-postinstall_cmds=""
-postuninstall_cmds=""
+archive_cmds=""
+archive_expsym_cmds="if test \\\"x\\\`head -1 \$export_symbols\\\`\\\" = xEXPORTS; then
+	cp \$export_symbols \$output_objdir/\$soname-def;
+      else
+	echo EXPORTS > \$output_objdir/\$soname-def;
+	_lt_hint=1;
+	cat \$export_symbols | while read symbol; do
+	 set dummy \\\$symbol;
+	 case \\\$# in
+	   2) echo \\\"   \\\$2 @ \\\$_lt_hint ; \\\" >> \$output_objdir/\$soname-def;;
+	   *) echo \\\"     \\\$2 @ \\\$_lt_hint \\\$3 ; \\\" >> \$output_objdir/\$soname-def;;
+	 esac;
+	 _lt_hint=\\\`expr 1 + \\\$_lt_hint\\\`;
+	done;
+      fi~
+      
+      \$CC -Wl,--base-file,\$output_objdir/\$soname-base  -Wl,-e,__cygwin_dll_entry@12 -o \$output_objdir/\$soname \$libobjs \$deplibs \$compiler_flags~
+      \$DLLTOOL --as=\$AS --dllname \$soname --exclude-symbols DllMain@12,_cygwin_dll_entry@12,_cygwin_noncygwin_dll_entry@12,DllMainCRTStartup@12,DllEntryPoint@12 --def \$output_objdir/\$soname-def --base-file \$output_objdir/\$soname-base --output-exp \$output_objdir/\$soname-exp~
+      \$CC -Wl,--base-file,\$output_objdir/\$soname-base \$output_objdir/\$soname-exp  -Wl,-e,__cygwin_dll_entry@12 -o \$output_objdir/\$soname \$libobjs \$deplibs \$compiler_flags~
+      \$DLLTOOL --as=\$AS --dllname \$soname --exclude-symbols DllMain@12,_cygwin_dll_entry@12,_cygwin_noncygwin_dll_entry@12,DllMainCRTStartup@12,DllEntryPoint@12 --def \$output_objdir/\$soname-def --base-file \$output_objdir/\$soname-base --output-exp \$output_objdir/\$soname-exp --output-lib \$output_objdir/\$libname.dll.a~
+      \$CC \$output_objdir/\$soname-exp  -Wl,-e,__cygwin_dll_entry@12 -o \$output_objdir/\$soname \$libobjs \$deplibs \$compiler_flags"
+postinstall_cmds="dlpath=\\\`bash 2>&1 -c '. \$dir/\${file}i;echo \\\$dlname'\\\`~
+      dldir=\$destdir/\\\`dirname \\\$dlpath\\\`~
+      test -d \\\$dldir || mkdir -p \\\$dldir~
+      \$install_prog .libs/\$dlname \\\$dldir/\$dlname"
+postuninstall_cmds="dldll=\\\`bash 2>&1 -c '. \$file; echo \\\$dlname'\\\`~
+      dlpath=\$dir/\\\$dldll~
+       \$rm \\\$dlpath"
 
 # Commands to strip libraries.
 old_striplib="strip --strip-debug"
 striplib="strip --strip-unneeded"
 
 # Method to check whether dependent libraries are shared objects.
-deplibs_check_method="file_magic ELF [0-9][0-9]*-bit [LM]SB (shared object|dynamic lib )"
+deplibs_check_method="file_magic file format pei*-i386(.*architecture: i386)?"
 
 # Command to use when deplibs_check_method == file_magic.
-file_magic_cmd="\$MAGIC_CMD"
+file_magic_cmd="\$OBJDUMP -f"
 
 # Flag that allows shared libraries with undefined symbols to be built.
-allow_undefined_flag=""
+allow_undefined_flag="unsupported"
 
 # Flag that forces no undefined symbols.
 no_undefined_flag=""
 
 # Commands used to finish a libtool library installation in a directory.
-finish_cmds="PATH=\\\"\\\$PATH:/sbin\\\" ldconfig -n \$libdir"
+finish_cmds=""
 
 # Same as above, but a single script fragment to be evaled but not shown.
 finish_eval=""
 
 # Take the output of nm and produce a listing of raw symbols and C names.
-global_symbol_pipe="sed -n -e 's/^.*[ 	]\\([ABCDGISTW][ABCDGISTW]*\\)[ 	][ 	]*\\(\\)\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 \\2\\3 \\3/p'"
+global_symbol_pipe="sed -n -e 's/^.*[ 	]\\([ABCDGISTW][ABCDGISTW]*\\)[ 	][ 	]*\\(_\\)\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 \\2\\3 \\3/p'"
 
 # Transform the output of nm in a proper C declaration
 global_symbol_to_cdecl="sed -n -e 's/^. .* \\(.*\\)\$/extern char \\1;/p'"
@@ -221,16 +245,16 @@ global_symbol_to_c_name_address="sed -n -e 's/^: \\([^ ]*\\) \$/  {\\\"\\1\\\", 
 runpath_var=LD_RUN_PATH
 
 # This is the shared library path variable.
-shlibpath_var=LD_LIBRARY_PATH
+shlibpath_var=PATH
 
 # Is shlibpath searched before the hard-coded library search path?
-shlibpath_overrides_runpath=no
+shlibpath_overrides_runpath=unknown
 
 # How to hardcode a shared library path into an executable.
 hardcode_action=immediate
 
 # Whether we should hardcode library paths into libraries.
-hardcode_into_libs=yes
+hardcode_into_libs=no
 
 # Flag to hardcode $libdir into a binary during linking.
 # This must work even if $libdir does not exist.
@@ -253,7 +277,7 @@ hardcode_shlibpath_var=unsupported
 
 # Variables whose values should be saved in libtool wrapper scripts and
 # restored at relink time.
-variables_saved_for_relink="PATH LD_LIBRARY_PATH LD_RUN_PATH GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH"
+variables_saved_for_relink="PATH PATH LD_RUN_PATH GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH"
 
 # Whether libtool must link a program against all its dependency libraries.
 link_all_deplibs=unknown
@@ -268,13 +292,20 @@ sys_lib_dlsearch_path_spec="/lib /usr/lib"
 fix_srcfile_path=""
 
 # Set to yes if exported symbols are required.
-always_export_symbols=no
+always_export_symbols=yes
 
 # The commands to list exported symbols.
-export_symbols_cmds="\$NM \$libobjs \$convenience | \$global_symbol_pipe | sed 's/.* //' | sort | uniq > \$export_symbols"
+export_symbols_cmds="
+      \$DLLTOOL --export-all --exclude-symbols DllMain@12,_cygwin_dll_entry@12,_cygwin_noncygwin_dll_entry@12,DllMainCRTStartup@12,DllEntryPoint@12 --output-def \$output_objdir/\$soname-def \$libobjs \$convenience~
+      sed -e \\\"1,/EXPORTS/d\\\" -e \\\"s/ @ [0-9]*//\\\" -e \\\"s/ *;.*\$//\\\" < \$output_objdir/\$soname-def > \$export_symbols"
 
 # The commands to extract the exported symbol list from a shared archive.
-extract_expsyms_cmds=""
+extract_expsyms_cmds="test -f \$output_objdir/impgen.c || \\\\
+      sed -e \\\"/^# \\\\/\\\\* impgen\\\\.c starts here \\\\*\\\\//,/^# \\\\/\\\\* impgen.c ends here \\\\*\\\\// { s/^# //;s/^# *\$//; p; }\\\" -e d < \$0 > \$output_objdir/impgen.c~
+      test -f \$output_objdir/impgen.exe || (cd \$output_objdir && \\\\
+      if test \\\"x\$HOST_CC\\\" != \\\"x\\\" ; then \$HOST_CC -o impgen impgen.c ; \\\\
+      else \$CC -o impgen impgen.c ; fi)~
+      \$output_objdir/impgen \$dir/\$soroot > \$output_objdir/\$soname-def"
 
 # Symbols that should not be listed in the preloaded symbols.
 exclude_expsyms="_GLOBAL_OFFSET_TABLE_"
@@ -283,6 +314,179 @@ exclude_expsyms="_GLOBAL_OFFSET_TABLE_"
 include_expsyms=""
 
 # ### END LIBTOOL CONFIG
+
+      # This is a source program that is used to create dlls on Windows
+      # Don't remove nor modify the starting and closing comments
+# /* ltdll.c starts here */
+# #define WIN32_LEAN_AND_MEAN
+# #include <windows.h>
+# #undef WIN32_LEAN_AND_MEAN
+# #include <stdio.h>
+#
+# #ifndef __CYGWIN__
+# #  ifdef __CYGWIN32__
+# #    define __CYGWIN__ __CYGWIN32__
+# #  endif
+# #endif
+#
+# #ifdef __cplusplus
+# extern "C" {
+# #endif
+# BOOL APIENTRY DllMain (HINSTANCE hInst, DWORD reason, LPVOID reserved);
+# #ifdef __cplusplus
+# }
+# #endif
+#
+# #ifdef __CYGWIN__
+# #include <cygwin/cygwin_dll.h>
+# DECLARE_CYGWIN_DLL( DllMain );
+# #endif
+# HINSTANCE __hDllInstance_base;
+#
+# BOOL APIENTRY
+# DllMain (HINSTANCE hInst, DWORD reason, LPVOID reserved)
+# {
+#   __hDllInstance_base = hInst;
+#   return TRUE;
+# }
+# /* ltdll.c ends here */
+	# This is a source program that is used to create import libraries
+	# on Windows for dlls which lack them. Don't remove nor modify the
+	# starting and closing comments
+# /* impgen.c starts here */
+# /*   Copyright (C) 1999-2000 Free Software Foundation, Inc.
+#
+#  This file is part of GNU libtool.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#  */
+#
+# #include <stdio.h>		/* for printf() */
+# #include <unistd.h>		/* for open(), lseek(), read() */
+# #include <fcntl.h>		/* for O_RDONLY, O_BINARY */
+# #include <string.h>		/* for strdup() */
+#
+# /* O_BINARY isn't required (or even defined sometimes) under Unix */
+# #ifndef O_BINARY
+# #define O_BINARY 0
+# #endif
+#
+# static unsigned int
+# pe_get16 (fd, offset)
+#      int fd;
+#      int offset;
+# {
+#   unsigned char b[2];
+#   lseek (fd, offset, SEEK_SET);
+#   read (fd, b, 2);
+#   return b[0] + (b[1]<<8);
+# }
+#
+# static unsigned int
+# pe_get32 (fd, offset)
+#     int fd;
+#     int offset;
+# {
+#   unsigned char b[4];
+#   lseek (fd, offset, SEEK_SET);
+#   read (fd, b, 4);
+#   return b[0] + (b[1]<<8) + (b[2]<<16) + (b[3]<<24);
+# }
+#
+# static unsigned int
+# pe_as32 (ptr)
+#      void *ptr;
+# {
+#   unsigned char *b = ptr;
+#   return b[0] + (b[1]<<8) + (b[2]<<16) + (b[3]<<24);
+# }
+#
+# int
+# main (argc, argv)
+#     int argc;
+#     char *argv[];
+# {
+#     int dll;
+#     unsigned long pe_header_offset, opthdr_ofs, num_entries, i;
+#     unsigned long export_rva, export_size, nsections, secptr, expptr;
+#     unsigned long name_rvas, nexp;
+#     unsigned char *expdata, *erva;
+#     char *filename, *dll_name;
+#
+#     filename = argv[1];
+#
+#     dll = open(filename, O_RDONLY|O_BINARY);
+#     if (dll < 1)
+# 	return 1;
+#
+#     dll_name = filename;
+#
+#     for (i=0; filename[i]; i++)
+# 	if (filename[i] == '/' || filename[i] == '\\'  || filename[i] == ':')
+# 	    dll_name = filename + i +1;
+#
+#     pe_header_offset = pe_get32 (dll, 0x3c);
+#     opthdr_ofs = pe_header_offset + 4 + 20;
+#     num_entries = pe_get32 (dll, opthdr_ofs + 92);
+#
+#     if (num_entries < 1) /* no exports */
+# 	return 1;
+#
+#     export_rva = pe_get32 (dll, opthdr_ofs + 96);
+#     export_size = pe_get32 (dll, opthdr_ofs + 100);
+#     nsections = pe_get16 (dll, pe_header_offset + 4 +2);
+#     secptr = (pe_header_offset + 4 + 20 +
+# 	      pe_get16 (dll, pe_header_offset + 4 + 16));
+#
+#     expptr = 0;
+#     for (i = 0; i < nsections; i++)
+#     {
+# 	char sname[8];
+# 	unsigned long secptr1 = secptr + 40 * i;
+# 	unsigned long vaddr = pe_get32 (dll, secptr1 + 12);
+# 	unsigned long vsize = pe_get32 (dll, secptr1 + 16);
+# 	unsigned long fptr = pe_get32 (dll, secptr1 + 20);
+# 	lseek(dll, secptr1, SEEK_SET);
+# 	read(dll, sname, 8);
+# 	if (vaddr <= export_rva && vaddr+vsize > export_rva)
+# 	{
+# 	    expptr = fptr + (export_rva - vaddr);
+# 	    if (export_rva + export_size > vaddr + vsize)
+# 		export_size = vsize - (export_rva - vaddr);
+# 	    break;
+# 	}
+#     }
+#
+#     expdata = (unsigned char*)malloc(export_size);
+#     lseek (dll, expptr, SEEK_SET);
+#     read (dll, expdata, export_size);
+#     erva = expdata - export_rva;
+#
+#     nexp = pe_as32 (expdata+24);
+#     name_rvas = pe_as32 (expdata+32);
+#
+#     printf ("EXPORTS\n");
+#     for (i = 0; i<nexp; i++)
+#     {
+# 	unsigned long name_rva = pe_as32 (erva+name_rvas+i*4);
+# 	printf ("\t%s @ %ld ;\n", erva+name_rva, 1+ i);
+#     }
+#
+#     return 0;
+# }
+# /* impgen.c ends here */
 
 # ltmain.sh - Provide generalized library-building support services.
 # NOTE: Changing this file will not affect anything until you rerun configure.

@@ -1,4 +1,9 @@
-2006-04-19 Borut Razem <borut.razem AT siol.net>
+2006-04-22 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx, */Makefile, */Makefile.in:
+	  references to CVS replaced with Subversion
+
+2006-04-21 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx, */Makefile, */Makefile.in:
 	  references to CVS replaced with Subversion

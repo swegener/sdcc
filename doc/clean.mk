@@ -1,5 +1,5 @@
 clean:
-# The directories are still in CVS, so don't delete them
+# The directories are still in Subversion, so don't delete them
 #       rm -rf $(MANUAL).html $(TSS).html
 	rm -rf $(MANUAL).html/* $(TSS).html/* $(CDB).html
 	rm -rf $(MANUAL).txt $(TSS).txt $(CDB).txt \

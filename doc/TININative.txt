@@ -4,7 +4,7 @@ Using SDCC to develop Native Java functions
 Prerequisites
 --------------
 
-1) Download the latest compiler sources from http://sdcc.sourceforge.net (cvs download), build & 
+1) Download the latest compiler sources from http://sdcc.sourceforge.net (Subversion download), build & 
    install the compiler.
 2) Download & install tini development kit. SDCC uses 'a390' assembler to generate Native libraries,
    it is NOT distributed with the compiler. Tested with Version 1.02d.

@@ -1,3 +1,12 @@
+2006-04-24 Borut Razem <borut.razem AT siol.net>
+
+	* device/examples/main8051.c: deleted - it was removed from CVS
+	  24.mar.2000 and after that modified 18.feb.2001, so it reappered
+	  after the transition to Subversion 
+	* src/SDCCalloc.h: deleted - it was removed  from CVS
+	  3.feb.2001 and after that modified 18.feb.2001, so it reappered
+	  after the transition to Subversion 
+
 2006-04-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/asx8051.dsp: added mcs51/strcmpi.h

@@ -6,6 +6,10 @@
 	* src/SDCCalloc.h: deleted - it was removed  from CVS
 	  3.feb.2001 and after that modified 18.feb.2001, so it reappered
 	  after the transition to Subversion 
+	* sim/ucsim/cpu.gif, sim/ucsim/interrupt.gif, sim/ucsim/new.gif, 
+	  sim/ucsim/serial1.gif, sim/ucsim/serial2.gif,
+	  sim/ucsim/term_cpuopt.gif, sim/ucsim/timers.gif, sim/ucsim/wins.gif,
+	  sim/ucsim/post.jpg, sim/ucsim/UCsim.jpg: corrected
 
 2006-04-22 Maarten Brock <sourceforge.brock AT dse.nl>
 

@@ -107,8 +107,12 @@ int REGallBanks(regs *reg);
 void addMemRange(memRange *r, int type);
 void setMaxRAM(int size);
 void setDefMaxRam(void);
-unsigned getMaxRam(void);
-int getHasSecondConfigReg(void);
+
+void pic14_assignConfigWordValue(int address, int value);
+int pic14_emitConfigWord (FILE * vFile);
+int pic14_getConfigWord(int address);
+unsigned pic14_getMaxRam(void);
+int pic14_getHasSecondConfigReg(void);
 int pic14_getSharebankSize(void);
 int pic14_getSharebankAddress(void);
 

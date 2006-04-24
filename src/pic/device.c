@@ -932,17 +932,19 @@ void assignRelocatableRegisters(set *regset, int used)
 	
 }
 
+/* Keep track of whether we found an assignment to the __config words. */
+static int pic14_hasSetConfigWord = 0;
 
 /*-----------------------------------------------------------------*
-*  void assignConfigWordValue(int address, int value)
-*
-* Most midrange PICs have one config word at address 0x2007.
-* Newer PIC14s have a second config word at address 0x2008.
-* This routine will assign values to those addresses.
-*
-*-----------------------------------------------------------------*/
+ *  void assignConfigWordValue(int address, int value)
+ *
+ * Most midrange PICs have one config word at address 0x2007.
+ * Newer PIC14s have a second config word at address 0x2008.
+ * This routine will assign values to those addresses.
+ *
+ *-----------------------------------------------------------------*/
 
-void assignConfigWordValue(int address, int value)
+void pic14_assignConfigWordValue(int address, int value)
 {
 	if (CONFIG_WORD_ADDRESS == address)
 		config_word = value;
@@ -951,16 +953,44 @@ void assignConfigWordValue(int address, int value)
 		config2_word = value;
 	
 	//fprintf(stderr,"setting config word 0x%x to 0x%x\n", address, value);
-	
+	pic14_hasSetConfigWord = 1;
 }
-/*-----------------------------------------------------------------*
-* int getConfigWord(int address)
-*
-* Get the current value of a config word.
-*
-*-----------------------------------------------------------------*/
 
-int getConfigWord(int address)
+/*-----------------------------------------------------------------*
+ * int pic14_emitConfigWord (FILE * vFile)
+ * 
+ * Emit the __config directives iff we found a previous assignment
+ * to the config word.
+ *-----------------------------------------------------------------*/
+extern char *iComments2;
+int pic14_emitConfigWord (FILE * vFile)
+{
+  if (pic14_hasSetConfigWord)
+  {
+    fprintf (vFile, "%s", iComments2);
+    fprintf (vFile, "; config word \n");
+    fprintf (vFile, "%s", iComments2);
+    if (pic14_getHasSecondConfigReg())
+    {
+      fprintf (vFile, "\t__config _CONFIG1, 0x%x\n", pic14_getConfigWord(0x2007));
+      fprintf (vFile, "\t__config _CONFIG2, 0x%x\n", pic14_getConfigWord(0x2008));
+    }
+    else
+      fprintf (vFile, "\t__config 0x%x\n", pic14_getConfigWord(0x2007));
+
+    return 1;
+  }
+  return 0;
+}
+
+/*-----------------------------------------------------------------*
+ * int pic14_getConfigWord(int address)
+ *
+ * Get the current value of a config word.
+ *
+ *-----------------------------------------------------------------*/
+
+int pic14_getConfigWord(int address)
 {
 	switch (address)
 	{
@@ -978,7 +1008,7 @@ int getConfigWord(int address)
 /*-----------------------------------------------------------------*
 *  
 *-----------------------------------------------------------------*/
-unsigned getMaxRam(void)
+unsigned pic14_getMaxRam(void)
 {
 	return pic->defMaxRAMaddrs;
 }
@@ -988,7 +1018,7 @@ unsigned getMaxRam(void)
 *  int getHasSecondConfigReg(void) - check if the device has a 
 *  second config register, rather than just one.
 *-----------------------------------------------------------------*/
-int getHasSecondConfigReg(void)
+int pic14_getHasSecondConfigReg(void)
 {
 	if(!pic)
 		return 0;
@@ -1018,8 +1048,8 @@ int pic14_getSharebankAddress(void)
 	int sharebankAddress = 0x7f;
 	/* If total RAM is less than 0x7f as with 16f84 then reduce
 	 * sharebankAddress to fit */
-	if ((unsigned)sharebankAddress > getMaxRam())
-		sharebankAddress = (int)getMaxRam();
+	if ((unsigned)sharebankAddress > pic14_getMaxRam())
+		sharebankAddress = (int)pic14_getMaxRam();
 	return sharebankAddress;
 }
 

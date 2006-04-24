@@ -52,7 +52,7 @@
 /*-----------------------------------------------------------------*/
 
 extern void genpic14Code (iCode *);
-extern void assignConfigWordValue(int address, int value);
+extern void pic14_assignConfigWordValue(int address, int value);
 
 /* Global data */
 static struct
@@ -603,7 +603,7 @@ dirregWithName (char *name)
 int IS_CONFIG_ADDRESS(int address)
 {
 	
-	return address == 0x2007 || address == 0x2008;
+	return ((address == 0x2007) || (address == 0x2008));
 }
 
 /*-----------------------------------------------------------------*/
@@ -2961,7 +2961,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 			if(IS_VALOP(IC_RIGHT(ic))) {
 				debugLog ("  setting config word to %x\n", 
 					(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
-				assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
+				pic14_assignConfigWordValue(  SPEC_ADDR ( OP_SYM_ETYPE(IC_RESULT(ic))),
 					(int) floatFromVal (IC_RIGHT(ic)->operand.valOperand));
 			}
 			
@@ -3754,7 +3754,7 @@ packRegisters (eBBlock * ebp)
 		/* TrueSym := iTempNN:1             */
 		for (ic = ebp->sch; ic; ic = ic->next)
 		{
-			
+
 			/* find assignment of the form TrueSym := iTempNN:1 */
 			if (ic->op == '=' && !POINTER_SET (ic))
 				change += packRegsForAssign (ic, ebp);
@@ -4134,8 +4134,8 @@ pic14_assignRegisters (ebbIndex * ebbi)
 	iCode *ic;
 	int i;
 	
-	debugLog ("<><><><><><><><><><><><><><><><><>\nstarting\t%s:%s", __FILE__, __FUNCTION__);
-	debugLog ("\nebbs before optimizing:\n");
+	debugLog ("<><><><><><><><><><><><><><><><><>\nstarting\t%s:%s\n", __FILE__, __FUNCTION__);
+	debugLog ("ebbs before optimizing:\n");
 	dumpEbbsToDebug (ebbs, count);
 	
 	setToNull ((void *) &_G.funcrUsed);

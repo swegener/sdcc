@@ -29,6 +29,7 @@
 #include "newalloc.h"
 #include "gen.h"
 #include "main.h"
+#include "device.h"
 
 
 #ifdef WORDS_BIGENDIAN
@@ -224,6 +225,7 @@ emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size
 }
 
 #define IS_DEFINED_HERE(sym)	(!IS_EXTERN(sym->etype))
+extern int IS_CONFIG_ADDRESS( int addr );
 static void
 pic14_constructAbsMap (FILE *ofile)
 {
@@ -243,6 +245,20 @@ pic14_constructAbsMap (FILE *ofile)
       if (IS_DEFINED_HERE(sym) && SPEC_ABSA(sym->etype))
       {
 	addr = SPEC_ADDR(sym->etype);
+
+	/* handle CONFIG words here */
+	if (IS_CONFIG_ADDRESS( addr ))
+	{
+	  //fprintf( stderr, "%s: assignment to CONFIG@0x%x found\n", __FUNCTION__, addr );
+	  //fprintf( stderr, "ival: %p (0x%x)\n", sym->ival, (int)list2int( sym->ival ) );
+	  if (sym->ival) {
+	    pic14_assignConfigWordValue( addr, (int)list2int( sym->ival ) );
+	  } else {
+	    fprintf( stderr, "ERROR: Symbol %s, which is covering a __CONFIG word must be initialized!\n", sym->name );
+	  }
+	  continue;
+	}
+	
 	if (max == -1 || addr > max) max = addr;
 	if (min == -1 || addr < min) min = addr;
 	//fprintf (stderr, "%s: sym %s @ 0x%x\n", __FUNCTION__, sym->name, addr);
@@ -340,6 +356,11 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 	sym = setNextItem (map->syms)) {
 		
 		//printf("%s\n",sym->name);
+
+		/* ignore if config word */
+		if (SPEC_ABSA(sym->etype)
+		    && IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype)))
+			continue;
 		
 		/* if extern then add it into the extern list */
 		if (IS_EXTERN (sym->etype)) {
@@ -444,7 +465,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 		it is a global variable */
 		if (sym->ival && sym->level == 0) {
 			ast *ival = NULL;
-			
+		
 			if (IS_AGGREGATE (sym->type))
 				ival = initAggregates (sym, sym->ival, NULL);
 			else
@@ -983,17 +1004,6 @@ pic14createInterruptVect (FILE * vFile)
 	}
 	
 	fprintf (vFile, "%s", iComments2);
-	fprintf (vFile, "; config word \n");
-	fprintf (vFile, "%s", iComments2);
-	if (getHasSecondConfigReg())
-	{
-		fprintf (vFile, "\t__config _CONFIG1, 0x%x\n", getConfigWord(0x2007));
-		fprintf (vFile, "\t__config _CONFIG2, 0x%x\n", getConfigWord(0x2008));
-	}
-	else
-		fprintf (vFile, "\t__config 0x%x\n", getConfigWord(0x2007));
-	
-	fprintf (vFile, "%s", iComments2);
 	fprintf (vFile, "; reset vector \n");
 	fprintf (vFile, "%s", iComments2);
 	fprintf (vFile, "STARTUP\t%s\n", CODE_NAME); // Lkr file should place section STARTUP at address 0x0
@@ -1289,6 +1299,9 @@ picglue ()
 	{
 		port->genAssemblerPreamble(asmFile);
 	}
+
+	/* Emit the __config directive */
+	pic14_emitConfigWord (asmFile);
 	
 	/* print the extern variables in this module */
 	pic14printExterns (asmFile);

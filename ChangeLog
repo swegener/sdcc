@@ -1,3 +1,17 @@
+2006-04-24 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (pic14_assignConfigWordValue): remember assignments to
+	    config word, "pic14_"-prefixed some extern functions
+	  (pic14_emitConfigWord): emit __config directive(s) if assignment to
+	    config word has been found
+	* src/pic/device.h: added prototypes
+	* src/pic/pcode.c: added "pic14_"-prefix where needed
+	* src/pic/ralloc.c (IS_CONFIG_ADDRESS,pic14_assignRegisters): cosmetic fixup
+	* src/pic/glue.c (pic14_constructAbsMap): handle assignments to config words,
+	  (pic14emitRegularMap): ignore config words,
+	  (pic14createInterruptVect): moved generating __config directives away
+	  (picglue): have __config directives emitted
+
 2006-04-24 Borut Razem <borut.razem AT siol.net>
 
 	* doc/Makefile: sync with nightly build makefile

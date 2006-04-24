@@ -732,11 +732,23 @@ void OptimizeRegUsage(set *fregs, int optimize_multi_uses, int optimize_level)
 		fprintf(stderr,"Reg: %s\n",reg->name);
 		*/
 		
+		/* Catch inconsistently set-up live ranges
+		 * (see tracker items #1469504 + #1474602)
+		 * FIXME: Actually we should rather fix the
+		 * computation of the liveranges instead...
+		 */
+		if (!reg || !reg->reglives.usedpFlows
+			|| !reg->reglives.assignedpFlows)
+		{
+		  //fprintf( stderr, "skipping reg w/o liveranges: %s\n", reg ? reg->name : "(unknown)");
+		  continue;
+		}
+
 		if(reg->type == REG_SFR || reg->type == REG_STK || reg->isPublic || reg->isExtern|| reg->isFixed) {
 			//fprintf(stderr,"skipping SFR: %s\n",reg->name);
 			continue;
 		}
-		
+
 		pcfl_used = setFirstItem(reg->reglives.usedpFlows);
 		pcfl_assigned = setFirstItem(reg->reglives.assignedpFlows);
 		
@@ -1672,7 +1684,7 @@ void pCodeRegOptimizeRegUsage(int level)
 
 #if 0
 	/* This is currently broken (need rewrite to correctly
-	 * hamdle arbitrary pCodeOps instead of registers only). */
+	 * handle arbitrary pCodeOps instead of registers only). */
 	if (!pic14_options.disable_df)
 		optimizeDataflow ();
 #endif

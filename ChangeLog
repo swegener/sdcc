@@ -1,3 +1,10 @@
+2006-04-24 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcoderegs.c (OptimizeRegUsage): do not optimize
+	    registers that have not been assigned proper liveranges,
+	    fixes #1469504 and #1474602,
+	  (pCodeRegOptimizeRegUsage): fixed typo in comment
+
 2006-04-24 Borut Razem <borut.razem AT siol.net>
 
 	* device/examples/main8051.c: deleted - it was removed from CVS

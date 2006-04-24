@@ -7,19 +7,19 @@
 #define type_{type}
 
 #if defined(PORT_HOST)
-#  include "../../../../../sdccconf.h"
+#  include "sdccconf.h"
 #  define mullong(a,b) mullong_wrapper(a,b)
 #  if defined(type_c) && !defined(WORDS_BIGENDIAN)
 #    define _SDCC_NO_ASM_LIB_FUNCS 1
 #    define near
 #    define long int
-#    include "../../../../../device/lib/_mullong.c"
+#    include "device/lib/_mullong.c"
 #  endif
 #else
 #  if defined(type_c)
 #    define _SDCC_NO_ASM_LIB_FUNCS 1
 #  endif
-#  include "../../../../../device/lib/_mullong.c"
+#  include "device/lib/_mullong.c"
 #  define mullong _mullong
 #endif
 

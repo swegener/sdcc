@@ -10,7 +10,7 @@ clean_local:
 
 clean: clean_local
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk clean; cd ..;\
+	  $(MAKE) -C $$pkg clean;\
 	done
 
 
@@ -22,7 +22,7 @@ distclean_local: clean_local
 
 distclean: distclean_local
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk distclean; cd ..;\
+	  $(MAKE) -C $$pkg distclean;\
 	done
 
 
@@ -30,7 +30,7 @@ distclean: distclean_local
 # -----------------------------------------
 mostlyclean: clean_local
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk mostlyclean; cd ..;\
+	  $(MAKE) -C $$pkg mostlyclean;\
 	done
 
 
@@ -39,7 +39,7 @@ mostlyclean: clean_local
 # -----------------------------------------------------------------------
 realclean: distclean_local
 	@for pkg in $(PKGS); do\
-	  cd $$pkg && $(MAKE) -f clean.mk realclean; cd ..;\
+	  $(MAKE) $$pkg realclean;\
 	done
 
 # End of gui.src/clean.mk

@@ -4,7 +4,7 @@ $Id$
 Current pic16 port status is: Development
 
 Some things may change without notification between port updates. The latest
-CVS snapshot is guarenteed to compile without problems, but does not
+SVN snapshot is guarenteed to compile without problems, but does not
 guarantee backwards compatibility.
 
 For any questions please ask the current port

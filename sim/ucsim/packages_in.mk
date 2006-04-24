@@ -38,3 +38,5 @@ endif
 
 PKGS		= cmd.src sim.src gui.src $(S51) $(SAVR) $(SZ80) $(XA) \
 		  $(SHC08) doc
+PKGS_ALL	= cmd.src sim.src gui.src s51.src avr.src z80.src xa.src \
+		  hc08.src doc

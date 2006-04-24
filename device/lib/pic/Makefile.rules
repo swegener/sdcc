@@ -13,41 +13,41 @@
 ###
 
 # update dependencies
-$(topsrcdir)/$(builddir)/%.d : %.c
+$(top_builddir)$(builddir)/%.d : %.c
 ifndef SILENT
-	@echo "[  CPP  ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+	@echo "[  CPP  ] ==> $(patsubst $(top_builddir)%,%,$@)"
 endif
-	$(Q)$(CPP) $(CPPFLAGS) -o "$@" "$<";
+	$(Q)$(CPP) $(CPPFLAGS) -o "$@" "$<"
 
 # assemble
-$(topsrcdir)/$(builddir)/%.o : %.S
+$(top_builddir)$(builddir)/%.o : %.S
 ifndef SILENT
-	@echo "[  AS   ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+	@echo "[  AS   ] ==> $(patsubst $(top_builddir)%,%,$@)"
 endif
-	$(Q)$(CPP) $(CPPFLAGS) -P -o "$*.Spp" "$<";
-	$(Q)$(AS) $(ASFLAGS) -o "$@" -c "$*.Spp";
-	$(Q)$(RM) "$*.Spp";
+	$(Q)$(CPP) $(CPPFLAGS) -P -o "$*.Spp" "$<"
+	$(Q)$(AS) $(ASFLAGS) -o "$@" -c "$*.Spp"
+	$(Q)$(RM) "$*.Spp"
 
 # compile
-$(topsrcdir)/$(builddir)/%.o : %.c
+$(top_builddir)$(builddir)/%.o : %.c
 ifndef SILENT
-	@echo "[  CC   ] ==> $(patsubst $(topsrcdir)/%,%,$@)";
+	@echo "[  CC   ] ==> $(patsubst $(top_builddir)%,%,$@)"
 endif
-	$(Q)$(CC) $(CFLAGS) -o "$@" -c "$<";
+	$(Q)$(CC) $(CFLAGS) -o "$@" -c "$<"
 
 # create library
 ifneq (,$(strip $(LIB_O)))
 %.lib : $(LIB_O)
 ifndef SILENT
-	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== $(patsubst $(topsrcdir)/$(builddir)/%,%,$^)";
+	@echo "[  LIB  ] $(patsubst $(top_builddir)%,%,$@) <== $(patsubst $(top_builddir)$(builddir)/%,%,$^)"
 endif
-	$(Q)$(RM) "$@"; $(LIB) $(LIBFLAGS) "$@" $^;
+	$(Q)$(RM) "$@"; $(LIB) $(LIBFLAGS) "$@" $^
 else
 %.lib : recurse
 ifndef SILENT
-	@echo "[  LIB  ] $(patsubst $(topsrcdir)/%,%,$@) <== **/*.o";
+	@echo "[  LIB  ] $(patsubst $(top_builddir)%,%,$@) <== **/*.o"
 endif
-	$(Q)$(RM) "$@"; LIB_O=`find "$(topsrcdir)/$(builddir)" -name "*.o"`; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O};
+	$(Q)$(RM) "$@"; LIB_O=`find "$(top_builddir)$(builddir)" -name "*.o"`; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O}
 endif
 
 .PHONY : recurse force
@@ -57,7 +57,7 @@ ifneq (,$(strip $(SUBDIRS)))
 recurse : force
 	$(Q)+for DIR in $(SUBDIRS) ; do \
 		$(GREP) "^$${ARCH}$$" "$${DIR}.ignore" &> /dev/null || ( \
-			[ -d "$(topsrcdir)/$(builddir)/$${DIR}" ] || $(MKDIR) "$(topsrcdir)/$(builddir)/$${DIR}"; \
+			$(MKDIR) "$(top_builddir)$(builddir)/$${DIR}"; \
 			$(MAKE) -C "$${DIR}" builddir="$(builddir)/$${DIR}" $(MAKECMDGOALS); \
 		) || exit 1; \
 	done

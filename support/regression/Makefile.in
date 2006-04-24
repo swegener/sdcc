@@ -15,8 +15,8 @@
 # one of the library files should cause all to re-run
 
 # Dependancies:
-#   * The sdcc-extra package, available from Subversion.
-#       o  svn co https://svn.sourceforge.net/svnroot/sdcc/trunk/sdcc-extra sdcc-extra
+#   * The sdcc-extra package, available from svn.
+#       o svn co https://svn.sourceforge.net/svnroot/sdcc/trunk/sdcc-extra
 #       o Provides the emulators
 #   * The gbdk-lib package from gbdk.
 #       o cvs -d cvs.gbdk.sourceforge.net:/cvsroot/gbdk co gbdk-lib
@@ -42,21 +42,27 @@
 
 CC = @CC@
 
+# support VPATH:
+VPATH        = @srcdir@
+srcdir       = @srcdir@
+top_srcdir   = @top_srcdir@
+top_builddir = @top_builddir@
+
 # All original tests live in TESTS_DIR and below
-TESTS_DIR = tests
+TESTS_DIR = $(srcdir)/tests
 TESTS_NAME = $(TESTS_DIR)
 # All suite results go in RESULTS_DIR
 RESULTS_DIR = results
 # All data relating to supported ports live in their own directory
 # under PORTS_DIR.
-PORTS_DIR = ports
+PORTS_DIR = $(srcdir)/ports
 
 # Itermediate data directories
 # Directory that generated cases and the related object code go.
 CASES_DIR = gen
 
 # Script that takes a source test suite and generates the iterations
-GENERATE_CASES = generate-cases.py
+GENERATE_CASES = $(srcdir)/generate-cases.py
 
 # Magically generate the list of configured ports to test.
 # Each directory under ports/ is used as a port name.  Each port is tested.
@@ -136,13 +142,12 @@ PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 # Each test generates a result log file
 PORT_RESULTS = $(ALL_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out)
 
-SDCC_DIR = ../..
-SDCC_EXTRA_DIR = ../../../sdcc-extra
-INC_DIR = $(SDCC_DIR)/device/include
+SDCC_EXTRA_DIR = $(top_builddir)../sdcc-extra
+INC_DIR = $(top_srcdir)/device/include
 
 # Defaults.  Override in spec.mk if required.
 # Path to SDCC
-SDCC = $(SDCC_DIR)/bin/sdcc
+SDCC = $(top_builddir)bin/sdcc
 # Base flags.
 SDCCFLAGS +=
 # Extension of object intermediate files
@@ -159,7 +164,7 @@ endif
 
 make_library: $(MAKE_LIBRARY)
 
-SDCCFLAGS += -Ifwk/include -Itests -I$(INC_DIR)
+SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests -I$(INC_DIR)
 
 # List of intermediate files to keep.  Pretty much keep everything as
 # disk space is free.
@@ -167,21 +172,21 @@ SDCCFLAGS += -Ifwk/include -Itests -I$(INC_DIR)
 
 # Rule to generate the iterations of a test suite off the soure suite.
 $(PORT_CASES_DIR)/%/iterations.stamp: $(TESTS_DIR)/%.c $(GENERATE_CASES)
-	echo Processing $<
-	rm -rf `dirname $@`
-	mkdir -p `dirname $@`
-	python $(GENERATE_CASES) $< `dirname $@` > /dev/null
+	echo Processing $(notdir $<)
+	rm -rf $(dir $@)
+	mkdir -p $(dir $@)
+	python $(GENERATE_CASES) $< $(dir $@) > /dev/null
 	touch $@
 
 # Rule linking the combined results log to all of the files in the
 # iteration directory.
 $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
-	$(MAKE) iterations PORT=$(PORT) CASES=`dirname $<`
+	$(MAKE) iterations PORT=$(PORT) CASES=$(dir $<)
 
 # Rule to summaries the results for one port after all of the tests
 # have been run.
 port-results: port-dirs $(PORT_RESULTS)
-	echo Summary for \'$(PORT)\': `cat $(PORT_RESULTS) | python collate-results.py`
+	echo Summary for \'$(PORT)\': `cat $(PORT_RESULTS) | python $(srcdir)/collate-results.py`
 	echo
 
 port-dirs:
@@ -194,11 +199,11 @@ test-port: port-results
 # test
 
 # List of all of the generated iteration source files.
-SUB_CASES = $(sort $(wildcard $(CASES)/*.c))
+SUB_CASES = $(sort $(wildcard $(CASES)*.c))
 # List of all the sub result logs generated from the iterations.
 SUB_RESULTS = $(SUB_CASES:%.c=%.out)
 # Overall target.  Concatenation of all of the sub results.
-RESULTS = $(CASES:$(CASES_DIR)/%$(DIREXT)=$(RESULTS_DIR)/%.out)
+RESULTS = $(CASES:$(CASES_DIR)/%/$(DIREXT)=$(RESULTS_DIR)/%.out)
 
 iterations: $(RESULTS)
 
@@ -206,7 +211,7 @@ iterations: $(RESULTS)
 $(RESULTS): $(SUB_RESULTS)
 	cat $(SUB_RESULTS) > $@
 
-# The remainder of the rules are in $PORT/spec.mak.  The port needs to
+# The remainder of the rules are in $PORT/spec.mk.  The port needs to
 # be able to turn an iterated test suite into a sub result, normally
 # by:
 #    1. Compile the required library files
@@ -220,5 +225,8 @@ $(RESULTS): $(SUB_RESULTS)
 # BeginGeneric rules
 
 clean:
-	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc fwk/lib/timeout fwk/lib/timeout.exe
+	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
 	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i; done
+
+distclean: clean
+	rm -f Makefile

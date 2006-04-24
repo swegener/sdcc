@@ -17,11 +17,12 @@ LEX		= @LEX@
 YACC		= @YACC@
 BISON_PLUS_PLUS	= @BISON_PLUS_PLUS@
 
-PRJDIR		= ..
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/sim.src -I$(PRJDIR)/gui.src
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
+		  -I$(top_srcdir)/sim.src -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
@@ -37,13 +38,14 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+VPATH           = @srcdir@
 
 OBJECTS		= cmdset.o command.o newcmd.o cmdutil.o syntax.o \
 		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o \
 		  cmduc.o cmdstat.o cmdmem.o \
 		  cmdpars.o cmdlex.o
 
-DEVEL		= $(shell ( bash -c "test -e $(PRJDIR)/devel && echo yes" ))
+DEVEL		= $(shell ( bash -c "test -e $(top_builddir)devel && echo yes" ))
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -83,11 +85,11 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: *.cc *.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) *.cc >Makefile.dep
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $^ >Makefile.dep
 
 include Makefile.dep
-include clean.mk
+include $(srcdir)/clean.mk
 
 cmdpars.cc: cmdpars.y
 
@@ -98,9 +100,9 @@ endif
 # My rules
 # --------
 
-cmdlib: $(PRJDIR)/libcmd.a
+cmdlib: $(top_builddir)libcmd.a
 
-$(PRJDIR)/libcmd.a: $(OBJECTS)
+$(top_builddir)libcmd.a: $(OBJECTS)
 	ar -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
@@ -127,8 +129,8 @@ endif
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of cmd.src/Makefile.in

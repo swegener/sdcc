@@ -13,7 +13,8 @@ CPP		= @CPP@
 INSTALL		= @INSTALL@
 STRIP           = @STRIP@
 
-PRJDIR		= ../..
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
 srcdir		= @srcdir@
 prefix		= @prefix@
@@ -29,7 +30,9 @@ infodir         = @info@
 
 EXEEXT          = @EXEEXT@
 
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR)
+VPATH           = @srcdir@
+
+CPPFLAGS	= @CPPFLAGS@ -I. -I$(srcdir)
 CFLAGS		= @CFLAGS@ -Wall
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
@@ -45,8 +48,8 @@ LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
 		  lkstore.o lknoice.o lkmem.o lkaomf51.o strcmpi.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
-ASHC08		= $(PRJDIR)/bin/as-hc08$(EXEEXT)
-ASLINK		= $(PRJDIR)/bin/link-hc08$(EXEEXT)
+ASHC08		= $(top_builddir)bin/as-hc08$(EXEEXT)
+ASLINK		= $(top_builddir)bin/link-hc08$(EXEEXT)
 
 transform       = @program_transform_name@
 
@@ -94,11 +97,14 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(ASSOURCES) $(LKSOURCES) *.h $(PRJDIR)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(ASSOURCES) $(LKSOURCES) >Makefile.dep
+Makefile.dep: $(ASSOURCES) $(LKSOURCES) $(srcdir)/*.h $(top_builddir)*.h $(top_srcdir)/*.h
+	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
-include Makefile.dep
-include clean.mk
+ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
+                                   clean distclean mostlyclean realclean)" ""
+  include Makefile.dep
+endif
+include $(srcdir)/clean.mk
 
 # My rules
 # --------
@@ -109,8 +115,8 @@ include clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-          $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+          $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
         fi
 
 # End of Makefile

@@ -42,7 +42,33 @@ AC_PROG_MAKE_SET
 
 # Checks for library functions.
 
-$CP pics.all pics.build
+$CP "$srcdir"/pics.all pics.build
 
-AC_CONFIG_FILES([Makefile.common])
+AC_CONFIG_FILES([Makefile
+                 Makefile.common
+                 debug/Makefile
+                 debug/gstack/Makefile
+                 libc/Makefile
+                 libc/ctype/Makefile
+                 libc/delay/Makefile
+                 libc/stdio/Makefile
+                 libc/stdlib/Makefile
+                 libc/string/Makefile
+                 libc/utils/Makefile
+                 libdev/Makefile
+                 libio/Makefile
+                 libio/adc/Makefile
+                 libio/i2c/Makefile
+                 libio/usart/Makefile
+                 libm/Makefile
+                 libsdcc/Makefile
+                 libsdcc/char/Makefile
+                 libsdcc/fixed16x16/Makefile
+                 libsdcc/float/Makefile
+                 libsdcc/gptr/Makefile
+                 libsdcc/int/Makefile
+                 libsdcc/long/Makefile
+                 libsdcc/lregs/Makefile
+                 startup/Makefile
+                 ])
 AC_OUTPUT

@@ -9,7 +9,8 @@ STARTYEAR	= 1997
 SHELL		= /bin/sh
 INSTALL		= @INSTALL@
 
-PRJDIR		= ..
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -22,6 +23,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+VPATH           = @srcdir@
 #docdir		= $(prefix)/share/doc/ucsim
 docdir		= @docdir@/ucsim
 
@@ -35,10 +37,10 @@ doc: checkconf
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	cp *.html $(DESTDIR)$(docdir)
-	cp *.gif $(DESTDIR)$(docdir)
-	cp *.jpg $(DESTDIR)$(docdir)
-	cp *.fig $(DESTDIR)$(docdir)
+	cp $(srcdir)/*.html $(DESTDIR)$(docdir)
+	cp $(srcdir)/*.gif $(DESTDIR)$(docdir)
+	cp $(srcdir)/*.jpg $(DESTDIR)$(docdir)
+	cp $(srcdir)/*.fig $(DESTDIR)$(docdir)
 
 
 # Deleting all the installed files
@@ -67,7 +69,7 @@ installdirs:
 
 # Creating dependencies
 # ---------------------
-include clean.mk
+include $(srcdir)/clean.mk
 
 # My rules
 # --------
@@ -75,8 +77,8 @@ include clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of s51.src/Makefile.in

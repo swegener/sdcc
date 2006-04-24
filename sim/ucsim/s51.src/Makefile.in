@@ -14,11 +14,13 @@ RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 STRIP		= @STRIP@
 
-PRJDIR		= ..
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src -I$(PRJDIR)/gui.src
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
+		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
+		  -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
@@ -29,7 +31,7 @@ SDCC		= sdcc
 SDCFLAGS	= --debug --stack-after-data --model-small
 SDCPPFLAGS	= 
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lguiucsim -lcmd -lsim
+LIBS		= @LIBS@ -L$(top_builddir) -lsim -lutil -lguiucsim -lcmd -lsim
 DL		= @DL@
 dl_ok		= @dl_ok@
 
@@ -44,6 +46,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+VPATH           = @srcdir@
 
 EXEEXT		= @EXEEXT@
 
@@ -102,11 +105,11 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: *.cc *.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) *.cc >Makefile.dep
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $^ >Makefile.dep
 
 include Makefile.dep
-include clean.mk
+include $(srcdir)/clean.mk
 
 #parser.cc: parser.y
 
@@ -118,25 +121,25 @@ include clean.mk
 
 s51.src: s51$(EXEEXT) shared_lib
 
-s51$(EXEEXT): $(OBJECTS) $(PRJDIR)/*.a
+s51$(EXEEXT): $(OBJECTS) $(top_builddir)*.a
 	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(PRJDIR)/s51.so
+shared_lib: $(top_builddir)s51.so
 else
 shared_lib:
-	@$(PRJDIR)/mkecho $(PRJDIR) "No 51 shared lib made."
-	@$(PRJDIR)/mkecho $(PRJDIR) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+	@$(top_srcdir)/mkecho $(top_builddir) "No 51 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
 endif
 
-$(PRJDIR)/s51.so: $(OBJECTS_SHARED)
+$(top_builddir)s51.so: $(OBJECTS_SHARED)
 	$(CXX) -shared $(OBJECTS_SHARED) -o $@
 
 otherlibs:
-	cd $(PRJDIR) && $(MAKE) libs
-	cd $(PRJDIR)/cmd.src && $(MAKE) all
-	cd $(PRJDIR)/sim.src && $(MAKE) all
-	$(MAKE) -C $(PRJDIR)/gui.src checkconf ucsim_lib
+	$(MAKE) -C $(top_builddir) libs
+	$(MAKE) -C $(top_builddir)cmd.src all
+	$(MAKE) -C $(top_builddir)sim.src all
+	$(MAKE) -C $(top_builddir)gui.src checkconf ucsim_lib
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) -c $< -o $@
@@ -148,8 +151,8 @@ otherlibs:
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of s51.src/Makefile.in

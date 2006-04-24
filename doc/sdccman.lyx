@@ -840,7 +840,7 @@ status Collapsed
 /
 \end_inset 
 
--disable-device-lib-build Disables automatically building device libraries
+-disable-device-lib Disables automatically building device libraries
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -855,6 +855,20 @@ status Collapsed
 \end_inset 
 
 -disable-packihx Disables building packihx
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-enable-doc Build pdf, html and txt files from the lyx sources
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1571,7 +1585,7 @@ status Collapsed
 /
 \end_inset 
 
--disable-device-lib-build
+-disable-device-lib
 \backslash 
 
 \newline 
@@ -3554,13 +3568,137 @@ sdcc_yyyymmdd_setup.exe
 
  and execute it.
  A windows typical installer will guide you through the installation process.
+\layout Subsection
+
+VPATH
+\begin_inset LatexCommand \index{VPATH}
+
+\end_inset 
+
+ feature
+\layout Standard
+
+SDCC supports the VPATH feature provided by configure and make.
+ It allows to separate the source and build trees.
+ Here's an example:
+\layout Standard
+
+
+\family typewriter 
+cd ~\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+# cd $HOME
+\layout Standard
+
+
+\family typewriter 
+tar -xzf sdcc.src.tar.gz\SpecialChar ~
+# extract source to directory sdcc
+\layout Standard
+
+
+\family typewriter 
+mkdir sdcc.build\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+# put output in sdcc.build
+\layout Standard
+
+
+\family typewriter 
+cd sdcc.build
+\layout Standard
+
+
+\family typewriter 
+../sdcc/configure\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+# configure is doing all the magic!
+\layout Standard
+
+
+\family typewriter 
+make
+\layout Standard
+\noindent 
+That's it! 
+\series bold 
+configure
+\series default 
+ will create the directory tree will all the necessary Makefiles in ~/sdcc.build.
+ It automagically computes the variables srcdir, top_srcdir and top_buildir
+ for each directory.
+ After running 
+\series bold 
+make
+\series default 
+ the generated files will be in ~/sdcc.build, while the source files stay
+ in ~/sdcc.
+\newline 
+This is not only usefull for building different binaries, e.g.
+ when cross compiling.
+ It also gives you a much better overview in the source tree when all the
+ generated files are not scattered between the source files.
+ And the best thing is: if you want to change a file you can leave the original
+ file untouched in the source directory.
+ Simply copy it to the build directory, edit it, enter `make clean`, `rm
+ Makefile.dep` and `make`.
+ 
+\series bold 
+make
+\series default 
+ will do the rest for you!
 \layout Section
 
 Building the Documentation
 \layout Standard
 
-If the necessary tools (LyX, LaTeX, LaTeX2HTML) are installed it is as easy
- as changing into the doc directory and typing 
+Add -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-enable-doc to the configure arguments to build the documentation together
+ with all the other stuff.
+ You will need several tools (LyX, LaTeX, LaTeX2HTML, pdflatex, dvipdf,
+ dvips and makeindex) to get the job done.
+ Another possibility is to change to the doc directory and to type 
 \family sans 
 \series bold 
 
@@ -3582,7 +3720,7 @@ x).
 
 \end_inset 
 
- as editor this is straightforward.
+ as editor is straightforward.
  Prebuilt documentation in html and pdf format is available from 
 \begin_inset LatexCommand \url{http://sdcc.sf.net/snap.php}
 

@@ -16,21 +16,21 @@
 ### $Id$
 ###
 
-include $(topsrcdir)/Makefile.common
+include $(top_builddir)Makefile.common
 
 SUBDIRS ?= 
 MKLIB	?= 
 
 # fallback: if builddir is not specified via the command line...
-builddir ?= build/$(patsubst $(shell cd $(topsrcdir); pwd)/%,%,$(CURDIR))
+builddir ?= build/$(patsubst $(shell cd $(top_builddir); pwd)/%,%,$(CURDIR))
 
-C_SRC	?= $(wildcard *.c)
-S_SRC	?= $(wildcard *.S)
-OBJS	?= $(addprefix $(topsrcdir)/$(builddir)/,$(C_SRC:.c=.o) $(S_SRC:.S=.o))
+C_SRC	?= $(notdir $(wildcard $(srcdir)/*.c))
+S_SRC	?= $(notdir $(wildcard $(srcdir)/*.S))
+OBJS	?= $(addprefix $(top_builddir)$(builddir)/,$(C_SRC:.c=.o) $(S_SRC:.S=.o))
 LIB_O	?= $(OBJS)
 
 ifneq (,$(strip $(MKLIB)))
-LIB_LIB = $(topsrcdir)/$(builddir)/$(MKLIB)
+LIB_LIB = $(top_builddir)$(builddir)/$(MKLIB)
 TARGETS ?= $(LIB_LIB)
 else
 LIB_LIB = 
@@ -44,11 +44,11 @@ all : install
 ifneq (,$(strip $(TARGETS)))
 # usually install $(LIB_LIB) or $(OBJS), race condition in "[ -d x ] || mkdir x"
 install : recurse $(OBJS) $(LIB_LIB)
-	@[ -d "$(topsrcdir)/$(installdir)" ] || ( $(MKDIR) "$(topsrcdir)/$(installdir)" || true );
+	@$(MKDIR) "$(top_builddir)$(installdir)"
 ifndef SILENT
-	@echo "[INSTALL] $(patsubst $(topsrcdir)/$(builddir)/%,%,$(TARGETS))";
+	@echo "[INSTALL] $(patsubst $(top_builddir)$(builddir)/%,%,$(TARGETS))";
 endif
-	$(Q)$(CP) $(TARGETS) "$(topsrcdir)/$(installdir)"
+	$(Q)$(CP) $(TARGETS) "$(top_builddir)$(installdir)"
 else
 # used in subdirs like libc/ctype whose files
 # are contained in a parent's library
@@ -63,11 +63,11 @@ clean : recurse
 	@-echo "dummy" > .dummy
 	$(Q)-$(RM) .dummy $(TARGETS)
 	@-echo "dummy" > .dummy
-	$(Q)-$(RM) .dummy $(addprefix $(topsrcdir)/$(installdir)/,$(notdir $(TARGETS)))
-	$(Q)-[ ! -d "$(topsrcdir)/$(builddir)" ] || $(RMDIR) "$(topsrcdir)/$(builddir)"
+	$(Q)-$(RM) .dummy $(addprefix $(top_builddir)$(installdir)/,$(notdir $(TARGETS)))
+	$(Q)-[ ! -d "$(top_builddir)$(builddir)" ] || $(RMDIR) "$(top_builddir)$(builddir)"
 
 clean-intermediate : recurse
 	@-echo "dummy" > .dummy
 	$(Q)-$(RM) .dummy $(foreach suf,p lst hex cod sym,$(OBJS:.o=.$(suf)))
 	
-include $(topsrcdir)/Makefile.rules
+include $(top_srcdir)/Makefile.rules

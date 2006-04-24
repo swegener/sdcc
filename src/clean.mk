@@ -1,5 +1,4 @@
-CLEANALLPORTS = avr ds390 izt mcs51 pic pic16 z80 xa51
-PRJDIR = ..
+CLEANALLPORTS = avr ds390 ds400 hc08 izt mcs51 pic pic16 z80 xa51
 
 # Deleting all files created by building the program
 # --------------------------------------------------
@@ -7,9 +6,11 @@ clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~ \#*
 	rm -f version.h
-	rm -f $(PRJDIR)/bin/sdcc$(EXEEXT) sdcc$(EXEEXT)
+	rm -f $(top_builddir)bin/sdcc$(EXEEXT) sdcc$(EXEEXT)
 	for port in $(CLEANALLPORTS) ; do\
-	  $(MAKE) -C $$port -f ../port-clean.mk clean ;\
+	  if [ -f $$port/Makefile ]; then\
+	    $(MAKE) -C $$port clean ;\
+	  fi\
 	done
 
 
@@ -17,6 +18,11 @@ clean:
 # -----------------------------------------------------------------
 distclean: clean
 	rm -f Makefile *.dep
+	for port in $(CLEANALLPORTS) ; do\
+	  if [ -f $$port/Makefile ]; then\
+	    $(MAKE) -C $$port distclean ;\
+	  fi\
+	done
 
 
 # Like clean but some files may still exist

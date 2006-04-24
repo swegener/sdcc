@@ -5,20 +5,20 @@
 #        PREBUILD - list of special files to build before deps.
 
 # Ports are always located in sdcc/src/<portname>
-PRJDIR = ../..
+
 # Output
 LIB = port.a
 # Include the sdcc/src directory
-INCLUDEFLAGS = -I..
+INCLUDEFLAGS = -I$(srcdir)/.. -I..
 
 # If the sources aren't specified, assume all in this directory.
 ifndef SOURCES
-SOURCES = $(wildcard *.c)
+SOURCES = $(notdir $(wildcard $(srcdir)/*.c))
 endif
 
 # If the peephole rules aren't specified, assume all.
 ifndef PEEPRULES
-PEEPDEFS = $(wildcard *.def)
+PEEPDEFS = $(notdir $(wildcard $(srcdir)/*.def))
 PEEPRULES = $(PEEPDEFS:.def=.rul)
 endif
 
@@ -26,7 +26,7 @@ PREBUILD += $(PEEPRULES)
 
 all: $(PREBUILD) dep $(LIB)
 
-include $(PRJDIR)/Makefile.common
+include $(top_builddir)Makefile.common
 
 $(LIB): $(OBJ)
 	rm -f $(LIB)
@@ -34,13 +34,16 @@ $(LIB): $(OBJ)
 	$(RANLIB) $(LIB)
 
 %.rul: %.def
-	$(AWK) -f ../SDCCpeeph.awk $< > $@
+	$(AWK) -f $(srcdir)/../SDCCpeeph.awk $< > $@
 
 dep: Makefile.dep
 
-Makefile.dep: $(PREBUILD) Makefile $(SOURCES) $(SPECIAL) *.h $(PRJDIR)/*.h $(PRJDIR)/src/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(SOURCES) >Makefile.dep
+Makefile.dep: $(PREBUILD) Makefile $(SOURCES) $(SPECIAL)
+	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
-include Makefile.dep
+# don't include Makefile.dep for the listed targets:
+ifeq "$(findstring $(MAKECMDGOALS),clean distclean)" ""
+  include Makefile.dep
+endif
 
-include ../port-clean.mk
+include $(srcdir)/../port-clean.mk

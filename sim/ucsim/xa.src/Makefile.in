@@ -14,18 +14,20 @@ RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 STRIP		= @STRIP@
 
-PRJDIR		= ..
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
 EXEEXT		= @EXEEXT@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/sim.src -I$(PRJDIR)/gui.src
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
+		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
+		  -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
-LIBS		= @LIBS@ -L$(PRJDIR) -lsim -lutil -lguiucsim -lcmd -lsim
+LIBS		= @LIBS@ -L$(top_builddir) -lsim -lutil -lguiucsim -lcmd -lsim
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -38,6 +40,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+VPATH           = @srcdir@
 
 OBJECTS         = sxa.o glob.o \
 		  inst.o \
@@ -88,11 +91,11 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: *.cc *.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) *.cc >Makefile.dep
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $^ >Makefile.dep
 
 include Makefile.dep
-include clean.mk
+include $(srcdir)/clean.mk
 
 # My rules
 # --------
@@ -100,12 +103,12 @@ include clean.mk
 
 xa.src: sxa$(EXEEXT)
 
-sxa$(EXEEXT): $(OBJECTS) $(PRJDIR)/*.a
+sxa$(EXEEXT): $(OBJECTS) $(top_builddir)*.a
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 otherlibs:
-	cd $(PRJDIR)/cmd.src && $(MAKE) all
-	cd $(PRJDIR)/sim.src && $(MAKE) all
+	$(MAKE) -C $(top_builddir)cmd.src all
+	$(MAKE) -C $(top_builddir)sim.src all
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
@@ -117,8 +120,8 @@ otherlibs:
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of xa.src/Makefile.in

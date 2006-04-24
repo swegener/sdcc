@@ -1,97 +1,66 @@
-#
-#
-#
+VPATH        = @srcdir@
+srcdir       = @srcdir@
+top_builddir = @top_builddir@
+top_srcdir   = @top_srcdir@
 
-VERSION         = @VERSION@
-VERSIONHI       = @VERSIONHI@
-VERSIONLO       = @VERSIONLO@
-VERSIONP        = @VERSIONP@
+include $(top_builddir)Makefile.common
 
-SHELL		= /bin/sh
-CC		= @CC@
-CPP		= @CPP@
-INSTALL		= @INSTALL@
+OBJDIR	= obj/$(EXT)
 
-PRJDIR		= ../..
+SDC	= .
 
-srcdir		= @srcdir@
-prefix		= @prefix@
-exec_prefix     = @exec_prefix@
-bindir          = @bindir@
-libdir          = @libdir@
-datadir         = @datadir@
-includedir      = @include@
-mandir          = @mandir@
-man1dir         = $(mandir)/man1
-man2dir         = $(mandir)/man2
-infodir         = @infodir@
+SLIBSRC	= NewAlloc.c
 
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR)
-CFLAGS		= @CFLAGS@ -Wall -DINDEXLIB -DMLH_MAP -DUNIX -DSDK -funsigned-char -ggdb
-M_OR_MM		= @M_OR_MM@
-LDFLAGS		= @LDFLAGS@ -lm
+SRC	= asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
+	  assubr.c assym.c z80adr.c z80ext.c z80mch.c z80pst.c
 
-ASOBJECTS	= asdata.o asexpr.o aslex.o aslist.o asmain.o asout.o \
-		  assubr.o assym.o z80adr.o z80ext.o z80mch.o z80pst.o	
-ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
+OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
+SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o) 
 
-ASXZ80		= $(PRJDIR)/bin/as-z80
+BINS	= $(BUILDDIR)/as$(EXT)$(EXEEXT)
 
-# Compiling entire program or any subproject
-# ------------------------------------------
-all: checkconf $(ASXZ80)
+CFLAGS	+= $(CPPFLAGS) $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
+CFLAGS	+= -funsigned-char
+CFLAGS	+= -I$(SLIB) 
 
-$(ASXZ80): $(ASOBJECTS)
-	$(CC) $(CFLAGS) -o $@ $(ASOBJECTS) $(LDFLAGS)
+LDFLAGS += -lm $(EXTRALIBS)
 
-# Compiling and installing everything and runing test
-# ---------------------------------------------------
-install: all installdirs
-	$(INSTALL) $(ASXZ80) $(DESTDIR)$(bindir)/as-z80
+all:	dep $(BINS)
 
-# Deleting all the installed files
-# --------------------------------
-uninstall:
-	rm -f $(DESTDIR)$(bindir)/as-z80
-
-
-# Performing self-test
-# --------------------
-check:
-
-
-# Performing installation test
-# ----------------------------
-installcheck:
-
-
-# Creating installation directories
-# ---------------------------------
-installdirs:
-	$(INSTALL) -d $(DESTDIR)$(bindir)
-
-
-# Creating dependencies
-# ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(ASSOURCES) *.h $(PRJDIR)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(ASSOURCES) >Makefile.dep
+Makefile.dep: $(SRC) $(srcdir)/*.h
+	$(CPP) $(CPPFLAGS) $(M_OR_MM) $^ > Makefile.dep
 
-include Makefile.dep
-include clean.mk
+ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
+                                   clean distclean mostlyclean realclean)" ""
+  include Makefile.dep
+endif
 
-# My rules
-# --------
-.c.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+# We need a '.stamp'-file in $(OBJDIR), because the time stamp
+# of $(OBJDIR) itself is always updated, when a file in $(OBJDIR)
+# is updated. A rule like
+#	$(OBJDIR)/anyfile: $(OBJDIR)
+# will always force a remake (at least on Linux ext2).
+
+$(OBJDIR)/.stamp:
+	mkdir -p $(OBJDIR)
+	touch $(OBJDIR)/.stamp
+
+$(BINS): $(OBJS) $(SLIBOBJS)
+	$(CC) -o $(BINS) $(OBJS) $(SLIBOBJS) $(LDFLAGS)
 
 
-# Remaking configuration
-# ----------------------
-checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-          $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
-        fi
+$(OBJDIR)/%.o:	%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
 
-# End of Makefile
+$(OBJDIR)/%.o:	$(SLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+_as-z80:
+	$(MAKE) EXT=-z80$(E)
+
+_as-gbz80:
+	$(MAKE) EXT=-gbz80$(E) OPTS=-DGAMEBOY
+
+include $(srcdir)/clean.mk

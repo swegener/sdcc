@@ -28,7 +28,6 @@ mandir          = @mandir@
 man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
-srcdir          = @srcdir@
 docdir          = @docdir@
 DESTDIR         =
 
@@ -36,11 +35,23 @@ include_dir_suffix = @include_dir_suffix@
 lib_dir_suffix     = @lib_dir_suffix@
 
 # Modules to enable/disable
-OPT_ENABLE_UCSIM = @OPT_ENABLE_UCSIM@
-OPT_ENABLE_DEVICE_LIB_BUILD = @OPT_ENABLE_DEVICE_LIB_BUILD@
-OPT_ENABLE_PACKIHX = @OPT_ENABLE_PACKIHX@
+OPT_DISABLE_AVR   = @OPT_DISABLE_AVR@
+OPT_DISABLE_DS390 = @OPT_DISABLE_DS390@
+OPT_DISABLE_DS400 = @OPT_DISABLE_DS400@
+OPT_DISABLE_HC08  = @OPT_DISABLE_HC08@
+OPT_DISABLE_MCS51 = @OPT_DISABLE_MCS51@
+OPT_DISABLE_PIC   = @OPT_DISABLE_PIC@
+OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
+OPT_DISABLE_XA51  = @OPT_DISABLE_XA51@
+OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
 
-SLIB			= $(PRJDIR)/support/Util
+OPT_DISABLE_UCSIM     = @OPT_DISABLE_UCSIM@
+OPT_DISABLE_DEVICE_LIB= @OPT_DISABLE_DEVICE_LIB@
+OPT_DISABLE_PACKIHX   = @OPT_DISABLE_PACKIHX@
+OPT_ENABLE_DOC        = @OPT_ENABLE_DOC@
+OPT_DISABLE_SDCPP     = @OPT_DISABLE_SDCPP@
+
+SLIB			= $(top_builddir)support/Util
 
 EXEEXT          = @EXEEXT@
 transform       = @program_transform_name@
@@ -48,7 +59,7 @@ transform       = @program_transform_name@
 # Flags
 
 DEFS           += $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS       += $(INCLUDEFLAGS) -I. -I$(PRJDIR) -I$(SLIB)
+CPPFLAGS       += $(INCLUDEFLAGS) -I. -I$(top_builddir) -I$(srcdir)/$(SLIB) -I$(srcdir)
 CFLAGS         += -Wall @CFLAGS@
 LDFLAGS        += @LDFLAGS@
 M_OR_MM         = @M_OR_MM@

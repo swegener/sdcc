@@ -13,10 +13,15 @@ CPP		= @CPP@
 INSTALL		= @INSTALL@
 STRIP           = @STRIP@
 
-PRJDIR		= ../..
-SLIB		= $(PRJDIR)/support/Util
 
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+SLIB		= $(top_builddir)support/Util
+SDCCLIB		= $(top_builddir)src
+
+VPATH           = @srcdir@
 srcdir		= @srcdir@
+
 prefix		= @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
@@ -29,7 +34,7 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 
 STD_INC		= @sdcc_include_dir@
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(PRJDIR) -I$(PRJDIR)/support -I$(SLIB)
+CPPFLAGS	= @CPPFLAGS@ -I$(top_builddir) -I$(top_srcdir) -I$(srcdir)/$(SLIB)
 CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
@@ -39,14 +44,16 @@ EXEEXT          = @EXEEXT@
 LIBS            = @LIBS@
 LIBDIRS         =
 
-SLIBOBJS		= NewAlloc.o
+OBJECTS		= sdcdb.o symtab.o simi.o \
+		  break.o cmd.o
+SLIBOBJS	= NewAlloc.o SDCCerr.o
+SDCCOBJS	= SDCCset.o SDCChasht.o
 
-OBJECTS		= sdcdb.o symtab.o simi.o $(PRJDIR)/src/SDCCset.o \
-		  break.o cmd.o $(PRJDIR)/src/SDCChasht.o \
-		  $(PRJDIR)/support/Util/SDCCerr.o
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
+SLIBSOURCES	= $(patsubst %.o,$(SLIB)/%.c,$(SLIBOBJS))
+SDCCSOURCES	= $(patsubst %.o,$(SDCCLIB)/%.c,$(SDCCOBJS))
 
-TARGET		= $(PRJDIR)/bin/sdcdb$(EXEEXT)
+TARGET		= $(top_builddir)bin/sdcdb$(EXEEXT)
 
 
 # Compiling entire program or any subproject
@@ -58,8 +65,8 @@ all: checkconf $(TARGET)
 install: all installdirs
 	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
 	$(STRIP) $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
-	cp $(PRJDIR)/debugger/mcs51/sdcdb.el $(DESTDIR)$(bindir)/sdcdb.el
-	cp $(PRJDIR)/debugger/mcs51/sdcdbsrc.el $(DESTDIR)$(bindir)/sdcdbsrc.el
+	cp $(srcdir)/sdcdb.el $(DESTDIR)$(bindir)/sdcdb.el
+	cp $(srcdir)/sdcdbsrc.el $(DESTDIR)$(bindir)/sdcdbsrc.el
 
 
 # Deleting all the installed files
@@ -89,16 +96,19 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(SOURCES) *.h $(PRJDIR)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(SOURCES) >Makefile.dep
+Makefile.dep: $(SOURCES) $(SLIBSOURCES) $(SDCCSOURCES) $(srcdir)/*.h $(top_builddir)*.h $(top_srcdir)/*.h
+	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
-include Makefile.dep
-include clean.mk
+ifeq "$(findstring $(MAKECMDGOALS),uninstall installcheck installdirs checkconf \
+                                   clean distclean mostlyclean realclean)" ""
+  include Makefile.dep
+endif
+include $(srcdir)/clean.mk
 
 # My rules
 # --------
-$(TARGET): $(OBJECTS) $(SLIBOBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(SLIBOBJS) $(LIBDIRS) $(LIBS)
+$(TARGET): $(OBJECTS) $(SLIBOBJS) $(SDCCOBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(SLIBOBJS) $(SDCCOBJS) $(LIBDIRS) $(LIBS)
 
 .c.o:
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
@@ -106,11 +116,14 @@ $(TARGET): $(OBJECTS) $(SLIBOBJS)
 $(SLIBOBJS):%.o:$(SLIB)/%.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
+$(SDCCOBJS):%.o:$(SDCCLIB)/%.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-          $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+          $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
         fi
 
 # End of cpp/Makefile

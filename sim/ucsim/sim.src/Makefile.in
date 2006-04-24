@@ -13,11 +13,12 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 
-PRJDIR		= ..
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/cmd.src -I$(PRJDIR)/gui.src
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
+		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
@@ -33,6 +34,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+VPATH           = @srcdir@
 
 OBJECTS         = stack.o mem.o sim.o itsrc.o brk.o arg.o \
 		  guiobj.o uc.o hw.o
@@ -42,8 +44,8 @@ OBJECTS         = stack.o mem.o sim.o itsrc.o brk.o arg.o \
 # ------------------------------------------
 all: checkconf sim_lib
 
-test_mem_speed: $(PRJDIR)/lib*.a test_mem_speed.o
-	$(CXX) -o $@ test_mem_speed.o -L$(PRJDIR) -Wl,--start-group -lsim -lutil -lcmd -Wl,--end-group
+test_mem_speed: $(top_builddir)lib*.a test_mem_speed.o
+	$(CXX) -o $@ test_mem_speed.o -L$(top_builddir) -Wl,--start-group -lsim -lutil -lcmd -Wl,--end-group
 
 sim.src: all
 
@@ -79,11 +81,11 @@ installdirs:
 # ---------------------
 dep: main.dep
 
-Makefile.dep: *.cc *.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) *.cc >Makefile.dep
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $^ >Makefile.dep
 
 include Makefile.dep
-include clean.mk
+include $(srcdir)/clean.mk
 
 #parser.cc: parser.y
 
@@ -92,9 +94,9 @@ include clean.mk
 # My rules
 # --------
 
-sim_lib: $(PRJDIR)/libsim.a
+sim_lib: $(top_builddir)libsim.a
 
-$(PRJDIR)/libsim.a: $(OBJECTS)
+$(top_builddir)libsim.a: $(OBJECTS)
 	ar -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
@@ -115,8 +117,8 @@ $(PRJDIR)/libsim.a: $(OBJECTS)
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of sim.src/Makefile

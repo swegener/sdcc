@@ -1,6 +1,9 @@
 PRJDIR          = ..
+VPATH           = @srcdir@
+srcdir          = @srcdir@
+top_builddir    = @top_builddir@
 
-include $(PRJDIR)/Makefile.common
+include $(PRJDIR)/$(top_builddir)Makefile.common
 
 CFLAGS          += -Wall
 
@@ -8,7 +11,7 @@ OBJECTS 	= packihx.o
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
-TARGET		= $(PRJDIR)/bin/packihx$(EXEEXT)
+TARGET		= $(PRJDIR)/$(top_builddir)bin/packihx$(EXEEXT)
 
 all: $(TARGET)
 
@@ -50,4 +53,4 @@ $(TARGET): $(OBJECTS)
 
 checkconf:
 
-include clean.mk
+include $(srcdir)/clean.mk

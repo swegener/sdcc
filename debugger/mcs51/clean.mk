@@ -1,12 +1,9 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
-PRJDIR = ../..
-
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(PRJDIR)/bin/sdcdb$(EXEEXT) \
-	$(PRJDIR)/support/Util/SDCCerr.o
+	rm -f $(top_builddir)bin/sdcdb$(EXEEXT)
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

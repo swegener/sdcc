@@ -8,7 +8,7 @@ normal :
 	sdcc -mds390 --model-large test390.c
 
 clean:
-	rm mon.ihx *.lst *.rel *.rst *.sym *.cdb *.map *.ihx *.lnk *.asm
+	rm -f mon.ihx *.lst *.rel *.rst *.sym *.cdb *.map *.ihx *.lnk *.asm
 
 sim:
 	./s51 -t DS390F -Sout=test.lst test390.ihx

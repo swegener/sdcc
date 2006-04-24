@@ -3,45 +3,47 @@
 
 # path to uCsim
 # path to uCsim
-SZ80A = $(SDCC_DIR)/sim/ucsim/z80.src/sz80
-SZ80B = $(SDCC_DIR)/bin/sz80
+SZ80A = $(top_builddir)sim/ucsim/z80.src/sz80
+SZ80B = $(top_builddir)bin/sz80
 
 UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
 
-SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT=
+SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT= -I$(top_srcdir)
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
 LINKFLAGS = --nostdlib
 LINKFLAGS += z80.lib
-LIBDIR = $(SDCC_DIR)/device/lib/build/z80
+LIBDIR = $(top_builddir)device/lib/build/z80
 
 #OBJEXT = .o
 EXEEXT = .ihx
 
-EXTRAS = $(PORTS_DIR)/$(PORT)/testfwk$(OBJEXT) $(PORTS_DIR)/$(PORT)/support$(OBJEXT)
+EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to link into .ihx
 %.ihx: %.c $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
-%$(OBJEXT): %.asm
-	$(SDCC_DIR)/bin/as-z80 -plosgff $@ $<
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
+	$(top_builddir)bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-$(PORTS_DIR)/$(PORT)/%$(OBJEXT): fwk/lib/%.c
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 # run simulator with 10 seconds timeout
-%.out: %$(EXEEXT) fwk/lib/timeout
-	mkdir -p `dirname $@`
-	-fwk/lib/timeout 10 $(UCZ80) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
+%.out: %$(EXEEXT) $(CASES_DIR)/timeout
+	mkdir -p $(dir $@)
+	-$(CASES_DIR)/timeout 10 $(UCZ80) $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	python get_ticks.py < $@ >> $@
+	python $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
 
-fwk/lib/timeout: fwk/lib/timeout.c
+$(CASES_DIR)/timeout: fwk/lib/timeout.c
+	$(CC) $< -o $@
 
 _clean:
-	rm -f ports/$(PORT)/testfwk.asm ports/$(PORT)/*.lst ports/$(PORT)/*.o ports/$(PORT)/*.sym
-

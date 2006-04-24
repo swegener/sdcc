@@ -1,3 +1,38 @@
+2006-04-24 Bernhard Held <bernhard AT bernhardheld.de>
+
+	Enabled VPATH feature: changed nearly all Makefiles (149 files).
+	See sdccman.lyx '2.4.10 VPATH feature' about how to use it.
+
+	One basic decision: e.g. src/clean.mk includes further files. In order
+	to make this work there are two solutions:
+	- rename another dozen clean.mk to clean_in.mk, add srcdir to them and
+	  run configure on them. This way they can use
+	  'include $(srcdir)/port-clean.mk'
+	- always include clean.mk by the Makefile at the same level. To avoid
+	  that `make clean` tries to include and build Makefile.dep the
+	  MAKECMDGOALS are examined (see e.g. src/Makefile.in). This has been
+	  implemented, because now even `make uninstall` doesn't create
+	  Makefile.in. clean.mk could be eliminated by pasting it in
+	  Makefile.in.
+
+	* debugger/mcs51/Makefile.in: build own objects from library sources
+	(SLIB, SDCC) in current directory
+
+	* configure, configure.in: renamed --disable-device-lib-build in 
+	--disable-device-lib; added --enable-doc, the required tools are
+	searched by configure; added result message; the toolchain for the
+	belonging ports are now only built, if the port is enabled.
+
+	* support/regression/*: all output is written in directory gen, because
+	the fwk and ports directories don't livet in the build tree using vpath
+
+	* doc/sdccman.lyx: renamed --disable-device-lib-build to
+	--disable-device-lib, added --enable-doc, added section VPATH
+
+	* sim/ucsim/configure.in,
+	* sim/ucsim/configure.in: hc08 couldn't be disabled, now hc08 and
+	z80 are enabled by default
+
 2006-04-24 Raphael Neider <rneider AT web.de>
 
 	* src/pic/device.c (pic14_assignConfigWordValue): remember assignments to

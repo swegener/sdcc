@@ -12,7 +12,8 @@ CPP             = @CPP@
 INSTALL         = @INSTALL@
 CP              = @CP@
 
-PRJDIR          = ..
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -24,13 +25,14 @@ mandir          = @mandir@
 man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
+VPATH           = @srcdir@
 srcdir          = @srcdir@
 
 include_dir_suffix = @include_dir_suffix@
 
 sdcc_includedir    = $(DESTDIR)$(datadir)/$(include_dir_suffix)
 
-CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR)
+CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir)
 
 
 # Compiling entire program or any subproject
@@ -40,23 +42,26 @@ all:
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(CP) -r asm *.h $(sdcc_includedir)
-	if [ "`grep mcs51 ../../ports.build`" = mcs51 ]; then \
-		$(CP) mcs51/*.h $(sdcc_includedir)/mcs51 ; \
+	$(CP) -r $(srcdir)/asm $(srcdir)/*.h $(sdcc_includedir)
+	if [ "`grep mcs51 $(top_builddir)ports.build`" = mcs51 ]; then \
+		$(CP) $(srcdir)/mcs51/*.h $(sdcc_includedir)/mcs51 ; \
 	fi
-	if [ "`grep '^pic$$' ../../ports.build`" = pic ]; then \
-		$(CP) pic/*.h pic/*.inc pic/*.txt $(sdcc_includedir)/pic ; \
+	if [ "`grep '^pic$$' $(top_builddir)ports.build`" = pic ]; then \
+		$(CP) $(srcdir)/pic/*.h $(sdcc_includedir)/pic ; \
+		$(CP) $(srcdir)/pic/pic14devices.txt $(sdcc_includedir)/pic ; \
 	fi
-	if [ "`grep pic16 ../../ports.build`" = pic16 ]; then \
-		$(CP) pic16/*.h $(sdcc_includedir)/pic16 ; \
+	if [ "`grep pic16 $(top_builddir)ports.build`" = pic16 ]; then \
+		$(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16 ; \
 	fi
-	if [ "`grep z80 ../../ports.build`" = z80 ]; then \
-		$(CP) z80/*.h $(sdcc_includedir)/z80 ; \
+	if [ "`grep z80 $(top_builddir)ports.build`" = z80 ]; then \
+		$(CP) $(srcdir)/z80/*.h $(sdcc_includedir)/z80 ; \
 	fi
-	if [ "`grep hc08 ../../ports.build`" = hc08 ]; then \
-		$(CP) hc08/*.h $(sdcc_includedir)/hc08 ; \
+	if [ "`grep hc08 $(top_builddir)ports.build`" = hc08 ]; then \
+		$(CP) $(srcdir)/hc08/*.h $(sdcc_includedir)/hc08 ; \
 	fi
 	rm -rf `find $(sdcc_includedir) -type d -name '.svn'`
+	# some files in CVS are executable :-(
+	find $(sdcc_includedir) -type f -exec chmod 644 {} \;
 
 
 # Deleting all the installed files
@@ -94,7 +99,7 @@ dep: #Makefile.dep
 #	$(CPP) $(CPPFLAGS) $(M_OR_MM) *.c >main.dep
 
 #include Makefile.dep
-include clean.mk
+include $(srcdir)/clean.mk
 
 # My rules
 # --------
@@ -103,8 +108,8 @@ include clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" \
+	@if [ -f $(top_builddir)devel ]; then\
+	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" \
 	  freshconf;\
 	fi
 

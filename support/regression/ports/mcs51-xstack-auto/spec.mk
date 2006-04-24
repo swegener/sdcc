@@ -4,15 +4,16 @@
 
 include $(PORTS_DIR)/mcs51/spec.mk
 
-LIBSRCDIR = ../../device/lib
-LIBDIR    = gen/$(PORT)/lib
+LIBSRCDIR   = $(top_srcdir)/device/lib
+LIBBUILDDIR = $(top_builddir)device/lib
+LIBDIR      = $(PORT_CASES_DIR)/lib
 
 LIBSDCCFLAGS+=--std-sdcc99 --stack-auto --xstack
 SDCCFLAGS   +=$(LIBSDCCFLAGS)
 
-# copy support.c
-$(PORTS_DIR)/$(PORT)/%.c: $(PORTS_DIR)/mcs51/%.c
-	cp $< $@
+# use C sources from mcs51
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51/%.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 SOURCES = _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
           _decdptr.c _divsint.c _divslong.c _divuint.c \
@@ -52,11 +53,11 @@ $(LIBDIR):
 	mkdir -p $(LIBDIR)
 
 $(LIBDIR)/%.rel: $(LIBSRCDIR)/%.c
-	-$(SDCC) -I../../device/include -I../../device/include/mcs51 $(LIBSDCCFLAGS) -c $< -o $@
+	-$(SDCC) -I$(top_srcdir)/device/include -I$(top_srcdir)/device/include/mcs51 $(LIBSDCCFLAGS) -c $< -o $@
 
 .PHONY: lib-files
 lib-files:
-	make -C $(LIBSRCDIR)/mcs51 all
-	cp $(LIBSRCDIR)/mcs51/*.rel $(LIBSRCDIR)/mcs51/mcs51.lib $(LIBDIR)
+	make -C $(LIBBUILDDIR)/mcs51 all
+	cp $(LIBBUILDDIR)/mcs51/*.rel $(LIBBUILDDIR)/mcs51/mcs51.lib $(LIBDIR)
 	echo $(MODULES) | tr ' ' '\n' > $(LIBDIR)/libsdcc.lib
 	touch $(LIBDIR)/libfloat.lib $(LIBDIR)/libint.lib $(LIBDIR)/liblong.lib

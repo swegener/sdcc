@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(PRJDIR)/link-z80 link-z80 
+	rm -f $(top_builddir)bin/link-z80 link-z80
 
 
 # Deleting all files created by configuring or building the program

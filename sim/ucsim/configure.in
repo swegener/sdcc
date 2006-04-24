@@ -6,8 +6,8 @@ AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h)
 AC_PROG_AWK
 
 AC_MSG_CHECKING(version of the package)
-if test -f .version; then
-  VERSION=`cat .version`
+if test -f ${srcdir}/.version; then
+  VERSION=`cat ${srcdir}/.version`
   AC_MSG_RESULT($VERSION)
 else
   VERSION="0.0.0"
@@ -60,13 +60,13 @@ if test $enable_avr != "no"; then
 fi,
 enable_avr="yes")
 AC_ARG_ENABLE(z80,
-[  --enable-z80            compile simulator for Z80],
+[  --disable-z80           do not compile simulator for Z80],
 if test $enable_z80 != "no"; then
     enable_z80="yes"
 fi,
-enable_z80="no")
+enable_z80="yes")
 AC_ARG_ENABLE(hc08,
-[  --enable-hc08           compile simulator for hc08],
+[  --disable-hc08          do not compile simulator for hc08],
 if test $enable_hc08 != "no"; then
     enable_hc08="yes"
 fi,
@@ -201,19 +201,43 @@ dl_ok="no"
 DL="")
 AC_SUBST(dl_ok)
 AC_SUBST(DL)
+
+#AC_CHECK_LIB(panel,panel_above,
+#panel_ok="yes"
+#curses_ok="yes"
+#CURSES_LIBS="-lpanel -lcurses"
+#,
+#panel_ok="no"
+#AC_CHECK_LIB(curses,nl,
+#curses_ok="yes"
+#CURSES_LIBS="-lcurses"
+#,
+#curses_ok="no")
+#,
+#-lcurses)
+
 AC_CHECK_LIB(panel,panel_above,
 panel_ok="yes"
 curses_ok="yes"
-CURSES_LIBS="-lpanel -lcurses"
-,
+CURSES_LIBS="-lpanel",
 panel_ok="no"
-AC_CHECK_LIB(curses,nl,
-curses_ok="yes"
-CURSES_LIBS="-lcurses"
-,
-ncurses_ok="no")
-,
--lcurses)
+curses_ok="no"
+)
+
+if test $curses_ok != yes; then
+  AC_CHECK_LIB(curses,nl,
+  curses_ok="yes"
+  CURSES_LIBS="-lcurses",
+  curses_ok="no")
+fi
+
+if test $curses_ok != yes; then
+  AC_CHECK_LIB(ncurses,nl,
+  curses_ok="yes"
+  CURSES_LIBS="-lncurses",
+  curses_ok="no")
+fi
+
 AC_SUBST(panel_ok)
 AC_SUBST(curses_ok)
 AC_SUBST(CURSES_LIBS)
@@ -491,7 +515,8 @@ AC_DEFINE_UNQUOTED(_M_, "${M}")
 # Generating output files
 # ===========================================================================
 
-AC_OUTPUT(main.mk:main_in.mk
+AC_OUTPUT(Makefile
+main.mk:main_in.mk
 packages.mk:packages_in.mk
 sim.src/Makefile
 cmd.src/Makefile

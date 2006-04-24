@@ -23,8 +23,9 @@
 #Boston MA 02111-1307, USA.
 
 EXEEXT = @EXEEXT@
-PRJDIR = ../..
-TARGET = $(PRJDIR)/bin/sdcpp$(EXEEXT)
+TARGET = ../../bin/sdcpp$(EXEEXT)
+
+VPATH  = @srcdir@
 
 # This is the default target.
 all: $(TARGET)
@@ -93,7 +94,7 @@ exeext = @host_exeext@
 transform       = @program_transform_name@
 
 # Top build directory, relative to here.
-top_builddir = .
+top_builddir = @top_builddir@
 
 # Whether we were configured with NLS.
 USE_NLS = @USE_NLS@
@@ -119,7 +120,7 @@ clean:
 
 distclean: clean
 	-rm -f auto-host.h auto-build.h cstamp-h Makefile
-	-rm -f config.status config.run config.cache config.bak config.log *~
+	-rm -f configargs.h config.status config.run config.cache config.bak config.log *~
 
 # This tells GNU Make version 3 not to put all variables in the environment.
 .NOEXPORT:
@@ -145,7 +146,7 @@ SYSTEM_H = system.h hwint.h
 #@build_overrides@
 #
 
-INCLUDES = -I$(srcdir) -I$(LIBIBERTY_DIR)
+INCLUDES = -I$(srcdir) -I$(LIBIBERTY_DIR) -I.
 
 # Always use -I$(srcdir)/config when compiling.
 .c.o:
@@ -223,6 +224,7 @@ MY_LIBIBERTY_BITS = safe-ctype.o obstack.o splay-tree.o \
 		    lbasename.o
 
 $(TARGET): cppmain.o intl.o $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS) 
+	mkdir -p $(dir $@)
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ cppmain.o \
 	$(MY_LIBIBERTY_BITS) libcpp.a $(LIBS)
 

@@ -271,7 +271,7 @@ PACKAGE_VERSION=
 PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
-ac_unique_file="Makefile"
+ac_unique_file="Makefile.in"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -312,9 +312,9 @@ ac_includes_default="\
 ac_subdirs_all="$ac_subdirs_all support/cpp2"
 ac_subdirs_all="$ac_subdirs_all packihx"
 ac_subdirs_all="$ac_subdirs_all sim/ucsim"
-ac_subdirs_all="$ac_subdirs_all device/lib/pic16"
 ac_subdirs_all="$ac_subdirs_all device/lib/pic"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP LYX LATEX LATEX2HTML PDFLATEX DVIPDF EGREP M_OR_MM sdccconf_h_dir_separator include_dir_suffix lib_dir_suffix docdir OPT_ENABLE_UCSIM OPT_ENABLE_DEVICE_LIB_BUILD OPT_ENABLE_PACKIHX subdirs LIBOBJS LTLIBOBJS'
+ac_subdirs_all="$ac_subdirs_all device/lib/pic16"
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP EGREP M_OR_MM sdccconf_h_dir_separator include_dir_suffix lib_dir_suffix docdir OPT_DISABLE_MCS51 OPT_DISABLE_GBZ80 OPT_DISABLE_Z80 OPT_DISABLE_AVR OPT_DISABLE_DS390 OPT_DISABLE_DS400 OPT_DISABLE_PIC OPT_DISABLE_PIC16 OPT_DISABLE_XA51 OPT_DISABLE_HC08 OPT_DISABLE_UCSIM OPT_DISABLE_DEVICE_LIB OPT_DISABLE_PACKIHX OPT_DISABLE_SDCPP OPT_ENABLE_DOC LYX LATEX LATEX2HTML PDFLATEX DVIPDF DVIPS MAKEINDEX OPT_ENABLE_LIBGC subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -881,13 +881,14 @@ Optional Features:
   --disable-ds390-port    Excludes the DS390 port
   --disable-ds400-port    Excludes the DS400 port
   --disable-pic-port      Excludes the PIC port
-  --disable-pic16-port    Excludes the PIC port
+  --disable-pic16-port    Excludes the PIC16 port
   --disable-xa51-port     Excludes the XA51 port
   --disable-hc08-port     Excludes the HC08 port
   --disable-ucsim         Disables configuring and building of ucsim
-  --disable-device-lib-build
-                          Disables automatically building device libraries
+  --disable-device-lib    Disables building device libraries
   --disable-packihx       Disables building packihx
+  --disable-sdcpp         Disables building sdcpp
+  --enable-doc            Enables building the documentation
   --enable-libgc          Use the Bohem memory allocator. Lower runtime
                           footprint.
 
@@ -1394,8 +1395,8 @@ done
 
 echo "$as_me:$LINENO: checking version of the package" >&5
 echo $ECHO_N "checking version of the package... $ECHO_C" >&6
-if test -f .version; then
-  VERSION=`cat .version`
+if test -f ${srcdir}/.version; then
+  VERSION=`cat ${srcdir}/.version`
 elif test -f ../.version; then
   VERSION=`cat ../.version`
 else
@@ -3612,187 +3613,6 @@ echo "${ECHO_T}no" >&6
 fi
 
 
-# Extract the first word of "lyx", so it can be a program name with args.
-set dummy lyx; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_LYX+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$LYX"; then
-  ac_cv_prog_LYX="$LYX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_LYX="lyx"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_prog_LYX" && ac_cv_prog_LYX=":"
-fi
-fi
-LYX=$ac_cv_prog_LYX
-if test -n "$LYX"; then
-  echo "$as_me:$LINENO: result: $LYX" >&5
-echo "${ECHO_T}$LYX" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-# Extract the first word of "latex", so it can be a program name with args.
-set dummy latex; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_LATEX+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$LATEX"; then
-  ac_cv_prog_LATEX="$LATEX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_LATEX="latex"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_prog_LATEX" && ac_cv_prog_LATEX=":"
-fi
-fi
-LATEX=$ac_cv_prog_LATEX
-if test -n "$LATEX"; then
-  echo "$as_me:$LINENO: result: $LATEX" >&5
-echo "${ECHO_T}$LATEX" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-# Extract the first word of "latex2html", so it can be a program name with args.
-set dummy latex2html; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_LATEX2HTML+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$LATEX2HTML"; then
-  ac_cv_prog_LATEX2HTML="$LATEX2HTML" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_LATEX2HTML="latex2html"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_prog_LATEX2HTML" && ac_cv_prog_LATEX2HTML=":"
-fi
-fi
-LATEX2HTML=$ac_cv_prog_LATEX2HTML
-if test -n "$LATEX2HTML"; then
-  echo "$as_me:$LINENO: result: $LATEX2HTML" >&5
-echo "${ECHO_T}$LATEX2HTML" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-# Extract the first word of "pdflatex", so it can be a program name with args.
-set dummy pdflatex; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_PDFLATEX+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$PDFLATEX"; then
-  ac_cv_prog_PDFLATEX="$PDFLATEX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_PDFLATEX="pdflatex"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_prog_PDFLATEX" && ac_cv_prog_PDFLATEX=":"
-fi
-fi
-PDFLATEX=$ac_cv_prog_PDFLATEX
-if test -n "$PDFLATEX"; then
-  echo "$as_me:$LINENO: result: $PDFLATEX" >&5
-echo "${ECHO_T}$PDFLATEX" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-# Extract the first word of "dvipdf", so it can be a program name with args.
-set dummy dvipdf; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_DVIPDF+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$DVIPDF"; then
-  ac_cv_prog_DVIPDF="$DVIPDF" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DVIPDF="dvipdf"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_prog_DVIPDF" && ac_cv_prog_DVIPDF=":"
-fi
-fi
-DVIPDF=$ac_cv_prog_DVIPDF
-if test -n "$DVIPDF"; then
-  echo "$as_me:$LINENO: result: $DVIPDF" >&5
-echo "${ECHO_T}$DVIPDF" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-
 
 
 if test "$YACC" = ":"; then
@@ -4590,7 +4410,7 @@ done
 # Macro definitions
 # ===========================================================================
 
-# DD_COPT macro checks if the compiler specified as the 1st parameter
+# adl_DD_COPT macro checks if the compiler specified as the 1st parameter
 # supports option specified as the 2nd parameter
 # For example: DD_CPORT(CXX, fPIC)
 
@@ -4603,7 +4423,7 @@ done
 #
 # Examples:
 #
-#  AC_EXPAND(prefix, "/usr/local", expanded_prefix)
+#  adl_EXPAND(prefix, "/usr/local", expanded_prefix)
 
 
 
@@ -4654,7 +4474,6 @@ done
 
 
 
-# AC_NORMALIZE_DEFINE_UNQUOTED(var, DEFINE, REFERENCE_STRING)
 
 
 
@@ -6756,7 +6575,7 @@ esac
 # The variables in the header are replaced by AC_*DEFINE*()
 # sdccconf_h_dir_separator contains a backslash.
 
-if test "${sdccconf_h_dir_separator}" = ""; then
+if test "x${sdccconf_h_dir_separator}" = "x"; then
     sdccconf_h_dir_separator="/"
 fi
 
@@ -6815,24 +6634,15 @@ _ACEOF
 
   ac_ndu=$expanded_prefix
   case ":$ac_ndu:" in
-# change empty paths to '.'
   ::) ac_ndu='.' ;;
-# strip trailing slashes
   :*[\\/]:) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   cat >>confdefs.h <<_ACEOF
@@ -6854,24 +6664,15 @@ _ACEOF
 
   ac_ndu=$expanded_exec_prefix
   case ":$ac_ndu:" in
-# change empty paths to '.'
   ::) ac_ndu='.' ;;
-# strip trailing slashes
   :*[\\/]:) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   cat >>confdefs.h <<_ACEOF
@@ -6893,24 +6694,15 @@ _ACEOF
 
   ac_ndu=$expanded_bindir
   case ":$ac_ndu:" in
-# change empty paths to '.'
   ::) ac_ndu='.' ;;
-# strip trailing slashes
   :*[\\/]:) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   cat >>confdefs.h <<_ACEOF
@@ -6932,24 +6724,15 @@ _ACEOF
 
   ac_ndu=$expanded_datadir
   case ":$ac_ndu:" in
-# change empty paths to '.'
   ::) ac_ndu='.' ;;
-# strip trailing slashes
   :*[\\/]:) ac_ndu=`echo "$ac_ndu" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) ac_ndu=`echo "[$]ac_ndu" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) ac_ndu=`echo "$ac_ndu" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   cat >>confdefs.h <<_ACEOF
@@ -6961,24 +6744,15 @@ _ACEOF
 # include/lib suffix
 norm_inc_dir_suffix=${include_dir_suffix}
 case ":$norm_inc_dir_suffix:" in
-# change empty paths to '.'
   ::) norm_inc_dir_suffix='.' ;;
-# strip trailing slashes
   :*[\\/]:) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) norm_inc_dir_suffix=`echo "[$]norm_inc_dir_suffix" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) norm_inc_dir_suffix=`echo "$norm_inc_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
 cat >>confdefs.h <<_ACEOF
@@ -6987,24 +6761,15 @@ _ACEOF
 
 norm_lib_dir_suffix=${lib_dir_suffix}
 case ":$norm_lib_dir_suffix:" in
-# change empty paths to '.'
   ::) norm_lib_dir_suffix='.' ;;
-# strip trailing slashes
   :*[\\/]:) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) norm_lib_dir_suffix=`echo "[$]norm_lib_dir_suffix" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) norm_lib_dir_suffix=`echo "$norm_lib_dir_suffix" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
 cat >>confdefs.h <<_ACEOF
@@ -7037,45 +6802,27 @@ _lcl_to=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
      echo "$_lcl_receval")`
   _lcl_notation="$_lcl_from$_lcl_to"
   case ":$_lcl_from:" in
-# change empty paths to '.'
   ::) _lcl_from='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case '/' in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   case ":$_lcl_to:" in
-# change empty paths to '.'
   ::) _lcl_to='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case '/' in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   _lcl_common_prefix=''
@@ -7104,47 +6851,29 @@ done
 _lcl_second_suffix=`expr "x$_lcl_to" : "x$_lcl_common_prefix/*\(.*\)"`
 _lcl_result_tmp="$_lcl_first_rel$_lcl_second_suffix"
   case ":$_lcl_result_tmp:" in
-# change empty paths to '.'
   ::) _lcl_result_tmp='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case "$_lcl_notation" in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   eval $_lcl_result_var='$_lcl_result_tmp'
 done
 case ":$bin2data_dir:" in
-# change empty paths to '.'
   ::) bin2data_dir='.' ;;
-# strip trailing slashes
   :*[\\/]:) bin2data_dir=`echo "$bin2data_dir" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) bin2data_dir=`echo "[$]bin2data_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) bin2data_dir=`echo "$bin2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) bin2data_dir=`echo "$bin2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) bin2data_dir=`echo "$bin2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
 cat >>confdefs.h <<_ACEOF
@@ -7176,45 +6905,27 @@ _lcl_to=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
      echo "$_lcl_receval")`
   _lcl_notation="$_lcl_from$_lcl_to"
   case ":$_lcl_from:" in
-# change empty paths to '.'
   ::) _lcl_from='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case '/' in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   case ":$_lcl_to:" in
-# change empty paths to '.'
   ::) _lcl_to='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case '/' in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   _lcl_common_prefix=''
@@ -7243,47 +6954,29 @@ done
 _lcl_second_suffix=`expr "x$_lcl_to" : "x$_lcl_common_prefix/*\(.*\)"`
 _lcl_result_tmp="$_lcl_first_rel$_lcl_second_suffix"
   case ":$_lcl_result_tmp:" in
-# change empty paths to '.'
   ::) _lcl_result_tmp='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case "$_lcl_notation" in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   eval $_lcl_result_var='$_lcl_result_tmp'
 done
 case ":$prefix2bin_dir:" in
-# change empty paths to '.'
   ::) prefix2bin_dir='.' ;;
-# strip trailing slashes
   :*[\\/]:) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) prefix2bin_dir=`echo "[$]prefix2bin_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) prefix2bin_dir=`echo "$prefix2bin_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
 cat >>confdefs.h <<_ACEOF
@@ -7315,45 +7008,27 @@ _lcl_to=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
      echo "$_lcl_receval")`
   _lcl_notation="$_lcl_from$_lcl_to"
   case ":$_lcl_from:" in
-# change empty paths to '.'
   ::) _lcl_from='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_from=`echo "$_lcl_from" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case '/' in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_from=`echo "[$]_lcl_from" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_from=`echo "$_lcl_from" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   case ":$_lcl_to:" in
-# change empty paths to '.'
   ::) _lcl_to='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_to=`echo "$_lcl_to" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case '/' in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_to=`echo "[$]_lcl_to" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_to=`echo "$_lcl_to" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   _lcl_common_prefix=''
@@ -7382,47 +7057,29 @@ done
 _lcl_second_suffix=`expr "x$_lcl_to" : "x$_lcl_common_prefix/*\(.*\)"`
 _lcl_result_tmp="$_lcl_first_rel$_lcl_second_suffix"
   case ":$_lcl_result_tmp:" in
-# change empty paths to '.'
   ::) _lcl_result_tmp='.' ;;
-# strip trailing slashes
   :*[\\/]:) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case "$_lcl_notation" in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) _lcl_result_tmp=`echo "[$]_lcl_result_tmp" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) _lcl_result_tmp=`echo "$_lcl_result_tmp" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
   eval $_lcl_result_var='$_lcl_result_tmp'
 done
 case ":$prefix2data_dir:" in
-# change empty paths to '.'
   ::) prefix2data_dir='.' ;;
-# strip trailing slashes
   :*[\\/]:) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,[\\/]*$,,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
 case $sdccconf_h_dir_separator in
-# if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) prefix2data_dir=`echo "[$]prefix2data_dir" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g' | sed 's,^[\\/],\\\\\\\\,'` ;;
+    *\\*) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
  *) prefix2data_dir=`echo "$prefix2data_dir" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
 esac
 if test "${prefix2data_dir}" = "."; then
@@ -7487,237 +7144,707 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+# Port selection helper
+# ===========================================================================
+# macro AC_DO_ENABLER()
+#   $1 used to access enable_$1, e.g. enable-doc
+#   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. DOC
+#   $3 help string
+
+
+# macro AC_DO_DISABLER()
+#   $1 used to access disable_$1, e.g. ucsim
+#   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. UCSIM
+#   $3 help string
+
+
+# macro AC_DO_PORT($1, $2, $3, $4)
+#   $1 used to access enable_$2_port, e.g. gbz80
+#   $2 port name in ports.all and ports.build, e.g. z80
+#   $3 OPT_DISABLE_$3, normally uppercase of $2, e.g. GBZ80
+#   $4 help string
+
+
 # Now handle the port selection
 # ===========================================================================
 rm -f ports.all ports.build
-# Check whether --enable-mcs51-port or --disable-mcs51-port was given.
+
+  # Check whether --enable-mcs51-port or --disable-mcs51-port was given.
 if test "${enable_mcs51_port+set}" = set; then
   enableval="$enable_mcs51_port"
 
 fi;
-echo mcs51 >>ports.all
-if test "$enable_mcs51_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_MCS51 1
+
+  if test "$enable_mcs51_port" = "no"; then
+    OPT_DISABLE_MCS51=1
+  else
+    enable_mcs51_port="yes"
+    OPT_DISABLE_MCS51=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_MCS51 $OPT_DISABLE_MCS51
 _ACEOF
 
-else
+
+
+  echo mcs51 >>ports.all
+  if test $OPT_DISABLE_MCS51 = 0; then
     echo mcs51 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_MCS51 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-gbz80-port or --disable-gbz80-port was given.
+  # Check whether --enable-gbz80-port or --disable-gbz80-port was given.
 if test "${enable_gbz80_port+set}" = set; then
   enableval="$enable_gbz80_port"
 
 fi;
-echo z80 >>ports.all
-if test "$enable_gbz80_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_GBZ80 1
+
+  if test "$enable_gbz80_port" = "no"; then
+    OPT_DISABLE_GBZ80=1
+  else
+    enable_gbz80_port="yes"
+    OPT_DISABLE_GBZ80=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_GBZ80 $OPT_DISABLE_GBZ80
 _ACEOF
 
-else
+
+
+  echo z80 >>ports.all
+  if test $OPT_DISABLE_GBZ80 = 0; then
     echo z80 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_GBZ80 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-z80-port or --disable-z80-port was given.
+  # Check whether --enable-z80-port or --disable-z80-port was given.
 if test "${enable_z80_port+set}" = set; then
   enableval="$enable_z80_port"
 
 fi;
-echo z80 >>ports.all
-if test "$enable_z80_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_Z80 1
+
+  if test "$enable_z80_port" = "no"; then
+    OPT_DISABLE_Z80=1
+  else
+    enable_z80_port="yes"
+    OPT_DISABLE_Z80=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_Z80 $OPT_DISABLE_Z80
 _ACEOF
 
-else
+
+
+  echo z80 >>ports.all
+  if test $OPT_DISABLE_Z80 = 0; then
     echo z80 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_Z80 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-avr-port or --disable-avr-port was given.
+  # Check whether --enable-avr-port or --disable-avr-port was given.
 if test "${enable_avr_port+set}" = set; then
   enableval="$enable_avr_port"
 
 fi;
-echo avr >>ports.all
-if test "$enable_avr_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_AVR 1
+
+  if test "$enable_avr_port" = "no"; then
+    OPT_DISABLE_AVR=1
+  else
+    enable_avr_port="yes"
+    OPT_DISABLE_AVR=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_AVR $OPT_DISABLE_AVR
 _ACEOF
 
-else
+
+
+  echo avr >>ports.all
+  if test $OPT_DISABLE_AVR = 0; then
     echo avr >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_AVR 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-ds390-port or --disable-ds390-port was given.
+  # Check whether --enable-ds390-port or --disable-ds390-port was given.
 if test "${enable_ds390_port+set}" = set; then
   enableval="$enable_ds390_port"
 
 fi;
-echo ds390 >>ports.all
-if test "$enable_ds390_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_DS390 1
+
+  if test "$enable_ds390_port" = "no"; then
+    OPT_DISABLE_DS390=1
+  else
+    enable_ds390_port="yes"
+    OPT_DISABLE_DS390=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_DS390 $OPT_DISABLE_DS390
 _ACEOF
 
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_TININative 1
-_ACEOF
 
-else
+
+  echo ds390 >>ports.all
+  if test $OPT_DISABLE_DS390 = 0; then
     echo ds390 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_DS390 0
+  fi
+
+cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_TININative $OPT_DISABLE_DS390
 _ACEOF
 
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_TININative 0
-_ACEOF
 
-fi
-
-# Check whether --enable-ds400-port or --disable-ds400-port was given.
+  # Check whether --enable-ds400-port or --disable-ds400-port was given.
 if test "${enable_ds400_port+set}" = set; then
   enableval="$enable_ds400_port"
 
 fi;
-echo ds400 >>ports.all
-if test "$enable_ds400_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_DS400 1
+
+  if test "$enable_ds400_port" = "no"; then
+    OPT_DISABLE_DS400=1
+  else
+    enable_ds400_port="yes"
+    OPT_DISABLE_DS400=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_DS400 $OPT_DISABLE_DS400
 _ACEOF
 
-else
+
+
+  echo ds400 >>ports.all
+  if test $OPT_DISABLE_DS400 = 0; then
     echo ds400 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_DS400 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-pic-port or --disable-pic-port was given.
+  # Check whether --enable-pic-port or --disable-pic-port was given.
 if test "${enable_pic_port+set}" = set; then
   enableval="$enable_pic_port"
 
 fi;
-echo pic >>ports.all
-if test "$enable_pic_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_PIC 1
+
+  if test "$enable_pic_port" = "no"; then
+    OPT_DISABLE_PIC=1
+  else
+    enable_pic_port="yes"
+    OPT_DISABLE_PIC=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_PIC $OPT_DISABLE_PIC
 _ACEOF
 
-else
+
+
+  echo pic >>ports.all
+  if test $OPT_DISABLE_PIC = 0; then
     echo pic >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_PIC 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-pic16-port or --disable-pic16-port was given.
+  # Check whether --enable-pic16-port or --disable-pic16-port was given.
 if test "${enable_pic16_port+set}" = set; then
   enableval="$enable_pic16_port"
 
 fi;
-echo pic16 >>ports.all
-if test "$enable_pic16_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_PIC16 1
+
+  if test "$enable_pic16_port" = "no"; then
+    OPT_DISABLE_PIC16=1
+  else
+    enable_pic16_port="yes"
+    OPT_DISABLE_PIC16=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_PIC16 $OPT_DISABLE_PIC16
 _ACEOF
 
-else
+
+
+  echo pic16 >>ports.all
+  if test $OPT_DISABLE_PIC16 = 0; then
     echo pic16 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_PIC16 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-xa51-port or --disable-xa51-port was given.
+  # Check whether --enable-xa51-port or --disable-xa51-port was given.
 if test "${enable_xa51_port+set}" = set; then
   enableval="$enable_xa51_port"
 
 fi;
-echo xa51 >>ports.all
-if test "$enable_xa51_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_XA51 1
+
+  if test "$enable_xa51_port" = "no"; then
+    OPT_DISABLE_XA51=1
+  else
+    enable_xa51_port="yes"
+    OPT_DISABLE_XA51=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_XA51 $OPT_DISABLE_XA51
 _ACEOF
 
-else
+
+
+  echo xa51 >>ports.all
+  if test $OPT_DISABLE_XA51 = 0; then
     echo xa51 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_XA51 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-hc08-port or --disable-hc08-port was given.
+  # Check whether --enable-hc08-port or --disable-hc08-port was given.
 if test "${enable_hc08_port+set}" = set; then
   enableval="$enable_hc08_port"
 
 fi;
-echo hc08 >>ports.all
-if test "$enable_hc08_port" = "no"; then
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_HC08 1
+
+  if test "$enable_hc08_port" = "no"; then
+    OPT_DISABLE_HC08=1
+  else
+    enable_hc08_port="yes"
+    OPT_DISABLE_HC08=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_HC08 $OPT_DISABLE_HC08
 _ACEOF
 
-else
+
+
+  echo hc08 >>ports.all
+  if test $OPT_DISABLE_HC08 = 0; then
     echo hc08 >>ports.build
-    cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_HC08 0
-_ACEOF
+  fi
 
-fi
 
-# Check whether --enable-ucsim or --disable-ucsim was given.
+
+  # Check whether --enable-ucsim or --disable-ucsim was given.
 if test "${enable_ucsim+set}" = set; then
   enableval="$enable_ucsim"
 
 fi;
-OPT_ENABLE_UCSIM=$enable_ucsim
+
+      arg1=`echo ucsim | sed s/-/_/`
+
+  if test "`eval echo \\$enable_$arg1`" = "no"; then
+    OPT_DISABLE_UCSIM=1
+  else
+    OPT_DISABLE_UCSIM=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_UCSIM $OPT_DISABLE_UCSIM
+_ACEOF
 
 
-# Check whether --enable-device-lib-build or --disable-device-lib-build was given.
-if test "${enable_device_lib_build+set}" = set; then
-  enableval="$enable_device_lib_build"
+
+
+  # Check whether --enable-device-lib or --disable-device-lib was given.
+if test "${enable_device_lib+set}" = set; then
+  enableval="$enable_device_lib"
 
 fi;
-OPT_ENABLE_DEVICE_LIB_BUILD=$enable_device_lib_build
+
+      arg1=`echo device-lib | sed s/-/_/`
+
+  if test "`eval echo \\$enable_$arg1`" = "no"; then
+    OPT_DISABLE_DEVICE_LIB=1
+  else
+    OPT_DISABLE_DEVICE_LIB=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_DEVICE_LIB $OPT_DISABLE_DEVICE_LIB
+_ACEOF
 
 
-# Check whether --enable-packihx or --disable-packihx was given.
+
+
+  # Check whether --enable-packihx or --disable-packihx was given.
 if test "${enable_packihx+set}" = set; then
   enableval="$enable_packihx"
 
 fi;
-OPT_ENABLE_PACKIHX=$enable_packihx
+
+      arg1=`echo packihx | sed s/-/_/`
+
+  if test "`eval echo \\$enable_$arg1`" = "no"; then
+    OPT_DISABLE_PACKIHX=1
+  else
+    OPT_DISABLE_PACKIHX=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_PACKIHX $OPT_DISABLE_PACKIHX
+_ACEOF
 
 
-# Check whether --enable-libgc or --disable-libgc was given.
+
+
+  # Check whether --enable-sdcpp or --disable-sdcpp was given.
+if test "${enable_sdcpp+set}" = set; then
+  enableval="$enable_sdcpp"
+
+fi;
+
+      arg1=`echo sdcpp | sed s/-/_/`
+
+  if test "`eval echo \\$enable_$arg1`" = "no"; then
+    OPT_DISABLE_SDCPP=1
+  else
+    OPT_DISABLE_SDCPP=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_SDCPP $OPT_DISABLE_SDCPP
+_ACEOF
+
+
+
+
+
+  # Check whether --enable-doc or --disable-doc was given.
+if test "${enable_doc+set}" = set; then
+  enableval="$enable_doc"
+
+fi;
+
+  if test "$enable_doc" = "yes"; then
+    OPT_ENABLE_DOC=1
+  else
+    OPT_ENABLE_DOC=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_ENABLE_DOC $OPT_ENABLE_DOC
+_ACEOF
+
+
+
+if test $OPT_ENABLE_DOC = 1; then
+  # Extract the first word of "lyx", so it can be a program name with args.
+set dummy lyx; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_LYX+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$LYX"; then
+  ac_cv_prog_LYX="$LYX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_LYX="lyx"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_LYX" && ac_cv_prog_LYX=":"
+fi
+fi
+LYX=$ac_cv_prog_LYX
+if test -n "$LYX"; then
+  echo "$as_me:$LINENO: result: $LYX" >&5
+echo "${ECHO_T}$LYX" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  # Extract the first word of "latex", so it can be a program name with args.
+set dummy latex; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_LATEX+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$LATEX"; then
+  ac_cv_prog_LATEX="$LATEX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_LATEX="latex"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_LATEX" && ac_cv_prog_LATEX=":"
+fi
+fi
+LATEX=$ac_cv_prog_LATEX
+if test -n "$LATEX"; then
+  echo "$as_me:$LINENO: result: $LATEX" >&5
+echo "${ECHO_T}$LATEX" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  # Extract the first word of "latex2html", so it can be a program name with args.
+set dummy latex2html; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_LATEX2HTML+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$LATEX2HTML"; then
+  ac_cv_prog_LATEX2HTML="$LATEX2HTML" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_LATEX2HTML="latex2html"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_LATEX2HTML" && ac_cv_prog_LATEX2HTML=":"
+fi
+fi
+LATEX2HTML=$ac_cv_prog_LATEX2HTML
+if test -n "$LATEX2HTML"; then
+  echo "$as_me:$LINENO: result: $LATEX2HTML" >&5
+echo "${ECHO_T}$LATEX2HTML" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  # Extract the first word of "pdflatex", so it can be a program name with args.
+set dummy pdflatex; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_PDFLATEX+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$PDFLATEX"; then
+  ac_cv_prog_PDFLATEX="$PDFLATEX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_PDFLATEX="pdflatex"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_PDFLATEX" && ac_cv_prog_PDFLATEX=":"
+fi
+fi
+PDFLATEX=$ac_cv_prog_PDFLATEX
+if test -n "$PDFLATEX"; then
+  echo "$as_me:$LINENO: result: $PDFLATEX" >&5
+echo "${ECHO_T}$PDFLATEX" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  # Extract the first word of "dvipdf", so it can be a program name with args.
+set dummy dvipdf; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_DVIPDF+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$DVIPDF"; then
+  ac_cv_prog_DVIPDF="$DVIPDF" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DVIPDF="dvipdf"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_DVIPDF" && ac_cv_prog_DVIPDF=":"
+fi
+fi
+DVIPDF=$ac_cv_prog_DVIPDF
+if test -n "$DVIPDF"; then
+  echo "$as_me:$LINENO: result: $DVIPDF" >&5
+echo "${ECHO_T}$DVIPDF" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  # Extract the first word of "dvips", so it can be a program name with args.
+set dummy dvips; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_DVIPS+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$DVIPS"; then
+  ac_cv_prog_DVIPS="$DVIPS" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DVIPS="dvips"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_DVIPS" && ac_cv_prog_DVIPS=":"
+fi
+fi
+DVIPS=$ac_cv_prog_DVIPS
+if test -n "$DVIPS"; then
+  echo "$as_me:$LINENO: result: $DVIPS" >&5
+echo "${ECHO_T}$DVIPS" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  # Extract the first word of "makeindex", so it can be a program name with args.
+set dummy makeindex; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_MAKEINDEX+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$MAKEINDEX"; then
+  ac_cv_prog_MAKEINDEX="$MAKEINDEX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_MAKEINDEX="makeindex"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_MAKEINDEX" && ac_cv_prog_MAKEINDEX=":"
+fi
+fi
+MAKEINDEX=$ac_cv_prog_MAKEINDEX
+if test -n "$MAKEINDEX"; then
+  echo "$as_me:$LINENO: result: $MAKEINDEX" >&5
+echo "${ECHO_T}$MAKEINDEX" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+
+  if test "$LYX" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program lyx." >&5
+echo "$as_me: error: Cannot find required program lyx." >&2;}
+   { (exit 1); exit 1; }; }
+ fi
+
+  if test "$LATEX" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program latex." >&5
+echo "$as_me: error: Cannot find required program latex." >&2;}
+   { (exit 1); exit 1; }; }
+ fi
+
+  if test "$LATEX2HTML" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program latex2html." >&5
+echo "$as_me: error: Cannot find required program latex2html." >&2;}
+   { (exit 1); exit 1; }; }
+ fi
+
+  if test "$PDFLATEX" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program pdflatex." >&5
+echo "$as_me: error: Cannot find required program pdflatex." >&2;}
+   { (exit 1); exit 1; }; }
+ fi
+
+  if test "$DVIPDF" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program dvipdf." >&5
+echo "$as_me: error: Cannot find required program dvipdf." >&2;}
+   { (exit 1); exit 1; }; }
+ fi
+
+  if test "$DVIPS" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program dvips." >&5
+echo "$as_me: error: Cannot find required program dvips." >&2;}
+   { (exit 1); exit 1; }; }
+ fi
+
+  if test "$MAKEINDEX" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program makeindex." >&5
+echo "$as_me: error: Cannot find required program makeindex." >&2;}
+   { (exit 1); exit 1; }; }
+ fi
+
+fi
+
+
+  # Check whether --enable-libgc or --disable-libgc was given.
 if test "${enable_libgc+set}" = set; then
   enableval="$enable_libgc"
 
 fi;
-if test "$enable_libgc" = "yes"; then
+
+  if test "$enable_libgc" = "yes"; then
+    OPT_ENABLE_LIBGC=1
+  else
+    OPT_ENABLE_LIBGC=0
+  fi
+
+  cat >>confdefs.h <<_ACEOF
+#define OPT_ENABLE_LIBGC $OPT_ENABLE_LIBGC
+_ACEOF
+
+
+
+if test $OPT_ENABLE_LIBGC = 1; then
 
 echo "$as_me:$LINENO: checking for GC_malloc in -lgc" >&5
 echo $ECHO_N "checking for GC_malloc in -lgc... $ECHO_C" >&6
@@ -7792,14 +7919,12 @@ _ACEOF
 
 fi
 
-        OPT_ENABLE_LIBGC=1
-else
-        OPT_ENABLE_LIBGC=0
+  if test $ac_cv_lib_gc_GC_malloc = no; then
+    { { echo "$as_me:$LINENO: error: Cannot find library libgc with Bohem memory allocator." >&5
+echo "$as_me: error: Cannot find library libgc with Bohem memory allocator." >&2;}
+   { (exit 1); exit 1; }; }
+  fi
 fi
-cat >>confdefs.h <<_ACEOF
-#define OPT_ENABLE_LIBGC $OPT_ENABLE_LIBGC
-_ACEOF
-
 
 #remove duplicates
 uniq ports.all ports
@@ -7809,28 +7934,83 @@ mv ports ports.build
 
 # Generating output files
 # ===========================================================================
-
+test $OPT_DISABLE_SDCPP   = 0 &&
 
 subdirs="$subdirs support/cpp2"
 
-
+test $OPT_DISABLE_PACKIHX = 0 &&
 
 subdirs="$subdirs packihx"
 
-
+test $OPT_DISABLE_UCSIM   = 0 &&
 
 subdirs="$subdirs sim/ucsim"
 
+test $OPT_ENABLE_DOC      = 1 &&           ac_config_files="$ac_config_files doc/Makefile"
 
 
-subdirs="$subdirs device/lib/pic16"
+test $OPT_DISABLE_AVR = 0 &&           ac_config_files="$ac_config_files src/avr/Makefile"
 
 
+if test $OPT_DISABLE_DS390 = 0; then
+            ac_config_files="$ac_config_files src/ds390/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 &&           ac_config_files="$ac_config_files device/lib/ds390/Makefile"
+
+fi
+
+if test $OPT_DISABLE_DS400 = 0; then
+            ac_config_files="$ac_config_files src/ds400/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 &&           ac_config_files="$ac_config_files device/lib/ds400/Makefile"
+
+fi
+
+if test $OPT_DISABLE_HC08 = 0; then
+                      ac_config_files="$ac_config_files src/hc08/Makefile as/hc08/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 &&           ac_config_files="$ac_config_files device/lib/hc08/Makefile"
+
+fi
+
+if test $OPT_DISABLE_MCS51 = 0; then
+                                ac_config_files="$ac_config_files src/mcs51/Makefile as/mcs51/Makefile debugger/mcs51/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 &&                                         ac_config_files="$ac_config_files device/lib/mcs51/Makefile device/lib/small/Makefile device/lib/medium/Makefile device/lib/large/Makefile"
+
+fi
+
+if test $OPT_DISABLE_PIC = 0; then
+            ac_config_files="$ac_config_files src/pic/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 &&
 
 subdirs="$subdirs device/lib/pic"
 
+fi
+if test $OPT_DISABLE_PIC16 = 0; then
+            ac_config_files="$ac_config_files src/pic16/Makefile"
 
-                                                                                          ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile as/mcs51/Makefile as/hc08/Makefile device/include/Makefile device/lib/Makefile debugger/mcs51/Makefile support/regression/Makefile Makefile.common:Makefile.common.in"
+  test $OPT_DISABLE_DEVICE_LIB = 0 &&
+
+subdirs="$subdirs device/lib/pic16"
+
+fi
+
+test $OPT_DISABLE_XA51 = 0 &&           ac_config_files="$ac_config_files src/xa51/Makefile"
+
+
+if test $OPT_DISABLE_Z80 = 0; then
+                                                    ac_config_files="$ac_config_files src/z80/Makefile as/Makefile as/z80/Makefile link/Makefile link/z80/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 &&                     ac_config_files="$ac_config_files device/lib/z80/Makefile device/lib/gbz80/Makefile"
+
+fi
+
+test $OPT_DISABLE_DEVICE_LIB = 0 &&           ac_config_files="$ac_config_files device/lib/Makefile"
+
+
+                                                                                          ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8357,14 +8537,41 @@ for ac_config_target in $ac_config_targets
 do
   case "$ac_config_target" in
   # Handling of arguments.
+  "doc/Makefile" ) CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+  "src/avr/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/avr/Makefile" ;;
+  "src/ds390/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/ds390/Makefile" ;;
+  "device/lib/ds390/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/ds390/Makefile" ;;
+  "src/ds400/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/ds400/Makefile" ;;
+  "device/lib/ds400/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/ds400/Makefile" ;;
+  "src/hc08/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/hc08/Makefile" ;;
+  "as/hc08/Makefile" ) CONFIG_FILES="$CONFIG_FILES as/hc08/Makefile" ;;
+  "device/lib/hc08/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/hc08/Makefile" ;;
+  "src/mcs51/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/mcs51/Makefile" ;;
+  "as/mcs51/Makefile" ) CONFIG_FILES="$CONFIG_FILES as/mcs51/Makefile" ;;
+  "debugger/mcs51/Makefile" ) CONFIG_FILES="$CONFIG_FILES debugger/mcs51/Makefile" ;;
+  "device/lib/mcs51/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/mcs51/Makefile" ;;
+  "device/lib/small/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/small/Makefile" ;;
+  "device/lib/medium/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/medium/Makefile" ;;
+  "device/lib/large/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/large/Makefile" ;;
+  "src/pic/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/pic/Makefile" ;;
+  "src/pic16/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/pic16/Makefile" ;;
+  "src/xa51/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/xa51/Makefile" ;;
+  "src/z80/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/z80/Makefile" ;;
+  "as/Makefile" ) CONFIG_FILES="$CONFIG_FILES as/Makefile" ;;
+  "as/z80/Makefile" ) CONFIG_FILES="$CONFIG_FILES as/z80/Makefile" ;;
+  "link/Makefile" ) CONFIG_FILES="$CONFIG_FILES link/Makefile" ;;
+  "link/z80/Makefile" ) CONFIG_FILES="$CONFIG_FILES link/z80/Makefile" ;;
+  "device/lib/z80/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/z80/Makefile" ;;
+  "device/lib/gbz80/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/gbz80/Makefile" ;;
+  "device/lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
   "main.mk" ) CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-  "as/mcs51/Makefile" ) CONFIG_FILES="$CONFIG_FILES as/mcs51/Makefile" ;;
-  "as/hc08/Makefile" ) CONFIG_FILES="$CONFIG_FILES as/hc08/Makefile" ;;
   "device/include/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/include/Makefile" ;;
-  "device/lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
-  "debugger/mcs51/Makefile" ) CONFIG_FILES="$CONFIG_FILES debugger/mcs51/Makefile" ;;
+  "support/librarian/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/librarian/Makefile" ;;
+  "support/makebin/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/makebin/Makefile" ;;
   "support/regression/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/regression/Makefile" ;;
+  "support/valdiag/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/valdiag/Makefile" ;;
+  "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "Makefile.common" ) CONFIG_FILES="$CONFIG_FILES Makefile.common:Makefile.common.in" ;;
   "sdccconf.h" ) CONFIG_HEADERS="$CONFIG_HEADERS sdccconf.h:sdccconf_in.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -8480,20 +8687,35 @@ s,@AUTOCONF@,$AUTOCONF,;t t
 s,@STRIP@,$STRIP,;t t
 s,@AS@,$AS,;t t
 s,@CP@,$CP,;t t
-s,@LYX@,$LYX,;t t
-s,@LATEX@,$LATEX,;t t
-s,@LATEX2HTML@,$LATEX2HTML,;t t
-s,@PDFLATEX@,$PDFLATEX,;t t
-s,@DVIPDF@,$DVIPDF,;t t
 s,@EGREP@,$EGREP,;t t
 s,@M_OR_MM@,$M_OR_MM,;t t
 s,@sdccconf_h_dir_separator@,$sdccconf_h_dir_separator,;t t
 s,@include_dir_suffix@,$include_dir_suffix,;t t
 s,@lib_dir_suffix@,$lib_dir_suffix,;t t
 s,@docdir@,$docdir,;t t
-s,@OPT_ENABLE_UCSIM@,$OPT_ENABLE_UCSIM,;t t
-s,@OPT_ENABLE_DEVICE_LIB_BUILD@,$OPT_ENABLE_DEVICE_LIB_BUILD,;t t
-s,@OPT_ENABLE_PACKIHX@,$OPT_ENABLE_PACKIHX,;t t
+s,@OPT_DISABLE_MCS51@,$OPT_DISABLE_MCS51,;t t
+s,@OPT_DISABLE_GBZ80@,$OPT_DISABLE_GBZ80,;t t
+s,@OPT_DISABLE_Z80@,$OPT_DISABLE_Z80,;t t
+s,@OPT_DISABLE_AVR@,$OPT_DISABLE_AVR,;t t
+s,@OPT_DISABLE_DS390@,$OPT_DISABLE_DS390,;t t
+s,@OPT_DISABLE_DS400@,$OPT_DISABLE_DS400,;t t
+s,@OPT_DISABLE_PIC@,$OPT_DISABLE_PIC,;t t
+s,@OPT_DISABLE_PIC16@,$OPT_DISABLE_PIC16,;t t
+s,@OPT_DISABLE_XA51@,$OPT_DISABLE_XA51,;t t
+s,@OPT_DISABLE_HC08@,$OPT_DISABLE_HC08,;t t
+s,@OPT_DISABLE_UCSIM@,$OPT_DISABLE_UCSIM,;t t
+s,@OPT_DISABLE_DEVICE_LIB@,$OPT_DISABLE_DEVICE_LIB,;t t
+s,@OPT_DISABLE_PACKIHX@,$OPT_DISABLE_PACKIHX,;t t
+s,@OPT_DISABLE_SDCPP@,$OPT_DISABLE_SDCPP,;t t
+s,@OPT_ENABLE_DOC@,$OPT_ENABLE_DOC,;t t
+s,@LYX@,$LYX,;t t
+s,@LATEX@,$LATEX,;t t
+s,@LATEX2HTML@,$LATEX2HTML,;t t
+s,@PDFLATEX@,$PDFLATEX,;t t
+s,@DVIPDF@,$DVIPDF,;t t
+s,@DVIPS@,$DVIPS,;t t
+s,@MAKEINDEX@,$MAKEINDEX,;t t
+s,@OPT_ENABLE_LIBGC@,$OPT_ENABLE_LIBGC,;t t
 s,@subdirs@,$subdirs,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
@@ -9166,4 +9388,218 @@ echo "$as_me: error: $ac_sub_configure failed for $ac_dir" >&2;}
 fi
 
 
+# I found no better place
+mkdir -p bin
+
+# Prepare result message
+# ======================
+
+# In the C-header we need \\ as dir-separator, but in the message only \
+dirch=${sdccconf_h_dir_separator}
+test ${dirch} = '\\' && dirch='\'
+
+# calc friendly strings
+
+binPath=`echo "/${prefix2bin_dir}" | sed 's,/\./,/,g'`
+case ":$binPath:" in
+  ::) binPath='.' ;;
+  :*[\\/]:) binPath=`echo "$binPath" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) binPath=`echo "$binPath" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) binPath=`echo "$binPath" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+binPath=`echo "$binPath" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+incPath1=`echo "/${prefix2data_dir}/${norm_inc_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$incPath1:" in
+  ::) incPath1='.' ;;
+  :*[\\/]:) incPath1=`echo "$incPath1" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) incPath1=`echo "$incPath1" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) incPath1=`echo "$incPath1" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+incPath1=`echo "$incPath1" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+incPath2=`echo "/${bin2data_dir}/${norm_inc_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$incPath2:" in
+  ::) incPath2='.' ;;
+  :*[\\/]:) incPath2=`echo "$incPath2" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) incPath2=`echo "$incPath2" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) incPath2=`echo "$incPath2" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+incPath2=`echo "$incPath2" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+incPath3=`echo "${expanded_datadir}/${norm_inc_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$incPath3:" in
+  ::) incPath3='.' ;;
+  :*[\\/]:) incPath3=`echo "$incPath3" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) incPath3=`echo "$incPath3" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) incPath3=`echo "$incPath3" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+incPath3=`echo "$incPath3" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+libPath1=`echo "/${prefix2data_dir}/${norm_lib_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$libPath1:" in
+  ::) libPath1='.' ;;
+  :*[\\/]:) libPath1=`echo "$libPath1" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) libPath1=`echo "$libPath1" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) libPath1=`echo "$libPath1" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+libPath1=`echo "$libPath1" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+libPath2=`echo "/${bin2data_dir}/${norm_lib_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$libPath2:" in
+  ::) libPath2='.' ;;
+  :*[\\/]:) libPath2=`echo "$libPath2" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) libPath2=`echo "$libPath2" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) libPath2=`echo "$libPath2" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+libPath2=`echo "$libPath2" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+libPath3=`echo "${expanded_datadir}/${norm_lib_dir_suffix}" | sed 's,/\./,/,g'`
+case ":$libPath3:" in
+  ::) libPath3='.' ;;
+  :*[\\/]:) libPath3=`echo "$libPath3" | sed 's,[\\/]*$,,'` ;;
+  :*:) ;;
+esac
+case $dirch in
+
+    *\\*) libPath3=`echo "$libPath3" | sed 's,\(.\)[\\/][\\/]*,\1\\\\\\\\,g
+                                  s,^[\\/],\\\\\\\\,'` ;;
+
+ *) libPath3=`echo "$libPath3" | sed 's,\(.\)[\\/][\\/]*,\1/,g'` ;;
+esac
+libPath3=`echo "$libPath3" | sed 's,\\\\\\\\,\\\\,g'`
+
+
+echo "$as_me:$LINENO: result:
+sdcc ${VERSION} is now configured for
+
+  Build:                ${build_alias}
+  Host:                 ${host_alias}
+  Source directory:     ${srcdir}
+  C compiler:           ${CC}
+  CFLAGS:               ${CFLAGS}
+
+  ENABLED Ports:
+    avr                 ${enable_avr_port}
+    ds390               ${enable_ds390_port}
+    ds400               ${enable_ds400_port}
+    gbz80               ${enable_gbz80_port}
+    hc08                ${enable_hc08_port}
+    pic                 ${enable_pic_port}
+    pic16               ${enable_pic16_port}
+    xa51                ${enable_xa51_port}
+    z80                 ${enable_z80_port}
+
+  Disable packihx:      ${OPT_DISABLE_PACKIHX}
+  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
+  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Enable documentation: ${OPT_ENABLE_DOC}
+  Enable libgc:         ${OPT_ENABLE_LIBGC}
+
+  Install paths:
+    binary files:       ${exec_prefix}
+    include files:      ${datadir}/${include_dir_suffix}
+    library files:      ${datadir}/${lib_dir_suffix}
+    documentation:      ${docdir}
+
+    prefix:             ${prefix}
+    datadir:            ${datadir}
+
+  Search paths (incomplete, see manual for all search paths):
+    binary files:       \$SDCC_HOME${binPath}
+    include files:      ${incPath1}
+                        path(argv[0])${incPath2}
+                        ${incPath3}
+    library files:      \$SDCC_HOME${libPath1}${dirch}<model>
+                        path(argv[0])${libPath2}${dirch}<model>
+                        ${libPath3}${dirch}<model>
+" >&5
+echo "${ECHO_T}
+sdcc ${VERSION} is now configured for
+
+  Build:                ${build_alias}
+  Host:                 ${host_alias}
+  Source directory:     ${srcdir}
+  C compiler:           ${CC}
+  CFLAGS:               ${CFLAGS}
+
+  ENABLED Ports:
+    avr                 ${enable_avr_port}
+    ds390               ${enable_ds390_port}
+    ds400               ${enable_ds400_port}
+    gbz80               ${enable_gbz80_port}
+    hc08                ${enable_hc08_port}
+    pic                 ${enable_pic_port}
+    pic16               ${enable_pic16_port}
+    xa51                ${enable_xa51_port}
+    z80                 ${enable_z80_port}
+
+  Disable packihx:      ${OPT_DISABLE_PACKIHX}
+  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
+  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Enable documentation: ${OPT_ENABLE_DOC}
+  Enable libgc:         ${OPT_ENABLE_LIBGC}
+
+  Install paths:
+    binary files:       ${exec_prefix}
+    include files:      ${datadir}/${include_dir_suffix}
+    library files:      ${datadir}/${lib_dir_suffix}
+    documentation:      ${docdir}
+
+    prefix:             ${prefix}
+    datadir:            ${datadir}
+
+  Search paths (incomplete, see manual for all search paths):
+    binary files:       \$SDCC_HOME${binPath}
+    include files:      ${incPath1}
+                        path(argv[0])${incPath2}
+                        ${incPath3}
+    library files:      \$SDCC_HOME${libPath1}${dirch}<model>
+                        path(argv[0])${libPath2}${dirch}<model>
+                        ${libPath3}${dirch}<model>
+" >&6
 # End of configure/configure.in

@@ -11,16 +11,17 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 
-PRJDIR		= ..
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
-CPPFLAGS        = @CPPFLAGS@ -I. -I$(PRJDIR) \
-		  -I$(PRJDIR)/sim.src -I$(PRJDIR)/cmd.src
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_builddir) -I$(top_srcdir) \
+		  -I$(top_srcdir)/sim.src -I$(top_srcdir)/cmd.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
 
-LIBS		= @LIBS@ @CURSES_LIBS@ -L$(PRJDIR)
+LIBS		= @LIBS@ @CURSES_LIBS@ -L$(top_builddir)
 
 curses_ok	= @curses_ok@
 
@@ -35,6 +36,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+VPATH           = @srcdir@
 
 enable_serio	= @enable_serio@
 PKGS		=
@@ -67,7 +69,7 @@ all: gui.src
 gui.src: checkconf gui_api
 ifeq ($(curses_ok),yes)
 	@for pkg in dummy $(CURSES_PKGS); do\
-	  if test -d $$pkg; then $(MAKE) -C $$pkg $$pkg; else : ; fi ;\
+	  if test -f $$pkg/Makefile; then $(MAKE) -C $$pkg $$pkg; else : ; fi ;\
 	done
 endif
 #	@for pkg in $(PKGS); do\
@@ -82,7 +84,7 @@ gui_api: ucsim_lib tool_lib
 install: install_gui_api
 ifeq ($(curses_ok),yes)
 	@for pkg in $(CURSES_PKGS); do\
-	  cd $$pkg && $(MAKE) install ; cd ..;\
+	  $(MAKE) -C $$pkg install ; cd ..;\
 	done
 endif
 
@@ -94,7 +96,7 @@ install_gui_api:
 uninstall: uninstall_gui_api
 ifeq ($(curses_ok),yes)
 	@for pkg in $(CURSES_PKGS); do\
-	  cd $$pkg && $(MAKE) uninstall ; cd ..;\
+	  $(MAKE) -C $$pkg uninstall ; cd ..;\
 	done
 endif
 
@@ -105,14 +107,14 @@ uninstall_gui_api:
 # --------------------
 check: check_local
 	@for pkg in $(CURSES_PKGS); do\
-	  cd $$pkg && $(MAKE) check ; cd ..;\
+	  $(MAKE) -C $$pkg check ; cd ..;\
 	done
 
 check_local:
 
 test: test_local
 	@for pkg in $(CURSES_PKGS); do\
-	  cd $$pkg && $(MAKE) test ; cd ..;\
+	  $(MAKE) -C $$pkg test ; cd ..;\
 	done
 
 test_local:
@@ -122,7 +124,7 @@ test_local:
 # ----------------------------
 installcheck: installcheck_gui_api
 	@for pkg in $(CURSES_PKGS); do\
-	  cd $$pkg && $(MAKE) installcheck ; cd ..;\
+	  $(MAKE) -C $$pkg installcheck ; cd ..;\
 	done
 
 installcheck_gui_api:
@@ -132,7 +134,7 @@ installcheck_gui_api:
 # ---------------------------------
 installdirs:
 	@for pkg in $(CURSES_PKGS); do\
-	  cd $$pkg && $(MAKE) installdirs ; cd ..;\
+	  $(MAKE) -C $$pkg installdirs ; cd ..;\
 	done
 
 
@@ -140,24 +142,31 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(ALL_SOURCES) *.h
-	$(CXXCPP) -MM $(CPPFLAGS) $(M_OR_MM) $(ALL_SOURCES) >Makefile.dep
+Makefile.dep: $(ALL_SOURCES) $(srcdir)/*.h
+	$(CXXCPP) -MM $(CPPFLAGS) $(M_OR_MM) $^ >Makefile.dep
 
-include Makefile.dep
-include clean.mk
+# don't include Makefile.dep for the listed targets:
+ifeq "$(findstring $(MAKECMDGOALS),uninstall uninstall_gui_api \
+                                   check check_local test test_local \
+                                   checkconf \
+                                   clean_local clean distclean_local \
+                                   distclean mostlyclean realclean)" ""
+  include Makefile.dep
+endif
+include $(srcdir)/clean.mk
 
 
 # My rules
 # --------
-ucsim_lib: $(PRJDIR)/libguiucsim.a
+ucsim_lib: $(top_builddir)libguiucsim.a
 
-$(PRJDIR)/libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
+$(top_builddir)libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
 	ar -rcu $*.a $(OBJECTS) $(UCSIM_OBJECTS)
 	$(RANLIB) $*.a
 
-tool_lib: $(PRJDIR)/libguitool.a
+tool_lib: $(top_builddir)libguitool.a
 
-$(PRJDIR)/libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
+$(top_builddir)libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
 	ar -rcu $*.a $(OBJECTS) $(TOOL_OBJECTS)
 	$(RANLIB) $*.a
 
@@ -168,8 +177,8 @@ $(PRJDIR)/libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(PRJDIR)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" PRJDIR="$(PRJDIR)" freshconf;\
+	@if [ -f $(top_builddir)devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of gui.src/Makefile

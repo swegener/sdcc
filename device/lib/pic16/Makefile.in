@@ -1,0 +1,62 @@
+###########################################################
+### Makefile for the GNU PIC Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+###
+### The GNU PIC Library was originally designed and
+### implemented by
+###	Vangelis Rokas <vrokas@otenet.gr>
+###
+### It is currently maintained by
+###	Raphael Neider <rneider@web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See COPYING for details.
+###
+### $Id$
+###
+
+top_builddir = @top_builddir@
+top_srcdir   = @top_srcdir@
+srcdir       = @srcdir@
+VPATH        = @srcdir@
+
+top_pic16builddir = .
+
+include $(top_pic16builddir)/Makefile.common
+
+ifeq (:,$(findstring :,$(LD) $(AS) $(LIB)))
+
+.PHONY : all
+
+all % : 
+	@echo "gputils not found -- PIC16 library not built!"
+
+else
+
+SUBDIRS	   = debug libc libdev libio libm libsdcc startup
+builddir   = build
+installdir = bin
+export installdir
+
+C_SRC = $(notdir $(wildcard $(srcdir)/*.c))
+S_SRC = $(notdir $(wildcard $(srcdir)/*.S))
+OBJS = $(C_SRC:.c=.o) $(S_SRC:.S=.o)
+
+.PHONY : all clean distclean clean-intermediate install
+
+all : install
+
+install : recurse
+
+clean : recurse
+	$(Q)-$(RMDIR) "$(top_pic16builddir)/$(builddir)"
+
+distclean: clean
+	$(RM) -f Makefile
+
+clean-intermediate : recurse
+
+include $(top_srcdir)/Makefile.rules
+
+endif

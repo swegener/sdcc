@@ -2,14 +2,14 @@
 
 AC_PREREQ(2.54)
 AC_INIT
-AC_CONFIG_SRCDIR([Makefile])
+AC_CONFIG_SRCDIR([Makefile.in])
 AC_CONFIG_HEADER(sdccconf.h:sdccconf_in.h)
 
 AC_PROG_AWK
 
 AC_MSG_CHECKING(version of the package)
-if test -f .version; then
-  VERSION=`cat .version`
+if test -f ${srcdir}/.version; then
+  VERSION=`cat ${srcdir}/.version`
 elif test -f ../.version; then
   VERSION=`cat ../.version`
 else
@@ -49,12 +49,6 @@ AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_CHECK_PROG(AS, as, as, :)
 AC_CHECK_PROG(CP, cp, cp, :)
 
-AC_CHECK_PROG(LYX,        lyx,        lyx, :)
-AC_CHECK_PROG(LATEX,      latex,      latex, :)
-AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html, :)
-AC_CHECK_PROG(PDFLATEX,   pdflatex,   pdflatex, :)
-AC_CHECK_PROG(DVIPDF,     dvipdf,     dvipdf, :)
-
 AC_DEFUN(SDCC_REQUIRE_PROG,
 [if test "$1" = ":"; then
   AC_MSG_ERROR([Cannot find required program $2.])
@@ -87,11 +81,11 @@ AC_CHECK_FUNCS(vsnprintf snprintf vsprintf mkstemp)
 # Macro definitions
 # ===========================================================================
 
-# DD_COPT macro checks if the compiler specified as the 1st parameter
+# adl_DD_COPT macro checks if the compiler specified as the 1st parameter
 # supports option specified as the 2nd parameter
 # For example: DD_CPORT(CXX, fPIC)
 
-AC_DEFUN(DD_COPT, [
+AC_DEFUN(adl_DD_COPT, [
 AC_CACHE_CHECK(whether $$1 accepts -$2,sdcc_cv_$1$2,
 cat >_test_.c <<EOF
 #include <stdio.h>
@@ -113,9 +107,9 @@ rm -f _test_.* a.out)
 #
 # Examples:
 #
-#  AC_EXPAND(prefix, "/usr/local", expanded_prefix)
+#  adl_EXPAND(prefix, "/usr/local", expanded_prefix)
 
-AC_DEFUN([AC_EXPAND], [
+AC_DEFUN([adl_EXPAND], [
   test "x$prefix" = xNONE && prefix="$ac_default_prefix"
   test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
   ac_expand=[$]$1
@@ -145,24 +139,25 @@ dnl http://www.gnu.org/software/ac-archive/htmldoc/normpath.html
 dnl
 AC_DEFUN([adl_NORMALIZE_PATH],
 [case ":[$]$1:" in
-# change empty paths to '.'
+dnl change empty paths to '.'
   ::) $1='.' ;;
-# strip trailing slashes
+dnl strip trailing slashes
   :*[[\\/]]:) $1=`echo "[$]$1" | sed 's,[[\\/]]*[$],,'` ;;
   :*:) ;;
 esac
-# squeze repeated slashes
+dnl squeze repeated slashes
 case ifelse($2,,"[$]$1",$2) in
-# if the path contains any backslashes, turn slashes into backslashes
+dnl if the path contains any backslashes, turn slashes into backslashes
 
-# Bernhard Held 2003-04-06
-# This was the original line. It doesn't:
-# - convert the first slash
-# - replace a slash with a double-backslash
-# *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
- *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\\\\\,g' | sed 's,^[[\\/]],\\\\\\\\,'` ;;
+dnl Bernhard Held 2003-04-06
+dnl This was the original line. It does not:
+dnl - convert the first slash
+dnl - replace a slash with a double-backslash
+dnl *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
+    *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\\\\\,g
+                                  s,^[[\\/]],\\\\\\\\,'` ;;
 
-# if the path contains slashes, also turn backslashes into slashes
+dnl if the path contains slashes, also turn backslashes into slashes
  *) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1/,g'` ;;
 esac])
 
@@ -281,9 +276,9 @@ done])
 
 dnl adl_RECURSIVE_EVAL(VALUE, RESULT)
 dnl =================================
-dnl Interpolate the VALUE in loop until it doesn't change,
+dnl Interpolate the VALUE in loop until it does not change,
 dnl and set the result to $RESULT.
-dnl WARNING: It's easy to get an infinite loop with some unsane input.
+dnl WARNING: It is easy to get an infinite loop with some unsane input.
 AC_DEFUN([adl_RECURSIVE_EVAL],
 [_lcl_receval="$1"
 $2=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
@@ -295,13 +290,22 @@ $2=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
      done
      echo "[$]_lcl_receval")`])
 
-
-# AC_NORMALIZE_DEFINE_UNQUOTED(var, DEFINE, REFERENCE_STRING)
-
-AC_DEFUN([AC_NORMALIZE_DEFINE_UNQUOTED], [
+dnl adl_NORMALIZE_DEFINE_UNQUOTED(var, DEFINE, REFERENCE_STRING)
+AC_DEFUN([adl_NORMALIZE_DEFINE_UNQUOTED], [
   ac_ndu=[$]$1
   adl_NORMALIZE_PATH([ac_ndu], [$]$3)
   AC_DEFINE_UNQUOTED($2, "${ac_ndu}")
+])
+
+dnl adl_NORMALIZE_PATH_MSG(input_string, var, dir_separator)
+dnl ========================================================
+dnl call adl_NORMALIZE_PATH and format it for the result message
+AC_DEFUN([adl_NORMALIZE_PATH_MSG], [
+dnl replace /./ by /
+$2=`echo "$1" | sed 's,/\./,/,g'`
+adl_NORMALIZE_PATH([$2], [$3])
+dnl replace \\ by \
+$2=`echo "[$]$2" | sed 's,\\\\\\\\,\\\\,g'`
 ])
 
 
@@ -321,12 +325,12 @@ M_OR_MM=$sdcc_cv_MM
 AC_SUBST(M_OR_MM)
 
 # This is the first time when CFLAGS are set/modified!!
-DD_COPT(CC, ggdb)
+adl_DD_COPT(CC, ggdb)
 if test "$sdcc_cv_CCggdb" = "yes"; then
   CFLAGS="-ggdb ${CFLAGS}"
 fi
 
-DD_COPT(CC, pipe)
+adl_DD_COPT(CC, pipe)
 if test "$sdcc_cv_CCpipe" = "yes"; then
   CFLAGS="-pipe $CFLAGS"
 fi
@@ -391,7 +395,7 @@ AC_C_BIGENDIAN
 # The variables in the header are replaced by AC_*DEFINE*()
 # sdccconf_h_dir_separator contains a backslash.
 AC_ARG_VAR(sdccconf_h_dir_separator, needed in sdccconf.h: either "/" (default) or "\\")
-if test "${sdccconf_h_dir_separator}" = ""; then
+if test "x${sdccconf_h_dir_separator}" = "x"; then
     sdccconf_h_dir_separator="/"
 fi
 
@@ -433,23 +437,23 @@ AC_DEFINE_UNQUOTED(DIR_SEPARATOR_CHAR  , '${sdccconf_h_dir_separator}')
 
 # prefix:
 # default: "NONE", ${ac_default_prefix}: "/usr/local"
-AC_EXPAND(prefix, ac_default_prefix, expanded_prefix)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_prefix, PREFIX, sdccconf_h_dir_separator)
+adl_EXPAND(prefix, ac_default_prefix, expanded_prefix)
+adl_NORMALIZE_DEFINE_UNQUOTED(expanded_prefix, PREFIX, sdccconf_h_dir_separator)
 
 # exec_prefix:
 # default: "${prefix}"
-AC_EXPAND(exec_prefix, expanded_prefix, expanded_exec_prefix)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_exec_prefix, EXEC_PREFIX, sdccconf_h_dir_separator)
+adl_EXPAND(exec_prefix, expanded_prefix, expanded_exec_prefix)
+adl_NORMALIZE_DEFINE_UNQUOTED(expanded_exec_prefix, EXEC_PREFIX, sdccconf_h_dir_separator)
 
 # bindir:
 # default: "${exec_prefix}/bin"
-AC_EXPAND(bindir, "NONE", expanded_bindir)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_bindir, BINDIR, sdccconf_h_dir_separator)
+adl_EXPAND(bindir, "NONE", expanded_bindir)
+adl_NORMALIZE_DEFINE_UNQUOTED(expanded_bindir, BINDIR, sdccconf_h_dir_separator)
 
 # datadir:
 # default: "${prefix}/share"
-AC_EXPAND(datadir, "NONE", expanded_datadir)
-AC_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, sdccconf_h_dir_separator)
+adl_EXPAND(datadir, "NONE", expanded_datadir)
+adl_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, sdccconf_h_dir_separator)
 
 # include/lib suffix
 norm_inc_dir_suffix=${include_dir_suffix}
@@ -501,149 +505,117 @@ AC_DEFINE_UNQUOTED(SDCC_INCLUDE_NAME, "${sdcc_include_name}")
 sdcc_lib_name="SDCC_LIB"
 AC_DEFINE_UNQUOTED(SDCC_LIB_NAME, "${sdcc_lib_name}")
 
+# Port selection helper
+# ===========================================================================
+# macro AC_DO_ENABLER()
+#   $1 used to access enable_$1, e.g. enable-doc
+#   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. DOC
+#   $3 help string
+AC_DEFUN([AC_DO_ENABLER], [
+  AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], $3))
+
+  if test "[$]enable_$1" = "yes"; then
+    OPT_ENABLE_$2=1
+  else
+    OPT_ENABLE_$2=0
+  fi
+
+  AC_DEFINE_UNQUOTED(OPT_ENABLE_$2, [$]OPT_ENABLE_$2)
+  AC_SUBST(OPT_ENABLE_$2)
+])
+
+# macro AC_DO_DISABLER()
+#   $1 used to access disable_$1, e.g. ucsim
+#   $2 OPT_DISABLE_$2, normally uppercase of $1, e.g. UCSIM
+#   $3 help string
+AC_DEFUN([AC_DO_DISABLER], [
+  AC_ARG_ENABLE($1, AC_HELP_STRING([--disable-$1], $3))
+
+  dnl the '-' in 'device-lib' needs special handling,
+  dnl because the variable is 'enable_device_lib'
+  arg1=`echo $1 | sed s/-/_/`
+
+  if test "`eval echo \\$enable_$arg1`" = "no"; then
+    OPT_DISABLE_$2=1
+  else
+    OPT_DISABLE_$2=0
+  fi
+
+  AC_DEFINE_UNQUOTED(OPT_DISABLE_$2, [$]OPT_DISABLE_$2)
+  AC_SUBST(OPT_DISABLE_$2)
+])
+
+# macro AC_DO_PORT($1, $2, $3, $4)
+#   $1 used to access enable_$2_port, e.g. gbz80
+#   $2 port name in ports.all and ports.build, e.g. z80
+#   $3 OPT_DISABLE_$3, normally uppercase of $2, e.g. GBZ80
+#   $4 help string
+AC_DEFUN([AC_DO_PORT], [
+  AC_ARG_ENABLE($1-port,
+                AC_HELP_STRING([--disable-$1-port], $4))
+
+  if test "[$]enable_$1_port" = "no"; then
+    OPT_DISABLE_$3=1
+  else
+    enable_$1_port="yes"
+    OPT_DISABLE_$3=0
+  fi
+
+  AC_DEFINE_UNQUOTED(OPT_DISABLE_$3, [$]OPT_DISABLE_$3)
+  AC_SUBST(OPT_DISABLE_$3)
+
+  echo $2 >>ports.all
+  if test [$]OPT_DISABLE_$3 = 0; then
+    echo $2 >>ports.build
+  fi
+])
+
 # Now handle the port selection
 # ===========================================================================
 rm -f ports.all ports.build
-AC_ARG_ENABLE(mcs51-port,
-            AC_HELP_STRING([--disable-mcs51-port],
-                           [Excludes the Intel mcs51 port]))
-echo mcs51 >>ports.all
-if test "$enable_mcs51_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_MCS51, 1)
-else
-    echo mcs51 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_MCS51, 0)
+AC_DO_PORT(mcs51, mcs51, MCS51, [Excludes the Intel mcs51 port])
+AC_DO_PORT(gbz80, z80,   GBZ80, [Excludes the Gameboy gbz80 port])
+AC_DO_PORT(z80,   z80,   Z80,   [Excludes the z80 port])
+AC_DO_PORT(avr,   avr,   AVR,   [Excludes the AVR port])
+AC_DO_PORT(ds390, ds390, DS390, [Excludes the DS390 port])
+AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390)
+AC_DO_PORT(ds400, ds400, DS400, [Excludes the DS400 port])
+AC_DO_PORT(pic,   pic,   PIC,   [Excludes the PIC port])
+AC_DO_PORT(pic16, pic16, PIC16, [Excludes the PIC16 port])
+AC_DO_PORT(xa51,  xa51,  XA51,  [Excludes the XA51 port])
+AC_DO_PORT(hc08,  hc08,  HC08,  [Excludes the HC08 port])
+
+AC_DO_DISABLER(ucsim,      UCSIM,      [Disables configuring and building of ucsim])
+AC_DO_DISABLER([device-lib], DEVICE_LIB, [Disables building device libraries])
+AC_DO_DISABLER(packihx,    PACKIHX,    [Disables building packihx])
+AC_DO_DISABLER(sdcpp,      SDCPP,      [Disables building sdcpp])
+
+AC_DO_ENABLER(doc,   DOC,   [Enables building the documentation])
+if test $OPT_ENABLE_DOC = 1; then
+  AC_CHECK_PROG(LYX,        lyx,        lyx, :)
+  AC_CHECK_PROG(LATEX,      latex,      latex, :)
+  AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html, :)
+  AC_CHECK_PROG(PDFLATEX,   pdflatex,   pdflatex, :)
+  AC_CHECK_PROG(DVIPDF,     dvipdf,     dvipdf, :)
+  AC_CHECK_PROG(DVIPS,      dvips,      dvips, :)
+  AC_CHECK_PROG(MAKEINDEX,  makeindex,  makeindex, :)
+
+  SDCC_REQUIRE_PROG($LYX,        lyx)
+  SDCC_REQUIRE_PROG($LATEX,      latex)
+  SDCC_REQUIRE_PROG($LATEX2HTML, latex2html)
+  SDCC_REQUIRE_PROG($PDFLATEX,   pdflatex)
+  SDCC_REQUIRE_PROG($DVIPDF,     dvipdf)
+  SDCC_REQUIRE_PROG($DVIPS,      dvips)
+  SDCC_REQUIRE_PROG($MAKEINDEX,  makeindex)
 fi
 
-AC_ARG_ENABLE(gbz80-port,
-            AC_HELP_STRING([--disable-gbz80-port],
-                           [Excludes the Gameboy gbz80 port]))
-echo z80 >>ports.all
-if test "$enable_gbz80_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_GBZ80, 1)
-else
-    echo z80 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_GBZ80, 0)
+AC_DO_ENABLER(libgc, LIBGC, [Use the Bohem memory allocator. Lower runtime footprint.])
+if test $OPT_ENABLE_LIBGC = 1; then
+  AC_CHECK_LIB(gc, GC_malloc)
+  if test $ac_cv_lib_gc_GC_malloc = no; then
+    AC_MSG_ERROR([Cannot find library libgc with Bohem memory allocator.])
+  fi
 fi
-
-AC_ARG_ENABLE(z80-port,
-            AC_HELP_STRING([--disable-z80-port],
-                           [Excludes the z80 port]))
-echo z80 >>ports.all
-if test "$enable_z80_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_Z80, 1)
-else
-    echo z80 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_Z80, 0)
-fi
-
-AC_ARG_ENABLE(avr-port,
-            AC_HELP_STRING([--disable-avr-port],
-                           [Excludes the AVR port]))
-echo avr >>ports.all
-if test "$enable_avr_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 1)
-else
-    echo avr >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, 0)
-fi
-
-AC_ARG_ENABLE(ds390-port,
-            AC_HELP_STRING([--disable-ds390-port],
-                           [Excludes the DS390 port]))
-echo ds390 >>ports.all
-if test "$enable_ds390_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS390, 1)
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, 1)
-else
-    echo ds390 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS390, 0)
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, 0)
-fi
-
-AC_ARG_ENABLE(ds400-port,
-            AC_HELP_STRING([--disable-ds400-port],
-                           [Excludes the DS400 port]))
-echo ds400 >>ports.all
-if test "$enable_ds400_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS400, 1)
-else
-    echo ds400 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_DS400, 0)
-fi
-
-AC_ARG_ENABLE(pic-port,
-            AC_HELP_STRING([--disable-pic-port],
-                           [Excludes the PIC port]))
-echo pic >>ports.all
-if test "$enable_pic_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC, 1)
-else
-    echo pic >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC, 0)
-fi
-
-AC_ARG_ENABLE(pic16-port,
-            AC_HELP_STRING([--disable-pic16-port],
-                           [Excludes the PIC port]))
-echo pic16 >>ports.all
-if test "$enable_pic16_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC16, 1)
-else
-    echo pic16 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_PIC16, 0)
-fi
-
-AC_ARG_ENABLE(xa51-port,
-            AC_HELP_STRING([--disable-xa51-port],
-                           [Excludes the XA51 port]))
-echo xa51 >>ports.all
-if test "$enable_xa51_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_XA51, 1)
-else
-    echo xa51 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_XA51, 0)
-fi
-
-AC_ARG_ENABLE(hc08-port,
-            AC_HELP_STRING([--disable-hc08-port],
-                           [Excludes the HC08 port]))
-echo hc08 >>ports.all
-if test "$enable_hc08_port" = "no"; then
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_HC08, 1)
-else
-    echo hc08 >>ports.build
-    AC_DEFINE_UNQUOTED(OPT_DISABLE_HC08, 0)
-fi
-
-AC_ARG_ENABLE(ucsim,
-              AC_HELP_STRING([--disable-ucsim],
-                             [Disables configuring and building of ucsim]))
-OPT_ENABLE_UCSIM=$enable_ucsim
-AC_SUBST(OPT_ENABLE_UCSIM)
-
-AC_ARG_ENABLE(device-lib-build,
-              AC_HELP_STRING([--disable-device-lib-build],
-                             [Disables automatically building device libraries]))
-OPT_ENABLE_DEVICE_LIB_BUILD=$enable_device_lib_build
-AC_SUBST(OPT_ENABLE_DEVICE_LIB_BUILD)
-
-AC_ARG_ENABLE(packihx,
-              AC_HELP_STRING([--disable-packihx],
-                             [Disables building packihx]))
-OPT_ENABLE_PACKIHX=$enable_packihx
-AC_SUBST(OPT_ENABLE_PACKIHX)
-
-AC_ARG_ENABLE(libgc,
-              AC_HELP_STRING([--enable-libgc],
-                             [Use the Bohem memory allocator. Lower runtime footprint.]))
-if test "$enable_libgc" = "yes"; then
-        AC_CHECK_LIB(gc, GC_malloc)
-        OPT_ENABLE_LIBGC=1
-else
-        OPT_ENABLE_LIBGC=0
-fi
-AC_DEFINE_UNQUOTED(OPT_ENABLE_LIBGC, $OPT_ENABLE_LIBGC)
 
 #remove duplicates
 uniq ports.all ports
@@ -653,22 +625,136 @@ mv ports ports.build
 
 # Generating output files
 # ===========================================================================
-AC_CONFIG_SUBDIRS(support/cpp2)
-AC_CONFIG_SUBDIRS(packihx)
-AC_CONFIG_SUBDIRS(sim/ucsim)
-AC_CONFIG_SUBDIRS(device/lib/pic16)
-AC_CONFIG_SUBDIRS(device/lib/pic)
+test $OPT_DISABLE_SDCPP   = 0 && AC_CONFIG_SUBDIRS(support/cpp2)
+test $OPT_DISABLE_PACKIHX = 0 && AC_CONFIG_SUBDIRS(packihx)
+test $OPT_DISABLE_UCSIM   = 0 && AC_CONFIG_SUBDIRS(sim/ucsim)
+test $OPT_ENABLE_DOC      = 1 && AC_CONFIG_FILES([doc/Makefile])
+
+test $OPT_DISABLE_AVR = 0 && AC_CONFIG_FILES([src/avr/Makefile])
+
+if test $OPT_DISABLE_DS390 = 0; then
+  AC_CONFIG_FILES([src/ds390/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/ds390/Makefile])
+fi
+
+if test $OPT_DISABLE_DS400 = 0; then
+  AC_CONFIG_FILES([src/ds400/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/ds400/Makefile])
+fi
+
+if test $OPT_DISABLE_HC08 = 0; then
+  AC_CONFIG_FILES([src/hc08/Makefile
+                   as/hc08/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/hc08/Makefile])
+fi
+
+if test $OPT_DISABLE_MCS51 = 0; then
+  AC_CONFIG_FILES([src/mcs51/Makefile
+                   as/mcs51/Makefile
+                   debugger/mcs51/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/mcs51/Makefile
+                                                       device/lib/small/Makefile
+                                                       device/lib/medium/Makefile
+                                                       device/lib/large/Makefile])
+fi
+
+if test $OPT_DISABLE_PIC = 0; then
+  AC_CONFIG_FILES(src/pic/Makefile)
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/lib/pic)
+fi
+if test $OPT_DISABLE_PIC16 = 0; then
+  AC_CONFIG_FILES(src/pic16/Makefile)
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/lib/pic16)
+fi
+
+test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
+
+if test $OPT_DISABLE_Z80 = 0; then
+  AC_CONFIG_FILES([src/z80/Makefile
+                   as/Makefile
+                   as/z80/Makefile
+                   link/Makefile
+                   link/z80/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/z80/Makefile
+                                                       device/lib/gbz80/Makefile])
+fi
+
+test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile])
 
 AC_CONFIG_FILES([main.mk:main_in.mk
 src/Makefile
-as/mcs51/Makefile
-as/hc08/Makefile
 device/include/Makefile
-device/lib/Makefile
-debugger/mcs51/Makefile
+support/librarian/Makefile
+support/makebin/Makefile
 support/regression/Makefile
+support/valdiag/Makefile
+Makefile
 Makefile.common:Makefile.common.in
 ])
 AC_OUTPUT
 
+# I found no better place
+mkdir -p bin
+
+# Prepare result message
+# ======================
+
+# In the C-header we need \\ as dir-separator, but in the message only \
+dirch=${sdccconf_h_dir_separator}
+test ${dirch} = '\\' && dirch='\'
+
+# calc friendly strings
+adl_NORMALIZE_PATH_MSG(/${prefix2bin_dir},                         [binPath],  [$dirch])
+adl_NORMALIZE_PATH_MSG(/${prefix2data_dir}/${norm_inc_dir_suffix}, [incPath1], [$dirch])
+adl_NORMALIZE_PATH_MSG(/${bin2data_dir}/${norm_inc_dir_suffix},    [incPath2], [$dirch])
+adl_NORMALIZE_PATH_MSG(${expanded_datadir}/${norm_inc_dir_suffix}, [incPath3], [$dirch])
+adl_NORMALIZE_PATH_MSG(/${prefix2data_dir}/${norm_lib_dir_suffix}, [libPath1], [$dirch])
+adl_NORMALIZE_PATH_MSG(/${bin2data_dir}/${norm_lib_dir_suffix},    [libPath2], [$dirch])
+adl_NORMALIZE_PATH_MSG(${expanded_datadir}/${norm_lib_dir_suffix}, [libPath3], [$dirch])
+
+AC_MSG_RESULT([
+sdcc ${VERSION} is now configured for
+
+  Build:                ${build_alias}
+  Host:                 ${host_alias}
+  Source directory:     ${srcdir}
+  C compiler:           ${CC}
+  CFLAGS:               ${CFLAGS}
+
+  ENABLED Ports:
+    avr                 ${enable_avr_port}
+    ds390               ${enable_ds390_port}
+    ds400               ${enable_ds400_port}
+    gbz80               ${enable_gbz80_port}
+    hc08                ${enable_hc08_port}
+    pic                 ${enable_pic_port}
+    pic16               ${enable_pic16_port}
+    xa51                ${enable_xa51_port}
+    z80                 ${enable_z80_port}
+
+  Disable packihx:      ${OPT_DISABLE_PACKIHX}
+  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
+  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Enable documentation: ${OPT_ENABLE_DOC}
+  Enable libgc:         ${OPT_ENABLE_LIBGC}
+
+  Install paths:
+    binary files:       ${exec_prefix}
+    include files:      ${datadir}/${include_dir_suffix}
+    library files:      ${datadir}/${lib_dir_suffix}
+    documentation:      ${docdir}
+
+    prefix:             ${prefix}
+    datadir:            ${datadir}
+
+  Search paths (incomplete, see manual for all search paths):
+    binary files:       \$SDCC_HOME${binPath}
+    include files:      ${incPath1}
+                        path(argv[[0]])${incPath2}
+                        ${incPath3}
+    library files:      \$SDCC_HOME${libPath1}${dirch}<model>
+                        path(argv[[0]])${libPath2}${dirch}<model>
+                        ${libPath3}${dirch}<model>
+])
 # End of configure/configure.in

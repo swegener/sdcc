@@ -1,4 +1,5 @@
-include incl.mk
+CLEANALLPORTS = ds390 ds400 gbz80 hc08 large mcs51 medium pic pic16 small z80
+include $(srcdir)/incl.mk
 
 # Deleting all files created by building the program
 # --------------------------------------------------
@@ -9,22 +10,25 @@ clean:
 	rm -rf build
 	for model in $(MODELS); do \
 	  if [ -d $$model ]; then \
-	    cd $$model && for name in *; do if [ -f $$name -a $$name != Makefile ]; then rm $$name; fi; done; \
+	    cd $$model && for name in *; do if [ -f $$name -a $$name != Makefile -a $$name != Makefile.in ]; then rm $$name; fi; done; \
 	  fi; \
 	done
-	make -C mcs51 clean
-	make -C ds390 clean
-	make -C z80 clean
-	make -C gbz80 clean
-	make -C hc08 clean
-	make -C pic16 clean
-	make -C pic clean
+	for port in $(CLEANALLPORTS) ; do\
+	  if [ -f $$port/Makefile ]; then\
+	    $(MAKE) -C $$port clean ;\
+	  fi\
+	done
+
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
 distclean: clean
 	rm -f Makefile *.dep
-	rm -f ds390/*.dep
+	for port in $(CLEANALLPORTS) ; do\
+	  if [ -f $$port/Makefile ]; then\
+	    $(MAKE) -C $$port distclean ;\
+	  fi\
+	done
 
 # Like clean but some files may still exist
 # -----------------------------------------

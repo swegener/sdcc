@@ -23,12 +23,13 @@ Q	?= @		# be quiet
 
 #################################################
 ### compiler switches
-ARCH   ?= 877		# might be overwritten in libio
+# ARCH might be overwritten in libio
+ARCH   ?= 877
 
 CFLAGS ?=
 CFLAGS += -mpic14 -p16f$(ARCH)
 CFLAGS += --std-c99
-CFLAGS += -I. -I$(topsrcdir)/../../include/pic
+CFLAGS += -I. -I$(top_srcdir)/../../include/pic
 
 #################################################
 ### optimization flags
@@ -54,7 +55,8 @@ CFLAGS += --i-code-in-asm
 ### assembler switches
 ASFLAGS ?=
 ASFLAGS += -pp16f$(ARCH)
-ASFLAGS += -I$(topsrcdir)/../../include/pic
+ASFLAGS += -I$(top_srcdir)/../../include/pic
+ASFLAGS += -I. -I$(srcdir)
 
 #################################################
 ### linker switches
@@ -68,8 +70,8 @@ LIBFLAGS += -c
 
 #################################################
 ### programs to use
-CPP	= $(topsrcdir)/../../../bin/sdcpp
-CC	= $(topsrcdir)/../../../bin/sdcc
+CPP	= $(top_builddir)../../../bin/sdcpp
+CC	= $(top_builddir)../../../bin/sdcc
 AS	= @GPASM@
 LD	= @GPLINK@
 LIB	= @GPLIB@

@@ -13,17 +13,19 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 
-PRJDIR		= .
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 SIMDIR		= sim.src
 CMDDIR		= cmd.src
 GUIDIR		= gui.src
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 # FIXME: -Imcs51 must be removed!!!
-CPPFLAGS        = @CPPFLAGS@ -I$(PRJDIR) -I$(PRJDIR)/$(SIMDIR) \
-		  -I$(CMDDIR) -I$(GUIDIR)
-CFLAGS          = @CFLAGS@ -I$(PRJDIR) -Wall
-CXXFLAGS        = @CXXFLAGS@ -I$(PRJDIR) -Wall
+CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir). -I$(srcdir) \
+                  -I$(top_srcdir)/$(SIMDIR) \
+		  -I$(top_srcdir)/$(CMDDIR) -I$(top_srcdir)/$(GUIDIR)
+CFLAGS          = @CFLAGS@ -I$(top_builddir) -Wall
+CXXFLAGS        = @CXXFLAGS@ -I$(top_builddir) -Wall
 M_OR_MM         = @M_OR_MM@
 
 EXEEXT		= @EXEEXT@
@@ -43,6 +45,7 @@ man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
 infodir         = @infodir@
 srcdir          = @srcdir@
+VPATH           = @srcdir@
 
 OBJECTS         = pobj.o globals.o utils.o error.o app.o option.o
 SOURCES		= $(patsubst %.o,%.cc,$(OBJECTS))
@@ -95,11 +98,11 @@ installdirs:
 # ---------------------
 dep: main.dep
 
-main.dep: $(ALL_SOURCES) *.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(ALL_SOURCES) >main.dep
+main.dep: $(ALL_SOURCES) *.h $(srcdir)/*.h
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $^ >main.dep
 
 include main.dep
-include clean.mk
+include $(srcdir)/clean.mk
 
 #parser.cc: parser.y
 
@@ -120,7 +123,7 @@ endif
 
 ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
 	echo $(UCSIM_LIB_FILES)
-	$(CXX) $(CXXFLAGS) -o $@ $< -L$(PRJDIR) $(UCSIM_LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $< -L$(top_builddir) $(UCSIM_LIBS)
 
 ptt: ptt.o
 	$(CXX) $(CXXFLAGS) -o $@ $< -lpthread
@@ -132,7 +135,7 @@ ptt: ptt.o
 # ----------------------
 checkconf:
 	@if [ -f devel ]; then\
-	  $(PRJDIR)/mkecho $(PRJDIR) "MAIN.MK checkconf";\
+	  $(top_srcdir)/mkecho $(top_builddir) "MAIN.MK checkconf";\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" freshconf;\
 	fi
 

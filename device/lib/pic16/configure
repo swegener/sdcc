@@ -1634,9 +1634,9 @@ fi
 
 # Checks for library functions.
 
-$CP pics.all pics.build
+$CP "$srcdir"/pics.all pics.build
 
-          ac_config_files="$ac_config_files Makefile.common"
+                                                                                                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile Makefile.common debug/Makefile debug/gstack/Makefile libc/Makefile libc/ctype/Makefile libc/delay/Makefile libc/stdio/Makefile libc/stdlib/Makefile libc/string/Makefile libc/utils/Makefile libdev/Makefile libio/Makefile libio/adc/Makefile libio/i2c/Makefile libio/usart/Makefile libm/Makefile libsdcc/Makefile libsdcc/char/Makefile libsdcc/fixed16x16/Makefile libsdcc/float/Makefile libsdcc/gptr/Makefile libsdcc/int/Makefile libsdcc/long/Makefile libsdcc/lregs/Makefile startup/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -2188,7 +2188,32 @@ for ac_config_target in $ac_config_targets
 do
   case "$ac_config_target" in
   # Handling of arguments.
+  "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "Makefile.common" ) CONFIG_FILES="$CONFIG_FILES Makefile.common" ;;
+  "debug/Makefile" ) CONFIG_FILES="$CONFIG_FILES debug/Makefile" ;;
+  "debug/gstack/Makefile" ) CONFIG_FILES="$CONFIG_FILES debug/gstack/Makefile" ;;
+  "libc/Makefile" ) CONFIG_FILES="$CONFIG_FILES libc/Makefile" ;;
+  "libc/ctype/Makefile" ) CONFIG_FILES="$CONFIG_FILES libc/ctype/Makefile" ;;
+  "libc/delay/Makefile" ) CONFIG_FILES="$CONFIG_FILES libc/delay/Makefile" ;;
+  "libc/stdio/Makefile" ) CONFIG_FILES="$CONFIG_FILES libc/stdio/Makefile" ;;
+  "libc/stdlib/Makefile" ) CONFIG_FILES="$CONFIG_FILES libc/stdlib/Makefile" ;;
+  "libc/string/Makefile" ) CONFIG_FILES="$CONFIG_FILES libc/string/Makefile" ;;
+  "libc/utils/Makefile" ) CONFIG_FILES="$CONFIG_FILES libc/utils/Makefile" ;;
+  "libdev/Makefile" ) CONFIG_FILES="$CONFIG_FILES libdev/Makefile" ;;
+  "libio/Makefile" ) CONFIG_FILES="$CONFIG_FILES libio/Makefile" ;;
+  "libio/adc/Makefile" ) CONFIG_FILES="$CONFIG_FILES libio/adc/Makefile" ;;
+  "libio/i2c/Makefile" ) CONFIG_FILES="$CONFIG_FILES libio/i2c/Makefile" ;;
+  "libio/usart/Makefile" ) CONFIG_FILES="$CONFIG_FILES libio/usart/Makefile" ;;
+  "libm/Makefile" ) CONFIG_FILES="$CONFIG_FILES libm/Makefile" ;;
+  "libsdcc/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/Makefile" ;;
+  "libsdcc/char/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/char/Makefile" ;;
+  "libsdcc/fixed16x16/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/fixed16x16/Makefile" ;;
+  "libsdcc/float/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/float/Makefile" ;;
+  "libsdcc/gptr/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/gptr/Makefile" ;;
+  "libsdcc/int/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/int/Makefile" ;;
+  "libsdcc/long/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/long/Makefile" ;;
+  "libsdcc/lregs/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/lregs/Makefile" ;;
+  "startup/Makefile" ) CONFIG_FILES="$CONFIG_FILES startup/Makefile" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;

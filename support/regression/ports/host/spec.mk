@@ -1,19 +1,19 @@
 # Port specification for compiling on the host machines version of gcc
 SDCC = $(shell ( sh -c "gcc --version" 2>&1 ) > /dev/null  && echo gcc || echo cc)
-SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -fpack-struct -DREENTRANT=
+SDCCFLAGS = -DPORT_HOST=1 -Wall -fsigned-char -fpack-struct -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
 
 EXEEXT = .bin
 OBJEXT = .o
 INC_DIR = .
 
-# otherwise `make` deletes it and `make -j`will fail
-.PRECIOUS: ports/$(PORT)/testfwk$(OBJEXT)
+# otherwise `make` deletes testfwk.o and `make -j` will fail
+.PRECIOUS: $(PORT_CASES_DIR)/%$(OBJEXT)
 
 # Required extras
-EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
+EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 %.out: %$(EXEEXT)
-	mkdir -p `dirname $@`
+	mkdir -p $(dir $@)
 	-$< > $@
 	-grep -n FAIL $@ /dev/null || true
 
@@ -23,9 +23,10 @@ EXTRAS = ports/$(PORT)/testfwk$(OBJEXT) ports/$(PORT)/support$(OBJEXT)
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-ports/$(PORT)/%$(OBJEXT): fwk/lib/%.c
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
 _clean:
-	rm -f ports/$(PORT)/support.o ports/$(PORT)/testfwk$(OBJEXT)
-

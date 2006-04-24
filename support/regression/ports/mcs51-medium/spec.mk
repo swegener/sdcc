@@ -4,10 +4,10 @@
 
 SDCCFLAGS +=--model-medium
 
-# copy support.c
-$(PORTS_DIR)/$(PORT)/%.c: $(PORTS_DIR)/mcs51/%.c
-	cp $< $@
-
 include $(PORTS_DIR)/mcs51/spec.mk
 
-LIBDIR = $(SDCC_DIR)/device/lib/build/medium
+# use C sources from mcs51
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51/%.c
+	$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+LIBDIR = $(top_builddir)device/lib/build/medium

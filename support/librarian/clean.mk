@@ -1,8 +1,7 @@
-PRJDIR = ../..
-
 clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~ \#*
-	rm -f $(PRJDIR)/bin/sdcclib$(EXEEXT)
+	rm -f $(top_builddir)bin/sdcclib$(EXEEXT)
 
 distclean realclean: clean
+	rm -f Makefile

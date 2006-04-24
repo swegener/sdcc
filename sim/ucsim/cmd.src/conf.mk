@@ -6,7 +6,7 @@
 
 freshconf: Makefile
 
-Makefile: $(srcdir)/Makefile.in $(PRJDIR)/configure.in
-	cd $(PRJDIR) && $(SHELL) ./config.status
+Makefile: $(srcdir)/Makefile.in $(top_srcdir)/configure.in
+	cd $(top_builddir) && $(SHELL) ./config.status
 
 # End of cmd.src/conf.mk

@@ -1,3 +1,7 @@
+2006-04-24 Borut Razem <borut.razem AT siol.net>
+
+	* doc/Makefile: sync with nightly build makefile
+
 2006-04-24 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcoderegs.c (OptimizeRegUsage): do not optimize

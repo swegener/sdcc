@@ -1,12 +1,22 @@
 include ../Makefile.common
 
+ifdef $(LYX_SYSDIR)
+  LYXFLAGS += -sysdir $(LYX_SYSDIR)
+endif
+
 MANUAL = sdccman
 TSS = test_suite_spec
 CDB = cdbfileformat
 
-all: $(MANUAL).pdf $(MANUAL).html/index.html $(MANUAL).txt \
-	$(TSS).pdf $(TSS).html/index.html $(TSS).txt \
-	$(CDB).pdf $(CDB).html/index.html $(CDB).txt
+SOURCES = $(MANUAL).lyx $(TSS).lyx $(CDB).lyx
+
+TXT  = $(SOURCES:.lyx=.txt)
+PDF  = $(SOURCES:.lyx=.pdf)
+TEX  = $(SOURCES:.lyx=.tex)
+HTML_DIR   = $(SOURCES:.lyx=.html)
+HTML_INDEX = $(SOURCES:.lyx=.html/index.html)
+
+all: $(TXT) $(PDF) $(HTML_INDEX)
 
 install:
 	$(INSTALL) -d $(DESTDIR)$(docdir)
@@ -23,63 +33,74 @@ install:
 uninstall:
 	rm -rf $(DESTDIR)$(docdir)
 
-$(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
+$(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).ind
+	rm -rf $(MANUAL).html 
 	mkdir -p `dirname $@`
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
 	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 5 -show_section_numbers -local_icons -info "" -dir $(MANUAL).html $(MANUAL)
+	-latex2html -show_section_numbers -split 5 -local_icons -dir $(MANUAL).html `basename $<`
 	mv `basename $< .tex`.orig.tex $<
+	rm -f $(MANUAL).html/WARNINGS $(MANUAL).html/labels.pl
 
 $(TSS).html/index.html: $(TSS).tex
+	rm -rf `dirname $@`
 	mkdir -p `dirname $@`
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
 	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 0 -local_icons -info "" -dir $(TSS).html $(TSS)
+	-latex2html -split 0 -local_icons -dir $(TSS).html `basename $<`
 	mv `basename $< .tex`.orig.tex $<
+	rm -f $(TSS).html/WARNINGS $(TSS).html/labels.pl
 
 $(CDB).html/index.html: $(CDB).tex
+	rm -rf `dirname $@`
 	mkdir -p `dirname $@`
 	# fixes latex2html problems with two consecutive dashes for long-options: --stack-auto
 	# fixes latex2html problems with \tabularnewline
 	mv $< `basename $< .tex`.orig.tex
 	sed 's,-\\/-,-\\/-\\/-,g' < `basename $< .tex`.orig.tex | \
 	sed 's,\\tabularnewline$$,\\\\,g' > $<
-	-latex2html -split 0 -show_section_numbers -local_icons -info "" -dir $(CDB).html $(CDB)
+	-latex2html -show_section_numbers -split 0 -local_icons -dir $(CDB).html `basename $<`
 	mv `basename $< .tex`.orig.tex $<
+	rm -f $(CDB).html/WARNINGS $(CDB).html/labels.pl
 
 %.txt: %.lyx
-	lyx -e text $<
+	lyx -e text $(LYXFLAGS) $<
 
-%.pdf: %.tex %.dvi %.ind
-	dvipdf $*
-# pdflatex creates documents for acrobat reader >= 5.0	
-#	which pdflatex > /dev/null && pdflatex $* || dvipdf $*
+%.pdf: %.tex
+	@echo "### Create pdf from tex: $< -> $@"
+	pdflatex $*
+	-makeindex $*
+	pdflatex $*
+	pdflatex $*
+	pdfopt $*.pdf tmp.pdf
+	rm $*.pdf
+	mv tmp.pdf $*.pdf
 
-%.ps:  %.pdf
-	dvips $*
+#%.ps:  %.pdf
+#	dvips $*
 
 %.dvi: %.tex
 	latex $<
 
 %.tex: %.lyx
-	lyx -e latex $<
+	lyx -e latex $< $(LYXFLAGS)
 
-%.ind: %.dvi
-	latex $*
-	-makeindex $*
-#	-makeindex -s l2hidx.ist $*
-	latex $*
-	latex $*
+#%.ind: %.dvi
+#	latex $*
+#	-makeindex $*
+##	-makeindex -s l2hidx.ist $*
+	#latex $*
+#	latex $*
 
-%.glo: %.dvi
-	# the glossary, not implemented yet
-	# makeindex -s l2hglo.ist -o $@ $<
+#%.glo: %.dvi
+#	# the glossary, not implemented yet
+#	# makeindex -s l2hglo.ist -o $@ $<
 
 archive: all
 	rm -rf sdcc-doc sdcc-doc.tar.bz2

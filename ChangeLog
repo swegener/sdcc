@@ -4,6 +4,9 @@
 	remove cast to same type
 	* src/SDCCast.c (decorateType): fix for RFE 1475742,
 	optimize 'ifx (op == 0)' resp. 'ifx (op != 0)'
+	* as/z80/Makefile,
+	* link/z80/Makefile: removed, they have moved to
+	Makefile.in files
 
 2006-04-24 Bernhard Held <bernhard AT bernhardheld.de>
 

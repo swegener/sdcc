@@ -3629,6 +3629,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       changePointer(LTYPE(tree));
       checkTypeSanity(LETYPE(tree), "(cast)");
 
+      /* if 'from' and 'to' are the same remove the superflous cast, */
+      /* this helps other optimizations */
+      if (compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
+        {
+          return tree->right;
+        }
+
       /* If code memory is read only, then pointers to code memory */
       /* implicitly point to constants -- make this explicit       */
       {

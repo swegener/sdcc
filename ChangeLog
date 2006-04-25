@@ -1,3 +1,8 @@
+2006-04-25 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (decorateType): partial fix for RFE 1475769,
+	remove cast to same type	
+
 2006-04-24 Bernhard Held <bernhard AT bernhardheld.de>
 
 	Enabled VPATH feature: changed nearly all Makefiles (149 files).

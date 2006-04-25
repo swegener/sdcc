@@ -1,7 +1,9 @@
 2006-04-25 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): partial fix for RFE 1475769,
-	remove cast to same type	
+	remove cast to same type
+	* src/SDCCast.c (decorateType): fix for RFE 1475742,
+	optimize 'ifx (op == 0)' resp. 'ifx (op != 0)'
 
 2006-04-24 Bernhard Held <bernhard AT bernhardheld.de>
 

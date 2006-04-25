@@ -3923,6 +3923,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 goto errorTreeReturn;
               }
         }
+
       /* if unsigned value < 0  then always false */
       /* if (unsigned value) > 0 then '(unsigned value) ? 1 : 0' */
       if (SPEC_USIGN(LETYPE(tree)) &&
@@ -3950,9 +3951,23 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                      tree->right); /* val 0 */
               tree->right->lineno = tree->lineno;
               tree->right->left->lineno = tree->lineno;
-              decorateType (tree->right, RESULT_TYPE_NONE);
+              tree->decorated = 0;
+              return decorateType (tree, resultType);
             }
         }
+
+      /* 'ifx (op == 0)' -> 'ifx (!(op))' */
+      if (IS_LITERAL(RTYPE(tree))  &&
+          floatFromVal (valFromType (RETYPE (tree))) == 0 &&
+          tree->opval.op == EQ_OP &&
+          resultType == RESULT_TYPE_IFX)
+        {
+          tree->opval.op = '!';
+          tree->right = NULL;
+          tree->decorated = 0;
+          return decorateType (tree, resultType);
+        }
+
       /* if they are both literal then */
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) &&

@@ -2,13 +2,14 @@
     size: 8,16,32
     msb: 0,1
 */
+#include <stdint.h>
 #include <testfwk.h>
 
 #define SIZE ({size})
 #define MSB ({msb})
 
 #if SIZE == 8
-#  define TYPE unsigned char
+#  define TYPE uint8_t
 #  if MSB
 #    define TEST_VECT 0xa4
 #  else
@@ -17,7 +18,7 @@
 #endif
 
 #if SIZE == 16
-#  define TYPE unsigned int
+#  define TYPE uint16_t
 #  if MSB
 #    define TEST_VECT 0xa8ce
 #  else
@@ -26,12 +27,7 @@
 #endif
 
 #if SIZE == 32
-/* long is 64 bits on 64 bit mabhines */
-#  if defined (__alpha__) || defined (__x86_64__)
-#    define TYPE unsigned int
-#  else
-#    define TYPE unsigned long
-#  endif
+#  define TYPE uint32_t
 #  if MSB
 #    define TEST_VECT 0xa8c5a5c6
 #  else
@@ -39,7 +35,6 @@
 #  endif
 #endif
 
-#if !defined __ds390
 TYPE rol1(TYPE s){ return (s<<1) | (s>>(SIZE-1)); }
 TYPE rol2(TYPE s){ return (s<<2) | (s>>(SIZE-2)); }
 TYPE rol3(TYPE s){ return (s<<3) | (s>>(SIZE-3)); }
@@ -47,9 +42,8 @@ TYPE rol4(TYPE s){ return (s<<4) | (s>>(SIZE-4)); }
 TYPE rol5(TYPE s){ return (s<<5) | (s>>(SIZE-5)); }
 TYPE rol6(TYPE s){ return (s<<6) | (s>>(SIZE-6)); }
 TYPE rol7(TYPE s){ return (s<<7) | (s>>(SIZE-7)); }
-#endif
 
-#if SIZE >=16 && !defined __ds390
+#if SIZE >=16
 TYPE rol8 (TYPE s){ return (s<<8 ) | (s>>(SIZE-8 )); }
 TYPE rol9 (TYPE s){ return (s<<9 ) | (s>>(SIZE-9 )); }
 TYPE rol10(TYPE s){ return (s<<10) | (s>>(SIZE-10)); }
@@ -79,7 +73,7 @@ testRol(void)
     TYPE u;
 
     u = t;
-#if !defined __ds390
+
     ASSERT( rol1(u) == (TYPE)((TEST_VECT<<1) | (TEST_VECT>>(SIZE-1))) );
     ASSERT( rol2(u) == (TYPE)((TEST_VECT<<2) | (TEST_VECT>>(SIZE-2))) );
     ASSERT( rol3(u) == (TYPE)((TEST_VECT<<3) | (TEST_VECT>>(SIZE-3))) );
@@ -87,9 +81,8 @@ testRol(void)
     ASSERT( rol5(u) == (TYPE)((TEST_VECT<<5) | (TEST_VECT>>(SIZE-5))) );
     ASSERT( rol6(u) == (TYPE)((TEST_VECT<<6) | (TEST_VECT>>(SIZE-6))) );
     ASSERT( rol7(u) == (TYPE)((TEST_VECT<<7) | (TEST_VECT>>(SIZE-7))) );
-#endif
 
-#if SIZE >=16 && !defined __ds390
+#if SIZE >=16
     ASSERT( rol8 (u) == (TYPE)((TEST_VECT<<8 ) | (TEST_VECT>>(SIZE-8 ))) );
     ASSERT( rol9 (u) == (TYPE)((TEST_VECT<<9 ) | (TEST_VECT>>(SIZE-9 ))) );
     ASSERT( rol10(u) == (TYPE)((TEST_VECT<<10) | (TEST_VECT>>(SIZE-10))) );
@@ -112,4 +105,3 @@ testRol(void)
     ASSERT( rol31(u) == (TYPE)((TEST_VECT<<31) | (TEST_VECT>>(SIZE-31))) );
 #endif
 }
-

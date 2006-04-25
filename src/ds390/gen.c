@@ -8063,30 +8063,46 @@ movLeft2Result (operand * left, int offl,
 
 #ifdef BETTER_LITERAL_SHIFT
 /*-----------------------------------------------------------------*/
-/* AccAXRrl1 - right rotate c->a:x->c by 1                         */
+/* AccAXRrl1 - right rotate a:x by 1                               */
 /*-----------------------------------------------------------------*/
 static void
 AccAXRrl1 (char *x)
 {
-  emitcode ("rrc", "a");
+  emitcode ("mov", "c,acc.0");
   emitcode ("xch", "a,%s", x);
   emitcode ("rrc", "a");
   emitcode ("xch", "a,%s", x);
+  emitcode ("rrc", "a");
 }
 #endif
 
 #ifdef BETTER_LITERAL_SHIFT
 //REMOVE ME!!!
 /*-----------------------------------------------------------------*/
-/* AccAXLrl1 - left rotate c<-a:x<-c by 1                          */
+/* AccAXLrl1 - left rotate a:x by 1                                */
 /*-----------------------------------------------------------------*/
 static void
 AccAXLrl1 (char *x)
 {
+  emitcode ("mov", "c,acc.7");
   emitcode ("xch", "a,%s", x);
   emitcode ("rlc", "a");
   emitcode ("xch", "a,%s", x);
   emitcode ("rlc", "a");
+}
+#endif
+
+#ifdef BETTER_LITERAL_SHIFT
+/*-----------------------------------------------------------------*/
+/* AccAXRsh1 - right shift c->a:x->c by 1                          */
+/*-----------------------------------------------------------------*/
+static void
+AccAXRsh1 (char *x)
+{
+  emitcode ("rrc", "a");
+  emitcode ("xch", "a,%s", x);
+  emitcode ("rrc", "a");
+  emitcode ("xch", "a,%s", x);
 }
 #endif
 
@@ -8124,16 +8140,16 @@ AccAXLsh (char *x, int shCount)
       break;
     case 3:
     case 4:
-    case 5:                     // AAAAABBB:CCCCCDDD
+    case 5:                             // AAAAABBB:CCCCCDDD
 
-      AccRol (shCount);         // BBBAAAAA:CCCCCDDD
+      AccRol (shCount);                 // BBBAAAAA:CCCCCDDD
 
       emitcode ("anl", "a,#!constbyte",
                 SLMask[shCount]);       // BBB00000:CCCCCDDD
 
       emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBB00000
 
-      AccRol (shCount);         // DDDCCCCC:BBB00000
+      AccRol (shCount);                 // DDDCCCCC:BBB00000
 
       emitcode ("xch", "a,%s", x);      // BBB00000:DDDCCCCC
 
@@ -8149,15 +8165,16 @@ AccAXLsh (char *x, int shCount)
       emitcode ("xrl", "a,%s", x);      // BBBCCCCC:DDD00000
 
       break;
-    case 6:                     // AAAAAABB:CCCCCCDD
+    case 6:                             // AAAAAABB:CCCCCCDD
       emitcode ("anl", "a,#!constbyte",
                 SRMask[shCount]);       // 000000BB:CCCCCCDD
+#if 1
+      AccAXRrl1 (x);                    // D000000B:BCCCCCCD
+      AccAXRrl1 (x);                    // DD000000:BBCCCCCC
+      emitcode ("xch", "a,%s", x);      // BBCCCCCC:DD000000
+#else
       emitcode ("mov", "c,acc.0");      // c = B
       emitcode ("xch", "a,%s", x);      // CCCCCCDD:000000BB
-#if 0
-      AccAXRrl1 (x);            // BCCCCCCD:D000000B
-      AccAXRrl1 (x);            // BBCCCCCC:DD000000
-#else
       emitcode("rrc","a");
       emitcode("xch","a,%s", x);
       emitcode("rrc","a");
@@ -8170,16 +8187,14 @@ AccAXLsh (char *x, int shCount)
       emitcode("xch","a,%s", x);
 #endif
       break;
-    case 7:                     // a:x <<= 7
+    case 7:                             // a:x <<= 7
 
       emitcode ("anl", "a,#!constbyte",
                 SRMask[shCount]);       // 0000000B:CCCCCCCD
 
-      emitcode ("mov", "c,acc.0");      // c = B
+      AccAXRrl1 (x);                    // D0000000:BCCCCCCC
 
-      emitcode ("xch", "a,%s", x);      // CCCCCCCD:0000000B
-
-      AccAXRrl1 (x);            // BCCCCCCC:D0000000
+      emitcode ("xch", "a,%s", x);      // BCCCCCCC:D0000000
 
       break;
     default:
@@ -8202,26 +8217,26 @@ AccAXRsh (char *x, int shCount)
       break;
     case 1:
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
+      AccAXRsh1 (x);                    // 0->a:x
 
       break;
     case 2:
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
+      AccAXRsh1 (x);                    // 0->a:x
 
       CLRC;
-      AccAXRrl1 (x);            // 0->a:x
+      AccAXRsh1 (x);                    // 0->a:x
 
       break;
     case 3:
     case 4:
-    case 5:                     // AAAAABBB:CCCCCDDD = a:x
+    case 5:                             // AAAAABBB:CCCCCDDD = a:x
 
-      AccRol (8 - shCount);     // BBBAAAAA:DDDCCCCC
+      AccRol (8 - shCount);             // BBBAAAAA:DDDCCCCC
 
       emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBBAAAAA
 
-      AccRol (8 - shCount);     // DDDCCCCC:BBBAAAAA
+      AccRol (8 - shCount);             // DDDCCCCC:BBBAAAAA
 
       emitcode ("anl", "a,#!constbyte",
                 SRMask[shCount]);       // 000CCCCC:BBBAAAAA
@@ -8240,12 +8255,10 @@ AccAXRsh (char *x, int shCount)
       emitcode ("xch", "a,%s", x);      // 000AAAAA:BBBCCCCC
 
       break;
-    case 6:                     // AABBBBBB:CCDDDDDD
+    case 6:                             // AABBBBBB:CCDDDDDD
 
-      emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // ABBBBBBC:CDDDDDDA
-
-      AccAXLrl1 (x);            // BBBBBBCC:DDDDDDAA
+      AccAXLrl1 (x);                    // ABBBBBBC:CDDDDDDE
+      AccAXLrl1 (x);                    // BBBBBBCC:DDDDDDAA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDAA:BBBBBBCC
 
@@ -8253,11 +8266,9 @@ AccAXRsh (char *x, int shCount)
                 SRMask[shCount]);       // 000000AA:BBBBBBCC
 
       break;
-    case 7:                     // ABBBBBBB:CDDDDDDD
+    case 7:                             // ABBBBBBB:CDDDDDDD
 
-      emitcode ("mov", "c,acc.7");      // c = A
-
-      AccAXLrl1 (x);            // BBBBBBBC:DDDDDDDA
+      AccAXLrl1 (x);                    // BBBBBBBC:DDDDDDDA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDDA:BBBBBBCC
 
@@ -8285,27 +8296,27 @@ AccAXRshS (char *x, int shCount)
       break;
     case 1:
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
+      AccAXRsh1 (x);                    // s->a:x
 
       break;
     case 2:
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
+      AccAXRsh1 (x);                    // s->a:x
 
       emitcode ("mov", "c,acc.7");
-      AccAXRrl1 (x);            // s->a:x
+      AccAXRsh1 (x);                    // s->a:x
 
       break;
     case 3:
     case 4:
-    case 5:                     // AAAAABBB:CCCCCDDD = a:x
+    case 5:                             // AAAAABBB:CCCCCDDD = a:x
 
       tlbl = newiTempLabel (NULL);
-      AccRol (8 - shCount);     // BBBAAAAA:CCCCCDDD
+      AccRol (8 - shCount);             // BBBAAAAA:CCCCCDDD
 
       emitcode ("xch", "a,%s", x);      // CCCCCDDD:BBBAAAAA
 
-      AccRol (8 - shCount);     // DDDCCCCC:BBBAAAAA
+      AccRol (8 - shCount);             // DDDCCCCC:BBBAAAAA
 
       emitcode ("anl", "a,#!constbyte",
                 SRMask[shCount]);       // 000CCCCC:BBBAAAAA
@@ -8328,15 +8339,14 @@ AccAXRshS (char *x, int shCount)
                 (unsigned char) ~SRMask[shCount]);      // 111AAAAA:BBBCCCCC
 
       emitcode ("", "!tlabeldef", tlbl->key + 100);
-      break;                    // SSSSAAAA:BBBCCCCC
+      break;                            // SSSSAAAA:BBBCCCCC
 
-    case 6:                     // AABBBBBB:CCDDDDDD
+    case 6:                             // AABBBBBB:CCDDDDDD
 
       tlbl = newiTempLabel (NULL);
-      emitcode ("mov", "c,acc.7");
-      AccAXLrl1 (x);            // ABBBBBBC:CDDDDDDA
 
-      AccAXLrl1 (x);            // BBBBBBCC:DDDDDDAA
+      AccAXLrl1 (x);                    // ABBBBBBC:CDDDDDDA
+      AccAXLrl1 (x);                    // BBBBBBCC:DDDDDDAA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDAA:BBBBBBCC
 
@@ -8349,12 +8359,11 @@ AccAXRshS (char *x, int shCount)
 
       emitcode ("", "!tlabeldef", tlbl->key + 100);
       break;
-    case 7:                     // ABBBBBBB:CDDDDDDD
+    case 7:                             // ABBBBBBB:CDDDDDDD
 
       tlbl = newiTempLabel (NULL);
-      emitcode ("mov", "c,acc.7");      // c = A
 
-      AccAXLrl1 (x);            // BBBBBBBC:DDDDDDDA
+      AccAXLrl1 (x);                    // BBBBBBBC:DDDDDDDA
 
       emitcode ("xch", "a,%s", x);      // DDDDDDDA:BBBBBBCC
 

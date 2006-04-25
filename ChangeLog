@@ -1,3 +1,11 @@
+2006-04-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (AccAXRrl1, AccAXLrl1): changed to real rotate by 1,
+	  (AccAXRsh1): added, shift right by 1,
+	  (AccAXLsh, AccAXRsh, AccAXRshS): updated for AccAXRrl1, AccAXRsh1 and
+	   AccAXLrl1
+	* support/regression/tests/rotate.c: use <stdint.h> and enabled ds390
+
 2006-04-25 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (decorateType): partial fix for RFE 1475769,
@@ -28,7 +36,7 @@
 	* debugger/mcs51/Makefile.in: build own objects from library sources
 	(SLIB, SDCC) in current directory
 
-	* configure, configure.in: renamed --disable-device-lib-build in 
+	* configure, configure.in: renamed --disable-device-lib-build in
 	--disable-device-lib; added --enable-doc, the required tools are
 	searched by configure; added result message; the toolchain for the
 	belonging ports are now only built, if the port is enabled.
@@ -72,11 +80,11 @@
 
 	* device/examples/main8051.c: deleted - it was removed from CVS
 	  24.mar.2000 and after that modified 18.feb.2001, so it reappered
-	  after the transition to Subversion 
+	  after the transition to Subversion
 	* src/SDCCalloc.h: deleted - it was removed  from CVS
 	  3.feb.2001 and after that modified 18.feb.2001, so it reappered
-	  after the transition to Subversion 
-	* sim/ucsim/cpu.gif, sim/ucsim/interrupt.gif, sim/ucsim/new.gif, 
+	  after the transition to Subversion
+	* sim/ucsim/cpu.gif, sim/ucsim/interrupt.gif, sim/ucsim/new.gif,
 	  sim/ucsim/serial1.gif, sim/ucsim/serial2.gif,
 	  sim/ucsim/term_cpuopt.gif, sim/ucsim/timers.gif, sim/ucsim/wins.gif,
 	  sim/ucsim/post.jpg, sim/ucsim/UCsim.jpg: corrected

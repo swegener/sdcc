@@ -17,6 +17,9 @@
 # Don't use :- since 4.3BSD and earlier shells don't like it.
 doit="${DOITPROG-}"
 
+# make sure ordinary users can access files installed by
+# a restrictive root using umaks 0077
+umask 0022
 
 # put in absolute paths if you don't have them in your path; or use env. vars.
 

@@ -9535,7 +9535,7 @@ sdcc ${VERSION} is now configured for
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
-  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Disable sdcpp:        ${OPT_DISABLE_SDCPP}
   Enable documentation: ${OPT_ENABLE_DOC}
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 
@@ -9580,7 +9580,7 @@ sdcc ${VERSION} is now configured for
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
-  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Disable sdcpp:        ${OPT_DISABLE_SDCPP}
   Enable documentation: ${OPT_ENABLE_DOC}
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 

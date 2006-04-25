@@ -213,9 +213,12 @@ TARGETS        += model-pic16
 endif
 
 ifeq ($(OPT_DISABLE_Z80), 0)
-TARGETS        += model-z80 model-gbz80
+TARGETS        += model-z80
 endif
 
+ifeq ($(OPT_DISABLE_GBZ80), 0)
+TARGETS        += model-gbz80
+endif
 
 # Compiling entire program or any subproject
 # ------------------------------------------

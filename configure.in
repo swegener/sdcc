@@ -586,7 +586,7 @@ AC_DO_PORT(xa51,  xa51,  XA51,  [Excludes the XA51 port])
 AC_DO_PORT(hc08,  hc08,  HC08,  [Excludes the HC08 port])
 
 AC_DO_DISABLER(ucsim,      UCSIM,      [Disables configuring and building of ucsim])
-AC_DO_DISABLER([device-lib], DEVICE_LIB, [Disables building device libraries])
+AC_DO_DISABLER(device-lib, DEVICE_LIB, [Disables building device libraries])
 AC_DO_DISABLER(packihx,    PACKIHX,    [Disables building packihx])
 AC_DO_DISABLER(sdcpp,      SDCPP,      [Disables building sdcpp])
 
@@ -735,7 +735,7 @@ sdcc ${VERSION} is now configured for
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
-  Disable ucsim:        ${OPT_DISABLE_UCSIM}
+  Disable sdcpp:        ${OPT_DISABLE_SDCPP}
   Enable documentation: ${OPT_ENABLE_DOC}
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 

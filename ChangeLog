@@ -1,3 +1,10 @@
+2006-04-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug-460010.c,
+	* support/regression/tests/bug-524691.c,
+	* support/regression/tests/bug-716242.c: removed conditional defines
+	  that are already in testfwk.h
+
 2006-04-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (AccAXRrl1, AccAXLrl1): changed to real rotate by 1,

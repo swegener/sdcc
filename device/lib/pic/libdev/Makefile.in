@@ -7,7 +7,7 @@ CP = @CP@
 RM = @RM@
 RMDIR = @RMDIR@
 
-CPPFLAGS = -I../../../include/pic
+CPPFLAGS = -I$(srcdir)/../../../include/pic
 
 C_SRC = $(wildcard pic16*.c)
 OBJS = $(C_SRC:.c=.o)

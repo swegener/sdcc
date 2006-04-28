@@ -1,3 +1,8 @@
+2006-04-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/librarian/sdcclib.c: moved include <limits.h> up to enable
+	  compilation with MSVC 2005 Express Edition (VC8)
+
 2006-04-26 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/Makefile: fixed build of gbz80 lib

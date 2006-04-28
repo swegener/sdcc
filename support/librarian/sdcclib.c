@@ -15,11 +15,11 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 
+#define _POSIX_
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#define _POSIX_
-#include <limits.h>
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
 #include <unistd.h>
 #endif

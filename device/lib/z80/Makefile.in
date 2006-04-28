@@ -15,7 +15,7 @@ CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I../../include -I.
+CFLAGS = -I$(srcdir)/../../include -I.
 
 all: $(LIB) crt0.o
 

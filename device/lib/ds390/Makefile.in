@@ -9,7 +9,7 @@ OBJECTS = tinibios.rel memcpyx.rel  lcd390.rel i2c390.rel rtc390.rel
 
 SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 
-CPPFLAGS = -I../../include
+CPPFLAGS = -I$(srcdir)/../../include
 CFLAGS = -mds390 $(CPPFLAGS) $(VERBOSE)
 
 all: $(OBJECTS) libds390.lib

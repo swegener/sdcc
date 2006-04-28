@@ -1,3 +1,11 @@
+2006-04-28 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* device/lib/gbz80/Makefile.in,
+	* device/lib/z80/Makefile.in,
+	* device/lib/ds390/Makefile.in,
+	* device/lib/ds400/Makefile.in: added srcdir to include search path,
+	thanks to Borut for the bug report
+
 2006-04-28 Raphael Neider <rneider AT web.de>
 
 	* src/pic/{gen.c,main.h,pcode.c},

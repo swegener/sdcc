@@ -47,7 +47,9 @@ install: all installdirs
 		$(CP) $(srcdir)/mcs51/*.h $(sdcc_includedir)/mcs51 ; \
 	fi
 	if [ "`grep '^pic$$' $(top_builddir)ports.build`" = pic ]; then \
-		$(CP) $(srcdir)/pic/*.h $(sdcc_includedir)/pic ; \
+		$(CP) $(srcdir)/pic/*.h   $(sdcc_includedir)/pic ; \
+		$(CP) $(srcdir)/pic/*.inc $(sdcc_includedir)/pic ; \
+		$(CP) $(srcdir)/pic/*.txt $(sdcc_includedir)/pic ; \
 		$(CP) $(srcdir)/pic/pic14devices.txt $(sdcc_includedir)/pic ; \
 	fi
 	if [ "`grep pic16 $(top_builddir)ports.build`" = pic16 ]; then \

@@ -190,7 +190,7 @@ void DEBUGpic14_emitcode (char *inst,char *fmt, ...)
 {
 	va_list ap;
 	char lb[INITIAL_INLINEASM];  
-	unsigned char *lbp = lb;
+	unsigned char *lbp = (unsigned char *)lb;
 	
 	if(!debug_verbose && !options.debug)
 		return;
@@ -293,7 +293,7 @@ void pic14_emitcode (char *inst,char *fmt, ...)
 {
 	va_list ap;
 	char lb[INITIAL_INLINEASM];  
-	unsigned char *lbp = lb;
+	unsigned char *lbp = (unsigned char *)lb;
 	
 	va_start(ap,fmt);   
 	
@@ -2596,7 +2596,7 @@ static void genCall (iCode *ic)
 {
 	sym_link *dtype;	 
 	symbol *sym;
-	unsigned char *name;
+	char *name;
 	int isExtern;
 	
 	FENTRY;

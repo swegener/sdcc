@@ -1487,7 +1487,7 @@ void pic14initMnemonics(void)
 	
 	for(i=0; i<MAX_PIC14MNEMONICS; i++)
 		if(pic14Mnemonics[i])
-			hTabAddItem(&pic14MnemonicsHash, mnem2key(pic14Mnemonics[i]->mnemonic), pic14Mnemonics[i]);
+			hTabAddItem(&pic14MnemonicsHash, mnem2key((unsigned char *)pic14Mnemonics[i]->mnemonic), pic14Mnemonics[i]);
 		pci = hTabFirstItem(pic14MnemonicsHash, &key);
 		
 		while(pci) {
@@ -1504,7 +1504,7 @@ int getpCode(char *mnem,unsigned dest)
 {
 	
 	pCodeInstruction *pci;
-	int key = mnem2key(mnem);
+	int key = mnem2key((unsigned char *)mnem);
 	
 	if(!mnemonics_initialized)
 		pic14initMnemonics();
@@ -1538,7 +1538,7 @@ void pic14initpCodePeepCommands(void)
 	i = 0;
 	do {
 		hTabAddItem(&pic14pCodePeepCommandsHash, 
-			mnem2key(peepCommands[i].cmd), &peepCommands[i]);
+			mnem2key((unsigned char *)peepCommands[i].cmd), &peepCommands[i]);
 		i++;
 	} while (peepCommands[i].cmd);
 	
@@ -1560,7 +1560,7 @@ int getpCodePeepCommand(char *cmd)
 {
 	
 	peepCommand *pcmd;
-	int key = mnem2key(cmd);
+	int key = mnem2key((unsigned char *)cmd);
 	
 	
 	pcmd = hTabFirstItemWK(pic14pCodePeepCommandsHash, key);

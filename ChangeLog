@@ -1,5 +1,11 @@
 2006-04-28 Raphael Neider <rneider AT web.de>
 
+	* src/pic/{gen.c,main.h,pcode.c},
+	* src/pic16/{gen.c,pcode.c}: quietened compiler warnings
+	    concerning signedness with casts
+
+2006-04-28 Raphael Neider <rneider AT web.de>
+
 	* src/pic/gen.c (genFunction): set global pic14_hasInterrupt on
 	    definition of an interrupt handler,
 	* src/pic/glue.c (pic14_emitInterruptHandler): moved output of

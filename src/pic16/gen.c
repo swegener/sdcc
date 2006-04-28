@@ -249,7 +249,7 @@ void pic16_emitpcomment (char *fmt, ...)
 {
     va_list ap;
     char lb[INITIAL_INLINEASM];  
-    unsigned char *lbp = lb;
+    unsigned char *lbp = (unsigned char *)lb;
 
     va_start(ap,fmt);   
 
@@ -275,7 +275,7 @@ void DEBUGpic16_emitcode (char *inst,char *fmt, ...)
 {
     va_list ap;
     char lb[INITIAL_INLINEASM];  
-    unsigned char *lbp = lb;
+    unsigned char *lbp = (unsigned char *)lb;
 
     if(!pic16_debug_verbose)
       return;

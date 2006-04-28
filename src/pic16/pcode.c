@@ -3245,7 +3245,7 @@ void pic16initMnemonics(void)
 
   for(i=0; i<MAX_PIC16MNEMONICS; i++)
     if(pic16Mnemonics[i])
-      hTabAddItem(&pic16MnemonicsHash, mnem2key(pic16Mnemonics[i]->mnemonic), pic16Mnemonics[i]);
+      hTabAddItem(&pic16MnemonicsHash, mnem2key((const unsigned char *)pic16Mnemonics[i]->mnemonic), pic16Mnemonics[i]);
   pci = hTabFirstItem(pic16MnemonicsHash, &key);
 
   while(pci) {
@@ -3262,7 +3262,7 @@ int pic16_getpCode(char *mnem,unsigned dest)
 {
 
   pCodeInstruction *pci;
-  int key = mnem2key(mnem);
+  int key = mnem2key((unsigned char *)mnem);
 
   if(!mnemonics_initialized)
     pic16initMnemonics();
@@ -3302,7 +3302,7 @@ void pic16initpCodePeepCommands(void)
   i = 0;
   do {
     hTabAddItem(&pic16pCodePeepCommandsHash, 
-		mnem2key(peepCommands[i].cmd), &peepCommands[i]);
+		mnem2key((const unsigned char *)peepCommands[i].cmd), &peepCommands[i]);
     i++;
   } while (peepCommands[i].cmd);
 
@@ -3324,7 +3324,7 @@ int pic16_getpCodePeepCommand(char *cmd)
 {
 
   peepCommand *pcmd;
-  int key = mnem2key(cmd);
+  int key = mnem2key((unsigned char *)cmd);
 
 
   pcmd = hTabFirstItemWK(pic16pCodePeepCommandsHash, key);
@@ -8801,7 +8801,7 @@ int comparePtr (const void *p1, const void *p2)
 /* getSymbolFromOperand - return a pointer to the symbol in */
 /*                        the given operand and its length  */
 /*----------------------------------------------------------*/
-char *getSymbolFromOperand (char *op, unsigned int *len)
+char *getSymbolFromOperand (char *op, int *len)
 {
   char *sym, *curr;
   *len = 0;

@@ -76,6 +76,7 @@ int pic14_getSharebankSize(void);
 int pic14_getSharebankAddress(void);
 
 char *udata_section_name=0;		// FIXME Temporary fix to change udata section name -- VR
+int pic14_hasInterrupt = 0;		// Indicates whether to emit interrupt handler or not
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
@@ -1176,6 +1177,26 @@ pic14emitOverlay (FILE * afile)
 }
 
 
+void
+pic14_emitInterruptHandler (FILE * asmFile)
+{
+	if (pic14_hasInterrupt)
+	{
+
+		fprintf (asmFile, "%s", iComments2);
+		fprintf (asmFile, "; interrupt and initialization code\n");
+		fprintf (asmFile, "%s", iComments2);
+		// Note - for mplink may have to enlarge section vectors in .lnk file
+		// Note: Do NOT name this code_interrupt to avoid nameclashes with
+		//       source files's code segment (interrupt.c -> code_interrupt)
+		fprintf (asmFile, "c_interrupt\t%s\t0x4\n", CODE_NAME);
+		
+		/* interrupt service routine */
+		fprintf (asmFile, "__sdcc_interrupt\n");
+		copypCode(asmFile, 'I');
+	}	
+}
+
 /*-----------------------------------------------------------------*/
 /* glue - the final glue that hold the whole thing together        */
 /*-----------------------------------------------------------------*/
@@ -1380,16 +1401,12 @@ picglue ()
 	/* copy the interrupt vector table */
 	if (mainf && IFFUNC_HASBODY(mainf->type)) {
 		copyFile (asmFile, vFile);
-		
-		fprintf (asmFile, "%s", iComments2);
-		fprintf (asmFile, "; interrupt and initialization code\n");
-		fprintf (asmFile, "%s", iComments2);
-		fprintf (asmFile, "code_interrupt\t%s\t0x4\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
-		
-		/* interrupt service routine */
-		fprintf (asmFile, "__sdcc_interrupt\n");
-		copypCode(asmFile, 'I');
-		
+	}
+	
+	/* create interupt ventor handler */
+	pic14_emitInterruptHandler (asmFile);
+	
+	if (mainf && IFFUNC_HASBODY(mainf->type)) {
 		/* initialize data memory */
 		fprintf (asmFile, "code_init\t%s\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
 		fprintf (asmFile,"__sdcc_gsinit_startup\n");

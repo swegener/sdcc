@@ -59,6 +59,7 @@ extern void printpBlock(FILE *of, pBlock *pb);
 
 static int labelOffset=0;
 extern int debug_verbose;
+extern int pic14_hasInterrupt;
 //static int optimized_for_speed = 0;
 
 /* max_key keeps track of the largest label number used in 
@@ -2925,6 +2926,7 @@ static void genFunction (iCode *ic)
 		emitpcode(POC_CLRF,   popCopyReg(&pc_pclath));/* during an interrupt PCLATH must be cleared before a goto or call statement */
 		
 		pBlockConvert2ISR(pb);
+		pic14_hasInterrupt = 1;
 #if 0  
 		if (!inExcludeList("acc"))		
 			pic14_emitcode ("push","acc");  

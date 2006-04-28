@@ -7946,7 +7946,7 @@ test $OPT_DISABLE_UCSIM   = 0 &&
 
 subdirs="$subdirs sim/ucsim"
 
-test $OPT_ENABLE_DOC      = 1 &&           ac_config_files="$ac_config_files doc/Makefile"
+          ac_config_files="$ac_config_files doc/Makefile"
 
 
 test $OPT_DISABLE_AVR = 0 &&           ac_config_files="$ac_config_files src/avr/Makefile"

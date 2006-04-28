@@ -7,6 +7,14 @@
 	* device/lib/ds390/Makefile.in,
 	* device/lib/ds400/Makefile.in: added srcdir to include search path,
 	thanks to Borut for the bug report
+	* configure.in,
+	* configure: always create doc/Makefile independent from --enable-doc
+	* Makefile.in: always install from directory doc independent from
+	--enable-doc
+	* device/lib/pic/Makefile.in: added libdev again, it was erroneously
+	removed
+	* device/lib/pic/libdev/Makefile.in: fixed VPATH build
+	* doc/Makefile.in: install *.txt if present
 
 2006-04-28 Raphael Neider <rneider AT web.de>
 

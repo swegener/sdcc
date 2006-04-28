@@ -51,8 +51,9 @@ endif
 
 ifeq ($(OPT_ENABLE_DOC), 1)
 TARGETS         += sdcc-doc
-PKGS            += $(SDCC_DOC)
 endif
+# always install docs, which don't need to be built 
+PKGS            += $(SDCC_DOC)
 
 ifeq ($(OPT_DISABLE_SDCPP), 0)
 SDCC_LIBS       += support/cpp2

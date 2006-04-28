@@ -1,6 +1,9 @@
 SDCC_BASE = ../../../..
 INSTALL_DIR = ../bin
 
+VPATH  = @srcdir@
+srcdir = @srcdir@
+
 CC = $(SDCC_BASE)/bin/sdcc
 LIB = @GPLIB@
 CP = @CP@
@@ -9,7 +12,7 @@ RMDIR = @RMDIR@
 
 CPPFLAGS = -I$(srcdir)/../../../include/pic
 
-C_SRC = $(wildcard pic16*.c)
+C_SRC = $(notdir $(wildcard $(srcdir)/pic16*.c))
 OBJS = $(C_SRC:.c=.o)
 LIBS = $(addprefix $(INSTALL_DIR)/,$(OBJS:.o=.lib))
 

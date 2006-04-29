@@ -4069,6 +4069,30 @@ pCodeOp *pic16_newpCodeOpLit(int lit)
   return pcop;
 }
 
+/* Allow for 12 bit literals, required for LFSR */
+pCodeOp *pic16_newpCodeOpLit12(int lit)
+{
+  char *s = buffer;
+  pCodeOp *pcop;
+
+
+  pcop = Safe_calloc(1,sizeof(pCodeOpLit) );
+  pcop->type = PO_LITERAL;
+
+  pcop->name = NULL;
+  //if(lit>=0)
+    sprintf(s,"0x%03x", ((unsigned int)lit) & 0x0fff);
+  //else
+  //  sprintf(s, "%i", lit);
+  
+  if(s)
+    pcop->name = Safe_strdup(s);
+
+  ((pCodeOpLit *)pcop)->lit = lit;
+
+  return pcop;
+}
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2)

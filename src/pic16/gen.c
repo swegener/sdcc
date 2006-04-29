@@ -1869,6 +1869,12 @@ pCodeOp *pic16_popGetLit(int lit)
   return pic16_newpCodeOpLit(lit);
 }
 
+/* Allow for 12 bit literals (LFSR x, <here!>). */
+pCodeOp *pic16_popGetLit12(int lit)
+{
+  return pic16_newpCodeOpLit12(lit);
+}
+
 /*-----------------------------------------------------------------*/
 /* pic16_popGetLit2 - asm operator to pcode operator conversion    */
 /*-----------------------------------------------------------------*/
@@ -10512,7 +10518,18 @@ static void genRightShift (iCode *ic) {
 void pic16_loadFSR0(operand *op, int lit)
 {
   if((IS_SYMOP(op) && OP_SYMBOL(op)->remat) || is_LitOp( op )) {
-    pic16_emitpcode(POC_LFSR, pic16_popGetLit2(0, pic16_popGet(AOP(op), 0)));
+    if (AOP_TYPE(op) == AOP_LIT) {
+      /* handle 12 bit integers correctly */
+      unsigned int val = (unsigned int)floatFromVal(AOP(op)->aopu.aop_lit);
+      if ((val & 0x0fff) != val) {
+        fprintf (stderr, "WARNING: Accessing memory at 0x%x truncated to 0x%x.\n",
+		val, (val & 0x0fff) );
+	val &= 0x0fff;
+      }
+      pic16_emitpcode(POC_LFSR, pic16_popGetLit2(0, pic16_popGetLit12(val)));
+    } else {
+      pic16_emitpcode(POC_LFSR, pic16_popGetLit2(0, pic16_popGet(AOP(op), 0)));
+    }
   } else {
     assert (!IS_SYMOP(op) || !OP_SYMBOL(op)->remat);
     // set up FSR0 with address of result

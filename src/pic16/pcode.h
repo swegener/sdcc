@@ -1035,6 +1035,7 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...);
 pCodeOp *pic16_newpCodeOpLabel(char *name, int key);
 pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space);
 pCodeOp *pic16_newpCodeOpLit(int lit);
+pCodeOp *pic16_newpCodeOpLit12(int lit);
 pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2);
 pCodeOp *pic16_newpCodeOpBit(char *name, int bit,int inBitSpace, PIC_OPTYPE subt);
 pCodeOp *pic16_newpCodeOpBit_simple (struct asmop *op, int offs, int bit);

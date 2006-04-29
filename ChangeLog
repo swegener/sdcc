@@ -1,3 +1,10 @@
+2006-04-28 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/pcode.c (pic16_newpCodeOpLit12),
+	* src/pic16/gen.c (pic16_popGetLit12): NEW, create 12 bit literal,
+	  (pic16_loadFSR0): handle 12 bit literals correctly, fixes #1440527
+	* src/pic16/pcode.h: added prototype for pic16_newpCodeOpLit12()
+
 2006-04-28 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* device/lib/pic/libdev/Makefile.in,

@@ -367,8 +367,8 @@ void AddRel(void)
     fclose(lib);
     fclose(libindex);
 
-    _unlink(LibNameTmp);
-    _unlink(IndexName);
+    unlink(LibNameTmp);
+    unlink(IndexName);
 }
 
 void ExtractRel(void)

@@ -17,7 +17,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 # Rule to link into .ihx
 #%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
 
-%$(EXEEXT): %.c $(EXTRAS)
+%$(EXEEXT): %$(OBJEXT) $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.asm

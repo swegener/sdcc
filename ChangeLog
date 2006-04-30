@@ -1,3 +1,8 @@
+2006-04-30 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* support/scripts/sdcc.nsi: removed all Readmes and Makefiles
+	in the library source
+
 2006-04-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/hc08/spec.mk: fixed bug 1478892

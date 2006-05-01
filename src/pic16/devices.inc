@@ -3,7 +3,7 @@
 
    Written By -  Scott Dattalo scott@dattalo.com
    Ported to PIC16 By -  Martin Dubuc m.dubuc@rogers.com
-   Moved from device.c - Raphael Neider, rneider@web.de
+   Moved from device.c - Raphael Neider <rneider AT web.de>
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the

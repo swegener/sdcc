@@ -71,10 +71,9 @@ typedef struct AssignedMemory {
  */
 
 extern AssignedMemory *finalMapping;
-#define PROCESSOR_NAMES    4
 /* Processor unique attributes */
 typedef struct PIC_device {
-	char *name[PROCESSOR_NAMES];/* aliases for the processor name */
+	char *name;                 /* the processor name */
 
 	memRange *ram;              /* RAM memory map */
 	memRange *sfr;              /* SFR memory map */

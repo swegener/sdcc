@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------
  itoa.c - convert (unsigned) int to strings
 
- written by: Raphael Neider <rneider@web.de>
+ written by: Raphael Neider <rneider AT web.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public

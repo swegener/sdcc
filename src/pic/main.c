@@ -294,13 +294,13 @@ _pic14_genAssemblerPreamble (FILE * of)
 	
 	if(!name) {
 		
-		name = "p16f877";
+		name = "16f877";
 		fprintf(stderr,"WARNING: No Pic has been selected, defaulting to %s\n",name);
 	}
 	
-	fprintf (of, "\tlist\tp=%s\n",&name[1]);
+	fprintf (of, "\tlist\tp=%s\n",name);
 	fprintf (of, "\tradix dec\n");
-	fprintf (of, "\tinclude \"%s.inc\"\n",name);
+	fprintf (of, "\tinclude \"p%s.inc\"\n",name);
 }
 
 /* Generate interrupt vector table. */
@@ -445,6 +445,7 @@ static void _pic14_do_link (void)
   char temp[128];
   set *tSet=NULL;
   int ret;
+  char * procName;
   
   /*
    * link command format:
@@ -477,8 +478,13 @@ static void _pic14_do_link (void)
   shash_add(&linkValues, "ofiles", joinStrSet(relFilesSet));
 
   /* LIBRARIES */
+  procName = processor_base_name();
+  if (!procName) {
+     procName = "16f877";
+  }
+	
   addSet(&libFilesSet, "libsdcc.lib");
-  SNPRINTF(&temp[0], 128, "pic%s.lib", port->processor);
+  SNPRINTF(&temp[0], 128, "pic%s.lib", procName);
   addSet(&libFilesSet, temp);
   shash_add(&linkValues, "libs", joinStrSet(libFilesSet));
 

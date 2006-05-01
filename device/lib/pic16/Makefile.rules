@@ -1,14 +1,14 @@
 ###########################################################
 ### Makefile.rules for the GNU PIC Library
 ###
-### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+### Copyright (C) 2005 by Raphael Neider <rneider AT web.de>
 ###
 ### The GNU PIC Library was originally designed and
 ### implemented by
 ###	Vangelis Rokas <vrokas@otenet.gr>
 ###
 ### It is currently maintained by
-###	Raphael Neider <rneider@web.de>
+###	Raphael Neider <rneider AT web.de>
 ###
 ### This file may be distributed under the terms of the the
 ### GNU General Public License (GPL). See COPYING for details.

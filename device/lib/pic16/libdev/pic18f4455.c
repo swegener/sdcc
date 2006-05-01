@@ -5,7 +5,7 @@
  * 
  * May, 2005
  * The GNU PIC Library is maintained by
- *     Raphael Neider <rneider@web.de>
+ *     Raphael Neider <rneider AT web.de>
  * 
  * originally designed by
  *     Vangelis Rokas <vrokas@otenet.gr>

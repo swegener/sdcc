@@ -7,7 +7,7 @@
   PIC port   -  Scott Dattalo scott@dattalo.com (2000)
   PIC16 port -  Martin Dubuc m.dubuc@rogers.com (2002)
              -  Vangelis Rokas vrokas@otenet.gr (2003,2004,2005)
-  Bug Fixes  -  Raphael Neider rneider@web.de (2004,2005)
+  Bug Fixes  -  Raphael Neider <rneider AT web.de> (2004,2005)
   
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the

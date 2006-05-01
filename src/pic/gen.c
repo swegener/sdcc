@@ -5,7 +5,7 @@
          and -  Jean-Louis VERN.jlvern@writeme.com (1999)
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
   PIC port   -  Scott Dattalo scott@dattalo.com (2000)
-    cont'd   -  Raphael Neider rneider@web.de (2005)
+    cont'd   -  Raphael Neider <rneider AT web.de> (2005)
   
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the

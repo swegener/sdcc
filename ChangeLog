@@ -1,3 +1,23 @@
+2006-05-01 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (sanitise_processor_name): only remove p(ic) prefix,
+	  (create_pic): store only prefix-free device name,
+	  (init_pic): check for device names with "16" prefix,
+	  (list_valid_pics),
+	* src/pic/device.h (struct PIC_device),
+	* src/pic/main.c (_pic14_genAssemblerPreamble): adapted to single
+	    stored device name,
+	* device/include/pic/pic12f{635,675,629,683}.h,
+	* device/lib/pic/libdev/pic12f{635,675,629,683}.c: NEW device libraries
+	* device/lib/pic/libdev/Makefile.in: allow pic12* devices,
+	* device/include/pic/pic16f505.h,
+	* device/lib/pic/libdev/pic16f505.c: removed
+	* device/include/pic/pic14devices.txt: added support for pic12f
+	    devices, removed unsupported non 16-bit devices
+	    [above changes provided by patch from Zik Saleeba]
+	* src/pic/*, src/pic16/*, device/include/pic16/*,
+	  device/lib/pic/**, device/lib/pic16/**: obfuscated email address
+
 2006-05-01 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, doc/Makefile.in:

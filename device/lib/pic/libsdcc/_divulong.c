@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------------
    _divulong.c : 32 bit division routines for pic14 devices
 
-  	Written By	Raphael Neider, rneider@web.de (2005)
+  	Written By	Raphael Neider <rneider AT web.de> (2005)
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public

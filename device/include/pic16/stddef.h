@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    stddef.h - ANSI functions forward declarations
 
-   Ported to PIC16 port by Raphael Neider, 2005 (rneider@web.de)
+   Ported to PIC16 port by Raphael Neider <rneider AT web.de> (2005)
 
    Written By -  Maarten Brock / sourceforge.brock@dse.nl (June 2004)
 

@@ -1,10 +1,10 @@
 ###########################################################
 ### Makefile.rules for the SDCC/PIC14 Library
 ###
-### Copyright (C) 2005 by Raphael Neider <rneider@web.de>
+### Copyright (C) 2005 by Raphael Neider <rneider AT web.de>
 ###
 ### The library is currently maintained by
-###	Raphael Neider <rneider@web.de>
+###	Raphael Neider <rneider AT web.de>
 ###
 ### This file may be distributed under the terms of the the
 ### GNU General Public License (GPL). See GPL for details.

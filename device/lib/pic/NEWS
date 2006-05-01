@@ -35,10 +35,10 @@ The pic14 library is split into several parts:
   common to all pic14 chips. This part is currently absent...
 
 The SDCC/pic14 library has been created by
-	Raphael Neider (2005), rneider@web.de
+	Raphael Neider <rneider AT web.de> (2005)
 
 It is currently maintained by
-	Raphael Neider, rneider@web.de
+	Raphael Neider <rneider AT web.de>
 
 The pic14 and the device specific parts (whose sources are found
 in device/lib/pic/) are to be licensed nuder the terms of the

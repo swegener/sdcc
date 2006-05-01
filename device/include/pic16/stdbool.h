@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   stdbool.h - ANSI functions forward declarations
 
-   Ported to PIC16 port by Raphael Neider 2005 (RNeider@web.de)
+   Ported to PIC16 port by Raphael Neider <rneider AT web.de> (2005)
    
              Written By -  Maarten Brock, sourceforge.brock@dse.nl (2004)
 

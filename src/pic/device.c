@@ -113,15 +113,12 @@ static char *sanitise_processor_name(char *name)
 	if (name == NULL)
 		return NULL;
 	
-	if (STRNCASECMP(proc_pos, "pic16", 5) == 0)
-		proc_pos += 5;
-
-	else if (STRNCASECMP(proc_pos, "p16", 3) == 0)
+	if (STRNCASECMP(proc_pos, "pic", 3) == 0)
 		proc_pos += 3;
+
+	else if (tolower(*proc_pos) == 'p')
+		proc_pos += 1;
 				
-	else if (STRNCASECMP(proc_pos, "16", 2) == 0)
-		proc_pos += 2;
-					
 	return proc_pos;
 }
 
@@ -133,14 +130,8 @@ static PIC_device *create_pic(char *pic_name, int maxram, int bankmsk, int confs
 	char *simple_pic_name = sanitise_processor_name(pic_name);
 	
 	new_pic = Safe_calloc(1, sizeof(PIC_device));
-	new_pic->name[0] = Safe_calloc(strlen(simple_pic_name)+3, sizeof(char));
-	sprintf(new_pic->name[0], "16%s", simple_pic_name);
-	new_pic->name[1] = Safe_calloc(strlen(simple_pic_name)+4, sizeof(char));
-	sprintf(new_pic->name[1], "p16%s", simple_pic_name);
-	new_pic->name[2] = Safe_calloc(strlen(simple_pic_name)+6, sizeof(char));
-	sprintf(new_pic->name[2], "pic16%s", simple_pic_name);
-	new_pic->name[3] = Safe_calloc(strlen(simple_pic_name)+1, sizeof(char));
-	strcpy(new_pic->name[3], simple_pic_name);
+	new_pic->name = Safe_calloc(strlen(simple_pic_name)+1, sizeof(char));
+	strcpy(new_pic->name, simple_pic_name);
 			
 	new_pic->defMaxRAMaddrs = maxram;
 	new_pic->bankMask = bankmsk;
@@ -228,8 +219,8 @@ static PIC_device *find_device(char *pic_name)
 	char filename[512];
 	int len = 512;
 	
+	/* allow abbreviations of the form "f877" - convert to "16f877" */
 	simple_pic_name = sanitise_processor_name(pic_name);
-	
 	num_of_supported_PICS = 0;
 	
 	/* open the piclist file */
@@ -647,28 +638,22 @@ void dump_sfr(FILE *of)
 * list_alias - if non-zero, print all of the supported aliases
 *              for a device (e.g. F84, 16F84, etc...)
 *-----------------------------------------------------------------*/
-void list_valid_pics(int ncols, int list_alias)
+void list_valid_pics(int ncols)
 {
 	int col=0,longest;
-	int i,j,k,l;
-	int max_alias = 1;
+	int i,k,l;
 	
 	if (num_of_supported_PICS == 0)
 		find_device(NULL);          /* load all the definitions */
-	
-	if(list_alias)
-		max_alias = PROCESSOR_NAMES;
 	
 	/* decrement the column number if it's greater than zero */
 	ncols = (ncols > 1) ? ncols-1 : 4;
 	
 	/* Find the device with the longest name */
 	for(i=0,longest=0; i<num_of_supported_PICS; i++) {
-		for(j=0; j<max_alias; j++) {
-			k = strlen(Pics[i]->name[j]);
-			if(k>longest)
-				longest = k;
-		}
+		k = strlen(Pics[i]->name);
+		if(k>longest)
+			longest = k;
 	}
 	
 #if 1
@@ -681,8 +666,8 @@ void list_valid_pics(int ncols, int list_alias)
 	fprintf(stderr, "-----------------------------------------------------\n");
 	
 	for(i=0;  i < num_of_supported_PICS; i++) {
-		fprintf(stderr,"  %s", Pics[i]->name[0]);
-		l = longest + 2 - strlen(Pics[i]->name[0]);
+		fprintf(stderr,"  %s", Pics[i]->name);
+		l = longest + 2 - strlen(Pics[i]->name);
 		for(k=0; k<l; k++)
 			fputc(' ',stderr);
 	
@@ -701,21 +686,17 @@ void list_valid_pics(int ncols, int list_alias)
 	fprintf(stderr, "\nPIC14 processors supported:\n");
 	for(i=0;  i < num_of_supported_PICS; i++) {
 			
-		for (j = 0; j<max_alias; j++) {
-			
-			fprintf(stderr,"%s", Pics[i]->name[j]);
-			if(col<ncols) {
-				l = longest + 2 - strlen(Pics[i]->name[j]);
-				for(k=0; k<l; k++)
-					fputc(' ',stderr);
+		fprintf(stderr,"%s", Pics[i]->name);
+		if(col<ncols) {
+			l = longest + 2 - strlen(Pics[i]->name);
+			for(k=0; k<l; k++)
+				fputc(' ',stderr);
 				
-				col++;
+			col++;
 				
-			} else {
-				fputc('\n',stderr);
-				col = 0;
-			}
-			
+		} else {
+			fputc('\n',stderr);
+			col = 0;
 		}
 		
 	}
@@ -729,16 +710,23 @@ void list_valid_pics(int ncols, int list_alias)
 *-----------------------------------------------------------------*/
 void init_pic(char *pic_type)
 {
+	char long_name[PIC14_STRING_LEN];
+	
 	pic = find_device(pic_type);
 	
-	if(!pic) {
-		if(pic_type)
-			fprintf(stderr, "'%s' was not found.\n", pic_type);
-		else
-			fprintf(stderr, "No processor has been specified (use -pPROCESSOR_NAME)\n");
+	if (pic == NULL) {
+		/* check for shortened "16xxx" form */
+		sprintf(long_name, "16%s", pic_type);
+		pic = find_device(long_name);
+		if (pic == NULL) {
+			if(pic_type != NULL && pic_type[0] != '\0')
+				fprintf(stderr, "'%s' was not found.\n", pic_type);
+			else
+				fprintf(stderr, "No processor has been specified (use -pPROCESSOR_NAME)\n");
 		
-		list_valid_pics(7,0);
-		exit(1);
+			list_valid_pics(7);
+			exit(1);
+		}
 	}
 }
 
@@ -763,7 +751,7 @@ char *processor_base_name(void)
 	if(!pic)
 		return NULL;
 	
-	return pic->name[1];
+	return pic->name;
 }
 
 /*-----------------------------------------------------------------*

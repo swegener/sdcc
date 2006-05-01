@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    fps16x16_lteq.c - compare two __fixed16x16 values
 
-             written by - Raphael Neider, rneider@web.de (2005)
+             written by - Raphael Neider <rneider AT web.de> (2005)
    
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU Library General Public License as published by the

@@ -369,7 +369,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
         if (options.debug) {
           fprintf (map->oFile, "==.\n");
         }
-        if (IS_STATIC (sym->etype))
+          if (IS_STATIC (sym->etype) || sym->level)
           tfprintf (map->oFile, "!slabeldef\n", sym->rname);
         else
           tfprintf (map->oFile, "!labeldef\n", sym->rname);           

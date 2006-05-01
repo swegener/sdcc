@@ -1,3 +1,8 @@
+2006-05-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (emitRegularMap): partial fix for bug 1477149, thanks
+	  Hubert Sack for patch 1479782
+
 2006-05-01 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/glue.c (pic16_printIvalStruct): fixed bug #1445929
@@ -33,7 +38,7 @@
 	* support/scripts/sdcc.nsi: removed all Readmes and Makefiles
 	in the library source
 
-2006-04-26 Maarten Brock <sourceforge.brock AT dse.nl>
+2006-04-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/hc08/spec.mk: fixed bug 1478892
 

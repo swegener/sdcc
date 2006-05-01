@@ -859,7 +859,7 @@ void pic16_printIvalStruct (symbol * sym, sym_link * type,
     iloop = ilist->init.deep;
   }
 
-  for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
+  for (; (sflds && iloop); sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
 //    fprintf(stderr, "%s:%d sflds: %p\tiloop = %p\n", __FILE__, __LINE__, sflds, iloop);
     if (IS_BITFIELD(sflds->type)) {
       pic16_printIvalBitFields(&sflds, &iloop, ptype, p);

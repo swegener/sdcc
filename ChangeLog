@@ -1,3 +1,7 @@
+2006-05-01 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/glue.c (pic16_printIvalStruct): fixed bug #1445929
+
 2006-05-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic/device.c (sanitise_processor_name): only remove p(ic) prefix,

@@ -1,3 +1,9 @@
+2006-05-01 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure, doc/Makefile.in:
+	  sync with nightly build makefile - latex, dvipdf and dvips
+	  not needed any more
+
 2006-04-30 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/scripts/sdcc.nsi: removed all Readmes and Makefiles

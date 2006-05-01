@@ -314,7 +314,7 @@ ac_subdirs_all="$ac_subdirs_all packihx"
 ac_subdirs_all="$ac_subdirs_all sim/ucsim"
 ac_subdirs_all="$ac_subdirs_all device/lib/pic"
 ac_subdirs_all="$ac_subdirs_all device/lib/pic16"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP EGREP M_OR_MM sdccconf_h_dir_separator include_dir_suffix lib_dir_suffix docdir OPT_DISABLE_MCS51 OPT_DISABLE_GBZ80 OPT_DISABLE_Z80 OPT_DISABLE_AVR OPT_DISABLE_DS390 OPT_DISABLE_DS400 OPT_DISABLE_PIC OPT_DISABLE_PIC16 OPT_DISABLE_XA51 OPT_DISABLE_HC08 OPT_DISABLE_UCSIM OPT_DISABLE_DEVICE_LIB OPT_DISABLE_PACKIHX OPT_DISABLE_SDCPP OPT_ENABLE_DOC LYX LATEX LATEX2HTML PDFLATEX DVIPDF DVIPS MAKEINDEX OPT_ENABLE_LIBGC subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS AWK VERSION VERSIONHI VERSIONLO VERSIONP CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB LEX LEXLIB LEX_OUTPUT_ROOT YACC AUTOCONF STRIP AS CP EGREP M_OR_MM sdccconf_h_dir_separator include_dir_suffix lib_dir_suffix docdir OPT_DISABLE_MCS51 OPT_DISABLE_GBZ80 OPT_DISABLE_Z80 OPT_DISABLE_AVR OPT_DISABLE_DS390 OPT_DISABLE_DS400 OPT_DISABLE_PIC OPT_DISABLE_PIC16 OPT_DISABLE_XA51 OPT_DISABLE_HC08 OPT_DISABLE_UCSIM OPT_DISABLE_DEVICE_LIB OPT_DISABLE_PACKIHX OPT_DISABLE_SDCPP OPT_ENABLE_DOC LYX LATEX2HTML PDFLATEX PDFOPT MAKEINDEX OPT_ENABLE_LIBGC subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -7564,42 +7564,7 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  # Extract the first word of "latex", so it can be a program name with args.
-set dummy latex; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_LATEX+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$LATEX"; then
-  ac_cv_prog_LATEX="$LATEX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_LATEX="latex"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_prog_LATEX" && ac_cv_prog_LATEX=":"
-fi
-fi
-LATEX=$ac_cv_prog_LATEX
-if test -n "$LATEX"; then
-  echo "$as_me:$LINENO: result: $LATEX" >&5
-echo "${ECHO_T}$LATEX" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
+#  AC_CHECK_PROG(LATEX,      latex,      latex, :)
   # Extract the first word of "latex2html", so it can be a program name with args.
 set dummy latex2html; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -7672,15 +7637,15 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  # Extract the first word of "dvipdf", so it can be a program name with args.
-set dummy dvipdf; ac_word=$2
+  # Extract the first word of "pdfopt", so it can be a program name with args.
+set dummy pdfopt; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_DVIPDF+set}" = set; then
+if test "${ac_cv_prog_PDFOPT+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  if test -n "$DVIPDF"; then
-  ac_cv_prog_DVIPDF="$DVIPDF" # Let the user override the test.
+  if test -n "$PDFOPT"; then
+  ac_cv_prog_PDFOPT="$PDFOPT" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -7689,61 +7654,27 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DVIPDF="dvipdf"
+    ac_cv_prog_PDFOPT="pdfopt"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
 done
 done
 
-  test -z "$ac_cv_prog_DVIPDF" && ac_cv_prog_DVIPDF=":"
+  test -z "$ac_cv_prog_PDFOPT" && ac_cv_prog_PDFOPT=":"
 fi
 fi
-DVIPDF=$ac_cv_prog_DVIPDF
-if test -n "$DVIPDF"; then
-  echo "$as_me:$LINENO: result: $DVIPDF" >&5
-echo "${ECHO_T}$DVIPDF" >&6
+PDFOPT=$ac_cv_prog_PDFOPT
+if test -n "$PDFOPT"; then
+  echo "$as_me:$LINENO: result: $PDFOPT" >&5
+echo "${ECHO_T}$PDFOPT" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-  # Extract the first word of "dvips", so it can be a program name with args.
-set dummy dvips; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_DVIPS+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$DVIPS"; then
-  ac_cv_prog_DVIPS="$DVIPS" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_DVIPS="dvips"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_prog_DVIPS" && ac_cv_prog_DVIPS=":"
-fi
-fi
-DVIPS=$ac_cv_prog_DVIPS
-if test -n "$DVIPS"; then
-  echo "$as_me:$LINENO: result: $DVIPS" >&5
-echo "${ECHO_T}$DVIPS" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
+#  AC_CHECK_PROG(DVIPDF,     dvipdf,     dvipdf, :)
+#  AC_CHECK_PROG(DVIPS,      dvips,      dvips, :)
   # Extract the first word of "makeindex", so it can be a program name with args.
 set dummy makeindex; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -7787,12 +7718,7 @@ echo "$as_me: error: Cannot find required program lyx." >&2;}
    { (exit 1); exit 1; }; }
  fi
 
-  if test "$LATEX" = ":"; then
-  { { echo "$as_me:$LINENO: error: Cannot find required program latex." >&5
-echo "$as_me: error: Cannot find required program latex." >&2;}
-   { (exit 1); exit 1; }; }
- fi
-
+#  SDCC_REQUIRE_PROG($LATEX,      latex)
   if test "$LATEX2HTML" = ":"; then
   { { echo "$as_me:$LINENO: error: Cannot find required program latex2html." >&5
 echo "$as_me: error: Cannot find required program latex2html." >&2;}
@@ -7805,18 +7731,14 @@ echo "$as_me: error: Cannot find required program pdflatex." >&2;}
    { (exit 1); exit 1; }; }
  fi
 
-  if test "$DVIPDF" = ":"; then
-  { { echo "$as_me:$LINENO: error: Cannot find required program dvipdf." >&5
-echo "$as_me: error: Cannot find required program dvipdf." >&2;}
+  if test "$PDFOPT" = ":"; then
+  { { echo "$as_me:$LINENO: error: Cannot find required program pdfopt." >&5
+echo "$as_me: error: Cannot find required program pdfopt." >&2;}
    { (exit 1); exit 1; }; }
  fi
 
-  if test "$DVIPS" = ":"; then
-  { { echo "$as_me:$LINENO: error: Cannot find required program dvips." >&5
-echo "$as_me: error: Cannot find required program dvips." >&2;}
-   { (exit 1); exit 1; }; }
- fi
-
+#  SDCC_REQUIRE_PROG($DVIPDF,     dvipdf)
+#  SDCC_REQUIRE_PROG($DVIPS,      dvips)
   if test "$MAKEINDEX" = ":"; then
   { { echo "$as_me:$LINENO: error: Cannot find required program makeindex." >&5
 echo "$as_me: error: Cannot find required program makeindex." >&2;}
@@ -8709,11 +8631,9 @@ s,@OPT_DISABLE_PACKIHX@,$OPT_DISABLE_PACKIHX,;t t
 s,@OPT_DISABLE_SDCPP@,$OPT_DISABLE_SDCPP,;t t
 s,@OPT_ENABLE_DOC@,$OPT_ENABLE_DOC,;t t
 s,@LYX@,$LYX,;t t
-s,@LATEX@,$LATEX,;t t
 s,@LATEX2HTML@,$LATEX2HTML,;t t
 s,@PDFLATEX@,$PDFLATEX,;t t
-s,@DVIPDF@,$DVIPDF,;t t
-s,@DVIPS@,$DVIPS,;t t
+s,@PDFOPT@,$PDFOPT,;t t
 s,@MAKEINDEX@,$MAKEINDEX,;t t
 s,@OPT_ENABLE_LIBGC@,$OPT_ENABLE_LIBGC,;t t
 s,@subdirs@,$subdirs,;t t

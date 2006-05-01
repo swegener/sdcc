@@ -2,12 +2,13 @@ VPATH  = @srcdir@
 srcdir = @srcdir@
 
 LYX        = @LYX@
-LATEX      = @LATEX@
+#LATEX      = @LATEX@
 LATEX2HTML = @LATEX2HTML@
 PDFLATEX   = @PDFLATEX@
-DVIPDF     = @DVIPDF@
-DVIPS      = @DVIPS@
+#DVIPDF     = @DVIPDF@
+#DVIPS      = @DVIPS@
 MAKEINDEX  = @MAKEINDEX@
+PDFOPT     = @PDFOPT@
 
 include ../Makefile.common
 
@@ -80,18 +81,18 @@ $(CDB).html/index.html: $(CDB).tex
 	  $(LYX) -e text $< ; \
 	fi
 
-%.pdf: %.tex %.dvi %.ind
-	$(DVIPDF) $*
-# pdflatex creates documents for acrobat reader >= 5.0	
-#	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDF) $*
+#%.pdf: %.tex %.dvi %.ind
+#	$(DVIPDF) $*
+## pdflatex creates documents for acrobat reader >= 5.0	
+##	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDF) $*
 
-%.ps:  %.pdf
-	$(DVIPS) $*
+#%.ps:  %.pdf
+#	$(DVIPS) $*
 
-%.dvi: %.tex
-	$(LATEX) $<
-	@# rerun to in include aux
-	$(LATEX) $<
+#%.dvi: %.tex
+#	$(LATEX) $<
+#	@# rerun to in include aux
+#	$(LATEX) $<
 
 %.tex: %.lyx
 	if [ "$(srcdir)" != "." ] ; then \
@@ -102,19 +103,28 @@ $(CDB).html/index.html: $(CDB).tex
 	  $(LYX) -e latex $< ; \
 	fi
 
-%.ind: %.dvi
-	$(LATEX) $*
-	# is there an index?
-	if [ -f $*.idx ] ; then \
-	  $(MAKEINDEX) $*; \
-	  $(LATEX) $*; \
-	  $(LATEX) $*; \
-	fi
-#	  -$(MAKEINDEX) -s l2hidx.ist $*; \
+#%.ind: %.dvi
+#	$(LATEX) $*
+#	# is there an index?
+#	if [ -f $*.idx ] ; then \
+#	  $(MAKEINDEX) $*; \
+#	  $(LATEX) $*; \
+#	  $(LATEX) $*; \
+#	fi
+##	  -$(MAKEINDEX) -s l2hidx.ist $*; \
 
-%.glo: %.dvi
-	# the glossary, not implemented yet
-	# $(MAKEINDEX) -s l2hglo.ist -o $@ $<
+#%.glo: %.dvi
+#	# the glossary, not implemented yet
+#	# $(MAKEINDEX) -s l2hglo.ist -o $@ $<
+
+%.pdf: %.tex
+	$(PDFLATEX) $*
+	-$(MAKEINDEX) $*
+	$(PDFLATEX) $*
+	$(PDFLATEX) $*
+	$(PDFOPT) $*.pdf tmp.pdf
+	rm $*.pdf
+	mv tmp.pdf $*.pdf
 
 archive: all
 	rm -rf sdcc-doc sdcc-doc.tar.bz2

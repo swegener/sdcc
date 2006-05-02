@@ -37,7 +37,7 @@ install:
 uninstall:
 	rm -rf $(DESTDIR)$(docdir)
 
-$(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).ind ;#$(MANUAL).glo
+$(MANUAL).html/index.html: $(MANUAL).tex ;#$(MANUAL).ind $(MANUAL).glo
 	mkdir -p $(dir $@)
 	@# fixes $(LATEX2HTML) problems with two consecutive dashes for long-options: --stack-auto
 	@# fixes $(LATEX2HTML) problems with \tabularnewline

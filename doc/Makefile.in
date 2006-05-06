@@ -2,11 +2,8 @@ VPATH  = @srcdir@
 srcdir = @srcdir@
 
 LYX        = @LYX@
-#LATEX      = @LATEX@
 LATEX2HTML = @LATEX2HTML@
 PDFLATEX   = @PDFLATEX@
-#DVIPDF     = @DVIPDF@
-#DVIPS      = @DVIPS@
 MAKEINDEX  = @MAKEINDEX@
 PDFOPT     = @PDFOPT@
 
@@ -32,7 +29,7 @@ install:
 	if [ -f $(TSS).pdf                ]; then cp -rf $(TSS).pdf     $(DESTDIR)$(docdir); fi
 	if [ -f $(CDB).pdf                ]; then cp -rf $(CDB).pdf     $(DESTDIR)$(docdir); fi
 	rm -rf `find $(DESTDIR)$(docdir) -name .svn -type d`
-	rm -f $(DESTDIR)$(docdir)/*/WARNINGS $(DESTDIR)$(docdir)/*/*.pl $(DESTDIR)$(docdir)/*/images.*
+	rm -f $(DESTDIR)$(docdir)/*/images.*
 
 uninstall:
 	rm -rf $(DESTDIR)$(docdir)
@@ -47,6 +44,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex ;#$(MANUAL).ind $(MANUAL).glo
 	touch $< -r $(basename $<).orig.tex # avoid warning that *.tex is newer than *.aux
 	-$(LATEX2HTML) -split 5 -show_section_numbers -local_icons -info "" -dir $(MANUAL).html $(MANUAL)
 	mv $(basename $<).orig.tex $<
+	rm -f $(MANUAL).html/WARNINGS $(MANUAL).html/labels.pl
 
 $(TSS).html/index.html: $(TSS).tex
 	mkdir -p $(dir $@)
@@ -58,6 +56,7 @@ $(TSS).html/index.html: $(TSS).tex
 	touch $< -r $(basename $<).orig.tex # avoid warning that *.tex is newer than *.aux
 	-$(LATEX2HTML) -split 0 -local_icons -info "" -dir $(TSS).html $(TSS)
 	mv $(basename $<).orig.tex $<
+	rm -f $(TSS).html/WARNINGS $(TSS).html/labels.pl
 
 $(CDB).html/index.html: $(CDB).tex
 	mkdir -p $(dir $@)
@@ -69,6 +68,7 @@ $(CDB).html/index.html: $(CDB).tex
 	touch $< -r $(basename $<).orig.tex # avoid warning that *.tex is newer than *.aux
 	-$(LATEX2HTML) -split 0 -show_section_numbers -local_icons -info "" -dir $(CDB).html $(CDB)
 	mv $(basename $<).orig.tex $<
+	rm -f $(CDB).html/WARNINGS $(CDB).html/labels.pl
 
 %.txt: %.lyx
 	@# $(LYX) will export the file in the directory of the $(LYX) file

@@ -1086,7 +1086,7 @@ regs *
 pic16_allocWithIdx (int idx)
 {
 
-  regs *dReg;
+  regs *dReg=NULL;
 
   debugLog ("%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
 //  fprintf(stderr, "%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
@@ -1105,12 +1105,19 @@ pic16_allocWithIdx (int idx)
     
     debugLog ("Dynamic Register not found\n");
 
-//	return (NULL);
-    //fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
-    werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-	    "allocWithIdx not found");
-    exit (1);
+#if 1
+	dReg = newReg(REG_GPR, PO_GPR_TEMP, idx, NULL, 1, 0, NULL);
+	addSet(&pic16_dynAllocRegs, dReg);
+	hTabAddItem(&dynAllocRegNames, regname2key(dReg->name), dReg);
+#endif
 
+	if(!dReg) {
+//  	return (NULL);
+    //fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
+	    werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+		    "allocWithIdx not found");
+	    exit (1);
+	}
   }
 
   dReg->wasUsed = 1;

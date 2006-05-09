@@ -6,7 +6,7 @@
   Bug Fixes  -  Wojciech Stryjewski  wstryj1@tiger.lsu.edu (1999 v2.1.9a)
   PIC port   -  Scott Dattalo scott@dattalo.com (2000)
   PIC16 port -  Martin Dubuc m.dubuc@rogers.com (2002)
-             -  Vangelis Rokas vrokas@otenet.gr (2003,2004,2005)
+             -  Vangelis Rokas <vrokas AT users.sourceforge.net> (2003-2006)
   Bug Fixes  -  Raphael Neider <rneider AT web.de> (2004,2005)
   
   This program is free software; you can redistribute it and/or modify it
@@ -707,6 +707,7 @@ static asmop *aopForSym (iCode *ic, operand *op, bool result)
           /* if SEND do the send here */
           _G.resDirect = 1;
         } else {
+//		  debugf3("symbol `%s' level = %d / %d\n", sym->name, ic->level, ic->seq);
           for(i=0;i<aop->size;i++) {
             aop->aopu.stk.pop[i] = pcop[i] = pic16_popGetTempRegCond(_G.fregsUsed, _G.sregsAlloc, 0 );
             _G.sregsAlloc = bitVectSetBit(_G.sregsAlloc, PCOR(pcop[i])->r->rIdx);
@@ -1411,10 +1412,21 @@ void pic16_freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop)
                 for(i=0;i<aop->size;i++) {
                   PCOR(aop->aopu.stk.pop[i] )->r->isFree = 1;
 
-                  if(bitVectBitValue(_G.sregsAlloc, PCOR(aop->aopu.stk.pop[i])->r->rIdx))
+                  if(bitVectBitValue(_G.sregsAlloc, PCOR(aop->aopu.stk.pop[i])->r->rIdx)) {
                       bitVectUnSetBit(_G.sregsAlloc, PCOR(aop->aopu.stk.pop[i])->r->rIdx);
+//                      pic16_popReleaseTempReg(aop->aopu.stk.pop[i], 0);
+                  }
                 }
+                
+                {
+                  regs *sr;
                   
+                    _G.sregsAllocSet = reverseSet( _G.sregsAllocSet );
+                    for(sr=setFirstItem(_G.sregsAllocSet) ; sr; sr=setFirstItem(_G.sregsAllocSet)) {
+                      pic16_poppCodeOp( pic16_popRegFromIdx( sr->rIdx ) );
+                      deleteSetItem( &_G.sregsAllocSet, sr );
+                    }
+                }
               }
               _G.resDirect = 0;
           }

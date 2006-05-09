@@ -299,6 +299,8 @@ typedef enum
   POC_XORFW,
 
   POC_BANKSEL
+
+  /* pseudo-instructions */
 } PIC_OPCODE;
 
 

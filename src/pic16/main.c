@@ -53,6 +53,7 @@ static char *_pic16_keywords[] =
   "pdata",
   "reentrant",
   "sfr",
+  "sfr16",
   "using",
   "_data",
   "_code",

@@ -1,3 +1,11 @@
+2006-05-09 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/gen.c (pic16_freeAsmop): release any temp registers
+	allocated by aopForSym thus fixing bug #1478657 about failed testfwk.c
+	* src/pic16/main.c (_pic16_keywords): added 'sfr16' keyword,
+	* src/pic16/ralloc.c (pic16_allocWithIdx): also a fix for bug exposed by
+	bug report #1478657,
+
 2006-05-05 Borut Razem <borut.razem AT siol.net>
 
 	* doc/Makefile.in: remove of WARNINGS and labels.pl immediately after

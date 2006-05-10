@@ -1,3 +1,8 @@
+2006-05-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/mcs51/Makefile.in: changed string comparison operator
+	  to = for POSIX compliance; == is bash extension
+
 2006-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/hc08/_mulint.c: applied patch 1485428, thanks

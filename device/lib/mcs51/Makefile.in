@@ -29,9 +29,9 @@ $(LIB): $(OBJ) Makefile
 
 %.rel: %.asm
 	@# TODO: asx8051 should place it's output in the current dir
-	test $(srcdir) == . || cp $< .
+	test $(srcdir) = . || cp $< .
 	-$(AS) $(ASFLAGS) $(notdir $<)
-	test $(srcdir) == . || rm $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
 
 clean:
 	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.lib

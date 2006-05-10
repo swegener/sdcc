@@ -93,6 +93,7 @@ _mulint (int a, int b)
 	ais #2
 	pulx
 	pula
+   _endasm;
 #endif
 }
 #pragma restore

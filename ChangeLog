@@ -1,3 +1,8 @@
+2006-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/hc08/_mulint.c: applied patch 1485428, thanks
+	  kosmonaut_pirx
+
 2006-05-09 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/gen.c (pic16_freeAsmop): release any temp registers

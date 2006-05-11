@@ -1,3 +1,8 @@
+2006-05-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCval.c (valNot): fix for regression test failure
+	  of not.c on big endian hosts
+
 2006-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/inlcude/mcs51/msc1210.h: new, added, thanks Philippe Latu

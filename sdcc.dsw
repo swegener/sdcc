@@ -300,7 +300,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "packihx"=.\packihx\PackIhx.dsp - Package Owner=<4>
+Project: "packihx"=.\support\packihx\PackIhx.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -1,3 +1,16 @@
+2006-05-11 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* packihx/,
+	* configure.in,
+	* configure,
+	* sdcc.dsw,
+	* Makefile.bcc,
+	* Makefile.in,
+	* support/packihx/Makefile.in,
+	* support/packihx/clean.mk,
+	* support/packihx/Makefile.bcc,
+	* support/packihx/PackIhx.dsp: moved packihx to support/packihx
+
 2006-05-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCval.c (valNot): fix for regression test failure

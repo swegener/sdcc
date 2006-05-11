@@ -1,6 +1,6 @@
 # Makefile for Borlad C++
 
-PRJDIR          = ..
+PRJDIR          = ../..
 
 !include $(PRJDIR)/Bcc.inc
 

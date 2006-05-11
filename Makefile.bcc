@@ -29,7 +29,7 @@ sdcc:
         cd ..
 
 packihx:
-        cd packihx
+        cd support\packihx
         make -f Makefile.bcc
         cd ..
 

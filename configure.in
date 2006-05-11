@@ -628,7 +628,7 @@ mv ports ports.build
 # Generating output files
 # ===========================================================================
 test $OPT_DISABLE_SDCPP   = 0 && AC_CONFIG_SUBDIRS(support/cpp2)
-test $OPT_DISABLE_PACKIHX = 0 && AC_CONFIG_SUBDIRS(packihx)
+test $OPT_DISABLE_PACKIHX = 0 && AC_CONFIG_SUBDIRS(support/packihx)
 test $OPT_DISABLE_UCSIM   = 0 && AC_CONFIG_SUBDIRS(sim/ucsim)
 AC_CONFIG_FILES([doc/Makefile])
 

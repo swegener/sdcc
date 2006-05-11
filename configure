@@ -310,7 +310,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all support/cpp2"
-ac_subdirs_all="$ac_subdirs_all packihx"
+ac_subdirs_all="$ac_subdirs_all support/packihx"
 ac_subdirs_all="$ac_subdirs_all sim/ucsim"
 ac_subdirs_all="$ac_subdirs_all device/lib/pic"
 ac_subdirs_all="$ac_subdirs_all device/lib/pic16"
@@ -7862,7 +7862,7 @@ subdirs="$subdirs support/cpp2"
 
 test $OPT_DISABLE_PACKIHX = 0 &&
 
-subdirs="$subdirs packihx"
+subdirs="$subdirs support/packihx"
 
 test $OPT_DISABLE_UCSIM   = 0 &&
 

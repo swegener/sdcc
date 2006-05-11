@@ -1,7 +1,7 @@
 clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~ \#*
-	rm -f $(top_builddir)bin/packihx$(EXEEXT)
+	rm -f $(TARGET)
 
 distclean realclean: clean
 	rm -f config.* Makefile

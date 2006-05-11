@@ -839,7 +839,10 @@ storeRegToAop (regs *reg, asmop *aop, int loffset)
 
   if (aop->type == AOP_DUMMY)
     return;
-    
+
+  if (aop->type == AOP_CRY) /* This can only happen if IFX was optimized */
+    return;                 /* away, so just toss the result */
+
   switch (regidx)
     {
       case A_IDX:
@@ -2168,6 +2171,14 @@ asmopToBool (asmop *aop, bool resultInA)
             hc08_freeReg (hc08_reg_a);
             flagsonly = FALSE;
           }
+        break;
+      case AOP_LIT:
+        /* Higher levels should optimize this case away but let's be safe */
+        if ((unsigned long) floatFromVal (aop->aopu.aop_lit))
+          loadRegFromConst (hc08_reg_a, one);
+        else
+          loadRegFromConst (hc08_reg_a, zero);
+        hc08_freeReg(hc08_reg_a);
         break;
       default:
         if (size==1)
@@ -7694,6 +7705,30 @@ genIfx (iCode * ic, iCode * popIc)
   D(emitcode (";     genIfx",""));
 
   aopOp (cond, ic, FALSE);
+
+  /* If the condition is a literal, we can just do an unconditional */
+  /* branch or no branch */
+  if (AOP_TYPE (cond) == AOP_LIT)
+    {
+      unsigned long lit = (unsigned long) floatFromVal (AOP (cond)->aopu.aop_lit);
+      freeAsmop (cond, NULL, ic, TRUE);
+
+      /* if there was something to be popped then do it */
+      if (popIc)
+        genIpop (popIc);
+      if (lit)
+        {
+          if (IC_TRUE (ic))
+            emitBranch ("jmp", IC_TRUE (ic));
+        }
+      else
+        {
+          if (IC_FALSE (ic))
+            emitBranch ("jmp", IC_FALSE (ic));
+        }
+      ic->generated = 1;
+      return;
+    }
 
   /* get the value into acc */
   if (AOP_TYPE (cond) != AOP_CRY)

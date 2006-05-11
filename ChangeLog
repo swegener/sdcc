@@ -1,3 +1,8 @@
+2006-05-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (asmopToBool, genIfx): fix for bug #1429722
+	* src/hc08/gen.c (storeRegToAop): fix for bug #1439894
+
 2006-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sim/ucsim/sim.src/memcl.h: added get_decoder() to cl_address_space

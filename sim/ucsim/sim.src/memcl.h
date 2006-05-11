@@ -292,6 +292,8 @@ public:
   virtual void set_bit1(t_addr addr, t_mem bits);
   virtual void set_bit0(t_addr addr, t_mem bits);
 
+  virtual class cl_address_decoder *get_decoder(t_addr addr);
+
   virtual class cl_memory_cell *get_cell(t_addr addr);
   virtual int get_cell_flag(t_addr addr);
   virtual bool get_cell_flag(t_addr addr, enum cell_flag flag);

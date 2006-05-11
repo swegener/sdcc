@@ -1,3 +1,13 @@
+2006-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sim/ucsim/sim.src/memcl.h: added get_decoder() to cl_address_space
+	* sim/ucsim/sim.src/mem.cc: implemented cl_address_space::get_decoder,
+	  (cl_address_space constructor): removed expensive initialization,
+	  (cl_address_space::get_cell): extended for late initialization,
+	  (cl_address_space::*): use late initialization,
+	  (cl_address_decoder::activate): removed expensive initialization,
+	  This reduced regression test running time by 25%
+
 2006-05-11 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* packihx/,

@@ -180,4 +180,11 @@ __sfr __at 0xf8 EIP; // extended interrupt priority
   __sbit __at 0xfe C0IP;
   __sbit __at 0xff CANBIP;
 
+/*  WORD/DWORD Registers  */
+
+__sfr16 __at (0x8C8A) TMR0     ;  /* TIMER 0 COUNTER                                         */
+__sfr16 __at (0x8D8B) TMR1     ;  /* TIMER 1 COUNTER                                         */
+__sfr16 __at (0xCDCC) TMR2     ;  /* TIMER 2 COUNTER                                         */
+__sfr16 __at (0xCBCA) RCAP2    ;  /* TIMER 2 CAPTURE REGISTER WORD                           */
+
 #endif /* DS80C390_H */

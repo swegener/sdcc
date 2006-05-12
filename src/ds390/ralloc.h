@@ -29,12 +29,13 @@
 
 enum
   {
-    R2_IDX = 0, R3_IDX, R4_IDX,
-    R5_IDX, R6_IDX, R7_IDX,
-    R0_IDX, R1_IDX, DPL_IDX, 
-    DPH_IDX, DPX_IDX, B_IDX, X8_IDX,
-    X9_IDX, X10_IDX, X11_IDX,
-    X12_IDX, CND_IDX ,
+    R2_IDX = 0, R3_IDX, R4_IDX, R5_IDX,
+    R6_IDX, R7_IDX, R0_IDX, R1_IDX,
+    DPL_IDX, DPH_IDX, DPX_IDX, B_IDX,
+    B0_IDX, B1_IDX, B2_IDX,  B3_IDX,
+    B4_IDX, B5_IDX, B6_IDX,  B7_IDX,
+    X8_IDX, X9_IDX, X10_IDX, X11_IDX,
+    X12_IDX, CND_IDX,
     A_IDX, DPL1_IDX, DPH1_IDX,
     DPX1_IDX, DPS_IDX, AP_IDX,
     END_IDX
@@ -44,6 +45,7 @@ enum
 #define REG_PTR 0x01
 #define REG_GPR 0x02
 #define REG_CND 0x04
+#define REG_BIT 0x08
 /* definition for the registers */
 typedef struct regs
   {
@@ -64,8 +66,10 @@ extern regs regs390[];
 regs *ds390_regWithIdx (int);
 
 bitVect *ds390_rUmaskForOp (operand * op);
+bitVect *ds390_allBitregs (void);
 
 extern int ds390_ptrRegReq;
 extern int ds390_nRegs;
+extern int ds390_nBitRegs;
 
 #endif

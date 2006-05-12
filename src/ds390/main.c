@@ -32,6 +32,8 @@ static char *_ds390_keywords[] =
   "pdata",
   "reentrant",
   "sfr",
+  "sfr16",
+  "sfr32",
   "sbit",
   "using",
   "xdata",

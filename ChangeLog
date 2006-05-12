@@ -1,3 +1,16 @@
+2006-05-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: documented numeric ranges, WEBDOC #1442369
+	* device/include/ds80c390.h: added sfr16 definitions
+	* src/ds390/gen.c,
+	* src/ds390/gen.h,
+	* src/ds390/main.c,
+	* src/ds390/ralloc.c,
+	* src/ds390/ralloc.h: changes all over the place to sync with mcs51
+	  fixing several bugs and adding sfr16/sfr32, reentrant bit params,
+	  bit returning functions
+	* support/regression/tests/sfr16.c: enabled test on ds390
+
 2006-05-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (asmopToBool, genIfx): fix for bug #1429722

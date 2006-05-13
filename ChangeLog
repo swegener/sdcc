@@ -1,3 +1,14 @@
+2006-05-13 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/avr/gen.c (aopop),
+	* src/ds390/gen.c (aopOp),
+	* src/hc08/gen.c (aopOp),
+	* src/mcs51/gen.c (aopop),
+	* src/pic16/gen.c (pic16_aopOp),
+	* src/pic/gen.c (aopOp),
+	* src/z80/gen.c (aopop): fix for bug #1479882; use new, exclusive asmop
+	if size of operand is smaller than spill location
+
 2006-05-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: documented numeric ranges, WEBDOC #1442369

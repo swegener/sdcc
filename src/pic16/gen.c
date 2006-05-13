@@ -1289,6 +1289,10 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 #endif
 
 	sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
+	if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
+	    /* Don't reuse the new aop */
+	    sym->usl.spillLoc->aop = NULL;
+	}
 	//aop->aopu.pcop = pic16_popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
 	if (sym->usl.spillLoc && sym->usl.spillLoc->rname) {
 	  aop->aopu.pcop = pic16_popRegFromString(sym->usl.spillLoc->rname, 

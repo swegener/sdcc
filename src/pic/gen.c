@@ -942,9 +942,12 @@ void aopOp (operand *op, iCode *ic, bool result)
 		/* else spill location	*/
 		if (sym->usl.spillLoc)
 		{
+			asmop *oldAsmOp = NULL;
+
 			if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
 			{
 				/* force a new aop if sizes differ */
+				oldAsmOp = sym->usl.spillLoc->aop;
 				sym->usl.spillLoc->aop = NULL;
 			}
 			DEBUGpic14_emitcode(";","%s %d %s sym->rname = %s, offset %d",
@@ -953,6 +956,11 @@ void aopOp (operand *op, iCode *ic, bool result)
 				sym->rname, sym->usl.spillLoc->offset);
 		
 			sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
+			if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
+			{
+				/* Don't reuse the new aop, go with the last one */
+				sym->usl.spillLoc->aop = oldAsmOp;
+			}
 			//aop->aopu.pcop = popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
 			aop->aopu.pcop = popRegFromString(sym->usl.spillLoc->rname, 
 				getSize(sym->type), 

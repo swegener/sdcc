@@ -1205,13 +1205,21 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
 
       if (sym->usl.spillLoc)
         {
+          asmop *oldAsmOp = NULL;
+
           if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
             {
               /* force a new aop if sizes differ */
+              oldAsmOp = sym->usl.spillLoc->aop;
               sym->usl.spillLoc->aop = NULL;
             }
           sym->aop = op->aop = aop =
                      aopForSym (ic, sym->usl.spillLoc, result, useDP2);
+          if (getSize(sym->type) != getSize(sym->usl.spillLoc->type))
+            {
+              /* Don't reuse the new aop, go with the last one */
+              sym->usl.spillLoc->aop = oldAsmOp;
+            }
           aop->size = getSize (sym->type);
           return;
         }

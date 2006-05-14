@@ -1,3 +1,9 @@
+2006-05-14 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* support/packihx/configure.in,
+	* support/packihx/configure: removed warning, autoconf >= 2.5x can
+	determine sizeof basic types even while cross compiling
+
 2006-05-13 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/avr/gen.c (aopop),

@@ -1,13 +1,8 @@
 AC_INIT(packihx.c)
 AC_CONFIG_HEADER(config.h:config_in.h)
-AC_PREREQ(2.13)
+AC_PREREQ(2.54)
 
 AC_PROG_CC
-
-# Defaults are for gcc on a 32 bit machine
-if test "$ac_cv_prog_cc_cross" = "yes"; then
-  AC_MSG_WARN("Cannot determine the sizeof basic types while cross compiling.  Using gcc on a 32 bit machine defaults.")
-fi
 
 AC_CHECK_SIZEOF(char, 1)
 AC_CHECK_SIZEOF(short, 2)

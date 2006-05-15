@@ -1,3 +1,10 @@
+2006-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/P89c51RD2.h,
+	* device/include/mcs51/P89LPC901.h,
+	* device/include/mcs51/P89LPC922.h,
+	* device/include/mcs51/P89LPC932.h: added, thanks Omar Espinosa
+
 2006-05-14 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* device/lib/pic16/libsdcc/stack/{stack.S, Makefile.in}: add workaround

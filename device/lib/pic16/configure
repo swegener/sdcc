@@ -1636,7 +1636,7 @@ fi
 
 $CP "$srcdir"/pics.all pics.build
 
-                                                                                                                                                                                                                                                                    ac_config_files="$ac_config_files Makefile Makefile.common debug/Makefile debug/gstack/Makefile libc/Makefile libc/ctype/Makefile libc/delay/Makefile libc/stdio/Makefile libc/stdlib/Makefile libc/string/Makefile libc/utils/Makefile libdev/Makefile libio/Makefile libio/adc/Makefile libio/i2c/Makefile libio/usart/Makefile libm/Makefile libsdcc/Makefile libsdcc/char/Makefile libsdcc/fixed16x16/Makefile libsdcc/float/Makefile libsdcc/gptr/Makefile libsdcc/int/Makefile libsdcc/long/Makefile libsdcc/lregs/Makefile startup/Makefile"
+                                                                                                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile Makefile.common debug/Makefile debug/gstack/Makefile libc/Makefile libc/ctype/Makefile libc/delay/Makefile libc/stdio/Makefile libc/stdlib/Makefile libc/string/Makefile libc/utils/Makefile libdev/Makefile libio/Makefile libio/adc/Makefile libio/i2c/Makefile libio/usart/Makefile libm/Makefile libsdcc/Makefile libsdcc/char/Makefile libsdcc/fixed16x16/Makefile libsdcc/float/Makefile libsdcc/gptr/Makefile libsdcc/int/Makefile libsdcc/long/Makefile libsdcc/lregs/Makefile libsdcc/stack/Makefile startup/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -2213,6 +2213,7 @@ do
   "libsdcc/int/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/int/Makefile" ;;
   "libsdcc/long/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/long/Makefile" ;;
   "libsdcc/lregs/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/lregs/Makefile" ;;
+  "libsdcc/stack/Makefile" ) CONFIG_FILES="$CONFIG_FILES libsdcc/stack/Makefile" ;;
   "startup/Makefile" ) CONFIG_FILES="$CONFIG_FILES startup/Makefile" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

@@ -3,8 +3,6 @@ top_srcdir   = @top_srcdir@
 srcdir       = @srcdir@
 VPATH        = @srcdir@
 
-SUBDIRS = char fixed16x16 float gptr int long stack
-	# lregs
-MKLIB = libsdcc.lib
+SUBDIRS = 
 
 include $(top_srcdir)/Makefile.subdir

@@ -69,6 +69,7 @@ AC_CONFIG_FILES([Makefile
                  libsdcc/int/Makefile
                  libsdcc/long/Makefile
                  libsdcc/lregs/Makefile
+                 libsdcc/stack/Makefile
                  startup/Makefile
                  ])
 AC_OUTPUT

@@ -1,3 +1,8 @@
+2006-05-14 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* device/lib/pic16/libsdcc/stack/{stack.S, Makefile.in}: add workaround
+	to fix missing stack pragma in compiled binary object file,
+
 2006-05-14 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/packihx/configure.in,

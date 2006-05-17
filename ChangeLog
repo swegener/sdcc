@@ -1,3 +1,8 @@
+2006-05-17 Borut Razem <borut.razem AT siol.net>
+
+	* support/Util/dbuf.c: fixed bug #1489008 fix dbuf_c_str(),
+	  thanks Stas Sergeev
+
 2006-05-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/P89c51RD2.h,
@@ -26,6 +31,12 @@
 	* src/pic/gen.c (aopOp),
 	* src/z80/gen.c (aopop): fix for bug #1479882; use new, exclusive asmop
 	if size of operand is smaller than spill location
+
+2006-05-12 Borut Razem <borut.razem AT siol.net>
+
+	* *.dsw, *.dsp: changed property svn:eol-style to CRLF since they
+	  have to have CR/LF line endings even if they are checked out on *nix
+	  or on WIN32 in cygwin binmode
 
 2006-05-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

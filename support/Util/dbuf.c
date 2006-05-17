@@ -1,8 +1,8 @@
 /*
   dbuf.c - Dynamic buffer implementation
-  version 1.1.1, April 11th, 2003
+  version 1.1.2, May 17th, 2006
 
-  Copyright (c) 2002-2003 Borut Razem
+  Copyright (c) 2002-2006 Borut Razem
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -146,7 +146,8 @@ const char *dbuf_c_str(struct dbuf_s *dbuf)
   assert(dbuf->buf != NULL);
 
   /* only if not already null terminated */
-  if (((char *)dbuf->buf)[dbuf->len] != '\0') {
+  if (dbuf->len == dbuf->alloc ||
+    ((char *)dbuf->buf)[dbuf->len] != '\0') {
     dbuf_expand(dbuf, 1);
     ((char *)dbuf->buf)[dbuf->len] = '\0';
   }

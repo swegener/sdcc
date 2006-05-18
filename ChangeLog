@@ -4,6 +4,8 @@
 	  with offset
 	* src/mcs51/peeph.def (186.x): updated and reenabled to fix bugs
 	  1489016, 1434401 and 1490124
+	* src/ds390/peeph.def (186.x, 227.x): updated and reenabled to fix bugs
+	  1489016, 1434401 and 1490124
 
 2006-05-17 Borut Razem <borut.razem AT siol.net>
 

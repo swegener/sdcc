@@ -9868,21 +9868,12 @@ genCodePointerGet (operand * left,
 
       while (size--)
         {
-          if (pi)
-            {
-              emitcode ("clr", "a");
-              emitcode ("movc", "a,@a+dptr");
-              if (!ifx)
-              aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
-              emitcode ("inc", "dptr");
-            }
-          else
-            {
-              emitcode ("mov", "a,#0x%02x", offset);
-              emitcode ("movc", "a,@a+dptr");
-              if (!ifx)
-              aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
-            }
+          emitcode ("clr", "a");
+          emitcode ("movc", "a,@a+dptr");
+          if (!ifx)
+            aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+          if (size || pi)
+            emitcode ("inc", "dptr");
         }
     }
 

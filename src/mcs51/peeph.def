@@ -1449,7 +1449,8 @@ replace {
 	mov	%1,a
 } if notVolatile %1
 
-replace {
+// char indexed access to: long code table[] = {4,3,2,1};
+replace restart {
 	add	a,#%1
 	mov	dpl,a
 	clr	a
@@ -1468,25 +1469,28 @@ replace {
 	mov	%4,a
 	inc	dptr
 	clr	a
+	movc	a,@a+dptr
 } by {
 	;	Peephole 186.a	optimized movc sequence
+	mov	b,a
 	mov	dptr,#%1
-	mov	b,acc
 	movc	a,@a+dptr
 	mov	%2,a
-	mov	acc,b
 	inc	dptr
+	mov	a,b
 	movc	a,@a+dptr
 	mov	%3,a
-	mov	acc,b
 	inc	dptr
+	mov	a,b
 	movc	a,@a+dptr
 	mov	%4,a
-	mov	acc,b
 	inc	dptr
+	mov	a,b
+	movc	a,@a+dptr
 }
 
-replace {
+// char indexed access to: void* code table[] = {4,3,2,1};
+replace restart {
 	add	a,#%1
 	mov	dpl,a
 	clr	a
@@ -1501,21 +1505,24 @@ replace {
 	mov	%3,a
 	inc	dptr
 	clr	a
+	movc	a,@a+dptr
 } by {
 	;	Peephole 186.b	optimized movc sequence
+	mov	b,a
 	mov	dptr,#%1
-	mov	b,acc
 	movc	a,@a+dptr
 	mov	%2,a
-	mov	acc,b
 	inc	dptr
+	mov	a,b
 	movc	a,@a+dptr
 	mov	%3,a
-	mov	acc,b
 	inc	dptr
+	mov	a,b
+	movc	a,@a+dptr
 }
 
-replace {
+// char indexed access to: int code table[] = {4,3,2,1};
+replace restart {
 	add	a,#%1
 	mov	dpl,a
 	clr	a
@@ -1526,31 +1533,31 @@ replace {
 	mov	%2,a
 	inc	dptr
 	clr	a
+	movc	a,@a+dptr
 } by {
 	;	Peephole 186.c	optimized movc sequence
-	mov	dptr,#%1
-	mov	b,acc
-	movc	a,@a+dptr
 	mov	%2,a
-	mov	acc,b
+	mov	dptr,#%1
+	movc	a,@a+dptr
+	xch	a,%2
 	inc	dptr
+	movc	a,@a+dptr
 }
 
-// disabled due to bug #1434401
-//// char indexed access to: char code table[] = {4,3,2,1};
-//replace {
-//	add	a,#%1
-//	mov	dpl,a
-//	clr	a
-//	addc	a,#(%1 >> 8)
-//	mov	dph,a
-//	clr	a
-//	movc	a,@a+dptr
-//} by {
-//	;	Peephole 186.d	optimized movc sequence
-//	mov	dptr,#%1
-//	movc	a,@a+dptr
-//}
+// char indexed access to: char code table[] = {4,3,2,1};
+replace {
+	add	a,#%1
+	mov	dpl,a
+	clr	a
+	addc	a,#(%1 >> 8)
+	mov	dph,a
+	clr	a
+	movc	a,@a+dptr
+} by {
+	;	Peephole 186.d	optimized movc sequence
+	mov	dptr,#%1
+	movc	a,@a+dptr
+}
 
 // char indexed access to: int code table[] = {4,3,2,1};
 replace {

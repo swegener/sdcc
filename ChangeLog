@@ -1,3 +1,10 @@
+2006-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genCodePointerGet): inc dptr instead of loading acc
+	  with offset
+	* src/mcs51/peeph.def (186.x): updated and reenabled to fix bugs
+	  1489016, 1434401 and 1490124
+
 2006-05-17 Borut Razem <borut.razem AT siol.net>
 
 	* support/Util/dbuf.c: fixed bug #1489008 fix dbuf_c_str(),

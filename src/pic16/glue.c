@@ -1436,7 +1436,7 @@ void pic16_emitConfigRegs(FILE *of)
 {
   int i;
 
-	for(i=0;i<pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart;i++)
+	for(i=0;i<=(pic16->cwInfo.confAddrEnd-pic16->cwInfo.confAddrStart);i++)
 		if(pic16->cwInfo.crInfo[i].emit)	//mask != -1)
 			fprintf (of, "\t__config 0x%x, 0x%hhx\n",
 				pic16->cwInfo.confAddrStart+i,
@@ -1447,7 +1447,7 @@ void pic16_emitIDRegs(FILE *of)
 {
   int i;
 
-	for(i=0;i<pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart;i++)
+	for(i=0;i<=(pic16->idInfo.idAddrEnd-pic16->idInfo.idAddrStart);i++)
 		if(pic16->idInfo.irInfo[i].emit)
 			fprintf (of, "\t__idlocs 0x%06x, 0x%hhx\n",
 				pic16->idInfo.idAddrStart+i,

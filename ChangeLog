@@ -1,3 +1,8 @@
+2006-05-19 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/glue.c (pic16_emitConfigRegs, pic16_emitIDRegs): fixed
+	bug in for-loop that didn't emit the last of CONFIG and ID registers
+
 2006-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genCodePointerGet): inc dptr instead of loading acc

@@ -1,3 +1,11 @@
+2006-05-20 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (bitpatternFromVal): fixed for 64-bit machines
+	* src/pic16/ralloc.c (newReg): use correct name in hashtable,
+	  (allocReg): add only new registers to dynAllocRegs,
+	  (pic16_assignRegisters): do not reset dynrIdx, fixes bugs
+	    #1489055, #1445850, and probably #1483693
+
 2006-05-19 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/glue.c (pic16_emitConfigRegs, pic16_emitIDRegs): fixed

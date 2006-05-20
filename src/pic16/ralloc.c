@@ -153,6 +153,7 @@ debugLog (char *fmt,...)
   vsprintf (buffer, fmt, ap);
 
   fprintf (debugF, "%s", buffer);
+  //fprintf (stderr, "%s", buffer);
 /*
    while (isspace((unsigned char)*bufferP)) bufferP++;
 
@@ -424,7 +425,7 @@ regs* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int a
 	dReg->regop = refop;
   
 	if(!(type == REG_SFR && alias == 0x80))
-		hTabAddItem(&dynDirectRegNames, regname2key(name), dReg);
+		hTabAddItem(&dynDirectRegNames, regname2key(dReg->name), dReg);
 
   return dReg;
 }
@@ -578,17 +579,16 @@ allocReg (short type)
 //					(_inRegAllocator)?"ralloc":"", currFunc, reg->name, reg->rIdx);
 
 #if 1
-                if(_inRegAllocator && (dynrIdx > MAX_P16_NREGS)) {
-//                  debugf("allocating more registers than available\n", 0);
-//                  return (NULL);
-                }
+		if(_inRegAllocator && (dynrIdx > MAX_P16_NREGS)) {
+		  //                  debugf("allocating more registers than available\n", 0);
+		  //                  return (NULL);
+		}
+		
+		addSet(&pic16_dynAllocRegs, reg);
+		hTabAddItem(&dynAllocRegNames, regname2key(reg->name), reg);
+//		fprintf(stderr, "%s:%d added reg to pic16_dynAllocRegs = %p\n", __FUNCTION__, __LINE__, pic16_dynAllocRegs);
 #endif
 	}
-
-	addSet(&pic16_dynAllocRegs, reg);
-	hTabAddItem(&dynAllocRegNames, regname2key(reg->name), reg);
-
-//	fprintf(stderr, "%s:%d added reg to pic16_dynAllocRegs = %p\n", __FUNCTION__, __LINE__, pic16_dynAllocRegs);
 	
 	debugLog ("%s of type %s for register rIdx: %d (0x%x)\n", __FUNCTION__, debugLogRegType (type), dynrIdx-1, dynrIdx-1);
 
@@ -4464,7 +4464,9 @@ pic16_assignRegisters (ebbIndex * ebbi)
   regTypeNum ();
 
   /* start counting function temporary registers from zero */
-  dynrIdx = 0;
+  /* XXX: Resetting dynrIdx breaks register allocation,
+   *      see #1489055, #1483693 (?), and #1445850! */
+  //dynrIdx = 0;
 
   /* and serially allocate registers */
   serialRegAssign (ebbs, count);

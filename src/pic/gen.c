@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
 #include "SDCCglobl.h"
 #include "newalloc.h"
 
@@ -9361,10 +9362,10 @@ bitpatternFromVal (value *val)
 {
   union {
     float d;
-    unsigned long l;
+    uint32_t l;
   } float_long;
 
-  assert (sizeof (float) == sizeof (long));
+  assert (sizeof (float) == sizeof (uint32_t));
 
   //fprintf (stderr, "%s:%u(%s): val=%lf, type: %d, etype: %d\n", __FILE__, __LINE__, __FUNCTION__, floatFromVal(val), SPEC_NOUN(val->type), SPEC_NOUN(val->etype));
 

@@ -1147,7 +1147,8 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   /* ignore transfers at the same byte, unless its volatile */
   if (srcaop->op && !isOperandVolatile (srcaop->op, FALSE)
       && dstaop->op && !isOperandVolatile (dstaop->op, FALSE)
-      && operandsEqu(srcaop->op, dstaop->op) && srcofs == dstofs)
+      && operandsEqu(srcaop->op, dstaop->op) && srcofs == dstofs
+      && dstaop->type == srcaop->type)
     return;
       
   if (srcaop->stacked && srcaop->stk_aop[srcofs])
@@ -6514,9 +6515,7 @@ genLeftShift (iCode * ic)
   operand *left, *right, *result;
   int size, offset;
   symbol *tlbl, *tlbl1;
-//  int i;
   char *shift;
-  regs *reg;
 
   D(emitcode (";     genLeftShift",""));
 
@@ -6540,14 +6539,16 @@ genLeftShift (iCode * ic)
      more that 32 bits make no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
 
-  aopOp (left, ic, FALSE);
   aopOp (result, ic, FALSE);
+  aopOp (left, ic, FALSE);
+
+  if (sameRegs(AOP (right), AOP (result)) || IS_AOP_XA (AOP (result)))
+    AOP (result) = forceStackedAop (AOP (result));
 
   /* now move the left to the result if they are not the
      same */
   if (!sameRegs (AOP (left), AOP (result)))
     {
-
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)
@@ -6563,10 +6564,8 @@ genLeftShift (iCode * ic)
   offset = 0;
   tlbl1 = newiTempLabel (NULL);
 
-  reg = hc08_reg_a;
-
-  loadRegFromAop (reg, AOP (right), 0);
-  freeAsmop (right, NULL, ic, TRUE);
+  loadRegFromAop (hc08_reg_x, AOP (right), 0);
+  emitcode ("tstx", "");
   emitBranch ("beq", tlbl1);
   emitLabel (tlbl);
   
@@ -6576,12 +6575,13 @@ genLeftShift (iCode * ic)
       rmwWithAop (shift, AOP (result), offset);  
       shift="rol";
     }
-  rmwWithReg ("dec", reg);
+  rmwWithReg ("dec", hc08_reg_x);
   emitBranch ("bne", tlbl);
   emitLabel (tlbl1);
-  hc08_freeReg (reg);
+  hc08_freeReg (hc08_reg_x);
   
   freeAsmop (result, NULL, ic, TRUE);
+  freeAsmop (right, NULL, ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6833,7 +6833,6 @@ genRightShift (iCode * ic)
   operand *right, *left, *result;
   sym_link *retype;
   int size, offset;
-//  char *l;
   symbol *tlbl, *tlbl1;
   char *shift;
   bool sign;
@@ -6872,19 +6871,25 @@ genRightShift (iCode * ic)
      more that 32 bits make no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
 
-  aopOp (left, ic, FALSE);
   aopOp (result, ic, FALSE);
+  aopOp (left, ic, FALSE);
 
   if (sameRegs(AOP (right), AOP (result)) || IS_AOP_XA (AOP (result)))
     AOP (result) = forceStackedAop (AOP (result));
   
-  size = AOP_SIZE (result); 
-  offset = size-1;
-  while (size--)
+  /* now move the left to the result if they are not the
+     same */
+  if (!sameRegs (AOP (left), AOP (result)))
     {
-      transferAopAop (AOP (left), offset, AOP (result), offset);
-      offset--;
+      size = AOP_SIZE (result); 
+      offset = 0;
+      while (size--)
+        {
+          transferAopAop (AOP (left), offset, AOP (result), offset);
+          offset++;
+        }
     }
+  freeAsmop (left, NULL, ic, TRUE);
   
   tlbl = newiTempLabel (NULL);
   size = AOP_SIZE (result);
@@ -6893,8 +6898,9 @@ genRightShift (iCode * ic)
 
   loadRegFromAop (hc08_reg_x, AOP (right), 0);
   emitcode ("tstx", "");
-  emitcode ("beq", "%05d$", tlbl1->key + 100);
-  emitcode ("", "%05d$:", tlbl->key + 100);
+  emitBranch ("beq", tlbl1);
+  emitLabel (tlbl);
+
   shift= sign ? "asr" : "lsr";
   for (offset=size-1;offset>=0;offset--)
     {
@@ -6902,11 +6908,11 @@ genRightShift (iCode * ic)
       shift="ror";
     }
   rmwWithReg ("dec", hc08_reg_x);
-  emitcode ("bne","%05d$", tlbl->key + 100);
-  emitcode ("", "%05d$:", tlbl1->key + 100);
+  emitBranch ("bne", tlbl);
+  emitLabel (tlbl1);
+  hc08_freeReg (hc08_reg_x);
   
   freeAsmop (result, NULL, ic, TRUE);
-  freeAsmop (left, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
 }
 

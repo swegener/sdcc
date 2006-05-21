@@ -288,3 +288,29 @@ replace {
 	; Peephole 6b  - replaced jmp to rts with rts
 	rts
 } if labelIsReturnOnly
+
+replace restart {
+	psha
+	lda	%1
+	sta	1,s
+} by {
+	; Peephole 7  - optimized stack allocation
+	lda	%1
+	psha
+}
+
+replace restart {
+	lda	%1
+	sta	%1
+} by {
+	; Peephole 8a  - removed redundant sta
+	lda	%1
+} if notVolatile %1
+
+replace restart {
+	sta	%1
+	lda	%1
+} by {
+	; Peephole 8b  - removed redundant lda
+	sta	%1
+} if notVolatile %1

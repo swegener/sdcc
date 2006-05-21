@@ -86,3 +86,24 @@ testShiftOne(void)
     result <<= 1;
     ASSERT(result == ({type})(({type}){vals} << 1));
 }
+
+static {type} ShiftLeftByParam ({type} count)
+{
+    {attr} {storage} {type} i;
+    i = ({type}){vals};
+    return (i << count);
+}
+
+static {type} ShiftRightByParam ({type} count)
+{
+    {attr} {storage} {type} i;
+    i = ({type}){vals};
+    return (i >> count);
+}
+
+void
+testShiftByParam(void)
+{
+    ASSERT(ShiftLeftByParam(2)  == ({type})({vals} << 2));
+    ASSERT(ShiftRightByParam(2) == ({type})({vals} >> 2));
+}

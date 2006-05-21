@@ -1,3 +1,11 @@
+2006-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/hc08/gen.c (transferAopAop): aop forced to stack was not restored,
+	  (genLeftShift, genRightShift): fixed bug 1491627
+	* src/hc08/peeph.def (rules 7, 8.x): added
+	* support/regression/tests/shifts.c (ShiftLeftByParam,
+	  ShiftRightByParam, testShiftByParam): added to test variable shifting
+
 2006-05-20 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (bitpatternFromVal): fixed for 64-bit machines

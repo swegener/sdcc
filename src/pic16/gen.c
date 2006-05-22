@@ -4012,15 +4012,28 @@ void pic16_storeForReturn(iCode *ic, /*operand *op,*/ int offset, pCodeOp *dest)
       }
     }
 
-    if(is_LitOp(op)) {
-      pic16_movLit2f(dest, lit);
+    if (AOP_TYPE(op) == AOP_LIT) {
+      /* FIXME: broken for
+       *   char __at(0x456) foo;
+       *   return &foo;
+       * (upper byte is 0x00 (__code space) instead of 0x80 (__data) */
+      pic16_movLit2f(dest, (lit >> (8ul*offset)));
+    } else if (AOP_TYPE(op) == AOP_PCODE
+    		&& AOP(op)->aopu.pcop->type == PO_IMMEDIATE) {
+      /* char *s= "aaa"; return s; */
+      /* XXX: Using UPPER(__str_0) will yield 0b00XXXXXX, so
+       *      that the generic pointer is interpreted correctly
+       *      as referring to __code space, but this is fragile! */
+      pic16_emitpcode(POC_MOVLW, pic16_popGet( AOP(op), offset ));
+      /* XXX: should check that dest != WREG */
+      pic16_emitpcode(POC_MOVWF, dest);
     } else {
       if(dest->type == PO_WREG && (offset == 0)) {
-        pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(op), offset));
-      return;
+	pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(op), offset));
+	return;
+      }
+      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(op), offset), dest));
     }
-    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popGet(AOP(op), offset), dest));
-  }
 }
 
 /*-----------------------------------------------------------------*/

@@ -1,3 +1,8 @@
+2006-05-22 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_storeForReturn): fragile fix for
+	  bug #1492360 (problematic due to generic pointers, see code)
+
 2006-05-22 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/pic16/specs.mk: removed stack size linker

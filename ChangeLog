@@ -1,3 +1,8 @@
+2006-05-22 Borut Razem <borut.razem AT siol.net>
+
+	* support/Util/dbuf.c: fixed bug #1489008 fix dbuf_c_str(),
+	  second try. Thanks Stas Sergeev once more.
+
 2006-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/hc08/gen.c (transferAopAop): aop forced to stack was not restored,

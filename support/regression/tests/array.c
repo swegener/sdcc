@@ -4,11 +4,6 @@
 */
 #include <testfwk.h>
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
-# define xdata
-# define code
-#endif
-
 #define TC(x) (0x10+(x))
 #define TI(x) (0x1020+(x) + 0x100*(x))
 #define TL(x) (0x10203040+(x))

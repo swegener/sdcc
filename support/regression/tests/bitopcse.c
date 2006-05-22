@@ -16,7 +16,7 @@
 #  define _data idata
 #endif
 
-#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80) || defined(SDCC_hc08)
+#if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80) || defined(SDCC_hc08) || defined(SDCC_pic16)
 #  define NO_BIT_TYPE
 #endif
 

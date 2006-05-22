@@ -5,11 +5,14 @@
  */
 #include <testfwk.h>
 
-#ifdef __mcs51
-xdata
+#ifdef SDCC_pic16
+#define ARRAY_SIZE  60
+#else
+#define ARRAY_SIZE  130
 #endif
+
 static unsigned int
-testArray[130];
+testArray[ARRAY_SIZE];
 
 static unsigned int test_int ; 
 static unsigned char test_index ; 

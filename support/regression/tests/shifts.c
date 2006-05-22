@@ -1,4 +1,5 @@
 /** Tests covering the shift operators.
+    disabled for pic16
 
     sign: signed, unsigned
     type: char, int, long
@@ -12,7 +13,7 @@
 #include <testfwk.h>
 
 void
-testShiftClasses(void)
+test1ShiftClasses(void)
 {
     {attr} {storage} {sign} {type} i, result;
 
@@ -30,7 +31,7 @@ testShiftClasses(void)
 }
 
 void
-testShiftRight(void)
+test2ShiftRight(void)
 {
     {attr} {storage} {type} i, result;
 
@@ -48,8 +49,8 @@ testShiftRight(void)
     ASSERT(result == -15); 
 }
 
-static void
-testShiftByteMultiples(void)
+void
+test3ShiftByteMultiples(void)
 {
     {attr} {storage} {type} i;
 
@@ -64,8 +65,8 @@ testShiftByteMultiples(void)
     ASSERT((({type}) i<<24) == (({type}) {vals} << 24));
 }
 
-static void
-testShiftOne(void)
+void
+test4ShiftOne(void)
 {
     {attr} {storage} {sign} {type} i;
     {sign} {type} result;

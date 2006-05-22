@@ -2,29 +2,34 @@
  */
 #include <testfwk.h>
 #include <stdlib.h>
-
-/* PENDING */
-#if defined(__gbz80) || defined(__z80) || defined(__GNUC__)
-#define XDATA
-#else
-#define XDATA xdata
+#if defined(SDCC_pic16)
+#include <malloc.h>
 #endif
 
-XDATA char heap[100];
+xdata char heap[100];
 
 void
 testMalloc(void)
 {
-  void XDATA *p1, *p2, *p3;
+  void xdata *p1, *p2, *p3;
   char *p;
   unsigned char i;
 
-#if !defined(__gbz80) && !defined(__z80) && !defined(__GNUC__)
-  init_dynamic_memory((MEMHEADER XDATA *)heap, sizeof(heap));
+#if !defined(__GNUC__) && !defined(SDCC_gbz80) && !defined(SDCC_z80)
+#if defined(SDCC_pic16)
+  _initHeap(heap, sizeof heap);
+#else
+  init_dynamic_memory((MEMHEADER xdata *)heap, sizeof(heap));
+#endif
 
   p1 = malloc(200);
   ASSERT(p1 == NULL);
   LOG(("p1 == NULL when out of memory\n"));
+#ifdef PORT_HOST
+  LOG(("p1: %p\n", p1));
+#else
+  LOG(("p1: %u\n", (unsigned) p1));
+#endif
 #endif
 
   p1 = malloc(5);

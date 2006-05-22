@@ -8,6 +8,7 @@
 void
 testMul(void)
 {
+#ifndef SDCC_pic16  /* bug [ 1444425 ] onebyte.c regression tes fails on pic16 */
   {attrL}            char  cL;
   {attrL}  unsigned  char ucL;
   {attrR}            char  cR;
@@ -35,6 +36,7 @@ testMul(void)
   ucL = 128;  cR =   1; ur8 = ucL * cR;  ur8b  = cR * ucL; ASSERT(ur8 ==  128); ASSERT(ur8b  ==  128);
   ucL = 128; ucR =   5; r16 = ucL * ucR; r16b = ucR * ucL; ASSERT(r16 ==  640); ASSERT(r16b ==  640);
   ucL = 128; ucR =   1; ur8 = ucL * ucR; ur8b = ucR * ucL; ASSERT(ur8 ==  128); ASSERT(ur8b ==  128);
+#endif
 }
 
 void

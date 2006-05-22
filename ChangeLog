@@ -1,5 +1,32 @@
 2006-05-22 Borut Razem <borut.razem AT siol.net>
 
+	* support/regression/ports/pic16/specs.mk: removed stack size linker
+	  directive
+	* support/regression/tests/array.c,
+	  support/regression/tests/bitopcse.c,
+	  support/regression/tests/bug-908454.c,
+	  support/regression/tests/malloc.c: modified for pic16 regression test
+	* support/regression/tests/bitfields.c:
+	  pic16 - excluded bitfileds of size > 8
+	* support/regression/tests/bp.c: pic16 - reduced data size
+	* support/regression/tests/bug-221100.c: pic16 - reduced data size
+	* support/regression/tests/bug-460010.c:
+	  pic16 - used the absolute address the fits in memory
+	* support/regression/tests/bug-716242.c:
+	  bug [ 1443651 ] pic 16: redefining symbol that cannot be redefined.
+	* support/regression/tests/float.c:
+	  pic16 - excluded - data size too big
+	* support/regression/tests/onebyte.c:
+	  pic16 - bug [ 1444425 ] onebyte.c regression tes fails on pic16
+	* support/regression/tests/shifts.c:
+	  pic16 - function names probably have to differ in first X characters
+	  (gpasm limitation?)
+	* support/regression/tests/staticinit.c:
+	  pic16 - excluded some tests due error: no target memory available for
+	  section ".idata"
+
+2006-05-22 Borut Razem <borut.razem AT siol.net>
+
 	* support/Util/dbuf.c: fixed bug #1489008 fix dbuf_c_str(),
 	  second try. Thanks Stas Sergeev once more.
 

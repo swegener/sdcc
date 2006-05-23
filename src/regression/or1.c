@@ -1,10 +1,16 @@
 #include "gpsim_assert.h"
 
+/* bit types are not ANSI - so provide a way of disabling bit types
+ * if this file is used to test other compilers besides SDCC */
+#define SUPPORT_BIT_TYPES 0
+
 unsigned char failures=0;
 
+#if SUPPORT_BIT_TYPES
 bit bit0 = 0;
 bit bit1 = 0;
 bit bit2 = 0;
+#endif
 
 unsigned int uint0 = 0;
 unsigned int uint1 = 0;
@@ -138,6 +144,7 @@ void or_uint2uint(void)
 
 }
 
+#if SUPPORT_BIT_TYPES
 void or_bits1(void)
 {
 
@@ -151,6 +158,7 @@ void or_bits2(void)
   bit0 = bit1 | bit2;
 
 }
+#endif
 
 void main(void)
 {
@@ -167,6 +175,7 @@ void main(void)
   uint1=1;
   or_uint2uint();
 
+#if SUPPORT_BIT_TYPES
   or_bits1();
   if(bit0)
     failures++;
@@ -183,7 +192,7 @@ void main(void)
   or_bits2();
   if(!bit0)
     failures++;
-
+#endif
 
   done();
 }

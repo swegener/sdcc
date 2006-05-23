@@ -8,7 +8,6 @@
 
 unsigned char failures = 0;
 
-bit bit0 = 0;
 int int0 = 0;
 int int1 = 0;
 char char0 = 0;

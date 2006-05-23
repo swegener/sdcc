@@ -1,7 +1,6 @@
 #include "gpsim_assert.h"
 unsigned char failures=0;
 
-bit bit0 = 0;
 unsigned int aint0 = 0;
 unsigned int aint1 = 0;
 unsigned char achar0 = 0;
@@ -56,7 +55,7 @@ void switch2(void)
 
 }
 
-main(void)
+void main(void)
 {
 
   achar0 = 0;

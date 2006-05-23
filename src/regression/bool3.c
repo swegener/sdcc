@@ -6,8 +6,6 @@
 
 unsigned char failures=0;
 
-bit bit0 = 0;
-bit bit1 = 0;
 unsigned int ui0 = 0;
 unsigned int ui1 = 0;
 unsigned char uc0 = 0;

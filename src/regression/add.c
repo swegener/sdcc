@@ -4,7 +4,7 @@
 
 /* bit types are not ANSI - so provide a way of disabling bit types
  * if this file is used to test other compilers besides SDCC */
-#define SUPPORT_BIT_TYPES 1
+#define SUPPORT_BIT_TYPES 0
 
 /* Some compilers that support bit types do not support bit arithmetic 
  * (like bitx = bity + bitz;) */

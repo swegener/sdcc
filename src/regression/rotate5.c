@@ -3,7 +3,6 @@
 
 unsigned char failures=0;
 
-bit bit0 = 0;
 signed int aint0 = 0;
 signed int aint1 = 0;
 signed char achar0 = 0;

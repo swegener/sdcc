@@ -10,9 +10,6 @@
 
  */
 
-bit bit0 = 0;
-bit bit1 = 0;
-
 unsigned char failures = 0;
 
 unsigned char achar0 = 0;

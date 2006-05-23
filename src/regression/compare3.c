@@ -7,7 +7,6 @@
 
 unsigned char failures = 0;
 
-bit bit0 = 0;
 unsigned int aint0 = 0;
 unsigned int aint1 = 0;
 unsigned char achar0 = 0;

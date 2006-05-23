@@ -2,7 +2,6 @@
 
 unsigned char failures=0;
 
-bit bit0 = 0;
 unsigned int uint0 = 0;
 unsigned int uint1 = 0;
 unsigned char uchar0 = 0;

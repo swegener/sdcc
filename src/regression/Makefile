@@ -52,7 +52,7 @@ Q ?= @ # be quiet
 CC = sdcc
 LINKER = gplink
 TARGETPIC = 16f877
-CFLAGS = -Wl,--map -I ../../device/include/pic -mpic14 -pp$(TARGETPIC)
+CFLAGS = -Wl,--map -I ../../device/include/pic -mpic14 -pp$(TARGETPIC) -Wl,-q
 
 .SUFFIXES: .asm .c .cod .stc
 
@@ -74,7 +74,6 @@ SRC = b.c \
 	and2.c \
 	b.c \
 	bool1.c \
-	bool2.c \
 	bool3.c \
 	call1.c \
 	compare.c \
@@ -113,6 +112,7 @@ SRC = b.c \
 #	rotate7.c \
 #	string1.c \
 #	struct1.c \
+#	bool2.c \
 
 COD := $(patsubst %.c, %.cod, $(SRC))
 ASM := $(patsubst %.c, %.asm, $(SRC))

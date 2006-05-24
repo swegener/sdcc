@@ -34,9 +34,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdint.h>
+#if defined(_MSC_VER)
+	#include "pstdint.h"
+#else
+	#include <stdint.h>
+#endif
 #include "SDCCglobl.h"
-#include "newalloc.h"
+#include "newalloc.h" 
 
 #include "common.h"
 #include "SDCCpeeph.h"

@@ -1,3 +1,23 @@
+2006-05-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/break.c,
+	* debugger/mcs51/cmd.c (throughout): removed unused variables and labels,
+	  use %p to print pointers, made address variables unsigned
+	* debugger/mcs51/cmd.c (infoSymbols): added missing parameter to printf
+	* debugger/mcs51/symtab.c (parseSymbol): must return something
+	* src/mcs51/gen.c (aopForSym): small optimization,
+	   moved declarations mcs51_ptrRegReq and mcs51_nRegs to ralloc.h,
+	  (freeAsmop): added missing break,
+	  (aopPut): removed parameter bvolatile, determine it inside the function,
+	  (saveRegisters, unsaveRegisters): small optimization,
+	  (genIpush): removed pointless check,
+	  (throughout): replaced Safe_calloc, strcpy with Safe_strdup,
+	  replaced sprintf with SNPRINTF,
+	  replaced strcpy with strncpyz,
+	  updated aopPut calls,
+	  replaced D(emitcode("; genXXX", "")) with D(emitcode(";", "genXXX"))
+	* src/mcs51/ralloc.h:  added declarations mcs51_ptrRegReq and mcs51_nRegs
+
 2006-05-24 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/bug-221100.c: fixed xdata problem caused by

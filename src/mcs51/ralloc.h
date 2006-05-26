@@ -65,4 +65,7 @@ regs *mcs51_regWithIdx (int);
 bitVect *mcs51_rUmaskForOp (operand * op);
 bitVect *mcs51_allBitregs (void);
 
+extern int mcs51_ptrRegReq;
+extern int mcs51_nRegs;
+
 #endif

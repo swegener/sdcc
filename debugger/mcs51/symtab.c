@@ -261,7 +261,7 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
         if ( applyToSetFTrue(symbols,symWithRName,s,&nsym))
         {
             if ( nsym->rname != nsym->name )
-                return;
+                return NULL;
             doadd = 0;
         }
     }

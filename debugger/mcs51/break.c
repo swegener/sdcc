@@ -74,7 +74,6 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
         char *fileName, int lineno)
 {
     breakp *bp, *bpl;
-    char simbuf[50];
 
     Dprintf(D_break, ("setBreakPoint: addr:%x atype:%s bpType:%s [%s:%d]\n",
         addr,
@@ -158,7 +157,6 @@ void deleteNEXTbp ()
 {
     breakp *bp;
     int k;
-    char simcmd[50];
 
     Dprintf(D_break, ("break: Deleting all NEXT BPs\n"));
 
@@ -193,7 +191,6 @@ void deleteUSERbp (int bpnum)
 {
     breakp *bp;
     int k;
-    char simcmd[50];
 
     Dprintf(D_break, ("break: deleteUSERbp %d\n", bpnum));
 
@@ -364,7 +361,6 @@ static int simStopBPCB( unsigned int addr)
 void clearUSERbp ( unsigned int addr )
 {
     breakp *bp;
-    char simcmd[50];
 
     /* for break points delete if they are STEP */
     for ( bp = hTabFirstItemWK(bptable,addr); bp ;
@@ -498,7 +494,7 @@ BP_CALLBACK(userBpCB)
 
     if ( bp->commands )
     {
-        Dprintf(D_break, ("break: userBpCB: commands:%d\n", bp->commands));
+        Dprintf(D_break, ("break: userBpCB: commands:%p\n", bp->commands));
         setCmdLine(bp->commands);
     }
     

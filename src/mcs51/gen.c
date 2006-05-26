@@ -72,12 +72,12 @@ static unsigned short rbank = -1;
                        AOP_TYPE(x) == AOP_R0))
 
 #define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY ||  \
-                        AOP_TYPE(x) == AOP_DPTR || AOP(x)->paged))
+                        AOP_TYPE(x) == AOP_DPTR || \
+                        AOP(x)->paged))
 
 #define AOP_INPREG(x) (x && (x->type == AOP_REG &&                        \
                       (x->aopu.aop_reg[0] == mcs51_regWithIdx(R0_IDX) || \
                       x->aopu.aop_reg[0] == mcs51_regWithIdx(R1_IDX) )))
-
 
 #define SYM_BP(sym)   (SPEC_OCLS (sym->etype)->paged ? "_bpx" : "_bp")
 
@@ -115,8 +115,6 @@ static char *rb1regs[] = {
     "b0",  "b1",  "b2",  "b3",  "b4",  "b5",  "b6",  "b7"
 };
 
-extern int mcs51_ptrRegReq;
-extern int mcs51_nRegs;
 extern FILE *codeOutFile;
 static void saveRBank (int, iCode *, bool);
 
@@ -158,21 +156,33 @@ emitcode (char *inst, const char *fmt,...)
   if (inst && *inst)
     {
       if (fmt && *fmt)
+        {
           SNPRINTF (lb, sizeof(lb), "%s\t", inst);
+        }
       else
+        {
           SNPRINTF (lb, sizeof(lb), "%s", inst);
+        }
+
       tvsprintf (lb + strlen(lb), sizeof(lb) - strlen(lb), fmt, ap);
     }
   else
+    {
       tvsprintf (lb, sizeof(lb), fmt, ap);
+    }
 
   while (isspace ((unsigned char)*lbp))
+    {
       lbp++;
+    }
 
   if (lbp && *lbp)
+    {
       lineCurr = (lineCurr ?
                   connectLine (lineCurr, newLineNode (lb)) :
                   (lineHead = newLineNode (lb)));
+    }
+
   lineCurr->isInline = _G.inLine;
   lineCurr->isDebug = _G.debugLine;
   lineCurr->ic = _G.current_iCode;
@@ -202,7 +212,7 @@ mova (const char *x)
   if (!strncmp(x, "a", 2) || !strncmp(x, "acc", 4))
     return;
 
-  emitcode("mov","a,%s", x);
+  emitcode("mov", "a,%s", x);
 }
 
 /*-----------------------------------------------------------------*/
@@ -561,6 +571,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 {
   asmop *aop;
   memmap *space;
+  bool accuse = leftRightUseAcc (ic) || _G.accInUse;
 
   wassertl (ic != NULL, "Got a null iCode");
   wassertl (sym != NULL, "Got a null symbol");
@@ -570,7 +581,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   /* if already has one */
   if (sym->aop)
     {
-	  sym->aop->allocated++;
+      sym->aop->allocated++;
       return sym->aop;
     }
 
@@ -587,14 +598,14 @@ aopForSym (iCode * ic, symbol * sym, bool result)
          the pointer register */
       if (aop->type != AOP_STK)
         {
-
           if (sym->onStack)
             {
               char offset = ((sym->stack < 0) ?
                          ((char) (sym->stack - _G.nRegsSaved)) :
                          ((char) sym->stack)) & 0xff;
 
-              if ((offset >= -3) && (offset <= 3))
+              if ((abs(offset) <= 3) ||
+                  (accuse && (abs(offset) <= 7)))
                 {
                   emitcode ("mov", "%s,%s",
                             aop->aopu.aop_ptr->name, SYM_BP (sym));
@@ -611,20 +622,21 @@ aopForSym (iCode * ic, symbol * sym, bool result)
                 }
               else
                 {
-                  if (_G.accInUse || leftRightUseAcc (ic))
+                  if (accuse)
                     emitcode ("push", "acc");
                   emitcode ("mov", "a,%s", SYM_BP (sym));
                   emitcode ("add", "a,#0x%02x", offset);
-                  emitcode ("mov", "%s,a",
-                            aop->aopu.aop_ptr->name);
-                  if (_G.accInUse || leftRightUseAcc (ic))
+                  emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
+                  if (accuse)
                     emitcode ("pop", "acc");
                 }
             }
           else
-            emitcode ("mov", "%s,#%s",
-                      aop->aopu.aop_ptr->name,
-                      sym->rname);
+            {
+              emitcode ("mov", "%s,#%s",
+                        aop->aopu.aop_ptr->name,
+                        sym->rname);
+            }
           aop->paged = space->paged;
         }
       else
@@ -656,8 +668,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
   if (IS_FUNC (sym->type))
     {
       sym->aop = aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (sym->rname) + 1);
-      strcpy (aop->aopu.aop_immd.aop_immd1, sym->rname);
+      aop->aopu.aop_immd.aop_immd1 = Safe_strdup(sym->rname);
       aop->size = getSize (sym->type);
       return aop;
     }
@@ -704,21 +715,25 @@ aopForRemat (symbol * sym)
     }
 
   if (val)
-    sprintf (buffer, "(%s %c 0x%04x)",
-             OP_SYMBOL (IC_LEFT (ic))->rname,
-             val >= 0 ? '+' : '-',
-             abs (val) & 0xffff);
+    {
+      SNPRINTF (buffer, sizeof(buffer),
+                "(%s %c 0x%04x)",
+                OP_SYMBOL (IC_LEFT (ic))->rname,
+                val >= 0 ? '+' : '-',
+                abs (val) & 0xffff);
+    }
   else
-    strcpy (buffer, OP_SYMBOL (IC_LEFT (ic))->rname);
+    {
+      strncpyz (buffer, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof(buffer));
+    }
 
-  aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (buffer) + 1);
-  strcpy (aop->aopu.aop_immd.aop_immd1, buffer);
+  aop->aopu.aop_immd.aop_immd1 = Safe_strdup(buffer);
   /* set immd2 field if required */
-  if (aop->aopu.aop_immd.from_cast_remat) {
-          sprintf(buffer,"#0x%02x",ptr_type);
-          aop->aopu.aop_immd.aop_immd2 = Safe_calloc (1, strlen (buffer) + 1);
-          strcpy (aop->aopu.aop_immd.aop_immd2, buffer);
-  }
+  if (aop->aopu.aop_immd.from_cast_remat)
+    {
+      sprintf(buffer,"#0x%02x",ptr_type);
+      aop->aopu.aop_immd.aop_immd2 = Safe_strdup(buffer);
+    }
 
   return aop;
 }
@@ -879,7 +894,7 @@ aopOp (operand * op, iCode * ic, bool result)
   /* if already has a asmop then continue */
   if (op->aop)
     {
-	  op->aop->allocated++;
+      op->aop->allocated++;
       return;
     }
 
@@ -887,7 +902,7 @@ aopOp (operand * op, iCode * ic, bool result)
   if (IS_SYMOP (op) && OP_SYMBOL (op)->aop)
     {
       op->aop = OP_SYMBOL (op)->aop;
-	  op->aop->allocated++;
+      op->aop->allocated++;
       return;
     }
 
@@ -1097,6 +1112,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
             _G.r0Pushed--;
           }
       }
+      break;
     }
 
 dealloc:
@@ -1239,14 +1255,12 @@ aopGetUsesAcc (operand * oper, int offset)
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* aopGet - for fetching value of the aop                          */
-/*-----------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+/* aopGet - for fetching value of the aop                            */
+/*-------------------------------------------------------------------*/
 static char *
 aopGet (operand * oper, int offset, bool bit16, bool dname)
 {
-  char *s = buffer;
-  char *rs;
   asmop * aop = AOP (oper);
 
   /* offset is greater than
@@ -1282,10 +1296,9 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
           emitcode ("movx", "a,@%s", aop->aopu.aop_ptr->name);
           return (dname ? "acc" : "a");
         }
-      sprintf (s, "@%s", aop->aopu.aop_ptr->name);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+      SNPRINTF (buffer, sizeof(buffer), "@%s", aop->aopu.aop_ptr->name);
+      return Safe_strdup(buffer);
+
 
     case AOP_DPTR:
       if (aop->code && aop->coff==0 && offset>=1) {
@@ -1318,36 +1331,52 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
         }
       return (dname ? "acc" : "a");
 
-
     case AOP_IMMD:
-      if (aop->aopu.aop_immd.from_cast_remat && (offset == (aop->size-1))) {
-              sprintf(s,"%s",aop->aopu.aop_immd.aop_immd2);
-      } else if (bit16)
-        sprintf (s, "#%s", aop->aopu.aop_immd.aop_immd1);
+      if (aop->aopu.aop_immd.from_cast_remat && (offset == (aop->size-1)))
+        {
+          SNPRINTF(buffer, sizeof(buffer),
+                   "%s",aop->aopu.aop_immd.aop_immd2);
+        }
+      else if (bit16)
+        {
+          SNPRINTF(buffer, sizeof(buffer),
+                   "#%s", aop->aopu.aop_immd.aop_immd1);
+        }
       else if (offset)
-        sprintf (s, "#(%s >> %d)",
-                 aop->aopu.aop_immd.aop_immd1,
-                 offset * 8);
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "#(%s >> %d)",
+                    aop->aopu.aop_immd.aop_immd1,
+                    offset * 8);
+        }
       else
-        sprintf (s, "#%s",
-                 aop->aopu.aop_immd.aop_immd1);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "#%s", aop->aopu.aop_immd.aop_immd1);
+        }
+      return Safe_strdup(buffer);
 
     case AOP_DIR:
       if (SPEC_SCLS (getSpec (operandType (oper))) == S_SFR && offset)
-        sprintf (s, "(%s >> %d)",
-                 aop->aopu.aop_dir, offset * 8);
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "(%s >> %d)",
+                    aop->aopu.aop_dir, offset * 8);
+        }
       else if (offset)
-        sprintf (s, "(%s + %d)",
-                 aop->aopu.aop_dir,
-                 offset);
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "(%s + %d)",
+                   aop->aopu.aop_dir,
+                   offset);
+        }
       else
-        sprintf (s, "%s", aop->aopu.aop_dir);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                   "%s", aop->aopu.aop_dir);
+        }
+
+      return Safe_strdup(buffer);
 
     case AOP_REG:
       if (dname)
@@ -1431,9 +1460,9 @@ aopPutUsesAcc (operand * oper, const char *s, int offset)
 /* aopPut - puts a string for a aop and indicates if acc is in use */
 /*-----------------------------------------------------------------*/
 static bool
-aopPut (operand * result, const char *s, int offset, bool bvolatile)
+aopPut (operand * result, const char *s, int offset)
 {
-  char *d = buffer;
+  bool bvolatile = isOperandVolatile (result, FALSE);
   bool accuse = FALSE;
   asmop * aop = AOP (result);
 
@@ -1455,17 +1484,31 @@ aopPut (operand * result, const char *s, int offset, bool bvolatile)
 
     case AOP_DIR:
       if (SPEC_SCLS (getSpec (operandType (result))) == S_SFR && offset)
-        sprintf (d, "(%s >> %d)", aop->aopu.aop_dir, offset * 8);
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "(%s >> %d)",
+                    aop->aopu.aop_dir, offset * 8);
+        }
       else if (offset)
-        sprintf (d, "(%s + %d)", aop->aopu.aop_dir, offset);
+        {
+            SNPRINTF (buffer, sizeof(buffer),
+                      "(%s + %d)",
+                      aop->aopu.aop_dir, offset);
+        }
       else
-        sprintf (d, "%s", aop->aopu.aop_dir);
+        {
+            SNPRINTF (buffer, sizeof(buffer),
+                     "%s", aop->aopu.aop_dir);
+        }
 
-      if (strcmp (d, s) || bvolatile)
-          emitcode ("mov", "%s,%s", d, s);
-      if (!strcmp (d, "acc"))
+      if (strcmp (buffer, s) || bvolatile)
+        {
+            emitcode ("mov", "%s,%s", buffer, s);
+        }
+      if (!strcmp (buffer, "acc"))
+        {
           accuse = TRUE;
-
+        }
       break;
 
     case AOP_REG:
@@ -1481,11 +1524,15 @@ aopPut (operand * result, const char *s, int offset, bool bvolatile)
               strcmp (s, "r5") == 0 ||
               strcmp (s, "r6") == 0 ||
               strcmp (s, "r7") == 0)
-            emitcode ("mov", "%s,%s",
-                      aop->aopu.aop_reg[offset]->dname, s);
+            {
+              emitcode ("mov", "%s,%s",
+                        aop->aopu.aop_reg[offset]->dname, s);
+            }
           else
-            emitcode ("mov", "%s,%s",
-                      aop->aopu.aop_reg[offset]->name, s);
+            {
+              emitcode ("mov", "%s,%s",
+                        aop->aopu.aop_reg[offset]->name, s);
+            }
         }
       break;
 
@@ -1551,13 +1598,14 @@ aopPut (operand * result, const char *s, int offset, bool bvolatile)
                strcmp (s, "r7") == 0)
         {
           char buffer[10];
-          sprintf (buffer, "a%s", s);
+          SNPRINTF (buffer, sizeof(buffer), "a%s", s);
           emitcode ("mov", "@%s,%s",
                     aop->aopu.aop_ptr->name, buffer);
         }
       else
-        emitcode ("mov", "@%s,%s", aop->aopu.aop_ptr->name, s);
-
+        {
+          emitcode ("mov", "@%s,%s", aop->aopu.aop_ptr->name, s);
+        }
       break;
 
     case AOP_STK:
@@ -1602,20 +1650,17 @@ aopPut (operand * result, const char *s, int offset, bool bvolatile)
 
     case AOP_STR:
       aop->coff = offset;
-      if (strcmp (aop->aopu.aop_str[offset], s) ||
-          bvolatile)
+      if (strcmp (aop->aopu.aop_str[offset], s) || bvolatile)
         emitcode ("mov", "%s,%s", aop->aopu.aop_str[offset], s);
       break;
 
     case AOP_ACC:
       accuse = TRUE;
       aop->coff = offset;
-      if (!offset && (strcmp (s, "acc") == 0) &&
-          !bvolatile)
+      if (!offset && (strcmp (s, "acc") == 0) && !bvolatile)
         break;
 
-      if (strcmp (aop->aopu.aop_str[offset], s) &&
-          !bvolatile)
+      if (strcmp (aop->aopu.aop_str[offset], s) && !bvolatile)
         emitcode ("mov", "%s,%s", aop->aopu.aop_str[offset], s);
       break;
 
@@ -1663,7 +1708,7 @@ pointToEnd (asmop * aop)
 static void
 reAdjustPreg (asmop * aop)
 {
-  if ((aop->coff==0) || aop->size <= 1)
+  if ((aop->coff==0) || (aop->size <= 1))
     return;
 
   switch (aop->type)
@@ -1731,13 +1776,13 @@ outAcc (operand * result)
   size = getDataSize (result);
   if (size)
     {
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       size--;
       offset = 1;
       /* unsigned or positive */
       while (size--)
         {
-          aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+          aopPut (result, zero, offset++);
         }
     }
 }
@@ -1750,7 +1795,9 @@ outBitC (operand * result)
 {
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
-    aopPut (result, "c", 0, isOperandVolatile (result, FALSE));
+    {
+      aopPut (result, "c", 0);
+    }
   else
     {
       emitcode ("clr", "a");
@@ -1809,7 +1856,7 @@ genNot (iCode * ic)
 {
   symbol *tlbl;
 
-  D(emitcode (";     genNot",""));
+  D (emitcode (";", "genNot"));
 
   /* assign asmOps to operand & result */
   aopOp (IC_LEFT (ic), ic, FALSE);
@@ -1904,7 +1951,7 @@ genCpl (iCode * ic)
       char *l = aopGet (IC_LEFT (ic), offset, FALSE, FALSE);
       MOVA (l);
       emitcode ("cpl", "a");
-      aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+      aopPut (IC_RESULT (ic), "a", offset++);
     }
 
 
@@ -1923,7 +1970,7 @@ genUminusFloat (operand * op, operand * result)
   int size, offset = 0;
   char *l;
 
-  D(emitcode (";     genUminusFloat",""));
+  D (emitcode (";", "genUminusFloat"));
 
   /* for this we just copy and then flip the bit */
 
@@ -1933,17 +1980,15 @@ genUminusFloat (operand * op, operand * result)
     {
       aopPut (result,
               aopGet (op, offset, FALSE, FALSE),
-              offset,
-              isOperandVolatile (result, FALSE));
+              offset);
       offset++;
     }
 
   l = aopGet (op, offset, FALSE, FALSE);
-
   MOVA (l);
 
   emitcode ("cpl", "acc.7");
-  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", offset);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1953,10 +1998,9 @@ static void
 genUminus (iCode * ic)
 {
   int offset, size;
-  sym_link *optype, *rtype;
+  sym_link *optype;
 
-
-  D(emitcode (";     genUminus",""));
+  D (emitcode (";", "genUminus"));
 
   /* assign asmops */
   aopOp (IC_LEFT (ic), ic, FALSE);
@@ -1975,7 +2019,6 @@ genUminus (iCode * ic)
     }
 
   optype = operandType (IC_LEFT (ic));
-  rtype = operandType (IC_RESULT (ic));
 
   /* if float then do float stuff */
   if (IS_FLOAT (optype))
@@ -1987,7 +2030,6 @@ genUminus (iCode * ic)
   /* otherwise subtract from zero */
   size = AOP_SIZE (IC_LEFT (ic));
   offset = 0;
-  //CLRC ;
   while (size--)
     {
       char *l = aopGet (IC_LEFT (ic), offset, FALSE, FALSE);
@@ -2005,7 +2047,7 @@ genUminus (iCode * ic)
           emitcode ("clr", "a");
           emitcode ("subb", "a,%s", l);
         }
-      aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+      aopPut (IC_RESULT (ic), "a", offset++);
     }
 
   /* if any remaining bytes in the result */
@@ -2015,7 +2057,7 @@ genUminus (iCode * ic)
       emitcode ("rlc", "a");
       emitcode ("subb", "a,acc");
       while (size--)
-        aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+        aopPut (IC_RESULT (ic), "a", offset++);
     }
 
 release:
@@ -2062,7 +2104,17 @@ saveRegisters (iCode * lic)
   ic->regsSaved = 1;
   if (options.useXstack)
     {
+      bitVect *rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), rsave);
+      int nBits = bitVectnBitsOn (rsavebits);
       int count = bitVectnBitsOn (rsave);
+
+      if (nBits != 0)
+        {
+          count = count - nBits + 1;
+          /* remove all but the first bits as they are pushed all at once */
+          rsave = bitVectCplAnd (rsave, rsavebits);
+          rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
+        }
 
       if (count == 1)
         {
@@ -2083,17 +2135,6 @@ saveRegisters (iCode * lic)
         }
       else if (count != 0)
         {
-          bitVect *rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), rsave);
-          int nBits = bitVectnBitsOn (rsavebits);
-
-          if (nBits != 0)
-            {
-              count = count - nBits + 1;
-              /* remove all but the first bits as they are pushed all at once */
-              rsave = bitVectCplAnd (rsave, rsavebits);
-              rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
-            }
-
           if (bitVectBitValue (rsave, R0_IDX))
             {
               emitcode ("push", "%s", mcs51_regWithIdx (R0_IDX)->dname);
@@ -2162,7 +2203,17 @@ unsaveRegisters (iCode * ic)
 
   if (options.useXstack)
     {
+      bitVect *rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), rsave);
+      int nBits = bitVectnBitsOn (rsavebits);
       int count = bitVectnBitsOn (rsave);
+
+      if (nBits != 0)
+        {
+          count = count - nBits + 1;
+          /* remove all but the first bits as they are popped all at once */
+          rsave = bitVectCplAnd (rsave, rsavebits);
+          rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
+        }
 
       if (count == 1)
         {
@@ -2182,17 +2233,6 @@ unsaveRegisters (iCode * ic)
         }
       else if (count != 0)
         {
-          bitVect *rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), rsave);
-          int nBits = bitVectnBitsOn (rsavebits);
-
-          if (nBits != 0)
-            {
-              count = count - nBits + 1;
-              /* remove all but the first bits as they are popped all at once */
-              rsave = bitVectCplAnd (rsave, rsavebits);
-              rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
-            }
-
           emitcode ("mov", "r0,%s", spname);
           for (i = mcs51_nRegs; i >= 0; i--)
             {
@@ -2286,7 +2326,7 @@ assignResultValue (operand * oper, operand * func)
     {
       if ((offset == 3) && pushedA)
         emitcode ("pop", "acc");
-      accuse |= aopPut (oper, fReturn[offset], offset, isOperandVolatile (oper, FALSE));
+      accuse |= aopPut (oper, fReturn[offset], offset);
       offset++;
     }
   return accuse;
@@ -2303,7 +2343,7 @@ genXpush (iCode * ic)
   regs *r;
   int size, offset = 0;
 
-  D(emitcode (";     genXpush",""));
+  D (emitcode (";", "genXpush"));
 
   aopOp (IC_LEFT (ic), ic, FALSE);
   r = getFreePtr (ic, &aop, FALSE);
@@ -2347,7 +2387,7 @@ genIpush (iCode * ic)
   char *l;
   char *prev = "";
 
-  D(emitcode (";     genIpush",""));
+  D (emitcode (";", "genIpush"));
 
   /* if this is not a parm push : ie. it is spill push
      and spill push is always done on the local stack */
@@ -2397,8 +2437,7 @@ genIpush (iCode * ic)
     {
       l = aopGet (IC_LEFT (ic), offset++, FALSE, TRUE);
       if (AOP_TYPE (IC_LEFT (ic)) != AOP_REG &&
-          AOP_TYPE (IC_LEFT (ic)) != AOP_DIR &&
-          strcmp (l, "a"))
+          AOP_TYPE (IC_LEFT (ic)) != AOP_DIR)
         {
           if (strcmp (l, prev) || *l == '@')
             MOVA (l);
@@ -2422,7 +2461,7 @@ genIpop (iCode * ic)
 {
   int size, offset;
 
-  D(emitcode (";     genIpop",""));
+  D (emitcode (";", "genIpop"));
 
   /* if the temp was not pushed then */
   if (OP_SYMBOL (IC_LEFT (ic))->isspilt)
@@ -2432,8 +2471,10 @@ genIpop (iCode * ic)
   size = AOP_SIZE (IC_LEFT (ic));
   offset = (size - 1);
   while (size--)
-    emitcode ("pop", "%s", aopGet (IC_LEFT (ic), offset--,
-                                   FALSE, TRUE));
+    {
+      emitcode ("pop", "%s", aopGet (IC_LEFT (ic), offset--,
+                                     FALSE, TRUE));
+    }
 
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 }
@@ -2505,7 +2546,6 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
         {
           emitcode ("mov", "a,psw");
           emitcode ("movx", "@%s,a", r->name);
-
         }
       else
         {
@@ -2729,7 +2769,7 @@ genCall (iCode * ic)
   bool resultInF0 = FALSE;
   bool assignResultGenerated = FALSE;
 
-  D(emitcode(";     genCall",""));
+  D (emitcode (";", "genCall"));
 
   dtype = operandType (IC_LEFT (ic));
   etype = getSpec(dtype);
@@ -2741,7 +2781,6 @@ genCall (iCode * ic)
         } else {
             genSend(_G.sendSet);
         }
-
       _G.sendSet = NULL;
     }
 
@@ -2882,7 +2921,7 @@ genCall (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* -10l - generates a call by pointer statement                */
+/* genPcall - generates a call by pointer statement                */
 /*-----------------------------------------------------------------*/
 static void
 genPcall (iCode * ic)
@@ -2894,7 +2933,7 @@ genPcall (iCode * ic)
   bool swapBanks = FALSE;
   bool resultInF0 = FALSE;
 
-  D(emitcode(";     genPCall",""));
+  D (emitcode (";", "genPcall"));
 
   dtype = operandType (IC_LEFT (ic))->next;
   etype = getSpec(dtype);
@@ -3198,7 +3237,6 @@ genFunction (iCode * ic)
      save acc, b, dpl, dph  */
   if (IFFUNC_ISISR (sym->type))
     {
-
       if (!inExcludeList ("acc"))
         emitcode ("push", "acc");
       if (!inExcludeList ("b"))
@@ -3212,14 +3250,13 @@ genFunction (iCode * ic)
          registers :-) */
       if (!FUNC_REGBANK (sym->type))
         {
+          int i;
 
           /* if this function does not call any other
              function then we can be economical and
              save only those registers that are used */
           if (!IFFUNC_HASFCALL(sym->type))
             {
-              int i;
-
               /* if any registers used */
               if (sym->regsUsed)
                 {
@@ -3234,13 +3271,11 @@ genFunction (iCode * ic)
             }
           else
             {
-
               /* this function has a function call. We cannot
-                 determines register usage so we will have to push the
+                 determine register usage so we will have to push the
                  entire bank */
                 saveRBank (0, ic, FALSE);
                 if (options.parms_in_bank1) {
-                    int i;
                     for (i=0; i < 8 ; i++ ) {
                         emitcode ("push","%s",rb1regs[i]);
                     }
@@ -3643,13 +3678,12 @@ genEndFunction (iCode * ic)
          registers :-) */
       if (!FUNC_REGBANK (sym->type))
         {
+          int i;
           /* if this function does not call any other
              function then we can be economical and
              save only those registers that are used */
           if (!IFFUNC_HASFCALL(sym->type))
             {
-              int i;
-
               /* if any registers used */
               if (sym->regsUsed)
                 {
@@ -3665,7 +3699,6 @@ genEndFunction (iCode * ic)
           else
             {
               if (options.parms_in_bank1) {
-                  int i;
                   for (i = 7 ; i >= 0 ; i-- ) {
                       emitcode ("pop","%s",rb1regs[i]);
                   }
@@ -3864,7 +3897,7 @@ genRet (iCode * ic)
 {
   int size, offset = 0, pushed = 0;
 
-  D(emitcode (";     genRet",""));
+  D (emitcode (";", "genRet"));
 
   /* if we have no return value then
      just generate the "ret" */
@@ -3875,7 +3908,6 @@ genRet (iCode * ic)
      move the return value into place */
   aopOp (IC_LEFT (ic), ic, FALSE);
   size = AOP_SIZE (IC_LEFT (ic));
-
 
   if (IS_BIT(_G.currentFunc->etype))
     {
@@ -4091,8 +4123,8 @@ genPlusIncr (iCode * ic)
       if ((AOP_TYPE (IC_LEFT (ic)) != AOP_DIR) && (icount > 5))
         return FALSE;
 
-      aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), 0, FALSE, FALSE), 0, FALSE);
-      aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), 1, FALSE, FALSE), 1, FALSE);
+      aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), 0, FALSE, FALSE), 0);
+      aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), 1, FALSE, FALSE), 1);
       while (icount--)
         emitcode ("inc", "dptr");
 
@@ -4119,7 +4151,7 @@ genPlusIncr (iCode * ic)
         {
           MOVA (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
           emitcode ("add", "a,#0x%02x", ((char) icount) & 0xff);
-          aopPut (IC_RESULT (ic), "a", 0, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), "a", 0);
         }
       else
         {
@@ -4144,7 +4176,7 @@ outBitAcc (operand * result)
   /* if the result is a bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
     }
   else
     {
@@ -4197,16 +4229,14 @@ adjustArithmeticResult (iCode * ic)
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))
     aopPut (IC_RESULT (ic),
             aopGet (IC_LEFT (ic)), 2, FALSE, FALSE),
-            2,
-            isOperandVolatile (IC_RESULT (ic), FALSE));
+            2);
 
   if (AOP_SIZE (IC_RESULT (ic)) == 3 &&
       AOP_SIZE (IC_RIGHT (ic)) == 3 &&
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
     aopPut (IC_RESULT (ic),
             aopGet (IC_RIGHT (ic)), 2, FALSE, FALSE),
-            2,
-            isOperandVolatile (IC_RESULT (ic), FALSE));
+            2);
 
   if (AOP_SIZE (IC_RESULT (ic)) == 3 &&
       AOP_SIZE (IC_LEFT (ic)) < 3 &&
@@ -4216,7 +4246,7 @@ adjustArithmeticResult (iCode * ic)
     {
       char buffer[5];
       sprintf (buffer, "#%d", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
-      aopPut (IC_RESULT (ic), buffer, 2, isOperandVolatile (IC_RESULT (ic), FALSE));
+      aopPut (IC_RESULT (ic), buffer, 2);
     }
 }
 #else
@@ -4233,8 +4263,7 @@ adjustArithmeticResult (iCode * ic)
     {
       aopPut (IC_RESULT (ic),
               aopGet (IC_LEFT (ic), GPTRSIZE - 1, FALSE, FALSE),
-              GPTRSIZE - 1,
-              isOperandVolatile (IC_RESULT (ic), FALSE));
+              GPTRSIZE - 1);
     }
 
   if (opIsGptr (IC_RESULT (ic)) &&
@@ -4243,8 +4272,7 @@ adjustArithmeticResult (iCode * ic)
     {
       aopPut (IC_RESULT (ic),
               aopGet (IC_RIGHT (ic), GPTRSIZE - 1, FALSE, FALSE),
-              GPTRSIZE - 1,
-              isOperandVolatile (IC_RESULT (ic), FALSE));
+              GPTRSIZE - 1);
     }
 
   if (opIsGptr (IC_RESULT (ic)) &&
@@ -4255,7 +4283,7 @@ adjustArithmeticResult (iCode * ic)
     {
       char buffer[5];
       sprintf (buffer, "#%d", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
-      aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1, isOperandVolatile (IC_RESULT (ic), FALSE));
+      aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
     }
 }
 #endif
@@ -4291,7 +4319,7 @@ genPlus (iCode * ic)
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);
       IC_LEFT (ic) = t;
-	  swappedLR = TRUE;
+      swappedLR = TRUE;
     }
 
   /* if both left & right are in bit
@@ -4322,7 +4350,7 @@ genPlus (iCode * ic)
             {
               MOVA (aopGet (IC_RIGHT (ic), offset, FALSE, FALSE));
               emitcode ("addc", "a,#00");
-              aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+              aopPut (IC_RESULT (ic), "a", offset++);
             }
         }
       goto release;
@@ -4351,21 +4379,19 @@ genPlus (iCode * ic)
       D(emitcode (";     genPlus aligned array",""));
       aopPut (IC_RESULT (ic),
               aopGet (rightOp, 0, FALSE, FALSE),
-              0,
-              isOperandVolatile (IC_RESULT (ic), FALSE));
+              0);
 
       if( 1 == getDataSize (IC_RIGHT (ic)) )
         {
           aopPut (IC_RESULT (ic),
                   aopGet (leftOp, 1, FALSE, FALSE),
-                  1,
-                  isOperandVolatile (IC_RESULT (ic), FALSE));
+                  1);
         }
       else
         {
           MOVA (aopGet (IC_LEFT (ic), 1, FALSE, FALSE));
           emitcode ("add", "a,%s", aopGet (rightOp, 1, FALSE, FALSE));
-          aopPut (IC_RESULT (ic), "a", 1, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), "a", 1);
         }
       goto release;
     }
@@ -4406,7 +4432,7 @@ genPlus (iCode * ic)
               MOVA (aopGet (rightOp, offset, FALSE, TRUE));
               emitcode (add, "a,%s", aopGet (leftOp, offset, FALSE, TRUE));
             }
-          aopPut (IC_RESULT (ic), "a", offset, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), "a", offset);
           add = "addc";  /* further adds must propagate carry */
         }
       else
@@ -4417,8 +4443,7 @@ genPlus (iCode * ic)
               /* just move */
               aopPut (IC_RESULT (ic),
                       aopGet (leftOp, offset, FALSE, FALSE),
-                      offset,
-                      isOperandVolatile (IC_RESULT (ic), FALSE));
+                      offset);
             }
         }
       offset++;
@@ -4567,7 +4592,7 @@ genMinusDec (iCode * ic)
         emitcode ("dec", "%s", l);
 
       if (AOP_NEEDSACC (IC_RESULT (ic)))
-        aopPut (IC_RESULT (ic), "a", 0, isOperandVolatile (IC_RESULT (ic), FALSE));
+        aopPut (IC_RESULT (ic), "a", 0);
 
       return TRUE;
     }
@@ -4589,11 +4614,11 @@ addSign (operand * result, int offset, int sign)
           emitcode ("rlc", "a");
           emitcode ("subb", "a,acc");
           while (size--)
-            aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+            aopPut (result, "a", offset++);
         }
       else
         while (size--)
-          aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+          aopPut (result, zero, offset++);
     }
 }
 
@@ -4622,7 +4647,7 @@ genMinusBits (iCode * ic)
       emitcode ("jnb", "%s,%05d$", AOP (IC_LEFT (ic))->aopu.aop_dir, (lbl->key + 100));
       emitcode ("inc", "a");
       emitcode ("", "%05d$:", (lbl->key + 100));
-      aopPut (IC_RESULT (ic), "a", 0, isOperandVolatile (IC_RESULT (ic), FALSE));
+      aopPut (IC_RESULT (ic), "a", 0);
       addSign (IC_RESULT (ic), MSB16, SPEC_USIGN (getSpec (operandType (IC_RESULT (ic)))));
     }
 }
@@ -4687,7 +4712,7 @@ genMinus (iCode * ic)
                   emitcode ("addc", "a,#0x%02x",
                             (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
                 }
-              aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+              aopPut (IC_RESULT (ic), "a", offset++);
             }
           else
             {
@@ -4695,7 +4720,7 @@ genMinus (iCode * ic)
               if (!sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))
                 {
                   aopPut (IC_RESULT (ic), aopGet (IC_LEFT (ic), offset, FALSE, FALSE),
-                          offset, isOperandVolatile (IC_RESULT (ic), FALSE));
+                          offset);
                 }
               offset++;
             }
@@ -4743,10 +4768,9 @@ genMinus (iCode * ic)
                       aopGet(rightOp, offset, FALSE, TRUE));
           }
 
-          aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), "a", offset++);
         }
     }
-
 
   adjustArithmeticResult (ic);
 
@@ -4840,9 +4864,9 @@ genMultOneByte (operand * left,
         }
 
       emitcode ("mul", "ab");
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       if (size == 2)
-        aopPut (result, "b", 1, isOperandVolatile (result, FALSE));
+        aopPut (result, "b", 1);
 
       popB (pushedB);
       return;
@@ -4909,7 +4933,6 @@ genMultOneByte (operand * left,
   else /* ! literal */
     {
       if (rUnsigned)  /* emitcode (";", "signed"); */
-
         emitcode ("mov", "b,%s", aopGet (right, 0, FALSE, FALSE));
       else
         {
@@ -4968,9 +4991,9 @@ genMultOneByte (operand * left,
         }
       emitcode ("", "%05d$:", (lbl->key + 100));
     }
-  aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", 0);
   if (size == 2)
-    aopPut (result, "b", 1, isOperandVolatile (result, FALSE));
+    aopPut (result, "b", 1);
 
   popB (pushedB);
 }
@@ -5050,7 +5073,7 @@ genDivbits (operand * left,
 
   popB (pushedB);
 
-  aopPut (result, "c", 0, isOperandVolatile (result, FALSE));
+  aopPut (result, "c", 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5110,9 +5133,9 @@ genDivOneByte (operand * left,
       emitcode ("mov", "b,%s", aopGet (right, 0, FALSE, FALSE));
       MOVA (aopGet (left, 0, FALSE, FALSE));
       emitcode ("div", "ab");
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       while (size--)
-        aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, zero, offset++);
 
       popB (pushedB);
       return;
@@ -5228,7 +5251,7 @@ genDivOneByte (operand * left,
       emitcode ("inc", "a");
       emitcode ("", "%05d$:", (lbl->key + 100));
 
-      accuse = aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      accuse = aopPut (result, "a", 0);
       if (size > 0)
         {
           /* msb is 0x00 or 0xff depending on the sign */
@@ -5242,7 +5265,7 @@ genDivOneByte (operand * left,
               emitcode ("mov", "c,F0");
               emitcode ("subb", "a,acc");
               while (size--)
-                aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+                aopPut (result, "a", offset++);
             }
           else /* compiletimeSign */
             {
@@ -5252,15 +5275,15 @@ genDivOneByte (operand * left,
                   pushedA = TRUE;
                 }
               while (size--)
-                aopPut (result, "#0xff", offset++, isOperandVolatile (result, FALSE));
+                aopPut (result, "#0xff", offset++);
             }
         }
     }
   else
     {
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       while (size--)
-        aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, zero, offset++);
     }
 
   if (pushedA)
@@ -5337,7 +5360,7 @@ genModbits (operand * left,
 
   popB (pushedB);
 
-  aopPut (result, "c", 0, isOperandVolatile (result, FALSE));
+  aopPut (result, "c", 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -5394,16 +5417,16 @@ genModOneByte (operand * left,
                 int size2 = size;
                 int offs2 = offset;
 
-                aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+                aopPut (result, "a", 0);
                 while (size2--)
-                  aopPut (result, "#0xff", offs2++, isOperandVolatile (result, FALSE));
+                  aopPut (result, "#0xff", offs2++);
                 lbl2 = newiTempLabel (NULL);
                 emitcode ("sjmp", "%05d$", (lbl2->key + 100));
               }
             emitcode ("", "%05d$:", (lbl->key + 100));
-            aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+            aopPut (result, "a", 0);
             while (size--)
-              aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+              aopPut (result, zero, offset++);
             if (lbl2)
               {
                 emitcode ("", "%05d$:", (lbl2->key + 100));
@@ -5424,9 +5447,9 @@ genModOneByte (operand * left,
       emitcode ("mov", "b,%s", aopGet (right, 0, FALSE, FALSE));
       MOVA (aopGet (left, 0, FALSE, FALSE));
       emitcode ("div", "ab");
-      aopPut (result, "b", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "b", 0);
       while (size--)
-        aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, zero, offset++);
 
       popB (pushedB);
       return;
@@ -5512,7 +5535,7 @@ genModOneByte (operand * left,
       emitcode ("inc", "a");
       emitcode ("", "%05d$:", (lbl->key + 100));
 
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       if (size > 0)
         {
           /* msb is 0x00 or 0xff depending on the sign */
@@ -5521,18 +5544,18 @@ genModOneByte (operand * left,
               emitcode ("mov", "c,F0");
               emitcode ("subb", "a,acc");
               while (size--)
-                aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+                aopPut (result, "a", offset++);
             }
           else /* compiletimeSign */
             while (size--)
-              aopPut (result, "#0xff", offset++, isOperandVolatile (result, FALSE));
+              aopPut (result, "#0xff", offset++);
         }
     }
   else
     {
-      aopPut (result, "b", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "b", 0);
       while (size--)
-        aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, zero, offset++);
     }
 
   popB (pushedB);
@@ -5937,7 +5960,7 @@ genCmpEq (iCode * ic, iCode * ifx)
       operand *t = IC_RIGHT (ic);
       IC_RIGHT (ic) = IC_LEFT (ic);
       IC_LEFT (ic) = t;
-	  swappedLR = TRUE;
+      swappedLR = TRUE;
     }
 
   if (ifx && !AOP_SIZE (result))
@@ -6073,7 +6096,7 @@ genCmpEq (iCode * ic, iCode * ifx)
       gencjne (left, right, newiTempLabel (NULL));
       if (AOP_TYPE (result) == AOP_CRY && AOP_SIZE (result))
         {
-          aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+          aopPut (result, "a", 0);
           goto release;
         }
       if (ifx)
@@ -6534,13 +6557,13 @@ genAnd (iCode * ic, iCode * ifx)
                 }
               else if (bytelit == 0)
                 {
-                  aopPut (result, zero, offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, zero, offset);
                 }
               else if (IS_AOP_PREG (result))
                 {
                   MOVA (aopGet (left, offset, FALSE, TRUE));
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else
                 emitcode ("anl", "%s,%s",
@@ -6560,13 +6583,13 @@ genAnd (iCode * ic, iCode * ifx)
                   emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("anl", "a,b");
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else if (aopGetUsesAcc (left, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else
                 {
@@ -6574,7 +6597,7 @@ genAnd (iCode * ic, iCode * ifx)
                   if (IS_AOP_PREG (result))
                     {
                       emitcode ("anl", "a,%s", aopGet (left, offset, FALSE, TRUE));
-                      aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                      aopPut (result, "a", offset);
                     }
                   else
                     emitcode ("anl", "%s,a",
@@ -6653,8 +6676,7 @@ genAnd (iCode * ic, iCode * ifx)
                     {
                       aopPut (result,
                               aopGet (left, offset, FALSE, FALSE),
-                              offset,
-                              isOperandVolatile (result, FALSE));
+                              offset);
                       continue;
                     }
                   else if (bytelit == 0)
@@ -6662,7 +6684,7 @@ genAnd (iCode * ic, iCode * ifx)
                       /* dummy read of volatile operand */
                       if (isOperandVolatile (left, FALSE))
                         MOVA (aopGet (left, offset, FALSE, FALSE));
-                      aopPut (result, zero, offset, isOperandVolatile (result, FALSE));
+                      aopPut (result, zero, offset);
                       continue;
                     }
                   else if (AOP_TYPE (left) == AOP_ACC)
@@ -6670,13 +6692,13 @@ genAnd (iCode * ic, iCode * ifx)
                       if (!offset)
                         {
                           emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                          aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                          aopPut (result, "a", offset);
                           continue;
                         }
                       else
                         {
                           emitcode ("anl", "b,%s", aopGet (right, offset, FALSE, FALSE));
-                          aopPut (result, "b", offset, isOperandVolatile (result, FALSE));
+                          aopPut (result, "b", offset);
                           continue;
                         }
                     }
@@ -6705,7 +6727,7 @@ genAnd (iCode * ic, iCode * ifx)
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("anl", "a,%s", aopGet (left, offset, FALSE, FALSE));
                 }
-              aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+              aopPut (result, "a", offset);
             }
         }
     }
@@ -6896,13 +6918,13 @@ genOr (iCode * ic, iCode * ifx)
                 }
               else if (bytelit == 0x0FF)
                 {
-                  aopPut (result, "#0xFF", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "#0xFF", offset);
                 }
               else if (IS_AOP_PREG (left))
                 {
                   MOVA (aopGet (left, offset, FALSE, TRUE));
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else
                 {
@@ -6924,13 +6946,13 @@ genOr (iCode * ic, iCode * ifx)
                   emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,b");
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else if (aopGetUsesAcc (left, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else
                 {
@@ -6938,7 +6960,7 @@ genOr (iCode * ic, iCode * ifx)
                   if (IS_AOP_PREG (left))
                     {
                       emitcode ("orl", "a,%s", aopGet (left, offset, FALSE, TRUE));
-                      aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                      aopPut (result, "a", offset);
                     }
                   else
                     {
@@ -7000,8 +7022,7 @@ genOr (iCode * ic, iCode * ifx)
                     {
                       aopPut (result,
                               aopGet (left, offset, FALSE, FALSE),
-                              offset,
-                              isOperandVolatile (result, FALSE));
+                              offset);
                       continue;
                     }
                   else if (bytelit == 0x0FF)
@@ -7009,7 +7030,7 @@ genOr (iCode * ic, iCode * ifx)
                       /* dummy read of volatile operand */
                       if (isOperandVolatile (left, FALSE))
                         MOVA (aopGet (left, offset, FALSE, FALSE));
-                      aopPut (result, "#0xFF", offset, isOperandVolatile (result, FALSE));
+                      aopPut (result, "#0xFF", offset);
                       continue;
                     }
                 }
@@ -7037,7 +7058,7 @@ genOr (iCode * ic, iCode * ifx)
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (left, offset, FALSE, FALSE));
                 }
-              aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+              aopPut (result, "a", offset);
             }
         }
     }
@@ -7213,7 +7234,7 @@ genXor (iCode * ic, iCode * ifx)
                 {
                   MOVA (aopGet (left, offset, FALSE, TRUE));
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else
                 {
@@ -7235,13 +7256,13 @@ genXor (iCode * ic, iCode * ifx)
                   emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,b");
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else if (aopGetUsesAcc (left, offset))
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
-                  aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offset);
                 }
               else
                 {
@@ -7249,7 +7270,7 @@ genXor (iCode * ic, iCode * ifx)
                   if (IS_AOP_PREG (left))
                     {
                       emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, TRUE));
-                      aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                      aopPut (result, "a", offset);
                     }
                   else
                     emitcode ("xrl", "%s,a",
@@ -7315,8 +7336,7 @@ genXor (iCode * ic, iCode * ifx)
                     {
                       aopPut (result,
                               aopGet (left, offset, FALSE, FALSE),
-                              offset,
-                              isOperandVolatile (result, FALSE));
+                              offset);
                       continue;
                     }
                 }
@@ -7344,7 +7364,7 @@ genXor (iCode * ic, iCode * ifx)
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, TRUE));
                 }
-              aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+              aopPut (result, "a", offset);
             }
         }
     }
@@ -7363,12 +7383,11 @@ genInline (iCode * ic)
 {
   char *buffer, *bp, *bp1;
 
-  D(emitcode (";     genInline",""));
+  D (emitcode (";", "genInline"));
 
   _G.inLine += (!options.asmpeep);
 
-  buffer = bp = bp1 = Safe_calloc(1, strlen(IC_INLINE(ic))+1);
-  strcpy (buffer, IC_INLINE (ic));
+  buffer = bp = bp1 = Safe_strdup(IC_INLINE(ic));
 
   /* emit each line as a code */
   while (*bp)
@@ -7434,7 +7453,7 @@ genRRC (iCode * ic)
       MOVA (l);
       emitcode ("rrc", "a");
       if (AOP_SIZE (result) > 1)
-        aopPut (result, "a", offset--, isOperandVolatile (result, FALSE));
+        aopPut (result, "a", offset--);
     }
   /* now we need to put the carry into the
      highest order byte of the result */
@@ -7445,7 +7464,7 @@ genRRC (iCode * ic)
     }
   emitcode ("mov", "acc.7,c");
  release:
-  aopPut (result, "a", AOP_SIZE (result) - 1, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", AOP_SIZE (result) - 1);
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
 }
@@ -7481,14 +7500,14 @@ genRLC (iCode * ic)
       }
       emitcode("rlc","a"); /* bit0 will be written later */
       if (AOP_SIZE (result) > 1)
-        aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, "a", offset++);
       while (size--)
         {
           l = aopGet (left, offset, FALSE, FALSE);
           MOVA (l);
           emitcode ("rlc", "a");
           if (AOP_SIZE (result) > 1)
-            aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+            aopPut (result, "a", offset++);
         }
     }
   /* now we need to put the carry into the
@@ -7500,7 +7519,7 @@ genRLC (iCode * ic)
     }
   emitcode ("mov", "acc.0,c");
  release:
-  aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", 0);
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
 }
@@ -7631,8 +7650,7 @@ genGetByte (iCode * ic)
   offset = (int)floatFromVal (AOP (right)->aopu.aop_lit) / 8;
   aopPut (result,
           aopGet (left, offset, FALSE, FALSE),
-          0,
-          isOperandVolatile (result, FALSE));
+          0);
 
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
@@ -7660,12 +7678,10 @@ genGetWord (iCode * ic)
   offset = (int)floatFromVal (AOP (right)->aopu.aop_lit) / 8;
   aopPut (result,
           aopGet (left, offset, FALSE, FALSE),
-          0,
-          isOperandVolatile (result, FALSE));
+          0);
   aopPut (result,
           aopGet (left, offset+1, FALSE, FALSE),
-          1,
-          isOperandVolatile (result, FALSE));
+          1);
 
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (right, NULL, ic, TRUE);
@@ -7692,15 +7708,14 @@ genSwap (iCode * ic)
     case 1: /* swap nibbles in byte */
       MOVA (aopGet (left, 0, FALSE, FALSE));
       emitcode ("swap", "a");
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       break;
     case 2: /* swap bytes in word */
       if (AOP_TYPE(left) == AOP_REG && sameRegs(AOP(left), AOP(result)))
         {
           MOVA (aopGet (left, 0, FALSE, FALSE));
-          aopPut (result, aopGet (left, 1, FALSE, FALSE),
-                  0, isOperandVolatile (result, FALSE));
-          aopPut (result, "a", 1, isOperandVolatile (result, FALSE));
+          aopPut (result, aopGet (left, 1, FALSE, FALSE), 0);
+          aopPut (result, "a", 1);
         }
       else if (operandsEqu (left, result))
         {
@@ -7715,19 +7730,16 @@ genSwap (iCode * ic)
               reg = "b";
               leftInB = TRUE;
             }
-          aopPut (result, aopGet (left, 1, FALSE, FALSE),
-                  0, isOperandVolatile (result, FALSE));
-          aopPut (result, reg, 1, isOperandVolatile (result, FALSE));
+          aopPut (result, aopGet (left, 1, FALSE, FALSE), 0);
+          aopPut (result, reg, 1);
 
           if (leftInB)
             popB (pushedB);
         }
       else
         {
-          aopPut (result, aopGet (left, 1, FALSE, FALSE),
-                  0, isOperandVolatile (result, FALSE));
-          aopPut (result, aopGet (left, 0, FALSE, FALSE),
-                  1, isOperandVolatile (result, FALSE));
+          aopPut (result, aopGet (left, 1, FALSE, FALSE), 0);
+          aopPut (result, aopGet (left, 0, FALSE, FALSE), 1);
         }
       break;
     default:
@@ -7737,7 +7749,6 @@ genSwap (iCode * ic)
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);
 }
-
 
 /*-----------------------------------------------------------------*/
 /* AccRol - rotate left accumulator by known count                 */
@@ -7877,7 +7888,7 @@ shiftR1Left2Result (operand * left, int offl,
     AccSRsh (shCount);
   else
     AccRsh (shCount);
-  aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", offr);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7892,7 +7903,7 @@ shiftL1Left2Result (operand * left, int offl,
   MOVA (l);
   /* shift left accumulator */
   AccLsh (shCount);
-  aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", offr);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7910,19 +7921,19 @@ movLeft2Result (operand * left, int offl,
       if (*l == '@' && (IS_AOP_PREG (result)))
         {
           emitcode ("mov", "a,%s", l);
-          aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+          aopPut (result, "a", offr);
         }
       else
         {
           if (!sign)
-            aopPut (result, l, offr, isOperandVolatile (result, FALSE));
+            aopPut (result, l, offr);
           else
             {
               /* MSB sign in acc.7 ! */
               if (getDataSize (left) == offl + 1)
                 {
                   MOVA (l);
-                  aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+                  aopPut (result, "a", offr);
                 }
             }
         }
@@ -8269,13 +8280,13 @@ shiftL2Left2Result (operand * left, int offl,
   if (usedB)
     {
       emitcode ("xch", "a,b");
-      aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
-      aopPut (result, "b", offr + MSB16, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offr);
+      aopPut (result, "b", offr + MSB16);
       popB (pushedB);
     }
   else
     {
-      aopPut (result, "a", offr + MSB16, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offr + MSB16);
     }
 }
 
@@ -8323,12 +8334,12 @@ shiftR2Left2Result (operand * left, int offl,
   if (usedB)
     {
       emitcode ("xch", "a,b");
-      aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offr);
       emitcode ("xch", "a,b");
       popB (pushedB);
     }
   if (getDataSize (result) > 1)
-    aopPut (result, "a", offr + MSB16, isOperandVolatile (result, FALSE));
+    aopPut (result, "a", offr + MSB16);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8353,7 +8364,7 @@ shiftLLeftOrResult (operand * left, int offl,
       emitcode ("orl", "a,%s", aopGet (result, offr, FALSE, FALSE));
     }
   /* back to result */
-  aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", offr);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8369,7 +8380,7 @@ shiftRLeftOrResult (operand * left, int offl,
   /* or with result */
   emitcode ("orl", "a,%s", aopGet (result, offr, FALSE, FALSE));
   /* back to result */
-  aopPut (result, "a", offr, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", offr);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8407,7 +8418,7 @@ genlshTwo (operand * result, operand * left, int shCount)
           else
             movLeft2Result (left, LSB, result, MSB16, 0);
         }
-      aopPut (result, zero, LSB, isOperandVolatile (result, FALSE));
+      aopPut (result, zero, LSB);
     }
 
   /*  1 <= shCount <= 7 */
@@ -8440,7 +8451,7 @@ shiftLLong (operand * left, operand * result, int offr)
         emitcode ("xch", "a,%s",
                   aopGet (left, LSB + offr, FALSE, FALSE));
       else
-        aopPut (result, "a", LSB + offr, isOperandVolatile (result, FALSE));
+        aopPut (result, "a", LSB + offr);
     }
 
   if (size >= MSB16 + offr)
@@ -8456,7 +8467,7 @@ shiftLLong (operand * left, operand * result, int offr)
         emitcode ("xch", "a,%s",
                   aopGet (left, MSB16 + offr, FALSE, FALSE));
       else
-        aopPut (result, "a", MSB16 + offr, isOperandVolatile (result, FALSE));
+        aopPut (result, "a", MSB16 + offr);
     }
 
   if (size >= MSB24 + offr)
@@ -8472,7 +8483,7 @@ shiftLLong (operand * left, operand * result, int offr)
         emitcode ("xch", "a,%s",
                   aopGet (left, MSB24 + offr, FALSE, FALSE));
       else
-        aopPut (result, "a", MSB24 + offr, isOperandVolatile (result, FALSE));
+        aopPut (result, "a", MSB24 + offr);
     }
 
   if (size > MSB32 + offr)
@@ -8483,10 +8494,10 @@ shiftLLong (operand * left, operand * result, int offr)
           MOVA (l);
         }
       emitcode ("rlc", "a");
-      aopPut (result, "a", MSB32 + offr, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", MSB32 + offr);
     }
   if (offr != LSB)
-    aopPut (result, zero, LSB, isOperandVolatile (result, FALSE));
+    aopPut (result, zero, LSB);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8511,9 +8522,9 @@ genlshFour (operand * result, operand * left, int shCount)
         shiftL1Left2Result (left, LSB, result, MSB32, shCount);
       else
         movLeft2Result (left, LSB, result, MSB32, 0);
-      aopPut (result, zero, LSB, isOperandVolatile (result, FALSE));
-      aopPut (result, zero, MSB16, isOperandVolatile (result, FALSE));
-      aopPut (result, zero, MSB24, isOperandVolatile (result, FALSE));
+      aopPut (result, zero, LSB);
+      aopPut (result, zero, MSB16);
+      aopPut (result, zero, MSB24);
       return;
     }
 
@@ -8530,8 +8541,8 @@ genlshFour (operand * result, operand * left, int shCount)
           movLeft2Result (left, MSB16, result, MSB32, 0);
           movLeft2Result (left, LSB, result, MSB24, 0);
         }
-      aopPut (result, zero, MSB16, isOperandVolatile (result, FALSE));
-      aopPut (result, zero, LSB, isOperandVolatile (result, FALSE));
+      aopPut (result, zero, MSB16);
+      aopPut (result, zero, LSB);
       return;
     }
 
@@ -8554,7 +8565,7 @@ genlshFour (operand * result, operand * left, int shCount)
               movLeft2Result (left, MSB24, result, MSB32, 0);
               movLeft2Result (left, MSB16, result, MSB24, 0);
               movLeft2Result (left, LSB, result, MSB16, 0);
-              aopPut (result, zero, LSB, isOperandVolatile (result, FALSE));
+              aopPut (result, zero, LSB);
             }
           else if (shCount == 1)
             shiftLLong (left, result, MSB16);
@@ -8563,7 +8574,7 @@ genlshFour (operand * result, operand * left, int shCount)
               shiftL2Left2Result (left, MSB16, result, MSB24, shCount);
               shiftL1Left2Result (left, LSB, result, MSB16, shCount);
               shiftRLeftOrResult (left, LSB, result, MSB24, 8 - shCount);
-              aopPut (result, zero, LSB, isOperandVolatile (result, FALSE));
+              aopPut (result, zero, LSB);
             }
         }
     }
@@ -8621,7 +8632,7 @@ genLeftShiftLiteral (operand * left,
 
   else if (shCount >= (size * 8))
     while (size--)
-      aopPut (result, zero, size, isOperandVolatile (result, FALSE));
+      aopPut (result, zero, size);
   else
     {
       switch (size)
@@ -8702,10 +8713,10 @@ genLeftShift (iCode * ic)
             {
 
               emitcode ("mov", "a,%s", l);
-              aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+              aopPut (result, "a", offset);
             }
           else
-            aopPut (result, l, offset, isOperandVolatile (result, FALSE));
+            aopPut (result, l, offset);
           offset++;
         }
     }
@@ -8728,7 +8739,7 @@ genLeftShift (iCode * ic)
       emitcode ("", "%05d$:", tlbl1->key + 100);
       emitcode ("djnz", "b,%05d$", tlbl->key + 100);
       popB (pushedB);
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       goto release;
     }
 
@@ -8739,13 +8750,13 @@ genLeftShift (iCode * ic)
   l = aopGet (result, offset, FALSE, FALSE);
   MOVA (l);
   emitcode ("add", "a,acc");
-  aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+  aopPut (result, "a", offset++);
   while (--size)
     {
       l = aopGet (result, offset, FALSE, FALSE);
       MOVA (l);
       emitcode ("rlc", "a");
-      aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offset++);
     }
   reAdjustPreg (AOP (result));
 
@@ -8817,23 +8828,23 @@ shiftRLong (operand * left, int offl,
     {
       // shift is > 8
       if (sign)
-	    {
+        {
           emitcode ("rlc", "a");
           emitcode ("subb", "a,acc");
           if (useSameRegs && sameReg (AOP (left), MSB32, AOP (result), MSB32))
-		    {
+            {
               emitcode ("xch", "a,%s", aopGet (left, MSB32, FALSE, FALSE));
-		    }
+            }
           else
-		    {
-              aopPut (result, "a", MSB32, isOperandVolatile (result, FALSE));
+            {
+              aopPut (result, "a", MSB32);
               MOVA (aopGet (left, MSB32, FALSE, FALSE));
-		    }
-	    }
-	  else
-	    {
-          aopPut (result, zero, MSB32, isOperandVolatile (result, FALSE));
-	    }
+            }
+        }
+      else
+        {
+          aopPut (result, zero, MSB32);
+        }
     }
 
   if (!sign)
@@ -8854,7 +8865,7 @@ shiftRLong (operand * left, int offl,
     }
   else
     {
-      aopPut (result, "a", MSB32-offl, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", MSB32-offl);
       MOVA (aopGet (left, MSB24, FALSE, FALSE));
     }
 
@@ -8866,13 +8877,13 @@ shiftRLong (operand * left, int offl,
     }
   else
     {
-      aopPut (result, "a", MSB24-offl, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", MSB24-offl);
       MOVA (aopGet (left, MSB16, FALSE, FALSE));
     }
   emitcode ("rrc", "a");
   if (offl != LSB)
     {
-      aopPut (result, "a", MSB16 - offl, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", MSB16 - offl);
     }
   else
     {
@@ -8883,11 +8894,11 @@ shiftRLong (operand * left, int offl,
         }
       else
         {
-          aopPut (result, "a", MSB16 - offl, isOperandVolatile (result, FALSE));
+          aopPut (result, "a", MSB16 - offl);
           MOVA (aopGet (left, LSB, FALSE, FALSE));
-	    }
+        }
       emitcode ("rrc", "a");
-      aopPut (result, "a", LSB, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", LSB);
     }
 }
 
@@ -9084,10 +9095,10 @@ genSignedRightShift (iCode * ic)
             {
 
               emitcode ("mov", "a,%s", l);
-              aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+              aopPut (result, "a", offset);
             }
           else
-            aopPut (result, l, offset, isOperandVolatile (result, FALSE));
+            aopPut (result, l, offset);
           offset++;
         }
     }
@@ -9113,7 +9124,7 @@ genSignedRightShift (iCode * ic)
       emitcode ("", "%05d$:", tlbl1->key + 100);
       emitcode ("djnz", "b,%05d$", tlbl->key + 100);
       popB (pushedB);
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       goto release;
     }
 
@@ -9126,7 +9137,7 @@ genSignedRightShift (iCode * ic)
       l = aopGet (result, offset, FALSE, FALSE);
       MOVA (l);
       emitcode ("rrc", "a");
-      aopPut (result, "a", offset--, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offset--);
     }
   reAdjustPreg (AOP (result));
   emitcode ("", "%05d$:", tlbl1->key + 100);
@@ -9212,10 +9223,10 @@ genRightShift (iCode * ic)
             {
 
               emitcode ("mov", "a,%s", l);
-              aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+              aopPut (result, "a", offset);
             }
           else
-            aopPut (result, l, offset, isOperandVolatile (result, FALSE));
+            aopPut (result, l, offset);
           offset++;
         }
     }
@@ -9237,7 +9248,7 @@ genRightShift (iCode * ic)
       emitcode ("", "%05d$:", tlbl1->key + 100);
       emitcode ("djnz", "b,%05d$", tlbl->key + 100);
       popB (pushedB);
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       goto release;
     }
 
@@ -9250,7 +9261,7 @@ genRightShift (iCode * ic)
       l = aopGet (result, offset, FALSE, FALSE);
       MOVA (l);
       emitcode ("rrc", "a");
-      aopPut (result, "a", offset--, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offset--);
     }
   reAdjustPreg (AOP (result));
 
@@ -9405,7 +9416,7 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
           emitcode ("orl", "a,#0x%02x", (unsigned char) (0xff << blen));
           emitcode ("", "%05d$:", tlbl->key + 100);
         }
-      aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offset++);
       goto finish;
     }
 
@@ -9414,7 +9425,7 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
   for (rlen=blen;rlen>=8;rlen-=8)
     {
       emitPtrByteGet (rname, ptype, FALSE);
-      aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offset++);
       if (rlen>8)
         emitcode ("inc", "%s", rname);
     }
@@ -9433,7 +9444,7 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
           emitcode ("orl", "a,#0x%02x", (unsigned char) (0xff << rlen));
           emitcode ("", "%05d$:", tlbl->key + 100);
         }
-      aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", offset++);
     }
 
 finish:
@@ -9453,7 +9464,7 @@ finish:
         }
       rsize -= offset;
       while (rsize--)
-        aopPut (result, source, offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, source, offset++);
     }
 }
 
@@ -9483,7 +9494,7 @@ genDataPointerGet (operand * left,
         sprintf (buffer, "(%s + %d)", l + 1, offset);
       else
         sprintf (buffer, "%s", l + 1);
-      aopPut (result, buffer, offset++, isOperandVolatile (result, FALSE));
+      aopPut (result, buffer, offset++);
     }
 
   freeAsmop (result, NULL, ic, TRUE);
@@ -9579,12 +9590,12 @@ genNearPointerGet (operand * left,
 
               emitcode ("mov", "a,@%s", rname);
               if (!ifx)
-              aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+                aopPut (result, "a", offset);
             }
           else
             {
               sprintf (buffer, "@%s", rname);
-              aopPut (result, buffer, offset, isOperandVolatile (result, FALSE));
+              aopPut (result, buffer, offset);
             }
           offset++;
           if (size || pi)
@@ -9596,7 +9607,7 @@ genNearPointerGet (operand * left,
   if (aop)       /* we had to allocate for this iCode */
     {
       if (pi) { /* post increment present */
-        aopPut (left, rname, 0, isOperandVolatile (left, FALSE));
+        aopPut (left, rname, 0);
       }
       freeAsmop (NULL, aop, ic, RESULTONSTACK (ic) ? FALSE : TRUE);
     }
@@ -9683,7 +9694,7 @@ genPagedPointerGet (operand * left,
 
           emitcode ("movx", "a,@%s", rname);
           if (!ifx)
-          aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+            aopPut (result, "a", offset);
 
           offset++;
 
@@ -9695,7 +9706,8 @@ genPagedPointerGet (operand * left,
   /* now some housekeeping stuff */
   if (aop) /* we had to allocate for this iCode */
     {
-      if (pi) aopPut (left, rname, 0, isOperandVolatile (left, FALSE));
+      if (pi)
+        aopPut (left, rname, 0);
       freeAsmop (NULL, aop, ic, TRUE);
     }
   else
@@ -9818,7 +9830,7 @@ genFarPointerGet (operand * left,
         {
           emitcode ("movx", "a,@dptr");
           if (!ifx)
-            aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+            aopPut (result, "a", offset++);
           if (size || pi)
             emitcode ("inc", "dptr");
         }
@@ -9826,10 +9838,10 @@ genFarPointerGet (operand * left,
 
   if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR)
     {
-    aopPut (left, "dpl", 0, isOperandVolatile (left, FALSE));
-    aopPut (left, "dph", 1, isOperandVolatile (left, FALSE));
-    pi->generated = 1;
-  }
+      aopPut (left, "dpl", 0);
+      aopPut (left, "dph", 1);
+      pi->generated = 1;
+    }
 
   if (ifx && !ifx->generated)
     {
@@ -9841,7 +9853,7 @@ genFarPointerGet (operand * left,
 }
 
 /*-----------------------------------------------------------------*/
-/* genCodePointerGet - gget value from code space                  */
+/* genCodePointerGet - get value from code space                   */
 /*-----------------------------------------------------------------*/
 static void
 genCodePointerGet (operand * left,
@@ -9871,7 +9883,7 @@ genCodePointerGet (operand * left,
           emitcode ("clr", "a");
           emitcode ("movc", "a,@a+dptr");
           if (!ifx)
-            aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+            aopPut (result, "a", offset++);
           if (size || pi)
             emitcode ("inc", "dptr");
         }
@@ -9879,10 +9891,10 @@ genCodePointerGet (operand * left,
 
   if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR)
     {
-    aopPut (left, "dpl", 0, isOperandVolatile (left, FALSE));
-    aopPut (left, "dph", 1, isOperandVolatile (left, FALSE));
-    pi->generated = 1;
-  }
+      aopPut (left, "dpl", 0);
+      aopPut (left, "dph", 1);
+      pi->generated = 1;
+    }
 
   if (ifx && !ifx->generated)
     {
@@ -9894,7 +9906,7 @@ genCodePointerGet (operand * left,
 }
 
 /*-----------------------------------------------------------------*/
-/* genGenPointerGet - gget value from generic pointer space        */
+/* genGenPointerGet - get value from generic pointer space         */
 /*-----------------------------------------------------------------*/
 static void
 genGenPointerGet (operand * left,
@@ -9923,7 +9935,7 @@ genGenPointerGet (operand * left,
         {
           emitcode ("lcall", "__gptrget");
           if (!ifx)
-          aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+            aopPut (result, "a", offset++);
           if (size || pi)
             emitcode ("inc", "dptr");
         }
@@ -9931,10 +9943,10 @@ genGenPointerGet (operand * left,
 
   if (pi && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR)
     {
-    aopPut (left, "dpl", 0, isOperandVolatile (left, FALSE));
-    aopPut (left, "dph", 1, isOperandVolatile (left, FALSE));
-    pi->generated = 1;
-  }
+      aopPut (left, "dpl", 0);
+      aopPut (left, "dph", 1);
+      pi->generated = 1;
+    }
 
   if (ifx && !ifx->generated)
     {
@@ -10282,7 +10294,7 @@ genNearPointerSet (operand * right,
   if (aop) /* we had to allocate for this iCode */
     {
       if (pi)
-        aopPut (result, rname, 0, isOperandVolatile (result, FALSE));
+        aopPut (result, rname, 0);
       freeAsmop (NULL, aop, ic, TRUE);
     }
   else
@@ -10375,7 +10387,7 @@ genPagedPointerSet (operand * right,
   if (aop) /* we had to allocate for this iCode */
     {
       if (pi)
-        aopPut (result, rname, 0, isOperandVolatile (result, FALSE));
+        aopPut (result, rname, 0);
       freeAsmop (NULL, aop, ic, TRUE);
     }
   else
@@ -10439,8 +10451,8 @@ genFarPointerSet (operand * right,
         }
     }
   if (pi && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD) {
-    aopPut (result, "dpl", 0, isOperandVolatile (result, FALSE));
-    aopPut (result, "dph", 1, isOperandVolatile (result, FALSE));
+    aopPut (result, "dpl", 0);
+    aopPut (result, "dph", 1);
     pi->generated=1;
   }
   freeAsmop (result, NULL, ic, TRUE);
@@ -10485,8 +10497,8 @@ genGenPointerSet (operand * right,
     }
 
   if (pi && AOP_TYPE (result) != AOP_STR && AOP_TYPE (result) != AOP_IMMD) {
-    aopPut (result, "dpl", 0, isOperandVolatile (result, FALSE));
-    aopPut (result, "dph", 1, isOperandVolatile (result, FALSE));
+    aopPut (result, "dpl", 0);
+    aopPut (result, "dph", 1);
     pi->generated=1;
   }
   freeAsmop (result, NULL, ic, TRUE);
@@ -10628,12 +10640,12 @@ genAddrOf (iCode * ic)
           emitcode ("add", "a,#0x%02x", ((sym->stack < 0) ?
                                          ((char) (sym->stack - _G.nRegsSaved)) :
                                          ((char) sym->stack)) & 0xff);
-          aopPut (IC_RESULT (ic), "a", 0, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), "a", 0);
         }
       else
         {
           /* we can just move _bp */
-          aopPut (IC_RESULT (ic), SYM_BP (sym), 0, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), SYM_BP (sym), 0);
         }
       /* fill the result with zero */
       size = AOP_SIZE (IC_RESULT (ic)) - 1;
@@ -10641,7 +10653,7 @@ genAddrOf (iCode * ic)
       offset = 1;
       while (size--)
         {
-          aopPut (IC_RESULT (ic), zero, offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), zero, offset++);
         }
 
       goto release;
@@ -10660,7 +10672,7 @@ genAddrOf (iCode * ic)
                  offset * 8);
       else
         sprintf (s, "#%s", sym->rname);
-      aopPut (IC_RESULT (ic), s, offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+      aopPut (IC_RESULT (ic), s, offset++);
     }
 
 release:
@@ -10695,7 +10707,7 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
   while (size--)
     {
       emitcode ("pop", "acc");
-      aopPut (result, "a", --offset, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", --offset);
     }
   freeAsmop (result, NULL, ic, FALSE);
 }
@@ -10750,9 +10762,9 @@ genAssign (iCode * ic)
       if (AOP_TYPE (right) == AOP_LIT)
         {
           if (((int) operandLitValue (right)))
-            aopPut (result, one, 0, isOperandVolatile (result, FALSE));
+            aopPut (result, one, 0);
           else
-            aopPut (result, zero, 0, isOperandVolatile (result, FALSE));
+            aopPut (result, zero, 0);
           goto release;
         }
 
@@ -10760,13 +10772,13 @@ genAssign (iCode * ic)
       if (AOP_TYPE (right) == AOP_CRY)
         {
           emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-          aopPut (result, "c", 0, isOperandVolatile (result, FALSE));
+          aopPut (result, "c", 0);
           goto release;
         }
 
       /* we need to or */
       toBoolean (right);
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       goto release;
     }
 
@@ -10786,8 +10798,7 @@ genAssign (iCode * ic)
         {
           aopPut (result,
                   aopGet (right, offset, FALSE, FALSE),
-                  offset,
-                  isOperandVolatile (result, FALSE));
+                  offset);
           lit >>= 8;
           offset++;
           size--;
@@ -10795,7 +10806,7 @@ genAssign (iCode * ic)
       emitcode ("clr", "a");
       while (size--)
         {
-          aopPut (result, "a", offset, isOperandVolatile (result, FALSE));
+          aopPut (result, "a", offset);
           offset++;
         }
     }
@@ -10805,8 +10816,7 @@ genAssign (iCode * ic)
         {
           aopPut (result,
                   aopGet (right, offset, FALSE, FALSE),
-                  offset,
-                  isOperandVolatile (result, FALSE));
+                  offset);
           offset++;
         }
     }
@@ -10958,9 +10968,9 @@ genCast (iCode * ic)
       if (AOP_TYPE (right) == AOP_LIT)
         {
           if (((int) operandLitValue (right)))
-            aopPut (result, one, 0, isOperandVolatile (result, FALSE));
+            aopPut (result, one, 0);
           else
-            aopPut (result, zero, 0, isOperandVolatile (result, FALSE));
+            aopPut (result, zero, 0);
 
           goto release;
         }
@@ -10969,16 +10979,15 @@ genCast (iCode * ic)
       if (AOP_TYPE (right) == AOP_CRY)
         {
           emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-          aopPut (result, "c", 0, isOperandVolatile (result, FALSE));
+          aopPut (result, "c", 0);
           goto release;
         }
 
       /* we need to or */
       toBoolean (right);
-      aopPut (result, "a", 0, isOperandVolatile (result, FALSE));
+      aopPut (result, "a", 0);
       goto release;
     }
-
 
   /* if they are the same size : or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
@@ -10995,13 +11004,11 @@ genCast (iCode * ic)
         {
           aopPut (result,
                   aopGet (right, offset, FALSE, FALSE),
-                  offset,
-                  isOperandVolatile (result, FALSE));
+                  offset);
           offset++;
         }
       goto release;
     }
-
 
   /* if the result is of type pointer */
   if (IS_PTR (ctype))
@@ -11034,8 +11041,7 @@ genCast (iCode * ic)
             {
               aopPut (result,
                       aopGet (right, offset, FALSE, FALSE),
-                      offset,
-                      isOperandVolatile (result, FALSE));
+                      offset);
               offset++;
             }
           /* the last byte depending on type */
@@ -11050,7 +11056,7 @@ genCast (iCode * ic)
                 }
 
                 sprintf(gpValStr, "#0x%x", gpVal);
-                aopPut (result, gpValStr, GPTRSIZE - 1, isOperandVolatile (result, FALSE));
+                aopPut (result, gpValStr, GPTRSIZE - 1);
             }
           goto release;
         }
@@ -11062,8 +11068,7 @@ genCast (iCode * ic)
         {
           aopPut (result,
                   aopGet (right, offset, FALSE, FALSE),
-                  offset,
-                  isOperandVolatile (result, FALSE));
+                  offset);
           offset++;
         }
       goto release;
@@ -11078,8 +11083,7 @@ genCast (iCode * ic)
     {
       aopPut (result,
               aopGet (right, offset, FALSE, FALSE),
-              offset,
-              isOperandVolatile (result, FALSE));
+              offset);
       offset++;
     }
 
@@ -11089,7 +11093,7 @@ genCast (iCode * ic)
   if (!IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE(right)==AOP_CRY)
     {
       while (size--)
-        aopPut (result, zero, offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, zero, offset++);
     }
   else
     {
@@ -11100,7 +11104,7 @@ genCast (iCode * ic)
       emitcode ("rlc", "a");
       emitcode ("subb", "a,acc");
       while (size--)
-        aopPut (result, "a", offset++, isOperandVolatile (result, FALSE));
+        aopPut (result, "a", offset++);
     }
 
   /* we are done hurray !!!! */
@@ -11167,7 +11171,7 @@ genDjnz (iCode * ic, iCode * ifx)
            return 0;
       }
       emitcode ("dec", "%s", rByte);
-      aopPut (IC_RESULT (ic), rByte, 0, isOperandVolatile (IC_RESULT (ic), FALSE));
+      aopPut (IC_RESULT (ic), rByte, 0);
       emitcode ("jnz", "%05d$", lbl->key + 100);
   }
   else if (IS_AOP_PREG (IC_RESULT (ic)))
@@ -11228,11 +11232,9 @@ genReceive (iCode * ic)
                   _G.accInUse++;
                   aopOp (IC_RESULT (ic), ic, FALSE);
                   _G.accInUse--;
-                  aopPut (IC_RESULT (ic), "a", offset,
-                          isOperandVolatile (IC_RESULT (ic), FALSE));
+                  aopPut (IC_RESULT (ic), "a", offset);
                   for (offset = 1; offset<size; offset++)
-                    aopPut (IC_RESULT (ic), tempRegs[--roffset]->name, offset,
-                            isOperandVolatile (IC_RESULT (ic), FALSE));
+                    aopPut (IC_RESULT (ic), tempRegs[--roffset]->name, offset);
                   goto release;
                 }
             }
@@ -11244,8 +11246,7 @@ genReceive (iCode * ic)
                     emitcode("mov","%s,%s", tempRegs[offset]->name, fReturn[offset]);
                   aopOp (IC_RESULT (ic), ic, FALSE);
                   for (offset = 0; offset<size; offset++)
-                    aopPut (IC_RESULT (ic), tempRegs[offset]->name, offset,
-                            isOperandVolatile (IC_RESULT (ic), FALSE));
+                    aopPut (IC_RESULT (ic), tempRegs[offset]->name, offset);
                   goto release;
                 }
             }
@@ -11263,7 +11264,7 @@ genReceive (iCode * ic)
           while (size--)
             {
               emitcode ("pop", "acc");
-              aopPut (IC_RESULT (ic), "a", offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+              aopPut (IC_RESULT (ic), "a", offset++);
             }
         }
       else
@@ -11290,7 +11291,7 @@ genReceive (iCode * ic)
       rb1off = ic->argreg;
       while (size--)
         {
-          aopPut (IC_RESULT (ic), rb1regs[rb1off++ -5], offset++, isOperandVolatile (IC_RESULT (ic), FALSE));
+          aopPut (IC_RESULT (ic), rb1regs[rb1off++ -5], offset++);
         }
     }
 
@@ -11371,9 +11372,9 @@ genCritical (iCode *ic)
   if (IC_RESULT (ic))
     {
       aopOp (IC_RESULT (ic), ic, TRUE);
-      aopPut (IC_RESULT (ic), one, 0, 0);
+      aopPut (IC_RESULT (ic), one, 0);
       emitcode ("jbc", "ea,%05d$", (tlbl->key + 100)); /* atomic test & clear */
-      aopPut (IC_RESULT (ic), zero, 0, 0);
+      aopPut (IC_RESULT (ic), zero, 0);
       emitcode ("", "%05d$:", (tlbl->key + 100));
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
     }

@@ -3773,9 +3773,9 @@ static void genFunction (iCode *ic)
           pic16_pushpCodeOp(pic16_popCopyReg(pic16_framepnt_hi));
         pic16_pushpCodeOp(pic16_popCopyReg(pic16_framepnt_lo));
 
-        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( pic16_stackpnt_lo, pic16_framepnt_lo, 0));
         if(STACK_MODEL_LARGE)
           pic16_emitpcode(POC_MOVFF, pic16_popCombine2( pic16_stackpnt_hi, pic16_framepnt_hi, 0));
+        pic16_emitpcode(POC_MOVFF, pic16_popCombine2( pic16_stackpnt_lo, pic16_framepnt_lo, 0));
       }
     }
 
@@ -3928,9 +3928,9 @@ static void genEndFunction (iCode *ic)
         || FUNC_HASSTACKPARM(sym->etype)
         ) {
         /* restore stack frame */
+        pic16_poppCodeOp( pic16_popCopyReg( pic16_framepnt_lo ));
         if(STACK_MODEL_LARGE)
           pic16_poppCodeOp( pic16_popCopyReg( pic16_framepnt_hi ));
-        pic16_poppCodeOp( pic16_popCopyReg( pic16_framepnt_lo ));
       }
     }
 

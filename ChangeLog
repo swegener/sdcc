@@ -1,3 +1,9 @@
+2006-05-28 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/pic16/gen.c (genFunction, genEndFunction): some
+	beautifications, fixed bug with falsely restoring FSR2 in large
+	stack model, thanks to Beau E. Cox for reporting the bug
+
 2006-05-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/break.c,

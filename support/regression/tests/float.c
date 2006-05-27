@@ -1,7 +1,6 @@
 /* Float tests.
 
    operation: ADD, SUB, MUL, DIV, REVDIV
-   Test excluded from pic16 regression test
 */
 
 #if 1
@@ -25,12 +24,11 @@
 #ifdef SDCC_mcs51
 #define STORAGE xdata
 #define XDATA xdata
-#else
-#define STORAGE
+#elif SDCC_pic16
+#define STORAGE code
 #define XDATA
 #endif
 
-#ifndef SDCC_pic16
 XDATA volatile float left, right, result;
 
 struct {
@@ -80,12 +78,10 @@ char compare (float is, float should) {
     return 1;
   }
 }
-#endif  /* SDCC_pic16 */
 
 void
 testFloatMath(void)
 {
-#ifndef SDCC_pic16
   int i;
   int t = sizeof(cases)/sizeof(cases[0]);
   float result;
@@ -123,7 +119,6 @@ testFloatMath(void)
     #endif
   }
   DEBUG(printf ("%d tests, %d errors\n", tests, errors));
-#endif  /* SDCC_pic16 */
 }
 
 #ifndef REENTRANT

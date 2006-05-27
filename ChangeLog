@@ -2,6 +2,12 @@
 
 	* support/regression/fwk/lib/testfwk.c: increase stack size
 	  from deafult 64 bytes to 128 bytes
+	* support/regression/tests/staticinit.c,
+	  support/regression/tests/float.c: regression tests fully enabled
+	  for pic16 port by putting the initialized data arrays into the code
+	  section
+	* support/regression/ports/pic16/spec.mk: don't link default libraries.
+	  This was changed by mistake in the previous version.
 
 2006-05-28 Vangelis Rokas <vrokas AT users.sourceforge.net>
 

@@ -4,8 +4,6 @@
     type: char, int, long
 */
 
-//error: no target memory available for section ".idata"
-
 #include <testfwk.h>
 
 static {type} smallDense[] = {
@@ -23,7 +21,7 @@ testSmallDense(void)
     ASSERT(smallDense[5] == 6);
 }
 
-#ifdef __mcs51
+#ifdef SDCC_mcs51
 idata at 0xa0	/* leave space for the stack */
 #endif
 static {type} smallSparse[] = {
@@ -44,7 +42,7 @@ testSmallSparse(void)
     ASSERT(smallSparse[8] == 1);
 }
 
-#ifdef __mcs51
+#ifdef SDCC_mcs51
 idata at 0xd0
 #endif
 static {type} smallSparseZero[] = {
@@ -72,9 +70,10 @@ testSmallSparseZero(void)
     ASSERT(smallSparseZeroTail[0] == 1);
 }
 
-#ifndef SDCC_pic16
-#ifdef __mcs51
+#ifdef SDCC_mcs51
 xdata
+#elif SDCC_pic16
+code
 #endif
 static {type} largeMixed[] = {
     1, 2, 3, 4, 5, 6, 7,	/* 0-6 */
@@ -113,12 +112,10 @@ static {type} largeMixed[] = {
     3, 4, 5, 6, 3, 4, 5, 6,
     3, 4, 5, 6, 3, 4, 5, 6
 };
-#endif
 
 static void
 testLargeMixed(void)
 {
-#ifndef SDCC_pic16
     ASSERT(largeMixed[0] == 1);
     ASSERT(largeMixed[1] == 2);
     ASSERT(largeMixed[7] == 1);
@@ -129,5 +126,4 @@ testLargeMixed(void)
     ASSERT(largeMixed[143+1] == 4);
     ASSERT(largeMixed[143+8+1] == 4);
     ASSERT(largeMixed[143+16+1] == 4);
-#endif
 }

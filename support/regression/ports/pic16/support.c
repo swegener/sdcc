@@ -23,6 +23,8 @@
 -------------------------------------------------------------------------*/
 
 #pragma preproc_asm -
+#pragma stack 0x200 128 /* set stack size to 128 bytes */
+
 #include <pic18f452.h>
 
 

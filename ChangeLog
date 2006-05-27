@@ -1,7 +1,9 @@
 2006-05-27 Borut Razem <borut.razem AT siol.net>
 
-	* support/regression/fwk/lib/testfwk.c: increase stack size
-	  from deafult 64 bytes to 128 bytes
+	* support/regression/fwk/lib/testfwk.c: define array in _printn() as
+	  static instead auto
+	* support/regression/ports/pic16/support.c: increase stack size
+	  from default 64 bytes to 128 bytes
 	* support/regression/tests/staticinit.c,
 	  support/regression/tests/float.c: regression tests fully enabled
 	  for pic16 port by putting the initialized data arrays into the code

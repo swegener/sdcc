@@ -7,10 +7,6 @@
 #include <tinibios.h> /* main() must see the ISR declarations */
 #endif
 
-#ifdef SDCC_pic16
-#pragma stack 0x200 128 /* set stack size to 128 bytes */
-#endif
-
 #ifdef SDCC_mcs51
 /* until changed, isr's must have a prototype in the module containing main */
 void T2_isr (void) interrupt 5;

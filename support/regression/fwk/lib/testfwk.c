@@ -3,11 +3,15 @@
 #include <testfwk.h>
 #include <stdarg.h>
 
-#ifdef __ds390
+#ifdef SDCC_ds390
 #include <tinibios.h> /* main() must see the ISR declarations */
 #endif
 
-#if defined(SDCC_mcs51)
+#ifdef SDCC_pic16
+#pragma stack 0x200 128 /* set stack size to 128 bytes */
+#endif
+
+#ifdef SDCC_mcs51
 /* until changed, isr's must have a prototype in the module containing main */
 void T2_isr (void) interrupt 5;
 #endif
@@ -64,7 +68,7 @@ _printn(int n)
     _putchar('0');
   }
   else {
-    char buf[6];
+    static char buf[6];
     char *p = &buf[sizeof(buf) - 1];
     char neg = 0;
 

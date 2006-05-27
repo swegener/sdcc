@@ -22,11 +22,14 @@
 #endif
 
 #ifdef SDCC_mcs51
-#define STORAGE xdata
-#define XDATA xdata
+#  define STORAGE xdata
+#  define XDATA xdata
 #elif SDCC_pic16
-#define STORAGE code
-#define XDATA
+#  define STORAGE code
+#  define XDATA
+#else
+#  define STORAGE
+#  define XDATA
 #endif
 
 XDATA volatile float left, right, result;

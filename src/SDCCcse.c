@@ -175,6 +175,13 @@ replaceAllSymBySym (iCode * ic, operand * from, operand * to, bitVect ** ndpset)
 {
   iCode *lic;
 
+#ifdef RANGEHUNT
+  printf ("replaceAllSymBySym\n\t");
+  printOperand (from, stdout);
+  printf ("\nwith\t");
+  printOperand (to, stdout);
+  printf ("\n");
+#endif
   for (lic = ic; lic; lic = lic->next)
     {
       int siaddr;
@@ -471,6 +478,16 @@ DEFSETFUNC (findPointerSet)
       getSize (operandType (IC_RIGHT (cdp->diCode))) ==
       getSize (operandType (rop)))
     {
+      if (IS_SPEC (operandType (IC_RIGHT (cdp->diCode))) &&
+          SPEC_USIGN (operandType (IC_RIGHT (cdp->diCode))) !=
+          SPEC_USIGN (operandType (rop)))
+        {
+          /* bug #1493710
+            Reminder for Bernhard: check of signedness
+            could be unnecessary together with 'checkSign', if
+            signedness of operation is stored in ic */
+          return 0;
+        }
       *opp = IC_RIGHT (cdp->diCode);
       return 1;
     }

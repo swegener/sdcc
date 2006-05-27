@@ -1,3 +1,8 @@
+2006-05-27 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCcse.c (findPointerSet): fixed bug #1493710
+	* support/regression/tests/bug-1493710.c: added
+
 2006-05-27 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/fwk/lib/testfwk.c: define array in _printn() as

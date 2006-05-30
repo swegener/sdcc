@@ -9,9 +9,10 @@
 	* src/SDCCast.c (isLoopCountable): fixed bug #1478316
 	(processParms): fixed bug #1247551
 	* src/SDCCmain.c (printVersionInfo, printOptions, printUsage,
-	parseCmdLine, main): print version to stdout, help to stdout on
-	windows and to stderr on all the rest; exit with EXIT_FAILURE if
-	no arguments given
+	parseCmdLine, main): print '--version' to stdout,
+	print 'help' to stdout if --help is given,
+	print 'help' to stderr and exit with EXIT_FAILURE if no or bad
+	arguments are given; fixed --help
 
 2006-05-27 Bernhard Held <bernhard AT bernhardheld.de>
 

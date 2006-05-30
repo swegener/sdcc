@@ -91,10 +91,9 @@ int ds390_jammed = 0;
 char scratchFileName[PATH_MAX];
 char buffer[PATH_MAX * 2];
 
-#define OPTION_HELP     "-help"
-
 #define LENGTH(_a)      (sizeof(_a)/sizeof(*(_a)))
 
+#define OPTION_HELP             "--help"
 #define OPTION_STACK_8BIT       "--stack-8bit"
 #define OPTION_OUT_FMT_IHX      "--out-fmt-ihx"
 #define OPTION_OUT_FMT_S19      "--out-fmt-s19"
@@ -146,7 +145,7 @@ char buffer[PATH_MAX * 2];
 static const OPTION
 optionsTable[] = {
     { 0,    NULL,                   NULL, "General options" },
-    { 0,    "--help",               NULL, "Display this help" },
+    { 0,    OPTION_HELP,            NULL, "Display this help" },
     { 'v',  OPTION_VERSION,         NULL, "Display sdcc's version" },
     { 0,    "--verbose",            &options.verbose, "Trace calls to the preprocessor, assembler, and linker" },
     { 'V',  NULL,                   &options.verboseExec, "Execute verbosely.  Show sub commands as they are run" },

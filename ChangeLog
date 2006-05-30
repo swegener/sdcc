@@ -1,3 +1,9 @@
+2006-05-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (optionsTable, parseCmdLine): handle --use-stdout
+	  immediately when encountered,
+	  (printUsage): always use stderr even on windows
+
 2006-05-30 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (isLoopCountable): fixed bug #1478316
@@ -5,7 +11,7 @@
 	* src/SDCCmain.c (printVersionInfo, printOptions, printUsage,
 	parseCmdLine, main): print version to stdout, help to stdout on
 	windows and to stderr on all the rest; exit with EXIT_FAILURE if
-	no arguments given	
+	no arguments given
 
 2006-05-27 Bernhard Held <bernhard AT bernhardheld.de>
 

@@ -165,7 +165,7 @@ optionsTable[] = {
     { 'o',  NULL,                   NULL, "Place the output into the given path resp. file" },
     { 0,    OPTION_PRINT_SEARCH_DIRS, &options.printSearchDirs, "display the directories in the compiler's search path"},
     { 0,    OPTION_MSVC_ERROR_STYLE, &options.vc_err_style, "messages are compatible with Micro$oft visual studio"},
-    { 0,    OPTION_USE_STDOUT, &options.use_stdout, "send errors to stdout instead of stderr"},
+    { 0,    OPTION_USE_STDOUT,      NULL, "send errors to stdout instead of stderr"},
     { 0,    "--nostdlib",           &options.nostdlib, "Do not include the standard library directory in the search path" },
     { 0,    "--nostdinc",           &options.nostdinc, "Do not include the standard include directory in the search path" },
     { 0,    OPTION_LESS_PEDANTIC,   NULL, "Disable some of the more pedantic warnings" },
@@ -499,17 +499,7 @@ static void
 printUsage (void)
 {
     int i;
-#if defined(__MINGW32__)
-    FILE *stream = stdout;
-#elif defined(__DJGPP__)
-    FILE *stream = stdout;
-#elif defined(_MSC_VER)
-    FILE *stream = stdout;
-#elif defined(__BORLANDC__)
-    FILE *stream = stdout;
-#else
     FILE *stream = stderr;
-#endif
 
     printVersionInfo (stream);
     fprintf (stream,
@@ -891,6 +881,15 @@ parseCmdLine (int argc, char **argv)
       /* options */
       if (argv[i][0] == '-' && argv[i][1] == '-')
         {
+          if (strcmp (argv[i], OPTION_USE_STDOUT) == 0)
+            {
+              if (options.use_stdout == 0)
+                {
+                  options.use_stdout = 1;
+                  dup2(STDOUT_FILENO, STDERR_FILENO);
+                }
+              continue;
+            }
           if (strcmp (argv[i], OPTION_HELP) == 0)
             {
               printUsage ();
@@ -966,7 +965,7 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_VERSION) == 0)
             {
               printVersionInfo (stdout);
-              exit (0);
+              exit (EXIT_SUCCESS);
               continue;
             }
 
@@ -1438,7 +1437,6 @@ parseCmdLine (int argc, char **argv)
         werror (E_FILE_OPEN_ERR, scratchFileName);
     }
   MSVC_style(options.vc_err_style);
-  if(options.use_stdout) dup2(STDOUT_FILENO, STDERR_FILENO);
 
   return 0;
 }

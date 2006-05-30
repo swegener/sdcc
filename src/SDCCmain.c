@@ -436,16 +436,16 @@ _findProcessor (int argc, char **argv)
 /* printVersionInfo - prints the version info        */
 /*-----------------------------------------------------------------*/
 void
-printVersionInfo (void)
+printVersionInfo (FILE *stream)
 {
   int i;
 
-  fprintf (stderr,
+  fprintf (stream,
            "SDCC : ");
   for (i = 0; i < NUM_PORTS; i++)
-    fprintf (stderr, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
+    fprintf (stream, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
 
-  fprintf (stderr, " " SDCC_VERSION_STR
+  fprintf (stream, " " SDCC_VERSION_STR
 #ifdef SDCC_SUB_VERSION_STR
            "/" SDCC_SUB_VERSION_STR
 #endif
@@ -467,7 +467,7 @@ printVersionInfo (void)
 }
 
 static void
-printOptions(const OPTION *optionsTable)
+printOptions(const OPTION *optionsTable, FILE *stream)
 {
   int i;
   for (i = 0;
@@ -478,11 +478,11 @@ printOptions(const OPTION *optionsTable)
       if (!optionsTable[i].shortOpt && !optionsTable[i].longOpt
           && optionsTable[i].help)
         {
-          fprintf (stdout, "\n%s:\n", optionsTable[i].help);
+          fprintf (stream, "\n%s:\n", optionsTable[i].help);
         }
       else
         {
-          fprintf(stdout, "  %c%c  %-20s  %s\n",
+          fprintf(stream, "  %c%c  %-20s  %s\n",
                   optionsTable[i].shortOpt !=0 ? '-' : ' ',
                   optionsTable[i].shortOpt !=0 ? optionsTable[i].shortOpt : ' ',
                   optionsTable[i].longOpt != NULL ? optionsTable[i].longOpt : "",
@@ -495,28 +495,38 @@ printOptions(const OPTION *optionsTable)
 /*-----------------------------------------------------------------*/
 /* printUsage - prints command line syntax         */
 /*-----------------------------------------------------------------*/
-void
+static void
 printUsage (void)
 {
     int i;
-    printVersionInfo();
-    fprintf (stdout,
+#if defined(__MINGW32__)
+    FILE *stream = stdout;
+#elif defined(__DJGPP__)
+    FILE *stream = stdout;
+#elif defined(_MSC_VER)
+    FILE *stream = stdout;
+#elif defined(__BORLANDC__)
+    FILE *stream = stdout;
+#else
+    FILE *stream = stderr;
+#endif
+
+    printVersionInfo (stream);
+    fprintf (stream,
              "Usage : sdcc [options] filename\n"
              "Options :-\n"
              );
 
-    printOptions(optionsTable);
+    printOptions (optionsTable, stream);
 
     for (i = 0; i < NUM_PORTS; i++)
       {
         if (_ports[i]->poptions != NULL)
           {
-            fprintf (stdout, "\nSpecial options for the %s port:\n", _ports[i]->target);
-            printOptions (_ports[i]->poptions);
+            fprintf (stream, "\nSpecial options for the %s port:\n", _ports[i]->target);
+            printOptions (_ports[i]->poptions, stream);
           }
       }
-
-    exit (0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -884,7 +894,7 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_HELP) == 0)
             {
               printUsage ();
-              exit (0);
+              exit (EXIT_SUCCESS);
             }
 
           if (strcmp (argv[i], OPTION_STACK_8BIT) == 0)
@@ -955,7 +965,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_VERSION) == 0)
             {
-              printVersionInfo ();
+              printVersionInfo (stdout);
               exit (0);
               continue;
             }
@@ -1154,7 +1164,7 @@ parseCmdLine (int argc, char **argv)
               verifyShortOption(argv[i]);
 
               printUsage ();
-              exit (0);
+              exit (EXIT_SUCCESS);
               break;
 
             case 'm':
@@ -1246,7 +1256,7 @@ parseCmdLine (int argc, char **argv)
             case 'v':
               verifyShortOption(argv[i]);
 
-              printVersionInfo ();
+              printVersionInfo (stdout);
               exit (0);
               break;
 
@@ -2297,8 +2307,6 @@ main (int argc, char **argv, char **envp)
   /* turn all optimizations off by default */
   memset (&optimize, 0, sizeof (struct optimize));
 
-  /*printVersionInfo (); */
-
   if (NUM_PORTS==0) {
     fprintf (stderr, "Build error: no ports are enabled.\n");
     exit (1);
@@ -2364,12 +2372,13 @@ main (int argc, char **argv, char **envp)
         doPrintSearchDirs();
 
   /* if no input then printUsage & exit */
-  if (!options.c1mode && !fullSrcFileName && peekSet(relFilesSet) == NULL) {
-    if (!options.printSearchDirs)
+  if (!options.c1mode && !fullSrcFileName && peekSet(relFilesSet) == NULL)
+    {
+      if (options.printSearchDirs)
+        exit (EXIT_SUCCESS);
       printUsage();
-
-    exit(0);
-  }
+      exit (EXIT_FAILURE);
+    }
 
   /* initMem() is expensive, but
      initMem() must called before port->finaliseOptions ().

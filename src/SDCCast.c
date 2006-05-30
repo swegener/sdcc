@@ -1497,7 +1497,7 @@ isLabelInAst (symbol * label, ast * tree)
 /* isLoopCountable - return true if the loop count can be determi- */
 /* -ned at compile time .                                          */
 /*-----------------------------------------------------------------*/
-bool
+static bool
 isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
                  symbol ** sym, ast ** init, ast ** end)
 {
@@ -1520,6 +1520,10 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr,
       *init = initExpr->right;
     }
   else
+    return FALSE;
+
+  /* don't reverse loop with volatile counter */
+  if (IS_VOLATILE ((*sym)->type))
     return FALSE;
 
   /* for now the symbol has to be of
@@ -1927,7 +1931,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
 /* if the for loop is reversible. If yes will set the value of     */
 /* the loop control var & init value & termination value           */
 /*-----------------------------------------------------------------*/
-bool
+static bool
 isLoopReversible (ast * loop, symbol ** loopCntrl,
                   ast ** init, ast ** end)
 {

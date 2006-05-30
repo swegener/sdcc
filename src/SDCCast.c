@@ -747,7 +747,7 @@ processParms (ast *func,
     }
 
   /* decorate parameter */
-  resultType = defParm ? getResultTypeFromType (defParm->etype) :
+  resultType = defParm ? getResultTypeFromType (defParm->type) :
                          RESULT_TYPE_NONE;
   *actParm = decorateType (*actParm, resultType);
 

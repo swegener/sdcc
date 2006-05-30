@@ -1,6 +1,7 @@
 2006-05-30 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (isLoopCountable): fixed bug #1478316
+	(processParms): fixed bug #1247551
 
 2006-05-27 Bernhard Held <bernhard AT bernhardheld.de>
 

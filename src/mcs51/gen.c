@@ -197,7 +197,7 @@ emitcode (char *inst, const char *fmt,...)
 static void
 emitLabel (symbol *tlbl)
 {
-  emitcode ("", "%05d$:", (tlbl->key +100));
+  emitcode ("", "%05d$:", tlbl->key + 100);
 }
 
 /*-----------------------------------------------------------------*/
@@ -423,8 +423,8 @@ endOfWorld:
       (*aopp)->type = AOP_STK;
       return NULL;
     }
-    /* in the case that result AND left AND right needs a pointer reg
-       we can safely use the result's */
+  /* in the case that result AND left AND right needs a pointer reg
+     we can safely use the result's */
   if (bitVectBitValue (mcs51_rUmaskForOp(IC_RESULT(ic)), R0_IDX))
     {
       (*aopp)->type = AOP_R0;
@@ -434,7 +434,7 @@ endOfWorld:
     {
       (*aopp)->type = AOP_R1;
       return REG_WITH_INDEX (R1_IDX);
-  }
+    }
 
   /* now this is REALLY the end of the world */
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
@@ -1516,20 +1516,20 @@ aopPut (operand * result, const char *s, int offset)
         }
       else if (offset)
         {
-            SNPRINTF (buffer, sizeof(buffer),
-                      "(%s + %d)",
-                      aop->aopu.aop_dir, offset);
+          SNPRINTF (buffer, sizeof(buffer),
+                    "(%s + %d)",
+                    aop->aopu.aop_dir, offset);
         }
       else
         {
-            SNPRINTF (buffer, sizeof(buffer),
+          SNPRINTF (buffer, sizeof(buffer),
                     "%s",
                     aop->aopu.aop_dir);
         }
 
       if (strcmp (buffer, s) || bvolatile)
         {
-            emitcode ("mov", "%s,%s", buffer, s);
+          emitcode ("mov", "%s,%s", buffer, s);
         }
       if (!strcmp (buffer, "acc"))
         {
@@ -3679,7 +3679,8 @@ genEndFunction (iCode * ic)
         }
       else if (sym->stack || FUNC_HASSTACKPARM(sym->type))
         {
-          emitcode ("mov", "sp,_bp");
+          if (sym->stack)
+            emitcode ("mov", "sp,_bp");
           emitcode ("pop", "_bp");
         }
     }
@@ -4075,7 +4076,7 @@ genPlusIncr (iCode * ic)
           && (labelRange = findLabelBackwards (ic, IC_LABEL (ic->next)->key)) != 0
           && labelRange <= 10)
         {
-          emitcode (";", "tail increment optimized");
+          D (emitcode (";", "tail increment optimized (range %d)", labelRange));
           tlbl = IC_LABEL (ic->next);
           emitTlbl = 0;
         }
@@ -4513,7 +4514,7 @@ genMinusDec (iCode * ic)
   if ((icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
-  D(emitcode (";     genMinusDec",""));
+  D (emitcode (";", "genMinusDec"));
 
   /* if decrement >=16 bits in register or direct space */
   if ((AOP_TYPE(IC_LEFT(ic)) == AOP_REG || AOP_TYPE(IC_LEFT(ic)) == AOP_DIR) &&
@@ -4533,7 +4534,7 @@ genMinusDec (iCode * ic)
           && (labelRange = findLabelBackwards (ic, IC_LABEL (ic->next)->key)) != 0
           && labelRange <= 10)
         {
-          emitcode (";", "tail decrement optimized");
+          D (emitcode (";", "tail decrement optimized (range %d)", labelRange));
           tlbl = IC_LABEL (ic->next);
           emitTlbl = 0;
         }
@@ -5380,7 +5381,7 @@ genModbits (operand * left,
   char *l;
   bool pushedB;
 
-  D(emitcode (";     genModbits",""));
+  D (emitcode (";", "genModbits"));
 
   pushedB = pushB ();
 
@@ -5412,7 +5413,7 @@ genModOneByte (operand * left,
   symbol *lbl;
   int size, offset;
 
-  D(emitcode (";     genModOneByte",""));
+  D (emitcode (";", "genModOneByte"));
 
   size = AOP_SIZE (result) - 1;
   offset = 1;
@@ -6792,7 +6793,7 @@ genOr (iCode * ic, iCode * ifx)
   unsigned long lit = 0L;
   int bytelit = 0;
 
-  D(emitcode (";     genOr",""));
+  D (emitcode (";", "genOr"));
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE);
@@ -8656,7 +8657,7 @@ genLeftShiftLiteral (operand * left,
   int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
-  D(emitcode (";     genLeftShiftLiteral",""));
+  D (emitcode (";", "genLeftShiftLiteral"));
 
   freeAsmop (right, NULL, ic, TRUE);
 
@@ -8678,7 +8679,6 @@ genLeftShiftLiteral (operand * left,
           movLeft2Result (left, size, result, size, 0);
         }
     }
-
   else if (shCount >= (size * 8))
     {
       while (size--)
@@ -9009,7 +9009,8 @@ genrshFour (operand * result, operand * left,
         }
     }
   else
-    {                           /* 1 <= shCount <= 7 */
+    {
+      /* 1 <= shCount <= 7 */
       if (shCount <= 2)
         {
           shiftRLong (left, LSB, result, sign);
@@ -9038,7 +9039,7 @@ genRightShiftLiteral (operand * left,
   int shCount = (int) floatFromVal (AOP (right)->aopu.aop_lit);
   int size;
 
-  D(emitcode (";     genRightShiftLiteral",""));
+  D (emitcode (";", "genRightShiftLiteral"));
 
   freeAsmop (right, NULL, ic, TRUE);
 
@@ -9063,10 +9064,11 @@ genRightShiftLiteral (operand * left,
 
   else if (shCount >= (size * 8))
     {
-      if (sign) {
-        /* get sign in acc.7 */
-        MOVA (aopGet (left, size - 1, FALSE, FALSE));
-      }
+      if (sign)
+        {
+          /* get sign in acc.7 */
+          MOVA (aopGet (left, size - 1, FALSE, FALSE));
+        }
       addSign (result, LSB, sign);
     }
   else
@@ -9534,7 +9536,7 @@ genDataPointerGet (operand * left,
   char buffer[256];
   int size, offset = 0;
 
-  D(emitcode (";     genDataPointerGet",""));
+  D (emitcode (";", "genDataPointerGet"));
 
   aopOp (result, ic, TRUE);
 
@@ -9574,7 +9576,7 @@ genNearPointerGet (operand * left,
   sym_link *ltype = operandType (left);
   char buffer[80];
 
-  D(emitcode (";     genNearPointerGet",""));
+  D (emitcode (";", "genNearPointerGet"));
 
   rtype = operandType (result);
   retype = getSpec (rtype);
@@ -9712,7 +9714,7 @@ genPagedPointerGet (operand * left,
   char *rname;
   sym_link *rtype, *retype;
 
-  D(emitcode (";     genPagedPointerGet",""));
+  D (emitcode (";", "genPagedPointerGet"));
 
   rtype = operandType (result);
   retype = getSpec (rtype);
@@ -9866,7 +9868,7 @@ genFarPointerGet (operand * left,
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
 
-  D(emitcode (";     genFarPointerGet",""));
+  D (emitcode (";", "genFarPointerGet"));
 
   aopOp (left, ic, FALSE);
   loadDptrFromOperand (left, FALSE);
@@ -9918,7 +9920,7 @@ genCodePointerGet (operand * left,
   int size, offset;
   sym_link *retype = getSpec (operandType (result));
 
-  D(emitcode (";     genCodePointerGet",""));
+  D (emitcode (";", "genCodePointerGet"));
 
   aopOp (left, ic, FALSE);
   loadDptrFromOperand (left, FALSE);
@@ -10486,7 +10488,7 @@ genFarPointerSet (operand * right,
   aopOp (result, ic, FALSE);
   loadDptrFromOperand (result, FALSE);
 
-  /* so dptr know contains the address */
+  /* so dptr now contains the address */
   aopOp (right, ic, FALSE);
 
   /* if bit then unpack */
@@ -10526,12 +10528,12 @@ genGenPointerSet (operand * right,
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
-  D(emitcode (";     genGenPointerSet",""));
+  D (emitcode (";", "genGenPointerSet"));
 
   aopOp (result, ic, FALSE);
   loadDptrFromOperand (result, TRUE);
 
-  /* so dptr know contains the address */
+  /* so dptr now contains the address */
   aopOp (right, ic, FALSE);
 
   /* if bit then unpack */
@@ -10749,7 +10751,7 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
   int offset = 0;
   char *l;
 
-  D(emitcode (";     genFarFarAssign",""));
+  D (emitcode (";", "genFarFarAssign"));
 
   /* first push the right side on to the stack */
   while (size--)
@@ -10898,7 +10900,7 @@ genJumpTab (iCode * ic)
   char *l;
   unsigned int count;
 
-  D(emitcode (";     genJumpTab",""));
+  D (emitcode (";", "genJumpTab"));
 
   count = elementsInSet( IC_JTLABELS (ic) );
 
@@ -11021,9 +11023,7 @@ genCast (iCode * ic)
   aopOp (result, ic, FALSE);
 
   /* if the result is a bit (and not a bitfield) */
-  // if (AOP_TYPE (result) == AOP_CRY)
   if (IS_BIT (OP_SYMBOL (result)->type))
-    /* not for bitfields */
     {
       /* if the right size is a literal then
          we know what the value is */
@@ -11439,7 +11439,7 @@ genCritical (iCode *ic)
   if (IC_RESULT (ic))
     {
       aopOp (IC_RESULT (ic), ic, TRUE);
-      aopPut (IC_RESULT (ic), one, 0);
+      aopPut (IC_RESULT (ic), one, 0); /* save old ea in an operand */
       emitcode ("jbc", "ea,%05d$", (tlbl->key + 100)); /* atomic test & clear */
       aopPut (IC_RESULT (ic), zero, 0);
       emitLabel (tlbl);
@@ -11526,7 +11526,7 @@ gen51Code (iCode * lic)
               debugFile->writeCLine (ic);
             }
           if (!options.noCcodeInAsm) {
-            emitcode ("", ";%s:%d: %s", ic->filename, ic->lineno,
+            emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno,
                       printCLine(ic->filename, ic->lineno));
           }
           cln = ic->lineno;
@@ -11736,7 +11736,9 @@ gen51Code (iCode * lic)
 
         case '=':
           if (POINTER_SET (ic))
-            genPointerSet (ic, hasInc (IC_RESULT(ic),ic,getSize(operandType(IC_RIGHT(ic)))));
+            genPointerSet (ic,
+                           hasInc (IC_RESULT (ic), ic,
+                                   getSize (operandType (IC_RIGHT (ic)))));
           else
             genAssign (ic);
           break;

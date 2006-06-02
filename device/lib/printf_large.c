@@ -80,13 +80,14 @@ static const char memory_id[] = "IXCP-";
   static void output_digit( unsigned char n )
 #endif
   {
-    register unsigned char c;
-    if (n <= 9)
-      c = n + '0';
-    else if (lower_case)
-      c = n + (unsigned char)('a' - 10);
-    else
-      c = n + (unsigned char)('A' - 10);
+    register unsigned char c = n + (unsigned char)'0';
+
+    if (c > (unsigned char)'9')
+    {
+      c += (unsigned char)('A' - '0' - 10);
+      if (lower_case)
+         c += (unsigned char)('a' - 'A');
+    }
     output_char( c, p );
   }
 
@@ -126,7 +127,7 @@ static void calculate_digit( value_t _AUTOMEM * value, unsigned char radix )
     {
       *pb4 -= radix;
       ul |= 1;
-  }
+    }
   } while (--i);
   value->ul = ul;
 }
@@ -147,7 +148,7 @@ static void calculate_digit( unsigned char radix )
     {
       b4 -= radix;
       ul |= 1;
-  }
+    }
   } while (--i);
   value.ul = ul;
   value.byte[4] = b4;

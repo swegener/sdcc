@@ -1,5 +1,15 @@
 2006-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/lib/printf_large.c (output_digit): optimized further, Tnx Frieder
+	* src/ds390/gen.c (emitLabel): new, added,
+	  (genDjnz): fixed stack overflow bug,
+	  (throughout): cosmetic changes to sync with mcs51/gen.c,
+	  replaced emitcode("", "%05d$:", lbl->key + 100) with emitLabel(lbl)
+	* src/mcs51/gen.c (genEndFunction): small optimization,
+	  (throughout): cosmetic changes to sync with ds390/gen.c
+
+2006-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/lib/printf_large.c (output_digit, calculate_digit): optimized,
 	  (_print_format): fixed printing pointers
 	* src/mcs51/gen.c (emitLabel, movb): new, added,

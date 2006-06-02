@@ -1,8 +1,16 @@
-2006-05-31 Maarten Brock <sourceforge.brock AT dse.nl>
+2006-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c (output_digit, calculate_digit): optimized,
 	  (_print_format): fixed printing pointers
-	* src/mcs51/peeph.def: added rule 140
+	* src/mcs51/gen.c (emitLabel, movb): new, added,
+	  (genAssign): small optimization,
+	  (genDjnz): fixed stack overflow bug,
+	  (throughout): replaced sprintf with SNPRINTF,
+	  replaced mcs51_regWithIdx with REG_WITH_INDEX,
+	  replaced emitcode("mov", "b,...") with MOVB(...),
+	  replaced emitcode("", "%05d$:", lbl->key + 100) with emitLabel(lbl),
+	  replaced D(emitcode("; genXXX", "")) with D(emitcode(";", "genXXX"))
+	* src/mcs51/peeph.def: added rules 140 and 264
 	* src/SDCCmem.c (allocLocal): store register declared locals in DSEG/OSEG
 	  so they may get optimized into registers
 

@@ -134,7 +134,7 @@ test-host2:
 
 # Begin per-port rules
 # List of all of the known source test suites.
-ALL_TESTS = $(shell find $(TESTS_DIR) -name "*.c")
+ALL_TESTS = $(shell find $(TESTS_DIR) -name "*.c" | sort)
 
 # Intermediate directory
 PORT_CASES_DIR = $(CASES_DIR)/$(PORT)

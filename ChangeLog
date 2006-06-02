@@ -1,3 +1,10 @@
+2006-06-02 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/pic16/support.c: increase stack size
+	  to 255 bytes
+	* support/regression/Makefile.in: sort tests by name so that the
+	  resutlts can be compared on different machines / platforms
+
 2006-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c (output_digit): optimized further, Tnx Frieder

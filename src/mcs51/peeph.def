@@ -856,6 +856,19 @@ replace {
 	mov	r%1,a
 }
 
+// applies to genlshOne
+replace {
+	mov	ar%1,@%2
+	mov	a,r%1
+	add	a,acc
+	mov	r%1,a
+} by {
+	;	Peephole 140	removed redundant mov
+	mov	a,@%2
+	add	a,@%2
+	mov	r%1,a
+}
+
 replace {
 	mov	r%1,a
 	mov	r%2,ar%1
@@ -3109,8 +3122,6 @@ replace {
 } if notVolatile %1
 
 
-
-
 // rules 247.x apply to f.e. bitfields.c
 replace {
 	mov	r%5,#%1
@@ -4521,6 +4532,19 @@ replace {
 	;	Peephole 263.c	optimized loading const
 	mov	%1,#(%2 + 1)
 }
+
+
+replace {
+	clr	a
+	cjne	%1,%2,%3
+	inc	a
+%3:
+	jz	%4
+} by {
+	;	Peephole 264	jump optimization (acc not set)
+	cjne	%1,%2,%4
+%3:
+} if labelRefCount(%3 1), labelRefCountChange(%3 -1)
 
 // should be one of the last peepholes
 replace{

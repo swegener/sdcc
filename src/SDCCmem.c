@@ -462,7 +462,6 @@ allocParms (value * val)
 
   for (lval = val; lval; lval = lval->next, pNum++)
     {
-
       /* check the declaration */
       checkDecl (lval->sym, 0);
 
@@ -476,11 +475,9 @@ allocParms (value * val)
       lval->sym->ismyparm = 1;
       lval->sym->localof = currFunc;
 
-
       /* if automatic variables r 2b stacked */
       if (options.stackAuto || IFFUNC_ISREENT (currFunc->type))
         {
-
           if (lval->sym)
             lval->sym->onStack = 1;
 
@@ -533,32 +530,31 @@ allocParms (value * val)
               continue;
             }
 
-            /* otherwise depending on the memory model */
-            SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
+          /* otherwise depending on the memory model */
+          SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
               port->mem.default_local_map;
-            if (options.model == MODEL_SMALL)
-              {
-                /* note here that we put it into the overlay segment
-                   first, we will remove it from the overlay segment
-                   after the overlay determination has been done */
-                if (!options.noOverlay)
-                  {
-                    SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
-                      overlay;
-                  }
-              }
-            else if (options.model == MODEL_MEDIUM)
-              {
-                SPEC_SCLS (lval->etype) = S_PDATA;
-              }
-            else
-              {
-                SPEC_SCLS (lval->etype) = S_XDATA;
-              }
+          if (options.model == MODEL_SMALL)
+            {
+              /* note here that we put it into the overlay segment
+                 first, we will remove it from the overlay segment
+                 after the overlay determination has been done */
+              if (!options.noOverlay)
+                {
+                  SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) =
+                    overlay;
+                }
+            }
+          else if (options.model == MODEL_MEDIUM)
+            {
+              SPEC_SCLS (lval->etype) = S_PDATA;
+            }
+          else
+            {
+              SPEC_SCLS (lval->etype) = S_XDATA;
+            }
           allocIntoSeg (lval->sym);
         }
     }
-
   return;
 }
 
@@ -572,7 +568,6 @@ deallocParms (value * val)
 
   for (lval = val; lval; lval = lval->next)
     {
-
       /* unmark is myparm */
       lval->sym->ismyparm = 0;
 
@@ -600,13 +595,12 @@ deallocParms (value * val)
           addSym (SymbolTab, lval->sym, lval->sym->name,
                   lval->sym->level, lval->sym->block, 1);
           lval->sym->_isparm = 1;
-          if (!isinSet (operKeyReset, lval->sym)) {
-            addSet(&operKeyReset, lval->sym);
-          }
+          if (!isinSet (operKeyReset, lval->sym))
+            {
+              addSet(&operKeyReset, lval->sym);
+            }
         }
-
     }
-
   return;
 }
 
@@ -616,7 +610,6 @@ deallocParms (value * val)
 void
 allocLocal (symbol * sym)
 {
-
   /* generate an unique name */
   SNPRINTF (sym->rname, sizeof(sym->rname),
             "%s%s_%s_%d_%d",
@@ -680,7 +673,7 @@ allocLocal (symbol * sym)
       return;
     }
 
-  if (SPEC_SCLS (sym->etype) == S_DATA)
+  if ((SPEC_SCLS (sym->etype) == S_DATA) || (SPEC_SCLS (sym->etype) == S_REGISTER))
     {
       SPEC_OCLS (sym->etype) = (options.noOverlay ? data : overlay);
       allocIntoSeg (sym);
@@ -697,8 +690,7 @@ allocLocal (symbol * sym)
      overlay  analysis has been done */
   if (options.model == MODEL_SMALL) {
       SPEC_OCLS (sym->etype) =
-        (options.noOverlay ? port->mem.default_local_map
-         : overlay);
+        (options.noOverlay ? port->mem.default_local_map : overlay);
   } else {
       SPEC_OCLS (sym->etype) = port->mem.default_local_map;
   }

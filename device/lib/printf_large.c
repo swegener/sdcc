@@ -24,7 +24,7 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-#if defined(__ds390)
+#if defined (SDCC_ds390)
 #define USE_FLOATS 1
 #endif
 
@@ -80,8 +80,14 @@ static const char memory_id[] = "IXCP-";
   static void output_digit( unsigned char n )
 #endif
   {
-    output_char( n <= 9 ? '0'+n :
-               (lower_case ? n+(char)('a'-10) : n+(char)('A'-10)), p );
+    register unsigned char c;
+    if (n <= 9)
+      c = n + '0';
+    else if (lower_case)
+      c = n + (unsigned char)('a' - 10);
+    else
+      c = n + (unsigned char)('A' - 10);
+    output_char( c, p );
   }
 
 /*--------------------------------------------------------------------------*/
@@ -105,38 +111,46 @@ static const char memory_id[] = "IXCP-";
 /*--------------------------------------------------------------------------*/
 
 #if defined SDCC_STACK_AUTO
-static void calculate_digit( value_t* value, unsigned char radix )
+static void calculate_digit( value_t _AUTOMEM * value, unsigned char radix )
 {
-  unsigned char i;
+  unsigned long ul = value->ul;
+  unsigned char _AUTOMEM * pb4 = &value->byte[4];
+  unsigned char i = 32;
 
-  for( i = 32; i != 0; i-- )
+  do
   {
-    value->byte[4] = (value->byte[4] << 1) | ((value->ul >> 31) & 0x01);
-    value->ul <<= 1;
+    *pb4 = (*pb4 << 1) | ((ul >> 31) & 0x01);
+    ul <<= 1;
 
-    if (radix <= value->byte[4] )
+    if (radix <= *pb4 )
     {
-      value->byte[4] -= radix;
-      value->ul |= 1;
-    }
+      *pb4 -= radix;
+      ul |= 1;
   }
+  } while (--i);
+  value->ul = ul;
 }
 #else
 static void calculate_digit( unsigned char radix )
 {
-  unsigned char i;
+  register unsigned long ul = value.ul;
+  register unsigned char b4 = value.byte[4];
+  register unsigned char i = 32;
 
-  for( i = 32; i != 0; i-- )
+  do
   {
-    value.byte[4] = (value.byte[4] << 1) | ((value.ul >> 31) & 0x01);
-    value.ul <<= 1;
+    b4 = (b4 << 1);
+    b4 |= (ul >> 31) & 0x01;
+    ul <<= 1;
 
-    if (radix <= value.byte[4] )
+    if (radix <= b4 )
     {
-      value.byte[4] -= radix;
-      value.ul |= 1;
-    }
+      b4 -= radix;
+      ul |= 1;
   }
+  } while (--i);
+  value.ul = ul;
+  value.byte[4] = b4;
 }
 #endif
 
@@ -390,10 +404,10 @@ int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list 
       prefix_sign     = 0;
       prefix_space    = 0;
       signed_argument = 0;
-      radix           = 0;
       char_argument   = 0;
       long_argument   = 0;
       float_argument  = 0;
+      radix           = 0;
       width           = 0;
       decimals        = -1;
 
@@ -503,8 +517,19 @@ get_conversion_spec:
       case 'P':
         PTR = va_arg(ap,ptr_t);
 
-#ifdef SDCC_ds390
-        output_char(memory_id[(value.byte[3] > 3) ? 4 : value.byte[3]], p );
+#if defined (SDCC_ds390)
+        {
+          unsigned char memtype = value.byte[3];
+          if (memtype > 0x80)
+            c = 'C';
+          else if (memtype > 0x60)
+            c = 'P';
+          else if (memtype > 0x40)
+            c = 'I';
+          else
+            c = 'X';
+        }
+        output_char(c, p);
         output_char(':', p);
         output_char('0', p);
         output_char('x', p);
@@ -512,17 +537,34 @@ get_conversion_spec:
         OUTPUT_2DIGITS( value.byte[1] );
         OUTPUT_2DIGITS( value.byte[0] );
         charsOutputted += 10;
-#else
-        output_char( memory_id[(value.byte[2] > 3) ? 4 : value.byte[2]], p );
+#elif defined (SDCC_mcs51)
+        {
+          unsigned char memtype = value.byte[2];
+          if (memtype > 0x80)
+            c = 'C';
+          else if (memtype > 0x60)
+            c = 'P';
+          else if (memtype > 0x40)
+            c = 'I';
+          else
+            c = 'X';
+        }
+        output_char(c, p);
         output_char(':', p);
         output_char('0', p);
         output_char('x', p);
-        if ((value.byte[2] != 0x00 /* DSEG */) &&
-            (value.byte[2] != 0x03 /* SSEG */))
+        if ((c != 'I' /* idata */) &&
+            (c != 'P' /* pdata */))
         {
           OUTPUT_2DIGITS( value.byte[1] );
           charsOutputted += 2;
         }
+        OUTPUT_2DIGITS( value.byte[0] );
+        charsOutputted += 6;
+#else
+        output_char('0', p);
+        output_char('x', p);
+        OUTPUT_2DIGITS( value.byte[1] );
         OUTPUT_2DIGITS( value.byte[0] );
         charsOutputted += 6;
 #endif

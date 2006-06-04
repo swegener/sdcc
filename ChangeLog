@@ -26,6 +26,7 @@
 	* src/mcs51/ralloc.c (packRegsForAssign): removed outcommented source
 	* support/regression/tests/constantRange.c: added
 	* support/valdiag/tests/constantRange.c: added
+	* support/valdiag/valdiag.py: added -DPORT_HOST=1
 
 2006-06-02 Borut Razem <borut.razem AT siol.net>
 

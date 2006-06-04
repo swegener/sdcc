@@ -2178,20 +2178,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
             }
        }
     }
-#if 0
-  /* if assignment then check that right is not a bit */
-  if (ASSIGNMENT (dic) && !POINTER_SET (dic))
-    {
-      sym_link *etype = operandType (IC_RIGHT (dic));
-      if (IS_BITFIELD (etype))
-        {
-          /* if result is a bit too then it's ok */
-          etype = operandType (IC_RESULT (dic));
-          if (!IS_BITFIELD (etype))
-            return 0;
-        }
-    }
-#endif
+
   /* if the result is on stack or iaccess then it must be
      the same atleast one of the operands */
   if (OP_SYMBOL (IC_RESULT (ic))->onStack ||

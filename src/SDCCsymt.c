@@ -1966,12 +1966,12 @@ computeType (sym_link * type1, sym_link * type2,
       && (   (SPEC_USIGN (etype1)
               /* if this operand is promoted to a larger type,
                  then it will be promoted to a signed type */
-              && !(getSize (etype1) < getSize (reType))
+              && !(bitsForType (etype1) < bitsForType (reType))
               /* char require special handling */
               && !IS_CHAR (etype1))
           || /* same for 2nd operand */  
              (SPEC_USIGN (etype2)
-              && !(getSize (etype2) < getSize (reType))
+              && !(bitsForType (etype2) < bitsForType (reType))
               && !IS_CHAR (etype2))
           || /* if both are 'unsigned char' and not promoted
                 let the result be unsigned too */

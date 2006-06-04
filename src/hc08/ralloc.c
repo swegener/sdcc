@@ -1953,7 +1953,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       return 0;
     }
 
-
   /* if the true symbol is defined in far space or on stack
      then we should not since this will increase register pressure */
 #if 0
@@ -2028,16 +2027,18 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
     return 0;			/* did not find */
 
   /* if assignment then check that right is not a bit */
-  if (ASSIGNMENT (dic) && !POINTER_SET (dic))
+  if (ASSIGNMENT (ic) && !POINTER_SET (ic))
     {
-      sym_link *etype = operandType (IC_RIGHT (dic));
+      sym_link *etype = operandType (IC_RESULT (dic));
       if (IS_BITFIELD (etype))
         {
           /* if result is a bit too then it's ok */
-	  etype = operandType (IC_RESULT (dic));
+          etype = operandType (IC_RESULT (ic));
           if (!IS_BITFIELD (etype))
-	    return 0;
-	}
+            {
+              return 0;
+            }
+       }
     }
   /* if the result is on stack or iaccess then it must be
      the same atleast one of the operands */

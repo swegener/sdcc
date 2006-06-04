@@ -109,7 +109,7 @@ SDCCERR - SDCC Standard error handler
 #define E_EXTERN_MISMATCH              91 /* extern declaration mismatches */
 #define W_NONRENT_ARGS                 92 /* fptr non reentrant has args */
 #define W_DOUBLE_UNSUPPORTED           93 /* 'double' not supported yet */
-#define W_IF_NEVER_TRUE                94 /* if always false     */
+#define W_COMP_RANGE                   94 /* comparison is always %s due to limited range of data type */
 #define W_FUNC_NO_RETURN               95 /* no return statement found */
 #define W_PRE_PROC_WARNING             96 /* preprocessor generated warning */
 #define W_STRUCT_AS_ARG                97 /* structure passed as argument */
@@ -173,7 +173,7 @@ SDCCERR - SDCC Standard error handler
 #define W_PTR2INTEGRAL_NOCAST         155
 #define W_SYMBOL_NAME_TOO_LONG        156
 #define W_CAST_STRUCT_PTR             157 /* pointer to different structure types */
-#define W_IF_ALWAYS_TRUE              158
+#define W_LIT_OVERFLOW                158 /* overflow in implicit constant conversion */
 #define E_PARAM_NAME_OMITTED          159
 #define W_NO_FILE_ARG_IN_C1           160
 #define E_NEED_OPT_O_IN_C1            161

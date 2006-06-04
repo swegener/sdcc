@@ -1,3 +1,32 @@
+2006-06-04 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCval.c (checkConstantRange): added
+	* src/SDCCval.h: added checkConstantRange
+	* support/Util/SDCCerr.c,
+	* support/Util/SDCCerr.h: replaced unused W_IF_NEVER_TRUE and
+	W_IF_ALWAYS_TRUE by W_COMP_RANGE and W_LIT_OVERFLOW
+	* src/SDCC.y: moved early 'condition transformations' to SDCCast.c
+	* src/SDCCast.c (decorateType): added checkConstantRange,
+	added 'condition transformations' from SDCC.y so that now W_COMP_RANGE
+	can be emitted with the correct always true/false warning,
+	added optimization for double '!';
+	result of decorateType() must be assigned back to the tree, because
+	decorateType() can change the tree
+	* src/SDCCicode.c (geniCodeLogic),
+	(geniCodeAssign): replaced new checkConstantRange, added warnings,
+	(checkConstantRange): removed, it was only a fragment which never
+	emitted a warning
+	* src/SDCCsymt.c (computeType): fixed promotion for
+	"-1 < (unsigned bit) b"
+	* src/pic/ralloc.c (packRegsForAssign),
+	* src/pic16/ralloc.c (packRegsForAssign),
+	* src/hc08/ralloc.c (packRegsForAssign),
+	* src/z80/ralloc.c (packRegsForAssign): ported fix for bug #930931
+	from mcs51
+	* src/mcs51/ralloc.c (packRegsForAssign): removed outcommented source
+	* support/regression/tests/constantRange.c: added
+	* support/valdiag/tests/constantRange.c: added
+
 2006-06-02 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/ports/pic16/support.c: increase stack size

@@ -3492,6 +3492,20 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           goto errorTreeReturn;
         }
 
+      /* if left is another '!' */
+      if (tree->left->opval.op == '!')
+        {
+          /* remove double '!!X' by 'X ? 1 : 0' */
+          tree->opval.op = '?';
+          tree->left  = tree->left->left;
+          tree->right = newNode (':',
+                                  newAst_VALUE (constVal ("1")),
+                                  newAst_VALUE (constVal ("0")));
+          tree->right->lineno = tree->lineno;
+          tree->decorated = 0;
+          return decorateType (tree, resultType);
+        }
+
       /* if left is a literal then do it */
       if (IS_LITERAL (LTYPE (tree)))
         {
@@ -3928,36 +3942,56 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               }
         }
 
-      /* if unsigned value < 0  then always false */
+      {
+        CCR_RESULT ccr_result = CCR_OK;
+
+        /* if left is integral and right is literal
+           then check constant range */
+        if (IS_INTEGRAL(LTYPE(tree)) && IS_LITERAL(RTYPE(tree)))
+          ccr_result = checkConstantRange (LTYPE (tree), RTYPE (tree),
+                                           tree->opval.op, FALSE);
+        if (ccr_result == CCR_OK &&
+            IS_INTEGRAL(RTYPE(tree)) && IS_LITERAL(LTYPE(tree)))
+          ccr_result = checkConstantRange (RTYPE (tree), LTYPE (tree),
+                                           tree->opval.op, TRUE);
+        switch (ccr_result)
+            {
+              case CCR_ALWAYS_TRUE:
+              case CCR_ALWAYS_FALSE:
+                if (!options.lessPedantic)
+                  werror (W_COMP_RANGE,
+                          ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
+                return decorateType (newAst_VALUE (constVal (
+                                   ccr_result == CCR_ALWAYS_TRUE ? "1" : "0")),
+                                                   resultType);
+              case CCR_OK:
+              default:
+                break;
+            }
+      }
+
       /* if (unsigned value) > 0 then '(unsigned value) ? 1 : 0' */
-      if (SPEC_USIGN(LETYPE(tree)) &&
-          !IS_CHAR(LETYPE(tree)) && /* promotion to signed int */
+      if (tree->opval.op == '>' &&
+          SPEC_USIGN(LETYPE(tree)) &&
           IS_LITERAL(RTYPE(tree))  &&
           ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0)
         {
-          if (tree->opval.op == '<')
+          if (resultType == RESULT_TYPE_IFX)
             {
-              return tree->right;
+              /* the parent is an ifx: */
+              /* if (unsigned value) */
+              return tree->left;
             }
-          if (tree->opval.op == '>')
-            {
-              if (resultType == RESULT_TYPE_IFX)
-                {
-                  /* the parent is an ifx: */
-                  /* if (unsigned value) */
-                  return tree->left;
-                }
 
-              /* (unsigned value) ? 1 : 0 */
-              tree->opval.op = '?';
-              tree->right = newNode (':',
-                                     newAst_VALUE (constVal ("1")),
-                                     tree->right); /* val 0 */
-              tree->right->lineno = tree->lineno;
-              tree->right->left->lineno = tree->lineno;
-              tree->decorated = 0;
-              return decorateType (tree, resultType);
-            }
+          /* (unsigned value) ? 1 : 0 */
+          tree->opval.op = '?';
+          tree->right = newNode (':',
+                                  newAst_VALUE (constVal ("1")),
+                                  tree->right); /* val 0 */
+          tree->right->lineno = tree->lineno;
+          tree->right->left->lineno = tree->lineno;
+          tree->decorated = 0;
+          return decorateType (tree, resultType);
         }
 
       /* 'ifx (op == 0)' -> 'ifx (!(op))' */
@@ -3986,6 +4020,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                    tree->opval.val->type);
           return tree;
         }
+
       /* if one is 'signed char ' and the other one is 'unsigned char' */
       /* it's necessary to promote to int */
       if (IS_CHAR (RTYPE (tree)) && IS_CHAR (LTYPE (tree)) &&
@@ -4019,6 +4054,50 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       LRVAL (tree) = RRVAL (tree) = 1;
       TTYPE (tree) = TETYPE (tree) = newBoolLink ();
+
+      /* condition transformations */
+      {
+        unsigned transformedOp = 0;
+
+        switch (tree->opval.op)
+          {
+            case '<':             /* transform (a < b)  to !(a >= b)  */
+              if (port->lt_nge)
+                transformedOp = GE_OP;
+              break;
+            case '>':             /* transform (a > b)  to !(a <= b)  */
+              if (port->gt_nle)
+                transformedOp = LE_OP;
+              break;
+            case LE_OP:           /* transform (a <= b) to !(a > b)   */
+              if (port->le_ngt)
+                transformedOp = '>';
+              break;
+            case GE_OP:           /* transform (a >= b) to !(a < b)   */
+              if (port->ge_nlt)
+                transformedOp = '<';
+              break;
+            case NE_OP:           /* transform (a != b) to !(a == b)   */
+              if (port->ne_neq)
+                transformedOp = EQ_OP;
+              break;
+            case EQ_OP:           /* transform (a == b) to !(a != b)   */
+              if (port->eq_nne)
+                transformedOp = NE_OP;
+              break;
+            default:
+              break;
+          }
+        if (transformedOp)
+          {
+            tree->opval.op = transformedOp;
+            tree->decorated = 0;
+            tree = newNode ('!', tree, NULL);
+            tree->lineno = tree->left->lineno;
+            return decorateType (tree, resultType);
+          }
+      }
+
       return tree;
 
       /*------------------------------------------------------------------*/
@@ -4480,9 +4559,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
     case FOR:
 
-      decorateType (resolveSymbols (AST_FOR (tree, initExpr)), RESULT_TYPE_NONE);
-      decorateType (resolveSymbols (AST_FOR (tree, condExpr)), RESULT_TYPE_NONE);
-      decorateType (resolveSymbols (AST_FOR (tree, loopExpr)), RESULT_TYPE_NONE);
+      AST_FOR (tree, initExpr) = decorateType (
+                  resolveSymbols (AST_FOR (tree, initExpr)), RESULT_TYPE_NONE);
+      AST_FOR (tree, condExpr) = decorateType (
+                  resolveSymbols (AST_FOR (tree, condExpr)), RESULT_TYPE_NONE);
+      AST_FOR (tree, loopExpr) = decorateType (
+                  resolveSymbols (AST_FOR (tree, loopExpr)), RESULT_TYPE_NONE);
 
       /* if the for loop is reversible then
          reverse it otherwise do what we normally
@@ -4561,6 +4643,15 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
 
   if (!tree)
     return NULL;
+
+  /* while-loops insert a label between the IFX and the condition,
+     therefore look behind the label too */
+  if (tree->opval.op == LABEL &&
+      IS_ANDORNOT (tree->right))
+    {
+      tree->right = backPatchLabels (tree->right, trueLabel, falseLabel);
+      return tree;
+    }
 
   if (!(IS_ANDORNOT (tree)))
     return tree;

@@ -11662,7 +11662,7 @@ gen51Code (iCode * lic)
         case NE_OP:
 
           /* note these two are xlated by algebraic equivalence
-             during parsing SDCC.y */
+             in decorateType() in SDCCast.c */
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
                   "got '>=' or '<=' shouldn't have come here");
           break;

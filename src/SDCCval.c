@@ -367,6 +367,258 @@ cheapestVal (value *val)
   return (val);
 }
 
+/*--------------------------------------------------------------------*/
+/* checkConstantRange - check if constant fits in numeric range of    */
+/* var type in comparisons and assignments                            */
+/*--------------------------------------------------------------------*/
+CCR_RESULT
+checkConstantRange (sym_link *var, sym_link *lit, int op, bool exchangeLeftRight)
+{
+  sym_link *reType;
+  double litVal;
+  int varBits;
+
+  litVal = floatFromVal (valFromType (lit));
+  varBits = bitsForType (var);
+
+  /* sanity checks */
+  if (   IS_FLOAT (var)
+      || IS_FIXED (var))
+    return CCR_OK;
+  if (varBits < 1)
+    return CCR_ALWAYS_FALSE;
+  if (varBits > 32)
+    return CCR_ALWAYS_TRUE;
+
+  /* special: assignment */
+  if (op == '=')
+    {
+      if (IS_BIT (var))
+        return CCR_OK;
+
+      if (getenv ("SDCC_VERY_PEDANTIC"))
+        {
+          if (SPEC_USIGN (var))
+            {
+              TYPE_UDWORD maxVal = 0xffffffffu >> (32 - varBits);
+
+              if (   litVal < 0
+                  || litVal > maxVal)
+                return CCR_OVL;
+              return CCR_OK;
+            }
+          else
+            {
+              TYPE_DWORD minVal = 0xffffffff << (varBits - 1);
+              TYPE_DWORD maxVal = 0x7fffffff >> (32 - varBits);
+
+              if (   litVal < minVal
+                  || litVal > maxVal)
+                return CCR_OVL;
+              return CCR_OK;
+            }
+        }
+      else
+        {
+          /* ignore signedness, e.g. allow everything
+             from -127...+255 for (unsigned) char */
+          TYPE_DWORD  minVal = 0xffffffff  << (varBits - 1);
+          TYPE_UDWORD maxVal = 0xffffffffu >> (32 - varBits);
+
+          if (   litVal < minVal
+              || litVal > maxVal)
+            return CCR_OVL;
+          return CCR_OK;
+        }
+    }
+
+  if (exchangeLeftRight)
+    switch (op)
+      {
+        case EQ_OP:             break;
+        case NE_OP:             break;
+        case '>':   op = '<';   break;
+        case GE_OP: op = LE_OP; break;
+        case '<':   op = '>';   break;
+        case LE_OP: op = GE_OP; break;
+        default:                return CCR_ALWAYS_FALSE;
+      }
+
+  reType = computeType (var, lit, RESULT_TYPE_NONE, op);
+
+  if (SPEC_USIGN (reType))
+    {
+      /* unsigned operation */
+      TYPE_UDWORD minValP, maxValP, minValM, maxValM;
+      TYPE_UDWORD opBitsMask = 0xffffffffu >> (32 - bitsForType (reType));
+
+      if (SPEC_USIGN (lit) && SPEC_USIGN (var))
+        {
+          /* both operands are unsigned, this is easy */
+          minValP = 0;
+          maxValP = 0xffffffffu >> (32 - varBits);
+          /* there's only range, just copy it to 2nd set */
+          minValM = minValP;
+          maxValM = maxValP;
+        }
+      else if (SPEC_USIGN (var))
+        {
+          /* lit is casted from signed to unsigned, e.g.:
+               unsigned u;
+                 u == (char) -17
+              -> u == 0xffef'
+          */
+          minValP = 0;
+          maxValP = 0xffffffffu >> (32 - varBits);
+          /* there's only one range, just copy it to 2nd set */
+          minValM = minValP;
+          maxValM = maxValP;
+
+          /* it's an unsigned operation */
+          if (   IS_CHAR (reType)
+              || IS_INT (reType))
+            {
+              /* make signed literal unsigned and
+                 limit no of bits to size of return type */
+              litVal = (TYPE_UDWORD) litVal & opBitsMask;
+            }
+        }
+      else /* SPEC_USIGN (lit) */
+        {
+          /* var is casted from signed to unsigned, e.g.:
+               signed char c;
+                 c == (unsigned) -17
+              -> c == 0xffef'
+
+             The possible values after casting var
+             split up in two, nonconsecutive ranges:
+
+             minValP =      0;  positive range: 0...127
+             maxValP =   0x7f;
+             minValM = 0xff80;  negative range: -128...-1
+             maxValM = 0xffff;
+          */
+
+          /* positive range */
+          minValP = 0;
+          maxValP = 0x7fffffffu >> (32 - varBits);
+
+          /* negative range */
+          minValM = 0xffffffff  << (varBits - 1);
+          maxValM = 0xffffffffu; /* -1 */
+          /* limit no of bits to size of return type */
+          minValM &= opBitsMask;
+          maxValM &= opBitsMask;
+        }
+
+      switch (op)
+        {
+          case EQ_OP:                   /* var == lit */
+            if (   litVal <= maxValP
+                && litVal >= minValP) /* 0 */
+              return CCR_OK;
+            if (   litVal <= maxValM
+                && litVal >= minValM)
+              return CCR_OK;
+            return CCR_ALWAYS_FALSE;
+          case NE_OP:                   /* var != lit */
+            if (   litVal <= maxValP
+                && litVal >= minValP) /* 0 */
+              return CCR_OK;
+            if (   litVal <= maxValM
+                && litVal >= minValM)
+              return CCR_OK;
+            return CCR_ALWAYS_TRUE;
+          case '>':                     /* var >  lit */
+            if (litVal >= maxValM)
+              return CCR_ALWAYS_FALSE;
+            if (litVal <  minValP) /* 0 */
+              return CCR_ALWAYS_TRUE;
+            return CCR_OK;
+          case GE_OP:                   /* var >= lit */
+            if (litVal >  maxValM)
+              return CCR_ALWAYS_FALSE;
+            if (litVal <= minValP) /* 0 */
+              return CCR_ALWAYS_TRUE;
+            return CCR_OK;
+          case '<':                     /* var <  lit */
+            if (litVal >  maxValM)
+              return CCR_ALWAYS_TRUE;
+            if (litVal <= minValP) /* 0 */
+              return CCR_ALWAYS_FALSE;
+            return CCR_OK;
+          case LE_OP:                   /* var <= lit */
+            if (litVal >= maxValM)
+              return CCR_ALWAYS_TRUE;
+            if (litVal <  minValP) /* 0 */
+              return CCR_ALWAYS_FALSE;
+            return CCR_OK;
+          default:
+            return CCR_ALWAYS_FALSE;
+        }
+    }
+  else
+    {
+      /* signed operation */
+      TYPE_DWORD minVal, maxVal;
+
+      if (SPEC_USIGN (var))
+        {
+          /* unsigned var, but signed operation. This happens
+             when var is promoted to signed int.
+             Set actual min/max values of var. */
+          minVal = 0;
+          maxVal = 0xffffffff >> (32 - varBits);
+        }
+      else
+        {
+          /* signed var */
+          minVal = 0xffffffff << (varBits - 1);
+          maxVal = 0x7fffffff >> (32 - varBits);
+        }
+
+      switch (op)
+        {
+          case EQ_OP:                   /* var == lit */
+            if (   litVal > maxVal
+                || litVal < minVal)
+              return CCR_ALWAYS_FALSE;
+            return CCR_OK;
+          case NE_OP:                   /* var != lit */
+            if (   litVal > maxVal
+                || litVal < minVal)
+              return CCR_ALWAYS_TRUE;
+            return CCR_OK;
+          case '>':                     /* var >  lit */
+            if (litVal >= maxVal)
+              return CCR_ALWAYS_FALSE;
+            if (litVal <  minVal)
+              return CCR_ALWAYS_TRUE;
+            return CCR_OK;
+          case GE_OP:                   /* var >= lit */
+            if (litVal >  maxVal)
+              return CCR_ALWAYS_FALSE;
+            if (litVal <= minVal)
+              return CCR_ALWAYS_TRUE;
+            return CCR_OK;
+          case '<':                     /* var <  lit */
+            if (litVal >  maxVal)
+              return CCR_ALWAYS_TRUE;
+            if (litVal <= minVal)
+              return CCR_ALWAYS_FALSE;
+            return CCR_OK;
+          case LE_OP:                   /* var <= lit */
+            if (litVal >= maxVal)
+              return CCR_ALWAYS_TRUE;
+            if (litVal <  minVal)
+              return CCR_ALWAYS_FALSE;
+            return CCR_OK;
+          default:
+            return CCR_ALWAYS_FALSE;
+        }
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* valueFromLit - creates a value from a literal                   */
 /*-----------------------------------------------------------------*/

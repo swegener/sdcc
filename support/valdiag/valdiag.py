@@ -28,7 +28,7 @@ macrodefs = {}
 
 gcc = {
     "CC":"gcc",
-    "CCFLAGS":"-c -Wall",
+    "CCFLAGS":"-c -Wall -DPORT_HOST=1",
     "CCDEF":"-D",
     "CCOUTPUT":"-o",
     "defined": {

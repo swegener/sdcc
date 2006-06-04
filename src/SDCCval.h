@@ -70,6 +70,16 @@ typedef struct initList
   }
 initList;
 
+/* return values from checkConstantRange */
+typedef enum
+  {
+    CCR_OK,           /* evaluate at runtime */
+    CCR_OVL,
+    CCR_ALWAYS_FALSE,
+    CCR_ALWAYS_TRUE
+  }
+CCR_RESULT;
+
 #define  IS_VARG(x)		(x->vArgs)
 
 /* forward definitions for the symbol table related functions */
@@ -85,6 +95,7 @@ value *charVal (char *);
 value *symbolVal (symbol *);
 void printVal (value *);
 double floatFromVal (value *);
+CCR_RESULT checkConstantRange (sym_link *var, sym_link *lit, int op, bool exchangeOps);
 value *array2Ptr (value *);
 value *valUnaryPM (value *);
 value *valComplement (value *);

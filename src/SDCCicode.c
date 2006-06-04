@@ -128,88 +128,6 @@ iCodeTable codeTable[] =
 };
 
 /*-----------------------------------------------------------------*/
-/* checkConstantRange: check a constant against the type           */
-/*-----------------------------------------------------------------*/
-
-
-/*   pedantic=0: allmost anything is allowed as long as the absolute
-       value is within the bit range of the type, and -1 is treated as
-       0xf..f for unsigned types (e.g. in assign)
-     pedantic=1: -1==-1, not allowed for unsigned types (e.g. in compare)
-     pedantic>1: "char c=200" is not allowed (evaluates to -56)
-*/
-
-void checkConstantRange(sym_link *ltype, value *val, char *msg,
-                        int pedantic) {
-  double max;
-  int warnings=0;
-  int negative=0;
-  long v;
-
-  max = pow ((double)2.0, (double)bitsForType(ltype));
-
-  if (IS_LONG(val->type)) {
-    if (IS_UNSIGNED(val->type)) {
-      v=SPEC_CVAL(val->type).v_ulong;
-    } else {
-      v=SPEC_CVAL(val->type).v_long;
-    }
-  } else {
-    if (IS_UNSIGNED(val->type)) {
-      v=SPEC_CVAL(val->type).v_uint;
-    } else {
-      v=SPEC_CVAL(val->type).v_int;
-    }
-  }
-
-
-#if 0
-  // this could be a good idea
-  if (options.pedantic)
-    pedantic=2;
-#endif
-
-  if (IS_FLOAT(ltype)) {
-    // anything will do
-    return;
-  }
-
-  if (IS_FIXED(ltype)) {
-    // anything will do
-    return;
-  }
-
-  if (!IS_UNSIGNED(val->type) && v<0) {
-    negative=1;
-    if (IS_UNSIGNED(ltype) && (pedantic>1)) {
-      warnings++;
-    }
-    v=-v;
-  }
-
-  // if very pedantic: "char c=200" is not allowed
-  if (pedantic>1 && !IS_UNSIGNED(ltype)) {
-    max = max/2 + negative;
-  }
-
-  if (v >= max) {
-    warnings++;
-  }
-
-#if 0 // temporary disabled, leaving the warning as a reminder
-  if (warnings) {
-    SNPRINTF (message, sizeof(message), "for %s %s in %s",
-             IS_UNSIGNED(ltype) ? "unsigned" : "signed",
-             nounName(ltype), msg);
-    werror (W_CONST_RANGE, message);
-
-    if (pedantic>1)
-      fatalError++;
-  }
-#endif
-}
-
-/*-----------------------------------------------------------------*/
 /* operandName - returns the name of the operand                   */
 /*-----------------------------------------------------------------*/
 int
@@ -3010,8 +2928,17 @@ geniCodeLogic (operand * left, operand * right, int op)
      check if the literal value is within bounds */
   if (IS_INTEGRAL (ltype) && IS_VALOP (right) && IS_LITERAL (rtype))
     {
-      checkConstantRange(ltype,
-                         OP_VALUE(right), "compare operation", 1);
+      CCR_RESULT ccr_result = checkConstantRange (ltype, rtype, op, FALSE);
+      switch (ccr_result)
+        {
+          case CCR_ALWAYS_TRUE:
+          case CCR_ALWAYS_FALSE:
+            if (!options.lessPedantic)
+              werror (W_COMP_RANGE, "true resp. false");
+            return operandFromLit (ccr_result == CCR_ALWAYS_TRUE ? 1 : 0);
+          default:
+            break;
+        }
     }
 
   /* if one operand is a pointer and the other is a literal generic void pointer,
@@ -3228,10 +3155,11 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
 
   /* left is integral type and right is literal then
      check if the literal value is within bounds */
-  if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype))
+  if (IS_INTEGRAL (ltype) && right->type == VALUE && IS_LITERAL (rtype) &&
+      checkConstantRange (ltype, rtype, '=', FALSE) == CCR_OVL &&
+      !options.lessPedantic)
     {
-      checkConstantRange(ltype,
-                         OP_VALUE(right), "= operation", 0);
+      werror (W_LIT_OVERFLOW);
     }
 
   /* if the left & right type don't exactly match */

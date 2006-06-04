@@ -3181,12 +3181,12 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 	 * if it fits for pic16, but I leave it here just in case */
 
 	/* if assignment then check that right is not a bit */
-	if (ASSIGNMENT (dic) && !POINTER_SET (dic)) {
-	  sym_link *etype = operandType (IC_RIGHT (dic));
+	if (ASSIGNMENT (ic) && !POINTER_SET (ic)) {
+	  sym_link *etype = operandType (IC_RESULT (dic));
 
 		if (IS_BITFIELD (etype)) {
 			/* if result is a bit too then it's ok */
-			etype = operandType (IC_RESULT (dic));
+			etype = operandType (IC_RESULT (ic));
 			if (!IS_BITFIELD (etype)) {
 				debugLog(" %d bitfields\n");
 			  return 0;

@@ -1995,17 +1995,8 @@ static pCodeOp *pic16_popRegFromIdx(int rIdx)
 /*---------------------------------------------------------------------------------*/
 pCodeOp *pic16_popGet2(asmop *aop_src, asmop *aop_dst, int offset)
 {
-  pCodeOpReg2 *pcop2;
-  pCodeOp *temp;
-  
-	pcop2 = (pCodeOpReg2 *)pic16_popGet(aop_src, offset);
-
-	/* comment the following check, so errors to throw up */
-//	if(!pcop2)return NULL;
-
-	temp = pic16_popGet(aop_dst, offset);
-	pcop2->pcop2 = temp;
-	
+  pCodeOp2 *pcop2 = (pCodeOp2 *)pic16_newpCodeOp2(
+  	pic16_popGet(aop_src, offset), pic16_popGet(aop_dst, offset));
   return PCOP(pcop2);
 }
 
@@ -2017,15 +2008,10 @@ pCodeOp *pic16_popGet2(asmop *aop_src, asmop *aop_dst, int offset)
 /*--------------------------------------------------------------------------------.-*/
 pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst)
 {
-  pCodeOpReg2 *pcop2;
- 
-	pcop2 = (pCodeOpReg2 *)src;
-	pcop2->pcop2 = dst;
-	
-	return PCOP(pcop2);
+  pCodeOp2 *pcop2;
+  pcop2 = (pCodeOp2 *)pic16_newpCodeOp2(src, dst);
+  return PCOP(pcop2);
 }
-
-
 
 /*---------------------------------------------------------------------------------*/
 /* pic16_popCombine2 - combine two pCodeOpReg variables into one for use with      */
@@ -2033,16 +2019,8 @@ pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst)
 /*---------------------------------------------------------------------------------*/
 pCodeOp *pic16_popCombine2(pCodeOpReg *src, pCodeOpReg *dst, int noalloc)
 {
-  pCodeOpReg2 *pcop2;
-
-	if(!noalloc) {
-		pcop2 = (pCodeOpReg2 *)pic16_popCopyReg(src);
-		pcop2->pcop2 = pic16_popCopyReg(dst);
-	} else {
-		/* the pCodeOp may be already allocated */
-		pcop2 = (pCodeOpReg2 *)(src);
-		pcop2->pcop2 = (pCodeOp *)(dst);
-	}
+  pCodeOp2 *pcop2 = (pCodeOp2 *)pic16_newpCodeOp2(
+  	pic16_popCopyReg(src), pic16_popCopyReg(dst) );
 
   return PCOP(pcop2);
 }

@@ -3525,6 +3525,7 @@ static int RegCond(pCodeOp *pcop)
   return 0;
 }
 
+
 /*-----------------------------------------------------------------*/
 /* pic16_newpCode - create and return a newly initialized pCode          */
 /*                                                                 */
@@ -4141,6 +4142,7 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
 //			fprintf(stderr,"%s %s %d\n",__FUNCTION__,name,offset);
 	} else {
 		pcop->name = NULL;
+		PCOI(pcop)->rIdx = -1;
 	}
 
 	PCOI(pcop)->index = index;
@@ -4398,6 +4400,11 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
     else
       pcop = pic16_newpCodeOpReg(-1);
     break;
+    
+  case PO_TWO_OPS:
+    assert( !"Cannot create PO_TWO_OPS from string!" );
+    pcop = NULL;
+    break;
 
   default:
     pcop = Safe_calloc(1,sizeof(pCodeOp) );
@@ -4409,6 +4416,15 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
   }
 
   return pcop;
+}
+
+pCodeOp *pic16_newpCodeOp2(pCodeOp *src, pCodeOp *dst)
+{
+  pCodeOp2 *pcop2 = Safe_calloc(1, sizeof(pCodeOp2));
+  pcop2->pcop.type = PO_TWO_OPS;
+  pcop2->pcopL = src;
+  pcop2->pcopR = dst;
+  return PCOP(pcop2);
 }
 
 /* This is a multiple of two as gpasm pads DB directives to even length,
@@ -4803,6 +4819,7 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 	} 
 
 	if(pcop) {
+
 		switch(pcop->type) {
 			case PO_W:
 			case PO_WREG:
@@ -4812,17 +4829,17 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 			case PO_FSR0:
 				if(use_buffer) {
 					SAFE_snprintf(&buffer,&size,"%s",PCOR(pcop)->r->name);
-					return buffer;
+					return (buffer);
 				}
-				return PCOR(pcop)->r->name;
+				return (PCOR(pcop)->r->name);
 				break;
 			case PO_GPR_TEMP:
 				r = pic16_regWithIdx(PCOR(pcop)->r->rIdx);
 				if(use_buffer) {
 					SAFE_snprintf(&buffer,&size,"%s",r->name);
-					return buffer;
+					return (buffer);
 				}
-				return r->name;
+				return (r->name);
 
 			case PO_IMMEDIATE:
 				s = buffer;
@@ -4849,7 +4866,7 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 							pcop->name);
 					}
 				}
-				return buffer;
+				return (buffer);
 
 			case PO_GPR_REGISTER:
 			case PO_DIR:
@@ -4862,7 +4879,7 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 				} else {
 					SAFE_snprintf(&s,&size,"%s",pcop->name);
 				}
-				return buffer;
+				return (buffer);
 			case PO_GPR_BIT:
 				s = buffer;
 				if(PCORB(pcop)->subtype == PO_GPR_TEMP) {
@@ -4875,19 +4892,23 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 				}
 
 				return (buffer);
+			case PO_TWO_OPS:
+				return (pic16_get_op( PCOP2(pcop)->pcopL, use_buffer ? buffer : NULL, size ));
+				
 			default:
 				if(pcop->name) {
 					if(use_buffer) {
 						SAFE_snprintf(&buffer,&size,"%s",pcop->name);
-						return buffer;
+						return (buffer);
 					}
-				return pcop->name;
+				return (pcop->name);
 				}
 
 		}
+  		return ("unhandled type for op1");
 	}
 
-  return "NO operand1";
+  return ("NO operand1");
 }
 
 /*-----------------------------------------------------------------*/
@@ -4895,95 +4916,10 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 /*-----------------------------------------------------------------*/
 char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
 {
-  regs *r;
-  static char b[128];
-  char *s;
-  int use_buffer = 1;    // copy the string to the passed buffer pointer
 
-	if(!buffer) {
-		buffer = b;
-		size = sizeof(b);
-		use_buffer = 0;     // Don't bother copying the string to the buffer.
-	} 
-
-#if 0
-	fprintf(stderr, "%s:%d second operand %s is %d\tPO_DIR(%d) PO_GPR_TEMP(%d) PO_IMMEDIATE(%d) PO_INDF0(%d) PO_FSR0(%d)\n",
-		__FUNCTION__, __LINE__, PCOR(PCOR2(pcop)->pcop2)->r->name, PCOR2(pcop)->pcop2->type,
-		PO_DIR, PO_GPR_TEMP, PO_IMMEDIATE, PO_INDF0, PO_FSR0);
-#endif
-
-	if(pcop) {
-		switch(PCOR2(pcop)->pcop2->type) {
-			case PO_W:
-			case PO_WREG:
-			case PO_PRODL:
-			case PO_PRODH:
-			case PO_INDF0:
-			case PO_FSR0:
-				if(use_buffer) {
-					SAFE_snprintf(&buffer,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
-					return buffer;
-				}
-				return PCOR(PCOR2(pcop)->pcop2)->r->name;
-				break;
-			case PO_GPR_TEMP:
-				r = pic16_regWithIdx(PCOR(PCOR2(pcop)->pcop2)->r->rIdx);
-
-				if(use_buffer) {
-					SAFE_snprintf(&buffer,&size,"%s",r->name);
-					return buffer;
-				}
-				return r->name;
-
-			case PO_IMMEDIATE:
-					assert( 0 );
-				break;
-#if 0
-				s = buffer;
-
-				if(PCOI(pcop)->_const) {
-					if( PCOI(pcop)->offset && PCOI(pcop)->offset<4) {
-						SAFE_snprintf(&s,&size,"(((%s+%d) >> %d)&0xff)",
-							pcop->name,
-							PCOI(pcop)->index,
-							8 * PCOI(pcop)->offset );
-					} else
-						SAFE_snprintf(&s,&size,"LOW(%s+%d)",pcop->name,PCOI(pcop)->index);
-				} else {
-      					if( PCOI(pcop)->index) {
-						SAFE_snprintf(&s,&size,"(%s + %d)",
-							pcop->name,
-							PCOI(pcop)->index );
-					} else {
-						if(PCOI(pcop)->offset)
-							SAFE_snprintf(&s,&size,"(%s >> %d)&0xff",pcop->name, 8*PCOI(pcop)->offset);
-						else
-							SAFE_snprintf(&s,&size,"%s",pcop->name);
-					}
-				}
-				return buffer;
-#endif
-			case PO_DIR:
-				s = buffer;
-				if( PCOR(PCOR2(pcop)->pcop2)->instance) {
-					SAFE_snprintf(&s,&size,"(%s + %d)",
-						PCOR(PCOR2(pcop)->pcop2)->r->name,
-						PCOR(PCOR2(pcop)->pcop2)->instance );
-				} else {
-					SAFE_snprintf(&s,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
-				}
-				return buffer;
-
-			default:
-				if(PCOR(PCOR2(pcop)->pcop2)->r->name) {
-					if(use_buffer) {
-						SAFE_snprintf(&buffer,&size,"%s",PCOR(PCOR2(pcop)->pcop2)->r->name);
-						return buffer;
-					}
-					return PCOR(PCOR2(pcop)->pcop2)->r->name;
-				}
-		}
-	}
+  if(pcop && pcop->type == PO_TWO_OPS) {
+    return pic16_get_op( PCOP2(pcop)->pcopR, buffer, size );
+  }
 
   return "NO operand2";
 }
@@ -5034,10 +4970,14 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 
     if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
 
-	if(PCI(pc)->is2MemOp) {
-		SAFE_snprintf(&s,&size, "%s, %s", 
-		pic16_get_op(PCOP(PCI(pc)->pcop), NULL, 0),
-		pic16_get_op2(PCOP(PCI(pc)->pcop), NULL, 0));
+	//if(PCI(pc)->is2MemOp)
+	if (PCI(pc)->pcop->type == PO_TWO_OPS)
+	{
+		/* split into two phases due to static buffer in pic16_get_op() */
+		SAFE_snprintf(&s,&size, "%s", 
+			pic16_get_op((PCI(pc)->pcop), NULL, 0));
+		SAFE_snprintf(&s, &size, ", %s",
+			pic16_get_op2((PCI(pc)->pcop), NULL, 0));
 		break;
 	}
 
@@ -5858,9 +5798,13 @@ regs * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
     
   case PO_WILD:
     break;
+
+  case PO_TWO_OPS:
+    return pic16_getRegFrompCodeOp( PCOP2(pcop)->pcopL );
+    break;
     
   default:
-	fprintf(stderr, "pic16_getRegFromInstruction - unknown reg type %d (%s)\n",pcop->type, dumpPicOptype (pcop->type));
+	fprintf(stderr, "pic16_getRegFrompCodeOp - unknown reg type %d (%s)\n",pcop->type, dumpPicOptype (pcop->type));
 //	assert( 0 );
 	break;
   }
@@ -5872,7 +5816,6 @@ regs * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
 /*-----------------------------------------------------------------*/
 regs * pic16_getRegFromInstruction(pCode *pc)
 {
-
   if(!pc                   || 
      !isPCI(pc)            ||
      !PCI(pc)->pcop        ||
@@ -5885,7 +5828,7 @@ regs * pic16_getRegFromInstruction(pCode *pc)
   	dumpPicOptype( PCI(pc)->pcop->type), PCI(pc)->pcop->type);
 #endif
 
-  return pic16_getRegFrompCodeOp (PCI(pc)->pcop);
+  return( pic16_getRegFrompCodeOp (PCI(pc)->pcop) );
 }
 
 /*-------------------------------------------------------------------------------*/
@@ -5901,13 +5844,15 @@ regs * pic16_getRegFromInstruction2(pCode *pc)
      (PCI(pc)->num_ops == 1))		// accept only 2 operand commands
     return NULL;
 
+  if (PCI(pc)->pcop->type != PO_TWO_OPS)
+    return NULL;
 
 #if 0
   fprintf(stderr, "pic16_getRegFromInstruction2 - reg type %s (%d)\n",
   	dumpPicOptype( PCI(pc)->pcop->type), PCI(pc)->pcop->type);
 #endif
 
-  return pic16_getRegFrompCodeOp (PCOR2(PCI(pc)->pcop)->pcop2);
+  return pic16_getRegFrompCodeOp (PCOP2(PCI(pc)->pcop)->pcopR);
 }
 
 /*-----------------------------------------------------------------*/
@@ -8756,12 +8701,14 @@ char *pic_optype_names[]={
 	"PO_BIT",            // bit operand.
 	"PO_STR",            //  (8051 legacy)
 	"PO_LABEL",
-	"PO_WILD"            // Wild card operand in peep optimizer
+	"PO_WILD",           // Wild card operand in peep optimizer
+	"PO_TWO_OPS"         // combine two operands
 };
 
 
 char *dumpPicOptype(PIC_OPTYPE type)
 {
+	assert( type >= 0 && type < sizeof(pic_optype_names)/sizeof( char *) );
 	return (pic_optype_names[ type ]);
 }
 
@@ -11768,9 +11715,9 @@ static void assignValnums (pCode *pc) {
     if (!isSpecial1 && pic16_regIsLocal (reg1) && val && oldval && !pic16_isAlive (SPO_STATUS, pc)) {
       //pc->print (stderr, pc); fprintf (stderr, "lit: %d (%x, %x)\n", lit, lit, val->in_val);
       if (lit == 0) {
-        newpc = pic16_newpCode (POC_CLRF, PCOR2(pci->pcop)->pcop2);
+        newpc = pic16_newpCode (POC_CLRF, PCOP2(pci->pcop)->pcopR);
       } else if (lit == 0x00ff) {
-	newpc = pic16_newpCode (POC_SETF, PCOR2(pci->pcop)->pcop2);
+	newpc = pic16_newpCode (POC_SETF, PCOP2(pci->pcop)->pcopR);
       } else {
         newpc = NULL;
       }
@@ -11810,7 +11757,7 @@ static void assignValnums (pCode *pc) {
 	    if (copy->val && copy->val == val->in_val) {
 	      //fprintf (stderr, "found replacement symbol for %s (val %x) <-- %s (assigned %x @ %p)\n", strFromSym(sym1), val->in_val, strFromSym(copy->sym), copy->val, copy->pc);
 	      if (copy->sym == SPO_WREG) {
-	        newpc = pic16_newpCode (POC_MOVWF, pic16_pCodeOpCopy (PCOR2(pci->pcop)->pcop2));
+	        newpc = pic16_newpCode (POC_MOVWF, pic16_pCodeOpCopy (PCOP2(pci->pcop)->pcopR));
 	      } else {
 		pCodeOp *pcop = NULL;
 		/* the code below fails if we try to replace
@@ -11839,7 +11786,7 @@ static void assignValnums (pCode *pc) {
 		assert( pcop );
                 newpc = pic16_newpCode(POC_MOVFF, pic16_popGet2p(
 			pcop,
-			pic16_pCodeOpCopy (PCOR2(pci->pcop)->pcop2)));
+			pic16_pCodeOpCopy (PCOP2(pci->pcop)->pcopR)));
 	      }
 	      pic16_InsertCommentAfter (pc->prev, "=DF= MOVFF: SRC op %s replaced by %s", strFromSym(sym1), strFromSym(copy->sym));
 	      pic16_df_saved_bytes += PCI(pc)->isize - PCI(newpc)->isize;

@@ -113,6 +113,7 @@ const char *pic16_pCodeOpType(pCodeOp *pcop)
     case PO_STR:		return  "PO_STR";
     case PO_LABEL:		return  "PO_LABEL";
     case PO_WILD:		return  "PO_WILD";
+    case PO_TWO_OPS:		return  "PO_TWO_OPS";
     }
   }
 
@@ -152,6 +153,7 @@ const char *pic16_pCodeOpSubType(pCodeOp *pcop)
     case PO_STR:		return  "PO_STR";
     case PO_LABEL:		return  "PO_LABEL";
     case PO_WILD:		return  "PO_WILD";
+    case PO_TWO_OPS:		return  "PO_TWO_OPS";
     }
   }
 

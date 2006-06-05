@@ -185,7 +185,8 @@ typedef enum
   PO_BIT,            // bit operand.
   PO_STR,            //  (8051 legacy)
   PO_LABEL,
-  PO_WILD            // Wild card operand in peep optimizer
+  PO_WILD,           // Wild card operand in peep optimizer
+  PO_TWO_OPS         // combine two operands
 } PIC_OPTYPE;
 
 
@@ -466,20 +467,14 @@ typedef struct pCodeOpReg
   struct regs *r;
   int instance;    // byte # of Multi-byte registers
   struct pBlock *pb;
-
-  pCodeOp *pcop2;	// second memory operand (NEEDED IN gen.c:pic16_popGet2p (pCodeOpReg casted into pCodeOpReg2) 
 } pCodeOpReg;
 
-typedef struct pCodeOpReg2
+typedef struct pCodeOp2
 {
-  pCodeOp pcop;		// used by default to all references
-  int rIdx;
-  struct regs *r;
-  int instance;		// assume same instance for both operands
-  struct pBlock *pb;
-
-  pCodeOp *pcop2;	// second memory operand
-} pCodeOpReg2;
+  pCodeOp pcop;		// describes this pCodeOp
+  pCodeOp *pcopL;	// reference to left pCodeOp (src)
+  pCodeOp *pcopR;	// reference to right pCodeOp (dest)
+} pCodeOp2;
 
 typedef struct pCodeOpRegBit
 {
@@ -962,12 +957,13 @@ typedef struct peepCommand {
 #define PCINF(x)  ((pCodeInfo *)(x))
 
 #define PCOP(x)   ((pCodeOp *)(x))
+#define PCOP2(x)  ((pCodeOp2 *)(x))
 //#define PCOB(x)   ((pCodeOpBit *)(x))
 #define PCOL(x)   ((pCodeOpLit *)(x))
 #define PCOI(x)   ((pCodeOpImmd *)(x))
 #define PCOLAB(x) ((pCodeOpLabel *)(x))
 #define PCOR(x)   ((pCodeOpReg *)(x))
-#define PCOR2(x)  ((pCodeOpReg2 *)(x))
+//#define PCOR2(x)  ((pCodeOpReg2 *)(x))
 #define PCORB(x)  ((pCodeOpRegBit *)(x))
 #define PCOO(x)   ((pCodeOpOpt *)(x))
 #define PCOLR(x)  ((pCodeOpLocalReg *)(x))
@@ -1044,6 +1040,7 @@ pCodeOp *pic16_newpCodeOpBit_simple (struct asmop *op, int offs, int bit);
 pCodeOp *pic16_newpCodeOpRegFromStr(char *name);
 pCodeOp *pic16_newpCodeOpReg(int rIdx);
 pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE p);
+pCodeOp *pic16_newpCodeOp2(pCodeOp *src, pCodeOp *dst);
 pCodeOp *pic16_newpCodeOpRegNotVect(bitVect *bv);
 pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop);
 

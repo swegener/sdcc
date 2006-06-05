@@ -1,3 +1,22 @@
+2006-06-05 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/{pcode.h,genarith.c}:
+	  introduced pCodeOp combining any two pCodeOps (previously only
+	  two register operands could be combined), removed pcop2 from
+	  pCodepReg, replaced pCodeOpReg2 with pCodeOp2, fixes #1492366
+	* src/pic16/pcodepeep.c (pic16_pCodeOpCopy): added case for PO_TWO_OPS
+	* src/pic16/gen.c (pic16_popGet2,pic16_popGet2p,pic16_popCombine2):
+	  rewritten to use new PO_TWO_OPS
+	* src/pic16/main.c (_hasNativeMulFor): cover more cases natively,
+	* src/pic16/pcode.c (pic16_newpCodeOpImmd): initialize rIdx field,
+	  (pic16_newpCodeOp): catch invalid attempts on PO_TWO_OPS,
+	  (pic16_newpCodeOp2): NEW, create combined pCodeOp,
+	  (pic16_get_op): embraced return arg to allow #define return(x),
+	    added new case for combined opcodes
+	  (pic16_get_op2): reduced to use pic16_get_op() on second pCodeOp,
+	  (pic16_pCode2str,pic16_getRegFrompCodeOp,
+	   pic16_getRegFromInstruction2): fixed/added handling of new pCodeOp
+
 2006-06-04 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCval.c (checkConstantRange): added

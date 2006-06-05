@@ -1965,7 +1965,7 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 
 	  /* now check whether the second operand matches */
 	  /* assert that optimizations do not touch operations that work on SFRs or INDF registers */
-	  if(PCOW2(PCI(pcd)->pcop) && (PCOR2(PCI(pcd)->pcop)->pcop2->type == PO_WILD) && (!(PCOR2(PCI(pcs)->pcop)->pcop2) || ((PCOR2(PCI(pcs)->pcop)->pcop2->type != PO_SFR_REGISTER) && (PCOR2(PCI(pcs)->pcop)->pcop2) && (PCOR2(PCI(pcs)->pcop)->pcop2->type != PO_INDF0)))) {
+	  if(PCOW2(PCI(pcd)->pcop) && (PCOP2(PCI(pcd)->pcop)->pcopR->type == PO_WILD) && (!(PCOP2(PCI(pcs)->pcop)->pcopR) || ((PCOP2(PCI(pcs)->pcop)->pcopR->type != PO_SFR_REGISTER) && (PCOP2(PCI(pcs)->pcop)->pcopR) && (PCOP2(PCI(pcs)->pcop)->pcopR->type != PO_INDF0)))) {
 	
 //		fprintf(stderr, "%s:%d %s second operand is wild\n", __FILE__, __LINE__, __FUNCTION__);
 	
@@ -1978,9 +1978,9 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 		}
 #endif
 
-		PCOW2(PCI(pcd)->pcop)->matched = PCOR2(PCI(pcs)->pcop)->pcop2;
+		PCOW2(PCI(pcd)->pcop)->matched = PCOP2(PCI(pcs)->pcop)->pcopR;
 		if(!peepBlock->target.wildpCodeOps[index]) {
-			peepBlock->target.wildpCodeOps[index] = PCOR2(PCI(pcs)->pcop)->pcop2;
+			peepBlock->target.wildpCodeOps[index] = PCOP2(PCI(pcs)->pcop)->pcopR;
 
 		//if(PCI(pcs)->pcop->type == PO_GPR_TEMP) 
 
@@ -1994,21 +1994,21 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 				);
 			*/
 
-		  return ((havematch==1) && pCodeOpCompare(PCOR2(PCI(pcs)->pcop)->pcop2,
+		  return ((havematch==1) && pCodeOpCompare(PCOP2(PCI(pcs)->pcop)->pcopR,
 				peepBlock->target.wildpCodeOps[index]));
 		}
 
-		if(PCOR2(PCI(pcs)->pcop)->pcop2) {
+		if(PCOP2(PCI(pcs)->pcop)->pcopR) {
 		  char *n;
 
-			switch(PCOR2(PCI(pcs)->pcop)->pcop2->type) {
+			switch(PCOP2(PCI(pcs)->pcop)->pcopR->type) {
 			case PO_GPR_TEMP:
 			case PO_FSR0:
 		      //case PO_INDF0:
-				n = PCOR(PCOR2(PCI(pcs)->pcop)->pcop2)->r->name;
+				n = PCOR(PCOP2(PCI(pcs)->pcop)->pcopR)->r->name;
 				break;
 			default:
-				n = PCOR2(PCI(pcs)->pcop)->pcop2->name;
+				n = PCOP2(PCI(pcs)->pcop)->pcopR->name;
 			}
 
 			if(peepBlock->target.vars[index])
@@ -2020,7 +2020,7 @@ static int pCodePeepMatchLine(pCodePeep *peepBlock, pCode *pcs, pCode *pcd)
 			}
 		}
 	  
-	  } else if (PCOW2(PCI(pcd)->pcop) && (PCOR2(PCI(pcd)->pcop)->pcop2->type == PO_WILD) && PCOR2(PCI(pcs)->pcop)->pcop2)
+	  } else if (PCOW2(PCI(pcd)->pcop) && (PCOP2(PCI(pcd)->pcop)->pcopR->type == PO_WILD) && PCOP2(PCI(pcs)->pcop)->pcopR)
 	    {
 	      return 0;
 	    } else {
@@ -2250,6 +2250,11 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
     return pcopnew;
     break;
 
+  case PO_TWO_OPS:
+    pcopnew = pic16_newpCodeOp2( pic16_pCodeOpCopy( PCOP2(pcop)->pcopL ),
+    pic16_pCodeOpCopy( PCOP2(pcop)->pcopR ) );
+    return pcopnew;
+
   default:
     assert ( !"unhandled pCodeOp type copied" );
   } // switch
@@ -2473,11 +2478,11 @@ int pic16_pCodePeepMatchRule(pCode *pc)
 	      pcop = pic16_pCodeOpCopy(PCI(pcr)->pcop);
 	  }
 
-	  if(PCI(pcr)->is2MemOp && PCOR2(PCI(pcr)->pcop)->pcop2) {
+	  if(PCI(pcr)->is2MemOp && PCOP2(PCI(pcr)->pcop)->pcopR) {
 	    /* The replacing instruction has also a second operand.
 	     * Is it wild? */
 //		fprintf(stderr, "%s:%d pcop2= %p\n", __FILE__, __LINE__, PCOR2(PCI(pcr)->pcop)->pcop2);
-	    if(PCOR2(PCI(pcr)->pcop)->pcop2->type == PO_WILD) {
+	    if(PCOP2(PCI(pcr)->pcop)->pcopR->type == PO_WILD) {
 	      int index = PCOW2(PCI(pcr)->pcop)->id;
 //		fprintf(stderr, "%s:%d replacing index= %d\n", __FUNCTION__, __LINE__, index);
 	      //DFPRINTF((stderr,"copying wildopcode\n"));
@@ -2488,7 +2493,7 @@ int pic16_pCodePeepMatchRule(pCode *pc)
 		DFPRINTF((stderr,"error, wildopcode in replace but not source?\n"));
 	    } else
 	      pcop = pic16_popCombine2(pic16_pCodeOpCopy(pcop),
-	      	pic16_pCodeOpCopy(PCOR2(PCI(pcr)->pcop)->pcop2), 0);
+	      	pic16_pCodeOpCopy(PCOP2(PCI(pcr)->pcop)->pcopR), 0);
 	      
 	  }
 	  

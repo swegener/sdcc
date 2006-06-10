@@ -1859,7 +1859,7 @@ linkEdit (char **envp)
         options.out_fmt ? ".S19" : ".ihx",
         sizeof(scratchFileName));
       if (strcmp (fullDstFileName, scratchFileName))
-        unlink (fullDstFileName);
+        remove (fullDstFileName);
       rename (scratchFileName, fullDstFileName);
 
       strncpyz (buffer, fullDstFileName, sizeof(buffer));
@@ -1875,14 +1875,14 @@ linkEdit (char **envp)
       *q = 0;
       strncatz(buffer, ".map", sizeof(buffer));
       if (strcmp (scratchFileName, buffer))
-        unlink (buffer);
+        remove (buffer);
       rename (scratchFileName, buffer);
       *p = 0;
       strncatz (scratchFileName, ".mem", sizeof(scratchFileName));
       *q = 0;
       strncatz(buffer, ".mem", sizeof(buffer));
       if (strcmp (scratchFileName, buffer))
-        unlink (buffer);
+        remove (buffer);
       rename (scratchFileName, buffer);
       if (options.debug)
         {
@@ -1891,13 +1891,13 @@ linkEdit (char **envp)
           *q = 0;
           strncatz(buffer, ".cdb", sizeof(buffer));
           if (strcmp (scratchFileName, buffer))
-            unlink (buffer);
+            remove (buffer);
           rename (scratchFileName, buffer);
           /* and the OMF file without extension: */
           *p = 0;
           *q = 0;
           if (strcmp (scratchFileName, buffer))
-            unlink (buffer);
+            remove (buffer);
           rename (scratchFileName, buffer);
         }
     }
@@ -1950,7 +1950,7 @@ assemble (char **envp)
                   port->linker.rel_ext,
                   sizeof(scratchFileName));
         if (strcmp (scratchFileName, fullDstFileName))
-          unlink (fullDstFileName);
+          remove (fullDstFileName);
         rename (scratchFileName, fullDstFileName);
     }
 }

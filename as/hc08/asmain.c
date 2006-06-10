@@ -375,7 +375,7 @@ int i;
 	if (i) {
 	  // remove output file
 	  printf ("removing %s\n", relFile);
-	  unlink(relFile);
+	  remove(relFile);
 	}
 	exit(i);
 }

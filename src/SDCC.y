@@ -392,45 +392,37 @@ assignment_expr
 				     $$ = newNode($2,$1,$3);
 				     break;
 			     case MUL_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('*',removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, '*', $3);
 				     break;
 			     case DIV_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('/',removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, '/', $3);
 				     break;
 			     case MOD_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('%',removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, '%', $3);
 				     break;
 			     case ADD_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('+',removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, '+', $3);
 				     break;
 			     case SUB_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('-',removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, '-', $3);
 				     break;
 			     case LEFT_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode(LEFT_OP,removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, LEFT_OP, $3);
 				     break;
 			     case RIGHT_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode(RIGHT_OP,removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, RIGHT_OP, $3);
 				     break;
 			     case AND_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('&',removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, '&', $3);
 				     break;
 			     case XOR_ASSIGN:
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('^',removePreIncDecOps(copyAst($1)),$3));
+				     $$ = createRMW($1, '^', $3);
 				     break;
 			     case OR_ASSIGN:
-				     /* $$ = newNode('=',$1,newNode('|',removeIncDecOps(copyAst($1)),$3)); */
-				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
-                                                      newNode('|',removePreIncDecOps(copyAst($1)),$3));
+/*				     $$ = newNode('=',$1,newNode('|',removeIncDecOps(copyAst($1)),$3)); */
+/*				     $$ = newNode('=',removePostIncDecOps(copyAst($1)),
+                                                      newNode('|',removePreIncDecOps(copyAst($1)),$3)); */
+				     $$ = createRMW($1, '|', $3);
 				     break;
 			     default :
 				     $$ = NULL;

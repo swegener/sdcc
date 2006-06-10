@@ -189,6 +189,7 @@ ast *removePreIncDecOps (ast *);
 ast *removePostIncDecOps (ast *);
 value *sizeofOp (sym_link *);
 value *evalStmnt (ast *);
+ast *createRMW (ast *, unsigned, ast *);
 ast *createFunction (symbol *, ast *);
 ast *createBlock (symbol *, ast *);
 ast *createLabel (symbol *, ast *);

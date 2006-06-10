@@ -91,7 +91,7 @@ DEFSETFUNC (rmTmpFiles)
   int ret;
 
   if (name) {
-      ret = unlink (name);
+      ret = remove (name);
       assert(ret == 0);
       Safe_free (name);
   }

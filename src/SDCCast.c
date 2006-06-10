@@ -254,7 +254,7 @@ exit:
   return dest;
 
 }
-
+#if 0
 /*-----------------------------------------------------------------*/
 /* removeIncDecOps: remove for side effects in *_ASSIGN's          */
 /*                  "*s++ += 3" -> "*s++ = *s++ + 3"               */
@@ -325,9 +325,91 @@ ast *removePostIncDecOps (ast * tree) {
 
  return tree;
 }
+#endif
+/*-----------------------------------------------------------------*/
+/* replaceAstWithTemporary: Replace the AST pointed to by the arg  */
+/*            with a reference to a new temporary variable. Returns*/
+/*            an AST which assigns the original value to the       */
+/*            temporary.                                           */
+/*-----------------------------------------------------------------*/
+static ast *replaceAstWithTemporary(ast **treeptr)
+{
+  symbol *sym = newSymbol (genSymName(NestLevel), NestLevel );
+  ast *tempvar;
+
+  /* Tell gatherImplicitVariables() to automatically give the
+     symbol the correct type */
+  sym->infertype = 1;
+  sym->type = NULL;
+  sym->etype = NULL;
+
+  tempvar = newNode('=', newAst_VALUE(symbolVal(sym)), *treeptr);
+  *treeptr = newAst_VALUE(symbolVal(sym));
+  
+  addSymChain(&sym);
+
+  return tempvar;
+}
 
 /*-----------------------------------------------------------------*/
-/* hasSEFcalls - returns TRUE if tree has a function call          */
+/* createRMW: Create a read-modify-write expression, using a       */
+/*            temporary variable if necessary to avoid duplicating */
+/*            any side effects, for use in e.g.                    */
+/*               foo()->count += 5;      becomes                   */
+/*               tmp = foo(); tmp->count = tmp->count + 5;         */
+/*-----------------------------------------------------------------*/
+ast * createRMW (ast *target, unsigned op, ast *operand)
+{
+  ast *readval, *writeval;
+  ast *tempvar1 = NULL;
+  ast *tempvar2 = NULL;
+  ast *result;
+
+  if (!target || !operand) {
+    return NULL;
+  }
+
+  /* we need to create two copies of target: one to read from and
+     one to write to. but we need to do this without duplicating
+     any side effects that may be contained in the tree. */
+
+  if (IS_AST_OP(target)) {
+    /* if this is a dereference, put the referenced item in the temporary */
+    if (IS_DEREF_OP(target) || target->opval.op == PTR_OP) { 
+      /* create a new temporary containing the item being dereferenced */
+      if (hasSEFcalls(target->left))
+        tempvar1 = replaceAstWithTemporary(&(target->left));
+    } else if (target->opval.op == '[') {
+      /* Array access is similar, but we have to avoid side effects in
+	 both values [WIML: Why not transform a[b] to *(a+b) in parser?] */
+      if (hasSEFcalls(target->left))
+	tempvar1 = replaceAstWithTemporary(&(target->left));
+      if (hasSEFcalls(target->right))
+	tempvar2 = replaceAstWithTemporary(&(target->right));
+    } else {
+      /* we would have to handle '.', but it is not generated any more */
+      wassertl(target->opval.op != '.', "obsolete opcode in tree");
+
+      /* no other kinds of ASTs are lvalues and can contain side effects */
+    }
+  }
+
+  readval = target;
+  writeval = copyAst(target);
+
+  result = newNode('=', writeval, newNode(op, readval, operand));
+  if (tempvar2)
+    result = newNode(',', tempvar2, result);
+  if (tempvar1)
+    result = newNode(',', tempvar1, result);
+
+  return result;
+  
+}
+
+/*-----------------------------------------------------------------*/
+/* hasSEFcalls - returns TRUE if tree has a function call,         */
+/*               inc/decrement, or other side effect               */
 /*-----------------------------------------------------------------*/
 bool
 hasSEFcalls (ast * tree)
@@ -2254,6 +2336,73 @@ getLeftResultType (ast *tree, RESULT_TYPE resultType)
     }
 }
 
+/*------------------------------------------------------------------*/
+/* gatherImplicitVariables: assigns correct type information to     */
+/*            symbols and values created by replaceAstWithTemporary */
+/*            and adds the symbols to the declarations list of the  */
+/*            innermost block that contains them                    */
+/*------------------------------------------------------------------*/
+void
+gatherImplicitVariables (ast * tree, ast * block)
+{
+  if (!tree)
+    return;
+
+  if (tree->type == EX_OP && tree->opval.op == BLOCK)
+    {
+      /* keep track of containing scope */
+      block = tree;
+    }
+  if (tree->type == EX_OP && tree->opval.op == '=' &&
+      tree->left->type == EX_VALUE && tree->left->opval.val->sym)
+    {
+      symbol *assignee = tree->left->opval.val->sym;
+
+      /* special case for assignment to compiler-generated temporary variable:
+         compute type of RHS, and set the symbol's type to match */
+      if (assignee->type == NULL && assignee->infertype) {
+        ast *dtr = decorateType (resolveSymbols(tree->right), RESULT_TYPE_NONE);
+    
+        if (dtr != tree->right)
+          tree->right = dtr;
+
+        assignee->type = copyLinkChain(TTYPE(dtr));
+        assignee->etype = getSpec(assignee->type);
+        SPEC_SCLS (assignee->etype) = S_AUTO;
+        SPEC_OCLS (assignee->etype) = NULL;
+        SPEC_EXTR (assignee->etype) = 0;
+        SPEC_STAT (assignee->etype) = 0;
+        SPEC_VOLATILE (assignee->etype) = 0;
+        SPEC_ABSA (assignee->etype) = 0;
+
+        wassertl(block != NULL, "implicit variable not contained in block");
+        wassert(assignee->next == NULL);
+        if (block != NULL) {
+          symbol **decl = &(block->values.sym);
+
+          while (*decl) {
+            wassert(*decl != assignee);  /* should not already be in list */
+            decl = &( (*decl)->next );
+          }
+
+          *decl = assignee;
+        }
+      }
+    }
+  if (tree->type == EX_VALUE && !(IS_LITERAL(tree->opval.val->etype)) &&
+      tree->opval.val->type == NULL &&
+      tree->opval.val->sym &&
+      tree->opval.val->sym->infertype)
+    {
+      /* fixup type of value for compiler-inferred temporary var */
+      tree->opval.val->type = tree->opval.val->sym->type;
+      tree->opval.val->etype = tree->opval.val->sym->etype;
+    }
+
+  gatherImplicitVariables(tree->left, block);
+  gatherImplicitVariables(tree->right, block);
+}
+
 /*--------------------------------------------------------------------*/
 /* decorateType - compute type for this tree, also does type checking.*/
 /* This is done bottom up, since type has to flow upwards.            */
@@ -2330,24 +2479,22 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 tree->opval.val->etype = tree->opval.val->sym->etype =
                 copyLinkChain (INTTYPE);
             }
+          else if (tree->opval.val->sym->implicit)
+            {
+              /* if implicit i.e. struct/union member then no type */
+              TTYPE (tree) = TETYPE (tree) = NULL;
+            }
           else
             {
+              /* copy the type from the value into the ast */
+              COPYTYPE (TTYPE (tree), TETYPE (tree), tree->opval.val->type);
 
-              /* if impilicit i.e. struct/union member then no type */
-              if (tree->opval.val->sym->implicit)
-                TTYPE (tree) = TETYPE (tree) = NULL;
-
-              else
-                {
-
-                  /* else copy the type */
-                  COPYTYPE (TTYPE (tree), TETYPE (tree), tree->opval.val->type);
-
-                  /* and mark it as referenced */
-                  tree->opval.val->sym->isref = 1;
-                }
+              /* and mark the symbol as referenced */
+              tree->opval.val->sym->isref = 1;
             }
         }
+      else
+        wassert(0); /* unreached: all values are literals or symbols */
 
       return tree;
     }
@@ -3647,7 +3794,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       changePointer(LTYPE(tree));
       checkTypeSanity(LETYPE(tree), "(cast)");
 
-      /* if 'from' and 'to' are the same remove the superflous cast, */
+      /* if 'from' and 'to' are the same remove the superfluous cast, */
       /* this helps other optimizations */
       if (compareTypeExact (LTYPE(tree), RTYPE(tree), -1) == 1)
         {
@@ -5799,20 +5946,22 @@ createFunction (symbol * name, ast * body)
   stackPtr = 0;
   xstackPtr = -1;
 
+  gatherImplicitVariables (body, NULL);  /* move implicit variables into blocks */
+
   /* allocate & autoinit the block variables */
   processBlockVars (body, &stack, ALLOCATE);
-
-  /* save the stack information */
-  if (options.useXstack)
-    name->xstack = SPEC_STAK (fetype) = stack;
-  else
-    name->stack = SPEC_STAK (fetype) = stack;
 
   /* name needs to be mangled */
   SNPRINTF (name->rname, sizeof(name->rname), "%s%s", port->fun_prefix, name->name);
 
   body = resolveSymbols (body); /* resolve the symbols */
   body = decorateType (body, RESULT_TYPE_NONE); /* propagateType & do semantic checks */
+
+  /* save the stack information */
+  if (options.useXstack)
+    name->xstack = SPEC_STAK (fetype) = stack;
+  else
+    name->stack = SPEC_STAK (fetype) = stack;
 
   ex = newAst_VALUE (symbolVal (name)); /* create name */
   ex = newNode (FUNCTION, ex, body);
@@ -5976,8 +6125,8 @@ void ast_print (ast * tree, FILE *outfile, int indent)
                         } else {
                                 fprintf(outfile,"SYMBOL ");
                         }
-                        fprintf(outfile,"(%s=%p)",
-                                tree->opval.val->sym->name,tree);
+                        fprintf(outfile,"(%s=%p @ %p)",
+                                tree->opval.val->sym->name, tree, tree->opval.val->sym);
                 }
                 if (tree->ftype) {
                         fprintf(outfile," type (");

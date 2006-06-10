@@ -42,11 +42,6 @@ void Timer(int action, char * message)
 }
 #endif
 
-/* yuck - but including unistd.h causes problems on Cygwin by redefining
- * Addr_T.
- */
-extern int unlink(const char *);
-
 /*)Module   lkmain.c
  *
  *  The module lkmain.c contains the functions which
@@ -155,7 +150,7 @@ void Areas51 (void)
  *
  *  The function main() evaluates the command line arguments to
  *  determine if the linker parameters are to input through 'stdin'
- *  or read from a command file.  The functiond as_getline() and parse()
+ *  or read from a command file.  The functions as_getline() and parse()
  *  are to input and evaluate the linker parameters.  The linking process
  *  proceeds by making the first pass through each .rel file in the order
  *  presented to the linker.  At the end of the first pass the setbase(),
@@ -470,7 +465,7 @@ lkexit(int i)
         copyfile(xfp,dfp);
         fclose(xfp);
         fclose(dfp);
-        unlink("temp.cdb");
+        remove("temp.cdb");
     }*/
     exit(i);
 }

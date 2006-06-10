@@ -1,3 +1,21 @@
+2006-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/hc08/asmain.c (asexit),
+	* as/hc08/lkmain.c (lkexit),
+	* as/mcs51/asmain.c (asexit),
+	* as/mcs51/lkmain.c (lkexit),
+	* src/SDCCglue.c (DEFSETFUNC),
+	* src/SDCCmain.c (linkEdit, assemble),
+	* support/librarian/sdcclib.c (AddRel),
+	  replaced unlink() by standard C remove()
+	* src/SDCC.y: replaced removePostIncDecOps() by createRMW()
+	* src/SDCCast.c (replaceAstWithTemporary, createRMW,
+	  gatherImplicitVariables): new, added to fix bug 608752,
+	  (createFunction): added gatherImplicitVariables()
+	* src/SDCCast.h: added createRMW prototype
+	* src/SDCCsymt.h (struct symbol): added infertype
+	* support/regression/tests/bug608752.c: new, added
+
 2006-06-10 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (pic16_aopOp): use WREG as destination even for

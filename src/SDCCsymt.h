@@ -256,6 +256,7 @@ typedef struct symbol
     in the symbol and not in v_struct or the declarator */
     unsigned implicit:1;                /* implicit flag                     */
     unsigned undefined:1;               /* undefined variable                */
+    unsigned infertype:1;               /* type should be inferred from first assign */
     unsigned _isparm:1;                 /* is a parameter          */
     unsigned ismyparm:1;                /* is parameter of the function being generated */
     unsigned isitmp:1;                  /* is an intermediate temp */

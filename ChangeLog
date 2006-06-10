@@ -1,3 +1,8 @@
+2006-06-10 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (pic16_aopOp): use WREG as destination even for
+	  multibyte dummy reads (fixes #1503234)
+
 2006-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/compiler.h: new, added header file to enable

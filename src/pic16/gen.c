@@ -1288,23 +1288,30 @@ void pic16_aopOp (operand *op, iCode *ic, bool result)
 			    sym->rname, sym->usl.spillLoc->offset);
 #endif
 
-	sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
-	if (sym->usl.spillLoc && getSize(sym->type) != getSize(sym->usl.spillLoc->type)) {
-	    /* Don't reuse the new aop */
-	    sym->usl.spillLoc->aop = NULL;
-	}
 	//aop->aopu.pcop = pic16_popGetImmd(sym->usl.spillLoc->rname,0,sym->usl.spillLoc->offset);
 	if (sym->usl.spillLoc && sym->usl.spillLoc->rname) {
+	  sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
 	  aop->aopu.pcop = pic16_popRegFromString(sym->usl.spillLoc->rname, 
 						  getSize(sym->type), 
 						  sym->usl.spillLoc->offset, op);
-	} else {
-	  fprintf (stderr, "%s:%d called for a spillLocation -- assigning WREG instead --- CHECK!\n", __FUNCTION__, __LINE__);
+	} else if (getSize(sym->type) <= 1) {
+	  //fprintf (stderr, "%s:%d called for a spillLocation -- assigning WREG instead --- CHECK (size:%u)!\n", __FUNCTION__, __LINE__, getSize(sym->type));
 	  pic16_emitpcomment (";!!! %s:%d called for a spillLocation -- assigning WREG instead --- CHECK", __FUNCTION__, __LINE__);
 	  assert (getSize(sym->type) <= 1);
+	  sym->aop = op->aop = aop = newAsmop(AOP_PCODE);
 	  aop->aopu.pcop = pic16_popCopyReg (&pic16_pc_wreg);
+	} else {
+	  /* We need some kind of dummy area for getSize(sym->type) byte,
+	   * use WREG for all storage locations.
+	   * XXX: This only works if we are implementing a `dummy read',
+	   *      the stored value will not be retrievable...
+	   *      See #1503234 for a case requiring this. */
+	  sym->aop = op->aop = aop = newAsmop(AOP_REG);
+	  aop->size = getSize(sym->type);
+	  for ( i = 0 ; i < aop->size ;i++)
+	    aop->aopu.aop_reg[i] = pic16_pc_wreg.r;
 	}
-        aop->size = getSize(sym->type);
+	aop->size = getSize(sym->type);
 
         return;
     }

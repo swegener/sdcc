@@ -1,7 +1,7 @@
 2006-06-11 Vangelis Rokas <vrokas AT users.sourceforge.net>
 
 	* src/pic16/gen.c (genCast): fixed bug with assignment of a pointer
-	to a char variable
+	to a char variable. Fixed bug #1504211
 
 2006-06-10 Borut Razem <borut.razem AT siol.net>
 

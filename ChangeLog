@@ -1,3 +1,7 @@
+2006-06-10 Borut Razem <borut.razem AT siol.net>
+
+	* CVSROOT: removed the CVS left-over
+
 2006-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/hc08/asmain.c (asexit),

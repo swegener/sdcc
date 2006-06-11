@@ -7,6 +7,9 @@
 
 	* src/pic16/gen.c (genCast): fixed bug with assignment of a pointer
 	to a char variable. Fixed bug #1504211
+	* device/include/pic16/adc.h,
+	device/include/lib/pic16/libio/adc/adcopen.c: applied patch #1364387
+	and fixed bug #1364390
 
 2006-06-10 Borut Razem <borut.razem AT siol.net>
 

@@ -54,7 +54,7 @@ void adc_open(unsigned char channel, unsigned char fosc, unsigned char pcfg, uns
   /* setup reference and pins */
   ADCON1 |= pcfg & 0x0f;
   
-  ADCON0 |= (config & ADC_FRM_RJUST);
+  ADCON1 |= (config & ADC_FRM_RJUST);
   
   if(config & ADC_INT_ON) {
     PIR1bits.ADIF = 0;

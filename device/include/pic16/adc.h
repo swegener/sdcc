@@ -44,11 +44,12 @@
 
 /* oscillator frequency */
 #define ADC_FOSC_2	0x00
-#define ADC_FOSC_4	0x10
-#define ADC_FOSC_16	0x11
+#define ADC_FOSC_4	0x04
+#define ADC_FOSC_8	0x01
+#define ADC_FOSC_16	0x05
 #define ADC_FOSC_32	0x02
-#define ADC_FOSC_64	0x12
-#define ADC_FOSC_RC	0x03
+#define ADC_FOSC_64	0x06
+#define ADC_FOSC_RC	0x07
 
 
 /* channel selection */

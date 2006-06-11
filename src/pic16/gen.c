@@ -2042,9 +2042,9 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 //  char *rs;
   pCodeOp *pcop;
 
-	FENTRY2;
-		/* offset is greater than
-		 * size then zero */
+    FENTRY2;
+    
+      /* offset is greater than size then zero */
 
 //    if (offset > (aop->size - 1) &&
 //        aop->type != AOP_LIT)
@@ -2122,7 +2122,9 @@ pCodeOp *pic16_popGet (asmop *aop, int offset) //, bool bit16, bool dname)
     case AOP_REG:
       {
 	int rIdx;
-	assert (aop && aop->aopu.aop_reg[offset] != NULL);
+
+//	debugf2("aop = %p\toffset = %d\n", aop, offset);
+//	assert (aop && aop->aopu.aop_reg[offset] != NULL);
 	rIdx = aop->aopu.aop_reg[offset]->rIdx;
 
 	DEBUGpic16_emitcode(";","%d\tAOP_REG", __LINE__);
@@ -10715,7 +10717,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
     return ;
   }
 
-  fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
+  fprintf(stderr, "SDCC pic16 port error: the port currently does not support *reading*\n");
   fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
   exit(-1);
 
@@ -13018,10 +13020,13 @@ static void genCast (iCode *ic)
 		if ((AOP_TYPE(right) == AOP_PCODE) && AOP(right)->aopu.pcop->type == PO_IMMEDIATE) {
 			pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right),0));
 			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),0));
-			pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right),1));
-			pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),1));
-			if(AOP_SIZE(result) <2)
-				fprintf(stderr,"%d -- result is not big enough to hold a ptr\n",__LINE__);
+
+			if(AOP_SIZE(result) < 2) {
+			  fprintf(stderr,"%d -- casting a ptr to a char\n",__LINE__);
+                        } else {
+                          pic16_emitpcode(POC_MOVLW, pic16_popGet(AOP(right),1));
+                          pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),1));
+                        }
 		} else {
 			/* if they in different places then copy */
 			size = AOP_SIZE(result);

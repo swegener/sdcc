@@ -50,9 +50,17 @@
 #ifdef toupper
 #undef toupper
 #endif
+#ifdef tolower
+#undef tolower
+#endif
+#ifdef isdigit
+#undef isdigit
+#endif
 
 //#define toupper(c) ((c)&=~0x20)
 #define toupper(c) ((c)&=0xDF)
+#define tolower(c) ((c)|=0x20)
+#define isdigit(c) ((unsigned char)c >= (unsigned char)'0' && (unsigned char)c <= (unsigned char)'9')
 
 typedef union
 {
@@ -63,22 +71,31 @@ typedef union
   char           *ptr;
 } value_t;
 
-static const char memory_id[] = "IXCP-";
-
 #ifndef SDCC_STACK_AUTO
   static BOOL lower_case;
   static pfn_outputchar output_char;
   static void* p;
   static value_t value;
+  static int charsOutputted;
 #endif
 
 /****************************************************************************/
 
 #ifdef SDCC_STACK_AUTO
-  static void output_digit( unsigned char n, BOOL lower_case, pfn_outputchar output_char, void* p )
+  #define OUTPUT_CHAR(c, p) { output_char (c, p); charsOutputted++; }
 #else
-  static void output_digit( unsigned char n )
+  #define OUTPUT_CHAR(c, p) _output_char (c)
+  static void _output_char( unsigned char c )
+  {
+    output_char( c, p );
+    charsOutputted++;
+  }
 #endif
+
+/*--------------------------------------------------------------------------*/
+
+#ifdef SDCC_STACK_AUTO
+  static void output_digit( unsigned char n, BOOL lower_case, pfn_outputchar output_char, void* p )
   {
     register unsigned char c = n + (unsigned char)'0';
 
@@ -90,11 +107,25 @@ static const char memory_id[] = "IXCP-";
     }
     output_char( c, p );
   }
+#else
+  static void output_digit( unsigned char n )
+  {
+    register unsigned char c = n + (unsigned char)'0';
+
+    if (c > (unsigned char)'9')
+    {
+      c += (unsigned char)('A' - '0' - 10);
+      if (lower_case)
+         c = tolower(c);
+    }
+    _output_char( c );
+  }
+#endif
 
 /*--------------------------------------------------------------------------*/
 
 #ifdef SDCC_STACK_AUTO
-  #define OUTPUT_2DIGITS( B )	output_2digits( B, lower_case, output_char, p )
+  #define OUTPUT_2DIGITS( B )	{ output_2digits( B, lower_case, output_char, p ); charsOutputted += 2; }
   static void output_2digits( unsigned char b, BOOL lower_case, pfn_outputchar output_char, void* p )
   {
     output_digit( b>>4,   lower_case, output_char, p );
@@ -169,24 +200,27 @@ static void calculate_digit( unsigned char radix )
 
 #ifdef SDCC_STACK_AUTO
 #define OUTPUT_FLOAT(F, W, D, L, Z, S, P)	output_float(F, W, D, L, Z, S, P, output_char, p)
-static int output_float (float f, unsigned char reqWidth,
-                         signed char reqDecimals,
-                         BOOL left, BOOL zero, BOOL sign, BOOL space,
-                         pfn_outputchar output_char, void* p)
+static unsigned char
+output_float (float f, unsigned char reqWidth,
+              signed char reqDecimals,
+              BOOL left, BOOL zero, BOOL sign, BOOL space,
+              pfn_outputchar output_char, void* p)
+{
+  unsigned char charsOutputted = 0;
 #else
 #define OUTPUT_FLOAT(F, W, D, L, Z, S, P)	output_float(F, W, D, L, Z, S, P)
-static int output_float (float f, unsigned char reqWidth,
-                         signed char reqDecimals,
-                         BOOL left, BOOL zero, BOOL sign, BOOL space)
-#endif
+static void
+output_float (float f, unsigned char reqWidth,
+              signed char reqDecimals,
+              BOOL left, BOOL zero, BOOL sign, BOOL space)
 {
-  BOOL negative=0;
+#endif //SDCC_STACK_AUTO
+  BOOL negative = 0;
   unsigned long integerPart;
   float decimalPart;
   char fpBuffer[128];
   char fpBI=0, fpBD;
   unsigned char minWidth, i;
-  int charsOutputted=0;
 
   // save the sign
   if (f<0) {
@@ -202,26 +236,29 @@ static int output_float (float f, unsigned char reqWidth,
     for (       ; f < 1.0;   exp--) f *=10.0;
 
     if (negative) {
-      output_char ('-', p);
-      charsOutputted++;
+      OUTPUT_CHAR ('-', p);
     } else {
       if (sign) {
-        output_char ('+', p);
-        charsOutputted++;
+        OUTPUT_CHAR ('+', p);
       }
     }
+#ifdef SDCC_STACK_AUTO
     charsOutputted += OUTPUT_FLOAT(f, 0, reqDecimals, 0, 0, 0, 0);
-    output_char ('e', p);
-    charsOutputted++;
+#else
+    OUTPUT_FLOAT(f, 0, reqDecimals, 0, 0, 0, 0);
+#endif
+    OUTPUT_CHAR ('e', p);
     if (exp<0) {
-      output_char ('-', p);
-      charsOutputted++;
+      OUTPUT_CHAR ('-', p);
       exp = -exp;
     }
-    output_char ('0'+exp/10, p);
-    output_char ('0'+exp%10, p);
-    charsOutputted += 2;
+    OUTPUT_CHAR ('0'+exp/10, p);
+    OUTPUT_CHAR ('0'+exp%10, p);
+#ifdef SDCC_STACK_AUTO
     return charsOutputted;
+#else
+    return;
+#endif //SDCC_STACK_AUTO
   }
 
   // split the float
@@ -268,93 +305,82 @@ static int output_float (float f, unsigned char reqWidth,
     if (zero) {
       if (negative)
       {
-        output_char('-', p);
-        charsOutputted++;
+        OUTPUT_CHAR('-', p);
       }
       else if (sign)
       {
-        output_char('+', p);
-        charsOutputted++;
+        OUTPUT_CHAR('+', p);
       }
       else if (space)
       {
-        output_char(' ', p);
-        charsOutputted++;
+        OUTPUT_CHAR(' ', p);
       }
       while (reqWidth-->minWidth)
       {
-        output_char('0', p);
-        charsOutputted++;
+        OUTPUT_CHAR('0', p);
       }
     } else {
       while (reqWidth-->minWidth)
       {
-        output_char(' ', p);
-        charsOutputted++;
+        OUTPUT_CHAR(' ', p);
       }
       if (negative)
       {
-        output_char('-', p);
-        charsOutputted++;
+        OUTPUT_CHAR('-', p);
       }
       else if (sign)
       {
-        output_char('+', p);
-        charsOutputted++;
+        OUTPUT_CHAR('+', p);
       }
       else if (space)
       {
-        output_char(' ', p);
-        charsOutputted++;
+        OUTPUT_CHAR(' ', p);
       }
     }
   } else {
     if (negative)
     {
-      output_char('-', p);
-      charsOutputted++;
+      OUTPUT_CHAR('-', p);
     }
     else if (sign)
     {
-      output_char('+', p);
-      charsOutputted++;
+      OUTPUT_CHAR('+', p);
     }
     else if (space)
     {
-      output_char(' ', p);
-      charsOutputted++;
+      OUTPUT_CHAR(' ', p);
     }
   }
 
   // output the integer part
   i=fpBI-1;
   do {
-    output_char (fpBuffer[i], p);
-    charsOutputted++;
+    OUTPUT_CHAR (fpBuffer[i], p);
   } while (i--);
 
   // ouput the decimal part
   if (reqDecimals) {
-    output_char ('.', p);
-    charsOutputted++;
+    OUTPUT_CHAR ('.', p);
     i=fpBI;
     while (reqDecimals--)
     {
-      output_char (fpBuffer[i++], p);
-      charsOutputted++;
+      OUTPUT_CHAR (fpBuffer[i++], p);
     }
   }
 
   if (left && reqWidth>minWidth) {
     while (reqWidth-->minWidth)
     {
-      output_char(' ', p);
-      charsOutputted++;
+      OUTPUT_CHAR(' ', p);
     }
   }
+#ifdef SDCC_STACK_AUTO
   return charsOutputted;
+#else
+  return;
+#endif //SDCC_STACK_AUTO
 }
-#endif
+#endif //USE_FLOATS
 
 int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap)
 {
@@ -369,11 +395,11 @@ int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list 
 #ifdef SDCC_STACK_AUTO
   BOOL   lower_case;
   value_t value;
+  int charsOutputted;
 #endif
   BOOL   lsd;
 
   unsigned char radix;
-  int charsOutputted;
   unsigned char  width;
   signed char decimals;
   unsigned char  length;
@@ -388,7 +414,7 @@ int _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list 
 #endif
 
   // reset output chars
-  charsOutputted=0;
+  charsOutputted = 0;
 
 #ifdef SDCC_ds390
   if (format==0) {
@@ -417,8 +443,7 @@ get_conversion_spec:
       c = *format++;
 
       if (c=='%') {
-        output_char(c, p);
-        charsOutputted++;
+        OUTPUT_CHAR(c, p);
         continue;
       }
 
@@ -467,8 +492,7 @@ get_conversion_spec:
         goto get_conversion_spec;
 
       case 'C':
-        output_char( va_arg(ap,int), p );
-        charsOutputted++;
+        OUTPUT_CHAR( va_arg(ap,int), p );
         break;
 
       case 'S':
@@ -493,15 +517,13 @@ get_conversion_spec:
           width -= length;
           while( width-- != 0 )
           {
-            output_char( ' ', p );
-            charsOutputted++;
+            OUTPUT_CHAR( ' ', p );
           }
         }
 
         while ( *PTR  && (decimals-- > 0))
         {
-          output_char( *PTR++, p );
-          charsOutputted++;
+          OUTPUT_CHAR( *PTR++, p );
         }
 
         if ( left_justify && (length < width))
@@ -509,8 +531,7 @@ get_conversion_spec:
           width -= length;
           while( width-- != 0 )
           {
-            output_char( ' ', p );
-            charsOutputted++;
+            OUTPUT_CHAR( ' ', p );
           }
         }
         break;
@@ -530,14 +551,13 @@ get_conversion_spec:
           else
             c = 'X';
         }
-        output_char(c, p);
-        output_char(':', p);
-        output_char('0', p);
-        output_char('x', p);
+        OUTPUT_CHAR(c, p);
+        OUTPUT_CHAR(':', p);
+        OUTPUT_CHAR('0', p);
+        OUTPUT_CHAR('x', p);
         OUTPUT_2DIGITS( value.byte[2] );
         OUTPUT_2DIGITS( value.byte[1] );
         OUTPUT_2DIGITS( value.byte[0] );
-        charsOutputted += 10;
 #elif defined (SDCC_mcs51)
         {
           unsigned char memtype = value.byte[2];
@@ -550,24 +570,21 @@ get_conversion_spec:
           else
             c = 'X';
         }
-        output_char(c, p);
-        output_char(':', p);
-        output_char('0', p);
-        output_char('x', p);
+        OUTPUT_CHAR(c, p);
+        OUTPUT_CHAR(':', p);
+        OUTPUT_CHAR('0', p);
+        OUTPUT_CHAR('x', p);
         if ((c != 'I' /* idata */) &&
             (c != 'P' /* pdata */))
         {
           OUTPUT_2DIGITS( value.byte[1] );
-          charsOutputted += 2;
         }
         OUTPUT_2DIGITS( value.byte[0] );
-        charsOutputted += 6;
 #else
-        output_char('0', p);
-        output_char('x', p);
+        OUTPUT_CHAR('0', p);
+        OUTPUT_CHAR('x', p);
         OUTPUT_2DIGITS( value.byte[1] );
         OUTPUT_2DIGITS( value.byte[0] );
-        charsOutputted += 6;
 #endif
         break;
 
@@ -595,8 +612,7 @@ get_conversion_spec:
 
       default:
         // nothing special, just output the character
-        output_char( c, p );
-        charsOutputted++;
+        OUTPUT_CHAR( c, p );
         break;
       }
 
@@ -606,8 +622,7 @@ get_conversion_spec:
         PTR="<NO FLOAT>";
         while (c=*PTR++)
         {
-          output_char (c, p);
-          charsOutputted++;
+          OUTPUT_CHAR (c, p);
         }
         // treat as long hex
         //radix=16;
@@ -616,9 +631,14 @@ get_conversion_spec:
         //width=8;
 #else
         // ignore b and l conversion spec for now
+#ifdef SDCC_STACK_AUTO
         charsOutputted += OUTPUT_FLOAT(value.f, width, decimals, left_justify,
                                      zero_padding, prefix_sign, prefix_space);
-#endif
+#else
+        OUTPUT_FLOAT(value.f, width, decimals, left_justify,
+                     zero_padding, prefix_sign, prefix_space);
+#endif //SDCC_STACK_AUTO
+#endif //USE_FLOATS
       } else if (radix != 0)
       {
         // Apperently we have to output an integral type
@@ -692,16 +712,14 @@ get_conversion_spec:
         {
           while ( width > (unsigned char) (length+1) )
           {
-            output_char( ' ', p );
-            charsOutputted++;
+            OUTPUT_CHAR( ' ', p );
             width--;
           }
         }
 
         if (signed_argument) // this now means the original value was negative
         {
-          output_char( '-', p );
-          charsOutputted++;
+          OUTPUT_CHAR( '-', p );
           // adjust width to compensate for this character
           width--;
         }
@@ -710,15 +728,13 @@ get_conversion_spec:
           // value > 0
           if (prefix_sign)
           {
-            output_char( '+', p );
-            charsOutputted++;
+            OUTPUT_CHAR( '+', p );
             // adjust width to compensate for this character
             width--;
           }
           else if (prefix_space)
           {
-            output_char( ' ', p );
-            charsOutputted++;
+            OUTPUT_CHAR( ' ', p );
             // adjust width to compensate for this character
             width--;
           }
@@ -728,8 +744,7 @@ get_conversion_spec:
         if (!left_justify)
           while ( width-- > length )
           {
-            output_char( zero_padding ? '0' : ' ', p );
-            charsOutputted++;
+            OUTPUT_CHAR( zero_padding ? '0' : ' ', p );
           }
         else
         {
@@ -755,24 +770,22 @@ get_conversion_spec:
           }
 #ifdef SDCC_STACK_AUTO
           output_digit( value.byte[4], lower_case, output_char, p );
+          charsOutputted++;
 #else
           output_digit( value.byte[4] );
 #endif
-          charsOutputted++;
         }
         if (left_justify)
           while (width-- > 0)
           {
-            output_char(' ', p);
-            charsOutputted++;
+            OUTPUT_CHAR(' ', p);
           }
       }
     }
     else
     {
       // nothing special, just output the character
-      output_char( c, p );
-      charsOutputted++;
+      OUTPUT_CHAR( c, p );
     }
   }
 

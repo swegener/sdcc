@@ -4286,7 +4286,7 @@ pCodeOp *pic16_newpCodeOpReg(int rIdx)
     if(!r) {
     	fprintf(stderr, "%s:%d Could not find a free GPR register\n",
 	    	__FUNCTION__, __LINE__);
-	exit(-1);
+	exit(EXIT_FAILURE);
     }
   }
 
@@ -4959,7 +4959,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 	if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
 		fprintf(stderr, "%s:%d: pCodeInstruction initialization error in instruction %s, magic is %x (defaut: %x)\n",
 			__FILE__, __LINE__, PCI(pc)->mnemonic, PCI(pc)->pci_magic, PCI_MAGIC);
-//		exit(-1);
+//		exit(EXIT_FAILURE);
 	}
 #endif
 

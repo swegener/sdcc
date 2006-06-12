@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 #include "aslink.h"
 
@@ -34,7 +33,7 @@ VOID gg(int in)
     for(i = 0; i < NBSEG; i++) {
       if((cart[i] = malloc(SEGSIZE)) == NULL) {
 	fprintf(stderr, "ERROR: can't allocate %dth segment of memory (%d bytes)\n", i, (int)SEGSIZE);
-	exit(-1);
+	exit(EXIT_FAILURE);
       }
       memset(cart[i], 0, SEGSIZE);
     }
@@ -50,7 +49,7 @@ VOID gg(int in)
       /* Perform some validity checks */
       if(pos >= ROMSIZE) {
 	fprintf(stderr, "ERROR: address overflow (addr %lx >= %lx)\n", pos, ROMSIZE);
-	exit(-1);
+	exit(EXIT_FAILURE);
       }
       if(current_rom_bank > 1)
 	pos += (current_rom_bank-1)*BANKSIZE;
@@ -62,7 +61,7 @@ VOID gg(int in)
 	    cart[pos/SEGSIZE][pos%SEGSIZE] = rtval[i];
 	  } else {
 	    fprintf(stderr, "ERROR: cartridge size overflow (addr %lx >= %lx)\n", pos, CARTSIZE);
-	    exit(-1);
+	    exit(EXIT_FAILURE);
 	  }
 	  pos++;
 	}

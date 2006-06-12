@@ -710,7 +710,7 @@ getStringArg(const char *szStart, char **argv, int *pi, int argc)
         {
           werror (E_ARGUMENT_MISSING, szStart);
           /* Die here rather than checking for errors later. */
-          exit(-1);
+          exit(EXIT_FAILURE);
         }
       else
         {
@@ -1617,7 +1617,7 @@ linkEdit (char **envp)
                       fprintf(stderr,
                         "Add support for your FLAT24 target in %s @ line %d\n",
                         __FILE__, __LINE__);
-                      exit(-1);
+                      exit(EXIT_FAILURE);
                     }
                   break;
                 case MODEL_PAGE0:
@@ -1665,7 +1665,7 @@ linkEdit (char **envp)
                   fprintf(stderr,
                     "Add support for your FLAT24 target in %s @ line %d\n",
                     __FILE__, __LINE__);
-                  exit(-1);
+                  exit(EXIT_FAILURE);
                 }
               }
 #endif
@@ -2313,7 +2313,7 @@ main (int argc, char **argv, char **envp)
   atexit(rm_tmpfiles);
 
   /* install signal handler;
-     it's only purpuse is to call exit() to remove temp files */
+     it's only purpose is to call exit() to remove temp files */
   if (!getenv("SDCC_LEAVE_SIGNALS"))
     {
       signal (SIGABRT, sig_handler);

@@ -6047,7 +6047,7 @@ static void genCmp (operand *left, operand *right,
         pic16_emitcode("anl","c,/%s",AOP(left)->aopu.aop_dir);
         
         werror(W_POSSBUG2, __FILE__, __LINE__);
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
     
     /* if literal is on the right then swap with left */
@@ -10719,7 +10719,7 @@ static void genUnpackBits (operand *result, operand *left, char *rname, int ptyp
 
   fprintf(stderr, "SDCC pic16 port error: the port currently does not support *reading*\n");
   fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
-  exit(-1);
+  exit(EXIT_FAILURE);
 
   return ;
 }
@@ -11526,7 +11526,7 @@ static void genPackBits (sym_link    *etype , operand *result,
 #if 0
   fprintf(stderr, "SDCC pic16 port error: the port currently does not support\n");
   fprintf(stderr, "bitfields of size >=8. Instead of generating wrong code, bailling out...\n");
-  exit(-1);
+  exit(EXIT_FAILURE);
 #endif
 
 

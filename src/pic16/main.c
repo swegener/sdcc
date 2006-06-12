@@ -233,7 +233,7 @@ _process_pragma(const char *sz)
         if (stackPos+stackLen > pic16->RAMsize) {
           fprintf (stderr, "%s:%u: error: stack [0x%03X,0x%03X] is placed outside available memory [0x000,0x%03X]!\n",
 		filename, lineno-1, stackPos, stackPos+stackLen-1, pic16->RAMsize-1);
-          exit(-1);
+          exit(EXIT_FAILURE);
           return 1;	/* considered an error, but this reports "invalid pragma stack"... */
         }
       }
@@ -266,7 +266,7 @@ _process_pragma(const char *sz)
 
       if (!symname || !location) {
         fprintf (stderr, "%s:%d: #pragma code [symbol] [location] -- symbol or location missing\n", filename, lineno-1);
-	exit (-1);
+	exit (EXIT_FAILURE);
         return 1; /* considered an error, but this reports "invalid pragma code"... */
       }
 
@@ -300,7 +300,7 @@ _process_pragma(const char *sz)
     
       if (!symname || !sectname) {
         fprintf (stderr, "%s:%d: #pragma udata [section-name] [symbol] -- section-name or symbol missing!\n", filename, lineno-1);
-	exit (-1);
+	exit (EXIT_FAILURE);
         return 1; /* considered an error, but this reports "invalid pragma code"... */
       }
     
@@ -516,7 +516,7 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
       else if(!STRCASECMP(stkmodel, "large"))pic16_options.stack_model = 1;
       else {
         fprintf(stderr, "Unknown stack model: %s", stkmodel);
-        exit(-1);
+        exit(EXIT_FAILURE);
       }
       return TRUE;
     }
@@ -555,7 +555,7 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
         else if(!STRCASECMP(tmp, "crlf"))pic16_nl = 1;
         else {
           fprintf(stderr, "invalid termination character id\n");
-          exit(-1);
+          exit(EXIT_FAILURE);
         }
         return TRUE;
     }

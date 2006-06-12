@@ -4475,6 +4475,6 @@ operand *validateOpType(operand         *op,
             " expected %s, got %s\n",
             macro, args, file, line,
             opTypeToStr(type), op ? opTypeToStr(op->type) : "null op");
-    exit(-1);
+    exit(EXIT_FAILURE);
     return op; // never reached, makes compiler happy.
 }

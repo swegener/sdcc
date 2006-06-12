@@ -1287,7 +1287,7 @@ static int pCodeRemove (pCode *pc, const char *comment)
 	else
 	{
 		fprintf (stderr, "Cannot move a label...\n");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	
 	if (comment)

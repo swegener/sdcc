@@ -1,3 +1,17 @@
+2006-06-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* link/z80/lkgb.c,
+	* link/z80/lkgg.c,
+	* src/pic16/gen.c,
+	* src/pic16/main.c,
+	* src/pic16/pcode.c,
+	* src/pic/main.c,
+	* src/pic/pcoderegs.c,
+	* src/SDCCicode.c,
+	* src/SDCCmain.c,
+	* src/SDCCsymt.c: replaced all exit(-1) by exit(EXIT_FAILURE) to fix
+	  bug 1504689 on minGW
+
 2006-06-12 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/printf_tiny.c: fixed bug #1465675 (%x format specifier)

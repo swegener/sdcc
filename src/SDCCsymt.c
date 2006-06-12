@@ -1428,8 +1428,7 @@ checkSClass (symbol * sym, int isProto)
     fprintf (stderr, "checkSClass: %s \n", sym->name);
   }
   
-  /* type is literal can happen for enums change
-     to auto */
+  /* type is literal can happen for enums change to auto */
   if (SPEC_SCLS (sym->etype) == S_LITERAL && !SPEC_ENUM (sym->etype))
     SPEC_SCLS (sym->etype) = S_AUTO;
   
@@ -3552,7 +3551,7 @@ sym_link *validateLink(sym_link         *l,
             " expected %s, got %s\n",
             macro, args, file, line, 
             DECLSPEC2TXT(select), l ? DECLSPEC2TXT(l->class) : "null-link");
-    exit(-1);
+    exit(EXIT_FAILURE);
     return l; // never reached, makes compiler happy.
 }
 

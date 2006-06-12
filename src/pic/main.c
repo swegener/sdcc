@@ -166,7 +166,7 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
 	if(!strncmp(buf, argv[ *i ], strlen(buf))) {
 		if(strlen(argv[ *i ]) <= strlen(buf)+1) {
 			fprintf(stderr, "WARNING: no `%s' entered\n", buf+2);
-			exit(-1);
+			exit(EXIT_FAILURE);
 		} else {
 			udata_section_name = strdup( strchr(argv[*i], '=') + 1 );
 		}

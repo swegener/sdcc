@@ -1,3 +1,7 @@
+2006-06-12 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/printf_tiny.c: fixed bug #1465675 (%x format specifier)
+
 2006-06-12 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (backPatchLabels): fixed bug #1504636

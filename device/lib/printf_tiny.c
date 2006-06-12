@@ -136,7 +136,7 @@ printf_format_c:
 
 printf_format_d:
 	//cjne	a, #'d', printf_format_u
-	cjne	a, #100, printf_format_u
+	cjne	a, #100, printf_format_x
 #ifndef ALWAYS_PRINT_UNSIGNED
 	mov	a, @r0
 	jnb	acc.7, printf_uint

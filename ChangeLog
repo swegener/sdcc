@@ -1,3 +1,7 @@
+2006-06-12 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCast.c (backPatchLabels): fixed bug #1504636
+
 2006-06-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c (OUTPUT_CHAR, _output_char): added and used

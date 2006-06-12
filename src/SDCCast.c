@@ -4794,6 +4794,7 @@ backPatchLabels (ast * tree, symbol * trueLabel, symbol * falseLabel)
   /* while-loops insert a label between the IFX and the condition,
      therefore look behind the label too */
   if (tree->opval.op == LABEL &&
+      tree->right &&
       IS_ANDORNOT (tree->right))
     {
       tree->right = backPatchLabels (tree->right, trueLabel, falseLabel);

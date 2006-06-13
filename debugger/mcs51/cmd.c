@@ -1723,9 +1723,7 @@ int cmdListFunctions (char *s, context *cctxt)
     printf("[functions]\n");
     f = setFirstItem(functions);
     i = 0;
-    for (;;) {
-      if (f == NULL)
-        break;
+    while (f != NULL) {
       if (our_verbose) {
         printf("  %d) sym:%p, fname:%s, modName:%s, mod:%p\n", i,
           f->sym, f->sym->name, f->modName, f->mod);
@@ -1735,7 +1733,7 @@ int cmdListFunctions (char *s, context *cctxt)
                 f->cfpoints, f->afpoints, f->laddr, f->lline);
       }
       else {
-        printf("<%s>", f->modName);
+        printf("<%s>", f->sym->name);
       }
       ++i;
       f = setNextItem(functions);
@@ -1745,7 +1743,7 @@ int cmdListFunctions (char *s, context *cctxt)
 }
 
 /*-----------------------------------------------------------------
- cmdListModules - list functions.
+ cmdListModules - list modules.
 |-----------------------------------------------------------------*/
 int cmdListModules (char *s, context *cctxt)
 {

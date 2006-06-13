@@ -60,10 +60,17 @@ enum {
 };
 
 // values for first byte (or 3 most significant bits) of generic pointer.
+#if 0
 #define GPTYPE_FAR       0x00
 #define GPTYPE_NEAR      0x40
 #define GPTYPE_XSTACK    0x60
 #define GPTYPE_CODE      0x80
+#else
+#define GPTYPE_FAR	(port->gp_tags.tag_far)
+#define GPTYPE_NEAR	(port->gp_tags.tag_near)
+#define GPTYPE_XSTACK	(port->gp_tags.tag_xstack)
+#define GPTYPE_CODE	(port->gp_tags.tag_code)
+#endif
 
 #define HASHTAB_SIZE 256
 

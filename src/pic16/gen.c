@@ -3980,7 +3980,7 @@ void pic16_storeForReturn(iCode *ic, /*operand *op,*/ int offset, pCodeOp *dest)
 {
   unsigned long lit=1;
   operand *op;
-
+  
     op = IC_LEFT(ic);
   
     // this fails for is_LitOp(op) (if op is an AOP_PCODE)

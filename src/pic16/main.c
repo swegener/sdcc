@@ -1127,6 +1127,15 @@ PORT pic16_port =
     4,		/* float */
     4		/* max */
   },
+
+    /* generic pointer tags */
+  {
+    0x00,	/* far */
+    0x80,	/* near */
+    0x00,	/* xstack */
+    0x00	/* code */
+  },
+  
   {
     "XSEG    (XDATA)",		// xstack
     "STACK   (DATA)",		// istack

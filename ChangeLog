@@ -1,3 +1,23 @@
+2006-06-13 Vangelis Rokas <vrokas AT users.sourceforge.net>
+
+	* src/port.h (struct PORT): added field gp_tags, to hold the tag
+	value of generic pointers,
+	* src/avr/main.c,
+	  src/ds390/main.c,
+	  src/hc08/main.c,
+	  src/izt/i186.c,
+	  src/izt/tlcs900h.c,
+	  src/mcs51/main.c,
+	  src/pic/main.c,
+	  src/pic16/main.c,
+	  src/xa51/main.c,
+	  src/z80/main.c: PORT structure, added elements for gp_tags field,
+	* src/SDCCsymt.h: replaced hardwired values of GPTYPE_* macros with
+	fields in the PORT structure of each port,
+	* src/SDCCast.c (decorateType): allow processing of generic pointers
+	for PIC16 port (FPTRSIZE equals GPTRSIZE), also set GPTYPE_NEAR for
+	S_FIXED symbols
+
 2006-06-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* link/z80/lkgb.c,

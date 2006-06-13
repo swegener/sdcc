@@ -3866,7 +3866,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         unsigned int gptype = 0;
         unsigned int addr = SPEC_ADDR (sym->etype);
 
-        if (IS_GENPTR (LTYPE (tree)) && GPTRSIZE > FPTRSIZE)
+        if (IS_GENPTR (LTYPE (tree)) && ((GPTRSIZE > FPTRSIZE)
+                                        || TARGET_IS_PIC16) )
           {
             switch (SPEC_SCLS (sym->etype))
               {
@@ -3885,6 +3886,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 break;
               default:
                 gptype = 0;
+
+                if(TARGET_IS_PIC16 && (SPEC_SCLS(sym->etype) == S_FIXED))
+                    gptype = GPTYPE_NEAR;
               }
             addr |= gptype << (8*(GPTRSIZE - 1));
           }

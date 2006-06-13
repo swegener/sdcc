@@ -540,6 +540,8 @@ PORT pic_port =
 		   16f877)
 		 */
 	},
+	/* tags for generic pointers */
+	{ 0x00, 0x00, 0x00, 0x80 },		/* far, near, xstack, code */
 	{
 		"XSEG    (XDATA)",
 		"STACK   (DATA)",

@@ -138,6 +138,16 @@ typedef struct
       }
     s;
 
+/** tags for far, near, xstack, code generic pointers */
+    struct
+      {
+        int tag_far;
+        int tag_near;
+        int tag_xstack;
+        int tag_code;
+      }
+    gp_tags;
+      
 /** memory regions related stuff */
     struct
       {

@@ -2,6 +2,7 @@
 
 	* debugger/mcs51/cmd.c (cmdListFunctions): fixed bugs 1181163 and
 	  1208515
+	* src/SDCClrange.c (findPrevUse): fixed bug 1294475
 
 2006-06-13 Vangelis Rokas <vrokas AT users.sourceforge.net>
 

@@ -442,8 +442,12 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
     {
       /* computeLiveRanges() is called twice */
       if (!emitWarnings)
-        werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
-                  OP_SYMBOL (op)->prereqv);
+        {
+          werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
+                    OP_SYMBOL (op)->prereqv);
+          OP_SYMBOL (op)->prereqv->reqv = NULL;
+          OP_SYMBOL (op)->prereqv->allocreq = 1;
+        }
       /* is this block part of a loop? */
       if (ebp->depth != 0)
         {

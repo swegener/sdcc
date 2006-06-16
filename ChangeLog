@@ -1,3 +1,13 @@
+2006-06-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/lkarea.c (lnkarea2): clear new xdatamap, bugfix for two
+	  consecutive abs areas
+	  (find_empty_space, allocate_space): added map to handle codemap or
+	   xdatamap,
+	  (lnksect2): renamed rloc to locIndex, fixed bug 960060 by handling
+	   absolute idata and xdata
+	* as/mcs51/lkmem.c (summary2): updated legend
+
 2006-06-16 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (shiftR2Left2Result): fixed bug #1507127

@@ -37,7 +37,7 @@
  *  The function newarea() creates and/or modifies area
  *  and areax structures for each A directive read from
  *  the .rel file(s).  The function lkparea() is called
- *  to find tha area structure associated with this name.
+ *  to find the area structure associated with this name.
  *  If the area does not yet exist then a new area
  *  structure is created and linked to any existing
  *  linked area structures. The area flags are copied
@@ -488,9 +488,10 @@ lnksect(register struct area *tap)
     }
 }
 
-Addr_T lnksect2 (struct area *tap, int rloc);
+Addr_T lnksect2 (struct area *tap, int locIndex);
 char idatamap[256];
 unsigned long codemap[524288];
+unsigned long xdatamap[131072];
 
 /*Modified version of the functions for packing variables in internal data memory*/
 VOID lnkarea2 (void)
@@ -508,6 +509,7 @@ VOID lnkarea2 (void)
 
     for(j=0; j<256; j++) idatamap[j]=' ';
     memset(codemap, 0, sizeof(codemap));
+    memset(xdatamap, 0, sizeof(xdatamap));
 
     /* first sort all absolute areas to the front */
     ap = areap;
@@ -522,7 +524,10 @@ VOID lnkarea2 (void)
             abs_ap->a_ap = areap;
             areap = abs_ap;
         }
-        ap = ap->a_ap;
+        else
+        {
+            ap = ap->a_ap;
+        }
     }
 
     /* next accumulate all GSINITx/GSFINAL area sizes
@@ -623,22 +628,10 @@ VOID lnkarea2 (void)
     }
     if(sp_dseg_s!=NULL) sp_dseg_s->s_addr=0;
     if(sp_dseg_l!=NULL) sp_dseg_l->s_addr=dseg_ap->a_size;
-
-#if 0
-    /*Print the memory map*/
-    fprintf(stderr, "Internal RAM layout:\n"
-           "      0 1 2 3 4 5 6 7 8 9 A B C D E F");
-    for(j=0; j<256; j++)
-    {
-        if(j%16==0) fprintf(stderr, "\n0x%02x:|", j);
-        fprintf(stderr, "%c|", idatamap[j]);
-    }
-    fprintf(stderr, "\n0-3:Reg Banks, a-z:Data, B:Bits, Q:Overlay, I:iData, S:Stack\n");
-#endif
 }
 
 static
-Addr_T find_empty_space(Addr_T start, Addr_T size)
+Addr_T find_empty_space(Addr_T start, Addr_T size, unsigned long *map)
 {
     int i, j, k;
     unsigned long mask, b;
@@ -652,12 +645,12 @@ Addr_T find_empty_space(Addr_T start, Addr_T size)
 
         while (i < j)
         {
-            if (codemap[i] & mask)
+            if (map[i] & mask)
             {
                 k = 32;
                 for (b=0x80000000; b!=0; b>>=1, k--)
                 {
-                    if (codemap[i] & b)
+                    if (map[i] & b)
                       break;
                 }
                 start = a + k;
@@ -671,13 +664,13 @@ Addr_T find_empty_space(Addr_T start, Addr_T size)
           continue;
 
         mask &= (1 << ((start + size) & 0x1F)) - 1;
-        if (codemap[i] & mask)
+        if (map[i] & mask)
         {
             k = 32;
             for (b=0x80000000; b!=0; b>>=1, k--)
             {
-                if (codemap[i] & b)
-                  break;
+                if (map[i] & b)
+                    break;
             }
             start = (a & ~0x1F) + k;
         }
@@ -688,7 +681,7 @@ Addr_T find_empty_space(Addr_T start, Addr_T size)
 }
 
 static
-Addr_T allocate_space(Addr_T start, Addr_T size, char* id)
+Addr_T allocate_space(Addr_T start, Addr_T size, char* id, unsigned long *map)
 {
     int i, j;
     unsigned long mask;
@@ -699,24 +692,24 @@ Addr_T allocate_space(Addr_T start, Addr_T size, char* id)
 
     while (i < j)
     {
-        if (codemap[i] & mask)
+        if (map[i] & mask)
         {
             fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
         }
-        codemap[i++] |= mask;
+        map[i++] |= mask;
         mask = 0xFFFFFFFF;
         a += 32;
     }
     mask &= (1 << ((start + size) & 0x1F)) - 1;
-    if (codemap[i] & mask)
+    if (map[i] & mask)
     {
         fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
     }
-    codemap[i] |= mask;
+    map[i] |= mask;
     return start;
 }
 
-Addr_T lnksect2 (struct area *tap, int rloc)
+Addr_T lnksect2 (struct area *tap, int locIndex)
 {
     register Addr_T size, addr;
     register struct areax *taxp;
@@ -756,7 +749,7 @@ Addr_T lnksect2 (struct area *tap, int rloc)
     taxp = tap->a_axp;
 
     /*Use a letter to identify each area in the internal RAM layout map*/
-    if (rloc==0)
+    if (locIndex==0)
     {
         /**/ if(!strcmp(tap->a_id, "DSEG"))
             fchar='D'; /*It will be converted to letters 'a' to 'z' later for each areax*/
@@ -781,12 +774,12 @@ Addr_T lnksect2 (struct area *tap, int rloc)
         else
             fchar=' ';/*???*/
     }
-    else if (rloc==1)
+    else if (locIndex == 1)
     {
         /**/ if(!strcmp(tap->a_id, "GSINIT"))
             fchar='G';
     }
-    else if (rloc==2)
+    else if (locIndex == 2)
     {
         /**/ if(!strcmp(tap->a_id, "XSTK"))
             fchar='K';
@@ -959,9 +952,18 @@ Addr_T lnksect2 (struct area *tap, int rloc)
     {
         while (taxp)
         {
-            if (rloc == 1)
+            if (locIndex == 0)
             {
-                allocate_space(taxp->a_addr, taxp->a_size, tap->a_id);
+                for (j=taxp->a_addr; (j<(int)(taxp->a_addr+taxp->a_size)) && (j<ramlimit); j++)
+                    idatamap[j] = 'A';
+            }
+            if (locIndex == 1)
+            {
+                allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap);
+            }
+            if (locIndex == 2)
+            {
+                allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, xdatamap);
             }
             taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */
             size += taxp->a_size;
@@ -970,9 +972,13 @@ Addr_T lnksect2 (struct area *tap, int rloc)
     }
     else /* Concatenated sections */
     {
-        if ((rloc == 1) && tap->a_size)
+        if ((locIndex == 1) && tap->a_size)
         {
-            addr = find_empty_space(addr, tap->a_size);
+            addr = find_empty_space(addr, tap->a_size, codemap);
+        }
+        if ((locIndex == 2) && tap->a_size)
+        {
+            addr = find_empty_space(addr, tap->a_size, xdatamap);
         }
         while (taxp)
         {
@@ -1037,10 +1043,15 @@ Addr_T lnksect2 (struct area *tap, int rloc)
                     taxp->a_size = 256-(addr & 0xFF);
                 }
                 //find next unused address now
-                if ((rloc == 1) && taxp->a_size)
+                if ((locIndex == 1) && taxp->a_size)
                 {
-                    addr = find_empty_space(addr, taxp->a_size);
-                    allocate_space(addr, taxp->a_size, tap->a_id);
+                    addr = find_empty_space(addr, taxp->a_size, codemap);
+                    allocate_space(addr, taxp->a_size, tap->a_id, codemap);
+                }
+                if ((locIndex == 2) && taxp->a_size)
+                {
+                    addr = find_empty_space(addr, taxp->a_size, xdatamap);
+                    allocate_space(addr, taxp->a_size, tap->a_id, xdatamap);
                 }
                 taxp->a_addr = addr;
                 addr += taxp->a_size;

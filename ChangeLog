@@ -1,3 +1,7 @@
+2006-06-16 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (shiftR2Left2Result): fixed bug #1507127
+
 2006-06-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/cmd.c (cmdListFunctions): fixed bugs 1181163 and

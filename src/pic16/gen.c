@@ -9087,8 +9087,9 @@ static void shiftR2Left2Result (operand *left, int offl,
   case 1:
   case 2:
   case 3:
+    /* obtain sign from left operand */
     if(sign)
-      pic16_emitpcode(POC_RLCFW,pic16_popGet(AOP(result),offr+MSB16));
+      pic16_emitpcode(POC_RLCFW,pic16_popGet(AOP(left),offr+MSB16));
     else
       emitCLRC;
 
@@ -9104,9 +9105,10 @@ static void shiftR2Left2Result (operand *left, int offl,
 
     while(--shCount) {
       if(sign)
-		pic16_emitpcode(POC_RLCFW,pic16_popGet(AOP(result),offr+MSB16));
+	/* now get sign from already assigned result (avoid BANKSEL) */
+	pic16_emitpcode(POC_RLCFW,pic16_popGet(AOP(result),offr+MSB16));
       else
-		emitCLRC;
+	emitCLRC;
       pic16_emitpcode(POC_RRCF,pic16_popGet(AOP(result),offr+MSB16));
       pic16_emitpcode(POC_RRCF,pic16_popGet(AOP(result),offr));
     }

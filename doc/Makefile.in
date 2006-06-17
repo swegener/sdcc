@@ -121,6 +121,7 @@ $(CDB).html/index.html: $(CDB).tex
 	$(PDFLATEX) $*
 	-$(MAKEINDEX) $*
 	$(PDFLATEX) $*
+	-$(MAKEINDEX) $*
 	$(PDFLATEX) $*
 	$(PDFOPT) $*.pdf tmp.pdf
 	rm $*.pdf

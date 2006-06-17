@@ -827,12 +827,13 @@ bit b;
 \SpecialChar ~
 b = ~b; /* equivalent to b=1 instead of toggling b */
 \begin_inset Marginal
-collapsed true
+collapsed false
 
 \layout Standard
 
 
 \series bold 
+\SpecialChar ~
 !
 \end_inset 
 
@@ -9573,7 +9574,7 @@ This is a data-type and a storage class specifier.
 
 
 \family typewriter 
-bit test_bit;
+__bit test_bit;
 \layout Standard
 
 Writing 1 to this variable generates the assembly code:
@@ -10470,6 +10471,7 @@ collapsed true
 
 
 \series bold 
+\SpecialChar ~
 !
 \end_inset 
 
@@ -10502,6 +10504,7 @@ collapsed true
 
 
 \series bold 
+\SpecialChar ~
 !
 \end_inset 
 
@@ -10572,7 +10575,7 @@ Absolute addresses can be specified for variables in all storage classes,
 
 
 \family typewriter 
-bit
+__bit
 \begin_inset LatexCommand \index{bit}
 
 \end_inset 
@@ -10602,19 +10605,19 @@ extern volatile
 
 \end_inset 
 
- bit MOSI;\SpecialChar ~
+ __bit MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* master out, slave in */
 \newline 
-extern volatile bit MISO;\SpecialChar ~
+extern volatile __bit MISO;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* master in, slave out */
 \newline 
-extern volatile bit MCLK;\SpecialChar ~
+extern volatile __bit MCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -10750,7 +10753,7 @@ Then, someplace in the code for the first hardware you would use
 
 
 \family typewriter 
-bit __at
+__bit __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
@@ -10766,13 +10769,13 @@ bit __at
 \SpecialChar ~
 /* I/O port 0, bit 0 */
 \newline 
-bit __at (0x81) MISO;\SpecialChar ~
+__bit __at (0x81) MISO;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 1 */
 \newline 
-bit __at (0x82) MCLK;\SpecialChar ~
+__bit __at (0x82) MCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -10784,19 +10787,19 @@ Similarly, for the second hardware you would use
 
 
 \family typewriter 
-bit __at (0x83) MOSI;\SpecialChar ~
+__bit __at (0x83) MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 3 */
 \newline 
-bit __at (0x91) MISO;\SpecialChar ~
+__bit __at (0x91) MISO;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 1, bit 1 */
 \newline 
-bit
+__bit
 \begin_inset LatexCommand \index{bit}
 
 \end_inset 
@@ -10978,19 +10981,19 @@ unsigned char foo()
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-xdata unsigned char i;
+__xdata unsigned char i;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-bit bvar;
+__bit bvar;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-data __at
+__data __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
@@ -12638,7 +12641,7 @@ Starting from a small snippet of c-code this example shows for the MCS51
 
 \family typewriter 
 \size footnotesize 
-unsigned char far
+unsigned char __far
 \begin_inset LatexCommand \index{far (storage class)}
 
 \end_inset 
@@ -12700,6 +12703,7 @@ collapsed false
 
 
 \series bold 
+\SpecialChar ~
 !
 \end_inset 
 
@@ -12936,7 +12940,7 @@ The new file buffer.c should compile with only one warning about the unreference
 
 \family typewriter 
 \size footnotesize 
-unsigned char far __at(0x7f00) buf[0x100];
+unsigned char __far __at(0x7f00) buf[0x100];
 \newline 
 unsigned char head, tail;
 \newline 
@@ -20937,9 +20941,9 @@ use an on-target monitor.
  In this context a monitor is a small program which usually accepts commands
  via a serial line and allows to set program counter, to single step through
  a program and read/write memory locations.
- For the 8051 a good example of a monitor with a very liberal licence is
- paulmon (
-\begin_inset LatexCommand \url{http://www.pjrc.com/tech/8051/paulmon2.html}
+ For the 8051 good examples of monitors are paulmon and cmon51 (see section
+ 
+\begin_inset LatexCommand \ref{sec:Related-open-source-tools}
 
 \end_inset 
 
@@ -22611,7 +22615,10 @@ last
 \emph on 
 not
 \emph default 
- the same as endianness).check whether the keyword 
+ the same as endianness).
+\layout Itemize
+
+check whether the keyword 
 \emph on 
 volatile
 \emph default 
@@ -22652,8 +22659,12 @@ check whether timing loops result in proper timing (or preferably consider
  a rewrite of the code with timer based delays instead).
 \layout Itemize
 
-check for differences in printf parameters (some compilers push (va_arg)
- char variables as integers others as char).
+check for differences in printf parameters (some compilers push (va_arg
+\begin_inset LatexCommand \index{va\_arg}
+
+\end_inset 
+
+) char variables as integers others as char).
 \layout Itemize
 
 check the resulting memory layout.
@@ -23342,6 +23353,11 @@ f
 \layout Section
 
 Related open source tools
+\begin_inset LatexCommand \label{sec:Related-open-source-tools}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Related tools}
 
 \end_inset 
@@ -23351,7 +23367,7 @@ Related open source tools
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="13" columns="3">
+<lyxtabular version="3" rows="14" columns="3">
 <features>
 <column alignment="left" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
@@ -23626,6 +23642,37 @@ Part of binutils (should be there anyway)
 
 \layout Standard
 
+cmon51
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8051 monitor (hex up-/download, single step, disassemble)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://sourceforge.net/projects/cmon51}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
 doxygen
 \begin_inset LatexCommand \index{doxygen (source documentation tool)}
 
@@ -23814,11 +23861,11 @@ Related documentation / recommended reading
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="6" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -23914,6 +23961,88 @@ C-FAQ-list
 
 
 \begin_inset LatexCommand \url{http://www.eskimo.com/~scs/C-faq/top.html}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ISO/IEC 9899:TC2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset Quotes sld
+\end_inset 
+
+C-Standard
+\begin_inset Quotes srd
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\size footnotesize 
+
+\begin_inset LatexCommand \url{http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ISO/IEC DTR 18037
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset Quotes sld
+\end_inset 
+
+Extensions for Embedded C
+\begin_inset Quotes srd
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\size footnotesize 
+
+\begin_inset LatexCommand \url{http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1021.pdf}
 
 \end_inset 
 
@@ -27598,6 +27727,20 @@ ANSI-Compliance
 
 \end_inset 
 
+
+\layout Standard
+
+The latest publically available version of the standard 
+\emph on 
+ISO/IEC 9899 - Programming languages - C
+\emph default 
+ should be available at: 
+\begin_inset LatexCommand \url{http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899}
+
+\end_inset 
+
+.
+\newline 
 
 \layout Standard
 

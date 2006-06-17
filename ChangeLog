@@ -1,3 +1,9 @@
+2006-06-17 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/Makefile.in: two runs of makeindex seem needed to get
+	correct page references in the index of sdccman.pdf 
+	* doc/sdccman.lyx: mentioned cmon51, added links, small changes
+
 2006-06-17 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/device/lib/Makefile.in: corrected PORTINCDIR path

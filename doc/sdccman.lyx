@@ -7,8 +7,8 @@
   pdftitle={SDCC Compiler User Guide},
   pdfauthor={SDCC development team},
   pdfsubject={installation, user manual},
-  pdfkeywords={8032 8051 ansi c compiler CPU DS390
-               embedded GPL HC08 manual mcs51 microcontroller PIC Z80},
+  pdfkeywords={68hc08 8032 8051 ansi c compiler CPU DS390                 embedded free Freescale GPL HC08 Intel manual Maxim mcs51 Microchip microcontroller open source PIC Z80 Zilog},
+  pdfpagemode=UseOutlines,
   colorlinks=true,
   linkcolor=blue] {hyperref}
 %
@@ -479,7 +479,7 @@ float
 
 \layout Standard
 
-4 bytes IEEE
+4 bytes IEEE 754
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -683,7 +683,12 @@ typewriter font.
 italic.
 \layout Section
 
-Compatibility with previous versions
+Compatibility
+\begin_inset LatexCommand \label{sec:Compatibility-with-previous}
+
+\end_inset 
+
+ with previous versions
 \begin_inset LatexCommand \index{Compatibility with previous versions}
 
 \end_inset 
@@ -821,6 +826,17 @@ bit b;
 \SpecialChar ~
 \SpecialChar ~
 b = ~b; /* equivalent to b=1 instead of toggling b */
+\begin_inset Marginal
+collapsed true
+
+\layout Standard
+
+
+\series bold 
+!
+\end_inset 
+
+
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -2146,10 +2162,10 @@ Install paths
 \begin_inset  Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3893,7 +3909,7 @@ sdcc-x.y.z-setup.exe
 
  or a setup program for one of the snapshots 
 \emph on 
-sdcc_yyyymmdd_setup.exe
+sdcc-yyyymmdd-xxxx-setup.exe
 \emph default 
  from 
 \begin_inset LatexCommand \url{http://sdcc.sf.net/snap.php}
@@ -4223,8 +4239,16 @@ status Collapsed
 
 \family default 
 \series default 
- at the prompt, and the program should run and tell you the version.
- If it doesn't run, or gives a message about not finding sdcc program, then
+ at the prompt, and the program should run and output its version like:
+ 
+\newline 
+
+\family typewriter 
+SDCC : mcs51/z80/avr/ds390/pic16/pic14/ds400/hc08 2.5.6 #4169 (May 8 2006)
+ (UNIX)
+\layout Standard
+
+If it doesn't run, or gives a message about not finding sdcc program, then
  you need to check over your installation.
  Make sure that the sdcc bin directory is in your executable search path
  defined by the PATH environment setting (
@@ -4956,7 +4980,12 @@ sourcefile.
 
 \end_inset 
 
- file containing debug information (generated with option -
+ 
+\begin_inset LatexCommand \label{OMF file}
+
+\end_inset 
+
+file containing debug information (generated with option -
 \begin_inset ERT
 status Collapsed
 
@@ -9158,6 +9187,14 @@ data
 \emph on 
 near
 \emph default 
+ or the more ANSI-C compliant forms 
+\emph on 
+__data
+\emph default 
+ and 
+\emph on 
+__near
+\emph default 
  can be used synonymously).
  Variables declared with this storage class will be allocated in the directly
  addressable portion of the internal RAM of a 8051, e.g.:
@@ -9165,7 +9202,7 @@ near
 
 
 \family typewriter 
-data unsigned char test_data;
+__data unsigned char test_data;
 \layout Standard
 
 Writing 0x01 to this variable generates the assembly code:
@@ -9178,7 +9215,7 @@ Writing 0x01 to this variable generates the assembly code:
 \SpecialChar ~
 mov\SpecialChar ~
 \SpecialChar ~
-_test_data,#0x01 
+_test_data,#0x01
 \layout Subsubsection
 
 xdata
@@ -9215,7 +9252,7 @@ default
 
 
 \family typewriter 
-xdata unsigned char test_xdata;
+__xdata unsigned char test_xdata;
 \layout Standard
 
 Writing 0x01 to this variable generates the assembly code:
@@ -9273,7 +9310,7 @@ Variables declared with this storage class will be allocated into the indirectly
 
 
 \family typewriter 
-idata unsigned char test_idata;
+__idata unsigned char test_idata;
 \layout Standard
 
 Writing 0x01 to this variable generates the assembly code:
@@ -9357,7 +9394,7 @@ default
 
 
 \family typewriter 
-pdata unsigned char test_pdata;
+__pdata unsigned char test_pdata;
 \layout Standard
 
 Writing 0x01 to this variable generates the assembly code:
@@ -9431,7 +9468,7 @@ code
 
 
 \family typewriter 
-code unsigned char test_code;
+__code unsigned char test_code;
 \layout Standard
 
 Read access to this variable generates the assembly code:
@@ -9476,7 +9513,7 @@ char
 
 
 \family typewriter 
-code char test_array[] = {'c','h','e','a','p'}; 
+__code char test_array[] = {'c','h','e','a','p'}; 
 \layout Standard
 
 Read access to this array using an 8-bit unsigned index generates the assembly
@@ -9648,7 +9685,7 @@ bit
 
 
 \family typewriter 
-sfr at
+__sfr __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
@@ -9658,7 +9695,7 @@ sfr at
 
 \end_inset 
 
- 0x80 P0;\SpecialChar ~
+ (0x80) P0;\SpecialChar ~
  /* special function register P0 at location 0x80 */
 \newline 
 /* 16 bit special function register combination for timer 0 */
@@ -9666,7 +9703,7 @@ sfr at
 /* with the high byte at location 0x8C and the low byte at location 0x8A
  */
 \newline 
-sfr16 at
+__sfr16 __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
@@ -9676,9 +9713,9 @@ sfr16 at
 
 \end_inset 
 
- 0x8C8A TMR0;
+ (0x8C8A) TMR0;
 \newline 
-sbit at 0xd7 CY; /* CY (Carry Flag
+__sbit __at (0xd7) CY; /* CY (Carry Flag
 \begin_inset LatexCommand \index{Flags}
 
 \end_inset 
@@ -9740,40 +9777,40 @@ Pointer declaration examples:
 /* pointer physically in internal ram pointing to object in external ram
  */ 
 \newline 
-xdata unsigned char * data p;
+__xdata unsigned char * __data p;
 \newline 
 
 \newline 
 /* pointer physically in external ram pointing to object in internal ram
  */ 
 \newline 
-data unsigned char * xdata p;
+__data unsigned char * __xdata p;
 \newline 
 
 \newline 
 /* pointer physically in code rom pointing to data in xdata space */ 
 \newline 
-xdata unsigned char * code p;
+__xdata unsigned char * __code p;
 \newline 
 
 \newline 
 /* pointer physically in code space pointing to data in code space */ 
 \newline 
-code unsigned char * code p;
+__code unsigned char * __code p;
 \newline 
 
 \newline 
 /* the following is a generic pointer physically located in xdata space
  */
 \newline 
-char * xdata p;
+char * __xdata p;
 \newline 
 
 \newline 
 /* the following is a function pointer physically located in data space
  */
 \newline 
-char (* data fp)(void);
+char (* __data fp)(void);
 \layout Standard
 
 Well you get the idea.
@@ -10008,6 +10045,8 @@ idata
 \emph default 
 ).
  
+\newline 
+
 \layout Standard
 
 By default the 8051 linker will place the stack after the last byte of (i)data
@@ -10406,7 +10445,15 @@ xdata
 
 \end_inset 
 
- 0x7ffe unsigned int chksum;
+ (0x7ffe) unsigned int chksum;
+\layout Standard
+
+or
+\layout Verse
+
+
+\family typewriter 
+__xdata __at (0x7ffe) unsigned int chksum;
 \layout Standard
 
 In the above example the variable chksum will be located at 0x7ffe and 0x7fff
@@ -10415,8 +10462,18 @@ In the above example the variable chksum will be located at 0x7ffe and 0x7fff
 \emph on 
 not
 \emph default 
- reserve any space for variables declared in this way (they are implemented
- with an equate in the assembler).
+ reserve any space for variables declared in this way
+\begin_inset Marginal
+collapsed true
+
+\layout Standard
+
+
+\series bold 
+!
+\end_inset 
+
+ (they are implemented with an equate in the assembler).
  Thus it is left to the programmer to make sure there are no overlaps with
  other variables that are declared without the absolute address.
  The assembler listing file (.lst
@@ -10438,6 +10495,17 @@ not
  Variables with an absolute address are 
 \emph on 
 not
+\begin_inset Marginal
+collapsed true
+
+\layout Standard
+
+
+\series bold 
+!
+\end_inset 
+
+
 \emph default 
  initialized
 \begin_inset LatexCommand \index{Variable initialization}
@@ -10461,17 +10529,17 @@ volatile
 
 \end_inset 
 
- xdata
+ __xdata
 \begin_inset LatexCommand \index{xdata (mcs51, ds390 storage class)}
 
 \end_inset 
 
- at
+ __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
 
- 0x8000 unsigned char PORTA_8255;
+ (0x8000) unsigned char PORTA_8255;
 \layout Standard
 
 For some architectures (mcs51) array accesses are more efficient if an (xdata/fa
@@ -10509,12 +10577,12 @@ bit
 
 \end_inset 
 
- at
+ __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
 
- 0x02 bvar;
+ (0x02) bvar;
 \layout Standard
 
 The above example will allocate the variable at offset 0x02 in the bit-addressab
@@ -10682,7 +10750,7 @@ Then, someplace in the code for the first hardware you would use
 
 
 \family typewriter 
-bit at
+bit __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
@@ -10692,19 +10760,19 @@ bit at
 
 \end_inset 
 
- 0x80 MOSI;\SpecialChar ~
+ (0x80) MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 0 */
 \newline 
-bit at 0x81 MISO;\SpecialChar ~
+bit __at (0x81) MISO;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 1 */
 \newline 
-bit at 0x82 MCLK;\SpecialChar ~
+bit __at (0x82) MCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -10716,13 +10784,13 @@ Similarly, for the second hardware you would use
 
 
 \family typewriter 
-bit at 0x83 MOSI;\SpecialChar ~
+bit __at (0x83) MOSI;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 /* I/O port 0, bit 3 */
 \newline 
-bit at 0x91 MISO;\SpecialChar ~
+bit __at (0x91) MISO;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -10733,7 +10801,7 @@ bit
 
 \end_inset 
 
- at 0x92 MCLK;\SpecialChar ~
+ __at (0x92) MCLK;\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -10840,7 +10908,7 @@ reentrant
 
 
 \family typewriter 
-unsigned char foo(char i) reentrant 
+unsigned char foo(char i) __reentrant 
 \newline 
 { 
 \newline 
@@ -10922,12 +10990,12 @@ bit bvar;
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-data at
+data __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
 
- 0x31 unsigned char j;
+ (0x31) unsigned char j;
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -11041,8 +11109,18 @@ no other function calls and the function is non-reentrant and the memory
 
 Note that the compiler (not the linkage editor) makes the decision for overlayin
 g the data items.
- Functions that are called from an interrupt service routine should be preceded
- by a #pragma\SpecialChar ~
+ Functions that are called from an interrupt service routine
+\begin_inset Marginal
+collapsed true
+
+\layout Standard
+
+
+\series bold 
+!
+\end_inset 
+
+ should be preceded by a #pragma\SpecialChar ~
 nooverlay
 \begin_inset LatexCommand \index{\#pragma nooverlay}
 
@@ -11101,12 +11179,12 @@ P3 = errcd;
 \newline 
 
 \newline 
-void some_isr () interrupt
+void some_isr () __interrupt
 \begin_inset LatexCommand \index{interrupt}
 
 \end_inset 
 
- 2
+ (2)
 \newline 
 {
 \newline 
@@ -11177,7 +11255,7 @@ outines to be coded in C, with some extended keywords.
 
 
 \family typewriter 
-void timer_isr (void) interrupt 1 using 1 
+void timer_isr (void) __interrupt (1) __using (1) 
 \newline 
 { 
 \newline 
@@ -11420,6 +11498,14 @@ status Collapsed
 \end_inset 
 
  compiler option.
+ Note, the type promotion
+\begin_inset LatexCommand \index{type promotion}
+
+\end_inset 
+
+ required by ANSI C can cause 16 bit routines to be used without the programmer
+ being aware of it.
+ 
 \layout Standard
 
 Calling other functions from an interrupt service routine is not recommended,
@@ -11472,11 +11558,11 @@ Interrupt numbers and the corresponding address & descriptions for the Standard
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="7" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features>
 <column alignment="center" valignment="top" leftline="true" width="0in">
-<column alignment="center" valignment="top" leftline="true" width="0in">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" width="0in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -11551,7 +11637,7 @@ Timer 0
 
 \layout Standard
 
-0x000B
+0x000b
 \end_inset 
 </cell>
 </row>
@@ -11603,7 +11689,7 @@ Timer 1
 
 \layout Standard
 
-0x001B
+0x001b
 \end_inset 
 </cell>
 </row>
@@ -11633,8 +11719,8 @@ Serial
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<row topline="true">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
@@ -11655,7 +11741,57 @@ Timer 2 (8052)
 
 \layout Standard
 
-0x002B
+0x002b
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+...
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+...
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+n
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0x0003 + 8*n
 \end_inset 
 </cell>
 </row>
@@ -11796,7 +11932,7 @@ critical
 
 
 \family typewriter 
-int foo () critical
+int foo () __critical
 \begin_inset LatexCommand \index{critical}
 
 \end_inset 
@@ -11842,7 +11978,7 @@ critical
 
 
 \family typewriter 
-critical{ i++; }
+__critical{ i++; }
 \layout Standard
 
 More than one statement could have been included in the block.
@@ -12512,7 +12648,7 @@ unsigned char far
 
 \end_inset 
 
- at
+ __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
@@ -12522,14 +12658,14 @@ unsigned char far
 
 \end_inset 
 
- 0x7f00 buf[0x100];
+(0x7f00) buf[0x100];
 \begin_inset LatexCommand \index{Aligned array}
 
 \end_inset 
 
 
 \newline 
-unsigned char head,tail;
+unsigned char head, tail;
 \newline 
 
 \newline 
@@ -12541,7 +12677,33 @@ void to_buffer( unsigned char c )
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-if( head != tail-1 ) 
+if( head != (unsigned char)(tail-1) )\SpecialChar ~
+/* cast 
+\series bold 
+needed
+\series default 
+ to avoid promotion
+\begin_inset LatexCommand \index{promotion to signed int}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{type promotion}
+
+\end_inset 
+
+ to integer */
+\begin_inset Marginal
+collapsed false
+
+\layout Standard
+
+
+\series bold 
+!
+\end_inset 
+
+
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -12552,6 +12714,18 @@ if( head != tail-1 )
 \SpecialChar ~
 \SpecialChar ~
 buf[ head++ ] = c;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
@@ -12625,7 +12799,7 @@ mov\SpecialChar ~
 \SpecialChar ~
 r2,dpl 
 \newline 
-;buffer.c if( head != tail-1 ) 
+;buffer.c if( head != (unsigned char)(tail-1) ) 
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -12762,9 +12936,9 @@ The new file buffer.c should compile with only one warning about the unreference
 
 \family typewriter 
 \size footnotesize 
-unsigned char far at 0x7f00 buf[0x100];
+unsigned char far __at(0x7f00) buf[0x100];
 \newline 
-unsigned char head,tail;
+unsigned char head, tail;
 \newline 
 #define USE_ASSEMBLY (1)
 \newline 
@@ -12782,7 +12956,7 @@ void to_buffer( unsigned char c )
 \SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
-if( head != tail-1 )
+if( head != (unsigned char)(tail-1) )
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -12850,7 +13024,7 @@ _asm
 ; If we were still using r2,r3 we would have to push them here.
  
 \newline 
-; if( head != tail-1 )
+; if( head != (unsigned char)(tail-1) )
 \newline 
 \SpecialChar ~
 \SpecialChar ~
@@ -13193,7 +13367,7 @@ volatile
 \newline 
 
 \newline 
-void simpleInterrupt(void) interrupt
+void simpleInterrupt(void) __interrupt
 \begin_inset LatexCommand \index{interrupt}
 
 \end_inset 
@@ -13203,7 +13377,7 @@ void simpleInterrupt(void) interrupt
 
 \end_inset 
 
- 1
+ (1)
 \newline 
 {
 \newline 
@@ -13217,7 +13391,7 @@ counter++;
 \newline 
 
 \newline 
-void nakedInterrupt(void) interrupt 2 _naked
+void nakedInterrupt(void) __interrupt (2) __naked
 \newline 
 {
 \newline 
@@ -13286,6 +13460,16 @@ For an 8051 target, the generated simpleInterrupt looks like:
 
 
 \family typewriter 
+Note, this is an 
+\series bold 
+outdated
+\series default 
+ example, recent versions of SDCC generate
+\newline 
+the same code for simpleInterrupt() and nakedInterrupt()!
+\newline 
+
+\newline 
 _simpleInterrupt:
 \newline 
 \SpecialChar ~
@@ -14160,8 +14344,8 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -14454,8 +14638,8 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.The
 \begin_inset  Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15084,7 +15268,12 @@ collapsed false
 
 \layout Standard
 
-The floating point routines for the mcs51 are implemented in assembler
+These floating point routines (
+\emph on 
+not
+\emph default 
+ sinf(), cosf(), ...) for the mcs51 are implemented in assembler.
+ 
 \end_inset 
 
 .
@@ -15147,6 +15336,19 @@ putchar()
  routines.
  SDCC does not know whether the system connects to a serial line with or
  without handshake, LCD, keyboard or other device.
+ And whether a 
+\family typewriter 
+lf
+\family default 
+ to 
+\family typewriter 
+crlf
+\family default 
+ conversion within 
+\family typewriter 
+putchar()
+\family default 
+ is intended.
  You'll find examples for serial routines f.e.
  in sdcc/device/lib.
 \layout Standard
@@ -15187,7 +15389,7 @@ DUSE_FLOATS=1
  on the command line.
  Use
 \emph on 
--
+ -
 \begin_inset ERT
 status Collapsed
 
@@ -15234,7 +15436,7 @@ printf_tiny()
 
 
 \family default 
- and 
+ (subset of printf using less than 270 bytes) and 
 \family typewriter 
 printf_fast()
 \begin_inset LatexCommand \index{printf\_fast() (mcs51)}
@@ -15252,15 +15454,22 @@ and
 
 
 \family default 
- which should fit the requirements of many embedded systems (printf_fast()
- can be customized by unsetting #defines to 
+ (floating-point aware version of printf_fast) which should fit the requirements
+ of many embedded systems (printf_fast() can be customized by unsetting
+ #defines to 
 \emph on 
 not
 \emph default 
  support long variables and field widths).
 \layout Subsection
 
-Math functions (sin, pow, sqrt etc.)
+Math functions (sinf, powf, sqrtf etc.)
+\layout Subsubsection
+
+<math.h>
+\layout Standard
+
+See definitions in file <math.h>.
 \layout Subsection
 
 Other libraries
@@ -15902,6 +16111,17 @@ codeseg <name>
 
 - Use this name (max.
  8 characters) for the code segment.
+ See option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-codeseg.
 \layout Itemize
 
 constseg <name>
@@ -15911,6 +16131,17 @@ constseg <name>
 
 - Use this name (max.
  8 characters) for the const segment.
+ See option -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-constseg.
 \layout Standard
 
 SDCPP supports the following #pragma directives:
@@ -16025,8 +16256,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -16068,8 +16299,8 @@ SDCC
 
 \layout Standard
 
-this Symbol is always defined.
- Since version 2.5.6 it's this version number as an int (ex.
+Always defined.
+ Since version 2.5.6 the version number as an int (ex.
  256)
 \end_inset 
 </cell>
@@ -20592,6 +20823,262 @@ status Collapsed
  Other ways to reduce stack usage may exist.
 \layout Chapter
 
+Debugging
+\layout Standard
+
+There are several approaches to debugging your code.
+ This chapter is meant to show your options and to give detail on some of
+ them:
+\newline 
+
+\newline 
+When writing your code:
+\layout Itemize
+
+write your code with debugging in mind (avoid duplicating code, put conceptually
+ similar variables into structs, use structured code, have strategic points
+ within your code where all variables are consistent, ...)
+\layout Itemize
+
+run a syntax-checking tool like splint
+\begin_inset LatexCommand \index{splint (syntax checking tool)}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \index{lint (syntax checking tool)}
+
+\end_inset 
+
+ (see -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-more-pedantic 
+\begin_inset LatexCommand \ref{lyx:more-pedantic-SPLINT}
+
+\end_inset 
+
+) over the code.
+\layout Itemize
+
+for the high level code use a C-compiler (like f.e.
+ GCC) to compile run and debug the code on your host.
+ See (see -
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-more-pedantic 
+\begin_inset LatexCommand \ref{lyx:more-pedantic-SPLINT}
+
+\end_inset 
+
+ ) on howto handle syntax extensions like __xdata, __at(), ...
+ 
+\layout Itemize
+
+use another C-compiler to compile code for your target.
+ Always an option but not recommended:) And not very likely to help you.
+ If you seriously consider walking this path you should at least occasionally
+ check portability of your code.
+ Most commercial compiler vendors will offer an evaluation version so you
+ can test compile your code or snippets of your code.
+\layout Standard
+
+Debugging on a simulator:
+\layout Itemize
+
+there is a separate section about SDCDB (section 
+\begin_inset LatexCommand \ref{cha:Debugging-with-SDCDB}
+
+\end_inset 
+
+) below.
+\layout Itemize
+
+or (8051 specific) use a freeware/commercial simulator which interfaces
+ to the AOMF
+\begin_inset LatexCommand \index{AOMF, AOMF51}
+
+\end_inset 
+
+ file (see 
+\begin_inset LatexCommand \ref{OMF file}
+
+\end_inset 
+
+) optionally generated by SDCC.
+\layout Standard
+
+Debugging On-target: 
+\layout Itemize
+
+use a MCU port pin to serially output debug data to the RS232 port of your
+ host.
+ You'll probably want some level shifting device typically involving a MAX232
+ or similar IC.
+ If the hardware serial port of the MCU is not available search for 'Software
+ UART' in your favourite search machine.
+\layout Itemize
+
+use an on-target monitor.
+ In this context a monitor is a small program which usually accepts commands
+ via a serial line and allows to set program counter, to single step through
+ a program and read/write memory locations.
+ For the 8051 a good example of a monitor with a very liberal licence is
+ paulmon (
+\begin_inset LatexCommand \url{http://www.pjrc.com/tech/8051/paulmon2.html}
+
+\end_inset 
+
+).
+\layout Itemize
+
+toggle MCU port pins at strategic points within your code and use an oscilloscop
+e.
+ A 
+\emph on 
+digital oscilloscope
+\emph default 
+
+\begin_inset LatexCommand \index{oscilloscope}
+
+\end_inset 
+
+ with deep trace memory is really helpful especially if you have to debug
+ a realtime application.
+ If you need to monitor more pins than your oscilloscope provides you can
+ sometimes get away with a small R-2R network.
+ On a single channel oscilloscope you could f.e.
+ monitor 2 push-pull driven pins by connecting one via a 10\SpecialChar ~
+k
+\begin_inset Formula $\Omega$
+\end_inset 
+
+ resistor and the other one by a 5\SpecialChar ~
+k
+\begin_inset Formula $\Omega$
+\end_inset 
+
+ resistor to the oscilloscope probe (check output drive capability of the
+ pins you want to monitor).
+ If you need to monitor many more pins a 
+\emph on 
+logic analyzer
+\emph default 
+ will be handy.
+\layout Itemize
+
+use an ICE (
+\emph on 
+i
+\emph default 
+n 
+\emph on 
+c
+\emph default 
+ircuit 
+\emph on 
+e
+\emph default 
+mulator
+\begin_inset LatexCommand \index{ICE (in circuit emulator)}
+
+\end_inset 
+
+).
+ Usually very expensive.
+ And very nice to have too.
+ And usually locks you (for years...) to the devices the ICE can emulate.
+ 
+\layout Itemize
+
+use a remote debugger.
+ In most 8-bit systems the symbol information is not available on the target,
+ and a complete debugger is too bulky for the target system.
+ Therefore usually a debugger on the host system connects to an on-target
+ debugging stub which accepts only primitive commands.
+ 
+\newline 
+Terms to enter into your favourite search engine could be 'remote debugging',
+ 'gdb stub' or 'inferior debugger'.
+ (is there one?)
+\layout Itemize
+
+use an on target hardware debugger.
+ Some of the more modern MCUs include hardware support for setting break
+ points and monitoring/changing variables by using dedicated hardware pins.
+ This facility doesn't require additional code to run on the target and
+ 
+\emph on 
+usually
+\emph default 
+ doesn't affect runtime behaviour until a breakpoint is hit.
+ For the mcs51 most hardware debuggers use the AOMF
+\begin_inset LatexCommand \index{AOMF, AOMF51}
+
+\end_inset 
+
+ file (see 
+\begin_inset LatexCommand \ref{OMF file}
+
+\end_inset 
+
+) as input file.
+ 
+\layout Standard
+
+Last not least:
+\layout Itemize
+
+if you are not familiar with any of the following terms you're likely to
+ run into problems rather sooner than later: 
+\emph on 
+volatile
+\emph default 
+, 
+\emph on 
+atomic
+\emph default 
+, 
+\emph on 
+memory map
+\emph default 
+, 
+\emph on 
+overlay
+\emph default 
+.
+ As an embedded programmer you 
+\emph on 
+have
+\emph default 
+ to know them so why not look them up 
+\emph on 
+before
+\emph default 
+ you have problems?)
+\layout Itemize
+
+tell someone else about your problem (actually this is a surprisingly effective
+ means to hunt down the bug even if the listener is not familiar with your
+ environment).
+ As 'failure to communicate' is probably one of the job-induced deformations
+ of an embedded programmer this is highly encouraged.
+\layout Section
+
 Debugging with SDCDB
 \begin_inset LatexCommand \label{cha:Debugging-with-SDCDB}
 
@@ -20624,7 +21111,7 @@ on, which also builds and installs the debugger in the target directory
  The debugger allows you debug BOTH at the C source and at the ASM source
  level.
  Sdcdb is currently not available on Win32 platforms.
-\layout Section
+\layout Subsection
 
 Compiling for Debugging
 \layout Standard
@@ -20646,7 +21133,7 @@ status Collapsed
 
  option must be specified for all files for which debug information is to
  be generated.
- The complier generates a .adb file for each of these files.
+ The compiler generates a .adb file for each of these files.
  The linker creates the .cdb
 \begin_inset LatexCommand \index{<file>.cdb}
 
@@ -20659,7 +21146,7 @@ status Collapsed
 
  files and the address information.
  This .cdb is used by the debugger.
-\layout Section
+\layout Subsection
 
 How the Debugger Works
 \layout Standard
@@ -20677,7 +21164,7 @@ status Collapsed
 -debug option is specified the compiler generates extra symbol information
  some of which are put into the assembler source and some are put into the
  .adb file.
-  Then the linker creates the .cdb file from the individual .adb files with
+ Then the linker creates the .cdb file from the individual .adb files with
  the address information for the symbols.
  The debugger reads the symbolic information generated by the compiler &
  the address information generated by the linker.
@@ -20685,9 +21172,19 @@ status Collapsed
  execution is controlled by the debugger.
  When a command is issued for the debugger, it translates it into appropriate
  commands for the simulator.
-\layout Section
+ (Currently sdcdb only connects to the simulator but 
+\emph on 
+newcdb
+\emph default 
+ at 
+\begin_inset LatexCommand \url{http://ec2drv.sf.net/}
 
-Starting the Debugger
+\end_inset 
+
+ is an effort to connect directly to the hardware.) 
+\layout Subsection
+
+Starting the Debugger SDCDB
 \layout Standard
 
 The debugger can be started using the following command line.
@@ -20720,9 +21217,9 @@ foo.ihx - the Intel hex format
 \end_inset 
 
  object file.
-\layout Section
+\layout Subsection
 
-Command Line Options
+SDCDB Command Line Options
 \layout Itemize
 
 -
@@ -20787,9 +21284,9 @@ status Collapsed
 \layout Itemize
 
 -k <port number> passed to simulator see the simulator docs for details.
-\layout Section
+\layout Subsection
 
-Debugger Commands
+SDCDB Debugger Commands
 \layout Standard
 
 As mentioned earlier the command interface for the debugger has been deliberatel
@@ -20938,9 +21435,9 @@ quit
 "Watch me now.
  Iam going Down.
  My name is Bobby Brown"
-\layout Section
+\layout Subsection
 
-Interfacing with DDD
+Interfacing SDCDB with DDD
 \layout Comment
 
 The screenshot was converted from png to eps with: 
@@ -21023,9 +21520,9 @@ and DDD was invoked with
 
 \newline 
 ddd -debugger 'sdcdb -cpu 8032 ddd_example'
-\layout Section
+\layout Subsection
 
-Interfacing with XEmacs
+Interfacing SDCDB with XEmacs
 \begin_inset LatexCommand \index{XEmacs}
 
 \end_inset 
@@ -21883,9 +22380,19 @@ Use the smallest data type to represent your data-value.
  If it is known in advance that the value is going to be less than 256 then
  use an 'unsigned char' instead of a 'short' or 'int'.
  Please note, that ANSI C requires both signed and unsigned chars to be
- promoted to 'signed int' before doing any operation.
+ promoted to 'signed int'
+\begin_inset LatexCommand \index{promotion to signed int}
+
+\end_inset 
+
+ before doing any operation.
  This promotion
 \begin_inset LatexCommand \index{type promotion}
+
+\end_inset 
+
+
+\begin_inset LatexCommand \label{type promotion}
 
 \end_inset 
 
@@ -22067,6 +22574,91 @@ feeling
  for the code generation.
 \layout Section
 
+Porting code from or to other compilers
+\layout Itemize
+
+check whether endianness of the compilers differs and adapt where needed.
+\layout Itemize
+
+check the device specific header files for compiler specific syntax.
+ Eventually include the file <compiler.h
+\begin_inset LatexCommand \index{compiler.h (include file)}
+
+\end_inset 
+
+> to allow using common header files.
+\layout Itemize
+
+check whether the startup code contains the correct initialization (watchdog,
+ peripherals).
+\layout Itemize
+
+check whether the sizes of short, int, long match.
+\layout Itemize
+
+check if some 16 or 32 bit hardware registers require a specific addressing
+ order (least significant or most significant byte first) and adapt if needed
+ (
+\emph on 
+first
+\emph default 
+ and 
+\emph on 
+last
+\emph default 
+ relate to time and not to lower/upper memory location here, so this is
+ 
+\emph on 
+not
+\emph default 
+ the same as endianness).check whether the keyword 
+\emph on 
+volatile
+\emph default 
+ is used where needed.
+ The compilers might differ in their optimization characteristics (as different
+ versions of the same compiler might also use more clever optimizations
+ this is good idea anyway).
+\layout Itemize
+
+check that the compilers are not told to supress warnings.
+\layout Itemize
+
+check and convert compiler specific extensions (interrupts, memory areas,
+ pragmas etc.).
+\layout Itemize
+
+check for differences in type promotion (especially check for math operations
+ on char variables and for the use of the ~\SpecialChar ~
+operator on bit variables.
+ See 
+\begin_inset LatexCommand \ref{type promotion}
+
+\end_inset 
+
+ and 
+\begin_inset LatexCommand \ref{sec:Compatibility-with-previous}
+
+\end_inset 
+
+).
+\layout Itemize
+
+check the assembly code generated for interrupt routines (f.e.
+ for calls to possibly non-reentrant library functions).
+\layout Itemize
+
+check whether timing loops result in proper timing (or preferably consider
+ a rewrite of the code with timer based delays instead).
+\layout Itemize
+
+check for differences in printf parameters (some compilers push (va_arg)
+ char variables as integers others as char).
+\layout Itemize
+
+check the resulting memory layout.
+\layout Section
+
 Tools
 \begin_inset LatexCommand \index{Tools}
 
@@ -22079,8 +22671,8 @@ Tools
 \begin_inset  Tabular
 <lyxtabular version="3" rows="12" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -22759,9 +23351,9 @@ Related open source tools
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="11" columns="3">
+<lyxtabular version="3" rows="13" columns="3">
 <features>
-<column alignment="center" valignment="top" leftline="true" width="0pt">
+<column alignment="left" valignment="top" leftline="true" width="0pt">
 <column alignment="block" valignment="top" leftline="true" width="30line%">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
@@ -22886,6 +23478,38 @@ PIC programmer
 
 
 \begin_inset LatexCommand \url{http://freshmeat.net/projects/flp5/}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+ec2drv/newcdb
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Tools for Silicon Laboratories JTAG debug adapter, partly based on sdcdb
+ (Unix only)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://sourceforge.net/projects/ec2drv}
 
 \end_inset 
 
@@ -23056,6 +23680,37 @@ IDE (has anyone tried integrating SDCC & sdcdb? Unix only)
 
 
 \begin_inset LatexCommand \url{http://www.kdevelop.org}
+
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+paulmon
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8051 monitor (hex up-/download, single step, disassemble)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.pjrc.com/tech/8051/paulmon2.html}
 
 \end_inset 
 
@@ -23686,15 +24341,43 @@ You can follow the status of the Subversion version
 \end_inset 
 
  in the Subversion repository
-\newline 
-
 \size footnotesize 
-
+ 
 \begin_inset LatexCommand \htmlurl{http://svn.sourceforge.net/viewcvs.cgi/*checkout*/sdcc/trunk/sdcc/ChangeLog}
 
 \end_inset 
 
 .
+\layout Section
+
+Subversion Source Code Repository
+\layout Standard
+
+The output of 
+\family sans 
+\series bold 
+sdcc --version
+\family default 
+\series default 
+ or the filenames of the snapshot versions of SDCC include date and its
+ Subversion
+\begin_inset LatexCommand \index{Subversion}
+
+\end_inset 
+
+ number.
+ Subversion allows to download the source of recent or previous versions
+ 
+\begin_inset LatexCommand \url{http://sourceforge.net/svn/?group_id=599}
+
+\end_inset 
+
+ (by number or by date).
+ An on-line source code browser and detailled instructions are also available
+ there.
+ SDCC versions starting from 1999 up to now are available (currently the
+ versions prior to the conversion from cvs to Subversion (April 2006) are
+ either by accessible by Subversion or by cvs).
 \layout Section
 
 Release policy

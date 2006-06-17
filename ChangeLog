@@ -1,4 +1,9 @@
-2006-06-13 Maarten Brock <sourceforge.brock AT dse.nl>
+2006-06-17 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: updated, added (porting source code, debugging),
+	mentioned ec2drv and paulmon
+
+2006-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/lkarea.c (lnkarea2): clear new xdatamap, bugfix for two
 	  consecutive abs areas

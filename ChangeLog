@@ -1,3 +1,7 @@
+2006-06-17 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/device/lib/Makefile.in: corrected PORTINCDIR path
+
 2006-06-17 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: updated, added (porting source code, debugging),

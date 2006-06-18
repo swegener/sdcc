@@ -3,8 +3,12 @@
 */
 
 #include <testfwk.h>
-#include <stdint.h>
 #include <stdbool.h>
+#ifdef __sun__
+#include <inttypes.h>
+#else
+#include <stdint.h>
+#endif
 
  int8_t s8;
 uint8_t u8;

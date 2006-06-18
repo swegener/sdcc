@@ -2,8 +2,12 @@
     size: 8,16,32
     msb: 0,1
 */
-#include <stdint.h>
 #include <testfwk.h>
+#ifdef __sun__
+#include <inttypes.h>
+#else
+#include <stdint.h>
+#endif
 
 #define SIZE ({size})
 #define MSB ({msb})

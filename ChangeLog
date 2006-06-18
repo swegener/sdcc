@@ -2,6 +2,13 @@
 
 	* support/regression/tests/structflexarray.c: flexible array members
 	  not supported by gcc < 3
+	* sim/ucsim/configure, sim/ucsim/configure.in: do not compile serio
+	  GUI tool by default
+	* src/pic/gen.c: don't include [p]strdin.h on solaris
+	* support/Util/pstdint.h: addad svn attributes
+	* support/regression/tests/constantRange.c,
+	  support/regression/tests/rotate.c: include inttypes.h instead
+	  stdint.h on solaris, addad svn attributes
 
 2006-06-18 Raphael Neider <rneider AT web.de>
 

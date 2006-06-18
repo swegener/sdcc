@@ -34,10 +34,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifndef __sun__
 #if defined(_MSC_VER)
 	#include "pstdint.h"
 #else
 	#include <stdint.h>
+#endif
 #endif
 #include "SDCCglobl.h"
 #include "newalloc.h" 

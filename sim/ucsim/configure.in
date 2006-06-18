@@ -82,7 +82,7 @@ AC_ARG_ENABLE(portmon,
 if test $enable_serio != "no"; then
     enable_serio="yes"
 fi,
-enable_serio="yes")
+enable_serio="no")
 AC_SUBST(enable_ucsim)
 AC_SUBST(enable_dlso)
 AC_SUBST(enable_51)

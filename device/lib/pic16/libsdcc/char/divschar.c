@@ -33,9 +33,9 @@
 
 unsigned char _divuchar (unsigned char a, unsigned char b);
 
-char _divschar (char a, char b) _IL_REENTRANT
+int _divschar (char a, char b) _IL_REENTRANT
 {
-  register char r;
+  register unsigned char r;
   char ta, tb;
 
     if(a<0)ta = -a; else ta = a;

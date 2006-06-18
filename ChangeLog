@@ -1,3 +1,32 @@
+2006-06-18 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCsymt.c (initCSupport): change return type of divschar to
+	  int for PIC16
+	* src/pic16/genarith.c (genAddLit): sign-extend via standard routine
+	  (pic16_genMinusBits): simplified sign-extension
+	  (pic16_genUMult8XLit_8,pic16_genUMult8X8_8): renamed to
+	    pic16_genMult8XLit_n resp. pic16_genMult8X8_n, fixed and
+	    adjusted to correctly handle mixed-signed operands, disabled
+	    now unused multiplciation routines
+	* src/pic16/gen.c (pic16_pushpCodeOp): fixed to handle literals
+	  (assignResultValue): added argument denoting the size of the result
+	    as returned by the function (fixes upcasts in assigning from
+	    function calls: char foo(); int i = foo();)
+	  (genCall,genPcall,genGenPointerGet,genReceive): pass size of
+	    function result to assignResultValue
+	  (genMult): disabled inlined multiplication code
+	  (genDiv): augmented to also handle the modulus operator, fixed to
+	    handle mixed-signed operands correctly
+	  (genMod): simply call genDiv, disabled unused code
+	  (genAssign): fixed missing (sign-)extension on result
+	* src/pic16/main.c (_hasNativeMulFor): accept literals [-128..256) as
+	    valid char operands, allow signed operands for native code, added
+	    division and modulo operator handling
+	* device/lib/pic16/libsdcc/char/divschar.c: divschar returns an int
+	
+	As a consequence, onebyte.c (if split into two files) and muldiv.c
+	pass regression tests.
+
 2006-06-17 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/Makefile.in: two runs of makeindex seem needed to get

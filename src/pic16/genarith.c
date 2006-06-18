@@ -750,13 +750,11 @@ static void genAddLit (iCode *ic, int lit)
 
   operand *result;
   operand *left;
-  sym_link *lleft;
 
     FENTRY;
 
 
   left = IC_LEFT(ic);
-  lleft = operandType (left);
   result = IC_RESULT(ic);
   same = pic16_sameRegs(AOP(left), AOP(result));
   size = pic16_getDataSize(result);
@@ -771,27 +769,7 @@ static void genAddLit (iCode *ic, int lit)
 #undef MIN
 
   /* extend to result size */
-  if (IS_UNSIGNED(lleft)) {
-    /* zero-extend */
-    for (i = sizeL; i < size; i++) {
-      pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), i));
-    } // for i
-  } else {
-    /* sign-extend */
-    if (size == sizeL + 1) {
-      pic16_emitpcode (POC_CLRF, pic16_popGet (AOP(result), sizeL));
-      pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit_simple (AOP(left),sizeL-1,7));
-      pic16_emitpcode (POC_SETF, pic16_popGet (AOP(result), sizeL));
-    } else {
-      pic16_emitpcode (POC_CLRF, pic16_popCopyReg (&pic16_pc_wreg));
-      pic16_emitpcode (POC_BTFSC, pic16_newpCodeOpBit_simple (AOP(left),sizeL-1,7));
-      pic16_emitpcode (POC_SETF, pic16_popCopyReg (&pic16_pc_wreg));
-      
-      for (i=sizeL; i < size; i++) {
-        pic16_emitpcode (POC_MOVWF, pic16_popGet (AOP(result), i));
-      } // for i
-    } // if
-  } // if (SIGNED)
+  pic16_addSign(result, sizeL, !IS_UNSIGNED(operandType(left)));
 
   /* special cases */
   if (lit == 0) {
@@ -1580,7 +1558,7 @@ void pic16_genMinusBits (iCode *ic)
         pic16_emitcode("inc","a");
         pic16_emitcode("","%05d_DS_:",(lbl->key+100));
         pic16_aopPut(AOP(IC_RESULT(ic)),"a",0);
-        pic16_addSign(IC_RESULT(ic), MSB16, SPEC_USIGN(getSpec(operandType(IC_RESULT(ic)))));
+        pic16_addSign(IC_RESULT(ic), MSB16, !IS_UNSIGNED(operandType(IC_RESULT(ic))));
     }
 }
 
@@ -1883,103 +1861,127 @@ void pic16_genMinus (iCode *ic)
 
 
 /*-----------------------------------------------------------------*
- * pic_genUMult8XLit_8 - unsigned multiplication of two 8-bit numbers.
+ * pic_genMult8XLit_n - multiplication of two 8-bit numbers.
  * 
  * 
  *-----------------------------------------------------------------*/
-void pic16_genUMult8XLit_8 (operand *left,
-			     operand *right,
-			     operand *result)
+void pic16_genMult8XLit_n (operand *left,
+    operand *right,
+    operand *result)
 {
-  unsigned int lit;
+  int lit;
   int same;
   int size = AOP_SIZE(result);
   int i;
 
-    FENTRY;
-	DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
+  FENTRY;
+  DEBUGpic16_pic16_AopType(__LINE__,left,right,result);
 
-	if (AOP_TYPE(right) != AOP_LIT){
-		fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
-		exit(1);
-	}
+  if (AOP_TYPE(right) != AOP_LIT){
+    fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
+    exit(1);
+  }
 
-	lit = (unsigned int)floatFromVal(AOP(right)->aopu.aop_lit);
-	lit &= 0xff;
-	pic16_emitpcomment("Unrolled 8 X 8 multiplication");
-	pic16_emitpcomment("FIXME: the function does not support result==WREG");
+  lit = (int)floatFromVal(AOP(right)->aopu.aop_lit);
+  assert( (lit >= -128) && (lit < 256) );
+  pic16_emitpcomment("Unrolled 8 X 8 multiplication");
+  pic16_emitpcomment("FIXME: the function does not support result==WREG");
+
+  same = pic16_sameRegs(AOP(left), AOP(result));
+  if(same) {
+    switch(lit & 0x00ff) {
+      case 0:
+	while (size--) {
+	  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),size));
+	} // while
+	return;
 	
-	same = pic16_sameRegs(AOP(left), AOP(result));
-	if(same) {
-		switch(lit) {
-			case 0:
-			        while (size--) {
-				  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),size));
-			        } // while
-				return;
-			case 2:
-				// its faster to left shift
-			        for (i=1; i < size; i++) {
-			          pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
-			        } // for
-				emitCLRC;
-				pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(left),0));
-				if (size > 1)
-				  pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),1));
-				return;
+      case 2:
+	/* sign extend left in result */
+	pic16_addSign(result, 1, !IS_UNSIGNED(operandType(left)));
+	// its faster to left shift
+	emitCLRC;
+	pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(left),0));
+	if (size > 1)
+	  pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),1));
+	return;
 
-			default:
-				if(AOP_TYPE(left) != AOP_ACC)
-					pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
-				pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit));
-				pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
-					pic16_popGet(AOP(result), 0)));
-				if (size > 1) {
-				  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh),
-									    pic16_popGet(AOP(result), 1)));
-				  for (i=2; i < size; i++) {
-				    pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
-				  } // for
-				} // if
-				return;
-		}
+      default:
+	if(AOP_TYPE(left) != AOP_ACC)
+	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
+	pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit & 0x00ff));
+	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(
+		&pic16_pc_prodl), pic16_popGet(AOP(result), 0)));
+	/* Adjust result's high bytes below! */
+    }
+  } else {
+    // operands different
+    switch(lit & 0x00ff) {
+      case 0:
+	while (size--) {
+	  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),size));
+	} // while
+	return;
+	
+      case 2:
+	if (IS_UNSIGNED(operandType(result))) {
+	  for (i=1; i < size; i++) {
+	    pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
+	  } // for
 	} else {
-		// operands different
-		switch(lit) {
-			case 0:
-			        while (size--) {
-				  pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),size));
-			        } // while
-				return;
-			case 2:
-			        for (i=1; i < size; i++) {
-			          pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
-			        } // for
-				emitCLRC;
-				pic16_emitpcode(POC_RLCFW, pic16_popGet(AOP(left), 0));
-				pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
-				if (size > 1)
-				  pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),1));
-				return;
-			default:
-				if(AOP_TYPE(left) != AOP_ACC)
-					pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
-				pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit));
-				pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
-					pic16_popGet(AOP(result), 0)));
-
-				if (size > 1) {
-				  pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh),
-									    pic16_popGet(AOP(result), 1)));
-				  for (i=2; i < size; i++) {
-				    pic16_emitpcode(POC_CLRF,  pic16_popGet(AOP(result),i));
-				  } // for
-				} // if
-				return;
-		}
+	  /* sign extend left to result */
+	  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0));
+	  pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit_simple(AOP(left), 0, 7));
+	  pic16_emitpcode(POC_MOVLW, pic16_popGetLit(0xff));
+	  for (i=1; i < size; i++) {
+	    pic16_emitpcode(POC_MOVWF,  pic16_popGet(AOP(result),i));
+	  } // for
 	}
+	emitCLRC;
+	pic16_emitpcode(POC_RLCFW, pic16_popGet(AOP(left), 0));
+	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), 0));
+	if (size > 1)
+	  pic16_emitpcode(POC_RLCF, pic16_popGet(AOP(result),1));
+	return;
+	
+      default:
+	if(AOP_TYPE(left) != AOP_ACC)
+	  pic16_emitpcode(POC_MOVFW, pic16_popGet(AOP(left), 0));
+	pic16_emitpcode(POC_MULLW, pic16_popGetLit(lit));
+	pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(
+		&pic16_pc_prodl), pic16_popGet(AOP(result), 0)));
+	/* Adjust result's high bytes below! */
+    }
+  }
+
+  if (size > 1) {
+    /* We need to fix PRODH for
+     * (a) literals < 0 and
+     * (b) signed register operands < 0.
+     */
+    //printf( "%s: lit %d, left unsigned: %d\n", __FUNCTION__, lit, SPEC_USIGN(getSpec(operandType(left))));
+    if (lit < 0) {
+      /* literal negative (i.e. in [-128..-1]), high byte == -1 */
+      pic16_mov2w(AOP(left), 0);
+      pic16_emitpcode(POC_SUBWF, pic16_popCopyReg(&pic16_pc_prodh));
+    }
+
+    if (!SPEC_USIGN(getSpec(operandType(left)))) {
+      /* register operand signed, determine signedness of high byte */
+      pic16_emitpcode(POC_MOVLW, pic16_popGetLit(lit & 0x00ff));
+      pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit_simple(AOP(left), 0, 7));
+      pic16_emitpcode(POC_SUBWF, pic16_popCopyReg(&pic16_pc_prodh));
+    }
+
+    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(
+	    &pic16_pc_prodh), pic16_popGet(AOP(result), 1)));
+
+    /* Need to sign-extend here. */
+    pic16_addSign(result, 2, !IS_UNSIGNED(operandType(result)));
+  } // if
 }
 
+#if 0
 /*-----------------------------------------------------------------------*
  * pic_genUMult16XLit_16 - unsigned multiplication of two 16-bit numbers *
  *-----------------------------------------------------------------------*/
@@ -2092,73 +2094,101 @@ void pic16_genUMult16XLit_16 (operand *left,
 		}
 	}
 }
+#endif
 
 
 /*-----------------------------------------------------------------*
- * genUMult8X8_8 - unsigned multiplication of two 8-bit numbers.
+ * genMult8X8_n - multiplication of two 8-bit numbers.
  * 
  * 
  *-----------------------------------------------------------------*/
-void pic16_genUMult8X8_8 (operand *left,
-			   operand *right,
-			   operand *result)
+void pic16_genMult8X8_n (operand *left, operand *right, operand *result)
 
 {
   FENTRY;
-  
-
-	if (AOP_TYPE(right) == AOP_LIT) {
-		pic16_genUMult8XLit_8(left,right,result);
-	  return;
-	}
-
-	/* cases:
-		A = A x B	B = A x B
-		A = B x C
-		W = A x B
-		W = W x B	W = B x W
-	*/
-	/* if result == right then exchange left and right */
-	if(pic16_sameRegs(AOP(result), AOP(right))) {
-	  operand *tmp;
-		tmp = left;
-		left = right;
-		right = tmp;
-	}
-		
-	if(AOP_TYPE(left) != AOP_ACC) {
-		// left is not WREG
-		if(AOP_TYPE(right) != AOP_ACC) {
-			pic16_mov2w(AOP(left), 0);
-			pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(right), 0));
-		} else {
-			pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(left), 0));
-		}
-	} else {
-		// left is WREG, right cannot be WREG (or can?!)
-		pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(right), 0));
-	}
-	
-	/* result is in PRODL:PRODH */
-	if(AOP_TYPE(result) != AOP_ACC) {
-		pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodl),
-			pic16_popGet(AOP(result), 0)));
 
 
-		if(AOP_SIZE(result)>1) {
-		  int i;
+  if (AOP_TYPE(right) == AOP_LIT) {
+    pic16_genMult8XLit_n(left,right,result);
+    return;
+  }
 
-			pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(&pic16_pc_prodh),
-			pic16_popGet(AOP(result), 1)));
-			
-			for(i=2;i<AOP_SIZE(result);i++)
-				pic16_emitpcode(POC_CLRF, pic16_popGet(AOP(result), i));
-		}
-	} else {
-		pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_prodl));
-	}
+  /* cases:
+     A = A x B	B = A x B
+     A = B x C
+     W = A x B
+     W = W x B	W = B x W
+     */
+  /* if result == right then exchange left and right */
+  if(pic16_sameRegs(AOP(result), AOP(right))) {
+    operand *tmp;
+    tmp = left;
+    left = right;
+    right = tmp;
+  }
+
+  if(AOP_TYPE(left) != AOP_ACC) {
+    // left is not WREG
+    if(AOP_TYPE(right) != AOP_ACC) {
+      pic16_mov2w(AOP(left), 0);
+      pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(right), 0));
+    } else {
+      pic16_emitpcode(POC_MULWF, pic16_popGet(AOP(left), 0));
+    }
+  } else {
+    // left is WREG, right cannot be WREG (or can?!)
+    pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(right), 0));
+  }
+
+  /* result is in PRODL:PRODH */
+  if(AOP_TYPE(result) != AOP_ACC) {
+    pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(
+	    &pic16_pc_prodl), pic16_popGet(AOP(result), 0)));
+
+
+    if(AOP_SIZE(result)>1) {
+
+      /* If s8 x s8 --> s16 multiplication was called for, fixup high byte.
+       * (left=a1a0, right=b1b0, X1: high byte, X0: low byte)
+       * 
+       *    a1a0 * b1b0
+       * --------------
+       *      a1b0 a0b0
+       * a1b1 a0b1
+       * ---------------
+       *           a0b0  a1= 0, b1= 0 (both unsigned)
+       *       -b0 a0b0  a1=-1, b1= 0 (a signed and < 0, b unsigned or >= 0)
+       *       -a0 a0b0  a1= 0, b1=-1 (b signed and < 0, a unsigned or >= 0)
+       *  -(a0+b0) a0b0  a1=-1, b1=-1 (a and b signed and < 0)
+       *
+       *  Currently, PRODH:PRODL holds a0b0 as 16 bit value; we need to
+       *  subtract a0 and/or b0 from PRODH. */
+      if (!IS_UNSIGNED(operandType(right))) {
+	/* right operand (b1) signed and < 0, then subtract left op (a0) */
+	pic16_mov2w( AOP(left), 0 );
+	pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit_simple(AOP(right), 0, 7));
+	pic16_emitpcode(POC_SUBWF, pic16_popCopyReg(&pic16_pc_prodh));
+      }
+
+      if (!IS_UNSIGNED(getSpec(operandType(left)))) {
+	/* left operand (a1) signed and < 0, then subtract right op (b0) */
+	pic16_mov2w( AOP(right), 0 );
+	pic16_emitpcode(POC_BTFSC, pic16_newpCodeOpBit_simple(AOP(left), 0, 7));
+	pic16_emitpcode(POC_SUBWF, pic16_popCopyReg(&pic16_pc_prodh));
+      }
+
+      pic16_emitpcode(POC_MOVFF, pic16_popGet2p(pic16_popCopyReg(
+	      &pic16_pc_prodh), pic16_popGet(AOP(result), 1)));
+
+      /* Must sign-extend here. */
+      pic16_addSign(result, 2, !IS_UNSIGNED(operandType(left)));
+    }
+  } else {
+    pic16_emitpcode(POC_MOVFW, pic16_popCopyReg(&pic16_pc_prodl));
+  }
 }
 
+#if 0
 /*------------------------------------------------------------------*
  * genUMult16X16_16 - unsigned multiplication of two 16-bit numbers *
  *------------------------------------------------------------------*/
@@ -2173,7 +2203,7 @@ void pic16_genUMult16X16_16 (operand *left,
 
 
 	if (AOP_TYPE(right) == AOP_LIT) {
-		pic16_genUMult8XLit_8(left,right,result);
+		pic16_genMult8XLit_n(left,right,result);
 	  return;
 	}
 
@@ -2247,14 +2277,16 @@ void pic16_genUMult16X16_16 (operand *left,
 		pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result), 1));
 	}	
 }
+#endif
 
-
+#if 0
 void pic16_genSMult16X16_16(operand *left,
 			operand *right,
 			operand *result)
 {
 
 }
+#endif
 
 #if 0
 /*-----------------------------------------------------------------*
@@ -2299,12 +2331,13 @@ void pic16_genMult8X8_8 (operand *left,
   FENTRY;
   
   if(AOP_TYPE(right) == AOP_LIT)
-    pic16_genUMult8XLit_8(left,right,result);
+    pic16_genMult8XLit_n(left,right,result);
   else
-    pic16_genUMult8X8_8(left,right,result);
+    pic16_genMult8X8_n(left,right,result);
 }
 
 
+#if 0
 /*-----------------------------------------------------------------*
  * pic16_genMult16X16_16 - multiplication of two 16-bit numbers    *
  *-----------------------------------------------------------------*/
@@ -2319,10 +2352,10 @@ void pic16_genMult16X16_16 (operand *left,
   else
     pic16_genUMult16X16_16(left,right,result);
 }
+#endif
 
 
-
-
+#if 0
 /*-----------------------------------------------------------------------*
  * pic_genUMult32XLit_32 - unsigned multiplication of two 32-bit numbers *
  *-----------------------------------------------------------------------*/
@@ -2435,8 +2468,9 @@ void pic16_genUMult32XLit_32 (operand *left,
 		}
 	}
 }
+#endif
 
-
+#if 0
 /*------------------------------------------------------------------*
  * genUMult32X32_32 - unsigned multiplication of two 32-bit numbers *
  *------------------------------------------------------------------*/
@@ -2450,7 +2484,7 @@ void pic16_genUMult32X32_32 (operand *left,
     FENTRY;
     
 	if (AOP_TYPE(right) == AOP_LIT) {
-		pic16_genUMult8XLit_8(left,right,result);
+		pic16_genMult8XLit_n(left,right,result);
 	  return;
 	}
 
@@ -2524,8 +2558,10 @@ void pic16_genUMult32X32_32 (operand *left,
 		pic16_emitpcode(POC_ADDWFC, pic16_popGet(AOP(result), 1));
 	}	
 }
+#endif
 
 
+#if 0
 /*-----------------------------------------------------------------*
  * pic16_genMult32X32_32 - multiplication of two 32-bit numbers    *
  *-----------------------------------------------------------------*/
@@ -2540,6 +2576,7 @@ void pic16_genMult32X32_32 (operand *left,
   else
     pic16_genUMult32X32_32(left,right,result);
 }
+#endif
 
 
 

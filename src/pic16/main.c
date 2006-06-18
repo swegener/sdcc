@@ -915,6 +915,17 @@ _pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
   //fprintf(stderr,"checking for native mult for %c (size: %d)\n", ic->op, getSize(OP_SYMBOL(IC_RESULT(ic))->type));
+  int symL, symR, symRes, sizeL = 0, sizeR = 0, sizeRes = 0;
+
+  /* left/right are symbols? */
+  symL = IS_SYMOP(IC_LEFT(ic));
+  symR = IS_SYMOP(IC_RIGHT(ic));
+  symRes = IS_SYMOP(IC_RESULT(ic));
+
+  /* --> then determine their sizes */
+  sizeL = symL ? getSize(OP_SYM_TYPE(IC_LEFT(ic))) : 4;
+  sizeR = symR ? getSize(OP_SYM_TYPE(IC_RIGHT(ic))) : 4;
+  sizeRes = symRes ? getSize(OP_SYM_TYPE(IC_RESULT(ic))) : 4;
 
   /* Checks to enable native multiplication.
    * PICs do not offer native division at all...
@@ -924,51 +935,39 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
    *       (regardless of the operands)
    * ( ii) if left and right are unsigned 8-bit operands,
    *       use native MUL
-   * (iii) if left or right is a literal in the range of [0..255)
+   * (iii) if left or right is a literal in the range of [-128..256)
    *       and the other is an unsigned byte, use native MUL
    */
   if (ic->op == '*')
   {
-    int symL, symR, symRes, sizeL = 0, sizeR = 0, sizeRes = 0;
-
-    /* left/right are symbols? */
-    symL = IS_SYMOP(IC_LEFT(ic));
-    symR = IS_SYMOP(IC_RIGHT(ic));
-    symRes = IS_SYMOP(IC_RESULT(ic));
-
-    /* --> then determine their sizes */
-    sizeL = symL ? getSize(OP_SYM_TYPE(IC_LEFT(ic))) : 4;
-    sizeR = symR ? getSize(OP_SYM_TYPE(IC_RIGHT(ic))) : 4;
-    sizeRes = symRes ? getSize(OP_SYM_TYPE(IC_RESULT(ic))) : 4;
-
     /* use native mult for `*: <?> x <?> --> {u8_t, s8_t}' */
     if (sizeRes == 1) { return TRUE; }
 
     /* use native mult for `u8_t x u8_t --> { u16_t, s16_t }' */
-    if (sizeL == 1 && symL && SPEC_USIGN(OP_SYM_TYPE(IC_LEFT(ic)))) {
+    if (sizeL == 1 && symL /*&& SPEC_USIGN(OP_SYM_TYPE(IC_LEFT(ic)))*/) {
       sizeL = 1;
     } else {
       //printf( "%s: left too large (%u) / signed (%u)\n", __FUNCTION__, sizeL, symL && !SPEC_USIGN(OP_SYM_TYPE(IC_LEFT(ic))));
       sizeL = 4;
     }
-    if (sizeR == 1 && symR && SPEC_USIGN(OP_SYM_TYPE(IC_RIGHT(ic)))) {
+    if (sizeR == 1 && symR /*&& SPEC_USIGN(OP_SYM_TYPE(IC_RIGHT(ic)))*/) {
       sizeR = 1;
     } else {
       //printf( "%s: right too large (%u) / signed (%u)\n", __FUNCTION__, sizeR, symR && !SPEC_USIGN(OP_SYM_TYPE(IC_RIGHT(ic))));
       sizeR = 4;
     }
 
-    /* also allow literals [0..256) for left/right operands */
+    /* also allow literals [-128..256) for left/right operands */
     if (IS_VALOP(IC_LEFT(ic)))
     {
       long l = (long)floatFromVal( OP_VALUE( IC_LEFT(ic) ) );
       sizeL = 4;
       //printf( "%s: val(left) = %ld\n", __FUNCTION__, l );
-      if (l >= 0 && l < 256)
+      if (l >= -128 && l < 256)
       {
 	sizeL = 1;
       } else {
-	//printf( "%s: left value %ld outside [0..256)\n", __FUNCTION__, l );
+	//printf( "%s: left value %ld outside [-128..256)\n", __FUNCTION__, l );
       }
     }
     if (IS_VALOP( IC_RIGHT(ic) ))
@@ -976,15 +975,50 @@ static bool _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
       long l = (long)floatFromVal( OP_VALUE( IC_RIGHT(ic) ) );
       sizeR = 4;
       //printf( "%s: val(right) = %ld\n", __FUNCTION__, l );
-      if (l >= 0 && l < 256)
+      if (l >= -128 && l < 256)
       {
 	sizeR = 1;
       } else {
-	//printf( "%s: right value %ld outside [0..256)\n", __FUNCTION__, l );
+	//printf( "%s: right value %ld outside [-128..256)\n", __FUNCTION__, l );
       }
     }
 
     /* use native mult iff left and right are (unsigned) 8-bit operands */
+    if (sizeL == 1 && sizeR == 1) { return TRUE; }
+  }
+
+  if (ic->op == '/' || ic->op == '%')
+  {
+    /* We must catch /: {u8_t,s8_t} x {u8_t,s8_t} --> {u8_t,s8_t},
+     * because SDCC will call 'divuchar' even for u8_t / s8_t.
+     * Example: 128 / -2 becomes 128 / 254 = 0 != -64... */
+    if (sizeL == 1 && sizeR == 1) return TRUE;
+
+    /* What about literals? */
+    if (IS_VALOP( IC_LEFT(ic) ))
+    {
+      long l = (long)floatFromVal( OP_VALUE( IC_LEFT(ic) ) );
+      sizeL = 4;
+      //printf( "%s: val(left) = %ld\n", __FUNCTION__, l );
+      if (l >= -128 && l < 256)
+      {
+	sizeL = 1;
+      } else {
+	//printf( "%s: left value %ld outside [-128..256)\n", __FUNCTION__, l );
+      }
+    }
+    if (IS_VALOP( IC_RIGHT(ic) ))
+    {
+      long l = (long)floatFromVal( OP_VALUE( IC_RIGHT(ic) ) );
+      sizeR = 4;
+      //printf( "%s: val(right) = %ld\n", __FUNCTION__, l );
+      if (l >= -128 && l < 256)
+      {
+	sizeR = 1;
+      } else {
+	//printf( "%s: right value %ld outside [-128..256)\n", __FUNCTION__, l );
+      }
+    }
     if (sizeL == 1 && sizeR == 1) { return TRUE; }
   }
 

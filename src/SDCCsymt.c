@@ -3456,17 +3456,50 @@ initCSupport ()
         {
           for (muldivmod = 1; muldivmod < 3; muldivmod++)
             {
-              /* div and mod */
-              SNPRINTF (buffer, sizeof(buffer),
-                        "_%s%s%s",
-                       smuldivmod[muldivmod],
-                       ssu[su],
-                       sbwd[bwd]);
-              __muldiv[muldivmod][bwd][su] = funcOfType (_mangleFunctionName(buffer), __multypes[bwd][su], __multypes[bwd][su], 2, options.intlong_rent);
-              FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+              /* div and mod : s8_t x s8_t -> s8_t should be s8_t x s8_t -> s16_t, see below */
+	      if (!TARGET_IS_PIC16 || muldivmod != 1 || bwd != 0 || su != 0)
+	      {
+		SNPRINTF (buffer, sizeof(buffer),
+		    "_%s%s%s",
+		    smuldivmod[muldivmod],
+		    ssu[su],
+		    sbwd[bwd]);
+		__muldiv[muldivmod][bwd][su] = funcOfType (
+		    _mangleFunctionName(buffer),
+		    __multypes[bwd][su],
+		    __multypes[bwd][su],
+		    2,
+		    options.intlong_rent);
+		FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+	      }
             }
         }
     }
+
+  if (TARGET_IS_PIC16)
+  {
+    /* PIC16 port wants __divschar/__modschar to return an int, so that both
+     * 100 / -4 = -25 and -128 / -1 = 128 can be handled correctly
+     * (first one would have to be sign extended, second one must not be).
+     * Similarly, modschar should be handled, but the iCode introduces cast
+     * here and forces '% : s8 x s8 -> s8' ... */
+    su = 0; bwd = 0;
+    for (muldivmod = 1; muldivmod < 2; muldivmod++) {
+      SNPRINTF (buffer, sizeof(buffer),
+	  "_%s%s%s",
+	  smuldivmod[muldivmod],
+	  ssu[su],
+	  sbwd[bwd]);
+      __muldiv[muldivmod][bwd][su] = funcOfType (
+	  _mangleFunctionName(buffer),
+	  __multypes[1][su],
+	  __multypes[bwd][su],
+	  2,
+	  options.intlong_rent);
+      FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+    }
+  }
+
   /* mul only */
   muldivmod = 0;
   /* byte */

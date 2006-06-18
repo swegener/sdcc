@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-#if __GNUC__ > 2
+#if !defined __GNUC__ || __GNUC__ > 2
 /* flexible array members not supported by gcc < 3 */
 struct str1
 {
@@ -17,8 +17,8 @@ struct str1 s12 = { 4, {5, 6, 7} }; /* different size */
 static void
 testFlexibleArray1(void)
 {
-#if __GNUC__ > 2
-/* flexible array members not supported by gcc < 3 */
+#if !defined __GNUC__ || __GNUC__ > 2
+  /* flexible array members not supported by gcc < 3 */
   /* test sizeof */
   ASSERT(sizeof(s11) == 1);
   /* test allocation size */
@@ -31,7 +31,7 @@ testFlexibleArray1(void)
 
 /* test initialisation with string */
 
-#if __GNUC__ > 2
+#if !defined __GNUC__ || __GNUC__ > 2
 /* flexible array members not supported by gcc < 3 */
 struct str2
 {
@@ -46,8 +46,8 @@ struct str2 s22 = { 2, "sdcc is great" }; /* different size */
 static void
 testFlexibleArray2(void)
 {
-#if __GNUC__ > 2
-/* flexible array members not supported by gcc < 3 */
+#if !defined __GNUC__ || __GNUC__ > 2
+  /* flexible array members not supported by gcc < 3 */
   /* test sizeof */
   ASSERT(sizeof(s21) == 2);
   /* test allocation size */

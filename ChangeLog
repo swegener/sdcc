@@ -1,3 +1,8 @@
+2006-06-18 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/tests/structflexarray.c: flexible array members
+	  not supported by gcc < 3
+
 2006-06-18 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCsymt.c (initCSupport): change return type of divschar to

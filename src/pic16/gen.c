@@ -3705,6 +3705,9 @@ static void genFunction (iCode *ic)
     pic16_emitcode(";"," function %s",sym->name);
     pic16_emitcode(";","-----------------------------------------");
 
+    /* prevent this symbol from being emitted as 'extern' */
+    pic16_stringInSet(sym->rname, &pic16_localFunctions, 1);
+
     pic16_emitcode("","%s:",sym->rname);
     pic16_addpCode2pBlock(pb,pic16_newpCodeFunction(moduleName,sym->rname));
 

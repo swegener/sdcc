@@ -29,14 +29,7 @@ void f1()
 
 /****************************/
 
-#ifndef SDCC_pic16
-// Ifdefed out for PIC16 port since it generates the error:
-// Duplicate label or redefinin g symbol that cannot be redefined. (_g)
-// Submitted to the bug tracker:
-// [ 1443651 ] pic 16: redefining symbol that cannot be redefined. (_g)
-
 void g (int (*h) (int));
-#endif
 
 void f2()
 {
@@ -47,14 +40,7 @@ void f2()
 
 /****************************/
 
-#ifndef SDCC_pic16
-// Ifdefed out for PIC16 port since it generates the error:
-// Duplicate label or redefinin g symbol that cannot be redefined. (_g)
-// Submitted to the bug tracker:
-// [ 1443651 ] pic 16: redefining symbol that cannot be redefined. (_g)
-
 void g (int (*h) (int));
-#endif
 
 void f3()
 {

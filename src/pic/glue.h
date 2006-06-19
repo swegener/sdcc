@@ -25,7 +25,12 @@
 #ifndef PIC_GLUE_H
 #define PIC_GLUE_H
 
+#include "../SDCCset.h"
+
+extern set *pic14_localFunctions;
+
 void picglue (void);
 unsigned int pic14aopLiteral (value *val, int offset);
+int pic14_stringInSet(const char *str, set **world, int autoAdd);
 
 #endif

@@ -1,5 +1,18 @@
 2006-06-19 Raphael Neider <rneider AT web.de>
 
+	* src/pic/glue.h,src/pic16/glue.h: added prototypes
+	* src/pic/glue.c,src/pic16/glue.c (pic1x_stringInSet,
+	  pic1x_emitSymbolIfNew): NEW, check for a string in a set,
+	  (pic14printExterns,pic14printPublics,pic16printPublics,
+	  pic16_printExterns): use new functions to emit symbols
+	  (picglue,pic16glue): emit publics before emitting externs
+	* src/pic/gen.c,src/pic16/gen.c (genFunction): remember the names of
+	  locally defined functions to avoid bug #1443651
+	* support/regression/tests/bug-716242.c: removed pic16 workaround
+	* support/regression/ports/pic16/spec.mk: ignore errors during build
+
+2006-06-19 Raphael Neider <rneider AT web.de>
+
 	* src/pic/glue.h: added pic14aopLiteral prototype
 	* src/pic/glue.c (pic14aopLiteral): return unsigned int
 	* src/pic/gen.c: removed stdint.h dependency

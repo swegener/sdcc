@@ -55,6 +55,7 @@ extern set *tmpfileNameSet;
 extern char *iComments1;
 extern char *iComments2;
 //extern void emitStaticSeg (memmap * map);
+set *pic14_localFunctions = NULL;
 
 extern DEFSETFUNC (closeTmpFiles);
 extern DEFSETFUNC (rmTmpFiles);
@@ -1025,6 +1026,41 @@ pic14initialComments (FILE * afile)
 	
 }
 
+int
+pic14_stringInSet(const char *str, set **world, int autoAdd)
+{
+  char *s;
+
+  if (!str) return 1;
+  assert(world);
+
+  for (s = setFirstItem(*world); s; s = setNextItem(*world))
+  {
+    /* found in set */
+    if (0 == strcmp(s, str)) return 1;
+  }
+
+  /* not found */
+  if (autoAdd) addSet(world, Safe_strdup(str));
+  return 0;
+}
+
+static int
+pic14_emitSymbolIfNew(FILE *file, const char *fmt, const char *sym, int checkLocals)
+{
+  static set *emitted = NULL;
+
+  if (!pic14_stringInSet(sym, &emitted, 1)) {
+    /* sym was not in emittedSymbols */
+    if (!checkLocals || !pic14_stringInSet(sym, &pic14_localFunctions, 0)) {
+      /* sym is not a locally defined function---avoid bug #1443651 */
+      fprintf( file, fmt, sym );
+      return 0;
+    }
+  }
+  return 1;
+}
+
 /*-----------------------------------------------------------------*/
 /* printExterns - generates extern for external variables          */
 /*-----------------------------------------------------------------*/
@@ -1037,9 +1073,8 @@ pic14printExterns (FILE * afile)
 	fprintf (afile, "; extern variables in this module\n");
 	fprintf (afile, "%s", iComments2);
 	
-	for (sym = setFirstItem (externs); sym;
-	sym = setNextItem (externs))
-		fprintf (afile, "\textern %s\n", sym->rname);
+	for (sym = setFirstItem (externs); sym; sym = setNextItem (externs))
+		pic14_emitSymbolIfNew(afile, "\textern %s\n", sym->rname, 1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1048,25 +1083,25 @@ pic14printExterns (FILE * afile)
 static void
 pic14printPublics (FILE * afile)
 {
-	symbol *sym;
-	
-	fprintf (afile, "%s", iComments2);
-	fprintf (afile, "; publics variables in this module\n");
-	fprintf (afile, "%s", iComments2);
-	
-	for (sym = setFirstItem (publics); sym;
-	sym = setNextItem (publics)) {
-		
-		if(!IS_BITFIELD(sym->type) && ((IS_FUNC(sym->type) || sym->allocreq))) {
-			if (!IS_BITVAR(sym->type))
-				fprintf (afile, "\tglobal %s\n", sym->rname);
-		} else {
-			/* Absolute variables are defines in the asm file as equates and thus can not be made global. */
-			/* Not any longer! */
-			//if (!SPEC_ABSA (sym->etype))
-				fprintf (afile, "\tglobal %s\n", sym->rname);
-		}
-	}
+  symbol *sym;
+
+  fprintf (afile, "%s", iComments2);
+  fprintf (afile, "; publics variables in this module\n");
+  fprintf (afile, "%s", iComments2);
+
+  for (sym = setFirstItem (publics); sym;
+      sym = setNextItem (publics)) {
+
+    if(!IS_BITFIELD(sym->type) && ((IS_FUNC(sym->type) || sym->allocreq))) {
+      if (!IS_BITVAR(sym->type))
+	pic14_emitSymbolIfNew(afile, "\tglobal %s\n", sym->rname, 0);
+    } else {
+      /* Absolute variables are defines in the asm file as equates and thus can not be made global. */
+      /* Not any longer! */
+      //if (!SPEC_ABSA (sym->etype))
+      pic14_emitSymbolIfNew(afile, "\tglobal %s\n", sym->rname, 0);
+    }
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1324,11 +1359,11 @@ picglue ()
 	/* Emit the __config directive */
 	pic14_emitConfigWord (asmFile);
 	
-	/* print the extern variables in this module */
-	pic14printExterns (asmFile);
-	
 	/* print the global variables in this module */
 	pic14printPublics (asmFile);
+	
+	/* print the extern variables in this module */
+	pic14printExterns (asmFile);
 	
 	/* copy the sfr segment */
 	fprintf (asmFile, "%s", iComments2);

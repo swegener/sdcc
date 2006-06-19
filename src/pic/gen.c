@@ -2886,6 +2886,9 @@ static void genFunction (iCode *ic)
 	pic14_emitcode(";"," function %s",(sym = OP_SYMBOL(IC_LEFT(ic)))->name);
 	pic14_emitcode(";","-----------------------------------------");
 	
+	/* prevent this symbol from being emitted as 'extern' */
+	pic14_stringInSet(sym->rname, &pic14_localFunctions, 1);
+
 	pic14_emitcode("","%s:",sym->rname);
 	addpCode2pBlock(pb,newpCodeFunction(NULL,sym->rname,!IS_STATIC (sym->etype)));
 	

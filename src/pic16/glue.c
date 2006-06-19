@@ -55,6 +55,7 @@ extern int initsfpnt;
 extern unsigned long pFile_isize;
 
 extern unsigned long pic16_countInstructions();
+set *pic16_localFunctions = NULL;
 set *rel_idataSymSet=NULL;
 set *fix_idataSymSet=NULL;
 
@@ -1522,6 +1523,41 @@ pic16initialComments (FILE * afile)
 	}
 }
 
+int
+pic16_stringInSet(const char *str, set **world, int autoAdd)
+{
+  char *s;
+
+  if (!str) return 1;
+  assert(world);
+
+  for (s = setFirstItem(*world); s; s = setNextItem(*world))
+  {
+    /* found in set */
+    if (0 == strcmp(s, str)) return 1;
+  }
+
+  /* not found */
+  if (autoAdd) addSet(world, Safe_strdup(str));
+  return 0;
+}
+
+static int
+pic16_emitSymbolIfNew(FILE *file, const char *fmt, const char *sym, int checkLocals)
+{
+  static set *emitted = NULL;
+
+  if (!pic16_stringInSet(sym, &emitted, 1)) {
+    /* sym was not in emittedSymbols */
+    if (!checkLocals || !pic16_stringInSet(sym, &pic16_localFunctions, 0)) {
+      /* sym is not a locally defined function---avoid bug #1443651 */
+      fprintf( file, fmt, sym );
+      return 0;
+    }
+  }
+  return 1;
+}
+
 /*-----------------------------------------------------------------*/
 /* printPublics - generates global declarations for publics        */
 /*-----------------------------------------------------------------*/
@@ -1537,7 +1573,7 @@ pic16printPublics (FILE *afile)
 	for(sym = setFirstItem (publics); sym; sym = setNextItem (publics))
 	  /* sanity check */
 	  if(!IS_STATIC(sym->etype))
-		fprintf(afile, "\tglobal %s\n", sym->rname);
+	  	pic16_emitSymbolIfNew(afile, "\tglobal %s\n", sym->rname, 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1557,10 +1593,10 @@ pic16_printExterns(FILE *afile)
 	fprintf(afile, "%s", iComments2);
 	
 	for(sym = setFirstItem(externs); sym; sym = setNextItem(externs))
-		fprintf(afile, "\textern %s\n", sym->rname);
+		pic16_emitSymbolIfNew(afile, "\textern %s\n", sym->rname, 1);
 
 	for(sym = setFirstItem(pic16_builtin_functions); sym; sym = setNextItem(pic16_builtin_functions))
-		fprintf(afile, "\textern _%s\n", sym->name);
+		pic16_emitSymbolIfNew(afile, "\textern _%s\n", sym->name, 1);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1809,12 +1845,12 @@ pic16glue ()
       pic16_OptimizeJumps();
     }
 
-    /* print the extern variables to this module */
-    pic16_printExterns(asmFile);
-	
     /* print the global variables in this module */
     pic16printPublics (asmFile);
 
+    /* print the extern variables to this module */
+    pic16_printExterns(asmFile);
+	
     pic16_writeUsedRegs(asmFile);
 
 #if 0

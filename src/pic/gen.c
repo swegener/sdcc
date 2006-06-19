@@ -34,13 +34,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#ifndef __sun__
-#if defined(_MSC_VER)
-	#include "pstdint.h"
-#else
-	#include <stdint.h>
-#endif
-#endif
 #include "SDCCglobl.h"
 #include "newalloc.h" 
 
@@ -49,6 +42,7 @@
 #include "ralloc.h"
 #include "pcode.h"
 #include "gen.h"
+#include "glue.h"
 
 /* When changing these, you must also update the assembler template
  * in device/lib/libsdcc/macros.inc */
@@ -78,7 +72,6 @@ static int GpsuedoStkPtr=0;
 
 pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func);
 extern char *get_op( pCodeOp *pcop,char *buff,size_t buf_size);
-unsigned int pic14aopLiteral (value *val, int offset);
 const char *AopType(short type);
 
 #define BYTEofLONG(l,b) ( (l>> (b<<3)) & 0x00ff)
@@ -1216,9 +1209,8 @@ char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 		return "AOP_accumulator_bug";
 		
 	case AOP_LIT:
-		sprintf(s,"0x%02x", pic14aopLiteral (aop->aopu.aop_lit,offset));
-		rs = Safe_calloc(1,strlen(s)+1);
-		strcpy(rs,s);	
+		sprintf(s, "0x%02x", pic14aopLiteral (aop->aopu.aop_lit, offset));
+		rs = Safe_strdup(s);
 		return rs;
 		
 	case AOP_STR:
@@ -9363,38 +9355,6 @@ static void genPackBits(sym_link *etype,operand *result,operand *right,int p_typ
   assert( !"bitfields larger than 8 bits or crossing byte boundaries are not yet supported" );
 }
 
-unsigned long
-bitpatternFromVal (value *val)
-{
-  union {
-    float d;
-    uint32_t l;
-  } float_long;
-
-  assert (sizeof (float) == sizeof (uint32_t));
-
-  //fprintf (stderr, "%s:%u(%s): val=%lf, type: %d, etype: %d\n", __FILE__, __LINE__, __FUNCTION__, floatFromVal(val), SPEC_NOUN(val->type), SPEC_NOUN(val->etype));
-
-  switch (SPEC_NOUN(val->type))
-  {
-  case V_INT:
-  case V_CHAR:
-    return (unsigned long)floatFromVal (val);
-    
-  case V_FLOAT:
-  case V_DOUBLE:
-    float_long.d = floatFromVal (val);
-    return float_long.l;
-    
-  default:
-    assert( !"unhandled value type" );
-    break;
-  }
-
-  float_long.d = floatFromVal (val);
-  return float_long.l;
-}
-
 /*-----------------------------------------------------------------*/
 /* genDataPointerSet - remat pointer to data space                 */
 /*-----------------------------------------------------------------*/
@@ -9433,20 +9393,18 @@ static void genDataPointerSet(operand *right,
 		emitpComment ("%s:%u: size=%d/%d, offset=%i", __FILE__,__LINE__, size, ressize, offset);
 		
 		if (AOP_TYPE(right) == AOP_LIT) {
-			/* XXX: might be float... */
-			unsigned int lit = bitpatternFromVal (AOP(IC_RIGHT(ic))->aopu.aop_lit);
-			lit = lit >> (8*offset);
+			unsigned int lit = pic14aopLiteral(AOP(IC_RIGHT(ic))->aopu.aop_lit, offset);
 			//fprintf (stderr, "%s:%u: lit %d 0x%x\n", __FUNCTION__,__LINE__, lit, lit);
 			if(lit&0xff) {
 				emitpcode(POC_MOVLW, popGetLit(lit&0xff));
-				emitpcode(POC_MOVWF, popGet(AOP(result),offset));
+				emitpcode(POC_MOVWF, popGet(AOP(result), offset));
 			} else {
-				emitpcode(POC_CLRF, popGet(AOP(result),offset));
+				emitpcode(POC_CLRF, popGet(AOP(result), offset));
 			}
 		} else {
 			//fprintf (stderr, "%s:%u: no lit\n", __FUNCTION__,__LINE__);
-			emitpcode(POC_MOVFW, popGet(AOP(right),offset));
-			emitpcode(POC_MOVWF, popGet(AOP(result),offset));
+			emitpcode(POC_MOVFW, popGet(AOP(right), offset));
+			emitpcode(POC_MOVWF, popGet(AOP(result), offset));
 		}
 		
 		offset++;

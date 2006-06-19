@@ -47,6 +47,7 @@
 #include "genutils.h"
 #include "device.h"
 #include "main.h"
+#include "glue.h"
 
 /* Set the following to 1 to enable the slower/bigger
  * but more robust generic shifting routine (which also
@@ -112,7 +113,6 @@ static int GpsuedoStkPtr=0;
 
 pCodeOp *pic16_popGetImmd(char *name, unsigned int offset, int index);
 
-unsigned int pic16aopLiteral (value *val, int offset);
 const char *pic16_AopType(short type);
 static iCode *ifxForOp ( operand *op, iCode *ic );
 
@@ -11895,29 +11895,15 @@ static void genDataPointerSet(operand *right,
 
     while (size--) {
       if (AOP_TYPE(right) == AOP_LIT) {
-        unsigned int lit;
-
-          if(!IS_FLOAT(operandType( right )))
-            lit = (unsigned long)floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
-          else {
-            union {
-              unsigned long lit_int;
-              float lit_float;
-            } info;
-	
-              /* take care if literal is a float */
-              info.lit_float = floatFromVal(AOP(IC_RIGHT(ic))->aopu.aop_lit);
-              lit = info.lit_int;
-          }
-                    lit = lit >> (8*offset);
-		    pic16_movLit2f(pic16_popGet(AOP(result),offset), lit);
-                } else {
-                  pic16_mov2w(AOP(right), offset);
-                  pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result),offset)); // patch 8
-                }
-		offset++;
-		resoffset++;
-	}
+	unsigned int lit = pic16aopLiteral(AOP(IC_RIGHT(ic))->aopu.aop_lit, offset);
+	pic16_movLit2f(pic16_popGet(AOP(result), offset), lit);
+      } else {
+	pic16_mov2w(AOP(right), offset);
+	pic16_emitpcode(POC_MOVWF, pic16_popGet(AOP(result), offset)); // patch 8
+      }
+      offset++;
+      resoffset++;
+    }
 
     pic16_freeAsmop(right,NULL,ic,TRUE);
 }

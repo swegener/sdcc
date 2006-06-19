@@ -26,5 +26,6 @@
 #define PIC_GLUE_H
 
 void picglue (void);
+unsigned int pic14aopLiteral (value *val, int offset);
 
 #endif

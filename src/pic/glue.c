@@ -81,7 +81,7 @@ int pic14_hasInterrupt = 0;		// Indicates whether to emit interrupt handler or n
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
 /*-----------------------------------------------------------------*/
-int pic14aopLiteral (value *val, int offset)
+unsigned int pic14aopLiteral (value *val, int offset)
 {
 	union {
 		float f;

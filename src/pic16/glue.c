@@ -79,7 +79,7 @@ extern void pic16_pCodeConstString(char *name, char *value);
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
 /*-----------------------------------------------------------------*/
-int pic16aopLiteral (value *val, int offset)
+unsigned int pic16aopLiteral (value *val, int offset)
 {
   union {
     float f;

@@ -1,3 +1,14 @@
+2006-06-19 Raphael Neider <rneider AT web.de>
+
+	* src/pic/glue.h: added pic14aopLiteral prototype
+	* src/pic/glue.c (pic14aopLiteral): return unsigned int
+	* src/pic/gen.c: removed stdint.h dependency
+	  (aopGet): use Safe_strdup()
+	  (bitpatternFromVal): removed, replaced use with pic14aopLiteral
+	  (genDataPointerSet): use pic14aopLiteral()
+	* src/pic16/glue.h, src/pic16/glue.c, src/pic16/gen.c: similar changes
+	  for pic16; thanks to Bernhard and Maarten
+
 2006-06-18 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/structflexarray.c: flexible array members

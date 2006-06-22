@@ -40,14 +40,14 @@ _putchar(char c)
 void
 _initEmu(void)
 {
-  /* load and configure the libgpsim_usart_con module */
+  /* load and configure the libgpsim_modules module */
   _asm
     ;; Set frequency to 20MHz
     .direct "e", ".frequency=20e6"
     
     ;; Load the USART library and module
-    .direct "e", "module library libgpsim_usart_con"
-    .direct "e", "module load usart_con U1"
+    .direct "e", "module library libgpsim_modules"
+    .direct "e", "module load usart U1"
 
     ;; Define a node
     .direct "e", "node PIC_tx"
@@ -57,6 +57,9 @@ _initEmu(void)
 
     ;; Set the USART module's Baud Rate
     .direct "e", "U1.rxbaud = 9600"
+
+    ;; Display the received character on terminal
+    .direct "e", "U1.console = true"
   _endasm;
 
   /* USART initialization */

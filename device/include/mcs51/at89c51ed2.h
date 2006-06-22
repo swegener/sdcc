@@ -131,7 +131,7 @@ __sfr __at (0xB8) IPL0;	    //Interrupt Priority 0 LOW
 	__sbit __at (0xB9) PT0L;//Timer 0 Interrupt Priority Low Bit.
 	__sbit __at (0xB8) PX0L;//External Interrupt 0 Priority Low Bit.
 
-__sfr __at (0xB7) IP0H;		//Interrupt Priority 0 HIGH  
+__sfr __at (0xB7) IPH0;		//Interrupt Priority 0 HIGH  
 	#define PPCH 0x40		//PCA Interrupt Priority High Bit.
 	#define PT2H 0x20		//Timer 2 Interrupt Priority High Bit.
 	#define PHS  0x10		//Serial Port Interrupt Priority High Bit.

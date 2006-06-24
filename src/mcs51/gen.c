@@ -71,11 +71,11 @@ static unsigned short rbank = -1;
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
 #define IS_AOP_PREG(x) (AOP(x) && (AOP_TYPE(x) == AOP_R1 || \
-                       AOP_TYPE(x) == AOP_R0))
+                        AOP_TYPE(x) == AOP_R0))
 
 #define AOP_NEEDSACC(x) (AOP(x) && (AOP_TYPE(x) == AOP_CRY ||  \
-                        AOP_TYPE(x) == AOP_DPTR || \
-                        AOP(x)->paged))
+                         AOP_TYPE(x) == AOP_DPTR || \
+                         AOP(x)->paged))
 
 #define AOP_INPREG(x) (x && (x->type == AOP_REG &&                        \
                        (x->aopu.aop_reg[0] == REG_WITH_INDEX(R0_IDX) || \
@@ -755,7 +755,7 @@ aopForRemat (symbol * sym)
   /* set immd2 field if required */
   if (aop->aopu.aop_immd.from_cast_remat)
     {
-      sprintf(buffer,"#0x%02x",ptr_type);
+      SNPRINTF (buffer, sizeof(buffer), "#0x%02x", ptr_type);
       aop->aopu.aop_immd.aop_immd2 = Safe_strdup(buffer);
     }
 
@@ -1083,7 +1083,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
           emitcode ("mov", "r1,b");
           R1INB--;
         }
-      if (_G.r1Pushed)
+      else if (_G.r1Pushed)
         {
           if (pop)
             {
@@ -1129,7 +1129,6 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
             emitcode ("pop", "ar1");
             _G.r1Pushed--;
           }
-
         if (_G.r0Pushed)
           {
             emitcode ("pop", "ar0");
@@ -1391,8 +1390,8 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
         {
           SNPRINTF (buffer, sizeof(buffer),
                     "(%s + %d)",
-                   aop->aopu.aop_dir,
-                   offset);
+                    aop->aopu.aop_dir,
+                    offset);
         }
       else
         {
@@ -2119,8 +2118,8 @@ saveRegisters (iCode * lic)
   if (ic->regsSaved)
     return;
   if (IS_SYMOP(IC_LEFT(ic)) &&
-      (IFFUNC_CALLEESAVES(OP_SYMBOL(IC_LEFT(ic))->type) ||
-       IFFUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT (ic)))))
+      (IFFUNC_CALLEESAVES (OP_SYMBOL (IC_LEFT (ic))->type) ||
+       IFFUNC_ISNAKED (OP_SYM_TYPE (IC_LEFT (ic)))))
     return;
 
   /* save the registers in use at this time but skip the
@@ -2520,15 +2519,15 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
   if (options.useXstack)
     {
       if (!ic)
-      {
+        {
           /* Assume r0 is available for use. */
           r = REG_WITH_INDEX (R0_IDX);;
-      }
+        }
       else
-      {
+        {
           aop = newAsmop (0);
           r = getFreePtr (ic, &aop, FALSE);
-      }
+        }
       // allocate space first
       emitcode ("mov", "%s,%s", r->name, spname);
       MOVA (r->name);
@@ -4239,7 +4238,7 @@ genPlusBits (iCode * ic)
       emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
       emitcode ("rlc", "a");
       emitcode ("mov", "c,%s", AOP (IC_RIGHT (ic))->aopu.aop_dir);
-      emitcode ("addc", "a,#0x00");
+      emitcode ("addc", "a,%s", zero);
       outAcc (IC_RESULT (ic));
     }
 }
@@ -4311,7 +4310,8 @@ adjustArithmeticResult (iCode * ic)
       !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_RIGHT (ic))))
     {
       char buffer[5];
-      sprintf (buffer, "#%d", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
+      SNPRINTF (buffer, sizeof(buffer),
+                "#%d", pointerTypeToGPByte (pointerCode (getSpec (operandType (IC_LEFT (ic)))), NULL, NULL));
       aopPut (IC_RESULT (ic), buffer, GPTRSIZE - 1);
     }
 }
@@ -4378,7 +4378,7 @@ genPlus (iCode * ic)
           while (size--)
             {
               MOVA (aopGet (IC_RIGHT (ic), offset, FALSE, FALSE));
-              emitcode ("addc", "a,#00");
+              emitcode ("addc", "a,%s", zero);
               aopPut (IC_RESULT (ic), "a", offset++);
             }
         }
@@ -4732,7 +4732,7 @@ genMinus (iCode * ic)
         {
           if (useCarry || ((lit >> (offset * 8)) & 0x0FFL))
             {
-            MOVA (aopGet (IC_LEFT (ic), offset, FALSE, FALSE));
+              MOVA (aopGet (IC_LEFT (ic), offset, FALSE, FALSE));
               if (!offset && !size && lit== (unsigned long) -1)
                 {
                   emitcode ("dec", "a");
@@ -4788,7 +4788,7 @@ genMinus (iCode * ic)
               /* reverse subtraction with 2's complement */
               if (offset == 0)
                 emitcode( "setb", "c");
-               else
+              else
                 emitcode( "cpl", "c");
               wassertl(!aopGetUsesAcc(leftOp, offset), "accumulator clash");
               MOVA (aopGet(rightOp, offset, FALSE, TRUE));
@@ -5750,6 +5750,33 @@ genCmp (operand * left, operand * right,
                     }
                   goto release;
                 }
+              else
+                {//nonzero literal
+                  int bytelit = ((lit >> (offset * 8)) & 0x0FFL);
+                  while (size && (bytelit == 0))
+                    {
+                      offset++;
+                      bytelit = ((lit >> (offset * 8)) & 0x0FFL);
+                      size--;
+                    }
+                  CLRC;
+                  while (size--)
+                    {
+                      MOVA (aopGet (left, offset, FALSE, FALSE));
+                      if (sign && size == 0)
+                        {
+                          emitcode ("xrl", "a,#0x80");
+                          emitcode ("subb", "a,#0x%02x",
+                                    0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+                        }
+                      else
+                        {
+                          emitcode ("subb", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                        }
+                      offset++;
+                    }
+                  goto release;
+                }
             }
           CLRC;
           while (size--)
@@ -5765,24 +5792,14 @@ genCmp (operand * left, operand * right,
               if (sign && size == 0)
                 {
                   emitcode ("xrl", "a,#0x80");
-                  if (AOP_TYPE (right) == AOP_LIT)
+                  if (!rightInB)
                     {
-                      unsigned long lit = (unsigned long)
-                      floatFromVal (AOP (right)->aopu.aop_lit);
-                      emitcode ("subb", "a,#0x%02x",
-                                0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+                      pushedB = pushB ();
+                      rightInB++;
+                      MOVB (aopGet (right, offset, FALSE, FALSE));
                     }
-                  else
-                    {
-                      if (!rightInB)
-                        {
-                          pushedB = pushB ();
-                          rightInB++;
-                          MOVB (aopGet (right, offset, FALSE, FALSE));
-                        }
-                      emitcode ("xrl", "b,#0x80");
-                      emitcode ("subb", "a,b");
-                    }
+                  emitcode ("xrl", "b,#0x80");
+                  emitcode ("subb", "a,b");
                 }
               else
                 {
@@ -6534,7 +6551,7 @@ genAnd (iCode * ic, iCode * ifx)
                 }
               else
                 {// what is this case? just found it in ds390/gen.c
-                   emitcode ("anl","a,#!constbyte",1 << (posbit & 0x07));
+                  emitcode ("anl","a,#!constbyte",1 << (posbit & 0x07));
                 }
               goto release;
             }
@@ -9551,7 +9568,10 @@ genDataPointerGet (operand * left,
                     "(%s + %d)", l + 1, offset);
         }
       else
-        sprintf (buffer, "%s", l + 1);
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "%s", l + 1);
+        }
       aopPut (result, buffer, offset++);
     }
 
@@ -9652,7 +9672,7 @@ genNearPointerGet (operand * left,
             }
           else
             {
-              sprintf (buffer, "@%s", rname);
+              SNPRINTF (buffer, sizeof(buffer), "@%s", rname);
               aopPut (result, buffer, offset);
             }
           offset++;
@@ -10239,9 +10259,9 @@ genDataPointerSet (operand * right,
   while (size--)
     {
       if (offset)
-        sprintf (buffer, "(%s + %d)", l + 1, offset);
+        SNPRINTF (buffer, sizeof(buffer), "(%s + %d)", l + 1, offset);
       else
-        sprintf (buffer, "%s", l + 1);
+        SNPRINTF (buffer, sizeof(buffer), "%s", l + 1);
       emitcode ("mov", "%s,%s", buffer,
                 aopGet (right, offset++, FALSE, FALSE));
     }
@@ -10732,7 +10752,7 @@ genAddrOf (iCode * ic)
                  sym->rname,
                  offset * 8);
       else
-        sprintf (s, "#%s", sym->rname);
+        SNPRINTF (s, sizeof(s), "#%s", sym->rname);
       aopPut (IC_RESULT (ic), s, offset++);
     }
 

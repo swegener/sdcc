@@ -1,5 +1,6 @@
-2006-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
+2006-06-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/mcs51/gen.c (genCmp): optimization for RFE 1162453
 	* src/SDCCglue.c (initPointer), fixed bug 1496419
 	* support/regression/tests/bug1496419.c: new, added
 

@@ -1,8 +1,21 @@
+2006-06-24 Borut Razem <borut.razem AT siol.net>
+
+	* sdcc/support/regression/tests/bitvars.c: added gbz80, pic16 and pic16
+	  to the list of sdcc tagrets not supporting bit type
+	* sdcc/support/regression/tests/bug-905992.c.c: excluded regression
+	  testfor pic16 due to bug:
+	  [ 1511794 ] pic16: regression test bug-895992.c fails
+
 2006-06-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genCmp): optimization for RFE 1162453
 	* src/SDCCglue.c (initPointer), fixed bug 1496419
 	* support/regression/tests/bug1496419.c: new, added
+
+2006-06-22 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/ports/pic16/support.c: use gpsim usart module from
+	  libgpsim_modules library
 
 2006-06-21 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

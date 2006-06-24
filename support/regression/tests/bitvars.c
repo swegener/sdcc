@@ -10,7 +10,8 @@
 #pragma disable_warning 180 //no warning about using complement on bit/unsigned char
 #endif
 
-#if defined (SDCC_hc08) || defined (SDCC_z80)
+#if defined (SDCC_hc08) || defined (SDCC_z80) || defined (SDCC_gbz80) || defined (SDCC_pic14) || defined (SDCC_pic16)
+/* sdcc tagrets not supporting bit type */
 #define NO_BITS
 #endif
 

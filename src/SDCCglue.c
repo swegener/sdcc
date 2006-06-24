@@ -360,22 +360,23 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                    sym->rname, equ,
                    SPEC_ADDR (sym->etype));
         }
-      else {
-        int size = getSize (sym->type) + sym->flexArrayLength;
-        if (size==0) {
-          werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
-        }
-        /* allocate space */
-        if (options.debug) {
-          fprintf (map->oFile, "==.\n");
-        }
+      else
+        {
+          int size = getSize (sym->type) + sym->flexArrayLength;
+          if (size==0) {
+            werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
+          }
+          /* allocate space */
+          if (options.debug) {
+            fprintf (map->oFile, "==.\n");
+          }
           if (IS_STATIC (sym->etype) || sym->level)
-          tfprintf (map->oFile, "!slabeldef\n", sym->rname);
-        else
-          tfprintf (map->oFile, "!labeldef\n", sym->rname);           
-        tfprintf (map->oFile, "\t!ds\n", 
-                  (unsigned int)  size & 0xffff);
-      }
+            tfprintf (map->oFile, "!slabeldef\n", sym->rname);
+          else
+            tfprintf (map->oFile, "!labeldef\n", sym->rname);           
+          tfprintf (map->oFile, "\t!ds\n", 
+                    (unsigned int)  size & 0xffff);
+        }
     }
 }
 
@@ -430,7 +431,7 @@ initPointer (initList * ilist, sym_link *toType)
   if (IS_AST_OP (expr) && expr->opval.op == '&') {
     /* address of symbol */
     if (IS_AST_SYM_VALUE (expr->left)) {
-      val = copyValue (AST_VALUE (expr->left));
+      val = AST_VALUE (expr->left);
       val->type = newLink (DECLARATOR);
       if (SPEC_SCLS (expr->left->etype) == S_CODE) {
         DCL_TYPE (val->type) = CPOINTER;
@@ -1252,8 +1253,7 @@ emitStaticSeg (memmap * map, FILE * out)
       if (IS_EXTERN (sym->etype))
         continue;
 
-      /* if it is not static add it to the public
-         table */
+      /* if it is not static add it to the public table */
       if (!IS_STATIC (sym->etype))
         {
           addSetHead (&publics, sym);
@@ -1925,7 +1925,6 @@ glue (void)
 
   if (mainf && IFFUNC_HASBODY(mainf->type))
     {
-
       /* entry point @ start of HOME */
       fprintf (asmFile, "__sdcc_program_startup:\n");
 

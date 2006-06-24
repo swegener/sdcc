@@ -1,3 +1,8 @@
+2006-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (initPointer), fixed bug 1496419
+	* support/regression/tests/bug1496419.c: new, added
+
 2006-06-21 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/at89c51ed2.h: Fixed bug 1510144 changed
@@ -64,14 +69,14 @@
 	    valid char operands, allow signed operands for native code, added
 	    division and modulo operator handling
 	* device/lib/pic16/libsdcc/char/divschar.c: divschar returns an int
-	
+
 	As a consequence, onebyte.c (if split into two files) and muldiv.c
 	pass regression tests.
 
 2006-06-17 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/Makefile.in: two runs of makeindex seem needed to get
-	correct page references in the index of sdccman.pdf 
+	correct page references in the index of sdccman.pdf
 	* doc/sdccman.lyx: mentioned cmon51, added links, small changes
 
 2006-06-17 Borut Razem <borut.razem AT siol.net>

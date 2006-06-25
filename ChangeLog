@@ -1,3 +1,23 @@
+2006-06-25 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic/libm: NEW, added math library functions
+	* device/lib/pic/libsdcc: NEW; added float support functions
+	* device/lib/pic/{Makefile.in,configure.in,configure}: added libm/
+	* device/include/pic/{limits.h,errno.h,sdcc-lib.h,float.h,math.h}:
+	  NEW, added math related headers
+	* device/include/asm/pic/features.h: NEW
+	* src/pic/gen.c (emitpcode_real): emit warning on NULL pCodeOp,
+	  (popGet): allow larger offsets for AOP_PCODE,
+	  (genDataPointerSet): handle literals explicitly, more debug output,
+	  (genAssign): fixed for float using aopLiteral ;-)
+	* src/pic/glue.c (pic14createInterruptVect): inserted pagesel before
+	  GOTO initialisation routine
+	* src/pic/pcoderegs.c (pCodeRegMapLiveRangesInFlow): set wasUsed
+	  flag on registers, fixes #1469043 (local variables do not work)
+	* src/pic/main.c (_pic14_do_link),
+	* src/pic16/main.c (_pic16_linkEdit): use fullDstFileName if
+	  available
+
 2006-06-25 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libc/stdio/sprintf.c: return the number of
@@ -29,6 +49,7 @@
 	* support/regression/ports/pic16/support.c: use gpsim usart module from
 	  libgpsim_modules library
 
+>>>>>>> .r4249
 2006-06-21 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/at89c51ed2.h: Fixed bug 1510144 changed

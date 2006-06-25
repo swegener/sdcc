@@ -29,7 +29,7 @@ all % :
 
 else
 
-SUBDIRS	   = libsdcc libdev
+SUBDIRS	   = libsdcc libdev libm
 builddir   = build
 installdir = bin
 export installdir

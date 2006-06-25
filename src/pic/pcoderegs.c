@@ -192,6 +192,7 @@ void pCodeRegMapLiveRangesInFlow(pCodeFlow *pcfl)
 				addSetIfnotP(& (reg->reglives.assignedpFlows), pcfl);
 			
 			addSetIfnotP(& (reg->reglives.usedpCodes), pc);
+			reg->wasUsed = 1;
 		}
 		
 		

@@ -1010,6 +1010,7 @@ pic14createInterruptVect (FILE * vFile)
 	fprintf (vFile, "%s", iComments2);
 	fprintf (vFile, "STARTUP\t%s\n", CODE_NAME); // Lkr file should place section STARTUP at address 0x0
 	fprintf (vFile, "\tnop\n"); /* first location for used by incircuit debugger */
+	fprintf( vFile, "\tpagesel __sdcc_gsinit_startup\n");
 	fprintf (vFile, "\tgoto\t__sdcc_gsinit_startup\n");
 }
 

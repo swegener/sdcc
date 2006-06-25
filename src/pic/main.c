@@ -468,10 +468,10 @@ static void _pic14_do_link (void)
   
   shash_add(&linkValues, "lflags", joinStrSet(linkOptionsSet));
 
-  shash_add(&linkValues, "outfile", dstFileName);
+  shash_add(&linkValues, "outfile", fullDstFileName ? fullDstFileName : dstFileName);
 
   if(fullSrcFileName) {
-    sprintf(temp, "%s.o", dstFileName);
+    sprintf(temp, "%s.o", fullDstFileName ? fullDstFileName : dstFileName );
     shash_add(&linkValues, "user_ofile", temp);
   }
 

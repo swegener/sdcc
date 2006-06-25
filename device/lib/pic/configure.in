@@ -47,5 +47,6 @@ AC_PROG_MAKE_SET
 AC_CONFIG_FILES([Makefile
                  Makefile.common
                  libdev/Makefile
-                 libsdcc/Makefile])
+                 libsdcc/Makefile
+		 libm/Makefile])
 AC_OUTPUT

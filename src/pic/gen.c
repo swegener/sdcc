@@ -274,8 +274,15 @@ void emitpcode_real(PIC_OPCODE poc, pCodeOp *pcop)
 {
 	if(pcop)
 		addpCode2pBlock(pb,newpCode(poc,pcop));
-	else
+	else {
+		static int has_warned = 0;
+		
 		DEBUGpic14_emitcode(";","%s  ignoring NULL pcop",__FUNCTION__);
+		if (!has_warned) {
+			has_warned = 1;
+			fprintf( stderr, "WARNING: encountered NULL pcop--this is probably a compiler bug...\n" );
+		}
+	}
 }
 
 void emitpcodeNULLop(PIC_OPCODE poc)
@@ -1435,10 +1442,15 @@ pCodeOp *popGet (asmop *aop, int offset) //, bool bit16, bool dname)
 
 	assert (aop);
 
+
 	/* XXX: still needed for BIT operands (AOP_CRY) */
 	if (offset > (aop->size - 1) &&
-		aop->type != AOP_LIT)
+		aop->type != AOP_LIT &&
+		aop->type != AOP_PCODE)
+	{
+		printf( "%s: (offset[%d] > AOP_SIZE(op)[%d]-1) && AOP_TYPE(op) != AOP_LIT)\n", __FUNCTION__, offset, aop->size);
 		return NULL;  //zero;
+	}
 	
 	/* depending on type */
 	switch (aop->type) {
@@ -9376,7 +9388,10 @@ static void genDataPointerSet(operand *right,
 	assert (IS_SYMOP(result));
 	assert (IS_PTR(OP_SYM_TYPE(result)));
 	
-	size = AOP_SIZE(right);
+	if (AOP_TYPE(right) == AOP_LIT)
+	  size = 4;
+	else
+	  size = AOP_SIZE(right);
 	ressize = getSize(OP_SYM_ETYPE(result));
 	if (size > ressize) size = ressize;
 	//fprintf (stderr, "%s:%u: size(right): %d, size(result): %d\n", __FUNCTION__,__LINE__, AOP_SIZE(right), ressize);
@@ -9393,7 +9408,7 @@ static void genDataPointerSet(operand *right,
 	
 	// tsd, was l+1 - the underline `_' prefix was being stripped
 	while (size--) {
-		emitpComment ("%s:%u: size=%d/%d, offset=%i", __FILE__,__LINE__, size, ressize, offset);
+		emitpComment ("%s:%u: size=%d/%d, offset=%d, AOP_TYPE(res)=%d", __FILE__,__LINE__, size, ressize, offset, AOP_TYPE(result));
 		
 		if (AOP_TYPE(right) == AOP_LIT) {
 			unsigned int lit = pic14aopLiteral(AOP(IC_RIGHT(ic))->aopu.aop_lit, offset);
@@ -10058,9 +10073,6 @@ static void genAssign (iCode *ic)
 	/* general case */
 	size = AOP_SIZE(result);
 	offset = 0 ;
-	if(AOP_TYPE(right) == AOP_LIT)
-		lit = (unsigned long)floatFromVal(AOP(right)->aopu.aop_lit);
-	
 	if( AOP_TYPE(right) == AOP_DIR  && (AOP_TYPE(result) == AOP_REG) && size==1)  {
 		DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 		if(aopIdx(AOP(result),0) == 4) {
@@ -10074,8 +10086,10 @@ static void genAssign (iCode *ic)
 	
 	know_W=-1;
 	while (size--) {
+	
 		DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 		if(AOP_TYPE(right) == AOP_LIT) {
+			lit = (unsigned long)pic14aopLiteral(AOP(right)->aopu.aop_lit, offset) & 0x0ff;
 			if(lit&0xff) {
 				if(know_W != (int)(lit&0xff))
 					emitpcode(POC_MOVLW,popGetLit(lit&0xff));
@@ -10083,8 +10097,6 @@ static void genAssign (iCode *ic)
 				emitpcode(POC_MOVWF, popGet(AOP(result),offset));
 			} else
 				emitpcode(POC_CLRF, popGet(AOP(result),offset));
-			
-			lit >>= 8;
 			
 		} else if (AOP_TYPE(right) == AOP_CRY) {
 			emitpcode(POC_CLRF, popGet(AOP(result),offset));

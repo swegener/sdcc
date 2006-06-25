@@ -674,10 +674,10 @@ static void _pic16_linkEdit(void)
   	shash_add(&linkValues, "incdirs", joinStrSet( appendStrSet(tSet, "-I\"", "\"")));
   	shash_add(&linkValues, "lflags", joinStrSet(linkOptionsSet));
   
-	shash_add(&linkValues, "outfile", dstFileName);
+	shash_add(&linkValues, "outfile", fullDstFileName ? fullDstFileName : dstFileName);
 
   	if(fullSrcFileName) {
-		sprintf(temp, "%s.o", dstFileName);
+		sprintf(temp, "%s.o", fullDstFileName ? fullDstFileName : dstFileName);
 //		addSetHead(&relFilesSet, Safe_strdup(temp));
                 shash_add(&linkValues, "user_ofile", temp);
 	}

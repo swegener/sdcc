@@ -42,5 +42,5 @@ unsigned int sprintf(char *ebuf, char *fmt, ...)
     i = vfprintf((FILE *) &ebuf, cfmt, ap);
     *ebuf='\0';
     
-  return (i+1);
+  return (i);
 }

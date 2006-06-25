@@ -1,3 +1,15 @@
+2006-06-25 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic16/libc/stdio/sprintf.c: return the number of
+	  characters printed (not including the trailing '\0' used to end
+	  output to strings). Problem detected in regression test bug-927659.c.
+	  NOTE: printf() family functions should return int instead
+	  unsigned int!
+	* device/lib/pic16/libc/stdio/vfprintf.c: "%%" prints "%", unknown
+	  specifier are printed as themselves
+	* sdcc/support/regression/tests/bug1057979.c: pic16 printf doesn't
+	  support flags, width and precision specifiers
+
 2006-06-24 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc/support/regression/tests/bitvars.c: added gbz80, pic16 and pic16

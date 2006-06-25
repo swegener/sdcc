@@ -24,12 +24,26 @@ test_sprintf(void)
   ASSERT( 0 == strcmp( s, "2147483647" ) );
 
   //and from bug 1073386
+#ifdef SDCC_pic16
+  //pic16 printf doesn't support flags, width and precision specifiers
+  sprintf( s, "%04X", 0x8765u );
+  ASSERT( 0 == strcmp( s, "04X" ) );
+
+  //and from bug 1193299
+  sprintf( s, "%3.3s", "abcd" );
+  ASSERT( 0 == strcmp( s, "3.3s" ) );
+  sprintf( s, "%-3.3s", "abcd" );
+  ASSERT( 0 == strcmp( s, "-3.3s" ) );
+  sprintf( s, "%3.3s", "ab" );
+  ASSERT( 0 == strcmp( s, "3.3s" ) );
+  sprintf( s, "%-3.3s", "ab" );
+  ASSERT( 0 == strcmp( s, "-3.3s" ) );
+#else
   sprintf( s, "%04X", 0x8765u );
   ASSERT( 0 == strcmp( s, "8765" ) );
 
   //and from bug 1193299
   sprintf( s, "%3.3s", "abcd" );
-  LOG((s));
   ASSERT( 0 == strcmp( s, "abc" ) );
   sprintf( s, "%-3.3s", "abcd" );
   ASSERT( 0 == strcmp( s, "abc" ) );
@@ -37,6 +51,7 @@ test_sprintf(void)
   ASSERT( 0 == strcmp( s, " ab" ) );
   sprintf( s, "%-3.3s", "ab" );
   ASSERT( 0 == strcmp( s, "ab " ) );
+#endif
 
 #if defined(SDCC__ds390) || defined(PORT_HOST)
   //and from bug 1358192

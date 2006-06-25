@@ -30,14 +30,17 @@
 
 /* following formats are supported :-
    format     output type       argument-type
+     %%        -                   -
      %u*       unsigned            *
-     %b	       binary
+     %b	       binary              int
+     %lb       binary              long
+     %hb       binary              char
      %d        decimal             int
      %ld       decimal             long
      %hd       decimal             char
-     %x        hexadecimal         int
-     %lxX      hexadecimal         long
-     %hxX      hexadecimal         char
+     %[xX]     hexadecimal         int
+     %l[xX]    hexadecimal         long
+     %h[xX]    hexadecimal         char
      %o        octal               int
      %lo       octal               long
      %ho       octal               char
@@ -71,98 +74,109 @@ unsigned int vfprintf(FILE *stream, char *fmt, va_list ap)
 
 
 #if _DEBUG
-    io_str( "vfprintf: " );
-    io_long( (unsigned long)stream );
-    io_long( (unsigned long)fmt );
+  io_str( "vfprintf: " );
+  io_long( (unsigned long)stream );
+  io_long( (unsigned long)fmt );
 #endif
 
 //    va_start(ap,fmt);
-    ch = fmt;
+  ch = fmt;
     
-    while( *ch ) {			//for (; *fmt ; fmt++ )
-        if (*ch == '%') {
-            flong = 0;
-            fstr = 0;
-            fchar = 0;
-            nosign = 0;
-            radix = 0;
-            upcase = 0;
-            ch++;
+  while( *ch ) {      //for (; *fmt ; fmt++ )
+    if (*ch == '%') {
+      flong = 0;
+      fstr = 0;
+      fchar = 0;
+      nosign = 0;
+      radix = 0;
+      upcase = 0;
+      ch++;
 
-            if(*ch == 'u') {
-              nosign = 1;
-              ch++;
-            }
-            
-            if(*ch == 'l') {
-              flong = 1;
-              ch++;
-            } else
-            if(*ch == 'h') {
-              fchar = 1;
-              ch++;
-            }
-            
-            if(*ch == 's')fstr = 1;
-            else if(*ch == 'd')radix = 10;
-            else if(*ch == 'x'){ radix = 16; upcase = 0; }
-            else if(*ch == 'X'){ radix = 16; upcase = 1; }
-            else if(*ch == 'c')radix = 0;
-            else if(*ch == 'o')radix = 8;
-            else if(*ch == 'b')radix = 2;
-            
-            if(fstr) {
-                str = va_arg(ap, char *);
-                while(*str) { __stream_putchar(stream, *str); str++; count++; }
-            } else {
-              val = 0;
-              if(flong) {
-                val = va_arg(ap, long);
-#if _DEBUG
-                io_long(val);
-#endif
-              }              
-              else
-              if(fchar) {
-                val = va_arg(ap, char);
-#if _DEBUG
-                io_long(val);
-#endif
-              }
-              else {
-                  val = va_arg(ap, int);
-#if _DEBUG
-                io_long(val);
-#endif
-              }
+      if(*ch == '%') {
+        __stream_putchar(stream, *ch);
+        ++count;
+        ++ch;
+        continue;
+      }
 
-              if(radix) {
-                if(nosign)
-                  ultoa(val, buffer, radix);
-                else
-                  ltoa (val, buffer, radix);
-
-                str1 = buffer;
-                while( (*str1) ) {
-                  radix = *str1;
-                  if(upcase)
-                    radix = toupper( radix );
-                  __stream_putchar(stream, (unsigned char)radix);
-                  count++;
-                  str1++;
-                }
-              }	else {
-                __stream_putchar(stream, (unsigned char)val);
-                count++;
-              }
-            }
-          } else {
-            __stream_putchar(stream, *ch);
-            count++;
-          }
-
+      if(*ch == 'u') {
+        nosign = 1;
         ch++;
+      }
+
+      if(*ch == 'l') {
+        flong = 1;
+        ch++;
+      } else if(*ch == 'h') {
+        fchar = 1;
+        ch++;
+      }
+
+      if(*ch == 's')fstr = 1;
+      else if(*ch == 'd')radix = 10;
+      else if(*ch == 'x'){ radix = 16; upcase = 0; }
+      else if(*ch == 'X'){ radix = 16; upcase = 1; }
+      else if(*ch == 'c')radix = 0;
+      else if(*ch == 'o')radix = 8;
+      else if(*ch == 'b')radix = 2;
+      else {
+        __stream_putchar(stream, *ch);
+        ++count;
+        ++ch;
+        continue;
+      }
+
+      if(fstr) {
+        str = va_arg(ap, char *);
+        while(*str) { __stream_putchar(stream, *str); str++; count++; }
+      } else {
+        val = 0;
+        if(flong) {
+          val = va_arg(ap, long);
+#if _DEBUG
+          io_long(val);
+#endif
+        }
+        else if(fchar) {
+          val = va_arg(ap, char);
+#if _DEBUG
+          io_long(val);
+#endif
+        }
+        else {
+          val = va_arg(ap, int);
+#if _DEBUG
+          io_long(val);
+#endif
+        }
+
+        if(radix) {
+          if(nosign)
+            ultoa(val, buffer, radix);
+          else
+            ltoa (val, buffer, radix);
+
+          str1 = buffer;
+          while( (*str1) ) {
+            radix = *str1;
+            if(upcase)
+              radix = toupper( radix );
+            __stream_putchar(stream, (unsigned char)radix);
+            count++;
+            str1++;
+          }
+        } else {
+          __stream_putchar(stream, (unsigned char)val);
+          count++;
+        }
+      }
+    } else {
+      __stream_putchar(stream, *ch);
+      count++;
     }
-  
+
+    ch++;
+  }
+
   return (count);
 }

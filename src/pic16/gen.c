@@ -3758,6 +3758,8 @@ static void genFunction (iCode *ic)
         pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));
         pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_fsr0l ));
         pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_fsr0h ));
+        pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_pclath ));
+        pic16_pushpCodeOp( pic16_popCopyReg( &pic16_pc_pclatu ));
         
 //        pic16_pBlockConvert2ISR(pb);
     }
@@ -3942,6 +3944,8 @@ static void genEndFunction (iCode *ic)
     _G.useWreg = 0;
 
     if (IFFUNC_ISISR(sym->type)) {
+      pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_pclatu ));
+      pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_pclath ));
       pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr0h ));
       pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_fsr0l));
       pic16_poppCodeOp( pic16_popCopyReg( &pic16_pc_prodh ));

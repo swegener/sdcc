@@ -1,3 +1,10 @@
+2006-06-29 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCicode.h: removed buggy semicolon in unused macro
+	* src/SDCClrange.c (findPrevUseSym, rlivePoint): fixed bug #1486853,
+	search for previous definiton of auto symbols too,
+	(findPrevUse): fixed logic of emitWarnings
+
 2006-06-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genFunction, genEndFunction): also preserve

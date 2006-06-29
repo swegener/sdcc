@@ -31,6 +31,11 @@ hTab *liveRanges = NULL;
 hTab *iCodehTab = NULL;
 hTab *iCodeSeqhTab = NULL;
 
+/* all symbols, for which the previous definition is searched
+   and warning is emitted if there's none. */
+#define IS_AUTOSYM(op) (IS_ITEMP(op) || \
+                        (IS_SYMOP(op) && IS_AUTO(op->operand.symOperand) && !IS_PARM(op)))
+
 /*-----------------------------------------------------------------*/
 /* hashiCodeKeys - add all iCodes to the hash table                */
 /*-----------------------------------------------------------------*/
@@ -386,9 +391,18 @@ findPrevUseSym  (eBBlock *ebp, iCode *ic, symbol * sym)
   /* search backward in the current block */
   for (uic = ic; uic; uic = uic->prev)
     {
-      if (!POINTER_SET (uic) && IS_ITEMP (IC_RESULT (uic)))
+      if (!POINTER_SET (uic) && IS_AUTOSYM (IC_RESULT (uic)))
         {
           if (IC_RESULT (uic)->key == sym->key)
+            {
+              /* Ok, found a definition */
+              return TRUE;
+            }
+        }
+      /* address taken from symbol? */
+      if (uic->op == ADDRESS_OF && IS_AUTOSYM (IC_LEFT (uic)))
+        {
+          if (IC_LEFT (uic)->key == sym->key)
             {
               /* Ok, found a definition */
               return TRUE;
@@ -441,15 +455,20 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
   if (!findPrevUseSym (ebp, ic->prev, OP_SYMBOL(op)))
     {
       /* computeLiveRanges() is called twice */
-      if (!emitWarnings)
+      if (emitWarnings)
         {
           werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
-                    OP_SYMBOL (op)->prereqv);
-          OP_SYMBOL (op)->prereqv->reqv = NULL;
-          OP_SYMBOL (op)->prereqv->allocreq = 1;
+                    IS_ITEMP (op) ? OP_SYMBOL (op)->prereqv->name :
+                                    OP_SYMBOL (op)->name);
+          if (IS_ITEMP (op))
+            {
+              OP_SYMBOL (op)->prereqv->reqv = NULL;
+              OP_SYMBOL (op)->prereqv->allocreq = 1;
+            }
         }
       /* is this block part of a loop? */
-      if (ebp->depth != 0)
+      if (IS_ITEMP (op) &&
+          ebp->depth != 0)
         {
           /* extend the life range to the outermost loop */
           unvisitBlocks(ebbs, count);
@@ -494,6 +513,8 @@ rliveClear (eBBlock ** ebbs, int count)
 
 /*-----------------------------------------------------------------*/
 /* rlivePoint - for each point compute the ranges that are alive   */
+/* The live range is only stored for ITEMPs; the same code is used */
+/* to find use of unitialized AUTOSYMs (an ITEMP is an AUTOSYM).   */
 /*-----------------------------------------------------------------*/
 static void
 rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
@@ -521,13 +542,16 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	    {
 	      incUsed (ic, IC_JTCOND(ic));
 
-	      if (!IS_ITEMP(IC_JTCOND(ic)))
+	      if (!IS_AUTOSYM(IC_JTCOND(ic)))
 	        continue;
 
 	      findPrevUse (ebbs[i], ic, IC_JTCOND(ic), ebbs, count, emitWarnings);
-	      unvisitBlocks(ebbs, count);
-	      ic->rlive = bitVectSetBit (ic->rlive, IC_JTCOND(ic)->key);
-	      findNextUse (ebbs[i], ic->next, IC_JTCOND(ic));
+              if (IS_ITEMP(IC_JTCOND(ic)))
+                {
+                  unvisitBlocks(ebbs, count);
+                  ic->rlive = bitVectSetBit (ic->rlive, IC_JTCOND(ic)->key);
+                  findNextUse (ebbs[i], ic->next, IC_JTCOND(ic));
+                }
 
 	      continue;
 	    }
@@ -536,13 +560,16 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	    {
 	      incUsed (ic, IC_COND(ic));
 
-	      if (!IS_ITEMP(IC_COND(ic)))
+	      if (!IS_AUTOSYM(IC_COND(ic)))
 	        continue;
 
 	      findPrevUse (ebbs[i], ic, IC_COND(ic), ebbs, count, emitWarnings);
-	      unvisitBlocks (ebbs, count);
-	      ic->rlive = bitVectSetBit (ic->rlive, IC_COND(ic)->key);
-	      findNextUse (ebbs[i], ic->next, IC_COND(ic));
+              if (IS_ITEMP(IC_COND(ic)))
+                {
+                  unvisitBlocks (ebbs, count);
+                  ic->rlive = bitVectSetBit (ic->rlive, IC_COND(ic)->key);
+                  findNextUse (ebbs[i], ic->next, IC_COND(ic));
+                }
 
 	      continue;
 	    }
@@ -550,53 +577,63 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	  if (IS_SYMOP(IC_LEFT(ic)))
 	    {
 	      incUsed (ic, IC_LEFT(ic));
-	      if (IS_ITEMP(IC_LEFT(ic)))
+	      if (IS_AUTOSYM(IC_LEFT(ic)) &&
+	          ic->op != ADDRESS_OF)
 	        {
 	          findPrevUse (ebbs[i], ic, IC_LEFT(ic), ebbs, count, emitWarnings);
-	          unvisitBlocks(ebbs, count);
-	          ic->rlive = bitVectSetBit (ic->rlive, IC_LEFT(ic)->key);
-	          findNextUse (ebbs[i], ic->next, IC_LEFT(ic));
+                  if (IS_ITEMP(IC_LEFT(ic)))
+                    {
+                      unvisitBlocks(ebbs, count);
+                      ic->rlive = bitVectSetBit (ic->rlive, IC_LEFT(ic)->key);
+                      findNextUse (ebbs[i], ic->next, IC_LEFT(ic));
 
-		  /* if this is a send extend the LR to the call */
-		  if (ic->op == SEND)
-		    {
-		      iCode *lic;
-		      for (lic = ic; lic; lic = lic->next)
-		        {
-			  if (lic->op == CALL || lic->op == PCALL)
-			    {
-			      markAlive (ic, lic->prev, IC_LEFT (ic)->key);
-			      break;
-			    }
-			}
-		    }
+                      /* if this is a send extend the LR to the call */
+                      if (ic->op == SEND)
+                        {
+                          iCode *lic;
+                          for (lic = ic; lic; lic = lic->next)
+                            {
+                              if (lic->op == CALL || lic->op == PCALL)
+                                {
+                                  markAlive (ic, lic->prev, IC_LEFT (ic)->key);
+                                  break;
+                                }
+                            }
+                        }
+                    }
 		}
 	    }
 
 	  if (IS_SYMOP(IC_RIGHT(ic)))
 	    {
 	      incUsed (ic, IC_RIGHT(ic));
-	      if (IS_ITEMP(IC_RIGHT(ic)))
+              if (IS_AUTOSYM(IC_RIGHT(ic)))
 	        {
 	          findPrevUse (ebbs[i], ic, IC_RIGHT(ic), ebbs, count, emitWarnings);
-	          unvisitBlocks(ebbs, count);
-	          ic->rlive = bitVectSetBit (ic->rlive, IC_RIGHT(ic)->key);
-	          findNextUse (ebbs[i], ic->next, IC_RIGHT(ic));
+                  if (IS_ITEMP(IC_RIGHT(ic)))
+                    {
+                      unvisitBlocks(ebbs, count);
+                      ic->rlive = bitVectSetBit (ic->rlive, IC_RIGHT(ic)->key);
+                      findNextUse (ebbs[i], ic->next, IC_RIGHT(ic));
+                    }
 		}
 	    }
 
 	  if (POINTER_SET(ic) && IS_SYMOP(IC_RESULT(ic)))
 	    incUsed (ic, IC_RESULT(ic));
 
-	  if (IS_ITEMP(IC_RESULT(ic)))
+          if (IS_AUTOSYM(IC_RESULT(ic)))
 	    {
 	      if (POINTER_SET(ic))
 	        {
 	          findPrevUse (ebbs[i], ic, IC_RESULT(ic), ebbs, count, emitWarnings);
 		}
-	      unvisitBlocks(ebbs, count);
-	      ic->rlive = bitVectSetBit (ic->rlive, IC_RESULT(ic)->key);
-	      findNextUse (ebbs[i], ic->next, IC_RESULT(ic));
+              if (IS_ITEMP(IC_RESULT(ic)))
+                {
+                  unvisitBlocks(ebbs, count);
+                  ic->rlive = bitVectSetBit (ic->rlive, IC_RESULT(ic)->key);
+                  findNextUse (ebbs[i], ic->next, IC_RESULT(ic));
+                }
 	    }
 
 	  if (!POINTER_SET(ic) && IC_RESULT(ic))

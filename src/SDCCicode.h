@@ -61,7 +61,7 @@ OPTYPE;
 #define LRTYPE        LRFTYPE LRETYPE
 #define IS_ITEMP(op)       (IS_SYMOP(op) && op->operand.symOperand->isitmp == 1)
 #define IS_PARM(op)        (IS_SYMOP(op) && op->operand.symOperand->_isparm)
-#define IS_ITEMPLBL(op)    (IS_ITEMP(op) && op->operand.symOperand->isilbl == 1);
+#define IS_ITEMPLBL(op)    (IS_ITEMP(op) && op->operand.symOperand->isilbl == 1)
 #define IS_OP_VOLATILE(op) (IS_SYMOP(op) && op->isvolatile)
 #define IS_OP_LITERAL(op)  (op && op->isLiteral)
 #define IS_OP_GLOBAL(op)   (IS_SYMOP(op) && op->isGlobal)

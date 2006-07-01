@@ -136,6 +136,13 @@ typedef enum
   }
 STORAGE_CLASS;
 
+#define TYPE_TARGET_CHAR  TYPE_BYTE
+#define TYPE_TARGET_INT   TYPE_WORD
+#define TYPE_TARGET_LONG  TYPE_DWORD
+#define TYPE_TARGET_UCHAR TYPE_UBYTE
+#define TYPE_TARGET_UINT  TYPE_UWORD
+#define TYPE_TARGET_ULONG TYPE_UDWORD
+
 /* specifier is the last in the type-chain */
 typedef struct specifier
   {
@@ -161,14 +168,14 @@ typedef struct specifier
     int argreg;                         /* reg no for regparm         */
     union
       {                                 /* Values if constant or enum */
-        TYPE_WORD   v_int;              /* 2 bytes: int and char values           */
-        char       *v_char;             /*          character string              */
-        TYPE_UWORD  v_uint;             /* 2 bytes: unsigned int const value      */
-        TYPE_DWORD  v_long;             /* 4 bytes: long constant value           */
-        TYPE_UDWORD v_ulong;            /* 4 bytes: unsigned long constant value  */
-        double      v_float;            /*          floating point constant value */
-        TYPE_UDWORD v_fixed16x16;       /* 4 bytes: fixed floating point constant value */
-        struct symbol *v_enum;          /* ptr to enum_list if enum==1            */
+        TYPE_TARGET_INT   v_int;        /* 2 bytes: int and char values           */
+        TYPE_TARGET_CHAR *v_char;       /*          character string              */
+        TYPE_TARGET_UINT  v_uint;       /* 2 bytes: unsigned int const value      */
+        TYPE_TARGET_LONG  v_long;       /* 4 bytes: long constant value           */
+        TYPE_TARGET_ULONG v_ulong;      /* 4 bytes: unsigned long constant value  */
+        double            v_float;      /*          floating point constant value */
+        TYPE_TARGET_ULONG v_fixed16x16; /* 4 bytes: fixed floating point constant value */
+        struct symbol    *v_enum;       /* ptr to enum_list if enum==1            */
       }
     const_val;
     struct structdef *v_struct;         /* structure pointer      */
@@ -601,7 +608,7 @@ sym_link *computeType (sym_link *, sym_link *, RESULT_TYPE, int);
 void processFuncPtrArgs (sym_link *);
 void processFuncArgs (symbol *);
 int isSymbolEqual (symbol *, symbol *);
-int powof2 (TYPE_UDWORD);
+int powof2 (TYPE_TARGET_ULONG);
 void printTypeChain (sym_link *, FILE *);
 void printTypeChainRaw (sym_link *, FILE *);
 void initCSupport ();

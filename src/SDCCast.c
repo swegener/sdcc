@@ -2123,7 +2123,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 /* searchLitOp - search tree (*ops only) for an ast with literal */
 /*-----------------------------------------------------------------*/
 static ast *
-searchLitOp (ast *tree, ast **parent, const unsigned char *ops)
+searchLitOp (ast *tree, ast **parent, const char *ops)
 {
   ast *ret;
 
@@ -3093,7 +3093,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* rearrange the tree */
       if (IS_LITERAL (RTYPE (tree))
           /* avoid infinite loop */
-          && (TYPE_UDWORD) floatFromVal (tree->right->opval.val) != 1)
+          && (TYPE_TARGET_ULONG) floatFromVal (tree->right->opval.val) != 1)
         {
           ast *parent;
           ast *litTree = searchLitOp (tree, &parent, "/");
@@ -3537,7 +3537,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* rearrange the tree */
       if (IS_LITERAL (RTYPE (tree))
           /* avoid infinite loop */
-          && (TYPE_UDWORD) floatFromVal (tree->right->opval.val) != 0)
+          && (TYPE_TARGET_ULONG) floatFromVal (tree->right->opval.val) != 0)
         {
           ast *litTree, *litParent;
           litTree = searchLitOp (tree, &litParent, "+-");
@@ -3759,7 +3759,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if only the right side is a literal & we are
          shifting more than size of the left operand then zero */
       if (IS_LITERAL (RTYPE (tree)) &&
-          ((TYPE_UDWORD) floatFromVal (valFromType (RETYPE (tree)))) >=
+          ((TYPE_TARGET_ULONG) floatFromVal (valFromType (RETYPE (tree)))) >=
           (getSize (TETYPE (tree)) * 8))
         {
           if (tree->opval.op==LEFT_OP ||
@@ -5324,7 +5324,7 @@ isBitAndPow2 (ast * tree)
   if (!IS_AST_LIT_VALUE (tree->right))
     return -1;
 
-  return powof2 ((TYPE_UDWORD)AST_LIT_VALUE (tree->right));
+  return powof2 ((TYPE_TARGET_ULONG)AST_LIT_VALUE (tree->right));
 }
 
 /*-----------------------------------------------------------------*/
@@ -6118,10 +6118,10 @@ void ast_print (ast * tree, FILE *outfile, int indent)
                 if (IS_LITERAL (tree->opval.val->etype)) {
                         fprintf(outfile,"CONSTANT (%p) value = ", tree);
                         if (SPEC_USIGN (tree->opval.val->etype))
-                                fprintf(outfile,"%u", (TYPE_UDWORD) floatFromVal(tree->opval.val));
+                                fprintf(outfile,"%u", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val));
                         else
-                                fprintf(outfile,"%d", (TYPE_DWORD) floatFromVal(tree->opval.val));
-                        fprintf(outfile,", 0x%x, %f", (TYPE_UDWORD) floatFromVal(tree->opval.val),
+                                fprintf(outfile,"%d", (TYPE_TARGET_LONG) floatFromVal(tree->opval.val));
+                        fprintf(outfile,", 0x%x, %f", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val),
                                                       floatFromVal(tree->opval.val));
                 } else if (tree->opval.val->sym) {
                         /* if the undefined flag is set then give error message */

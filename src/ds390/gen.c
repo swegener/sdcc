@@ -1662,6 +1662,7 @@ aopGet (operand * oper,
 /* aopPutUsesAcc - indicates ahead of time whether aopPut() will   */
 /*                 clobber the accumulator                         */
 /*-----------------------------------------------------------------*/
+#if 0
 static bool
 aopPutUsesAcc (operand * oper, const char *s, int offset)
 {
@@ -1700,6 +1701,7 @@ aopPutUsesAcc (operand * oper, const char *s, int offset)
       return FALSE;
     }
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* aopPut - puts a string for a aop and indicates if acc is in use */

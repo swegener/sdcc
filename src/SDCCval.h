@@ -95,6 +95,13 @@ value *charVal (char *);
 value *symbolVal (symbol *);
 void printVal (value *);
 double floatFromVal (value *);
+
+/* convert a fixed16x16 type to double */
+double doubleFromFixed16x16(TYPE_TARGET_ULONG value);
+
+/* convert a double type to fixed16x16 */
+TYPE_TARGET_ULONG fixed16x16FromDouble(double value);
+
 CCR_RESULT checkConstantRange (sym_link *var, sym_link *lit, int op, bool exchangeOps);
 value *array2Ptr (value *);
 value *valUnaryPM (value *);

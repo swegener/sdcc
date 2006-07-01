@@ -707,7 +707,7 @@ asmLineNodeFromLineNode (lineNode *ln, int currentDPS)
   asmLineNode *aln = ds390newAsmLineNode(currentDPS);
   char *op, op1[256], op2[256];
   int opsize;
-  const unsigned char *p;
+  const char *p;
   char inst[8];
   ds390opcodedata *opdat;
 

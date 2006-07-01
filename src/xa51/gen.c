@@ -97,7 +97,7 @@ void bailOut (char *mesg) {
 static void emitcode (char *inst, char *fmt,...) {
   va_list ap;
   char lb[INITIAL_INLINEASM];
-  unsigned char *lbp = lb;
+  char *lbp = lb;
 
   va_start (ap, fmt);
 

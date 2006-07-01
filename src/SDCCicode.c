@@ -1156,26 +1156,26 @@ operandOperation (operand * left, operand * right,
           /* signed and unsigned mul are the same, as long as the precision
              of the result isn't bigger than the precision of the operands. */
             retval = operandFromValue (valCastLiteral (type,
-                     (TYPE_UDWORD) operandLitValue (left) *
-                     (TYPE_UDWORD) operandLitValue (right)));
+                     (TYPE_TARGET_ULONG) operandLitValue (left) *
+                     (TYPE_TARGET_ULONG) operandLitValue (right)));
           else if (IS_UNSIGNED (type)) /* unsigned int */
             {
               /* unsigned int is handled here in order to detect overflow */
-              TYPE_UDWORD ul = (TYPE_UWORD) operandLitValue (left) *
-                               (TYPE_UWORD) operandLitValue (right);
+              TYPE_TARGET_ULONG ul = (TYPE_TARGET_UINT) operandLitValue (left) *
+                                     (TYPE_TARGET_UINT) operandLitValue (right);
 
-              retval = operandFromValue (valCastLiteral (type, (TYPE_UWORD) ul));
-              if (ul != (TYPE_UWORD) ul)
+              retval = operandFromValue (valCastLiteral (type, (TYPE_TARGET_UINT) ul));
+              if (ul != (TYPE_TARGET_UINT) ul)
                 werror (W_INT_OVL);
             }
           else /* signed int */
             {
               /* signed int is handled here in order to detect overflow */
-              TYPE_DWORD l = (TYPE_WORD) operandLitValue (left) *
-                             (TYPE_WORD) operandLitValue (right);
+              TYPE_TARGET_LONG l = (TYPE_TARGET_INT) operandLitValue (left) *
+                                   (TYPE_TARGET_INT) operandLitValue (right);
 
-              retval = operandFromValue (valCastLiteral (type, (TYPE_WORD) l));
-              if (l != (TYPE_WORD) l)
+              retval = operandFromValue (valCastLiteral (type, (TYPE_TARGET_INT) l));
+              if (l != (TYPE_TARGET_INT) l)
                 werror (W_INT_OVL);
             }
         }
@@ -1186,7 +1186,7 @@ operandOperation (operand * left, operand * right,
                                                    operandLitValue (right)));
       break;
     case '/':
-      if ((TYPE_UDWORD) operandLitValue (right) == 0)
+      if ((TYPE_TARGET_ULONG) operandLitValue (right) == 0)
         {
           werror (E_DIVIDE_BY_ZERO);
           retval = right;
@@ -1199,8 +1199,8 @@ operandOperation (operand * left, operand * right,
               SPEC_USIGN (let) = 1;
               SPEC_USIGN (ret) = 1;
               retval = operandFromValue (valCastLiteral (type,
-                                        (TYPE_UDWORD) operandLitValue (left) /
-                                        (TYPE_UDWORD) operandLitValue (right)));
+                                        (TYPE_TARGET_ULONG) operandLitValue (left) /
+                                        (TYPE_TARGET_ULONG) operandLitValue (right)));
             }
           else
             {
@@ -1211,7 +1211,7 @@ operandOperation (operand * left, operand * right,
         }
       break;
     case '%':
-      if ((TYPE_UDWORD) operandLitValue (right) == 0)
+      if ((TYPE_TARGET_ULONG) operandLitValue (right) == 0)
         {
           werror (E_DIVIDE_BY_ZERO);
           retval = right;
@@ -1219,31 +1219,31 @@ operandOperation (operand * left, operand * right,
       else
         {
           if (IS_UNSIGNED (type))
-            retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) %
-                                     (TYPE_UDWORD) operandLitValue (right));
+            retval = operandFromLit ((TYPE_TARGET_ULONG) operandLitValue (left) %
+                                     (TYPE_TARGET_ULONG) operandLitValue (right));
           else
-            retval = operandFromLit ((TYPE_DWORD) operandLitValue (left) %
-                                     (TYPE_DWORD) operandLitValue (right));
+            retval = operandFromLit ((TYPE_TARGET_LONG) operandLitValue (left) %
+                                     (TYPE_TARGET_LONG) operandLitValue (right));
         }
       break;
     case LEFT_OP:
       /* The number of left shifts is always unsigned. Signed doesn't make
          sense here. Shifting by a negative number is impossible. */
       retval = operandFromValue (valCastLiteral (type,
-                                 ((TYPE_UDWORD) operandLitValue (left) <<
-                                  (TYPE_UDWORD) operandLitValue (right))));
+                                 ((TYPE_TARGET_ULONG) operandLitValue (left) <<
+                                  (TYPE_TARGET_ULONG) operandLitValue (right))));
       break;
     case RIGHT_OP:
       /* The number of right shifts is always unsigned. Signed doesn't make
          sense here. Shifting by a negative number is impossible. */
       if (IS_UNSIGNED(let))
         /* unsigned: logic shift right */
-        retval = operandFromLit ((TYPE_UDWORD) operandLitValue (left) >>
-                                 (TYPE_UDWORD) operandLitValue (right));
+        retval = operandFromLit ((TYPE_TARGET_ULONG) operandLitValue (left) >>
+                                 (TYPE_TARGET_ULONG) operandLitValue (right));
       else
         /* signed: arithmetic shift right */
-        retval = operandFromLit ((TYPE_DWORD ) operandLitValue (left) >>
-                                 (TYPE_UDWORD) operandLitValue (right));
+        retval = operandFromLit ((TYPE_TARGET_LONG ) operandLitValue (left) >>
+                                 (TYPE_TARGET_ULONG) operandLitValue (right));
       break;
     case EQ_OP:
       if (IS_FLOAT (let) || IS_FLOAT (ret))
@@ -1259,10 +1259,10 @@ operandOperation (operand * left, operand * right,
       else
         {
           /* this op doesn't care about signedness */
-          TYPE_UDWORD l, r;
+          TYPE_TARGET_ULONG l, r;
 
-          l = (TYPE_UDWORD) operandLitValue (left);
-          r = (TYPE_UDWORD) operandLitValue (right);
+          l = (TYPE_TARGET_ULONG) operandLitValue (left);
+          r = (TYPE_TARGET_ULONG) operandLitValue (right);
           /* In order to correctly compare 'signed int' and 'unsigned int' it's
              neccessary to strip them to 16 bit.
              Literals are reduced to their cheapest type, therefore left and
@@ -1271,8 +1271,8 @@ operandOperation (operand * left, operand * right,
           if (!IS_LONG (let) &&
               !IS_LONG (ret))
             {
-              r = (TYPE_UWORD) r;
-              l = (TYPE_UWORD) l;
+              r = (TYPE_TARGET_UINT) r;
+              l = (TYPE_TARGET_UINT) l;
             }
           retval = operandFromLit (l == r);
         }
@@ -1299,18 +1299,18 @@ operandOperation (operand * left, operand * right,
       break;
     case BITWISEAND:
       retval = operandFromValue (valCastLiteral (type,
-                                                 (TYPE_UDWORD)operandLitValue(left) &
-                                                 (TYPE_UDWORD)operandLitValue(right)));
+                                                 (TYPE_TARGET_ULONG)operandLitValue(left) &
+                                                 (TYPE_TARGET_ULONG)operandLitValue(right)));
       break;
     case '|':
       retval = operandFromValue (valCastLiteral (type,
-                                                 (TYPE_UDWORD)operandLitValue(left) |
-                                                 (TYPE_UDWORD)operandLitValue(right)));
+                                                 (TYPE_TARGET_ULONG)operandLitValue(left) |
+                                                 (TYPE_TARGET_ULONG)operandLitValue(right)));
       break;
     case '^':
       retval = operandFromValue (valCastLiteral (type,
-                                                 (TYPE_UDWORD)operandLitValue(left) ^
-                                                 (TYPE_UDWORD)operandLitValue(right)));
+                                                 (TYPE_TARGET_ULONG)operandLitValue(left) ^
+                                                 (TYPE_TARGET_ULONG)operandLitValue(right)));
       break;
     case AND_OP:
       retval = operandFromLit (operandLitValue (left) &&
@@ -1322,7 +1322,7 @@ operandOperation (operand * left, operand * right,
       break;
     case RRC:
       {
-        TYPE_UDWORD i = (TYPE_UDWORD) operandLitValue (left);
+        TYPE_TARGET_ULONG i = (TYPE_TARGET_ULONG) operandLitValue (left);
 
         retval = operandFromLit ((i >> (getSize (operandType (left)) * 8 - 1)) |
                                  (i << 1));
@@ -1330,27 +1330,27 @@ operandOperation (operand * left, operand * right,
       break;
     case RLC:
       {
-        TYPE_UDWORD i = (TYPE_UDWORD) operandLitValue (left);
+        TYPE_TARGET_ULONG i = (TYPE_TARGET_ULONG) operandLitValue (left);
 
         retval = operandFromLit ((i << (getSize (operandType (left)) * 8 - 1)) |
                                  (i >> 1));
       }
       break;
     case GETABIT:
-      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
-                                (TYPE_UDWORD)operandLitValue(right)) & 1);
+      retval = operandFromLit (((TYPE_TARGET_ULONG)operandLitValue(left) >>
+                                (TYPE_TARGET_ULONG)operandLitValue(right)) & 1);
       break;
     case GETBYTE:
-      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
-                                (TYPE_UDWORD)operandLitValue(right)) & 0xFF);
+      retval = operandFromLit (((TYPE_TARGET_ULONG)operandLitValue(left) >>
+                                (TYPE_TARGET_ULONG)operandLitValue(right)) & 0xFF);
       break;
     case GETWORD:
-      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
-                                (TYPE_UDWORD)operandLitValue(right)) & 0xFFFF);
+      retval = operandFromLit (((TYPE_TARGET_ULONG)operandLitValue(left) >>
+                                (TYPE_TARGET_ULONG)operandLitValue(right)) & 0xFFFF);
       break;
 
     case GETHBIT:
-      retval = operandFromLit (((TYPE_UDWORD)operandLitValue(left) >>
+      retval = operandFromLit (((TYPE_TARGET_ULONG)operandLitValue(left) >>
                                 ((getSize (let) * 8) - 1)) & 1);
       break;
 
@@ -1361,7 +1361,7 @@ operandOperation (operand * left, operand * right,
 
     case '~':
       retval = operandFromValue (valCastLiteral (type,
-                                                 ~((TYPE_UDWORD)
+                                                 ~((TYPE_TARGET_ULONG)
                                                    operandLitValue (left))));
       break;
 
@@ -2098,7 +2098,7 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
                                       right->operand.valOperand));
 
   if (IS_LITERAL(retype)) {
-    p2 = powof2 ((TYPE_UDWORD) floatFromVal (right->operand.valOperand));
+    p2 = powof2 ((TYPE_TARGET_ULONG) floatFromVal (right->operand.valOperand));
   }
 
   resType = usualBinaryConversions (&left, &right, resultType, '*');
@@ -2165,7 +2165,7 @@ geniCodeDivision (operand * left, operand * right, RESULT_TYPE resultType)
       !IS_FLOAT (letype) &&
       !IS_FIXED (letype) &&
       IS_UNSIGNED(letype) &&
-      ((p2 = powof2 ((TYPE_UDWORD)
+      ((p2 = powof2 ((TYPE_TARGET_ULONG)
                     floatFromVal (right->operand.valOperand))) > 0)) {
     ic = newiCode (RIGHT_OP, left, operandFromLit (p2)); /* right shift */
   }

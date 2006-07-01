@@ -959,6 +959,7 @@ static regs *getRegGprNoSpil()
 /*-----------------------------------------------------------------*/
 /* getRegBitNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
+#if 0
 static regs *getRegBitNoSpil()
 {
   regs *reg;
@@ -976,6 +977,7 @@ static regs *getRegBitNoSpil()
   /* just to make the compiler happy */
   return 0;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* symHasReg - symbol has a given register                         */

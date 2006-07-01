@@ -146,18 +146,18 @@ typedef int bool;
  */
 struct optimize
   {
-    unsigned global_cse;
-    unsigned ptrArithmetic;
-    unsigned label1;
-    unsigned label2;
-    unsigned label3;
-    unsigned label4;
-    unsigned loopInvariant;
-    unsigned loopInduction;
-    unsigned noJTabBoundary;
-    unsigned noLoopReverse;
-    unsigned codeSpeed;
-    unsigned codeSize;
+    int global_cse;
+    int ptrArithmetic;
+    int label1;
+    int label2;
+    int label3;
+    int label4;
+    int loopInvariant;
+    int loopInduction;
+    int noJTabBoundary;
+    int noLoopReverse;
+    int codeSpeed;
+    int codeSize;
   };
 
 /** Build model.

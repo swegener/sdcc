@@ -3141,8 +3141,8 @@ hc08_assignRegisters (ebbIndex * ebbi)
   /* free up any _G.stackSpil locations allocated */
   applyToSet (_G.stackSpil, deallocStackSpil);
   _G.slocNum = 0;
-  setToNull ((void **) &_G.stackSpil);
-  setToNull ((void **) &_G.spiltSet);
+  setToNull ((void *) &_G.stackSpil);
+  setToNull ((void *) &_G.spiltSet);
   /* mark all registers as free */
   freeAllRegs ();
 

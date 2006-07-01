@@ -261,7 +261,7 @@ int writeRecord(unsigned len, unsigned offset, unsigned type,
 #define OUTPUT_CHUNK 16		
 static unsigned pendingLen = 0;
 static unsigned pendingOffset = 0;
-static char 	pending[MAX_INPUT_COOKED + OUTPUT_CHUNK];
+static Uint8	pending[MAX_INPUT_COOKED + OUTPUT_CHUNK];
 
 /* Buffer up a data record. */
 int bufferOutput(Line *line)

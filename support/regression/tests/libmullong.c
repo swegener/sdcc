@@ -36,8 +36,8 @@ struct
   char c2;
 } pack_test;
 
-TYPE_DWORD
-mullong_wrapper (TYPE_DWORD a, TYPE_DWORD b)
+TYPE_TARGET_LONG
+mullong_wrapper (TYPE_TARGET_LONG a, TYPE_TARGET_LONG b)
 {
   if (sizeof(pack_test) == 4)
     /* length of struct ok: use SDCC library */
@@ -51,8 +51,8 @@ mullong_wrapper (TYPE_DWORD a, TYPE_DWORD b)
 
 #else
 
-TYPE_DWORD
-mullong_wrapper (TYPE_DWORD a, TYPE_DWORD b)
+TYPE_TARGET_LONG
+mullong_wrapper (TYPE_TARGET_LONG a, TYPE_TARGET_LONG b)
 {
     return a * b;
 }

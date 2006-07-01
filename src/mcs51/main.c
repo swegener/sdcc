@@ -590,7 +590,7 @@ asmLineNodeFromLineNode (lineNode *ln)
   asmLineNode *aln = newAsmLineNode();
   char *op, op1[256], op2[256];
   int opsize;
-  const unsigned char *p;
+  const char *p;
   char inst[8];
   mcs51opcodedata *opdat;
 

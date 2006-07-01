@@ -1,3 +1,32 @@
+2006-07-01 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* as/hc08/lkaomf51.c (OutputName),
+	* as/mcs51/lkaomf51.c (OutputName),
+	* as/z80/asmain.c (asmbl),
+	* src/ds390/main.c (asmLineNodeFromLineNode),
+	* src/hc08/ralloc.c (hc08_assignRegisters),
+	* src/mcs51/main.c (asmLineNodeFromLineNode),
+	* src/xa51/ralloc.c (checkRegMask),
+	* src/xa51/gen.c (emitcode),
+	* src/z80/gen.c (_emit2),
+	* src/SDCCast.c (searchLitOp),
+	* src/SDCCglobl.h,
+	* support/packihx/packihx.c,
+	* support/Util/MySystem.c (split_command): fix gcc 4 warnings
+	* src/ds390/gen.c (aopPutUsesAcc),
+	* src/ds390/ralloc.c (getRegBitNoSpil): unused, therefore disabled
+	* support/regression/tests/libmullong.c (mullong_wrapper),
+	* src/SDCCsymt.c (powof2),
+	* src/SDCCast.c,
+	* src/SDCCicode.c: renamed TYPE_WORD by TYPE_TARGET_INT and so on
+	* src/SDCCsymt.h: added TYPE_TARGET_*
+	* src/SDCCutil.c (doubleFromFixed16x16, fixed16x16FromDouble),
+	* src/SDCCutil.h (doubleFromFixed16x16, fixed16x16FromDouble): moved to
+	SDCCast because 1) header problems 2) this is the right place
+	* src/SDCCast.c (doubleFromFixed16x16, fixed16x16FromDouble): added
+	* src/SDCCval.h (doubleFromFixed16x16, fixed16x16FromDouble): added
+	prototype
+
 2006-06-29 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCicode.h: removed buggy semicolon in unused macro

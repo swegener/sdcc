@@ -3125,7 +3125,7 @@ printTypeChainRaw (sym_link * start, FILE * of)
 /* powof2 - returns power of two for the number if number is pow 2 */
 /*-----------------------------------------------------------------*/
 int
-powof2 (TYPE_UDWORD num)
+powof2 (TYPE_TARGET_ULONG num)
 {
   int nshifts = 0;
   int n1s = 0;

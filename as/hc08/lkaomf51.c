@@ -203,7 +203,7 @@ void OutputWord(int value)
 	OutputByte((unsigned char)(value/0x100));
 }
 
-void OutputName(unsigned char * name)
+void OutputName(char * name)
 {
 	int k;
 	OutputByte((unsigned char)strlen(name));

@@ -493,7 +493,7 @@ asmbl()
 #ifdef SDK
 	double f1, f2;
 	unsigned int mantissa, exponent;
-	const signed char readbuffer[80];
+	const char readbuffer[80];
 #endif
 	laddr = dot.s_addr;
 	lmode = SLIST;

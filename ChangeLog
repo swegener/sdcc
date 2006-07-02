@@ -1,3 +1,11 @@
+2006-07-02 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/devices.inc,
+	* device/include/pic16/pic18fregs.h,
+	* device/include/pic16/pic18f4550.h,
+	* device/lib/pic16/pics.all,
+	* device/lib/pic16/libdev/pic18f4550.c: added support for 18f4550
+
 2006-07-01 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* as/hc08/lkaomf51.c (OutputName),

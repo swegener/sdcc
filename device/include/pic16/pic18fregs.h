@@ -72,6 +72,9 @@
 #elif defined(pic18f4520)
 #  include <pic18f4520.h>
 
+#elif defined(pic18f4550)
+#  include <pic18f4550.h>	/* Might use 2550.h */
+
 #elif defined(pic18f6520)
 #  include <pic18f6520.h>
 

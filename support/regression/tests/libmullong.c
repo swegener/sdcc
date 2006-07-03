@@ -28,6 +28,13 @@
  */
 #if defined(PORT_HOST)
 
+#define TYPE_TARGET_CHAR  TYPE_BYTE
+#define TYPE_TARGET_INT   TYPE_WORD
+#define TYPE_TARGET_LONG  TYPE_DWORD
+#define TYPE_TARGET_UCHAR TYPE_UBYTE
+#define TYPE_TARGET_UINT  TYPE_UWORD
+#define TYPE_TARGET_ULONG TYPE_UDWORD
+
 #if defined(type_c) && !defined(WORDS_BIGENDIAN)
 struct
 {

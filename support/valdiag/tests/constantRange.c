@@ -222,25 +222,25 @@ void foo(void)
     unsigned ub3:3;
   } str;
 
-  str.sb1 = -2;			/* WARNING(SDCC) */
+  str.sb1 = -2;			/* WARNING */
   str.sb1 = -1;
   str.sb1 =  1;
-  str.sb1 =  2;			/* WARNING(SDCC) */
+  str.sb1 =  2;			/* WARNING */
 
-  str.ub1 = -2;			/* WARNING(SDCC) */
+  str.ub1 = -2;			/* WARNING */
   str.ub1 = -1;
   str.ub1 =  1;
-  str.ub1 =  2;			/* WARNING(SDCC) */
+  str.ub1 =  2;			/* WARNING */
 
-  str.sb3 = -5;			/* WARNING(SDCC) */
+  str.sb3 = -5;			/* WARNING */
   str.sb3 = -4;
   str.sb3 =  7;
-  str.sb3 =  8;			/* WARNING(SDCC) */
+  str.sb3 =  8;			/* WARNING */
 
-  str.ub3 = -5;			/* WARNING(SDCC) */
+  str.ub3 = -5;			/* WARNING */
   str.ub3 = -4;
   str.ub3 =  7;
-  str.ub3 =  8;			/* WARNING(SDCC) */
+  str.ub3 =  8;			/* WARNING */
 
   ASSERT (! (-2 == str.sb1));	/* WARNING */
   ASSERT (  (-1 == str.sb1));

@@ -1,3 +1,11 @@
+2006-07-03 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* support/regression/valdiag/tests/switch.c,
+	* support/regression/valdiag/tests/constantRange.c: adapted to gcc 4
+	* support/regression/tests/libmullong.c: fixed for host
+	* support/regression/ports/host/spec.mk: disable all warnings for host,
+	SDCC runs with --less-pedantic too
+
 2006-07-03 Borut Razem <borut.razem AT siol.net>
 
 	* src/configure.in, src/configure, src/Makefile.in, as/z80/Makefile.in:

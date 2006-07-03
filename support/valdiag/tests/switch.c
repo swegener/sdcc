@@ -69,7 +69,7 @@ char foo(void)
   switch(x)
     {
       char y;
-      x++;		/* WARNING */
+      x++;		/* WARNING(SDCC) */
       
       case 0:
         return 0;
@@ -88,7 +88,7 @@ char foo(void)
 {
   switch(x)
     {
-      char y=1;		/* WARNING */
+      char y=1;		/* WARNING(SDCC) */
       
       case 0:
         return 0;
@@ -133,6 +133,7 @@ char foo(void)
         y = x;
         return x;
     }
+  return 0;
 }
 #endif
 

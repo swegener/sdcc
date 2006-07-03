@@ -1,6 +1,7 @@
 2006-07-03 Borut Razem <borut.razem AT siol.net>
 
-	* src/configure.in, src/configure, src/Makefile.in: defined CPPFLAGS
+	* src/configure.in, src/configure, src/Makefile.in, as/z80/Makefile.in:
+	  defined CPPFLAGS
 	* src/port.mk: defined CPPFLAGS, renamed to src/port.mk.in
 	* src/avr/Makefile.in, rc/ds390/Makefile.in, src/ds400/Makefile.in,
 	  src/hc08/Makefile.in, src/mcs51/Makefile.in, src/pic16/Makefile.in,

@@ -3,6 +3,8 @@ srcdir       = @srcdir@
 top_builddir = @top_builddir@
 top_srcdir   = @top_srcdir@
 
+CPPFLAGS += @CPPFLAGS@
+
 include $(top_builddir)Makefile.common
 
 OBJDIR	= obj/$(EXT)

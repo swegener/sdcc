@@ -143,7 +143,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(ALL_SOURCES) $(srcdir)/*.h
-	$(CXXCPP) -MM $(CPPFLAGS) $(M_OR_MM) $^ >Makefile.dep
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >Makefile.dep
 
 # don't include Makefile.dep for the listed targets:
 ifeq "$(findstring $(MAKECMDGOALS),uninstall uninstall_gui_api \

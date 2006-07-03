@@ -99,7 +99,7 @@ installdirs:
 dep: main.dep
 
 main.dep: $(ALL_SOURCES) *.h $(srcdir)/*.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $^ >main.dep
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >main.dep
 
 include main.dep
 include $(srcdir)/clean.mk

@@ -5,6 +5,11 @@
 	* src/avr/Makefile.in, rc/ds390/Makefile.in, src/ds400/Makefile.in,
 	  src/hc08/Makefile.in, src/mcs51/Makefile.in, src/pic16/Makefile.in,
 	  src/pic/Makefile.in, src/xa51/Makefile.in, src/z80/Makefile.in:
+	  include ../port.mk
+	* sim/ucsim/main_in.mk, sim/ucsim/avr.src/Makefile.in,
+	  sim/ucsim/gui.src/Makefile.in, sim/ucsim/hc08.src/Makefile.in,
+	  sim/ucsim/s52.src/Makefile.in, sim/ucsim/sim.src/Makefile.in,
+	  sim/ucsim/xa.src/Makefile.in: ignore header files for dependencies
 
 2006-07-02 Raphael Neider <rneider AT web.de>
 

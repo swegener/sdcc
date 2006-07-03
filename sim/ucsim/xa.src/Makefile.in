@@ -92,7 +92,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $^ >Makefile.dep
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >Makefile.dep
 
 include Makefile.dep
 include $(srcdir)/clean.mk

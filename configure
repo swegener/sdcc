@@ -7932,7 +7932,7 @@ fi
 test $OPT_DISABLE_DEVICE_LIB = 0 &&           ac_config_files="$ac_config_files device/lib/Makefile"
 
 
-                                                                                          ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile Makefile Makefile.common:Makefile.common.in"
+                                                                                                    ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile src/port.mk:src/port.mk.in device/include/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8016,9 +8016,10 @@ for ac_i in : $LIBOBJS; do test "x$ac_i" = x: && continue
   # 1. Remove the extension, and $U if already installed.
   ac_i=`echo "$ac_i" |
 	 sed 's/\$U\././;s/\.o$//;s/\.obj$//'`
-  # 2. Add them.
-  ac_libobjs="$ac_libobjs $ac_i\$U.$ac_objext"
-  ac_ltlibobjs="$ac_ltlibobjs $ac_i"'$U.lo'
+  # 2. Prepend LIBOBJDIR.  When used with automake>=1.10 LIBOBJDIR
+  #    will be set to the directory where LIBOBJS objects are built.
+  ac_libobjs="$ac_libobjs \${LIBOBJDIR}$ac_i\$U.$ac_objext"
+  ac_ltlibobjs="$ac_ltlibobjs \${LIBOBJDIR}$ac_i"'$U.lo'
 done
 LIBOBJS=$ac_libobjs
 
@@ -8488,6 +8489,7 @@ do
   "device/lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
   "main.mk" ) CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+  "src/port.mk" ) CONFIG_FILES="$CONFIG_FILES src/port.mk:src/port.mk.in" ;;
   "device/include/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/include/Makefile" ;;
   "support/librarian/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/librarian/Makefile" ;;
   "support/makebin/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/makebin/Makefile" ;;

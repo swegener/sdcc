@@ -685,6 +685,7 @@ test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile])
 
 AC_CONFIG_FILES([main.mk:main_in.mk
 src/Makefile
+src/port.mk:src/port.mk.in
 device/include/Makefile
 support/librarian/Makefile
 support/makebin/Makefile

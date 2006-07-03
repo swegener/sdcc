@@ -18,7 +18,7 @@ PORT_LIBS	= $(PORTS:%=%/port.a)
 LIBS		= -lm @LIBS@
 
 #CFLAGS          += -Werror
-CPPFLAGS	+= -I$(srcdir)
+CPPFLAGS	+= -I$(srcdir) @CPPFLAGS@
 
 ifdef SDCC_SUB_VERSION
 CFLAGS		+= -DSDCC_SUB_VERSION_STR=\"$(SDCC_SUB_VERSION)\"

@@ -30,7 +30,7 @@ all:	dep $(BINS)
 dep: Makefile.dep
 
 Makefile.dep: $(SRC) $(srcdir)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) > Makefile.dep
+	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) > Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
                                    clean distclean mostlyclean realclean)" ""

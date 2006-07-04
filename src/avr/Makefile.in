@@ -4,4 +4,5 @@ top_builddir = @top_builddir@
 top_srcdir   = @top_srcdir@
 
 # Make all in this directory
-include ../port.mk
+include $(srcdir)/../port.mk
+

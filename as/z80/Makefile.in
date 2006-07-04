@@ -3,8 +3,6 @@ srcdir       = @srcdir@
 top_builddir = @top_builddir@
 top_srcdir   = @top_srcdir@
 
-CPPFLAGS += @CPPFLAGS@
-
 include $(top_builddir)Makefile.common
 
 OBJDIR	= obj/$(EXT)
@@ -32,7 +30,7 @@ all:	dep $(BINS)
 dep: Makefile.dep
 
 Makefile.dep: $(SRC) $(srcdir)/*.h
-	$(CPP) $(CPPFLAGS) $(M_OR_MM) $^ > Makefile.dep
+	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) > Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
                                    clean distclean mostlyclean realclean)" ""

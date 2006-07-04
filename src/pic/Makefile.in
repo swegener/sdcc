@@ -6,4 +6,4 @@ top_srcdir   = @top_srcdir@
 # Make all in this directory
 PORT	= pic
 
-include ../port.mk
+include $(srcdir)/../port.mk

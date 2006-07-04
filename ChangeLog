@@ -1,3 +1,13 @@
+2006-07-04 Borut Razem <borut.razem AT siol.net>
+
+	* src/configure.in, src/configure, src/Makefile.in, as/z80/Makefile.in,
+	  src/port.mk,
+	  src/avr/Makefile.in, src/ds390/Makefile.in, src/ds400/Makefile.in,
+	  src/hc08/Makefile.in, src/mcs51/Makefile.in, src/pic16/Makefile.in,
+	  src/pic/Makefile.in, src/xa51/Makefile.in, src/z80/Makefile.in:
+	  reverted changes from 2006-07-03
+	* Makefile.common.in: added @CPPFLAGS@ to CPPFLAGS
+
 2006-07-03 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* support/regression/valdiag/tests/switch.c,
@@ -11,7 +21,7 @@
 	* src/configure.in, src/configure, src/Makefile.in, as/z80/Makefile.in:
 	  defined CPPFLAGS
 	* src/port.mk: defined CPPFLAGS, renamed to src/port.mk.in
-	* src/avr/Makefile.in, rc/ds390/Makefile.in, src/ds400/Makefile.in,
+	* src/avr/Makefile.in, src/ds390/Makefile.in, src/ds400/Makefile.in,
 	  src/hc08/Makefile.in, src/mcs51/Makefile.in, src/pic16/Makefile.in,
 	  src/pic/Makefile.in, src/xa51/Makefile.in, src/z80/Makefile.in:
 	  include ../port.mk

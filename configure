@@ -7932,7 +7932,7 @@ fi
 test $OPT_DISABLE_DEVICE_LIB = 0 &&           ac_config_files="$ac_config_files device/lib/Makefile"
 
 
-                                                                                                    ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile src/port.mk:src/port.mk.in device/include/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile Makefile Makefile.common:Makefile.common.in"
+                                                                                          ac_config_files="$ac_config_files main.mk:main_in.mk src/Makefile device/include/Makefile support/librarian/Makefile support/makebin/Makefile support/regression/Makefile support/valdiag/Makefile Makefile Makefile.common:Makefile.common.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -8489,7 +8489,6 @@ do
   "device/lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
   "main.mk" ) CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-  "src/port.mk" ) CONFIG_FILES="$CONFIG_FILES src/port.mk:src/port.mk.in" ;;
   "device/include/Makefile" ) CONFIG_FILES="$CONFIG_FILES device/include/Makefile" ;;
   "support/librarian/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/librarian/Makefile" ;;
   "support/makebin/Makefile" ) CONFIG_FILES="$CONFIG_FILES support/makebin/Makefile" ;;

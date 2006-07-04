@@ -6,8 +6,6 @@
 
 # Ports are always located in sdcc/src/<portname>
 
-CPPFLAGS += @CPPFLAGS@
-
 # Output
 LIB = port.a
 # Include the sdcc/src directory

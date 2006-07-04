@@ -1,6 +1,6 @@
 # Port specification for compiling on the host machines version of gcc
 SDCC = $(shell ( sh -c "gcc --version" 2>&1 ) > /dev/null  && echo gcc || echo cc)
-SDCCFLAGS = -DPORT_HOST=1 -fsigned-char -fpack-struct -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
+SDCCFLAGS = $(CPPFLAGS) -DPORT_HOST=1 -fsigned-char -fpack-struct -DREENTRANT= -I$(top_builddir) -I$(top_srcdir)
 # disable all warnings:
 SDCCFLAGS+= -w
 # enable all warnings:

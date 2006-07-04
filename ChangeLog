@@ -7,6 +7,8 @@
 	  src/pic/Makefile.in, src/xa51/Makefile.in, src/z80/Makefile.in:
 	  reverted changes from 2006-07-03
 	* Makefile.common.in: added @CPPFLAGS@ to CPPFLAGS
+	* support/regression/Makefile.in, support/regression/ports/host/spec.mk:
+	  added CPPFLAGS, used by the host port
 
 2006-07-03 Bernhard Held <bernhard AT bernhardheld.de>
 

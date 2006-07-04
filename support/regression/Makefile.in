@@ -41,6 +41,7 @@
 .SILENT:
 
 CC = @CC@
+CPPFLAGS = @CPPFLAGS@
 
 # support VPATH:
 VPATH        = @srcdir@

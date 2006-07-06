@@ -344,7 +344,12 @@ testBitfields(void)
 {
   c_bf.c0_3 = 2;
   c_bf.c3_5 = 3;
+#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__))
+  /* bitfields on powerpc architecture are allocated from left to right */
+  ASSERT(*(char *)(&c_bf) == ((2<<(8-3)) + 3) );
+#else
   ASSERT(*(char *)(&c_bf) == (2 + (3<<3)) );
+#endif
 
 #if 0 // not yet
   i_bf.i0_7 = 23;

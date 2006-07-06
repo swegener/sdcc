@@ -1,3 +1,8 @@
+2006-07-06 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/tests/bitfields.c:
+	  fixed bug [ 1518322 ] regression test bitfields fails on ppc hosts
+
 2006-07-04 Borut Razem <borut.razem AT siol.net>
 
 	* src/configure.in, src/configure, src/Makefile.in, as/z80/Makefile.in,

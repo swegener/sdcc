@@ -7786,11 +7786,21 @@ genAddrOf (iCode * ic)
      variable */
   if (sym->onStack)
     {
-      /* if it has an offset then we need to compute
-         it */
+      /* if it has an offset then we need to compute it */
+      offset = _G.stackOfs + _G.stackPushes + sym->stack;
       hc08_useReg (hc08_reg_hx);
       emitcode ("tsx", "");
-      emitcode ("aix", "#%d", _G.stackOfs + _G.stackPushes +sym->stack);
+      while (offset > 127)
+        {
+          emitcode ("aix", "#127");
+          offset -= 127;
+        }
+      while (offset < -128)
+        {
+          emitcode ("aix", "#-128");
+          offset += 128;
+        }
+      emitcode ("aix", "#%d", offset);
       storeRegToFullAop (hc08_reg_hx, AOP (IC_RESULT (ic)), FALSE);
       hc08_freeReg (hc08_reg_hx);
 

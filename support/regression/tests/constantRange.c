@@ -10,6 +10,13 @@
 #include <stdint.h>
 #endif
 
+#if defined (__GNUC__) && defined (__alpha__) && (__GNUC__ < 3)
+/* bool should be casted to int in order to pass the test. Is this a gcc bug? */
+#define INT_CAST  (int)
+#else
+#define INT_CAST
+#endif
+
  int8_t s8;
 uint8_t u8;
 
@@ -125,7 +132,7 @@ testFoo1(void)
   ASSERT (! ( 0 != sb));
   ASSERT (  ( 1 != sb));
 
-  ASSERT (  (-1 <  sb));
+  ASSERT (  (-1 <  INT_CAST sb));
   ASSERT (! ( 0 <  sb));
 
   ASSERT (  ( 0 <= sb));
@@ -134,7 +141,7 @@ testFoo1(void)
   ASSERT (! ( 0 >  sb));
   ASSERT (  ( 1 >  sb));
 
-  ASSERT (! (-1 >= sb));
+  ASSERT (! (-1 >= INT_CAST sb));
   ASSERT (  ( 0 >= sb));
 
 
@@ -146,7 +153,7 @@ testFoo1(void)
   ASSERT (! ( 0 != ub));
   ASSERT (  ( 1 != ub));
 
-  ASSERT (  (-1 <  ub));
+  ASSERT (  (-1 <  INT_CAST ub));
   ASSERT (! ( 0 <  ub));
 
   ASSERT (  ( 0 <= ub));
@@ -155,7 +162,7 @@ testFoo1(void)
   ASSERT (! ( 0 >  ub));
   ASSERT (  ( 1 >  ub));
 
-  ASSERT (! (-1 >= ub));
+  ASSERT (! (-1 >= INT_CAST ub));
   ASSERT (  ( 0 >= ub));
 }
 

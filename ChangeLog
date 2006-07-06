@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bitfields.c:
 	  fixed bug [ 1518322 ] regression test bitfields fails on ppc hosts
+	* support/regression/tests/constantRange.c:
+	  fixed bug [ 1518317 ] regression test constantRange fails on alpha host
 
 2006-07-04 Borut Razem <borut.razem AT siol.net>
 

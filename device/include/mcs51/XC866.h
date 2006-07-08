@@ -237,6 +237,31 @@ __sfr __at (0xB3) _XPAGE;    // this is the name SDCC expects for this sfr
 
 //   SFR bit definitions
 
+/*  P0  */
+__sbit __at (0x80) P0_0 ;
+__sbit __at (0x81) P0_1 ;
+__sbit __at (0x82) P0_2 ;
+__sbit __at (0x83) P0_3 ;
+__sbit __at (0x84) P0_4 ;
+__sbit __at (0x85) P0_5 ;
+
+/*  P1  */
+__sbit __at (0x90) P1_0 ;
+__sbit __at (0x91) P1_1 ;
+__sbit __at (0x92) P1_5 ;
+__sbit __at (0x93) P1_6 ;
+__sbit __at (0x94) P1_7 ;
+
+/*  P2  */
+__sbit __at (0xA0) P2_0 ;
+__sbit __at (0xA1) P2_1 ;
+__sbit __at (0xA2) P2_2 ;
+__sbit __at (0xA3) P2_3 ;
+__sbit __at (0xA4) P2_4 ;
+__sbit __at (0xA5) P2_5 ;
+__sbit __at (0xA6) P2_6 ;
+__sbit __at (0xA7) P2_7 ;
+
 /*  P3  */
 __sbit __at (0xB0) P3_0 ;
 __sbit __at (0xB1) P3_1 ;
@@ -363,6 +388,7 @@ __sbit __at (0x8E) TR1;
 #define RST2 0xE0         // Restore SFR page from ST2
 #define SST3 0xB0         // Save SFR page to ST3
 #define RST3 0xF0         // Restore SFR page from ST3
+#define noSST 0x00	  // Switch page without saving
 
 #define SFR_PAGE(pg,op) pg+op
 

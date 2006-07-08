@@ -428,7 +428,7 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
   if (IS_AST_OP (expr) && expr->opval.op == '&') {
     /* address of symbol */
     if (IS_AST_SYM_VALUE (expr->left)) {
-      val = copyValue (AST_VALUE (expr->left));
+      val = AST_VALUE (expr->left);
       val->type = newLink (DECLARATOR);
       if(SPEC_SCLS (expr->left->etype) == S_CODE) {
         DCL_TYPE (val->type) = CPOINTER;

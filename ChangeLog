@@ -1,3 +1,8 @@
+2006-07-10 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: added device/include/asm/pic/features.h and
+	  device/lib/src/pic/libm/*.c in WIN32 installation
+
 2006-07-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/XC866.h: added sbit definitions for Px_x, P1_x, P2_x

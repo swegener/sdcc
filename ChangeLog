@@ -1,7 +1,10 @@
 2006-07-10 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added device/include/asm/pic/features.h and
-	  device/lib/src/pic/libm/*.c in WIN32 installation
+	  device/lib/src/pic/libm/*.c and device/lib/src/pic16/libsdcc/stack/*.S
+	  in WIN32 installation
+	* .version, sdcc.spec, doc/sdccman.lyx: changed sdcc version to 2.6.0 -
+	  release candidate 1
 
 2006-07-08 Maarten Brock <sourceforge.brock AT dse.nl>
 

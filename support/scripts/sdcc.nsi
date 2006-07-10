@@ -430,6 +430,9 @@ Section "SDCC library sources"
   File "${DEV_ROOT}\lib\src\pic16\libsdcc\lregs\*.c"
 #  File "${DEV_ROOT}\lib\src\pic16\libsdcc\lregs\Makefile"
 
+  SetOutPath "$INSTDIR\lib\src\pic16\libsdcc\stack"
+  File "${DEV_ROOT}\lib\src\pic16\libsdcc\stack\*.S"
+
   SetOutPath "$INSTDIR\lib\src\pic16\startup"
   File "${DEV_ROOT}\lib\src\pic16\startup\*.c"
 #  File "${DEV_ROOT}\lib\src\pic16\startup\Makefile"

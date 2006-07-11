@@ -5,7 +5,7 @@ $Id$
 
 Welcome to SDCC, a freeware, retargettable, optimizing ANSI C compiler
 that supports a growing list of processors including the Intel mcs51
-family, the Zilog z80 and the Maxim ds390.
+family, the Zilog z80, the Maxim ds390 and the Motorola HC08.
 
 See share/sdcc/doc/INSTALL.txt for the installation instructions for
 the binary kits.
@@ -36,7 +36,7 @@ questions on the user mailing list.  See:
 
 
 Notes:
-* The hc08, ds400, pic14 and pic16 are currently experimental, but work is in
+* The ds400, pic14 and pic16 are currently experimental, but work is in
 progress. Please check http://sdcc.sourceforge.net/snap.php for snapshots.
 * The TININative, gbz80, avr and xa51 ports are no longer maintained.
 
@@ -55,23 +55,24 @@ support/	- Libraries and apps that may not be provided by your system.
 Authors and interested persons:
 * Sandeep Dutta (sandeep AT users.sourceforge.net)
 
-* Daniel Drotos       <drdani AT mazsola.iit.uni-miskolc.hu>
 * Jean Loius-VERN     <jlvern AT writeme.com>
-* Johan Knol          <johan.knol AT iduna.nl>
-* Karl Bongers        <karl AT turbobit.com>
+* Daniel Drotos       <drdani AT mazsola.iit.uni-miskolc.hu>
 * Kevin Vigor         <kevin AT vigor.nu>
+* Johan Knol          <johan.knol AT iduna.nl>
 * Scott Dattalo       <scott AT dattalo.com>
-* Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
-* Hans-Juergen Dorn   <hans.dorn AT apl-landau.de>
-* Daniel Drotos       <drdani AT mazsola.lit.uni.miskolc.hu>
-* Frieder Ferlemann   <frieder.ferlemann AT web.de>
-* Klaus Flittner      <klaus_flittner AT gmx.de>
+* Karl Bongers        <karl AT turbobit.com>
 * Bernhard Held       <bernhard AT bernhardheld.de>
-* Erik Petrich        <epetrich AT ivorytower.norman.ok.us>
+* Frieder Ferlemann   <frieder.ferlemann AT web.de>
+* Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 * Borut Razem         <borut.razem AT siol.net>
 * Vangelis Rokas      <vrokas AT otenet.gr>
+* Erik Petrich        <epetrich AT ivorytower.norman.ok.us>
 * Paul Stoffregen     <paul AT pjrc.com>
 * Michael Hope        <michaelh AT juju.net.nz> <nz_michaelh AT yahoo.com>
+* Maarten Brock       <sourceforge.brock AT dse.nl>
+* Raphael Neider      <RNeider AT web.de>
+* Hans-Juergen Dorn   <hans.dorn AT apl-landau.de>
+* Klaus Flittner      <klaus_flittner AT gmx.de>
 
 SDCC includes code from:
 * Alan Baldwin      <baldwin AT shop-pdp.kent.edu>

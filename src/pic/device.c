@@ -426,8 +426,10 @@ void addMemRange(memRange *r, int type)
 				}
 				}
 			} else {
-				fprintf(stderr, "WARNING: %s:%s memory at 0x%x is beyond max ram = 0x%x\n",
-					__FILE__,__FUNCTION__,(i|alias), maxRAMaddress);
+				if (getenv("SDCCPICDEBUG")) {
+					fprintf(stderr, "WARNING: %s:%s memory at 0x%x is beyond max ram = 0x%x\n",
+						__FILE__,__FUNCTION__,(i|alias), maxRAMaddress);
+				}
 			}
 		}
 		
@@ -843,8 +845,10 @@ int assignRegister(regs *reg, int start_address)
 			return reg->address;
 		}
 		
-		fprintf(stderr, "WARNING: Ignoring Out of Range register assignment at fixed address %d, %s\n",
-		    reg->address, reg->name);
+		if (getenv("SDCCPICDEBUG")) {
+			fprintf(stderr, "WARNING: Ignoring Out of Range register assignment at fixed address %d, %s\n",
+			    reg->address, reg->name);
+		}
 		
 	} else {
 		

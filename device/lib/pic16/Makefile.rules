@@ -48,8 +48,10 @@ else
 %.lib : recurse
 ifndef SILENT
 	@echo "[  LIB  ] $(patsubst $(top_builddir)%,%,$@) <== **/*.o"
-endif
 	$(Q)$(RM) "$@"; LIB_O=`find "$(top_builddir)$(builddir)" -name "*.o"`; echo $${LIB_O}; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O}
+else
+	$(Q)$(RM) "$@"; LIB_O=`find "$(top_builddir)$(builddir)" -name "*.o"`;                 [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O}
+endif
 endif
 
 .PHONY : recurse force

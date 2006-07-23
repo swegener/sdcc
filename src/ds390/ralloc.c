@@ -124,8 +124,7 @@ allocReg (short type)
             currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, i);
           return &regs390[i];
         }
-      /* otherwise look for specific type
-         of register */
+      /* otherwise look for specific type of register */
       if (regs390[i].isFree &&
           regs390[i].type == type)
         {
@@ -959,7 +958,6 @@ static regs *getRegGprNoSpil()
 /*-----------------------------------------------------------------*/
 /* getRegBitNoSpil - get it cannot be spilt                        */
 /*-----------------------------------------------------------------*/
-#if 0
 static regs *getRegBitNoSpil()
 {
   regs *reg;
@@ -977,7 +975,6 @@ static regs *getRegBitNoSpil()
   /* just to make the compiler happy */
   return 0;
 }
-#endif
 
 /*-----------------------------------------------------------------*/
 /* symHasReg - symbol has a given register                         */
@@ -1671,6 +1668,8 @@ static void fillGaps()
             for (i=0; i < sym->nRegs ; i++ ) {
                 if (sym->regType == REG_PTR)
                     sym->regs[i] = getRegPtrNoSpil ();
+                else if (sym->regType == REG_BIT)
+                    sym->regs[i] = getRegBitNoSpil ();
                 else
                     sym->regs[i] = getRegGprNoSpil ();
             }

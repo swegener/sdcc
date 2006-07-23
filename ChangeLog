@@ -1,3 +1,12 @@
+2006-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/compiler.h: added SFRX for xdata based special
+	  function registers and corrected defaults with additional warning
+	* device/lib/malloc.c: cosmetic changes
+	* device/lib/realloc.c: bugfix for bug #1496907, Thanks Efim Monyak
+	* src/ds390/ralloc.c (getRegBitNoSpil): reenabled,
+	  (fillGaps): and used it
+
 2006-07-20 Raphael Neider <rneider AT web.de>
 
 	* src/pic/device.c (addMemRange,assignRegister): suppress verbose

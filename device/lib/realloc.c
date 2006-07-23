@@ -97,6 +97,11 @@ void xdata * realloc (void * p, size_t size)
           {
             pnew = (MEMHEADER xdata * )((char xdata *)_sdcc_prev_memheader + _sdcc_prev_memheader->len);
             _sdcc_prev_memheader->next = pnew;
+
+#if _SDCC_MALLOC_TYPE_MLH
+            pthis->next->prev = pnew;
+#endif
+
             memmove(pnew, pthis, pthis->len);
             pnew->len = size;
             ret = MEM(pnew);

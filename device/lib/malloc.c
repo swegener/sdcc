@@ -102,27 +102,27 @@ malloc (unsigned int size)
 
       if (ret)
         {
-      if (!current_header->len)
-        { //This code works only for first_header in the list and only
-          current_header->len = size; //for first allocation
-        }
-      else
-        {
-          //else create new header at the begin of spare
-          new_header = (MEMHEADER * )((char *)current_header + current_header->len);
-          new_header->next = current_header->next; //and plug it into the chain
-          new_header->prev = current_header;
-          current_header->next  = new_header;
-          if (new_header->next)
-            {
-              new_header->next->prev = new_header;
+          if (!current_header->len)
+            { //This code works only for first_header in the list and only
+              current_header->len = size; //for first allocation
             }
-          new_header->len  = size; //mark as used
+          else
+            {
+              //else create new header at the begin of spare
+              new_header = (MEMHEADER * )((char *)current_header + current_header->len);
+              new_header->next = current_header->next; //and plug it into the chain
+              new_header->prev = current_header;
+              current_header->next  = new_header;
+              if (new_header->next)
+                {
+                  new_header->next->prev = new_header;
+                }
+              new_header->len  = size; //mark as used
               ret = &new_header->mem;
+            }
         }
     }
-}
-    return ret;
+  return ret;
 }
 
 #else

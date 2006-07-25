@@ -64,9 +64,9 @@
 # define SBIT(name, addr, bit)  __sbit  __at(addr+bit)                  name
 # define SFR(name, addr)        __sfr   __at(addr)                      name
 # define SFRX(name, addr)       xdata volatile unsigned char __at(addr) name
-# define SFR16(name, addr)      __sfr16 __at(((addr+1)<<8) | addr)      name
+# define SFR16(name, addr)      __sfr16 __at(((addr+1U)<<8) | addr)     name
 # define SFR16E(name, fulladdr) __sfr16 __at(fulladdr)                  name
-# define SFR32(name, addr)      __sfr32 __at(((addr+3)<<24) | ((addr+2)<<16) | ((addr+1)<<8) | addr) name
+# define SFR32(name, addr)      __sfr32 __at(((addr+3UL)<<24) | ((addr+2UL)<<16) | ((addr+1UL)<<8) | addr) name
 # define SFR32E(name, fulladdr) __sfr32 __at(fulladdr)                  name
 
 /** Keil C51

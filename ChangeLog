@@ -1,6 +1,7 @@
 2006-07-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/knownbugs.html: added, contains list of known bugs at release
+	* device/include/mcs51/compiler.h: fixed SFR32 for SDCC
 
 2006-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
 

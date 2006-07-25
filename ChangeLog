@@ -2,6 +2,7 @@
 
 	* configure.in, configure, sdccconf_in.h: fixed bug
 	  [ 1519095 ] regression test onebyte.c fails on ppc64 host
+	* doc/knownbugs.html: removed [ 1519095 ] from the list
 
 2006-07-25 Maarten Brock <sourceforge.brock AT dse.nl>
 

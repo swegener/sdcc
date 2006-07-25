@@ -52,9 +52,9 @@
 #undef TYPE_BYTE
 #undef TYPE_WORD
 #undef TYPE_DWORD
-#define TYPE_UBYTE unsigned TYPE_BYTE
-#define TYPE_UWORD unsigned TYPE_WORD
-#define TYPE_UDWORD unsigned TYPE_DWORD
+#undef TYPE_UBYTE
+#undef TYPE_UWORD
+#undef TYPE_UDWORD
 
 #undef WORDS_BIGENDIAN
 

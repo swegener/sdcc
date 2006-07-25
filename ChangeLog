@@ -1,3 +1,8 @@
+2006-07-25 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure, sdccconf_in.h: fixed bug
+	  [ 1519095 ] regression test onebyte.c fails on ppc64 host
+
 2006-07-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/knownbugs.html: added, contains list of known bugs at release

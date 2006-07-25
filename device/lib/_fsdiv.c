@@ -42,20 +42,52 @@ ___fsdiv:
 	cpl	sign_a
 00001$:
 
-	// if divisor is zero, return infinity
-	cjne	r7, #0, 00002$
-	ljmp	fs_return_inf
+	// if divisor is zero, ...
+	cjne	r7, #0, 00003$
+	// if dividend is also zero, return NaN
+	cjne	r4, #0, 00002$
+	ljmp	fs_return_nan
 00002$:
-	// if dividend is zero, return zero
-	cjne	r4, #0, 00003$
-	ljmp	fs_return_zero
+	// but dividend is non-zero, return infinity
+	ljmp	fs_return_inf
 00003$:
+	// if dividend is zero, return zero
+	cjne	r4, #0, 00004$
+	ljmp	fs_return_zero
+00004$:
+	// if divisor is infinity, ...
+	mov	a, exp_b
+	cjne	a, #0xFF, 00006$
+	// and dividend is also infinity, return NaN
+	mov	a, exp_a
+	cjne	a, #0xFF, 00005$
+	ljmp	fs_return_nan
+00005$:
+	// but dividend is not infinity, return zero
+	ljmp	fs_return_zero
+00006$:
+	// if dividend is infinity, return infinity
+	mov	a, exp_a
+	cjne	a, #0xFF, 00007$
+	ljmp	fs_return_inf
+00007$:
 
 	// subtract exponents
 	clr	c
-	mov	a, exp_a
 	subb	a, exp_b
+	// if no carry then no underflow
+	jnc	00008$
 	add	a, #127
+	jc	00009$
+	ljmp	fs_return_zero
+
+00008$:
+	add	a, #128
+	dec	a
+	jnc	00009$
+	ljmp	fs_return_inf
+
+00009$:
 	mov	exp_a, a
 
 	// need extra bits on a's mantissa
@@ -67,7 +99,7 @@ ___fsdiv:
 	subb	a, r3
 	mov	a, r7
 	subb	a, r4
-	jc	00005$
+	jc	00010$
 	dec	exp_a
 	clr	c
 	mov	a, r2
@@ -82,15 +114,15 @@ ___fsdiv:
 	clr	a
 	rlc	a
 	mov	r4, a
-	sjmp	00006$
-00005$:
+	sjmp	00011$
+00010$:
 #endif
 	clr	a
 	xch	a, r4
 	xch	a, r3
 	xch	a, r2
 	mov	r1, a
-00006$:
+00011$:
 
 	// begin long division
 	push	exp_a
@@ -99,7 +131,7 @@ ___fsdiv:
 #else
 	mov	b, #24
 #endif
-00010$:
+00012$:
 	// compare
 	clr	c
 	mov	a, r1
@@ -112,11 +144,11 @@ ___fsdiv:
 	subb	a, #0		// carry==0 if mant1 >= mant2
 
 #ifdef FLOAT_FULL_ACCURACY
-	djnz	b, 00011$
+	djnz	b, 00013$
 	sjmp	00015$
-00011$:
+00013$:
 #endif
-	jc	00012$
+	jc	00014$
 	// subtract
 	mov	a, r1
 	subb	a, r5
@@ -132,7 +164,7 @@ ___fsdiv:
 	mov	r4, a
 	clr	c
 
-00012$:
+00014$:
 	// shift result
 	cpl	c
 	mov	a, r0
@@ -161,10 +193,10 @@ ___fsdiv:
 	mov	r4, a
 
 #ifdef FLOAT_FULL_ACCURACY
-	sjmp	00010$
+	sjmp	00012$
 00015$:
 #else
-	djnz	b, 00010$
+	djnz	b, 00012$
 #endif
 
 	// now we've got a division result, so all we need to do
@@ -185,6 +217,7 @@ ___fsdiv:
 	pop	exp_a
 	jnc	00016$
 	inc	exp_a
+	// incrementing exp_a without checking carry is dangerous
 	mov	r4, #0x80
 00016$:
 #else
@@ -238,7 +271,7 @@ float __fsdiv (float a1, float a2)
   volatile long result;
   volatile unsigned long mask;
   volatile long mant1, mant2;
-  volatile int exp ;
+  volatile int exp;
   char sign;
 
   fl1.f = a1;
@@ -254,8 +287,10 @@ float __fsdiv (float a1, float a2)
 
   /* divide by zero??? */
   if (!fl2.l)
-    /* return NaN or -NaN */
-    return (-1.0);
+    {/* return NaN or -NaN */
+      fl2.l = 0x7FC00000;
+      return (fl2.f);
+    }
 
   /* numerator zero??? */
   if (!fl1.l)
@@ -296,7 +331,12 @@ float __fsdiv (float a1, float a2)
   result &= ~HIDDEN;
 
   /* pack up and go home */
-  fl1.l = PACK (sign ? 1ul<<31 : 0, (unsigned long) exp, result);
+  if (exp >= 0x100)
+    fl1.l = (sign ? SIGNBIT : 0) | 0x7F800000;
+  else if (exp < 0)
+    fl1.l = 0;
+  else
+    fl1.l = PACK (sign ? SIGNBIT : 0 , exp, result);
   return (fl1.f);
 }
 

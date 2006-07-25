@@ -51,12 +51,32 @@ ___fsmul:
 	cpl	sign_a
 00003$:
 
-	// add the exponents
+	// check if either input is infinity
+	mov	a, exp_b
+	cjne	a, #0xFF, 00004$
+	ljmp	fs_return_inf
+00004$:
 	mov	a, exp_a
-	add	a, exp_b
-	add	a, #130
-	mov	exp_a, a
+	cjne	a, #0xFF, 00005$
+	ljmp	fs_return_inf
+00005$:
 
+	// add the exponents
+	add	a, exp_b
+	// if carry then no underflow
+	jc	00006$
+	add	a, #130
+	jc	00007$
+	ljmp	fs_return_zero
+
+00006$:
+	add	a, #131
+	dec	a
+	jnc	00007$
+	ljmp	fs_return_inf
+
+00007$:
+	mov	exp_a, a
 
 	// now we need to multipy r4/r3/r2 * r7/r6/r5
 	// ------------------------------------------
@@ -215,7 +235,7 @@ float __fsmul (float a1, float a2) {
   volatile unsigned long result;
   volatile int exp;
   char sign;
-  
+
   fl1.f = a1;
   fl2.f = a2;
 
@@ -252,7 +272,12 @@ float __fsmul (float a1, float a2) {
   result &= ~HIDDEN;
 
   /* pack up and go home */
-  fl1.l = PACK (sign ? SIGNBIT : 0 , (unsigned long)exp, result);  
+  if (exp >= 0x100)
+    fl1.l = (sign ? SIGNBIT : 0) | 0x7F800000;
+  else if (exp < 0)
+    fl1.l = 0;
+  else
+    fl1.l = PACK (sign ? SIGNBIT : 0 , exp, result);
   return (fl1.f);
 }
 

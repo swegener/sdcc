@@ -1,3 +1,7 @@
+2006-07-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/knownbugs.html: added, contains list of known bugs at release
+
 2006-07-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/compiler.h: added SFRX for xdata based special

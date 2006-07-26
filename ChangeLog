@@ -1,5 +1,9 @@
 2006-07-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/lib/pic/libsdcc/fsdiv.c,
+	* device/lib/pic/libsdcc/fsmul.c,
+	* device/lib/pic16/libsdcc/float/fsdiv.c,
+	* device/lib/pic16/libsdcc/float/fsmul.c,
 	* device/lib/_fsdiv.c,
 	* device/lib/_fsmul.c: bugfix, handle too large and too small numbers
 	* support/regression/tests/bug1520966.c: added

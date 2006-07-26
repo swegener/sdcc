@@ -51,8 +51,10 @@ float __fsdiv (float a1, float a2) _FS_REENTRANT
 
   /* divide by zero??? */
   if (!fl2.l)
-    /* return NaN or -NaN */
-    return (-1.0);
+    {/* return NaN or -NaN */
+      fl2.l = 0x7FC00000;
+      return (fl2.f);
+    }
 
   /* numerator zero??? */
   if (!fl1.l)
@@ -93,7 +95,12 @@ float __fsdiv (float a1, float a2) _FS_REENTRANT
   result &= ~HIDDEN;
 
   /* pack up and go home */
-  fl1.l = PACK (sign ? 1ul<<31 : 0, (unsigned long) exp, result);
+  if (exp >= 0x100)
+    fl1.l = (sign ? SIGNBIT : 0) | 0x7F800000;
+  else if (exp < 0)
+    fl1.l = 0;
+  else
+    fl1.l = PACK (sign ? SIGNBIT : 0 , exp, result);
   return (fl1.f);
 }
 

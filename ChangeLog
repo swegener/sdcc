@@ -7,6 +7,7 @@
 	* device/lib/_fsdiv.c,
 	* device/lib/_fsmul.c: bugfix, handle too large and too small numbers
 	* support/regression/tests/bug1520966.c: added
+	* doc/knownbugs.html: removed [ 1520966 ] from the list
 
 2006-07-25 Borut Razem <borut.razem AT siol.net>
 

@@ -3,6 +3,10 @@
 	* device/lib/pic/Makefile.in, device/lib/pic/Makefile.subdir,
 	  device/lib/pic/libdev/Makefile.in: fixed bug
 	  [ 1438354 ] pic libsdcc: distclean doesn't work
+	* device/lib/pic16/Makefile.in, device/lib/pic16/Makefile.subdir,
+	  device/lib/pic16/libio/Makefile.in: fixed bug
+	  [ 1438344 ] pic16 lib: clean doesn't work properly
+	* doc/knownbugs.html removed [ 1438354 ] and [ 1438344 ] from the list
 
 2006-07-26 Maarten Brock <sourceforge.brock AT dse.nl>
 

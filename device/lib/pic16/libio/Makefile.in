@@ -31,7 +31,14 @@ include $(top_builddir)Makefile.common
 # I create $(builddir)/$${arch} right here in order to prevent 
 # the sub-make's `builddir´ rules from aborting if another sub-make
 # already created the above directory (happened on Alpha).
-all clean clean-intermediate install :
+all clean-intermediate install : libio-recurse
+
+clean : libio-recurse
+	$(Q)-[ ! -d "$(top_builddir)$(builddir)" ] || $(RMDIR) "$(top_builddir)$(builddir)"
+
+distclean : clean
+ 
+libio-recurse :
 	$(Q)+cat $(top_builddir)pics.build \
 		| $(SED) -e "s,[ \t]*#.*$$,," \
 		| $(GREP) -v "^[ \t]*$$" \

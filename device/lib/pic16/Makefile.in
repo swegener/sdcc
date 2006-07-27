@@ -53,7 +53,9 @@ clean : recurse
 	$(Q)-$(RMDIR) "$(top_pic16builddir)/$(builddir)"
 
 distclean: clean
-	$(RM) -f Makefile
+	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common pics.build
+	$(Q)find $(SUBDIRS) -name Makefile -delete
+	$(Q)-[ ! -d bin ] || $(RMDIR) bin
 
 clean-intermediate : recurse
 

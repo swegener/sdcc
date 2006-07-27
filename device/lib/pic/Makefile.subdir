@@ -61,6 +61,9 @@ clean : recurse
 	$(Q)-$(RM) $(addprefix $(top_builddir)$(installdir)/,$(notdir $(TARGETS)))
 	$(Q)-[ ! -d "$(top_builddir)$(builddir)" ] || $(RMDIR) "$(top_builddir)$(builddir)"
 
+distclean : clean
+	$(Q)-$(RM) Makefile
+
 clean-intermediate : recurse
 	@-echo "dummy" > .dummy
 	$(Q)-$(RM) .dummy $(foreach suf,p lst hex cod sym,$(OBJS:.o=.$(suf)))

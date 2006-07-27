@@ -39,6 +39,9 @@ clean : clean-intermediate
 	$(Q)-$(RM) $(OBJS) $(LIBS)
 	$(Q)-$(RMDIR) ../build/libdev
 
+distclean: clean
+	$(Q)-$(RM) Makefile
+
 clean-intermediate :
 	$(Q)-$(RM) *.lst *.d *.adb
 

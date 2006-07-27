@@ -1,3 +1,9 @@
+2006-07-27 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic/Makefile.in, device/lib/pic/Makefile.subdir,
+	  device/lib/pic/libdev/Makefile.in: fixed bug
+	  [ 1438354 ] pic libsdcc: distclean doesn't work
+
 2006-07-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/pic/libsdcc/fsdiv.c,

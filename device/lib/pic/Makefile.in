@@ -48,7 +48,8 @@ clean : recurse
 	$(Q)-$(RMDIR) "$(top_builddir)$(builddir)"
 
 distclean: clean
-	rm -f Makefile
+	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common
+	$(Q)-$(RMDIR) bin
 
 clean-intermediate : recurse
 

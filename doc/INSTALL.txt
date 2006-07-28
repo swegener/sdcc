@@ -1,43 +1,83 @@
 SDCC Binary Kit Install Help
 ----------------------------
-$Id$
 
 For Linux users:
-Even if the default search paths look into /usr/local, sdcc is fully
-relocatable. Try `sdcc --print-search-dirs` if you've problems with header or
-library files. See sdccman.[txt|pdf|html] for more detailed information.
-
+================
 To install:
 
-* Extract the binary kit to a temporary directory. This will create a
-new directory called 'sdcc' in the temporary directory.
+* Extract the binary kit to a temporary directory.
+  This will create a new directory called 'sdcc' in the temporary directory.
     cd ~
     mkdir tmp
     cd tmp
-    tar xzf path/to/binary/kit/sdcc.tar.gz
+    tar xzf path/to/binary/kit/sdcc-2.6.0-i386-unknown-linux2.2.tar.gz
 
 * Change to the sdcc directory and copy all files to /usr/local
     cd sdcc
     cp -r * /usr/local
 
-This will install sdcc into /usr/local/bin/sdcc, support files into
-/usr/local/share/sdcc, and documentation into
-/usr/local/share/sdcc/doc.
+This will install sdcc binaries into: /usr/local/bin/
+header files into:                    /usr/local/share/sdcc/include/
+library files into:                   /usr/local/share/sdcc/lib/
+and documentation into:               /usr/local/share/sdcc/doc/
 
 You can test the install by entering:
     /usr/local/bin/sdcc -v
 
 This should return sdcc's version number.
 
+Even if the default search paths look into /usr/local, sdcc is fully
+relocatable. Try `sdcc --print-search-dirs` if you have problems with header
+or library files. See sdccman.[txt|pdf|html] for more detailed information.
+
 
 For Windows 9X/NT/2000/XP users:
-sdcc for win32 is fully relocatable.
+================================
 To install:
 
-* Open sdcc-2.4.0-i586-mingw32msvc.zip in WinZip
-* Extract all files to c:\ (or any other path you like), making sure to check 'Use folder names'
+* If you would like to keep a copy of your previous version,
+  rename the directory where it's installed first
+* Run sdcc-2.6.0-setup.exe
+
+By default this will install sdcc binaries into: C:\Program Files\SDCC\bin\
+header files into:                               C:\Program Files\SDCC\include\
+library files into:                              C:\Program Files\SDCC\lib\
+and documentation into:                          C:\Program Files\SDCC\doc\
 
 You can test the install by opening a DOS box and entering:
-    c:\sdcc\bin\sdcc -v
+    sdcc -v
 
 This should return sdcc's version number.
+
+sdcc for win32 is fully relocatable. Try `sdcc --print-search-dirs` if you
+have problems with header or library files. See sdccman.[txt|pdf|html] for
+more detailed information.
+
+
+For Mac OS X users:
+===================
+To install:
+
+* Extract the binary kit to a temporary directory.
+  This will create a new directory called 'sdcc' in the temporary directory.
+    cd ~
+    mkdir tmp
+    cd tmp
+    tar xzf path/to/binary/kit/sdcc-2.6.0-ppc-unknown-macosx.tar.gz
+
+* Change to the sdcc directory and copy all files to /Developer/sdcc
+    cp -r sdcc /Developer/sdcc
+
+This will install sdcc binaries into: /Developer/sdcc/bin/
+header files into:                    /Developer/sdcc/share/sdcc/include/
+library files into:                   /Developer/sdcc/share/sdcc/lib/
+and documentation into:               /Developer/sdcc/share/sdcc/doc/
+
+You can test the install by entering:
+    /Developer/sdcc/bin/sdcc -v
+
+This should return sdcc's version number.
+
+Even if the default search paths look into /usr/local, sdcc is fully
+relocatable. Try `sdcc --print-search-dirs` if you have problems with header
+or library files. See sdccman.[txt|pdf|html] for more detailed information.

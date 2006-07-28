@@ -1,6 +1,7 @@
 2006-07-28 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: remove $INSTDIR\include\asm\pic16\*.h
+	* doc/INSTALL.txt: updated
 
 2006-07-27 Borut Razem <borut.razem AT siol.net>
 

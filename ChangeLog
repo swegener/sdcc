@@ -1,3 +1,7 @@
+2006-07-28 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: remove $INSTDIR\include\asm\pic16\*.h
+
 2006-07-27 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic/Makefile.in, device/lib/pic/Makefile.subdir,

@@ -575,6 +575,7 @@ Section Uninstall
 
   Delete "$INSTDIR\include\asm\z80\*.h"
   Delete "$INSTDIR\include\asm\pic16\*.h"
+  Delete "$INSTDIR\include\asm\pic\*.h"
   Delete "$INSTDIR\include\asm\mcs51\*.h"
   Delete "$INSTDIR\include\asm\gbz80\*.h"
   Delete "$INSTDIR\include\asm\ds390\*.h"
@@ -627,6 +628,7 @@ Section Uninstall
 
   RMDir "$INSTDIR\include\asm\z80"
   RMDir "$INSTDIR\include\asm\pic16"
+  RMDir "$INSTDIR\include\asm\pic"
   RMDir "$INSTDIR\include\asm\mcs51"
   RMDir "$INSTDIR\include\asm\gbz80"
   RMDir "$INSTDIR\include\asm\ds390"

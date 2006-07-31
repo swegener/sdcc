@@ -1,3 +1,9 @@
+2006-07-31 Borut Razem <borut.razem AT siol.net>
+
+	* Small Device C Compiler 2.6.0 released
+	* support/scripts/sdcc.nsi: added FULL_DOC option
+	* .version, doc/sdccman.lyx: changed sdcc version to 2.6.1
+
 2006-07-28 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: remove $INSTDIR\include\asm\pic16\*.h

@@ -26,7 +26,7 @@
 # How to create WIN32 setup.exe
 #
 # - unpack WIN32 mingw daily snapshot sdcc-snapshot-i586-mingw32msvc-yyyymmdd.zip
-#   to a clean directory (the option to create directories should be enambled).
+#   to a clean directory (the option to create directories should be enabled).
 #   A sub directory sdcc is created (referenced as PKGDIR in continuation).
 # - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
 #   (this file) from the sdcc Subversion snapshot to the PKGDIR directory
@@ -146,8 +146,12 @@ SectionEnd
 Section "SDCC documentation"
   SectionIn 1 2 3
   SetOutPath "$INSTDIR\doc"
+!ifdef FULL_DOC
+  File /r "${SDCC_ROOT}\doc\*"
+!else
   File "${SDCC_ROOT}\doc\ChangeLog_head.txt"
   File "${SDCC_ROOT}\doc\README.TXT"
+!endif
 SectionEnd
 
 Section "SDCC include files"
@@ -589,8 +593,10 @@ Section Uninstall
   Delete "$INSTDIR\include\hc08\*.h"
   Delete "$INSTDIR\include\*.h"
 
+!ifndef FULL_DOC
   Delete "$INSTDIR\doc\README.TXT"
   Delete "$INSTDIR\doc\ChangeLog_head.txt"
+!endif
 
   Delete "$INSTDIR\bin\*.exe"
 
@@ -641,7 +647,11 @@ Section Uninstall
   RMDir "$INSTDIR\include\hc08"
   RMDir "$INSTDIR\include"
 
+!ifdef FULL_DOC
+  RMDir /r "$INSTDIR\doc"
+!else
   RMDir "$INSTDIR\doc"
+!endif
 
   RMDir "$INSTDIR\bin"
 

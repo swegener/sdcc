@@ -28,7 +28,7 @@ PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
 EXEEXT		= @EXEEXT@
 
-LIBS		= @LIBS@ -L$(top_builddir) -lsim -lutil -lguiucsim -lcmd -lsim
+LIBS		= -L$(top_builddir) -lsim -lutil -lguiucsim -lcmd -lsim @LIBS@
 DL		= @DL@
 dl_ok		= @dl_ok@
 

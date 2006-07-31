@@ -1,12 +1,26 @@
 2006-07-31 Borut Razem <borut.razem AT siol.net>
 
+	* sim/ucsim/configure, sim/ucsim/cmd.src/newcmdcl.h,
+	  sim/ucsim/cmd.src/newcmd.cc, sim/ucsim/cmd.src/cmdutil.cc,
+	  sim/ucsim/z80.src/Makefile.in, sim/ucsim/configure.in,
+	  sim/ucsim/hc08.src/Makefile.in, sim/ucsim/hc08.src/hc08.cc,
+	  sim/ucsim/ddconfig_in.h, sim/ucsim/s51.src/Makefile.in,
+	  sim/ucsim/s51.src/uc51cl.h, sim/ucsim/s51.src/serialcl.h,
+	  sim/ucsim/s51.src/uc51.cc, sim/ucsim/s51.src/serial.cc,
+	  sim/ucsim/app.cc, sim/ucsim/avr.src/Makefile.in:
+	  enable ucsim mingw compilation. Serial port is disabled,
+	  since it uses termios.h API, which is not available on native
+	  WIN32
+
+2006-07-31 Borut Razem <borut.razem AT siol.net>
+
 	* Small Device C Compiler 2.6.0 released
 	* support/scripts/sdcc.nsi: added FULL_DOC option
 	* .version, doc/sdccman.lyx: changed sdcc version to 2.6.1
 
 2006-07-28 Borut Razem <borut.razem AT siol.net>
 
-	* support/scripts/sdcc.nsi: remove $INSTDIR\include\asm\pic16\*.h
+	* support/scripts/sdcc.nsi: remove $INSTDIR/include/asm/pic16/*.h
 	* doc/INSTALL.txt: updated
 
 2006-07-27 Borut Razem <borut.razem AT siol.net>
@@ -191,7 +205,7 @@
 2006-06-25 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libc/stdio/sprintf.c: return the number of
-	  characters printed (not including the trailing '\0' used to end
+	  characters printed (not including the trailing '/0' used to end
 	  output to strings). Problem detected in regression test bug-927659.c.
 	  NOTE: printf() family functions should return int instead
 	  unsigned int!
@@ -991,7 +1005,7 @@
 	* as/mcs51/lkhead.c (newhead): head is absolute but not overlay
 	* as/hc08/lklibr.c (addfile, fndsym),
 	* as/mcs51/lklibr.c (addfile, buildlibraryindex, fndsym): prevent
-	  index out of range and detect both '\' and '/'
+	  index out of range and detect both '/' and '/'
 	* device/include/mcs51/c8051f200.h: added _XPAGE, removed bad comment
 	* device/include/stdbool.h: removed SDCC_ds390 from check to pass
 	  regression tests (ds390 cannot return bool yet)
@@ -1054,8 +1068,8 @@
 
 2006-04-18 Borut Razem <borut.razem AT siol.net>
 
-	* support/scripts/sdcc.nsi: removed unexisting ${DEV_ROOT}\lib\pic\*.o,
-	  ${DEV_ROOT}\lib\src\pic\libdev\*.S, ${DEV_ROOT}\lib\src\pic\libdev\*.inc
+	* support/scripts/sdcc.nsi: removed unexisting ${DEV_ROOT}/lib/pic/*.o,
+	  ${DEV_ROOT}/lib/src/pic/libdev/*.S, ${DEV_ROOT}/lib/src/pic/libdev/*.inc
 
 2006-04-17 Borut Razem <borut.razem AT siol.net>
 
@@ -2992,7 +3006,7 @@
 
 2005-06-20 Slade Rich <slade_rich AT users.sourceforge.net>
 
-	* src/pic/pcode.c : Fixed problem when a string constant contains a "\r\n"
+	* src/pic/pcode.c : Fixed problem when a string constant contains a "/r/n"
 	  and the output asm file line is printed on two lines.
 
 2005-06-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
@@ -3037,20 +3051,20 @@
 2005-05-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_printIvalChar): fixed _constant_ string
-	  initializers with \0, bug #1208187
+	  initializers with /0, bug #1208187
 	* src/pic/glue.c (printIvalChar): fixed (non- and constant) string
-	  intializers with \0, bug #1208187
+	  intializers with /0, bug #1208187
 
 2005-05-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_printIvalChar): fixed string
-	  initializers with \0, bug #1208187
+	  initializers with /0, bug #1208187
 	* src/pic16/main.c (_process_pragma): added sanity checks
 	  for stack position and size, emit warnings when appropriate
 
 2005-05-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* device/lib/_strncpy.c: fixed not filling with \0
+	* device/lib/_strncpy.c: fixed not filling with /0
 
 2005-05-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -3253,7 +3267,7 @@
 	  (findNextInstruction), (findPrevInstruction),
 	  (findInstructionUsingLabel),
 	  src/pic/pcode.h: fixed bug #1164907 - Labels not being recognized
-	* src/pic/pcode.c (findLabel): added missing '\n'
+	* src/pic/pcode.c (findLabel): added missing '/n'
 	* src/src.dsp: added SDCCdwarf2.c to the project
 
 2005-04-09 Borut Razem <borut.razem AT siol.net>
@@ -3837,7 +3851,7 @@
 	to memccpy(void *, void *, char, size_t)
 	* src/pic16/gen.c (genFunction, genEndFunction): reenable if-case to
 	check whether to omit frame pointer or not,
-	* (genInline): convert all occurences of "\n" to LF in inline
+	* (genInline): convert all occurences of "/n" to LF in inline
 	assembler blocks, this helps formatting the inline text,
 	* (pic16_loadFSR0): modified prototype,
 	* (genNearPointerGet, genNearPointerSet): reorganization of code,
@@ -5601,8 +5615,8 @@
 
 2004-08-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* src/mcs51/gen.c (genInline): Add \n for labels, not DOS/WIN dirs
-	  such as c:\mydir.
+	* src/mcs51/gen.c (genInline): Add /n for labels, not DOS/WIN dirs
+	  such as c:/mydir.
 
 2004-08-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -5666,7 +5680,7 @@
 	  _memcmp.c _memmove.c calloc.c realloc.c free.c
 	* support/regression/tests/malloc.c: added tests for new functionality
 	* support/regression/tests/zeropad.c: added tests for truncated initializers
-	  and initialized char arrays starting with '\x0'
+	  and initialized char arrays starting with '/x0'
 	* src/mcs51/peeph.def: fixed regression, added peephole 177.f
 
 2004-07-26 Bernhard Held <bernhard AT bernhardheld.de>
@@ -5844,7 +5858,7 @@
 	a member of a specific memory bank,
 	* (pic16_printIvalCharPtr): added code to add string literals either
 	to code or the idata sections,
-	* src/pic16/main.c (_process_pragma): added \n to WHITE constant,
+	* src/pic16/main.c (_process_pragma): added /n to WHITE constant,
 	also accept the 'udata' pragma,
 	* src/pic16/main.h: new structure types sectName and sectSym
 	* src/pic16/pcode.c: added new pCodeInstruction entry for BANKSEL
@@ -8473,7 +8487,7 @@
 
 2003-10-31  Borut Razem <borut.razem AT siol.net>
 
-	* support\cpp2\cpplex.c: fixed for SDCPP:
+	* support/cpp2/cpplex.c: fixed for SDCPP:
 	  comments(when executed with -C option) and _asm blocks
 	  were included even if they where in skipped #if block.
 	  Applied solution from GCC cpp 3.3.2
@@ -9215,20 +9229,20 @@
 
 	Fixed some warnings when building with MSVC:
 
-	* as\mcs51\asdata.c
-	* as\z80\asdata.c
-	* as\mcs51\asm.h
-	* as\z80\asm.h
-	* link\z80\aslink.h
-	* link\z80\lkdata.c
-	* link\z80\lkeval.c
-	* link\z80\lkgb.c
-	* link\z80\lkihx.c
-	* link\z80\lks19.c
-	* link\z80\lksym.c
-	* support\cpp2\cpplib.c
-	* src\ds390\gen.c
-	* src\mcs51\gen.c
+	* as/mcs51/asdata.c
+	* as/z80/asdata.c
+	* as/mcs51/asm.h
+	* as/z80/asm.h
+	* link/z80/aslink.h
+	* link/z80/lkdata.c
+	* link/z80/lkeval.c
+	* link/z80/lkgb.c
+	* link/z80/lkihx.c
+	* link/z80/lks19.c
+	* link/z80/lksym.c
+	* support/cpp2/cpplib.c
+	* src/ds390/gen.c
+	* src/mcs51/gen.c
 
 2003-08-03  Bernhard Held <bernhard AT bernhardheld.de>
 
@@ -9236,21 +9250,21 @@
 
 2003-08-01  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* support\librarian\clean.mk: Do not remove Makefile.
-	* support\librarian\Makefile: added.
+	* support/librarian/clean.mk: Do not remove Makefile.
+	* support/librarian/Makefile: added.
 
 2003-08-01  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
 	Added librarian to MSVC build:
 	* all.dsp
 	* sdcc.dsw
-	* support\librarian\librarian.dsp
+	* support/librarian/librarian.dsp
 
 	'configure' not needed for librarian, removed:
-	* support\librarian\configure
-	* support\librarian\configure.in
-	* support\librarian\config_in.h
-	* support\librarian\Makefile.in
+	* support/librarian/configure
+	* support/librarian/configure.in
+	* support/librarian/config_in.h
+	* support/librarian/Makefile.in
 
 	Hopefully these ones built the librarian and the rest of sdcc properly:
 	* Makefile
@@ -9270,13 +9284,13 @@
 	Adding sdcclib to the build.  MSVC project coming soon.
 	Files added/changed:
 
-	* support\librarian\clean.mk
-	* support\librarian\configure
-	* support\librarian\configure.in
-	* support\librarian\config_in.h
-	* support\librarian\Makefile.bcc
-	* support\librarian\Makefile.in
-	* support\librarian\sdcclib.c
+	* support/librarian/clean.mk
+	* support/librarian/configure
+	* support/librarian/configure.in
+	* support/librarian/config_in.h
+	* support/librarian/Makefile.bcc
+	* support/librarian/Makefile.in
+	* support/librarian/sdcclib.c
 	* Makefile.bcc
 	* Makefile
 	* Makefile.common.in
@@ -9289,25 +9303,25 @@
 	example, one compiled using --model-large and another one compiled with
 	--model-small.  The following files were modified:
 
-	* as\mcs51\asdata.c
-	* as\mcs51\aslink.h
-	* as\mcs51\asm.h
-	* as\mcs51\asmain.c
-	* as\mcs51\asout.c
-	* as\mcs51\i51pst.c
-	* as\mcs51\lkdata.c
-	* as\mcs51\lklibr.c
-	* as\mcs51\lkmain.c
-	* as\z80\asdata.c
-	* as\z80\asm.h
-	* as\z80\asmain.c
-	* as\z80\asout.c
-	* as\z80\z80pst.c
-	* link\z80\aslink.h
-	* link\z80\lkdata.c
-	* link\z80\lklibr.c
-	* link\z80\lkmain.c
-	* src\SDCCglue.c
+	* as/mcs51/asdata.c
+	* as/mcs51/aslink.h
+	* as/mcs51/asm.h
+	* as/mcs51/asmain.c
+	* as/mcs51/asout.c
+	* as/mcs51/i51pst.c
+	* as/mcs51/lkdata.c
+	* as/mcs51/lklibr.c
+	* as/mcs51/lkmain.c
+	* as/z80/asdata.c
+	* as/z80/asm.h
+	* as/z80/asmain.c
+	* as/z80/asout.c
+	* as/z80/z80pst.c
+	* link/z80/aslink.h
+	* link/z80/lkdata.c
+	* link/z80/lklibr.c
+	* link/z80/lkmain.c
+	* src/SDCCglue.c
 
 2003-07-28  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
@@ -9493,7 +9507,7 @@
 
 2003-06-18  Bernhard Held <bernhard AT bernhardheld.de>
 
-	* support/Util/MySystem.c (merge_command): quick fix for Linux segfault with \"cmd\" arg
+	* support/Util/MySystem.c (merge_command): quick fix for Linux segfault with /"cmd/" arg
 
 2003-06-15  Borut Razem <borut.razem AT siol.net>
 
@@ -9549,7 +9563,7 @@
 	* doc/sdccman.lyx: updated to Lyx 1.3
 	* doc/cdbfileformat.lyx: updated to Lyx 1.3
 	* doc/test_suite_spec.lyx: updated to Lyx 1.3
-	* doc/Makefile: added fix for the \tabularnewline problem, thanks to Jesus
+	* doc/Makefile: added fix for the /tabularnewline problem, thanks to Jesus
 
 2003-06-03  Bernhard Held <bernhard AT bernhardheld.de>
 
@@ -10111,7 +10125,7 @@
 	* src/SDCC.lex: Fix for bug #711240: dynamic buffer handling of C
           literal strings in stringLiteral()
 	* support/Util/dbuf.c, support/Util/dbuf.h: added: dynamic buffer handling
-	* src/Makefile.bcc, src/Makefile.in, src\src.dsp: added support/Util/dbuf.c
+	* src/Makefile.bcc, src/Makefile.in, src/src.dsp: added support/Util/dbuf.c
           to the project
 
 2003-03-27  Paul Stoffregen <paul AT pjrc.com>
@@ -10678,7 +10692,7 @@
 2003-01-12  Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCmain.c (main): port->finaliseOptions() moved for z80 linking
-	* src/SDCCutil.c (join): ugly bug: missing '\0'
+	* src/SDCCutil.c (join): ugly bug: missing '/0'
 	* as/mcs51/lkmem.c (summary): sp on address 7 is safe
 
 2003-01-11  Bernhard Held <bernhard AT bernhardheld.de>
@@ -10763,23 +10777,23 @@
 
 2002-12-10  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-    * in \sdcc\as\mcs51\ changed these files in order to create an
+    * in /sdcc/as/mcs51/ changed these files in order to create an
     aomf51 file: aslink.h, lkdta.c, lklex.c, lklibr.c, lklist.c,
     lkmain.c.  Also added: lkmem.c and lkaomf51.c.  Changed the
     following files to include the previous two files: aslink.dsp,
     Makefile.aslink, Makefile.bcc, and Makefile.in.
 
-    * Changed \sdcc\src\SDCCmain.c so it creates files with extension
+    * Changed /sdcc/src/SDCCmain.c so it creates files with extension
     .adb instead of .cdb
 
 2002-11-09  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* \sdcc\as\mcs51\lklist.c: Now reports memory usage using the
+	* /sdcc/as/mcs51/lklist.c: Now reports memory usage using the
 	value from option --iram-size.
 
 2002-09-20  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* \sdcc\as\mcs51\lklist.c: added boundary check before using
+	* /sdcc/as/mcs51/lklist.c: added boundary check before using
 	dram[] array.
 
 2002-09-18    <wiml AT hhhh.org>
@@ -10794,50 +10808,50 @@
 	  compact code for X = LITERAL - Y
 
 2002-09-00  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
-	* \sdcc\as\mcs51\lklist.c: Fixed incorrect number of parameters to
+	* /sdcc/as/mcs51/lklist.c: Fixed incorrect number of parameters to
 	sprintf() in line 1267.
 
 2002-09-08  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
-	* \sdcc\src\SDCCglue.c: Generate areas REG_BANK_[0-3] only for 8051
+	* /sdcc/src/SDCCglue.c: Generate areas REG_BANK_[0-3] only for 8051
 	like ports.
 
 2002-09-04  Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 	Changes to aslink (All the changes are marked with 'JCF'):
 
-	* \sdcc\as\mcs51\aslink.h: External definition of sflag and
+	* /sdcc/as/mcs51/aslink.h: External definition of sflag and
 	summary().
 
-	* \sdcc\as\mcs51\lkarea.c: Computes the size of area BSEG_BYTES from
+	* /sdcc/as/mcs51/lkarea.c: Computes the size of area BSEG_BYTES from
 	area BSEG.  Also moves, if possible, the DATA area down into the internal
 	ram so more space is available.
 
-	* \sdcc\as\mcs51\lkdata.c: Definition of memory summary output flag
+	* /sdcc/as/mcs51/lkdata.c: Definition of memory summary output flag
 	sflag.
 
-	* \sdcc\as\mcs51\lklist.c: For the BSEG area report the size in bits,
+	* /sdcc/as/mcs51/lklist.c: For the BSEG area report the size in bits,
 	not bytes.  Function summary() which creates a memory usage summary
 	file with extension .mem.  Reports of overlaping stack and small stack
 	size.  If the space for the stack is less than 16 bytes aslink trows a
 	warning.
 
-	* \sdcc\as\mcs51\lkmain.c: Creation of some of the default areas for
+	* /sdcc/as/mcs51/lkmain.c: Creation of some of the default areas for
 	the 8051.  Option 'y' for memory summary output file.
 
 	Changes to sdcc (All the changes are marked with 'JCF'):
 
-	* \sdcc\src\SDCCglobl.h: External definition of RegBankUsed[4].
+	* /sdcc/src/SDCCglobl.h: External definition of RegBankUsed[4].
 
-	* \sdcc\src\SDCCglue.c:  If a register bank is used, creates an
+	* /sdcc/src/SDCCglue.c:  If a register bank is used, creates an
 	overlaying area	for it (uses RegBankUsed[4]).
 
-	* \sdcc\src\SDCCmain.c: Definition RegBankUsed[4]; marks register
+	* /sdcc/src/SDCCmain.c: Definition RegBankUsed[4]; marks register
 	bank zero as used by default.  By default aslink locates the stack
 	(equivalent to --stack-after-data).  Pass option 'y' to aslink for
 	the creation of the .mem file.  Delegates the allocation of data area
 	to aslink (it is not longer 0x30 by default).  If --stack-loc passes
 	the begining of the stack area to aslink.
 
-	* \sdcc\src\SDCCmem.c:  If a register bank is used, marks it so
+	* /sdcc/src/SDCCmem.c:  If a register bank is used, marks it so
 	glue() in SDCCglue.c creates an area for it.
 
 2002-09-03  Borut Razem <borut.razem AT siol.net>
@@ -10934,7 +10948,7 @@
 	  so it is replaced with STRCASECMP, which is defined as stricmp in case of MSC and BORLANDC
 	- solved MSC error in function aopDump()
 
-	* sdcc_vc.h: define PREFIX as "\\sdcc"
+	* sdcc_vc.h: define PREFIX as "//sdcc"
 
 2002-07-18  Bernhard Held <bernhard AT bernhardheld.de>
 	* src/SDCCast.c (decorateType): fixed access to array of structures http://sourceforge.net/mailarchive/forum.php?thread_id=902690&forum_id=4107

@@ -136,14 +136,45 @@ fi
 AC_HEADER_STDC
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(unistd.h)
-AC_CHECK_HEADER(sys/socket.h,
-    AC_DEFINE(SOCKET_AVAIL)
-    AC_DEFINE(HAVE_SYS_SOCKET_H)
-    AC_EGREP_HEADER(socklen_t,
-		    sys/socket.h,
-		    AC_DEFINE_UNQUOTED(SOCKLEN_T, socklen_t),
-		    AC_DEFINE_UNQUOTED(SOCKLEN_T, uint))
+
+AC_CHECK_HEADER(termios.h,
+  AC_DEFINE(HAVE_TERMIOS_H)
+  SERIAL_AVAIL=1,
+  SERIAL_AVAIL=0
 )
+AC_SUBST(SERIAL_AVAIL)
+
+AC_CHECK_HEADER(curses.h,
+  AC_DEFINE(HAVE_CURSES_H)
+  curses_h_ok=yes,
+  curses_h_ok=no
+)
+
+ucsim_cv_socket="unknown"
+AC_CHECK_HEADER(sys/socket.h,
+  AC_DEFINE(HAVE_SYS_SOCKET_H)
+  AC_DEFINE(SOCKET_AVAIL)
+  AC_DEFINE_UNQUOTED(UCSOCKET_T, int)
+  ucsim_cv_socket="<sys/socket.h>"
+)
+
+if test $ucsim_cv_socket = unknown; then
+  AC_CHECK_HEADER(winsock2.h,
+    AC_DEFINE(HAVE_WINSOCK2_H)
+    AC_DEFINE(SOCKET_AVAIL)
+    AC_DEFINE_UNQUOTED(UCSOCKET_T, SOCKET)
+    ucsim_cv_socket="<winsock2.h>"
+  )
+fi
+
+if test $ucsim_cv_socket != unknown; then
+  AC_EGREP_HEADER(socklen_t,
+    $ucsim_cv_socket,
+    AC_DEFINE_UNQUOTED(SOCKLEN_T, socklen_t),
+    AC_DEFINE_UNQUOTED(SOCKLEN_T, uint))
+fi
+AC_DEFINE_UNQUOTED(HEADER_SOCKET, ${ucsim_cv_socket})
+
 AC_CHECK_HEADER(dlfcn.h)
 AC_HEADER_DIRENT
 
@@ -151,6 +182,11 @@ AC_HEADER_DIRENT
 
 AC_CACHE_CHECK(which header file defines FD_ macros, ucsim_cv_fd,
 [ucsim_cv_fd="unknown"
+AC_EGREP_CPP(yes, [
+#include <winsock2.h>
+#ifdef FD_ZERO
+yes
+#endif], ucsim_cv_fd="<winsock2.h>")
 AC_EGREP_CPP(yes, [
 #include <sys/time.h>
 #ifdef FD_ZERO
@@ -165,35 +201,47 @@ AC_EGREP_CPP(yes, [
 #include <sys/select.h>
 #ifdef FD_ZERO
 yes
-#endif], ucsim_cv_fd="<sys/types.h>")])
+#endif], ucsim_cv_fd="<sys/select.h>")])
 
-AC_DEFINE(FD_HEADER_OK, 0)
+ucsim_cv_header_ok=0
 if echo $ucsim_cv_fd|grep time >/dev/null 2>&1; then
 AC_DEFINE(FD_NEED_TIME_H, 1)
-AC_DEFINE(FD_HEADER_OK, 1)
+ucsim_cv_header_ok=1
 else
 AC_DEFINE(FD_NEED_TIME_H, 0)
 fi
 if echo $ucsim_cv_fd|grep types >/dev/null 2>&1; then
 AC_DEFINE(FD_NEED_TYPES_H, 1)
-AC_DEFINE(FD_HEADER_OK, 1)
+ucsim_cv_header_ok=1
 else
 AC_DEFINE(FD_NEED_TYPES_H, 0)
 fi
 if echo $ucsim_cv_fd|grep select >/dev/null 2>&1; then
 AC_DEFINE(FD_NEED_SELECT_H, 1)
-AC_DEFINE(FD_HEADER_OK, 1)
+ucsim_cv_header_ok=1
 else
 AC_DEFINE(FD_NEED_SELECT_H, 0)
 fi
+if echo $ucsim_cv_fd|grep winsock2 >/dev/null 2>&1; then
+AC_DEFINE(FD_NEED_WINSOCK2_H, 1)
+ucsim_cv_header_ok=1
+else
+AC_DEFINE(FD_NEED_WINSOCK2_H, 0)
+fi
 
+AC_DEFINE_UNQUOTED(FD_HEADER_OK, ${ucsim_cv_header_ok})
 AC_DEFINE_UNQUOTED(HEADER_FD, ${ucsim_cv_fd})
 
 
 # Checking for functions/libs
 # ===========================================================================
-AC_CHECK_LIB(socket,socket)
-AC_CHECK_LIB(nsl,xdr_short)
+if echo $ucsim_cv_socket|grep winsock2 >/dev/null 2>&1; then
+  LIBS="-lwsock32 $LIBS"
+else
+  AC_CHECK_LIB(socket,socket)
+  AC_CHECK_LIB(nsl,xdr_short)
+fi
+
 AC_CHECK_LIB(dl,dlopen,
 dl_ok="yes"
 DL="-ldl",
@@ -216,26 +264,31 @@ AC_SUBST(DL)
 #,
 #-lcurses)
 
-AC_CHECK_LIB(panel,panel_above,
-panel_ok="yes"
-curses_ok="yes"
-CURSES_LIBS="-lpanel",
-panel_ok="no"
-curses_ok="no"
-)
+if test $curses_h_ok != yes; then
+  panel_ok="no"
+  curses_ok="no"
+else
+  AC_CHECK_LIB(panel,panel_above,
+    panel_ok="yes"
+    curses_ok="yes"
+    CURSES_LIBS="-lpanel",
+    panel_ok="no"
+    curses_ok="no"
+  )
 
-if test $curses_ok != yes; then
-  AC_CHECK_LIB(curses,nl,
-  curses_ok="yes"
-  CURSES_LIBS="-lcurses",
-  curses_ok="no")
-fi
+  if test $curses_ok != yes; then
+    AC_CHECK_LIB(curses,nl,
+      curses_ok="yes"
+      CURSES_LIBS="-lcurses",
+      curses_ok="no")
+  fi
 
-if test $curses_ok != yes; then
-  AC_CHECK_LIB(ncurses,nl,
-  curses_ok="yes"
-  CURSES_LIBS="-lncurses",
-  curses_ok="no")
+  if test $curses_ok != yes; then
+    AC_CHECK_LIB(ncurses,nl,
+      curses_ok="yes"
+      CURSES_LIBS="-lncurses",
+      curses_ok="no")
+  fi
 fi
 
 AC_SUBST(panel_ok)
@@ -304,7 +357,7 @@ AC_DEFUN(ucsim_ACCEPT_LENGTH_T,
     for ac_val in int size_t socklen_t; do
       CPPFLAGS="$ac_save_CPPFLAGS -DACCEPT_SOCKLEN_T=$ac_val"
       AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>],
+#include ${ucsim_cv_socket}],
         [struct sockaddr a; $ac_val len; accept (0, &a, &len);],
         [ucsim_cv_accept_length_type=$ac_val; break])
     done
@@ -422,7 +475,7 @@ fi
 # nor build .so
 # Quick + dirty by Bernhard
 # FIXME
-if $CXX -v 2>&1 | grep -i cygwin 1>&5 2>&5; then
+if $CXX --version 2>&1 | grep -i cygming 1>&5 2>&5 || $CXX --version 2>&1 | grep -i cygwin 1>&5 2>&5; then
     PICOPT=""
     SHAREDLIB="no"
 fi

@@ -31,13 +31,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <ctype.h>
 #include <sys/types.h>
-#ifdef _WIN32
-# include <winsock2.h>
-# define SOCKET_AVAIL
-#elif defined HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
+#ifdef SOCKET_AVAIL
+# include HEADER_SOCKET
+# if defined HAVE_SYS_SOCKET_H
+#  include <netinet/in.h>
+#  include <arpa/inet.h>
+# endif
 #endif
 #include "i_string.h"
 

@@ -36,11 +36,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
 #endif
-#ifdef _WIN32
-# include <winsock2.h>
-# define SOCKET_AVAIL
-#elif defined HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
+#ifdef SOCKET_AVAIL
+# include HEADER_SOCKET
 #endif
 #include <ctype.h>
 #include <errno.h>

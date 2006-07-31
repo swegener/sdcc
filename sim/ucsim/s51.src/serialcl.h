@@ -41,8 +41,10 @@ protected:
   class cl_address_space *sfr;
   bool there_is_t2, t2_baud;
   class cl_memory_cell *sbuf, *pcon, *scon;
+#ifdef HAVE_TERMIOS_H
   struct termios saved_attributes_in; // Attributes of serial interface
   struct termios saved_attributes_out;
+#endif
   class cl_optref *serial_in_file_option;
   class cl_optref *serial_out_file_option;
   FILE *serial_in;	// Serial line input

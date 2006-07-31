@@ -30,9 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef HAVE_TERMIOS_H
 #include <termios.h>
-#include <fcntl.h>
+#endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+#include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -148,8 +152,10 @@ cl_51core::mk_hw_elements(void)
   h->init();
   hws->add(h= new cl_timer1(this, 1, "timer1"));
   h->init();
+#ifdef HAVE_TERMIOS_H
   hws->add(h= new cl_serial(this));
   h->init();
+#endif
   hws->add(h= new cl_port(this, 0));
   h->init();
   hws->add(h= new cl_port(this, 1));

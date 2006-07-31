@@ -32,16 +32,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdarg.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#ifdef _WIN32
-# include <winsock2.h>
-# define SOCKET_AVAIL
-#elif defined HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <netdb.h>
-#endif
 #include <sys/time.h>
+#ifdef SOCKET_AVAIL
+# include HEADER_SOCKET
+# if defined HAVE_SYS_SOCKET_H
+#  include <netinet/in.h>
+#  include <arpa/inet.h>
+#  include <netdb.h>
+# endif
+#endif
 #if FD_HEADER_OK
 # include HEADER_FD
 #endif
@@ -478,7 +477,7 @@ int
 cl_console::input_avail(void)
 {
   struct timeval tv;
-  int i;
+  UCSOCKET_T i;
   
   if ((i= get_in_fd()) < 0)
     return(0);
@@ -893,7 +892,7 @@ cl_commander::set_fd_set(void)
   fd_num= 0;
   for (i= 0; i < cons->count; i++)
     {
-      int fd;
+      UCSOCKET_T fd;
       class cl_console *c= (class cl_console*)(cons->at(i));
       if ((fd= c->get_in_fd()) >= 0)
 	{
@@ -1148,7 +1147,7 @@ cl_commander::wait_input(void)
 int
 cl_commander::proc_input(void)
 {
-  int i;
+  UCSOCKET_T i;
 
   for (i= 0; i < fd_num; i++)
     if (FD_ISSET(i, &active_set))

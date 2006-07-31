@@ -189,7 +189,7 @@ public:
   class cl_app *app;
   class cl_list *cons;
   fd_set read_set, active_set;
-  int fd_num;
+  UCSOCKET_T fd_num;
   //class cl_sim *sim;
   class cl_console *actual_console, *frozen_console;
   class cl_cmdset *cmdset;

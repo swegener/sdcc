@@ -6,7 +6,10 @@
 
 2006-08-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* sim/ucsim/hc08.src/hc08mac.h: removed faulty and unused add_u16_disp
+	* sim/ucsim/hc08.src/hc08.cc: removed faulty and unused int8
 	* sim/ucsim/z80.src/z80mac.h (add_u16_disp): use explicit signed char cast
+	* sim/ucsim/z80.src/z80.cc: removed faulty and unused int8
 
 2006-07-31 Borut Razem <borut.razem AT siol.net>
 
@@ -215,7 +218,7 @@
 2006-06-25 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libc/stdio/sprintf.c: return the number of
-	  characters printed (not including the trailing '/0' used to end
+	  characters printed (not including the trailing '\0' used to end
 	  output to strings). Problem detected in regression test bug-927659.c.
 	  NOTE: printf() family functions should return int instead
 	  unsigned int!
@@ -1015,7 +1018,7 @@
 	* as/mcs51/lkhead.c (newhead): head is absolute but not overlay
 	* as/hc08/lklibr.c (addfile, fndsym),
 	* as/mcs51/lklibr.c (addfile, buildlibraryindex, fndsym): prevent
-	  index out of range and detect both '/' and '/'
+	  index out of range and detect both '\' and '/'
 	* device/include/mcs51/c8051f200.h: added _XPAGE, removed bad comment
 	* device/include/stdbool.h: removed SDCC_ds390 from check to pass
 	  regression tests (ds390 cannot return bool yet)
@@ -1078,8 +1081,8 @@
 
 2006-04-18 Borut Razem <borut.razem AT siol.net>
 
-	* support/scripts/sdcc.nsi: removed unexisting ${DEV_ROOT}/lib/pic/*.o,
-	  ${DEV_ROOT}/lib/src/pic/libdev/*.S, ${DEV_ROOT}/lib/src/pic/libdev/*.inc
+	* support/scripts/sdcc.nsi: removed unexisting ${DEV_ROOT}\lib\pic\*.o,
+	  ${DEV_ROOT}\lib\src\pic\libdev\*.S, ${DEV_ROOT}\lib\src\pic\libdev\*.inc
 
 2006-04-17 Borut Razem <borut.razem AT siol.net>
 
@@ -3016,7 +3019,7 @@
 
 2005-06-20 Slade Rich <slade_rich AT users.sourceforge.net>
 
-	* src/pic/pcode.c : Fixed problem when a string constant contains a "/r/n"
+	* src/pic/pcode.c : Fixed problem when a string constant contains a "\r\n"
 	  and the output asm file line is printed on two lines.
 
 2005-06-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
@@ -3061,20 +3064,20 @@
 2005-05-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_printIvalChar): fixed _constant_ string
-	  initializers with /0, bug #1208187
+	  initializers with \0, bug #1208187
 	* src/pic/glue.c (printIvalChar): fixed (non- and constant) string
-	  intializers with /0, bug #1208187
+	  intializers with \0, bug #1208187
 
 2005-05-26 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_printIvalChar): fixed string
-	  initializers with /0, bug #1208187
+	  initializers with \0, bug #1208187
 	* src/pic16/main.c (_process_pragma): added sanity checks
 	  for stack position and size, emit warnings when appropriate
 
 2005-05-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* device/lib/_strncpy.c: fixed not filling with /0
+	* device/lib/_strncpy.c: fixed not filling with \0
 
 2005-05-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -3277,7 +3280,7 @@
 	  (findNextInstruction), (findPrevInstruction),
 	  (findInstructionUsingLabel),
 	  src/pic/pcode.h: fixed bug #1164907 - Labels not being recognized
-	* src/pic/pcode.c (findLabel): added missing '/n'
+	* src/pic/pcode.c (findLabel): added missing '\n'
 	* src/src.dsp: added SDCCdwarf2.c to the project
 
 2005-04-09 Borut Razem <borut.razem AT siol.net>
@@ -3861,7 +3864,7 @@
 	to memccpy(void *, void *, char, size_t)
 	* src/pic16/gen.c (genFunction, genEndFunction): reenable if-case to
 	check whether to omit frame pointer or not,
-	* (genInline): convert all occurences of "/n" to LF in inline
+	* (genInline): convert all occurences of "\n" to LF in inline
 	assembler blocks, this helps formatting the inline text,
 	* (pic16_loadFSR0): modified prototype,
 	* (genNearPointerGet, genNearPointerSet): reorganization of code,
@@ -5625,8 +5628,8 @@
 
 2004-08-04 Jesus Calvino-Fraga <jesusc AT ece.ubc.ca>
 
-	* src/mcs51/gen.c (genInline): Add /n for labels, not DOS/WIN dirs
-	  such as c:/mydir.
+	* src/mcs51/gen.c (genInline): Add \n for labels, not DOS/WIN dirs
+	  such as c:\mydir.
 
 2004-08-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -5690,7 +5693,7 @@
 	  _memcmp.c _memmove.c calloc.c realloc.c free.c
 	* support/regression/tests/malloc.c: added tests for new functionality
 	* support/regression/tests/zeropad.c: added tests for truncated initializers
-	  and initialized char arrays starting with '/x0'
+	  and initialized char arrays starting with '\x0'
 	* src/mcs51/peeph.def: fixed regression, added peephole 177.f
 
 2004-07-26 Bernhard Held <bernhard AT bernhardheld.de>
@@ -5868,7 +5871,7 @@
 	a member of a specific memory bank,
 	* (pic16_printIvalCharPtr): added code to add string literals either
 	to code or the idata sections,
-	* src/pic16/main.c (_process_pragma): added /n to WHITE constant,
+	* src/pic16/main.c (_process_pragma): added \n to WHITE constant,
 	also accept the 'udata' pragma,
 	* src/pic16/main.h: new structure types sectName and sectSym
 	* src/pic16/pcode.c: added new pCodeInstruction entry for BANKSEL
@@ -9517,7 +9520,7 @@
 
 2003-06-18  Bernhard Held <bernhard AT bernhardheld.de>
 
-	* support/Util/MySystem.c (merge_command): quick fix for Linux segfault with /"cmd/" arg
+	* support/Util/MySystem.c (merge_command): quick fix for Linux segfault with \"cmd\" arg
 
 2003-06-15  Borut Razem <borut.razem AT siol.net>
 
@@ -9573,7 +9576,7 @@
 	* doc/sdccman.lyx: updated to Lyx 1.3
 	* doc/cdbfileformat.lyx: updated to Lyx 1.3
 	* doc/test_suite_spec.lyx: updated to Lyx 1.3
-	* doc/Makefile: added fix for the /tabularnewline problem, thanks to Jesus
+	* doc/Makefile: added fix for the \tabularnewline problem, thanks to Jesus
 
 2003-06-03  Bernhard Held <bernhard AT bernhardheld.de>
 
@@ -10702,7 +10705,7 @@
 2003-01-12  Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCmain.c (main): port->finaliseOptions() moved for z80 linking
-	* src/SDCCutil.c (join): ugly bug: missing '/0'
+	* src/SDCCutil.c (join): ugly bug: missing '\0'
 	* as/mcs51/lkmem.c (summary): sp on address 7 is safe
 
 2003-01-11  Bernhard Held <bernhard AT bernhardheld.de>
@@ -10958,7 +10961,7 @@
 	  so it is replaced with STRCASECMP, which is defined as stricmp in case of MSC and BORLANDC
 	- solved MSC error in function aopDump()
 
-	* sdcc_vc.h: define PREFIX as "//sdcc"
+	* sdcc_vc.h: define PREFIX as "\\sdcc"
 
 2002-07-18  Bernhard Held <bernhard AT bernhardheld.de>
 	* src/SDCCast.c (decorateType): fixed access to array of structures http://sourceforge.net/mailarchive/forum.php?thread_id=902690&forum_id=4107

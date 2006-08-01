@@ -49,7 +49,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define uint32 t_addr
 #define uint8 unsigned char
-#define int8 char
 
 /*******************************************************************/
 

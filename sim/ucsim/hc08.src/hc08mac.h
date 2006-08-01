@@ -28,7 +28,6 @@
 #define push1(val) {store1(regs.SP,(val)); regs.SP-=1; }
 #define pop2(var) {var=get2(regs.SP+1); regs.SP+=2;}
 #define pop1(var) {var=get1(regs.SP+1); regs.SP+=1;}
-#define add_u16_disp(_w, _d) (( (unsigned short)(_w) + (char)(_d) ) & 0xffff)
 
 
 #define FLAG_SET(f) {regs.P |= f;}

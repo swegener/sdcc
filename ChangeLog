@@ -1,3 +1,7 @@
+2006-08-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sim/ucsim/z80.src/z80mac.h (add_u16_disp): use explicit signed char cast
+
 2006-07-31 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/configure, sim/ucsim/cmd.src/newcmdcl.h,

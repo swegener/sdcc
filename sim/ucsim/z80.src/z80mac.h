@@ -4,7 +4,7 @@
  * some z80 code base from Karl Bongers karl@turbobit.com
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -27,7 +27,7 @@
 #define push1(val) {regs.SP-=1; store1(regs.SP,(val));}
 #define pop2(var) {var=get2(regs.SP),regs.SP+=2;}
 //#define pop1(var) {var=get1(regs.SP),regs.SP+=1;}
-#define add_u16_disp(_w, _d) (( (unsigned short)(_w) + (char)(_d) ) & 0xffff)
+#define add_u16_disp(_w, _d) (( (unsigned short)(_w) + (signed char)(_d) ) & 0xffff)
 
 #define sub_A_bytereg(br) { \
       regs.F &= ~(BIT_ALL);  /* clear these */ \

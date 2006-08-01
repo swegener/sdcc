@@ -729,8 +729,8 @@ aopForSym (iCode * ic, symbol * sym, bool result, bool useDP2)
           if (sym->onStack)
             {
               signed char offset = ((sym->stack < 0) ?
-                         ((char) (sym->stack - _G.nRegsSaved)) :
-                         ((char) sym->stack)) & 0xff;
+                         ((signed char) (sym->stack - _G.nRegsSaved)) :
+                         ((signed char) sym->stack)) & 0xff;
 
               if ((abs(offset) <= 3) ||
                   (accuse && (abs(offset) <= 7)))

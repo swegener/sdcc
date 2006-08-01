@@ -1,3 +1,9 @@
+2006-08-01 Borut Razem <borut.razem AT siol.net>
+
+	* src/mcs51/gen.c, src/dc390/gen.c: fixed warning:
+	  comparison is always false due to limited range of data type
+	  on PPC64 machine (openpower-linux1) where "char = unsigned char"
+
 2006-08-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sim/ucsim/z80.src/z80mac.h (add_u16_disp): use explicit signed char cast

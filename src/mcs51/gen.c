@@ -624,7 +624,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
         {
           if (sym->onStack)
             {
-              char offset = ((sym->stack < 0) ?
+              signed char offset = ((sym->stack < 0) ?
                          ((char) (sym->stack - _G.nRegsSaved)) :
                          ((char) sym->stack)) & 0xff;
 

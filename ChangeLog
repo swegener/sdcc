@@ -1,3 +1,12 @@
+2006-08-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/gen.c (aopPut): fixed bug !*ixy should be !*iyx,
+	  (shiftIntoPair): added case 2 for PAIR_IY,
+	  (setupToPreserveCarry): replaced parameters with iCode and check if
+	   PAIR_DE is in use to fix bug 1399290,
+	  (genPlus, genMinus): updated call to setupToPreserveCarry
+	* support/regression/tests/bug1399290.c: new
+
 2006-08-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/Makefile.in (Z80SOURCES): enabled float support

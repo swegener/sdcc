@@ -2067,7 +2067,7 @@ aopPut (asmop * aop, const char *s, int offset)
       if (aop->aopu.aop_pairId==PAIR_IX)
         emit2 ("ld !*ixx,%s", 0, s);
       else if (aop->aopu.aop_pairId==PAIR_IY)
-        emit2 ("ld !*ixy,%s", 0, s);
+        emit2 ("ld !*iyx,%s", 0, s);
       else
         emit2 ("ld (%s),%s", _pairs[aop->aopu.aop_pairId].name, s);
       break;
@@ -3628,30 +3628,27 @@ shiftIntoPair (int idx, asmop *aop)
   wassertl (IS_Z80, "Only implemented for the Z80");
   //  wassertl (aop->type == AOP_EXSTK, "Only implemented for EXSTK");
 
+  emitDebug ("; Shift into pair idx %u", idx);
+
   switch (idx)
     {
     case 0:
       id = PAIR_HL;
+      setupPair (PAIR_HL, aop, 0);
       break;
     case 1:
       id = PAIR_DE;
       _push (PAIR_DE);
-      break;
-    default:
-      wassertl (0, "Internal error - hit default case");
-    }
-
-  emitDebug ("; Shift into pair idx %u", idx);
-
-  if (id == PAIR_HL)
-    {
-      setupPair (PAIR_HL, aop, 0);
-    }
-  else
-    {
       setupPair (PAIR_IY, aop, 0);
       emit2 ("push iy");
       emit2 ("pop %s", _pairs[id].name);
+      break;
+    case 2:
+      id = PAIR_IY;
+      setupPair (PAIR_IY, aop, 0);
+      break;
+    default:
+      wassertl (0, "Internal error - hit default case");
     }
 
   aop->type = AOP_PAIRPTR;
@@ -3661,8 +3658,12 @@ shiftIntoPair (int idx, asmop *aop)
 }
 
 static void
-setupToPreserveCarry (asmop *result, asmop *left, asmop *right)
+setupToPreserveCarry (iCode * ic)
 {
+  asmop *left   = AOP (IC_LEFT (ic));
+  asmop *right  = AOP (IC_RIGHT (ic));
+  asmop *result = AOP (IC_RESULT (ic));
+
   wassert (left && right);
 
   if (IS_Z80)
@@ -3672,7 +3673,12 @@ setupToPreserveCarry (asmop *result, asmop *left, asmop *right)
           shiftIntoPair (0, right);
           /* check result again, in case right == result */
           if (couldDestroyCarry (result))
-            shiftIntoPair (1, result);
+            {
+              if (!isPairInUse (PAIR_DE, ic))
+                shiftIntoPair (1, result);
+              else
+                shiftIntoPair (2, result);
+            }
         }
       else if (couldDestroyCarry (right))
         {
@@ -3812,8 +3818,8 @@ genPlus (iCode * ic)
     }
 
   /* Special case:
-     ld hl,sp+n trashes C so we cant afford to do it during an
-     add with stack based varibles.  Worst case is:
+     ld hl,sp+n trashes C so we can't afford to do it during an
+     add with stack based variables.  Worst case is:
      ld  hl,sp+left
      ld  a,(hl)
      ld  hl,sp+right
@@ -3826,7 +3832,7 @@ genPlus (iCode * ic)
      adc (hl)
      ld  hl,sp+result+1
      ld  (hl),a
-     So you cant afford to load up hl if either left, right, or result
+     So you can't afford to load up hl if either left, right, or result
      is on the stack (*sigh*)  The alt is:
      ld  hl,sp+left
      ld  de,(hl)
@@ -3882,7 +3888,7 @@ genPlus (iCode * ic)
         }
     }
 
-  setupToPreserveCarry (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
+  setupToPreserveCarry (ic);
 
   while (size--)
     {
@@ -3914,7 +3920,6 @@ release:
   freeAsmop (IC_LEFT (ic), NULL, ic);
   freeAsmop (IC_RIGHT (ic), NULL, ic);
   freeAsmop (IC_RESULT (ic), NULL, ic);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -4080,7 +4085,7 @@ genMinus (iCode * ic)
         }
     }
 
-  setupToPreserveCarry (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
+  setupToPreserveCarry (ic);
 
   /* if literal, add a,#-lit, else normal subb */
   while (size--)

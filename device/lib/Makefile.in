@@ -66,65 +66,71 @@ OPT_DISABLE_PIC16 = @OPT_DISABLE_PIC16@
 OPT_DISABLE_XA51  = @OPT_DISABLE_XA51@
 OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
 
-SOURCES		= _atof.c _atoi.c _atol.c _autobaud.c _bp.c _schar2fs.c \
-		  _decdptr.c _divsint.c _divslong.c _divuint.c \
-		  _divulong.c _fs2schar.c _fs2sint.c _fs2slong.c \
-		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
-		  _fsdiv.c _fseq.c _fsgt.c _fslt.c _fscmp.c _fsmul.c \
-		  _fsneq.c _fssub.c _gptrget.c _gptrgetc.c _gptrput.c \
-		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
-		  _islower.c _isprint.c _ispunct.c _isspace.c \
-		  _isupper.c _isxdigit.c _itoa.c _ltoa.c \
-		  _slong2fs.c \
-		  _memcmp.c _memcpy.c _memmove.c _memset.c \
-		  _modsint.c _modslong.c _moduint.c _modulong.c \
-		  _mulint.c _mullong.c \
-		  abs.c labs.c \
-		  _ser.c _setjmp.c \
-		  _spx.c _startup.c \
-		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
-		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
-		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-		  _strstr.c _strtok.c \
-		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
-		  calloc.c malloc.c realloc.c free.c \
-		  serial.c ser_ir.c printfl.c \
-		  printf_large.c sprintf.c vprintf.c puts.c gets.c \
-		  printf_fast.c printf_fast_f.c printf_tiny.c \
-		  assert.c time.c bpx.c \
-		  _fsget1arg.c _fsget2args.c _fsnormalize.c \
-		  _fsreturnval.c _fsrshift.c _fsswapargs.c _logexpf.c \
-		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
-		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
-		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
-		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c errno.c
+SOURCES =	_autobaud.c _bp.c _decdptr.c \
+		_gptrget.c _gptrgetc.c _gptrput.c \
+		_ser.c _setjmp.c \
+		serial.c ser_ir.c \
+		_atof.c _atoi.c _atol.c _itoa.c _ltoa.c \
+		_schar2fs.c _sint2fs.c _slong2fs.c \
+		_uchar2fs.c _uint2fs.c _ulong2fs.c \
+		_fs2schar.c _fs2sint.c _fs2slong.c \
+		_fs2uchar.c _fs2uint.c _fs2ulong.c \
+		_fsadd.c _fsdiv.c _fsmul.c _fssub.c \
+		_fseq.c _fsgt.c _fslt.c _fsneq.c \
+		_divsint.c _divslong.c _divuint.c _divulong.c \
+		_modsint.c _modslong.c _moduint.c _modulong.c \
+		_mulint.c _mullong.c \
+		abs.c labs.c \
+		_iscntrl.c _isdigit.c _isgraph.c \
+		_isprint.c _ispunct.c _isspace.c \
+		_islower.c _isupper.c _isxdigit.c \
+		_spx.c _startup.c \
+		_strcat.c _strchr.c _strcmp.c _strcpy.c \
+		_strcspn.c _strlen.c _strncat.c _strncmp.c \
+		_strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+		_strstr.c _strtok.c \
+		_memcmp.c _memcpy.c _memmove.c _memset.c \
+		calloc.c malloc.c realloc.c free.c \
+		printf_large.c sprintf.c vprintf.c puts.c gets.c \
+		printf_fast.c printf_fast_f.c printf_tiny.c printfl.c \
+		assert.c time.c bpx.c \
+		_fscmp.c _fsget1arg.c _fsget2args.c _fsnormalize.c \
+		_fsreturnval.c _fsrshift.c _fsswapargs.c _logexpf.c \
+		fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
+		cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
+		asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
+		sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c errno.c
 
 OBJECTS		= $(patsubst %.c,$(PORTDIR)/%.rel,$(SOURCES))
 
-Z80SOURCES      = _atof.c _atoi.c \
-		  _iscntrl.c _isdigit.c _isgraph.c \
-		  _islower.c _isprint.c _ispunct.c _isspace.c \
-		  _isupper.c _isxdigit.c \
-		  _memcmp.c _memcpy.c _memmove.c _memset.c \
-		  _startup.c \
-		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
-		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
-		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-		  _strstr.c _strtok.c \
-		  assert.c \
-		  _modslong.c _modulong.c \
-		  _mullong.c \
-		  abs.c labs.c \
-		  _divslong.c _divulong.c \
-		  calloc.c malloc.c realloc.c free.c \
-		  printf_large.c sprintf.c vprintf.c puts.c gets.c \
-		  _fs2schar.c _fs2sint.c _fs2slong.c \
-		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
-		  _fsdiv.c _fseq.c _fsgt.c _fslt.c _fsmul.c \
-		  _fsneq.c _fssub.c \
-		  _uchar2fs.c _uint2fs.c \
-		  _ulong2fs.c \
-		  _slong2fs.c _sint2fs.c _schar2fs.c
+Z80SOURCES =	\
+		_atof.c _atoi.c _atol.c _itoa.c _ltoa.c \
+		_schar2fs.c _sint2fs.c _slong2fs.c \
+		_uchar2fs.c _uint2fs.c _ulong2fs.c \
+		_fs2schar.c _fs2sint.c _fs2slong.c \
+		_fs2uchar.c _fs2uint.c _fs2ulong.c \
+		_fsadd.c _fsdiv.c _fsmul.c _fssub.c \
+		_fseq.c _fsgt.c _fslt.c _fsneq.c \
+		_divslong.c _divulong.c \
+		_modslong.c _modulong.c \
+		_mullong.c \
+		abs.c labs.c \
+		_iscntrl.c _isdigit.c _isgraph.c \
+		_isprint.c _ispunct.c _isspace.c \
+		_islower.c _isupper.c _isxdigit.c \
+		_startup.c \
+		_strcat.c _strchr.c _strcmp.c _strcpy.c \
+		_strcspn.c _strlen.c _strncat.c _strncmp.c \
+		_strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+		_strstr.c _strtok.c \
+		_memcmp.c _memcpy.c _memmove.c _memset.c \
+		calloc.c malloc.c realloc.c free.c \
+		printf_large.c sprintf.c vprintf.c puts.c gets.c \
+		assert.c time.c \
+		fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
+		cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
+		asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
+		sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c errno.c
 
 Z80OBJECTS      = $(Z80SOURCES:%.c=$(PORTDIR)/%.o)
 
@@ -156,32 +162,33 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 
 XA51OBJECTS      = $(XA51SOURCES:%.c=$(PORTDIR)/%.rel)
 
-HC08SOURCES	= _atof.c _atoi.c _atol.c _schar2fs.c \
-		  _divsint.c _divslong.c \
-		  _fs2schar.c _fs2sint.c _fs2slong.c \
-		  _fs2uchar.c _fs2uint.c _fs2ulong.c _fsadd.c \
-		  _fsdiv.c _fseq.c _fsgt.c _fslt.c _fsmul.c \
-		  _fsneq.c _fssub.c \
-		  _sint2fs.c _iscntrl.c _isdigit.c _isgraph.c \
-		  _islower.c _isprint.c _ispunct.c _isspace.c \
-		  _isupper.c _isxdigit.c _itoa.c _ltoa.c \
-		  _slong2fs.c \
-		  _memcmp.c _memcpy.c _memmove.c _memset.c \
-		  _modsint.c _modslong.c _moduint.c _modulong.c \
-		  abs.c labs.c \
-		  _spx.c _startup.c \
-		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
-		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
-		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
-		  _strstr.c _strtok.c \
-		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
-		  calloc.c malloc.c realloc.c free.c \
-		  printf_large.c sprintf.c vprintf.c \
-		  assert.c time.c \
-		  fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
-		  cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
-		  asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
-		  sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c errno.c
+HC08SOURCES =	\
+		_atof.c _atoi.c _atol.c _itoa.c _ltoa.c \
+		_schar2fs.c _sint2fs.c _slong2fs.c \
+		_uchar2fs.c _uint2fs.c _ulong2fs.c \
+		_fs2schar.c _fs2sint.c _fs2slong.c \
+		_fs2uchar.c _fs2uint.c _fs2ulong.c \
+		_fsadd.c _fsdiv.c _fsmul.c _fssub.c \
+		_fseq.c _fsgt.c _fslt.c _fsneq.c \
+		_divsint.c _divslong.c \
+		_modsint.c _modslong.c _moduint.c _modulong.c \
+		abs.c labs.c \
+		_iscntrl.c _isdigit.c _isgraph.c \
+		_isprint.c _ispunct.c _isspace.c \
+		_islower.c _isupper.c _isxdigit.c \
+		_spx.c _startup.c \
+		_strcat.c _strchr.c _strcmp.c _strcpy.c \
+		_strcspn.c _strlen.c _strncat.c _strncmp.c \
+		_strncpy.c _strpbrk.c _strrchr.c _strspn.c \
+		_strstr.c _strtok.c \
+		_memcmp.c _memcpy.c _memmove.c _memset.c \
+		calloc.c malloc.c realloc.c free.c \
+		printf_large.c sprintf.c vprintf.c puts.c gets.c \
+		assert.c time.c \
+		fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \
+		cosf.c logf.c log10f.c sqrtf.c tancotf.c tanf.c cotf.c \
+		asincosf.c asinf.c acosf.c atanf.c atan2f.c sincoshf.c \
+		sinhf.c coshf.c tanhf.c floorf.c ceilf.c modff.c errno.c
 
 HC08OBJECTS	= $(patsubst %.c,$(PORTDIR)/%.rel,$(HC08SOURCES))
 

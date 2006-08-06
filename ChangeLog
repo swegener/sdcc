@@ -1,3 +1,19 @@
+2006-08-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/Makefile.in (Z80SOURCES): enabled float support
+	* sim/ucsim/z80.src/inst.cc (inst_rst): generate breakpoint on RST8,ACC==0
+	* src/ds390/gen.c (shiftRLong),
+	* src/hc08/gen.c (shiftLLong, shiftRLong): fixed bug 1533966
+	* src/mcs51/gen.c (sameReg): changed to sameByte,
+	  (xch_a_aopGet): new,
+	  (shiftL2Left2Result, shiftR2Left2Result, shiftRLeftOrResult, shiftLLong,
+	   shiftRLong): fixed bug 1533966
+	* src/z80/gen.c (shiftR2Left2Result, shiftL2Left2Result, genlshTwo,
+	  genLeftShiftLiteral, genrshTwo, genRightShiftLiteral): fixed bug 1533966
+	* support/regression/Makefile.in: disabled z80, enabled ucz80
+	* support/regression/tests/float_trans.c: enabled test for z80 and host
+	* support/regression/tests/shifts2.c: new, for testing bug 1533966
+
 2006-08-01 Borut Razem <borut.razem AT siol.net>
 
 	* src/mcs51/gen.c, src/dc390/gen.c: fixed warning:

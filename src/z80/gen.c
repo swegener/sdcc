@@ -5707,6 +5707,9 @@ shiftR2Left2Result (operand * left, int offl,
   movLeft2Result (left, offl, result, offr, 0);
   movLeft2Result (left, offl + 1, result, offr + 1, 0);
 
+  if (shCount == 0)
+    return;
+
   /*  if (AOP(result)->type == AOP_REG) { */
 
   tlbl = newiTempLabel (NULL);
@@ -5752,6 +5755,9 @@ shiftL2Left2Result (operand * left, int offl,
       movLeft2Result (left, offl, result, offr, 0);
       movLeft2Result (left, offl + 1, result, offr + 1, 0);
     }
+
+  if (shCount == 0)
+    return;
 
   if (getPairId (AOP (result)) == PAIR_HL)
     {
@@ -5956,7 +5962,7 @@ shiftL1Left2Result (operand * left, int offl,
 
 
 /*-----------------------------------------------------------------*/
-/* genlshTwo - left shift two bytes by known amount != 0           */
+/* genlshTwo - left shift two bytes by known amount                */
 /*-----------------------------------------------------------------*/
 static void
 genlshTwo (operand * result, operand * left, int shCount)
@@ -5974,8 +5980,8 @@ genlshTwo (operand * result, operand * left, int shCount)
           if (shCount)
             {
               movLeft2Result (left, LSB, result, MSB16, 0);
-              aopPut (AOP (result), "!zero", 0);
               shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+              aopPut (AOP (result), "!zero", LSB);
             }
           else
             {
@@ -5988,7 +5994,7 @@ genlshTwo (operand * result, operand * left, int shCount)
           aopPut (AOP (result), "!zero", LSB);
         }
     }
-  /*  1 <= shCount <= 7 */
+  /*  0 <= shCount <= 7 */
   else
     {
       if (size == 1)
@@ -6031,12 +6037,8 @@ genLeftShiftLiteral (operand * left,
   size = getSize (operandType (result));
 
   /* I suppose that the left size >= result size */
-  if (shCount == 0)
-    {
-      wassert (0);
-    }
 
-  else if (shCount >= (size * 8))
+  if (shCount >= (size * 8))
     {
       while (size--)
         {
@@ -6231,7 +6233,7 @@ shiftR1Left2Result (operand * left, int offl,
 }
 
 /*-----------------------------------------------------------------*/
-/* genrshTwo - right shift two bytes by known amount != 0          */
+/* genrshTwo - right shift two bytes by known amount               */
 /*-----------------------------------------------------------------*/
 static void
 genrshTwo (operand * result, operand * left,
@@ -6264,7 +6266,7 @@ genrshTwo (operand * result, operand * left,
           aopPut (AOP (result), "!zero", 1);
         }
     }
-  /*  1 <= shCount <= 7 */
+  /*  0 <= shCount <= 7 */
   else
     {
       shiftR2Left2Result (left, LSB, result, LSB, shCount, sign);
@@ -6292,12 +6294,8 @@ genRightShiftLiteral (operand * left,
   size = getSize (operandType (result));
 
   /* I suppose that the left size >= result size */
-  if (shCount == 0)
-    {
-      wassert (0);
-    }
 
-  else if (shCount >= (size * 8)) {
+  if (shCount >= (size * 8)) {
     const char *s;
     if (!SPEC_USIGN(getSpec(operandType(left)))) {
       _moveA(aopGet (AOP (left), 0, FALSE));

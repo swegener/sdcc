@@ -955,7 +955,8 @@ cl_z80::inst_rst(t_mem code)
       //PC = 0x08;
       switch (regs.A) {
         case 0:
-          ::exit(0);
+          return(resBREAKPOINT);
+//          ::exit(0);
         break;
 
         case 1:

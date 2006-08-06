@@ -27,8 +27,8 @@
 
 -------------------------------------------------------------------------*/
 
-#define D(x)
-//#define D(x) x
+//#define D(x)
+#define D(x) x
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6309,7 +6309,7 @@ genlshTwo (operand * result, operand * left, int shCount)
 
 /*-----------------------------------------------------------------*/
 /* shiftLLong - shift left one long from left to result            */
-/* offl = LSB or MSB16                                             */
+/* offr = LSB or MSB16                                             */
 /*-----------------------------------------------------------------*/
 static void
 shiftLLong (operand * left, operand * result, int offr)
@@ -6326,10 +6326,10 @@ shiftLLong (operand * left, operand * result, int offr)
   loadRegFromAop (hc08_reg_xa, AOP (left), LSB);
   rmwWithReg ("lsl", hc08_reg_a);
   rmwWithReg ("rol", hc08_reg_x);
-  storeRegToAop (hc08_reg_xa, AOP (result), offr);
 
   if (offr==LSB)
     {
+      storeRegToAop (hc08_reg_xa, AOP (result), offr);
       loadRegFromAop (hc08_reg_xa, AOP (left), MSB24);
       rmwWithReg ("rol", hc08_reg_a);
       rmwWithReg ("rol", hc08_reg_x);
@@ -6337,7 +6337,9 @@ shiftLLong (operand * left, operand * result, int offr)
     }
   else if (offr==MSB16)
     {
+      storeRegToAop (hc08_reg_a, AOP (result), offr);
       loadRegFromAop (hc08_reg_a, AOP (left), MSB24);
+      storeRegToAop (hc08_reg_x, AOP (result), offr+1);
       rmwWithReg ("rol", hc08_reg_a);
       storeRegToAop (hc08_reg_a, AOP (result), offr+2);
       storeConstToAop (zero, AOP (result), 0);
@@ -6658,6 +6660,7 @@ shiftRLong (operand * left, int offl,
         rmwWithReg ("lsr", hc08_reg_x);
       rmwWithReg ("ror", hc08_reg_a);
       storeRegToAop (hc08_reg_xa, AOP (result), MSB24);
+      loadRegFromAop (hc08_reg_xa, AOP (left), LSB);
     }
   else if (offl==MSB16)
     {
@@ -6666,15 +6669,27 @@ shiftRLong (operand * left, int offl,
         rmwWithReg ("asr", hc08_reg_a);
       else
         rmwWithReg ("lsr", hc08_reg_a);
+      loadRegFromAop (hc08_reg_x, AOP (left), MSB24);
       storeRegToAop (hc08_reg_a, AOP (result), MSB24);
-      storeRegSignToUpperAop (hc08_reg_a, AOP (result), MSB32, sign);
+      loadRegFromAop (hc08_reg_a, AOP (left), MSB16);
     }
 
-  loadRegFromAop (hc08_reg_xa, AOP (left), offl);
   rmwWithReg ("ror", hc08_reg_x);
   rmwWithReg ("ror", hc08_reg_a);
   storeRegToAop (hc08_reg_xa, AOP (result), LSB);
 
+  if (offl==MSB16)
+    {
+      if (sign)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (left), MSB24);
+          storeRegSignToUpperAop (hc08_reg_a, AOP (result), MSB32, sign);
+        }
+      else
+        {
+          storeConstToAop (zero, AOP (result), MSB32);
+        }
+    }
 
   pullOrFreeReg (hc08_reg_x, needpulx);
   pullOrFreeReg (hc08_reg_a, needpula);

@@ -849,11 +849,14 @@ operandsEqu (operand * op1, operand * op2)
 }
 
 /*-----------------------------------------------------------------*/
-/* sameReg - two asmops have the same register at given offsets    */
+/* sameByte - two asmops have the same address at given offsets    */
 /*-----------------------------------------------------------------*/
 static bool
-sameReg (asmop * aop1, int off1, asmop * aop2, int off2)
+sameByte (asmop * aop1, int off1, asmop * aop2, int off2)
 {
+  if (aop1 == aop2 && off1 == off2)
+    return TRUE;
+
   if (aop1->type != AOP_REG && aop1->type != AOP_CRY)
     return FALSE;
 
@@ -1871,6 +1874,32 @@ toBoolean (operand * oper)
                     aopGet (oper, offset++, FALSE, FALSE));
         }
     }
+}
+
+
+/*-------------------------------------------------------------------*/
+/* xch_a_aopGet - for exchanging acc with value of the aop           */
+/*-------------------------------------------------------------------*/
+static char *
+xch_a_aopGet (operand * oper, int offset, bool bit16, bool dname)
+{
+  char * l;
+
+  if (aopGetUsesAcc (oper, offset))
+    {
+      emitcode("mov", "b,a");
+      MOVA (aopGet (oper, offset, bit16, dname));
+      emitcode("xch", "a,b");
+      aopPut (oper, "a", offset);
+      emitcode("xch", "a,b");
+      l = "b";
+    }
+  else
+    {
+      l = aopGet (oper, offset, bit16, dname);
+      emitcode("xch", "a,%s", l);
+    }
+  return l;
 }
 
 
@@ -3438,7 +3467,6 @@ genFunction (iCode * ic)
             }
         }
     }
-
 
   if (fReentrant)
     {
@@ -8323,8 +8351,8 @@ shiftL2Left2Result (operand * left, int offl,
     {
       /* don't crash result[offr] */
       MOVA (aopGet (left, offl, FALSE, FALSE));
-      emitcode ("xch", "a,%s", aopGet (left, offl + MSB16, FALSE, FALSE));
-      x = aopGet (result, offr, FALSE, FALSE);
+      x = xch_a_aopGet (left, offl + MSB16, FALSE, FALSE);
+      usedB = !strncmp(x, "b", 1);
     }
   else if (aopGetUsesAcc (result, offr))
     {
@@ -8375,8 +8403,8 @@ shiftR2Left2Result (operand * left, int offl,
     {
       /* don't crash result[offr] */
       MOVA (aopGet (left, offl, FALSE, FALSE));
-      emitcode ("xch", "a,%s", aopGet (left, offl + MSB16, FALSE, FALSE));
-      x = aopGet (result, offr, FALSE, FALSE);
+      x = xch_a_aopGet (left, offl + MSB16, FALSE, FALSE);
+      usedB = !strncmp(x, "b", 1);
     }
   else if (aopGetUsesAcc (result, offr))
     {
@@ -8445,7 +8473,16 @@ shiftRLeftOrResult (operand * left, int offl,
   /* shift right accumulator */
   AccRsh (shCount);
   /* or with result */
-  emitcode ("orl", "a,%s", aopGet (result, offr, FALSE, FALSE));
+  if (aopGetUsesAcc(result, offr))
+    {
+      emitcode ("xch", "a,b");
+      MOVA (aopGet (result, offr, FALSE, FALSE));
+      emitcode ("orl", "a,b");
+    }
+  else
+    {
+      emitcode ("orl", "a,%s", aopGet (result, offr, FALSE, FALSE));
+    }
   /* back to result */
   aopPut (result, "a", offr);
 }
@@ -8515,8 +8552,7 @@ shiftLLong (operand * left, operand * result, int offr)
       emitcode ("add", "a,acc");
       if (sameRegs (AOP (left), AOP (result)) &&
           size >= MSB16 + offr && offr != LSB)
-        emitcode ("xch", "a,%s",
-                  aopGet (left, LSB + offr, FALSE, FALSE));
+        xch_a_aopGet (left, LSB + offr, FALSE, FALSE);
       else
         aopPut (result, "a", LSB + offr);
     }
@@ -8531,8 +8567,7 @@ shiftLLong (operand * left, operand * result, int offr)
       emitcode ("rlc", "a");
       if (sameRegs (AOP (left), AOP (result)) &&
           size >= MSB24 + offr && offr != LSB)
-        emitcode ("xch", "a,%s",
-                  aopGet (left, MSB16 + offr, FALSE, FALSE));
+        xch_a_aopGet (left, MSB16 + offr, FALSE, FALSE);
       else
         aopPut (result, "a", MSB16 + offr);
     }
@@ -8547,8 +8582,7 @@ shiftLLong (operand * left, operand * result, int offr)
       emitcode ("rlc", "a");
       if (sameRegs (AOP (left), AOP (result)) &&
           size >= MSB32 + offr && offr != LSB)
-        emitcode ("xch", "a,%s",
-                  aopGet (left, MSB24 + offr, FALSE, FALSE));
+        xch_a_aopGet (left, MSB24 + offr, FALSE, FALSE);
       else
         aopPut (result, "a", MSB24 + offr);
     }
@@ -8883,9 +8917,9 @@ static void
 shiftRLong (operand * left, int offl,
             operand * result, int sign)
 {
-  bool useSameRegs = regsInCommon (left, result);
+  bool overlapping = regsInCommon (left, result) || operandsEqu(left, result);
 
-  if (useSameRegs && offl>1)
+  if (overlapping && offl>1)
     {
       // we are in big trouble, but this shouldn't happen
       werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
@@ -8900,9 +8934,9 @@ shiftRLong (operand * left, int offl,
         {
           emitcode ("rlc", "a");
           emitcode ("subb", "a,acc");
-          if (useSameRegs && sameReg (AOP (left), MSB32, AOP (result), MSB32))
+          if (overlapping && sameByte (AOP (left), MSB32, AOP (result), MSB32))
             {
-              emitcode ("xch", "a,%s", aopGet (left, MSB32, FALSE, FALSE));
+              xch_a_aopGet (left, MSB32, FALSE, FALSE);
             }
           else
             {
@@ -8912,7 +8946,16 @@ shiftRLong (operand * left, int offl,
         }
       else
         {
-          aopPut (result, zero, MSB32);
+          if (aopPutUsesAcc (result, zero, MSB32))
+            {
+              emitcode("xch", "a,b");
+              aopPut (result, zero, MSB32);
+              emitcode("xch", "a,b");
+            }
+          else
+            {
+              aopPut (result, zero, MSB32);
+            }
         }
     }
 
@@ -8927,28 +8970,29 @@ shiftRLong (operand * left, int offl,
 
   emitcode ("rrc", "a");
 
-  if (useSameRegs && offl==MSB16 &&
-      sameReg (AOP (left), MSB24, AOP (result), MSB32-offl))
+  if (overlapping && offl==MSB16 &&
+      sameByte (AOP (left), MSB24, AOP (result), MSB32-offl))
     {
-      emitcode ("xch", "a,%s",aopGet (left, MSB24, FALSE, FALSE));
+      xch_a_aopGet (left, MSB24, FALSE, FALSE);
     }
   else
     {
-      aopPut (result, "a", MSB32-offl);
+      aopPut (result, "a", MSB32 - offl);
       MOVA (aopGet (left, MSB24, FALSE, FALSE));
     }
 
   emitcode ("rrc", "a");
-  if (useSameRegs && offl==1 &&
-      sameReg (AOP (left), MSB16, AOP (result), MSB24-offl))
+  if (overlapping && offl==MSB16 &&
+      sameByte (AOP (left), MSB16, AOP (result), MSB24-offl))
     {
-      emitcode ("xch", "a,%s",aopGet (left, MSB16, FALSE, FALSE));
+      xch_a_aopGet (left, MSB16, FALSE, FALSE);
     }
   else
     {
-      aopPut (result, "a", MSB24-offl);
+      aopPut (result, "a", MSB24 - offl);
       MOVA (aopGet (left, MSB16, FALSE, FALSE));
     }
+
   emitcode ("rrc", "a");
   if (offl != LSB)
     {
@@ -8956,10 +9000,10 @@ shiftRLong (operand * left, int offl,
     }
   else
     {
-      if (useSameRegs &&
-          sameReg (AOP (left), LSB, AOP (result), MSB16-offl))
+      if (overlapping &&
+          sameByte (AOP (left), LSB, AOP (result), MSB16-offl))
         {
-          emitcode ("xch", "a,%s",aopGet (left, LSB, FALSE, FALSE));
+          xch_a_aopGet (left, LSB, FALSE, FALSE);
         }
       else
         {

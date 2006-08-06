@@ -9626,12 +9626,13 @@ static void
 shiftRLong (operand * left, int offl,
             operand * result, int sign)
 {
-  int isSameRegs=sameRegs(AOP(left),AOP(result));
+  bool overlapping = regsInCommon (left, result) || operandsEqu(left, result);
 
-  if (isSameRegs && offl>1) {
-    // we are in big trouble, but this shouldn't happen
-    werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
-  }
+  if (overlapping && offl>1)
+    {
+      // we are in big trouble, but this shouldn't happen
+      werror(E_INTERNAL_ERROR, __FILE__, __LINE__);
+    }
 
   MOVA (aopGet (left, MSB32, FALSE, FALSE, NULL));
 
@@ -9662,28 +9663,44 @@ shiftRLong (operand * left, int offl,
 
   emitcode ("rrc", "a");
 
-  if (isSameRegs && offl==MSB16) {
-    emitcode ("xch",
-              "a,%s",aopGet (left, MSB24, FALSE, FALSE, DP2_RESULT_REG));
-  } else {
-    aopPut (result, "a", MSB32);
-    MOVA (aopGet (left, MSB24, FALSE, FALSE, NULL));
-  }
-
-  emitcode ("rrc", "a");
-  if (isSameRegs && offl==1) {
-    emitcode ("xch", "a,%s",
-              aopGet (left, MSB16, FALSE, FALSE, DP2_RESULT_REG));
-  } else {
-    aopPut (result, "a", MSB24);
-    MOVA (aopGet (left, MSB16, FALSE, FALSE, NULL));
-  }
-  emitcode ("rrc", "a");
-  aopPut (result, "a", MSB16 - offl);
-
-  if (offl == LSB)
+  if (overlapping && offl==MSB16)
     {
-      MOVA (aopGet (left, LSB, FALSE, FALSE, NULL));
+      emitcode ("xch", "a,%s", aopGet (left, MSB24, FALSE, FALSE, DP2_RESULT_REG));
+    }
+  else
+    {
+      aopPut (result, "a", MSB32 - offl);
+      MOVA (aopGet (left, MSB24, FALSE, FALSE, NULL));
+    }
+
+  emitcode ("rrc", "a");
+
+  if (overlapping && offl==MSB16)
+    {
+      emitcode ("xch", "a,%s", aopGet (left, MSB16, FALSE, FALSE, DP2_RESULT_REG));
+    }
+  else
+    {
+      aopPut (result, "a", MSB24 - offl);
+      MOVA (aopGet (left, MSB16, FALSE, FALSE, NULL));
+    }
+
+  emitcode ("rrc", "a");
+  if (offl != LSB)
+    {
+      aopPut (result, "a", MSB16 - offl);
+    }
+  else
+    {
+      if (overlapping && offl==MSB16)
+        {
+          emitcode ("xch", "a,%s", aopGet (left, LSB, FALSE, FALSE, DP2_RESULT_REG));
+        }
+      else
+        {
+          aopPut (result, "a", MSB16 - offl);
+          MOVA (aopGet (left, LSB, FALSE, FALSE, NULL));
+        }
       emitcode ("rrc", "a");
       aopPut (result, "a", LSB);
     }

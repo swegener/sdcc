@@ -12,23 +12,12 @@
 /*
  * Extensions: P. Felber
  */
-#include <limits.h>
-
-#ifndef PATH_MAX
- #if defined(__BORLANDC__) || defined(_MSC_VER)
-  #include <stdlib.h>
-  #define PATH_MAX	_MAX_PATH
- #else
-  #define PATH_MAX	255	/* define a reasonable value */
- #endif
-#endif
-
 #define	VERSION	"V01.75"
 
 /*
  * Case Sensitivity Flag
  */
-#define	CASE_SENSITIVE	0
+#define	CASE_SENSITIVE	1
 
 /*)Module	asmlnk.h
  *
@@ -80,6 +69,19 @@
 #define	VOID	void
 #define	FSEPX	'.'
 #define	OTHERSYSTEM
+#endif
+
+/*
+ * PATH_MAX
+ */
+#include <limits.h>
+#ifndef PATH_MAX                /* POSIX, but not required   */
+ #if defined(__BORLANDC__) || defined(_MSC_VER)
+  #include <stdlib.h>
+  #define PATH_MAX	_MAX_PATH
+ #else
+  #define PATH_MAX	255	/* define a reasonable value */
+ #endif
 #endif
 
 /*
@@ -149,12 +151,12 @@
 /*
  * Area types
  */
-#define	A_CON	000		/* concatenate */
-#define	A_OVR	004		/* overlay */
-#define	A_REL	000		/* relocatable */
-#define	A_ABS	010		/* absolute */
-#define	A_NOPAG	000		/* non-paged */
-#define	A_PAG	020		/* paged */
+#define	A_CON	0000		/* concatenate */
+#define	A_OVR	0004		/* overlay */
+#define	A_REL	0000		/* relocatable */
+#define	A_ABS	0010		/* absolute */
+#define	A_NOPAG	0000		/* non-paged */
+#define	A_PAG	0020		/* paged */
 
 /*
  * File types

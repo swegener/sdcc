@@ -1,5 +1,12 @@
 2006-08-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* as/z80/asm.h: made CASE_SENSITIVE 1
+	* link/z80/aslink.h: made CASE_SENSITIVE 1
+	* src/z80/gen.c (throughout): made all conditionals upper case
+	* support/regression/tests/bug1503067.c: new
+
+2006-08-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/z80/gen.c (aopPut): fixed bug !*ixy should be !*iyx,
 	  (shiftIntoPair): added case 2 for PAIR_IY,
 	  (setupToPreserveCarry): replaced parameters with iCode and check if

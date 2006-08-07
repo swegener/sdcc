@@ -3329,7 +3329,7 @@ genEndFunction (iCode * ic)
               emit2 ("pop af");
               //parity odd <==> P/O=0 <==> interrupt enable flag IFF2 was 0 <==>
               //don't enable interrupts as they were off before
-              emit2 ("jp po,!tlabel", tlbl->key + 100);
+              emit2 ("jp PO,!tlabel", tlbl->key + 100);
               emit2 ("!ei");
               emit2 ("!tlabeldef", (tlbl->key + 100));
             }
@@ -3547,7 +3547,7 @@ genPlusIncr (iCode * ic)
           emit2 ("inc %s", aopGet (AOP (IC_RESULT (ic)), offset++, FALSE));
           if (size)
             {
-              emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+              emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
             }
         }
       emitLabel (tlbl->key + 100);
@@ -3600,7 +3600,7 @@ outBitAcc (operand * result)
     }
   else
     {
-      emit2 ("!shortjp z,!tlabel", tlbl->key + 100);
+      emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
       emit2 ("ld a,!one");
       emitLabel (tlbl->key + 100);
       outAcc (result);
@@ -4267,28 +4267,28 @@ genIfxJump (iCode * ic, char *jval)
       jlbl = IC_TRUE (ic);
       if (!strcmp (jval, "a"))
         {
-          inst = "nz";
+          inst = "NZ";
         }
       else if (!strcmp (jval, "c"))
         {
-          inst = "c";
+          inst = "C";
         }
       else if (!strcmp (jval, "nc"))
         {
-          inst = "nc";
+          inst = "NC";
         }
       else if (!strcmp (jval, "m"))
         {
-          inst = "m";
+          inst = "M";
         }
       else if (!strcmp (jval, "p"))
         {
-          inst = "p";
+          inst = "P";
         }
       else
         {
           /* The buffer contains the bit on A that we should test */
-          inst = "nz";
+          inst = "NZ";
         }
     }
   else
@@ -4297,28 +4297,28 @@ genIfxJump (iCode * ic, char *jval)
       jlbl = IC_FALSE (ic);
       if (!strcmp (jval, "a"))
         {
-          inst = "z";
+          inst = "Z";
         }
       else if (!strcmp (jval, "c"))
         {
-          inst = "nc";
+          inst = "NC";
         }
       else if (!strcmp (jval, "nc"))
         {
-          inst = "c";
+          inst = "C";
         }
       else if (!strcmp (jval, "m"))
         {
-          inst = "p";
+          inst = "P";
         }
       else if (!strcmp (jval, "p"))
         {
-          inst = "m";
+          inst = "M";
         }
       else
         {
           /* The buffer contains the bit on A that we should test */
-          inst = "z";
+          inst = "Z";
         }
     }
   /* Z80 can do a conditional long jump */
@@ -4773,7 +4773,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
             {
               emit2 ("or a,a");
             }
-          emit2 ("jp nz,!tlabel", lbl->key + 100);
+          emit2 ("jp NZ,!tlabel", lbl->key + 100);
         }
       else
         {
@@ -4784,7 +4784,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
                 emit2 ("or a,a");
               else
                 emit2 ("cp a,%s", aopGet (AOP (right), offset, FALSE));
-              emit2 ("jp nz,!tlabel", lbl->key + 100);
+              emit2 ("jp NZ,!tlabel", lbl->key + 100);
               offset++;
             }
         }
@@ -4801,11 +4801,11 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
           if ((AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) &&
               ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
             /* PENDING */
-            emit2 ("jp nz,!tlabel", lbl->key + 100);
+            emit2 ("jp NZ,!tlabel", lbl->key + 100);
           else
             {
               emit2 ("cp %s", aopGet (AOP (right), offset, FALSE));
-              emit2 ("jp nz,!tlabel", lbl->key + 100);
+              emit2 ("jp NZ,!tlabel", lbl->key + 100);
             }
           offset++;
         }
@@ -4818,7 +4818,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
         {
           _moveA (aopGet (AOP (right), offset, FALSE));
           emit2 ("cp %s", aopGet (AOP (left), offset, FALSE));
-          emit2 ("!shortjp nz,!tlabel", lbl->key + 100);
+          emit2 ("!shortjp NZ,!tlabel", lbl->key + 100);
           offset++;
         }
     }
@@ -4984,7 +4984,7 @@ genAndOp (iCode * ic)
     {
       tlbl = newiTempLabel (NULL);
       _toBoolean (left);
-      emit2 ("!shortjp z,!tlabel", tlbl->key + 100);
+      emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
       _toBoolean (right);
       emitLabel (tlbl->key + 100);
       outBitAcc (result);
@@ -5021,7 +5021,7 @@ genOrOp (iCode * ic)
     {
       tlbl = newiTempLabel (NULL);
       _toBoolean (left);
-      emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+      emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
       _toBoolean (right);
       emitLabel (tlbl->key + 100);
       outBitAcc (result);
@@ -5155,7 +5155,7 @@ genAnd (iCode * ic, iCode * ifx)
                   /* For the flags */
                   emit2 ("or a,a");
                 }
-              emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+              emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
             }
               offset++;
         }
@@ -5339,7 +5339,7 @@ genOr (iCode * ic, iCode * ifx)
           _moveA (aopGet (AOP (left), offset, FALSE));
           /* OR with any literal is the same as OR with itself. */
           emit2 ("or a,a");
-          emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+          emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
 
           offset++;
         }
@@ -5494,7 +5494,7 @@ genXor (iCode * ic, iCode * ifx)
         {
           _moveA (aopGet (AOP (left), offset, FALSE));
           emit2 ("xor a,%s", aopGet (AOP (right), offset, FALSE));
-          emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+          emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
           offset++;
         }
       if (ifx)
@@ -5738,7 +5738,7 @@ shiftR2Left2Result (operand * left, int offl,
 
       emitLabel (tlbl1->key + 100);
       emit2 ("dec a");
-      emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+      emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
     }
 }
 
@@ -5829,7 +5829,7 @@ shiftL2Left2Result (operand * left, int offl,
           {
             emitLabel (tlbl1->key + 100);
             emit2 ("dec a");
-            emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+            emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
           }
       }
   }
@@ -6153,7 +6153,7 @@ genLeftShift (iCode * ic)
     }
   emitLabel (tlbl1->key + 100);
   emit2 ("dec a");
-  emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+  emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
 
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -6425,7 +6425,7 @@ genRightShift (iCode * ic)
     }
   emitLabel (tlbl1->key + 100);
   emit2 ("dec a");
-  emit2 ("!shortjp nz,!tlabel", tlbl->key + 100);
+  emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
 
   freeAsmop (left, NULL, ic);
   freeAsmop (result, NULL, ic);
@@ -6464,7 +6464,7 @@ genUnpackBits (operand * result, int pair)
           symbol *tlbl = newiTempLabel (NULL);
 
           emit2 ("bit %d,a", blen - 1);
-          emit2 ("jp z,!tlabel", tlbl->key + 100);
+          emit2 ("jp Z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
           emitLabel (tlbl->key + 100);
         }
@@ -6488,7 +6488,7 @@ genUnpackBits (operand * result, int pair)
           symbol *tlbl = newiTempLabel (NULL);
 
           emit2 ("bit %d,a", blen - 1);
-          emit2 ("jp z,!tlabel", tlbl->key + 100);
+          emit2 ("jp Z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
           emitLabel (tlbl->key + 100);
         }
@@ -6521,7 +6521,7 @@ genUnpackBits (operand * result, int pair)
           symbol *tlbl = newiTempLabel (NULL);
 
           emit2 ("bit %d,a", rlen - 1);
-          emit2 ("jp z,!tlabel", tlbl->key + 100);
+          emit2 ("jp Z,!tlabel", tlbl->key + 100);
           emit2 ("or a,!immedbyte", (unsigned char) (0xff << rlen));
           emitLabel (tlbl->key + 100);
         }
@@ -7461,7 +7461,7 @@ genCritical (iCode *ic)
       //disable interrupt
       emit2 ("!di");
       //parity odd <==> P/O=0 <==> interrupt enable flag IFF2=0
-      emit2 ("jp po,!tlabel", tlbl->key + 100);
+      emit2 ("jp PO,!tlabel", tlbl->key + 100);
       aopPut (AOP (IC_RESULT (ic)), "!one", 0);
       emit2 ("!tlabeldef", (tlbl->key + 100));
       freeAsmop (IC_RESULT (ic), NULL, ic);
@@ -7494,7 +7494,7 @@ genEndCritical (iCode *ic)
       aopOp (IC_RIGHT (ic), ic, FALSE, TRUE);
       _toBoolean (IC_RIGHT (ic));
       //don't enable interrupts if they were off before
-      emit2 ("!shortjp z,!tlabel", tlbl->key + 100);
+      emit2 ("!shortjp Z,!tlabel", tlbl->key + 100);
       emit2 ("!ei");
       emitLabel (tlbl->key + 100);
       freeAsmop (IC_RIGHT (ic), NULL, ic);
@@ -7505,7 +7505,7 @@ genEndCritical (iCode *ic)
       emit2 ("pop af");
       //parity odd <==> P/O=0 <==> interrupt enable flag IFF2 was 0 <==>
       //don't enable interrupts as they were off before
-      emit2 ("jp po,!tlabel", tlbl->key + 100);
+      emit2 ("jp PO,!tlabel", tlbl->key + 100);
       emit2 ("!ei");
       emit2 ("!tlabeldef", (tlbl->key + 100));
     }
@@ -7963,7 +7963,7 @@ genBuiltInStrcpy (iCode *ic, int nParams, operand **pparams)
   emit2 ("ld a,(hl)");
   emit2 ("ldi");
   emit2 ("or a");
-  emit2 ("!shortjp nz,!tlabel ; 1", label->key);
+  emit2 ("!shortjp NZ,!tlabel ; 1", label->key);
 
   freeAsmop (from, NULL, ic->next);
   freeAsmop (to, NULL, ic);

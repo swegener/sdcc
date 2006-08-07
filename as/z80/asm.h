@@ -18,7 +18,7 @@
 /*
  * Case Sensitivity Flag
  */
-#define	CASE_SENSITIVE	0
+#define	CASE_SENSITIVE	1
 
 /*)Module	asm.h
  *

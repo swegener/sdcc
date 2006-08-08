@@ -1,5 +1,5 @@
         ;;
-__rrulong_rrx_s::                
+__rrulong_rrx_s::
         ld      hl,#2
         add     hl,sp
 
@@ -17,7 +17,7 @@ __rrulong_rrx_s::
         ld      h,b
 1$:
         or      a,a
-        ret     z
+        ret     Z
 
         rr      h
         rr      l
@@ -27,10 +27,10 @@ __rrulong_rrx_s::
         dec     a
         jp      1$
 
-__rrslong_rrx_s::        
+__rrslong_rrx_s::
         ld      hl,#2
         add     hl,sp
-                
+
         ld      e,(hl)
         inc     hl
         ld      d,(hl)
@@ -45,7 +45,7 @@ __rrslong_rrx_s::
         ld      h,b
 1$:
         or      a,a
-        ret     z
+        ret     Z
 
         sra     h
         rr      l
@@ -54,12 +54,12 @@ __rrslong_rrx_s::
 
         dec     a
         jp      1$
-        
-__rlslong_rrx_s::                
-__rlulong_rrx_s::                
+ 
+__rlslong_rrx_s::
+__rlulong_rrx_s::
         ld      hl,#2
         add     hl,sp
-        
+
         ld      e,(hl)
         inc     hl
         ld      d,(hl)
@@ -74,12 +74,12 @@ __rlulong_rrx_s::
         ld      h,b
 1$:
         or      a,a
-        ret     z
+        ret     Z
 
         rl      e
         rl      d
         rl      l
         rl      h
 
-        dec     a        
+        dec     a
         jp      1$

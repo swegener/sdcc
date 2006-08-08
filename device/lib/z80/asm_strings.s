@@ -29,7 +29,7 @@ __strcpy_rrx_s::
         ld      a,(bc)
         ld      (de),a
         or      a
-        jp      nz,1$
+        jp      NZ,1$
 
         ret
         ;; Notes on strcpy styles:
@@ -39,17 +39,17 @@ __strcpy_rrx_s::
         ;; Can't use LDI as need to check for end of string.
         ;; Above also matches the z88dk version.
         .endif
-                
+
 ; void *memcpy(void *dest, const void *source, int count)
-_memcpy::       
+_memcpy::
         ;; Fall through to correct type
-__memcpy_rrf_s::                
+__memcpy_rrf_s::
         ld      a,#5
         rst     0x08
-__memcpy_rrx_s::       
+__memcpy_rrx_s::
         ;; Using LDIR
         ;; LDIR:        do; *DE = *HL; HL++; BC--; while BC != 0
-        
+
         ;; All registers are already saved.
 	pop	iy	; iy = return address
 	pop	de	; de = destination pointer
@@ -60,7 +60,7 @@ __memcpy_rrx_s::
 	push	de
 	ld	a,b
 	or	c
-	jr	z,1$
+	jr	Z,1$
 	ldir
 1$:
 	pop	hl	; return hl = original destination pointer
@@ -68,17 +68,17 @@ __memcpy_rrx_s::
 	jp	(iy)
         ret
 
-; int strcmp(const char *s1, const char *s2) 
+; int strcmp(const char *s1, const char *s2)
 _strcmp::
         ;; Fall through to the correct style
         ;; Fall through to correct type
-__strcmp_rrf_s::                
+__strcmp_rrf_s::
         ld      a,#5
         rst     0x08
-__strcmp_rrx_s::       
+__strcmp_rrx_s::
         ld      hl,#2
         add     hl,sp
-        
+
         ld      e,(hl)
         inc     hl
         ld      d,(hl)
@@ -87,13 +87,13 @@ __strcmp_rrx_s::
         inc     hl
         ld      h,(hl)
         ld      l,a
-        
-1$:     
+
+1$:
         ld      a,(de)
         sub     (hl)
 
         ;; Normally not taken, so use a jr (12/7) instead of jp (10)
-        jr      nz,2$
+        jr      NZ,2$
 
         ;; A == 0
         cp      (hl)
@@ -102,11 +102,11 @@ __strcmp_rrx_s::
         inc     hl
         ;; Normally taken.  Flag from the cp above.
         jp      nz,1$
-2$:     
+2$:
         ;; Sign extend
         ld      l,a
         rla
         sbc     a
         ld      h,a
         ret
-        
+

@@ -15,12 +15,12 @@ _strcpy::
 	ld	l,a
 
 	push	de
-1$:	
+1$:
 	ld	a,(hl+)
 	ld	(de),a
 	inc	de
 	or	a,a
-	jr	nz,1$
+	jr	NZ,1$
 
 	pop	de
 	ret
@@ -52,15 +52,15 @@ _memcpy::
 	inc	de
 2$:
 	dec	c
-	jr	nz,1$
+	jr	NZ,1$
 	dec	b
-	jr	nz,1$	
+	jr	NZ,1$
 
 	pop	de
 	pop	bc
 	ret
 
-; int strcmp(const char *s1, const char *s2) 
+; int strcmp(const char *s1, const char *s2)
 _strcmp::
 	lda	hl,2(sp)
 	ld	e,(hl)
@@ -72,14 +72,14 @@ _strcmp::
 	ld	l,a
 
 	jr	1$
-2$:	
+2$:
 	ld	a,(de)
 	sub	(hl)
-	jr	nz,4$
+	jr	NZ,4$
 	;; A == 0
 	cp	(hl)
-	jr	z,3$
-1$:	
+	jr	Z,3$
+1$:
 	inc	de
 	inc	hl
 	jr	2$
@@ -93,4 +93,3 @@ _strcmp::
 	ld	de,#-1
 5$:
 	ret
-	

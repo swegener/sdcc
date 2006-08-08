@@ -1,33 +1,33 @@
 	;; Originally from GBDK by Pascal Felber.
 	.area	_CODE
 
-__divschar_rrx_s::       
+__divschar_rrx_s::
         ld      hl,#2+1
         add     hl,sp
-        
+
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        
+
         ;; Fall through
 __divschar_rrx_hds::
         ld      c,l
-        
+
         call    .div8
 
 	ld	e,c
         ld      d,b
-        	
+
 	ret
-	
-__modschar_rrx_s::       
+
+__modschar_rrx_s::
         ld      hl,#2+1
         add     hl,sp
-        
+
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        
+
         ;; Fall through
 __modschar_rrx_hds::
         ld      c,l
@@ -35,13 +35,13 @@ __modschar_rrx_hds::
        	call	.div8
 
         ;; Already in DE
-        
+
 	ret
 
-__divsint_rrx_s::        
+__divsint_rrx_s::
         ld      hl,#2+3
         add     hl,sp
-        
+
         ld      d,(hl)
         dec     hl
         ld      e,(hl)
@@ -50,7 +50,7 @@ __divsint_rrx_s::
         dec     hl
         ld      l,(hl)
         ld      h,a
-        
+
         ;; Fall through
 __divsint_rrx_hds::
 	ld	b,h
@@ -60,13 +60,13 @@ __divsint_rrx_hds::
 
 	ld	e,c
 	ld	d,b
-	
+
 	ret
-	
+
 __modsint_rrx_s::
         ld      hl,#2+3
         add     hl,sp
-        
+
         ld      d,(hl)
         dec     hl
         ld      e,(hl)
@@ -84,18 +84,18 @@ __modsint_rrx_hds::
 	call	.div16
 
         ;; Already in DE
-	
+
 	ret
 
 	;; Unsigned
-__divuchar_rrx_s::       
+__divuchar_rrx_s::
         ld      hl,#2+1
         add     hl,sp
-        
+
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        
+
         ;; Fall through
 __divuchar_rrx_hds::
         ld      c,l
@@ -103,17 +103,17 @@ __divuchar_rrx_hds::
 
 	ld	e,c
         ld      d,b
-        
+
 	ret
-	
-__moduchar_rrx_s::       
+
+__moduchar_rrx_s::
         ld      hl,#2+1
         add     hl,sp
-        
+
         ld      e,(hl)
         dec     hl
         ld      l,(hl)
-        
+
         ;; Fall through
 __moduchar_rrx_hds::
         ld      c,l
@@ -123,10 +123,10 @@ __moduchar_rrx_hds::
 
         ret
 
-__divuint_rrx_s::                
+__divuint_rrx_s::
         ld      hl,#2+3
         add     hl,sp
-        
+
         ld      d,(hl)
         dec     hl
         ld      e,(hl)
@@ -144,13 +144,13 @@ __divuint_rrx_hds::
 
 	ld	e,c
 	ld	d,b
-	
+
 	ret
-	
-__moduint_rrx_s::                
+
+__moduint_rrx_s::
         ld      hl,#2+3
         add     hl,sp
-        
+
         ld      d,(hl)
         dec     hl
         ld      e,(hl)
@@ -160,7 +160,7 @@ __moduint_rrx_s::
         ld      l,(hl)
         ld      h,a
         ;; Fall through
-        
+
 __moduint_rrx_hds::
 	ld	b,h
 	ld	c,l
@@ -168,28 +168,28 @@ __moduint_rrx_hds::
 	call	.divu16
 
         ;; Already in DE
-	
+
 	ret
-	
+
 .div8::
 .mod8::
-	LD	A,C		; Sign extend
-	RLCA
-	SBC	A
-	LD	B,A
-	LD	A,E		; Sign extend
-	RLCA
-	SBC	A
-	LD	D,A
+	ld	a,c		; Sign extend
+	rlca
+	sbc	a
+	ld	b,a
+	ld	a,e		; Sign extend
+	rlca
+	sbc	a
+	ld	d,a
 
 	; Fall through to .div16
-	
+
 	;; 16-bit division
-	;; 
+	;;
 	;; Entry conditions
 	;;   BC = dividend
 	;;   DE = divisor
-	;; 
+	;;
 	;; Exit conditions
 	;;   BC = quotient
 	;;   DE = remainder
@@ -203,79 +203,79 @@ __moduint_rrx_hds::
 	;;  and divisor. Quotient is positive if signs are the same, negative
 	;;  if signs are different
 	;; Remainder has same sign as dividend
-	LD	A,B		; Get high byte of dividend
-	LD	(.srem),A	; Save as sign of remainder
-	XOR	D		; Xor with high byte of divisor
-	LD	(.squot),A	; Save sign of quotient
+	ld	a,b		; Get high byte of dividend
+	ld	(.srem),a	; Save as sign of remainder
+	xor	d		; Xor with high byte of divisor
+	ld	(.squot),a	; Save sign of quotient
 	;; Take absolute value of divisor
-	BIT	7,D
-	JR	Z,.chkde	; Jump if divisor is positive
-	SUB	A		; Substract divisor from 0
-	SUB	E
-	LD	E,A
-	SBC	A		; Propagate borrow (A=0xFF if borrow)
-	SUB	D
-	LD	D,A
+	bit	7,d
+	jr	Z,.chkde	; Jump if divisor is positive
+	sub	a		; Substract divisor from 0
+	sub	e
+	ld	e,a
+	sbc	a		; Propagate borrow (A=0xFF if borrow)
+	sub	d
+	ld	d,a
 	;; Take absolute value of dividend
 .chkde:
-	BIT	7,B
-	JR	Z,.dodiv	; Jump if dividend is positive
-	SUB	A		; Substract dividend from 0
-	SUB	C
-	LD	C,A
-	SBC	A		; Propagate borrow (A=0xFF if borrow)
-	SUB	B
-	LD	B,A
+	bit	7,b
+	jr	Z,.dodiv	; Jump if dividend is positive
+	sub	a		; Substract dividend from 0
+	sub	c
+	ld	c,a
+	sbc	a		; Propagate borrow (A=0xFF if borrow)
+	sub	b
+	ld	b,a
 	;; Divide absolute values
 .dodiv:
-	CALL	.divu16
-	RET	C		; Exit if divide by zero
+	call	.divu16
+	ret	C		; Exit if divide by zero
 	;; Negate quotient if it is negative
-	LD	A,(.squot)
-	AND	#0x80
-	JR	Z,.dorem	; Jump if quotient is positive
-	SUB	A		; Substract quotient from 0
-	SUB	C
-	LD	C,A
-	SBC	A		; Propagate borrow (A=0xFF if borrow)
-	SUB	B
-	LD	B,A
+	ld	a,(.squot)
+	and	#0x80
+	jr	Z,.dorem	; Jump if quotient is positive
+	sub	a		; Substract quotient from 0
+	sub	c
+	ld	c,a
+	sbc	a		; Propagate borrow (A=0xFF if borrow)
+	sub	b
+	ld	b,a
 .dorem:
 	;; Negate remainder if it is negative
-	LD	A,(.srem)
-	AND	#0x80
-	RET	Z		; Return if remainder is positive
-	SUB	A		; Substract remainder from 0
-	SUB	E
-	LD	E,A
-	SBC	A		; Propagate remainder (A=0xFF if borrow)
-	SUB	D
-	LD	D,A
-	RET
+	ld	a,(.srem)
+	and	#0x80
+	ret	Z		; Return if remainder is positive
+	sub	a		; Substract remainder from 0
+	sub	e
+	ld	e,a
+	sbc	a		; Propagate remainder (A=0xFF if borrow)
+	sub	d
+	ld	d,a
+	ret
 
 .divu8::
 .modu8::
-	LD	B,#0x00
-	LD	D,B
+	ld	b,#0x00
+	ld	d,b
 	; Fall through to divu16
 
 .divu16::
 .modu16::
 	;; Check for division by zero
-	LD	A,E
-	OR	D
-	JR	NZ,.divide	; Branch if divisor is non-zero
-	LD	BC,#0x00	; Divide by zero error
-	LD	D,B
-	LD	E,C
-	SCF			; Set carry, invalid result
-	RET
+	ld	a,e
+	or	d
+	jr	NZ,.divide	; Branch if divisor is non-zero
+	ld	bc,#0x00	; Divide by zero error
+	ld	d,b
+	ld	e,c
+	scf			; Set carry, invalid result
+	ret
 .divide:
-	LD	L,C		; L = low byte of dividend/quotient
-	LD	H,B		; H = high byte of dividend/quotient
-	LD	BC,#0x00	; BC = remainder
-	OR	A		; Clear carry to start
-	LD	A,#16		; 16 bits in dividend
+	ld	l,c		; L = low byte of dividend/quotient
+	ld	h,b		; H = high byte of dividend/quotient
+	ld	bc,#0x00	; BC = remainder
+	or	a		; Clear carry to start
+	ld	a,#16		; 16 bits in dividend
 .dvloop:
 	;; Shift next bit of quotient into bit 0 of dividend
 	;; Shift next MSB of dividend into LSB of remainder
@@ -284,42 +284,42 @@ __moduint_rrx_hds::
 	;; HL holds remainder
 	;; Do a 32-bit left shift, shifting carry to L, L to H,
 	;;  H to C, C to B
-	LD	(.dcnt),A
-	RL	L		; Carry (next bit of quotient) to bit 0
-	RL	H		; Shift remaining bytes
-	RL	C
-	RL	B		; Clears carry since BC was 0
+	ld	(.dcnt),a
+	rl	l		; Carry (next bit of quotient) to bit 0
+	rl	h		; Shift remaining bytes
+	rl	c
+	rl	b		; Clears carry since BC was 0
 	;; If remainder is >= divisor, next bit of quotient is 1. This
 	;;  bit goes to carry
-	PUSH	BC		; Save current remainder
-	LD	A,C		; Substract divisor from remainder
-	SBC	E
-	LD	C,A
-	LD	A,B
-	SBC	D
-	LD	B,A
-	CCF			; Complement borrow so 1 indicates a
+	push	bc		; Save current remainder
+	ld	a,c		; Substract divisor from remainder
+	sbc	e
+	ld	c,a
+	ld	a,b
+	sbc	d
+	ld	b,a
+	ccf			; Complement borrow so 1 indicates a
 				;  successful substraction (this is the
 				;  next bit of quotient)
-	JR	C,.drop		; Jump if remainder is >= dividend
-	POP	BC		; Otherwise, restore remainder
-	JR	.nodrop
+	jr	C,.drop		; Jump if remainder is >= dividend
+	pop	bc		; Otherwise, restore remainder
+	jr	.nodrop
 .drop:
-	INC	SP
-	INC	SP
+	inc	sp
+	inc	sp
 .nodrop:
-	LD	A,(.dcnt)
-	DEC	A		; DEC does not affect carry flag
-	JR	NZ,.dvloop
+	ld	a,(.dcnt)
+	dec	a		; DEC does not affect carry flag
+	jr	NZ,.dvloop
 	;; Shift last carry bit into quotient
-	LD	D,B		; DE = remainder
-	LD	E,C
-	RL	L		; Carry to L
-	LD	C,L		; C = low byte of quotient
-	RL	H
-	LD	B,H		; B = high byte of quotient
-	OR	A		; Clear carry, valid result
-	RET
+	ld	d,b		; DE = remainder
+	ld	e,c
+	rl	l		; Carry to L
+	ld	c,l		; C = low byte of quotient
+	rl	h
+	ld	b,h		; B = high byte of quotient
+	or	a		; Clear carry, valid result
+	ret
 
 	.area	_BSS
 

@@ -1,3 +1,17 @@
+2006-08-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/gbz80/asm_strings.s,
+	* device/lib/gbz80/crt0_rle.s,
+	* device/lib/gbz80/div.s,
+	* device/lib/gbz80/mul.s,
+	* device/lib/gbz80/shift.s,
+	* device/lib/z80/asm_strings.s,
+	* device/lib/z80/crt0_rle.s,
+	* device/lib/z80/div.s,
+	* device/lib/z80/mul.s,
+	* device/lib/z80/shift.s: changed to all lower case menmonics except the
+	  flags which are all upper case
+
 2006-08-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/z80/asm.h: made CASE_SENSITIVE 1

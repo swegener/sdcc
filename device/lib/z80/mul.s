@@ -84,7 +84,7 @@ __mulint_rrx_hds::
         ;; Optimise for the case when this side has 8 bits of data or
         ;; less.  This is often the case with support address calls.
         or      a
-        jp      nz,1$
+        jp      NZ,1$
 
         ld      b,#8
         ld      a,c
@@ -94,7 +94,7 @@ __mulint_rrx_hds::
         add     hl,hl
         rl      c
         rla                     ;DLE 27/11/98
-        jr      nc,2$
+        jr      NC,2$
         add     hl,de
 2$:
         djnz    1$

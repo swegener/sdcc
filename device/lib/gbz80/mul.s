@@ -1,5 +1,5 @@
 	;; Originally from GBDK by Pascal Felber.
-	
+
 	.area	_CODE
 
 __mulschar_rrx_s::
@@ -8,13 +8,13 @@ __mulschar_rrx_s::
 
         ld      e,(hl)
         inc     hl
-        ld      l,(hl)                
+        ld      l,(hl)
 
         ;; Fall through
 __mulschar_rrx_hds::
         ;; Need to sign extend before going in.
         ld      c,l
-        
+
         ld      a,l
         rla
         sbc     a,a
@@ -34,13 +34,13 @@ __muluchar_rrx_s::
         ld      e,(hl)
 
         inc     hl
-        ld      c,(hl)                
+        ld      c,(hl)
 
         ;; Clear the top
         xor     a
         ld      d,a
         ld      b,a
-        
+
         jp      .mul16
 
 __mulint_rrx_s::
@@ -84,7 +84,7 @@ __mulint_rrx_hds::
         ;; Optimise for the case when this side has 8 bits of data or
         ;; less.  This is often the case with support address calls.
         or      a
-        jp      nz,1$
+        jp      NZ,1$
 
         ld      b,#8
         ld      a,c
@@ -94,11 +94,11 @@ __mulint_rrx_hds::
         add     hl,hl
         rl      c
         rla                     ;DLE 27/11/98
-        jr      nc,2$
+        jr      NZ,2$
         add     hl,de
 2$:
         dec     b
-        jr      nz,1$
+        jr      NZ,1$
 
         ;; Return in DE
         ld      e,l

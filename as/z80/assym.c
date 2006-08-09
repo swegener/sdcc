@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "asm.h"
+#include "strcmpi.h"
 
 /*)Module	assym.c
  *
@@ -181,7 +182,7 @@ char *id;
 	h = hash(id);
 	mp = mnehash[h];
 	while (mp) {
-		if (symeq(id, mp->m_id))
+		if (as_strcmpi(id, mp->m_id) == 0)	/* JLH: case insensitive */
 			return (mp);
 		mp = mp->m_mp;
 	}
@@ -382,7 +383,7 @@ register char *p1, *p2;
  *	side effects:
  *		none
  */
- 
+
 int
 hash(p)
 register char *p;

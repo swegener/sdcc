@@ -1,3 +1,10 @@
+2006-08-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/z80/assym.c (mlookup): ignore case when looking up mnemonics
+	* as/z80/Makefile.in: added strcmpi.c
+	* as/z80/z80adr.c: added upper case registers and lower case conditionals
+	* support/Util/strcmpi.ch: added with intention to remove from mcs51/hc08
+
 2006-08-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/gbz80/asm_strings.s,

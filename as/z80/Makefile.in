@@ -9,19 +9,19 @@ OBJDIR	= obj/$(EXT)
 
 SDC	= .
 
-SLIBSRC	= NewAlloc.c
+SLIBSRC	= NewAlloc.c strcmpi.c
 
 SRC	= asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
 	  assubr.c assym.c z80adr.c z80ext.c z80mch.c z80pst.c
 
 OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
-SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o) 
+SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o)
 
 BINS	= $(BUILDDIR)/as$(EXT)$(EXEEXT)
 
 CFLAGS	+= $(CPPFLAGS) $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS	+= -funsigned-char
-CFLAGS	+= -I$(SLIB) 
+CFLAGS	+= -I$(SLIB)
 
 LDFLAGS += -lm $(EXTRALIBS)
 

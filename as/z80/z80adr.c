@@ -203,12 +203,21 @@ struct	adsym	R8[] = {
     { "h",	H|0400 },
     { "l",	L|0400 },
     { "a",	A|0400 },
+    { "B",	B|0400 },
+    { "C",	C|0400 },
+    { "D",	D|0400 },
+    { "E",	E|0400 },
+    { "H",	H|0400 },
+    { "L",	L|0400 },
+    { "A",	A|0400 },
     { "",	000 }
 };
 
 struct	adsym	R8X[] = {
     { "i",	I|0400 },
     { "r",	R|0400 },
+    { "I",	I|0400 },
+    { "R",	R|0400 },
     { "",	000 }
 };
 
@@ -217,22 +226,34 @@ struct	adsym	R16[] = {
     { "de",	DE|0400 },
     { "hl",	HL|0400 },
     { "sp",	SP|0400 },
+    { "BC",	BC|0400 },
+    { "DE",	DE|0400 },
+    { "HL",	HL|0400 },
+    { "SP",	SP|0400 },
 #ifndef GAMEBOY
     { "ix",	IX|0400 },
     { "iy",	IY|0400 },
+    { "IX",	IX|0400 },
+    { "IY",	IY|0400 },
 #else /* GAMEBOY */
     { "hl-",	HLD|0400 },
     { "hl+",	HLI|0400 },
     { "hld",	HLD|0400 },
     { "hli",	HLI|0400 },
+    { "HL-",	HLD|0400 },
+    { "HL+",	HLI|0400 },
+    { "HLD",	HLD|0400 },
+    { "HLI",	HLI|0400 },
 #endif /* GAMEBOY */
     { "",	000 }
 };
 
 struct	adsym	R16X[] = {
     { "af",	AF|0400 },
+    { "AF",     AF|0400 },
 #ifndef GAMEBOY
     { "af'",	AF|0400 },
+    { "AF'",	AF|0400 },
 #endif /* GAMEBOY */
     { "",	000 }
 };
@@ -246,11 +267,19 @@ struct	adsym	CND[] = {
     { "Z",	Z |0400 },
     { "NC",	NC|0400 },
     { "C",	CS|0400 },
+    { "nz",	NZ|0400 },
+    { "z",	Z |0400 },
+    { "nc",	NC|0400 },
+    { "c",	CS|0400 },
 #ifndef GAMEBOY
     { "PO",	PO|0400 },
     { "PE",	PE|0400 },
     { "P",	P |0400 },
     { "M",	M |0400 },
+    { "po",	PO|0400 },
+    { "pe",	PE|0400 },
+    { "p",	P |0400 },
+    { "m",	M |0400 },
 #endif /* GAMEBOY */
     { "",	000 }
 };

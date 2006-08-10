@@ -30,6 +30,11 @@
   typedef unsigned int size_t;
 #endif
 
-#define offsetof(s,m)   (size_t)&(((s *)0)->m)
+#if defined(SDCC_z80) || defined(SDCC_gbz80)
+  #define offsetof(s,m)   (size_t)&(((s *)0)->m)
+#else
+  /* temporary hack to fix bug 1518273 */
+  #define offsetof(s,m)   (size_t)&(((s __code *)0)->m)
+#endif
 
 #endif

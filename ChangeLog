@@ -1,3 +1,7 @@
+2006-08-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stddef.h: c temporary hack to fix bug 1518273
+
 2006-08-09 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/cc2510fx.h: added

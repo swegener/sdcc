@@ -1,3 +1,9 @@
+2006-08-09 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/cc2510fx.h: added
+	* src/z80/z80.dsp, src/gbz80/gbz80.dsp: added support/Util/strcmpi.ch
+	  to projects.
+
 2006-08-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/z80/assym.c (mlookup): ignore case when looking up mnemonics

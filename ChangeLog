@@ -1,3 +1,12 @@
+2006-08-12 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/fwk/include/testfwk.h,
+	  support/regression/fwk/lib/testfwk.c,
+	  support/regression/generate-cases.py,
+	  support/regression/Makefile.in:
+	  regression test framework does not depend on function pointers and
+	  variable arguments
+
 2006-08-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stddef.h: c temporary hack to fix bug 1518273

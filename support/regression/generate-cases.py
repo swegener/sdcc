@@ -9,27 +9,21 @@ outdir = sys.argv[2]
 
 # Start of the test function table definition
 testfuntableheader = """
-static TESTFUNP _tests[] = {
+void
+__runSuite(void)
+{
 """
 
-
 # End of the test function table definition
-testfuntablefooter = """\tNULL
-};
+testfuntablefooter = """}
 """
 
 # Code to generate the suite function
 testfunsuite = """
-TESTFUNP *
-suite(void)
-{
-    return _tests;
-}
-
 const char *
-getSuiteName(void)
+__getSuiteName(void)
 {
-    return "{testcase}";
+  return "{testcase}";
 }
 """ 
 
@@ -111,12 +105,16 @@ class InstanceGenerator:
         # Emmit the suite table
         fout.write(testfuntableheader)
 
+        n = 0;
         for fun in self.functions:
             # Turn the function definition into a pointer
             fun = re.sub(r'\(\w+\)', '', fun)
-            fout.write("\t" + fun + ",\n")
+            fout.write("  __prints(\"Running " + fun + "\\n\");\n");
+            fout.write('  ' + fun + "();\n")
+            n += 1;
 
         fout.write(testfuntablefooter)
+        fout.write("\nconst int __numCases = " + str(n) + ";\n")
         fout.write(testfunsuite);
         
         fout.close()
@@ -189,4 +187,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

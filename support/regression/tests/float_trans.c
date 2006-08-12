@@ -6,7 +6,9 @@
 #include <testfwk.h>
 #include <math.h>
 
+#if defined (__STDC_IEC_559__) || defined (SDCC)
 #define {func} 1
+#endif
 
 void
 testTrans(void)

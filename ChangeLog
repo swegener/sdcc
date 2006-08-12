@@ -1,3 +1,8 @@
+2006-08-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/float_trans.c: disabled test if __STDC_IEC_559__
+	  not defined on host
+
 2006-08-12 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/fwk/include/testfwk.h,

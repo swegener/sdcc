@@ -1,3 +1,8 @@
+2006-08-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/doc/asxhtm.html: documented changed ABS behaviour
+	* as/doc/README: fixed some typos
+
 2006-08-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/float_trans.c: disabled test if __STDC_IEC_559__

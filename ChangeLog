@@ -1,3 +1,10 @@
+2006-08-14 Borut Razem <borut.razem AT siol.net>
+
+	* support/fegression/ports/pic14/gpsim.cmd,
+	  support/fegression/ports/pic14/spec.mk,
+	  support/fegression/ports/pic14/support.c:
+	  added pic14 regression test
+
 2006-08-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/doc/asxhtm.html: documented changed ABS behaviour

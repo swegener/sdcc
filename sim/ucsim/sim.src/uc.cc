@@ -95,10 +95,10 @@ void
 cl_ticker::dump(int nr, double xtal, class cl_console *con)
 {
   con->dd_printf("timer #%d(\"%s\") %s%s: %g sec (%lu clks)\n",
-		 nr, get_name("unnamed"),
-		 (options&TICK_RUN)?"ON":"OFF",
-		 (options&TICK_INISR)?",ISR":"",
-		 get_rtime(xtal), ticks);
+                 nr, get_name("unnamed"),
+                 (options&TICK_RUN)?"ON":"OFF",
+                 (options&TICK_INISR)?",ISR":"",
+                 get_rtime(xtal), ticks);
 }
 
 
@@ -213,10 +213,10 @@ cl_uc::init(void)
       char *fname= (char *)(sim->app->in_files->at(i));
       long l;
       if ((l= read_hex_file(fname)) >= 0)
-	{
-	  sim->app->get_commander()->all_printf("%ld words read from %s\n",
-						l, fname);
-	}
+        {
+          sim->app->get_commander()->all_printf("%ld words read from %s\n",
+                                                l, fname);
+        }
     }
   return(0);
 }
@@ -240,7 +240,7 @@ cl_uc::reset(void)
   /*FIXME should we clear user counters?*/
   il= (class it_level *)(it_levels->top());
   while (il &&
-	 il->level >= 0)
+         il->level >= 0)
     {
       il= (class it_level *)(it_levels->pop());
       delete il;
@@ -653,10 +653,10 @@ cl_uc::address_space(char *id)
     {
       class cl_address_space *m= (cl_address_space *)(address_spaces->at(i));
       if (!m ||
-	  !m->have_real_name())
-	continue;
+          !m->have_real_name())
+        continue;
       if (m->is_inamed(id))
-	return(m);
+        return(m);
     }
   return(0);
 }
@@ -673,19 +673,19 @@ cl_uc::memory(char *id)
     {
       class cl_memory *m= (cl_memory *)(address_spaces->at(i));
       if (!m ||
-	  !m->have_real_name())
-	continue;
+          !m->have_real_name())
+        continue;
       if (m->is_inamed(id))
-	return(m);
+        return(m);
     }
   for (i= 0; i < memchips->count; i++)
     {
       class cl_memory *m= (cl_memory *)(memchips->at(i));
       if (!m ||
-	  !m->have_real_name())
-	continue;
+          !m->have_real_name())
+        continue;
       if (m->is_inamed(id))
-	return(m);
+        return(m);
     }
   return(0);
 }
@@ -701,7 +701,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
   while (bytes)
     {
       if (fscanf(f, "%2c", &s2[0]) == EOF)
-	return(0);
+        return(0);
       s2[2]= '\0';
       l= l*256 + strtol(s2, NULL, 16);
       bytes--;
@@ -739,32 +739,32 @@ cl_uc::read_hex_file(const char *nam)
   if (!rom)
     {
       sim->app->get_commander()->
-	dd_printf("No ROM address space to read in.\n");
+        dd_printf("No ROM address space to read in.\n");
       return(-1);
     }
 
   if (!nam)
     {
       sim->app->get_commander()->
-	dd_printf("cl_uc::read_hex_file File name not specified\n");
+        dd_printf("cl_uc::read_hex_file File name not specified\n");
       return(-1);
     }
   else
     if ((f= fopen(nam, "r")) == NULL)
       {
-	fprintf(stderr, "Can't open `%s': %s\n", nam, strerror(errno));
-	return(-1);
+        fprintf(stderr, "Can't open `%s': %s\n", nam, strerror(errno));
+        return(-1);
       }
 
   //memset(inst_map, '\0', sizeof(inst_map));
   ok= DD_TRUE;
   while (ok &&
-	 rtyp != 1)
+         rtyp != 1)
     {
       while (((c= getc(f)) != ':') &&
-	     (c != EOF)) ;
+             (c != EOF)) ;
       if (c != ':')
-	{fprintf(stderr, ": not found\n");break;}
+        {fprintf(stderr, ": not found\n");break;}
       recnum++;
       dnum= ReadInt(f, &ok, 1);//printf("dnum=%02x",dnum);
       chk = dnum;
@@ -774,59 +774,59 @@ cl_uc::read_hex_file(const char *nam)
       rtyp= ReadInt(f, &ok, 1);//printf("rtyp=%02x ",rtyp);
       chk+= rtyp;
       for (i= 0; ok && (i < dnum); i++)
-	{
-	  rec[i]= ReadInt(f, &ok, 1);//printf("%02x",rec[i]);
-	  chk+= rec[i];
-	}
+        {
+          rec[i]= ReadInt(f, &ok, 1);//printf("%02x",rec[i]);
+          chk+= rec[i];
+        }
       if (ok)
-	{
-	  sum= ReadInt(f, &ok, 1);//printf(" sum=%02x\n",sum);
-	  if (ok)
-	    {
-	      if (((sum + chk) & 0xff) == 0)
-		{
-		  if (rtyp == 0)
-		    {
-		      if (rom->width > 8)
-			addr/= 2;
-		      for (i= 0; i < dnum; i++)
-			{
-			  if (rom->width <= 8)
-			    {
-			      rom->set(addr, rec[i]);
-			      addr++;
-			      written++;
-			    }
-			  else if (rom->width <= 16)
-			    {
-			      if (get_low)
-				{
-				  low= rec[i];
-				  get_low= 0;
-				}
-			      else
-				{
-				  high= rec[i];
-				  rom->set(addr, (high*256)+low);
-				  addr++;
-				  written++;
-				  get_low= 1;
-				}
-			    }
-			}
-		    }
-		  else
-		    if (rtyp != 1)
-		      application->debug("Unknown record type %d(0x%x)\n",
-					 rtyp, rtyp);
-		}
-	      else
-		application->debug("Checksum error (%x instead of %x) in "
-				   "record %ld.\n", chk, sum, recnum);
-	    }
-	  else
-	    application->debug("Read error in record %ld.\n", recnum);
-	}
+        {
+          sum= ReadInt(f, &ok, 1);//printf(" sum=%02x\n",sum);
+          if (ok)
+            {
+              if (((sum + chk) & 0xff) == 0)
+                {
+                  if (rtyp == 0)
+                    {
+                      if (rom->width > 8)
+                        addr/= 2;
+                      for (i= 0; i < dnum; i++)
+                        {
+                          if (rom->width <= 8)
+                            {
+                              rom->set(addr, rec[i]);
+                              addr++;
+                              written++;
+                            }
+                          else if (rom->width <= 16)
+                            {
+                              if (get_low)
+                                {
+                                  low= rec[i];
+                                  get_low= 0;
+                                }
+                              else
+                                {
+                                  high= rec[i];
+                                  rom->set(addr, (high*256)+low);
+                                  addr++;
+                                  written++;
+                                  get_low= 1;
+                                }
+                            }
+                        }
+                    }
+                  else
+                    if (rtyp != 1)
+                      application->debug("Unknown record type %d(0x%x)\n",
+                                         rtyp, rtyp);
+                }
+              else
+                application->debug("Checksum error (%x instead of %x) in "
+                                   "record %ld.\n", chk, sum, recnum);
+            }
+          else
+            application->debug("Read error in record %ld.\n", recnum);
+        }
     }
   if (rom->width > 8 &&
       !get_low)
@@ -900,11 +900,11 @@ cl_uc::register_hw_read(enum mem_class type, t_addr addr, class cl_hw *hw)
   if ((m= (class cl_m*)mems->at(type)))
     {
       if ((l= m->read_locs->get_loc(addr)) == 0)
-	{
-	  l= new cl_memloc(addr);
-	  l->init();
-	  m->read_locs->add(l);
-	}
+        {
+          l= new cl_memloc(addr);
+          l->init();
+          m->read_locs->add(l);
+        }
       l->hws->add(hw);
     }
   else
@@ -930,7 +930,7 @@ cl_uc::get_hw(enum hw_cath cath, int *idx)
     {
       hw= (class cl_hw *)(hws->at(i));
       if (hw->cathegory == cath)
-	break;
+        break;
     }
   if (i >= hws->count)
     return(0);
@@ -951,7 +951,7 @@ cl_uc::get_hw(char *id_string, int *idx)
     {
       hw= (class cl_hw *)(hws->at(i));
       if (strstr(hw->id_string, id_string) == hw->id_string)
-	break;
+        break;
     }
   if (i >= hws->count)
     return(0);
@@ -970,7 +970,7 @@ cl_uc::get_hw(enum hw_cath cath, int hwid, int *idx)
     i= *idx;
   hw= get_hw(cath, &i);
   while (hw &&
-	 hw->id != hwid)
+         hw->id != hwid)
     {
       i++;
       hw= get_hw(cath, &i);
@@ -991,7 +991,7 @@ cl_uc::get_hw(char *id_string, int hwid, int *idx)
     i= *idx;
   hw= get_hw(id_string, &i);
   while (hw &&
-	 hw->id != hwid)
+         hw->id != hwid)
     {
       i++;
       hw= get_hw(id_string, &i);
@@ -1069,7 +1069,7 @@ cl_uc::print_disass(t_addr addr, class cl_console *con)
       int j;
       j= rom->width/4 + ((rom->width%4)?1:0) + 1;
       while (j)
-	con->dd_printf(" "), j--;
+        con->dd_printf(" "), j--;
       i++;
     }
   con->dd_printf(" %s\n", dis);
@@ -1120,10 +1120,10 @@ cl_uc::longest_inst(void)
   int max= 0;
 
   while (de &&
-	 de->mnemonic)
+         de->mnemonic)
     {
       if (de->length > max)
-	max= de->length;
+        max= de->length;
       de++;
     }
   return(max);
@@ -1136,8 +1136,8 @@ cl_uc::get_name(t_addr addr, struct name_entry tab[], char *buf)
 
   i= 0;
   while (tab[i].name &&
-	 (!(tab[i].cpu_type & type) ||
-	 (tab[i].addr != addr)))
+         (!(tab[i].cpu_type & type) ||
+         (tab[i].addr != addr)))
     i++;
   if (tab[i].name)
     strcpy(buf, tab[i].name);
@@ -1146,7 +1146,7 @@ cl_uc::get_name(t_addr addr, struct name_entry tab[], char *buf)
 
 bool
 cl_uc::symbol2address(char *sym, struct name_entry tab[],
-		      t_addr *addr)
+                      t_addr *addr)
 {
   int i;
 
@@ -1155,13 +1155,13 @@ cl_uc::symbol2address(char *sym, struct name_entry tab[],
     return(DD_FALSE);
   i= 0;
   while (tab[i].name &&
-	 (!(tab[i].cpu_type & type) ||
-	  strcasecmp(sym, tab[i].name) != 0))
+         (!(tab[i].cpu_type & type) ||
+          strcasecmp(sym, tab[i].name) != 0))
     i++;
   if (tab[i].name)
     {
       if (addr)
-	*addr= tab[i].addr;
+        *addr= tab[i].addr;
       return(DD_TRUE);
     }
   return(DD_FALSE);
@@ -1169,16 +1169,16 @@ cl_uc::symbol2address(char *sym, struct name_entry tab[],
 
 char *
 cl_uc::symbolic_bit_name(t_addr bit_address,
-			 class cl_memory *mem,
-			 t_addr mem_addr,
-			 t_mem bit_mask)
+                         class cl_memory *mem,
+                         t_addr mem_addr,
+                         t_mem bit_mask)
 {
   char *sym_name= 0;
   int i;
 
   i= 0;
   while (bit_tbl()[i].name &&
-	 (bit_tbl()[i].addr != bit_address))
+         (bit_tbl()[i].addr != bit_address))
     i++;
   if (bit_tbl()[i].name)
     {
@@ -1192,12 +1192,12 @@ cl_uc::symbolic_bit_name(t_addr bit_address,
     {
       i= 0;
       while (sfr_tbl()[i].name &&
-	     (sfr_tbl()[i].addr != mem_addr))
-	i++;
+             (sfr_tbl()[i].addr != mem_addr))
+        i++;
       if (sfr_tbl()[i].name)
-	sym_name= strdup(sfr_tbl()[i].name);
+        sym_name= strdup(sfr_tbl()[i].name);
       else
-	sym_name= 0;
+        sym_name= 0;
     }
   if (!sym_name)
     {
@@ -1230,15 +1230,15 @@ cl_uc::handle_event(class cl_event &event)
     {
     case ev_address_space_added:
       {
-	try {
-	  class cl_event_address_space_added &e=
-	    dynamic_cast<class cl_event_address_space_added &>(event);
-	  address_space_added(e.as);
-	  e.handle();
-	}
-	catch (...)
-	  { break; }
-	break;
+        try {
+          class cl_event_address_space_added &e=
+            dynamic_cast<class cl_event_address_space_added &>(event);
+          address_space_added(e.as);
+          e.handle();
+        }
+        catch (...)
+          { break; }
+        break;
       }
     default:
       return(pass_event_down(event));
@@ -1260,8 +1260,8 @@ cl_uc::mem_cell_changed(class cl_address_space *mem, t_addr addr)
     {
       int i;
       for (i= 0; i < mems->count; i++)
-	{
-	}
+        {
+        }
     }
 }
 */
@@ -1298,25 +1298,25 @@ cl_uc::check_errors(void)
   if (c)
     {
       for (i= 0; i < errors->count; i++)
-	{
-	  class cl_error *error= (class cl_error *)(errors->at(i));
-	  if (!error->is_on())
-	    continue;
-	  error->print(c);
-	  must_stop= must_stop || (error->get_type() & err_stop);
-	  if (error->inst)
-	    {
-	      class cl_console *con;
-	      con= c->actual_console;
-	      if (!con)
-		con= c->frozen_console;
-	      if (con)
-		{
-		  con->dd_printf("Erronouse instruction: ");
-		  print_disass(error->PC, con);
-		}
-	    }
-	}
+        {
+          class cl_error *error= (class cl_error *)(errors->at(i));
+          if (!error->is_on())
+            continue;
+          error->print(c);
+          must_stop= must_stop || (error->get_type() & err_stop);
+          if (error->inst)
+            {
+              class cl_console *con;
+              con= c->actual_console;
+              if (!con)
+                con= c->frozen_console;
+              if (con)
+                {
+                  con->dd_printf("Erronouse instruction: ");
+                  print_disass(error->PC, con);
+                }
+            }
+        }
       errors->free_all();
     }
   else
@@ -1356,7 +1356,7 @@ cl_uc::tick_hw(int cycles)
     {
       hw= (class cl_hw *)(hws->at(i));
       if (hw->flags & HWF_INSIDE)
-	hw->tick(cycles);
+        hw->tick(cycles);
     }
   do_extra_hw(cycles);
   return(0);
@@ -1383,11 +1383,11 @@ cl_uc::tick(int cycles)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t)
-	{
-	  if ((t->options&TICK_INISR) ||
-	      il->level < 0)
-	    t->tick(cycles * cpc);
-	}
+        {
+          if ((t->options&TICK_INISR) ||
+              il->level < 0)
+            t->tick(cycles * cpc);
+        }
     }
 
   // tick for hardwares
@@ -1414,9 +1414,9 @@ cl_uc::get_counter(char *nam)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t &&
-	  t->get_name() &&
-	  strcmp(t->get_name(), nam) == 0)
-	return(t);
+          t->get_name() &&
+          strcmp(t->get_name(), nam) == 0)
+        return(t);
     }
   return(0);
 }
@@ -1440,10 +1440,10 @@ cl_uc::add_counter(class cl_ticker *ticker, char */*nam*/)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (!t)
-	{
-	  counters->put_at(i, ticker);
-	  return;
-	}
+        {
+          counters->put_at(i, ticker);
+          return;
+        }
     }
   counters->add(ticker);
 }
@@ -1471,13 +1471,13 @@ cl_uc::del_counter(char *nam)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t &&
-	  t->get_name() &&
-	  strcmp(t->get_name(), nam) == 0)
-	{
-	  delete t;
-	  counters->put_at(i, 0);
-	  return;
-	}
+          t->get_name() &&
+          strcmp(t->get_name(), nam) == 0)
+        {
+          delete t;
+          counters->put_at(i, 0);
+          return;
+        }
     }
 }
 
@@ -1515,13 +1515,13 @@ cl_uc::fetch(t_mem *code)
       rom)
     {
       if (rom->get_cell_flag(PC, CELL_FETCH_BRK) &&
-	  (brk= fbrk->get_bp(PC, &idx)) &&
-	  (brk->do_hit()))
-	{
-	  if (brk->perm == brkDYNAMIC)
-	    fbrk->del_bp(PC);
-	  return(1);
-	}
+          (brk= fbrk->get_bp(PC, &idx)) &&
+          (brk->do_hit()))
+        {
+          if (brk->perm == brkDYNAMIC)
+            fbrk->del_bp(PC);
+          return(1);
+        }
     }
   *code= fetch();
   return(0);
@@ -1535,7 +1535,7 @@ cl_uc::do_inst(int step)
   if (step < 0)
     step= 1;
   while (step-- &&
-	 res == resGO)
+         res == resGO)
     {
       pre_inst();
       res= exec_inst();
@@ -1604,7 +1604,7 @@ cl_uc::stack_write(class cl_stack_op *op)
   if (op->get_op() & stack_read_operation)
     {
       class cl_error_stack_tracker_wrong_handle *e= new
-	cl_error_stack_tracker_wrong_handle(DD_FALSE);
+        cl_error_stack_tracker_wrong_handle(DD_FALSE);
       //fprintf(stderr, "%06"_A_"x cl_uc::stack_read() should be called for "
       //"%s\n", op->get_pc(), op->get_op_name());
       e->init();
@@ -1622,7 +1622,7 @@ cl_uc::stack_read(class cl_stack_op *op)
   if (op->get_op() & stack_write_operation)
     {
       class cl_error_stack_tracker_wrong_handle *e= new
-	cl_error_stack_tracker_wrong_handle(DD_TRUE);
+        cl_error_stack_tracker_wrong_handle(DD_TRUE);
       e->init();
       error(e);
       //fprintf(stderr, "%06"_A_"x cl_uc::stack_write() should be called for "
@@ -1633,8 +1633,8 @@ cl_uc::stack_read(class cl_stack_op *op)
     {
       class cl_error *e= new cl_error_stack_tracker_empty(op);
       /*printf("0x%06"_A_"x %s operation on stack but no operation was before\n
-	",
-	op->get_pc(), op->get_op_name());*/
+        ",
+        op->get_pc(), op->get_op_name());*/
       e->init();
       error(e);
       return;
@@ -1643,25 +1643,25 @@ cl_uc::stack_read(class cl_stack_op *op)
   if (top)
     {
       if (!top->match(op))
-	{
-	  class cl_error *e= new cl_error_stack_tracker_unmatch(top, op);
-	  e->init();
-	  error(e);
-	  /*printf("0x%06"_A_"x %s operation on stack but last was %s\n",
-	    op->get_pc(), op->get_op_name(), top->get_op_name());*/
-	}
+        {
+          class cl_error *e= new cl_error_stack_tracker_unmatch(top, op);
+          e->init();
+          error(e);
+          /*printf("0x%06"_A_"x %s operation on stack but last was %s\n",
+            op->get_pc(), op->get_op_name(), top->get_op_name());*/
+        }
       int top_size= top->data_size(), op_size= op->data_size();
       if (top_size != op_size)
-	{
-	  application->debug("0x%06"_A_"x %d bytes to read out of stack "
-			     "but %d was pushed in last operation\n",
-			     op->get_pc(), op_size, top_size);
-	}
+        {
+          application->debug("0x%06"_A_"x %d bytes to read out of stack "
+                             "but %d was pushed in last operation\n",
+                             op->get_pc(), op_size, top_size);
+        }
     }
 
   int removed= 0;
   while (top &&
-	 top->can_removed(op))
+         top->can_removed(op))
     {
       top= (class cl_stack_op *)stack_ops->pop();
       delete top;
@@ -1671,28 +1671,28 @@ cl_uc::stack_read(class cl_stack_op *op)
   if (removed != 1)
     {
       application->debug("0x%06"_A_"x %d ops removed from stack-tracker "
-			 "when %s happened, top pc=0x%06"_A_"x "
-			 "top before=0x%06"_A_"x op after=0x%06"_A_"x\n",
-			 op->get_pc(), removed, op->get_op_name(),
-			 top?(top->get_pc()):0, top?(top->get_before()):0,
-			 op->get_after());
+                         "when %s happened, top pc=0x%06"_A_"x "
+                         "top before=0x%06"_A_"x op after=0x%06"_A_"x\n",
+                         op->get_pc(), removed, op->get_op_name(),
+                         top?(top->get_pc()):0, top?(top->get_before()):0,
+                         op->get_after());
     }
   
   if (top)
     {
       int ta= top->get_after(), oa= op->get_after();
       if (ta != oa)
-	{
-	  application->debug("0x%06"_A_"x stack still inconsistent after %s, "
-			     "%d byte(s) should be read out; top after"
-			     "=0x%06"_A_"x op after=0x%06"_A_"x\n",
-			     op->get_pc(), op->get_op_name(), abs(ta-oa),
-			     ta, oa);
-	  class cl_error *e=
-	    new cl_error_stack_tracker_inconsistent(op, abs(ta-oa));
-	  e->init();
-	  error(e);
-	}
+        {
+          application->debug("0x%06"_A_"x stack still inconsistent after %s, "
+                             "%d byte(s) should be read out; top after"
+                             "=0x%06"_A_"x op after=0x%06"_A_"x\n",
+                             op->get_pc(), op->get_op_name(), abs(ta-oa),
+                             ta, oa);
+          class cl_error *e=
+            new cl_error_stack_tracker_inconsistent(op, abs(ta-oa));
+          e->init();
+          error(e);
+        }
     }
   
   delete op;
@@ -1721,8 +1721,8 @@ cl_uc::ebrk_at(t_addr addr, char *id)
     {
       eb= (class cl_ev_brk *)(ebrk->at(i));
       if (eb->addr == addr &&
-	  !strcmp(eb->id, id))
-	return(eb);
+          !strcmp(eb->id, id))
+        return(eb);
     }
   return(0);
 }
@@ -1771,8 +1771,8 @@ cl_uc::rm_ebrk(t_addr addr, char *id)
     {
       eb= (class cl_ev_brk *)(ebrk->at(i));
       if (eb->addr == addr &&
-	  !strcmp(eb->id, id))
-	ebrk->del_bp(i, 0);
+          !strcmp(eb->id, id))
+        ebrk->del_bp(i, 0);
     }
 }
 
@@ -1827,7 +1827,7 @@ cl_uc::make_new_brknr(void)
 
 class cl_ev_brk *
 cl_uc::mk_ebrk(enum brk_perm perm, class cl_address_space *mem,
-	       char op, t_addr addr, int hit)
+               char op, t_addr addr, int hit)
 {
   class cl_ev_brk *b;
   op= toupper(op);
@@ -1844,7 +1844,7 @@ cl_uc::check_events(void)
   for (i= 0; i < events->count; i++)
     {
       class cl_ev_brk *brk=
-	dynamic_cast<class cl_ev_brk *>(events->object_at(i));
+        dynamic_cast<class cl_ev_brk *>(events->object_at(i));
       sim->stop(brk);
     }
   sim->stop(resBREAKPOINT);
@@ -1865,18 +1865,17 @@ cl_error_unknown_code::cl_error_unknown_code(class cl_uc *the_uc)
 void
 cl_error_unknown_code::print(class cl_commander *c)
 {
-  FILE *f= c->get_out();
-  cmd_fprintf(f, "%s: unknown instruction code at ", get_type_name());
+  c->dd_printf("%s: unknown instruction code at ", get_type_name());
   if (uc->rom)
     {
-      cmd_fprintf(f, uc->rom->addr_format, PC);
-      cmd_fprintf(f, " (");
-      cmd_fprintf(f, uc->rom->data_format, uc->rom->get(PC));
-      cmd_fprintf(f, ")");
+      c->dd_printf(uc->rom->addr_format, PC);
+      c->dd_printf(" (");
+      c->dd_printf(uc->rom->data_format, uc->rom->get(PC));
+      c->dd_printf(")");
     }
   else
-    cmd_fprintf(f, "0x%06x", PC);
-  cmd_fprintf(f, "\n");
+    c->dd_printf("0x%06x", PC);
+  c->dd_printf("\n");
 }
 
 cl_uc_error_registry::cl_uc_error_registry(void)

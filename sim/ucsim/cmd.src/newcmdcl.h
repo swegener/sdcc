@@ -49,31 +49,31 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 // Flags of consoles
-#define CONS_NONE	 0
-#define CONS_DEBUG	 0x01	// Print debug messages on this console
-#define CONS_FROZEN	 0x02	// Console is frozen (g command issued)
-#define CONS_PROMPT	 0x04	// Prompt is out, waiting for input
-#define CONS_INTERACTIVE 0x08	// Interactive console
-#define CONS_NOWELCOME	 0x10	// Do not print welcome message
-#define CONS_INACTIVE	 0x20	// Do not do any action
-#define CONS_ECHO	 0x40	// Echo commands
+#define CONS_NONE        0
+#define CONS_DEBUG       0x01   // Print debug messages on this console
+#define CONS_FROZEN      0x02   // Console is frozen (g command issued)
+#define CONS_PROMPT      0x04   // Prompt is out, waiting for input
+#define CONS_INTERACTIVE 0x08   // Interactive console
+#define CONS_NOWELCOME   0x10   // Do not print welcome message
+#define CONS_INACTIVE    0x20   // Do not do any action
+#define CONS_ECHO        0x40   // Echo commands
 
-#define SY_ADDR		'a'
-#define ADDRESS		"a"
-#define SY_NUMBER	'n'
-#define NUMBER		"n"
-#define SY_DATA		'd'
-#define DATA		"d"
-#define SY_STRING	's'
-#define STRING		"s"
-#define SY_MEMORY	'm'
-#define MEMORY		"m"
-#define SY_HW		'h'
-#define HW		"h"
-#define SY_DATALIST	'D'
-#define DATALIST	"D"
-#define SY_BIT		'b'
-#define BIT		"b"
+#define SY_ADDR         'a'
+#define ADDRESS         "a"
+#define SY_NUMBER       'n'
+#define NUMBER          "n"
+#define SY_DATA         'd'
+#define DATA            "d"
+#define SY_STRING       's'
+#define STRING          "s"
+#define SY_MEMORY       'm'
+#define MEMORY          "m"
+#define SY_HW           'h'
+#define HW              "h"
+#define SY_DATALIST     'D'
+#define DATALIST        "D"
+#define SY_BIT          'b'
+#define BIT             "b"
 
 
 class cl_prompt_option: public cl_optref
@@ -132,8 +132,7 @@ public:
   virtual void welcome(void);
   virtual void redirect(char *fname, char *mode);
   virtual void un_redirect(void);
-  virtual FILE *get_out(void) { return(rout?rout:out); }
-  int cmd_do_print(FILE *f, char *format, va_list ap);
+  int cmd_do_print(char *format, va_list ap);
   virtual void print_prompt(void);
   virtual int  dd_printf(char *format, ...);
   virtual int  debug(char *format, ...);
@@ -148,6 +147,8 @@ public:
   virtual void set_id(int new_id);
   virtual int get_id(void) { return(id); }
   virtual void set_prompt(char *p);
+private:
+  FILE *get_out(void) { return(rout?rout:out); }
 };
 
 #ifdef SOCKET_AVAIL
@@ -159,7 +160,6 @@ public:
   cl_listen_console(int serverport, class cl_app *the_app);
 
   virtual void welcome(void) {}
-  virtual void prompt(void) {}
 
   virtual int match(int fdnum);
   virtual int get_in_fd(void);
@@ -173,7 +173,7 @@ class cl_sub_console: public cl_console
   class cl_console *parent;
 public:
   cl_sub_console(class cl_console *the_parent,
-		 FILE *fin, FILE *fout, class cl_app *the_app);
+                 FILE *fin, FILE *fout, class cl_app *the_app);
   virtual ~cl_sub_console(void);
   virtual int init(void);
 };
@@ -190,13 +190,12 @@ public:
   class cl_list *cons;
   fd_set read_set, active_set;
   UCSOCKET_T fd_num;
-  //class cl_sim *sim;
   class cl_console *actual_console, *frozen_console;
   class cl_cmdset *cmdset;
 
 public:
   cl_commander(class cl_app *the_app,
-	       class cl_cmdset *acmdset/*, class cl_sim *asim*/);
+               class cl_cmdset *acmdset/*, class cl_sim *asim*/);
   virtual ~cl_commander(void);
   virtual int init(void);
 
@@ -212,13 +211,10 @@ public:
   void set_fd_set(void);
 
   void prompt(void);
-  FILE *get_out(void);
-  int all_printf(char *format, ...);	// print to all consoles
-  int all_print(char *string, int length);
-  int dd_printf(char *format, ...);	// print to actual_console
-  int dd_printf(char *format, va_list ap);// print to actual_console
-  int debug(char *format, ...);		// print consoles with debug flag set
-  int debug(char *format, va_list ap);	// print consoles with debug flag set
+  int all_printf(char *format, ...);    // print to all consoles
+  int dd_printf(char *format, ...);     // print to actual_console
+  int debug(char *format, ...);         // print consoles with debug flag set
+  int debug(char *format, va_list ap);  // print consoles with debug flag set
   int flag_printf(int iflags, char *format, ...);
   int input_avail(void);
   int input_avail_on_frozen(void);

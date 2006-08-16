@@ -269,7 +269,7 @@ cl_console::~cl_console(void)
   if (out)
     {
       if (flags & CONS_PROMPT)
-	fprintf(out, "\n");
+        fprintf(out, "\n");
       fflush(out);
       fclose(out);
     }
@@ -304,18 +304,15 @@ cl_console::accept_last(void)
 void
 cl_console::welcome(void)
 {
-  FILE *Out= rout?rout:out;
-
-  if (!Out ||
-      (flags & CONS_NOWELCOME))
-    return;
-  fprintf(Out, "uCsim %s, Copyright (C) 1997 Daniel Drotos, Talker Bt.\n"
-	  "uCsim comes with ABSOLUTELY NO WARRANTY; for details type "
-	  "`show w'.\n"
-	  "This is free software, and you are welcome to redistribute it\n"
-	  "under certain conditions; type `show c' for details.\n",
-	  VERSIONSTR);
-  fflush(Out);
+  if (!(flags & CONS_NOWELCOME))
+    {
+      dd_printf("uCsim %s, Copyright (C) 1997 Daniel Drotos, Talker Bt.\n"
+        "uCsim comes with ABSOLUTELY NO WARRANTY; for details type "
+        "`show w'.\n"
+        "This is free software, and you are welcome to redistribute it\n"
+        "under certain conditions; type `show c' for details.\n",
+        VERSIONSTR);
+    }
 }
 
 void
@@ -323,7 +320,7 @@ cl_console::redirect(char *fname, char *mode)
 {
   if ((rout= fopen(fname, mode)) == NULL)
     dd_printf("Unable to open file '%s' for %s: %s\n",
-	      fname, (mode[0]=='w')?"write":"append", strerror(errno));
+              fname, (mode[0]=='w')?"write":"append", strerror(errno));
 }
 
 void
@@ -337,58 +334,40 @@ cl_console::un_redirect(void)
 
 
 int
-cl_console::cmd_do_print(FILE *f, char *format, va_list ap)
+cl_console::cmd_do_print(char *format, va_list ap)
 {
-  int ret;
-#ifdef HAVE_VASPRINTF
-  char *msg= NULL;
-  vasprintf(&msg, format, ap);
-  ret= fprintf(f, "%s", msg);
-  free(msg);
-#else
-#  ifdef HAVE_VSNPRINTF
-  char msg[80*25];
-  vsnprintf(msg, 80*25, format, ap);
-  ret= fprintf(f, "%s", msg);
-#  else
-#    ifdef HAVE_VPRINTF
-  char msg[80*25];
-  vsprintf(msg, format, ap); /* Dangerous */
-  ret= fprintf(f, "%s", msg);
-#    else
-#      ifdef HAVE_DOPRNT
-  /* ??? */
-  /*strcpy(msg, "Unimplemented printf has called.\n");*/
-#      else
-  /*strcpy(msg, "printf can not be implemented, upgrade your libc.\n");*/
-#      endif
-#    endif
-#  endif
-#endif
-  fflush(f);
+  FILE *f = get_out();
+  int ret = 0;
+
+  if (f)
+   {
+      vfprintf(f, format, ap);
+      fflush(f);
+    }
+
   return(ret);
 }
 
 void
 cl_console::print_prompt(void)
 {
-  //char *p;
-  FILE *Out= rout?rout:out;
-
   if (flags & (CONS_PROMPT|CONS_FROZEN|CONS_INACTIVE))
     return;
   flags|= CONS_PROMPT;
-  if (!Out)
-    return;
   if (/*app->args->arg_avail('P')*/null_prompt_option->get_value(bool(0)))
-    putc('\0', Out);
+    {
+      FILE *Out = get_out();
+      if (Out)
+        {
+          putc('\0', Out);
+          fflush(Out);
+        }
+    }
   else
     {
-      fprintf(Out, "%d", id);
-      fprintf(Out, "%s", (prompt && prompt[0])?prompt:"> ");
-      //	      ((p= app->args->get_sarg(0, "prompt"))?p:"> "));
+      dd_printf("%d%s", id, (prompt && prompt[0])?prompt:"> ");
+      //              ((p= app->args->get_sarg(0, "prompt"))?p:"> "));
     }
-  fflush(Out);
 }
 
 int
@@ -396,14 +375,11 @@ cl_console::dd_printf(char *format, ...)
 {
   va_list ap;
   int ret= 0;
-  FILE *Out= rout?rout:out;
 
-  if (Out)
-    {
-      va_start(ap, format);
-      ret= cmd_do_print(Out, format, ap);
-      va_end(ap);
-    }
+  va_start(ap, format);
+  ret= cmd_do_print(format, ap);
+  va_end(ap);
+
   return(ret);
 }
 
@@ -415,14 +391,11 @@ cl_console::debug(char *format, ...)
 
   va_list ap;
   int ret= 0;
-  FILE *Out= rout?rout:out;
 
-  if (Out)
-    {
-      va_start(ap, format);
-      ret= cmd_do_print(Out, format, ap);
-      va_end(ap);
-    }
+  va_start(ap, format);
+  ret= cmd_do_print(format, ap);
+  va_end(ap);
+
   return(ret);
 }
 
@@ -430,14 +403,11 @@ void
 cl_console::print_bin(long data, int bits)
 {
   long mask= 1;
-  FILE *Out= rout?rout:out;
 
-  if (!Out)
-    return;
   mask= mask << ((bits >= 1)?(bits-1):0);
   while (bits--)
     {
-      fprintf(Out, "%c", (data&mask)?'1':'0');
+      dd_printf("%c", (data&mask)?'1':'0');
       mask>>= 1;
     }
 }
@@ -445,7 +415,7 @@ cl_console::print_bin(long data, int bits)
 void
 cl_console::print_char_octal(char c)
 {
-  FILE *Out= rout?rout:out;
+  FILE *Out= get_out();
 
   if (Out)
     ::print_char_octal(c, Out);
@@ -549,58 +519,58 @@ cl_console::proc_input(class cl_cmdset *cmdset)
   else
     {
       if (cmdstr &&
-	  *cmdstr == '\004')
-	retval= 1;
+          *cmdstr == '\004')
+        retval= 1;
       else
-	{
-	  class cl_cmdline *cmdline= 0;
-	  class cl_cmd *cm= 0;
-	  if (flags & CONS_ECHO)
-	    dd_printf("%s\n", cmdstr);
-	  cmdline= new cl_cmdline(app, cmdstr, this);
-	  cmdline->init();
-	  if (cmdline->repeat() &&
-	      accept_last() &&
-	      last_command)
-	    {
-	      cm= last_command;
-	      delete cmdline;
-	      cmdline= last_cmdline;
-	    }
-	  else
-	    {
-	      cm= cmdset->get_cmd(cmdline, accept_last());
-	      if (last_cmdline)
-		{
-		  delete last_cmdline;
-		  last_cmdline= 0;
-		}
-	      last_command= 0;
-	    }
-	  if (cm)
-	    {
-	      retval= cm->work(app, cmdline, this);
-	      if (cm->can_repeat)
-		{
-		  last_command= cm;
-		  last_cmdline= cmdline;
-		}
-	      else
-		delete cmdline;
-	    }
-	  else
-	    {
-	      class YY_cl_ucsim_parser_CLASS *pars;
-	      class cl_ucsim_lexer *lexer;
-	      lexer= new cl_ucsim_lexer(cmdstr);
-	      pars= new YY_cl_ucsim_parser_CLASS(lexer);
-	      pars->yyparse();
-	      delete cmdline;
-	      delete pars;
-	    }
-	  /*if (!cm)
-	    retval= interpret(cmdstr);*/
-	}
+        {
+          class cl_cmdline *cmdline= 0;
+          class cl_cmd *cm= 0;
+          if (flags & CONS_ECHO)
+            dd_printf("%s\n", cmdstr);
+          cmdline= new cl_cmdline(app, cmdstr, this);
+          cmdline->init();
+          if (cmdline->repeat() &&
+              accept_last() &&
+              last_command)
+            {
+              cm= last_command;
+              delete cmdline;
+              cmdline= last_cmdline;
+            }
+          else
+            {
+              cm= cmdset->get_cmd(cmdline, accept_last());
+              if (last_cmdline)
+                {
+                  delete last_cmdline;
+                  last_cmdline= 0;
+                }
+              last_command= 0;
+            }
+          if (cm)
+            {
+              retval= cm->work(app, cmdline, this);
+              if (cm->can_repeat)
+                {
+                  last_command= cm;
+                  last_cmdline= cmdline;
+                }
+              else
+                delete cmdline;
+            }
+          else
+            {
+              class YY_cl_ucsim_parser_CLASS *pars;
+              class cl_ucsim_lexer *lexer;
+              lexer= new cl_ucsim_lexer(cmdstr);
+              pars= new YY_cl_ucsim_parser_CLASS(lexer);
+              pars->yyparse();
+              delete cmdline;
+              delete pars;
+            }
+          /*if (!cm)
+            retval= interpret(cmdstr);*/
+        }
     }
   //retval= sim->do_cmd(cmd, this);
   un_redirect();
@@ -618,9 +588,7 @@ cl_console::proc_input(class cl_cmdset *cmdset)
 int
 cl_console::interpret(char *cmd)
 {
-  FILE *Out= rout?rout:out;
-
-  fprintf(Out, "Unknown command\n");
+  dd_printf("Unknown command\n");
   return(0);
 }
 
@@ -658,8 +626,8 @@ cl_listen_console::cl_listen_console(int serverport, class cl_app *the_app)
   if ((sock= make_server_socket(serverport)) >= 0)
     {
       if (listen(sock, 10) < 0)
-	fprintf(stderr, "Listen on port %d: %s\n",
-		serverport, strerror(errno));
+        fprintf(stderr, "Listen on port %d: %s\n",
+                serverport, strerror(errno));
     }
   in= out= 0;
 }
@@ -711,7 +679,7 @@ cl_listen_console::proc_input(class cl_cmdset *cmdset)
  */
 
 cl_sub_console::cl_sub_console(class cl_console *the_parent,
-			       FILE *fin, FILE *fout, class cl_app *the_app):
+                               FILE *fin, FILE *fout, class cl_app *the_app):
   cl_console(fin, fout, the_app)
 {
   parent= the_parent;
@@ -748,7 +716,7 @@ cl_sub_console::init(void)
  */
 
 cl_commander::cl_commander(class cl_app *the_app, class cl_cmdset *acmdset
-			   /*, class cl_sim *asim*/):
+                           /*, class cl_sim *asim*/):
   cl_base()
 {
   app= the_app;
@@ -812,13 +780,13 @@ cl_commander::init(void)
     {
       FILE *fc= fopen(Config, "r");
       if (!fc)
-	fprintf(stderr, "Can't open `%s': %s\n", Config, strerror(errno));
+        fprintf(stderr, "Can't open `%s': %s\n", Config, strerror(errno));
       else
-	{
-	  con= mk_console(fc, stderr);
-	  con->flags|= CONS_NOWELCOME|CONS_ECHO;
-	  add_console(con);
-	}
+        {
+          con= mk_console(fc, stderr);
+          con->flags|= CONS_NOWELCOME|CONS_ECHO;
+          add_console(con);
+        }
     }
   return(0);
 }
@@ -895,17 +863,17 @@ cl_commander::set_fd_set(void)
       UCSOCKET_T fd;
       class cl_console *c= (class cl_console*)(cons->at(i));
       if ((fd= c->get_in_fd()) >= 0)
-	{
-	  if ((c->flags & CONS_FROZEN) == 0 ||
-	      (c->flags & CONS_INTERACTIVE) != 0)
-	    {
-	      FD_SET(fd, &read_set);
-	      if (fd > fd_num)
-		fd_num= fd;
-	    }
-	}
+        {
+          if ((c->flags & CONS_FROZEN) == 0 ||
+              (c->flags & CONS_INTERACTIVE) != 0)
+            {
+              FD_SET(fd, &read_set);
+              if (fd > fd_num)
+                fd_num= fd;
+            }
+        }
       else
-	;//fprintf(stderr, "** Skipping console %p\n",c);
+        ;//fprintf(stderr, "** Skipping console %p\n",c);
     }
   fd_num++;
 }
@@ -924,13 +892,10 @@ cl_commander::all_printf(char *format, ...)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console *c= (class cl_console*)(cons->at(i));
-      FILE *Out= c->get_out();
-      if (Out)
-	{
-	  va_start(ap, format);
-	  ret= c->cmd_do_print(Out, format, ap);
-	  va_end(ap);
-	}
+
+      va_start(ap, format);
+      ret= c->cmd_do_print(format, ap);
+      va_end(ap);
     }
   return(ret);
 }
@@ -947,99 +912,34 @@ cl_commander::prompt(void)
     }
 }
 
-int
-cl_commander::all_print(char *string, int length)
-{
-  int i;
-  
-  for (i= 0; i < cons->count; i++)
-    {
-      class cl_console *c= (class cl_console*)(cons->at(i));
-      FILE *Out= c->get_out();
-      if (Out)
-	{
-	  for (int j= 0; j < length; j++)
-	    putc(string[j], Out);
-	}
-    }
-  return(0);
-}
-
 /*
  * Printing to actual_console
  */
-
-FILE *
-cl_commander::get_out(void)
-{
-  if (actual_console)
-    return(actual_console->get_out());
-  else if (frozen_console)
-    return(frozen_console->get_out());
-  return(0);
-}
 
 int
 cl_commander::dd_printf(char *format, ...)
 {
   va_list ap;
   int ret= 0;
-  FILE *f;
   class cl_console *con;
 
   if (actual_console)
     {
-      f= actual_console->get_out();
       con= actual_console;
     }
   else if (frozen_console)
     {
-      f= frozen_console->get_out();
       con= frozen_console;
     }
   else
     {
-      f= 0;
       con= 0;
     }
-  if (/*actual_console &&
-	actual_console->out*/f &&
-			     con)
+  if (con)
     {
       va_start(ap, format);
-      ret= con->cmd_do_print(f/*actual_console->out*/, format, ap);
+      ret= con->cmd_do_print(format, ap);
       va_end(ap);
-    }
-  return(ret);
-}
-
-int
-cl_commander::dd_printf(char *format, va_list ap)
-{
-  int ret= 0;
-  FILE *f;
-  class cl_console *con;
-
-  if (actual_console)
-    {
-      f= actual_console->get_out();
-      con= actual_console;
-    }
-  else if (frozen_console)
-    {
-      f= frozen_console->get_out();
-      con= frozen_console;
-    }
-  else
-    {
-      f= 0;
-      con= 0;
-    }
-  if (/*actual_console &&
-	actual_console->out*/f &&
-			     con)
-    {
-      ret= con->cmd_do_print(f/*actual_console->out*/, format, ap);
     }
   return(ret);
 }
@@ -1057,14 +957,12 @@ cl_commander::debug(char *format, ...)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console *c= (class cl_console*)(cons->at(i));
-      FILE *Out= c->get_out();
-      if (Out &&
-	  c->flags & CONS_DEBUG)
-	{
-	  va_start(ap, format);
-	  ret= c->cmd_do_print(Out, format, ap);
-	  va_end(ap);
-	}
+      if (c->flags & CONS_DEBUG)
+        {
+          va_start(ap, format);
+          ret= c->cmd_do_print(format, ap);
+          va_end(ap);
+        }
     }
   return(ret);
 }
@@ -1077,12 +975,10 @@ cl_commander::debug(char *format, va_list ap)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console *c= (class cl_console*)(cons->at(i));
-      FILE *Out= c->get_out();
-      if (Out &&
-	  c->flags & CONS_DEBUG)
-	{
-	  ret= c->cmd_do_print(Out, format, ap);
-	}
+      if (c->flags & CONS_DEBUG)
+        {
+          ret= c->cmd_do_print(format, ap);
+        }
     }
   return(ret);
 }
@@ -1096,14 +992,12 @@ cl_commander::flag_printf(int iflags, char *format, ...)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console *c= (class cl_console*)(cons->at(i));
-      FILE *Out= c->get_out();
-      if (Out &&
-	  (c->flags & iflags) == iflags)
-	{
-	  va_start(ap, format);
-	  ret= c->cmd_do_print(Out, format, ap);
-	  va_end(ap);
-	}
+      if ((c->flags & iflags) == iflags)
+        {
+          va_start(ap, format);
+          ret= c->cmd_do_print(format, ap);
+          va_end(ap);
+        }
     }
   return(ret);
 }
@@ -1152,24 +1046,24 @@ cl_commander::proc_input(void)
   for (i= 0; i < fd_num; i++)
     if (FD_ISSET(i, &active_set))
       {
-	class cl_console *c;
-	int j;
-	for (j= 0; j < cons->count; j++)
-	  {
-	    c= (class cl_console*)(cons->at(j));
-	    if (c->match(i))
-	      {
-		actual_console= c;
-		int retval= c->proc_input(cmdset);
-		if (retval)
-		  {
-		    del_console(c);
-		    delete c;
-		  }
-		actual_console= 0;
-		return(cons->count == 0);
-	      }
-	  }
+        class cl_console *c;
+        int j;
+        for (j= 0; j < cons->count; j++)
+          {
+            c= (class cl_console*)(cons->at(j));
+            if (c->match(i))
+              {
+                actual_console= c;
+                int retval= c->proc_input(cmdset);
+                if (retval)
+                  {
+                    del_console(c);
+                    delete c;
+                  }
+                actual_console= 0;
+                return(cons->count == 0);
+              }
+          }
       }
   return(0);
 }

@@ -118,8 +118,8 @@ get_name_entry(struct name_entry tabl[], char *name, class cl_uc *uc)
     return(0);
   for (p= name; *p; *p= toupper(*p), p++);
   while (tabl[i].name &&
-	 (!(tabl[i].cpu_type & uc->type) ||
-	 (strcmp(tabl[i].name, name) != 0)))
+         (!(tabl[i].cpu_type & uc->type) ||
+         (strcmp(tabl[i].name, name) != 0)))
     {
       //printf("tabl[%d].name=%s <-> %s\n",i,tabl[i].name,name);
       i++;
@@ -137,9 +137,9 @@ get_name_entry(struct name_entry tabl[], char *name, class cl_uc *uc)
 
 /*bool
 interpret_bitname(char *name, class cl_uc *uc,
-		  uchar **cell, uchar *celladdr,
-		  uchar *bitaddr, uchar *bitmask,
-		  char **symname)
+                  uchar **cell, uchar *celladdr,
+                  uchar *bitaddr, uchar *bitmask,
+                  char **symname)
 {
   char *dot, *p;
   char *sym, bitnumstr[2];
@@ -150,48 +150,48 @@ interpret_bitname(char *name, class cl_uc *uc,
     {
       *dot++= '\0';
       if ((ne= get_name_entry(uc->sfr_tbl(), name, uc)) == NULL)
-	{
-	  *celladdr= strtol(name, &p, 0);
-	  if (p && *p)
-	    {
-	      dot--;
-	      *dot= '.';
-	      return(DD_FALSE);
-	    }
-	}
+        {
+          *celladdr= strtol(name, &p, 0);
+          if (p && *p)
+            {
+              dot--;
+              *dot= '.';
+              return(DD_FALSE);
+            }
+        }
       else
-	*celladdr= ne->addr;
+        *celladdr= ne->addr;
       if ((*celladdr < 0x20) ||
-	  ((*celladdr > 0x2f) && (*celladdr < 0x80)) ||
-	  ((*celladdr > 0x7f) && (*celladdr & 0x07)))
-	return(DD_FALSE);
+          ((*celladdr > 0x2f) && (*celladdr < 0x80)) ||
+          ((*celladdr > 0x7f) && (*celladdr & 0x07)))
+        return(DD_FALSE);
       bitnum= strtol(dot, &p, 0);
       if ((p && *p) ||
-	  (bitnum < 0) ||
-	  (bitnum > 7))
-	return(DD_FALSE);
+          (bitnum < 0) ||
+          (bitnum > 7))
+        return(DD_FALSE);
       if (*celladdr > 0x7f)
-	*bitaddr= *celladdr + bitnum;
+        *bitaddr= *celladdr + bitnum;
       else
-	*bitaddr= (*celladdr - 0x20)*8 + bitnum;
+        *bitaddr= (*celladdr - 0x20)*8 + bitnum;
       dot--;
       *dot= '.';
     }
   else
     {
       if ((ne= get_name_entry(uc->bit_tbl(), name, uc)) == NULL)
-	{
-	  *bitaddr= strtol(name, &p, 0);
-	  if ((p && *p) ||
-	      (*bitaddr > 0xff))
-	    return(DD_FALSE);
-	}
+        {
+          *bitaddr= strtol(name, &p, 0);
+          if ((p && *p) ||
+              (*bitaddr > 0xff))
+            return(DD_FALSE);
+        }
       else
-	*bitaddr= ne->addr;
+        *bitaddr= ne->addr;
       if (*bitaddr > 0x7f)
-	*celladdr= *bitaddr & 0xf8;
+        *celladdr= *bitaddr & 0xf8;
       else
-	*celladdr= (*bitaddr >> 3) + 0x20;
+        *celladdr= (*bitaddr >> 3) + 0x20;
     }
   // *bitaddr, *celladdr now OK
   *cell= uc->get_bit//FIXME
@@ -202,7 +202,7 @@ interpret_bitname(char *name, class cl_uc *uc,
     return(DD_TRUE);
   i= 0;
   while (uc->bit_tbl()[i].name &&
-	 (uc->bit_tbl()[i].addr != *bitaddr))
+         (uc->bit_tbl()[i].addr != *bitaddr))
     i++;
   if (uc->bit_tbl()[i].name)
     {
@@ -212,7 +212,7 @@ interpret_bitname(char *name, class cl_uc *uc,
     }
   i= 0;
   while (uc->sfr_tbl()[i].name &&
-	 (uc->sfr_tbl()[i].addr != *celladdr))
+         (uc->sfr_tbl()[i].addr != *celladdr))
     i++;
   if (uc->sfr_tbl()[i].name)
     sym= strdup(uc->sfr_tbl()[i].name);
@@ -249,97 +249,47 @@ proc_escape(char *string, int *len)
       char *spec_c;
 
       if (*s == '\\' &&
-	  *(s+1))
-	{
-	  s++;
-	  if (*s == '0')
-	    {
-	      if (!isdigit(*(s+1)))
-		{
-		  *p++= '\0';
-		  s++;
-		}
-	      else
-		{
-		  char *octal, *chk, data;
-		  int i, j;
-		  i= strspn(s, "01234567");
-		  octal= (char *)malloc(i+1);
-		  j= 0;
-		  while (*s &&
-			 (j < i))
-		    octal[j++]= *s++;
-		  octal[j]= '\0';
-		  data= strtol(octal, &chk, 8);
-		  if (!chk || !(*chk))
-		    *p++= data;
-		}
-	    }
-	  else
-	    if ((spec_c= strchr(spec_chars, *s)) != NULL)
-	      {
-		*p++= spec[spec_c-spec_chars];
-		s++;
-	      }
-	    else
-	      *p++= *s++;
-	}
+          *(s+1))
+        {
+          s++;
+          if (*s == '0')
+            {
+              if (!isdigit(*(s+1)))
+                {
+                  *p++= '\0';
+                  s++;
+                }
+              else
+                {
+                  char *octal, *chk, data;
+                  int i, j;
+                  i= strspn(s, "01234567");
+                  octal= (char *)malloc(i+1);
+                  j= 0;
+                  while (*s &&
+                         (j < i))
+                    octal[j++]= *s++;
+                  octal[j]= '\0';
+                  data= strtol(octal, &chk, 8);
+                  if (!chk || !(*chk))
+                    *p++= data;
+                }
+            }
+          else
+            if ((spec_c= strchr(spec_chars, *s)) != NULL)
+              {
+                *p++= spec[spec_c-spec_chars];
+                s++;
+              }
+            else
+              *p++= *s++;
+        }
       else
-	*p++= *s++;
+        *p++= *s++;
     }
   *p= '\0';
   *len= p-str;
   return(str);
-}
-
-
-
-extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
-extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
-
-int
-cmd_vfprintf(FILE *f, char *format, va_list ap)
-{
-  int ret;
-  if (!f)
-    return(0);
-#ifdef HAVE_VASPRINTF
-  char *msg= NULL;
-  vasprintf(&msg, format, ap);
-  ret= fprintf(f, "%s", msg);
-  free(msg);
-#else
-#  ifdef HAVE_VSNPRINTF
-  char msg[80*25];
-  vsnprintf(msg, 80*25, format, ap);
-  ret= fprintf(f, "%s", msg);
-#  else
-#    ifdef HAVE_VPRINTF
-  char msg[80*25];
-  vsprintf(msg, format, ap); /* Dangerous */
-  ret= fprintf(f, "%s", msg);
-#    else
-#      ifdef HAVE_DOPRNT
-  /* ??? */
-  /*strcpy(msg, "Unimplemented printf has called.\n");*/
-#      else
-  /*strcpy(msg, "printf can not be implemented, upgrade your libc.\n");*/
-#      endif
-#    endif
-#  endif
-#endif
-  fflush(f);
-  return(ret);
-}
-
-int
-cmd_fprintf(FILE *f, char *format, ...)
-{
-  va_list ap;
-  va_start(ap, format);
-  int ret= cmd_vfprintf(f, format, ap);
-  va_end(ap);
-  return(ret);
 }
 
 

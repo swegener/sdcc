@@ -36,15 +36,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern int make_server_socket(unsigned short int port);
 //extern void print_bin(long data, int bits, class cl_console *con);
 extern struct name_entry *get_name_entry(struct name_entry tabl[],
-					 char *name,
-					 class cl_uc *uc);
+                                         char *name,
+                                         class cl_uc *uc);
 /*extern bool interpret_bitname(char *name, class cl_uc *uc,
-			      uchar **cell, uchar *celladdr,
-			      uchar *bitaddr, uchar *bitmask,
-			      char **symname);*/
+                              uchar **cell, uchar *celladdr,
+                              uchar *bitaddr, uchar *bitmask,
+                              char **symname);*/
 extern char *proc_escape(char *string, int *len);
-extern int cmd_vfprintf(FILE *f, char *format, va_list ap);
-extern int cmd_fprintf(FILE *f, char *format, ...);
 
 
 #endif

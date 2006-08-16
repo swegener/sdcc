@@ -1,3 +1,9 @@
+2006-08-16 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/cmd.src/newcmd.cc, sim/ucsim/cmd.src/newcmdcl.h,
+	  sim/ucsim/cmd.src/cmdutil.cc, sim/ucsim/cmd.src/cmdutil.h,
+	  sim/ucsim/sim.src/mem.cc, sim/ucsim/sim.src/uc.cc: code cleaning
+
 2006-08-14 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/Makefile.in,

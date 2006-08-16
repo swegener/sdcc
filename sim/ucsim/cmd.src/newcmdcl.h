@@ -211,10 +211,11 @@ public:
   void set_fd_set(void);
 
   void prompt(void);
-  int all_printf(char *format, ...);    // print to all consoles
-  int dd_printf(char *format, ...);     // print to actual_console
-  int debug(char *format, ...);         // print consoles with debug flag set
-  int debug(char *format, va_list ap);  // print consoles with debug flag set
+  int all_printf(char *format, ...);        // print to all consoles
+  int dd_printf(char *format, va_list ap);  // print to actual_console
+  int dd_printf(char *format, ...);         // print to actual_console
+  int debug(char *format, ...);             // print consoles with debug flag set
+  int debug(char *format, va_list ap);      // print consoles with debug flag set
   int flag_printf(int iflags, char *format, ...);
   int input_avail(void);
   int input_avail_on_frozen(void);

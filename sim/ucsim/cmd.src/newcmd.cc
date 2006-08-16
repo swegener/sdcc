@@ -917,9 +917,8 @@ cl_commander::prompt(void)
  */
 
 int
-cl_commander::dd_printf(char *format, ...)
+cl_commander::dd_printf(char *format, va_list ap)
 {
-  va_list ap;
   int ret= 0;
   class cl_console *con;
 
@@ -937,10 +936,21 @@ cl_commander::dd_printf(char *format, ...)
     }
   if (con)
     {
-      va_start(ap, format);
       ret= con->cmd_do_print(format, ap);
-      va_end(ap);
     }
+  return(ret);
+}
+
+int
+cl_commander::dd_printf(char *format, ...)
+{
+  va_list ap;
+  int ret= 0;
+
+  va_start(ap, format);
+  ret= dd_printf(format, ap);
+  va_end(ap);
+
   return(ret);
 }
 

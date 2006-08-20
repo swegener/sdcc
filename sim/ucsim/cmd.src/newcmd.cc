@@ -66,10 +66,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmdutil.h"
 
 
-extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
-extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
-
-
 /*
  * Options of console
  */
@@ -336,14 +332,16 @@ cl_console::un_redirect(void)
 int
 cl_console::cmd_do_print(char *format, va_list ap)
 {
+  int ret;
   FILE *f = get_out();
-  int ret = 0;
 
   if (f)
    {
-      vfprintf(f, format, ap);
+      ret= vfprintf(f, format, ap);
       fflush(f);
     }
+  else
+    ret= 0;
 
   return(ret);
 }
@@ -427,15 +425,6 @@ cl_console::print_char_octal(char c)
  */
 
 int
-cl_console::match(int fdnum)
-{
-  if (in &&
-      fileno(in) == fdnum)
-    return(1);
-  return(0);
-}
-
-int
 cl_console::get_in_fd(void)
 {
   if (flags & CONS_INACTIVE)
@@ -467,9 +456,7 @@ cl_console::read_line(void)
 #ifdef HAVE_GETLINE
   if (getline(&s, 0, in) < 0)
     return(0);
-#else
-
-# ifdef HAVE_GETDELIM
+#elif defined HAVE_GETDELIM
   size_t n= 30;
   s= (char *)malloc(n);
   if (getdelim(&s, &n, '\n', in) < 0)
@@ -477,17 +464,13 @@ cl_console::read_line(void)
       free(s);
       return(0);
     }
-# else
-
-#  ifdef HAVE_FGETS
+#elif defined HAVE_FGETS
   s= (char *)malloc(300);
   if (fgets(s, 300, in) == NULL)
     {
       free(s);
       return(0);
     }
-#  endif
-# endif
 #endif
   s[strlen(s)-1]= '\0';
   if (s[strlen(s)-1] == '\r')
@@ -630,12 +613,6 @@ cl_listen_console::cl_listen_console(int serverport, class cl_app *the_app)
                 serverport, strerror(errno));
     }
   in= out= 0;
-}
-
-int
-cl_listen_console::match(int fdnum)
-{
-  return(sock == fdnum);
 }
 
 int
@@ -1051,31 +1028,25 @@ cl_commander::wait_input(void)
 int
 cl_commander::proc_input(void)
 {
-  UCSOCKET_T i;
+  for (int j = 0; j < cons->count; j++)
+    {
+      class cl_console *c = (class cl_console*)(cons->at(j));
 
-  for (i= 0; i < fd_num; i++)
-    if (FD_ISSET(i, &active_set))
-      {
-        class cl_console *c;
-        int j;
-        for (j= 0; j < cons->count; j++)
-          {
-            c= (class cl_console*)(cons->at(j));
-            if (c->match(i))
-              {
-                actual_console= c;
-                int retval= c->proc_input(cmdset);
-                if (retval)
-                  {
-                    del_console(c);
-                    delete c;
-                  }
-                actual_console= 0;
-                return(cons->count == 0);
-              }
-          }
-      }
-  return(0);
+      int fd = c->get_in_fd();
+      if (fd >= 0 && FD_ISSET(fd, &active_set))
+        {
+          actual_console = c;
+          int retval = c->proc_input(cmdset);
+          if (retval)
+            {
+              del_console(c);
+              delete c;
+            }
+          actual_console = 0;
+          return(0 == cons->count);
+        }
+    }
+  return 0;
 }
 
 void

@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (cmd.src/cmdcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -114,7 +114,7 @@ public:
   class cl_app *app;
   int flags; // See CONS_XXXX
   char *prompt;
-  
+
 public:
   cl_console(void): cl_base() { app= 0; in= out= 0; flags= 0; }
   cl_console(char *fin, char *fout, class cl_app *the_app);
@@ -138,7 +138,6 @@ public:
   virtual int  debug(char *format, ...);
   virtual void print_bin(long data, int bits);
   virtual void print_char_octal(char c);
-  virtual int  match(int fdnum);
   virtual int  get_in_fd(void);
   virtual int  input_avail(void);
   virtual char *read_line(void);
@@ -161,7 +160,6 @@ public:
 
   virtual void welcome(void) {}
 
-  virtual int match(int fdnum);
   virtual int get_in_fd(void);
   virtual int proc_input(class cl_cmdset *cmdset);
 };

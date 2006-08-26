@@ -2,6 +2,9 @@
 
 	* src/ds390/gen.c (genAnd, genOr, genXor): fixed bug 1546986
 	* support/regression/tests/bug1546986.c: new, added
+	* as/mcs51/.cvsignore,
+	* debugger/mcs51/.cvsignore,
+	* src/.cvsignore: deleted
 
 2006-08-25 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

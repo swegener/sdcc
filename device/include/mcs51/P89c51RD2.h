@@ -179,14 +179,13 @@ __sbit __at (0xB0)    P3_0;
 #define  RXD    P3_0
 
 /*  SCON  */
-__sbit __at (0x98)    SCON_7; // alternatively "FE"
-__sbit __at (0x98)    SCON_7;
-__sbit __at (0x98)    SCON_6;
-__sbit __at (0x98)    SCON_5;
-__sbit __at (0x98)    SCON_4;
-__sbit __at (0x98)    SCON_3;
-__sbit __at (0x98)    SCON_2;
-__sbit __at (0x98)    SCON_1;
+__sbit __at (0x9F)    SCON_7; // alternatively "FE"
+__sbit __at (0x9E)    SCON_6;
+__sbit __at (0x9D)    SCON_5;
+__sbit __at (0x9C)    SCON_4;
+__sbit __at (0x9B)    SCON_3;
+__sbit __at (0x9A)    SCON_2;
+__sbit __at (0x99)    SCON_1;
 __sbit __at (0x98)    SCON_0;
 
 #define  SM0    SCON_7  // alternatively "FE"

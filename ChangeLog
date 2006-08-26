@@ -1,3 +1,8 @@
+2006-08-25 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/P89c51RD2.h: fixed bug 1546936 (error in sbit
+	  definitions)
+
 2006-08-20 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/newcmd.cc, sim/ucsim/cmd.src/newcmdcl.h:

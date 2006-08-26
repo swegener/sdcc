@@ -1,3 +1,8 @@
+2006-08-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genAnd, genOr, genXor): fixed bug 1546986
+	* support/regression/tests/bug1546986.c: new, added
+
 2006-08-25 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/P89c51RD2.h: fixed bug 1546936 (error in sbit

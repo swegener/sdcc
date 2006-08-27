@@ -1408,6 +1408,8 @@ aopGetUsesAcc (operand * oper, int offset)
         return TRUE;
       return FALSE;
     case AOP_DPTR:
+    case AOP_DPTR2:
+    case AOP_DPTRn:
       return TRUE;
     case AOP_IMMD:
       return FALSE;

@@ -1,6 +1,7 @@
 2006-08-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genAnd, genOr, genXor): fixed bug 1546986
+	* src/ds390/gen.c (aopGetUsesAcc): handle AOP_DPTR2 and AOP_DPTRn too
 
 2006-08-26 Maarten Brock <sourceforge.brock AT dse.nl>
 

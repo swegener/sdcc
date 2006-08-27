@@ -6669,7 +6669,7 @@ genAnd (iCode * ic, iCode * ifx)
                 }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
-                  emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("anl", "a,b");
                   aopPut (result, "a", offset);
@@ -6689,8 +6689,7 @@ genAnd (iCode * ic, iCode * ifx)
                       aopPut (result, "a", offset);
                     }
                   else
-                    emitcode ("anl", "%s,a",
-                              aopGet (left, offset, FALSE, TRUE));
+                    emitcode ("anl", "%s,a", aopGet (left, offset, FALSE, TRUE));
                 }
             }
         }
@@ -6714,30 +6713,41 @@ genAnd (iCode * ic, iCode * ifx)
                 {
                   if (offset)
                     emitcode("mov", "a,b");
-                  emitcode ("anl", "a,%s",
-                            aopGet (right, offset, FALSE, FALSE));
-                } else {
-                  if (AOP_TYPE(left)==AOP_ACC)
+                  emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                }
+              else if (AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (!offset)
                     {
-                      if (!offset)
-                        {
-                          bool pushedB = pushB ();
-                          emitcode("mov", "b,a");
-                          MOVA (aopGet (right, offset, FALSE, FALSE));
-                          emitcode("anl", "a,b");
-                          popB (pushedB);
-                        }
-                      else
-                        {
-                          MOVA (aopGet (right, offset, FALSE, FALSE));
-                          emitcode("anl", "a,b");
-                        }
-                    } else {
+                      bool pushedB = pushB ();
+                      emitcode("mov", "b,a");
                       MOVA (aopGet (right, offset, FALSE, FALSE));
-                      emitcode ("anl", "a,%s",
-                                aopGet (left, offset, FALSE, FALSE));
+                      emitcode("anl", "a,b");
+                      popB (pushedB);
+                    }
+                  else
+                    {
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("anl", "a,b");
                     }
                 }
+              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+                {
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
+                  MOVA (aopGet (right, offset, FALSE, FALSE));
+                  emitcode ("anl", "a,b");
+                }
+              else if (aopGetUsesAcc (left, offset))
+                {
+                  MOVA (aopGet (left, offset, FALSE, FALSE));
+                  emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                    }
+              else
+                {
+                  MOVA (aopGet (right, offset, FALSE, FALSE));
+                  emitcode ("anl", "a,%s", aopGet (left, offset, FALSE, FALSE));
+                }
+
               emitcode ("jnz", "%05d$", tlbl->key + 100);
               offset++;
             }
@@ -6794,15 +6804,32 @@ genAnd (iCode * ic, iCode * ifx)
                 }
               // faster than result <- left, anl result,right
               // and better if result is SFR
-              if (AOP_TYPE (left) == AOP_ACC)
+              if ((AOP_TYPE(right)==AOP_REG  || IS_AOP_PREG(right) || AOP_TYPE(right)==AOP_DIR)
+                  && AOP_TYPE(left)==AOP_ACC)
                 {
                   if (offset)
                     emitcode("mov", "a,b");
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
                 }
+              else if (AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (!offset)
+                    {
+                      bool pushedB = pushB ();
+                      emitcode("mov", "b,a");
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("anl", "a,b");
+                      popB (pushedB);
+                    }
+                  else
+                    {
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("anl", "a,b");
+                    }
+                }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
-                  emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("anl", "a,b");
                 }
@@ -7032,7 +7059,7 @@ genOr (iCode * ic, iCode * ifx)
                 }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
-                  emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,b");
                   aopPut (result, "a", offset);
@@ -7053,8 +7080,7 @@ genOr (iCode * ic, iCode * ifx)
                     }
                   else
                     {
-                      emitcode ("orl", "%s,a",
-                                aopGet (left, offset, FALSE, TRUE));
+                      emitcode ("orl", "%s,a", aopGet (left, offset, FALSE, TRUE));
                     }
                 }
             }
@@ -7074,16 +7100,46 @@ genOr (iCode * ic, iCode * ifx)
             emitcode ("setb", "c");
           while (sizer--)
             {
-              if (AOP_TYPE(right)==AOP_REG && AOP_TYPE(left)==AOP_ACC) {
-                if (offset)
-                  emitcode("mov", "a,b");
-                emitcode ("orl", "a,%s",
-                          aopGet (right, offset, FALSE, FALSE));
-              } else {
-                MOVA (aopGet (right, offset, FALSE, FALSE));
-                emitcode ("orl", "a,%s",
-                          aopGet (left, offset, FALSE, FALSE));
+              if ((AOP_TYPE(right)==AOP_REG  || IS_AOP_PREG(right) || AOP_TYPE(right)==AOP_DIR)
+                  && AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (offset)
+                    emitcode("mov", "a,b");
+                  emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                }
+              else if (AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (!offset)
+                    {
+                      bool pushedB = pushB ();
+                      emitcode("mov", "b,a");
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("orl", "a,b");
+                      popB (pushedB);
+                    }
+                  else
+                    {
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("orl", "a,b");
+                    }
+                }
+              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+                {
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
+                  MOVA (aopGet (right, offset, FALSE, FALSE));
+                  emitcode ("orl", "a,b");
+                }
+              else if (aopGetUsesAcc (left, offset))
+                {
+                  MOVA (aopGet (left, offset, FALSE, FALSE));
+                  emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                }
+              else
+                {
+                  MOVA (aopGet (right, offset, FALSE, FALSE));
+                  emitcode ("orl", "a,%s", aopGet (left, offset, FALSE, FALSE));
               }
+
               emitcode ("jnz", "%05d$", tlbl->key + 100);
               offset++;
             }
@@ -7123,17 +7179,34 @@ genOr (iCode * ic, iCode * ifx)
                       continue;
                     }
                 }
-              // faster than result <- left, anl result,right
+              // faster than result <- left, orl result,right
               // and better if result is SFR
-              if (AOP_TYPE (left) == AOP_ACC)
+              if ((AOP_TYPE(right)==AOP_REG  || IS_AOP_PREG(right) || AOP_TYPE(right)==AOP_DIR)
+                  && AOP_TYPE(left)==AOP_ACC)
                 {
                   if (offset)
                     emitcode("mov", "a,b");
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
                 }
+              else if (AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (!offset)
+                    {
+                      bool pushedB = pushB ();
+                      emitcode("mov", "b,a");
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("orl", "a,b");
+                      popB (pushedB);
+                    }
+                  else
+                    {
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("orl", "a,b");
+                    }
+                }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
-                  emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("orl", "a,b");
                 }
@@ -7260,7 +7333,6 @@ genXor (iCode * ic, iCode * ifx)
                     }
                 }
             }
-
         }
       else
         {
@@ -7342,7 +7414,7 @@ genXor (iCode * ic, iCode * ifx)
                 }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
-                  emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,b");
                   aopPut (result, "a", offset);
@@ -7362,8 +7434,7 @@ genXor (iCode * ic, iCode * ifx)
                       aopPut (result, "a", offset);
                     }
                   else
-                    emitcode ("xrl", "%s,a",
-                              aopGet (left, offset, FALSE, TRUE));
+                    emitcode ("xrl", "%s,a", aopGet (left, offset, FALSE, TRUE));
                 }
             }
         }
@@ -7388,19 +7459,46 @@ genXor (iCode * ic, iCode * ifx)
                 {
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                 }
+              else if ((AOP_TYPE(right)==AOP_REG  || IS_AOP_PREG(right) || AOP_TYPE(right)==AOP_DIR)
+                  && AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (offset)
+                    emitcode("mov", "a,b");
+                  emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                }
+              else if (AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (!offset)
+                    {
+                      bool pushedB = pushB ();
+                      emitcode("mov", "b,a");
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("xrl", "a,b");
+                      popB (pushedB);
+                    }
+                  else
+                    {
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("xrl", "a,b");
+                    }
+                }
+              else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
+                {
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
+                  MOVA (aopGet (right, offset, FALSE, FALSE));
+                  emitcode ("xrl", "a,b");
+                }
+              else if (aopGetUsesAcc (left, offset))
+                {
+                  MOVA (aopGet (left, offset, FALSE, FALSE));
+                  emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
+                }
               else
                 {
-                  if (AOP_TYPE(right)==AOP_REG && AOP_TYPE(left)==AOP_ACC) {
-                    if (offset)
-                      emitcode("mov", "a,b");
-                    emitcode ("xrl", "a,%s",
-                              aopGet (right, offset, FALSE, FALSE));
-                  } else {
-                    MOVA (aopGet (right, offset, FALSE, FALSE));
-                    emitcode ("xrl", "a,%s",
-                              aopGet (left, offset, FALSE, FALSE));
-                  }
+                  MOVA (aopGet (right, offset, FALSE, FALSE));
+                  emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, TRUE));
                 }
+              
               emitcode ("jnz", "%05d$", tlbl->key + 100);
               offset++;
             }
@@ -7430,17 +7528,34 @@ genXor (iCode * ic, iCode * ifx)
                       continue;
                     }
                 }
-              // faster than result <- left, anl result,right
+              // faster than result <- left, xrl result,right
               // and better if result is SFR
-              if (AOP_TYPE (left) == AOP_ACC)
+              if ((AOP_TYPE(right)==AOP_REG  || IS_AOP_PREG(right) || AOP_TYPE(right)==AOP_DIR)
+                  && AOP_TYPE(left)==AOP_ACC)
                 {
                   if (offset)
                     emitcode("mov", "a,b");
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
                 }
+              else if (AOP_TYPE(left)==AOP_ACC)
+                {
+                  if (!offset)
+                    {
+                      bool pushedB = pushB ();
+                      emitcode("mov", "b,a");
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("xrl", "a,b");
+                      popB (pushedB);
+                    }
+                  else
+                    {
+                      MOVA (aopGet (right, offset, FALSE, FALSE));
+                      emitcode("xrl", "a,b");
+                    }
+                }
               else if (aopGetUsesAcc (left, offset) && aopGetUsesAcc (right, offset))
                 {
-                  emitcode ("mov", "b,%s", aopGet (left, offset, FALSE, FALSE));
+                  MOVB (aopGet (left, offset, FALSE, FALSE));
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,b");
                 }

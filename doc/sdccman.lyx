@@ -15465,6 +15465,100 @@ and
 not
 \emph default 
  support long variables and field widths).
+\layout Subsubsection
+
+<malloc.h>
+\begin_inset LatexCommand \index{malloc.h}
+
+\end_inset 
+
+
+\layout Standard
+
+Before using dynamic
+\begin_inset LatexCommand \index{dynamic}
+
+\end_inset 
+
+ memory allocation with SDCC, you have to provide heap
+\begin_inset LatexCommand \index{heap}
+
+\end_inset 
+
+ space for malloc to allocate memory from
+\family typewriter 
+.
+ 
+\family default 
+You can acomplish this by including the following code into your source:
+\layout Verse
+
+
+\family typewriter 
+#include <malloc.h>
+\begin_inset LatexCommand \index{malloc.h}
+
+\end_inset 
+
+ /* calloc
+\begin_inset LatexCommand \index{calloc}
+
+\end_inset 
+
+, malloc
+\begin_inset LatexCommand \index{malloc}
+
+\end_inset 
+
+, realloc
+\begin_inset LatexCommand \index{realloc}
+
+\end_inset 
+
+, and free
+\begin_inset LatexCommand \index{free}
+
+\end_inset 
+
+ */ 
+\newline 
+
+\newline 
+#define HEAPSIZE 0x1000 /* Adjust depending on available memory */ 
+\newline 
+unsigned char xdata myheap[HEAPSIZE]; /* The actual heap for dynamic memory
+ */ 
+\newline 
+
+\newline 
+void main (void) 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* Your variable declarations come here*/
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+...
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+init_dynamic_memory((MEMHEADER xdata *)myheap, HEAPSIZE);
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+...
+ /* Rest of your code*/
+\newline 
+} 
+\newline 
+
 \layout Subsection
 
 Math functions (sinf, powf, sqrtf etc.)

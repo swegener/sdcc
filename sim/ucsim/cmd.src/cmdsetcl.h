@@ -46,7 +46,7 @@ COMMAND_METHODS_ON(app,cl_help_cmd)
 int matches;
 class cl_cmd *cmd_found;
 bool do_set(class cl_cmdline *cmdline, int pari, class cl_cmdset *cmdset,
-	    class cl_console *con);
+            class cl_console_base *con);
 COMMAND_TAIL;
 
 COMMAND(cl_quit_cmd);

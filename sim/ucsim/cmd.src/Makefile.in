@@ -26,6 +26,7 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
 M_OR_MM         = @M_OR_MM@
+WINSOCK_AVAIL	= @WINSOCK_AVAIL@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -40,10 +41,16 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS		= cmdset.o command.o newcmd.o cmdutil.o syntax.o \
+OBJECTS		= cmdset.o command.o cmdutil.o syntax.o \
 		  get.o set.o timer.o bp.o info.o show.o cmdgui.o cmdconf.o \
 		  cmduc.o cmdstat.o cmdmem.o \
-		  cmdpars.o cmdlex.o
+		  cmdpars.o cmdlex.o newcmd.o
+
+ifeq ($(WINSOCK_AVAIL), 1)
+OBJECTS += newcmdwin32.o
+else
+OBJECTS += newcmdposix.o
+endif
 
 DEVEL		= $(shell ( bash -c "test -e $(top_builddir)devel && echo yes" ))
 
@@ -86,7 +93,7 @@ installdirs:
 dep: Makefile.dep
 
 Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
-	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >Makefile.dep
+	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(addprefix $(srcdir)/, $(OBJECTS:.o=.cc)) >Makefile.dep
 
 include Makefile.dep
 include $(srcdir)/clean.mk

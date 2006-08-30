@@ -40,9 +40,9 @@
 
 struct id_element error_on_off_names[]= {
   { ERROR_PARENT, "unset" },
-  { ERROR_ON	, "on" },
-  { ERROR_OFF	, "off" },
-  { 0		, 0 }
+  { ERROR_ON    , "on" },
+  { ERROR_OFF   , "off" },
+  { 0           , 0 }
 };
 
 static class cl_error_registry error_registry;
@@ -53,7 +53,7 @@ class cl_list *cl_error_registry::registered_errors= NIL;
  */
 
 cl_error_class::cl_error_class(enum error_type typ, char *aname,
-			       enum error_on_off be_on/* = ERROR_PARENT*/):
+                               enum error_on_off be_on/* = ERROR_PARENT*/):
   cl_base()
 {
   type= typ;
@@ -62,8 +62,8 @@ cl_error_class::cl_error_class(enum error_type typ, char *aname,
 }
 
 cl_error_class::cl_error_class(enum error_type typ, char *aname,
-			       class cl_error_class *parent,
-			       enum error_on_off be_on/* = ERROR_PARENT*/):
+                               class cl_error_class *parent,
+                               enum error_on_off be_on/* = ERROR_PARENT*/):
   cl_base()
 {
   type= typ;
@@ -88,9 +88,9 @@ cl_error_class::is_on(void)
   if (on == ERROR_PARENT)
     {
       if (!get_parent())
-	return(DD_TRUE);
+        return(DD_TRUE);
       class cl_error_class *p=
-	dynamic_cast<class cl_error_class *>(get_parent());
+        dynamic_cast<class cl_error_class *>(get_parent());
       return(p->is_on());
     }
   else
@@ -167,7 +167,7 @@ cl_error::is_on(void)
 }
 
 void
-cl_error::print(class cl_commander *c)
+cl_error::print(class cl_commander_base *c)
 {
   c->dd_printf("%s\n", get_type_name());
 }

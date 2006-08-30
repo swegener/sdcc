@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (app.cc)
  *
  * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -59,6 +59,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "showcl.h"
 #include "getcl.h"
 #include "setcl.h"
+#ifdef _WIN32
+#include "newcmdwin32cl.h"
+#else
+#include "newcmdposixcl.h"
+#endif
 
 
 /*
@@ -150,28 +155,28 @@ cl_app::run(void)
   int done= 0;
 
   while (!done &&
-	 going)
+         going)
     {
       if (sim)
-	{
-	  if (sim->state & SIM_GO)
-	    {
-	      if (commander->input_avail())
-		done= commander->proc_input();
-	      else
-		sim->step();
-	    }
-	  else
-	    {
-	      commander->wait_input();
-	      done= commander->proc_input();
-	    }
-	}
+        {
+          if (sim->state & SIM_GO)
+            {
+              if (commander->input_avail())
+                done= commander->proc_input();
+              else
+                sim->step();
+            }
+          else
+            {
+              commander->wait_input();
+              done= commander->proc_input();
+            }
+        }
       else
-	{
-	  commander->wait_input();
-	  done= commander->proc_input();
-	}
+        {
+          commander->wait_input();
+          done= commander->proc_input();
+        }
     }
   return(0);
 }
@@ -191,12 +196,12 @@ print_help(char *name)
 {
   printf("%s: %s\n", name, VERSIONSTR);
   printf("Usage: %s [-hHVvP] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
-	 "       [-c file] [-s file] [-S optionlist]"
+         "       [-c file] [-s file] [-S optionlist]"
 #ifdef SOCKET_AVAIL
-	 " [-Z portnum] [-k portnum]"
+         " [-Z portnum] [-k portnum]"
 #endif
-	 "\n"
-	 "       [files...]\n", name);
+         "\n"
+         "       [files...]\n", name);
   printf
     (
      "Options:\n"
@@ -250,236 +255,299 @@ cl_app::proc_arguments(int argc, char *argv[])
     switch (c)
       {
       case 'c':
-	if (!options->set_value("console_on", this, optarg))
-	  fprintf(stderr, "Warning: No \"console_on\" option found "
-		  "to set by -c\n");
-	break;
+        if (!options->set_value("console_on", this, optarg))
+          fprintf(stderr, "Warning: No \"console_on\" option found "
+                  "to set by -c\n");
+        break;
       case 'C':
-	if (!options->set_value("config_file", this, optarg))
-	  fprintf(stderr, "Warning: No \"config_file\" option found to set "
-		  "parameter of -C as config file\n");
-	break;
+        if (!options->set_value("config_file", this, optarg))
+          fprintf(stderr, "Warning: No \"config_file\" option found to set "
+                  "parameter of -C as config file\n");
+        break;
 #ifdef SOCKET_AVAIL
       case 'Z': case 'r':
-	{
-	  // By Sandeep
-	  // Modified by DD
-	  class cl_option *o;
-	  options->new_option(o= new cl_number_option(this, "port_number",
-						      "Listen on port (-Z)"));
-	  o->init();
-	  o->hide();
-	  if (!options->set_value("port_number", this, strtol(optarg, NULL, 0)))
-	    fprintf(stderr, "Warning: No \"port_number\" option found"
-		    " to set parameter of -Z as pot number to listen on\n");
-	  break;
-	}
+        {
+          // By Sandeep
+          // Modified by DD
+          class cl_option *o;
+          options->new_option(o= new cl_number_option(this, "port_number",
+                                                      "Listen on port (-Z)"));
+          o->init();
+          o->hide();
+          if (!options->set_value("port_number", this, strtol(optarg, NULL, 0)))
+            fprintf(stderr, "Warning: No \"port_number\" option found"
+                    " to set parameter of -Z as pot number to listen on\n");
+          break;
+        }
 #endif
       case 'p': {
-	if (!options->set_value("prompt", this, optarg))
-	  fprintf(stderr, "Warning: No \"prompt\" option found to set "
-		  "parameter of -p as default prompt\n");
-	break;
+        if (!options->set_value("prompt", this, optarg))
+          fprintf(stderr, "Warning: No \"prompt\" option found to set "
+                  "parameter of -p as default prompt\n");
+        break;
       }
       case 'P':
-	if (!options->set_value("null_prompt", this, bool(DD_TRUE)))
-	  fprintf(stderr, "Warning: No \"null_prompt\" option found\n");
-	break;
+        if (!options->set_value("null_prompt", this, bool(DD_TRUE)))
+          fprintf(stderr, "Warning: No \"null_prompt\" option found\n");
+        break;
       case 'X':
-	{
-	  double XTAL;
-	  for (cp= optarg; *cp; *cp= toupper(*cp), cp++);
-	  XTAL= strtod(optarg, &cp);
-	  if (*cp == 'K')
-	    XTAL*= 1e3;
-	  if (*cp == 'M')
-	    XTAL*= 1e6;
-	  if (XTAL == 0)
-	    {
-	      fprintf(stderr, "Xtal frequency must be greather than 0\n");
-	      exit(1);
-	    }
-	  if (!options->set_value("xtal", this, XTAL))
-	    fprintf(stderr, "Warning: No \"xtal\" option found to set "
-		    "parameter of -X as XTAL frequency\n");
-	  break;
-	}
+        {
+          double XTAL;
+          for (cp= optarg; *cp; *cp= toupper(*cp), cp++);
+          XTAL= strtod(optarg, &cp);
+          if (*cp == 'K')
+            XTAL*= 1e3;
+          if (*cp == 'M')
+            XTAL*= 1e6;
+          if (XTAL == 0)
+            {
+              fprintf(stderr, "Xtal frequency must be greather than 0\n");
+              exit(1);
+            }
+          if (!options->set_value("xtal", this, XTAL))
+            fprintf(stderr, "Warning: No \"xtal\" option found to set "
+                    "parameter of -X as XTAL frequency\n");
+          break;
+        }
       case 'v':
-	printf("%s: %s\n", argv[0], VERSIONSTR);
+        printf("%s: %s\n", argv[0], VERSIONSTR);
         exit(0);
         break;
       case 'V':
-	if (!options->set_value("debug", this, (bool)DD_TRUE))
-	  fprintf(stderr, "Warning: No \"debug\" option found to set "
-		  "by -V parameter\n");	
-	break;
+        if (!options->set_value("debug", this, (bool)DD_TRUE))
+          fprintf(stderr, "Warning: No \"debug\" option found to set "
+                  "by -V parameter\n");
+        break;
       case 't':
-	{
-	  if (cpu_type)
-	    free(cpu_type);
-	  cpu_type= case_string(case_upper, optarg);
-	  if (!options->set_value("cpu_type", this, /*optarg*/cpu_type))
-	    fprintf(stderr, "Warning: No \"cpu_type\" option found to set "
-		    "parameter of -t as type of controller\n");	
-	  break;
-	}
+        {
+          if (cpu_type)
+            free(cpu_type);
+          cpu_type= case_string(case_upper, optarg);
+          if (!options->set_value("cpu_type", this, /*optarg*/cpu_type))
+            fprintf(stderr, "Warning: No \"cpu_type\" option found to set "
+                    "parameter of -t as type of controller\n");
+          break;
+        }
       case 's':
       {
-	FILE *Ser_in, *Ser_out;
-	if (s_done)
-	  {
-	    fprintf(stderr, "-s option can not be used more than once.\n");
-	    break;
-	  }
-	s_done= DD_TRUE;
-	if ((Ser_in= fopen(optarg, "r")) == NULL)
-	  {
-	    fprintf(stderr,
-		    "Can't open `%s': %s\n", optarg, strerror(errno));
-	    return(4);
-	  }
-	if (!options->set_value("serial_in_file", this, (void*)Ser_in))
-	  fprintf(stderr, "Warning: No \"serial_in_file\" option found to set "
-		  "parameter of -s as serial input file\n");
-	if ((Ser_out= fopen(optarg, "w")) == NULL)
-	  {
-	    fprintf(stderr,
-		    "Can't open `%s': %s\n", optarg, strerror(errno));
-	    return(4);
-	  }
-	if (!options->set_value("serial_out_file", this, Ser_out))
-	  fprintf(stderr, "Warning: No \"serial_out_file\" option found "
-		  "to set parameter of -s as serial output file\n");
-	break;
+#ifdef _WIN32
+        /* TODO: this code should be probably used for all platforms? */
+        FILE *Ser;
+        if (s_done)
+          {
+            fprintf(stderr, "-s option can not be used more than once.\n");
+            break;
+          }
+        s_done= DD_TRUE;
+        if ((Ser= fopen(optarg, "r+")) == NULL)
+          {
+            fprintf(stderr,
+                    "Can't open `%s': %s\n", optarg, strerror(errno));
+            return(4);
+          }
+        if (!options->set_value("serial_in_file", this, Ser))
+          fprintf(stderr, "Warning: No \"serial_in_file\" option found to set "
+                  "parameter of -s as serial input file\n");
+        if (!options->set_value("serial_out_file", this, Ser))
+          fprintf(stderr, "Warning: No \"serial_out_file\" option found "
+                  "to set parameter of -s as serial output file\n");
+#else
+        FILE *Ser_in, *Ser_out;
+        if (s_done)
+          {
+            fprintf(stderr, "-s option can not be used more than once.\n");
+            break;
+          }
+        s_done= DD_TRUE;
+        if ((Ser_in= fopen(optarg, "r")) == NULL)
+          {
+            fprintf(stderr,
+                    "Can't open `%s': %s\n", optarg, strerror(errno));
+            return(4);
+          }
+        if (!options->set_value("serial_in_file", this, Ser_in))
+          fprintf(stderr, "Warning: No \"serial_in_file\" option found to set "
+                  "parameter of -s as serial input file\n");
+        if ((Ser_out= fopen(optarg, "w")) == NULL)
+          {
+            fprintf(stderr,
+                    "Can't open `%s': %s\n", optarg, strerror(errno));
+            return(4);
+          }
+        if (!options->set_value("serial_out_file", this, Ser_out))
+          fprintf(stderr, "Warning: No \"serial_out_file\" option found "
+                  "to set parameter of -s as serial output file\n");
+#endif
+        break;
       }
 #ifdef SOCKET_AVAIL
       // socket serial I/O by Alexandre Frey <Alexandre.Frey@trusted-logic.fr>
       case 'k':
-	{
-	  FILE *Ser_in, *Ser_out;
-	  int  sock;
-	  unsigned short serverport;
-	  int client_sock;
-	  
-	  if (k_done) {
-	    fprintf(stderr, "Serial input specified more than once.\n");
-	  }
-	  k_done= DD_TRUE;
+        {
+          FILE *Ser_in, *Ser_out;
+          UCSOCKET_T sock;
+          unsigned short serverport;
+          UCSOCKET_T client_sock;
 
-	  serverport = atoi(optarg);
-	  sock= make_server_socket(serverport);
-	  if (listen(sock, 1) < 0) {
-	    fprintf(stderr, "Listen on port %d: %s\n", serverport,
-		    strerror(errno));
-	    return (4);
-	  }
-	  fprintf(stderr, "Listening on port %d for a serial connection.\n",
-		  serverport);
-	  if ((client_sock= accept(sock, NULL, NULL)) < 0) {
-	    fprintf(stderr, "accept: %s\n", strerror(errno));
-	  }
-	  fprintf(stderr, "Serial connection established.\n");
+          if (k_done)
+            {
+              fprintf(stderr, "Serial input specified more than once.\n");
+            }
+          k_done= DD_TRUE;
 
-	  if ((Ser_in= fdopen(client_sock, "r")) == NULL) {
-	    fprintf(stderr, "Can't create input stream: %s\n", strerror(errno));
-	    return (4);
-	  }
-	  if (!options->set_value("serial_in_file", this, (void*)Ser_in))
-	    fprintf(stderr, "Warning: No \"serial_in_file\" option found to "
-		    "set parameter of -s as serial input file\n");
-	  if ((Ser_out= fdopen(client_sock, "w")) == NULL) {
-	    fprintf(stderr, "Can't create output stream: %s\n", strerror(errno));
-	    return (4);
-	  }
-	  if (!options->set_value("serial_out_file", this, Ser_out))
-	    fprintf(stderr, "Warning: No \"serial_out_file\" option found "
-		    "to set parameter of -s as serial output file\n");
-	  break;
-	}
+          serverport = atoi(optarg);
+          sock = make_server_socket(serverport);
+#ifdef _WIN32
+          if (SOCKET_ERROR == listen((SOCKET)sock, 1))
+            {
+              fprintf(stderr, "Listen on port %d: %d\n", serverport,
+                WSAGetLastError());
+              return (4);
+            }
+          fprintf(stderr, "Listening on port %d for a serial connection.\n",
+            serverport);
+          if (INVALID_SOCKET == (client_sock = accept(sock, NULL, NULL)))
+            {
+              fprintf(stderr, "accept: %d\n", WSAGetLastError());
+              return (4);
+            }
+          fprintf(stderr, "Serial connection established.\n");
+
+          int fh = _open_osfhandle((intptr_t)client_sock, 0);
+          if (-1 == fh)
+            {
+              perror("_open_osfhandle");
+              return (4);
+            }
+          if (NULL == (Ser_in = fdopen(fh, "r")))
+            {
+              fprintf(stderr, "Can't create input stream: %s\n", strerror(errno));
+              return (4);
+            }
+
+          fh = _open_osfhandle((intptr_t)client_sock, 0);
+          if (-1 == fh)
+            {
+              perror("_open_osfhandle");
+            }
+          if (NULL == (Ser_out = fdopen(fh, "w"))) {
+            fprintf(stderr, "Can't create output stream: %s\n", strerror(errno));
+            return (4);
+          }
+#else
+          if (listen(sock, 1) < 0) {
+            fprintf(stderr, "Listen on port %d: %s\n", serverport,
+                    strerror(errno));
+            return (4);
+          }
+          fprintf(stderr, "Listening on port %d for a serial connection.\n",
+                  serverport);
+          if ((client_sock= accept(sock, NULL, NULL)) < 0) {
+            fprintf(stderr, "accept: %s\n", strerror(errno));
+          }
+          fprintf(stderr, "Serial connection established.\n");
+
+          if ((Ser_in= fdopen(client_sock, "r")) == NULL) {
+            fprintf(stderr, "Can't create input stream: %s\n", strerror(errno));
+            return (4);
+          }
+          if ((Ser_out= fdopen(client_sock, "w")) == NULL) {
+            fprintf(stderr, "Can't create output stream: %s\n", strerror(errno));
+            return (4);
+          }
+#endif
+          if (!options->set_value("serial_in_file", this, (void*)Ser_in))
+            fprintf(stderr, "Warning: No \"serial_in_file\" option found to "
+                    "set parameter of -s as serial input file\n");
+          if (!options->set_value("serial_out_file", this, Ser_out))
+            fprintf(stderr, "Warning: No \"serial_out_file\" option found "
+                    "to set parameter of -s as serial output file\n");
+          break;
+        }
 #endif
       case 'S':
-	subopts= optarg;
-	while (*subopts != '\0')
-	  switch (get_sub_opt(&subopts, S_opts, &value))
-	    {
-	      FILE *Ser_in, *Ser_out;
-	    case SOPT_IN:
-	      if (value == NULL) {
-		fprintf(stderr, "No value for -S in\n");
-		exit(1);
-	      }
-	      if (S_i_done)
-		{
-		  fprintf(stderr, "Serial input specified more than once.\n");
-		  break;
-		}
-	      S_i_done= DD_TRUE;
-	      if ((Ser_in= fopen(value, "r")) == NULL)
-		{
-		  fprintf(stderr,
-			  "Can't open `%s': %s\n", value, strerror(errno));
-		  exit(4);
-		}
-	      if (!options->set_value("serial_in_file", this, (void*)Ser_in))
-		fprintf(stderr, "Warning: No \"serial_in_file\" option found "
-			"to set parameter of -s as serial input file\n");
-	      break;
-	    case SOPT_OUT:
-	      if (value == NULL) {
-		fprintf(stderr, "No value for -S out\n");
-		exit(1);
-	      }
-	      if (S_o_done)
-		{
-		  fprintf(stderr, "Serial output specified more than once.\n");
-		  break;
-		}
-	      if ((Ser_out= fopen(value, "w")) == NULL)
-		{
-		  fprintf(stderr,
-			  "Can't open `%s': %s\n", value, strerror(errno));
-		  exit(4);
-		}
-	      if (!options->set_value("serial_out_file", this, Ser_out))
-		fprintf(stderr, "Warning: No \"serial_out_file\" option found "
-			"to set parameter of -s as serial output file\n");
-	      break;
-	    default:
-	      /* Unknown suboption. */
-	      fprintf(stderr, "Unknown suboption `%s' for -S\n", value);
-	      exit(1);
-	      break;
-	    }
-	break;
+        subopts= optarg;
+        while (*subopts != '\0')
+          switch (get_sub_opt(&subopts, S_opts, &value))
+            {
+              FILE *Ser_in, *Ser_out;
+            case SOPT_IN:
+              if (value == NULL) {
+                fprintf(stderr, "No value for -S in\n");
+                exit(1);
+              }
+              if (S_i_done)
+                {
+                  fprintf(stderr, "Serial input specified more than once.\n");
+                  break;
+                }
+              S_i_done= DD_TRUE;
+              if ((Ser_in= fopen(value, "r")) == NULL)
+                {
+                  fprintf(stderr,
+                          "Can't open `%s': %s\n", value, strerror(errno));
+                  exit(4);
+                }
+              if (!options->set_value("serial_in_file", this, (void*)Ser_in))
+                fprintf(stderr, "Warning: No \"serial_in_file\" option found "
+                        "to set parameter of -s as serial input file\n");
+              break;
+            case SOPT_OUT:
+              if (value == NULL) {
+                fprintf(stderr, "No value for -S out\n");
+                exit(1);
+              }
+              if (S_o_done)
+                {
+                  fprintf(stderr, "Serial output specified more than once.\n");
+                  break;
+                }
+              if ((Ser_out= fopen(value, "w")) == NULL)
+                {
+                  fprintf(stderr,
+                          "Can't open `%s': %s\n", value, strerror(errno));
+                  exit(4);
+                }
+              if (!options->set_value("serial_out_file", this, Ser_out))
+                fprintf(stderr, "Warning: No \"serial_out_file\" option found "
+                        "to set parameter of -s as serial output file\n");
+              break;
+            default:
+              /* Unknown suboption. */
+              fprintf(stderr, "Unknown suboption `%s' for -S\n", value);
+              exit(1);
+              break;
+            }
+        break;
       case 'h':
-	print_help("s51");
-	exit(0);
-	break;
+        print_help("s51");
+        exit(0);
+        break;
       case 'H':
-	{
-	  if (!cpus)
-	    {
-	      fprintf(stderr, "CPU type is not selectable\n");
-	      exit(0);
-	    }
-	  i= 0;
-	  while (cpus[i].type_str != NULL)
-	    {
-	      printf("%s\n", cpus[i].type_str);
-	      i++;
-	    }
-	  exit(0);
-	  break;
-	}
+        {
+          if (!cpus)
+            {
+              fprintf(stderr, "CPU type is not selectable\n");
+              exit(0);
+            }
+          i= 0;
+          while (cpus[i].type_str != NULL)
+            {
+              printf("%s\n", cpus[i].type_str);
+              i++;
+            }
+          exit(0);
+          break;
+        }
       case '?':
-	if (isprint(optopt))
-	  fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-	else
-	  fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-	return(1);
-	break;
+        if (isprint(optopt))
+          fprintf(stderr, "Unknown option `-%c'.\n", optopt);
+        else
+          fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
+        return(1);
+        break;
       default:
-	exit(c);
+        exit(c);
       }
 
   for (i= optind; i < argc; i++)
@@ -529,7 +597,7 @@ cl_app::set_simulator(class cl_sim *simulator)
   if (sim)
     remove_simulator();
   sim= simulator;
-  
+
 }
 
 void
@@ -555,7 +623,7 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
 "conf               Configuration",
 "long help of conf"));
     cmd->init();
-    cset->add(cmd= new cl_conf_objects_cmd("objects", 0, 
+    cset->add(cmd= new cl_conf_objects_cmd("objects", 0,
 "conf objects       Show object tree",
 "long help of conf objects"));
     cmd->init();
@@ -601,11 +669,11 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
       cset= new cl_cmdset();
       cset->init();
     }
-    cset->add(cmd= new cl_show_copying_cmd("copying", 0, 
+    cset->add(cmd= new cl_show_copying_cmd("copying", 0,
 "show copying       Conditions for redistributing copies of uCsim",
 "long help of show copying"));
     cmd->init();
-    cset->add(cmd= new cl_show_warranty_cmd("warranty", 0, 
+    cset->add(cmd= new cl_show_warranty_cmd("warranty", 0,
 "show warranty      Various kinds of warranty you do not have",
 "long help of show warranty"));
     cmd->init();
@@ -681,44 +749,44 @@ cl_app::mk_options(void)
   class cl_option *o;
 
   options->new_option(o= new cl_bool_option(this, "null_prompt",
-					    "Use \\0 as prompt (-P)"));
+                                            "Use \\0 as prompt (-P)"));
   o->init();
 
   options->new_option(o= new cl_pointer_option(this, "serial_in_file",
-					       "Input file for serial line (-s)"));
+                                               "Input file for serial line (-s)"));
   o->init();
   o->hide();
 
   options->new_option(o= new cl_pointer_option(this, "serial_out_file",
-					       "Output file for serial line (-s)"));
+                                               "Output file for serial line (-s)"));
   o->init();
   o->hide();
 
   options->new_option(o= new cl_string_option(this, "prompt",
-					      "String of prompt (-p)"));
+                                              "String of prompt (-p)"));
   o->init();
 
   options->new_option(o= new cl_bool_option(this, "debug",
-					    "Print debug messages (-V)"));
+                                            "Print debug messages (-V)"));
   o->init();
 
   options->new_option(o= new cl_string_option(this, "console_on",
-					      "Open console on this file (-c)"));
+                                              "Open console on this file (-c)"));
   o->init();
   o->hide();
 
   options->new_option(o= new cl_string_option(this, "config_file",
-					      "Execute this file at startup (-C)"));
+                                              "Execute this file at startup (-C)"));
   o->init();
   o->hide();
 
   options->new_option(o= new cl_float_option(this, "xtal",
-					     "Frequency of XTAL in Hz"));
+                                             "Frequency of XTAL in Hz"));
   o->init();
   o->set_value(11059200.0);
 
   options->new_option(o= new cl_string_option(this, "cpu_type",
-					      "Type of controller (-t)"));
+                                              "Type of controller (-t)"));
   o->init();
   o->hide();
 }

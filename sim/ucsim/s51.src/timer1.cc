@@ -61,7 +61,7 @@ cl_timer1::overflow(void)
 }*/
 
 void
-cl_timer1::print_info(class cl_console *con)
+cl_timer1::print_info(class cl_console_base *con)
 {
   char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "stop" };
   //int tmod= cell_tmod->get();
@@ -69,7 +69,7 @@ cl_timer1::print_info(class cl_console *con)
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
 
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
-		 256*cell_th->get()+cell_tl->get());
+                 256*cell_th->get()+cell_tl->get());
   //int mode= (tmod & (bmM11|bmM01)) >> 4;
   con->dd_printf(" %s", modes[mode]);
   con->dd_printf(" %s", (/*tmod&bm*/C_T/*1*/)?"counter":"timer");

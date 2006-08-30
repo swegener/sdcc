@@ -56,7 +56,7 @@ public:
   virtual int tick(int cycles);
   virtual void reset(void);
   
-  virtual void print_info(class cl_console *con);
+  virtual void print_info(class cl_console_base *con);
 };
 
 

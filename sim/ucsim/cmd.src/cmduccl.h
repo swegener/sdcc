@@ -47,8 +47,8 @@ COMMAND_HEAD(cl_where_cmd)
   public: int last;
 COMMAND_METHODS_ON(uc,cl_where_cmd)
   virtual int do_real_work(class cl_uc *uc,
-			   class cl_cmdline *cmdline, class cl_console *con,
-			   bool case_sensitive);
+                           class cl_cmdline *cmdline, class cl_console_base *con,
+                           bool case_sensitive);
 COMMAND_TAIL;
 COMMAND_DATA_ANCESTOR_ON(uc,cl_Where_cmd,cl_where_cmd,int last);
 

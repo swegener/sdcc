@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (cmd.src/get.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -50,7 +50,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_get_sfr_cmd::do_work(class cl_sim *sim,
-//			class cl_cmdline *cmdline, class cl_console *con)
+//                      class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 {
   class cl_address_space *mem= uc->address_space(MEM_SFR_ID);
@@ -67,11 +67,11 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
        i++, parm= cmdline->param(i))
     {
       if (!parm->as_address(uc) ||
-	  !mem->valid_address(parm->value.address))
-	con->dd_printf("Warning: Invalid address %s\n",
-		       (char*)cmdline->tokens->at(i+1));
+          !mem->valid_address(parm->value.address))
+        con->dd_printf("Warning: Invalid address %s\n",
+                       (char*)cmdline->tokens->at(i+1));
       else
-	mem->dump(parm->value.address, parm->value.address, 1, con);
+        mem->dump(parm->value.address, parm->value.address, 1, con);
     }
 
   return(DD_FALSE);;
@@ -85,7 +85,7 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 
 //int
 //cl_get_option_cmd::do_work(class cl_sim *sim,
-//			   class cl_cmdline *cmdline, class cl_console *con)
+//                         class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_APP(cl_get_option_cmd)
 {
   class cl_cmd_arg *parm= cmdline->param(0);
@@ -104,25 +104,25 @@ COMMAND_DO_WORK_APP(cl_get_option_cmd)
     {
       class cl_option *o= (class cl_option *)(/*uc*/app->options->at(i));
       if ((!s ||
-	   !strcmp(s, o->get_name())))
-	{
-	  if (!o->hidden)
-	    {
-	      con->dd_printf("%2d. %s(by %s): ", i, object_name(o),
-			     object_name(o->get_creator()));
-	      o->print(con);
-	      con->dd_printf(" - %s\n", o->help);
-	    }
-	  else
-	    {
-	      /*
-	      con->dd_printf("%2d. %s(by %s) is hidden!\n", i, object_name(o),
-			   object_name(o->get_creator()));
-	      */
-	    }
-	}
+           !strcmp(s, o->get_name())))
+        {
+          if (!o->hidden)
+            {
+              con->dd_printf("%2d. %s(by %s): ", i, object_name(o),
+                             object_name(o->get_creator()));
+              o->print(con);
+              con->dd_printf(" - %s\n", o->help);
+            }
+          else
+            {
+              /*
+              con->dd_printf("%2d. %s(by %s) is hidden!\n", i, object_name(o),
+                           object_name(o->get_creator()));
+              */
+            }
+        }
     }
-  
+
   return(DD_FALSE);;
 }
 

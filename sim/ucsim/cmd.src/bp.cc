@@ -45,7 +45,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_break_cmd::do_work(class cl_sim *sim,
-//		      class cl_cmdline *cmdline, class cl_console *con)
+//                    class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_break_cmd)
 {
   t_addr addr= 0;
@@ -53,9 +53,9 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
   char op;
   class cl_address_space *mem;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
 
   if (cmdline->syntax_match(uc, ADDRESS)) {
     addr= params[0]->value.address;
@@ -91,7 +91,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
 
 void
 cl_break_cmd::do_fetch(class cl_uc *uc,
-		       t_addr addr, int hit, class cl_console *con)
+                       t_addr addr, int hit, class cl_console_base *con)
 {
   if (hit > 99999)
     {
@@ -103,8 +103,8 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
   else
     {
       class cl_brk *b= new cl_fetch_brk(uc->address_space(MEM_ROM_ID),
-					uc->make_new_brknr(),
-					addr, perm, hit);
+                                        uc->make_new_brknr(),
+                                        addr, perm, hit);
       b->init();
       uc->fbrk->add_bp(b);
       char *s= uc->disass(addr, NULL);
@@ -115,9 +115,9 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
 
 void
 cl_break_cmd::do_event(class cl_uc *uc,
-		       class cl_address_space *mem,
-		       char op, t_addr addr, int hit,
-		       class cl_console *con)
+                       class cl_address_space *mem,
+                       char op, t_addr addr, int hit,
+                       class cl_console_base *con)
 {
   class cl_ev_brk *b= NULL;
 
@@ -135,7 +135,7 @@ cl_break_cmd::do_event(class cl_uc *uc,
 
 //int
 //cl_clear_cmd::do_work(class cl_sim *sim,
-//		      class cl_cmdline *cmdline, class cl_console *con)
+//                    class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_clear_cmd)
 {
   int idx;
@@ -144,10 +144,10 @@ COMMAND_DO_WORK_UC(cl_clear_cmd)
   if (cmdline->param(0) == 0)
     {
       if (!brk)
-	{
-	  con->dd_printf("No breakpoint at this address.\n");
-	  return(0);
-	}
+        {
+          con->dd_printf("No breakpoint at this address.\n");
+          return(0);
+        }
       uc->fbrk->del_bp(uc->PC);
       return(0);
     }
@@ -158,12 +158,12 @@ COMMAND_DO_WORK_UC(cl_clear_cmd)
     {
       t_addr addr;
       if (!param->as_address(uc))
-	return(DD_FALSE);
+        return(DD_FALSE);
       addr= param->value.address;
       if (uc->fbrk->bp_at(addr) == 0)
-	con->dd_printf("No breakpoint at 0x%06x\n", addr);
+        con->dd_printf("No breakpoint at 0x%06x\n", addr);
       else
-	uc->fbrk->del_bp(addr);
+        uc->fbrk->del_bp(addr);
     }
 
   return(DD_FALSE);
@@ -176,7 +176,7 @@ COMMAND_DO_WORK_UC(cl_clear_cmd)
 
 //int
 //cl_delete_cmd::do_work(class cl_sim *sim,
-//		       class cl_cmdline *cmdline, class cl_console *con)
+//                     class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_delete_cmd)
 {
   if (cmdline->param(0) == 0)
@@ -189,14 +189,14 @@ COMMAND_DO_WORK_UC(cl_delete_cmd)
       int i= 0;
       class cl_cmd_arg *param;
       while ((param= cmdline->param(i++)))
-	{
-	  long num;
-	  if (param->get_ivalue(&num))
-	    {
-	      if (!uc->rm_brk(num))
-		con->dd_printf("Error\n");
-	    }
-	}
+        {
+          long num;
+          if (param->get_ivalue(&num))
+            {
+              if (!uc->rm_brk(num))
+                con->dd_printf("Error\n");
+            }
+        }
     }
   return(DD_FALSE);
 }

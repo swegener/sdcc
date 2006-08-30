@@ -41,9 +41,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /* Counter to count clock ticks */
 
-#define TICK_RUN	0x01
-#define TICK_INISR	0x02
-#define TICK_IDLE	0x03
+#define TICK_RUN        0x01
+#define TICK_INISR      0x02
+#define TICK_IDLE       0x03
 
 class cl_ticker: public cl_base
 {
@@ -58,7 +58,7 @@ public:
   
   virtual int tick(int nr);
   virtual double get_rtime(double xtal);
-  virtual void dump(int nr, double xtal, class cl_console *con);
+  virtual void dump(int nr, double xtal, class cl_console_base *con);
 };
 
 
@@ -77,40 +77,40 @@ public:
 class cl_uc: public cl_base
 {
 public:
-  int type;			// CPU family
-  int technology;		// CMOS, HMOS
-  int state;			// GO, IDLE, PD
+  int type;                     // CPU family
+  int technology;               // CMOS, HMOS
+  int state;                    // GO, IDLE, PD
   //class cl_list *options;
   class cl_xtal_option *xtal_option;
 
-  t_addr PC, instPC;		// Program Counter
-  bool inst_exec;		// Instruction is executed
-  class cl_ticker *ticks;	// Nr of XTAL clocks
-  class cl_ticker *isr_ticks;	// Time in ISRs
-  class cl_ticker *idle_ticks;	// Time in idle mode
-  class cl_list *counters;	// User definable timers (tickers)
-  int inst_ticks;		// ticks of an instruction
-  double xtal;			// Clock speed
+  t_addr PC, instPC;            // Program Counter
+  bool inst_exec;               // Instruction is executed
+  class cl_ticker *ticks;       // Nr of XTAL clocks
+  class cl_ticker *isr_ticks;   // Time in ISRs
+  class cl_ticker *idle_ticks;  // Time in idle mode
+  class cl_list *counters;      // User definable timers (tickers)
+  int inst_ticks;               // ticks of an instruction
+  double xtal;                  // Clock speed
 
-  int brk_counter;		// Number of breakpoints
-  class brk_coll *fbrk;		// Collection of FETCH break-points
-  class brk_coll *ebrk;		// Collection of EVENT breakpoints
+  int brk_counter;              // Number of breakpoints
+  class brk_coll *fbrk;         // Collection of FETCH break-points
+  class brk_coll *ebrk;         // Collection of EVENT breakpoints
   class cl_sim *sim;
   //class cl_list *mems;
   class cl_hws *hws;
   
-  class cl_list *memchips;	// v3
+  class cl_list *memchips;      // v3
   class cl_address_space_list *address_spaces;
-  class cl_address_space *rom;	// Required for almost every uc
+  class cl_address_space *rom;  // Required for almost every uc
 
   //class cl_list *address_decoders;
 
-  class cl_irqs *it_sources;	// Sources of interrupts
-  class cl_list *it_levels;	// Follow interrupt services
-  class cl_list *stack_ops;	// Track stack operations
+  class cl_irqs *it_sources;    // Sources of interrupts
+  class cl_list *it_levels;     // Follow interrupt services
+  class cl_list *stack_ops;     // Track stack operations
 
-  class cl_list *errors;	// Errors of instruction execution
-  class cl_list *events;	// Events happened during inst exec
+  class cl_list *errors;        // Errors of instruction execution
+  class cl_list *events;        // Events happened during inst exec
 
   t_addr sp_max;
   t_addr sp_avg;
@@ -192,8 +192,8 @@ public:
   virtual void remove_all_breaks(void);
   virtual int make_new_brknr(void);
   virtual class cl_ev_brk *mk_ebrk(enum brk_perm perm,
-				   class cl_address_space *mem,
-				   char op, t_addr addr, int hit);
+                                   class cl_address_space *mem,
+                                   char op, t_addr addr, int hit);
   virtual void check_events(void);
 
   // disassembling and symbol recognition
@@ -201,26 +201,26 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
-  virtual void print_disass(t_addr addr, class cl_console *con);
-  virtual void print_regs(class cl_console *con);
+  virtual void print_disass(t_addr addr, class cl_console_base *con);
+  virtual void print_regs(class cl_console_base *con);
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
   virtual bool get_name(t_addr addr, struct name_entry tab[], char *buf);
   virtual bool symbol2address(char *sym, struct name_entry tab[],
-			      t_addr *addr);
+                              t_addr *addr);
   virtual char *symbolic_bit_name(t_addr bit_address,
-				  class cl_memory *mem,
-				  t_addr mem_addr,
-				  t_mem bit_mask);
+                                  class cl_memory *mem,
+                                  t_addr mem_addr,
+                                  t_mem bit_mask);
 
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
-					  t_addr *memaddr,
-					  t_mem *bitmask);
+                                          t_addr *memaddr,
+                                          t_mem *bitmask);
   virtual t_addr bit_address(class cl_memory *mem,
-			     t_addr mem_address,
-			     int bit_number) { return(-1); }
+                             t_addr mem_address,
+                             int bit_number) { return(-1); }
   
   // messages from app to handle and broadcast
   virtual bool handle_event(class cl_event &event);
@@ -252,7 +252,7 @@ protected:
 public:
   cl_error_unknown_code(class cl_uc *the_uc);
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
 };
 
 class cl_uc_error_registry: public cl_error_registry

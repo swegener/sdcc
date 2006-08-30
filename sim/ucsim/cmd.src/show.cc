@@ -49,7 +49,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_show_copying_cmd::do_work(class cl_sim *sim,
-//			     class cl_cmdline *cmdline, class cl_console *con)
+//                           class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK(cl_show_copying_cmd)
 {
   con->dd_printf("%s\n", copying);
@@ -64,7 +64,7 @@ COMMAND_DO_WORK(cl_show_copying_cmd)
 
 //int
 //cl_show_warranty_cmd::do_work(class cl_sim *sim,
-//			      class cl_cmdline *cmdline, class cl_console *con)
+//                            class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK(cl_show_warranty_cmd)
 {
   con->dd_printf("%s\n", warranty);
@@ -94,34 +94,34 @@ COMMAND_DO_WORK_APP(cl_show_option_cmd)
     {
       class cl_option *o= (class cl_option *)(/*uc*/app->options->at(i));
       if (!s ||
-	  !strcmp(s, o->get_name()))
-	{
-	  int j;
-	  con->dd_printf("%d. %s: ", i, object_name(o));
-	  o->print(con);
-	  con->dd_printf(" - %s\n", o->help);
-	  con->dd_printf("  Type: %s\n", o->get_type_name());
-	  /*union option_value *val= o->get_value();
-	  con->dd_printf("  Value: \"");
-	  unsigned int uj;
-	  TYPE_UBYTE *d= (TYPE_UBYTE*)val;
-	  for (uj= 0; uj < sizeof(*val); uj++)
-	  con->print_char_octal(d[uj]);
-	  con->dd_printf("\"\n");*/
-	  con->dd_printf("  Hidden: %s\n", (o->hidden)?"True":"False");
-	  con->dd_printf("  Creator: \"%s\"\n  %d Users:\n",
-			 object_name(o->get_creator()),
-			 o->users->count);
-	  for (j= 0; j < o->users->count; j++)
-	    {
-	      class cl_optref *r= (class cl_optref *)(o->users->at(j));
-	      con->dd_printf("    %2d. owner(s)=\"%s\"\n", j,
-			     object_name(r->get_owner()));
-	    }
-	  if (i >= 0 &&
-	      i < app->options->count-1)
-	    con->dd_printf("\n");
-	}
+          !strcmp(s, o->get_name()))
+        {
+          int j;
+          con->dd_printf("%d. %s: ", i, object_name(o));
+          o->print(con);
+          con->dd_printf(" - %s\n", o->help);
+          con->dd_printf("  Type: %s\n", o->get_type_name());
+          /*union option_value *val= o->get_value();
+          con->dd_printf("  Value: \"");
+          unsigned int uj;
+          TYPE_UBYTE *d= (TYPE_UBYTE*)val;
+          for (uj= 0; uj < sizeof(*val); uj++)
+          con->print_char_octal(d[uj]);
+          con->dd_printf("\"\n");*/
+          con->dd_printf("  Hidden: %s\n", (o->hidden)?"True":"False");
+          con->dd_printf("  Creator: \"%s\"\n  %d Users:\n",
+                         object_name(o->get_creator()),
+                         o->users->count);
+          for (j= 0; j < o->users->count; j++)
+            {
+              class cl_optref *r= (class cl_optref *)(o->users->at(j));
+              con->dd_printf("    %2d. owner(s)=\"%s\"\n", j,
+                             object_name(r->get_owner()));
+            }
+          if (i >= 0 &&
+              i < app->options->count-1)
+            con->dd_printf("\n");
+        }
     }
   
   return(DD_FALSE);
@@ -132,8 +132,8 @@ COMMAND_DO_WORK_APP(cl_show_option_cmd)
 #include "errorcl.h"
 
 static void
-show_error_cmd_print_node(class cl_console *con,
-			  int indent, class cl_base *node)
+show_error_cmd_print_node(class cl_console_base *con,
+                          int indent, class cl_base *node)
 {
   if (!node)
     return;
@@ -144,10 +144,10 @@ show_error_cmd_print_node(class cl_console *con,
   class cl_error_class *ec= dynamic_cast<class cl_error_class *>(node);
   char *str;
   con->dd_printf("%s: %s [%s/%s]\n",
-		 str= case_string(case_case, ec->get_type_name()),
-		 name, get_id_string(error_on_off_names,
-				     ec->get_on()),
-		 (ec->is_on())?"ON":"OFF");
+                 str= case_string(case_case, ec->get_type_name()),
+                 name, get_id_string(error_on_off_names,
+                                     ec->get_on()),
+                 (ec->is_on())?"ON":"OFF");
   free(str);
   class cl_base *c= node->first_child();
   while (c)
@@ -181,7 +181,7 @@ COMMAND_DO_WORK_APP(cl_show_error_cmd)
       class cl_error_class *ec;
       ec= dynamic_cast<class cl_error_class*>(registered_errors->object_at(i));
       if (!ec->get_parent())
-	show_error_cmd_print_node(con, 0, ec);
+        show_error_cmd_print_node(con, 0, ec);
     }
   return(DD_FALSE);
 }

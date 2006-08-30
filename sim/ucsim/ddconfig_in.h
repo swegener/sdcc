@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (ddconfig.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define DD_TRUE  1
 #define DD_FALSE 0
-#define NIL	0
+#define NIL     0
 
 #undef STDC_HEADERS
 #undef HAVE_GETOPT_H
@@ -75,6 +75,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #undef HAVE_VPRINTF
 #undef HAVE_DOPRNT
 #undef HAVE_VSNPRINTF
+#undef HAVE__VSNPRINTF
 #undef HAVE_VASPRINTF
 
 #undef HAVE_GETLINE

@@ -41,7 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_info_bp_cmd::do_work(class cl_sim *sim,
-//			class cl_cmdline *cmdline, class cl_console *con)
+//                      class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 {
   int i;
@@ -53,26 +53,26 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
       class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
       s= uc->disass(fb->addr, NULL);
       con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", fb->nr,
-		     "fetch", (fb->perm==brkFIX)?"keep":"del ",
-		     fb->hit, fb->cnt,
-		     fb->addr, s);
+                     "fetch", (fb->perm==brkFIX)?"keep":"del ",
+                     fb->hit, fb->cnt,
+                     fb->addr, s);
       free(s);
     }
   for (i= 0; i < uc->ebrk->count; i++)
     {
       class cl_ev_brk *eb= (class cl_ev_brk *)(uc->ebrk->at(i));
       con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", eb->nr,
-		     "event", (eb->perm==brkFIX)?"keep":"del ",
-		     eb->hit, eb->cnt,
-		     eb->addr, eb->id);
+                     "event", (eb->perm==brkFIX)?"keep":"del ",
+                     eb->hit, eb->cnt,
+                     eb->addr, eb->id);
     }
   /*t_addr a;
   class cl_rom *r= (class cl_rom *)(sim->uc->mem(MEM_ROM));
   for (a= 0; a < sim->uc->get_mem_size(MEM_ROM); a++)
     {
       if (r->bp_map->get(a))
-	con->dd_printf("0x%06x\n", a);
-	}*/
+        con->dd_printf("0x%06x\n", a);
+        }*/
   return(0);
 }
 
@@ -83,7 +83,7 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 
 //int
 //cl_info_reg_cmd::do_work(class cl_sim *sim,
-//			 class cl_cmdline *cmdline, class cl_console *con)
+//                       class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_info_reg_cmd)
 {
   uc->print_regs(con);
@@ -97,14 +97,14 @@ COMMAND_DO_WORK_UC(cl_info_reg_cmd)
 
 //int
 //cl_info_hw_cmd::do_work(class cl_sim *sim,
-//			class cl_cmdline *cmdline, class cl_console *con)
+//                      class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_info_hw_cmd)
 {
   class cl_hw *hw;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
 
   if (cmdline->syntax_match(uc, HW)) {
     hw= params[0]->value.hw;
@@ -123,7 +123,7 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
 
 //int
 //cl_info_stack_cmd::do_work(class cl_sim *sim,
-//                          class cl_cmdline *cmdline, class cl_console *con)
+//                          class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_info_stack_cmd)
 {
   int i;
@@ -152,56 +152,56 @@ COMMAND_DO_WORK_UC(cl_info_memory_cmd)
     {
       class cl_memory_chip *m= (class cl_memory_chip *)(uc->memchips->at(i));
       if (m)
-	con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
-		       m->get_start_address(),
-		       m->highest_valid_address(),
-		       m->get_size(),
-		       m->get_name(),
-		       m->width, m->data_format, m->addr_format);
+        con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
+                       m->get_start_address(),
+                       m->highest_valid_address(),
+                       m->get_size(),
+                       m->get_name(),
+                       m->width, m->data_format, m->addr_format);
     }
   con->dd_printf("Address spaces:\n");
   for (i= 0; i < uc->address_spaces->count; i++)
     {
       class cl_address_space *m=
-	(class cl_address_space *)(uc->address_spaces->at(i));
+        (class cl_address_space *)(uc->address_spaces->at(i));
       if (m)
-	con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
-		       m->get_start_address(),
-		       m->highest_valid_address(),
-		       m->get_size(),
-		       m->get_name(),
-		       m->width, m->data_format, m->addr_format);
+        con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
+                       m->get_start_address(),
+                       m->highest_valid_address(),
+                       m->get_size(),
+                       m->get_name(),
+                       m->width, m->data_format, m->addr_format);
     }
   con->dd_printf("Address decoders:\n");
   for (i= 0; i < uc->address_spaces->count; i++)
     {
       class cl_address_space *m=
-	(class cl_address_space *)(uc->address_spaces->at(i));
+        (class cl_address_space *)(uc->address_spaces->at(i));
       int j;
       for (j= 0; j < m->decoders->count; j++)
-	{
-	  class cl_address_decoder *d=
-	    (class cl_address_decoder *)(m->decoders->at(j));
-	  con->dd_printf("%2d ", j);
-	  if (d->address_space)
-	    {
-	      con->dd_printf("%s ", d->address_space->get_name("unknown"));
-	      con->dd_printf(d->address_space->addr_format, d->as_begin);
-	      con->dd_printf(" ");
-	      con->dd_printf(d->address_space->addr_format, d->as_end);
-	    }
-	  else
-	    con->dd_printf("x");
-	  con->dd_printf(" -> ");
-	  if (d->memchip)
-	    {
-	      con->dd_printf("%s ", d->memchip->get_name("unknown"));
-	      con->dd_printf(d->memchip->addr_format, d->chip_begin);
-	    }
-	  else
-	    con->dd_printf("x");
-	  con->dd_printf(" %s\n", (d->activated)?"activated":"inactive");
-	}
+        {
+          class cl_address_decoder *d=
+            (class cl_address_decoder *)(m->decoders->at(j));
+          con->dd_printf("%2d ", j);
+          if (d->address_space)
+            {
+              con->dd_printf("%s ", d->address_space->get_name("unknown"));
+              con->dd_printf(d->address_space->addr_format, d->as_begin);
+              con->dd_printf(" ");
+              con->dd_printf(d->address_space->addr_format, d->as_end);
+            }
+          else
+            con->dd_printf("x");
+          con->dd_printf(" -> ");
+          if (d->memchip)
+            {
+              con->dd_printf("%s ", d->memchip->get_name("unknown"));
+              con->dd_printf(d->memchip->addr_format, d->chip_begin);
+            }
+          else
+            con->dd_printf("x");
+          con->dd_printf(" %s\n", (d->activated)?"activated":"inactive");
+        }
     }
   return(0);
 }

@@ -64,8 +64,8 @@ cl_wdt::write(class cl_memory_cell *cell, t_mem *val)
     {
       wdt= 0;
       /*uc->sim->app->get_commander()->
-	debug("%g sec (%d tick): Watchdog timer enabled/reset PC= 0x%06x"
-	"\n", uc->get_rtime(), uc->ticks->ticks, uc51r->PC);*/
+        debug("%g sec (%d tick): Watchdog timer enabled/reset PC= 0x%06x"
+        "\n", uc->get_rtime(), uc->ticks->ticks, uc51r->PC);*/
     }
   written_since_reset= DD_TRUE;
 }
@@ -77,13 +77,13 @@ cl_wdt::tick(int cycles)
     {
       wdt+= cycles;
       if (wdt > reset_value)
-	{
-	  /*sim->app->get_commander()->
-	    debug("%g sec (%d ticks): Watchdog timer resets the CPU, "
-	    "PC= 0x%06x\n", get_rtime(), ticks->ticks, PC);*/
-	  uc->reset();
-	  //return(resWDTRESET);
-	}
+        {
+          /*sim->app->get_commander()->
+            debug("%g sec (%d ticks): Watchdog timer resets the CPU, "
+            "PC= 0x%06x\n", get_rtime(), ticks->ticks, PC);*/
+          uc->reset();
+          //return(resWDTRESET);
+        }
     }
   return(0);
 }
@@ -96,10 +96,10 @@ cl_wdt::reset(void)
 }
 
 void
-cl_wdt::print_info(class cl_console *con)
+cl_wdt::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d] %s counter=%d (remains=%d)\n", id_string, id,
-		 (wdt>=0)?"ON":"OFF", wdt, (wdt>=0)?(reset_value-wdt):0);
+                 (wdt>=0)?"ON":"OFF", wdt, (wdt>=0)?(reset_value-wdt):0);
 }
 
 

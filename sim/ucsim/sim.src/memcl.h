@@ -42,23 +42,23 @@ class cl_event_handler;
 
 
 // Cell types
-#define CELL_NORMAL	0x00	/* Nothing special */
-#define CELL_HW_READ	0x01	/* Hw handles read */
-#define CELL_HW_WRITE	0x02	/* Hw catches write */
-//#define CELL_INST	0x04	/* Marked as instruction */
-//#define CELL_FETCH_BRK	0x08	/* Fetch breakpoint */
-#define CELL_READ_BRK	0x10	/* Read event breakpoint */
-#define CELL_WRITE_BRK	0x20	/* Write event breakpoint */
+#define CELL_NORMAL     0x00    /* Nothing special */
+#define CELL_HW_READ    0x01    /* Hw handles read */
+#define CELL_HW_WRITE   0x02    /* Hw catches write */
+//#define CELL_INST     0x04    /* Marked as instruction */
+//#define CELL_FETCH_BRK        0x08    /* Fetch breakpoint */
+#define CELL_READ_BRK   0x10    /* Read event breakpoint */
+#define CELL_WRITE_BRK  0x20    /* Write event breakpoint */
 
 // Cell flags
 enum cell_flag {
-  CELL_NONE		= 0x00,
-  CELL_INST		= 0x04,	/* Marked as instruction */
-  CELL_FETCH_BRK	= 0x08,	/* Fetch breakpoint */
-  CELL_NON_DECODED	= 0x40	/* Cell is not decoded (yet) */
+  CELL_NONE             = 0x00,
+  CELL_INST             = 0x04, /* Marked as instruction */
+  CELL_FETCH_BRK        = 0x08, /* Fetch breakpoint */
+  CELL_NON_DECODED      = 0x40  /* Cell is not decoded (yet) */
 };
 
-#define CELL_GENERAL	(CELL_NORMAL|CELL_INST|CELL_FETCH_BRK)
+#define CELL_GENERAL    (CELL_NORMAL|CELL_INST|CELL_FETCH_BRK)
 
 
 /*
@@ -100,10 +100,10 @@ public:
   virtual void err_non_decoded(t_addr addr);
 
   virtual t_addr dump(t_addr start, t_addr stop, int bpl,
-		      class cl_console *con);
-  virtual t_addr dump(class cl_console *con);
+                      class cl_console_base *con);
+  virtual t_addr dump(class cl_console_base *con);
   virtual bool search_next(bool case_sensitive,
-			   t_mem *array, int len, t_addr *addr);
+                           t_mem *array, int len, t_addr *addr);
 
 
   virtual t_addr lowest_valid_address(void) { return(start_address); }
@@ -135,7 +135,7 @@ protected:
 public:
   cl_memory_operator(class cl_memory_cell *acell, t_addr addr);
   cl_memory_operator(class cl_memory_cell *acell, t_addr addr,
-		     t_mem *data_place, t_mem the_mask);
+                     t_mem *data_place, t_mem the_mask);
 
   virtual void set_data(t_mem *data_place, t_mem the_mask);
   virtual class cl_memory_operator *get_next(void) { return(next_operator); }
@@ -155,7 +155,7 @@ protected:
   class cl_hw *hw;
 public:
   cl_hw_operator(class cl_memory_cell *acell, t_addr addr,
-		 t_mem *data_place, t_mem the_mask, class cl_hw *ahw);
+                 t_mem *data_place, t_mem the_mask, class cl_hw *ahw);
 
   virtual bool match(class cl_hw *the_hw) { return(hw == the_hw); }
 
@@ -171,8 +171,8 @@ protected:
   class cl_brk *bp;
 public:
   cl_event_break_operator(class cl_memory_cell *acell, t_addr addr,
-			  t_mem *data_place, t_mem the_mask,
-			  class cl_uc *auc, class cl_brk *the_bp):
+                          t_mem *data_place, t_mem the_mask,
+                          class cl_uc *auc, class cl_brk *the_bp):
     cl_memory_operator(acell, addr, data_place, the_mask)
   {
     uc= auc;
@@ -186,8 +186,8 @@ class cl_write_operator: public cl_event_break_operator
 {
 public:
   cl_write_operator(class cl_memory_cell *acell, t_addr addr,
-		    t_mem *data_place, t_mem the_mask,
-		    class cl_uc *auc, class cl_brk *the_bp);
+                    t_mem *data_place, t_mem the_mask,
+                    class cl_uc *auc, class cl_brk *the_bp);
 
   virtual t_mem write(t_mem val);
 };
@@ -196,8 +196,8 @@ class cl_read_operator: public cl_event_break_operator
 {
 public:
   cl_read_operator(class cl_memory_cell *acell, t_addr addr,
-		   t_mem *data_place, t_mem the_mask,
-		   class cl_uc *auc, class cl_brk *the_bp);
+                   t_mem *data_place, t_mem the_mask,
+                   class cl_uc *auc, class cl_brk *the_bp);
 
   virtual t_mem read(void);
 };
@@ -300,14 +300,14 @@ public:
   virtual void set_cell_flag(t_addr addr, bool set_to, enum cell_flag flag);
 
   virtual bool decode_cell(t_addr addr,
-			   class cl_memory_chip *chip, t_addr chipaddr);
+                           class cl_memory_chip *chip, t_addr chipaddr);
   virtual void undecode_cell(t_addr addr);
   virtual void undecode_area(class cl_address_decoder *skip,
-			     t_addr begin, t_addr end, class cl_console *con);
+                             t_addr begin, t_addr end, class cl_console_base *con);
 
   virtual class cl_memory_cell *register_hw(t_addr addr, class cl_hw *hw,
-					    int *ith,
-					    bool announce);
+                                            int *ith,
+                                            bool announce);
 
   virtual void set_brk(t_addr addr, class cl_brk *brk);
   virtual void del_brk(t_addr addr, class cl_brk *brk);
@@ -372,11 +372,11 @@ public:
   bool activated;
 public:
   cl_address_decoder(class cl_memory *as, class cl_memory *chip,
-		     t_addr asb, t_addr ase, t_addr cb);
+                     t_addr asb, t_addr ase, t_addr cb);
   virtual ~cl_address_decoder(void);
   virtual int init(void);
 
-  virtual bool activate(class cl_console *con);
+  virtual bool activate(class cl_console_base *con);
 
   virtual bool fully_covered_by(t_addr begin, t_addr end);
   virtual bool is_in(t_addr begin, t_addr end);
@@ -436,7 +436,7 @@ class cl_error_mem_invalid_address: public cl_error_mem
 public:
   cl_error_mem_invalid_address(class cl_memory *amem, t_addr aaddr);
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
 };
 
 class cl_error_mem_non_decoded: public cl_error_mem
@@ -444,7 +444,7 @@ class cl_error_mem_non_decoded: public cl_error_mem
 public:
   cl_error_mem_non_decoded(class cl_memory *amem, t_addr aaddr);
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
 };
 
 class cl_mem_error_registry: public cl_error_registry

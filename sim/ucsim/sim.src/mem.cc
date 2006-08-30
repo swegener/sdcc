@@ -164,7 +164,7 @@ cl_memory::err_non_decoded(t_addr addr)
 
 
 t_addr
-cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
+cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
 {
   int i;
   t_addr lva= lowest_valid_address();
@@ -219,7 +219,7 @@ cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
 }
 
 t_addr
-cl_memory::dump(class cl_console *con)
+cl_memory::dump(class cl_console_base *con)
 {
   return(dump(dump_finished, dump_finished+10*8-1, 8, con));
 }
@@ -885,7 +885,7 @@ cl_address_space::undecode_cell(t_addr addr)
 
 void
 cl_address_space::undecode_area(class cl_address_decoder *skip,
-                                t_addr begin, t_addr end,class cl_console *con)
+                                t_addr begin, t_addr end,class cl_console_base *con)
 {
 #define D if (con) con->debug
   D("Undecoding area 0x%x-0x%x of %s\n", begin, end, get_name());
@@ -1166,7 +1166,7 @@ cl_address_decoder::init(void)
 
 
 bool
-cl_address_decoder::activate(class cl_console *con)
+cl_address_decoder::activate(class cl_console_base *con)
 {
 #define D if (con) con->debug
   D("Activation of an address decoder\n");
@@ -1358,7 +1358,7 @@ cl_error_mem_invalid_address(class cl_memory *amem, t_addr aaddr):
 }
 
 void
-cl_error_mem_invalid_address::print(class cl_commander *c)
+cl_error_mem_invalid_address::print(class cl_commander_base *c)
 {
   c->dd_printf("%s: invalid address ", get_type_name());
   c->dd_printf(mem->addr_format, addr);
@@ -1375,7 +1375,7 @@ cl_error_mem_non_decoded(class cl_memory *amem, t_addr aaddr):
 }
 
 void
-cl_error_mem_non_decoded::print(class cl_commander *c)
+cl_error_mem_non_decoded::print(class cl_commander_base *c)
 {
   c->dd_printf("%s: access of non-decoded address ", get_type_name());
   c->dd_printf(mem->addr_format, addr);

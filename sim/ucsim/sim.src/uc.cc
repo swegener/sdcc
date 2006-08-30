@@ -92,7 +92,7 @@ cl_ticker::get_rtime(double xtal)
 }
 
 void
-cl_ticker::dump(int nr, double xtal, class cl_console *con)
+cl_ticker::dump(int nr, double xtal, class cl_console_base *con)
 {
   con->dd_printf("timer #%d(\"%s\") %s%s: %g sec (%lu clks)\n",
                  nr, get_name("unnamed"),
@@ -1039,7 +1039,7 @@ cl_uc::disass(t_addr addr, char *sep)
 }
 
 void
-cl_uc::print_disass(t_addr addr, class cl_console *con)
+cl_uc::print_disass(t_addr addr, class cl_console_base *con)
 {
   char *dis;
   class cl_brk *b;
@@ -1077,7 +1077,7 @@ cl_uc::print_disass(t_addr addr, class cl_console *con)
 }
 
 void
-cl_uc::print_regs(class cl_console *con)
+cl_uc::print_regs(class cl_console_base *con)
 {
   con->dd_printf("No registers\n");
 }
@@ -1292,7 +1292,7 @@ void
 cl_uc::check_errors(void)
 {
   int i;
-  class cl_commander *c= sim->app->get_commander();
+  class cl_commander_base *c= sim->app->get_commander();
   bool must_stop= DD_FALSE;
 
   if (c)
@@ -1306,7 +1306,7 @@ cl_uc::check_errors(void)
           must_stop= must_stop || (error->get_type() & err_stop);
           if (error->inst)
             {
-              class cl_console *con;
+              class cl_console_base *con;
               con= c->actual_console;
               if (!con)
                 con= c->frozen_console;
@@ -1863,7 +1863,7 @@ cl_error_unknown_code::cl_error_unknown_code(class cl_uc *the_uc)
 }
 
 void
-cl_error_unknown_code::print(class cl_commander *c)
+cl_error_unknown_code::print(class cl_commander_base *c)
 {
   c->dd_printf("%s: unknown instruction code at ", get_type_name());
   if (uc->rom)

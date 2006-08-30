@@ -51,14 +51,14 @@
 
 //int
 //cl_set_mem_cmd::do_work(class cl_sim *sim,
-//			class cl_cmdline *cmdline, class cl_console *con)
+//                      class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_set_mem_cmd)
 {
   class cl_memory *mem= 0;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
 
   if (cmdline->syntax_match(uc, MEMORY ADDRESS DATALIST)) {
     mem= params[0]->value.memory.memory;
@@ -70,17 +70,17 @@ COMMAND_DO_WORK_UC(cl_set_mem_cmd)
       con->dd_printf("Error: no data\n");
     else if (start < mem->get_start_address())
       con->dd_printf("Start address less then 0x%"_A_"x\n",
-		     mem->get_start_address());
+                     mem->get_start_address());
     else
       {
-	int i;
-	t_addr addr;
-	for (i= 0, addr= start;
-	     i < len && mem->valid_address(addr);
-	     i++, addr++)
-	  mem->write(addr, array[i]);
-	uc->check_errors();
-	mem->dump(start, start+len-1, 8, con);
+        int i;
+        t_addr addr;
+        for (i= 0, addr= start;
+             i < len && mem->valid_address(addr);
+             i++, addr++)
+          mem->write(addr, array[i]);
+        uc->check_errors();
+        mem->dump(start, start+len-1, 8, con);
       }
   }
   else
@@ -97,16 +97,16 @@ COMMAND_DO_WORK_UC(cl_set_mem_cmd)
 
 //int
 //cl_set_bit_cmd::do_work(class cl_sim *sim,
-//			class cl_cmdline *cmdline, class cl_console *con)
+//                      class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_set_bit_cmd)
 {
   class cl_memory *mem;
   t_addr mem_addr= 0;
   t_mem bit_mask= 0;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   
   if (cmdline->syntax_match(uc, BIT NUMBER)) {
     mem= params[0]->value.bit.mem;
@@ -134,9 +134,9 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
 {
   class cl_hw *hw= 0;
   class cl_cmd_arg *params[1]= { cmdline->param(0)/*,
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3)*/ };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3)*/ };
   
   if (params[0] && /*cmdline->syntax_match(uc, HW)*/params[0]->as_hw(uc)) {
     hw= params[0]->value.hw;
@@ -156,12 +156,12 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
     else*/
     {
       if (hw)
-	{
-	  cmdline->shift();
-	  hw->set_cmd(cmdline, con);
-	}
+        {
+          cmdline->shift();
+          hw->set_cmd(cmdline, con);
+        }
       else
-	con->dd_printf("Error: no hw\n");
+        con->dd_printf("Error: no hw\n");
     }
   return(DD_FALSE);;
 }
@@ -174,15 +174,15 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
 
 //int
 //cl_set_option_cmd::do_work(class cl_sim *sim,
-//			   class cl_cmdline *cmdline, class cl_console *con)
+//                         class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_APP(cl_set_option_cmd)
 {
   char *id= 0, *s= 0;
   int idx;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   class cl_option *option= 0;
 
   if (cmdline->syntax_match(0/*app->get_uc()*/, NUMBER STRING)) {
@@ -197,15 +197,15 @@ COMMAND_DO_WORK_APP(cl_set_option_cmd)
     int n= app->options->nuof_options(id, cr);
     if (n > 1)
       {
-	con->dd_printf("Ambiguous option name, use number instead\n");
-	return(DD_FALSE);
+        con->dd_printf("Ambiguous option name, use number instead\n");
+        return(DD_FALSE);
       }
     else if (n == 0)
       ;//con->dd_printf("Named option does not exist\n");
     else
       {
-	if ((option= app->options->get_option(id, cr)) == 0)
-	  option= app->options->get_option(cr, id);
+        if ((option= app->options->get_option(id, cr)) == 0)
+          option= app->options->get_option(cr, id);
       }
   }
   else if (cmdline->syntax_match(0/*app->get_uc()*/, STRING STRING)) {
@@ -214,8 +214,8 @@ COMMAND_DO_WORK_APP(cl_set_option_cmd)
     int n= app->options->nuof_options(id);
     if (n > 1)
       {
-	con->dd_printf("Ambiguous option name, use number instead\n");
-	return(DD_FALSE);
+        con->dd_printf("Ambiguous option name, use number instead\n");
+        return(DD_FALSE);
       }
     else if (n == 0)
       ;//con->dd_printf("Named option does not exist\n");
@@ -243,13 +243,13 @@ COMMAND_DO_WORK_APP(cl_set_option_cmd)
 
 //int
 //cl_set_option_cmd::do_work(class cl_sim *sim,
-//			   class cl_cmdline *cmdline, class cl_console *con)
+//                         class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_APP(cl_set_error_cmd)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   char *error_name= NIL, *value= NIL;
 
   if (cmdline->syntax_match(0/*app->get_uc()*/, STRING STRING)) {
@@ -266,26 +266,26 @@ COMMAND_DO_WORK_APP(cl_set_error_cmd)
     {
       int i;
       for (i= 0; i < registered_errors->count; i++)
-	{
-	  class cl_error_class *e=
-	    dynamic_cast<class cl_error_class *>(registered_errors->object_at(i));
-	  if (e->is_inamed(error_name))
-	    {
-	      if (strchr("uU-?", *value) != NULL)
-		e->set_on(ERROR_PARENT);
-	      else if (strchr("1tTyY", *value) != NULL ||
-		       (strlen(value) > 1 &&
-			strchr("nN", value[2]) != NULL))
-		e->set_on(ERROR_ON);
-	      else if (strchr("0fFnN", *value) != NULL ||
-		       (strlen(value) > 1 &&
-			strchr("fF", value[2]) != NULL))
-		e->set_on(ERROR_OFF);
-	      else
-		con->dd_printf("Bad value (%s)\n", value);
-	      return(DD_FALSE);
-	    }
-	}
+        {
+          class cl_error_class *e=
+            dynamic_cast<class cl_error_class *>(registered_errors->object_at(i));
+          if (e->is_inamed(error_name))
+            {
+              if (strchr("uU-?", *value) != NULL)
+                e->set_on(ERROR_PARENT);
+              else if (strchr("1tTyY", *value) != NULL ||
+                       (strlen(value) > 1 &&
+                        strchr("nN", value[2]) != NULL))
+                e->set_on(ERROR_ON);
+              else if (strchr("0fFnN", *value) != NULL ||
+                       (strlen(value) > 1 &&
+                        strchr("fF", value[2]) != NULL))
+                e->set_on(ERROR_OFF);
+              else
+                con->dd_printf("Bad value (%s)\n", value);
+              return(DD_FALSE);
+            }
+        }
     }
   con->dd_printf("Error %s not found\n", error_name);
 

@@ -50,51 +50,51 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_run_cmd::do_work(class cl_sim *sim,
-//		    class cl_cmdline *cmdline, class cl_console *con)
+//                  class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_SIM(cl_run_cmd)
 {
   class cl_brk *b;
   t_addr start, end;
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
 
   if (params[0])
     if (!(params[0]->get_address(sim->uc, &start)))
       {
-	con->dd_printf("Error: wrong start address\n");
-	return(DD_FALSE);
+        con->dd_printf("Error: wrong start address\n");
+        return(DD_FALSE);
       }
   if (params[1])
     if (!(params[1]->get_address(sim->uc, &end)))
       {
-	con->dd_printf("Error: wromg end address\n");
-	return(DD_FALSE);
+        con->dd_printf("Error: wromg end address\n");
+        return(DD_FALSE);
       }
   if (params[0])
     {
       if (!sim->uc->inst_at(start))
-	con->dd_printf("Warning: maybe not instruction at 0x%06lx\n", start);
+        con->dd_printf("Warning: maybe not instruction at 0x%06lx\n", start);
       sim->uc->PC= start;
       if (params[1])
-	{
-	  if (start == end)
-	    {
-	      con->dd_printf("Addresses must be different.\n");
-	      return(DD_FALSE);
-	    }
-	  if ((b= sim->uc->fbrk_at(end)))
-	    {
-	    }
-	  else
-	    {
-	      b= new cl_fetch_brk(sim->uc->address_space(MEM_ROM_ID),
-				  sim->uc->make_new_brknr(), end,
-				  brkDYNAMIC, 1);
-	      sim->uc->fbrk->add_bp(b);
-	    }
-	}
+        {
+          if (start == end)
+            {
+              con->dd_printf("Addresses must be different.\n");
+              return(DD_FALSE);
+            }
+          if ((b= sim->uc->fbrk_at(end)))
+            {
+            }
+          else
+            {
+              b= new cl_fetch_brk(sim->uc->address_space(MEM_ROM_ID),
+                                  sim->uc->make_new_brknr(), end,
+                                  brkDYNAMIC, 1);
+              sim->uc->fbrk->add_bp(b);
+            }
+        }
     }
   con->dd_printf("Simulation started, PC=0x%06x\n", sim->uc->PC);
   if (sim->uc->fbrk_at(sim->uc->PC))
@@ -112,7 +112,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 
 //int
 //cl_stop_cmd::do_work(class cl_sim *sim,
-//		     class cl_cmdline *cmdline, class cl_console *con)
+//                   class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_SIM(cl_stop_cmd)
 {
   sim->stop(resUSER);
@@ -128,7 +128,7 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
 
 //int
 //cl_step_cmd::do_work(class cl_sim *sim,
-//		     class cl_cmdline *cmdline, class cl_console *con)
+//                   class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_step_cmd)
 {
   //printf("step %x\n",uc->PC);
@@ -146,7 +146,7 @@ COMMAND_DO_WORK_UC(cl_step_cmd)
 
 //int
 //cl_next_cmd::do_work(class cl_sim *sim,
-//		     class cl_cmdline *cmdline, class cl_console *con)
+//                   class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_SIM(cl_next_cmd)
 {
   class cl_brk *b;
@@ -160,7 +160,7 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
   int i= 0;
   de= &(sim->uc->dis_tbl()[i]);
   while ((code & de->mask) != de->code &&
-	 de->mnemonic)
+         de->mnemonic)
     {
       i++;
       de= &(sim->uc->dis_tbl()[i]);
@@ -174,19 +174,19 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
     {
       next= sim->uc->PC + inst_len;
       if (!sim->uc->fbrk_at(next))
-	{
-	  b= new cl_fetch_brk(sim->uc->address_space(MEM_ROM_ID),
-			      sim->uc->make_new_brknr(),
-			      next, brkDYNAMIC, 1);
+        {
+          b= new cl_fetch_brk(sim->uc->address_space(MEM_ROM_ID),
+                              sim->uc->make_new_brknr(),
+                              next, brkDYNAMIC, 1);
 
-	  b->init();
-//	  sim->uc->fbrk->add_bp(b);
+          b->init();
+//        sim->uc->fbrk->add_bp(b);
 
-	  sim->uc->fbrk->add(b);
-	  b->activate();
-	}
+          sim->uc->fbrk->add(b);
+          b->activate();
+        }
       if (sim->uc->fbrk_at(sim->uc->PC))
-	sim->uc->do_inst(1);
+        sim->uc->do_inst(1);
       sim->start(con);
       //sim->uc->do_inst(-1);
     }
@@ -205,11 +205,11 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 
 //int
 //cl_help_cmd::do_work(class cl_sim *sim,
-//		     class cl_cmdline *cmdline, class cl_console *con)
+//                   class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_APP(cl_help_cmd)
 {
   class cl_sim *sim;
-  class cl_commander *commander;
+  class cl_commander_base *commander;
   class cl_cmdset *cmdset= 0;
   int i;
   class cl_cmd_arg *parm= cmdline->param(0);
@@ -222,11 +222,11 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
   if (!parm) {
     for (i= 0; i < cmdset->count; i++)
       {
-	class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
-	if (c->short_help)
-	  con->dd_printf("%s\n", c->short_help);
-	else
-	  con->dd_printf("%s\n", (char*)(c->names->at(0)));
+        class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
+        if (c->short_help)
+          con->dd_printf("%s\n", c->short_help);
+        else
+          con->dd_printf("%s\n", (char*)(c->names->at(0)));
       }
   }
   else
@@ -234,55 +234,55 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
       matches= 0;
       do_set(cmdline, 0, cmdset, con);
       if (matches == 1 &&
-	  cmd_found)
-	{
-	  int names;
-	  con->dd_printf("Names of command:");
-	  for (names= 0; names < cmd_found->names->count; names++)
-	    con->dd_printf(" %s", (char*)(cmd_found->names->at(names)));
-	  con->dd_printf("\n");
-	  class cl_cmdset *subset= cmd_found->get_subcommands();
-	  if (subset)
-	    {
-	      con->dd_printf("\"%s\" must be followed by the name of a "
-			     "subcommand\nList of subcommands:\n",
-			     (char*)(cmd_found->names->at(0)));
-	      for (i= 0; i < subset->count; i++)
-		{
-		  class cl_cmd *c=
-		    dynamic_cast<class cl_cmd *>(subset->object_at(i));
-		  con->dd_printf("%s\n", c->short_help);
-		}
-	    }
-	  if (cmd_found->long_help)
-	    con->dd_printf("%s\n", cmd_found->long_help);
-	}
+          cmd_found)
+        {
+          int names;
+          con->dd_printf("Names of command:");
+          for (names= 0; names < cmd_found->names->count; names++)
+            con->dd_printf(" %s", (char*)(cmd_found->names->at(names)));
+          con->dd_printf("\n");
+          class cl_cmdset *subset= cmd_found->get_subcommands();
+          if (subset)
+            {
+              con->dd_printf("\"%s\" must be followed by the name of a "
+                             "subcommand\nList of subcommands:\n",
+                             (char*)(cmd_found->names->at(0)));
+              for (i= 0; i < subset->count; i++)
+                {
+                  class cl_cmd *c=
+                    dynamic_cast<class cl_cmd *>(subset->object_at(i));
+                  con->dd_printf("%s\n", c->short_help);
+                }
+            }
+          if (cmd_found->long_help)
+            con->dd_printf("%s\n", cmd_found->long_help);
+        }
       if (!matches ||
-	  !cmd_found)
-	con->dd_printf("No such command.\n");
+          !cmd_found)
+        con->dd_printf("No such command.\n");
       //return(DD_FALSE);
       /*
       int pari;
       for (pari= 0; pari < cmdline->nuof_params(); pari++)
-	{
-	  class cl_cmd_arg *act_param;
-	  act_param= (class cl_cmd_arg *)(cmdline->param(pari));
-	  for (i= 0; i < cmdset->count; i++)
-	    {
-	      class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
-	      if (!c->name_match(act_param->s_value, DD_FALSE))
-		continue;
-	      if (c->short_help)
-		con->dd_printf("%s\n", c->short_help);
-	      else
-		con->dd_printf("%s\n", (char*)(c->names->at(0)));
-	      if (pari < cmdline->nuof_params()-1)
-		continue;
-	      cmdset= c->get_subcommands();
-	      if (!cmdset)
-		return(DD_FALSE);
-	    }
-	}
+        {
+          class cl_cmd_arg *act_param;
+          act_param= (class cl_cmd_arg *)(cmdline->param(pari));
+          for (i= 0; i < cmdset->count; i++)
+            {
+              class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
+              if (!c->name_match(act_param->s_value, DD_FALSE))
+                continue;
+              if (c->short_help)
+                con->dd_printf("%s\n", c->short_help);
+              else
+                con->dd_printf("%s\n", (char*)(c->names->at(0)));
+              if (pari < cmdline->nuof_params()-1)
+                continue;
+              cmdset= c->get_subcommands();
+              if (!cmdset)
+                return(DD_FALSE);
+            }
+        }
       return(DD_FALSE);
       */
     }
@@ -292,43 +292,43 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
     matches= 0;
     for (i= 0; i < cmdset->count; i++)
       {
-	c= (class cl_cmd *)(cmdset->at(i));
-	if (c->name_match(parm->value.string.string, DD_FALSE))
-	  matches++;
+        c= (class cl_cmd *)(cmdset->at(i));
+        if (c->name_match(parm->value.string.string, DD_FALSE))
+          matches++;
       }
     if (!matches)
       con->dd_printf("No such command\n");
     else if (matches > 1)
       for (i= 0; i < cmdset->count; i++)
-	{
-	  c= (class cl_cmd *)(cmdset->at(i));
-	  if (!c->name_match(parm->value.string.string, DD_FALSE))
-	    continue;
-	  if (c->short_help)
-	    con->dd_printf("%s\n", c->short_help);
-	  else
-	    con->dd_printf("%s\n", (char*)(c->names->at(0)));
-	}
+        {
+          c= (class cl_cmd *)(cmdset->at(i));
+          if (!c->name_match(parm->value.string.string, DD_FALSE))
+            continue;
+          if (c->short_help)
+            con->dd_printf("%s\n", c->short_help);
+          else
+            con->dd_printf("%s\n", (char*)(c->names->at(0)));
+        }
     else
       for (i= 0; i < cmdset->count; i++)
-	{
-	  c= (class cl_cmd *)(cmdset->at(i));
-	  if (!c->name_match(parm->value.string.string, DD_FALSE))
-	    continue;
-	  if (c->short_help)
-	    con->dd_printf("%s\n", c->short_help);
-	  else
-	    con->dd_printf("%s\n", (char*)(c->names->at(0)));
-	  int names;
-	  con->dd_printf("Names of command:");
-	  for (names= 0; names < c->names->count; names++)
-	    con->dd_printf(" %s", (char*)(c->names->at(names)));
-	  con->dd_printf("\n");
-	  if (c->long_help)
-	    con->dd_printf("%s\n", c->long_help);
-	  else
-	    con->dd_printf("%s\n", (char*)(c->names->at(0)));
-	}
+        {
+          c= (class cl_cmd *)(cmdset->at(i));
+          if (!c->name_match(parm->value.string.string, DD_FALSE))
+            continue;
+          if (c->short_help)
+            con->dd_printf("%s\n", c->short_help);
+          else
+            con->dd_printf("%s\n", (char*)(c->names->at(0)));
+          int names;
+          con->dd_printf("Names of command:");
+          for (names= 0; names < c->names->count; names++)
+            con->dd_printf(" %s", (char*)(c->names->at(names)));
+          con->dd_printf("\n");
+          if (c->long_help)
+            con->dd_printf("%s\n", c->long_help);
+          else
+            con->dd_printf("%s\n", (char*)(c->names->at(0)));
+        }
   }
   else
     con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax");
@@ -339,37 +339,37 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 
 bool
 cl_help_cmd::do_set(class cl_cmdline *cmdline, int pari,
-		    class cl_cmdset *cmdset,
-		    class cl_console *con)
+                    class cl_cmdset *cmdset,
+                    class cl_console_base *con)
 {
   int i;
   for (i= 0; i < cmdset->count; i++)
     {
       class cl_cmd *cmd= dynamic_cast<class cl_cmd *>(cmdset->object_at(i));
       if (!cmd)
-	continue;
+        continue;
       if (pari >= cmdline->nuof_params())
-	return(DD_FALSE);
+        return(DD_FALSE);
       class cl_cmd_arg *param= cmdline->param(pari);
       if (!param)
-	return(DD_FALSE);
+        return(DD_FALSE);
       class cl_cmdset *next_set= cmd->get_subcommands();
       if (cmd->name_match(param->s_value, DD_FALSE))
-	{
-	  if (pari+1 >= cmdline->nuof_params())
-	    {
-	      matches++;
-	      cmd_found= cmd;
-	      if (cmd->short_help)
-		con->dd_printf("%s\n", cmd->short_help);
-	      else
-		con->dd_printf("%s\n", (char*)(cmd->names->at(0)));
-	      //continue;
-	    }
-	  else
-	    if (next_set)
-	      do_set(cmdline, pari+1, next_set, con);
-	}
+        {
+          if (pari+1 >= cmdline->nuof_params())
+            {
+              matches++;
+              cmd_found= cmd;
+              if (cmd->short_help)
+                con->dd_printf("%s\n", cmd->short_help);
+              else
+                con->dd_printf("%s\n", (char*)(cmd->names->at(0)));
+              //continue;
+            }
+          else
+            if (next_set)
+              do_set(cmdline, pari+1, next_set, con);
+        }
     }
   return(DD_TRUE);
 }
@@ -382,7 +382,7 @@ cl_help_cmd::do_set(class cl_cmdline *cmdline, int pari,
 
 //int
 //cl_quit_cmd::do_work(class cl_sim *sim,
-//		     class cl_cmdline */*cmdline*/, class cl_console */*con*/)
+//                   class cl_cmdline */*cmdline*/, class cl_console_base */*con*/)
 COMMAND_DO_WORK(cl_quit_cmd)
 {
   return(1);
@@ -396,7 +396,7 @@ COMMAND_DO_WORK(cl_quit_cmd)
 
 //int
 //cl_kill_cmd::do_work(class cl_sim *sim,
-//		     class cl_cmdline */*cmdline*/, class cl_console */*con*/)
+//                   class cl_cmdline */*cmdline*/, class cl_console_base */*con*/)
 COMMAND_DO_WORK_APP(cl_kill_cmd)
 {
   app->going= 0;
@@ -421,8 +421,8 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
   else
     con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
-  class cl_commander *c= app->get_commander();
-  class cl_console *cons= con->clone_for_exec(fn);
+  class cl_commander_base *c= app->get_commander();
+  class cl_console_base *cons= con->clone_for_exec(fn);
   if (cons)
     {
       cons->flags|= CONS_NOWELCOME;

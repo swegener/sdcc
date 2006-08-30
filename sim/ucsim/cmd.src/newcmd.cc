@@ -2,7 +2,8 @@
  * Simulator of microcontrollers (cmd.src/newcmd.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ * Copyright (C) 2006, Borut Razem - borut.razem@siol.net
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -31,22 +32,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#ifdef SOCKET_AVAIL
-# include HEADER_SOCKET
-# if defined HAVE_SYS_SOCKET_H
-#  include <netinet/in.h>
-#  include <arpa/inet.h>
-#  include <netdb.h>
-# endif
-#endif
-#if FD_HEADER_OK
-# include HEADER_FD
-#endif
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
 #include "i_string.h"
 
 #include "cmdlexcl.h"
@@ -70,7 +55,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Options of console
  */
 
-cl_prompt_option::cl_prompt_option(class cl_console *console):
+cl_prompt_option::cl_prompt_option(class cl_console_base *console):
   cl_optref(console)
 {
   con= console;
@@ -100,7 +85,7 @@ cl_prompt_option::option_changed(void)
 }
 
 
-cl_debug_option::cl_debug_option(class cl_console *console):
+cl_debug_option::cl_debug_option(class cl_console_base *console):
   cl_prompt_option(console)
 {}
 
@@ -134,112 +119,8 @@ cl_debug_option::option_changed(void)
  *____________________________________________________________________________
  */
 
-cl_console::cl_console(char *fin, char *fout, class cl_app *the_app):
-  cl_base()
-{
-  FILE *f;
-
-  app= the_app;
-  in= 0;
-  if (fin)
-    if (f= fopen(fin, "r"), in= f, !f)
-      fprintf(stderr, "Can't open `%s': %s\n", fin, strerror(errno));
-  out= 0;
-  if (fout)
-    if (f= fopen(fout, "w"), out= f, !f)
-      fprintf(stderr, "Can't open `%s': %s\n", fout, strerror(errno));
-  prompt= 0;
-  flags= CONS_NONE;
-  if (in &&
-      isatty(fileno(in)))
-    flags|= CONS_INTERACTIVE;
-  else
-    ;//fprintf(stderr, "Warning: non-interactive console\n");
-  rout= 0;
-  id= 0;
-  lines_printed= new cl_ustrings(100, 100, "console_cache");
-}
-
-cl_console::cl_console(FILE *fin, FILE *fout, class cl_app *the_app):
-  cl_base()
-{
-  app= the_app;
-  in = fin;
-  out= fout;
-  prompt= 0;
-  flags= CONS_NONE;
-  if (in &&
-      isatty(fileno(in)))
-    flags|= CONS_INTERACTIVE;
-  else
-    ;//fprintf(stderr, "Warning: non-interactive console\n");
-  rout= 0;
-  id= 0;
-  lines_printed= new cl_ustrings(100, 100, "console_cache");
-}
-
-/*
- * use the port number supplied to connect to localhost for 
- * (by Sandeep)
- */
-
-#ifdef SOCKET_AVAIL
-static int
-connect_to_port(int portnum)
-{
-  int sock= socket(AF_INET,SOCK_STREAM,0);
-  struct sockaddr_in sin;
-
-  sin.sin_family = AF_INET;
-  sin.sin_port = htons(portnum);
-  sin.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-  if (connect(sock, (struct sockaddr *)&sin, sizeof(sin))) {
-    fprintf(stderr, "Connect to port %d: %s\n", portnum, strerror(errno));
-    return -1;
-  }
-  return sock;
-}
-
-cl_console::cl_console(int portnumber, class cl_app *the_app)
-{
-  int sock= connect_to_port(portnumber);
-
-  app= the_app;
-  if (!(in= fdopen(sock, "r")))
-    fprintf(stderr, "cannot open port for input\n");
-  if (!(out= fdopen(sock, "w")))
-    fprintf(stderr, "cannot open port for output\n");
-  //fprintf(stderr, "init socket done\n");
-  id= 0;
-  lines_printed= new cl_ustrings(1, 1, "console_cache");
-}
-#endif
-
-class cl_console *
-cl_console::clone_for_exec(char *fin)
-{
-  FILE *fi= 0, *fo= 0;
-
-  if (!fin)
-    return(0);
-  if (fi= fopen(fin, "r"), !fi)
-    {
-      fprintf(stderr, "Can't open `%s': %s\n", fin, strerror(errno));
-      return(0);
-    }
-  if ((fo= fdopen(dup(fileno(out)), "a")) == 0)
-    {
-      fclose(fi);
-      fprintf(stderr, "Can't re-open output file: %s\n", strerror(errno));
-      return(0);
-    }
-  class cl_console *con= new cl_sub_console(this, fi, fo, app);
-  return(con);
-}
-
 int
-cl_console::init(void)
+cl_console_base::init(void)
 {
   cl_base::init();
   prompt_option= new cl_prompt_option(this);
@@ -257,48 +138,8 @@ cl_console::init(void)
   return(0);
 }
 
-cl_console::~cl_console(void)
-{
-  if (in)
-    fclose(in);
-  un_redirect();
-  if (out)
-    {
-      if (flags & CONS_PROMPT)
-        fprintf(out, "\n");
-      fflush(out);
-      fclose(out);
-    }
-  delete prompt_option;
-  delete null_prompt_option;
-  delete debug_option;
-#ifdef SOCKET_AVAIL
-  /*  if (sock)
-    {
-      shutdown(sock, 2);
-      close(sock);
-      }*/
-#endif
-}
-
-
-bool
-cl_console::accept_last(void)
-{
-  if (!in)
-    return(DD_FALSE);
-  if (isatty(fileno(in)))
-    return(DD_TRUE);
-  return(DD_FALSE);
-}
-
-
-/*
- * Output functions
- */
-
 void
-cl_console::welcome(void)
+cl_console_base::welcome(void)
 {
   if (!(flags & CONS_NOWELCOME))
     {
@@ -312,64 +153,25 @@ cl_console::welcome(void)
 }
 
 void
-cl_console::redirect(char *fname, char *mode)
+cl_console_base::print_prompt(void)
 {
-  if ((rout= fopen(fname, mode)) == NULL)
-    dd_printf("Unable to open file '%s' for %s: %s\n",
-              fname, (mode[0]=='w')?"write":"append", strerror(errno));
-}
-
-void
-cl_console::un_redirect(void)
-{
-  if (!rout)
+  if (flags & (CONS_PROMPT | CONS_FROZEN | CONS_INACTIVE))
     return;
-  fclose(rout);
-  rout= NULL;
-}
 
-
-int
-cl_console::cmd_do_print(char *format, va_list ap)
-{
-  int ret;
-  FILE *f = get_out();
-
-  if (f)
-   {
-      ret= vfprintf(f, format, ap);
-      fflush(f);
-    }
-  else
-    ret= 0;
-
-  return(ret);
-}
-
-void
-cl_console::print_prompt(void)
-{
-  if (flags & (CONS_PROMPT|CONS_FROZEN|CONS_INACTIVE))
-    return;
-  flags|= CONS_PROMPT;
+  flags |= CONS_PROMPT;
   if (/*app->args->arg_avail('P')*/null_prompt_option->get_value(bool(0)))
     {
-      FILE *Out = get_out();
-      if (Out)
-        {
-          putc('\0', Out);
-          fflush(Out);
-        }
+      dd_printf("%c", 0);
     }
   else
     {
-      dd_printf("%d%s", id, (prompt && prompt[0])?prompt:"> ");
+      dd_printf("%d%s", id, (prompt && prompt[0]) ? prompt : "> ");
       //              ((p= app->args->get_sarg(0, "prompt"))?p:"> "));
     }
 }
 
 int
-cl_console::dd_printf(char *format, ...)
+cl_console_base::dd_printf(char *format, ...)
 {
   va_list ap;
   int ret= 0;
@@ -382,7 +184,7 @@ cl_console::dd_printf(char *format, ...)
 }
 
 int
-cl_console::debug(char *format, ...)
+cl_console_base::debug(char *format, ...)
 {
   if ((flags & CONS_DEBUG) == 0)
     return(0);
@@ -397,8 +199,12 @@ cl_console::debug(char *format, ...)
   return(ret);
 }
 
+/*
+ * Printing out an integer in binary format
+ */
+
 void
-cl_console::print_bin(long data, int bits)
+cl_console_base::print_bin(long data, int bits)
 {
   long mask= 1;
 
@@ -411,103 +217,95 @@ cl_console::print_bin(long data, int bits)
 }
 
 void
-cl_console::print_char_octal(char c)
+cl_console_base::print_char_octal(char c)
 {
-  FILE *Out= get_out();
-
-  if (Out)
-    ::print_char_octal(c, Out);
+  if (strchr("\a\b\f\n\r\t\v\"", c))
+    switch (c)
+      {
+      case '\a': dd_printf("\a"); break;
+      case '\b': dd_printf("\b"); break;
+      case '\f': dd_printf("\f"); break;
+      case '\n': dd_printf("\n"); break;
+      case '\r': dd_printf("\r"); break;
+      case '\t': dd_printf("\t"); break;
+      case '\v': dd_printf("\v"); break;
+      case '\"': dd_printf("\""); break;
+      }
+  else if (isprint(c))
+    dd_printf("%c", c);
+  else
+    dd_printf("\\%03hho", c);
 }
-
-
-/*
- * Input functions
- */
 
 int
-cl_console::get_in_fd(void)
+cl_console_base::interpret(char *cmd)
 {
-  if (flags & CONS_INACTIVE)
-    return(-2);
-  return(in?fileno(in):-1);
+  dd_printf("Unknown command\n");
+  return(0);
 }
 
-int
-cl_console::input_avail(void)
+void
+cl_console_base::set_id(int new_id)
 {
-  struct timeval tv;
-  UCSOCKET_T i;
-  
-  if ((i= get_in_fd()) < 0)
-    return(0);
-  fd_set s;
-  FD_ZERO(&s);
-  FD_SET(i, &s);
-  tv.tv_sec= tv.tv_usec= 0;
-  i= select(i+1, &s, NULL, NULL, &tv);
-  return(i);
+  char *s;
+
+  id= new_id;
+  set_name(s= format_string("console%d", id));
+  free(s);
 }
 
-char *
-cl_console::read_line(void)
+void
+cl_console_base::set_prompt(char *p)
 {
-  char *s= NULL;
+  if (prompt)
+    free(prompt);
+  if (p && *p)
+    prompt= strdup(p);
+  else
+    prompt= 0;
+}
 
-#ifdef HAVE_GETLINE
-  if (getline(&s, 0, in) < 0)
-    return(0);
-#elif defined HAVE_GETDELIM
-  size_t n= 30;
-  s= (char *)malloc(n);
-  if (getdelim(&s, &n, '\n', in) < 0)
+bool
+cl_console_base::input_active(void) const
+{
+  if (((flags & CONS_FROZEN) == 0 ||
+    (flags & CONS_INTERACTIVE) != 0) &&
+    (flags & CONS_INACTIVE) == 0)
     {
-      free(s);
-      return(0);
+      return true;
     }
-#elif defined HAVE_FGETS
-  s= (char *)malloc(300);
-  if (fgets(s, 300, in) == NULL)
-    {
-      free(s);
-      return(0);
-    }
-#endif
-  s[strlen(s)-1]= '\0';
-  if (s[strlen(s)-1] == '\r')
-    s[strlen(s)-1]= '\0';
-  flags&= ~CONS_PROMPT;
-  return(s);
+  else
+    return false;
 }
 
 int
-cl_console::proc_input(class cl_cmdset *cmdset)
+cl_console_base::proc_input(class cl_cmdset *cmdset)
 {
-  int retval= 0;
+  int retval = 0;
 
   un_redirect();
-  if (feof(in))
+  if (is_eof())
     {
-      fprintf(out, "End\n");
-      return(1);
+      dd_printf("End\n");
+      return 1;
     }
-  char *cmdstr= read_line();
+  char *cmdstr = read_line();
   if (!cmdstr)
-    return(1);
+    return 1;
   if (flags & CONS_FROZEN)
     {
       app->get_sim()->stop(resUSER);
       flags&= ~CONS_FROZEN;
-      retval= 0;
+      retval = 0;
     }
   else
     {
-      if (cmdstr &&
-          *cmdstr == '\004')
-        retval= 1;
+      if (cmdstr && *cmdstr == '\004')
+        retval = 1;
       else
         {
           class cl_cmdline *cmdline= 0;
-          class cl_cmd *cm= 0;
+          class cl_cmd *cm = 0;
           if (flags & CONS_ECHO)
             dd_printf("%s\n", cmdstr);
           cmdline= new cl_cmdline(app, cmdstr, this);
@@ -516,9 +314,9 @@ cl_console::proc_input(class cl_cmdset *cmdset)
               accept_last() &&
               last_command)
             {
-              cm= last_command;
+              cm = last_command;
               delete cmdline;
-              cmdline= last_cmdline;
+              cmdline = last_cmdline;
             }
           else
             {
@@ -526,17 +324,17 @@ cl_console::proc_input(class cl_cmdset *cmdset)
               if (last_cmdline)
                 {
                   delete last_cmdline;
-                  last_cmdline= 0;
+                  last_cmdline = 0;
                 }
-              last_command= 0;
+              last_command = 0;
             }
           if (cm)
             {
               retval= cm->work(app, cmdline, this);
               if (cm->can_repeat)
                 {
-                  last_command= cm;
-                  last_cmdline= cmdline;
+                  last_command = cm;
+                  last_cmdline = cmdline;
                 }
               else
                 delete cmdline;
@@ -545,8 +343,8 @@ cl_console::proc_input(class cl_cmdset *cmdset)
             {
               class YY_cl_ucsim_parser_CLASS *pars;
               class cl_ucsim_lexer *lexer;
-              lexer= new cl_ucsim_lexer(cmdstr);
-              pars= new YY_cl_ucsim_parser_CLASS(lexer);
+              lexer = new cl_ucsim_lexer(cmdstr);
+              pars = new YY_cl_ucsim_parser_CLASS(lexer);
               pars->yyparse();
               delete cmdline;
               delete pars;
@@ -563,239 +361,29 @@ cl_console::proc_input(class cl_cmdset *cmdset)
   return(retval);
 }
 
-/*
- * Old version, sim->do_cmd() falls into this if it doesn't find a new
- * command object which can handle entered command
- */
-
-int
-cl_console::interpret(char *cmd)
-{
-  dd_printf("Unknown command\n");
-  return(0);
-}
-
-void
-cl_console::set_id(int new_id)
-{
-  char *s;
-
-  id= new_id;
-  set_name(s= format_string("console%d", id));
-  free(s);
-}
-
-void
-cl_console::set_prompt(char *p)
-{
-  if (prompt)
-    free(prompt);
-  if (p &&
-      *p)
-    prompt= strdup(p);
-  else
-    prompt= 0;
-}
-
-
-/*
- * This console listen on a socket and can accept connection requests
- */
-#ifdef SOCKET_AVAIL
-
-cl_listen_console::cl_listen_console(int serverport, class cl_app *the_app)
-{
-  app= the_app;
-  if ((sock= make_server_socket(serverport)) >= 0)
-    {
-      if (listen(sock, 10) < 0)
-        fprintf(stderr, "Listen on port %d: %s\n",
-                serverport, strerror(errno));
-    }
-  in= out= 0;
-}
-
-int
-cl_listen_console::get_in_fd(void)
-{
-  return(sock);
-}
-
-int
-cl_listen_console::proc_input(class cl_cmdset *cmdset)
-{
-  int newsock;
-  ACCEPT_SOCKLEN_T size;
-  struct sockaddr_in sock_addr;
-  class cl_commander *cmd;
-
-  cmd= app->get_commander();
-  size= sizeof(struct sockaddr); 
-  newsock= accept(sock, (struct sockaddr*)&sock_addr, &size);
-  if (newsock < 0)
-    {
-      perror("accept");
-      return(0);
-    }
-  if (!(in= fdopen(newsock, "r+")))
-    fprintf(stderr, "cannot open port for input\n");
-  if (!(out= fdopen(newsock, "w+")))
-    fprintf(stderr, "cannot open port for output\n");
-  class cl_console *c= cmd->mk_console(in, out);
-  c->flags|= CONS_INTERACTIVE;
-  cmd->add_console(c);
-  in= out= 0;
-  return(0);
-}
-
-#endif /* SOCKET_AVAIL */
-
-
-/*
- * Sub-console
- */
-
-cl_sub_console::cl_sub_console(class cl_console *the_parent,
-                               FILE *fin, FILE *fout, class cl_app *the_app):
-  cl_console(fin, fout, the_app)
-{
-  parent= the_parent;
-}
-
-cl_sub_console::~cl_sub_console(void)
-{
-  class cl_commander *c= app->get_commander();
-
-  if (parent && c)
-    {
-      c->activate_console(parent);
-    }
-}
-
-int
-cl_sub_console::init(void)
-{
-  class cl_commander *c= app->get_commander();
-
-  if (parent && c)
-    {
-      c->deactivate_console(parent);
-    }
-  cl_console::init();
-  flags|= CONS_ECHO;
-  return(0);
-}
-
 
 /*
  * Command interpreter
  *____________________________________________________________________________
  */
 
-cl_commander::cl_commander(class cl_app *the_app, class cl_cmdset *acmdset
-                           /*, class cl_sim *asim*/):
+cl_commander_base::cl_commander_base(class cl_app *the_app, class cl_cmdset *acmdset):
   cl_base()
 {
   app= the_app;
-  cons= new cl_list(1, 1, "consoles"); 
+  cons= new cl_list(1, 1, "consoles");
   actual_console= frozen_console= 0;
   cmdset= acmdset;
 }
 
-int
-cl_commander::init(void)
-{
-  class cl_optref console_on_option(this);
-  class cl_optref config_file_option(this);
-  class cl_optref port_number_option(this);
-  class cl_console *con;
-
-  console_on_option.init();
-  console_on_option.use("console_on");
-  config_file_option.init();
-  config_file_option.use("config_file");
-  port_number_option.init();
-
-  cl_base::init();
-  set_name("Commander");
-  
-  bool need_config= DD_TRUE;
-
-#ifdef SOCKET_AVAIL
-  if (port_number_option.use("port_number"))
-    add_console(mk_console(port_number_option.get_value((long)0)));
-#endif
-
-  /* The following code is commented out because it produces gcc warnings
-   * newcmd.cc: In member function `virtual int cl_commander::init()':
-   * newcmd.cc:785: warning: 'Config' might be used uninitialized in this function
-   * newcmd.cc:786: warning: 'cn' might be used uninitialized in this function
-   */
-  /*
-  char *Config= config_file_option.get_value(Config);
-  char *cn= console_on_option.get_value(cn);
-   */
-  /* Here shoud probably be something else, but is still better then the former code... */
-  char *Config= config_file_option.get_value("");
-  char *cn= console_on_option.get_value("");
-
-  if (cn)
-    {
-      add_console(con= mk_console(cn, cn));
-      exec_on(con, Config);
-      need_config= DD_FALSE;
-    }
-  if (cons->get_count() == 0)
-    {
-      add_console(con= mk_console(stdin, stdout));
-      exec_on(con, Config);
-      need_config= DD_FALSE;
-    }
-  if (need_config &&
-      Config &&
-      *Config)
-    {
-      FILE *fc= fopen(Config, "r");
-      if (!fc)
-        fprintf(stderr, "Can't open `%s': %s\n", Config, strerror(errno));
-      else
-        {
-          con= mk_console(fc, stderr);
-          con->flags|= CONS_NOWELCOME|CONS_ECHO;
-          add_console(con);
-        }
-    }
-  return(0);
-}
-
-cl_commander::~cl_commander(void)
+cl_commander_base::~cl_commander_base(void)
 {
   delete cons;
   delete cmdset;
 }
 
-class cl_console *
-cl_commander::mk_console(char *fin, char *fout)
-{
-  return(new cl_console(fin, fout, app));
-}
-
-class cl_console *
-cl_commander::mk_console(FILE *fin, FILE *fout)
-{
-  return(new cl_console(fin, fout, app));
-}
-
-#ifdef SOCKET_AVAIL
-class cl_console *
-cl_commander::mk_console(int portnumber)
-{
-  return(new cl_listen_console(portnumber, app));
-}
-#endif
-
 void
-cl_commander::add_console(class cl_console *console)
+cl_commander_base::add_console(class cl_console_base *console)
 {
   if (!console)
     return;
@@ -806,14 +394,14 @@ cl_commander::add_console(class cl_console *console)
 }
 
 void
-cl_commander::del_console(class cl_console *console)
+cl_commander_base::del_console(class cl_console_base *console)
 {
   cons->disconn(console);
   set_fd_set();
 }
 
 void
-cl_commander::activate_console(class cl_console *console)
+cl_commander_base::activate_console(class cl_console_base *console)
 {
   console->flags&= ~CONS_INACTIVE;
   //console->print_prompt();
@@ -821,54 +409,25 @@ cl_commander::activate_console(class cl_console *console)
 }
 
 void
-cl_commander::deactivate_console(class cl_console *console)
+cl_commander_base::deactivate_console(class cl_console_base *console)
 {
   console->flags|= CONS_INACTIVE;
   set_fd_set();
 }
-
-void
-cl_commander::set_fd_set(void)
-{
-  int i;
-
-  //fprintf(stderr, "** Setting fd set\n");  
-  FD_ZERO(&read_set);
-  fd_num= 0;
-  for (i= 0; i < cons->count; i++)
-    {
-      UCSOCKET_T fd;
-      class cl_console *c= (class cl_console*)(cons->at(i));
-      if ((fd= c->get_in_fd()) >= 0)
-        {
-          if ((c->flags & CONS_FROZEN) == 0 ||
-              (c->flags & CONS_INTERACTIVE) != 0)
-            {
-              FD_SET(fd, &read_set);
-              if (fd > fd_num)
-                fd_num= fd;
-            }
-        }
-      else
-        ;//fprintf(stderr, "** Skipping console %p\n",c);
-    }
-  fd_num++;
-}
-
 
 /*
  * Printing to all consoles
  */
 
 int
-cl_commander::all_printf(char *format, ...)
+cl_commander_base::all_printf(char *format, ...)
 {
   va_list ap;
   int i, ret= 0;
-  
+
   for (i= 0; i < cons->count; i++)
     {
-      class cl_console *c= (class cl_console*)(cons->at(i));
+      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
 
       va_start(ap, format);
       ret= c->cmd_do_print(format, ap);
@@ -878,13 +437,13 @@ cl_commander::all_printf(char *format, ...)
 }
 
 void
-cl_commander::prompt(void)
+cl_commander_base::prompt(void)
 {
   int i;
-  
+
   for (i= 0; i < cons->count; i++)
     {
-      class cl_console *c= (class cl_console*)(cons->at(i));
+      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
       c->print_prompt();
     }
 }
@@ -894,10 +453,10 @@ cl_commander::prompt(void)
  */
 
 int
-cl_commander::dd_printf(char *format, va_list ap)
+cl_commander_base::dd_printf(char *format, va_list ap)
 {
   int ret= 0;
-  class cl_console *con;
+  class cl_console_base *con;
 
   if (actual_console)
     {
@@ -919,7 +478,7 @@ cl_commander::dd_printf(char *format, va_list ap)
 }
 
 int
-cl_commander::dd_printf(char *format, ...)
+cl_commander_base::dd_printf(char *format, ...)
 {
   va_list ap;
   int ret= 0;
@@ -936,14 +495,14 @@ cl_commander::dd_printf(char *format, ...)
  */
 
 int
-cl_commander::debug(char *format, ...)
+cl_commander_base::debug(char *format, ...)
 {
   va_list ap;
   int i, ret= 0;
 
   for (i= 0; i < cons->count; i++)
     {
-      class cl_console *c= (class cl_console*)(cons->at(i));
+      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
       if (c->flags & CONS_DEBUG)
         {
           va_start(ap, format);
@@ -955,13 +514,13 @@ cl_commander::debug(char *format, ...)
 }
 
 int
-cl_commander::debug(char *format, va_list ap)
+cl_commander_base::debug(char *format, va_list ap)
 {
   int i, ret= 0;
 
   for (i= 0; i < cons->count; i++)
     {
-      class cl_console *c= (class cl_console*)(cons->at(i));
+      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
       if (c->flags & CONS_DEBUG)
         {
           ret= c->cmd_do_print(format, ap);
@@ -971,14 +530,14 @@ cl_commander::debug(char *format, va_list ap)
 }
 
 int
-cl_commander::flag_printf(int iflags, char *format, ...)
+cl_commander_base::flag_printf(int iflags, char *format, ...)
 {
   va_list ap;
   int i, ret= 0;
 
   for (i= 0; i < cons->count; i++)
     {
-      class cl_console *c= (class cl_console*)(cons->at(i));
+      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
       if ((c->flags & iflags) == iflags)
         {
           va_start(ap, format);
@@ -990,75 +549,21 @@ cl_commander::flag_printf(int iflags, char *format, ...)
 }
 
 int
-cl_commander::input_avail(void)
+cl_commander_base::input_avail_on_frozen(void)
 {
-  struct timeval tv;
-  int i;
-
-  tv.tv_sec= tv.tv_usec= 0;
-  active_set= read_set;
-  i= select(fd_num, &active_set, NULL, NULL, &tv);
-  return(i);
-}
-
-int
-cl_commander::input_avail_on_frozen(void)
-{
-  int fd;
-
-  if (!frozen_console)
-    return(0);
-  if ((fd= frozen_console->get_in_fd()) >= 0 &&
-      !isatty(fd))
+  if (!frozen_console || frozen_console->is_tty())
     return(0);
   return(frozen_console->input_avail());
 }
 
-int
-cl_commander::wait_input(void)
-{
-  int i;
-
-  active_set= read_set;
-  prompt();
-  i= select(fd_num, &active_set, NULL, NULL, NULL);
-  return(i);
-}
-
-int
-cl_commander::proc_input(void)
-{
-  for (int j = 0; j < cons->count; j++)
-    {
-      class cl_console *c = (class cl_console*)(cons->at(j));
-
-      int fd = c->get_in_fd();
-      if (fd >= 0 && FD_ISSET(fd, &active_set))
-        {
-          actual_console = c;
-          int retval = c->proc_input(cmdset);
-          if (retval)
-            {
-              del_console(c);
-              delete c;
-            }
-          actual_console = 0;
-          return(0 == cons->count);
-        }
-    }
-  return 0;
-}
-
 void
-cl_commander::exec_on(class cl_console *cons, char *file_name)
+cl_commander_base::exec_on(class cl_console_base *cons, char *file_name)
 {
-  FILE *fi= fopen(file_name, "r");
-
-  if (!cons ||
-      !fi)
+  if (!cons || !file_name || !fopen(file_name, "r"))
     return;
-  class cl_console *subcon= cons->clone_for_exec(file_name);
-  subcon->flags|= CONS_NOWELCOME;
+
+  class cl_console_base *subcon = cons->clone_for_exec(file_name);
+  subcon->flags |= CONS_NOWELCOME;
   add_console(subcon);
 }
 

@@ -44,13 +44,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_timer_cmd::do_work(class cl_sim *sim,
-//		      class cl_cmdline *cmdline, class cl_console *con)
+//                    class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_timer_cmd)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   
   if (!params[0])
     {
@@ -62,11 +62,11 @@ COMMAND_DO_WORK_UC(cl_timer_cmd)
       as_nr= DD_TRUE;
       id_nr= params[0]->value.number;
       if (id_nr <= 0)
-	{
-	  con->dd_printf("Error: "
-			 "Timer id must be greater than zero or a string\n");
-	  return(DD_TRUE);
-	}
+        {
+          con->dd_printf("Error: "
+                         "Timer id must be greater than zero or a string\n");
+          return(DD_TRUE);
+        }
       ticker= uc->get_counter(id_nr);
     }
   else
@@ -87,12 +87,12 @@ COMMAND_DO_WORK_UC(cl_timer_cmd)
  */
 
 COMMAND_DO_WORK_UC(cl_timer_add_cmd)
-  //add(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console *con)
+  //add(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   long dir= +1, in_isr= 0;
 
   if (cl_timer_cmd::do_work(uc, cmdline, con))
@@ -100,21 +100,21 @@ COMMAND_DO_WORK_UC(cl_timer_add_cmd)
   if (ticker)
     {
       if (!as_nr)
-	con->dd_printf("Error: Timer \"%s\" already exists\n", id_str);
+        con->dd_printf("Error: Timer \"%s\" already exists\n", id_str);
       else
-	con->dd_printf("Error: Timer %d already exists\n", id_nr);
+        con->dd_printf("Error: Timer %d already exists\n", id_nr);
       return(DD_FALSE);
     }
 
   if (cmdline->nuof_params() > 0)
     {
       if (cmdline->syntax_match(uc, NUMBER))
-	dir= params[0]->value.number;
+        dir= params[0]->value.number;
       else if (cmdline->syntax_match(uc, NUMBER NUMBER))
-	{
-	  dir= params[0]->value.number;
-	  in_isr= params[1]->value.number;
-	}
+        {
+          dir= params[0]->value.number;
+          in_isr= params[1]->value.number;
+        }
     }
 
   if (!as_nr)
@@ -138,16 +138,16 @@ COMMAND_DO_WORK_UC(cl_timer_add_cmd)
  */
 
 COMMAND_DO_WORK_UC(cl_timer_delete_cmd)
-  //del(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console *con)
+  //del(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console_base *con)
 {
   if (cl_timer_cmd::do_work(uc, cmdline, con))
     return(DD_FALSE);
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Timer \"%s\" does not exist\n", id_str);
+        con->dd_printf("Timer \"%s\" does not exist\n", id_str);
       else
-	con->dd_printf("Timer %d does not exist\n", id_nr);
+        con->dd_printf("Timer %d does not exist\n", id_nr);
       return(DD_FALSE);
     }
   if (!as_nr)
@@ -165,12 +165,12 @@ COMMAND_DO_WORK_UC(cl_timer_delete_cmd)
  */
 
 COMMAND_DO_WORK_UC(cl_timer_get_cmd)
-  //get(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console *con)
+  //get(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console_base *con)
 {
   if (cmdline->nuof_params())
     {
       if (cl_timer_cmd::do_work(uc, cmdline, con))
-	return(DD_FALSE);
+        return(DD_FALSE);
     }
   else
     ticker= 0;
@@ -182,11 +182,11 @@ COMMAND_DO_WORK_UC(cl_timer_get_cmd)
       uc->isr_ticks->dump(0, uc->xtal, con);
       uc->idle_ticks->dump(0, uc->xtal, con);
       for (id_nr= 0; id_nr < uc->counters->count; id_nr++)
-	{
-	  ticker= uc->get_counter(id_nr);
-	  if (ticker)
-	    ticker->dump(id_nr, uc->xtal, con);
-	}
+        {
+          ticker= uc->get_counter(id_nr);
+          if (ticker)
+            ticker->dump(id_nr, uc->xtal, con);
+        }
     }
 
   return(DD_FALSE);
@@ -199,16 +199,16 @@ COMMAND_DO_WORK_UC(cl_timer_get_cmd)
  */
 
 COMMAND_DO_WORK_UC(cl_timer_run_cmd)
-  //run(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console *con)
+  //run(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console_base *con)
 {
   if (cl_timer_cmd::do_work(uc, cmdline, con))
     return(DD_FALSE);
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Timer %d does not exist\n", id_str);
+        con->dd_printf("Timer %d does not exist\n", id_str);
       else
-	con->dd_printf("Timer %d does not exist\n", id_nr);
+        con->dd_printf("Timer %d does not exist\n", id_nr);
       return(0);
     }
   ticker->options|= TICK_RUN;
@@ -223,7 +223,7 @@ COMMAND_DO_WORK_UC(cl_timer_run_cmd)
  */
 
 COMMAND_DO_WORK_UC(cl_timer_stop_cmd)
-  //stop(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console *con)
+  //stop(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console_base *con)
 {
   if (cl_timer_cmd::do_work(uc, cmdline, con))
     return(DD_FALSE);
@@ -231,9 +231,9 @@ COMMAND_DO_WORK_UC(cl_timer_stop_cmd)
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Timer %d does not exist\n", id_str);
+        con->dd_printf("Timer %d does not exist\n", id_str);
       else
-	con->dd_printf("Timer %d does not exist\n", id_nr);
+        con->dd_printf("Timer %d does not exist\n", id_nr);
       return(DD_FALSE);
     }
   ticker->options&= ~TICK_RUN;
@@ -249,21 +249,21 @@ COMMAND_DO_WORK_UC(cl_timer_stop_cmd)
  */
 
 COMMAND_DO_WORK_UC(cl_timer_value_cmd)
-  //val(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console *con)
+  //val(class cl_uc *uc, class cl_cmdline *cmdline, class cl_console_base *con)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   
   if (cl_timer_cmd::do_work(uc, cmdline, con))
     return(DD_FALSE);
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Error: Timer %d does not exist\n", id_str);
+        con->dd_printf("Error: Timer %d does not exist\n", id_str);
       else
-	con->dd_printf("Error: Timer %d does not exist\n", id_nr);
+        con->dd_printf("Error: Timer %d does not exist\n", id_nr);
       return(DD_FALSE);
     }
   if (params[2])

@@ -2,7 +2,8 @@
  * Simulator of microcontrollers (cmd.src/cmdutil.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ * Copyright (C) 2006, Borut Razem - borut.razem@siol.net
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -30,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <assert.h>
 #include <sys/types.h>
 #ifdef SOCKET_AVAIL
 # include HEADER_SOCKET
@@ -38,11 +40,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #  include <arpa/inet.h>
 # endif
 #endif
+#ifdef _WIN32
+#include <malloc.h>
+#endif
+
 #include "i_string.h"
 
 #include "stypes.h"
 #include "globals.h"
 #include "uccl.h"
+#include "cmdutil.h"
 
 
 /*
@@ -50,12 +57,59 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 #ifdef SOCKET_AVAIL
+#ifdef _WIN32
+static void
+init_winsock(void)
+{
+  static bool is_initialized = false;
+
+  if (!is_initialized)
+    {
+      WSADATA wsaData;
+
+      // Initialize Winsock
+      int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+      if (iResult != 0)
+        {
+          printf("WSAStartup failed: %d\n", iResult);
+          exit(1);
+        }
+    }
+}
+
+SOCKET
+make_server_socket(unsigned short int port)
+{
+  init_winsock();
+
+  struct sockaddr_in name;
+
+  /* Create the socket. */
+  SOCKET sock = WSASocket(PF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0);
+  if (INVALID_SOCKET == sock)
+    {
+      fprintf(stderr, "socket: %d\n", WSAGetLastError());
+      return INVALID_SOCKET;
+    }
+
+  name.sin_family     = AF_INET;
+  name.sin_port       = htons(port);
+  name.sin_addr.s_addr= htonl(INADDR_ANY);
+  if (SOCKET_ERROR == bind(sock, (struct sockaddr *)&name, sizeof(name)))
+    {
+      fprintf(stderr, "bind: %d\n", WSAGetLastError());
+      return INVALID_SOCKET;
+    }
+
+  return sock;
+}
+#else
 int
 make_server_socket(unsigned short int port)
 {
   int sock, i;
   struct sockaddr_in name;
-     
+
   /* Create the socket. */
   sock= socket(PF_INET, SOCK_STREAM, 0);
   if (sock < 0)
@@ -63,7 +117,7 @@ make_server_socket(unsigned short int port)
       perror("socket");
       return(0);
     }
-     
+
   /* Give the socket a name. */
   i= 1;
   if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&i, sizeof(i)) < 0)
@@ -82,25 +136,142 @@ make_server_socket(unsigned short int port)
   return(sock);
 }
 #endif
+#endif
 
-
-/*
- * Printing out an integer in binary format
- */
-
-/*void
-print_bin(long data, int bits, class cl_console *con)
+#if _WIN32
+enum e_handle_type
+get_handle_type(HANDLE handle)
 {
-  long mask= 1;
+  DWORD file_type = GetFileType(handle);
 
-  mask= mask << ((bits >= 1)?(bits-1):0);
-  while (bits--)
+  switch (file_type)
     {
-      con->printf("%c", (data&mask)?'1':'0');
-      mask>>= 1;
-    }
-}*/
+    case FILE_TYPE_CHAR:
+      {
+              DWORD err;
 
+        if (!ClearCommError(handle, &err, NULL))
+          { 
+            if (ERROR_INVALID_HANDLE == GetLastError())
+              return CH_CONSOLE;
+          }
+      }
+      return CH_SERIAL;
+
+    case FILE_TYPE_DISK:
+      return CH_FILE;
+    }
+
+  char sockbuf[256];
+  int optlen = sizeof(sockbuf);
+
+  if (SOCKET_ERROR != getsockopt((SOCKET)handle, SOL_SOCKET, SO_TYPE, sockbuf, &optlen) ||
+    WSAENOTSOCK != WSAGetLastError())
+    return CH_SOCKET;
+
+  assert(false);
+  return CH_UNDEF;
+}
+
+bool
+input_avail(HANDLE handle, e_handle_type type)
+{
+  if (CH_UNDEF == type)
+      type = get_handle_type(handle);
+
+  switch (type)
+    {
+    case CH_SOCKET:
+      {
+        struct timeval tv = {0, 0};
+
+        assert(INVALID_HANDLE_VALUE != handle);
+
+        fd_set s;
+        FD_ZERO(&s);
+        FD_SET((SOCKET)handle, &s);
+
+        int ret = select(0, &s, NULL, NULL, &tv);
+        if (SOCKET_ERROR == ret)
+          fprintf(stderr, "Can't select: %d\n", WSAGetLastError());
+
+        return ret != SOCKET_ERROR && ret != 0;
+      }
+
+    case CH_FILE:
+      return true;
+
+    case CH_CONSOLE:
+      {
+        PINPUT_RECORD pIRBuf;
+        DWORD NumPending;
+        DWORD NumPeeked;
+
+        /*
+         * Peek all pending console events
+         */
+        if (INVALID_HANDLE_VALUE == handle ||
+          !GetNumberOfConsoleInputEvents(handle, &NumPending) ||
+          NumPending == 0 ||
+          NULL == (pIRBuf = (PINPUT_RECORD)_alloca(NumPending * sizeof(INPUT_RECORD))))
+          return FALSE;
+
+        if (PeekConsoleInput(handle, pIRBuf, NumPending, &NumPeeked) &&
+          NumPeeked != 0L &&
+          NumPeeked <= NumPending)
+          {
+
+            /*
+             * Scan all of the peeked events to determine if any is a key event
+             * which should be recognized.
+             */
+            for ( ; NumPeeked > 0 ; NumPeeked--, pIRBuf++ )
+              {
+                if (KEY_EVENT == pIRBuf->EventType &&
+                  pIRBuf->Event.KeyEvent.bKeyDown &&
+                  pIRBuf->Event.KeyEvent.uChar.AsciiChar)
+                  return true;
+              }
+          }
+
+        return false;
+      }
+
+    case CH_SERIAL:
+      {
+        DWORD err;
+        COMSTAT comStat;
+
+        bool res = ClearCommError(handle, &err, &comStat);
+        assert(res);
+
+        return res ? comStat.cbInQue > 0 : false;
+      }
+
+    default:
+      assert(false);
+      return false;
+    }
+}
+#else
+bool
+input_avail(UCSOCKET_T fd)
+{
+  assert(0 <= fd);
+
+  fd_set s;
+  FD_ZERO(&s);
+  FD_SET(fd, &s);
+
+  struct timeval tv = {0, 0};
+
+  int i = select(fd + 1, &s, NULL, NULL, &tv);
+  if (i < 0)
+    perror("select");
+
+  return i > 0;
+}
+#endif
 
 /*
  * Searching for a name in the specified table
@@ -145,7 +316,7 @@ interpret_bitname(char *name, class cl_uc *uc,
   char *sym, bitnumstr[2];
   struct name_entry *ne;
   int bitnum, i;
-  
+
   if ((dot= strchr(name, '.')) != NULL)
     {
       *dot++= '\0';

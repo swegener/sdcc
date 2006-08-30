@@ -83,7 +83,7 @@ public:
                        int *mnemonic);
 
   virtual char *disass(t_addr addr, char *sep);
-  virtual void print_regs(class cl_console *con);
+  virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
   virtual int get_reg(int word_flag, unsigned int index);

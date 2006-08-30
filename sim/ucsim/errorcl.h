@@ -54,10 +54,10 @@ protected:
   enum error_on_off on;
 public:
   cl_error_class(enum error_type typ, char *aname,
-		 enum error_on_off be_on= ERROR_PARENT);
+                 enum error_on_off be_on= ERROR_PARENT);
   cl_error_class(enum error_type typ, char *aname,
-		 class cl_error_class *parent,
-		 enum error_on_off be_on= ERROR_PARENT);
+                 class cl_error_class *parent,
+                 enum error_on_off be_on= ERROR_PARENT);
   
   enum error_on_off get_on(void) { return(on); }
   void set_on(enum error_on_off val);
@@ -99,15 +99,15 @@ private:
   }
 };
 
-class cl_commander; //forward
+class cl_commander_base; //forward
 
 class cl_error: public cl_base
 {
 protected:
   class cl_error_class *classification;
 public:
-  bool inst;	// Occured during instruction execution
-  t_addr PC;	// Address of the instruction
+  bool inst;    // Occured during instruction execution
+  t_addr PC;    // Address of the instruction
 public:
   cl_error(void);
   virtual ~cl_error(void);
@@ -119,7 +119,7 @@ public:
   virtual bool is_on(void);
   virtual class cl_error_class *get_class(void) { return(classification); }
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
   virtual char *get_type_name();
 };
 

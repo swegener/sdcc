@@ -1,3 +1,46 @@
+2006-08-30 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/cmd.src/newcmdposix.cc, sim/ucsim/cmd.src/newcmdposixcl.h,
+	  sim/ucsim/cmd.src/newcmdwin32.cc, sim/ucsim/cmd.src/newcmdwin32cl.h,
+	  sim/ucsim/app.cc, sim/ucsim/appcl.h, sim/ucsim/configure,
+	  sim/ucsim/configure.in, sim/ucsim/ddconfig_in.h, sim/ucsim/error.cc,
+	  sim/ucsim/errorcl.h, sim/ucsim/option.cc, sim/ucsim/optioncl.h,
+	  sim/ucsim/utils.cc, sim/ucsim/utils.h, sim/ucsim/cmd.src/Makefile.in,
+	  sim/ucsim/avr.src/avr.cc, sim/ucsim/avr.src/avrcl.h,
+	  sim/ucsim/cmd.src/bp.cc, sim/ucsim/cmd.src/bpcl.h,
+	  sim/ucsim/cmd.src/cmdconf.cc, sim/ucsim/cmd.src/cmdgui.cc,
+	  sim/ucsim/cmd.src/cmdmem.cc, sim/ucsim/cmd.src/cmdset.cc,
+	  sim/ucsim/cmd.src/cmdsetcl.h, sim/ucsim/cmd.src/cmdstat.cc,
+	  sim/ucsim/cmd.src/cmduc.cc, sim/ucsim/cmd.src/cmduccl.h,
+	  sim/ucsim/cmd.src/cmdutil.cc, sim/ucsim/cmd.src/cmdutil.h,
+	  sim/ucsim/cmd.src/command.cc, sim/ucsim/cmd.src/commandcl.h,
+	  sim/ucsim/cmd.src/get.cc, sim/ucsim/cmd.src/getcl.h,
+	  sim/ucsim/cmd.src/info.cc, sim/ucsim/cmd.src/newcmd.cc,
+	  sim/ucsim/cmd.src/newcmdcl.h, sim/ucsim/cmd.src/set.cc,
+	  sim/ucsim/cmd.src/show.cc, sim/ucsim/cmd.src/timer.cc,
+	  sim/ucsim/hc08.src/hc08.cc, sim/ucsim/hc08.src/hc08cl.h,
+	  sim/ucsim/s51.src/Makefile.in, sim/ucsim/s51.src/interrupt.cc,
+	  sim/ucsim/s51.src/interruptcl.h, sim/ucsim/s51.src/pca.cc,
+	  sim/ucsim/s51.src/pcacl.h, sim/ucsim/s51.src/port.cc,
+	  sim/ucsim/s51.src/portcl.h, sim/ucsim/s51.src/serial.cc,
+	  sim/ucsim/s51.src/serialcl.h, sim/ucsim/s51.src/timer0.cc,
+	  sim/ucsim/s51.src/timer0cl.h, sim/ucsim/s51.src/timer1.cc,
+	  sim/ucsim/s51.src/timer1cl.h, sim/ucsim/s51.src/timer2.cc,
+	  sim/ucsim/s51.src/timer2cl.h, sim/ucsim/s51.src/uc390.cc,
+	  sim/ucsim/s51.src/uc390cl.h, sim/ucsim/s51.src/uc390hw.cc,
+	  sim/ucsim/s51.src/uc390hwcl.h, sim/ucsim/s51.src/uc51.cc,
+	  sim/ucsim/s51.src/uc51cl.h, sim/ucsim/s51.src/wdt.cc,
+	  sim/ucsim/s51.src/wdtcl.h, sim/ucsim/sim.src/hw.cc,
+	  sim/ucsim/sim.src/hwcl.h, sim/ucsim/sim.src/mem.cc,
+	  sim/ucsim/sim.src/memcl.h, sim/ucsim/sim.src/obsolete.cc,
+	  sim/ucsim/sim.src/obsolete.h, sim/ucsim/sim.src/sim.cc,
+	  sim/ucsim/sim.src/simcl.h, sim/ucsim/sim.src/stack.cc,
+	  sim/ucsim/sim.src/stackcl.h, sim/ucsim/sim.src/test_mem_speed.cc,
+	  sim/ucsim/sim.src/uc.cc, sim/ucsim/sim.src/uccl.h,
+	  sim/ucsim/xa.src/xa.cc, sim/ucsim/xa.src/xacl.h,
+	  sim/ucsim/z80.src/z80.cc, sim/ucsim/z80.src/z80cl.h:
+	  ucsim WIN32 native port
+
 2006-08-30 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* doc/sdccman.lyx: added note on dynamic memory heap initialization

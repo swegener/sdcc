@@ -50,7 +50,7 @@ public:
   virtual int do_mode3(int cycles);
   //virtual void overflow(void);
 
-  virtual void print_info(class cl_console *con);
+  virtual void print_info(class cl_console_base *con);
 };
 
 

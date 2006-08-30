@@ -46,30 +46,30 @@ cl_port::init(void)
     case 0: addr_p= P0; break;
     case 1:
       {
-	addr_p= P1;
-	/*class cl_hw *hw;
-	if ((hw= uc->get_hw(HW_TIMER, 2, 0)))
-	hws_to_inform->add(hw);*/
-	make_partner(HW_TIMER, 2);
-	make_partner(HW_PCA, 0);
-	break;
+        addr_p= P1;
+        /*class cl_hw *hw;
+        if ((hw= uc->get_hw(HW_TIMER, 2, 0)))
+        hws_to_inform->add(hw);*/
+        make_partner(HW_TIMER, 2);
+        make_partner(HW_PCA, 0);
+        break;
       }
     case 2: addr_p= P2; break;
     case 3:
       {
-	addr_p= P3;
-	//class cl_hw *hw;
-	/*if ((hw= uc->get_hw(HW_TIMER, 0, 0)))
-	  hws_to_inform->add(hw);
-	if ((hw= uc->get_hw(HW_TIMER, 1, 0)))
-	  hws_to_inform->add(hw);
-	if ((hw= uc->get_hw(HW_DUMMY, 0, 0)))
-	hws_to_inform->add(hw);*/
-	make_partner(HW_TIMER, 0);
-	make_partner(HW_TIMER, 1);
-	make_partner(HW_INTERRUPT, 0);
-	make_partner(HW_DUMMY, 0);
-	break;
+        addr_p= P3;
+        //class cl_hw *hw;
+        /*if ((hw= uc->get_hw(HW_TIMER, 0, 0)))
+          hws_to_inform->add(hw);
+        if ((hw= uc->get_hw(HW_TIMER, 1, 0)))
+          hws_to_inform->add(hw);
+        if ((hw= uc->get_hw(HW_DUMMY, 0, 0)))
+        hws_to_inform->add(hw);*/
+        make_partner(HW_TIMER, 0);
+        make_partner(HW_TIMER, 1);
+        make_partner(HW_INTERRUPT, 0);
+        make_partner(HW_DUMMY, 0);
+        break;
       }
     default: addr_p= P0; return(1);
     }
@@ -109,7 +109,7 @@ cl_port::write(class cl_memory_cell *cell, t_mem *val)
 }
 
 void
-cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console *con)
+cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   struct ev_port_changed ep;
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
@@ -127,12 +127,12 @@ cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console *con)
       ep.new_value= cell_p->get();
       ep.new_pins= port_pins;
       if (ep.pins != ep.new_pins)
-	inform_partners(EV_PORT_CHANGED, &ep);
+        inform_partners(EV_PORT_CHANGED, &ep);
     }
   else
     {
       con->dd_printf("set hardware port[%d] pins_value\n                   Set port pins\n",
-		     id);
+                     id);
       value= 0;
     }
 }
@@ -146,7 +146,7 @@ cl_port::mem_cell_changed(class cl_m *mem, t_addr addr)
 }*/
 
 void
-cl_port::print_info(class cl_console *con)
+cl_port::print_info(class cl_console_base *con)
 {
   uchar data;
 
@@ -155,19 +155,19 @@ cl_port::print_info(class cl_console *con)
   con->dd_printf("P%d    ", id);
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Value in SFR register)\n",
-		 data, data, isprint(data)?data:'.');
+                 data, data, isprint(data)?data:'.');
 
   data= /*uc->*/port_pins/*[id]*/;
   con->dd_printf("Pin%d  ", id);
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Output of outside circuits)\n",
-		 data, data, isprint(data)?data:'.');
+                 data, data, isprint(data)?data:'.');
 
   data= cell_p->read();
   con->dd_printf("Port%d ", id);
   con->print_bin(data, 8);
   con->dd_printf(" 0x%02x %3d %c (Value on the port pins)\n",
-		 data, data, isprint(data)?data:'.');
+                 data, data, isprint(data)?data:'.');
 }
 
 

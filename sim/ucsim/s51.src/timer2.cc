@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 cl_timer2::cl_timer2(class cl_uc *auc, int aid, char *aid_string,
-		     int afeatures):
+                     int afeatures):
   cl_timer0(auc, /*2*/aid, /*"timer2"*/aid_string)
 {
   features= afeatures;
@@ -44,7 +44,7 @@ cl_timer2::cl_timer2(class cl_uc *auc, int aid, char *aid_string,
   if (features & (t2_down|t2_clock_out))
     {
       register_cell(sfr, T2MOD, &cell_t2mod,
-		    wtd_restore_write);
+                    wtd_restore_write);
     }
 }
 
@@ -65,9 +65,9 @@ void
 cl_timer2::added_to_uc(void)
 {
   uc->it_sources->add(new cl_it_src(bmET2, T2CON, bmTF2, 0x002b, false,
-				    "timer #2 TF2", 7));
+                                    "timer #2 TF2", 7));
   exf2it= new cl_it_src(bmET2, T2CON, bmEXF2, 0x002b, false,
-			"timer #2 EXF2", 7);
+                        "timer #2 EXF2", 7);
   uc->it_sources->add(exf2it);
 }
 
@@ -80,20 +80,20 @@ cl_timer2::mem_cell_changed(class cl_mem *mem, t_addr addr)
   if (mem && sfr && mem == sfr)
     {
       switch (addr)
-	{
-	case T2CON:
-	  c= cell_tcon= sfr->get_cell(T2CON);
-	  break;
-	}
+        {
+        case T2CON:
+          c= cell_tcon= sfr->get_cell(T2CON);
+          break;
+        }
       if (c)
-	{
-	  t_mem d= c->get();
-	  write(c, &d);
-	}
+        {
+          t_mem d= c->get();
+          write(c, &d);
+        }
       if (addr == addr_tl)
-	cell_tl= sfr->get_cell(addr_tl);
+        cell_tl= sfr->get_cell(addr_tl);
       if (addr == addr_th)
-	cell_th= sfr->get_cell(addr_th);
+        cell_th= sfr->get_cell(addr_th);
       cell_rcap2l= sfr->get_cell(RCAP2L);
       cell_rcap2h= sfr->get_cell(RCAP2H);
     }
@@ -123,33 +123,33 @@ cl_timer2::write(class cl_memory_cell *cell, t_mem *val)
       CP_RL2= *val & mask_CP_RL2;
       EXEN2 = *val & bmEXEN2;
       if (!(RCLK || TCLK) &&
-	  !CP_RL2)
-	mode= T2MODE_RELOAD;
+          !CP_RL2)
+        mode= T2MODE_RELOAD;
       else if (!(RCLK || TCLK) &&
-	       CP_RL2)
-	mode= T2MODE_CAPTURE;
+               CP_RL2)
+        mode= T2MODE_CAPTURE;
       else if (RCLK || TCLK)
-	mode= T2MODE_BAUDRATE;
+        mode= T2MODE_BAUDRATE;
       else
-	mode= T2MODE_OFF;
+        mode= T2MODE_OFF;
       if (mode != oldmode)
-	inform_partners(EV_T2_MODE_CHANGED, val);
+        inform_partners(EV_T2_MODE_CHANGED, val);
     }
   else if (cell == cell_t2mod)
     {
       bit_dcen= (*val & bmDCEN) != 0;
       bit_t2oe= (*val & bmT2OE) != 0;
       if ((features & t2_down) &&
-	  bit_dcen &&
-	  mode == T2MODE_RELOAD)
-	{
-	  mode= T2MODE_DOWN;
-	  if (exf2it)
-	    exf2it->deactivate();
-	}
+          bit_dcen &&
+          mode == T2MODE_RELOAD)
+        {
+          mode= T2MODE_DOWN;
+          if (exf2it)
+            exf2it->deactivate();
+        }
       if ((features & t2_clock_out) &&
-	  bit_t2oe)
-	mode= T2MODE_CLKOUT;
+          bit_t2oe)
+        mode= T2MODE_CLKOUT;
     }
   if (mode != oldmode ||
       TR && !oldtr ||
@@ -207,12 +207,12 @@ cl_timer2::do_t2_baud(int cycles)
   while (cycles--)
     {
       if (!cell_tl->add(1))
-	if (!cell_th->add(1))
-	  {
-	    cell_th->set(cell_rcap2h->get());
-	    cell_tl->set(cell_rcap2l->get());
-	    inform_partners(EV_OVERFLOW, 0);
-	  }
+        if (!cell_th->add(1))
+          {
+            cell_th->set(cell_rcap2h->get());
+            cell_tl->set(cell_rcap2l->get());
+            inform_partners(EV_OVERFLOW, 0);
+          }
     }
   return(resGO);
 }
@@ -242,7 +242,7 @@ cl_timer2::do_t2_capture(int cycles)
   if (!cell_tl->add(1))
     {
       if (!cell_th->add(1))
-	cell_tcon->set_bit1(bmTF2);
+        cell_tcon->set_bit1(bmTF2);
     }
 }
 
@@ -271,11 +271,11 @@ cl_timer2::do_t2_reload(int cycles)
   if (!cell_tl->add(1))
     {
       if (!cell_th->add(1))
-	{
-	  cell_tcon->set_bit1(mask_TF);
-	  cell_th->set(cell_rcap2h->get());
-	  cell_tl->set(cell_rcap2l->get());
-	}
+        {
+          cell_tcon->set_bit1(mask_TF);
+          cell_th->set(cell_rcap2h->get());
+          cell_tl->set(cell_rcap2l->get());
+        }
     }
 }
 
@@ -294,39 +294,39 @@ cl_timer2::do_t2_down(int cycles)
     // UP
     while (cycles--)
       if (!cell_tl->add(1))
-	{
-	  if (!cell_th->add(1))
-	    {
-	      cell_tcon->set_bit1(mask_TF);
-	      cell_th->set(cell_rcap2h->get());
-	      cell_tl->set(cell_rcap2l->get());
-	      toggle= DD_TRUE;
-	    }
-	}
+        {
+          if (!cell_th->add(1))
+            {
+              cell_tcon->set_bit1(mask_TF);
+              cell_th->set(cell_rcap2h->get());
+              cell_tl->set(cell_rcap2l->get());
+              toggle= DD_TRUE;
+            }
+        }
   else
     // DOWN
     while (cycles--)
       {
-	t_mem l, h;
-	if ((l= cell_tl->add(-1)) == 0xff)
-	  h= cell_th->add(-1);
-	else
-	  h= cell_th->get();
-	if ((TYPE_UWORD)(h*256+l) <
-	    (TYPE_UWORD)(cell_rcap2h->get()*256+cell_rcap2l->get()))
-	  {
-	    cell_tcon->set_bit1(mask_TF);
-	    cell_th->set(0xff);
-	    cell_tl->set(0xff);
-	    toggle= DD_TRUE;
-	  }
+        t_mem l, h;
+        if ((l= cell_tl->add(-1)) == 0xff)
+          h= cell_th->add(-1);
+        else
+          h= cell_th->get();
+        if ((TYPE_UWORD)(h*256+l) <
+            (TYPE_UWORD)(cell_rcap2h->get()*256+cell_rcap2l->get()))
+          {
+            cell_tcon->set_bit1(mask_TF);
+            cell_th->set(0xff);
+            cell_tl->set(0xff);
+            toggle= DD_TRUE;
+          }
       }
   if (toggle &&
       sfr)
     {
       class cl_memory_cell *p1= sfr->get_cell(P1);
       if (p1)
-	p1->set(p1->get() ^ bmEXF2);
+        p1->set(p1->get() ^ bmEXF2);
     }
 }
 
@@ -350,20 +350,20 @@ cl_timer2::do_t2_clock_out(int cycles)
   while (cycles--)
     {
       if (!cell_tl->add(1))
-	if (!cell_th->add(1))
-	  {
-	    cell_th->set(cell_rcap2h->get());
-	    cell_tl->set(cell_rcap2l->get());
-	    inform_partners(EV_OVERFLOW, 0);
-	    if (!C_T &&
-		sfr)
-	      {
-		// toggle T2 on P1
-		class cl_memory_cell *p1= sfr->get_cell(P1);
-		if (p1)
-		  p1->set(p1->get() ^ bmT2);
-	      }
-	  }
+        if (!cell_th->add(1))
+          {
+            cell_th->set(cell_rcap2h->get());
+            cell_tl->set(cell_rcap2l->get());
+            inform_partners(EV_OVERFLOW, 0);
+            if (!C_T &&
+                sfr)
+              {
+                // toggle T2 on P1
+                class cl_memory_cell *p1= sfr->get_cell(P1);
+                if (p1)
+                  p1->set(p1->get() ^ bmT2);
+              }
+          }
     }
 }
 
@@ -379,34 +379,34 @@ cl_timer2::happen(class cl_hw *where, enum hw_event he, void *params)
       t_mem p1n= ep->new_pins & ep->new_value;
       t_mem p1o= ep->pins & ep->prev_value;
       if (!(p1n & mask_T) &&
-	  (p1o & mask_T))
-	T_edge++;
+          (p1o & mask_T))
+        T_edge++;
       if (!(p1n & bmT2EX) &&
-	  (p1o & bmT2EX))
-	t2ex_edge++;
+          (p1o & bmT2EX))
+        t2ex_edge++;
       bit_t2ex= p1n & bmT2EX;
     }
 }
 
 void
-cl_timer2::print_info(class cl_console *con)
+cl_timer2::print_info(class cl_console_base *con)
 {
   int t2con= cell_tcon->get();
 
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
-		 256*cell_th->get()+cell_tl->get());
+                 256*cell_th->get()+cell_tl->get());
   if (RCLK || TCLK)
     {
       con->dd_printf(" baud");
       if (RCLK)
-	con->dd_printf(" RCLK");
+        con->dd_printf(" RCLK");
       if (TCLK)
-	con->dd_printf(" TCLK");
+        con->dd_printf(" TCLK");
     }
   else
     con->dd_printf(" %s", (CP_RL2)?"capture":"reload");
   con->dd_printf(" 0x%04x",
-		 256*cell_rcap2h->get()+cell_rcap2l->get());
+                 256*cell_rcap2h->get()+cell_rcap2l->get());
   con->dd_printf(" %s", (C_T)?"counter":"timer");
   con->dd_printf(" %s", (TR)?"ON":"OFF");
   con->dd_printf(" irq=%c", (t2con&bmTF2)?'1':'0');

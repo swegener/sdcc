@@ -39,8 +39,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 cl_watched_cell::cl_watched_cell(class cl_address_space *amem, t_addr aaddr,
-				 class cl_memory_cell **astore,
-				 enum what_to_do_on_cell_change awtd)
+                                 class cl_memory_cell **astore,
+                                 enum what_to_do_on_cell_change awtd)
 {
   mem= amem;
   addr= aaddr;
@@ -50,13 +50,13 @@ cl_watched_cell::cl_watched_cell(class cl_address_space *amem, t_addr aaddr,
     {
       cell= mem->get_cell(addr);
       if (store)
-	*store= cell;
+        *store= cell;
     }
 }
 
 void
 cl_watched_cell::mem_cell_changed(class cl_address_space *amem, t_addr aaddr,
-				  class cl_hw *hw)
+                                  class cl_hw *hw)
 {
   if (mem &&
       mem == amem &&
@@ -64,19 +64,19 @@ cl_watched_cell::mem_cell_changed(class cl_address_space *amem, t_addr aaddr,
     {
       cell= mem->get_cell(addr);
       if (store &&
-	  (wtd & WTD_RESTORE))
-	*store= cell;
+          (wtd & WTD_RESTORE))
+        *store= cell;
       if (wtd & WTD_WRITE)
-	{
-	  t_mem d= cell->get();
-	  hw->write(cell, &d);
-	}
+        {
+          t_mem d= cell->get();
+          hw->write(cell, &d);
+        }
     }
 }
 
 void
 cl_watched_cell::address_space_added(class cl_address_space *amem,
-				     class cl_hw *hw)
+                                     class cl_hw *hw)
 {
 }
 
@@ -90,19 +90,19 @@ class cl_hw *hw)
     {
       cell= mem->get_cell(addr);
       if (store &&
-	  (wtd & WTD_RESTORE))
-	*store= cell;
+          (wtd & WTD_RESTORE))
+        *store= cell;
       if (wtd & WTD_WRITE)
-	{
-	  t_mem d= cell->get();
-	  hw->write(cell, &d);
-	}
+        {
+          t_mem d= cell->get();
+          hw->write(cell, &d);
+        }
     }
 }
 
 void
 cl_used_cell::address_space_added(class cl_address_space *amem,
-				  class cl_hw *hw)
+                                  class cl_hw *hw)
 {
 }
 
@@ -188,15 +188,15 @@ cl_hw::write(class cl_m *mem, t_addr addr, t_mem *val)
 }*/
 
 void
-cl_hw::set_cmd(class cl_cmdline *cmdline, class cl_console *con)
+cl_hw::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   con->dd_printf("Nothing to do\n");
 }
 
 class cl_memory_cell *
 cl_hw::register_cell(class cl_address_space *mem, t_addr addr,
-		     class cl_memory_cell **store,
-		     enum what_to_do_on_cell_change awtd)
+                     class cl_memory_cell **store,
+                     enum what_to_do_on_cell_change awtd)
 {
   class cl_watched_cell *wc;
   class cl_memory_cell *cell;
@@ -216,8 +216,8 @@ cl_hw::register_cell(class cl_address_space *mem, t_addr addr,
 
 class cl_memory_cell *
 cl_hw::use_cell(class cl_address_space *mem, t_addr addr,
-		class cl_memory_cell **store,
-		enum what_to_do_on_cell_change awtd)
+                class cl_memory_cell **store,
+                enum what_to_do_on_cell_change awtd)
 {
   class cl_watched_cell *wc;
   class cl_memory_cell *cell;
@@ -237,7 +237,7 @@ cl_hw::mem_cell_changed(class cl_address_space *mem, t_addr addr)
   for (i= 0; i < watched_cells->count; i++)
     {
       class cl_watched_cell *wc=
-	(class cl_watched_cell *)(watched_cells->at(i));
+        (class cl_watched_cell *)(watched_cells->at(i));
       wc->mem_cell_changed(mem, addr, this);
     }
 }
@@ -250,7 +250,7 @@ cl_hw::address_space_added(class cl_address_space *as)
   for (i= 0; i < watched_cells->count; i++)
     {
       class cl_watched_cell *wc=
-	dynamic_cast<class cl_watched_cell *>(watched_cells->object_at(i));
+        dynamic_cast<class cl_watched_cell *>(watched_cells->object_at(i));
       wc->address_space_added(as, this);
     }
 }
@@ -280,7 +280,7 @@ cl_hw::inform_partners(enum hw_event he, void *params)
 
 
 void
-cl_hw::print_info(class cl_console *con)
+cl_hw::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d]\n", id_string, id);
 }
@@ -366,12 +366,12 @@ cl_partner_hw::refresh(void)
     {
       // partner is already set
       if (partner != hw)
-	{
-	  // partner changed?
-	  partner= hw;
-	}
+        {
+          // partner changed?
+          partner= hw;
+        }
       else
-	partner= hw;
+        partner= hw;
     }
   partner= hw;
 }
@@ -385,12 +385,12 @@ cl_partner_hw::refresh(class cl_hw *new_hw)
       id == new_hw->id)
     {
       if (partner)
-	{
-	  // partner changed?
-	  partner= new_hw;
-	}
+        {
+          // partner changed?
+          partner= new_hw;
+        }
       else
-	partner= new_hw;
+        partner= new_hw;
     }
 }
 

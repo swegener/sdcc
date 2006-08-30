@@ -393,7 +393,7 @@ cl_uc390::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space(MEM_IXRAM_ID),
-			     chip, 0, 0xfff, 0);
+                             chip, 0, 0xfff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -419,7 +419,7 @@ void
 cl_uc390::clear_sfr(void)
 {
   cl_uc52::clear_sfr();
-	  /* SFR   value */
+          /* SFR   value */
   sfr->write(0x80, 0xff); /* P4     */
   sfr->write(0x81, 0x07); /* SP     */
   sfr->write(0x86, 0x04); /* DPS    */
@@ -622,7 +622,7 @@ cl_uc390::inst_jmp_Sa_dptr (uchar code)
     }
 
   PC = rom->validate_address(sfr->read (ph) * 256 + sfr->read (pl) +
-			     acc->read());
+                             acc->read());
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     PC += sfr->read (px) * 256*256;
 
@@ -695,11 +695,11 @@ cl_uc390::inst_movc_a_Sa_dptr (uchar code)
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     acc->write (rom->read ((sfr->read (px) * 256*256 +
-			    sfr->read (ph) * 256 + sfr->read (pl) +
+                            sfr->read (ph) * 256 + sfr->read (pl) +
                 acc->read())));
   else
     acc->write (rom->read ((sfr->read (ph) * 256 + sfr->read (pl) +
-			    acc->read())));
+                            acc->read())));
 
   if (dps & 0x20)                      /* auto-switch dptr */
     sfr->write (DPS, dps ^ 1);  /* toggle dual-dptr switch */
@@ -975,14 +975,14 @@ cl_uc390::inst_lcall (uchar code, uint addr, bool intr)
       class cl_stack_op *so;
       if (addr)
         {
-	  PC = addr;
-	  so= new cl_stack_intr(instPC, PC, pushed, sp_before, sfr->get(SP));
-	}
+          PC = addr;
+          so= new cl_stack_intr(instPC, PC, pushed, sp_before, sfr->get(SP));
+        }
       else
         {
-	  PC = h * 256 + l;
-	  so= new cl_stack_call(instPC, PC, pushed, sp_before, sfr->get(SP));
-	}
+          PC = h * 256 + l;
+          so= new cl_stack_call(instPC, PC, pushed, sp_before, sfr->get(SP));
+        }
       so->init();
       stack_write(so);
     }
@@ -1129,21 +1129,21 @@ cl_uc390::disass (t_addr addr, char *sep)
                 sprintf (temp, "%02"_M_"x", rom->get (addr + 2));
               break;
             case 'b': // bitaddr at 2nd byte
-	      {
-		t_addr ba = rom->get (addr+1);
-		if (get_name (ba, bit_tbl(), temp))
-		  break;
-		if (get_name ((ba<128) ? ((ba/8)+32) : (ba&0xf8), sfr_tbl(), temp))
-		  {
-		    strcat (temp, ".");
-		    sprintf (c, "%1"_M_"d", ba & 0x07);
-		    strcat (temp, c);
-		    break;
-		  }
-		sprintf (temp, "%02x.%"_M_"d", (ba<128) ? ((ba/8)+32) : (ba&0xf8),
-		 	 ba & 0x07);
-		break;
-	      }
+              {
+                t_addr ba = rom->get (addr+1);
+                if (get_name (ba, bit_tbl(), temp))
+                  break;
+                if (get_name ((ba<128) ? ((ba/8)+32) : (ba&0xf8), sfr_tbl(), temp))
+                  {
+                    strcat (temp, ".");
+                    sprintf (c, "%1"_M_"d", ba & 0x07);
+                    strcat (temp, c);
+                    break;
+                  }
+                sprintf (temp, "%02x.%"_M_"d", (ba<128) ? ((ba/8)+32) : (ba&0xf8),
+                         ba & 0x07);
+                break;
+              }
             case 'r': // rel8 address at 2nd byte
               sprintf (temp, "%04"_A_"x",
                        t_addr (addr + 2 + (signed char) (rom->get (addr + 1))));
@@ -1195,7 +1195,7 @@ cl_uc390::disass (t_addr addr, char *sep)
 }
 
 void
-cl_uc390::print_regs (class cl_console *con)
+cl_uc390::print_regs (class cl_console_base *con)
 {
   t_addr start;
   t_mem data;
@@ -1211,38 +1211,38 @@ cl_uc390::print_regs (class cl_console *con)
   start = sfr->get (PSW) & 0x18;
   data = iram->get (iram->get (start));
   con->dd_printf("%06x %02x %c",
-		  iram->get (start), data, isprint (data) ? data : '.');
+                  iram->get (start), data, isprint (data) ? data : '.');
   con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x",
-		 sfr->get (ACC), sfr->get (ACC),
-		 isprint (sfr->get (ACC)) ?
-		 (sfr->get (ACC)) : '.', sfr->get (B));
+                 sfr->get (ACC), sfr->get (ACC),
+                 isprint (sfr->get (ACC)) ?
+                 (sfr->get (ACC)) : '.', sfr->get (B));
   eram2xram ();
   data = get_mem (MEM_XRAM_ID,
                   sfr->get (DPX) * 256*256 + sfr->get (DPH) * 256 + sfr->get (DPL));
   con->dd_printf ("   DPTR= 0x%02x%02x%02x @DPTR= 0x%02x %3d %c\n",
-		  sfr->get (DPX), sfr->get (DPH), sfr->get (DPL),
-		  data, data, isprint (data) ? data : '.');
+                  sfr->get (DPX), sfr->get (DPH), sfr->get (DPL),
+                  data, data, isprint (data) ? data : '.');
   data = iram->get (iram->get (start + 1));
   con->dd_printf ("%06x %02x %c", iram->get (start + 1), data,
-		  isprint (data) ? data : '.');
+                  isprint (data) ? data : '.');
   data= sfr->get (PSW);
   con->dd_printf ("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c    ",
-		  data,
-		  (data & bmCY) ? '1' : '0', (data & bmAC) ? '1' : '0',
-		  (data & bmOV) ? '1' : '0', (data & bmP ) ? '1' : '0'
-		  );
+                  data,
+                  (data & bmCY) ? '1' : '0', (data & bmAC) ? '1' : '0',
+                  (data & bmOV) ? '1' : '0', (data & bmP ) ? '1' : '0'
+                  );
   /* show stack pointer */
   if (sfr->get (ACON) & 0x04)
     /* SA: 10 bit stack */
     con->dd_printf ("SP10 0x%03x %3d\n",
-		    (sfr->get (ESP) & 3) * 256 + sfr->get (SP),
-		    get_mem (MEM_IXRAM_ID, (sfr->get (ESP) & 3) * 256 + sfr->get (SP))
-		    );
+                    (sfr->get (ESP) & 3) * 256 + sfr->get (SP),
+                    get_mem (MEM_IXRAM_ID, (sfr->get (ESP) & 3) * 256 + sfr->get (SP))
+                    );
   else
     con->dd_printf ("SP 0x%02x %3d\n",
-		    sfr->get (SP),
-		    iram->get (sfr->get (SP))
-		    );
+                    sfr->get (SP),
+                    iram->get (sfr->get (SP))
+                    );
   print_disass (PC, con);
 }
 

@@ -129,7 +129,7 @@ cl_avr::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
-			     chip, 0, 0xffff, 0);
+                             chip, 0, 0xffff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -138,7 +138,7 @@ cl_avr::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= ram/*address_space(MEM_IRAM_ID)*/,
-			     chip, 0, 0x7f, 0);
+                             chip, 0, 0x7f, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -181,7 +181,7 @@ cl_avr::disass(t_addr addr, char *sep)
   code= get_mem(MEM_ROM_ID, addr);
   i= 0;
   while ((code & dis_tbl()[i].mask) != dis_tbl()[i].code &&
-	 dis_tbl()[i].mnemonic)
+         dis_tbl()[i].mnemonic)
     i++;
   if (dis_tbl()[i].mnemonic == NULL)
     {
@@ -194,90 +194,90 @@ cl_avr::disass(t_addr addr, char *sep)
   while (*b)
     {
       if (*b == '%')
-	{
-	  b++;
-	  switch (*(b++))
-	    {
-	    case 'd': // Rd   .... ...d dddd ....  0<=d<=31
-	      if (!get_name(data= (code&0x01f0)>>4, sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
-	      break;
-	    case 'D': // Rd   .... .... dddd ....  16<=d<=31
-	      if (!get_name(data= 16+((code&0xf0)>>4), sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
-	      break;
-	    case 'K': // K    .... KKKK .... KKKK  0<=K<=255
-	      sprintf(temp, "%d", ((code&0xf00)>>4)|(code&0xf));
-	      break;
-	    case 'r': // Rr   .... ..r. .... rrrr  0<=r<=31
-	      if (!get_name(data= ((code&0x0200)>>5)|(code&0x000f),
-			    sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
-	      break;
-	    case '2': // Rdl  .... .... ..dd ....  dl= {24,26,28,30}
-	      if (!get_name(data= 24+(2*((code&0x0030)>>4)),
-			    sfr_tbl(), temp))
-		sprintf(temp, "r%d", data);
-	      break;
-	    case '6': // K    .... .... KK.. KKKK  0<=K<=63
-	      sprintf(temp, "%d", ((code&0xc0)>>2)|(code&0xf));
-	      break;
-	    case 's': // s    .... .... .sss ....  0<=s<=7
-	      sprintf(temp, "%d", (code&0x70)>>4);
-	      break;
-	    case 'b': // b    .... .... .... .bbb  0<=b<=7
-	      sprintf(temp, "%d", code&0x7);
-	      break;
-	    case 'k': // k    .... ..kk kkkk k...  -64<=k<=+63
-	      {
-		int k= (code&0x3f8)>>3;
-		if (code&0x200)
-		  k|= -128;
-		sprintf(temp, "0x%06x", k+1+(signed int)addr);
-		break;
-	      }
-	    case 'A': // k    .... ...k kkkk ...k  0<=k<=64K
-	              //      kkkk kkkk kkkk kkkk  0<=k<=4M
-	      sprintf(temp, "0x%06x",
-		      (((code&0x1f0)>>3)|(code&1))*0x10000+
-		      (uint)get_mem(MEM_ROM_ID, addr+1));
-	      break;
-	    case 'P': // P    .... .... pppp p...  0<=P<=31
-	      data= (code&0xf8)>>3;
-	      if (!get_name(data+0x20, sfr_tbl(), temp))
-		sprintf(temp, "%d", data);
-	      break;
-	    case 'p': // P    .... .PP. .... PPPP  0<=P<=63
-	      data= ((code&0x600)>>5)|(code&0xf);
-	      if (!get_name(data+0x20, sfr_tbl(), temp))
-		sprintf(temp, "%d", data);
-	      break;
-	    case 'q': // q    ..q. qq.. .... .qqq  0<=q<=63
-	      sprintf(temp, "%d",
-		      ((code&0x2000)>>8)|((code&0xc00)>>7)|(code&7));
-	      break;
-	    case 'R': // k    SRAM address on second word 0<=k<=65535
-	      sprintf(temp, "0x%06x", (uint)get_mem(MEM_ROM_ID, addr+1));
-	      break;
-	    case 'a': // k    .... kkkk kkkk kkkk  -2k<=k<=2k
-	      {
-		int k= code&0xfff;
-		if (code&0x800)
-		  k|= -4096;
-		sprintf(temp, "0x%06"_A_"x",
-			rom->validate_address(k+1+(signed int)addr));
-		break;
-	      }
-	    default:
-	      strcpy(temp, "?");
-	      break;
-	    }
-	  t= temp;
-	  while (*t)
-	    *(p++)= *(t++);
-	}
+        {
+          b++;
+          switch (*(b++))
+            {
+            case 'd': // Rd   .... ...d dddd ....  0<=d<=31
+              if (!get_name(data= (code&0x01f0)>>4, sfr_tbl(), temp))
+                sprintf(temp, "r%d", data);
+              break;
+            case 'D': // Rd   .... .... dddd ....  16<=d<=31
+              if (!get_name(data= 16+((code&0xf0)>>4), sfr_tbl(), temp))
+                sprintf(temp, "r%d", data);
+              break;
+            case 'K': // K    .... KKKK .... KKKK  0<=K<=255
+              sprintf(temp, "%d", ((code&0xf00)>>4)|(code&0xf));
+              break;
+            case 'r': // Rr   .... ..r. .... rrrr  0<=r<=31
+              if (!get_name(data= ((code&0x0200)>>5)|(code&0x000f),
+                            sfr_tbl(), temp))
+                sprintf(temp, "r%d", data);
+              break;
+            case '2': // Rdl  .... .... ..dd ....  dl= {24,26,28,30}
+              if (!get_name(data= 24+(2*((code&0x0030)>>4)),
+                            sfr_tbl(), temp))
+                sprintf(temp, "r%d", data);
+              break;
+            case '6': // K    .... .... KK.. KKKK  0<=K<=63
+              sprintf(temp, "%d", ((code&0xc0)>>2)|(code&0xf));
+              break;
+            case 's': // s    .... .... .sss ....  0<=s<=7
+              sprintf(temp, "%d", (code&0x70)>>4);
+              break;
+            case 'b': // b    .... .... .... .bbb  0<=b<=7
+              sprintf(temp, "%d", code&0x7);
+              break;
+            case 'k': // k    .... ..kk kkkk k...  -64<=k<=+63
+              {
+                int k= (code&0x3f8)>>3;
+                if (code&0x200)
+                  k|= -128;
+                sprintf(temp, "0x%06x", k+1+(signed int)addr);
+                break;
+              }
+            case 'A': // k    .... ...k kkkk ...k  0<=k<=64K
+                      //      kkkk kkkk kkkk kkkk  0<=k<=4M
+              sprintf(temp, "0x%06x",
+                      (((code&0x1f0)>>3)|(code&1))*0x10000+
+                      (uint)get_mem(MEM_ROM_ID, addr+1));
+              break;
+            case 'P': // P    .... .... pppp p...  0<=P<=31
+              data= (code&0xf8)>>3;
+              if (!get_name(data+0x20, sfr_tbl(), temp))
+                sprintf(temp, "%d", data);
+              break;
+            case 'p': // P    .... .PP. .... PPPP  0<=P<=63
+              data= ((code&0x600)>>5)|(code&0xf);
+              if (!get_name(data+0x20, sfr_tbl(), temp))
+                sprintf(temp, "%d", data);
+              break;
+            case 'q': // q    ..q. qq.. .... .qqq  0<=q<=63
+              sprintf(temp, "%d",
+                      ((code&0x2000)>>8)|((code&0xc00)>>7)|(code&7));
+              break;
+            case 'R': // k    SRAM address on second word 0<=k<=65535
+              sprintf(temp, "0x%06x", (uint)get_mem(MEM_ROM_ID, addr+1));
+              break;
+            case 'a': // k    .... kkkk kkkk kkkk  -2k<=k<=2k
+              {
+                int k= code&0xfff;
+                if (code&0x800)
+                  k|= -4096;
+                sprintf(temp, "0x%06"_A_"x",
+                        rom->validate_address(k+1+(signed int)addr));
+                break;
+              }
+            default:
+              strcpy(temp, "?");
+              break;
+            }
+          t= temp;
+          while (*t)
+            *(p++)= *(t++);
+        }
       else
-	*(p++)= *(b++);
+        *(p++)= *(b++);
     }
   *p= '\0';
 
@@ -298,7 +298,7 @@ cl_avr::disass(t_addr addr, char *sep)
   if (sep == NULL)
     {
       while (strlen(buf) < 6)
-	strcat(buf, " ");
+        strcat(buf, " ");
     }
   else
     strcat(buf, sep);
@@ -308,7 +308,7 @@ cl_avr::disass(t_addr addr, char *sep)
 
 
 void
-cl_avr::print_regs(class cl_console *con)
+cl_avr::print_regs(class cl_console_base *con)
 {
   uchar data, sreg= ram->get(SREG);
   uint x, y, z;
@@ -316,30 +316,30 @@ cl_avr::print_regs(class cl_console *con)
   ram->dump(0, 31, 16, con);
 
   con->dd_printf("ITHSVNZC  SREG= 0x%02x %3d %c\n",
-		 sreg, sreg, isprint(sreg)?sreg:'.');
+                 sreg, sreg, isprint(sreg)?sreg:'.');
   con->dd_printf("%c%c%c%c%c%c%c%c  ",
-		 (sreg&BIT_I)?'1':'0',
-		 (sreg&BIT_T)?'1':'0',
-		 (sreg&BIT_H)?'1':'0',
-		 (sreg&BIT_S)?'1':'0',
-		 (sreg&BIT_V)?'1':'0',
-		 (sreg&BIT_N)?'1':'0',
-		 (sreg&BIT_Z)?'1':'0',
-		 (sreg&BIT_C)?'1':'0');
+                 (sreg&BIT_I)?'1':'0',
+                 (sreg&BIT_T)?'1':'0',
+                 (sreg&BIT_H)?'1':'0',
+                 (sreg&BIT_S)?'1':'0',
+                 (sreg&BIT_V)?'1':'0',
+                 (sreg&BIT_N)?'1':'0',
+                 (sreg&BIT_Z)?'1':'0',
+                 (sreg&BIT_C)?'1':'0');
   con->dd_printf("SP  = 0x%06x\n", ram->get(SPH)*256+ram->get(SPL));
 
   x= ram->get(XH)*256 + ram->get(XL);
   data= ram->get(x);
   con->dd_printf("X= 0x%04x [X]= 0x%02x %3d %c  ", x,
-		 data, data, isprint(data)?data:'.');
+                 data, data, isprint(data)?data:'.');
   y= ram->get(YH)*256 + ram->get(YL);
   data= ram->get(y);
   con->dd_printf("Y= 0x%04x [Y]= 0x%02x %3d %c  ", y,
-		 data, data, isprint(data)?data:'.');
+                 data, data, isprint(data)?data:'.');
   z= ram->get(ZH)*256 + ram->get(ZL);
   data= ram->get(z);
   con->dd_printf("Z= 0x%04x [Z]= 0x%02x %3d %c\n", z,
-		 data, data, isprint(data)?data:'.');
+                 data, data, isprint(data)?data:'.');
 
   print_disass(PC, con);
 }
@@ -430,197 +430,197 @@ cl_avr::exec_inst(void)
     {
     case 0x0000:
       {
-	// 0x0...
-	switch (code & 0xfc00)
-	  {
-	  case 0x0000:
-	    {
-	      switch (code & 0xff00)
-		{
-		case 0x0100: return(movw_Rd_Rr(code));
-		case 0x0200: return(muls_Rd_Rr(code));
-		case 0x0300:
-		  {
-		    switch (code & 0xff88)
-		      {
-		      case 0x0300: return(mulsu_Rd_Rr(code));
-		      case 0x0308: return(fmul_Rd_Rr(code));
-		      case 0x0380: return(fmuls_Rd_Rr(code));
-		      case 0x0388: return(fmulsu_Rd_Rr(code));
-		      }
-		    break;
-		  }
-		  break;
-		}
-	      break;
-	    }
-	  case 0x0400: return(cpc_Rd_Rr(code));
-	  case 0x0800: return(sbc_Rd_Rr(code));
-	  case 0x0c00: return(add_Rd_Rr(code));
-	  }
-	break;
+        // 0x0...
+        switch (code & 0xfc00)
+          {
+          case 0x0000:
+            {
+              switch (code & 0xff00)
+                {
+                case 0x0100: return(movw_Rd_Rr(code));
+                case 0x0200: return(muls_Rd_Rr(code));
+                case 0x0300:
+                  {
+                    switch (code & 0xff88)
+                      {
+                      case 0x0300: return(mulsu_Rd_Rr(code));
+                      case 0x0308: return(fmul_Rd_Rr(code));
+                      case 0x0380: return(fmuls_Rd_Rr(code));
+                      case 0x0388: return(fmulsu_Rd_Rr(code));
+                      }
+                    break;
+                  }
+                  break;
+                }
+              break;
+            }
+          case 0x0400: return(cpc_Rd_Rr(code));
+          case 0x0800: return(sbc_Rd_Rr(code));
+          case 0x0c00: return(add_Rd_Rr(code));
+          }
+        break;
       }
     case 0x1000:
       {
-	// 0x1...
-	switch (code & 0xfc00)
-	  {
-	  case 0x1000: return(cpse_Rd_Rr(code));
-	  case 0x1400: return(cp_Rd_Rr(code));
-	  case 0x1800: return(sub_Rd_Rr(code));
-	  case 0x1c00: return(adc_Rd_Rr(code));
-	  }
-	break;
+        // 0x1...
+        switch (code & 0xfc00)
+          {
+          case 0x1000: return(cpse_Rd_Rr(code));
+          case 0x1400: return(cp_Rd_Rr(code));
+          case 0x1800: return(sub_Rd_Rr(code));
+          case 0x1c00: return(adc_Rd_Rr(code));
+          }
+        break;
       }
     case 0x2000:
       {
-	// 0x2...
-	switch (code & 0xfc00)
-	  {
-	  case 0x2000: return(and_Rd_Rr(code));
-	  case 0x2400: return(eor_Rd_Rr(code));
-	  case 0x2800: return(or_Rd_Rr(code));
-	  case 0x2c00: return(mov_Rd_Rr(code));
-	}
-	break;
+        // 0x2...
+        switch (code & 0xfc00)
+          {
+          case 0x2000: return(and_Rd_Rr(code));
+          case 0x2400: return(eor_Rd_Rr(code));
+          case 0x2800: return(or_Rd_Rr(code));
+          case 0x2c00: return(mov_Rd_Rr(code));
+        }
+        break;
       }
     case 0x8000:
       {
-	// 0x8...
-	switch (code &0xf208)
-	  {
-	  case 0x8000: return(ldd_Rd_Z_q(code));
-	  case 0x8008: return(ldd_Rd_Y_q(code));
-	  case 0x8200: return(std_Z_q_Rr(code));
-	  case 0x8208: return(std_Y_q_Rr(code));
-	  }
-	break;
+        // 0x8...
+        switch (code &0xf208)
+          {
+          case 0x8000: return(ldd_Rd_Z_q(code));
+          case 0x8008: return(ldd_Rd_Y_q(code));
+          case 0x8200: return(std_Z_q_Rr(code));
+          case 0x8208: return(std_Y_q_Rr(code));
+          }
+        break;
       }
     case 0x9000:
       {
-	// 0x9...
-	if ((code & 0xff0f) == 0x9509)
-	  return(icall(code));
-	if ((code & 0xff0f) == 0x9409)
-	  return(ijmp(code));
-	if ((code & 0xff00) == 0x9600)
-	  return(adiw_Rdl_K(code));
-	if ((code & 0xff00) == 0x9700)
-	  return(sbiw_Rdl_K(code));
-	switch (code & 0xfc00)
-	  {
-	  case 0x9000:
-	    {
-	      switch (code & 0xfe0f)
-		{
-		case 0x9000: return(lds_Rd_k(code));
-		case 0x9001: return(ld_Rd_ZS(code));
-		case 0x9002: return(ld_Rd_SZ(code));
-		case 0x9004: return(lpm_Rd_Z(code));
-		case 0x9005: return(lpm_Rd_ZS(code));
-		case 0x9006: return(elpm_Rd_Z(code));
-		case 0x9007: return(elpm_Rd_ZS(code));
-		case 0x9009: return(ld_Rd_YS(code));
-		case 0x900a: return(ld_Rd_SY(code));
-		case 0x900c: return(ld_Rd_X(code));
-		case 0x900d: return(ld_Rd_XS(code));
-		case 0x900e: return(ld_Rd_SX(code));
-		case 0x900f: return(pop_Rd(code));
-		case 0x9200: return(sts_k_Rr(code));
-		case 0x9201: return(st_ZS_Rr(code));
-		case 0x9202: return(st_SZ_Rr(code));
-		case 0x9209: return(st_YS_Rr(code));
-		case 0x920a: return(st_SY_Rr(code));
-		case 0x920c: return(st_X_Rr(code));
-		case 0x920d: return(st_XS_Rr(code));
-		case 0x920e: return(st_SX_Rr(code));
-		case 0x920f: return(push_Rr(code));
-		}
-	      break;
-	    }
-	  case 0x9400:
-	    {
-	      switch (code & 0xfe0f)
-		{
-		case 0x9400: return(com_Rd(code));
-		case 0x9401: return(neg_Rd(code));
-		case 0x9402: return(swap_Rd(code));
-		case 0x9403: return(inc_Rd(code));
-		case 0x9405: return(asr_Rd(code));
-		case 0x9406: return(lsr_Rd(code));
-		case 0x9407: return(ror_Rd(code));
-		case 0x940a: return(dec_Rd(code));
-		case 0x940c: case 0x940d: return(jmp_k(code));
-		case 0x940e: case 0x940f: return(call_k(code));
-		}
-	      break;
-	    }
-	  case 0x9800:
-	    {
-	      switch (code & 0xff00)
-		{
-		case 0x9800: return(cbi_A_b(code));
-		case 0x9900: return(sbic_P_b(code));
-		case 0x9a00: return(sbi_A_b(code));
-		case 0x9b00: return(sbis_P_b(code));
-		}
-	      break;
-	    }
-	  case 0x9c00: return(mul_Rd_Rr(code));
-	  }
-	break;
+        // 0x9...
+        if ((code & 0xff0f) == 0x9509)
+          return(icall(code));
+        if ((code & 0xff0f) == 0x9409)
+          return(ijmp(code));
+        if ((code & 0xff00) == 0x9600)
+          return(adiw_Rdl_K(code));
+        if ((code & 0xff00) == 0x9700)
+          return(sbiw_Rdl_K(code));
+        switch (code & 0xfc00)
+          {
+          case 0x9000:
+            {
+              switch (code & 0xfe0f)
+                {
+                case 0x9000: return(lds_Rd_k(code));
+                case 0x9001: return(ld_Rd_ZS(code));
+                case 0x9002: return(ld_Rd_SZ(code));
+                case 0x9004: return(lpm_Rd_Z(code));
+                case 0x9005: return(lpm_Rd_ZS(code));
+                case 0x9006: return(elpm_Rd_Z(code));
+                case 0x9007: return(elpm_Rd_ZS(code));
+                case 0x9009: return(ld_Rd_YS(code));
+                case 0x900a: return(ld_Rd_SY(code));
+                case 0x900c: return(ld_Rd_X(code));
+                case 0x900d: return(ld_Rd_XS(code));
+                case 0x900e: return(ld_Rd_SX(code));
+                case 0x900f: return(pop_Rd(code));
+                case 0x9200: return(sts_k_Rr(code));
+                case 0x9201: return(st_ZS_Rr(code));
+                case 0x9202: return(st_SZ_Rr(code));
+                case 0x9209: return(st_YS_Rr(code));
+                case 0x920a: return(st_SY_Rr(code));
+                case 0x920c: return(st_X_Rr(code));
+                case 0x920d: return(st_XS_Rr(code));
+                case 0x920e: return(st_SX_Rr(code));
+                case 0x920f: return(push_Rr(code));
+                }
+              break;
+            }
+          case 0x9400:
+            {
+              switch (code & 0xfe0f)
+                {
+                case 0x9400: return(com_Rd(code));
+                case 0x9401: return(neg_Rd(code));
+                case 0x9402: return(swap_Rd(code));
+                case 0x9403: return(inc_Rd(code));
+                case 0x9405: return(asr_Rd(code));
+                case 0x9406: return(lsr_Rd(code));
+                case 0x9407: return(ror_Rd(code));
+                case 0x940a: return(dec_Rd(code));
+                case 0x940c: case 0x940d: return(jmp_k(code));
+                case 0x940e: case 0x940f: return(call_k(code));
+                }
+              break;
+            }
+          case 0x9800:
+            {
+              switch (code & 0xff00)
+                {
+                case 0x9800: return(cbi_A_b(code));
+                case 0x9900: return(sbic_P_b(code));
+                case 0x9a00: return(sbi_A_b(code));
+                case 0x9b00: return(sbis_P_b(code));
+                }
+              break;
+            }
+          case 0x9c00: return(mul_Rd_Rr(code));
+          }
+        break;
       }
     case 0xa000:
       {
-	// 0xa...
-	switch (code &0xf208)
-	  {
-	  case 0xa000: return(ldd_Rd_Z_q(code));
-	  case 0xa008: return(ldd_Rd_Y_q(code));
-	  case 0xa200: return(std_Z_q_Rr(code));
-	  case 0xa208: return(std_Y_q_Rr(code));
-	  }
-	break;
+        // 0xa...
+        switch (code &0xf208)
+          {
+          case 0xa000: return(ldd_Rd_Z_q(code));
+          case 0xa008: return(ldd_Rd_Y_q(code));
+          case 0xa200: return(std_Z_q_Rr(code));
+          case 0xa208: return(std_Y_q_Rr(code));
+          }
+        break;
       }
     case 0xb000:
       {
-	// 0xb...
-	switch (code & 0xf800)
-	  {
-	  case 0xb000: return(in_Rd_A(code));
-	  case 0xb800: return(out_A_Rr(code));
-	  }
-	break;
+        // 0xb...
+        switch (code & 0xf800)
+          {
+          case 0xb000: return(in_Rd_A(code));
+          case 0xb800: return(out_A_Rr(code));
+          }
+        break;
       }
     case 0xe000:
       {
-	// 0xe...
-	switch (code & 0xff0f)
-	  {
-	  case 0xef0f: return(ser_Rd(code));
-	  }
-	break;
+        // 0xe...
+        switch (code & 0xff0f)
+          {
+          case 0xef0f: return(ser_Rd(code));
+          }
+        break;
       }
     case 0xf000:
       {
-	// 0xf...
-	switch (code & 0xfc00)
-	  {
-	  case 0xf000: return(brbs_s_k(code));
-	  case 0xf400: return(brbc_s_k(code));
-	  case 0xf800: case 0xfc00:
-	    {
-	      switch (code & 0xfe08)
-		{
-		case 0xf800: return(bld_Rd_b(code));
-		case 0xfa00: return(bst_Rd_b(code));
-		case 0xfc00: case 0xfc08: return(sbrc_Rr_b(code));
-		case 0xfe00: case 0xfe08: return(sbrs_Rr_b(code));
-		}
-	      break;
-	    }
-	  }
-	break;
+        // 0xf...
+        switch (code & 0xfc00)
+          {
+          case 0xf000: return(brbs_s_k(code));
+          case 0xf400: return(brbc_s_k(code));
+          case 0xf800: case 0xfc00:
+            {
+              switch (code & 0xfe08)
+                {
+                case 0xf800: return(bld_Rd_b(code));
+                case 0xfa00: return(bst_Rd_b(code));
+                case 0xfc00: case 0xfc08: return(sbrc_Rr_b(code));
+                case 0xfe00: case 0xfe08: return(sbrs_Rr_b(code));
+                }
+              break;
+            }
+          }
+        break;
       }
     }
   /*if (PC)

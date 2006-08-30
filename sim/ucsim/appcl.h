@@ -78,7 +78,7 @@ public:
 class cl_app: public cl_base
 {
 protected:
-  class cl_commander *commander;
+  class cl_commander_base *commander;
 public:
   class cl_sim *sim;
   class cl_ustrings *in_files;
@@ -101,7 +101,7 @@ protected:
 public:
   class cl_sim *get_sim(void) { return(sim); }
   class cl_uc *get_uc(void);
-  class cl_commander *get_commander(void) { return(commander); }
+  class cl_commander_base *get_commander(void) { return(commander); }
   virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
 
 public: // messages to broadcast

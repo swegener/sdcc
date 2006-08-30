@@ -156,7 +156,7 @@ cl_rom::~cl_rom(void)
 
 
 cl_mem::cl_mem(enum mem_class atype, char *aclass_name,
-	       t_addr asize, int awidth, class cl_uc *auc):
+               t_addr asize, int awidth, class cl_uc *auc):
   cl_guiobj()
 {
   int i;
@@ -203,12 +203,12 @@ cl_mem::init(void)
 
   addr_format= (char *)malloc(10);
   sprintf(addr_format, "0x%%0%dx",
-	  size-1<=0xf?1:
-	  (size-1<=0xff?2:
-	   (size-1<=0xfff?3:
-	    (size-1<=0xffff?4:
-	     (size-1<=0xfffff?5:
-	      (size-1<=0xffffff?6:12))))));
+          size-1<=0xf?1:
+          (size-1<=0xff?2:
+           (size-1<=0xfff?3:
+            (size-1<=0xffff?4:
+             (size-1<=0xfffff?5:
+              (size-1<=0xffffff?6:12))))));
   data_format= (char *)malloc(10);
   sprintf(data_format, "%%0%dx", width/4+((width%4)?1:0));
 
@@ -282,7 +282,7 @@ cl_mem::write(t_addr addr, t_mem val)
   else
   ((TYPE_UDWORD*)mem)[addr]= (*val)&mask;*/
   fprintf(stderr, "FIXME cl_mem::write(0x%06"_A_"x, 0x%04"_M_"x)\n",
-	  addr, val);
+          addr, val);
   return(0);
 }
 
@@ -324,47 +324,47 @@ cl_mem::add(t_addr addr, long what)
 }
 
 t_addr
-cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
+cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
 {
   int i;
 
   while ((start <= stop) &&
-	 (start < size))
+         (start < size))
     {
       con->dd_printf(addr_format, start); con->dd_printf(" ");
       for (i= 0;
-	   (i < bpl) &&
-	     (start+i < size) &&
-	     (start+i <= stop);
-	   i++)
-	{
-	  con->dd_printf(data_format, /*read*/get(start+i)); con->dd_printf(" ");
-	}
+           (i < bpl) &&
+             (start+i < size) &&
+             (start+i <= stop);
+           i++)
+        {
+          con->dd_printf(data_format, /*read*/get(start+i)); con->dd_printf(" ");
+        }
       while (i < bpl)
-	{
-	  int j;
-	  j= width/4 + ((width%4)?1:0) + 1;
-	  while (j)
-	    {
-	      con->dd_printf(" ");
-	      j--;
-	    }
-	  i++;
-	}
+        {
+          int j;
+          j= width/4 + ((width%4)?1:0) + 1;
+          while (j)
+            {
+              con->dd_printf(" ");
+              j--;
+            }
+          i++;
+        }
       for (i= 0; (i < bpl) &&
-	     (start+i < size) &&
-	     (start+i <= stop);
-	   i++)
-	{
-	  long c= get(start+i);
-	  con->dd_printf("%c", isprint(255&c)?(255&c):'.');
-	  if (width > 8)
-	    con->dd_printf("%c", isprint(255&(c>>8))?(255&(c>>8)):'.');
-	  if (width > 16)
-	    con->dd_printf("%c", isprint(255&(c>>16))?(255&(c>>16)):'.');
-	  if (width > 24)
-	    con->dd_printf("%c", isprint(255&(c>>24))?(255&(c>>24)):'.');
-	}
+             (start+i < size) &&
+             (start+i <= stop);
+           i++)
+        {
+          long c= get(start+i);
+          con->dd_printf("%c", isprint(255&c)?(255&c):'.');
+          if (width > 8)
+            con->dd_printf("%c", isprint(255&(c>>8))?(255&(c>>8)):'.');
+          if (width > 16)
+            con->dd_printf("%c", isprint(255&(c>>16))?(255&(c>>16)):'.');
+          if (width > 24)
+            con->dd_printf("%c", isprint(255&(c>>24))?(255&(c>>24)):'.');
+        }
       con->dd_printf("\n");
       dump_finished= start+i;
       start+= bpl;
@@ -373,7 +373,7 @@ cl_mem::dump(t_addr start, t_addr stop, int bpl, class cl_console *con)
 }
 
 t_addr
-cl_mem::dump(class cl_console *con)
+cl_mem::dump(class cl_console_base *con)
 {
   return(dump(dump_finished, dump_finished+10*8-1, 8, con));
 }
@@ -468,7 +468,7 @@ cl_mapped_cell::get_event_handler(void)
  */
 
 cl_m::cl_m(enum mem_class atype, char *aclass_name, t_addr asize, int awidth,
-	   class cl_uc *auc):
+           class cl_uc *auc):
   cl_memory(aclass_name, asize, awidth)
   //cl_mem(atype, aclass_name, 0, awidth, auc)
 {
@@ -731,26 +731,26 @@ cl_m::search_next(bool case_sensitive, t_mem *array, int len, t_addr *addr)
 
   found= DD_FALSE;
   while (!found &&
-	 a+len <= size)
+         a+len <= size)
     {
       bool match= DD_TRUE;
       for (i= 0; i < len && match; i++)
-	{
-	  t_mem d1, d2;
-	  d1= get(a+i);
-	  d2= array[i];
-	  if (!case_sensitive)
-	    {
-	      if (/*d1 < 128*/isalpha(d1))
-		d1= toupper(d1);
-	      if (/*d2 < 128*/isalpha(d2))
-		d2= toupper(d2);
-	    }
-	  match= d1 == d2;
-	}
+        {
+          t_mem d1, d2;
+          d1= get(a+i);
+          d2= array[i];
+          if (!case_sensitive)
+            {
+              if (/*d1 < 128*/isalpha(d1))
+                d1= toupper(d1);
+              if (/*d2 < 128*/isalpha(d2))
+                d2= toupper(d2);
+            }
+          match= d1 == d2;
+        }
       found= match;
       if (!found)
-	a++;
+        a++;
     }
 
   if (addr)
@@ -780,11 +780,11 @@ cl_m::register_hw(t_addr addr, class cl_hw *hw, int *ith, bool announce)
       nc= new cl_ev_reg_cell(width, uc);
       nc->set(cell->get());
       nc->set_type(nc->get_type() &
-		   ~(CELL_GENERAL|CELL_READ_BRK|CELL_WRITE_BRK));
+                   ~(CELL_GENERAL|CELL_READ_BRK|CELL_WRITE_BRK));
       nc->set_type(nc->get_type() | (cell->get_type() & CELL_GENERAL));
       class cl_event_handler *eh= nc->get_event_handler();
       if (eh)
-	nc->set_type(nc->get_type() | eh->copy_from(cell->get_event_handler()));
+        nc->set_type(nc->get_type() | eh->copy_from(cell->get_event_handler()));
       nc->add_hw(hw, ith);
     }
   else
@@ -836,7 +836,7 @@ cl_m::set_brk(t_addr addr, class cl_brk *brk)
       set_cell_flag(addr, DD_TRUE, CELL_FETCH_BRK);
       return;
       break;
-    default: e= '.'; break;	  
+    default: e= '.'; break;       
     }
   
   if (cell->get_type() & (CELL_HW_READ | CELL_HW_WRITE))
@@ -849,25 +849,25 @@ cl_m::set_brk(t_addr addr, class cl_brk *brk)
       int i= 0;
       class cl_hw *hw;
       while ((hw= cell->get_hw(i)) != 0)
-	{
-	  nc->add_hw(hw, 0);
-	  i++;
-	}
+        {
+          nc->add_hw(hw, 0);
+          i++;
+        }
       if (((class cl_registered_cell *)cell)->hardwares)
-	{
-	  free(((class cl_registered_cell *)cell)->hardwares);
-	  ((class cl_registered_cell *)cell)->hardwares= 0;
-	}
+        {
+          free(((class cl_registered_cell *)cell)->hardwares);
+          ((class cl_registered_cell *)cell)->hardwares= 0;
+        }
       class cl_event_handler *eh;
       if ((eh= nc->get_event_handler()))
-	nc->set_type(nc->get_type() | eh->add_bp(brk));
+        nc->set_type(nc->get_type() | eh->add_bp(brk));
     }
   else if (cell->get_type() & (CELL_READ_BRK | CELL_WRITE_BRK))
     {
       /* Break is already set on it */
       class cl_event_handler *eh;
       if ((eh= cell->get_event_handler()))
-	cell->set_type(cell->get_type() | eh->add_bp(brk));
+        cell->set_type(cell->get_type() | eh->add_bp(brk));
       return;
     }
   else
@@ -879,7 +879,7 @@ cl_m::set_brk(t_addr addr, class cl_brk *brk)
       nc->set_type(nc->get_type() | (cell->get_type() & CELL_GENERAL));
       class cl_event_handler *eh;
       if ((eh= nc->get_event_handler()))
-	nc->set_type(nc->get_type() | eh->add_bp(brk));
+        nc->set_type(nc->get_type() | eh->add_bp(brk));
     }
 
   if (addr >= size)
@@ -926,13 +926,13 @@ cl_m::del_brk(t_addr addr, class cl_brk *brk)
       class cl_event_handler *eh;
       int t= CELL_NORMAL;
       if ((eh= cell->get_event_handler()))
-	t= eh->del_bp(brk);
+        t= eh->del_bp(brk);
       if (t & (CELL_READ_BRK|CELL_WRITE_BRK))
-	{
-	  cell->set_type(cell->get_type() & ~(CELL_READ_BRK|CELL_WRITE_BRK));
-	  cell->set_type(cell->get_type() | t);
-	  return;
-	}
+        {
+          cell->set_type(cell->get_type() & ~(CELL_READ_BRK|CELL_WRITE_BRK));
+          cell->set_type(cell->get_type() | t);
+          return;
+        }
       nc= new cl_registered_cell(width);
       nc->set(cell->get());
       nc->set_type(cell->get_type() & ~CELL_GENERAL);
@@ -940,12 +940,12 @@ cl_m::del_brk(t_addr addr, class cl_brk *brk)
       int i= 0;
       class cl_hw *hw;
       while ((hw= cell->get_hw(i)) != 0)
-	{
-	  nc->add_hw(hw, 0);
-	  i++;
-	}
+        {
+          nc->add_hw(hw, 0);
+          i++;
+        }
       if (((class cl_registered_cell *)cell)->hardwares)
-	free(((class cl_registered_cell *)cell)->hardwares);
+        free(((class cl_registered_cell *)cell)->hardwares);
     }
   else if (cell->get_type() & (CELL_READ_BRK | CELL_WRITE_BRK))
     {
@@ -953,13 +953,13 @@ cl_m::del_brk(t_addr addr, class cl_brk *brk)
       class cl_event_handler *eh;
       int t= CELL_NORMAL;
       if ((eh= cell->get_event_handler()))
-	t= eh->del_bp(brk);
+        t= eh->del_bp(brk);
       if (t & (CELL_READ_BRK|CELL_WRITE_BRK))
-	{
-	  cell->set_type(cell->get_type() & ~(CELL_READ_BRK|CELL_WRITE_BRK));
-	  cell->set_type(cell->get_type() | t);
-	  return;
-	}
+        {
+          cell->set_type(cell->get_type() & ~(CELL_READ_BRK|CELL_WRITE_BRK));
+          cell->set_type(cell->get_type() | t);
+          return;
+        }
       nc= new cl_normal_cell(width);
       nc->set(cell->get());
       nc->set_type(cell->get_type() & ~CELL_GENERAL);
@@ -1118,8 +1118,8 @@ cl_registered_cell::read(void)
   if (nuof_hws)
     for (i= 0; i < nuof_hws; i++)
       {
-	d= hardwares[i]->read(this);
-	;
+        d= hardwares[i]->read(this);
+        ;
       }
 #ifdef STATISTIC
   nuof_reads++;
@@ -1136,9 +1136,9 @@ cl_registered_cell::read(enum hw_cath skip)
   if (nuof_hws)
     for (i= 0; i < nuof_hws; i++)
       {
-	if ((skip & hardwares[i]->cathegory) == 0)
-	  d= hardwares[i]->read(this);
-	;
+        if ((skip & hardwares[i]->cathegory) == 0)
+          d= hardwares[i]->read(this);
+        ;
       }
 #ifdef STATISTIC
   nuof_reads++;
@@ -1155,8 +1155,8 @@ cl_registered_cell::write(t_mem val)
   if (nuof_hws)
     for (i= 0; i < nuof_hws; i++)
       {
-	hardwares[i]->write(this, &val);
-	;
+        hardwares[i]->write(this, &val);
+        ;
       }
 #ifdef STATISTIC
   nuof_writes++;
@@ -1176,7 +1176,7 @@ cl_registered_cell::add_hw(class cl_hw *hw, int *ith)
     hardwares= (class cl_hw **)malloc(sizeof(class cl_hw *));
   else
     hardwares= (class cl_hw **)realloc(hardwares,
-				       sizeof(class c_hw *) * (nuof_hws+1));
+                                       sizeof(class c_hw *) * (nuof_hws+1));
   hardwares[nuof_hws]= hw;
   nuof_hws++;
   if (ith)

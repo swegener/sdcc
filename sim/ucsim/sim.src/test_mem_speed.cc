@@ -48,15 +48,15 @@ do_rw_test(class cl_mem *mem, int time)
   while (go)
     for (a= 0; go && a < mem->size; a++)
       {
-	t_mem d2;
-	for (d2= 0; go && d2 <= 255; d2++)
-	  {
-	    d2= mem->write(a, d2);
-	    d= mem->read(a);
-	    if (d != d2)
-	      printf("%"_M_"d written to mem and %"_M_"d read back!\n", d2, d);
-	    counter+= 1;
-	  }
+        t_mem d2;
+        for (d2= 0; go && d2 <= 255; d2++)
+          {
+            d2= mem->write(a, d2);
+            d= mem->read(a);
+            if (d != d2)
+              printf("%"_M_"d written to mem and %"_M_"d read back!\n", d2, d);
+            counter+= 1;
+          }
       }
   return(counter);
 }
@@ -67,21 +67,21 @@ main(void)
   int i;
   class cl_mem *mem;
   class cl_m *m2;
-  class cl_console *con;
+  class cl_console_base *con;
 
   signal(SIGALRM, alarmed);
-  con= new cl_console(stdin, stdout, 0);
+  con= new cl_console_base(stdin, stdout, 0);
 
   mem= new cl_mem(MEM_SFR, "egy", 0x10000, 8, 0);
   mem->init();
   printf("%g operations on classic memory within 5 sec\n",
-	 do_rw_test(mem, 5));
+         do_rw_test(mem, 5));
   //mem->dump(con);
 
   m2= new cl_m(MEM_TYPES, "test", 0x10000, 8, 0);
   m2->init();
   printf("%g operations on new memory within 5 sec\n",
-	 do_rw_test(m2, 5));
+         do_rw_test(m2, 5));
 
   class cl_hw_test *hw= new cl_hw_test();
   for (i= 0; i < 0x10000; i++)
@@ -89,10 +89,10 @@ main(void)
       class cl_cell *c= m2->get_cell(i);
       int dummy;
       if (c)
-	c->add_hw(hw, &dummy);
+        c->add_hw(hw, &dummy);
     }
   printf("%g operations on new memory within 5 sec with hw read\n",
-	 do_rw_test(m2, 5));
+         do_rw_test(m2, 5));
   //m2->dump(con);
 
   return(0);

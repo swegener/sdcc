@@ -30,9 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef HAVE_TERMIOS_H
-#include <termios.h>
-#endif
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -135,8 +132,8 @@ cl_51core::id_string(void)
 
   for (i= 0; cpus_51[i].type_str != NULL && cpus_51[i].type != type; i++) ;
   sprintf(id_string_51, "%s %s",
-	  cpus_51[i].type_str?cpus_51[i].type_str:"51",
-	  (technology==CPU_HMOS)?"HMOS":"CMOS");
+          cpus_51[i].type_str?cpus_51[i].type_str:"51",
+          (technology==CPU_HMOS)?"HMOS":"CMOS");
   return(id_string_51);
 }
 
@@ -152,10 +149,8 @@ cl_51core::mk_hw_elements(void)
   h->init();
   hws->add(h= new cl_timer1(this, 1, "timer1"));
   h->init();
-#ifdef HAVE_TERMIOS_H
   hws->add(h= new cl_serial(this));
   h->init();
-#endif
   hws->add(h= new cl_port(this, 0));
   h->init();
   hws->add(h= new cl_port(this, 1));
@@ -237,7 +232,7 @@ cl_51core::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
-			     chip, 0, 0xffff, 0);
+                             chip, 0, 0xffff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -246,7 +241,7 @@ cl_51core::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= iram/*address_space(MEM_IRAM_ID)*/,
-			     chip, 0, 0x7f, 0);
+                             chip, 0, 0x7f, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -255,7 +250,7 @@ cl_51core::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= xram/*address_space(MEM_XRAM_ID)*/,
-			     chip, 0, 0xffff, 0);
+                             chip, 0, 0xffff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -264,7 +259,7 @@ cl_51core::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= sfr/*address_space(MEM_SFR_ID)*/,
-			     chip, 0x80, 0xff, 0);
+                             chip, 0x80, 0xff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -284,13 +279,13 @@ cl_51core::~cl_51core(void)
   if (serial_out)
     {
       if (isatty(fileno(serial_out)))
-	tcsetattr(fileno(serial_out), TCSANOW, &saved_attributes_out);
+        tcsetattr(fileno(serial_out), TCSANOW, &saved_attributes_out);
       fclose(serial_out);
     }
   if (serial_in)
     {
       if (isatty(fileno(serial_in)))
-	tcsetattr(fileno(serial_in), TCSANOW, &saved_attributes_in);
+        tcsetattr(fileno(serial_in), TCSANOW, &saved_attributes_in);
       fclose(serial_in);
     }
   */
@@ -332,75 +327,75 @@ cl_51core::disass(t_addr addr, char *sep)
   while (*b)
     {
       if (*b == '%')
-	{
-	  b++;
-	  switch (*(b++))
-	    {
-	    case 'A': // absolute address
-	      sprintf(temp, "%04"_A_"x",
-		      t_addr((addr&0xf800)|
-			     (((code>>5)&0x07)*256 +
-			      rom->get(addr+1))));
-	      break;
-	    case 'l': // long address
-	      sprintf(temp, "%04"_A_"x",
-		      t_addr(rom->get(addr+1)*256 +
-			     rom->get(addr+2)));
-	      break;
-	    case 'a': // addr8 (direct address) at 2nd byte
- 	      if (!get_name(rom->get(addr+1), sfr_tbl(), temp))
-		sprintf(temp, "%02"_M_"x", rom->get(addr+1));
-	      break;
-	    case '8': // addr8 (direct address) at 3rd byte
- 	      if (!get_name(rom->get(addr+2), sfr_tbl(), temp))
-		sprintf(temp, "%02"_M_"x", rom->get(addr+2));
-	      //sprintf(temp, "%02"_M_"x", rom->get(addr+2));
-	      break;
-	    case 'b': // bitaddr at 2nd byte
-	      {
-		t_addr ba= rom->get(addr+1);
-		if (get_name(ba, bit_tbl(), temp))
-		  break;
-		if (get_name((ba<128)?((ba/8)+32):(ba&0xf8), sfr_tbl(), temp))
-		  {
-		    strcat(temp, ".");
-		    sprintf(c, "%1"_M_"d", ba & 0x07);
-		    strcat(temp, c);
-		    break;
-		  }
-		sprintf(temp, "%02x.%"_M_"d", (ba<128)?((ba/8)+32):(ba&0xf8),
-			ba & 0x07);
-		break;
-	      }
-	    case 'r': // rel8 address at 2nd byte
-	      sprintf(temp, "%04"_A_"x",
-		      t_addr(addr+2+(signed char)(rom->get(addr+1))));
-	      break;
-	    case 'R': // rel8 address at 3rd byte
-	      sprintf(temp, "%04"_A_"x",
-		      t_addr(addr+3+(signed char)(rom->get(addr+2))));
-	      break;
-	    case 'd': // data8 at 2nd byte
-	      sprintf(temp, "%02"_M_"x", rom->get(addr+1));
-	      break;
-	    case 'D': // data8 at 3rd byte
-	      sprintf(temp, "%02"_M_"x", rom->get(addr+2));
-	      break;
-	    case '6': // data16 at 2nd(H)-3rd(L) byte
-	      sprintf(temp, "%04"_A_"x",
-		      t_addr(rom->get(addr+1)*256 +
-			     rom->get(addr+2)));
-	      break;
-	    default:
-	      strcpy(temp, "?");
-	      break;
-	    }
-	  t= temp;
-	  while (*t)
-	    *(p++)= *(t++);
-	}
+        {
+          b++;
+          switch (*(b++))
+            {
+            case 'A': // absolute address
+              sprintf(temp, "%04"_A_"x",
+                      t_addr((addr&0xf800)|
+                             (((code>>5)&0x07)*256 +
+                              rom->get(addr+1))));
+              break;
+            case 'l': // long address
+              sprintf(temp, "%04"_A_"x",
+                      t_addr(rom->get(addr+1)*256 +
+                             rom->get(addr+2)));
+              break;
+            case 'a': // addr8 (direct address) at 2nd byte
+              if (!get_name(rom->get(addr+1), sfr_tbl(), temp))
+                sprintf(temp, "%02"_M_"x", rom->get(addr+1));
+              break;
+            case '8': // addr8 (direct address) at 3rd byte
+              if (!get_name(rom->get(addr+2), sfr_tbl(), temp))
+                sprintf(temp, "%02"_M_"x", rom->get(addr+2));
+              //sprintf(temp, "%02"_M_"x", rom->get(addr+2));
+              break;
+            case 'b': // bitaddr at 2nd byte
+              {
+                t_addr ba= rom->get(addr+1);
+                if (get_name(ba, bit_tbl(), temp))
+                  break;
+                if (get_name((ba<128)?((ba/8)+32):(ba&0xf8), sfr_tbl(), temp))
+                  {
+                    strcat(temp, ".");
+                    sprintf(c, "%1"_M_"d", ba & 0x07);
+                    strcat(temp, c);
+                    break;
+                  }
+                sprintf(temp, "%02x.%"_M_"d", (ba<128)?((ba/8)+32):(ba&0xf8),
+                        ba & 0x07);
+                break;
+              }
+            case 'r': // rel8 address at 2nd byte
+              sprintf(temp, "%04"_A_"x",
+                      t_addr(addr+2+(signed char)(rom->get(addr+1))));
+              break;
+            case 'R': // rel8 address at 3rd byte
+              sprintf(temp, "%04"_A_"x",
+                      t_addr(addr+3+(signed char)(rom->get(addr+2))));
+              break;
+            case 'd': // data8 at 2nd byte
+              sprintf(temp, "%02"_M_"x", rom->get(addr+1));
+              break;
+            case 'D': // data8 at 3rd byte
+              sprintf(temp, "%02"_M_"x", rom->get(addr+2));
+              break;
+            case '6': // data16 at 2nd(H)-3rd(L) byte
+              sprintf(temp, "%04"_A_"x",
+                      t_addr(rom->get(addr+1)*256 +
+                             rom->get(addr+2)));
+              break;
+            default:
+              strcpy(temp, "?");
+              break;
+            }
+          t= temp;
+          while (*t)
+            *(p++)= *(t++);
+        }
       else
-	*(p++)= *(b++);
+        *(p++)= *(b++);
     }
   *p= '\0';
 
@@ -421,7 +416,7 @@ cl_51core::disass(t_addr addr, char *sep)
   if (sep == NULL)
     {
       while (strlen(buf) < 6)
-	strcat(buf, " ");
+        strcat(buf, " ");
     }
   else
     strcat(buf, sep);
@@ -431,7 +426,7 @@ cl_51core::disass(t_addr addr, char *sep)
 
 
 void
-cl_51core::print_regs(class cl_console *con)
+cl_51core::print_regs(class cl_console_base *con)
 {
   t_addr start;
   uchar data;
@@ -442,22 +437,22 @@ cl_51core::print_regs(class cl_console *con)
   start= psw->get() & 0x18;
   data= iram->get(iram->get(start));
   con->dd_printf("%06x %02x %c",
-	      iram->get(start), data, isprint(data)?data:'.');
+              iram->get(start), data, isprint(data)?data:'.');
 
   con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
-	      isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
+              isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B)); 
   //eram2xram();
   data= xram->get(sfr->get(DPH)*256+sfr->get(DPL));
   con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", sfr->get(DPH),
-	      sfr->get(DPL), data, data, isprint(data)?data:'.');
+              sfr->get(DPL), data, data, isprint(data)?data:'.');
 
   data= iram->get(iram->get(start+1));
   con->dd_printf("%06x %02x %c", iram->get(start+1), data,
-	      isprint(data)?data:'.');
+              isprint(data)?data:'.');
   data= psw->get();
   con->dd_printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
-	      (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
-	      (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
+              (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
+              (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
 
   print_disass(PC, con);
 }
@@ -493,7 +488,7 @@ cl_51core::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
 
 t_addr
 cl_51core::bit_address(class cl_memory *mem,
-		       t_addr mem_address, int bit_number)
+                       t_addr mem_address, int bit_number)
 {
   if (bit_number < 0 ||
       bit_number > 7 ||
@@ -508,16 +503,16 @@ cl_51core::bit_address(class cl_memory *mem,
   if (mem == sfr)
     {
       if (mem_address < 128 ||
-	  mem_address % 8 != 0 ||
-	  mem_address > 255)
-	return(-1);
+          mem_address % 8 != 0 ||
+          mem_address > 255)
+        return(-1);
       return(128 + (mem_address-128) + bit_number);
     }
   if (mem == iram)
     {
       if (mem_address < 0x20 ||
-	  mem_address >= 0x20+32)
-	return(-1);
+          mem_address >= 0x20+32)
+        return(-1);
       return((mem_address-0x20)*8 + bit_number);
     }
   return(-1);
@@ -593,50 +588,50 @@ cl_51core::analyze(t_addr addr)
   code= rom->get(addr);
   tabl= &(dis_tbl()[code]);
   while (!inst_at(addr) &&
-	 code != 0xa5 /* break point */)
+         code != 0xa5 /* break point */)
     {
       set_inst_at(addr);
       switch (tabl->branch)
-	{
-	case 'a': // acall
-	  analyze((addr & 0xf800)|
-		  ((rom->get(addr+1)&0x07)*256+
-		   rom->get(addr+2)));
-	  analyze(addr+tabl->length);
-	  break;
-	case 'A': // ajmp
-	  addr= (addr & 0xf800)|
-	    ((rom->get(addr+1) & 0x07)*256 + rom->get(addr+2));
-	  break;
-	case 'l': // lcall
-	  analyze(rom->get(addr+1)*256 + rom->get(addr+2));
-	  analyze(addr+tabl->length);
-	  break;
-	case 'L': // ljmp
-	  addr= rom->get(addr+1)*256 + rom->get(addr+2);
-	  break;
-	case 'r': // reljmp (2nd byte)
-	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+1))));
-	  analyze(addr+tabl->length);
-	  break;
-	case 'R': // reljmp (3rd byte)
-	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+2))));
-	  analyze(addr+tabl->length);
-	  break;
-	case 's': // sjmp
-	  {
-	    signed char target;
-	    target= rom->get(addr+1);
-	    addr+= 2;
-	    addr= rom->validate_address(addr+target);
-	    break;
-	  }
-	case '_':
-	  return;
-	default:
-	  addr= rom->validate_address(addr+tabl->length);
-	  break;
-	}
+        {
+        case 'a': // acall
+          analyze((addr & 0xf800)|
+                  ((rom->get(addr+1)&0x07)*256+
+                   rom->get(addr+2)));
+          analyze(addr+tabl->length);
+          break;
+        case 'A': // ajmp
+          addr= (addr & 0xf800)|
+            ((rom->get(addr+1) & 0x07)*256 + rom->get(addr+2));
+          break;
+        case 'l': // lcall
+          analyze(rom->get(addr+1)*256 + rom->get(addr+2));
+          analyze(addr+tabl->length);
+          break;
+        case 'L': // ljmp
+          addr= rom->get(addr+1)*256 + rom->get(addr+2);
+          break;
+        case 'r': // reljmp (2nd byte)
+          analyze(rom->validate_address(addr+(signed char)(rom->get(addr+1))));
+          analyze(addr+tabl->length);
+          break;
+        case 'R': // reljmp (3rd byte)
+          analyze(rom->validate_address(addr+(signed char)(rom->get(addr+2))));
+          analyze(addr+tabl->length);
+          break;
+        case 's': // sjmp
+          {
+            signed char target;
+            target= rom->get(addr+1);
+            addr+= 2;
+            addr= rom->validate_address(addr+target);
+            break;
+          }
+        case '_':
+          return;
+        default:
+          addr= rom->validate_address(addr+tabl->length);
+          break;
+        }
       code= rom->get(addr);
       tabl= &(dis_tbl()[code]);
     }
@@ -862,89 +857,89 @@ cl_51core::exec_inst(void)
  * (inp_avail will be TRUE if ENTER is pressed) and it can confuse
  * command interepter.
  */
-//static class cl_console *c= NULL;
+//static class cl_console_base *c= NULL;
 int
 cl_51core::do_inst(int step)
 {
   result= resGO;
   while ((result == resGO) &&
-	 (state != stPD) &&
-	 (step != 0))
+         (state != stPD) &&
+         (step != 0))
     {
       if (step > 0)
-	step--;
+        step--;
       if (state == stGO)
-	{
-	  interrupt->was_reti= DD_FALSE;
-	  pre_inst();
-	  result= exec_inst();
-	  post_inst();
-	  /*
-	  {
-	    if (c)
-	      print_regs(c);
-	    else
-	      {
-		if (sim->app->get_commander()==NULL)
-		  printf("no commander PC=0x%x\n",PC);
-		else
-		  if (sim->app->get_commander()->frozen_console==NULL)
-		    printf("no frozen console PC=0x%x\n",PC);
-		  else
-		    c= sim->app->get_commander()->frozen_console;
-		if (c)
-		  print_regs(c);
-		else
-		  printf("no console PC=0x%x\n",PC);
-	      }
-	  }
-	  */
-	  /*if (result == resGO)
-	    result= check_events();*/
-	}
+        {
+          interrupt->was_reti= DD_FALSE;
+          pre_inst();
+          result= exec_inst();
+          post_inst();
+          /*
+          {
+            if (c)
+              print_regs(c);
+            else
+              {
+                if (sim->app->get_commander()==NULL)
+                  printf("no commander PC=0x%x\n",PC);
+                else
+                  if (sim->app->get_commander()->frozen_console==NULL)
+                    printf("no frozen console PC=0x%x\n",PC);
+                  else
+                    c= sim->app->get_commander()->frozen_console;
+                if (c)
+                  print_regs(c);
+                else
+                  printf("no console PC=0x%x\n",PC);
+              }
+          }
+          */
+          /*if (result == resGO)
+            result= check_events();*/
+        }
       else
-	{
-	  // tick hw in idle state
-	  inst_ticks= 1;
-	  post_inst();
-	  tick(1);
-	}
+        {
+          // tick hw in idle state
+          inst_ticks= 1;
+          post_inst();
+          tick(1);
+        }
       if (result == resGO)
-	{
-	  int res;
-	  if ((res= do_interrupt()) != resGO)
-	    result= res;
-	  else
-	    result= idle_pd();
-	}
+        {
+          int res;
+          if ((res= do_interrupt()) != resGO)
+            result= res;
+          else
+            result= idle_pd();
+        }
       if ((step < 0) &&
-	  ((ticks->ticks % 100000) < 50))
-	{
-	  if (sim->app->get_commander()->input_avail_on_frozen())
-	    {
-	      result= resUSER;
-	    }
-	  else
-	    if (sim->app->get_commander()->input_avail())
-	      break;
-	}
+          ((ticks->ticks % 100000) < 50))
+        {
+          if (sim->app->get_commander()->input_avail_on_frozen())
+            {
+              result= resUSER;
+            }
+          else
+            if (sim->app->get_commander()->input_avail())
+              break;
+        }
       if (((result == resINTERRUPT) &&
-	   stop_at_it) ||
-	  result >= resSTOP)
-	{
-	  sim->stop(result);
-	  break;
-	}
+           stop_at_it) ||
+          result >= resSTOP)
+        {
+          sim->stop(result);
+          break;
+        }
     }
   if (state == stPD)
     {
       //FIXME: tick outsiders eg. watchdog
       if (sim->app->get_commander()->input_avail_on_frozen())
-	{
-	  //fprintf(stderr,"uc: inp avail in PD mode, user stop\n");
+        {
+          //fprintf(stderr,"uc: inp avail in PD mode, user stop\n");
           result= resUSER;
           sim->stop(result); 
-	}
+        }
     }
   return(result);
 }
@@ -963,41 +958,41 @@ cl_51core::post_inst(void)
     {
       // IE0 edge triggered
       if (p3_int0_edge)
-	{
-	  // falling edge on INT0
-	  sim->app->get_commander()->
-	    debug("%g sec (%d clks): Falling edge detected on INT0 (P3.2)\n",
-			  get_rtime(), ticks->ticks);
-	  sfr->set_bit1(TCON, bmIE0);
-	  p3_int0_edge= 0;
-	}
+        {
+          // falling edge on INT0
+          sim->app->get_commander()->
+            debug("%g sec (%d clks): Falling edge detected on INT0 (P3.2)\n",
+                          get_rtime(), ticks->ticks);
+          sfr->set_bit1(TCON, bmIE0);
+          p3_int0_edge= 0;
+        }
     }
   else
     {
       // IE0 level triggered
       if (p3 & bm_INT0)
-	sfr->set_bit0(TCON, bmIE0);
+        sfr->set_bit0(TCON, bmIE0);
       else
-	sfr->set_bit1(TCON, bmIE0);
+        sfr->set_bit1(TCON, bmIE0);
     }
   if ((tcon & bmIT1))
     {
       // IE1 edge triggered
       if (p3_int1_edge)
-	{
-	  // falling edge on INT1
-	  sfr->set_bit1(TCON, bmIE1);
-	  p3_int1_edge= 0;
-	}
+        {
+          // falling edge on INT1
+          sfr->set_bit1(TCON, bmIE1);
+          p3_int1_edge= 0;
+        }
     }
   else
     {
       // IE1 level triggered
       if (p3 & bm_INT1)
-	sfr->set_bit0(TCON, bmIE1);
+        sfr->set_bit0(TCON, bmIE1);
       else
-	sfr->set_bit1(TCON, bmIE1);
-	}*/
+        sfr->set_bit1(TCON, bmIE1);
+        }*/
   //prev_p3= p3 & port_pins[3];
   //prev_p1= p3 & port_pins[1];
 //}
@@ -1035,28 +1030,28 @@ cl_51core::do_interrupt(void)
     {
       class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
       if (is->is_active() &&
-	  (ie & is->ie_mask) &&
-	  (sfr->get(is->src_reg) & is->src_mask))
-	{
-	  int pr= it_priority(is->ie_mask);
-	  if (il->level >= 0 &&
-	      pr <= il->level)
-	    continue;
-	  if (state == stIDLE)
-	    {
-	      state= stGO;
-	      sfr->set_bit0(PCON, bmIDL);
-	      interrupt->was_reti= DD_TRUE;
-	      return(resGO);
-	    }
-	  if (is->clr_bit)
-	    sfr->set_bit0(is->src_reg, is->src_mask);
-	  sim->app->get_commander()->
-	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
-			  get_rtime(), ticks->ticks, object_name(is), PC);
-	  IL= new it_level(pr, is->addr, PC, is);
-	  return(accept_it(IL));
-	}
+          (ie & is->ie_mask) &&
+          (sfr->get(is->src_reg) & is->src_mask))
+        {
+          int pr= it_priority(is->ie_mask);
+          if (il->level >= 0 &&
+              pr <= il->level)
+            continue;
+          if (state == stIDLE)
+            {
+              state= stGO;
+              sfr->set_bit0(PCON, bmIDL);
+              interrupt->was_reti= DD_TRUE;
+              return(resGO);
+            }
+          if (is->clr_bit)
+            sfr->set_bit0(is->src_reg, is->src_mask);
+          sim->app->get_commander()->
+            debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
+                          get_rtime(), ticks->ticks, object_name(is), PC);
+          IL= new it_level(pr, is->addr, PC, is);
+          return(accept_it(IL));
+        }
     }
   return(resGO);
 }
@@ -1103,18 +1098,18 @@ cl_51core::idle_pd(void)
   if (pcon & bmIDL)
     {
       if (state != stIDLE)
-	sim->app->get_commander()->
-	  debug("%g sec (%d clks): CPU in Idle mode (PC=0x%x, PCON=0x%x)\n",
-		get_rtime(), ticks->ticks, PC, pcon);
+        sim->app->get_commander()->
+          debug("%g sec (%d clks): CPU in Idle mode (PC=0x%x, PCON=0x%x)\n",
+                get_rtime(), ticks->ticks, PC, pcon);
       state= stIDLE;
       //was_reti= 1;
     }
   if (pcon & bmPD)
     {
       if (state != stPD)
-	sim->app->get_commander()->
-	  debug("%g sec (%d clks): CPU in PowerDown mode\n",
-			get_rtime(), ticks->ticks);
+        sim->app->get_commander()->
+          debug("%g sec (%d clks): CPU in PowerDown mode\n",
+                        get_rtime(), ticks->ticks);
       state= stPD;
     }
   return(resGO);
@@ -1137,7 +1132,7 @@ cl_51core::check_events(void)
     {
       eb= (class cl_ev_brk *)(ebrk->at(i));
       if (eb->match(&event_at))
-	return(resBREAKPOINT);
+        return(resBREAKPOINT);
     }
   return(resGO);
 }*/
@@ -1254,20 +1249,20 @@ cl_uc51_dummy_hw::write(class cl_memory_cell *cell, t_mem *val)
       p = DD_FALSE;
       uc= *val;
       for (i= 0; i < 8; i++)
-	{
-	  if (uc & 1)
-	    p= !p;
-	  uc>>= 1;
-	}
+        {
+          if (uc & 1)
+            p= !p;
+          uc>>= 1;
+        }
       if (p)
-	cell_psw->set_bit1(bmP);
+        cell_psw->set_bit1(bmP);
       else
-	cell_psw->set_bit0(bmP);
+        cell_psw->set_bit0(bmP);
     }
   else if (cell == cell_sp)
     {
       if (*val > uc->sp_max)
-	uc->sp_max= *val;
+        uc->sp_max= *val;
       uc->sp_avg= (uc->sp_avg+(*val))/2;
     }
   /*else if (cell == cell_pcon)
@@ -1289,11 +1284,11 @@ cl_uc51_dummy_hw::happen(class cl_hw *where, enum hw_event he, void *params)
       t_mem p3o= ep->pins & ep->prev_value;
       t_mem p3n= ep->new_pins & ep->new_value;
       if ((p3o & bm_INT0) &&
-	  !(p3n & bm_INT0))
-	uc51->p3_int0_edge++;
+          !(p3n & bm_INT0))
+        uc51->p3_int0_edge++;
       if ((p3o & bm_INT1) &&
-	  !(p3n & bm_INT1))
-	uc51->p3_int1_edge++;
+          !(p3n & bm_INT1))
+        uc51->p3_int1_edge++;
     }
 }*/
 

@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (sim.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -56,6 +56,10 @@ cl_sim::cl_sim(class cl_app *the_app):
   //arguments= new cl_list(2, 2);
   //accept_args= more_args?strdup(more_args):0;
   gui= new cl_gui(this);
+
+  state = SIM_QUIT;
+  argc = 0;
+  argv = 0;
 }
 
 int
@@ -92,21 +96,21 @@ cl_sim::main(void)
   int done= 0;
 
   while (!done &&
-	 (state & SIM_QUIT) == 0)
+         (state & SIM_QUIT) == 0)
     {
       if (state & SIM_GO)
-	{
-	  uc->do_inst(-1);
-	  if (app->get_commander()->input_avail())
-	    {
-	      done= app->get_commander()->proc_input();
-	    }
-	}
+        {
+          uc->do_inst(-1);
+          if (app->get_commander()->input_avail())
+            {
+              done= app->get_commander()->proc_input();
+            }
+        }
       else
-	{
-	  app->get_commander()->wait_input();
-	  done= app->get_commander()->proc_input();
-	}
+        {
+          app->get_commander()->wait_input();
+          done= app->get_commander()->proc_input();
+        }
     }
   return(0);
 }
@@ -120,7 +124,7 @@ cl_sim::step(void)
 }
 
 /*int
-cl_sim::do_cmd(char *cmdstr, class cl_console *console)
+cl_sim::do_cmd(char *cmdstr, class cl_console_base *console)
 {
   class cl_cmdline *cmdline;
   class cl_cmd *cm;
@@ -138,7 +142,7 @@ cl_sim::do_cmd(char *cmdstr, class cl_console *console)
 }*/
 
 void
-cl_sim::start(class cl_console *con)
+cl_sim::start(class cl_console_base *con)
 {
   state|= SIM_GO;
   con->flags|= CONS_FROZEN;
@@ -149,54 +153,54 @@ cl_sim::start(class cl_console *con)
 void
 cl_sim::stop(int reason)
 {
-  class cl_commander *cmd= app->get_commander();
+  class cl_commander_base *cmd= app->get_commander();
 
   state&= ~SIM_GO;
   if (cmd->frozen_console)
     {
       if (reason == resUSER &&
-	  cmd->frozen_console->input_avail())
-	cmd->frozen_console->read_line();
+          cmd->frozen_console->input_avail())
+        cmd->frozen_console->read_line();
       cmd->frozen_console->dd_printf("Stop at 0x%06x: (%d) ", uc->PC, reason);
       switch (reason)
-	{
-	case resHALT:
-	  cmd->frozen_console->dd_printf("Halted\n");
-	  break;
-	case resINV_ADDR:
-	  cmd->frozen_console->dd_printf("Invalid address\n");
-	  break;
-	case resSTACK_OV:
-	  cmd->frozen_console->dd_printf("Stack overflow\n");
-	  break;
-	case resBREAKPOINT:
-	  cmd->frozen_console->dd_printf("Breakpoint\n");
-	  uc->print_regs(cmd->frozen_console);
-	  break;
-	case resINTERRUPT:
-	  cmd->frozen_console->dd_printf("Interrupt\n");
-	  break;
-	case resWDTRESET:
-	  cmd->frozen_console->dd_printf("Watchdog reset\n");
-	  break;
-	case resUSER:
-	  cmd->frozen_console->dd_printf("User stopped\n");
-	  break;
-	case resINV_INST:
-	  {
-	    cmd->frozen_console->dd_printf("Invalid instruction");
-	    if (uc->rom)
-	      cmd->frozen_console->dd_printf(" 0x%04x\n",
-					     uc->rom->get(uc->PC));
-	  }
+        {
+        case resHALT:
+          cmd->frozen_console->dd_printf("Halted\n");
+          break;
+        case resINV_ADDR:
+          cmd->frozen_console->dd_printf("Invalid address\n");
+          break;
+        case resSTACK_OV:
+          cmd->frozen_console->dd_printf("Stack overflow\n");
+          break;
+        case resBREAKPOINT:
+          cmd->frozen_console->dd_printf("Breakpoint\n");
+          uc->print_regs(cmd->frozen_console);
+          break;
+        case resINTERRUPT:
+          cmd->frozen_console->dd_printf("Interrupt\n");
+          break;
+        case resWDTRESET:
+          cmd->frozen_console->dd_printf("Watchdog reset\n");
+          break;
+        case resUSER:
+          cmd->frozen_console->dd_printf("User stopped\n");
+          break;
+        case resINV_INST:
+          {
+            cmd->frozen_console->dd_printf("Invalid instruction");
+            if (uc->rom)
+              cmd->frozen_console->dd_printf(" 0x%04x\n",
+                                             uc->rom->get(uc->PC));
+          }
          break;
-	case resERROR:
-	  // uc::check_error prints error messages...
-	  break;
-	default:
-	  cmd->frozen_console->dd_printf("Unknown reason\n");
-	  break;
-	}
+        case resERROR:
+          // uc::check_error prints error messages...
+          break;
+        default:
+          cmd->frozen_console->dd_printf("Unknown reason\n");
+          break;
+        }
       cmd->frozen_console->dd_printf("F 0x%06x\n", uc->PC); // for sdcdb
       //if (cmd->actual_console != cmd->frozen_console)
       cmd->frozen_console->flags&= ~CONS_FROZEN;
@@ -209,22 +213,22 @@ cl_sim::stop(int reason)
 void
 cl_sim::stop(class cl_ev_brk *brk)
 {
-  class cl_commander *cmd= app->get_commander();
+  class cl_commander_base *cmd= app->get_commander();
 
   state&= ~SIM_GO;
   if (cmd->frozen_console)
     {
-      class cl_console *con= cmd->frozen_console;
+      class cl_console_base *con= cmd->frozen_console;
       /*
       if (reason == resUSER &&
-	  cmd->frozen_console->input_avail())
-	cmd->frozen_console->read_line();
+          cmd->frozen_console->input_avail())
+        cmd->frozen_console->read_line();
       */
       //con->dd_printf("Stop at 0x%06x\n", uc->PC);
       con->dd_printf("Event `%s' at %s[0x%"_A_"x]: 0x%"_A_"x %s\n",
-		     brk->id, brk->get_mem()->get_name(), brk->addr,
-		     uc->instPC,
-		     uc->disass(uc->instPC, " "));
+                     brk->id, brk->get_mem()->get_name(), brk->addr,
+                     uc->instPC,
+                     uc->disass(uc->instPC, " "));
       //con->flags&= ~CONS_FROZEN;
       //con->print_prompt();
       //cmd->frozen_console= 0;
@@ -268,11 +272,11 @@ cl_sim::build_cmdset(class cl_cmdset *cmdset)
   {
     cset= new cl_cmdset();
     cset->init();
-    cset->add(cmd= new cl_gui_start_cmd("start", 0, 
+    cset->add(cmd= new cl_gui_start_cmd("start", 0,
 "gui start          Start interfacing with GUI tool",
 "long help of gui start"));
     cmd->init();
-    cset->add(cmd= new cl_gui_stop_cmd("stop", 0, 
+    cset->add(cmd= new cl_gui_stop_cmd("stop", 0,
 "gui stop           Stop interfacing with GUI tool",
 "long help of gui stop"));
     cmd->init();

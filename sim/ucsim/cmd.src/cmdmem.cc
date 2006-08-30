@@ -43,13 +43,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_conf_addmem_cmd::do_work(class cl_sim *sim,
-//			    class cl_cmdline *cmdline, class cl_console *con)
+//                          class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_memory_createchip_cmd)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   char *memid= NULL;
   int size= -1;
   int width= 8;
@@ -89,13 +89,13 @@ COMMAND_DO_WORK_UC(cl_memory_createchip_cmd)
 
 //int
 //cl_conf_addmem_cmd::do_work(class cl_sim *sim,
-//			    class cl_cmdline *cmdline, class cl_console *con)
+//                          class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_memory_createaddressspace_cmd)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };
   char *memid= NULL;
   int start= 0, size= -1, width= 8;
 
@@ -125,7 +125,7 @@ COMMAND_DO_WORK_UC(cl_memory_createaddressspace_cmd)
   else
     {
       class cl_address_space *mem=
-	new cl_address_space(memid, start, size, width);
+        new cl_address_space(memid, start, size, width);
       mem->init();
       uc->address_spaces->add(mem);
       mem->set_uc(uc);
@@ -141,14 +141,14 @@ COMMAND_DO_WORK_UC(cl_memory_createaddressspace_cmd)
 
 //int
 //cl_conf_addmem_cmd::do_work(class cl_sim *sim,
-//			    class cl_cmdline *cmdline, class cl_console *con)
+//                          class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_memory_createaddressdecoder_cmd)
 {
   class cl_cmd_arg *params[5]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3),
-				 cmdline->param(4) };
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3),
+                                 cmdline->param(4) };
   class cl_memory *as= 0, *chip= 0;
   t_addr as_begin= 0, as_end= 0, chip_begin= 0;
   
@@ -201,14 +201,14 @@ COMMAND_DO_WORK_UC(cl_memory_createaddressdecoder_cmd)
   else if (chip_begin >= chip->get_size())
     con->dd_printf("Wrong chip area specification\n");
   else if (as_begin < as->start_address ||
-	   as_end >= as->highest_valid_address())
+           as_end >= as->highest_valid_address())
     con->dd_printf("Specified area is out of address space\n");
   else if (as_end-as_begin > chip->get_size()-chip_begin)
     con->dd_printf("Specified area is out of chip size\n");
   else
     {
       class cl_address_decoder *d=
-	new cl_address_decoder(as, chip, as_begin, as_end, chip_begin);
+        new cl_address_decoder(as, chip, as_begin, as_end, chip_begin);
       ((class cl_address_space *)as)->decoders->add(d);
       d->activate(con);
     }

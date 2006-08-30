@@ -43,14 +43,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 enum what_to_do_on_cell_change {
-  wtd_none		= 0x01,
-  wtd_write		= 0x02,
-  wtd_restore		= 0x04,
-  wtd_restore_write	= 0x08
+  wtd_none              = 0x01,
+  wtd_write             = 0x02,
+  wtd_restore           = 0x04,
+  wtd_restore_write     = 0x08
 };
 
-#define WTD_WRITE	(wtd_write|wtd_restore_write)
-#define WTD_RESTORE	(wtd_restore|wtd_restore_write)
+#define WTD_WRITE       (wtd_write|wtd_restore_write)
+#define WTD_RESTORE     (wtd_restore|wtd_restore_write)
 
 class cl_hw; // forward
 
@@ -65,27 +65,27 @@ public:
   enum what_to_do_on_cell_change wtd;
 public:
   cl_watched_cell(class cl_address_space *amem, t_addr aaddr,
-		  class cl_memory_cell **astore,
-		  enum what_to_do_on_cell_change awtd);
+                  class cl_memory_cell **astore,
+                  enum what_to_do_on_cell_change awtd);
 
   virtual void mem_cell_changed(class cl_address_space *amem, t_addr aaddr,
-				class cl_hw *hw);
+                                class cl_hw *hw);
   virtual void address_space_added(class cl_address_space *amem,
-				   class cl_hw *hw);
+                                   class cl_hw *hw);
 };
 
 class cl_used_cell: public cl_watched_cell
 {
 public:
   cl_used_cell(class cl_address_space *amem, t_addr aaddr,
-	       class cl_memory_cell **astore,
-	       enum what_to_do_on_cell_change awtd):
+               class cl_memory_cell **astore,
+               enum what_to_do_on_cell_change awtd):
     cl_watched_cell(amem, aaddr, astore, awtd) {}
 
   virtual void mem_cell_changed(class cl_address_space *amem, t_addr aaddr,
-				class cl_hw *hw);
+                                class cl_hw *hw);
   virtual void address_space_added(class cl_address_space *amem,
-				   class cl_hw *hw);
+                                   class cl_hw *hw);
 };
 
 class cl_hw: public cl_guiobj
@@ -111,26 +111,26 @@ public:
   virtual t_mem read(class cl_memory_cell *cell) { return(cell->get()); }
   virtual void write(class cl_memory_cell */*cell*/, t_mem */*val*/) {}
 
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console *con);
+  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem,
-					      t_addr addr,
-					      class cl_memory_cell **store,
-					      enum what_to_do_on_cell_change
-					      awtd);
+                                              t_addr addr,
+                                              class cl_memory_cell **store,
+                                              enum what_to_do_on_cell_change
+                                              awtd);
   virtual class cl_memory_cell *use_cell(class cl_address_space *mem,
-					 t_addr addr,
-					 class cl_memory_cell **store,
-					 enum what_to_do_on_cell_change awtd);
+                                         t_addr addr,
+                                         class cl_memory_cell **store,
+                                         enum what_to_do_on_cell_change awtd);
   virtual void mem_cell_changed(class cl_address_space *mem, t_addr addr);
   virtual void address_space_added(class cl_address_space *as);
 
   virtual int tick(int cycles);
   virtual void reset(void) {}
   virtual void happen(class cl_hw */*where*/, enum hw_event /*he*/,
-		      void */*params*/) {}
+                      void */*params*/) {}
   virtual void inform_partners(enum hw_event he, void *params);
 
-  virtual void print_info(class cl_console *con);
+  virtual void print_info(class cl_console_base *con);
 };
 
 class cl_hws: public cl_list

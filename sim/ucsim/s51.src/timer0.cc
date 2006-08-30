@@ -87,22 +87,22 @@ cl_timer0::init(void)
     {
       //t_mem d;
       if (id == 0 || id == 1)
-	{
-	  //cell_tmod= sfr->register_hw(TMOD, this, 0);
-	  register_cell(sfr, TMOD, &cell_tmod, wtd_restore_write);
-	  //d= cell_tmod->get(); write(cell_tmod, &d);
-	  //cell_tcon= sfr->register_hw(TCON, this, 0);
-	  register_cell(sfr, TCON, &cell_tcon, wtd_restore_write);
-	  //d= cell_tcon->get(); write(cell_tcon, &d);
-	  INT= sfr->read(P3) & mask_INT;
-	}
+        {
+          //cell_tmod= sfr->register_hw(TMOD, this, 0);
+          register_cell(sfr, TMOD, &cell_tmod, wtd_restore_write);
+          //d= cell_tmod->get(); write(cell_tmod, &d);
+          //cell_tcon= sfr->register_hw(TCON, this, 0);
+          register_cell(sfr, TCON, &cell_tcon, wtd_restore_write);
+          //d= cell_tcon->get(); write(cell_tcon, &d);
+          INT= sfr->read(P3) & mask_INT;
+        }
       else if (id == 2)
-	{
-	  cell_tmod= 0;
-	  //cell_tcon= sfr->register_hw(T2CON, this, 0);
-	  register_cell(sfr, T2CON, &cell_tcon, wtd_restore_write);
-	  //d= cell_tcon->get(); write(cell_tcon, &d);
-	}
+        {
+          cell_tmod= 0;
+          //cell_tcon= sfr->register_hw(T2CON, this, 0);
+          register_cell(sfr, T2CON, &cell_tcon, wtd_restore_write);
+          //d= cell_tcon->get(); write(cell_tcon, &d);
+        }
       //cell_tl= sfr->get_cell(addr_tl);
       //cell_th= sfr->get_cell(addr_th);
       use_cell(sfr, addr_tl, &cell_tl, wtd_restore);
@@ -116,10 +116,10 @@ cl_timer0::added_to_uc(void)
 {
   if (id == 0)
     uc->it_sources->add(new cl_it_src(bmET0, TCON, bmTF0, 0x000b, true,
-				      "timer #0", 2));
+                                      "timer #0", 2));
   else if (id == 1)
     uc->it_sources->add(new cl_it_src(bmET1, TCON, bmTF1, 0x001b, true,
-				      "timer #1", 4));
+                                      "timer #1", 4));
 }
 
 /*t_mem
@@ -135,13 +135,13 @@ cl_timer0::write(class cl_memory_cell *cell, t_mem *val)
     {
       t_mem md= *val & (mask_M0|mask_M1);
       if (md == mask_M0)
-	mode= 1;
+        mode= 1;
       else if (md == mask_M1)
-	mode= 2;
+        mode= 2;
       else if (md == (mask_M0|mask_M1))
-	mode= 3;
+        mode= 3;
       else
-	mode= 0;
+        mode= 0;
       GATE= *val & mask_GATE;
       C_T = *val & mask_C_T;
       T_edge= 0;
@@ -192,15 +192,15 @@ cl_timer0::do_mode0(int cycles)
   if (GATE)
     {
       if ((/*p3 & mask_*/INT) == 0)
-	return(0);
+        return(0);
     }
 
   if (C_T)
     {
       /*cycles= 0;
       if ((uc51->prev_p3 & mask_T) &&
-	  !(p3 & uc51->port_pins[3] & mask_T))
-	  cycles= 1;*/
+          !(p3 & uc51->port_pins[3] & mask_T))
+          cycles= 1;*/
       cycles= T_edge;
       T_edge= 0;
     }
@@ -209,14 +209,14 @@ cl_timer0::do_mode0(int cycles)
       // mod 0, TH= 8 bit t/c, TL= 5 bit precounter
       t_mem tl= cell_tl->add(1);
       if ((tl & 0x1f) == 0)
-	{
-	  cell_tl->set(0);
-	  if (!cell_th->add(1))
-	    {
-	      cell_tcon->set_bit1(mask_TF);
-	      overflow();
-	    }
-	}
+        {
+          cell_tl->set(0);
+          if (!cell_th->add(1))
+            {
+              cell_tcon->set_bit1(mask_TF);
+              overflow();
+            }
+        }
     }
 
   return(0);
@@ -232,15 +232,15 @@ cl_timer0::do_mode1(int cycles)
   if (GATE)
     {
       if ((/*p3 & mask_*/INT) == 0)
-	return(0);
+        return(0);
     }
 
   if (C_T)
     {
       /*cycles= 0;
       if ((uc51->prev_p3 & mask_T) &&
-	  !(p3 & uc51->port_pins[3] & mask_T))
-	  cycles= 1;*/
+          !(p3 & uc51->port_pins[3] & mask_T))
+          cycles= 1;*/
       cycles= T_edge;
       T_edge= 0;
     }
@@ -249,13 +249,13 @@ cl_timer0::do_mode1(int cycles)
     {
       // mod 1 TH+TL= 16 bit t/c
       if (!cell_tl->add(1))
-	{
-	  if (!cell_th->add(1))
-	    {
-	      cell_tcon->set_bit1(mask_TF);
-	      overflow();
-	    }
-	}
+        {
+          if (!cell_th->add(1))
+            {
+              cell_tcon->set_bit1(mask_TF);
+              overflow();
+            }
+        }
     }
 
   return(0);
@@ -271,15 +271,15 @@ cl_timer0::do_mode2(int cycles)
   if (GATE)
     {
       if ((/*p3 & mask_*/INT) == 0)
-	return(0);
+        return(0);
     }
 
   if (C_T)
     {
       /*cycles= 0;
       if ((uc51->prev_p3 & mask_T) &&
-	  !(p3 & uc51->port_pins[3] & mask_T))
-	  cycles= 1;*/
+          !(p3 & uc51->port_pins[3] & mask_T))
+          cycles= 1;*/
       cycles= T_edge;
       T_edge= 0;
     }
@@ -289,12 +289,12 @@ cl_timer0::do_mode2(int cycles)
     {
       // mod 2 TL= 8 bit t/c auto reload from TH
       if (!cell_tl->add(1))
-	{
-	  cell_tl->set(cell_th->get());
-	  cell_tcon->set_bit1(mask_TF);
-	  //printf("timer%d overflow %d (%d) %d\n",id,uc->ticks->ticks,i,startt+(i*12));
-	  overflow();
-	}
+        {
+          cell_tl->set(cell_th->get());
+          cell_tcon->set_bit1(mask_TF);
+          //printf("timer%d overflow %d (%d) %d\n",id,uc->ticks->ticks,i,startt+(i*12));
+          overflow();
+        }
       //i++;
     }
   return(0);
@@ -312,15 +312,15 @@ cl_timer0::do_mode3(int cycles)
   if (GATE)
     {
       if ((/*p3 & mask_*/INT) == 0)
-	goto do_th;
+        goto do_th;
     }
 
   if (C_T)
     {
       /*cycles= 0;
       if ((uc51->prev_p3 & mask_T) &&
-	  !(p3 & uc51->port_pins[3] & mask_T))
-	  cycles= 1;*/
+          !(p3 & uc51->port_pins[3] & mask_T))
+          cycles= 1;*/
       cycles= T_edge;
       T_edge= 0;
     }
@@ -328,18 +328,18 @@ cl_timer0::do_mode3(int cycles)
   while (cycles--)
     {
       if (!cell_tl->add(1))
-	{
-	  cell_tcon->set_bit1(mask_TF);
-	  overflow();
-	}
+        {
+          cell_tcon->set_bit1(mask_TF);
+          overflow();
+        }
     }
 
  do_th:
   if ((cell_tcon->get() & bmTR1) != 0)
     while (cyc--)
       {
-	if (!cell_th->add(1))
-	  cell_tcon->set_bit1(bmTF1);
+        if (!cell_th->add(1))
+          cell_tcon->set_bit1(bmTF1);
       }
   return(0);
 }
@@ -362,15 +362,15 @@ cl_timer0::happen(class cl_hw *where, enum hw_event he, void *params)
       t_mem p3n= ep->new_pins & ep->new_value;
       t_mem p3o= ep->pins & ep->prev_value;
       if ((p3n & mask_T) &&
-	  !(p3o & mask_T))
-	T_edge++;
+          !(p3o & mask_T))
+        T_edge++;
       INT= p3n & mask_INT;
       //printf("timer%d p%dchanged (%02x,%02x->%02x,%02x) INT=%d(%02x) edge=%d(%02x)\n",id,where->id,ep->prev_value,ep->pins,ep->new_value,ep->new_pins,INT,mask_INT,T_edge,mask_T);
     }
 }
 
 void
-cl_timer0::print_info(class cl_console *con)
+cl_timer0::print_info(class cl_console_base *con)
 {
   char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "2x8 bit" };
   //t_mem tmod= cell_tmod->get();
@@ -378,7 +378,7 @@ cl_timer0::print_info(class cl_console *con)
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
 
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
-		 256*cell_th->get()+cell_tl->get());
+                 256*cell_th->get()+cell_tl->get());
   //int mode= tmod & (bmM00|bmM10);
   con->dd_printf(" %s", modes[mode]);
   con->dd_printf(" %s", (/*tmod&bm*/C_T/*0*/)?"counter":"timer");

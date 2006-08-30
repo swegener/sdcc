@@ -74,7 +74,7 @@ public:
   /* mods for disassembly of flat24 */
   virtual struct dis_entry *dis_tbl(void);
   virtual char * disass(t_addr addr, char *sep);
-  virtual void   print_regs(class cl_console *con);
+  virtual void   print_regs(class cl_console_base *con);
 
 protected:
   int flat24_flag; /* true if processor == ds390f */

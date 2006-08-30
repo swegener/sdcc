@@ -36,13 +36,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 {
 public:
   cl_get_sfr_cmd(//class cl_sim *asim,
-		 char *aname,
-		 int  can_rep,
-		 char *short_hlp,
-		 char *long_hlp):
+                 char *aname,
+                 int  can_rep,
+                 char *short_hlp,
+                 char *long_hlp):
     cl_cmd(aname, can_rep, short_hlp, long_hlp) {}
   virtual int do_work(class cl_sim *sim,
-		      class cl_cmdline *cmdline, class cl_console *con);
+                      class cl_cmdline *cmdline, class cl_console_base *con);
 };*/
 COMMAND_ON(uc,cl_get_sfr_cmd);
 
@@ -51,13 +51,13 @@ COMMAND_ON(uc,cl_get_sfr_cmd);
 {
 public:
   cl_get_option_cmd(//class cl_sim *asim,
-		    char *aname,
-		    int  can_rep,
-		    char *short_hlp,
-		    char *long_hlp):
+                    char *aname,
+                    int  can_rep,
+                    char *short_hlp,
+                    char *long_hlp):
     cl_cmd(aname, can_rep, short_hlp, long_hlp) {}
   virtual int do_work(class cl_sim *sim,
-		      class cl_cmdline *cmdline, class cl_console *con);
+                      class cl_cmdline *cmdline, class cl_console_base *con);
 };*/
 COMMAND_ON(app,cl_get_option_cmd);
 

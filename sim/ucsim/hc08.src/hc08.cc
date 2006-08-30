@@ -284,63 +284,63 @@ cl_hc08::disass(t_addr addr, char *sep)
   while (*b)
     {
       if (*b == '%')
-	{
-	  b++;
-	  switch (*(b++))
-	    {
-	    case 's': // s    signed byte immediate
-	      sprintf(temp, "#%d", (char)get_mem(MEM_ROM_ID, addr+immed_offset));
-	      ++immed_offset;
-	      break;
-	    case 'w': // w    word immediate operand
-	      sprintf(temp, "#0x%04x",
-	         (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-	                (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
-	      ++immed_offset;
-	      ++immed_offset;
-	      break;
-	    case 'b': // b    byte immediate operand
-	      sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
-	      ++immed_offset;
-	      break;
-	    case 'x': // x    extended addressing
-	      sprintf(temp, "0x%04x",
-	         (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-	                (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
-	      ++immed_offset;
-	      ++immed_offset;
-	      break;
-	    case 'd': // d    direct addressing
-	      sprintf(temp, "*0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
-	      ++immed_offset;
-	      break;
-	    case '2': // 2    word index offset
-	      sprintf(temp, "0x%04x",
-	         (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-	                (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
-	      ++immed_offset;
-	      ++immed_offset;
-	      break;
-	    case '1': // b    byte index offset
+        {
+          b++;
+          switch (*(b++))
+            {
+            case 's': // s    signed byte immediate
+              sprintf(temp, "#%d", (char)get_mem(MEM_ROM_ID, addr+immed_offset));
+              ++immed_offset;
+              break;
+            case 'w': // w    word immediate operand
+              sprintf(temp, "#0x%04x",
+                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
+                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
+              ++immed_offset;
+              ++immed_offset;
+              break;
+            case 'b': // b    byte immediate operand
+              sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
+              ++immed_offset;
+              break;
+            case 'x': // x    extended addressing
+              sprintf(temp, "0x%04x",
+                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
+                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
+              ++immed_offset;
+              ++immed_offset;
+              break;
+            case 'd': // d    direct addressing
+              sprintf(temp, "*0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
+              ++immed_offset;
+              break;
+            case '2': // 2    word index offset
+              sprintf(temp, "0x%04x",
+                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
+                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
+              ++immed_offset;
+              ++immed_offset;
+              break;
+            case '1': // b    byte index offset
               sprintf(temp, "0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
-	      ++immed_offset;
-	      break;
-	    case 'p': // b    byte index offset
+              ++immed_offset;
+              break;
+            case 'p': // b    byte index offset
               sprintf(temp, "0x%04x",
                  addr+immed_offset+1
                  +(char)get_mem(MEM_ROM_ID, addr+immed_offset));
-	      ++immed_offset;
-	      break;
-	    default:
-	      strcpy(temp, "?");
-	      break;
-	    }
-	  t= temp;
-	  while (*t)
-	    *(p++)= *(t++);
-	}
+              ++immed_offset;
+              break;
+            default:
+              strcpy(temp, "?");
+              break;
+            }
+          t= temp;
+          while (*t)
+            *(p++)= *(t++);
+        }
       else
-	*(p++)= *(b++);
+        *(p++)= *(b++);
     }
   *p= '\0';
 
@@ -361,7 +361,7 @@ cl_hc08::disass(t_addr addr, char *sep)
   if (sep == NULL)
     {
       while (strlen(buf) < 6)
-	strcat(buf, " ");
+        strcat(buf, " ");
     }
   else
     strcat(buf, sep);
@@ -371,26 +371,26 @@ cl_hc08::disass(t_addr addr, char *sep)
 
 
 void
-cl_hc08::print_regs(class cl_console *con)
+cl_hc08::print_regs(class cl_console_base *con)
 {
   con->dd_printf("V--HINZC  Flags= 0x%02x %3d %c  ",
-		 regs.P, regs.P, isprint(regs.P)?regs.P:'.');
+                 regs.P, regs.P, isprint(regs.P)?regs.P:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",
-		 regs.A, regs.A, isprint(regs.A)?regs.A:'.');
+                 regs.A, regs.A, isprint(regs.A)?regs.A:'.');
   con->dd_printf("%c--%c%c%c%c%c  ",
-		 (regs.P&BIT_V)?'1':'0',
-		 (regs.P&BIT_H)?'1':'0',
-		 (regs.P&BIT_I)?'1':'0',
-		 (regs.P&BIT_N)?'1':'0',
-		 (regs.P&BIT_Z)?'1':'0',
-		 (regs.P&BIT_C)?'1':'0');
+                 (regs.P&BIT_V)?'1':'0',
+                 (regs.P&BIT_H)?'1':'0',
+                 (regs.P&BIT_I)?'1':'0',
+                 (regs.P&BIT_N)?'1':'0',
+                 (regs.P&BIT_Z)?'1':'0',
+                 (regs.P&BIT_C)?'1':'0');
   con->dd_printf("    H= 0x%02x %3d %c  ",
-		 regs.H, regs.H, isprint(regs.H)?regs.H:'.');
+                 regs.H, regs.H, isprint(regs.H)?regs.H:'.');
   con->dd_printf("X= 0x%02x %3d %c\n",
-		 regs.X, regs.X, isprint(regs.X)?regs.X:'.');
+                 regs.X, regs.X, isprint(regs.X)?regs.X:'.');
   con->dd_printf("SP= 0x%04x [SP+1]= %02x %3d %c\n",
-		 regs.SP, ram->get(regs.SP+1), ram->get(regs.SP+1),
-		 isprint(ram->get(regs.SP+1))?ram->get(regs.SP+1):'.');
+                 regs.SP, ram->get(regs.SP+1), ram->get(regs.SP+1),
+                 isprint(ram->get(regs.SP+1))?ram->get(regs.SP+1):'.');
   
   print_disass(PC, con);
 }

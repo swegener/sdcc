@@ -1,7 +1,8 @@
 /*
- * Simulator of microcontrollers (cmd.src/cmdcl.h)
+ * Simulator of microcontrollers (cmd.src/newcmdcl.h)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2006, Borut Razem - borut.razem@siol.net
  *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -34,9 +35,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
-#if FD_HEADER_OK
-# include HEADER_FD
-#endif
 
 // prj
 #include "pobjcl.h"
@@ -79,9 +77,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_prompt_option: public cl_optref
 {
 protected:
-  class cl_console *con;
+  class cl_console_base *con;
 public:
-  cl_prompt_option(class cl_console *console);
+  cl_prompt_option(class cl_console_base *console);
   virtual int init(void);
   virtual void option_changed(void);
 };
@@ -89,7 +87,7 @@ public:
 class cl_debug_option: public cl_prompt_option
 {
 public:
-  cl_debug_option(class cl_console *console);
+  cl_debug_option(class cl_console_base *console);
   virtual int init(void);
   virtual void option_changed(void);
 };
@@ -98,115 +96,76 @@ public:
  * Command console
  */
 
-class cl_console: public cl_base
+class cl_console_base: public cl_base
 {
-  friend class cl_commander;
 protected:
-  FILE *in, *out, *rout/*redirected output*/;
-  int id;
   class cl_prompt_option *prompt_option;
   class cl_optref *null_prompt_option;
   class cl_debug_option *debug_option;
   class cl_ustrings *lines_printed;
   class cl_cmd *last_command;
   class cl_cmdline *last_cmdline;
-public:
-  class cl_app *app;
-  int flags; // See CONS_XXXX
-  char *prompt;
 
 public:
-  cl_console(void): cl_base() { app= 0; in= out= 0; flags= 0; }
-  cl_console(char *fin, char *fout, class cl_app *the_app);
-  cl_console(FILE *fin, FILE *fout, class cl_app *the_app);
-  cl_console(char *fin, FILE *fout);
-#ifdef SOCKET_AVAIL
-  cl_console(int portnumber, class cl_app *the_app);
-#endif
-  virtual ~cl_console(void);
-  virtual class cl_console *clone_for_exec(char *fin);
+  cl_console_base(void): cl_base() { app = 0; flags = 0; prompt = 0; }
+
+  virtual class cl_console_base *clone_for_exec(char *fin) = 0;
+
+  virtual void redirect(char *fname, char *mode) = 0;
+  virtual void un_redirect(void) = 0;
+  virtual int cmd_do_print(char *format, va_list ap) = 0;
+  virtual bool is_tty(void) const = 0;
+  virtual bool is_eof(void) const = 0;
+  virtual int input_avail(void) = 0;
+  virtual char *read_line(void) = 0;
+
   virtual int init(void);
-
-  virtual bool accept_last(void);
-
   virtual void welcome(void);
-  virtual void redirect(char *fname, char *mode);
-  virtual void un_redirect(void);
-  int cmd_do_print(char *format, va_list ap);
-  virtual void print_prompt(void);
-  virtual int  dd_printf(char *format, ...);
-  virtual int  debug(char *format, ...);
-  virtual void print_bin(long data, int bits);
-  virtual void print_char_octal(char c);
-  virtual int  get_in_fd(void);
-  virtual int  input_avail(void);
-  virtual char *read_line(void);
-  virtual int  proc_input(class cl_cmdset *cmdset);
-  virtual bool interpret(char *cmd);
-  virtual void set_id(int new_id);
-  virtual int get_id(void) { return(id); }
-  virtual void set_prompt(char *p);
-private:
-  FILE *get_out(void) { return(rout?rout:out); }
-};
-
-#ifdef SOCKET_AVAIL
-class cl_listen_console: public cl_console
-{
-public:
-  int sock;
-public:
-  cl_listen_console(int serverport, class cl_app *the_app);
-
-  virtual void welcome(void) {}
-
-  virtual int get_in_fd(void);
   virtual int proc_input(class cl_cmdset *cmdset);
-};
-#endif
 
+  void print_prompt(void);
+  int dd_printf(char *format, ...);
+  int debug(char *format, ...);
+  void print_bin(long data, int bits);
+  void print_char_octal(char c);
 
-class cl_sub_console: public cl_console
-{
-  class cl_console *parent;
+  bool interpret(char *cmd);
+  int get_id(void) const { return(id); }
+  void set_id(int new_id);
+  void set_prompt(char *p);
+  
+  bool input_active(void) const;
+  bool accept_last(void) { return is_tty() ? DD_TRUE : DD_FALSE; }
+
 public:
-  cl_sub_console(class cl_console *the_parent,
-                 FILE *fin, FILE *fout, class cl_app *the_app);
-  virtual ~cl_sub_console(void);
-  virtual int init(void);
-};
+  int flags; // See CONS_XXXX
 
+protected:
+  class cl_app *app;
+  char *prompt;
+  int id;
+};
 
 /*
  * Command interpreter
  */
 
-class cl_commander: public cl_base
+class cl_commander_base: public cl_base
 {
 public:
   class cl_app *app;
   class cl_list *cons;
-  fd_set read_set, active_set;
-  UCSOCKET_T fd_num;
-  class cl_console *actual_console, *frozen_console;
+  class cl_console_base *actual_console, *frozen_console;
   class cl_cmdset *cmdset;
 
 public:
-  cl_commander(class cl_app *the_app,
-               class cl_cmdset *acmdset/*, class cl_sim *asim*/);
-  virtual ~cl_commander(void);
-  virtual int init(void);
+  cl_commander_base(class cl_app *the_app, class cl_cmdset *acmdset);
+  virtual ~cl_commander_base(void);
 
-  virtual class cl_console *mk_console(char *fin, char *fout);
-  virtual class cl_console *mk_console(FILE *fin, FILE *fout);
-#ifdef SOCKET_AVAIL
-  virtual class cl_console *mk_console(int portnumber);
-#endif
-  void add_console(class cl_console *console);
-  void del_console(class cl_console *console);
-  void activate_console(class cl_console *console);
-  void deactivate_console(class cl_console *console);
-  void set_fd_set(void);
+  void add_console(class cl_console_base *console);
+  void del_console(class cl_console_base *console);
+  void activate_console(class cl_console_base *console);
+  void deactivate_console(class cl_console_base *console);
 
   void prompt(void);
   int all_printf(char *format, ...);        // print to all consoles
@@ -215,14 +174,17 @@ public:
   int debug(char *format, ...);             // print consoles with debug flag set
   int debug(char *format, va_list ap);      // print consoles with debug flag set
   int flag_printf(int iflags, char *format, ...);
-  int input_avail(void);
   int input_avail_on_frozen(void);
-  int wait_input(void);
-  int proc_input(void);
-  void exec_on(class cl_console *cons, char *file_name);
+  void exec_on(class cl_console_base *cons, char *file_name);
+
+  virtual int init(void) = 0;
+  virtual void set_fd_set(void) = 0;
+  virtual int proc_input(void) = 0;
+  virtual int input_avail(void) = 0;
+  virtual int wait_input(void) = 0;
 };
 
 
 #endif
 
-/* End of cmd.src/cmdcl.h */
+/* End of cmd.src/newcmdcl.h */

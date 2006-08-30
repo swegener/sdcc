@@ -18,21 +18,21 @@ public:
 
 public:
   cl_mem(enum mem_class atype, char *aclass_name, t_addr asize, int awidth,
-	 class cl_uc *auc);
+         class cl_uc *auc);
   virtual ~cl_mem(void);
   virtual int init(void);
   virtual char *id_string(void);
   virtual int get_cell_flag(t_addr //addr
-			    ) { return(CELL_NORMAL); }
+                            ) { return(CELL_NORMAL); }
   virtual bool get_cell_flag(t_addr //addr
-			     , int //flag
-			     )
+                             , int //flag
+                             )
   { return(DD_FALSE); }
   virtual void set_cell_flag(t_addr addr, bool set_to, int flag) {}
 
   virtual t_mem read(t_addr addr);
   virtual t_mem read(t_addr addr, enum hw_cath //skip
-		     ) {return(read(addr));}
+                     ) {return(read(addr));}
   virtual t_mem get(t_addr addr);
   virtual t_mem write(t_addr addr, t_mem val);
   virtual void set(t_addr addr, t_mem val);
@@ -43,18 +43,18 @@ public:
   virtual t_mem add(t_addr addr, long what);
   virtual t_mem wadd(t_addr addr, long what) { return(add(addr, what)); }
   virtual t_addr dump(t_addr start, t_addr stop, int bpl,
-		      class cl_console *con);
-  virtual t_addr dump(class cl_console *con);
+                      class cl_console_base *con);
+  virtual t_addr dump(class cl_console_base *con);
   virtual bool search_next(bool case_sensitive,
-			   t_mem *array, int len, t_addr *addr);
+                           t_mem *array, int len, t_addr *addr);
 
   virtual class cl_cell *get_cell(t_addr addr) {return(0);}
   virtual class cl_cell *register_hw(t_addr addr, class cl_hw *hw, int *ith,
-				     bool announce)
+                                     bool announce)
   { return(0); }
   virtual void set_brk(t_addr //addr
-		       , class cl_brk *//brk
-		       ) {}
+                       , class cl_brk *//brk
+                       ) {}
   virtual void del_brk(t_addr addr, class cl_brk *brk) {}
 #ifdef STATISTIC
   virtual unsigned long get_nuof_reads(void) {return(0);}
@@ -129,10 +129,10 @@ public:
   virtual t_mem wadd(t_addr addr, long what);
 
   virtual bool search_next(bool case_sensitive,
-			   t_mem *array, int len, t_addr *addr);
+                           t_mem *array, int len, t_addr *addr);
 
   virtual class cl_cell *register_hw(t_addr addr, class cl_hw *hw, int *ith,
-				     bool announce);
+                                     bool announce);
   virtual void set_brk(t_addr addr, class cl_brk *brk);
   virtual void del_brk(t_addr addr, class cl_brk *brk);
 
@@ -149,7 +149,7 @@ class cl_normal_cell: public cl_cell
 {
 public:
   t_mem data;
-  TYPE_UBYTE type;	// See CELL_XXXX
+  TYPE_UBYTE type;      // See CELL_XXXX
   //protected:
 
 public:

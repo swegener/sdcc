@@ -118,7 +118,7 @@ AC_SUBST(LIBTOOL_DEPS)
 
 AC_PROG_LEX
 if test ${LEX} = "flex"; then
-	AC_DEFINE(HAVE_FLEX)
+        AC_DEFINE(HAVE_FLEX)
 fi
 AC_PROG_YACC
 AC_CHECK_PROG(BISON_PLUS_PLUS, bison++, bison++, :)
@@ -134,15 +134,7 @@ if test -d /stuff/include; then
 fi
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS(getopt.h)
-AC_CHECK_HEADERS(unistd.h)
-
-AC_CHECK_HEADER(termios.h,
-  AC_DEFINE(HAVE_TERMIOS_H)
-  SERIAL_AVAIL=1,
-  SERIAL_AVAIL=0
-)
-AC_SUBST(SERIAL_AVAIL)
+AC_CHECK_HEADERS(getopt.h unistd.h termios.h)
 
 AC_CHECK_HEADER(curses.h,
   AC_DEFINE(HAVE_CURSES_H)
@@ -158,14 +150,17 @@ AC_CHECK_HEADER(sys/socket.h,
   ucsim_cv_socket="<sys/socket.h>"
 )
 
+WINSOCK_AVAIL=0
 if test $ucsim_cv_socket = unknown; then
   AC_CHECK_HEADER(winsock2.h,
     AC_DEFINE(HAVE_WINSOCK2_H)
     AC_DEFINE(SOCKET_AVAIL)
     AC_DEFINE_UNQUOTED(UCSOCKET_T, SOCKET)
     ucsim_cv_socket="<winsock2.h>"
+    WINSOCK_AVAIL=1
   )
 fi
+AC_SUBST(WINSOCK_AVAIL)
 
 if test $ucsim_cv_socket != unknown; then
   AC_EGREP_HEADER(socklen_t,
@@ -236,7 +231,7 @@ AC_DEFINE_UNQUOTED(HEADER_FD, ${ucsim_cv_fd})
 # Checking for functions/libs
 # ===========================================================================
 if echo $ucsim_cv_socket|grep winsock2 >/dev/null 2>&1; then
-  LIBS="-lwsock32 $LIBS"
+  LIBS="-lws2_32 $LIBS"
 else
   AC_CHECK_LIB(socket,socket)
   AC_CHECK_LIB(nsl,xdr_short)
@@ -297,6 +292,7 @@ AC_SUBST(CURSES_LIBS)
 
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(vsnprintf)
+AC_CHECK_FUNCS(_vsnprintf)
 AC_CHECK_FUNCS(vasprintf)
 AC_CHECK_FUNCS(strlen strcpy strcat strstr strcmp strerror strtok strdup)
 AC_CHECK_FUNCS(strchr memcpy)
@@ -404,7 +400,7 @@ if test "$CC" = "i586-mingw32msvc-gcc"; then
   ac_cv_c_bigendian=no
   ac_cv_sizeof_char=1
   ac_cv_sizeof_short=2
-  ac_cv_sizeof_int=4 
+  ac_cv_sizeof_int=4
   ac_cv_sizeof_long=4
   ac_cv_sizeof_long_long=4
 fi
@@ -415,9 +411,9 @@ then
 else
 #echo "CROSS ENDIAN"
     if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
-	ac_cv_c_bigendian=no
+        ac_cv_c_bigendian=no
     else
-	: # FIXME
+        : # FIXME
     fi
 #echo "CROSS ENDIAN DONE"
 fi
@@ -443,13 +439,13 @@ if test "$ucsim_cv_CXXgstabs" = "yes"; then
    gopt="-gstabs+ -g3"
 elif test "$ucsim_cv_CXXggdb" = "yes"; then
      gopt="-ggdb -g3"
-else 
+else
      gopt="-g"
 fi
 if test "$CXXFLAGS"x = x ;then
-	CXXFLAGS="$gopt"
+        CXXFLAGS="$gopt"
 else
-	CXXFLAGS="$CXXFLAGS $gopt"
+        CXXFLAGS="$CXXFLAGS $gopt"
 fi
 
 DD_COPT(CXX, pipe)
@@ -465,7 +461,7 @@ if test "$ucsim_cv_CXXfPIC" = "yes"; then
 else
     DD_COPT(CXX, fpic)
     if test "$ucsim_cv_CXXfpic" = "yes"; then
-	PICOPT="-fpic"
+        PICOPT="-fpic"
     fi
 fi
 if test "$PICOPT"x != "x"; then
@@ -500,13 +496,13 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(long long)
 else
     if $CXX -v 2>&1|grep "mingw" >/dev/null 2>&1; then
-	ac_cv_sizeof_char=1
-	ac_cv_sizeof_short=2
-	ac_cv_sizeof_int=4 
-	ac_cv_sizeof_long=4
-	ac_cv_sizeof_long_long=4
+        ac_cv_sizeof_char=1
+        ac_cv_sizeof_short=2
+        ac_cv_sizeof_int=4
+        ac_cv_sizeof_long=4
+        ac_cv_sizeof_long_long=4
     else
-	: # FIXME
+        : # FIXME
     fi
 #echo
 fi
@@ -514,24 +510,24 @@ fi
 type_name()
 {
     if expr "$ac_cv_sizeof_char" '>=' "$1" >/dev/null; then
-	echo "char"
-	exit
+        echo "char"
+        exit
     fi
     if expr "$ac_cv_sizeof_short" '>=' "$1" >/dev/null; then
-	echo "short"
-	exit
+        echo "short"
+        exit
     fi
     if expr "$ac_cv_sizeof_int" '>=' "$1" >/dev/null; then
-	echo "int"
-	exit
+        echo "int"
+        exit
     fi
     if expr "$ac_cv_sizeof_long" '>=' "$1" >/dev/null; then
-	echo "long"
-	exit
+        echo "long"
+        exit
     fi
     if expr "$ac_cv_sizeof_long_long" '>=' "$1" >/dev/null; then
-	echo "long long"
-	exit
+        echo "long long"
+        exit
     fi
     echo "long long"
 }

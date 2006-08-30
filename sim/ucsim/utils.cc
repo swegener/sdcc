@@ -2,7 +2,7 @@
  * Simulator of microcontrollers (utils.cc)
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -58,7 +58,7 @@ get_sub_opt(char **option, const char * const *tokens, char **valuep)
     *valuep= 0;
   i= 0;
   while (tokens[i] &&
-	 strcmp(*option, tokens[i]))
+   strcmp(*option, tokens[i]))
     i++;
   if (!tokens[i])
     *valuep= *option;
@@ -72,8 +72,7 @@ get_id_string(struct id_element *ids, int id)
 {
   int i= 0;
 
-  while (ids[i].id_string &&
-	 id != ids[i].id)
+  while (ids[i].id_string && id != ids[i].id)
     i++;
   return(ids[i].id_string);
 }
@@ -91,8 +90,7 @@ get_string_id(struct id_element *ids, char *str)
 {
   int i= 0;
 
-  while (ids[i].id_string &&
-	 strcmp(ids[i].id_string, str) != 0)
+  while (ids[i].id_string && strcmp(ids[i].id_string, str) != 0)
     i++;
   return(ids[i].id);
 }
@@ -102,8 +100,7 @@ get_string_id(struct id_element *ids, char *str, int def)
 {
   int i= 0;
 
-  while (ids[i].id_string &&
-	 strcmp(ids[i].id_string, str) != 0)
+  while (ids[i].id_string && strcmp(ids[i].id_string, str) != 0)
     i++;
   return(ids[i].id_string?ids[i].id:def);
 }
@@ -112,59 +109,29 @@ get_string_id(struct id_element *ids, char *str, int def)
 extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
 extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
 
-static char *
-vformat_string(char *format, va_list ap)
-{
-#ifdef HAVE_VASPRINTF
-  char *msg= NULL;
-  vasprintf(&msg, format, ap);
-  return(msg);
-#else
-#  ifdef HAVE_VSNPRINTF
-  char *msg= (char*)malloc(80*25);
-  vsnprintf(msg, 80*25, format, ap);
-  return(msg);
-#  else
-#    ifdef HAVE_VPRINTF
-  char *msg= (char*)malloc(80*25);
-  vsprintf(msg, format, ap); /* Dangerous */
-  return(msg);
-#    endif
-#  endif
-#endif
-}
-
 char *
 format_string(char *format, ...)
 {
   va_list ap;
 
   va_start(ap, format);
-  char *s= vformat_string(format, ap);
+#ifdef HAVE_VASPRINTF
+  char *msg= NULL;
+  vasprintf(&msg, format, ap);
+  return(msg);
+#elif defined HAVE_VSNPRINTF
+  char *msg= (char*)malloc(80*25);
+  vsnprintf(msg, 80*25, format, ap);
+  return(msg);
+#elif defined HAVE__VSNPRINTF
+  char *msg= (char*)malloc(80*25);
+  _vsnprintf(msg, 80*25, format, ap);
+  return(msg);
+#else
+#error No vasprintf or vsnprintf
+#endif
   va_end(ap);
-  return(s);
-}
-
-
-void
-print_char_octal(char c, FILE *f)
-{
-  if (strchr("\a\b\f\n\r\t\v\"", c))
-    switch (c)
-      {
-      case '\a': fprintf(f, "\a"); break;
-      case '\b': fprintf(f, "\b"); break;
-      case '\f': fprintf(f, "\f"); break;
-      case '\n': fprintf(f, "\n"); break;
-      case '\r': fprintf(f, "\r"); break;
-      case '\t': fprintf(f, "\t"); break;
-      case '\v': fprintf(f, "\v"); break;
-      case '\"': fprintf(f, "\""); break;
-      }
-  else if (isprint(c))
-    fprintf(f, "%c", c);
-  else
-    fprintf(f, "\\%03hho", c);
+  return(msg);
 }
 
 
@@ -175,8 +142,7 @@ object_name(class cl_base *o)
 
   if (o)
     name= o->get_name();
-  if (name &&
-      *name)
+  if (name && *name)
     return(name);
   return("(unkown)");
 }
@@ -191,23 +157,26 @@ case_string(enum letter_case lcase, char *str)
   switch (lcase)
     {
     case case_upper:
-      while (p && *p) {
-	*p= toupper(*p);
-	p++;
-      }
+      while (p && *p)
+        {
+          *p= toupper(*p);
+          p++;
+       }
       break;
     case case_lower:
-      while (p && *p) {
-	*p= tolower(*p);
-	p++;
-      }
+      while (p && *p)
+        {
+          *p= tolower(*p);
+          p++;
+        }
       break;
     case case_case:
       if (!p || *p == '\0')
-	break;
-      while (isspace(*p)) p++;
+        break;
+      while (isspace(*p))
+        p++;
       if (*p)
-	*p= toupper(*p);
+        *p= toupper(*p);
       break;
     }
   return(s);

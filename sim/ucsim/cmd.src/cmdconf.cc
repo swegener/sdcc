@@ -43,7 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //int
 //cl_conf_cmd::do_work(class cl_sim *sim,
-//		     class cl_cmdline *cmdline, class cl_console *con)
+//                   class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_conf_cmd)
 {
   int i;
@@ -51,7 +51,7 @@ COMMAND_DO_WORK_UC(cl_conf_cmd)
   con->dd_printf("ucsim version %s\n", VERSIONSTR);
   con->dd_printf("Type of microcontroller: %s\n", uc->id_string());
   con->dd_printf("Controller has %d hardware element(s).\n",
-		 uc->hws->count);
+                 uc->hws->count);
   for (i= 0; i < uc->hws->count; i++)
     {
       class cl_hw *hw= (class cl_hw *)(uc->hws->at(i));
@@ -66,8 +66,8 @@ COMMAND_DO_WORK_UC(cl_conf_cmd)
  */
 
 static void
-conf_objects_cmd_print_node(class cl_console *con,
-			    int indent, class cl_base *node)
+conf_objects_cmd_print_node(class cl_console_base *con,
+                            int indent, class cl_base *node)
 {
   if (!node)
     return;
@@ -86,14 +86,14 @@ conf_objects_cmd_print_node(class cl_console *con,
 
 //int
 //cl_conf_addmem_cmd::do_work(class cl_sim *sim,
-//			    class cl_cmdline *cmdline, class cl_console *con)
+//                          class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_APP(cl_conf_objects_cmd)
 {
   //class cl_address_space *mem= 0;
   /*class cl_cmd_arg *params[4]= { cmdline->param(0),
-				 cmdline->param(1),
-				 cmdline->param(2),
-				 cmdline->param(3) };*/
+                                 cmdline->param(1),
+                                 cmdline->param(2),
+                                 cmdline->param(3) };*/
   class cl_error *cl_error_base = new cl_error();
   conf_objects_cmd_print_node(con, 0, /*application*/cl_error_base->get_class());
   delete cl_error_base;

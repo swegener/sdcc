@@ -49,18 +49,18 @@ class cl_stack_op: public cl_base
 {
 protected:
   enum stack_op operation;
-  t_addr PC;	// of instruction
+  t_addr PC;    // of instruction
   t_addr SP_before;
   t_addr SP_after;
 public:
   cl_stack_op(enum stack_op op,
-	      t_addr iPC, t_addr iSP_before, t_addr iSP_after);
+              t_addr iPC, t_addr iSP_before, t_addr iSP_after);
   virtual ~cl_stack_op(void);
   virtual class cl_stack_op *mk_copy(void);
-  static void info_head(class cl_console *con);
-  virtual void info(class cl_console *con, class cl_uc *uc);
+  static void info_head(class cl_console_base *con);
+  virtual void info(class cl_console_base *con, class cl_uc *uc);
 protected:
-  virtual void print_info(class cl_console *con);
+  virtual void print_info(class cl_console_base *con);
 public:
   virtual char *get_op_name(void);
   virtual char *get_matching_name(void) { return("unknown"); }
@@ -83,11 +83,11 @@ protected:
   t_addr pushed_addr;
 public:
   cl_stack_call(t_addr iPC, t_addr called, t_addr pushed,
-		t_addr iSP_before, t_addr iSP_after);
+                t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
   virtual char *get_op_name(void);
-  virtual void print_info(class cl_console *con);
+  virtual void print_info(class cl_console_base *con);
 public:
   virtual char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
@@ -99,11 +99,11 @@ class cl_stack_intr: public cl_stack_call
 {
 public:
   cl_stack_intr(t_addr iPC, t_addr called, t_addr pushed,
-		t_addr iSP_before, t_addr iSP_after);
+                t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
   virtual char *get_op_name(void);
-  virtual void print_info(class cl_console *con);
+  virtual void print_info(class cl_console_base *con);
 public:
   virtual char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
@@ -120,7 +120,7 @@ public:
   virtual class cl_stack_op *mk_copy(void);
 protected:
   virtual char *get_op_name(void);
-  virtual void print_info(class cl_console *con);
+  virtual void print_info(class cl_console_base *con);
 public:
   virtual char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
@@ -197,7 +197,7 @@ public:
 public:
   cl_error_stack_tracker_wrong_handle(bool write_op);
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
 };
 
 class cl_error_stack_tracker_empty: public cl_error_stack_tracker
@@ -208,7 +208,7 @@ public:
   cl_error_stack_tracker_empty(class cl_stack_op *op);
   virtual ~cl_error_stack_tracker_empty(void);
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
 };
 
 class cl_error_stack_tracker_unmatch: public cl_error_stack_tracker
@@ -220,7 +220,7 @@ public:
                                 class cl_stack_op *op);
   virtual ~cl_error_stack_tracker_unmatch(void);
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
 };
 
 class cl_error_stack_tracker_inconsistent: public cl_error_stack_tracker
@@ -230,10 +230,10 @@ protected:
   int unread_data_size;
 public:
   cl_error_stack_tracker_inconsistent(class cl_stack_op *op,
-				      int the_unread_data_size);
+                                      int the_unread_data_size);
   virtual ~cl_error_stack_tracker_inconsistent(void);
 
-  virtual void print(class cl_commander *c);
+  virtual void print(class cl_commander_base *c);
 };
 
 class cl_stack_error_registry: public cl_error_registry

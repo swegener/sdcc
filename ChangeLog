@@ -1,3 +1,7 @@
+2006-08-31 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/cmd.src/newcmdposix.cc: #include <assert.h>
+
 2006-08-30 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/newcmdposix.cc, sim/ucsim/cmd.src/newcmdposixcl.h,

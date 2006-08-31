@@ -1,5 +1,9 @@
 # Port specification for the xa51 port running with uCsim
 
+ifndef DEV_NULL
+  DEV_NULL = /dev/null
+endif
+
 # path to uCsim
 SXA_A = $(top_builddir)sim/ucsim/xa.src/sxa
 SXA_B = $(top_builddir)bin/sxa
@@ -29,7 +33,7 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 # run simulator with 1 second timeout
 %.out: %$(EXEEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 1 $(SXA) -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/xa51/uCsim.cmd >/dev/null || \
+	-$(CASES_DIR)/timeout 1 $(SXA) -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/xa51/uCsim.cmd >/dev/null || \
           echo -e --- FAIL: \"timeout, simulation killed\" in $(<:.ihx=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	-grep -n FAIL $@ /dev/null || true
 

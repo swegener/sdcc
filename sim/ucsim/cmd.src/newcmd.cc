@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "i_string.h"
 
 #include "cmdlexcl.h"

@@ -1,6 +1,13 @@
 2006-08-31 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/newcmdposix.cc: #include <assert.h>
+	* sim/ucsim/cmd.src/newcmd.cc: #include <ctype.h>
+	* sim/ucsim/cmd.src/newcmd.cc: #include <ctype.h>
+	* support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/mcs51/spec.mk,
+	  support/regression/ports/xa51/spec.mk: introduced DEV_NULL variable.
+	  To run regression tests in mingw environment:
+	  make DEV_NULL=NUL CC=gcc
 
 2006-08-30 Borut Razem <borut.razem AT siol.net>
 

@@ -2,6 +2,10 @@
 #
 # model small
 
+ifndef DEV_NULL
+  DEV_NULL = /dev/null
+endif
+
 # path to uCsim
 S51A = $(top_builddir)sim/ucsim/s51.src/s51
 S51B = $(top_builddir)bin/s51
@@ -38,7 +42,7 @@ $(PORT_CASES_DIR)/fwk.lib:
 # run simulator with 30 seconds timeout
 %.out: %$(EXEEXT) gen/timeout
 	mkdir -p $(dir $@)
-	-gen/timeout 30 $(S51) -t32 -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/mcs51/uCsim.cmd > $(@:.out=.sim) \
+	-gen/timeout 30 "$(S51)" -t32 -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/mcs51/uCsim.cmd > $(@:.out=.sim) \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true

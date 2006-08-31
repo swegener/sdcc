@@ -1,5 +1,9 @@
 # Port specification for the ds390 port running with uCsim
 
+ifndef DEV_NULL
+  DEV_NULL = /dev/null
+endif
+
 # path to uCsim
 S51A = $(top_builddir)sim/ucsim/s51.src/s51
 S51B = $(top_builddir)bin/s51
@@ -32,7 +36,7 @@ $(PORT_CASES_DIR)/%$(OBJEXT): fwk/lib/%.c
 # run simulator with 25 seconds timeout
 %.out: %$(EXEEXT) $(CASES_DIR)/timeout
 	mkdir -p $(dir $@)
-	-$(CASES_DIR)/timeout 25 $(S51) -tds390f -S in=/dev/null,out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd > $(@:.out=.sim) || \
+	-$(CASES_DIR)/timeout 25 $(S51) -tds390f -S in=$(DEV_NULL),out=$@ $< < $(PORTS_DIR)/ds390/uCsim.cmd > $(@:.out=.sim) || \
           echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(EXEEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
 	python $(srcdir)/get_ticks.py < $(@:.out=.sim) >> $@
 	-grep -n FAIL $@ /dev/null || true

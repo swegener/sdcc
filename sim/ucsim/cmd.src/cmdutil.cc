@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <ctype.h>
 #include <assert.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #ifdef SOCKET_AVAIL
 # include HEADER_SOCKET
@@ -39,6 +40,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #  include <netinet/in.h>
 #  include <arpa/inet.h>
 # endif
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
 #endif
 #ifdef _WIN32
 #include <malloc.h>

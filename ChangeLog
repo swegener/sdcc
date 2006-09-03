@@ -1,6 +1,7 @@
 2006-09-03 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc.spec: corrected for 2.6.0. Thanks to Christer Weinigel.
+	* device/lib/Makefile.in device/lib/clean.mk: small but essential corrections
 
 2006-09-03 Raphael Neider <rneider AT web.de>
 

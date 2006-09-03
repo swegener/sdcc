@@ -319,7 +319,7 @@ $(PORTDIR):
 	mkdir -p $(PORTDIR)
 
 port-specific-objects:
-	if [ -f $(PORT)/Makefile ]; then \
+	-if [ -f $(PORT)/Makefile ]; then \
 	  $(MAKE) -C $(PORT); \
 	  cp -f $(PORT)/*.lib $(PORT)/*$(OEXT) $(PORTDIR); \
 	fi

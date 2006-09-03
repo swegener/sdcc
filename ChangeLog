@@ -1,3 +1,10 @@
+2006-09-03 Raphael Neider <rneider AT web.de>
+
+	* src/pic/ralloc.c,
+	* src/pic/pcode.c (InitReuseRegs): allocate registers with pseudo
+	  indices >= 0x1000 to disambiguate them from fixed regs __at(addr),
+	  fixes #1550049
+
 2006-09-01 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/cmdutil.cc: #include <sys/time.h> and <unistd.h>

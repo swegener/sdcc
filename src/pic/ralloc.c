@@ -82,8 +82,8 @@ set *dynInternalRegs=NULL;
 static hTab  *dynDirectRegNames= NULL;
 // static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
-static int dynrIdx=0x20;
-static int rDirectIdx=0;
+static int dynrIdx = 0x1000;
+static int rDirectIdx = 0x5000;
 
 int pic14_nRegs = 128;   // = sizeof (regspic14) / sizeof (regs);
 

@@ -5654,7 +5654,9 @@ DEFSETFUNC (resetrIdx)
 void InitReuseReg(void)
 {
 	/* Find end of statically allocated variables for start idx */
-	unsigned maxIdx = 0x20; /* Start from begining of GPR. Note may not be 0x20 on some PICs */
+	/* Start from begining of GPR. Note may not be 0x20 on some PICs */
+	/* XXX: Avoid clashes with fixed registers, start late. */
+	unsigned maxIdx = 0x1000;
 	regs *r;
 	for (r = setFirstItem(dynDirectRegs); r; r = setNextItem(dynDirectRegs)) {
 		if (r->type != REG_SFR) {

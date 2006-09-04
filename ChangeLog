@@ -1,5 +1,10 @@
 2006-09-05 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/gen.c (genPackBits): fix assignemnt to 8-bit,
+	  byte-aligned bitfields, fixes #1539278
+
+2006-09-05 Raphael Neider <rneider AT web.de>
+
 	* src/pic/gen.c (genReceive): skip unreferenced arguments,
 	  fixes #1544120
 

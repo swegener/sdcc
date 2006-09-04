@@ -11722,7 +11722,7 @@ static void genPackBits (sym_link    *etype , operand *result,
       || SPEC_BLEN(etype) <= 8 )  {
     int fsr0_setup = 0;
 
-    if (blen != 8 || bstr != 0) {
+    if (blen != 8 || (bstr % 8) != 0) {
       // we need to combine the value with the old value
       if(!shifted_and_masked)
       {
@@ -11757,7 +11757,12 @@ static void genPackBits (sym_link    *etype , operand *result,
         if (lit != 0)
 	  pic16_emitpcode(POC_IORLW, pic16_popGetLit(lit));
       }
-    } // if (blen != 8 || bstr != 0)
+    } else { // if (blen == 8 && (bstr % 8) == 0)
+	if (shifted_and_masked) {
+	    // move right (literal) to WREG (only case where right is not yet in WREG)
+	    pic16_mov2w(AOP(right), (bstr / 8));
+	}
+    }
 
     /* write new value back */
     if ((IS_SYMOP(result) && !IS_PTR(operandType(result)))

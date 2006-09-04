@@ -115,6 +115,9 @@ volatile __PORTB_t __at (0xF81) PORTBbits;
 __sfr __at (0xF82) PORTC;
 volatile __PORTC_t __at (0xF82) PORTCbits;
 
+__sfr __at (0xF83) PORTD;
+volatile __PORTD_t __at (0xF83) PORTDbits;
+
 __sfr __at (0xF84) PORTE;
 volatile __PORTE_t __at (0xF84) PORTEbits;
 
@@ -135,6 +138,9 @@ volatile __TRISB_t __at (0xF93) TRISBbits;
 
 __sfr __at (0xF94) TRISC;
 volatile __TRISC_t __at (0xF94) TRISCbits;
+
+__sfr __at (0xF95) TRISD;
+volatile __TRISD_t __at (0xF95) TRISDbits;
 
 __sfr __at (0xF9B) OSCTUNE;
 volatile __OSCTUNE_t __at (0xF9B) OSCTUNEbits;

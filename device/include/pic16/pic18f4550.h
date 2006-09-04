@@ -551,6 +551,35 @@ typedef union {
 } __PORTC_t;
 extern volatile __PORTC_t __at (0xF82) PORTCbits;
 
+extern __sfr __at (0xF83) PORTD;
+typedef union {
+	struct {
+		unsigned RD0       	: 1;
+		unsigned RD1       	: 1;
+		unsigned RD2       	: 1;
+		unsigned RD3       	: 1;
+		unsigned RD4       	: 1;
+		unsigned RD5       	: 1;
+		unsigned RD6       	: 1;
+		unsigned RD7       	: 1;
+	};
+	struct {
+		unsigned RD        	: 8;
+	};
+	/* aliases */
+	struct {
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned           	:1;
+		unsigned ECCPB     	:1;
+		unsigned ECCPC     	:1;
+		unsigned ECCPD     	:1;
+	};
+} __PORTD_t;
+extern volatile __PORTD_t __at (0xF83) PORTDbits;
+
 extern __sfr __at (0xF84) PORTE;
 typedef union {
 	struct {
@@ -669,6 +698,21 @@ typedef union {
 	};
 } __TRISC_t;
 extern volatile __TRISC_t __at (0xF94) TRISCbits;
+
+extern __sfr __at (0xF95) TRISD;
+typedef union {
+	struct {
+		unsigned TRISD0    	: 1;
+		unsigned TRISD1    	: 1;
+		unsigned TRISD2    	: 1;
+		unsigned TRISD3    	: 1;
+		unsigned TRISD4    	: 1;
+		unsigned TRISD5    	: 1;
+		unsigned TRISD6    	: 1;
+		unsigned TRISD7    	: 1;
+	};
+} __TRISD_t;
+extern volatile __TRISD_t __at (0xF95) TRISDbits;
 
 extern __sfr __at (0xF9B) OSCTUNE;
 typedef union {

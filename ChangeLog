@@ -1,3 +1,10 @@
+2006-09-04 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: move ucSim executables to a separate section
+	* support/scripts/sdcc_cygwin_mingw32: don't disable ucsim,
+	  -mno-cygwin is a part of the compiler name
+	* support/scripts/sdcc_mingw32: don't disable ucsim
+
 2006-09-03 Borut Razem <borut.razem AT siol.net>
 
 	* sdcc.spec: corrected for 2.6.0. Thanks to Christer Weinigel.

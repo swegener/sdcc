@@ -60,9 +60,9 @@ SetCompressor /SOLID lzma
 !system "unix2dos ${SDCC_ROOT}\doc\ChangeLog_head.txt" = 0
 !system "unix2dos ${SDCC_ROOT}\doc\README.TXT" = 0
 
-InstType "Full (Bin, Doc, Lib, Src)"
-InstType "Medium (Bin, Doc, Lib)"
-InstType "Compact (Bin, Doc)"
+InstType "Full (Bin, ucSim, Doc, Lib, Src)"
+InstType "Medium (Bin, ucSim, Doc, Lib)"
+InstType "Compact (Bin, ucSim, Doc)"
 
 ;--------------------------------
 ;Variables
@@ -140,7 +140,28 @@ SectionEnd
 Section "SDCC application files"
   SectionIn 1 2 3 RO
   SetOutPath "$INSTDIR\bin"
-  File "${SDCC_ROOT}\bin\*.exe"
+  File "${SDCC_ROOT}\bin\as-gbz80.exe"
+  File "${SDCC_ROOT}\bin\as-hc08.exe"
+  File "${SDCC_ROOT}\bin\as-z80.exe"
+  File "${SDCC_ROOT}\bin\asx8051.exe"
+  File "${SDCC_ROOT}\bin\aslink.exe"
+  File "${SDCC_ROOT}\bin\link-gbz80.exe"
+  File "${SDCC_ROOT}\bin\link-hc08.exe"
+  File "${SDCC_ROOT}\bin\link-z80.exe"
+  File "${SDCC_ROOT}\bin\makebin.exe"
+  File "${SDCC_ROOT}\bin\packihx.exe"
+  File "${SDCC_ROOT}\bin\sdcc.exe
+  File "${SDCC_ROOT}\bin\sdcclib.exe
+  File "${SDCC_ROOT}\bin\sdcpp.exe
+SectionEnd
+
+Section "ucSim application files"
+  SectionIn 1 2 3
+  SetOutPath "$INSTDIR\bin"
+  File "${SDCC_ROOT}\bin\s51.exe"
+  File "${SDCC_ROOT}\bin\savr.exe"
+  File "${SDCC_ROOT}\bin\shc08.exe"
+  File "${SDCC_ROOT}\bin\sz80.exe"
 SectionEnd
 
 Section "SDCC documentation"

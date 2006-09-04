@@ -1,3 +1,8 @@
+2006-09-05 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (genReceive): skip unreferenced arguments,
+	  fixes #1544120
+
 2006-09-04 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: move ucSim executables to a separate section

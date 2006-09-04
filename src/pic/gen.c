@@ -10575,6 +10575,7 @@ static void genReceive (iCode *ic)
 		_G.accInUse++;
 		aopOp(IC_RESULT(ic),ic,FALSE);
 		_G.accInUse--;
+		GpsuedoStkPtr = ic->parmBytes; // address used arg on stack
 		assignResultValue(IC_RESULT(ic));
 	}
 	

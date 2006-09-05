@@ -2,6 +2,8 @@
 
 	* src/SDCCopt.c (cnvToFcall): fixed bug 1551947 by updating OP_USES
 	  and OP_DEFS
+	* support/regression/tests/bug1551947.c: new, added
+	* src/SDCCsymt.h: strings are char* not byte*
 
 2006-09-05 Raphael Neider <rneider AT web.de>
 

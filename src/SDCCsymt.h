@@ -169,7 +169,7 @@ typedef struct specifier
     union
       {                                 /* Values if constant or enum */
         TYPE_TARGET_INT   v_int;        /* 2 bytes: int and char values           */
-        TYPE_TARGET_CHAR *v_char;       /*          character string              */
+        char             *v_char;       /*          character string              */
         TYPE_TARGET_UINT  v_uint;       /* 2 bytes: unsigned int const value      */
         TYPE_TARGET_LONG  v_long;       /* 4 bytes: long constant value           */
         TYPE_TARGET_ULONG v_ulong;      /* 4 bytes: unsigned long constant value  */
@@ -280,7 +280,7 @@ typedef struct symbol
     unsigned isinvariant:1;             /* is a loop invariant  */
     unsigned cdef:1;                    /* compiler defined symbol */
     unsigned addrtaken:1;               /* address of the symbol was taken */
-    unsigned isreqv:1;                  /* is the register quivalent of a symbol */
+    unsigned isreqv:1;                  /* is the register equivalent of a symbol */
     unsigned udChked:1;                 /* use def checking has been already done */
 
     /* following flags are used by the backend

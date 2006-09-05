@@ -68,7 +68,12 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
   left = IC_LEFT (ic);
   right = IC_RIGHT (ic);
 
-  if(IS_FLOAT(operandType( IC_RIGHT( ic ) ))) {
+  if (IS_SYMOP (left))
+      bitVectUnSetBit (OP_USES (left), ic->key);
+  if (IS_SYMOP (right))
+      bitVectUnSetBit (OP_USES (right), ic->key);
+  
+  if (IS_FLOAT (operandType (right))) {
     switch (ic->op)
       {
       case '+':
@@ -103,7 +108,7 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
         break;
       }
   } else
-  if(IS_FIXED16X16 (operandType (IC_RIGHT(ic)))) {
+  if (IS_FIXED16X16 (operandType (right))) {
     switch (ic->op)
       {
       case '+':
@@ -147,31 +152,35 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
       /* first one */
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
         {
-          newic = newiCode (SEND, IC_LEFT (ic), NULL);
+          newic = newiCode (SEND, left, NULL);
           newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->etype);
         }
       else
         {
-          newic = newiCode ('=', NULL, IC_LEFT (ic));
+          newic = newiCode ('=', NULL, left);
           IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type));
         }
 
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
+      if (IS_SYMOP (left))
+          OP_USES (left) = bitVectSetBit (OP_USES (left), newic->key);
 
       /* second one */
       if (IS_REGPARM (FUNC_ARGS(func->type)->next->etype))
         {
-          newic = newiCode (SEND, IC_RIGHT (ic), NULL);
+          newic = newiCode (SEND, right, NULL);
           newic->argreg = SPEC_ARGREG(FUNC_ARGS(func->type)->next->etype);
         }
       else
         {
-          newic = newiCode ('=', NULL, IC_RIGHT (ic));
+          newic = newiCode ('=', NULL, right);
           IC_RESULT (newic) = operandFromValue (FUNC_ARGS(func->type)->next);
         }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
+      if (IS_SYMOP (right))
+          OP_USES (right) = bitVectSetBit (OP_USES (right), newic->key);
 
     }
   else
@@ -187,12 +196,13 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
         {
           newic = newiCode (IPUSH, right, NULL);
           newic->parmPush = 1;
-          //bytesPushed+=4;
           bytesPushed += getSize(operandType(right));
         }
 
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
+      if (IS_SYMOP (right))
+          OP_USES (right) = bitVectSetBit (OP_USES (right), newic->key);
 
       /* insert push left */
       if (IS_REGPARM (FUNC_ARGS(func->type)->etype))
@@ -204,17 +214,21 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
         {
           newic = newiCode (IPUSH, left, NULL);
           newic->parmPush = 1;
-          //bytesPushed+=4;
           bytesPushed += getSize(operandType(left));
         }
       addiCodeToeBBlock (ebp, newic, ip);
       newic->lineno = lineno;
+      if (IS_SYMOP (left))
+          OP_USES (left) = bitVectSetBit (OP_USES (left), newic->key);
+
     }
   /* insert the call */
   newic = newiCode (CALL, operandFromSymbol (func), NULL);
   IC_RESULT (newic) = IC_RESULT (ic);
+  bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+  OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), newic->key);
   newic->lineno = lineno;
-  newic->parmBytes+=bytesPushed;
+  newic->parmBytes += bytesPushed;
   ebp->hasFcall = 1;
   if (currFunc)
     FUNC_HASFCALL (currFunc->type) = 1;
@@ -781,7 +795,6 @@ convertToFcall (eBBlock ** ebbs, int count)
               (IS_FLOAT (operandType (IC_RIGHT (ic))) ||
                IS_FIXED( operandType (IC_RIGHT (ic)))))
             {
-
               cnvToFcall (ic, ebbs[i]);
             }
 
@@ -1554,7 +1567,7 @@ eBBlockFromiCode (iCode * ic)
   /* convert operations with support routines
      written in C to function calls : I am doing
      this at this point since I want all the
-     operations to be as they are for optimzations */
+     operations to be as they are for optimizations */
   convertToFcall (ebbi->bbOrder, ebbi->count);
 
   /* compute the live ranges */

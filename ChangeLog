@@ -1,3 +1,12 @@
+2006-09-05 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure: support for winsock2
+	* debugger/mcs51/break.h, debugger/mcs51/cmd.c,
+	  debugger/mcs51/cmd.h, debugger/mcs51/sdcdb.c,
+	  debugger/mcs51/sdcdb.h, debugger/mcs51/simi.c,
+	  debugger/mcs51/simi.h, debugger/mcs51/symtab.c,
+	  debugger/mcs51/symtab.h: sdcdb WIN32 native port
+
 2006-09-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCopt.c (cnvToFcall): fixed bug 1551947 by updating OP_USES

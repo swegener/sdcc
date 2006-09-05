@@ -1,24 +1,24 @@
 /*-------------------------------------------------------------------------
   sdcdb.h - Header file used by ALL source files for the debugger
-	      Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
+        Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #ifndef  SDCDB_H
@@ -62,18 +62,18 @@ typedef short bool;
 #define min(a,b) (a < b ? a : b)
 #endif
 
-/* 
+/*
  * #ifndef ALLOC
- * #define  ALLOC(x,sz) if (!(x = calloc(1, sz)))                          \
+ * #define  ALLOC(x,sz) if (!(x = calloc(1, sz)))                       \
  *          {                                                           \
- *             fprintf(stderr,"sdcdb: out of memory\n"); \
+ *             fprintf(stderr,"sdcdb: out of memory\n");                \
  *             exit (1);                                                \
  *          }
  * #endif
  * #ifndef ALLOC_ATOMIC
  * #define ALLOC_ATOMIC(x,sz)   if (!(x = calloc(1, sz)))   \
  *          {                                               \
- *             fprintf(stderr,"sdcdb: out of memory\n"); \
+ *             fprintf(stderr,"sdcdb: out of memory\n");    \
  *             exit (1);                                    \
  *          }
  * #endif
@@ -95,7 +95,7 @@ typedef short bool;
 
 #define  STACK_FULL(stack)    ((p_##stack) <= stack )
 #define  STACK_EMPTY(stack)   ((p_##stack) >= (stack +      \
-                              sizeof(stack)/sizeof(*stack)) )  
+                              sizeof(stack)/sizeof(*stack)) )
 
 #define  STACK_PUSH_(stack,x) (*--p_##stack = (x))
 #define  STACK_POP_(stack)    (*p_##stack++)
@@ -124,7 +124,7 @@ typedef short bool;
 #define  STACK_STARTWALK(stack)   (w_##stack = p_##stack)
 
 #define  STACK_WALK(stack)    (w_##stack >= (stack + sizeof(stack)/sizeof(*stack)) \
-			       ? NULL : *w_##stack++ )
+                               ? NULL : *w_##stack++ )
 
 #include "src/SDCCbitv.h"
 
@@ -156,14 +156,14 @@ typedef struct srcLine
     char     *src ;
 
 } srcLine ;
-    
+
 /*-----------------------------------------------------------------*/
 /*                     structure for cdb record                    */
 /*-----------------------------------------------------------------*/
 typedef struct  cdbrecs {
     char type ;               /* type of line */
     char *line;               /* contents of line */
-    struct cdbrecs *next;     /* next in chain */    
+    struct cdbrecs *next;     /* next in chain */
 } cdbrecs ;
 
 /*-----------------------------------------------------------------*/
@@ -177,9 +177,9 @@ typedef struct module {
     char *asm_name;          /* asm file name  */
     int   ncLines;           /* number of lines in this module */
     int   nasmLines;         /* # of lines in the assembler file */
-    srcLine  **cLines;       /* actual source lines */    
+    srcLine  **cLines;       /* actual source lines */
     srcLine  **asmLines;     /* actual assembler source lines*/
-    set       *cfpoints;     /* set of double line execution points */   
+    set       *cfpoints;     /* set of double line execution points */
 } module;
 
 /*-----------------------------------------------------------------*/
@@ -191,19 +191,19 @@ typedef struct exePoint
     int      line  ;
     short    block , level ;
 } exePoint ;
- 
+
 /*-----------------------------------------------------------------*/
 /*                   definition for a function                     */
 /*-----------------------------------------------------------------*/
 typedef struct function {
-    struct symbol  *sym     ;/* pointer to symbol for function */ 
-    char           *modName ;/* module name */            
-    module         *mod     ;/* module for this function */     
+    struct symbol  *sym     ;/* pointer to symbol for function */
+    char           *modName ;/* module name */
+    module         *mod     ;/* module for this function */
     int        entryline    ;/* first line in the function */
     int        aentryline   ;
     int        exitline     ;/* last line in the function  */
     int        aexitline    ;
-    set       *cfpoints     ;/* set of all C execution points in func */   
+    set       *cfpoints     ;/* set of all C execution points in func   */
     set       *afpoints     ;/* set of all ASM execution points in func */
     unsigned   int laddr    ;/* last executed address                   */
     int        lline        ;/* last executed linenumber                */
@@ -223,7 +223,7 @@ typedef struct linkrec {
 /*-----------------------------------------------------------------*/
 /*                       program context                           */
 /*-----------------------------------------------------------------*/
-typedef struct context {    
+typedef struct context {
     function *func;           /* current function we are in */
     char     *modName;        /* name of the module         */
     unsigned int addr ;       /* current pc                 */

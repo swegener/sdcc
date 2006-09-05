@@ -1,24 +1,24 @@
 /*-------------------------------------------------------------------------
   symtab.h - Header file for symbol table for sdcdb ( debugger )
-	      Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
+        Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1999)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #ifndef  SYMTAB_H
@@ -38,7 +38,7 @@ typedef struct structdef {
 
 /* noun definitions */
 enum  { V_INT   =  0,
-	V_FLOAT     ,
+        V_FLOAT     ,
         V_CHAR      ,
         V_VOID      ,
         V_STRUCT    ,
@@ -49,7 +49,7 @@ enum  { V_INT   =  0,
 /* storage class    */
 enum  { S_FIXED  =  0,
         S_AUTO       ,
-        S_REGISTER   ,        
+        S_REGISTER   ,
         S_CONSTANT   ,
         S_SFR        ,
         S_SBIT       ,
@@ -68,7 +68,7 @@ typedef struct specifier {
     unsigned    noun        ;  /* CHAR INT STRUCTURE LABEL   */
     unsigned    sclass      ;  /* REGISTER,AUTO,FIX,CONSTANT */
     unsigned    _long : 1   ;  /* 1=long            */
-    unsigned    _short: 1	;	/* 1=short int	  */
+    unsigned    _short: 1       ;       /* 1=short int    */
     unsigned _unsigned: 1   ;  /* 1=unsigned, 0=signed       */
     unsigned   _static: 1   ;  /* 1=static keyword found     */
     unsigned   _extern: 1   ;  /* 1=extern found             */
@@ -85,8 +85,8 @@ typedef struct specifier {
     unsigned   _addr        ;  /* address of symbol          */
     unsigned   _stack       ;  /* stack offset for stacked v */
     unsigned   _bitStart    ;  /* bit start position         */
-    int        _bitLength   ;  /* bit length                 */        
-    
+    int        _bitLength   ;  /* bit length                 */
+
     struct structdef *v_struct; /* structure pointer      */
 } specifier ;
 
@@ -97,7 +97,7 @@ enum {  POINTER   = 0,       /* pointer to near data */
         GPOINTER     ,       /* _generic pointer     */
         PPOINTER     ,       /* paged area pointer   */
         IPOINTER     ,       /* pointer to upper 128 bytes */
-	UPOINTER     ,       /* unknown pointer used only when parsing */
+        UPOINTER     ,       /* unknown pointer used only when parsing */
         ARRAY        ,
         FUNCTION     };
 
@@ -117,22 +117,22 @@ typedef struct link {
     unsigned tdef  : 1      ;  /* current link created by    */
     /* typedef if this flag is set*/
     union {
-	specifier      s     ;  /* if CLASS == SPECIFIER      */
-	declarator     d     ;  /* if CLASS == DECLARATOR     */
+        specifier      s     ;  /* if CLASS == SPECIFIER      */
+        declarator     d     ;  /* if CLASS == DECLARATOR     */
     } select ;
-    
+
     struct link    *next    ;  /* next element on the chain  */
 } link ;
 
 typedef struct symbol {
     char     *name               ;
-    
+
     short    size               ;
-    short    level	       	;  /* declration lev,fld offset */
-    short    block              ;  /* sequential block # of defintion */       
+    short    level              ;  /* declration lev,fld offset */
+    short    block              ;  /* sequential block # of defintion */
     short    isonstack          ;  /* is the variable on stack */
     unsigned isfunc        :1   ;  /* is a functions           */
-    unsigned offset		;  /* offset from top if struct */
+    unsigned offset             ;  /* offset from top if struct */
     unsigned addr               ;  /* address if the symbol */
     unsigned eaddr              ;  /* end address for functions */
     char     addr_type          ;  /* which address space   */
@@ -163,12 +163,12 @@ typedef struct symbol {
 #define DCL_PTR_CONST(l) l->select.d.ptr_const
 #define DCL_PTR_VOLATILE(l) l->select.d.ptr_volatile
 #define DCL_TSPEC(l) l->select.d.tspec
-#define SPEC_NOUN(x) x->select.s.noun 
+#define SPEC_NOUN(x) x->select.s.noun
 #define SPEC_LONG(x) x->select.s._long
 #define SPEC_SHORT(x) x->select.s._short
 #define SPEC_USIGN(x) x->select.s._unsigned
 #define SPEC_SCLS(x) x->select.s.sclass
-#define SPEC_OCLS(x) x->select.s.oclass 
+#define SPEC_OCLS(x) x->select.s.oclass
 #define SPEC_STAT(x) x->select.s._static
 #define SPEC_EXTR(x) x->select.s._extern
 #define SPEC_CODE(x) x->select.s._codesg
@@ -190,14 +190,14 @@ typedef struct symbol {
 #define SPEC_TYPEDEF(x) x->select.s._typedef
 
 /* type check macros */
-#define IS_DECL(x)   ( x && x->class == DECLARATOR	)
+#define IS_DECL(x)   ( x && x->class == DECLARATOR      )
 #define IS_SPEC(x)   ( x && x->class == SPECIFIER  )
 #define IS_ARRAY(x)  (IS_DECL(x) && DCL_TYPE(x) == ARRAY)
 #define IS_PTR(x)    (IS_DECL(x) && (DCL_TYPE(x) == POINTER    ||    \
                                      DCL_TYPE(x) == FPOINTER   ||    \
-			             DCL_TYPE(x) == GPOINTER   ||    \
-			             DCL_TYPE(x) == IPOINTER   ||    \
-			             DCL_TYPE(x) == PPOINTER   ||    \
+                                     DCL_TYPE(x) == GPOINTER   ||    \
+                                     DCL_TYPE(x) == IPOINTER   ||    \
+                                     DCL_TYPE(x) == PPOINTER   ||    \
                                      DCL_TYPE(x) == CPOINTER   ||    \
                                      DCL_TYPE(x) == UPOINTER  ))
 #define IS_PTR_CONST(x) (IS_PTR(x) && DCL_PTR_CONST(x))
@@ -217,7 +217,7 @@ typedef struct symbol {
 #define IS_INT(x)    (IS_SPEC(x) && x->select.s.noun == V_INT)
 #define IS_VOID(x)   (IS_SPEC(x) && x->select.s.noun == V_VOID)
 #define IS_CHAR(x)   (IS_SPEC(x) && x->select.s.noun == V_CHAR)
-#define IS_EXTERN(x)	(IS_SPEC(x) && x->select.s._extern)
+#define IS_EXTERN(x)    (IS_SPEC(x) && x->select.s._extern)
 #define IS_VOLATILE(x)  (IS_SPEC(x) && x->select.s._volatile )
 #define IS_INTEGRAL(x) (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
                                        x->select.s.noun == V_CHAR || \
@@ -230,7 +230,7 @@ typedef struct symbol {
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x))
 #define IS_AGGREGATE(x) (IS_ARRAY(x) || IS_STRUCT(x))
 #define IS_LITERAL(x)   (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
-#define IS_ISR(x)		(IS_SPEC(x)  && SPEC_INTRTN(x))
+#define IS_ISR(x)               (IS_SPEC(x)  && SPEC_INTRTN(x))
 
 
 symbol *parseSymbol (char *, char **, int );

@@ -63,13 +63,21 @@ AC_LANG([C])
 
 # Checking for header files.
 # ===========================================================================
-AC_CHECK_HEADERS(sys/socket.h)
+socket_type=unknown
+AC_CHECK_HEADERS(sys/socket.h, socket_type=sys_socket_h)
+if test $socket_type = unknown; then
+  AC_CHECK_HEADERS(winsock2.h, socket_type=winsock2_h)
+fi
 
 
 # Checking for functions/libs
 # ===========================================================================
-AC_CHECK_LIB(socket,socket)
-AC_CHECK_LIB(nsl,xdr_short)
+if test $socket_type = winsock2_h; then
+  LIBS="-lws2_32 $LIBS"
+else
+  AC_CHECK_LIB(socket,socket)
+  AC_CHECK_LIB(nsl,xdr_short)
+fi
 
 
 # Checking for functions

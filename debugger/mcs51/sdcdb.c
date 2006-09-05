@@ -569,7 +569,7 @@ static void functionPoints ()
              ep = setNextItem(mod->cfpoints))
         {
             if (ep->addr >= sym->addr &&
-                ep->addr <= sym->eaddr ) 
+                ep->addr <= sym->eaddr )
             {
                 addSet(&func->cfpoints,ep);
             }
@@ -750,7 +750,7 @@ int cmdHelp (char *s, context *cctxt)
     }
     else if (*s)
     {
-        for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) 
+        for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++)
         {
             if ((cmdTab[i].htxt) && !strcmp(cmdTab[i].cmd,s))
             {
@@ -769,7 +769,7 @@ int cmdHelp (char *s, context *cctxt)
     for (i = 0 ; i < (sizeof(cmdTab)/sizeof(struct cmdtab)) ; i++) {
 
       /* command string matches */
-      
+
       if ((cmdTab[i].htxt) && (i >= startline))
         fprintf(stdout,"%s",cmdTab[i].htxt);
       if (i == endline)
@@ -904,14 +904,14 @@ static void commandLoop(FILE *cmdfile)
 {
     char *line, save_ch, *s;
     actualcmdfile = cmdfile;
-    while (1) 
+    while (1)
     {
         if ( cmdfile == stdin )
         {
             if (sim_cmd_mode)
                 printf("(sim) ");
             else
-                fprintf(stdout,"(sdcdb) ");        
+                fprintf(stdout,"(sdcdb) ");
             fflush(stdout);
         }
 
@@ -1125,6 +1125,7 @@ sigintr(int sig)
         sendSim("stop\n");
 }
 
+#ifndef _WIN32
 /* the only child can be the simulator */
 static void sigchld(int sig)
 {
@@ -1134,23 +1135,27 @@ static void sigchld(int sig)
     /* if ( retpid == simPid ) */
     simactive = 0;
 }
+#endif
 
 static void
 setsignals()
 {
-    signal(SIGHUP , SIG_IGN);		
-    signal(SIGCONT, SIG_IGN);		
-    signal(SIGINT , sigintr );	
-    signal(SIGTERM, bad_signal);	
+    signal(SIGINT , sigintr );
+    signal(SIGABRT, bad_signal);
+    signal(SIGTERM, bad_signal);
+
+#ifndef _WIN32
+    signal(SIGHUP , SIG_IGN);
+    signal(SIGCONT, SIG_IGN);
     signal(SIGCHLD, sigchld );
 
-    signal(SIGABRT, bad_signal);
     signal(SIGALRM, bad_signal);
     //signal(SIGFPE,  bad_signal);
     //signal(SIGILL,  bad_signal);
     signal(SIGPIPE, bad_signal);
     signal(SIGQUIT, bad_signal);
     //signal(SIGSEGV, bad_signal);
+#endif
 }
 
 /*-----------------------------------------------------------------*/

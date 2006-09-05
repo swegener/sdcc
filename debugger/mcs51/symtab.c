@@ -660,7 +660,7 @@ static void lnkSymRec (char *s)
         sym->rname = alloccpy(s,bp - s);
         sym->scopetype = *s;
         sym->name  = sym->rname;
-        addSet(&symbols,sym); 
+        addSet(&symbols,sym);
     }
     *bp = save_ch;
     if ( *bp )
@@ -736,7 +736,7 @@ static void lnkCSrc (char *s)
     /* one line can have more than one address : (for loops !)*/
     if (line < mod->ncLines && line > 0 /*&&
         ( !mod->cLines[line]->addr ||
-        mod->cLines[line]->level > level )*/ ) 
+        mod->cLines[line]->level > level )*/ )
     {
         if ( mod->cLines[line]->addr != INT_MAX )
         {

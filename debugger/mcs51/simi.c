@@ -175,13 +175,13 @@ char *argsToCmdLine(char **args, int nargs)
         if (0 < nargs)
             ++argLen;
 
-        if (argLen >= cmdLen)
+        if (cmdPos + argLen >= cmdLen)
         {
             do
             {
                 cmdLen += cmdLen;
             }
-            while (argLen >= cmdLen);
+            while (cmdPos + argLen >= cmdLen);
             cmd = Safe_realloc(cmd, cmdLen);
         }
 
@@ -203,6 +203,8 @@ char *argsToCmdLine(char **args, int nargs)
         if (quote)
             cmd[cmdPos++] = '"';
     }
+
+    cmd[cmdPos] = '\0'
 
     return cmd;
 }

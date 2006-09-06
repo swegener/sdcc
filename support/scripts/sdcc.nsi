@@ -150,9 +150,9 @@ Section "SDCC application files"
   File "${SDCC_ROOT}\bin\link-z80.exe"
   File "${SDCC_ROOT}\bin\makebin.exe"
   File "${SDCC_ROOT}\bin\packihx.exe"
-  File "${SDCC_ROOT}\bin\sdcc.exe
-  File "${SDCC_ROOT}\bin\sdcclib.exe
-  File "${SDCC_ROOT}\bin\sdcpp.exe
+  File "${SDCC_ROOT}\bin\sdcc.exe"
+  File "${SDCC_ROOT}\bin\sdcclib.exe"
+  File "${SDCC_ROOT}\bin\sdcpp.exe"
 SectionEnd
 
 Section "ucSim application files"

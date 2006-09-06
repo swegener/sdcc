@@ -1,3 +1,9 @@
+2006-09-06 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/sdcc.nsi: fixed Error: unterminated string parsing
+	  line at sdcc.nsi:153
+	* sdcc/debugger/mcs51/simi.c: argsToCmdLine() fixes
+
 2006-09-05 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure: support for winsock2

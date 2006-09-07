@@ -626,7 +626,28 @@ Section Uninstall
   Delete "$INSTDIR\doc\ChangeLog_head.txt"
 !endif
 
-  Delete "$INSTDIR\bin\*.exe"
+  Delete "$INSTDIR\bin\as-gbz80.exe"
+  Delete "$INSTDIR\bin\as-hc08.exe"
+  Delete "$INSTDIR\bin\as-z80.exe"
+  Delete "$INSTDIR\bin\asx8051.exe"
+  Delete "$INSTDIR\bin\aslink.exe"
+  Delete "$INSTDIR\bin\link-gbz80.exe"
+  Delete "$INSTDIR\bin\link-hc08.exe"
+  Delete "$INSTDIR\bin\link-z80.exe"
+  Delete "$INSTDIR\bin\makebin.exe"
+  Delete "$INSTDIR\bin\packihx.exe"
+  Delete "$INSTDIR\bin\sdcc.exe"
+  Delete "$INSTDIR\bin\sdcclib.exe"
+  Delete "$INSTDIR\bin\sdcpp.exe"
+
+  Delete "$INSTDIR\bin\s51.exe"
+  Delete "$INSTDIR\bin\savr.exe"
+  Delete "$INSTDIR\bin\shc08.exe"
+  Delete "$INSTDIR\bin\sz80.exe"
+
+  Delete "$INSTDIR\bin\sdcdb.exe"
+  Delete "$INSTDIR\bin\sdcdb.el"
+  Delete "$INSTDIR\bin\sdcdbsrc.el"
 
   Delete "$INSTDIR\COPYING.TXT"
   Delete "$INSTDIR\sdcc.ico"

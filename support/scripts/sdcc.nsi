@@ -60,9 +60,9 @@ SetCompressor /SOLID lzma
 !system "unix2dos ${SDCC_ROOT}\doc\ChangeLog_head.txt" = 0
 !system "unix2dos ${SDCC_ROOT}\doc\README.TXT" = 0
 
-InstType "Full (Bin, ucSim, Doc, Lib, Src)"
-InstType "Medium (Bin, ucSim, Doc, Lib)"
-InstType "Compact (Bin, ucSim, Doc)"
+InstType "Full (Bin, ucSim, SDCDB, Doc, Lib, Src)"
+InstType "Medium (Bin, ucSim, SDCDB, Doc, Lib)"
+InstType "Compact (Bin, ucSim, SDCDB, Doc)"
 
 ;--------------------------------
 ;Variables
@@ -162,6 +162,13 @@ Section "ucSim application files"
   File "${SDCC_ROOT}\bin\savr.exe"
   File "${SDCC_ROOT}\bin\shc08.exe"
   File "${SDCC_ROOT}\bin\sz80.exe"
+SectionEnd
+
+Section "SDCDB files"
+  SectionIn 1 2 3
+  File "${SDCC_ROOT}\bin\sdcdb.exe"
+  File "${SDCC_ROOT}\bin\sdcdb.el"
+  File "${SDCC_ROOT}\bin\sdcdbsrc.el"
 SectionEnd
 
 Section "SDCC documentation"

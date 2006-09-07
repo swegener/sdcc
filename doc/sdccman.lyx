@@ -142,8 +142,8 @@ Sandeep Dutta
 
 , etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 and
  Zilog Z80 based MCUs.
- It can be retargetted for other microprocessors, support for Microchip
- PIC, Atmel AVR is under development.
+ It can be retargeted for other microprocessors, support for Microchip PIC,
+ Atmel AVR is under development.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses ASXXXX
 \begin_inset LatexCommand \index{asXXXX (as-gbz80, as-hc08, asx8051, as-z80)}
@@ -155,7 +155,7 @@ Sandeep Dutta
 
 \end_inset 
 
-, an open source retargettable assembler & linker.
+, an open source retargetable assembler & linker.
  SDCC has extensive language extensions suitable for utilizing various microcont
 rollers and underlying hardware effectively.
  
@@ -960,7 +960,7 @@ For most users it is sufficient to skip to either section
 \end_inset 
 
 .
- More detailled instructions follow below.
+ More detailed instructions follow below.
 \layout Section
 
 Configure Options
@@ -16252,6 +16252,68 @@ preproc_asm
 
  (+ | -) - switch _asm _endasm block preprocessing on / off.
  Default is on.
+ You use this prama to define multilines of assembly code.
+ This will prevent the preprocessor from changing the formating required
+ by assembly code.
+ Below is an example on how to use this pragma.
+\layout Verse
+
+
+\family typewriter 
+#pragma preproc_asm -
+\begin_inset LatexCommand \index{\#pragma preproc\_asm}
+
+\end_inset 
+
+
+\newline 
+#define MYDELAY _asm
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+nop ;my assembly comment...
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+nop
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+nop
+\newline 
+_endasm
+\newline 
+#pragma preproc_asm +
+\newline 
+
+\newline 
+void foo (void) 
+\newline 
+{ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ ...
+ 
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ MYDELAY;
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ ...
+ 
+\newline 
+} 
+\newline 
+
 \layout Standard
 
 The pragma's are intended to be used to turn-on or off certain optimizations
@@ -16330,6 +16392,12 @@ int foo ()
 The compiler will generate a warning message when extra space is allocated.
  It is strongly recommended that the save and restore pragma's be used when
  changing options for a function.
+\newline 
+
+\newline 
+
+\newline 
+
 \layout Section
 
 Defines Created by the Compiler
@@ -16354,8 +16422,8 @@ The compiler creates the following #defines
 \begin_inset  Tabular
 <lyxtabular version="3" rows="11" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="3in">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="3in">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -16424,7 +16492,7 @@ SDCC_mcs51
 
 \end_inset 
 
-, etc
+, etc.
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -16432,7 +16500,7 @@ SDCC_mcs51
 
 \layout Standard
 
-depending on the model used (e.g.: -mds390
+depending on the model used (e.g.: -mds390)
 \end_inset 
 </cell>
 </row>
@@ -19683,7 +19751,7 @@ rest of the pointer
 
 \layout Standard
 
-descrption
+description
 \end_inset 
 </cell>
 </row>
@@ -20297,7 +20365,7 @@ void main(void)
 {
 \layout LyX-Code
 
-    stdout = STREAM_USER;    /* this is not necessery, since stdout points
+    stdout = STREAM_USER;    /* this is not necessary, since stdout points
 \layout LyX-Code
 
                               * by default to STREAM_USER */

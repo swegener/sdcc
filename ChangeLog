@@ -1,3 +1,8 @@
+2006-09-07 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* doc/sdccman.lyx: Some re-formating plus example on using
+	  #pragma preproc_asm +/-
+
 2006-09-07 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/sdcc.nsi: added SDCDB executables in a separate

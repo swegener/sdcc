@@ -664,7 +664,7 @@ static void _pic16_linkEdit(void)
   	 * {linker} {incdirs} {lflags} -o {outfile} {spec_ofiles} {ofiles} {libs}
   	 *
   	 */
-  	sprintf(lfrm, "{linker} {incdirs} {lflags} -o {outfile} {user_ofile} {ofiles} {spec_ofiles} {libs}");
+  	sprintf(lfrm, "{linker} {incdirs} {lflags} -w -r -o {outfile} {user_ofile} {ofiles} {spec_ofiles} {libs}");
 
   	shash_add(&linkValues, "linker", pic16_linkCmd[0]);
 
@@ -863,6 +863,10 @@ _pic16_genAssemblerPreamble (FILE * of)
 	}
 
 	fprintf (of, "\tlist\tp=%s\n",&name[1]);
+	if (pic16_mplab_comp) {
+	  // provide ACCESS macro used during SFR accesses
+	  fprintf (of, "\tinclude <p%s.inc>\n", &name[1]);
+	}
 
 	if(!pic16_options.omit_configw) {
 		pic16_emitConfigRegs(of);
@@ -1099,7 +1103,7 @@ oclsExpense (struct memmap *oclass)
 */
 const char *pic16_linkCmd[] =
 {
-  "gplink", "$l", "-o \"$2\"", "\"$1\"","$3", NULL
+  "gplink", "$l", "-w", "-r", "-o \"$2\"", "\"$1\"","$3", NULL
 };
 
 

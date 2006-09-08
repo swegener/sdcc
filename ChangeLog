@@ -1,3 +1,11 @@
+2006-09-08 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/main.c (_pic16_linkEdit,pic16_linkCmd),
+	* src/pic/main.c(_pic14_do_link, linkCmd): pass "-w" and "-r"
+	    to gplink to disable processor mismatch warning and to allow
+	    the use of devices with only aliased (shared) memory banks,
+	  (_pic16_genAssemblerPreamble): include pXXX.inc on --mplab-comp
+
 2006-09-07 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* doc/sdccman.lyx: Some re-formating plus example on using

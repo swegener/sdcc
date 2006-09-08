@@ -419,7 +419,7 @@ MUST be terminated with a NULL.
 */
 static const char *_linkCmd[] =
 {
-	"gplink", "$l", "-o \"$2\"", "\"$1\"", "$3", NULL
+	"gplink", "$l", "-w", "-r", "-o \"$2\"", "\"$1\"", "$3", NULL
 };
 
 static const char *_asmCmd[] =
@@ -453,7 +453,7 @@ static void _pic14_do_link (void)
    *
    */
 
-  sprintf(lfrm, "{linker} {incdirs} {sysincdirs} {lflags} -o {outfile} {user_ofile} {spec_ofiles} {ofiles} {libs}");
+  sprintf(lfrm, "{linker} {incdirs} {sysincdirs} {lflags} -w -r -o {outfile} {user_ofile} {spec_ofiles} {ofiles} {libs}");
 
   shash_add(&linkValues, "linker", "gplink");
 

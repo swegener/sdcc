@@ -1949,21 +1949,11 @@ status Collapsed
 /
 \end_inset 
 
--disable-ucsim
+-host=i586-mingw32msvc
 \backslash 
 
 \newline 
 -
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
-\end_inset 
-
--host=i586-mingw32msvc -
 \begin_inset ERT
 status Collapsed
 
@@ -1989,30 +1979,6 @@ compile on Cygwin for Mingw32 (see also sdcc/support/scripts/sdcc_cygwin_mingw32
 \layout LyX-Code
 
 ./configure -C 
-\backslash 
-
-\newline 
-CFLAGS=
-\begin_inset Quotes srd
-\end_inset 
-
--mno-cygwin -O2
-\begin_inset Quotes srd
-\end_inset 
-
- 
-\backslash 
-
-\newline 
-LDFLAGS=
-\begin_inset Quotes srd
-\end_inset 
-
--mno-cygwin
-\begin_inset Quotes srd
-\end_inset 
-
- 
 \backslash 
 
 \newline 
@@ -2116,17 +2082,27 @@ sdccconf_h_dir_separator=
 \backslash 
 
 \newline 
--
-\begin_inset ERT
-status Collapsed
-
-\layout Standard
-
-\backslash 
-/
+CC=
+\begin_inset Quotes srd
 \end_inset 
 
--disable-ucsim
+gcc -mno-cygwin
+\begin_inset Quotes srd
+\end_inset 
+
+ 
+\backslash 
+
+\newline 
+CXX=
+\begin_inset Quotes srd
+\end_inset 
+
+g++ -mno-cygwin
+\begin_inset Quotes srd
+\end_inset 
+
+ 
 \layout Standard
 
 'configure' is quite slow on Cygwin (at least on windows before Win2000/XP).

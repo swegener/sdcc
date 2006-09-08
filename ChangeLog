@@ -1,3 +1,7 @@
+2006-09-08 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: SDCDB and ucSim are available on Win32 platforms.
+
 2006-09-08 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/main.c (_pic16_linkEdit,pic16_linkCmd),

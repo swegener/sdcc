@@ -579,7 +579,6 @@ status Collapsed
 \newline 
 SDCC also comes with a companion source level debugger SDCDB, the debugger
  currently uses ucSim a freeware simulator for 8051 and other micro-controllers.
- SDCDB and ucSim are currently not available on Win32 platforms.
  
 \newline 
 
@@ -3410,14 +3409,6 @@ With the Mingw32 gcc cross compiler it's easy to compile SDCC for Win32.
  See section 'Configure Options'.
 \layout Subsection
 
-Building SDCC on Windows 
-\layout Standard
-
-With the exception of Cygwin the SDCC binaries uCsim and sdcdb can't be
- built on Windows.
- They use Unix-sockets, which are not available on Win32.
-\layout Subsection
-
 Building SDCC using Cygwin and Mingw32
 \layout Standard
 
@@ -3617,8 +3608,7 @@ Download the source package
 
 \series default 
  SDCC is distributed with all the projects, workspaces, and files you need
- to build it using Visual C++ 6.0/NET (except for sdcdb.exe which currently
- doesn't build under MSVC).
+ to build it using Visual C++ 6.0/NET (except for SDCDB and ucSim).
  The workspace name is 'sdcc.dsw'.
  Please note that as it is now, all the executables are created in a folder
  called sdcc
@@ -3818,7 +3808,7 @@ Building SDCC Using Borland
 
 From the sdcc directory, run the command "make -f Makefile.bcc".
  This should regenerate all the .exe files in the bin directory except for
- sdcdb.exe (which currently doesn't build under Borland C++).
+ SDCDB and ucSim.
 \layout Enumerate
 
 If you modify any source files and need to rebuild, be aware that the dependenci
@@ -4638,11 +4628,9 @@ link-gbz80 - The Z80 and GameBoy Z80 linkers.
 \layout Itemize
 
 s51 - The ucSim 8051 simulator.
- Not available on Win32 platforms.
 \layout Itemize
 
 sdcdb - The source debugger.
- Not available on Win32 platforms.
 \layout Itemize
 
 packihx - A tool to pack (compress) Intel hex files.
@@ -4726,19 +4714,18 @@ S51
 .
  It currently supports the core mcs51, the Dallas DS80C390 and the Phillips
  XA51 family.
- S51 is currently not available on Win32 platfors.
 \layout Subsection
 
 sdcdb - Source Level Debugger
 \layout Standard
 
-Sdcdb
-\begin_inset LatexCommand \index{sdcdb (debugger)}
+SDCDB
+\begin_inset LatexCommand \index{SDCDB (debugger)}
 
 \end_inset 
 
  is the companion source level debugger.
- More about sdcdb in section 
+ More about SDCDB in section 
 \begin_inset LatexCommand \ref{cha:Debugging-with-SDCDB}
 
 \end_inset 
@@ -4750,7 +4737,6 @@ Sdcdb
 \end_inset 
 
 , but can be easily changed to use other simulators.
- Sdcdb is currently not available on Win32 platfors.
 \layout Chapter
 
 Using SDCC
@@ -21251,7 +21237,7 @@ Debugging with SDCDB
 \end_inset 
 
 
-\begin_inset LatexCommand \index{sdcdb (debugger)}
+\begin_inset LatexCommand \index{SDCDB (debugger)}
 
 \end_inset 
 
@@ -21276,7 +21262,6 @@ on, which also builds and installs the debugger in the target directory
  specified during configuration.
  The debugger allows you debug BOTH at the C source and at the ASM source
  level.
- Sdcdb is currently not available on Win32 platforms.
 \layout Subsection
 
 Compiling for Debugging
@@ -21338,7 +21323,7 @@ status Collapsed
  execution is controlled by the debugger.
  When a command is issued for the debugger, it translates it into appropriate
  commands for the simulator.
- (Currently sdcdb only connects to the simulator but 
+ (Currently SDCDM only connects to the simulator but 
 \emph on 
 newcdb
 \emph default 
@@ -22879,7 +22864,7 @@ Directory
 
 \layout Standard
 
-uCsim
+ucSsim
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -23062,7 +23047,7 @@ sdcc/bin
 
 \layout Standard
 
-sdcdb
+SDCDB
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -23393,8 +23378,8 @@ sdcc/doc/*
 
 \layout Standard
 
-Notes on debugging with sdcdb
-\begin_inset LatexCommand \index{sdcdb (debugger)}
+Notes on debugging with SDCDB
+\begin_inset LatexCommand \index{SDCDB (debugger)}
 
 \end_inset 
 
@@ -23677,7 +23662,7 @@ ec2drv/newcdb
 
 \layout Standard
 
-Tools for Silicon Laboratories JTAG debug adapter, partly based on sdcdb
+Tools for Silicon Laboratories JTAG debug adapter, partly based on SDCDB
  (Unix only)
 \end_inset 
 </cell>
@@ -23879,7 +23864,7 @@ kdevelop
 
 \layout Standard
 
-IDE (has anyone tried integrating SDCC & sdcdb? Unix only)
+IDE (has anyone tried integrating SDCC & SDCDB? Unix only)
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -23987,8 +23972,8 @@ ddd
 
 \layout Standard
 
-Debugger, serves nicely as GUI to sdcdb
-\begin_inset LatexCommand \index{sdcdb (debugger)}
+Debugger, serves nicely as GUI to SDCDB
+\begin_inset LatexCommand \index{SDCDB (debugger)}
 
 \end_inset 
 

@@ -1,3 +1,9 @@
+2006-09-09 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/sdcdb.c, debugger/mcs51/simi.c:
+	  sdcdb WIN32 native port
+	* src/clean.mk: fixed
+
 2006-09-08 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: SDCDB and ucSim are available on Win32 platforms.

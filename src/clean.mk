@@ -10,7 +10,7 @@ clean:
 	for port in $(CLEANALLPORTS) ; do\
 	  if [ -f $$port/Makefile ]; then\
 	    $(MAKE) -C $$port clean ;\
-	  fi\
+	  fi;\
 	done
 
 
@@ -21,7 +21,7 @@ distclean: clean
 	for port in $(CLEANALLPORTS) ; do\
 	  if [ -f $$port/Makefile ]; then\
 	    $(MAKE) -C $$port distclean ;\
-	  fi\
+	  fi;\
 	done
 
 

@@ -142,7 +142,7 @@ Dprintf(D_simi, ("simi: waitForSim start(%d)\n", timeout_ms));
     sbp = simibuff;
 
     while ((ch = fgetc(simin)) > 0 ) {
-      *sbp++ = ch;
+        *sbp++ = ch;
     }
     *sbp = 0;
     Dprintf(D_simi, ("waitForSim(%d) got[%s]\n", timeout_ms, simibuff));
@@ -153,7 +153,25 @@ Dprintf(D_simi, ("simi: waitForSim start(%d)\n", timeout_ms));
 /* openSimulator - create a pipe to talk to simulator              */
 /*-----------------------------------------------------------------*/
 #ifdef _WIN32
-char *argsToCmdLine(char **args, int nargs)
+static void init_winsock(void)
+{
+    static int is_initialized = 0;
+
+    if (!is_initialized)
+    {
+        WSADATA wsaData;
+        int iResult;
+
+        // Initialize Winsock
+        if (0 != WSAStartup(MAKEWORD(2,2), &wsaData))
+        {
+            fprintf(stderr, "WSAStartup failed: %d\n", iResult);
+            exit(1);
+        }
+    }
+}
+
+static char *argsToCmdLine(char **args, int nargs)
 {
 #define CHUNCK  256
     int i;
@@ -172,7 +190,7 @@ char *argsToCmdLine(char **args, int nargs)
             argLen += 2;
         }
 
-        if (0 < nargs)
+        if (0 < i)
             ++argLen;
 
         if (cmdPos + argLen >= cmdLen)
@@ -185,7 +203,7 @@ char *argsToCmdLine(char **args, int nargs)
             cmd = Safe_realloc(cmd, cmdLen);
         }
 
-        if (0 < nargs)
+        if (0 < i)
         {
             cmd[cmdPos++] = ' ';
             --argLen;
@@ -204,12 +222,12 @@ char *argsToCmdLine(char **args, int nargs)
             cmd[cmdPos++] = '"';
     }
 
-    cmd[cmdPos] = '\0'
+    cmd[cmdPos] = '\0';
 
     return cmd;
 }
 
-PROCESS_INFORMATION *execSimulator(char **args, int nargs)
+static PROCESS_INFORMATION *execSimulator(char **args, int nargs)
 {
     STARTUPINFO si;
     static PROCESS_INFORMATION pi;
@@ -247,6 +265,9 @@ void openSimulator (char **args, int nargs)
     int retry = 0;
     int i;
     int fh;
+
+    init_winsock();
+
     Dprintf(D_simi, ("simi: openSimulator\n"));
 #ifdef SDCDB_DEBUG
     if (D_simi & sdcdbDebug)
@@ -263,16 +284,19 @@ void openSimulator (char **args, int nargs)
     invalidateCache(IMEM_CACHE);
     invalidateCache(SREG_CACHE);
 
- try_connect:
-    sock = WSASocket(PF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0);
+    if (INVALID_SOCKET == (sock = WSASocket(PF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0))) {
+        fprintf(stderr, "cannot create socket: %d\n", WSAGetLastError());
+        exit(1);
+    }
 
     memset(&sin,0,sizeof(sin));
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = inet_addr("127.0.0.1");
     sin.sin_port = htons(9756);
 
+ try_connect:
     /* connect to the simulator */
-    if (INVALID_SOCKET == connect(sock,(struct sockaddr *) &sin, sizeof(sin)))
+    if (SOCKET_ERROR == connect(sock, (struct sockaddr *)&sin, sizeof(sin)))
     {
         /* if failed then wait 1 second & try again
            do this for 10 secs only */
@@ -287,38 +311,39 @@ void openSimulator (char **args, int nargs)
         perror("connect failed :");
         exit(1);
     }
-    fh = _open_osfhandle((intptr_t)socket, _O_TEXT);
+
+    fh = _open_osfhandle((intptr_t)sock, _O_TEXT);
     if (-1 == fh)
     {
-        fprintf(stderr, "cannot _open_osfhandle\n");
+    	perror("cannot _open_osfhandle");
         exit(1);
     }
 
     /* go the socket now turn it into a file handle */
-    if (!(simin = fdopen(sock,"r")))
+    if (!(simin = fdopen(fh, "r")))
     {
-        fprintf(stderr,"cannot open socket for read\n");
+        perror("cannot open socket for read");
         exit(1);
     }
 
-    fh = _open_osfhandle((intptr_t)socket, _O_TEXT);
+    fh = _open_osfhandle((intptr_t)sock, _O_TEXT);
     if (-1 == fh)
     {
-        fprintf(stderr, "cannot _open_osfhandle\n");
+    	perror("cannot _open_osfhandle");
         exit(1);
     }
 
-    if (!(simout = fdopen(sock,"w")))
+    if (!(simout = fdopen(fh, "w")))
     {
-        fprintf(stderr,"cannot open socket for write\n");
+        perror("cannot open socket for write");
         exit(1);
     }
     /* now that we have opened, wait for the prompt */
-    waitForSim(200,NULL);
+    waitForSim(200, NULL);
     simactive = 1;
 }
 #else
-int execSimulator(char **args, int nargs)
+static int execSimulator(char **args, int nargs)
 {
     if ((simPid = fork()))
     {
@@ -361,14 +386,18 @@ void openSimulator (char **args, int nargs)
     invalidateCache(IMEM_CACHE);
     invalidateCache(SREG_CACHE);
 
- try_connect:
-    sock = socket(AF_INET,SOCK_STREAM,0);
+    if ((sock = socket(AF_INET,SOCK_STREAM,0)) < 0)
+    {
+        perror("cannot create socket");
+        exit(1);
+    }
 
     memset(&sin,0,sizeof(sin));
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = inet_addr("127.0.0.1");
     sin.sin_port = htons(9756);
 
+ try_connect:
     /* connect to the simulator */
     if (connect(sock,(struct sockaddr *) &sin, sizeof(sin)) < 0)
     {
@@ -408,7 +437,7 @@ void openSimulator (char **args, int nargs)
 /*-----------------------------------------------------------------*/
 /* simResponse - returns buffer to simulator's response            */
 /*-----------------------------------------------------------------*/
-char *simResponse()
+char *simResponse(void)
 {
     return simibuff;
 }
@@ -643,34 +672,34 @@ unsigned int simGoTillBp ( unsigned int gaddr)
     invalidateCache(IMEM_CACHE);
     invalidateCache(SREG_CACHE);
     if (gaddr == 0) {
-      /* initial start, start & stop from address 0 */
-      //char buf[20];
+        /* initial start, start & stop from address 0 */
+        //char buf[20];
 
-         // this program is setting up a bunch of breakpoints automatically
-         // at key places.  Like at startup & main() and other function
-         // entry points.  So we don't need to setup one here..
-      //sendSim("break 0x0\n");
-      //sleep(1);
-      //waitForSim();
+           // this program is setting up a bunch of breakpoints automatically
+           // at key places.  Like at startup & main() and other function
+           // entry points.  So we don't need to setup one here..
+        //sendSim("break 0x0\n");
+        //sleep(1);
+        //waitForSim();
 
-      sendSim("reset\n");
-      waitForSim(wait_ms, NULL);
-      sendSim("run 0x0\n");
+        sendSim("reset\n");
+        waitForSim(wait_ms, NULL);
+        sendSim("run 0x0\n");
     } else      if (gaddr == -1) { /* resume */
-      sendSim ("run\n");
-      wait_ms = 100;
+        sendSim ("run\n");
+        wait_ms = 100;
     }
     else        if (gaddr == 1 ) { /* nexti or next */
-      sendSim ("next\n");
-      wait_ms = 100;
+        sendSim ("next\n");
+        wait_ms = 100;
     }
     else        if (gaddr == 2 ) { /* stepi or step */
-      sendSim ("step\n");
-      wait_ms = 100;
+        sendSim ("step\n");
+        wait_ms = 100;
     }
     else  {
-      printf("Error, simGoTillBp > 0!\n");
-      exit(1);
+        printf("Error, simGoTillBp > 0!\n");
+        exit(1);
     }
 
     waitForSim(wait_ms, NULL);
@@ -709,7 +738,7 @@ unsigned int simGoTillBp ( unsigned int gaddr)
 /*-----------------------------------------------------------------*/
 /* simReset - reset the simulator                                  */
 /*-----------------------------------------------------------------*/
-void simReset ()
+void simReset (void)
 {
     invalidateCache(XMEM_CACHE);
     invalidateCache(IMEM_CACHE);
@@ -722,7 +751,7 @@ void simReset ()
 /*-----------------------------------------------------------------*/
 /* closeSimulator - close connection to simulator                  */
 /*-----------------------------------------------------------------*/
-void closeSimulator ()
+void closeSimulator (void)
 {
 #ifdef _WIN32
     if ( ! simin || ! simout || INVALID_SOCKET == sock )

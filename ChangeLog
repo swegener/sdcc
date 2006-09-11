@@ -1,3 +1,7 @@
+2006-09-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/i51mch.c (machine): fixed warning
+
 2006-09-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/i51mch.c (machine): S_DJNZ fixed bug 1554318

@@ -52,7 +52,7 @@ machine(struct mne *mp)
                 }
                 else
                 {
-                outr11(&e, op, R_J11);
+                        outr11(&e, op, R_J11);
                 }
                 break;
 
@@ -69,7 +69,7 @@ machine(struct mne *mp)
                 }
                 else
                 {
-                outrw(&e, 0);
+                        outrw(&e, 0);
                 }
                 break;
 
@@ -395,11 +395,11 @@ machine(struct mne *mp)
                          */
                         if (flat24Mode)
                         {
-                            outr24(&e1, 0);
+                                outr24(&e1, 0);
                         }
                         else
                         {
-                        outrw(&e1, 0);
+                                outrw(&e1, 0);
                         }
                         break;
 
@@ -419,10 +419,10 @@ machine(struct mne *mp)
                 comma();
                 expr(&e1, 0);
                 if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                    if ( e1.e_addr == dot.s_addr)
-                        v1 = -3;
-                    else
-                        v1 = e1.e_addr - dot.s_addr - 1;
+                        if ( e1.e_addr == dot.s_addr)
+                                v1 = -3;
+                        else
+                                v1 = e1.e_addr - dot.s_addr - 1;
                         if (pass==2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
@@ -438,10 +438,10 @@ machine(struct mne *mp)
                 outab(op);
                 expr(&e1, 0);
                 if (e1.e_base.e_ap == NULL || e1.e_base.e_ap == dot.s_area) {
-                    if ( e1.e_addr == dot.s_addr)
-                        v1 = -2;
-                    else
-                        v1 = e1.e_addr - dot.s_addr - 1;
+                        if ( e1.e_addr == dot.s_addr)
+                                v1 = -2;
+                        else
+                                v1 = e1.e_addr - dot.s_addr - 1;
                         if (pass == 2 && ((v1 < -128) || (v1 > 127)))
                                 aerr();
                         outab(v1);
@@ -526,6 +526,7 @@ machine(struct mne *mp)
 
                 default:
                         aerr();
+                        v1 = 0;
                 }
 
                 /* branch destination */
@@ -609,7 +610,8 @@ machine(struct mne *mp)
         /* MUL/DIV A,B */
         case S_AB:
                 t = addr(&e);
-                if (t != S_RAB) aerr();
+                if (t != S_RAB)
+                        aerr();
                 outab(op);
                 break;
 

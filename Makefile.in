@@ -30,7 +30,7 @@ SDCC_MISC	+= debugger/mcs51
 endif
 
 ifeq ($(OPT_DISABLE_Z80), 0)
-SDCC_ASLINK     += as link
+SDCC_ASLINK     += as as/link
 endif
 
 ifeq ($(OPT_DISABLE_UCSIM), 0)

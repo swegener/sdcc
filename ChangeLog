@@ -1,3 +1,38 @@
+2006-09-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link,
+	* as/link/Makefile.in,
+	* as/link/z80/linkgbz80.dsp,
+	* as/link/z80/linkz80.dsp,
+	* configure,
+	* link,
+	* link/clean.mk,
+	* link/Makefile.in,
+	* link/README,
+	* link/z80,
+	* link/z80/aslink.h,
+	* link/z80/clean.mk,
+	* link/z80/conf.mk,
+	* link/z80/linkgbz80.dsp,
+	* link/z80/linkz80.dsp,
+	* link/z80/lkarea.c,
+	* link/z80/lkdata.c,
+	* link/z80/lkeval.c,
+	* link/z80/lkgb.c,
+	* link/z80/lkgg.c,
+	* link/z80/lkhead.c,
+	* link/z80/lkihx.c,
+	* link/z80/lklex.c,
+	* link/z80/lklibr.c,
+	* link/z80/lklist.c,
+	* link/z80/lkmain.c,
+	* link/z80/lkrloc.c,
+	* link/z80/lks19.c,
+	* link/z80/lksym.c,
+	* link/z80/Makefile.in,
+	* Makefile.in,
+	* sdcc.dsw: moved link/ to as/link/
+
 2006-09-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/i51mch.c (machine): fixed warning

@@ -240,7 +240,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "linkgbz80"=.\link\z80\linkgbz80.dsp - Package Owner=<4>
+Project: "linkgbz80"=.\as\link\z80\linkgbz80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -252,7 +252,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "linkz80"=.\LINK\Z80\linkz80.dsp - Package Owner=<4>
+Project: "linkz80"=.\as\link\z80\linkz80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

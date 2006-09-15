@@ -37,32 +37,33 @@ CFLAGS		= @CFLAGS@ -Wall -DINDEXLIB
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
 
-ASOBJECTS	= asmain.o aslex.o assym.o assubr.o asnoice.o \
-		  asexpr.o asdata.o aslist.o asout.o asstore.o \
-		  i51ext.o i51pst.o i51mch.o i51adr.o strcmpi.o
-ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
+LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
+		  lkeval.o lklex.o lksym.o lkrloc.o \
+		  lklibr.o lklist.o lkihx.o lks19.o \
+		  lkstore.o lknoice.o lkmem.o lkaomf51.o strcmpi.o
+LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
-ASX8051		= $(top_builddir)bin/asx8051$(EXEEXT)
+ASLINK		= $(top_builddir)bin/aslink$(EXEEXT)
 
 transform       = @program_transform_name@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf $(ASX8051)
+all: checkconf $(ASLINK)
 
-$(ASX8051): $(ASOBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS)
+$(ASLINK): $(LKOBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(LKOBJECTS)
 
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASX8051) `echo $(DESTDIR)$(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/asx8051$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/asx8051$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/aslink$(EXEEXT)
 
 
 # Performing self-test
@@ -85,7 +86,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(ASSOURCES) $(srcdir)/*.h $(top_builddir)*.h $(top_srcdir)/*.h
+Makefile.dep: $(LKSOURCES) $(srcdir)/*.h $(top_builddir)*.h $(top_srcdir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \

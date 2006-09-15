@@ -8135,7 +8135,7 @@ if test $OPT_DISABLE_HC08 = 0; then
 fi
 
 if test $OPT_DISABLE_MCS51 = 0; then
-                                ac_config_files="$ac_config_files src/mcs51/Makefile as/mcs51/Makefile debugger/mcs51/Makefile"
+                                ac_config_files="$ac_config_files src/mcs51/Makefile as/mcs51/Makefile as/link/mcs51/Makefile debugger/mcs51/Makefile"
 
   test $OPT_DISABLE_DEVICE_LIB = 0 &&                                         ac_config_files="$ac_config_files device/lib/mcs51/Makefile device/lib/small/Makefile device/lib/medium/Makefile device/lib/large/Makefile"
 

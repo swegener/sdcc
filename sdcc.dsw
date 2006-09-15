@@ -87,7 +87,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "aslink"=.\as\aslink.dsp - Package Owner=<4>
+Project: "aslink"=.\as\link\mcs51\aslink.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

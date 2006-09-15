@@ -1,3 +1,41 @@
+2006-09-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	as/link/mcs51
+	as/aslink.dsp,                  as/link/mcs51/aslink.dsp,
+	as/link/mcs51/aslink.h,         as/mcs51/aslink.h,
+	as/link/mcs51/aslink.mak,       as/mcs51/aslink.mak,
+	as/link/mcs51/lkaomf51.c,       as/mcs51/lkaomf51.c,
+	as/link/mcs51/lkarea.c,         as/mcs51/lkarea.c,
+	as/link/mcs51/lkdata.c,         as/mcs51/lkdata.c,
+	as/link/mcs51/lkeval.c,         as/mcs51/lkeval.c,
+	as/link/mcs51/lkhead.c,         as/mcs51/lkhead.c,
+	as/link/mcs51/lkihx.c,          as/mcs51/lkihx.c,
+	as/link/mcs51/lklex.c,          as/mcs51/lklex.c,
+	as/link/mcs51/lklibr.c,         as/mcs51/lklibr.c,
+	as/link/mcs51/lklist.c,         as/mcs51/lklist.c,
+	as/link/mcs51/lkmain.c,         as/mcs51/lkmain.c,
+	as/link/mcs51/lkmem.c,          as/mcs51/lkmem.c,
+	as/link/mcs51/lknoice.c,        as/mcs51/lknoice.c,
+	as/link/mcs51/lkrloc.c,         as/mcs51/lkrloc.c,
+	as/link/mcs51/lks19.c,          as/mcs51/lks19.c,
+	as/link/mcs51/lkstore.c,        as/mcs51/lkstore.c,
+	as/link/mcs51/lksym.c,          as/mcs51/lksym.c,
+	as/link/mcs51/Makefile.aslink,  as/mcs51/Makefile.aslink,
+	as/link/mcs51/alloc.h,
+	as/link/mcs51/clean.mk,
+	as/link/mcs51/conf.mk,
+	as/link/mcs51/Makefile.bcc,
+	as/link/mcs51/Makefile.in,
+	as/link/mcs51/readme.390,
+	as/link/mcs51/strcmpi.c,
+	as/link/mcs51/strcmpi.h,
+	as/mcs51/clean.mk,
+	as/mcs51/Makefile.bcc,
+	as/mcs51/Makefile.in,
+	configure,
+	Makefile.in,
+	sdcc.dsw: moved mcs51 linker to as/link/mcs51
+
 2006-09-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link,

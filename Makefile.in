@@ -25,7 +25,7 @@ SDCC_ASLINK     += as/hc08
 endif
 
 ifeq ($(OPT_DISABLE_MCS51), 0)
-SDCC_ASLINK     += as/mcs51
+SDCC_ASLINK     += as/mcs51 as/link/mcs51
 SDCC_MISC	+= debugger/mcs51
 endif
 

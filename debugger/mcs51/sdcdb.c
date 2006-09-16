@@ -1100,12 +1100,11 @@ static void parseCmdLine (int argc, char **argv)
             }
 
             if (-1 != access(argv[i], 0)) {
-            	/* file exists: strip the cdb or ihx externsion */
-                filename = argv[i];
-            	char *p = strrchr(argv[i], '.');
+                /* file exists: strip the cdb or ihx externsion */
+                char *p = strrchr(argv[i], '.');
 
-            	if (NULL != p &&
-                    (0 == strcmp(p, ".dcb") || 0 == strcmp(p, ".ihx")))
+                if (NULL != p &&
+                    (0 == strcmp(p, ".cdb") || 0 == strcmp(p, ".ihx")))
                     *p = '\0';
             }
             filename = argv[i];

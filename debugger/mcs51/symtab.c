@@ -35,50 +35,50 @@ unsigned int   getSize ( link *p )
 {
     /* if nothing return 0 */
     if ( ! p )
-  return 0 ;
+        return 0 ;
 
     if ( IS_SPEC(p) ) { /* if this is the specifier then */
 
-  switch (SPEC_NOUN(p)) { /* depending on the specifier type */
-  case V_INT:
-      return (IS_LONG(p) ? LONGSIZE : ( IS_SHORT(p) ? SHORTSIZE: INTSIZE)) ;
-  case V_FLOAT:
-      return FLOATSIZE ;
-  case V_CHAR:
-      return   CHARSIZE ;
-  case V_VOID:
-      return   0 ;
-  case V_STRUCT:
-      return   SPEC_STRUCT(p)->size ;
-  case V_LABEL:
-      return 0 ;
-  case V_SBIT:
-      return BITSIZE ;
-  case V_BIT:
-      return ((SPEC_BLEN(p) / 8) + (SPEC_BLEN(p) % 8 ? 1 : 0)) ;
-  default  :
-      return 0 ;
-  }
+        switch (SPEC_NOUN(p)) { /* depending on the specifier type */
+        case V_INT:
+            return (IS_LONG(p) ? LONGSIZE : ( IS_SHORT(p) ? SHORTSIZE: INTSIZE)) ;
+        case V_FLOAT:
+            return FLOATSIZE ;
+        case V_CHAR:
+            return   CHARSIZE ;
+        case V_VOID:
+            return   0 ;
+        case V_STRUCT:
+            return   SPEC_STRUCT(p)->size ;
+        case V_LABEL:
+            return 0 ;
+        case V_SBIT:
+            return BITSIZE ;
+        case V_BIT:
+            return ((SPEC_BLEN(p) / 8) + (SPEC_BLEN(p) % 8 ? 1 : 0)) ;
+        default  :
+            return 0 ;
+        }
     }
 
     /* this is a specifier  */
     switch (DCL_TYPE(p))  {
     case FUNCTION:
-  return 2;
+        return 2;
     case ARRAY:
-  return DCL_ELEM(p) * getSize (p->next) ;
+        return DCL_ELEM(p) * getSize (p->next) ;
     case IPOINTER:
     case PPOINTER:
     case POINTER:
-  return ( PTRSIZE ) ;
+        return ( PTRSIZE ) ;
     case FPOINTER:
     case CPOINTER:
-  return ( FPTRSIZE );
+        return ( FPTRSIZE );
     case GPOINTER:
-  return ( GPTRSIZE );
+        return ( GPTRSIZE );
 
     default     :
-  return  0 ;
+        return  0 ;
     }
 }
 
@@ -106,8 +106,8 @@ void parseFunc (char *line)
     while(*rs && *rs != ',') rs++;
     rs++;
     sscanf(rs,"%d,%d,%d",&i,
-     &(SPEC_INTN(func->sym->etype)),
-     &(SPEC_BANK(func->sym->etype)));
+        &(SPEC_INTN(func->sym->etype)),
+        &(SPEC_BANK(func->sym->etype)));
     SPEC_INTRTN(func->sym->etype) = i;
     addSet(&functions,func);
 }
@@ -127,111 +127,111 @@ static char  *parseTypeInfo (symbol *sym, char *s)
     /* bp now points to '}' ... go past it */
     s = ++bp;
     while (*s != ')') { /* till we reach the end */
-  link *type;
-  type = Safe_calloc(1,sizeof(link));
-  if (*s == ',') s++;
+        link *type;
+        type = Safe_calloc(1,sizeof(link));
+        if (*s == ',') s++;
 
-  /* is a declarator */
-  if (*s == 'D') {
-      s++;
-      switch (*s) {
-      case 'F':
-    DCL_TYPE(type) = FUNCTION;
-    s++;
-    break;
-      case 'G':
-    DCL_TYPE(type) = GPOINTER;
-    s++;
-    break;
-      case 'C':
-    DCL_TYPE(type) = CPOINTER;
-    s++;
-    break;
-      case 'X':
-    DCL_TYPE(type) = FPOINTER;
-    s++;
-    break;
-      case 'D':
-    DCL_TYPE(type) = POINTER;
-    s++;
-    break;
-      case 'I':
-    DCL_TYPE(type) = IPOINTER;
-    s++;
-    break;
-      case 'P':
-    DCL_TYPE(type) = PPOINTER;
-    s++;
-    break;
-      case 'A':
-    s++;
-    DCL_TYPE(type) = ARRAY ;
-    DCL_ELEM(type) = strtol(s,&s,10);
-    break;
-      }
-  } else {
-      /* is a specifier */
-      type->class = SPECIFIER ;
-      s++;
-      switch (*s) {
-      case 'L':
-    SPEC_NOUN(type) = V_INT;
-    SPEC_LONG(type) = 1;
-    s++;
-    break;
-      case 'I':
-    SPEC_NOUN(type) = V_INT;
-    s++;
-    break;
-      case 'S':
-      case 'C':
-    SPEC_NOUN(type) = V_CHAR ;
-    s++;
-    break;
-      case 'V':
-    SPEC_NOUN(type) = V_VOID;
-    s++;
-    break;
-      case 'F':
-    SPEC_NOUN(type) = V_FLOAT;
-    s++;
-    break;
-      case 'T':
-    s++;
-    SPEC_NOUN(type) = V_STRUCT;
-    {
-        char *ss = strtok(strdup(s),",):");
+        /* is a declarator */
+        if (*s == 'D') {
+            s++;
+            switch (*s) {
+            case 'F':
+                DCL_TYPE(type) = FUNCTION;
+                s++;
+                break;
+            case 'G':
+                DCL_TYPE(type) = GPOINTER;
+                s++;
+                break;
+            case 'C':
+                DCL_TYPE(type) = CPOINTER;
+                s++;
+                break;
+            case 'X':
+                DCL_TYPE(type) = FPOINTER;
+                s++;
+                break;
+            case 'D':
+                DCL_TYPE(type) = POINTER;
+                s++;
+                break;
+            case 'I':
+                DCL_TYPE(type) = IPOINTER;
+                s++;
+                break;
+            case 'P':
+                DCL_TYPE(type) = PPOINTER;
+                s++;
+                break;
+            case 'A':
+                s++;
+                DCL_TYPE(type) = ARRAY ;
+                DCL_ELEM(type) = strtol(s,&s,10);
+                break;
+            }
+        } else {
+            /* is a specifier */
+            type->class = SPECIFIER ;
+            s++;
+            switch (*s) {
+            case 'L':
+                SPEC_NOUN(type) = V_INT;
+                SPEC_LONG(type) = 1;
+                s++;
+                break;
+            case 'I':
+                SPEC_NOUN(type) = V_INT;
+                s++;
+                break;
+            case 'S':
+            case 'C':
+                SPEC_NOUN(type) = V_CHAR ;
+                s++;
+                break;
+            case 'V':
+                SPEC_NOUN(type) = V_VOID;
+                s++;
+                break;
+            case 'F':
+                SPEC_NOUN(type) = V_FLOAT;
+                s++;
+                break;
+            case 'T':
+                s++;
+                SPEC_NOUN(type) = V_STRUCT;
+                {
+                    char *ss = strtok(strdup(s),",):");
 
-        SPEC_STRUCT(type) = structWithName(ss);
-        free(ss);
-    }
-    break;
-      case 'X':
-    s++;
-    SPEC_NOUN(type) = V_SBIT;
-    break;
-      case 'B':
-    SPEC_NOUN(type) = V_BIT;
-    s++;
-    SPEC_BSTR(type) = strtol(s,&s,10);
-    s++;
-    SPEC_BLEN(type) = strtol(s,&s,10);
-    break;
-      }
-      while (*s != ':') s++;
-      s++;
-      if (*s++ == 'S')
-    SPEC_USIGN(type) = 0;
-      else
-    SPEC_USIGN(type) = 1;
+                    SPEC_STRUCT(type) = structWithName(ss);
+                    free(ss);
+                }
+                break;
+            case 'X':
+                s++;
+                SPEC_NOUN(type) = V_SBIT;
+                break;
+            case 'B':
+                SPEC_NOUN(type) = V_BIT;
+                s++;
+                SPEC_BSTR(type) = strtol(s,&s,10);
+                s++;
+                SPEC_BLEN(type) = strtol(s,&s,10);
+                break;
+            }
+            while (*s != ':') s++;
+            s++;
+            if (*s++ == 'S')
+                SPEC_USIGN(type) = 0;
+            else
+                SPEC_USIGN(type) = 1;
 
-  }
+        }
 
-  /* add the type to the symbol's type chain */
-  if (sym->type)
-      sym->etype = sym->etype->next = type;
-  else
-      sym->type = sym->etype = type;
+        /* add the type to the symbol's type chain */
+        if (sym->type)
+            sym->etype = sym->etype->next = type;
+        else
+            sym->type = sym->etype = type;
     }
 
     return ++s;
@@ -275,10 +275,10 @@ symbol *parseSymbol (char *s, char **rs, int doadd)
     nsym->scopetype = *s;
     s++ ;
     if (nsym->scopetype != 'G') {
-  /* get the function name it is local to */
-  bp = s;
-  while (*s != '$') s++;
-  nsym->sname = alloccpy(bp,s - bp);
+        /* get the function name it is local to */
+        bp = s;
+        while (*s != '$') s++;
+        nsym->sname = alloccpy(bp,s - bp);
     }
 
     /* next get the name */
@@ -347,20 +347,20 @@ structdef *parseStruct (char *s)
     nsdef->size = 0;
     s++;
     while (*s && *s != ']') {
-  int offset ;
-  symbol *sym ;
-  while (!isdigit(*s)) s++;
-  offset = strtol(s,&s,10);
-  while (*s != ':') s++;
-  s++;
-  sym = parseSymbol(s,&s,0);
-  sym->offset = offset ;
-  s += 3;
-  if (!fields)
-      fields = nsdef->fields = sym;
-  else
-      fields = fields->next = sym;
-  nsdef->size += sym->size;
+        int offset ;
+        symbol *sym ;
+        while (!isdigit(*s)) s++;
+        offset = strtol(s,&s,10);
+        while (*s != ':') s++;
+        s++;
+        sym = parseSymbol(s,&s,0);
+        sym->offset = offset ;
+        s += 3;
+        if (!fields)
+            fields = nsdef->fields = sym;
+        else
+            fields = fields->next = sym;
+        nsdef->size += sym->size;
     }
 
     return nsdef;
@@ -383,14 +383,14 @@ module *parseModule (char *s, bool createName )
     nmod->name = s;
 
     if (createName) {
-  sprintf(buffer,"%s.c",s);
+        sprintf(buffer,"%s.c",s);
 
-  nmod->c_name = Safe_malloc(strlen(buffer)+1);
-  strcpy(nmod->c_name,buffer);
+        nmod->c_name = Safe_malloc(strlen(buffer)+1);
+        strcpy(nmod->c_name,buffer);
 
-  sprintf(buffer,"%s.asm",s);
-  nmod->asm_name = Safe_malloc(strlen(buffer)+1);
-  strcpy(nmod->asm_name,buffer);
+        sprintf(buffer,"%s.asm",s);
+        nmod->asm_name = Safe_malloc(strlen(buffer)+1);
+        strcpy(nmod->asm_name,buffer);
     }
 
     return nmod;
@@ -406,11 +406,11 @@ DEFSETFUNC(moduleWithName)
     V_ARG(module **,rmod);
 
     if (*rmod)
-  return 0;
+        return 0;
 
     if (strcmp(mod->name,s) == 0) {
-  *rmod = mod ;
-  return 1;
+        *rmod = mod ;
+        return 1;
     }
 
     return 0;
@@ -426,10 +426,10 @@ DEFSETFUNC(moduleWithCName)
     V_ARG(module **,rmod);
 
     if (*rmod)
-  return 0;
+        return 0;
     if (strcmp(mod->c_name,s) == 0) {
-  *rmod = mod;
-  return 1;
+        *rmod = mod;
+        return 1;
     }
 
     return 0;
@@ -445,10 +445,10 @@ DEFSETFUNC(moduleWithAsmName)
     V_ARG(module **,rmod);
 
     if (*rmod)
-  return 0;
+        return 0;
     if (strcmp(mod->asm_name,s) == 0) {
-  *rmod = mod;
-  return 1;
+        *rmod = mod;
+        return 1;
     }
 
     return 0;
@@ -466,9 +466,9 @@ structdef *structWithName (char *s)
     /* go thru the struct table looking for a match */
     for ( i = 0 ; i < nStructs ; i++ ) {
 
-  if (strcmp(currModName,structs[i]->sname) == 0 &&
-      strcmp(s,structs[i]->tag) == 0)
-      return structs[i];
+        if (strcmp(currModName,structs[i]->sname) == 0 &&
+            strcmp(s,structs[i]->tag) == 0)
+            return structs[i];
     }
 
     nsdef = Safe_calloc(1,sizeof(structdef));
@@ -491,11 +491,11 @@ DEFSETFUNC(symWithRName)
     V_ARG(symbol **,rsym);
 
     if (*rsym)
-  return 0;
+        return 0;
 
     if (strcmp(sym->rname,s) == 0) {
-  *rsym = sym;
-  return 1;
+        *rsym = sym;
+        return 1;
     }
 
     return 0;
@@ -511,11 +511,11 @@ DEFSETFUNC(funcWithRName)
     V_ARG(function **,rfunc);
 
     if (*rfunc)
-  return 0;
+        return 0;
 
     if (strcmp(func->sym->rname,s) == 0) {
-  *rfunc = func;
-  return 1;
+        *rfunc = func;
+        return 1;
     }
 
     return 0;
@@ -534,20 +534,20 @@ DEFSETFUNC(symLocal)
     V_ARG(symbol **,rsym);
 
     if (strcmp(name,sym->name) == 0 && /* name matches */
-  sym->scopetype != 'G'       && /* local scope  */
-  (sym->sname && strcmp(sym->sname,sname) == 0) && /* scope == specified scope */
-  sym->block <= block         && /* block & level kindo matches */
-  sym->level <= level) {
+        sym->scopetype != 'G'       && /* local scope  */
+        (sym->sname && strcmp(sym->sname,sname) == 0) && /* scope == specified scope */
+        sym->block <= block         && /* block & level kindo matches */
+        sym->level <= level) {
 
-  /* if a symbol was previously found then
-     sure that ones block & level are less
-     then this one */
-  if (*rsym && (*rsym)->block >= block &&
-      (*rsym)->level >= level)
-      return 0;
+        /* if a symbol was previously found then
+           sure that ones block & level are less
+           then this one */
+        if (*rsym && (*rsym)->block >= block &&
+            (*rsym)->level >= level)
+            return 0;
 
-  *rsym = sym;
-  return 1;
+        *rsym = sym;
+        return 1;
     }
 
     return 0;
@@ -563,13 +563,13 @@ DEFSETFUNC(symGlobal)
     V_ARG(symbol **,rsym);
 
     if (*rsym)
-  return 0;
+        return 0;
 
     /* simple :: global & name matches */
     if (sym->scopetype == 'G' &&
-  strcmp(sym->name,name) == 0) {
-  *rsym = sym;
-  return 1;
+        strcmp(sym->name,name) == 0) {
+        *rsym = sym;
+        return 1;
     }
 
     return 0;
@@ -584,15 +584,15 @@ symbol *symLookup (char *name, context *ctxt)
 
     if ((ctxt) && (ctxt->func) &&
         (ctxt->func->sym) && (ctxt->func->sym->name)) {
-      /* first try & find a local variable for the given name */
-      if ( applyToSet(symbols,symLocal,
-        name,
-        ctxt->func->sym->name,
-        ctxt->block,
-        ctxt->level,
-        &sym))
-         return sym;
-      sym = NULL;
+        /* first try & find a local variable for the given name */
+        if ( applyToSet(symbols,symLocal,
+            name,
+            ctxt->func->sym->name,
+            ctxt->block,
+            ctxt->level,
+            &sym))
+            return sym;
+        sym = NULL;
     }
 
     if ((ctxt) && (ctxt->func) &&
@@ -602,13 +602,13 @@ symbol *symLookup (char *name, context *ctxt)
           name,
           ctxt->func->mod->name,
           0,0,&sym))
-             return sym;
+          return sym;
       sym = NULL;
     }
 
     /* no:: try global */
     if ( applyToSet(symbols,symGlobal,name,&sym))
-      return sym;
+        return sym;
 
     /* cannot find return null */
     return NULL;
@@ -624,13 +624,13 @@ static void lnkFuncEnd (char *s)
 
     /* copy till we get to a ':' */
     while ( *s != ':' )
-  *bp++ = *s++;
+        *bp++ = *s++;
     bp -= 1;
     *bp = '\0';
 
     func = NULL;
     if (!applyToSet(functions,funcWithRName,sname,&func))
-  return ;
+        return ;
 
     s++;
     sscanf(s,"%x",&func->sym->eaddr);
@@ -683,21 +683,21 @@ static void lnkAsmSrc (char *s)
     /* input will be of format
        filename$<line>:<address> */
     while (*s != '$' && *s != '.')
-  *bp++ = *s++;
+        *bp++ = *s++;
     *bp = '\0';
     /* skip to line stuff */
     while (*s != '$') s++;
 
     if (!applyToSet(modules,moduleWithName,mname,&mod))
-  return ;
+        return ;
 
     if (sscanf(s,"$%d:%x",&line,&addr) != 2)
-  return ;
+        return ;
 
     line--;
     if (line < mod->nasmLines) {
-  mod->asmLines[line]->addr = addr;
-  Dprintf(D_symtab, ("symtab: asm %s(%d:0x%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src));
+        mod->asmLines[line]->addr = addr;
+        Dprintf(D_symtab, ("symtab: asm %s(%d:0x%x) %s",mod->asm_name,line,addr,mod->asmLines[line]->src));
     }
 }
 
@@ -715,21 +715,21 @@ static void lnkCSrc (char *s)
        filename.ext$<line>$<level>$<block>:<address> */
     /* get the module name */
     while (*s != '$' )
-  *bp++ = *s++;
+        *bp++ = *s++;
     *bp = '\0';
     /* skip the extension */
     while (*s != '$') s++;
 
     if (sscanf(s,"$%d$%d$%d:%x",
-         &line,&level,&block,&addr) != 4)
-  return ;
+        &line,&level,&block,&addr) != 4)
+        return ;
 
     mod = NULL;
     if (!applyToSet(modules,moduleWithCName,mname,&mod)) {
-  mod = parseModule(mname,FALSE);
-  mod->c_name = alloccpy(mname,strlen(mname));
-  mod->cfullname=searchDirsFname(mod->c_name);
-  mod->cLines = loadFile(mod->c_name,&mod->ncLines);
+        mod = parseModule(mname, FALSE);
+        mod->c_name = alloccpy(mname,strlen(mname));
+        mod->cfullname=searchDirsFname(mod->c_name);
+        mod->cLines = loadFile(mod->c_name,&mod->ncLines);
     }
 
     line--;
@@ -773,19 +773,19 @@ void parseLnkRec (char *s)
 
   /* c source line address */
     case 'C':
-  lnkCSrc(s+2);
-  break;
+        lnkCSrc(s+2);
+        break;
   /* assembler source address */
     case 'A':
-  lnkAsmSrc(s+2);
-  break;
+        lnkAsmSrc(s+2);
+        break;
 
     case 'X':
-  lnkFuncEnd(s+1);
-  break;
+        lnkFuncEnd(s+1);
+        break;
 
     default :
-  lnkSymRec(s);
-  break;
+        lnkSymRec(s);
+        break;
     }
 }

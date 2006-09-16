@@ -315,7 +315,7 @@ void openSimulator (char **args, int nargs)
     fh = _open_osfhandle((intptr_t)sock, _O_TEXT);
     if (-1 == fh)
     {
-    	perror("cannot _open_osfhandle");
+        perror("cannot _open_osfhandle");
         exit(1);
     }
 
@@ -329,7 +329,7 @@ void openSimulator (char **args, int nargs)
     fh = _open_osfhandle((intptr_t)sock, _O_TEXT);
     if (-1 == fh)
     {
-    	perror("cannot _open_osfhandle");
+        perror("cannot _open_osfhandle");
         exit(1);
     }
 

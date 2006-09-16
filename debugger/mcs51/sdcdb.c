@@ -433,7 +433,7 @@ static void loadModules (void)
         switch (loop->type) {
         /* for module records do */
         case MOD_REC:
-            currMod = parseModule(loop->line,TRUE);
+            currMod = parseModule(loop->line, TRUE);
             currModName = currMod->name ;
 
             currMod->cfullname = searchDirsFname(currMod->c_name);
@@ -690,7 +690,11 @@ int cmdFile (char *s,context *cctxt)
     specialFunctionRegs();
 
     /* start the simulator & setup connection to it */
+#ifdef _WIN32
+    if (INVALID_SOCKET == sock)
+#else
     if ( sock == -1 )
+#endif
         openSimulator((char **)simArgs,nsimArgs);
     fprintf(stdout,"%s",simResponse());
     /* now send the filename to be loaded to the simulator */
@@ -1095,7 +1099,16 @@ static void parseCmdLine (int argc, char **argv)
                 continue ;
             }
 
-            filename = strtok(argv[i],".");
+            if (-1 != access(argv[i], 0)) {
+            	/* file exists: strip the cdb or ihx externsion */
+                filename = argv[i];
+            	char *p = strrchr(argv[i], '.');
+
+            	if (NULL != p &&
+                    (0 == strcmp(p, ".dcb") || 0 == strcmp(p, ".ihx")))
+                    *p = '\0';
+            }
+            filename = argv[i];
 
         }
     }

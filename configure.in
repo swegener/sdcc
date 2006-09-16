@@ -672,6 +672,7 @@ fi
 if test $OPT_DISABLE_MCS51 = 0; then
   AC_CONFIG_FILES([src/mcs51/Makefile
                    as/mcs51/Makefile
+                   as/link/mcs51/Makefile
                    debugger/mcs51/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/mcs51/Makefile
                                                        device/lib/small/Makefile
@@ -694,8 +695,8 @@ if test $OPT_DISABLE_Z80 = 0; then
   AC_CONFIG_FILES([src/z80/Makefile
                    as/Makefile
                    as/z80/Makefile
-                   link/Makefile
-                   link/z80/Makefile])
+                   as/link/Makefile
+                   as/link/z80/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/z80/Makefile
                                                        device/lib/gbz80/Makefile])
 fi

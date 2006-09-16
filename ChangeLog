@@ -1,3 +1,11 @@
+2006-09-16 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/sdcdb.c: partially fixed
+	  [ 1203664 ] sdcdb fails to open files w. two "." periods
+	* debugger/mcs51/simi.c, debugger/mcs51/symtab.c,
+	  debugger/mcs51/symtab.h: fixed indenting
+	* configure.in, configure: up to date with latest Maarten's changes
+
 2006-09-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	as/link/mcs51

@@ -138,7 +138,7 @@ typedef struct symbol {
     char     addr_type          ;  /* which address space   */
     link     *type              ;  /* start of type chain        */
     link     *etype             ;  /* end of type chain          */
-    char      scopetype         ;  /* 'G' global, 'F' - file, 'L' local */
+    char     scopetype         ;  /* 'G' global, 'F' - file, 'L' local */
     char     *sname             ;  /* if 'F' or 'L' then scope name */
     char     *rname             ;  /* real name i.e. mangled beyond recognition */
     char     addrspace          ;  /* address space designator      */
@@ -158,90 +158,90 @@ typedef struct symbol {
 #define MAXBASESIZE 4
 
 /* Easy Access Macros */
-#define DCL_TYPE(l)  l->select.d.dcl_type
-#define DCL_ELEM(l)  l->select.d.num_elem
+#define DCL_TYPE(l)      l->select.d.dcl_type
+#define DCL_ELEM(l)      l->select.d.num_elem
 #define DCL_PTR_CONST(l) l->select.d.ptr_const
 #define DCL_PTR_VOLATILE(l) l->select.d.ptr_volatile
-#define DCL_TSPEC(l) l->select.d.tspec
-#define SPEC_NOUN(x) x->select.s.noun
-#define SPEC_LONG(x) x->select.s._long
-#define SPEC_SHORT(x) x->select.s._short
-#define SPEC_USIGN(x) x->select.s._unsigned
-#define SPEC_SCLS(x) x->select.s.sclass
-#define SPEC_OCLS(x) x->select.s.oclass
-#define SPEC_STAT(x) x->select.s._static
-#define SPEC_EXTR(x) x->select.s._extern
-#define SPEC_CODE(x) x->select.s._codesg
-#define SPEC_RENT(x) x->select.s._reent
-#define SPEC_INTN(x) x->select.s._IntNo
-#define SPEC_ABSA(x) x->select.s._absadr
-#define SPEC_BANK(x) x->select.s._regbank
-#define SPEC_ADDR(x) x->select.s._addr
-#define SPEC_STAK(x) x->select.s._stack
-#define SPEC_CVAL(x) x->select.s.const_val
-#define SPEC_BSTR(x) x->select.s._bitStart
-#define SPEC_BLEN(x) x->select.s._bitLength
-#define SPEC_BNKF(x) x->select.s._rbank
-#define SPEC_INTRTN(x) x->select.s._intrtn
-#define SPEC_CRTCL(x) x->select.s._critical
+#define DCL_TSPEC(l)     l->select.d.tspec
+#define SPEC_NOUN(x)     x->select.s.noun
+#define SPEC_LONG(x)     x->select.s._long
+#define SPEC_SHORT(x)    x->select.s._short
+#define SPEC_USIGN(x)    x->select.s._unsigned
+#define SPEC_SCLS(x)     x->select.s.sclass
+#define SPEC_OCLS(x)     x->select.s.oclass
+#define SPEC_STAT(x)     x->select.s._static
+#define SPEC_EXTR(x)     x->select.s._extern
+#define SPEC_CODE(x)     x->select.s._codesg
+#define SPEC_RENT(x)     x->select.s._reent
+#define SPEC_INTN(x)     x->select.s._IntNo
+#define SPEC_ABSA(x)     x->select.s._absadr
+#define SPEC_BANK(x)     x->select.s._regbank
+#define SPEC_ADDR(x)     x->select.s._addr
+#define SPEC_STAK(x)     x->select.s._stack
+#define SPEC_CVAL(x)     x->select.s.const_val
+#define SPEC_BSTR(x)     x->select.s._bitStart
+#define SPEC_BLEN(x)     x->select.s._bitLength
+#define SPEC_BNKF(x)     x->select.s._rbank
+#define SPEC_INTRTN(x)   x->select.s._intrtn
+#define SPEC_CRTCL(x)    x->select.s._critical
 #define SPEC_VOLATILE(x) x->select.s._volatile
-#define SPEC_CONST(x) x->select.s._const
-#define SPEC_STRUCT(x) x->select.s.v_struct
-#define SPEC_TYPEDEF(x) x->select.s._typedef
+#define SPEC_CONST(x)    x->select.s._const
+#define SPEC_STRUCT(x)   x->select.s.v_struct
+#define SPEC_TYPEDEF(x)  x->select.s._typedef
 
 /* type check macros */
-#define IS_DECL(x)   ( x && x->class == DECLARATOR      )
-#define IS_SPEC(x)   ( x && x->class == SPECIFIER  )
-#define IS_ARRAY(x)  (IS_DECL(x) && DCL_TYPE(x) == ARRAY)
-#define IS_PTR(x)    (IS_DECL(x) && (DCL_TYPE(x) == POINTER    ||    \
+#define IS_DECL(x)       ( x && x->class == DECLARATOR      )
+#define IS_SPEC(x)       ( x && x->class == SPECIFIER  )
+#define IS_ARRAY(x)      (IS_DECL(x) && DCL_TYPE(x) == ARRAY)
+#define IS_PTR(x)        (IS_DECL(x) && (DCL_TYPE(x) == POINTER    ||    \
                                      DCL_TYPE(x) == FPOINTER   ||    \
                                      DCL_TYPE(x) == GPOINTER   ||    \
                                      DCL_TYPE(x) == IPOINTER   ||    \
                                      DCL_TYPE(x) == PPOINTER   ||    \
                                      DCL_TYPE(x) == CPOINTER   ||    \
                                      DCL_TYPE(x) == UPOINTER  ))
-#define IS_PTR_CONST(x) (IS_PTR(x) && DCL_PTR_CONST(x))
-#define IS_FARPTR(x) (IS_DECL(x) && DCL_TYPE(x) == FPOINTER)
-#define IS_GENPTR(x) (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
-#define IS_FUNC(x)   (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
-#define IS_LONG(x)   (IS_SPEC(x) && x->select.s._long)
-#define IS_SHORT(x)   (IS_SPEC(x) && x->select.s._short)
-#define IS_TYPEDEF(x)(IS_SPEC(x) && x->select.s._typedef)
-#define IS_CONSTANT(x)  (IS_SPEC(x) && (x->select.s.sclass == S_CONSTANT ||\
+#define IS_PTR_CONST(x)  (IS_PTR(x) && DCL_PTR_CONST(x))
+#define IS_FARPTR(x)     (IS_DECL(x) && DCL_TYPE(x) == FPOINTER)
+#define IS_GENPTR(x)     (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)
+#define IS_FUNC(x)       (IS_DECL(x) && DCL_TYPE(x) == FUNCTION)
+#define IS_LONG(x)       (IS_SPEC(x) && x->select.s._long)
+#define IS_SHORT(x)      (IS_SPEC(x) && x->select.s._short)
+#define IS_TYPEDEF(x)    (IS_SPEC(x) && x->select.s._typedef)
+#define IS_CONSTANT(x)   (IS_SPEC(x) && (x->select.s.sclass == S_CONSTANT ||\
                                         x->select.s._const == 1))
-#define IS_STRUCT(x) (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
-#define IS_ABSOLUTE(x)  (IS_SPEC(x) && x->select.s._absadr )
-#define IS_REGISTER(x)  (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
-#define IS_RENT(x)   (IS_SPEC(x) && x->select.s._reent )
-#define IS_STATIC(x) (IS_SPEC(x) && SPEC_STAT(x))
-#define IS_INT(x)    (IS_SPEC(x) && x->select.s.noun == V_INT)
-#define IS_VOID(x)   (IS_SPEC(x) && x->select.s.noun == V_VOID)
-#define IS_CHAR(x)   (IS_SPEC(x) && x->select.s.noun == V_CHAR)
-#define IS_EXTERN(x)    (IS_SPEC(x) && x->select.s._extern)
-#define IS_VOLATILE(x)  (IS_SPEC(x) && x->select.s._volatile )
-#define IS_INTEGRAL(x) (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
+#define IS_STRUCT(x)     (IS_SPEC(x) && x->select.s.noun == V_STRUCT)
+#define IS_ABSOLUTE(x)   (IS_SPEC(x) && x->select.s._absadr )
+#define IS_REGISTER(x)   (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
+#define IS_RENT(x)       (IS_SPEC(x) && x->select.s._reent )
+#define IS_STATIC(x)     (IS_SPEC(x) && SPEC_STAT(x))
+#define IS_INT(x)        (IS_SPEC(x) && x->select.s.noun == V_INT)
+#define IS_VOID(x)       (IS_SPEC(x) && x->select.s.noun == V_VOID)
+#define IS_CHAR(x)       (IS_SPEC(x) && x->select.s.noun == V_CHAR)
+#define IS_EXTERN(x)     (IS_SPEC(x) && x->select.s._extern)
+#define IS_VOLATILE(x)   (IS_SPEC(x) && x->select.s._volatile )
+#define IS_INTEGRAL(x)   (IS_SPEC(x) && (x->select.s.noun == V_INT ||  \
                                        x->select.s.noun == V_CHAR || \
                                        x->select.s.noun == V_BIT ||  \
                                        x->select.s.noun == V_SBIT ))
-#define IS_BITFIELD(x) (IS_SPEC(x) && (x->select.s.noun == V_BIT))
-#define IS_BITVAR(x) (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
+#define IS_BITFIELD(x)   (IS_SPEC(x) && (x->select.s.noun == V_BIT))
+#define IS_BITVAR(x)     (IS_SPEC(x) && (x->select.s.noun  == V_BIT ||   \
                                      x->select.s.noun == V_SBIT ))
-#define IS_FLOAT(x)  (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
+#define IS_FLOAT(x)      (IS_SPEC(x) && x->select.s.noun == V_FLOAT)
 #define IS_ARITHMETIC(x) (IS_INTEGRAL(x) || IS_FLOAT(x))
-#define IS_AGGREGATE(x) (IS_ARRAY(x) || IS_STRUCT(x))
-#define IS_LITERAL(x)   (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
-#define IS_ISR(x)               (IS_SPEC(x)  && SPEC_INTRTN(x))
+#define IS_AGGREGATE(x)  (IS_ARRAY(x) || IS_STRUCT(x))
+#define IS_LITERAL(x)    (IS_SPEC(x)  && x->select.s.sclass == S_LITERAL)
+#define IS_ISR(x)        (IS_SPEC(x)  && SPEC_INTRTN(x))
 
 
-symbol *parseSymbol (char *, char **, int );
+symbol *parseSymbol (char *, char **, int);
 structdef *parseStruct (char *);
 void parseFunc (char *);
-module *parseModule (char *, bool  );
+module *parseModule (char *, bool);
 void parseLnkRec (char *);
 symbol *symLookup (char *,context *);
 DEFSETFUNC(moduleWithName);
 DEFSETFUNC(moduleWithCName);
 DEFSETFUNC(moduleWithAsmName);
-unsigned int   getSize ( link * );
+unsigned int getSize (link *);
 
 #endif

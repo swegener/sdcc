@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <alloc.h>
 #include "aslink.h"
 
 /*)Module	lkihx.c
@@ -20,7 +19,7 @@
  *	output the relocated object code in the
  *	Intel Hex format.
  *
- *	lkihx.c contains the following function:
+ *	lkihx.c contains the following functions:
  *		VOID	ihx(i)
  *
  *	lkihx.c contains no local variables.

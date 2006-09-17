@@ -12,7 +12,6 @@
 #include <setjmp.h>
 #include <string.h>
 #include "aslink.h"
-#include "strcmpi.h"
 
 static void DefineGlobal( char *name, Addr_T value, int page );
 static void DefineScoped( char *name, Addr_T value, int page );

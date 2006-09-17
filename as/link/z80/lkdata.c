@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <alloc.h>
 #include "aslink.h"
 
 /*)Module	lkdata.c
@@ -254,7 +253,7 @@ struct	areax	*axp;	/*	Pointer to the current
  *		char	s_type;			Symbol subtype
  *		char	s_flag;			Flag byte
  *		Addr_T	s_addr;			Address
- *		char	s_id[NCPS];		Name
+ *              char    *s_id;                  Name (JLH)
  *	};
  */
 struct	sym *symhash[NHASH]; /*	array of pointers to NHASH

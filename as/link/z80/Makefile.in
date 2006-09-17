@@ -11,13 +11,15 @@ SLIBSRC	= NewAlloc.c
 
 SRC	= lkarea.c lkdata.c lkeval.c lkhead.c lkihx.c lklex.c \
 	  lklibr.c lklist.c lkmain.c lkrloc.c lks19.c lksym.c \
-	  lkgb.c lkgg.c
+	  lkgb.c lkgg.c \
+	  ../lkstore.c
 
 OBJS	= $(SRC:%.c=$(OBJDIR)/%.o) 
 SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o) 
 
 BINS	= $(BUILDDIR)link$(EXT)$(EXEEXT)
 
+CPPFLAGS+= -I..
 CFLAGS	+= $(CPPFLAGS) $(OPTS) -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS	+= -funsigned-char -DUNIX
 CFLAGS	+= -I$(top_builddir)as/$(PORT) -I$(SLIB) 

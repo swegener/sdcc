@@ -1,7 +1,7 @@
 /* aslink.h */
 
 /*
- * (C) Copyright 1989-1995
+ * (C) Copyright 1989-1996
  * All Rights Reserved
  *
  * Alan R. Baldwin
@@ -18,9 +18,11 @@
  *           - add jflag and jfp for NoICE output
  * 30-Jan-98 JLH:
  *           - add memory space flags to a_flag for 8051
+ *
+ * Extensions: P. Felber
  */
 
-#define VERSION "V01.70 + NoICE + SDCC Feb 1999"
+#define VERSION "V01.75 + NoICE + SDCC Feb 1999"
 
 /*
  * Case Sensitivity Flag
@@ -177,25 +179,51 @@
 /*
  * Area type flags
  */
-#define A_CON   0000            /* concatenate */
-#define A_OVR   0004            /* overlay */
-#define A_REL   0000            /* relocatable */
-#define A_ABS   0010            /* absolute */
-#define A_NOPAG 0000            /* non-paged */
-#define A_PAG   0020            /* paged */
+#define A_CON     0000          /* concatenate */
+#define A_OVR     0004          /* overlay */
+#define A_REL     0000          /* relocatable */
+#define A_ABS     0010          /* absolute */
+#define A_NOPAG   0000          /* non-paged */
+#define A_PAG     0020          /* paged */
 
 /* Additional flags for 8051 address spaces */
-#define A_DATA  0000            /* data space (default)*/
-#define A_CODE  0040            /* code space */
-#define A_XDATA 0100            /* external data space */
-#define A_BIT   0200            /* bit addressable space */
+#define A_DATA    0000          /* data space (default)*/
+#define A_CODE    0040          /* code space */
+#define A_XDATA   0100          /* external data space */
+#define A_BIT     0200          /* bit addressable space */
+
+/* Additional flags for hc08 */
+#define A_NOLOAD  0400          /* nonloadable */
+#define A_LOAD    0000          /* loadable (default) */
 
 /*
  * File types
  */
+#define F_INV	0		/* invalid */
 #define F_STD   1               /* stdin */
 #define F_LNK   2               /* File.lnk */
 #define F_REL   3               /* File.rel */
+#define	F_CMD	4		/* Command line */
+
+#ifdef GAMEBOY
+/*
+ * Multiple banks support
+ */
+extern int nb_rom_banks;
+extern int nb_ram_banks;
+extern int current_rom_bank;
+extern int mbc_type;
+extern char cart_name[];
+/*
+ * ROM patching support
+ */
+typedef struct _patch {
+  unsigned int addr;
+  unsigned char value;
+  struct _patch *next;
+} patch;
+extern patch* patches;
+#endif /* GAMEBOY */
 
 /*
  *      General assembler address type
@@ -248,7 +276,7 @@ struct  area
         struct  areax   *a_axp; /* Area extension link */
         Addr_T  a_addr;         /* Beginning address of area */
         Addr_T  a_size;         /* Total size of the area */
-        Addr_T  a_unaloc;       /* Total number of unalocated bytes, for error reporting */
+        Addr_T  a_unaloc;       /* Total number of unallocated bytes, for error reporting */
         char    a_type;         /* Area subtype */
         char    a_flag;         /* Flag byte */
         char    a_id[NCPS];     /* Name */
@@ -497,7 +525,7 @@ extern  char    ccase[];        /*      an array of characters which
 extern  struct  lfile   *filep; /*      The pointers (lfile *) filep,
                                  *      (lfile *) cfp, and (FILE *) sfp
                                  *      are used in conjunction with
-                                 *      the routine as_getline() to read
+                                 *      the routine lk_getline() to read
                                  *      asmlnk commands from
                                  *      (1) the standard input or
                                  *      (2) or a command file
@@ -588,6 +616,8 @@ extern  int     stacksize;      /*      Pack data memory flag
                                  */
 extern  int     jflag;          /*      NoICE output flag
                                  */
+extern	int	symflag;	/*	no$gmb .sym output flag
+				 */
 extern  int     xflag;          /*      Map file radix type flag
                                  */
 extern  int     pflag;          /*      print linker command file flag
@@ -671,6 +701,7 @@ extern  VOID            link_main();
 extern  VOID            lkexit();
 extern  int             main();
 extern  VOID            map();
+extern	VOID		sym();
 extern  int             parse();
 extern  VOID            setbas();
 extern  VOID            setgbl();
@@ -682,8 +713,8 @@ extern  char            endline();
 extern  char            get();
 extern  VOID            getfid();
 extern  VOID            getid();
-extern  VOID            getSid();
-extern  int             as_getline();
+extern  VOID            getSid(char *id);
+extern  int             lk_getline();
 extern  int             getmap();
 extern  char            getnb();
 extern  int             more();
@@ -695,7 +726,6 @@ extern  VOID            chop_crlf();
 extern  VOID            lkparea();
 extern  VOID            lnkarea();
 extern  VOID            lnkarea2();
-extern  VOID            lnksect();
 extern  VOID            newarea();
 
 /* lkhead.c */
@@ -774,10 +804,13 @@ extern  VOID            ihxEntendedLinearAddress(Addr_T);
 extern  VOID            newArea();
 
 /* lkstore.c */
-extern char             *StoreString( char *str );
+extern  char *          StoreString( char *str );
 
 /* lknoice.c */
-extern void             DefineNoICE( char *name, Addr_T value, int page );
+extern  void            DefineNoICE( char *name, Addr_T value, int page );
+
+/* EEP: lkelf.c */
+extern  VOID            elf();
 
 /* JCF: lkmem.c */
 extern int summary(struct area * xp);
@@ -786,3 +819,11 @@ extern int summary2(struct area * xp);
 /* JCF: lkaomf51.c */
 extern void SaveLinkedFilePath(char * filepath);
 extern void CreateAOMF51(void);
+
+/* lkgb.h */
+VOID gb(int in);
+VOID gg(int in);
+
+/* strcmpi.h */
+extern int as_strcmpi(const char *s1, const char *s2);
+extern int as_strncmpi(const char *s1, const char *s2, size_t n);

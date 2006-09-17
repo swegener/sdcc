@@ -1,3 +1,39 @@
+2006-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/aslink.h,
+	* as/link/mcs51/aslink.h,
+	* as/link/z80/aslink.h: merged and moved to as/link/
+	* as/link/lkstore.c,
+	* as/link/mcs51/lkstore.c: moved to as/link/
+	* as/link/clean.mk: remove *.o
+	* as/link/mcs51/alloc.h: deleted
+	* as/link/mcs51/lkarea.c: added lnksect prototype
+	* as/link/mcs51/lkdata.c,
+	* as/link/mcs51/lklex.c,
+	* as/link/mcs51/lkmain.c: renamed as_getline to lk_getline
+	* as/link/mcs51/lkmem.c,
+	* as/link/mcs51/lknoice.c: removed include strcmpi.h
+	* as/link/mcs51/lksym.c: include stdlib.h instead of malloc.h or alloc.h
+	* as/link/mcs51/aslink.dsp,
+	* as/link/mcs51/Makefile.aslink,
+	* as/link/mcs51/Makefile.bcc,
+	* as/link/mcs51/Makefile.in: updated for moved files
+	* as/link/z80/lkarea.c,
+	* as/link/z80/lkhead.c,
+	* as/link/z80/lklex.c,
+	* as/link/z80/lklibr.c,
+	* as/link/z80/lklist.c,
+	* as/link/z80/lkmain.c,
+	* as/link/z80/lkrloc.c,
+	* as/link/z80/lksym.c: synced with mcs51
+	* as/link/z80/lkdata.c,
+	* as/link/z80/lkeval.c,
+	* as/link/z80/lkihx.c,
+	* as/link/z80/lks19.c: cosmetic changes
+	* as/link/z80/Makefile.in,
+	* as/link/z80/linkgbz80.dsp,
+	* as/link/z80/linkz80.dsp: updated for moved files
+
 2006-09-16 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/sdcdb.c: partially fixed

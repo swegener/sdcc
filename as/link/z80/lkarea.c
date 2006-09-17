@@ -33,7 +33,7 @@
  *	The function newarea() creates and/or modifies area
  *	and areax structures for each A directive read from
  *	the .rel file(s).  The function lkparea() is called
- *	to find tha area structure associated with this name.
+ *	to find the area structure associated with this name.
  *	If the area does not yet exist then a new area
  *	structure is created and linked to any existing
  *	linked area structures. The area flags are copied
@@ -187,8 +187,7 @@ newarea()
  */
 
 VOID
-lkparea(id)
-char *id;
+lkparea(char *id)
 {
 	register struct area *tap;
 	register struct areax *taxp;
@@ -220,6 +219,7 @@ char *id;
 	axp->a_bap = ap;
 	axp->a_bhp = hp;
 	strncpy(ap->a_id, id, NCPS);
+        ap->a_addr = 0;
 }
 
 /*)Function	VOID	lnkarea()
@@ -262,7 +262,7 @@ char *id;
  *			area address.  The size of the area
  *			is the sum of the section sizes.
  *
- *		NOTE:	Relocatable (REL) areas ae always concatenated
+ *		NOTE:	Relocatable (REL) areas are always concatenated
  *			with each other, thus relocatable area B
  *			(defined after area A) will follow
  *			relocatable area A independent of the
@@ -295,9 +295,9 @@ char *id;
  *	functions called:
  *		int	fprintf()	c_library
  *		VOID	lnksect()	lkarea.c
- *		symbol *lkpsym()	lksysm.c
+ *		symbol *lkpsym()	lksym.c
  *		char *	strncpy()	c_library
- *		int	symeq()		lksysm.c
+ *		int	symeq()		lksym.c
  *
  *	side effects:
  *		All area and areax addresses and sizes are
@@ -305,20 +305,73 @@ char *id;
  *		structures.
  */
 
+unsigned long codemap[2048];
+Addr_T lnksect(register struct area *tap);
 /*
  * Resolve all area addresses.
  */
 VOID
 lnkarea()
 {
-	register int rloc;
+        register Addr_T rloc = 0;
+        Addr_T gs_size = 0;
 	char temp[NCPS];
 	struct sym *sp;
+        struct area *abs_ap = NULL;
+        struct area *gs0_ap = NULL;
 
-	rloc = 0;
+        memset(codemap, 0, sizeof(codemap));
+
+        /* first sort all absolute areas to the front */
+        ap = areap;
+        /* no need to check first area, it's in front anyway */
+        while (ap && ap->a_ap)
+        {
+                if (ap->a_ap->a_flag & A_ABS)
+                {/* next area is absolute, move it to front,
+                    reversed sequence is no problem for absolutes */
+                        abs_ap = ap->a_ap;
+                        ap->a_ap = abs_ap->a_ap;
+                        abs_ap->a_ap = areap;
+                        areap = abs_ap;
+                }
+                else
+                {
+                        ap = ap->a_ap;
+                }
+        }
+
+        /* next accumulate all GSINITx/GSFINAL area sizes
+           into GSINIT so they stay together */
+        ap = areap;
+        while (ap)
+        {
+                if (!strncmp(ap->a_id, "GS", 2))
+                {/* GSxxxxx area */
+                        if (ap->a_size == 0)
+                        {
+                                axp = ap->a_axp;
+                                while (axp)
+                                {
+                                        ap->a_size += axp->a_size;
+                                        axp = axp->a_axp;
+                                }
+                        }
+                        gs_size += ap->a_size;
+                        if (!strcmp(ap->a_id, "GSINIT0"))
+                        {/* GSINIT0 area */
+                                gs0_ap = ap;
+                        }
+                }
+                ap = ap->a_ap;
+        }
+        if (gs0_ap)
+                gs0_ap->a_size = gs_size;
+
 	ap = areap;
-	while (ap) {
-		if (ap->a_flag&A_ABS) {
+        while (ap)
+        {
+                if (ap->a_flag & A_ABS) {
 			/*
 			 * Absolute sections
 			 */
@@ -329,8 +382,7 @@ lnkarea()
 			 */
 			if (ap->a_addr == 0)
 				ap->a_addr = rloc;
-			lnksect(ap);
-			rloc = ap->a_addr + ap->a_size;
+                        rloc = lnksect(ap);
 		}
 
 		/*
@@ -339,7 +391,8 @@ lnkarea()
 		 *	l_<areaname>	the length of the area
 		 */
 
-		if (! symeq(ap->a_id, _abs_)) {
+                if (! symeq(ap->a_id, _abs_))
+                {
 			strncpy(temp+2,ap->a_id,NCPS-2);
 			*(temp+1) = '_';
 
@@ -357,6 +410,85 @@ lnkarea()
 		}
 		ap = ap->a_ap;
 	}
+}
+
+static
+Addr_T find_empty_space(Addr_T start, Addr_T size, unsigned long *map)
+{
+    int i, j, k;
+    unsigned long mask, b;
+
+    while (1)
+    {
+        Addr_T a = start;
+        i = start >> 5;
+        j = (start + size) >> 5;
+        mask = -(1 << (start & 0x1F));
+
+        while (i < j)
+        {
+            if (map[i] & mask)
+            {
+                k = 32;
+                for (b=0x80000000; b!=0; b>>=1, k--)
+                {
+                    if (map[i] & b)
+                      break;
+                }
+                start = a + k;
+                break;
+            }
+            i++;
+            mask = 0xFFFFFFFF;
+            a += 32;
+        }
+        if (start > a)
+          continue;
+
+        mask &= (1 << ((start + size) & 0x1F)) - 1;
+        if (map[i] & mask)
+        {
+            k = 32;
+            for (b=0x80000000; b!=0; b>>=1, k--)
+            {
+                if (map[i] & b)
+                  break;
+            }
+            start = (a & ~0x1F) + k;
+        }
+        if (start <= a)
+          break;
+    }
+    return start;
+}
+
+static
+Addr_T allocate_space(Addr_T start, Addr_T size, char* id, unsigned long *map)
+{
+    int i, j;
+    unsigned long mask;
+    Addr_T a = start;
+    i = start >> 5;
+    j = (start + size) >> 5;
+    mask = -(1 << (start & 0x1F));
+
+    while (i < j)
+    {
+        if (map[i] & mask)
+        {
+            fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
+        }
+        map[i++] |= mask;
+        mask = 0xFFFFFFFF;
+        a += 32;
+    }
+    mask &= (1 << ((start + size) & 0x1F)) - 1;
+    if (map[i] & mask)
+    {
+        fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
+    }
+    map[i] |= mask;
+    return start;
 }
 
 /*)Function	VOID	lnksect()
@@ -385,9 +517,7 @@ lnkarea()
  *		and linked into the structures.
  */
 
-VOID
-lnksect(tap)
-register struct area *tap;
+Addr_T lnksect(register struct area *tap)
 {
 	register Addr_T size, addr;
 	register struct areax *taxp;
@@ -399,8 +529,9 @@ register struct area *tap;
 	    "\n?ASlink-Warning-Paged Area %.8s Boundary Error\n", tap->a_id);
 	    lkerr++;
 	}
+
 	taxp = tap->a_axp;
-	if (tap->a_flag&A_OVR) {
+        if (tap->a_flag & A_OVR) {
 		/*
 		 * Overlayed sections
 		 */
@@ -410,11 +541,35 @@ register struct area *tap;
 				size = taxp->a_size;
 			taxp = taxp->a_axp;
 		}
-	} else {
+        }
+        else if (tap->a_flag & A_ABS)
+        {
+                /*
+                 * Absolute sections
+                 */
+                while (taxp)
+                {
+                        allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap);
+                        taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */
+                        size += taxp->a_size;
+                        taxp = taxp->a_axp;
+                }
+        }
+        else
+        {
 		/*
 		 * Concatenated sections
 		 */
+                if (tap->a_size) {
+                        addr = find_empty_space(addr, tap->a_size, codemap);
+                }
 		while (taxp) {
+                        //find next unused address now
+                        if (taxp->a_size)
+                        {
+                                addr = find_empty_space(addr, taxp->a_size, codemap);
+                                allocate_space(addr, taxp->a_size, tap->a_id, codemap);
+                        }
 			taxp->a_addr = addr;
 			addr += taxp->a_size;
 			size += taxp->a_size;
@@ -422,9 +577,12 @@ register struct area *tap;
 		}
 	}
 	tap->a_size = size;
-	if ((tap->a_flag&A_PAG) && (size > 256)) {
+
+        if ((tap->a_flag & A_PAG) && (size > 256))
+        {
 	    fprintf(stderr,
 	    "\n?ASlink-Warning-Paged Area %.8s Length Error\n", tap->a_id);
 	    lkerr++;
 	}
+        return addr;
 }

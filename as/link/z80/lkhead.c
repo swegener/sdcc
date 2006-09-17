@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <alloc.h>
 #include "aslink.h"
 
 /*Module	lkhead.c
@@ -108,7 +107,7 @@ newhead()
 	 * Setup Absolute DEF linkage.
 	 */
 	lkparea(_abs_);
-	ap->a_flag = A_ABS|A_OVR;
+	ap->a_flag = A_ABS;
 }
 
 /*)Function	VOID	module()

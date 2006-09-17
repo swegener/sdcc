@@ -315,6 +315,7 @@ lkparea(char *id)
  *      structures.
  */
 
+VOID lnksect(register struct area *tap);
 /*
  * Resolve all area addresses.
  */

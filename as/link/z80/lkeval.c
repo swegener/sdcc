@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <alloc.h>
 #include "aslink.h"
 
 /*)Module	lkeval.c
@@ -304,7 +303,7 @@ term()
 		}
 	}
         /* Shouldn't get here. */
-        return 0;
+        return(0);
 }
 
 /*)Function	int	digit(c, r)

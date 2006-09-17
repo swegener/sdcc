@@ -22,7 +22,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "aslink.h"
-#include "strcmpi.h"
 
 int summary(struct area * areap)
 {

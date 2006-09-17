@@ -15,7 +15,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <alloc.h>
 #include "aslink.h"
 
 /*)Module	lklex.c
@@ -28,6 +27,7 @@
  *		char	get()
  *		VOID	getfid()
  *		VOID	getid()
+ *              VOID    getSid()
  *		int	lk_getline()
  *		int	getmap()
  *		char	getnb()
@@ -99,10 +99,67 @@ char *id;
 		*p++ = 0;
 }
 
+/*)Function     VOID    getSid (char *id)
+ *
+ *              char *  id              a pointer to a string of
+ *                                      maximum length NCPS
+ *
+ *  getSid is derived from getid. It is called from newsym()
+ *  in lksym.c, when an S-record has to be scanned. getSid accepts
+ *  much more characters than getid, which is necessary for SDCC.
+ *
+ *      The function getSid() scans the current input text line
+ *      from the current position copying the next string
+ *      into the external string buffer (id).  The string ends when a space
+ *      character (space, tab, \0) is found. The maximum number of
+ *      characters copied is NCPS.  If the input string is larger than
+ *      NCPS characters then the string is truncated, if the input string
+ *      is shorter than NCPS characters then the string is NULL filled.
+ *      Intervening white space (SPACES and TABS) are skipped.
+ *
+ *      local variables:
+ *              char *  p               pointer to external string buffer
+ *              int     c               current character value
+ *
+ *      global variables:
+ *              char    ctype[]         a character array which defines the
+ *                                      type of character being processed.
+ *                                      This index is the character
+ *                                      being processed.
+ *
+ *      called functions:
+ *              char    get()           lklex.c
+ *              char    getnb()         lklex.c
+ *              VOID    unget()         lklex.c
+ *
+ *      side effects:
+ *              use of getnb(), get(), and unget() updates the
+ *              global pointer ip the position in the current
+ *              input text line.
+ */
+
+VOID
+getSid (char *id)
+{
+        register int c;
+        register char *p;
+
+        c = getnb();
+        p = id;
+        do {
+                if (p < &id[NCPS])
+                        *p++ = c;
+                c = get();
+        } while (c != '\0' && c != ' ' && c != '\t');
+        unget(c);
+        while (p < &id[NCPS])
+                *p++ = 0;
+}
+
 /*)Function	VOID	getfid(fid,c)
  *
  *		char *	str		a pointer to a string of
- *					maximum length FILSPC
+ *                                      maximum length PATH_MAX
  *		int	c		this is first character to
  *					copy to the string buffer
  *
@@ -111,7 +168,7 @@ char *id;
  *	into the external string buffer (str).  The string ends when a
  *	non SPACE type character is found. The maximum number of
  *	characters copied is FILSPC. If the input string is larger than
- *	FILSPC characters then the string is truncated, if the input string
+ *      PATH_MAX characters then the string is truncated, if the input string
  *	is shorter than FILSPC characters then the string is NULL filled.
  *
  *	local variables:
@@ -140,8 +197,9 @@ char *str;
 	register char *p;
 
 	p = str;
-	do {
-		if (p < &str[FILSPC-1])
+        do
+        {
+                if (p < &str[PATH_MAX-1])
 			*p++ = c;
 		c = get();
 		if (c == ';')
@@ -152,7 +210,7 @@ char *str;
 #else /* SDK */
 	} while (c && (ctype[c] != SPACE));
 #endif /* SDK */
-	while (p < &str[FILSPC])
+        while (p < &str[PATH_MAX])
 		*p++ = 0;
 }
 
@@ -426,7 +484,7 @@ getmap(d)
 int
 lk_getline()
 {
-	register int i, ftype;
+        register int ftype;
 	register char *fid;
 
 loop:	if (pflag && cfp && cfp->f_type == F_STD)
@@ -501,9 +559,7 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 			return(0);
 		}
 	}
-	i = strlen(ib) - 1;
-	if (ib[i] == '\n')
-		ib[i] = 0;
+        chop_crlf(ib);
 	return (1);
 }
 

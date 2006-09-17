@@ -98,6 +98,7 @@ syminit()
  *		Addr_T	eval()		lkeval.c
  *		VOID	exit()		c_library
  *		int	fprintf()	c_library
+ *              char    getSid()        lklex.c
  *		char	get()		lklex.c
  *		char	getnb()		lklex.c
  *		sym *	lkpsym()	lksym.c
@@ -130,7 +131,7 @@ newsym()
 	struct sym **s;
 	char id[NCPS];
 
-	getid(id, -1);
+        getSid(id);     // old: getid(id, -1);
 	tsp = lkpsym(id, 1);
 	c = getnb();get();get();
 	if (c == 'R') {
@@ -179,7 +180,7 @@ newsym()
 	lkexit(1);
 
 	/* Never reached */
-        return 0;
+        return(0);
 }
 
 /*)Function	sym *	lkpsym(id,f)
@@ -232,7 +233,7 @@ char *id;
 	sp = (struct sym *) new (sizeof(struct sym));
 	sp->s_sp = symhash[h];
 	symhash[h] = sp;
-	strncpy(sp->s_id, id, NCPS);
+        sp->s_id = StoreString( id );   /* JLH */
 	return (sp);
 }
 
@@ -359,8 +360,8 @@ struct sym *tsp;
 		p = hp->s_list;
 		for (i=0; i<hp->h_nglob; ++i) {
 		    if (p[i] == tsp) {
-			fprintf(fp, "\n?ASlink-Warning-Undefined Global %s ", tsp->s_id);
-			fprintf(fp, "referenced by module %s\n", hp->m_id);
+                        fprintf(fp, "\n?ASlink-Warning-Undefined Global '%s' ", tsp->s_id);
+                        fprintf(fp, "referenced by module '%s'\n", hp->m_id);
 			lkerr++;
 		    }
 		}
@@ -396,21 +397,11 @@ int
 symeq(p1, p2)
 register char *p1, *p2;
 {
-	register int n;
-
-	n = NCPS;
-	do {
-
 #if	CASE_SENSITIVE
-		if (*p1++ != *p2++)
-			return (0);
+                return (strncmp( p1, p2, NCPS ) == 0);
 #else
-		if (ccase[(unsigned char)(*p1++)] != ccase[(unsigned char)(*p2++)])
-			return (0);
+                return (as_strncmpi( p1, p2, NCPS ) == 0);
 #endif
-
-	} while (--n);
-	return (1);
 }
 
 /*)Function	int	hash(p)
@@ -484,15 +475,11 @@ VOID *
 new(n)
 unsigned int n;
 {
-	register char *p,*q;
-	register unsigned int i;
+        register char *p;
 
-	if ((p = (char *) malloc(n)) == NULL) {
+        if ((p = (char *) calloc(n, 1)) == NULL) {
 		fprintf(stderr, "Out of space!\n");
 		lkexit(1);
-	}
-	for (i=0,q=p; i<n; i++) {
-		*q++ = 0;
 	}
 	return (p);
 }

@@ -24,7 +24,7 @@
  *		VOID	getfid()
  *		VOID	getid()
  *		VOID	getSid()
- *		int	as_getline()
+ *		int	lk_getline()
  *		int	getmap()
  *		char	getnb()
  *		int	more()
@@ -103,7 +103,7 @@ char *id;
  *  getSid is derived from getid. It is called from newsym()
  *  in lksym.c, when an S-record has to be scanned. getSid accepts
  *  much more characters than getid, which is necessary for SDCC.
- * 
+ *
  *	The function getSid() scans the current input text line
  *	from the current position copying the next string
  *	into the external string buffer (id).  The string ends when a space
@@ -135,13 +135,12 @@ char *id;
  */
 
 VOID
-getSid (id)
-char *id;
+getSid (char *id)
 {
-  register int c;
+	register int c;
 	register char *p;
 
-  c = getnb();
+	c = getnb();
 	p = id;
 	do {
 		if (p < &id[NCPS])
@@ -251,7 +250,7 @@ getnb()
  *	global variables:
  *		char	ctype[]		array of character types, one per
  *				 	ASCII character
- *		
+ *
  *	functions called:
  *		char	get()		lklex.c
  *		char	getnb()		lklex.c
@@ -425,15 +424,15 @@ getmap(d)
 	return (c);
 }
 
-/*)Function	int	as_getline()
+/*)Function	int	lk_getline()
  *
- *	The function as_getline() reads a line of input text from a
+ *	The function lk_getline() reads a line of input text from a
  *	.rel source text file, a .lnk command file or from stdin.
  *	Lines of text are processed from a single .lnk file or
  *	multiple .rel files until all files have been read.
  *	The input text line is copied into the global string ib[]
  *	and converted to a NULL terminated string.  The function
- *	as_getline() returns a (1) after succesfully reading a line
+ *	lk_getline() returns a (1) after succesfully reading a line
  *	or a (0) if all files have been read.
  *	This function also opens each input .lst file and output
  *	.rst file as each .rel file is processed.
@@ -479,7 +478,7 @@ getmap(d)
  */
 
 int
-as_getline()
+lk_getline()
 {
 	register int ftype;
 	register char *fid;

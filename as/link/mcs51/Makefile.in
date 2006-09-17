@@ -32,7 +32,7 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS	= @CPPFLAGS@ -I. -I$(srcdir)
+CPPFLAGS	= @CPPFLAGS@ -I.. -I$(srcdir)
 CFLAGS		= @CFLAGS@ -Wall -DINDEXLIB
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
@@ -40,7 +40,9 @@ LDFLAGS		= @LDFLAGS@
 LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
 		  lkeval.o lklex.o lksym.o lkrloc.o \
 		  lklibr.o lklist.o lkihx.o lks19.o \
-		  lkstore.o lknoice.o lkmem.o lkaomf51.o strcmpi.o
+		  lknoice.o lkmem.o lkaomf51.o \
+		  ../lkstore.o \
+		  strcmpi.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
 ASLINK		= $(top_builddir)bin/aslink$(EXEEXT)
@@ -86,7 +88,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(LKSOURCES) $(srcdir)/*.h $(top_builddir)*.h $(top_srcdir)/*.h
+Makefile.dep: $(LKSOURCES) $(srcdir)/../*.h $(top_builddir)*.h $(top_srcdir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \

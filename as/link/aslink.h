@@ -199,11 +199,11 @@
 /*
  * File types
  */
-#define F_INV	0		/* invalid */
+#define F_INV   0               /* invalid */
 #define F_STD   1               /* stdin */
 #define F_LNK   2               /* File.lnk */
 #define F_REL   3               /* File.rel */
-#define	F_CMD	4		/* Command line */
+#define F_CMD   4               /* Command line */
 
 #ifdef GAMEBOY
 /*
@@ -616,8 +616,8 @@ extern  int     stacksize;      /*      Pack data memory flag
                                  */
 extern  int     jflag;          /*      NoICE output flag
                                  */
-extern	int	symflag;	/*	no$gmb .sym output flag
-				 */
+extern  int     symflag;        /*      no$gmb .sym output flag
+                                 */
 extern  int     xflag;          /*      Map file radix type flag
                                  */
 extern  int     pflag;          /*      print linker command file flag
@@ -701,7 +701,7 @@ extern  VOID            link_main();
 extern  VOID            lkexit();
 extern  int             main();
 extern  VOID            map();
-extern	VOID		sym();
+extern  VOID            sym();
 extern  int             parse();
 extern  VOID            setbas();
 extern  VOID            setgbl();

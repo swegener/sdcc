@@ -14,15 +14,15 @@ SRC	= lkarea.c lkdata.c lkeval.c lkhead.c lkihx.c lklex.c \
 	  lkgb.c lkgg.c \
 	  ../lkstore.c
 
-OBJS	= $(SRC:%.c=$(OBJDIR)/%.o) 
-SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o) 
+OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
+SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o)
 
 BINS	= $(BUILDDIR)link$(EXT)$(EXEEXT)
 
-CPPFLAGS+= -I..
+CPPFLAGS+= -I.. -I$(srcdir)/..
 CFLAGS	+= $(CPPFLAGS) $(OPTS) -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS	+= -funsigned-char -DUNIX
-CFLAGS	+= -I$(top_builddir)as/$(PORT) -I$(SLIB) 
+CFLAGS	+= -I$(top_builddir)as/$(PORT) -I$(SLIB)
 
 LDFLAGS += -lm $(EXTRALIBS)
 

@@ -7,17 +7,17 @@ VERSIONHI       = @VERSIONHI@
 VERSIONLO       = @VERSIONLO@
 VERSIONP        = @VERSIONP@
 
-SHELL		= /bin/sh
-CC		= @CC@
-CPP		= @CPP@
-INSTALL		= @INSTALL@
+SHELL           = /bin/sh
+CC              = @CC@
+CPP             = @CPP@
+INSTALL         = @INSTALL@
 STRIP           = @STRIP@
 
-top_builddir	= @top_builddir@
-top_srcdir	= @top_srcdir@
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
 
-srcdir		= @srcdir@
-prefix		= @prefix@
+srcdir          = @srcdir@
+prefix          = @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
@@ -32,20 +32,20 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS	= @CPPFLAGS@ -I.. -I$(srcdir)
-CFLAGS		= @CFLAGS@ -Wall -DINDEXLIB
-M_OR_MM		= @M_OR_MM@
-LDFLAGS		= @LDFLAGS@
+CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/..
+CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB
+M_OR_MM         = @M_OR_MM@
+LDFLAGS         = @LDFLAGS@
 
-LKOBJECTS	= lkmain.o lkhead.o lkarea.o lkdata.o \
-		  lkeval.o lklex.o lksym.o lkrloc.o \
-		  lklibr.o lklist.o lkihx.o lks19.o \
-		  lknoice.o lkmem.o lkaomf51.o \
-		  ../lkstore.o \
-		  strcmpi.o
-LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
+LKOBJECTS       = lkmain.o lkhead.o lkarea.o lkdata.o \
+                  lkeval.o lklex.o lksym.o lkrloc.o \
+                  lklibr.o lklist.o lkihx.o lks19.o \
+                  lknoice.o lkmem.o lkaomf51.o \
+                  ../lkstore.o \
+                  strcmpi.o
+LKSOURCES       = $(patsubst %.o,%.c,$(LKOBJECTS))
 
-ASLINK		= $(top_builddir)bin/aslink$(EXEEXT)
+ASLINK          = $(top_builddir)bin/aslink$(EXEEXT)
 
 transform       = @program_transform_name@
 

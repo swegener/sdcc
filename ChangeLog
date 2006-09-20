@@ -1,3 +1,7 @@
+2006-09-20 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libio/i2c/i2cnack.c (i2c_nack): fixed ACKDT bit
+
 2006-09-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/aslink.h: cosmetic changes

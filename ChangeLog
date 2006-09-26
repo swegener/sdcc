@@ -2,6 +2,7 @@
 
 	* device/include/stdlib.h: added rand prototypes
 	* device/lib/rand.c: new, added
+	* device/lib/Makefile.in: added rand.c
 
 2006-09-20 Raphael Neider <rneider AT web.de>
 

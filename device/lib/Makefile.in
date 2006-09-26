@@ -80,7 +80,7 @@ SOURCES =	_autobaud.c _bp.c _decdptr.c \
 		_divsint.c _divslong.c _divuint.c _divulong.c \
 		_modsint.c _modslong.c _moduint.c _modulong.c \
 		_mulint.c _mullong.c \
-		abs.c labs.c \
+		abs.c labs.c rand.c \
 		_iscntrl.c _isdigit.c _isgraph.c \
 		_isprint.c _ispunct.c _isspace.c \
 		_islower.c _isupper.c _isxdigit.c \
@@ -114,7 +114,7 @@ Z80SOURCES =	\
 		_divslong.c _divulong.c \
 		_modslong.c _modulong.c \
 		_mullong.c \
-		abs.c labs.c \
+		abs.c labs.c rand.c \
 		_iscntrl.c _isdigit.c _isgraph.c \
 		_isprint.c _ispunct.c _isspace.c \
 		_islower.c _isupper.c _isxdigit.c \
@@ -145,7 +145,7 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _isupper.c _isxdigit.c _slong2fs.c _memcmp.c \
 		  _memcpy.c _memmove.c _memset.c _modsint.c _modslong.c \
 		  _moduint.c _modulong.c _mulint.c _mullong.c \
-		  abs.c labs.c \
+		  abs.c labs.c rand.c \
 		  _strcat.c _strchr.c _strcmp.c _strcpy.c \
 		  _strcspn.c _strlen.c _strncat.c _strncmp.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
@@ -172,7 +172,7 @@ HC08SOURCES =	\
 		_fseq.c _fsgt.c _fslt.c _fsneq.c \
 		_divsint.c _divslong.c \
 		_modsint.c _modslong.c _moduint.c _modulong.c \
-		abs.c labs.c \
+		abs.c labs.c rand.c \
 		_iscntrl.c _isdigit.c _isgraph.c \
 		_isprint.c _ispunct.c _isspace.c \
 		_islower.c _isupper.c _isxdigit.c \

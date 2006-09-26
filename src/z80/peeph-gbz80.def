@@ -1,8 +1,8 @@
 replace {
-	ld      (hl),a
-        dec     hl
+	ld	(hl),a
+	dec	hl
 } by {
-        ld      (hl-),a
+	ld	(hl-),a
 }
 replace {
 	ld	(hl),a
@@ -58,8 +58,8 @@ replace {
 	ld	(hl),a
 	ld	%1,(hl)
 } by {
-        ld      (hl),a
-        ld      %1,a
+	ld	(hl),a
+	ld	%1,a
 }
 replace {
 	ld	(hl),a

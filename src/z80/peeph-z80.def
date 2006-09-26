@@ -17,11 +17,9 @@ replace {
 	ld	%1,a
 	xor	a,a
 	or	a,%1
-	jp	z,%2
 } by {
 	ld	%1,a
 	or	a,a
-	jp	z,%2
 }
 replace {
 	rlca
@@ -104,9 +102,9 @@ replace restart {
 
 replace {
 %1:
-	in0     a,(%2)
+	in0	a,(%2)
 	and	a,#%3
-	jp	z,%4
+	jp	Z,%4
 %5:
 	jp	%6
 %4:
@@ -116,9 +114,9 @@ replace {
 	ret
 } by {
 %1:
-	in0     a,(%2)
+	in0	a,(%2)
 	and	a,#%3
-	jp	nz,%5
+	jp	NZ,%5
 %4:
 	call	%7
 	jp	%1
@@ -126,5 +124,3 @@ replace {
 %6:
 	ret
 }
-
-

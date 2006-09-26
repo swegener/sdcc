@@ -43,4 +43,9 @@ extern void _itoa(unsigned int, char*, unsigned char);
 
 extern void _ultoa(unsigned long, char*, unsigned char);
 extern void _ltoa(unsigned long, char*, unsigned char);
+
+#define RAND_MAX 32767
+
+int rand(void);
+void srand(unsigned int seed);
 #endif

@@ -3,6 +3,7 @@
 	* device/include/stdlib.h: added rand prototypes
 	* device/lib/rand.c: new, added
 	* device/lib/Makefile.in: added rand.c
+	* src/z80/peeph.def: updated conditonals, fixed bug 1565908
 
 2006-09-20 Raphael Neider <rneider AT web.de>
 

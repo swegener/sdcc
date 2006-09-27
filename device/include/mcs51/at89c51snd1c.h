@@ -399,7 +399,7 @@ __sbit __at (0x98) RI     ;
 #define MSK_AUDEN   0x01
 
 /* AUDSTA bits */
-#define MSK_SREC    0x80
+#define MSK_SREQ    0x80
 #define MSK_UDRN    0x40
 #define MSK_AUBUSY  0x20
 

@@ -2,6 +2,8 @@
 
 	* device/include/mcs51/at89c51snd1c.h: fixed MSK_SREQ definition
 	  thanks Weston T. Schmidt for patch 1555221
+	* src/mcs51/peeph.def: renamed rule 257 to 257.a, added 257.b
+	* src/SDCCicode.c(geniCodeMultiply): small optimization
 
 2006-09-26 Maarten Brock <sourceforge.brock AT dse.nl>
 

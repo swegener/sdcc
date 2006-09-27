@@ -2130,11 +2130,19 @@ geniCodeMultiply (operand * left, operand * right, RESULT_TYPE resultType)
     }
   else
     {
-      ic = newiCode ('*', left, right);         /* normal multiplication */
       /* if the size left or right > 1 then support routine */
       if (getSize (ltype) > 1 || getSize (rtype) > 1)
-        ic->supportRtn = 1;
-
+        {
+          if (IS_LITERAL (retype))
+            ic = newiCode ('*', right, left); /* multiplication by support routine with one literal */
+          else
+            ic = newiCode ('*', left, right); /* multiplication by support routine */
+          ic->supportRtn = 1;
+        }
+      else
+        {
+          ic = newiCode ('*', left, right);   /* normal multiplication */
+        }
     }
   IC_RESULT (ic) = newiTempOperand (resType, 1);
 

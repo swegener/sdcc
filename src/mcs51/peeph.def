@@ -3830,14 +3830,25 @@ replace {
 
 
 // unsigned char i=8; do{ } while(--i != 0);
-// this currently only applies if i is kept in a register
+// this applies if i is kept in a register
 replace {
 	dec	%1
 	cjne	%1,#0x00,%2
 } by {
-	;	Peephole 257	optimized decrement with compare
+	;	Peephole 257.a	optimized decrement with compare
 	djnz	%1,%2
-} if notVolatile %1
+} if notVolatile(%1)
+
+// unsigned char i=8; do{ } while(--i != 0);
+// this applies if i is kept in data memory
+replace {
+	dec	%1
+	mov	a,%1
+	jnz	%2
+} by {
+	;	Peephole 257.b	optimized decrement with compare
+	djnz	%1,%2
+} if notVolatile(%1), operandsNotRelated(%1 '@r0' '@r1')
 
 
 // in_byte<<=1; if(in_bit) in_byte|=1;

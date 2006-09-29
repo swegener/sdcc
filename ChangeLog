@@ -1,3 +1,11 @@
+2006-09-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genPlusIncr, genMinusDec, genAddrOf): small
+	  optimizations, see also patch 887161 by Stas Sergeev
+	* src/mcs51/peeph.def(104, 207, 209, 212): disabled as they do not seem
+	  to be necessary anymore,
+	  (102, 103, 104, 127): renamed all occurances of bp to _bp
+
 2006-09-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/at89c51snd1c.h: fixed MSK_SREQ definition

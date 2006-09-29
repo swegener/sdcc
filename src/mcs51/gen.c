@@ -4085,7 +4085,9 @@ genPlusIncr (iCode * ic)
   D(emitcode (";     genPlusIncr",""));
 
   /* if increment >=16 bits in register or direct space */
-  if ((AOP_TYPE(IC_LEFT(ic)) == AOP_REG || AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ) &&
+  if (( AOP_TYPE(IC_LEFT(ic)) == AOP_REG || 
+        AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ||
+        (IS_AOP_PREG (IC_LEFT(ic)) && !AOP_NEEDSACC (IC_LEFT(ic))) ) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
       !isOperandVolatile (IC_RESULT (ic), FALSE) &&
       (size > 1) &&
@@ -4216,6 +4218,14 @@ genPlusIncr (iCode * ic)
             }
         }
 
+      return TRUE;
+    }
+
+  if (icount == 1)
+    {
+      MOVA (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
+      emitcode ("inc", "a");
+      aopPut (IC_RESULT (ic), "a", 0);
       return TRUE;
     }
 
@@ -4545,7 +4555,9 @@ genMinusDec (iCode * ic)
   D (emitcode (";", "genMinusDec"));
 
   /* if decrement >=16 bits in register or direct space */
-  if ((AOP_TYPE(IC_LEFT(ic)) == AOP_REG || AOP_TYPE(IC_LEFT(ic)) == AOP_DIR) &&
+  if (( AOP_TYPE(IC_LEFT(ic)) == AOP_REG || 
+        AOP_TYPE(IC_LEFT(ic)) == AOP_DIR ||
+        (IS_AOP_PREG (IC_LEFT(ic)) && !AOP_NEEDSACC (IC_LEFT(ic))) ) &&
       sameRegs (AOP (IC_LEFT (ic)), AOP (IC_RESULT (ic))) &&
       (size > 1) &&
       (icount == 1))
@@ -4653,6 +4665,14 @@ genMinusDec (iCode * ic)
       if (AOP_NEEDSACC (IC_RESULT (ic)))
         aopPut (IC_RESULT (ic), "a", 0);
 
+      return TRUE;
+    }
+
+  if (icount == 1)
+    {
+      MOVA (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
+      emitcode ("dec", "a");
+      aopPut (IC_RESULT (ic), "a", 0);
       return TRUE;
     }
 
@@ -7498,7 +7518,7 @@ genXor (iCode * ic, iCode * ifx)
                   MOVA (aopGet (right, offset, FALSE, FALSE));
                   emitcode ("xrl", "a,%s", aopGet (left, offset, FALSE, TRUE));
                 }
-              
+
               emitcode ("jnz", "%05d$", tlbl->key + 100);
               offset++;
             }
@@ -10877,11 +10897,25 @@ genAddrOf (iCode * ic)
       /* if it has an offset then we need to compute it */
       if (sym->stack)
         {
-          emitcode ("mov", "a,%s", SYM_BP (sym));
-          emitcode ("add", "a,#0x%02x", ((sym->stack < 0) ?
-                                         ((char) (sym->stack - _G.nRegsSaved)) :
-                                         ((char) sym->stack)) & 0xff);
-          aopPut (IC_RESULT (ic), "a", 0);
+          int stack_offset = ((sym->stack < 0) ?
+                              ((char) (sym->stack - _G.nRegsSaved)) :
+                              ((char) sym->stack)) & 0xff;
+          if ((abs(stack_offset) == 1) &&
+              !AOP_NEEDSACC(IC_RESULT (ic)) &&
+              !isOperandVolatile (IC_RESULT (ic), FALSE))
+            {
+              aopPut (IC_RESULT (ic), SYM_BP (sym), 0);
+              if (stack_offset > 0)
+                emitcode ("inc", "%s", aopGet (IC_RESULT (ic), LSB, FALSE, FALSE));
+              else
+                emitcode ("dec", "%s", aopGet (IC_RESULT (ic), LSB, FALSE, FALSE));
+            }
+          else
+            {
+              emitcode ("mov", "a,%s", SYM_BP (sym));
+              emitcode ("add", "a,#0x%02x", stack_offset);
+              aopPut (IC_RESULT (ic), "a", 0);
+            }
         }
       else
         {

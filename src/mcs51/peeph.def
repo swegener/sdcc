@@ -215,19 +215,19 @@ replace {
 %3:
 	mov	dpl,%1
 %7:
-	mov	sp,bp
-	pop	bp
+	mov	sp,_bp
+	pop	_bp
 } by {
-	;	Peephole 102	removed redundant mov
+	;	Peephole 102	removed redundant mov to %1
 	mov	dpl,%2
 	ljmp	%3
 %4:
 	mov	dpl,%5
 %3:
 %7:
-	mov	sp,bp
-	pop	bp
-} if notVolatile %1
+	mov	sp,_bp
+	pop	_bp
+} if notVolatile(%1), labelRefCount(%3 1)
 
 replace {
 	mov	%1,%2
@@ -237,30 +237,31 @@ replace {
 %3:
 	mov	dpl,%1
 %7:
-	mov	sp,bp
-	pop	bp
+	mov	sp,_bp
+	pop	_bp
 } by {
-	;	Peephole 103	removed redundant mov
+	;	Peephole 103	removed redundant mov to %1
 	mov	dpl,%2
 	ljmp	%3
 %4:
 	mov	dpl,%5
 %3:
 %7:
-	mov	sp,bp
-	pop	bp
-}
+	mov	sp,_bp
+	pop	_bp
+} if labelRefCount(%3 1)
 
-replace {
-	mov	a,bp
-	clr	c
-	add	a,#0x01
-	mov	r%1,a
-} by {
-	;	Peephole 104	optimized increment (acc not set to r%1, flags undefined)
-	mov	r%1,bp
-	inc	r%1
-}
+// Does not seem to be triggered anymore
+//replace {
+//	mov	a,_bp
+//	clr	c
+//	add	a,#0x01
+//	mov	r%1,a
+//} by {
+//	;	Peephole 104	optimized increment (acc not set to r%1, flags undefined)
+//	mov	r%1,_bp
+//	inc	r%1
+//}
 
 replace {
 	mov	%1,a
@@ -582,11 +583,11 @@ replace {
 replace {
 	push	psw
 	mov	psw,%1
-	push	bp
-	mov	bp,%2
+	push	_bp
+	mov	_bp,%2
 %3:
-	mov	%2,bp
-	pop	bp
+	mov	%2,_bp
+	pop	_bp
 	pop	psw
 	ret
 } by {
@@ -1973,14 +1974,15 @@ replace {
 	;	Peephole 206	removed redundant mov %1,%1
 } if notVolatile
 
-replace {
-	mov	a,_bp
-	add	a,#0x00
-	mov	%1,a
-} by {
-	;	Peephole 207	removed zero add (acc not set to %1, flags undefined)
-	mov	%1,_bp
-}
+// Does not seem to be triggered anymore
+//replace {
+//	mov	a,_bp
+//	add	a,#0x00
+//	mov	%1,a
+//} by {
+//	;	Peephole 207	removed zero add (acc not set to %1, flags undefined)
+//	mov	%1,_bp
+//}
 
 replace {
 	push	acc
@@ -1991,16 +1993,17 @@ replace {
 	mov	r%1,_bp
 }
 
-replace {
-	mov	a,_bp
-	add	a,#0x00
-	inc	a
-	mov	%1,a
-} by {
-	;	Peephole 209	optimized increment (acc not set to %1, flags undefined)
-	mov	%1,_bp
-	inc	%1
-}
+// Does not seem to be triggered anymore
+//replace {
+//	mov	a,_bp
+//	add	a,#0x00
+//	inc	a
+//	mov	%1,a
+//} by {
+//	;	Peephole 209	optimized increment (acc not set to %1, flags undefined)
+//	mov	%1,_bp
+//	inc	%1
+//}
 
 replace {
 	mov	dptr,#((((%1 >> 8)) <<8) + %1)
@@ -2016,15 +2019,16 @@ replace {
 	;	Peephole 211	removed redundant push %1 pop %1
 }
 
-replace {
-	mov	a,_bp
-	add	a,#0x01
-	mov	r%1,a
-} by {
-	;	Peephole 212	reduced add sequence to inc
-	mov	r%1,_bp
-	inc	r%1
-}
+// Does not seem to be triggered anymore
+//replace {
+//	mov	a,_bp
+//	add	a,#0x01
+//	mov	r%1,a
+//} by {
+//	;	Peephole 212	reduced add sequence to inc
+//	mov	r%1,_bp
+//	inc	r%1
+//}
 
 // reverts peephole 159? asx8051 cannot handle, too complex?
 replace {

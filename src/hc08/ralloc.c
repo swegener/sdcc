@@ -1671,49 +1671,58 @@ createRegMask (eBBlock ** ebbs, int count)
 static char *
 rematStr (symbol * sym)
 {
-  char *s = buffer;
   iCode *ic = sym->rematiCode;
-//  int offset = 0;
+  int offset = 0;
 
   while (1)
     {
-      /* if plus or minus print the right hand side */
-      if (ic->op == '+' || ic->op == '-')
-	{
-	  sprintf (s, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)),
-		   ic->op);
-	  s += strlen (s);
-	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-	  continue;
-	}
-
-/*
+      /* if plus adjust offset to right hand side */
       if (ic->op == '+')
         {
-          offset += operandLitValue (IC_RIGHT (ic));
+          offset += (int) operandLitValue (IC_RIGHT (ic));
 	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
           continue;
         }
+
+      /* if minus adjust offset to right hand side */
       if (ic->op == '-')
         {
-          offset -= operandLitValue (IC_RIGHT (ic));
+          offset -= (int) operandLitValue (IC_RIGHT (ic));
 	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
           continue;
         }
-*/
+
       /* cast then continue */
       if (IS_CAST_ICODE(ic)) {
 	  ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
 	  continue;
       }
       /* we reached the end */
-      if (ic->op == ADDRESS_OF)
-        sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
-      else if (ic->op == '=')
-        sprintf (s, "0x%04x", (int) operandLitValue (IC_RIGHT (ic)) );
       break;
     }
 
+  if (ic->op == ADDRESS_OF)
+    {
+      if (offset)
+        {
+          SNPRINTF (buffer, sizeof(buffer),
+                    "(%s %c 0x%04x)",
+                    OP_SYMBOL (IC_LEFT (ic))->rname,
+                    offset >= 0 ? '+' : '-',
+                    abs (offset) & 0xffff);
+        }
+      else
+        {
+          strncpyz (buffer, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof(buffer));
+        }
+    }
+  else if (ic->op == '=')
+    {
+      offset += (int) operandLitValue (IC_RIGHT (ic));
+      SNPRINTF (buffer, sizeof(buffer),
+                "0x%04x",
+                offset & 0xffff);
+    }
   return buffer;
 }
 

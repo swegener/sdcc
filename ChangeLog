@@ -1,5 +1,14 @@
 2006-09-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/lib/libsdcc.lib: added module rand
+	* src/ds390/ralloc.c (rematStr),
+	* src/hc08/ralloc.c (rematStr),
+	* src/mcs51/ralloc.c (rematStr),
+	* src/z80/ralloc.c (rematStr): made output more consistent
+	* src/mcs51/gen.c: cosmetic changes
+
+2006-09-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/port.h: added mem.cabs_name to PORT
 	* src/ds390/main.c,
 	* src/hc08/main.c,

@@ -1934,21 +1934,23 @@ createRegMask (eBBlock ** ebbs, int count)
 static char *
 rematStr (symbol * sym)
 {
-  char *s = buffer;
   iCode *ic = sym->rematiCode;
-
-  *s = 0;
+  int offset = 0;
 
   while (1)
     {
-
-      /* if plus or minus print the right hand side */
-      if (ic->op == '+' || ic->op == '-')
+      /* if plus adjust offset to right hand side */
+      if (ic->op == '+')
         {
-          SNPRINTF (s, sizeof(buffer) - strlen(buffer),
-                    "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)),
-                    ic->op);
-          s += strlen (s);
+          offset += (int) operandLitValue (IC_RIGHT (ic));
+          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+          continue;
+        }
+
+      /* if minus adjust offset to right hand side */
+      if (ic->op == '-')
+        {
+          offset -= (int) operandLitValue (IC_RIGHT (ic));
           ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
           continue;
         }
@@ -1959,11 +1961,21 @@ rematStr (symbol * sym)
           continue;
       }
       /* we reached the end */
-      SNPRINTF (s, sizeof(buffer) - strlen(buffer),
-                "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
       break;
     }
 
+  if (offset)
+    {
+      SNPRINTF (buffer, sizeof(buffer),
+                "(%s %c 0x%04x)",
+                OP_SYMBOL (IC_LEFT (ic))->rname,
+                offset >= 0 ? '+' : '-',
+                abs (offset) & 0xffff);
+    }
+  else
+    {
+      strncpyz (buffer, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof(buffer));
+    }
   return buffer;
 }
 

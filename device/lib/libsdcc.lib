@@ -36,6 +36,7 @@ _bp
 _spx
 abs
 labs
+rand
 _atoi
 _atol
 calloc

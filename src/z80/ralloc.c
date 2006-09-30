@@ -1540,29 +1540,51 @@ createRegMask (eBBlock ** ebbs, int count)
 
 /** Returns the rematerialized string for a remat var.
  */
-char *
+static char *
 rematStr (symbol * sym)
 {
-  char *s = buffer;
   iCode *ic = sym->rematiCode;
+  int offset = 0;
 
   while (1)
     {
+      /* if plus adjust offset to right hand side */
+      if (ic->op == '+')
+        {
+          offset += (int) operandLitValue (IC_RIGHT (ic));
+          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+          continue;
+        }
 
-      /* if plus or minus print the right hand side */
-      if (ic->op == '+' || ic->op == '-')
+      /* if minus adjust offset to right hand side */
+      if (ic->op == '-')
 	{
-	  sprintf (s, "0x%04x %c ", (int) operandLitValue (IC_RIGHT (ic)),
-		   ic->op);
-	  s += strlen (s);
+          offset -= (int) operandLitValue (IC_RIGHT (ic));
 	  ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
 	  continue;
 	}
+
+      /* cast then continue */
+      if (IS_CAST_ICODE(ic)) {
+          ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+          continue;
+      }
       /* we reached the end */
-      sprintf (s, "%s", OP_SYMBOL (IC_LEFT (ic))->rname);
       break;
     }
 
+  if (offset)
+    {
+      SNPRINTF (buffer, sizeof(buffer),
+                "(%s %c 0x%04x)",
+                OP_SYMBOL (IC_LEFT (ic))->rname,
+                offset >= 0 ? '+' : '-',
+                abs (offset) & 0xffff);
+    }
+  else
+    {
+      strncpyz (buffer, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof(buffer));
+    }
   return buffer;
 }
 

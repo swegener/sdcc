@@ -967,8 +967,7 @@ aopOp (operand * op, iCode * ic, bool result)
       /* rematerialize it NOW */
       if (sym->remat)
         {
-          sym->aop = op->aop = aop =
-            aopForRemat (sym);
+          sym->aop = op->aop = aop = aopForRemat (sym);
           aop->size = getSize (sym->type);
           return;
         }
@@ -4082,7 +4081,7 @@ genPlusIncr (iCode * ic)
 
   icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
-  D(emitcode (";     genPlusIncr",""));
+  D(emitcode (";","genPlusIncr"));
 
   /* if increment >=16 bits in register or direct space */
   if (( AOP_TYPE(IC_LEFT(ic)) == AOP_REG || 
@@ -9738,18 +9737,17 @@ genDataPointerGet (operand * left,
 
   /* get the string representation of the name */
   l = aopGet (left, 0, FALSE, TRUE);
+  l++; // remove #
   size = AOP_SIZE (result);
   while (size--)
     {
       if (offset)
         {
-          SNPRINTF (buffer, sizeof(buffer),
-                    "(%s + %d)", l + 1, offset);
+          SNPRINTF (buffer, sizeof(buffer), "(%s + %d)", l, offset);
         }
       else
         {
-          SNPRINTF (buffer, sizeof(buffer),
-                    "%s", l + 1);
+          SNPRINTF (buffer, sizeof(buffer), "%s", l);
         }
       aopPut (result, buffer, offset++);
     }
@@ -10434,13 +10432,14 @@ genDataPointerSet (operand * right,
   aopOp (right, ic, FALSE);
 
   l = aopGet (result, 0, FALSE, TRUE);
+  l++; //remove #
   size = AOP_SIZE (right);
   while (size--)
     {
       if (offset)
-        SNPRINTF (buffer, sizeof(buffer), "(%s + %d)", l + 1, offset);
+        SNPRINTF (buffer, sizeof(buffer), "(%s + %d)", l, offset);
       else
-        SNPRINTF (buffer, sizeof(buffer), "%s", l + 1);
+        SNPRINTF (buffer, sizeof(buffer), "%s", l);
       emitcode ("mov", "%s,%s", buffer,
                 aopGet (right, offset++, FALSE, FALSE));
     }

@@ -30,14 +30,16 @@ char LibNameTmp[PATH_MAX];
 char IndexName[PATH_MAX];
 char RelName[PATH_MAX];
 char AdbName[PATH_MAX];
+char ListName[PATH_MAX];
 
-#define version "0.1"
+#define version "1.0"
 
 #define OPT_ADD_REL 0
 #define OPT_EXT_REL 1
 #define OPT_DEL_REL 2
-#define OPT_DUMP_SYM 3
-#define OPT_DUMP_MOD 4
+#define OPT_ADD_LIST 3
+#define OPT_DUMP_SYM 4
+#define OPT_DUMP_MOD 5
 
 #define MAXLINE 254
 #define EQ(A,B) !strcmp((A),(B))
@@ -94,6 +96,7 @@ int set_options (char * opt)
 	"Usage: %s [-options] library relfile\n\n"
 	"available options:\n"
 	"a - Adds relfile to library.  If relfile exists, replaces it.\n"
+   	"l - Adds relfile list to library.\n"
 	"d - Deletes relfile from library.\n"
 	"e - Extracts relfile from library.\n"
 	"s - Dumps symbols of library.\n"
@@ -117,6 +120,9 @@ int set_options (char * opt)
 		break;
 		case 'a':
 		    action=OPT_ADD_REL;
+		break;
+		case 'l':
+		    action=OPT_ADD_LIST;
 		break;
 		case 'e':
 		    action=OPT_EXT_REL;
@@ -160,7 +166,10 @@ void ProcLineOptions (int argc, char **argv)
 
 				case 1:
 					cont_par++;
-					strcpy(RelName, argv[j]);
+                    if(action==OPT_ADD_LIST)
+                        strcpy(ListName, argv[j]);
+                    else
+					    strcpy(RelName, argv[j]);
 				break;
 
 				default:
@@ -172,12 +181,12 @@ void ProcLineOptions (int argc, char **argv)
 
 	if ( (cont_par!=2) && (action<OPT_DUMP_SYM) )
 	{
-		printf("Error: Too %s arguments.\n", cont_par<2?"few":"many");
+		printf("ERROR: Too %s arguments.\n", cont_par<2?"few":"many");
 		set_options("h"); /*Show help and exit*/
 	}
 	else if ( (cont_par!=1) && (action>=OPT_DUMP_SYM) )
 	{
-		printf("Error: Too %s arguments.\n", cont_par<1?"few":"many");
+		printf("ERROR: Too %s arguments.\n", cont_par<1?"few":"many");
 		set_options("h"); /*Show help and exit*/
 	}
 }
@@ -206,7 +215,7 @@ void AddRel(void)
         rel=fopen(RelName, "r");
         if(rel==NULL)
         {
-            printf("ERROR: Couldn't open file '%s'", RelName);
+            printf("ERROR: Couldn't open file '%s'\n", RelName);
             if(lib!=NULL) fclose(lib);
             return;
         }
@@ -216,7 +225,7 @@ void AddRel(void)
     newlib=fopen(LibNameTmp, "w");
     if(newlib==NULL)
     {
-        printf("ERROR: Couldn't create temporary file '%s'", LibNameTmp);
+        printf("ERROR: Couldn't create temporary file '%s'\n", LibNameTmp);
         if(lib!=NULL) fclose(lib);
         fclose(rel);
         return;
@@ -226,7 +235,7 @@ void AddRel(void)
     libindex=fopen(IndexName, "w");
     if(libindex==NULL)
     {
-        printf("ERROR: Couldn't create temporary file '%s'", IndexName);
+        printf("ERROR: Couldn't create temporary file '%s'\n", IndexName);
         if(lib!=NULL) fclose(lib);
         fclose(newlib);
         fclose(rel);
@@ -379,14 +388,14 @@ void ExtractRel(void)
     lib=fopen(LibName, "r");
     if(lib==NULL)
     {
-        printf("ERROR: Couldn't open file '%s'", LibName);
+        printf("ERROR: Couldn't open file '%s'\n", LibName);
         return;
     }
 
     rel=fopen(RelName, "w");
     if(rel==NULL)
     {
-        printf("ERROR: Couldn't create file '%s'", RelName);
+        printf("ERROR: Couldn't create file '%s'\n", RelName);
         fclose(lib);
         return;
     }
@@ -395,7 +404,7 @@ void ExtractRel(void)
     adb=fopen(AdbName, "w");
     if(adb==NULL)
     {
-        printf("ERROR: Couldn't create file '%s'", AdbName);
+        printf("ERROR: Couldn't create file '%s'\n", AdbName);
         fclose(lib);
         fclose(rel);
         return;
@@ -450,10 +459,19 @@ void DumpSymbols(void)
     lib=fopen(LibName, "r");
     if(lib==NULL)
     {
-        printf("ERROR: Couldn't open file '%s'", LibName);
+        printf("ERROR: Couldn't open file '%s'\n", LibName);
         return;
     }
 
+    FLine[0]=0;
+    fgets(FLine, MAXLINE, lib);
+    CleanLine(FLine);
+    if(NEQ(FLine, "<SDCCLIB>"))
+    {
+        printf("ERROR: File '%s' was not created with '%s'\n", LibName, ProgName); 
+        return;
+    }
+    
     while(!feof(lib))
     {
         if(state==3) break;
@@ -502,6 +520,50 @@ void DumpSymbols(void)
     fclose(lib);
 }
 
+int fileexist(char * fname)
+{
+    FILE * fp;
+    
+    fp=fopen(fname, "r");
+    if(fp==NULL) return 0;
+    fclose(fp);
+    return 1;
+}
+
+void AddList(void)
+{
+    FILE * list;
+
+    list=fopen(ListName, "r");
+    if(list==NULL)
+    {
+        printf("ERROR: Couldn't open list file '%s'\n", ListName);
+        return;
+    }
+
+    action=OPT_ADD_REL;
+    while(!feof(list))
+    {
+        RelName[0]=0;
+        fgets(RelName, PATH_MAX, list);
+        CleanLine(RelName);
+        if(strlen(RelName)>0) //Skip empty lines
+        {
+            if(strchr(RelName,'.')==NULL)
+            {
+                //Try adding the default sdcc extensions
+                strcat(RelName,".o");
+                if(!fileexist(RelName))
+                    ChangeExtension(RelName, "rel");
+            }
+            printf("Adding: %s\n", RelName);
+            AddRel();
+        }
+    }
+    action=OPT_ADD_LIST;
+    fclose(list);
+}
+
 int main(int argc, char **argv)
 {
 	ProcLineOptions (argc, argv);
@@ -515,6 +577,10 @@ int main(int argc, char **argv)
 		    AddRel();
 		break;
 		
+        case OPT_ADD_LIST:
+            AddList();
+        break;
+
 		case OPT_EXT_REL:
             ExtractRel();
         break;

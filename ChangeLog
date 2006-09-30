@@ -1,3 +1,7 @@
+2006-09-30 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* support/librarian/sdcclib.c: Added option -l.
+
 2006-09-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/libsdcc.lib: added module rand

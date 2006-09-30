@@ -559,6 +559,7 @@ PORT pic_port =
 		NULL, // xidata
 		NULL, // xinit
 		"CONST   (CODE)",		// const_name - const data (code or not)
+		"CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
 		NULL,
 		NULL,
 		1        // code is read only

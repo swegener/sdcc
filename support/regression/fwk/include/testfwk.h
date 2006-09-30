@@ -30,6 +30,7 @@ void __runSuite(void);
 # define pdata
 # define xdata
 # define code
+# define at(x)
 #endif
 
 #if defined(SDCC_hc08)

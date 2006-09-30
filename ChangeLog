@@ -1,3 +1,22 @@
+2006-09-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/port.h: added mem.cabs_name to PORT
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/mcs51/main.c,
+	* src/pic16/main.c,
+	* src/pic/main.c,
+	* src/xa51/main.c,
+	* src/z80/main.c: added cabs_name initializers
+	* src/SDCCglue.c (emitStaticSeg): allocate and initialize absolute
+	  constants
+	  (emitMaps): emit absolutes in code memory into cabs_name
+	* src/SDCCmem.c,
+	* src/SDCCmem.h: added memory map c_abs and defined CABS_NAME
+	* src/ds390/gen.c (genCodePointerGet): fixed bug if left is a literal
+	* support/regression/fwk/include/testfwk.h: added define for at
+	* support/regression/tests/absolute.c: added, new
+
 2006-09-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (genPlusIncr, genMinusDec, genAddrOf): small

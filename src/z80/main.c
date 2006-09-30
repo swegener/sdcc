@@ -617,6 +617,7 @@ PORT z80_port =
     NULL, /* xidata */
     NULL, /* xinit */
     NULL, /* const_name */
+    "CABS", /* cabs_name */
     NULL,
     NULL,
     1
@@ -736,6 +737,7 @@ PORT gbz80_port =
     NULL, /* xidata */
     NULL, /* xinit */
     NULL, /* const_name */
+    "CABS", /* cabs_name */
     NULL,
     NULL,
     1

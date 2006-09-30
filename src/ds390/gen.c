@@ -10904,7 +10904,8 @@ genCodePointerGet (operand * left,
           _endLazyDPSEvaluation ();
       }
       pi->generated = 1;
-  } else if ((OP_SYMBOL(left)->ruonly || AOP_INDPTRn(left)) &&
+  } else if (IS_SYMOP(left) &&
+             (OP_SYMBOL(left)->ruonly || AOP_INDPTRn(left)) &&
              AOP_SIZE(result) > 1 &&
              (OP_SYMBOL (left)->liveTo > ic->seq || ic->depth)) {
 

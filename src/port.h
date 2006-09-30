@@ -167,6 +167,7 @@ typedef struct
 	const char *xidata_name; // initialized xdata
 	const char *xinit_name; // a code copy of xidata
 	const char *const_name; // const data (code or not)
+	const char *cabs_name; // const absolute data (code or not)
 	struct memmap *default_local_map; // default location for auto vars
 	struct memmap *default_globl_map; // default location for globl vars
 	int code_ro;		/* code space read-only 1=yes */
@@ -201,10 +202,10 @@ typedef struct
 
     struct
       {
-	/** One more than the smallest
-	    mul/div operation the processor can do nativley
-	    Eg if the processor has an 8 bit mul, nativebelow is 2 */
-	unsigned muldiv;
+        /** One more than the smallest
+            mul/div operation the processor can do natively
+            Eg if the processor has an 8 bit mul, native below is 2 */
+        unsigned muldiv;
         unsigned shift;
       }
     support;

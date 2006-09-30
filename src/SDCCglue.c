@@ -1276,8 +1276,8 @@ emitStaticSeg (memmap * map, FILE * out)
         fprintf (out, "%s$%d$%d", sym->name, sym->level, sym->block);
       }
       
-      /* if it has an absolute address */
-      if (SPEC_ABSA (sym->etype))
+      /* if it has an absolute address and no initializer */
+      if (SPEC_ABSA (sym->etype) && !sym->ival)
         {
           if (options.debug)
             fprintf (out, " == 0x%04x\n", SPEC_ADDR (sym->etype));
@@ -1294,6 +1294,10 @@ emitStaticSeg (memmap * map, FILE * out)
           /* if it has an initial value */
           if (sym->ival)
             {
+              if (SPEC_ABSA (sym->etype))
+                {
+                  tfprintf (out, "\t!org\n", SPEC_ADDR (sym->etype));
+                }
               fprintf (out, "%s:\n", sym->rname);
               noAlloc++;
               resolveIvalSym (sym->ival, sym->type);
@@ -1361,6 +1365,8 @@ emitMaps (void)
     tfprintf (code->oFile, "\t!area\n", xinit->sname);
     emitStaticSeg (xinit, code->oFile);
   }
+  tfprintf (code->oFile, "\t!area\n", c_abs->sname);
+  emitStaticSeg (c_abs, code->oFile);
   inInitMode--;
 }
 

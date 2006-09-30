@@ -16,6 +16,7 @@ memmap *xinit = NULL;           /* the initializers for xidata */
 memmap *idata = NULL;           /* internal data upto 256      */
 memmap *bit = NULL;             /* bit addressable space       */
 memmap *statsg = NULL;          /* the constant data segment   */
+memmap *c_abs = NULL;           /* constant absolute data      */
 memmap *sfr = NULL;             /* register space              */
 memmap *reg = NULL;             /* register space              */
 memmap *sfrbit = NULL;          /* sfr bit space               */
@@ -147,6 +148,18 @@ initMem ()
      POINTER-TYPE   -   CPOINTER
    */
   statsg = allocMap (0, 1, 0, 0, 0, 1, 0, STATIC_NAME, 'D', CPOINTER);
+
+  /* Constant Absolute Data segment (for variables );
+     SFRSPACE       -   NO
+     FAR-SPACE      -   YES
+     PAGED          -   NO
+     DIRECT-ACCESS  -   NO
+     BIT-ACCESS     -   NO
+     CODE-ACCESS    -   YES
+     DEBUG-NAME     -   'D'
+     POINTER-TYPE   -   CPOINTER
+   */
+  c_abs = allocMap (0, 1, 0, 0, 0, 1, 0, CABS_NAME, 'D', CPOINTER);
 
   /* Data segment - internal storage segment ;
      SFRSPACE       -   NO
@@ -330,7 +343,11 @@ allocDefault (symbol * sym)
       if (sym->_isparm)
         return FALSE;
       /* if code change to constant */
-      SPEC_OCLS (sym->etype) = statsg;
+      if (sym->ival && (sym->level==0) && SPEC_ABSA(sym->etype)) {
+        SPEC_OCLS(sym->etype) = c_abs;
+      } else {
+        SPEC_OCLS (sym->etype) = statsg;
+      }
       break;
     case S_XDATA:
       // should we move this to the initialized data segment?

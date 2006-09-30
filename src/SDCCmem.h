@@ -46,6 +46,7 @@ extern FILE *junkFile;
 #define	 HOME_NAME     port->mem.home_name
 #define  OVERLAY_NAME  port->mem.overlay_name
 #define  CONST_NAME    port->mem.const_name
+#define  CABS_NAME     port->mem.cabs_name
 
 /* forward definition for variables */
 extern memmap *xstack;		/* xternal stack data           */
@@ -59,6 +60,7 @@ extern memmap *xinit;           /* the initializers for xidata  */
 extern memmap *idata;		/* internal data upto 256       */
 extern memmap *bit;		/* bit addressable space        */
 extern memmap *statsg;		/* static code segment          */
+extern memmap *c_abs;		/* constant absolute data       */
 extern memmap *sfr;		/* register space               */
 extern memmap *sfrbit;		/* sfr bit space                */
 extern memmap *reg;		/* register space               */

@@ -288,6 +288,7 @@ PORT xa51_port =
     "XISEG   (XDATA)", // initialized xdata
     "XINIT   (CODE)", // a code copy of xiseg
     "CONST   (CODE)",		// const_name - const data (code or not)
+    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
     NULL, // default local map
     NULL, // default global map
     1

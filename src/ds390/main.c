@@ -879,9 +879,10 @@ PORT ds390_port =
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
     "HOME    (CODE)",
-    "XISEG   (XDATA)", // initialized xdata
-    "XINIT   (CODE)", // a code copy of xiseg
+    "XISEG   (XDATA)",		// initialized xdata
+    "XINIT   (CODE)",		// a code copy of xiseg
     "CONST   (CODE)",		// const_name - const data (code or not)
+    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
     NULL,
     NULL,
     1
@@ -1198,6 +1199,7 @@ PORT tininative_port =
     NULL,
     NULL,
     "CONST   (CODE)",		// const_name - const data (code or not)
+    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
     NULL,
     NULL,
     1
@@ -1430,6 +1432,7 @@ PORT ds400_port =
     "XISEG   (XDATA)", // initialized xdata
     "XINIT   (CODE)", // a code copy of xiseg
     "CONST   (CODE)",		// const_name - const data (code or not)
+    "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
     NULL,
     NULL,
     1

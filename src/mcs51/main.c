@@ -754,6 +754,7 @@ PORT mcs51_port =
     "XISEG   (XDATA)",          // xidata_name - initialized xdata   initialized xdata
     "XINIT   (CODE)",           // xinit_name - a code copy of xiseg
     "CONST   (CODE)",           // const_name - const data (code or not)
+    "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
     NULL,
     NULL,
     1

@@ -1469,6 +1469,7 @@ pic16emitMaps ()
   pic16emitRegularMap (sfrbit, FALSE, FALSE);
   pic16emitRegularMap (code, TRUE, FALSE);
   pic16emitStaticSeg (statsg);
+  pic16emitStaticSeg (c_abs);
 }
 
 /*-----------------------------------------------------------------*/

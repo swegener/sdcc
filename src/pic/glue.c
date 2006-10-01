@@ -974,6 +974,7 @@ pic14emitMaps ()
 	pic14emitRegularMap (sfrbit, FALSE, FALSE);
 	pic14emitRegularMap (code, TRUE, FALSE);
 	pic14emitStaticSeg (statsg);
+	pic14emitStaticSeg (c_abs);
 }
 
 /*-----------------------------------------------------------------*/

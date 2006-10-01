@@ -1,3 +1,8 @@
+2006-10-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/pic16/glue.c (pic16emitMaps),
+	* src/pic/glue.c (pic14emitMaps): hopefully fixed bug 1568779
+
 2006-09-30 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* support/librarian/sdcclib.c: Added option -l.

@@ -7,28 +7,27 @@
    under the terms of the GNU Library General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU Library General Public License for more details.
-   
+
    You should have received a copy of the GNU Library General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-   
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 #include <string.h>
 
-__data void *memcpypgm2ram (__data void *dst, void __code *src, size_t acount) 
+__data void *memcpypgm2ram (__data void *dst, __code void *src, size_t acount)
 {
-  void *ret = dst;	/* perhaps ret should be removed, use dst instead */
   char __data *d = dst;
-  char *s = src;
-	
+  char __code *s = src;
+
     /*
      * copy from lower addresses to higher addresses
      */
@@ -36,5 +35,5 @@ __data void *memcpypgm2ram (__data void *dst, void __code *src, size_t acount)
       *d++ = *s++;
     }
 
-  return(ret);
+  return(dst);
 }

@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-char * gets(const char *str) {
-  char *s=str;
+char * gets(char *s) {
   char c;
   unsigned int count=0;
   
@@ -22,7 +21,7 @@ char * gets(const char *str) {
       putchar('\r');
       putchar('\n');
       *s=0;
-      return str;
+      return s;
     default:
       *s++=c;
       count++;

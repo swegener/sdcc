@@ -435,7 +435,7 @@ int summary2(struct area * areap)
     xp=areap;
     while (xp)
     {
-        if((xp->a_flag & A_CODE) && !(xp->a_flag & A_ABS))
+        if (xp->a_flag & A_CODE)
         {
             if(xp->a_size)
             {
@@ -475,7 +475,7 @@ int summary2(struct area * areap)
                 Paged.End = xp->a_addr + xp->a_size;
         }
 
-        else if((xp->a_flag & A_XDATA) && !(xp->a_flag & A_ABS))
+        else if (xp->a_flag & A_XDATA)
         {
             if(xp->a_size)
             {

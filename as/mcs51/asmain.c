@@ -811,7 +811,7 @@ loop:
 		lmode = SLIST;
 		break;
 
-    case S_OPTSDCC:
+	case S_OPTSDCC:
 		p = optsdcc;
 		if ((c = getnb()) != 0) {
 			do {
@@ -836,7 +836,7 @@ loop:
 		break;
 
 	case S_DAREA:
-	        getid(id, -1);
+		getid(id, -1);
 		uaf = 0;
 		uf  = A_CON|A_REL;
 		if ((c = getnb()) == '(') {
@@ -875,6 +875,7 @@ loop:
 	case S_ORG:
 		if (dot.s_area->a_flag & A_ABS) {
 			outall();
+			dot.s_area->a_size += dot.s_addr - dot.s_org;
 			laddr = dot.s_addr = dot.s_org = absexpr();
 		} else {
 			err('o');
@@ -1135,7 +1136,8 @@ register struct area *nap;
 	  }
 	} else if (oap->a_flag & A_ABS) {
 	  oap->a_addr = dot.s_org;
-	  oap->a_size = dot.s_addr - dot.s_org;
+	  oap->a_size += dot.s_addr - dot.s_org;
+	  dot.s_addr = dot.s_org = 0;
 	} else {
 	  oap->a_addr = 0;
 	  oap->a_size = dot.s_addr;
@@ -1143,6 +1145,10 @@ register struct area *nap;
 	if (nap->a_flag & A_OVR) {
 	  // a new overlay starts at 0, no fuzz
 	  dot.s_addr = 0;
+	  fuzz = 0;
+	} else if (nap->a_flag & A_ABS) {
+	  // a new absolute starts at org, no fuzz
+	  dot.s_addr = dot.s_org;
 	  fuzz = 0;
 	} else {
 	  dot.s_addr = nap->a_size;

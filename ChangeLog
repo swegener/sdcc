@@ -2,6 +2,12 @@
 
 	* src/pic16/glue.c (pic16emitMaps),
 	* src/pic/glue.c (pic14emitMaps): hopefully fixed bug 1568779
+	* device/lib/gets.c: fixed bug 1568829,thanks Philipp Krause
+	* device/lib/pic16/libc/string/memcpypgm2ram.c,
+	* device/lib/pic16/libc/string/memcpyram2ram.c: fixed bug 1568836, thanks
+	  Philipp Krause
+	* as/mcs51/asmain.c (asmbl, newdot): fixed problems with absolute areas
+	* as/link/mcs51/lkmem.c (summary2): reverted, do do count abs segments
 
 2006-09-30 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

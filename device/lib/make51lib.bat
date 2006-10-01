@@ -33,3 +33,5 @@ cd mcs51
 @for %%I in (*.rel) do sdcclib ..\large\mcs51.lib %%I
 cd..
 del *.rel *.sym *.asm *.lst *.adb
+
+set SDCCLIB_CC=

@@ -1,6 +1,10 @@
 2006-09-30 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* support/librarian/sdcclib.c: Added option -l.
+	* as/link/mcs51/lkmem.c: don't use absolute segments to compute memory
+	  usage totals.
+	* device/lib/make51lib.bat: added.  Allows building mcs51 libraries easily
+	  using Windows command prompt.
 
 2006-09-30 Maarten Brock <sourceforge.brock AT dse.nl>
 

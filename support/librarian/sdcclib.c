@@ -533,6 +533,10 @@ int fileexist(char * fname)
 void AddList(void)
 {
     FILE * list;
+    char *cc;
+    char *as;
+    char CmdLine[1024];
+    char SrcName[PATH_MAX];
 
     list=fopen(ListName, "r");
     if(list==NULL)
@@ -540,6 +544,9 @@ void AddList(void)
         printf("ERROR: Couldn't open list file '%s'\n", ListName);
         return;
     }
+
+    cc = getenv("SDCCLIB_CC");
+    as = getenv("SDCCLIB_AS");
 
     action=OPT_ADD_REL;
     while(!feof(list))
@@ -549,6 +556,34 @@ void AddList(void)
         CleanLine(RelName);
         if(strlen(RelName)>0) //Skip empty lines
         {
+            if((cc!=NULL)||(as!=NULL))
+            {
+                strcpy(SrcName, RelName);
+                if(strchr(SrcName,'.')==NULL)
+                    strcat(SrcName,".src");
+            }
+
+            if(cc!=NULL)
+            {
+                ChangeExtension(SrcName, "c");
+                if(fileexist(SrcName))
+                {
+                    sprintf(CmdLine, "%s %s", cc, SrcName);
+                    printf("%s\n", CmdLine);
+                    system(CmdLine);
+                }
+            }
+            else if(as!=NULL)
+            {
+                ChangeExtension(SrcName, "asm");
+                if(fileexist(SrcName))
+                {
+                    sprintf(CmdLine, "%s %s", as, SrcName);
+                    printf("%s\n", CmdLine);
+                    system(CmdLine);
+                }
+            }
+
             if(strchr(RelName,'.')==NULL)
             {
                 //Try adding the default sdcc extensions
@@ -556,6 +591,7 @@ void AddList(void)
                 if(!fileexist(RelName))
                     ChangeExtension(RelName, "rel");
             }
+
             printf("Adding: %s\n", RelName);
             AddRel();
         }

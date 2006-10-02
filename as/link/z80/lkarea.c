@@ -305,8 +305,9 @@ lkparea(char *id)
  *		structures.
  */
 
-unsigned long codemap[2048];
-Addr_T lnksect(register struct area *tap);
+//unsigned long codemap[2048];
+//Addr_T lnksect(register struct area *tap);
+VOID lnksect(register struct area *tap);
 /*
  * Resolve all area addresses.
  */
@@ -314,9 +315,10 @@ VOID
 lnkarea()
 {
         register Addr_T rloc = 0;
-        Addr_T gs_size = 0;
+//        Addr_T gs_size = 0;
 	char temp[NCPS];
 	struct sym *sp;
+#if 0
         struct area *abs_ap = NULL;
         struct area *gs0_ap = NULL;
 
@@ -367,7 +369,7 @@ lnkarea()
         }
         if (gs0_ap)
                 gs0_ap->a_size = gs_size;
-
+#endif
 	ap = areap;
         while (ap)
         {
@@ -382,7 +384,9 @@ lnkarea()
 			 */
 			if (ap->a_addr == 0)
 				ap->a_addr = rloc;
-                        rloc = lnksect(ap);
+//                        rloc = lnksect(ap);
+			lnksect(ap);
+			rloc = ap->a_addr + ap->a_size;
 		}
 
 		/*
@@ -411,7 +415,7 @@ lnkarea()
 		ap = ap->a_ap;
 	}
 }
-
+#if 0
 static
 Addr_T find_empty_space(Addr_T start, Addr_T size, unsigned long *map)
 {
@@ -490,7 +494,7 @@ Addr_T allocate_space(Addr_T start, Addr_T size, char* id, unsigned long *map)
     map[i] |= mask;
     return start;
 }
-
+#endif
 /*)Function	VOID	lnksect()
  *
  *		area *	tap		pointer to an area structure
@@ -517,7 +521,8 @@ Addr_T allocate_space(Addr_T start, Addr_T size, char* id, unsigned long *map)
  *		and linked into the structures.
  */
 
-Addr_T lnksect(register struct area *tap)
+VOID lnksect(register struct area *tap)
+//Addr_T lnksect(register struct area *tap)
 {
 	register Addr_T size, addr;
 	register struct areax *taxp;
@@ -542,6 +547,7 @@ Addr_T lnksect(register struct area *tap)
 			taxp = taxp->a_axp;
 		}
         }
+#if 0
         else if (tap->a_flag & A_ABS)
         {
                 /*
@@ -555,21 +561,26 @@ Addr_T lnksect(register struct area *tap)
                         taxp = taxp->a_axp;
                 }
         }
+#endif
         else
         {
 		/*
 		 * Concatenated sections
 		 */
+/*
                 if (tap->a_size) {
                         addr = find_empty_space(addr, tap->a_size, codemap);
                 }
+*/
 		while (taxp) {
+/*
                         //find next unused address now
                         if (taxp->a_size)
                         {
                                 addr = find_empty_space(addr, taxp->a_size, codemap);
                                 allocate_space(addr, taxp->a_size, tap->a_id, codemap);
                         }
+*/
 			taxp->a_addr = addr;
 			addr += taxp->a_size;
 			size += taxp->a_size;
@@ -584,5 +595,5 @@ Addr_T lnksect(register struct area *tap)
 	    "\n?ASlink-Warning-Paged Area %.8s Length Error\n", tap->a_id);
 	    lkerr++;
 	}
-        return addr;
+//        return addr;
 }

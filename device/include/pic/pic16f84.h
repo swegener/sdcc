@@ -265,4 +265,50 @@ extern volatile __STATUS_bits_t __at(STATUS_ADDR) STATUS_bits;
 #define RP1                  STATUS_bits.RP1
 #define IRP                  STATUS_bits.IRP
 
+// ----- PORTA bits --------------------
+typedef union {
+    struct {
+    unsigned char RA0:1;
+    unsigned char RA1:1;
+    unsigned char RA2:1;
+    unsigned char RA3:1;
+    unsigned char RA4:1;
+    unsigned char :1;
+    unsigned char :1;
+    unsigned char :1;
+    };
+} __PORTA_bits_t;
+extern volatile __PORTA_bits_t __at(PORTA_ADDR) PORTA_bits;
+				    
+#define RA0             PORTA_bits.RA0
+#define RA1             PORTA_bits.RA1
+#define RA2             PORTA_bits.RA2
+#define RA3             PORTA_bits.RA3
+#define RA4		PORTA_bits.RA4
+
+// ----- PORTB bits --------------------
+
+typedef union {
+    struct {
+    unsigned char RB0:1;
+    unsigned char RB1:1;
+    unsigned char RB2:1;
+    unsigned char RB3:1;
+    unsigned char RB4:1;
+    unsigned char RB5:1;
+    unsigned char RB6:1;
+    unsigned char RB7:1;
+    };
+} __PORTB_bits_t;
+extern volatile __PORTB_bits_t __at(PORTB_ADDR) PORTB_bits;
+				    
+#define RB0		PORTB_bits.RB0
+#define RB1		PORTB_bits.RB1
+#define RB2		PORTB_bits.RB2
+#define RB3		PORTB_bits.RB3
+#define RB4		PORTB_bits.RB4
+#define RB5		PORTB_bits.RB5
+#define RB6		PORTB_bits.RB6
+#define RB7		PORTB_bits.RB7
+
 #endif

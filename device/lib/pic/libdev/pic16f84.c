@@ -25,8 +25,10 @@ __sfr  __at (EECON2_ADDR)                  EECON2;
 // 
 // bitfield definitions
 // 
-volatile __EECON1_bits_t __at(EECON1_ADDR) EECON1_bits;
-volatile __INTCON_bits_t __at(INTCON_ADDR) INTCON_bits;
+volatile __EECON1_bits_t     __at(EECON1_ADDR)     EECON1_bits;
+volatile __INTCON_bits_t     __at(INTCON_ADDR)     INTCON_bits;
 volatile __OPTION_REG_bits_t __at(OPTION_REG_ADDR) OPTION_REG_bits;
-volatile __STATUS_bits_t __at(STATUS_ADDR) STATUS_bits;
+volatile __STATUS_bits_t     __at(STATUS_ADDR)     STATUS_bits;
+volatile __PORTA_bits_t      __at(PORTA_ADDR)      PORTA_bits;
+volatile __PORTB_bits_t      __at(PORTB_ADDR)      PORTB_bits;
 

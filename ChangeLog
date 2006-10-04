@@ -1,3 +1,9 @@
+2006-10-04 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/{pic16f84.h,pic16f84a.h},
+	* device/lib/pic/libdev/{pic16f84.c,pic16f84a.c}: added PORT[AB]_bits
+	  from patch #1522504, thanks to Robas Teodor
+
 2006-10-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/z80/lkarea.c: essentially reverted lnksect() to #4380 which

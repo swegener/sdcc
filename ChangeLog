@@ -1,3 +1,10 @@
+2006-09-16 Borut Razem <borut.razem AT siol.net>
+
+	* partially fixed [ 1570701 ] peephole - not replacing code from multiline macros,
+	  thanks to dfulab:
+	  - sdcc.dsw: changed property eol-style to CRLF
+	  - support/scripts/resource.rc: replaced references to "afxres.h" with "winres.h"
+
 2006-10-04 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/{pic16f84.h,pic16f84a.h},

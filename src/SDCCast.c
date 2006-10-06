@@ -2249,11 +2249,11 @@ addCast (ast *tree, RESULT_TYPE resultType, bool promote)
         newLink = newIntLink();
         upCasted = TRUE;
         break;
+      case RESULT_TYPE_IFX:
       case RESULT_TYPE_OTHER:
-        if (!promote)
-          return tree;
-        /* return type is long, float: promote char to int */
-        if (getSize (tree->etype) >= INTSIZE)
+        if (!promote ||
+            /* return type is ifx, long, float: promote char to int */
+            getSize (tree->etype) >= INTSIZE)
           return tree;
         newLink = newIntLink();
         upCasted = TRUE;

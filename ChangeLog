@@ -1,3 +1,11 @@
+2006-10-06 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCglue.c (tempfileandname): changed un*x tmp search paths
+	to /tmp and /var/tmp acc. LSB
+	* src/SDCCast.c (addCast): Fixed bug 1571231: promote in case of
+	RESULT_TYPE_IFX
+	* support/regression/tests/onebyte.c: added test
+
 2006-10-05 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* src/mcs51/gen.c: emitcode for "add a,0x%02x" requires only 8 bits.

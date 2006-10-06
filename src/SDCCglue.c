@@ -1966,7 +1966,7 @@ glue (void)
 /** Creates a temporary file with unique file name
     Scans, in order:
     - TMP, TEMP, TMPDIR env. variables
-    - if Un*x system: /usr/tmp and /tmp
+    - if Un*x system: /tmp and /var/tmp
     - root directory using mkstemp() if available
     - default location using tempnam()
 */
@@ -1999,14 +1999,14 @@ tempfileandname(char *fname, size_t len)
   }
 #else
   {
-    /* try with /usr/tmp and /tmp on Un*x systems */
+    /* try with /tmp and /var/tmp on Un*x systems */
     struct stat statbuf;
 
     if (tmpdir == NULL) {
-      if (stat("/usr/tmp", &statbuf) != -1)
-        tmpdir = "/usr/tmp";
-      else if (stat("/tmp", &statbuf) != -1)
+      if (stat("/tmp", &statbuf) != -1)
         tmpdir = "/tmp";
+      else if (stat("/var/tmp", &statbuf) != -1)
+        tmpdir = "/var/tmp";
     }
   }
 #endif

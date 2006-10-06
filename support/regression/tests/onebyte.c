@@ -243,3 +243,16 @@ testUMinus(void)
   sc = -128;
   ASSERT(-sc == 128);
 }
+
+void
+testBug1571231(void)
+{
+  unsigned char  {attrL} uc;
+
+  /* bug-1571231 */
+  uc = 0x80;
+  if (uc + 0x80)
+    ASSERT(1);
+  else
+    ASSERT(0);
+}

@@ -1,4 +1,8 @@
-2006-09-16 Borut Razem <borut.razem AT siol.net>
+2006-10-05 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* src/mcs51/gen.c: emitcode for "add a,0x%02x" requires only 8 bits.
+
+2006-10-05 Borut Razem <borut.razem AT siol.net>
 
 	* partially fixed [ 1570701 ] peephole - not replacing code from multiline macros,
 	  thanks to dfulab:

@@ -649,7 +649,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
                   if (accuse)
                     emitcode ("push", "acc");
                   emitcode ("mov", "a,%s", SYM_BP (sym));
-                  emitcode ("add", "a,#0x%02x", offset);
+                  emitcode ("add", "a,#0x%02x", offset & 0xff);
                   emitcode ("mov", "%s,a", aop->aopu.aop_ptr->name);
                   if (accuse)
                     emitcode ("pop", "acc");
@@ -3616,14 +3616,14 @@ genFunction (iCode * ic)
       if (i > 3 && accIsFree)
         {
           emitcode ("mov", "a,_spx");
-          emitcode ("add", "a,#0x%02x", i);
+          emitcode ("add", "a,#0x%02x", i & 0xff);
           emitcode ("mov", "_spx,a");
         }
       else if (i > 5)
         {
           emitcode ("push", "acc");
           emitcode ("mov", "a,_spx");
-          emitcode ("add", "a,#0x%02x", i);
+          emitcode ("add", "a,#0x%02x", i & 0xff);
           emitcode ("mov", "_spx,a");
           emitcode ("pop", "acc");
         }
@@ -10912,7 +10912,7 @@ genAddrOf (iCode * ic)
           else
             {
               emitcode ("mov", "a,%s", SYM_BP (sym));
-              emitcode ("add", "a,#0x%02x", stack_offset);
+              emitcode ("add", "a,#0x%02x", stack_offset & 0xff);
               aopPut (IC_RESULT (ic), "a", 0);
             }
         }

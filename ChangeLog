@@ -1,3 +1,9 @@
+2006-10-08 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* doc/sdccman.lyx: added to the manual
+	* doc/figures/ddd_example.png: added (neither pdflatex nor
+	most browsers seem to like the .eps file)
+
 2006-10-06 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCglue.c (tempfileandname): changed un*x tmp search paths

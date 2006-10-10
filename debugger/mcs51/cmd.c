@@ -334,7 +334,7 @@ static  int printOrSetSymValue (symbol *sym, context *cctxt,
                                 char *rs, char *val, char cmp);
 
 int srcMode = SRC_CMODE ;
-static set  *dispsymbols = NULL   ; /* set of displayable symbols */
+set *dispsymbols = NULL   ; /* set of displayable symbols */
 static int currentFrame = 0;        /* actual displayed frame     */
 /*-----------------------------------------------------------------*/
 /* funcWithName - returns function with name                       */
@@ -747,19 +747,15 @@ void simGo (unsigned int gaddr)
 /*-----------------------------------------------------------------*/
 static char *preparePrint(char *s, context *cctxt, int *fmt, symbol **sym)
 {
-    char *bp = s+strlen(s) -1;
+    char *bp;
     char save_ch ;
 
     *fmt = FMT_NON;
     *sym = NULL;
 
-    while (isspace(*s)) s++;
+    s = trim(s);
     if (!*s)
         return (char *)0;
-
-    while (isspace(*bp)) bp--;
-    bp++ ;
-    *bp = '\0';
 
     if ( *s == '/' )
     {
@@ -781,7 +777,7 @@ static char *preparePrint(char *s, context *cctxt, int *fmt, symbol **sym)
                 break;
         }
         s++;
-        while (isspace(*s)) s++;
+        s = trim_left(s);
     }
     for ( bp = s; *bp && ( isalnum( *bp ) || *bp == '_' || *bp == '$'); bp++ );
     save_ch = *bp;
@@ -857,14 +853,14 @@ static int cmdDisasm (char *s, context *cctxt, int args)
 
     if ( args > 0 )
     {
-        while (*s && isspace(*s)) s++;
+        s = trim_left(s);
 
         if ( isdigit(*s))
         {
             saddr = strtol(s,&s,0);
             if ( args > 1 )
             {
-                while (*s && isspace(*s)) s++;
+                s = trim_left(s);
 
                 if ( isdigit(*s))
                     eaddr = strtol(s,0,0);
@@ -980,13 +976,8 @@ static int commonSetUserBp(char *s, context *cctxt, char bpType)
         fprintf(stdout,"No symbol table is loaded.  Use the \"file\" command.\n");
         return 0;
     }
-    /* white space skip */
-    while (*s && isspace(*s)) s++;
-
-    /* null terminate it after stripping trailing blanks*/
-    bp = s + strlen(s);
-    while (bp != s && isspace(*bp)) bp--;
-    *bp = '\0';
+    /* trim left and right */
+    s = trim(s);
 
     /* case a) nothing */
     /* if nothing given then current location : we know
@@ -1148,7 +1139,7 @@ int cmdSetUserBp (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdJump (char *s, context *cctxt)
 {
-    char *bp ;
+    char *bp;
     function *func = NULL;
     if (STACK_EMPTY(callStack))
     {
@@ -1156,13 +1147,9 @@ int cmdJump (char *s, context *cctxt)
         return 0;
     }
 
-    /* white space skip */
-    while (*s && isspace(*s)) s++;
+    /* trim left and right */
+    s = trim(s);
 
-    /* null terminate it after stripping trailing blanks*/
-    bp = s + strlen(s);
-    while (bp != s && isspace(*bp)) bp--;
-    *bp = '\0';
     if (! *s )
     {
         fprintf(stdout,"No argument: need line or *addr.\n");
@@ -1262,7 +1249,7 @@ int cmdListAsm (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdSetOption (char *s, context *cctxt)
 {
-    while (*s && isspace(*s)) s++;
+    s = trim_left(s);
     if (strncmp(s,"srcmode",7) == 0 ) {
         if (srcMode == SRC_CMODE)
             srcMode = SRC_AMODE;
@@ -1299,7 +1286,7 @@ int cmdSetOption (char *s, context *cctxt)
         s = rs;
         while (*s && *s != '=') s++;
         *s++ = '\0';
-        while (isspace(*s)) *s++ = '\0';
+        s = trim_left(s);
         if (*s && sym)
         {
             printOrSetSymValue(sym,cctxt,0,0,0,rs,s,'\0');
@@ -1337,14 +1324,14 @@ int cmdContinue (char *s, context *cctxt)
 int cmdIgnore (char *s, context *cctxt)
 {
     int bpnum, cnt ;
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if (!*s )
     {
         fprintf(stdout,"Argument required (breakpoint number).\n");
         return 0;
     }
     bpnum = strtol(s,&s,10);
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if (!*s )
     {
         fprintf(stdout,"Second argument (specified ignore-count) is missing.");
@@ -1361,14 +1348,14 @@ int cmdIgnore (char *s, context *cctxt)
 int cmdCondition (char *s, context *cctxt)
 {
     int bpnum ;
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if (!*s )
     {
         fprintf(stdout,"Argument required (breakpoint number).\n");
         return 0;
     }
     bpnum = strtol(s,&s,10);
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if (*s)
         s = Safe_strdup(s);
     else
@@ -1384,7 +1371,7 @@ int cmdCommands (char *s, context *cctxt)
 {
     int bpnum ;
     char *cmds,*line;
-    while (isspace(*s)) s++;
+    s = trim_left(s);
 
     if (!*s )
         bpnum = getLastBreakptNumber();
@@ -1394,7 +1381,7 @@ int cmdCommands (char *s, context *cctxt)
     cmds = NULL;
     while ((line = getNextCmdLine()))
     {
-        while (isspace(*line)) line++;
+        line = trim_left(line);
         if (!strncmp(line,"end",3))
             break;
         if (! cmds )
@@ -1417,7 +1404,7 @@ int cmdCommands (char *s, context *cctxt)
 int cmdDelUserBp (char *s, context *cctxt)
 {
     int bpnum ;
-    while (isspace(*s)) s++;
+    s = trim_left(s);
 
     if (!*s ) {
         if (userBpPresent) {
@@ -2025,22 +2012,23 @@ static int infomode = 0;
 /*-----------------------------------------------------------------*/
 int cmdInfo (char *s, context *cctxt)
 {
-    while (isspace(*s)) s++;
+    /* trim left and_right*/
+    s = trim(s);
 
     /* list all break points */
-    if (strncmp(s,"break",5) == 0) {
+    if (strcmp(s,"break") == 0) {
         listUSERbp();
         return 0;
     }
 
     /* info frame same as frame */
-    if (strcmp(s,"frame") == 0) {
-        cmdFrame (s,cctxt);
+    if (strncmp(s,"frame",5) == 0) {
+        cmdFrame (s+5,cctxt);
         return 0;
     }
 
     if (strncmp(s,"line",4) == 0) {
-    infomode=1;
+        infomode=1;
         cmdListSrc (s+4,cctxt);
         return 0;
     }
@@ -2073,7 +2061,7 @@ int cmdInfo (char *s, context *cctxt)
         }
         return 0;
     }
-    if (strncmp(s,"functions",7) == 0)
+    if (strcmp(s,"functions") == 0)
     {
         function *f;
         module *m = NULL;
@@ -2092,7 +2080,7 @@ int cmdInfo (char *s, context *cctxt)
     /* info stack display call stack */
     if (strcmp(s,"stack") == 0) {
         infoStack(cctxt);
-    showfull = 1;
+        showfull = 1;
         return 0;
     }
 
@@ -2151,7 +2139,7 @@ int cmdListSrc (char *s, context *cctxt)
     function *func = NULL;
 
 
-    while (*s && isspace(*s)) s++;
+    s = trim_left(s);
 
     /* if the user has spcified line numer then the line number
        can be of the following formats
@@ -2921,7 +2909,7 @@ int conditionIsTrue( char *s, context *cctxt)
             }
             s++ ;
         }
-        while (isspace(*s)) *s++ = '\0';
+        s = trim_left(s);
         fmt = printOrSetSymValue(sym,cctxt,0,0,0,rs,s,cmp_char);
     }
     Safe_free(dup);
@@ -3034,7 +3022,7 @@ int cmdUnDisplay (char *s, context *cctxt)
     dsymbol *dsym;
     int dnum;
 
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if (!*s)
     {
         for (dsym = setFirstItem(dispsymbols);
@@ -3069,14 +3057,11 @@ int cmdUnDisplay (char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdPrintType (char *s, context *cctxt)
 {
-        symbol *sym ;
-    char *bp = s+strlen(s) -1;
+    symbol *sym ;
 
-    while (isspace(*s)) s++;
+    /* trim left and right */
+    s = trim(s);
     if (!*s) return 0;
-    while (isspace(*bp)) bp--;
-    bp++ ;
-    *bp = '\0';
 
     if ((sym = symLookup(s,cctxt))) {
         printTypeInfo(sym->type);
@@ -3111,13 +3096,8 @@ int cmdClrUserBp (char *s, context *cctxt)
         return 0;
     }
 
-    /* white space skip */
-    while (*s && isspace(*s)) s++;
-
-    /* null terminate it after stripping trailing blanks*/
-    bp = s + strlen(s);
-    while (bp != s && isspace(*bp)) bp--;
-    *bp = '\0';
+    /* trim left and right */
+    s = trim(s);
 
     /* case a) nothing */
     /* if nothing given then current location : we know
@@ -3274,7 +3254,7 @@ static void printFrame()
 /*-----------------------------------------------------------------*/
 int cmdUp(char *s, context *cctxt)
 {
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if ( *s )
         currentFrame += strtol(s,0,10);
     else
@@ -3289,7 +3269,7 @@ int cmdUp(char *s, context *cctxt)
 /*-----------------------------------------------------------------*/
 int cmdDown(char *s, context *cctxt)
 {
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if ( *s )
         currentFrame -= strtol(s,0,10);
     else
@@ -3306,7 +3286,7 @@ int cmdFrame (char *s, context *cctxt)
     function *func = NULL;
     int framenr = 0;
 
-    while (isspace(*s)) s++;
+    s = trim_left(s);
     if ( *s )
         currentFrame = strtol(s,0,10);
     printFrame();
@@ -3346,7 +3326,7 @@ int cmdFinish (char *s, context *ctxt)
 int cmdShow (char *s, context *cctxt)
 {
     /* skip white space */
-    while (*s && isspace(*s)) s++ ;
+    s = trim_left(s);
 
     if (strcmp(s,"copying") == 0) {
         fputs(copying,stdout);

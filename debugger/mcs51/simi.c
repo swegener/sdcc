@@ -589,7 +589,7 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
            case of bit variables which case it becomes
            [address] [assembler bit address] [v] */
         /* first skip thru white space */
-        while (isspace(*resp)) resp++ ;
+        resp = trim_left(resp);
 
         if (strncmp(resp, "0x",2) == 0)
             resp += 2;
@@ -611,7 +611,7 @@ unsigned long simGetValue (unsigned int addr,char mem, int size)
         for (i = 0 ; i < size ; i++ )
         {
             /* skip white space */
-            while (isspace(*resp)) resp++ ;
+            resp = trim_left(resp);
 
             b[i] = strtol(resp,&resp,16);
         }

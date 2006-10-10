@@ -68,6 +68,8 @@ typedef struct breakp
 
 extern char userBpPresent;
 extern char doingSteps;
+extern hTab *bptable;
+
 
 
 int setBreakPoint (unsigned , char , char,

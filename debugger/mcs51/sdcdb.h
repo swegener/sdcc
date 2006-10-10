@@ -251,6 +251,8 @@ extern set *modules  ; /* set of modules   */
 extern set *functions; /* set of functions */
 extern set *symbols  ; /* set of symbols */
 extern set *sfrsymbols;/* set of symbols of sfr or sbit */
+extern set *dispsymbols; /* set of displayable symbols */
+
 
 extern char *currModName ;
 extern char userinterrupt ;
@@ -271,4 +273,10 @@ char *searchDirsFname (char *);
 char *getNextCmdLine(void );
 void setCmdLine( char * );
 void stopCommandList( void );
+
+/* trimming functions */
+extern char *trim_left(char *s);
+extern char *trim_right(char *s);
+extern char *trim(char *s);
+
 #endif

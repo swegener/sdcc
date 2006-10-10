@@ -1,3 +1,10 @@
+2006-10-10 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/break.[ch], debugger/mcs51/cmd.c,
+	  debugger/mcs51/sdcdb.[ch], debugger/mcs51/simi.c:
+	  [ 1185668 ] add gnu readline support to sdcdb -
+	  prepared for READLINE, not enabled yet
+
 2006-10-10 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcode.c (pic16_pCode2str): use isACCESS_BANK macro

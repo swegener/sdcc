@@ -27,10 +27,10 @@
 #include "cmd.h"
 #include "newalloc.h"
 
-static hTab *bptable = NULL;
+hTab *bptable = NULL;
 char doingSteps    = 0;
 char userBpPresent = 0;
-                                
+
 /* call stack can be 1024 deep */
 STACK_DCL(callStack,function *,1024);
 
@@ -59,7 +59,7 @@ void resetHitCount()
     int k;
     breakp *bp;
     for ( bp = hTabFirstItem(bptable,&k); bp ;
-          bp = hTabNextItem(bptable,&k)) 
+          bp = hTabNextItem(bptable,&k))
     {
         bp->hitCnt    = 0;
         bp->ignoreCnt = 0;
@@ -96,7 +96,7 @@ int setBreakPoint (unsigned addr, char addrType, char bpType,
     if (bpType == USER || bpType == TMPUSER)
     {
         for ( bpl = hTabFirstItemWK(bptable,addr) ; bpl;
-              bpl = hTabNextItemWK(bptable)) 
+              bpl = hTabNextItemWK(bptable))
         {
 
             /* if also a user break point then issue Note : */
@@ -137,11 +137,11 @@ void deleteSTEPbp ()
     Dprintf(D_break, ("break: Deleting all STEP BPs\n"));
     /* for break points delete if they are STEP */
     for ( bp = hTabFirstItem(bptable,&k); bp ;
-          bp = hTabNextItem(bptable,&k)) 
+          bp = hTabNextItem(bptable,&k))
     {
 
         /* if this is a step then delete */
-        if (bp->bpType == STEP) 
+        if (bp->bpType == STEP)
         {
             hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
             Safe_free(bp);
@@ -162,11 +162,11 @@ void deleteNEXTbp ()
 
     /* for break points delete if they are NEXT */
     for ( bp = hTabFirstItem(bptable,&k); bp ;
-          bp = hTabNextItem(bptable,&k)) 
+          bp = hTabNextItem(bptable,&k))
     {
 
         /* if this is a step then delete */
-        if (bp->bpType == NEXT) 
+        if (bp->bpType == NEXT)
         {
             hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
             Safe_free(bp);
@@ -202,7 +202,7 @@ void deleteUSERbp (int bpnum)
            point matches or bpnumber == -1 (meaning delete
            all user break points */
         if ((bp->bpType == USER || bp->bpType == TMPUSER )
-            && ( bp->bpnum == bpnum || bpnum == -1)) 
+            && ( bp->bpnum == bpnum || bpnum == -1))
         {
             hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
@@ -238,10 +238,10 @@ void setUserbpCommand (int bpnum, char *cmds)
                       bpnum, cmds));
 
     for ( bp = hTabFirstItem(bptable,&k); bp ;
-          bp = hTabNextItem(bptable,&k)) 
+          bp = hTabNextItem(bptable,&k))
     {
         if ((bp->bpType == USER || bp->bpType == TMPUSER )
-            && ( bp->bpnum == bpnum )) 
+            && ( bp->bpnum == bpnum ))
         {
             if ( bp->commands )
                 Safe_free(bp->commands);
@@ -263,10 +263,10 @@ void setUserbpCondition (int bpnum, char *cond)
                       bpnum, cond?cond:""));
 
     for ( bp = hTabFirstItem(bptable,&k); bp ;
-          bp = hTabNextItem(bptable,&k)) 
+          bp = hTabNextItem(bptable,&k))
     {
         if ((bp->bpType == USER || bp->bpType == TMPUSER )
-            && ( bp->bpnum == bpnum )) 
+            && ( bp->bpnum == bpnum ))
         {
             if ( bp->condition )
                 Safe_free(bp->condition);
@@ -288,10 +288,10 @@ void setUserbpIgnCount (int bpnum, int ignorecnt )
                       bpnum, ignorecnt));
 
     for ( bp = hTabFirstItem(bptable,&k); bp ;
-          bp = hTabNextItem(bptable,&k)) 
+          bp = hTabNextItem(bptable,&k))
     {
         if ((bp->bpType == USER || bp->bpType == TMPUSER )
-            && ( bp->bpnum == bpnum )) 
+            && ( bp->bpnum == bpnum ))
         {
             bp->ignoreCnt = bp->hitCnt + ignorecnt;
             return;
@@ -340,7 +340,7 @@ void listUSERbp ()
         if ( bp->hitCnt > 0 )
             fprintf(stdout,"\tbreakpoint already hit %d time%s\n",
                     bp->hitCnt,bp->hitCnt>1?"s":"" );
-        
+
 
     }
 }
@@ -367,13 +367,13 @@ void clearUSERbp ( unsigned int addr )
           bp = hTabNextItemWK(bptable)) {
 
         /* if this is a step then delete */
-        if (bp->bpType == USER || bp->bpType == TMPUSER) 
+        if (bp->bpType == USER || bp->bpType == TMPUSER)
         {
             hTabDeleteItem(&bptable,bp->addr,bp,DELETE_ITEM,NULL);
 
             /* if this leaves no other break points then
                send command to simulator to delete bp from this addr */
-            if (hTabSearch(bptable,bp->addr) == NULL) 
+            if (hTabSearch(bptable,bp->addr) == NULL)
             {
                 simClearBP(bp->addr);
             }
@@ -409,7 +409,7 @@ int dispatchCB (unsigned addr, context *ctxt)
     }
 
     /* dispatch the call back functions */
-    for (; bp; bp = hTabNextItemWK(bptable)) 
+    for (; bp; bp = hTabNextItemWK(bptable))
     {
         rv += (*bp->callBack)(addr,bp,ctxt);
     }
@@ -434,12 +434,12 @@ BP_CALLBACK(fentryCB)
     ctxt->func->stkaddr = simGetValue (0x81,'I',1);
 
     Dprintf(D_break, ("break: fentryCB: BP_CALLBACK entry %s sp=0x%02x %p\n",
-                      ctxt->func->sym->name, 
+                      ctxt->func->sym->name,
                       ctxt->func->stkaddr, p_callStack));
 
     /* and set laddr of calling function to return addr from stack */
     if ((func = STACK_PEEK(callStack)))
-    { 
+    {
         /* extern stack ?? 'A' */
         func->laddr = simGetValue (ctxt->func->stkaddr-1,'B',2);
     }
@@ -497,7 +497,7 @@ BP_CALLBACK(userBpCB)
         Dprintf(D_break, ("break: userBpCB: commands:%p\n", bp->commands));
         setCmdLine(bp->commands);
     }
-    
+
     if (srcMode == SRC_CMODE) {
         fprintf(stdout,"Breakpoint %d, %s() at %s:%d\n",
                 bp->bpnum,
@@ -524,7 +524,7 @@ BP_CALLBACK(userBpCB)
 
         /* if this leaves no other break points then
            send command to simulator to delete bp from this addr */
-        if (hTabSearch(bptable,bp->addr) == NULL) 
+        if (hTabSearch(bptable,bp->addr) == NULL)
         {
             simClearBP (bp->addr);
             Dprintf(D_break, ("break: simClearBP 0x%x\n", bp->addr));

@@ -4,6 +4,8 @@
 typedef struct {
   unsigned int isLibrarySource:1;
   int disable_df;
+  int stackLocation;
+  int stackSize;
 } pic14_options_t;
 
 extern pic14_options_t pic14_options;

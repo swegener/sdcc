@@ -800,6 +800,8 @@ void mapRegister(regs *reg)
 	
 	for(i=0; i<reg->size; i++) {
 		
+		assert(reg->address >= 0 && reg->address < maxRAMaddress);
+		
 		alias = finalMapping[reg->address].alias;
 		reg->alias = alias;
 		
@@ -1024,13 +1026,17 @@ int pic14_getHasSecondConfigReg(void)
  *-----------------------------------------------------------------*/
 int pic14_getSharebankSize(void)
 {
-	return 16;
+	if (pic14_options.stackSize <= 0) {
+		// default size: 16 bytes
+		return 16;
+	} else {
+		return pic14_options.stackSize;
+	}
 }
 
 /*-----------------------------------------------------------------*
  * Query the highest byte address occupied by the sharebank of the
  * selected device.
- * FIXME: Currently always returns 0x7f.
  * THINK: Might not be needed, if we assign all shareable objects to
  *        a `udata_shr' section and let the linker do the rest...
  * Tried it, but yields `no target memory available' for pic16f877...
@@ -1038,10 +1044,21 @@ int pic14_getSharebankSize(void)
 int pic14_getSharebankAddress(void)
 {
 	int sharebankAddress = 0x7f;
-	/* If total RAM is less than 0x7f as with 16f84 then reduce
-	 * sharebankAddress to fit */
-	if ((unsigned)sharebankAddress > pic14_getMaxRam())
-		sharebankAddress = (int)pic14_getMaxRam();
+	if (pic14_options.stackLocation != 0) {
+	    // permanent (?) workaround for pic16f84a-like devices with hardly
+	    // any memory:
+	    // 0x00-0x0B SFR
+	    // 0x0C-0x4F memory,
+	    // 0x50-0x7F unimplemented (reads as 0),
+	    // 0x80-0x8B SFRs (partly mapped to 0x0?)
+	    // 0x8c-0xCF mapped to 0x0C-0x4F
+	    sharebankAddress = pic14_options.stackLocation + pic14_getSharebankSize() - 1;
+	} else {
+	    /* If total RAM is less than 0x7f as with 16f84 then reduce
+	     * sharebankAddress to fit */
+	    if ((unsigned)sharebankAddress > pic14_getMaxRam())
+		    sharebankAddress = (int)pic14_getMaxRam();
+	}
 	return sharebankAddress;
 }
 

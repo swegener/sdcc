@@ -1,3 +1,12 @@
+2006-10-10 Raphael Neider <rneider AT web.de>
+
+	* src/pic/main.c (_pic14_parseOptions): added --stack-loc=NUM and
+	  --stack-siz=NUM options to configure the argument passing stack
+	* src/pic/main.h: added stackLocation and stackSize to pic14_options_t
+	* src/pic/device.c (mapRegister): catch out-of-memory SIGSEGVs,
+	  (pic14_getSharebankSize): obey --stack-siz=NUM,
+	  (pic14_getSharebankAddress): obey --stack-loc=NUM
+
 2006-10-08 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: added to the manual

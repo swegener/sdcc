@@ -12,6 +12,7 @@
 #include "SDCCmacro.h"
 #include "MySystem.h"
 #include "glue.h"
+#include <errno.h>
 //#include "gen.h"
 
 
@@ -51,10 +52,15 @@ static char *_pic14_keywords[] =
 
 pic14_options_t pic14_options;
 
+#define ARG_STACKLOC	"--stack-loc"
+#define ARG_STACKSIZ	"--stack-siz"
+
 extern int debug_verbose;	/* from pcode.c */
 static OPTION _pic14_poptions[] = {
 	{ 0 , "--debug-xtra", &debug_verbose, "show more debug info in assembly output" },
 	{ 0 , "--no-pcode-opt", &pic14_options.disable_df, "disable (slightly faulty) optimization on pCode" },
+	{ 0 , ARG_STACKLOC, &pic14_options.stackLocation, "sets the lowest address of the argument passing stack" },
+	{ 0 , ARG_STACKSIZ, &pic14_options.stackSize, "sets the size if the argument passing stack (default: 16, minimum: 4)" },
 	{ 0 , NULL, NULL, NULL }
 };
 
@@ -153,6 +159,7 @@ static bool
 _pic14_parseOptions (int *pargc, char **argv, int *i)
 {
 	char buf[128];
+	int len;
 	
 	/* TODO: allow port-specific command line options to specify
 	* segment names here.
@@ -169,6 +176,37 @@ _pic14_parseOptions (int *pargc, char **argv, int *i)
 			exit(EXIT_FAILURE);
 		} else {
 			udata_section_name = strdup( strchr(argv[*i], '=') + 1 );
+		}
+		return 1;
+	}
+
+	len = strlen(ARG_STACKLOC);
+	if (!strncmp(ARG_STACKLOC, argv[ *i ], len)) {
+		if (argv[*i][len] != '=' || argv[*i][len+1] == 0) {
+		    printf("ERROR: no number entered for %s=num\n", ARG_STACKLOC);
+		    exit(EXIT_FAILURE);
+		}
+		// extract number from "--stack-loc=0x70"
+		pic14_options.stackLocation = strtol(argv[ *i ] + len + 1, NULL, 0);
+
+		if (errno) {
+		    printf("ERROR: Could not parse number after %s=num\n", ARG_STACKLOC);
+		    exit(EXIT_FAILURE);
+		}
+		return 1;
+	}
+
+	len = strlen(ARG_STACKLOC);
+	if (!strncmp(ARG_STACKSIZ, argv[*i], len)) {
+		if (argv[*i][len] != '=' || argv[*i][len+1] == 0) {
+		    printf("ERROR: no number entered for %s=num\n", ARG_STACKSIZ);
+		    exit(EXIT_FAILURE);
+		}
+		// extract number from "--stack-size=16"
+		pic14_options.stackSize = strtol(argv[ *i ] + len + 1, NULL, 0);
+		if (errno) {
+		    printf("ERROR: Could not parse number after %s=num\n", ARG_STACKLOC);
+		    exit(EXIT_FAILURE);
 		}
 		return 1;
 	}

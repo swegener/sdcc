@@ -48,14 +48,21 @@
 
 #elif defined(pic18f2220)
 #  include <pic18f2220.h>
+
 #elif defined(pic18f2320)
 #  include <pic18f2220.h>	/* Yes, it's 2220.h */
 
 #elif defined(pic18f2455)
 #  include <pic18f2455.h>
 
+#elif defined(pic18f2525)
+#  include <pic18f2620.h>   /* just a 2620 core with less flash */
+
 #elif defined(pic18f2550)
 #  include <pic18f2550.h>
+
+#elif defined(pic18f2620)
+#  include <pic18f2620.h>
 
 #elif defined(pic18f4220)
 #  include <pic18f4220.h>
@@ -72,8 +79,14 @@
 #elif defined(pic18f4520)
 #  include <pic18f4520.h>
 
+#elif defined(pic18f4525)
+#  include <pic18f4620.h>   /* just a 4620 core with less flash */
+
 #elif defined(pic18f4550)
 #  include <pic18f4550.h>	/* Might use 2550.h */
+
+#elif defined(pic18f4620)
+#  include <pic18f4620.h>
 
 #elif defined(pic18f6520)
 #  include <pic18f6520.h>

@@ -5022,7 +5022,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 
           r = pic16_getRegFromInstruction(pc);
 //              fprintf(stderr, "%s:%d reg = %p\tname= %s, accessBank= %d\n",
-//                      __FUNCTION__, __LINE__, r, (r)?r->name:"<null>", (r)?r->accessBank:-1);
+//                      __FUNCTION__, __LINE__, r, (r)?r->name:"<null>", (r)?isACCESS_BANK(r):-1);
 
           if(PCI(pc)->isAccess) {
 	    static char *bank_spec[2][2] = {
@@ -5030,7 +5030,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 	      { ", B", ", BANKED" }/* MPASM (should) use BANKED by default */
 	    };
 	     
-	    SAFE_snprintf(&s,&size,"%s", bank_spec[(r && !r->accessBank) ? 1 : 0][pic16_mplab_comp ? 1 : 0]);
+	    SAFE_snprintf(&s,&size,"%s", bank_spec[(r && !isACCESS_BANK(r)) ? 1 : 0][pic16_mplab_comp ? 1 : 0]);
 	  }
         }
 //      

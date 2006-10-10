@@ -1,5 +1,16 @@
 2006-10-10 Raphael Neider <rneider AT web.de>
 
+	* src/pic16/pcode.c (pic16_pCode2str): use isACCESS_BANK macro
+	* src/pic16/devices.inc,
+	* device/include/pic16 (pic18f[24]620.h),
+	* device/include/pic18fregs.h,
+	* device/lib/pic16/pics.all,
+	* device/lib/pic16/libdev/pic18f[24]{620,525}.c): added support for
+	  18f2620, 18f4620, 18f2525, and 18f4525 devices, thanks to
+	  Gary Plumbridge and Anton Strobl
+
+2006-10-10 Raphael Neider <rneider AT web.de>
+
 	* src/pic/main.c (_pic14_parseOptions): added --stack-loc=NUM and
 	  --stack-siz=NUM options to configure the argument passing stack
 	* src/pic/main.h: added stackLocation and stackSize to pic14_options_t

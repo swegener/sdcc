@@ -1,3 +1,11 @@
+2006-10-10 Raphael Neider <rneider AT web.de>
+
+	* src/SDCCmain.c (optionsTable): accept --stack-size for PICs,
+	* src/pic/device.c (pic14_getSharebankSize,pic14_getSharebankAddress),
+	* src/pic/main.c (_pic14_parseOptions),
+	* src/pic/main.h: mostly reverted to previous state, now use results
+	    from SDCCmain.c's argument parsing
+
 2006-10-10 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/break.[ch], debugger/mcs51/cmd.c,
@@ -13,8 +21,8 @@
 	* device/include/pic18fregs.h,
 	* device/lib/pic16/pics.all,
 	* device/lib/pic16/libdev/pic18f[24]{620,525}.c): added support for
-	  18f2620, 18f4620, 18f2525, and 18f4525 devices, thanks to
-	  Gary Plumbridge and Anton Strobl
+	    18f2620, 18f4620, 18f2525, and 18f4525 devices, thanks to
+	    Gary Plumbridge and Anton Strobl
 
 2006-10-10 Raphael Neider <rneider AT web.de>
 

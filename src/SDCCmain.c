@@ -262,8 +262,10 @@ optionsTable[] = {
     { 0,    OPTION_STACK_LOC,       NULL, "<nnnn> Stack pointer initial value" },
     { 0,    OPTION_DATA_LOC,        NULL, "<nnnn> Direct data start location" },
     { 0,    OPTION_IDATA_LOC,       NULL, NULL },
+#if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51 || !OPT_DISABLE_PIC
+    { 0,    OPTION_STACK_SIZE,      NULL,"MCS51/DS390/PIC - Tells the linker to allocate this space for stack"},
+#endif
 #if !OPT_DISABLE_DS390 || !OPT_DISABLE_MCS51
-    { 0,    OPTION_STACK_SIZE,      NULL,"MCS51/DS390 - Tells the linker to allocate this space for stack"},
     { 0,    OPTION_PACK_IRAM,       NULL,"MCS51/DS390 - Tells the linker to pack variables in internal ram (default)"},
     { 0,    OPTION_NO_PACK_IRAM,    &options.no_pack_iram,"MCS51/DS390 - Tells the linker not to pack variables in internal ram"},
 #endif

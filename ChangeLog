@@ -1,3 +1,9 @@
+2006-10-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (checkSClass): no error for uninitialised absolute
+	  variables in code memory
+	* support/regression/tests/absolute.c: added test for this
+
 2006-10-15 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (InsertBankSel): suppress BANKSELs for one bank

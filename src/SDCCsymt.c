@@ -1587,6 +1587,7 @@ checkSClass (symbol * sym, int isProto)
         //!sym->level &&
         port->mem.code_ro &&
         !IS_EXTERN (sym->etype) &&
+        !SPEC_ABSA (sym->etype) &&
         !funcInChain (sym->type))
       werror (E_CODE_NO_INIT, sym->name);
   }

@@ -1,3 +1,10 @@
+2006-10-15 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (InsertBankSel): suppress BANKSELs for one bank
+	  devices,
+	  (BankSelect): emit BANKSEL before touching linker-placed regs,
+	  fixes #1570934
+
 2006-10-10 Raphael Neider <rneider AT web.de>
 
 	* src/SDCCmain.c (optionsTable): accept --stack-size for PICs,

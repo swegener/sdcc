@@ -4556,7 +4556,12 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 {
 	pCode *new_pc;
 	
-	pCodeOp *pcop = popCopyReg(PCOR(pci->pcop));
+	pCodeOp *pcop;
+
+	// This is a NOP for single-banked devices.
+	if (pic14_getMaxRam() < 0x80) return;
+	
+	pcop = popCopyReg(PCOR(pci->pcop));
 	pcop->type = PO_GPR_REGISTER; // Sometimes the type is set to legacy 8051 - so override it
 	if (pcop->name == 0)
 		pcop->name = strdup(name);
@@ -4609,11 +4614,7 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 	} else {
 		bank = 'L'; // Unfixed local registers are allocated by the linker therefore its bank is unknown
 	}
-	if ((cur_bank == 'L')&&(bank == 'L')) { // If current bank and new bank are both allocated locally by the linker, then assume it is in same bank.
-		return 'L'; // Local registers are presumed to be in same linker assigned bank
-	} else if ((bank == 'L')&&(cur_bank != 'L')) { // Reg is now local and linker to assign bank
-		insertBankSel(pci, reg->name); // Let linker choose the bank selection
-	} else if (bank == 'E') { // Reg is now extern and linker to assign bank
+	if (bank == 'E' || bank == 'L') { // Reg is now extern and linker to assign bank
 		insertBankSel(pci, reg->name); // Let linker choose the bank selection
 	} else if ((cur_bank == -1)||(cur_bank == 'L')||(cur_bank == 'E')) { // Current bank unknown and new register bank is known then can set bank bits
 		insertBankSwitch(pci, bank&1, PIC_RP0_BIT);

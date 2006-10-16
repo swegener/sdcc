@@ -16636,7 +16636,7 @@ status Collapsed
 \layout Standard
 
 The preprocessor SDCPP
-\begin_inset LatexCommand \index{SDCPP (preprocessor)}
+\begin_inset LatexCommand \index{sdcpp (preprocessor)}
 
 \end_inset 
 
@@ -25135,7 +25135,7 @@ Interfacing SDCC to Syn and Textpad
 
 \size footnotesize 
 
-\begin_inset LatexCommand \url{http://www.goalsemi.com/TB_%20Interfacing%20SDCC%20to%20Syn%20and%20Textpad.pdf}
+\begin_inset LatexCommand \url{http://www.ramtron.com/doc/Products/Microcontroller/Support_Tools.asp}
 
 \end_inset 
 
@@ -25172,7 +25172,7 @@ Installing and Configuring SDCC and Crimson Editor
 
 \size footnotesize 
 
-\begin_inset LatexCommand \url{http://www.ramtron.com/lib/mcusupporttools/TB100%20-%20How%20to%20Install%20and%20Configure%20the%20SDCC%20&%20Crimson%20Editor.pdf}
+\begin_inset LatexCommand \url{http://www.ramtron.com/doc/Products/Microcontroller/Support_Tools.asp}
 
 \end_inset 
 

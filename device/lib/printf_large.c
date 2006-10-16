@@ -53,6 +53,9 @@
 #ifdef tolower
 #undef tolower
 #endif
+#ifdef islower
+#undef islower
+#endif
 #ifdef isdigit
 #undef isdigit
 #endif
@@ -60,6 +63,7 @@
 //#define toupper(c) ((c)&=~0x20)
 #define toupper(c) ((c)&=0xDF)
 #define tolower(c) ((c)|=0x20)
+#define islower(c) ((unsigned char)c >= (unsigned char)'a' && (unsigned char)c <= (unsigned char)'z')
 #define isdigit(c) ((unsigned char)c >= (unsigned char)'0' && (unsigned char)c <= (unsigned char)'9')
 
 typedef union
@@ -467,11 +471,13 @@ get_conversion_spec:
         goto get_conversion_spec;
       }
 
-      lower_case = islower(c);
-      if (lower_case)
+      if (islower(c))
       {
         c = toupper(c);
+        lower_case = 1;
       }
+      else
+        lower_case = 0;
 
       switch( c )
       {
@@ -521,9 +527,10 @@ get_conversion_spec:
           }
         }
 
-        while ( *PTR  && (decimals-- > 0))
+        while ( (c = *PTR)  && (decimals-- > 0))
         {
-          OUTPUT_CHAR( *PTR++, p );
+          OUTPUT_CHAR( c, p );
+          PTR++;
         }
 
         if ( left_justify && (length < width))

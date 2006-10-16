@@ -1,3 +1,8 @@
+2006-10-16 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/printf_large.c: slightly smaller
+	* doc/sdccman.lyx: do not use spaces within html links
+
 2006-10-16 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, sdccconf_in.h, src/SDCCglobal,

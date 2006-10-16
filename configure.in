@@ -38,7 +38,6 @@ sdcc_cv_versionp=$VERSIONP
 # Required programs
 # ===========================================================================
 AC_PROG_CC
-AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_RANLIB
@@ -58,26 +57,7 @@ AC_DEFUN(SDCC_REQUIRE_PROG,
 SDCC_REQUIRE_PROG($YACC, bison)
 SDCC_REQUIRE_PROG($LEX, lex)
 
-AC_LANG([C])
-
-
-# Checking for header files.
-# ===========================================================================
-socket_type=unknown
-AC_CHECK_HEADERS(sys/socket.h, socket_type=sys_socket_h)
-if test $socket_type = unknown; then
-  AC_CHECK_HEADERS(winsock2.h, socket_type=winsock2_h)
-fi
-
-
-# Checking for functions/libs
-# ===========================================================================
-if test $socket_type = winsock2_h; then
-  LIBS="-lws2_32 $LIBS"
-else
-  AC_CHECK_LIB(socket,socket)
-  AC_CHECK_LIB(nsl,xdr_short)
-fi
+AC_LANG_C
 
 
 # Checking for functions
@@ -608,25 +588,20 @@ AC_DO_DISABLER(ucsim,      UCSIM,      [Disables configuring and building of ucs
 AC_DO_DISABLER(device-lib, DEVICE_LIB, [Disables building device libraries])
 AC_DO_DISABLER(packihx,    PACKIHX,    [Disables building packihx])
 AC_DO_DISABLER(sdcpp,      SDCPP,      [Disables building sdcpp])
+AC_DO_DISABLER(sdcdb,      SDCDB,      [Disables building sdcdb])
 
 AC_DO_ENABLER(doc,   DOC,   [Enables building the documentation])
 if test $OPT_ENABLE_DOC = 1; then
   AC_CHECK_PROG(LYX,        lyx,        lyx, :)
-#  AC_CHECK_PROG(LATEX,      latex,      latex, :)
   AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html, :)
   AC_CHECK_PROG(PDFLATEX,   pdflatex,   pdflatex, :)
   AC_CHECK_PROG(PDFOPT,     pdfopt,     pdfopt, :)
-#  AC_CHECK_PROG(DVIPDF,     dvipdf,     dvipdf, :)
-#  AC_CHECK_PROG(DVIPS,      dvips,      dvips, :)
   AC_CHECK_PROG(MAKEINDEX,  makeindex,  makeindex, :)
 
   SDCC_REQUIRE_PROG($LYX,        lyx)
-#  SDCC_REQUIRE_PROG($LATEX,      latex)
   SDCC_REQUIRE_PROG($LATEX2HTML, latex2html)
   SDCC_REQUIRE_PROG($PDFLATEX,   pdflatex)
   SDCC_REQUIRE_PROG($PDFOPT,     pdfopt)
-#  SDCC_REQUIRE_PROG($DVIPDF,     dvipdf)
-#  SDCC_REQUIRE_PROG($DVIPS,      dvips)
   SDCC_REQUIRE_PROG($MAKEINDEX,  makeindex)
 fi
 
@@ -649,6 +624,7 @@ mv ports ports.build
 test $OPT_DISABLE_SDCPP   = 0 && AC_CONFIG_SUBDIRS(support/cpp2)
 test $OPT_DISABLE_PACKIHX = 0 && AC_CONFIG_SUBDIRS(support/packihx)
 test $OPT_DISABLE_UCSIM   = 0 && AC_CONFIG_SUBDIRS(sim/ucsim)
+test $OPT_DISABLE_SDCDB   = 0 && AC_CONFIG_SUBDIRS(debugger/mcs51)
 AC_CONFIG_FILES([doc/Makefile])
 
 test $OPT_DISABLE_AVR = 0 && AC_CONFIG_FILES([src/avr/Makefile])
@@ -672,8 +648,7 @@ fi
 if test $OPT_DISABLE_MCS51 = 0; then
   AC_CONFIG_FILES([src/mcs51/Makefile
                    as/mcs51/Makefile
-                   as/link/mcs51/Makefile
-                   debugger/mcs51/Makefile])
+                   as/link/mcs51/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/mcs51/Makefile
                                                        device/lib/small/Makefile
                                                        device/lib/medium/Makefile
@@ -758,6 +733,7 @@ sdcc ${VERSION} is now configured for
   Disable ucsim:        ${OPT_DISABLE_UCSIM}
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}
   Disable sdcpp:        ${OPT_DISABLE_SDCPP}
+  Disable sdcdb:        ${OPT_DISABLE_SDCDB}
   Enable documentation: ${OPT_ENABLE_DOC}
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 

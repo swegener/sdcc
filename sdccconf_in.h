@@ -39,8 +39,6 @@
 #undef STD_DS400_LIB
 #undef STD_XA51_LIB
 
-#undef HAVE_SYS_SOCKET_H
-
 #undef HAVE_STRERROR
 #undef HAVE_VSNPRINTF
 #undef HAVE_SNPRINTF

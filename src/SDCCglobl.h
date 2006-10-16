@@ -18,18 +18,19 @@
 
 #define UNIX_DIR_SEPARATOR_CHAR    '/'
 
-#ifdef _WIN32       /* WIN32 native */
+#ifdef WIN32
+# define NATIVE_WIN32          1
+# ifndef __MINGW32__
+#   define  PATH_MAX  _MAX_PATH
+# endif
+#endif
 
-#  define NATIVE_WIN32          1
-#  ifdef __MINGW32__  /* GCC MINGW32 depends on configure */
-#    include "sdccconf.h"
-#  else
-#    include "sdcc_vc.h"
-#    define PATH_MAX  _MAX_PATH
-#  endif
-
-#else               /* Assume Un*x style system */
-#  include "sdccconf.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#elif defined(_WIN32) && !defined(__MINGW32__)
+# include "sdccc_vc.h"
+#else
+# include "sdccconf.h"
 #endif
 
 #include "SDCCerr.h"

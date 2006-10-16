@@ -27,10 +27,10 @@
 #include "break.h"
 #include "cmd.h"
 #include "newalloc.h"
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
 #include <readline/readline.h>
 #include <readline/history.h>
-#endif  /* HAVE_READLINE */
+#endif  /* HAVE_LIBREADLINE */
 
 #ifdef SDCDB_DEBUG
 int   sdcdbDebug = 0;
@@ -62,7 +62,7 @@ int lineno = 0;
 int fatalError = 0;
 
 static void commandLoop(FILE *cmdfile);
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
 char *completionCmdSource(const char *text, int state);
 char *completionCmdFile(const char *text, int state);
 char *completionCmdInfo(const char *text, int state);
@@ -86,18 +86,18 @@ char *completionCmdSetOption(const char *text, int state);
 #define completionCmdUnDisplay NULL
 #define completionCmdSetUserBp NULL
 #define completionCmdSetOption NULL
-#endif /* HAVE_READLINE */
+#endif /* HAVE_LIBREADLINE */
 
 /* command table */
 struct cmdtab
 {
     char      *cmd ;  /* command the user will enter */
     int (*cmdfunc)(char *,context *);   /* function to execute when command is entered */
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
     rl_compentry_func_t *completion_func;
 #else
     void *dummy;
-#endif  /* HAVE_READLINE */
+#endif  /* HAVE_LIBREADLINE */
     char *htxt ;    /* short help text */
 
 } cmdTab[] = {
@@ -250,11 +250,11 @@ char *trim_left(char *s)
 
 char *trim_right(char *s)
 {
-    char *p = &s[strlen(s)];
+    char *p = &s[strlen(s) - 1];
 
-    while (p > s && isspace(*--p))
-      ;
-    *p = '\0';
+    while (p >= s && isspace(*p))
+      --p;
+    *++p = '\0';
 
     return s;
 }
@@ -869,7 +869,7 @@ int interpretCmd (char *s)
     } else
         pcmd = strdup(s);
 
-    /* trim tailing blanks */
+    /* trim trailing blanks */
     s = trim_right(s);
 
     if (sim_cmd_mode) {
@@ -958,7 +958,7 @@ void stopCommandList()
     stopcmdlist = 1;
 }
 
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
 // helper function for doing readline completion.
 // input: toknum=index of token to find (0=first token)
 // output: *start=first character index of the token,
@@ -1419,7 +1419,7 @@ char *completionMain(const char *text, int state)
 
     return (*compl_func)(text,state);
 }
-#endif  /* HAVE_READLINE */
+#endif  /* HAVE_LIBREADLINE */
 
 /*-----------------------------------------------------------------*/
 /* commandLoop - the main command loop or loop over command file   */
@@ -1429,7 +1429,7 @@ static void commandLoop(FILE *cmdfile)
     char *line, save_ch, *s;
     char *line_read;
 
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
     FILE *old_rl_instream, *old_rl_outstream;
     actualcmdfile = cmdfile;
 
@@ -1497,7 +1497,7 @@ static void commandLoop(FILE *cmdfile)
         //        actualcmdfile,cmdfile);
         if (fgets(cmdbuff,sizeof(cmdbuff),cmdfile) == NULL)
             break;
-#endif  /* HAVE_READLINE */
+#endif  /* HAVE_LIBREADLINE */
 
           if (interpretCmd(cmdbuff))
               break;
@@ -1530,11 +1530,11 @@ static void commandLoop(FILE *cmdfile)
             }
         }
     }
-#ifdef HAVE_READLINE
+#ifdef HAVE_LIBREADLINE
     // restore readline's input/output streams
     rl_instream = old_rl_instream;
     rl_outstream = old_rl_outstream;
-#endif  /* HAVE_READLINE */
+#endif  /* HAVE_LIBREADLINE */
 }
 
 /*-----------------------------------------------------------------*/

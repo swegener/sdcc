@@ -2,11 +2,6 @@
 #
 #
 
-VERSION         = @VERSION@
-VERSIONHI       = @VERSIONHI@
-VERSIONLO       = @VERSIONLO@
-VERSIONP        = @VERSIONP@
-
 SHELL		= /bin/sh
 CC		= @CC@
 CPP		= @CPP@
@@ -14,8 +9,8 @@ INSTALL		= @INSTALL@
 STRIP           = @STRIP@
 
 
-top_builddir	= @top_builddir@
-top_srcdir	= @top_srcdir@
+top_builddir	= ../../
+top_srcdir	= @srcdir@/../..
 SLIB		= $(top_builddir)support/Util
 SDCCLIB		= $(top_builddir)src
 
@@ -34,14 +29,14 @@ man2dir         = $(mandir)/man2
 infodir         = @infodir@
 
 STD_INC		= @sdcc_include_dir@
-CPPFLAGS	= @CPPFLAGS@ -I$(top_builddir) -I$(top_srcdir) -I$(srcdir)/$(SLIB)
+CPPFLAGS	= @CPPFLAGS@ -I. -I$(top_builddir) -I$(top_srcdir) -I$(srcdir)/$(SLIB) -DHAVE_CONFIG_H
 CFLAGS		= @CFLAGS@
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
 
 EXEEXT          = @EXEEXT@
 
-LIBS            = @LIBS@
+LIBS            = @LIBS@ @LIBREADLINE@
 LIBDIRS         =
 
 OBJECTS		= sdcdb.o symtab.o simi.o \

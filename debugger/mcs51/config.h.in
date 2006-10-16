@@ -1,0 +1,20 @@
+/*
+ */
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+
+#undef DIR_SEPARATOR_STRING
+
+#undef DATADIR
+
+#undef LIB_DIR_SUFFIX
+
+#undef HAVE_SYS_SOCKET_H
+
+#undef HAVE_LIBREADLINE
+
+#endif
+
+/* End of config.h */

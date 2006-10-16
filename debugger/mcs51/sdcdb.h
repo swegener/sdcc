@@ -45,7 +45,7 @@ extern int sdcdbDebug;
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#include "sdccconf.h"
+#include "config.h"
 #include "src/SDCCset.h"
 #include "src/SDCChasht.h"
 

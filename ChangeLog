@@ -1,3 +1,8 @@
+2006-10-16 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (BankSelect): another fix on (partial) BANKSELs,
+	  fixes #1577882, removes close to all banking optimizations
+
 2006-10-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c (checkSClass): no error for uninitialised absolute

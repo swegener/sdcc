@@ -4541,6 +4541,7 @@ static void insertPCodeInstruction(pCodeInstruction *pci, pCodeInstruction *new_
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
+#if 0
 static void insertBankSwitch(pCodeInstruction *pci, int Set_Clear, int RP_BankBit)
 {
 	pCode *new_pc;
@@ -4549,7 +4550,7 @@ static void insertBankSwitch(pCodeInstruction *pci, int Set_Clear, int RP_BankBi
 	
 	insertPCodeInstruction(pci, PCI(new_pc));
 }
-
+#endif
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void insertBankSel(pCodeInstruction  *pci, const char *name)
@@ -4583,6 +4584,12 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 static int LastRegIdx = -1; /* If the previous register is the same one again then no need to change bank. */
 static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 {
+#if 1
+	/* Always insert BANKSELs rather than try to be clever:
+	 * Too many bugs in optimized banksels... */
+	insertBankSel(pci, reg->name); // Let linker choose the bank selection
+	return 'L';
+#else
 	int bank;
 	int a = reg->alias>>7;
 	if ((a&3) == 3) {
@@ -4607,6 +4614,8 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 	LastRegIdx = reg->rIdx;
 #endif
 	
+	/* Optimized code---unfortunately this turns out to be buggy
+	 * (at least on devices with more than two banks). */
 	if (reg->isFixed) {
 		bank = REG_BANK(reg);
 	} else if (reg->isExtern) {
@@ -4639,6 +4648,7 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 	}
 	
 	return bank;
+#endif
 }
 
 /*-----------------------------------------------------------------*/

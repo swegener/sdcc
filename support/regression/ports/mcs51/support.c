@@ -10,7 +10,7 @@ _sdcc_external_startup (void)
   TMOD = 0x21;  /* timer control mode, byte operation */
   TCON = 0;     /* timer control register, byte operation */
 
-  TH1  = 0xFA;  /* serial reload value, 9,600 baud at 11.0952Mhz */
+  TH1  = 0xFF;  /* serial reload value, 57,600 baud at 11.0592 MHz */
   TL1  = 0xFF;  /* reload asap */
   TR1  = 1;     /* start serial timer */
 

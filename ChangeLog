@@ -1,3 +1,9 @@
+2006-10-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/mcs51/support.c: use highest baudrate so the
+	  regression tests are not waiting in the simulator for simulated
+	  transmission of debug output
+
 2006-10-16 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/printf_large.c: slightly smaller

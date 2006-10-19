@@ -1,3 +1,22 @@
+2006-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/gbz80/crt0.s,
+	* device/lib/gbz80/crt0_rle.s,
+	* device/lib/gbz80/div.s,
+	* device/lib/gbz80/fstubs.s,
+	* device/lib/gbz80/heap.s,
+	* device/lib/gbz80/mul.s,
+	* device/lib/gbz80/putchar.s,
+	* device/lib/gbz80/stubs.s,
+	* device/lib/z80/crt0.s,
+	* device/lib/z80/crt0_rle.s,
+	* device/lib/z80/div.s,
+	* device/lib/z80/fstubs.s,
+	* device/lib/z80/heap.s,
+	* device/lib/z80/mul.s,
+	* device/lib/z80/putchar.s,
+	* device/lib/z80/stubs.s: removed all leading underscores from area names
+
 2006-10-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/mcs51/support.c: use highest baudrate so the

@@ -1,4 +1,4 @@
-        .area   _CODE
+        .area   CODE
 
         ;; Special RLE decoder used for initing global data
 __initrleblock::

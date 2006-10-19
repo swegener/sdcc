@@ -1,5 +1,5 @@
         ;; Stubs to match between function names
-        .area _CODE
+        .area CODE
 
         .globl  __mullong
         .globl  __modslong

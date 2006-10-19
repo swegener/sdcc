@@ -1,4 +1,4 @@
-        .area   _CODE
+        .area   CODE
 
         ;; Special RLE decoder used for initing global data
 __initrleblock::
@@ -42,4 +42,3 @@ __initrleblock::
         ;; Push the return address back onto the stack
         push    hl
         ret
-

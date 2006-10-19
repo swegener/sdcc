@@ -1,4 +1,4 @@
-	.area _CODE
+	.area CODE
 _putchar::       
 _putchar_rr_s:: 
         ld      hl,#2

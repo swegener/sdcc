@@ -1,5 +1,5 @@
         ;; Originally from GBDK by Pascal Felber.
-        .area   _CODE
+        .area   CODE
 
 __divschar_rrx_s::
         ld      hl,#2+1
@@ -329,7 +329,7 @@ __moduint_rrx_hds::
         or      a               ; Clear carry, valid result
         ret
 
-        .area   _BSS
+        .area   BSS
 
 .srem:
         .ds 0x01                ; Sign of quotient

@@ -1,7 +1,7 @@
 	;; Generic crt0.s for a GBZ80
 	.globl	_main
 
-	.area _HEADER (ABS)
+	.area HEADER (ABS)
 	;; Reset vector
 	.org 	0
 	jp	init
@@ -38,16 +38,16 @@ init:
 	jp	_exit
 
 	;; Ordering of segments for the linker.
-	.area	_HOME
-	.area	_CODE
-        .area   _GSINIT
-        .area   _GSFINAL
+	.area	HOME
+	.area	CODE
+        .area   GSINIT
+        .area   GSFINAL
         
-	.area	_DATA
-        .area   _BSS
-        .area   _HEAP
+	.area	DATA
+        .area   BSS
+        .area   HEAP
 
-        .area   _CODE
+        .area   CODE
 __clock::
 	ld	a,#2
 	rst	0x08
@@ -61,8 +61,8 @@ _exit::
 	halt
 	jr	1$
 
-        .area   _GSINIT
+        .area   GSINIT
 gsinit::	
 
-        .area   _GSFINAL
+        .area   GSFINAL
         ret

@@ -2567,7 +2567,7 @@ replace {
 	mov	%7,%15
 	mov	%8,%16
 	;	Peephole 238.a	removed 4 redundant moves
-} if operandsNotSame8 %1 %2 %3 %4 %5 %6 %7 %8
+} if operandsNotSame8(%1 %2 %3 %4 %5 %6 %7 %8), notVolatile(%1 %2 %3 %4 %9 %10 %11 %12)
 
 // applies to device/lib/log10f.c
 replace {
@@ -2585,7 +2585,7 @@ replace {
 	mov	%3,%7
 	mov	%4,%8
 	;	Peephole 238.b	removed 3 redundant moves
-} if operandsNotSame7 %1 %2 %3 %4 %5 %6 %7
+} if operandsNotSame7(%1 %2 %3 %4 %5 %6 %7), notVolatile(%1 %2 %3 %5 %6 %7)
 
 // applies to f.e. device/lib/time.c
 replace {
@@ -2604,7 +2604,7 @@ replace {
 	mov	%3,%7
 	mov	%4,%8
 	;	Peephole 238.c	removed 2 redundant moves
-} if operandsNotSame4 %1 %2 %3 %4
+} if operandsNotSame4(%1 %2 %3 %4), notVolatile(%1 %2 %5 %6)
 
 // applies to f.e. support/regression/tests/bug-524209.c
 replace {
@@ -2620,7 +2620,7 @@ replace {
 	mov	%2,%5
 	mov	%3,%6
 	;	Peephole 238.d	removed 3 redundant moves
-} if operandsNotSame6 %1 %2 %3 %4 %5 %6
+} if operandsNotSame6(%1 %2 %3 %4 %5 %6), notVolatile(%1 %2 %3 %4 %5 %6)
 
 // applies to f.e. ser_ir.asm
 replace {

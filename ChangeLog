@@ -1,5 +1,6 @@
-2006-10-16 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+2006-10-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
+	* src/mcs51/peeph.def: peephole 238.x added check for notvolatile
 	* support/regression/ports/mcs51/support.c: removed race 
 	condition on TI in _putchar allowing to use serial port mode 0	
 

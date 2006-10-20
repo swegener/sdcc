@@ -1,6 +1,6 @@
 	;; Originally from GBDK by Pascal Felber.
 
-	.area	CODE
+	.area	_CODE
 
 __mulschar_rrx_s::
         ld      hl,#2

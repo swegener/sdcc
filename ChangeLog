@@ -1,8 +1,27 @@
+2006-10-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/gbz80/crt0.s,
+	* device/lib/gbz80/crt0_rle.s,
+	* device/lib/gbz80/div.s,
+	* device/lib/gbz80/fstubs.s,
+	* device/lib/gbz80/heap.s,
+	* device/lib/gbz80/mul.s,
+	* device/lib/gbz80/putchar.s,
+	* device/lib/gbz80/stubs.s,
+	* device/lib/z80/crt0.s,
+	* device/lib/z80/crt0_rle.s,
+	* device/lib/z80/div.s,
+	* device/lib/z80/fstubs.s,
+	* device/lib/z80/heap.s,
+	* device/lib/z80/mul.s,
+	* device/lib/z80/putchar.s,
+	* device/lib/z80/stubs.s: reverted, I was mistaken
+
 2006-10-20 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: peephole 238.x added check for notvolatile
-	* support/regression/ports/mcs51/support.c: removed race 
-	condition on TI in _putchar allowing to use serial port mode 0	
+	* support/regression/ports/mcs51/support.c: removed race
+	condition on TI in _putchar allowing to use serial port mode 0
 
 2006-10-20 Borut Razem <borut.razem AT siol.net>
 

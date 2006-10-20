@@ -2,7 +2,7 @@
         .module crt0
        	.globl	_main
 
-	.area HEADER (ABS)
+	.area	_HEADER (ABS)
 	;; Reset vector
 	.org 	0
 	jp	init
@@ -21,11 +21,11 @@
 	reti
 	.org	0x38
 	reti
-	
+
 	.org	0x100
 init:
 	;; Stack at the top of memory.
-	ld	sp,#0xffff        
+	ld	sp,#0xffff
 
         ;; Initialise global variables
         call    gsinit
@@ -33,21 +33,21 @@ init:
 	jp	_exit
 
 	;; Ordering of segments for the linker.
-	.area	HOME
-	.area	CODE
-        .area   GSINIT
-        .area   GSFINAL
-        
-	.area	DATA
-        .area   BSS
-        .area   HEAP
+	.area	_HOME
+	.area	_CODE
+        .area   _GSINIT
+        .area   _GSFINAL
 
-        .area   CODE
+	.area	_DATA
+        .area   _BSS
+        .area   _HEAP
+
+        .area   _CODE
 __clock::
 	ld	a,#2
         rst     0x08
 	ret
-	
+
 _exit::
 	;; Exit - special code to the emulator
 	ld	a,#0
@@ -56,8 +56,8 @@ _exit::
 	halt
 	jr	1$
 
-        .area   GSINIT
-gsinit::	
+        .area   _GSINIT
+gsinit::
 
-        .area   GSFINAL
+        .area   _GSFINAL
         ret

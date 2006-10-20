@@ -1,6 +1,6 @@
-	;; Originally from GBDK by Pascal Felber.
+        ;; Originally from GBDK by Pascal Felber.
 
-	.area	CODE
+        .area   _CODE
 
 __mulschar_rrx_s::
         ld      hl,#2
@@ -60,21 +60,21 @@ __mulint_rrx_s::
 
 __muluchar_rrx_hds::
 __mulint_rrx_hds::
-	;; Parameters:
-	;;	HL, DE (left, right irrelivent)
-	ld	b,h
-	ld	c,l
+        ;; Parameters:
+        ;;      HL, DE (left, right irrelivent)
+        ld      b,h
+        ld      c,l
 
-	;; 16-bit multiplication
-	;;
-	;; Entry conditions
-	;;   BC = multiplicand
-	;;   DE = multiplier
-	;;
-	;; Exit conditions
-	;;   DE = less significant word of product
-	;;
-	;; Register used: AF,BC,DE,HL
+        ;; 16-bit multiplication
+        ;;
+        ;; Entry conditions
+        ;;   BC = multiplicand
+        ;;   DE = multiplier
+        ;;
+        ;; Exit conditions
+        ;;   DE = less significant word of product
+        ;;
+        ;; Register used: AF,BC,DE,HL
 .mul16:
         ld      hl,#0
         ld      a,b

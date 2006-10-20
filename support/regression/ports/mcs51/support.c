@@ -6,7 +6,7 @@ _sdcc_external_startup (void)
 {
   /* copied from device/examples/mcs51/simple2/hi.c */
   PCON = 0x80;  /* power control byte, set SMOD bit for serial port */
-  SCON = 0x40;  /* serial control byte, mode 1, RI _NOT_ active */
+  SCON = 0x00;  /* serial control byte, mode 0, RI _NOT_ active */
   TMOD = 0x21;  /* timer control mode, byte operation */
   TCON = 0;     /* timer control register, byte operation */
 
@@ -23,8 +23,8 @@ _putchar (char c)
 {
   while (!TI)
     ;
-  SBUF = c;
   TI = 0;
+  SBUF = c;
 }
 
 void

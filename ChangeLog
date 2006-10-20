@@ -1,3 +1,8 @@
+2006-10-16 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/ports/mcs51/support.c: removed race 
+	condition on TI in _putchar allowing to use serial port mode 0	
+
 2006-10-20 Borut Razem <borut.razem AT siol.net>
 
 	* sebugger/mcs51/sdcdb.c: replaced isblank() with isspace()

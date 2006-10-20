@@ -977,12 +977,12 @@ int completionHelper_GetTokenNumber(int toknum, int *start, int *end)
     {
         // start = skip blanks from end
         *start = *end;
-        while (p[*start] && isblank( p[*start] ))
+        while (p[*start] && isspace( p[*start] ))
             (*start)++;
 
         // end = skip non-blanks from start
         *end = *start;
-        while (p[*end] && !isblank( p[*end] ))
+        while (p[*end] && !isspace( p[*end] ))
             (*end)++;
 
         if (tok_index == toknum)
@@ -1051,14 +1051,14 @@ char *completionCommandsList(const char *text, int state)
         char *p = rl_line_buffer;
 
         // skip blanks
-        while (p && isblank(*p))
+        while (p && isspace(*p))
         {
             if (p-rl_line_buffer == rl_point)
                 ok = 1;
             p++;
         }
 
-        while (p && !isblank(*p))
+        while (p && !isspace(*p))
         {
             if (p-rl_line_buffer == rl_point)
                 ok = 1;

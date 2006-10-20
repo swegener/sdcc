@@ -1,3 +1,7 @@
+2006-10-20 Borut Razem <borut.razem AT siol.net>
+
+	* sebugger/mcs51/sdcdb.c: replaced isblank() with isspace()
+
 2006-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/gbz80/crt0.s,

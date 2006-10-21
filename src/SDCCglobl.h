@@ -28,7 +28,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #elif defined(_WIN32) && !defined(__MINGW32__)
-# include "sdccc_vc.h"
+# include "sdcc_vc.h"
 #else
 # include "sdccconf.h"
 #endif

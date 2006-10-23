@@ -1,6 +1,10 @@
+2006-10-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (movc): improved check for 0 and 1, see RFE 1582704
+
 2006-10-23 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
-	* support/regression/ports/mcs51/support.c: smaller 
+	* support/regression/ports/mcs51/support.c: smaller
 	_sdcc_external_startup()
 	* device/lib/mcs51/crtxclear.asm: don't check high byte of l_PSEG
 

@@ -244,9 +244,9 @@ movb (const char *x)
 static void
 movc (const char *s)
 {
-  if (s == zero)
+  if (!strcmp (s, zero))
     CLRC;
-  else if (s == one)
+  else if (!strcmp (s, one))
     SETC;
   else if (strcmp (s, "c"))
     {/* it's not in carry already */

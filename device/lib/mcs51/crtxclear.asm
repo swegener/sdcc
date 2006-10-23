@@ -36,7 +36,6 @@
 __mcs51_genXRAMCLEAR::
 	mov	r0,#l_PSEG
 	mov	a,r0
-	orl	a,#(l_PSEG >> 8)
 	jz	00005$
 	mov	r1,#s_PSEG
 	mov	__XPAGE,#(s_PSEG >> 8)

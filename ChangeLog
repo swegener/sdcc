@@ -1,3 +1,9 @@
+2006-10-23 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/ports/mcs51/support.c: smaller 
+	_sdcc_external_startup()
+	* device/lib/mcs51/crtxclear.asm: don't check high byte of l_PSEG
+
 2006-10-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/gbz80/crt0.s,

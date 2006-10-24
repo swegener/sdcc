@@ -1,3 +1,7 @@
+2006-10-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/main.c (_process_pragma, _parseOptions): fixed bug 1583318
+
 2006-10-24 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/lib/serial_io.c: Default putchar() and getchar() for

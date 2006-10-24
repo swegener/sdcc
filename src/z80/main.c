@@ -186,6 +186,7 @@ _process_pragma (const char *sz)
     }
     gbz80_port.mem.code_name = Safe_strdup (buffer);
     code->sname = gbz80_port.mem.code_name;
+    options.code_seg = gbz80_port.mem.code_name;
     return 0;
   }
   else if( startsWith( sz, "portmode=" ) || startsWith( sz, "portmode " ))
@@ -272,6 +273,7 @@ _parseOptions (int *pargc, char **argv, int *i)
 	      /* ROM bank */
 	      sprintf (buffer, "CODE_%u", bank);
 	      gbz80_port.mem.code_name = Safe_strdup (buffer);
+	      options.code_seg = gbz80_port.mem.code_name;
 	      return TRUE;
 	    case 'a':
 	      /* RAM bank */

@@ -44,6 +44,7 @@ malloc
 realloc
 free
 serial
+serial_io
 _autobaud
 _startup
 _ser

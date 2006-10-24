@@ -69,7 +69,7 @@ OPT_DISABLE_Z80   = @OPT_DISABLE_Z80@
 SOURCES =	_autobaud.c _bp.c _decdptr.c \
 		_gptrget.c _gptrgetc.c _gptrput.c \
 		_ser.c _setjmp.c \
-		serial.c ser_ir.c \
+		serial.c serial_io.c ser_ir.c \
 		_atof.c _atoi.c _atol.c _itoa.c _ltoa.c \
 		_schar2fs.c _sint2fs.c _slong2fs.c \
 		_uchar2fs.c _uint2fs.c _ulong2fs.c \

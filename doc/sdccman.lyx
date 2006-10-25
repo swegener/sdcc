@@ -212,7 +212,7 @@ Supported data-types are:
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<column alignment="block" valignment="top" leftline="true" rightline="true" width="20text%">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -461,7 +461,7 @@ signed
 
 \layout Standard
 
-0, +4.294.967.296
+0, +4.294.967.295
 \end_inset 
 </cell>
 </row>
@@ -502,6 +502,16 @@ signed
 
 \layout Standard
 
+1.175494351E-38, 
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+3.402823466E+38
 \end_inset 
 </cell>
 </row>
@@ -11490,7 +11500,7 @@ interrupt
 main
 \emph default 
 .
- The optional 
+ The optional (8051 specific) keyword 
 \emph on 
 using
 \begin_inset LatexCommand \index{using (mcs51, ds390 register bank)}
@@ -11504,15 +11514,23 @@ using
 
 
 \emph default 
- keyword can be used to tell the compiler to use the specified register
- bank (8051 specific) when generating code for this function.
+ can be used to tell the compiler to use the specified register bank when
+ generating code for this function.
  
 \newline 
+Interrupt service routines open the door for some very interesting bugs:
+\layout Subsubsection
 
+
+\begin_inset LatexCommand \label{sub:Common-interrupt-pitfall-volatile}
+
+\end_inset 
+
+Common interrupt pitfall: variable not declared 
+\emph on 
+volatile
 \layout Standard
 
-Interrupt service routines open the door for some very interesting bugs:
-\newline 
 If an interrupt service routine changes variables which are accessed by
  other functions these variables have to be declared 
 \emph on 
@@ -11524,7 +11542,22 @@ volatile
 \end_inset 
 
 .
- 
+ See 
+\begin_inset LatexCommand \url{http://en.wikipedia.org/wiki/Volatile_variable}
+
+\end_inset 
+
+ .
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{sub:Common-interrupt-pitfall-non-atomic}
+
+\end_inset 
+
+Common interrupt pitfall: 
+\emph on 
+non-atomic access
 \layout Standard
 
 If the access to these variables is not 
@@ -11540,8 +11573,10 @@ atomic
  the processor needs more than one instruction for the access and could
  be interrupted while accessing the variable) the interrupt must be disabled
  during the access to avoid inconsistent data.
- Access to 16 or 32 bit variables is obviously not atomic on 8 bit CPUs
- and should be protected by disabling interrupts.
+ 
+\newline 
+Access to 16 or 32 bit variables is obviously not atomic on 8 bit CPUs and
+ should be protected by disabling interrupts.
  You're not automatically on the safe side if you use 8 bit variables though.
  We need an example here: f.e.
  on the 8051 the harmless looking 
@@ -11598,8 +11633,19 @@ counter\SpecialChar ~
 counter
 \family default 
  is located in data memory.
- Bugs like these are hard to reproduce and can cause a lot of trouble.
+\newline 
+Bugs like these are hard to reproduce and can cause a lot of trouble.
  
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{sub:Common-interrupt-pitfall-stack-overflow}
+
+\end_inset 
+
+Common interrupt pitfall: 
+\emph on 
+stack overflow
 \layout Standard
 
 The return address and the registers used in the interrupt service routine
@@ -11630,6 +11676,16 @@ deepest
 
  subroutine when the stack is already in use for f.e.
  many return addresses.
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{sub:Common-interrupt-pitfall-non-reentrant}
+
+\end_inset 
+
+Common interrupt pitfall: 
+\emph on 
+use of non-reentrant functions
 \layout Standard
 
 A special note here, int (16 bit) and long (32 bit) integer division
@@ -11652,8 +11708,7 @@ A special note here, int (16 bit) and long (32 bit) integer division
 
 \end_inset 
 
- operations are implemented using external support routines developed in
- ANSI-C.
+ operations are implemented using external support routines.
  If an interrupt service routine needs to do any of these operations then
  the support routines (as mentioned in a following section) will have to
  be recompiled using the
@@ -11695,14 +11750,37 @@ status Collapsed
 \end_inset 
 
  compiler option.
- Note, the type promotion
+ 
+\newline 
+Note, the type promotion
 \begin_inset LatexCommand \index{type promotion}
 
 \end_inset 
 
- required by ANSI C can cause 16 bit routines to be used without the programmer
- being aware of it.
- 
+ required by ANSI C can cause 16 bit routines to be used
+\begin_inset Marginal
+collapsed true
+
+\layout Standard
+
+
+\series bold 
+\SpecialChar ~
+!
+\end_inset 
+
+ without the programmer being aware of it.
+ See f.e.
+ the cast 
+\family typewriter 
+(unsigned char)(tail-1)
+\family default 
+ within the if clause in section 
+\begin_inset LatexCommand \ref{sub:A-Step-by Assembler Introduction}
+
+\end_inset 
+
+.
 \layout Standard
 \added_space_bottom bigskip 
 Calling other functions from an interrupt service routine is not recommended,
@@ -11725,9 +11803,7 @@ nooverlay
 \emph default 
  if all parameters are passed in registers.
 \newline 
-
-\newline 
-Also see section 
+ Also see section 
 \begin_inset LatexCommand \ref{sub:Overlaying}
 
 \end_inset 
@@ -12941,7 +13017,85 @@ unsigned char __far
 
 
 \newline 
-unsigned char head, tail;
+unsigned char head, tail;\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+/* if interrupts
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ are involved see
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+section 
+\begin_inset LatexCommand \ref{sub:Common-interrupt-pitfall-volatile}
+
+\end_inset 
+
+ about
+\series bold 
+ volatile
+\series default 
+ */
 \newline 
 
 \newline 
@@ -18481,8 +18635,12 @@ NO_REG_OPT do not perform pCode registers optimization.
 Preprocessor Macros
 \layout Standard
 
-PIC16 port defines the following preprocessor macros while translating a
- source.
+PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port defines the following preprocessor macros while translating a source.
 \layout Standard
 \align center 
 
@@ -18863,7 +19021,12 @@ Pragmas
 
 \layout Standard
 
-PIC16 port currently supports the following pragmas:
+PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port currently supports the following pragmas:
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -19310,7 +19473,12 @@ There is one main header file
 
 \end_inset 
 
- that can be included to the source files using the pic16 port.
+ that can be included to the source files using the pic16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port.
  That file is the 
 \series bold 
 pic18fregs.h
@@ -19723,8 +19891,12 @@ These limitations are caused by the fact that only FSRxL is modified when
 Functions
 \layout Standard
 
-In addition to the standard SDCC function keywords, PIC16 port makes available
- two more:
+In addition to the standard SDCC function keywords, PIC16
+\begin_inset LatexCommand \index{PIC16}
+
+\end_inset 
+
+ port makes available two more:
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -23346,6 +23518,12 @@ volatile
  The compilers might differ in their optimization characteristics (as different
  versions of the same compiler might also use more clever optimizations
  this is good idea anyway).
+ See section 
+\begin_inset LatexCommand \ref{sub:Common-interrupt-pitfall-volatile}
+
+\end_inset 
+
+.
 \layout Itemize
 
 check that the compilers are not told to supress warnings.

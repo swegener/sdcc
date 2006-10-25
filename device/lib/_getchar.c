@@ -1,4 +1,4 @@
-/* Default putchar and getchar to the serial port
+/* Default getchar() using the serial port
 
    Written By -  Jesus Calvino-Fraga (October/2006)
 
@@ -20,38 +20,14 @@
 #ifdef SDCC_mcs51
 #include <8051.h>
 
-bit serial_init_flag=0;
-
-void init_serial (void)
-{
-	TR1=0;
-	TMOD=(TMOD&0x0f)|0x20;
-	PCON|=0x80;
-	TH1=TL1=0xff; //115200 baud with a 22MHz crystal 
-	TR1=1;
-	SCON=0x52;
-	serial_init_flag=1;
-}
-
-void putchar (char c)
-{
-	if(!serial_init_flag) init_serial();
-	if (c=='\n')
-	{
-		while (!TI);
-		TI=0;
-		SBUF='\r';
-	}
-	while (!TI);
-	TI=0;
-	SBUF=c;
-}
+extern bit uart_init_flag;
+void inituart(unsigned char t1_reload);
 
 char getchar (void)
 {
 	char c;
 	
-	if(!serial_init_flag) init_serial();
+	if(!uart_init_flag) inituart(0xff);
 
 	while (!RI);
 	RI=0;

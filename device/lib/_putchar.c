@@ -20,13 +20,13 @@
 #ifdef SDCC_mcs51
 #include <8051.h>
 
-extern bit uart_init_flag;
+bit putchar_crlf=0;
 void inituart(unsigned char t1_reload);
 
 void putchar (char c)
 {
-	if(!uart_init_flag) inituart(0xff);
-	if (c=='\n')
+	if((!SM0)&&(!SM1)) inituart(0xff);
+	if ((c=='\n') && putchar_crlf)
 	{
 		while (!TI);
 		TI=0;

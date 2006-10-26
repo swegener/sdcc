@@ -1,3 +1,9 @@
+2006-10-24 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/lib/_putchar.c, device/lib/_getchar.c, device/lib/inituart.c:
+	Initialize uart only if SM0 and SM1 are zero.  Also, use flag to turn
+	on/off CR to CRLF conversion.  
+
 2006-10-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: updated IRQ section

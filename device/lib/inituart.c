@@ -20,8 +20,6 @@
 #ifdef SDCC_mcs51
 #include <8051.h>
 
-bit uart_init_flag=0;
-
 void inituart (unsigned char t1_reload)
 {
 	TR1=0;
@@ -30,7 +28,6 @@ void inituart (unsigned char t1_reload)
 	TH1=TL1=t1_reload;
 	TR1=1;
 	SCON=0x52;
-	uart_init_flag=1;
 }
 
 #endif

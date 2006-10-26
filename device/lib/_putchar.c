@@ -20,7 +20,7 @@
 #ifdef SDCC_mcs51
 #include <8051.h>
 
-bit putchar_crlf=0;
+bit putchar_crlf=1;
 void inituart(unsigned char t1_reload);
 
 void putchar (char c)

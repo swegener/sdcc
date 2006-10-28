@@ -343,22 +343,20 @@ static regs *regWithIdx (set *dRegs, int idx, int fixed);
 static regs* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int size, int alias)
 {
 	
-	regs *dReg;
+	regs *dReg, *reg_alias;
 
 	/* check whether a matching register already exists */
 	dReg = dirregWithName( name );
 	if (dReg) {
-	  //printf( "%s: already present: %s\n", __FUNCTION__, name );
-	  return (dReg);
-	}
-	dReg = regWithIdx( dynDirectRegs, rIdx, 0 );
-	if (!dReg) dReg = regWithIdx( dynDirectRegs, rIdx, 1 );
-	if (dReg)
-	{
-	  //printf(  "%s: already present %s (idx:%d/%x)", __FUNCTION__, name, rIdx, rIdx );
-	  return (dReg);
+		//printf( "%s: already present: %s\n", __FUNCTION__, name );
+		return (dReg);
 	}
 	
+	// check whether a register at that location exists
+	reg_alias = regWithIdx( dynDirectRegs, rIdx, 0 );
+	if (!reg_alias) reg_alias = regWithIdx( dynDirectRegs, rIdx, 1 );
+	
+	// create a new register
 	dReg = Safe_calloc(1,sizeof(regs));
 	dReg->type = type;
 	dReg->pc_type = pc_type;
@@ -383,18 +381,12 @@ static regs* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int si
 	dReg->address = 0;
 	dReg->size = size;
 	dReg->alias = alias;
-	dReg->reg_alias = NULL;
+	dReg->reg_alias = reg_alias;
 	dReg->reglives.usedpFlows = newSet();
 	dReg->reglives.assignedpFlows = newSet();
-	
 	hTabAddItem(&dynDirectRegNames, regname2key(dReg->name), dReg);
-#ifdef __GNUC__
-	debugLog( "%s: Created register %s (%p).\n",
-		__FUNCTION__, dReg->name, __builtin_return_address(0) );
-#else
-	debugLog( "%s: Created register %s.\n",
-		__FUNCTION__, dReg->name);
-#endif
+	debugLog( "%s: Created register %s.\n", __FUNCTION__, dReg->name);
+	
 	return dReg;
 }
 
@@ -410,6 +402,7 @@ regWithIdx (set *dRegs, int idx, int fixed)
 	dReg = setNextItem(dRegs)) {
 		
 		if(idx == dReg->rIdx && (fixed == (int)dReg->isFixed)) {
+			while (dReg->reg_alias) dReg = dReg->reg_alias;
 			return dReg;
 		}
 	}
@@ -590,6 +583,8 @@ dirregWithName (char *name)
 	while(reg) {
 		
 		if(STRCASECMP(reg->name, name) == 0) {
+			// handle registers with multiple names
+			while (reg->reg_alias) reg = reg->reg_alias;
 			return(reg);
 		}
 		

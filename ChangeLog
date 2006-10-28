@@ -1,3 +1,13 @@
+2006-10-29 Raphael Neider <rneider AT web.de>
+
+	* src/pic/ralloc.c (newReg): create aliases for registers with
+	  multiple names to fix #1579535 and #1584001,
+	  (regWithIdx,dirregWithName): resolve aliases on lookup
+	* src/pic/pcode.c (DoBankSelect): die with error message on failing
+	  bankselect
+	* device/lib/pic/libdev/Makefile.in: move pseudo stack down to 0x4f
+	  to prevent build errors on small devices
+
 2006-10-28 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (genFunction,genCall): drop "same code page"

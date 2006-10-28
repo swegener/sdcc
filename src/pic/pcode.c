@@ -4755,6 +4755,11 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 	}
 	
 	reg = getRegFromInstruction(pc);
+	if (!reg && isPCI(pc) &&
+		((PCI(pc)->inCond | PCI(pc)->outCond) & PCC_REGISTER))
+	{
+	    assert(!"Could not get register from instruction.");
+	}
 	if (reg) {
 		if (IsBankChange(pc,reg,&cur_bank))
 			return cur_bank;

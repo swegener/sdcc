@@ -69,6 +69,7 @@ for the next function.
 */
 static int max_key=0;
 static int GpsuedoStkPtr=0;
+static int pic14_inISR = 0;
 
 pCodeOp *popGetImmd(char *name, unsigned int offset, int index,int is_func);
 extern char *get_op( pCodeOp *pcop,char *buff,size_t buf_size);
@@ -2690,13 +2691,18 @@ static void genCall (iCode *ic)
 	/* make the call */
 	sym = OP_SYMBOL(IC_LEFT(ic));
 	name = sym->rname[0] ? sym->rname : sym->name;
-	isExtern = IS_EXTERN(sym->etype);
+	isExtern = IS_EXTERN(sym->etype) || pic14_inISR;
 	if (isExtern) {
-		emitpcode(POC_PAGESEL,popGetWithString(name,1)); /* Extern functions maybe on another page - must call pagesel */
+		/* Extern functions and ISRs maybe on a different page;
+		 * must call pagesel */
+		emitpcode(POC_PAGESEL,popGetWithString(name,1));
 	}
 	emitpcode(POC_CALL,popGetWithString(name,isExtern));
 	if (isExtern) {
-		emitpcode(POC_PAGESEL,popGetWithString("$",0)); /* May have returned from another page - must call pagesel to restore PCLATH before next goto or call instruction */
+		/* May have returned from a different page;
+		 * must use pagesel to restore PCLATH before next
+		 * goto or call instruction */
+		emitpcode(POC_PAGESEL,popGetWithString("$",0));
 	}
 	GpsuedoStkPtr=0;
 	/* if we need assign a result value */
@@ -2932,7 +2938,9 @@ static void genFunction (iCode *ic)
 #endif
 	
 	/* if this is an interrupt service routine */
+	pic14_inISR = 0;
 	if (IFFUNC_ISISR(sym->type)) {
+		pic14_inISR = 1;
 	/*  already done in pic14createInterruptVect() - delete me
 	addpCode2pBlock(pb,newpCode(POC_GOTO,newpCodeOp("END_OF_INTERRUPT+1",PO_STR)));
 	emitpcodeNULLop(POC_NOP);

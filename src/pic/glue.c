@@ -301,6 +301,8 @@ pic14_constructAbsMap (FILE *ofile)
 	if (getSize(sym->type) > size) {
 	  size = getSize(sym->type);
 	}
+	addSet (&symbolsEmitted, (void *) sym->name);
+	addSet (&symbolsEmitted, (void *) sym->rname);
       } // for
       fprintf (ofile, "\tres\t%d\n", size);
     } // if

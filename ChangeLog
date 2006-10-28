@@ -1,3 +1,10 @@
+2006-10-28 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (genFunction,genCall): drop "same code page"
+	  assumption within interrupt handlers, fixes #1584940
+	* src/pic/glue.c (pic14_constructAbsMap): mark absolute symbols as
+	  "emitted" to avoid emitting them again in udata
+
 2006-10-27 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/lib/_putchar.c, device/lib/_getchar.c, device/lib/inituart.c:

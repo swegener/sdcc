@@ -1,4 +1,9 @@
-2006-10-24 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+2006-10-27 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/lib/_putchar.c, device/lib/_getchar.c, device/lib/inituart.c:
+	Removed.
+ 
+2006-10-26 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/lib/_putchar.c, device/lib/_getchar.c, device/lib/inituart.c:
 	Initialize uart only if SM0 and SM1 are zero.  Also, use flag to turn

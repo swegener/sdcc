@@ -44,9 +44,6 @@ malloc
 realloc
 free
 serial
-inituart
-_putchar
-_getchar
 _autobaud
 _startup
 _ser

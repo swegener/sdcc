@@ -108,6 +108,7 @@ newhead()
 	 */
 	lkparea(_abs_);
 	ap->a_flag = A_ABS;
+    axp->a_addr = 0;
 }
 
 /*)Function	VOID	module()

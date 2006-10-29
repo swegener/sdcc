@@ -21,7 +21,7 @@ SDCC_PACKIHX	= support/packihx
 SDCC_LIBRARIAN	= support/librarian
 
 ifeq ($(OPT_DISABLE_HC08), 0)
-SDCC_ASLINK     += as/hc08
+SDCC_ASLINK     += as/hc08 as/link/hc08
 endif
 
 ifeq ($(OPT_DISABLE_MCS51), 0)

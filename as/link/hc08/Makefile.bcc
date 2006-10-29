@@ -1,0 +1,20 @@
+# Makefile for Borland C++
+
+PRJDIR          = ../..
+
+!include $(PRJDIR)/Bcc.inc
+
+LKOBJECTS       = lkmain.obj lkarea.obj lkdata.obj \
+                  lkrloc.obj \
+                  lklibr.obj lkihx.obj lks19.obj \
+                  lkmem.obj lkaomf51.obj \
+                  ../lkeval.obj ../lkhead.obj ../lklex.obj ../lklist.obj \
+                  ../lknoice.obj ../lkstore.obj ../lksym.obj \
+                  ../../strcmpi.obj
+
+ASLINK          = $(PRJDIR)/bin/aslink.exe
+
+all: $(ASLINK)
+
+$(ASLINK): $(LKOBJECTS)
+        $(CC) $(CFLAGS) -e$@ $(LKOBJECTS)

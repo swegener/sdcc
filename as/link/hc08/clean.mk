@@ -5,7 +5,7 @@ include $(top_builddir)Makefile.common
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(top_builddir)bin/as-hc08$(EXEEXT) as-hc08$(EXEEXT)
+	rm -f $(top_builddir)bin/link-hc08$(EXEEXT) link-hc08$(EXEEXT)
 
 
 # Deleting all files created by configuring or building the program

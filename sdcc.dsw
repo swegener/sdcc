@@ -228,7 +228,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "link_hc08"=.\as\hc08\link_hc08.dsp - Package Owner=<4>
+Project: "link_hc08"=.\as\link\hc08\link_hc08.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

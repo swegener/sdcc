@@ -111,7 +111,7 @@ void Areas51 (void)
  *
  *	The function main() evaluates the command line arguments to
  *	determine if the linker parameters are to input through 'stdin'
- *	or read from a command file.  The functions as_getline() and parse()
+ *	or read from a command file.  The functions lk_getline() and parse()
  *	are to input and evaluate the linker parameters.  The linking process
  *	proceeds by making the first pass through each .rel file in the order
  *	presented to the linker.  At the end of the first pass the setbase(),
@@ -165,7 +165,7 @@ void Areas51 (void)
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		int	as_getline()	lklex.c
+ *		int	lk_getline()	lklex.c
  *		VOID	library()	lklibr.c
  *		VOID	link_main()	lkmain.c
  *		VOID	lkexit()	lkmain.c
@@ -188,8 +188,7 @@ void Areas51 (void)
  */
 
 int
-main(argc, argv)
-char *argv[];
+main(int argc, char *argv[])
 {
 	register char *p;
 	register int c, i;
@@ -247,7 +246,7 @@ char *argv[];
 	filep = startp;
 	while (1) {
 		ip = ib;
-		if (as_getline() == 0)
+		if (lk_getline() == 0)
 			break;
 		if (pflag && sfp != stdin)
 			fprintf(stdout, "%s\n", ip);
@@ -282,7 +281,7 @@ char *argv[];
 		
 		Areas51(); /*JCF: Create the default 8051 areas in the right order*/
 
-		while (as_getline()) {
+		while (lk_getline()) {
 			ip = ib;
 
                         /* pass any "magic comments" to NoICE output */
@@ -406,8 +405,7 @@ char *argv[];
  */
 
 VOID
-lkexit(i)
-int i;
+lkexit(int i)
 {
 	if (mfp != NULL) fclose(mfp);
 	if (jfp != NULL) fclose(jfp);
@@ -461,7 +459,7 @@ int i;
 VOID
 link_main()
 {
-	register int c;
+	register char c;
 
 	if ((c=endline()) == 0) { return; }
 	switch (c) {
@@ -945,7 +943,7 @@ bassav()
 
 /*)Function	VOID	setbas()
  *
- *	The function setbas() scans the base address lines in hte
+ *	The function setbas() scans the base address lines in the
  *	basep structure, evaluates the arguments, and sets beginning
  *	address of the specified areas.
  *
@@ -1056,7 +1054,7 @@ gblsav()
 	
 /*)Function	VOID	setgbl()
  *
- *	The function setgbl() scans the global variable lines in hte
+ *	The function setgbl() scans the global variable lines in the
  *	globlp structure, evaluates the arguments, and sets a variable
  *	to this value.
  *
@@ -1158,9 +1156,7 @@ setgbl()
  */
 
 FILE *
-afile(fn, ft, wf)
-char *fn;
-char *ft;
+afile(char *fn, char *ft, int wf)
 {
 	FILE *fp;
 	char fb[PATH_MAX];
@@ -1239,7 +1235,6 @@ iramsav()
 {
   unget(getnb());
   if (ip && *ip)
-    //iram_size = atoi(ip);
     iram_size = expr(0);	/* evaluate size expression */
   else
     iram_size = 128;		/* Default is 128 (0x80) bytes */

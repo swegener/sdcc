@@ -278,8 +278,10 @@ struct  area
         Addr_T  a_size;         /* Total size of the area */
         Addr_T  a_unaloc;       /* Total number of unallocated bytes, for error reporting */
         char    a_type;         /* Area subtype */
-        char    a_flag;         /* Flag byte */
+        int     a_flag;         /* Flag byte */
         char    a_id[NCPS];     /* Name */
+        char    *a_image;       /* Something for hc08/lkelf */
+        char    *a_used;        /* Something for hc08/lkelf */
 };
 
 /*

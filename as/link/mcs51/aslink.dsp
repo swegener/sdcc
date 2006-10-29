@@ -7,19 +7,19 @@
 CFG=aslink - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "aslink.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "aslink.mak" CFG="aslink - Win32 Release"
-!MESSAGE
+!MESSAGE 
 !MESSAGE Possible choices for configuration are:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "aslink - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE "aslink - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -55,19 +55,19 @@ LINK32=link.exe
 !ELSEIF  "$(CFG)" == "aslink - Win32 Release"
 
 # PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Use_Debug_Libraries 0
 # PROP BASE Output_Dir "mcs51\Release"
 # PROP BASE Intermediate_Dir "mcs51\Release"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
+# PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "MLH_MAP" /D "SDK" /FD /c
-# ADD CPP /nologo /ML /W3 /GX /O2 /I ".." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "MLH_MAP" /D "SDK" /FD /c
+# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "MLH_MAP" /D "SDK" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I ".." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "INDEXLIB" /D "MLH_MAP" /D "SDK" /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -77,7 +77,7 @@ LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\..\bin_vc\aslink.exe" /pdbtype:sept
 # ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\..\bin_vc\aslink.exe" /pdbtype:sept
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -100,11 +100,11 @@ SOURCE=.\lkdata.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkeval.c
+SOURCE=..\lkeval.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkhead.c
+SOURCE=..\lkhead.c
 # End Source File
 # Begin Source File
 
@@ -112,7 +112,7 @@ SOURCE=.\lkihx.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lklex.c
+SOURCE=..\lklex.c
 # End Source File
 # Begin Source File
 
@@ -120,7 +120,7 @@ SOURCE=.\lklibr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lklist.c
+SOURCE=..\lklist.c
 # End Source File
 # Begin Source File
 
@@ -132,7 +132,7 @@ SOURCE=.\lkmem.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lknoice.c
+SOURCE=..\lknoice.c
 # End Source File
 # Begin Source File
 
@@ -148,11 +148,11 @@ SOURCE=..\lkstore.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lksym.c
+SOURCE=..\lksym.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\strcmpi.c
+SOURCE=..\..\strcmpi.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -160,11 +160,7 @@ SOURCE=.\strcmpi.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\alloc.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\aslink.h
+SOURCE=..\aslink.h
 # End Source File
 # End Group
 # End Target

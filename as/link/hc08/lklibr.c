@@ -133,7 +133,7 @@ addlib()
     }
     if(foundcount == 0)
     {
-        printf("?ASlink-Warning-Couldn't find library '%s'\n", ip);
+        fprintf(stderr, "?ASlink-Warning-Couldn't find library '%s'\n", ip);
     }
 }
 
@@ -370,7 +370,8 @@ void LoadRel(FILE * libfp, char * ModName)
                     if(EQ(str, ModName)) state=1;
                     else
                     {
-                        printf("Bad offset in library file str=%s, Modname=%s\n", str, ModName);
+                        fprintf(stderr, "?ASlink-Error-Bad offset in library file str=%s, Modname=%s\n",
+                            str, ModName);
                         lkexit(1);
                     }
                 }
@@ -631,7 +632,7 @@ char *name;
     {
         if ((libfp = fopen(lbnh->libspc, "r")) == NULL)
         {
-            fprintf(stderr, "Cannot open library file %s\n",
+            fprintf(stderr, "ASlink-Error-Cannot open library file %s\n",
                 lbnh->libspc);
             lkexit(1);
         }

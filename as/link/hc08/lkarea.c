@@ -37,7 +37,7 @@
  *      The function newarea() creates and/or modifies area
  *      and areax structures for each A directive read from
  *      the .rel file(s).  The function lkparea() is called
- *      to find tha area structure associated with this name.
+ *      to find the area structure associated with this name.
  *      If the area does not yet exist then a new area
  *      structure is created and linked to any existing
  *      linked area structures. The area flags are copied
@@ -203,6 +203,7 @@ lkparea(char *id)
 
     ap = areap;
     axp = (struct areax *) new (sizeof(struct areax));
+    axp->a_addr = -1; /* default: no address yet */
     while (ap) {
         if (symeq(id, ap->a_id)) {
             taxp = ap->a_axp;
@@ -271,7 +272,7 @@ lkparea(char *id)
  *                      area address.  The size of the area
  *                      is the sum of the section sizes.
  *
- *      NOTE:   Relocatable (REL) areas ae always concatenated
+ *      NOTE:           Relocatable (REL) areas are always concatenated
  *                      with each other, thus relocatable area B
  *                      (defined after area A) will follow
  *                      relocatable area A independent of the
@@ -304,9 +305,9 @@ lkparea(char *id)
  *      functions called:
  *              int             fprintf()       c_library
  *              VOID    lnksect()       lkarea.c
- *              symbol *lkpsym()        lksysm.c
+ *              symbol *lkpsym()        lksym.c
  *              char *  strncpy()       c_library
- *              int             symeq()         lksysm.c
+ *              int     symeq()         lksym.c
  *
  *      side effects:
  *              All area and areax addresses and sizes are
@@ -315,6 +316,7 @@ lkparea(char *id)
  */
 
 unsigned long codemap[2048];
+Addr_T lnksect(struct area *tap);
 /*
  * Resolve all area addresses.
  */
@@ -347,7 +349,10 @@ lnkarea()
             abs_ap->a_ap = areap;
             areap = abs_ap;
         }
-        ap = ap->a_ap;
+        else
+        {
+            ap = ap->a_ap;
+        }
     }
 
     /* next accumulate all GSINITx/GSFINAL area sizes
@@ -410,6 +415,7 @@ lnkarea()
                 }
                 ap->a_type = 1;
             }
+
             rloc[ locIndex ] = lnksect(ap);
         }
 
@@ -419,7 +425,8 @@ lnkarea()
          *      l_<areaname>    the length of the area
          */
 
-        if (! symeq(ap->a_id, _abs_)) {
+        if (! symeq(ap->a_id, _abs_))
+        {
             strncpy(temp+2,ap->a_id,NCPS-2);
             *(temp+1) = '_';
 
@@ -464,7 +471,7 @@ lnkarea()
 }
 
 static
-Addr_T find_empty_space(Addr_T start, Addr_T size)
+Addr_T find_empty_space(Addr_T start, Addr_T size, unsigned long *map)
 {
     int i, j, k;
     unsigned long mask, b;
@@ -478,12 +485,12 @@ Addr_T find_empty_space(Addr_T start, Addr_T size)
 
         while (i < j)
         {
-            if (codemap[i] & mask)
+            if (map[i] & mask)
             {
                 k = 32;
                 for (b=0x80000000; b!=0; b>>=1, k--)
                 {
-                    if (codemap[i] & b)
+                    if (map[i] & b)
                       break;
                 }
                 start = a + k;
@@ -497,12 +504,12 @@ Addr_T find_empty_space(Addr_T start, Addr_T size)
           continue;
 
         mask &= (1 << ((start + size) & 0x1F)) - 1;
-        if (codemap[i] & mask)
+        if (map[i] & mask)
         {
             k = 32;
             for (b=0x80000000; b!=0; b>>=1, k--)
             {
-                if (codemap[i] & b)
+                if (map[i] & b)
                   break;
             }
             start = (a & ~0x1F) + k;
@@ -514,7 +521,7 @@ Addr_T find_empty_space(Addr_T start, Addr_T size)
 }
 
 static
-Addr_T allocate_space(Addr_T start, Addr_T size, char* id)
+Addr_T allocate_space(Addr_T start, Addr_T size, char* id, unsigned long *map)
 {
     int i, j;
     unsigned long mask;
@@ -525,20 +532,20 @@ Addr_T allocate_space(Addr_T start, Addr_T size, char* id)
 
     while (i < j)
     {
-        if (codemap[i] & mask)
+        if (map[i] & mask)
         {
             fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
         }
-        codemap[i++] |= mask;
+        map[i++] |= mask;
         mask = 0xFFFFFFFF;
         a += 32;
     }
     mask &= (1 << ((start + size) & 0x1F)) - 1;
-    if (codemap[i] & mask)
+    if (map[i] & mask)
     {
         fprintf(stderr, "memory overlap near 0x%X for %s\n", a, id);
     }
-    codemap[i] |= mask;
+    map[i] |= mask;
     return start;
 }
 
@@ -576,7 +583,6 @@ Addr_T lnksect(struct area *tap)
     size = 0;
     addr = tap->a_addr;
 
-    /* MB: is this possible for hc08 ??? */
     if ((tap->a_flag&A_PAG) && (addr & 0xFF)) {
         fprintf(stderr,
         "\n?ASlink-Warning-Paged Area %8s Boundary Error\n", tap->a_id);
@@ -599,7 +605,7 @@ Addr_T lnksect(struct area *tap)
     	 * Absolute sections
     	 */
         while (taxp) {
-            allocate_space(taxp->a_addr, taxp->a_size, tap->a_id);
+            allocate_space(taxp->a_addr, taxp->a_size, tap->a_id, codemap);
             taxp->a_addr = 0; /* reset to zero so relative addresses become absolute */
             size += taxp->a_size;
             taxp = taxp->a_axp;
@@ -609,14 +615,14 @@ Addr_T lnksect(struct area *tap)
          * Concatenated sections
          */
         if (tap->a_size) {
-            addr = find_empty_space(addr, tap->a_size);
+            addr = find_empty_space(addr, tap->a_size, codemap);
         }
         while (taxp) {
             //find next unused address now
             if (taxp->a_size)
             {
-                addr = find_empty_space(addr, taxp->a_size);
-                allocate_space(addr, taxp->a_size, tap->a_id);
+                addr = find_empty_space(addr, taxp->a_size, codemap);
+                allocate_space(addr, taxp->a_size, tap->a_id, codemap);
             }
             taxp->a_addr = addr;
             addr += taxp->a_size;
@@ -626,7 +632,6 @@ Addr_T lnksect(struct area *tap)
     }
     tap->a_size = size;
 
-    /* MB: is this possible for hc08 ??? */
     if ((tap->a_flag&A_PAG) && (size > 256)) {
         fprintf(stderr,
         "\n?ASlink-Warning-Paged Area %8s Length Error\n", tap->a_id);

@@ -7,17 +7,17 @@ VERSIONHI       = @VERSIONHI@
 VERSIONLO       = @VERSIONLO@
 VERSIONP        = @VERSIONP@
 
-SHELL           = /bin/sh
-CC              = @CC@
-CPP             = @CPP@
-INSTALL         = @INSTALL@
+SHELL		= /bin/sh
+CC		= @CC@
+CPP		= @CPP@
+INSTALL		= @INSTALL@
 STRIP           = @STRIP@
 
-top_builddir    = @top_builddir@
-top_srcdir      = @top_srcdir@
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
 
-srcdir          = @srcdir@
-prefix          = @prefix@
+srcdir		= @srcdir@
+prefix		= @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
@@ -32,21 +32,21 @@ EXEEXT          = @EXEEXT@
 
 VPATH           = @srcdir@
 
-CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/..
-CFLAGS          = @CFLAGS@ -Wall -DINDEXLIB
-M_OR_MM         = @M_OR_MM@
-LDFLAGS         = @LDFLAGS@
+CPPFLAGS	= @CPPFLAGS@ -I$(srcdir)/..
+CFLAGS		= @CFLAGS@ -Wall
+M_OR_MM		= @M_OR_MM@
+LDFLAGS		= @LDFLAGS@
 
-LKOBJECTS       = lkmain.o lkarea.o lkdata.o \
-                  lkrloc.o \
-                  lklibr.o lkihx.o lks19.o \
-                  lkmem.o lkaomf51.o \
-                  ../lkeval.o ../lkhead.o ../lklex.o ../lklist.o \
-                  ../lknoice.o ../lkstore.o ../lksym.o \
-                  ../../strcmpi.o
-LKSOURCES       = $(patsubst %.o,%.c,$(LKOBJECTS))
+LKOBJECTS	= lkmain.o lkarea.o lkdata.o \
+		  lkrloc.o \
+		  lklibr.o lkihx.o lks19.o lkelf.o \
+		  lkmem.o lkaomf51.o \
+		  ../lkeval.o ../lkhead.o ../lklex.o ../lklist.o  \
+		  ../lknoice.o ../lkstore.o ../lksym.o \
+		  ../../strcmpi.o
+LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
-ASLINK          = $(top_builddir)bin/aslink$(EXEEXT)
+ASLINK		= $(top_builddir)bin/link-hc08$(EXEEXT)
 
 transform       = @program_transform_name@
 
@@ -60,13 +60,13 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/aslink$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(ASLINK) `echo $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) `echo $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/aslink$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/link-hc08$(EXEEXT)
 
 
 # Performing self-test

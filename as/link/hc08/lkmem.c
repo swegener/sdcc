@@ -22,7 +22,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "aslink.h"
-#include "strcmpi.h"
 
 int summary(struct area * areap) 
 {
@@ -257,7 +256,7 @@ int summary(struct area * areap)
 		REPORT_ERROR(buff, 1);
 	}
 #endif
-	/*Report the position of the begining of the stack*/
+	/*Report the position of the beginning of the stack*/
 	fprintf(of, "\n%stack starts at: 0x%02lx (sp set to 0x%02lx)",
 		rflag ? "16 bit mode initial s" : "S", Stack.Start, Stack.Start-1);
 

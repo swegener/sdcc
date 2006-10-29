@@ -1,3 +1,43 @@
+2006-10-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/asx8051.dsp: corrected output directories
+	* as/link/hc08: new directory for hc08 linker
+	* as/hc08/aslink.h,             as/link/aslink.h,
+	* as/hc08/aslink.mak,           as/link/hc08/aslink.mak,
+	* as/hc08/clean.mk,             as/link/hc08/clean.mk,
+	* as/hc08/link_hc08.dsp,        as/link/hc08/link_hc08.dsp,
+	* as/hc08/lkaomf51.c,           as/link/hc08/lkaomf51.c,
+	* as/hc08/lkarea.c,             as/link/hc08/lkarea.c,
+	* as/hc08/lkdata.c,             as/link/hc08/lkdata.c,
+	* as/hc08/lkelf.c,              as/link/hc08/lkelf.c,
+	* as/hc08/lkihx.c,              as/link/hc08/lkihx.c,
+	* as/hc08/lklibr.c,             as/link/hc08/lklibr.c,
+	* as/hc08/lkmain.c,             as/link/hc08/lkmain.c,
+	* as/hc08/lkmem.c,              as/link/hc08/lkmem.c,
+	* as/hc08/lkrloc.c,             as/link/hc08/lkrloc.c,
+	* as/hc08/lks19.c,              as/link/hc08/lks19.c,
+	* as/hc08/Makefile.aslink,      as/link/hc08/Makefile.aslink,
+	* as/hc08/Makefile.bcc,         as/link/hc08/Makefile.bcc,
+	* as/hc08/Makefile.in,          as/link/hc08/Makefile.in,
+	* as/link/hc08/conf.mk,
+	* configure,
+	* configure.in,
+	* Makefile.in,
+	* sdcc.dsw: moved hc08 linker to as/link/hc08
+	* as/hc08/lkeval.c,     as/link/mcs51/lkeval.c,     as/link/lkeval.c,
+	* as/hc08/lkhead.c,     as/link/mcs51/lkhead.c,     as/link/lkhead.c,
+	* as/hc08/lklex.c,      as/link/mcs51/lklex.c,      as/link/lklex.c,
+	* as/hc08/lklist.c,     as/link/mcs51/lklist.c,     as/link/lklist.c,
+	* as/hc08/lknoice.c,    as/link/mcs51/lknoice.c,    as/link/lknoice.c,
+	* as/hc08/lksym.c,      as/link/mcs51/lksym.c,      as/link/lksym.c,
+	* as/link/mcs51/aslink.dsp,
+	* as/link/mcs51/Makefile.in: factored out the common files
+	* as/hc08/lkstore.c: deleted, use the one already in as/link/
+	* as/clean.mk: extra cleaning common files
+	* as/link/mcs51/strcmpi.c,      as/strcmpi.c: moved
+	* as/link/mcs51/strcmpi.h: deleted, moved protoype to aslink.h
+	* as/mcs51/asm.h: include sdccconf.h or sdcc_vc.h
+
 2006-10-29 Raphael Neider <rneider AT web.de>
 
 	* src/pic/ralloc.c (newReg): create aliases for registers with
@@ -19,12 +59,12 @@
 
 	* device/lib/_putchar.c, device/lib/_getchar.c, device/lib/inituart.c:
 	Removed.
- 
+
 2006-10-26 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/lib/_putchar.c, device/lib/_getchar.c, device/lib/inituart.c:
 	Initialize uart only if SM0 and SM1 are zero.  Also, use flag to turn
-	on/off CR to CRLF conversion.  
+	on/off CR to CRLF conversion.
 
 2006-10-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 

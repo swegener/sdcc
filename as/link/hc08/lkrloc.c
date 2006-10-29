@@ -81,9 +81,7 @@ static int lastAreaIndex = -1;
  *
  */
 
-VOID
-reloc(c)
-char c;
+VOID reloc(char c)
 {
 	switch(c) {
 
@@ -155,8 +153,7 @@ char c;
  *
  */
 
-VOID
-relt()
+VOID relt(VOID)
 {
 	rtcnt = 0;
 	while (more()) {
@@ -256,8 +253,7 @@ relt()
  *
  */
 
-VOID
-relr()
+VOID relr(VOID)
 {
 	register int mode;
 	register Addr_T reli, relv;
@@ -639,8 +635,7 @@ char *errmsg[] = {
  *
  */
 
-VOID
-relp()
+VOID relp(VOID)
 {
 	register int aindex, rindex;
 	int mode, rtp;
@@ -740,8 +735,7 @@ relp()
  *
  */
 
-VOID
-rele()
+VOID rele(VOID)
 {
 	if (uflag != 0) {
 		lkulist(0);
@@ -777,8 +771,7 @@ rele()
  *
  */
 
-Addr_T
-evword()
+Addr_T evword(VOID)
 {
 	register Addr_T v;
 
@@ -815,10 +808,7 @@ evword()
  *
  */
 
-Addr_T
-adb_b(v, i)
-register Addr_T v;
-register int i;
+Addr_T adb_b(register Addr_T v, register int i)
 {
 	return(rtval[i] += v);
 }
@@ -850,10 +840,7 @@ register int i;
  *
  */
 
-Addr_T
-adb_lo(v, i)
-Addr_T	v;
-int	i;
+Addr_T adb_lo(Addr_T  v, int i)
 {
 	register Addr_T j;
 
@@ -896,10 +883,7 @@ int	i;
  *
  */
 
-Addr_T
-adb_hi(v, i)
-Addr_T	v;
-int	i;
+Addr_T adb_hi(Addr_T  v, int i)
 {
 	register Addr_T j;
 
@@ -942,8 +926,7 @@ int	i;
  *
  */
 
-Addr_T
-adb_24_hi(Addr_T v, int i)
+Addr_T adb_24_hi(Addr_T v, int i)
 {
 	register Addr_T j;
 
@@ -990,8 +973,7 @@ adb_24_hi(Addr_T v, int i)
  *
  */
 
-Addr_T
-adb_24_mid(Addr_T v, int i)
+Addr_T adb_24_mid(Addr_T v, int i)
 {
 	register Addr_T j;
 
@@ -1031,8 +1013,7 @@ adb_24_mid(Addr_T v, int i)
  *
  */
 
-Addr_T
-adb_24_lo(Addr_T v, int i)
+Addr_T adb_24_lo(Addr_T v, int i)
 {
 	register Addr_T j;
 
@@ -1075,10 +1056,7 @@ adb_24_lo(Addr_T v, int i)
  *
  */
 
-Addr_T
-adw_w(v, i)
-register Addr_T v;
-register int i;
+Addr_T adw_w(register Addr_T v, register int i)
 {
 	register Addr_T j;
 
@@ -1116,8 +1094,7 @@ register int i;
  *		The word value of rtval[] is changed.
  *
  */
-Addr_T
-adw_24(Addr_T v, int i)
+Addr_T adw_24(Addr_T v, int i)
 {
 	register Addr_T j;
 
@@ -1165,10 +1142,7 @@ adw_24(Addr_T v, int i)
  *
  */
 
-Addr_T
-adw_lo(v, i)
-Addr_T	v;
-int	i;
+Addr_T adw_lo(Addr_T  v, int i)
 {
 	register Addr_T j;
 
@@ -1211,10 +1185,7 @@ int	i;
  *
  */
 
-Addr_T
-adw_hi(v, i)
-Addr_T	v;
-int	i;
+Addr_T adw_hi(Addr_T  v, int i)
 {
 	register Addr_T j;
 
@@ -1253,9 +1224,7 @@ int	i;
  *
  */
 
-VOID
-relerr(str)
-char *str;
+VOID relerr(char *str)
 {
 	errdmp(stderr, str);
 	if (mfp)
@@ -1293,10 +1262,7 @@ char *str;
  *
  */
 
-VOID
-errdmp(fptr, str)
-FILE *fptr;
-char *str;
+VOID errdmp(FILE *fptr, char *str)
 {
 	int mode, aindex, rindex;
 	struct sym **s;
@@ -1381,10 +1347,7 @@ char *str;
  *
  */
 
-VOID
-prntval(fptr, v)
-FILE *fptr;
-Addr_T v;
+VOID prntval(FILE *fptr, Addr_T v)
 {
 	if (xflag == 0) {
 		fprintf(fptr, "%04X\n", v);
@@ -1418,9 +1381,7 @@ Addr_T v;
  *
  */
 
-VOID
-relerp(str)
-char *str;
+VOID relerp(char *str)
 {
 	erpdmp(stderr, str);
 	if (mfp)
@@ -1451,10 +1412,7 @@ char *str;
  *
  */
 
-VOID
-erpdmp(fptr, str)
-FILE *fptr;
-char *str;
+VOID erpdmp(FILE *fptr, char *str)
 {
 	register struct head *thp;
 

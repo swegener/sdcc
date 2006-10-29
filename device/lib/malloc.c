@@ -139,6 +139,15 @@ malloc (unsigned int size)
             // xdata - variable in external memory (just RAM)
             //--------------------------------------------------------------------
 
+            #define MEMHEADER   struct MAH// Memory Allocation Header
+
+            MEMHEADER
+            {
+              MEMHEADER __xdata *  next;
+              unsigned int         len;
+              unsigned char        mem[];
+            };
+
             #define HEADER_SIZE sizeof(MEMHEADER)
 
             MEMHEADER xdata * _sdcc_first_memheader;
@@ -168,8 +177,8 @@ malloc (unsigned int size)
 
               if ( !array ) //Reserved memory starts at 0x0000 but that's NULL...
               {             //So, we lost one byte!
-                 array++;
-                 size--;
+                array++;
+                size--;
               }
               _sdcc_first_memheader = (MEMHEADER xdata * ) array;
               //Reserve a mem for last header
@@ -217,7 +226,7 @@ malloc (unsigned int size)
                 {
                   if (!current_header->len)
                   { //This code works only for first_header in the list and only
-                     current_header->len = size; //for first allocation
+                    current_header->len = size; //for first allocation
                   }
                   else
                   { //else create new header at the begin of spare

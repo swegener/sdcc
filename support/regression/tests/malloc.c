@@ -19,7 +19,7 @@ testMalloc(void)
 #if defined(SDCC_pic16)
   _initHeap(heap, sizeof heap);
 #else
-  init_dynamic_memory((MEMHEADER xdata *)heap, sizeof(heap));
+  init_dynamic_memory(heap, sizeof(heap));
 #endif
 
   p1 = malloc(200);

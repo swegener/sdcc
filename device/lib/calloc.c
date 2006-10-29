@@ -46,6 +46,15 @@ struct _MEMHEADER
 
 #else
 
+#define MEMHEADER   struct MAH// Memory Allocation Header
+
+MEMHEADER
+{
+  MEMHEADER __xdata *  next;
+  unsigned int         len;
+  unsigned char        mem[];
+};
+
 #define HEADER_SIZE sizeof(MEMHEADER)
 
 #endif

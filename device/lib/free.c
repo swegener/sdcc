@@ -101,6 +101,15 @@ free (void *p)
             // xdata - variable in external memory (just RAM)
             //--------------------------------------------------------------------
 
+            #define MEMHEADER   struct MAH// Memory Allocation Header
+
+            MEMHEADER
+            {
+              MEMHEADER __xdata *  next;
+              unsigned int         len;
+              unsigned char        mem[];
+            };
+
             #define HEADER_SIZE sizeof(MEMHEADER)
 
             //Static here means: can be accessed from this module only

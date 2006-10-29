@@ -1,5 +1,14 @@
 2006-10-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* device/include/malloc.h,
+	* device/lib/calloc.c,
+	* device/lib/free.c,
+	* device/lib/malloc.c,
+	* device/lib/realloc.c: moved definition of struct into sources
+	* support/regression/tests/malloc.c: use void* for init_dynamic_memory()
+
+2006-10-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* as/asx8051.dsp: corrected output directories
 	* as/link/hc08: new directory for hc08 linker
 	* as/hc08/aslink.h,             as/link/aslink.h,

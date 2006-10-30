@@ -153,6 +153,7 @@ Section "SDCC application files"
   File "${SDCC_ROOT}\bin\sdcc.exe"
   File "${SDCC_ROOT}\bin\sdcclib.exe"
   File "${SDCC_ROOT}\bin\sdcpp.exe"
+  File "${SDCC_ROOT}\bin\readline5.dll"
 SectionEnd
 
 Section "ucSim application files"

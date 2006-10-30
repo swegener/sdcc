@@ -3,6 +3,7 @@
 	* debugger/mcs51/sdcdb.c: replaced hardcoded "/" with DIR_SEPARATOR_STRING
 	* debugger/mcs51/acinclude.m4, debugger/mcs51/aclocal.m4,
 	  debugger/mcs51/configure: locate readline even when cross compiling
+	* support/scripts/sdcc.nsi: include readline5.dll into the setup package
 
 2006-10-29 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

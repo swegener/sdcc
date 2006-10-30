@@ -640,6 +640,8 @@ Section Uninstall
   Delete "$INSTDIR\bin\sdcc.exe"
   Delete "$INSTDIR\bin\sdcclib.exe"
   Delete "$INSTDIR\bin\sdcpp.exe"
+  Delete "$INSTDIR\bin\readline5.dll"
+
 
   Delete "$INSTDIR\bin\s51.exe"
   Delete "$INSTDIR\bin\savr.exe"

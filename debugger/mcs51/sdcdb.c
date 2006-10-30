@@ -52,7 +52,7 @@ short showfull = 0;
 char userinterrupt = 0;
 char nointerrupt = 0;
 char contsim = 0;
-char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX "/small" ;
+char *ssdirl = DATADIR LIB_DIR_SUFFIX ":" DATADIR LIB_DIR_SUFFIX DIR_SEPARATOR_STRING "small" ;
 char *simArgs[40];
 int nsimArgs = 0;
 char model_str[20];

@@ -1,3 +1,8 @@
+2006-10-30 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/sdcdb.c: replaced hardcoded "/" with DIR_SEPARATOR_STRING
+	* debugger/mcs51/acinclude.m4: locate readline even when cross compiling
+
 2006-10-29 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/serial_IO.h: putchar() and getchar() using
@@ -136,7 +141,7 @@
 
 2006-10-20 Borut Razem <borut.razem AT siol.net>
 
-	* sebugger/mcs51/sdcdb.c: replaced isblank() with isspace()
+	* debugger/mcs51/sdcdb.c: replaced isblank() with isspace()
 
 2006-10-19 Maarten Brock <sourceforge.brock AT dse.nl>
 

@@ -3620,7 +3620,8 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   (exit $ac_status); }; }; then
 
         wi_cv_lib_readline=yes
-        wi_cv_lib_readline_result=yes
+        { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
 
 else
   echo "$as_me: failed program was:" >&5
@@ -3628,7 +3629,8 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 
         wi_cv_lib_readline=no
-        wi_cv_lib_readline_result=no
+        { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
 
 fi
 
@@ -3636,8 +3638,6 @@ rm -f core conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 
       if test "$wi_cv_lib_readline" = yes; then
-        { echo "$as_me:$LINENO: result: $wi_cv_lib_readline_result" >&5
-echo "${ECHO_T}$wi_cv_lib_readline_result" >&6; }
 
 
 cat >>confdefs.h <<_ACEOF

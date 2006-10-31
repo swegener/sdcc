@@ -66,14 +66,13 @@ EOF
         rl_function_of_keyseq(NULL, NULL, NULL);
       ],[
         wi_cv_lib_readline=yes
-        wi_cv_lib_readline_result=yes
+        AC_MSG_RESULT(yes)
       ],[
         wi_cv_lib_readline=no
-        wi_cv_lib_readline_result=no
+        AC_MSG_RESULT(no)
       ])
 
       if test "$wi_cv_lib_readline" = yes; then
-        AC_MSG_RESULT($wi_cv_lib_readline_result)
         AC_SUBST(LIBREADLINE)
         AC_DEFINE_UNQUOTED(HAVE_LIBREADLINE, $wi_READLINE_VERSION, [Readline])
         break

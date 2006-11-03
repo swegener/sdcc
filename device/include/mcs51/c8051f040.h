@@ -194,6 +194,9 @@ __sfr __at 0xE4 XBR3     ;  /* CROSSBAR CONFIGURATION REGISTER 3             */
 __sfr __at 0xE8 P6       ;  /* PORT 6                                        */
 __sfr __at 0xF8 P7       ;  /* PORT 7                                        */
 
+/*
+Do NOT use sfr16 for CAN0DAT !
+*/
 
 /*  BIT Registers  */
 
@@ -314,6 +317,7 @@ __sbit __at 0xB8 PX0     ;  /* EXTERNAL INTERRUPT 0 PRIORITY                 */
 __sbit __at 0xB9 PT0     ;  /* TIMER 0 PRIORITY                              */
 __sbit __at 0xBA PX1     ;  /* EXTERNAL INTERRUPT 1 PRIORITY                 */
 __sbit __at 0xBB PT1     ;  /* TIMER 1 PRIORITY                              */
+__sbit __at 0xBC PS0     ;  /* SERIAL PORT PRIORITY                          */
 __sbit __at 0xBC PS      ;  /* SERIAL PORT PRIORITY                          */
 __sbit __at 0xBD PT2     ;  /* TIMER 2 PRIORITY                              */
 

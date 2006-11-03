@@ -3,11 +3,13 @@ replace {
 } by {
 	ERROR - peephole - caught (hl),(hl)
 }
+
 replace restart {
 	ld	%1,%1
 } by {
-	; Removed redundent load
+	; peephole removed redundant load.
 }
+
 replace restart {
 	xor	a,a
 	or	a,%1
@@ -18,13 +20,7 @@ replace restart {
 	or	a,%1
 	jp	%2,%3
 }
-replace restart {
-	cp	a,#0x00
-	jp	NZ,%1
-} by {
-	or	a,a
-	jp	NZ,%1
-}
+
 replace restart {
 	jp	NZ,%1
 	jp	%2
@@ -36,7 +32,8 @@ replace restart {
 %1:
 	jp	%3
 %2:
-}
+} if labelRefCountChange(%1 -1)
+
 replace restart {
 	jp	NZ,%1
 	jp	%2
@@ -44,7 +41,8 @@ replace restart {
 } by {
 	jp	Z,%2
 %1:
-}
+} if labelRefCountChange(%1 -1)
+
 replace restart {
 	jp	Z,%1
 	jp	%2
@@ -52,19 +50,22 @@ replace restart {
 } by {
 	jp	NZ,%2
 %1:
-}
+} if labelRefCountChange(%1 -1)
+
 replace restart {
 	or	a,%1
 	or	a,a
 } by {
 	or	a,%1
 }
+
 replace restart {
 	or	a,%1)
 	or	a,a
 } by {
 	or	a,%1)
 }
+
 replace restart {
 	xor	a,a
 	or	a,%1
@@ -79,6 +80,7 @@ replace restart {
 	or	a,%3
 	jp	Z,%2
 }
+
 replace restart {
 	jp	NZ,%1
 	inc	%3)
@@ -89,37 +91,43 @@ replace restart {
 	inc	%3)
 %1:
 	jp	%2
-}
+} if labelRefCountChange(%1 -1), labelRefCountChange(%2 1)
+
 replace restart {
 	xor	a,a
 	ld	a,#0x00
 } by {
 	xor	a,a
 }
+
 replace {
 	ld	e,#0x00
 	ld	d,#0x00
 } by {
 	ld	de,#0x0000
 }
+
 replace {
 	ld	l,#0x00
 	ld	h,#0x00
 } by {
 	ld	hl,#0x0000
 }
+
 replace {
 	ld	c,#0x00
 	ld	b,#0x00
 } by {
 	ld	bc,#0x0000
 }
+
 replace restart {
 	ld	%1,a
 	ld	a,%1
 } by {
 	ld	%1,a
 } if notVolatile %1
+
 replace restart {
 	jp	%1,%2
 	jr	%3
@@ -130,7 +138,8 @@ replace restart {
 	jr	%3
 %2:
 	jp	%4
-}
+} if labelRefCountChange(%2 -1), labelRefCountChange(%4 1)
+
 replace {
 	ld	l,e
 	ld	h,d
@@ -142,12 +151,14 @@ replace {
 	push	de
 	push	bc
 }
+
 replace {
 	and	a,#%1
 	or	a,a
 } by {
 	and	a,#%1
 }
+
 replace {
 	ld	b,l
 	ld	a,b
@@ -158,6 +169,7 @@ replace {
 	pop	bc
 	ld	b,a
 }
+
 replace {
 	ld	d,l
 	ld	a,d
@@ -168,6 +180,7 @@ replace {
 	pop	de
 	ld	d,a
 }
+
 replace {
 	ld	a,b
 	push	af
@@ -176,6 +189,7 @@ replace {
 	push	bc
 	inc	sp
 }
+
 replace {
 	ld	a,d
 	push	af
@@ -184,6 +198,7 @@ replace {
 	push	de
 	inc	sp
 }
+
 replace {
 	ld	a,%1
 	sub	a,#%2
@@ -198,6 +213,7 @@ replace {
 	cp	a,#%4
 	jp	P,%5
 }
+
 replace {
 	ld	e,l
 	ld	d,h
@@ -207,6 +223,7 @@ replace {
 	ld	e,l
 	ld	d,h
 }
+
 replace {
 	ld	%1,%2
 	ld	%3,%4
@@ -217,3 +234,231 @@ replace {
 	ld	%3,%4
 }
 
+// From: Philipp Klaus Krause
+replace restart {
+	ld	%1,a
+	ld	a,%2
+	add	a,%1
+	ld	%1,a
+} by {
+	; peephole removed loads by exploiting commutativity of addition.
+	add	a,%2
+	ld	%1,a
+}
+
+// From: Philipp Klaus Krause
+replace restart {
+	ld	%1,a
+	ld	a,%2
+	add	a,%1
+} by {
+	ld	%1, a
+	; peephole removed load by exploiting commutativity of addition.
+	add	a, %2
+}
+
+// From: Philipp Klaus Krause
+replace {
+	or	a,%1
+	jp	NZ,%2
+	ld	%3,#0x00
+} by {
+	or	a,%1
+	jp	NZ,%2
+	ld	%3,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace {
+	and	a,%1
+	jp	NZ,%2
+	ld	%3,#0x00
+} by {
+	and	a,%1
+	jp	NZ,%2
+	ld	%3,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace {
+	sub	a,%1
+	jp	NZ,%2
+	ld	%3,#0x00
+} by {
+	sub	a,%1
+	jp	NZ,%2
+	ld	%3,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace {
+	dec	a
+	jp	NZ,%1
+	ld	%2,#0x00
+} by {
+	dec	a
+	jp	NZ,%1
+	ld	%2,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace {
+	or	a,%1
+	jp	NZ,%2
+	ld	a,%3
+	or	a,a
+} by {
+	or	a,%1
+	jp	NZ,%2
+	or	a,%3
+	; peephole shortened or using a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace {
+	and	a,%1
+	jp	NZ,%2
+	ld	a,%3
+	or	a,a
+} by {
+	and	a,%1
+	jp	NZ,%2
+	or	a,%3
+	; peephole shortened or using a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace {
+	sub	a,%1
+	jp	NZ,%2
+	ld	a,%3
+	or	a,a
+} by {
+	sub	a,%1
+	jp	NZ,%2
+	or	a,%3
+	; peephole shortened or using a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace {
+	dec	a
+	jp	NZ,%1
+	ld	a,%2
+	or	a,a
+} by {
+	dec	a
+	jp	NZ,%1
+	or	a,%2
+	; peephole shortened or using a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace restart {
+	or	a,%1
+	jp	NZ,%2
+	push	%3
+	ld	%4,#0x00
+} by {
+	or	a,%1
+	jp	NZ,%2
+	push	%3
+	ld	%4,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace restart {
+	and	a,%1
+	jp	NZ,%2
+	push	%3
+	ld	%4,#0x00
+} by {
+	sub	a,%1
+	jp	NZ,%2
+	push	%3
+	ld	%4,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace restart {
+	sub	a,%1
+	jp	NZ,%2
+	push	%3
+	ld	%4,#0x00
+} by {
+	sub	a,%1
+	jp	NZ,%2
+	push	%3
+	ld	%4,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace restart {
+	dec	a
+	jp	NZ,%1
+	push	%2
+	ld	%3,#0x00
+} by {
+	dec	a
+	jp	NZ,%1
+	push	%2
+	ld	%3,a
+	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+}
+
+// From: Philipp Klaus Krause
+replace restart{
+	jp	NZ,%1
+	or	a,%2
+	jp	Z,%3
+%1:
+	jp	%4
+%3:
+} by {
+	jp	NZ,%4
+	; peephole redirected jump
+	or	a,%2
+	jp	NZ,%4
+	; peephole redirected jump
+%3:
+} if labelRefCount(%1 1), labelRefCountChange(%1 -1), labelRefCountChange(%3 -1), labelRefCountChange(%4 1)
+
+// Should be one of the last ones. Opens the code to further peephole optimization.
+// From: Philipp Klaus Krause
+replace restart {
+%1:
+} by {
+	; peephole removed unused label %1.
+} if labelRefCount(%1 0)
+
+// From: Philipp Klaus Krause
+replace {
+	jp	Z,%5
+} by {
+	jr	Z,%5
+} if labelInRange()
+
+replace {
+	jp	NZ,%5
+} by {
+	jr	NZ,%5
+} if labelInRange()
+
+replace {
+	jp	C,%5
+} by {
+	jr	C,%5
+} if labelInRange()
+
+replace {
+	jp	NC,%5
+} by {
+	jr	NC,%5
+} if labelInRange()

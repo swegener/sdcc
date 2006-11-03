@@ -352,6 +352,7 @@ __sbit __at (0xB8) PX0             ;  /* EXTERNAL INTERRUPT 0 PRIORITY          
 __sbit __at (0xB9) PT0             ;  /* TIMER 0 PRIORITY                              */
 __sbit __at (0xBA) PX1             ;  /* EXTERNAL INTERRUPT 1 PRIORITY                 */
 __sbit __at (0xBB) PT1             ;  /* TIMER 1 PRIORITY                              */
+__sbit __at (0xBC) PS0             ;  /* SERIAL PORT PRIORITY                          */
 __sbit __at (0xBC) PS              ;  /* SERIAL PORT PRIORITY                          */
 __sbit __at (0xBD) PT2             ;  /* TIMER 2 PRIORITY                              */
 

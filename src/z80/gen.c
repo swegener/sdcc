@@ -4779,11 +4779,11 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
         {
           while (size--)
             {
-              emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
-              if ((AOP_TYPE (right) == AOP_LIT) && lit == 0)
+              _moveA (aopGet (AOP (left), offset, FALSE));
+              if ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0)
                 emit2 ("or a,a");
               else
-                emit2 ("cp a,%s", aopGet (AOP (right), offset, FALSE));
+                emit2 ("sub a,%s", aopGet (AOP (right), offset, FALSE));
               emit2 ("jp NZ,!tlabel", lbl->key + 100);
               offset++;
             }
@@ -4798,13 +4798,18 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
       while (size--)
         {
           _moveA (aopGet (AOP (left), offset, FALSE));
-          if ((AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) &&
+          if (/*AOP_TYPE (left) == AOP_DIR &&*/ AOP_TYPE (right) == AOP_LIT &&
               ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
-            /* PENDING */
-            emit2 ("jp NZ,!tlabel", lbl->key + 100);
+            {
+              /* PENDING */
+              /* MB: pending what? doesn't this need "or a,a"? */
+              /* and I don't think AOP_TYPE(left) has anything to do with this */
+              emit2 ("or a,a");
+              emit2 ("jp NZ,!tlabel", lbl->key + 100);
+            }
           else
             {
-              emit2 ("cp %s", aopGet (AOP (right), offset, FALSE));
+              emit2 ("sub %s", aopGet (AOP (right), offset, FALSE));
               emit2 ("jp NZ,!tlabel", lbl->key + 100);
             }
           offset++;

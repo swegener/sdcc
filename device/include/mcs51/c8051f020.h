@@ -244,8 +244,8 @@ __sbit __at (0xA8) EX0         ;  /* EXTERNAL INTERRUPT 0 ENABLE                
 __sbit __at (0xA9) ET0         ;  /* TIMER 0 INTERRUPT ENABLE                                */
 __sbit __at (0xAA) EX1         ;  /* EXTERNAL INTERRUPT 1 ENABLE                             */
 __sbit __at (0xAB) ET1         ;  /* TIMER 1 INTERRUPT ENABLE                                */
-__sbit __at (0xAC) ES          ;  /* SERIAL PORT 0 INTERRUPT ENABLE                          */
 __sbit __at (0xAC) ES0         ;  /* SERIAL PORT 0 INTERRUPT ENABLE                          */
+__sbit __at (0xAC) ES          ;  /* SERIAL PORT 0 INTERRUPT ENABLE                          */
 __sbit __at (0xAD) ET2         ;  /* TIMER 2 INTERRUPT ENABLE                                */
 __sbit __at (0xAF) EA          ;  /* GLOBAL INTERRUPT ENABLE                                 */
 
@@ -264,6 +264,7 @@ __sbit __at (0xB8) PX0         ;  /* EXTERNAL INTERRUPT 0 PRIORITY              
 __sbit __at (0xB9) PT0         ;  /* TIMER 0 PRIORITY                                        */
 __sbit __at (0xBA) PX1         ;  /* EXTERNAL INTERRUPT 1 PRIORITY                           */
 __sbit __at (0xBB) PT1         ;  /* TIMER 1 PRIORITY                                        */
+__sbit __at (0xBC) PS0         ;  /* SERIAL PORT PRIORITY                                    */
 __sbit __at (0xBC) PS          ;  /* SERIAL PORT PRIORITY                                    */
 __sbit __at (0xBD) PT2         ;  /* TIMER 2 PRIORITY                                        */
 

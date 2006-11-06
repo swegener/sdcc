@@ -1,3 +1,13 @@
+2006-11-06 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/acinclude.m4, debugger/mcs51/aclocal.m4,
+	  debugger/mcs51/configure: fixed failed check because the function
+	  rl_function_of_keyseq isn't in Readline 5.2. Thanks to Ilya Goldberg
+	  who submitted the patch for gpsim.
+	* debugger/mcs51/configure.in: removed the result message
+	* debugger/mcs51/Makefile.in: fixed the config.status warning
+	  "... seems to ignore the --datarootdir setting"
+
 2006-11-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/c8051f020.h,

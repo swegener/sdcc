@@ -213,38 +213,4 @@ AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX,
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
-# Prepare result message
-# ======================
-
-# In the C-header we need \\ as dir-separator, but in the message only \
-dirch=${sdccconf_h_dir_separator}
-test ${dirch} = '\\' && dirch='\'
-
-AC_MSG_RESULT([
-sdcdb is now configured for
-
-  Build:                ${build_alias}
-  Host:                 ${host_alias}
-  Source directory:     ${srcdir}
-  C compiler:           ${CC}
-  CFLAGS:               ${CFLAGS}
-
-  Install paths:
-    binary files:       ${exec_prefix}
-    include files:      ${datadir}/${include_dir_suffix}
-    library files:      ${datadir}/${lib_dir_suffix}
-    documentation:      ${docdir}
-
-    prefix:             ${prefix}
-    datadir:            ${datadir}
-
-  Search paths (incomplete, see manual for all search paths):
-    binary files:       \$SDCC_HOME${binPath}
-    include files:      ${incPath1}
-                        path(argv[[0]])${incPath2}
-                        ${incPath3}
-    library files:      \$SDCC_HOME${libPath1}${dirch}<model>
-                        path(argv[[0]])${libPath2}${dirch}<model>
-                        ${libPath3}${dirch}<model>
-])
 # End of configure/configure.in

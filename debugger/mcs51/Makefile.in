@@ -17,16 +17,7 @@ SDCCLIB		= $(top_builddir)src
 VPATH           = @srcdir@
 srcdir		= @srcdir@
 
-prefix		= @prefix@
-exec_prefix     = @exec_prefix@
 bindir          = @bindir@
-libdir          = @libdir@
-datadir         = @datadir@
-includedir      = @includedir@
-mandir          = @mandir@
-man1dir         = $(mandir)/man1
-man2dir         = $(mandir)/man2
-infodir         = @infodir@
 
 STD_INC		= @sdcc_include_dir@
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(top_builddir) -I$(top_srcdir) -I$(srcdir)/$(SLIB) -DHAVE_CONFIG_H

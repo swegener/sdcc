@@ -50,8 +50,8 @@ EOF
         #include <readline/readline.h>
       ],[
         /* function-body */
+        int dummy = rl_completion_append_character; /* rl_completion_append_character appeared in version 2.1 */
         readline(NULL);
-        rl_function_of_keyseq(NULL, NULL, NULL);
       ],[
         wi_cv_lib_readline=yes
         AC_MSG_RESULT(yes)

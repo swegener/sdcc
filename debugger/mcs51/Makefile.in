@@ -17,6 +17,8 @@ SDCCLIB		= $(top_builddir)src
 VPATH           = @srcdir@
 srcdir		= @srcdir@
 
+prefix		= @prefix@
+exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 
 STD_INC		= @sdcc_include_dir@

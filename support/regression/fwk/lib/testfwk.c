@@ -12,6 +12,9 @@
 #ifdef SDCC_mcs51
 /* until changed, isr's must have a prototype in the module containing main */
 void T2_isr (void) interrupt 5;
+#define MEMSPACE_BUF idata
+#else
+#define MEMSPACE_BUF
 #endif
 
 /** Define this if the port's div or mod functions are broken.
@@ -69,8 +72,8 @@ __printn(int n)
     _putchar('0');
   }
   else {
-    static char buf[6];
-    char *p = &buf[sizeof(buf) - 1];
+    static char MEMSPACE_BUF buf[6];
+    char MEMSPACE_BUF *p = &buf[sizeof(buf) - 1];
     char neg = 0;
 
     buf[sizeof(buf) - 1] = '\0';
@@ -128,7 +131,7 @@ __printf(const char *szFormat, ...)
 }
 
 void
-__fail(const char *szMsg, const char *szCond, const char *szFile, int line)
+__fail(code const char *szMsg, code const char *szCond, code const char *szFile, int line)
 {
   __printf("--- FAIL: \"%s\" on %s at %s:%u\n", szMsg, szCond, szFile, line);
   __numFailures++;
@@ -154,7 +157,7 @@ main(void)
 }
 #else
 void
-__fail(const char *szMsg, const char *szCond, const char *szFile, int line)
+__fail(code const char *szMsg, code const char *szCond, code const char *szFile, int line)
 {
   __prints("--- FAIL: \"");
   __prints(szMsg);

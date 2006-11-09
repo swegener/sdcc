@@ -1,3 +1,10 @@
+2006-11-09 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/generate-cases.py,
+	* support/regression/fwk/include/testfwk.h,
+	* support/regression/fwk/lib/testfwk.c: used code pointers,
+	  (about 50kByte less code generated for mcs51) 
+
 2006-11-06 Borut Razem <borut.razem AT siol.net>
 
 	* debugger/mcs51/acinclude.m4, debugger/mcs51/aclocal.m4,

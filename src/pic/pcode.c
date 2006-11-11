@@ -2339,6 +2339,11 @@ pCodeOp *newpCodeOpBit(char *name, int ibit, int inBitSpace)
 		sym = symFindWithName(bit, name);
 		if (!sym) sym = symFindWithName(sfrbit, name);
 		if (!sym) sym = symFindWithName(sfr, name);
+		if (!sym) sym = symFindWithName(reg, name);
+		// Hack to fix accesses to _INTCON_bits (e.g. GIE=0), see #1579535.
+		// XXX: This ignores nesting levels, but works for globals...
+		if (!sym) sym = findSym(SymbolTab, NULL, name);
+		if (!sym && name && name[0] == '_') sym = findSym(SymbolTab, NULL, &name[1]);
 		if (sym) {
 			r = allocNewDirReg(sym->etype,name);
 		}

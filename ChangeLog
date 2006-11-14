@@ -1,3 +1,10 @@
+2006-11-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/aslink.h,
+	* as/link/mcs51/lkihx.c (newArea),
+	* as/link/mcs51/lkrloc.c: renamed newArea() to ihxNewArea()
+	* as/link/mcs51/lkihx.c (ihx): output reset vector as start address
+
 2006-11-11 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (newpCodeOpBit): search SymbolTab for referenced
@@ -8,7 +15,7 @@
 	* support/regression/generate-cases.py,
 	* support/regression/fwk/include/testfwk.h,
 	* support/regression/fwk/lib/testfwk.c: used code pointers,
-	  (about 50kByte less code generated for mcs51) 
+	  (about 50kByte less code generated for mcs51)
 
 2006-11-06 Borut Razem <borut.razem AT siol.net>
 

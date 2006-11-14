@@ -803,7 +803,7 @@ extern  VOID            s19();
 /* lkihx.c */
 extern  VOID            ihx();
 extern  VOID            ihxEntendedLinearAddress(Addr_T);
-extern  VOID            newArea();
+extern  VOID            ihxNewArea();
 
 /* lkstore.c */
 extern  char *          StoreString( char *str );

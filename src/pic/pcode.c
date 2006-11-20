@@ -4607,9 +4607,13 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 #if 1
 	/* Always insert BANKSELs rather than try to be clever:
 	 * Too many bugs in optimized banksels... */
+	static PIC_device *pic;
+	if (!pic) pic = pic14_getPIC();
 
 	// possible optimizations:
 	// * do not emit BANKSELs for SFRs that are present in all banks (bankmsk == regmap for this register)
+	if (reg && pic && ((reg->alias & pic->bankMask) == pic->bankMask)) return 'L';
+	
 	insertBankSel(pci, reg->name); // Let linker choose the bank selection
 	return 'L';
 #else

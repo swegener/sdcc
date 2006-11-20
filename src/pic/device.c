@@ -1062,3 +1062,7 @@ int pic14_getSharebankAddress(void)
 	return sharebankAddress;
 }
 
+PIC_device * pic14_getPIC(void)
+{
+    return pic;
+}

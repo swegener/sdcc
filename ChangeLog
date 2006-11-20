@@ -1,3 +1,11 @@
+2006-11-21 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.{c,h}: added pic14_getPIC()
+	* src/pic/gen.c (continueIfTrue,jumpIfTrue): added PIC code,
+	  (genAnd): added PIC code for one case, fixes #1597044
+	* src/pic/pcode.c (BankSelect): Ohoh, added generic optimization for
+	  SFRs that are present in all banks (e.g., STATUS)
+
 2006-11-20 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c: changed inverted ops for DECFSZ/DECFSZW and

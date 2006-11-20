@@ -5487,7 +5487,11 @@ static void continueIfTrue (iCode *ic)
 	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(IC_TRUE(ic))
-		pic14_emitcode("ljmp","%05d_DS_",IC_TRUE(ic)->key+100);
+	{
+		// Why +100?!?
+		emitpcode(POC_GOTO, popGetLabel(IC_TRUE(ic)->key+100));
+		pic14_emitcode("ljmp","%05d_DS_",IC_FALSE(ic)->key+100);
+	}
 	ic->generated = 1;
 }
 
@@ -5499,7 +5503,11 @@ static void jumpIfTrue (iCode *ic)
 	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	if(!IC_TRUE(ic))
+	{
+		// Why +100?!?
+		emitpcode(POC_GOTO, popGetLabel(IC_TRUE(ic)->key+100));
 		pic14_emitcode("ljmp","%05d_DS_",IC_FALSE(ic)->key+100);
+	}
 	ic->generated = 1;
 }
 
@@ -5640,7 +5648,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 						offset++;
 					}
 					emitpcode(((rIfx.condition) ? POC_BTFSC : POC_BTFSS),
-						newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),posbit,0));
+						newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),posbit-1,0));
 					emitpcode(POC_GOTO,popGetLabel(rIfx.lbl->key));
 					
 					ifx->generated = 1;
@@ -5654,16 +5662,29 @@ static void genAnd (iCode *ic, iCode *ifx)
 				pic14_emitcode("setb","c");
 			while(sizel--){
 				if((bytelit = ((lit >> (offset*8)) & 0x0FFL)) != 0x0L){
-					MOVA( aopGet(AOP(left),offset,FALSE,FALSE));
+					mov2w( AOP(left), offset);
 					// byte ==  2^n ?
-					if((posbit = isLiteralBit(bytelit)) != 0)
+					if((posbit = isLiteralBit(bytelit)) != 0) {
+						emitpcode(rIfx.condition ? POC_BTFSC : POC_BTFSS, // XXX: or the other way round?
+							newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),posbit - 1, 0));
 						pic14_emitcode("jb","acc.%d,%05d_DS_",(posbit-1)&0x07,tlbl->key+100);
+					}
 					else{
+						emitpcode(POC_ANDLW, newpCodeOpLit(bytelit & 0x0ff));
+						if (rIfx.condition) emitSKPZ;
+						else emitSKPNZ;
+						
 						if(bytelit != 0x0FFL)
+						{
 							pic14_emitcode("anl","a,%s",
 							aopGet(AOP(right),offset,FALSE,TRUE));
+						}
 						pic14_emitcode("jnz","%05d_DS_",tlbl->key+100);
 					}
+
+					emitpcode(POC_GOTO, popGetLabel(rIfx.lbl->key));
+					ifx->generated = 1;
+						
 				}
 				offset++;
 			}

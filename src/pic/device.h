@@ -114,5 +114,6 @@ unsigned pic14_getMaxRam(void);
 int pic14_getHasSecondConfigReg(void);
 int pic14_getSharebankSize(void);
 int pic14_getSharebankAddress(void);
+PIC_device * pic14_getPIC(void);
 
 #endif  /* __DEVICE_H__ */

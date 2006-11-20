@@ -543,9 +543,9 @@ pCodeInstruction pciDECFSZ = {
 		1,0,  // dest, bit instruction
 		1,1,  // branch, skip
 		0,    // literal operand
-		POC_NOP,
-		PCC_REGISTER,   // inCond
-		PCC_REGISTER    // outCond
+		POC_DECF,		// followed by BTFSC STATUS, Z --> also kills STATUS
+		PCC_REGISTER,		// inCond
+		PCC_REGISTER | PCC_Z	// outCond
 };
 
 pCodeInstruction pciDECFSZW = {
@@ -565,9 +565,9 @@ pCodeInstruction pciDECFSZW = {
 		0,0,  // dest, bit instruction
 		1,1,  // branch, skip
 		0,    // literal operand
-		POC_NOP,
+		POC_DECFW,	// followed by BTFSC STATUS, Z --> also kills STATUS
 		PCC_REGISTER,   // inCond
-		PCC_W           // outCond
+		PCC_W | PCC_Z   // outCond
 };
 
 pCodeInstruction pciGOTO = {
@@ -653,9 +653,9 @@ pCodeInstruction pciINCFSZ = {
 		1,0,  // dest, bit instruction
 		1,1,  // branch, skip
 		0,    // literal operand
-		POC_NOP,
-		PCC_REGISTER,   // inCond
-		PCC_REGISTER    // outCond
+		POC_INCF,		// followed by BTFSC STATUS, Z --> also kills STATUS
+		PCC_REGISTER,		// inCond
+		PCC_REGISTER | PCC_Z    // outCond
 };
 
 pCodeInstruction pciINCFSZW = {
@@ -675,9 +675,9 @@ pCodeInstruction pciINCFSZW = {
 		0,0,  // dest, bit instruction
 		1,1,  // branch, skip
 		0,    // literal operand
-		POC_NOP,
+		POC_INCFW,	// followed by BTFSC STATUS, Z --> also kills STATUS
 		PCC_REGISTER,   // inCond
-		PCC_W           // outCond
+		PCC_W | PCC_Z   // outCond
 };
 
 pCodeInstruction pciIORWF = {
@@ -4538,6 +4538,21 @@ static void insertPCodeInstruction(pCodeInstruction *pci, pCodeInstruction *new_
 
 		pCodeInsertAfter (pcprev, jump);
 
+		// Yuck: Cannot simply replace INCFSZ/INCFSZW/DECFSZ/DECFSZW
+		// We replace them with INCF/INCFW/DECF/DECFW followed by 'BTFSS STATUS, Z'
+		switch (PCI(pcprev)->op) {
+		case POC_INCFSZ:
+		case POC_INCFSZW:
+		case POC_DECFSZ:
+		case POC_DECFSZW:
+		    // These are turned into non-skipping instructions, so
+		    // insert 'BTFSC STATUS, Z' after pcprev
+		    pCodeInsertAfter (pcprev, newpCode(POC_BTFSC, popCopyGPR2Bit(PCOP(&pc_status), PIC_Z_BIT)));
+		    break;
+		default:
+		    // no special actions required
+		    break;
+		}
 		pCodeReplace (pcprev, pCodeInstructionCopy (PCI(pcprev), 1));
 		pcprev = NULL;
 		pCodeInsertAfter((pCode*)pci, label);
@@ -4592,6 +4607,9 @@ static int BankSelect(pCodeInstruction *pci, int cur_bank, regs *reg)
 #if 1
 	/* Always insert BANKSELs rather than try to be clever:
 	 * Too many bugs in optimized banksels... */
+
+	// possible optimizations:
+	// * do not emit BANKSELs for SFRs that are present in all banks (bankmsk == regmap for this register)
 	insertBankSel(pci, reg->name); // Let linker choose the bank selection
 	return 'L';
 #else
@@ -4763,7 +4781,11 @@ static int DoBankSelect(pCode *pc, int cur_bank) {
 	if (!reg && isPCI(pc) &&
 		((PCI(pc)->inCond | PCI(pc)->outCond) & PCC_REGISTER))
 	{
-	    assert(!"Could not get register from instruction.");
+	    if (PCI(pc)->pcop && PCI(pc)->pcop->type == PO_IMMEDIATE) {
+		// fine, this should be low(variable) --> no BANKING required
+	    } else {
+		assert(!"Could not get register from instruction.");
+	    }
 	}
 	if (reg) {
 		if (IsBankChange(pc,reg,&cur_bank))

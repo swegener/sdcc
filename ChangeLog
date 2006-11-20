@@ -1,3 +1,11 @@
+2006-11-20 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c: changed inverted ops for DECFSZ/DECFSZW and
+	  INCFSZ/INCFSZW and declared them as changing Z bit,
+	  (insertPCodeInstruction): correctly invert the above instructions,
+	  fixes #1599333,
+	  (DoBankSelect): don't panic on po_immediates
+
 2006-11-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/aslink.h,

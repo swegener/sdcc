@@ -88,8 +88,6 @@ void m3(unsigned char uc)
 
 void main(void)
 {
-  dummy = 0;
-
   c1 = 1;
   c3 = 5;
 

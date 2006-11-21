@@ -2,6 +2,12 @@
 
 unsigned char failures=0;
 
+#if SUPPORT_BIT_TYPES
+# define bit bit
+#else
+# define bit unsigned char
+#endif
+
 bit bit0 = 0;
 bit bit1 = 0;
 unsigned int aint0 = 0;

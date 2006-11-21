@@ -3,8 +3,8 @@
 // Pointer tests
 
 unsigned char failures = 0;
+unsigned char dummy;
 
-bit bit0 = 0;
 unsigned int aint0 = 0;
 unsigned int aint1 = 0;
 unsigned char achar0 = 0;
@@ -92,10 +92,10 @@ void check_array(char base_value)
 
 void index_by_pointer(unsigned char *index, unsigned char expected_value)
 {
-
+/*
   if(buff[*index] != expected_value)
     failures++;
-
+*/
 }
 
 

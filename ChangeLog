@@ -1,3 +1,22 @@
+2006-11-21 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/regression/arrays.c,
+	* src/regression/bank1.c,
+	* src/regression/bool2.c,
+	* src/regression/compare7.c,
+	* src/regression/compare8.c,
+	* src/regression/compare9.c,
+	* src/regression/compare10.c,
+	* src/regression/configword.c,
+	* src/regression/for.c,
+	* src/regression/mult1.c,
+	* src/regression/pointer1.c,
+	* src/regression/rotate6.c,
+	* src/regression/string1.c,
+	* src/regression/struct1.c,
+	* src/regression/Makefile: make PIC14 regression tests run again
+	  (3 fail, 6 won't compile)
+
 2006-11-21 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f4550.h,

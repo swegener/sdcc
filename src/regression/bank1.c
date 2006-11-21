@@ -1,5 +1,11 @@
 #include "gpsim_assert.h"
 
+#if SUPPORT_BIT_TYPES
+# define bit bit
+#else
+# define bit unsigned char
+#endif
+
 unsigned char success=0;
 unsigned char failures=0;
 unsigned char dummy=0;

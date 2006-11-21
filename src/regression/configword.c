@@ -3,6 +3,7 @@
  * be assigned */
 
 unsigned char failures=0;
+unsigned char dummy;
 
 /* copied from 16f877.inc file supplied with gpasm */
 
@@ -31,7 +32,7 @@ unsigned char failures=0;
 
 typedef unsigned int word;
 
-word at 0x2007  CONFIG = _WDT_OFF & _PWRTE_ON;
+//word at 0x2007  CONFIG = _WDT_OFF & _PWRTE_ON;
 
 
 /* to do -- write a test that puts the PIC to sleep,

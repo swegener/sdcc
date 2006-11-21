@@ -66,26 +66,27 @@ CREATESTC = create_stc
 SIMULATE = simulate
 
 # List the C files to be test here:
-SRC = b.c \
-	add.c \
+SRC =	add.c \
 	add2.c \
 	add3.c \
-	and1.c \
+	add4.c \
 	and2.c \
+	arrays.c \
 	b.c \
+	bank1.c \
 	bool1.c \
+	bool2.c \
 	bool3.c \
 	call1.c \
 	compare.c \
 	compare2.c \
 	compare3.c \
-	compare4.c \
-	compare5.c \
-	compare6.c \
+	configword.c \
 	for.c \
 	inline.c \
+	mult1.c \
 	nestfor.c \
-	or1.c \
+	pointer1.c \
 	ptrarg.c \
 	ptrfunc.c \
 	rotate1.c \
@@ -93,30 +94,24 @@ SRC = b.c \
 	rotate3.c \
 	rotate4.c \
 	rotate5.c \
+	string1.c \
+	struct1.c \
 	sub.c \
 	sub2.c \
 	switch1.c \
 	while.c \
 	xor.c
-#	arrays.c \
-#	add4.c \
-#	bank1.c \
 #	compare7.c \
 #	compare8.c \
 #	compare9.c \
 #	compare10.c \
-#	configword.c \
-#	mult1.c \
-#	pointer1.c \
 #	rotate6.c \
 #	rotate7.c \
-#	string1.c \
-#	struct1.c \
-#	bool2.c \
 
 COD := $(patsubst %.c, %.cod, $(SRC))
 ASM := $(patsubst %.c, %.asm, $(SRC))
-O := $(patsubst %.c, %.o, $(SRC))
+O   := $(patsubst %.c, %.o,   $(SRC))
+P   := $(patsubst %.c, %.p,   $(SRC))
 STC := $(patsubst %.c, %.stc, $(SRC))
 HEX := $(patsubst %.c, %.hex, $(SRC))
 LST := $(patsubst %.c, %.lst, $(SRC))
@@ -164,6 +159,12 @@ cleano:
 	  if [ -f $$f ]; then rm $$f; fi \
 	done ; \
 
+cleanp:
+	files="$(P)" ; \
+	for f in $$files ; do \
+	  if [ -f $$f ]; then rm $$f; fi \
+	done ; \
+
 cleanasm:
 	files="$(ASM)" ; \
 	for f in $$files ; do \
@@ -188,5 +189,11 @@ cleanlst:
 	  if [ -f $$f ]; then rm $$f; fi \
 	done ; \
 
-clean: cleancod cleanasm cleanstc cleano cleanhex cleanlst
+cleanmap:
+	files="$(MAP)" ; \
+	for f in $$files ; do \
+	  if [ -f $$f ]; then rm $$f; fi \
+	done ; \
+
+clean: cleancod cleanasm cleanstc cleano cleanp cleanhex cleanlst cleanmap
 	if [ -f "$(LOGFILE)" ]; then rm $(LOGFILE); fi

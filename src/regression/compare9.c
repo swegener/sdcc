@@ -23,7 +23,7 @@ signed char char1 = 0;
 
 typedef unsigned int word;
 
-word at 0x2007  CONFIG = wdt_off & pwrte_on;
+//word at 0x2007  CONFIG = wdt_off & pwrte_on;
 
 void
 done()

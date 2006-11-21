@@ -29,11 +29,14 @@ void for1(void)
 void for2(void)
 {
   unsigned char i=0;
+  unsigned char j;
 
   for(i=0; i<10; i++)
     uchar0++;
 
-  if(i < 10)
+  j = (volatile)i;
+
+  if(j != 10)
     failures++;
 
 }
@@ -41,11 +44,13 @@ void for2(void)
 void for3(void)
 {
   unsigned int i=0;
+  volatile unsigned int j;
 
   for(i=0; i<10; i++)
     uint0++;
 
-  if(i < 10)
+  j = i;
+  if(j != 10)
     failures++;
 
 }

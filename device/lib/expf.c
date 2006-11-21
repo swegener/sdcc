@@ -233,6 +233,7 @@ exp_cordic_skip:
 	dec	sp
 	dec	sp
 expf_done:
+	clr	acc.7		// Result is always positive!
 	_endasm;
 #pragma less_pedantic
 }

@@ -224,8 +224,8 @@ __sfr __at (0xFBB) CCPR2L;
 
 __sfr __at (0xFBC) CCPR2H;
 
-__sfr __at (0xFBD) ECCP1CON;
-volatile __ECCP1CON_t __at (0xFBD) ECCP1CONbits;
+__sfr __at (0xFBD) CCP1CON;
+volatile __CCP1CON_t __at (0xFBD) CCP1CONbits;
 
 __sfr __at (0xFBE) CCPR1L;
 

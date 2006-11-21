@@ -1026,7 +1026,7 @@ extern __sfr __at (0xFBB) CCPR2L;
 
 extern __sfr __at (0xFBC) CCPR2H;
 
-extern __sfr __at (0xFBD) ECCP1CON;
+extern __sfr __at (0xFBD) CCP1CON;
 typedef union {
 	struct {
 		unsigned CCP1M0    	: 1;
@@ -1038,8 +1038,8 @@ typedef union {
 		unsigned P1M0      	: 1;
 		unsigned P1M1      	: 1;
 	};
-} __ECCP1CON_t;
-extern volatile __ECCP1CON_t __at (0xFBD) ECCP1CONbits;
+} __CCP1CON_t;
+extern volatile __CCP1CON_t __at (0xFBD) CCP1CONbits;
 
 extern __sfr __at (0xFBE) CCPR1L;
 
@@ -1397,16 +1397,6 @@ typedef union {
 		unsigned RBIE      	: 1;
 		unsigned INT0IE    	: 1;
 		unsigned TMR0IE    	: 1;
-		unsigned PEIE_GIEL 	: 1;
-		unsigned GIE_GIEH  	: 1;
-	};
-	struct {
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
 		unsigned PEIE      	: 1;
 		unsigned GIE       	: 1;
 	};

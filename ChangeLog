@@ -1,3 +1,11 @@
+2006-11-21 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f4550.h,
+	* device/include/pic16/pic18f4455.h,
+	* device/lib/pic16/libdev/pic18f4550.c,
+	* device/lib/pic16/libdev/pic18f4455.c: fixed #1578591 and #1595144
+	* configure.in: removed superfluous closing bracket
+
 2006-11-21 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/lib/expf.c: Fixed bug 1599523: result of expf(x) is

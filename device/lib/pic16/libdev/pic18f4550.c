@@ -130,6 +130,12 @@ volatile __LATB_t __at (0xF8A) LATBbits;
 __sfr __at (0xF8B) LATC;
 volatile __LATC_t __at (0xF8B) LATCbits;
 
+__sfr __at (0xF8C) LATD;
+volatile __LATD_t __at (0xF8C) LATDbits;
+
+__sfr __at (0xF8D) LATE;
+volatile __LATE_t __at (0xF8D) LATEbits;
+
 __sfr __at (0xF92) TRISA;
 volatile __TRISA_t __at (0xF92) TRISAbits;
 
@@ -141,6 +147,9 @@ volatile __TRISC_t __at (0xF94) TRISCbits;
 
 __sfr __at (0xF95) TRISD;
 volatile __TRISD_t __at (0xF95) TRISDbits;
+
+__sfr __at (0xF96) TRISE;
+volatile __TRISE_t __at (0xF96) TRISEbits;
 
 __sfr __at (0xF9B) OSCTUNE;
 volatile __OSCTUNE_t __at (0xF9B) OSCTUNEbits;

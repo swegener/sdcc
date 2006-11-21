@@ -641,7 +641,7 @@ fi
 
 if test $OPT_DISABLE_HC08 = 0; then
   AC_CONFIG_FILES([src/hc08/Makefile
-                   as/hc08/Makefile]
+                   as/hc08/Makefile
                    as/link/hc08/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/hc08/Makefile])
 fi

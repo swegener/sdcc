@@ -1,4 +1,23 @@
-2006-11-14 Maarten Brock <sourceforge.brock AT dse.nl>
+2006-11-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/c8051f000.h, device/include/mcs51/C8051F000.h,
+	* device/include/mcs51/c8051f018.h, device/include/mcs51/C8051F018.h,
+	* device/include/mcs51/c8051f020.h, device/include/mcs51/C8051F020.h,
+	* device/include/mcs51/c8051f040.h, device/include/mcs51/C8051F040.h,
+	* device/include/mcs51/c8051f060.h, device/include/mcs51/C8051F060.h,
+	* device/include/mcs51/c8051f120.h, device/include/mcs51/C8051F120.h,
+	* device/include/mcs51/c8051f200.h, device/include/mcs51/C8051F200.h,
+	* device/include/mcs51/c8051f300.h, device/include/mcs51/C8051F300.h,
+	* device/include/mcs51/c8051f310.h, device/include/mcs51/C8051F310.h,
+	* device/include/mcs51/c8051f320.h, device/include/mcs51/C8051F320.h,
+	* device/include/mcs51/c8051f326.h, device/include/mcs51/C8051F326.h,
+	* device/include/mcs51/c8051f330.h, device/include/mcs51/C8051F330.h,
+	* device/include/mcs51/c8051f340.h, device/include/mcs51/C8051F340.h,
+	* device/include/mcs51/c8051f350.h, device/include/mcs51/C8051F350.h,
+	* device/include/mcs51/c8051f410.h, device/include/mcs51/C8051F410.h:
+	  Renamed to all upper case as per the standard set by SiLabs
+
+2006-11-23 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/C8051F520.h: new, added
 	* device/include/mcs51/compiler.h: added link about predefined macros

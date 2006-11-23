@@ -22,5 +22,5 @@ q
 }
 }
 $ a\
-FAILED
+===> FAILED
 ' | tee -a $LOGFILE

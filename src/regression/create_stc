@@ -11,4 +11,5 @@ fi
 
 echo "load $1" > $2
 echo "run" >> $2
+echo "symbol _failures" >> $2
 echo "quit" >> $2

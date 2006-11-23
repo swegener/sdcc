@@ -83,7 +83,6 @@ static hTab  *dynDirectRegNames= NULL;
 // static hTab  *regHash = NULL;    /* a hash table containing ALL registers */
 
 static int dynrIdx = 0x1000;
-static int rDirectIdx = 0x5000;
 
 int pic14_nRegs = 128;   // = sizeof (regspic14) / sizeof (regs);
 
@@ -384,7 +383,7 @@ static regs* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int si
 	dReg->reg_alias = reg_alias;
 	dReg->reglives.usedpFlows = newSet();
 	dReg->reglives.assignedpFlows = newSet();
-	hTabAddItem(&dynDirectRegNames, regname2key(dReg->name), dReg);
+	if (type != REG_STK) hTabAddItem(&dynDirectRegNames, regname2key(dReg->name), dReg);
 	debugLog( "%s: Created register %s.\n", __FUNCTION__, dReg->name);
 	
 	return dReg;
@@ -501,14 +500,13 @@ void initStack(int base_address, int size)
 		char buffer[16];
 		regs *r;
 		SNPRINTF(&buffer[0], 16, "STK%02d", i);
-		r = newReg(REG_STK, PO_GPR_TEMP,base_address,buffer,1,0);
-		r->address = base_address; // Pseudo stack needs a fixed location that can be known by all modules
-		r->isFixed = 1;
+		// Trying to use shared memory for pseudo stack
+		r = newReg(REG_STK, PO_GPR_TEMP, base_address--, buffer, 1, 0x180);
+		r->isFixed = 0; // fixed location no longer required
 		r->isPublic = 1;
+		r->isEmitted = 1;
 		//r->name[0] = 's';
-		r->alias = 0x180; // Using shared memory for pseudo stack
 		addSet(&dynStackRegs,r);
-		base_address--;
 	}
 }
 
@@ -631,7 +629,7 @@ allocNewDirReg (sym_link *symlnk,const char *name)
 			else
 				idx = address;
 		} else {
-			idx = rDirectIdx++;
+			idx = dynrIdx++;
 		}
 		reg = newReg(REG_GPR, PO_DIR, idx, (char*)name,getSize (symlnk),0 );
 		debugLog ("  -- added %s to hash, size = %d\n", (char*)name,reg->size);
@@ -744,7 +742,7 @@ allocDirReg (operand *op )
 		if(!IS_CONFIG_ADDRESS(address)) {
 			//fprintf(stderr,"allocating new reg %s\n",name);
 			
-			reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
+			reg = newReg(REG_GPR, PO_DIR, dynrIdx++, name,getSize (OP_SYMBOL (op)->type),0 );
 			debugLog ("  -- added %s to hash, size = %d\n", name,reg->size);
 			
 			//hTabAddItem(&dynDirectRegNames, regname2key(name), reg);
@@ -821,7 +819,7 @@ allocRegByName (char *name, int size)
 		* a new one and put it in the hash table AND in the 
 		* dynDirectRegNames set */
 		//fprintf (stderr,"%s symbol name %s, size:%d\n", __FUNCTION__,name,size);
-		reg = newReg(REG_GPR, PO_DIR, rDirectIdx++, name,size,0 );
+		reg = newReg(REG_GPR, PO_DIR, dynrIdx++, name,size,0 );
 		for (sym = setFirstItem(sfr->syms); sym; sym = setNextItem(sfr->syms)) {
 			if (strcmp(reg->name+1,sym->name)==0) {
 				unsigned a = SPEC_ADDR(sym->etype);
@@ -897,14 +895,14 @@ typeRegWithIdx (int idx, int type, int fixed)
 		
 		break;
 	case REG_STK:
-		if( (dReg = regWithIdx ( dynStackRegs, idx, fixed)) != NULL ) {
+		if( (dReg = regWithIdx ( dynStackRegs, idx, 0)) != NULL ) {
 			debugLog ("Found a Stack Register!\n");
 			return dReg;
 		}
 		else {
 		  werror (E_STACK_OUT, "Register");
                   /* return an existing register just to avoid the SDCC crash */
-		  return regWithIdx ( dynStackRegs, 0x7f, fixed);
+		  return regWithIdx ( dynStackRegs, 0x7f, 0);
                 }
 		break;
 	case REG_SFR:
@@ -1124,7 +1122,7 @@ void packBits(set *bregs)
 				bit_no=0;
 				sprintf (buffer, "bitfield%d", byte_no);
 				//fprintf(stderr,"new relocatable bit field\n");
-				relocbitfield = newReg(REG_GPR, PO_GPR_BIT,rDirectIdx++,buffer,1,0);
+				relocbitfield = newReg(REG_GPR, PO_GPR_BIT,dynrIdx++,buffer,1,0);
 				relocbitfield->isBitField = 1;
 				//addSet(&dynDirectRegs,relocbitfield);
 				addSet(&dynInternalRegs,relocbitfield);
@@ -1133,7 +1131,7 @@ void packBits(set *bregs)
 			}
 			
 			breg->reg_alias = relocbitfield;
-			breg->address = rDirectIdx;   /* byte_no; */
+			breg->address = dynrIdx;   /* byte_no; */
 			breg->rIdx = bit_no++;
 		}
 	}

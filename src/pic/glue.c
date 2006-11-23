@@ -322,11 +322,10 @@ pic14_constructAbsMap (FILE *ofile)
     for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
       fprintf (ofile, "\tglobal STK%02d\n", i);
     } // for i
-    fprintf (ofile, "sharebank udata_ovr 0x%04x\n",
-	  pic14_getSharebankAddress() - pic14_getSharebankSize() + 1);
+    fprintf (ofile, "sharebank udata_shr\n");//pic14_getSharebankAddress() - pic14_getSharebankSize());
     fprintf (ofile, "PSAVE\tres 1\n");
     fprintf (ofile, "SSAVE\tres 1\n");
-    fprintf (ofile, "WSAVE\tres 1\n");
+    fprintf (ofile, "WSAVE\tres 1\n"); // WSAVE *must* be in sharebank (IRQ handlers)
     /* fill rest of sharebank with stack STKxx .. STK00 */
     for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
       fprintf (ofile, "STK%02d\tres 1\n", i);
@@ -338,7 +337,10 @@ pic14_constructAbsMap (FILE *ofile)
     fprintf (ofile, "\textern SSAVE\n");
     fprintf (ofile, "\textern WSAVE\n");
     for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
-      fprintf (ofile, "\textern STK%02d\n", i);
+	char buffer[128];
+	SNPRINTF(&buffer[0], 127, "STK%02d", i);
+	fprintf (ofile, "\textern %s\n", &buffer[0]);
+	addSet (&symbolsEmitted, (void *) &buffer[0]);
     } // for i
   }
 }

@@ -809,6 +809,7 @@ typedef struct peepCommand {
 #define isPCL(x)        ((PCODE(x)->type == PC_LABEL))
 #define isPCW(x)        ((PCODE(x)->type == PC_WILD))
 #define isPCCS(x)       ((PCODE(x)->type == PC_CSOURCE))
+#define isPCASMDIR(x)	((PCODE(x)->type == PC_ASMDIR))
 
 /*
   macros for checking pCodeInstruction types

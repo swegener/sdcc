@@ -122,7 +122,7 @@ void c_2(void)
 void c_ff(void)
 {
 
-  if(char0 != 0xff)
+  if(char0 != (char)0xff)
     failures++;
 
   if(int0 != 0xff)
@@ -145,7 +145,7 @@ void c_ff(void)
 void c_a5(void)
 {
 
-  if(char0 != 0xa5)
+  if(char0 != (char)0xa5)
     failures++;
 
   if(int0 != 0xa5)

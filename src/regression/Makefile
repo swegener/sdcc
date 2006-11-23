@@ -52,7 +52,7 @@ Q ?= @ # be quiet
 CC = sdcc
 LINKER = gplink
 TARGETPIC = 16f877
-CFLAGS = -Wl,--map -I ../../device/include/pic -mpic14 -pp$(TARGETPIC) -Wl,-q
+CFLAGS = -Wl,--map -I ../../device/include/pic -L ../../device/lib/pic/bin -mpic14 -pp$(TARGETPIC) -Wl,-q
 
 .SUFFIXES: .asm .c .cod .stc
 
@@ -66,47 +66,52 @@ CREATESTC = create_stc
 SIMULATE = simulate
 
 # List the C files to be test here:
-SRC =	add.c \
-	add2.c \
-	add3.c \
-	add4.c \
-	and2.c \
-	arrays.c \
-	b.c \
-	bank1.c \
-	bool1.c \
-	bool2.c \
-	bool3.c \
-	call1.c \
-	compare.c \
-	compare2.c \
-	compare3.c \
-	configword.c \
-	for.c \
-	inline.c \
-	mult1.c \
-	nestfor.c \
-	pointer1.c \
-	ptrarg.c \
-	ptrfunc.c \
-	rotate1.c \
-	rotate2.c \
-	rotate3.c \
-	rotate4.c \
-	rotate5.c \
-	string1.c \
-	struct1.c \
-	sub.c \
-	sub2.c \
-	switch1.c \
-	while.c \
-	xor.c
-#	compare7.c \
-#	compare8.c \
-#	compare9.c \
-#	compare10.c \
-#	rotate6.c \
-#	rotate7.c \
+SRC = add.c \
+      add2.c \
+      add3.c \
+      add4.c \
+      and1.c \
+      and2.c \
+      arrays.c \
+      b.c \
+      bank1.c \
+      bool1.c \
+      bool2.c \
+      bool3.c \
+      call1.c \
+      compare.c \
+      compare10.c \
+      compare2.c \
+      compare3.c \
+      compare4.c \
+      compare5.c \
+      compare6.c \
+      compare7.c \
+      compare8.c \
+      compare9.c \
+      configword.c \
+      for.c \
+      inline.c \
+      mult1.c \
+      nestfor.c \
+      or1.c \
+      pointer1.c \
+      ptrarg.c \
+      ptrfunc.c \
+      rotate1.c \
+      rotate2.c \
+      rotate3.c \
+      rotate4.c \
+      rotate5.c \
+      rotate6.c \
+      rotate7.c \
+      string1.c \
+      struct1.c \
+      sub.c \
+      sub2.c \
+      switch1.c \
+      while.c \
+      xor.c
 
 COD := $(patsubst %.c, %.cod, $(SRC))
 ASM := $(patsubst %.c, %.asm, $(SRC))

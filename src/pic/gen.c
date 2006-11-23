@@ -5648,7 +5648,7 @@ static void genAnd (iCode *ic, iCode *ifx)
 						offset++;
 					}
 					emitpcode(((rIfx.condition) ? POC_BTFSC : POC_BTFSS),
-						newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),posbit-1,0));
+						newpCodeOpBit(aopGet(AOP(left),offset,FALSE,FALSE),posbit,0));
 					emitpcode(POC_GOTO,popGetLabel(rIfx.lbl->key));
 					
 					ifx->generated = 1;

@@ -1,3 +1,8 @@
+2006-11-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/C8051F520.h: new, added
+	* device/include/mcs51/compiler.h: added link about predefined macros
+
 2006-11-23 Raphael Neider <rneider AT web.de>
 
 	* src/regression/Makefile: add -L path to fresh library
@@ -25,7 +30,7 @@
 	    optimizations (suppress BANKSELs to same register and to registers
 	    present in all banks),
 	  (AnalyzeBanking): update flow after BANKSELection
-	
+
 	* src/pic/glue.c (pic14_constructAbsMap): emit pseudo stack in
 	    sharebank, let linker place it, mark STKxx symbols as emitted
 

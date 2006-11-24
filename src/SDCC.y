@@ -133,8 +133,16 @@ bool uselessDecl = TRUE;
 %%
 
 file
+   : /* empty */
+        { if (!options.lessPedantic)
+		    werror(W_EMPTY_SOURCE_FILE);
+        }
+   | program
+   ;
+
+program
    : external_definition       
-   | file external_definition
+   | program external_definition
    ;
 
 external_definition

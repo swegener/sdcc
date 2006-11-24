@@ -205,6 +205,7 @@ SDCCERR - SDCC Standard error handler
 #define W_C89_NO_FLEXARRAY            187 /* ISO C90 does not support flexible array members */
 #define E_FLEXARRAY_NOTATEND          188 /* flexible array member not at end of struct */
 #define E_FLEXARRAY_INEMPTYSTRCT      189 /* flexible array in otherwise empty struct */
+#define W_EMPTY_SOURCE_FILE           190 /* ISO C forbids an empty source file */
 
 #define MAX_ERROR_WARNING             256 /* size of disable warnings array */
 

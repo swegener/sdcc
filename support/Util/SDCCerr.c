@@ -432,6 +432,8 @@ struct
    "flexible array member not at end of struct" },
 { E_FLEXARRAY_INEMPTYSTRCT, ERROR_LEVEL_ERROR,
    "flexible array in otherwise empty struct" },
+{ W_EMPTY_SOURCE_FILE, ERROR_LEVEL_WARNING,
+   "ISO C forbids an empty source file" },
 };
 
 /*

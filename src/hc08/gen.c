@@ -2735,6 +2735,8 @@ genPcall (iCode * ic)
   emitBranch ("bsr", tlbl);
   emitBranch ("bra", rlbl);
   emitLabel (tlbl);
+  _G.stackPushes += 2; /* account for the bsr return address now on stack */
+  updateCFA();
 
   /* Push the function's address */
   aopOp (IC_LEFT (ic), ic, FALSE);
@@ -2753,6 +2755,8 @@ genPcall (iCode * ic)
   emitcode ("rts", "");
 
   emitLabel (rlbl);
+  _G.stackPushes -= 4; /* account for rts here & in called function */
+  updateCFA();
 
 
   /* if we need assign a result value */

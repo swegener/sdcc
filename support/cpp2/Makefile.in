@@ -185,15 +185,14 @@ version.o: version.c version.h
 
 hashtable.o: hashtable.c hashtable.h $(CONFIG_H) $(SYSTEM_H) $(OBSTACK_H)
 
+line-map.o: line-map.c line-map.h intl.h $(CONFIG_H) $(SYSTEM_H)
+
+mbchar.o: mbchar.c mbchar.h $(CONFIG_H) $(SYSTEM_H)
+
 prefix.o: prefix.c $(CONFIG_H) $(SYSTEM_H) Makefile prefix.h
 	$(CC) $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) \
 	-DPREFIX=\"$(prefix)\" \
 	  -c $(srcdir)/prefix.c
-
-intl.o: intl.c intl.h Makefile
-	$(CC) $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) \
-	  -DLOCALEDIR=\"$(localedir)\" \
-	  -c $(srcdir)/intl.c
 
 #
 # Remake cpp and protoize.
@@ -209,7 +208,8 @@ PREPROCESSOR_DEFINES = \
 
 LIBCPP_OBJS =	cpplib.o cpplex.o cppmacro.o cppexp.o cppfiles.o \
 		cpphash.o cpperror.o cppinit.o cppdefault.o \
-		hashtable.o mkdeps.o prefix.o version.o mbchar.o
+		hashtable.o mkdeps.o prefix.o version.o mbchar.o \
+		line-map.o
 
 LIBCPP_DEPS =	cpplib.h cpphash.h hashtable.h intl.h $(OBSTACK_H) $(SYSTEM_H)
 
@@ -221,9 +221,9 @@ libcpp.a: $(LIBCPP_OBJS)
 	-$(RANLIB) libcpp.a
 
 MY_LIBIBERTY_BITS = safe-ctype.o obstack.o splay-tree.o \
-		    lbasename.o
+		    lbasename.o hex.o concat.o
 
-$(TARGET): cppmain.o intl.o $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS) 
+$(TARGET): cppmain.o $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS)
 	mkdir -p $(dir $@)
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ cppmain.o \
 	$(MY_LIBIBERTY_BITS) libcpp.a $(LIBS)
@@ -246,6 +246,10 @@ obstack.o: $(LIBIBERTY_DIR)/obstack.c $(LIBIBERTY_DIR)/obstack.h $(CONFIG_H) $(L
 splay-tree.o: $(LIBIBERTY_DIR)/splay-tree.c $(LIBIBERTY_DIR)/splay-tree.h $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 lbasename.o: $(LIBIBERTY_DIR)/lbasename.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+hex.o: $(LIBIBERTY_DIR)/hex.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+concat.o: $(LIBIBERTY_DIR)/concat.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 cppdefault.o: cppdefault.c $(CONFIG_H) $(SYSTEM_H) cppdefault.h Makefile
 	$(CC) $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) \

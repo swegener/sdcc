@@ -94,6 +94,17 @@ ht_create (order)
   return table;
 }
 
+/* Frees all memory associated with a hash table.  */
+
+void
+ht_destroy (table)
+     hash_table *table;
+{
+  obstack_free (&table->stack, NULL);
+  free (table->entries);
+  free (table);
+}
+
 /* Returns the hash entry for the a STR of length LEN.  If that string
    already exists in the table, returns the existing entry, and, if
    INSERT is CPP_ALLOCED, frees the last obstack object.  If the
@@ -151,7 +162,7 @@ ht_lookup (table, str, len, insert)
 
   HT_LEN (node) = len;
   if (insert == HT_ALLOC)
-    HT_STR (node) = obstack_copy (&table->stack, str, len + 1);
+    HT_STR (node) = obstack_copy0 (&table->stack, str, len);
   else
     HT_STR (node) = str;
 
@@ -258,7 +269,7 @@ ht_dump_statistics (table)
 	nids++;
       }
   while (++p < limit);
-      
+
   nelts = table->nelements;
   overhead = obstack_memory_used (&table->stack) - total_bytes;
   headers = table->nslots * sizeof (hashnode);

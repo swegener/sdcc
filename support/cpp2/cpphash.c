@@ -1,6 +1,6 @@
 /* Hash tables for the CPP library.
    Copyright (C) 1986, 1987, 1989, 1992, 1993, 1994, 1995, 1996, 1998,
-   1999, 2000 Free Software Foundation, Inc.
+   1999, 2000, 2001, 2002 Free Software Foundation, Inc.
    Written by Per Bothner, 1994.
    Based on CCCP program by Paul Rubin, June 1986
    Adapted to ANSI C, Richard Stallman, Jan 1987
@@ -32,13 +32,12 @@ static cpp_hashnode *alloc_node PARAMS ((hash_table *));
 
 /* Return an identifier node for hashtable.c.  Used by cpplib except
    when integrated with the C front ends.  */
-
 static cpp_hashnode *
 alloc_node (table)
      hash_table *table;
 {
   cpp_hashnode *node;
-  
+
   node = (cpp_hashnode *) obstack_alloc (&table->pfile->hash_ob,
 					 sizeof (cpp_hashnode));
   memset ((PTR) node, 0, sizeof (cpp_hashnode));
@@ -47,12 +46,13 @@ alloc_node (table)
 
 /* Set up the identifier hash table.  Use TABLE if non-null, otherwise
    create our own.  */
-
 void
 _cpp_init_hashtable (pfile, table)
      cpp_reader *pfile;
      hash_table *table;
 {
+  struct spec_nodes *s;
+
   if (table == NULL)
     {
       pfile->our_hashtable = 1;
@@ -63,24 +63,37 @@ _cpp_init_hashtable (pfile, table)
 
   table->pfile = pfile;
   pfile->hash_table = table;
+
+  /* Now we can initialize things that use the hash table.  */
+  _cpp_init_directives (pfile);
+  _cpp_init_internal_pragmas (pfile);
+
+  s = &pfile->spec_nodes;
+  s->n_defined		= cpp_lookup (pfile, DSC("defined"));
+  s->n_true		= cpp_lookup (pfile, DSC("true"));
+  s->n_false		= cpp_lookup (pfile, DSC("false"));
+  s->n__STRICT_ANSI__   = cpp_lookup (pfile, DSC("__STRICT_ANSI__"));
+  s->n__VA_ARGS__       = cpp_lookup (pfile, DSC("__VA_ARGS__"));
+  s->n__VA_ARGS__->flags |= NODE_DIAGNOSTIC;
+  /* SDCC _asm specific */
+  s->n__asm             = cpp_lookup (pfile, DSC("_asm"));
+
 }
 
 /* Tear down the identifier hash table.  */
-
 void
 _cpp_destroy_hashtable (pfile)
      cpp_reader *pfile;
 {
   if (pfile->our_hashtable)
     {
-      free (pfile->hash_table);
+      ht_destroy (pfile->hash_table);
       obstack_free (&pfile->hash_ob, 0);
     }
 }
 
 /* Returns the hash entry for the STR of length LEN, creating one
    if necessary.  */
-
 cpp_hashnode *
 cpp_lookup (pfile, str, len)
      cpp_reader *pfile;
@@ -92,7 +105,6 @@ cpp_lookup (pfile, str, len)
 }
 
 /* Determine whether the str STR, of length LEN, is a defined macro.  */
-
 int
 cpp_defined (pfile, str, len)
      cpp_reader *pfile;
@@ -109,7 +121,6 @@ cpp_defined (pfile, str, len)
 
 /* For all nodes in the hashtable, callback CB with parameters PFILE,
    the node, and V.  */
-
 void
 cpp_forall_identifiers (pfile, cb, v)
      cpp_reader *pfile;

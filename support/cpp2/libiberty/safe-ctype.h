@@ -16,8 +16,8 @@ Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public
 License along with libiberty; see the file COPYING.LIB.  If
-not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+not, write to the Free Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+Boston, MA 02110-1301, USA.  */
 
 /* This is a compatible replacement of the standard C library's <ctype.h>
    with the following properties:
@@ -37,7 +37,24 @@ Boston, MA 02111-1307, USA.  */
 
 #ifdef isalpha
  #error "safe-ctype.h and ctype.h may not be used simultaneously"
+#endif
+
+/* Determine host character set.  */
+#define HOST_CHARSET_UNKNOWN 0
+#define HOST_CHARSET_ASCII   1
+#define HOST_CHARSET_EBCDIC  2
+
+#if  '\n' == 0x0A && ' ' == 0x20 && '0' == 0x30 \
+   && 'A' == 0x41 && 'a' == 0x61 && '!' == 0x21
+#  define HOST_CHARSET HOST_CHARSET_ASCII
 #else
+# if '\n' == 0x15 && ' ' == 0x40 && '0' == 0xF0 \
+   && 'A' == 0xC1 && 'a' == 0x81 && '!' == 0x5A
+#  define HOST_CHARSET HOST_CHARSET_EBCDIC
+# else
+#  define HOST_CHARSET HOST_CHARSET_UNKNOWN
+# endif
+#endif
 
 /* Categories.  */
 
@@ -63,7 +80,9 @@ enum {
   _sch_isalnum  = _sch_isalpha|_sch_isdigit,	/* A-Za-z0-9 */
   _sch_isidnum  = _sch_isidst|_sch_isdigit,	/* A-Za-z0-9_ */
   _sch_isgraph  = _sch_isalnum|_sch_ispunct,	/* isprint and not space */
-  _sch_iscppsp  = _sch_isvsp|_sch_isnvsp	/* isspace + \0 */
+  _sch_iscppsp  = _sch_isvsp|_sch_isnvsp,	/* isspace + \0 */
+  _sch_isbasic  = _sch_isprint|_sch_iscppsp     /* basic charset of ISO C
+						   (plus ` and @)  */
 };
 
 /* Character classification.  */
@@ -86,6 +105,7 @@ extern const unsigned short _sch_istable[256];
 
 #define ISIDNUM(c)	_sch_test(c, _sch_isidnum)
 #define ISIDST(c)	_sch_test(c, _sch_isidst)
+#define IS_ISOBASIC(c)	_sch_test(c, _sch_isbasic)
 #define IS_VSPACE(c)	_sch_test(c, _sch_isvsp)
 #define IS_NVSPACE(c)	_sch_test(c, _sch_isnvsp)
 #define IS_SPACE_OR_NUL(c)	_sch_test(c, _sch_iscppsp)
@@ -96,5 +116,4 @@ extern const unsigned char  _sch_tolower[256];
 #define TOUPPER(c) _sch_toupper[(c) & 0xff]
 #define TOLOWER(c) _sch_tolower[(c) & 0xff]
 
-#endif /* no ctype.h */
 #endif /* SAFE_CTYPE_H */

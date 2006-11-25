@@ -47,7 +47,7 @@ static const char *munge	PARAMS ((const char *));
    not properly handled.  It isn't possible to get this right in any
    current version of Make.  (??? Still true?  Old comment referred to
    3.76.1.)  */
-   
+
 static const char *
 munge (filename)
      const char *filename;
@@ -179,21 +179,23 @@ deps_add_target (d, t, quote)
    is quoted for MAKE.  */
 void
 deps_add_default_target (pfile, tgt)
-    cpp_reader *pfile;
-    const char *tgt;
+     cpp_reader *pfile;
+     const char *tgt;
 {
+   struct deps *d = pfile->deps;
+
   /* Only if we have no targets.  */
-  if (pfile->deps->ntargets)
+  if (d->ntargets)
     return;
 
   if (tgt[0] == '\0')
-    deps_add_target (pfile->deps, "-", 1);
+    deps_add_target (d, "-", 1);
   else
     {
 #ifndef TARGET_OBJECT_SUFFIX
 # define TARGET_OBJECT_SUFFIX ".o"
 #endif
-      char *start = lbasename (tgt);
+      const char *start = lbasename (tgt);
       char *o;
       char *suffix;
       const char *obj_ext;
@@ -219,7 +221,7 @@ deps_add_default_target (pfile, tgt)
         suffix = o + strlen (o);
       strcpy (suffix, obj_ext);
 
-      deps_add_target (pfile->deps, o, 1);
+      deps_add_target (d, o, 1);
     }
 }
 
@@ -290,7 +292,7 @@ deps_write (d, fp, colmax)
     }
   putc ('\n', fp);
 }
-  
+
 void
 deps_phony_targets (d, fp)
      const struct deps *d;

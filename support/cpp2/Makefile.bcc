@@ -6,11 +6,13 @@ PRJDIR          = ../..
 
 CFLAGS = $(CFLAGS) -I. -I./libiberty -DHAVE_CONFIG_H
 
-OBJECTS         = cppmain.obj intl.obj \
+OBJECTS         = cppmain.obj \
                   cpplib.obj cpplex.obj cppmacro.obj cppexp.obj cppfiles.obj \
                   cpphash.obj cpperror.obj cppinit.obj cppdefault.obj \
                   hashtable.obj mkdeps.obj prefix.obj version.obj mbchar.obj \
-                  safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj
+                  line-map.obj \
+                  safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj \
+                  hex.obj concat.obj
 
 TARGET          = $(PRJDIR)/bin/sdcpp.exe
 
@@ -26,3 +28,5 @@ safe-ctype.obj: libiberty\safe-ctype.c
 obstack.obj: libiberty\obstack.c
 splay-tree.obj: libiberty\splay-tree.c
 lbasename.obj: libiberty\lbasename.c
+hex.obj: libiberty\hex.c
+concat.obj: libiberty\concat.c

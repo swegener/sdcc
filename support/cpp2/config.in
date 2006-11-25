@@ -1,7 +1,20 @@
 /* config.in.  Generated automatically from configure.in by autoheader.  */
 
+/* Define if using alloca.c.  */
+#undef C_ALLOCA
+
 /* Define to empty if the keyword does not work.  */
 #undef const
+
+/* Define to one of _getb67, GETB67, getb67 for Cray-2 and Cray-YMP systems.
+   This function is required for alloca.c support on those systems.  */
+#undef CRAY_STACKSEG_END
+
+/* Define if you have alloca, as a function or macro.  */
+#undef HAVE_ALLOCA
+
+/* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
+#undef HAVE_ALLOCA_H
 
 /* Define if you have the ANSI # stringizing operator in cpp. */
 #undef HAVE_STRINGIZE
@@ -21,6 +34,15 @@
 /* Define to `unsigned' if <sys/types.h> doesn't define.  */
 #undef size_t
 
+/* If using the C implementation of alloca, define if you know the
+   direction of stack growth for your system; otherwise it will be
+   automatically deduced at run-time.
+ STACK_DIRECTION > 0 => grows toward higher addresses
+ STACK_DIRECTION < 0 => grows toward lower addresses
+ STACK_DIRECTION = 0 => direction of growth unknown
+ */
+#undef STACK_DIRECTION
+
 /* Define if you have the ANSI C header files.  */
 #undef STDC_HEADERS
 
@@ -30,17 +52,38 @@
 /* Define to `int' if <sys/types.h> doesn't define.  */
 #undef ssize_t
 
+/* Define if cpp should also search $prefix/include.  */
+#undef PREFIX_INCLUDE_DIR
+
 /* Define if you have the dcgettext function.  */
 #undef HAVE_DCGETTEXT
 
+/* Define if you have the dup2 function.  */
+#undef HAVE_DUP2
+
+/* Define if you have the getegid function.  */
+#undef HAVE_GETEGID
+
+/* Define if you have the geteuid function.  */
+#undef HAVE_GETEUID
+
+/* Define if you have the getgid function.  */
+#undef HAVE_GETGID
+
 /* Define if you have the getpagesize function.  */
 #undef HAVE_GETPAGESIZE
+
+/* Define if you have the getuid function.  */
+#undef HAVE_GETUID
 
 /* Define if you have the kill function.  */
 #undef HAVE_KILL
 
 /* Define if you have the lstat function.  */
 #undef HAVE_LSTAT
+
+/* Define if you have the mempcpy function.  */
+#undef HAVE_MEMPCPY
 
 /* Define if you have the munmap function.  */
 #undef HAVE_MUNMAP
@@ -60,17 +103,11 @@
 /* Define if you have the strdup function.  */
 #undef HAVE_STRDUP
 
-/* Define if you have the strrchr function.  */
-#undef HAVE_STRRCHR
-
-/* Define if you have the strstr function.  */
-#undef HAVE_STRSTR
+/* Define if you have the tsearch function.  */
+#undef HAVE_TSEARCH
 
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
-
-/* Define if you have the <iconv.h> header file.  */
-#undef HAVE_ICONV_H
 
 /* Define if you have the <langinfo.h> header file.  */
 #undef HAVE_LANGINFO_H
@@ -117,9 +154,6 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
-/* Define if you have the i library (-li).  */
-#undef HAVE_LIBI
-
 /* Define to enable the use of a default linker. */
 #undef DEFAULT_LINKER
 
@@ -159,6 +193,9 @@
 /* Define if your compiler supports the `long double' type. */
 #undef HAVE_LONG_DOUBLE
 
+/* Define if the `_Bool' type is built-in. */
+#undef HAVE__BOOL
+
 /* The number of bytes in type short */
 #undef SIZEOF_SHORT
 
@@ -170,6 +207,9 @@
 
 /* Define if the host execution character set is EBCDIC. */
 #undef HOST_EBCDIC
+
+/* Define if you have a working <stdbool.h> header file. */
+#undef HAVE_STDBOOL_H
 
 /* Define if you can safely include both <string.h> and <strings.h>. */
 #undef STRING_WITH_STRINGS
@@ -207,6 +247,12 @@
 /* Define if read-only mmap of a plain file works. */
 #undef HAVE_MMAP_FILE
 
+/* Define if you have the iconv() function. */
+#undef HAVE_ICONV
+
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
+
 /* Define to 1 if we found this declaration otherwise define to 0. */
 #undef HAVE_DECL_GETENV
 
@@ -240,11 +286,31 @@
 /* Define if host mkdir takes a single argument. */
 #undef MKDIR_TAKES_ONE_ARG
 
-/* Define to the name of the distribution. */
-#undef PACKAGE
+/* Define if you have the iconv() function. */
+#undef HAVE_ICONV
 
-/* Define to the version of the distribution. */
-#undef VERSION
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
+
+/* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
+#undef HAVE_LANGINFO_CODESET
+
+/* Define if your <locale.h> file defines LC_MESSAGES. */
+#undef HAVE_LC_MESSAGES
+
+/* Define to 1 if translation of program messages to the user's native language
+   is requested. */
+#undef ENABLE_NLS
+
+/* Define if you have the <libintl.h> header file. */
+#undef HAVE_LIBINTL_H
+
+/* Define if the GNU gettext() function is already present or preinstalled. */
+#undef HAVE_GETTEXT
+
+/* Define to use the libintl included with this package instead of any
+   version in the system libraries. */
+#undef USE_INCLUDED_LIBINTL
 
 /* Define to 1 if installation paths should be looked up in Windows32
    Registry. Ignored on non windows32 hosts. */

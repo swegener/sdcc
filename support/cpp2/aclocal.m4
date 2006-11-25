@@ -1,3 +1,16 @@
+dnl See if stdbool.h properly defines bool and true/false.
+AC_DEFUN(gcc_AC_HEADER_STDBOOL,
+[AC_CACHE_CHECK([for working stdbool.h],
+  ac_cv_header_stdbool_h,
+[AC_TRY_COMPILE([#include <stdbool.h>],
+[bool foo = false;],
+ac_cv_header_stdbool_h=yes, ac_cv_header_stdbool_h=no)])
+if test $ac_cv_header_stdbool_h = yes; then
+  AC_DEFINE(HAVE_STDBOOL_H, 1,
+  [Define if you have a working <stdbool.h> header file.])
+fi
+])
+
 dnl See whether we can include both string.h and strings.h.
 AC_DEFUN(gcc_AC_HEADER_STRING,
 [AC_CACHE_CHECK([whether string.h and strings.h may both be included],
@@ -126,6 +139,18 @@ fi
 AC_SUBST(LN)dnl
 ])
 
+dnl Check whether _Bool is built-in.
+AC_DEFUN(gcc_AC_C__BOOL,
+[AC_CACHE_CHECK(for built-in _Bool, gcc_cv_c__bool,
+[AC_TRY_COMPILE(,
+[_Bool foo;],
+gcc_cv_c__bool=yes, gcc_cv_c__bool=no)
+])
+if test $gcc_cv_c__bool = yes; then
+  AC_DEFINE(HAVE__BOOL, 1, [Define if the \`_Bool' type is built-in.])
+fi
+])
+
 dnl Define MKDIR_TAKES_ONE_ARG if mkdir accepts only one argument instead
 dnl of the usual 2.
 AC_DEFUN(gcc_AC_FUNC_MKDIR_TAKES_ONE_ARG,
@@ -140,7 +165,7 @@ AC_DEFUN(gcc_AC_FUNC_MKDIR_TAKES_ONE_ARG,
 #endif
 #ifdef HAVE_DIRECT_H
 # include <direct.h>
-#endif], [mkdir ("foo", 0);], 
+#endif], [mkdir ("foo", 0);],
         gcc_cv_mkdir_takes_one_arg=no, gcc_cv_mkdir_takes_one_arg=yes)])
 if test $gcc_cv_mkdir_takes_one_arg = yes ; then
   AC_DEFINE(MKDIR_TAKES_ONE_ARG, 1, [Define if host mkdir takes a single argument.])
@@ -240,7 +265,7 @@ AC_CACHE_VAL(gcc_cv_path_$1,
   /*)
   gcc_cv_path_$1="[$]$1" # Let the user override the test with a path.
   ;;
-  ?:/*)			 
+  ?:/*)
   gcc_cv_path_$1="[$]$1" # Let the user override the test with a dos path.
   ;;
   *)
@@ -249,7 +274,7 @@ dnl $ac_dummy forces splitting on constant user-supplied paths.
 dnl POSIX.2 word splitting is done only on the output of word expansions,
 dnl not every word.  This closes a longstanding sh security hole.
   ac_dummy="ifelse([$4], , $PATH, [$4])"
-  for ac_dir in $ac_dummy; do 
+  for ac_dir in $ac_dummy; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       gcc_cv_path_$1="$ac_dir/$ac_word"
@@ -533,7 +558,7 @@ test_3 ()
       x[0] = 1;
       perror_exit ("test 3 no fault 1", 19);
     }
-  
+
   signal (SIGSEGV, sigsegv);
   if (setjmp (r) == 0)
     {
@@ -610,7 +635,7 @@ rm -f ct-mmap.inc
 ])
 
 # Check whether mmap can map a plain file, without MAP_FIXED.
-AC_DEFUN([AC_FUNC_MMAP_FILE], 
+AC_DEFUN([AC_FUNC_MMAP_FILE],
 [AC_CACHE_CHECK(for working mmap of a file, ac_cv_func_mmap_file,
 [# Create a file one thousand bytes long.
 for i in 1 2 3 4 5 6 7 8 9 0
@@ -687,7 +712,7 @@ else
 fi
 ])
 
-dnl Determine if enumerated bitfields are unsigned.   ISO C says they can 
+dnl Determine if enumerated bitfields are unsigned.   ISO C says they can
 dnl be either signed or unsigned.
 dnl
 AC_DEFUN(gcc_AC_C_ENUM_BF_UNSIGNED,
@@ -696,7 +721,7 @@ AC_DEFUN(gcc_AC_C_ENUM_BF_UNSIGNED,
 enum t { BLAH = 128 } ;
 struct s_t { enum t member : 8; } s ;
 int main(void)
-{            
+{
         s.member = BLAH;
         if (s.member < 0) exit(1);
         exit(0);
@@ -758,7 +783,7 @@ if test $gcc_cv_decl_char_bit = no; then
      [switch(0) {
   case (unsigned char)((unsigned long)1 << $i) == ((unsigned long)1 << $i):
   case (unsigned char)((unsigned long)1<<($i-1)) == ((unsigned long)1<<($i-1)):
-  ; }], 
+  ; }],
      [gcc_cv_c_nbby=$i; break])
    i=`expr $i + 1`
  done

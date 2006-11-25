@@ -1,23 +1,23 @@
 /* Get common system includes and various definitions and declarations based
    on autoconf macros.
-   Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
-This file is part of GNU CC.
+This file is part of GCC.
 
-GNU CC is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+GCC is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
 
-GNU CC is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
 
 You should have received a copy of the GNU General Public License
-along with GNU CC; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+along with GCC; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.  */
 
 
 #ifndef GCC_SYSTEM_H
@@ -30,7 +30,7 @@ Boston, MA 02111-1307, USA.  */
 
 #include "ansidecl.h"
 
-/* We must include stdarg.h/varargs.h before stdio.h. */
+/* We must include stdarg.h/varargs.h before stdio.h.  */
 #ifdef ANSI_PROTOTYPES
 #include <stdarg.h>
 #else
@@ -65,11 +65,6 @@ Boston, MA 02111-1307, USA.  */
 #include <libiberty/safe-ctype.h>
 #else
 #include <safe-ctype.h>
-#endif
-
-/* Define a default escape character; it's different for EBCDIC.  */
-#ifndef TARGET_ESC
-#define TARGET_ESC 033
 #endif
 
 #include <sys/types.h>
@@ -122,6 +117,8 @@ extern int errno;
 
 #ifdef HAVE_SYS_PARAM_H
 # include <sys/param.h>
+/* We use this identifier later and it appears in some vendor param.h's.  */
+# undef PREFETCH
 #endif
 
 #if HAVE_LIMITS_H
@@ -130,6 +127,16 @@ extern int errno;
 
 /* Get definitions of HOST_WIDE_INT and HOST_WIDEST_INT.  */
 #include "hwint.h"
+
+/* A macro to determine whether a VALUE lies inclusively within a
+   certain range without evaluating the VALUE more than once.  This
+   macro won't warn if the VALUE is unsigned and the LOWER bound is
+   zero, as it would e.g. with "VALUE >= 0 && ...".  Note the LOWER
+   bound *is* evaluated twice, and LOWER must not be greater than
+   UPPER.  However the bounds themselves can be either positive or
+   negative.  */
+#define IN_RANGE(VALUE, LOWER, UPPER) \
+  ((unsigned HOST_WIDE_INT) ((VALUE) - (LOWER)) <= ((UPPER) - (LOWER)))
 
 /* Infrastructure for defining missing _MAX and _MIN macros.  Note that
    macros defined with these cannot be used in #if.  */
@@ -340,7 +347,7 @@ extern void abort PARAMS ((void));
 # define STDERR_FILENO  2
 #endif
 
-/* Some systems have mkdir that takes a single argument. */
+/* Some systems have mkdir that takes a single argument.  */
 #ifdef MKDIR_TAKES_ONE_ARG
 # define mkdir(a,b) mkdir(a)
 #endif
@@ -386,8 +393,8 @@ extern void abort PARAMS ((void));
   (IS_DIR_SEPARATOR ((STR)[0]) || (STR)[0] == '$')
 #endif
 
-/* Get libiberty declarations. */
-/* #include "libiberty.h" */
+/* Get libiberty declarations.  */
+#include "libiberty.h"
 #include "sdcc.h"
 #include "symcat.h"
 
@@ -408,12 +415,12 @@ extern void abort PARAMS ((void));
 #endif
 
 #ifndef offsetof
-#define offsetof(TYPE, MEMBER)	((size_t) &((TYPE *)0)->MEMBER)
+#define offsetof(TYPE, MEMBER)	((size_t) &((TYPE *) 0)->MEMBER)
 #endif
 
 /* Traditional C cannot initialize union members of structs.  Provide
    a macro which expands appropriately to handle it.  This only works
-   if you intend to initalize the union member to zero since it relies
+   if you intend to initialize the union member to zero since it relies
    on default initialization to zero in the traditional C case.  */
 #ifdef __STDC__
 #define UNION_INIT_ZERO , {0}
@@ -427,6 +434,36 @@ extern void abort PARAMS ((void));
 #define __FUNCTION__ "?"
 #endif /* ! __FUNCTION__ */
 #endif
+
+/* __builtin_expect(A, B) evaluates to A, but notifies the compiler that
+   the most likely value of A is B.  This feature was added at some point
+   between 2.95 and 3.0.  Let's use 3.0 as the lower bound for now.  */
+#if (GCC_VERSION < 3000)
+#define __builtin_expect(a, b) (a)
+#endif
+
+/* Provide some sort of boolean type.  We use stdbool.h if it's
+  available.  This must be after all inclusion of system headers,
+  as some of them will mess us up.  */
+#undef bool
+#undef true
+#undef false
+#undef TRUE
+#undef FALSE
+
+#ifdef HAVE_STDBOOL_H
+# include <stdbool.h>
+#else
+# if !HAVE__BOOL
+typedef char _Bool;
+# endif
+# define bool _Bool
+# define true 1
+# define false 0
+#endif
+
+#define TRUE true
+#define FALSE false
 
 /* As the last action in this file, we poison the identifiers that
    shouldn't be used.  Note, luckily gcc-3.0's token-based integrated
@@ -455,6 +492,29 @@ extern void abort PARAMS ((void));
 #undef calloc
 #undef strdup
  #pragma GCC poison malloc realloc calloc strdup
+
+/* Old target macros that have moved to the target hooks structure.  */
+ #pragma GCC poison ASM_OPEN_PAREN ASM_CLOSE_PAREN			\
+	FUNCTION_PROLOGUE FUNCTION_EPILOGUE				\
+	FUNCTION_END_PROLOGUE FUNCTION_BEGIN_EPILOGUE			\
+	DECL_MACHINE_ATTRIBUTES COMP_TYPE_ATTRIBUTES INSERT_ATTRIBUTES	\
+	VALID_MACHINE_DECL_ATTRIBUTE VALID_MACHINE_TYPE_ATTRIBUTE	\
+	SET_DEFAULT_TYPE_ATTRIBUTES SET_DEFAULT_DECL_ATTRIBUTES		\
+	MERGE_MACHINE_TYPE_ATTRIBUTES MERGE_MACHINE_DECL_ATTRIBUTES	\
+	MD_INIT_BUILTINS MD_EXPAND_BUILTIN ASM_OUTPUT_CONSTRUCTOR	\
+	ASM_OUTPUT_DESTRUCTOR SIGNED_CHAR_SPEC
+
+/* And other obsolete target macros, or macros that used to be in target
+   headers and were not used, and may be obsolete or may never have
+   been used.  */
+ #pragma GCC poison INT_ASM_OP ASM_OUTPUT_EH_REGION_BEG			   \
+	ASM_OUTPUT_EH_REGION_END ASM_OUTPUT_LABELREF_AS_INT		   \
+	DOESNT_NEED_UNWINDER EH_TABLE_LOOKUP OBJC_SELECTORS_WITHOUT_LABELS \
+	OMIT_EH_TABLE EASY_DIV_EXPR IMPLICIT_FIX_EXPR			   \
+	LONGJMP_RESTORE_FROM_STACK MAX_INT_TYPE_SIZE ASM_IDENTIFY_GCC	   \
+	STDC_VALUE TRAMPOLINE_ALIGN ASM_IDENTIFY_GCC_AFTER_SOURCE	   \
+	SLOW_ZERO_EXTEND SUBREG_REGNO_OFFSET DWARF_LINE_MIN_INSTR_LENGTH
+
 #endif /* IN_GCC */
 
 /* Note: not all uses of the `index' token (e.g. variable names and

@@ -39,7 +39,7 @@ static void ht_expand PARAMS ((hash_table *));
 #endif
   /* Let them override the alloc and free routines too.  */
 #ifndef OBSTACK_CHUNK_ALLOC
-#define OBSTACK_CHUNK_ALLOC malloc
+#define OBSTACK_CHUNK_ALLOC xmalloc
 #endif
 #ifndef OBSTACK_CHUNK_FREE
 #define OBSTACK_CHUNK_FREE free

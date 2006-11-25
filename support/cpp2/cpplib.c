@@ -215,7 +215,7 @@ skip_rest_of_line (pfile)
      cpp_reader *pfile;
 {
   /* Discard all stacked contexts.  */
-  while (pfile->context != &pfile->base_context)
+  while (pfile->context->prev)
     _cpp_pop_context (pfile);
 
   /* Sweep up all tokens remaining on the line.  */
@@ -411,12 +411,17 @@ run_directive (pfile, dir_no, buf, count)
 {
   cpp_push_buffer (pfile, (const U_CHAR *) buf, count,
 		   /* from_stage3 */ true, 1);
+  /* Disgusting hack.  */
+  if (dir_no == T_PRAGMA)
+    pfile->buffer->inc = pfile->buffer->prev->inc;
   start_directive (pfile);
   /* We don't want a leading # to be interpreted as a directive.  */
   pfile->buffer->saved_flags = 0;
   pfile->directive = &dtable[dir_no];
   (void) (*pfile->directive->handler) (pfile);
   end_directive (pfile, 1);
+  if (dir_no == T_PRAGMA)
+    pfile->buffer->inc = NULL;
   _cpp_pop_buffer (pfile);
 }
 
@@ -1305,7 +1310,44 @@ destringize_and_run (pfile, in)
     }
   *dest = '\0';
 
-  run_directive (pfile, T_PRAGMA, result, dest - result);
+  /* Ugh; an awful kludge.  We are really not set up to be lexing
+     tokens when in the middle of a macro expansion.  Use a new
+     context to force cpp_get_token to lex, and so skip_rest_of_line
+     doesn't go beyond the end of the text.  Also, remember the
+     current lexing position so we can return to it later.
+
+     Something like line-at-a-time lexing should remove the need for
+     this.  */
+  {
+    cpp_context *saved_context = pfile->context;
+    cpp_token *saved_cur_token = pfile->cur_token;
+    tokenrun *saved_cur_run = pfile->cur_run;
+
+    pfile->context = xnew (cpp_context);
+    pfile->context->macro = 0;
+    pfile->context->prev = 0;
+    run_directive (pfile, T_PRAGMA, result, dest - result);
+    free (pfile->context);
+    pfile->context = saved_context;
+    pfile->cur_token = saved_cur_token;
+    pfile->cur_run = saved_cur_run;
+  }
+
+  /* See above comment.  For the moment, we'd like
+
+     token1 _Pragma ("foo") token2
+
+     to be output as
+
+             token1
+             # 7 "file.c"
+             #pragma foo
+             # 7 "file.c"
+                            token2
+
+      Getting the line markers is a little tricky.  */
+  if (pfile->cb.line_change)
+    (*pfile->cb.line_change) (pfile, pfile->cur_token, false);
 }
 
 /* Handle the _Pragma operator.  */
@@ -1317,25 +1359,19 @@ _cpp_do__Pragma (pfile)
   unsigned int len;
   const cpp_token *string = get__Pragma_string (pfile);
 
-  if (!string)
-    cpp_error (pfile, "_Pragma takes a parenthesized string literal");
-  else
+  if (string)
     {
-      /* Ideally, we'd like
-			token1 _Pragma ("foo") token2
-	 to be output as
-			token1
-			# 7 "file.c"
-			#pragma foo
-			# 7 "file.c"
-					       token2
-	 Getting these correct line markers is a little tricky.  */
+      unsigned int len;
 
-      buffer = destringize (&string->val.str, &len);
+      unsigned char *buffer = destringize (&string->val.str, &len);
       buffer[len] = 0;
-      cpp_output_string ("\n#pragma "); cpp_output_string (buffer); cpp_output_string ("\n");
+      cpp_output_string ("\n#pragma ");
+      cpp_output_string (buffer);
+      cpp_output_string ("\n");
       free ((PTR) buffer);
     }
+  else
+    cpp_error (pfile, "_Pragma takes a parenthesized string literal");
 }
 
 /* Just ignore #sccs, on systems where we define it at all.  */

@@ -99,12 +99,17 @@ static void path_include		PARAMS ((cpp_reader *,
 						 char *, int));
 static void init_library		PARAMS ((void));
 static void init_builtins		PARAMS ((cpp_reader *));
+static void mark_named_operators	PARAMS ((cpp_reader *));
 static void append_include_chain	PARAMS ((cpp_reader *,
 						 char *, int, int));
 static struct search_path * remove_dup_dir	PARAMS ((cpp_reader *,
+						 struct search_path *,
+						 struct search_path **));
+static struct search_path * remove_dup_nonsys_dirs PARAMS ((cpp_reader *,
+						 struct search_path **,
 						 struct search_path *));
 static struct search_path * remove_dup_dirs PARAMS ((cpp_reader *,
-						 struct search_path *));
+						 struct search_path **));
 static void merge_include_chains	PARAMS ((cpp_reader *));
 static bool push_include		PARAMS ((cpp_reader *,
 						 struct pending_option *));
@@ -188,7 +193,7 @@ path_include (pfile, list, path)
 	  name[q - p] = 0;
 	}
 
-      append_include_chain (pfile, name, path, 0);
+      append_include_chain (pfile, name, path, path == SYSTEM);
 
       /* Advance past this name.  */
       if (*q == 0)
@@ -271,21 +276,77 @@ append_include_chain (pfile, dir, path, cxx_aware)
 }
 
 /* Handle a duplicated include path.  PREV is the link in the chain
-   before the duplicate.  The duplicate is removed from the chain and
-   freed.  Returns PREV.  */
+   before the duplicate, or NULL if the duplicate is at the head of
+   the chain.  The duplicate is removed from the chain and freed.
+   Returns PREV.  */
 static struct search_path *
-remove_dup_dir (pfile, prev)
+remove_dup_dir (pfile, prev, head_ptr)
      cpp_reader *pfile;
      struct search_path *prev;
+     struct search_path **head_ptr;
 {
-  struct search_path *cur = prev->next;
+  struct search_path *cur;
+
+  if (prev != NULL)
+    {
+      cur = prev->next;
+      prev->next = cur->next;
+    }
+  else
+    {
+      cur = *head_ptr;
+      *head_ptr = cur->next;
+    }
 
   if (CPP_OPTION (pfile, verbose))
     fprintf (stderr, _("ignoring duplicate directory \"%s\"\n"), cur->name);
 
-  prev->next = cur->next;
   free ((PTR) cur->name);
   free (cur);
+
+  return prev;
+}
+
+/* Remove duplicate non-system directories for which there is an equivalent
+   system directory later in the chain.  The range for removal is between
+   *HEAD_PTR and END.  Returns the directory before END, or NULL if none.
+   This algorithm is quadratic in the number of system directories, which is
+   acceptable since there aren't usually that many of them.  */
+static struct search_path *
+remove_dup_nonsys_dirs (pfile, head_ptr, end)
+     cpp_reader *pfile;
+     struct search_path **head_ptr;
+     struct search_path *end;
+{
+  int sysdir = 0;
+  struct search_path *prev = NULL, *cur, *other;
+
+  for (cur = *head_ptr; cur; cur = cur->next)
+    {
+      if (cur->sysp)
+	{
+	  sysdir = 1;
+	  for (other = *head_ptr, prev = NULL;
+	       other != end;
+	       other = other ? other->next : *head_ptr)
+	    {
+	      if (!other->sysp
+		  && INO_T_EQ (cur->ino, other->ino)
+		  && cur->dev == other->dev)
+		{
+		  other = remove_dup_dir (pfile, prev, head_ptr);
+		  if (CPP_OPTION (pfile, verbose))
+		    fprintf (stderr,
+  _("  as it is a non-system directory that duplicates a system directory\n"));
+		}
+	      prev = other;
+	    }
+	}
+    }
+
+  if (!sysdir)
+    for (cur = *head_ptr; cur != end; cur = cur->next)
+      prev = cur;
 
   return prev;
 }
@@ -295,31 +356,18 @@ remove_dup_dir (pfile, prev)
    in the number of -I switches, which is acceptable since there
    aren't usually that many of them.  */
 static struct search_path *
-remove_dup_dirs (pfile, head)
+remove_dup_dirs (pfile, head_ptr)
      cpp_reader *pfile;
-     struct search_path *head;
+     struct search_path **head_ptr;
 {
   struct search_path *prev = NULL, *cur, *other;
 
-  for (cur = head; cur; cur = cur->next)
+  for (cur = *head_ptr; cur; cur = cur->next)
     {
-      for (other = head; other != cur; other = other->next)
+      for (other = *head_ptr; other != cur; other = other->next)
         if (INO_T_EQ (cur->ino, other->ino) && cur->dev == other->dev)
 	  {
-	    if (cur->sysp && !other->sysp)
-	      {
-		cpp_warning (pfile,
-			     "changing search order for system directory \"%s\"",
-			     cur->name);
-		if (strcmp (cur->name, other->name))
-		  cpp_warning (pfile,
-			       "  as it is the same as non-system directory \"%s\"",
-			       other->name);
-		else
-		  cpp_warning (pfile,
-			       "  as it has already been specified as a non-system directory");
-	      }
-	    cur = remove_dup_dir (pfile, prev);
+	    cur = remove_dup_dir (pfile, prev, head_ptr);
 	    break;
 	  }
       prev = cur;
@@ -357,28 +405,33 @@ merge_include_chains (pfile)
   else
     brack = systm;
 
-  /* This is a bit tricky.  First we drop dupes from the quote-include
-     list.  Then we drop dupes from the bracket-include list.
-     Finally, if qtail and brack are the same directory, we cut out
-     brack and move brack up to point to qtail.
+  /* This is a bit tricky.  First we drop non-system dupes of system
+     directories from the merged bracket-include list.  Next we drop
+     dupes from the bracket and quote include lists.  Then we drop
+     non-system dupes from the merged quote-include list.  Finally,
+     if qtail and brack are the same directory, we cut out brack and
+     move brack up to point to qtail.
 
      We can't just merge the lists and then uniquify them because
      then we may lose directories from the <> search path that should
-     be there; consider -Ifoo -Ibar -I- -Ifoo -Iquux. It is however
+     be there; consider -Ifoo -Ibar -I- -Ifoo -Iquux.  It is however
      safe to treat -Ibar -Ifoo -I- -Ifoo -Iquux as if written
      -Ibar -I- -Ifoo -Iquux.  */
 
-  remove_dup_dirs (pfile, brack);
-  qtail = remove_dup_dirs (pfile, quote);
+  remove_dup_nonsys_dirs (pfile, &brack, systm);
+  remove_dup_dirs (pfile, &brack);
 
   if (quote)
     {
+      qtail = remove_dup_dirs (pfile, &quote);
       qtail->next = brack;
 
+      qtail = remove_dup_nonsys_dirs (pfile, &quote, brack);
+
       /* If brack == qtail, remove brack as it's simpler.  */
-      if (brack && INO_T_EQ (qtail->ino, brack->ino)
+      if (qtail && brack && INO_T_EQ (qtail->ino, brack->ino)
 	  && qtail->dev == brack->dev)
-	brack = remove_dup_dir (pfile, qtail);
+	brack = remove_dup_dir (pfile, qtail, &quote);
     }
   else
     quote = brack;
@@ -395,7 +448,7 @@ struct lang_flags
   char objc;
   char cplusplus;
   char extended_numbers;
-  char trigraphs;
+  char std;
   char dollars_in_ident;
   char cplusplus_comments;
   char digraphs;
@@ -403,7 +456,7 @@ struct lang_flags
 
 /* ??? Enable $ in identifiers in assembly? */
 static const struct lang_flags lang_defaults[] =
-{ /*              c99 objc c++ xnum trig dollar c++comm digr  */
+{ /*              c99 objc c++ xnum std dollar c++comm digr  */
   /* GNUC89 */  { 0,  0,   0,  1,   0,   1,     1,      1     },
   /* GNUC99 */  { 1,  0,   0,  1,   0,   1,     1,      1     },
   /* STDC89 */  { 0,  0,   0,  0,   1,   0,     0,      0     },
@@ -423,14 +476,15 @@ set_lang (pfile, lang)
      enum c_lang lang;
 {
   const struct lang_flags *l = &lang_defaults[(int) lang];
-
+  
   CPP_OPTION (pfile, lang) = lang;
 
   CPP_OPTION (pfile, c99)		 = l->c99;
   CPP_OPTION (pfile, objc)		 = l->objc;
   CPP_OPTION (pfile, cplusplus)		 = l->cplusplus;
   CPP_OPTION (pfile, extended_numbers)	 = l->extended_numbers;
-  CPP_OPTION (pfile, trigraphs)		 = l->trigraphs;
+  CPP_OPTION (pfile, std)		 = l->std;
+  CPP_OPTION (pfile, trigraphs)		 = l->std;
   CPP_OPTION (pfile, dollars_in_ident)	 = l->dollars_in_ident;
   CPP_OPTION (pfile, cplusplus_comments) = l->cplusplus_comments;
   CPP_OPTION (pfile, digraphs)		 = l->digraphs;
@@ -614,28 +668,22 @@ cpp_destroy (pfile)
    Two values are not compile time constants, so we tag
    them in the FLAGS field instead:
    VERS		value is the global version_string, quoted
-   ULP		value is the global user_label_prefix
-
-   Also, macros with CPLUS set in the flags field are entered only for C++.  */
+   ULP		value is the global user_label_prefix  */
 struct builtin
 {
   const U_CHAR *name;
   const char *value;
   unsigned char builtin;
-  unsigned char operator;
   unsigned short flags;
   unsigned short len;
 };
 #define VERS		0x01
 #define ULP		0x02
-#define CPLUS		0x04
 #define BUILTIN		0x08
-#define OPERATOR  	0x10
 
-#define B(n, t)       { U n, 0, t, 0, BUILTIN, sizeof n - 1 }
-#define C(n, v)       { U n, v, 0, 0, 0, sizeof n - 1 }
-#define X(n, f)       { U n, 0, 0, 0, f, sizeof n - 1 }
-#define O(n, c, f)    { U n, 0, 0, c, OPERATOR | f, sizeof n - 1 }
+#define B(n, t)       { U n, 0, t, BUILTIN, sizeof n - 1 }
+#define C(n, v)       { U n, v, 0, 0, sizeof n - 1 }
+#define X(n, f)       { U n, 0, 0, f, sizeof n - 1 }
 static const struct builtin builtin_array[] =
 {
   B("__TIME__",		 BT_TIME),
@@ -671,29 +719,54 @@ static const struct builtin builtin_array[] =
 #else
   C("__STDC__",		 "1"),
 #endif
-
-  /* Named operators known to the preprocessor.  These cannot be #defined
-     and always have their stated meaning.  They are treated like normal
-     identifiers except for the type code and the meaning.  Most of them
-     are only for C++ (but see iso646.h).  */
-  O("and",	CPP_AND_AND, CPLUS),
-  O("and_eq",	CPP_AND_EQ,  CPLUS),
-  O("bitand",	CPP_AND,     CPLUS),
-  O("bitor",	CPP_OR,      CPLUS),
-  O("compl",	CPP_COMPL,   CPLUS),
-  O("not",	CPP_NOT,     CPLUS),
-  O("not_eq",	CPP_NOT_EQ,  CPLUS),
-  O("or",	CPP_OR_OR,   CPLUS),
-  O("or_eq",	CPP_OR_EQ,   CPLUS),
-  O("xor",	CPP_XOR,     CPLUS),
-  O("xor_eq",	CPP_XOR_EQ,  CPLUS)
 };
 #undef B
 #undef C
 #undef X
-#undef O
 #define builtin_array_end \
  builtin_array + sizeof(builtin_array)/sizeof(struct builtin)
+
+/* Named operators known to the preprocessor.  These cannot be
+   #defined and always have their stated meaning.  They are treated
+   like normal identifiers except for the type code and the meaning.
+   Most of them are only for C++ (but see iso646.h).  */
+#define B(n, t)    { DSC(n), t }
+static const struct named_op
+{
+  const U_CHAR *name;
+  unsigned int len;
+  enum cpp_ttype value;
+} operator_array[] = {
+  B("and",	CPP_AND_AND),
+  B("and_eq",	CPP_AND_EQ),
+  B("bitand",	CPP_AND),
+  B("bitor",	CPP_OR),
+  B("compl",	CPP_COMPL),
+  B("not",	CPP_NOT),
+  B("not_eq",	CPP_NOT_EQ),
+  B("or",	CPP_OR_OR),
+  B("or_eq",	CPP_OR_EQ),
+  B("xor",	CPP_XOR),
+  B("xor_eq",	CPP_XOR_EQ)
+};
+#undef B
+
+/* Mark the C++ named operators in the hash table.  */
+static void
+mark_named_operators (pfile)
+     cpp_reader *pfile;
+{
+  const struct named_op *b;
+
+  for (b = operator_array;
+       b < (operator_array + ARRAY_SIZE (operator_array));
+       b++)
+    {
+      cpp_hashnode *hp = cpp_lookup (pfile, b->name, b->len);
+      hp->flags |= NODE_OPERATOR;
+      hp->value.operator = b->value;
+    }
+}
 
 /* Subroutine of cpp_read_main_file; reads the builtins table above and
    enters them, and language-specific macros, into the hash table.  */
@@ -705,26 +778,12 @@ init_builtins (pfile)
 
   for(b = builtin_array; b < builtin_array_end; b++)
     {
-      if ((b->flags & CPLUS) && ! CPP_OPTION (pfile, cplusplus))
-	continue;
-
-      if ((b->flags & OPERATOR) && ! CPP_OPTION (pfile, operator_names))
-	continue;
-
-      if (b->flags & (OPERATOR | BUILTIN))
+      if (b->flags & BUILTIN)
 	{
 	  cpp_hashnode *hp = cpp_lookup (pfile, b->name, b->len);
-	  if (b->flags & OPERATOR)
-	    {
-	      hp->flags |= NODE_OPERATOR;
-	      hp->value.operator = b->operator;
-	    }
-	  else
-	    {
-	      hp->type = NT_MACRO;
-	      hp->flags |= NODE_BUILTIN | NODE_WARN;
-	      hp->value.builtin = b->builtin;
-	    }
+	  hp->type = NT_MACRO;
+	  hp->flags |= NODE_BUILTIN | NODE_WARN;
+	  hp->value.builtin = b->builtin;
 	}
       else			/* A standard macro of some kind.  */
 	{
@@ -783,7 +842,6 @@ init_builtins (pfile)
 #undef OPERATOR
 #undef VERS
 #undef ULP
-#undef CPLUS
 #undef builtin_array_end
 
 /* And another subroutine.  This one sets up the standard include path.  */
@@ -844,7 +902,7 @@ init_standard_includes (pfile)
 		  && !CPP_OPTION (pfile, no_standard_cplusplus_includes)))
 	    {
 	      /* Does this dir start with the prefix?  */
-	      if (!memcmp (p->fname, default_prefix, default_len))
+	      if (!strncmp (p->fname, default_prefix, default_len))
 		{
 		  /* Yes; change prefix and add to search list.  */
 		  int flen = strlen (p->fname);
@@ -1003,6 +1061,10 @@ void
 cpp_finish_options (pfile)
      cpp_reader *pfile;
 {
+  /* Mark named operators before handling command line macros.  */
+  if (CPP_OPTION (pfile, cplusplus) && CPP_OPTION (pfile, operator_names))
+    mark_named_operators (pfile);
+
   /* Install builtins and process command line macros etc. in the order
      they appeared, but only if not already preprocessed.  */
   if (! CPP_OPTION (pfile, preprocessed))
@@ -1290,7 +1352,7 @@ parse_option (input)
       md = (mn + mx) / 2;
 
       opt_len = cl_options[md].opt_len;
-      comp = memcmp (input, cl_options[md].opt_text, opt_len);
+      comp = strncmp (input, cl_options[md].opt_text, opt_len);
 
       if (comp > 0)
 	mn = md + 1;
@@ -1315,7 +1377,7 @@ parse_option (input)
 	      for (; mn < (unsigned int) N_OPTS; mn++)
 		{
 		  opt_len = cl_options[mn].opt_len;
-		  if (memcmp (input, cl_options[mn].opt_text, opt_len))
+		  if (strncmp (input, cl_options[mn].opt_text, opt_len))
 		    break;
 		  if (input[opt_len] == '\0')
 		    return mn;
@@ -1762,7 +1824,7 @@ cpp_handle_option (pfile, argc, argv, ignore)
 	case OPT_obj_ext:
 	  CPP_OPTION (pfile, obj_ext) = arg;
 	  break;
-	}
+ 	}
     }
   return i + 1;
 }
@@ -1879,7 +1941,10 @@ init_dependency_output (pfile)
 	{
 	  spec = getenv ("SUNPRO_DEPENDENCIES");
 	  if (spec)
-	    CPP_OPTION (pfile, print_deps) = 2;
+	    {
+	      CPP_OPTION (pfile, print_deps) = 2;
+	      CPP_OPTION (pfile, deps_ignore_main_file) = 1;
+	    }
 	  else
 	    return;
 	}
@@ -1981,7 +2046,7 @@ Switches:\n\
   -MG                       Treat missing header file as generated files\n\
 "), stdout);
   fputs (_("\
-  -MP                       Generate phony targets for all headers\n\
+  -MP			    Generate phony targets for all headers\n\
   -MQ <target>              Add a MAKE-quoted target\n\
   -MT <target>              Add an unquoted target\n\
 "), stdout);

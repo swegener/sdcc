@@ -1,3 +1,48 @@
+2006-11-25 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/cppexp.c, support/cpp2/hashtable.h,
+	  support/cpp2/configure, support/cpp2/Makefile.in,
+	  support/cpp2/cppfiles.c, support/cpp2/output.h,
+	  support/cpp2/cppinit.c, support/cpp2/cpplib.c,
+	  support/cpp2/config.h, support/cpp2/cpplib.h,
+	  support/cpp2/Makefile.bcc, support/cpp2/cpphash.c,
+	  support/cpp2/cppdefault.c, support/cpp2/config.in,
+	  support/cpp2/system.h, support/cpp2/cpplex.c,
+	  support/cpp2/cpphash.h, support/cpp2/mbchar.c,
+	  support/cpp2/cppdefault.h, support/cpp2/prefix.c
+	  support/cpp2/hwint.h, support/cpp2/mbchar.h,
+	  support/cpp2/prefix.h, support/cpp2/cppmacro.c,
+	  support/cpp2/configure.in, support/cpp2/intl.h,
+	  support/cpp2/sdcpp.dsp, support/cpp2/acconfig.h,
+	  support/cpp2/sdcc.h, support/cpp2/mkdeps.c,
+	  support/cpp2/version.c, support/cpp2/cppmain.c,
+	  support/cpp2/ansidecl.h, support/cpp2/libiberty.h,
+	  support/cpp2/hashtable.c, support/cpp2/aclocal.m4,
+	  support/cpp2/cpperror.c,
+	  support/cpp2/libiberty/safe-ctype.c,
+	  support/cpp2/libiberty/safe-ctype.h,
+	  support/cpp2/libiberty/splay-tree.c,
+	  support/cpp2/libiberty/obstack.c,
+	  support/cpp2/libiberty/lbasename.c,
+	  support/cpp2/libiberty/splay-tree.h,
+	  support/cpp2/libiberty/obstack.h:
+	  synchronized with GCC CPP release version 3.2.3,
+	  the latest before integration of cpp into gcc
+	* support/cpp2/except.h, support/cpp2/line-map.c,
+	  support/cpp2/line-map.h,
+	  support/cpp2/libiberty/hex.c,
+	  support/cpp2/libiberty/concat.c,
+	  support/cpp2/libiberty/filenames.h: added
+	* support/cpp2/intl.c: deleted
+
+2006-11-24 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.y: enabled compilation of empty source file
+	* support/Util/SDCCerr.[ch]: added sdcc warning 190 -
+	  "ISO C forbids an empty source file"
+	* device/lib/_startup.c, device/lib/printf_tiny.c: disable warning 190
+	  if all the code is ifdefed out.
+
 2006-11-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genPcall): fix for bug #1601032

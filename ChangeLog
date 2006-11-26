@@ -1,5 +1,10 @@
 2006-11-25 Borut Razem <borut.razem AT siol.net>
 
+	* support/cpp2/libiberty.h: commented out x*alloc() declarations
+	  since they are redefined by macros in support/cpp2/sdcc.h
+
+2006-11-25 Borut Razem <borut.razem AT siol.net>
+
 	* support/cpp2/cppexp.c, support/cpp2/hashtable.h,
 	  support/cpp2/configure, support/cpp2/Makefile.in,
 	  support/cpp2/cppfiles.c, support/cpp2/output.h,

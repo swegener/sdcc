@@ -1,11 +1,15 @@
 /* Various stuff needed to hack the build for SDCC. */
-#define xmalloc(s) malloc(s)
-#define xstrdup(s) strdup(s)
-#define xrealloc(p,s) realloc(p,s)
-#define xcalloc(n,e) calloc(n,e)
-#define xmalloc_set_program_name(n) /* nada */
-#define xstrerror(e) strerror(e)
+#define xmalloc   malloc
+#define xstrdup   strdup
+#define xrealloc  realloc
+#define xcalloc   calloc
 
+#define xstrerror strerror
+#define xmalloc_set_program_name(n) /* nada */
+
+/*
+ * From defaults.h
+ */
 /* Define results of standard character escape sequences.  */
 #define TARGET_BELL	007
 #define TARGET_BS	010
@@ -14,7 +18,7 @@
 #define TARGET_VT	013
 #define TARGET_FF	014
 #define TARGET_CR	015
-#  define TARGET_ESC 033
+#define TARGET_ESC	033
 
 #define CHAR_TYPE_SIZE 8
 #define WCHAR_TYPE_SIZE 32	/* ? maybe ? */

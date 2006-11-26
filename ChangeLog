@@ -1,7 +1,8 @@
-2006-11-25 Borut Razem <borut.razem AT siol.net>
+2006-11-26 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2/libiberty.h: commented out x*alloc() declarations
 	  since they are redefined by macros in support/cpp2/sdcc.h
+	* support/cpp2/sdcc.h: x*alloc macro redefinition
 
 2006-11-25 Borut Razem <borut.razem AT siol.net>
 

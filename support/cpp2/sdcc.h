@@ -10,6 +10,10 @@
 /*
  * From defaults.h
  */
+#ifndef GET_ENVIRONMENT
+#define GET_ENVIRONMENT(VALUE, NAME) do { (VALUE) = getenv (NAME); } while (0)
+#endif
+
 /* Define results of standard character escape sequences.  */
 #define TARGET_BELL	007
 #define TARGET_BS	010
@@ -33,4 +37,11 @@
 
 #ifdef _WIN32
 #define HAVE_DOS_BASED_FILE_SYSTEM
+#endif
+
+/*
+ * From hashtab.h
+ */
+#ifndef GTY
+#define GTY(X)
 #endif

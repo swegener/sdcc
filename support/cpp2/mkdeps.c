@@ -47,7 +47,7 @@ static const char *munge	PARAMS ((const char *));
    not properly handled.  It isn't possible to get this right in any
    current version of Make.  (??? Still true?  Old comment referred to
    3.76.1.)  */
-
+   
 static const char *
 munge (filename)
      const char *filename;
@@ -215,12 +215,12 @@ deps_add_default_target (pfile, tgt)
       o = (char *) alloca (strlen (start) + strlen (obj_ext) + 1);
 
       strcpy (o, start);
-
+      
       suffix = strrchr (o, '.');
       if (!suffix)
         suffix = o + strlen (o);
       strcpy (suffix, obj_ext);
-
+      
       deps_add_target (d, o, 1);
     }
 }
@@ -292,7 +292,7 @@ deps_write (d, fp, colmax)
     }
   putc ('\n', fp);
 }
-
+  
 void
 deps_phony_targets (d, fp)
      const struct deps *d;

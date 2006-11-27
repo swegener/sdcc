@@ -6,11 +6,11 @@ PRJDIR          = ../..
 
 CFLAGS = $(CFLAGS) -I. -I./libiberty -DHAVE_CONFIG_H
 
-OBJECTS         = cppmain.obj \
-                  cpplib.obj cpplex.obj cppmacro.obj cppexp.obj cppfiles.obj \
-                  cpphash.obj cpperror.obj cppinit.obj cppdefault.obj \
+OBJECTS         = sdcppmain.obj sdcppinit.obj \
+                  cppmain.obj cpplib.obj cpplex.obj cppmacro.obj cppexp.obj \
+                  cppfiles.obj cpphash.obj cpperror.obj cppdefault.obj \
                   hashtable.obj mkdeps.obj prefix.obj version.obj mbchar.obj \
-                  line-map.obj \
+                  line-map.obj cpptrad.obj \
                   safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj \
                   hex.obj concat.obj
 

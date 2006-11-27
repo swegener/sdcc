@@ -117,10 +117,6 @@ SOURCE=.\cpphash.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\cppinit.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\cpplex.c
 # End Source File
 # Begin Source File
@@ -134,6 +130,10 @@ SOURCE=.\cppmacro.c
 # Begin Source File
 
 SOURCE=.\cppmain.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\cpptrad.c
 # End Source File
 # Begin Source File
 
@@ -170,6 +170,14 @@ SOURCE=.\prefix.c
 # Begin Source File
 
 SOURCE=".\libiberty\safe-ctype.c"
+# End Source File
+# Begin Source File
+
+SOURCE=.\sdcppinit.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\sdcppmain.c
 # End Source File
 # Begin Source File
 

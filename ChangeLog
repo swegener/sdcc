@@ -17,7 +17,8 @@
 	  support\cpp2\cpperror.c:
 	  synchronized with GCC CPP release version 3.3.6,
 	  the latest where cppmain.c still exists.
-	* support\cpp2\sdcppmain.c, support\cpp2\sdcppinit.c: added
+	* support\cpp2\cpptrad.c, support\cpp2\sdcppmain.c,
+	  support\cpp2\sdcppinit.c: added
 
 2006-11-27 Borut Razem <borut.razem AT siol.net>
 

@@ -1355,8 +1355,6 @@ void
 _cpp_do__Pragma (pfile)
      cpp_reader *pfile;
 {
-  unsigned char *buffer;
-  unsigned int len;
   const cpp_token *string = get__Pragma_string (pfile);
 
   if (string)

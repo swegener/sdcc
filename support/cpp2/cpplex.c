@@ -279,7 +279,6 @@ skip_asm_block (pfile)
       prev_space = is_space(c);
       c = *buffer->cur++;
 
-    next_char:
       /* FIXME: For speed, create a new character class of characters
 	 of interest inside block comments.  */
       if (c == '?' || c == '\\')
@@ -299,7 +298,6 @@ skip_asm_block (pfile)
 	{
 	  prev_space = is_space(c);
 	  handle_newline (pfile);
-	  goto next_char;
 	}
       else if (c == '\t')
 	adjust_column (pfile);
@@ -1586,15 +1584,15 @@ cpp_output_token (token, fp)
 	  case CPP_CHAR:	left = '\''; right = '\''; tag = '\0'; break;
     	  case CPP_WCHAR:	left = '\''; right = '\''; tag = 'L';  break;
 	  case CPP_HEADER_NAME:	left = '<';  right = '>';  tag = '\0'; break;
-	  default:
+	  case CPP_ASM:		left = '\0'; right = '\0'; tag = '\0'; break;
+          default:
 	    fprintf (stderr, "impossible STRING token %s\n", TOKEN_NAME (token));
 	    return;
 	  }
 	if (tag) putc (tag, fp);
-	putc (left, fp);
+	if (left) putc (left, fp);
 	fwrite (token->val.str.text, 1, token->val.str.len, fp);
-	putc (right, fp);
-      }
+	if (right) putc (right, fp);      }
       break;
 
     case SPELL_NONE:

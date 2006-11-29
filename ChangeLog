@@ -1,3 +1,10 @@
+2006-11-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/asm/mcs51/features.h,
+	* device/include/malloc.h,
+	* device/include/stdio.h: changed keywords to double underscore variants,
+	  fixes bug 1590261
+
 2006-11-27 Borut Razem <borut.razem AT siol.net>
 
 	* support\cpp2\cppexp.c, support\cpp2\hashtable.h,

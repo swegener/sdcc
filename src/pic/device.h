@@ -44,6 +44,7 @@ typedef struct memRange {
 	                         * e.g. alias = 0x80 means start_address is identical
 	                         * to the memory location at (0x80 | start_address) */
 	int bank;               /* PIC memory bank this range occupies */
+	struct memRange *next;	/* linked list */
 
 } memRange;
 
@@ -110,10 +111,12 @@ void setDefMaxRam(void);
 void pic14_assignConfigWordValue(int address, int value);
 int pic14_emitConfigWord (FILE * vFile);
 int pic14_getConfigWord(int address);
+
 unsigned pic14_getMaxRam(void);
 int pic14_getHasSecondConfigReg(void);
-int pic14_getSharebankSize(void);
-int pic14_getSharebankAddress(void);
+int pic14_allRAMShared(void);
+int pic14_hasSharebank(int *low, int *high, int *size);
+int pic14_getSharedStack(int *low, int *high, int *size);
 PIC_device * pic14_getPIC(void);
 
 #endif  /* __DEVICE_H__ */

@@ -26,6 +26,7 @@
 
 #include "common.h"
 #include "ralloc.h"
+#include "device.h"
 #include "pcode.h"
 #include "gen.h"
 
@@ -487,11 +488,13 @@ regFindFree (set *dRegs)
 /*-----------------------------------------------------------------*/
 /* initStack - allocate registers for a pseudo stack               */
 /*-----------------------------------------------------------------*/
-void initStack(int base_address, int size)
+void initStack(int base_address, int size, int shared)
 {
 	
 	int i;
-	
+	PIC_device *pic;
+
+	pic = pic14_getPIC();
 	Gstack_base_addr = base_address;
 	Gstack_size = size;
 	//fprintf(stderr,"initStack [base:0x%02x, size:%d]\n", base_address, size);
@@ -500,9 +503,9 @@ void initStack(int base_address, int size)
 		char buffer[16];
 		regs *r;
 		SNPRINTF(&buffer[0], 16, "STK%02d", i);
-		// Trying to use shared memory for pseudo stack
-		r = newReg(REG_STK, PO_GPR_TEMP, base_address--, buffer, 1, 0x180);
-		r->isFixed = 0; // fixed location no longer required
+		// multi-bank device, sharebank prohibited by user
+		r = newReg(REG_STK, PO_GPR_TEMP, base_address--, buffer, 1, shared ? (pic ? pic->bankMask : 0x180) : 0x0);
+		r->isFixed = 1;
 		r->isPublic = 1;
 		r->isEmitted = 1;
 		//r->name[0] = 's';
@@ -896,6 +899,10 @@ typeRegWithIdx (int idx, int type, int fixed)
 		break;
 	case REG_STK:
 		if( (dReg = regWithIdx ( dynStackRegs, idx, 0)) != NULL ) {
+			debugLog ("Found a Stack Register!\n");
+			return dReg;
+		} else
+		if( (dReg = regWithIdx ( dynStackRegs, idx, 1)) != NULL ) {
 			debugLog ("Found a Stack Register!\n");
 			return dReg;
 		}

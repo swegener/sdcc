@@ -73,8 +73,6 @@ extern void printChar (FILE * ofile, char *s, int plen);
 void  pCodeInitRegisters(void);
 int getConfigWord(int address);
 int getHasSecondConfigReg(void);
-int pic14_getSharebankSize(void);
-int pic14_getSharebankAddress(void);
 
 char *udata_section_name=0;		// FIXME Temporary fix to change udata section name -- VR
 int pic14_hasInterrupt = 0;		// Indicates whether to emit interrupt handler or not
@@ -238,6 +236,8 @@ pic14_constructAbsMap (FILE *ofile)
   set *aliases;
   int addr, min=-1, max=-1;
   int size;
+  PIC_device *pic;
+  int low, high, shared;
 
   for (i=0; maps[i] != NULL; i++)
   {
@@ -314,20 +314,32 @@ pic14_constructAbsMap (FILE *ofile)
    *      required by larger devices but only up to STK03 might
    *      be defined using smaller devices. */
   fprintf (ofile, "\n");
+  shared = pic14_getSharedStack(&low, &high, &size);
   if (!pic14_options.isLibrarySource)
   {
+    pic = pic14_getPIC();
+
     fprintf (ofile, "\tglobal PSAVE\n");
     fprintf (ofile, "\tglobal SSAVE\n");
     fprintf (ofile, "\tglobal WSAVE\n");
-    for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
+    for (i = size - 4; i >= 0; i--) {
       fprintf (ofile, "\tglobal STK%02d\n", i);
     } // for i
-    fprintf (ofile, "sharebank udata_shr\n");//pic14_getSharebankAddress() - pic14_getSharebankSize());
+
+    // 16f84 has no SHAREBANK (in linkerscript) but memory aliased in two
+    // banks, sigh...
+    if (1 || !shared) {
+	// for single banked devices: use normal, "banked" RAM
+	fprintf (ofile, "sharebank udata_ovr 0x%04X\n", low);
+    } else {
+	// for devices with at least two banks, require a sharebank section
+	fprintf (ofile, "sharebank udata_shr\n");
+    }
     fprintf (ofile, "PSAVE\tres 1\n");
     fprintf (ofile, "SSAVE\tres 1\n");
     fprintf (ofile, "WSAVE\tres 1\n"); // WSAVE *must* be in sharebank (IRQ handlers)
     /* fill rest of sharebank with stack STKxx .. STK00 */
-    for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
+    for (i = size - 4; i >= 0; i--) {
       fprintf (ofile, "STK%02d\tres 1\n", i);
     } // for i
   } else {
@@ -336,7 +348,7 @@ pic14_constructAbsMap (FILE *ofile)
     fprintf (ofile, "\textern PSAVE\n");
     fprintf (ofile, "\textern SSAVE\n");
     fprintf (ofile, "\textern WSAVE\n");
-    for (i=pic14_getSharebankSize()-4; i >= 0; i--) {
+    for (i = size - 4; i >= 0; i--) {
 	char buffer[128];
 	SNPRINTF(&buffer[0], 127, "STK%02d", i);
 	fprintf (ofile, "\textern %s\n", &buffer[0]);

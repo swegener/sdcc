@@ -27,7 +27,7 @@ pic%.c : $(GPUTILS)/header/p%.inc
 endif
 
 pic%.o : pic%.c
-	-$(CC) $(CPPFLAGS) $(CFLAGS) -mpic14 -p$* --stack-loc 0x4f -o "$@" -c "$<"
+	-$(CC) $(CPPFLAGS) $(CFLAGS) -mpic14 -p$* -o "$@" -c "$<"
 
 $(INSTALL_DIR)/%.lib : %.o
 	-$(LIB) -c "$@" "$<";

@@ -62,6 +62,7 @@ AssignedMemory *finalMapping=NULL;
 
 static unsigned int config_word = DEFAULT_CONFIG_WORD;
 static unsigned int config2_word = DEFAULT_CONFIG2_WORD;
+static memRange *rangeRAM = NULL;
 
 extern int pic14_is_shared (regs *reg);
 extern void emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize);
@@ -141,6 +142,8 @@ static PIC_device *create_pic(char *pic_name, int maxram, int bankmsk, int confs
 	new_pic->dataMemSize = data;
 	new_pic->eepromMemSize = eeprom;
 	new_pic->ioPins = io;
+
+	new_pic->ram = rangeRAM;
 	
 	Pics[num_of_supported_PICS] = new_pic;
 	num_of_supported_PICS++;
@@ -176,19 +179,26 @@ static void register_map(int num_words, char word[SPLIT_WORDS_MAX][PIC14_STRING_
 /* define ram areas - may be duplicated across banks */
 static void ram_map(int num_words, char word[SPLIT_WORDS_MAX][PIC14_STRING_LEN])
 {
-	memRange r;
+	memRange *r;
 	
 	if (num_words < 4) {
 		fprintf(stderr, "WARNING: not enough values in %s memmap directive\n", DEVICE_FILE_NAME);
 		return;
 	}
+
+	r = Safe_calloc(1, sizeof(memRange));
+	//fprintf (stderr, "%s: %s %s %s\n", __FUNCTION__, word[1], word[2], word[3]);
 	
-	r.start_address = parse_config_value(word[1]);
-	r.end_address = parse_config_value(word[2]);
-	r.alias = parse_config_value(word[3]);
-	r.bank = (r.start_address >> 7) & 3;
+	r->start_address = parse_config_value(word[1]);
+	r->end_address = parse_config_value(word[2]);
+	r->alias = parse_config_value(word[3]);
+	r->bank = (r->start_address >> 7) & 3;
 		
-	addMemRange(&r, 0);
+	addMemRange(r, 0);
+
+	// add memRange to device entry for future lookup (sharebanks)
+	r->next = rangeRAM;
+	rangeRAM = r;
 }
 
 extern set *includeDirsSet;
@@ -404,6 +414,8 @@ void addMemRange(memRange *r, int type)
 {
 	int i;
 	int alias = r->alias;
+
+	//fprintf (stderr, "%s: range %x..%x, alias %x, bank %x\n", __FUNCTION__, r->start_address, r->end_address, r->alias, r->bank);
 	
 	if (maxRAMaddress < 0) {
 		fprintf(stderr, "missing maxram setting in %s\n", DEVICE_FILE_NAME);
@@ -710,7 +722,7 @@ void list_valid_pics(int ncols)
 /*-----------------------------------------------------------------*
 *  
 *-----------------------------------------------------------------*/
-void init_pic(char *pic_type)
+PIC_device *init_pic(char *pic_type)
 {
 	char long_name[PIC14_STRING_LEN];
 	
@@ -730,6 +742,7 @@ void init_pic(char *pic_type)
 			exit(1);
 		}
 	}
+	return pic;
 }
 
 /*-----------------------------------------------------------------*
@@ -1021,45 +1034,110 @@ int pic14_getHasSecondConfigReg(void)
 }
 
 /*-----------------------------------------------------------------*
- * Query the size of the sharebank of the selected device.
- * FIXME: Currently always returns 16.
+ * True iff the device has memory aliased in every bank.
+ * If true, low and high will be set to the low and high address
+ * occupied by the (last) sharebank found.
  *-----------------------------------------------------------------*/
-int pic14_getSharebankSize(void)
+int pic14_hasSharebank(int *low, int *high, int *size)
 {
-	if (options.stack_size <= 0) {
-		// default size: 16 bytes
-		return 16;
-	} else {
-		return options.stack_size;
-	}
+	memRange *r;
+
+	assert(pic);
+	r = pic->ram;
+
+	while (r) {
+	    //fprintf (stderr, "%s: region %x..%x, bank %x, alias %x, pic->bankmask %x\n",  __FUNCTION__, r->start_address, r->end_address, r->bank, r->alias, pic->bankMask);
+	    if (r->alias == pic->bankMask) {
+		if (low) *low = r->start_address;
+		if (high) *high = r->end_address;
+		if (size) *size = r->end_address - r->start_address + 1;
+		return 1;
+	    } // if
+	    r = r->next;
+	} // while
+
+	if (low) *low = 0x0;
+	if (high) *high = 0x0;
+	if (size) *size = 0x0;
+	//fprintf (stderr, "%s: no shared bank found\n", __FUNCTION__);
+	return 0;
 }
 
-/*-----------------------------------------------------------------*
- * Query the highest byte address occupied by the sharebank of the
- * selected device.
- * THINK: Might not be needed, if we assign all shareable objects to
- *        a `udata_shr' section and let the linker do the rest...
- * Tried it, but yields `no target memory available' for pic16f877...
- *-----------------------------------------------------------------*/
-int pic14_getSharebankAddress(void)
+/*
+ * True iff the memory region [low, high] is aliased in all banks.
+ */
+int pic14_isShared(int low, int high)
 {
-	int sharebankAddress = 0x7f;
-	if (options.stack_loc != 0) {
-	    // permanent (?) workaround for pic16f84a-like devices with hardly
-	    // any memory:
-	    // 0x00-0x0B SFR
-	    // 0x0C-0x4F memory,
-	    // 0x50-0x7F unimplemented (reads as 0),
-	    // 0x80-0x8B SFRs (partly mapped to 0x0?)
-	    // 0x8c-0xCF mapped to 0x0C-0x4F
-	    sharebankAddress = options.stack_loc + pic14_getSharebankSize() - 1;
-	} else {
-	    /* If total RAM is less than 0x7f as with 16f84 then reduce
-	     * sharebankAddress to fit */
-	    if ((unsigned)sharebankAddress > pic14_getMaxRam())
-		    sharebankAddress = (int)pic14_getMaxRam();
-	}
-	return sharebankAddress;
+	memRange *r;
+
+	assert(pic);
+	r = pic->ram;
+
+	while (r) {
+	    //fprintf (stderr, "%s: region %x..%x, bank %x, alias %x, pic->bankmask %x\n", __FUNCTION__, r->start_address, r->end_address, r->bank, r->alias, pic->bankMask);
+	    if ((r->alias == pic->bankMask) && (r->start_address <= low) && (r->end_address >= high)) {
+		return 1;
+	    } // if
+	    r = r->next;
+	} // while
+
+	return 0;
+}
+
+/*
+ * True iff all RAM is aliased in all banks (no BANKSELs required except for
+ * SFRs).
+ */
+int pic14_allRAMShared(void)
+{
+	memRange *r;
+
+	assert(pic);
+	r = pic->ram;
+
+	while (r) {
+	    if (r->alias != pic->bankMask) return 0;
+	    r = r->next;
+	} // while
+	
+	return 1;
+}
+
+/*
+ * True iff the pseudo stack is a sharebank --> let linker place it.
+ * [low, high] denotes a size byte long block of (shared or banked)
+ * memory to be used.
+ */
+int pic14_getSharedStack(int *low, int *high, int *size)
+{
+    int haveShared;
+    int l, h, s;
+
+    haveShared = pic14_hasSharebank(&l, &h, &s);
+    if ((options.stack_loc != 0) || !haveShared)
+    {
+	// sharebank not available or not to be used
+	s = options.stack_size ? options.stack_size : 0x10;
+	l = options.stack_loc ? options.stack_loc : 0x20;
+	h = (options.stack_loc ? options.stack_loc : 0x20) + s  - 1;
+	if (low) *low = l;
+	if (high) *high = h;
+	if (size) *size = s;
+	// return 1 iff [low, high] is present in all banks
+	//fprintf(stderr, "%s: low %x, high %x, size %x, shared %d\n", __FUNCTION__, l, h, s, pic14_isShared(l, h));
+	return (pic14_isShared(l, h));
+    } else {
+	// sharebanks available for use by the stack
+	if (options.stack_size) s = options.stack_size;
+	else if (!s || s > 16) s = 16; // limit stack to 16 bytes in SHAREBANK
+
+	// provide addresses for sharebank
+	if (low) *low = l;
+	if (high) *high = l + s - 1;
+	if (size) *size = s;
+	//fprintf(stderr, "%s: low %x, high %x, size %x, shared 1\n", __FUNCTION__, l, h, s);
+	return 1;
+    }
 }
 
 PIC_device * pic14_getPIC(void)

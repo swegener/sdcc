@@ -1,3 +1,24 @@
+2006-11-30 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (create_pic,ram_map): add memRange entries to PIC
+	  (pic14_getSharebankSize, pic14_getSharebankAddress): replaced with
+	  (pic14_hasSharebank,pic14_isShared,pic14_allRAMShared,
+	   pic14_getSharedStack): NEW, evaluate the memRange entries to locate
+	   a sharebank, use a non-shared bank for the stack if none available
+	* src/pic/device.h (struct memRange): added linked list next field,
+	  added prototypes for above functions
+	* src/pic/ralloc.c (initStack): handle shared and banked stacks,
+	  (typeRegWithIdx): accept fixed and unfixed stack registers
+	* src/pic/pcode.c (pCodeInitRegisters): use new functions to create
+	  the stack, handle shared and banked stack (except for WSAVE),
+	  (insertBankSel): removed useless optimization (will never fire),
+	  (FixRegisterBanking): added optimization for devices with only one
+	  possibly aliased bank of memory, like 16f84
+	* src/pic/glue.c (pic14_constructAbsMap): back to udata_ovr, as some
+	  devices have no SHAREBANK in the linker script
+	* device/include/pic/pic14devices.txt: documented memmap
+	* device/lib/pic/libdev/Makefile.in: removed --stack-loc again
+
 2006-11-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (transferRegReg, loadRegFromAop, forceStackedAop,
@@ -9,7 +30,6 @@
 	  genRightShift): fixed bug with non-constant bit shift stored to
 	  a volatile result (SF Open Discussion forum thread #1616749).
 	  Single byte case is not yet optimized.
-
 
 2006-11-28 Maarten Brock <sourceforge.brock AT dse.nl>
 

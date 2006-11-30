@@ -1335,34 +1335,32 @@ void SAFE_snprintf(char **str, size_t *size, const  char  *format, ...)
 #endif    //  HAVE_VSNPRINTF
 
 
-extern  void initStack(int base_address, int size);
+extern  void initStack(int base_address, int size, int shared);
 extern regs *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
 extern regs *allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias);
-extern void init_pic(char *);
+extern PIC_device *init_pic(char *);
 
 void  pCodeInitRegisters(void)
 {
 	static int initialized=0;
-	int shareBankAddress,stkSize;
+	int shareBankAddress, stkSize, haveShared;
+	PIC_device *pic;
 	
 	if(initialized)
 		return;
 	initialized = 1;
 	
-	init_pic(port->processor);
-	/* FIXME - some PIC ICs like 16C7X which do not have a shared bank
-	 * need a different approach.
-	 * The fixed address might not be needed anyway, possibly the
-	 * linker will assign udata_shr sections correctly... */
-	shareBankAddress = pic14_getSharebankAddress();
+	pic = init_pic(port->processor);
+	haveShared = pic14_getSharedStack(NULL, &shareBankAddress, &stkSize);
 	/* Set pseudo stack size to SHAREBANKSIZE - 3.
 	 * On multi memory bank ICs this leaves room for WSAVE/SSAVE/PSAVE
 	 * (used for interrupts) to fit into the shared portion of the
-	 * memory bank */
-	stkSize = pic14_getSharebankSize()-3;
-	/* Putting the pseudo stack in shared memory so all modules use the same register when passing fn parameters */
-	initStack(shareBankAddress, stkSize);
+	 * memory bank. */
+	stkSize = stkSize - 3;
+	assert(stkSize >= 0);
+	initStack(shareBankAddress, stkSize, haveShared);
 	
+	/* TODO: Read aliases for SFRs from regmap lines in device description. */
 	pc_status.r = allocProcessorRegister(IDX_STATUS,"STATUS", PO_STATUS, 0x180);
 	pc_pcl.r = allocProcessorRegister(IDX_PCL,"PCL", PO_PCL, 0x80);
 	pc_pclath.r = allocProcessorRegister(IDX_PCLATH,"PCLATH", PO_PCLATH, 0x180);
@@ -1377,9 +1375,12 @@ void  pCodeInitRegisters(void)
 	pc_pcl.rIdx = IDX_PCL;
 	pc_pclath.rIdx = IDX_PCLATH;
 	
-	pc_wsave.r = allocInternalRegister(IDX_WSAVE,pc_wsave.pcop.name,pc_wsave.pcop.type, 0x180); /* Interrupt storage for working register - must be same address in all banks ie section SHAREBANK. */
-	pc_ssave.r = allocInternalRegister(IDX_SSAVE,pc_ssave.pcop.name,pc_ssave.pcop.type, 0); /* Interrupt storage for status register. */
-	pc_psave.r = allocInternalRegister(IDX_PSAVE,pc_psave.pcop.name,pc_psave.pcop.type, 0); /* Interrupt storage for pclath register. */
+	/* Interrupt storage for working register - must be same address in all banks ie section SHAREBANK. */
+	pc_wsave.r = allocInternalRegister(IDX_WSAVE,pc_wsave.pcop.name,pc_wsave.pcop.type, pic ? pic->bankMask : 0x180);
+	/* Interrupt storage for status register. */
+	pc_ssave.r = allocInternalRegister(IDX_SSAVE,pc_ssave.pcop.name,pc_ssave.pcop.type, (pic && haveShared) ? pic->bankMask : 0);
+	/* Interrupt storage for pclath register. */
+	pc_psave.r = allocInternalRegister(IDX_PSAVE,pc_psave.pcop.name,pc_psave.pcop.type, (pic && haveShared) ? pic->bankMask : 0);
 	
 	pc_wsave.rIdx = pc_wsave.r->rIdx;
 	pc_ssave.rIdx = pc_ssave.r->rIdx;
@@ -4608,8 +4609,6 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 	
 	pCodeOp *pcop;
 
-	// This is a NOP for single-banked devices.
-	if (pic14_getMaxRam() < 0x80) return;
 	// Never BANKSEL STATUS, this breaks all kinds of code (e.g., interrupt handlers).
 	if (!strcmp("STATUS", name) || !strcmp("_STATUS", name)) return;
 	
@@ -4648,12 +4647,15 @@ void FixRegisterBanking(pBlock *pb)
     regs *reg;
     const char *cur_bank, *new_bank;
     unsigned cur_mask, new_mask, max_mask;
+    int allRAMmshared;
     
     if (!pb) return;
 
     max_mask = pic14_getPIC()->bankMask;
     cur_mask = max_mask;
     cur_bank = NULL;
+
+    allRAMmshared = pic14_allRAMShared();
 
     for (pc = pb->pcHead; pc; pc = pc->next)
     {
@@ -4702,6 +4704,16 @@ void FixRegisterBanking(pBlock *pb)
 			continue;
 		    }
 
+		    // only one bank of memory and no SFR accessed?
+		    // XXX: We can do better with fixed registers.
+		    if (allRAMmshared && reg && (reg->type != REG_SFR) && (!reg->isFixed)) {
+			// no BANKSEL required
+			addpCodeComment(pc->prev, "BANKOPT1b BANKSEL dropped; %s present in all of %s's banks", new_bank, cur_bank);
+			continue;
+		    }
+
+		    // restrict cur_mask to cover only the banks this register
+		    // is in (as well as the previous registers)
 		    cur_mask &= new_mask;
 
 		    if (sameBank(reg, new_bank, cur_bank)) {

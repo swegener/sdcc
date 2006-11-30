@@ -193,6 +193,52 @@ replace {
 	movx	@dptr,a
 } if notVolatile %1
 
+// applies to f.e. lib/src/time.c (--model-large)
+replace {
+	mov	a,%1
+	movx	@dptr,a
+	inc	dptr
+	mov	a,%1
+	movx	@dptr,a
+	inc	dptr
+	mov	a,%1
+	movx	@dptr,a
+	inc	dptr
+	mov	a,%1
+	movx	@dptr,a
+} by {
+	mov	a,%1
+	movx	@dptr,a
+	inc	dptr
+	;	Peephole 101.a	removed redundant moves
+	movx	@dptr,a
+	inc	dptr
+	movx	@dptr,a
+	inc	dptr
+	movx	@dptr,a
+} if notVolatile %1
+
+// applies to f.e. support/regression/tests/literalop.c (--model-large)
+replace {
+	mov	a,%1
+	movx	@dptr,a
+	inc	dptr
+	mov	a,%1
+	movx	@dptr,a
+	inc	dptr
+	mov	a,%1
+	movx	@dptr,a
+} by {
+	mov	a,%1
+	movx	@dptr,a
+	inc	dptr
+	;	Peephole 101.b	removed redundant moves
+	movx	@dptr,a
+	inc	dptr
+	movx	@dptr,a
+} if notVolatile %1
+
+// applies to f.e. support/regression/tests/onebyte.c (--model-large)
 replace {
 	mov	a,%1
 	movx	@dptr,a
@@ -203,7 +249,7 @@ replace {
 	mov	a,%1
 	movx	@dptr,a
 	inc	dptr
-	;	Peephole 101	removed redundant mov
+	;	Peephole 101.c	removed redundant mov
 	movx	@dptr,a
 } if notVolatile %1
 
@@ -268,7 +314,7 @@ replace {
 	mov	a,%1
 } by {
 	mov	%1,a
-;	Peephole 105	removed redundant mov
+	;	Peephole 105	removed redundant mov
 } if notVolatile %1
 
 replace {
@@ -793,7 +839,7 @@ replace {
 	mov	%1,a
 	mov	dpl,%2
 	mov	dph,%3
-	;	Peephole 136	removed redundant move
+	;	Peephole 136	removed redundant mov
 } if notVolatile %1
 
 // WTF? Doesn't look sensible to me...
@@ -845,7 +891,8 @@ replace {
 } by {
 	;	Peephole 139.b	removed redundant mov
 	orl	a,%2
-	mov	r%1,a }
+	mov	r%1,a
+}
 
 replace {
 	mov	r%1,a
@@ -875,7 +922,7 @@ replace {
 	mov	r%2,ar%1
 	mov	ar%1,@r%2
 } by {
-	;	Peephole 142	removed redundant moves
+	;	Peephole 142	removed redundant mov
 	mov	r%2,a
 	mov	ar%1,@r%2
 }
@@ -1284,7 +1331,7 @@ replace {
 	mov	%1,%2
 	mov	%1,%3
 } by {
-	;	Peephole 177.c	removed redundant move
+	;	Peephole 177.c	removed redundant mov
 	mov	%1,%3
 } if notVolatile %1 %2
 
@@ -1297,7 +1344,7 @@ replace restart {
 } by {
 	mov	%1,%2
 	mov	%3,%4
-	;	Peephole 177.d	removed redundant move
+	;	Peephole 177.d	removed redundant mov
 } if notVolatile(%1 %2),operandsNotRelated(%1 %2 %3)
 
 // applies to f.e. bug-607243.c
@@ -1306,7 +1353,7 @@ replace {
 	mov	r%1,%2
 	mov	ar%1,%3
 } by {
-	;	peephole 177.e	removed redundant move
+	;	peephole 177.e	removed redundant mov
 	mov	ar%1,%3
 } if notVolatile %2 %3
 
@@ -1314,7 +1361,7 @@ replace {
 	mov	ar%1,%2
 	mov	r%1,%3
 } by {
-	;	peephole 177.f	removed redundant move
+	;	peephole 177.f	removed redundant mov
 	mov	r%1,%3
 } if notVolatile %2
 
@@ -1972,7 +2019,7 @@ replace {
 	mov	%1,%1
 } by {
 	;	Peephole 206	removed redundant mov %1,%1
-} if notVolatile
+} if notVolatile %1
 
 // Does not seem to be triggered anymore
 //replace {
@@ -2054,7 +2101,7 @@ replace	 {
 	add	a,%1
 } by {
 	mov	%1,a
-	;	Peephole 214	reduced some extra moves
+	;	Peephole 214.a	removed redundant mov
 	add	a,%2
 } if operandsNotSame
 
@@ -2063,7 +2110,7 @@ replace {
 	add	a,%2
 	mov	%1,a
 } by {
-	;	Peephole 215	removed some moves
+	;	Peephole 214.b	removed redundant mov
 	add	a,%2
 	mov	%1,a
 } if operandsNotSame
@@ -2182,13 +2229,13 @@ replace {
 replace {
 	mov	%1 + %2,(%2 + %1)
 } by {
-	;	Peephole 221.a	remove redundant move
+	;	Peephole 221.a	remove redundant mov
 } if notVolatile
 
 replace {
 	mov	(%1 + %2 + %3),((%2 + %1) + %3)
 } by {
-	;	Peephole 221.b	remove redundant move
+	;	Peephole 221.b	remove redundant mov
 } if notVolatile
 
 replace {
@@ -4560,6 +4607,7 @@ replace {
 	cjne	%1,%2,%4
 %3:
 } if labelRefCount(%3 1), labelRefCountChange(%3 -1)
+
 
 // should be one of the last peepholes
 replace{

@@ -1,3 +1,8 @@
+2006-11-30 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/peeph.def: added 101.a,b (moves to int/long xdata)
+	* doc/sdccman.lyx: various small changes, acknowledged Sourceforge
+
 2006-11-30 Raphael Neider <rneider AT web.de>
 
 	* src/pic/device.c (dump_sfr): always emit symbols

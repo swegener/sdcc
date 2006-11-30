@@ -1059,21 +1059,31 @@ status Collapsed
 \end_inset 
 
 -datadir see table below
+\newline 
+
 \layout List
 \labelwidthstring 00.00.0000
 
+\SpecialChar ~
+\SpecialChar ~
 docdir environment variable, see table below
 \layout List
 \labelwidthstring 00.00.0000
 
+\SpecialChar ~
+\SpecialChar ~
 include_dir_suffix environment variable, see table below
 \layout List
 \labelwidthstring 00.00.0000
 
+\SpecialChar ~
+\SpecialChar ~
 lib_dir_suffix environment variable, see table below
 \layout List
 \labelwidthstring 00.00.0000
 
+\SpecialChar ~
+\SpecialChar ~
 sdccconf_h_dir_separator environment variable, either / or 
 \backslash 
 
@@ -1081,6 +1091,8 @@ sdccconf_h_dir_separator environment variable, either / or
  makes sense here.
  This character will only be used in sdccconf.h; don't forget it's a C-header,
  therefore a double-backslash is needed there.
+\newline 
+
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -1235,6 +1247,8 @@ status Collapsed
 \end_inset 
 
 -disable-packihx Disables building packihx
+\newline 
+
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -4685,7 +4699,17 @@ The preprocessor
 
 \end_inset 
 
- is a modified version of the GNU preprocessor.
+ is a modified version of the GNU cpp
+\begin_inset LatexCommand \index{cpp|see{sdcpp}}
+
+\end_inset 
+
+ preprocessor 
+\begin_inset LatexCommand \url{http://gcc.gnu.org/}
+
+\end_inset 
+
+.
  The C preprocessor is used to pull in #include sources, process #ifdef
  statements, #defines and so on.
 \layout Subsection
@@ -5064,7 +5088,7 @@ Postprocessing the Intel Hex
  file
 \layout Standard
 
-The Intel Hex file
+In most cases this won't be needed but the Intel Hex file
 \begin_inset LatexCommand \index{<file>.ihx}
 
 \end_inset 
@@ -5105,8 +5129,13 @@ The separately available
 \end_inset 
 
  package additionally allows to set undefined locations to a predefined
- value, to insert checksums of various flavours (crc, add, xor) and to perform
- other manipulations (convert, split, crop, offset, ...).
+ value, to insert checksums
+\begin_inset LatexCommand \index{checksum}
+
+\end_inset 
+
+ of various flavours (crc, add, xor) and to perform other manipulations
+ (convert, split, crop, offset, ...).
  
 \newline 
 
@@ -5118,11 +5147,56 @@ srec_cat\SpecialChar ~
 \SpecialChar ~
 sourcefile.ihx -intel\SpecialChar ~
 \SpecialChar ~
+-o sourcefile.hex -intel
+\newline 
+
+\newline 
+
+\family default 
+\series default 
+An example for a more complex command line
+\begin_inset Foot
+collapsed false
+
+\layout Standard
+
+the command backfills
+\begin_inset LatexCommand \index{backfill unused memory}
+
+\end_inset 
+
+ unused memory with 0x12 and the overall 16 bit sum of the complete 64 kByte
+ block is zero.
+ If the program counter on an mcs51 runs wild the backfill pattern 0x12
+ will be interpreted as an 
+\family typewriter 
+lcall
+\family default 
+ to address 
+\family typewriter 
+0x1212
+\family default 
+ (where an emergency routine could sit).
+\end_inset 
+
+ could look like:
+\newline 
+
+\newline 
+
+\family sans 
+\series bold 
+\size footnotesize 
+srec_cat\SpecialChar ~
+sourcefile.ihx -intel\SpecialChar ~
 \SpecialChar ~
--fill 0xff 0x0000 0x8000\SpecialChar ~
-\SpecialChar ~
+-fill 0x12 0x0000 0xfffe\SpecialChar ~
+-little-endian-checksum-nega
+tive 0xfffe 0x02 0x02\SpecialChar ~
 \SpecialChar ~
 -o sourcefile.hex -intel
+\size default 
+
 \newline 
 
 \newline 
@@ -5760,7 +5834,7 @@ Processor Selection Options
 
 \end_inset 
 
- processor (In development, not complete).
+ processor (Not maintained, not complete).
  AVR users should probably have a look at winavr 
 \begin_inset LatexCommand \url{http://sourceforge.net/projects/winavr}
 
@@ -6071,9 +6145,29 @@ sdcpp
 \end_inset 
 
 .
- SDCC uses an adapted version of the preprocessor cpp of the GNU Compiler
- Collection (gcc), if you need more dedicated options please refer to the
- documentation at 
+ SDCC uses an adapted version of the preprocessor 
+\emph on 
+cpp
+\emph default 
+ of the GNU Compiler Collection
+\begin_inset LatexCommand \index{gcc (GNU Compiler Collection)}
+
+\end_inset 
+
+ (
+\emph on 
+gcc
+\emph default 
+ 
+\begin_inset LatexCommand \url{http://gcc.gnu.org/}
+
+\end_inset 
+
+), if you need more dedicated options please refer to the GCC\SpecialChar ~
+3.3.6\SpecialChar ~
+CPP\SpecialChar ~
+Manual
+ at 
 \begin_inset LatexCommand \htmlurl{http://www.gnu.org/software/gcc/onlinedocs/}
 
 \end_inset 
@@ -6214,8 +6308,12 @@ status Collapsed
 \end_inset 
 
  segment, default value 0.
- Note when this option is used the interrupt vector table is also relocated
- to the given address.
+ Note when this option is used the interrupt vector table
+\begin_inset LatexCommand \index{interrupt vector table}
+
+\end_inset 
+
+ is also relocated to the given address.
  The value entered can be in Hexadecimal or Decimal format, e.g.: -
 \begin_inset ERT
 status Collapsed
@@ -8371,9 +8469,19 @@ status Collapsed
 
 \series default 
  Display errors and warnings using MSVC style, so you can use SDCC with
- visual studio.
- With SDCC both offering a GCC-like (the default) and a MSVC-like output
- style, integration into most programming editors should be straightforward.
+ the visual studio IDE
+\begin_inset LatexCommand \index{IDE}
+
+\end_inset 
+
+.
+ With SDCC both offering a GCC-like (the default) and a MSVC-like
+\begin_inset LatexCommand \index{MSVC output style}
+
+\end_inset 
+
+ output style, integration into most programming editors should be straightforwa
+rd.
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -9820,12 +9928,19 @@ __sfr __at
  (0x80) P0;\SpecialChar ~
  /* special function register P0 at location 0x80 */
 \newline 
-/* 16 bit special function register combination for timer 0 */
+
 \newline 
-/* with the high byte at location 0x8C and the low byte at location 0x8A
- */
+/* 16 bit special function register combination for timer 0
 \newline 
-__sfr16 __at
+\SpecialChar ~
+\SpecialChar ~
+ with the high byte at location 0x8C and the low byte at location 0x8A */
+\newline 
+__sfr16 __at (0x8C8A) TMR0;
+\newline 
+
+\newline 
+__sbit __at
 \begin_inset LatexCommand \index{at}
 
 \end_inset 
@@ -9835,9 +9950,8 @@ __sfr16 __at
 
 \end_inset 
 
- (0x8C8A) TMR0;
-\newline 
-__sbit __at (0xd7) CY; /* CY (Carry Flag
+ (0xd7) CY;\SpecialChar ~
+ /* CY (Carry Flag
 \begin_inset LatexCommand \index{Flags}
 
 \end_inset 
@@ -9989,8 +10103,12 @@ unsigned char * p;
 \newline 
 
 \newline 
-/* the following is a function pointer physically located in data space
- */
+/* the following is a function pointer
+\begin_inset LatexCommand \index{function pointer}
+
+\end_inset 
+
+ physically located in data space */
 \newline 
 char (* __data fp)(void);
 \layout Standard
@@ -10030,8 +10148,12 @@ generic
 \end_inset 
 
  routines.
- Explicitly specifying the pointer type will generate the most efficient
- code.
+ Explicitly specifying the pointer
+\begin_inset LatexCommand \index{pointer}
+
+\end_inset 
+
+ type will generate the most efficient code.
 \layout Subsubsection
 
 Notes on MCS51 memory
@@ -11492,7 +11614,12 @@ interrupt
 \emph default 
  keyword is the interrupt number this routine will service.
  When present, the compiler will insert a call to this routine in the interrupt
- vector table for the interrupt number specified.
+ vector table
+\begin_inset LatexCommand \index{interrupt vector table}
+
+\end_inset 
+
+ for the interrupt number specified.
  If you have multiple source files in your project, interrupt service routines
  can be present in any of them, but a prototype of the isr MUST be present
  or included in the file that contains the function 
@@ -11821,10 +11948,19 @@ about Functions using private register banks.
 MCS51/DS390 Interrupt Service Routines
 \layout Standard
 
-Interrupt numbers and the corresponding address & descriptions for the Standard
- 8051/8052 are listed below.
- SDCC will automatically adjust the interrupt vector table to the maximum
- interrupt number specified.
+Interrupt
+\begin_inset LatexCommand \index{interrupt}
+
+\end_inset 
+
+ numbers and the corresponding address & descriptions for the Standard 8051/8052
+ are listed below.
+ SDCC will automatically adjust the 
+\begin_inset LatexCommand \index{interrupt vector table}
+
+\end_inset 
+
+ to the maximum interrupt number specified.
 \newline 
 
 \layout Standard
@@ -12905,13 +13041,12 @@ status Collapsed
 
 \end_inset 
 
-and section 
+ and section 
 \begin_inset LatexCommand \ref{sub:MCS51-variants}
 
 \end_inset 
 
-\SpecialChar ~
-about MCS51-variants.
+ about MCS51-variants.
 \layout Subsection
 
 HC08 Startup Code
@@ -15921,13 +16056,13 @@ not
 
 \layout Standard
 
-Before using dynamic
-\begin_inset LatexCommand \index{dynamic}
+Before using dynamic memory allocation
+\begin_inset LatexCommand \index{dynamic memory allocation (malloc)}
 
 \end_inset 
 
- memory allocation with SDCC, you have to provide heap
-\begin_inset LatexCommand \index{heap}
+ with SDCC, you have to provide heap
+\begin_inset LatexCommand \index{heap (malloc)}
 
 \end_inset 
 
@@ -15962,7 +16097,7 @@ You can acomplish this by including the following code into your source:
 \end_inset 
 
 , and free
-\begin_inset LatexCommand \index{free}
+\begin_inset LatexCommand \index{free (malloc)}
 
 \end_inset 
 
@@ -16555,7 +16690,12 @@ noiv
 
 \end_inset 
 
- vector table entries for all ISR functions defined after the pragma.
+ vector table
+\begin_inset LatexCommand \index{interrupt vector table}
+
+\end_inset 
+
+ entries for all ISR functions defined after the pragma.
  This is useful in cases where the interrupt vector table must be defined
  manually, or when there is a secondary, manually defined interrupt vector
  table (e.g.
@@ -17499,7 +17639,12 @@ regressions tests
 
 
 \emph default 
- as the MCS51 and DS390 ports, so floating point support, support for long
+ (see section 
+\begin_inset LatexCommand \ref{sec:Quality-control}
+
+\end_inset 
+
+) as the MCS51 and DS390 ports, so floating point support, support for long
  variables and bitfield support is fine.
  See mailing lists and forums about interrupt routines.
 \layout Standard
@@ -17528,8 +17673,8 @@ As always, the code is the authoritative reference - see z80/ralloc.c and
 
 The HC08 port
 \layout Standard
-\added_space_bottom bigskip 
-The port to the Motorola HC08
+
+The port to the Freescale/Motorola HC08
 \begin_inset LatexCommand \index{HC08}
 
 \end_inset 
@@ -17540,6 +17685,14 @@ The port to the Motorola HC08
  unoptimized.
  Some of the SDCC's standard C library functions have embedded non-HC08
  inline assembly and so are not yet usable.
+\layout Standard
+\added_space_bottom bigskip 
+The HC08 port passes the regression test suite (see section 
+\begin_inset LatexCommand \ref{sec:Quality-control}
+
+\end_inset 
+
+).
 \layout Section
 \pagebreak_top 
 The PIC14 port
@@ -17551,7 +17704,17 @@ The 14bit PIC
 \end_inset 
 
  port still requires a major effort from the development community.
- However it can work for very simple code.
+ However it can work for simple code.
+ It passes its (smaller set of) regression tests
+\begin_inset LatexCommand \index{Regression test (PIC14)}
+
+\end_inset 
+
+ in the directory 
+\shape italic 
+sdcc/src/regression
+\shape default 
+.
 \layout Subsection
 
 C code and 14bit PIC code page
@@ -21669,6 +21832,34 @@ status Collapsed
 -fommit-frame-pointer might reduce stack usage by not creating unnecessery
  stack frames.
  Other ways to reduce stack usage may exist.
+\layout Subsection
+
+Known bugs
+\layout Standard
+
+The PIC16 Port currently does not pass SDCC's regression test
+\begin_inset LatexCommand \index{Regression test (PIC16)}
+
+\end_inset 
+
+ suite (see section 
+\begin_inset LatexCommand \ref{sec:Quality-control}
+
+\end_inset 
+
+) and thus the nightly regression tests for the PIC16 target are currently
+ disabled for all hosts except for 
+\emph on 
+Linux on Opteron.
+
+\emph default 
+ This means you can see the result of the PIC16 regression tests f.e.
+ by checking the log files in 
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/regression_test_results/amd64-unknown-linux2.3/}
+
+\end_inset 
+
+ (pick the most up to date file there, scroll down, lend a hand).
 \layout Chapter
 
 Debugging
@@ -23475,10 +23666,15 @@ check the device specific header files
 
 \end_inset 
 
-> to allow using common header files.
+> 
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/include/mcs51/compiler.h?view=markup}
+
+\end_inset 
+
+ to allow using common header files.
  (see f.e.
  cc2510fx.h 
-\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/include/mcs51/P89c51RD2.h?view=markup}
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/include/mcs51/cc2510fx.h?view=markup}
 
 \end_inset 
 
@@ -24786,7 +24982,7 @@ Statically checks c sources (see
 \layout Standard
 
 ddd
-\begin_inset LatexCommand \index{ddd (debugger)}
+\begin_inset LatexCommand \index{DDD (debugger)}
 
 \end_inset 
 
@@ -24834,10 +25030,10 @@ Related documentation / recommended reading
 \align left 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="7" columns="3">
 <features>
 <column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="block" valignment="top" leftline="true" width="30line%">
+<column alignment="center" valignment="top" leftline="true" width="0">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -24924,7 +25120,12 @@ c-faq
 
 \layout Standard
 
-C-FAQ-list
+C-FAQ
+\begin_inset LatexCommand \index{C FAQ}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -24933,7 +25134,7 @@ C-FAQ-list
 \layout Standard
 
 
-\begin_inset LatexCommand \url{http://www.eskimo.com/~scs/C-faq/top.html}
+\begin_inset LatexCommand \url{http://www.c-faq.com}
 
 \end_inset 
 
@@ -25036,7 +25237,7 @@ Extensions for Embedded C
 
 \layout Standard
 
-Latest datasheet of the target CPU
+Latest datasheet of target CPU
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -25048,7 +25249,7 @@ vendor
 \end_inset 
 </cell>
 </row>
-<row topline="true">
+<row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -25070,34 +25271,6 @@ Revision history of datasheet
 \layout Standard
 
 vendor
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-S.
- S.
- Muchnick
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-Advanced Compiler Design and Implementation
-\end_inset 
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\layout Standard
-
-bookstore (very dedicated, probably read other books first)
 \end_inset 
 </cell>
 </row>
@@ -25266,6 +25439,11 @@ Silicon Laboratories / Cygnal
 
 \size footnotesize 
 Integrating SDCC 8051 Tools Into The Silicon Labs IDE
+\begin_inset LatexCommand \index{IDE}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -25794,7 +25972,7 @@ sdcc --version
  there.
  SDCC versions starting from 1999 up to now are available (currently the
  versions prior to the conversion from cvs
-\begin_inset LatexCommand \index{cvs (see Subversion)}
+\begin_inset LatexCommand \index{cvs|see{Subversion}}
 
 \end_inset 
 
@@ -25873,6 +26051,11 @@ Maybe we should include some links to real world applications.
 \layout Section
 
 Quality control
+\begin_inset LatexCommand \label{sec:Quality-control}
+
+\end_inset 
+
+
 \begin_inset LatexCommand \index{Quality control}
 
 \end_inset 
@@ -25890,19 +26073,36 @@ regression tests
 
 \end_inset 
 
- check that SDCC itself compiles flawlessly on several platforms and checks
- the quality of the code generated by SDCC by running the code through simulator
-s.
- There is a separate document 
+ check that SDCC itself compiles flawlessly on several host platforms (i386,
+ Opteron, 64 bit Alpha, ppc64, MacOS X on PPC, Solaris on Sparc) and checks
+ the quality of the code generated by SDCC by running the code for several
+ target platforms through simulators.
+ The regression test suite comprises more than 100 files which expand to
+ more than 500 test cases which include more than 4500 tests.
+ The results of these tests are published daily on SDCC's snapshot page
+ (click on the red or green symbols on the right side of 
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
+
+\end_inset 
+
+).
+\layout Standard
+
+There is a separate document 
 \shape italic 
-test_suite.pdf
+test_suite.pdf 
 \begin_inset LatexCommand \index{Test suite}
 
 \end_inset 
 
 
 \shape default 
- about this.
+ 
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/doc/test_suite_spec.pdf}
+
+\end_inset 
+
+ about the regression test suite.
 \layout Standard
 
 You'll find the test code in the directory 
@@ -25943,8 +26143,12 @@ make test-mcs51
 .
 \layout Standard
 
-The pic port uses a different set of regression tests, you'll find them
- in the directory 
+The 14bit pic port uses a different set of regression tests 
+\begin_inset LatexCommand \index{Regression test (PIC14)}
+
+\end_inset 
+
+, you'll find them in the directory 
 \shape italic 
 sdcc/src/regression
 \shape default 
@@ -30886,6 +31090,38 @@ Thanks to all the other volunteer developers who have helped with coding,
 \emph default 
 
 \newline 
+
+\newline 
+
+\emph on 
+Also thanks to Sourceforge 
+\begin_inset LatexCommand \url{http://www.sf.net}
+
+\end_inset 
+
+ which has hosted the project since 1999 and donates significant download
+ bandwidth and probably more than 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+$10^{13}$
+\end_inset 
+
+CPU cycles per day.
+\newline 
+ 
+\begin_inset Note
+collapsed false
+
+\layout Standard
+
+more than 10^13 is an estimate: on my Athlon 2800+ it takes about (0.5+6.5+20)
+ minutes for (configure+make+regression test), and there is (i386, amd64,
+ alpha, ppc64, (mingw32), sparc, macosx).
+ 
+\end_inset 
+
 
 \layout Standard
 

@@ -64,7 +64,6 @@ static unsigned int config_word = DEFAULT_CONFIG_WORD;
 static unsigned int config2_word = DEFAULT_CONFIG2_WORD;
 static memRange *rangeRAM = NULL;
 
-extern int pic14_is_shared (regs *reg);
 extern void emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize);
 
 
@@ -563,16 +562,7 @@ void dump_sfr(FILE *of)
 		
 		if (reg && !reg->isEmitted)
 		{
-		  if (pic14_options.isLibrarySource && pic14_is_shared (reg))
-		  {
-		    /* rely on external declarations for the non-fixed stack */
-		    /* Update: We always emit the STACK symbols into a
-		     * udata_shr section, so no extern declaration is
-		     * required. */
-		    //fprintf (of, "\textern\t%s\n", reg->name);
-		  } else {
-		    emitSymbolToFile (of, reg->name, "udata", reg->size, reg->isFixed ? reg->address : -1, 0, pic14_is_shared (reg));
-		  }
+		  emitSymbolToFile (of, reg->name, "udata", reg->size, reg->isFixed ? reg->address : -1, 0, 0);
 		  
 		  reg->isEmitted = 1;
 		}

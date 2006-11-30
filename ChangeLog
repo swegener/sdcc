@@ -1,5 +1,10 @@
 2006-11-30 Raphael Neider <rneider AT web.de>
 
+	* src/pic/device.c (dump_sfr): always emit symbols
+	* src/pic/glue.c (pic14printPublics): fixed typo
+
+2006-11-30 Raphael Neider <rneider AT web.de>
+
 	* src/pic/device.c (create_pic,ram_map): add memRange entries to PIC
 	  (pic14_getSharebankSize, pic14_getSharebankAddress): replaced with
 	  (pic14_hasSharebank,pic14_isShared,pic14_allRAMShared,

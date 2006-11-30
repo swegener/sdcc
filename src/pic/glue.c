@@ -105,22 +105,6 @@ unsigned int pic14aopLiteral (value *val, int offset)
 	
 }
 
-/* Check whether the given reg is shared amongst all .o files of a project.
- * This is true for the pseudo stack and WSAVE, SSAVE and PSAVE. */
-static int
-is_shared_address (int addr)
-{
-  return ((addr > Gstack_base_addr - 18)
-  	&& (addr <= Gstack_base_addr));
-}
-
-int
-pic14_is_shared (regs *reg)
-{
-	if (!reg) return 0;
-	return is_shared_address (reg->address);
-}
-
 static int
 is_valid_identifier( const char *name )
 {
@@ -1104,7 +1088,7 @@ pic14printPublics (FILE * afile)
   symbol *sym;
 
   fprintf (afile, "%s", iComments2);
-  fprintf (afile, "; publics variables in this module\n");
+  fprintf (afile, "; public variables in this module\n");
   fprintf (afile, "%s", iComments2);
 
   for (sym = setFirstItem (publics); sym;

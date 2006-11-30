@@ -27,8 +27,12 @@
 
 -------------------------------------------------------------------------*/
 
+/* Use the D macro for basic (unobtrusive) debugging messages */
 //#define D(x)
 #define D(x) x
+/* Use the DD macro for detailed debugging messages */
+#define DD(x)
+//#define DD(x) x
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +51,7 @@ char *aopLiteralLong (value * val, int offset, int size);
 extern int allocInfo;
 static int pushReg (regs *reg, bool freereg);
 static void pullReg (regs *reg);
+static void transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs);
 
 static char *zero = "#0x00";
 static char *one = "#0x01";
@@ -227,7 +232,7 @@ transferRegReg (regs *sreg, regs *dreg, bool freesrc)
       return;
     }
 
-  D(emitcode ("", "; transferRegReg(%s,%s)",
+  DD(emitcode ("", "; transferRegReg(%s,%s)",
             sreg->name, dreg->name));
 
   srcidx = sreg->rIdx;
@@ -598,7 +603,7 @@ loadRegFromAop (regs *reg, asmop *aop, int loffset)
     printf(" reg missing operand link\n");
 #endif
 
-  D(emitcode ("", ";     loadRegFromAop (%s, %s, %d)",
+  DD(emitcode ("", ";     loadRegFromAop (%s, %s, %d)",
             reg->name, aopName (aop), loffset));
 	
   /* If operand is volatile, we cannot optimize. */
@@ -613,7 +618,7 @@ loadRegFromAop (regs *reg, asmop *aop, int loffset)
       && (reg->aopofs == loffset))
     {
       hc08_useReg(reg);
-      D(emitcode ("","; already had correct value for %s", reg->name));
+      DD(emitcode ("","; already had correct value for %s", reg->name));
       return;
     }
 
@@ -623,7 +628,7 @@ loadRegFromAop (regs *reg, asmop *aop, int loffset)
       && operandsEqu(hc08_reg_h->aop->op,aop->op)
       && (hc08_reg_h->aopofs == loffset))
     {
-      D(emitcode ("","; found correct value for %s in h", reg->name));
+      DD(emitcode ("","; found correct value for %s in h", reg->name));
       transferRegReg (hc08_reg_h, reg, FALSE);
       hc08_useReg (reg);
       return;
@@ -634,7 +639,7 @@ loadRegFromAop (regs *reg, asmop *aop, int loffset)
       && operandsEqu(hc08_reg_x->aop->op,aop->op)
       && (hc08_reg_x->aopofs == loffset))
     {
-      D(emitcode ("","; found correct value for %s in x", reg->name));
+      DD(emitcode ("","; found correct value for %s in x", reg->name));
       transferRegReg (hc08_reg_x, reg, FALSE);
       hc08_useReg (reg);
       return;
@@ -644,7 +649,7 @@ loadRegFromAop (regs *reg, asmop *aop, int loffset)
       && operandsEqu(hc08_reg_a->aop->op,aop->op)
       && (hc08_reg_a->aopofs == loffset))
     {
-      D(emitcode ("","; found correct value for %s in a", reg->name));
+      DD(emitcode ("","; found correct value for %s in a", reg->name));
       transferRegReg (hc08_reg_a, reg, FALSE);
       hc08_useReg (reg);
       return;
@@ -768,25 +773,51 @@ forceload:
 /*--------------------------------------------------------------------------*/
 /* forceStackedAop - Reserve space on the stack for asmop aop; when         */
 /*                   freeAsmop is called with aop, the stacked data will    */
-/*                   be copied to the original aop location and             */
+/*                   be copied to the original aop location.                */
 /*--------------------------------------------------------------------------*/
 static asmop *
-forceStackedAop (asmop *aop)
+forceStackedAop (asmop *aop, bool copyOrig)
 {
+  regs *reg;
   int loffset;
   asmop *newaop = newAsmop (aop->type);
   memcpy (newaop, aop, sizeof(*newaop));
   
-  D(emitcode("", "; forcedStackAop %s", aopName(aop)));
+  DD(emitcode("", "; forcedStackAop %s", aopName(aop)));
+
+  if (copyOrig && hc08_reg_a->isFree)
+    reg = hc08_reg_a;
+  else if (copyOrig && hc08_reg_x->isFree)
+    reg = hc08_reg_x;
+  else
+    reg = NULL;
+ 
   for (loffset=0; loffset < newaop->size; loffset++)
     {
       asmop *aopsof = newAsmop (AOP_SOF);
       aopsof->size = 1;
-      aopsof->aopu.aop_stk = pushReg (hc08_reg_a, FALSE);
+      if (copyOrig && reg)
+        {
+          loadRegFromAop (reg, aop, loffset);
+          aopsof->aopu.aop_stk = pushReg (reg, FALSE);
+        }
+      else
+        {
+          aopsof->aopu.aop_stk = pushReg (hc08_reg_a, FALSE);
+        }
       aopsof->op = aop->op;
       newaop->stk_aop[loffset] = aopsof;
     }
   newaop->stacked = 1;
+
+  if (!reg && copyOrig)
+    {
+      for (loffset=0; loffset < newaop->size; loffset++)
+        {
+	  transferAopAop (aop, loffset, newaop, loffset);
+	}
+    }
+
   return newaop;
 }
 
@@ -803,7 +834,7 @@ storeRegToAop (regs *reg, asmop *aop, int loffset)
   int otheridx;
   #endif
 
-  D(emitcode ("", ";     storeRegToAop (%s, %s, %d), stacked=%d, isaddr=%d",
+  DD(emitcode ("", ";     storeRegToAop (%s, %s, %d), stacked=%d, isaddr=%d",
             reg->name, aopName (aop), loffset, aop->stacked, aop->isaddr));
 
   if ((reg->rIdx == HX_IDX) && aop->stacked
@@ -923,19 +954,19 @@ storeRegToAop (regs *reg, asmop *aop, int loffset)
                 && operandsEqu(otherreg->aop->op,aop->op)
                 && (otherreg->aopofs == loffset))
               {
-                D(emitcode("","; marking %s stale", otherreg->name));
+                DD(emitcode("","; marking %s stale", otherreg->name));
                 otherreg->aop=NULL;
               }
           }
       if ((!hc08_reg_x->aop || !hc08_reg_h->aop) && hc08_reg_hx->aop)
         {
           hc08_reg_hx->aop = NULL;
-          D(emitcode("","; marking hx stale"));
+          DD(emitcode("","; marking hx stale"));
         }
       if ((!hc08_reg_x->aop || !hc08_reg_a->aop) && hc08_reg_xa->aop)
         {
           hc08_reg_xa->aop = NULL;
-          D(emitcode("","; marking xa stale"));
+          DD(emitcode("","; marking xa stale"));
         }
     
       reg->aop = aop;
@@ -1163,10 +1194,10 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
       return;
     }
 
-//  D(emitcode ("", "; transferAopAop (%s, %d, %s, %d)",
+//  DD(emitcode ("", "; transferAopAop (%s, %d, %s, %d)",
 //            aopName (srcaop), srcofs, aopName (dstaop), dstofs));
-//  D(emitcode ("", "; srcaop->type = %d", srcaop->type));
-//  D(emitcode ("", "; dstaop->type = %d", dstaop->type));
+//  DD(emitcode ("", "; srcaop->type = %d", srcaop->type));
+//  DD(emitcode ("", "; dstaop->type = %d", dstaop->type));
   
   if (dstofs >= dstaop->size)
     return;
@@ -1869,7 +1900,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
       int stackAdjust;
       int loffset;
 
-      D(emitcode ("","; freeAsmop restoring stacked %s", aopName(aop)));
+      DD(emitcode ("","; freeAsmop restoring stacked %s", aopName(aop)));
       aop->stacked = 0;
       stackAdjust = 0;
       for (loffset=0; loffset<aop->size; loffset++)
@@ -1911,7 +1942,7 @@ aopDerefAop (asmop *aop)
   sym_link *type, *etype;
   int p_type;
   
-  D(emitcode ("", ";     aopDerefAop(%s)", aopName(aop)));
+  DD(emitcode ("", ";     aopDerefAop(%s)", aopName(aop)));
   if (aop->op)
     {
     
@@ -2394,7 +2425,7 @@ genUminus (iCode * ic)
   else
     {
       if (IS_AOP_XA (AOP (IC_RESULT (ic))))
-        result = forceStackedAop (AOP (IC_RESULT (ic)));
+        result = forceStackedAop (AOP (IC_RESULT (ic)), FALSE);
       else
         result = AOP (IC_RESULT (ic));
 	
@@ -3208,7 +3239,7 @@ genPlusIncr (iCode * ic)
 
   icount = (unsigned int) floatFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
 
-  D(emitcode ("", "; IS_AOP_HX = %d", IS_AOP_HX (AOP (left))));
+  DD(emitcode ("", "; IS_AOP_HX = %d", IS_AOP_HX (AOP (left))));
   
   if ((IS_AOP_HX (AOP (left)) ||
        ( (AOP_TYPE (left) == AOP_DIR) && (AOP_TYPE (result) == AOP_DIR) )
@@ -3234,7 +3265,7 @@ genPlusIncr (iCode * ic)
       return TRUE;
     }
 
-  D(emitcode ("", "; icount = %d, sameRegs=%d", icount, 
+  DD(emitcode ("", "; icount = %d, sameRegs=%d", icount, 
             sameRegs (AOP (left), AOP (result))));
   
   if ((icount > 255) || (icount<0))
@@ -3319,9 +3350,9 @@ genPlus (iCode * ic)
   if (genPlusIncr (ic) == TRUE)
     goto release;
 
-  D(emitcode("",";  left size = %d", getDataSize (IC_LEFT(ic))));
-  D(emitcode("",";  right size = %d", getDataSize (IC_RIGHT(ic))));
-  D(emitcode("",";  result size = %d", getDataSize (IC_RESULT(ic))));
+  DD(emitcode("",";  left size = %d", getDataSize (IC_LEFT(ic))));
+  DD(emitcode("",";  right size = %d", getDataSize (IC_RIGHT(ic))));
+  DD(emitcode("",";  result size = %d", getDataSize (IC_RESULT(ic))));
   
   size = getDataSize (IC_RESULT (ic));
 
@@ -3552,7 +3583,7 @@ genMultOneByte (operand * left,
       || (lUnsigned && rUnsigned))
     {
       // just an unsigned 8*8=8/16 multiply
-      //D(emitcode (";","unsigned"));
+      //DD(emitcode (";","unsigned"));
 
       loadRegFromAop (hc08_reg_a, AOP (left), 0);
       loadRegFromAop (hc08_reg_x, AOP (right), 0);
@@ -4590,19 +4621,19 @@ genPointerGetSetOfs (iCode *ic)
   asmop *derefaop;
 
   /* Make sure we have a next iCode */
-  D(emitcode("","; checking lic"));
+  DD(emitcode("","; checking lic"));
   if (!lic)
     return FALSE;
 
   /* Make sure the result of the addition is an iCode */
-  D(emitcode("","; checking IS_ITEMP"));
+  DD(emitcode("","; checking IS_ITEMP"));
   if (!IS_ITEMP (IC_RESULT (ic)))
     return FALSE;
 
   /* Make sure the next iCode is a pointer set or get */
   pset = POINTER_SET(lic);
   pget = POINTER_GET(lic);
-  D(emitcode("","; pset=%d, pget=%d",pset,pget));
+  DD(emitcode("","; pset=%d, pget=%d",pset,pget));
   if (!pset && !pget)
     return FALSE;
 
@@ -4610,25 +4641,25 @@ genPointerGetSetOfs (iCode *ic)
   if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) > 1)
     return FALSE;
     
-  D(emitcode("", "; checking pset operandsEqu"));
+  DD(emitcode("", "; checking pset operandsEqu"));
   if (pset & !operandsEqu (IC_RESULT (ic), IC_RESULT (lic)))
     return FALSE;
 
-  D(emitcode("", "; checking pget operandsEqu"));
+  DD(emitcode("", "; checking pget operandsEqu"));
   if (pget & !operandsEqu (IC_RESULT (ic), IC_LEFT (lic)))
     return FALSE;
 
-  D(emitcode("", "; checking IS_SYMOP"));
+  DD(emitcode("", "; checking IS_SYMOP"));
   if (!IS_SYMOP (IC_LEFT (ic)))
     return FALSE;
 
-  D(emitcode("", "; checking !IS_TRUE_SYMOP"));
+  DD(emitcode("", "; checking !IS_TRUE_SYMOP"));
   if (IS_TRUE_SYMOP (IC_LEFT (ic)))
     return FALSE;
 
   sym = OP_SYMBOL (IC_LEFT (ic));
   
-  D(emitcode("", "; checking remat"));
+  DD(emitcode("", "; checking remat"));
   if (!sym->remat)
     return FALSE;
     
@@ -4953,10 +4984,10 @@ genAnd (iCode * ic, iCode * ifx)
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);
 
 #ifdef DEBUG_TYPE
-  D(emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  DD(emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
 	    AOP_TYPE (result),
 	    AOP_TYPE (left), AOP_TYPE (right)));
-  D(emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  DD(emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
 	    AOP_SIZE (result),
 	    AOP_SIZE (left), AOP_SIZE (right)));
 #endif
@@ -5117,10 +5148,10 @@ genOr (iCode * ic, iCode * ifx)
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);
 
 #ifdef DEBUG_TYPE
-  D(emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  DD(emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
 	    AOP_TYPE (result),
 	    AOP_TYPE (left), AOP_TYPE (right)));
-  D(emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  DD(emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
 	    AOP_SIZE (result),
 	    AOP_SIZE (left), AOP_SIZE (right)));
 #endif
@@ -5276,10 +5307,10 @@ genXor (iCode * ic, iCode * ifx)
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);
 
 #ifdef DEBUG_TYPE
-  D(emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  DD(emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
 	    AOP_TYPE (result),
 	    AOP_TYPE (left), AOP_TYPE (right)));
-  D(emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  DD(emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
 	    AOP_SIZE (result),
 	    AOP_SIZE (left), AOP_SIZE (right)));
 #endif
@@ -6473,7 +6504,7 @@ genLeftShiftLiteral (operand * left,
   size = AOP_SIZE (result);
 
 #if VIEW_SIZE
-  D(emitcode ("; shift left ", "result %d, left %d", size,
+  DD(emitcode ("; shift left ", "result %d, left %d", size,
 	    AOP_SIZE (left)));
 #endif
 
@@ -6522,6 +6553,7 @@ genLeftShift (iCode * ic)
   int size, offset;
   symbol *tlbl, *tlbl1;
   char *shift;
+  asmop *aopResult;
 
   D(emitcode (";     genLeftShift",""));
 
@@ -6540,30 +6572,33 @@ genLeftShift (iCode * ic)
     }
 
   /* shift count is unknown then we have to form
-     a loop get the loop count in A : Note: we take
+     a loop get the loop count in X : Note: we take
      only the lower order byte since shifting
      more that 32 bits make no sense anyway, ( the
      largest size of an object can be only 32 bits ) */
 
   aopOp (result, ic, FALSE);
   aopOp (left, ic, FALSE);
+  aopResult = AOP (result);
 
-  if (sameRegs(AOP (right), AOP (result)) || IS_AOP_XA (AOP (result)))
-    AOP (result) = forceStackedAop (AOP (result));
+  if (sameRegs(AOP (right), AOP (result)) || IS_AOP_XA (AOP (result))
+      || isOperandVolatile (result, FALSE)) 
+    aopResult = forceStackedAop (AOP (result), sameRegs ( AOP (left), AOP (result)));
 
   /* now move the left to the result if they are not the
      same */
-  if (!sameRegs (AOP (left), AOP (result)))
+  if (!sameRegs (AOP (left), aopResult))
     {
       size = AOP_SIZE (result);
       offset = 0;
       while (size--)
 	{
-	  transferAopAop (AOP (left), offset, AOP (result), offset);
+	  transferAopAop (AOP (left), offset, aopResult, offset);
 	  offset++;
 	}
     }
   freeAsmop (left, NULL, ic, TRUE);
+  AOP (result) = aopResult;
   
   tlbl = newiTempLabel (NULL);
   size = AOP_SIZE (result);
@@ -6797,7 +6832,7 @@ genRightShiftLiteral (operand * left,
   aopOp (result, ic, FALSE);
 
 #if VIEW_SIZE
-  D(emitcode ("; shift right ", "result %d, left %d", AOP_SIZE (result),
+  DD(emitcode ("; shift right ", "result %d, left %d", AOP_SIZE (result),
 	    AOP_SIZE (left)));
 #endif
 
@@ -6855,6 +6890,7 @@ genRightShift (iCode * ic)
   symbol *tlbl, *tlbl1;
   char *shift;
   bool sign;
+  asmop *aopResult;
   
   D(emitcode (";     genRightShift",""));
 
@@ -6892,23 +6928,26 @@ genRightShift (iCode * ic)
 
   aopOp (result, ic, FALSE);
   aopOp (left, ic, FALSE);
+  aopResult = AOP (result);
 
-  if (sameRegs(AOP (right), AOP (result)) || IS_AOP_XA (AOP (result)))
-    AOP (result) = forceStackedAop (AOP (result));
-  
+  if (sameRegs(AOP (right), AOP (result)) || IS_AOP_XA (AOP (result))
+      || isOperandVolatile (result, FALSE)) 
+    aopResult = forceStackedAop (AOP (result), sameRegs ( AOP (left), AOP (result)));
+
   /* now move the left to the result if they are not the
      same */
-  if (!sameRegs (AOP (left), AOP (result)))
+  if (!sameRegs (AOP (left), aopResult))
     {
-      size = AOP_SIZE (result); 
+      size = AOP_SIZE (result);
       offset = 0;
       while (size--)
-        {
-          transferAopAop (AOP (left), offset, AOP (result), offset);
-          offset++;
-        }
+	{
+	  transferAopAop (AOP (left), offset, aopResult, offset);
+	  offset++;
+	}
     }
   freeAsmop (left, NULL, ic, TRUE);
+  AOP (result) = aopResult;
   
   tlbl = newiTempLabel (NULL);
   size = AOP_SIZE (result);
@@ -8636,15 +8675,15 @@ genhc08Code (iCode * lic)
 	}
 
       if (!hc08_reg_a->isFree)
-        D(emitcode("","; forgot to free a"));
+        DD(emitcode("","; forgot to free a"));
       if (!hc08_reg_x->isFree)
-        D(emitcode("","; forgot to free x"));
+        DD(emitcode("","; forgot to free x"));
       if (!hc08_reg_h->isFree)
-        D(emitcode("","; forgot to free h"));
+        DD(emitcode("","; forgot to free h"));
       if (!hc08_reg_hx->isFree)
-        D(emitcode("","; forgot to free hx"));
+        DD(emitcode("","; forgot to free hx"));
       if (!hc08_reg_xa->isFree)
-        D(emitcode("","; forgot to free xa"));
+        DD(emitcode("","; forgot to free xa"));
     }
 
   debugFile->writeFrameAddress (NULL, NULL, 0);  /* have no idea where frame is now */

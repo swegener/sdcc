@@ -1,3 +1,16 @@
+2006-11-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (transferRegReg, loadRegFromAop, forceStackedAop,
+	  storeRegToAop, freeAsmop, genPlusIncr, genPlus, genPointerGetSetOfs,
+	  genAnd, genOr, genXor, genLeftShiftLiteral, genRightShiftLiteral,
+	  genhc08Code): switched most of the D (debug) macros to DD (detailed
+	  debug) macros to better control clutter in the generated .asm file.
+	* src/hc08/gen.c: (forceStackedAop, genUminus, genLeftShift,
+	  genRightShift): fixed bug with non-constant bit shift stored to
+	  a volatile result (SF Open Discussion forum thread #1616749).
+	  Single byte case is not yet optimized.
+
+
 2006-11-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/asm/mcs51/features.h,

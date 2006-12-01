@@ -1,3 +1,8 @@
+2006-12-01 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (register_reassign): do not crash on recursive code
+	  but emit warning (recursion is not supported for pic14)
+
 2006-11-30 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/peeph.def: added 101.a,b (moves to int/long xdata)

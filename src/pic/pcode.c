@@ -5272,6 +5272,17 @@ static unsigned register_reassign(pBlock *pb, unsigned idx)
 	pc = setFirstItem(pb->function_entries);
 	if(!pc)
 		return idx;
+
+	if (pb->visited) {
+	    static int output = 0;
+	    if (output < 3) {
+		pc = findNextpCode(pb->pcHead, PC_FUNCTION);
+		fprintf(stderr, "WARNING: Recursive code (%s) probably won't work, check the .asm file.\n",
+			pc ? PCF(pc)->fname : "unknown function");
+		output++;
+	    }
+	    return idx;
+	}
 	
 	pb->visited = 1;
 	

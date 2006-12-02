@@ -25,7 +25,7 @@
 #define _SER_H_
 
 void ser_init(void);
-void ser_interrupt_handler(void) interrupt 4 using 1;
+void ser_interrupt_handler(void) __interrupt 4 __using 1;
 void ser_putc(unsigned char);
 unsigned char ser_getc(void);
 void ser_printString(char *String);

@@ -32,12 +32,12 @@
 #endif
 
 /* define AT89S53 specific registers only */
-sfr at 0x84 DP1L;	/* Data Pointer 1 Low Byte */
-sfr at 0x85 DP1H ;	/* Data Pointer 1 High Byte */
-sfr at 0x86 SPDR;	/* SPI Data Register */
-sfr at 0xAA SPSR;	/* SPI Status Register */
-sfr at 0x96 WMCON;	/* Watchdog and Memory Control Register */
-sfr at 0xD5 SPCR;	/* SPI Control Register */
+__sfr __at (0x84) DP1L;     /* Data Pointer 1 Low Byte */
+__sfr __at (0x85) DP1H;     /* Data Pointer 1 High Byte */
+__sfr __at (0x86) SPDR;     /* SPI Data Register */
+__sfr __at (0xAA) SPSR;     /* SPI Status Register */
+__sfr __at (0x96) WMCON;    /* Watchdog and Memory Control Register */
+__sfr __at (0xD5) SPCR;     /* SPI Control Register */
 
 /*------------------------------------------------
 SPSR (0xAA) Bit Values - Reset Value = 0000.0000

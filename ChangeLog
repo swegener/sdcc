@@ -1,3 +1,13 @@
+2006-12-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/asm/default/features.h,
+	* device/include/asm/ds390/features.h,
+	* device/include/mcs51/at89s53.h,
+	* device/include/ser.h,
+	* device/include/ser_ir.h,
+	* device/include/serial.h: changed keywords to double underscore variants,
+	  fixes bug 1590261 some more, thanks Steven Borley
+
 2006-12-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (register_reassign): do not crash on recursive code

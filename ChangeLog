@@ -1,3 +1,7 @@
+2006-12-02 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/cc2430.h: added
+
 2006-12-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/asm/default/features.h,

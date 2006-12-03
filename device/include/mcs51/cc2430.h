@@ -30,24 +30,24 @@
 
 // Interrupt Vectors
 
-#define RFERR_VECTOR    0   // RF TX FIFO underflow and RX FIFO overflow. 
-#define ADC_VECTOR      1   // ADC end of conversion 
-#define URX0_VECTOR     2   // USART0 RX complete 
-#define URX1_VECTOR     3   // USART1 RX complete 
-#define ENC_VECTOR      4   // AES encryption/decryption complete 
-#define ST_VECTOR       5   // Sleep Timer compare 
-#define P2INT_VECTOR    6   // Port 2 inputs 
-#define UTX0_VECTOR     7   // USART0 TX complete 
-#define DMA_VECTOR      8   // DMA transfer complete 
-#define T1_VECTOR       9   // Timer 1 (16-bit) capture/compare/overflow 
-#define T2_VECTOR       10  // Timer 2 (MAC Timer) 
-#define T3_VECTOR       11  // Timer 3 (8-bit) capture/compare/overflow 
-#define T4_VECTOR       12  // Timer 4 (8-bit) capture/compare/overflow 
-#define P0INT_VECTOR    13  // Port 0 inputs 
-#define UTX1_VECTOR     14  // USART1 TX complete 
-#define P1INT_VECTOR    15  // Port 1 inputs 
-#define RF_VECTOR       16  // RF general interrupts 
-#define WDT_VECTOR      17  // Watchdog overflow in timer mode 
+#define RFERR_VECTOR    0   // RF TX FIFO underflow and RX FIFO overflow.
+#define ADC_VECTOR      1   // ADC end of conversion
+#define URX0_VECTOR     2   // USART0 RX complete
+#define URX1_VECTOR     3   // USART1 RX complete
+#define ENC_VECTOR      4   // AES encryption/decryption complete
+#define ST_VECTOR       5   // Sleep Timer compare
+#define P2INT_VECTOR    6   // Port 2 inputs
+#define UTX0_VECTOR     7   // USART0 TX complete
+#define DMA_VECTOR      8   // DMA transfer complete
+#define T1_VECTOR       9   // Timer 1 (16-bit) capture/compare/overflow
+#define T2_VECTOR       10  // Timer 2 (MAC Timer)
+#define T3_VECTOR       11  // Timer 3 (8-bit) capture/compare/overflow
+#define T4_VECTOR       12  // Timer 4 (8-bit) capture/compare/overflow
+#define P0INT_VECTOR    13  // Port 0 inputs
+#define UTX1_VECTOR     14  // USART1 TX complete
+#define P1INT_VECTOR    15  // Port 1 inputs
+#define RF_VECTOR       16  // RF general interrupts
+#define WDT_VECTOR      17  // Watchdog overflow in timer mode
 
 // SFR Registers and BITs
 
@@ -68,12 +68,12 @@ SFR(DPH1,     0x85) // Data Pointer 1 High Byte
 SFR(U0CSR,    0x86) // USART 0 Control and Status
 SFR(PCON,     0x87) // Power Mode Control
 SFR(TCON,     0x88) // Interrupt Flags
-   SBIT(IT0,      0x88, 0); // reserved (must always be set to 1) 
+   SBIT(IT0,      0x88, 0); // reserved (must always be set to 1)
    SBIT(RFERRIF,  0x88, 1); // RFERR – RF TX/RX FIFO interrupt flag
-   SBIT(IT1,      0x88, 2); // reserved (must always be set to 1) 
-   SBIT(URX0IF,   0x88, 3); // USART0 RX Interrupt Flag 
-   SBIT(ADCIF,    0x88, 5); // ADC Interrupt Flag 
-   SBIT(URX1IF,   0x88, 7); // USART1 RX Interrupt Flag 
+   SBIT(IT1,      0x88, 2); // reserved (must always be set to 1)
+   SBIT(URX0IF,   0x88, 3); // USART0 RX Interrupt Flag
+   SBIT(ADCIF,    0x88, 5); // ADC Interrupt Flag
+   SBIT(URX1IF,   0x88, 7); // USART1 RX Interrupt Flag
 SFR(P0IFG,    0x89) // Port 0 Interrupt Status Flag
 SFR(P1IFG,    0x8A) // Port 1 Interrupt Status Flag
 SFR(P2IFG,    0x8B) // Port 2 Interrupt Status Flag
@@ -92,13 +92,14 @@ SFR(P1,       0x90) // Port 1
 SFR(RFIM,     0x91) // RF Interrupt Mask
 SFR(DPS,      0x92) // Data Pointer Select
 SFR(MPAGE,    0x93) // Memory Page Select
+SFR(_XPAGE,   0x93) // Memory Page Select under the name SDCC needs it
 SFR(T2CMP,    0x94) // Timer 2 Compare Value
 SFR(ST0,      0x95) // Sleep Timer 0
 SFR(ST1,      0x96) // Sleep Timer 1
 SFR(ST2,      0x97) // Sleep Timer 2
 SFR(S0CON,    0x98) // Interrupt Flags 2
-   SBIT(ENCIF_0,  0x98, 0); // AES Interrupt Flag 0 
-   SBIT(ENCIF_1,  0x98, 1); // AES Interrupt Flag 1 
+   SBIT(ENCIF_0,  0x98, 0); // AES Interrupt Flag 0
+   SBIT(ENCIF_1,  0x98, 1); // AES Interrupt Flag 1
 SFR(IEN2,     0x9A) // Interrupt Enable 2
 SFR(S1CON,    0x9B) // Interrupt Flags 3
 SFR(T2PEROF0, 0x9C) // Timer 2 Overflow Capture/Compare 0
@@ -121,13 +122,13 @@ SFR(T2CAPHPH, 0xA5) // Timer 2 Period High Byte
 SFR(T2TLD,    0xA6) // Timer 2 Timer Value Low Byte
 SFR(T2THD,    0xA7) // Timer 2 Timer Value High Byte
 SFR(IEN0,     0xA8) // Interrupt Enable 0
-   SBIT(RFERRIE,  0xA8, 0); // RF TX/RX FIFO interrupt enable 
-   SBIT(ADCIE,    0xA8, 1); // ADC Interrupt Enable 
-   SBIT(URX0IE,   0xA8, 2); // USART0 RX Interrupt Enable 
+   SBIT(RFERRIE,  0xA8, 0); // RF TX/RX FIFO interrupt enable
+   SBIT(ADCIE,    0xA8, 1); // ADC Interrupt Enable
+   SBIT(URX0IE,   0xA8, 2); // USART0 RX Interrupt Enable
    SBIT(URX1IE,   0xA8, 3); // USART1 RX Interrupt Enable
-   SBIT(ENCIE,    0xA8, 4); // AES Encryption/Decryption Interrupt Enable 
-   SBIT(STIE,     0xA8, 5); // Sleep Timer Interrupt Enable 
-   SBIT(EA,       0xA8, 7); // Global Interrupt Enable 
+   SBIT(ENCIE,    0xA8, 4); // AES Encryption/Decryption Interrupt Enable
+   SBIT(STIE,     0xA8, 5); // Sleep Timer Interrupt Enable
+   SBIT(EA,       0xA8, 7); // Global Interrupt Enable
 SFR(IP0,      0xA9) // Interrupt Priority 0
 SFR(FWT,      0xAB) // Flash Write Timing
 SFR(FADDRL,   0xAC) // Flash Address Low Byte
@@ -141,12 +142,12 @@ SFR(ADCCON1,  0xB4) // ADC Control 1
 SFR(ADCCON2,  0xB5) // ADC Control 2
 SFR(ADCCON3,  0xB6) // ADC Control 3
 SFR(IEN1,     0xB8) // Interrupt Enable 1
-   SBIT(DMAIE,    0xB8, 0); // DMA Transfer Interrupt Enable 
-   SBIT(T1IE,     0xB8, 1); // Timer 1 Interrupt Enable 
-   SBIT(T2IE,     0xB8, 2); // Timer 2 Interrupt Enable 
-   SBIT(T3IE,     0xB8, 3); // Timer 3 Interrupt Enable 
-   SBIT(T4IE,     0xB8, 4); // Timer 4 Interrupt Enable 
-   SBIT(P0IE,     0xB8, 5); // Port 0 Interrupt Enable 
+   SBIT(DMAIE,    0xB8, 0); // DMA Transfer Interrupt Enable
+   SBIT(T1IE,     0xB8, 1); // Timer 1 Interrupt Enable
+   SBIT(T2IE,     0xB8, 2); // Timer 2 Interrupt Enable
+   SBIT(T3IE,     0xB8, 3); // Timer 3 Interrupt Enable
+   SBIT(T4IE,     0xB8, 4); // Timer 4 Interrupt Enable
+   SBIT(P0IE,     0xB8, 5); // Port 0 Interrupt Enable
 SFR(IP1,      0xB9) // Interrupt Priority 1
 SFR(ADCL,     0xBA) // ADC Data Low
 SFR(ADCH,     0xBB) // ADC Data High
@@ -154,13 +155,13 @@ SFR(RNDL,     0xBC) // Random Number Generator Data Low Byte
 SFR(RNDH,     0xBD) // Random Number Generator Data High Byte
 SFR(SLEEP,    0xBE) // Sleep Mode Control
 SFR(IRCON,    0xC0) // Interrupt Flags 4
-   SBIT(DMAIF,    0xC0, 0); // DMA Complete Interrupt Flag 
-   SBIT(T1IF,     0xC0, 1); // Timer 1 Interrupt Flag 
-   SBIT(T2IF,     0xC0, 2); // Timer 2 Interrupt Flag 
-   SBIT(T3IF,     0xC0, 3); // Timer 3 Interrupt Flag 
-   SBIT(T4IF,     0xC0, 4); // Timer 4 Interrupt Flag 
-   SBIT(P0IF,     0xC0, 5); // Port 0 Interrupt Flag 
-   SBIT(STIF,     0xC0, 7); // Sleep Timer Interrupt Flag 
+   SBIT(DMAIF,    0xC0, 0); // DMA Complete Interrupt Flag
+   SBIT(T1IF,     0xC0, 1); // Timer 1 Interrupt Flag
+   SBIT(T2IF,     0xC0, 2); // Timer 2 Interrupt Flag
+   SBIT(T3IF,     0xC0, 3); // Timer 3 Interrupt Flag
+   SBIT(T4IF,     0xC0, 4); // Timer 4 Interrupt Flag
+   SBIT(P0IF,     0xC0, 5); // Port 0 Interrupt Flag
+   SBIT(STIF,     0xC0, 7); // Sleep Timer Interrupt Flag
 SFR(U0DBUF,   0xC1) // USART 0 Receive/Transmit Data Buffer
 SFR(U0BAUD,   0xC2) // USART 0 Baud Rate Control
 SFR(T2CNF,    0xC3) // Timer 2 Configuration
@@ -176,14 +177,14 @@ SFR(T3CC0,    0xCD) // Timer 3 Channel 0 Capture/Compare Value
 SFR(T3CCTL1,  0xCE) // Timer 3 Channel 1 Capture/Compare Control
 SFR(T3CC1,    0xCF) // Timer 3 Channel 1 Capture/Compare Value
 SFR(PSW,      0xD0) // Program Status Word
-   SBIT(P,        0xD0, 0); // Parity Flag 
+   SBIT(P,        0xD0, 0); // Parity Flag
    SBIT(F1,       0xD0, 1); // User-Defined Flag
-   SBIT(OV,       0xD0, 2); // Overflow Flag 
-   SBIT(RS0,      0xD0, 3); // Register Bank Select 0 
-   SBIT(RS1,      0xD0, 4); // Register Bank Select 1 
+   SBIT(OV,       0xD0, 2); // Overflow Flag
+   SBIT(RS0,      0xD0, 3); // Register Bank Select 0
+   SBIT(RS1,      0xD0, 4); // Register Bank Select 1
    SBIT(F0,       0xD0, 5); // User-Defined Flag
-   SBIT(AC,       0xD0, 6); // Auxiliary Carry Flag 
-   SBIT(CY,       0xD0, 7); // Carry Flag 
+   SBIT(AC,       0xD0, 6); // Auxiliary Carry Flag
+   SBIT(CY,       0xD0, 7); // Carry Flag
 SFR(DMAIRQ,   0xD1) // DMA Interrupt Flag
 SFR(DMA1CFGL, 0xD2) // DMA Channel 1-4 Configuration Address Low Byte
 SFR(DMA1CFGH, 0xD3) // DMA Channel 1-4 Configuration Address High Byte
@@ -223,11 +224,11 @@ SFR(T1CCTL0,  0xE5) // Timer 1 Channel 0 Capture/Compare Control
 SFR(T1CCTL1,  0xE6) // Timer 1 Channel 1 Capture/Compare Control
 SFR(T1CCTL2,  0xE7) // Timer 1 Channel 2 Capture/Compare Control
 SFR(IRCON2,   0xE8) // Interrupt Flags 5
-   SBIT(P2IF,     0xE8, 0); // Port 2 Interrupt Flag 
-   SBIT(UTX0IF,   0xE8, 1); // USART0 TX Interrupt Flag 
-   SBIT(UTX1IF,   0xE8, 2); // USART1 TX Interrupt Flag 
-   SBIT(P1IF,     0xE8, 3); // Port 1 Interrupt Flag 
-   SBIT(WDTIF,    0xE8, 4); // Watchdog Timer Interrupt Flag 
+   SBIT(P2IF,     0xE8, 0); // Port 2 Interrupt Flag
+   SBIT(UTX0IF,   0xE8, 1); // USART0 TX Interrupt Flag
+   SBIT(UTX1IF,   0xE8, 2); // USART1 TX Interrupt Flag
+   SBIT(P1IF,     0xE8, 3); // Port 1 Interrupt Flag
+   SBIT(WDTIF,    0xE8, 4); // Watchdog Timer Interrupt Flag
 SFR(RFIF,     0xE9) // RF Interrupt Flags
 SFR(T4CNT,    0xEA) // Timer 4 Counter
 SFR(T4CTL,    0xEB) // Timer 4 Control

@@ -498,7 +498,11 @@ get_conversion_spec:
         goto get_conversion_spec;
 
       case 'C':
-        OUTPUT_CHAR( va_arg(ap,int), p );
+	if( char_argument )
+          c = va_arg(ap,char);
+        else
+          c = va_arg(ap,int);
+        OUTPUT_CHAR( c, p );
         break;
 
       case 'S':

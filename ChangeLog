@@ -1,3 +1,8 @@
+2006-12-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/tests/snprintf.c: some checks
+	* lib/src/printf_large.c: %bc: read char instead of int from stack
+
 2006-12-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/cc2430.h: inserted _XPAGE

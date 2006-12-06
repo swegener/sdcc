@@ -1,3 +1,9 @@
+2006-12-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (linkEdit): fixed bug 1609279
+	* .version: bumped to 2.6.2 because a) it's been a while
+	  b) the linker sources have moved c) the preprocessor is upgraded
+
 2006-12-04 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* support/regression/tests/snprintf.c: some checks

@@ -1532,14 +1532,14 @@ linkEdit (char **envp)
 
           /* data segment start. If zero, the linker chooses
              the best place for data */
-          if(options.data_loc)
+          if (options.data_loc)
             {
               WRITE_SEG_LOC (DATA_NAME, options.data_loc);
             }
 
           /* xdata segment start. If zero, the linker chooses
              the best place for xdata */
-          if(options.xdata_loc)
+          if (options.xdata_loc)
             {
               WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
             }
@@ -1832,6 +1832,13 @@ linkEdit (char **envp)
   /*  if (options.verbose)fprintf(stderr, "linker command line: %s\n", buffer); */
 
   system_ret = my_system (buffer);
+
+#ifdef _WIN32
+  #define STRCMP stricmp
+#else
+  #define STRCMP strcmp
+#endif
+
   /* TODO: most linker don't have a -o parameter */
   /* -o option overrides default name? */
   if (fullDstFileName)
@@ -1860,7 +1867,7 @@ linkEdit (char **envp)
       strncatz (scratchFileName,
         options.out_fmt ? ".S19" : ".ihx",
         sizeof(scratchFileName));
-      if (strcmp (fullDstFileName, scratchFileName))
+      if (STRCMP (fullDstFileName, scratchFileName))
         remove (fullDstFileName);
       rename (scratchFileName, fullDstFileName);
 
@@ -1876,14 +1883,14 @@ linkEdit (char **envp)
       strncatz (scratchFileName, ".map", sizeof(scratchFileName));
       *q = 0;
       strncatz(buffer, ".map", sizeof(buffer));
-      if (strcmp (scratchFileName, buffer))
+      if (STRCMP (scratchFileName, buffer))
         remove (buffer);
       rename (scratchFileName, buffer);
       *p = 0;
       strncatz (scratchFileName, ".mem", sizeof(scratchFileName));
       *q = 0;
       strncatz(buffer, ".mem", sizeof(buffer));
-      if (strcmp (scratchFileName, buffer))
+      if (STRCMP (scratchFileName, buffer))
         remove (buffer);
       rename (scratchFileName, buffer);
       if (options.debug)
@@ -1892,13 +1899,13 @@ linkEdit (char **envp)
           strncatz (scratchFileName, ".cdb", sizeof(scratchFileName));
           *q = 0;
           strncatz(buffer, ".cdb", sizeof(buffer));
-          if (strcmp (scratchFileName, buffer))
+          if (STRCMP (scratchFileName, buffer))
             remove (buffer);
           rename (scratchFileName, buffer);
           /* and the OMF file without extension: */
           *p = 0;
           *q = 0;
-          if (strcmp (scratchFileName, buffer))
+          if (STRCMP (scratchFileName, buffer))
             remove (buffer);
           rename (scratchFileName, buffer);
         }

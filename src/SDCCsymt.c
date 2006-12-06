@@ -438,12 +438,16 @@ pointerTypes (sym_link * ptr, sym_link * type)
 void 
 addDecl (symbol * sym, int type, sym_link * p)
 {
+  static sym_link *empty = NULL;
   sym_link *head;
   sym_link *tail;
   sym_link *t;
 
   if (getenv("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "SDCCsymt.c:addDecl(%s,%d,%p)\n", sym->name, type, p);
+
+  if (empty == NULL)
+    empty = newLink(SPECIFIER);
 
   /* if we are passed a link then set head & tail */
   if (p)
@@ -464,28 +468,28 @@ addDecl (symbol * sym, int type, sym_link * p)
       sym->type = head;
       sym->etype = tail;
     }
+  else if (IS_SPEC (sym->etype) && IS_SPEC (head) && head == tail)
+    {
+      sym->etype = mergeSpec (sym->etype, head, sym->name);
+    }
+  else if (IS_SPEC (sym->etype) && !IS_SPEC (head) && head == tail)
+    {
+      t = sym->type;
+      while (t->next != sym->etype)
+        t = t->next;
+      t->next = head;
+      tail->next = sym->etype;
+    }
+  else if (IS_FUNC (sym->type) && IS_SPEC (sym->type->next) &&
+           !memcmp(sym->type->next, empty, sizeof(sym_link)))
+    {
+      sym->type->next = head;
+      sym->etype = tail;
+    }
   else
     {
-      if (IS_SPEC (sym->etype) && IS_SPEC (head) && head == tail)
-        {
-          sym->etype = mergeSpec (sym->etype, head, sym->name);
-        }
-      else
-        {
-          if (IS_SPEC (sym->etype) && !IS_SPEC (head) && head == tail)
-            {
-              t = sym->type;
-              while (t->next != sym->etype)
-                t = t->next;
-              t->next = head;
-              tail->next = sym->etype;
-            }
-          else
-            {
-              sym->etype->next = head;
-              sym->etype = tail;
-            }
-        }
+      sym->etype->next = head;
+      sym->etype = tail;
     }
 
   /* if the type is an unknown pointer and has

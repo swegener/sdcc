@@ -128,7 +128,6 @@ static void do_pragma_dependency	PARAMS ((cpp_reader *));
 static void do_linemarker		PARAMS ((cpp_reader *));
 static const cpp_token *get_token_no_padding PARAMS ((cpp_reader *));
 static const cpp_token *get__Pragma_string PARAMS ((cpp_reader *));
-static unsigned char *destringize	PARAMS ((const cpp_string *, unsigned int *));
 static void destringize_and_run PARAMS ((cpp_reader *, const cpp_string *));
 static int parse_answer PARAMS ((cpp_reader *, struct answer **, int));
 static cpp_hashnode *parse_assertion PARAMS ((cpp_reader *, struct answer **,
@@ -1189,6 +1188,8 @@ do_pragma_poison (pfile)
   pfile->state.poisoned_ok = 0;
 }
 
+/* SDCC specific
+   sdcc_hash pragma */
 static void
 do_pragma_sdcc_hash (pfile)
      cpp_reader *pfile;
@@ -1320,29 +1321,6 @@ get__Pragma_string (pfile)
   return string;
 }
 
-/* Returns a malloced buffer containing a destringized cpp_string by
-   removing the first \ of \" and \\ sequences.  */
-static unsigned char *
-destringize (in, len)
-     const cpp_string *in;
-     unsigned int *len;
-{
-  const unsigned char *src, *limit;
-  unsigned char *dest, *result;
-
-  dest = result = (unsigned char *) xmalloc (in->len);
-  for (src = in->text, limit = src + in->len; src < limit;)
-    {
-      /* We know there is a character following the backslash.  */
-      if (*src == '\\' && (src[1] == '\\' || src[1] == '"'))
-	src++;
-      *dest++ = *src++;
-    }
-
-  *len = dest - result;
-  return result;
-}
-
 /* Destringize IN into a temporary buffer, by removing the first \ of
    \" and \\ sequences, and process the result as a #pragma directive.  */
 static void
@@ -1412,16 +1390,7 @@ _cpp_do__Pragma (pfile)
   const cpp_token *string = get__Pragma_string (pfile);
 
   if (string)
-    {
-      unsigned int len;
-
-      unsigned char *buffer = destringize (&string->val.str, &len);
-      buffer[len] = 0;
-      fputs ("\n#pragma ", pfile->print.outf);
-      fputs (buffer, pfile->print.outf);
-      putc ('\n', pfile->print.outf);
-      free ((PTR) buffer);
-    }
+    destringize_and_run (pfile, &string->val.str);
   else
     cpp_error (pfile, DL_ERROR,
 	       "_Pragma takes a parenthesized string literal");

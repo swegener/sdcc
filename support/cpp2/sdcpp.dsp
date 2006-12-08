@@ -187,6 +187,22 @@ SOURCE=".\libiberty\splay-tree.c"
 
 SOURCE=.\version.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\xexit.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\xmalloc.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\xstrdup.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\xstrerror.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

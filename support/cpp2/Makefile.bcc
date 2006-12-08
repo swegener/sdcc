@@ -12,7 +12,8 @@ OBJECTS         = sdcppmain.obj sdcppinit.obj \
                   hashtable.obj mkdeps.obj prefix.obj version.obj mbchar.obj \
                   line-map.obj cpptrad.obj \
                   safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj \
-                  hex.obj concat.obj
+                  hex.obj concat.obj \
+                  xmalloc.obj xstrdup.obj xexit.obj xstrerror.obj
 
 TARGET          = $(PRJDIR)/bin/sdcpp.exe
 
@@ -30,3 +31,7 @@ splay-tree.obj: libiberty\splay-tree.c
 lbasename.obj: libiberty\lbasename.c
 hex.obj: libiberty\hex.c
 concat.obj: libiberty\concat.c
+xmalloc.obj: libiberty\xmalloc.c
+xstrdup.obj: libiberty\xstrdup.c
+xexit.obj: libiberty\xexit.c
+xstrerror.obj: libiberty\xstrerror.c

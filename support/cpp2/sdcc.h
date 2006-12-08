@@ -1,12 +1,3 @@
-/* Various stuff needed to hack the build for SDCC. */
-#define xmalloc   malloc
-#define xstrdup   strdup
-#define xrealloc  realloc
-#define xcalloc   calloc
-
-#define xstrerror strerror
-#define xmalloc_set_program_name(n) /* nada */
-
 /*
  * From defaults.h
  */

@@ -35,6 +35,9 @@
 /* True if we have seen a "fatal" error.  */
 #define CPP_FATAL_ERRORS(PFILE) (cpp_errors (PFILE) >= CPP_FATAL_LIMIT)
 
+extern void sdcpp_finish (cpp_reader *pfile);
+
+
 const char *progname;		/* Needs to be global.  */
 
 
@@ -201,6 +204,55 @@ do_preprocessing (cpp_reader *pfile, int argc, char **argv)
   cpp_preprocess_file (pfile, pfile->opts.in_fname, outf);
 }
 
+/* Print a fatal I/O error message.  Argument are like printf.
+   Also include a system error message based on `errno'.  */
+void
+fatal_io_error VPARAMS ((const char *msgid, ...))
+{
+  va_list ap;
+
+  va_start (ap, msgid);
+  fprintf (stderr, "%s: %s: ", progname, xstrerror (errno));
+  vfprintf(stderr, msgid, ap);
+  va_end (ap);
+  exit (FATAL_EXIT_CODE);
+}
+
+/* Common finish hook for the C, ObjC and C++ front ends.  */
+void
+common_finish (cpp_reader *pfile)
+{
+  FILE *deps_stream = NULL;
+
+  if (CPP_OPTION (pfile, deps.style) != DEPS_NONE)
+    {
+      const char *const deps_mode =
+        CPP_OPTION (pfile, deps.append) ? "a" : "w";
+
+      /* If -M or -MM was seen without -MF, default output to the
+         output stream.  */
+      if (CPP_OPTION (pfile, deps.file)[0] == '\0')
+        deps_stream = stdout;
+      else
+        {
+          deps_stream = fopen (CPP_OPTION (pfile, deps.file), deps_mode);
+          if (deps_stream == 0)
+	    {
+	      cpp_errno (pfile, DL_ERROR, CPP_OPTION (pfile, deps.file));
+	      return;
+	    }
+        }
+    }
+
+  /* For performance, avoid tearing down cpplib's internal structures
+     with cpp_destroy ().  */
+  cpp_finish (pfile, deps_stream);
+
+  if (deps_stream && deps_stream != stdout
+      && (ferror (deps_stream) || fclose (deps_stream)))
+    fatal_io_error ("closing dependency file %s", CPP_OPTION (pfile, deps.file));
+}
+
 int
 main (int argc, char **argv)
 {
@@ -212,6 +264,8 @@ main (int argc, char **argv)
   pfile = cpp_create_reader (CLK_GNUC89);
 
   do_preprocessing (pfile, argc, argv);
+
+  common_finish(pfile);
 
   cpp_destroy (pfile);
 

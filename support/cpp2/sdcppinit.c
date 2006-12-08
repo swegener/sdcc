@@ -1,6 +1,6 @@
 /* CPP Library.
    Copyright (C) 1986, 1987, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+   1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
    Contributed by Per Bothner, 1994-95.
    Based on CCCP program by Paul Rubin, June 1986
    Adapted to ANSI C, Richard Stallman, Jan 1987
@@ -532,6 +532,7 @@ cpp_create_reader (lang)
   CPP_OPTION (pfile, operator_names) = 1;
   CPP_OPTION (pfile, warn_endif_labels) = 1;
   CPP_OPTION (pfile, warn_long_long) = !CPP_OPTION (pfile, c99);
+  CPP_OPTION (pfile, sysroot) = cpp_SYSROOT;
   /* SDCC _asm specific */
   CPP_OPTION (pfile, preproc_asm) = 1;
 
@@ -811,13 +812,21 @@ init_standard_includes (pfile)
 	      || (CPP_OPTION (pfile, cplusplus)
 		  && !CPP_OPTION (pfile, no_standard_cplusplus_includes)))
 	    {
-	      /* Does this dir start with the prefix?  */
+	      /* Should we be translating sysrooted dirs too?  Assume
+		 that iprefix and sysroot are mutually exclusive, for
+		 now.  */
+	      if (p->add_sysroot && CPP_OPTION (pfile, sysroot)
+		  && *(CPP_OPTION (pfile, sysroot)))
+		continue;
+
+              /* Does this dir start with the prefix?  */
 	      if (!strncmp (p->fname, default_prefix, default_len))
 		{
 		  /* Yes; change prefix and add to search list.  */
 		  int flen = strlen (p->fname);
 		  int this_len = specd_len + flen - default_len;
-		  char *str = (char *) xmalloc (this_len + 1);
+
+                  char *str = (char *) xmalloc (this_len + 1);
 		  memcpy (str, specd_prefix, specd_len);
 		  memcpy (str + specd_len,
 			  p->fname + default_len,
@@ -829,7 +838,6 @@ init_standard_includes (pfile)
 	}
     }
 
-  /* Search ordinary names for GNU include directories.  */
   for (p = cpp_include_defaults; p->fname; p++)
     {
       /* Some standard dirs are only for C++.  */
@@ -837,7 +845,16 @@ init_standard_includes (pfile)
 	  || (CPP_OPTION (pfile, cplusplus)
 	      && !CPP_OPTION (pfile, no_standard_cplusplus_includes)))
 	{
-	  char *str = update_path (p->fname, p->component);
+	  char *str;
+
+	  /* Should this dir start with the sysroot?  */
+	  if (p->add_sysroot && CPP_OPTION (pfile, sysroot)
+	      && *(CPP_OPTION (pfile, sysroot)))
+	    str = concat (CPP_OPTION (pfile, sysroot), p->fname, NULL);
+
+	  else
+	    str = update_path (p->fname, p->component);
+
 	  append_include_chain (pfile, str, SYSTEM, p->cxx_aware);
 	}
     }
@@ -1081,68 +1098,6 @@ cpp_finish_options (pfile)
   free_chain (CPP_OPTION (pfile, pending)->directive_head);
 }
 
-/* Use mkdeps.c to output dependency information.  */
-static void
-output_deps (cpp_reader *pfile)
-{
-  /* Stream on which to print the dependency information.  */
-  FILE *deps_stream = 0;
-  const char *const deps_mode =
-    CPP_OPTION (pfile, deps.append) ? "a" : "w";
-
-  if (CPP_OPTION (pfile, deps.file)[0] == '\0')
-    deps_stream = stdout;
-  else
-    {
-      deps_stream = fopen (CPP_OPTION (pfile, deps.file), deps_mode);
-      if (deps_stream == 0)
-	{
-	  cpp_errno (pfile, DL_ERROR, CPP_OPTION (pfile, deps.file));
-	  return;
-	}
-    }
-
-  deps_write (pfile->deps, deps_stream, 72);
-
-  if (CPP_OPTION (pfile, deps.phony_targets))
-    deps_phony_targets (pfile->deps, deps_stream);
-
-  /* Don't close stdout.  */
-  if (deps_stream != stdout)
-    {
-      if (ferror (deps_stream) || fclose (deps_stream) != 0)
-	cpp_error (pfile, DL_ERROR, "I/O error on output");
-    }
-}
-
-/* This is called at the end of preprocessing.  It pops the
-   last buffer and writes dependency output.  It should also
-   clear macro definitions, such that you could call cpp_start_read
-   with a new filename to restart processing.  */
-void
-sdcpp_finish (cpp_reader *pfile)
-{
-  /* Warn about unused macros before popping the final buffer.  */
-  if (CPP_OPTION (pfile, warn_unused_macros))
-    cpp_forall_identifiers (pfile, _cpp_warn_if_unused_macro, NULL);
-
-  /* cpplex.c leaves the final buffer on the stack.  This it so that
-     it returns an unending stream of CPP_EOFs to the client.  If we
-     popped the buffer, we'd dereference a NULL buffer pointer and
-     segfault.  It's nice to allow the client to do worry-free excess
-     cpp_get_token calls.  */
-  while (pfile->buffer)
-    _cpp_pop_buffer (pfile);
-
-  /* Don't write the deps file if preprocessing has failed.  */
-  if (CPP_OPTION (pfile, deps.style) && pfile->errors == 0)
-    output_deps (pfile);
-
-  /* Report on headers that could use multiple include guards.  */
-  if (CPP_OPTION (pfile, print_include_names))
-    _cpp_report_missing_guards (pfile);
-}
-
 /* Push the next buffer on the stack given by -include, if any.  */
 void
 _cpp_maybe_push_include_file (pfile)
@@ -1267,6 +1222,7 @@ new_pending_directive (pend, text, handler)
   DEF_OPT("fno-show-column",          0,      OPT_fno_show_column)            \
   DEF_OPT("fpreprocessed",            0,      OPT_fpreprocessed)              \
   DEF_OPT("fshow-column",             0,      OPT_fshow_column)               \
+  DEF_OPT("fsigned-char",             0,      OPT_fsigned_char)               \
   DEF_OPT("ftabstop=",                no_num, OPT_ftabstop)                   \
   DEF_OPT("funsigned-char",           0,      OPT_funsigned_char)             \
   DEF_OPT("h",                        0,      OPT_h)                          \
@@ -1274,6 +1230,7 @@ new_pending_directive (pend, text, handler)
   DEF_OPT("imacros",                  no_fil, OPT_imacros)                    \
   DEF_OPT("include",                  no_fil, OPT_include)                    \
   DEF_OPT("iprefix",                  no_pth, OPT_iprefix)                    \
+  DEF_OPT("isysroot",                 no_dir, OPT_isysroot)                   \
   DEF_OPT("isystem",                  no_dir, OPT_isystem)                    \
   DEF_OPT("iwithprefix",              no_dir, OPT_iwithprefix)                \
   DEF_OPT("iwithprefixbefore",        no_dir, OPT_iwithprefixbefore)          \
@@ -1476,6 +1433,12 @@ cpp_handle_option (pfile, argc, argv)
 		CPP_OPTION (pfile, tabstop) = tabstop;
 	    }
 	  break;
+        case OPT_fsigned_char:
+          CPP_OPTION (pfile, unsigned_char) = 0;
+	  break;
+        case OPT_funsigned_char:
+          CPP_OPTION (pfile, unsigned_char) = 1;
+	  break;
 	case OPT_w:
 	  CPP_OPTION (pfile, inhibit_warnings) = 1;
 	  break;
@@ -1539,7 +1502,10 @@ cpp_handle_option (pfile, argc, argv)
 	  CPP_OPTION (pfile, include_prefix) = arg;
 	  CPP_OPTION (pfile, include_prefix_len) = strlen (arg);
 	  break;
-	case OPT_lang_c:
+	case OPT_isysroot:
+	  CPP_OPTION (pfile, sysroot) = arg;
+	  break;
+        case OPT_lang_c:
 	  cpp_set_lang (pfile, CLK_GNUC89);
 	  break;
 	case OPT_lang_cplusplus:
@@ -1867,6 +1833,7 @@ Switches:\n\
   -iwithprefix <dir>        Add <dir> to the end of the system include path\n\
   -iwithprefixbefore <dir>  Add <dir> to the end of the main include path\n\
   -isystem <dir>            Add <dir> to the start of the system include path\n\
+  -isysroot <dir>           Set <dir> to be the system root directory\n\
 "), stdout);
   fputs (_("\
   -idirafter <dir>          Add <dir> to the end of the system include path\n\
@@ -1951,6 +1918,8 @@ Switches:\n\
   fputs (_("\
   -fpreprocessed            Treat the input file as already preprocessed\n\
   -ftabstop=<number>        Distance between tab stops for column reporting\n\
+  -fsigned-char             Make \"char\" signed by default\n\
+  -funsigned-char           Make \"char\" unsigned by default\n\
   -P                        Do not generate #line directives\n\
   -$                        Do not allow '$' in identifiers\n\
   -remap                    Remap file names when including files\n\

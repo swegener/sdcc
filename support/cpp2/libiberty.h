@@ -260,7 +260,6 @@ extern int xatexit (void (*fn) (void));
 
 extern void xexit (int status) ATTRIBUTE_NORETURN;
 
-#if 0 /* SDCC specific */
 /* Set the program name used by xmalloc.  */
 
 extern void xmalloc_set_program_name (const char *);
@@ -296,7 +295,6 @@ extern char *xstrndup (const char *, size_t) ATTRIBUTE_MALLOC;
 /* Copy an existing memory buffer to a new memory buffer without fail.  */
 
 extern void *xmemdup (const void *, size_t, size_t) ATTRIBUTE_MALLOC;
-#endif
 
 /* Physical memory routines.  Return values are in BYTES.  */
 extern double physmem_total (void);

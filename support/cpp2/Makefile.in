@@ -221,7 +221,8 @@ libcpp.a: $(LIBCPP_OBJS)
 	-$(RANLIB) libcpp.a
 
 MY_LIBIBERTY_BITS = safe-ctype.o obstack.o splay-tree.o \
-		    lbasename.o hex.o concat.o
+		    lbasename.o hex.o concat.o \
+		    xmalloc.o xstrdup.o xstrerror.o xexit.o
 
 $(TARGET): sdcppmain.o sdcppinit.o $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS)
 	mkdir -p $(dir $@)
@@ -252,6 +253,14 @@ lbasename.o: $(LIBIBERTY_DIR)/lbasename.c  $(CONFIG_H) $(LIBCPP_DEPS)
 hex.o: $(LIBIBERTY_DIR)/hex.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 concat.o: $(LIBIBERTY_DIR)/concat.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+xmalloc.o: $(LIBIBERTY_DIR)/xmalloc.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+xstrdup.o: $(LIBIBERTY_DIR)/xstrdup.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+xexit.o: $(LIBIBERTY_DIR)/xexit.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+xstrerror.o: $(LIBIBERTY_DIR)/xstrerror.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 cppdefault.o: cppdefault.c $(CONFIG_H) $(SYSTEM_H) cppdefault.h Makefile
 	$(CC) $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) \

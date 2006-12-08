@@ -396,7 +396,6 @@ extern void abort PARAMS ((void));
 
 /* Get libiberty declarations.  */
 #include "libiberty.h"
-#include "sdcc.h"
 #include "symcat.h"
 
 /* Provide a default for the HOST_BIT_BUCKET.
@@ -548,5 +547,8 @@ typedef char _Bool;
  #pragma GCC poison bcopy bzero bcmp rindex
 
 #endif /* GCC >= 3.0 */
+
+/* SDCC specific */
+#include "sdcc.h"
 
 #endif /* ! GCC_SYSTEM_H */

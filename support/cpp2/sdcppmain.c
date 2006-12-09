@@ -35,8 +35,6 @@
 /* True if we have seen a "fatal" error.  */
 #define CPP_FATAL_ERRORS(PFILE) (cpp_errors (PFILE) >= CPP_FATAL_LIMIT)
 
-extern void sdcpp_finish (cpp_reader *pfile);
-
 
 const char *progname;		/* Needs to be global.  */
 
@@ -207,7 +205,7 @@ do_preprocessing (cpp_reader *pfile, int argc, char **argv)
 /* Print a fatal I/O error message.  Argument are like printf.
    Also include a system error message based on `errno'.  */
 void
-fatal_io_error VPARAMS ((const char *msgid, ...))
+fatal_io_error (const char *msgid, ...)
 {
   va_list ap;
 

@@ -1,3 +1,6 @@
+#ifndef __SDCC_H
+#define __SDCC_H
+
 /*
  * From defaults.h
  */
@@ -36,3 +39,5 @@
 #ifndef GTY
 #define GTY(X)
 #endif
+
+#endif  /* __SDCC_H */

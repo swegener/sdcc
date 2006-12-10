@@ -111,7 +111,7 @@ void printf_small(char *fmt, ...) __reentrant
             } else {
               if(flong)val = va_arg(ap, long);
               else
-              if(fchar)val = va_arg(ap, char);
+              if(fchar)val = (char)va_arg(ap, int); // FIXME: SDCC casts char arguments into ints
               else {
                   val = va_arg(ap, int);
               }

@@ -132,8 +132,10 @@ void printf_tiny(char *fmt, ...)
             } else {
               if(ISLONG)val = va_arg(ap, long);
               else
-              if(ISCHAR)val = va_arg(ap, char);
-              else {
+              if(ISCHAR) {
+		  val = (unsigned char)va_arg(ap, int); // FIXME: SDCC casts char arguments into ints
+		  if (!HAVESIGN) val = (char)val; // FIXME cont'd: sign-extend if required
+	      } else {
                   val = va_arg(ap, int);
               }
 

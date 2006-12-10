@@ -1,3 +1,11 @@
+2006-12-10 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libc/stdio/vfprintf.c,
+	* device/lib/pic16/libc/stdio/printf_small.c,
+	* device/lib/pic16/libc/stdio/printf_timy.c: pop int from stack for
+	  char arguments, as char varargs are cast to int by the caller,
+	  hopefully fixes #1604915 (other device libraries are still affected)
+
 2006-12-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 	* src/mcs51/ralloc.c (packRegsForAssign),
 	* src/hc08/ralloc.c (packRegsForAssign): fixed bug #1605880

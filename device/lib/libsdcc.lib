@@ -39,6 +39,7 @@ labs
 rand
 _atoi
 _atol
+_heap
 calloc
 malloc
 realloc

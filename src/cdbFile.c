@@ -46,6 +46,33 @@ FILE *cdbFilePtr = NULL;
 char *cdbModuleName = NULL;
 
 /******************************************************************
+ * spacesToUnderscores - replace all non alpha-numerics with
+ * underscores
+ *
+ *
+ *****************************************************************/
+
+static char *
+spacesToUnderscores (char *dest, const char *src, size_t len)
+{
+  unsigned int i;
+  char *p;
+
+  assert(dest != NULL);
+  assert(src != NULL);
+  assert(len > 0);
+
+  --len;
+  for (p = dest, i = 0; *src != '\0' && i < len; ++src, ++i) {
+    *p++ = (isspace((unsigned char)*src) || (*src == '-')) ? '_' : *src;
+  }
+  *p = '\0';
+
+  return dest;
+}
+
+
+/******************************************************************
  *
  *
  *
@@ -127,6 +154,7 @@ int cdbWriteEndFunction(symbol *pSym, iCode *ic, int offset)
       sprintf (debugSym, "C$%s$%d$%d$%d",
 	       FileBaseName (ic->filename), pSym->lastLine,
 	       ic->level, ic->block);
+      spacesToUnderscores (debugSym, debugSym, sizeof (debugSym));
       emitDebuggerSymbol (debugSym);
     }
 
@@ -263,6 +291,7 @@ int cdbWriteCLine(iCode *ic)
   sprintf (debugSym, "C$%s$%d$%d$%d", 
 	   FileBaseName (ic->filename), ic->lineno,
 	   ic->level, ic->block);
+  spacesToUnderscores (debugSym, debugSym, sizeof (debugSym));
   emitDebuggerSymbol (debugSym);
 
   return 1;

@@ -16056,88 +16056,35 @@ not
 
 \layout Standard
 
-Before using dynamic memory allocation
+As of SDCC 2.6.2 you no longer need to call an initialization routine before
+ using dynamic memory allocation
 \begin_inset LatexCommand \index{dynamic memory allocation (malloc)}
 
 \end_inset 
 
- with SDCC, you have to provide heap
+ and a default heap
 \begin_inset LatexCommand \index{heap (malloc)}
 
 \end_inset 
 
- space for malloc to allocate memory from
-\family typewriter 
-.
+ space of 1024 bytes is provided for malloc to allocate memory from.
  
 \family default 
-You can acomplish this by including the following code into your source:
+If you need a different heap size you need to recompile _heap.c with the
+ required size defined in HEAP_SIZE. It is recommended to make a copy of this
+ file into your project directory and compile it there with:
 \layout Verse
 
 
 \family typewriter 
-#include <malloc.h>
-\begin_inset LatexCommand \index{malloc.h}
-
-\end_inset 
-
- /* calloc
-\begin_inset LatexCommand \index{calloc}
-
-\end_inset 
-
-, malloc
-\begin_inset LatexCommand \index{malloc}
-
-\end_inset 
-
-, realloc
-\begin_inset LatexCommand \index{realloc}
-
-\end_inset 
-
-, and free
-\begin_inset LatexCommand \index{free (malloc)}
-
-\end_inset 
-
- */ 
+sdcc -c _heap.c -D HEAD_SIZE=2048
 \newline 
+\family default 
+And then link it with:
+\layout Verse
 
-\newline 
-#define HEAPSIZE 0x1000 /* Adjust depending on available memory */ 
-\newline 
-unsigned char xdata myheap[HEAPSIZE]; /* The actual heap for dynamic memory
- */ 
-\newline 
-
-\newline 
-void main (void) 
-\newline 
-{ 
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-/* Your variable declarations come here*/
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-...
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-init_dynamic_memory((MEMHEADER xdata *)myheap, HEAPSIZE);
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-...
- /* Rest of your code*/
-\newline 
-} 
+\family typewriter 
+sdcc main.rel _heap.rel
 \newline 
 
 \layout Subsection

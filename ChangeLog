@@ -1,3 +1,18 @@
+2006-12-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/malloc.h: removed init_dynamic_memory
+	* device/lib/malloc.c: made init_dynamic_memory static and automatically
+	  call it once from malloc. Also use _sdcc_heap[] from _heap.c
+	* device/lib/_heap.c: new, added, contains _sdcc_heap[]
+	* device/lib/libsdcc.lib,
+	* device/lib/Makefile.in,
+	* support/regression/ports/mcs51-xstack-auto/spec.mk: added _heap.c
+	* doc/sdccman.lyx: documented use of new _heap.c
+	* support/regression/tests/malloc.c: removed init_dynamic_memory
+	* src/cdbFile.c(spacesToUnderscores): new function,
+	  (cdbWriteEndFunction, cdbWriteCLine): use spacesToUnderscores, fixes bug
+	  1068030
+
 2006-12-09 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2/sdcc.h: prevent multiple inclusion

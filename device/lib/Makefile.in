@@ -90,7 +90,7 @@ SOURCES =	_autobaud.c _bp.c _decdptr.c \
 		_strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		_strstr.c _strtok.c \
 		_memcmp.c _memcpy.c _memmove.c _memset.c \
-		calloc.c malloc.c realloc.c free.c \
+		_heap.c calloc.c malloc.c realloc.c free.c \
 		printf_large.c sprintf.c vprintf.c puts.c gets.c \
 		printf_fast.c printf_fast_f.c printf_tiny.c printfl.c \
 		assert.c time.c bpx.c \
@@ -151,7 +151,7 @@ XA51SOURCES      = _atof.c _atoi.c _atol.c _schar2fs.c \
 		  _strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		  _strstr.c _strtok.c \
 		  _uchar2fs.c _uint2fs.c _ulong2fs.c \
-		  calloc.c malloc.c realloc.c free.c \
+		  _heap.c calloc.c malloc.c realloc.c free.c \
 		  puts.c gets.c \
 		  printf_large.c puts.c gets.c \
 		  assert.c time.c \
@@ -182,7 +182,7 @@ HC08SOURCES =	\
 		_strncpy.c _strpbrk.c _strrchr.c _strspn.c \
 		_strstr.c _strtok.c \
 		_memcmp.c _memcpy.c _memmove.c _memset.c \
-		calloc.c malloc.c realloc.c free.c \
+		_heap.c calloc.c malloc.c realloc.c free.c \
 		printf_large.c sprintf.c vprintf.c puts.c gets.c \
 		assert.c time.c \
 		fabsf.c frexpf.c ldexpf.c expf.c powf.c sincosf.c sinf.c \

@@ -1,3 +1,7 @@
+2006-12-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+	* src/mcs51/ralloc.c (packRegsForAssign),
+	* src/hc08/ralloc.c (packRegsForAssign): fixed bug #1605880
+
 2006-12-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/malloc.h: removed init_dynamic_memory

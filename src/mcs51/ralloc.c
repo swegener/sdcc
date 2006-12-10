@@ -2110,6 +2110,13 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
             }
         }
 
+      /* Don't move an assignment out of a critical block */
+      if (dic->op == CRITICAL)
+	{
+	  dic = NULL;
+	  break;
+	}
+
       if (SKIP_IC2 (dic))
         continue;
 

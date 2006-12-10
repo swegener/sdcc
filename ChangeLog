@@ -12,6 +12,9 @@
 	* src/cdbFile.c(spacesToUnderscores): new function,
 	  (cdbWriteEndFunction, cdbWriteCLine): use spacesToUnderscores, fixes bug
 	  1068030
+	* device/include/tinibios.h: removed defines for putchar and getchar
+	* device/lib/ds390/Makefile.in: added putchar.c
+	* device/lib/ds390/putchar.c: new, added, fixes bug 1465671
 
 2006-12-09 Borut Razem <borut.razem AT siol.net>
 

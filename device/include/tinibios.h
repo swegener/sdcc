@@ -5,9 +5,6 @@
 #include <ds80c390.h>
 #include <time.h>
 
-#define Serial0GetChar getchar
-#define Serial0PutChar putchar
-
 void Serial0Init (unsigned long baud, unsigned char buffered);
 char Serial0GetChar(void);
 void Serial0PutChar(char);
@@ -47,7 +44,7 @@ void ClockMicroSecondsDelay(unsigned int us);
 /* Set the cpu speed in clocks per machine cycle, valid values are:
    1024: Divide-by-1024 (power management) mode (screws ALL timers and serial)
       4: Standard 8051 divide-by-4 mode
-      2: Use 2x xtal multiplier 
+      2: Use 2x xtal multiplier
       1: Use 4x xtal multiplier (Don't do this with a TINI at 18.432MHz)
 */
 #define CPU_SPEED 2
@@ -79,10 +76,10 @@ extern void LcdLPrintf(unsigned int collumnRow, const char *format, ...) __reent
 extern char I2CReset(void);
 extern char I2CStart(void);
 extern char I2CStop(void);
-extern char I2CSendStop(char addr, char count, 
+extern char I2CSendStop(char addr, char count,
 			char send_stop);
 extern char I2CReceive(char addr, char count);
-extern char I2CSendReceive(char addr, char tx_count, 
+extern char I2CSendReceive(char addr, char tx_count,
 			   char rx_count);
 //extern char I2CByteOut(char);
 //extern void I2CDumpError(char);
@@ -109,7 +106,7 @@ void ClockIrqHandler (void) __interrupt 1 __naked;
 // functions for dealing with the ds400 ROM firmware.
 
 // A wrapper which calls rom_init allocating all available RAM in CE0
-// to the heap, sets the serial port to SERIAL_0_BAUD, sets up the 
+// to the heap, sets the serial port to SERIAL_0_BAUD, sets up the
 // millisecond timer, and diddles the clock multiplier.
 
 // Values for the romInit "speed" parameter.

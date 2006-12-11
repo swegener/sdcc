@@ -1,3 +1,7 @@
+2006-12-11 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/cc2430.h: fixed missing ';'
+
 2006-12-10 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic16/libc/stdio/vfprintf.c,

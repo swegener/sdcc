@@ -23,7 +23,7 @@
 
 #include <compiler.h>
 
-SFR(P0,         0x80);      // Port 0 
+SFR(P0,         0x80);      // Port 0
    SBIT(P0_0,     0x80, 0); // Port 0 bit 0
    SBIT(P0_1,     0x80, 1); // Port 0 bit 1
    SBIT(P0_2,     0x80, 2); // Port 0 bit 2
@@ -32,15 +32,15 @@ SFR(P0,         0x80);      // Port 0
    SBIT(P0_5,     0x80, 5); // Port 0 bit 5
    SBIT(P0_6,     0x80, 6); // Port 0 bit 6
    SBIT(P0_7,     0x80, 7); // Port 0 bit 7
-SFR(SP,         0x81);      // Stack Pointer 
+SFR(SP,         0x81);      // Stack Pointer
 SFR(DPL,        0x82);      // Data Pointer Low Byte
 SFR(DPH,        0x83);      // Data Pointer High Byte
 SFR(PCON,       0x87);      // Power Mode Control
 SFR(TCON,       0x88);      // Timer Control
    SBIT(IT0,      0x88, 0); // Ext. Interrupt 0 Type Select
-   SBIT(IE0,      0x88, 1); // Ext. Interrupt 0 Flag 
-   SBIT(IT1,      0x88, 2); // Ext. Interrupt 1 Type Select 
-   SBIT(IE1,      0x88, 3); // Ext. Interrupt 1 Flag 
+   SBIT(IE0,      0x88, 1); // Ext. Interrupt 0 Flag
+   SBIT(IT1,      0x88, 2); // Ext. Interrupt 1 Type Select
+   SBIT(IE1,      0x88, 3); // Ext. Interrupt 1 Flag
    SBIT(TR0,      0x88, 4); // Timer 0 Run Control
    SBIT(TF0,      0x88, 5); // Timer 0 Overflow Flag
    SBIT(TR1,      0x88, 6); // Timer 1 Run Control
@@ -54,7 +54,7 @@ SFR16E(TMR1,    0x8D8B);    // Timer/Counter 1 Word
    SFR(TH1,       0x8D);    // Timer/Counter 1 High Byte
 SFR(CKCON,      0x8E);      // Clock Control
 SFR(PSCTL,      0x8F);      // Program Store R/W Control
-SFR(P1,         0x90);      // Port 1 
+SFR(P1,         0x90);      // Port 1
    SBIT(P1_0,     0x90, 0); // Port 1 bit 0
    SBIT(P1_1,     0x90, 1); // Port 1 bit 1
    SBIT(P1_2,     0x90, 2); // Port 1 bit 2
@@ -77,7 +77,7 @@ SFR(SCON0,      0x98);      // Serial Port 0 Control
 SFR(SBUF0,      0x99);      // Serial Port 0 Data Buffer
 SFR(CPT0CN,     0x9B);      // Comparator 0 Control
 SFR(CPT0MD,     0x9D);      // Comparator 0 Mode Selection
-SFR(CPT0CN,     0x9F);      // Comparator 0 MUX Selection
+SFR(CPT0MX,     0x9F);      // Comparator 0 MUX Selection
 SFR(SPI0CFG,    0xA1);      // SPI Configuration
 SFR(SPI0CKR,    0xA2);      // SPI Clock Rate Control
 SFR(SPI0DAT,    0xA3);      // SPI Data
@@ -130,22 +130,22 @@ SFR16(TMR2,     0xCC);      // Timer/Counter 2 Word
    SFR(TMR2H,     0xCD);    // Timer/Counter 2 High Byte
 SFR(P1MAT,      0xCF);      // Port 1 Match
 SFR(PSW,        0xD0);      // Program Status Word
-   SBIT(P,        0xD0, 0); // Parity Flag 
+   SBIT(P,        0xD0, 0); // Parity Flag
    SBIT(F1,       0xD0, 1); // User-Defined Flag
-   SBIT(OV,       0xD0, 2); // Overflow Flag 
-   SBIT(RS0,      0xD0, 3); // Register Bank Select 0 
-   SBIT(RS1,      0xD0, 4); // Register Bank Select 1 
+   SBIT(OV,       0xD0, 2); // Overflow Flag
+   SBIT(RS0,      0xD0, 3); // Register Bank Select 0
+   SBIT(RS1,      0xD0, 4); // Register Bank Select 1
    SBIT(F0,       0xD0, 5); // User-Defined Flag
-   SBIT(AC,       0xD0, 6); // Auxiliary Carry Flag 
-   SBIT(CY,       0xD0, 7); // Carry Flag 
+   SBIT(AC,       0xD0, 6); // Auxiliary Carry Flag
+   SBIT(CY,       0xD0, 7); // Carry Flag
 SFR(REF0CN,     0xD1);      // Voltage Reference Control
 SFR(P0SKIP,     0xD4);      // Port 0 Skip
 SFR(P1SKIP,     0xD5);      // Port 1 Skip
 SFR(P0MAT,      0xD7);      // Port 0 Match
 SFR(PCA0CN,     0xD8);      // PCA Control
-   SBIT(CCF0,     0xD8, 0); // PCA Module 0 Capture/Compare Flag 
-   SBIT(CCF1,     0xD8, 1); // PCA Module 1 Capture/Compare Flag 
-   SBIT(CCF2,     0xD8, 2); // PCA Module 2 Capture/Compare Flag 
+   SBIT(CCF0,     0xD8, 0); // PCA Module 0 Capture/Compare Flag
+   SBIT(CCF1,     0xD8, 1); // PCA Module 1 Capture/Compare Flag
+   SBIT(CCF2,     0xD8, 2); // PCA Module 2 Capture/Compare Flag
    SBIT(CR,       0xD8, 6); // PCA Counter/Timer Run Control
    SBIT(CF,       0xD8, 7); // PCA Counter/Timer Overflow Flag
 SFR(PCA0MD,     0xD9);      // PCA Mode
@@ -158,10 +158,10 @@ SFR(XBR1,       0xE2);      // Port I/O Crossbar Control 1
 SFR(IT01CF,     0xE4);      // INT0/INT1 Configuration
 SFR(EIE1,       0xE6);      // Extended Interrupt Enable 1
 SFR(ADC0CN,     0xE8);      // ADC0 Control
-   SBIT(AD0CM0,   0xE8, 0); // ADC0 Conversion Start Mode Select Bit 0 
+   SBIT(AD0CM0,   0xE8, 0); // ADC0 Conversion Start Mode Select Bit 0
    SBIT(AD0CM1,   0xE8, 1); // ADC0 Conversion Start Mode Select Bit 1
    SBIT(AD0LJST,  0xE8, 2); // ADC0 Left Justify Select
-   SBIT(AD0WINT,  0xE8, 3); // ADC0 Window Compare Interrupt Flag 
+   SBIT(AD0WINT,  0xE8, 3); // ADC0 Window Compare Interrupt Flag
    SBIT(AD0BUSY,  0xE8, 4); // ADC0 Busy Bit
    SBIT(AD0INT,   0xE8, 5); // ADC0 Conversion Complete Interrupt Flag
    SBIT(BURSTEN,  0xE8, 6); // ADC0 Burst Mode Enable Bit
@@ -187,7 +187,7 @@ SFR(SPI0CN,     0xF8);      // SPI0 Control
    SBIT(WCOL,     0xE8, 6); // SPI0 Write Collision Flag
    SBIT(SPIF,     0xE8, 7); // SPI0 Interrupt Flag
 SFR16(PCA0,     0xF9);      // PCA Counter Word
-   SFR(PCA0L,     0xF9);    // PCA Counter Low Byte
+   SFR(PCA0L,    0xF9);    // PCA Counter Low Byte
    SFR(PCA0H,     0xFA);    // PCA Counter High Byte
 SFR16(PCA0CP0,  0xFB);      // PCA Capture 0 Word
    SFR(PCA0CPL0,  0xFB);    // PCA Capture 0 Low Byte

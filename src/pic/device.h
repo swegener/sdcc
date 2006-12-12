@@ -48,30 +48,6 @@ typedef struct memRange {
 
 } memRange;
 
-/* AssignedMemory - A structure to keep track of the memory that has been used.
- *
- * When a register gets assigned an address this struct is used to
- * keep track of a few details about the register. There is one of
- * these structures for each memory location in the device.
- */
-
-typedef struct AssignedMemory {
-	regs *reg;        /* Pointer to the register (NULL if this is an invalid address) */
-	int  instance;    /* the i'th byte of a multibyte register */
-	int  alias;       /* Bit mapping of aliased addresses (see memRange) */
-	int  bank;        /* Memory bank of this register */
-	int  isValid:1;   /* True if the address is legal */
-	int  isSFR:1;     /* True if the address is that of a Special Function reg */
-	int  isEmitted:1; /* True if the register has been written to a cBlock */
-
-} AssignedMemory;
-
-
-/*
- * finalMapping - Dynamically allocated array that records the register assignments
- */
-
-extern AssignedMemory *finalMapping;
 /* Processor unique attributes */
 typedef struct PIC_device {
 	char *name;                 /* the processor name */
@@ -94,9 +70,6 @@ typedef struct PIC_device {
 
 /* Given a pointer to a register, this macro returns the bank that it is in */
 #define REG_ADDR(r)        ((r)->isBitField ? (((r)->address)>>3) : (r)->address)
-#define REG_BANK(r)        (finalMapping[REG_ADDR(r)].bank)
-#define REG_isALIASED(r)   (finalMapping[REG_ADDR(r)].alias != 0)
-#define REG_isVALID(r)     (finalMapping[REG_ADDR(r)].isValid)
 
 
 /****************************************/

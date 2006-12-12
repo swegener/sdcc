@@ -1075,10 +1075,7 @@ void writeSetUsedRegs(FILE *of, set *dRegs)
 	}
 	
 }
-extern void assignFixedRegisters(set *regset);
-extern void assignRelocatableRegisters(set *regset,int used);
 extern void dump_map(void);
-extern void dump_sfr(FILE *of);
 
 void packBits(set *bregs)
 {
@@ -1177,6 +1174,7 @@ void bitEQUs(FILE *of, set *bregs)
 	}
 	
 }
+
 void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
 {
 	regs *reg;
@@ -1202,62 +1200,13 @@ void aliasEQUs(FILE *of, set *fregs, int use_rIdx)
 
 void writeUsedRegs(FILE *of) 
 {
+	
 	packBits(dynDirectBitRegs);
 	
-	assignFixedRegisters(dynInternalRegs);
-	assignFixedRegisters(dynAllocRegs);
-	assignFixedRegisters(dynStackRegs);
-	assignFixedRegisters(dynDirectRegs);
-	
-	assignRelocatableRegisters(dynInternalRegs,0);
-	assignRelocatableRegisters(dynAllocRegs,0);
-	assignRelocatableRegisters(dynStackRegs,0);
-	
-	assignRelocatableRegisters(dynDirectRegs,0);
-	/*
-	assignRelocatableRegisters(dynDirectRegs,0);
-	printf("assignRelocatableRegisters(dynDirectRegs,0);\n");
-	*/
 	//dump_map();
 	
-	dump_sfr(of);
 	bitEQUs(of,dynDirectBitRegs);
-	/*
-	aliasEQUs(of,dynAllocRegs,0);
-	aliasEQUs(of,dynDirectRegs,0);
-	aliasEQUs(of,dynStackRegs,0);
-	aliasEQUs(of,dynProcessorRegs,1);
-	*/
 }
-
-#if 0
-/*-----------------------------------------------------------------*/
-/* allDefsOutOfRange - all definitions are out of a range          */
-/*-----------------------------------------------------------------*/
-static bool
-allDefsOutOfRange (bitVect * defs, int fseq, int toseq)
-{
-	int i;
-	
-	debugLog ("%s\n", __FUNCTION__);
-	if (!defs)
-		return TRUE;
-	
-	for (i = 0; i < defs->size; i++)
-	{
-		iCode *ic;
-		
-		if (bitVectBitValue (defs, i) &&
-			(ic = hTabItemWithKey (iCodehTab, i)) &&
-			(ic->seq >= fseq && ic->seq <= toseq))
-			
-			return FALSE;
-		
-	}
-	
-	return TRUE;
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* computeSpillable - given a point find the spillable live ranges */

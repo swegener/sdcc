@@ -84,12 +84,13 @@ while (<DATA>) {
 	    $bitmask{"$register"} = $bitmask;
 	}
     } elsif (/^\s*ram\s+(\S+)\s+(\S+)\s+(\S+)/) {
-	$lo = $1;
-	$hi = $2;
-	$bitmask = $3;
-	foreach $device (split(/[,\s]+/, $devices)) {
-	    $ram{"p$device"} .= "#pragma memmap $lo $hi RAM $bitmask$'";
-	}
+	# This info is now provided in "include/pic/pic14devices.txt".
+	#$lo = $1;
+	#$hi = $2;
+	#$bitmask = $3;
+	#foreach $device (split(/[,\s]+/, $devices)) {
+	#    $ram{"p$device"} .= "#pragma memmap $lo $hi RAM $bitmask$'";
+	#}
     } elsif (/^\s*processor\s+/) {
 	$devices = $';
 	$type = '';

@@ -102,54 +102,10 @@ _pic14_regparm (sym_link * l, bool reentrant)
 static int
 _process_pragma(const char *sz)
 {
+#if 0
 	static const char *WHITE = " \t";
 	char	*ptr = strtok((char *)sz, WHITE);
-	
-	if (startsWith (ptr, "memmap"))
-	{
-		char	*start;
-		char	*end;
-		char	*type;
-		char	*alias;
-		
-		start = strtok((char *)NULL, WHITE);
-		end = strtok((char *)NULL, WHITE);
-		type = strtok((char *)NULL, WHITE);
-		alias = strtok((char *)NULL, WHITE);
-		
-		if (start != (char *)NULL
-			&& end != (char *)NULL
-			&& type != (char *)NULL) {
-			value		*startVal = constVal(start);
-			value		*endVal = constVal(end);
-			value		*aliasVal;
-			memRange	r;
-			
-			if (alias == (char *)NULL) {
-				aliasVal = constVal(0);
-			} else {
-				aliasVal = constVal(alias);
-			}
-			
-			r.start_address = (int)floatFromVal(startVal);
-			r.end_address = (int)floatFromVal(endVal);
-			r.alias = (int)floatFromVal(aliasVal);
-			r.bank = (r.start_address >> 7) & 3;
-			
-			if (strcmp(type, "RAM") == 0) {
-				addMemRange(&r, 0);
-			} else if (strcmp(type, "SFR") == 0) {
-				addMemRange(&r, 1);
-			} else {
-				return 1;
-			}
-		}
-		
-		return 0;
-	} else if (startsWith (ptr, "maxram")) {
-		// not used any more - comes from device config file pic14devices.txt instead
-		return 0;
-	}
+#endif	
 	return 1;
 }
 

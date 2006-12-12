@@ -77,6 +77,10 @@ int getHasSecondConfigReg(void);
 char *udata_section_name=0;		// FIXME Temporary fix to change udata section name -- VR
 int pic14_hasInterrupt = 0;		// Indicates whether to emit interrupt handler or not
 
+static set *emitted = NULL;
+int pic14_stringInSet(const char *str, set **world, int autoAdd);
+static void emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize);
+
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
 /*-----------------------------------------------------------------*/
@@ -130,82 +134,6 @@ is_valid_identifier( const char *name )
 
   /* valid identifier */
   return 1;
-}
-
-/* set of already emitted symbols; we store only pointers to the emitted
- * symbol names so these MUST NO BE CHANGED afterwards... */
-static set *symbolsEmitted = NULL;
-
-/*-------------------------------------------------------------------*/
-/* emitSymbolToFile - write a symbol definition only if it is not    */
-/*                    already present                                */
-/*-------------------------------------------------------------------*/
-void
-emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize)
-{
-	const char *sym;
-	static unsigned int sec_idx = 0;
-
-	/* workaround: variables declared via `sbit' result in a numeric
-	 * identifier (0xHH), EQU'ing them is invalid, so just ignore it.
-	 * sbit is heavily used in the inc2h-generated header files!
-	 */
-	if (!is_valid_identifier(name))
-	{
-	  //fprintf( stderr, "%s:%s:%u: ignored symbol: %s\n", __FILE__, __FUNCTION__, __LINE__, name );
-	  return;
-	}
-	
-	/* check whether the symbol is already defined */
-	for (sym = (const char *) setFirstItem (symbolsEmitted);
-		sym;
-		sym = (const char *) setNextItem (symbolsEmitted))
-	{
-		if (!strcmp (sym, name))
-		{
-			//fprintf (stderr, "%s: already emitted: %s\n", __FUNCTION__, name);
-			return;
-		}
-	} // for
-	
-	/* new symbol -- define it */
-	//fprintf (stderr, "%s: emitting %s (%d)\n", __FUNCTION__, name, size);
-	if (useEQU)
-	  fprintf (of, "%s\tEQU\t0x%04x\n", name, addr);
-	else
-	{
-	  /* we place each symbol into a section of its own to allow the linker
-	   * to distribute the data into all available memory banks */
-	  if (!section_type) section_type = "udata";
-	  if (addr != -1)
-	  {
-	    /* absolute symbols are handled in pic14_constructAbsMap */
-	    /* do nothing */
-#if 0
-	    /* workaround gpasm bug with symbols being EQUated and placed in absolute sections */
-	    if (1 || !is_shared_address (addr))
-	    {
-	      if (globalize) fprintf (of, "\tglobal\t%s\n", name);
-	      fprintf (of, "udata_%s_%u\t%s\t0x%04x\n", moduleName,
-	          sec_idx++, "udata_ovr", addr);
-	      fprintf (of, "%s\tres\t%d\n", name, size);
-	    }
-	    else
-	    {
-	      /* EQUs cannot be exported... */
-	      fprintf (of, "%s\tEQU\t0x%04x\n", name, addr);
-	    }
-#endif
-	  } else {
-	    if (globalize) fprintf (of, "\tglobal\t%s\n", name);
-	    fprintf (of, "udata_%s_%u\t%s\n", moduleName,
-	          sec_idx++, section_type);
-	    fprintf (of, "%s\tres\t%d\n", name, size);
-	  }
-	}
-
-	//if (options.verbose) fprintf (stderr, "%s: emitted %s\n", __FUNCTION__, name);
-	addSet (&symbolsEmitted, (void *) name);
 }
 
 #define IS_DEFINED_HERE(sym)	(!IS_EXTERN(sym->etype))
@@ -285,8 +213,11 @@ pic14_constructAbsMap (FILE *ofile)
 	if (getSize(sym->type) > size) {
 	  size = getSize(sym->type);
 	}
-	addSet (&symbolsEmitted, (void *) sym->name);
-	addSet (&symbolsEmitted, (void *) sym->rname);
+	if (sym->islocal) {
+	  // global symbols must be emitted again as 'global sym->name'
+	  pic14_stringInSet(sym->name, &emitted, 1);
+	  pic14_stringInSet(sym->rname, &emitted, 1);
+	}
       } // for
       fprintf (ofile, "\tres\t%d\n", size);
     } // if
@@ -336,7 +267,7 @@ pic14_constructAbsMap (FILE *ofile)
 	char buffer[128];
 	SNPRINTF(&buffer[0], 127, "STK%02d", i);
 	fprintf (ofile, "\textern %s\n", &buffer[0]);
-	addSet (&symbolsEmitted, (void *) &buffer[0]);
+	pic14_stringInSet(&buffer[0], &emitted, 1);
     } // for i
   }
 }
@@ -1050,8 +981,6 @@ pic14_stringInSet(const char *str, set **world, int autoAdd)
 static int
 pic14_emitSymbolIfNew(FILE *file, const char *fmt, const char *sym, int checkLocals)
 {
-  static set *emitted = NULL;
-
   if (!pic14_stringInSet(sym, &emitted, 1)) {
     /* sym was not in emittedSymbols */
     if (!checkLocals || !pic14_stringInSet(sym, &pic14_localFunctions, 0)) {
@@ -1061,6 +990,49 @@ pic14_emitSymbolIfNew(FILE *file, const char *fmt, const char *sym, int checkLoc
     }
   }
   return 1;
+}
+
+/*-------------------------------------------------------------------*/
+/* emitSymbolToFile - write a symbol definition only if it is not    */
+/*                    already present                                */
+/*-------------------------------------------------------------------*/
+static void
+emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize)
+{
+    static unsigned int sec_idx = 0;
+
+    /* workaround: variables declared via `sbit' result in a numeric
+     * identifier (0xHH), EQU'ing them is invalid, so just ignore it.
+     * sbit is heavily used in the inc2h-generated header files!
+     */
+    if (!is_valid_identifier(name))
+    {
+	//fprintf( stderr, "%s:%s:%u: ignored symbol: %s\n", __FILE__, __FUNCTION__, __LINE__, name );
+	return;
+    }
+
+    /* check whether the symbol is already defined */
+    if (pic14_stringInSet(name, &emitted, 1)) return;
+
+    /* new symbol -- define it */
+    //fprintf (stderr, "%s: emitting %s (%d)\n", __FUNCTION__, name, size);
+    if (useEQU) {
+	fprintf (of, "%s\tEQU\t0x%04x\n", name, addr);
+    } else {
+	/* we place each symbol into a section of its own to allow the linker
+	 * to distribute the data into all available memory banks */
+	if (!section_type) section_type = "udata";
+	if (addr != -1)
+	{
+	    /* absolute symbols are handled in pic14_constructAbsMap */
+	    /* do nothing */
+	} else {
+	    if (globalize) fprintf (of, "\tglobal\t%s\n", name);
+	    fprintf (of, "udata_%s_%u\t%s\n", moduleName,
+		    sec_idx++, section_type);
+	    fprintf (of, "%s\tres\t%d\n", name, size);
+	}
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1104,6 +1076,28 @@ pic14printPublics (FILE * afile)
       pic14_emitSymbolIfNew(afile, "\tglobal %s\n", sym->rname, 0);
     }
   }
+}
+
+static void
+pic14printLocals (FILE * afile)
+{
+  set *allregs[6] = { dynAllocRegs, dynStackRegs, dynProcessorRegs, dynDirectRegs, dynDirectBitRegs, dynInternalRegs };
+  regs *reg;
+  int i;
+
+  /* emit all registers from all possible sets */
+  for (i = 0; i < 6; i++) {
+    if (allregs[i] == NULL) continue;
+
+    for (reg = setFirstItem(allregs[i]); reg; reg = setNextItem(allregs[i])) {
+      if (reg->isEmitted) continue;
+
+      if (reg->wasUsed && !reg->isExtern) {
+        emitSymbolToFile(afile, reg->name, "udata", reg->size, reg->isFixed ? reg->address : -1, 0, reg->isPublic);
+      }
+      reg->isEmitted = 1;
+    } // for
+  } // for
 }
 
 /*-----------------------------------------------------------------*/
@@ -1387,7 +1381,10 @@ picglue ()
 	
 	/* Put all variables into a cblock */
 	AnalyzeBanking();
+
+	/* print the locally defined variables in this module */
 	writeUsedRegs(asmFile);
+	pic14printLocals (asmFile);
 	
 	/* create the overlay segments */
 	fprintf (asmFile, "%s", iComments2);

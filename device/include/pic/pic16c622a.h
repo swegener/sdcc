@@ -47,23 +47,6 @@
 // Memory organization.
 //
 
-#pragma memmap INDF_ADDR INDF_ADDR SFR 0x000	// INDF
-#pragma memmap TMR0_ADDR TMR0_ADDR SFR 0x000	// TMR0
-#pragma memmap PCL_ADDR PCL_ADDR SFR 0x000	// PCL
-#pragma memmap STATUS_ADDR STATUS_ADDR SFR 0x000	// STATUS
-#pragma memmap FSR_ADDR FSR_ADDR SFR 0x000	// FSR
-#pragma memmap PORTA_ADDR PORTA_ADDR SFR 0x000	// PORTA
-#pragma memmap PORTB_ADDR PORTB_ADDR SFR 0x000	// PORTB
-#pragma memmap PCLATH_ADDR PCLATH_ADDR SFR 0x000	// PCLATH
-#pragma memmap INTCON_ADDR INTCON_ADDR SFR 0x000	// INTCON
-#pragma memmap PIR1_ADDR PIR1_ADDR SFR 0x000	// PIR1
-#pragma memmap CMCON_ADDR CMCON_ADDR SFR 0x000	// CMCON
-#pragma memmap OPTION_REG_ADDR OPTION_REG_ADDR SFR 0x000	// OPTION_REG
-#pragma memmap TRISA_ADDR TRISA_ADDR SFR 0x000	// TRISA
-#pragma memmap TRISB_ADDR TRISB_ADDR SFR 0x000	// TRISB
-#pragma memmap PIE1_ADDR PIE1_ADDR SFR 0x000	// PIE1
-#pragma memmap PCON_ADDR PCON_ADDR SFR 0x000	// PCON
-#pragma memmap VRCON_ADDR VRCON_ADDR SFR 0x000	// VRCON
 
 
 //         LIST

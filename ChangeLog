@@ -1,3 +1,30 @@
+2006-12-13 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.h: removed AssignedMemory structure and macros
+	* src/pic/device.c: removed global finalMapping (linker assigns
+	    memory locations), 
+	  (register_map): add SFRs to remembered memRanges
+	  (addMemRange,isSFR,dump_map,dump_sfr,mapRegister,assignRegister,
+	  assignFixedRegisters,assignRelocatableRegisters): removed,
+	  (setMaxRAM,validAddress): adapted accordingly,
+	  (pic14_hasSharebank,pic14_getSharedStack): only report and use
+	    reasonably sized sharebanks,
+	* src/pic/ralloc.c (writeUsedRegs): stripped down (remove?),
+	  (allDefsOutOfRange): removed unused code,
+	* src/pic/main.c (_process_pragma): removed memmap/maxram pragma
+	    handling
+	* src/pic/pcode.c (register_reassign): removed recursion warning,
+	    fired far too often,
+	* src/pic/glue.c (emitSymbolToFile,pic14_constructAbsMap): modified
+	    to use existing pic14_stringInSet() to avoid duplicate symbols,
+	    tidied up the code a bit,
+	  (pic14printLocals): added in symmetry to printExterns, replaces
+	    writeUsedRegs more or less,
+	  (picglue): call new pic14_printLocals(),
+	* device/include/pic/pic*.h: removed #pragma memmap directives,
+	    information gathered from include/pic/pic14devices.txt
+	* support/scripts/inc2h.pl: do not emit #pragma memmap lines
+
 2006-12-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/C8051F520.h: fixed buggy CPT0MX

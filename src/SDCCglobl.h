@@ -305,7 +305,7 @@ extern set *libFilesSet;
 extern set *libPathsSet;
 extern set *libDirsSet;         /* list of lib search directories */
 
-void setParseWithComma (set **, char *);
+void setParseWithComma (set **, const char *);
 
 /** Creates a temporary file a'la tmpfile which avoids the bugs
     in cygwin wrt c:\tmp.

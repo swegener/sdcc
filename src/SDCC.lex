@@ -705,14 +705,14 @@ static int doPragma(int id, const char *name, const char *cp)
     case P_CALLEE_SAVES:
       /* append to the functions already listed
          in callee-saves */
-      setParseWithComma(&options.calleeSavesSet, (char *)cp);
+      setParseWithComma(&options.calleeSavesSet, cp);
       err = -1;
       break;
 
     case P_EXCLUDE:
       {
         deleteSet(&options.excludeRegsSet);
-        setParseWithComma(&options.excludeRegsSet, (char *)cp);
+        setParseWithComma(&options.excludeRegsSet, cp);
         err = -1;
       }
       break;
@@ -1010,6 +1010,7 @@ static int process_pragma(const char *s)
   if (0 != strcmp("#pragma", get_pragma_string(&token)))
     {
       /* Oops, womething went totally wrong - internal error */
+      wassertl(0, "pragma parser internal error");
     }
 
   /* skip spaces */

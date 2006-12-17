@@ -342,14 +342,14 @@ get_pragma_token(const char *s, struct pragma_token_s *token)
   dbuf_set_size(&token->dbuf, 0);
 
   /* skip leading spaces */
-  while (*s != '\n' && isspace(*s))
+  while ('\n' != *s && isspace(*s))
     ++s;
 
   if ('\0' == *s || '\n' == *s)
     {
       token->type = TOKEN_EOL;
     }
-  else if (isdigit(*s))
+  else
     {
       char *end;
 
@@ -360,21 +360,21 @@ get_pragma_token(const char *s, struct pragma_token_s *token)
           token->val.int_val = val;
           token->type = TOKEN_INT;
           dbuf_append(&token->dbuf, s, end - s);
+          s = end;
         }
-      s = end;
-    }
-  else
-    {
-      while ('\0' != *s && !isspace(*s))
+      else
         {
-          dbuf_append(&token->dbuf, s, 1);
-          ++s;
-        }
+          while ('\0' != *s && !isspace(*s))
+            {
+              dbuf_append(&token->dbuf, s, 1);
+              ++s;
+            }
 
-      token->type = TOKEN_STR;
+          token->type = TOKEN_STR;
+        }
     }
 
-    return (char *)s;
+  return (char *)s;
 }
 
 const char *

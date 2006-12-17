@@ -524,22 +524,35 @@ printUsage (void)
 /* setParseWithComma - separates string with comma to a set        */
 /*-----------------------------------------------------------------*/
 void
-setParseWithComma (set **dest, char *src)
+setParseWithComma (set **dest, const char *src)
 {
-  char *p;
-  int length;
+  const char *p, *end;
+  struct dbuf_s dbuf;
 
   /* skip the initial white spaces */
   while (isspace((unsigned char)*src))
-    src++;
+    ++src;
 
   /* skip the trailing white spaces */
-  length = strlen(src);
-  while (length && isspace((unsigned char)src[length-1]))
-    src[--length] = '\0';
+  end = &src[strlen(src) - 1];
+  while (end >= src && isspace((unsigned char)*end))
+    --end;
+  ++end;
 
-  for (p = strtok(src, ","); p != NULL; p = strtok(NULL, ","))
-    addSet(dest, Safe_strdup(p));
+  dbuf_init(&dbuf, 16);
+
+  p = src;
+  while (src < end)
+    {
+      while (p < end && ',' != *p)
+        ++p;
+      dbuf_append(&dbuf, src, p - src);
+      addSet(dest, Safe_strdup(dbuf_c_str(&dbuf)));
+      dbuf_set_size(&dbuf, 0);
+      src = ++p;
+    }
+
+  dbuf_destroy(&dbuf);
 }
 
 /*-----------------------------------------------------------------*/

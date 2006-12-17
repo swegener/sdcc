@@ -99,16 +99,6 @@ _pic14_regparm (sym_link * l, bool reentrant)
 	return 1;
 }
 
-static int
-_process_pragma(const char *sz)
-{
-#if 0
-	static const char *WHITE = " \t";
-	char	*ptr = strtok((char *)sz, WHITE);
-#endif	
-	return 1;
-}
-
 extern char *udata_section_name;
 
 static bool
@@ -564,7 +554,7 @@ PORT pic_port =
 	NULL, 				/* genInitStartup */
 	_pic14_reset_regparm,
 	_pic14_regparm,
-	_process_pragma,				/* process a pragma */
+	NULL,				/* process a pragma */
 	NULL,
 	_hasNativeMulFor,
 	hasExtBitOp,			/* hasExtBitOp */

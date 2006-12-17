@@ -15,9 +15,9 @@
 #define TARGET_ID_AVR      4
 #define TARGET_ID_DS390    5
 #define TARGET_ID_PIC      6
-#define TARGET_ID_PIC16	   7
+#define TARGET_ID_PIC16    7
 #define TARGET_ID_XA51     9
-#define TARGET_ID_DS400	   10
+#define TARGET_ID_DS400    10
 #define TARGET_ID_HC08     11
 
 /* Macro to test the target we are compiling for.
@@ -30,21 +30,33 @@
 #define TARGET_IS_DS390 (port->id==TARGET_ID_DS390)
 #define TARGET_IS_DS400 (port->id==TARGET_ID_DS400)
 #define TARGET_IS_PIC   (port->id==TARGET_ID_PIC)
-#define TARGET_IS_PIC16	(port->id==TARGET_ID_PIC16)
+#define TARGET_IS_PIC16 (port->id==TARGET_ID_PIC16)
 #define TARGET_IS_XA51 (port->id==TARGET_ID_XA51)
 #define TARGET_IS_HC08 (port->id==TARGET_ID_HC08)
 
-#define MAX_BUILTIN_ARGS	16
+#define MAX_BUILTIN_ARGS        16
 /* definition of builtin functions */
 typedef struct builtins
-{
-    char *name ;		/* name of builtin function */
-    char *rtype;		/* return type as string : see typefromStr */
-    int  nParms;		/* number of parms : max 8 */
+  {
+    char *name;                 /* name of builtin function */
+    char *rtype;                /* return type as string : see typefromStr */
+    int  nParms;                /* number of parms : max 8 */
     char *parm_types[MAX_BUILTIN_ARGS]; /* each parm type as string : see typeFromStr */
-} builtins ;
+  } builtins;
 
 struct ebbIndex;
+
+/* pragma structure */
+struct pragma_s
+  {
+    const char *name;
+    int id;
+    char deprecated;
+    int (*func)(int id, const char *name, const char *cp);
+  };
+
+/* defined in SDCClex.lex */
+int process_pragma_tbl(const struct pragma_s *pragma_tbl, const char *s);
 
 /* Processor specific names */
 typedef struct
@@ -64,15 +76,15 @@ typedef struct
       {
         /** Pointer to glue function */
         void (*do_glue)(void);
-	/** TRUE if all types of glue functions should be inserted into
-	    the file that also defines main.
-	    We dont want this in cases like the z80 where the startup
-	    code is provided by a seperate module.
-	*/
-	bool glue_up_main;
-	/* OR of MODEL_* */
-	int supported_models;
-	int default_model;
+        /** TRUE if all types of glue functions should be inserted into
+            the file that also defines main.
+            We dont want this in cases like the z80 where the startup
+            code is provided by a seperate module.
+        */
+        bool glue_up_main;
+        /* OR of MODEL_* */
+        int supported_models;
+        int default_model;
       }
     general;
 
@@ -84,15 +96,15 @@ typedef struct
         /** Alternate macro based form. */
         const char *mcmd;
         /** Arguments for debug mode. */
-	const char *debug_opts;
+        const char *debug_opts;
         /** Arguments for normal assembly mode. */
-	const char *plain_opts;
-	/* print externs as global */
-	int externGlobal;
-	/* assembler file extension */
-	const char *file_ext;
+        const char *plain_opts;
+        /* print externs as global */
+        int externGlobal;
+        /* assembler file extension */
+        const char *file_ext;
         /** If non-null will be used to execute the assembler. */
-	void (*do_assemble) (set *);
+        void (*do_assemble) (set *);
       }
     assembler;
 
@@ -100,41 +112,41 @@ typedef struct
     struct
       {
         /** Command to run (eg link-z80) */
-	const char **cmd;
+        const char **cmd;
         /** Alternate macro based form. */
         const char *mcmd;
         /** If non-null will be used to execute the link. */
-	void (*do_link) (void);
+        void (*do_link) (void);
         /** Extension for object files (.rel, .obj, ...) */
-	const char *rel_ext;
+        const char *rel_ext;
         /** 1 if port needs the .lnk file, 0 otherwise */
-	const int needLinkerScript;
+        const int needLinkerScript;
       }
     linker;
 
     struct
       {
 /** Default peephole rules */
-	char *default_rules;
-	int (*getSize)(lineNode *line);
-	bitVect * (*getRegsRead)(lineNode *line);
-	bitVect * (*getRegsWritten)(lineNode *line);
+        char *default_rules;
+        int (*getSize)(lineNode *line);
+        bitVect * (*getRegsRead)(lineNode *line);
+        bitVect * (*getRegsWritten)(lineNode *line);
       }
     peep;
 
 /** Basic type sizes */
     struct
       {
-	int char_size;
-	int short_size;
+        int char_size;
+        int short_size;
         unsigned int int_size;
-	int long_size;
-	int ptr_size;       //near
-	int fptr_size;      //far
-	int gptr_size;      //generic
-	int bit_size;
-	int float_size;
-	int max_base_size;
+        int long_size;
+        int ptr_size;       //near
+        int fptr_size;      //far
+        int gptr_size;      //generic
+        int bit_size;
+        int float_size;
+        int max_base_size;
       }
     s;
 
@@ -147,37 +159,37 @@ typedef struct
         int tag_code;
       }
     gp_tags;
-      
+
 /** memory regions related stuff */
     struct
       {
-	const char *xstack_name;
-	const char *istack_name;
-	const char *code_name;
-	const char *data_name;
-	const char *idata_name;
-	const char *pdata_name;
-	const char *xdata_name;
-	const char *bit_name;
-	const char *reg_name;
-	const char *static_name;
-	const char *overlay_name;
-	const char *post_static_name;
-	const char *home_name;
-	const char *xidata_name; // initialized xdata
-	const char *xinit_name; // a code copy of xidata
-	const char *const_name; // const data (code or not)
-	const char *cabs_name; // const absolute data (code or not)
-	struct memmap *default_local_map; // default location for auto vars
-	struct memmap *default_globl_map; // default location for globl vars
-	int code_ro;		/* code space read-only 1=yes */
+        const char *xstack_name;
+        const char *istack_name;
+        const char *code_name;
+        const char *data_name;
+        const char *idata_name;
+        const char *pdata_name;
+        const char *xdata_name;
+        const char *bit_name;
+        const char *reg_name;
+        const char *static_name;
+        const char *overlay_name;
+        const char *post_static_name;
+        const char *home_name;
+        const char *xidata_name; // initialized xdata
+        const char *xinit_name; // a code copy of xidata
+        const char *const_name; // const data (code or not)
+        const char *cabs_name; // const absolute data (code or not)
+        struct memmap *default_local_map; // default location for auto vars
+        struct memmap *default_globl_map; // default location for globl vars
+        int code_ro;            /* code space read-only 1=yes */
       }
     mem;
 
     struct
       {
-	  void (*genExtraAreaDeclaration)(FILE *, bool);
-	  void (*genExtraAreaLinkOptions)(FILE *);
+          void (*genExtraAreaDeclaration)(FILE *, bool);
+          void (*genExtraAreaLinkOptions)(FILE *);
       }
     extraAreas;
 
@@ -185,18 +197,18 @@ typedef struct
     struct
       {
 /** -1 for grows down (z80), +1 for grows up (mcs51) */
-	int direction;
+        int direction;
 /** Extra overhead when calling between banks */
-	int bank_overhead;
+        int bank_overhead;
 /** Extra overhead when the function is an ISR */
-	int isr_overhead;
+        int isr_overhead;
 /** Standard overhead for a function call */
-	int call_overhead;
+        int call_overhead;
 /** Re-enterant space */
-	int reent_overhead;
-	/** 'banked' call overhead.
-	    Mild overlap with bank_overhead */
-	int banked_overhead;
+        int reent_overhead;
+        /** 'banked' call overhead.
+            Mild overlap with bank_overhead */
+        int banked_overhead;
       }
     stack;
 
@@ -212,19 +224,19 @@ typedef struct
 
     struct
       {
-	void (*emitDebuggerSymbol) (char *);
-	struct
-	  {
-	    int (*regNum) (struct regs *);
-	    bitVect * cfiSame;
-	    bitVect * cfiUndef;
-	    int addressSize;
-	    int regNumRet;
-	    int regNumSP;
-	    int regNumBP;
-	    int offsetSP;
-	  }
-	dwarf;
+        void (*emitDebuggerSymbol) (char *);
+        struct
+          {
+            int (*regNum) (struct regs *);
+            bitVect * cfiSame;
+            bitVect * cfiUndef;
+            int addressSize;
+            int regNumRet;
+            int regNumSP;
+            int regNumBP;
+            int offsetSP;
+          }
+        dwarf;
       }
     debugger;
 
@@ -243,8 +255,8 @@ typedef struct
     const char *fun_prefix;
 
     /** Called once the processor target has been selected.
-	First chance to initalise and set any port specific variables.
-	'port' is set before calling this.  May be NULL.
+        First chance to initalise and set any port specific variables.
+        'port' is set before calling this.  May be NULL.
     */
     void (*init) (void);
 /** Parses one option + its arguments */
@@ -257,13 +269,13 @@ typedef struct
 /** Called after all the options have been parsed. */
     void (*finaliseOptions) (void);
     /** Called after the port has been selected but before any
-	options are parsed. */
+        options are parsed. */
     void (*setDefaultOptions) (void);
 /** Does the dirty work. */
     void (*assignRegisters) (struct ebbIndex *);
 
     /** Returns the register name of a symbol.
-	Used so that 'regs' can be an incomplete type. */
+        Used so that 'regs' can be an incomplete type. */
     const char *(*getRegName) (struct regs * reg);
 
     /* list of keywords that are used by this
@@ -287,11 +299,11 @@ typedef struct
     void (*genInitStartup) (FILE * of);
 
     /* parameter passing in register related functions */
-    void (*reset_regparms) (void);	/* reset the register count */
-    int (*reg_parm) (struct sym_link *, bool reentrant);	/* will return 1 if can be passed in register */
+    void (*reset_regparms) (void);      /* reset the register count */
+    int (*reg_parm) (struct sym_link *, bool reentrant);        /* will return 1 if can be passed in register */
 
     /** Process the pragma string 'sz'.  Returns 0 if recognised and
-	processed, 1 otherwise.  May be NULL.
+        processed, 1 otherwise.  May be NULL.
     */
     int (*process_pragma) (const char *sz);
 
@@ -324,18 +336,18 @@ typedef struct
     bool little_endian;
 
     /* condition transformations */
-    bool lt_nge;		/* transform (a < b)  to !(a >= b)  */
-    bool gt_nle;		/* transform (a > b)  to !(a <= b)  */
-    bool le_ngt;		/* transform (a <= b) to !(a > b)   */
-    bool ge_nlt;		/* transform (a >= b) to !(a < b)   */
-    bool ne_neq;		/* transform a != b --> ! (a == b)  */
-    bool eq_nne;		/* transform a == b --> ! (a != b)  */
+    bool lt_nge;                /* transform (a < b)  to !(a >= b)  */
+    bool gt_nle;                /* transform (a > b)  to !(a <= b)  */
+    bool le_ngt;                /* transform (a <= b) to !(a > b)   */
+    bool ge_nlt;                /* transform (a >= b) to !(a < b)   */
+    bool ne_neq;                /* transform a != b --> ! (a == b)  */
+    bool eq_nne;                /* transform a == b --> ! (a != b)  */
 
     bool arrayInitializerSuppported;
     bool (*cseOk) (iCode *ic, iCode *pdic);
     builtins *builtintable;     /* table of builtin functions */
-    int unqualified_pointer;	/* unqualified pointers type is  */
-    int reset_labelKey  ;	/* reset Label no 1 at the start of a function */
+    int unqualified_pointer;    /* unqualified pointers type is  */
+    int reset_labelKey  ;       /* reset Label no 1 at the start of a function */
     int globals_allowed ;       /* global & static locals not allowed ?  0 ONLY TININative*/
 #define PORT_MAGIC 0xAC32
 /** Used at runtime to detect if this structure has been completly filled in. */

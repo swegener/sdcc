@@ -434,6 +434,8 @@ struct
    "flexible array in otherwise empty struct" },
 { W_EMPTY_SOURCE_FILE, ERROR_LEVEL_WARNING,
    "ISO C forbids an empty source file" },
+{ W_BAD_PRAGMA_ARGUMENTS, ERROR_LEVEL_WARNING,
+   "#pragma %s: bad argument(s); pragma ignored" },
 };
 
 /*

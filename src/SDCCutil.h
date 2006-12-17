@@ -26,6 +26,7 @@
 #define SDCCUTIL_H
 
 #include "SDCChasht.h"
+#include "dbuf.h"
 #include <stdarg.h>
 
 /** Given an array of name, value string pairs creates a new hash
@@ -111,5 +112,22 @@ size_t SDCCsnprintf(char *, size_t, const char *, ...);
 // We don't have a native snprintf nor the functions we need to write one.
 #  error "Need at least one of snprintf, vsnprintf, vsprintf!"
 # endif
+
+/** Pragma tokenizer
+ */
+enum pragma_token_e { TOKEN_UNKNOWN, TOKEN_STR, TOKEN_INT, TOKEN_EOL };
+
+struct pragma_token_s {
+  enum pragma_token_e type;
+  struct dbuf_s dbuf;
+  union {
+    int int_val;
+  } val;
+};
+
+void init_pragma_token(struct pragma_token_s *token);
+char *get_pragma_token(const char *s, struct pragma_token_s *token);
+const char *get_pragma_string(struct pragma_token_s *token);
+void free_pragma_token(struct pragma_token_s *token);
 
 #endif

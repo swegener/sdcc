@@ -138,78 +138,136 @@ _reg_parm (sym_link * l, bool reentrant)
         }
     }
 }
+
+enum {
+  P_BANK = 1,
+  P_PORTMODE
+};
+
 static int
-_process_pragma (const char *sz)
+do_pragma(int id, const char *name, const char *cp)
 {
-  if( startsWith( sz, "bank=" ) || startsWith( sz, "bank " ))
-  {
-    char buffer[128];
-    
-    if (sz[4]=='=')
-      werror(W_DEPRECATED_PRAGMA, "bank=");
-    
-    strncpy (buffer, sz + 5, sizeof (buffer));
-    buffer[sizeof (buffer) - 1 ] = '\0';
-    chomp (buffer);
-    if (isdigit ((unsigned char)buffer[0]))
-    {
+  struct pragma_token_s token;
+  int err = 0;
+  int processed = 1;
 
-    }
-    else if (!strcmp (buffer, "BASE"))
-    {
-      strcpy (buffer, "HOME");
-    }
-    if (isdigit ((unsigned char)buffer[0]))
-    {
-	  /* Arg was a bank number.  Handle in an ASM independent
-	     way. */
-      char num[128];
-      strncpy (num, sz + 5, sizeof (num));
-      num[sizeof (num) -1] = '\0';
-      chomp (num);
+  init_pragma_token(&token);
 
-      switch (_G.asmType)
+  switch (id)
+    {
+    case P_BANK:
       {
-	    case ASM_TYPE_ASXXXX:
-	      sprintf (buffer, "CODE_%s", num);
-	      break;
-	    case ASM_TYPE_RGBDS:
-	      sprintf (buffer, "CODE,BANK[%s]", num);
-	      break;
-	    case ASM_TYPE_ISAS:
-	      /* PENDING: what to use for ISAS? */
-	      sprintf (buffer, "CODE,BANK(%s)", num);
-	      break;
-	    default:
-	      wassert (0);
+        char buffer[128];
+
+        cp = get_pragma_token(cp, &token);
+
+        switch (token.type)
+          {
+          case TOKEN_EOL:
+            err = 1;
+            break;
+
+          case TOKEN_INT:
+            switch (_G.asmType)
+              {
+	      case ASM_TYPE_ASXXXX:
+	        sprintf(buffer, "CODE_%d", token.val.int_val);
+	        break;
+
+              case ASM_TYPE_RGBDS:
+	        sprintf(buffer, "CODE,BANK[%d]", token.val.int_val);
+	        break;
+
+	      case ASM_TYPE_ISAS:
+	        /* PENDING: what to use for ISAS? */
+	        sprintf (buffer, "CODE,BANK(%d)", token.val.int_val);
+	        break;
+
+	      default:
+	        wassert (0);
+              }
+            break;
+
+          default:
+            {
+              const char *str = get_pragma_string(&token);
+
+              strcpy(buffer, (0 == strcmp("BASE", str)) ? "HOME" : str);
+            }
+            break;
+          }
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        gbz80_port.mem.code_name = Safe_strdup (buffer);
+        code->sname = gbz80_port.mem.code_name;
+        options.code_seg = gbz80_port.mem.code_name;
       }
-    }
-    gbz80_port.mem.code_name = Safe_strdup (buffer);
-    code->sname = gbz80_port.mem.code_name;
-    options.code_seg = gbz80_port.mem.code_name;
-    return 0;
+      break;
+
+    case P_PORTMODE:
+      { /*.p.t.20030716 - adding pragma to manipulate z80 i/o port addressing modes */
+        const char *str;
+
+        cp = get_pragma_token(cp, &token);
+
+        if (TOKEN_EOL == token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        str = get_pragma_string(&token);
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        if (!strcmp(str, "z80"))
+          { z80_opts.port_mode = 80; }
+        else if(!strcmp(str, "z180"))
+          { z80_opts.port_mode = 180; }
+        else if(!strcmp(str, "save"))
+          { z80_opts.port_back = z80_opts.port_mode; }
+        else if(!strcmp(str, "restore" ))
+          { z80_opts.port_mode = z80_opts.port_back; }
+        else
+          err = 1;
+      }
+      break;
+
+    default:
+      processed = 0;
+      break;
   }
-  else if( startsWith( sz, "portmode=" ) || startsWith( sz, "portmode " ))
-  { /*.p.t.20030716 - adding pragma to manipulate z80 i/o port addressing modes */
-    char bfr[128];
 
-    if (sz[8]=='=')
-      werror(W_DEPRECATED_PRAGMA, "portmode=");
+  get_pragma_token(cp, &token);
 
-    strncpy( bfr, sz + 9, sizeof (bfr));
-    bfr[sizeof (bfr) - 1] = '\0';
-    chomp( bfr );
+  if (1 == err)
+    werror(W_BAD_PRAGMA_ARGUMENTS, name);
 
-    if     ( !strcmp( bfr, "z80"     )){ z80_opts.port_mode =  80; }
-    else if( !strcmp( bfr, "z180"    )){ z80_opts.port_mode = 180; }
-    else if( !strcmp( bfr, "save"    )){ z80_opts.port_back = z80_opts.port_mode; }
-    else if( !strcmp( bfr, "restore" )){ z80_opts.port_mode = z80_opts.port_back; }
-    else                                 return( 1 );
+  free_pragma_token(&token);
+  return processed;
+}
 
-    return( 0 );
-  }
+static struct pragma_s pragma_tbl[] = {
+  { "bank",     P_BANK,     0, do_pragma },
+  { "portmode", P_PORTMODE, 0, do_pragma },
+  { NULL,       0,          0, NULL },
+  };
 
-  return 1;
+static int
+_process_pragma(const char *s)
+{
+  return process_pragma_tbl(pragma_tbl, s);
 }
 
 static const char *_gbz80_rgbasmCmd[] =

@@ -2,24 +2,24 @@
   SDCC.lex - lexical analyser for use with sdcc ( a freeware compiler for
   8/16 bit microcontrollers)
   Written by : Sandeep Dutta . sandeep.dutta@usa.net (1997)
-  
+
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
    Free Software Foundation; either version 2, or (at your option) any
    later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-    
+
    In other words, you are welcome to use, share and improve this program.
    You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!  
+   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 D       [0-9]
@@ -58,7 +58,7 @@ static struct dbuf_s asmbuff;
 /* forward declarations */
 static char *stringLiteral(void);
 static void count(void);
-static int process_pragma(char *);
+static int process_pragma(const char *);
 static int check_type(void);
 static int isTargetKeyword(char *s);
 static int checkCurrFile(char *s);
@@ -240,7 +240,7 @@ _?"_asm"         {
 "^"            { count(); return('^'); }
 "|"            { count(); return('|'); }
 "?"            { count(); return('?'); }
-^#pragma.*"\n" { count(); process_pragma(yytext); }
+^#pragma.*$    { count(); process_pragma(yytext); }
 ^(#line.*"\n")|(#.*"\n") { count(); checkCurrFile(yytext); }
 
 ^[^(]+"("[0-9]+") : error"[^\n]+ { werror(E_PRE_PROC_FAILED, yytext); count(); }
@@ -447,7 +447,7 @@ out:
 }
 
 
-enum pragma_id {
+enum {
      P_SAVE = 1,
      P_RESTORE,
      P_NOINDUCTION,
@@ -561,261 +561,474 @@ static void copyAndFreeSDCCERRG(struct SDCCERRG *dest, struct SDCCERRG *src)
   Safe_free(src);
 }
 
-static void doPragma(int op, char *cp)
+/*
+ * returns 1 if the pragma was processed, 0 if not
+ */
+static int doPragma(int id, const char *name, const char *cp)
 {
-  int i;
+  struct pragma_token_s token;
+  int err = 0;
+  int processed = 1;
 
-  switch (op) {
-  case P_SAVE:
+  init_pragma_token(&token);
+
+  switch (id) 
     {
-      STACK_PUSH(options_stack, cloneOptions(&options));
-      STACK_PUSH(optimize_stack, cloneOptimize(&optimize));
-      STACK_PUSH(SDCCERRG_stack, cloneSDCCERRG(&_SDCCERRG));
-    }
-    break;
-
-  case P_RESTORE:
-    {
-      struct options *optionsp;
-      struct optimize *optimizep;
-      struct SDCCERRG *sdccerrgp;
-
-      optionsp = STACK_POP(options_stack);
-      copyAndFreeOptions(&options, optionsp);
-
-      optimizep = STACK_POP(optimize_stack);
-      copyAndFreeOptimize(&optimize, optimizep);
-
-      sdccerrgp = STACK_POP(SDCCERRG_stack);
-      copyAndFreeSDCCERRG(&_SDCCERRG, sdccerrgp);
-    }
-    break;
-
-  case P_NOINDUCTION:
-    optimize.loopInduction = 0;
-    break;
-
-  case P_NOINVARIANT:
-    optimize.loopInvariant = 0;
-    break;
-
-  case P_INDUCTION:
-    optimize.loopInduction = 1;
-    break;
-
-  case P_STACKAUTO:
-    options.stackAuto = 1;
-    break;
-
-  case P_NOJTBOUND:
-    optimize.noJTabBoundary = 1;
-    break;
-
-  case P_NOGCSE:
-    optimize.global_cse = 0;
-    break;
-
-  case P_NOOVERLAY:
-    options.noOverlay = 1;
-    break;
-
-  case P_LESSPEDANTIC:
-    options.lessPedantic = 1;
-    setErrorLogLevel(ERROR_LEVEL_WARNING);
-    break;
-
-  case P_CALLEE_SAVES:
-    /* append to the functions already listed
-       in callee-saves */
-    setParseWithComma(&options.calleeSavesSet, cp);
-    break;
-
-  case P_EXCLUDE:
-    {
-      deleteSet(&options.excludeRegsSet);
-      setParseWithComma(&options.excludeRegsSet, cp);
-    }
-    break;
-
-  case P_NOIV:
-    options.noiv = 1;
-    break;
-
-  case P_LOOPREV:
-    optimize.noLoopReverse = 1;
-    break;
-
-  case P_OVERLAY_:
-    break; /* notyet */
-
-  case P_DISABLEWARN:
-    if (sscanf(cp, "%d", &i) && (i<MAX_ERROR_WARNING))
+    case P_SAVE:
       {
-        setWarningDisabled(i);
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        STACK_PUSH(options_stack, cloneOptions(&options));
+        STACK_PUSH(optimize_stack, cloneOptimize(&optimize));
+        STACK_PUSH(SDCCERRG_stack, cloneSDCCERRG(&_SDCCERRG));
       }
-    break;
-  
-  case P_OPTCODESPEED:
-    optimize.codeSpeed = 1;
-    optimize.codeSize = 0;
-    break;
+      break;
 
-  case P_OPTCODESIZE:
-    optimize.codeSpeed = 0;
-    optimize.codeSize = 1;
-    break;
+    case P_RESTORE:
+      {
+        struct options *optionsp;
+        struct optimize *optimizep;
+        struct SDCCERRG *sdccerrgp;
 
-  case P_OPTCODEBALANCED:
-    optimize.codeSpeed = 0;
-    optimize.codeSize = 0;
-    break;
-  
-  case P_STD_C89:
-    options.std_c99 = 0;
-    options.std_sdcc = 0;
-    break;
-  
-  case P_STD_C99:
-    options.std_c99 = 1;
-    options.std_sdcc = 0;
-    break;
-  
-  case P_STD_SDCC89:
-    options.std_c99 = 0;
-    options.std_sdcc = 1;
-    break;
-  
-  case P_STD_SDCC99:
-    options.std_c99 = 1;
-    options.std_sdcc = 1;
-    break;
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
 
-  case P_CODESEG:
-    {
-      char str[9];
-      char *segname = Safe_malloc(15);
-      sscanf(cp, " %8s", str);
-      str[8] = '\0';
-      sprintf(segname, "%-8.8s(CODE)", str);
-      options.code_seg = segname;
+        optionsp = STACK_POP(options_stack);
+        copyAndFreeOptions(&options, optionsp);
+
+        optimizep = STACK_POP(optimize_stack);
+        copyAndFreeOptimize(&optimize, optimizep);
+
+        sdccerrgp = STACK_POP(SDCCERRG_stack);
+        copyAndFreeSDCCERRG(&_SDCCERRG, sdccerrgp);
+      }
+      break;
+
+    case P_NOINDUCTION:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.loopInduction = 0;
+      break;
+
+    case P_NOINVARIANT:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.loopInvariant = 0;
+      break;
+
+    case P_INDUCTION:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.loopInduction = 1;
+      break;
+
+    case P_STACKAUTO:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.stackAuto = 1;
+      break;
+
+    case P_NOJTBOUND:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.noJTabBoundary = 1;
+      break;
+
+    case P_NOGCSE:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.global_cse = 0;
+      break;
+
+    case P_NOOVERLAY:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.noOverlay = 1;
+      break;
+
+    case P_LESSPEDANTIC:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.lessPedantic = 1;
+      setErrorLogLevel(ERROR_LEVEL_WARNING);
+      break;
+
+    case P_CALLEE_SAVES:
+      /* append to the functions already listed
+         in callee-saves */
+      setParseWithComma(&options.calleeSavesSet, (char *)cp);
+      err = -1;
+      break;
+
+    case P_EXCLUDE:
+      {
+        deleteSet(&options.excludeRegsSet);
+        setParseWithComma(&options.excludeRegsSet, (char *)cp);
+        err = -1;
+      }
+      break;
+
+    case P_NOIV:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.noiv = 1;
+      break;
+
+    case P_LOOPREV:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.noLoopReverse = 1;
+      break;
+
+    case P_OVERLAY_:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      break; /* notyet */
+
+    case P_DISABLEWARN:
+      {
+        int warn;
+
+        cp = get_pragma_token(cp, &token);
+
+        if (token.type != TOKEN_INT)
+          {
+            err = 1;
+            break;
+          }
+        warn = token.val.int_val;
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        if (warn < MAX_ERROR_WARNING)
+          setWarningDisabled(warn);
+      }
+      break;
+
+    case P_OPTCODESPEED:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.codeSpeed = 1;
+      optimize.codeSize = 0;
+      break;
+
+    case P_OPTCODESIZE:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.codeSpeed = 0;
+      optimize.codeSize = 1;
+      break;
+
+    case P_OPTCODEBALANCED:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      optimize.codeSpeed = 0;
+      optimize.codeSize = 0;
+      break;
+
+    case P_STD_C89:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.std_c99 = 0;
+      options.std_sdcc = 0;
+      break;
+
+    case P_STD_C99:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.std_c99 = 1;
+      options.std_sdcc = 0;
+      break;
+
+    case P_STD_SDCC89:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.std_c99 = 0;
+      options.std_sdcc = 1;
+      break;
+
+    case P_STD_SDCC99:
+      cp = get_pragma_token(cp, &token);
+      if (TOKEN_EOL != token.type)
+        {
+          err = 1;
+          break;
+        }
+
+      options.std_c99 = 1;
+      options.std_sdcc = 1;
+      break;
+
+    case P_CODESEG:
+      {
+        const char *segname;
+
+        cp = get_pragma_token(cp, &token);
+        if (token.type == TOKEN_EOL)
+          {
+            err = 1;
+            break;
+          }
+        segname = get_pragma_string(&token);
+
+        cp = get_pragma_token(cp, &token);
+        if (token.type != TOKEN_EOL)
+          {
+            err = 1;
+            break;
+          }
+
+        if (strlen(segname) > 8)
+          {
+            err = 1;
+            break;
+          }
+        else
+          {
+            dbuf_append(&token.dbuf, "(CODE)", (sizeof "(CODE)") - 1);
+            options.code_seg = Safe_strdup(get_pragma_string(&token));
+          }
+      }
+      break;
+
+    case P_CONSTSEG:
+      {
+        const char *segname;
+
+        cp = get_pragma_token(cp, &token);
+        if (token.type == TOKEN_EOL)
+          {
+            err = 1;
+            break;
+          }
+        segname = get_pragma_string(&token);
+
+        cp = get_pragma_token(cp, &token);
+        if (token.type != TOKEN_EOL)
+          {
+            err = 1;
+            break;
+          }
+
+        if (strlen(segname) > 8)
+          {
+            err = 1;
+            break;
+          }
+        else
+          {
+            dbuf_append(&token.dbuf, "(CODE)", (sizeof "(CODE)") - 1);
+            options.code_seg = Safe_strdup(get_pragma_string(&token));
+          }
+      }
+      break;
+
+    default:
+      processed = 0;
+      break;
     }
-    break;
 
-  case P_CONSTSEG:
-    {
-      char str[9];
-      char *segname = Safe_malloc(15);
-      sscanf(cp, " %8s", str);
-      str[8] = '\0';
-      sprintf(segname, "%-8.8s(CODE)", str);
-      options.const_seg = segname;
-    }
-    break;
-  }
+  get_pragma_token(cp, &token);
+
+  if (1 == err || (0 == err && token.type != TOKEN_EOL))
+    werror(W_BAD_PRAGMA_ARGUMENTS, name);
+
+  free_pragma_token(&token);
+  return processed;
 }
 
-static int process_pragma(char *s)
+static struct pragma_s pragma_tbl[] = {
+  { "save",           P_SAVE,         0, doPragma },
+  { "restore",        P_RESTORE,      0, doPragma },
+  { "noinduction",    P_NOINDUCTION,  0, doPragma },
+  { "noinvariant",    P_NOINVARIANT,  0, doPragma },
+  { "noloopreverse",  P_LOOPREV,      0, doPragma },
+  { "induction",      P_INDUCTION,    0, doPragma },
+  { "stackauto",      P_STACKAUTO,    0, doPragma },
+  { "nojtbound",      P_NOJTBOUND,    0, doPragma },
+  { "nogcse",         P_NOGCSE,       0, doPragma },
+  { "nooverlay",      P_NOOVERLAY,    0, doPragma },
+  { "callee_saves",   P_CALLEE_SAVES, 0, doPragma },
+  { "exclude",        P_EXCLUDE,      0, doPragma },
+  { "noiv",           P_NOIV,         0, doPragma },
+  { "overlay",        P_OVERLAY_,     0, doPragma },
+  { "less_pedantic",  P_LESSPEDANTIC, 0, doPragma },
+  { "disable_warning",P_DISABLEWARN,  0, doPragma },
+  { "opt_code_speed", P_OPTCODESPEED, 0, doPragma },
+  { "opt_code_size",  P_OPTCODESIZE,  0, doPragma },
+  { "opt_code_balanced", P_OPTCODEBALANCED, 0, doPragma },
+  { "std_c89",        P_STD_C89,      0, doPragma },
+  { "std_c99",        P_STD_C99,      0, doPragma },
+  { "std_sdcc89",     P_STD_SDCC89,   0, doPragma },
+  { "std_sdcc99",     P_STD_SDCC99,   0, doPragma },
+  { "codeseg",        P_CODESEG,      0, doPragma },
+  { "constseg",       P_CONSTSEG,     0, doPragma },
+  { NULL,             0,              0, NULL },
+};
+
+/*
+ * returns 1 if the pragma was processed, 0 if not
+ */
+int
+process_pragma_tbl(const struct pragma_s *pragma_tbl, const char *s)
 {
-#define NELEM(x)    (sizeof (x) / sizeof (x)[0])
-#define PRAGMA_STR  "#pragma"
-#define PRAGMA_LEN  ((sizeof PRAGMA_STR) - 1)
-
-  static struct pragma_s
-    {
-      const char *name;
-      enum pragma_id id;
-      char deprecated;
-    } pragma_tbl[] = {
-    { "save",           P_SAVE,         0 },
-    { "restore",        P_RESTORE,      0 },
-    { "noinduction",    P_NOINDUCTION,  0 },
-    { "noinvariant",    P_NOINVARIANT,  0 },
-    { "noloopreverse",  P_LOOPREV,      0 },
-    { "induction",      P_INDUCTION,    0 },
-    { "stackauto",      P_STACKAUTO,    0 },
-    { "nojtbound",      P_NOJTBOUND,    0 },
-    { "nogcse",         P_NOGCSE,       0 },
-    { "nooverlay",      P_NOOVERLAY,    0 },
-    { "callee_saves",   P_CALLEE_SAVES, 0 },
-    { "exclude",        P_EXCLUDE,      0 },
-    { "noiv",           P_NOIV,         0 },
-    { "overlay",        P_OVERLAY_,     0 },
-    { "less_pedantic",  P_LESSPEDANTIC, 0 },
-    { "disable_warning",P_DISABLEWARN,  0 },
-    { "opt_code_speed", P_OPTCODESPEED, 0 },
-    { "opt_code_size",  P_OPTCODESIZE,  0 },
-    { "opt_code_balanced",  P_OPTCODEBALANCED,  0 },
-    { "std_c89",        P_STD_C89,      0 },
-    { "std_c99",        P_STD_C99,      0 },
-    { "std_sdcc89",     P_STD_SDCC89,   0 },
-    { "std_sdcc99",     P_STD_SDCC99,   0 },
-    { "codeseg",        P_CODESEG,      0 },
-    { "constseg",       P_CONSTSEG,     0 },
-
-    /*
-     * The following lines are deprecated pragmas,
-     * only for bacward compatibility.
-     * They should be removed in next major release after 1.4.0
-     */
-
-    { "SAVE",           P_SAVE,         1 },
-    { "RESTORE",        P_RESTORE,      1 },
-    { "NOINDUCTION",    P_NOINDUCTION,  1 },
-    { "NOINVARIANT",    P_NOINVARIANT,  1 },
-    { "NOLOOPREVERSE",  P_LOOPREV,      1 },
-    { "INDUCTION",      P_INDUCTION,    1 },
-    { "STACKAUTO",      P_STACKAUTO,    1 },
-    { "NOJTBOUND",      P_NOJTBOUND,    1 },
-    { "NOGCSE",         P_NOGCSE,       1 },
-    { "NOOVERLAY",      P_NOOVERLAY,    1 },
-    { "CALLEE-SAVES",   P_CALLEE_SAVES, 1 },
-    { "EXCLUDE",        P_EXCLUDE,      1 },
-    { "NOIV",           P_NOIV,         1 },
-    { "OVERLAY",        P_OVERLAY_,     1 },
-    { "LESS_PEDANTIC",  P_LESSPEDANTIC, 1 },
-  };
-  char *cp;
+  struct pragma_token_s token;
   int i;
+  int ret = 0;
 
-  /* find the pragma */
-  while (strncmp(s, PRAGMA_STR, PRAGMA_LEN))
-    s++;
-  s += PRAGMA_LEN;
+  init_pragma_token(&token);
 
-  /* look for the directive */
-  while(isspace((unsigned char)*s))
-    s++;
-
-  cp = s;
-  /* look for the end of the directive */
-  while ((!isspace((unsigned char)*s)) && (*s != '\n'))
-    s++ ;
+  s = get_pragma_token(s, &token);
 
   /* skip separating whitespace */
-  while (isspace((unsigned char)*s) && (*s != '\n'))
+  while ('\n' != *s && isspace((unsigned char)*s))
     s++;
 
-  /* First give the port a chance */
-  if (port->process_pragma && !port->process_pragma(cp))
-    return 0;
-
-  for (i = 0; i < NELEM(pragma_tbl); i++)
+  for (i = 0; NULL != pragma_tbl[i].name; ++i)
     {
       /* now compare and do what needs to be done */
-      size_t len = strlen(pragma_tbl[i].name);
-
-      if (strncmp(cp, pragma_tbl[i].name, len) == 0)
+      if (strcmp(get_pragma_string(&token), pragma_tbl[i].name) == 0)
         {
           if (pragma_tbl[i].deprecated != 0)
             werror(W_DEPRECATED_PRAGMA, pragma_tbl[i].name);
 
-          doPragma(pragma_tbl[i].id, s);
-          return 0;
+          ret = (*pragma_tbl[i].func)(pragma_tbl[i].id, pragma_tbl[i].name, s);
+          break;
         }
     }
 
-  werror(W_UNKNOWN_PRAGMA, cp);
-  return 0;
+  free_pragma_token(&token);
+  return ret;
+}
+
+static int process_pragma(const char *s)
+{
+  struct pragma_token_s token;
+
+  init_pragma_token(&token);
+
+  s = get_pragma_token(s, &token);
+  if (0 != strcmp("#pragma", get_pragma_string(&token)))
+    {
+      /* Oops, womething went totally wrong - internal error */
+    }
+
+  /* skip spaces */
+  while ('\n' != *s && isspace((unsigned char)*s))
+    ++s;
+
+  /* First give the port a chance */
+  if (port->process_pragma && port->process_pragma(s))
+    return 1;
+
+  if (process_pragma_tbl(pragma_tbl, s))
+    {
+      return 1;
+    }
+  else
+    {
+      werror(W_UNKNOWN_PRAGMA, s);
+      return 0;
+    }
 }
 
 /* will return 1 if the string is a part
@@ -826,7 +1039,7 @@ static int isTargetKeyword(char *s)
 
   if (port->keywords == NULL)
     return 0;
-  
+
   if (s[0] == '_' && s[1] == '_')
     {
       /* Keywords in the port's array have either 0 or 1 underscore, */
@@ -864,16 +1077,13 @@ int yyerror(char *s)
 {
   fflush(stdout);
 
-  if (mylineno && filename) {
-    if(options.vc_err_style)
-      fprintf(stderr, "\n%s(%d) : %s: token -> '%s' ; column %d\n",
-        filename, mylineno, s, yytext, column);
-    else
-      fprintf(stderr, "\n%s:%d: %s: token -> '%s' ; column %d\n",
-        filename, mylineno, s ,yytext, column);
-    fatalError++;
-  } else {
-    /* this comes from an empy file, no problem */
-  }
+  if(options.vc_err_style)
+    fprintf(stderr, "\n%s(%d) : %s: token -> '%s' ; column %d\n",
+      filename, mylineno, s, yytext, column);
+  else
+    fprintf(stderr, "\n%s:%d: %s: token -> '%s' ; column %d\n",
+      filename, mylineno, s ,yytext, column);
+  fatalError++;
+
   return 0;
 }

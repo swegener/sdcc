@@ -31,7 +31,6 @@
 #include "SDCCutil.h"
 #include "glue.h"
 #include "pcode.h"
-//#include "gen.h"
 
 
 static char _defaultRules[] =
@@ -161,258 +160,347 @@ struct {
 } libflags = { 0, 0, 0, 0, 0 };
   
 
+enum {
+  P_MAXRAM = 1,
+  P_STACK,
+  P_CODE,
+  P_UDATA,
+  P_LIBRARY
+};
+
 static int
-_process_pragma(const char *sz)
+do_pragma(int id, const char *name, const char *cp)
 {
-  static const char *WHITE = " \t\n";
-  static const char *WHITECOMMA = " \t\n,";
-  char *ptr = strtok((char *)sz, WHITE);
+  struct pragma_token_s token;
+  int err = 0;
+  int processed = 1;
 
+  init_pragma_token(&token);
+
+  switch (id)
+    {
     /* #pragma maxram [maxram] */
-    if (startsWith (ptr, "maxram")) {
-      char *maxRAM = strtok((char *)NULL, WHITE);
+    case P_MAXRAM:
+      {
+        int max_ram;
 
-        if (maxRAM != (char *)NULL) {
-          int maxRAMaddress;
-          value *maxRAMVal;
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_INT == token.type)
+          max_ram = token.val.int_val;
+        else
+          {
+            err = 1;
+            break;
+          }
 
-            maxRAMVal = constVal(maxRAM);
-            maxRAMaddress = (int)floatFromVal(maxRAMVal);
-            pic16_setMaxRAM(maxRAMaddress);
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        pic16_setMaxRAM(max_ram);
+      }
+      break;
+
+    /* #pragma stack [stack-position] [stack-len] */
+    case  P_STACK:
+      {
+        unsigned int stackPos, stackLen;
+        regs *reg;
+        symbol *sym;
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_INT != token.type)
+          {
+            err = 1;
+            break;
+          }
+        stackPos = token.val.int_val;
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_INT != token.type)
+          {
+            err = 1;
+            break;
+          }
+        stackLen = token.val.int_val;
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        if (stackLen < 1) {
+          stackLen = 64;
+          fprintf(stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
+                  filename, lineno, stackLen, stackLen);
         }
 
-        return 0;
-    }
-  
-  /* #pragma stack [stack-position] [stack-len] */
-  if(startsWith(ptr, "stack")) {
-    char *stackPosS = strtok((char *)NULL, WHITE);
-    char *stackLenS = strtok((char *)NULL, WHITE);
-    value *stackPosVal;
-    value *stackLenVal;
-    regs *reg;
-    symbol *sym;
-
-      if (!stackPosS) {
-        fprintf (stderr, "%s:%d: #pragma stack [stack-pos] [stack-length] -- stack-position missing\n", filename, lineno-1);
-
-        return 0; /* considered an error */
-      }
-
-      stackPosVal = constVal( stackPosS );
-      stackPos = (unsigned int)floatFromVal( stackPosVal );
-
-      if(stackLenS) {
-        stackLenVal = constVal( stackLenS );
-        stackLen = (unsigned int)floatFromVal( stackLenVal );
-      }
-
-      if(stackLen < 1) {
-        stackLen = 64;
-        fprintf(stderr, "%s:%d: warning: setting stack to default size %d (0x%04x)\n",
-                filename, lineno-1, stackLen, stackLen);
-      }
-
-      /* check sanity of stack */
-      if ((stackPos >> 8) != ((stackPos+stackLen-1) >> 8)) {
-        fprintf (stderr, "%s:%u: warning: stack [0x%03X,0x%03X] crosses memory bank boundaries (not fully tested)\n",
-		filename,lineno-1, stackPos, stackPos+stackLen-1);
-      }
-
-      if (pic16) {
-        if (stackPos < pic16->acsSplitOfs) {
-          fprintf (stderr, "%s:%u: warning: stack [0x%03X, 0x%03X] intersects with the access bank [0x000,0x%03x] -- this is highly discouraged!\n",
-		filename, lineno-1, stackPos, stackPos+stackLen-1, pic16->acsSplitOfs);
+        /* check sanity of stack */
+        if ((stackPos >> 8) != ((stackPos + stackLen - 1) >> 8)) {
+          fprintf (stderr, "%s:%u: warning: stack [0x%03X,0x%03X] crosses memory bank boundaries (not fully tested)\n",
+                  filename, lineno, stackPos, stackPos + stackLen - 1);
         }
 
-        if (stackPos+stackLen > 0xF00 + pic16->acsSplitOfs) {
-          fprintf (stderr, "%s:%u: warning: stack [0x%03X,0x%03X] intersects with special function registers [0x%03X,0xFFF]-- this is highly discouraged!\n",
-		filename, lineno-1, stackPos, stackPos+stackLen-1, 0xF00 + pic16->acsSplitOfs);
+        if (pic16) {
+          if (stackPos < pic16->acsSplitOfs) {
+            fprintf (stderr, "%s:%u: warning: stack [0x%03X, 0x%03X] intersects with the access bank [0x000,0x%03x] -- this is highly discouraged!\n",
+                  filename, lineno, stackPos, stackPos + stackLen - 1, pic16->acsSplitOfs);
+          }
+
+          if (stackPos+stackLen > 0xF00 + pic16->acsSplitOfs) {
+            fprintf (stderr, "%s:%u: warning: stack [0x%03X,0x%03X] intersects with special function registers [0x%03X,0xFFF]-- this is highly discouraged!\n",
+                   filename, lineno, stackPos, stackPos + stackLen - 1, 0xF00 + pic16->acsSplitOfs);
+          }
+
+          if (stackPos+stackLen > pic16->RAMsize) {
+            fprintf (stderr, "%s:%u: error: stack [0x%03X,0x%03X] is placed outside available memory [0x000,0x%03X]!\n",
+                  filename, lineno, stackPos, stackPos + stackLen - 1, pic16->RAMsize-1);
+            err = 1;
+            break;
+          }
         }
 
-        if (stackPos+stackLen > pic16->RAMsize) {
-          fprintf (stderr, "%s:%u: error: stack [0x%03X,0x%03X] is placed outside available memory [0x000,0x%03X]!\n",
-		filename, lineno-1, stackPos, stackPos+stackLen-1, pic16->RAMsize-1);
-          exit(EXIT_FAILURE);
-          return 1;	/* considered an error, but this reports "invalid pragma stack"... */
+        reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
+        addSet(&pic16_fix_udata, reg);
+
+        reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos + stackLen-1, "_stack_end", 1, 0, NULL);
+        addSet(&pic16_fix_udata, reg);
+
+        sym = newSymbol("stack", 0);
+        sprintf(sym->rname, "_%s", sym->name);
+        addSet(&publics, sym);
+
+        sym = newSymbol("stack_end", 0);
+        sprintf(sym->rname, "_%s", sym->name);
+        addSet(&publics, sym);
+    
+        initsfpnt = 1;    // force glue() to initialize stack/frame pointers */
+      }
+      break;
+
+    /* #pragma code [symbol] [location] */
+    case P_CODE:
+      {
+        absSym *absS;
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_STR != token.type)
+          goto code_err;
+
+        absS = Safe_calloc(1, sizeof(absSym));
+        sprintf(absS->name, "_%s", get_pragma_string(&token));
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_INT != token.type)
+          {
+          code_err:
+            //fprintf (stderr, "%s:%d: #pragma code [symbol] [location] -- symbol or location missing\n", filename, lineno);
+            err = 1;
+            break;
+          }
+        absS->address = token.val.int_val;
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+
+        if ((absS->address % 2) != 0) {
+          absS->address--;
+          fprintf(stderr, "%s:%d: warning: code memory locations should be word aligned, will locate to 0x%06x instead\n",
+                  filename, lineno, absS->address);
         }
+
+        addSet(&absSymSet, absS);
+//      fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
+//        __FILE__, __LINE__, symname, absS->address);
       }
+      break;
 
-      reg=newReg(REG_SFR, PO_SFR_REGISTER, stackPos, "_stack", stackLen-1, 0, NULL);
-      addSet(&pic16_fix_udata, reg);
-    
-      reg = newReg(REG_SFR, PO_SFR_REGISTER, stackPos + stackLen-1, "_stack_end", 1, 0, NULL);
-      addSet(&pic16_fix_udata, reg);
-    
-      sym = newSymbol("stack", 0);
-      sprintf(sym->rname, "_%s", sym->name);
-      addSet(&publics, sym);
+    /* #pragma udata [section-name] [symbol] */
+    case P_UDATA:
+      {
+        char *sectname;
+        const char *symname;
+        symbol *nsym;
+        sectSym *ssym;
+        sectName *snam;
+        int found = 0;
 
-      sym = newSymbol("stack_end", 0);
-      sprintf(sym->rname, "_%s", sym->name);
-      addSet(&publics, sym);
-    
-      initsfpnt = 1;    // force glue() to initialize stack/frame pointers */
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL == token.type)
+          goto udata_err;
 
-    return 0;
-  }
-  
-  /* #pragma code [symbol] [location] */
-  if(startsWith(ptr, "code")) {
-    char *symname = strtok((char *)NULL, WHITE);
-    char *location = strtok((char *)NULL, WHITE);
-    absSym *absS;
-    value *addr;
+        sectname = Safe_strdup(get_pragma_string(&token));
 
-      if (!symname || !location) {
-        fprintf (stderr, "%s:%d: #pragma code [symbol] [location] -- symbol or location missing\n", filename, lineno-1);
-	exit (EXIT_FAILURE);
-        return 1; /* considered an error, but this reports "invalid pragma code"... */
-      }
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL == token.type)
+          {
+          udata_err:
+            //fprintf (stderr, "%s:%d: #pragma udata [section-name] [symbol] -- section-name or symbol missing!\n", filename, lineno);
+            err = 1;
+            break;
+          }
+        symname = get_pragma_string(&token);
 
-      absS = Safe_calloc(1, sizeof(absSym));
-      sprintf(absS->name, "_%s", symname);
-    
-      addr = constVal( location );
-      absS->address = (unsigned int)floatFromVal( addr );
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
 
-      if((absS->address % 2) != 0) {
-        absS->address--;
-        fprintf(stderr, "%s:%d: warning: code memory locations should be word aligned, will locate to 0x%06x instead\n",
-                filename, lineno-1, absS->address);
-      }
+        while (symname) {
+          ssym = Safe_calloc(1, sizeof(sectSym));
+          ssym->name = Safe_calloc(1, strlen(symname) + 2);
+          sprintf(ssym->name, "%s%s", port->fun_prefix, symname);
+          ssym->reg = NULL;
 
-      addSet(&absSymSet, absS);
-//    fprintf(stderr, "%s:%d symbol %s will be placed in location 0x%06x in code memory\n",
-//      __FILE__, __LINE__, symname, absS->address);
+          addSet(&sectSyms, ssym);
 
-    return 0;
-  }
-
-  /* #pragma udata [section-name] [symbol] */
-  if(startsWith(ptr, "udata")) {
-    char *sectname = strtok((char *)NULL, WHITE);
-    char *symname = strtok((char *)NULL, WHITE);
-    symbol *nsym;
-    sectSym *ssym;
-    sectName *snam;
-    int found=0;
-    
-      if (!symname || !sectname) {
-        fprintf (stderr, "%s:%d: #pragma udata [section-name] [symbol] -- section-name or symbol missing!\n", filename, lineno-1);
-	exit (EXIT_FAILURE);
-        return 1; /* considered an error, but this reports "invalid pragma code"... */
-      }
-    
-      while(symname) {
-        ssym = Safe_calloc(1, sizeof(sectSym));
-        ssym->name = Safe_calloc(1, strlen(symname)+2);
-        sprintf(ssym->name, "%s%s", port->fun_prefix, symname);
-        ssym->reg = NULL;
-
-        addSet(&sectSyms, ssym);
-
-        nsym = newSymbol(symname, 0);
-        strcpy(nsym->rname, ssym->name);
+          nsym = newSymbol((char *)symname, 0);
+          strcpy(nsym->rname, ssym->name);
 
 #if 0
-        checkAddSym(&publics, nsym);
+          checkAddSym(&publics, nsym);
 #endif
 
-        found = 0;
-        for(snam=setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {
-          if(!strcmp(sectname, snam->name)){ found=1; break; }
-        }
-      
-        if(!found) {
-          snam = Safe_calloc(1, sizeof(sectName));
-          snam->name = Safe_strdup( sectname );
-          snam->regsSet = NULL;
-        
-          addSet(&sectNames, snam);
-        }
-      
-        ssym->section = snam;
-        
+          found = 0;
+          for (snam = setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {
+            if (!strcmp(sectname, snam->name)){ found=1; break; }
+          }
+
+          if(!found) {
+            snam = Safe_calloc(1, sizeof(sectName));
+            snam->name = Safe_strdup(sectname);
+            snam->regsSet = NULL;
+
+            addSet(&sectNames, snam);
+          }
+
+          ssym->section = snam;
+
 #if 0
-        fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
-           ssym->name, snam->name, snam);
+          fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
+             ssym->name, snam->name, snam);
 #endif
 
-        symname = strtok((char *)NULL, WHITE);
-    }
-
-    return 0;
-  }
-  
-  /* #pragma wparam function1[, function2[,...]] */
-  if(startsWith(ptr, "wparam")) {
-    char *fname = strtok((char *)NULL, WHITECOMMA);
-
-      
-      while(fname) {
-        fprintf(stderr, "PIC16 Warning: `%s' wparam pragma is obsolete. use function attribute `wparam' instead.\n", fname);
-        addSet(&wparamList, Safe_strdup(fname));
-              
-//        debugf("passing with WREG to %s\n", fname);
-        fname = strtok((char *)NULL, WHITECOMMA);
-      }
-            
-      return 0;
-  }
-        
-  /* #pragma library library_module */
-  if(startsWith(ptr, "library")) {
-  char *lmodule = strtok((char *)NULL, WHITE);
-        
-    if(lmodule) {
-      /* lmodule can be:
-       * c	link the C library
-       * math	link the math library
-       * io	link the IO library
-       * debug	link the debug libary
-       * anything else, will link as-is */
-       
-      if(!strcmp(lmodule, "c"))libflags.want_libc = 1;
-      else if(!strcmp(lmodule, "math"))libflags.want_libm = 1;
-      else if(!strcmp(lmodule, "io"))libflags.want_libio = 1;
-      else if(!strcmp(lmodule, "debug"))libflags.want_libdebug = 1;
-      else if(!strcmp(lmodule, "ignore"))libflags.ignore = 1;
-      else {
-        if(!libflags.ignore) {
-          fprintf(stderr, "link library %s\n", lmodule);
-          addSetHead(&libFilesSet, lmodule);
+          cp = get_pragma_token(cp, &token);
+          symname = (TOKEN_EOL != token.type) ? get_pragma_string(&token) : NULL;
         }
+
+        Safe_free(sectname);
       }
-    }
-    
-    return 0;
-  }
-   
+      break;
+
+    /* #pragma library library_module */
+    case P_LIBRARY:
+      {
+        const char *lmodule;
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            lmodule = get_pragma_string(&token);
+
+            /* lmodule can be:
+             * c	link the C library
+             * math	link the math library
+             * io	link the IO library
+             * debug	link the debug libary
+             * anything else, will link as-is */
+     
+            if(!strcmp(lmodule, "c"))libflags.want_libc = 1;
+            else if(!strcmp(lmodule, "math"))
+              libflags.want_libm = 1;
+            else if(!strcmp(lmodule, "io"))
+              libflags.want_libio = 1;
+            else if(!strcmp(lmodule, "debug"))
+              libflags.want_libdebug = 1;
+            else if(!strcmp(lmodule, "ignore"))
+              libflags.ignore = 1;
+            else
+              {
+                if(!libflags.ignore)
+                  {
+                    fprintf(stderr, "link library %s\n", lmodule);
+                    addSetHead(&libFilesSet, (char *)lmodule);
+                  }
+              }
+          }
+        else
+          {
+            err = 1;
+            break;
+          }
+
+        cp = get_pragma_token(cp, &token);
+        if (TOKEN_EOL != token.type)
+          {
+            err = 1;
+            break;
+          }
+      }
+      break;
+
 #if 0
   /* This is an experimental code for #pragma inline
      and is temporarily disabled for 2.5.0 release */
-  if(startsWith(ptr, "inline")) {
-    char *tmp = strtok((char *)NULL, WHITECOMMA);
-
-      while(tmp) {
-        addSet(&asmInlineMap, Safe_strdup( tmp ));
-        tmp = strtok((char *)NULL, WHITECOMMA);
-      }
-
+    case P_INLINE:
       {
-        char *s;
+        char *tmp = strtok((char *)NULL, WHITECOMMA);
+
+        while(tmp) {
+          addSet(&asmInlineMap, Safe_strdup( tmp ));
+          tmp = strtok((char *)NULL, WHITECOMMA);
+        }
+
+        {
+          char *s;
           
           for(s = setFirstItem(asmInlineMap); s ; s = setNextItem(asmInlineMap)) {
             debugf("inline asm: `%s'\n", s);
           }
+        }
       }
-      
-      return 0;
-  }
+      break;
 #endif  /* 0 */
 
-  return 1;
+    default:
+      processed = 0;
+      break;
+  }
+
+  get_pragma_token(cp, &token);
+
+  if (1 == err)
+    werror(W_BAD_PRAGMA_ARGUMENTS, name);
+
+  free_pragma_token(&token);
+  return processed;
+}
+
+static struct pragma_s pragma_tbl[] = {
+  { "maxram",  P_MAXRAM,  0, do_pragma },
+  { "stack",   P_STACK,   0, do_pragma },
+  { "code",    P_CODE,    0, do_pragma },
+  { "udata",   P_UDATA,   0, do_pragma },
+  { "library", P_LIBRARY, 0, do_pragma },
+/*{ "inline",  P_INLINE,  0, do_pragma }, */
+  { NULL,      0,         0, NULL },
+  };
+
+static int
+_process_pragma(const char *s)
+{
+  return process_pragma_tbl(pragma_tbl, s);
 }
 
 #define REP_UDATA	"--preplace-udata-with="

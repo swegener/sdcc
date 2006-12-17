@@ -1,6 +1,6 @@
 /*
   dbuf.c - Dynamic buffer implementation
-  version 1.1.2, May 22th, 2006
+  version 1.1.3, December 17th, 2006
 
   Copyright (c) 2002-2006 Borut Razem
 
@@ -105,7 +105,7 @@ int dbuf_set_size(struct dbuf_s *dbuf, size_t size)
 {
   assert(dbuf != NULL);
   assert(dbuf->alloc != 0);
-  assert(size < dbuf->len);
+  assert(size <= dbuf->len);
 
   if (size <= dbuf->len) {
     dbuf->len = size;

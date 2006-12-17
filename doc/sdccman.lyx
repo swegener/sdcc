@@ -10658,7 +10658,7 @@ portmode
 
 \end_inset 
 
-=z180 (z80) is used to turn on (off) the Z180/HD64180 port addressing instructio
+ z180 (z80) is used to turn on (off) the Z180/HD64180 port addressing instructio
 ns 
 \family typewriter 
 in0/out0
@@ -19204,17 +19204,6 @@ If the stack_size field is omitted then a stack is created with the default
 \layout List
 \labelwidthstring 00.00.0000
 
-wparam 
-\emph on 
-This pragma is deprecated.
- Its use will cause a warning message to be issued.
-\emph default 
-
-\newline 
-
-\layout List
-\labelwidthstring 00.00.0000
-
 code
 \begin_inset LatexCommand \index{PIC16!Pragmas!\#pragma code}
 
@@ -20039,9 +20028,6 @@ void func_wparam(int a) wparam
 \layout LyX-Code
 
 }
-\layout Standard
-
-This keyword replaces the deprecated wparam pragma.
 \layout List
 \labelwidthstring 00.00.0000
 

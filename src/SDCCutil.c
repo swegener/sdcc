@@ -23,9 +23,9 @@
 -------------------------------------------------------------------------*/
 
 #include <math.h>
+#include <ctype.h>
 
 #ifdef _WIN32
-#include <ctype.h>
 #include <windows.h>
 #endif
 #include <sys/stat.h>
@@ -325,5 +325,66 @@ size_t SDCCsnprintf(char *dst, size_t n, const char *fmt, ...)
 
   return len;
 }
-
 #endif
+
+/** Pragma tokenizer
+ */
+void
+init_pragma_token(struct pragma_token_s *token)
+{
+  dbuf_init(&token->dbuf, 16);
+  token->type = TOKEN_UNKNOWN;
+}
+
+char *
+get_pragma_token(const char *s, struct pragma_token_s *token)
+{
+  dbuf_set_size(&token->dbuf, 0);
+
+  /* skip leading spaces */
+  while (*s != '\n' && isspace(*s))
+    ++s;
+
+  if ('\0' == *s || '\n' == *s)
+    {
+      token->type = TOKEN_EOL;
+    }
+  else if (isdigit(*s))
+    {
+      char *end;
+
+      long val = strtol(s, &end, 0);
+
+      if (end != s && ('\0' == *end || isspace(*s)))
+        {
+          token->val.int_val = val;
+          token->type = TOKEN_INT;
+          dbuf_append(&token->dbuf, s, end - s);
+        }
+      s = end;
+    }
+  else
+    {
+      while ('\0' != *s && !isspace(*s))
+        {
+          dbuf_append(&token->dbuf, s, 1);
+          ++s;
+        }
+
+      token->type = TOKEN_STR;
+    }
+
+    return (char *)s;
+}
+
+const char *
+get_pragma_string(struct pragma_token_s *token)
+{
+  return dbuf_c_str(&token->dbuf);
+}
+
+void
+free_pragma_token(struct pragma_token_s *token)
+{
+  dbuf_destroy(&token->dbuf);
+}

@@ -192,7 +192,7 @@ do_pragma(int id, const char *name, const char *cp)
             {
               const char *str = get_pragma_string(&token);
 
-              strcpy(buffer, (0 == strcmp("BASE", str)) ? "HOME" : str);
+              strncpyz(buffer, (0 == strcmp("BASE", str)) ? "HOME" : str, sizeof buffer);
             }
             break;
           }

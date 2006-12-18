@@ -754,8 +754,7 @@ static int doPragma(int id, const char *name, const char *cp)
         int warn;
 
         cp = get_pragma_token(cp, &token);
-
-        if (token.type != TOKEN_INT)
+        if (TOKEN_INT != token.type)
           {
             err = 1;
             break;

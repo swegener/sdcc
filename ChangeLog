@@ -1,3 +1,9 @@
+2006-12-18 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCutil.c: fixed a bug in (get_pragma_token)
+	* src/pic16/main.c, src/SDCC.lex, src/z80/main.c:
+	  small cosmetic changes
+
 2006-12-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* doc/sdccman.lyx: added the long missed iCode table 

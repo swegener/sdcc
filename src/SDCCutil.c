@@ -355,7 +355,7 @@ get_pragma_token(const char *s, struct pragma_token_s *token)
 
       long val = strtol(s, &end, 0);
 
-      if (end != s && ('\0' == *end || isspace(*s)))
+      if (end != s && ('\0' == *end || isspace(*end)))
         {
           token->val.int_val = val;
           token->type = TOKEN_INT;

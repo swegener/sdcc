@@ -417,7 +417,8 @@ do_pragma(int id, const char *name, const char *cp)
              * debug	link the debug libary
              * anything else, will link as-is */
      
-            if(!strcmp(lmodule, "c"))libflags.want_libc = 1;
+            if(!strcmp(lmodule, "c"))
+              libflags.want_libc = 1;
             else if(!strcmp(lmodule, "math"))
               libflags.want_libm = 1;
             else if(!strcmp(lmodule, "io"))

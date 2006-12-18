@@ -60,8 +60,8 @@ static char *stringLiteral(void);
 static void count(void);
 static int process_pragma(const char *);
 static int check_type(void);
-static int isTargetKeyword(char *s);
-static int checkCurrFile(char *s);
+static int isTargetKeyword(const char *s);
+static int checkCurrFile(const char *s);
 %}
 
 %x asm
@@ -265,7 +265,7 @@ _?"_asm"         {
 #endif
 
 
-static int checkCurrFile (char *s)
+static int checkCurrFile (const char *s)
 {
     int  lNum;
     char *tptr;
@@ -289,8 +289,8 @@ static int checkCurrFile (char *s)
     s = tptr;
 
     /* now see if we have a file name */
-    while (*s != '\"' && *s)
-      s++;
+    while (*s != '"' && *s)
+      ++s;
 
     /* if we don't have a filename then */
     /* set the current line number to   */
@@ -303,20 +303,24 @@ static int checkCurrFile (char *s)
     /* if we have a filename then check */
     /* if it is "standard in" if yes then */
     /* get the currentfile name info    */
-    s++ ;
+    ++s;
 
     /* in c1mode fullSrcFileName is NULL */
     if (fullSrcFileName &&
          strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0) {
       lineno = mylineno = lNum;
       currFname = fullSrcFileName;
-    } else {
-        char *sb = s;
-        /* mark the end of the filename */
-        while (*s != '"') s++;
-        *s = '\0';
-        currFname = strdup (sb);
-        lineno = mylineno = lNum;
+    }
+    else {
+      const char *sb = s;
+
+      /* find the end of the filename */
+      while (*s && *s != '"')
+        ++s;
+      currFname = Safe_malloc(s - sb + 1);
+      memcpy(currFname, sb, s - sb);
+      currFname[s - sb] = '\0';
+      lineno = mylineno = lNum;
     }
     filename = currFname ;
     return 0;
@@ -408,7 +412,7 @@ static char *stringLiteral(void)
       /* find the next non whitespace character     */
       /* if that is a double quote then carry on    */
       dbuf_append(&dbuf, "\"", 1);  /* Pass end of this string or substring to evaluator */
-      while ((ch = input()) && (isspace(ch) || ch == '\\')) {
+      while ((ch = input()) && (isspace(ch) || ch == '\\' || ch == '#')) {
         switch (ch) {
         case '\\':
           if ((ch = input()) != '\n') {
@@ -422,15 +426,46 @@ static char *stringLiteral(void)
           break;
 
         case '\n':
-          mylineno++;
+          lineno = ++mylineno;
+          column = 0;
           break;
+
+        case '#':
+          if (0 == column) {
+            /* # at the beginning of the line: collect the entire line */
+            struct dbuf_s linebuf;
+            const char *line;
+            
+            dbuf_init(&linebuf, STR_BUF_CHUNCK_LEN);
+            dbuf_append(&linebuf, "#", 1);
+
+            while ((ch = input()) && ch != '\n') {
+              buf[0] = ch;
+              dbuf_append(&linebuf, buf, 1);
+            }
+
+            if (ch == '\n') {
+              lineno = ++mylineno;
+              column = 0;
+            }
+
+            line = dbuf_c_str(&linebuf);
+
+            /* process the line */
+            if (startsWith(line, "#pragma"))
+              process_pragma(line);
+            else
+              checkCurrFile(line);
+
+            dbuf_destroy(&linebuf);
+          }
         }
       }
 
       if (!ch)
         goto out;
 
-      if (ch != '\"') {
+      if (ch != '"') {
         unput(ch);
         goto out;
       }
@@ -1033,7 +1068,7 @@ static int process_pragma(const char *s)
 
 /* will return 1 if the string is a part
    of a target specific keyword */
-static int isTargetKeyword(char *s)
+static int isTargetKeyword(const char *s)
 {
   int i;
 

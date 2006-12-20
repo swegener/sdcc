@@ -43,6 +43,10 @@ typedef unsigned char uchar;
     || (((prevc) == 'p' || (prevc) == 'P') \
         && CPP_OPTION (pfile, extended_numbers))))
 
+/* Test if a X or x is valid within a preprocessing number.  */
+#define VALID_HEX(c, prevc) \
+  (((c) == 'X' || (c) == 'x') && (prevc) == '0')
+
 #define CPP_OPTION(PFILE, OPTION) ((PFILE)->opts.OPTION)
 #define CPP_BUFFER(PFILE) ((PFILE)->buffer)
 #define CPP_BUF_COLUMN(BUF, CUR) ((CUR) - (BUF)->line_base + (BUF)->col_adjust)

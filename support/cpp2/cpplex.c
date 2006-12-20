@@ -577,26 +577,42 @@ parse_slow (pfile, cur, number_p, plen)
       if (c == '?' || c == '\\')
 	c = skip_escaped_newlines (pfile);
 
-      if (!is_idchar (c))
-	{
-	  if (!number_p)
+      if (number_p)
+        {
+          if (!ISXDIGIT (c) && c != '.' && !VALID_SIGN (c, prevc) && !VALID_HEX (c, prevc))
 	    break;
-	  if (c != '.' && !VALID_SIGN (c, prevc))
-	    break;
-	}
 
-      /* Handle normal identifier characters in this loop.  */
-      do
-	{
-	  prevc = c;
-	  obstack_1grow (stack, c);
+            obstack_1grow (stack, c);
 
-	  if (c == '$')
-	    saw_dollar++;
+            base = cur = buffer->cur;
+            while (ISXDIGIT (*cur))
+              ++cur;
 
-	  c = *buffer->cur++;
-	}
-      while (is_idchar (c));
+            if (cur != base)
+              obstack_grow (stack, base, cur - base);
+
+            prevc = cur[-1];
+            c = *cur++;
+            buffer->cur = cur;
+        }
+      else
+        {
+          if (!is_idchar (c))
+            break;
+
+          /* Handle normal identifier characters in this loop.  */
+          do
+	    {
+	      prevc = c;
+	      obstack_1grow (stack, c);
+
+	      if (c == '$')
+	        saw_dollar++;
+
+	      c = *buffer->cur++;
+	    }
+          while (is_idchar (c));
+        }
     }
 
   /* Step back over the unwanted char.  */
@@ -628,7 +644,8 @@ parse_number (pfile, number, leading_period)
   /* Fast-path loop.  Skim over a normal number.
      N.B. ISIDNUM does not include $.  */
   cur = pfile->buffer->cur;
-  while (ISIDNUM (*cur) || *cur == '.' || VALID_SIGN (*cur, cur[-1]))
+
+  while (ISXDIGIT (*cur) || *cur == '.' || VALID_SIGN (*cur, cur[-1]) || VALID_HEX (*cur, cur[-1]))
     cur++;
 
   /* Check for slow-path cases.  */

@@ -1,3 +1,9 @@
+2006-12-20 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/cpphash.h, support/cpp2/cpplex.c: fixed bug #982435
+	* support/regression/tests/bug-1351710.c: renamed from bug-1351710.c,
+	  added regression test for bug #982435
+
 2006-12-18 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCutil.c: fixed a bug in (get_pragma_token)

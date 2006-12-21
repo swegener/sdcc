@@ -1,3 +1,29 @@
+2006-12-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/mcs51/lkarea.c (lnkarea2): handle absolute areas, restructured
+	   BSEG handling,
+	  (lnksect2): use --data-loc and --idata-loc as lower bound for ramstart,
+	   corrected overlayed areax addresses, warn about memory overlaps
+	* as/mcs51/asmain.c (asmbl): create a new area for every .org directive
+	* src/avr/main.c,
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/mcs51/main.c,
+	* src/pic16/main.c,
+	* src/pic/main.c,
+	* src/xa51/main.c,
+	* src/z80/main.c,
+	* src/port.h: added xabs_name and iabs_name
+	* src/SDCCglue.c (emitRegularMap): allocate for absolutes with initializer
+	  (glue, emitMaps): create and emit maps d_abs and i_abs
+	* src/SDCCglue.h: cosmetic changes
+	* src/SDCCmain.c (setDefaultOptions): idata can start below 0x80
+	* src/SDCCmem.h,
+	* src/SDCCmem.c (initMem): added x_abs, i_abs and d_abs
+	  (allocDefault): put absolute, initialized globals in them
+	* support/regression/tests/absolute.c: added absolute bdata test
+	* device/lib/printf_large.c (output_float): moved fpBuffer to stack/xdata
+
 2006-12-20 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2/cpphash.h, support/cpp2/cpplex.c: fixed bug #982435

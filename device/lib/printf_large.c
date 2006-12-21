@@ -211,6 +211,7 @@ output_float (float f, unsigned char reqWidth,
               pfn_outputchar output_char, void* p)
 {
   unsigned char charsOutputted = 0;
+  char fpBuffer[128];
 #else
 #define OUTPUT_FLOAT(F, W, D, L, Z, S, P)	output_float(F, W, D, L, Z, S, P)
 static void
@@ -218,11 +219,11 @@ output_float (float f, unsigned char reqWidth,
               signed char reqDecimals,
               BOOL left, BOOL zero, BOOL sign, BOOL space)
 {
+  xdata char fpBuffer[128];
 #endif //SDCC_STACK_AUTO
   BOOL negative = 0;
   unsigned long integerPart;
   float decimalPart;
-  char fpBuffer[128];
   char fpBI=0, fpBD;
   unsigned char minWidth, i;
 

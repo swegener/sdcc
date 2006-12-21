@@ -883,6 +883,8 @@ PORT ds390_port =
     "XINIT   (CODE)",		// a code copy of xiseg
     "CONST   (CODE)",		// const_name - const data (code or not)
     "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
+    "XABS    (ABS,XDATA)",	// xabs_name - absolute xdata/pdata
+    "IABS    (ABS,DATA)",	// iabs_name - absolute idata/data
     NULL,
     NULL,
     1
@@ -1200,6 +1202,8 @@ PORT tininative_port =
     NULL,
     "CONST   (CODE)",		// const_name - const data (code or not)
     "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
+    "XABS    (ABS,XDATA)",	// xabs_name - absolute xdata/pdata
+    "IABS    (ABS,DATA)",	// iabs_name - absolute idata/data
     NULL,
     NULL,
     1
@@ -1433,6 +1437,8 @@ PORT ds400_port =
     "XINIT   (CODE)", // a code copy of xiseg
     "CONST   (CODE)",		// const_name - const data (code or not)
     "CABS    (ABS,CODE)",	// cabs_name - const absolute data (code or not)
+    "XABS    (ABS,XDATA)",	// xabs_name - absolute xdata/pdata
+    "IABS    (ABS,DATA)",	// iabs_name - absolute idata/data
     NULL,
     NULL,
     1

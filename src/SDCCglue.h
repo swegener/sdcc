@@ -41,7 +41,6 @@ extern set *pipeSet;
 extern set *tmpfileNameSet;
 
 void rm_tmpfiles (void);
-int 
-pointerTypeToGPByte (const int p_type, const char *iname, const char *oname);
+int pointerTypeToGPByte (const int p_type, const char *iname, const char *oname);
 
 #endif

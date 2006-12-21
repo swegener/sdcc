@@ -678,6 +678,8 @@ PORT z80_port =
     NULL, /* xinit */
     NULL, /* const_name */
     "CABS", /* cabs_name */
+    NULL, /* xabs_name */
+    NULL, /* iabs_name */
     NULL,
     NULL,
     1
@@ -798,6 +800,8 @@ PORT gbz80_port =
     NULL, /* xinit */
     NULL, /* const_name */
     "CABS", /* cabs_name */
+    NULL, /* xabs_name */
+    NULL, /* iabs_name */
     NULL,
     NULL,
     1

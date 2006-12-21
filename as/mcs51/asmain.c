@@ -483,6 +483,7 @@ asmbl()
 	char fn[PATH_MAX];
 	char *p;
 	int d, n, uaf, uf;
+	static struct area *abs_ap; /* pointer to current absolute area structure */
 
 	laddr = dot.s_addr;
 	lmode = SLIST;
@@ -870,18 +871,31 @@ loop:
 		}
 		newdot(ap);
 		lmode = SLIST;
+		if (dot.s_area->a_flag & A_ABS)
+			abs_ap = ap;
 		break;
 
 	case S_ORG:
 		if (dot.s_area->a_flag & A_ABS) {
-			outall();
-			dot.s_area->a_size += dot.s_addr - dot.s_org;
-			laddr = dot.s_addr = dot.s_org = absexpr();
+			char buf[NCPS];
+			laddr = absexpr();
+			sprintf(buf, "%s%x", abs_ap->a_id, laddr);
+			if ((ap = alookup(buf)) == NULL) {
+				ap = (struct area *) new (sizeof(struct area));
+				*ap = *areap;
+				ap->a_ap = areap;
+				strncpy(ap->a_id, buf, NCPS);
+				ap->a_ref = areap->a_ref + 1;
+				ap->a_size = 0;
+				ap->a_fuzz = 0;
+				areap = ap;
+			}
+			newdot(ap);
+			lmode = ALIST;
+			dot.s_addr = dot.s_org = laddr;
 		} else {
 			err('o');
 		}
-		outall();
-		lmode = ALIST;
 		break;
 
 	case S_RADIX:

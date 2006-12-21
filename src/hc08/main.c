@@ -438,8 +438,10 @@ PORT hc08_port =
     "HOME (CODE)",
     "XISEG", // initialized xdata
     "XINIT", // a code copy of xiseg
-    "CONST   (CODE)", // const_name - const data (code or not)
+    "CONST   (CODE)",     // const_name - const data (code or not)
     "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
+    "XABS    (ABS)",      // xabs_name - absolute xdata
+    "IABS    (ABS)",      // iabs_name - absolute data
     NULL,
     NULL,
     1

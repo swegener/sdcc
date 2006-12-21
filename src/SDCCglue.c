@@ -281,7 +281,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       /* if it has an initial value then do it only if
          it is a global variable */
       if (sym->ival && sym->level == 0) {
-        if (SPEC_OCLS(sym->etype)==xidata) {
+        if ((SPEC_OCLS(sym->etype)==xidata) && !SPEC_ABSA (sym->etype)) {
           /* create a new "XINIT (CODE)" symbol, that will be emitted later
              in the static seg */
           newSym=copySymbol (sym);
@@ -309,8 +309,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
               printIval (sym, sym->type, sym->ival, tmpFile);
               noAlloc--;
             }
-
-          sym->ival=NULL;
         } else {
           if (IS_AGGREGATE (sym->type)) {
             ival = initAggregates (sym, sym->ival, NULL);
@@ -338,12 +336,11 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
             allocInfo = 1;
           }
         }         
-        sym->ival = NULL;
       }
 
       /* if it has an absolute address then generate
          an equate for this no need to allocate space */
-      if (SPEC_ABSA (sym->etype))
+      if (SPEC_ABSA (sym->etype) && !sym->ival)
         {
           char *equ="=";
           if (options.debug) {
@@ -370,13 +367,17 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
           if (options.debug) {
             fprintf (map->oFile, "==.\n");
           }
+          if (SPEC_ABSA (sym->etype))
+            {
+              tfprintf (map->oFile, "\t!org\n", SPEC_ADDR (sym->etype));
+            }
           if (IS_STATIC (sym->etype) || sym->level)
             tfprintf (map->oFile, "!slabeldef\n", sym->rname);
           else
             tfprintf (map->oFile, "!labeldef\n", sym->rname);           
-          tfprintf (map->oFile, "\t!ds\n", 
-                    (unsigned int)  size & 0xffff);
+          tfprintf (map->oFile, "\t!ds\n", (unsigned int) size & 0xffff);
         }
+      sym->ival = NULL;
     }
 }
 
@@ -1346,6 +1347,8 @@ emitMaps (void)
      data, idata & bit & xdata */
   emitRegularMap (data, TRUE, TRUE);
   emitRegularMap (idata, TRUE, TRUE);
+  emitRegularMap (d_abs, TRUE, TRUE);
+  emitRegularMap (i_abs, TRUE, TRUE);
   emitRegularMap (bit, TRUE, TRUE);
   emitRegularMap (pdata, TRUE, TRUE);
   emitRegularMap (xdata, TRUE, TRUE);
@@ -1791,6 +1794,15 @@ glue (void)
     fprintf (asmFile, "; indirectly addressable internal ram data\n");
     fprintf (asmFile, "%s", iComments2);
     copyFile (asmFile, idata->oFile);
+  }
+
+  /* create the absolute idata/data segment */
+  if ( (i_abs) && (mcs51_like) ) {
+    fprintf (asmFile, "%s", iComments2);
+    fprintf (asmFile, "; absolute internal ram data\n");
+    fprintf (asmFile, "%s", iComments2);
+    copyFile (asmFile, d_abs->oFile);
+    copyFile (asmFile, i_abs->oFile);
   }
 
   /* copy the bit segment */

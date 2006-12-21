@@ -567,7 +567,7 @@ setDefaultOptions (void)
   options.code_loc = 0;           /* code starts at 0 */
   options.data_loc = 0;           /* JCF: By default let the linker locate data */
   options.xdata_loc = 0;
-  options.idata_loc = 0x80;
+  options.idata_loc = 0;          /* MB: No need to limit idata to 0x80-0xFF */
   options.nopeep = 0;
   options.model = port->general.default_model;
   options.nostdlib = 0;
@@ -679,7 +679,7 @@ processFile (char *s)
     }
 
   /* if the extention is type .rel or .r or .REL or .R
-     addtional object file will be passed to the linker */
+     additional object file will be passed to the linker */
   if (strcmp (fext, ".r") == 0 || strcmp (fext, ".rel") == 0 ||
       strcmp (fext, ".R") == 0 || strcmp (fext, ".REL") == 0 ||
       strcmp (fext, port->linker.rel_ext) == 0)

@@ -38,9 +38,9 @@
 /* definition of builtin functions */
 typedef struct builtins
   {
-    char *name;                 /* name of builtin function */
-    char *rtype;                /* return type as string : see typefromStr */
-    int  nParms;                /* number of parms : max 8 */
+    char *name;                         /* name of builtin function */
+    char *rtype;                        /* return type as string : see typefromStr */
+    int  nParms;                        /* number of parms : max 8 */
     char *parm_types[MAX_BUILTIN_ARGS]; /* each parm type as string : see typeFromStr */
   } builtins;
 
@@ -180,6 +180,8 @@ typedef struct
         const char *xinit_name; // a code copy of xidata
         const char *const_name; // const data (code or not)
         const char *cabs_name; // const absolute data (code or not)
+	const char *xabs_name; // absolute xdata/pdata
+	const char *iabs_name; // absolute idata/data
         struct memmap *default_local_map; // default location for auto vars
         struct memmap *default_globl_map; // default location for globl vars
         int code_ro;            /* code space read-only 1=yes */

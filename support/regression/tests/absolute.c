@@ -24,3 +24,21 @@ testAbsolute(void)
   ASSERT(pI[0] == 0x1234);
 #endif
 }
+
+#if defined(SDCC_mcs51) || defined(SDCC_ds390)
+volatile data at(0x20) unsigned char Byte0 = 0x00;
+volatile data at(0x22) unsigned char Byte1 = 0x00;
+volatile bit Bit0, Bit1, Bit2, Bit3, Bit4, Bit5, Bit6, Bit7, Bit8;
+#endif
+
+void
+testAbsBdata(void)
+{
+#if defined(SDCC_mcs51) || defined(SDCC_ds390)
+  Bit0 = 1;
+  ASSERT(Byte0 == 0x00);
+  Byte0 = 0xFF;
+  Bit0 = 0;
+  ASSERT(Byte0 == 0xFF);
+#endif
+}

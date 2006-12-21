@@ -17,6 +17,9 @@ memmap *idata = NULL;           /* internal data upto 256      */
 memmap *bit = NULL;             /* bit addressable space       */
 memmap *statsg = NULL;          /* the constant data segment   */
 memmap *c_abs = NULL;           /* constant absolute data      */
+memmap *x_abs = NULL;           /* absolute xdata/pdata        */
+memmap *i_abs = NULL;           /* absolute idata upto 256     */
+memmap *d_abs = NULL;           /* absolute data upto 128      */
 memmap *sfr = NULL;             /* register space              */
 memmap *reg = NULL;             /* register space              */
 memmap *sfrbit = NULL;          /* sfr bit space               */
@@ -135,7 +138,7 @@ initMem ()
      DEBUG-NAME     -   'C'
      POINTER-TYPE   -   CPOINTER
    */
-  home = allocMap (0, 1, 0, 0, 0, 1, options.code_loc, CODE_NAME, 'C', CPOINTER);
+  home = allocMap (0, 1, 0, 0, 0, 1, options.code_loc, HOME_NAME, 'C', CPOINTER);
 
   /* Static segment (code for variables );
      SFRSPACE       -   NO
@@ -172,6 +175,22 @@ initMem ()
      POINTER-TYPE   -   POINTER
    */
   data = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, DATA_NAME, 'E', POINTER);
+
+  /* Absolute internal storage segment ;
+     SFRSPACE       -   NO
+     FAR-SPACE      -   NO
+     PAGED          -   NO
+     DIRECT-ACCESS  -   YES
+     BIT-ACCESS     -   NO
+     CODE-ACCESS    -   NO
+     DEBUG-NAME     -   'E'
+     POINTER-TYPE   -   POINTER
+   */
+  if (IABS_NAME) {
+    d_abs = allocMap (0, 0, 0, 1, 0, 0, options.data_loc, IABS_NAME, 'E', POINTER);
+  } else {
+    d_abs = NULL;
+  }
 
   /* overlay segment - same as internal storage segment ;
      SFRSPACE       -   NO
@@ -234,6 +253,22 @@ initMem ()
                       IDATA_NAME, 'G', IPOINTER);
   } else {
     idata=NULL;
+  }
+
+  /* Indirectly addressed absolute internal segment
+     SFRSPACE       -   NO
+     FAR-SPACE      -   NO
+     PAGED          -   NO
+     DIRECT-ACCESS  -   NO
+     BIT-ACCESS     -   NO
+     CODE-ACCESS    -   NO
+     DEBUG-NAME     -   'E'
+     POINTER-TYPE   -   IPOINTER
+   */
+  if (IABS_NAME) {
+    i_abs = allocMap (0, 0, 0, 0, 0, 0, options.data_loc, IABS_NAME, 'E', IPOINTER);
+  } else {
+    i_abs = NULL;
   }
 
   /* Bit space ;
@@ -343,7 +378,7 @@ allocDefault (symbol * sym)
       if (sym->_isparm)
         return FALSE;
       /* if code change to constant */
-      if (sym->ival && (sym->level==0) && SPEC_ABSA(sym->etype)) {
+      if (sym->ival && (sym->level==0) && SPEC_ABSA (sym->etype)) {
         SPEC_OCLS(sym->etype) = c_abs;
       } else {
         SPEC_OCLS (sym->etype) = statsg;
@@ -352,17 +387,27 @@ allocDefault (symbol * sym)
     case S_XDATA:
       // should we move this to the initialized data segment?
       if (port->genXINIT &&
-          sym->ival && (sym->level==0) && !SPEC_ABSA(sym->etype)) {
+          sym->ival && (sym->level==0) && !SPEC_ABSA (sym->etype)) {
         SPEC_OCLS(sym->etype) = xidata;
       } else {
         SPEC_OCLS (sym->etype) = xdata;
       }
       break;
     case S_DATA:
-      SPEC_OCLS (sym->etype) = data;
+      /* absolute initialized global */
+      if (sym->ival && (sym->level==0) && SPEC_ABSA (sym->etype)) {
+        SPEC_OCLS(sym->etype) = d_abs;
+      } else {
+        SPEC_OCLS (sym->etype) = data;
+      }
       break;
     case S_IDATA:
-      SPEC_OCLS (sym->etype) = idata;
+      /* absolute initialized global */
+      if (sym->ival && (sym->level==0) && SPEC_ABSA (sym->etype)) {
+        SPEC_OCLS(sym->etype) = i_abs;
+      } else {
+        SPEC_OCLS (sym->etype) = idata;
+      }
       sym->iaccess = 1;
       break;
     case S_PDATA:

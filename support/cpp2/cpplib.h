@@ -403,6 +403,10 @@ struct cpp_options
      object file exetnsion */
   const char *obj_ext;
 
+  /* SDCC specific
+     pedantic_parse_number */
+  unsigned char pedantic_parse_number;
+
   /* Dependency generation.  */
   struct
   {

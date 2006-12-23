@@ -123,6 +123,7 @@ static void do_pragma_once	PARAMS ((cpp_reader *));
 static void do_pragma_poison	PARAMS ((cpp_reader *));
 static void do_pragma_sdcc_hash PARAMS ((cpp_reader *));
 static void do_pragma_preproc_asm	PARAMS ((cpp_reader *));
+static void do_pragma_pedantic_parse_number PARAMS ((cpp_reader *));
 static void do_pragma_system_header	PARAMS ((cpp_reader *));
 static void do_pragma_dependency	PARAMS ((cpp_reader *));
 static void do_linemarker		PARAMS ((cpp_reader *));
@@ -1089,6 +1090,8 @@ _cpp_init_internal_pragmas (pfile)
   cpp_register_pragma(pfile, 0, "sdcc_hash", do_pragma_sdcc_hash);
   /* SDCC _asm specific */
   cpp_register_pragma(pfile, 0, "preproc_asm", do_pragma_preproc_asm);
+  /* SDCC specific */
+  cpp_register_pragma(pfile, 0, "pedantic_parse_number", do_pragma_pedantic_parse_number);
 }
 
 /* Pragmata handling.  We handle some, and pass the rest on to the
@@ -1194,20 +1197,43 @@ static void
 do_pragma_sdcc_hash (pfile)
      cpp_reader *pfile;
 {
+  const cpp_token *tok = _cpp_lex_token (pfile);
+
+  if (tok->type == CPP_PLUS)
+    {
+      CPP_OPTION(pfile, allow_naked_hash)++;
+    }
+  else if (tok->type == CPP_MINUS)
+    {
+      CPP_OPTION(pfile, allow_naked_hash)--;
+    }
+  else
+    {
+      cpp_error (pfile, DL_ERROR,
+                 "invalid #pragma sdcc_hash directive, need '+' or '-'");
+    }
+}
+
+/* SDCC specific
+   pedantic_parse_number pragma */
+static void
+do_pragma_pedantic_parse_number (pfile)
+     cpp_reader *pfile;
+{
     const cpp_token *tok = _cpp_lex_token (pfile);
 
-    if (tok->type == CPP_PLUS)
+  if (tok->type == CPP_PLUS)
     {
-	CPP_OPTION(pfile, allow_naked_hash)++;
+      CPP_OPTION(pfile, pedantic_parse_number)++;
     }
-    else if (tok->type == CPP_MINUS)
+  else if (tok->type == CPP_MINUS)
     {
-	CPP_OPTION(pfile, allow_naked_hash)--;
+      CPP_OPTION(pfile, pedantic_parse_number)--;
     }
-    else
+  else
     {
-	cpp_error (pfile, DL_ERROR,
-		   "invalid #pragma sdcc_hash directive, need '+' or '-'");
+      cpp_error (pfile, DL_ERROR,
+                 "invalid #pragma pedantic_parse_number directive, need '+' or '-'");
     }
 }
 
@@ -1230,7 +1256,7 @@ do_pragma_preproc_asm (pfile)
   else
     {
       cpp_error (pfile, DL_ERROR,
-		 "invalid #pragma preproc_asm directive, need '+' or '-'");
+                 "invalid #pragma preproc_asm directive, need '+' or '-'");
     }
 }
 

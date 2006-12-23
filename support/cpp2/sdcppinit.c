@@ -1245,6 +1245,8 @@ new_pending_directive (pend, text, handler)
   DEF_OPT("obj-ext=",                 no_arg, OPT_obj_ext)                    \
   DEF_OPT("pedantic",                 0,      OPT_pedantic)                   \
   DEF_OPT("pedantic-errors",          0,      OPT_pedantic_errors)            \
+  /* SDCC specific */                                                         \
+  DEF_OPT("pedantic-parse-number",    0,      OPT_pedantic_parse_number)      \
   DEF_OPT("remap",                    0,      OPT_remap)                      \
   DEF_OPT("std=c++98",                0,      OPT_std_cplusplus98)            \
   DEF_OPT("std=c89",                  0,      OPT_std_c89)                    \
@@ -1488,8 +1490,11 @@ cpp_handle_option (pfile, argc, argv)
 	case OPT_pedantic:
  	  CPP_OPTION (pfile, pedantic) = 1;
 	  break;
+        case OPT_pedantic_parse_number:
+          CPP_OPTION (pfile, pedantic_parse_number) = 1;
+          break;
 	case OPT_trigraphs:
- 	  CPP_OPTION (pfile, trigraphs) = 1;
+	  CPP_OPTION (pfile, trigraphs) = 1;
 	  break;
 	case OPT_plus:
 	  CPP_OPTION (pfile, cplusplus) = 1;
@@ -1851,6 +1856,10 @@ Switches:\n\
   -lang-c                   Assume that the input sources are in C\n\
   -lang-c89                 Assume that the input sources are in C89\n\
 "), stdout);
+  /* SDCC specific */
+  fputs (_("\
+  -pedantic-parse-number    Pedantic parse number\n\
+"), stdout);
   fputs (_("\
   -lang-c++                 Assume that the input sources are in C++\n\
   -lang-asm                 Assume that the input sources are in assembler\n\
@@ -1890,7 +1899,7 @@ Switches:\n\
   -MG                       Treat missing header file as generated files\n\
 "), stdout);
   fputs (_("\
-  -MP			    Generate phony targets for all headers\n\
+  -MP                       Generate phony targets for all headers\n\
   -MQ <target>              Add a MAKE-quoted target\n\
   -MT <target>              Add an unquoted target\n\
 "), stdout);

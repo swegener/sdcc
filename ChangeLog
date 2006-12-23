@@ -1,3 +1,10 @@
+2006-12-23 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/cpphash.h, support/cpp2/cpplex.c,
+	  support/cpp2/cpplib.[ch], support/cpp2/sdcppinit.c, doc/sdccman.lyx:
+	  an other try to fix bug #982435: introduced -pedantic-parse-number
+	  command line option and pedantic_parse_number pragma
+
 2006-12-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/link/mcs51/lkarea.c (lnkarea2): handle absolute areas, restructured

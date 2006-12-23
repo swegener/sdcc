@@ -6122,6 +6122,34 @@ file"'.
 Like `-dD' except that the macro arguments and contents are omitted.
  Only `#define name' is included in the output.
 \layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-pedantic-parse-number
+\begin_inset LatexCommand \index{-pedantic-parse-number}
+
+\end_inset 
+
+
+\size large 
+\bar under 
+ 
+\series default 
+\size default 
+\bar default 
+Pedentic parse numbers so that situations like 0xfe-LO_B(3) are parsed properly
+ and the macro LO_B(3) gets expanded.
+ See also #pragma pedantic_parse_number in section
+\begin_inset LatexCommand \ref{sec:Pragmas}
+
+\end_inset 
+
+ 
+\emph on
+Note: this functionality is not in conformance with standard!
+
+\layout List
 \added_space_bottom bigskip \labelwidthstring 00.00.0000
 
 
@@ -16957,6 +16985,57 @@ void foo (void)
 \newline 
 } 
 \newline 
+
+\layout Itemize
+
+
+\series bold
+pedantic_parse_number
+\series default
+
+\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
+
+\end_inset
+
+ (+ | -) - Pedantic parse numbers so that situations like 0xfe-LO_B(3) are
+ parsed properly and the macro LO_B(3) gets expanded.
+ Default is off.
+ Below is an example on how to use this pragma.
+
+\emph on
+ Note: this functionality is not in conformance with standard!
+
+\layout Verse
+
+
+\family typewriter
+#pragma pedantic_parse_number +
+\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
+
+\end_inset
+
+
+\newline 
+\newline
+#define LO_B(x) ((x) & 0xff)
+\newline
+\newline
+unsigned char foo(void)
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+unsigned char c=0xfe-LO_B(3);
+\newline
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+
+return c;
+\newline
+}
+\newline
 
 \layout Standard
 

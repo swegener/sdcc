@@ -74,6 +74,7 @@ static int skip_whitespace PARAMS ((cpp_reader *, cppchar_t));
 static cpp_hashnode *parse_identifier PARAMS ((cpp_reader *));
 static uchar *parse_slow PARAMS ((cpp_reader *, const uchar *, int,
 				  unsigned int *));
+static void pedantic_parse_number PARAMS ((cpp_reader *, cpp_string *, int));
 static void parse_number PARAMS ((cpp_reader *, cpp_string *, int));
 static int unescaped_terminator_p PARAMS ((cpp_reader *, const uchar *));
 static void parse_string PARAMS ((cpp_reader *, cpp_token *, cppchar_t));
@@ -577,42 +578,26 @@ parse_slow (pfile, cur, number_p, plen)
       if (c == '?' || c == '\\')
 	c = skip_escaped_newlines (pfile);
 
-      if (number_p)
-        {
-          if (!ISXDIGIT (c) && c != '.' && !VALID_SIGN (c, prevc) && !VALID_HEX (c, prevc))
+      if (!is_idchar (c))
+	{
+	  if (!number_p)
 	    break;
+	  if (c != '.' && !VALID_SIGN (c, prevc))
+	    break;
+	}
 
-            obstack_1grow (stack, c);
+      /* Handle normal identifier characters in this loop.  */
+      do
+	{
+	  prevc = c;
+	  obstack_1grow (stack, c);
 
-            base = cur = buffer->cur;
-            while (ISXDIGIT (*cur))
-              ++cur;
+	  if (c == '$')
+	    saw_dollar++;
 
-            if (cur != base)
-              obstack_grow (stack, base, cur - base);
-
-            prevc = cur[-1];
-            c = *cur++;
-            buffer->cur = cur;
-        }
-      else
-        {
-          if (!is_idchar (c))
-            break;
-
-          /* Handle normal identifier characters in this loop.  */
-          do
-	    {
-	      prevc = c;
-	      obstack_1grow (stack, c);
-
-	      if (c == '$')
-	        saw_dollar++;
-
-	      c = *buffer->cur++;
-	    }
-          while (is_idchar (c));
-        }
+	  c = *buffer->cur++;
+	}
+      while (is_idchar (c));
     }
 
   /* Step back over the unwanted char.  */
@@ -630,6 +615,249 @@ parse_slow (pfile, cur, number_p, plen)
   return obstack_finish (stack);
 }
 
+/* SDCC specific */
+/* Pedantic parse a number, beginning with character C, skipping embedded
+   backslash-newlines.  LEADING_PERIOD is nonzero if there was a "."
+   before C.  Place the result in NUMBER.  */
+static void
+pedantic_parse_number (pfile, number, leading_period)
+     cpp_reader *pfile;
+     cpp_string *number;
+     int leading_period;
+{
+  enum num_type_e { NT_DEC, NT_HEX } num_type = NT_DEC;
+  enum num_part_e { NP_WHOLE, NP_FRACT, NP_EXP, NP_INT_SUFFIX, NP_FLOAT_SUFFIX } num_part = NP_WHOLE;
+
+  uchar c = *(pfile->buffer->cur - 1);
+  struct obstack *stack = &pfile->hash_table->stack;
+  cpp_buffer *buffer = pfile->buffer;
+  int len = 0;
+  int has_whole = 0;
+  int has_fract = 0;
+
+  if (leading_period)
+    {
+      num_part = NP_FRACT;
+      ++len;
+      obstack_1grow (stack, '.');
+      c = get_effective_char(pfile);
+    }
+  else
+    {
+      if ('0' == c)  
+        {
+          has_whole = 1;
+          ++len;
+          obstack_1grow (stack, c);
+          c = get_effective_char(pfile);
+
+          switch (c)
+            {
+            case 'X':
+            case 'x':
+              num_type = NT_HEX;
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+              break;
+
+            case '.':
+              num_part = NP_FRACT;
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+              break;
+            }
+        }
+    }
+
+  for (; ; )
+    {
+      switch (num_part)
+        {
+        case NP_WHOLE:
+          if (NT_DEC == num_type)
+            {
+              while (ISDIGIT (c))
+                {
+                  has_whole = 1;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char(pfile);
+                }
+
+              if ('.' == c)
+                {
+                  num_part = NP_FRACT;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char(pfile);
+                  continue;
+                }
+              else if ('E' == c || 'e' == c)
+                {
+                  if (has_whole || has_fract)
+                  {
+                    num_part = NP_EXP;
+                    ++len;
+                    obstack_1grow (stack, c);
+                    c = get_effective_char(pfile);
+                    continue;
+                  }
+                  else
+                    break;
+                }
+            }
+          else
+            {
+              while (ISXDIGIT (c))
+                {
+                  has_whole = 1;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char(pfile);
+                }
+
+              if ('.' == c)
+                {
+                  num_part = NP_FRACT;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char(pfile);
+                  continue;
+                }
+              else if ('P' == c || 'p' == c)
+                {
+                  if (has_whole || has_fract)
+                    {
+                      num_part = NP_EXP;
+                      ++len;
+                      obstack_1grow (stack, c);
+                      c = get_effective_char(pfile);
+                      continue;
+                    }
+                  else
+                    break;
+                }
+            }
+          num_part = NP_INT_SUFFIX;
+          continue;
+
+        case NP_FRACT:
+          if (NT_DEC == num_type)
+            {
+              while (ISDIGIT (c))
+                {
+                  has_fract = 1;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char(pfile);
+                }
+
+              if ('E' == c || 'e' == c)
+                {
+                  if (has_whole || has_fract)
+                    {
+                      num_part = NP_EXP;
+                      ++len;
+                      obstack_1grow (stack, c);
+                      c = get_effective_char(pfile);
+                      continue;
+                    }
+                }
+            }
+          else
+            {
+              while (ISXDIGIT (c))
+                {
+                  has_fract = 1;
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char(pfile);
+                }
+
+              if ('P' == c || 'p' == c)
+                {
+                  if (has_whole || has_fract)
+                    {
+                      num_part = NP_EXP;
+                      ++len;
+                      obstack_1grow (stack, c);
+                      c = get_effective_char(pfile);
+                      continue;
+                    }
+                }
+            }
+          num_part = NP_FLOAT_SUFFIX;
+          continue;
+            
+        case NP_EXP:
+          if ('+' == c || '-' == c)
+            {
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+            }
+
+          while (ISDIGIT (c))
+            {
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+            }
+
+          num_part = NP_FLOAT_SUFFIX;
+          continue;
+
+        case NP_INT_SUFFIX:
+           if ('L' == c || 'l' == c)
+            {
+              uchar prevc = c;
+
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+
+              if (c == prevc)
+                {
+                  ++len;
+                  obstack_1grow (stack, c);
+                  c = get_effective_char(pfile);
+                }
+            }
+          else if ('U' == c || 'u' == c)
+            {
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+            }
+          break;
+
+        case NP_FLOAT_SUFFIX:
+           if ('F' == c || 'f' == c)
+            {
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+            }
+          else if ('L' == c || 'l' == c)
+            {
+              ++len;
+              obstack_1grow (stack, c);
+              c = get_effective_char(pfile);
+            }
+          break;
+        }
+      break;
+    }
+
+  /* Step back over the unwanted char.  */
+  BACKUP ();
+
+  number->text = obstack_finish (stack);
+  number->len = len;
+}
+
 /* Parse a number, beginning with character C, skipping embedded
    backslash-newlines.  LEADING_PERIOD is nonzero if there was a "."
    before C.  Place the result in NUMBER.  */
@@ -644,8 +872,7 @@ parse_number (pfile, number, leading_period)
   /* Fast-path loop.  Skim over a normal number.
      N.B. ISIDNUM does not include $.  */
   cur = pfile->buffer->cur;
-
-  while (ISXDIGIT (*cur) || *cur == '.' || VALID_SIGN (*cur, cur[-1]) || VALID_HEX (*cur, cur[-1]))
+  while (ISIDNUM (*cur) || *cur == '.' || VALID_SIGN (*cur, cur[-1]))
     cur++;
 
   /* Check for slow-path cases.  */
@@ -1163,7 +1390,10 @@ _cpp_lex_direct (pfile)
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
       result->type = CPP_NUMBER;
-      parse_number (pfile, &result->val.str, 0);
+      if (CPP_OPTION(pfile, pedantic_parse_number))
+        pedantic_parse_number (pfile, &result->val.str, 0);
+      else
+        parse_number (pfile, &result->val.str, 0);
       break;
 
     case 'L':
@@ -1366,7 +1596,10 @@ _cpp_lex_direct (pfile)
       else if (ISDIGIT (c))
 	{
 	  result->type = CPP_NUMBER;
-	  parse_number (pfile, &result->val.str, 1);
+          if (CPP_OPTION(pfile, pedantic_parse_number))
+            pedantic_parse_number (pfile, &result->val.str, 1);
+          else
+	    parse_number (pfile, &result->val.str, 1);
 	}
       else if (c == '*' && CPP_OPTION (pfile, cplusplus))
 	result->type = CPP_DOT_STAR;

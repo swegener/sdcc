@@ -30,7 +30,10 @@ return "A"
  */
 #if !defined (__GNUC__) && !defined (_MSC_VER)
 /* since this fails on GCC cpp and MSVC cl -E... */
+#pragma pedantic_parse_number +
+
 #define LO_B(x) ((x) & 0xff)
+#define BAD(x) ((x) & 0xff)
 
 unsigned char
 hexeminus(void)
@@ -39,6 +42,9 @@ unsigned char a=0x\
 fe\
 -\
 LO_B(3);
-return a;
+
+unsigned char b=0xfe-BAD(3);
+
+return (a + b);
 }
 #endif

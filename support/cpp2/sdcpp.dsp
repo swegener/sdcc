@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".\libiberty" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /FD /D /GZ "HAVE_CONFIG_H" /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".\libiberty" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".\libiberty" /I ".\win32" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /I "." /I ".\libiberty" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "." /I ".\libiberty" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "_WIN32" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "." /I ".\libiberty" /I ".\win32" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "_WIN32" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -93,7 +93,19 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=".\c-incpath.c"
+# End Source File
+# Begin Source File
+
+SOURCE=".\c-ppoutput.c"
+# End Source File
+# Begin Source File
+
 SOURCE=.\libiberty\concat.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\cppcharset.c
 # End Source File
 # Begin Source File
 
@@ -117,6 +129,10 @@ SOURCE=.\cpphash.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cppinit.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cpplex.c
 # End Source File
 # Begin Source File
@@ -129,11 +145,23 @@ SOURCE=.\cppmacro.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\cppmain.c
+SOURCE=.\cpptrad.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\cpptrad.c
+SOURCE=.\diagnostic.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\win32\dirent.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\getpwd.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\hashtab.c
 # End Source File
 # Begin Source File
 
@@ -165,7 +193,19 @@ SOURCE=.\libiberty\obstack.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\options.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\opts.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\prefix.c
+# End Source File
+# Begin Source File
+
+SOURCE=".\pretty-print.c"
 # End Source File
 # Begin Source File
 
@@ -173,15 +213,19 @@ SOURCE=".\libiberty\safe-ctype.c"
 # End Source File
 # Begin Source File
 
-SOURCE=.\sdcppinit.c
+SOURCE=".\sdcpp-opts.c"
 # End Source File
 # Begin Source File
 
-SOURCE=.\sdcppmain.c
+SOURCE=.\sdcpp.c
 # End Source File
 # Begin Source File
 
 SOURCE=".\libiberty\splay-tree.c"
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\vasprintf.c
 # End Source File
 # Begin Source File
 
@@ -194,6 +238,10 @@ SOURCE=.\libiberty\xexit.c
 # Begin Source File
 
 SOURCE=.\libiberty\xmalloc.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\xmemdup.c
 # End Source File
 # Begin Source File
 
@@ -217,6 +265,10 @@ SOURCE=".\auto-host.h"
 # End Source File
 # Begin Source File
 
+SOURCE=".\c-incpath.h"
+# End Source File
+# Begin Source File
+
 SOURCE=.\config.h
 # End Source File
 # Begin Source File
@@ -233,11 +285,27 @@ SOURCE=.\cpplib.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\diagnostic.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\win32\dirent.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\hashtab.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\hashtable.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\hwint.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\input.h
 # End Source File
 # Begin Source File
 
@@ -261,6 +329,14 @@ SOURCE=.\libiberty\obstack.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\options.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\opts.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\output.h
 # End Source File
 # Begin Source File
@@ -269,11 +345,15 @@ SOURCE=.\prefix.h
 # End Source File
 # Begin Source File
 
+SOURCE=".\pretty-print.h"
+# End Source File
+# Begin Source File
+
 SOURCE=".\libiberty\safe-ctype.h"
 # End Source File
 # Begin Source File
 
-SOURCE=.\sdcc.h
+SOURCE=.\sdcpp.h
 # End Source File
 # Begin Source File
 

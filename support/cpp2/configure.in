@@ -22,7 +22,7 @@
 
 # Initialization and defaults
 AC_PREREQ(2.13)
-AC_INIT(cppmain.c)
+AC_INIT(sdcpp.c)
 AC_CONFIG_HEADER(auto-host.h:config.in)
 
 remove=rm

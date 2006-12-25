@@ -1,5 +1,5 @@
 /* Utility to update paths from internal to external forms.
-   Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002
+   Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003
    Free Software Foundation, Inc.
 
 This file is part of GCC.
@@ -74,21 +74,20 @@ Boston, MA 02111-1307, USA.  */
 
 static const char *std_prefix = PREFIX;
 
-static const char *get_key_value	PARAMS ((char *));
-static char *translate_name		PARAMS ((char *));
-static char *save_string		PARAMS ((const char *, int));
-static void tr				PARAMS ((char *, int, int));
+static const char *get_key_value (char *);
+static char *translate_name (char *);
+static char *save_string (const char *, int);
+static void tr (char *, int, int);
 
 #if defined(_WIN32) && defined(ENABLE_WIN32_REGISTRY)
-static char *lookup_key		PARAMS ((char *));
+static char *lookup_key (char *);
 static HKEY reg_key = (HKEY) INVALID_HANDLE_VALUE;
 #endif
 
 /* Given KEY, as above, return its value.  */
 
 static const char *
-get_key_value (key)
-     char *key;
+get_key_value (char *key)
 {
   const char *prefix = 0;
   char *temp = 0;
@@ -112,9 +111,7 @@ get_key_value (key)
 /* Return a copy of a string that has been placed in the heap.  */
 
 static char *
-save_string (s, len)
-  const char *s;
-  int len;
+save_string (const char *s, int len)
 {
   char *result = xmalloc (len + 1);
 
@@ -128,8 +125,7 @@ save_string (s, len)
 /* Look up "key" in the registry, as above.  */
 
 static char *
-lookup_key (key)
-     char *key;
+lookup_key (char *key)
 {
   char *dst;
   DWORD size;
@@ -157,12 +153,12 @@ lookup_key (key)
     }
 
   size = 32;
-  dst = (char *) xmalloc (size);
+  dst = xmalloc (size);
 
   res = RegQueryValueExA (reg_key, key, 0, &type, dst, &size);
   if (res == ERROR_MORE_DATA && type == REG_SZ)
     {
-      dst = (char *) xrealloc (dst, size);
+      dst = xrealloc (dst, size);
       res = RegQueryValueExA (reg_key, key, 0, &type, dst, &size);
     }
 
@@ -181,8 +177,7 @@ lookup_key (key)
    Otherwise, return the given name.  */
 
 static char *
-translate_name (name)
-     char *name;
+translate_name (char *name)
 {
   char code;
   char *key, *old_name;
@@ -200,7 +195,7 @@ translate_name (name)
 	   keylen++)
 	;
 
-      key = (char *) alloca (keylen + 1);
+      key = alloca (keylen + 1);
       strncpy (key, &name[1], keylen);
       key[keylen] = 0;
 
@@ -231,9 +226,7 @@ translate_name (name)
 
 /* In a NUL-terminated STRING, replace character C1 with C2 in-place.  */
 static void
-tr (string, c1, c2)
-     char *string;
-     int c1, c2;
+tr (char *string, int c1, int c2)
 {
   do
     {
@@ -248,9 +241,7 @@ tr (string, c1, c2)
    freeing it.  */
 
 char *
-update_path (path, key)
-  const char *path;
-  const char *key;
+update_path (const char *path, const char *key)
 {
   char *result, *p;
 
@@ -348,11 +339,9 @@ update_path (path, key)
   return result;
 }
 
-/* Reset the standard prefix */
+/* Reset the standard prefix.  */
 void
-set_std_prefix (prefix, len)
-  const char *prefix;
-  int len;
+set_std_prefix (const char *prefix, int len)
 {
   std_prefix = save_string (prefix, len);
 }

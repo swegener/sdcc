@@ -1,3 +1,43 @@
+2006-12-25 Borut Razem <borut.razem AT siol.net>
+
+	* SDCPP synchronized with GCC CPP release version 3.4.6,
+	  the latest release before 4.x:
+	* support/cpp2/Makefile.in, support/cpp2/config.h,
+	  support/cpp2/configure, support/cpp2/configure.in,
+	  support/cpp2/cppdefault.c, support/cpp2/cppdefault.h,
+	  support/cpp2/cpperror.c, support/cpp2/cppexp.c,
+	  support/cpp2/cppfiles.c, support/cpp2/cpphash.c,
+	  support/cpp2/cpphash.h, support/cpp2/cppinit.c,
+	  support/cpp2/cpplex.c, support/cpp2/cpplib.c,
+	  support/cpp2/cpplib.h, support/cpp2/cppmacro.c,
+	  support/cpp2/cpptrad.c, support/cpp2/except.h,
+	  support/cpp2/hashtable.c, support/cpp2/hashtable.h,
+	  support/cpp2/hwint.h, support/cpp2/intl.h,
+	  support/cpp2/line-map.c, support/cpp2/line-map.h,
+	  support/cpp2/mkdeps.c, support/cpp2/mkdeps.h,
+	  support/cpp2/output.h, support/cpp2/prefix.c,
+	  support/cpp2/prefix.h, support/cpp2/sdcpp.dsp,
+	  support/cpp2/system.h, support/cpp2/version.c:
+	  modified
+	* support/cpp2/c-incpath.c, support/cpp2/c-incpath.h,
+	  support/cpp2/c-ppoutput.c, support/cpp2/c-pretty-print.c,
+	  support/cpp2/c-pretty-print.h, support/cpp2/cppcharset.c,
+	  support/cpp2/cppucnid.h, support/cpp2/diagnostic.c,
+	  support/cpp2/diagnostic.def, support/cpp2/diagnostic.h,
+	  support/cpp2/hashtab.c, support/cpp2/hashtab.h,
+	  support/cpp2/input.h, support/cpp2/libiberty/getpwd.c,
+	  support/cpp2/libiberty/vasprintf.c, support/cpp2/libiberty/xmemdup.c,
+	  support/cpp2/move-if-change, support/cpp2/opts.c,
+	  support/cpp2/opts.h, support/cpp2/opts.sh,
+	  support/cpp2/pretty-print.c, support/cpp2/pretty-print.h,
+	  support/cpp2/sdcpp.opt, support/cpp2/sdcpp-opts.c,
+	  support/cpp2/win32, support/cpp2/win32/dirent.c,
+	  support/cpp2/win32/dirent.h:
+	  added
+	* support/cpp2/sdcpp.c: renamed from sdcppmain.c
+	* support/cpp2/sdcpp.h: renamed from sdcc.h
+	* sdcppinit.c: deleted
+
 2006-12-23 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2/cpphash.h, support/cpp2/cpplex.c,

@@ -268,22 +268,31 @@ mkdeps.o: mkdeps.c $(CONFIG_H) $(SYSTEM_H) mkdeps.h
 
 # Libiberty
 
-safe-ctype.o: $(LIBIBERTY_DIR)/safe-ctype.c $(LIBIBERTY_DIR)/safe-ctype.h $(CONFIG_H) $(LIBCPP_DEPS)
+concat.o: $(LIBIBERTY_DIR)/concat.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 
-obstack.o: $(LIBIBERTY_DIR)/obstack.c $(LIBIBERTY_DIR)/obstack.h $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-splay-tree.o: $(LIBIBERTY_DIR)/splay-tree.c $(LIBIBERTY_DIR)/splay-tree.h $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-lbasename.o: $(LIBIBERTY_DIR)/lbasename.c  $(CONFIG_H) $(LIBCPP_DEPS)
+getpwd.o: $(LIBIBERTY_DIR)/getpwd.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 
 hex.o: $(LIBIBERTY_DIR)/hex.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 
-concat.o: $(LIBIBERTY_DIR)/concat.c  $(CONFIG_H) $(LIBCPP_DEPS)
+lbasename.o: $(LIBIBERTY_DIR)/lbasename.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+
+obstack.o: $(LIBIBERTY_DIR)/obstack.c $(LIBIBERTY_DIR)/obstack.h $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+
+safe-ctype.o: $(LIBIBERTY_DIR)/safe-ctype.c $(LIBIBERTY_DIR)/safe-ctype.h $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+
+splay-tree.o: $(LIBIBERTY_DIR)/splay-tree.c $(LIBIBERTY_DIR)/splay-tree.h $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+
+vasprintf.o: $(LIBIBERTY_DIR)/vasprintf.c  $(CONFIG_H) $(LIBCPP_DEPS)
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+
+xexit.o: $(LIBIBERTY_DIR)/xexit.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 
 xmalloc.o: $(LIBIBERTY_DIR)/xmalloc.c  $(CONFIG_H) $(LIBCPP_DEPS)
@@ -295,11 +304,5 @@ xmemdup.o: $(LIBIBERTY_DIR)/xmemdup.c  $(CONFIG_H) $(LIBCPP_DEPS)
 xstrdup.o: $(LIBIBERTY_DIR)/xstrdup.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
 
-xexit.o: $(LIBIBERTY_DIR)/xexit.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
 xstrerror.o: $(LIBIBERTY_DIR)/xstrerror.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-getpwd.o: $(LIBIBERTY_DIR)/getpwd.c  $(CONFIG_H) $(LIBCPP_DEPS)
 	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)

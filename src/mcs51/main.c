@@ -729,7 +729,8 @@ PORT mcs51_port =
     _defaultRules,
     getInstructionSize,
     getRegsRead,
-    getRegsWritten
+    getRegsWritten,
+    mcs51DeadMove
   },
   {
     /* Sizes: char, short, int, long, ptr, fptr, gptr, bit, float, max */

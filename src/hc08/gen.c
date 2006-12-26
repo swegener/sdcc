@@ -193,6 +193,7 @@ static void
 emitLabel (symbol *tlbl)
 {
   emitcode ("", "%05d$:", (tlbl->key +100));
+  lineCurr->isLabel = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2187,7 +2188,7 @@ asmopToBool (asmop *aop, bool resultInA)
             emitcode ("tsta", "");
             emitcode ("bne", "%05d$", (tlbl->key + 100));
             emitcode ("tstx", "");
-            emitcode ("", "%05d$:", (tlbl->key + 100));
+            emitLabel (tlbl);
           }
         else
           {
@@ -2248,7 +2249,7 @@ asmopToBool (asmop *aop, bool resultInA)
                 emitcode ("tst", "%s", aopAdrStr (aop, 0, FALSE));
                 emitcode ("bne", "%05d$", (tlbl->key + 100));
                 emitcode ("tst", "%s", aopAdrStr (aop, 1, FALSE));
-                emitcode ("", "%05d$:", (tlbl->key + 100));
+                emitLabel (tlbl);
                 break;
               }
           }
@@ -2885,6 +2886,7 @@ genFunction (iCode * ic)
   emitcode (";", "-----------------------------------------");
 
   emitcode ("", "%s:", sym->rname);
+  lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
   
   _G.stackOfs = 0;
@@ -3165,7 +3167,7 @@ genLabel (iCode * ic)
 	  
   debugFile->writeLabel(IC_LABEL (ic), ic);
 
-  emitcode ("", "%05d$:", (IC_LABEL (ic)->key + 100));
+  emitLabel (IC_LABEL (ic));
 
 }
 

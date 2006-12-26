@@ -1,20 +1,3 @@
-//replace restart {
-//	  pop  %1
-//	  push %1
-//} by {
-//	  ;	  Peephole 1	 removed pop %1 push %1 (not push pop)
-//}
-
-//replace restart {
-//	  pop  %1
-//	  mov  %2,%3
-//	  push %1
-//} by {
-//	  ;	  Peephole 2	 removed pop %1 push %1 (not push pop)
-//	  mov  %2,%3
-//}
-
-//
 // added by Jean Louis VERN for
 // his shift stuff
 replace {
@@ -4608,10 +4591,15 @@ replace {
 %3:
 } if labelRefCount(%3 1), labelRefCountChange(%3 -1)
 
+replace restart {
+	pop	ar%1
+} by {
+	;	Peephole 300	pop ar%1 removed
+} if deadMove %1
 
 // should be one of the last peepholes
 replace{
 %1:
 } by {
-	;	Peephole 300	removed redundant label %1
+	;	Peephole 400	removed redundant label %1
 } if labelRefCount(%1 0)

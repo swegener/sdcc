@@ -413,6 +413,7 @@ _vemit2 (const char *szFormat, va_list ap)
   _G.lines.current->isInline = _G.lines.isInline;
   _G.lines.current->isDebug = _G.lines.isDebug;
   _G.lines.current->ic = _G.current_iCode;
+  _G.lines.current->isComment = (*buffer == ';');
 }
 
 static void
@@ -1636,6 +1637,7 @@ static void
 emitLabel (int key)
 {
   emit2 ("!tlabeldef", key);
+  _G.lines.current->isLabel = 1;
   spillCached ();
 }
 
@@ -2899,6 +2901,7 @@ emitCall (iCode * ic, bool ispcall)
           fetchHL (AOP (IC_LEFT (ic)));
           emit2 ("jp !*hl");
           emit2 ("!tlabeldef", (rlbl->key + 100));
+          _G.lines.current->isLabel = 1;
           _G.stack.pushed -= 2;
         }
       freeAsmop (IC_LEFT (ic), NULL, ic);
@@ -3112,8 +3115,10 @@ genFunction (iCode * ic)
     {
       sprintf (buffer, "%s_start", sym->rname);
       emit2 ("!labeldef", buffer);
+      _G.lines.current->isLabel = 1;
     }
   emit2 ("!functionlabeldef", sym->rname);
+  _G.lines.current->isLabel = 1;
 
   ftype = operandType (IC_LEFT (ic));
 
@@ -3332,6 +3337,7 @@ genEndFunction (iCode * ic)
               emit2 ("jp PO,!tlabel", tlbl->key + 100);
               emit2 ("!ei");
               emit2 ("!tlabeldef", (tlbl->key + 100));
+              _G.lines.current->isLabel = 1;
             }
         }
     }
@@ -3359,6 +3365,7 @@ genEndFunction (iCode * ic)
     {
       sprintf (buffer, "%s_end", sym->rname);
       emit2 ("!labeldef", buffer);
+      _G.lines.current->isLabel = 1;
     }
 
   _G.flushStatics = 1;
@@ -5169,6 +5176,7 @@ genAnd (iCode * ic, iCode * ifx)
         {
           emit2 ("clr c");
           emit2 ("!tlabeldef", tlbl->key + 100);
+          _G.lines.current->isLabel = 1;
         }
       // if(left & literal)
       else
@@ -7469,6 +7477,7 @@ genCritical (iCode *ic)
       emit2 ("jp PO,!tlabel", tlbl->key + 100);
       aopPut (AOP (IC_RESULT (ic)), "!one", 0);
       emit2 ("!tlabeldef", (tlbl->key + 100));
+      _G.lines.current->isLabel = 1;
       freeAsmop (IC_RESULT (ic), NULL, ic);
     }
   else
@@ -7513,6 +7522,7 @@ genEndCritical (iCode *ic)
       emit2 ("jp PO,!tlabel", tlbl->key + 100);
       emit2 ("!ei");
       emit2 ("!tlabeldef", (tlbl->key + 100));
+      _G.lines.current->isLabel = 1;
     }
 }
 

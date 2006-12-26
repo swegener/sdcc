@@ -8,7 +8,7 @@ License:       GPL
 Group:         Applications/Engineering
 Summary:       Small Device C Compiler
 Requires:      sdcc-common
-Version:       2.6.0
+Version:       2.6.3
 Release:       2
 Source:        %{name}-src-%{version}.tar.gz
 URL:           http://sdcc.sourceforge.net/
@@ -78,6 +78,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_defaultdocdir}
 
 %changelog
+* Sun Dec 26 2006 - bernhard AT bernhardheld.de
+- version updated
+* Sun Sep 03 2006 - Christer Weinigel
+- fixed build of doc
 * Tue Mar 09 2004 - bernhard AT bernhardheld.de
 - split into two packages
 * Wed Feb 26 2004 - bernhard AT bernhardheld.de

@@ -1538,6 +1538,7 @@ createRegMask (eBBlock ** ebbs, int count)
     }
 }
 
+#if 0
 /** Returns the rematerialized string for a remat var.
  */
 static char *
@@ -1587,6 +1588,7 @@ rematStr (symbol * sym)
     }
   return buffer;
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */

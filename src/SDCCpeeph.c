@@ -33,14 +33,8 @@ static peepRule *rootRules = NULL;
 static peepRule *currRule = NULL;
 
 #define HTAB_SIZE 53
-typedef struct
-  {
-    char name[SDCC_NAME_MAX + 1];
-    int refCount;
-  }
-labelHashEntry;
 
-static hTab *labelHash = NULL;
+hTab *labelHash = NULL;
 
 static struct
 {
@@ -52,9 +46,8 @@ static int hashSymbolName (const char *name);
 static void buildLabelRefCountHash (lineNode * head);
 
 static bool matchLine (char *, char *, hTab **);
-bool isLabelDefinition (const char *line, const char **start, int *len);
 
-#define FBYNAME(x) int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
+#define FBYNAME(x) static int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
         lineNode *head, char *cmdLine)
 
 #if !OPT_DISABLE_PIC
@@ -69,7 +62,7 @@ void pic16_peepRules2pCode(peepRule *);
 /* pcDistance - afinds a label back ward or forward                */
 /*-----------------------------------------------------------------*/
 
-int
+static int
 pcDistance (lineNode * cpos, char *lbl, bool back)
 {
   lineNode *pl = cpos;
@@ -81,8 +74,8 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
     {
 
       if (pl->line &&
-          *pl->line != ';' &&
-          pl->line[strlen (pl->line) - 1] != ':' &&
+          !pl->isComment &&
+          !pl->isLabel &&
           !pl->isDebug) {
                 if (port->peep.getSize) {
                         dist += port->peep.getSize(pl);
@@ -248,7 +241,7 @@ FBYNAME (labelIsReturnOnly)
 
   for(pl = currPl; pl; pl = pl->next) {
         if (pl->line && !pl->isDebug && !pl->isComment &&
-          pl->line[strlen(pl->line)-1] == ':') {
+          pl->isLabel) {
                 if (strncmp(pl->line, label, len) == 0) break; /* Found Label */
                 if (strlen(pl->line) != 7     || !ISCHARDIGIT(*(pl->line))   ||
                   !ISCHARDIGIT(*(pl->line+1)) || !ISCHARDIGIT(*(pl->line+2)) ||
@@ -310,6 +303,19 @@ FBYNAME (okToRemoveSLOC)
   return TRUE; /* safe for a peephole to remove it :) */
 }
 
+/*-----------------------------------------------------------------*/
+/* deadMove - Check, if a pop/push pair can be removed             */
+/*-----------------------------------------------------------------*/
+FBYNAME (deadMove)
+{
+  char *op = hTabItemWithKey (vars, 1);
+
+  if (port->peep.deadMove)
+    return port->peep.deadMove (op, currPl, head);
+
+  fprintf (stderr, "Function deadMove not initialized in port structure\n"); 
+  return FALSE;
+}
 
 /*-----------------------------------------------------------------*/
 /* operandsNotSame - check if %1 & %2 are the same                 */
@@ -508,6 +514,34 @@ FBYNAME (operandsNotSame8)
     return TRUE;
 }
 
+/*-----------------------------------------------------------------*/
+/* labelHashEntry- searches for a label in the list labelHash      */
+/* Builds labelHash, if it does not yet exist.                     */
+/* Returns the labelHashEntry or NULL                              */
+/*-----------------------------------------------------------------*/
+labelHashEntry *
+getLabelRef (const char *label, lineNode *head)
+{
+  labelHashEntry *entry;
+
+  /* If we don't have the label hash table yet, build it. */
+  if (!labelHash)
+    {
+      buildLabelRefCountHash (head);
+    }
+
+  entry = hTabFirstItemWK (labelHash, hashSymbolName (label));
+
+  while (entry)
+    {
+      if (!strcmp (label, entry->name))
+        {
+          break;
+        }
+      entry = hTabNextItemWK (labelHash);
+    }
+  return entry;
+}
 
 /* labelRefCount:
 
@@ -522,30 +556,14 @@ FBYNAME (labelRefCount)
   int varNumber, expectedRefCount;
   bool rc = FALSE;
 
-  /* If we don't have the label hash table yet, build it. */
-  if (!labelHash)
-    {
-      buildLabelRefCountHash (head);
-    }
-
   if (sscanf (cmdLine, "%*[ \t%]%d %d", &varNumber, &expectedRefCount) == 2)
     {
       char *label = hTabItemWithKey (vars, varNumber);
 
       if (label)
         {
-          labelHashEntry *entry;
+          labelHashEntry *entry = getLabelRef (label, head);
 
-          entry = hTabFirstItemWK (labelHash, hashSymbolName (label));
-
-          while (entry)
-            {
-              if (!strcmp (label, entry->name))
-                {
-                  break;
-                }
-              entry = hTabNextItemWK (labelHash);
-            }
           if (entry)
             {
 #if 0
@@ -1003,7 +1021,7 @@ FBYNAME (operandsLiteral)
 /*-----------------------------------------------------------------*/
 /* callFuncByName - calls a function as defined in the table       */
 /*-----------------------------------------------------------------*/
-int
+static int
 callFuncByName (char *fname,
                 hTab * vars,
                 lineNode * currPl,
@@ -1073,6 +1091,9 @@ callFuncByName (char *fname,
     },
     {
       "okToRemoveSLOC", okToRemoveSLOC
+    },
+    {
+      "deadMove", deadMove
     },
     {
       "24bitModeAndPortDS390", flat24bitModeAndPortDS390
@@ -1202,8 +1223,7 @@ printLine (lineNode * head, FILE * of)
 
       /* don't indent comments & labels */
       if (head->line &&
-          (*head->line == ';' ||
-           head->line[strlen (head->line) - 1] == ':')) {
+          (head->isComment || head->isLabel)) {
         fprintf (of, "%s\n", head->line);
       } else {
         if (head->isInline && *head->line=='#') {
@@ -1219,7 +1239,7 @@ printLine (lineNode * head, FILE * of)
 /*-----------------------------------------------------------------*/
 /* newPeepRule - creates a new peeprule and attach it to the root  */
 /*-----------------------------------------------------------------*/
-peepRule *
+static peepRule *
 newPeepRule (lineNode * match,
              lineNode * replace,
              char *cond,
@@ -1338,11 +1358,16 @@ getPeepLine (lineNode ** head, char **bpp)
 
       if (!isComment || (isComment && !options.noPeepComments))
         {
+          const char *dummy1;
+          int dummy2;
+
           if (!currL)
             *head = currL = newLineNode (lines);
           else
             currL = connectLine (currL, newLineNode (lines));
           currL->isComment = isComment;
+          currL->isLabel = isLabelDefinition (currL->line, &dummy1, &dummy2,
+                                              TRUE);
         }
 
     }
@@ -1820,16 +1845,13 @@ reassociate_ic (lineNode *shead, lineNode *stail,
   csl = shead;
   while (1)
     {
-      const char *labelStart;
-      int labelLength;
-
       /* skip over any comments */
       while (csl!=stail->next && csl->isComment)
         csl = csl->next;
       if (csl==stail->next)
         break;
 
-      if (isLabelDefinition(csl->line, &labelStart, &labelLength))
+      if (csl->isLabel)
         {
           /* found a source line label; look for it in the replacment lines */
           crl = rhead;
@@ -1931,6 +1953,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
       else
         lhead = cl = newLineNode (lb);
       cl->isComment = pl->isComment;
+      cl->isLabel   = pl->isLabel;
     }
 
   /* add the comments if any to the head of list */
@@ -1983,7 +2006,8 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
  * and len will be it's length.
  */
 bool
-isLabelDefinition (const char *line, const char **start, int *len)
+isLabelDefinition (const char *line, const char **start, int *len,
+                   bool isPeepRule)
 {
   const char *cp = line;
 
@@ -2004,7 +2028,8 @@ isLabelDefinition (const char *line, const char **start, int *len)
 
   *start = cp;
 
-  while (ISCHARALNUM (*cp) || (*cp == '$') || (*cp == '_'))
+  while (ISCHARALNUM (*cp) || (*cp == '$') || (*cp == '_') ||
+         (isPeepRule && (*cp == '%')))
     {
       cp++;
     }
@@ -2053,30 +2078,35 @@ buildLabelRefCountHash (lineNode * head)
   labelHash = newHashTable (HTAB_SIZE);
 
   /* First pass: locate all the labels. */
-  line = head;
-
-  while (line)
+  for (line = head; line; line = line->next)
     {
-      if (isLabelDefinition (line->line, &label, &labelLen)
-          && labelLen <= SDCC_NAME_MAX)
+      if (line->isLabel  ||
+          line->isInline)
         {
-          labelHashEntry *entry;
+          /* run isLabelDefinition to:
+             - look for labels in inline assembler
+             - calculate labelLen
+          */
+          if (isLabelDefinition (line->line, &label, &labelLen, FALSE) &&
+              labelLen <= SDCC_NAME_MAX)
+            {
+              labelHashEntry *entry;
 
-          entry = traceAlloc (&_G.labels, Safe_alloc(sizeof (labelHashEntry)));
+              entry = traceAlloc (&_G.labels, Safe_alloc(sizeof (labelHashEntry)));
 
-          memcpy (entry->name, label, labelLen);
-          entry->name[labelLen] = 0;
-          entry->refCount = -1;
+              memcpy (entry->name, label, labelLen);
+              entry->name[labelLen] = 0;
+              entry->refCount = -1;
 
-          /* Assume function entry points are referenced somewhere,   */
-          /* even if we can't find a reference (might be from outside */
-          /* the function) */
-          if (line->ic && (line->ic->op == FUNCTION))
-            entry->refCount++;
+              /* Assume function entry points are referenced somewhere,   */
+              /* even if we can't find a reference (might be from outside */
+              /* the function) */
+              if (line->ic && (line->ic->op == FUNCTION))
+                entry->refCount++;
 
-          hTabAddItem (&labelHash, hashSymbolName (entry->name), entry);
+              hTabAddItem (&labelHash, hashSymbolName (entry->name), entry);
+            }
         }
-      line = line->next;
     }
 
 

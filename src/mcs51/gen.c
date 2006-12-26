@@ -198,6 +198,7 @@ static void
 emitLabel (symbol *tlbl)
 {
   emitcode ("", "%05d$:", tlbl->key + 100);
+  lineCurr->isLabel = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3255,6 +3256,7 @@ genFunction (iCode * ic)
   emitcode (";", "-----------------------------------------");
 
   emitcode ("", "%s:", sym->rname);
+  lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
   _G.currentFunc = sym;
 
@@ -4020,7 +4022,7 @@ genLabel (iCode * ic)
   if (IC_LABEL (ic) == entryLabel)
     return;
 
-  emitcode ("", "%05d$:", (IC_LABEL (ic)->key + 100));
+  emitLabel (IC_LABEL (ic));
 }
 
 /*-----------------------------------------------------------------*/

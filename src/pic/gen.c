@@ -301,7 +301,7 @@ void pic14_emitcode (char *inst,char *fmt, ...)
 {
 	va_list ap;
 	char lb[INITIAL_INLINEASM];  
-	unsigned char *lbp = (unsigned char *)lb;
+	char *lbp = lb;
 	
 	va_start(ap,fmt);   
 	
@@ -322,6 +322,7 @@ void pic14_emitcode (char *inst,char *fmt, ...)
 	(lineHead = newLineNode(lb)));
 	lineCurr->isInline = _G.inLine;
 	lineCurr->isDebug  = _G.debugLine;
+	lineCurr->isLabel = (lbp[strlen (lbp) - 1] == ':');
 	
 	if(debug_verbose)
 		addpCode2pBlock(pb,newpCodeCharP(lb));

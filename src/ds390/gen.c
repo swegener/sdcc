@@ -191,7 +191,7 @@ static unsigned char SRMask[] =
                                 emitcode ("setb","F1");                         \
                                 emitcode ("jbc","EA,!tlabel",lbl->key+100);     \
                                 emitcode ("clr","F1");                          \
-                                emitcode ("","!tlabeldef",lbl->key+100);        \
+                                emitLabel (lbl);                                \
                         }}
 #define UNPROTECT_SP    { if (options.protect_sp_update) {                      \
                                 emitcode ("mov","EA,F1");                       \
@@ -247,6 +247,7 @@ emitcode (char *inst, const char *fmt,...)
   lineCurr->isDebug = _G.debugLine;
   lineCurr->ic = _G.current_iCode;
   lineCurr->aln = ds390newAsmLineNode(_currentDPS);
+  lineCurr->isComment = (*lbp == ';');
   va_end (ap);
 }
 
@@ -254,6 +255,7 @@ static void
 emitLabel (symbol *tlbl)
 {
   emitcode ("", "!tlabeldef", tlbl->key + 100);
+  lineCurr->isLabel = 1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3396,6 +3398,7 @@ genFunction (iCode * ic)
   emitcode (";", "-----------------------------------------");
 
   emitcode ("", "%s:", sym->rname);
+  lineCurr->isLabel = 1;
   ftype = operandType (IC_LEFT (ic));
   _G.currentFunc = sym;
 
@@ -4144,7 +4147,7 @@ genLabel (iCode * ic)
 
   D (emitcode (";", "genLabel"));
 
-  emitcode ("", "!tlabeldef", (IC_LABEL (ic)->key + 100));
+  emitLabel (IC_LABEL (ic));
 }
 
 /*-----------------------------------------------------------------*/
@@ -12627,7 +12630,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
         emitcode ("mov","b,%s",aopGet (count, 1, FALSE, TRUE, NULL));
         freeAsmop (count, NULL, ic, FALSE);
         emitcode ("mov", "dps,#!constbyte",0x21);       /* Select DPTR2 & auto-toggle. */
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         if (fromc) {
             emitcode ("clr","a");
             emitcode ("movc", "a,@a+dptr");
@@ -12646,7 +12649,7 @@ static void genMemcpyX2X( iCode *ic, int nparms, operand **parms, int fromc)
         emitcode ("addc","a,#!constbyte",0xFF);
         emitcode ("mov","b,a");
         emitcode ("sjmp","!tlabel",lbl->key+100);
-        emitcode ("","!tlabeldef",lbl1->key+100);
+        emitLabel (lbl1);
     }
     emitcode ("mov", "dps,#0");
     _G.dptrInUse = _G.dptr1InUse = 0;
@@ -12746,7 +12749,7 @@ static void genMemcmpX2X( iCode *ic, int nparms, operand **parms, int fromc)
         emitcode ("mov","b,%s",aopGet (count, 1, FALSE, TRUE, NULL));
         freeAsmop (count, NULL, ic, FALSE);
         emitcode ("mov", "dps,#!constbyte",0x21);       /* Select DPTR2 & auto-toggle. */
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         if (fromc) {
             emitcode ("clr","a");
             emitcode ("movc", "a,@a+dptr");
@@ -12769,9 +12772,9 @@ static void genMemcmpX2X( iCode *ic, int nparms, operand **parms, int fromc)
         emitcode ("addc","a,#!constbyte",0xFF);
         emitcode ("mov","b,a");
         emitcode ("sjmp","!tlabel",lbl->key+100);
-        emitcode ("","!tlabeldef",lbl1->key+100);
+        emitLabel (lbl1);
         emitcode ("clr","a");
-        emitcode ("","!tlabeldef",lbl2->key+100);
+        emitLabel (lbl2);
         aopOp (IC_RESULT(ic), ic, FALSE,FALSE);
         aopPut(IC_RESULT(ic),"a",0);
         freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
@@ -12863,7 +12866,7 @@ static void genInp( iCode *ic, int nparms, operand **parms)
         emitcode ("mov", "dps,#!constbyte",0x1);        /* Select DPTR2 */
         emitcode ("mov", "b,%s",aopGet(count,0,FALSE,FALSE,NULL));
         freeAsmop (count, NULL, ic, FALSE);
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         emitcode ("movx", "a,@dptr");   /* read data from port */
         emitcode ("dec","dps");         /* switch to DPTR */
         emitcode ("movx", "@dptr,a");   /* save into location */
@@ -12878,7 +12881,7 @@ static void genInp( iCode *ic, int nparms, operand **parms)
         emitcode ("mov","b,%s",aopGet (count, 1, FALSE, TRUE, NULL));
         freeAsmop (count, NULL, ic, FALSE);
         emitcode ("mov", "dps,#!constbyte",0x1);        /* Select DPTR2 */
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         emitcode ("movx", "a,@dptr");
         emitcode ("dec","dps");         /* switch to DPTR */
         emitcode ("movx", "@dptr,a");
@@ -12896,7 +12899,7 @@ static void genInp( iCode *ic, int nparms, operand **parms)
         emitcode ("addc","a,#!constbyte",0xFF);
         emitcode ("mov","b,a");
         emitcode ("sjmp","!tlabel",lbl->key+100);
-        emitcode ("","!tlabeldef",lbl1->key+100);
+        emitLabel (lbl1);
     }
     emitcode ("mov", "dps,#0");
     _G.dptrInUse = _G.dptr1InUse = 0;
@@ -12983,7 +12986,7 @@ static void genOutp( iCode *ic, int nparms, operand **parms)
         emitcode (";","OH  JOY auto increment with djnz (very fast)");
         emitcode ("mov", "dps,#!constbyte",0x0);        /* Select DPTR */
         emitcode ("mov", "b,%s",aopGet(count,0,FALSE,FALSE,NULL));
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         emitcode ("movx", "a,@dptr");   /* read data from port */
         emitcode ("inc","dps");         /* switch to DPTR2 */
         emitcode ("movx", "@dptr,a");   /* save into location */
@@ -12999,7 +13002,7 @@ static void genOutp( iCode *ic, int nparms, operand **parms)
         emitcode ("mov","b,%s",aopGet (count, 1, FALSE, TRUE, NULL));
         freeAsmop (count, NULL, ic, FALSE);
         emitcode ("mov", "dps,#!constbyte",0x0);        /* Select DPTR */
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         emitcode ("movx", "a,@dptr");
         emitcode ("inc", "dptr");
         emitcode ("inc","dps");         /* switch to DPTR2 */
@@ -13015,7 +13018,7 @@ static void genOutp( iCode *ic, int nparms, operand **parms)
         emitcode ("addc","a,#!constbyte",0xFF);
         emitcode ("mov","b,a");
         emitcode ("sjmp","!tlabel",lbl->key+100);
-        emitcode ("","!tlabeldef",lbl1->key+100);
+        emitLabel (lbl1);
     }
     emitcode ("mov", "dps,#0");
     _G.dptrInUse = _G.dptr1InUse = 0;
@@ -13117,7 +13120,7 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
         l = aopGet(val, 0, FALSE, FALSE, NULL);
         emitcode ("mov", "b,%s",aopGet(count,0,FALSE,FALSE,NULL));
         MOVA(l);
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         emitcode ("movx", "@dptr,a");
         emitcode ("inc", "dptr");
         emitcode ("djnz","b,!tlabel",lbl->key+100);
@@ -13126,7 +13129,7 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
 
         emitcode ("mov","_ap,%s",aopGet (count, 0, FALSE, TRUE, NULL));
         emitcode ("mov","b,%s",aopGet (count, 1, FALSE, TRUE, NULL));
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         MOVA (aopGet(val, 0, FALSE, FALSE, NULL));
         emitcode ("movx", "@dptr,a");
         emitcode ("inc", "dptr");
@@ -13140,7 +13143,7 @@ static void genMemsetX(iCode *ic, int nparms, operand **parms)
         emitcode ("addc","a,#!constbyte",0xFF);
         emitcode ("mov","b,a");
         emitcode ("sjmp","!tlabel",lbl->key+100);
-        emitcode ("","!tlabeldef",lbl1->key+100);
+        emitLabel (lbl1);
     }
     freeAsmop (count, NULL, ic, FALSE);
     unsavermask(rsave);
@@ -13326,7 +13329,7 @@ static void genNatLibGetStateBlock(iCode *ic,int nparms,
                 aopPut(IC_RESULT(ic),"r3",1);
         }
         freeAsmop (IC_RESULT(ic), NULL, ic, FALSE);
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         unsavermask(rsave);
 }
 
@@ -13373,7 +13376,7 @@ static void genMMMalloc (iCode *ic,int nparms, operand **parms,
         emitcode ("jz","!tlabel",lbl->key+100);
         emitcode ("mov","r2,#!constbyte",0xff);
         emitcode ("mov","r3,#!constbyte",0xff);
-        emitcode ("","!tlabeldef",lbl->key+100);
+        emitLabel (lbl);
         /* we don't care about the pointer : we just save the handle */
         rsym = OP_SYMBOL(IC_RESULT(ic));
         if (rsym->liveFrom != rsym->liveTo) {

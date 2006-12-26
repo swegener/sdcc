@@ -1,4 +1,39 @@
-2006-12-36 Borut Razem <borut.razem AT siol.net>
+2006-12-26 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCpeeph.c: made labelHashEntry global,
+	made pcDistance, FBYNAME static,
+	(pcDistance): made static, use isComment and isLabel,
+	(deadMove): added,
+	(getLabelRef): added, extracted from labelRefCount(),
+	(labelRefCount): use new getLabelRef(),
+	(callFuncByName): made static, added deadMove,
+	use isComment and isLabel,
+	(newPeepRule): made static, set isLabel,
+	(isLabelDefinition): added parameter isPeepRule to allow '%' in
+	labels from peephole rules,
+	(buildLabelRefCountHash): speed up by running isLabelDefinition() only
+	when isComment or isLabel is set
+	* src/SDCCpeeph.h: added "isLabel" and "visited" to struct lineNode,
+	added labelHashEntry, isLabelDefinition, labelHash and getLabelRef
+	to make them global
+	* src/mcs51/peep.h: added
+	* src/mcs51/peep.c: added, implements mcs51DeadMove()
+	* src/port.h: added peep->deadMove to port structure
+	* src/mcs51/main.c: initialize peep->deadMove with mcs51DeadMove
+	* src/mcs51/peeph.def: renumbered rule 300 to 400, added new rule 300
+	deadMove, finally removed no. 1 and 2
+	* src/mcs51/gen.c,
+	* src/pic/gen.c,
+	* src/z80/gen.c,
+	* src/z80/ralloc.c,
+	* src/pic16/gen.c,
+	* src/ds390/gen.c,
+	* src/hc08/gen.c: mark lines with isComment or isLabel
+	* sim/ucsim/s51.src/uc390hw.cc: don't waist 65535 ticks before CKRDY
+	* .version,
+	* sdcc.spec: bumped version to 2.6.3
+
+2006-12-26 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2/Makefile.in: added dependency on options.h
 	* configure: regenerated

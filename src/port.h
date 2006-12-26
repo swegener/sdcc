@@ -8,6 +8,7 @@
 #include "SDCCicode.h"
 #include "SDCCargs.h"
 #include "SDCCpeeph.h"
+#include "mcs51/peep.h"
 
 #define TARGET_ID_MCS51    1
 #define TARGET_ID_GBZ80    2
@@ -131,6 +132,7 @@ typedef struct
         int (*getSize)(lineNode *line);
         bitVect * (*getRegsRead)(lineNode *line);
         bitVect * (*getRegsWritten)(lineNode *line);
+        bool (*deadMove) (const char *op, lineNode *currPl, lineNode *head);
       }
     peep;
 

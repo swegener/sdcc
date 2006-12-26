@@ -266,6 +266,7 @@ void pic16_emitpcomment (char *fmt, ...)
                     (lineHead = newLineNode(lb)));
     lineCurr->isInline = _G.inLine;
     lineCurr->isDebug  = _G.debugLine;
+    lineCurr->isComment = 1;
 
     pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(lb));
     va_end(ap);
@@ -378,6 +379,8 @@ void pic16_emitcode (char *inst,char *fmt, ...)
                     (lineHead = newLineNode(lb)));
     lineCurr->isInline = _G.inLine;
     lineCurr->isDebug  = _G.debugLine;
+    lineCurr->isLabel = (lbp[strlen (lbp) - 1] == ':');
+    lineCurr->isComment = (*lbp == ';');
 
 // VR    fprintf(stderr, "lb = <%s>\n", lbp);
 

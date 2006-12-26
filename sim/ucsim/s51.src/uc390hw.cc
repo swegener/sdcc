@@ -92,7 +92,7 @@ cl_uc390_hw::read (class cl_memory_cell *cell)
   if (cell == cell_exif)
     {
       if (ctm_ticks &&
-          uc390->ticks->ticks >= ctm_ticks + 65535)
+          uc390->ticks->ticks >= ctm_ticks + 50 /*65535*/)
         {
           ctm_ticks = 0;
           cell->set (cell->get() | 0x08); /* set CKRDY */

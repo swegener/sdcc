@@ -222,7 +222,7 @@ LIBCPP_OBJS =	c-ppoutput.o cppinit.o cpplib.o cpplex.o cppmacro.o cppexp.o cppfi
 		line-map.o cpptrad.o cppcharset.o hashtab.o \
 		opts.o options.o diagnostic.o pretty-print.o c-incpath.o
 
-LIBCPP_DEPS =	cpplib.h cpphash.h hashtable.h intl.h $(OBSTACK_H) $(SYSTEM_H)
+LIBCPP_DEPS =	cpplib.h cpphash.h hashtable.h intl.h options.h $(OBSTACK_H) $(SYSTEM_H)
 
 # Most of the other archives built/used by this makefile are for
 # targets.  This one is strictly for the host.
@@ -240,8 +240,8 @@ $(TARGET): sdcpp.o sdcpp-opts.o $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS)
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ sdcpp.o sdcpp-opts.o \
 	$(MY_LIBIBERTY_BITS) libcpp.a $(LIBS)
 
-sdcpp.o:      sdcpp.c  $(CONFIG_H) cpplib.h $(SYSTEM_H)
-sdcpp-opts.o: sdcpp-opts.c $(CONFIG_H) $(LIBCPP_DEPS)
+sdcpp.o:      sdcpp.c  $(CONFIG_H) cpplib.h $(SYSTEM_H) options.h
+sdcpp-opts.o: sdcpp-opts.c $(CONFIG_H) $(LIBCPP_DEPS) options.h
 
 c-ppoutput.o:  c-ppoutput.c  $(CONFIG_H) cpplib.h intl.h $(SYSTEM_H)
 cppinit.o:  cppinit.c  $(CONFIG_H) $(LIBCPP_DEPS) cppdefault.h \

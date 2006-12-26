@@ -1,3 +1,9 @@
+2006-12-36 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/Makefile.in: added dependency on options.h
+	* configure: regenerated
+	* support/cpp2/sdcpp.opt, support/cpp2/move-if-change: svn:eol-style native
+
 2006-12-25 Borut Razem <borut.razem AT siol.net>
 
 	* SDCPP synchronized with GCC CPP release version 3.4.6,

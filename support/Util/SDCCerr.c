@@ -436,6 +436,8 @@ struct
    "ISO C forbids an empty source file" },
 { W_BAD_PRAGMA_ARGUMENTS, ERROR_LEVEL_WARNING,
    "#pragma %s: bad argument(s); pragma ignored" },
+{ E_BAD_RESTRICT, ERROR_LEVEL_ERROR,
+   "Only pointers may be qualified with 'restrict'" },
 };
 
 /*

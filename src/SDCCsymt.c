@@ -657,6 +657,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   SPEC_CONST(dest) |= SPEC_CONST (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);
   SPEC_VOLATILE (dest) |= SPEC_VOLATILE (src);
+  SPEC_RESTRICT (dest) |= SPEC_RESTRICT (src);
   SPEC_ADDR (dest) |= SPEC_ADDR (src);
   SPEC_OCLS (dest) = SPEC_OCLS (src);
   SPEC_BLEN (dest) |= SPEC_BLEN (src);
@@ -1441,6 +1442,24 @@ checkSClass (symbol * sym, int isProto)
       SPEC_SCLS (sym->etype) == S_SFR)
     {
       SPEC_VOLATILE (sym->etype) = 1;
+    }
+  
+  /* make sure restrict is only used with pointers */
+  if (SPEC_RESTRICT (sym->etype))
+    {
+      werrorfl (sym->fileDef, sym->lineDef, E_BAD_RESTRICT);
+      SPEC_RESTRICT (sym->etype) = 0;
+    }
+  t = sym->type;
+  while (t)
+    {
+      if (IS_DECL (t) && DCL_PTR_RESTRICT (t) && !IS_PTR (t))
+        {
+          werrorfl (sym->fileDef, sym->lineDef, E_BAD_RESTRICT);
+	  DCL_PTR_RESTRICT (t) = 0;
+          break;
+        }
+      t = t->next;
     }
   
   /* if absolute address given then it mark it as

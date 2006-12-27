@@ -117,3 +117,5 @@ extern volatile XDATA at 0 int a; /* IGNORE */
 volatile XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
 #endif
 #endif
+
+int validDeclaraction;  /* to make sure this is never an empty source file */

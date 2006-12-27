@@ -31,6 +31,8 @@ gcc = {
     "CCFLAGS":"-c -Wall -DPORT_HOST=1",
     "CCDEF":"-D",
     "CCOUTPUT":"-o",
+    "C89":"-std=c89",
+    "C99":"-std=c99",
     "defined": {
         "__GNUC__":"1",
         "GCC":"1"
@@ -44,6 +46,8 @@ sdcc = {
     "CCFLAGS":"-c -m{port}",
     "CCDEF":"-D",
     "CCOUTPUT":"-o",
+    "C89":"--std-sdcc89",
+    "C99":"--std-sdcc99",
     "defined": {
         "SDCC":"1",
         "SDCC_{port}":"1",
@@ -267,7 +271,13 @@ failurecount = 0
 
 for testname in testcases.keys():
     ccdef = compilermode["CCDEF"]+testname
-    cmd = string.join([cc,ccflags,ccdef,inputfilename])
+    if testname[-3:] == "C89":
+        ccstd = compilermode["C89"]
+    elif testname[-3:] == "C99":
+        ccstd = compilermode["C99"]
+    else:
+        ccstd = ""
+    cmd = string.join([cc,ccflags,ccstd,ccdef,inputfilename])
     print
     print cmd
     spawn = popen2.Popen4(cmd)

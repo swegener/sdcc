@@ -158,6 +158,7 @@ typedef struct specifier
     unsigned b_absadr:1;                /* absolute address specfied  */
     unsigned b_volatile:1;              /* is marked as volatile      */
     unsigned b_const:1;                 /* is a constant              */
+    unsigned b_restrict:1;              /* is restricted              */
     unsigned b_typedef:1;               /* is typedefed               */
     unsigned b_isregparm:1;             /* is the first parameter     */
     unsigned b_isenum:1;                /* is an enumerated type      */
@@ -205,6 +206,7 @@ typedef struct declarator
                                         /* always 0 for flexible arrays */
     unsigned ptr_const:1;               /* pointer is constant        */
     unsigned ptr_volatile:1;            /* pointer is volatile        */
+    unsigned ptr_restrict:1;            /* pointer is resticted       */
     struct sym_link *tspec;             /* pointer type specifier     */
   }
 declarator;
@@ -364,6 +366,7 @@ extern sym_link *validateLink(sym_link  *l,
 #define DCL_ELEM(l)  validateLink(l, "DCL_ELEM", #l, DECLARATOR, __FILE__, __LINE__)->select.d.num_elem
 #define DCL_PTR_CONST(l) validateLink(l, "DCL_PTR_CONST", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_const
 #define DCL_PTR_VOLATILE(l) validateLink(l, "DCL_PTR_VOLATILE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_volatile
+#define DCL_PTR_RESTRICT(l) validateLink(l, "DCL_PTR_RESTRICT", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_restrict
 #define DCL_TSPEC(l) validateLink(l, "DCL_TSPEC", #l, DECLARATOR, __FILE__, __LINE__)->select.d.tspec
 
 #define FUNC_DEBUG //assert(IS_FUNC(x));
@@ -437,6 +440,7 @@ extern sym_link *validateLink(sym_link  *l,
 #define SPEC_ISR_SAVED_BANKS(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitStart
 #define SPEC_VOLATILE(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_volatile
 #define SPEC_CONST(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_const
+#define SPEC_RESTRICT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_restrict
 #define SPEC_STRUCT(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.v_struct
 #define SPEC_TYPEDEF(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_typedef
 #define SPEC_REGPARM(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_isregparm
@@ -456,6 +460,7 @@ extern sym_link *validateLink(sym_link  *l,
                                      DCL_TYPE(x) == CPOINTER   ||    \
                                      DCL_TYPE(x) == UPOINTER  ))
 #define IS_PTR_CONST(x) (IS_PTR(x) && DCL_PTR_CONST(x))
+#define IS_PTR_RESTRICT(x) (IS_PTR(x) && DCL_PTR_RESTRICT(x))
 #define IS_FARPTR(x) (IS_DECL(x) && DCL_TYPE(x) == FPOINTER)
 #define IS_CODEPTR(x) (IS_DECL(x) && DCL_TYPE(x) == CPOINTER)
 #define IS_GENPTR(x) (IS_DECL(x) && DCL_TYPE(x) == GPOINTER)

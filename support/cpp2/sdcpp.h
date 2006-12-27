@@ -3,7 +3,11 @@
 
 #ifdef _WIN32
 #include <string.h>
+#ifdef __BORLANDC__
 #define strcasecmp  stricmp
+#else
+#define strcasecmp  _stricmp
+#endif
 #endif
 #define BYTES_BIG_ENDIAN  0
 

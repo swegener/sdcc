@@ -335,68 +335,79 @@ do_pragma(int id, const char *name, const char *cp)
         int found = 0;
 
         cp = get_pragma_token(cp, &token);
-        if (TOKEN_EOL == token.type)
-          goto udata_err;
-
-        sectname = Safe_strdup(get_pragma_string(&token));
+        if (TOKEN_STR == token.type)
+          sectname = Safe_strdup(get_pragma_string(&token));
+        else
+          {
+            err = 1;
+            break;
+          }
 
         cp = get_pragma_token(cp, &token);
-        if (TOKEN_EOL == token.type)
+        if (TOKEN_STR == token.type)
+          symname = get_pragma_string(&token);
+        else
           {
-          udata_err:
             //fprintf (stderr, "%s:%d: #pragma udata [section-name] [symbol] -- section-name or symbol missing!\n", filename, lineno);
             err = 1;
-            break;
+            symname = NULL;
           }
-        symname = get_pragma_string(&token);
 
-        cp = get_pragma_token(cp, &token);
-        if (TOKEN_EOL != token.type)
+        while (symname)
           {
-            err = 1;
-            break;
-          }
+            ssym = Safe_calloc(1, sizeof(sectSym));
+            ssym->name = Safe_calloc(1, strlen(symname) + 2);
+            sprintf(ssym->name, "%s%s", port->fun_prefix, symname);
+            ssym->reg = NULL;
 
-        while (symname) {
-          ssym = Safe_calloc(1, sizeof(sectSym));
-          ssym->name = Safe_calloc(1, strlen(symname) + 2);
-          sprintf(ssym->name, "%s%s", port->fun_prefix, symname);
-          ssym->reg = NULL;
+            addSet(&sectSyms, ssym);
 
-          addSet(&sectSyms, ssym);
-
-          nsym = newSymbol((char *)symname, 0);
-          strcpy(nsym->rname, ssym->name);
+            nsym = newSymbol((char *)symname, 0);
+            strcpy(nsym->rname, ssym->name);
 
 #if 0
-          checkAddSym(&publics, nsym);
+            checkAddSym(&publics, nsym);
 #endif
 
-          found = 0;
-          for (snam = setFirstItem(sectNames);snam;snam=setNextItem(sectNames)) {
-            if (!strcmp(sectname, snam->name)){ found=1; break; }
-          }
+            found = 0;
+            for (snam = setFirstItem(sectNames);snam;snam=setNextItem(sectNames))
+              {
+                if (!strcmp(sectname, snam->name))
+                  {
+                    found=1;
+                    break;
+                  }
+              }
 
-          if(!found) {
-            snam = Safe_calloc(1, sizeof(sectName));
-            snam->name = Safe_strdup(sectname);
-            snam->regsSet = NULL;
+            if(!found)
+              {
+                snam = Safe_calloc(1, sizeof(sectName));
+                snam->name = Safe_strdup(sectname);
+                snam->regsSet = NULL;
 
-            addSet(&sectNames, snam);
-          }
+                addSet(&sectNames, snam);
+              }
 
-          ssym->section = snam;
+            ssym->section = snam;
 
 #if 0
-          fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
-             ssym->name, snam->name, snam);
+            fprintf(stderr, "%s:%d placing symbol %s at section %s (%p)\n", __FILE__, __LINE__,
+               ssym->name, snam->name, snam);
 #endif
 
-          cp = get_pragma_token(cp, &token);
-          symname = (TOKEN_EOL != token.type) ? get_pragma_string(&token) : NULL;
-        }
+            cp = get_pragma_token(cp, &token);
+            if (TOKEN_STR == token.type)
+              symname = get_pragma_string(&token);
+            else if (TOKEN_EOL == token.type)
+              symname = NULL;
+            else
+              {
+                err = 1;
+                symname = NULL;
+              }
+          }
 
-        Safe_free(sectname);
+          Safe_free(sectname);
       }
       break;
 

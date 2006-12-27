@@ -93,6 +93,10 @@ SOURCE=.\main.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\peep.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\ralloc.c
 # End Source File
 # End Group
@@ -106,6 +110,10 @@ SOURCE=.\gen.h
 # Begin Source File
 
 SOURCE=.\main.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\peep.h
 # End Source File
 # Begin Source File
 

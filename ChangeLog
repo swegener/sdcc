@@ -18,6 +18,8 @@
 	* support/cpp2/libiberty/getpwd.c, support/cpp2/sdcpp.h:
 	  fixed for borland C
 	* support/cpp2/libiberty/Makefile.bcc: updated
+	* src/pic16/main.c: fixed #pragma udata handling
+	* src/mcs51/mcs51.dsp: added peep.[ch] to the project
 
 2006-12-26 Bernhard Held <bernhard AT bernhardheld.de>
 

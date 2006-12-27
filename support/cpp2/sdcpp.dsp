@@ -181,10 +181,6 @@ SOURCE=".\line-map.c"
 # End Source File
 # Begin Source File
 
-SOURCE=.\mbchar.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\mkdeps.c
 # End Source File
 # Begin Source File

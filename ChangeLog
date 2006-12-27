@@ -1,3 +1,12 @@
+2006-12-27 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/cppmain.c, support/cpp2/mbchar.[ch]: removed
+	* support/cpp2/libiberty/Makefile.in, support/cpp2/libiberty/sdcpp.dsp:
+	  mbchar removed
+	* support/cpp2/libiberty/getpwd.c, support/cpp2/sdcpp.h:
+	  fixed for borland C
+	* support/cpp2/libiberty/Makefile.bcc: updated
+
 2006-12-26 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCpeeph.c: made labelHashEntry global,

@@ -6,14 +6,15 @@ PRJDIR          = ../..
 
 CFLAGS = $(CFLAGS) -I. -I./libiberty -DHAVE_CONFIG_H
 
-OBJECTS         = sdcppmain.obj sdcppinit.obj \
-                  cppmain.obj cpplib.obj cpplex.obj cppmacro.obj cppexp.obj \
+OBJECTS         = sdcpp.obj cppinit.obj \
+                  cpplib.obj cpplex.obj cppmacro.obj cppexp.obj \
                   cppfiles.obj cpphash.obj cpperror.obj cppdefault.obj \
-                  hashtable.obj mkdeps.obj prefix.obj version.obj mbchar.obj \
+                  hashtable.obj mkdeps.obj prefix.obj version.obj \
                   line-map.obj cpptrad.obj \
+                  sdcpp-opts.obj cppcharset.obj hashtab.obj c-incpath.obj c-ppoutput.obj opts.obj options.obj diagnostic.obj pretty-print.obj \
                   safe-ctype.obj obstack.obj splay-tree.obj lbasename.obj \
                   hex.obj concat.obj \
-                  xmalloc.obj xstrdup.obj xexit.obj xstrerror.obj
+                  xmalloc.obj xstrdup.obj xexit.obj xmemdup.obj xstrerror.obj getpwd.obj vasprintf.obj
 
 TARGET          = $(PRJDIR)/bin/sdcpp.exe
 
@@ -34,4 +35,7 @@ concat.obj: libiberty\concat.c
 xmalloc.obj: libiberty\xmalloc.c
 xstrdup.obj: libiberty\xstrdup.c
 xexit.obj: libiberty\xexit.c
+xmemdup.obj: libiberty\xmemdup.c
 xstrerror.obj: libiberty\xstrerror.c
+getpwd.obj: libiberty\getpwd.c
+vasprintf.obj: libiberty\vasprintf.c

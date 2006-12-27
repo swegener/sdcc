@@ -3,11 +3,11 @@
 
 #ifdef _WIN32
 #include <string.h>
-#define strcasecmp  _stricmp
+#define strcasecmp  stricmp
 #endif
 #define BYTES_BIG_ENDIAN  0
 
-#if defined _MSC_VER || defined __MINGW32__
+#if defined _MSC_VER || defined __MINGW32__ || defined __BORLANDC__
 /*
  * The following define causes the following warning:
  * warning: `I' flag used with `%x' printf format
@@ -220,7 +220,7 @@ extern void sdcpp_common_finish (void);
 
 /* Nonzero means pass #include lines through to the output.  */
 
-char flag_dump_includes;
+extern char flag_dump_includes;
 
 /* In c-ppoutput.c  */
 extern void init_pp_output (FILE *);

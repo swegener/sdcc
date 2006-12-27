@@ -229,9 +229,9 @@ libcpp.a: $(LIBCPP_OBJS)
 	$(AR) $(AR_FLAGS) libcpp.a $(LIBCPP_OBJS)
 	-$(RANLIB) libcpp.a
 
-MY_LIBIBERTY_BITS = safe-ctype.o obstack.o splay-tree.o \
-		    lbasename.o hex.o concat.o \
-		    xmalloc.o xmemdup.o xstrdup.o xstrerror.o xexit.o getpwd.o
+MY_LIBIBERTY_BITS = concat.o getpwd.o hex.o lbasename.o obstack.o \
+		    safe-ctype.o splay-tree.o vasprintf.c xexit.o xmalloc.o \
+		    xmemdup.o xstrdup.o xstrerror.o
 
 $(TARGET): sdcpp.o sdcpp-opts.o $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS)
 	mkdir -p $(dir $@)

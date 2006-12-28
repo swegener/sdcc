@@ -1,3 +1,9 @@
+2006-12-28 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/config.in, support/cpp2/configure.in,
+	  support/cpp2/configure, support/cpp2/Makefile.in:
+	  fix for the solaris build
+
 2006-12-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.y (type_specifier2, pointer),
@@ -8,7 +14,7 @@
 	* support/valdiag/valdiag.py: Allow test cases to specify
 	  required language standard
 	* support/valdiag/tests/restrict.c: New file to test restrict keyword
-	* support/valdiag/tests/tentdecl.c: Supress empty source file error 
+	* support/valdiag/tests/tentdecl.c: Supress empty source file error
 
 2006-12-27 Borut Razem <borut.razem AT siol.net>
 

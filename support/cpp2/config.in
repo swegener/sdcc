@@ -106,6 +106,9 @@
 /* Define if you have the tsearch function.  */
 #undef HAVE_TSEARCH
 
+/* Define to 1 if we found this declaration otherwise define to 0. */
+#undef HAVE_DECL_STRSIGNAL
+
 /* Define if you have the <fcntl.h> header file.  */
 #undef HAVE_FCNTL_H
 

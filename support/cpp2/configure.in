@@ -167,6 +167,13 @@ else
 fi
 
 # Find some useful tools
+AC_PROG_AWK
+# We need awk to run opts.sh (to create options.c and options.h).
+# Bail out if it's missing.
+case ${AWK} in
+  "") AC_MSG_ERROR([can't build without awk, bailing out]) ;;
+esac
+
 gcc_AC_PROG_LN
 gcc_AC_PROG_LN_S
 AC_PROG_RANLIB
@@ -200,7 +207,7 @@ AC_C_STRINGIZE
 dnl Disabled until we have a complete test for buggy enum bitfields.
 dnl gcc_AC_C_ENUM_BF_UNSIGNED
 
-AC_CHECK_FUNCS(clock strchr strrchr lstat)
+AC_CHECK_FUNCS(clock strsignal strchr strrchr lstat)
 
 AC_CHECK_TYPE(ssize_t, int)
 
@@ -210,7 +217,7 @@ AC_FUNC_MMAP_FILE
 # We will need to find libiberty.h and ansidecl.h
 saved_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -I${srcdir} -I${srcdir}/../include"
-gcc_AC_CHECK_DECLS(getenv abort errno \
+gcc_AC_CHECK_DECLS(getenv abort strsignal errno \
 	malloc realloc calloc free clock, , ,[
 #include "ansidecl.h"
 #include "system.h"])

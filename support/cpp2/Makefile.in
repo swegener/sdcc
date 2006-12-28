@@ -42,6 +42,7 @@ ALL_CFLAGS = $(INTERNAL_CFLAGS) $(X_CFLAGS) $(T_CFLAGS) \
 ALL_CPPFLAGS = $(CPPFLAGS) $(X_CPPFLAGS) $(T_CPPFLAGS)
 LDFLAGS = @LDFLAGS@
 
+AWK = @AWK@
 CC = @CC@
 AR = ar
 AR_FLAGS = rc
@@ -185,7 +186,7 @@ config.status: $(srcdir)/configure  version.c
 options.c: $(lang_opt_files) $(srcdir)/opts.sh options.h intl.h
 
 options.h: $(lang_opt_files) $(srcdir)/opts.sh Makefile
-	AWK=awk $(SHELL) $(srcdir)/opts.sh \
+	AWK=$(AWK) $(SHELL) $(srcdir)/opts.sh \
                '$(SHELL) $(srcdir)/move-if-change' \
                options.c options.h $(lang_opt_files)
 

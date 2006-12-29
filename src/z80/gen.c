@@ -128,9 +128,9 @@ enum
 };
 
 static char *_z80_return[] =
-{"l", "h", "e", "d"};
+  {"l", "h", "e", "d"};
 static char *_gbz80_return[] =
-{"e", "d", "l", "h"};
+  {"e", "d", "l", "h"};
 static char *_fReceive[] =
   { "c", "b", "e", "d" };
 
@@ -2515,6 +2515,16 @@ assignResultValue (operand * oper)
     }
   else
     {
+      if ((AOP_TYPE (oper) == AOP_REG) && (AOP_SIZE (oper) == 4) &&
+          !strcmp (AOP (oper)->aopu.aop_reg[size-1]->name, _fReturn[size-2]))
+        {
+          size--;
+          _emitMove ("a", _fReturn[size-1]);
+          _emitMove (_fReturn[size-1], _fReturn[size]);
+          _emitMove (_fReturn[size], "a");
+          aopPut (AOP (oper), _fReturn[size], size-1);
+          size--;
+        }
       while (size--)
         {
           aopPut (AOP (oper), _fReturn[size], size);
@@ -8136,7 +8146,7 @@ genZ80Code (iCode * lic)
              spilt live range, if there is an ifx statement
              following this pop then the if statement might
              be using some of the registers being popped which
-             would destory the contents of the register so
+             would destroy the contents of the register so
              we need to check for this condition and handle it */
           if (ic->next &&
               ic->next->op == IFX &&

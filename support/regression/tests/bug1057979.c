@@ -53,7 +53,7 @@ test_sprintf(void)
   ASSERT( 0 == strcmp( s, "ab " ) );
 #endif
 
-#if defined(SDCC__ds390) || defined(PORT_HOST)
+#if defined(SDCC_ds390) || defined(PORT_HOST)
   //and from bug 1358192
   sprintf( s, "%f", 10.1 );
   LOG((s));

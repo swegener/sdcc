@@ -41,12 +41,17 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_RANLIB
-AC_PROG_LEX
-AC_PROG_YACC
 AC_CHECK_PROG(AUTOCONF, autoconf, autoconf, :)
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_CHECK_PROG(AS, as, as, :)
 AC_CHECK_PROG(CP, cp, cp, :)
+
+dnl Don't use AC_PROG_LEX; we insist on flex.
+dnl LEXLIB is not useful in gcc.
+AC_CHECK_PROGS([FLEX], flex, :)
+
+dnl Don't use AC_PROG_YACC; we insist on bison.
+AC_CHECK_PROGS([BISON], bison, :)
 
 AC_DEFUN(SDCC_REQUIRE_PROG,
 [if test "$1" = ":"; then
@@ -54,8 +59,8 @@ AC_DEFUN(SDCC_REQUIRE_PROG,
  fi
 ])
 
-SDCC_REQUIRE_PROG($YACC, bison)
-SDCC_REQUIRE_PROG($LEX, lex)
+SDCC_REQUIRE_PROG($BISON, bison)
+SDCC_REQUIRE_PROG($FLEX, flex)
 
 AC_LANG_C
 

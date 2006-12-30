@@ -61,7 +61,7 @@ MTL=midl.exe
 # Name "sdcppa - Win32 Debug"
 # Begin Source File
 
-SOURCE=.\auto-host_vc_in.h
+SOURCE=".\auto-host_vc_in.h"
 
 !IF  "$(CFG)" == "sdcppa - Win32 Release"
 
@@ -70,6 +70,7 @@ InputPath=.\auto-host_vc_in.h
 
 "auto-host.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy auto-host_vc_in.h auto-host.h > nul
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "sdcppa - Win32 Debug"
@@ -79,6 +80,61 @@ InputPath=.\auto-host_vc_in.h
 
 "auto-host.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy auto-host_vc_in.h auto-host.h > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\options_vc_in.c
+
+!IF  "$(CFG)" == "sdcppa - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\options_vc_in.c
+
+"options.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy options_vc_in.c options.c > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "sdcppa - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\options_vc_in.c
+
+"options.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy options_vc_in.c options.c > nul
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\options_vc_in.h
+
+!IF  "$(CFG)" == "sdcppa - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\options_vc_in.h
+
+"options.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy options_vc_in.h options.h > nul
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "sdcppa - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\options_vc_in.h
+
+"options.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	copy options_vc_in.h options.h > nul
+
 # End Custom Build
 
 !ENDIF 

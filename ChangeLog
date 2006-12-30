@@ -1,4 +1,8 @@
 2006-12-30 Bernhard Held <bernhard AT bernhardheld.de>
+	* src/mcs51/peeph.def: renamed rule 400 to 500, moved rule 253.x to
+	400.x for better code in RFE 899102
+
+2006-12-30 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCpeeph.c (deadMove),
 	* src/port.h,

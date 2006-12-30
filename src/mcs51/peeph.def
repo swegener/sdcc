@@ -3712,39 +3712,6 @@ replace {
 	mov	r%3,a
 }
 
-// applies to: void test( char c ) { if( c ) func1(); else func2(); }
-replace {
-	lcall	%1
-	ret
-} by {
-	;	Peephole 253.a	replaced lcall/ret with ljmp
-	ljmp	%1
-}
-
-// applies to: void test( char c ) { if( c ) func1(); else func2(); }
-replace {
-	lcall	%1
-%2:
-	ret
-} by {
-	;	Peephole 253.b	replaced lcall/ret with ljmp
-	ljmp	%1
-	;
-} if labelRefCount %2 0
-
-// applies to f.e. scott-bool1.c
-replace {
-	lcall	%1
-%2:
-	ret
-} by {
-	;	Peephole 253.c	replaced lcall with ljmp
-	ljmp	%1
-%2:
-	ret
-}
-
-
 // applies to f.e. funptrs.c
 // saves one byte if %1 is a register or @register
 replace {
@@ -4605,9 +4572,42 @@ replace {
 } if notVolatile(%2), deadMove(%1)
 
 
+// applies to: void test( char c ) { if( c ) func1(); else func2(); }
+replace {
+	lcall	%1
+	ret
+} by {
+	;	Peephole 400.a	replaced lcall/ret with ljmp
+	ljmp	%1
+}
+
+// applies to: void test( char c ) { if( c ) func1(); else func2(); }
+replace {
+	lcall	%1
+%2:
+	ret
+} by {
+	;	Peephole 400.b	replaced lcall/ret with ljmp
+	ljmp	%1
+	;
+} if labelRefCount %2 0
+
+// applies to f.e. scott-bool1.c
+replace {
+	lcall	%1
+%2:
+	ret
+} by {
+	;	Peephole 400.c	replaced lcall with ljmp
+	ljmp	%1
+%2:
+	ret
+}
+
+
 // should be one of the last peepholes
 replace{
 %1:
 } by {
-	;	Peephole 400	removed redundant label %1
+	;	Peephole 500	removed redundant label %1
 } if labelRefCount(%1 0)

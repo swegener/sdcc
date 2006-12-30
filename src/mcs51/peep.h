@@ -22,4 +22,4 @@
   what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-bool mcs51DeadMove (const char *op, lineNode *currPl, lineNode *head);
+bool mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head);

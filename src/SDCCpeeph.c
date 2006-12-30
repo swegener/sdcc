@@ -308,10 +308,10 @@ FBYNAME (okToRemoveSLOC)
 /*-----------------------------------------------------------------*/
 FBYNAME (deadMove)
 {
-  char *op = hTabItemWithKey (vars, 1);
+  const char *reg = hTabItemWithKey (vars, 1);
 
   if (port->peep.deadMove)
-    return port->peep.deadMove (op, currPl, head);
+    return port->peep.deadMove (reg, currPl, head);
 
   fprintf (stderr, "Function deadMove not initialized in port structure\n"); 
   return FALSE;

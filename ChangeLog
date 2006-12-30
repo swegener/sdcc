@@ -1,3 +1,18 @@
+2006-12-30 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCpeeph.c (deadMove),
+	* src/port.h,
+	* src/mcs51/peep.h: renamed 'op' by 'reg'
+	* src/mcs51/peep.c (isFunc, isCallerSaveFunc): added,
+	(scan4op): small change for removeDeadMove(), added support for
+	'callee saves' and/or PACLL function calls,
+	(removeDeadMove): added, removes superflous 'mov r%1,%2',
+	(removeDeadPopPush): renamed from mcs51DeadMove(), common parts
+	left in new dispatcher mcs51DeadMove()
+	(mcs51DeadMove): dispatcher for removeDeadPopPush() and new
+	removeDeadMove()
+	* src/mcs51/peeph.def: added rule 301 removing superflous 'mov r%1,%2'
+
 2006-12-30 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* support/cpp2/options_vc_in.h, support/cpp2/options_vc_in.c,

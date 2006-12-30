@@ -132,7 +132,7 @@ typedef struct
         int (*getSize)(lineNode *line);
         bitVect * (*getRegsRead)(lineNode *line);
         bitVect * (*getRegsWritten)(lineNode *line);
-        bool (*deadMove) (const char *op, lineNode *currPl, lineNode *head);
+        bool (*deadMove) (const char *reg, lineNode *currPl, lineNode *head);
       }
     peep;
 

@@ -26,7 +26,7 @@
 #include "ralloc.h"
 
 #define D(x) x
-#define DEADMOVEERROR "Internal error: deadmove\n"
+#define DEADMOVEERROR "SDCC internal error: deadmove in " __FILE__" line %d\n", __LINE__
 
 typedef enum
 {
@@ -200,6 +200,35 @@ findLabel (const lineNode *pl)
 }
 
 /*-----------------------------------------------------------------*/
+/* isFunc - returns TRUE if it's a CALL or PCALL (not _gptrget())  */
+/*-----------------------------------------------------------------*/
+static bool
+isFunc (const lineNode *pl)
+{
+  if (pl && pl->ic)
+    {
+      if (   pl->ic->op == CALL
+          || pl->ic->op == PCALL)
+        return TRUE;
+    }
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* isCallerSaveFunc - returns TRUE if it's a 'normal' function     */
+/* call and it's a 'caller save' (not 'callee save')               */
+/*-----------------------------------------------------------------*/
+static bool
+isCallerSaveFunc (const lineNode *pl)
+{
+  if (!isFunc (pl))
+    return FALSE;
+  if (FUNC_CALLEESAVES(OP_SYM_TYPE(IC_LEFT(pl->ic))))
+    return FALSE;
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
 /* scan4op - "executes" and examines the assembler opcodes,        */
 /* follows conditional and un-conditional jumps.                   */
 /* Moreover it registers all passed labels.                        */
@@ -308,9 +337,8 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
               if (bitVectBitValue (port->peep.getRegsWritten ((*pl)), rIdx))
                 return S4O_WR_OP;
 
-              /* should never reach here */
-              D(fprintf (stderr, DEADMOVEERROR);)
-              return S4O_ABORT;
+              /* we can get here, if the register name is
+                 part of a variable name: ignore it */
             }
         }
 
@@ -340,7 +368,12 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
         {
           case 'a':
             if (strncmp ("acall", (*pl)->line, 5) == 0)
-              return S4O_TERM;
+              {
+                /* for comments see 'lcall' */
+                if (isCallerSaveFunc (*pl))
+                  return S4O_TERM;
+                break;
+              }
             if (strncmp ("ajmp", (*pl)->line, 4) == 0)
               {
                 *pl = findLabel (*pl);
@@ -384,7 +417,23 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
             break;
           case 'l':
             if (strncmp ("lcall", (*pl)->line, 5) == 0)
-              return S4O_TERM;
+              {
+                if (isCallerSaveFunc (*pl))
+                  {
+                    /* If it's a 'normal' 'caller save' function call, all
+                       registers have been saved until the 'lcall'. The
+                       'life range' of all registers end at the lcall,
+                       and we can terminate our search.
+                    */
+                    return S4O_TERM;
+                  }
+                /* If it's a 'callee save' function call, registers are saved
+                   by the callee. We've got no information, if the register
+                   might live beyond the lcall. Therefore we've to continue
+                   the search.
+                */
+                break;
+              }
             if (strncmp ("ljmp", (*pl)->line, 4) == 0)
               {
                 *pl = findLabel (*pl);
@@ -398,9 +447,23 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
               return S4O_PUSHPOP;
             break;
           case 'r':
-            /* pcall uses ret */
-            if (strncmp ("ret", (*pl)->line, 3) == 0) /* catches "reti" too */
+            if (strncmp ("reti", (*pl)->line, 4) == 0)
               return S4O_TERM;
+
+            if (strncmp ("ret", (*pl)->line, 3) == 0)
+              {
+                /* pcall uses 'ret' */
+                if (isFunc (*pl))
+                  {
+                    /* for comments see 'lcall' */
+                    if (isCallerSaveFunc (*pl))
+                      return S4O_TERM;
+                    break;
+                  }
+
+                /* it's a normal function return */
+                return S4O_TERM;
+              }
             break;
           case 's':
             if (strncmp ("sjmp", (*pl)->line, 4) == 0)
@@ -507,12 +570,11 @@ doTermScan (lineNode **pl, const char *pReg)
 }
 
 /*-----------------------------------------------------------------*/
-/* -                                                               */
+/* removeDeadPopPush - remove pop/push pair if possible            */
 /*-----------------------------------------------------------------*/
-bool
-mcs51DeadMove (const char *op1, lineNode *currPl, lineNode *head)
+static bool
+removeDeadPopPush (const char *pReg, lineNode *currPl, lineNode *head)
 {
-  char pReg[5] = "ar";
   lineNode *pushPl, *pl;
 
   /* A pop/push pair can be removed, if these criteria are met
@@ -543,15 +605,10 @@ mcs51DeadMove (const char *op1, lineNode *currPl, lineNode *head)
       ;    - inline assembly
       ;    - a jump in or out of area 2 (see checkLabelRef())
 
-      ; An "acall", "lcall", "ret", "reti" or write access of ar0 terminate
-      ; the search, and the pop/push pair can safely be removed.
+      ; An "acall", "lcall" (not callee save), "ret" (not PCALL with
+      ; callee save), "reti" or write access of r0 terminate
+      ; the search, and the "mov r0,a" can safely be removed.
   */
-
-  _G.head = head;
-  strcat (pReg, op1);
-
-  unvisitLines (_G.head);
-  cleanLabelRef();
 
   /* area 1 */
   pushPl = currPl->next;
@@ -588,4 +645,66 @@ mcs51DeadMove (const char *op1, lineNode *currPl, lineNode *head)
 
   /* 'pop ar0' will be removed by peephole framework after returning TRUE */
   return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* removeDeadMove - remove superflous 'mov r%1,%2'                 */
+/*-----------------------------------------------------------------*/
+static bool
+removeDeadMove (const char *pReg, lineNode *currPl, lineNode *head)
+{
+  lineNode *pl;
+
+  /* "mov r0,a" can be removed, if these criteria are met
+     (r0 is just an example here, r0...r7 are possible):
+
+      ; There must not be:
+      ;    - read access of r0
+      ;    - "jmp @a+dptr" opcode
+      ;    - inline assembly
+      ;    - a jump in or out of this area (see checkLabelRef())
+
+      ; An "acall", "lcall" (not callee save), "ret" (not PCALL with
+      ; callee save), "reti" or write access of r0 terminate
+      ; the search, and the "mov r0,a" can safely be removed.
+  */
+  pl = currPl->next;
+  if (!doTermScan (&pl, pReg))
+    return FALSE;
+
+  if (!checkLabelRef())
+    return FALSE;
+
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* mcs51DeadMove - dispatch condition deadmove between             */
+/* - remove pop/push                                               */
+/* - remove mov r%1,%2                                             */
+/*-----------------------------------------------------------------*/
+bool
+mcs51DeadMove (const char *reg, lineNode *currPl, lineNode *head)
+{
+  char pReg[5] = "ar";
+
+  _G.head = head;
+  strcat (pReg, reg);
+
+  unvisitLines (_G.head);
+  cleanLabelRef();
+
+  if (strncmp (currPl->line, "pop", 3) == 0)
+    return removeDeadPopPush (pReg, currPl, head);
+  else if (   strncmp (currPl->line, "mov", 3) == 0
+           && (currPl->line[3] == ' ' || currPl->line[3] == '\t'))
+    return removeDeadMove (pReg, currPl, head);
+  else
+    {
+      fprintf (stderr, "Error: "
+                       "peephole rule with condition deadMove "
+                       "used with unknown opocde:\n"
+                       "\t%s\n", currPl->line);
+      return FALSE;
+    }
 }

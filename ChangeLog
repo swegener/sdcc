@@ -1,3 +1,7 @@
+2006-12-30 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/spacs.h: deleted from svn
+
 2006-12-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/gen.c (assignResultValue): fixed bug when registers overlap,

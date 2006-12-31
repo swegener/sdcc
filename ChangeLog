@@ -1,3 +1,8 @@
+2006-12-31 Borut Razem <borut.razem AT siol.net>
+
+	* configure.in, configure: fixed bug #1538756: configure dies if bison
+	  and flex are not installed, 2nd try
+
 2006-12-30 Bernhard Held <bernhard AT bernhardheld.de>
 	* src/mcs51/peeph.def: renamed rule 400 to 500, moved rule 253.x to
 	400.x for better code in RFE 899102
@@ -21,10 +26,14 @@
 
 	* support/cpp2/options_vc_in.h, support/cpp2/options_vc_in.c,
 	  support/cpp2/sdcppa.dsp: create 'options.h' and 'options.c' under MSVC.
+	* configure.in, configure: fixed buf #1538756: configure dies if bison
+	  and flex are not installed
 
 2006-12-30 Borut Razem <borut.razem AT siol.net>
 
 	* support/cpp2/spacs.h: deleted from svn
+	* configure.in, configure: fixed bug #1538756: configure dies if bison
+	  and flex are not installed
 
 2006-12-21 Maarten Brock <sourceforge.brock AT dse.nl>
 

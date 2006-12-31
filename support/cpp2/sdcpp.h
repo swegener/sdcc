@@ -122,14 +122,6 @@ extern const struct lang_hooks lang_hooks;
 /* None of these functions are suitable for ATTRIBUTE_PRINTF, because
    each language front end can extend them with its own set of format
    specifiers.  We must use custom format checks.  */
-#if GCC_VERSION >= 3004
-#define ATTRIBUTE_GCC_DIAG(m, n) __attribute__ ((__format__ (GCC_DIAG_STYLE, m, n))) ATTRIBUTE_NONNULL(m)
-#else
-#define ATTRIBUTE_GCC_DIAG(m, n) ATTRIBUTE_NONNULL(m)
-#endif
-/* None of these functions are suitable for ATTRIBUTE_PRINTF, because
-   each language front end can extend them with its own set of format
-   specifiers.  We must use custom format checks.  */
 #if GCC_VERSION >= 4001
 #define ATTRIBUTE_GCC_DIAG(m, n) __attribute__ ((__format__ (GCC_DIAG_STYLE, m, n))) ATTRIBUTE_NONNULL(m)
 #else

@@ -1,5 +1,63 @@
 2006-12-31 Borut Razem <borut.razem AT siol.net>
 
+	* SDCPP synchronized with GCC CPP release version 4.1.1,
+	  currently the latest release:
+	* support/cpp2/libcpp, support/cpp2/libcpp/include,
+	  support/cpp2/libcpp/include/cpp-id-data.h
+	  support/cpp2/libiberty/fopen_unlocked.c
+	  support/cpp2/libiberty/md5.c
+	  support/cpp2/md5.h
+	  support/cpp2/opt-functions.awk
+	  support/cpp2/opt-gather.awk
+	  support/cpp2/optc-gen.awk
+	  support/cpp2/opth-gen.awk:
+	  added
+	* support/cpp2/Makefile.in, support/cpp2/auto-host_vc_in.h,
+	  support/cpp2/c-incpath.c, support/cpp2/c-incpath.h,
+	  support/cpp2/c-ppoutput.c, support/cpp2/c-pretty-print.c,
+	  support/cpp2/c-pretty-print.h, support/cpp2/cppdefault.c,
+	  support/cpp2/cppdefault.h, support/cpp2/diagnostic.c,
+	  support/cpp2/diagnostic.h, support/cpp2/except.h,
+	  support/cpp2/hwint.h, support/cpp2/input.h,
+	  support/cpp2/intl.h, support/cpp2/move-if-change,
+	  support/cpp2/opts.c, support/cpp2/opts.h,
+	  support/cpp2/output.h, support/cpp2/prefix.c,
+	  support/cpp2/prefix.h, support/cpp2/pretty-print.c,
+	  support/cpp2/pretty-print.h, support/cpp2/sdcpp-opts.c,
+	  support/cpp2/sdcpp.c, support/cpp2/sdcpp.dsp,
+	  support/cpp2/sdcpp.h, support/cpp2/sdcpp.opt,
+	  support/cpp2/sdcppa.dsp, support/cpp2/symcat.h,
+	  support/cpp2/version.c:
+	  modified
+	* support/cpp2/libcpp/charset.c, support/cpp2/libcpp/directives.c,
+	  support/cpp2/libcpp/errors.c, support/cpp2/libcpp/expr.c,
+	  support/cpp2/libcpp/files.c, support/cpp2/libcpp/identifiers.c,
+	  support/cpp2/libcpp/include/cpplib.h, support/cpp2/libcpp/include/line-map.h,
+	  support/cpp2/libcpp/include/mkdeps.h, support/cpp2/libcpp/include/symtab.h,
+	  support/cpp2/libcpp/init.c, support/cpp2/libcpp/internal.h,
+	  support/cpp2/libcpp/lex.c, support/cpp2/libcpp/line-map.c,
+	  support/cpp2/libcpp/macro.c, support/cpp2/libcpp/mkdeps.c,
+	  support/cpp2/libcpp/symtab.c, support/cpp2/libcpp/system.h,
+	  support/cpp2/libcpp/traditional.c, support/cpp2/libcpp/ucnid.h,
+	  support/cpp2/libiberty/hashtab.c, support/cpp2/libiberty/hashtab.h:
+	  moved
+	* support/cpp2/cppcharset.c, support/cpp2/cpperror.c,
+	  support/cpp2/cppexp.c, support/cpp2/cppfiles.c,
+	  support/cpp2/cpphash.c, support/cpp2/cpphash.h,
+	  support/cpp2/cppinit.c, support/cpp2/cpplex.c,
+	  support/cpp2/cpplib.c, support/cpp2/cpplib.h,
+	  support/cpp2/cppmacro.c, support/cpp2/cpptrad.c,
+	  support/cpp2/cppucnid.h, support/cpp2/hashtab.c,
+	  support/cpp2/hashtab.h, support/cpp2/hashtable.c,
+	  support/cpp2/hashtable.h, support/cpp2/line-map.c,
+	  support/cpp2/line-map.h, support/cpp2/mkdeps.c,
+	  support/cpp2/mkdeps.h, support/cpp2/options_vc_in.c,
+	  support/cpp2/options_vc_in.h, support/cpp2/opts.sh,
+	  support/cpp2/system.h:
+	  deleted / moved
+
+2006-12-31 Borut Razem <borut.razem AT siol.net>
+
 	* configure.in, configure: fixed bug #1538756: configure dies if bison
 	  and flex are not installed, 2nd try
 

@@ -119,7 +119,6 @@ extern const struct lang_hooks lang_hooks;
 #ifndef GCC_DIAG_STYLE
 #define GCC_DIAG_STYLE __gcc_diag__
 #endif
-
 /* None of these functions are suitable for ATTRIBUTE_PRINTF, because
    each language front end can extend them with its own set of format
    specifiers.  We must use custom format checks.  */
@@ -128,10 +127,26 @@ extern const struct lang_hooks lang_hooks;
 #else
 #define ATTRIBUTE_GCC_DIAG(m, n) ATTRIBUTE_NONNULL(m)
 #endif
-extern void warning (const char *, ...);
-extern void error (const char *, ...);
+/* None of these functions are suitable for ATTRIBUTE_PRINTF, because
+   each language front end can extend them with its own set of format
+   specifiers.  We must use custom format checks.  */
+#if GCC_VERSION >= 4001
+#define ATTRIBUTE_GCC_DIAG(m, n) __attribute__ ((__format__ (GCC_DIAG_STYLE, m, n))) ATTRIBUTE_NONNULL(m)
+#else
+#define ATTRIBUTE_GCC_DIAG(m, n) ATTRIBUTE_NONNULL(m)
+#endif
+extern void internal_error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2)
+     ATTRIBUTE_NORETURN;
+extern void warning0 (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
+/* Pass one of the OPT_W* from options.h as the first parameter.  */
+extern void warning (int, const char *, ...) ATTRIBUTE_GCC_DIAG(2,3);
+extern void error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
 extern void fatal_error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2)
      ATTRIBUTE_NORETURN;
+extern void pedwarn (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
+extern void sorry (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
+extern void inform (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
+extern void verbatim (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
 
 #ifdef BUFSIZ
   /* N.B. Unlike all the others, fnotice is just gettext+fprintf, and
@@ -181,13 +196,10 @@ extern int flag_signed_char;
 
 extern int flag_pedantic_errors;
 
-/* Don't print warning messages.  -w.  */
-
-extern bool inhibit_warnings;
-
 /*
  * From c-common.h
  */
+#include "hwint.h"
 #include "cpplib.h"
 
 /* Nonzero means don't output line number information.  */

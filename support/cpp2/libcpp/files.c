@@ -1,6 +1,6 @@
 /* Part of CPP library.  File handling.
    Copyright (C) 1986, 1987, 1989, 1992, 1993, 1994, 1995, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+   1999, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
    Written by Per Bothner, 1994.
    Based on CCCP program by Paul Rubin, June 1986
    Adapted to ANSI C, Richard Stallman, Jan 1987
@@ -19,15 +19,15 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
-#include "cpphash.h"
-#include "intl.h"
+#include "internal.h"
 #include "mkdeps.h"
 #include "hashtab.h"
+#include "md5.h"
 #include <dirent.h>
 
 /* Variable length record files on VMS will have a stat size that includes
@@ -40,15 +40,12 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #endif
 
 #ifdef __DJGPP__
+#include <io.h>
   /* For DJGPP redirected input is opened in text mode.  */
 #  define set_stdin_to_binary_mode() \
      if (! isatty (0)) setmode (0, O_BINARY)
 #else
 #  define set_stdin_to_binary_mode() /* Nothing */
-#endif
-
-#ifndef O_BINARY
-# define O_BINARY 0
 #endif
 
 /* This structure represents a file searched for by CPP, whether it
@@ -108,11 +105,8 @@ struct _cpp_file
   /* If BUFFER above contains the true contents of the file.  */
   bool buffer_valid;
 
-  /* 0: file not known to be a PCH.
-     1: file is a PCH (on return from find_include_file).
-     2: file is not and never will be a valid precompiled header.
-     3: file is always a valid precompiled header.  */
-  uchar pch;
+  /* File is a PCH (on return from find_include_file).  */
+  bool pch;
 };
 
 /* A singly-linked list for all searches for a given file name, with
@@ -180,7 +174,9 @@ static void read_name_map (cpp_dir *dir);
 static char *remap_filename (cpp_reader *pfile, _cpp_file *file);
 static char *append_file_to_dir (const char *fname, cpp_dir *dir);
 static bool validate_pch (cpp_reader *, _cpp_file *file, const char *pchname);
-static bool include_pch_p (_cpp_file *file);
+static int pchf_save_compare (const void *e1, const void *e2);
+static int pchf_compare (const void *d_p, const void *e_p);
+static bool check_file_against_entries (cpp_reader *, _cpp_file *, bool);
 
 /* Given a filename in FILE->PATH, with the empty string interpreted
    as <stdin>, open it.
@@ -259,7 +255,7 @@ pch_open_file (cpp_reader *pfile, _cpp_file *file, bool *invalid_pch)
 
   flen = strlen (path);
   len = flen + sizeof (extension);
-  pchname = xmalloc (len);
+  pchname = XNEWVEC (char, len);
   memcpy (pchname, path, flen);
   memcpy (pchname + flen, extension, sizeof (extension));
 
@@ -283,7 +279,7 @@ pch_open_file (cpp_reader *pfile, _cpp_file *file, bool *invalid_pch)
 	      if (dlen + plen > len)
 		{
 		  len += dlen + 64;
-		  pchname = xrealloc (pchname, len);
+		  pchname = XRESIZEVEC (char, pchname, len);
 		}
 	      memcpy (pchname + plen, d->d_name, dlen);
 	      valid = validate_pch (pfile, file, pchname);
@@ -319,23 +315,58 @@ find_file_in_dir (cpp_reader *pfile, _cpp_file *file, bool *invalid_pch)
   if (CPP_OPTION (pfile, remap) && (path = remap_filename (pfile, file)))
     ;
   else
-    path = append_file_to_dir (file->name, file->dir);
+    if (file->dir->construct)
+      path = file->dir->construct (file->name, file->dir);
+    else
+      path = append_file_to_dir (file->name, file->dir);
 
-  file->path = path;
-  if (pch_open_file (pfile, file, invalid_pch))
-    return true;
-
-  if (open_file (file))
-    return true;
-
-  if (file->err_no != ENOENT)
+  if (path)
     {
-      open_file_failed (pfile, file, 0);
-      return true;
+      file->path = path;
+      if (pch_open_file (pfile, file, invalid_pch))
+	return true;
+
+      if (open_file (file))
+	return true;
+
+      if (file->err_no != ENOENT)
+	{
+	  open_file_failed (pfile, file, 0);
+	  return true;
+	}
+
+      free (path);
+      file->path = file->name;
+    }
+  else
+    {
+      file->err_no = ENOENT;
+      file->path = NULL;
     }
 
-  free (path);
-  file->path = file->name;
+  return false;
+}
+
+/* Return tue iff the missing_header callback found the given HEADER.  */
+static bool
+search_path_exhausted (cpp_reader *pfile, const char *header, _cpp_file *file)
+{
+  missing_header_cb func = pfile->cb.missing_header;
+
+  /* When the regular search path doesn't work, try context dependent
+     headers search paths.  */
+  if (func
+      && file->dir == NULL)
+    {
+      if ((file->path = func (pfile, header, &file->dir)) != NULL)
+	{
+	  if (open_file (file))
+	    return true;
+	  free ((void *)file->path);
+	}
+      file->path = file->name;
+    }
+
   return false;
 }
 
@@ -347,7 +378,7 @@ _cpp_find_failed (_cpp_file *file)
 
 /* Given a filename FNAME search for such a file in the include path
    starting from START_DIR.  If FNAME is the empty string it is
-   interpreted as STDIN if START_DIR is PFILE->no_seach_path.
+   interpreted as STDIN if START_DIR is PFILE->no_search_path.
 
    If the file is not found in the file cache fall back to the O/S and
    add the result to our cache.
@@ -391,6 +422,17 @@ _cpp_find_file (cpp_reader *pfile, const char *fname, cpp_dir *start_dir, bool f
       file->dir = file->dir->next;
       if (file->dir == NULL)
 	{
+	  if (search_path_exhausted (pfile, fname, file))
+	    {
+	      /* Although this file must not go in the cache, because
+		 the file found might depend on things (like the current file)
+		 that aren't represented in the cache, it still has to go in
+		 the list of all files so that #import works.  */
+	      file->next_file = pfile->all_files;
+	      pfile->all_files = file;
+	      return file;
+	    }
+
 	  open_file_failed (pfile, file, angle_brackets);
 	  if (invalid_pch)
 	    {
@@ -487,7 +529,7 @@ read_file_guts (cpp_reader *pfile, _cpp_file *file)
        the majority of C source files.  */
     size = 8 * 1024;
 
-  buf = xmalloc (size + 1);
+  buf = XNEWVEC (uchar, size + 1);
   total = 0;
   while ((count = read (file->fd, buf + total, size - total)) > 0)
     {
@@ -498,7 +540,7 @@ read_file_guts (cpp_reader *pfile, _cpp_file *file)
 	  if (regular)
 	    break;
 	  size *= 2;
-	  buf = xrealloc (buf, size + 1);
+	  buf = XRESIZEVEC (uchar, buf, size + 1);
 	}
     }
 
@@ -584,9 +626,9 @@ should_stack_file (cpp_reader *pfile, _cpp_file *file, bool import)
     return false;
 
   /* Handle PCH files immediately; don't stack them.  */
-  if (include_pch_p (file))
+  if (file->pch)
     {
-      pfile->cb.read_pch (pfile, file->path, file->fd, file->pchname);
+      pfile->cb.read_pch (pfile, file->pchname, file->fd, file->path);
       close (file->fd);
       file->fd = -1;
       return false;
@@ -594,6 +636,19 @@ should_stack_file (cpp_reader *pfile, _cpp_file *file, bool import)
 
   if (!read_file (pfile, file))
     return false;
+
+  /* Check the file against the PCH file.  This is done before
+     checking against files we've already seen, since it may save on
+     I/O.  */
+  if (check_file_against_entries (pfile, file, import))
+    {
+      /* If this isn't a #import, but yet we can't include the file,
+	 that means that it was #import-ed in the PCH file,
+	 so we can never include it again.  */
+      if (! import)
+	_cpp_mark_file_once_only (pfile, file);
+      return false;
+    }
 
   /* Now we've read the file's contents, we can stack it if there
      are no once-only files.  */
@@ -660,8 +715,10 @@ _cpp_stack_file (cpp_reader *pfile, _cpp_file *file, bool import)
   if (!should_stack_file (pfile, file, import))
       return false;
 
-  sysp = MAX ((pfile->map ? pfile->map->sysp : 0),
-	      (file->dir ? file->dir->sysp : 0));
+  if (pfile->buffer == NULL || file->dir == NULL)
+    sysp = 0;
+  else
+    sysp = MAX (pfile->buffer->sysp,  file->dir->sysp);
 
   /* Add the file to the dependencies on its first inclusion.  */
   if (CPP_OPTION (pfile, deps.style) > !!sysp && !file->stack_count)
@@ -678,6 +735,7 @@ _cpp_stack_file (cpp_reader *pfile, _cpp_file *file, bool import)
   buffer = cpp_push_buffer (pfile, file->buffer, file->st.st_size,
 			    CPP_OPTION (pfile, preprocessed));
   buffer->file = file;
+  buffer->sysp = sysp;
 
   /* Initialize controlling macro state.  */
   pfile->mi_valid = true;
@@ -727,7 +785,8 @@ search_path_head (cpp_reader *pfile, const char *fname, int angle_brackets,
   else if (pfile->quote_ignores_source_dir)
     dir = pfile->quote_include;
   else
-    return make_cpp_dir (pfile, dir_name_of_file (file), pfile->map->sysp);
+    return make_cpp_dir (pfile, dir_name_of_file (file),
+			 pfile->buffer ? pfile->buffer->sysp : 0);
 
   if (dir == NULL)
     cpp_error (pfile, CPP_DL_ERROR,
@@ -745,7 +804,7 @@ dir_name_of_file (_cpp_file *file)
   if (!file->dir_name)
     {
       size_t len = lbasename (file->path) - file->path;
-      char *dir_name = xmalloc (len + 1);
+      char *dir_name = XNEWVEC (char, len + 1);
 
       memcpy (dir_name, file->path, len);
       dir_name[len] = '\0';
@@ -763,21 +822,32 @@ _cpp_stack_include (cpp_reader *pfile, const char *fname, int angle_brackets,
 		    enum include_type type)
 {
   struct cpp_dir *dir;
+  _cpp_file *file;
 
   dir = search_path_head (pfile, fname, angle_brackets, type);
   if (!dir)
     return false;
 
-  return _cpp_stack_file (pfile, _cpp_find_file (pfile, fname, dir, false,
-						 angle_brackets),
-		     type == IT_IMPORT);
+  file = _cpp_find_file (pfile, fname, dir, false, angle_brackets);
+
+  /* Compensate for the increment in linemap_add.  In the case of a
+     normal #include, we're currently at the start of the line
+     *following* the #include.  A separate source_location for this
+     location makes no sense (until we do the LC_LEAVE), and
+     complicates LAST_SOURCE_LINE_LOCATION.  This does not apply if we
+     found a PCH file (in which case linemap_add is not called) or we
+     were included from the command-line.  */
+  if (! file->pch && file->err_no == 0 && type != IT_CMDLINE)
+    pfile->line_table->highest_location--;
+
+  return _cpp_stack_file (pfile, file, type == IT_IMPORT);
 }
 
 /* Could not open FILE.  The complication is dependency output.  */
 static void
 open_file_failed (cpp_reader *pfile, _cpp_file *file, int angle_brackets)
 {
-  int sysp = pfile->map ? pfile->map->sysp: 0;
+  int sysp = pfile->line_table->highest_line > 1 && pfile->buffer ? pfile->buffer->sysp : 0;
   bool print_dep = CPP_OPTION (pfile, deps.style) > (angle_brackets || !!sysp);
 
   errno = file->err_no;
@@ -811,7 +881,7 @@ make_cpp_file (cpp_reader *pfile, cpp_dir *dir, const char *fname)
 {
   _cpp_file *file;
 
-  file = xcalloc (1, sizeof (_cpp_file));
+  file = XCNEW (_cpp_file);
   file->main_file = !pfile->buffer;
   file->fd = -1;
   file->dir = dir;
@@ -853,11 +923,12 @@ make_cpp_dir (cpp_reader *pfile, const char *dir_name, int sysp)
     if (entry->start_dir == NULL)
       return entry->u.dir;
 
-  dir = xcalloc (1, sizeof (cpp_dir));
+  dir = XCNEW (cpp_dir);
   dir->next = pfile->quote_include;
   dir->name = (char *) dir_name;
   dir->len = strlen (dir_name);
   dir->sysp = sysp;
+  dir->construct = 0;
 
   /* Store this new result in the hash table.  */
   entry = new_file_hash_entry (pfile);
@@ -875,8 +946,8 @@ allocate_file_hash_entries (cpp_reader *pfile)
 {
   pfile->file_hash_entries_used = 0;
   pfile->file_hash_entries_allocated = 127;
-  pfile->file_hash_entries = xmalloc
-    (pfile->file_hash_entries_allocated * sizeof (struct file_hash_entry));
+  pfile->file_hash_entries = XNEWVEC (struct file_hash_entry,
+                                      pfile->file_hash_entries_allocated);
 }
 
 /* Return a new file hash entry.  */
@@ -897,8 +968,8 @@ cpp_included (cpp_reader *pfile, const char *fname)
 {
   struct file_hash_entry *entry;
 
-  entry = htab_find_with_hash (pfile->file_hash, fname,
-			       htab_hash_string (fname));
+  entry = (struct file_hash_entry *)
+     htab_find_with_hash (pfile->file_hash, fname, htab_hash_string (fname));
 
   while (entry && (entry->start_dir == NULL || entry->u.file->err_no))
     entry = entry->next;
@@ -970,12 +1041,15 @@ void
 cpp_make_system_header (cpp_reader *pfile, int syshdr, int externc)
 {
   int flags = 0;
+  const struct line_maps *line_table = pfile->line_table;
+  const struct line_map *map = &line_table->maps[line_table->used-1];
 
   /* 1 = system header, 2 = system header to be treated as C.  */
   if (syshdr)
     flags = 1 + (externc != 0);
-  _cpp_do_file_change (pfile, LC_RENAME, pfile->map->to_file,
-		       SOURCE_LINE (pfile->map, pfile->line), flags);
+  pfile->buffer->sysp = flags;
+  _cpp_do_file_change (pfile, LC_RENAME, map->to_file,
+		       SOURCE_LINE (map, pfile->line_table->highest_line), flags);
 }
 
 /* Allow the client to change the current file.  Used by the front end
@@ -1060,8 +1134,6 @@ _cpp_compare_file_date (cpp_reader *pfile, const char *fname,
 bool
 cpp_push_include (cpp_reader *pfile, const char *fname)
 {
-  /* Make the command line directive take up a line.  */
-  pfile->line++;
   return _cpp_stack_include (pfile, fname, false, IT_CMDLINE);
 }
 
@@ -1118,7 +1190,7 @@ append_file_to_dir (const char *fname, cpp_dir *dir)
 
   dlen = dir->len;
   flen = strlen (fname);
-  path = xmalloc (dlen + 1 + flen + 1);
+  path = XNEWVEC (char, dlen + 1 + flen + 1);
   memcpy (path, dir->name, dlen);
   if (dlen && path[dlen - 1] != '/')
     path[dlen++] = '/';
@@ -1136,7 +1208,7 @@ read_filename_string (int ch, FILE *f)
   int len;
 
   len = 20;
-  set = alloc = xmalloc (len + 1);
+  set = alloc = XNEWVEC (char, len + 1);
   if (! is_space (ch))
     {
       *set++ = ch;
@@ -1145,7 +1217,7 @@ read_filename_string (int ch, FILE *f)
 	  if (set - alloc == len)
 	    {
 	      len *= 2;
-	      alloc = xrealloc (alloc, len + 1);
+	      alloc = XRESIZEVEC (char, alloc, len + 1);
 	      set = alloc + len / 2;
 	    }
 	  *set++ = ch;
@@ -1166,14 +1238,14 @@ read_name_map (cpp_dir *dir)
   size_t len, count = 0, room = 9;
 
   len = dir->len;
-  name = alloca (len + sizeof (FILE_NAME_MAP_FILE) + 1);
+  name = (char *) alloca (len + sizeof (FILE_NAME_MAP_FILE) + 1);
   memcpy (name, dir->name, len);
   if (len && name[len - 1] != '/')
     name[len++] = '/';
   strcpy (name + len, FILE_NAME_MAP_FILE);
   f = fopen (name, "r");
 
-  dir->name_map = xmalloc (room * sizeof (char *));
+  dir->name_map = XNEWVEC (const char *, room);
 
   /* Silently return NULL if we cannot open.  */
   if (f)
@@ -1190,7 +1262,7 @@ read_name_map (cpp_dir *dir)
 	  if (count + 2 > room)
 	    {
 	      room += 8;
-	      dir->name_map = xrealloc (dir->name_map, room * sizeof (char *));
+	      dir->name_map = XRESIZEVEC (const char *, dir->name_map, room);
 	    }
 
 	  dir->name_map[count] = read_filename_string (ch, f);
@@ -1247,7 +1319,7 @@ remap_filename (cpp_reader *pfile, _cpp_file *file)
 	return NULL;
 
       len = dir->len + (p - fname + 1);
-      new_dir = xmalloc (len + 1);
+      new_dir = XNEWVEC (char, len + 1);
       memcpy (new_dir, dir->name, dir->len);
       memcpy (new_dir + dir->len, fname, p - fname + 1);
       new_dir[len] = '\0';
@@ -1255,13 +1327,6 @@ remap_filename (cpp_reader *pfile, _cpp_file *file)
       dir = make_cpp_dir (pfile, new_dir, dir->sysp);
       fname = p + 1;
     }
-}
-
-/* Return true if FILE is usable by PCH.  */
-static bool
-include_pch_p (_cpp_file *file)
-{
-  return file->pch & 1;
 }
 
 /* Returns true if PCHNAME is a valid PCH file for FILE.  */
@@ -1285,7 +1350,7 @@ validate_pch (cpp_reader *pfile, _cpp_file *file, const char *pchname)
       if (CPP_OPTION (pfile, print_include_names))
 	{
 	  unsigned int i;
-	  for (i = 1; i < pfile->line_maps.depth; i++)
+	  for (i = 1; i < pfile->line_table->depth; i++)
 	    putc ('.', stderr);
 	  fprintf (stderr, "%c %s\n",
 		   valid ? '!' : 'x', pchname);
@@ -1294,4 +1359,248 @@ validate_pch (cpp_reader *pfile, _cpp_file *file, const char *pchname)
 
   file->path = saved_path;
   return valid;
+}
+
+/* Get the path associated with the _cpp_file F.  The path includes
+   the base name from the include directive and the directory it was
+   found in via the search path.  */
+
+const char *
+cpp_get_path (struct _cpp_file *f)
+{
+  return f->path;
+}
+
+/* Get the directory associated with the _cpp_file F.  */
+
+cpp_dir *
+cpp_get_dir (struct _cpp_file *f)
+{
+  return f->dir;
+}
+
+/* Get the cpp_buffer currently associated with the cpp_reader
+   PFILE.  */
+
+cpp_buffer *
+cpp_get_buffer (cpp_reader *pfile)
+{
+  return pfile->buffer;
+}
+
+/* Get the _cpp_file associated with the cpp_buffer B.  */
+
+_cpp_file *
+cpp_get_file (cpp_buffer *b)
+{
+  return b->file;
+}
+
+/* Get the previous cpp_buffer given a cpp_buffer B.  The previous
+   buffer is the buffer that included the given buffer.  */
+
+cpp_buffer *
+cpp_get_prev (cpp_buffer *b)
+{
+  return b->prev;
+}
+
+/* This data structure holds the list of header files that were seen
+   while the PCH was being built.  The 'entries' field is kept sorted
+   in memcmp() order; yes, this means that on little-endian systems,
+   it's sorted initially by the least-significant byte of 'size', but
+   that's OK.  The code does rely on having entries with the same size
+   next to each other.  */
+
+struct pchf_entry {
+  /* The size of this file.  This is used to save running a MD5 checksum
+     if the sizes don't match.  */
+  off_t size;
+  /* The MD5 checksum of this file.  */
+  unsigned char sum[16];
+  /* Is this file to be included only once?  */
+  bool once_only;
+};
+
+struct pchf_data {
+  /* Number of pchf_entry structures.  */
+  size_t count;
+
+  /* Are there any values with once_only set?
+     This is used as an optimisation, it means we don't have to search
+     the structure if we're processing a regular #include.  */
+  bool have_once_only;
+
+  struct pchf_entry entries[1];
+};
+
+static struct pchf_data *pchf;
+
+/* A qsort ordering function for pchf_entry structures.  */
+
+static int
+pchf_save_compare (const void *e1, const void *e2)
+{
+  return memcmp (e1, e2, sizeof (struct pchf_entry));
+}
+
+/* Create and write to F a pchf_data structure.  */
+
+bool
+_cpp_save_file_entries (cpp_reader *pfile, FILE *fp)
+{
+  size_t count = 0;
+  struct pchf_data *result;
+  size_t result_size;
+  _cpp_file *f;
+
+  for (f = pfile->all_files; f; f = f->next_file)
+    ++count;
+
+  result_size = (sizeof (struct pchf_data)
+		 + sizeof (struct pchf_entry) * (count - 1));
+  result = XCNEWVAR (struct pchf_data, result_size);
+
+  result->count = 0;
+  result->have_once_only = false;
+
+  for (f = pfile->all_files; f; f = f->next_file)
+    {
+      size_t count;
+
+      /* This should probably never happen, since if a read error occurred
+	 the PCH file shouldn't be written...  */
+      if (f->dont_read || f->err_no)
+	continue;
+
+      if (f->stack_count == 0)
+	continue;
+
+      count = result->count++;
+
+      result->entries[count].once_only = f->once_only;
+      /* |= is avoided in the next line because of an HP C compiler bug */
+      result->have_once_only = result->have_once_only | f->once_only;
+      if (f->buffer_valid)
+	md5_buffer ((const char *)f->buffer,
+		    f->st.st_size, result->entries[count].sum);
+      else
+	{
+	  FILE *ff;
+	  int oldfd = f->fd;
+
+	  if (!open_file (f))
+	    {
+	      open_file_failed (pfile, f, 0);
+	      return false;
+	    }
+	  ff = fdopen (f->fd, "rb");
+	  md5_stream (ff, result->entries[count].sum);
+	  fclose (ff);
+	  f->fd = oldfd;
+	}
+      result->entries[count].size = f->st.st_size;
+    }
+
+  result_size = (sizeof (struct pchf_data)
+                 + sizeof (struct pchf_entry) * (result->count - 1));
+
+  qsort (result->entries, result->count, sizeof (struct pchf_entry),
+	 pchf_save_compare);
+
+  return fwrite (result, result_size, 1, fp) == 1;
+}
+
+/* Read the pchf_data structure from F.  */
+
+bool
+_cpp_read_file_entries (cpp_reader *pfile ATTRIBUTE_UNUSED, FILE *f)
+{
+  struct pchf_data d;
+
+  if (fread (&d, sizeof (struct pchf_data) - sizeof (struct pchf_entry), 1, f)
+       != 1)
+    return false;
+
+  pchf = XNEWVAR (struct pchf_data, sizeof (struct pchf_data)
+		  + sizeof (struct pchf_entry) * (d.count - 1));
+  memcpy (pchf, &d, sizeof (struct pchf_data) - sizeof (struct pchf_entry));
+  if (fread (pchf->entries, sizeof (struct pchf_entry), d.count, f)
+      != d.count)
+    return false;
+  return true;
+}
+
+/* The parameters for pchf_compare.  */
+
+struct pchf_compare_data
+{
+  /* The size of the file we're looking for.  */
+  off_t size;
+
+  /* The MD5 checksum of the file, if it's been computed.  */
+  unsigned char sum[16];
+
+  /* Is SUM valid?  */
+  bool sum_computed;
+
+  /* Do we need to worry about entries that don't have ONCE_ONLY set?  */
+  bool check_included;
+
+  /* The file that we're searching for.  */
+  _cpp_file *f;
+};
+
+/* bsearch comparison function; look for D_P in E_P.  */
+
+static int
+pchf_compare (const void *d_p, const void *e_p)
+{
+  const struct pchf_entry *e = (const struct pchf_entry *)e_p;
+  struct pchf_compare_data *d = (struct pchf_compare_data *)d_p;
+  int result;
+
+  result = memcmp (&d->size, &e->size, sizeof (off_t));
+  if (result != 0)
+    return result;
+
+  if (! d->sum_computed)
+    {
+      _cpp_file *const f = d->f;
+
+      md5_buffer ((const char *)f->buffer, f->st.st_size, d->sum);
+      d->sum_computed = true;
+    }
+
+  result = memcmp (d->sum, e->sum, 16);
+  if (result != 0)
+    return result;
+
+  if (d->check_included || e->once_only)
+    return 0;
+  else
+    return 1;
+}
+
+/* Check that F is not in a list read from a PCH file (if any).
+   Assumes that f->buffer_valid is true.  Return TRUE if the file
+   should not be read.  */
+
+static bool
+check_file_against_entries (cpp_reader *pfile ATTRIBUTE_UNUSED,
+			    _cpp_file *f,
+			    bool check_included)
+{
+  struct pchf_compare_data d;
+
+  if (pchf == NULL
+      || (! check_included && ! pchf->have_once_only))
+    return false;
+
+  d.size = f->st.st_size;
+  d.sum_computed = false;
+  d.f = f;
+  d.check_included = check_included;
+  return bsearch (&d, pchf->entries, pchf->count, sizeof (struct pchf_entry),
+		  pchf_compare) != NULL;
 }

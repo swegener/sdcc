@@ -17,7 +17,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
  In other words, you are welcome to use, share and improve this program.
  You are forbidden to forbid anyone else to use, share and improve
@@ -26,7 +26,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
-#include "cpphash.h"
+#include "internal.h"
 
 static cpp_hashnode *alloc_node (hash_table *);
 
@@ -37,7 +37,7 @@ alloc_node (hash_table *table)
 {
   cpp_hashnode *node;
 
-  node = obstack_alloc (&table->pfile->hash_ob, sizeof (cpp_hashnode));
+  node = XOBNEW (&table->pfile->hash_ob, cpp_hashnode);
   memset (node, 0, sizeof (cpp_hashnode));
   return node;
 }
@@ -75,7 +75,6 @@ _cpp_init_hashtable (cpp_reader *pfile, hash_table *table)
   s->n__VA_ARGS__->flags |= NODE_DIAGNOSTIC;
   /* SDCC _asm specific */
   s->n__asm             = cpp_lookup (pfile, DSC("_asm"));
-
 }
 
 /* Tear down the identifier hash table.  */

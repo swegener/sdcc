@@ -25,7 +25,7 @@
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
-#include "cpphash.h"
+#include "internal.h"
 #include "version.h"
 #include "mkdeps.h"
 #include "opts.h"
@@ -74,9 +74,15 @@ const struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
 
 const char *main_input_filename;
 
+#ifndef USE_MAPPED_LOCATION
+location_t unknown_location = { NULL, 0 };
+#endif
+
 /* Current position in real source file.  */
 
 location_t input_location;
+
+struct line_maps line_table;
 
 /* Stack of currently pending input files.  */
 
@@ -136,6 +142,14 @@ static const char *src_pwd;
    was already initialized, return false.  As a special case, it may
    be called with a NULL argument to test whether src_pwd has NOT been
    initialized yet.  */
+
+/* From intl.c */
+/* Opening quotation mark for diagnostics.  */
+const char *open_quote = "'";
+
+/* Closing quotation mark for diagnostics.  */
+const char *close_quote = "'";
+/* ----------- */
 
 bool
 set_src_pwd (const char *pwd)
@@ -292,7 +306,7 @@ decode_d_option (const char *arg)
 	break;
 
       default:
-	warning ("unrecognized gcc debugging option: %c", c);
+	warning (0, "unrecognized gcc debugging option: %c", c);
 	break;
       }
 }

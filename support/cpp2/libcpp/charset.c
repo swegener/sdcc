@@ -16,13 +16,12 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
-#include "cpphash.h"
-#include "cppucnid.h"
+#include "internal.h"
 
 /* Character set handling for C-family languages.
 
@@ -81,8 +80,10 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #if HOST_CHARSET == HOST_CHARSET_ASCII
 #define SOURCE_CHARSET "UTF-8"
+#define LAST_POSSIBLY_BASIC_SOURCE_CHAR 0x7e
 #elif HOST_CHARSET == HOST_CHARSET_EBCDIC
 #define SOURCE_CHARSET "UTF-EBCDIC"
+#define LAST_POSSIBLY_BASIC_SOURCE_CHAR 0xFF
 #else
 #error "Unrecognized basic host character set"
 #endif
@@ -485,7 +486,7 @@ conversion_loop (int (*const one_conversion)(iconv_t, const uchar **, size_t *,
 
       outbytesleft += OUTBUF_BLOCK_SIZE;
       to->asize += OUTBUF_BLOCK_SIZE;
-      to->text = xrealloc (to->text, to->asize);
+      to->text = XRESIZEVEC (uchar, to->text, to->asize);
       outbuf = to->text + to->asize - outbytesleft;
     }
 }
@@ -537,7 +538,7 @@ convert_no_conversion (iconv_t cd ATTRIBUTE_UNUSED,
   if (to->len + flen > to->asize)
     {
       to->asize = to->len + flen;
-      to->text = xrealloc (to->text, to->asize);
+      to->text = XRESIZEVEC (uchar, to->text, to->asize);
     }
   memcpy (to->text + to->len, from, flen);
   to->len += flen;
@@ -577,7 +578,7 @@ convert_using_iconv (iconv_t cd, const uchar *from, size_t flen,
 
       outbytesleft += OUTBUF_BLOCK_SIZE;
       to->asize += OUTBUF_BLOCK_SIZE;
-      to->text = xrealloc (to->text, to->asize);
+      to->text = XRESIZEVEC (uchar, to->text, to->asize);
       outbuf = (char *)to->text + to->asize - outbytesleft;
     }
 }
@@ -627,7 +628,7 @@ init_iconv_desc (cpp_reader *pfile, const char *to, const char *from)
       return ret;
     }
 
-  pair = alloca(strlen(to) + strlen(from) + 2);
+  pair = (char *) alloca(strlen(to) + strlen(from) + 2);
 
   strcpy(pair, from);
   strcat(pair, "/");
@@ -649,7 +650,7 @@ init_iconv_desc (cpp_reader *pfile, const char *to, const char *from)
       if (ret.cd == (iconv_t) -1)
 	{
 	  if (errno == EINVAL)
-	    cpp_error (pfile, CPP_DL_ERROR, /* XXX should be DL_SORRY */
+	    cpp_error (pfile, CPP_DL_ERROR, /* FIXME should be DL_SORRY */
 		       "conversion from %s to %s not supported by iconv",
 		       from, to);
 	  else
@@ -660,7 +661,7 @@ init_iconv_desc (cpp_reader *pfile, const char *to, const char *from)
     }
   else
     {
-      cpp_error (pfile, CPP_DL_ERROR, /* XXX should be DL_SORRY */
+      cpp_error (pfile, CPP_DL_ERROR, /* FIXME: should be DL_SORRY */
 		 "no iconv implementation, cannot convert from %s to %s",
 		 from, to);
       ret.func = convert_no_conversion;
@@ -701,6 +702,7 @@ cpp_init_iconv (cpp_reader *pfile)
   pfile->wide_cset_desc = init_iconv_desc (pfile, wcset, SOURCE_CHARSET);
 }
 
+/* Destroy iconv(3) descriptors set up by cpp_init_iconv, if necessary.  */
 void
 _cpp_destroy_iconv (cpp_reader *pfile)
 {
@@ -713,6 +715,63 @@ _cpp_destroy_iconv (cpp_reader *pfile)
     }
 }
 
+/* Utility routine for use by a full compiler.  C is a character taken
+   from the *basic* source character set, encoded in the host's
+   execution encoding.  Convert it to (the target's) execution
+   encoding, and return that value.
+
+   Issues an internal error if C's representation in the narrow
+   execution character set fails to be a single-byte value (C99
+   5.2.1p3: "The representation of each member of the source and
+   execution character sets shall fit in a byte.")  May also issue an
+   internal error if C fails to be a member of the basic source
+   character set (testing this exactly is too hard, especially when
+   the host character set is EBCDIC).  */
+cppchar_t
+cpp_host_to_exec_charset (cpp_reader *pfile, cppchar_t c)
+{
+  uchar sbuf[1];
+  struct _cpp_strbuf tbuf;
+
+  /* This test is merely an approximation, but it suffices to catch
+     the most important thing, which is that we don't get handed a
+     character outside the unibyte range of the host character set.  */
+  if (c > LAST_POSSIBLY_BASIC_SOURCE_CHAR)
+    {
+      cpp_error (pfile, CPP_DL_ICE,
+		 "character 0x%lx is not in the basic source character set\n",
+		 (unsigned long)c);
+      return 0;
+    }
+
+  /* Being a character in the unibyte range of the host character set,
+     we can safely splat it into a one-byte buffer and trust that that
+     is a well-formed string.  */
+  sbuf[0] = c;
+
+  /* This should never need to reallocate, but just in case... */
+  tbuf.asize = 1;
+  tbuf.text = XNEWVEC (uchar, tbuf.asize);
+  tbuf.len = 0;
+
+  if (!APPLY_CONVERSION (pfile->narrow_cset_desc, sbuf, 1, &tbuf))
+    {
+      cpp_errno (pfile, CPP_DL_ICE, "converting to execution character set");
+      return 0;
+    }
+  if (tbuf.len != 1)
+    {
+      cpp_error (pfile, CPP_DL_ICE,
+		 "character 0x%lx is not unibyte in execution character set",
+		 (unsigned long)c);
+      return 0;
+    }
+  c = tbuf.text[0];
+  free(tbuf.text);
+  return c;
+}
+
+
 
 /* Utility routine that computes a mask of the form 0000...111... with
    WIDTH 1-bits.  */
@@ -726,45 +785,128 @@ width_to_mask (size_t width)
     return ((size_t) 1 << width) - 1;
 }
 
-
+/* A large table of unicode character information.  */
+enum {
+  /* Valid in a C99 identifier?  */
+  C99 = 1,
+  /* Valid in a C99 identifier, but not as the first character?  */
+  DIG = 2,
+  /* Valid in a C++ identifier?  */
+  CXX = 4,
+  /* NFC representation is not valid in an identifier?  */
+  CID = 8,
+  /* Might be valid NFC form?  */
+  NFC = 16,
+  /* Might be valid NFKC form?  */
+  NKC = 32,
+  /* Certain preceding characters might make it not valid NFC/NKFC form?  */
+  CTX = 64
+};
+
+static const struct {
+  /* Bitmap of flags above.  */
+  unsigned char flags;
+  /* Combining class of the character.  */
+  unsigned char combine;
+  /* Last character in the range described by this entry.  */
+  unsigned short end;
+} ucnranges[] = {
+#include "ucnid.h"
+};
 
 /* Returns 1 if C is valid in an identifier, 2 if C is valid except at
    the start of an identifier, and 0 if C is not valid in an
    identifier.  We assume C has already gone through the checks of
-   _cpp_valid_ucn.  The algorithm is a simple binary search on the
-   table defined in cppucnid.h.  */
+   _cpp_valid_ucn.  Also update NST for C if returning nonzero.  The
+   algorithm is a simple binary search on the table defined in
+   ucnid.h.  */
 
 static int
-ucn_valid_in_identifier (cpp_reader *pfile, cppchar_t c)
+ucn_valid_in_identifier (cpp_reader *pfile, cppchar_t c,
+			 struct normalize_state *nst)
 {
   int mn, mx, md;
 
-  mn = -1;
-  mx = ARRAY_SIZE (ucnranges);
-  while (mx - mn > 1)
+  if (c > 0xFFFF)
+    return 0;
+
+  mn = 0;
+  mx = ARRAY_SIZE (ucnranges) - 1;
+  while (mx != mn)
     {
       md = (mn + mx) / 2;
-      if (c < ucnranges[md].lo)
+      if (c <= ucnranges[md].end)
 	mx = md;
-      else if (c > ucnranges[md].hi)
-	mn = md;
       else
-	goto found;
+	mn = md + 1;
     }
-  return 0;
 
- found:
   /* When -pedantic, we require the character to have been listed by
      the standard for the current language.  Otherwise, we accept the
      union of the acceptable sets for C++98 and C99.  */
+  if (! (ucnranges[mn].flags & (C99 | CXX)))
+      return 0;
+
   if (CPP_PEDANTIC (pfile)
-      && ((CPP_OPTION (pfile, c99) && !(ucnranges[md].flags & C99))
+      && ((CPP_OPTION (pfile, c99) && !(ucnranges[mn].flags & C99))
 	  || (CPP_OPTION (pfile, cplusplus)
-	      && !(ucnranges[md].flags & CXX))))
+	      && !(ucnranges[mn].flags & CXX))))
     return 0;
 
+  /* Update NST.  */
+  if (ucnranges[mn].combine != 0 && ucnranges[mn].combine < nst->prev_class)
+    nst->level = normalized_none;
+  else if (ucnranges[mn].flags & CTX)
+    {
+      bool safe;
+      cppchar_t p = nst->previous;
+
+      /* Easy cases from Bengali, Oriya, Tamil, Jannada, and Malayalam.  */
+      if (c == 0x09BE)
+	safe = p != 0x09C7;  /* Use 09CB instead of 09C7 09BE.  */
+      else if (c == 0x0B3E)
+	safe = p != 0x0B47;  /* Use 0B4B instead of 0B47 0B3E.  */
+      else if (c == 0x0BBE)
+	safe = p != 0x0BC6 && p != 0x0BC7;  /* Use 0BCA/0BCB instead.  */
+      else if (c == 0x0CC2)
+	safe = p != 0x0CC6;  /* Use 0CCA instead of 0CC6 0CC2.  */
+      else if (c == 0x0D3E)
+	safe = p != 0x0D46 && p != 0x0D47;  /* Use 0D4A/0D4B instead.  */
+      /* For Hangul, characters in the range AC00-D7A3 are NFC/NFKC,
+	 and are combined algorithmically from a sequence of the form
+	 1100-1112 1161-1175 11A8-11C2
+	 (if the third is not present, it is treated as 11A7, which is not
+	 really a valid character).
+	 Unfortunately, C99 allows (only) the NFC form, but C++ allows
+	 only the combining characters.  */
+      else if (c >= 0x1161 && c <= 0x1175)
+	safe = p < 0x1100 || p > 0x1112;
+      else if (c >= 0x11A8 && c <= 0x11C2)
+	safe = (p < 0xAC00 || p > 0xD7A3 || (p - 0xAC00) % 28 != 0);
+      else
+	{
+	  /* Uh-oh, someone updated ucnid.h without updating this code.  */
+	  cpp_error (pfile, CPP_DL_ICE, "Character %x might not be NFKC", c);
+	  safe = true;
+	}
+      if (!safe && c < 0x1161)
+	nst->level = normalized_none;
+      else if (!safe)
+	nst->level = MAX (nst->level, normalized_identifier_C);
+    }
+  else if (ucnranges[mn].flags & NKC)
+    ;
+  else if (ucnranges[mn].flags & NFC)
+    nst->level = MAX (nst->level, normalized_C);
+  else if (ucnranges[mn].flags & CID)
+    nst->level = MAX (nst->level, normalized_identifier_C);
+  else
+    nst->level = normalized_none;
+  nst->previous = c;
+  nst->prev_class = ucnranges[mn].combine;
+
   /* In C99, UCN digits may not begin identifiers.  */
-  if (CPP_OPTION (pfile, c99) && (ucnranges[md].flags & DIG))
+  if (CPP_OPTION (pfile, c99) && (ucnranges[mn].flags & DIG))
     return 2;
 
   return 1;
@@ -781,9 +923,8 @@ ucn_valid_in_identifier (cpp_reader *pfile, cppchar_t c)
    program is ill-formed.
 
    *PSTR must be preceded by "\u" or "\U"; it is assumed that the
-   buffer end is delimited by a non-hex digit.  Returns zero if UCNs
-   are not part of the relevant standard, or if the string beginning
-   at *PSTR doesn't syntactically match the form 'NNNN' or 'NNNNNNNN'.
+   buffer end is delimited by a non-hex digit.  Returns zero if the
+   UCN has not been consumed.
 
    Otherwise the nonzero value of the UCN, whether valid or invalid,
    is returned.  Diagnostics are emitted for invalid values.  PSTR
@@ -791,12 +932,12 @@ ucn_valid_in_identifier (cpp_reader *pfile, cppchar_t c)
    invalid character.
 
    IDENTIFIER_POS is 0 when not in an identifier, 1 for the start of
-   an identifier, or 2 otherwise.
-*/
+   an identifier, or 2 otherwise.  */
 
 cppchar_t
 _cpp_valid_ucn (cpp_reader *pfile, const uchar **pstr,
-		const uchar *limit, int identifier_pos)
+		const uchar *limit, int identifier_pos,
+		struct normalize_state *nst)
 {
   cppchar_t result, c;
   unsigned int length;
@@ -816,7 +957,10 @@ _cpp_valid_ucn (cpp_reader *pfile, const uchar **pstr,
   else if (str[-1] == 'U')
     length = 8;
   else
-    abort();
+    {
+      cpp_error (pfile, CPP_DL_ICE, "In _cpp_valid_ucn but not a UCN");
+      length = 4;
+    }
 
   result = 0;
   do
@@ -829,10 +973,15 @@ _cpp_valid_ucn (cpp_reader *pfile, const uchar **pstr,
     }
   while (--length && str < limit);
 
+  /* Partial UCNs are not valid in strings, but decompose into
+     multiple tokens in identifiers, so we can't give a helpful
+     error message in that case.  */
+  if (length && identifier_pos)
+    return 0;
+  
   *pstr = str;
   if (length)
     {
-      /* We'll error when we try it out as the start of an identifier.  */
       cpp_error (pfile, CPP_DL_ERROR,
 		 "incomplete universal character name %.*s",
 		 (int) (str - base), base);
@@ -850,9 +999,19 @@ _cpp_valid_ucn (cpp_reader *pfile, const uchar **pstr,
 		 (int) (str - base), base);
       result = 1;
     }
+  else if (identifier_pos && result == 0x24 
+	   && CPP_OPTION (pfile, dollars_in_ident))
+    {
+      if (CPP_OPTION (pfile, warn_dollars) && !pfile->state.skipping)
+	{
+	  CPP_OPTION (pfile, warn_dollars) = 0;
+	  cpp_error (pfile, CPP_DL_PEDWARN, "'$' in identifier or number");
+	}
+      NORMALIZE_STATE_UPDATE_IDNUM (nst);
+    }
   else if (identifier_pos)
     {
-      int validity = ucn_valid_in_identifier (pfile, result);
+      int validity = ucn_valid_in_identifier (pfile, result, nst);
 
       if (validity == 0)
 	cpp_error (pfile, CPP_DL_ERROR,
@@ -873,8 +1032,6 @@ _cpp_valid_ucn (cpp_reader *pfile, const uchar **pstr,
 /* Convert an UCN, pointed to by FROM, to UTF-8 encoding, then translate
    it to the execution character set and write the result into TBUF.
    An advanced pointer is returned.  Issues all relevant diagnostics.  */
-
-
 static const uchar *
 convert_ucn (cpp_reader *pfile, const uchar *from, const uchar *limit,
 	     struct _cpp_strbuf *tbuf, bool wide)
@@ -886,9 +1043,10 @@ convert_ucn (cpp_reader *pfile, const uchar *from, const uchar *limit,
   int rval;
   struct cset_converter cvt
     = wide ? pfile->wide_cset_desc : pfile->narrow_cset_desc;
+  struct normalize_state nst = INITIAL_NORMALIZE_STATE;
 
   from++;  /* Skip u/U.  */
-  ucn = _cpp_valid_ucn (pfile, &from, limit, 0);
+  ucn = _cpp_valid_ucn (pfile, &from, limit, 0, &nst);
 
   rval = one_cppchar_to_utf8 (ucn, &bufp, &bytesleft);
   if (rval)
@@ -904,6 +1062,11 @@ convert_ucn (cpp_reader *pfile, const uchar *from, const uchar *limit,
   return from;
 }
 
+/* Subroutine of convert_hex and convert_oct.  N is the representation
+   in the execution character set of a numeric escape; write it into the
+   string buffer TBUF and update the end-of-string pointer therein.  WIDE
+   is true if it's a wide string that's being assembled in TBUF.  This
+   function issues no diagnostics and never fails.  */
 static void
 emit_numeric_escape (cpp_reader *pfile, cppchar_t n,
 		     struct _cpp_strbuf *tbuf, bool wide)
@@ -924,7 +1087,7 @@ emit_numeric_escape (cpp_reader *pfile, cppchar_t n,
       if (tbuf->len + nbwc > tbuf->asize)
 	{
 	  tbuf->asize += OUTBUF_BLOCK_SIZE;
-	  tbuf->text = xrealloc (tbuf->text, tbuf->asize);
+	  tbuf->text = XRESIZEVEC (uchar, tbuf->text, tbuf->asize);
 	}
 
       for (i = 0; i < nbwc; i++)
@@ -937,10 +1100,12 @@ emit_numeric_escape (cpp_reader *pfile, cppchar_t n,
     }
   else
     {
+      /* Note: this code does not handle the case where the target
+	 and host have a different number of bits in a byte.  */
       if (tbuf->len + 1 > tbuf->asize)
 	{
 	  tbuf->asize += OUTBUF_BLOCK_SIZE;
-	  tbuf->text = xrealloc (tbuf->text, tbuf->asize);
+	  tbuf->text = XRESIZEVEC (uchar, tbuf->text, tbuf->asize);
 	}
       tbuf->text[tbuf->len++] = n;
     }
@@ -1112,8 +1277,14 @@ convert_escape (cpp_reader *pfile, const uchar *from, const uchar *limit,
 	cpp_error (pfile, CPP_DL_PEDWARN,
 		   "unknown escape sequence '\\%c'", (int) c);
       else
-	cpp_error (pfile, CPP_DL_PEDWARN,
-		   "unknown escape sequence: '\\%03o'", (int) c);
+	{
+	  /* diagnostic.c does not support "%03o".  When it does, this
+	     code can use %03o directly in the diagnostic again.  */
+	  char buf[32];
+	  sprintf(buf, "%03o", (int) c);
+	  cpp_error (pfile, CPP_DL_PEDWARN,
+		     "unknown escape sequence: '\\%s'", buf);
+	}
     }
 
   /* Now convert what we have to the execution character set.  */
@@ -1141,7 +1312,7 @@ cpp_interpret_string (cpp_reader *pfile, const cpp_string *from, size_t count,
     = wide ? pfile->wide_cset_desc : pfile->narrow_cset_desc;
 
   tbuf.asize = MAX (OUTBUF_BLOCK_SIZE, from->len);
-  tbuf.text = xmalloc (tbuf.asize);
+  tbuf.text = XNEWVEC (uchar, tbuf.asize);
   tbuf.len = 0;
 
   for (i = 0; i < count; i++)
@@ -1172,7 +1343,7 @@ cpp_interpret_string (cpp_reader *pfile, const cpp_string *from, size_t count,
   /* NUL-terminate the 'to' buffer and translate it to a cpp_string
      structure.  */
   emit_numeric_escape (pfile, 0, &tbuf, wide);
-  tbuf.text = xrealloc (tbuf.text, tbuf.len);
+  tbuf.text = XRESIZEVEC (uchar, tbuf.text, tbuf.len);
   to->text = tbuf.text;
   to->len = tbuf.len;
   return true;
@@ -1186,8 +1357,8 @@ cpp_interpret_string (cpp_reader *pfile, const cpp_string *from, size_t count,
 /* Subroutine of do_line and do_linemarker.  Convert escape sequences
    in a string, but do not perform character set conversion.  */
 bool
-_cpp_interpret_string_notranslate (cpp_reader *pfile, const cpp_string *in,
-				   cpp_string *out)
+cpp_interpret_string_notranslate (cpp_reader *pfile, const cpp_string *from,
+				  size_t count,	cpp_string *to, bool wide)
 {
   struct cset_converter save_narrow_cset_desc = pfile->narrow_cset_desc;
   bool retval;
@@ -1195,7 +1366,7 @@ _cpp_interpret_string_notranslate (cpp_reader *pfile, const cpp_string *in,
   pfile->narrow_cset_desc.func = convert_no_conversion;
   pfile->narrow_cset_desc.cd = (iconv_t) -1;
 
-  retval = cpp_interpret_string (pfile, in, 1, out, false);
+  retval = cpp_interpret_string (pfile, from, count, to, wide);
 
   pfile->narrow_cset_desc = save_narrow_cset_desc;
   return retval;
@@ -1352,8 +1523,71 @@ cpp_interpret_charconst (cpp_reader *pfile, const cpp_token *token,
 
   return result;
 }
+
+/* Convert an identifier denoted by ID and LEN, which might contain
+   UCN escapes, to the source character set, either UTF-8 or
+   UTF-EBCDIC.  Assumes that the identifier is actually a valid identifier.  */
+cpp_hashnode *
+_cpp_interpret_identifier (cpp_reader *pfile, const uchar *id, size_t len)
+{
+  /* It turns out that a UCN escape always turns into fewer characters
+     than the escape itself, so we can allocate a temporary in advance.  */
+  uchar * buf = (uchar *) alloca (len + 1);
+  uchar * bufp = buf;
+  size_t idp;
+  
+  for (idp = 0; idp < len; idp++)
+    if (id[idp] != '\\')
+      *bufp++ = id[idp];
+    else
+      {
+	unsigned length = id[idp+1] == 'u' ? 4 : 8;
+	cppchar_t value = 0;
+	size_t bufleft = len - (bufp - buf);
+	int rval;
 
-uchar *
+	idp += 2;
+	while (length && idp < len && ISXDIGIT (id[idp]))
+	  {
+	    value = (value << 4) + hex_value (id[idp]);
+	    idp++;
+	    length--;
+	  }
+	idp--;
+
+	/* Special case for EBCDIC: if the identifier contains
+	   a '$' specified using a UCN, translate it to EBCDIC.  */
+	if (value == 0x24)
+	  {
+	    *bufp++ = '$';
+	    continue;
+	  }
+
+	rval = one_cppchar_to_utf8 (value, &bufp, &bufleft);
+	if (rval)
+	  {
+	    errno = rval;
+	    cpp_errno (pfile, CPP_DL_ERROR,
+		       "converting UCN to source character set");
+	    break;
+	  }
+      }
+
+  return CPP_HASHNODE (ht_lookup (pfile->hash_table, 
+				  buf, bufp - buf, HT_ALLOC));
+}
+
+/* Convert an input buffer (containing the complete contents of one
+   source file) from INPUT_CHARSET to the source character set.  INPUT
+   points to the input buffer, SIZE is its allocated size, and LEN is
+   the length of the meaningful data within the buffer.  The
+   translated buffer is returned, and *ST_SIZE is set to the length of
+   the meaningful data within the translated buffer.
+
+   INPUT is expected to have been allocated with xmalloc.  This function
+   will either return INPUT, or free it and return a pointer to another
+   xmalloc-allocated block of memory.  */
+uchar * 
 _cpp_convert_input (cpp_reader *pfile, const char *input_charset,
 		    uchar *input, size_t size, size_t len, off_t *st_size)
 {
@@ -1370,7 +1604,7 @@ _cpp_convert_input (cpp_reader *pfile, const char *input_charset,
   else
     {
       to.asize = MAX (65536, len);
-      to.text = xmalloc (to.asize);
+      to.text = XNEWVEC (uchar, to.asize);
       to.len = 0;
 
       if (!APPLY_CONVERSION (input_cset, input, len, &to))
@@ -1388,19 +1622,46 @@ _cpp_convert_input (cpp_reader *pfile, const char *input_charset,
   /* Resize buffer if we allocated substantially too much, or if we
      haven't enough space for the \n-terminator.  */
   if (to.len + 4096 < to.asize || to.len >= to.asize)
-    to.text = xrealloc (to.text, to.len + 1);
+    to.text = XRESIZEVEC (uchar, to.text, to.len + 1);
 
-  to.text[to.len] = '\n';
+  /* If the file is using old-school Mac line endings (\r only),
+     terminate with another \r, not an \n, so that we do not mistake
+     the \r\n sequence for a single DOS line ending and erroneously
+     issue the "No newline at end of file" diagnostic.  */
+  if (to.text[to.len - 1] == '\r')
+    to.text[to.len] = '\r';
+  else
+    to.text[to.len] = '\n';
+
   *st_size = to.len;
   return to.text;
 }
 
+/* Decide on the default encoding to assume for input files.  */
 const char *
 _cpp_default_encoding (void)
 {
   const char *current_encoding = NULL;
 
-#if defined (HAVE_LOCALE_H) && defined (HAVE_LANGINFO_CODESET)
+  /* We disable this because the default codeset is 7-bit ASCII on
+     most platforms, and this causes conversion failures on every
+     file in GCC that happens to have one of the upper 128 characters
+     in it -- most likely, as part of the name of a contributor.
+     We should definitely recognize in-band markers of file encoding,
+     like:
+     - the appropriate Unicode byte-order mark (FE FF) to recognize
+       UTF16 and UCS4 (in both big-endian and little-endian flavors)
+       and UTF8
+     - a "#i", "#d", "/ *", "//", " #p" or "#p" (for #pragma) to
+       distinguish ASCII and EBCDIC.
+     - now we can parse something like "#pragma GCC encoding <xyz>
+       on the first line, or even Emacs/VIM's mode line tags (there's
+       a problem here in that VIM uses the last line, and Emacs has
+       its more elaborate "local variables" convention).
+     - investigate whether Java has another common convention, which
+       would be friendly to support.
+     (Zack Weinberg and Paolo Bonzini, May 20th 2004)  */
+#if defined (HAVE_LOCALE_H) && defined (HAVE_LANGINFO_CODESET) && 0
   setlocale (LC_CTYPE, "");
   current_encoding = nl_langinfo (CODESET);
 #endif

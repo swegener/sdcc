@@ -1,6 +1,6 @@
 /* Parse C expressions for cpplib.
    Copyright (C) 1987, 1992, 1994, 1995, 1997, 1998, 1999, 2000, 2001,
-   2002 Free Software Foundation.
+   2002, 2004 Free Software Foundation.
    Contributed by Per Bothner, 1994.
 
 This program is free software; you can redistribute it and/or modify it
@@ -15,13 +15,13 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+Foundation, 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.  */
 
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
-#include "cpphash.h"
+#include "internal.h"
 
 #define PART_PRECISION (sizeof (cpp_num_part) * CHAR_BIT)
 #define HALF_MASK (~(cpp_num_part) 0 >> (PART_PRECISION / 2))
@@ -65,8 +65,8 @@ static unsigned int interpret_int_suffix (const uchar *, size_t);
 static void check_promotion (cpp_reader *, const struct op *);
 
 /* Token type abuse to create unary plus and minus operators.  */
-#define CPP_UPLUS (CPP_LAST_CPP_OP + 1)
-#define CPP_UMINUS (CPP_LAST_CPP_OP + 2)
+#define CPP_UPLUS ((enum cpp_ttype) (CPP_LAST_CPP_OP + 1))
+#define CPP_UMINUS ((enum cpp_ttype) (CPP_LAST_CPP_OP + 2))
 
 /* With -O2, gcc appears to produce nice code, moving the error
    message load and subsequent jump completely out of the main path.  */
@@ -408,6 +408,7 @@ append_digit (cpp_num num, int digit, int base, size_t precision)
   result.high = num.high << shift;
   result.low = num.low << shift;
   result.high |= num.low >> (PART_PRECISION - shift);
+  result.unsignedp = num.unsignedp;
 
   if (base == 10)
     {
@@ -428,6 +429,7 @@ append_digit (cpp_num num, int digit, int base, size_t precision)
 
   result.low += add_low;
   result.high += add_high;
+  result.overflow = overflow;
 
   /* The above code catches overflow of a cpp_num type.  This catches
      overflow of the (possibly shorter) target precision.  */
@@ -435,10 +437,8 @@ append_digit (cpp_num num, int digit, int base, size_t precision)
   num.high = result.high;
   result = num_trim (result, precision);
   if (!num_eq (result, num))
-    overflow = true;
+    result.overflow = true;
 
-  result.unsignedp = num.unsignedp;
-  result.overflow = overflow;
   return result;
 }
 
@@ -520,6 +520,9 @@ eval_token (cpp_reader *pfile, const cpp_token *token)
   unsigned int temp;
   int unsignedp = 0;
 
+  result.unsignedp = false;
+  result.overflow = false;
+
   switch (token->type)
     {
     case CPP_NUMBER:
@@ -591,7 +594,6 @@ eval_token (cpp_reader *pfile, const cpp_token *token)
     }
 
   result.unsignedp = !!unsignedp;
-  result.overflow = false;
   return result;
 }
 
@@ -625,7 +627,7 @@ extra semantics need to be handled with operator-specific code.  */
 
 /* Operator to priority map.  Must be in the same order as the first
    N entries of enum cpp_ttype.  */
-static const struct operator
+static const struct cpp_operator
 {
   uchar prio;
   uchar flags;
@@ -751,11 +753,11 @@ _cpp_parse_expr (cpp_reader *pfile)
 	    SYNTAX_ERROR ("missing expression between '(' and ')'");
 
 	  if (op.op == CPP_EOF && top->op == CPP_EOF)
-	    SYNTAX_ERROR ("#if with no expression");
+ 	    SYNTAX_ERROR ("#if with no expression");
 
-	  if (top->op != CPP_EOF && top->op != CPP_OPEN_PAREN)
-	    SYNTAX_ERROR2 ("operator '%s' has no right operand",
-			   cpp_token_as_text (pfile, top->token));
+ 	  if (top->op != CPP_EOF && top->op != CPP_OPEN_PAREN)
+ 	    SYNTAX_ERROR2 ("operator '%s' has no right operand",
+ 			   cpp_token_as_text (pfile, top->token));
 	  else if (op.op == CPP_CLOSE_PAREN || op.op == CPP_EOF)
 	    /* Complain about missing paren during reduction.  */;
 	  else
@@ -973,7 +975,7 @@ _cpp_expand_op_stack (cpp_reader *pfile)
   size_t old_size = (size_t) (pfile->op_limit - pfile->op_stack);
   size_t new_size = old_size * 2 + 20;
 
-  pfile->op_stack = xrealloc (pfile->op_stack, new_size * sizeof (struct op));
+  pfile->op_stack = XRESIZEVEC (struct op, pfile->op_stack, new_size);
   pfile->op_limit = pfile->op_stack + new_size;
 
   return pfile->op_stack + old_size;
@@ -1170,8 +1172,9 @@ static cpp_num
 num_rshift (cpp_num num, size_t precision, size_t n)
 {
   cpp_num_part sign_mask;
+  bool x = num_positive (num, precision);
 
-  if (num.unsignedp || num_positive (num, precision))
+  if (num.unsignedp || x)
     sign_mask = 0;
   else
     sign_mask = ~(cpp_num_part) 0;
@@ -1336,12 +1339,11 @@ num_binary_op (cpp_reader *pfile, cpp_num lhs, cpp_num rhs, enum cpp_ttype op)
       result.high = lhs.high + rhs.high;
       if (result.low < lhs.low)
 	result.high++;
+      result.unsignedp = lhs.unsignedp || rhs.unsignedp;
+      result.overflow = false;
 
       result = num_trim (result, precision);
-      result.unsignedp = lhs.unsignedp || rhs.unsignedp;
-      if (result.unsignedp)
-	result.overflow = false;
-      else
+      if (!result.unsignedp)
 	{
 	  bool lhsp = num_positive (lhs, precision);
 	  result.overflow = (lhsp == num_positive (rhs, precision)
@@ -1388,7 +1390,8 @@ num_part_mul (cpp_num_part lhs, cpp_num_part rhs)
 
   result.high += HIGH_PART (middle[0]);
   result.high += HIGH_PART (middle[1]);
-  result.unsignedp = 1;
+  result.unsignedp = true;
+  result.overflow = false;
 
   return result;
 }
@@ -1520,9 +1523,8 @@ num_div_op (cpp_reader *pfile, cpp_num lhs, cpp_num rhs, enum cpp_ttype op)
   if (op == CPP_DIV)
     {
       result.unsignedp = unsignedp;
-      if (unsignedp)
-	result.overflow = false;
-      else
+      result.overflow = false;
+      if (!unsignedp)
 	{
 	  if (negate)
 	    result = num_negate (result, precision);

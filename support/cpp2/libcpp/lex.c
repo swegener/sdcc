@@ -1,5 +1,5 @@
 /* CPP Library - lexical analysis.
-   Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
    Contributed by Per Bothner, 1994-95.
    Based on CCCP program by Paul Rubin, June 1986
    Adapted to ANSI C, Richard Stallman, Jan 1987
@@ -17,12 +17,12 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
-#include "cpphash.h"
+#include "internal.h"
 #include <assert.h>
 
 enum spell_type
@@ -42,8 +42,8 @@ struct token_spelling
 static const unsigned char *const digraph_spellings[] =
 { U"%:", U"%:%:", U"<:", U":>", U"<%", U"%>" };
 
-#define OP(e, s) { SPELL_OPERATOR, U s           },
-#define TK(e, s) { s,              U #e },
+#define OP(e, s) { SPELL_OPERATOR, U s  },
+#define TK(e, s) { SPELL_ ## s,    U #e },
 static const struct token_spelling token_spellings[N_TTYPES] = { TTYPE_TABLE };
 #undef OP
 #undef TK
@@ -54,9 +54,6 @@ static const struct token_spelling token_spellings[N_TTYPES] = { TTYPE_TABLE };
 static void add_line_note (cpp_buffer *, const uchar *, unsigned int);
 static int skip_line_comment (cpp_reader *);
 static void skip_whitespace (cpp_reader *, cppchar_t);
-static cpp_hashnode *lex_identifier (cpp_reader *, const uchar *);
-static void lex_number (cpp_reader *, cpp_string *);
-static bool forms_identifier_p (cpp_reader *, int);
 static void lex_string (cpp_reader *, cpp_token *, const uchar *);
 static void save_comment (cpp_reader *, cpp_token *, const uchar *, cppchar_t);
 static void create_literal (cpp_reader *, cpp_token *, const uchar *,
@@ -89,8 +86,8 @@ add_line_note (cpp_buffer *buffer, const uchar *pos, unsigned int type)
   if (buffer->notes_used == buffer->notes_cap)
     {
       buffer->notes_cap = buffer->notes_cap * 2 + 200;
-      buffer->notes = xrealloc (buffer->notes,
-				buffer->notes_cap * sizeof (_cpp_line_note));
+      buffer->notes = XRESIZEVEC (_cpp_line_note, buffer->notes,
+                                  buffer->notes_cap);
     }
 
   buffer->notes[buffer->notes_used].pos = pos;
@@ -271,19 +268,19 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
       if (note->type == '\\' || note->type == ' ')
 	{
 	  if (note->type == ' ' && !in_comment)
-	    cpp_error_with_line (pfile, CPP_DL_WARNING, pfile->line, col,
+	    cpp_error_with_line (pfile, CPP_DL_WARNING, pfile->line_table->highest_line, col,
 				 "backslash and newline separated by space");
 
 	  if (buffer->next_line > buffer->rlimit)
 	    {
-	      cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line, col,
+	      cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line_table->highest_line, col,
 				   "backslash-newline at end of file");
 	      /* Prevent "no newline at end of file" warning.  */
 	      buffer->next_line = buffer->rlimit;
 	    }
 
 	  buffer->line_base = note->pos;
-	  pfile->line++;
+	  CPP_INCREMENT_LINE (pfile, 0);
 	}
       else if (_cpp_trigraph_map[note->type])
 	{
@@ -291,14 +288,14 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
 	      && (!in_comment || warn_in_comment (pfile, note)))
 	    {
 	      if (CPP_OPTION (pfile, trigraphs))
-		cpp_error_with_line (pfile, CPP_DL_WARNING, pfile->line, col,
+		cpp_error_with_line (pfile, CPP_DL_WARNING, pfile->line_table->highest_line, col,
 				     "trigraph ??%c converted to %c",
 				     note->type,
 				     (int) _cpp_trigraph_map[note->type]);
 	      else
 		{
 		  cpp_error_with_line
-		    (pfile, CPP_DL_WARNING, pfile->line, col,
+		    (pfile, CPP_DL_WARNING, pfile->line_table->highest_line, col,
 		     "trigraph ??%c ignored, use -trigraphs to enable",
 		     note->type);
 		}
@@ -341,12 +338,15 @@ skip_asm_block (cpp_reader *pfile)
 	}
       else if (c == '\n')
 	{
+	  unsigned int cols;
 	  --buffer->cur;
 	  _cpp_process_line_notes (pfile, true);
 	  if (buffer->next_line >= buffer->rlimit)
 	    return true;
 	  _cpp_clean_line (pfile);
-	  pfile->line++;
+
+	  cols = buffer->next_line - buffer->line_base;
+	  CPP_INCREMENT_LINE (pfile, cols);
 	}
     }
 
@@ -389,18 +389,22 @@ _cpp_skip_block_comment (cpp_reader *pfile)
 	    {
 	      buffer->cur = cur;
 	      cpp_error_with_line (pfile, CPP_DL_WARNING,
-				   pfile->line, CPP_BUF_COL (buffer),
+				   pfile->line_table->highest_line, CPP_BUF_COL (buffer),
 				   "\"/*\" within comment");
 	    }
 	}
       else if (c == '\n')
 	{
+	  unsigned int cols;
 	  buffer->cur = cur - 1;
 	  _cpp_process_line_notes (pfile, true);
 	  if (buffer->next_line >= buffer->rlimit)
 	    return true;
 	  _cpp_clean_line (pfile);
-	  pfile->line++;
+
+	  cols = buffer->next_line - buffer->line_base;
+	  CPP_INCREMENT_LINE (pfile, cols);
+
 	  cur = buffer->cur;
 	}
     }
@@ -417,13 +421,13 @@ static int
 skip_line_comment (cpp_reader *pfile)
 {
   cpp_buffer *buffer = pfile->buffer;
-  unsigned int orig_line = pfile->line;
+  unsigned int orig_line = pfile->line_table->highest_line;
 
   while (*buffer->cur != '\n')
     buffer->cur++;
 
   _cpp_process_line_notes (pfile, true);
-  return orig_line != pfile->line;
+  return orig_line != pfile->line_table->highest_line;
 }
 
 /* Skips whitespace, saving the next non-whitespace character.  */
@@ -442,7 +446,7 @@ skip_whitespace (cpp_reader *pfile, cppchar_t c)
       else if (c == '\0')
 	saw_NUL = true;
       else if (pfile->state.in_directive && CPP_PEDANTIC (pfile))
-	cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line,
+	cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line_table->highest_line,
 			     CPP_BUF_COL (buffer),
 			     "%s in preprocessing directive",
 			     c == '\f' ? "form feed" : "vertical tab");
@@ -472,10 +476,36 @@ name_p (cpp_reader *pfile, const cpp_string *string)
   return 1;
 }
 
+/* After parsing an identifier or other sequence, produce a warning about
+   sequences not in NFC/NFKC.  */
+static void
+warn_about_normalization (cpp_reader *pfile,
+			  const cpp_token *token,
+			  const struct normalize_state *s)
+{
+  if (CPP_OPTION (pfile, warn_normalize) < NORMALIZE_STATE_RESULT (s)
+      && !pfile->state.skipping)
+    {
+      /* Make sure that the token is printed using UCNs, even
+	 if we'd otherwise happily print UTF-8.  */
+      unsigned char *buf = XNEWVEC (unsigned char, cpp_token_len (token));
+      size_t sz;
+
+      sz = cpp_spell_token (pfile, token, buf, false) - buf;
+      if (NORMALIZE_STATE_RESULT (s) == normalized_C)
+	cpp_error_with_line (pfile, CPP_DL_WARNING, token->src_loc, 0,
+			     "`%.*s' is not in NFKC", (int) sz, buf);
+      else
+	cpp_error_with_line (pfile, CPP_DL_WARNING, token->src_loc, 0,
+			     "`%.*s' is not in NFC", (int) sz, buf);
+    }
+}
+
 /* Returns TRUE if the sequence starting at buffer->cur is invalid in
    an identifier.  FIRST is TRUE if this starts an identifier.  */
 static bool
-forms_identifier_p (cpp_reader *pfile, int first)
+forms_identifier_p (cpp_reader *pfile, int first,
+		    struct normalize_state *state)
 {
   cpp_buffer *buffer = pfile->buffer;
 
@@ -495,11 +525,13 @@ forms_identifier_p (cpp_reader *pfile, int first)
     }
 
   /* Is this a syntactically valid UCN?  */
-  if (0 && *buffer->cur == '\\'
+  if (CPP_OPTION (pfile, extended_identifiers)
+      && *buffer->cur == '\\'
       && (buffer->cur[1] == 'u' || buffer->cur[1] == 'U'))
     {
       buffer->cur += 2;
-      if (_cpp_valid_ucn (pfile, &buffer->cur, buffer->rlimit, 1 + !first))
+      if (_cpp_valid_ucn (pfile, &buffer->cur, buffer->rlimit, 1 + !first,
+			  state))
 	return true;
       buffer->cur -= 2;
     }
@@ -509,25 +541,43 @@ forms_identifier_p (cpp_reader *pfile, int first)
 
 /* Lex an identifier starting at BUFFER->CUR - 1.  */
 static cpp_hashnode *
-lex_identifier (cpp_reader *pfile, const uchar *base)
+lex_identifier (cpp_reader *pfile, const uchar *base, bool starts_ucn,
+		struct normalize_state *nst)
 {
   cpp_hashnode *result;
   const uchar *cur;
+  unsigned int len;
+  unsigned int hash = HT_HASHSTEP (0, *base);
 
-  do
-    {
-      cur = pfile->buffer->cur;
-
-      /* N.B. ISIDNUM does not include $.  */
-      while (ISIDNUM (*cur))
+  cur = pfile->buffer->cur;
+  if (! starts_ucn)
+    while (ISIDNUM (*cur))
+      {
+	hash = HT_HASHSTEP (hash, *cur);
 	cur++;
-
-      pfile->buffer->cur = cur;
+      }
+  pfile->buffer->cur = cur;
+  if (starts_ucn || forms_identifier_p (pfile, false, nst))
+    {
+      /* Slower version for identifiers containing UCNs (or $).  */
+      do {
+	while (ISIDNUM (*pfile->buffer->cur))
+	  {
+	    pfile->buffer->cur++;
+	    NORMALIZE_STATE_UPDATE_IDNUM (nst);
+	  }
+      } while (forms_identifier_p (pfile, false, nst));
+      result = _cpp_interpret_identifier (pfile, base,
+					  pfile->buffer->cur - base);
     }
-  while (forms_identifier_p (pfile, false));
+  else
+    {
+      len = cur - base;
+      hash = HT_HASHFINISH (hash, len);
 
-  result = (cpp_hashnode *)
-    ht_lookup (pfile->hash_table, base, cur - base, HT_ALLOC);
+      result = (cpp_hashnode *)
+	ht_lookup_with_hash (pfile->hash_table, base, len, hash, HT_ALLOC);
+    }
 
   /* Rarely, identifiers require diagnostics when lexed.  */
   if (__builtin_expect ((result->flags & NODE_DIAGNOSTIC)
@@ -579,7 +629,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
     }
   else
     {
-      if ('0' == c)  
+      if ('0' == c)
         {
           has_whole = 1;
           ++len;
@@ -725,7 +775,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
             }
           num_part = NP_FLOAT_SUFFIX;
           continue;
-            
+
         case NP_EXP:
           if ('+' == c || '-' == c)
             {
@@ -795,7 +845,8 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
 
 /* Lex a number to NUMBER starting at BUFFER->CUR - 1.  */
 static void
-lex_number (cpp_reader *pfile, cpp_string *number)
+lex_number (cpp_reader *pfile, cpp_string *number,
+	    struct normalize_state *nst)
 {
   const uchar *cur;
   const uchar *base;
@@ -808,11 +859,14 @@ lex_number (cpp_reader *pfile, cpp_string *number)
 
       /* N.B. ISIDNUM does not include $.  */
       while (ISIDNUM (*cur) || *cur == '.' || VALID_SIGN (*cur, cur[-1]))
-	cur++;
+	{
+	  cur++;
+	  NORMALIZE_STATE_UPDATE_IDNUM (nst);
+	}
 
       pfile->buffer->cur = cur;
     }
-  while (forms_identifier_p (pfile, false));
+  while (forms_identifier_p (pfile, false, nst));
 
   number->len = cur - base;
   dest = _cpp_unaligned_alloc (pfile, number->len + 1);
@@ -986,7 +1040,7 @@ save_comment (cpp_reader *pfile, cpp_token *token, const unsigned char *from,
 void
 _cpp_init_tokenrun (tokenrun *run, unsigned int count)
 {
-  run->base = xnewvec (cpp_token, count);
+  run->base = XNEWVEC (cpp_token, count);
   run->limit = run->base + count;
   run->next = NULL;
 }
@@ -997,7 +1051,7 @@ next_tokenrun (tokenrun *run)
 {
   if (run->next == NULL)
     {
-      run->next = xnew (tokenrun);
+      run->next = XNEW (tokenrun);
       run->next->prev = run;
       _cpp_init_tokenrun (run->next, 250);
     }
@@ -1022,8 +1076,7 @@ _cpp_temp_token (cpp_reader *pfile)
     }
 
   result = pfile->cur_token++;
-  result->line = old->line;
-  result->col = old->col;
+  result->src_loc = old->src_loc;
   return result;
 }
 
@@ -1061,7 +1114,16 @@ _cpp_lex_token (cpp_reader *pfile)
 		 handles the directive as normal.  */
 	      && pfile->state.parsing_args != 1
 	      && _cpp_handle_directive (pfile, result->flags & PREV_WHITE))
-	    continue;
+	    {
+	      if (pfile->directive_result.type == CPP_PADDING)
+		continue;
+	      else
+		{
+		  result = &pfile->directive_result;
+		  break;
+		}
+	    }
+
 	  if (pfile->cb.line_change && !pfile->state.skipping)
 	    pfile->cb.line_change (pfile, result, pfile->state.parsing_args);
 	}
@@ -1116,7 +1178,7 @@ _cpp_get_fresh_line (cpp_reader *pfile)
 	{
 	  /* Only warn once.  */
 	  buffer->next_line = buffer->rlimit;
-	  cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line - 1,
+	  cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line_table->highest_line,
 			       CPP_BUF_COLUMN (buffer, buffer->cur),
 			       "no newline at end of file");
 	}
@@ -1167,7 +1229,7 @@ _cpp_lex_direct (cpp_reader *pfile)
 	  if (!pfile->state.in_directive)
 	    {
 	      /* Tell the compiler the line number of the EOF token.  */
-	      result->line = pfile->line;
+	      result->src_loc = pfile->line_table->highest_line;
 	      result->flags = BOL;
 	    }
 	  return result;
@@ -1184,17 +1246,19 @@ _cpp_lex_direct (cpp_reader *pfile)
     }
   buffer = pfile->buffer;
  update_tokens_line:
-  result->line = pfile->line;
+  result->src_loc = pfile->line_table->highest_line;
 
  skipped_white:
   if (buffer->cur >= buffer->notes[buffer->cur_note].pos
       && !pfile->overlaid_buffer)
     {
       _cpp_process_line_notes (pfile, false);
-      result->line = pfile->line;
+      result->src_loc = pfile->line_table->highest_line;
     }
   c = *buffer->cur++;
-  result->col = CPP_BUF_COLUMN (buffer, buffer->cur);
+
+  LINEMAP_POSITION_FOR_COLUMN (result->src_loc, pfile->line_table,
+			       CPP_BUF_COLUMN (buffer, buffer->cur));
 
   switch (c)
     {
@@ -1204,18 +1268,23 @@ _cpp_lex_direct (cpp_reader *pfile)
       goto skipped_white;
 
     case '\n':
-      pfile->line++;
+      if (buffer->cur < buffer->rlimit)
+	CPP_INCREMENT_LINE (pfile, 0);
       buffer->need_line = true;
       goto fresh_line;
 
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
-      result->type = CPP_NUMBER;
-      if (CPP_OPTION(pfile, pedantic_parse_number))
-        pedantic_lex_number (pfile, &result->val.str);
-      else
-        lex_number (pfile, &result->val.str);
-      break;
+      {
+	struct normalize_state nst = INITIAL_NORMALIZE_STATE;
+	result->type = CPP_NUMBER;
+	if (CPP_OPTION(pfile, pedantic_parse_number))
+	  pedantic_lex_number (pfile, &result->val.str);
+	else
+	  lex_number (pfile, &result->val.str, &nst);
+	warn_about_normalization (pfile, result, &nst);
+	break;
+      }
 
     case 'L':
       /* 'L' may introduce wide characters or strings.  */
@@ -1238,7 +1307,12 @@ _cpp_lex_direct (cpp_reader *pfile)
     case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
     case 'Y': case 'Z':
       result->type = CPP_NAME;
-      result->val.node = lex_identifier (pfile, buffer->cur - 1);
+      {
+	struct normalize_state nst = INITIAL_NORMALIZE_STATE;
+	result->val.node = lex_identifier (pfile, buffer->cur - 1, false,
+					   &nst);
+	warn_about_normalization (pfile, result, &nst);
+      }
 
       /* SDCC _asm specific */
       /* handle _asm ... _endasm ;  */
@@ -1254,7 +1328,7 @@ _cpp_lex_direct (cpp_reader *pfile)
       else if (result->val.node->flags & NODE_OPERATOR)
 	{
 	  result->flags |= NAMED_OP;
-	  result->type = result->val.node->directive_index;
+	  result->type = (enum cpp_ttype) result->val.node->directive_index;
 	}
       break;
 
@@ -1274,7 +1348,7 @@ _cpp_lex_direct (cpp_reader *pfile)
 	    cpp_error (pfile, CPP_DL_ERROR, "unterminated comment");
 	}
       else if (c == '/' && (CPP_OPTION (pfile, cplusplus_comments)
-			    || CPP_IN_SYSTEM_HEADER (pfile)))
+			    || cpp_in_system_header (pfile)))
 	{
 	  /* Warn about comments only if pedantically GNUC89, and not
 	     in system headers.  */
@@ -1393,11 +1467,13 @@ _cpp_lex_direct (cpp_reader *pfile)
       result->type = CPP_DOT;
       if (ISDIGIT (*buffer->cur))
 	{
+	  struct normalize_state nst = INITIAL_NORMALIZE_STATE;
 	  result->type = CPP_NUMBER;
-          if (CPP_OPTION(pfile, pedantic_parse_number))
-            pedantic_lex_number (pfile, &result->val.str);
-          else
-            lex_number (pfile, &result->val.str);
+	  if (CPP_OPTION(pfile, pedantic_parse_number))
+	    pedantic_lex_number (pfile, &result->val.str);
+	  else
+	    lex_number (pfile, &result->val.str, &nst);
+	  warn_about_normalization (pfile, result, &nst);
 	}
       else if (*buffer->cur == '.' && buffer->cur[1] == '.')
 	buffer->cur += 2, result->type = CPP_ELLIPSIS;
@@ -1480,11 +1556,13 @@ _cpp_lex_direct (cpp_reader *pfile)
     case '\\':
       {
 	const uchar *base = --buffer->cur;
+	struct normalize_state nst = INITIAL_NORMALIZE_STATE;
 
-	if (forms_identifier_p (pfile, true))
+	if (forms_identifier_p (pfile, true, &nst))
 	  {
 	    result->type = CPP_NAME;
-	    result->val.node = lex_identifier (pfile, base);
+	    result->val.node = lex_identifier (pfile, base, true, &nst);
+	    warn_about_normalization (pfile, result, &nst);
 	    break;
 	  }
 	buffer->cur++;
@@ -1509,19 +1587,56 @@ cpp_token_len (const cpp_token *token)
     {
     default:		len = 4;				break;
     case SPELL_LITERAL:	len = token->val.str.len;		break;
-    case SPELL_IDENT:	len = NODE_LEN (token->val.node);	break;
+    case SPELL_IDENT:	len = NODE_LEN (token->val.node) * 10;	break;
     }
 
   return len;
 }
 
+/* Parse UTF-8 out of NAMEP and place a \U escape in BUFFER.
+   Return the number of bytes read out of NAME.  (There are always
+   10 bytes written to BUFFER.)  */
+
+static size_t
+utf8_to_ucn (unsigned char *buffer, const unsigned char *name)
+{
+  int j;
+  int ucn_len = 0;
+  int ucn_len_c;
+  unsigned t;
+  unsigned long utf32;
+
+  /* Compute the length of the UTF-8 sequence.  */
+  for (t = *name; t & 0x80; t <<= 1)
+    ucn_len++;
+
+  utf32 = *name & (0x7F >> ucn_len);
+  for (ucn_len_c = 1; ucn_len_c < ucn_len; ucn_len_c++)
+    {
+      utf32 = (utf32 << 6) | (*++name & 0x3F);
+
+      /* Ill-formed UTF-8.  */
+      if ((*name & ~0x3F) != 0x80)
+	abort ();
+    }
+
+  *buffer++ = '\\';
+  *buffer++ = 'U';
+  for (j = 7; j >= 0; j--)
+    *buffer++ = "0123456789abcdef"[(utf32 >> (4 * j)) & 0xF];
+  return ucn_len;
+}
+
+
 /* Write the spelling of a token TOKEN to BUFFER.  The buffer must
    already contain the enough space to hold the token's spelling.
    Returns a pointer to the character after the last character written.
+   FORSTRING is true if this is to be the spelling after translation
+   phase 1 (this is different for UCNs).
    FIXME: Would be nice if we didn't need the PFILE argument.  */
 unsigned char *
 cpp_spell_token (cpp_reader *pfile, const cpp_token *token,
-		 unsigned char *buffer)
+		 unsigned char *buffer, bool forstring)
 {
   switch (TOKEN_SPELL (token))
     {
@@ -1545,8 +1660,26 @@ cpp_spell_token (cpp_reader *pfile, const cpp_token *token,
 
     spell_ident:
     case SPELL_IDENT:
-      memcpy (buffer, NODE_NAME (token->val.node), NODE_LEN (token->val.node));
-      buffer += NODE_LEN (token->val.node);
+      if (forstring)
+	{
+	  memcpy (buffer, NODE_NAME (token->val.node),
+		  NODE_LEN (token->val.node));
+	  buffer += NODE_LEN (token->val.node);
+	}
+      else
+	{
+	  size_t i;
+	  const unsigned char * name = NODE_NAME (token->val.node);
+
+	  for (i = 0; i < NODE_LEN (token->val.node); i++)
+	    if (name[i] & ~0x7F)
+	      {
+		i += utf8_to_ucn (buffer, name + i) - 1;
+		buffer += 10;
+	      }
+	    else
+	      *buffer++ = NODE_NAME (token->val.node)[i];
+	}
       break;
 
     case SPELL_LITERAL:
@@ -1571,7 +1704,7 @@ cpp_token_as_text (cpp_reader *pfile, const cpp_token *token)
   unsigned int len = cpp_token_len (token) + 1;
   unsigned char *start = _cpp_unaligned_alloc (pfile, len), *end;
 
-  end = cpp_spell_token (pfile, token, start);
+  end = cpp_spell_token (pfile, token, start, false);
   end[0] = '\0';
 
   return start;
@@ -1615,8 +1748,21 @@ cpp_output_token (const cpp_token *token, FILE *fp)
 
     spell_ident:
     case SPELL_IDENT:
-      fwrite (NODE_NAME (token->val.node), 1, NODE_LEN (token->val.node), fp);
-    break;
+      {
+	size_t i;
+	const unsigned char * name = NODE_NAME (token->val.node);
+
+	for (i = 0; i < NODE_LEN (token->val.node); i++)
+	  if (name[i] & ~0x7F)
+	    {
+	      unsigned char buffer[10];
+	      i += utf8_to_ucn (buffer, name + i) - 1;
+	      fwrite (buffer, 1, 10, fp);
+	    }
+	  else
+	    fputc (NODE_NAME (token->val.node)[i], fp);
+      }
+      break;
 
     case SPELL_LITERAL:
       fwrite (token->val.str.text, 1, token->val.str.len, fp);
@@ -1756,7 +1902,7 @@ new_buff (size_t len)
     len = MIN_BUFF_SIZE;
   len = CPP_ALIGN (len);
 
-  base = xmalloc (len + sizeof (_cpp_buff));
+  base = XNEWVEC (unsigned char, len + sizeof (_cpp_buff));
   result = (_cpp_buff *) (base + len);
   result->base = base;
   result->cur = base;
@@ -1893,4 +2039,28 @@ _cpp_aligned_alloc (cpp_reader *pfile, size_t len)
 
   buff->cur = result + len;
   return result;
+}
+
+/* Say which field of TOK is in use.  */
+
+enum cpp_token_fld_kind
+cpp_token_val_index (cpp_token *tok)
+{
+  switch (TOKEN_SPELL (tok))
+    {
+    case SPELL_IDENT:
+      return CPP_TOKEN_FLD_NODE;
+    case SPELL_LITERAL:
+      return CPP_TOKEN_FLD_STR;
+    case SPELL_NONE:
+      if (tok->type == CPP_MACRO_ARG)
+	return CPP_TOKEN_FLD_ARG_NO;
+      else if (tok->type == CPP_PADDING)
+	return CPP_TOKEN_FLD_SOURCE;
+      else if (tok->type == CPP_PRAGMA)
+	return CPP_TOKEN_FLD_STR;
+      /* else fall through */
+    default:
+      return CPP_TOKEN_FLD_NONE;
+    }
 }

@@ -29,9 +29,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /* True if we should exit after parsing options.  */
 bool exit_after_options;
 
-/* Don't print warning messages.  -w.  */
-bool inhibit_warnings;
-
 /* Treat warnings as errors.  -Werror.  */
 bool warnings_are_errors;
 
@@ -119,14 +116,14 @@ find_opt (const char *input, int lang_mask)
     {
       const struct cl_option *opt = &cl_options[mn];
 
-      /* Is this switch a prefix of the input?  */
-      if (!strncmp (input, opt->opt_text + 1, opt->opt_len))
+      /* Is the input either an exact match or a prefix that takes a
+	 joined argument?  */
+      if (!strncmp (input, opt->opt_text + 1, opt->opt_len)
+	  && (input[opt->opt_len] == '\0' || (opt->flags & CL_JOINED)))
 	{
-	  /* If language is OK, and the match is exact or the switch
-	     takes a joined argument, return it.  */
-	  if ((opt->flags & lang_mask)
-	      && (input[opt->opt_len] == '\0' || (opt->flags & CL_JOINED)))
-	    return mn;
+	  /* If language is OK, return it.  */
+	  if (opt->flags & lang_mask)
+
 
 	  /* If we haven't remembered a prior match, remember this
 	     one.  Any prior match is necessarily better.  */
@@ -199,7 +196,7 @@ complain_wrong_lang (const char *text, const struct cl_option *option,
   bad_lang = write_langs (lang_mask);
 
   /* Eventually this should become a hard error IMO.  */
-  warning ("command line option \"%s\" is valid for %s but not for %s",
+  warning (0, "command line option \"%s\" is valid for %s but not for %s",
 	   text, ok_langs, bad_lang);
 
   free (ok_langs);
@@ -220,10 +217,12 @@ handle_option (const char **argv, unsigned int lang_mask)
 
   opt = argv[0];
 
-  /* Drop the "no-" from negative switches.  */
-  if ((opt[1] == 'W' || opt[1] == 'f')
+  opt_index = find_opt (opt + 1, lang_mask | CL_COMMON | CL_TARGET);
+  if (opt_index == cl_options_count
+      && (opt[1] == 'W' || opt[1] == 'f' || opt[1] == 'm')
       && opt[2] == 'n' && opt[3] == 'o' && opt[4] == '-')
     {
+      /* Drop the "no-" from negative switches.  */
       size_t len = strlen (opt) - 3;
 
       dup = xmalloc (len + 1);
@@ -232,9 +231,9 @@ handle_option (const char **argv, unsigned int lang_mask)
       memcpy (dup + 2, opt + 5, len - 2 + 1);
       opt = dup;
       value = 0;
+      opt_index = find_opt (opt + 1, lang_mask | CL_COMMON | CL_TARGET);
     }
 
-  opt_index = find_opt (opt + 1, lang_mask | CL_COMMON);
   if (opt_index == cl_options_count)
     goto done;
 
@@ -247,6 +246,14 @@ handle_option (const char **argv, unsigned int lang_mask)
 
   /* We've recognized this switch.  */
   result = 1;
+
+  /* Check to see if the option is disabled for this configuration.  */
+  if (option->flags & CL_DISABLED)
+    {
+      error ("command line option %qs"
+	     " is not supported by this configuration", opt);
+      goto done;
+    }
 
   /* Sort out any argument the switch takes.  */
   if (option->flags & CL_JOINED)
@@ -278,7 +285,7 @@ handle_option (const char **argv, unsigned int lang_mask)
 
   /* Now we've swallowed any potential argument, complain if this
      is a switch for a different front end.  */
-  if (!(option->flags & (lang_mask | CL_COMMON)))
+  if (!(option->flags & (lang_mask | CL_COMMON | CL_TARGET)))
     {
       complain_wrong_lang (argv[0], option, lang_mask);
       goto done;
@@ -286,7 +293,7 @@ handle_option (const char **argv, unsigned int lang_mask)
 
   if (arg == NULL && (option->flags & (CL_JOINED | CL_SEPARATE)))
     {
-      if (!(*lang_hooks.missing_argument) (opt, opt_index))
+      if (!lang_hooks.missing_argument (opt, opt_index))
 	error ("missing argument to \"%s\"", opt);
       goto done;
     }
@@ -303,6 +310,34 @@ handle_option (const char **argv, unsigned int lang_mask)
 	}
     }
 
+  if (option->flag_var)
+    switch (option->var_type)
+      {
+      case CLVC_BOOLEAN:
+	*(int *) option->flag_var = value;
+	break;
+
+      case CLVC_EQUAL:
+	*(int *) option->flag_var = (value
+				     ? option->var_value
+				     : !option->var_value);
+	break;
+
+      case CLVC_BIT_CLEAR:
+      case CLVC_BIT_SET:
+	if ((value != 0) == (option->var_type == CLVC_BIT_SET))
+	  *(int *) option->flag_var |= option->var_value;
+	else
+	  *(int *) option->flag_var &= ~option->var_value;
+	////if (option->flag_var == &target_flags)
+	////  target_flags_explicit |= option->var_value;
+	break;
+
+      case CLVC_STRING:
+	*(const char **) option->flag_var = arg;
+	break;
+      }
+
   if (option->flags & lang_mask)
     if ((*lang_hooks.handle_option) (opt_index, arg, value) == 0)
       result = 0;
@@ -311,10 +346,23 @@ handle_option (const char **argv, unsigned int lang_mask)
     if (common_handle_option (opt_index, arg, value) == 0)
       result = 0;
 
+  ////if (result && (option->flags & CL_TARGET))
+  ////  if (!targetm.handle_option (opt_index, arg, value))
+  ////    result = 0;
+
  done:
   if (dup)
     free (dup);
   return result;
+}
+
+/* Handle FILENAME from the command line.  */
+void
+add_input_filename (const char *filename)
+{
+  num_in_fnames++;
+  in_fnames = xrealloc (in_fnames, num_in_fnames * sizeof (in_fnames[0]));
+  in_fnames[num_in_fnames - 1] = filename;
 }
 
 /* Decode and handle the vector of command line options.  LANG_MASK
@@ -349,15 +397,6 @@ handle_options (unsigned int argc, const char **argv, unsigned int lang_mask)
     }
 }
 
-/* Handle FILENAME from the command line.  */
-void
-add_input_filename (const char *filename)
-{
-  num_in_fnames++;
-  in_fnames = xrealloc (in_fnames, num_in_fnames * sizeof (in_fnames[0]));
-  in_fnames[num_in_fnames - 1] = filename;
-}
-
 /* Parse command line options and set default flag values.  Do minimal
    options processing.  */
 void
@@ -366,7 +405,7 @@ decode_options (unsigned int argc, const char **argv)
   unsigned int lang_mask;
 
   /* Perform language-specific options initialization.  */
-  lang_mask = (*lang_hooks.init_options) (argc, argv);
+  lang_mask = lang_hooks.init_options (argc, argv);
 
   lang_hooks.initialize_diagnostics (global_dc);
 
@@ -377,7 +416,10 @@ decode_options (unsigned int argc, const char **argv)
 }
 
 /* Handle target- and language-independent options.  Return zero to
-   generate an "unknown option" message.  */
+   generate an "unknown option" message.  Only options that need
+   extra handling need to be listed here; if you simply want
+   VALUE assigned to a variable, it happens automatically.  */
+
 static int
 common_handle_option (size_t scode, const char *arg,
 		      int value ATTRIBUTE_UNUSED)
@@ -459,7 +501,7 @@ print_filtered_help (unsigned int flag)
   const char *help, *opt, *tab;
   static char *printed;
 
-  if (flag == CL_COMMON)
+  if (flag == CL_COMMON || flag == CL_TARGET)
     {
       filter = flag;
       if (!printed)
@@ -605,4 +647,66 @@ wrap_help (const char *help, const char *item, unsigned int item_width)
       remaining -= len;
     }
   while (remaining);
+}
+
+/* Return 1 if OPTION is enabled, 0 if it is disabled, or -1 if it isn't
+   a simple on-off switch.  */
+
+int
+option_enabled (int opt_idx)
+{
+  const struct cl_option *option = &(cl_options[opt_idx]);
+  if (option->flag_var)
+    switch (option->var_type)
+      {
+      case CLVC_BOOLEAN:
+	return *(int *) option->flag_var != 0;
+
+      case CLVC_EQUAL:
+	return *(int *) option->flag_var == option->var_value;
+
+      case CLVC_BIT_CLEAR:
+	return (*(int *) option->flag_var & option->var_value) == 0;
+
+      case CLVC_BIT_SET:
+	return (*(int *) option->flag_var & option->var_value) != 0;
+
+      case CLVC_STRING:
+	break;
+      }
+  return -1;
+}
+
+/* Fill STATE with the current state of option OPTION.  Return true if
+   there is some state to store.  */
+
+bool
+get_option_state (int option, struct cl_option_state *state)
+{
+  if (cl_options[option].flag_var == 0)
+    return false;
+
+  switch (cl_options[option].var_type)
+    {
+    case CLVC_BOOLEAN:
+    case CLVC_EQUAL:
+      state->data = cl_options[option].flag_var;
+      state->size = sizeof (int);
+      break;
+
+    case CLVC_BIT_CLEAR:
+    case CLVC_BIT_SET:
+      state->ch = option_enabled (option);
+      state->data = &state->ch;
+      state->size = 1;
+      break;
+
+    case CLVC_STRING:
+      state->data = *(const char **) cl_options[option].flag_var;
+      if (state->data == 0)
+	state->data = "";
+      state->size = strlen (state->data) + 1;
+      break;
+    }
+  return true;
 }

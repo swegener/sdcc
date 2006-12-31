@@ -1,5 +1,5 @@
 /* CPP Library - traditional lexical analysis and macro expansion.
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
    Contributed by Neil Booth, May 2002
 
 This program is free software; you can redistribute it and/or modify it
@@ -14,12 +14,12 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include "config.h"
 #include "system.h"
 #include "cpplib.h"
-#include "cpphash.h"
+#include "internal.h"
 
 /* The replacement text of a function-like macro is stored as a
    contiguous sequence of aligned blocks, each representing the text
@@ -76,7 +76,7 @@ enum ls {ls_none = 0,		/* Normal state.  */
 	 ls_predicate,		/* After the predicate, maybe paren?  */
 	 ls_answer};		/* In answer to predicate.  */
 
-/* Lexing TODO: Maybe handle space in escaped newlines.  Stop cpplex.c
+/* Lexing TODO: Maybe handle space in escaped newlines.  Stop lex.c
    from recognizing comments and directives during its lexing pass.  */
 
 static const uchar *skip_whitespace (cpp_reader *, const uchar *, int);
@@ -107,7 +107,7 @@ check_output_buffer (cpp_reader *pfile, size_t n)
       size_t size = pfile->out.cur - pfile->out.base;
       size_t new_size = (size + n) * 3 / 2;
 
-      pfile->out.base = xrealloc (pfile->out.base, new_size);
+      pfile->out.base = XRESIZEVEC (unsigned char, pfile->out.base, new_size);
       pfile->out.limit = pfile->out.base + new_size;
       pfile->out.cur = pfile->out.base + size;
     }
@@ -148,7 +148,7 @@ static const uchar *
 copy_comment (cpp_reader *pfile, const uchar *cur, int in_define)
 {
   bool unterminated, copy = false;
-  unsigned int from_line = pfile->line;
+  source_location src_loc = pfile->line_table->highest_line;
   cpp_buffer *buffer = pfile->buffer;
 
   buffer->cur = cur;
@@ -158,7 +158,7 @@ copy_comment (cpp_reader *pfile, const uchar *cur, int in_define)
     unterminated = _cpp_skip_block_comment (pfile);
     
   if (unterminated)
-    cpp_error_with_line (pfile, CPP_DL_ERROR, from_line, 0,
+    cpp_error_with_line (pfile, CPP_DL_ERROR, src_loc, 0,
 			 "unterminated comment");
 
   /* Comments in directives become spaces so that tokens are properly
@@ -268,13 +268,13 @@ _cpp_overlay_buffer (cpp_reader *pfile, const uchar *start, size_t len)
   cpp_buffer *buffer = pfile->buffer;
 
   pfile->overlaid_buffer = buffer;
-  buffer->saved_cur = buffer->cur;
-  buffer->saved_rlimit = buffer->rlimit;
-  /* Prevent the ISO lexer from scanning a fresh line.  */
-  pfile->saved_line = pfile->line--;
+  pfile->saved_cur = buffer->cur;
+  pfile->saved_rlimit = buffer->rlimit;
+  pfile->saved_line_base = buffer->next_line;
   buffer->need_line = false;
 
   buffer->cur = start;
+  buffer->line_base = start;
   buffer->rlimit = start + len;
 }
 
@@ -284,12 +284,12 @@ _cpp_remove_overlay (cpp_reader *pfile)
 {
   cpp_buffer *buffer = pfile->overlaid_buffer;
 
-  buffer->cur = buffer->saved_cur;
-  buffer->rlimit = buffer->saved_rlimit;
+  buffer->cur = pfile->saved_cur;
+  buffer->rlimit = pfile->saved_rlimit;
+  buffer->line_base = pfile->saved_line_base;
   buffer->need_line = true;
 
   pfile->overlaid_buffer = NULL;
-  pfile->line = pfile->saved_line;
 }
 
 /* Reads a logical line into the output buffer.  Returns TRUE if there
@@ -359,7 +359,7 @@ _cpp_scan_out_logical_line (cpp_reader *pfile, cpp_macro *macro)
   CUR (pfile->context) = pfile->buffer->cur;
   RLIMIT (pfile->context) = pfile->buffer->rlimit;
   pfile->out.cur = pfile->out.base;
-  pfile->out.first_line = pfile->line;
+  pfile->out.first_line = pfile->line_table->highest_line;
   /* start_of_input_line is needed to make sure that directives really,
      really start at the first character of the line.  */
   start_of_input_line = pfile->buffer->cur;
@@ -404,7 +404,7 @@ _cpp_scan_out_logical_line (cpp_reader *pfile, cpp_macro *macro)
 	  pfile->out.cur = out - 1;
 	  pfile->buffer->cur = cur;
 	  pfile->buffer->need_line = true;
-	  pfile->line++;
+	  CPP_INCREMENT_LINE (pfile, 0);
 
 	  if ((lex_state == ls_fun_open || lex_state == ls_fun_close)
 	      && !pfile->state.in_directive
@@ -487,7 +487,7 @@ _cpp_scan_out_logical_line (cpp_reader *pfile, cpp_macro *macro)
 		    {
 		      maybe_start_funlike (pfile, node, out_start, &fmacro);
 		      lex_state = ls_fun_open;
-		      fmacro.line = pfile->line;
+		      fmacro.line = pfile->line_table->highest_line;
 		      continue;
 		    }
 		  else if (!recursive_macro (pfile, node))
@@ -605,7 +605,7 @@ _cpp_scan_out_logical_line (cpp_reader *pfile, cpp_macro *macro)
 		  /* Null directive.  Ignore it and don't invalidate
 		     the MI optimization.  */
 		  pfile->buffer->need_line = true;
-		  pfile->line++;
+		  CPP_INCREMENT_LINE (pfile, 0);
 		  result = false;
 		  goto done;
 		}
@@ -701,6 +701,7 @@ push_replacement_text (cpp_reader *pfile, cpp_hashnode *node)
       cpp_macro *macro = node->value.macro;
       macro->used = 1;
       text = macro->exp.text;
+      macro->traditional = 1;
       len = macro->count;
     }
 
@@ -934,6 +935,7 @@ save_replacement_text (cpp_reader *pfile, cpp_macro *macro,
       memcpy (exp, pfile->out.base, len);
       exp[len] = '\n';
       macro->exp.text = exp;
+      macro->traditional = 1;
       macro->count = len;
     }
   else
@@ -949,6 +951,7 @@ save_replacement_text (cpp_reader *pfile, cpp_macro *macro,
       exp = BUFF_FRONT (pfile->a_buff);
       block = (struct block *) (exp + macro->count);
       macro->exp.text = exp;
+      macro->traditional = 1;
 
       /* Write out the block information.  */
       block->text_len = len;
@@ -1066,7 +1069,7 @@ bool
 _cpp_expansions_different_trad (const cpp_macro *macro1,
 				const cpp_macro *macro2)
 {
-  uchar *p1 = xmalloc (macro1->count + macro2->count);
+  uchar *p1 = XNEWVEC (uchar, macro1->count + macro2->count);
   uchar *p2 = p1 + macro1->count;
   uchar quote1 = 0, quote2 = 0;
   bool mismatch;

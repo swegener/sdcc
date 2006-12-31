@@ -1,5 +1,5 @@
 /* C/ObjC/C++ command line option handling.
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
    Contributed by Neil Booth.
 
 This file is part of GCC.
@@ -16,8 +16,8 @@ for more details.
 
 You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.  */
+Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.  */
 
 #include "config.h"
 #include "system.h"
@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "c-incpath.h"
 #include "opts.h"
 #include "options.h"
+#include "mkdeps.h"
 
 #ifndef DOLLARS_IN_IDENTIFIERS
 # define DOLLARS_IN_IDENTIFIERS true
@@ -74,6 +75,9 @@ static bool quote_chain_split;
 
 /* If -Wunused-macros.  */
 static bool warn_unused_macros;
+
+/* If -Wvariadic-macros.  */
+static bool warn_variadic_macros = true;
 
 /* Number of deferred options.  */
 static size_t deferred_count;
@@ -132,6 +136,7 @@ sdcpp_common_missing_argument (const char *opt, size_t code)
     case OPT_idirafter:
     case OPT_isysroot:
     case OPT_isystem:
+    case OPT_iquote:
       error ("missing path after \"%s\"", opt);
       break;
 
@@ -166,7 +171,7 @@ defer_opt (enum opt_code code, const char *arg)
 unsigned int
 sdcpp_common_init_options (unsigned int argc, const char **argv ATTRIBUTE_UNUSED)
 {
-  parse_in = cpp_create_reader (CLK_GNUC89, NULL);
+  parse_in = cpp_create_reader (CLK_GNUC89, NULL, &line_table);
 
   cpp_opts = cpp_get_options (parse_in);
   cpp_opts->dollars_in_ident = DOLLARS_IN_IDENTIFIERS;
@@ -176,7 +181,7 @@ sdcpp_common_init_options (unsigned int argc, const char **argv ATTRIBUTE_UNUSED
      before passing on command-line options to cpplib.  */
   cpp_opts->warn_dollars = 0;
 
-  deferred_opts = xmalloc (argc * sizeof (struct deferred_opt));
+  deferred_opts = XNEWVEC (struct deferred_opt, argc);
 
   return CL_SDCPP;
 }
@@ -227,13 +232,14 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 
     case OPT_I:
       if (strcmp (arg, "-"))
-	add_path (xstrdup (arg), BRACKET, 0);
+	add_path (xstrdup (arg), BRACKET, 0, true);
       else
 	{
 	  if (quote_chain_split)
 	    error ("-I- specified twice");
 	  quote_chain_split = true;
 	  split_quote_chain ();
+	  inform ("obsolete option -I- used, please use -iquote instead");
 	}
       break;
 
@@ -309,6 +315,7 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 
     case OPT_Werror:
       cpp_opts->warnings_are_errors = value;
+      global_dc->warning_as_error_requested = value;
       break;
 
     case OPT_Wimport:
@@ -325,6 +332,10 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       cpp_opts->warn_system_headers = value;
       break;
 
+    case OPT_Wtraditional:
+      cpp_opts->warn_traditional = value;
+      break;
+
     case OPT_Wtrigraphs:
       cpp_opts->warn_trigraphs = value;
       break;
@@ -335,6 +346,10 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 
     case OPT_Wunused_macros:
       warn_unused_macros = value;
+      break;
+
+    case OPT_Wvariadic_macros:
+      warn_variadic_macros = value;
       break;
 
     case OPT_ansi:
@@ -360,6 +375,10 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 #if 0 // pch not supported by sdcpp
     case OPT_fpch_deps:
       cpp_opts->restore_pch_deps = value;
+      break;
+
+    case OPT_fpch_preprocess:
+      flag_pch_preprocess = value;
       break;
 #endif
 
@@ -390,7 +409,7 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       break;
 
     case OPT_idirafter:
-      add_path (xstrdup (arg), AFTER, 0);
+      add_path (xstrdup (arg), AFTER, 0, true);
       break;
 
     case OPT_imacros:
@@ -402,12 +421,16 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       iprefix = arg;
       break;
 
+    case OPT_iquote:
+      add_path (xstrdup (arg), QUOTE, 0, true);
+      break;
+
     case OPT_isysroot:
       sysroot = arg;
       break;
 
     case OPT_isystem:
-      add_path (xstrdup (arg), SYSTEM, 0);
+      add_path (xstrdup (arg), SYSTEM, 0, true);
       break;
 
     case OPT_iwithprefix:
@@ -459,6 +482,13 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       cpp_opts->pedantic_parse_number = 1;
       break;
 
+#if 0 // pch not supported by sdcpp
+    case OPT_print_pch_checksum:
+      c_common_print_pch_checksum (stdout);
+      exit_after_options = true;
+      break;
+#endif
+
     case OPT_remap:
       cpp_opts->remap = 1;
       break;
@@ -503,7 +533,7 @@ sdcpp_common_post_options (const char **pfilename)
   /* Canonicalize the input and output filenames.  */
   if (in_fnames == NULL)
     {
-      in_fnames = xmalloc (sizeof (in_fnames[0]));
+      in_fnames = XNEWVEC (const char *, 1);
       in_fnames[0] = "";
     }
   else if (strcmp (in_fnames[0], "-") == 0)
@@ -547,8 +577,7 @@ sdcpp_common_post_options (const char **pfilename)
   cb->dir_change = cb_dir_change;
   cpp_post_options (parse_in);
 
-  saved_lineno = input_line;
-  input_line = 0;
+  input_location = UNKNOWN_LOCATION;
 
   /* If an error has occurred in cpplib, note it so we fail
      immediately.  */
@@ -563,7 +592,7 @@ sdcpp_common_post_options (const char **pfilename)
       return false;
     }
 
-  if (flag_working_directory && ! flag_no_line_commands)
+  if (flag_working_directory && !flag_no_line_commands)
     pp_dir_change (parse_in, get_src_pwd ());
 
   return 1;
@@ -573,8 +602,6 @@ sdcpp_common_post_options (const char **pfilename)
 bool
 sdcpp_common_init (void)
 {
-  input_line = saved_lineno;
-
   /* Default CPP arithmetic to something sensible for the host for the
      benefit of dumb users like fix-header.  */
   cpp_opts->precision = CHAR_BIT * sizeof (long);
@@ -587,6 +614,11 @@ sdcpp_common_init (void)
   /* This can't happen until after wchar_precision and bytes_big_endian
      are known.  */
   cpp_init_iconv (parse_in);
+
+#if 0
+  if (version_flag)
+    c_common_print_pch_checksum (stderr);
+#endif
 
   finish_options ();
   preprocess_file (parse_in);
@@ -666,6 +698,7 @@ check_deps_environment_vars (void)
 	deps_file = spec;
 
       deps_append = 1;
+      deps_seen = true;
     }
 }
 
@@ -674,13 +707,22 @@ static void
 handle_deferred_opts (void)
 {
   size_t i;
+  struct deps *deps;
+
+  /* Avoid allocating the deps buffer if we don't need it.
+     (This flag may be true without there having been -MT or -MQ
+     options, but we'll still need the deps buffer.)  */
+  if (!deps_seen)
+    return;
+
+  deps = cpp_get_deps (parse_in);
 
   for (i = 0; i < deferred_count; i++)
     {
       struct deferred_opt *opt = &deferred_opts[i];
 
       if (opt->code == OPT_MT || opt->code == OPT_MQ)
-	cpp_add_dependency_target (parse_in, opt->arg, opt->code == OPT_MQ);
+	deps_add_target (deps, opt->arg, opt->code == OPT_MQ);
     }
 }
 
@@ -713,6 +755,11 @@ sanitize_cpp_opts (void)
   cpp_opts->unsigned_char = !flag_signed_char;
   cpp_opts->stdc_0_in_system_headers = STDC_0_IN_SYSTEM_HEADERS;
 
+  /* Similarly with -Wno-variadic-macros.  No check for c99 here, since
+     this also turns off warnings about GCCs extension.  */
+  cpp_opts->warn_variadic_macros
+    = warn_variadic_macros && (pedantic || warn_traditional);
+
   /* If we're generating preprocessor output, emit current directory
      if explicitly requested  */
   if (flag_working_directory == -1)
@@ -731,12 +778,12 @@ add_prefixed_path (const char *suffix, size_t chain)
   prefix     = iprefix ? iprefix : cpp_GCC_INCLUDE_DIR;
   prefix_len = iprefix ? strlen (iprefix) : cpp_GCC_INCLUDE_DIR_len;
 
-  path = xmalloc (prefix_len + suffix_len + 1);
+  path = (char *) xmalloc (prefix_len + suffix_len + 1);
   memcpy (path, prefix, prefix_len);
   memcpy (path + prefix_len, suffix, suffix_len);
   path[prefix_len + suffix_len] = '\0';
 
-  add_path (path, chain, 0);
+  add_path (path, chain, 0, false);
 }
 
 /* Handle -D, -U, -A, -imacros, and the first -include.  */
@@ -747,7 +794,10 @@ finish_options (void)
     {
       size_t i;
 
-      cpp_change_file (parse_in, LC_RENAME, _("<built-in>"));
+      cb_file_change (parse_in,
+		      linemap_add (&line_table, LC_RENAME, 0,
+				   _("<built-in>"), 0));
+
       cpp_init_builtins (parse_in, 0 /*flag_hosted*/);
 
       /* We're about to send user input to cpplib, so make it warn for
@@ -806,7 +856,7 @@ push_command_line_include (void)
     {
       struct deferred_opt *opt = &deferred_opts[include_cursor++];
 
-      if (! cpp_opts->preprocessed && opt->code == OPT_include
+      if (!cpp_opts->preprocessed && opt->code == OPT_include
 	  && cpp_push_include (parse_in, opt->arg))
 	return;
     }
@@ -817,19 +867,18 @@ push_command_line_include (void)
       /* -Wunused-macros should only warn about macros defined hereafter.  */
       cpp_opts->warn_unused_macros = warn_unused_macros;
       /* Restore the line map from <command line>.  */
-      if (! cpp_opts->preprocessed)
-	cpp_change_file (parse_in, LC_RENAME, main_input_filename);
+      if (!cpp_opts->preprocessed)
+	cpp_change_file (parse_in, LC_RENAME, this_input_filename);
 
       /* Set this here so the client can change the option if it wishes,
 	 and after stacking the main file so we don't trace the main file.  */
-      cpp_get_line_maps (parse_in)->trace_includes
-	= cpp_opts->print_include_names;
+      line_table.trace_includes = cpp_opts->print_include_names;
     }
 }
 
 /* File change callback.  Has to handle -include files.  */
 static void
-cb_file_change (cpp_reader *pfile ATTRIBUTE_UNUSED,
+cb_file_change (cpp_reader * ARG_UNUSED (pfile),
 		const struct line_map *new_map)
 {
   pp_file_change (new_map);
@@ -839,10 +888,10 @@ cb_file_change (cpp_reader *pfile ATTRIBUTE_UNUSED,
 }
 
 void
-cb_dir_change (cpp_reader *pfile ATTRIBUTE_UNUSED, const char *dir)
+cb_dir_change (cpp_reader * ARG_UNUSED (pfile), const char *dir)
 {
-  if (! set_src_pwd (dir))
-    warning ("too late for # directive to set debug directory");
+  if (!set_src_pwd (dir))
+    warning (0, "too late for # directive to set debug directory");
 }
 
 /* Set the C 89 standard (with 1994 amendments if C94, without GNU

@@ -66,7 +66,7 @@ SOURCE=".\auto-host_vc_in.h"
 !IF  "$(CFG)" == "sdcppa - Win32 Release"
 
 # Begin Custom Build
-InputPath=.\auto-host_vc_in.h
+InputPath=".\auto-host_vc_in.h"
 
 "auto-host.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy auto-host_vc_in.h auto-host.h > nul
@@ -76,7 +76,7 @@ InputPath=.\auto-host_vc_in.h
 !ELSEIF  "$(CFG)" == "sdcppa - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\auto-host_vc_in.h
+InputPath=".\auto-host_vc_in.h"
 
 "auto-host.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	copy auto-host_vc_in.h auto-host.h > nul
@@ -88,53 +88,40 @@ InputPath=.\auto-host_vc_in.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\options_vc_in.c
+SOURCE=.\sdcpp.opt
 
 !IF  "$(CFG)" == "sdcppa - Win32 Release"
 
 # Begin Custom Build
-InputPath=.\options_vc_in.c
+InputPath=.\sdcpp.opt
+
+BuildCmds= \
+	gawk -f opt-gather.awk sdcpp.opt | gawk -f opt-functions.awk -f optc-gen.awk -v header_name="config.h system.h options.h" > options.c \
+	gawk -f opt-gather.awk sdcpp.opt | gawk -f opt-functions.awk -f opth-gen.awk > options.h \
+	
 
 "options.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy options_vc_in.c options.c > nul
+   $(BuildCmds)
 
+"options.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "sdcppa - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\options_vc_in.c
+InputPath=.\sdcpp.opt
+
+BuildCmds= \
+	gawk -f opt-gather.awk sdcpp.opt | gawk -f opt-functions.awk -f optc-gen.awk -v header_name="config.h system.h options.h" > options.c \
+	gawk -f opt-gather.awk sdcpp.opt | gawk -f opt-functions.awk -f opth-gen.awk > options.h \
+	
 
 "options.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy options_vc_in.c options.c > nul
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\options_vc_in.h
-
-!IF  "$(CFG)" == "sdcppa - Win32 Release"
-
-# Begin Custom Build
-InputPath=.\options_vc_in.h
+   $(BuildCmds)
 
 "options.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy options_vc_in.h options.h > nul
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "sdcppa - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\options_vc_in.h
-
-"options.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	copy options_vc_in.h options.h > nul
-
+   $(BuildCmds)
 # End Custom Build
 
 !ENDIF 

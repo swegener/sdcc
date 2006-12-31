@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".\libiberty" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /FR /FD /D /GZ "HAVE_CONFIG_H" /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".\libiberty" /I ".\win32" /I ".\sdcpp" /I ".\sdcpp\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "." /I ".\libiberty" /I ".\win32" /I ".\libcpp" /I ".\libcpp\include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /FR /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /I "." /I ".\libiberty" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "." /I ".\libiberty" /I ".\win32" /I ".\sdcpp" /I ".\sdcpp\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "_WIN32" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "." /I ".\libiberty" /I ".\win32" /I ".\libcpp" /I ".\libcpp\include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "HAVE_CONFIG_H" /D "_WIN32" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -124,10 +124,6 @@ SOURCE=.\libcpp\init.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\libcpp\internal.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\libcpp\lex.c
 # End Source File
 # Begin Source File
@@ -140,10 +136,6 @@ SOURCE=.\libcpp\macro.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\libcpp\makeucnid.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\libcpp\mkdeps.c
 # End Source File
 # Begin Source File
@@ -152,15 +144,7 @@ SOURCE=.\libcpp\symtab.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\libcpp\system.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\libcpp\traditional.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\libcpp\ucnid.h
 # End Source File
 # End Group
 # Begin Group "libiberty"
@@ -172,7 +156,15 @@ SOURCE=.\libiberty\concat.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\libiberty\fopen_unlocked.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\libiberty\getpwd.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\hashtab.c
 # End Source File
 # Begin Source File
 
@@ -181,6 +173,10 @@ SOURCE=.\libiberty\hex.c
 # Begin Source File
 
 SOURCE=.\libiberty\lbasename.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\md5.c
 # End Source File
 # Begin Source File
 
@@ -275,6 +271,62 @@ SOURCE=.\version.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Group "libcpp_h"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Group "include"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=".\libcpp\include\cpp-id-data.h"
+# End Source File
+# Begin Source File
+
+SOURCE=.\libcpp\include\cpplib.h
+# End Source File
+# Begin Source File
+
+SOURCE=".\libcpp\include\line-map.h"
+# End Source File
+# Begin Source File
+
+SOURCE=.\libcpp\include\mkdeps.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\libcpp\include\symtab.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=.\libcpp\internal.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\libcpp\system.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\libcpp\ucnid.h
+# End Source File
+# End Group
+# Begin Group "win32_h"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\win32\dirent.h
+# End Source File
+# End Group
+# Begin Group "libiberty_h"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\libiberty\obstack.h
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\ansidecl.h
@@ -297,27 +349,7 @@ SOURCE=.\cppdefault.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\cpphash.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\cpplib.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\diagnostic.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\win32\dirent.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\hashtab.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\hashtable.h
 # End Source File
 # Begin Source File
 
@@ -334,18 +366,6 @@ SOURCE=.\intl.h
 # Begin Source File
 
 SOURCE=.\libiberty.h
-# End Source File
-# Begin Source File
-
-SOURCE=".\line-map.h"
-# End Source File
-# Begin Source File
-
-SOURCE=.\mkdeps.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\libiberty\obstack.h
 # End Source File
 # Begin Source File
 

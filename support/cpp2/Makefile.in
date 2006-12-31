@@ -205,17 +205,6 @@ s-options-h: optionlist $(srcdir)/opt-functions.awk $(srcdir)/opth-gen.awk
 	$(SHELL) $(srcdir)/move-if-change tmp-options.h options.h
 	$(STAMP) $@
 
-version.o: version.c version.h
-
-hashtable.o: hashtable.c hashtable.h $(CONFIG_H) $(SYSTEM_H) $(OBSTACK_H)
-
-cppcharset.o: cppcharset.c $(CONFIG_H) $(SYSTEM_H)
-
-prefix.o: prefix.c $(CONFIG_H) $(SYSTEM_H) Makefile prefix.h
-	$(CC) $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) \
-	-DPREFIX=\"$(prefix)\" \
-	  -c $(srcdir)/prefix.c
-
 #
 # Remake cpp and protoize.
 
@@ -342,26 +331,37 @@ xstrerror.o: $(LIBIBERTY_DIR)/xstrerror.c  $(CONFIG_H) $(LIBCPP_DEPS)
 ##########################
 # Sdcpp
 
-SDCC_OBJS =	sdcpp.o sdcpp-opts.o c-ppoutput.o cppdefault.o prefix.o version.o opts.o options.o diagnostic.o pretty-print.o c-incpath.o
+SDCC_OBJS = sdcpp.o sdcpp-opts.o c-ppoutput.o cppdefault.o prefix.o version.o opts.o options.o diagnostic.o pretty-print.o c-incpath.o
 
 $(TARGET): $(SDCC_OBJS) $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS)
 	mkdir -p $(dir $@)
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(SDCC_OBJS) \
 	$(MY_LIBIBERTY_BITS) libcpp.a $(LIBS)
 
-sdcpp.o:      sdcpp.c  $(CONFIG_H) $(SYSTEM_H) options.h
+sdcpp.o: sdcpp.c $(CONFIG_H) $(SYSTEM_H) options.h
 
 sdcpp-opts.o: sdcpp-opts.c $(CONFIG_H) $(LIBCPP_DEPS) options.h
 
-c-ppoutput.o:  c-ppoutput.c  $(CONFIG_H) $(SYSTEM_H)
+c-ppoutput.o: c-ppoutput.c $(CONFIG_H) $(SYSTEM_H)
 
-opts.o:     opts.c     $(CONFIG_H) $(LIBCPP_DEPS) options.h
+options.o: options.c $(CONFIG_H) $(LIBCPP_DEPS) options.h
 
-diagnostic.o: diagnostic.c $(CONFIG_H) $(LIBCPP_DEPS) diagnostic.h
+opts.o: opts.c $(CONFIG_H) $(LIBCPP_DEPS) options.h
+
+diagnostic.o: diagnostic.c $(CONFIG_H) $(LIBCPP_DEPS) diagnostic.h options.h
 
 pretty-print.o: pretty-print.c $(CONFIG_H) $(LIBCPP_DEPS) pretty-print.h
 
 c-incpath.o: $(CONFIG_H) $(LIBCPP_DEPS) c-incpath.h
+
+version.o: version.c version.h
+
+cppcharset.o: cppcharset.c $(CONFIG_H) $(SYSTEM_H)
+
+prefix.o: prefix.c $(CONFIG_H) $(SYSTEM_H) Makefile prefix.h
+	$(CC) $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) \
+	-DPREFIX=\"$(prefix)\" \
+	  -c $(srcdir)/prefix.c
 
 cppdefault.o: cppdefault.c $(CONFIG_H) $(SYSTEM_H) cppdefault.h Makefile
 	$(CC) $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) \

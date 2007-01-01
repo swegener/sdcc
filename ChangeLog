@@ -1,3 +1,12 @@
+2007-01-01 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/libcpp/directives.c, support/cpp2/libcpp/identifiers.c,
+	  support/cpp2/libcpp/init.c, support/cpp2/libcpp/sdcpp-opts.c,
+	  support/cpp2/libcpp/sdcpp.c:
+	  sdcpp specific pragma/directive/option handling moved to sdcpp.c
+	* doc/sdccman.lyx: reference to the GCC 4.1.1 CPP Manual
+	* support/cpp2/libcpp/mkdeps.c: synchronized with GCC CPP 4.1.1
+
 2006-12-31 Borut Razem <borut.razem AT siol.net>
 
 	* SDCPP synchronized with GCC CPP release version 4.1.1,

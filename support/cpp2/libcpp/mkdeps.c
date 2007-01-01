@@ -14,7 +14,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
  In other words, you are welcome to use, share and improve this program.
  You are forbidden to forbid anyone else to use, share and improve
@@ -36,6 +36,11 @@ struct deps
   const char **depv;
   unsigned int ndeps;
   unsigned int deps_size;
+
+  const char **vpathv;
+  size_t *vpathlv;
+  unsigned int nvpaths;
+  unsigned int vpaths_size;
 };
 
 static const char *munge (const char *);
@@ -79,7 +84,7 @@ munge (const char *filename)
     }
 
   /* Now we know how big to make the buffer.  */
-  buffer = xmalloc (len + 1);
+  buffer = XNEWVEC (char, len + 1);
 
   for (p = filename, dst = buffer; *p; p++, dst++)
     {
@@ -106,24 +111,48 @@ munge (const char *filename)
   return buffer;
 }
 
+/* If T begins with any of the partial pathnames listed in d->vpathv,
+   then advance T to point beyond that pathname.  */
+static const char *
+apply_vpath (struct deps *d, const char *t)
+{
+  if (d->vpathv)
+    {
+      unsigned int i;
+      for (i = 0; i < d->nvpaths; i++)
+	{
+	  if (!strncmp (d->vpathv[i], t, d->vpathlv[i]))
+	    {
+	      const char *p = t + d->vpathlv[i];
+	      if (!IS_DIR_SEPARATOR (*p))
+		goto not_this_one;
+
+	      /* Do not simplify $(vpath)/../whatever.  ??? Might not
+		 be necessary. */
+	      if (p[1] == '.' && p[2] == '.' && IS_DIR_SEPARATOR (p[3]))
+		goto not_this_one;
+
+	      /* found a match */
+	      t = t + d->vpathlv[i] + 1;
+	      break;
+	    }
+	not_this_one:;
+	}
+    }
+
+  /* Remove leading ./ in any case.  */
+  while (t[0] == '.' && IS_DIR_SEPARATOR (t[1]))
+    t += 2;
+
+  return t;
+}
+
 /* Public routines.  */
 
 struct deps *
 deps_init (void)
 {
-  struct deps *d = xmalloc (sizeof (struct deps));
-
-  /* Allocate space for the vectors only if we need it.  */
-
-  d->targetv = 0;
-  d->depv = 0;
-
-  d->ntargets = 0;
-  d->targets_size = 0;
-  d->ndeps = 0;
-  d->deps_size = 0;
-
-  return d;
+  return XCNEW (struct deps);
 }
 
 void
@@ -145,6 +174,14 @@ deps_free (struct deps *d)
       free (d->depv);
     }
 
+  if (d->vpathv)
+    {
+      for (i = 0; i < d->nvpaths; i++)
+	free ((void *) d->vpathv[i]);
+      free (d->vpathv);
+      free (d->vpathlv);
+    }
+
   free (d);
 }
 
@@ -156,10 +193,10 @@ deps_add_target (struct deps *d, const char *t, int quote)
   if (d->ntargets == d->targets_size)
     {
       d->targets_size = d->targets_size * 2 + 4;
-      d->targetv = xrealloc (d->targetv,
-			     d->targets_size * sizeof (const char *));
+      d->targetv = XRESIZEVEC (const char *, d->targetv, d->targets_size);
     }
 
+  t = apply_vpath (d, t);
   if (quote)
     t = munge (t);  /* Also makes permanent copy.  */
   else
@@ -220,14 +257,43 @@ deps_add_default_target (cpp_reader *pfile, const char *tgt)
 void
 deps_add_dep (struct deps *d, const char *t)
 {
-  t = munge (t);  /* Also makes permanent copy.  */
+  t = munge (apply_vpath (d, t));  /* Also makes permanent copy.  */
 
   if (d->ndeps == d->deps_size)
     {
       d->deps_size = d->deps_size * 2 + 8;
-      d->depv = xrealloc (d->depv, d->deps_size * sizeof (const char *));
+      d->depv = XRESIZEVEC (const char *, d->depv, d->deps_size);
     }
   d->depv[d->ndeps++] = t;
+}
+
+void
+deps_add_vpath (struct deps *d, const char *vpath)
+{
+  const char *elem, *p;
+  char *copy;
+  size_t len;
+
+  for (elem = vpath; *elem; elem = p)
+    {
+      for (p = elem; *p && *p != ':'; p++);
+      len = p - elem;
+      copy = XNEWVEC (char, len + 1);
+      memcpy (copy, elem, len);
+      copy[len] = '\0';
+      if (*p == ':')
+	p++;
+
+      if (d->nvpaths == d->vpaths_size)
+	{
+	  d->vpaths_size = d->vpaths_size * 2 + 8;
+	  d->vpathv = XRESIZEVEC (const char *, d->vpathv, d->vpaths_size);
+	  d->vpathlv = XRESIZEVEC (size_t, d->vpathlv, d->vpaths_size);
+	}
+      d->vpathv[d->nvpaths] = copy;
+      d->vpathlv[d->nvpaths] = len;
+      d->nvpaths++;
+    }
 }
 
 void
@@ -332,7 +398,7 @@ deps_restore (struct deps *deps, FILE *fd, const char *self)
   unsigned int i, count;
   size_t num_to_read;
   size_t buf_size = 512;
-  char *buf = xmalloc (buf_size);
+  char *buf = XNEWVEC (char, buf_size);
 
   /* Number of dependences.  */
   if (fread (&count, 1, sizeof (count), fd) != sizeof (count))
@@ -347,7 +413,7 @@ deps_restore (struct deps *deps, FILE *fd, const char *self)
       if (buf_size < num_to_read + 1)
 	{
 	  buf_size = num_to_read + 1 + 127;
-	  buf = xrealloc (buf, buf_size);
+	  buf = XRESIZEVEC (char, buf, buf_size);
 	}
       if (fread (buf, 1, num_to_read, fd) != num_to_read)
 	return -1;

@@ -598,7 +598,7 @@ sdcpp_common_post_options (const char **pfilename)
   return 1;
 }
 
-/* Front end initialization common to C, ObjC and C++.  */
+/* Front end initialization. */
 bool
 sdcpp_common_init (void)
 {

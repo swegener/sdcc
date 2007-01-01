@@ -53,7 +53,7 @@ const char *progname;		/* Needs to be global.  */
 }
 
 /* From c-lang.c */
-#define LANG_HOOKS_INIT_OPTIONS sdcpp_common_init_options
+#define LANG_HOOKS_INIT_OPTIONS sdcpp_init_options
 #define LANG_HOOKS_INITIALIZE_DIAGNOSTICS sdcpp_initialize_diagnostics
 #define LANG_HOOKS_HANDLE_OPTION sdcpp_common_handle_option
 #define LANG_HOOKS_MISSING_ARGUMENT sdcpp_common_missing_argument
@@ -62,6 +62,7 @@ const char *progname;		/* Needs to be global.  */
 #define LANG_HOOKS_FINISH sdcpp_common_finish
 #define LANG_HOOKS_PRINT_ERROR_FUNCTION sdcpp_print_error_function
 
+static unsigned int sdcpp_init_options (unsigned int argc, const char **argv);
 static void sdcpp_initialize_diagnostics (diagnostic_context *context);
 static void sdcpp_print_error_function (diagnostic_context *context, const char *file);
 
@@ -172,6 +173,96 @@ get_src_pwd (void)
     src_pwd = getpwd ();
 
    return src_pwd;
+}
+
+/* SDCPP specific pragmas */
+/* SDCC specific
+   sdcc_hash pragma */
+static void
+do_pragma_sdcc_hash (cpp_reader *pfile)
+{
+    const cpp_token *tok = _cpp_lex_token (pfile);
+
+    if (tok->type == CPP_PLUS)
+    {
+	CPP_OPTION(pfile, allow_naked_hash)++;
+    }
+    else if (tok->type == CPP_MINUS)
+    {
+	CPP_OPTION(pfile, allow_naked_hash)--;
+    }
+    else
+    {
+	cpp_error (pfile, CPP_DL_ERROR,
+		   "invalid #pragma sdcc_hash directive, need '+' or '-'");
+    }
+}
+
+/* SDCC specific
+   pedantic_parse_number pragma */
+static void
+do_pragma_pedantic_parse_number (cpp_reader *pfile)
+{
+    const cpp_token *tok = _cpp_lex_token (pfile);
+
+  if (tok->type == CPP_PLUS)
+    {
+      CPP_OPTION(pfile, pedantic_parse_number)++;
+    }
+  else if (tok->type == CPP_MINUS)
+    {
+      CPP_OPTION(pfile, pedantic_parse_number)--;
+    }
+  else
+    {
+      cpp_error (pfile, CPP_DL_ERROR,
+                 "invalid #pragma pedantic_parse_number directive, need '+' or '-'");
+    }
+}
+
+/* SDCC _asm specific
+   switch _asm block preprocessing on / off */
+static void
+do_pragma_preproc_asm (cpp_reader *pfile)
+{
+  const cpp_token *tok = _cpp_lex_token (pfile);
+
+  if (tok->type == CPP_PLUS)
+    {
+      CPP_OPTION(pfile, preproc_asm)++;
+    }
+  else if (tok->type == CPP_MINUS)
+    {
+      CPP_OPTION(pfile, preproc_asm)--;
+    }
+  else
+    {
+      cpp_error (pfile, CPP_DL_ERROR,
+		 "invalid #pragma preproc_asm directive, need '+' or '-'");
+    }
+}
+
+/* SDCPP specific option initialization */
+static unsigned int
+sdcpp_init_options (unsigned int argc, const char **argv)
+{
+  unsigned int ret = sdcpp_common_init_options(argc, argv);
+
+  CPP_OPTION (parse_in, preproc_asm) = 1;
+  CPP_OPTION (parse_in, pedantic_parse_number) = 0;
+  CPP_OPTION (parse_in, obj_ext) = NULL;
+
+  /* Kevin abuse for SDCC. */
+  cpp_register_pragma(parse_in, 0, "sdcc_hash", do_pragma_sdcc_hash, false);
+  /* SDCC _asm specific */
+  cpp_register_pragma(parse_in, 0, "preproc_asm", do_pragma_preproc_asm, false);
+  /* SDCC specific */
+  cpp_register_pragma(parse_in, 0, "pedantic_parse_number", do_pragma_pedantic_parse_number, false);
+
+  /* SDCC _asm specific */
+  parse_in->spec_nodes.n__asm = cpp_lookup (parse_in, DSC("_asm"));
+
+  return ret;
 }
 
 static void

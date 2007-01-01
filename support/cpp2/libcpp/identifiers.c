@@ -73,8 +73,6 @@ _cpp_init_hashtable (cpp_reader *pfile, hash_table *table)
   s->n_false		= cpp_lookup (pfile, DSC("false"));
   s->n__VA_ARGS__       = cpp_lookup (pfile, DSC("__VA_ARGS__"));
   s->n__VA_ARGS__->flags |= NODE_DIAGNOSTIC;
-  /* SDCC _asm specific */
-  s->n__asm             = cpp_lookup (pfile, DSC("_asm"));
 }
 
 /* Tear down the identifier hash table.  */

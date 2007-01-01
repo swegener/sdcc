@@ -180,11 +180,6 @@ cpp_create_reader (enum c_lang lang, hash_table *table,
   /* Default the input character set to UTF-8.  */
   CPP_OPTION (pfile, input_charset) = _cpp_default_encoding ();
 
-  /* SDCC specific */
-  CPP_OPTION (pfile, preproc_asm) = 1;
-  CPP_OPTION (pfile, pedantic_parse_number) = 0;
-  CPP_OPTION (pfile, obj_ext) = NULL;
-
   /* A fake empty "directory" used as the starting point for files
      looked up without a search path.  Name cannot be '/' because we
      don't want to prepend anything at all to filenames using it.  All

@@ -121,9 +121,6 @@ static void do_pragma_once (cpp_reader *);
 static void do_pragma_poison (cpp_reader *);
 static void do_pragma_system_header (cpp_reader *);
 static void do_pragma_dependency (cpp_reader *);
-static void do_pragma_sdcc_hash (cpp_reader *pfile);
-static void do_pragma_preproc_asm (cpp_reader *pfile);
-static void do_pragma_pedantic_parse_number (cpp_reader *pfile);
 static void do_linemarker (cpp_reader *);
 static const cpp_token *get_token_no_padding (cpp_reader *);
 static const cpp_token *get__Pragma_string (cpp_reader *);
@@ -1097,7 +1094,7 @@ register_pragma (cpp_reader *pfile, const char *space, const char *name,
       node = cpp_lookup (pfile, U space, strlen (space));
       entry = lookup_pragma_entry (*chain, node);
       if (!entry)
-	entry = insert_pragma_entry (pfile, chain, node, NULL,
+	entry = insert_pragma_entry (pfile, chain, node, NULL, 
 				     allow_expansion, internal);
       else if (!entry->is_nspace)
 	goto clash;
@@ -1121,7 +1118,7 @@ register_pragma (cpp_reader *pfile, const char *space, const char *name,
 	cpp_error (pfile, CPP_DL_ICE, "#pragma %s is already registered", name);
     }
   else
-    insert_pragma_entry (pfile, chain, node, handler, allow_expansion,
+    insert_pragma_entry (pfile, chain, node, handler, allow_expansion, 
 			 internal);
 }
 
@@ -1146,17 +1143,10 @@ _cpp_init_internal_pragmas (cpp_reader *pfile)
 
   /* New GCC-specific pragmas should be put in the GCC namespace.  */
   register_pragma (pfile, "GCC", "poison", do_pragma_poison, false, true);
-  register_pragma (pfile, "GCC", "system_header", do_pragma_system_header,
+  register_pragma (pfile, "GCC", "system_header", do_pragma_system_header, 
 		   false, true);
-  register_pragma (pfile, "GCC", "dependency", do_pragma_dependency,
+  register_pragma (pfile, "GCC", "dependency", do_pragma_dependency, 
 		   false, true);
-
-  /* Kevin abuse for SDCC. */
-  cpp_register_pragma(pfile, 0, "sdcc_hash", do_pragma_sdcc_hash, false);
-  /* SDCC _asm specific */
-  cpp_register_pragma(pfile, 0, "preproc_asm", do_pragma_preproc_asm, false);
-  /* SDCC specific */
-  cpp_register_pragma(pfile, 0, "pedantic_parse_number", do_pragma_pedantic_parse_number, false);
 }
 
 /* Return the number of registered pragmas in PE.  */
@@ -1407,72 +1397,6 @@ do_pragma_poison (cpp_reader *pfile)
       hp->flags |= NODE_POISONED | NODE_DIAGNOSTIC;
     }
   pfile->state.poisoned_ok = 0;
-}
-
-/* SDCC specific
-   sdcc_hash pragma */
-static void
-do_pragma_sdcc_hash (cpp_reader *pfile)
-{
-    const cpp_token *tok = _cpp_lex_token (pfile);
-
-    if (tok->type == CPP_PLUS)
-    {
-	CPP_OPTION(pfile, allow_naked_hash)++;
-    }
-    else if (tok->type == CPP_MINUS)
-    {
-	CPP_OPTION(pfile, allow_naked_hash)--;
-    }
-    else
-    {
-	cpp_error (pfile, CPP_DL_ERROR,
-		   "invalid #pragma sdcc_hash directive, need '+' or '-'");
-    }
-}
-
-/* SDCC specific
-   pedantic_parse_number pragma */
-static void
-do_pragma_pedantic_parse_number (cpp_reader *pfile)
-{
-    const cpp_token *tok = _cpp_lex_token (pfile);
-
-  if (tok->type == CPP_PLUS)
-    {
-      CPP_OPTION(pfile, pedantic_parse_number)++;
-    }
-  else if (tok->type == CPP_MINUS)
-    {
-      CPP_OPTION(pfile, pedantic_parse_number)--;
-    }
-  else
-    {
-      cpp_error (pfile, CPP_DL_ERROR,
-                 "invalid #pragma pedantic_parse_number directive, need '+' or '-'");
-    }
-}
-
-/* SDCC _asm specific
-   switch _asm block preprocessing on / off */
-static void
-do_pragma_preproc_asm (cpp_reader *pfile)
-{
-  const cpp_token *tok = _cpp_lex_token (pfile);
-
-  if (tok->type == CPP_PLUS)
-    {
-      CPP_OPTION(pfile, preproc_asm)++;
-    }
-  else if (tok->type == CPP_MINUS)
-    {
-      CPP_OPTION(pfile, preproc_asm)--;
-    }
-  else
-    {
-      cpp_error (pfile, CPP_DL_ERROR,
-		 "invalid #pragma preproc_asm directive, need '+' or '-'");
-    }
 }
 
 /* Mark the current header as a system header.  This will suppress

@@ -5148,11 +5148,13 @@ createDo (symbol * trueLabel, symbol * continueLabel,
   /* if the body does not exist then it is simple */
   if (!doBody)
     {
-      condAst = backPatchLabels (condAst, continueLabel, NULL);
+      condAst = backPatchLabels (condAst, continueLabel, falseLabel);
       doTree = (IS_IFX (condAst) ? createLabel (continueLabel, condAst)
                 : newNode (IFX, createLabel (continueLabel, condAst), NULL));
       doTree->trueLabel = continueLabel;
       doTree->falseLabel = NULL;
+
+      doTree = newNode (NULLOP, doTree, createLabel (falseLabel, NULL));
       return doTree;
     }
 

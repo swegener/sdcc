@@ -3,6 +3,7 @@
 	* doc/sdccman.lyx: documented #pragma sdcc_hash
 	* support/cpp2/sdcpp.c: allow_naked_hash (value of #pragma sdcc_hash)
 	  initialized to 0
+	* support/cpp2/c-ppoutput.c: fixed warning: no newline at end of file
 
 2007-01-01 Bernhard Held <bernhard AT bernhardheld.de>
 

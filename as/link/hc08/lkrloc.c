@@ -536,7 +536,7 @@ VOID relr(VOID)
 		
 		if (lastAreaIndex != aindex) {
 			lastAreaIndex = aindex;
-			newArea();
+			ihxNewArea();
 		}
 #if 0		
 		if (extendedAddress != lastExtendedAddress)

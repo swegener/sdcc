@@ -214,13 +214,13 @@ ihx(i)
 	}
 }
 
-/*)Function	newArea(i)
- * The function newArea() is called when processing of new area is started.
+/*)Function	ihxNewArea(i)
+ * The function ihxNewArea() is called when processing of new area is started.
  * It resets the value of lastHexAddr.
  */ 
 
 VOID
-newArea()
+ihxNewArea()
 {
 	lastHexAddr = 0;
 }

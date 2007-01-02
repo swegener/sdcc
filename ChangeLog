@@ -1,3 +1,9 @@
+2007-01-02 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: documented #pragma sdcc_hash
+	* support/cpp2/sdcpp.c: allow_naked_hash (value of #pragma sdcc_hash)
+	  initialized to 0
+
 2007-01-01 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCast.c (createDo): backPatchLabels() needs falseLabel in

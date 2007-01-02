@@ -248,6 +248,7 @@ sdcpp_init_options (unsigned int argc, const char **argv)
 {
   unsigned int ret = sdcpp_common_init_options(argc, argv);
 
+  CPP_OPTION (parse_in, allow_naked_hash) = 0;
   CPP_OPTION (parse_in, preproc_asm) = 1;
   CPP_OPTION (parse_in, pedantic_parse_number) = 0;
   CPP_OPTION (parse_in, obj_ext) = NULL;

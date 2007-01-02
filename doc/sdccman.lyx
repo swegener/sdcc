@@ -16914,6 +16914,57 @@ The preprocessor SDCPP
 \layout Itemize
 
 
+\series bold
+pedantic_parse_number
+\series default
+
+\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
+
+\end_inset
+
+ (+ | -) - Pedantic parse numbers so that situations like 0xfe-LO_B(3) are
+ parsed properly and the macro LO_B(3) gets expanded.
+ Default is off.
+ Below is an example on how to use this pragma.
+
+\emph on
+ Note: this functionality is not in conformance with standard!
+
+\layout Verse
+
+
+\family typewriter
+#pragma pedantic_parse_number +
+\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
+
+\end_inset
+
+
+\newline 
+\newline
+#define LO_B(x) ((x) & 0xff)
+\newline
+\newline
+unsigned char foo(void)
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+unsigned char c=0xfe-LO_B(3);
+\newline
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+
+return c;
+\newline
+}
+\newline
+
+\layout Itemize
+
+
 \series bold 
 preproc_asm
 \series default 
@@ -16990,51 +17041,65 @@ void foo (void)
 
 
 \series bold
-pedantic_parse_number
+sdcc_hash
 \series default
 
-\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
+\begin_inset LatexCommand \index{\#pragma sdcc\_hash}
 
 \end_inset
 
- (+ | -) - Pedantic parse numbers so that situations like 0xfe-LO_B(3) are
- parsed properly and the macro LO_B(3) gets expanded.
- Default is off.
+ (+ | -) - Allow "naked" hash in macro definition, for example:
+\newline 
+\family typewriter
+#define DIR_LO(x) #(x & 0xff)
+\family default
+\newline 
+Default is off.
  Below is an example on how to use this pragma.
-
-\emph on
- Note: this functionality is not in conformance with standard!
-
 \layout Verse
 
 
 \family typewriter
-#pragma pedantic_parse_number +
-\begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
+#pragma preproc_asm +
+\newline
+#pragma sdcc_hash +
+\begin_inset LatexCommand \index{\#pragma sdcc\_hash}
 
 \end_inset
 
 
-\newline 
-\newline
-#define LO_B(x) ((x) & 0xff)
 \newline
 \newline
-unsigned char foo(void)
+#define ROMCALL(x) 
+\backslash
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-unsigned char c=0xfe-LO_B(3);
-\newline
+mov R6_B3, #(x & 0xff) 
+\backslash
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-
-return c;
+mov R7_B3, #((x >> 8) & 0xff) 
+\backslash
 \newline
-}
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+lcall __romcall
+\newline
+\newline
+...
+\newline
+_asm
+\newline
+ROMCALL(72)
+\newline
+_endasm;
+\newline
+...
 \newline
 
 \layout Standard

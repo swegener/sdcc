@@ -24,6 +24,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1

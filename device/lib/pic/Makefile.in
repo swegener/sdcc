@@ -18,7 +18,7 @@ top_srcdir   = @top_srcdir@
 VPATH  = @srcdir@
 srcdir = @srcdir@
 
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 ifeq (:,$(findstring :,$(LD) $(AS) $(LIB)))
 
@@ -45,7 +45,7 @@ all : install
 install : recurse
 
 clean : recurse
-	$(Q)-$(RMDIR) "$(top_builddir)$(builddir)"
+	$(Q)-$(RMDIR) "$(top_builddir)/$(builddir)"
 
 distclean: clean
 	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common

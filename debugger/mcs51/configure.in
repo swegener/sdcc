@@ -1,6 +1,6 @@
 #!/bin/sh
 
-AC_PREREQ(2.54)
+AC_PREREQ(2.60)
 AC_INIT
 AC_CONFIG_SRCDIR([Makefile.in])
 AC_CONFIG_HEADER(config.h)

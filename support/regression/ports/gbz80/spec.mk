@@ -5,7 +5,7 @@ EMU = $(SDCC_EXTRA_DIR)/emu/rrgb/rrgb
 SDCCFLAGS +=-mgbz80 --nostdinc --less-pedantic -DREENTRANT=
 LINKFLAGS = --nostdlib
 LINKFLAGS += gbz80.lib
-LIBDIR = $(top_builddir)device/lib/build/gbz80
+LIBDIR = $(top_builddir)/device/lib/build/gbz80
 
 EXEEXT = .gb
 

@@ -2,7 +2,7 @@
 # --------------------------------------------------
 clean:
 	rm -rf obj
-	rm -f *core *[%~] *.[oa] $(top_builddir)bin/makebin$(EXEEXT)
+	rm -f *core *[%~] *.[oa] $(top_builddir)/bin/makebin$(EXEEXT)
 	rm -f *.[a-z]*~
 
 # Deleting all files created by configuring or building the program

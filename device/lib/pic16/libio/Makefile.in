@@ -24,7 +24,7 @@ VPATH        = @srcdir@
 SUBDIRS = adc i2c usart
 
 ifeq ($(origin IO_ARCH),undefined)
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 .PHONY : all clean clean-intermediate install
 
@@ -34,17 +34,17 @@ include $(top_builddir)Makefile.common
 all clean-intermediate install : libio-recurse
 
 clean : libio-recurse
-	$(Q)-[ ! -d "$(top_builddir)$(builddir)" ] || $(RMDIR) "$(top_builddir)$(builddir)"
+	$(Q)-[ ! -d "$(top_builddir)/$(builddir)" ] || $(RMDIR) "$(top_builddir)/$(builddir)"
 
 distclean : clean
  
 libio-recurse :
-	$(Q)+cat $(top_builddir)pics.build \
+	$(Q)+cat $(top_builddir)/pics.build \
 		| $(SED) -e "s,[ \t]*#.*$$,," \
 		| $(GREP) -v "^[ \t]*$$" \
 		| while read arch; do \
 			[ "x$${arch}" = "x" ] \
-			|| ( $(MKDIR) "$(top_builddir)$(builddir)/$${arch}"; \
+			|| ( $(MKDIR) "$(top_builddir)/$(builddir)/$${arch}"; \
 				$(MAKE) MKLIB=libio18f$${arch}.lib builddir=$(builddir)/$${arch} ARCH=$${arch} IO_ARCH=$${arch} $(MAKECMDGOALS); ) \
 			|| exit 1; \
 	done

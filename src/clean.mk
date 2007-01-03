@@ -6,7 +6,8 @@ clean:
 	rm -f *core *[%~] *.[oa] *.output
 	rm -f .[a-z]*~ \#*
 	rm -f version.h
-	rm -f $(top_builddir)bin/sdcc$(EXEEXT) sdcc$(EXEEXT)
+	rm -f SDCCy.c SDCCy.h SDCClex.c
+	rm -f $(top_builddir)/bin/sdcc$(EXEEXT) sdcc$(EXEEXT)
 	for port in $(CLEANALLPORTS) ; do\
 	  if [ -f $$port/Makefile ]; then\
 	    $(MAKE) -C $$port clean ;\

@@ -4,14 +4,14 @@ srcdir = @srcdir@
 top_builddir = @top_builddir@
 
 SOURCES = makebin.c
-BIN = $(top_builddir)bin/makebin$(EXEEXT)
+BIN = $(top_builddir)/bin/makebin$(EXEEXT)
 
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 all: $(BIN)
 
 $(BIN): $(OBJ)
-	mkdir -p $(top_builddir)bin
+	mkdir -p $(top_builddir)/bin
 	$(CC) $(LDFLAGS) -o $(BIN) $(OBJ)
 
 install: all

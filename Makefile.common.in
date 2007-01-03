@@ -23,6 +23,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -51,7 +52,7 @@ OPT_DISABLE_PACKIHX   = @OPT_DISABLE_PACKIHX@
 OPT_ENABLE_DOC        = @OPT_ENABLE_DOC@
 OPT_DISABLE_SDCPP     = @OPT_DISABLE_SDCPP@
 
-SLIB			= $(top_builddir)support/Util
+SLIB			= $(top_builddir)/support/Util
 
 EXEEXT          = @EXEEXT@
 transform       = @program_transform_name@

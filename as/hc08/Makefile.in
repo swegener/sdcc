@@ -22,6 +22,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -42,7 +43,7 @@ ASOBJECTS	= asmain.o aslex.o assym.o assubr.o asnoice.o \
 		  m08ext.o m08pst.o m08mch.o m08adr.o strcmpi.o
 ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
 
-ASHC08		= $(top_builddir)bin/as-hc08$(EXEEXT)
+ASHC08		= $(top_builddir)/bin/as-hc08$(EXEEXT)
 
 transform       = @program_transform_name@
 
@@ -85,7 +86,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(ASSOURCES) $(srcdir)/*.h $(top_builddir)*.h $(top_srcdir)/*.h
+Makefile.dep: $(ASSOURCES) $(srcdir)/*.h $(top_builddir)/*.h $(top_srcdir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
@@ -103,7 +104,7 @@ include $(srcdir)/clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
           $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
         fi
 

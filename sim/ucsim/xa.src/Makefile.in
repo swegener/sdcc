@@ -34,6 +34,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -103,12 +104,12 @@ include $(srcdir)/clean.mk
 
 xa.src: sxa$(EXEEXT)
 
-sxa$(EXEEXT): $(OBJECTS) $(top_builddir)*.a
+sxa$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 otherlibs:
-	$(MAKE) -C $(top_builddir)cmd.src all
-	$(MAKE) -C $(top_builddir)sim.src all
+	$(MAKE) -C $(top_builddir)/cmd.src all
+	$(MAKE) -C $(top_builddir)/sim.src all
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
@@ -120,7 +121,7 @@ otherlibs:
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 

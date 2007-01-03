@@ -3,8 +3,8 @@
 
 # path to uCsim
 # path to uCsim
-SZ80A = $(top_builddir)sim/ucsim/z80.src/sz80
-SZ80B = $(top_builddir)bin/sz80
+SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80
+SZ80B = $(top_builddir)/bin/sz80
 
 UCZ80 = $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
 
@@ -12,7 +12,7 @@ SDCCFLAGS +=-mz80 --less-pedantic --profile -DREENTRANT= -I$(top_srcdir)
 #SDCCFLAGS +=--less-pedantic -DREENTRANT=reentrant
 LINKFLAGS = --nostdlib
 LINKFLAGS += z80.lib
-LIBDIR = $(top_builddir)device/lib/build/z80
+LIBDIR = $(top_builddir)/device/lib/build/z80
 
 #OBJEXT = .o
 EXEEXT = .ihx
@@ -24,7 +24,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
-	$(top_builddir)bin/as-z80 -plosgff $@ $<
+	$(top_builddir)/bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

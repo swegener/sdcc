@@ -4,7 +4,7 @@
 
 freshconf: Makefile
 
-Makefile: $(srcdir)/Makefile.in $(top_builddir)configure.in
+Makefile: $(srcdir)/Makefile.in $(top_builddir)/configure.in
 	cd $(top_builddir) && $(SHELL) ./config.status
 
 # End of conf.mk

@@ -38,6 +38,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -114,23 +115,23 @@ include $(srcdir)/clean.mk
 
 hc08.src: shc08$(EXEEXT)  shared_lib
 
-shc08$(EXEEXT): $(OBJECTS) $(top_builddir)*.a
+shc08$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)shc08.so
+shared_lib: $(top_builddir)/shc08.so
 else
 shared_lib:
 	@$(top_srcdir)/mkecho $(top_builddir) "No hc08 shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
 endif
 
-$(top_builddir)shc08.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(OBJECTS_SHARED) -o $(top_builddir)shc08.so
+$(top_builddir)/shc08.so: $(OBJECTS_SHARED)
+	$(CXX) -shared $(OBJECTS_SHARED) -o $(top_builddir)/shc08.so
 
 otherlibs:
-	$(MAKE) -C $(top_builddir)cmd.src all
-	$(MAKE) -C $(top_builddir)sim.src all
+	$(MAKE) -C $(top_builddir)/cmd.src all
+	$(MAKE) -C $(top_builddir)/sim.src all
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
@@ -142,7 +143,7 @@ otherlibs:
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 

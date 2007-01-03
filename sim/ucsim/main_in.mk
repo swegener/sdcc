@@ -21,7 +21,7 @@ GUIDIR		= gui.src
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 # FIXME: -Imcs51 must be removed!!!
-CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir). -I$(srcdir) \
+CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir) -I$(srcdir) \
                   -I$(top_srcdir)/$(SIMDIR) \
 		  -I$(top_srcdir)/$(CMDDIR) -I$(top_srcdir)/$(GUIDIR)
 CFLAGS          = @CFLAGS@ -I$(top_builddir) -Wall
@@ -39,6 +39,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1

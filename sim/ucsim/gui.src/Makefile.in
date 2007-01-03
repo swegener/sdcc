@@ -30,6 +30,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -158,15 +159,15 @@ include $(srcdir)/clean.mk
 
 # My rules
 # --------
-ucsim_lib: $(top_builddir)libguiucsim.a
+ucsim_lib: $(top_builddir)/libguiucsim.a
 
-$(top_builddir)libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
+$(top_builddir)/libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
 	ar -rcu $*.a $(OBJECTS) $(UCSIM_OBJECTS)
 	$(RANLIB) $*.a
 
-tool_lib: $(top_builddir)libguitool.a
+tool_lib: $(top_builddir)/libguitool.a
 
-$(top_builddir)libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
+$(top_builddir)/libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
 	ar -rcu $*.a $(OBJECTS) $(TOOL_OBJECTS)
 	$(RANLIB) $*.a
 
@@ -177,7 +178,7 @@ $(top_builddir)libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 

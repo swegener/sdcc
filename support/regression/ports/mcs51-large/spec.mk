@@ -10,4 +10,4 @@ include $(PORTS_DIR)/mcs51/spec.mk
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51/%.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@
 
-LIBDIR = $(top_builddir)device/lib/build/large
+LIBDIR = $(top_builddir)/device/lib/build/large

@@ -147,12 +147,12 @@ PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 # Each test generates a result log file
 PORT_RESULTS = $(ALL_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out)
 
-SDCC_EXTRA_DIR = $(top_builddir)../sdcc-extra
+SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
 INC_DIR = $(top_srcdir)/device/include
 
 # Defaults.  Override in spec.mk if required.
 # Path to SDCC
-SDCC = $(top_builddir)bin/sdcc
+SDCC = $(top_builddir)/bin/sdcc
 # Base flags.
 SDCCFLAGS += -DNO_VARARGS
 # Extension of object intermediate files

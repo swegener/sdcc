@@ -33,6 +33,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -52,7 +53,7 @@ else
 OBJECTS += newcmdposix.o
 endif
 
-DEVEL		= $(shell ( bash -c "test -e $(top_builddir)devel && echo yes" ))
+DEVEL		= $(shell ( bash -c "test -e $(top_builddir)/devel && echo yes" ))
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -107,9 +108,9 @@ endif
 # My rules
 # --------
 
-cmdlib: $(top_builddir)libcmd.a
+cmdlib: $(top_builddir)/libcmd.a
 
-$(top_builddir)libcmd.a: $(OBJECTS)
+$(top_builddir)/libcmd.a: $(OBJECTS)
 	ar -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
@@ -136,7 +137,7 @@ endif
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 

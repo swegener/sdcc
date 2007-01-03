@@ -3,7 +3,7 @@ srcdir       = @srcdir@
 top_builddir = @top_builddir@
 top_srcdir   = @top_srcdir@
 
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 OBJDIR	= obj/$(EXT)
 

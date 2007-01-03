@@ -28,6 +28,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -44,7 +45,7 @@ OBJECTS         = stack.o mem.o sim.o itsrc.o brk.o arg.o \
 # ------------------------------------------
 all: checkconf sim_lib
 
-test_mem_speed: $(top_builddir)lib*.a test_mem_speed.o
+test_mem_speed: $(top_builddir)/lib*.a test_mem_speed.o
 	$(CXX) -o $@ test_mem_speed.o -L$(top_builddir) -Wl,--start-group -lsim -lutil -lcmd -Wl,--end-group
 
 sim.src: all
@@ -94,9 +95,9 @@ include $(srcdir)/clean.mk
 # My rules
 # --------
 
-sim_lib: $(top_builddir)libsim.a
+sim_lib: $(top_builddir)/libsim.a
 
-$(top_builddir)libsim.a: $(OBJECTS)
+$(top_builddir)/libsim.a: $(OBJECTS)
 	ar -rcu $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
@@ -117,7 +118,7 @@ $(top_builddir)libsim.a: $(OBJECTS)
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 

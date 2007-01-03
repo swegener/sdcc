@@ -2,7 +2,7 @@ VPATH        = @srcdir@
 srcdir       = @srcdir@
 top_builddir = @top_builddir@
 
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 CFLAGS          += -Wall
 
@@ -10,7 +10,7 @@ OBJECTS 	= sdcclib.o
 
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
-TARGET		= $(top_builddir)bin/sdcclib$(EXEEXT)
+TARGET		= $(top_builddir)/bin/sdcclib$(EXEEXT)
 
 all: $(TARGET)
 

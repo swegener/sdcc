@@ -1,6 +1,6 @@
 AC_INIT(packihx.c)
 AC_CONFIG_HEADER(config.h:config_in.h)
-AC_PREREQ(2.54)
+AC_PREREQ(2.60)
 
 AC_PROG_CC
 

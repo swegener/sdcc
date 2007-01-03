@@ -79,8 +79,8 @@ LIBFLAGS += -c
 
 #################################################
 ### programs to use
-CPP	= $(top_builddir)../../../bin/sdcpp
-CC	= $(top_builddir)../../../bin/sdcc --asm=@GPASM@
+CPP	= $(top_builddir)/../../../bin/sdcpp
+CC	= $(top_builddir)/../../../bin/sdcc --asm=@GPASM@
 AS	= @GPASM@
 LD	= @GPLINK@
 LIB	= @GPLIB@

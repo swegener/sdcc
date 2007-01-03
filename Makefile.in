@@ -15,7 +15,7 @@ SDCC_LIBS	= support/makebin
 SDCC_DOC        = doc
 
 # Parts that are not normally compiled but need to be cleaned
-SDCC_EXTRA      = support/regression
+SDCC_EXTRA      = support/regression support/valdiag
 
 SDCC_PACKIHX	= support/packihx
 SDCC_LIBRARIAN	= support/librarian

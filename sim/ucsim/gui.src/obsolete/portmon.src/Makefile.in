@@ -78,7 +78,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(srcdir)/*.cc $(top_builddir)*.h $(PKGDIR)/*.h
+Makefile.dep: $(srcdir)/*.cc $(top_builddir)/*.h $(PKGDIR)/*.h
 	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >Makefile.dep
 
 include Makefile.dep
@@ -96,7 +96,7 @@ else
 portmon.src:
 endif
 
-portmon: $(OBJECTS) $(top_builddir)*.a $(PKGDIR)/*.a
+portmon: $(OBJECTS) $(top_builddir)/*.a $(PKGDIR)/*.a
 	$(CXX) $(CXXFLAGS) -o portmon $(OBJECTS) $(LIBS)
 
 ifeq ($(curses_ok),yes)
@@ -124,7 +124,7 @@ endif
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 

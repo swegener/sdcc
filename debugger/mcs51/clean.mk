@@ -3,12 +3,12 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(top_builddir)bin/sdcdb$(EXEEXT)
+	rm -f $(top_builddir)/bin/sdcdb$(EXEEXT)
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------
 distclean: clean
-	rm -f config.cache config.log config.status
+	rm -f config.h config.cache config.log config.status
 	rm -f Makefile *.dep
 
 

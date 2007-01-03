@@ -5,7 +5,7 @@
 include $(PORTS_DIR)/mcs51/spec.mk
 
 LIBSRCDIR   = $(top_srcdir)/device/lib
-LIBBUILDDIR = $(top_builddir)device/lib
+LIBBUILDDIR = $(top_builddir)/device/lib
 LIBDIR      = $(PORT_CASES_DIR)/lib
 
 LIBSDCCFLAGS+=--std-sdcc99 --stack-auto --xstack

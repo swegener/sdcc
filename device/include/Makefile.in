@@ -20,6 +20,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -43,22 +44,22 @@ all:
 # ----------------------------------------------------
 install: all installdirs
 	$(CP) -r $(srcdir)/asm $(srcdir)/*.h $(sdcc_includedir)
-	if [ "`grep mcs51 $(top_builddir)ports.build`" = mcs51 ]; then \
+	if [ "`grep mcs51 $(top_builddir)/ports.build`" = mcs51 ]; then \
 		$(CP) $(srcdir)/mcs51/*.h $(sdcc_includedir)/mcs51 ; \
 	fi
-	if [ "`grep '^pic$$' $(top_builddir)ports.build`" = pic ]; then \
+	if [ "`grep '^pic$$' $(top_builddir)/ports.build`" = pic ]; then \
 		$(CP) $(srcdir)/pic/*.h   $(sdcc_includedir)/pic ; \
 		$(CP) $(srcdir)/pic/*.inc $(sdcc_includedir)/pic ; \
 		$(CP) $(srcdir)/pic/*.txt $(sdcc_includedir)/pic ; \
 		$(CP) $(srcdir)/pic/pic14devices.txt $(sdcc_includedir)/pic ; \
 	fi
-	if [ "`grep pic16 $(top_builddir)ports.build`" = pic16 ]; then \
+	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
 		$(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16 ; \
 	fi
-	if [ "`grep z80 $(top_builddir)ports.build`" = z80 ]; then \
+	if [ "`grep z80 $(top_builddir)/ports.build`" = z80 ]; then \
 		$(CP) $(srcdir)/z80/*.h $(sdcc_includedir)/z80 ; \
 	fi
-	if [ "`grep hc08 $(top_builddir)ports.build`" = hc08 ]; then \
+	if [ "`grep hc08 $(top_builddir)/ports.build`" = hc08 ]; then \
 		$(CP) $(srcdir)/hc08/*.h $(sdcc_includedir)/hc08 ; \
 	fi
 	rm -rf `find $(sdcc_includedir) -type d -name '.svn'`
@@ -110,7 +111,7 @@ include $(srcdir)/clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" \
 	  freshconf;\
 	fi

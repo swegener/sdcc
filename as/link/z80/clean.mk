@@ -1,12 +1,12 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(top_builddir)bin/link-z80$(EXEEXT) link-z80$(EXEEXT) \
-	      $(top_builddir)bin/link-gbz80$(EXEEXT) link-gbz80$(EXEEXT)
+	rm -f $(top_builddir)/bin/link-z80$(EXEEXT) link-z80$(EXEEXT) \
+	      $(top_builddir)/bin/link-gbz80$(EXEEXT) link-gbz80$(EXEEXT)
 	rm -f *.dep
 	rm -rf obj
 

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+AC_PREREQ(2.60)
 AC_INIT(.version)
 AC_CONFIG_HEADER(ddconfig.h:ddconfig_in.h)
 

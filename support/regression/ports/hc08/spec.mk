@@ -1,13 +1,13 @@
 # path to uCsim
-UCHC08A = $(top_builddir)sim/ucsim/hc08.src/shc08
-UCHC08B = $(top_builddir)bin/shc08
+UCHC08A = $(top_builddir)/sim/ucsim/hc08.src/shc08
+UCHC08B = $(top_builddir)/bin/shc08
 
 UCHC08 = $(shell if [ -f $(UCHC08A) ]; then echo $(UCHC08A); else echo $(UCHC08B); fi)
 
 SDCCFLAGS +=-mhc08 --nostdinc --less-pedantic --out-fmt-ihx -DREENTRANT=reentrant -I$(top_srcdir)
 LINKFLAGS = --nostdlib
 LINKFLAGS += hc08.lib
-LIBDIR = $(top_builddir)device/lib/build/hc08
+LIBDIR = $(top_builddir)/device/lib/build/hc08
 
 OBJEXT = .rel
 EXEEXT = .ihx
@@ -21,7 +21,7 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 %$(OBJEXT): %.asm
-	$(top_builddir)bin/as-hc08 -plosgff $<
+	$(top_builddir)/bin/as-hc08 -plosgff $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

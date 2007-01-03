@@ -30,9 +30,9 @@ TARGETS = $(OBJS:.o=.lib)
 # [...]/devicelibs would be the default target)
 suball : all
 
-.PHONY : $(top_builddir)$(builddir)/device_libs suball
+.PHONY : $(top_builddir)/$(builddir)/device_libs suball
 
-$(top_builddir)$(builddir)/device_libs :
-	$(Q)+$(foreach dev,$(C_FILES:.c=),$(MAKE) $(top_builddir)$(builddir)/$(dev).lib LIB_O=$(top_builddir)$(builddir)/$(dev).o;)
+$(top_builddir)/$(builddir)/device_libs :
+	$(Q)+$(foreach dev,$(C_FILES:.c=),$(MAKE) $(top_builddir)/$(builddir)/$(dev).lib LIB_O=$(top_builddir)/$(builddir)/$(dev).o;)
 
 include $(top_srcdir)/Makefile.subdir

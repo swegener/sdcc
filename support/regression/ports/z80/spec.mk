@@ -6,7 +6,7 @@ RRZ80 = $(SDCC_EXTRA_DIR)/emu/rrz80/rrz80
 SDCCFLAGS +=-mz80 --nostdinc --less-pedantic --profile -DREENTRANT= -I$(top_srcdir)
 LINKFLAGS = --nostdlib
 LINKFLAGS += z80.lib
-LIBDIR = $(top_builddir)device/lib/build/z80
+LIBDIR = $(top_builddir)/device/lib/build/z80
 
 EXEEXT = .bin
 
@@ -15,17 +15,17 @@ EXTRAS = $(PORT_CASES_DIR)/testfwk$(OBJEXT) $(PORT_CASES_DIR)/support$(OBJEXT)
 
 # Rule to generate a Emulator .bin file from the .ihx linker output.
 %$(EXEEXT): %.ihx
-	$(top_builddir)bin/makebin -s 32768 < $< > $@
+	$(top_builddir)/bin/makebin -s 32768 < $< > $@
 
 # Rule to link into .ihx
 %.ihx: %.c $(EXTRAS)
 	$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) -L $(LIBDIR) $(EXTRAS) $< -o $@
 
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT)/%.asm
-	$(top_builddir)bin/as-z80 -plosgff $@ $<
+	$(top_builddir)/bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.s
-	$(top_builddir)bin/as-z80 -plosgff $@ $<
+	$(top_builddir)/bin/as-z80 -plosgff $@ $<
 
 %$(OBJEXT): %.c
 	$(SDCC) $(SDCCFLAGS) -c $< -o $@

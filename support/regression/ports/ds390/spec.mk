@@ -5,15 +5,15 @@ ifndef DEV_NULL
 endif
 
 # path to uCsim
-S51A = $(top_builddir)sim/ucsim/s51.src/s51
-S51B = $(top_builddir)bin/s51
+S51A = $(top_builddir)/sim/ucsim/s51.src/s51
+S51B = $(top_builddir)/bin/s51
 
 S51 = $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 
 SDCCFLAGS +=-mds390 --nostdinc --less-pedantic -DREENTRANT=reentrant -Wl-r -I$(top_srcdir)
 LINKFLAGS = --nostdlib
 LINKFLAGS += libds390.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
-LIBDIR = $(top_builddir)device/lib/build/ds390
+LIBDIR = $(top_builddir)/device/lib/build/ds390
 
 OBJEXT = .rel
 EXEEXT = .ihx

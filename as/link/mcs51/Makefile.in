@@ -22,6 +22,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -46,7 +47,7 @@ LKOBJECTS       = lkmain.o lkarea.o lkdata.o \
                   ../../strcmpi.o
 LKSOURCES       = $(patsubst %.o,%.c,$(LKOBJECTS))
 
-ASLINK          = $(top_builddir)bin/aslink$(EXEEXT)
+ASLINK          = $(top_builddir)/bin/aslink$(EXEEXT)
 
 transform       = @program_transform_name@
 
@@ -89,7 +90,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(LKSOURCES) $(srcdir)/../*.h $(top_builddir)*.h $(top_srcdir)/*.h
+Makefile.dep: $(LKSOURCES) $(srcdir)/../*.h $(top_builddir)/*.h $(top_srcdir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
@@ -107,7 +108,7 @@ include $(srcdir)/clean.mk
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
           $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
         fi
 

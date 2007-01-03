@@ -7,7 +7,7 @@ top_srcdir	= @top_srcdir@
 top_builddir	= @top_builddir@
 VPATH =           @srcdir@
 
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 USE_ALT_LEX	= 0
 
@@ -44,7 +44,7 @@ endif
 SLIBSOURCES	= $(patsubst %.o,$(SLIB)/%.c,$(SLIBOBJS))
 SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 
-TARGET		= $(top_builddir)bin/sdcc$(EXEEXT)
+TARGET		= $(top_builddir)/bin/sdcc$(EXEEXT)
 
 # Compiling entire program or any subproject
 # ------------------------------------------
@@ -55,8 +55,8 @@ $(PORT_LIBS): FORCE
 
 FORCE:
 
-$(top_builddir)support/gc/libgc.a:
-	$(MAKE) -C $(top_builddir)support/gc
+$(top_builddir)/support/gc/libgc.a:
+	$(MAKE) -C $(top_builddir)/support/gc
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
@@ -142,7 +142,7 @@ version.h: ../ChangeLog
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" \
 	  freshconf;\
 	fi

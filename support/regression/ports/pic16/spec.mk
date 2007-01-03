@@ -10,7 +10,7 @@ endif
 SDCCFLAGS += -mpic16 -pp18f452 -I$(top_srcdir)/device/include/pic16 --nostdinc --less-pedantic -Wl,-q -DREENTRANT=reentrant -I$(top_srcdir)
 LINKFLAGS = --nostdlib
 LINKFLAGS += libsdcc.lib libc18f.lib libm18f.lib
-LIBDIR = $(top_builddir)device/lib/build/pic16
+LIBDIR = $(top_builddir)/device/lib/build/pic16
 
 OBJEXT = .o
 EXEEXT = .cod

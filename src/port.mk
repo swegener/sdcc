@@ -26,7 +26,7 @@ PREBUILD += $(PEEPRULES)
 
 all: $(PREBUILD) dep $(LIB)
 
-include $(top_builddir)Makefile.common
+include $(top_builddir)/Makefile.common
 
 $(LIB): $(OBJ)
 	rm -f $(LIB)

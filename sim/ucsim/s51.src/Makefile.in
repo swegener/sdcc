@@ -40,6 +40,7 @@ exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 libdir          = @libdir@
 datadir         = @datadir@
+datarootdir     = @datarootdir@
 includedir      = @includedir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
@@ -121,25 +122,25 @@ include $(srcdir)/clean.mk
 
 s51.src: s51$(EXEEXT) shared_lib
 
-s51$(EXEEXT): $(OBJECTS) $(top_builddir)*.a
+s51$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
 	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)s51.so
+shared_lib: $(top_builddir)/s51.so
 else
 shared_lib:
 	@$(top_srcdir)/mkecho $(top_builddir) "No 51 shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
 endif
 
-$(top_builddir)s51.so: $(OBJECTS_SHARED)
+$(top_builddir)/s51.so: $(OBJECTS_SHARED)
 	$(CXX) -shared $(OBJECTS_SHARED) -o $@
 
 otherlibs:
 	$(MAKE) -C $(top_builddir) libs
-	$(MAKE) -C $(top_builddir)cmd.src all
-	$(MAKE) -C $(top_builddir)sim.src all
-	$(MAKE) -C $(top_builddir)gui.src checkconf ucsim_lib
+	$(MAKE) -C $(top_builddir)/cmd.src all
+	$(MAKE) -C $(top_builddir)/sim.src all
+	$(MAKE) -C $(top_builddir)/gui.src checkconf ucsim_lib
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) -c $< -o $@
@@ -151,7 +152,7 @@ otherlibs:
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 

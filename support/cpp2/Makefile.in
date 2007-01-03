@@ -123,6 +123,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/sdcpp$(EXEEXT)
 clean:
 	-rm -f $(TARGET) *.o core libcpp.a
+	rm -f s-options optionlist options.h s-options-h options.c
 
 distclean: clean
 	-rm -f auto-host.h auto-build.h cstamp-h Makefile

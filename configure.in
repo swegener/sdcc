@@ -1,6 +1,6 @@
 #!/bin/sh
 
-AC_PREREQ(2.54)
+AC_PREREQ(2.60)
 AC_INIT
 AC_CONFIG_SRCDIR([Makefile.in])
 AC_CONFIG_HEADER(sdccconf.h:sdccconf_in.h)
@@ -730,6 +730,7 @@ sdcc ${VERSION} is now configured for
     ds400               ${enable_ds400_port}
     gbz80               ${enable_gbz80_port}
     hc08                ${enable_hc08_port}
+    mcs51               ${enable_mcs51_port}
     pic                 ${enable_pic_port}
     pic16               ${enable_pic16_port}
     xa51                ${enable_xa51_port}
@@ -751,6 +752,7 @@ sdcc ${VERSION} is now configured for
 
     prefix:             ${prefix}
     datadir:            ${datadir}
+    datarootdir:        ${datarootdir}
 
   Search paths (incomplete, see manual for all search paths):
     binary files:       \$SDCC_HOME${binPath}

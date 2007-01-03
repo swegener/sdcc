@@ -11,8 +11,8 @@ STRIP           = @STRIP@
 
 top_builddir	= ../../
 top_srcdir	= @srcdir@/../..
-SLIB		= $(top_builddir)support/Util
-SDCCLIB		= $(top_builddir)src
+SLIB		= $(top_builddir)/support/Util
+SDCCLIB		= $(top_builddir)/src
 
 VPATH           = @srcdir@
 srcdir		= @srcdir@
@@ -41,7 +41,7 @@ SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
 SLIBSOURCES	= $(patsubst %.o,$(SLIB)/%.c,$(SLIBOBJS))
 SDCCSOURCES	= $(patsubst %.o,$(SDCCLIB)/%.c,$(SDCCOBJS))
 
-TARGET		= $(top_builddir)bin/sdcdb$(EXEEXT)
+TARGET		= $(top_builddir)/bin/sdcdb$(EXEEXT)
 
 
 # Compiling entire program or any subproject
@@ -84,7 +84,7 @@ installdirs:
 # ---------------------
 dep: Makefile.dep
 
-Makefile.dep: $(SOURCES) $(SLIBSOURCES) $(SDCCSOURCES) $(srcdir)/*.h $(top_builddir)*.h $(top_srcdir)/*.h
+Makefile.dep: $(SOURCES) $(SLIBSOURCES) $(SDCCSOURCES) $(srcdir)/*.h $(top_builddir)/*.h $(top_srcdir)/*.h
 	$(CPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.c,$^) >Makefile.dep
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall installcheck installdirs checkconf \
@@ -110,7 +110,7 @@ $(SDCCOBJS):%.o:$(SDCCLIB)/%.c
 # Remaking configuration
 # ----------------------
 checkconf:
-	@if [ -f $(top_builddir)devel ]; then\
+	@if [ -f $(top_builddir)/devel ]; then\
           $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
         fi
 

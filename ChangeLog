@@ -1,3 +1,8 @@
+2007-01-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/mcs51/lkarea.c (lnkarea2, lnksect2): replaced [di]seg_ap->a_addr
+	  with [di]ram_start to fix a regresion
+
 2007-01-03 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* configure.in: added missing mcs51 in status output

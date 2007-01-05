@@ -494,7 +494,8 @@ char idatamap[256];
 unsigned long codemap[524288];
 unsigned long xdatamap[131072];
 struct area *dseg_ap = NULL;
-struct area *iseg_ap = NULL;
+Addr_T dram_start = 0;
+Addr_T iram_start = 0;
 
 /*Modified version of the functions for packing variables in internal data memory*/
 VOID lnkarea2 (void)
@@ -576,10 +577,11 @@ VOID lnkarea2 (void)
         else if (!strcmp(ap->a_id, "DSEG"))
         {
             dseg_ap = ap; /*Need it later*/
+            dram_start = ap->a_addr;
         }
         else if (!strcmp(ap->a_id, "ISEG"))
         {
-            iseg_ap = ap; /*Need it later*/
+            iram_start = ap->a_addr;
         }
         ap = ap->a_ap;
     }
@@ -746,10 +748,7 @@ Addr_T lnksect2 (struct area *tap, int locIndex)
     /*Notice that only ISEG and SSEG can be in the indirectly addressable internal RAM*/
     if( (!strcmp(tap->a_id, "ISEG")) || (!strcmp(tap->a_id, "SSEG")) )
     {
-        if (iseg_ap)
-            ramstart = iseg_ap->a_addr;
-        else
-            ramstart = 0;
+        ramstart = iram_start;
 
         if ((iram_size <= 0) || (ramstart + iram_size > 0x100))
             ramlimit = 0x100;
@@ -758,10 +757,7 @@ Addr_T lnksect2 (struct area *tap, int locIndex)
     }
     else
     {
-        if (dseg_ap)
-            ramstart = dseg_ap->a_addr;
-        else
-            ramstart = 0;
+        ramstart = dram_start;
 
         if ((iram_size <= 0) || (ramstart + iram_size > 0x80))
             ramlimit = 0x80;

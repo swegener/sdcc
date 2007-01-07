@@ -16,6 +16,7 @@
 	  src/xa51/gen.c, src/xa51/main.c, src/z80/gen.c, src/z80/main.c,
 	  support/Util/dbuf.c, support/Util/dbuf.h:
 	  modified
+	* .version, sdcc.spec: bumped version to 2.6.4
 
 2007-01-07 Maarten Brock <sourceforge.brock AT dse.nl>
 

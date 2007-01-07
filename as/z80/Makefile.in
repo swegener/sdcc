@@ -9,7 +9,7 @@ OBJDIR	= obj/$(EXT)
 
 SDC	= .
 
-SLIBSRC	= NewAlloc.c strcmpi.c
+SLIBSRC	= NewAlloc.c ../strcmpi.c
 
 SRC	= asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c \
 	  assubr.c assym.c z80adr.c z80ext.c z80mch.c z80pst.c

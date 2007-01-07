@@ -40,7 +40,8 @@ LDFLAGS		= @LDFLAGS@
 
 ASOBJECTS	= asmain.o aslex.o assym.o assubr.o asnoice.o \
 		  asexpr.o asdata.o aslist.o asout.o asstore.o \
-		  m08ext.o m08pst.o m08mch.o m08adr.o strcmpi.o
+		  m08ext.o m08pst.o m08mch.o m08adr.o \
+		  ../strcmpi.o
 ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
 
 ASHC08		= $(top_builddir)/bin/as-hc08$(EXEEXT)

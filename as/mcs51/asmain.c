@@ -17,7 +17,6 @@
 #include <string.h>
 
 #include "asm.h"
-#include "strcmpi.h"
 
 /*)Module	asmain.c
  *
@@ -944,7 +943,7 @@ loop:
 			}
 		}
 		*p = 0;
-		if (++incfil == MAXINC ||
+		if ((++incfil == MAXINC) ||
 		   (ifp[incfil] = fopen(fn, "r")) == NULL) {
 			--incfil;
 			err('i');

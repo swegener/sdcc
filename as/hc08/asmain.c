@@ -17,7 +17,6 @@
 #include <string.h>
 
 #include "asm.h"
-#include "strcmpi.h"
 
 /*)Module	asmain.c
  *

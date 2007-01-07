@@ -88,63 +88,63 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=mcs51\asdata.c
+SOURCE=.\asdata.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\asexpr.c
+SOURCE=.\asexpr.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\aslex.c
+SOURCE=.\aslex.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\aslist.c
+SOURCE=.\aslist.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\asmain.c
+SOURCE=.\asmain.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\asnoice.c
+SOURCE=.\asnoice.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\asout.c
+SOURCE=.\asout.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\asstore.c
+SOURCE=.\asstore.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\assubr.c
+SOURCE=.\assubr.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\assym.c
+SOURCE=.\assym.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\i51adr.c
+SOURCE=.\i51adr.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\i51ext.c
+SOURCE=.\i51ext.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\i51mch.c
+SOURCE=.\i51mch.c
 # End Source File
 # Begin Source File
 
-SOURCE=mcs51\i51pst.c
+SOURCE=.\i51pst.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\mcs51\strcmpi.c
+SOURCE=..\strcmpi.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -152,15 +152,11 @@ SOURCE=.\mcs51\strcmpi.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\mcs51\asm.h
+SOURCE=.\asm.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\mcs51\i8051.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\mcs51\strcmpi.h
+SOURCE=.\i8051.h
 # End Source File
 # End Group
 # End Target

@@ -40,7 +40,8 @@ LDFLAGS		= @LDFLAGS@
 
 ASOBJECTS	= asmain.o aslex.o assym.o assubr.o asnoice.o \
 		  asexpr.o asdata.o aslist.o asout.o asstore.o \
-		  i51ext.o i51pst.o i51mch.o i51adr.o strcmpi.o
+		  i51ext.o i51pst.o i51mch.o i51adr.o \
+		  ../strcmpi.o
 ASSOURCES	= $(patsubst %.o,%.c,$(ASOBJECTS))
 
 ASX8051		= $(top_builddir)/bin/asx8051$(EXEEXT)

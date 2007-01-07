@@ -51,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_gbz80"=.\as\as_gbz80.dsp - Package Owner=<4>
+Project: "as_gbz80"=.\as\z80\as_gbz80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -75,7 +75,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "as_z80"=.\as\as_z80.dsp - Package Owner=<4>
+Project: "as_z80"=.\as\z80\as_z80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -102,7 +102,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "asx8051"=.\as\asx8051.dsp - Package Owner=<4>
+Project: "asx8051"=.\as\mcs51\asx8051.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -489,7 +489,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "z80"=.\SRC\z80\z80.dsp - Package Owner=<4>
+Project: "z80"=.\src\z80\z80.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

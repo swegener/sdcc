@@ -697,4 +697,8 @@ extern  struct  mne     mne[];
 /* Machine dependent functions */
 
 extern  VOID            minit();
-extern VOID machine(struct mne *);
+extern  VOID            machine(struct mne *);
+
+/* strcmpi.c */
+extern  int as_strcmpi(const char *s1, const char *s2);
+extern  int as_strncmpi(const char *s1, const char *s2, size_t n);

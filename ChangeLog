@@ -1,3 +1,33 @@
+2007-01-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/as_gbz80.dsp, as/z80/as_gbz80.dsp,
+	* as/as_z80.dsp,   as/z80/as_z80.dsp,
+	* as/asx8051.dsp,  as/mcs51/asx8051.dsp,
+	* sdcc.dsw: moved project files into subdir
+	* as/hc08/as_hc08.dsp,
+	* as/hc08/Makefile.bcc,
+	* as/hc08/Makefile.in,
+	* as/mcs51/Makefile.bcc,
+	* as/mcs51/Makefile.in,
+	* as/z80/Makefile.bcc,
+	* as/z80/Makefile.in,
+	* as/link/mcs51/Makefile.bcc: use as/strcmpi.c
+	* as/hc08/asm.h,
+	* as/mcs51/asm.h,
+	* as/z80/asm.h: added as_strcmpi() and as_strncmpi() prototypes
+	* as/hc08/asmain.c,
+	* as/hc08/assym.c,
+	* as/mcs51/asmain.c,
+	* as/mcs51/assym.c,
+	* as/z80/assym.c: removed include "strcmpi.h"
+	* as/hc08/strcmpi.c,
+	* as/hc08/strcmpi.h,
+	* as/mcs51/strcmpi.c,
+	* as/mcs51/strcmpi.h,
+	* support/Util/strcmpi.c,
+	* support/Util/strcmpi.h: removed files
+	* as/strcmpi.c: added as_strncmpi()
+
 2007-01-05 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* sdcc.dsw: Added some dependencies on project config.dsp

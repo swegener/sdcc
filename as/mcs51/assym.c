@@ -27,7 +27,6 @@
 #include <alloc.h>
 #endif
 #include "asm.h"
-#include "strcmpi.h"
 
 /*)Module	assym.c
  *

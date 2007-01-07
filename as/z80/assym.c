@@ -14,7 +14,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "asm.h"
-#include "strcmpi.h"
 
 /*)Module	assym.c
  *

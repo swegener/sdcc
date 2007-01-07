@@ -143,7 +143,7 @@ SOURCE=.\m08pst.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\strcmpi.c
+SOURCE=..\strcmpi.c
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -156,10 +156,6 @@ SOURCE=.\asm.h
 # Begin Source File
 
 SOURCE=.\m6808.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\strcmpi.h
 # End Source File
 # End Group
 # End Target

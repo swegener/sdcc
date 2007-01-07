@@ -1,4 +1,4 @@
-# Makefile for Borlad C
+# Makefile for Borland C
 
 PRJDIR          = ../..
 
@@ -7,8 +7,9 @@ PRJDIR          = ../..
 CFLAGS          = $(CFLAGS) -DINDEXLIB -DMLH_MAP -DSDK
 
 OBJECTS       = asdata.obj asexpr.obj aslex.obj aslist.obj asmain.obj \
-                  asout.obj assubr.obj assym.obj z80adr.obj z80ext.obj \
-                  z80mch.obj z80pst.obj
+                asout.obj assubr.obj assym.obj z80adr.obj z80ext.obj \
+                z80mch.obj z80pst.obj \
+                ../strcmpi.obj
 
 TARGET         = $(PRJDIR)/bin/as-z80.exe
 

@@ -4,12 +4,13 @@ PRJDIR          = ../..
 
 !include $(PRJDIR)/Bcc.inc
 
-LKOBJECTS       = lkmain.obj lkhead.obj lkarea.obj lkdata.obj \
-                  lkeval.obj lklex.obj lksym.obj lkrloc.obj \
-                  lklibr.obj lklist.obj lkihx.obj lks19.obj \
-                  lknoice.obj lkmem.obj lkaomf51.obj \
-                  ../lkstore.obj \
-                  strcmpi.obj
+LKOBJECTS       = lkmain.obj lkarea.obj lkdata.obj \
+                  lkrloc.obj \
+                  lklibr.obj lkihx.obj lks19.obj \
+                  lkmem.obj lkaomf51.obj \
+                  ../lkeval.obj ../lkhead.obj ../lklex.obj ../lklist.obj \
+                  ../lknoice.obj ../lkstore.obj ../lksym.obj \
+                  ../../strcmpi.obj
 
 ASLINK          = $(PRJDIR)/bin/aslink.exe
 

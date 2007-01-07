@@ -7,19 +7,19 @@
 CFG=as_gbz80 - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "as_gbz80.mak".
-!MESSAGE 
+!MESSAGE
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "as_gbz80.mak" CFG="as_gbz80 - Win32 Release"
-!MESSAGE 
+!MESSAGE
 !MESSAGE Possible choices for configuration are:
-!MESSAGE 
+!MESSAGE
 !MESSAGE "as_gbz80 - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE "as_gbz80 - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE 
+!MESSAGE
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -49,8 +49,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\bin_vc\as-z80.exe" /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\bin_vc\as-gbz80.exe" /pdbtype:sept
+# ADD BASE LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\as-z80.exe" /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /debug /machine:I386 /out:"..\..\bin_vc\as-gbz80.exe" /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "as_gbz80 - Win32 Release"
 
@@ -74,10 +74,10 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\bin_vc\as-z80.exe" /pdbtype:sept
-# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\bin_vc\as-gbz80.exe" /pdbtype:sept
+# ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\as-z80.exe" /pdbtype:sept
+# ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\as-gbz80.exe" /pdbtype:sept
 
-!ENDIF 
+!ENDIF
 
 # Begin Target
 

@@ -29,6 +29,7 @@
 #define SDCC_NAME_MAX  3*SDCC_SYMNAME_MAX // big enough for _<func>_<var>_etc
 #include "SDCChasht.h"
 #include "SDCCglobl.h"
+#include "dbuf.h"
 
 #define INTNO_MAX 255                   /* maximum allowed interrupt number */
 #define INTNO_UNSPEC (INTNO_MAX+1)      /* interrupt number unspecified */
@@ -614,6 +615,7 @@ void processFuncPtrArgs (sym_link *);
 void processFuncArgs (symbol *);
 int isSymbolEqual (symbol *, symbol *);
 int powof2 (TYPE_TARGET_ULONG);
+void dbuf_printTypeChain (sym_link *, struct dbuf_s *);
 void printTypeChain (sym_link *, FILE *);
 void printTypeChainRaw (sym_link *, FILE *);
 void initCSupport ();

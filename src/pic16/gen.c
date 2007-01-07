@@ -182,7 +182,7 @@ static struct {
 
 extern int pic16_ptrRegReq ;
 extern int pic16_nRegs;
-extern FILE *codeOutFile;
+extern struct dbuf_s *codeOutBuf;
 //static void saverbank (int, iCode *,bool);
 
 static lineNode *lineHead = NULL;
@@ -955,7 +955,9 @@ static asmop *aopForRemat (operand *op, bool result) // x symbol *sym)
 	for (;;) {
 		oldic = ic;
 
-//		pic16_emitpcomment("ic: %s\n", printILine(ic));
+//              chat *iLine = printILine(ic);
+//		pic16_emitpcomment("ic: %s\n", iLine);
+//              dbuf_free(iLine);
 	
 		if (ic->op == '+') {
 			val += (int) operandLitValue(IC_RIGHT(ic));
@@ -13638,11 +13640,12 @@ void genpic16Code (iCode *lic)
       }
 	
       if(options.iCodeInAsm) {
-        char *l;
+        char *iLine;
 
           /* insert here code to print iCode as comment */
-          l = Safe_strdup(printILine(ic));
-          pic16_emitpcomment("ic:%d: %s", ic->seq, l);
+          iLine = printILine(ic);
+          pic16_emitpcomment("ic:%d: %s", ic->seq, iLine);
+          dbuf_free(iLine);
       }
 
       /* if the result is marked as
@@ -13850,7 +13853,7 @@ void genpic16Code (iCode *lic)
       peepHole (&lineHead);
 
     /* now do the actual printing */
-    printLine (lineHead, codeOutFile);
+    printLine (lineHead, codeOutBuf);
 
 #ifdef PCODE_DEBUG
     DFPRINTF((stderr,"printing pBlock\n\n"));

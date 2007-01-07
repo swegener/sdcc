@@ -116,7 +116,7 @@ typedef struct resolvedIfx {
 
 extern int pic14_ptrRegReq ;
 extern int pic14_nRegs;
-extern FILE *codeOutFile;
+extern struct dbuf_s *codeOutBuf;
 static void saverbank (int, iCode *,bool);
 
 static lineNode *lineHead = NULL;
@@ -10674,7 +10674,9 @@ void genpic14Code (iCode *lic)
 		}
 		
 		if (options.iCodeInAsm) {
+                  char *iLine = printILine(ic);
 		  emitpComment ("[ICODE] %s:%d: %s", ic->filename, ic->lineno, printILine (ic));
+                  dbuf_free(iLine);
 		}
 		/* if the result is marked as
 		spilt and rematerializable or code for
@@ -10884,7 +10886,7 @@ void genpic14Code (iCode *lic)
 		peepHole (&lineHead);
 	}
 	/* now do the actual printing */
-	printLine (lineHead,codeOutFile);
+	printLine (lineHead,codeOutBuf);
 	
 #ifdef PCODE_DEBUG
 	DFPRINTF((stderr,"printing pBlock\n\n"));

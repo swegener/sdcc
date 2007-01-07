@@ -3,6 +3,7 @@
 /*-----------------------------------------------------------------*/
 
 #include "common.h"
+#include "dbuf_string.h"
 
 /* memory segments */
 memmap *xstack = NULL;          /* xternal stack data          */
@@ -70,13 +71,10 @@ allocMap (char rspace,          /* sfr space            */
   map->sname = name;
   map->dbName = dbName;
   map->ptrType = ptrType;
-  if (!(map->oFile = tempfile ()))
-    {
-      werror (E_TMPFILE_FAILED);
-      exit (1);
-    }
-  addSetHead (&tmpfileSet, map->oFile);
   map->syms = NULL;
+
+  dbuf_init(&map->oBuf, 4096);
+
   return map;
 }
 
@@ -1009,7 +1007,7 @@ redoStackOffsets (void)
 /* printAllocInfoSeg- print the allocation for a given section     */
 /*-----------------------------------------------------------------*/
 static void
-printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
+printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
 {
   symbol *sym;
 
@@ -1027,7 +1025,7 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
       if (sym->localof != func)
         continue;
 
-      fprintf (of, ";%-25s Allocated ", sym->name);
+      dbuf_printf (oBuf, ";%-25s Allocated ", sym->name);
 
       /* if assigned to registers */
       if (!sym->allocreq && sym->reqv)
@@ -1037,10 +1035,10 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
           sym = OP_SYMBOL (sym->reqv);
           if (!sym->isspilt || sym->remat)
             {
-              fprintf (of, "to registers ");
+              dbuf_append_str (oBuf, "to registers ");
               for (i = 0; i < 4 && sym->regs[i]; i++)
-                fprintf (of, "%s ", port->getRegName (sym->regs[i]));
-              fprintf (of, "\n");
+                dbuf_printf (oBuf, "%s ", port->getRegName (sym->regs[i]));
+              dbuf_append_char (oBuf, '\n');
               continue;
             }
           else
@@ -1052,12 +1050,12 @@ printAllocInfoSeg (memmap * map, symbol * func, FILE * of)
       /* if on stack */
       if (sym->onStack)
         {
-          fprintf (of, "to stack - offset %d\n", sym->stack);
+          dbuf_printf (oBuf, "to stack - offset %d\n", sym->stack);
           continue;
         }
 
       /* otherwise give rname */
-      fprintf (of, "with name '%s'\n", sym->rname);
+      dbuf_printf (oBuf, "with name '%s'\n", sym->rname);
     }
 }
 
@@ -1132,27 +1130,24 @@ doOverlays (eBBlock ** ebbs, int count)
 /* printAllocInfo - prints allocation information for a function   */
 /*-----------------------------------------------------------------*/
 void
-printAllocInfo (symbol * func, FILE * of)
+printAllocInfo (symbol * func, struct dbuf_s * oBuf)
 {
   if (!func)
         return;
 
-  if (!of)
-    of = stdout;
-
   /* must be called after register allocation is complete */
-  fprintf (of, ";------------------------------------------------------------\n");
-  fprintf (of, ";Allocation info for local variables in function '%s'\n", func->name);
-  fprintf (of, ";------------------------------------------------------------\n");
+  dbuf_append_str (oBuf, ";------------------------------------------------------------\n");
+  dbuf_printf (oBuf, ";Allocation info for local variables in function '%s'\n", func->name);
+  dbuf_append_str (oBuf, ";------------------------------------------------------------\n");
 
-  printAllocInfoSeg (xstack, func, of);
-  printAllocInfoSeg (istack, func, of);
-  printAllocInfoSeg (code, func, of);
-  printAllocInfoSeg (data, func, of);
-  printAllocInfoSeg (xdata, func, of);
-  printAllocInfoSeg (idata, func, of);
-  printAllocInfoSeg (sfr, func, of);
-  printAllocInfoSeg (sfrbit, func, of);
+  printAllocInfoSeg (xstack, func, oBuf);
+  printAllocInfoSeg (istack, func, oBuf);
+  printAllocInfoSeg (code, func, oBuf);
+  printAllocInfoSeg (data, func, oBuf);
+  printAllocInfoSeg (xdata, func, oBuf);
+  printAllocInfoSeg (idata, func, oBuf);
+  printAllocInfoSeg (sfr, func, oBuf);
+  printAllocInfoSeg (sfrbit, func, oBuf);
 
   {
     set *ovrset;
@@ -1163,10 +1158,10 @@ printAllocInfo (symbol * func, FILE * of)
          ovrset = setNextItem (ovrSetSets))
       {
         overlay->syms = ovrset;
-        printAllocInfoSeg (overlay, func, of);
+        printAllocInfoSeg (overlay, func, oBuf);
       }
     overlay->syms = tempOverlaySyms;
   }
 
-  fprintf (of, ";------------------------------------------------------------\n");
+  dbuf_append_str (oBuf, ";------------------------------------------------------------\n");
 }

@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "newalloc.h"
+#include "dbuf_string.h"
 
 
 /*-----------------------------------------------------------------*/
@@ -131,6 +132,7 @@ pcseDef (void *item, va_list ap)
 {
   cseDef *cdp = item;
   iCodeTable *icTab;
+  struct dbuf_s dbuf;
 
   (void) ap;
 
@@ -138,7 +140,9 @@ pcseDef (void *item, va_list ap)
     fprintf (stdout, "**null op**");
   printOperand (cdp->sym, stdout);
   icTab = getTableEntry (cdp->diCode->op);
-  icTab->iCodePrint (stdout, cdp->diCode, icTab->printName);
+  dbuf_init (&dbuf, 1024);
+  icTab->iCodePrint (&dbuf, cdp->diCode, icTab->printName);
+  dbuf_write_and_destroy (&dbuf, stdout);
   return 1;
 }
 

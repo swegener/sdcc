@@ -73,8 +73,8 @@ bool isLabelDefinition (const char *line, const char **start, int *len,
 extern hTab *labelHash;
 labelHashEntry *getLabelRef (const char *label, lineNode *head);
 
-void printLine (lineNode *, FILE *);
-lineNode *newLineNode (char *);
+void printLine (lineNode *, struct dbuf_s *);
+lineNode *newLineNode (const char *);
 lineNode *connectLine (lineNode *, lineNode *);
 void initPeepHole (void);
 void peepHole (lineNode **);

@@ -104,6 +104,10 @@ SOURCE=..\support\Util\dbuf.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\support\Util\dbuf_string.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\support\Util\MySystem.c
 # End Source File
 # Begin Source File
@@ -266,6 +270,10 @@ SOURCE=.\common.h
 # Begin Source File
 
 SOURCE=..\support\Util\dbuf.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\support\Util\dbuf_string.h
 # End Source File
 # Begin Source File
 

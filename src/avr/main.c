@@ -126,9 +126,9 @@ _avr_genAssemblerPreamble (FILE * of)
 
 /* Generate interrupt vector table. */
 static int
-_avr_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+_avr_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
-	return TRUE;
+  return TRUE;
 }
 
 /* Indicate which extended bit operations this port supports */

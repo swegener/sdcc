@@ -42,6 +42,7 @@
 #include "SDCCpeeph.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "dbuf_string.h"
 
 char *aopLiteral (value * val, int offset);
 char *aopLiteralLong (value * val, int offset, int size);
@@ -117,7 +118,7 @@ static char *rb1regs[] = {
     "b0",  "b1",  "b2",  "b3",  "b4",  "b5",  "b6",  "b7"
 };
 
-extern FILE *codeOutFile;
+extern struct dbuf_s *codeOutBuf;
 static void saveRBank (int, iCode *, bool);
 
 #define RESULTONSTACK(x) \
@@ -149,31 +150,32 @@ static unsigned char SRMask[] =
 /* emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
 static void
-emitcode (char *inst, const char *fmt,...)
+emitcode (const char *inst, const char *fmt,...)
 {
   va_list ap;
-  char lb[INITIAL_INLINEASM];
-  char *lbp = lb;
+  struct dbuf_s dbuf;
+  const char *lbp, *lb;
+
+  dbuf_init (&dbuf, INITIAL_INLINEASM);
 
   va_start (ap, fmt);
 
   if (inst && *inst)
     {
+      dbuf_append_str (&dbuf, inst);
+
       if (fmt && *fmt)
         {
-          SNPRINTF (lb, sizeof(lb), "%s\t", inst);
+          dbuf_append_char (&dbuf, '\t');
+          dbuf_tvprintf (&dbuf, fmt, ap);
         }
-      else
-        {
-          SNPRINTF (lb, sizeof(lb), "%s", inst);
-        }
-
-      tvsprintf (lb + strlen(lb), sizeof(lb) - strlen(lb), fmt, ap);
     }
   else
     {
-      tvsprintf (lb, sizeof(lb), fmt, ap);
+      dbuf_tvprintf (&dbuf, fmt, ap);
     }
+
+  lbp = lb = dbuf_c_str(&dbuf);
 
   while (isspace ((unsigned char)*lbp))
     {
@@ -192,6 +194,8 @@ emitcode (char *inst, const char *fmt,...)
   lineCurr->ic = _G.current_iCode;
   lineCurr->isComment = (*lbp==';');
   va_end (ap);
+
+  dbuf_destroy(&dbuf);
 }
 
 static void
@@ -11716,7 +11720,7 @@ gen51Code (iCode * lic)
 
   /* print the allocation information */
   if (allocInfo && currFunc)
-    printAllocInfo (currFunc, codeOutFile);
+    printAllocInfo (currFunc, codeOutBuf);
   /* if debug information required */
   if (options.debug && currFunc)
     {
@@ -11755,6 +11759,7 @@ gen51Code (iCode * lic)
       if (options.iCodeInAsm) {
         char regsInUse[80];
         int i;
+        char *iLine;
 
         #if 0
         for (i=0; i<8; i++) {
@@ -11771,7 +11776,9 @@ gen51Code (iCode * lic)
             }
         #endif
         }
+        iLine = printILine(ic);
         emitcode("", "; [%s] ic:%d: %s", regsInUse, ic->seq, printILine(ic));
+        dbuf_free(iLine);
       }
       /* if the result is marked as
          spilt and rematerializable or code for
@@ -12010,6 +12017,6 @@ gen51Code (iCode * lic)
     peepHole (&lineHead);
 
   /* now do the actual printing */
-  printLine (lineHead, codeOutFile);
+  printLine (lineHead, codeOutBuf);
   return;
 }

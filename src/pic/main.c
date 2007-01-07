@@ -12,6 +12,7 @@
 #include "SDCCmacro.h"
 #include "MySystem.h"
 #include "glue.h"
+#include "dbuf_string.h"
 #include <errno.h>
 //#include "gen.h"
 
@@ -257,7 +258,7 @@ _pic14_genAssemblerPreamble (FILE * of)
 
 /* Generate interrupt vector table. */
 static int
-_pic14_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+_pic14_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
 	int i;
 	
@@ -267,18 +268,18 @@ _pic14_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
 		return FALSE;
 	}
 	
-	fprintf (of, "\t;ajmp\t__sdcc_gsinit_startup\n");
+	dbuf_printf (oBuf, "\t;ajmp\t__sdcc_gsinit_startup\n");
 	
 	/* now for the other interrupts */
 	for (i = 0; i < maxInterrupts; i++)
 	{
 		if (interrupts[i])
 		{
-			fprintf (of, "\t;ljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+			dbuf_printf (oBuf, "\t;ljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
 		}
 		else
 		{
-			fprintf (of, "\t;reti\n\t.ds\t7\n");
+			dbuf_printf (oBuf, "\t;reti\n\t.ds\t7\n");
 		}
 	}
 	

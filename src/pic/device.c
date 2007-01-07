@@ -63,8 +63,6 @@ static unsigned int config_word = DEFAULT_CONFIG_WORD;
 static unsigned int config2_word = DEFAULT_CONFIG2_WORD;
 static memRange *rangeRAM = NULL;
 
-extern void emitSymbolToFile (FILE *of, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize);
-
 
 /* parse a value from the configuration file */
 static int parse_config_value(char *str)

@@ -1,3 +1,22 @@
+2007-01-07 Borut Razem <borut.razem AT siol.net>
+
+	* use dynamic memory buffers instead temporary files
+	* support/Util/dbuf_string.c, support/Util/dbuf_string.h:
+	  added
+	* src/Makefile.in, src/SDCC.lex, src/SDCCast.c, src/SDCCast.h,
+	  src/SDCCcse.c, src/SDCCglobl.h, src/SDCCglue.c, src/SDCCglue.h,
+	  src/SDCCicode.c, src/SDCCicode.h, src/SDCCmain.c, src/SDCCmem.c,
+	  src/SDCCmem.h, src/SDCCpeeph.c, src/SDCCpeeph.h, src/SDCCsymt.c,
+	  src/SDCCsymt.h, src/SDCCutil.c, src/asm.c, src/asm.h, src/avr/gen.c,
+	  src/avr/main.c, src/ds390/gen.c, src/ds390/main.c, src/hc08/gen.c,
+	  src/hc08/main.c, src/izt/gen.c, src/mcs51/gen.c, src/mcs51/main.c,
+	  src/pic/device.c, src/pic/gen.c, src/pic/glue.c, src/pic/main.c,
+	  src/pic/ralloc.c, src/pic16/gen.c, src/pic16/glue.c,
+	  src/pic16/main.c, src/pic16/ralloc.c, src/port.h, src/src.dsp,
+	  src/xa51/gen.c, src/xa51/main.c, src/z80/gen.c, src/z80/main.c,
+	  support/Util/dbuf.c, support/Util/dbuf.h:
+	  modified
+
 2007-01-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/port.h: added TARGET_Z80_LIKE macro

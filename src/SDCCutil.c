@@ -34,6 +34,7 @@
 #include "SDCCmacro.h"
 #include "SDCCutil.h"
 #include "newalloc.h"
+#include "dbuf_string.h"
 #ifndef _WIN32
 #include "findme.h"
 #endif
@@ -82,13 +83,16 @@ appendStrSet(set *list, const char *pre, const char *post)
 
   for (item = setFirstItem(list); item != NULL; item = setNextItem(list)) {
     dbuf_init(&dbuf, PATH_MAX);
+
     if (pre != NULL)
-      dbuf_append(&dbuf, pre, strlen(pre));
-    dbuf_append(&dbuf, item, strlen(item));
+      dbuf_append_str(&dbuf, pre);
+    dbuf_append_str(&dbuf, item);
     if (post != NULL)
-      dbuf_append(&dbuf, post, strlen(post));
-    addSet(&new_list, (void *)dbuf_c_str(&dbuf));
-    dbuf_detach(&dbuf);
+      dbuf_append_str(&dbuf, post);
+
+    /* null terminate the buffer */
+    dbuf_c_str(&dbuf);
+    addSet(&new_list, dbuf_detach(&dbuf));
   }
 
   return new_list;
@@ -107,8 +111,8 @@ joinStrSet(set *list)
 
   for (s = setFirstItem(list); s != NULL; s = setNextItem(list))
     {
-      dbuf_append(&dbuf, s, strlen(s));
-      dbuf_append(&dbuf, " ", 1);
+      dbuf_append_str(&dbuf, s);
+      dbuf_append_char(&dbuf, ' ');
     }
 
   s = dbuf_c_str(&dbuf);
@@ -339,7 +343,7 @@ init_pragma_token(struct pragma_token_s *token)
 char *
 get_pragma_token(const char *s, struct pragma_token_s *token)
 {
-  dbuf_set_size(&token->dbuf, 0);
+  dbuf_set_length(&token->dbuf, 0);
 
   /* skip leading spaces */
   while ('\n' != *s && isspace(*s))
@@ -366,7 +370,7 @@ get_pragma_token(const char *s, struct pragma_token_s *token)
         {
           while ('\0' != *s && !isspace(*s))
             {
-              dbuf_append(&token->dbuf, s, 1);
+              dbuf_append_char(&token->dbuf, *s);
               ++s;
             }
 

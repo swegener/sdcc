@@ -66,7 +66,7 @@ _G;
 
 extern int xa51_ptrRegReq;
 extern int xa51_nRegs;
-extern FILE *codeOutFile;
+extern struct dbuf_s *codeOutBuf;
 
 static lineNode *lineHead = NULL;
 static lineNode *lineCurr = NULL;
@@ -814,7 +814,7 @@ static void genFunction (iCode * ic) {
   emitcode (";", "genFunction %s", sym->rname);
 
   /* print the allocation information */
-  printAllocInfo (currFunc, codeOutFile);
+  printAllocInfo (currFunc, codeOutBuf);
 
   emitcode ("", "%s:", sym->rname);
 
@@ -1946,7 +1946,9 @@ void genXA51Code (iCode * lic) {
       cln = ic->lineno;
     }
     if (options.iCodeInAsm) {
-      emitcode("", ";ic:%d: %s", ic->key, printILine(ic));
+      char *iLine = printILine(ic);
+      emitcode("", ";ic:%d: %s", ic->key, iLine);
+      dbuf_free(iLine);
     }
 
     /* if the result is marked as
@@ -2156,6 +2158,6 @@ void genXA51Code (iCode * lic) {
     peepHole (&lineHead);
 
   /* now do the actual printing */
-  printLine (lineHead, codeOutFile);
+  printLine (lineHead, codeOutBuf);
   return;
 }

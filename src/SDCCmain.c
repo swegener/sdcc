@@ -539,20 +539,21 @@ setParseWithComma (set **dest, const char *src)
     --end;
   ++end;
 
-  dbuf_init(&dbuf, 16);
-
   p = src;
   while (src < end)
     {
+      dbuf_init(&dbuf, 16);
+
       while (p < end && ',' != *p)
         ++p;
       dbuf_append(&dbuf, src, p - src);
-      addSet(dest, Safe_strdup(dbuf_c_str(&dbuf)));
-      dbuf_set_size(&dbuf, 0);
+
+      /* null terminate the buffer */
+      dbuf_c_str(&dbuf);
+      addSet(dest, dbuf_detach(&dbuf));
+
       src = ++p;
     }
-
-  dbuf_destroy(&dbuf);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2106,7 +2107,6 @@ preProcess (char **envp)
           perror ("Preproc file not found");
           exit (1);
       }
-      addSetHead (&pipeSet, yyin);
     }
 
   return 0;
@@ -2336,9 +2336,6 @@ main (int argc, char **argv, char **envp)
     exit (1);
   }
 
-  /* install atexit handler */
-  atexit(rm_tmpfiles);
-
   /* install signal handler;
      it's only purpose is to call exit() to remove temp files */
   if (!getenv("SDCC_LEAVE_SIGNALS"))
@@ -2428,7 +2425,6 @@ main (int argc, char **argv, char **envp)
 
       if (pclose(yyin))
         fatalError = 1;
-      deleteSetItem(&pipeSet, yyin);
 
       if (fatalError) {
         exit (1);

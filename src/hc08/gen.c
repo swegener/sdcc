@@ -83,7 +83,7 @@ static asmop *hc08_aop_pass[4];
 
 extern int hc08_ptrRegReq;
 extern int hc08_nRegs;
-extern FILE *codeOutFile;
+extern struct dbuf_s *codeOutBuf;
 //static void saveRBank (int, iCode *, bool);
 static bool operandsEqu (operand * op1, operand * op2);
 static void loadRegFromConst (regs *reg, char *c);
@@ -8346,7 +8346,7 @@ genhc08Code (iCode * lic)
 
   /* print the allocation information */
   if (allocInfo && currFunc)
-    printAllocInfo (currFunc, codeOutFile);
+    printAllocInfo (currFunc, codeOutBuf);
   /* if debug information required */
   if (options.debug && currFunc)
     {
@@ -8418,13 +8418,16 @@ genhc08Code (iCode * lic)
       if (options.iCodeInAsm) {
 	char regsInUse[80];
 	int i;
+        char *iLine;
 
 	for (i=0; i<6; i++) {
 	  sprintf (&regsInUse[i],
 		   "%c", ic->riu & (1<<i) ? i+'0' : '-'); 
 	}
 	regsInUse[i]=0;
+        iLine = printILine(ic);
 	emitcode("", "; [%s] ic:%d: %s", regsInUse, ic->seq, printILine(ic));
+        dbuf_free(iLine);
       }
       /* if the result is marked as
          spilt and rematerializable or code for
@@ -8697,6 +8700,6 @@ genhc08Code (iCode * lic)
     peepHole (&lineHead);
 
   /* now do the actual printing */
-  printLine (lineHead, codeOutFile);
+  printLine (lineHead, codeOutBuf);
   return;
 }

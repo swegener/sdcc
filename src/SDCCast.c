@@ -63,7 +63,7 @@ static ast *backPatchLabels (ast *, symbol *, symbol *);
 void PA(ast *t);
 int inInitMode = 0;
 memmap *GcurMemmap=NULL;  /* points to the memmap that's currently active */
-FILE *codeOutFile;
+struct dbuf_s *codeOutBuf;
 int
 ptt (ast * tree)
 {
@@ -5983,7 +5983,7 @@ createFunction (symbol * name, ast * body)
 
   /* create the node & generate intermediate code */
   GcurMemmap = code;
-  codeOutFile = code->oFile;
+  codeOutBuf = &code->oBuf;
   piCode = iCodeFromAst (ex);
 
   if (fatalError)
@@ -5998,7 +5998,7 @@ createFunction (symbol * name, ast * body)
   if (staticAutos)
     {
       GcurMemmap = statsg;
-      codeOutFile = statsg->oFile;
+      codeOutBuf = &statsg->oBuf;
       eBBlockFromiCode (iCodeFromAst (decorateType (resolveSymbols (staticAutos), RESULT_TYPE_NONE)));
       staticAutos = NULL;
     }

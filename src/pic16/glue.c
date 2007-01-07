@@ -30,10 +30,8 @@
 #include "gen.h"
 #include "device.h"
 #include "main.h"
+#include "dbuf_string.h"
 #include <string.h>
-
-#include <string.h>
-
 
 
 extern symbol *interrupts[256];
@@ -45,9 +43,7 @@ extern unsigned maxInterrupts;
 extern int maxRegBank;
 extern symbol *mainf;
 extern char *VersionString;
-extern FILE *codeOutFile;
-extern set *tmpfileSet;
-extern set *tmpfileNameSet;
+extern struct dbuf_s *codeOutBuf;
 extern char *iComments1;
 extern char *iComments2;
 
@@ -65,7 +61,6 @@ extern DEFSETFUNC (rmTmpFiles);
 extern void pic16_AnalyzeBanking (void);
 extern void pic16_OptimizeJumps ();
 extern void pic16_OptimizeBanksel ();
-extern void copyFile (FILE * dest, FILE * src);
 extern void pic16_InlinepCode(void);
 extern void pic16_writeUsedRegs(FILE *);
 
@@ -128,7 +123,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 //	fprintf(stderr, "%s:%d map name= %s\n", __FUNCTION__, __LINE__, map->sname);
 	
 	if(addPublics)
-		fprintf (map->oFile, ";\t.area\t%s\n", map->sname);
+		dbuf_printf (&map->oBuf, ";\t.area\t%s\n", map->sname);
 		/* print the area name */
 
 	for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms)) {
@@ -225,7 +220,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 //				fprintf (stderr,"; %s == 0x%04x\t\treqv= %p nRegs= %d\n",
 //					sym->name, SPEC_ADDR (sym->etype), sym->reqv, sym->regType);
 
-			fprintf (map->oFile, "%s\tEQU\t0x%04x\n",
+			dbuf_printf (&map->oBuf, "%s\tEQU\t0x%04x\n",
 				sym->rname,
 				SPEC_ADDR (sym->etype));
 
@@ -313,13 +308,13 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			if (IS_BITVAR (sym->etype)) {
 				bitvars++;
 			} else {
-				fprintf (map->oFile, "\t%s\n", sym->rname);
+				dbuf_printf (map->oBuf, "\t%s\n", sym->rname);
 				if ((size = (unsigned int) getSize (sym->type) & 0xffff) > 1) {
 					for (i = 1; i < size; i++)
-						fprintf (map->oFile, "\t%s_%d\n", sym->rname, i);
+						dbuf_printf (map->oBuf, "\t%s_%d\n", sym->rname, i);
 				}
 			}
-			fprintf (map->oFile, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
+			dbuf_printf (map->oBuf, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
 #endif
 		}
 	
@@ -367,7 +362,7 @@ pic16emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 
 			if(ival) {
 				setAstLineno(ival, sym->lineDef);
-				codeOutFile = statsg->oFile;
+				codeOutBuf = &statsg->oBuf;
 				GcurMemmap = statsg;
 				eBBlockFromiCode (iCodeFromAst (ival));
 				sym->ival = NULL;
@@ -1363,7 +1358,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      /* symbol has absolute address but no initial value */
 	      
 	      /* allocate space */
-	      fprintf (code->oFile, "%s:\n", sym->rname);
+	      dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
 
 	      /* special case for character strings */
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
@@ -1388,7 +1383,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      pBlock *pb;
 
 	      /* symbol doesn't have absolute address but has initial value */
-	      fprintf (code->oFile, "%s:\n", sym->rname);
+	      dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
 	      noAlloc++;
 	      resolveIvalSym (sym->ival, sym->type);
 
@@ -1412,7 +1407,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__,
 	      /* symbol doesn't have absolute address and no initial value */
 	      /* allocate space */
 //	      fprintf(stderr, "%s:%d [3] generating init for label: %s\n", __FILE__, __LINE__, sym->rname);
-	      fprintf (code->oFile, "%s:\n", sym->rname);
+	      dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
 	      /* special case for character strings */
 	      if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) &&
 		  SPEC_CVAL (sym->etype).v_char) {
@@ -1476,7 +1471,7 @@ pic16emitMaps ()
 /* createInterruptVect - creates the interrupt vector              */
 /*-----------------------------------------------------------------*/
 static void
-pic16createInterruptVect (FILE * vFile)
+pic16createInterruptVect (struct dbuf_s * vBuf)
 {
 	/* if the main is only a prototype ie. no body then do nothing */
 #if 0
@@ -1489,8 +1484,8 @@ pic16createInterruptVect (FILE * vFile)
 #endif
 #if 0
 	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
-		fprintf (vFile, ";\t.area\t%s\n", CODE_NAME);
-		fprintf(vFile, ".intvecs\tcode\t0x%06x\n", pic16_options.ivt_loc);
+		dbuf_printf (vBuf, ";\t.area\t%s\n", CODE_NAME);
+		dbuf_printf (vBuf, ".intvecs\tcode\t0x%06x\n", pic16_options.ivt_loc);
 
 		/* this is an overkill since WE are the port,
 		 * and we know if we have a genIVT function! */
@@ -1604,12 +1599,12 @@ pic16_printExterns(FILE *afile)
 /* emitOverlay - will emit code for the overlay stuff              */
 /*-----------------------------------------------------------------*/
 static void
-pic16emitOverlay (FILE * afile)
+pic16emitOverlay (struct dbuf_s *aBuf)
 {
   set *ovrset;
 
   if (!elementsInSet (ovrSetSets))
-    fprintf (afile, ";\t.area\t%s\n", port->mem.overlay_name);
+    dbuf_printf (aBuf, ";\t.area\t%s\n", port->mem.overlay_name);
 
   /* for each of the sets in the overlay segment do */
   for (ovrset = setFirstItem (ovrSetSets); ovrset;
@@ -1624,9 +1619,9 @@ pic16emitOverlay (FILE * afile)
 	     otherwise the assembler will append each of these
 	     declarations into one chunk and will not overlay
 	     sad but true */
-	  fprintf (afile, ";\t.area _DUMMY\n");
+	  dbuf_printf (aBuf, ";\t.area _DUMMY\n");
 	  /* output the area informtion */
-	  fprintf (afile, ";\t.area\t%s\n", port->mem.overlay_name);	/* MOF */
+	  dbuf_printf (aBuf, ";\t.area\t%s\n", port->mem.overlay_name);	/* MOF */
 	}
 
       for (sym = setFirstItem (ovrset); sym;
@@ -1666,20 +1661,20 @@ pic16emitOverlay (FILE * afile)
 	    {
 
 	      if (options.debug || sym->level == 0)
-		fprintf (afile, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+		dbuf_printf (aBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
 
-	      fprintf (afile, "%s\t=\t0x%04x\n",
+	      dbuf_printf (aBuf, "%s\t=\t0x%04x\n",
 		       sym->rname,
 		       SPEC_ADDR (sym->etype));
 	    }
 	  else
 	    {
 	      if (options.debug || sym->level == 0)
-		fprintf (afile, "==.\n");
+		dbuf_printf (aBuf, "==.\n");
 
 	      /* allocate space */
-	      fprintf (afile, "%s:\n", sym->rname);
-	      fprintf (afile, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
+	      dbuf_printf (aBuf, "%s:\n", sym->rname);
+	      dbuf_printf (aBuf, "\t.ds\t0x%04x\n", (unsigned int) getSize (sym->type) & 0xffff);
 	    }
 
 	}
@@ -1716,16 +1711,18 @@ void emitStatistics(FILE *asmFile)
 void
 pic16glue ()
 {
-  FILE *vFile;
   FILE *asmFile;
-  FILE *ovrFile = tempfile();
+  struct dbuf_s ovrBuf;
+  struct dbuf_s vBuf;
+
+    dbuf_init(&ovrBuf, 4096);
+    dbuf_init(&vBuf, 4096);
 
     mainf = newSymbol ("main", 0);
     mainf->block = 0;
 
     mainf = findSymWithLevel(SymbolTab, mainf);
 
-    addSetHead(&tmpfileSet,ovrFile);
     pic16_pCodeInitRegisters();
 
     if(pic16_options.no_crt && mainf && IFFUNC_HASBODY(mainf->type)) {
@@ -1766,20 +1763,17 @@ pic16glue ()
 
     /* print the global struct definitions */
 
-    vFile = tempfile();
     /* PENDING: this isnt the best place but it will do */
     if (port->general.glue_up_main) {
       /* create the interrupt vector table */
-      pic16createInterruptVect (vFile);
+      pic16createInterruptVect (&vBuf);
     }
 
-    addSetHead(&tmpfileSet,vFile);
-    
     /* emit code for the all the variables declared */
     pic16emitMaps ();
 
     /* do the overlay segments */
-    pic16emitOverlay(ovrFile);
+    pic16emitOverlay(&ovrBuf);
     pic16_AnalyzepCode('*');
 
 #if 1
@@ -1872,7 +1866,7 @@ pic16glue ()
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; external ram data\n");
     fprintf (asmFile, "%s", iComments2);
-    copyFile (asmFile, xdata->oFile);
+    dbuf_write_and_destroy (&xdata->oBuf, asmFile);
 #endif
 
 #if 0
@@ -1880,7 +1874,7 @@ pic16glue ()
     fprintf (asmFile, "%s", iComments2);
     fprintf (asmFile, "; bit data\n");
     fprintf (asmFile, "%s", iComments2);
-    copyFile (asmFile, bit->oFile);
+    dbuf_write_and_destroy (&bit->oBuf, asmFile);
 #endif
 
     /* copy the interrupt vector table */
@@ -1888,7 +1882,7 @@ pic16glue ()
       fprintf (asmFile, "\n%s", iComments2);
       fprintf (asmFile, "; interrupt vector \n");
       fprintf (asmFile, "%s", iComments2);
-      copyFile (asmFile, vFile);
+      dbuf_write_and_destroy (&vBuf, asmFile);
     }
     
     /* copy global & static initialisations */
@@ -1908,7 +1902,7 @@ pic16glue ()
       }
     }
 
-//    copyFile (stderr, code->oFile);
+//    dbuf_write_and_destroy (&code->oBuf, stderr);
 
     fprintf(asmFile, "; I code from now on!\n");
     pic16_copypCode(asmFile, 'I');
@@ -1942,6 +1936,4 @@ pic16glue ()
 
     fprintf (asmFile,"\tend\n");
     fclose (asmFile);
-    
-    rm_tmpfiles();
 }

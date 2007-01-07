@@ -25,6 +25,7 @@
 #include "common.h"
 #include "newalloc.h"
 #include "math.h"
+#include "dbuf_string.h"
 
 /*-----------------------------------------------------------------*/
 /* global variables       */
@@ -54,7 +55,7 @@ int isLvaluereq(int lvl);
 void  setOClass (sym_link * ptr, sym_link * spec);
 static operand *geniCodeCast (sym_link *, operand *, bool);
 
-#define PRINTFUNC(x) void x (FILE *of, iCode *ic, char *s)
+#define PRINTFUNC(x) void x (struct dbuf_s *dbuf, iCode *ic, char *s)
 /* forward definition of ic print functions */
 PRINTFUNC (picGetValueAtAddr);
 PRINTFUNC (picSetValueAtAddr);
@@ -133,37 +134,53 @@ iCodeTable codeTable[] =
 int
 printOperand (operand * op, FILE * file)
 {
-  sym_link *opetype;
+  struct dbuf_s dbuf;
+  int ret;
   int pnl = 0;
-
-  if (!op)
-    return 1;
 
   if (!file)
     {
       file = stdout;
       pnl = 1;
     }
+  dbuf_init (&dbuf, 1024);
+  ret = dbuf_printOperand(op, &dbuf);
+  dbuf_write_and_destroy (&dbuf, file);
+
+  if (pnl)
+    putc ('\n', file);
+
+  return ret;
+}
+
+int
+dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
+{
+  sym_link *opetype;
+
+  if (!op)
+    return 1;
+
   switch (op->type)
     {
 
     case VALUE:
       opetype = getSpec (operandType (op));
       if (IS_FLOAT (opetype))
-        fprintf (file, "%g {", SPEC_CVAL (opetype).v_float);
+        dbuf_printf (dbuf, "%g {", SPEC_CVAL (opetype).v_float);
       else if (IS_FIXED16X16 (opetype))
-        fprintf (file, "%g {", doubleFromFixed16x16(SPEC_CVAL (opetype).v_fixed16x16));
+        dbuf_printf (dbuf, "%g {", doubleFromFixed16x16(SPEC_CVAL (opetype).v_fixed16x16));
       else
-        fprintf (file, "0x%x {", (unsigned) floatFromVal (op->operand.valOperand));
-      printTypeChain (operandType (op), file);
-      fprintf (file, "}");
+        dbuf_printf (dbuf, "0x%x {", (unsigned) floatFromVal (op->operand.valOperand));
+      dbuf_printTypeChain (operandType (op), dbuf);
+      dbuf_append_char (dbuf, '}');
       break;
 
     case SYMBOL:
 #define REGA 1
 //#if REGA      /* { */
     if(REGA && !getenv("PRINT_SHORT_OPERANDS")) {
-      fprintf (file, "%s [k%d lr%d:%d so:%d]{ ia%d a2p%d re%d rm%d nos%d ru%d dp%d}",           /*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
+      dbuf_printf (dbuf, "%s [k%d lr%d:%d so:%d]{ ia%d a2p%d re%d rm%d nos%d ru%d dp%d}",           /*{ar%d rm%d ru%d p%d a%d u%d i%d au%d k%d ks%d}"  , */
                (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name),
                op->key,
                OP_LIVEFROM (op), OP_LIVETO (op),
@@ -173,11 +190,11 @@ printOperand (operand * op, FILE * file)
                OP_SYMBOL(op)->ruonly,OP_SYMBOL(op)->dptr
         );
       {
-        fprintf (file, "{");
-        printTypeChain (operandType (op), file);
+        dbuf_append_char (dbuf, '{');
+        dbuf_printTypeChain (operandType (op), dbuf);
         if (SPIL_LOC (op) && IS_ITEMP (op))
-          fprintf (file, "}{ sir@ %s", SPIL_LOC (op)->rname);
-        fprintf (file, "}");
+          dbuf_printf (dbuf, "}{ sir@ %s", SPIL_LOC (op)->rname);
+        dbuf_append_char (dbuf, '}');
 
       }
 
@@ -188,42 +205,42 @@ printOperand (operand * op, FILE * file)
             {
               if (!OP_SYMBOL (op)->remat)
                 if (OP_SYMBOL (op)->usl.spillLoc)
-                  fprintf (file, "[%s]", (OP_SYMBOL (op)->usl.spillLoc->rname[0] ?
+                  dbuf_printf (dbuf, "[%s]", (OP_SYMBOL (op)->usl.spillLoc->rname[0] ?
                                        OP_SYMBOL (op)->usl.spillLoc->rname :
                                        OP_SYMBOL (op)->usl.spillLoc->name));
                 else
-                  fprintf (file, "[err]");
+                  dbuf_append_str (dbuf, "[err]");
               else
-                fprintf (file, "[remat]");
+                dbuf_append_str (dbuf, "[remat]");
             }
           else
             {
               int i;
-              fprintf (file, "[");
+              dbuf_append_char (dbuf, '[');
               for (i = 0; i < OP_SYMBOL (op)->nRegs; i++)
-                fprintf (file, "%s ", port->getRegName (OP_SYMBOL (op)->regs[i]));
-              fprintf (file, "]");
+                dbuf_printf (dbuf, "%s ", port->getRegName (OP_SYMBOL (op)->regs[i]));
+              dbuf_append_char (dbuf, ']');
             }
         }
 //#else         /* } else { */
     } else {
       /* (getenv("PRINT_SHORT_OPERANDS") != NULL) */
-      fprintf (file, "%s ", (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name));
+      dbuf_printf (dbuf, "%s ", (OP_SYMBOL (op)->rname[0] ? OP_SYMBOL (op)->rname : OP_SYMBOL (op)->name));
 
       if(getenv("PRINT_SHORT_OPERANDS")[0] < '1')
         {
-          fprintf (file, "[lr%d:%d so:%d]",
+          dbuf_printf (dbuf, "[lr%d:%d so:%d]",
                OP_LIVEFROM (op), OP_LIVETO (op),
                OP_SYMBOL (op)->stack);
         }
 
       if(getenv("PRINT_SHORT_OPERANDS")[0] < '2')
         {
-          fprintf (file, "{");
-          printTypeChain (operandType (op), file);
+          dbuf_append_char (dbuf, '{');
+          dbuf_printTypeChain (operandType (op), dbuf);
           if (SPIL_LOC (op) && IS_ITEMP (op))
-              fprintf (file, "}{ sir@ %s", SPIL_LOC (op)->rname);
-          fprintf (file, "}");
+              dbuf_printf (dbuf, "}{ sir@ %s", SPIL_LOC (op)->rname);
+          dbuf_append_char (dbuf, '}');
         }
 
       /* if assigned to registers */
@@ -233,21 +250,21 @@ printOperand (operand * op, FILE * file)
             {
               if (!OP_SYMBOL (op)->remat)
                 if (OP_SYMBOL (op)->usl.spillLoc)
-                  fprintf (file, "[%s]", (OP_SYMBOL (op)->usl.spillLoc->rname[0] ?
+                  dbuf_printf (dbuf, "[%s]", (OP_SYMBOL (op)->usl.spillLoc->rname[0] ?
                                        OP_SYMBOL (op)->usl.spillLoc->rname :
                                        OP_SYMBOL (op)->usl.spillLoc->name));
                 else
-                  fprintf (file, "[err]");
+                  dbuf_append_str (dbuf, "[err]");
               else
-                fprintf (file, "[remat]");
+                dbuf_append_str (dbuf, "[remat]");
             }
           else
             {
               int i;
-              fprintf (file, "[");
+              dbuf_append_char (dbuf, '[');
               for (i = 0; i < OP_SYMBOL (op)->nRegs; i++)
-                fprintf (file, "%s ", port->getRegName (OP_SYMBOL (op)->regs[i]));
-              fprintf (file, "]");
+                dbuf_printf (dbuf, "%s ", port->getRegName (OP_SYMBOL (op)->regs[i]));
+              dbuf_append_char (dbuf, ']');
             }
         }
 //#endif                /* } */
@@ -255,14 +272,12 @@ printOperand (operand * op, FILE * file)
       break;
 
     case TYPE:
-      fprintf (file, "(");
-      printTypeChain (op->operand.typeOperand, file);
-      fprintf (file, ")");
+      dbuf_append_char (dbuf, '(');
+      dbuf_printTypeChain (op->operand.typeOperand, dbuf);
+      dbuf_append_char (dbuf, ')');
       break;
     }
 
-  if (pnl)
-    fprintf (file, "\n");
   return 0;
 }
 
@@ -272,197 +287,195 @@ printOperand (operand * op, FILE * file)
 /*-----------------------------------------------------------------*/
 PRINTFUNC (picGetValueAtAddr)
 {
-  fprintf (of, "\t");
-  printOperand (IC_RESULT (ic), of);
-  fprintf (of, " = ");
-  fprintf (of, "@[");
-  printOperand (IC_LEFT (ic), of);
-  fprintf (of, "]");
-
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printOperand (IC_RESULT (ic), dbuf);
+  dbuf_append_str (dbuf, " = ");
+  dbuf_append_str (dbuf, "@[");
+  dbuf_printOperand (IC_LEFT (ic), dbuf);
+  dbuf_append_str (dbuf, "]\n");
 }
 
 PRINTFUNC (picSetValueAtAddr)
 {
-  fprintf (of, "\t");
-  fprintf (of, "*[");
-  printOperand (IC_LEFT (ic), of);
-  fprintf (of, "] = ");
-  printOperand (IC_RIGHT (ic), of);
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\t');
+  dbuf_append_str (dbuf, "*[");
+  dbuf_printOperand (IC_LEFT (ic), dbuf);
+  dbuf_append_str (dbuf, "] = ");
+  dbuf_printOperand (IC_RIGHT (ic), dbuf);
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picAddrOf)
 {
-  fprintf (of, "\t");
-  printOperand (IC_RESULT (ic), of);
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printOperand (IC_RESULT (ic), dbuf);
   if (IS_ITEMP (IC_LEFT (ic)))
-    fprintf (of, " = ");
+    dbuf_append_str (dbuf, " = ");
   else
-    fprintf (of, " = &[");
-  printOperand (IC_LEFT (ic), of);
+    dbuf_append_str (dbuf, " = &[");
+  dbuf_printOperand (IC_LEFT (ic), dbuf);
   if (IC_RIGHT (ic))
     {
       if (IS_ITEMP (IC_LEFT (ic)))
-        fprintf (of, " offsetAdd ");
+        dbuf_append_str (dbuf, " offsetAdd ");
       else
-        fprintf (of, " , ");
-      printOperand (IC_RIGHT (ic), of);
+        dbuf_append_str (dbuf, " , ");
+      dbuf_printOperand (IC_RIGHT (ic), dbuf);
     }
   if (IS_ITEMP (IC_LEFT (ic)))
-    fprintf (of, "\n");
+    dbuf_append_char (dbuf, '\n');
   else
-    fprintf (of, "]\n");
+    dbuf_append_str (dbuf, "]\n");
 }
 
 PRINTFUNC (picJumpTable)
 {
   symbol *sym;
 
-  fprintf (of, "\t");
-  fprintf (of, "%s\t", s);
-  printOperand (IC_JTCOND (ic), of);
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printf (dbuf, "%s\t", s);
+  dbuf_printOperand (IC_JTCOND (ic), dbuf);
+  dbuf_append_char (dbuf, '\n');
   for (sym = setFirstItem (IC_JTLABELS (ic)); sym;
        sym = setNextItem (IC_JTLABELS (ic)))
-    fprintf (of, "\t\t\t%s\n", sym->name);
+    dbuf_printf (dbuf, "\t\t\t%s\n", sym->name);
 }
 
 PRINTFUNC (picGeneric)
 {
-  fprintf (of, "\t");
-  printOperand (IC_RESULT (ic), of);
-  fprintf (of, " = ");
-  printOperand (IC_LEFT (ic), of);
-  fprintf (of, " %s ", s);
-  printOperand (IC_RIGHT (ic), of);
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printOperand (IC_RESULT (ic), dbuf);
+  dbuf_append_str (dbuf, " = ");
+  dbuf_printOperand (IC_LEFT (ic), dbuf);
+  dbuf_printf (dbuf, " %s ", s);
+  dbuf_printOperand (IC_RIGHT (ic), dbuf);
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picGenericOne)
 {
-  fprintf (of, "\t");
+  dbuf_append_char (dbuf, '\t');
   if (IC_RESULT (ic))
     {
-      printOperand (IC_RESULT (ic), of);
-      fprintf (of, " = ");
+      dbuf_printOperand (IC_RESULT (ic), dbuf);
+      dbuf_append_str (dbuf, " = ");
     }
 
   if (IC_LEFT (ic))
     {
-      fprintf (of, "%s ", s);
-      printOperand (IC_LEFT (ic), of);
+      dbuf_printf (dbuf, "%s ", s);
+      dbuf_printOperand (IC_LEFT (ic), dbuf);
     }
 
   if (!IC_RESULT (ic) && !IC_LEFT (ic))
-    fprintf (of, s);
+    dbuf_append_str (dbuf, s);
 
   if (ic->op == SEND || ic->op == RECEIVE) {
-      fprintf(of,"{argreg = %d}",ic->argreg);
+      dbuf_printf (dbuf,"{argreg = %d}",ic->argreg);
   }
   if (ic->op == IPUSH) {
-      fprintf(of,"{parmPush = %d}",ic->parmPush);
+      dbuf_printf (dbuf,"{parmPush = %d}",ic->parmPush);
   }
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picCast)
 {
-  fprintf (of, "\t");
-  printOperand (IC_RESULT (ic), of);
-  fprintf (of, " = ");
-  printOperand (IC_LEFT (ic), of);
-  printOperand (IC_RIGHT (ic), of);
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printOperand (IC_RESULT (ic), dbuf);
+  dbuf_append_str (dbuf, " = ");
+  dbuf_printOperand (IC_LEFT (ic), dbuf);
+  dbuf_printOperand (IC_RIGHT (ic), dbuf);
+  dbuf_append_char (dbuf, '\n');
 }
 
 
 PRINTFUNC (picAssign)
 {
-  fprintf (of, "\t");
+  dbuf_append_char (dbuf, '\t');
 
   if (IC_RESULT (ic)->isaddr && IS_ITEMP (IC_RESULT (ic)))
-    fprintf (of, "*(");
+    dbuf_append_str (dbuf, "*(");
 
-  printOperand (IC_RESULT (ic), of);
+  dbuf_printOperand (IC_RESULT (ic), dbuf);
 
   if (IC_RESULT (ic)->isaddr && IS_ITEMP (IC_RESULT (ic)))
-    fprintf (of, ")");
+    dbuf_append_char (dbuf, ')');
 
-  fprintf (of, " %s ", s);
-  printOperand (IC_RIGHT (ic), of);
+  dbuf_printf (dbuf, " %s ", s);
+  dbuf_printOperand (IC_RIGHT (ic), dbuf);
 
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picLabel)
 {
-  fprintf (of, " %s($%d) :\n", IC_LABEL (ic)->name, IC_LABEL (ic)->key);
+  dbuf_printf (dbuf, " %s($%d) :\n", IC_LABEL (ic)->name, IC_LABEL (ic)->key);
 }
 
 PRINTFUNC (picGoto)
 {
-  fprintf (of, "\t");
-  fprintf (of, " goto %s($%d)\n", IC_LABEL (ic)->name, IC_LABEL (ic)->key);
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printf (dbuf, " goto %s($%d)\n", IC_LABEL (ic)->name, IC_LABEL (ic)->key);
 }
 
 PRINTFUNC (picIfx)
 {
-  fprintf (of, "\t");
-  fprintf (of, "if ");
-  printOperand (IC_COND (ic), of);
+  dbuf_append_char (dbuf, '\t');
+  dbuf_append_str (dbuf, "if ");
+  dbuf_printOperand (IC_COND (ic), dbuf);
 
   if (!IC_TRUE (ic))
-    fprintf (of, " == 0 goto %s($%d)\n", IC_FALSE (ic)->name, IC_FALSE (ic)->key);
+    dbuf_printf (dbuf, " == 0 goto %s($%d)\n", IC_FALSE (ic)->name, IC_FALSE (ic)->key);
   else
     {
-      fprintf (of, " != 0 goto %s($%d)\n", IC_TRUE (ic)->name, IC_TRUE (ic)->key);
+      dbuf_printf (dbuf, " != 0 goto %s($%d)\n", IC_TRUE (ic)->name, IC_TRUE (ic)->key);
       if (IC_FALSE (ic))
-        fprintf (of, "\tzzgoto %s\n", IC_FALSE (ic)->name);
+        dbuf_printf (dbuf, "\tzzgoto %s\n", IC_FALSE (ic)->name);
     }
 }
 
 PRINTFUNC (picInline)
 {
-  fprintf (of, "%s", IC_INLINE (ic));
+  dbuf_append_str (dbuf, IC_INLINE (ic));
 }
 
 PRINTFUNC (picReceive)
 {
-  printOperand (IC_RESULT (ic), of);
-  fprintf (of, " = %s ", s);
-  printOperand (IC_LEFT (ic), of);
-  fprintf (of, "\n");
+  dbuf_printOperand (IC_RESULT (ic), dbuf);
+  dbuf_printf (dbuf, " = %s ", s);
+  dbuf_printOperand (IC_LEFT (ic), dbuf);
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picDummyRead)
 {
-  fprintf (of, "\t");
-  fprintf (of, "%s ", s);
-  printOperand (IC_RIGHT (ic), of);
-  fprintf (of, "\n");
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printf (dbuf, "%s ", s);
+  dbuf_printOperand (IC_RIGHT (ic), dbuf);
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picCritical)
 {
-  fprintf (of, "\t");
+  dbuf_append_char (dbuf, '\t');
   if (IC_RESULT (ic))
-    printOperand (IC_RESULT (ic), of);
+    dbuf_printOperand (IC_RESULT (ic), dbuf);
   else
-    fprintf (of, "(stack)");
-  fprintf (of, " = %s ", s);
-  fprintf (of, "\n");
+    dbuf_append_str (dbuf, "(stack)");
+  dbuf_printf (dbuf, " = %s ", s);
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picEndCritical)
 {
-  fprintf (of, "\t");
-  fprintf (of, "%s = ", s);
+  dbuf_append_char (dbuf, '\t');
+  dbuf_printf (dbuf, "%s = ", s);
   if (IC_RIGHT (ic))
-    printOperand (IC_RIGHT (ic), of);
+    dbuf_printOperand (IC_RIGHT (ic), dbuf);
   else
-    fprintf (of, "(stack)");
-  fprintf (of, "\n");
+    dbuf_append_str (dbuf, "(stack)");
+  dbuf_append_char (dbuf, '\n');
 }
 
 /*-----------------------------------------------------------------*/
@@ -473,6 +486,7 @@ piCode (void *item, FILE * of)
 {
   iCode *ic = item;
   iCodeTable *icTab;
+  struct dbuf_s dbuf;
 
   if (!of)
     of = stdout;
@@ -481,7 +495,9 @@ piCode (void *item, FILE * of)
   fprintf (of, "%s(%d:%d:%d:%d:%d)\t",
            ic->filename, ic->lineno,
            ic->seq, ic->key, ic->depth, ic->supportRtn);
-  icTab->iCodePrint (of, ic, icTab->printName);
+  dbuf_init (&dbuf, 1024);
+  icTab->iCodePrint (&dbuf, ic, icTab->printName);
+  dbuf_write_and_destroy (&dbuf, of);
   return 1;
 }
 
@@ -497,6 +513,7 @@ printiCChain (iCode * icChain, FILE * of)
 {
   iCode *loop;
   iCodeTable *icTab;
+  struct dbuf_s dbuf;
 
   if (!of)
     of = stdout;
@@ -508,7 +525,9 @@ printiCChain (iCode * icChain, FILE * of)
                    loop->filename, loop->lineno,
                    loop->seq, loop->key, loop->depth, loop->supportRtn);
 
-          icTab->iCodePrint (of, loop, icTab->printName);
+          dbuf_init(&dbuf, 1024);
+          icTab->iCodePrint (&dbuf, loop, icTab->printName);
+          dbuf_write_and_destroy (&dbuf, of);
         }
     }
 }

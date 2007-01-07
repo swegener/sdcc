@@ -123,7 +123,7 @@ _xa51_getRegName (struct regs *reg)
 
 /* Generate interrupt vector table. */
 static int
-_xa51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+_xa51_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
   return TRUE;
 }

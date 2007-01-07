@@ -32,15 +32,11 @@ void glue (void);
    This is needed in gen.c of z80 port */
 char *aopLiteral (value *, int);
 void flushStatics (void);
-int printIvalCharPtr (symbol *, sym_link *, value *, FILE *);
+int printIvalCharPtr (symbol *, sym_link *, value *, struct dbuf_s *);
 
 extern symbol *interrupts[];
 extern set *publics;
-extern set *tmpfileSet;
-extern set *pipeSet;
-extern set *tmpfileNameSet;
 
-void rm_tmpfiles (void);
 int pointerTypeToGPByte (const int p_type, const char *iname, const char *oname);
 
 #endif

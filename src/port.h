@@ -8,6 +8,7 @@
 #include "SDCCicode.h"
 #include "SDCCargs.h"
 #include "SDCCpeeph.h"
+#include "dbuf.h"
 #include "mcs51/peep.h"
 
 #define TARGET_ID_MCS51    1
@@ -296,7 +297,7 @@ typedef struct
      * it returns zero, default (8051) IVT generation code
      * will be used.
      */
-    int (*genIVT) (FILE * of, symbol ** intTable, int intCount);
+    int (*genIVT) (struct dbuf_s *oBuf, symbol ** intTable, int intCount);
 
     void (*genXINIT) (FILE * of);
 

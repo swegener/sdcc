@@ -8,6 +8,7 @@
 */
 #include "common.h"
 #include "asm.h"
+#include "dbuf_string.h"
 
 /* A 'token' is like !blah or %24f and is under the programmers
    control. */
@@ -36,25 +37,8 @@ FileBaseName (char *fileFullName)
   return p;
 }
 
-static const char *
-_findMapping (const char *szKey)
-{
-  return shash_find (_h, szKey);
-}
-
-// Append a string onto another, and update the pointer to the end of
-// the new string.
-static char *
-_appendAt (char *at, char *onto, const char *sz, size_t *max)
-{
-  wassert (at && onto && sz);
-  strncpyz (at, sz, *max);
-  *max -= strlen (at);
-  return at + strlen (at);
-}
-
 void
-tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
+dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
 {
   // Under Linux PPC va_list is a structure instead of a primitive type,
   // and doesnt like being passed around.  This version turns everything
@@ -67,20 +51,17 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
 
   // This is acheived by expanding the tokens and zero arg formats into
   // one big format string, which is passed to the native printf.
-  static int    count;
-  char          noTokens[INITIAL_INLINEASM];
-  char          newFormat[INITIAL_INLINEASM];
-  char          *pInto = noTokens;
-  size_t        pIntoLen = sizeof(noTokens);
-  char          *p;
-  char          token[MAX_TOKEN_LEN];
-  const char    *sz = format;
+  static int count;
+  struct dbuf_s tmpDBuf;
+  const char *noTokens;
+  char *p;
+  char token[MAX_TOKEN_LEN];
+  const char *sz = format;
 
-  // NULL terminate it to let strlen work.
-  *pInto = '\0';
+  dbuf_init(&tmpDBuf, INITIAL_INLINEASM);
 
   /* First pass: expand all of the macros */
-  while (pIntoLen && *sz)
+  while (*sz)
     {
       if (*sz == '!')
         {
@@ -95,9 +76,9 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
             }
           *p = '\0';
           /* Now find the token in the token list */
-          if ((t = _findMapping (token)))
+          if ((t = shash_find (_h, token)))
             {
-              pInto = _appendAt (pInto, noTokens, t, &pIntoLen);
+              dbuf_append_str(&tmpDBuf, t);
             }
           else
             {
@@ -107,26 +88,18 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
         }
       else
         {
-          *pInto++ = *sz++;
-          pIntoLen--;
+          dbuf_append_char(&tmpDBuf, *sz++);
         }
     }
 
-  if (!pIntoLen)
-  {
-      fprintf(stderr,
-                "Internal error: tvsprintf overflowed on pass one.\n");
-      // Might as well go on...
-  }
-
-  *pInto = '\0';
-
   /* Second pass: Expand any macros that we own */
+  noTokens = dbuf_c_str(&tmpDBuf);
   sz = noTokens;
-  pInto = newFormat;
-  pIntoLen = sizeof(newFormat);
 
-  while (pIntoLen && *sz)
+  /* recycle tmpDBuf */
+  dbuf_init(&tmpDBuf, INITIAL_INLINEASM);
+
+  while (*sz)
     {
       if (*sz == '%')
         {
@@ -136,100 +109,96 @@ tvsprintf (char *buffer, size_t len, const char *format, va_list ap)
             {
             case 'C':
               // Code segment name.
-              pInto = _appendAt (pInto, newFormat, CODE_NAME, &pIntoLen);
+              dbuf_append_str(&tmpDBuf, CODE_NAME);
               sz++;
               break;
+
             case 'F':
               // Source file name.
-              pInto = _appendAt (pInto, newFormat, fullSrcFileName, &pIntoLen);
+              dbuf_append_str(&tmpDBuf, fullSrcFileName);
               sz++;
               break;
+
             case 'N':
               // Current function name.
-              pInto = _appendAt (pInto, newFormat, currFunc->rname, &pIntoLen);
+              dbuf_append_str(&tmpDBuf, currFunc->rname);
               sz++;
               break;
+
             case 'I':
-              {
-                // Unique ID.
-                char id[20];
-                SNPRINTF (id, sizeof(id), "%u", ++count);
-                pInto = _appendAt (pInto, newFormat, id, &pIntoLen);
-                sz++;
-                break;
-              }
+              // Unique ID.
+              dbuf_printf(&tmpDBuf, "%u", ++count);
+              sz++;
+              break;
+
             default:
               // Not one of ours.  Copy until the end.
-              *pInto++ = '%';
-              pIntoLen--;
-              while (pIntoLen && !isalpha ((unsigned char)*sz))
-                {
-                  *pInto++ = *sz++;
-                  pIntoLen--;
-                }
-                if (pIntoLen)
-                {
-                    *pInto++ = *sz++;
-                    pIntoLen--;
-                }
+              dbuf_append_char(&tmpDBuf, '%');
+              while (!isalpha ((unsigned char)*sz))
+                dbuf_append_char(&tmpDBuf, *sz++);
+
+              dbuf_append_char(&tmpDBuf, *sz++);
             }
         }
       else
         {
-          *pInto++ = *sz++;
-          pIntoLen--;
+          dbuf_append_char(&tmpDBuf, *sz++);
         }
     }
 
-  if (!pIntoLen)
-  {
-      fprintf(stderr,
-                "Internal error: tvsprintf overflowed on pass two.\n");
-      // Might as well go on...
-  }
+  dbuf_free(noTokens);
 
-  *pInto = '\0';
+  sz = dbuf_c_str(&tmpDBuf);
 
-  // Now do the actual printing
-#if defined(HAVE_VSNPRINTF)
-    {
-        int wrlen;
-        wrlen = vsnprintf (buffer, len, newFormat, ap);
+  dbuf_vprintf(dbuf, sz, ap);
 
-        if (wrlen < 0 || (size_t)wrlen >= len)
-        {
-            fprintf(stderr, "Internal error: tvsprintf truncated.\n");
-        }
-    }
-
-#else
-    vsprintf (buffer, newFormat, ap);
-    if (strlen(buffer) >= len)
-    {
-        fprintf(stderr, "Internal error: tvsprintf overflowed.\n");
-    }
-#endif
+  dbuf_destroy(&tmpDBuf);
 }
 
 void
-tfprintf (FILE * fp, const char *szFormat,...)
+dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat,...)
 {
   va_list ap;
-  char buffer[INITIAL_INLINEASM];
-
   va_start (ap, szFormat);
-  tvsprintf (buffer, INITIAL_INLINEASM, szFormat, ap);
+  dbuf_tvprintf (dbuf, szFormat, ap);
   va_end(ap);
-  fputs (buffer, fp);
 }
 
 void
 tsprintf (char *buffer, size_t len, const char *szFormat,...)
 {
   va_list ap;
+  struct dbuf_s dbuf;
+  size_t copyLen;
+
+  dbuf_init(&dbuf, INITIAL_INLINEASM);
+
   va_start (ap, szFormat);
-  tvsprintf (buffer, len, szFormat, ap);
+  dbuf_tvprintf (&dbuf, szFormat, ap);
   va_end(ap);
+
+  copyLen = min(len - 1, dbuf_get_length(&dbuf));
+  memcpy(buffer, dbuf_get_buf(&dbuf), copyLen);
+  buffer[copyLen] = '\0';
+  dbuf_destroy(&dbuf);
+}
+
+void
+tfprintf (FILE *fp, const char *szFormat,...)
+{
+  va_list ap;
+  struct dbuf_s dbuf;
+  size_t len;
+
+  dbuf_init(&dbuf, INITIAL_INLINEASM);
+
+  va_start (ap, szFormat);
+  dbuf_tvprintf (&dbuf, szFormat, ap);
+  va_end(ap);
+
+  len = dbuf_get_length(&dbuf);
+  fwrite(dbuf_get_buf(&dbuf), 1, len, fp);
+  dbuf_destroy(&dbuf);
 }
 
 void
@@ -249,42 +218,26 @@ asm_addTree (const ASM_MAPPINGS * pMappings)
 
 /*-----------------------------------------------------------------*/
 /* printILine - return the readable i-code for this ic             */
-/*                                                                 */
-/* iCodePrint wants a file stream so we need a temporary file to   */
-/* fool it                                                         */
 /*-----------------------------------------------------------------*/
 char *
 printILine (iCode *ic)
 {
-  static char verbalICode[1024];
-  FILE *tmpFile;
+  char *verbalICode;
+  struct dbuf_s tmpBuf;
   iCodeTable *icTab=getTableEntry(ic->op);
-  int ret;
+
+  dbuf_init(&tmpBuf, 1024);
 
   if (INLINEASM == ic->op)
-    return "inline";
+    dbuf_append (&tmpBuf, "inline", (sizeof "inline") - 1);
+  else {
+    /* stuff the temporary file with the readable icode */
+    icTab->iCodePrint(&tmpBuf, ic, icTab->printName);
+  }
 
-  tmpFile = tempfile();
-  assert(NULL != tmpFile);
-  if (NULL == tmpFile)
-    return "";  /* return empty line if temporary file creation failed */
-
-  addSetHead(&tmpfileSet, tmpFile);
-
-  /* stuff the temporary file with the readable icode */
-  icTab->iCodePrint(tmpFile, ic, icTab->printName);
-
-  /* now swallow it */
-  rewind(tmpFile);
-  fgets(verbalICode, sizeof(verbalICode), tmpFile);
-
-  /* clean up the mess, we'll return here for all icodes!!
-   * Actually the temporary file is only closed. It will be
-   * removed by rm_tmpfiles().
-   */
-  ret = fclose(tmpFile);
-  assert(!ret);
-  deleteSetItem(&tmpfileSet, tmpFile);
+  /* null terminate the buffer */
+  dbuf_c_str(&tmpBuf);
+  verbalICode = dbuf_detach(&tmpBuf);
 
   /* kill the trailing NL */
   if ('\n' == verbalICode[strlen(verbalICode) - 1])

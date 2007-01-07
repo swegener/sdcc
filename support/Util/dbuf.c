@@ -1,8 +1,8 @@
 /*
   dbuf.c - Dynamic buffer implementation
-  version 1.1.3, December 17th, 2006
+  version 1.2.0, January 6th, 2007
 
-  Copyright (c) 2002-2006 Borut Razem
+  Copyright (c) 2002-2007 Borut Razem
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,10 +33,12 @@
 
 /*
  * Assure that the buffer is large enough to hold
- * size bytes; enlarge it if necessary.
+ * current length + size bytes; enlarge it if necessary.
+ *
+ * Intended for internal use.
  */
 
-static int dbuf_expand(struct dbuf_s *dbuf, size_t size)
+int _dbuf_expand(struct dbuf_s *dbuf, size_t size)
 {
   assert(dbuf->alloc != 0);
   assert(dbuf->buf != NULL);
@@ -101,14 +103,14 @@ struct dbuf_s *dbuf_new(size_t size)
  * Set the buffer size. Buffer size can be only decreased.
  */
 
-int dbuf_set_size(struct dbuf_s *dbuf, size_t size)
+int dbuf_set_length(struct dbuf_s *dbuf, size_t len)
 {
   assert(dbuf != NULL);
   assert(dbuf->alloc != 0);
-  assert(size <= dbuf->len);
+  assert(len <= dbuf->len);
 
-  if (size <= dbuf->len) {
-    dbuf->len = size;
+  if (len <= dbuf->len) {
+    dbuf->len = len;
     return 1;
   }
 
@@ -120,15 +122,15 @@ int dbuf_set_size(struct dbuf_s *dbuf, size_t size)
  * Append the buf to the end of the buffer.
  */
 
-int dbuf_append(struct dbuf_s *dbuf, const void *buf, size_t size)
+int dbuf_append(struct dbuf_s *dbuf, const void *buf, size_t len)
 {
   assert(dbuf != NULL);
   assert(dbuf->alloc != 0);
   assert(dbuf->buf != NULL);
 
-  if (dbuf_expand(dbuf, size) != 0) {
-    memcpy(&(((char *)dbuf->buf)[dbuf->len]), buf, size);
-    dbuf->len += size;
+  if (_dbuf_expand(dbuf, len) != 0) {
+    memcpy(&(((char *)dbuf->buf)[dbuf->len]), buf, len);
+    dbuf->len += len;
     return 1;
   }
 
@@ -147,10 +149,12 @@ const char *dbuf_c_str(struct dbuf_s *dbuf)
   assert(dbuf->alloc != 0);
   assert(dbuf->buf != NULL);
 
-  dbuf_expand(dbuf, 1);
-  ((char *)dbuf->buf)[dbuf->len] = '\0';
+  if (_dbuf_expand(dbuf, 1) != 0) {
+    ((char *)dbuf->buf)[dbuf->len] = '\0';
+    return dbuf->buf;
+  }
 
-  return dbuf->buf;
+  return NULL;
 }
 
 
@@ -169,10 +173,10 @@ const void *dbuf_get_buf(struct dbuf_s *dbuf)
 
 
 /*
- * Get the buffer size.
+ * Get the buffer length.
  */
 
-size_t dbuf_get_size(struct dbuf_s *dbuf)
+size_t dbuf_get_length(struct dbuf_s *dbuf)
 {
   assert(dbuf != NULL);
   assert(dbuf->alloc != 0);
@@ -255,4 +259,16 @@ void dbuf_delete(struct dbuf_s *dbuf)
 {
   dbuf_destroy(dbuf);
   free(dbuf);
+}
+
+
+/*
+ * Free detached buffer.
+ *
+ * See dbuf_detach()
+ */
+
+void dbuf_free(const void *buf)
+{
+  free((void *)buf);
 }

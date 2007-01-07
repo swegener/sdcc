@@ -137,7 +137,7 @@ static char *_fReceive[] =
 static char **_fReturn;
 static char **_fTmp;
 
-extern FILE *codeOutFile;
+extern struct dbuf_s *codeOutBuf;
 
 enum
   {
@@ -388,7 +388,7 @@ _tidyUp (char *buf)
 }
 
 static lineNode *
-_newLineNode (char *line)
+_newLineNode (const char *line)
 {
   lineNode *pl;
 
@@ -401,11 +401,16 @@ _newLineNode (char *line)
 static void
 _vemit2 (const char *szFormat, va_list ap)
 {
-  char buffer[INITIAL_INLINEASM];
+  struct dbuf_s dbuf;
+  const char *buffer;
 
-  tvsprintf (buffer, sizeof(buffer), szFormat, ap);
+  dbuf_init(&dbuf, INITIAL_INLINEASM);
 
-  _tidyUp (buffer);
+  dbuf_tvprintf (&dbuf, szFormat, ap);
+
+  buffer = dbuf_c_str(&dbuf);
+
+  _tidyUp ((char *)buffer);
   _G.lines.current = (_G.lines.current ?
               connectLine (_G.lines.current, _newLineNode (buffer)) :
               (_G.lines.head = _newLineNode (buffer)));
@@ -414,6 +419,8 @@ _vemit2 (const char *szFormat, va_list ap)
   _G.lines.current->isDebug = _G.lines.isDebug;
   _G.lines.current->ic = _G.current_iCode;
   _G.lines.current->isComment = (*buffer == ';');
+
+  dbuf_destroy(&dbuf);
 }
 
 static void
@@ -8109,7 +8116,9 @@ genZ80Code (iCode * lic)
         }
       if (options.iCodeInAsm)
         {
-          emit2 (";ic:%d: %s", ic->key, printILine(ic));
+          char *iLine = printILine(ic);
+          emit2 (";ic:%d: %s", ic->key, iLine);
+          dbuf_free(iLine);
         }
       /* if the result is marked as
          spilt and rematerializable or code for
@@ -8393,16 +8402,16 @@ genZ80Code (iCode * lic)
   /* This is unfortunate */
   /* now do the actual printing */
   {
-    FILE *fp = codeOutFile;
-    if (isInHome () && codeOutFile == code->oFile)
-      codeOutFile = home->oFile;
-    printLine (_G.lines.head, codeOutFile);
+    struct dbuf_s *buf = codeOutBuf;
+    if (isInHome () && codeOutBuf == &code->oBuf)
+      codeOutBuf = &home->oBuf;
+    printLine (_G.lines.head, codeOutBuf);
     if (_G.flushStatics)
       {
         flushStatics ();
         _G.flushStatics = 0;
       }
-    codeOutFile = fp;
+    codeOutBuf = buf;
   }
 
   freeTrace(&_G.lines.trace);

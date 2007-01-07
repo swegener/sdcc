@@ -172,7 +172,7 @@ static void
 static char *
 	debugAopGet (char *str, operand * op)
 {
-	if (str)
+        if (str)
 		debugLog (str);
 
 	printOperand (op, debugF);

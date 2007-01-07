@@ -5,6 +5,8 @@
 #ifndef SDCCMEM_H
 #define SDCCMEM_H
 
+#include "dbuf.h"
+
 struct set;
 struct value;
 struct eBBlock;
@@ -23,7 +25,7 @@ typedef struct memmap
     unsigned bitsp:1;		/* 1 = bit addressable space  */
     unsigned codesp:1;		/* 1 = code space             */
     unsigned regsp:1;		/* 1= sfr space               */
-    FILE *oFile;		/* object file associated     */
+    struct dbuf_s oBuf;		/* object buffer associated   */
     struct set *syms;		/* symbols defined in this segment */
   }
 memmap;
@@ -103,7 +105,7 @@ int allocVariables (struct symbol *);
 void overlay2Set ();
 void overlay2data ();
 void redoStackOffsets ();
-void printAllocInfo (struct symbol *, FILE *);
+void printAllocInfo (struct symbol *, struct dbuf_s *);
 void doOverlays (struct eBBlock **, int count);
 void deleteFromSeg(struct symbol *);
 #endif

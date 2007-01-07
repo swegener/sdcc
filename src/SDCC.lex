@@ -35,7 +35,7 @@ IS      (u|U|l|L)*
 #include <ctype.h>
 #include "common.h"
 #include "newalloc.h"
-#include "dbuf.h"
+#include "dbuf_string.h"
 
 #define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
                                 check_type())
@@ -78,7 +78,7 @@ _?"_asm"         {
   count();
   if (!options.std_sdcc && yytext[1] != '_')
     {
-      dbuf_append(&asmbuff, yytext, strlen(yytext));
+      dbuf_append_str(&asmbuff, yytext);
     }
   else
     {
@@ -90,10 +90,10 @@ _?"_asm"         {
 }
 <asm>\n        {
   count();
-  dbuf_append(&asmbuff, yytext, 1);
+  dbuf_append_char(&asmbuff, *yytext);
 }
 <asm>.         {
-  dbuf_append(&asmbuff, yytext, 1);
+  dbuf_append_char(&asmbuff, *yytext);
 }
 "at"           { count(); TKEYWORDSDCC(AT); }
 "__at"         { count(); TKEYWORD(AT); }
@@ -377,9 +377,9 @@ static char *stringLiteral(void)
   if (dbuf.alloc == 0)
     dbuf_init(&dbuf, STR_BUF_CHUNCK_LEN);
   else
-    dbuf_set_size(&dbuf, 0);
+    dbuf_set_length(&dbuf, 0);
 
-  dbuf_append(&dbuf, "\"", 1);
+  dbuf_append_char(&dbuf, '"');
   /* put into the buffer till we hit the first \" */
 
   while ((ch = input()) != 0) {
@@ -402,7 +402,7 @@ static char *stringLiteral(void)
     case '\n':
       /* if new line we have a new line break, which is illegal */
       werror(W_NEWLINE_IN_STRING);
-      dbuf_append(&dbuf, "\n", 1);
+      dbuf_append_char(&dbuf, '\n');
       lineno = ++mylineno;
       column = 0;
       break;
@@ -411,7 +411,7 @@ static char *stringLiteral(void)
       /* if this is a quote then we have work to do */
       /* find the next non whitespace character     */
       /* if that is a double quote then carry on    */
-      dbuf_append(&dbuf, "\"", 1);  /* Pass end of this string or substring to evaluator */
+      dbuf_append_char(&dbuf, '"');  /* Pass end of this string or substring to evaluator */
       while ((ch = input()) && (isspace(ch) || ch == '\\' || ch == '#')) {
         switch (ch) {
         case '\\':
@@ -437,11 +437,10 @@ static char *stringLiteral(void)
             const char *line;
             
             dbuf_init(&linebuf, STR_BUF_CHUNCK_LEN);
-            dbuf_append(&linebuf, "#", 1);
+            dbuf_append_char(&linebuf, '#');
 
             while ((ch = input()) && ch != '\n') {
-              buf[0] = ch;
-              dbuf_append(&linebuf, buf, 1);
+              dbuf_append_char(&linebuf, (char)ch);
             }
 
             if (ch == '\n') {
@@ -472,8 +471,7 @@ static char *stringLiteral(void)
       break;
 
     default:
-      buf[0] = ch;
-      dbuf_append(&dbuf, buf, 1);  /* Put next substring introducer into output string */
+      dbuf_append_char(&dbuf, (char)ch);  /* Put next substring introducer into output string */
     }
   }
 

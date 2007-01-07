@@ -1,9 +1,12 @@
 #ifndef ASM_PORT_INCLUDE
 #define ASM_PORT_INCLUDE
 
+#include "dbuf.h"
+
 void tfprintf (FILE * fp, const char *szFormat, ...);
 void tsprintf (char *buffer, size_t len, const char *szFormat, ...);
-void tvsprintf (char *buffer, size_t len, const char *szFormat, va_list ap);
+void dbuf_tprintf (struct dbuf_s *dbuf, const char *szFormat, ...);
+void dbuf_tvprintf (struct dbuf_s *dbuf, const char *szFormat, va_list ap);
 
 typedef struct
   {

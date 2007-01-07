@@ -24,6 +24,7 @@
 -------------------------------------------------------------------------*/
 
 #include "common.h"
+#include "dbuf_string.h"
 
 #define ISCHARDIGIT(c) isdigit((unsigned char)c)
 #define ISCHARSPACE(c) isspace((unsigned char)c)
@@ -1198,13 +1199,10 @@ callFuncByName (char *fname,
 /* printLine - prints a line chain into a given file               */
 /*-----------------------------------------------------------------*/
 void
-printLine (lineNode * head, FILE * of)
+printLine (lineNode * head, struct dbuf_s * oBuf)
 {
   iCode *last_ic = NULL;
   bool debug_iCode_tracking = (getenv("DEBUG_ICODE_TRACKING")!=NULL);
-
-  if (!of)
-    of = stdout;
 
   while (head)
     {
@@ -1214,23 +1212,23 @@ printLine (lineNode * head, FILE * of)
           if (debug_iCode_tracking)
             {
               if (head->ic)
-                fprintf (of, "; block = %d, seq = %d\n",
+                dbuf_printf (oBuf, "; block = %d, seq = %d\n",
                          head->ic->block, head->ic->seq);
               else
-                fprintf (of, "; iCode lost\n");
+                dbuf_append_str (oBuf, "; iCode lost\n");
             }
         }
 
       /* don't indent comments & labels */
       if (head->line &&
           (head->isComment || head->isLabel)) {
-        fprintf (of, "%s\n", head->line);
+        dbuf_printf (oBuf, "%s\n", head->line);
       } else {
         if (head->isInline && *head->line=='#') {
           // comment out preprocessor directives in inline asm
-          fprintf (of, ";");
+          dbuf_append_char (oBuf, ';');
         }
-        fprintf (of, "\t%s\n", head->line);
+        dbuf_printf (oBuf, "\t%s\n", head->line);
       }
       head = head->next;
     }
@@ -1274,7 +1272,7 @@ newPeepRule (lineNode * match,
 /* newLineNode - creates a new peep line                           */
 /*-----------------------------------------------------------------*/
 lineNode *
-newLineNode (char *line)
+newLineNode (const char *line)
 {
   lineNode *pl;
 

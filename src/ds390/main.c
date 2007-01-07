@@ -10,6 +10,7 @@
 #include "gen.h"
 #include "BuildCmd.h"
 #include "MySystem.h"
+#include "dbuf_string.h"
 #include "../SDCCutil.h"
 #include "../SDCCglobl.h"
 static char _defaultRules[] =
@@ -233,49 +234,49 @@ _ds390_genAssemblerPreamble (FILE * of)
 
 /* Generate interrupt vector table. */
 static int
-_ds390_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+_ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
   int i;
 
   if (options.model != MODEL_FLAT24)
     {
-      fprintf (of, "\tljmp\t__sdcc_gsinit_startup\n");
+      dbuf_printf (oBuf, "\tljmp\t__sdcc_gsinit_startup\n");
 
       /* now for the other interrupts */
       for (i = 0; i < maxInterrupts; i++)
         {
           if (interrupts[i])
             {
-              fprintf (of, "\tljmp\t%s\n", interrupts[i]->rname);
+              dbuf_printf (oBuf, "\tljmp\t%s\n", interrupts[i]->rname);
               if ( i != maxInterrupts - 1 )
-                fprintf (of, "\t.ds\t5\n");
+                dbuf_printf (oBuf, "\t.ds\t5\n");
             }
           else
             {
-              fprintf (of, "\treti\n");
+              dbuf_printf (oBuf, "\treti\n");
               if ( i != maxInterrupts - 1 )
-                fprintf (of, "\t.ds\t7\n");
+                dbuf_printf (oBuf, "\t.ds\t7\n");
             }
         }
       return TRUE;
     }
 
-  fprintf (of, "\tajmp\t__reset_vect\n");
+  dbuf_printf (oBuf, "\tajmp\t__reset_vect\n");
 
   /* now for the other interrupts */
   for (i = 0; i < maxInterrupts; i++)
     {
       if (interrupts[i])
 	{
-	  fprintf (of, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+	  dbuf_printf (oBuf, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
 	}
       else
 	{
-	  fprintf (of, "\treti\n\t.ds\t7\n");
+	  dbuf_printf (oBuf, "\treti\n\t.ds\t7\n");
 	}
     }
 
-  fprintf (of, "__reset_vect:\n\tljmp\t__sdcc_gsinit_startup\n");
+  dbuf_printf (oBuf, "__reset_vect:\n\tljmp\t__sdcc_gsinit_startup\n");
 
   return TRUE;
 }
@@ -1011,7 +1012,7 @@ static void _tininative_finaliseOptions (void)
     options.cc_only =1;
 }
 
-static int _tininative_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+static int _tininative_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
     return TRUE;
 }
@@ -1267,19 +1268,20 @@ PORT tininative_port =
 };
 
 static int
-_ds400_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+_ds400_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
-    /* We can't generate a static IVT, since the boot rom creates one
-     * for us in rom_init.
-     *
-     * we must patch it as part of the C startup.
-     */
-     fprintf (of, ";\tDS80C400 IVT must be generated at runtime.\n");
-    fprintf (of, "\tsjmp\t__sdcc_400boot\n");
-    fprintf (of, "\t.ascii\t'TINI'\t; required signature for 400 boot loader.\n");
-    fprintf (of, "\t.db\t0\t; selected bank: zero *should* work...\n");
-    fprintf (of, "\t__sdcc_400boot:\tljmp\t__sdcc_gsinit_startup\n");
-     return TRUE;
+  /* We can't generate a static IVT, since the boot rom creates one
+   * for us in rom_init.
+   *
+   * we must patch it as part of the C startup.
+   */
+  dbuf_printf (oBuf, ";\tDS80C400 IVT must be generated at runtime.\n");
+  dbuf_printf (oBuf, "\tsjmp\t__sdcc_400boot\n");
+  dbuf_printf (oBuf, "\t.ascii\t'TINI'\t; required signature for 400 boot loader.\n");
+  dbuf_printf (oBuf, "\t.db\t0\t; selected bank: zero *should* work...\n");
+  dbuf_printf (oBuf, "\t__sdcc_400boot:\tljmp\t__sdcc_gsinit_startup\n");
+
+  return TRUE;
 }
 
 

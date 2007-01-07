@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "newalloc.h"
+#include "dbuf_string.h"
 
 #include "SDCCsymt.h"
 
@@ -2795,10 +2796,8 @@ void PT(sym_link *type)
 void
 printTypeChain (sym_link * start, FILE * of)
 {
+  struct dbuf_s dbuf;
   int nlr = 0;
-  value *args;
-  sym_link * type, * search;
-  STORAGE_CLASS scls;
 
   if (!of)
     {
@@ -2806,8 +2805,23 @@ printTypeChain (sym_link * start, FILE * of)
       nlr = 1;
     }
 
+  dbuf_init (&dbuf, 1024);
+  dbuf_printTypeChain (start, &dbuf);
+  dbuf_write_and_destroy (&dbuf, of);
+
+  if (nlr)
+    putc ('\n', of);
+}
+
+void
+dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
+{
+  value *args;
+  sym_link * type, * search;
+  STORAGE_CLASS scls;
+
   if (start==NULL) {
-    fprintf (of, "void");
+    dbuf_append_str (dbuf, "void");
     return;
   }
 
@@ -2827,18 +2841,18 @@ printTypeChain (sym_link * start, FILE * of)
       if (type==start) {
         switch (scls) 
           {
-          case S_DATA: fprintf (of, "data-"); break;
-          case S_XDATA: fprintf (of, "xdata-"); break;
-          case S_SFR: fprintf (of, "sfr-"); break;
-          case S_SBIT: fprintf (of, "sbit-"); break;
-          case S_CODE: fprintf (of, "code-"); break;
-          case S_IDATA: fprintf (of, "idata-"); break;
-          case S_PDATA: fprintf (of, "pdata-"); break;
-          case S_LITERAL: fprintf (of, "literal-"); break;
-          case S_STACK: fprintf (of, "stack-"); break;
-          case S_XSTACK: fprintf (of, "xstack-"); break;
-          case S_BIT: fprintf (of, "bit-"); break;
-          case S_EEPROM: fprintf (of, "eeprom-"); break;
+          case S_DATA: dbuf_append_str (dbuf, "data-"); break;
+          case S_XDATA: dbuf_append_str (dbuf, "xdata-"); break;
+          case S_SFR: dbuf_append_str (dbuf, "sfr-"); break;
+          case S_SBIT: dbuf_append_str (dbuf, "sbit-"); break;
+          case S_CODE: dbuf_append_str (dbuf, "code-"); break;
+          case S_IDATA: dbuf_append_str (dbuf, "idata-"); break;
+          case S_PDATA: dbuf_append_str (dbuf, "pdata-"); break;
+          case S_LITERAL: dbuf_append_str (dbuf, "literal-"); break;
+          case S_STACK: dbuf_append_str (dbuf, "stack-"); break;
+          case S_XSTACK: dbuf_append_str (dbuf, "xstack-"); break;
+          case S_BIT: dbuf_append_str (dbuf, "bit-"); break;
+          case S_EEPROM: dbuf_append_str (dbuf, "eeprom-"); break;
           default: break;
           }
       }
@@ -2847,57 +2861,57 @@ printTypeChain (sym_link * start, FILE * of)
         {
           if (!IS_FUNC(type)) {
             if (DCL_PTR_VOLATILE (type)) {
-              fprintf (of, "volatile-");
+              dbuf_append_str (dbuf, "volatile-");
             }
             if (DCL_PTR_CONST (type)) {
-              fprintf (of, "const-");
+              dbuf_append_str (dbuf, "const-");
             }
           }
           switch (DCL_TYPE (type))
             {
             case FUNCTION:
-              fprintf (of, "function %s %s", 
+              dbuf_printf (dbuf, "function %s %s", 
                        (IFFUNC_ISBUILTIN(type) ? "__builtin__" : " "),
                        (IFFUNC_ISJAVANATIVE(type) ? "_JavaNative" : " "));
-              fprintf (of, "( ");
+              dbuf_append_str (dbuf, "( ");
               for (args = FUNC_ARGS(type); 
                    args; 
                    args=args->next) {
-                printTypeChain(args->type, of);
+                dbuf_printTypeChain(args->type, dbuf);
                 if (args->next)
-                  fprintf(of, ", ");
+                  dbuf_append_str (dbuf, ", ");
               }
-              fprintf (of, ") ");
+              dbuf_append_str (dbuf, ") ");
               break;
             case GPOINTER:
-              fprintf (of, "generic* ");
+              dbuf_append_str (dbuf, "generic* ");
               break;
             case CPOINTER:
-              fprintf (of, "code* ");
+              dbuf_append_str (dbuf, "code* ");
               break;
             case FPOINTER:
-              fprintf (of, "xdata* ");
+              dbuf_append_str (dbuf, "xdata* ");
               break;
             case EEPPOINTER:
-              fprintf (of, "eeprom* ");
+              dbuf_append_str (dbuf, "eeprom* ");
               break;
             case POINTER:
-              fprintf (of, "near* ");
+              dbuf_append_str (dbuf, "near* ");
               break;
             case IPOINTER:
-              fprintf (of, "idata* ");
+              dbuf_append_str (dbuf, "idata* ");
               break;
             case PPOINTER:
-              fprintf (of, "pdata* ");
+              dbuf_append_str (dbuf, "pdata* ");
               break;
             case UPOINTER:
-              fprintf (of, "unknown* ");
+              dbuf_append_str (dbuf, "unknown* ");
               break;
             case ARRAY:
               if (DCL_ELEM(type)) {
-                fprintf (of, "[%d] ", DCL_ELEM(type));
+                dbuf_printf (dbuf, "[%d] ", DCL_ELEM(type));
               } else {
-                fprintf (of, "[] ");
+                dbuf_append_str (dbuf, "[] ");
               }
               break;
             }
@@ -2905,57 +2919,57 @@ printTypeChain (sym_link * start, FILE * of)
       else
         {
           if (SPEC_VOLATILE (type))
-            fprintf (of, "volatile-");
+            dbuf_append_str (dbuf, "volatile-");
           if (SPEC_CONST (type))
-            fprintf (of, "const-");
+            dbuf_append_str (dbuf, "const-");
           if (SPEC_USIGN (type))
-            fprintf (of, "unsigned-");
+            dbuf_append_str (dbuf, "unsigned-");
           switch (SPEC_NOUN (type))
             {
             case V_INT:
               if (IS_LONG (type))
-                fprintf (of, "long-");
-              fprintf (of, "int");
+                dbuf_append_str (dbuf, "long-");
+              dbuf_append_str (dbuf, "int");
               break;
 
             case V_CHAR:
-              fprintf (of, "char");
+              dbuf_append_str (dbuf, "char");
               break;
 
             case V_VOID:
-              fprintf (of, "void");
+              dbuf_append_str (dbuf, "void");
               break;
 
             case V_FLOAT:
-              fprintf (of, "float");
+              dbuf_append_str (dbuf, "float");
               break;
 
             case V_FIXED16X16:
-              fprintf (of, "fixed16x16");
+              dbuf_append_str (dbuf, "fixed16x16");
               break;
 
             case V_STRUCT:
-              fprintf (of, "struct %s", SPEC_STRUCT (type)->tag);
+              dbuf_printf (dbuf, "struct %s", SPEC_STRUCT (type)->tag);
               break;
 
             case V_SBIT:
-              fprintf (of, "sbit");
+              dbuf_append_str (dbuf, "sbit");
               break;
 
             case V_BIT:
-              fprintf (of, "bit");
+              dbuf_append_str (dbuf, "bit");
               break;
 
             case V_BITFIELD:
-              fprintf (of, "bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
+              dbuf_printf (dbuf, "bitfield {%d,%d}", SPEC_BSTR (type), SPEC_BLEN (type));
               break;
 
             case V_DOUBLE:
-              fprintf (of, "double");
+              dbuf_append_str (dbuf, "double");
               break;
 
             default:
-              fprintf (of, "unknown type");
+              dbuf_append_str (dbuf, "unknown type");
               break;
             }
         }
@@ -2964,10 +2978,8 @@ printTypeChain (sym_link * start, FILE * of)
         search = search->next;
       type = search;
       if (type)
-        fputc (' ', of);
+          dbuf_append_char(dbuf, ' ');
     }
-  if (nlr)
-    fprintf (of, "\n");
 }
 
 /*--------------------------------------------------------------------*/

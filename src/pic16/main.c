@@ -31,6 +31,7 @@
 #include "SDCCutil.h"
 #include "glue.h"
 #include "pcode.h"
+#include "dbuf_string.h"
 
 
 static char _defaultRules[] =
@@ -979,35 +980,35 @@ _pic16_genAssemblerPreamble (FILE * of)
 
 /* Generate interrupt vector table. */
 static int
-_pic16_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+_pic16_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
 #if 1
 	/* PIC18F family has only two interrupts, the high and the low
 	 * priority interrupts, which reside at 0x0008 and 0x0018 respectively - VR */
 
 	if((!pic16_options.omit_ivt) || (pic16_options.omit_ivt && pic16_options.leave_reset)) {
-		fprintf(of, "; RESET vector\n");
-		fprintf(of, "\tgoto\t__sdcc_gsinit_startup\n");
+		dbuf_printf(oBuf, "; RESET vector\n");
+		dbuf_printf(oBuf, "\tgoto\t__sdcc_gsinit_startup\n");
 	}
 	
 	if(!pic16_options.omit_ivt) {
-		fprintf(of, "\tres 4\n");
+		dbuf_printf(oBuf, "\tres 4\n");
 
 
-		fprintf(of, "; High priority interrupt vector 0x0008\n");
+		dbuf_printf(oBuf, "; High priority interrupt vector 0x0008\n");
 		if(interrupts[1]) {
-			fprintf(of, "\tgoto\t%s\n", interrupts[1]->rname);
-			fprintf(of, "\tres\t12\n"); 
+			dbuf_printf(oBuf, "\tgoto\t%s\n", interrupts[1]->rname);
+			dbuf_printf(oBuf, "\tres\t12\n"); 
 		} else {
-			fprintf(of, "\tretfie\n");
-			fprintf(of, "\tres\t14\n");
+			dbuf_printf(oBuf, "\tretfie\n");
+			dbuf_printf(oBuf, "\tres\t14\n");
 		}
 
-		fprintf(of, "; Low priority interrupt vector 0x0018\n");
+		dbuf_printf(oBuf, "; Low priority interrupt vector 0x0018\n");
 		if(interrupts[2]) {
-			fprintf(of, "\tgoto\t%s\n", interrupts[2]->rname);
+			dbuf_printf(oBuf, "\tgoto\t%s\n", interrupts[2]->rname);
 		} else {
-			fprintf(of, "\tretfie\n");
+			dbuf_printf(oBuf, "\tretfie\n");
 		}
 	}
 #endif

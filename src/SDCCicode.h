@@ -201,7 +201,7 @@ typedef struct icodeFuncTable
   {
     int icode;
     char *printName;
-    void (*iCodePrint) (FILE *, iCode *, char *);
+    void (*iCodePrint) (struct dbuf_s *, iCode *, char *);
     iCode *(*iCodeCopy) (iCode *);
   }
 iCodeTable;
@@ -328,6 +328,7 @@ operand *operandFromLink (sym_link *);
 sym_link *aggrToPtr (sym_link *, bool);
 int aggrToPtrDclType (sym_link *, bool);
 int piCode (void *, FILE *);
+int dbuf_printOperand (operand *, struct dbuf_s *);
 int printOperand (operand *, FILE *);
 void setOperandType (operand *, sym_link *);
 bool isOperandInFarSpace (operand *);

@@ -1,8 +1,8 @@
 /*
   dbuf.h - Dynamic buffer interface
-  version 1.1.1, April 11th, 2003
+  version 1.2.0, January 6th, 2007
 
-  Copyright (c) 2002-2003 Borut Razem
+  Copyright (c) 2002-2007 Borut Razem
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@
 
 struct dbuf_s {
   size_t alloc;   /* size of allocated buffer in bytes */
-  size_t len;     /* actual size of the buffer in bytes */
+  size_t len;     /* actual length of the buffer in bytes */
   void *buf;      /* pointer to the buffer, allocated on heap */
 };
 
@@ -41,17 +41,19 @@ struct dbuf_s {
 extern "C" {
 #endif
 
+int _dbuf_expand(struct dbuf_s *dbuf, size_t size);
 struct dbuf_s *dbuf_new(size_t size);
 int dbuf_init(struct dbuf_s *dbuf, size_t size);
-int dbuf_set_size(struct dbuf_s *dbuf, size_t size);
-int dbuf_append(struct dbuf_s *dbuf, const void *buf, size_t size);
+int dbuf_set_length(struct dbuf_s *dbuf, size_t size);
+int dbuf_append(struct dbuf_s *dbuf, const void *buf, size_t len);
 const void *dbuf_get_buf(struct dbuf_s *dbuf);
-size_t dbuf_get_size(struct dbuf_s *dbuf);
+size_t dbuf_get_length(struct dbuf_s *dbuf);
 const char *dbuf_c_str(struct dbuf_s *dbuf);
 int dbuf_trim(struct dbuf_s *dbuf);
 void *dbuf_detach(struct dbuf_s *dbuf);
 void dbuf_destroy(struct dbuf_s *dbuf);
 void dbuf_delete(struct dbuf_s *dbuf);
+void dbuf_free(const void *buf);
 
 #ifdef __cplusplus
 }

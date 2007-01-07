@@ -173,7 +173,7 @@ ast;
 
 /* forward declarations for global variables */
 extern ast *staticAutos;
-extern FILE *codeOutFile;
+extern struct dbuf_s *codeOutBuf;
 extern struct memmap *GcurMemmap;
 
 /* forward definitions for functions   */

@@ -307,18 +307,6 @@ extern set *libDirsSet;         /* list of lib search directories */
 
 void setParseWithComma (set **, const char *);
 
-/** Creates a temporary file a'la tmpfile which avoids the bugs
-    in cygwin wrt c:\tmp.
-    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
-*/
-FILE *tempfile (void);
-
-/** Creates a temporary file name a'la tmpnam which avoids the bugs
-    in cygwin wrt c:\tmp.
-    Scans, in order: TMP, TEMP, TMPDIR, else uses tmpfile().
-*/
-char *tempfilename (void);
-
 /** An assert() macro that will go out through sdcc's error
     system.
 */

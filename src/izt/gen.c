@@ -234,7 +234,7 @@ _printLines (void)
 {
   // Currently a holder function.  The Z80 needs some special mangling
   // for bank support.
-  printLine (_G.lines.head, codeOutFile);
+  printLine (_G.lines.head, codeOutBuf);
 }
 
 void

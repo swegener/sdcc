@@ -8,6 +8,7 @@
 #include "main.h"
 #include "ralloc.h"
 #include "gen.h"
+#include "dbuf_string.h"
 #include "../SDCCutil.h"
 
 static char _defaultRules[] =
@@ -175,26 +176,26 @@ _mcs51_genAssemblerPreamble (FILE * of)
 
 /* Generate interrupt vector table. */
 static int
-_mcs51_genIVT (FILE * of, symbol ** interrupts, int maxInterrupts)
+_mcs51_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 {
   int i;
 
-  fprintf (of, "\tljmp\t__sdcc_gsinit_startup\n");
+  dbuf_printf (oBuf, "\tljmp\t__sdcc_gsinit_startup\n");
 
   /* now for the other interrupts */
   for (i = 0; i < maxInterrupts; i++)
     {
       if (interrupts[i])
         {
-          fprintf (of, "\tljmp\t%s\n", interrupts[i]->rname);
+          dbuf_printf (oBuf, "\tljmp\t%s\n", interrupts[i]->rname);
           if ( i != maxInterrupts - 1 )
-            fprintf (of, "\t.ds\t5\n");
+            dbuf_printf (oBuf, "\t.ds\t5\n");
         }
       else
         {
-          fprintf (of, "\treti\n");
+          dbuf_printf (oBuf, "\treti\n");
           if ( i != maxInterrupts - 1 )
-            fprintf (of, "\t.ds\t7\n");
+            dbuf_printf (oBuf, "\t.ds\t7\n");
         }
     }
   return TRUE;

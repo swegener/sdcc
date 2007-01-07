@@ -1080,6 +1080,7 @@ Addr_T lnksect2 (struct area *tap, int locIndex)
         }
     }
     tap->a_size = size;
+    tap->a_addr = tap->a_axp->a_addr;
 
     if ((tap->a_flag&A_PAG) && (size > 256))
     {

@@ -256,7 +256,7 @@ optionsTable[] = {
     { 0,    OPTION_XRAM_LOC,        NULL, "<nnnn> External Ram start location" },
     { 0,    OPTION_XRAM_SIZE,       NULL, "<nnnn> External Ram size" },
     { 0,    OPTION_IRAM_SIZE,       NULL, "<nnnn> Internal Ram size" },
-    { 0,    OPTION_XSTACK_LOC,      NULL, "<nnnn> External Ram start location" },
+    { 0,    OPTION_XSTACK_LOC,      NULL, "<nnnn> External Stack start location" },
     { 0,    OPTION_CODE_LOC,        NULL, "<nnnn> Code Segment Location" },
     { 0,    OPTION_CODE_SIZE,       NULL, "<nnnn> Code Segment size" },
     { 0,    OPTION_STACK_LOC,       NULL, "<nnnn> Stack pointer initial value" },
@@ -645,7 +645,7 @@ processFile (char *s)
           /* is the dot in the filename, not in the path? */
           (strrchr (buffer, DIR_SEPARATOR_CHAR) < strrchr (buffer, '.')))
         {
-        *strrchr (buffer, '.') = '\0';
+          *strrchr (buffer, '.') = '\0';
         }
 
       /* get rid of any path information
@@ -658,7 +658,7 @@ processFile (char *s)
              *(fext - 1) != DIR_SEPARATOR_CHAR &&
              *(fext - 1) != ':')
         {
-        fext--;
+          fext--;
         }
 #else
       /* do this by going backwards till we
@@ -1497,7 +1497,7 @@ linkEdit (char **envp)
           exit (1);
         }
 
-      if (TARGET_IS_Z80 || TARGET_IS_GBZ80)
+      if (TARGET_Z80_LIKE)
         {
           fprintf (lnkfile, "--\n-m\n-j\n-x\n-%c %s\n",
             out_fmt, dstFileName);
@@ -1509,7 +1509,7 @@ linkEdit (char **envp)
               fprintf (lnkfile, "-Y\n");
         }
 
-      if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
+      if (!(TARGET_Z80_LIKE)) /*Not for the z80, gbz80*/
         {
           /* if iram size specified */
           if (options.iram_size)
@@ -1537,7 +1537,7 @@ linkEdit (char **envp)
   fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
   if (segName) { Safe_free(segName); }
 
-      if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80)) /*Not for the z80, gbz80*/
+      if (!(TARGET_Z80_LIKE)) /*Not for the z80, gbz80*/
         {
 
           /* code segment start */
@@ -1555,6 +1555,13 @@ linkEdit (char **envp)
           if (options.xdata_loc)
             {
               WRITE_SEG_LOC (XDATA_NAME, options.xdata_loc);
+            }
+
+          /* pdata/xstack segment start. If zero, the linker
+             chooses the best place for them */
+          if (options.xstack_loc)
+            {
+              WRITE_SEG_LOC (PDATA_NAME, options.xstack_loc);
             }
 
           /* indirect data */
@@ -1595,7 +1602,7 @@ linkEdit (char **envp)
       /* standard library path */
       if (!options.nostdlib)
         {
-          if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
+          if (!(TARGET_Z80_LIKE || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
             {
               switch (options.model)
                 {
@@ -1697,8 +1704,7 @@ linkEdit (char **envp)
             {
               fprintf (lnkfile, "-l mcs51\n");
             }
-          if (!(TARGET_IS_Z80 || TARGET_IS_GBZ80
-            || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
+          if (!(TARGET_Z80_LIKE || TARGET_IS_HC08)) /*Not for the z80, gbz80*/
             { /*Why the z80 port is not using the standard libraries?*/
               fprintf (lnkfile, "-l %s\n", STD_LIB);
               fprintf (lnkfile, "-l %s\n", STD_INT_LIB);
@@ -1722,8 +1728,7 @@ linkEdit (char **envp)
       /*For the z80 and gbz80 ports, try to find where crt0.o is...
       It is very important for this file to be first on the linking proccess
       so the areas are set in the correct order, expecially _GSINIT*/
-      if ((TARGET_IS_Z80 || TARGET_IS_GBZ80) &&
-        !options.no_std_crt0) /*For the z80, gbz80*/
+      if ((TARGET_Z80_LIKE) && !options.no_std_crt0) /*For the z80, gbz80*/
         {
           char crt0path[PATH_MAX];
           FILE * crt0fp;

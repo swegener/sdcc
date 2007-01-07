@@ -1,4 +1,11 @@
-2007-01-06 Maarten Brock <sourceforge.brock AT dse.nl>
+2007-01-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/port.h: added TARGET_Z80_LIKE macro
+	* src/SDCCmain.c (linkEdit): use TARGET_Z80_LIKE,
+	  output PSEG location if --xram-loc or --xstack-loc was used
+	* as/link/mcs51/lkarea.c (lnksect2): set segment address afterwards
+
+2007-01-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/as_gbz80.dsp, as/z80/as_gbz80.dsp,
 	* as/as_z80.dsp,   as/z80/as_z80.dsp,

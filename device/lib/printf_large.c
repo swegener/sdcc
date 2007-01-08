@@ -211,7 +211,11 @@ output_float (float f, unsigned char reqWidth,
               pfn_outputchar output_char, void* p)
 {
   unsigned char charsOutputted = 0;
+ #if defined (SDCC_mcs51)
+  char fpBuffer[16];      //mcs51 has only a small stack
+ #else
   char fpBuffer[128];
+ #endif
 #else
 #define OUTPUT_FLOAT(F, W, D, L, Z, S, P)	output_float(F, W, D, L, Z, S, P)
 static void
@@ -223,9 +227,11 @@ output_float (float f, unsigned char reqWidth,
 #endif //SDCC_STACK_AUTO
   BOOL negative = 0;
   unsigned long integerPart;
+  float rounding;
   float decimalPart;
   char fpBI=0, fpBD;
   unsigned char minWidth, i;
+  signed char exp = -128;
 
   // save the sign
   if (f<0) {
@@ -235,7 +241,6 @@ output_float (float f, unsigned char reqWidth,
 
   if (f>0x00ffffff) {
     // this part is from Frank van der Hulst
-    signed char exp;
 
     for (exp = 0; f >= 10.0; exp++) f /=10.0;
     for (       ; f < 1.0;   exp--) f *=10.0;
@@ -247,28 +252,27 @@ output_float (float f, unsigned char reqWidth,
         OUTPUT_CHAR ('+', p);
       }
     }
-#ifdef SDCC_STACK_AUTO
-    charsOutputted += OUTPUT_FLOAT(f, 0, reqDecimals, 0, 0, 0, 0);
-#else
-    OUTPUT_FLOAT(f, 0, reqDecimals, 0, 0, 0, 0);
-#endif
-    OUTPUT_CHAR ('e', p);
-    if (exp<0) {
-      OUTPUT_CHAR ('-', p);
-      exp = -exp;
-    }
-    OUTPUT_CHAR ('0'+exp/10, p);
-    OUTPUT_CHAR ('0'+exp%10, p);
-#ifdef SDCC_STACK_AUTO
-    return charsOutputted;
-#else
-    return;
-#endif //SDCC_STACK_AUTO
+    reqWidth = 0;
+    left = 0;
+    zero = 0;
+    sign = 0;
+    space = 0;
   }
 
+  // display some decimals as default
+  if (reqDecimals==-1)
+    reqDecimals=DEFAULT_FLOAT_PRECISION;
+
+  // round the float
+  rounding = 0.5;
+  for (i=reqDecimals; i>0; i--) {
+      rounding /= 10.0;
+  }
+  f += rounding;
+
   // split the float
-  integerPart=f;
-  decimalPart=f-integerPart;
+  integerPart = f;
+  decimalPart = f - integerPart;
 
   // fill the buffer with the integerPart (in reversed order!)
   while (integerPart) {
@@ -280,25 +284,15 @@ output_float (float f, unsigned char reqWidth,
     fpBuffer[fpBI++]='0';
   }
 
-  // display some decimals as default
-  if (reqDecimals==-1)
-    reqDecimals=DEFAULT_FLOAT_PRECISION;
-
   // fill buffer with the decimalPart (in normal order)
   fpBD=fpBI;
 
-  for (i=reqDecimals; i>1; i--) {
+  for (i=reqDecimals; i>0; i--) {
       decimalPart *= 10.0;
       // truncate the float
-      integerPart=decimalPart;
-      fpBuffer[fpBD++]='0' + integerPart;
-      decimalPart-=integerPart;
-  }
-  if (i) {
-    decimalPart *= 10.0;
-    // truncate the float
-    integerPart = decimalPart + 0.5;
-    fpBuffer[fpBD++] = '0' + integerPart;
+      integerPart = decimalPart;
+      fpBuffer[fpBD++] = '0' + integerPart;
+      decimalPart -= integerPart;
   }
 
   minWidth=fpBI; // we need at least these
@@ -378,6 +372,16 @@ output_float (float f, unsigned char reqWidth,
     {
       OUTPUT_CHAR(' ', p);
     }
+  }
+
+  if (exp != -128) {
+    OUTPUT_CHAR ('e', p);
+    if (exp<0) {
+      OUTPUT_CHAR ('-', p);
+      exp = -exp;
+    }
+    OUTPUT_CHAR ('0'+exp/10, p);
+    OUTPUT_CHAR ('0'+exp%10, p);
   }
 #ifdef SDCC_STACK_AUTO
   return charsOutputted;

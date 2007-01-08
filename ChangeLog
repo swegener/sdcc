@@ -1,3 +1,10 @@
+2007-01-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/printf_large.c (output_float): removed recursion,
+	  use smaller buffer on stack for mcs51,
+	  fixed bug printing 1.96
+	* support/regression/tests/snprintf.c: added test
+
 2007-01-07 Borut Razem <borut.razem AT siol.net>
 
 	* use dynamic memory buffers instead temporary files

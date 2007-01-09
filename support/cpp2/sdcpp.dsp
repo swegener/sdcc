@@ -237,10 +237,6 @@ SOURCE=.\cppdefault.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\diagnostic.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\options.c
 # End Source File
 # Begin Source File
@@ -250,10 +246,6 @@ SOURCE=.\opts.c
 # Begin Source File
 
 SOURCE=.\prefix.c
-# End Source File
-# Begin Source File
-
-SOURCE=".\pretty-print.c"
 # End Source File
 # Begin Source File
 
@@ -349,15 +341,7 @@ SOURCE=.\cppdefault.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\diagnostic.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\hwint.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\input.h
 # End Source File
 # Begin Source File
 
@@ -382,10 +366,6 @@ SOURCE=.\output.h
 # Begin Source File
 
 SOURCE=.\prefix.h
-# End Source File
-# Begin Source File
-
-SOURCE=".\pretty-print.h"
 # End Source File
 # Begin Source File
 

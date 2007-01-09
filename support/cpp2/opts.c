@@ -24,7 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "intl.h"
 #include "opts.h"
 #include "options.h"
-#include "diagnostic.h"
 
 /* True if we should exit after parsing options.  */
 bool exit_after_options;
@@ -250,7 +249,7 @@ handle_option (const char **argv, unsigned int lang_mask)
   /* Check to see if the option is disabled for this configuration.  */
   if (option->flags & CL_DISABLED)
     {
-      error ("command line option %qs"
+      error ("command line option \"%s\""
 	     " is not supported by this configuration", opt);
       goto done;
     }
@@ -406,8 +405,6 @@ decode_options (unsigned int argc, const char **argv)
 
   /* Perform language-specific options initialization.  */
   lang_mask = lang_hooks.init_options (argc, argv);
-
-  lang_hooks.initialize_diagnostics (global_dc);
 
   /* Scan to see what optimization level has been specified.  That will
      determine the default value of many flags.  */

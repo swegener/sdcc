@@ -35,17 +35,17 @@ typedef long long long_long;
 #endif
 
 /* Define results of standard character escape sequences.  */
-#define TARGET_BELL	007
-#define TARGET_BS	010
-#define TARGET_TAB	011
-#define TARGET_NEWLINE	012
-#define TARGET_VT	013
-#define TARGET_FF	014
-#define TARGET_CR	015
-#define TARGET_ESC	033
+#define TARGET_BELL     007
+#define TARGET_BS       010
+#define TARGET_TAB      011
+#define TARGET_NEWLINE  012
+#define TARGET_VT       013
+#define TARGET_FF       014
+#define TARGET_CR       015
+#define TARGET_ESC      033
 
 #define CHAR_TYPE_SIZE 8
-#define WCHAR_TYPE_SIZE 32	/* ? maybe ? */
+#define WCHAR_TYPE_SIZE 32      /* ? maybe ? */
 
 #define SUPPORTS_ONE_ONLY 0
 
@@ -66,10 +66,6 @@ struct lang_hooks
      initialization needed before any calls to handle_option.  Return
      the language mask to filter the switch array with.  */
   unsigned int (*init_options) (unsigned int argc, const char **argv);
-
-  /* Callback used to perform language-specific initialization for the
-     global diagnostic context structure.  */
-  void (*initialize_diagnostics) (struct diagnostic_context *);
 
   /* Handle the switch CODE, which has real type enum opt_code from
      options.h.  If the switch takes an argument, it is passed in ARG
@@ -103,9 +99,6 @@ struct lang_hooks
 
   /* Called at the end of compilation, as a finalizer.  */
   void (*finish) (void);
-
-  /* Called by report_error_function to print out function name.  */
-  void (*print_error_function) (struct diagnostic_context *, const char *);
 };
 
 /* Each front end provides its own.  */
@@ -129,23 +122,12 @@ extern const struct lang_hooks lang_hooks;
 #endif
 extern void internal_error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2)
      ATTRIBUTE_NORETURN;
-extern void warning0 (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
 /* Pass one of the OPT_W* from options.h as the first parameter.  */
 extern void warning (int, const char *, ...) ATTRIBUTE_GCC_DIAG(2,3);
 extern void error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
 extern void fatal_error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2)
      ATTRIBUTE_NORETURN;
-extern void pedwarn (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
-extern void sorry (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
 extern void inform (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
-extern void verbatim (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
-
-#ifdef BUFSIZ
-  /* N.B. Unlike all the others, fnotice is just gettext+fprintf, and
-     therefore it can have ATTRIBUTE_PRINTF.  */
-extern void fnotice			(FILE *, const char *, ...)
-     ATTRIBUTE_PRINTF_2;
-#endif
 
 extern bool exit_after_options;
 
@@ -158,7 +140,7 @@ extern void decode_d_option (const char *);
    compilation was started.  */
 
 extern const char *get_src_pwd (void);
-extern bool set_src_pwd	(const char *);
+extern bool set_src_pwd (const char *);
 
 /*
  * From flags.h
@@ -242,10 +224,18 @@ extern void pp_dir_change (cpp_reader *, const char *);
 extern struct cpp_reader* parse_in;
 
 /*
+ * From input.h
+ */
+extern struct line_maps line_table;
+
+typedef source_location location_t; /* deprecated typedef */
+
+/* Top-level source file.  */
+extern const char *main_input_filename;
+
+/*
  * From tree.h
  */
-#include "input.h"
-
 /* Define the overall contents of a tree node.
    just to make diagnostic.c happy  */
 
@@ -258,5 +248,11 @@ union tree_node
 };
 
 #define DECL_SOURCE_LOCATION(NODE) ((NODE)->decl.locus)
+
+/*
+ * From diagnostic.h
+ */
+extern int errorcount;
+
 
 #endif  /* __SDCPP_H */

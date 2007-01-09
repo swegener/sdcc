@@ -1,25 +1,25 @@
 /*-------------------------------------------------------------------------
-    sdcppmain.c - sdcpp: SDCC preprocessor main file, using cpplib.
+  sdcppmain.c - sdcpp: SDCC preprocessor main file, using cpplib.
 
-    Written by Borut Razem, 2006.
+  Written by Borut Razem, 2006.
 
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2, or (at your option) any
-    later version.
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-    In other words, you are welcome to use, share and improve this program.
-    You are forbidden to forbid anyone else to use, share and improve
-    what you give them.   Help stamp out software-hoarding!
+  In other words, you are welcome to use, share and improve this program.
+  You are forbidden to forbid anyone else to use, share and improve
+  what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 #include "config.h"
@@ -30,41 +30,29 @@
 #include "mkdeps.h"
 #include "opts.h"
 #include "intl.h"
-#include "c-pretty-print.h"
-#include "diagnostic.h"
 
-#define CPP_FATAL_LIMIT 1000
-/* True if we have seen a "fatal" error.  */
-#define CPP_FATAL_ERRORS(PFILE) (cpp_errors (PFILE) >= CPP_FATAL_LIMIT)
-
-const char *progname;		/* Needs to be global.  */
+const char *progname;           /* Needs to be global.  */
 
 /* From laghooks-def.h */
 /* The whole thing.  The structure is defined in langhooks.h.  */
 #define LANG_HOOKS_INITIALIZER { \
   LANG_HOOKS_INIT_OPTIONS, \
-  LANG_HOOKS_INITIALIZE_DIAGNOSTICS, \
   LANG_HOOKS_HANDLE_OPTION, \
   LANG_HOOKS_MISSING_ARGUMENT, \
   LANG_HOOKS_POST_OPTIONS, \
   LANG_HOOKS_INIT, \
   LANG_HOOKS_FINISH, \
-  LANG_HOOKS_PRINT_ERROR_FUNCTION, \
 }
 
 /* From c-lang.c */
 #define LANG_HOOKS_INIT_OPTIONS sdcpp_init_options
-#define LANG_HOOKS_INITIALIZE_DIAGNOSTICS sdcpp_initialize_diagnostics
 #define LANG_HOOKS_HANDLE_OPTION sdcpp_common_handle_option
 #define LANG_HOOKS_MISSING_ARGUMENT sdcpp_common_missing_argument
 #define LANG_HOOKS_POST_OPTIONS sdcpp_common_post_options
 #define LANG_HOOKS_INIT sdcpp_common_init
 #define LANG_HOOKS_FINISH sdcpp_common_finish
-#define LANG_HOOKS_PRINT_ERROR_FUNCTION sdcpp_print_error_function
 
 static unsigned int sdcpp_init_options (unsigned int argc, const char **argv);
-static void sdcpp_initialize_diagnostics (diagnostic_context *context);
-static void sdcpp_print_error_function (diagnostic_context *context, const char *file);
 
 /* Each front end provides its own lang hook initializer.  */
 const struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
@@ -75,22 +63,7 @@ const struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
 
 const char *main_input_filename;
 
-#ifndef USE_MAPPED_LOCATION
-location_t unknown_location = { NULL, 0 };
-#endif
-
-/* Current position in real source file.  */
-
-location_t input_location;
-
 struct line_maps line_table;
-
-/* Stack of currently pending input files.  */
-
-struct file_stack *input_file_stack;
-
-/* Incremented on each change to input_file_stack.  */
-int input_file_stack_tick;
 
 /* Temporarily suppress certain warnings.
    This is set while reading code from a system header file.  */
@@ -102,7 +75,7 @@ int in_system_header = 0;
 
 int flag_pedantic_errors = 0;
 
-cpp_reader *parse_in;		/* Declared in c-pragma.h.  */
+cpp_reader *parse_in;           /* Declared in c-pragma.h.  */
 
 /* Nonzero means `char' should be signed.  */
 
@@ -185,16 +158,16 @@ do_pragma_sdcc_hash (cpp_reader *pfile)
 
     if (tok->type == CPP_PLUS)
     {
-	CPP_OPTION(pfile, allow_naked_hash)++;
+        CPP_OPTION(pfile, allow_naked_hash)++;
     }
     else if (tok->type == CPP_MINUS)
     {
-	CPP_OPTION(pfile, allow_naked_hash)--;
+        CPP_OPTION(pfile, allow_naked_hash)--;
     }
     else
     {
-	cpp_error (pfile, CPP_DL_ERROR,
-		   "invalid #pragma sdcc_hash directive, need '+' or '-'");
+        cpp_error (pfile, CPP_DL_ERROR,
+                   "invalid #pragma sdcc_hash directive, need '+' or '-'");
     }
 }
 
@@ -238,7 +211,7 @@ do_pragma_preproc_asm (cpp_reader *pfile)
   else
     {
       cpp_error (pfile, CPP_DL_ERROR,
-		 "invalid #pragma preproc_asm directive, need '+' or '-'");
+                 "invalid #pragma preproc_asm directive, need '+' or '-'");
     }
 }
 
@@ -264,33 +237,6 @@ sdcpp_init_options (unsigned int argc, const char **argv)
   parse_in->spec_nodes.n__asm = cpp_lookup (parse_in, DSC("_asm"));
 
   return ret;
-}
-
-static void
-sdcpp_initialize_diagnostics (diagnostic_context *context)
-{
-  pretty_printer *base = context->printer;
-  c_pretty_printer *pp = xmalloc (sizeof (c_pretty_printer));
-  memcpy (pp_base (pp), base, sizeof (pretty_printer));
-  pp_c_pretty_printer_init (pp);
-  context->printer = (pretty_printer *) pp;
-
-  /* It is safe to free this object because it was previously malloc()'d.  */
-  free (base);
-}
-
-/* The default function to print out name of current function that caused
-   an error.  */
-static void
-sdcpp_print_error_function (diagnostic_context *context, const char *file)
-{
-}
-
-/* Initialize the PRETTY-PRINTER for handling C codes.  */
-
-void
-pp_c_pretty_printer_init (c_pretty_printer *pp)
-{
 }
 
 void
@@ -321,10 +267,6 @@ general_init (const char *argv0)
   hex_init ();
 
   gcc_init_libintl ();
-
-  /* Initialize the diagnostics reporting machinery, so option parsing
-     can give warnings and errors.  */
-  diagnostic_initialize (global_dc);
 }
 
 /* Process the options that have been parsed.  */
@@ -336,50 +278,7 @@ process_options (void)
      sets the original filename if appropriate (e.g. foo.i -> foo.c)
      so we can correctly initialize debug output.  */
   /*no_backend =*/ (*lang_hooks.post_options) (&main_input_filename);
-  input_filename = main_input_filename;
 }
-
-#if 0
-/* A warning.  Use this for code which is correct according to the
-   relevant language specification but is likely to be buggy anyway.  */
-void
-warning (const char *msgid, ...)
-{
-  va_list ap;
-
-  va_start (ap, msgid);
-  fprintf (stderr, "%s: error: ", progname);
-  vfprintf (stderr, msgid, ap);
-  va_end (ap);
-}
-
-/* A hard error: the code is definitely ill-formed, and an object file
-   will not be produced.  */
-void
-error (const char *msgid, ...)
-{
-  va_list ap;
-
-  va_start (ap, msgid);
-  fprintf (stderr, "%s: warning: ", progname);
-  vfprintf (stderr, msgid, ap);
-  va_end (ap);
-}
-
-/* Print a fatal I/O error message.  Argument are like printf.
-   Also include a system error message based on `errno'.  */
-void
-fatal_io_error (const char *msgid, ...)
-{
-  va_list ap;
-
-  va_start (ap, msgid);
-  fprintf (stderr, "%s: %s: ", progname, xstrerror (errno));
-  vfprintf(stderr, msgid, ap);
-  va_end (ap);
-  exit (FATAL_EXIT_CODE);
-}
-#endif
 
 /* Parse a -d... command line switch.  */
 
@@ -391,16 +290,107 @@ decode_d_option (const char *arg)
   while (*arg)
     switch (c = *arg++)
       {
-      case 'D':	/* These are handled by the preprocessor.  */
+      case 'D': /* These are handled by the preprocessor.  */
       case 'I':
       case 'M':
       case 'N':
-	break;
+        break;
 
       default:
-	warning (0, "unrecognized gcc debugging option: %c", c);
-	break;
+        warning (0, "unrecognized gcc debugging option: %c", c);
+        break;
       }
+}
+
+/* Diagnostic */
+
+int errorcount = 0;
+
+/* An informative note.  Use this for additional details on an error
+   message.  */
+void
+inform (const char *gmsgid, ...)
+{
+  va_list ap;
+
+  va_start (ap, gmsgid);
+  fprintf (stderr, "%s: note: ", progname);
+  vfprintf (stderr, gmsgid, ap);
+  va_end (ap);
+}
+
+/* A warning.  Use this for code which is correct according to the
+   relevant language specification but is likely to be buggy anyway.  */
+void
+warning (int opt, const char *gmsgid, ...)
+{
+  va_list ap;
+
+  if CPP_OPTION (parse_in, warnings_are_errors)
+    ++errorcount;
+
+  va_start (ap, gmsgid);
+  fprintf (stderr, "%s: warning: ", progname);
+  vfprintf (stderr, gmsgid, ap);
+  va_end (ap);
+}
+
+/* A hard error: the code is definitely ill-formed, and an object file
+   will not be produced.  */
+void
+error (const char *gmsgid, ...)
+{
+  va_list ap;
+
+  ++errorcount;
+
+  va_start (ap, gmsgid);
+  fprintf (stderr, "%s: error: ", progname);
+  vfprintf (stderr, gmsgid, ap);
+  va_end (ap);
+}
+
+/* An error which is severe enough that we make no attempt to
+   continue.  Do not use this for internal consistency checks; that's
+   internal_error.  Use of this function should be rare.  */
+void
+fatal_error (const char *gmsgid, ...)
+{
+  va_list ap;
+
+  va_start (ap, gmsgid);
+  fprintf (stderr, "%s: fatal error: ", progname);
+  vfprintf (stderr, gmsgid, ap);
+  va_end (ap);
+
+  gcc_unreachable ();
+}
+
+/* An internal consistency check has failed.  We make no attempt to
+   continue.  Note that unless there is debugging value to be had from
+   a more specific message, or some other good reason, you should use
+   abort () instead of calling this function directly.  */
+void
+internal_error (const char *gmsgid, ...)
+{
+  va_list ap;
+
+  va_start (ap, gmsgid);
+  fprintf (stderr, "%s: internal compiler error: ", progname);
+  vfprintf (stderr, gmsgid, ap);
+  va_end (ap);
+
+  gcc_unreachable ();
+}
+
+/* Report an internal compiler error in a friendly manner.  This is
+   the function that gets called upon use of abort() in the source
+   code generally, thanks to a special macro.  */
+
+void
+fancy_abort (const char *file, int line, const char *function)
+{
+  internal_error ("in %s, at %s:%d", function, file, line);
 }
 
 /* Language-dependent initialization.  Returns nonzero on success.  */
@@ -439,7 +429,7 @@ do_compile (void)
     }
 }
 
-/* Entry point of cc1, cc1plus, jc1, f771, etc.
+/* Entry point of sdcpp.
    Exit code is FATAL_EXIT_CODE if can't open files or if there were
    any errors, or SUCCESS_EXIT_CODE if compilation succeeded.
 
@@ -448,7 +438,7 @@ do_compile (void)
 int
 main (unsigned int argc, const char **argv)
 {
-  /* Initialization of GCC's environment, and diagnostics.  */
+  /* Initialization of SDCPP's environment.  */
   general_init (argv[0]);
 
   /* Parse the options and do minimal processing; basically just
@@ -459,7 +449,7 @@ main (unsigned int argc, const char **argv)
   if (!exit_after_options)
     do_compile ();
 
-  if (errorcount || sorrycount)
+  if (errorcount)
     return (FATAL_EXIT_CODE);
 
   return (SUCCESS_EXIT_CODE);

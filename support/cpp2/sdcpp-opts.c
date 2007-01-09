@@ -21,7 +21,6 @@ Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
 
 #include "config.h"
 #include "system.h"
-#include "diagnostic.h"
 #include "intl.h"
 #include "cppdefault.h"
 #include "c-incpath.h"
@@ -315,7 +314,6 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 
     case OPT_Werror:
       cpp_opts->warnings_are_errors = value;
-      global_dc->warning_as_error_requested = value;
       break;
 
     case OPT_Wimport:
@@ -576,8 +574,6 @@ sdcpp_common_post_options (const char **pfilename)
   cb->file_change = cb_file_change;
   cb->dir_change = cb_dir_change;
   cpp_post_options (parse_in);
-
-  input_location = UNKNOWN_LOCATION;
 
   /* If an error has occurred in cpplib, note it so we fail
      immediately.  */

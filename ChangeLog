@@ -1,3 +1,17 @@
+2007-01-09 Borut Razem <borut.razem AT siol.net>
+
+	* get rid of diagnistic.[ch], pretty-print.[ch],
+	  c-pretty-print.[ch], ... used just for error, warning, ...
+	  message formatting
+	* suppoprt/cpp2/pretty-print.[ch], suppoprt/cpp2/diagnostic.[ch],
+	  suppoprt/cpp2/diagnostic.def, suppoprt/cpp2/input.h,
+	  suppoprt/cpp2/pretty-print.[ch]:
+	  removed
+	* suppoprt/cpp2/Makefile.in, suppoprt/cpp2/opts.c,
+	  suppoprt/cpp2/sdcpp-opts.c, suppoprt/cpp2/sdcpp.[ch],
+	  suppoprt/cpp2/sdcpp.dsp:
+	  changed
+
 2007-01-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c (output_float): removed recursion,

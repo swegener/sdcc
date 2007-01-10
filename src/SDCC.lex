@@ -5,21 +5,21 @@
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+  Free Software Foundation; either version 2, or (at your option) any
+  later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-   In other words, you are welcome to use, share and improve this program.
-   You are forbidden to forbid anyone else to use, share and improve
-   what you give them.   Help stamp out software-hoarding!
+  In other words, you are welcome to use, share and improve this program.
+  You are forbidden to forbid anyone else to use, share and improve
+  what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
 D       [0-9]
@@ -372,7 +372,6 @@ static char *stringLiteral(void)
 #define STR_BUF_CHUNCK_LEN  1024
   int ch;
   static struct dbuf_s dbuf;
-  char buf[2];
 
   if (dbuf.alloc == 0)
     dbuf_init(&dbuf, STR_BUF_CHUNCK_LEN);
@@ -393,6 +392,8 @@ static char *stringLiteral(void)
         column = 0;
       }
       else {
+        char buf[2];
+
         buf[0] = '\\';
         buf[1] = ch;
         dbuf_append(&dbuf, buf, 2); /* get the escape char, no further check */
@@ -891,40 +892,9 @@ static int doPragma(int id, const char *name, const char *cp)
       break;
 
     case P_CODESEG:
-      {
-        const char *segname;
-
-        cp = get_pragma_token(cp, &token);
-        if (token.type == TOKEN_EOL)
-          {
-            err = 1;
-            break;
-          }
-        segname = get_pragma_string(&token);
-
-        cp = get_pragma_token(cp, &token);
-        if (token.type != TOKEN_EOL)
-          {
-            err = 1;
-            break;
-          }
-
-        if (strlen(segname) > 8)
-          {
-            err = 1;
-            break;
-          }
-        else
-          {
-            dbuf_append(&token.dbuf, "(CODE)", (sizeof "(CODE)") - 1);
-            options.code_seg = Safe_strdup(get_pragma_string(&token));
-          }
-      }
-      break;
-
     case P_CONSTSEG:
       {
-        const char *segname;
+        struct dbuf_s segname;
 
         cp = get_pragma_token(cp, &token);
         if (token.type == TOKEN_EOL)
@@ -932,25 +902,22 @@ static int doPragma(int id, const char *name, const char *cp)
             err = 1;
             break;
           }
-        segname = get_pragma_string(&token);
+
+        dbuf_init(&segname, 16);
+        dbuf_printf(&segname, "%-8s(CODE)", get_pragma_string(&token));
 
         cp = get_pragma_token(cp, &token);
         if (token.type != TOKEN_EOL)
           {
+            dbuf_destroy(&segname);
             err = 1;
             break;
           }
 
-        if (strlen(segname) > 8)
-          {
-            err = 1;
-            break;
-          }
+        if (id == P_CODESEG)
+          options.code_seg = dbuf_detach(&segname);
         else
-          {
-            dbuf_append(&token.dbuf, "(CODE)", (sizeof "(CODE)") - 1);
-            options.code_seg = Safe_strdup(get_pragma_string(&token));
-          }
+          options.const_seg = dbuf_detach(&segname);
       }
       break;
 

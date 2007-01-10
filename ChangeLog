@@ -1,3 +1,8 @@
+2007-01-10 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.lex, src/SDCCmain.c: fixed bug #1631895:
+	  codeseg/constseg #pragma fail
+
 2007-01-09 Borut Razem <borut.razem AT siol.net>
 
 	* get rid of diagnistic.[ch], pretty-print.[ch],

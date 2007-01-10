@@ -32,6 +32,7 @@
 #include "common.h"
 #include <ctype.h>
 #include "newalloc.h"
+#include "dbuf_string.h"
 #include "SDCCerr.h"
 #include "BuildCmd.h"
 #include "MySystem.h"
@@ -1148,13 +1149,21 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_CODE_SEG) == 0)
             {
-              options.code_seg = getStringArg(OPTION_CODE_SEG, argv, &i, argc);
+              struct dbuf_s segname;
+
+              dbuf_init(&segname, 16);
+              dbuf_printf(&segname, "%-8s(CODE)", getStringArg(OPTION_CODE_SEG, argv, &i, argc));
+              options.code_seg = dbuf_detach(&segname);
               continue;
             }
 
           if (strcmp (argv[i], OPTION_CONST_SEG) == 0)
             {
-              options.const_seg = getStringArg(OPTION_CONST_SEG, argv, &i, argc);
+              struct dbuf_s segname;
+
+              dbuf_init(&segname, 16);
+              dbuf_printf(&segname, "%-8s(CODE)", getStringArg(OPTION_CONST_SEG, argv, &i, argc));
+              options.const_seg = dbuf_detach(&segname);
               continue;
             }
 

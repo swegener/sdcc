@@ -2,6 +2,10 @@
 
 	* src/SDCC.lex, src/SDCCmain.c: fixed bug #1631895:
 	  codeseg/constseg #pragma fail
+	* suppoprt/cpp2/Makefile.bcc: reenable Borland C compilation
+	* suppoprt/cpp2/configure.in, suppoprt/cpp2/libcpp/lex.c,
+	  suppoprt/cpp2/Makefile.in, suppoprt/cpp2/sdcpp-opts,
+	  suppoprt/cpp2/sdcpp.[ch]: house cleaning
 
 2007-01-09 Borut Razem <borut.razem AT siol.net>
 

@@ -36,8 +36,6 @@ Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
 # define TARGET_SYSTEM_ROOT NULL
 #endif
 
-static int saved_lineno;
-
 /* CPP's options.  */
 static cpp_options *cpp_opts;
 
@@ -192,7 +190,6 @@ sdcpp_common_init_options (unsigned int argc, const char **argv ATTRIBUTE_UNUSED
 int
 sdcpp_common_handle_option (size_t scode, const char *arg, int value)
 {
-  const struct cl_option *option = &cl_options[scode];
   enum opt_code code = (enum opt_code) scode;
   int result = 1;
 

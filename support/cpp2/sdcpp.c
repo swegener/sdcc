@@ -436,7 +436,7 @@ do_compile (void)
    It is not safe to call this function more than once.  */
 
 int
-main (unsigned int argc, const char **argv)
+main (int argc, const char **argv)
 {
   /* Initialization of SDCPP's environment.  */
   general_init (argv[0]);

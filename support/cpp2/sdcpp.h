@@ -2,6 +2,8 @@
 #define __SDCPP_H
 
 #ifdef _WIN32
+/* declaration of alloca */
+#include <malloc.h>
 #include <string.h>
 #ifdef __BORLANDC__
 #define strcasecmp  stricmp
@@ -10,22 +12,6 @@
 #endif
 #endif
 #define BYTES_BIG_ENDIAN  0
-
-#if defined _MSC_VER || defined __MINGW32__ || defined __BORLANDC__
-/*
- * The following define causes the following warning:
- * warning: `I' flag used with `%x' printf format
- * when copiled with mingw or cygwin -mno-cygwin gcc.
- * This is correct, because the mingw compilation links against msvcrt.dll,
- * which uses "I46" for 64 bit integer (long long) printf lenght modifier,
- * instead of "ll" used by libc.
- */
-#define PRINTF_INT64_MODIFIER "I64"
-typedef __int64 long_long;
-#else
-#define PRINTF_INT64_MODIFIER "ll"
-typedef long long long_long;
-#endif
 
 /*
  * From defaults.h
@@ -107,27 +93,14 @@ extern const struct lang_hooks lang_hooks;
 /*
  * From toplev.h
  */
-/* If we haven't already defined a frontend specific diagnostics
-   style, use the generic one.  */
-#ifndef GCC_DIAG_STYLE
-#define GCC_DIAG_STYLE __gcc_diag__
-#endif
-/* None of these functions are suitable for ATTRIBUTE_PRINTF, because
-   each language front end can extend them with its own set of format
-   specifiers.  We must use custom format checks.  */
-#if GCC_VERSION >= 4001
-#define ATTRIBUTE_GCC_DIAG(m, n) __attribute__ ((__format__ (GCC_DIAG_STYLE, m, n))) ATTRIBUTE_NONNULL(m)
-#else
-#define ATTRIBUTE_GCC_DIAG(m, n) ATTRIBUTE_NONNULL(m)
-#endif
-extern void internal_error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2)
+extern void internal_error (const char *, ...) ATTRIBUTE_PRINTF_1
      ATTRIBUTE_NORETURN;
 /* Pass one of the OPT_W* from options.h as the first parameter.  */
-extern void warning (int, const char *, ...) ATTRIBUTE_GCC_DIAG(2,3);
-extern void error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
-extern void fatal_error (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2)
+extern void warning (int, const char *, ...) ATTRIBUTE_PRINTF_2;
+extern void error (const char *, ...) ATTRIBUTE_PRINTF_1;
+extern void fatal_error (const char *, ...) ATTRIBUTE_PRINTF_1
      ATTRIBUTE_NORETURN;
-extern void inform (const char *, ...) ATTRIBUTE_GCC_DIAG(1,2);
+extern void inform (const char *, ...) ATTRIBUTE_PRINTF_1;
 
 extern bool exit_after_options;
 

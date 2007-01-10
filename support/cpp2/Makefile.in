@@ -36,7 +36,7 @@ srcdir = @srcdir@
 
 
 LIBS = @LIBS@
-CFLAGS = @CFLAGS@
+CFLAGS = @CFLAGS@ -Wall
 ALL_CFLAGS = $(INTERNAL_CFLAGS) $(X_CFLAGS) $(T_CFLAGS) \
   $(CFLAGS) $(WARN_CFLAGS) $(XCFLAGS) @DEFS@
 ALL_CPPFLAGS = $(CPPFLAGS) $(X_CPPFLAGS) $(T_CPPFLAGS)
@@ -127,7 +127,7 @@ clean:
 
 distclean: clean
 	-rm -f auto-host.h auto-build.h cstamp-h Makefile
-	-rm -f configargs.h config.status config.run config.cache config.bak config.log *~
+	config.status config.run config.cache config.bak config.log *~
 
 # This tells GNU Make version 3 not to put all variables in the environment.
 .NOEXPORT:

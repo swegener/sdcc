@@ -615,7 +615,6 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
 
   uchar c = *(pfile->buffer->cur - 1);
   struct obstack *stack = &pfile->hash_table->stack;
-  cpp_buffer *buffer = pfile->buffer;
   int len = 0;
   int has_whole = 0;
   int has_fract = 0;

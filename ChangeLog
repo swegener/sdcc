@@ -1,3 +1,7 @@
+2007-01-13 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: fixed format errors
+
 2007-01-10 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.lex, src/SDCCmain.c: fixed bug #1631895:

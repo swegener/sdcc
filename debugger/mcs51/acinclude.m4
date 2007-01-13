@@ -1,4 +1,8 @@
-dnl This macro will check for the presence of the readline library.
+dnl Borut Razem
+dnl
+dnl This macro checks for the presence of the readline library.
+dnl It works also in cross-compilation environment.
+dnl
 dnl To get it into the aclocal.m4 dnl file, do this:
 dnl   aclocal -I . --verbose
 dnl

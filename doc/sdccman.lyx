@@ -6146,9 +6146,8 @@ Pedentic parse numbers so that situations like 0xfe-LO_B(3) are parsed properly
 \end_inset 
 
  
-\emph on
+\emph on 
 Note: this functionality is not in conformance with standard!
-
 \layout List
 \added_space_bottom bigskip \labelwidthstring 00.00.0000
 
@@ -16914,53 +16913,58 @@ The preprocessor SDCPP
 \layout Itemize
 
 
-\series bold
+\series bold 
 pedantic_parse_number
-\series default
+\series default 
 
 \begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
 
-\end_inset
+\end_inset 
 
  (+ | -) - Pedantic parse numbers so that situations like 0xfe-LO_B(3) are
  parsed properly and the macro LO_B(3) gets expanded.
  Default is off.
  Below is an example on how to use this pragma.
 
-\emph on
+\emph on 
  Note: this functionality is not in conformance with standard!
-
 \layout Verse
 
 
-\family typewriter
+\family typewriter 
 #pragma pedantic_parse_number +
 \begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
 
-\end_inset
+\end_inset 
 
 
 \newline 
-\newline
-#define LO_B(x) ((x) & 0xff)
-\newline
-\newline
-unsigned char foo(void)
-\newline
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-unsigned char c=0xfe-LO_B(3);
-\newline
-\newline
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
 
+\newline 
+#define LO_B(x) ((x) & 0xff)
+\newline 
+
+\newline 
+unsigned char foo(void)
+\newline 
+{
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+unsigned char c=0xfe-LO_B(3);
+\newline 
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 return c;
-\newline
+\newline 
 }
-\newline
+\newline 
+
+\family default 
 
 \layout Itemize
 
@@ -17040,67 +17044,76 @@ void foo (void)
 \layout Itemize
 
 
-\series bold
+\series bold 
 sdcc_hash
-\series default
+\series default 
 
 \begin_inset LatexCommand \index{\#pragma sdcc\_hash}
 
-\end_inset
+\end_inset 
 
  (+ | -) - Allow "naked" hash in macro definition, for example:
 \newline 
-\family typewriter
+
+\family typewriter 
 #define DIR_LO(x) #(x & 0xff)
-\family default
+\family default 
+
 \newline 
 Default is off.
  Below is an example on how to use this pragma.
 \layout Verse
 
 
-\family typewriter
+\family typewriter 
 #pragma preproc_asm +
-\newline
+\newline 
 #pragma sdcc_hash +
 \begin_inset LatexCommand \index{\#pragma sdcc\_hash}
 
-\end_inset
+\end_inset 
 
 
-\newline
-\newline
+\newline 
+
+\newline 
 #define ROMCALL(x) 
-\backslash
-\newline
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\backslash 
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 mov R6_B3, #(x & 0xff) 
-\backslash
-\newline
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\backslash 
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 mov R7_B3, #((x >> 8) & 0xff) 
-\backslash
-\newline
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
+\backslash 
+
+\newline 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
 lcall __romcall
-\newline
-\newline
+\newline 
+
+\newline 
 ...
-\newline
+\newline 
 _asm
-\newline
+\newline 
 ROMCALL(72)
-\newline
+\newline 
 _endasm;
-\newline
+\newline 
 ...
-\newline
+\newline 
+
+\family default 
 
 \layout Standard
 

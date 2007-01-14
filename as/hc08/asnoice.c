@@ -9,12 +9,13 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
+#include <ctype.h>
 #include "asm.h"
 
-/* Return basic file name without path or extension */
-static char* BaseFileName( int fileNumber );
+/* Return basic file name without path or extension.
+   If spacesToUnderscores != 0 then spaces are converted to underscores */
 
-char* BaseFileName( int fileNumber )
+char* BaseFileName( int fileNumber, int spacesToUnderscores )
 {
 	static int prevFile = -1;
         static char baseName[ PATH_MAX ];
@@ -42,6 +43,14 @@ char* BaseFileName( int fileNumber )
 		if (p2 != NULL) *p2 = 0;
 		/* SD comment this out since not a ANSI Function */
                 /* strupr( baseName ); */
+
+                if (spacesToUnderscores)
+                {
+                  /* Convert spaces to underscores */
+                  for (p1 = baseName; *p1; ++p1)
+                    if (isspace(*p1))
+                      *p1 = '_';
+                }
 	}
 	return baseName;
 }
@@ -53,7 +62,7 @@ void DefineNoICE_Line()
         struct sym *pSym;
 
 	/* symbol is FILE.nnn */
-        sprintf( name, "%s.%u", BaseFileName( cfile ), srcline[ cfile ] );
+        sprintf( name, "%s.%u", BaseFileName( cfile, 0 ), srcline[ cfile ] );
 
         pSym = lookup( name );
         pSym->s_type = S_USER;
@@ -69,7 +78,7 @@ void DefineCDB_Line()
         struct sym *pSym;
 
 	/* symbol is FILE.nnn */
-        sprintf( name, "A$%s$%u", BaseFileName( cfile ), srcline[ cfile ] );
+        sprintf( name, "A$%s$%u", BaseFileName( cfile, 1 ), srcline[ cfile ] );
 
         pSym = lookup( name );
         pSym->s_type = S_USER;

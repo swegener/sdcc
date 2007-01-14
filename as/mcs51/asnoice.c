@@ -51,7 +51,6 @@ char* BaseFileName( int fileNumber, int spacesToUnderscores )
                     if (isspace(*p1))
                       *p1 = '_';
                 }
-
 	}
 	return baseName;
 }

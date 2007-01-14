@@ -1,3 +1,9 @@
+2007-01-14 Borut Razem <borut.razem AT siol.net>
+
+	* as/mcs51/asnoice.c: fixed bug #1447412:
+	  Cannot debug files that contain spaces in the path name
+	  by converting spaces in asm file mane to underscores
+
 2007-01-13 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: fixed format errors

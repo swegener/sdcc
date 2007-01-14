@@ -17843,19 +17843,13 @@ The linker organizes allocation for the code page and RAM banks.
  used.
  The compiler treats all functions of a single C file as being in the same
  code page unless it is non static.
- The compiler treats all local variables of a single C file as being in
- the same RAM bank unless it is an extern.
 \newline 
 
 \newline 
 To get the best follow these guide lines:
 \layout Enumerate
 
-make local functions static, as non static functions require code page selection
- overhead.
-\layout Enumerate
-
-Make local variables static as extern variables require RAM bank selection
+Make local functions static, as non static functions require code page selection
  overhead.
 \layout Enumerate
 
@@ -17864,10 +17858,11 @@ For devices that have multiple code pages it is more efficient to use the
  for the 16F877 use 4 separate files and i.e.
  for the 16F874 use 2 separate files.
  This way the linker can put the code for each file into different code
- pages and the compiler can allocate reusable variables more efficiently
- and there's less page selection overhead.
+ pages and there's less page selection overhead.
+\layout Enumerate
+
  And as for any 8 bit micro (especially for PIC 14 as they have a very simple
- instruction set) use 'unsigned char' whereever possible instead of 'int'.
+ instruction set), use 'unsigned char' whereever possible instead of 'int'.
 \layout Subsection
 
 Creating a device include file 
@@ -17884,7 +17879,7 @@ For generating a device include file
 Interrupt code
 \layout Standard
 
-For the interrupt function, use the keyword 'interrupt'
+For the interrupt function, use the keyword '__interrupt'
 \begin_inset LatexCommand \index{PIC14!interrupt}
 
 \end_inset 
@@ -17896,7 +17891,7 @@ For the interrupt function, use the keyword 'interrupt'
 
 
 \family typewriter 
-void Intr(void) interrupt 0
+void Intr(void) __interrupt 0
 \newline 
 {
 \newline 
@@ -18080,6 +18075,45 @@ status Collapsed
 \end_inset 
 
  disable (slightly faulty) optimization on pCode
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-loc
+\begin_inset LatexCommand \index{PIC14!Options!-\/-stack-loc}
+
+\end_inset 
+
+ sets the lowest address of the argument passing stack (defaults to a
+ suitably large shared databank to reduce BANKSEL overhead)
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-stack-size
+\begin_inset LatexCommand \index{PIC14!Options!-\/-stack-size}
+
+\end_inset 
+
+ sets the size if the argument passing stack (default: 16, minimum: 4)
 \layout Subsection
 
 The library
@@ -18527,7 +18561,7 @@ status Collapsed
 /
 \end_inset 
 
--stack-model=[model] Used in conjuction with the command above.
+-pstack-model=[model] Used in conjuction with the command above.
  Defines the stack model to be used, valid stack models are : 
 \begin_deeper 
 \layout List

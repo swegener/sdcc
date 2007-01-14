@@ -307,98 +307,6 @@ void pic14_outBitAcc(operand *result)
 	}
 }
 
-/*-----------------------------------------------------------------*/
-/* genPlusBits - generates code for addition of two bits           */
-/*-----------------------------------------------------------------*/
-void genPlusBits (iCode *ic)
-{
-	FENTRY;
-	
-	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	
-	DEBUGpic14_emitcode ("; ","result %s, left %s, right %s",
-		AopType(AOP_TYPE(IC_RESULT(ic))),
-		AopType(AOP_TYPE(IC_LEFT(ic))),
-		AopType(AOP_TYPE(IC_RIGHT(ic))));
-	/*
-	The following block of code will add two bits. 
-	Note that it'll even work if the destination is
-	the carry (C in the status register).
-	It won't work if the 'Z' bit is a source or destination.
-	*/
-	
-	/* If the result is stored in the accumulator (w) */
-	//if(strcmp(aopGet(AOP(IC_RESULT(ic)),0,FALSE,FALSE),"a") == 0 ) {}
-	switch(AOP_TYPE(IC_RESULT(ic))) {
-	case AOP_ACC:
-		emitpcode(POC_CLRW, NULL);
-		emitpcode(POC_BTFSC, popGet(AOP(IC_RIGHT(ic)),0));
-		emitpcode(POC_XORLW, popGetLit(1));
-		emitpcode(POC_BTFSC, popGet(AOP(IC_LEFT(ic)),0));
-		emitpcode(POC_XORLW, popGetLit(1));
-		
-		pic14_emitcode("clrw","");
-		pic14_emitcode("btfsc","(%s >> 3), (%s & 7)",
-			AOP(IC_RIGHT(ic))->aopu.aop_dir,
-			AOP(IC_RIGHT(ic))->aopu.aop_dir);
-		pic14_emitcode("xorlw","1");
-		pic14_emitcode("btfsc","(%s >> 3), (%s & 7)",
-			AOP(IC_LEFT(ic))->aopu.aop_dir,
-			AOP(IC_LEFT(ic))->aopu.aop_dir);
-		pic14_emitcode("xorlw","1");
-		break;
-	case AOP_REG:
-		emitpcode(POC_MOVLW, popGetLit(0));
-		emitpcode(POC_BTFSC, popGet(AOP(IC_RIGHT(ic)),0));
-		emitpcode(POC_XORLW, popGetLit(1));
-		emitpcode(POC_BTFSC, popGet(AOP(IC_LEFT(ic)),0));
-		emitpcode(POC_XORLW, popGetLit(1));
-		emitpcode(POC_MOVWF, popGet(AOP(IC_RESULT(ic)),0));
-		break;
-		/*  case AOP_CRY:
-		if(pic14_sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic)))) {
-		
-		  } else {
-		  
-			}
-		break;*/
-	default:
-		if(pic14_sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic)))) {
-			DebugAop(AOP(IC_LEFT(ic)));
-			emitpcode(POC_MOVLW, popGet(AOP(IC_LEFT(ic)),0));
-			emitpcode(POC_BTFSC, popGet(AOP(IC_RIGHT(ic)),0));
-			emitpcode(POC_XORWF, popGet(AOP(IC_LEFT(ic)),0));
-		} else {
-			emitpcode(POC_MOVLW, popGet(AOP(IC_RESULT(ic)),0));
-			emitpcode(POC_BCF,   popGet(AOP(IC_RESULT(ic)),0));
-			emitpcode(POC_BTFSC, popGet(AOP(IC_RIGHT(ic)),0));
-			emitpcode(POC_XORWF, popGet(AOP(IC_RESULT(ic)),0));
-			emitpcode(POC_BTFSC, popGet(AOP(IC_LEFT(ic)),0));
-			emitpcode(POC_XORWF, popGet(AOP(IC_RESULT(ic)),0));
-		}
-		
-		
-		pic14_emitcode("movlw","(1 << (%s & 7))",
-			AOP(IC_RESULT(ic))->aopu.aop_dir,
-			AOP(IC_RESULT(ic))->aopu.aop_dir);
-		pic14_emitcode("bcf","(%s >> 3), (%s & 7)",
-			AOP(IC_RESULT(ic))->aopu.aop_dir,
-			AOP(IC_RESULT(ic))->aopu.aop_dir);
-		pic14_emitcode("btfsc","(%s >> 3), (%s & 7)",
-			AOP(IC_RIGHT(ic))->aopu.aop_dir,
-			AOP(IC_RIGHT(ic))->aopu.aop_dir);
-		pic14_emitcode("xorwf","(%s >>3),f",
-			AOP(IC_RESULT(ic))->aopu.aop_dir);
-		pic14_emitcode("btfsc","(%s >> 3), (%s & 7)",
-			AOP(IC_LEFT(ic))->aopu.aop_dir,
-			AOP(IC_LEFT(ic))->aopu.aop_dir);
-		pic14_emitcode("xorwf","(%s>>3),f",
-			AOP(IC_RESULT(ic))->aopu.aop_dir);
-		break;
-	}
-	
-}
-
 #if 0
 /* This is the original version of this code.
 *
@@ -867,13 +775,6 @@ void genPlus (iCode *ic)
 		IC_LEFT(ic) = t;
 	}
 	
-	/* if both left & right are in bit space */
-	if (AOP_TYPE(IC_LEFT(ic)) == AOP_CRY &&
-		AOP_TYPE(IC_RIGHT(ic)) == AOP_CRY) {
-		genPlusBits (ic);
-		goto release ;
-	}
-	
 	/* if left in bit space & right literal */
 	if (AOP_TYPE(IC_LEFT(ic)) == AOP_CRY &&
 		AOP_TYPE(IC_RIGHT(ic)) == AOP_LIT) {
@@ -1292,32 +1193,6 @@ void addSign(operand *result, int offset, int sign)
 }
 
 /*-----------------------------------------------------------------*/
-/* genMinusBits - generates code for subtraction  of two bits      */
-/*-----------------------------------------------------------------*/
-void genMinusBits (iCode *ic)
-{
-	symbol *lbl = newiTempLabel(NULL);
-	FENTRY;
-	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
-	if (AOP_TYPE(IC_RESULT(ic)) == AOP_CRY){
-		pic14_emitcode("mov","c,%s",AOP(IC_LEFT(ic))->aopu.aop_dir);
-		pic14_emitcode("jnb","%s,%05d_DS_",AOP(IC_RIGHT(ic))->aopu.aop_dir,(lbl->key+100));
-		pic14_emitcode("cpl","c");
-		pic14_emitcode("","%05d_DS_:",(lbl->key+100));
-		pic14_outBitC(IC_RESULT(ic));
-	}
-	else{
-		pic14_emitcode("mov","c,%s",AOP(IC_RIGHT(ic))->aopu.aop_dir);
-		pic14_emitcode("subb","a,acc");
-		pic14_emitcode("jnb","%s,%05d_DS_",AOP(IC_LEFT(ic))->aopu.aop_dir,(lbl->key+100));
-		pic14_emitcode("inc","a");
-		pic14_emitcode("","%05d_DS_:",(lbl->key+100));
-		aopPut(AOP(IC_RESULT(ic)),"a",0);
-		addSign(IC_RESULT(ic), MSB16, SPEC_USIGN(getSpec(operandType(IC_RESULT(ic)))));
-	}
-}
-
-/*-----------------------------------------------------------------*/
 /* genMinus - generates code for subtraction                       */
 /*-----------------------------------------------------------------*/
 void genMinus (iCode *ic)
@@ -1342,14 +1217,6 @@ void genMinus (iCode *ic)
 		AopType(AOP_TYPE(IC_RESULT(ic))),
 		AopType(AOP_TYPE(IC_LEFT(ic))),
 		AopType(AOP_TYPE(IC_RIGHT(ic))));
-	
-	/* special cases :- */
-	/* if both left & right are in bit space */
-	if (AOP_TYPE(IC_LEFT(ic)) == AOP_CRY &&
-		AOP_TYPE(IC_RIGHT(ic)) == AOP_CRY) {
-		genPlusBits (ic);
-		goto release ;
-	}
 	
 	/* if I can do an decrement instead
 	of subtract then GOOD for ME */
@@ -1673,7 +1540,7 @@ void genUMult8XLit_16 (operand *left,
 	FENTRY;
 	if (AOP_TYPE(right) != AOP_LIT){
 		fprintf(stderr,"%s %d - right operand is not a literal\n",__FILE__,__LINE__);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	
 	
@@ -1788,7 +1655,7 @@ void genUMult8XLit_16 (operand *left,
 			temp = popGetTempReg();
 			if(!temp) {
 				fprintf(stderr,"ERROR: unable to allocate register. %s:%d\n",__FUNCTION__,__LINE__);
-				exit(1);
+				exit(EXIT_FAILURE);
 			}
 			emitpcode(POC_SWAPFW, popGet(AOP(left),0));
 			emitpcode(POC_MOVWF,  temp);

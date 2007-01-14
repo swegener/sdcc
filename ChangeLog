@@ -1,3 +1,18 @@
+2007-01-15 Raphael Neider <rneider AT web.de>
+
+	* doc/sdccman.lyx: updated PIC14/16 command line args, updated PIC14
+	    code page and data banking description
+	* src/pic/genarith.c,
+	* src/pic/gen.h: removed bit arithmetic functions,
+	    updated exit(1) to exit(EXIT_FAILURE)
+	* device/lib/pic16/libsdcc/stack/stack.S: default to 256 byte stack
+	* device/include/pic16/pic18f2455.h,
+	* device/lib/pic16/libdev/pic18f2455.c: added PORTD, LATD, LATE,
+	    TRISD and TRISE, fixed/added some bit names
+	* device/lib/pic16/libdev/pic18f{2550,4550,4455}.c,
+	* device/include/pic16/pic18f{2550,4550,4455}.h: simply include
+	    updated pic18f2455.{c,h} instead of duplicating them
+
 2007-01-14 Borut Razem <borut.razem AT siol.net>
 
 	* as/mcs51/asnoice.c, as/hc08/asnoice.c: fixed bug #1447412:

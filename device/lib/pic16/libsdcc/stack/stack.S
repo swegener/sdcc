@@ -25,7 +25,7 @@
 
 ; allocate space for stack
 stack_section	udata	0x0200
-_stack		res	63
+_stack		res	0xff
 _stack_end	res	1
 
 	end

@@ -257,7 +257,6 @@ static char *
 	case STRUCT:			return "STRUCT";
 	case UNION:			return "UNION";
 	case ENUM:			return "ENUM";
-	case ELIPSIS:			return "ELIPSIS";
 	case RANGE:			return "RANGE";
 	case FAR:			return "FAR";
 	case CASE:			return "CASE";

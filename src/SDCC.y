@@ -91,7 +91,7 @@ bool uselessDecl = TRUE;
 %token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
 %token NONBANKED BANKED SHADOWREGS WPARAM
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE FIXED16X16 CONST VOLATILE VOID BIT
-%token STRUCT UNION ENUM ELIPSIS RANGE FAR
+%token STRUCT UNION ENUM RANGE FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token NAKED JAVANATIVE OVERLAY
 %token <yyinline> INLINEASM
@@ -106,7 +106,7 @@ bool uselessDecl = TRUE;
 %type <sym> struct_declarator function_declarator function_declarator2
 %type <sym> struct_declarator_list  struct_declaration   struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
-%type <sym> declaration_list identifier_list parameter_identifier_list
+%type <sym> declaration_list identifier_list
 %type <sym> declarator2_function_attributes while do for critical
 %type <lnk> pointer type_specifier_list type_specifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier
@@ -1137,7 +1137,7 @@ function_declarator2
 	     
 	     $$ = $1;
          }
-   | declarator2 '(' parameter_identifier_list ')'
+   | declarator2 '(' identifier_list ')'
          {	   
 	   werror(E_OLD_STYLE,$1->name) ;	  
 	   /* assume it returns an int */
@@ -1226,11 +1226,6 @@ type_specifier_list
      else
        $$ = mergeSpec($1,$2, "type_specifier_list type_specifier");
    }
-   ;
-
-parameter_identifier_list
-   : identifier_list
-   | identifier_list ',' ELIPSIS
    ;
 
 identifier_list

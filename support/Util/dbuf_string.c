@@ -66,7 +66,11 @@ calc_result_length (const char *format, va_list args)
   int total_width = strlen (format) + 1;
   va_list ap;
 
-  memcpy (&ap, &args, sizeof (va_list));
+#ifdef va_copy
+  va_copy (ap, args);
+#else
+  memcpy ((PTR) &ap, (PTR) &args, sizeof (va_list));
+#endif
 
   while (*p != '\0')
     {
@@ -128,7 +132,9 @@ calc_result_length (const char *format, va_list args)
 	  p++;
 	}
     }
-
+#ifdef va_copy
+  va_end (ap);
+#endif
   return total_width;
 }
 

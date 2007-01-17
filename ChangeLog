@@ -1,3 +1,7 @@
+2007-01-17 Borut Razem <borut.razem AT siol.net>
+
+	* support/Util/dbuf_string.c: fixed for amd64
+
 2007-01-15 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic16/ralloc.c, src/pic/ralloc.c, src/SDCC.y:

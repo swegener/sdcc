@@ -686,7 +686,7 @@ constFixed16x16Val (char *s)
 /*-----------------------------------------------------------------*/
 /* constVal - converts an INTEGER constant into a cheapest value   */
 /*-----------------------------------------------------------------*/
-value *constVal (char *s)
+value *constVal (const char *s)
 {
   value *val;
   short hex = 0, octal = 0;
@@ -810,15 +810,14 @@ value *constVal (char *s)
     /param src Pointer to 'x' from start of hex character value
 */
 
-unsigned char hexEscape(char **src)
+unsigned char hexEscape(const char **src)
 {
   char *s ;
   unsigned long value ;
 
   (*src)++ ;    /* Skip over the 'x' */
-  s = *src ;    /* Save for error detection */
 
-  value = strtol (*src, src, 16);
+  value = strtol (*src, &s, 16);
 
   if (s == *src) {
       // no valid hex found
@@ -837,7 +836,7 @@ unsigned char hexEscape(char **src)
 /* adjust src to point at the last proccesed char                   */
 /*------------------------------------------------------------------*/
 
-unsigned char octalEscape (char **str) {
+unsigned char octalEscape (const char **str) {
   int digits;
   unsigned value=0;
 
@@ -870,7 +869,7 @@ unsigned char octalEscape (char **str) {
 */
 
 int
-copyStr (char *dest, char *src)
+copyStr (char *dest, const char *src)
 
 {
   char *OriginalDest = dest ;
@@ -953,7 +952,7 @@ copyStr (char *dest, char *src)
 /* strVal - converts a string constant to a value       */
 /*------------------------------------------------------------------*/
 value *
-strVal (char *s)
+strVal (const char *s)
 {
   value *val;
 
@@ -1063,7 +1062,7 @@ copyValue (value * src)
 /* charVal - converts a character constant to a value       */
 /*------------------------------------------------------------------*/
 value *
-charVal (char *s)
+charVal (const char *s)
 {
   value *val;
 

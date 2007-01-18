@@ -85,13 +85,13 @@ CCR_RESULT;
 /* forward definitions for the symbol table related functions */
 void initValue ();
 value *newValue ();
-value *constVal (char *);
+value *constVal (const char *);
 value *reverseVal (value *);
 value *reverseValWithType (value *);
 value *copyValue (value *);
 value *copyValueChain (value *);
-value *strVal (char *);
-value *charVal (char *);
+value *strVal (const char *);
+value *charVal (const char *);
 value *symbolVal (symbol *);
 void printVal (value *);
 double floatFromVal (value *);

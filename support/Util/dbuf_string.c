@@ -69,7 +69,7 @@ calc_result_length (const char *format, va_list args)
 #ifdef va_copy
   va_copy (ap, args);
 #else
-  memcpy ((PTR) &ap, (PTR) &args, sizeof (va_list));
+  memcpy (&ap, &args, sizeof (va_list));
 #endif
 
   while (*p != '\0')

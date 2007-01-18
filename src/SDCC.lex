@@ -53,10 +53,10 @@ char *currFname;
 int mylineno = 1;
 
 /* local definitions */
-static struct dbuf_s asmbuff;
+static struct dbuf_s asmbuff; /* reusable _asm buffer */
 
 /* forward declarations */
-static char *stringLiteral(void);
+static const char *stringLiteral(void);
 static void count(void);
 static int process_pragma(const char *);
 static int check_type(void);
@@ -70,8 +70,11 @@ _?"_asm"         {
   count();
   if (!options.std_sdcc && yytext[1] != '_')
     return check_type();
-  assert(asmbuff.alloc == 0 && asmbuff.len == 0 && asmbuff.buf == NULL);
-  dbuf_init(&asmbuff, INITIAL_INLINEASM);
+  if (asmbuff.buf == NULL)
+    dbuf_init(&asmbuff, INITIAL_INLINEASM);
+  else
+    dbuf_set_length(&asmbuff, 0);
+
   BEGIN(asm);
 }
 <asm>_?"_endasm" {
@@ -83,7 +86,6 @@ _?"_asm"         {
   else
     {
       yylval.yyinline = dbuf_c_str(&asmbuff);
-      dbuf_detach(&asmbuff);
       BEGIN(INITIAL);
       return (INLINEASM);
     }
@@ -123,7 +125,7 @@ _?"_asm"         {
 "__eeprom"     { count(); TKEYWORD(EEPROM); }
 "float"        { count(); return(FLOAT); }
 "fixed16x16"   { count(); TKEYWORDSDCC(FIXED16X16); }
-"__fixed16x16"   { count(); TKEYWORD(FIXED16X16); }
+"__fixed16x16" { count(); TKEYWORD(FIXED16X16); }
 "flash"        { count(); TKEYWORDSDCC(CODE); }
 "__flash"      { count(); TKEYWORD(CODE); }
 "for"          { count(); return(FOR); }
@@ -195,16 +197,16 @@ _?"_asm"         {
 {D}*"."{D}+({E})?{FS}?  { count(); yylval.val = constFloatVal(yytext);return(CONSTANT); }
 {D}+"."{D}*({E})?{FS}?  { count(); yylval.val = constFloatVal(yytext);return(CONSTANT); }
 \"             { count(); yylval.val=strVal(stringLiteral()); return(STRING_LITERAL); }
-">>=" { count(); yylval.yyint = RIGHT_ASSIGN ; return(RIGHT_ASSIGN); }
-"<<=" { count(); yylval.yyint = LEFT_ASSIGN  ; return(LEFT_ASSIGN); }
-"+="  { count(); yylval.yyint = ADD_ASSIGN   ; return(ADD_ASSIGN); }
-"-="  { count(); yylval.yyint = SUB_ASSIGN   ; return(SUB_ASSIGN); }
-"*="  { count(); yylval.yyint = MUL_ASSIGN   ; return(MUL_ASSIGN); }
-"/="  { count(); yylval.yyint = DIV_ASSIGN   ; return(DIV_ASSIGN); }
-"%="  { count(); yylval.yyint = MOD_ASSIGN   ; return(MOD_ASSIGN); }
-"&="  { count(); yylval.yyint = AND_ASSIGN   ; return(AND_ASSIGN); }
-"^="  { count(); yylval.yyint = XOR_ASSIGN   ; return(XOR_ASSIGN); }
-"|="  { count(); yylval.yyint = OR_ASSIGN    ; return(OR_ASSIGN); }
+">>="          { count(); yylval.yyint = RIGHT_ASSIGN ; return(RIGHT_ASSIGN); }
+"<<="          { count(); yylval.yyint = LEFT_ASSIGN  ; return(LEFT_ASSIGN); }
+"+="           { count(); yylval.yyint = ADD_ASSIGN   ; return(ADD_ASSIGN); }
+"-="           { count(); yylval.yyint = SUB_ASSIGN   ; return(SUB_ASSIGN); }
+"*="           { count(); yylval.yyint = MUL_ASSIGN   ; return(MUL_ASSIGN); }
+"/="           { count(); yylval.yyint = DIV_ASSIGN   ; return(DIV_ASSIGN); }
+"%="           { count(); yylval.yyint = MOD_ASSIGN   ; return(MOD_ASSIGN); }
+"&="           { count(); yylval.yyint = AND_ASSIGN   ; return(AND_ASSIGN); }
+"^="           { count(); yylval.yyint = XOR_ASSIGN   ; return(XOR_ASSIGN); }
+"|="           { count(); yylval.yyint = OR_ASSIGN    ; return(OR_ASSIGN); }
 ">>"           { count(); return(RIGHT_OP); }
 "<<"           { count(); return(LEFT_OP); }
 "++"           { count(); return(INC_OP); }
@@ -250,10 +252,13 @@ _?"_asm"         {
 [ \t\v\f]      { count(); }
 \\ {
   int ch = input();
+
+  ++column;
   if (ch != '\n') {
     /* that could have been removed by the preprocessor anyway */
     werror (W_STRAY_BACKSLASH, column);
     unput(ch);
+    --column;
   }
 }
 .              { count(); }
@@ -275,43 +280,45 @@ static int checkCurrFile (const char *s)
       return 0;
 
     /* check if this is a #line
-       this is not standard and can be removed in the future */
+     this is not standard and can be removed in the future */
 #define LINE_STR  "line"
 #define LINE_LEN  ((sizeof LINE_STR) - 1)
 
-    if (strncmp(s, LINE_STR, LINE_LEN) == 0)
-      s += LINE_LEN;
+  if (strncmp(s, LINE_STR, LINE_LEN) == 0)
+    s += LINE_LEN;
 
-    /* get the line number */
-    lNum = strtol(s, &tptr, 10);
-    if (tptr == s || !isspace((unsigned char)*tptr))
-      return 0;
-    s = tptr;
+  /* get the line number */
+  lNum = strtol(s, &tptr, 10);
+  if (tptr == s || !isspace((unsigned char)*tptr))
+    return 0;
+  s = tptr;
 
-    /* now see if we have a file name */
-    while (*s != '"' && *s)
-      ++s;
-
-    /* if we don't have a filename then */
-    /* set the current line number to   */
-    /* line number if printFlag is on   */
-    if (!*s) {
-      lineno = mylineno = lNum;
-      return 0;
-    }
-
-    /* if we have a filename then check */
-    /* if it is "standard in" if yes then */
-    /* get the currentfile name info    */
+  /* now see if we have a file name */
+  while (*s != '"' && *s)
     ++s;
 
-    /* in c1mode fullSrcFileName is NULL */
-    if (fullSrcFileName &&
-         strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0) {
+  /* if we don't have a filename then */
+  /* set the current line number to   */
+  /* line number if printFlag is on   */
+  if (!*s) {
+    lineno = mylineno = lNum;
+    return 0;
+  }
+
+  /* if we have a filename then check */
+  /* if it is "standard in" if yes then */
+  /* get the currentfile name info    */
+  ++s;
+
+  /* in c1mode fullSrcFileName is NULL */
+  if (fullSrcFileName &&
+    strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0)
+    {
       lineno = mylineno = lNum;
       currFname = fullSrcFileName;
     }
-    else {
+  else
+    {
       const char *sb = s;
 
       /* find the end of the filename */
@@ -322,8 +329,8 @@ static int checkCurrFile (const char *s)
       currFname[s - sb] = '\0';
       lineno = mylineno = lNum;
     }
-    filename = currFname ;
-    return 0;
+  filename = currFname;
+  return 0;
 }
 
 int column = 0;
@@ -332,17 +339,19 @@ int plineIdx =0;
 static void count(void)
 {
   int i;
-  for (i = 0; yytext[i] != '\0'; i++) {
-    if (yytext[i] == '\n') {
-      column = 0;
-      lineno = ++mylineno;
-    }
-    else
-      if (yytext[i] == '\t')
-        column += 8 - (column % 8);
+  for (i = 0; yytext[i] != '\0'; i++)
+    {
+      if (yytext[i] == '\n')
+        {
+          column = 0;
+          lineno = ++mylineno;
+        }
       else
-        column++;
-  }
+        if (yytext[i] == '\t')
+          column += 8 - (column % 8);
+        else
+          column++;
+    }
   /* ECHO; */
 }
 
@@ -350,16 +359,14 @@ static int check_type(void)
 {
   symbol *sym = findSym(SymbolTab, NULL, yytext);
 
+  strncpyz(yylval.yychar, yytext, SDCC_NAME_MAX);
+
   /* check if it is in the table as a typedef */
   if (!ignoreTypedefType && sym && IS_SPEC (sym->etype)
-      && SPEC_TYPEDEF (sym->etype)) {
-    strncpyz(yylval.yychar, yytext, SDCC_NAME_MAX);
+      && SPEC_TYPEDEF (sym->etype))
     return (TYPE_NAME);
-  }
-  else {
-    strncpyz (yylval.yychar, yytext, SDCC_NAME_MAX);
+  else
     return(IDENTIFIER);
-  }
 }
 
 /*
@@ -367,11 +374,11 @@ static int check_type(void)
  * to support ANSI hex and octal escape sequences in string literals
  */
 
-static char *stringLiteral(void)
+static const char *stringLiteral(void)
 {
 #define STR_BUF_CHUNCK_LEN  1024
   int ch;
-  static struct dbuf_s dbuf;
+  static struct dbuf_s dbuf;  /* reusable string literal buffer */
 
   if (dbuf.alloc == 0)
     dbuf_init(&dbuf, STR_BUF_CHUNCK_LEN);
@@ -379,135 +386,162 @@ static char *stringLiteral(void)
     dbuf_set_length(&dbuf, 0);
 
   dbuf_append_char(&dbuf, '"');
+
   /* put into the buffer till we hit the first \" */
 
-  while ((ch = input()) != 0) {
-    switch (ch) {
-    case '\\':
-      /* if it is a \ then escape char's are allowed */
+  for (; ; )
+    {
       ch = input();
-      if (ch == '\n') {
-        /* \<newline> is a continuator */
-        lineno = ++mylineno;
-        column = 0;
-      }
-      else {
-        char buf[2];
+      ++column;
+      if (ch == EOF)
+        break;
 
-        buf[0] = '\\';
-        buf[1] = ch;
-        dbuf_append(&dbuf, buf, 2); /* get the escape char, no further check */
-      }
-      break; /* carry on */
-
-    case '\n':
-      /* if new line we have a new line break, which is illegal */
-      werror(W_NEWLINE_IN_STRING);
-      dbuf_append_char(&dbuf, '\n');
-      lineno = ++mylineno;
-      column = 0;
-      break;
-
-    case '"':
-      /* if this is a quote then we have work to do */
-      /* find the next non whitespace character     */
-      /* if that is a double quote then carry on    */
-      dbuf_append_char(&dbuf, '"');  /* Pass end of this string or substring to evaluator */
-      while ((ch = input()) && (isspace(ch) || ch == '\\' || ch == '#')) {
-        switch (ch) {
+      switch (ch)
+        {
         case '\\':
-          if ((ch = input()) != '\n') {
-            werror(W_STRAY_BACKSLASH, column);
-            unput(ch);
-          }
-          else {
-            lineno = ++mylineno;
-            column = 0;
-          }
-          break;
+          /* if it is a \ then escape char's are allowed */
+          if ((ch = input()) == '\n')
+            {
+              /* \<newline> is a continuator */
+              lineno = ++mylineno;
+              column = 0;
+            }
+          else
+            {
+              char buf[2];
+
+              if (ch == EOF)
+                goto out;
+
+              ++column;
+              buf[0] = '\\';
+              buf[1] = ch;
+              dbuf_append(&dbuf, buf, 2); /* get the escape char, no further check */
+            }
+          break; /* carry on */
 
         case '\n':
+          /* if new line we have a new line break, which is illegal */
+          werror(W_NEWLINE_IN_STRING);
+          dbuf_append_char(&dbuf, '\n');
           lineno = ++mylineno;
           column = 0;
           break;
 
-        case '#':
-          if (0 == column) {
-            /* # at the beginning of the line: collect the entire line */
-            struct dbuf_s linebuf;
-            const char *line;
-            
-            dbuf_init(&linebuf, STR_BUF_CHUNCK_LEN);
-            dbuf_append_char(&linebuf, '#');
+        case '"':
+          /* if this is a quote then we have work to do */
+          /* find the next non whitespace character     */
+          /* if that is a double quote then carry on    */
+          dbuf_append_char(&dbuf, '"');  /* Pass end of this string or substring to evaluator */
+          while ((ch = input()) && (isspace(ch) || ch == '\\' || ch == '#'))
+            {
+              ++column;
 
-            while ((ch = input()) && ch != '\n') {
-              dbuf_append_char(&linebuf, (char)ch);
+              switch (ch)
+                {
+                case '\\':
+                  if ((ch = input()) != '\n')
+                    {
+                      ++column;
+                      werror(W_STRAY_BACKSLASH, column);
+                      if (ch != EOF)
+                        {
+                          unput(ch);
+                          --column;
+                        }
+                    }
+                    else
+                      {
+                        lineno = ++mylineno;
+                        column = 0;
+                      }
+                    break;
+
+                case '\n':
+                  lineno = ++mylineno;
+                  column = 0;
+                  break;
+
+                case '#':
+                  if (column == 0)
+                    {
+                      /* # at the beginning of the line: collect the entire line */
+                      struct dbuf_s linebuf;
+                      const char *line;
+
+                      dbuf_init(&linebuf, STR_BUF_CHUNCK_LEN);
+                      dbuf_append_char(&linebuf, '#');
+
+                      while ((ch = input()) != EOF && ch != '\n')
+                        dbuf_append_char(&linebuf, (char)ch);
+
+                      if (ch == '\n')
+                        {
+                          lineno = ++mylineno;
+                          column = 0;
+                        }
+
+                      line = dbuf_c_str(&linebuf);
+
+                      /* process the line */
+                      if (startsWith(line, "#pragma"))
+                        process_pragma(line);
+                      else
+                        checkCurrFile(line);
+
+                      dbuf_destroy(&linebuf);
+                    }
+                }
             }
 
-            if (ch == '\n') {
-              lineno = ++mylineno;
-              column = 0;
+          if (ch == EOF)
+            goto out;
+
+          if (ch != '"')
+            {
+              unput(ch);
+              --column;
+              goto out;
             }
+          break;
 
-            line = dbuf_c_str(&linebuf);
-
-            /* process the line */
-            if (startsWith(line, "#pragma"))
-              process_pragma(line);
-            else
-              checkCurrFile(line);
-
-            dbuf_destroy(&linebuf);
-          }
+        default:
+          dbuf_append_char(&dbuf, (char)ch);  /* Put next substring introducer into output string */
         }
-      }
-
-      if (!ch)
-        goto out;
-
-      if (ch != '"') {
-        unput(ch);
-        goto out;
-      }
-      break;
-
-    default:
-      dbuf_append_char(&dbuf, (char)ch);  /* Put next substring introducer into output string */
     }
-  }
 
 out:
-  return (char *)dbuf_c_str(&dbuf);
+  return dbuf_c_str(&dbuf);
 }
 
 
 enum {
-     P_SAVE = 1,
-     P_RESTORE,
-     P_NOINDUCTION,
-     P_NOINVARIANT,
-     P_INDUCTION,
-     P_STACKAUTO,
-     P_NOJTBOUND,
-     P_NOOVERLAY,
-     P_LESSPEDANTIC,
-     P_NOGCSE,
-     P_CALLEE_SAVES,
-     P_EXCLUDE,
-     P_NOIV,
-     P_LOOPREV,
-     P_OVERLAY_,     /* I had a strange conflict with P_OVERLAY while */
-                     /* cross-compiling for MINGW32 with gcc 3.2 */
-     P_DISABLEWARN,
-     P_OPTCODESPEED,
-     P_OPTCODESIZE,
-     P_OPTCODEBALANCED,
-     P_STD_C89,
-     P_STD_C99,
-     P_STD_SDCC89,
-     P_STD_SDCC99,
-     P_CODESEG,
-     P_CONSTSEG
+   P_SAVE = 1,
+   P_RESTORE,
+   P_NOINDUCTION,
+   P_NOINVARIANT,
+   P_INDUCTION,
+   P_STACKAUTO,
+   P_NOJTBOUND,
+   P_NOOVERLAY,
+   P_LESSPEDANTIC,
+   P_NOGCSE,
+   P_CALLEE_SAVES,
+   P_EXCLUDE,
+   P_NOIV,
+   P_LOOPREV,
+   P_OVERLAY_,     /* I had a strange conflict with P_OVERLAY while */
+                   /* cross-compiling for MINGW32 with gcc 3.2 */
+   P_DISABLEWARN,
+   P_OPTCODESPEED,
+   P_OPTCODESIZE,
+   P_OPTCODEBALANCED,
+   P_STD_C89,
+   P_STD_C99,
+   P_STD_SDCC89,
+   P_STD_SDCC99,
+   P_CODESEG,
+   P_CONSTSEG
 };
 
 

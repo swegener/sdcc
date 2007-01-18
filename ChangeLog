@@ -1,5 +1,16 @@
 2007-01-17 Borut Razem <borut.razem AT siol.net>
 
+	* support/Util/dbuf_string.c: removed (PTR) cast since it is not
+	  defined in MSVC
+	* src/SDCC.lex: stringLiteral() returns const char pointer,
+	  EOF detection in stringLiteral(), fixed asmbuf memory leak,
+	  fixed column counting
+	* src/SDCCval.[ch]: constVal(), value *strVal() and charVal()
+	  accept const char pointer as parameter
+	* src/SDCCdwarf2.c: corrected buffer size
+
+2007-01-17 Borut Razem <borut.razem AT siol.net>
+
 	* support/Util/dbuf_string.c: fixed for amd64
 
 2007-01-15 Borut Razem <borut.razem AT siol.net>

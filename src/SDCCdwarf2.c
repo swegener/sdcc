@@ -2739,7 +2739,7 @@ int dwWriteFunction(symbol *sym, iCode *ic)
 /*-----------------------------------------------------------------------*/
 int dwWriteEndFunction(symbol *sym, iCode *ic, int offset)
 {
-  char debugSym[SDCC_NAME_MAX];
+  char debugSym[SDCC_NAME_MAX + 1];
   
   if (ic)
     {
@@ -2777,7 +2777,7 @@ int dwWriteEndFunction(symbol *sym, iCode *ic, int offset)
 /*-----------------------------------------------------------------------*/
 int dwWriteLabel(symbol *sym, iCode *ic)
 {
-  char debugSym[SDCC_NAME_MAX];
+  char debugSym[SDCC_NAME_MAX + 1];
   dwtag * tp;
   
   /* ignore the compiler generated labels */

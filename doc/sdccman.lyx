@@ -7,7 +7,7 @@
   pdftitle={SDCC Compiler User Guide},
   pdfauthor={SDCC development team},
   pdfsubject={installation, user manual},
-  pdfkeywords={68hc08 8032 8051 ansi c compiler assembler CPU DS390                 embedded development free Floating Point Arithmetic Freescale GPL HC08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Zilog},
+  pdfkeywords={68hc08 8032 8051 ansi c compiler assembler CPU DS390 embedded development free Floating Point Arithmetic Freescale GPL HC08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Zilog},
   pdfpagemode=UseOutlines,
   colorlinks=true,
   linkcolor=blue] {hyperref}
@@ -82,7 +82,7 @@ SDCC Compiler User Guide
 
 
 \size normal 
-SDCC 2.6.2
+SDCC 2.6.4
 \size footnotesize 
 
 \newline 
@@ -16964,8 +16964,6 @@ return c;
 }
 \newline 
 
-\family default 
-
 \layout Itemize
 
 
@@ -17112,8 +17110,6 @@ _endasm;
 \newline 
 ...
 \newline 
-
-\family default 
 
 \layout Standard
 
@@ -18093,8 +18089,8 @@ status Collapsed
 
 \end_inset 
 
- sets the lowest address of the argument passing stack (defaults to a
- suitably large shared databank to reduce BANKSEL overhead)
+ sets the lowest address of the argument passing stack (defaults to a suitably
+ large shared databank to reduce BANKSEL overhead)
 \layout List
 \labelwidthstring 00.00.0000
 
@@ -23689,70 +23685,6 @@ Declare the variables to be local
  whenever possible, especially loop control variables (induction).
 \layout Itemize
 
-Since the compiler does not always do implicit integral promotion, the programme
-r should do an explicit cast when integral promotion is required.
-\layout Itemize
-
-Reducing the size of division, multiplication & modulus operations can reduce
- code size substantially.
- Take the following code for example.
-\begin_deeper 
-\layout Verse
-
-
-\family typewriter 
-foobar(unsigned int p1, unsigned char ch)
-\newline 
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-unsigned char ch1 = p1 % ch ;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-....
-\newline 
-}
-\layout Standard
-
-For the modulus operation the variable ch will be promoted to unsigned int
- first then the modulus operation will be performed (this will lead to a
- call to support routine _moduint()), and the result will be casted to a
- char.
- If the code is changed to 
-\layout Verse
-
-
-\family typewriter 
-foobar(unsigned int p1, unsigned char ch)
-\newline 
-{
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-unsigned char ch1 = (unsigned char)p1 % ch ;
-\newline 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-....
-\newline 
-}
-\layout Standard
-
-It would substantially reduce the code generated (future versions of the
- compiler will be smart enough to detect such optimization opportunities).
-\end_deeper 
-\layout Itemize
-
 Have a look at the assembly listing to get a 
 \begin_inset Quotes sld
 \end_inset 
@@ -23970,6 +23902,8 @@ Tools
 
 \layout Standard
 
+
+\series bold 
 Name
 \end_inset 
 </cell>
@@ -23978,6 +23912,8 @@ Name
 
 \layout Standard
 
+
+\series bold 
 Purpose
 \end_inset 
 </cell>
@@ -23986,6 +23922,8 @@ Purpose
 
 \layout Standard
 
+
+\series bold 
 Directory
 \end_inset 
 </cell>
@@ -24384,14 +24322,16 @@ Documentation
 \begin_inset  Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
-<column alignment="left" valignment="top" leftline="true" width="0">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
-<row topline="true" bottomline="true">
+<column alignment="block" valignment="top" leftline="true" width="40col%">
+<column alignment="block" valignment="top" leftline="true" rightline="true" width="60col%">
+<row topline="true" bottomline="true" endhead="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \layout Standard
 
+
+\series bold 
 Subject / Title
 \end_inset 
 </cell>
@@ -24400,7 +24340,9 @@ Subject / Title
 
 \layout Standard
 
-Where to get / filename
+
+\series bold 
+Filename / Where to get
 \end_inset 
 </cell>
 </row>
@@ -24419,6 +24361,22 @@ SDCC Compiler User Guide
 \layout Standard
 
 You're reading it right now
+\emph on 
+ \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\emph default 
+
+\newline 
+
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/doc/sdccman.pdf}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24437,6 +24395,22 @@ Changelog of SDCC
 \layout Standard
 
 sdcc/Changelog
+\emph on 
+ \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\emph default 
+
+\newline 
+
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/ChangeLog}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24456,7 +24430,9 @@ ASXXXX
 
 \end_inset 
 
- Assemblers and ASLINK
+ Assemblers and
+\newline 
+ASLINK
 \begin_inset LatexCommand \index{aslink}
 
 \end_inset 
@@ -24474,7 +24450,23 @@ ASXXXX
 
 \layout Standard
 
-sdcc/as/doc/asxhtm.html
+sdcc/as/doc/asxhtm.html 
+\emph on 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\emph default 
+
+\newline 
+
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/as/doc/asxhtm.html}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24497,7 +24489,23 @@ SDCC regression test
 
 \layout Standard
 
-sdcc/doc/test_suite_spec.pdf
+sdcc/doc/test_suite_spec.pdf 
+\emph on 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\emph default 
+
+\newline 
+
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/doc/test_suite_spec.pdf}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24515,7 +24523,23 @@ Various notes
 
 \layout Standard
 
-sdcc/doc/*
+sdcc/doc/* 
+\emph on 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\emph default 
+
+\newline 
+
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/doc/}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24538,7 +24562,23 @@ Notes on debugging with SDCDB
 
 \layout Standard
 
-sdcc/debugger/README
+sdcc/debugger/README 
+\emph on 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at
+\emph default 
+:
+\newline 
+
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/debugger/README}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24574,7 +24614,23 @@ sdcc/sim/ucsim/doc
 \bar default 
 \noun default 
 \color default
-/index.html
+/index.html 
+\emph on 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\emph default 
+
+\newline 
+
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/sim/ucsim/doc/index.html}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24597,7 +24653,23 @@ Temporary notes on the pic16
 
 \layout Standard
 
-sdcc/src/pic16/NOTES
+sdcc/src/pic16/NOTES 
+\emph on 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\newline 
+
+\emph default 
+
+\begin_inset LatexCommand \url{http://svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/src/pic16/NOTES}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24634,6 +24706,22 @@ cdbfileformat.pd
 \noun default 
 \color default
 f
+\emph on 
+ \SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+
+\hfill 
+online at:
+\emph default 
+
+\newline 
+
+\begin_inset LatexCommand \url{http://sdcc.sourceforge.net/doc/cdbfileformat.pdf}
+
+\end_inset 
+
+
 \end_inset 
 </cell>
 </row>
@@ -24672,6 +24760,8 @@ Related open source tools
 
 \layout Standard
 
+
+\series bold 
 Name
 \end_inset 
 </cell>
@@ -24680,6 +24770,8 @@ Name
 
 \layout Standard
 
+
+\series bold 
 Purpose
 \end_inset 
 </cell>
@@ -24688,6 +24780,8 @@ Purpose
 
 \layout Standard
 
+
+\series bold 
 Where to get
 \end_inset 
 </cell>
@@ -25158,7 +25252,7 @@ Related documentation / recommended reading
 <lyxtabular version="3" rows="7" columns="3">
 <features>
 <column alignment="left" valignment="top" leftline="true" width="0pt">
-<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="left" valignment="top" leftline="true" width="0">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="0pt">
 <row topline="true" bottomline="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -25166,6 +25260,8 @@ Related documentation / recommended reading
 
 \layout Standard
 
+
+\series bold 
 Name
 \end_inset 
 </cell>
@@ -25174,6 +25270,8 @@ Name
 
 \layout Standard
 
+
+\series bold 
 Subject / Title
 \end_inset 
 </cell>
@@ -25182,6 +25280,8 @@ Subject / Title
 
 \layout Standard
 
+
+\series bold 
 Where to get
 \end_inset 
 </cell>
@@ -25436,6 +25536,7 @@ s or correctness of the application notes
 \layout Standard
 
 
+\series bold 
 \size footnotesize 
 Vendor
 \end_inset 
@@ -25446,6 +25547,7 @@ Vendor
 \layout Standard
 
 
+\series bold 
 \size footnotesize 
 Subject / Title
 \end_inset 
@@ -25456,6 +25558,7 @@ Subject / Title
 \layout Standard
 
 
+\series bold 
 \size footnotesize 
 Where to get
 \end_inset 

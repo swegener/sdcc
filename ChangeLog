@@ -1,3 +1,8 @@
+2007-01-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/tests/swap.c: added in response to #1638622
+	* doc/sdccman.lyx: synced version, minor changes
+
 2007-01-18 Borut Razem <borut.razem AT siol.net>
 
 	* SDCClabel.c: fixed bug #1638651: wrong linenumber presented in warning

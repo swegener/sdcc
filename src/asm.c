@@ -6,6 +6,8 @@
     Note that the functions below only handle digit format modifiers.
     eg %02X is ok, but %lu and %.4u will fail.
 */
+#include <errno.h>
+
 #include "common.h"
 #include "asm.h"
 #include "dbuf_string.h"
@@ -265,29 +267,30 @@ printCLine (char *srcFile, int lineno)
       fclose (inFile);
       inFile = NULL;
       inLineNo = 0;
+      strncpyz (lastSrcFile, srcFile, PATH_MAX);
     }
   }
-  if (!inFile) {
-    inFile=fopen(srcFile, "r");
-    if (!inFile) {
-      perror ("printCLine");
-      exit (1);
+  if (!inFile && !(inFile = fopen(srcFile, "r"))) {
+    /* can't open the file:
+       don't panic, just return the error message */
+    SDCCsnprintf(inLineString, sizeof(inLineString), "ERROR: %s", strerror(errno));
+  }
+  else {
+    if (lineno<inLineNo) {
+      fseek (inFile, 0, SEEK_SET);
+      inLineNo=0;
+      /* rewinds++; */
     }
-    strncpyz (lastSrcFile, srcFile, PATH_MAX);
-  }
-  if (lineno<inLineNo) {
-    fseek (inFile, 0, SEEK_SET);
-    inLineNo=0;
-    /* rewinds++; */
-  }
-  while (fgets (inLineString, 1024, inFile)) {
-    inLineNo++;
-    if (inLineNo==lineno) {
-      // remove the trailing NL
-      inLineString[strlen(inLineString)-1]='\0';
-      break;
+    while (fgets (inLineString, 1024, inFile)) {
+      inLineNo++;
+      if (inLineNo==lineno) {
+        // remove the trailing NL
+        inLineString[strlen(inLineString)-1]='\0';
+        break;
+      }
     }
   }
+
   while (isspace ((unsigned char)*ilsP))
     ilsP++;
 

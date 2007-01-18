@@ -1,4 +1,14 @@
-2007-01-17 Borut Razem <borut.razem AT siol.net>
+2007-01-18 Borut Razem <borut.razem AT siol.net>
+
+	* SDCClabel.c: fixed bug #1638651: wrong linenumber presented in warning
+	* src/asm.c: don't die if the file drfined in #line couldn't be opened
+	* src/SDCC.lex, src/SDCCglobal.h, src/SDCCicode.c, src/SDCCsymt.c,
+	  src/SDCCval.c: removed redundant definitions of currFname and mylineno;
+	  use filename in lineno instead.
+	* SDCCast.c: removed MSVC warning C4018: '==' : signed/unsigned mismatch,
+	  print the file name in ast_print()
+
+2007-01-18 Borut Razem <borut.razem AT siol.net>
 
 	* support/Util/dbuf_string.c: removed (PTR) cast since it is not
 	  defined in MSVC

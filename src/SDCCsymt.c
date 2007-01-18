@@ -296,8 +296,8 @@ newSymbol (char *name, int scope)
   strncpyz (sym->name, name, sizeof(sym->name));        /* copy the name */
   sym->level = scope;           /* set the level    */
   sym->block = currBlockno;
-  sym->lineDef = mylineno;      /* set the line number */
-  sym->fileDef = currFname;
+  sym->lineDef = lineno;        /* set the line number */
+  sym->fileDef = filename;
   return sym;
 }
 

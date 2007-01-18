@@ -57,8 +57,8 @@ newiList (int type, void *ilist)
   nilist = Safe_alloc (sizeof (initList));
 
   nilist->type = type;
-  nilist->lineno = mylineno;
-  nilist->filename = currFname;
+  nilist->lineno = lineno;
+  nilist->filename = filename;
 
   switch (type)
     {

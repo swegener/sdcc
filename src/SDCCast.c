@@ -84,8 +84,8 @@ newAst_ (unsigned type)
   ex = Safe_alloc ( sizeof (ast));
 
   ex->type = type;
-  ex->lineno = (noLineno ? oldLineno : mylineno);
-  ex->filename = currFname;
+  ex->lineno = (noLineno ? oldLineno : lineno);
+  ex->filename = filename;
   ex->level = NestLevel;
   ex->block = currBlockno;
   ex->initMode = inInitMode;
@@ -345,7 +345,7 @@ static ast *replaceAstWithTemporary(ast **treeptr)
 
   tempvar = newNode('=', newAst_VALUE(symbolVal(sym)), *treeptr);
   *treeptr = newAst_VALUE(symbolVal(sym));
-  
+
   addSymChain(&sym);
 
   return tempvar;
@@ -375,17 +375,17 @@ ast * createRMW (ast *target, unsigned op, ast *operand)
 
   if (IS_AST_OP(target)) {
     /* if this is a dereference, put the referenced item in the temporary */
-    if (IS_DEREF_OP(target) || target->opval.op == PTR_OP) { 
+    if (IS_DEREF_OP(target) || target->opval.op == PTR_OP) {
       /* create a new temporary containing the item being dereferenced */
       if (hasSEFcalls(target->left))
         tempvar1 = replaceAstWithTemporary(&(target->left));
     } else if (target->opval.op == '[') {
       /* Array access is similar, but we have to avoid side effects in
-	 both values [WIML: Why not transform a[b] to *(a+b) in parser?] */
+         both values [WIML: Why not transform a[b] to *(a+b) in parser?] */
       if (hasSEFcalls(target->left))
-	tempvar1 = replaceAstWithTemporary(&(target->left));
+        tempvar1 = replaceAstWithTemporary(&(target->left));
       if (hasSEFcalls(target->right))
-	tempvar2 = replaceAstWithTemporary(&(target->right));
+        tempvar2 = replaceAstWithTemporary(&(target->right));
     } else {
       /* we would have to handle '.', but it is not generated any more */
       wassertl(target->opval.op != '.', "obsolete opcode in tree");
@@ -404,7 +404,7 @@ ast * createRMW (ast *target, unsigned op, ast *operand)
     result = newNode(',', tempvar1, result);
 
   return result;
-  
+
 }
 
 /*-----------------------------------------------------------------*/
@@ -2133,7 +2133,7 @@ searchLitOp (ast *tree, ast **parent, const char *ops)
       if (tree->right &&
           IS_AST_OP(tree->right) &&
           tree->right->right &&
-          (tree->right->opval.op == ops[0] || tree->right->opval.op == ops[1]))
+          (tree->right->opval.op == (unsigned)ops[0] || tree->right->opval.op == (unsigned)ops[1]))
         {
           if (IS_LITERAL (RTYPE (tree->right)) !=
               IS_LITERAL (LTYPE (tree->right)))
@@ -2150,7 +2150,7 @@ searchLitOp (ast *tree, ast **parent, const char *ops)
       if (tree->left &&
           IS_AST_OP(tree->left) &&
           tree->left->right &&
-          (tree->left->opval.op == ops[0] || tree->left->opval.op == ops[1]))
+          (tree->left->opval.op == (unsigned)ops[0] || tree->left->opval.op == (unsigned)ops[1]))
         {
           if (IS_LITERAL (RTYPE (tree->left)) !=
               IS_LITERAL (LTYPE (tree->left)))
@@ -2362,7 +2362,7 @@ gatherImplicitVariables (ast * tree, ast * block)
          compute type of RHS, and set the symbol's type to match */
       if (assignee->type == NULL && assignee->infertype) {
         ast *dtr = decorateType (resolveSymbols(tree->right), RESULT_TYPE_NONE);
-    
+
         if (dtr != tree->right)
           tree->right = dtr;
 
@@ -5921,7 +5921,7 @@ createFunction (symbol * name, ast * body)
       addSymChain (&name);
       allocVariables (name);
     }
-  name->lastLine = mylineno;
+  name->lastLine = lineno;
   currFunc = name;
 
   /* set the stack pointer */
@@ -6035,7 +6035,7 @@ skipall:
 }
 
 
-#define INDENT(x,f) { int i ; fprintf (f, "%d:", tree->lineno); for (i=0;i < x; i++) fprintf(f," "); }
+#define INDENT(x,f) { int i ; fprintf (f, "%s:%d:", tree->filename, tree->lineno); for (i=0;i < x; i++) fprintf(f," "); }
 /*-----------------------------------------------------------------*/
 /* ast_print : prints the ast (for debugging purposes)             */
 /*-----------------------------------------------------------------*/
@@ -6043,721 +6043,719 @@ skipall:
 void ast_print (ast * tree, FILE *outfile, int indent)
 {
 
-        if (!tree) return ;
+  if (!tree) return ;
 
-        /* can print only decorated trees */
-        if (!tree->decorated) return;
+  /* can print only decorated trees */
+  if (!tree->decorated) return;
 
-        /* if any child is an error | this one is an error do nothing */
-        if (tree->isError ||
-            (tree->left && tree->left->isError) ||
-            (tree->right && tree->right->isError)) {
-                fprintf(outfile,"ERROR_NODE(%p)\n",tree);
-        }
-
-
-        /* print the line          */
-        /* if not block & function */
-        if (tree->type == EX_OP &&
-            (tree->opval.op != FUNCTION &&
-             tree->opval.op != BLOCK &&
-             tree->opval.op != NULLOP)) {
-        }
-
-        if (tree->opval.op == FUNCTION) {
-                int arg=0;
-                value *args=FUNC_ARGS(tree->left->opval.val->type);
-                fprintf(outfile,"FUNCTION (%s=%p) type (",
-                        tree->left->opval.val->name, tree);
-                printTypeChain (tree->left->opval.val->type->next,outfile);
-                fprintf(outfile,") args (");
-                do {
-                  if (arg) {
-                    fprintf (outfile, ", ");
-                  }
-                  printTypeChain (args ? args->type : NULL, outfile);
-                  arg++;
-                  args= args ? args->next : NULL;
-                } while (args);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent);
-                ast_print(tree->right,outfile,indent);
-                return ;
-        }
-        if (tree->opval.op == BLOCK) {
-                symbol *decls = tree->values.sym;
-                INDENT(indent,outfile);
-                fprintf(outfile,"{\n");
-                while (decls) {
-                        INDENT(indent+2,outfile);
-                        fprintf(outfile,"DECLARE SYMBOL (%s=%p) type (",
-                                decls->name, decls);
-                        printTypeChain(decls->type,outfile);
-                        fprintf(outfile,")\n");
-
-                        decls = decls->next;
-                }
-                ast_print(tree->right,outfile,indent+2);
-                INDENT(indent,outfile);
-                fprintf(outfile,"}\n");
-                return;
-        }
-        if (tree->opval.op == NULLOP) {
-                ast_print(tree->left,outfile,indent);
-                ast_print(tree->right,outfile,indent);
-                return ;
-        }
-        INDENT(indent,outfile);
-
-        /*------------------------------------------------------------------*/
-        /*----------------------------*/
-        /*   leaf has been reached    */
-        /*----------------------------*/
-        /* if this is of type value */
-        /* just get the type        */
-        if (tree->type == EX_VALUE) {
-
-                if (IS_LITERAL (tree->opval.val->etype)) {
-                        fprintf(outfile,"CONSTANT (%p) value = ", tree);
-                        if (SPEC_USIGN (tree->opval.val->etype))
-                                fprintf(outfile,"%u", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val));
-                        else
-                                fprintf(outfile,"%d", (TYPE_TARGET_LONG) floatFromVal(tree->opval.val));
-                        fprintf(outfile,", 0x%x, %f", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val),
-                                                      floatFromVal(tree->opval.val));
-                } else if (tree->opval.val->sym) {
-                        /* if the undefined flag is set then give error message */
-                        if (tree->opval.val->sym->undefined) {
-                                fprintf(outfile,"UNDEFINED SYMBOL ");
-                        } else {
-                                fprintf(outfile,"SYMBOL ");
-                        }
-                        fprintf(outfile,"(%s=%p @ %p)",
-                                tree->opval.val->sym->name, tree, tree->opval.val->sym);
-                }
-                if (tree->ftype) {
-                        fprintf(outfile," type (");
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                } else {
-                        fprintf(outfile,"\n");
-                }
-                return ;
-        }
-
-        /* if type link for the case of cast */
-        if (tree->type == EX_LINK) {
-                fprintf(outfile,"TYPENODE (%p) type = (",tree);
-                printTypeChain(tree->opval.lnk,outfile);
-                fprintf(outfile,")\n");
-                return ;
-        }
+  /* if any child is an error | this one is an error do nothing */
+  if (tree->isError ||
+    (tree->left && tree->left->isError) ||
+    (tree->right && tree->right->isError)) {
+    fprintf(outfile,"ERROR_NODE(%p)\n",tree);
+  }
 
 
-        /* depending on type of operator do */
+  /* print the line          */
+  /* if not block & function */
+  if (tree->type == EX_OP &&
+    (tree->opval.op != FUNCTION &&
+    tree->opval.op != BLOCK &&
+    tree->opval.op != NULLOP)) {
+  }
 
-        switch (tree->opval.op) {
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*        array node          */
-                /*----------------------------*/
-        case '[':
-                fprintf(outfile,"ARRAY_OP (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
+  if (tree->opval.op == FUNCTION) {
+    int arg=0;
+    value *args=FUNC_ARGS(tree->left->opval.val->type);
+    fprintf(outfile,"FUNCTION (%s=%p) type (",
+      tree->left->opval.val->name, tree);
+    printTypeChain (tree->left->opval.val->type->next,outfile);
+    fprintf(outfile,") args (");
+    do {
+      if (arg) {
+        fprintf (outfile, ", ");
+      }
+      printTypeChain (args ? args->type : NULL, outfile);
+      arg++;
+      args= args ? args->next : NULL;
+    } while (args);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent);
+    ast_print(tree->right,outfile,indent);
+    return ;
+  }
+  if (tree->opval.op == BLOCK) {
+    symbol *decls = tree->values.sym;
+    INDENT(indent,outfile);
+    fprintf(outfile,"{\n");
+    while (decls) {
+      INDENT(indent+2,outfile);
+      fprintf(outfile,"DECLARE SYMBOL (%s=%p) type (",
+        decls->name, decls);
+      printTypeChain(decls->type,outfile);
+      fprintf(outfile,")\n");
 
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*      struct/union          */
-                /*----------------------------*/
-        case '.':
-                fprintf(outfile,"STRUCT_ACCESS (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
+      decls = decls->next;
+    }
+    ast_print(tree->right,outfile,indent+2);
+    INDENT(indent,outfile);
+    fprintf(outfile,"}\n");
+    return;
+  }
+  if (tree->opval.op == NULLOP) {
+    ast_print(tree->left,outfile,indent);
+    ast_print(tree->right,outfile,indent);
+    return ;
+  }
+  INDENT(indent,outfile);
 
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*    struct/union pointer    */
-                /*----------------------------*/
-        case PTR_OP:
-                fprintf(outfile,"PTR_ACCESS (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
+  /*------------------------------------------------------------------*/
+  /*----------------------------*/
+  /*   leaf has been reached    */
+  /*----------------------------*/
+  /* if this is of type value */
+  /* just get the type        */
+  if (tree->type == EX_VALUE) {
 
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*  ++/-- operation           */
-                /*----------------------------*/
-        case INC_OP:
-                if (tree->left)
-                  fprintf(outfile,"post-");
-                else
-                  fprintf(outfile,"pre-");
-                fprintf(outfile,"INC_OP (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2); /* postincrement case */
-                ast_print(tree->right,outfile,indent+2); /* preincrement case */
-                return ;
+    if (IS_LITERAL (tree->opval.val->etype)) {
+      fprintf(outfile,"CONSTANT (%p) value = ", tree);
+      if (SPEC_USIGN (tree->opval.val->etype))
+        fprintf(outfile,"%u", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val));
+      else
+        fprintf(outfile,"%d", (TYPE_TARGET_LONG) floatFromVal(tree->opval.val));
+      fprintf(outfile,", 0x%x, %f", (TYPE_TARGET_ULONG) floatFromVal(tree->opval.val),
+        floatFromVal(tree->opval.val));
+    } else if (tree->opval.val->sym) {
+      /* if the undefined flag is set then give error message */
+      if (tree->opval.val->sym->undefined) {
+        fprintf(outfile,"UNDEFINED SYMBOL ");
+      } else {
+        fprintf(outfile,"SYMBOL ");
+      }
+      fprintf(outfile,"(%s=%p @ %p)",
+        tree->opval.val->sym->name, tree, tree->opval.val->sym);
+    }
+    if (tree->ftype) {
+      fprintf(outfile," type (");
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+    } else {
+      fprintf(outfile,"\n");
+    }
+    return ;
+  }
 
-        case DEC_OP:
-                if (tree->left)
-                  fprintf(outfile,"post-");
-                else
-                  fprintf(outfile,"pre-");
-                fprintf(outfile,"DEC_OP (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2); /* postdecrement case */
-                ast_print(tree->right,outfile,indent+2); /* predecrement case */
-                return ;
-
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*  bitwise and               */
-                /*----------------------------*/
-        case '&':
-                if (tree->right) {
-                        fprintf(outfile,"& (%p) type (",tree);
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                        ast_print(tree->left,outfile,indent+2);
-                        ast_print(tree->right,outfile,indent+2);
-                } else {
-                        fprintf(outfile,"ADDRESS_OF (%p) type (",tree);
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                        ast_print(tree->left,outfile,indent+2);
-                        ast_print(tree->right,outfile,indent+2);
-                }
-                return ;
-                /*----------------------------*/
-                /*  bitwise or                */
-                /*----------------------------*/
-        case '|':
-                fprintf(outfile,"OR (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*  bitwise xor               */
-                /*----------------------------*/
-        case '^':
-                fprintf(outfile,"XOR (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*  division                  */
-                /*----------------------------*/
-        case '/':
-                fprintf(outfile,"DIV (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*            modulus         */
-                /*----------------------------*/
-        case '%':
-                fprintf(outfile,"MOD (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*  address dereference       */
-                /*----------------------------*/
-        case '*':                       /* can be unary  : if right is null then unary operation */
-                if (!tree->right) {
-                        fprintf(outfile,"DEREF (%p) type (",tree);
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                        ast_print(tree->left,outfile,indent+2);
-                        return ;
-                }
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*      multiplication        */
-                /*----------------------------*/
-                fprintf(outfile,"MULT (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
+  /* if type link for the case of cast */
+  if (tree->type == EX_LINK) {
+    fprintf(outfile,"TYPENODE (%p) type = (",tree);
+    printTypeChain(tree->opval.lnk,outfile);
+    fprintf(outfile,")\n");
+    return ;
+  }
 
 
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*    unary '+' operator      */
-                /*----------------------------*/
-        case '+':
-                /* if unary plus */
-                if (!tree->right) {
-                        fprintf(outfile,"UPLUS (%p) type (",tree);
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                        ast_print(tree->left,outfile,indent+2);
-                } else {
-                        /*------------------------------------------------------------------*/
-                        /*----------------------------*/
-                        /*      addition              */
-                        /*----------------------------*/
-                        fprintf(outfile,"ADD (%p) type (",tree);
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                        ast_print(tree->left,outfile,indent+2);
-                        ast_print(tree->right,outfile,indent+2);
-                }
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*      unary '-'             */
-                /*----------------------------*/
-        case '-':                       /* can be unary   */
-                if (!tree->right) {
-                        fprintf(outfile,"UMINUS (%p) type (",tree);
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                        ast_print(tree->left,outfile,indent+2);
-                } else {
-                        /*------------------------------------------------------------------*/
-                        /*----------------------------*/
-                        /*      subtraction           */
-                        /*----------------------------*/
-                        fprintf(outfile,"SUB (%p) type (",tree);
-                        printTypeChain(tree->ftype,outfile);
-                        fprintf(outfile,")\n");
-                        ast_print(tree->left,outfile,indent+2);
-                        ast_print(tree->right,outfile,indent+2);
-                }
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*    complement              */
-                /*----------------------------*/
-        case '~':
-                fprintf(outfile,"COMPL (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*           not              */
-                /*----------------------------*/
-        case '!':
-                fprintf(outfile,"NOT (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*           shift            */
-                /*----------------------------*/
-        case RRC:
-                fprintf(outfile,"RRC (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                return ;
+  /* depending on type of operator do */
 
-        case RLC:
-                fprintf(outfile,"RLC (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                return ;
-        case SWAP:
-                fprintf(outfile,"SWAP (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                return ;
-        case GETHBIT:
-                fprintf(outfile,"GETHBIT (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                return ;
-        case GETABIT:
-                fprintf(outfile,"GETABIT (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case GETBYTE:
-                fprintf(outfile,"GETBYTE (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case GETWORD:
-                fprintf(outfile,"GETWORD (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case LEFT_OP:
-                fprintf(outfile,"LEFT_SHIFT (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case RIGHT_OP:
-                fprintf(outfile,"RIGHT_SHIFT (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*         casting            */
-                /*----------------------------*/
-        case CAST:                      /* change the type   */
-                fprintf(outfile,"CAST (%p) from type (",tree);
-                printTypeChain(tree->right->ftype,outfile);
-                fprintf(outfile,") to type (");
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->right,outfile,indent+2);
-                return ;
+  switch (tree->opval.op) {
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*        array node          */
+    /*----------------------------*/
+  case '[':
+    fprintf(outfile,"ARRAY_OP (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
 
-        case AND_OP:
-                fprintf(outfile,"ANDAND (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case OR_OP:
-                fprintf(outfile,"OROR (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*      struct/union          */
+    /*----------------------------*/
+  case '.':
+    fprintf(outfile,"STRUCT_ACCESS (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
 
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*     comparison operators   */
-                /*----------------------------*/
-        case '>':
-                fprintf(outfile,"GT(>) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case '<':
-                fprintf(outfile,"LT(<) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case LE_OP:
-                fprintf(outfile,"LE(<=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case GE_OP:
-                fprintf(outfile,"GE(>=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case EQ_OP:
-                fprintf(outfile,"EQ(==) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-        case NE_OP:
-                fprintf(outfile,"NE(!=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*             sizeof         */
-                /*----------------------------*/
-        case SIZEOF:            /* evaluate wihout code generation */
-                fprintf(outfile,"SIZEOF %d\n",(getSize (tree->right->ftype)));
-                return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*    struct/union pointer    */
+    /*----------------------------*/
+  case PTR_OP:
+    fprintf(outfile,"PTR_ACCESS (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
 
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /* conditional operator  '?'  */
-                /*----------------------------*/
-        case '?':
-                fprintf(outfile,"QUEST(?) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*  ++/-- operation           */
+    /*----------------------------*/
+  case INC_OP:
+    if (tree->left)
+      fprintf(outfile,"post-");
+    else
+      fprintf(outfile,"pre-");
+    fprintf(outfile,"INC_OP (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2); /* postincrement case */
+    ast_print(tree->right,outfile,indent+2); /* preincrement case */
+    return ;
 
-        case ':':
-                fprintf(outfile,"COLON(:) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return ;
+  case DEC_OP:
+    if (tree->left)
+      fprintf(outfile,"post-");
+    else
+      fprintf(outfile,"pre-");
+    fprintf(outfile,"DEC_OP (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2); /* postdecrement case */
+    ast_print(tree->right,outfile,indent+2); /* predecrement case */
+    return ;
 
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*    assignment operators    */
-                /*----------------------------*/
-        case MUL_ASSIGN:
-                fprintf(outfile,"MULASS(*=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-        case DIV_ASSIGN:
-                fprintf(outfile,"DIVASS(/=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-        case AND_ASSIGN:
-                fprintf(outfile,"ANDASS(&=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-        case OR_ASSIGN:
-                fprintf(outfile,"ORASS(|=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-        case XOR_ASSIGN:
-                fprintf(outfile,"XORASS(^=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-        case RIGHT_ASSIGN:
-                fprintf(outfile,"RSHFTASS(>>=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-        case LEFT_ASSIGN:
-                fprintf(outfile,"LSHFTASS(<<=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*    -= operator             */
-                /*----------------------------*/
-        case SUB_ASSIGN:
-                fprintf(outfile,"SUBASS(-=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*          += operator       */
-                /*----------------------------*/
-        case ADD_ASSIGN:
-                fprintf(outfile,"ADDASS(+=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*      straight assignemnt   */
-                /*----------------------------*/
-        case '=':
-                fprintf(outfile,"ASSIGN(=) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*      comma operator        */
-                /*----------------------------*/
-        case ',':
-                fprintf(outfile,"COMMA(,) (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*       function call        */
-                /*----------------------------*/
-        case CALL:
-        case PCALL:
-                fprintf(outfile,"CALL (%p) type (",tree);
-                printTypeChain(tree->ftype,outfile);
-                fprintf(outfile,")\n");
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent+2);
-                return;
-        case PARAM:
-                fprintf(outfile,"PARMS\n");
-                ast_print(tree->left,outfile,indent+2);
-                if (tree->right /*&& !IS_AST_PARAM(tree->right)*/) {
-                        ast_print(tree->right,outfile,indent+2);
-                }
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*     return statement       */
-                /*----------------------------*/
-        case RETURN:
-                fprintf(outfile,"RETURN (%p) type (",tree);
-                if (tree->right) {
-                    printTypeChain(tree->right->ftype,outfile);
-                }
-                fprintf(outfile,")\n");
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*     label statement        */
-                /*----------------------------*/
-        case LABEL :
-                fprintf(outfile,"LABEL (%p)\n",tree);
-                ast_print(tree->left,outfile,indent+2);
-                ast_print(tree->right,outfile,indent);
-                return;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /*     switch statement       */
-                /*----------------------------*/
-        case SWITCH:
-                {
-                        value *val;
-                        fprintf(outfile,"SWITCH (%p) ",tree);
-                        ast_print(tree->left,outfile,0);
-                        for (val = tree->values.switchVals.swVals; val ; val = val->next) {
-                                INDENT(indent+2,outfile);
-                                fprintf(outfile,"CASE 0x%x GOTO _case_%d_%d\n",
-                                        (int) floatFromVal(val),
-                                        tree->values.switchVals.swNum,
-                                        (int) floatFromVal(val));
-                        }
-                        ast_print(tree->right,outfile,indent);
-                }
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /* ifx Statement              */
-                /*----------------------------*/
-        case IFX:
-                fprintf(outfile,"IF (%p) \n",tree);
-                ast_print(tree->left,outfile,indent+2);
-                if (tree->trueLabel) {
-                        INDENT(indent+2,outfile);
-                        fprintf(outfile,"NE(!=) 0 goto %s\n",tree->trueLabel->name);
-                }
-                if (tree->falseLabel) {
-                        INDENT(indent+2,outfile);
-                        fprintf(outfile,"EQ(==) 0 goto %s\n",tree->falseLabel->name);
-                }
-                ast_print(tree->right,outfile,indent+2);
-                return ;
-                /*----------------------------*/
-                /* goto Statement              */
-                /*----------------------------*/
-        case GOTO:
-                fprintf(outfile,"GOTO (%p) \n",tree);
-                ast_print(tree->left,outfile,indent+2);
-                fprintf(outfile,"\n");
-                return ;
-                /*------------------------------------------------------------------*/
-                /*----------------------------*/
-                /* for Statement              */
-                /*----------------------------*/
-        case FOR:
-                fprintf(outfile,"FOR (%p) \n",tree);
-                if (AST_FOR( tree, initExpr)) {
-                        INDENT(indent+2,outfile);
-                        fprintf(outfile,"INIT EXPR ");
-                        ast_print(AST_FOR(tree, initExpr),outfile,indent+2);
-                }
-                if (AST_FOR( tree, condExpr)) {
-                        INDENT(indent+2,outfile);
-                        fprintf(outfile,"COND EXPR ");
-                        ast_print(AST_FOR(tree, condExpr),outfile,indent+2);
-                }
-                if (AST_FOR( tree, loopExpr)) {
-                        INDENT(indent+2,outfile);
-                        fprintf(outfile,"LOOP EXPR ");
-                        ast_print(AST_FOR(tree, loopExpr),outfile,indent+2);
-                }
-                fprintf(outfile,"FOR LOOP BODY \n");
-                ast_print(tree->left,outfile,indent+2);
-                return ;
-        case CRITICAL:
-                fprintf(outfile,"CRITICAL (%p) \n",tree);
-                ast_print(tree->left,outfile,indent+2);
-        default:
-            return ;
-        }
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*  bitwise and               */
+    /*----------------------------*/
+  case '&':
+    if (tree->right) {
+      fprintf(outfile,"& (%p) type (",tree);
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+      ast_print(tree->left,outfile,indent+2);
+      ast_print(tree->right,outfile,indent+2);
+    } else {
+      fprintf(outfile,"ADDRESS_OF (%p) type (",tree);
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+      ast_print(tree->left,outfile,indent+2);
+      ast_print(tree->right,outfile,indent+2);
+    }
+    return ;
+    /*----------------------------*/
+    /*  bitwise or                */
+    /*----------------------------*/
+  case '|':
+    fprintf(outfile,"OR (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*  bitwise xor               */
+    /*----------------------------*/
+  case '^':
+    fprintf(outfile,"XOR (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*  division                  */
+    /*----------------------------*/
+  case '/':
+    fprintf(outfile,"DIV (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*            modulus         */
+    /*----------------------------*/
+  case '%':
+    fprintf(outfile,"MOD (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*  address dereference       */
+    /*----------------------------*/
+  case '*':                       /* can be unary  : if right is null then unary operation */
+    if (!tree->right) {
+      fprintf(outfile,"DEREF (%p) type (",tree);
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+      ast_print(tree->left,outfile,indent+2);
+      return ;
+    }
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*      multiplication        */
+    /*----------------------------*/
+    fprintf(outfile,"MULT (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+
+
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*    unary '+' operator      */
+    /*----------------------------*/
+  case '+':
+    /* if unary plus */
+    if (!tree->right) {
+      fprintf(outfile,"UPLUS (%p) type (",tree);
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+      ast_print(tree->left,outfile,indent+2);
+    } else {
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
+      /*      addition              */
+      /*----------------------------*/
+      fprintf(outfile,"ADD (%p) type (",tree);
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+      ast_print(tree->left,outfile,indent+2);
+      ast_print(tree->right,outfile,indent+2);
+    }
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*      unary '-'             */
+    /*----------------------------*/
+  case '-':                       /* can be unary   */
+    if (!tree->right) {
+      fprintf(outfile,"UMINUS (%p) type (",tree);
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+      ast_print(tree->left,outfile,indent+2);
+    } else {
+      /*------------------------------------------------------------------*/
+      /*----------------------------*/
+      /*      subtraction           */
+      /*----------------------------*/
+      fprintf(outfile,"SUB (%p) type (",tree);
+      printTypeChain(tree->ftype,outfile);
+      fprintf(outfile,")\n");
+      ast_print(tree->left,outfile,indent+2);
+      ast_print(tree->right,outfile,indent+2);
+    }
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*    complement              */
+    /*----------------------------*/
+  case '~':
+    fprintf(outfile,"COMPL (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*           not              */
+    /*----------------------------*/
+  case '!':
+    fprintf(outfile,"NOT (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*           shift            */
+    /*----------------------------*/
+  case RRC:
+    fprintf(outfile,"RRC (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    return ;
+
+  case RLC:
+    fprintf(outfile,"RLC (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    return ;
+  case SWAP:
+    fprintf(outfile,"SWAP (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    return ;
+  case GETHBIT:
+    fprintf(outfile,"GETHBIT (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    return ;
+  case GETABIT:
+    fprintf(outfile,"GETABIT (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case GETBYTE:
+    fprintf(outfile,"GETBYTE (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case GETWORD:
+    fprintf(outfile,"GETWORD (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case LEFT_OP:
+    fprintf(outfile,"LEFT_SHIFT (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case RIGHT_OP:
+    fprintf(outfile,"RIGHT_SHIFT (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*         casting            */
+    /*----------------------------*/
+  case CAST:                      /* change the type   */
+    fprintf(outfile,"CAST (%p) from type (",tree);
+    printTypeChain(tree->right->ftype,outfile);
+    fprintf(outfile,") to type (");
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+
+  case AND_OP:
+    fprintf(outfile,"ANDAND (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case OR_OP:
+    fprintf(outfile,"OROR (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*     comparison operators   */
+    /*----------------------------*/
+  case '>':
+    fprintf(outfile,"GT(>) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case '<':
+    fprintf(outfile,"LT(<) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case LE_OP:
+    fprintf(outfile,"LE(<=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case GE_OP:
+    fprintf(outfile,"GE(>=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case EQ_OP:
+    fprintf(outfile,"EQ(==) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+  case NE_OP:
+    fprintf(outfile,"NE(!=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*             sizeof         */
+    /*----------------------------*/
+  case SIZEOF:            /* evaluate wihout code generation */
+    fprintf(outfile,"SIZEOF %d\n",(getSize (tree->right->ftype)));
+    return ;
+
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /* conditional operator  '?'  */
+    /*----------------------------*/
+  case '?':
+    fprintf(outfile,"QUEST(?) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+
+  case ':':
+    fprintf(outfile,"COLON(:) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*    assignment operators    */
+    /*----------------------------*/
+  case MUL_ASSIGN:
+    fprintf(outfile,"MULASS(*=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+  case DIV_ASSIGN:
+    fprintf(outfile,"DIVASS(/=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+  case AND_ASSIGN:
+    fprintf(outfile,"ANDASS(&=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+  case OR_ASSIGN:
+    fprintf(outfile,"ORASS(|=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+  case XOR_ASSIGN:
+    fprintf(outfile,"XORASS(^=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+  case RIGHT_ASSIGN:
+    fprintf(outfile,"RSHFTASS(>>=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+  case LEFT_ASSIGN:
+    fprintf(outfile,"LSHFTASS(<<=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*    -= operator             */
+    /*----------------------------*/
+  case SUB_ASSIGN:
+    fprintf(outfile,"SUBASS(-=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*          += operator       */
+    /*----------------------------*/
+  case ADD_ASSIGN:
+    fprintf(outfile,"ADDASS(+=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*      straight assignemnt   */
+    /*----------------------------*/
+  case '=':
+    fprintf(outfile,"ASSIGN(=) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*      comma operator        */
+    /*----------------------------*/
+  case ',':
+    fprintf(outfile,"COMMA(,) (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*       function call        */
+    /*----------------------------*/
+  case CALL:
+  case PCALL:
+    fprintf(outfile,"CALL (%p) type (",tree);
+    printTypeChain(tree->ftype,outfile);
+    fprintf(outfile,")\n");
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent+2);
+    return;
+  case PARAM:
+    fprintf(outfile,"PARMS\n");
+    ast_print(tree->left,outfile,indent+2);
+    if (tree->right /*&& !IS_AST_PARAM(tree->right)*/) {
+      ast_print(tree->right,outfile,indent+2);
+    }
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*     return statement       */
+    /*----------------------------*/
+  case RETURN:
+    fprintf(outfile,"RETURN (%p) type (",tree);
+    if (tree->right) {
+      printTypeChain(tree->right->ftype,outfile);
+    }
+    fprintf(outfile,")\n");
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*     label statement        */
+    /*----------------------------*/
+  case LABEL :
+    fprintf(outfile,"LABEL (%p)\n",tree);
+    ast_print(tree->left,outfile,indent+2);
+    ast_print(tree->right,outfile,indent);
+    return;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /*     switch statement       */
+    /*----------------------------*/
+  case SWITCH:
+    {
+      value *val;
+      fprintf(outfile,"SWITCH (%p) ",tree);
+      ast_print(tree->left,outfile,0);
+      for (val = tree->values.switchVals.swVals; val ; val = val->next) {
+        INDENT(indent+2,outfile);
+        fprintf(outfile,"CASE 0x%x GOTO _case_%d_%d\n",
+          (int) floatFromVal(val),
+          tree->values.switchVals.swNum,
+          (int) floatFromVal(val));
+      }
+      ast_print(tree->right,outfile,indent);
+    }
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /* ifx Statement              */
+    /*----------------------------*/
+  case IFX:
+    fprintf(outfile,"IF (%p) \n",tree);
+    ast_print(tree->left,outfile,indent+2);
+    if (tree->trueLabel) {
+      INDENT(indent+2,outfile);
+      fprintf(outfile,"NE(!=) 0 goto %s\n",tree->trueLabel->name);
+    }
+    if (tree->falseLabel) {
+      INDENT(indent+2,outfile);
+      fprintf(outfile,"EQ(==) 0 goto %s\n",tree->falseLabel->name);
+    }
+    ast_print(tree->right,outfile,indent+2);
+    return ;
+    /*----------------------------*/
+    /* goto Statement              */
+    /*----------------------------*/
+  case GOTO:
+    fprintf(outfile,"GOTO (%p) \n",tree);
+    ast_print(tree->left,outfile,indent+2);
+    fprintf(outfile,"\n");
+    return ;
+    /*------------------------------------------------------------------*/
+    /*----------------------------*/
+    /* for Statement              */
+    /*----------------------------*/
+  case FOR:
+    fprintf(outfile,"FOR (%p) \n",tree);
+    if (AST_FOR( tree, initExpr)) {
+      INDENT(indent+2,outfile);
+      fprintf(outfile,"INIT EXPR ");
+      ast_print(AST_FOR(tree, initExpr),outfile,indent+2);
+    }
+    if (AST_FOR( tree, condExpr)) {
+      INDENT(indent+2,outfile);
+      fprintf(outfile,"COND EXPR ");
+      ast_print(AST_FOR(tree, condExpr),outfile,indent+2);
+    }
+    if (AST_FOR( tree, loopExpr)) {
+      INDENT(indent+2,outfile);
+      fprintf(outfile,"LOOP EXPR ");
+      ast_print(AST_FOR(tree, loopExpr),outfile,indent+2);
+    }
+    fprintf(outfile,"FOR LOOP BODY \n");
+    ast_print(tree->left,outfile,indent+2);
+    return ;
+  case CRITICAL:
+    fprintf(outfile,"CRITICAL (%p) \n",tree);
+    ast_print(tree->left,outfile,indent+2);
+  default:
+    return ;
+  }
 }
 
 void PA(ast *t)
 {
-        ast_print(t,stdout,0);
+  ast_print(t,stdout,0);
 }
-
-
 
 /*-----------------------------------------------------------------*/
 /* astErrors : returns non-zero if errors present in tree          */

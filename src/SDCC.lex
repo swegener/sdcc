@@ -45,12 +45,9 @@ IS      (u|U|l|L)*
 
 #define TKEYWORD99(token) return (options.std_c99 ? token : check_type())
 
-extern int lineno, column;
 extern char *filename;
-
-/* global definitions */
-char *currFname;
-int mylineno = 1;
+extern int lineno;
+int column = 0;         /* current column */
 
 /* local definitions */
 static struct dbuf_s asmbuff; /* reusable _asm buffer */
@@ -272,15 +269,15 @@ _?"_asm"         {
 
 static int checkCurrFile (const char *s)
 {
-    int  lNum;
-    char *tptr;
+  int  lNum;
+  char *tptr;
 
-    /* skip '#' character */
-    if (*s++ != '#')
-      return 0;
+  /* skip '#' character */
+  if (*s++ != '#')
+    return 0;
 
-    /* check if this is a #line
-     this is not standard and can be removed in the future */
+  /* check if this is a #line
+    this is not standard and can be removed in the future */
 #define LINE_STR  "line"
 #define LINE_LEN  ((sizeof LINE_STR) - 1)
 
@@ -293,29 +290,28 @@ static int checkCurrFile (const char *s)
     return 0;
   s = tptr;
 
+  /* adjust the line number */
+  lineno = lNum;
+
   /* now see if we have a file name */
   while (*s != '"' && *s)
     ++s;
 
-  /* if we don't have a filename then */
-  /* set the current line number to   */
-  /* line number if printFlag is on   */
-  if (!*s) {
-    lineno = mylineno = lNum;
-    return 0;
-  }
+  if (!*s)
+    {
+      /* no file name: return */
+      return 0;
+    }
 
-  /* if we have a filename then check */
-  /* if it is "standard in" if yes then */
-  /* get the currentfile name info    */
+  /* skip the double quote */
   ++s;
 
-  /* in c1mode fullSrcFileName is NULL */
+  /* get the file name and see if it is different from current one.
+     in c1mode fullSrcFileName is NULL */
   if (fullSrcFileName &&
-    strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0)
+    strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0 && fullSrcFileName[strlen(fullSrcFileName) - 1] == '"')
     {
-      lineno = mylineno = lNum;
-      currFname = fullSrcFileName;
+      filename = fullSrcFileName;
     }
   else
     {
@@ -324,17 +320,13 @@ static int checkCurrFile (const char *s)
       /* find the end of the filename */
       while (*s && *s != '"')
         ++s;
-      currFname = Safe_malloc(s - sb + 1);
-      memcpy(currFname, sb, s - sb);
-      currFname[s - sb] = '\0';
-      lineno = mylineno = lNum;
+
+      filename = Safe_malloc(s - sb + 1);
+      memcpy(filename, sb, s - sb);
+      filename[s - sb] = '\0';
     }
-  filename = currFname;
   return 0;
 }
-
-int column = 0;
-int plineIdx =0;
 
 static void count(void)
 {
@@ -344,7 +336,7 @@ static void count(void)
       if (yytext[i] == '\n')
         {
           column = 0;
-          lineno = ++mylineno;
+          ++lineno;
         }
       else
         if (yytext[i] == '\t')
@@ -403,7 +395,7 @@ static const char *stringLiteral(void)
           if ((ch = input()) == '\n')
             {
               /* \<newline> is a continuator */
-              lineno = ++mylineno;
+              ++lineno;
               column = 0;
             }
           else
@@ -424,7 +416,7 @@ static const char *stringLiteral(void)
           /* if new line we have a new line break, which is illegal */
           werror(W_NEWLINE_IN_STRING);
           dbuf_append_char(&dbuf, '\n');
-          lineno = ++mylineno;
+          ++lineno;
           column = 0;
           break;
 
@@ -452,13 +444,13 @@ static const char *stringLiteral(void)
                     }
                     else
                       {
-                        lineno = ++mylineno;
+                        ++lineno;
                         column = 0;
                       }
                     break;
 
                 case '\n':
-                  lineno = ++mylineno;
+                  ++lineno;
                   column = 0;
                   break;
 
@@ -477,7 +469,7 @@ static const char *stringLiteral(void)
 
                       if (ch == '\n')
                         {
-                          lineno = ++mylineno;
+                          ++lineno;
                           column = 0;
                         }
 
@@ -1113,10 +1105,10 @@ int yyerror(char *s)
 
   if(options.vc_err_style)
     fprintf(stderr, "\n%s(%d) : %s: token -> '%s' ; column %d\n",
-      filename, mylineno, s, yytext, column);
+      filename, lineno, s, yytext, column);
   else
     fprintf(stderr, "\n%s:%d: %s: token -> '%s' ; column %d\n",
-      filename, mylineno, s ,yytext, column);
+      filename, lineno, s ,yytext, column);
   fatalError++;
 
   return 0;

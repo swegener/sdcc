@@ -35,8 +35,8 @@ int iTempNum = 0;
 int iTempLblNum = 0;
 int operandKey = 0;
 int iCodeKey = 0;
-char *filename;
-int lineno;
+char *filename;                 /* current file name */
+int lineno = 1;                 /* current line number */
 int block;
 int scopeLevel;
 int seqPoint;

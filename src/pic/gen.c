@@ -3454,22 +3454,24 @@ static void genDivOneByte (operand *left,
 						   operand *result)
 {
 	int size;
+	int sign;
 	
 	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
-	assert (AOP_SIZE(result) == 1);
 	assert (AOP_SIZE(right) == 1);
 	assert (AOP_SIZE(left) == 1);
 
 	size = min(AOP_SIZE(result),AOP_SIZE(left));
+	sign = !(SPEC_USIGN(operandType(left))
+		&& SPEC_USIGN(operandType(right)));
 
 	if (AOP_TYPE(right) == AOP_LIT)
 	{
 		/* XXX: might add specialized code */
 	}
 
-	if (SPEC_USIGN(operandType(left)) && SPEC_USIGN(operandType(right)))
+	if (!sign)
 	{
 		/* unsigned division */
 	#if 1
@@ -3529,7 +3531,7 @@ static void genDivOneByte (operand *left,
 	}
 
 	/* now performed the signed/unsigned division -- extend result */
-	addSign(result, 1, !SPEC_USIGN(operandType(result)));
+	addSign(result, 1, sign);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3572,29 +3574,6 @@ release :
 }
 
 /*-----------------------------------------------------------------*/
-/* genModbits :- modulus of bits								   */
-/*-----------------------------------------------------------------*/
-static void genModbits (operand *left, 
-						operand *right, 
-						operand *result)
-{
-	
-	char *l;
-	
-	FENTRY;
-	/* the result must be bit */	  
-	pic14_emitcode("mov","b,%s",aopGet(AOP(right),0,FALSE,FALSE));
-	l = aopGet(AOP(left),0,FALSE,FALSE);
-	
-	MOVA(l);
-	
-	pic14_emitcode("div","ab");
-	pic14_emitcode("mov","a,b");
-	pic14_emitcode("rrc","a");
-	aopPut(AOP(result),"c",0);
-}
-
-/*-----------------------------------------------------------------*/
 /* genModOneByte : 8 bit modulus								   */
 /*-----------------------------------------------------------------*/
 static void genModOneByte (operand *left,
@@ -3602,22 +3581,24 @@ static void genModOneByte (operand *left,
 						   operand *result)
 {
 	int size;
+	int sign;
 	
 	FENTRY;
 	DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	
-	assert (AOP_SIZE(result) == 1);
 	assert (AOP_SIZE(right) == 1);
 	assert (AOP_SIZE(left) == 1);
 
 	size = min(AOP_SIZE(result),AOP_SIZE(left));
+	sign = !(SPEC_USIGN(operandType(left))
+		&& SPEC_USIGN(operandType(right)));
 
 	if (AOP_TYPE(right) == AOP_LIT)
 	{
 		/* XXX: might add specialized code */
 	}
 
-	if (SPEC_USIGN(operandType(left)) && SPEC_USIGN(operandType(right)))
+	if (!sign)
 	{
 		/* unsigned division */
 	#if 1
@@ -3677,7 +3658,7 @@ static void genModOneByte (operand *left,
 	}
 
 	/* now we performed the signed/unsigned modulus -- extend result */
-	addSign(result, 1, !SPEC_USIGN(operandType(result)));
+	addSign(result, 1, sign);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3695,14 +3676,6 @@ static void genMod (iCode *ic)
 	aopOp (left,ic,FALSE);
 	aopOp (right,ic,FALSE);
 	aopOp (result,ic,TRUE);
-	
-	/* special cases first */
-	/* both are bits */
-	if (AOP_TYPE(left) == AOP_CRY &&
-		AOP_TYPE(right)== AOP_CRY) {
-		genModbits(left,right,result);
-		goto release ;
-	}
 	
 	/* if both are of size == 1 */
 	if (AOP_SIZE(left) == 1 &&

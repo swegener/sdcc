@@ -1443,7 +1443,8 @@ picglue ()
 	
 	if (mainf && IFFUNC_HASBODY(mainf->type)) {
 		/* initialize data memory */
-		fprintf (asmFile, "code_init\t%s\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
+		/* do NOT name this code_init to avoid conflicts with init.c */
+		fprintf (asmFile, "c_init\t%s\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
 		fprintf (asmFile,"__sdcc_gsinit_startup\n");
 		/* FIXME: This is temporary.  The idata section should be used.  If 
 		not, we could add a special feature to the linker.  This will 

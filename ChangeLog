@@ -1,3 +1,11 @@
+2007-01-19 Raphael Neider <rneider AT web.de>
+
+	* src/pic/device.c (register_map): fixed list construction
+	* src/pic/gen.c (genDivOneByte,genModOneByte): accept result > 1 byte,
+	  (genMod): removed case for genModbits,
+	  (genModbits): removed as now unused/unimplemented
+	* src/pic/glue.c (picglue): prevent name clash with sources 'init.c'
+
 2007-01-18 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* support/regression/tests/swap.c: added in response to #1638622

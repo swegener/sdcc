@@ -166,11 +166,10 @@ static void register_map(int num_words, char word[SPLIT_WORDS_MAX][PIC14_STRING_
 		r->end_address = parse_config_value(word[pcount]);
 		r->alias = parse_config_value(word[1]);
 		r->bank = (r->start_address >> 7) & 3;
+		// add memRange to device entry for future lookup (sharebanks)
+		r->next = rangeRAM;
+		rangeRAM = r;
 	}
-	
-	// add memRange to device entry for future lookup (sharebanks)
-	r->next = rangeRAM;
-	rangeRAM = r;
 }
 
 

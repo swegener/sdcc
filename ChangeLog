@@ -5,7 +5,8 @@
 
 2007-01-18 Borut Razem <borut.razem AT siol.net>
 
-	* SDCClabel.c: fixed bug #1638651: wrong linenumber presented in warning
+	* SDCClabel.c: fixed bug #1638651: wrong linenumber presented in warning,
+	  thanks to Gunther Jehle
 	* src/asm.c: don't die if the file drfined in #line couldn't be opened
 	* src/SDCC.lex, src/SDCCglobal.h, src/SDCCicode.c, src/SDCCsymt.c,
 	  src/SDCCval.c: removed redundant definitions of currFname and mylineno;

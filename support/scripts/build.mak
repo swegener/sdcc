@@ -126,10 +126,10 @@ ifdef TNP
 	export CCC=$(TNP)c++; \
 	export RANLIB=$(TNP)ranlib; \
 	export CC=$(TNP)gcc; \
-	./configure --datadir=$(SDCC_ROOT)
+	./configure --datarootdir=$(SDCC_ROOT)
 	echo $$CCC
 else
-	cd sdcc; ./configure --datadir=$(SDCC_ROOT)
+	cd sdcc; ./configure --datarootdir=$(SDCC_ROOT)
 endif
 
 dist: _sdcc lcc tidy

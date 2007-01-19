@@ -1,3 +1,11 @@
+2007-01-19 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* doc/sdccman.lyx: updated "configure options" for autoconf 2.6
+	* support/scripts/sdcc_cygwin_mingw32,
+	* support/scripts/sdcc_mingw32,
+	* support/scripts/build.mak: replaced --datadir by --datarootdir for
+	conformance with autoconf 2.6
+
 2007-01-19 Raphael Neider <rneider AT web.de>
 
 	* src/pic/device.c (register_map): fixed list construction

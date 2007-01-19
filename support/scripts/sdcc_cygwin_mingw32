@@ -3,8 +3,8 @@
 
 ./configure -C \
 --prefix="/sdcc" \
---datadir="/sdcc" \
-docdir="/sdcc/doc" \
+--datarootdir="/sdcc" \
+docdir="\${datarootdir}/doc" \
 include_dir_suffix="include" \
 lib_dir_suffix="lib" \
 sdccconf_h_dir_separator="\\\\" \

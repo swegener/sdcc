@@ -1059,6 +1059,20 @@ status Collapsed
 \end_inset 
 
 -datadir see table below
+\layout List
+\labelwidthstring 00.00.0000
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-datarootdir see table below
 \newline 
 
 \layout List
@@ -1351,7 +1365,7 @@ These defaults are:
 \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features>
 <column alignment="block" valignment="top" leftline="true" width="0in">
 <column alignment="block" valignment="top" leftline="true" width="0in">
@@ -1462,7 +1476,7 @@ BINDIR
 
 
 \emph on 
-$EXECPREFIX
+$EXEC_PREFIX
 \emph default 
 /bin
 \end_inset 
@@ -1474,7 +1488,7 @@ $EXECPREFIX
 
 
 \emph on 
-$EXECPREFIX
+$EXEC_PREFIX
 \emph default 
 
 \backslash 
@@ -1491,6 +1505,38 @@ bin
 
 \emph on 
 DATADIR
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$DATAROOTDIR
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+$DATAROOTDIR
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+DATAROOTDIR
 \end_inset 
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
@@ -1534,7 +1580,7 @@ DOCDIR
 
 
 \emph on 
-$DATADIR
+$DATAROOTDIR
 \emph default 
 /sdcc/doc
 \end_inset 
@@ -1546,7 +1592,7 @@ $DATADIR
 
 
 \emph on 
-$DATADIR
+$DATAROOTDIR
 \emph default 
 
 \backslash 
@@ -1784,7 +1830,7 @@ status Collapsed
 /
 \end_inset 
 
--datadir=
+-datarootdir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1901,7 +1947,7 @@ status Collapsed
 /
 \end_inset 
 
--datadir=
+-datarootdir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -1917,7 +1963,9 @@ docdir=
 \begin_inset Quotes srd
 \end_inset 
 
-/sdcc/doc
+
+\backslash 
+${datarootdir}/doc
 \begin_inset Quotes srd
 \end_inset 
 
@@ -2058,7 +2106,7 @@ status Collapsed
 /
 \end_inset 
 
--datadir=
+-datarootdir=
 \begin_inset Quotes srd
 \end_inset 
 
@@ -2074,7 +2122,9 @@ docdir=
 \begin_inset Quotes srd
 \end_inset 
 
-/sdcc/doc
+
+\backslash 
+${datarootdir}/doc
 \begin_inset Quotes srd
 \end_inset 
 

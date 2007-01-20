@@ -1,5 +1,9 @@
 2007-01-20 Raphael Neider <rneider AT web.de>
 
+	* device/include/pic/pic14regs.h: reverted accidental wipe of the file
+
+2007-01-20 Raphael Neider <rneider AT web.de>
+
 	* device/lib/pic/libdev/devices.txt: device list for mkall.sh
 	* device/lib/pic/libdev/mkall.sh: script to rebuild all device libs
 	* device/lib/pic/libdev/pic14ports.txt: device PORT specifications

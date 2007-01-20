@@ -444,11 +444,10 @@ static const char *stringLiteral(void)
           dbuf_append_char(&dbuf, '"');  /* Pass end of this string or substring to evaluator */
           while ((ch = input()) && (isspace(ch) || ch == '\\' || ch == '#'))
             {
-              count_char(ch);
-
               switch (ch)
                 {
                 case '\\':
+                  count_char(ch);
                   if ((ch = input()) != '\n')
                     {
                       werror(W_STRAY_BACKSLASH, column);
@@ -457,9 +456,9 @@ static const char *stringLiteral(void)
                       else
                         count_char(ch);
                     }
-                    else
-                      count_char(ch);
-                    break;
+                  else
+                    count_char(ch);
+                  break;
 
                 case '\n':
                   count_char(ch);
@@ -471,6 +470,8 @@ static const char *stringLiteral(void)
                       /* # at the beginning of the line: collect the entire line */
                       struct dbuf_s linebuf;
                       const char *line;
+
+                      count_char(ch);
 
                       dbuf_init(&linebuf, STR_BUF_CHUNCK_LEN);
                       dbuf_append_char(&linebuf, '#');
@@ -491,6 +492,13 @@ static const char *stringLiteral(void)
 
                       dbuf_destroy(&linebuf);
                     }
+                  else
+                    unput(ch);
+                  break;
+
+                default:
+                  count_char(ch);
+                  break;
                 }
             }
 

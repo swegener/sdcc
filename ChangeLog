@@ -1,3 +1,8 @@
+2007-01-20 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.lex, src/SDCCmain.c, sdc/SDCCglobl.h, doc/sdccman.lyx:
+	  implemented RFE #1470316: allow "$" in variable names
+
 2007-01-20 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic14regs.h: reverted accidental wipe of the file

@@ -24,6 +24,7 @@
 
 D       [0-9]
 L       [a-zA-Z_]
+L_DOLL  [a-zA-Z_$]
 H       [a-fA-F0-9]
 E       [Ee][+-]?{D}+
 FS      (f|F|l|L)
@@ -55,6 +56,7 @@ static struct dbuf_s asmbuff; /* reusable _asm buffer */
 /* forward declarations */
 static const char *stringLiteral(void);
 static void count(void);
+static void count_char(int);
 static int process_pragma(const char *);
 static int check_type(void);
 static int isTargetKeyword(const char *s);
@@ -186,6 +188,15 @@ _?"_asm"         {
 "inline"       { count(); TKEYWORD99(INLINE); }
 "restrict"     { count(); TKEYWORD99(RESTRICT); }
 {L}({L}|{D})*  { count(); return(check_type()); }
+{L_DOLL}({L_DOLL}|{D})*  {
+  if (options.dollars_in_ident)
+    {
+      count();
+      return(check_type());
+    }
+  else
+    REJECT;
+}
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0[0-7]*{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 [1-9]{D}*{IS}?      { count(); yylval.val = constVal(yytext); return(CONSTANT); }
@@ -250,13 +261,14 @@ _?"_asm"         {
 \\ {
   int ch = input();
 
-  ++column;
-  if (ch != '\n') {
-    /* that could have been removed by the preprocessor anyway */
-    werror (W_STRAY_BACKSLASH, column);
-    unput(ch);
-    --column;
-  }
+  if (ch == '\n')
+    count_char(ch);
+  else
+    {
+      /* that could have been removed by the preprocessor anyway */
+      werror (W_STRAY_BACKSLASH, column);
+      unput(ch);
+    }
 }
 .              { count(); }
 %%
@@ -328,23 +340,31 @@ static int checkCurrFile (const char *s)
   return 0;
 }
 
+static void count_char(int ch)
+{
+  switch (ch)
+    {
+    case '\n':
+      column = 0;
+      ++lineno;
+      break;
+
+    case '\t':
+      column += 8 - (column % 8);
+      break;
+
+    default:
+      ++column;
+      break;
+    }
+}
+
 static void count(void)
 {
-  int i;
-  for (i = 0; yytext[i] != '\0'; i++)
-    {
-      if (yytext[i] == '\n')
-        {
-          column = 0;
-          ++lineno;
-        }
-      else
-        if (yytext[i] == '\t')
-          column += 8 - (column % 8);
-        else
-          column++;
-    }
-  /* ECHO; */
+  const char *p;
+
+  for (p = yytext; *p; ++p)
+    count_char(*p);
 }
 
 static int check_type(void)
@@ -384,7 +404,7 @@ static const char *stringLiteral(void)
   for (; ; )
     {
       ch = input();
-      ++column;
+      count_char(ch);
       if (ch == EOF)
         break;
 
@@ -392,11 +412,11 @@ static const char *stringLiteral(void)
         {
         case '\\':
           /* if it is a \ then escape char's are allowed */
-          if ((ch = input()) == '\n')
+          ch = input();
+          count_char(ch);
+          if (ch == '\n')
             {
               /* \<newline> is a continuator */
-              ++lineno;
-              column = 0;
             }
           else
             {
@@ -405,7 +425,6 @@ static const char *stringLiteral(void)
               if (ch == EOF)
                 goto out;
 
-              ++column;
               buf[0] = '\\';
               buf[1] = ch;
               dbuf_append(&dbuf, buf, 2); /* get the escape char, no further check */
@@ -416,8 +435,6 @@ static const char *stringLiteral(void)
           /* if new line we have a new line break, which is illegal */
           werror(W_NEWLINE_IN_STRING);
           dbuf_append_char(&dbuf, '\n');
-          ++lineno;
-          column = 0;
           break;
 
         case '"':
@@ -427,31 +444,25 @@ static const char *stringLiteral(void)
           dbuf_append_char(&dbuf, '"');  /* Pass end of this string or substring to evaluator */
           while ((ch = input()) && (isspace(ch) || ch == '\\' || ch == '#'))
             {
-              ++column;
+              count_char(ch);
 
               switch (ch)
                 {
                 case '\\':
                   if ((ch = input()) != '\n')
                     {
-                      ++column;
                       werror(W_STRAY_BACKSLASH, column);
                       if (ch != EOF)
-                        {
-                          unput(ch);
-                          --column;
-                        }
+                        unput(ch);
+                      else
+                        count_char(ch);
                     }
                     else
-                      {
-                        ++lineno;
-                        column = 0;
-                      }
+                      count_char(ch);
                     break;
 
                 case '\n':
-                  ++lineno;
-                  column = 0;
+                  count_char(ch);
                   break;
 
                 case '#':
@@ -468,10 +479,7 @@ static const char *stringLiteral(void)
                         dbuf_append_char(&linebuf, (char)ch);
 
                       if (ch == '\n')
-                        {
-                          ++lineno;
-                          column = 0;
-                        }
+                        count_char(ch);
 
                       line = dbuf_c_str(&linebuf);
 
@@ -492,9 +500,9 @@ static const char *stringLiteral(void)
           if (ch != '"')
             {
               unput(ch);
-              --column;
               goto out;
             }
+          count_char(ch);
           break;
 
         default:

@@ -142,6 +142,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_STD_SDCC99       "--std-sdcc99"
 #define OPTION_CODE_SEG         "--codeseg"
 #define OPTION_CONST_SEG        "--constseg"
+#define OPTION_DOLLARS_IN_IDENT "--fdollars-in-identifiers"
 
 static const OPTION
 optionsTable[] = {
@@ -176,6 +177,7 @@ optionsTable[] = {
     { 0,    OPTION_STD_SDCC89,      NULL, "Use C89 standard with SDCC extensions (default)" },
     { 0,    OPTION_STD_C99,         NULL, "Use C99 standard only (incomplete)" },
     { 0,    OPTION_STD_SDCC99,      NULL, "Use C99 standard with SDCC extensions (incomplete)" },
+    { 0,    OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character" },
 
     { 0,    NULL,                   NULL, "Code generation options"},
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },
@@ -2016,6 +2018,10 @@ preProcess (char **envp)
           strcpy(&buf[OBJ_EXT_LEN], port->linker.rel_ext);
           addSet(&preArgvSet, buf);
         }
+
+      /* if using dollar signs in identifiers */
+      if (options.dollars_in_ident)
+        addSet(&preArgvSet, Safe_strdup("--fdollars-in-identifiers"));
 
       /* if using external stack define the macro */
       if (options.useXstack)

@@ -8773,6 +8773,29 @@ status Collapsed
  Can be used for instance when using bank switching to put the const data
  in a bank.
 \layout List
+\labelwidthstring 00.00.0000
+
+
+\series bold 
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+/
+\end_inset 
+
+-fdollars-in-identifiers
+\begin_inset LatexCommand \index{-\/-fdollars-in-identifiers}
+
+\end_inset 
+
+
+\series default 
+ Permit '$' as an identifier character
+\layout List
 \added_space_bottom bigskip \labelwidthstring 00.00.0000
 
 

@@ -1,3 +1,14 @@
+2007-01-20 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic/libdev/devices.txt: device list for mkall.sh
+	* device/lib/pic/libdev/mkall.sh: script to rebuild all device libs
+	* device/lib/pic/libdev/pic14ports.txt: device PORT specifications
+	* support/scripts/inc2h.pl: fixed major .inc parsing bugs,
+	  applied patch from Robert Tate (#1629249) to add PORTs and TRISs
+	* device/lib/pic/libdev/pic*.c,
+	* device/include/pic/pic*.h: regenerated with enhanced inc2h.pl
+	* device/lib/pic/libdev/Makefile.in: show progress
+
 2007-01-19 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* doc/sdccman.lyx: updated "configure options" for autoconf 2.6

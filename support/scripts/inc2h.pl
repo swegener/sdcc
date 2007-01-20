@@ -19,13 +19,64 @@
 $rcsid = q~$Id$~;
 ($junk, $file, $version, $date, $time, $programmer, $status)
     = split(/\s+/, $rcsid);
-($programName) = ($file =~ /(\S+),v/);
+($programName) = ($file =~ /(\S+)/);
 
 if ($#ARGV < 0 || $#ARGV > 1 ) {
     Usage();
 }
 $processor = uc(shift);
 $path = shift;
+
+
+# just in time fixes for some register names
+sub fixname {
+    my $name = shift;
+    $name =~ s/COMCON/CMCON/ig;
+    # use OPTION_REG instead of OPTION as OPTION is a assembler directive
+    $name =~ s/OPTION(_REG)?/OPTION_REG/ig;
+    # often declared as LCDDATn, but bits defined for LCDDATAn, 0 <= n <= 10
+    $name =~ s/LCDDAT([^A])/LCDDATA$1/ig;
+    # LCDSE2 is missing in some headers, but LCDSE3 is declared...
+    $name =~ s/LCDSE3/LCDSE2/ig;
+    # XXX: should this be named LININTF or LINPRT?
+    $name =~ s/LININTF/LINPRT/ig;
+    # FIXME: duplicate declarations for n in {0,1,2}
+    $name =~ s/UEPn/UEP0/ig;
+
+    return $name;
+}
+
+sub checkname {
+    my $name = shift;
+    if (not exists $sfrs{$name}) {
+	print "SFR $name not defined (yet).\n";
+	# Find similar ones.
+	if (exists $sfrs{$name."0"}) {
+	    print "  but ".$name."0 exists---using that instead.\n";
+	    return $name."0";
+	}
+	$try = $name;
+	$try =~ s/[0-9]$//;
+	if (exists $sfrs{$try}) {
+	    print "  but $try exists---using that instead.\n";
+	    return $try;
+	}
+	die "Not found a similar SFR---aborting.\n";
+    }
+    return $name;
+}
+
+# exists clone for arrays---does this not exist in Perl?!?
+sub contained {
+    my $name = shift;
+    my $arr = shift;
+
+    foreach my $item (@$arr) {
+	return 1 if ($name eq $item); 
+    }
+    return 0;
+}
+
 
 if ($^O eq 'MSWin32') {
     if ($path eq '') {
@@ -45,6 +96,8 @@ else {
 	    $path = "/usr/share/gputils";
 	} elsif ( -x "/usr/share/gpasm") {
 	    $path = "/usr/share/gpasm";
+	} elsif ( -x "/usr/local/share/gputils") {
+	    $path = "/usr/local/share/gputils";
 	} else {
 	    die "Could not find gpasm includes.\n";
 	}
@@ -64,7 +117,7 @@ while (<DATA>) {
 	# Some MPASM include files are not entirely consistent
 	# with sfr names.
 	#
-	$alias{$2} = $1;
+	$alias{fixname($2)} = fixname($1);
     } elsif (/^\s*address\s+(\S+)\s+(\S+)/) {
 	#
 	# Set a default address for a special function register.
@@ -145,26 +198,33 @@ EOT
 #
 # Convert the file.
 #
+%sfrs = ();
 $defaultType = 'other';
 $includeFile = $path.$path_delim.'header'.$path_delim.'p'.lc($processor).'.inc';
+$headFile = "pic" . lc($processor) . ".h";
 $defsFile = "pic" . lc($processor) . ".c";
 open(HEADER, "<$includeFile")
     || die "$programName: Error: Cannot open include file $includeFile ($!)\n";
 
 while (<HEADER>) {
-    if (/^;-+ (\S+) Bits/i) {
+    
+    if (/^;-+ Register Files/i) {
+	$defaultType = 'sfr';
+	s/;/\/\//;
+	$body .= "$_";
+    } elsif (/^;-+\s*(\S+)\s+Bits/i || /^;-+\s*(\S+)\s+-+/i) {
+	# The second case is usually bits, but the word Bits is missing
         # also accept "UIE/UIR Bits"
 	foreach $name (split(/\//, $1)) {
+	    $name = fixname($name);
+	    $name = checkname($name);
+
 	    if (defined($alias{$name})) {
 		$defaultType = "bits $alias{$name}";
 	    } else {
 		$defaultType = "bits $name";
 	    }
 	}
-	s/;/\/\//;
-	$body .= "$_";
-    } elsif (/^;-+ Register Files/i) {
-	$defaultType = 'sfr';
 	s/;/\/\//;
 	$body .= "$_";
     } elsif (/^;=+/i) {
@@ -176,7 +236,7 @@ while (<HEADER>) {
 	# Convert ASM comments to C style.
 	#
 	$body .= "//$'";
-    } elsif (/^\s*IFNDEF __(\S+)/) {
+    } elsif (/^\s*IFNDEF\s+__(\S+)/) {
 	#
 	# Processor type.
 	#
@@ -212,9 +272,10 @@ while (<HEADER>) {
 	    #
 	    # A special function register.
 	    #
-	    $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
-				. "SFR %s\t// %s\n",
-				$name, $name, $bitmask, $name);
+#	    $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
+#				. "SFR %s\t// %s\n",
+#				$name, $name, $bitmask, $name);
+	    $name = fixname($name);
 	    if (defined $addr{"p$processor", "$name"}) {
 		$addresses .= sprintf("#define %s_ADDR\t0x%s\n", $name, $addr{"p$processor", "$name"});
 	    } else {
@@ -223,14 +284,16 @@ while (<HEADER>) {
 	    $body .= sprintf("extern __sfr  __at %-30s $name;$rest\n", "(${name}_ADDR)" );
 	    $c_head .= sprintf("__sfr  __at %-30s $name;\n", "(${name}_ADDR)");
 	    $addr{"p$processor", "$name"} = "0x$value";
+	    $sfrs{$name}=1;
 	} elsif ($type eq 'volatile') {
 	    #
 	    # A location that can change without 
 	    # direct program manipulation.
 	    #
-	    $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
-				. "SFR %s\t// %s\n",
-				$name, $name, $bitmask, $name);
+	    $name = fixname($name);
+#	    $pragmas .= sprintf("#pragma memmap %s_ADDR %s_ADDR "
+#				. "SFR %s\t// %s\n",
+#				$name, $name, $bitmask, $name);
 	    $body .= sprintf("extern __data __at %-30s $name;$rest\n", "(${name}_ADDR) volatile char");
 	    $c_head .= sprintf("__data __at %-30s $name;\n", "(${name}_ADDR) volatile char");
 	    if (defined $addr{"p$processor", "$name"}) {
@@ -246,13 +309,16 @@ while (<HEADER>) {
 	    for ($k=0; $k < scalar @{$bits{"$register"}->{oct($bit)}}; $k++) {
 	      $name = "" if ($bits{"$register"}->{oct($bit)} eq $name)
 	    }
-	    if ($name ne "") {
+	    if (($name ne "")
+		and (1 != contained($name, \@{$bits{"$register"}->{oct($bit)}}))
+	    ) {
 	      push @{$bits{"$register"}->{oct($bit)}}, $name;
 	    }
 	} else {
 	    #
 	    # Other registers, bits and/or configurations.
 	    #
+	    $name = fixname($name);
 	    if ($type eq 'other') {
 		#
 		# A known symbol.
@@ -323,6 +389,53 @@ $c_head .= <<EOT;
 // 
 EOT
 
+# Add PORT* and TRIS* bit entries
+# file format is:
+#    16f84   A0-4,B0-7
+#    *       A0-5,B0-7,C0-7,D0-7,E0-2
+{
+  my $pinfo = undef;
+  my $defpinfo = undef;
+  open(P14PORTS, "< pic14ports.txt") && do {
+    while(<P14PORTS>) {
+	s/\r//g; chomp;
+	if(/^\s*(\*|\w*)\s*([ABCDE0-7,-]+)\s*$/) {
+	    if(lc($1) eq lc($processor)) {
+		die if defined $pinfo;
+		$pinfo = $2;
+	    } elsif($1 eq "*") {
+		die if defined $defpinfo;
+		$defpinfo = $2;
+	    }
+	} elsif(/^\s*#/ || /^\s*$/) {
+	    # ignore blanks, comments
+	} else {
+	    die "bad line in pic14ports '$_'";
+	}
+    }
+    close P14PORTS;
+  };
+  $defpinfo = "A0-5,B0-7,C0-7,D0-7,E0-2" unless defined $defpinfo;
+  $pinfo = $defpinfo unless defined $pinfo;
+
+  if(defined $pinfo) {
+    foreach  (split /,/, $pinfo) {
+	if(/^([ABCDE])([0-7])-([0-7])$/) {
+	    my($prt, $low, $high) = ($1, $2, $3);
+	    next unless defined $sfrs{"PORT$prt"} && defined $sfrs{"TRIS$prt"};
+	    next if     defined $bits{"PORT$prt"};
+	    for(my $i = $low; $i <= $high; $i++) {
+		push @{$bits{"PORT$prt"}->{oct($i)}}, "R$prt".$i;
+	    }
+	    next if     defined $bits{"TRIS$prt"};
+	    for(my $i = $low; $i <= $high; $i++) {
+		push @{$bits{"TRIS$prt"}->{oct($i)}}, "TRIS$prt".$i;
+	    }
+	} else { die }
+    }
+  }
+}
+
 $structs = "";
 ## create struct declarations
 foreach $reg (sort keys %bits)
@@ -352,8 +465,10 @@ foreach $reg (sort keys %bits)
     $idx++;
   } while ($idx < $max);
   $structs .= "} __${reg}_bits_t;\n";
-  $structs .= "extern volatile __${reg}_bits_t __at(${reg}_ADDR) ${reg}_bits;\n\n";
-  $c_head .= "volatile __${reg}_bits_t __at(${reg}_ADDR) ${reg}_bits;\n";
+  #if(defined $sfrs{$reg}) {
+    $structs .= "extern volatile __${reg}_bits_t __at(${reg}_ADDR) ${reg}_bits;\n\n";
+    $c_head .= "volatile __${reg}_bits_t __at(${reg}_ADDR) ${reg}_bits;\n";
+  #}
   
   # emit defines for individual bits
   for ($i=0; $i < 8; $i++)
@@ -366,12 +481,14 @@ foreach $reg (sort keys %bits)
   $structs .= "\n";
 } # foreach
 
-print $header
+open(HEAD, ">$headFile") or die "Could not open $headFile for writing.";
+print HEAD $header
     . $addresses . "\n"
     . $pragmas . "\n\n"
     . $body . "\n"
     . $structs
     . "#endif\n";
+close(HEAD);
 
 open(DEFS, ">$defsFile") or die "Could not open $defsFile for writing.";
 print DEFS $c_head . "\n";

@@ -22,26 +22,29 @@ ifeq (0,1)
 # useful while fixing .inc files
 GPUTILS = /opt/modules/gputils-0.13.3/share/gputils
 pic%.c : $(GPUTILS)/header/p%.inc
-	-$(SDCC_BASE)/support/scripts/inc2h.pl $* $(GPUTILS) \
-	> $(SDCC_BASE)/device/include/pic/pic$*.h
+	-$(SDCC_BASE)/support/scripts/inc2h.pl $* $(GPUTILS);
+	-mv pic$*.h $(SDCC_BASE)/device/include/pic/pic$*.h;
 endif
 
 pic%.o : pic%.c
-	-$(CC) $(CPPFLAGS) $(CFLAGS) -mpic14 -p$* -o "$@" -c "$<"
+ifndef SILENT
+	@echo "[  CC   ] ==> $(patsubst $(top_builddir)/%,%,$@)"
+endif
+	@-$(CC) $(CPPFLAGS) $(CFLAGS) -mpic14 -p$* -o "$@" -c "$<"
 
 $(INSTALL_DIR)/%.lib : %.o
-	-$(LIB) -c "$@" "$<";
+	@-$(LIB) -c "$@" "$<";
 
 install : all
 
 clean : clean-intermediate
-	$(Q)-$(RM) *.asm
-	$(Q)-$(RM) $(OBJS) $(LIBS)
-	$(Q)-$(RMDIR) ../build/libdev
+	@-$(RM) *.asm
+	@-$(RM) $(OBJS) $(LIBS)
+	@-$(RMDIR) ../build/libdev
 
 distclean: clean
-	$(Q)-$(RM) Makefile
+	@-$(RM) Makefile
 
 clean-intermediate :
-	$(Q)-$(RM) *.lst *.d *.adb
+	@-$(RM) *.lst *.d *.adb
 

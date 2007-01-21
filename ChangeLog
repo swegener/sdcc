@@ -1,6 +1,7 @@
 2007-01-21 Borut Razem <borut.razem AT siol.net>
 
-	* 
+	* sim/ucsim/configure.in: introduced macro DD_COPT_NO_IGNORE,
+	  use -fPIC or -fpic if they are supported and not ignored
 
 2007-01-20 Borut Razem <borut.razem AT siol.net>
 

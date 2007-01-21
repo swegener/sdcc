@@ -2,6 +2,8 @@
 
 	* sim/ucsim/configure.in: introduced macro DD_COPT_NO_IGNORE,
 	  use -fPIC or -fpic if they are supported and not ignored
+	* src/SDCCval.c: fixed bug introduced by me in rev. #4577
+	* support/cpp2/libcpp/lex.c: fixed gcc 4.1.1 warnings
 
 2007-01-20 Borut Razem <borut.razem AT siol.net>
 

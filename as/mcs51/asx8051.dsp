@@ -7,19 +7,19 @@
 CFG=asx8051 - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "asx8051.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "asx8051.mak" CFG="asx8051 - Win32 Release"
-!MESSAGE
+!MESSAGE 
 !MESSAGE Possible choices for configuration are:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "asx8051 - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE "asx8051 - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -77,7 +77,7 @@ LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\asx8051.exe" /pdbtype:sept
 # ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\bin_vc\asx8051.exe" /pdbtype:sept
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 

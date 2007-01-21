@@ -827,6 +827,8 @@ unsigned char hexEscape(const char **src)
       werror(W_ESC_SEQ_OOR_FOR_CHAR);
     }
   }
+  *src = s;
+
   return (char) value;
 }
 

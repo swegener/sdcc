@@ -327,27 +327,27 @@ skip_asm_block (cpp_reader *pfile)
       c = *buffer->cur++;
 
       if (prev_space && c == '_')
-	{
+        {
           if (buffer->cur + _ENDASM_LEN <= buffer->rlimit &&
-            strncmp(buffer->cur, _ENDASM_STR, _ENDASM_LEN) == 0)
+            strncmp((char *)buffer->cur, _ENDASM_STR, _ENDASM_LEN) == 0)
             {
               buffer->cur += _ENDASM_LEN;
               ret = 0;
-	      break;
+              break;
             }
-	}
+        }
       else if (c == '\n')
-	{
-	  unsigned int cols;
-	  --buffer->cur;
-	  _cpp_process_line_notes (pfile, true);
-	  if (buffer->next_line >= buffer->rlimit)
-	    return true;
-	  _cpp_clean_line (pfile);
+        {
+          unsigned int cols;
+          --buffer->cur;
+          _cpp_process_line_notes (pfile, true);
+          if (buffer->next_line >= buffer->rlimit)
+            return true;
+          _cpp_clean_line (pfile);
 
-	  cols = buffer->next_line - buffer->line_base;
-	  CPP_INCREMENT_LINE (pfile, cols);
-	}
+          cols = buffer->next_line - buffer->line_base;
+          CPP_INCREMENT_LINE (pfile, cols);
+        }
     }
 
   _cpp_process_line_notes (pfile, true);
@@ -949,10 +949,10 @@ lex_string (cpp_reader *pfile, cpp_token *token, const uchar *base)
    CRs are automatically generated, because the output is
    opened in TEXT mode. If dest == NULL, only count chars */
 static unsigned int
-copy_text_chars (char *dest, const char *src, unsigned int len)
+copy_text_chars (unsigned char *dest, const unsigned char *src, unsigned int len)
 {
   unsigned int n = 0;
-  const char *p;
+  const unsigned char *p;
 
   for (p = src; p != src + len; ++p)
     {

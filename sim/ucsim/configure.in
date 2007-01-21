@@ -379,12 +379,35 @@ ucsim_ACCEPT_LENGTH_T
 AC_DEFUN(DD_COPT, [
 AC_CACHE_CHECK(whether $$1 accepts -$2,ucsim_cv_$1$2,
 cat >_test_.c <<EOF
-#include <stdio.h>
 int main(void) {return(0);}
 EOF
 $$1 -v -$2 -c _test_.c 1>&5 2>&5
 if test "$?" = "0"; then
   ucsim_cv_$1$2="yes"
+else
+  ucsim_cv_$1$2="no"
+fi
+rm -f _test_.* a.out)
+])
+
+# DD_COPT_NO_IGNORE macro checks if the compiler specified as the
+# 1st parameter supports and doesn't ignore option specified as the
+# 2nd parameter
+# For example: DD_COPT_NO_IGNORE(CXX, fPIC)
+
+AC_DEFUN(DD_COPT_NO_IGNORE, [
+AC_CACHE_CHECK(whether $$1 accepts and doesn't ignore -$2,ucsim_cv_$1$2,
+cat >_test_.c <<EOF
+int main(void) {return(0);}
+EOF
+ucsim_cv_$1$2=$($$1 -v -$2 -c _test_.c 2>&1 1>&5)
+if test "$?" = "0"; then
+  expr "$ucsim_cv_$1$2" : '.*'-$2'.*ignored' 1>&5 2>&5
+  if test "$?" = "0"; then
+    ucsim_cv_$1$2="no"
+  else
+    ucsim_cv_$1$2="yes"
+  fi
 else
   ucsim_cv_$1$2="no"
 fi
@@ -456,25 +479,17 @@ fi
 
 PICOPT=""
 SHAREDLIB="no"
-DD_COPT(CXX, fPIC)
+DD_COPT_NO_IGNORE(CXX, fPIC)
 if test "$ucsim_cv_CXXfPIC" = "yes"; then
     PICOPT="-fPIC"
 else
-    DD_COPT(CXX, fpic)
+    DD_COPT_NO_IGNORE(CXX, fpic)
     if test "$ucsim_cv_CXXfpic" = "yes"; then
         PICOPT="-fpic"
     fi
 fi
 if test "$PICOPT"x != "x"; then
     SHAREDLIB="yes"
-fi
-# If this is Cygwin neither use Position Independant Code
-# nor build .so
-# Quick + dirty by Bernhard
-# FIXME
-if $CXX --version 2>&1 | grep -i cygming 1>&5 2>&5 || $CXX --version 2>&1 | grep -i cygwin 1>&5 2>&5; then
-    PICOPT=""
-    SHAREDLIB="no"
 fi
 AC_SUBST(SHAREDLIB)
 AC_SUBST(PICOPT)

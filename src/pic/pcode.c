@@ -3033,6 +3033,9 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 					case 1:
 						SAFE_snprintf(&s,&size,"high (%s+%d)",pcop->name, PCOI(pcop)->index);
 						break;
+					case 2:
+						SAFE_snprintf(&s,&size,"0x%02x",PCOI(pcop)->_const ? GPTRTAG_CODE : GPTRTAG_DATA);
+						break;
 					default:
 						fprintf (stderr, "PO_IMMEDIATE/_const/offset=%d\n", PCOI(pcop)->offset);
 						assert ( !"offset too large" );
@@ -3055,6 +3058,9 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 						break;
 					case 1:
 						SAFE_snprintf(&s,&size,"high (%s + %d)",pcop->name, PCOI(pcop)->index);
+						break;
+					case 2:
+						SAFE_snprintf(&s,&size,"0x%02x",PCOI(pcop)->_const ? GPTRTAG_CODE : GPTRTAG_DATA);
 						break;
 					default:
 						fprintf (stderr, "PO_IMMEDIATE/mutable/offset=%d\n", PCOI(pcop)->offset);
@@ -5245,7 +5251,6 @@ DEFSETFUNC (resetrIdx)
 /*-----------------------------------------------------------------*/
 /* InitRegReuse - Initialises variables for code analyzer          */
 /*-----------------------------------------------------------------*/
-
 void InitReuseReg(void)
 {
 	/* Find end of statically allocated variables for start idx */
@@ -5264,56 +5269,77 @@ void InitReuseReg(void)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static unsigned register_reassign(pBlock *pb, unsigned idx)
+static unsigned register_reassign(pBlock *pb, unsigned idx, unsigned level)
 {
-	pCode *pc;
-	
-	/* check recursion */
-	pc = setFirstItem(pb->function_entries);
-	if(!pc)
-		return idx;
+    pCode *pc;
 
-	if (pb->visited) {
-	    /* TODO: Recursion detection missing, should emit a warning as recursive code will fail. */
-	    return idx;
-	}
-	
-	pb->visited = 1;
-	
-	DFPRINTF((stderr," reassigning registers for function \"%s\"\n",PCF(pc)->fname));
-	
-	if (pb->tregisters) {
-		regs *r;
-		for (r = setFirstItem(pb->tregisters); r; r = setNextItem(pb->tregisters)) {
-			if (r->type == REG_GPR) {
-				if (!r->isFixed) {
-					if (r->rIdx < (int)idx) {
-						char s[20];
-						r->rIdx = idx++;
-						if (peakIdx < idx) peakIdx = idx;
-						sprintf(s,"r0x%02X", r->rIdx);
-						DFPRINTF((stderr," reassigning register \"%s\" to \"%s\"\n",r->name,s));
-						free(r->name);
-						r->name = Safe_strdup(s);
-					}
-				}
-			}
-		}
-	}
-	for(pc = setFirstItem(pb->function_calls); pc; pc = setNextItem(pb->function_calls)) {
-		
-		if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
-			char *dest = get_op_from_instruction(PCI(pc));
-			
-			pCode *pcn = findFunction(dest);
-			if(pcn) {
-				register_reassign(pcn->pb,idx);
-			}
-		}
-		
-	}
-	
+    /* check recursion */
+    pc = setFirstItem(pb->function_entries);
+    if(!pc)
 	return idx;
+
+    if (pb->visited) {
+	/* TODO: Recursion detection missing, should emit a warning as recursive code will fail. */
+	return idx;
+    }
+
+    pb->visited = 1;
+
+    DFPRINTF((stderr," (%u) reassigning registers for function \"%s\"\n",level,PCF(pc)->fname));
+
+    if (pb->tregisters) {
+	regs *r;
+	for (r = setFirstItem(pb->tregisters); r; r = setNextItem(pb->tregisters)) {
+	    if (r->type == REG_GPR) {
+		if (!r->isFixed) {
+		    if (r->rIdx < (int)idx) {
+			char s[20];
+			set *regset;
+			// make sure, idx is not yet used in this routine...
+			do {
+			    regset = pb->tregisters;
+			    // do not touch s->curr ==> outer loop!
+			    while (regset && ((regs *)regset->item)->rIdx != idx) {
+				regset = regset->next;
+			    }
+			    if (regset) idx++;
+			} while (regset);
+			r->rIdx = idx++;
+			if (peakIdx < idx) peakIdx = idx;
+			sprintf(s,"r0x%02X", r->rIdx);
+			DFPRINTF((stderr," (%u) reassigning register %p \"%s\" to \"%s\"\n",level,r,r->name,s));
+			free(r->name);
+			r->name = Safe_strdup(s);
+		    }
+		}
+	    }
+	}
+    }
+    for(pc = setFirstItem(pb->function_calls); pc; pc = setNextItem(pb->function_calls)) {
+
+	if(pc->type == PC_OPCODE && PCI(pc)->op == POC_CALL) {
+	    char *dest = get_op_from_instruction(PCI(pc));
+
+	    pCode *pcn = findFunction(dest);
+	    if(pcn) {
+		/* This index increment from subroutines is not required, as all subroutines
+		 * may share registers NOT used by this one (< idx).
+		 * BUT if called functions A and B share a register, which gets assigned
+		 * rIdx = idx + 4 while analyzing A, we must not assign idx + 4 again while
+		 * analyzing B!
+		 * As an alternative to this "solution" we could check above whether an
+		 * to-be-assigned rIdx is already present in the register set of the
+		 * current function. This would increase the reused registers and make this
+		 * `idx =' irrelevant.
+		 * UPDATE: Implemented above; not fast, but works.
+		 * (Problem shown with regression test src/regression/sub2.c)
+		 */
+		/*idx = */register_reassign(pcn->pb,idx,level+1);
+	    }
+	}
+    }
+
+    return idx;
 }
 
 /*------------------------------------------------------------------*/
@@ -5344,8 +5370,8 @@ void ReuseReg(void)
 	InitReuseReg();
 	for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 		/* Non static functions can be called from other modules so their registers must reassign */
-		if (pb->function_entries&&(PCF(setFirstItem(pb->function_entries))->isPublic||!pb->visited))
-			register_reassign(pb,peakIdx);
+		if (pb->function_entries && (PCF(setFirstItem(pb->function_entries))->isPublic || !pb->visited))
+			register_reassign(pb,peakIdx,0);
 	}
 }
 

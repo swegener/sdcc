@@ -44,11 +44,6 @@
 #include "gen.h"
 #include "glue.h"
 
-/* When changing these, you must also update the assembler template
- * in device/lib/libsdcc/macros.inc */
-#define GPTRTAG_DATA	0x00
-#define GPTRTAG_CODE	0x80
-
 /* The PIC port(s) need not differentiate between POINTER and FPOINTER. */
 #define PIC_IS_DATA_PTR(x)	(IS_DATA_PTR(x) || IS_FARPTR(x))
 #define PIC_IS_FARPTR(x)	(PIC_IS_DATA_PTR(x))
@@ -82,8 +77,8 @@ kludgy & hacky stuff. This is what it is all about
 CODE GENERATION for a specific MCU . some of the
 routines may be reusable, will have to see */
 
-static char *zero = "#0x00";
-static char *one  = "#0x01";
+static char *zero = "0x00";
+static char *one  = "0x01";
 static char *spname = "sp";
 
 char *fReturnpic14[] = {"temp1","temp2","temp3","temp4" };
@@ -516,84 +511,7 @@ static asmop *aopForSym (iCode *ic,symbol *sym,bool result)
 	if (sym->aop)
 		return sym->aop;
 	
-#if 0
-	/* assign depending on the storage class */
-	/* if it is on the stack or indirectly addressable */
-	/* space we need to assign either r0 or r1 to it	 */    
-	if ((sym->onStack && !options.stack10bit) || sym->iaccess) {
-		sym->aop = aop = newAsmop(0);
-		aop->aopu.aop_ptr = getFreePtr(ic,&aop,result);
-		aop->size = getSize(sym->type);
-		
-		/* now assign the address of the variable to 
-		the pointer register */
-		if (aop->type != AOP_STK) {
-			
-			if (sym->onStack) {
-				if ( _G.accInUse )
-					pic14_emitcode("push","acc");
-				
-				pic14_emitcode("mov","a,_bp");
-				pic14_emitcode("add","a,#0x%02x",
-					((sym->stack < 0) ?
-					((char)(sym->stack - _G.nRegsSaved )) :
-				((char)sym->stack)) & 0xff);
-				pic14_emitcode("mov","%s,a",
-					aop->aopu.aop_ptr->name);
-				
-				if ( _G.accInUse )
-					pic14_emitcode("pop","acc");
-			} else
-				pic14_emitcode("mov","%s,#%s",
-				aop->aopu.aop_ptr->name,
-				sym->rname);
-			aop->paged = space->paged;
-		} else
-			aop->aopu.aop_stk = sym->stack;
-		return aop;
-	}
-	
-	if (sym->onStack && options.stack10bit)
-	{
-		/* It's on the 10 bit stack, which is located in
-		* far data space.
-		*/
-		
-		//DEBUGpic14_emitcode(";","%d",__LINE__);
-		
-		if ( _G.accInUse )
-			pic14_emitcode("push","acc");
-		
-		pic14_emitcode("mov","a,_bp");
-		pic14_emitcode("add","a,#0x%02x",
-			((sym->stack < 0) ?
-			((char)(sym->stack - _G.nRegsSaved )) :
-		((char)sym->stack)) & 0xff);
-		
-		genSetDPTR(1);
-		pic14_emitcode ("mov","dpx1,#0x40");
-		pic14_emitcode ("mov","dph1,#0x00");
-		pic14_emitcode ("mov","dpl1, a");
-		genSetDPTR(0);
-		
-		if ( _G.accInUse )
-			pic14_emitcode("pop","acc");
-		
-		sym->aop = aop = newAsmop(AOP_DPTR2);
-		aop->size = getSize(sym->type); 
-		return aop;
-	}
-#endif
-
 	//DEBUGpic14_emitcode(";","%d",__LINE__);
-	/* if in bit space */
-	if (IN_BITSPACE(space)) {
-		sym->aop = aop = newAsmop (AOP_CRY);
-		aop->aopu.aop_dir = sym->rname ;
-		aop->size = getSize(sym->type);
-		//DEBUGpic14_emitcode(";","%d sym->rname = %s, size = %d",__LINE__,sym->rname,aop->size);
-		return aop;
-	}
 	/* if it is in direct space */
 	if (IN_DIRSPACE(space)) {
 		sym->aop = aop = newAsmop (AOP_DIR);
@@ -1109,6 +1027,7 @@ char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 	//DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 	/* offset is greater than
 	size then zero */
+	assert(aop);
 	if (offset > (aop->size - 1) &&
 		aop->type != AOP_LIT)
 		return zero;
@@ -1236,6 +1155,9 @@ char *aopGet (asmop *aop, int offset, bool bit16, bool dname)
 			pCodeOp *pcop = aop->aopu.pcop;
 			DEBUGpic14_emitcode(";","%d: aopGet AOP_PCODE type %s",__LINE__,pCodeOpType(pcop));
 			if(pcop->name) {
+				if (pcop->type == PO_IMMEDIATE) {
+					offset += PCOI(pcop)->index;
+				}
 				if (offset) {
 					DEBUGpic14_emitcode(";","%s offset %d",pcop->name,offset);
 					sprintf(s,"(%s+%d)", pcop->name,offset);
@@ -10897,3 +10819,4 @@ op_isLitLike (operand *op)
   if (IS_PTR(OP_SYM_TYPE(op)) && AOP_TYPE(op) == AOP_PCODE && AOP(op)->aopu.pcop->type == PO_IMMEDIATE) return 1;
   return 0;
 }
+

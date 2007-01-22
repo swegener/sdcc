@@ -22,6 +22,11 @@
 //#include "ralloc.h"
 struct regs;
 
+/* When changing these, you must also update the assembler template
+ * in device/lib/libsdcc/macros.inc */
+#define GPTRTAG_DATA	0x00
+#define GPTRTAG_CODE	0x80
+
 /*
    Post code generation
 

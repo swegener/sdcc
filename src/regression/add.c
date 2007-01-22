@@ -166,18 +166,18 @@ void add_bit2uint(void)
 void main(void)
 {
   add_lit2uchar();
-  ASSERT(_failures == 0);
+  ASSERT(MANGLE(failures) == 0);
 
   achar0=16;
   achar1=0;
   add_uchar2uchar();
-  ASSERT(_failures == 0);
+  ASSERT(MANGLE(failures) == 0);
 
 
   achar0 = 0;
   achar1 = 32;
   add_uchar2uchar2();
-  ASSERT(_failures == 0);
+  ASSERT(MANGLE(failures) == 0);
 
 #if SUPPORT_BIT_TYPES
   add_bits();
@@ -185,7 +185,7 @@ void main(void)
   add_bit2uchar();
   add_bit2uint();
 #endif
-  ASSERT(_failures == 0);
+  ASSERT(MANGLE(failures) == 0);
 
   done();
 }

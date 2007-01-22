@@ -22,7 +22,8 @@ done()
   PASSED();
 }
 
-void c_char(void)
+void
+c_char(void)
 {
 
   if(char0 || char1)
@@ -66,7 +67,8 @@ void c_char(void)
 }
 
 
-void c_int(void)
+void
+c_int(void)
 {
 
   if(int0 || int1)
@@ -110,7 +112,8 @@ void c_int(void)
 }
 
 
-void c_long(void)
+void
+c_long(void)
 {
 
   if(long0 || long1)
@@ -153,7 +156,8 @@ void c_long(void)
 
 }
 
-void c_uminus(void)
+void
+c_uminus(void)
 {
 
   int1 = -int0;
@@ -177,3 +181,4 @@ main (void)
   success = failures;
   done ();
 }
+

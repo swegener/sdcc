@@ -1,3 +1,22 @@
+2007-01-22 Raphael Neider <rneider AT web.de>
+
+	* src/regression/bank1.c, src/regression/compare6.c,
+	  src/regression/add.c: cosmetic changes
+	* src/pic/pcode.h: moved GPTRTAG_* here from gen.c
+	* src/pic/gen.c: fixed global zero and one,
+	  (aopForSym): removed unued code,
+	  (aopGet): assert aop is defined, check and use `index' of
+	    pCodeImmd operands (fixes #1630908),
+	* src/pic/pcode.c (get_op): added output of generic pointer tag,
+	  (register_reassign): prevent accidental register unification,
+	  (ReuseReg): cosmetic changes (also above)
+	* src/pic/glue.c (pic14_constructAbsMap,pic14emitRegularMap,
+	  pic14emitStaticSeg): do not emit initialized data,
+	  (printIval*): replaced with working versions,
+	  (pic14createInterruptVect,picglue): use idata for initialized data,
+	    now init data should work in all modules (not only main()),
+	* device/lib/pic/libsdcc/idata.c: NEW, handle initialized data
+
 2007-01-21 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/configure.in: introduced macro DD_COPT_NO_IGNORE,

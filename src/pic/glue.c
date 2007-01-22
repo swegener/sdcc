@@ -42,7 +42,7 @@
 #define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
 
 extern symbol *interrupts[256];
-static void printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb);
+static void showAllMemmaps(FILE *of); // XXX: emits initialized symbols
 extern int noAlloc;
 extern set *publics;
 extern set *externs;
@@ -200,17 +200,27 @@ pic14_constructAbsMap (struct dbuf_s *oBuf)
     size = 1;
     aliases = hTabItemWithKey (ht, addr);
     if (aliases && elementsInSet(aliases)) {
-      dbuf_printf (oBuf, "udata_abs_%s_%x\tudata_ovr\t0x%04x",
+      /* Make sure there is no initialized value at this location! */
+      for (sym = setFirstItem(aliases); sym; sym = setNextItem(aliases)) {
+	  if (sym->ival) break;
+      } // for
+      if (sym) continue;
+      
+      dbuf_printf (oBuf, "udata_abs_%s_%x\tudata_ovr\t0x%04x\n",
 	  moduleName, addr, addr);
       for (sym = setFirstItem (aliases); sym;
 	  sym = setNextItem (aliases))
       {
-        /* emit STATUS as well as _STATUS, required for SFRs only */
-	dbuf_printf (oBuf, "\n%s", sym->name);
-	dbuf_printf (oBuf, "\n%s", sym->rname);
 	if (getSize(sym->type) > size) {
 	  size = getSize(sym->type);
 	}
+	
+	/* initialized values are handled somewhere else */
+	if (sym->ival) continue;
+	
+        /* emit STATUS as well as _STATUS, required for SFRs only */
+	dbuf_printf (oBuf, "%s\n", sym->name);
+	dbuf_printf (oBuf, "%s\n", sym->rname);
 	if (sym->islocal) {
 	  // global symbols must be emitted again as 'global sym->name'
 	  pic14_stringInSet(sym->name, &emitted, 1);
@@ -368,6 +378,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			}
 			else
 			{
+			    if (!sym->ival) {
 				emitSymbol (&map->oBuf,
 					sym->rname, 
 					NULL,
@@ -377,6 +388,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 						: -1,
 					0,
 					0);
+			    }
 				/*
 				{
 				int i, size;
@@ -391,7 +403,8 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			}
 			//dbuf_printf (&map->oBuf, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
 		}
-		
+
+#if 0		
 		/* if it has a initial value then do it only if
 		it is a global variable */
 		if (sym->ival && sym->level == 0) {
@@ -407,10 +420,12 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			eBBlockFromiCode (iCodeFromAst (ival));
 			sym->ival = NULL;
 		}
+#endif
 	}
 }
 
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* printIvalType - generates ival for int/char                     */
 /*-----------------------------------------------------------------*/
@@ -787,6 +802,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
 		return;
 	}
 }
+#endif
 
 extern void pCodeConstString(char *name, char *value);
 /*-----------------------------------------------------------------*/
@@ -852,6 +868,7 @@ pic14emitStaticSeg (memmap * map)
 			/* if it has an initial value */
 			if (sym->ival)
 			{
+#if 0
 				pBlock *pb;
 				
 				dbuf_printf (&code->oBuf, "%s:\n", sym->rname);
@@ -864,6 +881,7 @@ pic14emitStaticSeg (memmap * map)
 				
 				printIval (sym, sym->type, sym->ival, pb);
 				noAlloc--;
+#endif
 			}
 			else
 			{
@@ -909,6 +927,7 @@ pic14emitMaps ()
 /*-----------------------------------------------------------------*/
 /* createInterruptVect - creates the interrupt vector              */
 /*-----------------------------------------------------------------*/
+pCodeOp *popGetExternal (char *str);
 static void
 pic14createInterruptVect (struct dbuf_s * vBuf)
 {
@@ -942,6 +961,7 @@ pic14createInterruptVect (struct dbuf_s * vBuf)
 	dbuf_printf (vBuf, "\tnop\n"); /* first location for used by incircuit debugger */
 	dbuf_printf (vBuf, "\tpagesel __sdcc_gsinit_startup\n");
 	dbuf_printf (vBuf, "\tgoto\t__sdcc_gsinit_startup\n");
+	popGetExternal("__sdcc_gsinit_startup");
 }
 
 
@@ -1296,7 +1316,7 @@ picglue ()
 	/* print the global struct definitions */
 	if (options.debug)
 		cdbStructBlock (0);
-	
+
 	/* emit code for the all the variables declared */
 	pic14emitMaps ();
 	/* do the overlay segments */
@@ -1432,6 +1452,9 @@ picglue ()
 	fprintf (asmFile, "%s", iComments2);
         dbuf_write_and_destroy (&bit->oBuf, asmFile);
 
+	/* emit initialized data */
+	showAllMemmaps(asmFile);
+
 	/* copy the interrupt vector table */
 	if (mainf && IFFUNC_HASBODY(mainf->type))
 	  dbuf_write_and_destroy (&vBuf, asmFile);
@@ -1440,29 +1463,6 @@ picglue ()
 
 	/* create interupt ventor handler */
 	pic14_emitInterruptHandler (asmFile);
-	
-	if (mainf && IFFUNC_HASBODY(mainf->type)) {
-		/* initialize data memory */
-		/* do NOT name this code_init to avoid conflicts with init.c */
-		fprintf (asmFile, "c_init\t%s\n", CODE_NAME); // Note - for mplink may have to enlarge section vectors in .lnk file
-		fprintf (asmFile,"__sdcc_gsinit_startup\n");
-		/* FIXME: This is temporary.  The idata section should be used.  If 
-		not, we could add a special feature to the linker.  This will 
-		work in the mean time.  Put all initalized data in main.c */
-		copypCode(asmFile, statsg->dbName);
-		fprintf (asmFile,"\tpagesel _main\n");
-		fprintf (asmFile,"\tgoto _main\n");
-	}
-	
-#if 0    
-	
-	/* copy global & static initialisations */
-	fprintf (asmFile, "%s", iComments2);
-	fprintf (asmFile, "; global & static initialisations\n");
-	fprintf (asmFile, "%s", iComments2);
-	copypCode(asmFile, statsg->dbName);
-	
-#endif
 	
 	/* copy over code */
 	fprintf (asmFile, "%s", iComments2);
@@ -1488,3 +1488,485 @@ picglue ()
 	
 	fclose (asmFile);
 }
+
+/*
+ * Deal with initializers.
+ */
+#undef DEBUGprintf
+#if 0
+// debugging output
+#define DEBUGprintf printf
+#else
+// be quiet
+#define DEBUGprintf 1 ? (void)0 : (void)printf
+#endif
+
+
+void ast_print (ast * tree, FILE *outfile, int indent);
+
+#if 0
+/*
+ * Emit all memmaps.
+ */
+static void
+showInitList(initList *list, int level)
+{
+    static const char *list_type[] = { "INIT_NODE", "INIT_DEEP", "INIT_HOLE" };
+    static const char *ast_type[] = { "EX_OP", "EX_VALUE", "EX_LINK", "EX_OPERAND" };
+    struct ast *ast;
+    while (list) {
+	printf ("      %d: type %u (%s), init %p, next %p\n", level, list->type, list_type[list->type], list->init.node, list->next);
+	if (list->type == INIT_DEEP) {
+	    showInitList(list->init.deep, level + 1);
+	} else if (list->type == INIT_NODE) {
+	    ast = list->init.node;
+	    printf ("        type %u (%s), level %d, block %d, seqPoint %d\n",
+		    ast->type, ast_type[ast->type], ast->level, ast->block, ast->seqPoint);
+	    if (ast->type == EX_VALUE) {
+		printf ("          VAL %lf\n", floatFromVal(ast->opval.val));
+	    } else if (ast->type == EX_LINK) {
+		printTypeChain(ast->opval.lnk, NULL);
+	    } else if (ast->type == EX_OP) {
+		printf ("          OP %u\n", ast->opval.op);
+	    }
+	} // if
+	list = list->next;
+    } // while
+}
+#endif
+
+/*
+ * DEBUG: Print a value.
+ */
+void
+printVal(value *val)
+{
+    printf ("value %p: name %s, type %p, etype %p, sym %s, vArgs %d, lit 0x%lx/%ld\n",
+	    val, val->name, val->type, val->etype,
+	    val->sym ? val->sym->name : NULL, val->vArgs,
+	    (long)floatFromVal(val), (long)floatFromVal(val));
+    printTypeChain(val->type, stdout);
+    printf ("\n");
+    printTypeChain(val->etype, stdout);
+    printf ("\n");
+}
+
+//prototype from ../SDCCicode.c
+operand *operandFromAst (ast * tree,int lvl);
+
+char *
+parseIvalAst (ast *node, int *inCodeSpace) {
+#define LEN 4096
+    char *buffer = NULL;
+    char *left, *right;
+    
+    if (IS_AST_VALUE(node)) {
+	value *val = AST_VALUE(node);
+	symbol *sym = IS_AST_SYM_VALUE(node) ? AST_SYMBOL(node) : NULL;
+	if (inCodeSpace && val->type
+		&& (IS_FUNC(val->type) || IS_CODE(getSpec(val->type))))
+	{
+	    *inCodeSpace = 1;
+	}
+	if (inCodeSpace && sym
+		&& (IS_FUNC(sym->type)
+		    || IS_CODE(getSpec(sym->type))))
+	{
+	    *inCodeSpace = 1;
+	}
+	
+	DEBUGprintf ("%s: AST_VALUE\n", __FUNCTION__);
+	if (IS_AST_LIT_VALUE(node)) {
+	    buffer = Safe_alloc(LEN);
+	    SNPRINTF(buffer, LEN, "0x%lx", (long)AST_LIT_VALUE(node));
+	} else if (IS_AST_SYM_VALUE(node)) {
+	    assert ( AST_SYMBOL(node) );
+	    /*
+	    printf ("sym %s: ", AST_SYMBOL(node)->rname);
+	    printTypeChain(AST_SYMBOL(node)->type, stdout);
+	    printTypeChain(AST_SYMBOL(node)->etype, stdout);
+	    printf ("\n---sym %s: done\n", AST_SYMBOL(node)->rname);
+	    */
+	    buffer = Safe_strdup(AST_SYMBOL(node)->rname);
+	} else {
+	    assert ( !"Invalid values type for initializers in AST." );
+	}
+    } else if (IS_AST_OP(node)) {
+	DEBUGprintf ("%s: AST_OP\n", __FUNCTION__);
+	switch (node->opval.op) {
+	case CAST:
+	    assert (node->right);
+	    buffer = parseIvalAst(node->right, inCodeSpace);
+	    DEBUGprintf ("%s: %s\n", __FUNCTION__, buffer);
+	    break;
+	case '&':
+	    assert ( node->left && !node->right );
+	    buffer = parseIvalAst(node->left, inCodeSpace);
+	    DEBUGprintf ("%s: %s\n", __FUNCTION__, buffer);
+	    break;
+	case '+':
+	    assert (node->left && node->right );
+	    left = parseIvalAst(node->left, inCodeSpace);
+	    right = parseIvalAst(node->right, inCodeSpace);
+	    buffer = Safe_alloc(LEN);
+	    SNPRINTF(buffer, LEN, "(%s + %s)", left, right);
+	    DEBUGprintf ("%s: %s\n", __FUNCTION__, buffer);
+	    Safe_free(left);
+	    Safe_free(right);
+	    break;
+	case '[':
+	    assert ( node->left && node->right );
+	    assert ( IS_AST_VALUE(node->left) && AST_VALUE(node->left)->sym );
+	    right = parseIvalAst(node->right, inCodeSpace);
+	    buffer = Safe_alloc(LEN);
+	    SNPRINTF(buffer, LEN, "(%s + %u * %s)",
+		    AST_VALUE(node->left)->sym->rname, getSize(AST_VALUE(node->left)->type), right);
+	    Safe_free(right);
+	    DEBUGprintf ("%s: %s\n", __FUNCTION__, &buffer[0]);
+	    break;
+	default:
+	    assert ( !"Unhandled operation in initializer." );
+	    break;
+	}
+    } else {
+	assert ( !"Invalid construct in initializer." );
+    }
+    
+    return (buffer);
+}
+
+/*
+ * Emit the section preamble, absolute location (if any) and 
+ * symbol name(s) for intialized data.
+ */
+static int
+emitIvalLabel(FILE *of, symbol *sym)
+{
+    char *segname;
+    static int in_code = 0;
+    
+    if (sym) {
+	// code or data space?
+	if (IS_CODE(getSpec(sym->type))) {
+	    segname = "code";
+	    in_code = 1;
+	} else {
+	    segname = "idata";
+	    in_code  = 0;
+	}
+	fprintf(of, "\nD_%s_%s\t%s", moduleName, sym->name, segname);
+	if (SPEC_ABSA(getSpec(sym->type))) {
+	    // specify address for absolute symbols
+	    fprintf(of, "\t0x%04X", SPEC_ADDR(getSpec(sym->type)));
+	} // if
+	fprintf(of, "\n%s\n", sym->rname);
+    }
+    return (in_code);
+}
+
+char *get_op(pCodeOp *pcop,char *buffer, size_t size);
+/*
+ * Actually emit the initial values in .asm format.
+ */
+static void
+emitIvals(FILE *of, symbol *sym, initList *list, long lit, int size)
+{
+    int i;
+    ast *node;
+    operand *op;
+    value *val = NULL;
+    int inCodeSpace = 0;
+    char *str = NULL;
+    int in_code;
+    
+    assert (size <= sizeof(long));
+    assert (!list || (list->type == INIT_NODE));
+    node = list ? list->init.node : NULL;
+    
+    in_code = emitIvalLabel(of, sym);
+    if (!in_code) fprintf (of, "\tdb\t");
+
+    if (!node) {
+	// initialize as zero
+	for (i=0; i < size; i++) {
+	    if (in_code) {
+		fprintf (of, "\tretlw 0x00");
+	    } else {
+		fprintf (of, "%s0x00", (i == 0) ? "" : ", ");
+	    }
+	} // for
+	fprintf (of, "\n");
+	return;
+    } // if
+    
+    op = NULL;
+    if (constExprTree(node) && (val = constExprValue(node, 0))) {
+	op = operandFromValue(val);
+	DEBUGprintf ("%s: constExpr ", __FUNCTION__);
+	//printVal(val);
+    } else if (IS_AST_VALUE(node)) {
+	op = operandFromAst(node, 0);
+    } else if (IS_AST_OP(node)) {
+	str = parseIvalAst(node, &inCodeSpace);
+	DEBUGprintf("%s: AST_OP: %s\n", __FUNCTION__, str);
+	op = NULL;
+    } else {
+	assert ( !"Unhandled construct in intializer." );
+    }
+    
+    if (op) { 
+	aopOp(op, NULL, 1);
+	assert(AOP(op));
+	//printOperand(op, of);
+    }
+    
+    for (i=0; i < size; i++) {
+	char *text = op ? aopGet(AOP(op), i, 0, 0)
+	    : get_op(newpCodeOpImmd(str, i, 0, inCodeSpace, 0), NULL, 0);
+	if (in_code) {
+	    fprintf (of, "\tretlw %s\n", text);
+	} else {
+	    fprintf (of, "%s%s", (i == 0) ? "" : ", ", text);
+	}
+    } // for
+    fprintf (of, "\n");
+}
+
+/*
+ * For UNIONs, we first have to find the correct alternative to map the
+ * initializer to. This function maps the structure of the initializer to
+ * the UNION members recursively.
+ * Returns the type of the first `fitting' member.
+ */
+static sym_link *
+matchIvalToUnion (initList *list, sym_link *type, int size)
+{
+    symbol *sym;
+    
+    assert (type);
+
+    if (IS_PTR(type) || IS_CHAR(type) || IS_INT(type) || IS_LONG(type)
+	    || IS_FLOAT(type)) 
+    {
+	if (!list || (list->type == INIT_NODE)) {
+	    DEBUGprintf ("OK, simple type\n");
+	    return (type);
+	} else {
+	    DEBUGprintf ("ERROR, simple type\n");
+	    return (NULL);
+	}
+    } else if (IS_BITFIELD(type)) {
+	if (!list || (list->type == INIT_NODE)) {
+	    DEBUGprintf ("OK, bitfield\n");
+	    return (type);
+	} else {
+	    DEBUGprintf ("ERROR, bitfield\n");
+	    return (NULL);
+	}
+    } else if (IS_STRUCT(type) && SPEC_STRUCT(getSpec(type))->type == STRUCT) {
+	if (!list || (list->type == INIT_DEEP)) {
+	    if (list) list = list->init.deep;
+	    sym = SPEC_STRUCT(type)->fields;
+	    while (sym) {
+		DEBUGprintf ("Checking STRUCT member %s\n", sym->name);
+		if (!matchIvalToUnion(list, sym->type, 0)) {
+		    DEBUGprintf ("ERROR, STRUCT member %s\n", sym->name);
+		    return (NULL);
+		}
+		if (list) list = list->next;
+		sym = sym->next;
+	    } // while
+	    
+	    // excess initializers?
+	    if (list) {
+		DEBUGprintf ("ERROR, excess initializers\n");
+		return (NULL);
+	    }
+	    
+	    DEBUGprintf ("OK, struct\n");
+	    return (type);
+	}
+	return (NULL);
+    } else if (IS_STRUCT(type) && SPEC_STRUCT(getSpec(type))->type == UNION) {
+	if (!list || (list->type == INIT_DEEP)) {
+	    if (list) list = list->init.deep;
+	    sym = SPEC_STRUCT(type)->fields;
+	    while (sym) {
+		DEBUGprintf ("Checking UNION member %s.\n", sym->name);
+		if (((IS_STRUCT(sym->type) || getSize(sym->type) == size))
+			&& matchIvalToUnion(list, sym->type, size))
+		{
+		    DEBUGprintf ("Matched UNION member %s.\n", sym->name);
+		    return (sym->type);
+		}
+		sym = sym->next;
+	    } // while
+	} // if
+	// no match found
+	DEBUGprintf ("ERROR, no match found.\n");
+	return (NULL);
+    } else {
+	assert ( !"Unhandled type in UNION." );
+    }
+
+    assert ( !"No match found in UNION for the given initializer structure." );
+    return (NULL);
+}
+
+/*
+ * Parse the type and its initializer and emit it (recursively).
+ */
+static void
+emitInitVal(FILE *of, symbol *topsym, sym_link *my_type, initList *list)
+{
+    symbol *sym;
+    int size, i;
+    long lit;
+
+    size = getSize(my_type);
+
+    if (IS_PTR(my_type)) {
+	DEBUGprintf ("(pointer, %d byte) %p\n", size, list ? (void *)(long)list2int(list) : NULL);
+	emitIvals(of, topsym, list, 0, size);
+	return;
+    }
+
+    if (IS_ARRAY(my_type)) {
+	DEBUGprintf ("(array, %d items, %d byte) below\n", DCL_ELEM(my_type), size);
+	assert (!list || list->type == INIT_DEEP);
+	if (list) list = list->init.deep;
+	for (i = 0; i < DCL_ELEM(my_type); i++) {
+	    emitInitVal(of, topsym, my_type->next, list);
+	    topsym = NULL;
+	    if (list) list = list->next;
+	} // for i
+	return;
+    }
+    
+    if (IS_FLOAT(my_type)) {
+	// float, 32 bit
+	DEBUGprintf ("(float, %d byte) %lf\n", size, list ? list2int(list) : 0.0);
+	emitIvals(of, topsym, list, 0, size);
+	return;
+    }
+    
+    if (IS_CHAR(my_type) || IS_INT(my_type) || IS_LONG(my_type)) {
+	// integral type, 8, 16, or 32 bit
+	DEBUGprintf ("(integral, %d byte) 0x%lx/%ld\n", size, list ? (long)list2int(list) : 0, list ? (long)list2int(list) : 0);
+	emitIvals(of, topsym, list, 0, size);
+	return;
+	
+    } else if (IS_STRUCT(my_type) && SPEC_STRUCT(my_type)->type == STRUCT) {
+	// struct
+	DEBUGprintf ("(struct, %d byte) handled below\n", size);
+	assert (!list || (list->type == INIT_DEEP));
+
+	// iterate over struct members and initList
+	if (list) list = list->init.deep;
+	sym = SPEC_STRUCT(my_type)->fields;
+	while (sym) {
+	    long bitfield = 0;
+	    int len = 0;
+	    if (IS_BITFIELD(sym->type)) {
+		while (sym && IS_BITFIELD(sym->type)) {
+		    assert (!list || ((list->type == INIT_NODE) 
+				&& IS_AST_LIT_VALUE(list->init.node)));
+		    lit = list ? list2int(list) : 0;
+		    DEBUGprintf ( "(bitfield member) %02lx (%d bit, starting at %d, bitfield %02lx)\n",
+			    lit, SPEC_BLEN(getSpec(sym->type)),
+			    SPEC_BSTR(getSpec(sym->type)), bitfield);
+		    bitfield |= (lit & ((1ul << SPEC_BLEN(getSpec(sym->type))) - 1)) << SPEC_BSTR(getSpec(sym->type));
+		    len += SPEC_BLEN(getSpec(sym->type));
+
+		    sym = sym->next;
+		    if (list) list = list->next;
+		} // while
+		assert (len < sizeof (long) * 8); // did we overflow our initializer?!?
+		len = (len + 7) & ~0x07; // round up to full bytes
+		emitIvals(of, topsym, NULL, bitfield, len / 8);
+		topsym = NULL;
+	    } // if
+	    
+	    if (sym) {
+		emitInitVal(of, topsym, sym->type, list);
+		topsym = NULL;
+		sym = sym->next;
+		if (list) list = list->next;
+	    } // if
+	} // while
+	if (list) {
+	    assert ( !"Excess initializers." );
+	} // if
+	return;
+	
+    } else if (IS_STRUCT(my_type) && SPEC_STRUCT(my_type)->type == UNION) {
+	// union
+	DEBUGprintf ("(union, %d byte) handled below\n", size);
+	assert (list && list->type == INIT_DEEP);
+
+	// iterate over union members and initList, try to map number and type of fields and initializers
+	my_type = matchIvalToUnion(list, my_type, size);
+	if (my_type) {
+	    emitInitVal(of, topsym, my_type, list->init.deep);
+	    topsym = NULL;
+	    size -= getSize(my_type);
+	    if (size > 0) {
+		// pad with (leading) zeros
+		emitIvals(of, NULL, NULL, 0, size);
+	    }
+	    return;
+	} // if
+	
+	assert ( !"No UNION member matches the initializer structure.");
+    } else if (IS_BITFIELD(my_type)) {
+	assert ( !"bitfields should only occur in structs..." );
+	
+    } else {
+	printf ("SPEC_NOUN: %d\n", SPEC_NOUN(my_type));
+	assert( !"Unhandled initialized type.");
+    }
+}
+
+/*
+ * Iterate over all memmaps and emit their contents (attributes, symbols).
+ */
+static void
+showAllMemmaps(FILE *of)
+{
+    memmap *maps[] = {
+	xstack, istack, code, data, pdata, xdata, xidata, xinit,
+	idata, bit, statsg, c_abs, x_abs, i_abs, d_abs,
+	sfr, sfrbit, reg, generic, overlay, eeprom, home };
+    memmap * map;
+    symbol *sym;
+    initList *list;
+    int i;
+
+    DEBUGprintf ("---begin memmaps---\n");
+    for (i = 0; i < sizeof(maps) / sizeof (memmap *); i++) {
+	map = maps[i];
+	//DEBUGprintf ("memmap %i: %p\n", i, map);
+	if (map) {
+	    /*
+	    DEBUGprintf ("  pageno %c, sname %s, dbName %c, ptrType %d, slbl %d, sloc %u, fmap %u, paged %u, direct %u, bitsp %u, codesp %u, regsp %u, syms %p\n", 
+		    map->pageno, map->sname, map->dbName, map->ptrType, map->slbl,
+		    map->sloc, map->fmap, map->paged, map->direct, map->bitsp,
+		    map->codesp, map->regsp, map->syms);
+	    */
+	    for (sym = setFirstItem(map->syms); sym; sym = setNextItem(map->syms)) {
+		/*
+		fprintf (of, ";    name %s, rname %s, level %d, block %d, key %d, local %d, ival %p\n",
+			sym->name, sym->rname, sym->level, sym->block, sym->key, sym->islocal, sym->ival);
+		*/
+		list = sym->ival;
+		//if (list) showInitList(list, 0);
+		if (list) {
+		    resolveIvalSym( list, sym->type );
+		    emitInitVal(of, sym, sym->type, sym->ival);
+		}
+	    } // for sym
+	} // if (map)
+    } // for i
+    DEBUGprintf ("---end of memmaps---\n");
+}
+

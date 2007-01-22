@@ -1,5 +1,10 @@
 2007-01-22 Raphael Neider <rneider AT web.de>
 
+	* src/pic/glue.c (pic14emitRegularMap):	mark initialized symbols as
+	  emitted, do not emit them again...
+
+2007-01-22 Raphael Neider <rneider AT web.de>
+
 	* src/regression/bank1.c, src/regression/compare6.c,
 	  src/regression/add.c: cosmetic changes
 	* src/pic/pcode.h: moved GPTRTAG_* here from gen.c

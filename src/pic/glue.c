@@ -404,6 +404,13 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 			//dbuf_printf (&map->oBuf, "\t.ds\t0x%04x\n", (unsigned int)getSize (sym->type) & 0xffff);
 		}
 
+		/* if it has a initial value then do it only if
+		it is a global variable */
+		if (sym->ival) {
+		    /* mark symbol as already defined */
+		    pic14_stringInSet(sym->name, &emitted, 1);
+		    pic14_stringInSet(sym->rname, &emitted, 1);
+		}
 #if 0		
 		/* if it has a initial value then do it only if
 		it is a global variable */

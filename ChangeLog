@@ -1,3 +1,8 @@
+2007-01-25 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (sameBank,FixRegisterBanking): optimize banksels
+	  based on absolute register address, patch by Alex Blond
+
 2007-01-22 Raphael Neider <rneider AT web.de>
 
 	* src/pic/glue.c (pic14emitRegularMap):	mark initialized symbols as

@@ -4629,7 +4629,7 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static int sameBank(regs *reg, const char *new_bank, const char *cur_bank)
+static int sameBank(regs *reg, regs *previous_reg, const char *new_bank, const char *cur_bank, unsigned max_mask)
 {
     if (!cur_bank) return 0;
 
@@ -4639,6 +4639,9 @@ static int sameBank(regs *reg, const char *new_bank, const char *cur_bank)
     if (cur_bank[0] == '(' && reg && reg->name && !strncmp(reg->name, &cur_bank[1], strlen(reg->name))) return 1;
     if (cur_bank[0] == '(' && new_bank && !strncmp(new_bank, &cur_bank[1], strlen(new_bank))) return 1;
     
+    if (previous_reg && reg && previous_reg->isFixed && reg->isFixed && ((previous_reg->address & max_mask) == (reg->address & max_mask)))	// only if exists 
+      return 1;  // if we have address info, we use it for banksel optimization
+
     // XXX: identify '(regname + X)' and '(regname + Y)'
     
     return ((reg && reg->name && !strcmp(reg->name, cur_bank)) || (new_bank && !strcmp(new_bank, cur_bank)));
@@ -4651,6 +4654,7 @@ void FixRegisterBanking(pBlock *pb)
     pCode *pc;
     pCodeInstruction *pci;
     regs *reg;
+    regs *previous_reg;		// contains the previous variable access info
     const char *cur_bank, *new_bank;
     unsigned cur_mask, new_mask, max_mask;
     int allRAMmshared;
@@ -4660,6 +4664,7 @@ void FixRegisterBanking(pBlock *pb)
     max_mask = pic14_getPIC()->bankMask;
     cur_mask = max_mask;
     cur_bank = NULL;
+    previous_reg = NULL;
 
     allRAMmshared = pic14_allRAMShared();
 
@@ -4668,6 +4673,7 @@ void FixRegisterBanking(pBlock *pb)
 	// this one has a label---might check bank at all jumps here...
 	if (isPCI(pc) && (PCI(pc)->label || PCI(pc)->op == POC_CALL)) {
 	    addpCodeComment(pc->prev, "BANKOPT3 drop assumptions: PCI with label or call found");
+            previous_reg = NULL;
 	    cur_bank = NULL; // start new flow
 	    cur_mask = max_mask;
 	}
@@ -4675,6 +4681,7 @@ void FixRegisterBanking(pBlock *pb)
 	// this one is/might be a label or BANKSEL---assume nothing
 	if (isPCL(pc) || isPCASMDIR(pc)) {
 	    addpCodeComment(pc->prev, "BANKOPT4 drop assumptions: label or ASMDIR found");
+            previous_reg = NULL;
 	    cur_bank = NULL;
 	    cur_mask = max_mask;
 	}
@@ -4722,7 +4729,7 @@ void FixRegisterBanking(pBlock *pb)
 		    // is in (as well as the previous registers)
 		    cur_mask &= new_mask;
 
-		    if (sameBank(reg, new_bank, cur_bank)) {
+		    if (sameBank(reg, previous_reg, new_bank, cur_bank, max_mask)) {
 			// no BANKSEL required
 			addpCodeComment(pc->prev, "BANKOPT2 BANKSEL dropped; %s present in same bank as %s", new_bank, cur_bank);
 			continue;
@@ -4731,6 +4738,7 @@ void FixRegisterBanking(pBlock *pb)
 
 		cur_mask = new_mask;
 		cur_bank = new_bank;
+		previous_reg = reg;
 		insertBankSel(pci, cur_bank);
 	    } // if
 	} // if

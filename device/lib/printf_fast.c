@@ -236,6 +236,7 @@ printf_format_u:
 printf_format_c:
 	//cjne	a, #'c', printf_format_x
 	cjne	a, #99, printf_format_x
+	dec	r0
 	mov	a, @r0		// Acc has the character to print
 	dec	r0
 	sjmp	printf_char

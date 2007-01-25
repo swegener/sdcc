@@ -131,6 +131,7 @@ printf_str_loop:
 printf_format_c:
 	//cjne	a, #'c', printf_format_d
 	cjne	a, #99, printf_format_d
+	dec	r0
 	mov	a, @r0		// Acc has the character to print
 	dec	r0
 	lcall	printf_putchar

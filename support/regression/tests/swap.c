@@ -22,7 +22,7 @@ static void testSwap_4(void)
 }
 
 
-#define SWAP_8(x) (((x)<<8)|((x)>>8))
+#define SWAP_8(x) ((((x)<<8)|((x)>>8)) & 0xffff)
 
 static void testSwap_8(void)
 {
@@ -64,8 +64,7 @@ static void testSwap_8(void)
 }
 
 
-#define SWAP_16(x) (((x)<<16) | ((x)>>16))
-#define SWAP_16_2(x) ((unsigned int)((SWAP_8((unsigned int)x))<<16) | (SWAP_8(x)>>16))
+#define SWAP_16(x) ((((x)<<16) | ((x)>>16)) & 0xffffFFFF)
 
 static void testSwap_16(void)
 {
@@ -76,10 +75,6 @@ static void testSwap_16(void)
     tt = t;
     tt = SWAP_16(tt);
     ASSERT( tt == SWAP_16(TEST_VECT_32));
-
-    tt = t;
-    tt = SWAP_16_2(tt);
-    ASSERT( tt == SWAP_16_2(TEST_VECT_32));
 
     /* swapping union with little register pressure */
     {

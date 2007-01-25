@@ -1,3 +1,8 @@
+2007-01-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/tests/swap.c: 64 bit hosts failed
+	* doc/sdccman.lyx: added preliminary mcs51 printf feature matrix
+
 2007-01-25 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (sameBank,FixRegisterBanking): optimize banksels

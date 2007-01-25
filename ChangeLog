@@ -1,3 +1,6 @@
+2007-01-25 Paul Stoffregen <paul AT pjrc.com>
+	* device/lib/printf_fast.c: fix float overflow check, bug #1525093
+
 2007-01-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* support/regression/tests/swap.c: 64 bit hosts failed

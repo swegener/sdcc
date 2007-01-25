@@ -1,4 +1,4 @@
-top_builddir = ../../
+top_builddir = ../..
 top_srcdir   = ../..
 srcdir       = .
 

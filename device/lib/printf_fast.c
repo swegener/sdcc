@@ -936,6 +936,7 @@ print_float_int:
 	jnc	print_float_size_ok
 printf_float_too_big:
 	// TODO: should print some sort of overflow error??
+	pop	ar0
 	ljmp	printf_format_loop
 print_float_size_ok:
 	push	dpl

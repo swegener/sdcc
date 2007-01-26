@@ -17301,7 +17301,6 @@ _fs2ulong.
 \emph default
 \bar default
 \noun default
-\color default
 c
 \end_layout
 
@@ -18238,7 +18237,6 @@ cd
 \emph default
 \bar default
 \noun default
-\color default
 f
 \family roman
 \series medium
@@ -18247,7 +18245,6 @@ f
 \emph off
 \bar no
 \noun off
-\color none
 i
 \family default
 \series default
@@ -18256,7 +18253,6 @@ i
 \emph on
 \bar default
 \noun default
-\color default
 o
 \family roman
 \series medium
@@ -18265,7 +18261,6 @@ o
 \emph off
 \bar no
 \noun off
-\color none
 psux
 \end_layout
 
@@ -18292,7 +18287,6 @@ d
 \emph on
 \bar default
 \noun default
-\color default
 o
 \family roman
 \series medium
@@ -18301,7 +18295,6 @@ o
 \emph off
 \bar no
 \noun off
-\color none
 s
 \family default
 \series default
@@ -18310,7 +18303,6 @@ s
 \emph default
 \bar default
 \noun default
-\color default
 x
 \end_layout
 
@@ -18543,7 +18535,7 @@ float format
 status collapsed
 
 \begin_layout Standard
-Range limited to +/- 4294967040
+Range limited to +/- 4294967040, precision limited to 8 digits past decimal
 \end_layout
 
 \end_inset
@@ -28640,7 +28632,6 @@ sdcc/sim/ucsim/doc
 \emph default
 \bar default
 \noun default
-\color default
 /index.html 
 \emph on
 \InsetSpace ~
@@ -28735,7 +28726,6 @@ cdbfileformat.pd
 \emph default
 \bar default
 \noun default
-\color default
 f
 \emph on
  \InsetSpace ~

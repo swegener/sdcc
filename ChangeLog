@@ -1,5 +1,9 @@
 2007-01-26 Paul Stoffregen <paul AT pjrc.com>
 
+	* doc/sdccman.lyx: add printf_fast_f precision limitation note
+
+2007-01-26 Paul Stoffregen <paul AT pjrc.com>
+
 	* doc/sdccman.lyx: add printf benchmarks
 
 2007-01-25 Paul Stoffregen <paul AT pjrc.com>

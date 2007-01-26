@@ -17872,7 +17872,7 @@ and
 not
 \emph default
  support long variables and field widths).
- Be shure to only use only one of these printf options within a project.
+ Be sure to only use only one of these printf options within a project.
 \newline
 
 \end_layout
@@ -18843,6 +18843,16 @@ small / large
 
 \begin_layout Standard
 0.25 / 0.25 ms
+\begin_inset Foot
+status collapsed
+
+\begin_layout Standard
+printf_tiny integer speed is data dependent, worst case is 0.33 ms
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset

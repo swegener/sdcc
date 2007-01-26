@@ -1,8 +1,14 @@
+2007-01-26 Paul Stoffregen <paul AT pjrc.com>
+
+	* doc/sdccman.lyx: add printf benchmarks
+
 2007-01-25 Paul Stoffregen <paul AT pjrc.com>
+
 	* device/lib/printf_fast.c: fix %c, char promoted to int
 	* device/lib/printf_tiny.c: fix %c, char promoted to int
 
 2007-01-25 Paul Stoffregen <paul AT pjrc.com>
+
 	* device/lib/printf_fast.c: fix float overflow check, bug #1525093
 
 2007-01-25 Frieder Ferlemann <Frieder.Ferlemann AT web.de>

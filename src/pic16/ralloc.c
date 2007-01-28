@@ -31,12 +31,6 @@
 #include "gen.h"
 #include "device.h"
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 #ifndef debugf
 #define debugf(frm, rest)       _debugf(__FILE__, __LINE__, frm, rest)
 #endif

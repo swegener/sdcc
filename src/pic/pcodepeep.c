@@ -28,12 +28,6 @@
 #include "pcodeflow.h"
 #include "ralloc.h"
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 pCodeOp *popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
 pCodeOp *popRegFromString(char *str, int size, int offset);
 

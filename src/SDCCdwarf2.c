@@ -1575,7 +1575,7 @@ dwFindFileIndex (char * filename)
       if (!strncmp (includeDir, filename, strlen (includeDir))
           && strlen (filename) > strlen (includeDir))
         {
-	  if (*(filename+strlen (includeDir)) == DIR_SEPARATOR_CHAR)
+	  if (IS_DIR_SEPARATOR(filename[strlen (includeDir)]))
 	    break;
 	}
     }

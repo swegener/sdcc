@@ -31,14 +31,7 @@
 #include "gen.h"
 
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
 #define FENTRY2			1 ? (void)0 : printf 
-#else
-#define STRCASECMP strcasecmp
-//#define FENTRY2(fmt,...)	do { fprintf (stderr, "%s:%d: called.\n", __FUNCTION__, __LINE__); fprintf (stderr, fmt, ## __VA_ARGS__); } while (0)
-#define FENTRY2			1 ? (void)0 : printf 
-#endif
 
 /* this should go in SDCCicode.h, but it doesn't. */
 #define IS_REF(op)       (IS_SYMOP(op) && op->operand.symOperand->isref == 1)

@@ -88,7 +88,8 @@ set *libDirsSet = NULL;         /* list of lib search directories */
 int ds390_jammed = 0;
 #endif
 
-/* Globally accessible scratch buffer for file names. */
+/* Globally accessible scratch buffer for file names.
+   TODO: replace them with local buffers */
 char scratchFileName[PATH_MAX];
 char buffer[PATH_MAX * 2];
 
@@ -545,15 +546,15 @@ setParseWithComma (set **dest, const char *src)
   p = src;
   while (src < end)
     {
-      dbuf_init(&dbuf, 16);
+      dbuf_init (&dbuf, 16);
 
       while (p < end && ',' != *p)
         ++p;
-      dbuf_append(&dbuf, src, p - src);
+      dbuf_append (&dbuf, src, p - src);
 
       /* null terminate the buffer */
-      dbuf_c_str(&dbuf);
-      addSet(dest, dbuf_detach(&dbuf));
+      dbuf_c_str (&dbuf);
+      addSet(dest, dbuf_detach (&dbuf));
 
       src = ++p;
     }
@@ -605,29 +606,42 @@ setDefaultOptions (void)
 static void
 processFile (char *s)
 {
-  char *fext = NULL;
+  const char *extp;
+  struct dbuf_s ext;
+  struct dbuf_s path;
 
-  /* get the file extension */
-  fext = s + strlen (s);
-  while ((fext != s) && *fext != '.')
-    fext--;
+  dbuf_init (&ext, 128);
+  dbuf_init (&path, 128);
 
-  /* now if no '.' then we don't know what the file type is
+  /* get the file extension.
+     If no '.' then we don't know what the file type is
      so give a warning and return */
-  if (fext == s)
+  if (!dbuf_splitFile (s, &path, &ext))
     {
       werror (W_UNKNOWN_FEXT, s);
+
+      dbuf_destroy (&ext);
+      dbuf_destroy (&path);
+
       return;
     }
 
   /* otherwise depending on the file type */
-  if (strcmp (fext, ".c") == 0 || strcmp (fext, ".C") == 0)
+  extp = dbuf_c_str (&ext);
+  if (extp[1] == '\0' && (extp[0] == 'c' || extp[0] == 'C'))
     {
+      unsigned char *p;
+
+      dbuf_destroy (&ext);
+
       /* source file name : not if we already have a
          source file */
       if (fullSrcFileName)
         {
           werror (W_TOO_MANY_SRC, s);
+
+          dbuf_destroy (&path);
+
           return;
         }
 
@@ -636,71 +650,55 @@ processFile (char *s)
       if (!(srcFile = fopen (fullSrcFileName, "r")))
         {
           werror (E_FILE_OPEN_ERR, s);
+
+          dbuf_destroy (&path);
+
           exit (1);
-        }
-
-      /* copy the file name into the buffer */
-      strncpyz (buffer, s, sizeof(buffer));
-
-      /* get rid of the "."-extension */
-
-      /* is there a dot at all? */
-      if (strrchr (buffer, '.') &&
-          /* is the dot in the filename, not in the path? */
-          (strrchr (buffer, DIR_SEPARATOR_CHAR) < strrchr (buffer, '.')))
-        {
-          *strrchr (buffer, '.') = '\0';
         }
 
       /* get rid of any path information
          for the module name; */
-      fext = buffer + strlen (buffer);
-#if NATIVE_WIN32
-      /* do this by going backwards till we
-         get '\' or ':' or start of buffer */
-      while (fext != buffer &&
-             *(fext - 1) != DIR_SEPARATOR_CHAR &&
-             *(fext - 1) != ':')
-        {
-          fext--;
-        }
-#else
-      /* do this by going backwards till we
-         get '/' or start of buffer */
-      while (fext != buffer &&
-             *(fext - 1) != DIR_SEPARATOR_CHAR)
-        {
-          fext--;
-        }
-#endif
-      moduleNameBase = Safe_strdup ( fext );
-      moduleName = Safe_strdup ( fext );
+      dbuf_init (&ext, 128);
 
-      for (fext = moduleName; *fext; fext++)
-        if (!isalnum ((unsigned char)*fext))
-          *fext = '_';
+      dbuf_splitPath (dbuf_c_str (&path), NULL, &ext);
+      dbuf_destroy (&path);
+
+      moduleNameBase = Safe_strdup (dbuf_c_str (&ext));
+      moduleName = dbuf_detach (&ext);
+
+      for (p = moduleName; *p; ++p)
+        if (!isalnum(*p))
+          *p = '_';
       return;
     }
 
   /* if the extention is type .rel or .r or .REL or .R
      additional object file will be passed to the linker */
-  if (strcmp (fext, ".r") == 0 || strcmp (fext, ".rel") == 0 ||
-      strcmp (fext, ".R") == 0 || strcmp (fext, ".REL") == 0 ||
-      strcmp (fext, port->linker.rel_ext) == 0)
+  if ((extp[1] == '\0' && (extp[0] == 'r' || extp[0] == 'R')) ||
+      strcmp (extp, "rel") == 0 || strcmp (extp, "REL") == 0 ||
+      strcmp (extp, port->linker.rel_ext) == 0)
     {
-      addSet(&relFilesSet, Safe_strdup(s));
+      dbuf_destroy (&ext);
+      dbuf_destroy (&path);
+
+      addSet (&relFilesSet, Safe_strdup (s));
       return;
     }
 
   /* if .lib or .LIB */
-  if (strcmp (fext, ".lib") == 0 || strcmp (fext, ".LIB") == 0)
+  if (strcmp (extp, "lib") == 0 || strcmp (extp, ".LIB") == 0)
     {
-      addSet(&libFilesSet, Safe_strdup(s));
+      dbuf_destroy (&ext);
+      dbuf_destroy (&path);
+
+      addSet (&libFilesSet, Safe_strdup (s));
       return;
     }
 
-  werror (W_UNKNOWN_FEXT, s);
+  dbuf_destroy (&ext);
+  dbuf_destroy (&path);
 
+  werror (W_UNKNOWN_FEXT, s);
 }
 
 static void
@@ -729,7 +727,7 @@ getStringArg(const char *szStart, char **argv, int *pi, int argc)
         {
           werror (E_ARGUMENT_MISSING, szStart);
           /* Die here rather than checking for errors later. */
-          exit(EXIT_FAILURE);
+          exit (EXIT_FAILURE);
         }
       else
         {
@@ -759,42 +757,43 @@ verifyShortOption(const char *opt)
 static bool
 tryHandleUnsupportedOpt(char **argv, int *pi)
 {
-    if (argv[*pi][0] == '-')
-        {
-            const char *longOpt = "";
-            char shortOpt = -1;
-            int i;
+  if (argv[*pi][0] == '-')
+    {
+      const char *longOpt = "";
+      char shortOpt = -1;
+      int i;
 
-            if (argv[*pi][1] == '-')
-                {
-                    /* Long option. */
-                    longOpt = argv[*pi];
-                }
-            else
-                {
-                    shortOpt = argv[*pi][1];
-                }
-            for (i = 0; i < LENGTH(unsupportedOptTable); i++)
-                {
-                    if (unsupportedOptTable[i].shortOpt == shortOpt ||
-                        (longOpt && unsupportedOptTable[i].longOpt && !strcmp(unsupportedOptTable[i].longOpt, longOpt))) {
-                        /* Found an unsupported opt. */
-                        char buffer[100];
-                        SNPRINTF(buffer, sizeof(buffer),
-                                 "%s%c%c",
-                                 longOpt ? longOpt : "",
-                                 shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
-                        werror (W_UNSUPP_OPTION, buffer, unsupportedOptTable[i].message);
-                        return 1;
-                    }
-                }
-            /* Didn't find in the table */
-            return 0;
-        }
-    else
+      if (argv[*pi][1] == '-')
         {
-            /* Not an option, so can't be unsupported :) */
-            return 0;
+          /* Long option. */
+          longOpt = argv[*pi];
+        }
+      else
+        {
+          shortOpt = argv[*pi][1];
+        }
+      for (i = 0; i < LENGTH(unsupportedOptTable); i++)
+        {
+          if (unsupportedOptTable[i].shortOpt == shortOpt ||
+              (longOpt && unsupportedOptTable[i].longOpt && !strcmp(unsupportedOptTable[i].longOpt, longOpt)))
+            {
+              /* Found an unsupported opt. */
+              char buffer[100];
+              SNPRINTF(buffer, sizeof(buffer),
+                "%s%c%c",
+                longOpt ? longOpt : "",
+                shortOpt ? '-' : ' ', shortOpt ? shortOpt : ' ');
+              werror (W_UNSUPP_OPTION, buffer, unsupportedOptTable[i].message);
+              return 1;
+            }
+        }
+      /* Didn't find in the table */
+      return 0;
+    }
+  else
+    {
+      /* Not an option, so can't be unsupported :) */
+      return 0;
     }
 }
 
@@ -1153,9 +1152,9 @@ parseCmdLine (int argc, char **argv)
             {
               struct dbuf_s segname;
 
-              dbuf_init(&segname, 16);
-              dbuf_printf(&segname, "%-8s(CODE)", getStringArg(OPTION_CODE_SEG, argv, &i, argc));
-              options.code_seg = dbuf_detach(&segname);
+              dbuf_init (&segname, 16);
+              dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CODE_SEG, argv, &i, argc));
+              options.code_seg = dbuf_detach (&segname);
               continue;
             }
 
@@ -1163,9 +1162,9 @@ parseCmdLine (int argc, char **argv)
             {
               struct dbuf_s segname;
 
-              dbuf_init(&segname, 16);
-              dbuf_printf(&segname, "%-8s(CODE)", getStringArg(OPTION_CONST_SEG, argv, &i, argc));
-              options.const_seg = dbuf_detach(&segname);
+              dbuf_init (&segname, 16);
+              dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CONST_SEG, argv, &i, argc));
+              options.const_seg = dbuf_detach (&segname);
               continue;
             }
 
@@ -1217,41 +1216,40 @@ parseCmdLine (int argc, char **argv)
 
             case 'o':
               {
-                char *p;
+                char *outName = getStringArg("-o", argv, &i, argc);
+                size_t len = strlen(outName);
 
-                /* copy the file name into the buffer */
-                strncpyz(buffer, getStringArg("-o", argv, &i, argc),
-                         sizeof(buffer));
                 /* point to last character */
-                p = buffer + strlen (buffer) - 1;
-                if (*p == DIR_SEPARATOR_CHAR)
+                if (IS_DIR_SEPARATOR(outName[len - 1]))
                   {
                     /* only output path specified */
-                    dstPath = Safe_strdup (buffer);
+                    dstPath = Safe_malloc(len);
+                    memcpy(dstPath, outName, len - 1);
+                    dstPath[len - 1] = '\0';
                     fullDstFileName = NULL;
                   }
                 else
                   {
-                    fullDstFileName = Safe_strdup (buffer);
+                    struct dbuf_s path;
+
+                    dbuf_init (&path, 128);
+                    fullDstFileName = Safe_strdup (outName);
 
                     /* get rid of the "."-extension */
+                    dbuf_splitFile (outName, &path, NULL);
 
-                    /* is there a dot at all? */
-                    if (strrchr (buffer, '.') &&
-                        /* is the dot in the filename, not in the path? */
-                        (strrchr (buffer, DIR_SEPARATOR_CHAR) < strrchr (buffer, '.')))
-                      *strrchr (buffer, '.') = '\0';
+                    dbuf_c_str (&path);
+                    dstFileName = dbuf_detach (&path);
 
-                    dstFileName = Safe_strdup (buffer);
-
+                    dbuf_init (&path, 128);
                     /* strip module name to get path */
-                    p = strrchr (buffer, DIR_SEPARATOR_CHAR);
-                    if (p)
+                    if (dbuf_splitPath (dstFileName, &path, NULL))
                       {
-                        /* path with trailing / */
-                        p[1] = '\0';
-                        dstPath = Safe_strdup (buffer);
+                        dbuf_c_str (&path);
+                        dstPath = dbuf_detach (&path);
                       }
+                    else
+                      dbuf_destroy (&path);
                   }
                 break;
               }
@@ -1402,35 +1400,41 @@ parseCmdLine (int argc, char **argv)
       /* use the modulename from the C-source */
       if (fullSrcFileName)
         {
-          size_t bufSize = strlen (dstPath) + strlen (moduleNameBase) + 1;
+          struct dbuf_s path;
 
-          dstFileName = Safe_alloc (bufSize);
-          strncpyz (dstFileName, dstPath, bufSize);
-          strncatz (dstFileName, moduleNameBase, bufSize);
+          if (*dstPath != '\0')
+            {
+              dbuf_makePath (&path, dstPath, moduleNameBase);
+              dbuf_c_str (&path);
+              dstFileName = dbuf_detach (&path);
+            }
+          else
+            dstFileName = Safe_strdup(moduleNameBase);
         }
       /* use the modulename from the first object file */
       else if ((s = peekSet(relFilesSet)) != NULL)
         {
-          char *objectName;
-          size_t bufSize;
+          struct dbuf_s file;
 
-          strncpyz (buffer, s, sizeof(buffer));
-          /* remove extension (it must be .rel) */
-          *strrchr (buffer, '.') = '\0';
-          /* remove path */
-          objectName = strrchr (buffer, DIR_SEPARATOR_CHAR);
-          if (objectName)
+          dbuf_init(&file, 128);
+
+          dbuf_splitPath (s, NULL, &file);
+
+          if (*dstPath != '\0')
             {
-              ++objectName;
+              struct dbuf_s path;
+
+              dbuf_init(&path, 128);
+              dbuf_makePath (&path, dstPath, dbuf_c_str (&file));
+              dbuf_destroy (&file);
+              dbuf_c_str (&path);
+              dstFileName = dbuf_detach (&path);
             }
           else
             {
-              objectName = buffer;
+              dbuf_c_str (&file);
+              dstFileName = dbuf_detach (&file);
             }
-          bufSize = strlen (dstPath) + strlen (objectName) + 1;
-          dstFileName = Safe_alloc (bufSize);
-          strncpyz (dstFileName, dstPath, bufSize);
-          strncatz (dstFileName, objectName, bufSize);
         }
       /* else no module given: help text is displayed */
     }
@@ -1651,7 +1655,7 @@ linkEdit (char **envp)
                       fprintf(stderr,
                         "Add support for your FLAT24 target in %s @ line %d\n",
                         __FILE__, __LINE__);
-                      exit(EXIT_FAILURE);
+                      exit (EXIT_FAILURE);
                     }
                   break;
                 case MODEL_PAGE0:
@@ -1699,7 +1703,7 @@ linkEdit (char **envp)
                   fprintf(stderr,
                     "Add support for your FLAT24 target in %s @ line %d\n",
                     __FILE__, __LINE__);
-                  exit(EXIT_FAILURE);
+                  exit (EXIT_FAILURE);
                 }
               }
 #endif
@@ -1863,12 +1867,6 @@ linkEdit (char **envp)
 
   system_ret = my_system (buffer);
 
-#ifdef _WIN32
-  #define STRCMP stricmp
-#else
-  #define STRCMP strcmp
-#endif
-
   /* TODO: most linker don't have a -o parameter */
   /* -o option overrides default name? */
   if (fullDstFileName)
@@ -1897,7 +1895,7 @@ linkEdit (char **envp)
       strncatz (scratchFileName,
         options.out_fmt ? ".S19" : ".ihx",
         sizeof(scratchFileName));
-      if (STRCMP (fullDstFileName, scratchFileName))
+      if (FILENAME_CMP (fullDstFileName, scratchFileName))
         remove (fullDstFileName);
       rename (scratchFileName, fullDstFileName);
 
@@ -1913,14 +1911,14 @@ linkEdit (char **envp)
       strncatz (scratchFileName, ".map", sizeof(scratchFileName));
       *q = 0;
       strncatz(buffer, ".map", sizeof(buffer));
-      if (STRCMP (scratchFileName, buffer))
+      if (FILENAME_CMP (scratchFileName, buffer))
         remove (buffer);
       rename (scratchFileName, buffer);
       *p = 0;
       strncatz (scratchFileName, ".mem", sizeof(scratchFileName));
       *q = 0;
       strncatz(buffer, ".mem", sizeof(buffer));
-      if (STRCMP (scratchFileName, buffer))
+      if (FILENAME_CMP (scratchFileName, buffer))
         remove (buffer);
       rename (scratchFileName, buffer);
       if (options.debug)
@@ -1929,13 +1927,13 @@ linkEdit (char **envp)
           strncatz (scratchFileName, ".cdb", sizeof(scratchFileName));
           *q = 0;
           strncatz(buffer, ".cdb", sizeof(buffer));
-          if (STRCMP (scratchFileName, buffer))
+          if (FILENAME_CMP (scratchFileName, buffer))
             remove (buffer);
           rename (scratchFileName, buffer);
           /* and the OMF file without extension: */
           *p = 0;
           *q = 0;
-          if (STRCMP (scratchFileName, buffer))
+          if (FILENAME_CMP (scratchFileName, buffer))
             remove (buffer);
           rename (scratchFileName, buffer);
         }
@@ -2131,7 +2129,7 @@ preProcess (char **envp)
 static void
 setBinPaths(const char *argv0)
 {
-  char *p;
+  const char *p;
   char buf[PATH_MAX];
 
   /*
@@ -2146,7 +2144,7 @@ setBinPaths(const char *argv0)
      instead of slower addSet() */
 
   if ((p = getBinPath(argv0)) != NULL)
-    addSetHead(&binPathSet, Safe_strdup(p));
+    addSetHead(&binPathSet, (void *)p);
 
   if ((p = getenv(SDCC_DIR_NAME)) != NULL) {
     SNPRINTF(buf, sizeof buf, "%s" PREFIX2BIN_DIR, p);
@@ -2225,7 +2223,7 @@ setLibPath(void)
 static void
 setDataPaths(const char *argv0)
 {
-  char *p;
+  const char *p;
   char buf[PATH_MAX];
 
   /*
@@ -2243,6 +2241,7 @@ setDataPaths(const char *argv0)
 
   if ((p = getBinPath(argv0)) != NULL) {
     SNPRINTF(buf, sizeof buf, "%s" BIN2DATA_DIR, p);
+    free((void *)p);
     addSet(&dataDirsSet, Safe_strdup(buf));
   }
 
@@ -2442,7 +2441,7 @@ main (int argc, char **argv, char **envp)
         fatalError = 1;
 
       if (fatalError) {
-        exit (1);
+        exit (EXIT_FAILURE);
       }
 
       if (port->general.do_glue != NULL)

@@ -40,12 +40,6 @@
 #include "ralloc.h"
 #include "gen.h"
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 extern int allocInfo;
 
 /* this is the down and dirty file with all kinds of

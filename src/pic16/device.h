@@ -30,12 +30,6 @@
 #ifndef  __DEVICE_H__
 #define  __DEVICE_H__
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 #define CONFIGURATION_WORDS	20
 #define IDLOCATION_BYTES	20
 

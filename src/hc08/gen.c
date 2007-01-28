@@ -2839,12 +2839,6 @@ resultRemat (iCode * ic)
   return 0;
 }
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 /*-----------------------------------------------------------------*/
 /* inExcludeList - return 1 if the string is in exclude Reg list   */
 /*-----------------------------------------------------------------*/

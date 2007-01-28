@@ -31,14 +31,6 @@
 #include "ralloc.h"
 #include "device.h"
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#define STRNCASECMP strnicmp
-#else
-#define STRCASECMP strcasecmp
-#define STRNCASECMP strncasecmp
-#endif
-
 extern int Gstack_base_addr;
 extern int Gstack_size;
 

@@ -152,12 +152,25 @@ get_handle_type(HANDLE handle)
     {
     case FILE_TYPE_CHAR:
       {
-              DWORD err;
+        DWORD err;
 
         if (!ClearCommError(handle, &err, NULL))
-          { 
-            if (ERROR_INVALID_HANDLE == GetLastError())
-              return CH_CONSOLE;
+          {
+            switch (GetLastError())
+              {
+              case ERROR_INVALID_HANDLE:
+                return CH_CONSOLE;
+
+              case ERROR_INVALID_FUNCTION:
+                /*
+                 * In case of NUL device return type CH_FILE.
+                 * Is this the correct way to test it?
+                 */
+                return CH_FILE;
+
+              default:
+                assert(false);
+              }
           }
       }
       return CH_SERIAL;
@@ -218,13 +231,12 @@ input_avail(HANDLE handle, e_handle_type type)
           !GetNumberOfConsoleInputEvents(handle, &NumPending) ||
           NumPending == 0 ||
           NULL == (pIRBuf = (PINPUT_RECORD)_alloca(NumPending * sizeof(INPUT_RECORD))))
-          return FALSE;
+          return false;
 
         if (PeekConsoleInput(handle, pIRBuf, NumPending, &NumPeeked) &&
           NumPeeked != 0L &&
           NumPeeked <= NumPending)
           {
-
             /*
              * Scan all of the peeked events to determine if any is a key event
              * which should be recognized.

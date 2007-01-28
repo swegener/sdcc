@@ -18,6 +18,36 @@
 
 #define UNIX_DIR_SEPARATOR_CHAR    '/'
 
+#if defined(__BORLANDC__) || defined(_MSC_VER)
+#define STRCASECMP stricmp
+#define STRNCASECMP strnicmp
+#else
+#define STRCASECMP strcasecmp
+#define STRNCASECMP strncasecmp
+#endif
+
+#if defined(__MSDOS__) || defined(_WIN32) || defined(__OS2__) || defined (__CYGWIN__)
+
+#ifndef HAVE_DOS_BASED_FILE_SYSTEM
+#define HAVE_DOS_BASED_FILE_SYSTEM 1
+#endif
+
+#define IS_DIR_SEPARATOR(c)     ((c) == DIR_SEPARATOR_CHAR || (c) == UNIX_DIR_SEPARATOR_CHAR)
+/* Note that IS_ABSOLUTE_PATH accepts d:foo as well, although it is
+   only semi-absolute.  This is because the users of IS_ABSOLUTE_PATH
+   want to know whether to prepend the current working directory to
+   a file name, which should not be done with a name like d:foo.  */
+#define IS_ABSOLUTE_PATH(f)     (IS_DIR_SEPARATOR((f)[0]) || (((f)[0]) && ((f)[1] == ':')))
+#define FILENAME_CMP(s1, s2)    STRCASECMP(s1, s2)
+
+#else  /* not DOSish */
+
+#define IS_DIR_SEPARATOR(c)     ((c) == DIR_SEPARATOR_CHAR)
+#define IS_ABSOLUTE_PATH(f)     (IS_DIR_SEPARATOR((f)[0]))
+#define FILENAME_CMP(s1, s2)    strcmp(s1, s2)
+
+#endif /* not DOSish */
+
 #ifdef WIN32
 # define NATIVE_WIN32          1
 # ifndef __MINGW32__

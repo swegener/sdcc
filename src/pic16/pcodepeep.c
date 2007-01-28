@@ -32,12 +32,6 @@
 #include "pcodeflow.h"
 #include "ralloc.h"
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 pCodeOp *pic16_popCopyGPR2Bit(pCodeOpReg *pc, int bitval);
 
 pCodeOp *pic16_newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype);

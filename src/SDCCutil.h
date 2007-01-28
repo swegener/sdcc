@@ -48,12 +48,26 @@ set *appendStrSet(set *list, const char *pre, const char *post);
 */
 const char *joinStrSet(set *list);
 
+/** Split the path string to the directory and file name (including extension) components.
+    The directory component doesn't contain trailing directory separator.
+    Returns true if the path contains the directory separator. */
+int dbuf_splitPath(const char *path, struct dbuf_s *dir, struct dbuf_s *file);
+
+/** Split the path string to the file name (including directory) and file extension components.
+    The file name component doesn't contain trailing extension separator.
+    Returns true if the path contains the extension separator. */
+int dbuf_splitFile(const char *path, struct dbuf_s *file, struct dbuf_s *ext);
+
+/** Combile directory and the file name to a path string using the DIR_SEPARATOR_CHAR.
+ */
+void dbuf_makePath(struct dbuf_s *path, const char *dir, const char *file);
+
 /** Given a file with path information in the binary files directory,
     returns the directory component. Used for discovery of bin
     directory of SDCC installation. Returns NULL if the path is
     impossible.
 */
-char *getBinPath (const char *prel);
+const char *getBinPath (const char *prel);
 
 /** Returns true if the given path exists.
  */

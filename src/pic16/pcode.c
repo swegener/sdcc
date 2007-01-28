@@ -35,10 +35,7 @@
 extern char *pic16_aopGet (struct asmop *aop, int offset, bool bit16, bool dname);
 
 #if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
 #define inline
-#else
-#define STRCASECMP strcasecmp
 #endif
 
 #define DUMP_DF_GRAPHS 0

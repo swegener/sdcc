@@ -698,8 +698,6 @@ extern set *userIncDirsSet;
 
 static void _pic16_initPaths(void)
 {
-  char pic16incDir[512];
-  char pic16libDir[512];
   set *pic16incDirsSet=NULL;
   set *pic16libDirsSet=NULL;
   char devlib[512];
@@ -710,13 +708,15 @@ static void _pic16_initPaths(void)
     setMainValue("mcu1", pic16->name[1] );
     addSet(&preArgvSet, Safe_strdup("-D__{mcu1}"));
 
-    sprintf(pic16incDir, "%s%cpic16", INCLUDE_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
-    sprintf(pic16libDir, "%s%cpic16", LIB_DIR_SUFFIX, DIR_SEPARATOR_CHAR);
-
-
     if(!options.nostdinc) {
+      struct dbuf_s pic16incDir;
+
+      dbuf_init(&pic16incDir, 128);
+      dbuf_makePath(&pic16incDir, INCLUDE_DIR_SUFFIX, "pic16");
+
       /* setup pic16 include directory */
-      pic16incDirsSet = appendStrSet(dataDirsSet, NULL, pic16incDir);
+      pic16incDirsSet = appendStrSet(dataDirsSet, NULL, dbuf_c_str(&pic16incDir));
+      dbuf_destroy(&pic16incDir);
       includeDirsSet = pic16incDirsSet;
 //      mergeSets(&includeDirsSet, pic16incDirsSet);
     }
@@ -725,8 +725,13 @@ static void _pic16_initPaths(void)
     mergeSets(&pic16incDirsSet, userIncDirsSet);
 
     if(!options.nostdlib) {
+      struct dbuf_s pic16libDir;
+
+      dbuf_init(&pic16libDir, 128);
+      dbuf_makePath(&pic16libDir, INCLUDE_DIR_SUFFIX, "pic16");
       /* setup pic16 library directory */
-      pic16libDirsSet = appendStrSet(dataDirsSet, NULL, pic16libDir);
+      pic16libDirsSet = appendStrSet(dataDirsSet, NULL, dbuf_c_str(&pic16libDir));
+      dbuf_destroy(&pic16libDir);
       libDirsSet = pic16libDirsSet;
 //      mergeSets(&libDirsSet, pic16libDirsSet);
     }

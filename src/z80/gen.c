@@ -87,12 +87,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 #include "z80.h"
 #include "SDCCglobl.h"
 #include "SDCCpeeph.h"

@@ -120,61 +120,151 @@ joinStrSet(set *list)
   return s;
 }
 
+/** Split the path string to the directory and file name (including extension) components.
+    The directory component doesn't contain trailing directory separator.
+    Returns true if the path contains the directory separator. */
+int
+dbuf_splitPath(const char *path, struct dbuf_s *dir, struct dbuf_s *file)
+{
+  const char *p;
+  int ret;
+  const char *end = &path[strlen(path)];
+
+  for (p = end - 1; p >= path && !IS_DIR_SEPARATOR(*p); --p)
+    ;
+
+  ret = p >= path;
+
+  if (NULL != dir)
+    {
+      int len = p - path;
+
+      if (0 < len)
+        dbuf_append(dir, path, len);
+    }
+
+  if (NULL != file)
+    {
+      int len;
+
+      ++p;
+      len = end - p;
+
+      if (0 < len)
+        dbuf_append(file, p, len);
+    }
+
+  return ret;
+}
+
+/** Split the path string to the file name (including directory) and file extension components.
+    The file name component doesn't contain trailing extension separator.
+    Returns true if the path contains the extension separator. */
+int
+dbuf_splitFile(const char *path, struct dbuf_s *file, struct dbuf_s *ext)
+{
+  const char *p;
+  const char *end = &path[strlen(path)];
+
+  for (p = end - 1; p >= path && !IS_DIR_SEPARATOR(*p) && '.' != *p; --p)
+    ;
+
+  if (p < path || '.' != *p)
+    {
+      dbuf_append_str(file, path);
+
+      return 0;
+    }
+  else
+    {
+      if (NULL != file)
+        {
+          int len = p - path;
+
+          if (0 < len)
+            dbuf_append(file, path, len);
+        }
+
+      if (NULL != ext)
+        {
+          int len;
+
+          ++p;
+          len = end - p;
+
+          if (0 < len)
+            dbuf_append(ext, p, len);
+        }
+
+      return 1;
+    }
+}
+
+/** Combile directory and the file name to a path string using the DIR_SEPARATOR_CHAR.
+ */
+void
+dbuf_makePath(struct dbuf_s *path,const char *dir, const char *file)
+{
+  if (dir != NULL)
+    dbuf_append_str(path, dir);
+  
+  dbuf_append_char(path, DIR_SEPARATOR_CHAR);
+
+  if (file != NULL)
+    dbuf_append_str(path, file);
+}
+
 /** Given a file with path information in the binary files directory,
     returns the directory component. Used for discovery of bin
     directory of SDCC installation. Returns NULL if the path is
     impossible.
 */
 #ifdef _WIN32
-char *
+const char *
 getBinPath(const char *prel)
 {
-  char *p;
-  size_t len;
-  static char path[PATH_MAX];
-    
-  /* try DOS and *nix dir separator on WIN32 */
-  if (NULL != (p = strrchr(prel, DIR_SEPARATOR_CHAR)) ||
-    NULL != (p = strrchr(prel, UNIX_DIR_SEPARATOR_CHAR))) {
-    len = min((sizeof path) - 1, p - prel);
-    strncpy(path, prel, len);
-    path[len] = '\0';
-    return path;
-  }
-  /* not enough info in prel; do it with module name */
-  else if (0 != GetModuleFileName(NULL, path, sizeof path) &&
-    NULL != (p = strrchr(path, DIR_SEPARATOR_CHAR))) {
-    *p = '\0';
-    return path;
-  }
+  struct dbuf_s path;
+  const char *p;
+
+  dbuf_init(&path, 128);
+  dbuf_splitPath(prel, &path, NULL);
+
+  p = dbuf_c_str(&path);
+  if ('\0' != *p)
+    return p;
   else
-    return NULL;
+    {
+      char module[PATH_MAX];
+
+      dbuf_destroy(&path);
+
+      /* not enough info in prel; do it with module name */
+      if (0 != GetModuleFileName(NULL, module, sizeof (module)))
+        {
+          dbuf_init(&path, 128);
+
+          dbuf_splitPath(module, &path, NULL);
+          return dbuf_c_str(&path);
+        }
+      else
+        return NULL;
+    }
 }
 #else
-char *
+const char *
 getBinPath(const char *prel)
 {
-  static char path[PATH_MAX];
+  struct dbuf_s path;
   const char *ret_path;
 
-  if (NULL != (ret_path = findProgramPath(prel))) {
-    char *p;
-    size_t len;
+  if (NULL != (ret_path = findProgramPath(prel)))
+    {
+      dbuf_splitPath(prel, path, NULL);
 
-    if (NULL != (p = strrchr(ret_path, DIR_SEPARATOR_CHAR)) &&
-      PATH_MAX > (len = p - ret_path)) {
-      memcpy(path, ret_path, len);
-      path[len] = '\0';
       free((void *)ret_path);
 
-      return path;
+      return dbuf_c_str(path);
     }
-    else {
-      free((void *)ret_path);
-
-      return NULL;
-    }
-  }
   else
     return NULL;
 }

@@ -33,12 +33,6 @@ pCode *findFunction(char *fname);
 
 static void FixRegisterBanking(pBlock *pb);
 
-#if defined(__BORLANDC__) || defined(_MSC_VER)
-#define STRCASECMP stricmp
-#else
-#define STRCASECMP strcasecmp
-#endif
-
 /****************************************************************/
 /****************************************************************/
 

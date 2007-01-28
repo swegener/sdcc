@@ -1,3 +1,18 @@
+2007-01-28 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/devices.inc,
+	* device/include/pic16/pic18f[24][23]21.h,
+	* device/include/pic16/pic18fregs.h,
+	* device/lib/pic16/libdev/pic18f[24][23]21.c,
+	* device/lib/pic16/pics.all: added support for the 18f[24][23]21 family
+	* device/lib/pic16/libio/adc.ignore,
+	* device/lib/pic16/libio/i2c.ignore,
+	* device/lib/pic16/libio/usart.ignore: do not build I/O lib for new
+	  family, as gputils do not yet support the devices
+	* device/lib/pic16/Makefile.subdir: ignore errors on install
+	* support/scripts/inc2h-pic16.pl: script to generate pic16 device
+	  headers and libraries from gputils .inc files
+
 2007-01-26 Paul Stoffregen <paul AT pjrc.com>
 
 	* doc/sdccman.lyx: add printf_fast_f precision limitation note

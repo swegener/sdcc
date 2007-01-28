@@ -46,9 +46,9 @@ ifneq (,$(strip $(TARGETS)))
 install : recurse $(OBJS) $(LIB_LIB)
 	@$(MKDIR) "$(top_builddir)/$(installdir)"
 ifndef SILENT
-	@echo "[INSTALL] $(patsubst $(top_builddir)/$(builddir)/%,%,$(TARGETS))";
+	@-echo "[INSTALL] $(patsubst $(top_builddir)/$(builddir)/%,%,$(TARGETS))";
 endif
-	$(Q)$(CP) $(TARGETS) "$(top_builddir)/$(installdir)"
+	$(Q)-$(CP) $(TARGETS) "$(top_builddir)/$(installdir)"
 else
 # used in subdirs like libc/ctype whose files
 # are contained in a parent's library

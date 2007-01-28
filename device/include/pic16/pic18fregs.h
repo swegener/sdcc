@@ -49,8 +49,14 @@
 #elif defined(pic18f2220)
 #  include <pic18f2220.h>
 
+#elif defined(pic18f2221)
+#  include <pic18f2221.h>
+
 #elif defined(pic18f2320)
 #  include <pic18f2220.h>	/* Yes, it's 2220.h */
+
+#elif defined(pic18f2321)
+#  include <pic18f2321.h>
 
 #elif defined(pic18f2455)
 #  include <pic18f2455.h>
@@ -67,8 +73,14 @@
 #elif defined(pic18f4220)
 #  include <pic18f4220.h>
 
+#elif defined(pic18f4221)
+#  include <pic18f4221.h>
+
 #elif defined(pic18f4320)
 #  include <pic18f4220.h>	/* Yes, it's 4220.h */
+
+#elif defined(pic18f4321)
+#  include <pic18f4321.h>
 
 #elif defined(pic18f4331)
 #  include <pic18f4331.h>

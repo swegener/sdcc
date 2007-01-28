@@ -630,7 +630,7 @@ processFile (char *s)
   extp = dbuf_c_str (&ext);
   if (extp[1] == '\0' && (extp[0] == 'c' || extp[0] == 'C'))
     {
-      unsigned char *p;
+      char *p;
 
       dbuf_destroy (&ext);
 
@@ -667,7 +667,7 @@ processFile (char *s)
       moduleName = dbuf_detach (&ext);
 
       for (p = moduleName; *p; ++p)
-        if (!isalnum(*p))
+        if (!isalnum ((unsigned char)*p))
           *p = '_';
       return;
     }

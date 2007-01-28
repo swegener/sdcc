@@ -244,7 +244,8 @@ getBinPath(const char *prel)
           dbuf_init(&path, 128);
 
           dbuf_splitPath(module, &path, NULL);
-          return dbuf_c_str(&path);
+          dbuf_c_str(&path);
+          return dbuf_detach(&path);
         }
       else
         return NULL;
@@ -254,16 +255,18 @@ getBinPath(const char *prel)
 const char *
 getBinPath(const char *prel)
 {
-  struct dbuf_s path;
   const char *ret_path;
 
   if (NULL != (ret_path = findProgramPath(prel)))
     {
-      dbuf_splitPath(prel, path, NULL);
+      struct dbuf_s path;
 
+      dbuf_init(&path, 128);
+
+      dbuf_splitPath(ret_path, &path, NULL);
       free((void *)ret_path);
-
-      return dbuf_c_str(path);
+      dbuf_c_str(&path);
+      return dbuf_detach(&path);
     }
   else
     return NULL;

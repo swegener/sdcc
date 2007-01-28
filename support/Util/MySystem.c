@@ -249,7 +249,7 @@ merge_command(const char *command, const char *params)
 static int
 has_path(const char *path)
 {
-  return splitPath(path, NULL, 0, NULL, 0);
+  return dbuf_splitPath(path, NULL, NULL);
 }
 
 

@@ -1278,20 +1278,19 @@ pCodeOp *popGetExternal (char *str)
 	
 	if (str) {
 	  symbol *sym;
-	  bool found = 0;
 
-	  for (sym = setFirstItem (externs); !found && sym; sym = setNextItem (externs))
+	  for (sym = setFirstItem (externs); sym; sym = setNextItem (externs))
 	  {
-	    if (!strcmp (str, sym->rname))
-	      found = 1;
+	    if (!strcmp (str, sym->rname)) break;
 	  }
 	  
-	  if (!found)
+	  if (!sym)
 	  {
 	    sym = newSymbol(str, 0);
 	    strncpy(sym->rname, str, SDCC_NAME_MAX);
 	    addSet (&externs, sym);
 	  } // if
+	  sym->used++;
 	}
 	return pcop;
 }
@@ -1826,13 +1825,26 @@ static void get_returnvalue (operand *op, int offset, int idx)
 
 static void call_libraryfunc (char *name)
 {
-  /* library code might reside in different page... */
-  emitpcode (POC_PAGESEL, popGetWithString (name, 1));
-  /* call the library function */
-  emitpcode (POC_CALL, popGetExternal (name));
-  /* might return from different page... */
-  emitpcode (POC_PAGESEL, popGetWithString ("$", 0));
+    symbol *sym;
+
+    /* library code might reside in different page... */
+    emitpcode (POC_PAGESEL, popGetWithString (name, 1));
+    /* call the library function */
+    emitpcode (POC_CALL, popGetExternal (name));
+    /* might return from different page... */
+    emitpcode (POC_PAGESEL, popGetWithString ("$", 0));
+
+    /* create symbol, mark it as `extern' */
+    sym = findSym(SymbolTab, NULL, name);
+    if (!sym) {
+	sym = newSymbol(name, 0);
+	strncpy(sym->rname, name, SDCC_NAME_MAX);
+	addSym(SymbolTab, sym, sym->rname, 0, 0, 0);
+	addSet(&externs, sym); 
+    } // if
+    sym->used++;
 }
+
 #if 0
 /*-----------------------------------------------------------------*/
 /* reAdjustPreg - points a register back to where it should        */
@@ -2826,6 +2838,13 @@ static void genFunction (iCode *ic)
 
 	pic14_emitcode("","%s:",sym->rname);
 	addpCode2pBlock(pb,newpCodeFunction(NULL,sym->rname,!IS_STATIC (sym->etype)));
+
+	/* mark symbol as NOT extern (even if it was declared so previously) */
+	assert(IS_SPEC(sym->etype));
+	SPEC_EXTR(sym->etype) = 0;
+	sym->cdef = 0;
+	if (!SPEC_OCLS(sym->etype)) SPEC_OCLS(sym->etype) = code;
+	addSetIfnotP(&SPEC_OCLS(sym->etype)->syms, sym);
 	
 	ftype = operandType(IC_LEFT(ic));
 	

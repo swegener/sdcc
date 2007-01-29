@@ -1,3 +1,18 @@
+2007-01-29 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c (popGetExternal): simplified, mark symbol as used,
+	  (call_libraryfunc): retrieve/create symbol and mark as used,
+	  (genFunction): mark defined functions as non-extern and add again
+	   to code memmap for later output
+	* src/pic/glue.c (emitPseudoStack): put into own subroutine,
+	  (pic14printLocals): reworked for new symbol emission,
+	  (emitIfNew,pic14_constructAbsMap,emitIvalLabel,emitIvals,emitInitVal,
+	  showAllMemmaps): reworked symbol output using dbufs, added handling
+	    of string literals (still incomplete),
+	  (picglue): removed symbol emission, moved into showAllMemmaps,
+	  (emitSymbolSet): new workhorse for symbol output,
+	  (pic14emitMaps,pic14printPublics,pic14printExterns): commented out,
+
 2007-01-29 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCmain.c, src/SDCCutil.c: dbuf_splitFile: file extension

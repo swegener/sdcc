@@ -40,6 +40,7 @@
 #endif
 
 #define BYTE_IN_LONG(x,b) ((x>>(8*_ENDIAN(b)))&0xff)
+#define IS_GLOBAL(sym)	((sym)->level == 0)
 
 extern symbol *interrupts[256];
 static void showAllMemmaps(FILE *of); // XXX: emits initialized symbols
@@ -75,9 +76,12 @@ int getHasSecondConfigReg(void);
 char *udata_section_name=0;		// FIXME Temporary fix to change udata section name -- VR
 int pic14_hasInterrupt = 0;		// Indicates whether to emit interrupt handler or not
 
+/* dbufs for initialized data (idata and code sections),
+ * extern, and global declarations */
+struct dbuf_s *ivalBuf, *ivalCodeBuf, *extBuf, *gloBuf, *gloDefBuf, *locBuf;
+
 static set *emitted = NULL;
 int pic14_stringInSet(const char *str, set **world, int autoAdd);
-static void emitSymbol (struct dbuf_s *oBuf, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize);
 
 /*-----------------------------------------------------------------*/
 /* aopLiteral - string from a literal value                        */
@@ -107,6 +111,7 @@ unsigned int pic14aopLiteral (value *val, int offset)
 	
 }
 
+#if 0
 static int
 is_valid_identifier( const char *name )
 {
@@ -133,11 +138,82 @@ is_valid_identifier( const char *name )
   /* valid identifier */
   return 1;
 }
+#endif
+
+static void
+emitPseudoStack(struct dbuf_s *oBuf, struct dbuf_s *oBufExt)
+{
+    int shared, low, high, size, i;
+    PIC_device *pic;
+
+    /* also emit STK symbols
+     * XXX: This is ugly and fails as soon as devices start to get
+     *      differently sized sharebanks, since STK12 will be
+     *      required by larger devices but only up to STK03 might
+     *      be defined using smaller devices. */
+    shared = pic14_getSharedStack(&low, &high, &size);
+    if (!pic14_options.isLibrarySource)
+    {
+	pic = pic14_getPIC();
+
+	dbuf_printf (oBuf, "\n");
+	dbuf_printf (oBuf, "\tglobal PSAVE\n");
+	dbuf_printf (oBuf, "\tglobal SSAVE\n");
+	dbuf_printf (oBuf, "\tglobal WSAVE\n");
+	for (i = size - 4; i >= 0; i--) {
+	    dbuf_printf (oBuf, "\tglobal STK%02d\n", i);
+	} // for i
+	dbuf_printf (oBuf, "\n", i);
+
+	// 16f84 has no SHAREBANK (in linkerscript) but memory aliased in two
+	// banks, sigh...
+	if (1 || !shared) {
+	    // for single banked devices: use normal, "banked" RAM
+	    dbuf_printf (oBuf, "sharebank udata_ovr 0x%04X\n", low);
+	} else {
+	    // for devices with at least two banks, require a sharebank section
+	    dbuf_printf (oBuf, "sharebank udata_shr\n");
+	}
+	dbuf_printf (oBuf, "PSAVE\tres 1\n");
+	dbuf_printf (oBuf, "SSAVE\tres 1\n");
+	dbuf_printf (oBuf, "WSAVE\tres 1\n"); // WSAVE *must* be in sharebank (IRQ handlers)
+	/* fill rest of sharebank with stack STKxx .. STK00 */
+	for (i = size - 4; i >= 0; i--) {
+	    dbuf_printf (oBuf, "STK%02d\tres 1\n", i);
+	} // for i
+    } else {
+	/* declare STKxx as extern for all files
+	 * except the one containing main() */
+	dbuf_printf (oBufExt, "\n");
+	dbuf_printf (oBufExt, "\textern PSAVE\n");
+	dbuf_printf (oBufExt, "\textern SSAVE\n");
+	dbuf_printf (oBufExt, "\textern WSAVE\n");
+	for (i = size - 4; i >= 0; i--) {
+	    char buffer[128];
+	    SNPRINTF(&buffer[0], 127, "STK%02d", i);
+	    dbuf_printf (oBufExt, "\textern %s\n", &buffer[0]);
+	    pic14_stringInSet(&buffer[0], &emitted, 1);
+	} // for i
+    }
+    dbuf_printf (oBuf, "\n", i);
+}
+
+static int
+emitIfNew(struct dbuf_s *oBuf, set **emitted, const char *fmt,
+	const char *name)
+{
+    int wasPresent = pic14_stringInSet(name, emitted, 1);
+
+    if (!wasPresent) {
+	dbuf_printf (oBuf, fmt, name);
+    } // if
+    return (!wasPresent);
+}
 
 #define IS_DEFINED_HERE(sym)	(!IS_EXTERN(sym->etype))
 extern int IS_CONFIG_ADDRESS( int addr );
 static void
-pic14_constructAbsMap (struct dbuf_s *oBuf)
+pic14_constructAbsMap (struct dbuf_s *oBuf, struct dbuf_s *gloBuf)
 {
   memmap *maps[] = { data, sfr, NULL };
   int i;
@@ -146,8 +222,6 @@ pic14_constructAbsMap (struct dbuf_s *oBuf)
   set *aliases;
   int addr, min=-1, max=-1;
   int size;
-  PIC_device *pic;
-  int low, high, shared;
 
   for (i=0; maps[i] != NULL; i++)
   {
@@ -206,7 +280,7 @@ pic14_constructAbsMap (struct dbuf_s *oBuf)
       } // for
       if (sym) continue;
       
-      dbuf_printf (oBuf, "udata_abs_%s_%x\tudata_ovr\t0x%04x\n",
+      dbuf_printf (oBuf, "UD_abs_%s_%x\tudata_ovr\t0x%04x\n",
 	  moduleName, addr, addr);
       for (sym = setFirstItem (aliases); sym;
 	  sym = setNextItem (aliases))
@@ -219,67 +293,20 @@ pic14_constructAbsMap (struct dbuf_s *oBuf)
 	if (sym->ival) continue;
 	
         /* emit STATUS as well as _STATUS, required for SFRs only */
-	dbuf_printf (oBuf, "%s\n", sym->name);
+	//dbuf_printf (oBuf, "%s\tres\t0\n", sym->name);
 	dbuf_printf (oBuf, "%s\n", sym->rname);
-	if (sym->islocal) {
-	  // global symbols must be emitted again as 'global sym->name'
-	  pic14_stringInSet(sym->name, &emitted, 1);
-	  pic14_stringInSet(sym->rname, &emitted, 1);
-	}
+
+	if (IS_GLOBAL(sym) && !IS_STATIC(sym->etype)) {
+	    //emitIfNew(gloBuf, &emitted, "\tglobal\t%s\n", sym->name);
+	    emitIfNew(gloBuf, &emitted, "\tglobal\t%s\n", sym->rname);
+	} // if
       } // for
       dbuf_printf (oBuf, "\tres\t%d\n", size);
     } // if
   } // for i
-
-  /* also emit STK symbols
-   * XXX: This is ugly and fails as soon as devices start to get
-   *      differently sized sharebanks, since STK12 will be
-   *      required by larger devices but only up to STK03 might
-   *      be defined using smaller devices. */
-  dbuf_printf (oBuf, "\n");
-  shared = pic14_getSharedStack(&low, &high, &size);
-  if (!pic14_options.isLibrarySource)
-  {
-    pic = pic14_getPIC();
-
-    dbuf_printf (oBuf, "\tglobal PSAVE\n");
-    dbuf_printf (oBuf, "\tglobal SSAVE\n");
-    dbuf_printf (oBuf, "\tglobal WSAVE\n");
-    for (i = size - 4; i >= 0; i--) {
-      dbuf_printf (oBuf, "\tglobal STK%02d\n", i);
-    } // for i
-
-    // 16f84 has no SHAREBANK (in linkerscript) but memory aliased in two
-    // banks, sigh...
-    if (1 || !shared) {
-	// for single banked devices: use normal, "banked" RAM
-	dbuf_printf (oBuf, "sharebank udata_ovr 0x%04X\n", low);
-    } else {
-	// for devices with at least two banks, require a sharebank section
-	dbuf_printf (oBuf, "sharebank udata_shr\n");
-    }
-    dbuf_printf (oBuf, "PSAVE\tres 1\n");
-    dbuf_printf (oBuf, "SSAVE\tres 1\n");
-    dbuf_printf (oBuf, "WSAVE\tres 1\n"); // WSAVE *must* be in sharebank (IRQ handlers)
-    /* fill rest of sharebank with stack STKxx .. STK00 */
-    for (i = size - 4; i >= 0; i--) {
-      dbuf_printf (oBuf, "STK%02d\tres 1\n", i);
-    } // for i
-  } else {
-    /* declare STKxx as extern for all files
-     * except the one containing main() */
-    dbuf_printf (oBuf, "\textern PSAVE\n");
-    dbuf_printf (oBuf, "\textern SSAVE\n");
-    dbuf_printf (oBuf, "\textern WSAVE\n");
-    for (i = size - 4; i >= 0; i--) {
-	char buffer[128];
-	SNPRINTF(&buffer[0], 127, "STK%02d", i);
-	dbuf_printf (oBuf, "\textern %s\n", &buffer[0]);
-	pic14_stringInSet(&buffer[0], &emitted, 1);
-    } // for i
-  }
 }
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* emitRegularMap - emit code for maps with no special cases       */
 /*-----------------------------------------------------------------*/
@@ -430,6 +457,7 @@ pic14emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 #endif
 	}
 }
+#endif
 
 
 #if 0
@@ -811,6 +839,7 @@ printIval (symbol * sym, sym_link * type, initList * ilist, pBlock *pb)
 }
 #endif
 
+#if 0
 extern void pCodeConstString(char *name, char *value);
 /*-----------------------------------------------------------------*/
 /* emitStaticSeg - emitcode for the static segment                 */
@@ -909,8 +938,10 @@ pic14emitStaticSeg (memmap * map)
 	}
 	
 }
+#endif
 
 
+#if 0
 /*-----------------------------------------------------------------*/
 /* emitMaps - emits the code for the data portion the code         */
 /*-----------------------------------------------------------------*/
@@ -918,6 +949,7 @@ static void
 pic14emitMaps ()
 {
 	pic14_constructAbsMap (&sfr->oBuf);
+	emitPseudoStack(&sfr->oBuf, &sfr->oBuf);
 /* no special considerations for the following
 	data, idata & bit & xdata */
 	pic14emitRegularMap (data, TRUE, TRUE);
@@ -930,6 +962,7 @@ pic14emitMaps ()
 	pic14emitStaticSeg (statsg);
 	pic14emitStaticSeg (c_abs);
 }
+#endif
 
 /*-----------------------------------------------------------------*/
 /* createInterruptVect - creates the interrupt vector              */
@@ -1003,6 +1036,7 @@ pic14_stringInSet(const char *str, set **world, int autoAdd)
   return 0;
 }
 
+#if 0
 static int
 pic14_emitSymbolIfNew(FILE *file, const char *fmt, const char *sym, int checkLocals)
 {
@@ -1016,12 +1050,13 @@ pic14_emitSymbolIfNew(FILE *file, const char *fmt, const char *sym, int checkLoc
   }
   return 1;
 }
+#endif
 
+#if 0
 /*-------------------------------------------------------------------*/
 /* emitSymbol - write a symbol definition only if it is not    */
 /*                    already present                                */
 /*-------------------------------------------------------------------*/
-
 static void
 emitSymbol (struct dbuf_s *oBuf, const char *name, const char *section_type, int size, int addr, int useEQU, int globalize)
 {
@@ -1060,7 +1095,10 @@ emitSymbol (struct dbuf_s *oBuf, const char *name, const char *section_type, int
 	}
     }
 }
+#endif
 
+
+#if 0
 /*-----------------------------------------------------------------*/
 /* printExterns - generates extern for external variables          */
 /*-----------------------------------------------------------------*/
@@ -1103,30 +1141,39 @@ pic14printPublics (FILE * afile)
     }
   }
 }
+#endif
 
 static void
-pic14printLocals (FILE * afile)
+pic14printLocals (struct dbuf_s *oBuf)
 {
-  set *allregs[6] = { dynAllocRegs, dynStackRegs, dynProcessorRegs, dynDirectRegs, dynDirectBitRegs, dynInternalRegs };
-  regs *reg;
-  int i;
-  struct dbuf_s dbuf;
+    set *allregs[6] = { dynAllocRegs/*, dynStackRegs, dynProcessorRegs*/,
+	dynDirectRegs, dynDirectBitRegs/*, dynInternalRegs */ };
+    regs *reg;
+    int i;
+    static unsigned sectionNr = 0;
 
-  dbuf_init(&dbuf, 1024);
-  /* emit all registers from all possible sets */
-  for (i = 0; i < 6; i++) {
-    if (allregs[i] == NULL) continue;
+    /* emit all registers from all possible sets */
+    for (i = 0; i < 6; i++) {
+	if (allregs[i] == NULL) continue;
 
-    for (reg = setFirstItem(allregs[i]); reg; reg = setNextItem(allregs[i])) {
-      if (reg->isEmitted) continue;
+	for (reg = setFirstItem(allregs[i]); reg; reg = setNextItem(allregs[i])) {
+	    if (reg->isEmitted) continue;
 
-      if (reg->wasUsed && !reg->isExtern) {
-        emitSymbol(&dbuf, reg->name, "udata", reg->size, reg->isFixed ? reg->address : -1, 0, reg->isPublic);
-      }
-      reg->isEmitted = 1;
+	    if (reg->wasUsed && !reg->isExtern) {
+		if (!pic14_stringInSet(reg->name, &emitted, 1)) {
+		    if (reg->isFixed) {
+			// Should not happen, really...
+			dbuf_printf(oBuf, "UDL_%s_%u\tudata\t0x%04X\n%s\tres\t%d\n",
+				moduleName, sectionNr++, reg->address, reg->name, reg->size);
+		    } else {
+			dbuf_printf(oBuf, "UDL_%s_%u\tudata\n%s\tres\t%d\n",
+				moduleName, sectionNr++, reg->name, reg->size);
+		    }
+		}
+	    }
+	    reg->isEmitted = 1;
+	} // for
     } // for
-  } // for
-  dbuf_write_and_destroy(&dbuf, afile);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1263,7 +1310,6 @@ pic14_emitInterruptHandler (FILE * asmFile)
 void
 picglue ()
 {
-	char udata_name[80];
 	FILE *asmFile;
         struct dbuf_s ovrBuf;
         struct dbuf_s vBuf;
@@ -1325,7 +1371,7 @@ picglue ()
 		cdbStructBlock (0);
 
 	/* emit code for the all the variables declared */
-	pic14emitMaps ();
+	//pic14emitMaps ();
 	/* do the overlay segments */
 	pic14emitOverlay(&ovrBuf);
 	
@@ -1383,12 +1429,13 @@ picglue ()
 	pic14_emitConfigWord (asmFile);
 	
 	/* print the global variables in this module */
-	pic14printPublics (asmFile);
+	//pic14printPublics (asmFile);
 	
 	/* print the extern variables in this module */
-	pic14printExterns (asmFile);
+	//pic14printExterns (asmFile);
 	
 	/* copy the sfr segment */
+#if 0
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "; special function registers\n");
 	fprintf (asmFile, "%s", iComments2);
@@ -1405,13 +1452,16 @@ picglue ()
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "%s\tudata\n", udata_name);
         dbuf_write_and_destroy(&data->oBuf, asmFile);
-	
+#endif
+
 	/* Put all variables into a cblock */
 	AnalyzeBanking();
 
+	/* emit initialized data */
+	showAllMemmaps(asmFile);
+
 	/* print the locally defined variables in this module */
 	writeUsedRegs(asmFile);
-	pic14printLocals (asmFile);
 	
 	/* create the overlay segments */
 	fprintf (asmFile, "%s", iComments2);
@@ -1454,13 +1504,12 @@ picglue ()
 #endif
 	
 	/* copy the bit segment */
+#if 0
 	fprintf (asmFile, "%s", iComments2);
 	fprintf (asmFile, "; bit data\n");
 	fprintf (asmFile, "%s", iComments2);
         dbuf_write_and_destroy (&bit->oBuf, asmFile);
-
-	/* emit initialized data */
-	showAllMemmaps(asmFile);
+#endif
 
 	/* copy the interrupt vector table */
 	if (mainf && IFFUNC_HASBODY(mainf->type))
@@ -1647,10 +1696,11 @@ parseIvalAst (ast *node, int *inCodeSpace) {
  * symbol name(s) for intialized data.
  */
 static int
-emitIvalLabel(FILE *of, symbol *sym)
+emitIvalLabel(struct dbuf_s *oBuf, symbol *sym)
 {
     char *segname;
     static int in_code = 0;
+    static int sectionNr = 0;
     
     if (sym) {
 	// code or data space?
@@ -1661,12 +1711,14 @@ emitIvalLabel(FILE *of, symbol *sym)
 	    segname = "idata";
 	    in_code  = 0;
 	}
-	fprintf(of, "\nD_%s_%s\t%s", moduleName, sym->name, segname);
+	dbuf_printf(oBuf, "\nID_%s_%d\t%s", moduleName, sectionNr++, segname);
 	if (SPEC_ABSA(getSpec(sym->type))) {
 	    // specify address for absolute symbols
-	    fprintf(of, "\t0x%04X", SPEC_ADDR(getSpec(sym->type)));
+	    dbuf_printf(oBuf, "\t0x%04X", SPEC_ADDR(getSpec(sym->type)));
 	} // if
-	fprintf(of, "\n%s\n", sym->rname);
+	dbuf_printf(oBuf, "\n%s\n", sym->rname);
+
+	addSet(&emitted, sym->rname);
     }
     return (in_code);
 }
@@ -1676,7 +1728,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size);
  * Actually emit the initial values in .asm format.
  */
 static void
-emitIvals(FILE *of, symbol *sym, initList *list, long lit, int size)
+emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
 {
     int i;
     ast *node;
@@ -1690,19 +1742,19 @@ emitIvals(FILE *of, symbol *sym, initList *list, long lit, int size)
     assert (!list || (list->type == INIT_NODE));
     node = list ? list->init.node : NULL;
     
-    in_code = emitIvalLabel(of, sym);
-    if (!in_code) fprintf (of, "\tdb\t");
+    in_code = emitIvalLabel(oBuf, sym);
+    if (!in_code) dbuf_printf (oBuf, "\tdb\t");
 
     if (!node) {
 	// initialize as zero
 	for (i=0; i < size; i++) {
 	    if (in_code) {
-		fprintf (of, "\tretlw 0x00");
+		dbuf_printf (oBuf, "\tretlw 0x00");
 	    } else {
-		fprintf (of, "%s0x00", (i == 0) ? "" : ", ");
+		dbuf_printf (oBuf, "%s0x00", (i == 0) ? "" : ", ");
 	    }
 	} // for
-	fprintf (of, "\n");
+	dbuf_printf (oBuf, "\n");
 	return;
     } // if
     
@@ -1720,7 +1772,7 @@ emitIvals(FILE *of, symbol *sym, initList *list, long lit, int size)
     } else {
 	assert ( !"Unhandled construct in intializer." );
     }
-    
+
     if (op) { 
 	aopOp(op, NULL, 1);
 	assert(AOP(op));
@@ -1731,12 +1783,12 @@ emitIvals(FILE *of, symbol *sym, initList *list, long lit, int size)
 	char *text = op ? aopGet(AOP(op), i, 0, 0)
 	    : get_op(newpCodeOpImmd(str, i, 0, inCodeSpace, 0), NULL, 0);
 	if (in_code) {
-	    fprintf (of, "\tretlw %s\n", text);
+	    dbuf_printf (oBuf, "\tretlw %s\n", text);
 	} else {
-	    fprintf (of, "%s%s", (i == 0) ? "" : ", ", text);
+	    dbuf_printf (oBuf, "%s%s", (i == 0) ? "" : ", ", text);
 	}
     } // for
-    fprintf (of, "\n");
+    dbuf_printf (oBuf, "\n");
 }
 
 /*
@@ -1824,17 +1876,33 @@ matchIvalToUnion (initList *list, sym_link *type, int size)
  * Parse the type and its initializer and emit it (recursively).
  */
 static void
-emitInitVal(FILE *of, symbol *topsym, sym_link *my_type, initList *list)
+emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *list)
 {
     symbol *sym;
     int size, i;
     long lit;
+    unsigned char *str;
 
     size = getSize(my_type);
 
     if (IS_PTR(my_type)) {
 	DEBUGprintf ("(pointer, %d byte) %p\n", size, list ? (void *)(long)list2int(list) : NULL);
-	emitIvals(of, topsym, list, 0, size);
+	emitIvals(oBuf, topsym, list, 0, size);
+	return;
+    }
+
+    if (IS_ARRAY(my_type) && topsym->isstrlit) {
+	str = (unsigned char *)SPEC_CVAL(topsym->etype).v_char;
+	emitIvalLabel(oBuf, topsym);
+	do {
+	    dbuf_printf (oBuf, "\tretlw 0x%02x ; '%c'\n", str[0], (str[0] >= 0x20 && str[0] < 128) ? str[0] : '.');
+	} while (*(str++));
+	return;
+    }
+
+    if (IS_ARRAY(my_type) && list && list->type == INIT_NODE) {
+	fprintf (stderr, "Unhandled initialized symbol: %s\n", topsym->name);
+	assert ( !"Initialized char-arrays are not yet supported, assign at runtime instead." );
 	return;
     }
 
@@ -1843,7 +1911,7 @@ emitInitVal(FILE *of, symbol *topsym, sym_link *my_type, initList *list)
 	assert (!list || list->type == INIT_DEEP);
 	if (list) list = list->init.deep;
 	for (i = 0; i < DCL_ELEM(my_type); i++) {
-	    emitInitVal(of, topsym, my_type->next, list);
+	    emitInitVal(oBuf, topsym, my_type->next, list);
 	    topsym = NULL;
 	    if (list) list = list->next;
 	} // for i
@@ -1853,14 +1921,14 @@ emitInitVal(FILE *of, symbol *topsym, sym_link *my_type, initList *list)
     if (IS_FLOAT(my_type)) {
 	// float, 32 bit
 	DEBUGprintf ("(float, %d byte) %lf\n", size, list ? list2int(list) : 0.0);
-	emitIvals(of, topsym, list, 0, size);
+	emitIvals(oBuf, topsym, list, 0, size);
 	return;
     }
     
     if (IS_CHAR(my_type) || IS_INT(my_type) || IS_LONG(my_type)) {
 	// integral type, 8, 16, or 32 bit
 	DEBUGprintf ("(integral, %d byte) 0x%lx/%ld\n", size, list ? (long)list2int(list) : 0, list ? (long)list2int(list) : 0);
-	emitIvals(of, topsym, list, 0, size);
+	emitIvals(oBuf, topsym, list, 0, size);
 	return;
 	
     } else if (IS_STRUCT(my_type) && SPEC_STRUCT(my_type)->type == STRUCT) {
@@ -1890,12 +1958,12 @@ emitInitVal(FILE *of, symbol *topsym, sym_link *my_type, initList *list)
 		} // while
 		assert (len < sizeof (long) * 8); // did we overflow our initializer?!?
 		len = (len + 7) & ~0x07; // round up to full bytes
-		emitIvals(of, topsym, NULL, bitfield, len / 8);
+		emitIvals(oBuf, topsym, NULL, bitfield, len / 8);
 		topsym = NULL;
 	    } // if
 	    
 	    if (sym) {
-		emitInitVal(of, topsym, sym->type, list);
+		emitInitVal(oBuf, topsym, sym->type, list);
 		topsym = NULL;
 		sym = sym->next;
 		if (list) list = list->next;
@@ -1914,12 +1982,12 @@ emitInitVal(FILE *of, symbol *topsym, sym_link *my_type, initList *list)
 	// iterate over union members and initList, try to map number and type of fields and initializers
 	my_type = matchIvalToUnion(list, my_type, size);
 	if (my_type) {
-	    emitInitVal(of, topsym, my_type, list->init.deep);
+	    emitInitVal(oBuf, topsym, my_type, list->init.deep);
 	    topsym = NULL;
 	    size -= getSize(my_type);
 	    if (size > 0) {
 		// pad with (leading) zeros
-		emitIvals(of, NULL, NULL, 0, size);
+		emitIvals(oBuf, NULL, NULL, 0, size);
 	    }
 	    return;
 	} // if
@@ -1935,6 +2003,75 @@ emitInitVal(FILE *of, symbol *topsym, sym_link *my_type, initList *list)
 }
 
 /*
+ * Emit a set of symbols.
+ * type - 0: have symbol tell whether it is local, extern or global
+ *        1: assume all symbols in set to be global
+ *        2: assume all symbols in set to be extern
+ */
+static void
+emitSymbolSet(set *s, int type)
+{
+    symbol *sym;
+    initList *list;
+    unsigned sectionNr = 0;
+
+    for (sym = setFirstItem(s); sym; sym = setNextItem(s)) {
+#if 0
+	fprintf (stdout, ";    name %s, rname %s, level %d, block %d, key %d, local %d, ival %p, static %d, cdef %d, used %d\n",
+		sym->name, sym->rname, sym->level, sym->block, sym->key, sym->islocal, sym->ival, IS_STATIC(sym->etype), sym->cdef, sym->used);
+#endif
+
+	if (sym->isstrlit) {
+	    // special case: string literals
+	    emitInitVal(ivalBuf, sym, sym->type, NULL);
+	    continue;
+	}
+
+	if (type != 0 || sym->cdef
+		|| (!IS_STATIC(sym->etype)
+		    && IS_GLOBAL(sym)))
+	{
+	    // bail out for ___fsadd and friends
+	    if (sym->cdef && !sym->used) continue;
+
+	    /* export or import non-static globals */
+	    if (!pic14_stringInSet(sym->rname, &emitted, 0)) {
+
+		if (type == 2 || IS_EXTERN(sym->etype) || sym->cdef)
+		{
+		    /* do not add to emitted set, it might occur again! */
+		    //if (!sym->used) continue;
+		    // declare symbol
+		    emitIfNew (extBuf, &emitted, "\textern\t%s\n", sym->rname);
+		} else {
+		    // declare symbol
+		    emitIfNew (gloBuf, &emitted, "\tglobal\t%s\n", sym->rname);
+		    if (!sym->ival && !IS_FUNC(sym->type)) {
+			// also define symbol
+			if (IS_ABSOLUTE(sym->etype)) {
+			    // absolute location?
+			    //dbuf_printf (gloDefBuf, "UD_%s_%u\tudata\t0x%04X\n", moduleName, sectionNr++, SPEC_ADDR(sym->etype));
+			    // deferred to pic14_constructAbsMap
+			} else {
+			    dbuf_printf (gloDefBuf, "UD_%s_%u\tudata\n", moduleName, sectionNr++);
+			    dbuf_printf (gloDefBuf, "%s\tres\t%d\n\n", sym->rname, getSize(sym->type));
+			}
+		    } // if
+		} // if
+		pic14_stringInSet(sym->rname, &emitted, 1);
+	    } // if
+	} // if
+	list = sym->ival;
+	//if (list) showInitList(list, 0);
+	if (list) {
+	    resolveIvalSym( list, sym->type );
+	    emitInitVal(ivalBuf, sym, sym->type, sym->ival);
+	    dbuf_printf (ivalBuf, "\n");
+	}
+    } // for sym
+}
+
+/*
  * Iterate over all memmaps and emit their contents (attributes, symbols).
  */
 static void
@@ -1945,35 +2082,50 @@ showAllMemmaps(FILE *of)
 	idata, bit, statsg, c_abs, x_abs, i_abs, d_abs,
 	sfr, sfrbit, reg, generic, overlay, eeprom, home };
     memmap * map;
-    symbol *sym;
-    initList *list;
     int i;
 
     DEBUGprintf ("---begin memmaps---\n");
+    if (!extBuf) extBuf = dbuf_new(1024);
+    if (!gloBuf) gloBuf = dbuf_new(1024);
+    if (!gloDefBuf) gloDefBuf = dbuf_new(1024);
+    if (!ivalBuf) ivalBuf = dbuf_new(1024);
+    if (!locBuf) locBuf = dbuf_new(1024);
+
+    dbuf_printf (extBuf, "%s; external declarations\n%s", iComments2, iComments2);
+    dbuf_printf (gloBuf, "%s; global declarations\n%s", iComments2, iComments2);
+    dbuf_printf (gloDefBuf, "%s; global definitions\n%s", iComments2, iComments2);
+    dbuf_printf (ivalBuf, "%s; initialized data\n%s", iComments2, iComments2);
+    dbuf_printf (locBuf, "%s; compiler-defined variables\n%s", iComments2, iComments2);
+
     for (i = 0; i < sizeof(maps) / sizeof (memmap *); i++) {
 	map = maps[i];
 	//DEBUGprintf ("memmap %i: %p\n", i, map);
 	if (map) {
-	    /*
-	    DEBUGprintf ("  pageno %c, sname %s, dbName %c, ptrType %d, slbl %d, sloc %u, fmap %u, paged %u, direct %u, bitsp %u, codesp %u, regsp %u, syms %p\n", 
+#if 0
+	    fprintf (stdout, ";  pageno %c, sname %s, dbName %c, ptrType %d, slbl %d, sloc %u, fmap %u, paged %u, direct %u, bitsp %u, codesp %u, regsp %u, syms %p\n", 
 		    map->pageno, map->sname, map->dbName, map->ptrType, map->slbl,
 		    map->sloc, map->fmap, map->paged, map->direct, map->bitsp,
 		    map->codesp, map->regsp, map->syms);
-	    */
-	    for (sym = setFirstItem(map->syms); sym; sym = setNextItem(map->syms)) {
-		/*
-		fprintf (of, ";    name %s, rname %s, level %d, block %d, key %d, local %d, ival %p\n",
-			sym->name, sym->rname, sym->level, sym->block, sym->key, sym->islocal, sym->ival);
-		*/
-		list = sym->ival;
-		//if (list) showInitList(list, 0);
-		if (list) {
-		    resolveIvalSym( list, sym->type );
-		    emitInitVal(of, sym, sym->type, sym->ival);
-		}
-	    } // for sym
+#endif
+	    emitSymbolSet(map->syms, 0);
 	} // if (map)
     } // for i
     DEBUGprintf ("---end of memmaps---\n");
+
+    emitSymbolSet(publics, 1);
+    emitSymbolSet(externs, 2);
+
+    emitPseudoStack(gloBuf, extBuf);
+    pic14_constructAbsMap(gloDefBuf, gloBuf);
+
+    pic14printLocals (locBuf);
+
+    dbuf_write_and_destroy(extBuf, of);
+    dbuf_write_and_destroy(gloBuf, of);
+    dbuf_write_and_destroy(gloDefBuf, of);
+    dbuf_write_and_destroy(locBuf, of);
+    dbuf_write_and_destroy(ivalBuf, of);
+
+    extBuf = gloBuf = gloDefBuf = locBuf = ivalBuf = NULL;
 }
 

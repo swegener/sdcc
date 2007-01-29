@@ -628,7 +628,7 @@ processFile (char *s)
 
   /* otherwise depending on the file type */
   extp = dbuf_c_str (&ext);
-  if (extp[1] == '\0' && (extp[0] == 'c' || extp[0] == 'C'))
+  if (STRCASECMP (extp, ".c") == 0)
     {
       char *p;
 
@@ -674,8 +674,7 @@ processFile (char *s)
 
   /* if the extention is type .rel or .r or .REL or .R
      additional object file will be passed to the linker */
-  if ((extp[1] == '\0' && (extp[0] == 'r' || extp[0] == 'R')) ||
-      strcmp (extp, "rel") == 0 || strcmp (extp, "REL") == 0 ||
+  if (STRCASECMP (extp, ".r") == 0 || STRCASECMP (extp, ".rel") == 0 ||
       strcmp (extp, port->linker.rel_ext) == 0)
     {
       dbuf_destroy (&ext);
@@ -686,7 +685,7 @@ processFile (char *s)
     }
 
   /* if .lib or .LIB */
-  if (strcmp (extp, "lib") == 0 || strcmp (extp, ".LIB") == 0)
+  if (STRCASECMP (extp, ".lib") == 0)
     {
       dbuf_destroy (&ext);
       dbuf_destroy (&path);

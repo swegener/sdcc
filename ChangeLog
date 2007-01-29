@@ -1,3 +1,8 @@
+2007-01-29 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCCmain.c, src/SDCCutil.c: dbuf_splitFile: file extension
+	  component contains the extension separator.
+
 2007-01-28 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/cmd.src/cmdutil.cc: NUL device is detected as CG_FILE type

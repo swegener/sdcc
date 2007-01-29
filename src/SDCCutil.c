@@ -158,7 +158,7 @@ dbuf_splitPath(const char *path, struct dbuf_s *dir, struct dbuf_s *file)
 }
 
 /** Split the path string to the file name (including directory) and file extension components.
-    The file name component doesn't contain trailing extension separator.
+    File extension component contains the extension separator.
     Returns true if the path contains the extension separator. */
 int
 dbuf_splitFile(const char *path, struct dbuf_s *file, struct dbuf_s *ext)
@@ -187,10 +187,7 @@ dbuf_splitFile(const char *path, struct dbuf_s *file, struct dbuf_s *ext)
 
       if (NULL != ext)
         {
-          int len;
-
-          ++p;
-          len = end - p;
+          int len = end - p;
 
           if (0 < len)
             dbuf_append(ext, p, len);

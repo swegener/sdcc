@@ -4621,24 +4621,63 @@ static void insertBankSel(pCodeInstruction  *pci, const char *name)
 	insertPCodeInstruction(pci, PCI(new_pc));
 }
 
+/*
+ * isValidIdChar - check if c may be present in an identifier
+ */
+static int isValidIdChar (char c)
+{
+    if (c >= 'a' && c <= 'z') return 1;
+    if (c >= 'A' && c <= 'Z') return 1;
+    if (c >= '0' && c <= '9') return 1;
+    if (c == '_') return 1;
+    return 0;
+}
+
+/*
+ * bankcompare - check if two operand string refer to the same register
+ * This functions handles NAME and (NAME + x) in both operands.
+ * Returns 1 on same register, 0 on different (or unknown) registers.
+ */
+static int bankCompare(const char *op1, const char *op2)
+{
+    int i;
+
+    if (!op1 && !op2) return 0; // both unknown, might be different though!
+    if (!op1 || !op2) return 0;
+
+    // find start of operand name
+    while (op1[0] == '(' || op1[0] == ' ') op1++;
+    while (op2[0] == '(' || op2[0] == ' ') op2++;
+
+    // compare till first non-identifier character
+    for (i = 0; (op1[i] == op2[i]) && isValidIdChar(op1[i]); i++);
+    if (!isValidIdChar(op1[i]) && !isValidIdChar(op2[i])) return 1;
+
+    // play safe---assume different operands
+    return 0;
+}
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
+extern int pic14_operandsAllocatedInSameBank(const char *str1, const char *str2);
 static int sameBank(regs *reg, regs *previous_reg, const char *new_bank, const char *cur_bank, unsigned max_mask)
 {
     if (!cur_bank) return 0;
 
-    // identify '(regname + X)' and 'regname'
-    if (reg && reg->name && reg->name[0] == '(' && !strncmp(&reg->name[1], cur_bank, strlen(cur_bank))) return 1;
-    if (new_bank && new_bank[0] == '(' && !strncmp(&new_bank[1], cur_bank, strlen(cur_bank))) return 1;
-    if (cur_bank[0] == '(' && reg && reg->name && !strncmp(reg->name, &cur_bank[1], strlen(reg->name))) return 1;
-    if (cur_bank[0] == '(' && new_bank && !strncmp(new_bank, &cur_bank[1], strlen(new_bank))) return 1;
-    
     if (previous_reg && reg && previous_reg->isFixed && reg->isFixed && ((previous_reg->address & max_mask) == (reg->address & max_mask)))	// only if exists 
       return 1;  // if we have address info, we use it for banksel optimization
 
-    // XXX: identify '(regname + X)' and '(regname + Y)'
-    
-    return ((reg && reg->name && !strcmp(reg->name, cur_bank)) || (new_bank && !strcmp(new_bank, cur_bank)));
+    // regard '(regname + X)' and '(regname + Y)' as equal
+    if (reg && reg->name && bankCompare(reg->name, cur_bank)) return 1;
+    if (new_bank && bankCompare(new_bank, cur_bank)) return 1;
+
+    // check allocation policy from glue.c
+    if (reg && reg->name && pic14_operandsAllocatedInSameBank(reg->name, cur_bank)) return 1;
+    if (new_bank && pic14_operandsAllocatedInSameBank(new_bank, cur_bank)) return 1;
+
+    // seems to be a different operand--might be a different bank
+    //printf ("BANKSEL from %s to %s/%s\n", cur_bank, reg->name, new_bank);
+    return 0;
 }
     
 /*-----------------------------------------------------------------*/

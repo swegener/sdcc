@@ -78,7 +78,7 @@ int pic14_hasInterrupt = 0;		// Indicates whether to emit interrupt handler or n
 
 /* dbufs for initialized data (idata and code sections),
  * extern, and global declarations */
-struct dbuf_s *ivalBuf, *ivalCodeBuf, *extBuf, *gloBuf, *gloDefBuf, *locBuf;
+struct dbuf_s *ivalBuf, *extBuf, *gloBuf, *gloDefBuf;
 
 static set *emitted = NULL;
 int pic14_stringInSet(const char *str, set **world, int autoAdd);
@@ -163,7 +163,7 @@ emitPseudoStack(struct dbuf_s *oBuf, struct dbuf_s *oBufExt)
 	for (i = size - 4; i >= 0; i--) {
 	    dbuf_printf (oBuf, "\tglobal STK%02d\n", i);
 	} // for i
-	dbuf_printf (oBuf, "\n", i);
+	dbuf_printf (oBuf, "\n");
 
 	// 16f84 has no SHAREBANK (in linkerscript) but memory aliased in two
 	// banks, sigh...
@@ -195,7 +195,7 @@ emitPseudoStack(struct dbuf_s *oBuf, struct dbuf_s *oBufExt)
 	    pic14_stringInSet(&buffer[0], &emitted, 1);
 	} // for i
     }
-    dbuf_printf (oBuf, "\n", i);
+    dbuf_printf (oBuf, "\n");
 }
 
 static int
@@ -1143,13 +1143,41 @@ pic14printPublics (FILE * afile)
 }
 #endif
 
+/*
+ * Interface to BANKSEL generation.
+ * This function should return != 0 iff str1 and str2 denote operands that
+ * are known to be allocated into the same bank. Consequently, there will
+ * be no BANKSEL emitted if str2 is accessed while str1 has been used to
+ * select the current bank just previously.
+ *
+ * If in doubt, return 0.
+ */
+int
+pic14_operandsAllocatedInSameBank(const char *str1, const char *str2) {
+    // see pic14printLocals
+    
+    if (getenv("SDCC_PIC14_SPLIT_LOCALS")) {
+	// no clustering applied, each register resides in its own bank
+    } else {
+	// check whether BOTH names are local registers
+	// XXX: This is some kind of shortcut, should be safe...
+	// In this model, all r0xXXXX are allocated into a single section
+	// per file, so no BANKSEL required if accessing a r0xXXXX after a
+	// (different) r0xXXXX. Works great for multi-byte operands.
+	if (str1 && str2 && str1[0] == 'r' && str2[0] == 'r') return (1);
+    } // if
+
+    // assume operands in different banks
+    return (0);
+}
+
 static void
 pic14printLocals (struct dbuf_s *oBuf)
 {
     set *allregs[6] = { dynAllocRegs/*, dynStackRegs, dynProcessorRegs*/,
 	dynDirectRegs, dynDirectBitRegs/*, dynInternalRegs */ };
     regs *reg;
-    int i;
+    int i, is_first = 1;
     static unsigned sectionNr = 0;
 
     /* emit all registers from all possible sets */
@@ -1163,11 +1191,23 @@ pic14printLocals (struct dbuf_s *oBuf)
 		if (!pic14_stringInSet(reg->name, &emitted, 1)) {
 		    if (reg->isFixed) {
 			// Should not happen, really...
+			assert ( !"Compiler-assigned variables should not be pinned... This is a bug." );
 			dbuf_printf(oBuf, "UDL_%s_%u\tudata\t0x%04X\n%s\tres\t%d\n",
 				moduleName, sectionNr++, reg->address, reg->name, reg->size);
 		    } else {
-			dbuf_printf(oBuf, "UDL_%s_%u\tudata\n%s\tres\t%d\n",
-				moduleName, sectionNr++, reg->name, reg->size);
+			if (getenv("SDCC_PIC14_SPLIT_LOCALS")) {
+			    // assign each local register into its own section
+			    dbuf_printf(oBuf, "UDL_%s_%u\tudata\n%s\tres\t%d\n",
+				    moduleName, sectionNr++, reg->name, reg->size);
+			} else {
+			    // group all local registers into a single section
+			    // This should greatly improve BANKSEL generation...
+			    if (is_first) {
+				dbuf_printf(oBuf, "UDL_%s_%u\tudata\n", moduleName, sectionNr++);
+				is_first = 0;
+			    }
+			    dbuf_printf(oBuf, "%s\tres\t%d\n", reg->name, reg->size);
+			}
 		    }
 		}
 	    }
@@ -2077,6 +2117,7 @@ emitSymbolSet(set *s, int type)
 static void
 showAllMemmaps(FILE *of)
 {
+    struct dbuf_s locBuf;
     memmap *maps[] = {
 	xstack, istack, code, data, pdata, xdata, xidata, xinit,
 	idata, bit, statsg, c_abs, x_abs, i_abs, d_abs,
@@ -2089,13 +2130,13 @@ showAllMemmaps(FILE *of)
     if (!gloBuf) gloBuf = dbuf_new(1024);
     if (!gloDefBuf) gloDefBuf = dbuf_new(1024);
     if (!ivalBuf) ivalBuf = dbuf_new(1024);
-    if (!locBuf) locBuf = dbuf_new(1024);
+    dbuf_init(&locBuf, 1024);
 
     dbuf_printf (extBuf, "%s; external declarations\n%s", iComments2, iComments2);
     dbuf_printf (gloBuf, "%s; global declarations\n%s", iComments2, iComments2);
     dbuf_printf (gloDefBuf, "%s; global definitions\n%s", iComments2, iComments2);
     dbuf_printf (ivalBuf, "%s; initialized data\n%s", iComments2, iComments2);
-    dbuf_printf (locBuf, "%s; compiler-defined variables\n%s", iComments2, iComments2);
+    dbuf_printf (&locBuf, "%s; compiler-defined variables\n%s", iComments2, iComments2);
 
     for (i = 0; i < sizeof(maps) / sizeof (memmap *); i++) {
 	map = maps[i];
@@ -2118,14 +2159,14 @@ showAllMemmaps(FILE *of)
     emitPseudoStack(gloBuf, extBuf);
     pic14_constructAbsMap(gloDefBuf, gloBuf);
 
-    pic14printLocals (locBuf);
+    pic14printLocals (&locBuf);
 
     dbuf_write_and_destroy(extBuf, of);
     dbuf_write_and_destroy(gloBuf, of);
     dbuf_write_and_destroy(gloDefBuf, of);
-    dbuf_write_and_destroy(locBuf, of);
+    dbuf_write_and_destroy(&locBuf, of);
     dbuf_write_and_destroy(ivalBuf, of);
 
-    extBuf = gloBuf = gloDefBuf = locBuf = ivalBuf = NULL;
+    extBuf = gloBuf = gloDefBuf = ivalBuf = NULL;
 }
 

@@ -1,3 +1,17 @@
+2007-01-31 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (isValidIdChar,bankCompare): fuzzy matching of
+	    operand names, handles name and (name + n) for all n,
+	  (sameBank): restructured, also check bank allocation policy,
+	* src/pic/glue.c (emitPseudoStack): fixed printf arguments,
+	  (pic14_operandsAllocatedInSameBank): check whether to operands
+	    will be allocated into the same bank (i.e., section) to reduce
+	    BANKSEL overhead, queried from pcode.c:sameBank,
+	  (pic14printLocals): reintroduced clustering registers into a single
+	    section: all compiler generated symbols will now reside in one
+	    bank (per file), reducing BANKSEL overhead and code size,
+	  (showAllMemmaps): use local dbuf where possible
+
 2007-01-29 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (popGetExternal): simplified, mark symbol as used,
@@ -11,7 +25,7 @@
 	    of string literals (still incomplete),
 	  (picglue): removed symbol emission, moved into showAllMemmaps,
 	  (emitSymbolSet): new workhorse for symbol output,
-	  (pic14emitMaps,pic14printPublics,pic14printExterns): commented out,
+	  (pic14emitMaps,pic14printPublics,pic14printExterns): commented out
 
 2007-01-29 Borut Razem <borut.razem AT siol.net>
 

@@ -1,3 +1,8 @@
+2007-01-31 Borut Razem <borut.razem AT siol.net>
+
+	* support/Util/dbuf_string.h: added ATTRIBUTE_PRINTF to dbuf_printf()
+	  if compiled with GCC. Thanks to Raphael Neider
+
 2007-01-31 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (isValidIdChar,bankCompare): fuzzy matching of

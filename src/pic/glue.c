@@ -1465,9 +1465,6 @@ picglue ()
 		port->genAssemblerPreamble(asmFile);
 	}
 
-	/* Emit the __config directive */
-	pic14_emitConfigWord (asmFile);
-	
 	/* print the global variables in this module */
 	//pic14printPublics (asmFile);
 	
@@ -2061,6 +2058,17 @@ emitSymbolSet(set *s, int type)
 		sym->name, sym->rname, sym->level, sym->block, sym->key, sym->islocal, sym->ival, IS_STATIC(sym->etype), sym->cdef, sym->used);
 #endif
 
+	if (SPEC_ABSA(sym->etype)
+		&& IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))
+		&& sym->ival)
+	{
+	    // handle config words
+	    pic14_assignConfigWordValue(SPEC_ADDR(sym->etype),
+		    (int)list2int(sym->ival));
+	    pic14_stringInSet(sym->rname, &emitted, 1);
+	    continue;
+	}
+
 	if (sym->isstrlit) {
 	    // special case: string literals
 	    emitInitVal(ivalBuf, sym, sym->type, NULL);
@@ -2158,8 +2166,8 @@ showAllMemmaps(FILE *of)
 
     emitPseudoStack(gloBuf, extBuf);
     pic14_constructAbsMap(gloDefBuf, gloBuf);
-
     pic14printLocals (&locBuf);
+    pic14_emitConfigWord(of); // must be done after all the rest
 
     dbuf_write_and_destroy(extBuf, of);
     dbuf_write_and_destroy(gloBuf, of);

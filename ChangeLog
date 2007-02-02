@@ -1,3 +1,8 @@
+2007-02-02 Raphael Neider <rneider AT web.de>
+
+	* src/pic/glue.c (emitSymbolSet): check sym->etype before use
+	* src/regression/Makefile: use --no-pcode-opt, ignore failing tests
+
 2007-02-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic/glue.c (picglue,emitSymbolSet,showAllMemmaps): emit the

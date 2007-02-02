@@ -2058,7 +2058,7 @@ emitSymbolSet(set *s, int type)
 		sym->name, sym->rname, sym->level, sym->block, sym->key, sym->islocal, sym->ival, IS_STATIC(sym->etype), sym->cdef, sym->used);
 #endif
 
-	if (SPEC_ABSA(sym->etype)
+	if (sym->etype && SPEC_ABSA(sym->etype)
 		&& IS_CONFIG_ADDRESS(SPEC_ADDR(sym->etype))
 		&& sym->ival)
 	{

@@ -1,9 +1,15 @@
 2007-02-03 Borut Razem <borut.razem AT siol.net>
 
-	* sdc/SDCC.y, src/SDCCmain.c, src/SDCCglobl.h, doc/sdccman.lyx:
+	* src/SDCC.y, src/SDCCmain.c, src/SDCCglobl.h, doc/sdccman.lyx:
 	  applied patch #1646602 option to set default signedness of char to
 	  unsigned, added -funsigned-char command line option,
 	  thanks to Gunther Jehle
+	* device/lib/Makefile.in: added the -f option to rm so it doesn't
+	  prompt for file deletion a few hundred times (especially the
+	  subversion files, which have ro permissions so it asks for
+	  confirmation), thanks to Simon McAuliffe;
+	  added {} + option to find in order to remove multiple files from a
+	  single rm commad
 
 2007-02-02 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

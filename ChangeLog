@@ -1,3 +1,9 @@
+2007-02-03 Borut Razem <borut.razem AT siol.net>
+
+	* sdc/SDCC.y, src/SDCCmain.c, src/SDCCglobl.h, doc/sdccman.lyx:
+	  applied patch #1646602 option to set default signedness of char to
+	  unsigned, added -funsigned-char command line option
+
 2007-02-02 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/SST89x5xRDx.h: Added.
@@ -10,7 +16,7 @@
 2007-02-01 Raphael Neider <rneider AT web.de>
 
 	* src/pic/glue.c (picglue,emitSymbolSet,showAllMemmaps): emit the
-	    config words again
+	  config words again
 
 2007-01-31 Borut Razem <borut.razem AT siol.net>
 

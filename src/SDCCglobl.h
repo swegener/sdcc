@@ -286,6 +286,7 @@ struct options
     int std_c99;                /* enable C99 keywords/constructs */
     int std_sdcc;               /* enable SDCC extensions to C */
     int dollars_in_ident;       /* zero means dollar signs are punctuation */
+    int unsigned_char;          /* use unsigned for char without signed/unsigned modifier */
     const char *code_seg;       /* segment name to use instead of CSEG */
     const char *const_seg;      /* segment name to use instead of CONST */
     /* sets */
@@ -311,16 +312,16 @@ extern int seqPointNo;          /* current sequence point */
 extern FILE *yyin;              /* */
 extern FILE *asmFile;           /* assembly output file */
 extern FILE *cdbFile;           /* debugger symbol file */
-extern int NestLevel;           /* NestLevel                 SDCC.y   */
-extern int stackPtr;            /* stack pointer             SDCC.y   */
-extern int xstackPtr;           /* external stack pointer    SDCC.y   */
+extern int NestLevel;           /* NestLevel                 SDCC.y */
+extern int stackPtr;            /* stack pointer             SDCC.y */
+extern int xstackPtr;           /* external stack pointer    SDCC.y */
 extern int reentrant;           /* /X flag has been sent     SDCC.y */
-extern char buffer[PATH_MAX * 2];/* general buffer           SDCCmain.c   */
-extern int currRegBank;         /* register bank being used  SDCCgens.c   */
-extern int RegBankUsed[4];      /* JCF: register banks used  SDCCmain.c   */
-extern int BitBankUsed;         /* MB: overlayable bit bank  SDCCmain.c   */
+extern char buffer[PATH_MAX * 2];/* general buffer           SDCCmain.c */
+extern int currRegBank;         /* register bank being used  SDCCgens.c */
+extern int RegBankUsed[4];      /* JCF: register banks used  SDCCmain.c */
+extern int BitBankUsed;         /* MB: overlayable bit bank  SDCCmain.c */
 extern struct symbol *currFunc; /* current function    SDCCgens.c */
-extern int cNestLevel;          /* block nest level  SDCCval.c      */
+extern int cNestLevel;          /* block nest level  SDCCval.c */
 extern int currBlockno;         /* sequentail block number */
 extern struct optimize optimize;
 extern struct options options;

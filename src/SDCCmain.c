@@ -144,6 +144,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_CODE_SEG         "--codeseg"
 #define OPTION_CONST_SEG        "--constseg"
 #define OPTION_DOLLARS_IN_IDENT "--fdollars-in-identifiers"
+#define OPTION_UNSIGNED_CHAR    "--funsigned-char"
 
 static const OPTION
 optionsTable[] = {
@@ -179,6 +180,7 @@ optionsTable[] = {
     { 0,    OPTION_STD_C99,         NULL, "Use C99 standard only (incomplete)" },
     { 0,    OPTION_STD_SDCC99,      NULL, "Use C99 standard with SDCC extensions (incomplete)" },
     { 0,    OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character" },
+    { 0,    OPTION_UNSIGNED_CHAR,   &options.unsigned_char, "Make \"char\" unsigned by default" },
 
     { 0,    NULL,                   NULL, "Code generation options"},
     { 'm',  NULL,                   NULL, "Set the port to use e.g. -mz80." },

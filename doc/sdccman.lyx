@@ -8595,6 +8595,45 @@ status Collapsed
 
 \end_inset
 
+-funsigned-char
+\begin_inset LatexCommand \index{-\/-funsigned-char}
+
+\end_inset
+
+
+\series default
+ The default signedness for every type is
+\family typewriter
+ signed
+\family default
+. In some embedded enviornments the default signedness of
+\family typewriter
+ char
+\family default
+ is
+\family typewriter
+ unsigned
+\family default
+. To set the signess for characters to unsigned, use the option --funsigned-char.
+ If this option is set and no signedness keyword (unsigned/signed) is given, a char will be signed.
+ All other types are unaffected.
+
+\layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+
+\backslash
+/
+
+\end_inset
+
 -main-return
 \begin_inset LatexCommand \index{-\/-main-return}
 

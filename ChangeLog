@@ -2,7 +2,8 @@
 
 	* sdc/SDCC.y, src/SDCCmain.c, src/SDCCglobl.h, doc/sdccman.lyx:
 	  applied patch #1646602 option to set default signedness of char to
-	  unsigned, added -funsigned-char command line option
+	  unsigned, added -funsigned-char command line option,
+	  thanks to Gunther Jehle
 
 2007-02-02 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 

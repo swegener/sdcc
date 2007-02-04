@@ -125,25 +125,25 @@ SFR(SFCF, 0xB1); // SuperFlash Configuration
    #define SWR    0x02 // Software Reset
    #define BSEL   0x01 // Program memory block switching bit
 SFR(SFCM, 0xB2); // SuperFlash Command
-   #define FIE 0x80 Flash Interrupt Enable
-   #define CHIP_ERASE 0x01
-   #define SECTOR_ERASE 0x0B
-   #define BLOCK_ERASE 0x0D
-   #define BYTE_VERIFY 0x0C
-   #define BYTE_PROGRAM 0x0E
-   #define PROG_SB1 0x0F
-   #define PROG_SB2 0x03
-   #define PROG_SB3 0x05
-   #define PROG_SC0 0x09
+   #define FIE                 0x80 // Flash Interrupt Enable
+   #define CHIP_ERASE          0x01
+   #define SECTOR_ERASE        0x0B
+   #define BLOCK_ERASE         0x0D
+   #define BYTE_VERIFY         0x0C
+   #define BYTE_PROGRAM        0x0E
+   #define PROG_SB1            0x0F
+   #define PROG_SB2            0x03
+   #define PROG_SB3            0x05
+   #define PROG_SC0            0x09
    #define ENABLE_CLOCK_DOUBLE 0x08
 SFR(SFAL, 0xB3); // SuperFlash Address Low Register - A7 to A0
 SFR(SFAH, 0xB4); // SuperFlash Address High Register - A15 to A8
 SFR(SFDT, 0xB5); // SuperFlash Data Register
 SFR(SFST, 0xB6); // SuperFlash Status
-   #define SB1_i 0x80 // Security Bit 1 status (inverse of SB1 bit)
-   #define SB2_i 0x40 // Security Bit 2 status (inverse of SB2 bit)
-   #define SB3_i 0x20 // Security Bit 3 status (inverse of SB3 bit)
-   #define EDC_i 0x08 // Double Clock Status
+   #define SB1_i      0x80 // Security Bit 1 status (inverse of SB1 bit)
+   #define SB2_i      0x40 // Security Bit 2 status (inverse of SB2 bit)
+   #define SB3_i      0x20 // Security Bit 3 status (inverse of SB3 bit)
+   #define EDC_i      0x08 // Double Clock Status
    #define FLASH_BUSY 0x04 // Flash operation completion polling bit
 
 // TABLE 3-7: Watchdog Timer SFRs

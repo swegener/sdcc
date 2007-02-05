@@ -2,6 +2,7 @@
   timeout.c - source file for running ucSim within the regression tests
 
              Written By -  Bernhard Held . bernhard@bernhardheld.de (2001)
+   Native WIN32 port by -  Borut Razem . borut.razem@siol.net (2007)
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -24,7 +25,7 @@
 
 #define PROGNAME "timeout"
 
-#define USAGE PROGNAME " : 1.00\n" \
+#define USAGE PROGNAME " : 1.10\n" \
               "Usage : " PROGNAME " timeout_in_seconds filename [arguments]\n" \
               "  \"filename\" is executed, the arguments are passed to \"filename\".\n" \
               "  When \"filename\" exits before the timeout expires, the\n" \
@@ -32,17 +33,123 @@
               "  When the timeout expires before \"filename\" exits, \"filename\"\n" \
               "  will be killed and an exit-status of 1 is returned.\n"
 
-/* First the program tries to limit the maximum CPU-time to the timeout-value.
-   Then the child is run with execvp().
+#ifdef _WIN32
+#include <windows.h>
+#include <stdio.h>
+#include <malloc.h>
 
-   It's not possible to limit the CPU-time under Cygwin (V1.3.3). If setrlimit (RLIMIT_CPU, rlp)
-   fails, the program will fork() and run the child with execvp(). The fork/exec pair is slow on
-   Cygwin, but what else can we do? The parent sleeps until:
-   - a signal shows the child´s exitus
-	The exit status of the child is returned.
+/*
+   Native WIN32 version:
+
+   The program creates a chile process using CreateProcess(). The waits until:
+   - the child exits
+        The exit status of the child is returned.
    - the timeout elapses
-	The child will be killed.
+        The child will be killed.
 */
+
+int
+makeCmdLine(char *buf, int argc, const char * const *argv)
+{
+  int len = 0;
+
+  argv += 2;
+  while (argc-- > 2)
+    {
+      int argLen = strlen(*argv);
+      len += argLen;
+      if (buf)
+        {
+          memcpy(buf, *argv, argLen);
+          buf += argLen;
+        }
+      if (argc > 2)
+        {
+          ++len;
+          if (buf)
+            *buf++ = ' ';
+        }
+      ++argv;
+    }
+  if (buf)
+    *buf = '\0';
+
+  return len + 1;
+}
+
+int
+main (int argc, const char * const *argv)
+{
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+  char *cmdLine;
+  long timeout;
+  DWORD exitCode;
+  HANDLE oldStderr;
+
+  if (argc < 3)
+    {
+      fprintf (stderr, USAGE);
+      return 1;
+    }
+  timeout = atol (argv[1]);
+  if (timeout == 0)
+    {
+      fprintf (stderr, "Error parameter " PROGNAME ": must be a non-zero dezimal value\n");
+      return 1;
+    }
+
+  cmdLine = alloca(makeCmdLine(NULL, argc, argv));
+  makeCmdLine(cmdLine, argc, argv);
+
+  ZeroMemory(&si, sizeof (si));
+  si.cb = sizeof (si);
+  ZeroMemory(&pi, sizeof (pi));
+
+  /* We'll redirect here stderr to stdout, which will be redirected  */
+  /* to /dev/null by the shell. The shell could also redirect stderr */
+  /* to /dev/null, but then this program doesn't have the chance to  */
+  /* output any real error. */
+  oldStderr = GetStdHandle (STD_ERROR_HANDLE);
+  SetStdHandle (STD_ERROR_HANDLE, GetStdHandle (STD_OUTPUT_HANDLE));
+
+  /* Start the child process. */
+  if(!CreateProcess (NULL, // No module name (use command line)
+    cmdLine,        // Command line
+    NULL,           // Process handle not inheritable
+    NULL,           // Thread handle not inheritable
+    TRUE,           // Set handle inheritance to TRUE
+    0,              // No creation flags
+    NULL,           // Use parent's environment block
+    NULL,           // Use parent's starting directory 
+    &si,            // Pointer to STARTUPINFO structure
+    &pi)            // Pointer to PROCESS_INFORMATION structure
+    ) 
+    {
+      printf ("CreateProcess failed (%d).\n", GetLastError ());
+      return 1;
+    }
+
+  /* Restore stderr */
+  SetStdHandle (STD_ERROR_HANDLE, oldStderr);
+
+  /* Wait until child process exits or timeout expires. */
+  if (WaitForSingleObject (pi.hProcess, timeout * 1000) == WAIT_TIMEOUT)
+    {
+      TerminateProcess (pi.hProcess, 1);
+      WaitForSingleObject (pi.hProcess, INFINITE);
+    }
+
+  GetExitCodeProcess (pi.hProcess, &exitCode);
+
+  /* Close process and thread handles. */
+  CloseHandle (pi.hProcess);
+  CloseHandle (pi.hThread);
+
+  return exitCode;
+}
+
+#else
 
 #include <signal.h>
 #include <stdio.h>
@@ -52,6 +159,18 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+
+/* First the program tries to limit the maximum CPU-time to the timeout-value.
+   Then the child is run with execvp().
+
+   It's not possible to limit the CPU-time under Cygwin (V1.3.3). If setrlimit (RLIMIT_CPU, rlp)
+   fails, the program will fork() and run the child with execvp(). The fork/exec pair is slow on
+   Cygwin, but what else can we do? The parent sleeps until:
+   - a signal shows the child´s exitus
+        The exit status of the child is returned.
+   - the timeout elapses
+        The child will be killed.
+*/
 
 /* Get the status from all child processes that have terminated, without ever waiting.
    This function is designed to be a handler for SIGCHLD, the signal that indicates
@@ -164,4 +283,4 @@ main (int argc, char * const *argv)
         }
     }
 }
-
+#endif

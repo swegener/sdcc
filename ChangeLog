@@ -1,3 +1,8 @@
+2007-02-05 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/fwk/lib/timeout.c: native WIN32 port,
+	  implemented #1651830 Reg. tests: rewrite timeout.c to use WIN32 API
+
 2007-02-03 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.y, src/SDCCmain.c, src/SDCCglobl.h, doc/sdccman.lyx:

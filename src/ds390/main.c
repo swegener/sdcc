@@ -939,11 +939,7 @@ PORT ds390_port =
   1,				/* transform >= to ! < */
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
-#if 0 // obsolete, and buggy for != xdata
-  TRUE,                         /* we support array initializers. */
-#else
   FALSE,                        /* No array initializer support. */
-#endif
   cseCostEstimation,
   __ds390_builtins,             /* table of builtin functions */
   GPOINTER,			/* treat unqualified pointers as "generic" pointers */
@@ -1258,7 +1254,7 @@ PORT tininative_port =
   1,				/* transform >= to ! < */
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
-  TRUE,                         /* we support array initializers. */
+  FALSE,                        /* No array initializer support. */
   cseCostEstimation,
   __tininative_builtins,        /* table of builtin functions */
   FPOINTER,			/* treat unqualified pointers as far pointers */
@@ -1494,7 +1490,7 @@ PORT ds400_port =
   1,				/* transform >= to ! < */
   1,				/* transform != to !(a == b) */
   0,				/* leave == */
-  TRUE,                         /* we support array initializers. */
+  FALSE,                        /* No array initializer support. */
   cseCostEstimation,
   __ds390_builtins,             /* table of builtin functions */
   GPOINTER,			/* treat unqualified pointers as "generic" pointers */

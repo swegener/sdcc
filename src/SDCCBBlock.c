@@ -463,7 +463,10 @@ addiCodeToeBBlock (eBBlock * ebp, iCode * ic, iCode * ip)
   /* if this is true then we put it before the condition else */
   /* we put it before if, this is to reduce register pressure, */
   /* we don't have to hold  condition too long in a register  */
-  if (ebp->ech->op == IFX)
+
+  /* loop induction sometimes appends a GOTO instruction, */
+  /* it must be at the very end */
+  if (ebp->ech->op == IFX && ic->op != GOTO)
     {
       iCode *ipoint;
 

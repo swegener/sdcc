@@ -1,3 +1,8 @@
+2007-02-06 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/SDCCBlock.c (addiCodeToeBBlock): fixed bug 1652207: GOTO icodes
+	appended by loop induction must be at the very end of the eBBlock
+
 2007-02-05 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/fwk/lib/timeout.c: native WIN32 port,

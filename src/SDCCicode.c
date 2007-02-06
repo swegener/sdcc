@@ -4290,8 +4290,7 @@ ast2iCode (ast * tree,int lvl)
         else
           right = geniCodeRValue (right, FALSE);
 
-        geniCodeAssign (left, right, 0, 1);
-        return right;
+        return geniCodeAssign (left, right, 0, 1);
       }
     case MUL_ASSIGN:
       return

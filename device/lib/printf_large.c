@@ -470,7 +470,7 @@ get_conversion_spec:
       }
 
       if (c=='.') {
-        if (decimals=-1) decimals=0;
+        if (decimals==-1) decimals=0;
         else
           ; // duplicate, ignore
         goto get_conversion_spec;

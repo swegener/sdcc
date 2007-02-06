@@ -1,3 +1,10 @@
+2007-02-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/printf_large.c (_print_format): fixed compare/assign bug, how
+	  can this have lived here for so many years?
+	* src/SDCCicode.c (ast2iCode): return left instead of right for assignment,
+	  fixes bug 1273984, see also patch 1645121, thanks Günther Jehle
+
 2007-02-06 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/SDCCBlock.c (addiCodeToeBBlock): fixed bug 1652207: GOTO icodes

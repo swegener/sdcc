@@ -1642,12 +1642,29 @@ aopPut (operand * result, const char *s, int offset)
 
     case AOP_STK:
       if (strcmp (s, "a") == 0)
-        emitcode ("push", "acc");
-      else
-        if (*s=='@') {
+        {
+          emitcode ("push", "acc");
+        }
+      else if (*s=='@')
+        {
           MOVA(s);
           emitcode ("push", "acc");
-        } else {
+        }
+      else if (strcmp (s, "r0") == 0 ||
+               strcmp (s, "r1") == 0 ||
+               strcmp (s, "r2") == 0 ||
+               strcmp (s, "r3") == 0 ||
+               strcmp (s, "r4") == 0 ||
+               strcmp (s, "r5") == 0 ||
+               strcmp (s, "r6") == 0 ||
+               strcmp (s, "r7") == 0)
+        {
+          char buffer[10];
+          SNPRINTF (buffer, sizeof(buffer), "a%s", s);
+          emitcode ("push", buffer);
+        }
+      else
+        {
           emitcode ("push", s);
         }
 

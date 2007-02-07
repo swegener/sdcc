@@ -1403,8 +1403,9 @@ parseCmdLine (int argc, char **argv)
         {
           struct dbuf_s path;
 
-          if (*dstPath != '\0')
+		  if (*dstPath != '\0')
             {
+              dbuf_init(&path, 128);
               dbuf_makePath (&path, dstPath, moduleNameBase);
               dbuf_c_str (&path);
               dstFileName = dbuf_detach (&path);

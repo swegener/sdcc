@@ -1,3 +1,8 @@
+2007-02-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (aopPut): use direct name for pushing registers
+	* src/SDCCmain.c (parseCmdLine): dbuf_s path must be initialised
+
 2007-02-07 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/devices.inc,

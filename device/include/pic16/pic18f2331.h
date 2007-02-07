@@ -1,5 +1,5 @@
 /* 
- * pic18f4331.h - device specific declarations
+ * pic18f2331.h - device specific declarations
  *
  * This file is part of the GNU PIC library for SDCC,
  * originally devised by Vangelis Rokas <vrokas AT otenet.gr>
@@ -8,8 +8,8 @@
  * (c) 2007 by Raphael Neider <rneider AT web.de>
  */
 
-#ifndef __PIC18F4331_H__
-#define __PIC18F4331_H__ 1
+#ifndef __PIC18F2331_H__
+#define __PIC18F2331_H__ 1
 
 
 
@@ -90,14 +90,6 @@
 // CONFIG3H Options
 #define	_MCLRE_OFF_3H       	0x7F	 // Disabled
 #define	_MCLRE_ON_3H        	0xFF	 // Enabled
-#define	_EXCLKMX_RD0_3H     	0xEF	 // Multiplexed with RD0
-#define	_EXCLKMX_RC3_3H     	0xFF	 // Multiplexed with RC3
-#define	_PWM4MX_RD5_3H      	0xF7	 // Multiplexed with RD5
-#define	_PWM4MX_RB5_3H      	0xFF	 // Multiplexed with RB5
-#define	_SSPMX_RD1_3H       	0xFB	 // SDO output is multiplexed with RD1
-#define	_SSPMX_RC7_3H       	0xFF	 // SD0 output is multiplexed with RC7
-#define	_FLTAMX_RD4_3H      	0xFE	 // Multiplexed with RD4
-#define	_FLTAMX_RC1_3H      	0xFF	 // Multiplexed with RC1
 
 // CONFIG4L Options
 #define	_STVREN_OFF_4L      	0xFE	 // Disabled
@@ -112,10 +104,6 @@
 #define	_CP0_OFF_5L         	0xFF	 // Disabled
 #define	_CP1_ON_5L          	0xFD	 // Enabled
 #define	_CP1_OFF_5L         	0xFF	 // Disabled
-#define	_CP2_ON_5L          	0xFB	 // Enabled
-#define	_CP2_OFF_5L         	0xFF	 // Disabled
-#define	_CP3_ON_5L          	0xF7	 // Enabled
-#define	_CP3_OFF_5L         	0xFF	 // Disabled
 
 // CONFIG5H Options
 #define	_CPB_ON_5H          	0xBF	 // Enabled
@@ -128,10 +116,6 @@
 #define	_WRT0_OFF_6L        	0xFF	 // Disabled
 #define	_WRT1_ON_6L         	0xFD	 // Enabled
 #define	_WRT1_OFF_6L        	0xFF	 // Disabled
-#define	_WRT2_ON_6L         	0xFB	 // Enabled
-#define	_WRT2_OFF_6L        	0xFF	 // Disabled
-#define	_WRT3_ON_6L         	0xF7	 // Enabled
-#define	_WRT3_OFF_6L        	0xFF	 // Disabled
 
 // CONFIG6H Options
 #define	_WRTB_ON_6H         	0xBF	 // Enabled
@@ -146,10 +130,6 @@
 #define	_EBTR0_OFF_7L       	0xFF	 // Disabled
 #define	_EBTR1_ON_7L        	0xFD	 // Enabled
 #define	_EBTR1_OFF_7L       	0xFF	 // Disabled
-#define	_EBTR2_ON_7L        	0xFB	 // Enabled
-#define	_EBTR2_OFF_7L       	0xFF	 // Disabled
-#define	_EBTR3_ON_7L        	0xF7	 // Enabled
-#define	_EBTR3_OFF_7L       	0xFF	 // Disabled
 
 // CONFIG7H Options
 #define	_EBTRB_ON_7H        	0xBF	 // Enabled
@@ -512,48 +492,13 @@ typedef union {
 } __PORTCbits_t;
 extern volatile __PORTCbits_t __at (0xF82) PORTCbits;
 
-extern __sfr __at (0xF83) PORTD;
-typedef union {
-	struct {
-		unsigned RD0       	: 1;
-		unsigned RD1       	: 1;
-		unsigned RD2       	: 1;
-		unsigned RD3       	: 1;
-		unsigned RD4       	: 1;
-		unsigned RD5       	: 1;
-		unsigned RD6       	: 1;
-		unsigned RD7       	: 1;
-	};
-} __PORTDbits_t;
-extern volatile __PORTDbits_t __at (0xF83) PORTDbits;
-
 extern __sfr __at (0xF84) PORTE;
 typedef union {
 	struct {
-		unsigned RE0       	: 1;
-		unsigned RE1       	: 1;
-		unsigned RE2       	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
 		unsigned RE3       	: 1;
-		unsigned RE4       	: 1;
-		unsigned RE5       	: 1;
-		unsigned RE6       	: 1;
-		unsigned RE7       	: 1;
-	};
-	struct {
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned NOT_MCLR  	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-	};
-	struct {
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned MCLR      	: 1;
 		unsigned           	: 1;
 		unsigned           	: 1;
 		unsigned           	: 1;
@@ -610,36 +555,6 @@ typedef union {
 	};
 } __LATCbits_t;
 extern volatile __LATCbits_t __at (0xF8B) LATCbits;
-
-extern __sfr __at (0xF8C) LATD;
-typedef union {
-	struct {
-		unsigned LATD0     	: 1;
-		unsigned LATD1     	: 1;
-		unsigned LATD2     	: 1;
-		unsigned LATD3     	: 1;
-		unsigned LATD4     	: 1;
-		unsigned LATD5     	: 1;
-		unsigned LATD6     	: 1;
-		unsigned LATD7     	: 1;
-	};
-} __LATDbits_t;
-extern volatile __LATDbits_t __at (0xF8C) LATDbits;
-
-extern __sfr __at (0xF8D) LATE;
-typedef union {
-	struct {
-		unsigned LATE0     	: 1;
-		unsigned LATE1     	: 1;
-		unsigned LATE2     	: 1;
-		unsigned LATE3     	: 1;
-		unsigned LATE4     	: 1;
-		unsigned LATE5     	: 1;
-		unsigned LATE6     	: 1;
-		unsigned LATE7     	: 1;
-	};
-} __LATEbits_t;
-extern volatile __LATEbits_t __at (0xF8D) LATEbits;
 
 extern __sfr __at (0xF90) PR5L;
 
@@ -734,66 +649,6 @@ typedef union {
 	};
 } __TRISCbits_t;
 extern volatile __TRISCbits_t __at (0xF94) TRISCbits;
-
-extern __sfr __at (0xF95) DDRD;
-typedef union {
-	struct {
-		unsigned RD0       	: 1;
-		unsigned RD1       	: 1;
-		unsigned RD2       	: 1;
-		unsigned RD3       	: 1;
-		unsigned RD4       	: 1;
-		unsigned RD5       	: 1;
-		unsigned RD6       	: 1;
-		unsigned RD7       	: 1;
-	};
-} __DDRDbits_t;
-extern volatile __DDRDbits_t __at (0xF95) DDRDbits;
-
-extern __sfr __at (0xF95) TRISD;
-typedef union {
-	struct {
-		unsigned TRISD0    	: 1;
-		unsigned TRISD1    	: 1;
-		unsigned TRISD2    	: 1;
-		unsigned TRISD3    	: 1;
-		unsigned TRISD4    	: 1;
-		unsigned TRISD5    	: 1;
-		unsigned TRISD6    	: 1;
-		unsigned TRISD7    	: 1;
-	};
-} __TRISDbits_t;
-extern volatile __TRISDbits_t __at (0xF95) TRISDbits;
-
-extern __sfr __at (0xF96) DDRE;
-typedef union {
-	struct {
-		unsigned RE0       	: 1;
-		unsigned RE1       	: 1;
-		unsigned RE2       	: 1;
-		unsigned RE3       	: 1;
-		unsigned RE4       	: 1;
-		unsigned RE5       	: 1;
-		unsigned RE6       	: 1;
-		unsigned RE7       	: 1;
-	};
-} __DDREbits_t;
-extern volatile __DDREbits_t __at (0xF96) DDREbits;
-
-extern __sfr __at (0xF96) TRISE;
-typedef union {
-	struct {
-		unsigned TRISE0    	: 1;
-		unsigned TRISE1    	: 1;
-		unsigned TRISE2    	: 1;
-		unsigned TRISE3    	: 1;
-		unsigned TRISE4    	: 1;
-		unsigned TRISE5    	: 1;
-		unsigned TRISE6    	: 1;
-		unsigned TRISE7    	: 1;
-	};
-} __TRISEbits_t;
-extern volatile __TRISEbits_t __at (0xF96) TRISEbits;
 
 extern __sfr __at (0xF99) ADCHS;
 typedef union {
@@ -1182,27 +1037,12 @@ typedef union {
 		unsigned ANS2      	: 1;
 		unsigned ANS3      	: 1;
 		unsigned ANS4      	: 1;
-		unsigned ANS5      	: 1;
-		unsigned ANS6      	: 1;
-		unsigned ANS7      	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
+		unsigned           	: 1;
 	};
 } __ANSEL0bits_t;
 extern volatile __ANSEL0bits_t __at (0xFB8) ANSEL0bits;
-
-extern __sfr __at (0xFB9) ANSEL1;
-typedef union {
-	struct {
-		unsigned ANS8      	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-		unsigned           	: 1;
-	};
-} __ANSEL1bits_t;
-extern volatile __ANSEL1bits_t __at (0xFB9) ANSEL1bits;
 
 extern __sfr __at (0xFBA) CCP2CON;
 typedef union {

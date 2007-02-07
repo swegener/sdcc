@@ -1,5 +1,5 @@
 /*
- * pic18f4331.c - device specific definitions
+ * pic18f2331.c - device specific definitions
  *
  * This file is part of the GNU PIC library for SDCC,
  * originally devised by Vangelis Rokas <vrokas AT otenet.gr>
@@ -8,7 +8,7 @@
  * (c) 2007 by Raphael Neider <rneider AT web.de>
  */
 
-#include <pic18f4331.h>
+#include <pic18f2331.h>
 
 
 __sfr __at (0xF60) DFLTCON;
@@ -108,9 +108,6 @@ volatile __PORTBbits_t __at (0xF81) PORTBbits;
 __sfr __at (0xF82) PORTC;
 volatile __PORTCbits_t __at (0xF82) PORTCbits;
 
-__sfr __at (0xF83) PORTD;
-volatile __PORTDbits_t __at (0xF83) PORTDbits;
-
 __sfr __at (0xF84) PORTE;
 volatile __PORTEbits_t __at (0xF84) PORTEbits;
 
@@ -126,12 +123,6 @@ volatile __LATBbits_t __at (0xF8A) LATBbits;
 
 __sfr __at (0xF8B) LATC;
 volatile __LATCbits_t __at (0xF8B) LATCbits;
-
-__sfr __at (0xF8C) LATD;
-volatile __LATDbits_t __at (0xF8C) LATDbits;
-
-__sfr __at (0xF8D) LATE;
-volatile __LATEbits_t __at (0xF8D) LATEbits;
 
 __sfr __at (0xF90) PR5L;
 
@@ -154,18 +145,6 @@ volatile __DDRCbits_t __at (0xF94) DDRCbits;
 
 __sfr __at (0xF94) TRISC;
 volatile __TRISCbits_t __at (0xF94) TRISCbits;
-
-__sfr __at (0xF95) DDRD;
-volatile __DDRDbits_t __at (0xF95) DDRDbits;
-
-__sfr __at (0xF95) TRISD;
-volatile __TRISDbits_t __at (0xF95) TRISDbits;
-
-__sfr __at (0xF96) DDRE;
-volatile __DDREbits_t __at (0xF96) DDREbits;
-
-__sfr __at (0xF96) TRISE;
-volatile __TRISEbits_t __at (0xF96) TRISEbits;
 
 __sfr __at (0xF99) ADCHS;
 volatile __ADCHSbits_t __at (0xF99) ADCHSbits;
@@ -240,9 +219,6 @@ volatile __T5CONbits_t __at (0xFB7) T5CONbits;
 
 __sfr __at (0xFB8) ANSEL0;
 volatile __ANSEL0bits_t __at (0xFB8) ANSEL0bits;
-
-__sfr __at (0xFB9) ANSEL1;
-volatile __ANSEL1bits_t __at (0xFB9) ANSEL1bits;
 
 __sfr __at (0xFBA) CCP2CON;
 volatile __CCP2CONbits_t __at (0xFBA) CCP2CONbits;

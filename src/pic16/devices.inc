@@ -362,6 +362,52 @@
     }
   },
   {
+    {"p18f2331", "18f2331", "pic18f2331", "f2331"}, // also: 18f[24][34]31
+    0,			/* always 0 */
+    0x300,		/* RAM in bytes */
+    0x60,		/* access bank split */
+    0,			/* always 0 */
+    { 0xf60, 0xfff },	/* range of SFR's */
+    {
+    /* configuration words */
+      0x300001,		/* first address */
+      0x30000d,		/* last address */
+      { { 0xcf, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x1f, 0, 0xff } /* 3 */ , 
+        { 0x3c, 0, 0xff } /* 4 */ , { 0x9b, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ ,
+	{  -1 , 0, 0xff } /* 7 */ , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ ,
+	{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ ,  { 0x0f, 0, 0xff } /* c */ ,
+	{ 0x40, 0, 0xff } /* d */ }
+    },
+    /* IDLOCs --- always 0 */
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
+    }
+  },
+  {
+    {"p18f2431", "18f2431", "pic18f2431", "f2431"}, // also: 18f[24][34]31
+    0,			/* always 0 */
+    0x300,		/* RAM in bytes */
+    0x60,		/* access bank split */
+    0,			/* always 0 */
+    { 0xf60, 0xfff },	/* range of SFR's */
+    {
+    /* configuration words */
+      0x300001,		/* first address */
+      0x30000d,		/* last address */
+      { { 0xcf, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x1f, 0, 0xff } /* 3 */ , 
+        { 0x3c, 0, 0xff } /* 4 */ , { 0x9b, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ ,
+	{  -1 , 0, 0xff } /* 7 */ , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ ,
+	{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ ,  { 0x0f, 0, 0xff } /* c */ ,
+	{ 0x40, 0, 0xff } /* d */ }
+    },
+    /* IDLOCs --- always 0 */
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
+    }
+  },
+  {
     {"p18f2455", "18f2455", "pic18f2455", "f2455"},
     0,
     0x800,	/* 2048 */
@@ -540,22 +586,46 @@
     }
   },
   {
-    {"p18f4331", "18f4331", "pic18f4331", "f4331"},
-    0,
-    0x300,	/* 768 */
-    0x60,
-    0,
-    { 0xf60, 0xfff },	/* PIC18F4331 range of SFR's */
+    {"p18f4331", "18f4331", "pic18f4331", "f4331"}, // also: 18f[24][34]31
+    0,			/* always 0 */
+    0x300,		/* RAM in bytes */
+    0x60,		/* access bank split */
+    0,			/* always 0 */
+    { 0xf60, 0xfff },	/* range of SFR's */
     {
-    /* PIC18F4331 configuration words */
-      0x300001,
-      0x30000d,
-      { { 0xcf, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x3f, 0, 0xff } /* 3 */ , 
-      { 0x3c, 0, 0xff } /* 4 */ , { 0x9d, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ , 
-      { -1, 0, 0xff } /* 7 */  , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ , 
-      { 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ , { 0x0f, 0, 0xff } /* c */ , 
-      { 0x40, 0, 0xff } /* d */  }
+    /* configuration words */
+      0x300001,		/* first address */
+      0x30000d,		/* last address */
+      { { 0xcf, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x1f, 0, 0xff } /* 3 */ , 
+        { 0x3c, 0, 0xff } /* 4 */ , { 0x9b, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ ,
+	{  -1 , 0, 0xff } /* 7 */ , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ ,
+	{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ ,  { 0x0f, 0, 0xff } /* c */ ,
+	{ 0x40, 0, 0xff } /* d */ }
     },
+    /* IDLOCs --- always 0 */
+    { 0x200000, 0x200007, 
+      { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
+        { 0, 0 }, { 0, 0 }, { 0, 0 } }
+    }
+  },
+  {
+    {"p18f4431", "18f4431", "pic18f4431", "f4431"}, // also: 18f[24][34]31
+    0,			/* always 0 */
+    0x300,		/* RAM in bytes */
+    0x60,		/* access bank split */
+    0,			/* always 0 */
+    { 0xf60, 0xfff },	/* range of SFR's */
+    {
+    /* configuration words */
+      0x300001,		/* first address */
+      0x30000d,		/* last address */
+      { { 0xcf, 0, 0xff } /* 1 */ , { 0x0f, 0, 0xff } /* 2 */ , { 0x1f, 0, 0xff } /* 3 */ , 
+        { 0x3c, 0, 0xff } /* 4 */ , { 0x9b, 0, 0xff } /* 5 */ , { 0x85, 0, 0xff } /* 6 */ ,
+	{  -1 , 0, 0xff } /* 7 */ , { 0x0f, 0, 0xff } /* 8 */ , { 0xc0, 0, 0xff } /* 9 */ ,
+	{ 0x0f, 0, 0xff } /* a */ , { 0xe0, 0, 0xff } /* b */ ,  { 0x0f, 0, 0xff } /* c */ ,
+	{ 0x40, 0, 0xff } /* d */ }
+    },
+    /* IDLOCs --- always 0 */
     { 0x200000, 0x200007, 
       { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, 
         { 0, 0 }, { 0, 0 }, { 0, 0 } }

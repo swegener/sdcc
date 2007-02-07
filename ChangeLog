@@ -1,3 +1,12 @@
+2007-02-07 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/devices.inc,
+	* device/include/pic16/pic18fregs.h,
+	* device/include/pic16/pic18f[24][34]31.h,
+	* device/lib/pic16/libdev/pic18f[24][34]31.c,
+	* device/lib/pic16/pics.all: added 18f[24][34]31 family
+	* device/lib/pic16/libio/i2c.ignore: do not build i2c
+
 2007-02-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/printf_large.c (_print_format): fixed compare/assign bug, how

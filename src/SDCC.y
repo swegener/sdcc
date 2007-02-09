@@ -1018,9 +1018,7 @@ opt_assign_expr
                                  $$ = cenum = constVal(lbuff);
                               }
                               else {
-                                 SNPRINTF(lbuff, sizeof(lbuff),
-                                          "%d",0);
-                                 $$ = cenum = constVal(lbuff);
+                                 $$ = cenum = constVal("0");
                               }
                            }
    ;
@@ -1450,15 +1448,12 @@ end_block   : '}'     { currBlockno = STACK_POP(blockNum); }
             ;
 
 compound_statement
-   : start_block end_block                    { $$ = createBlock(NULL,NULL); }
-   | start_block statement_list end_block     { $$ = createBlock(NULL,$2) ;  }
+   : start_block end_block                    { $$ = createBlock(NULL, NULL); }
+   | start_block statement_list end_block     { $$ = createBlock(NULL, $2); }
+   | start_block declaration_list end_block   { $$ = createBlock($2, NULL); }
    | start_block
-          declaration_list                    { addSymChain(&$2); }
-     end_block                                { $$ = createBlock($2,NULL) ;  }
-   | start_block
-          declaration_list                    {  addSymChain (&$2); }
-          statement_list
-     end_block                                {$$ = createBlock($2,$4)   ;  }
+          declaration_list statement_list
+     end_block                                {$$ = createBlock($2, $3); }
    | error ';'                                { $$ = NULL ; }
    ;
 
@@ -1473,6 +1468,7 @@ declaration_list
        else
          $$ = $1 ;
        ignoreTypedefType = 0;
+       addSymChain(&$1);
      }
 
    | declaration_list declaration
@@ -1496,6 +1492,7 @@ declaration_list
            $$ = $2 ;
        }
        ignoreTypedefType = 0;
+       addSymChain(&$2);
      }
    ;
 

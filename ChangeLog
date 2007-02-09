@@ -1,3 +1,8 @@
+2007-02-09 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.y: fixed bug #1159134: invalid duplicate declarations with
+	  same scope
+
 2007-02-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (aopPut): use direct name for pushing registers
@@ -24,6 +29,10 @@
 
 	* src/SDCCBlock.c (addiCodeToeBBlock): fixed bug 1652207: GOTO icodes
 	appended by loop induction must be at the very end of the eBBlock
+
+2007-02-05 Kevin Vigor
+
+	* src/ds390/gen.c, src/ds390/main.c: Address bug 1469393.
 
 2007-02-05 Borut Razem <borut.razem AT siol.net>
 

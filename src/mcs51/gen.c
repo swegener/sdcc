@@ -3983,37 +3983,41 @@ genRet (iCode * ic)
 
   if (IS_BIT(_G.currentFunc->etype))
     {
-      movc (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
-      size = 0;
-    }
-
-  while (size--)
-    {
-      char *l;
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
-        {
-          /* #NOCHANGE */
-          l = aopGet (IC_LEFT (ic), offset++,
-                      FALSE, TRUE);
-          emitcode ("push", "%s", l);
-          pushed++;
-        }
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
+        emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
       else
-        {
-          l = aopGet (IC_LEFT (ic), offset,
-                      FALSE, FALSE);
-          if (strcmp (fReturn[offset], l))
-            emitcode ("mov", "%s,%s", fReturn[offset++], l);
-        }
+        movc (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
     }
-
-  while (pushed)
+  else
     {
-      pushed--;
-      if (strcmp (fReturn[pushed], "a"))
-        emitcode ("pop", fReturn[pushed]);
-      else
-        emitcode ("pop", "acc");
+      while (size--)
+        {
+          char *l;
+          if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
+            {
+              /* #NOCHANGE */
+              l = aopGet (IC_LEFT (ic), offset++,
+                          FALSE, TRUE);
+              emitcode ("push", "%s", l);
+              pushed++;
+            }
+          else
+            {
+              l = aopGet (IC_LEFT (ic), offset,
+                          FALSE, FALSE);
+              if (strcmp (fReturn[offset], l))
+                emitcode ("mov", "%s,%s", fReturn[offset++], l);
+            }
+        }
+
+      while (pushed)
+        {
+          pushed--;
+          if (strcmp (fReturn[pushed], "a"))
+            emitcode ("pop", fReturn[pushed]);
+          else
+            emitcode ("pop", "acc");
+        }
     }
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 

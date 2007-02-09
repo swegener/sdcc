@@ -1,3 +1,8 @@
+2007-02-09 Bernhard Held <bernhard AT bernhardheld.de>
+
+	* src/mcs51/gen.c (genRet): fixed RFE 1652561: added code for bit to
+	bit moves in return statement
+
 2007-02-09 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.y: fixed bug #1159134: invalid duplicate declarations with
@@ -22,8 +27,8 @@
 	* device/lib/printf_large.c (_print_format): fixed compare/assign bug, how
 	  can this have lived here for so many years?
 	* src/SDCCicode.c (ast2iCode): return left instead of right for assignment,
-	  fixes bug 1273984, see also patch 1645121, thanks Günther Jehle
-	* support/regression/tests/bug1273984.c: new, added, thanks Günther Jehle
+	  fixes bug 1273984, see also patch 1645121, thanks Gnther Jehle
+	* support/regression/tests/bug1273984.c: new, added, thanks Gnther Jehle
 
 2007-02-06 Bernhard Held <bernhard AT bernhardheld.de>
 

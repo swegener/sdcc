@@ -1072,83 +1072,90 @@ addSymChain (symbol ** symHead)
 
       if (!sym->level && !(IS_SPEC(sym->etype) && IS_TYPEDEF(sym->etype)))
         checkDecl (sym, 0);
-      
+
       /* if already exists in the symbol table then check if
          one of them is an extern definition if yes then
          then check if the type match, if the types match then
          delete the current entry and add the new entry      */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
-          csym->level == sym->level) {
-
-        /* If the previous definition was for an array with incomplete */
-        /* type, and the new definition has completed the type, update */
-        /* the original type to match */
-        if (IS_DECL(csym->type) && DCL_TYPE(csym->type)==ARRAY
-            && IS_DECL(sym->type) && DCL_TYPE(sym->type)==ARRAY)
-          {
-            if (!DCL_ELEM(csym->type) && DCL_ELEM(sym->type))
-              DCL_ELEM(csym->type) = DCL_ELEM(sym->type);
-          }
-
-        #if 0
-        /* If only one of the definitions used the "at" keyword, copy */
-        /* the address to the other. */
-        if (IS_SPEC(csym->etype) && SPEC_ABSA(csym->etype)
-            && IS_SPEC(sym->etype) && !SPEC_ABSA(sym->etype))
-          {
-            SPEC_ABSA (sym->etype) = 1;
-            SPEC_ADDR (sym->etype) = SPEC_ADDR (csym->etype);
-          }
-        if (IS_SPEC(csym->etype) && !SPEC_ABSA(csym->etype)
-            && IS_SPEC(sym->etype) && SPEC_ABSA(sym->etype))
-          {
-            SPEC_ABSA (csym->etype) = 1;
-            SPEC_ADDR (csym->etype) = SPEC_ADDR (sym->etype);
-          }
-        #endif
-  
-        error = 0;        
-        if (csym->ival && sym->ival)
-          error = 1;
-        if (compareTypeExact (csym->type, sym->type, sym->level) != 1)
-          error = 1;
-        
-        if (error) {
-          /* one definition extern ? */
-          if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype))
-            werror (E_EXTERN_MISMATCH, sym->name);
+          csym->level == sym->level)
+        {
+          /* if not in file scope then show symbol redefined error
+             else check if symbols have conpatible types */
+          if (sym->level > 0)
+            error = 1;
           else
-            werror (E_DUPLICATE, sym->name);
-          werrorfl (csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
-          #if 0
-          fprintf (stderr, "from type '");
-          printTypeChain (csym->type, stderr);
-          if (IS_SPEC (csym->etype) && SPEC_ABSA (csym->etype))
-            fprintf(stderr, " at 0x%x", SPEC_ADDR (csym->etype));
-          fprintf (stderr, "'\nto type '");
-          printTypeChain (sym->type, stderr);
-          if (IS_SPEC (sym->etype) && SPEC_ABSA (sym->etype))
-            fprintf(stderr, " at 0x%x", SPEC_ADDR (sym->etype));
-          fprintf (stderr, "'\n");
-          #endif
-          continue;
+            {
+              /* If the previous definition was for an array with incomplete */
+              /* type, and the new definition has completed the type, update */
+              /* the original type to match */
+              if (IS_DECL(csym->type) && DCL_TYPE(csym->type)==ARRAY
+                  && IS_DECL(sym->type) && DCL_TYPE(sym->type)==ARRAY)
+                {
+                  if (!DCL_ELEM(csym->type) && DCL_ELEM(sym->type))
+                    DCL_ELEM(csym->type) = DCL_ELEM(sym->type);
+                }
+
+              #if 0
+              /* If only one of the definitions used the "at" keyword, copy */
+              /* the address to the other. */
+              if (IS_SPEC(csym->etype) && SPEC_ABSA(csym->etype)
+                  && IS_SPEC(sym->etype) && !SPEC_ABSA(sym->etype))
+                {
+                  SPEC_ABSA (sym->etype) = 1;
+                  SPEC_ADDR (sym->etype) = SPEC_ADDR (csym->etype);
+                }
+              if (IS_SPEC(csym->etype) && !SPEC_ABSA(csym->etype)
+                  && IS_SPEC(sym->etype) && SPEC_ABSA(sym->etype))
+                {
+                  SPEC_ABSA (csym->etype) = 1;
+                  SPEC_ADDR (csym->etype) = SPEC_ADDR (sym->etype);
+                }
+              #endif
+
+              error = 0;
+              if (csym->ival && sym->ival)
+                error = 1;
+              if (compareTypeExact (csym->type, sym->type, sym->level) != 1)
+                error = 1;
+            }
+
+          if (error)
+            {
+              /* one definition extern ? */
+              if (IS_EXTERN (csym->etype) || IS_EXTERN (sym->etype))
+                werror (E_EXTERN_MISMATCH, sym->name);
+              else
+                werror (E_DUPLICATE, sym->name);
+              werrorfl (csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
+              #if 0
+              fprintf (stderr, "from type '");
+              printTypeChain (csym->type, stderr);
+              if (IS_SPEC (csym->etype) && SPEC_ABSA (csym->etype))
+                fprintf(stderr, " at 0x%x", SPEC_ADDR (csym->etype));
+              fprintf (stderr, "'\nto type '");
+              printTypeChain (sym->type, stderr);
+              if (IS_SPEC (sym->etype) && SPEC_ABSA (sym->etype))
+                fprintf(stderr, " at 0x%x", SPEC_ADDR (sym->etype));
+              fprintf (stderr, "'\n");
+              #endif
+              continue;
+            }
+
+          if (csym->ival && !sym->ival)
+            sym->ival = csym->ival;
+
+          /* delete current entry */
+          deleteSym (SymbolTab, csym, csym->name);
+          deleteFromSeg(csym);
+
+          symPtrPtr = symHead;
+          while (*symPtrPtr && *symPtrPtr != csym)
+            symPtrPtr = &(*symPtrPtr)->next;
+          if (*symPtrPtr == csym)
+            *symPtrPtr = csym->next;
         }
 
-        if (csym->ival && !sym->ival)
-          sym->ival = csym->ival;
-
-        /* delete current entry */
-        deleteSym (SymbolTab, csym, csym->name);
-        deleteFromSeg(csym);
-        
-        symPtrPtr = symHead;
-        while (*symPtrPtr && *symPtrPtr != csym)
-          symPtrPtr = &(*symPtrPtr)->next;
-        if (*symPtrPtr == csym)
-          *symPtrPtr = csym->next;
-          
-      }
-      
       /* add new entry */
       addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
     }
@@ -1181,7 +1188,7 @@ structElemType (sym_link * stype, value * id)
   sym_link *petype = getSpec (stype);
 
   if (fields && id) {
-    
+
     /* look for the id */
     while (fields)
       {
@@ -1202,7 +1209,7 @@ structElemType (sym_link * stype, value * id)
   }
 
   werror (E_NOT_MEMBER, id->name);
-    
+
   // the show must go on
   return newIntLink();
 }
@@ -1230,131 +1237,131 @@ getStructElement (structdef * sdef, symbol * sym)
 int 
 compStructSize (int su, structdef * sdef)
 {
-    int sum = 0, usum = 0;
-    int bitOffset = 0;
-    symbol *loop;
+  int sum = 0, usum = 0;
+  int bitOffset = 0;
+  symbol *loop;
 
-    /* for the identifiers  */
-    loop = sdef->fields;
-    while (loop) {
+  /* for the identifiers  */
+  loop = sdef->fields;
+  while (loop) {
 
-        /* create the internal name for this variable */
-        SNPRINTF (loop->rname, sizeof(loop->rname), "_%s", loop->name);
-        if (su == UNION) {
-            sum = 0;
-            bitOffset = 0;
-        }
-        SPEC_VOLATILE (loop->etype) |= (su == UNION ? 1 : 0);
-
-        /* if this is a bit field  */
-        if (loop->bitVar) {
-
-            /* change it to a unsigned bit */
-            SPEC_NOUN (loop->etype) = V_BITFIELD;
-            /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
-            /* a "plain" int bitfield is unsigned */
-            if (!loop->etype->select.s.b_signed)
-              SPEC_USIGN(loop->etype) = 1;
-
-            SPEC_BLEN (loop->etype) = loop->bitVar;
-
-            if (loop->bitVar == BITVAR_PAD) {
-                /* A zero length bitfield forces padding */
-                SPEC_BSTR (loop->etype) = bitOffset;
-                SPEC_BLEN (loop->etype) = 0;
-                bitOffset = 8;
-                loop->offset = sum;
-            }
-            else {
-                if (bitOffset == 8) {
-                    bitOffset = 0;
-                    sum++;
-                }
-                /* check if this fit into the remaining   */
-                /* bits of this byte else align it to the */
-                /* next byte boundary                     */
-                if (loop->bitVar <= (8 - bitOffset)) {
-                    /* fits into current byte */
-                    loop->offset = sum;
-                    SPEC_BSTR (loop->etype) = bitOffset;
-                    bitOffset += loop->bitVar;
-                }
-                else if (!bitOffset) {
-                    /* does not fit, but is already byte aligned */
-                    loop->offset = sum;
-                    SPEC_BSTR (loop->etype) = bitOffset;
-                    bitOffset += loop->bitVar;
-                } 
-                else {
-					if( TARGET_IS_PIC16 && getenv("PIC16_PACKED_BITFIELDS") ) {
-						/* if PIC16 && enviroment variable is set, then
-						 * tightly pack bitfields, this means that when a
-						 * bitfield goes beyond byte alignment, do not
-						 * automatically start allocatint from next byte,
-						 * but also use the available bits first */
-						fprintf(stderr, ": packing bitfields in structures\n");
-						SPEC_BSTR (loop->etype) = bitOffset;
-						bitOffset += loop->bitVar;
-						loop->offset = (su == UNION ? sum = 0 : sum);
-					} else {
-						/* does not fit; need to realign first */
-	                    sum++;
-    	                loop->offset = (su == UNION ? sum = 0 : sum);
-        	            bitOffset = 0;
-            	        SPEC_BSTR (loop->etype) = bitOffset;
-                	    bitOffset += loop->bitVar;
-                	}
-                }
-                while (bitOffset>8) {
-                    bitOffset -= 8;
-                    sum++;
-                } 
-            }
-        }
-        else {
-            /* This is a non-bit field. Make sure we are */
-            /* byte aligned first */
-            if (bitOffset) {
-                sum++;
-                loop->offset = (su == UNION ? sum = 0 : sum);
-                bitOffset = 0;
-            }
-            loop->offset = sum;
-            checkDecl (loop, 1);
-            sum += getSize (loop->type);
-
-            /* search for "flexibel array members" */
-            /* and do some syntax checks */
-            if (   su == STRUCT
-                && checkStructFlexArray (loop, loop->type))
-              {
-                /* found a "flexible array member" */
-                sdef->b_flexArrayMember = TRUE;
-                /* is another struct-member following? */
-                if (loop->next)
-                  werror (E_FLEXARRAY_NOTATEND);
-                /* is it the first struct-member? */
-                else if (loop == sdef->fields)
-                  werror (E_FLEXARRAY_INEMPTYSTRCT);
-              }
-        }
-
-        loop = loop->next;
-
-        /* if union then size = sizeof largest field */
-        if (su == UNION) {
-            /* For UNION, round up after each field */
-            sum += ((bitOffset+7)/8);
-            usum = max (usum, sum);
-        }
-
+    /* create the internal name for this variable */
+    SNPRINTF (loop->rname, sizeof(loop->rname), "_%s", loop->name);
+    if (su == UNION) {
+        sum = 0;
+        bitOffset = 0;
     }
-    
-    /* For STRUCT, round up after all fields processed */
-    if (su != UNION)
-        sum += ((bitOffset+7)/8);
+    SPEC_VOLATILE (loop->etype) |= (su == UNION ? 1 : 0);
 
-    return (su == UNION ? usum : sum);
+    /* if this is a bit field  */
+    if (loop->bitVar) {
+
+      /* change it to a unsigned bit */
+      SPEC_NOUN (loop->etype) = V_BITFIELD;
+      /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
+      /* a "plain" int bitfield is unsigned */
+      if (!loop->etype->select.s.b_signed)
+        SPEC_USIGN(loop->etype) = 1;
+
+      SPEC_BLEN (loop->etype) = loop->bitVar;
+
+      if (loop->bitVar == BITVAR_PAD) {
+        /* A zero length bitfield forces padding */
+        SPEC_BSTR (loop->etype) = bitOffset;
+        SPEC_BLEN (loop->etype) = 0;
+        bitOffset = 8;
+        loop->offset = sum;
+      }
+      else {
+        if (bitOffset == 8) {
+          bitOffset = 0;
+          sum++;
+        }
+        /* check if this fit into the remaining   */
+        /* bits of this byte else align it to the */
+        /* next byte boundary                     */
+        if (loop->bitVar <= (8 - bitOffset)) {
+          /* fits into current byte */
+          loop->offset = sum;
+          SPEC_BSTR (loop->etype) = bitOffset;
+          bitOffset += loop->bitVar;
+        }
+        else if (!bitOffset) {
+          /* does not fit, but is already byte aligned */
+          loop->offset = sum;
+          SPEC_BSTR (loop->etype) = bitOffset;
+          bitOffset += loop->bitVar;
+        } 
+        else {
+          if( TARGET_IS_PIC16 && getenv("PIC16_PACKED_BITFIELDS") ) {
+            /* if PIC16 && enviroment variable is set, then
+             * tightly pack bitfields, this means that when a
+             * bitfield goes beyond byte alignment, do not
+             * automatically start allocatint from next byte,
+             * but also use the available bits first */
+            fprintf(stderr, ": packing bitfields in structures\n");
+            SPEC_BSTR (loop->etype) = bitOffset;
+            bitOffset += loop->bitVar;
+            loop->offset = (su == UNION ? sum = 0 : sum);
+          } else {
+            /* does not fit; need to realign first */
+            sum++;
+            loop->offset = (su == UNION ? sum = 0 : sum);
+            bitOffset = 0;
+            SPEC_BSTR (loop->etype) = bitOffset;
+            bitOffset += loop->bitVar;
+          }
+        }
+        while (bitOffset>8) {
+          bitOffset -= 8;
+          sum++;
+        }
+      }
+    }
+    else {
+      /* This is a non-bit field. Make sure we are */
+      /* byte aligned first */
+      if (bitOffset) {
+        sum++;
+        loop->offset = (su == UNION ? sum = 0 : sum);
+        bitOffset = 0;
+      }
+      loop->offset = sum;
+      checkDecl (loop, 1);
+      sum += getSize (loop->type);
+
+      /* search for "flexibel array members" */
+      /* and do some syntax checks */
+      if (   su == STRUCT
+          && checkStructFlexArray (loop, loop->type))
+        {
+          /* found a "flexible array member" */
+          sdef->b_flexArrayMember = TRUE;
+          /* is another struct-member following? */
+          if (loop->next)
+            werror (E_FLEXARRAY_NOTATEND);
+          /* is it the first struct-member? */
+          else if (loop == sdef->fields)
+            werror (E_FLEXARRAY_INEMPTYSTRCT);
+        }
+    }
+
+    loop = loop->next;
+
+    /* if union then size = sizeof largest field */
+    if (su == UNION) {
+      /* For UNION, round up after each field */
+      sum += ((bitOffset+7)/8);
+      usum = max (usum, sum);
+    }
+
+  }
+
+  /* For STRUCT, round up after all fields processed */
+  if (su != UNION)
+    sum += ((bitOffset+7)/8);
+
+  return (su == UNION ? usum : sum);
 }
 
 /*-------------------------------------------------------------------*/
@@ -1457,7 +1464,7 @@ checkSClass (symbol * sym, int isProto)
       if (IS_DECL (t) && DCL_PTR_RESTRICT (t) && !IS_PTR (t))
         {
           werrorfl (sym->fileDef, sym->lineDef, E_BAD_RESTRICT);
-	  DCL_PTR_RESTRICT (t) = 0;
+          DCL_PTR_RESTRICT (t) = 0;
           break;
         }
       t = t->next;
@@ -3493,21 +3500,21 @@ initCSupport ()
           for (muldivmod = 1; muldivmod < 3; muldivmod++)
             {
               /* div and mod : s8_t x s8_t -> s8_t should be s8_t x s8_t -> s16_t, see below */
-	      if (!TARGET_IS_PIC16 || muldivmod != 1 || bwd != 0 || su != 0)
-	      {
-		SNPRINTF (buffer, sizeof(buffer),
-		    "_%s%s%s",
-		    smuldivmod[muldivmod],
-		    ssu[su],
-		    sbwd[bwd]);
-		__muldiv[muldivmod][bwd][su] = funcOfType (
-		    _mangleFunctionName(buffer),
-		    __multypes[bwd][su],
-		    __multypes[bwd][su],
-		    2,
-		    options.intlong_rent);
-		FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
-	      }
+              if (!TARGET_IS_PIC16 || muldivmod != 1 || bwd != 0 || su != 0)
+              {
+                SNPRINTF (buffer, sizeof(buffer),
+                    "_%s%s%s",
+                    smuldivmod[muldivmod],
+                    ssu[su],
+                    sbwd[bwd]);
+                __muldiv[muldivmod][bwd][su] = funcOfType (
+                    _mangleFunctionName(buffer),
+                    __multypes[bwd][su],
+                    __multypes[bwd][su],
+                    2,
+                    options.intlong_rent);
+                FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
+              }
             }
         }
     }
@@ -3522,16 +3529,16 @@ initCSupport ()
     su = 0; bwd = 0;
     for (muldivmod = 1; muldivmod < 2; muldivmod++) {
       SNPRINTF (buffer, sizeof(buffer),
-	  "_%s%s%s",
-	  smuldivmod[muldivmod],
-	  ssu[su],
-	  sbwd[bwd]);
+          "_%s%s%s",
+          smuldivmod[muldivmod],
+          ssu[su],
+          sbwd[bwd]);
       __muldiv[muldivmod][bwd][su] = funcOfType (
-	  _mangleFunctionName(buffer),
-	  __multypes[1][su],
-	  __multypes[bwd][su],
-	  2,
-	  options.intlong_rent);
+          _mangleFunctionName(buffer),
+          __multypes[1][su],
+          __multypes[bwd][su],
+          2,
+          options.intlong_rent);
       FUNC_NONBANKED (__muldiv[muldivmod][bwd][su]->type) = 1;
     }
   }
@@ -3604,11 +3611,11 @@ void initBuiltIns()
     }
 }
 
-sym_link *validateLink(sym_link         *l, 
+sym_link *validateLink(sym_link         *l,
                         const char      *macro,
                         const char      *args,
                         const char      select,
-                        const char      *file, 
+                        const char      *file,
                         unsigned        line)
 {    
   if (l && l->class==select)
@@ -3681,5 +3688,5 @@ newEnumType (symbol *enumlist)
         SPEC_USIGN (type) = 1;
     }
   
-  return type;    
+  return type;
 }

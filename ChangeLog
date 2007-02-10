@@ -1,3 +1,8 @@
+2007-02-10 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.y: fixed bug #1159134: invalid duplicate declarations with
+	  same scope, this time for real ;-)
+
 2007-02-09 Bernhard Held <bernhard AT bernhardheld.de>
 
 	* src/mcs51/gen.c (genRet): fixed RFE 1652561: added code for bit to

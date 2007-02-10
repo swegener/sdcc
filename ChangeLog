@@ -1,7 +1,9 @@
 2007-02-10 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCC.y: fixed bug #1159134: invalid duplicate declarations with
-	  same scope, this time for real ;-)
+	* src/SDCCsymt.c: fixed bug #1159134: invalid duplicate declarations
+	  with same scope
+	* support/regression/tests/bug-1654060.c: added regression test for
+	  #1654060
 
 2007-02-09 Bernhard Held <bernhard AT bernhardheld.de>
 
@@ -10,8 +12,8 @@
 
 2007-02-09 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCC.y: fixed bug #1159134: invalid duplicate declarations with
-	  same scope
+	* src/SDCC.y: fixed bug #1654060 typedef within function causes
+	  syntax error
 
 2007-02-07 Maarten Brock <sourceforge.brock AT dse.nl>
 

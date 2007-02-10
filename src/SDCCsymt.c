@@ -1080,9 +1080,10 @@ addSymChain (symbol ** symHead)
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
           csym->level == sym->level)
         {
-          /* if not in file scope then show symbol redefined error
+          /* if not formal parameter and not in file scope
+             then show symbol redefined error
              else check if symbols have conpatible types */
-          if (sym->level > 0)
+          if (!sym->_isparm && sym->level > 0)
             error = 1;
           else
             {

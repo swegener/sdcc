@@ -1621,6 +1621,7 @@ operandsEqu (operand * op1, operand * op2)
   if (sym1 == sym2)
     return TRUE;
 
+  /* if they have the same rname */
   if (sym1->rname[0] && sym2->rname[0]
       && strcmp (sym1->rname, sym2->rname) == 0)
     return TRUE;
@@ -5702,7 +5703,7 @@ genSwap (iCode * ic)
       hc08_freeReg (hc08_reg_a);
       break;
     case 2: /* swap bytes in a word */
-      if (operandsEqu (left, result))
+      if (operandsEqu (left, result) || sameRegs (AOP (left), AOP (result)))
         {
           loadRegFromAop (hc08_reg_a, AOP (left), 0);
           hc08_useReg (hc08_reg_a);

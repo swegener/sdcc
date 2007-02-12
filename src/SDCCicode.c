@@ -3238,7 +3238,9 @@ geniCodeAssign (operand * left, operand * right, int nosupdate, int strictLval)
     ic->supportRtn = 1;
 
   ic->nosupdate = nosupdate;
-  return left;
+  /* left could be a pointer assignment,
+     return the properly casted right instead */
+  return right;
 }
 
 /*-----------------------------------------------------------------*/

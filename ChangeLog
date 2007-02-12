@@ -1,3 +1,8 @@
+2007-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCicode.c (geniCodeAssign): return (itemp) right instead of left
+	  for better fix of bug 1273984, compiles pic16 rand.c
+
 2007-02-12 Borut Razem <borut.razem AT siol.net>
 
 	* src/pic16/main.c: fixed pic16 standard library directory bug

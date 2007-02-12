@@ -728,7 +728,7 @@ static void _pic16_initPaths(void)
       struct dbuf_s pic16libDir;
 
       dbuf_init(&pic16libDir, 128);
-      dbuf_makePath(&pic16libDir, INCLUDE_DIR_SUFFIX, "pic16");
+      dbuf_makePath(&pic16libDir, LIB_DIR_SUFFIX, "pic16");
       /* setup pic16 library directory */
       pic16libDirsSet = appendStrSet(dataDirsSet, NULL, dbuf_c_str(&pic16libDir));
       dbuf_destroy(&pic16libDir);

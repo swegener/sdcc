@@ -962,40 +962,37 @@ enum_specifier
    ;
 
 enumerator_list
-   : enumerator
-   | enumerator_list ',' {
-                         }
-   | enumerator_list ',' enumerator
-     {
-       symbol *dsym;
-
-       for (dsym=$1; dsym; dsym=dsym->next)
-         {
-           if (strcmp($3->name, dsym->name)==0)
-             {
-               werrorfl($3->fileDef, $3->lineDef, E_DUPLICATE_MEMBER, "enum", $3->name);
-               werrorfl(dsym->fileDef, dsym->lineDef, E_PREVIOUS_DEF);
-             }
-         }
-
-       $3->next = $1 ;
-       $$ = $3  ;
-     }
-   ;
+    : enumerator
+    | enumerator_list ','
+    | enumerator_list ',' enumerator
+      {
+        $3->next = $1 ;
+        $$ = $3  ;
+      }
+    ;
 
 enumerator
-   : identifier opt_assign_expr
-     {
-       /* make the symbol one level up */
-       $1->level-- ;
-       $1->type = copyLinkChain($2->type);
-       $1->etype= getSpec($1->type);
-       SPEC_ENUM($1->etype) = 1;
-       $$ = $1 ;
-       // do this now, so we can use it for the next enums in the list
-       addSymChain(&$1);
-     }
-   ;
+    : identifier opt_assign_expr
+      {
+        symbol *sym;
+
+        /* make the symbol one level up */
+        $1->level-- ;
+        // check if the symbol at the same level already exists
+        if ((sym = findSymWithLevel (SymbolTab, $1)) &&
+          sym->level == $1->level)
+          {
+            werrorfl ($1->fileDef, $1->lineDef, E_DUPLICATE_MEMBER, "enum", $1->name);
+            werrorfl (sym->fileDef, sym->lineDef, E_PREVIOUS_DEF);
+          }
+        $1->type = copyLinkChain ($2->type);
+        $1->etype= getSpec ($1->type);
+        SPEC_ENUM ($1->etype) = 1;
+        $$ = $1 ;
+        // do this now, so we can use it for the next enums in the list
+        addSymChain (&$1);
+      }
+    ;
 
 opt_assign_expr
    :  '='   constant_expr  {

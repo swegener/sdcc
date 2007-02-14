@@ -100,7 +100,7 @@ sdcc-device-lib: sdcc-cc sdcc-aslink
 
 sdcc-device-tini:
 	$(MAKE) -C device/include
-	$(MAKE) -C device/lib modelDS390
+	$(MAKE) -C device/lib model-ds390 model-ds400
 
 # doc depends on latex and latex2html
 sdcc-doc:
@@ -129,7 +129,7 @@ install-tini:
 	@for pkg in $(PKGS_TINI); do\
 	  $(MAKE) -C $$pkg install ;\
 	done
-	$(MAKE) -C device/lib installDS390
+	$(MAKE) -C device/lib install
 
 
 

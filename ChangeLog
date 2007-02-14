@@ -1,6 +1,8 @@
 2007-02-14 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.y: fixed bug #1291133: duplicate members across enum(s)
+	* Makefile.in: applied patch from Makefile related part of
+	  #1469393: Compiler does not initialize static data
 
 2007-02-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

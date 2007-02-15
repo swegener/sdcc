@@ -1,3 +1,14 @@
+2007-02-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/mcs51/rtrack.h,
+	* src/mcs51/rtrack.c: added register tracking for the mcs51 port,
+	  by checking the strings passed by emitcode() to the assembler.
+	  Feel free to change. This in part addresses RFE #482179. 
+	  Set environment variable SDCC_RTRACK to enable.
+	* src/mcs51/gen.c: inserted hooks
+	* src/mcs51/ralloc.h: added two members to struct regs
+	* support/regression/tests/regtrack.c: added
+
 2007-02-14 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.y: fixed bug #1291133: duplicate members across enum(s)

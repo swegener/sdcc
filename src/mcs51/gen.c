@@ -41,6 +41,7 @@
 #include "common.h"
 #include "SDCCpeeph.h"
 #include "ralloc.h"
+#include "rtrack.h"
 #include "gen.h"
 #include "dbuf_string.h"
 
@@ -149,7 +150,7 @@ static unsigned char SRMask[] =
 /*-----------------------------------------------------------------*/
 /* emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
-static void
+void
 emitcode (const char *inst, const char *fmt,...)
 {
   va_list ap;
@@ -184,6 +185,8 @@ emitcode (const char *inst, const char *fmt,...)
 
   if (lbp && *lbp)
     {
+      rtrackUpdate (lbp);
+
       lineCurr = (lineCurr ?
                   connectLine (lineCurr, newLineNode (lb)) :
                   (lineHead = newLineNode (lb)));
@@ -227,6 +230,11 @@ mova (const char *x)
   if (!strncmp(x, "a", 2) || !strncmp(x, "acc", 4))
     return;
 
+  /* if it is a literal mov try to get it cheaper */
+  if (*x == '#' &&
+      rtrackMoveALit(x))
+    return;
+
   emitcode("mov", "a,%s", x);
 }
 
@@ -239,6 +247,13 @@ movb (const char *x)
   /* do some early peephole optimization */
   if (!strncmp(x, "b", 2))
     return;
+
+  /* if it is a literal mov try to get it cheaper */
+  if (*x == '#')
+    {
+      emitcode("mov","b,%s", rtrackGetLit(x));
+      return;
+    }
 
   emitcode("mov","b,%s", x);
 }
@@ -4960,7 +4975,7 @@ genMultOneByte (operand * left,
         {
           /* moving to accumulator first helps peepholes */
           MOVA (aopGet (left, 0, FALSE, FALSE));
-          emitcode ("mov", "b,%s", aopGet (right, 0, FALSE, FALSE));
+          MOVB (aopGet (right, 0, FALSE, FALSE));
         }
       else
         {
@@ -5235,7 +5250,7 @@ genDivOneByte (operand * left,
   if (lUnsigned && rUnsigned)
     {
       /* unsigned is easy */
-      emitcode ("mov", "b,%s", aopGet (right, 0, FALSE, FALSE));
+      MOVB (aopGet (right, 0, FALSE, FALSE));
       MOVA (aopGet (left, 0, FALSE, FALSE));
       emitcode ("div", "ab");
       aopPut (result, "a", 0);
@@ -5549,7 +5564,7 @@ genModOneByte (operand * left,
   if (lUnsigned && rUnsigned)
     {
       /* unsigned is easy */
-      emitcode ("mov", "b,%s", aopGet (right, 0, FALSE, FALSE));
+      MOVB (aopGet (right, 0, FALSE, FALSE));
       MOVA (aopGet (left, 0, FALSE, FALSE));
       emitcode ("div", "ab");
       aopPut (result, "b", 0);

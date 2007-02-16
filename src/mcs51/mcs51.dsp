@@ -99,6 +99,10 @@ SOURCE=.\peep.c
 
 SOURCE=.\ralloc.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\rtrack.c
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

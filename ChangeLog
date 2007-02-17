@@ -1,3 +1,8 @@
+2007-02-17 Borut Razem <borut.razem AT siol.net>
+
+	* support/cpp2/directives.c, support/cpp2/version.c:
+	  synchronized with GCC CPP 4.1.2
+
 2007-02-15 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* src/mcs51/rtrack.h,

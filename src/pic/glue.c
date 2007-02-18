@@ -1928,7 +1928,7 @@ emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *li
 	return;
     }
 
-    if (IS_ARRAY(my_type) && topsym->isstrlit) {
+    if (IS_ARRAY(my_type) && topsym && topsym->isstrlit) {
 	str = (unsigned char *)SPEC_CVAL(topsym->etype).v_char;
 	emitIvalLabel(oBuf, topsym);
 	do {

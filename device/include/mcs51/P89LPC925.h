@@ -26,9 +26,9 @@
 #ifndef REG_P89LPC925_H
 #define REG_P89LPC925_H
 
-#include <compiler_h>
+#include <compiler.h>
 
-SFR(ACC*, 0xE0); // Accumulator
+SFR(ACC, 0xE0); // Accumulator
    SBIT(ACC_7, 0xE0, 7);
    SBIT(ACC_6, 0xE0, 6);
    SBIT(ACC_5, 0xE0, 5);
@@ -87,7 +87,7 @@ SFR(AUXR1, 0xA2); // Auxiliary function register
    #define SRST  0x08
    #define DPS   0x01
 
-SFR(B*, 0xF0); // B register
+SFR(B, 0xF0); // B register
    SBIT(B_7, 0xF0, 7);
    SBIT(B_6, 0xF0, 6);
    SBIT(B_5, 0xF0, 5);
@@ -160,7 +160,7 @@ SFR(I2ADR, 0xDB); // I2C slave address register
    #define I2ADR_0 0x02
    #define GC      0x01
 
-SFR(I2CON*, 0xD8); // I2C control register
+SFR(I2CON, 0xD8); // I2C control register
    SBIT(I2EN,  0xD8, 6);
    SBIT(STA,   0xD8, 5);
    SBIT(STO,   0xD8, 4);
@@ -181,7 +181,7 @@ SFR(I2STAT, 0xD9); // I2C status register
    #define STA_1 0x10
    #define STA_0 0x08
 
-SFR(IEN0*, 0xA8); // Interrupt enable 0
+SFR(IEN0, 0xA8); // Interrupt enable 0
    SBIT(EA,    0xA8, 7);
    SBIT(EWDRT, 0xA8, 6);
    SBIT(EBO,   0xA8, 5);
@@ -192,14 +192,14 @@ SFR(IEN0*, 0xA8); // Interrupt enable 0
    SBIT(ET0,   0xA8, 1);
    SBIT(EX0,   0xA8, 0);
 
-SFR(IEN1*, 0xE8); // Interrupt enable 1
+SFR(IEN1, 0xE8); // Interrupt enable 1
    SBIT(EAD,  0xE8, 7);
    SBIT(EST,  0xE8, 6);
    SBIT(EC,   0xE8, 2);
    SBIT(EKBI, 0xE8, 1);
    SBIT(EI2C, 0xE8, 0);
 
-SFR(IP0*, 0xB8); // Interrupt priority 0
+SFR(IP0, 0xB8); // Interrupt priority 0
    SBIT(PWDRT, 0xB8, 6);
    SBIT(PBO,   0xB8, 5);
    SBIT(PS,    0xB8, 4);
@@ -219,7 +219,7 @@ SFR(IP0H, 0xB7); // Interrupt priority 0 HIGH
    #define PT0H   0x02
    #define PX0H   0x01
 
-SFR(IP1*, 0xF8); // Interrupt priority 1
+SFR(IP1, 0xF8); // Interrupt priority 1
    SBIT(PAD,  0xF8, 7);
    SBIT(PST,  0xF8, 6);
    SBIT(PC,   0xF8, 2);
@@ -241,7 +241,7 @@ SFR(KBMASK, 0x86); // Keypad interrupt register mask
 
 SFR(KBPATN, 0x93); // Keypad pattern register
 
-SFR(P0*, 0x80); // Port 0
+SFR(P0, 0x80); // Port 0
    SBIT(P0_7, 0x80, 7);
    SBIT(P0_6, 0x80, 6);
    SBIT(P0_5, 0x80, 5);
@@ -252,13 +252,13 @@ SFR(P0*, 0x80); // Port 0
    SBIT(P0_0, 0x80, 0);
    //P0 alternate pin functions
    SBIT(T1,     0x80, 7);
-   SBIT(CMP1,   0x80, 6);
+   SBIT(CMP1b,  0x80, 6); //Should be CMP1 but there is SFR with that name
    SBIT(CMPREF, 0x80, 5);
    SBIT(CIN1A,  0x80, 4);
    SBIT(CIN1B,  0x80, 3);
    SBIT(CIN2A,  0x80, 2);
    SBIT(CIN2B,  0x80, 1);
-   SBIT(CMP2,   0x80, 0);
+   SBIT(CMP2b,  0x80, 0); //Should be CMP2 but there is SFR with that name
    //More P0 alternate pin functions
    SBIT(KB7, 0x80, 7);
    SBIT(KB6, 0x80, 6);
@@ -269,7 +269,7 @@ SFR(P0*, 0x80); // Port 0
    SBIT(KB1, 0x80, 1);
    SBIT(KB0, 0x80, 0);
 
-SFR(P1*, 0x90); // Port 1
+SFR(P1, 0x90); // Port 1
    SBIT(P1_5, 0x90, 5);
    SBIT(P1_4, 0x90, 4);
    SBIT(P1_3, 0x90, 3);
@@ -286,7 +286,7 @@ SFR(P1*, 0x90); // Port 1
    SBIT(RXD,  0x90, 1);
    SBIT(TXD,  0x90, 0);
 
-SFR(P3*, 0xB0); // Port 3
+SFR(P3, 0xB0); // Port 3
    SBIT(P3_1, 0xB0, 1);
    SBIT(P3_0, 0xB0, 0);
    SBIT(XTAL1, 0xB0, 1);
@@ -355,7 +355,7 @@ SFR(PCONA, 0xB5); // Power control register A
    #define I2PD  0x08
    #define SPD   0x02
 
-SFR(PSW*, 0xD0); // Program status word
+SFR(PSW, 0xD0); // Program status word
    SBIT(CY,  0xD0, 7);
    SBIT(AC,  0xD0, 6);
    SBIT(F0,  0xD0, 5);
@@ -397,7 +397,7 @@ SFR(SADEN, 0xB9); // Serial port address enable
 
 SFR(SBUF, 0x99); // Serial Port data buffer register
 
-SFR(SCON*, 0x98); // Serial port control
+SFR(SCON, 0x98); // Serial port control
    SBIT(FE,  0x98, 7);
    SBIT(SM0, 0x98, 7);
    SBIT(SM1, 0x98, 6);
@@ -424,7 +424,7 @@ SFR(TAMOD, 0x8F); // Timer0 and 1 auxiliary mode
    #define T1M2 0x10
    #define T0M2 0x01
 
-SFR(TCON*, 0x88); // Timer0 and 1 control
+SFR(TCON, 0x88); // Timer0 and 1 control
    SBIT(TF1, 0x88, 7);
    SBIT(TR1, 0x88, 6);
    SBIT(TF0, 0x88, 5);

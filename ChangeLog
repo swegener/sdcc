@@ -1,3 +1,7 @@
+2007-02-22 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/P89LPC925.h: Added.
+
 2007-02-18 Raphael Neider <rneider AT web.de>
 
 	* src/pic/glue.c (emitInitVal): fixed #1659894 (SIGSEGV on arrays)

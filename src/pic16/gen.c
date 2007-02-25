@@ -13175,12 +13175,12 @@ static void genCast (iCode *ic)
 	      tag = GPTR_TAG_CODE;
 	    } else if (IS_PTR(rtype)) {
 	      PERFORM_ONCE(weirdcast,
-	      fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(unknown*)' -- assumimg __data space\n", ic->filename, ic->lineno);
+	      fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(unknown*)' -- assuming __data space\n", ic->filename, ic->lineno);
 	      );
 	      tag = GPTR_TAG_DATA;
 	    } else {
 	      PERFORM_ONCE(weirdcast,
-	      fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(non-pointer)' -- assumimg __data space\n", ic->filename, ic->lineno);
+	      fprintf (stderr, "%s:%u: WARNING: casting `(generic*)(non-pointer)' -- assuming __data space\n", ic->filename, ic->lineno);
 	      );
 	      tag = GPTR_TAG_DATA;
 	    }

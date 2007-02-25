@@ -21,6 +21,8 @@ top_srcdir   = @top_srcdir@
 srcdir       = @srcdir@
 VPATH        = @srcdir@
 
+.NOTPARALLEL:
+
 SUBDIRS = 
 MKLIB	= device_libs
 C_FILES = $(notdir $(wildcard $(srcdir)/*.c))

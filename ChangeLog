@@ -1,3 +1,9 @@
+2007-02-25 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/gen.c (genCast): fixed typo
+	* device/lib/pic16/Makefile.subdir: only install existing files
+	* device/lib/pic16/libdev/Makefile.in: build serially, avoid races
+
 2007-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/mcs51/crtcall.asm: new, added for indirect calls

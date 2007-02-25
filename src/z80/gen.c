@@ -701,9 +701,12 @@ _push (PAIR_ID pairId)
 static void
 _pop (PAIR_ID pairId)
 {
-  emit2 ("pop %s", _pairs[pairId].name);
-  _G.stack.pushed -= 2;
-  spillPair (pairId);
+  if (pairId != PAIR_INVALID)
+    {
+      emit2 ("pop %s", _pairs[pairId].name);
+      _G.stack.pushed -= 2;
+      spillPair (pairId);
+    }
 }
 
 void
@@ -2086,6 +2089,7 @@ aopPut (asmop * aop, const char *s, int offset)
 #define AOP_TYPE(op) AOP(op)->type
 #define AOP_SIZE(op) AOP(op)->size
 #define AOP_NEEDSACC(x) (AOP(x) && ((AOP_TYPE(x) == AOP_CRY) || (AOP_TYPE(x) == AOP_SFR)))
+#define AOP_IS_PAIRPTR(x, p) (AOP_TYPE (x) == AOP_PAIRPTR && AOP (x)->aopu.aop_pairId == p)
 
 static void
 commitPair (asmop * aop, PAIR_ID id)
@@ -2945,7 +2949,6 @@ emitCall (iCode * ic, bool ispcall)
         OP_SYMBOL (IC_RESULT (ic))->spildir)) ||
       IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
-
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
 
       assignResultValue (IC_RESULT (ic));
@@ -4752,8 +4755,9 @@ genCmpLt (iCode * ic, iCode * ifx)
 
 /*-----------------------------------------------------------------*/
 /* gencjneshort - compare and jump if not equal                    */
+/* returns pair that still needs to be popped                      */
 /*-----------------------------------------------------------------*/
-static void
+static PAIR_ID
 gencjneshort (operand * left, operand * right, symbol * lbl)
 {
   int size = max (AOP_SIZE (left), AOP_SIZE (right));
@@ -4768,18 +4772,13 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
       left = t;
     }
 
+  /* if the right side is a literal then anything goes */
   if (AOP_TYPE (right) == AOP_LIT)
     {
       lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
-    }
-
-  /* if the right side is a literal then anything goes */
-  if (AOP_TYPE (right) == AOP_LIT &&
-      AOP_TYPE (left) != AOP_DIR)
-    {
       if (lit == 0)
         {
-          emit2 ("ld a,%s", aopGet (AOP (left), offset, FALSE));
+          _moveA (aopGet (AOP (left), offset, FALSE));
           if (size > 1)
             {
               while (--size)
@@ -4807,21 +4806,22 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
             }
         }
     }
-  /* if the right side is in a register or in direct space or
-     if the left is a pointer register & right is not */
+  /* if the right side is in a register or
+     pointed to by HL, IX or IY */
   else if (AOP_TYPE (right) == AOP_REG ||
-           AOP_TYPE (right) == AOP_DIR ||
-           (AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT))
+           AOP_TYPE (right) == AOP_HL  ||
+           AOP_TYPE (right) == AOP_IY  ||
+           AOP_TYPE (right) == AOP_STK ||
+           AOP_IS_PAIRPTR (right, PAIR_HL) ||
+           AOP_IS_PAIRPTR (right, PAIR_IX) ||
+           AOP_IS_PAIRPTR (right, PAIR_IY))
     {
       while (size--)
         {
           _moveA (aopGet (AOP (left), offset, FALSE));
-          if (/*AOP_TYPE (left) == AOP_DIR &&*/ AOP_TYPE (right) == AOP_LIT &&
+          if (AOP_TYPE (right) == AOP_LIT &&
               ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0))
             {
-              /* PENDING */
-              /* MB: pending what? doesn't this need "or a,a"? */
-              /* and I don't think AOP_TYPE(left) has anything to do with this */
               emit2 ("or a,a");
               emit2 ("jp NZ,!tlabel", lbl->key + 100);
             }
@@ -4833,18 +4833,31 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
           offset++;
         }
     }
+  /* right is in direct space or a pointer reg, need both a & b */
   else
     {
-      /* right is a pointer reg need both a & b */
-      /* PENDING: is this required? */
+      PAIR_ID pair;
+      for (pair = PAIR_BC; pair <= PAIR_HL; pair++)
+        {
+          if (((AOP_TYPE (left)  != AOP_PAIRPTR) || (AOP (left)->aopu.aop_pairId  != pair)) &&
+              ((AOP_TYPE (right) != AOP_PAIRPTR) || (AOP (right)->aopu.aop_pairId != pair)))
+            {
+              break;
+            }
+        }
+      _push (pair);
       while (size--)
         {
+          emit2 ("; direct compare");
+          _emitMove (_pairs[pair].l, aopGet (AOP (left), offset, FALSE));
           _moveA (aopGet (AOP (right), offset, FALSE));
-          emit2 ("cp %s", aopGet (AOP (left), offset, FALSE));
+          emit2 ("sub %s", _pairs[pair].l);
           emit2 ("!shortjp NZ,!tlabel", lbl->key + 100);
           offset++;
         }
+      return pair;
     }
+  return PAIR_INVALID;
 }
 
 /*-----------------------------------------------------------------*/
@@ -4855,7 +4868,7 @@ gencjne (operand * left, operand * right, symbol * lbl)
 {
   symbol *tlbl = newiTempLabel (NULL);
 
-  gencjneshort (left, right, lbl);
+  PAIR_ID pop = gencjneshort (left, right, lbl);
 
   /* PENDING: ?? */
   emit2 ("ld a,!one");
@@ -4863,6 +4876,7 @@ gencjne (operand * left, operand * right, symbol * lbl)
   emitLabel (lbl->key + 100);
   emit2 ("xor a,a");
   emitLabel (tlbl->key + 100);
+  _pop (pop);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4900,19 +4914,24 @@ genCmpEq (iCode * ic, iCode * ifx)
         }
       else
         {
+          PAIR_ID pop;
           tlbl = newiTempLabel (NULL);
-          gencjneshort (left, right, tlbl);
+          pop = gencjneshort (left, right, tlbl);
           if (IC_TRUE (ifx))
             {
+              _pop (pop);
               emit2 ("jp !tlabel", IC_TRUE (ifx)->key + 100);
               emitLabel (tlbl->key + 100);
+              _pop (pop);
             }
           else
             {
               /* PENDING: do this better */
               symbol *lbl = newiTempLabel (NULL);
+              _pop (pop);
               emit2 ("!shortjp !tlabel", lbl->key + 100);
               emitLabel (tlbl->key + 100);
+              _pop (pop);
               emit2 ("jp !tlabel", IC_FALSE (ifx)->key + 100);
               emitLabel (lbl->key + 100);
             }

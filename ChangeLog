@@ -1,3 +1,27 @@
+2007-02-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/mcs51/crtcall.asm: new, added for indirect calls
+	* device/lib/mcs51/crtclear.asm,
+	* device/lib/mcs51/crtxclear.asm: renumbered labels
+	* device/lib/mcs51/Makefile.in: added crtcall.asm
+	* doc/sdccman.lyx: documented mcs51 crt* library startup code
+	* src/mcs51/gen.c (movc): removed,
+	  (aopGet, genPlusBits): clear a after loading the carry (possibly from
+	    acc.x or psw.x),
+	  (toCarry, genSend, genRet): added function toCarry,
+	  (genPcall): use "lcall @a+dptr" for functions w/o parameters,
+	  (assignBit, genAssign, genCast): added function assignBit
+	* src/mcs51/Makefile.bcc: added rtrack.c
+	* src/mcs51/ralloc.h: made valueKnown a bitfield
+	* src/mcs51/rtrack.c (getReg, rtrackUpdate): added getReg,
+	  fixed "jbc acc" and "cpl acc" bug, enhanced "cjne", "jnz" and "djnz",
+	  disabled InvalidateAllRx for lcall __gptrput, added "xch a,rn"
+	* src/pic/pcode.c (FixRegisterBanking): fixed warning used uninitialized
+	* src/z80/gen.c: added AOP_IS_PAIRPTR,
+	  (_pop): only pop valid pairs, see gencjneshort,
+	  (gencjneshort): return pair that still needs to be popped, restructured,
+	  (gencjne, genCmpEq): call _pop
+
 2007-02-23 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic14devices.txt: 16f684 has only one config word
@@ -20,7 +44,7 @@
 	* src/mcs51/rtrack.h,
 	* src/mcs51/rtrack.c: added register tracking for the mcs51 port,
 	  by checking the strings passed by emitcode() to the assembler.
-	  Feel free to change. This in part addresses RFE #482179. 
+	  Feel free to change. This in part addresses RFE #482179.
 	  Set environment variable SDCC_RTRACK to enable.
 	* src/mcs51/gen.c: inserted hooks
 	* src/mcs51/ralloc.h: added two members to struct regs

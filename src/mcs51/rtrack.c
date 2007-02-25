@@ -119,6 +119,18 @@ static void invalidateAll()
   regs8051[A_IDX].valueKnown = 0;
 }
 
+static regs * getReg(const char *str)
+{
+  char *s;
+  int regNum;
+
+  regNum = strtol (str, &s, 16);
+  if (s == str+1)
+    {
+      return &regs8051[Rx_NUM_TO_IDX(regNum)];
+    }
+  return NULL;
+}
 
 /* tracking values within registers by looking
    at the line passed to the assembler.
@@ -155,18 +167,11 @@ void rtrackUpdate (const char *line)
       if (!strncmp (line,"mov\ta,r",7))
         {
           /* handle mov from Rx if Rx is known */
-          char *s;
-          int regNum;
-
-          regNum = strtol (line+7, &s, 16);
-          if (s == line+8)
+          regs *r = getReg(line+7);
+          if (r && r->valueKnown)
             {
-              regs *r = &regs8051[Rx_NUM_TO_IDX(regNum)];
-              if (r->valueKnown)
-                {
-                  REGS8051_SET (A_IDX, r->value);
-                  return;
-                }
+              REGS8051_SET (A_IDX, r->value);
+              return;
             }
           REGS8051_UNSET (A_IDX);
           return;
@@ -269,20 +274,21 @@ void rtrackUpdate (const char *line)
 
       if(!strncmp (line,"inc\tr",5))
         {
-          char *s;
-          int regNum;
-
-          regNum = strtol (line+5, &s, 16);
-          if (s == line+6)
+          regs *r = getReg(line+5);
+          if (r && r->valueKnown)
             {
-              regs *r = &regs8051[Rx_NUM_TO_IDX(regNum)];
-              if (r->valueKnown)
-                {
-                  REGS8051_SET (Rx_NUM_TO_IDX(regNum), r->value+1);
-                }
-              return;
+              REGS8051_SET (r->rIdx, r->value+1);
             }
+          return;
         }
+    }
+
+  /* some bit in acc is cleared
+     MB: I'm too lazy to find out which right now */
+  if (!strncmp (line,"jbc\tacc",7))
+    {
+      REGS8051_UNSET (A_IDX);
+      return;
     }
 
   /* unfortunately the label typically following these
@@ -297,12 +303,38 @@ void rtrackUpdate (const char *line)
   /* if branch not taken in "cjne r2,#0x08,somewhere" 
      r2 is known to be 8 */
   if (!strncmp (line,"cjne",4))
+    {
+      if(!strncmp (line,"cjne\ta,#0x",10))
+        {
+          char *s;
+          int value;
+
+          value = strtol (line+8, &s, 16);
+          if (s != line+8)
+              REGS8051_SET (A_IDX, value); /* valid hex found */
+        }
+      if(!strncmp (line,"cjne\tr",6))
+        {
+          char *s;
+          int value;
+          regs *r = getReg(line+6);
+          value = strtol (line+8, &s, 16);
+          if (r && s != line+8)
+              REGS8051_SET (r->rIdx, value); /* valid hex found */
+        }
+      return;
+    }
+
+  /* acc eventually known to be zero */
+  if (!strncmp (line,"jz\t",3))
     return;
 
   /* acc eventually known to be zero */
-  if (!strncmp (line,"jz\t",3) ||
-      !strncmp (line,"jnz\t",4))
-    return;
+  if (!strncmp (line,"jnz\t",4))
+    {
+      REGS8051_SET (A_IDX, 0x00); // branch not taken
+      return;
+    }
 
   if (!strncmp (line,"djnz\tr",6))
     {
@@ -312,8 +344,8 @@ void rtrackUpdate (const char *line)
       regNum = strtol (line+6, &s, 16);
       if (s == line+7)
         {
-          REGS8051_UNSET (Rx_NUM_TO_IDX(regNum));
-          // REGS8051_SET (Rx_NUM_TO_IDX(regNum), 0x00); // branch not taken
+          //REGS8051_UNSET (Rx_NUM_TO_IDX(regNum));
+          REGS8051_SET (Rx_NUM_TO_IDX(regNum), 0x00); // branch not taken
           return;
         }
     }
@@ -334,7 +366,8 @@ void rtrackUpdate (const char *line)
       !strncmp (line,"rlc\ta,",6) ||
       !strncmp (line,"rrc\ta,",6) ||
       !strncmp (line,"setb\ta",6) ||
-      !strncmp (line,"clrb\ta,",7))
+      !strncmp (line,"clrb\ta,",7)||
+      !strncmp (line,"cpl\tacc",7))
     {
       /* could also handle f.e. "add a,Rx" if a, Rx are known or "xrl a,#0x08" */
       REGS8051_UNSET (A_IDX);
@@ -358,19 +391,12 @@ void rtrackUpdate (const char *line)
 
       if(!strncmp (line,"dec\tr",5))
         {
-          char *s;
-          int regNum;
-
-          regNum = strtol (line+5, &s, 16);
-          if (s == line+6)
+          regs *r = getReg(line+5);
+          if (r && r->valueKnown)
             {
-              regs *r = &regs8051[Rx_NUM_TO_IDX(regNum)];
-              if (r->valueKnown)
-                {
-                  REGS8051_SET (Rx_NUM_TO_IDX(regNum), r->value-1);
-                }
-              return;
+              REGS8051_SET (r->rIdx, r->value-1);
             }
+          return;
         }
     }
 
@@ -424,7 +450,8 @@ void rtrackUpdate (const char *line)
       if (!strcmp (line,"lcall\t__gptrput"))
         {
           /* invalidate R0..R7 because they might have been changed */
-          invalidateAllRx();
+          /* MB: too paranoid ? */
+          //invalidateAllRx();
           return;
         }
       if (!strcmp (line,"lcall\t__gptrget"))
@@ -437,6 +464,24 @@ void rtrackUpdate (const char *line)
           return;
         }
      }
+
+  if (!strncmp (line,"xch\ta,r",7))
+    {
+      /* handle xch acc with Rn */
+      regs *r = getReg(line+7);
+      if (r)
+        {
+          unsigned swap;
+          swap = r->valueKnown;
+          r->valueKnown = regs8051[A_IDX].valueKnown;
+          regs8051[A_IDX].valueKnown = swap;
+
+          swap = r->value;
+          r->value = regs8051[A_IDX].value;
+          regs8051[A_IDX].value = swap;
+          return;
+        }
+    }
 
   /* all others unrecognized, invalidate */
   invalidateAll();
@@ -520,6 +565,7 @@ int rtrackMoveALit (const char *x)
                !a->valueKnown))
             {
               /* peepholes convert to clr a */
+              /* MB: why not here ? */
               emitcode ("mov", "a,#0x00");
               return 1;
             }

@@ -4738,6 +4738,8 @@ void FixRegisterBanking(pBlock *pb)
 		    new_mask = 0; // unknown, assume worst case
 		} else {
 		    assert(!"Could not get register from instruction.");
+		    new_bank = "UNKNOWN";
+		    new_mask = 0; // unknown, assume worst case
 		}
 
 		// optimizations...

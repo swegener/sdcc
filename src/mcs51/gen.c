@@ -259,24 +259,6 @@ movb (const char *x)
 }
 
 /*-----------------------------------------------------------------*/
-/* movc - moves specified value into the carry                     */
-/*-----------------------------------------------------------------*/
-static void
-movc (const char *s)
-{
-  if (!strcmp (s, zero))
-    CLRC;
-  else if (!strcmp (s, one))
-    SETC;
-  else if (strcmp (s, "c"))
-    {/* it's not in carry already */
-      MOVA (s);
-      /* set C, if a >= 1 */
-      emitcode ("add", "a,#0xff");
-    }
-}
-
-/*-----------------------------------------------------------------*/
 /* pushB - saves register B if necessary                           */
 /*-----------------------------------------------------------------*/
 static bool
@@ -1431,8 +1413,8 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
         return aop->aopu.aop_reg[offset]->name;
 
     case AOP_CRY:
-      emitcode ("clr", "a");
       emitcode ("mov", "c,%s", aop->aopu.aop_dir);
+      emitcode ("clr", "a");
       emitcode ("rlc", "a");
       return (dname ? "acc" : "a");
 
@@ -1686,29 +1668,27 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_CRY:
-      /* if not bit variable */
+      /* if result no bit variable */
       if (!aop->aopu.aop_dir)
         {
+          assert (!strcmp (s, "c"));
           /* inefficient: move carry into A and use jz/jnz */
           emitcode ("clr", "a");
           emitcode ("rlc", "a");
           accuse = TRUE;
         }
-      else
+      else if (s == zero)
+          emitcode ("clr", "%s", aop->aopu.aop_dir);
+      else if (s == one)
+          emitcode ("setb", "%s", aop->aopu.aop_dir);
+      else if (!strcmp (s, "c"))
+          emitcode ("mov", "%s,c", aop->aopu.aop_dir);
+      else if (strcmp (s, aop->aopu.aop_dir))
         {
-          if (s == zero)
-            emitcode ("clr", "%s", aop->aopu.aop_dir);
-          else if (s == one)
-            emitcode ("setb", "%s", aop->aopu.aop_dir);
-          else if (!strcmp (s, "c"))
-            emitcode ("mov", "%s,c", aop->aopu.aop_dir);
-          else if (strcmp (s, aop->aopu.aop_dir))
-            {
-              MOVA (s);
-              /* set C, if a >= 1 */
-              emitcode ("add", "a,#0xff");
-              emitcode ("mov", "%s,c", aop->aopu.aop_dir);
-            }
+          MOVA (s);
+          /* set C, if a >= 1 */
+          emitcode ("add", "a,#0xff");
+          emitcode ("mov", "%s,c", aop->aopu.aop_dir);
         }
       break;
 
@@ -1909,6 +1889,56 @@ toBoolean (operand * oper)
           emitcode ("orl", "a,%s",
                     aopGet (oper, offset++, FALSE, FALSE));
         }
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* toCarry - make boolean and move into carry                      */
+/*-----------------------------------------------------------------*/
+static void
+toCarry (operand * oper)
+{
+  /* if the operand is a literal then
+     we know what the value is */
+  if (AOP_TYPE (oper) == AOP_LIT)
+    {
+      if ((int) operandLitValue (oper))
+        SETC;
+      else
+        CLRC;
+    }
+  else if (AOP_TYPE (oper) == AOP_CRY)
+    {
+      emitcode ("mov", "c,%s", oper->aop->aopu.aop_dir);
+    }
+  else
+    {
+      /* or the operand into a */
+      toBoolean (oper);
+      /* set C, if a >= 1 */
+      emitcode ("add", "a,#0xff");
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* assignBit - assign operand to bit operand                       */
+/*-----------------------------------------------------------------*/
+static void
+assignBit (operand * result, operand * right)
+{
+  /* if the right side is a literal then
+     we know what the value is */
+  if (AOP_TYPE (right) == AOP_LIT)
+    {
+      if ((int) operandLitValue (right))
+        aopPut (result, one, 0);
+      else
+        aopPut (result, zero, 0);
+    }
+  else
+    {
+      toCarry (right);
+      aopPut (result, "c", 0);
     }
 }
 
@@ -2764,19 +2794,10 @@ static void genSend(set *sendSet)
               else
                   emitcode ("clr", "b[%d]", bit);
             }
-          else if (AOP_TYPE (IC_LEFT (sic)) == AOP_CRY)
-            {
-              char *l = AOP (IC_LEFT (sic))->aopu.aop_dir;
-                if (strcmp (l, "c"))
-                    emitcode ("mov", "c,%s", l);
-                emitcode ("mov", "b[%d],c", bit);
-            }
           else
             {
               /* we need to or */
-              toBoolean (IC_LEFT (sic));
-              /* set C, if a >= 1 */
-              emitcode ("add", "a,#0xff");
+              toCarry (IC_LEFT (sic));
               emitcode ("mov", "b[%d],c", bit);
             }
           bit_count++;
@@ -3047,7 +3068,7 @@ genPcall (iCode * ic)
       // need caution message to user here
     }
 
-  if (IS_LITERAL(etype))
+  if (IS_LITERAL (etype))
     {
       /* if send set is not empty then assign */
       if (_G.sendSet)
@@ -3097,6 +3118,7 @@ genPcall (iCode * ic)
 
               if (!swapBanks)
                 {
+                  /* what if aopGet needs r0 or r1 ??? */
                   emitcode ("mov", "ar0,%s", aopGet(IC_LEFT (ic), 0, FALSE, FALSE));
                   emitcode ("mov", "ar1,%s", aopGet(IC_LEFT (ic), 1, FALSE, FALSE));
                   emitcode ("mov", "ar2,%s", aopGet(IC_LEFT (ic), 2, FALSE, FALSE));
@@ -3128,7 +3150,7 @@ genPcall (iCode * ic)
               emitcode ("lcall", "__sdcc_banked_call");
             }
         }
-      else
+      else if (_G.sendSet)
         {
           /* push the return address on to the stack */
           emitcode ("mov", "a,#%05d$", (rlbl->key + 100));
@@ -3159,6 +3181,38 @@ genPcall (iCode * ic)
           /* make the call */
           emitcode ("ret", "");
           emitLabel (rlbl);
+        }
+      else /* the send set is empty */
+        {
+          char *l;
+          /* now get the calling address into dptr */
+          aopOp (IC_LEFT (ic), ic, FALSE);
+
+          l = aopGet (IC_LEFT (ic), 0, FALSE, FALSE);
+          if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
+            {
+              emitcode ("mov", "r0,%s", l);
+              l = aopGet (IC_LEFT (ic), 1, FALSE, FALSE);
+              emitcode ("mov", "dph,%s", l);
+              emitcode ("mov", "dpl,r0");
+            }
+          else
+            {
+              emitcode ("mov", "dpl,%s", l);
+              l = aopGet (IC_LEFT (ic), 1, FALSE, FALSE);
+              emitcode ("mov", "dph,%s", l);
+            }
+
+          freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
+
+          if (swapBanks)
+            {
+              emitcode ("mov", "psw,#0x%02x",
+               ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+            }
+
+          /* make the call */
+          emitcode ("lcall", "__sdcc_call_dptr");
         }
     }
   if (swapBanks)
@@ -3998,10 +4052,7 @@ genRet (iCode * ic)
 
   if (IS_BIT(_G.currentFunc->etype))
     {
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
-        emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
-      else
-        movc (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
+      toCarry (IC_LEFT (ic));
     }
   else
     {
@@ -4011,15 +4062,13 @@ genRet (iCode * ic)
           if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
             {
               /* #NOCHANGE */
-              l = aopGet (IC_LEFT (ic), offset++,
-                          FALSE, TRUE);
+              l = aopGet (IC_LEFT (ic), offset++, FALSE, TRUE);
               emitcode ("push", "%s", l);
               pushed++;
             }
           else
             {
-              l = aopGet (IC_LEFT (ic), offset,
-                          FALSE, FALSE);
+              l = aopGet (IC_LEFT (ic), offset, FALSE, FALSE);
               if (strcmp (fReturn[offset], l))
                 emitcode ("mov", "%s,%s", fReturn[offset++], l);
             }
@@ -4296,10 +4345,10 @@ genPlusBits (iCode * ic)
 {
   D (emitcode (";", "genPlusBits"));
 
+  emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
     {
       symbol *lbl = newiTempLabel (NULL);
-      emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
       emitcode ("jnb", "%s,%05d$", AOP (IC_RIGHT (ic))->aopu.aop_dir, (lbl->key + 100));
       emitcode ("cpl", "c");
       emitLabel (lbl);
@@ -4308,7 +4357,6 @@ genPlusBits (iCode * ic)
   else
     {
       emitcode ("clr", "a");
-      emitcode ("mov", "c,%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
       emitcode ("rlc", "a");
       emitcode ("mov", "c,%s", AOP (IC_RIGHT (ic))->aopu.aop_dir);
       emitcode ("addc", "a,%s", zero);
@@ -11064,28 +11112,7 @@ genAssign (iCode * ic)
   /* if the result is a bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      /* if the right size is a literal then
-         we know what the value is */
-      if (AOP_TYPE (right) == AOP_LIT)
-        {
-          if (((int) operandLitValue (right)))
-            aopPut (result, one, 0);
-          else
-            aopPut (result, zero, 0);
-          goto release;
-        }
-
-      /* the right is also a bit variable */
-      if (AOP_TYPE (right) == AOP_CRY)
-        {
-          emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-          aopPut (result, "c", 0);
-          goto release;
-        }
-
-      /* we need to or */
-      toBoolean (right);
-      aopPut (result, "a", 0);
+      assignBit (result, right);
       goto release;
     }
 
@@ -11273,29 +11300,7 @@ genCast (iCode * ic)
   /* if the result is a bit (and not a bitfield) */
   if (IS_BIT (OP_SYMBOL (result)->type))
     {
-      /* if the right size is a literal then
-         we know what the value is */
-      if (AOP_TYPE (right) == AOP_LIT)
-        {
-          if (((int) operandLitValue (right)))
-            aopPut (result, one, 0);
-          else
-            aopPut (result, zero, 0);
-
-          goto release;
-        }
-
-      /* the right is also a bit variable */
-      if (AOP_TYPE (right) == AOP_CRY)
-        {
-          emitcode ("mov", "c,%s", AOP (right)->aopu.aop_dir);
-          aopPut (result, "c", 0);
-          goto release;
-        }
-
-      /* we need to or */
-      toBoolean (right);
-      aopPut (result, "a", 0);
+      assignBit (result, right);
       goto release;
     }
 

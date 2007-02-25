@@ -8,7 +8,7 @@ SAS = $(top_builddir)/bin/asx8051
 SCC = $(top_builddir)/bin/sdcc
 
 OBJ = crtstart.rel crtxinit.rel crtxclear.rel crtclear.rel crtxstack.rel \
-      crtpagesfr.rel crtbank.rel
+      crtpagesfr.rel crtbank.rel crtcall.rel
 
 LIB = mcs51.lib
 

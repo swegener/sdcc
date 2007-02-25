@@ -47,17 +47,18 @@ enum
 /* definition for the registers */
 typedef struct regs
   {
-    short type;         /* can have value
-                           REG_GPR, REG_PTR or REG_CND */
-    short rIdx;         /* index into register table */
+    short type;             /* can have value
+                               REG_GPR, REG_PTR or REG_CND */
+    short rIdx;             /* index into register table */
     short otype;
-    char *name;         /* name */
-    char *dname;        /* name when direct access needed */
-    char *base;         /* base address */
-    short offset;       /* offset from the base */
-    unsigned isFree:1;  /* is currently unassigned  */
-    unsigned char value; /* from rtrack.c only valid when valueKnown is set */
-    short valueKnown;
+    char *name;             /* name */
+    char *dname;            /* name when direct access needed */
+    char *base;             /* base address */
+    short offset;           /* offset from the base */
+    unsigned isFree:1;      /* is currently unassigned  */
+    unsigned valueKnown:1;  /* from rtrack.c */
+    unsigned char value;    /* from rtrack.c only valid when valueKnown is set */
+
   }
 regs;
 extern regs regs8051[];

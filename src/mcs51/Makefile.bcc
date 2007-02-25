@@ -1,8 +1,8 @@
-# Makefile for Borlad C++
+# Makefile for Borland C++
 
 PRJDIR = ../..
 
-OBJ = gen.obj ralloc.obj main.obj
+OBJ = gen.obj ralloc.obj main.obj rtrack.obj
 LIB = port.lib
 
 !include $(PRJDIR)/Bcc.inc

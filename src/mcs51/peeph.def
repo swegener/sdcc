@@ -1483,15 +1483,15 @@ replace {
 	mov	%1,a
 } if notVolatile %1
 
-replace {
-// acc being incremented might cause problems
-	mov	%1,a
-	inc	%1
-} by {
-	;	Peephole 185	changed order of increment (acc incremented also!)
-	inc	a
-	mov	%1,a
-} if notVolatile %1
+//replace {
+// acc being incremented might cause problems with register tracking
+//	mov	%1,a
+//	inc	%1
+//} by {
+//	;	Peephole 185	changed order of increment (acc incremented also!)
+//	inc	a
+//	mov	%1,a
+//} if notVolatile %1
 
 // char indexed access to: long code table[] = {4,3,2,1};
 replace restart {
@@ -1690,13 +1690,24 @@ replace {
 	;	Peephole 191	removed redundant mov
 } if notVolatile %1
 
+// applies to f.e. regression/ports/mcs51/support.c
 replace {
 	mov	r%1,a
 	mov	@r%2,ar%1
 } by {
 	mov	r%1,a
-	;	Peephole 192	used a instead of ar%1 as source
+	;	Peephole 192.a	used a instead of ar%1 as source
 	mov	@r%2,a
+}
+
+// applies to f.e. printf_large.c
+replace {
+	mov	ar%1,@r%2
+	mov	a,r%1
+} by {
+	;	Peephole 192.b	used a instead of ar%1 as destination
+	mov	a,@r%2
+	mov	r%1,a
 }
 
 replace {

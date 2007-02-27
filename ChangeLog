@@ -1,3 +1,13 @@
+2007-02-27 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* src/SDCCglobl.h,
+	* src/SDCCmain.c,
+	* src/mcs51/gen.c, 
+	* src/mcs51/rtrack.c, 
+	* src/ds390/gen.c,
+	* doc/sdccman.lyx: added --no-gen-comments
+	* src/mcs51/peeph.def: added 192.b, disabled 185
+
 2007-02-25 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/gen.c (genCast): fixed typo

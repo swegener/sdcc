@@ -30,6 +30,8 @@
     - a label causes loss of tracking (no handling of information of blocks
       known to follow/preceed the current block)
     - not used in aopGet or genRet
+    - does not track which registers are known to be unchanged within
+      a function (would not have to be saved when calling the function)
 -------------------------------------------------------------------------*/
 
 
@@ -44,7 +46,7 @@
 #define DEBUG(x)
 //#define DEBUG(x) x
 
-#define D(x) x
+#define D(x) do if (!options.noGenComments) {x;} while(0)
 
 #define REGS8051_SET(idx,val) do{ \
                                   regs8051[idx].value = (val) & 0xff; \

@@ -28,8 +28,7 @@
       Made everything static
 -------------------------------------------------------------------------*/
 
-//#define D(x)
-#define D(x) x
+#define D(x) do if (!options.noGenComments) {x;} while(0)
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -28,8 +28,7 @@
 -------------------------------------------------------------------------*/
 
 /* Use the D macro for basic (unobtrusive) debugging messages */
-//#define D(x)
-#define D(x) x
+#define D(x) do if (!options.noGenComments) {x;} while(0)
 /* Use the DD macro for detailed debugging messages */
 #define DD(x)
 //#define DD(x) x
@@ -4230,8 +4229,9 @@ negatedCmp (int opcode)
   return EQ_OP; /* shouldn't happen, but need to return something */
 }
 
-/* compile only if the debugging macro D is enabled */
-#if (D(1) -0)
+/*------------------------------------------------------------------*/
+/* nameCmp : helper function for human readable debug output        */
+/*------------------------------------------------------------------*/
 static char *
 nameCmp (int opcode)
 {
@@ -4253,7 +4253,6 @@ nameCmp (int opcode)
       return "invalid";
     }
 }
-#endif
 
 /*------------------------------------------------------------------*/
 /* branchInstCmp : returns the conditional branch instruction that  */

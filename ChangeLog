@@ -1,5 +1,7 @@
 2007-02-28 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
+	* device/lib/mcs51/crtxclear.asm: pdata segment of 256 byte would not
+	be cleared. Unconditionally set __XPAGE
 	* src/hc08/gen.c: --no-gen-comments (RFE #1493816) for hc08
 
 2007-02-27 Frieder Ferlemann <Frieder.Ferlemann AT web.de>

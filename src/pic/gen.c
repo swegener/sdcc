@@ -9641,7 +9641,16 @@ static void genGenPointerSet (operand *right, operand *result, iCode *ic)
 	  int size = AOP_SIZE(right);
 	  int idx = 0;
 
-	  assert (size == getSize(OP_SYM_ETYPE(result)));
+	  /* The following assertion fails for
+	   *   struct foo { char a; char b; } bar;
+	   *   void demo(struct foo *dst, char c) { dst->b = c; }
+	   * as size will be 1 (sizeof(c)), whereas dst->b will be accessed
+	   * using (((char *)dst)+1), whose OP_SYM_ETYPE still is struct foo
+	   * of size 2.
+	   * The frontend seems to guarantee that IC_LEFT has the correct size,
+	   * it works fine both for larger and smaller types of `char c'.
+	   * */
+	  //assert (size == getSize(OP_SYM_ETYPE(result)));
 	  assert (size > 0 && size <= 4);
 
 	  /* pass arguments */

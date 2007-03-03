@@ -1,3 +1,8 @@
+2007-03-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (parseCmdLine): only set options.xstack_loc for mcs51,
+	  added condition to macro, fixes bug 1666080
+
 2007-03-02 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (genGenPointerSet): removed bogus assertion
@@ -12,8 +17,8 @@
 
 	* src/SDCCglobl.h,
 	* src/SDCCmain.c,
-	* src/mcs51/gen.c, 
-	* src/mcs51/rtrack.c, 
+	* src/mcs51/gen.c,
+	* src/mcs51/rtrack.c,
 	* src/ds390/gen.c,
 	* doc/sdccman.lyx: added --no-gen-comments
 	* src/mcs51/peeph.def: added 192.b, disabled 185

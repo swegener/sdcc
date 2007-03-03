@@ -1454,11 +1454,11 @@ parseCmdLine (int argc, char **argv)
   if (TARGET_IS_MCS51)
     {
       options.float_rent++;
-    }
 
-  /* set up external stack location if not explicitly specified */
-  if (!options.xstack_loc)
-    options.xstack_loc = options.xdata_loc;
+      /* set up external stack location if not explicitly specified */
+      if (!options.xstack_loc)
+        options.xstack_loc = options.xdata_loc;
+    }
 
   /* if debug option is set then open the cdbFile */
   if (options.debug && fullSrcFileName)
@@ -1552,10 +1552,13 @@ linkEdit (char **envp)
         }
 
 #define WRITE_SEG_LOC(N, L) \
-  segName = Safe_strdup(N); \
-  c = strtok(segName, " \t"); \
-  fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
-  if (segName) { Safe_free(segName); }
+  if (N) \
+  { \
+    segName = Safe_strdup(N); \
+    c = strtok(segName, " \t"); \
+    fprintf (lnkfile,"-b %s = 0x%04x\n", c, L); \
+    if (segName) { Safe_free(segName); } \
+  }
 
       if (!(TARGET_Z80_LIKE)) /*Not for the z80, gbz80*/
         {

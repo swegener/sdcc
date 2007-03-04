@@ -1,3 +1,10 @@
+2007-03-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (emitMaps, glue),
+	* src/SDCCmem.c (initMem, allocDefault): added x_abs for initialized
+	  absolute xdata
+	* support/regression/tests/absolute.c: added xdata test
+
 2007-03-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmain.c (parseCmdLine): only set options.xstack_loc for mcs51,

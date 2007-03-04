@@ -935,7 +935,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s * oB
 
   /* PENDING: this is _very_ mcs51 specific, including a magic
      number...
-     It's also endin specific.
+     It's also endian specific.
    */
   size = getSize (type);
 
@@ -1322,6 +1322,7 @@ emitMaps (void)
   emitRegularMap (bit, TRUE, TRUE);
   emitRegularMap (pdata, TRUE, TRUE);
   emitRegularMap (xdata, TRUE, TRUE);
+  emitRegularMap (x_abs, TRUE, TRUE);
   if (port->genXINIT) {
     emitRegularMap (xidata, TRUE, TRUE);
   }
@@ -1589,13 +1590,13 @@ glue (void)
 
   if(port->general.glue_up_main &&
     (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400))
-  {
+    {
       mcs51_like=1; /*So it has bits, sfr, sbits, data, idata, etc...*/
-  }
+    }
   else
-  {
+    {
       mcs51_like=0;
-  }
+    }
 
   /* print the global struct definitions */
   if (options.debug)
@@ -1642,11 +1643,11 @@ glue (void)
   tfprintf (asmFile, "\t!module\n",
     spacesToUnderscores (moduleBuf, moduleName, sizeof moduleBuf));
   if(mcs51_like)
-  {
-    fprintf (asmFile, "\t.optsdcc -m%s", port->target);
-
-    switch(options.model)
     {
+      fprintf (asmFile, "\t.optsdcc -m%s", port->target);
+
+      switch(options.model)
+      {
         case MODEL_SMALL:   fprintf (asmFile, " --model-small");   break;
         case MODEL_COMPACT: fprintf (asmFile, " --model-compact"); break;
         case MODEL_MEDIUM:  fprintf (asmFile, " --model-medium");  break;
@@ -1654,19 +1655,19 @@ glue (void)
         case MODEL_FLAT24:  fprintf (asmFile, " --model-flat24");  break;
         case MODEL_PAGE0:   fprintf (asmFile, " --model-page0");   break;
         default: break;
+      }
+      /*if(options.stackAuto)      fprintf (asmFile, " --stack-auto");*/
+      if(options.useXstack)      fprintf (asmFile, " --xstack");
+      /*if(options.intlong_rent)   fprintf (asmFile, " --int-long-rent");*/
+      /*if(options.float_rent)     fprintf (asmFile, " --float-rent");*/
+      if(options.noRegParams)    fprintf (asmFile, " --no-reg-params");
+      if(options.parms_in_bank1) fprintf (asmFile, " --parms-in-bank1");
+      fprintf (asmFile, "\n");
     }
-    /*if(options.stackAuto)      fprintf (asmFile, " --stack-auto");*/
-    if(options.useXstack)      fprintf (asmFile, " --xstack");
-    /*if(options.intlong_rent)   fprintf (asmFile, " --int-long-rent");*/
-    /*if(options.float_rent)     fprintf (asmFile, " --float-rent");*/
-    if(options.noRegParams)    fprintf (asmFile, " --no-reg-params");
-    if(options.parms_in_bank1) fprintf (asmFile, " --parms-in-bank1");
-    fprintf (asmFile, "\n");
-  }
-  else if(TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_HC08)
-  {
-    fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
-  }
+  else if(TARGET_Z80_LIKE || TARGET_IS_HC08)
+    {
+      fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
+    }
 
   tfprintf (asmFile, "\t!fileprelude\n");
 
@@ -1682,14 +1683,14 @@ glue (void)
     printExterns (asmFile);
 
   if(( mcs51_like )
-   ||( TARGET_IS_Z80 )) /*.p.t.20030924 need to output SFR table for Z80 as well */
-  {
+     ||( TARGET_IS_Z80 )) /*.p.t.20030924 need to output SFR table for Z80 as well */
+    {
       /* copy the sfr segment */
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; special function registers\n");
       fprintf (asmFile, "%s", iComments2);
       dbuf_write_and_destroy (&sfr->oBuf, asmFile);
-  }
+    }
   
   if(mcs51_like)
     {
@@ -1701,35 +1702,35 @@ glue (void)
 
       /*JCF: Create the areas for the register banks*/
       if(RegBankUsed[0]||RegBankUsed[1]||RegBankUsed[2]||RegBankUsed[3])
-      {
-         fprintf (asmFile, "%s", iComments2);
-         fprintf (asmFile, "; overlayable register banks\n");
-         fprintf (asmFile, "%s", iComments2);
-         if(RegBankUsed[0])
-           fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
-         if(RegBankUsed[1]||options.parms_in_bank1)
-           fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
-         if(RegBankUsed[2])
-           fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
-         if(RegBankUsed[3])
-           fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
-      }
+        {
+          fprintf (asmFile, "%s", iComments2);
+          fprintf (asmFile, "; overlayable register banks\n");
+          fprintf (asmFile, "%s", iComments2);
+          if(RegBankUsed[0])
+            fprintf (asmFile, "\t.area REG_BANK_0\t(REL,OVR,DATA)\n\t.ds 8\n");
+          if(RegBankUsed[1]||options.parms_in_bank1)
+            fprintf (asmFile, "\t.area REG_BANK_1\t(REL,OVR,DATA)\n\t.ds 8\n");
+          if(RegBankUsed[2])
+            fprintf (asmFile, "\t.area REG_BANK_2\t(REL,OVR,DATA)\n\t.ds 8\n");
+          if(RegBankUsed[3])
+            fprintf (asmFile, "\t.area REG_BANK_3\t(REL,OVR,DATA)\n\t.ds 8\n");
+        }
       if(BitBankUsed)
-      {
-         fprintf (asmFile, "%s", iComments2);
-         fprintf (asmFile, "; overlayable bit register bank\n");
-         fprintf (asmFile, "%s", iComments2);
-         fprintf (asmFile, "\t.area BIT_BANK\t(REL,OVR,DATA)\n");
-         fprintf (asmFile, "bits:\n\t.ds 1\n");
-         fprintf (asmFile, "\tb0 = bits[0]\n");
-         fprintf (asmFile, "\tb1 = bits[1]\n");
-         fprintf (asmFile, "\tb2 = bits[2]\n");
-         fprintf (asmFile, "\tb3 = bits[3]\n");
-         fprintf (asmFile, "\tb4 = bits[4]\n");
-         fprintf (asmFile, "\tb5 = bits[5]\n");
-         fprintf (asmFile, "\tb6 = bits[6]\n");
-         fprintf (asmFile, "\tb7 = bits[7]\n");
-      }
+        {
+          fprintf (asmFile, "%s", iComments2);
+          fprintf (asmFile, "; overlayable bit register bank\n");
+          fprintf (asmFile, "%s", iComments2);
+          fprintf (asmFile, "\t.area BIT_BANK\t(REL,OVR,DATA)\n");
+          fprintf (asmFile, "bits:\n\t.ds 1\n");
+          fprintf (asmFile, "\tb0 = bits[0]\n");
+          fprintf (asmFile, "\tb1 = bits[1]\n");
+          fprintf (asmFile, "\tb2 = bits[2]\n");
+          fprintf (asmFile, "\tb3 = bits[3]\n");
+          fprintf (asmFile, "\tb4 = bits[4]\n");
+          fprintf (asmFile, "\tb5 = bits[5]\n");
+          fprintf (asmFile, "\tb6 = bits[6]\n");
+          fprintf (asmFile, "\tb7 = bits[7]\n");
+        }
     }
 
   /* copy the data segment */
@@ -1740,12 +1741,13 @@ glue (void)
 
 
   /* create the overlay segments */
-  if (overlay) {
-    fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; overlayable items in %s ram \n", mcs51_like?"internal":"");
-    fprintf (asmFile, "%s", iComments2);
-    dbuf_write_and_destroy (&ovrBuf, asmFile);
-  }
+  if (overlay)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; overlayable items in %s ram \n", mcs51_like?"internal":"");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&ovrBuf, asmFile);
+    }
 
   /* create the stack segment MOF */
   if (mainf && IFFUNC_HASBODY(mainf->type))
@@ -1758,29 +1760,32 @@ glue (void)
     }
 
   /* create the idata segment */
-  if ( (idata) && (mcs51_like) ) {
-    fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; indirectly addressable internal ram data\n");
-    fprintf (asmFile, "%s", iComments2);
-    dbuf_write_and_destroy (&idata->oBuf, asmFile);
-  }
+  if ( (idata) && (mcs51_like) )
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; indirectly addressable internal ram data\n");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&idata->oBuf, asmFile);
+    }
 
   /* create the absolute idata/data segment */
-  if ( (i_abs) && (mcs51_like) ) {
-    fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; absolute internal ram data\n");
-    fprintf (asmFile, "%s", iComments2);
-    dbuf_write_and_destroy (&d_abs->oBuf, asmFile);
-    dbuf_write_and_destroy (&i_abs->oBuf, asmFile);
-  }
+  if ( (i_abs) && (mcs51_like) )
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; absolute internal ram data\n");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&d_abs->oBuf, asmFile);
+      dbuf_write_and_destroy (&i_abs->oBuf, asmFile);
+    }
 
   /* copy the bit segment */
-  if (mcs51_like) {
-    fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; bit data\n");
-    fprintf (asmFile, "%s", iComments2);
-    dbuf_write_and_destroy (&bit->oBuf, asmFile);
-  }
+  if (mcs51_like)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; bit data\n");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&bit->oBuf, asmFile);
+    }
 
   /* copy paged external ram data */
   if (mcs51_like)
@@ -1802,12 +1807,22 @@ glue (void)
     }
 
   /* copy external ram data */
-  if (mcs51_like) {
-    fprintf (asmFile, "%s", iComments2);
-    fprintf (asmFile, "; external ram data\n");
-    fprintf (asmFile, "%s", iComments2);
-    dbuf_write_and_destroy (&xdata->oBuf, asmFile);
-  }
+  if (mcs51_like)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; external ram data\n");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&xdata->oBuf, asmFile);
+    }
+
+  /* create the absolute xdata segment */
+  if (mcs51_like || TARGET_IS_HC08)
+    {
+      fprintf (asmFile, "%s", iComments2);
+      fprintf (asmFile, "; absolute external ram data\n");
+      fprintf (asmFile, "%s", iComments2);
+      dbuf_write_and_destroy (&x_abs->oBuf, asmFile);
+    }
 
   /* copy external initialized ram data */
   fprintf (asmFile, "%s", iComments2);
@@ -1817,10 +1832,10 @@ glue (void)
 
   /* If the port wants to generate any extra areas, let it do so. */
   if (port->extraAreas.genExtraAreaDeclaration)
-  {
+    {
       port->extraAreas.genExtraAreaDeclaration(asmFile, 
                                                mainf && IFFUNC_HASBODY(mainf->type));
-  }
+    }
     
   /* copy the interrupt vector table */
   if (mainf && IFFUNC_HASBODY(mainf->type))
@@ -1855,6 +1870,7 @@ glue (void)
         }
       else
         {
+          assert (mcs51_like);
           fprintf (asmFile, "__sdcc_gsinit_startup:\n");
           /* if external stack is specified then the
              higher order byte of the xdatalocation is
@@ -1889,7 +1905,6 @@ glue (void)
               port->genXINIT(asmFile);
             }
         }
-
     }
   dbuf_write_and_destroy (&statsg->oBuf, asmFile);
 
@@ -1935,8 +1950,9 @@ glue (void)
   tfprintf (asmFile, "\t!areacode\n", options.code_seg);
   dbuf_write_and_destroy (&code->oBuf, asmFile);
 
-  if (port->genAssemblerEnd) {
+  if (port->genAssemblerEnd)
+    {
       port->genAssemblerEnd(asmFile);
-  }
+    }
   fclose (asmFile);
 }

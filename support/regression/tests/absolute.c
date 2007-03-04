@@ -1,6 +1,6 @@
 /** Absolute addressing tests.
 
-    mem: code
+    mem: code, xdata
 */
 #include <testfwk.h>
 
@@ -16,7 +16,7 @@ testAbsolute(void)
 {
 #if defined(SDCC_mcs51) || defined(SDCC_ds390) || defined(SDCC_hc08)
   char {mem} *pC = (char {mem} *)(0xCAB0);
-  int  {mem} *pI = (char {mem} *)(0xCAB0);
+  int  {mem} *pI = (int  {mem} *)(0xCAB0);
 
   ASSERT(u == 'x');
   ASSERT(pC[7] == 'x');

@@ -8,5 +8,5 @@
  * (c) 2007 by Raphael Neider <rneider AT web.de>
  */
 
-#include <pic18f4331.c>
+#include "pic18f4331.c"
 

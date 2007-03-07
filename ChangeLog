@@ -1,3 +1,8 @@
+2007-03-07  Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic16/libdev/pic18f[24][34]31.c:
+	  serch include files in the current directory
+
 2007-03-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c (emitMaps, glue),

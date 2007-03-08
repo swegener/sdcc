@@ -1,3 +1,7 @@
+2007-03-08 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/printf_large.c: 6 bytes less __data mem (6 more __idata)
+
 2007-03-07  Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libdev/pic18f[24][34]31.c:

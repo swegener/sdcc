@@ -42,6 +42,12 @@
 #define NULL_STRING_LENGTH 6
 #endif
 
+#if defined (SDCC_mcs51) && defined (SDCC_MODEL_SMALL) && !defined (SDCC_STACK_AUTO)
+# define MEM_SPACE_BUF __idata
+#else
+# define MEM_SPACE_BUF
+#endif
+
 /****************************************************************************/
 
 //typedef char * ptr_t;
@@ -223,7 +229,7 @@ output_float (float f, unsigned char reqWidth,
               signed char reqDecimals,
               BOOL left, BOOL zero, BOOL sign, BOOL space)
 {
-  xdata char fpBuffer[128];
+  __xdata char fpBuffer[128];
 #endif //SDCC_STACK_AUTO
   BOOL negative = 0;
   unsigned long integerPart;
@@ -657,10 +663,10 @@ get_conversion_spec:
 #endif //USE_FLOATS
       } else if (radix != 0)
       {
-        // Apperently we have to output an integral type
+        // Apparently we have to output an integral type
         // with radix "radix"
-        unsigned char store[6];
-        unsigned char _AUTOMEM *pstore = &store[5];
+        unsigned char MEM_SPACE_BUF store[6];
+        unsigned char MEM_SPACE_BUF *pstore = &store[5];
 
         // store value in byte[0] (LSB) ... byte[3] (MSB)
         if (char_argument)

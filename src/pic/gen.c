@@ -3115,8 +3115,7 @@ registers :-) */
 #endif
 		
 		/* if debug then send end of function */
-		/*	if (options.debug && currFunc) { */
-		if (currFunc) {
+		if (options.debug && debugFile && currFunc) {
 			debugFile->writeEndFunction (currFunc, ic, 1);
 		}
 		
@@ -3151,7 +3150,7 @@ registers :-) */
 		}
 		
 		/* if debug then send end of function */
-		if (currFunc) {
+		if (options.debug && debugFile && currFunc) {
 			debugFile->writeEndFunction (currFunc, ic, 1);
 		}
 		
@@ -10567,10 +10566,8 @@ void genpic14Code (iCode *lic)
 	addpBlock(pb);
 	
 	/* if debug information required */
-	if (options.debug && currFunc) { 
-		if (currFunc) {
-			debugFile->writeFunction (currFunc, lic);
-		}
+	if (options.debug && debugFile && currFunc) { 
+		debugFile->writeFunction (currFunc, lic);
 	}
 	
 	

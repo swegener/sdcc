@@ -1,3 +1,10 @@
+2007-03-09 Raphael Neider <rneider AT web.de>
+
+	* src/pic/gen.c,
+	* src/pic/glue.c,
+	* src/pic/ralloc.c: suppress undesired debug output
+	* src/SDCCmain.c (linkEdit): initialize c to quieten compiler
+
 2007-03-08 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/printf_large.c: 6 bytes less __data mem (6 more __idata)

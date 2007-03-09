@@ -88,14 +88,14 @@ int Gstack_size = 0;
 
 
 static void spillThis (symbol *);
-static int debug = 1;
+static int debug = 0;	// should be 0 when committed, creates .d files
 static FILE *debugF = NULL;
 /*-----------------------------------------------------------------*/
 /* debugLog - open a file for debugging information                */
 /*-----------------------------------------------------------------*/
 //static void debugLog(char *inst,char *fmt, ...)
 static void
-	debugLog (char *fmt,...)
+debugLog (char *fmt,...)
 {
 	static int append = 0;	// First time through, open the file without append.
 
@@ -118,41 +118,29 @@ static void
 			werror (E_FILE_OPEN_ERR, buffer);
 			exit (1);
 		}
-		append = 1;		// Next time debubLog is called, we'll append the debug info
+		append = 1;		// Next time debugLog is called, we'll append the debug info
 
 	}
 
 	va_start (ap, fmt);
-
 	vsprintf (buffer, fmt, ap);
+	va_end (ap);
 
 	fprintf (debugF, "%s", buffer);
 	//if (options.verbose) fprintf (stderr, "%s: %s", __FUNCTION__, buffer);
-	/*
-	while (isspace((unsigned char)*bufferP)) bufferP++;
-
-	if (bufferP && *bufferP) 
-		lineCurr = (lineCurr ?
-		connectLine(lineCurr,newLineNode(lb)) :
-		(lineHead = newLineNode(lb)));
-	lineCurr->isInline = _G.inLine;
-	lineCurr->isDebug  = _G.debugLine;
-	*/
-	va_end (ap);
-
 }
  
 static void
-	debugNewLine (void)
+debugNewLine (void)
 {
 	if (debugF)
 		fputc ('\n', debugF);
 }
  /*-----------------------------------------------------------------*/
- /* debugLogClose - closes the debug log file (if opened)           */
+ /* pic14_debugLogClose - closes the debug log file (if opened)           */
  /*-----------------------------------------------------------------*/
-static void
-	debugLogClose (void)
+void
+pic14_debugLogClose (void)
 {
 	if (debugF)
 	{
@@ -163,20 +151,20 @@ static void
 #define AOP(op) op->aop
  
 static char *
-	debugAopGet (char *str, operand * op)
+debugAopGet (char *str, operand * op)
 {
-        if (str)
-		debugLog (str);
+	if (!debug) return NULL;
+
+        if (str) debugLog (str);
 
 	printOperand (op, debugF);
 	debugNewLine ();
 
 	return NULL;
-
 }
 
 static char *
-	decodeOp (unsigned int op)
+decodeOp (unsigned int op)
 {
 
 	if (op < 128 && op > ' ')
@@ -3640,10 +3628,11 @@ packForPush (iCode * ic, eBBlock * ebp)
 
 void printSymType(char * str, sym_link *sl)
 {
-	debugLog ("    %s Symbol type: ",str);
-	printTypeChain( sl, debugF);
-	debugLog ("\n");
-	
+	if (debug) {
+		debugLog ("    %s Symbol type: ",str);
+		printTypeChain( sl, debugF);
+		debugLog ("\n");
+	}
 }
 
 /*-----------------------------------------------------------------*/
@@ -4169,6 +4158,6 @@ pic14_assignRegisters (ebbIndex * ebbi)
 	//pic14_freeAllRegs ();
 	
 	debugLog ("leaving\n<><><><><><><><><><><><><><><><><>\n");
-	debugLogClose ();
+	pic14_debugLogClose ();
 	return;
 }

@@ -1488,6 +1488,7 @@ linkEdit (char **envp)
   char linkerScriptFileName[PATH_MAX];
 
   linkerScriptFileName[0] = 0;
+  c = NULL;
 
   if(port->linker.needLinkerScript)
     {

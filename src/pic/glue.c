@@ -72,6 +72,7 @@ extern void printChar (FILE * ofile, char *s, int plen);
 void  pCodeInitRegisters(void);
 int getConfigWord(int address);
 int getHasSecondConfigReg(void);
+void pic14_debugLogClose(void); // from ralloc.c
 
 char *udata_section_name=0;		// FIXME Temporary fix to change udata section name -- VR
 int pic14_hasInterrupt = 0;		// Indicates whether to emit interrupt handler or not
@@ -1429,7 +1430,7 @@ picglue ()
 	
 	AnalyzepCode('*');
 	
-	pcode_test();
+	if (options.debug) pcode_test();
 	
 	
 	/* now put it all together into the assembler file */
@@ -1580,6 +1581,7 @@ picglue ()
 	fprintf (asmFile,"\tend\n");
 	
 	fclose (asmFile);
+	pic14_debugLogClose();
 }
 
 /*

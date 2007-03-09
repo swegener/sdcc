@@ -1,5 +1,9 @@
 2007-03-09 Raphael Neider <rneider AT web.de>
 
+	* device/include/pic/pic14devices.txt: fixed confsiz of 16f91[3467]
+
+2007-03-09 Raphael Neider <rneider AT web.de>
+
 	* src/pic/gen.c,
 	* src/pic/glue.c,
 	* src/pic/ralloc.c: suppress undesired debug output

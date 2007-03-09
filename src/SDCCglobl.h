@@ -299,7 +299,8 @@ struct options
 /* forward definition for variables accessed globally */
 extern int noAssemble;          /* no assembly, stop after code generation */
 extern char *yytext;
-extern char *currFname;
+extern char *lexFilename;       /* lex idea of current file name */
+extern int lexLineno;           /* lex idea of line number of the current file */
 extern char *fullSrcFileName;   /* full name for the source file; */
                                 /* can be NULL while linking without compiling */
 extern char *fullDstFileName;   /* full name for the output file; */

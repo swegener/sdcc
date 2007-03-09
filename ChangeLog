@@ -1,3 +1,9 @@
+2007-03-09 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.lex, src/SDCCast.c. src/SDCCglobl.c, src/SDCCsymt.c,
+	  src/SDCCval.c: fixed bugs #1676768: Wrong line number reported and
+	  1673361: Missaligned comments in output files
+
 2007-03-09 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic/pic14devices.txt: fixed confsiz of 16f91[3467]
@@ -13,10 +19,10 @@
 
 	* device/lib/printf_large.c: 6 bytes less __data mem (6 more __idata)
 
-2007-03-07  Borut Razem <borut.razem AT siol.net>
+2007-03-07 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/libdev/pic18f[24][34]31.c:
-	  serch include files in the current directory
+	  search include files in the current directory
 
 2007-03-04 Maarten Brock <sourceforge.brock AT dse.nl>
 

@@ -293,11 +293,11 @@ newSymbol (char *name, int scope)
 
   sym = Safe_alloc ( sizeof (symbol));
 
-  strncpyz (sym->name, name, sizeof(sym->name));        /* copy the name */
-  sym->level = scope;           /* set the level    */
+  strncpyz (sym->name, name, sizeof(sym->name)); /* copy the name */
+  sym->level = scope;           /* set the level */
   sym->block = currBlockno;
-  sym->lineDef = lineno;        /* set the line number */
-  sym->fileDef = filename;
+  sym->lineDef = lexLineno;    /* set the line number */
+  sym->fileDef = lexFilename;
   return sym;
 }
 

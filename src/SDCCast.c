@@ -84,8 +84,8 @@ newAst_ (unsigned type)
   ex = Safe_alloc ( sizeof (ast));
 
   ex->type = type;
-  ex->lineno = (noLineno ? oldLineno : lineno);
-  ex->filename = filename;
+  ex->lineno = (noLineno ? oldLineno : lexLineno);
+  ex->filename = lexFilename;
   ex->level = NestLevel;
   ex->block = currBlockno;
   ex->initMode = inInitMode;
@@ -1037,11 +1037,8 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
       if (lcnt && size > lcnt)
       {
           // Array size was specified, and we have more initializers than needed.
-          char *name=sym->opval.val->sym->name;
-          int lineno=sym->opval.val->sym->lineDef;
-          char *filename=sym->opval.val->sym->fileDef;
-
-          werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
+          werrorfl (sym->opval.val->sym->fileDef, sym->opval.val->sym->lineDef,
+            W_EXCESS_INITIALIZERS, "array", sym->opval.val->sym->name);
       }
   }
   else
@@ -1065,9 +1062,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast *rootValue)
           {
               // is this a better way? at least it won't crash
               char *name = (IS_AST_SYM_VALUE(sym)) ? AST_SYMBOL(sym)->name : "";
-              int lineno = iloop->lineno;
-              char *filename = iloop->filename;
-              werrorfl (filename, lineno, W_EXCESS_INITIALIZERS, "array", name);
+              werrorfl (iloop->filename, iloop->lineno, W_EXCESS_INITIALIZERS, "array", name);
 
               break;
           }
@@ -1305,8 +1300,8 @@ gatherAutoInit (symbol * autoChain)
           }
 
           /* update lineno for error msg */
-          lineno=sym->lineDef;
-          setAstLineno (ilist->init.node, lineno);
+          lineno = sym->lineDef;
+          setAstLineno (ilist->init.node, sym->lineDef);
 
           if (IS_AGGREGATE (sym->type)) {
             work = initAggregates (sym, sym->ival, NULL);
@@ -2449,7 +2444,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 /*----------------------------*/
 /*   leaf has been reached    */
 /*----------------------------*/
-  lineno=tree->lineno;
+  lineno = tree->lineno;
   /* if this is of type value */
   /* just get the type        */
   if (tree->type == EX_VALUE)
@@ -2472,7 +2467,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           /* if the undefined flag is set then give error message */
           if (tree->opval.val->sym->undefined)
             {
-              werror (E_ID_UNDEF, tree->opval.val->sym->name);
+              werrorfl (tree->filename, tree->lineno, E_ID_UNDEF, tree->opval.val->sym->name);
               /* assume int */
               TTYPE (tree) = TETYPE (tree) =
                 tree->opval.val->type = tree->opval.val->sym->type =
@@ -2598,21 +2593,21 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* first check if this is a array or a pointer */
       if ((!IS_ARRAY (LTYPE (tree))) && (!IS_PTR (LTYPE (tree))))
         {
-          werror (E_NEED_ARRAY_PTR, "[]");
+          werrorfl (tree->filename, tree->lineno, E_NEED_ARRAY_PTR, "[]");
           goto errorTreeReturn;
         }
 
       /* check if the type of the idx */
       if (!IS_INTEGRAL (RTYPE (tree)))
         {
-          werror (E_IDX_NOT_INT);
+          werrorfl (tree->filename, tree->lineno, E_IDX_NOT_INT);
           goto errorTreeReturn;
         }
 
       /* if the left is an rvalue then error */
       if (LRVAL (tree))
         {
-          werror (E_LVALUE_REQUIRED, "array access");
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "array access");
           goto errorTreeReturn;
         }
 
@@ -2622,7 +2617,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           int arraySize = DCL_ELEM (LTYPE (tree));
           if (arraySize && arrayIndex >= arraySize)
             {
-              werror (W_IDX_OUT_OF_BOUNDS, arrayIndex, arraySize);
+              werrorfl (tree->filename, tree->lineno, W_IDX_OUT_OF_BOUNDS, arrayIndex, arraySize);
             }
         }
 
@@ -2639,7 +2634,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if this is not a structure */
       if (!IS_STRUCT (LTYPE (tree)))
         {
-          werror (E_STRUCT_UNION, ".");
+          werrorfl (tree->filename, tree->lineno, E_STRUCT_UNION, ".");
           goto errorTreeReturn;
         }
       TTYPE (tree) = structElemType (LTYPE (tree),
@@ -2656,13 +2651,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if not pointer to a structure */
       if (!IS_PTR (LTYPE (tree)) && !IS_ARRAY (LTYPE(tree)))
         {
-          werror (E_PTR_REQD);
+          werrorfl (tree->filename, tree->lineno, E_PTR_REQD);
           goto errorTreeReturn;
         }
 
       if (!IS_STRUCT (LTYPE (tree)->next))
         {
-          werror (E_STRUCT_UNION, "->");
+          werrorfl (tree->filename, tree->lineno, E_STRUCT_UNION, "->");
           goto errorTreeReturn;
         }
 
@@ -2752,7 +2747,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         sym_link *ltc = (tree->right ? RTYPE (tree) : LTYPE (tree));
         COPYTYPE (TTYPE (tree), TETYPE (tree), ltc);
         if (!tree->initMode && IS_CONSTANT(TTYPE(tree)))
-          werror (E_CODE_WRITE, tree->opval.op==INC_OP ? "++" : "--");
+          werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, tree->opval.op==INC_OP ? "++" : "--");
 
         if (tree->right)
           RLVAL (tree) = 1;
@@ -2772,8 +2767,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
             {
-              werror (E_BITWISE_OP);
-              werror (W_CONTINUE, "left & right types are ");
+              werrorfl (tree->filename, tree->lineno, E_BITWISE_OP);
+              werrorfl (tree->filename, tree->lineno, W_CONTINUE, "left & right types are ");
               printTypeChain (LTYPE (tree), stderr);
               fprintf (stderr, ",");
               printTypeChain (RTYPE (tree), stderr);
@@ -2875,13 +2870,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if bit field then error */
       if (IS_BITVAR (tree->left->etype))
         {
-          werror (E_ILLEGAL_ADDR, "address of bit variable");
+          werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of bit variable");
           goto errorTreeReturn;
         }
 
       if (LETYPE(tree) && SPEC_SCLS (tree->left->etype) == S_REGISTER)
         {
-          werror (E_ILLEGAL_ADDR, "address of register variable");
+          werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of register variable");
           goto errorTreeReturn;
         }
 
@@ -2893,13 +2888,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       if (IS_LITERAL(LTYPE(tree)))
         {
-          werror (E_ILLEGAL_ADDR, "address of literal");
+          werrorfl (tree->filename, tree->lineno, E_ILLEGAL_ADDR, "address of literal");
           goto errorTreeReturn;
         }
 
      if (LRVAL (tree))
         {
-          werror (E_LVALUE_REQUIRED, "address of");
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "address of");
           goto errorTreeReturn;
         }
       if (!LETYPE (tree))
@@ -2998,8 +2993,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
     case '^':
       if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
         {
-          werror (E_BITWISE_OP);
-          werror (W_CONTINUE, "left & right types are ");
+          werrorfl (tree->filename, tree->lineno, E_BITWISE_OP);
+          werrorfl (tree->filename, tree->lineno, W_CONTINUE, "left & right types are ");
           printTypeChain (LTYPE (tree), stderr);
           fprintf (stderr, ",");
           printTypeChain (RTYPE (tree), stderr);
@@ -3064,7 +3059,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
     case '/':
       if (!IS_ARITHMETIC (LTYPE (tree)) || !IS_ARITHMETIC (RTYPE (tree)))
         {
-          werror (E_INVALID_OP, "divide");
+          werrorfl (tree->filename, tree->lineno, E_INVALID_OP, "divide");
           goto errorTreeReturn;
         }
       /* if they are both literal then */
@@ -3131,8 +3126,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
     case '%':
       if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (RTYPE (tree)))
         {
-          werror (E_BITWISE_OP);
-          werror (W_CONTINUE, "left & right types are ");
+          werrorfl (tree->filename, tree->lineno, E_BITWISE_OP);
+          werrorfl (tree->filename, tree->lineno, W_CONTINUE, "left & right types are ");
           printTypeChain (LTYPE (tree), stderr);
           fprintf (stderr, ",");
           printTypeChain (RTYPE (tree), stderr);
@@ -3168,13 +3163,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           if (!IS_PTR (LTYPE (tree)) && !IS_ARRAY (LTYPE (tree)))
             {
-              werror (E_PTR_REQD);
+              werrorfl (tree->filename, tree->lineno, E_PTR_REQD);
               goto errorTreeReturn;
             }
 
           if (LRVAL (tree))
             {
-              werror (E_LVALUE_REQUIRED, "pointer deref");
+              werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "pointer deref");
               goto errorTreeReturn;
             }
           if (IS_ADDRESS_OF_OP(tree->left))
@@ -3223,7 +3218,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
       if (!IS_ARITHMETIC (LTYPE (tree)) || !IS_ARITHMETIC (RTYPE (tree)))
         {
-          werror (E_INVALID_OP, "multiplication");
+          werrorfl (tree->filename, tree->lineno, E_INVALID_OP, "multiplication");
           goto errorTreeReturn;
         }
 
@@ -3287,7 +3282,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           if (!IS_ARITHMETIC (LTYPE (tree)))
             {
-              werror (E_UNARY_OP, '+');
+              werrorfl (tree->filename, tree->lineno, E_UNARY_OP, '+');
               goto errorTreeReturn;
             }
 
@@ -3315,21 +3310,21 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if ((IS_PTR (LTYPE (tree)) || IS_ARRAY (LTYPE (tree))) &&
           (IS_PTR (RTYPE (tree)) || IS_ARRAY (RTYPE (tree))))
         {
-          werror (E_PTR_PLUS_PTR);
+          werrorfl (tree->filename, tree->lineno, E_PTR_PLUS_PTR);
           goto errorTreeReturn;
         }
 
       if (!IS_ARITHMETIC (LTYPE (tree)) &&
           !IS_PTR (LTYPE (tree)) && !IS_ARRAY (LTYPE (tree)))
         {
-          werror (E_PLUS_INVALID, "+");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "+");
           goto errorTreeReturn;
         }
 
       if (!IS_ARITHMETIC (RTYPE (tree)) &&
           !IS_PTR (RTYPE (tree)) && !IS_ARRAY (RTYPE (tree)))
         {
-          werror (E_PLUS_INVALID, "+");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "+");
           goto errorTreeReturn;
         }
       /* if they are both literal then */
@@ -3430,7 +3425,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           if (!IS_ARITHMETIC (LTYPE (tree)))
             {
-              werror (E_UNARY_OP, tree->opval.op);
+              werrorfl (tree->filename, tree->lineno, E_UNARY_OP, tree->opval.op);
               goto errorTreeReturn;
             }
 
@@ -3462,7 +3457,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             IS_ARRAY (LTYPE (tree)) ||
             IS_ARITHMETIC (LTYPE (tree))))
         {
-          werror (E_PLUS_INVALID, "-");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "-");
           goto errorTreeReturn;
         }
 
@@ -3470,7 +3465,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             IS_ARRAY (RTYPE (tree)) ||
             IS_ARITHMETIC (RTYPE (tree))))
         {
-          werror (E_PLUS_INVALID, "-");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "-");
           goto errorTreeReturn;
         }
 
@@ -3478,7 +3473,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           !(IS_PTR (RTYPE (tree)) || IS_ARRAY (RTYPE (tree)) ||
             IS_INTEGRAL (RTYPE (tree))))
         {
-          werror (E_PLUS_INVALID, "-");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "-");
           goto errorTreeReturn;
         }
 
@@ -3591,7 +3586,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* can be only integral type */
       if (!IS_INTEGRAL (LTYPE (tree)))
         {
-          werror (E_UNARY_OP, tree->opval.op);
+          werrorfl (tree->filename, tree->lineno, E_UNARY_OP, tree->opval.op);
           goto errorTreeReturn;
         }
 
@@ -3613,7 +3608,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
              bit -> int -> ~int -> bit
              uchar -> int -> ~int -> bit
           */
-          werror(W_COMPLEMENT);
+          werrorfl (tree->filename, tree->lineno, W_COMPLEMENT);
 
           /* optimize bit-result, even if we optimize a buggy source */
           tree->type = EX_VALUE;
@@ -3635,7 +3630,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           !IS_PTR (LTYPE (tree)) &&
           !IS_ARRAY (LTYPE (tree)))
         {
-          werror (E_UNARY_OP, tree->opval.op);
+          werrorfl (tree->filename, tree->lineno, E_UNARY_OP, tree->opval.op);
           goto errorTreeReturn;
         }
 
@@ -3694,8 +3689,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
     case RIGHT_OP:
       if (!IS_INTEGRAL (LTYPE (tree)) || !IS_INTEGRAL (tree->left->etype))
         {
-          werror (E_SHIFT_OP_INVALID);
-          werror (W_CONTINUE, "left & right types are ");
+          werrorfl (tree->filename, tree->lineno, E_SHIFT_OP_INVALID);
+          werrorfl (tree->filename, tree->lineno, W_CONTINUE, "left & right types are ");
           printTypeChain (LTYPE (tree), stderr);
           fprintf (stderr, ",");
           printTypeChain (RTYPE (tree), stderr);
@@ -3765,8 +3760,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (tree->opval.op==LEFT_OP ||
               (tree->opval.op==RIGHT_OP && SPEC_USIGN(LETYPE(tree))))
             {
-              lineno=tree->lineno;
-              werror (W_SHIFT_CHANGED,
+              werrorfl (tree->filename, tree->lineno, W_SHIFT_CHANGED,
                       (tree->opval.op == LEFT_OP ? "left" : "right"));
               tree->type = EX_VALUE;
               tree->left = tree->right = NULL;
@@ -3786,7 +3780,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* cannot cast to an aggregate type */
       if (IS_AGGREGATE (LTYPE (tree)))
         {
-          werror (E_CAST_ILLEGAL);
+          werrorfl (tree->filename, tree->lineno, E_CAST_ILLEGAL);
           goto errorTreeReturn;
         }
 
@@ -3833,7 +3827,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               } else if (IS_GENPTR(LTYPE(tree)) && !IS_PTR(RTYPE(tree)) &&
                          ((int)floatFromVal(valFromType(RETYPE(tree)))) !=0 ) /* special case of NULL */  {
                       sym_link *rest = LTYPE(tree)->next;
-                      werror(W_LITERAL_GENERIC);
+                      werrorfl (tree->filename, tree->lineno, W_LITERAL_GENERIC);
                       TTYPE(tree) = newLink(DECLARATOR);
                       DCL_TYPE(TTYPE(tree)) = FPOINTER;
                       TTYPE(tree)->next = rest;
@@ -3854,7 +3848,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           IS_PTR(RTYPE(tree)) && IS_STRUCT(RTYPE(tree)->next) &&
           strcmp(SPEC_STRUCT(LETYPE(tree))->tag,SPEC_STRUCT(RETYPE(tree))->tag))
         {
-          werror(W_CAST_STRUCT_PTR,SPEC_STRUCT(RETYPE(tree))->tag,
+          werrorfl (tree->filename, tree->lineno, W_CAST_STRUCT_PTR,SPEC_STRUCT(RETYPE(tree))->tag,
                  SPEC_STRUCT(LETYPE(tree))->tag);
         }
 #endif
@@ -4008,7 +4002,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           !IS_ARRAY (LTYPE (tree)) &&
           !IS_INTEGRAL (LTYPE (tree)))
         {
-          werror (E_COMPARE_OP);
+          werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
           goto errorTreeReturn;
         }
 
@@ -4016,7 +4010,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           !IS_ARRAY (RTYPE (tree)) &&
           !IS_INTEGRAL (RTYPE (tree)))
         {
-          werror (E_COMPARE_OP);
+          werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
           goto errorTreeReturn;
         }
       /* if they are both literal then */
@@ -4066,7 +4060,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           }
           if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
             {
-              werror (E_COMPARE_OP);
+              werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
               fprintf (stderr, "comparing type ");
               printTypeChain (LTYPE (tree), stderr);
               fprintf (stderr, "to type ");
@@ -4083,7 +4077,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
             if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
               {
-                werror (E_COMPARE_OP);
+                werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
                 fprintf (stderr, "comparing type ");
                 printTypeChain (LTYPE (tree), stderr);
                 fprintf (stderr, "to type ");
@@ -4110,7 +4104,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               case CCR_ALWAYS_TRUE:
               case CCR_ALWAYS_FALSE:
                 if (!options.lessPedantic)
-                  werror (W_COMP_RANGE,
+                  werrorfl (tree->filename, tree->lineno, W_COMP_RANGE,
                           ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
                 return decorateType (newAst_VALUE (constVal (
                                    ccr_result == CCR_ALWAYS_TRUE ? "1" : "0")),
@@ -4197,7 +4191,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             }
           else
             {
-              werror (W_CMP_SU_CHAR);
+              werrorfl (tree->filename, tree->lineno, W_CMP_SU_CHAR);
               tree->left  = addCast (tree->left , RESULT_TYPE_INT, TRUE);
               tree->right = addCast (tree->right, RESULT_TYPE_INT, TRUE);
             }
@@ -4378,7 +4372,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) &&
           (compareType (RTYPE (tree), LTYPE (tree)) == 0))
         {
-          werror (E_TYPE_MISMATCH, "conditional operator", " ");
+          werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "conditional operator", " ");
           goto errorTreeReturn;
         }
 
@@ -4399,18 +4393,18 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (!IS_ARITHMETIC (LTYPE (tree)) ||
           !IS_ARITHMETIC (RTYPE (tree)))
         {
-          werror (E_OPS_INTEGRAL);
+          werrorfl (tree->filename, tree->lineno, E_OPS_INTEGRAL);
           goto errorTreeReturn;
         }
       RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
 
       if (!tree->initMode && IS_CONSTANT (LTYPE (tree)))
-        werror (E_CODE_WRITE, tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
+        werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
 
       if (LRVAL (tree))
         {
-          werror (E_LVALUE_REQUIRED, tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, tree->opval.op==MUL_ASSIGN ? "*=" : "/=");
           goto errorTreeReturn;
         }
       LLVAL (tree) = 1;
@@ -4426,18 +4420,18 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (!IS_INTEGRAL (LTYPE (tree)) ||
           !IS_INTEGRAL (RTYPE (tree)))
         {
-          werror (E_OPS_INTEGRAL);
+          werrorfl (tree->filename, tree->lineno, E_OPS_INTEGRAL);
           goto errorTreeReturn;
         }
       RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
 
       if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-        werror (E_CODE_WRITE, "&= or |= or ^= or >>= or <<=");
+        werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, "&= or |= or ^= or >>= or <<=");
 
       if (LRVAL (tree))
         {
-          werror (E_LVALUE_REQUIRED, "&= or |= or ^= or >>= or <<=");
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "&= or |= or ^= or >>= or <<=");
           goto errorTreeReturn;
         }
       LLVAL (tree) = 1;
@@ -4452,14 +4446,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (!(IS_PTR (LTYPE (tree)) ||
             IS_ARITHMETIC (LTYPE (tree))))
         {
-          werror (E_PLUS_INVALID, "-=");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "-=");
           goto errorTreeReturn;
         }
 
       if (!(IS_PTR (RTYPE (tree)) ||
             IS_ARITHMETIC (RTYPE (tree))))
         {
-          werror (E_PLUS_INVALID, "-=");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "-=");
           goto errorTreeReturn;
         }
       RRVAL (tree) = 1;
@@ -4470,11 +4464,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                             tree->opval.op));
 
       if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-        werror (E_CODE_WRITE, "-=");
+        werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, "-=");
 
       if (LRVAL (tree))
         {
-          werror (E_LVALUE_REQUIRED, "-=");
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "-=");
           goto errorTreeReturn;
         }
       LLVAL (tree) = 1;
@@ -4490,19 +4484,19 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if both pointers then problem */
       if (IS_PTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)))
         {
-          werror (E_PTR_PLUS_PTR);
+          werrorfl (tree->filename, tree->lineno, E_PTR_PLUS_PTR);
           goto errorTreeReturn;
         }
 
       if (!IS_ARITHMETIC (LTYPE (tree)) && !IS_PTR (LTYPE (tree)))
         {
-          werror (E_PLUS_INVALID, "+=");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "+=");
           goto errorTreeReturn;
         }
 
       if (!IS_ARITHMETIC (RTYPE (tree)) && !IS_PTR (RTYPE (tree)))
         {
-          werror (E_PLUS_INVALID, "+=");
+          werrorfl (tree->filename, tree->lineno, E_PLUS_INVALID, "+=");
           goto errorTreeReturn;
         }
       RRVAL (tree) = 1;
@@ -4513,11 +4507,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                             tree->opval.op));
 
       if (!tree->initMode && IS_CONSTANT (LETYPE (tree)))
-        werror (E_CODE_WRITE, "+=");
+        werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, "+=");
 
       if (LRVAL (tree))
         {
-          werror (E_LVALUE_REQUIRED, "+=");
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "+=");
           goto errorTreeReturn;
         }
 
@@ -4535,14 +4529,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* cannot be an aggregate */
       if (IS_AGGREGATE (LTYPE (tree)))
         {
-          werror (E_AGGR_ASSIGN);
+          werrorfl (tree->filename, tree->lineno, E_AGGR_ASSIGN);
           goto errorTreeReturn;
         }
 
       /* they should either match or be castable */
       if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
         {
-          werror (E_TYPE_MISMATCH, "assignment", " ");
+          werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "assignment", " ");
           printFromToType(RTYPE(tree),LTYPE(tree));
         }
 
@@ -4550,7 +4544,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
          then report error */
       if (IS_VOID (LTYPE (tree)))
         {
-          werror (E_CAST_ZERO);
+          werrorfl (tree->filename, tree->lineno, E_CAST_ZERO);
           printFromToType(RTYPE(tree), LTYPE(tree));
         }
 
@@ -4560,11 +4554,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       LLVAL (tree) = 1;
       if (!tree->initMode ) {
         if (IS_CONSTANT(LTYPE(tree)))
-          werror (E_CODE_WRITE, "=");
+          werrorfl (tree->filename, tree->lineno, E_CODE_WRITE, "=");
       }
       if (LRVAL (tree))
         {
-          werror (E_LVALUE_REQUIRED, "=");
+          werrorfl (tree->filename, tree->lineno, E_LVALUE_REQUIRED, "=");
           goto errorTreeReturn;
         }
 
@@ -4671,7 +4665,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       if (!IS_VOID (currFunc->type->next) && tree->right == NULL)
         {
-          werror (W_VOID_FUNC, currFunc->name);
+          werrorfl (tree->filename, tree->lineno, W_VOID_FUNC, currFunc->name);
           goto errorTreeReturn;
         }
 
@@ -4737,7 +4731,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                                           tree->left), RESULT_TYPE_NONE);
       }
     case PARAM:
-      werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
+      werrorfl (tree->filename, tree->lineno, E_INTERNAL_ERROR, __FILE__, __LINE__,
               "node PARAM shouldn't be processed here");
               /* but in processParams() */
       return tree;
@@ -5921,7 +5915,7 @@ createFunction (symbol * name, ast * body)
       addSymChain (&name);
       allocVariables (name);
     }
-  name->lastLine = lineno;
+  name->lastLine = lexLineno;
   currFunc = name;
 
   /* set the stack pointer */

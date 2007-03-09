@@ -50,6 +50,10 @@ extern char *filename;
 extern int lineno;
 int column = 0;         /* current column */
 
+/* global definitions */
+char *lexFilename;
+int lexLineno = 1;
+
 /* local definitions */
 static struct dbuf_s asmbuff; /* reusable _asm buffer */
 
@@ -303,7 +307,7 @@ static int checkCurrFile (const char *s)
   s = tptr;
 
   /* adjust the line number */
-  lineno = lNum;
+  lineno = lexLineno = lNum;
 
   /* now see if we have a file name */
   while (*s != '"' && *s)
@@ -323,20 +327,22 @@ static int checkCurrFile (const char *s)
   if (fullSrcFileName &&
     strncmp(s, fullSrcFileName, strlen(fullSrcFileName)) == 0 && fullSrcFileName[strlen(fullSrcFileName) - 1] == '"')
     {
-      filename = fullSrcFileName;
+      lexFilename = fullSrcFileName;
     }
   else
     {
       const char *sb = s;
 
-      /* find the end of the filename */
+      /* find the end of the file name */
       while (*s && *s != '"')
         ++s;
 
-      filename = Safe_malloc(s - sb + 1);
-      memcpy(filename, sb, s - sb);
-      filename[s - sb] = '\0';
+      lexFilename = Safe_malloc(s - sb + 1);
+      memcpy(lexFilename, sb, s - sb);
+      lexFilename[s - sb] = '\0';
     }
+  filename = lexFilename;
+
   return 0;
 }
 
@@ -346,7 +352,7 @@ static void count_char(int ch)
     {
     case '\n':
       column = 0;
-      ++lineno;
+      lineno = ++lexLineno;
       break;
 
     case '\t':
@@ -1121,10 +1127,10 @@ int yyerror(char *s)
 
   if(options.vc_err_style)
     fprintf(stderr, "\n%s(%d) : %s: token -> '%s' ; column %d\n",
-      filename, lineno, s, yytext, column);
+      lexFilename, lexLineno, s, yytext, column);
   else
     fprintf(stderr, "\n%s:%d: %s: token -> '%s' ; column %d\n",
-      filename, lineno, s ,yytext, column);
+      lexFilename, lexLineno, s ,yytext, column);
   fatalError++;
 
   return 0;

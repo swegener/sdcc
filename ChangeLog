@@ -1,3 +1,10 @@
+2007-03-10 Borut Razem <borut.razem AT siol.net>
+
+	* src/SDCC.lex, src/SDCCutil.[ch], src/SDCCval:
+	  fixed RFE #1624219: double backslashes in filenames;
+	  functions hexEscape(), octalEscape() and copyStr() moved from
+	  SDCCval.c to SDCCutil.c and made them glovbally available
+
 2007-03-09 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.lex, src/SDCCast.c. src/SDCCglobl.c, src/SDCCsymt.c,

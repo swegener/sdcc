@@ -332,14 +332,18 @@ static int checkCurrFile (const char *s)
   else
     {
       const char *sb = s;
+      char *tmpFname;
 
       /* find the end of the file name */
       while (*s && *s != '"')
         ++s;
 
+      tmpFname = Safe_malloc(s - sb + 1);
+      memcpy(tmpFname, sb, s - sb);
+      tmpFname[s - sb] = '\0';
+
       lexFilename = Safe_malloc(s - sb + 1);
-      memcpy(lexFilename, sb, s - sb);
-      lexFilename[s - sb] = '\0';
+      copyStr(lexFilename, tmpFname);
     }
   filename = lexFilename;
 

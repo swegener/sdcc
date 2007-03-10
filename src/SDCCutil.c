@@ -383,7 +383,6 @@ char *strncatz(char *dest, const char *src, size_t n)
     return dest;
 }
 
-
 /*-----------------------------------------------------------------*/
 /* getBuildNumber - return build number                            */
 /*-----------------------------------------------------------------*/
@@ -481,4 +480,161 @@ void
 free_pragma_token(struct pragma_token_s *token)
 {
   dbuf_destroy(&token->dbuf);
+}
+
+/*! /fn char hexEscape(char **src)
+
+    /param src Pointer to 'x' from start of hex character value
+*/
+
+unsigned char
+hexEscape (const char **src)
+{
+  char *s ;
+  unsigned long value ;
+
+  (*src)++ ;    /* Skip over the 'x' */
+
+  value = strtol (*src, &s, 16);
+
+  if (s == *src)
+    {
+      // no valid hex found
+      werror(E_INVALID_HEX);
+    }
+  else
+    {
+      if (value > 255)
+        {
+          werror(W_ESC_SEQ_OOR_FOR_CHAR);
+        }
+    }
+  *src = s;
+
+  return (char) value;
+}
+
+/*------------------------------------------------------------------*/
+/* octalEscape - process an octal constant of max three digits      */
+/* return the octal value, throw a warning for illegal octal        */
+/* adjust src to point at the last proccesed char                   */
+/*------------------------------------------------------------------*/
+
+unsigned char
+octalEscape (const char **str)
+{
+  int digits;
+  unsigned value=0;
+
+  for (digits = 0; digits < 3; digits++)
+    {
+      if (**str >='0' && **str <= '7')
+        {
+          value = value*8 + (**str - '0');
+          (*str)++;
+        }
+      else
+        {
+          break;
+        }
+    }
+  if (digits)
+    {
+      if (value > 255 /* || (**str>='0' && **str<='7') */ )
+        {
+          werror (W_ESC_SEQ_OOR_FOR_CHAR);
+        }
+    }
+  return value;
+}
+
+/*!
+  /fn int copyStr (char *dest, char *src)
+
+  Copies a source string to a dest buffer interpreting escape sequences
+  and special characters
+
+  /param dest Buffer to receive the resultant string
+  /param src  Buffer containing the source string with escape sequecnes
+  /return Number of characters in output string
+
+*/
+
+int
+copyStr (char *dest, const char *src)
+{
+  char *OriginalDest = dest ;
+
+  while (*src)
+    {
+      if (*src == '\"')
+        src++;
+      else if (*src == '\\')
+        {
+          src++;
+          switch (*src)
+            {
+            case 'n':
+              *dest++ = '\n';
+              break;
+            case 't':
+              *dest++ = '\t';
+              break;
+            case 'v':
+              *dest++ = '\v';
+              break;
+            case 'b':
+              *dest++ = '\b';
+              break;
+            case 'r':
+              *dest++ = '\r';
+              break;
+            case 'f':
+              *dest++ = '\f';
+              break;
+            case 'a':
+              *dest++ = '\a';
+              break;
+
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+              *dest++ = octalEscape(&src);
+              src-- ;
+              break;
+
+            case 'x':
+              *dest++ = hexEscape(&src) ;
+              src-- ;
+              break ;
+
+            case '\\':
+              *dest++ = '\\';
+              break;
+            case '\?':
+              *dest++ = '\?';
+              break;
+            case '\'':
+              *dest++ = '\'';
+              break;
+            case '\"':
+              *dest++ = '\"';
+              break;
+            default:
+              *dest++ = *src;
+            }
+          src++;
+        }
+      else
+        *dest++ = *src++;
+    }
+
+  *dest++ = '\0';
+
+  return dest - OriginalDest ;
 }

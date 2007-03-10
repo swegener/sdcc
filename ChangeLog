@@ -1,3 +1,7 @@
+2007-03-10 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/ADuC84x.h: Added.
+
 2007-03-10 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.lex, src/SDCCutil.[ch], src/SDCCval:

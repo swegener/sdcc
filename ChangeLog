@@ -1,3 +1,8 @@
+2007-03-11 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/printf_large.c: pointer was converted to generic
+	pointer for mcs51 models other than model-small (Maarten noticed)
+
 2007-03-10 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/ADuC84x.h: Added.

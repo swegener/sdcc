@@ -44,8 +44,10 @@
 
 #if defined (SDCC_mcs51) && defined (SDCC_MODEL_SMALL) && !defined (SDCC_STACK_AUTO)
 # define MEM_SPACE_BUF __idata
+# define MEM_SPACE_BUF_PP __idata
 #else
 # define MEM_SPACE_BUF
+# define MEM_SPACE_BUF_PP _AUTOMEM
 #endif
 
 /****************************************************************************/
@@ -666,7 +668,7 @@ get_conversion_spec:
         // Apparently we have to output an integral type
         // with radix "radix"
         unsigned char MEM_SPACE_BUF store[6];
-        unsigned char MEM_SPACE_BUF *pstore = &store[5];
+        unsigned char MEM_SPACE_BUF_PP *pstore = &store[5];
 
         // store value in byte[0] (LSB) ... byte[3] (MSB)
         if (char_argument)

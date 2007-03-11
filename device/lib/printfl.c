@@ -48,12 +48,12 @@
 #include <8051.h>
 #endif
 
-static data char radix ;
+static __data char radix ;
 static bit  long_flag = 0;
 static bit  string_flag =0;
 static bit  char_flag = 0;
-static char * data str ;
-static data long val;
+static char * __data str ;
+static __data long val;
 
 /* This great loop fails with the ds390 port (2003-01-13).
 
@@ -67,7 +67,7 @@ static data long val;
 */
 
 #if NICE_LIFO_IMPLEMENTATION_BUT_NOT_PORTABLE
-static data volatile char ch;
+static __data volatile char ch;
 static bit sign;
 
 static void pval(void)
@@ -177,12 +177,16 @@ void printf_small (char * fmt, ... ) reentrant
 #else
             if (radix)
             {
-              static char data buffer[12], c;
+              static char __idata buffer[12]; /* 37777777777(oct) */
+              char __idata * stri;
 
               _ltoa (val, buffer, radix);
-              str = buffer;
-              while ((c = *str++) != '\0')
-                putchar (c);
+              stri = buffer;
+              while (*stri)
+                {
+                  putchar (*stri);
+                  stri++;
+                }
             }
 #endif
             else

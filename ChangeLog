@@ -1,5 +1,6 @@
 2007-03-11 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
+	* device/lib/printfl.c: 13 bytes less __data mem (12 more __idata)
 	* device/lib/printf_large.c: pointer was converted to generic
 	pointer for mcs51 models other than model-small (Maarten noticed)
 

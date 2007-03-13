@@ -23,6 +23,7 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
+LDFLAGS         = @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
@@ -118,7 +119,7 @@ include $(srcdir)/clean.mk
 avr.src: savr$(EXEEXT) shared_lib
 
 savr$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/savr.so
@@ -129,7 +130,7 @@ shared_lib:
 endif
 
 $(top_builddir)/savr.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(OBJECTS_SHARED) -o $(top_builddir)/savr.so
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/savr.so
 
 otherlibs:
 	$(MAKE) -C $(top_builddir)/cmd.src all

@@ -19,6 +19,7 @@ LIBS		= -lm @LIBS@
 
 #CFLAGS          += -Werror
 CPPFLAGS	+= -I$(srcdir)
+LDFLAGS		= @LDFLAGS@
 
 ifdef SDCC_SUB_VERSION
 CFLAGS		+= -DSDCC_SUB_VERSION_STR=\"$(SDCC_SUB_VERSION)\"

@@ -25,6 +25,7 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
+LDFLAGS         = @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 
 LIBS		= @LIBS@ -L$(top_builddir) -lsim -lutil -lguiucsim -lcmd -lsim
@@ -105,7 +106,7 @@ include $(srcdir)/clean.mk
 xa.src: sxa$(EXEEXT)
 
 sxa$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 otherlibs:
 	$(MAKE) -C $(top_builddir)/cmd.src all

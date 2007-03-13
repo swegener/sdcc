@@ -23,6 +23,7 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
+LDFLAGS         = @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
@@ -123,7 +124,7 @@ include $(srcdir)/clean.mk
 s51.src: s51$(EXEEXT) shared_lib
 
 s51$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/s51.so
@@ -134,7 +135,7 @@ shared_lib:
 endif
 
 $(top_builddir)/s51.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(OBJECTS_SHARED) -o $@
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs:
 	$(MAKE) -C $(top_builddir) libs

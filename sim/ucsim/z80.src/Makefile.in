@@ -23,6 +23,7 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/gui.src
 CFLAGS          = @CFLAGS@ -Wall
 CXXFLAGS        = @CXXFLAGS@ -Wall
+LDFLAGS         = @LDFLAGS@
 M_OR_MM         = @M_OR_MM@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
@@ -121,7 +122,7 @@ include $(srcdir)/clean.mk
 z80.src: sz80$(EXEEXT) shared_lib
 
 sz80$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/sz80.so
@@ -132,7 +133,7 @@ shared_lib:
 endif
 
 $(top_builddir)/sz80.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(OBJECTS_SHARED) -o $(top_builddir)/sz80.so
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/sz80.so
 
 otherlibs:
 	$(MAKE) -C $(top_builddir)/cmd.src all

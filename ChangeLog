@@ -1,3 +1,10 @@
+2007-03-13 Borut Razem <borut.razem AT siol.net>
+
+	* src/Makefile.in, sim/ucsim/avr.src/Makefile.in, 
+	  sim/ucsim/hc08.src/Makefile.in, sim/ucsim/s51.src/Makefile.in,
+	  sim/ucsim/xa.src/Makefile.in, sim/ucsim/z80.src/Makefile.in:
+	  introduced LDFLAGS
+
 2007-03-11 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/printfl.c: 13 bytes less __data mem (12 more __idata)

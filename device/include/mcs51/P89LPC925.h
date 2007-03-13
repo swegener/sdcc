@@ -270,6 +270,8 @@ SFR(P0, 0x80); // Port 0
    SBIT(KB0, 0x80, 0);
 
 SFR(P1, 0x90); // Port 1
+   SBIT(P1_7, 0x90, 7);
+   SBIT(P1_6, 0x90, 6);
    SBIT(P1_5, 0x90, 5);
    SBIT(P1_4, 0x90, 4);
    SBIT(P1_3, 0x90, 3);

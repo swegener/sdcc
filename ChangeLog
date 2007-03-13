@@ -1,3 +1,7 @@
+2007-03-13 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/P89LPC925.h: Added missing P1_6 and P1_7.
+
 2007-03-13 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/_strlen.c: assembler version for mcs51

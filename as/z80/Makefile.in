@@ -23,7 +23,7 @@ CFLAGS	+= $(CPPFLAGS) $(OPTS) -I. -DINDEXLIB -DMLH_MAP -DUNIX -DSDK
 CFLAGS	+= -funsigned-char
 CFLAGS	+= -I$(SLIB)
 
-LDFLAGS += -lm $(EXTRALIBS)
+LDFLAGS = @LDFLAGS@ -lm $(EXTRALIBS)
 
 all:	dep $(BINS)
 

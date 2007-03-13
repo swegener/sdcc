@@ -17,7 +17,8 @@
 
 	* src/Makefile.in, sim/ucsim/avr.src/Makefile.in, 
 	  sim/ucsim/hc08.src/Makefile.in, sim/ucsim/s51.src/Makefile.in,
-	  sim/ucsim/xa.src/Makefile.in, sim/ucsim/z80.src/Makefile.in:
+	  sim/ucsim/xa.src/Makefile.in, sim/ucsim/z80.src/Makefile.in,
+	  as/link/z80/Makefile.in, as/z80/Makefile.in:
 	  introduced LDFLAGS
 
 2007-03-11 Frieder Ferlemann <Frieder.Ferlemann AT web.de>

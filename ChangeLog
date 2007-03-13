@@ -1,3 +1,7 @@
+2007-03-13 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/_strlen.c: assembler version for mcs51
+
 2007-03-13 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic18f2221.h,

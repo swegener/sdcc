@@ -150,7 +150,7 @@ while (<>) {
     
     if (/IFNDEF _*(18.*[0-9]+)/i) {
 	$processor = lc($1);
-	LOG "Found processor: $processor.\n";
+	#LOG "Found processor: $processor.\n";
 	setup($processor);
 	next;
     }
@@ -200,7 +200,7 @@ while (<>) {
 	my $addr = oct("0x" . $2);
 	#LOG sprintf("Found device ID $1 at 0x%X.\n", $addr);
 	if ($state != 6) {
-	    print "\n// device IDs\n";
+	    #print "\n// device IDs\n";
 	    $state = 6;
 	}
 	DEFINE ($1, sprintf ("0x%X", $addr));
@@ -211,7 +211,7 @@ while (<>) {
 	my $addr = oct("0x" . $2);
 	#LOG sprintf("Found ID location: $1 at 0x%X.\n", $addr);
 	if ($state != 5) {
-	    print "\n// ID locations\n";
+	    #print "\n// ID locations\n";
 	    $state = 5;
 	}
 	DEFINE ($1, sprintf ("0x%X", $addr));
@@ -221,7 +221,7 @@ while (<>) {
     # extract configuration bits
     if (/Configuration Bits/i) {
 	$state = 3;
-	printf "\n\n// Configuration Bits\n";
+	#print "\n\n// Configuration Bits\n";
 	header "\n\n// Configuration Bits\n";
 	next;
     }
@@ -229,6 +229,9 @@ while (<>) {
     if ($state == 3 and /(_\w+) EQU H'([0-9a-f]+)/i) {
 	$name = $1;
 	my $addr = oct("0x" . $2);
+	# convert to double underscore form for SDCC internal consistency
+	$name =~ s/^_//g;
+	$name = "__".$name;
 	#LOG sprintf("Found config word $1 at 0x%X.\n", $addr);
 	DEFINE ($name, sprintf ("0x%X", $addr));
 	next;
@@ -237,7 +240,7 @@ while (<>) {
     if (($state == 3 or $state == 4) and /;--+ ((\w+) Options) --/i) {
 	$name = uc($2);
 	$state = 4;
-	print "\n// $1\n";
+	#print "\n// $1\n";
 	header "\n// $1\n";
 	next;
     }
@@ -269,7 +272,7 @@ while (<>) {
 	);
 	next;
     } elsif ($state == 2 and /(\w+) EQU ([0-9]+)/i) {
-	print "@@@@ FOUND $1 $2 for $name\n";
+	#print "@@@@ FOUND $1 $2 for $name\n";
 	my $bit = 0+$2;
 	#LOG "Found bit declaration: $1 as bit $bit in reg $name.\n";
 	push @{$sfrs->{"$name"}->{"bit$bit"}}, $1;
@@ -281,7 +284,7 @@ while (<>) {
     }
 
     # unknown/unhandled line
-    print "// $_\n";
+    #print "// $_\n";
 }
 
 header "\n";
@@ -301,7 +304,7 @@ foreach my $idx (sort keys %$namelut) {
 	header sprintf ("extern __sfr __at (0x%03X) %s;\n", $idx, $reg);
 	library sprintf (      "__sfr __at (0x%03X) %s;\n", $idx, $reg);
 
-	print sprintf ("$reg @ %X (<= %d bit names)\n", $sfrs->{"$reg"}->{"addr"}, $names);
+	#print sprintf ("$reg @ %X (<= %d bit names)\n", $sfrs->{"$reg"}->{"addr"}, $names);
 	if ($names > 0) {
 	    header sprintf ("typedef union {\n");
 

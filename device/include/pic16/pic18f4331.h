@@ -14,18 +14,18 @@
 
 
 // Configuration Bits
-#define	_CONFIG1H           	0x300001
-#define	_CONFIG2L           	0x300002
-#define	_CONFIG2H           	0x300003
-#define	_CONFIG3L           	0x300004
-#define	_CONFIG3H           	0x300005
-#define	_CONFIG4L           	0x300006
-#define	_CONFIG5L           	0x300008
-#define	_CONFIG5H           	0x300009
-#define	_CONFIG6L           	0x30000A
-#define	_CONFIG6H           	0x30000B
-#define	_CONFIG7L           	0x30000C
-#define	_CONFIG7H           	0x30000D
+#define	__CONFIG1H           	0x300001
+#define	__CONFIG2L           	0x300002
+#define	__CONFIG2H           	0x300003
+#define	__CONFIG3L           	0x300004
+#define	__CONFIG3H           	0x300005
+#define	__CONFIG4L           	0x300006
+#define	__CONFIG5L           	0x300008
+#define	__CONFIG5H           	0x300009
+#define	__CONFIG6L           	0x30000A
+#define	__CONFIG6H           	0x30000B
+#define	__CONFIG7L           	0x30000C
+#define	__CONFIG7H           	0x30000D
 
 // CONFIG1H Options
 #define	_OSC_LP_1H          	0xF0	 // LP

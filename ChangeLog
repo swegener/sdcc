@@ -1,3 +1,14 @@
+2007-03-13 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic16/pic18f2221.h,
+	* device/include/pic16/pic18f2321.h,
+	* device/include/pic16/pic18f2331.h,
+	* device/include/pic16/pic18f4221.h,
+	* device/include/pic16/pic18f4321.h,
+	* device/include/pic16/pic18f4331.h: fixed config byte location names
+	* support/scripts/inc2h-pic16.pl: removed debug output, emit
+	  consistently named config byte locations
+
 2007-03-13 Borut Razem <borut.razem AT siol.net>
 
 	* src/Makefile.in, sim/ucsim/avr.src/Makefile.in, 

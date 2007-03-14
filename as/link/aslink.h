@@ -94,6 +94,12 @@
  #endif
 #endif
 
+#ifdef SDK
+    #define LKOBJEXT "o"
+#else /* SDK */
+    #define LKOBJEXT "rel"
+#endif /* SDK */
+
 /*
  * This file defines the format of the
  * relocatable binary file.

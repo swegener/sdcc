@@ -59,9 +59,8 @@
  */
 
 VOID
-syminit()
+syminit(void)
 {
-    //	register int h;
 	struct sym **spp;
 
 	spp = &symhash[0];
@@ -128,7 +127,7 @@ syminit()
  *
  */
 struct sym *
-newsym()
+newsym(void)
 {
   register unsigned i ;
   register unsigned nglob ;
@@ -150,7 +149,7 @@ newsym()
 	if (c == 'D') {
 		i = eval();
 		if (tsp->s_type & S_DEF && tsp->s_addr != i) {
-			fprintf(stderr, "Multiple definition of %8s\n", id);
+			fprintf(stderr, "Multiple definition of %s\n", id);
 			lkerr++;
 		}
 		tsp->s_type |= S_DEF;
@@ -160,7 +159,7 @@ newsym()
 		tsp->s_addr = i;
 		tsp->s_axp = axp;
 	} else {
-		fprintf(stderr, "Invalid symbol type %c for %8s\n", c, id);
+		fprintf(stderr, "Invalid symbol type %c for %s\n", c, id);
 		lkexit(1);
 	}
 	/*
@@ -180,6 +179,8 @@ newsym()
 	}
 	fprintf(stderr, "Header symbol list overflow\n");
 	lkexit(1);
+
+	/* Never reached */
 	return(0);
 }
 
@@ -215,8 +216,7 @@ newsym()
  */
 
 struct sym *
-lkpsym(id, f)
-char *id;
+lkpsym(char *id, int f)
 {
 	register struct sym *sp;
 	register int h;
@@ -259,8 +259,7 @@ char *id;
  */
 
 Addr_T
-symval(tsp)
-register struct sym *tsp;
+symval(register struct sym *tsp)
 {
 	register Addr_T val;
 
@@ -299,8 +298,7 @@ register struct sym *tsp;
  */
 
 VOID
-symdef(fp)
-FILE *fp;
+symdef(FILE *fp)
 {
 	register struct sym *sp;
 	register int i;
@@ -348,25 +346,23 @@ FILE *fp;
  */
 
 VOID
-symmod(fp, tsp)
-FILE *fp;
-struct sym *tsp;
+symmod(FILE *fp, struct sym *tsp)
 {
 	register int i;
 	struct sym **p;
 
 	if ((hp = headp) != NULL) {
-	    while(hp) {
-		p = hp->s_list;
-		for (i=0; i<hp->h_nglob; ++i) {
-		    if (p[i] == tsp) {
-			fprintf(fp, "\n?ASlink-Warning-Undefined Global '%s' ", tsp->s_id);
-			fprintf(fp, "referenced by module '%s'\n", hp->m_id);
-			lkerr++;
-		    }
+		while(hp) {
+			p = hp->s_list;
+			for (i=0; i<hp->h_nglob; ++i) {
+				if (p[i] == tsp) {
+					fprintf(fp, "\n?ASlink-Warning-Undefined Global '%s' ", tsp->s_id);
+					fprintf(fp, "referenced by module '%s'\n", hp->m_id);
+					lkerr++;
+				}
+			}
+			hp = hp->h_hp;
 		}
-	    hp = hp->h_hp;
-	    }
 	}
 }
 
@@ -394,13 +390,12 @@ struct sym *tsp;
  */
 
 int
-symeq(p1, p2)
-register char *p1, *p2;
+symeq(register char *p1, register char *p2)
 {
 #if	CASE_SENSITIVE
-		return (strcmp( p1, p2 ) == 0);
+		return (strncmp( p1, p2, NCPS ) == 0);
 #else
-		return (as_strcmpi( p1, p2 ) == 0);
+		return (as_strncmpi( p1, p2, NCPS ) == 0);
 #endif
 }
 
@@ -428,21 +423,21 @@ register char *p1, *p2;
  */
  
 int
-hash(p)
-register char *p;
+hash(register char *p)
 {
-	register int h;
+	register int h, n;
 
 	h = 0;
-	while (*p) {
+	n = NCPS;
+	while (*p && n--) {
 
 #if	CASE_SENSITIVE
 		h += *p++;
 #else
-		h += ccase[*p++];
+		h += ccase[(unsigned char)(*p++)];
 #endif
 
-	};
+	}
 	return (h&HMASK);
 }
 
@@ -471,8 +466,7 @@ register char *p;
  */
 
 VOID *
-new(n)
-unsigned int n;
+new(unsigned int n)
 {
 	register char *p;
 

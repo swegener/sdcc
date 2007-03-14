@@ -302,6 +302,7 @@ term()
 			return(symval(sp));
 		}
 	}
+	/* Shouldn't get here. */
 	return(0);
 }
 

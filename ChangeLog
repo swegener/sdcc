@@ -1,3 +1,34 @@
+2007-03-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/link/aslink.h: added LKOBJEXT
+	* as/link/hc08/link_hc08.dsp,
+	* as/link/hc08/Makefile.bcc,
+	* as/link/hc08/Makefile.in,
+	* as/link/mcs51/aslink.dsp,
+	* as/link/mcs51/Makefile.bcc,
+	* as/link/mcs51/Makefile.in: moved lkamof51.c and lkdata.c
+	* as/link/hc08/lkaomf51.c,      as/link/mcs51/lkaomf51.c,
+	* as/link/lkaomf51.c: merged and moved
+	* as/link/hc08/lkdata.c,        as/link/mcs51/lkdata.c,
+	* as/link/z80/lkdata.c,
+	* as/link/lkdata.c: merged and moved
+	* as/link/hc08/lkmain.c,
+	* as/link/mcs51/lkmain.c: cosmetic changes
+	* as/link/z80/lkeval.c,         as/link/lkeval.c: merged
+	* as/link/lklex.c: use LKOBJEXT
+	* as/link/z80/lklist.c,         as/link/lklist.c: merged,
+	  ANSI-fied functions, removed bubble-sorts
+	* as/link/z80/lksym.c           as/link/lksym.c: merged,
+	  ANSI-fied functions
+	* as/link/z80/linkgbz80.dsp,
+	* as/link/z80/linkz80.dsp,
+	* as/link/z80/Makefile.in: added lkaomf51.c and lknoice.c,
+	  moved lkdata.c, lkeval.c, lkhead.c, lklex.x, lklist.c, lksym.c
+	* as/link/z80/lkhead.c,
+	* as/link/z80/lklex.c: deleted
+	* as/link/z80/lklibr.c: moved LKOBJEXT to aslink.h
+	* as/link/z80/lkmain.c: added copyfile()
+
 2007-03-13 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/P89LPC925.h: Added missing P1_6 and P1_7.
@@ -19,7 +50,7 @@
 
 2007-03-13 Borut Razem <borut.razem AT siol.net>
 
-	* src/Makefile.in, sim/ucsim/avr.src/Makefile.in, 
+	* src/Makefile.in, sim/ucsim/avr.src/Makefile.in,
 	  sim/ucsim/hc08.src/Makefile.in, sim/ucsim/s51.src/Makefile.in,
 	  sim/ucsim/xa.src/Makefile.in, sim/ucsim/z80.src/Makefile.in,
 	  as/link/z80/Makefile.in, as/z80/Makefile.in:

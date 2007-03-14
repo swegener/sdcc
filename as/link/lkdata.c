@@ -63,6 +63,8 @@ int     aflag;          /*      Overlapping area warning flag
                          */
 int     jflag;          /*      NoICE output flag
                          */
+int     symflag;        /*      no$gmb .sym output flag
+                         */
 int     xflag;          /*      Map file radix type flag
                          */
 int     pflag;          /*      print linker command file flag

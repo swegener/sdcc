@@ -10,7 +10,7 @@
  *
  * 31-Oct-97 JLH:
  *           - add jflag and jfp to control NoICE output file genration
- *  3-Nov-97 JLH: 
+ *  3-Nov-97 JLH:
  *           - use a_type == 0 as "virgin area" flag: set == 1 if -b
  */
 
@@ -91,7 +91,7 @@ void Areas51 (void)
 		ip=rel[j];
 		link_main();
 	}
-	
+
 	/*Set the start address of the default areas:*/
 	for(ap=areap; ap; ap=ap->a_ap)
 	{
@@ -215,7 +215,7 @@ main(int argc, char *argv[])
 				case 'F':
 					startp->f_type = F_LNK;
 					break;
-	
+
 				case 'n':
 				case 'N':
 					pflag = 0;
@@ -263,12 +263,12 @@ main(int argc, char *argv[])
 		usage();
 
 	syminit();
-	
+
 	if (dflag){
 	    //dfp = afile("temp", "cdb", 1);
-		SaveLinkedFilePath(linkp->f_idp); //Must be the first one... 
+		SaveLinkedFilePath(linkp->f_idp); //Must be the first one...
 		dfp = afile(linkp->f_idp,"cdb",1); //JCF: Nov 30, 2002
-	    if (dfp == NULL) 
+	    if (dfp == NULL)
 		lkexit(1);
 	}
 
@@ -278,7 +278,7 @@ main(int argc, char *argv[])
 		filep = linkp;
 		hp = NULL;
 		radix = 10;
-		
+
 		Areas51(); /*JCF: Create the default 8051 areas in the right order*/
 
 		while (lk_getline()) {
@@ -865,7 +865,7 @@ parse()
 
 				case 'z':
                                 case 'Z':
-				        dflag = 1;					
+				        dflag = 1;
 					return(0);
 				default:
 					fprintf(stderr, "Invalid option\n");
@@ -1051,7 +1051,7 @@ gblsav()
 	gsp->g_strp = (char *) new (strlen(ip)+1);
 	strcpy(gsp->g_strp, ip);
 }
-	
+
 /*)Function	VOID	setgbl()
  *
  *	The function setgbl() scans the global variable lines in the
@@ -1162,7 +1162,7 @@ afile(char *fn, char *ft, int wf)
 	char fb[PATH_MAX];
 	char *omode;
 	int i;
-	
+
 	switch (wf) {
 		case 0: omode = "r"; break;
 		case 1: omode = "w"; break;
@@ -1192,7 +1192,7 @@ afile(char *fn, char *ft, int wf)
 		strcat(fb, ".");
 		strcat(fb, strlen(ft)?ft:"rel");
 	}
-		
+
 	fp = fopen(fb, omode);
 	if (fp==NULL)
 	{
@@ -1371,27 +1371,27 @@ usage()
 	lkexit(1);
 }
 
-/*)Function	VOID	copyfile()
- *		
- *		FILE    *dest           destination file
- *		FILE    *src            source file
+/*)Function VOID    copyfile()
+ *
+ *      FILE    *dest           destination file
+ *      FILE    *src            source file
  *
  *      function will copy source file to destination file
  *
  *
- *	functions called:
- *		int	fgetc() 	c_library
- *              int     fputc()         c_library
+ *  functions called:
+ *      int     fgetc()         c_library
+ *      int     fputc()         c_library
  *
- *	side effects:
- *		none
+ *  side effects:
+ *      none
  */
 VOID copyfile (dest,src)
 FILE *src,*dest ;
-{    
+{
     int ch;
-    while ((ch = fgetc(src)) != EOF) {
 
-	fputc(ch,dest);
+    while ((ch = fgetc(src)) != EOF) {
+        fputc(ch,dest);
     }
 }

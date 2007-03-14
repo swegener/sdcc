@@ -89,17 +89,22 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\lkaomf51.c
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
+# End Source File
+# Begin Source File
+
 SOURCE=.\lkarea.c
 # ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkdata.c
+SOURCE=..\lkdata.c
 # ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkeval.c
+SOURCE=..\lkeval.c
 # ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
@@ -114,7 +119,7 @@ SOURCE=.\lkgg.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkhead.c
+SOURCE=..\lkhead.c
 # ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
@@ -124,7 +129,7 @@ SOURCE=.\lkihx.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lklex.c
+SOURCE=..\lklex.c
 # ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
@@ -134,7 +139,12 @@ SOURCE=.\lklibr.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lklist.c
+SOURCE=..\lklist.c
+# ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
+# End Source File
+# Begin Source File
+
+SOURCE=..\lknoice.c
 # ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # Begin Source File
@@ -159,7 +169,7 @@ SOURCE=..\lkstore.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lksym.c
+SOURCE=..\lksym.c
 # ADD CPP /D "SDK" /D "INDEXLIB" /D "GAMEBOY"
 # End Source File
 # End Group

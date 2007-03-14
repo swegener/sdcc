@@ -507,23 +507,23 @@ loop:	if (pflag && cfp && cfp->f_type == F_STD)
 				sfp = afile(fid, "lnk", 0);
 			} else
 			if (ftype == F_REL) {
-				sfp = afile(fid, "rel", 0);
+				sfp = afile(fid, LKOBJEXT, 0);
 				/* if a .cdb file exists then copy it over */
 				if (dflag && sfp && dfp && pass == 0) {
-				    FILE *xfp = afile(fid,"adb",0); //JCF: Nov 30, 2002
-				    if (xfp) {
-					copyfile(dfp,xfp);
-					fclose(xfp);
-				    }
+					FILE *xfp = afile(fid,"adb",0); //JCF: Nov 30, 2002
+					if (xfp) {
+						copyfile(dfp,xfp);
+						fclose(xfp);
+					}
 				}
 				if (uflag && pass != 0) {
-				 SaveLinkedFilePath(fid); //Save the linked path for aomf51
-				 if ((tfp = afile(fid, "lst", 0)) != NULL) {
-				  if ((rfp = afile(fid, "rst", 1)) == NULL) {
-					fclose(tfp);
-					tfp = NULL;
-				  }
-				 }
+					SaveLinkedFilePath(fid); //Save the linked path for aomf51
+					if ((tfp = afile(fid, "lst", 0)) != NULL) {
+						if ((rfp = afile(fid, "rst", 1)) == NULL) {
+							fclose(tfp);
+							tfp = NULL;
+						}
+					}
 				}
 				gline = 1;
 			} else {

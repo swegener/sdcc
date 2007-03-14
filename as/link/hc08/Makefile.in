@@ -38,13 +38,13 @@ CFLAGS		= @CFLAGS@ -Wall
 M_OR_MM		= @M_OR_MM@
 LDFLAGS		= @LDFLAGS@
 
-LKOBJECTS	= lkmain.o lkarea.o lkdata.o \
-		  lkrloc.o \
-		  lklibr.o lkihx.o lks19.o lkelf.o \
-		  lkmem.o lkaomf51.o \
-		  ../lkeval.o ../lkhead.o ../lklex.o ../lklist.o  \
-		  ../lknoice.o ../lkstore.o ../lksym.o \
-		  ../../strcmpi.o
+LKOBJECTS	= lkmain.o lkarea.o lkihx.o \
+			  lklibr.o lkrloc.o lks19.o \
+			  lkelf.o lkmem.o \
+			  ../lkaomf51.o ../lkdata.o \
+			  ../lkeval.o ../lkhead.o ../lklex.o ../lklist.o  \
+			  ../lknoice.o ../lkstore.o ../lksym.o \
+			  ../../strcmpi.o
 LKSOURCES	= $(patsubst %.o,%.c,$(LKOBJECTS))
 
 ASLINK		= $(top_builddir)/bin/link-hc08$(EXEEXT)

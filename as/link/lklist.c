@@ -152,10 +152,8 @@ static int _cmpSymByAddr(const void *p1, const void *p2)
  *		areax *	oxp		pointer to an area extension structure
  *		int	c		character value
  *		int	i		loop counter
- *		int	j		bubble sort update status
  *		char *	ptr		pointer to an id string
  *		int	nmsym		number of symbols in area
- *		Addr_T	a0		temporary
  *		Addr_T	ai		temporary
  *		Addr_T	aj		temporary
  *		sym *	sp		pointer to a symbol structure
@@ -180,21 +178,39 @@ static int _cmpSymByAddr(const void *p1, const void *p2)
  */
 
 VOID
-lstarea(xp)
-struct area *xp;
+lstarea(struct area *xp)
 {
 	register struct areax *oxp;
 	register int i;
-	/* int j; */
 	register char *ptr;
 	int nmsym;
-	/* Addr_T a0; */
 	Addr_T 	   ai, aj;
 	struct sym *sp;
 	struct sym **p;
 	int memPage;
 
 	putc('\n', mfp);
+
+	/*
+	 * Find number of symbols in area
+	 */
+	nmsym = 0;
+	oxp = xp->a_axp;
+	while (oxp) {
+		for (i=0; i<NHASH; i++) {
+			sp = symhash[i];
+			while (sp != NULL) {
+				if (oxp == sp->s_axp)
+					++nmsym;
+				sp = sp->s_sp;
+			}
+		}
+		oxp = oxp->a_axp;
+	}
+	if (nmsym == 0) {
+		return;
+	}
+
 	if (xflag == 0) {
 		fprintf(mfp, "Hexadecimal\n\n");
 	} else
@@ -266,27 +282,6 @@ struct area *xp;
 	}
 
 	/*
-	 * Find number of symbols in area
-	 */
-	nmsym = 0;
-	oxp = xp->a_axp;
-	while (oxp) {
-		for (i=0; i<NHASH; i++) {
-			sp = symhash[i];
-			while (sp != NULL) {
-				if (oxp == sp->s_axp)
-					++nmsym;
-				sp = sp->s_sp;
-			}
-		}
-		oxp = oxp->a_axp;
-	}
-	if (nmsym == 0) {
-		putc('\n', mfp);
-		return;
-	}
-
-	/*
 	 * Allocate space for an array of pointers to symbols
 	 * and load array.
 	 */
@@ -310,29 +305,7 @@ struct area *xp;
 		oxp = oxp->a_axp;
 	}
 
-#if 0
-	/*
-	 * Bubble Sort of Addresses in Symbol Table Array
-	 */
-	j = 1;
-	while (j) {
-		j = 0;
-		sp = p[0];
-		a0 = sp->s_addr + sp->s_axp->a_addr;
-		for (i=1; i<nmsym; ++i) {
-			sp = p[i];
-			ai = sp->s_addr + sp->s_axp->a_addr;
-			if (a0 > ai) {
-				j = 1;
-				p[i] = p[i-1];
-				p[i-1] = sp;
-			}
-			a0 = ai;
-		}
-	}
-#else
 	qsort(p, nmsym, sizeof(struct sym *), _cmpSymByAddr);
-#endif	
 
 	/*
 	 * Symbol Table Output
@@ -397,10 +370,8 @@ struct area *xp;
  *		areax *	oxp		pointer to an area extension structure
  *		int	c		character value
  *		int	i		loop counter
- *		int	j		bubble sort update status
  *		char *	ptr		pointer to an id string
  *		int	nmsym		number of symbols in area
- *		Addr_T	a0		temporary
  *		Addr_T	ai		temporary
  *		Addr_T	aj		temporary
  *		sym *	sp		pointer to a symbol structure
@@ -425,17 +396,16 @@ struct area *xp;
  */
 
 VOID
-lstarea(xp)
-struct area *xp;
+lstarea(struct area *xp)
 {
 	register struct areax *oxp;
-	register c, i, j;
+	register int c, i;
 	register char *ptr;
 	int nmsym;
-	Addr_T a0, ai, aj;
+	Addr_T ai, aj;
 	struct sym *sp;
 	struct sym **p;
-        int page;
+	int page;
 
 	putc('\n', mfp);
 	slew(mfp);
@@ -547,29 +517,7 @@ struct area *xp;
 		oxp = oxp->a_axp;
 	}
 
-#if 0
-	/*
-	 * Bubble Sort of Addresses in Symbol Table Array
-	 */
-	j = 1;
-	while (j) {
-		j = 0;
-		sp = p[0];
-		a0 = sp->s_addr + sp->s_axp->a_addr;
-		for (i=1; i<nmsym; ++i) {
-			sp = p[i];
-			ai = sp->s_addr + sp->s_axp->a_addr;
-			if (a0 > ai) {
-				j = 1;
-				p[i] = p[i-1];
-				p[i-1] = sp;
-			}
-			a0 = ai;
-		}
-	}
-#else
 	qsort(p, nmsym, sizeof(struct sym *), _cmpSymByAddr);
-#endif	
 
 	/*
 	 * Symbol Table Output
@@ -591,7 +539,7 @@ struct area *xp;
 			fprintf(mfp, " %05u  ", aj);
 		}
 		ptr = &sp->s_id[0];
-		fprintf(mfp, "%s", ptr );
+		fprintf(mfp, "%*s", NCPS, ptr );
 
 		/* NoICE output of symbol */
 		if (jflag) DefineNoICE( ptr, aj, memPage );
@@ -599,6 +547,91 @@ struct area *xp;
 	putc('\n', mfp);
 	free(p);
 	slew(mfp);
+}
+#endif
+
+#ifdef SDK
+VOID lstareatosym(struct area *xp)
+{
+        /* Output the current area symbols to a NO$GMB .sym file */
+        register struct areax *oxp;
+        register int i;
+        int nmsym;
+        Addr_T a0;
+        struct sym *sp;
+        struct sym **p;
+
+        /*
+         * Find number of symbols in area
+         */
+        nmsym = 0;
+        oxp = xp->a_axp;
+        while (oxp) {
+                for (i=0; i<NHASH; i++) {
+                        sp = symhash[i];
+                        while (sp != NULL) {
+                                if (oxp == sp->s_axp)
+                                        ++nmsym;
+                                sp = sp->s_sp;
+                        }
+                }
+                oxp = oxp->a_axp;
+        }
+
+        /*
+         * Symbol Table Output
+         */
+        if (!((xp->a_size==0)&&(xp->a_addr==0)&&(nmsym==0))) {
+                /* Dont worry about any area information */
+                fprintf(mfp, "; Area: %s\n", xp->a_id );
+                if (nmsym>0) {
+                        /*
+                         * Allocate space for an array of pointers to symbols
+                         * and load array.
+                         */
+                        if ( (p = (struct sym **) malloc(nmsym*sizeof(struct sym *)))
+                            == NULL) {
+                                fprintf(mfp, "\nInsufficient space to build Map Segment.\n");
+                                return;
+                        }
+                        nmsym = 0;
+                        oxp = xp->a_axp;
+                        while (oxp) {
+                                for (i=0; i<NHASH; i++) {
+                                        sp = symhash[i];
+                                        while (sp != NULL) {
+                                                if (oxp == sp->s_axp) {
+                                                        p[nmsym++] = sp;
+                                                }
+                                                sp = sp->s_sp;
+                                        }
+                                }
+                                oxp = oxp->a_axp;
+                        }
+
+                        qsort(p, nmsym, sizeof(struct sym *), _cmpSymByAddr);
+
+                        i = 0;
+                        while (i < nmsym) {
+                                /* no$gmb requires the symbol names to be less than 32 chars long.  Truncate. */
+                                char name[32];
+                                strncpy(name, p[i]->s_id, 31);
+                                name[31] = '\0';
+                                if ((strncmp("l__", name, 3)!=0)&&(strchr(name,' ')==NULL)) {
+                                        a0=p[i]->s_addr + p[i]->s_axp->a_addr;
+                                        if (a0>0x7FFFU) {
+                                                /* Not inside the ROM, so treat as being in bank zero */
+                                                fprintf(mfp, "00:%04X %s\n", a0, name);
+                                        }
+                                        else {
+                                                fprintf(mfp, "%02X:%04X %s\n", a0/16384, a0, name);
+                                        }
+                                }
+                                i++;
+                        }
+                        free(p);
+                }
+        }
 }
 #endif
 
@@ -644,8 +677,7 @@ struct area *xp;
  */
 
 VOID
-lkulist(i)
-int i;
+lkulist(int i)
 {
 	Addr_T pc;
 
@@ -747,8 +779,7 @@ int i;
  */
 
 VOID
-lkalist(pc)
-Addr_T pc;
+lkalist(Addr_T pc)
 {
 	char str[8];
 	int i;
@@ -874,9 +905,7 @@ loop:	if (tfp == NULL)
  */
 
 VOID
-lkglist(pc,v)
-Addr_T pc;
-int v;
+lkglist(Addr_T pc, int v)
 {
 	char str[8];
 	int i;
@@ -1085,14 +1114,12 @@ loop:	if (tfp == NULL)
  */
 
 int
-dgt(rdx, str, n)
-int rdx, n;
-char *str;
+dgt(int rdx, char *str, int n)
 {
 	int i;
 
 	for (i=0; i<n; i++) {
-		if ((ctype[(int)*str++] & rdx) == 0)
+		if ((ctype[(unsigned char)(*str++)] & rdx) == 0)
 			return(0);
 	}
 	return(1);

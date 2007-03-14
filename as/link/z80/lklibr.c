@@ -42,12 +42,6 @@
 #endif /* SDK */
 #endif
 
-#ifdef SDK
-    #define LKOBJEXT "o"
-#else /* SDK */
-    #define LKOBJEXT "rel"
-#endif /* SDK */
-
 /*)Module   lklibr.c
  *
  *  The module lklibr.c contains the functions which

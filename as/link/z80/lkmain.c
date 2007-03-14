@@ -1498,3 +1498,28 @@ usage()
                 fprintf(stderr, "%s\n", *dp);
         lkexit(1);
 }
+
+/*)Function VOID    copyfile()
+ *
+ *      FILE    *dest           destination file
+ *      FILE    *src            source file
+ *
+ *      function will copy source file to destination file
+ *
+ *
+ *  functions called:
+ *      int     fgetc()         c_library
+ *      int     fputc()         c_library
+ *
+ *  side effects:
+ *      none
+ */
+VOID copyfile (dest,src)
+FILE *src,*dest ;
+{
+    int ch;
+
+    while ((ch = fgetc(src)) != EOF) {
+        fputc(ch,dest);
+    }
+}

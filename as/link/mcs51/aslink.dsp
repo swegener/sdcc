@@ -7,19 +7,19 @@
 CFG=aslink - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "aslink.mak".
-!MESSAGE 
+!MESSAGE
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "aslink.mak" CFG="aslink - Win32 Release"
-!MESSAGE 
+!MESSAGE
 !MESSAGE Possible choices for configuration are:
-!MESSAGE 
+!MESSAGE
 !MESSAGE "aslink - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE "aslink - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE 
+!MESSAGE
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -77,7 +77,7 @@ LINK32=link.exe
 # ADD BASE LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\..\bin_vc\aslink.exe" /pdbtype:sept
 # ADD LINK32 /nologo /subsystem:console /machine:I386 /out:"..\..\..\bin_vc\aslink.exe" /pdbtype:sept
 
-!ENDIF 
+!ENDIF
 
 # Begin Target
 
@@ -88,7 +88,7 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\lkaomf51.c
+SOURCE=..\lkaomf51.c
 # End Source File
 # Begin Source File
 
@@ -96,7 +96,7 @@ SOURCE=.\lkarea.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\lkdata.c
+SOURCE=..\lkdata.c
 # End Source File
 # Begin Source File
 

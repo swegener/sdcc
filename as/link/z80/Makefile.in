@@ -5,14 +5,17 @@ top_srcdir   = @top_srcdir@
 
 include $(top_builddir)/Makefile.common
 
-OBJDIR	= obj/$(EXT)
+OBJDIR	= obj$(EXT)
 
 SLIBSRC	= NewAlloc.c
 
-SRC	= lkarea.c lkdata.c lkeval.c lkhead.c lkihx.c lklex.c \
-	  lklibr.c lklist.c lkmain.c lkrloc.c lks19.c lksym.c \
+SRC	= lkmain.c lkarea.c lkihx.c \
+	  lklibr.c lkrloc.c lks19.c \
 	  lkgb.c lkgg.c \
-	  ../lkstore.c
+	  ../lkaomf51.c ../lkdata.c \
+	  ../lkeval.c ../lkhead.c ../lklex.c ../lklist.c \
+	  ../lknoice.c ../lkstore.c ../lksym.c \
+	  ../../strcmpi.c
 
 OBJS	= $(SRC:%.c=$(OBJDIR)/%.o)
 SLIBOBJS	= $(SLIBSRC:%.c=$(OBJDIR)/%.o)

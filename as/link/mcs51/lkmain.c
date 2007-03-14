@@ -1437,8 +1437,8 @@ VOID copyfile (dest,src)
 FILE *src,*dest ;
 {
     int ch;
-    while ((ch = fgetc(src)) != EOF) {
 
-    fputc(ch,dest);
+    while ((ch = fgetc(src)) != EOF) {
+        fputc(ch,dest);
     }
 }

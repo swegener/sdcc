@@ -4537,7 +4537,7 @@ replace {
 } by {
 	;	Peephole 263.a	optimized loading const
 	mov	%1,#(%2 + 3)
-}
+} if notVolatile(%1)
 
 replace {
 	mov	%1,#%2
@@ -4546,7 +4546,7 @@ replace {
 } by {
 	;	Peephole 263.b	optimized loading const
 	mov	%1,#(%2 + 2)
-}
+} if notVolatile(%1)
 
 replace {
 	mov	%1,#%2
@@ -4554,7 +4554,7 @@ replace {
 } by {
 	;	Peephole 263.c	optimized loading const
 	mov	%1,#(%2 + 1)
-}
+} if notVolatile(%1)
 
 
 replace {

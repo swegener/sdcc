@@ -1,3 +1,7 @@
+2007-03-19 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* /as/link/mcs51/aslink.dsp: Object extension for mcs51 is 'rel' not 'o'.
+
 2007-03-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peeph.def (263.x): fixed bug for volatile variables

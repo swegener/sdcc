@@ -1453,9 +1453,9 @@ static void commandLoop(FILE *cmdfile)
           if ( cmdfile == stdin )
           {
               if (sim_cmd_mode)
-                  line_read = (char*)readline ("(sim)");
+                  line_read = (char*)readline ("(sim) ");
               else
-                  line_read = (char*)readline ("(sdcdb)");
+                  line_read = (char*)readline ("(sdcdb) ");
           }
           else
               line_read = (char*)readline ("");

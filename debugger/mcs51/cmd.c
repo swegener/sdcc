@@ -2016,7 +2016,7 @@ int cmdInfo (char *s, context *cctxt)
     s = trim(s);
 
     /* list all break points */
-    if (strcmp(s,"break") == 0) {
+    if (strncmp(s,"break",5) == 0) {
         listUSERbp();
         return 0;
     }

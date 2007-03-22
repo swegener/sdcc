@@ -1,3 +1,8 @@
+2007-03-22 Borut Razem <borut.razem AT siol.net>
+
+	* debugger/mcs51/cmd.c, debugger/mcs51/sdcdb.c:
+	  fixed bug #1653671: sdcdb integration into ddd is broken
+
 2007-03-22 Raphael Neider <rneider AT web.de>
 
 	* src/pic/gen.c (popGetExternal): augmented to also create references

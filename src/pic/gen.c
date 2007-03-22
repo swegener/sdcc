@@ -1272,9 +1272,15 @@ pCodeOp *popGetWithString(char *str, int isExtern)
 	return pcop;
 }
 
-pCodeOp *popGetExternal (char *str)
+pCodeOp *popGetExternal (char *str, int isReg)
 {
-	pCodeOp *pcop = popGetWithString (str, 1);
+	pCodeOp *pcop;
+	
+	if (isReg) {
+	    pcop = newpCodeOpRegFromStr(str);
+	} else {
+	    pcop = popGetWithString (str, 1);
+	}
 	
 	if (str) {
 	  symbol *sym;
@@ -1830,7 +1836,7 @@ static void call_libraryfunc (char *name)
     /* library code might reside in different page... */
     emitpcode (POC_PAGESEL, popGetWithString (name, 1));
     /* call the library function */
-    emitpcode (POC_CALL, popGetExternal (name));
+    emitpcode (POC_CALL, popGetExternal (name, 0));
     /* might return from different page... */
     emitpcode (POC_PAGESEL, popGetWithString ("$", 0));
 
@@ -2626,6 +2632,16 @@ static void genCall (iCode *ic)
 	/* make the call */
 	sym = OP_SYMBOL(IC_LEFT(ic));
 	name = sym->rname[0] ? sym->rname : sym->name;
+	/*
+	 * As SDCC emits code as soon as it reaches the end of each
+	 * function's definition, prototyped functions that are implemented
+	 * after the current one are always considered EXTERN, which
+	 * introduces many unneccessary PAGESEL instructions.
+	 * XXX: Use a post pass to iterate over all `CALL _name' statements
+	 * and insert `PAGESEL _name' and `PAGESEL $' around the CALL
+	 * only iff there is no definition of the function in the whole
+	 * file (might include this in the PAGESEL pass).
+	 */
 	isExtern = IS_EXTERN(sym->etype) || pic14_inISR;
 	if (isExtern) {
 		/* Extern functions and ISRs maybe on a different page;
@@ -2877,74 +2893,25 @@ static void genFunction (iCode *ic)
 	pic14_inISR = 0;
 	if (IFFUNC_ISISR(sym->type)) {
 		pic14_inISR = 1;
-	/*  already done in pic14createInterruptVect() - delete me
-	addpCode2pBlock(pb,newpCode(POC_GOTO,newpCodeOp("END_OF_INTERRUPT+1",PO_STR)));
-	emitpcodeNULLop(POC_NOP);
-	emitpcodeNULLop(POC_NOP);
-	emitpcodeNULLop(POC_NOP);
-		*/
 		emitpcode(POC_MOVWF,  popCopyReg(&pc_wsave));
 		emitpcode(POC_SWAPFW, popCopyReg(&pc_status));
+		/* XXX: Why? Does this assume that ssave and psave reside
+		 * in a shared bank or bank0? We cannot guarantee the
+		 * latter...
+		 */
 		emitpcode(POC_CLRF,   popCopyReg(&pc_status));
 		emitpcode(POC_MOVWF,  popCopyReg(&pc_ssave));
+		//emitpcode(POC_MOVWF,  popGetExternal("___sdcc_saved_status",1 ));
 		emitpcode(POC_MOVFW,  popCopyReg(&pc_pclath));
+		/* during an interrupt PCLATH must be cleared before a goto or call statement */
+		emitpcode(POC_CLRF,   popCopyReg(&pc_pclath));
 		emitpcode(POC_MOVWF,  popCopyReg(&pc_psave));
-		emitpcode(POC_CLRF,   popCopyReg(&pc_pclath));/* during an interrupt PCLATH must be cleared before a goto or call statement */
+		//emitpcode(POC_MOVWF,  popGetExternal("___sdcc_saved_pclath", 1));
+		emitpcode(POC_MOVFW,  popCopyReg(&pc_fsr));
+		emitpcode(POC_MOVWF,  popGetExternal("___sdcc_saved_fsr", 1));
 		
 		pBlockConvert2ISR(pb);
 		pic14_hasInterrupt = 1;
-#if 0  
-		if (!inExcludeList("acc"))		
-			pic14_emitcode ("push","acc");  
-		if (!inExcludeList("b"))
-			pic14_emitcode ("push","b");
-		if (!inExcludeList("dpl"))
-			pic14_emitcode ("push","dpl");
-		if (!inExcludeList("dph"))
-			pic14_emitcode ("push","dph");
-		if (options.model == MODEL_FLAT24 && !inExcludeList("dpx"))
-		{
-			pic14_emitcode ("push", "dpx");
-			/* Make sure we're using standard DPTR */
-			pic14_emitcode ("push", "dps");
-			pic14_emitcode ("mov", "dps, #0x00");
-			if (options.stack10bit)
-			{ 
-				/* This ISR could conceivably use DPTR2. Better save it. */
-				pic14_emitcode ("push", "dpl1");
-				pic14_emitcode ("push", "dph1");
-				pic14_emitcode ("push", "dpx1");
-			}
-		}
-		/* if this isr has no bank i.e. is going to
-		run with bank 0 , then we need to save more
-		registers :-) */
-		if (!FUNC_REGBANK(sym->type)) {
-			
-		/* if this function does not call any other
-		function then we can be economical and
-			save only those registers that are used */
-			if (! IFFUNC_HASFCALL(sym->type)) {
-				int i;
-				
-				/* if any registers used */
-				if (sym->regsUsed) {
-					/* save the registers used */
-					for ( i = 0 ; i < sym->regsUsed->size ; i++) {
-						if (bitVectBitValue(sym->regsUsed,i) ||
-							(pic14_ptrRegReq && (i == R0_IDX || i == R1_IDX)) )
-							pic14_emitcode("push","junk");//"%s",pic14_regWithIdx(i)->dname); 		
-					}
-				}
-				
-			} else {
-			/* this function has	a function call cannot
-			determines register usage so we will have the
-				entire bank */
-				saverbank(0,ic,FALSE);
-			} 	
-		}
-#endif
 	} else {
 	/* if callee-save to be used for this function
 		then save the registers being used in this function */
@@ -3089,40 +3056,19 @@ registers :-) */
 				unsaverbank(0,ic,FALSE);
 			} 	
 		}
-#if 0
-		if (options.model == MODEL_FLAT24 && !inExcludeList("dpx"))
-		{
-			if (options.stack10bit)
-			{
-				pic14_emitcode ("pop", "dpx1");
-				pic14_emitcode ("pop", "dph1");
-				pic14_emitcode ("pop", "dpl1");
-			} 
-			pic14_emitcode ("pop", "dps");
-			pic14_emitcode ("pop", "dpx");
-		}
-		if (!inExcludeList("dph"))
-			pic14_emitcode ("pop","dph");
-		if (!inExcludeList("dpl"))
-			pic14_emitcode ("pop","dpl");
-		if (!inExcludeList("b"))
-			pic14_emitcode ("pop","b");
-		if (!inExcludeList("acc"))
-			pic14_emitcode ("pop","acc");
-		
-		if (IFFUNC_ISCRITICAL(sym->type))
-			pic14_emitcode("setb","ea");
-#endif
 		
 		/* if debug then send end of function */
 		if (options.debug && debugFile && currFunc) {
 			debugFile->writeEndFunction (currFunc, ic, 1);
 		}
 		
-		pic14_emitcode ("reti","");
+		emitpcode(POC_MOVFW,  popGetExternal("___sdcc_saved_fsr", 1));
+		emitpcode(POC_MOVWF,  popCopyReg(&pc_fsr));
+		//emitpcode(POC_MOVFW,  popGetExternal("___sdcc_saved_pclath", 1));
 		emitpcode(POC_MOVFW,  popCopyReg(&pc_psave));
 		emitpcode(POC_MOVWF,  popCopyReg(&pc_pclath));
-		emitpcode(POC_CLRF,   popCopyReg(&pc_status));
+		emitpcode(POC_CLRF,   popCopyReg(&pc_status)); // see genFunction
+		//emitpcode(POC_SWAPFW, popGetExternal("___sdcc_saved_status", 1));
 		emitpcode(POC_SWAPFW, popCopyReg(&pc_ssave));
 		emitpcode(POC_MOVWF,  popCopyReg(&pc_status));
 		emitpcode(POC_SWAPF,  popCopyReg(&pc_wsave));
@@ -3452,6 +3398,7 @@ static void genDivOneByte (operand *left,
 		emitSKPNC;
 		emitpcode(POC_GOTO, popGetLabel(lbl->key));
 		emitpcode(POC_DECF, popGet(AOP(result),0));
+		popReleaseTempReg(temp);
 	#endif
 	}
 	else

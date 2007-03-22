@@ -968,7 +968,7 @@ pic14emitMaps ()
 /*-----------------------------------------------------------------*/
 /* createInterruptVect - creates the interrupt vector              */
 /*-----------------------------------------------------------------*/
-pCodeOp *popGetExternal (char *str);
+pCodeOp *popGetExternal (char *str, int isReg);
 static void
 pic14createInterruptVect (struct dbuf_s * vBuf)
 {
@@ -1002,7 +1002,7 @@ pic14createInterruptVect (struct dbuf_s * vBuf)
 	dbuf_printf (vBuf, "\tnop\n"); /* first location for used by incircuit debugger */
 	dbuf_printf (vBuf, "\tpagesel __sdcc_gsinit_startup\n");
 	dbuf_printf (vBuf, "\tgoto\t__sdcc_gsinit_startup\n");
-	popGetExternal("__sdcc_gsinit_startup");
+	popGetExternal("__sdcc_gsinit_startup", 0);
 }
 
 

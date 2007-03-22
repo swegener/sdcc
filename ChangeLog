@@ -1,5 +1,19 @@
 2007-03-22 Raphael Neider <rneider AT web.de>
 
+	* src/pic/gen.c (popGetExternal): augmented to also create references
+	  to external variables (not only labels),
+	  (genCall): comment on plan to reduce PAGESEL overhead,
+	  (genFunction, genEndFunction): also save/restore FSR around interrupt
+	  handling code, removed lots of unused code
+	  (genDivOneByte): release acquired temp register
+	* src/pic/glue.c (pic14createInterruptVect): adadt to new signature
+	  of popGetExternal
+	* device/lib/pic/libsdcc/shadowregs.c: NEW, provide storage location
+	  for registers that need to be saved during interrupts (FSR, STATUS,
+	  PCLATH; W needs special handling), currently only FSR is used
+
+2007-03-22 Raphael Neider <rneider AT web.de>
+
 	* device/include/pic/pic14devices.txt: 16f688 has only one config word
 
 2007-03-19 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>

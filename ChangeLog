@@ -1,3 +1,7 @@
+2007-03-22 Raphael Neider <rneider AT web.de>
+
+	* device/include/pic/pic14devices.txt: 16f688 has only one config word
+
 2007-03-19 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* /as/link/mcs51/aslink.dsp: Object extension for mcs51 is 'rel' not 'o'.

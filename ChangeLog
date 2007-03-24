@@ -10,6 +10,7 @@
 	  removed header guard)
 	* .version,
 	* sdcc.spec: bumped version to 2.6.5
+	* src/SDCCmain.c(parseCmdLine): fixed bug 1677144
 
 2007-03-22 Borut Razem <borut.razem AT siol.net>
 

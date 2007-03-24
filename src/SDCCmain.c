@@ -1405,7 +1405,7 @@ parseCmdLine (int argc, char **argv)
         {
           struct dbuf_s path;
 
-		  if (*dstPath != '\0')
+          if (*dstPath != '\0')
             {
               dbuf_init(&path, 128);
               dbuf_makePath (&path, dstPath, moduleNameBase);
@@ -1421,6 +1421,14 @@ parseCmdLine (int argc, char **argv)
           struct dbuf_s file;
 
           dbuf_init(&file, 128);
+
+          /* get rid of the "."-extension */
+          dbuf_splitFile (s, &file, NULL);
+
+          dbuf_c_str (&file);
+          s = dbuf_detach (&file);
+
+          dbuf_init (&file, 128);
 
           dbuf_splitPath (s, NULL, &file);
 
@@ -1490,7 +1498,7 @@ linkEdit (char **envp)
   linkerScriptFileName[0] = 0;
   c = NULL;
 
-  if(port->linker.needLinkerScript)
+  if (port->linker.needLinkerScript)
     {
       char out_fmt;
 
@@ -1510,7 +1518,7 @@ linkEdit (char **envp)
         }
 
       /* first we need to create the <filename>.lnk file */
-      SNPRINTF (linkerScriptFileName, sizeof(scratchFileName),
+      SNPRINTF (linkerScriptFileName, sizeof(linkerScriptFileName),
         "%s.lnk", dstFileName);
       if (!(lnkfile = fopen (linkerScriptFileName, "w")))
         {
@@ -2085,8 +2093,8 @@ preProcess (char **envp)
 
       if (port && port->processor && TARGET_IS_PIC) {
         char proc[512];
-	SNPRINTF(&proc[0], 512, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
-	addSet(&preArgvSet, Safe_strdup(proc));
+        SNPRINTF(&proc[0], 512, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
+        addSet(&preArgvSet, Safe_strdup(proc));
       }
 
       /* standard include path */

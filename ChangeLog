@@ -4,6 +4,12 @@
 	  (saveRBank, unsaveRBank): don't save bits,
 	  (genFunction, genEndFunction): save bits exactly once, fix bug 1535242
 	* support/regression/tests/bug1535242.c: new, added
+	* device/include/assert.h: applied patch 1686533 to fix bug 1686528,
+	  thanks Alexey Shamrin <shamrin AT gmail.com>,
+	  made assert.h header ANSI compliant (added a check for NDEBUG macro,
+	  removed header guard)
+	* .version,
+	* sdcc.spec: bumped version to 2.6.5
 
 2007-03-22 Borut Razem <borut.razem AT siol.net>
 

@@ -119,7 +119,6 @@ static char *rb1regs[] = {
 };
 
 extern struct dbuf_s *codeOutBuf;
-static void saveRBank (int, iCode *, bool);
 
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
@@ -2235,6 +2234,7 @@ saveRegisters (iCode * lic)
           rsave = bitVectCplAnd (rsave, rsavebits);
           rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
         }
+      freeBitVect (rsavebits);
 
       if (count == 1)
         {
@@ -2305,6 +2305,7 @@ saveRegisters (iCode * lic)
             }
         }
     }
+  freeBitVect (rsave);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2334,6 +2335,7 @@ unsaveRegisters (iCode * ic)
           rsave = bitVectCplAnd (rsave, rsavebits);
           rsave = bitVectSetBit (rsave, bitVectFirstBit (rsavebits));
         }
+      freeBitVect (rsavebits);
 
       if (count == 1)
         {
@@ -2393,6 +2395,7 @@ unsaveRegisters (iCode * ic)
             }
         }
     }
+  freeBitVect (rsave);
 }
 
 
@@ -2606,7 +2609,7 @@ static void
 saveRBank (int bank, iCode * ic, bool pushPsw)
 {
   int i;
-  int count = 8 + ((mcs51_nRegs > 8) ? 1 : 0) + (pushPsw ? 1 : 0);
+  int count = 8 + (pushPsw ? 1 : 0);
   asmop *aop = NULL;
   regs *r = NULL;
 
@@ -2615,7 +2618,7 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
       if (!ic)
         {
           /* Assume r0 is available for use. */
-          r = REG_WITH_INDEX (R0_IDX);;
+          r = REG_WITH_INDEX (R0_IDX);
         }
       else
         {
@@ -2642,22 +2645,6 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
       else
         emitcode ("push", "(%s+%d)",
                   regs8051[i].base, 8 * bank + regs8051[i].offset);
-    }
-
-  if (mcs51_nRegs > 8)
-    {
-      if (options.useXstack)
-        {
-          emitcode ("mov", "a,bits");
-          emitcode ("movx", "@%s,a", r->name);
-          if (--count)
-            emitcode ("inc", "%s", r->name);
-        }
-      else
-        {
-          emitcode ("push", "bits");
-        }
-      BitBankUsed = 1;
     }
 
   if (pushPsw)
@@ -2722,20 +2709,6 @@ unsaveRBank (int bank, iCode * ic, bool popPsw)
       else
         {
           emitcode ("pop", "psw");
-        }
-    }
-
-  if (mcs51_nRegs > 8)
-    {
-      if (options.useXstack)
-        {
-          emitcode ("dec", "%s", r->name);
-          emitcode ("movx", "a,@%s", r->name);
-          emitcode ("mov", "bits,a");
-        }
-      else
-        {
-          emitcode ("pop", "bits");
         }
     }
 
@@ -3057,7 +3030,7 @@ genPcall (iCode * ic)
   /* if we are calling a not _naked function that is not using
      the same register bank then we need to save the
      destination registers on the stack */
-  if (currFunc && dtype && !IFFUNC_ISNAKED(dtype) &&
+  if (currFunc && dtype && !IFFUNC_ISNAKED (dtype) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) &&
       !IFFUNC_ISISR (dtype))
     {
@@ -3079,12 +3052,12 @@ genPcall (iCode * ic)
       if (swapBanks)
         {
           emitcode ("mov", "psw,#0x%02x",
-           ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+           ((FUNC_REGBANK (dtype)) << 3) & 0xff);
         }
 
-      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT (getSpec(dtype)))
         {
-          if (IFFUNC_CALLEESAVES(dtype))
+          if (IFFUNC_CALLEESAVES (dtype))
             {
               werror (E_BANKED_WITH_CALLEESAVES);
             }
@@ -3105,9 +3078,9 @@ genPcall (iCode * ic)
     }
   else
     {
-      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT(getSpec(dtype)))
+      if (IFFUNC_ISBANKEDCALL (dtype) && !SPEC_STAT (getSpec(dtype)))
         {
-          if (IFFUNC_CALLEESAVES(dtype))
+          if (IFFUNC_CALLEESAVES (dtype))
             {
               werror (E_BANKED_WITH_CALLEESAVES);
             }
@@ -3142,7 +3115,7 @@ genPcall (iCode * ic)
               if (swapBanks)
                 {
                   emitcode ("mov", "psw,#0x%02x",
-                   ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+                   ((FUNC_REGBANK (dtype)) << 3) & 0xff);
                 }
 
               /* make the call */
@@ -3174,7 +3147,7 @@ genPcall (iCode * ic)
           if (swapBanks)
             {
               emitcode ("mov", "psw,#0x%02x",
-               ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+               ((FUNC_REGBANK (dtype)) << 3) & 0xff);
             }
 
           /* make the call */
@@ -3207,7 +3180,7 @@ genPcall (iCode * ic)
           if (swapBanks)
             {
               emitcode ("mov", "psw,#0x%02x",
-               ((FUNC_REGBANK(dtype)) << 3) & 0xff);
+               ((FUNC_REGBANK (dtype)) << 3) & 0xff);
             }
 
           /* make the call */
@@ -3216,7 +3189,7 @@ genPcall (iCode * ic)
     }
   if (swapBanks)
     {
-      selectRegBank (FUNC_REGBANK(currFunc->type), IS_BIT (etype));
+      selectRegBank (FUNC_REGBANK (currFunc->type), IS_BIT (etype));
     }
 
   /* if we need assign a result value */
@@ -3263,7 +3236,7 @@ genPcall (iCode * ic)
 //    unsaveRBank (FUNC_REGBANK (dtype), ic, TRUE);
 
   /* if we had saved some registers then unsave them */
-  if (ic->regsSaved && !IFFUNC_CALLEESAVES(dtype))
+  if (ic->regsSaved && !IFFUNC_CALLEESAVES (dtype))
     unsaveRegisters (ic);
 
   if (IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))))
@@ -3377,6 +3350,16 @@ genFunction (iCode * ic)
      save acc, b, dpl, dph  */
   if (IFFUNC_ISISR (sym->type))
     {
+      bitVect *rsavebits;
+
+      rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), sym->regsUsed);
+      if (IFFUNC_HASFCALL(sym->type) || !bitVectIsZero (rsavebits))
+        {
+          emitcode ("push", "bits");
+          BitBankUsed = 1;
+        }
+      freeBitVect (rsavebits);
+
       if (!inExcludeList ("acc"))
         emitcode ("push", "acc");
       if (!inExcludeList ("b"))
@@ -3400,12 +3383,11 @@ genFunction (iCode * ic)
               /* if any registers used */
               if (sym->regsUsed)
                 {
-                  bool bits_pushed = FALSE;
                   /* save the registers used */
                   for (i = 0; i < sym->regsUsed->size; i++)
                     {
                       if (bitVectBitValue (sym->regsUsed, i))
-                        bits_pushed = pushReg (i, bits_pushed);
+                        pushReg (i, TRUE);
                     }
                 }
             }
@@ -3811,6 +3793,7 @@ genEndFunction (iCode * ic)
 
   if (IFFUNC_ISISR (sym->type))
     {
+      bitVect *rsavebits;
 
       /* now we need to restore the registers */
       /* if this isr has no bank i.e. is going to
@@ -3827,12 +3810,11 @@ genEndFunction (iCode * ic)
               /* if any registers used */
               if (sym->regsUsed)
                 {
-                  bool bits_popped = FALSE;
                   /* save the registers used */
                   for (i = sym->regsUsed->size; i >= 0; i--)
                     {
                       if (bitVectBitValue (sym->regsUsed, i))
-                        bits_popped = popReg (i, bits_popped);
+                        popReg (i, TRUE);
                     }
                 }
             }
@@ -3843,8 +3825,8 @@ genEndFunction (iCode * ic)
                       emitcode ("pop","%s",rb1regs[i]);
                   }
               }
-              /* this function has  a function call cannot
-                 determines register usage so we will have to pop the
+              /* this function has a function call. We cannot
+                 determine register usage so we will have to pop the
                  entire bank */
               unsaveRBank (0, ic, FALSE);
             }
@@ -3884,6 +3866,11 @@ genEndFunction (iCode * ic)
         emitcode ("pop", "b");
       if (!inExcludeList ("acc"))
         emitcode ("pop", "acc");
+
+      rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), sym->regsUsed);
+      if (IFFUNC_HASFCALL(sym->type) || !bitVectIsZero (rsavebits))
+        emitcode ("pop", "bits");
+      freeBitVect (rsavebits);
 
       /* if debug then send end of function */
       if (options.debug && currFunc)

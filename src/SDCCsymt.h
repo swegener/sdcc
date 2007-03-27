@@ -156,6 +156,7 @@ typedef struct specifier
     unsigned b_signed:1;                /* just for sanity checks only*/
     unsigned b_static:1;                /* 1=static keyword found     */
     unsigned b_extern:1;                /* 1=extern found             */
+    unsigned b_inline:1;		/* inline function requested  */
     unsigned b_absadr:1;                /* absolute address specfied  */
     unsigned b_volatile:1;              /* is marked as volatile      */
     unsigned b_const:1;                 /* is a constant              */
@@ -246,6 +247,7 @@ typedef struct sym_link
       unsigned critical:1;              /* critical function          */
       unsigned intrtn:1;                /* this is an interrupt routine */
       unsigned rbank:1;                 /* seperate register bank     */
+      unsigned inlinereq:1;             /* inlining requested         */
       unsigned intno;                   /* 1=Interrupt svc routine    */
       short    regbank;                 /* register bank 2b used      */
       unsigned builtin;                 /* is a builtin function      */
@@ -268,7 +270,7 @@ typedef struct symbol
     int key;
     unsigned flexArrayLength;           /* if the symbol specifies a struct
     with a "flexible array member", then the additional length in bytes for
-    the "fam" is stored here. Because the lenght can be different from symbol
+    the "fam" is stored here. Because the length can be different from symbol
     to symbol AND v_struct isn't copied in copyLinkChain(), it's located here
     in the symbol and not in v_struct or the declarator */
     unsigned implicit:1;                /* implicit flag                     */
@@ -285,6 +287,7 @@ typedef struct symbol
     unsigned addrtaken:1;               /* address of the symbol was taken */
     unsigned isreqv:1;                  /* is the register equivalent of a symbol */
     unsigned udChked:1;                 /* use def checking has been already done */
+    unsigned generated:1;               /* code generated (function symbols only) */
 
     /* following flags are used by the backend
        for code generation and can be changed
@@ -353,6 +356,7 @@ typedef struct symbol
     int used;                           /* no. of times this was used */
     int recvSize;                       /* size of first argument  */
     struct bitVect *clashes;            /* overlaps with what other symbols */
+    struct ast * funcTree;              /* function body ast if inlined */
   }
 symbol;
 
@@ -387,6 +391,8 @@ extern sym_link *validateLink(sym_link  *l,
 #define FUNC_INTNO(x) (x->funcAttrs.intno)
 #define FUNC_REGBANK(x) (x->funcAttrs.regbank)
 #define FUNC_HASSTACKPARM(x) (x->funcAttrs.hasStackParms)
+#define FUNC_ISINLINE(x) (x->funcAttrs.inlinereq)
+#define IFFUNC_ISINLINE(x) (IS_FUNC(x) && FUNC_ISINLINE(x))
 
 #define FUNC_ISREENT(x) (x->funcAttrs.reent)
 #define IFFUNC_ISREENT(x) (IS_FUNC(x) && FUNC_ISREENT(x))
@@ -446,6 +452,7 @@ extern sym_link *validateLink(sym_link  *l,
 #define SPEC_TYPEDEF(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_typedef
 #define SPEC_REGPARM(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_isregparm
 #define SPEC_ARGREG(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.argreg
+#define SPEC_INLINE(x) validateLink(x, "SPEC_INLINE", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_inline
 
 /* type check macros */
 #define IS_DECL(x)   ( x && x->class == DECLARATOR      )
@@ -479,6 +486,7 @@ extern sym_link *validateLink(sym_link  *l,
 #define IS_REGISTER(x)  (IS_SPEC(x) && SPEC_SCLS(x) == S_REGISTER)
 #define IS_RENT(x)   (IS_SPEC(x) && x->select.s._reent )
 #define IS_STATIC(x) (IS_SPEC(x) && SPEC_STAT(x))
+#define IS_INLINE(x) (IS_SPEC(x) && SPEC_INLINE(x))
 #define IS_INT(x)    (IS_SPEC(x) && x->select.s.noun == V_INT)
 #define IS_VOID(x)   (IS_SPEC(x) && x->select.s.noun == V_VOID)
 #define IS_CHAR(x)   (IS_SPEC(x) && x->select.s.noun == V_CHAR)

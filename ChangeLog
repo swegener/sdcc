@@ -1,3 +1,16 @@
+2007-03-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCC.y (declaration_specifiers, function_specifier),
+	* support/Util/SDCCerr.c,
+	* support/Util/SDCCerr.h,
+	* src/SDCCsymt.h,
+	* src/SDCCsymt.c (mergeSpec, checkFunction): Parse and validate the
+	  inline keyword
+	* src/SDCCmem.c (deallocParms),
+	* src/SDCCast.c: support for function inlining, not quite complete
+	* src/SDCCsymt.c (printTypeChain, printTypeChainRaw): display
+	  'restrict' qualifier
+
 2007-03-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (saveRegisters, unsaveRegisters): free some bitVects,

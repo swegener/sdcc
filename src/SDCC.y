@@ -109,7 +109,7 @@ bool uselessDecl = TRUE;
 %type <sym> declaration_list identifier_list
 %type <sym> declarator2_function_attributes while do for critical
 %type <lnk> pointer type_specifier_list type_specifier type_name
-%type <lnk> storage_class_specifier struct_or_union_specifier
+%type <lnk> storage_class_specifier struct_or_union_specifier function_specifier
 %type <lnk> declaration_specifiers sfr_reg_bit sfr_attributes type_specifier2
 %type <lnk> function_attribute function_attributes enum_specifier
 %type <lnk> abstract_declarator abstract_declarator2 unqualified_pointer
@@ -520,6 +520,20 @@ declaration_specifiers
      else
        $$ = mergeSpec($1,$2, "type_specifier declaration_specifiers");
    }
+   | function_specifier				    { $$ = $1; }
+   | function_specifier declaration_specifiers          { 
+     /* if the decl $2 is not a specifier */
+     /* find the spec and replace it      */
+     if ( !IS_SPEC($2)) {
+       sym_link *lnk = $2 ;
+       while (lnk && !IS_SPEC(lnk->next))
+	 lnk = lnk->next;
+       lnk->next = mergeSpec($1,lnk->next, "function_specifier declaration_specifiers - skipped");
+       $$ = $2 ;
+     }
+     else
+       $$ = mergeSpec($1,$2, "function_specifier declaration_specifiers");
+   }
    ;
 
 init_declarator_list
@@ -553,6 +567,13 @@ storage_class_specifier
    | REGISTER  {
                   $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_REGISTER ;
+               }
+   ;
+
+function_specifier
+   : INLINE   {
+                  $$ = newLink (SPECIFIER) ;
+                  SPEC_INLINE($$) = 1 ;
                }
    ;
 
@@ -624,6 +645,10 @@ type_specifier2
    | VOLATILE  {
                   $$=newLink(SPECIFIER);
                   SPEC_VOLATILE($$) = 1 ;
+               }
+   | RESTRICT  {
+                  $$=newLink(SPECIFIER);
+                  SPEC_RESTRICT($$) = 1 ;
                }
    | FLOAT     {
                   $$=newLink(SPECIFIER);
@@ -1156,6 +1181,7 @@ pointer
                  DCL_TSPEC($1) = $2;
                  DCL_PTR_CONST($1) = SPEC_CONST($2);
                  DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
+                 DCL_PTR_RESTRICT($1) = SPEC_RESTRICT($2);
              }
              else
                  werror (W_PTR_TYPE_INVALID);
@@ -1168,39 +1194,40 @@ pointer
          }
    | unqualified_pointer type_specifier_list pointer
          {
-             $$ = $1 ;
-             if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {
-                 DCL_PTR_CONST($1) = SPEC_CONST($2);
-                 DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
-                 switch (SPEC_SCLS($2)) {
-                 case S_XDATA:
-                     DCL_TYPE($3) = FPOINTER;
-                     break;
-                 case S_IDATA:
-                     DCL_TYPE($3) = IPOINTER ;
-                     break;
-                 case S_PDATA:
-                     DCL_TYPE($3) = PPOINTER ;
-                     break;
-                 case S_DATA:
-                     DCL_TYPE($3) = POINTER ;
-                     break;
-                 case S_CODE:
-                     DCL_TYPE($3) = CPOINTER ;
-                     break;
-                 case S_EEPROM:
-                     DCL_TYPE($3) = EEPPOINTER;
-                     break;
-                 default:
-                   // this could be just "constant"
-                   // werror(W_PTR_TYPE_INVALID);
-                     ;
-                 }
-             }
-             else
-                 werror (W_PTR_TYPE_INVALID);
-             $$->next = $3 ;
-         }
+	     $$ = $1 ;  	     
+	     if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {
+		 DCL_PTR_CONST($1) = SPEC_CONST($2);
+		 DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
+		 DCL_PTR_RESTRICT($1) = SPEC_RESTRICT($2);
+		 switch (SPEC_SCLS($2)) {
+		 case S_XDATA:
+		     DCL_TYPE($3) = FPOINTER;
+		     break;
+		 case S_IDATA:
+		     DCL_TYPE($3) = IPOINTER ;
+		     break;
+		 case S_PDATA:
+		     DCL_TYPE($3) = PPOINTER ;
+		     break;
+		 case S_DATA:
+		     DCL_TYPE($3) = POINTER ;
+		     break;
+		 case S_CODE:
+		     DCL_TYPE($3) = CPOINTER ;
+		     break;
+		 case S_EEPROM:
+		     DCL_TYPE($3) = EEPPOINTER;
+		     break;
+		 default:
+		   // this could be just "constant" 
+		   // werror(W_PTR_TYPE_INVALID);
+		     ;
+		 }
+	     }
+	     else 
+		 werror (W_PTR_TYPE_INVALID);
+	     $$->next = $3 ;
+	 }
    ;
 
 unqualified_pointer

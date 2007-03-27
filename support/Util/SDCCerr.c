@@ -438,6 +438,8 @@ struct
    "#pragma %s: bad argument(s); pragma ignored" },
 { E_BAD_RESTRICT, ERROR_LEVEL_ERROR,
    "Only pointers may be qualified with 'restrict'" },
+{ E_BAD_INLINE, ERROR_LEVEL_ERROR,
+   "Only functions may be qualified with 'inline'" },
 };
 
 /*

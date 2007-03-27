@@ -698,11 +698,16 @@ deallocParms (value * val)
       if (lval->sym->rname[0])
         {
           char buffer[SDCC_NAME_MAX];
+          symbol * argsym = lval->sym;
+
           strncpyz (buffer, lval->sym->rname, sizeof(buffer));
           lval->sym = copySymbol (lval->sym);
           strncpyz (lval->sym->rname, buffer, sizeof(lval->sym->rname));
+
           strncpyz (lval->sym->name, buffer, sizeof(lval->sym->name));
-          strncpyz (lval->name, buffer, sizeof(lval->name));
+          /* need to keep the original name for inlining to work */
+          /*strncpyz (lval->name, buffer, sizeof(lval->name)); */
+
           addSym (SymbolTab, lval->sym, lval->sym->name,
                   lval->sym->level, lval->sym->block, 1);
           lval->sym->_isparm = 1;
@@ -710,6 +715,9 @@ deallocParms (value * val)
             {
               addSet(&operKeyReset, lval->sym);
             }
+
+          /* restore the original symbol */
+          lval->sym = argsym;
         }
     }
   return;

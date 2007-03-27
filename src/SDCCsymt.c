@@ -655,6 +655,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   dest->select.s.b_signed|=src->select.s.b_signed;
   SPEC_STAT (dest) |= SPEC_STAT (src);
   SPEC_EXTR (dest) |= SPEC_EXTR (src);
+  SPEC_INLINE (dest) |= SPEC_INLINE (src);
   SPEC_CONST(dest) |= SPEC_CONST (src);
   SPEC_ABSA (dest) |= SPEC_ABSA (src);
   SPEC_VOLATILE (dest) |= SPEC_VOLATILE (src);
@@ -684,6 +685,7 @@ mergeSpec (sym_link * dest, sym_link * src, char *name)
   FUNC_ISOVERLAY(dest) |= FUNC_ISOVERLAY(src);
   FUNC_INTNO(dest) |= FUNC_INTNO(src);
   FUNC_REGBANK(dest) |= FUNC_REGBANK(src);
+  FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
 
   return dest;
 }
@@ -2416,7 +2418,14 @@ checkFunction (symbol * sym, symbol *csym)
       werror(E_SYNTAX_ERROR, sym->name);
       return 0;
     }
-    
+  
+  /* move inline specifier from return type to function attributes */
+  if (IS_INLINE (sym->etype))
+    {
+      SPEC_INLINE (sym->etype) = 0;
+      FUNC_ISINLINE (sym->type) = 1;
+    }
+
   /* make sure the type is complete and sane */
   checkTypeSanity(((symbol *)sym)->etype, ((symbol *)sym)->name);
 
@@ -2874,6 +2883,9 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
             if (DCL_PTR_CONST (type)) {
               dbuf_append_str (dbuf, "const-");
             }
+            if (DCL_PTR_RESTRICT (type)) {
+              dbuf_append_str (dbuf, "restrict-");
+            }
           }
           switch (DCL_TYPE (type))
             {
@@ -3025,10 +3037,16 @@ printTypeChainRaw (sym_link * start, FILE * of)
             if (DCL_PTR_CONST (type)) {
               fprintf (of, "const-");
             }
+            if (DCL_PTR_RESTRICT (type)) {
+              fprintf (of, "restrict-");
+            }
           }
           switch (DCL_TYPE (type))
             {
             case FUNCTION:
+              if (IFFUNC_ISINLINE(type)) {
+                fprintf (of, "inline-");
+              }
               fprintf (of, "function %s %s", 
                        (IFFUNC_ISBUILTIN(type) ? "__builtin__" : " "),
                        (IFFUNC_ISJAVANATIVE(type) ? "_JavaNative" : " "));

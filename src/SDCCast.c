@@ -31,6 +31,11 @@ set *astList = NULL;
 set *operKeyReset = NULL;
 ast *staticAutos = NULL;
 int labelKey = 1;
+static struct {
+  int count;            /* number of inline functions inserted */
+  symbol * retsym;      /* variable for inlined function return value */
+  symbol * retlab;      /* label ending inlined function (virtual return) */
+} inlineState;
 
 #define LRVAL(x) x->left->rvalue
 #define RRVAL(x) x->right->rvalue
@@ -5815,6 +5820,7 @@ optimizeCompare (ast * root)
 noOptimize:
   return root;
 }
+
 /*-----------------------------------------------------------------*/
 /* addSymToBlock : adds the symbol to the first block we find      */
 /*-----------------------------------------------------------------*/
@@ -5868,6 +5874,397 @@ DEFSETFUNC (resetParmKey)
   sym->remat = 0;
   return 1;
 }
+
+
+
+/*------------------------------------------------------------------*/
+/* fixupInlineLabel - change a label in an inlined function so that */
+/*                    it is always unique no matter how many times  */
+/*                    the function is inlined.                      */
+/*------------------------------------------------------------------*/
+static void
+fixupInlineLabel (symbol * sym)
+{
+  char name[SDCC_NAME_MAX + 1];
+  
+  SNPRINTF(name, sizeof(name), "%s_%d", sym->name, inlineState.count);
+  strcpy (sym->name, name);
+}
+
+
+/*------------------------------------------------------------------*/
+/* copyAstLoc - copy location information (file, line, block, etc.) */
+/*              from one ast node to another                        */
+/*------------------------------------------------------------------*/
+static void
+copyAstLoc (ast * dest, ast * src)
+{
+  dest->lineno = src->lineno;
+  dest->filename = src->filename;
+  dest->level = src->level;
+  dest->block = src->block;
+  dest->seqPoint = src->seqPoint;
+  
+}
+
+
+/*-----------------------------------------------------------------*/
+/* fixupInline - perform various fixups on an inline function tree */
+/*               to take into account that it is no longer a       */
+/*               stand-alone function.                             */
+/*-----------------------------------------------------------------*/
+static void
+fixupInline (ast * tree, int level)
+{
+  tree->block = currBlockno;
+
+  if (IS_AST_OP (tree) && (tree->opval.op == BLOCK))
+    {
+      symbol * decls;
+
+      currBlockno++;
+      level++;
+
+      /* Add any declared variables back into the symbol table */
+      decls = tree->values.sym;
+      while (decls)
+        {
+          decls->level = level;
+          decls->block = currBlockno;
+          addSym (SymbolTab, decls, decls->name, decls->level, decls->block, 0);
+          decls = decls->next;
+        }
+    }
+
+  tree->level = level;
+
+  /* Update symbols */
+  if (IS_AST_VALUE (tree) &&
+      tree->opval.val->sym)
+    {
+      symbol * sym = tree->opval.val->sym;
+
+      sym->level = level;
+      sym->block = currBlockno;
+
+      /* If the symbol is a label, we need to renumber it */
+      if (sym->islbl)
+        fixupInlineLabel (sym);
+    }
+
+  /* Update IFX target labels */
+  if (tree->type == EX_OP && tree->opval.op == IFX)
+    {
+      if (tree->trueLabel)
+        fixupInlineLabel (tree->trueLabel);
+      if (tree->falseLabel)
+        fixupInlineLabel (tree->falseLabel);
+    }
+
+  /* Replace RETURN with optional assignment and a GOTO to the end */
+  /* of the inlined function */
+  if (tree->type == EX_OP && tree->opval.op == RETURN)
+    {
+      ast * assignTree = NULL;
+      ast * gotoTree;
+
+      if (inlineState.retsym && tree->right)
+        {
+          assignTree = newNode ('=',
+                                newAst_VALUE (symbolVal (inlineState.retsym)),
+                                tree->right);
+          copyAstLoc (assignTree, tree);
+        }
+
+      gotoTree = newNode (GOTO,
+                          newAst_VALUE (symbolVal (inlineState.retlab)),
+                          NULL);
+      copyAstLoc (gotoTree, tree);
+
+      tree->opval.op = NULLOP;
+      tree->left = assignTree;
+      tree->right = gotoTree;
+    }
+
+   /* Update any children */
+   if (tree->left)
+      fixupInline (tree->left, level);
+   if (tree->right)
+      fixupInline (tree->right, level);
+
+  if (IS_AST_OP (tree) && (tree->opval.op == LABEL))
+    {
+      symbol * label = tree->left->opval.val->sym;
+
+      label->key = labelKey++;
+      /* Add this label back into the symbol table */
+      addSym (LabelTab, label, label->name, label->level, 0, 0);
+    }
+
+
+  if (IS_AST_OP (tree) && (tree->opval.op == BLOCK))
+    {
+      level--;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* inlineAddDecl - add a variable declaration to an ast block. It  */
+/*                 is also added to the symbol table if addSymTab  */
+/*                 is nonzero.                                     */
+/*-----------------------------------------------------------------*/
+static void
+inlineAddDecl (symbol * sym, ast * block, int addSymTab)
+{
+  if (block != NULL)
+    {
+      symbol **decl = &(block->values.sym);
+
+      sym->level = block->level;
+      sym->block = block->block;
+
+      while (*decl)
+        {
+          if (strcmp ((*decl)->name, sym->name) == 0)
+            return;
+          decl = &( (*decl)->next );
+        }
+
+      *decl = sym;
+
+      if (addSymTab)
+        addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 0);
+
+    }
+}
+
+
+/*-----------------------------------------------------------------*/
+/* inlineTempVar - create a temporary variable for inlining        */
+/*-----------------------------------------------------------------*/
+static symbol *
+inlineTempVar (sym_link * type, int level)
+{
+  symbol * sym;
+
+  sym = newSymbol (genSymName(level), level );
+  sym->type = copyLinkChain (type);
+  sym->etype = getSpec(sym->type);
+  SPEC_SCLS (sym->etype) = S_AUTO;
+  SPEC_OCLS (sym->etype) = NULL;
+  SPEC_EXTR (sym->etype) = 0;
+  SPEC_STAT (sym->etype) = 0;
+  if IS_SPEC (sym->type)
+    SPEC_VOLATILE (sym->type) = 0;
+  else
+    DCL_PTR_VOLATILE (sym->type) = 0;
+  SPEC_ABSA (sym->etype) = 0;
+
+  return sym;
+}
+
+
+/*-----------------------------------------------------------------*/
+/* inlineFindParmRecurse - recursive function for inlineFindParm   */
+/*-----------------------------------------------------------------*/
+static ast *
+inlineFindParmRecurse (ast * parms, int *index)
+{
+  if (!parms)
+    return NULL;
+
+  if (parms->type == EX_OP && parms->opval.op == PARAM)
+  {
+    ast * p;
+
+    p=inlineFindParmRecurse (parms->left, index);
+    if (p)
+      return p;
+    p=inlineFindParmRecurse (parms->right, index);
+    if (p)
+      return p;
+  }
+  if (!*index)
+    return parms;
+  (*index)--;
+  return NULL;
+}
+
+
+/*-----------------------------------------------------------------*/
+/* inlineFindParm - search an ast tree of parameters to find one   */
+/*                  at a particular index (0=first parameter).     */
+/*                  Returns NULL if not found.                     */
+/*-----------------------------------------------------------------*/
+static ast *
+inlineFindParm (ast * parms, int index)
+{
+  return inlineFindParmRecurse (parms, &index);
+}
+
+
+/*-----------------------------------------------------------------*/
+/* expandInlineFuncs - replace calls to inline functions with the  */
+/*                     function itself                             */
+/*-----------------------------------------------------------------*/
+static void
+expandInlineFuncs (ast * tree, ast * block)
+{
+  if (IS_AST_OP (tree) && (tree->opval.op == CALL) && tree->left
+      && IS_AST_VALUE (tree->left) && tree->left->opval.val->sym)
+    {
+      symbol * func = tree->left->opval.val->sym;
+      symbol * csym;
+
+      /* The symbol is probably not bound yet, so find the real one */
+      csym = findSymWithLevel (SymbolTab, func);
+      if (csym)
+        func = csym;
+
+      /* Is this an inline function that we can inline? */
+      if (IFFUNC_ISINLINE (func->type) && func->funcTree)
+        {
+          symbol * retsym = NULL;
+          symbol * retlab;
+          ast * inlinetree;
+          ast * inlinetree2;
+          ast * temptree;
+          value * args;
+          int argIndex;
+
+          /* Generate a label for the inlined function to branch to */
+          /* in case it contains a return statement */
+          retlab = newSymbol (genSymName(tree->level+1), tree->level+1 );
+          retlab->isitmp = 1;
+          retlab->islbl = 1;
+          inlineState.retlab = retlab;
+
+          /* Build the subtree for the inlined function in the form: */
+          /* { //inlinetree block                                    */
+          /*   { //inlinetree2 block                                 */
+          /*     inline_function_code;                               */
+          /*     retlab:                                             */
+          /*   }                                                     */
+          /* }                                                       */
+          temptree = newNode (LABEL, newAst_VALUE (symbolVal (retlab)), NULL);
+          copyAstLoc (temptree, tree);
+          temptree = newNode (NULLOP, copyAst (func->funcTree), temptree);
+          copyAstLoc (temptree, tree);
+          temptree = newNode (BLOCK, NULL, temptree);
+          copyAstLoc (temptree, tree);
+          inlinetree2 = temptree;
+          inlinetree = newNode (BLOCK, NULL, inlinetree2);
+          copyAstLoc (inlinetree, tree);
+
+          /* To pass parameters to the inlined function, we need some  */
+          /* intermediate variables. This avoids scoping problems      */
+          /* when the parameter declaration names are used differently */
+          /* during the function call. For example, a function         */
+          /* declared as func(int x, int y) but called as func(y,x).   */
+          /* { //inlinetree block                                      */
+          /*   type1 temparg1;                                         */
+          /*   ...                                                     */
+          /*   typen tempargn;                                         */
+          /*   temparg1 = argument1;                                   */
+          /*   ...                                                     */
+          /*   tempargn = argumentn;                                   */
+          /*   { //inlinetree2 block                                   */
+          /*     type1 param1;                                         */
+          /*     ...                                                   */
+          /*     typen paramn;                                         */
+          /*     param1 = temparg1;                                    */
+          /*     ...                                                   */
+          /*     paramn = tempargn;                                    */
+          /*     inline_function_code;                                 */
+          /*     retlab:                                               */
+          /*   }                                                       */
+          /* }                                                         */
+          args = FUNC_ARGS (func->type);
+          argIndex = 0;
+          while (args)
+            {
+              symbol * temparg;
+              ast * passedarg;
+              ast * assigntree;
+              symbol * parm = copySymbol (args->sym);
+
+              temparg = inlineTempVar (args->sym->type, tree->level+1);
+              inlineAddDecl (temparg, inlinetree, FALSE);
+
+              passedarg = inlineFindParm (tree->right, argIndex);
+              assigntree = newNode ('=',
+                                    newAst_VALUE (symbolVal (temparg)),
+                                    passedarg);
+              inlinetree->right = newNode (NULLOP,
+                                           assigntree,
+                                           inlinetree->right);
+
+              inlineAddDecl (parm, inlinetree2, FALSE);
+              parm->_isparm = 0;
+
+              assigntree = newNode ('=',
+                                    newAst_VALUE (symbolVal (parm)),
+                                    newAst_VALUE (symbolVal (temparg)));
+              inlinetree2->right = newNode (NULLOP,
+                                           assigntree,
+                                           inlinetree2->right);
+
+
+              args = args->next;
+              argIndex++;
+            }
+
+          /* Handle the return type */
+          if (!IS_VOID (func->type->next))
+            {
+              /* Create a temporary symbol to hold the return value and   */
+              /* join it with the inlined function using the comma        */
+              /* operator. The fixupInline function will take care of     */
+              /* changing return statements into assignments to retsym.   */
+              /* (parameter passing and return label omitted for clarity) */
+              /* rettype retsym;                                          */
+              /* ...                                                      */
+              /* {{inline_function_code}}, retsym                         */
+
+              retsym = inlineTempVar (func->type->next, tree->level);
+              inlineAddDecl (retsym, block, TRUE);
+
+              tree->opval.op = ',';
+              tree->left = inlinetree;
+              tree->right = newAst_VALUE (symbolVal (retsym));
+            }
+          else
+            {
+              tree->opval.op = NULLOP;
+              tree->left = NULL;
+              tree->right = inlinetree;
+            }
+          inlineState.retsym = retsym;
+
+          /* Renumber the various internal counters on the inlined   */
+          /* function's tree nodes and symbols. Add the inlined      */
+          /* function's local variables to the appropriate scope(s). */
+          /* Convert inlined return statements to an assignment to   */
+          /* retsym (if needed) and a goto retlab.                   */
+          fixupInline (inlinetree, inlinetree->level);
+          inlineState.count++;
+        }
+
+    }
+
+  /* Recursively continue to search for functions to inline. */
+  if (IS_AST_OP (tree))
+    {
+      if (tree->opval.op == BLOCK)
+        block = tree;
+
+      if (tree->left)
+        expandInlineFuncs (tree->left, block);
+      if (tree->right)
+        expandInlineFuncs (tree->right, block);
+    }
+}
+
 
 /*-----------------------------------------------------------------*/
 /* createFunction - This is the key node that calls the iCode for  */
@@ -5938,6 +6335,12 @@ createFunction (symbol * name, ast * body)
   if (IFFUNC_ISREENT (name->type))
     reentrant++;
 
+  inlineState.count = 0;
+  expandInlineFuncs (body, NULL);
+
+  if (FUNC_ISINLINE (name->type))
+    name->funcTree = copyAst (body);
+
   allocParms (FUNC_ARGS(name->type));   /* allocate the parameters */
 
   /* do processing for parameters that are passed in registers */
@@ -5975,10 +6378,15 @@ createFunction (symbol * name, ast * body)
       goto skipall;
     }
 
+  /* Do not generate code for inline functions unless extern also */
+  if (FUNC_ISINLINE (name->type) && !IS_EXTERN (fetype))
+    goto skipall;
+
   /* create the node & generate intermediate code */
   GcurMemmap = code;
   codeOutBuf = &code->oBuf;
   piCode = iCodeFromAst (ex);
+  name->generated = 1;
 
   if (fatalError)
     {

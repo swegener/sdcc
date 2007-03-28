@@ -1,3 +1,8 @@
+2007-03-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/C8051F360.h: new, added
+	* device/include/mcs51/C8051F520.h: fixed buggy sbit addresses SPI0CN
+
 2007-03-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.y (declaration_specifiers, function_specifier),

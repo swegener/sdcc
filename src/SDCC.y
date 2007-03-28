@@ -102,7 +102,8 @@ bool uselessDecl = TRUE;
 %token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE RESTRICT
 
 %type <yyint> Interrupt_storage
-%type <sym> identifier declarator declarator2 declarator3 enumerator_list enumerator
+%type <sym> identifier identifier_or_typename declarator declarator2 declarator3
+%type <sym> enumerator_list enumerator
 %type <sym> struct_declarator function_declarator function_declarator2
 %type <sym> struct_declarator_list struct_declaration struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
@@ -1717,5 +1718,17 @@ jump_statement
 identifier
    : IDENTIFIER   { $$ = newSymbol ($1,NestLevel) ; }
    ;
+
+identifier_or_typename
+    : identifier
+    | TYPE_NAME {
+        symbol *sym;
+        sym_link   *p  ;
+        sym = findSym(TypedefTab,NULL,$1) ;
+        $$ = p = copyLinkChain(sym->type);
+        SPEC_TYPEDEF(getSpec(p)) = 0;
+        ignoreTypedefType = 1;
+      }
+
 %%
 

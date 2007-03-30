@@ -3644,7 +3644,8 @@ void isData(sym_link *sl)
 {
 	FILE *of = stderr;
 	
-	if(!sl)
+	// avoid garbage `data' and `sfr' output
+	if(!sl || !debugF)
 		return;
 	
 	if(debugF)

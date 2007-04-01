@@ -2035,7 +2035,7 @@ preProcess (char **envp)
 
       /* if using dollar signs in identifiers */
       if (options.dollars_in_ident)
-        addSet(&preArgvSet, Safe_strdup("--fdollars-in-identifiers"));
+        addSet(&preArgvSet, Safe_strdup("-fdollars-in-identifiers"));
 
       /* if using external stack define the macro */
       if (options.useXstack)

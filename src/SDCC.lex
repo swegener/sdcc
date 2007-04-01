@@ -23,8 +23,7 @@
 -------------------------------------------------------------------------*/
 
 D       [0-9]
-L       [a-zA-Z_]
-L_DOLL  [a-zA-Z_$]
+L       [a-zA-Z_$]
 H       [a-fA-F0-9]
 E       [Ee][+-]?{D}+
 FS      (f|F|l|L)
@@ -58,6 +57,7 @@ int lexLineno = 1;
 static struct dbuf_s asmbuff; /* reusable _asm buffer */
 
 /* forward declarations */
+int yyerror(char *s);
 static const char *stringLiteral(void);
 static void count(void);
 static void count_char(int);
@@ -191,15 +191,13 @@ _?"_asm"         {
 "__overlay"    { count(); TKEYWORD(OVERLAY); }
 "inline"       { count(); TKEYWORD99(INLINE); }
 "restrict"     { count(); TKEYWORD99(RESTRICT); }
-{L}({L}|{D})*  { count(); return(check_type()); }
-{L_DOLL}({L_DOLL}|{D})*  {
-  if (options.dollars_in_ident)
+{L}({L}|{D})*  {
+  if (!options.dollars_in_ident && strchr(yytext, '$'))
     {
-      count();
-      return(check_type());
+      yyerror("stray '$' in program");
     }
-  else
-    REJECT;
+  count();
+  return(check_type());
 }
 0[xX]{H}+{IS}? { count(); yylval.val = constVal(yytext); return(CONSTANT); }
 0[0-7]*{IS}?     { count(); yylval.val = constVal(yytext); return(CONSTANT); }

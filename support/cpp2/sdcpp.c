@@ -316,6 +316,7 @@ inform (const char *gmsgid, ...)
   va_start (ap, gmsgid);
   fprintf (stderr, "%s: note: ", progname);
   vfprintf (stderr, gmsgid, ap);
+  putc('\n', stderr);
   va_end (ap);
 }
 
@@ -332,6 +333,7 @@ warning (int opt, const char *gmsgid, ...)
   va_start (ap, gmsgid);
   fprintf (stderr, "%s: warning: ", progname);
   vfprintf (stderr, gmsgid, ap);
+  putc('\n', stderr);
   va_end (ap);
 }
 
@@ -347,6 +349,7 @@ error (const char *gmsgid, ...)
   va_start (ap, gmsgid);
   fprintf (stderr, "%s: error: ", progname);
   vfprintf (stderr, gmsgid, ap);
+  putc('\n', stderr);
   va_end (ap);
 }
 
@@ -361,6 +364,7 @@ fatal_error (const char *gmsgid, ...)
   va_start (ap, gmsgid);
   fprintf (stderr, "%s: fatal error: ", progname);
   vfprintf (stderr, gmsgid, ap);
+  putc('\n', stderr);
   va_end (ap);
 
   gcc_unreachable ();
@@ -378,6 +382,7 @@ internal_error (const char *gmsgid, ...)
   va_start (ap, gmsgid);
   fprintf (stderr, "%s: internal compiler error: ", progname);
   vfprintf (stderr, gmsgid, ap);
+  putc('\n', stderr);
   va_end (ap);
 
   gcc_unreachable ();

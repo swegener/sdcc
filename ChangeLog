@@ -1,11 +1,13 @@
 2007-04-01 Borut Razem <borut.razem AT siol.net>
 
-	* src/SDCC.lex, sdc/SDCCmain.c, support/cpp2/sdcpp.c:
+	* src/SDCC.lex, src/SDCCmain.c, support/cpp2/sdcpp.c:
 	  fixed bug #1692042: input buffer overflow...scanner uses REJECT
+	* support/cpp2/sdcpp.c: fixed recursion bug - internal_error() called
+	  gcc_unreachable() called internal_error()...
 
 2007-03-30 Raphael Neider <rneider AT web.de>
 
-	* src/pic/ralloc.c (isData): suppress garbage debug output
+	* src/pic/ralloc.c (isData): suppress garbage debug output4/1/2007 6:28PM
 
 2007-03-28 Borut Razem <borut.razem AT siol.net>
 

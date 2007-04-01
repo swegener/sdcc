@@ -367,7 +367,7 @@ fatal_error (const char *gmsgid, ...)
   putc('\n', stderr);
   va_end (ap);
 
-  gcc_unreachable ();
+  exit (FATAL_EXIT_CODE);
 }
 
 /* An internal consistency check has failed.  We make no attempt to
@@ -385,7 +385,7 @@ internal_error (const char *gmsgid, ...)
   putc('\n', stderr);
   va_end (ap);
 
-  gcc_unreachable ();
+  exit (FATAL_EXIT_CODE);
 }
 
 /* Report an internal compiler error in a friendly manner.  This is

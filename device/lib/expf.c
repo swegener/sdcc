@@ -108,7 +108,7 @@ expf_range_ok:
 	mov     r3,#0x39
 	lcall	expf_scale_and_add
 expf_no_range_reduction:
-	
+
 
 // Compute e^x using the cordic algorithm.  This works over an
 // input range of 0 to 0.69314712.  Can be extended to work from
@@ -318,7 +318,7 @@ fs_lshift_done:
 #define C1       0.693359375
 #define C2      -2.1219444005469058277e-4
 
-#define BIGX    88.72283911  /* ln(XMAX) */
+#define BIGX    88.72283911  /* ln(HUGE_VALF) */
 #define EXPEPS  1.0E-7       /* exp(1.0E-7)=0.0000001 */
 #define K1      1.4426950409 /* 1/ln(2) */
 
@@ -340,7 +340,8 @@ float expf(const float x)
         if(sign)
         {
             errno=ERANGE;
-            return XMAX;
+            return HUGE_VALF
+            ;
         }
         else
         {

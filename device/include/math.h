@@ -1,6 +1,6 @@
 /*  math.h: Floating point math function declarations
 
-    Copyright (C) 2001  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,8 @@
 #ifndef _INC_MATH
 #define _INC_MATH
 
+#define HUGE_VALF   3.402823466e+38
+
 #define PI          3.1415926536
 #define TWO_PI      6.2831853071
 #define HALF_PI     1.5707963268
@@ -34,7 +36,6 @@
 // EPS=2**(-12).  Also define EPS2=EPS*EPS.
 #define EPS 244.14062E-6
 #define EPS2 59.6046E-9
-#define XMAX 3.402823466E+38
 
 union float_long
 {

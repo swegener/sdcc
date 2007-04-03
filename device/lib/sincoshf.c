@@ -37,7 +37,7 @@
 #define K2 0.24999308500451499336E+0 /* v**(-2) */
 #define K3 0.13830277879601902638E-4 /* v/2-1   */
 
-//WMAX is defined as ln(XMAX)-ln(v)+0.69
+//WMAX is defined as ln(HUGE_VALF)-ln(v)+0.69
 #define WMAX 44.93535952E+0
 //WBAR 0.35*(b+1)
 #define WBAR 1.05
@@ -59,7 +59,7 @@ float sincoshf(const float x, const int iscosh)
             if (w>WMAX)
             {
                 errno=ERANGE;
-                z=XMAX;
+                z=HUGE_VALF;
             }
             else
             {

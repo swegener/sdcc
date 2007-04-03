@@ -1,3 +1,10 @@
+2007-04-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/math.h,
+	* device/lib/cotf.c,
+	* device/lib/expf.c,
+	* device/lib/sincoshf.c: changed XMAX to C99 HUGE_VALF
+
 2007-04-01 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCC.lex, src/SDCCmain.c, support/cpp2/sdcpp.c:

@@ -1,6 +1,6 @@
 /*  cotf.c: Computes cot(x) where x is a 32-bit float.
 
-    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org 
+    Copyright (C) 2001, 2002  Jesus Calvino-Fraga, jesusc@ieee.org
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,9 +32,9 @@ float cotf(const float x) _FLOAT_FUNC_REENTRANT
     {
         errno = ERANGE;
         if (x<0.0)
-            return -XMAX;
+            return -HUGE_VALF;
         else
-            return XMAX;
+            return +HUGE_VALF;
     }
     return tancotf(x, 1);
 }

@@ -23,7 +23,7 @@
 #include <string.h>
 
 #if defined(SDCC_STACK_AUTO) || defined(SDCC_z80) || defined(SDCC_gbz80)
-  #define CRITICAL critical
+  #define CRITICAL __critical
 #else
   #define CRITICAL
 #endif
@@ -31,12 +31,12 @@
 //--------------------------------------------------------------------
 //realloc function implementation for embedded system
 //Non-ANSI keywords are C51 specific.
-// xdata - variable in external memory (just RAM)
+// __xdata - variable in external memory (just RAM)
 //--------------------------------------------------------------------
 
 #if _SDCC_MALLOC_TYPE_MLH
 
-#define xdata
+#define __xdata
 
 typedef struct _MEMHEADER MEMHEADER;
 
@@ -67,17 +67,17 @@ MEMHEADER
 
 #endif
 
-extern MEMHEADER xdata * _sdcc_prev_memheader;
+extern MEMHEADER __xdata * _sdcc_prev_memheader;
 
 // apart from finding the header
 // this function also finds it's predecessor
-extern MEMHEADER xdata * _sdcc_find_memheader(void xdata * p);
+extern MEMHEADER __xdata * _sdcc_find_memheader(void __xdata * p);
 
-void xdata * realloc (void * p, size_t size)
+void __xdata * realloc (void * p, size_t size)
 {
-  register MEMHEADER xdata * pthis;
-  register MEMHEADER xdata * pnew;
-  register void xdata * ret;
+  register MEMHEADER __xdata * pthis;
+  register MEMHEADER __xdata * pnew;
+  register void __xdata * ret;
 
   CRITICAL
   {
@@ -86,7 +86,7 @@ void xdata * realloc (void * p, size_t size)
     {
       if (size > (0xFFFF-HEADER_SIZE))
       {
-        ret = (void xdata *) NULL; //To prevent overflow in next line
+        ret = (void __xdata *) NULL; //To prevent overflow in next line
       }
       else
       {
@@ -104,7 +104,7 @@ void xdata * realloc (void * p, size_t size)
                 ((unsigned int)_sdcc_prev_memheader) -
                 _sdcc_prev_memheader->len) >= size))
           {
-            pnew = (MEMHEADER xdata * )((char xdata *)_sdcc_prev_memheader + _sdcc_prev_memheader->len);
+            pnew = (MEMHEADER __xdata * )((char __xdata *)_sdcc_prev_memheader + _sdcc_prev_memheader->len);
             _sdcc_prev_memheader->next = pnew;
 
 #if _SDCC_MALLOC_TYPE_MLH

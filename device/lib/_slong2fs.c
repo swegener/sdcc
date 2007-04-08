@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 //float __slong2fs (long x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___slong2fs
 ___slong2fs:
 	mov	r4, a
@@ -60,11 +60,10 @@ slong2fs_doit:
 slong2fs_positive:
 	lcall	fs_normalize_a
 	ljmp	fs_round_and_return
-	_endasm;
+	__endasm;
 }
 
 #else
-
 
 /* convert signed long to float */
 float __slong2fs (signed long sl) {
@@ -75,4 +74,3 @@ float __slong2fs (signed long sl) {
 }
 
 #endif
-

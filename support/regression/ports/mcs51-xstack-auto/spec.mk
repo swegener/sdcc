@@ -8,8 +8,8 @@ LIBSRCDIR   = $(top_srcdir)/device/lib
 LIBBUILDDIR = $(top_builddir)/device/lib
 LIBDIR      = $(PORT_CASES_DIR)/lib
 
-LIBSDCCFLAGS+=--std-sdcc99 --stack-auto --xstack
-SDCCFLAGS   +=$(LIBSDCCFLAGS)
+LIBSDCCFLAGS+= --stack-auto --xstack --std-c99
+SDCCFLAGS   += --stack-auto --xstack --std-sdcc99
 
 # use C sources from mcs51
 $(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/mcs51/%.c

@@ -10,7 +10,7 @@
 
 void _fs_cordic_rshift_r765_unsigned(void)
 {
-	_asm
+	__asm
 	add	a, #248
 	jnc	00003$
 	mov	b, r5
@@ -52,10 +52,10 @@ void _fs_cordic_rshift_r765_unsigned(void)
 	djnz	r0, 00010$
 	pop	ar0
 00030$:
-	_endasm;
+	__endasm;
 }
 
-code unsigned char _fs_natural_log_table[] = {
+__code unsigned char _fs_natural_log_table[] = {
 0xFF, 0x42, 0x2E, 0x16,         // 0.693147180560
 0xF6, 0x91, 0xF9, 0x0C,         // 0.405465108108
 0xF2, 0xFD, 0x23, 0x07,         // 0.223143551314

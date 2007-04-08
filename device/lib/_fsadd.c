@@ -23,10 +23,10 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-// float __fsadd (float a, float b) reentrant
-static void dummy(void) _naked
+// float __fsadd (float a, float b) __reentrant
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 
 	// extract the two inputs, placing them into:
 	//      sign     exponent   mantiassa
@@ -128,7 +128,7 @@ fsadd_direct_entry:
 	lcall	fs_normalize_a
 	ljmp	fs_round_and_return
 
-	_endasm;
+	__endasm;
 }
 
 #else
@@ -149,7 +149,6 @@ fsadd_direct_entry:
 ** sun!pipeline!phw or
 ** uunet!motown!pipeline!phw
 */
-
 
 union float_long
   {
@@ -233,4 +232,3 @@ float __fsadd (float a1, float a2)
 }
 
 #endif
-

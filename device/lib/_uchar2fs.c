@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // float long __uchar2fs (float x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___uchar2fs
 ___uchar2fs:
 	clr	a
@@ -36,12 +36,10 @@ ___uchar2fs:
 	mov	r1, a
 	mov	a, #134
 	ljmp	ulong2fs_doit
-	_endasm;
+	__endasm;
 }
 
 #else
-
-
 
 /* convert unsigned char to float */
 float __uchar2fs (unsigned char uc) {

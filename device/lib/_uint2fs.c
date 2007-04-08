@@ -23,9 +23,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // float long __uint2fs (float x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___uint2fs
 ___uint2fs:
 	clr	a
@@ -35,12 +35,10 @@ ___uint2fs:
 	mov	r1, a
 	mov	a, #142
 	ljmp	ulong2fs_doit
-	_endasm;
+	__endasm;
 }
 
 #else
-
-
 
 /* convert unsigned int to float */
 float __uint2fs (unsigned int ui) {
@@ -48,4 +46,3 @@ float __uint2fs (unsigned int ui) {
 }
 
 #endif
-

@@ -44,124 +44,122 @@
 #if defined _MODUINT_ASM_SMALL || defined _MODUINT_ASM_SMALL_AUTO
 
 static void
-_moduint_dummy (void) _naked
+_moduint_dummy (void) __naked
 {
-	_asm
+	__asm
 
-		.globl __moduint
+	.globl __moduint
 
-	__moduint:
+__moduint:
 
-		#define count   r2
-		#define al      dpl
-		#define ah      dph
+	#define count   r2
+	#define al      dpl
+	#define ah      dph
 
 #if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
 
-		ar0 = 0			; BUG register set is not considered
-		ar1 = 1
+	ar0 = 0			; BUG register set is not considered
+	ar1 = 1
 
-		.globl __modint
+	.globl __modint
 
-		mov	a,sp
-		add	a,#-2		; 2 bytes return address
-		mov	r0,a		; r0 points to bh
-		mov	ar1,@r0		; load bh
-		dec	r0
-		mov	ar0,@r0		; load bl
+	mov	a,sp
+	add	a,#-2		; 2 bytes return address
+	mov	r0,a		; r0 points to bh
+	mov	ar1,@r0		; load bh
+	dec	r0
+	mov	ar0,@r0		; load bl
 
-		#define bl      r0
-		#define bh      r1
+	#define bl      r0
+	#define bh      r1
 
-	__modint:			; entry point for __modsint
+__modint:			; entry point for __modsint
 
 
 #else // SDCC_STACK_AUTO
 
 #if !defined(SDCC_PARMS_IN_BANK1)
 #if defined(SDCC_NOOVERLAY)
-		.area DSEG    (DATA)
+	.area DSEG    (DATA)
 #else
-		.area OSEG    (OVR,DATA)
+	.area OSEG    (OVR,DATA)
 #endif
 
-		.globl __moduint_PARM_2
-		.globl __modsint_PARM_2
+	.globl __moduint_PARM_2
+	.globl __modsint_PARM_2
 
-	__moduint_PARM_2:
-	__modsint_PARM_2:
-		.ds	2
+__moduint_PARM_2:
+__modsint_PARM_2:
+	.ds	2
 
-		.area CSEG    (CODE)
+	.area CSEG    (CODE)
 
-		#define bl      (__moduint_PARM_2)
-		#define bh      (__moduint_PARM_2 + 1)
+	#define bl      (__moduint_PARM_2)
+	#define bh      (__moduint_PARM_2 + 1)
 #else
-		#define bl      (b1_0)
-		#define bh      (b1_1)
+	#define bl      (b1_0)
+	#define bh      (b1_1)
 #endif
 #endif // SDCC_STACK_AUTO
 
-		mov	a,bl		; avoid endless loop
-		orl	a,bh
-		jz	div_by_0
+	mov	a,bl		; avoid endless loop
+	orl	a,bh
+	jz	div_by_0
 
-		mov	count,#1
+	mov	count,#1
 
-	loop1:	mov	a,bl		; b <<= 1
-		add	a,acc
-		mov	bl,a
-		mov	a,bh
-		rlc	a
-		jc	msbset
-		mov	bh,a
+loop1:	mov	a,bl		; b <<= 1
+	add	a,acc
+	mov	bl,a
+	mov	a,bh
+	rlc	a
+	jc	msbset
+	mov	bh,a
 
-		mov	a,al		; a - b
-		subb	a,bl		; here carry is always clear
-		mov	a,ah
-		subb	a,bh
+	mov	a,al		; a - b
+	subb	a,bl		; here carry is always clear
+	mov	a,ah
+	subb	a,bh
 
-		jc	start
+	jc	start
 
-		inc	count
-		sjmp	loop1
+	inc	count
+	sjmp	loop1
 
+start:	clr	c
+	mov	a,bh		; b >>= 1;
+msbset:	rrc	a
+	mov	bh,a
+	mov	a,bl
+	rrc	a
+	mov	bl,a
 
-	start:	clr	c
-		mov	a,bh		; b >>= 1;
-	msbset:	rrc	a
-		mov	bh,a
-		mov	a,bl
-		rrc	a
-		mov	bl,a
+loop2:	clr	c
+	mov	a,al		; a - b
+	subb	a,bl
 
+	mov	b,a
+	mov	a,ah
+	subb	a,bh
 
-	loop2:	clr	c
-		mov	a,al		; a - b
-		subb	a,bl
+	jc	smaller		; a >= b?
 
-		mov	b,a
-		mov	a,ah
-		subb	a,bh
+	mov	ah,a		; -> yes;  a = a - b;
+	mov	al,b
+smaller:			; -> no
+	clr	c
+	mov	a,bh		; b >>= 1;
+	rrc	a
+	mov	bh,a
+	mov	a,bl
+	rrc	a
+	mov	bl,a
 
-		jc	smaller		; a >= b?
+	djnz	count,loop2
+div_by_0:
+	ret
 
-		mov	ah,a		; -> yes;  a = a - b;
-		mov	al,b
-	smaller:			; -> no
-		clr	c
-		mov	a,bh		; b >>= 1;
-		rrc	a
-		mov	bh,a
-		mov	a,bl
-		rrc	a
-		mov	bl,a
-
-		djnz	count,loop2
-	div_by_0:
-		ret
-
-	_endasm ;
+	__endasm;
 }
 
 #else  // defined _MODUINT_ASM_SMALL || defined _MODUINT_ASM_SMALL_AUTO

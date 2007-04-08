@@ -139,10 +139,10 @@
 #endif
 
 
-#define Nop()           do { _asm nop _endasm; } while(0)
-#define ClrWdt()        do { _asm clrwdt _endasm; } while(0)
-#define Sleep()         do { _asm sleep _endasm; } while(0)
-#define Reset()         do { _asm reset _endasm; } while(0)
+#define Nop()           do { __asm nop __endasm; } while(0)
+#define ClrWdt()        do { __asm clrwdt __endasm; } while(0)
+#define Sleep()         do { __asm sleep __endasm; } while(0)
+#define Reset()         do { __asm reset __endasm; } while(0)
 
 
 #endif /* __PIC18FREGS_H__ */

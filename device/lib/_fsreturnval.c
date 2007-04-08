@@ -24,9 +24,9 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 
 	.globl	fs_round_and_return
 fs_round_and_return:
@@ -99,8 +99,7 @@ fs_return_nan:
 	mov	a, #0x7F
 	ret
 
-	_endasm;
+	__endasm;
 }
 
 #endif
-

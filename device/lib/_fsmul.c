@@ -23,10 +23,10 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-// float __fsmul (float a, float b) reentrant
-static void dummy(void) _naked
+// float __fsmul (float a, float b) __reentrant
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fsmul
 ___fsmul:
 	// extract the two inputs, placing them into:
@@ -198,11 +198,10 @@ ___fsmul:
 
 00010$:
 	ljmp	fs_round_and_return
-	_endasm;
+	__endasm;
 }
 
 #else
-
 
 /*
 ** libgcc support for software floating point.
@@ -221,7 +220,6 @@ ___fsmul:
 */
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
-
 
 union float_long
   {
@@ -282,4 +280,3 @@ float __fsmul (float a1, float a2) {
 }
 
 #endif
-

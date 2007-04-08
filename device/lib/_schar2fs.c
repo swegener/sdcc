@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // float __schar2fs (char c)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___schar2fs
 ___schar2fs:
 	mov	r4, dpl
@@ -36,11 +36,10 @@ ___schar2fs:
 	mov	r1, a
 	mov	a, #134
 	ljmp	slong2fs_doit
-	_endasm;
+	__endasm;
 }
 
 #else
-
 
 /* convert signed char to float */
 float __schar2fs (signed char sc) {
@@ -48,4 +47,3 @@ float __schar2fs (signed char sc) {
 }
 
 #endif
-

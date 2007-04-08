@@ -24,9 +24,9 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	fs_swap_a_b
 fs_swap_a_b:
 	mov	a, exp_a
@@ -37,12 +37,12 @@ fs_swap_a_b:
 	// mov	a, psw
 	// swap	a		// depends on sign bits in psw.1 & psw.5
 	// mov	psw, a
-	 mov	c, sign_a
-	 rlc	a
-	 mov	c, sign_b
-	 mov	sign_a, c
-	 rrc	a
-	 mov	sign_b, c
+	mov	c, sign_a
+	rlc	a
+	mov	c, sign_b
+	mov	sign_a, c
+	rrc	a
+	mov	sign_b, c
 	mov	a, r4
 	xch	a, r7
 	mov	r4, a
@@ -53,8 +53,7 @@ fs_swap_a_b:
 	xch	a, r5
 	mov	r2, a
 	ret
-	_endasm;
+	__endasm;
 }
 
 #endif
-

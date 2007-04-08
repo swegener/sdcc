@@ -41,7 +41,7 @@ _mulint (int a, int b)
   a,b;	/* reference to make compiler happy */
 
 #if !defined(SDCC_STACK_AUTO)
-   _asm
+    __asm
    	ais #-2
 	psha
 	pshx
@@ -66,9 +66,9 @@ _mulint (int a, int b)
 	ais #2
 	pulx
 	pula
-   _endasm;
+    __endasm;
 #else
-   _asm
+    __asm
    	ais #-2
 	psha
 	pshx
@@ -93,7 +93,7 @@ _mulint (int a, int b)
 	ais #2
 	pulx
 	pula
-   _endasm;
+    __endasm;
 #endif
 }
 #pragma restore
@@ -109,11 +109,11 @@ int
 _mulint (int a, int b)
 {
 #if !defined(SDCC_STACK_AUTO) && (defined(SDCC_MODEL_LARGE) || defined(SDCC_ds390))	// still needed for large
-	union uu xdata *x;
-	union uu xdata *y;
+	union uu __xdata *x;
+	union uu __xdata *y;
 	union uu t;
-        x = (union uu xdata *)&a;
-        y = (union uu xdata *)&b;
+        x = (union uu __xdata *)&a;
+        y = (union uu __xdata *)&b;
 #else
 	register union uu *x;
 	register union uu *y;

@@ -50,151 +50,151 @@ unsigned unsigned _divuint (unsigned x, unsigned y);
 #if defined _DIVSINT_ASM_SMALL
 
 static void
-_divsint_dummy (void) _naked
+_divsint_dummy (void) __naked
 {
-	_asm
+	__asm
 
-		#define xl	dpl
-		#define xh	dph
+	#define xl	dpl
+	#define xh	dph
 
-		.globl __divsint
+	.globl __divsint
 
-		// _divsint_PARM_2 shares the same memory with _divuint_PARM_2
-		// and is defined in _divuint.c
+	// _divsint_PARM_2 shares the same memory with _divuint_PARM_2
+	// and is defined in _divuint.c
 #if defined(SDCC_PARMS_IN_BANK1)
-		#define yl      (b1_0)
-		#define yh      (b1_1)
+	#define yl      (b1_0)
+	#define yh      (b1_1)
 #else
-		#define yl      (__divsint_PARM_2)
-		#define yh      (__divsint_PARM_2 + 1)
+	#define yl      (__divsint_PARM_2)
+	#define yh      (__divsint_PARM_2 + 1)
 #endif
-	__divsint:
-					; xh in dph
-					; yh in (__divsint_PARM_2 + 1)
+__divsint:
+				; xh in dph
+				; yh in (__divsint_PARM_2 + 1)
 
-		clr	F0 		; Flag 0 in PSW
-					; available to user for general purpose
-		mov	a,xh
-		jnb	acc.7,a_not_negative
+	clr	F0 		; Flag 0 in PSW
+				; available to user for general purpose
+	mov	a,xh
+	jnb	acc.7,a_not_negative
 
-		setb	F0
+	setb	F0
 
-		clr	a
-		clr	c
-		subb	a,xl
-		mov	xl,a
-		clr	a
-		subb	a,xh
-		mov	xh,a
+	clr	a
+	clr	c
+	subb	a,xl
+	mov	xl,a
+	clr	a
+	subb	a,xh
+	mov	xh,a
 
-	a_not_negative:
+a_not_negative:
 
-		mov	a,yh
-		jnb	acc.7,b_not_negative
+	mov	a,yh
+	jnb	acc.7,b_not_negative
 
-		cpl	F0
+	cpl	F0
 
-		clr	a
-		clr	c
-		subb	a,yl
-		mov	yl,a
-		clr	a
-		subb	a,yh
-		mov	yh,a
+	clr	a
+	clr	c
+	subb	a,yl
+	mov	yl,a
+	clr	a
+	subb	a,yh
+	mov	yh,a
 
-	b_not_negative:
+b_not_negative:
 
-		lcall	__divuint
+	lcall	__divuint
 
-		jnb	F0,not_negative
+	jnb	F0,not_negative
 
-		clr	a
-		clr	c
-		subb	a,xl
-		mov	xl,a
-		clr	a
-		subb	a,xh
-		mov	xh,a
+	clr	a
+	clr	c
+	subb	a,xl
+	mov	xl,a
+	clr	a
+	subb	a,xh
+	mov	xh,a
 
-	not_negative:
-		ret
+not_negative:
+	ret
 
-	_endasm ;
+	__endasm;
 }
 
 #elif defined _DIVSINT_ASM_SMALL_AUTO
 
 static void
-_divsint_dummy (void) _naked
+_divsint_dummy (void) __naked
 {
-	_asm
+	__asm
 
-		#define xl	dpl
-		#define xh	dph
+	#define xl	dpl
+	#define xh	dph
 
-		.globl __divsint
+	.globl __divsint
 
-	__divsint:
+__divsint:
 
-		clr	F0 		; Flag 0 in PSW
-					; available to user for general purpose
-		mov	a,xh
-		jnb	acc.7,a_not_negative
+	clr	F0 		; Flag 0 in PSW
+				; available to user for general purpose
+	mov	a,xh
+	jnb	acc.7,a_not_negative
 
-		setb	F0
+	setb	F0
 
-		clr	a
-		clr	c
-		subb	a,xl
-		mov	xl,a
-		clr	a
-		subb	a,xh
-		mov	xh,a
+	clr	a
+	clr	c
+	subb	a,xl
+	mov	xl,a
+	clr	a
+	subb	a,xh
+	mov	xh,a
 
-	a_not_negative:
+a_not_negative:
 
-		mov	a,sp
-		add	a,#-2		; 2 bytes return address
-		mov	r0,a		; r0 points to yh
-		mov	a,@r0		; a = yh
+	mov	a,sp
+	add	a,#-2		; 2 bytes return address
+	mov	r0,a		; r0 points to yh
+	mov	a,@r0		; a = yh
 
-		jnb	acc.7,b_not_negative
+	jnb	acc.7,b_not_negative
 
-		cpl	F0
+	cpl	F0
 
-		dec	r0
+	dec	r0
 
-		clr	a
-		clr	c
-		subb	a,@r0		; yl
-		mov	@r0,a
-		clr	a
-		inc	r0
-		subb	a,@r0		; a = yh
+	clr	a
+	clr	c
+	subb	a,@r0		; yl
+	mov	@r0,a
+	clr	a
+	inc	r0
+	subb	a,@r0		; a = yh
 
-	b_not_negative:
+b_not_negative:
 
-		mov	r1,a		; yh
-		dec	r0
-		mov	a,@r0		; yl
-		mov	r0,a
+	mov	r1,a		; yh
+	dec	r0
+	mov	a,@r0		; yl
+	mov	r0,a
 
-		lcall	__divint
+	lcall	__divint
 
-		jnb	F0,not_negative
+	jnb	F0,not_negative
 
-		clr	a
-		clr	c
-		subb	a,xl
-		mov	xl,a
-		clr	a
-		subb	a,xh
-		mov	xh,a
+	clr	a
+	clr	c
+	subb	a,xl
+	mov	xl,a
+	clr	a
+	subb	a,xh
+	mov	xh,a
 
-	not_negative:
-		ret
+not_negative:
+	ret
 
-	_endasm ;
+	__endasm;
 }
 
 #else  // _DIVSINT_ASM_

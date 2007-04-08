@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // float long __sint2fs (float x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___sint2fs
 ___sint2fs:
 	mov	r4, dph
@@ -35,11 +35,10 @@ ___sint2fs:
 	mov	r1, #0
 	mov	a, #142
 	ljmp	slong2fs_doit
-	_endasm;
+	__endasm;
 }
 
 #else
-
 
 /* convert signed int to float */
 float __sint2fs (signed int si) {
@@ -47,4 +46,3 @@ float __sint2fs (signed int si) {
 }
 
 #endif
-

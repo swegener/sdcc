@@ -23,10 +23,10 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-//float __fssub (float a, float b) reentrant
-static void dummy(void) _naked
+//float __fssub (float a, float b) __reentrant
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fssub
 ___fssub:
 	mov	r0, sp
@@ -36,13 +36,10 @@ ___fssub:
 	cpl	acc.7
 	xch	a, @r0
 	ljmp	___fsadd
-	_endasm;
+	__endasm;
 }
 
 #else
-
-
-
 
 /*
 ** libgcc support for software floating point.
@@ -61,7 +58,6 @@ ___fssub:
 */
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
-
 
 union float_long
   {
@@ -89,4 +85,3 @@ float __fssub (float a1, float a2)
 }
 
 #endif
-

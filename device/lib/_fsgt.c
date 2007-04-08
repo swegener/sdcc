@@ -23,10 +23,10 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-// char __fsgt (float a, float b) reentrant
-static void dummy(void) _naked
+// char __fsgt (float a, float b) __reentrant
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fsgt
 ___fsgt:
 	mov	r7, a
@@ -65,12 +65,10 @@ skip_invert:
 	rlc	a
 	mov	dpl, a
 	ret
-	_endasm;
+	__endasm;
 }
 
 #else
-
-
 
 /*
 ** libgcc support for software floating point.
@@ -89,7 +87,6 @@ skip_invert:
 */
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
-
 
 union float_long
   {

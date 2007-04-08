@@ -36,14 +36,14 @@ __sbit __at (0xF5) B_5;
 
 #if defined DSDCC_MODEL_HUGE
 void
-_gptrput (char *gptr, char c) _naked
+_gptrput (char *gptr, char c) __naked
 {
 /* This is the banked version with pointers up to 22 bits.
    B cannot be trashed */
 
     gptr; c; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type according to SDCCsymt.h
     ;
@@ -81,20 +81,20 @@ _gptrput (char *gptr, char c) _naked
 
                                                         ;===
                                                         ;27 bytes
-_endasm;
+    __endasm;
 }
 
 #elif defined DSDCC_MODEL_MEDIUM
 
 void
-_gptrput (char *gptr, char c) _naked
+_gptrput (char *gptr, char c) __naked
 {
 /* This is the non-banked version with pointers up to 14 bits.
    Assumes B is free to be used */
 
     gptr; c; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type according to SDCCsymt.h
     ;
@@ -130,20 +130,20 @@ _gptrput (char *gptr, char c) _naked
         ret                                             ; 1
                                                         ;===
                                                         ;25 bytes
-    _endasm;
+    __endasm;
 }
 
 #elif 1
 
 void
-_gptrput (char *gptr, char c) _naked
+_gptrput (char *gptr, char c) __naked
 {
 /* This is the new version with pointers up to 16 bits.
    B cannot be trashed */
 
     gptr; c; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type according to SDCCsymt.h
     ;
@@ -179,19 +179,19 @@ _gptrput (char *gptr, char c) _naked
 
                                                         ;===
                                                         ;24 bytes
-_endasm;
+    __endasm;
 }
 
 #else
 
 void
-_gptrput (char *gptr, char c) _naked
+_gptrput (char *gptr, char c) __naked
 {
 /* This is the old version with pointers up to 16 bits. */
 
     gptr; c; /* hush the compiler */
 
-    _asm
+    __asm
         ar0 = 0x00
         push     acc                                    ; 2
     ;
@@ -243,7 +243,7 @@ _gptrput (char *gptr, char c) _naked
         ret                                             ; 1
                                                         ;===
                                                         ;46 bytes
-_endasm;
+    __endasm;
 }
 #endif
 
@@ -254,7 +254,7 @@ _endasm;
 void
 _gptrputWord ()
 {
-    _asm
+    __asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -302,7 +302,7 @@ _gptrputWord ()
         mov     r0,dph ; restore r0
         mov     dph,#0 ; restore dph
  00016$:
-    _endasm;
+    __endasm;
 }
 
 #else
@@ -310,7 +310,7 @@ _gptrputWord ()
 void
 _gptrputWord ()
 {
-    _asm
+    __asm
         push     acc
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
@@ -365,7 +365,7 @@ _gptrputWord ()
         inc     dptr
         pop     ar0
  00016$:
-    _endasm;
+    __endasm;
 }
 #endif
 

@@ -49,9 +49,9 @@
 #endif
 
 static __data char radix ;
-static bit  long_flag = 0;
-static bit  string_flag =0;
-static bit  char_flag = 0;
+static __bit  long_flag = 0;
+static __bit  string_flag =0;
+static __bit  char_flag = 0;
 static char * __data str ;
 static __data long val;
 
@@ -68,7 +68,7 @@ static __data long val;
 
 #if NICE_LIFO_IMPLEMENTATION_BUT_NOT_PORTABLE
 static __data volatile char ch;
-static bit sign;
+static __bit sign;
 
 static void pval(void)
 {
@@ -96,13 +96,13 @@ static void pval(void)
 #  if 1
                 if(radix != 16)  ch = (lval % radix) + '0';
                 else ch = "0123456789ABCDEF"[(unsigned char)lval & 0x0f];
-                _asm push _ch _endasm;
+                __asm push _ch __endasm;
                 lval /= radix;
 #  else
 		// This only looks more efficient, but isn't. see the .map
                 ch = (lval % radix) + '0';
                 if (ch>'9') ch+=7;
-                _asm push _ch _endasm;
+                __asm push _ch __endasm;
                 lval /= radix;
 #  endif
         }
@@ -110,17 +110,17 @@ static void pval(void)
 
         if (sign) {
                 ch = '-';
-                _asm push _ch _endasm;
+                __asm push _ch __endasm;
         }
 
         while (sp != SP) {
-                _asm pop _ch _endasm;
+                __asm pop _ch __endasm;
                 putchar(ch);
         }
 }
 #endif
 
-void printf_small (char * fmt, ... ) reentrant
+void printf_small (char * fmt, ... ) __reentrant
 {
     va_list ap ;
 

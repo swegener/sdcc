@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // unsigned long __fs2ulong (float x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fs2ulong
 ___fs2ulong:
 	mov	r7, #158
@@ -58,14 +58,10 @@ fs2ulong_done:
 	mov	b, r3
 	mov	a, r4
 	ret
-	_endasm;
+	__endasm;
 }
 
-
 #else
-
-
-
 
 /*
 ** libgcc support for software floating point.
@@ -114,5 +110,3 @@ __fs2ulong (float a1)
 }
 
 #endif
-
-

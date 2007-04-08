@@ -11,7 +11,7 @@
 #  define mullong(a,b) mullong_wrapper(a,b)
 #  if defined(type_c) && !defined(WORDS_BIGENDIAN)
 #    define _SDCC_NO_ASM_LIB_FUNCS 1
-#    define near
+#    define __near
 #    define long int
 #    include "device/lib/_mullong.c"
 #  endif

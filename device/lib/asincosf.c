@@ -34,7 +34,7 @@
 #define Q(g) ((Q2*g+Q1)*g+Q0)
 
 #ifdef SDCC_mcs51
-   #define myconst code
+   #define myconst __code
 #else
    #define myconst const
 #endif

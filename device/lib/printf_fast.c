@@ -91,31 +91,30 @@
 // Warning: using static/global variables makes these functions NON-reentrant!
 // reentrant keyword is only used for parameter passing method
 
-static bit long_flag, short_flag, print_zero_flag, negative_flag;
+static __bit long_flag, short_flag, print_zero_flag, negative_flag;
 
 #ifdef FIELD_WIDTH
-static bit field_width_flag;
-static bit leading_zero_flag;
-static data unsigned char field_width;
+static __bit field_width_flag;
+static __bit leading_zero_flag;
+static __data unsigned char field_width;
 #endif
 
 #ifdef FLOAT
 #define SDCC_FLOAT_LIB
 #include <float.h>
-static bit continue_float;
+static __bit continue_float;
 #ifndef FLOAT_FIXED4
-static data unsigned char frac_field_width;
-static data unsigned char float_frac_bcd[4];
+static __data unsigned char frac_field_width;
+static __data unsigned char float_frac_bcd[4];
 // TODO: can float_frac_bcd be overlaid with temps used by trig functions
 #endif
 #endif
 
 #ifndef FAST_INTEGER
 #ifdef LONG
-static data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp space
+static __data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp space
 #endif
 #endif
-
 
 
 #ifndef PRINTF_FAST
@@ -134,11 +133,11 @@ static data unsigned int i2bcd_tmp;  // slow 32 int conversion needs temp space
 #else // defines are compatible with printf_fast
 
 
-void PRINTF_FAST(code char *fmt, ...) reentrant
+void PRINTF_FAST(__code char *fmt, ...) __reentrant
 {
 	fmt;	/* suppress unreferenced variable warning */
 
-	_asm
+	__asm
 
 printf_begin:
 	mov	a, _bp		// r0 will point to va_args (stack)
@@ -148,7 +147,6 @@ printf_begin:
 	dec	r0
 	mov	dpl, @r0	// dptr has address of fmt
 	dec	r0
-
 
 printf_main_loop:
 	clr	a
@@ -202,7 +200,6 @@ printf_nondigit1:
 	add	a, #10
 printf_nondigit2:
 	add	a, #48
-
 
 printf_format_l:
 	//cjne	a, #'l', printf_format_h
@@ -276,10 +273,6 @@ printf_eot:
 	ljmp	printf_end
 
 
-
-
-
-
 	/* print a string... just grab each byte with __gptrget */
 	/* the user much pass a 24 bit generic pointer */
 
@@ -321,12 +314,6 @@ printf_str_done:
 	pop	dpl		// restore addr withing fmt
 	pop	dph
 	ljmp	printf_main_loop
-
-
-
-
-
-
 
 
 	/* printing in hex is easy because sdcc pushes the LSB first */
@@ -444,7 +431,6 @@ printf_uint_zero:
 0001$:
 #endif
 	ljmp	printf_main_loop
-
 
 
 printf_uint_begin:
@@ -616,12 +602,6 @@ printf_uint8a:
 	ljmp	printf_main_loop
 
 
-
-
-
-
-
-
 #ifdef FLOAT
 #ifdef FLOAT_FIXED4
 	// Print a float the easy way.  First, extract the integer part and
@@ -748,8 +728,6 @@ print_float_frac_skip:
 	ljmp	printf_main_loop
 
 #else // not FLOAT_FIXED4
-
-
 
 
 print_float:
@@ -1009,7 +987,6 @@ print_float_done:
 	ljmp	printf_main_loop
 
 
-
 	// acc=1 for tenths, acc=2 for hundredths, etc
 get_float_frac_digit:
 	dec	a
@@ -1024,9 +1001,6 @@ get_float_frac_digit:
 get_float_frac_digit_done:
 	anl	a, #15
 	ret
-
-
-
 
 #endif // end of normal FLOAT code (not FLOAT_FIXED4)
 
@@ -1077,17 +1051,6 @@ printf_get_float_2:
 #endif // FLOAT
 
 
-
-
-
-
-
-
-
-
-
-
-
 	/* read an integer into r1/r2/r3/r4, and msb into r5 */
 printf_get_int:
 	mov	a, @r0
@@ -1110,9 +1073,6 @@ printf_get_int:
 	dec	r0
 printf_get_done:
 	ret
-
-
-
 
 
 #ifdef FAST_INTEGER
@@ -1405,17 +1365,6 @@ printf_i2bcd_add_skip:
 #endif // not FAST_INTEGER
 
 
-
-
-
-
-
-
-
-
-
-
-
 #ifdef FIELD_WIDTH
 printf_space_loop:
 	//mov	a, #' '
@@ -1431,10 +1380,6 @@ printf_space:
 	jnz	printf_space_loop
 	ret
 #endif
-
-
-
-
 
 	/* print a hex digit, either upper 4 bit (msn) or lower 4 bits (lsn) */
 
@@ -1481,7 +1426,7 @@ printf_zero:
         ljmp	printf_putchar
   
 printf_end:
-	_endasm;
+	__endasm;
 }
 
 
@@ -1504,24 +1449,24 @@ printf_end:
  */
 
 #if 0
-static code unsigned char int2bcd_0[] = {
+static __code unsigned char int2bcd_0[] = {
 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15};
 
-static code unsigned char int2bcd_1[] = {
+static __code unsigned char int2bcd_1[] = {
 0x00, 0x16, 0x32, 0x48, 0x64, 0x80, 0x96, 0x12,
 0x28, 0x44, 0x60, 0x76, 0x92, 0x08, 0x24, 0x40,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02};
 #endif
 
-static code unsigned char int2bcd_2[] = {
+static __code unsigned char int2bcd_2[] = {
 0x00, 0x56, 0x12, 0x68, 0x24, 0x80, 0x36, 0x92,
 0x48, 0x04, 0x60, 0x16, 0x72, 0x28, 0x84, 0x40,
 0x00, 0x02, 0x05, 0x07, 0x10, 0x12, 0x15, 0x17,
 0x20, 0x23, 0x25, 0x28, 0x30, 0x33, 0x35, 0x38};
 
-static code unsigned char int2bcd_3[] = {
+static __code unsigned char int2bcd_3[] = {
 0x00, 0x96, 0x92, 0x88, 0x84, 0x80, 0x76, 0x72,
 0x68, 0x64, 0x60, 0x56, 0x52, 0x48, 0x44, 0x40,
 0x00, 0x40, 0x81, 0x22, 0x63, 0x04, 0x45, 0x86,
@@ -1530,7 +1475,7 @@ static code unsigned char int2bcd_3[] = {
 0x03, 0x03, 0x04, 0x04, 0x04, 0x05, 0x05, 0x06};
 
 #ifdef LONG
-static code unsigned char int2bcd_4[] = {
+static __code unsigned char int2bcd_4[] = {
 0x00, 0x36, 0x72, 0x08, 0x44, 0x80, 0x16, 0x52,
 0x88, 0x24, 0x60, 0x96, 0x32, 0x68, 0x04, 0x40,
 0x00, 0x55, 0x10, 0x66, 0x21, 0x76, 0x32, 0x87,
@@ -1538,7 +1483,7 @@ static code unsigned char int2bcd_4[] = {
 0x00, 0x06, 0x13, 0x19, 0x26, 0x32, 0x39, 0x45,
 0x52, 0x58, 0x65, 0x72, 0x78, 0x85, 0x91, 0x98};
 
-static code unsigned char int2bcd_5[] = {
+static __code unsigned char int2bcd_5[] = {
 0x00, 0x76, 0x52, 0x28, 0x04, 0x80, 0x56, 0x32,
 0x08, 0x84, 0x60, 0x36, 0x12, 0x88, 0x64, 0x40,
 0x00, 0x85, 0x71, 0x57, 0x43, 0x28, 0x14, 0x00,
@@ -1548,7 +1493,7 @@ static code unsigned char int2bcd_5[] = {
 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15};
 
-static code unsigned char int2bcd_6[] = {
+static __code unsigned char int2bcd_6[] = {
 0x00, 0x16, 0x32, 0x48, 0x64, 0x80, 0x96, 0x12,
 0x28, 0x44, 0x60, 0x76, 0x92, 0x08, 0x24, 0x40,
 0x00, 0x72, 0x44, 0x16, 0x88, 0x60, 0x32, 0x05,
@@ -1560,7 +1505,7 @@ static code unsigned char int2bcd_6[] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
 0x01, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02, 0x02};
 
-static code unsigned char int2bcd_7[] = {
+static __code unsigned char int2bcd_7[] = {
 0x00, 0x56, 0x12, 0x68, 0x24, 0x80, 0x36, 0x92,
 0x48, 0x04, 0x60, 0x16, 0x72, 0x28, 0x84, 0x40,
 0x00, 0x54, 0x09, 0x63, 0x18, 0x72, 0x27, 0x81,
@@ -1577,7 +1522,7 @@ static code unsigned char int2bcd_7[] = {
 
 /*
  * #! /usr/bin/perl
- * print "code unsigned char int2bcd[] = {\n";
+ * print "__code unsigned char int2bcd[] = {\n";
  * for ($i=0, $n=1; $i<32; $i++, $n*=2) {
  * 	$r = sprintf "%010u", $n;
  * 	$r =~ /([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])/;
@@ -1585,7 +1530,7 @@ static code unsigned char int2bcd_7[] = {
  * 	print ',' if $i < 31;
  * 	printf "\t\t// %10u\n", $n;
  * }
- * print "}\ncode unsigned char int2bcd[] = {\n";
+ * print "}\n__code unsigned char int2bcd[] = {\n";
  * for ($i=0, $n=1; $i<16; $i++, $n*=2) {
  * 	$r = sprintf "%06u", $n;
  * 	$r =~ /([0-9][0-9])([0-9][0-9])([0-9][0-9])/;
@@ -1597,7 +1542,7 @@ static code unsigned char int2bcd_7[] = {
 */
 
 #ifdef LONG
-static code unsigned char int2bcd[] = {
+static __code unsigned char int2bcd[] = {
 0x01, 0x00, 0x00, 0x00, 0x00,		//          1
 0x02, 0x00, 0x00, 0x00, 0x00,		//          2
 0x04, 0x00, 0x00, 0x00, 0x00,		//          4
@@ -1632,7 +1577,7 @@ static code unsigned char int2bcd[] = {
 0x48, 0x36, 0x48, 0x47, 0x21		// 2147483648
 };
 #else // not LONG
-static code unsigned char int2bcd[] = {
+static __code unsigned char int2bcd[] = {
 0x01, 0x00, 0x00,		//          1
 0x02, 0x00, 0x00,		//          2
 0x04, 0x00, 0x00,		//          4
@@ -1655,8 +1600,6 @@ static code unsigned char int2bcd[] = {
 #endif // not FAST_INTEGER
 
 
-
-
 #ifdef FLOAT
 #ifndef FLOAT_FIXED4
 
@@ -1673,7 +1616,7 @@ static code unsigned char int2bcd[] = {
  * }
  */
 
-static code unsigned char frac2bcd[] = {
+static __code unsigned char frac2bcd[] = {
 0x00, 0x00, 0x00, 0x50,		// 0.500000000000000  0.50000000
 0x00, 0x00, 0x00, 0x25,		// 0.250000000000000  0.75000000
 0x00, 0x00, 0x50, 0x12,		// 0.125000000000000  0.87500000
@@ -1715,7 +1658,7 @@ static code unsigned char frac2bcd[] = {
 // 100.0 - 999.99	2	100.0 = 0x42C80000  42C8
 // 1000 - 9999.9	1	1000  = 0x447A0000  447A
 // 10000+		0	10000 = 0x461C4000  461C
-static code unsigned int float_range_table[] = {
+static __code unsigned int float_range_table[] = {
 65536 - 0x3A83,
 65536 - 0x3C23,
 65536 - 0x3DCC,
@@ -1741,7 +1684,7 @@ static code unsigned int float_range_table[] = {
 * }
 */
 
-static code unsigned char frac2bcd[] = {
+static __code unsigned char frac2bcd[] = {
 0x00, 0x50,             // 0.500000000000000  0.5000
 0x00, 0x25,             // 0.250000000000000  0.7500
 0x50, 0x12,             // 0.125000000000000  0.8750
@@ -1763,4 +1706,3 @@ static code unsigned char frac2bcd[] = {
 
 
 #endif // defines compatible with printf_fast
-

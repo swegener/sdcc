@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // int __fs2sint (float x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fs2sint
 ___fs2sint:
 	lcall	___fs2slong
@@ -62,16 +62,14 @@ fs2sint_pos:
 fs2sint_maxval_pos:
 	mov	dptr, #0x7FFF
 	ret
-	_endasm;
+	__endasm;
 }
-
 
 #else
 
-
-
 /* convert float to signed int */
-signed int __fs2sint (float f) {
+signed int __fs2sint (float f)
+{
   signed long sl=__fs2slong(f);
   if (sl>=INT_MAX)
     return INT_MAX;
@@ -81,4 +79,3 @@ signed int __fs2sint (float f) {
 }
 
 #endif
-

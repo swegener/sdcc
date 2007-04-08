@@ -48,206 +48,205 @@ unsigned long _modulong (unsigned long a, unsigned long b);
 #if defined _MODSLONG_ASM_SMALL
 
 static void
-_modslong_dummy (void) _naked
+_modslong_dummy (void) __naked
 {
-	_asm
+	__asm
 
-		#define a0	dpl
-		#define a1	dph
-		#define a2	b
-		#define a3	r1
+	#define a0	dpl
+	#define a1	dph
+	#define a2	b
+	#define a3	r1
 
-		.globl __modslong
+	.globl __modslong
 #if defined(SDCC_PARMS_IN_BANK1)
-		#define b0      (b1_0)
-		#define b1      (b1_1)
-		#define b2      (b1_2)
-		#define b3      (b1_3)
+	#define b0      (b1_0)
+	#define b1      (b1_1)
+	#define b2      (b1_2)
+	#define b3      (b1_3)
 #else
-		// _modslong_PARM_2 shares the same memory with _modulong_PARM_2
-		// and is defined in _modulong.c
-		#define b0      (__modslong_PARM_2)
-		#define b1      (__modslong_PARM_2 + 1)
-		#define b2      (__modslong_PARM_2 + 2)
-		#define b3      (__modslong_PARM_2 + 3)
+	// _modslong_PARM_2 shares the same memory with _modulong_PARM_2
+	// and is defined in _modulong.c
+	#define b0      (__modslong_PARM_2)
+	#define b1      (__modslong_PARM_2 + 1)
+	#define b2      (__modslong_PARM_2 + 2)
+	#define b3      (__modslong_PARM_2 + 3)
 #endif
-	__modslong:
-					; a3 in acc
-					; b3 in (__modslong_PARM_2 + 3)
-		mov	a3,a		; save a3
+__modslong:
+				; a3 in acc
+				; b3 in (__modslong_PARM_2 + 3)
+	mov	a3,a		; save a3
 
-		clr	F0 		; Flag 0 in PSW
-					; available to user for general purpose
-		jnb	acc.7,a_not_negative
+	clr	F0 		; Flag 0 in PSW
+				; available to user for general purpose
+	jnb	acc.7,a_not_negative
 
-		setb	F0
+	setb	F0
 
-		clr	a		; a = -a;
-		clr	c
-		subb	a,a0
-		mov	a0,a
-		clr	a
-		subb	a,a1
-		mov	a1,a
-		clr	a
-		subb	a,a2
-		mov	a2,a
-		clr	a
-		subb	a,a3
-		mov	a3,a
+	clr	a		; a = -a;
+	clr	c
+	subb	a,a0
+	mov	a0,a
+	clr	a
+	subb	a,a1
+	mov	a1,a
+	clr	a
+	subb	a,a2
+	mov	a2,a
+	clr	a
+	subb	a,a3
+	mov	a3,a
 
-	a_not_negative:
+a_not_negative:
 
-		mov	a,b3
-		jnb	acc.7,b_not_negative
+	mov	a,b3
+	jnb	acc.7,b_not_negative
 
-		clr	a		; b = -b;
-		clr	c
-		subb	a,b0
-		mov	b0,a
-		clr	a
-		subb	a,b1
-		mov	b1,a
-		clr	a
-		subb	a,b2
-		mov	b2,a
-		clr	a
-		subb	a,b3
-		mov	b3,a
+	clr	a		; b = -b;
+	clr	c
+	subb	a,b0
+	mov	b0,a
+	clr	a
+	subb	a,b1
+	mov	b1,a
+	clr	a
+	subb	a,b2
+	mov	b2,a
+	clr	a
+	subb	a,b3
+	mov	b3,a
 
-	b_not_negative:
+b_not_negative:
 
-		mov	a,a3		; restore a3 in acc
+	mov	a,a3		; restore a3 in acc
 
-		lcall	__modulong
+	lcall	__modulong
 
-		jnb	F0,not_negative
+	jnb	F0,not_negative
 
 				; result in (a == r1), b, dph, dpl
-		clr	a
-		clr	c
-		subb	a,a0
-		mov	a0,a
-		clr	a
-		subb	a,a1
-		mov	a1,a
-		clr	a
-		subb	a,a2
-		mov	a2,a
-		clr	a
-		subb	a,a3
+	clr	a
+	clr	c
+	subb	a,a0
+	mov	a0,a
+	clr	a
+	subb	a,a1
+	mov	a1,a
+	clr	a
+	subb	a,a2
+	mov	a2,a
+	clr	a
+	subb	a,a3
 				; result in a, b, dph, dpl
-	not_negative:
-		ret
+not_negative:
+	ret
 
-	_endasm ;
+	__endasm;
 }
 
 #elif defined _MODSLONG_ASM_SMALL_AUTO
 
 static void
-_modslong_dummy (void) _naked
+_modslong_dummy (void) __naked
 {
-	_asm
+	__asm
 
-		#define a0	dpl
-		#define a1	dph
-		#define a2	b
-		#define a3	r1
+	#define a0	dpl
+	#define a1	dph
+	#define a2	b
+	#define a3	r1
 
-		#define b0	r2
-		#define b1	r3
-		#define b2	r4
-		#define b3	r5
+	#define b0	r2
+	#define b1	r3
+	#define b2	r4
+	#define b3	r5
 
-		ar2 = 2			; BUG register set is not considered
-		ar3 = 3
-		ar4 = 4
-		ar5 = 5
+	ar2 = 2			; BUG register set is not considered
+	ar3 = 3
+	ar4 = 4
+	ar5 = 5
 
-		.globl __modslong
+	.globl __modslong
 
-	__modslong:
+__modslong:
 
-					; a3 in acc
-		mov	a3,a		; save a3
+				; a3 in acc
+	mov	a3,a		; save a3
 
-		clr	F0		; F0 (Flag 0)
-					; available to user for general purpose
-		jnb	acc.7,a_not_negative
+	clr	F0		; F0 (Flag 0)
+				; available to user for general purpose
+	jnb	acc.7,a_not_negative
 
-		setb	F0
+	setb	F0
 
-		clr	a		; a = -a;
-		clr	c
-		subb	a,a0
-		mov	a0,a
-		clr	a
-		subb	a,a1
-		mov	a1,a
-		clr	a
-		subb	a,a2
-		mov	a2,a
-		clr	a
-		subb	a,a3
-		mov	a3,a
+	clr	a		; a = -a;
+	clr	c
+	subb	a,a0
+	mov	a0,a
+	clr	a
+	subb	a,a1
+	mov	a1,a
+	clr	a
+	subb	a,a2
+	mov	a2,a
+	clr	a
+	subb	a,a3
+	mov	a3,a
 
-	a_not_negative:
+a_not_negative:
 
-		mov	a,sp
-		add	a,#-2-3		; 2 bytes return address, 3 bytes param b
-		mov	r0,a		; r1 points to b0
+	mov	a,sp
+	add	a,#-2-3		; 2 bytes return address, 3 bytes param b
+	mov	r0,a		; r1 points to b0
 
+	mov	ar2,@r0		; load b0
+	inc	r0		; r0 points to b1
+	mov	ar3,@r0		; b1
+	inc	r0
+	mov	ar4,@r0		; b2
+	inc	r0
+	mov	a,@r0		; b3
+	mov	b3,a
 
-		mov	ar2,@r0		; load b0
-		inc	r0		; r0 points to b1
-		mov	ar3,@r0		; b1
-		inc	r0
-		mov	ar4,@r0		; b2
-		inc	r0
-		mov	a,@r0		; b3
-		mov	b3,a
+	jnb	acc.7,b_not_negative
 
-		jnb	acc.7,b_not_negative
+	clr	a		; b = -b;
+	clr	c
+	subb	a,b0
+	mov	b0,a
+	clr	a
+	subb	a,b1
+	mov	b1,a
+	clr	a
+	subb	a,b2
+	mov	b2,a
+	clr	a
+	subb	a,b3
+	mov	b3,a
 
-		clr	a		; b = -b;
-		clr	c
-		subb	a,b0
-		mov	b0,a
-		clr	a
-		subb	a,b1
-		mov	b1,a
-		clr	a
-		subb	a,b2
-		mov	b2,a
-		clr	a
-		subb	a,b3
-		mov	b3,a
+b_not_negative:
 
-	b_not_negative:
+	lcall	__modlong
 
-		lcall	__modlong
-
-		jnb	F0,not_negative
+	jnb	F0,not_negative
 
 				; result in (a == r1), b, dph, dpl
-		clr	a
-		clr	c
-		subb	a,a0
-		mov	a0,a
-		clr	a
-		subb	a,a1
-		mov	a1,a
-		clr	a
-		subb	a,a2
-		mov	a2,a
-		clr	a
-		subb	a,a3	; result in a, b, dph, dpl
+	clr	a
+	clr	c
+	subb	a,a0
+	mov	a0,a
+	clr	a
+	subb	a,a1
+	mov	a1,a
+	clr	a
+	subb	a,a2
+	mov	a2,a
+	clr	a
+	subb	a,a3		; result in a, b, dph, dpl
 
-	not_negative:
-		ret
+not_negative:
+	ret
 
-	_endasm ;
+	__endasm;
 }
 
 #else // _MODSLONG_ASM

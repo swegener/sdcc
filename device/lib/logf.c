@@ -32,12 +32,12 @@
 #include <float.h>
 
 // TODO: share with other temps
-static data unsigned char logf_tmp[4];
+static __data unsigned char logf_tmp[4];
 
 float logf(float x)
 {
 	x;
-	_asm
+	__asm
 
 	// extract the two input, placing it into:
 	//      sign     exponent   mantiassa
@@ -183,15 +183,11 @@ logf_exp_scale:
 	lcall	fs_normalize_a
 	// now just add log(fractional) +/- log(2) * abs(exp - 126)
 	ljmp	fsadd_direct_entry
-	_endasm;
+	__endasm;
 #pragma less_pedantic
 }
 
-
 #else // not MATH_ASM_MCS51
-
-
-
 
 /*Constants for 24 bits or less (8 decimal digits)*/
 #define A0 -0.5527074855E+0
@@ -239,4 +235,3 @@ float logf(const float x) _FLOAT_FUNC_REENTRANT
 }
 
 #endif
-

@@ -22,7 +22,7 @@
 #include <malloc.h>
 
 #if defined(SDCC_STACK_AUTO) || defined(SDCC_z80) || defined(SDCC_gbz80)
-  #define CRITICAL critical
+  #define CRITICAL __critical
 #else
   #define CRITICAL
 #endif
@@ -98,7 +98,7 @@ free (void *p)
             //--------------------------------------------------------------------
             //malloc and free functions implementation for embedded system
             //Non-ANSI keywords are C51 specific.
-            // xdata - variable in external memory (just RAM)
+            // __xdata - variable in external memory (just RAM)
             //--------------------------------------------------------------------
 
             #define MEMHEADER   struct MAH// Memory Allocation Header
@@ -113,19 +113,19 @@ free (void *p)
             #define HEADER_SIZE sizeof(MEMHEADER)
 
             //Static here means: can be accessed from this module only
-            extern MEMHEADER xdata * _sdcc_first_memheader;
+            extern MEMHEADER __xdata * _sdcc_first_memheader;
 
-            MEMHEADER xdata * _sdcc_prev_memheader;
+            MEMHEADER __xdata * _sdcc_prev_memheader;
             // apart from finding the header
             // this function also finds it's predecessor
-            MEMHEADER xdata * _sdcc_find_memheader(void xdata * p)
+            MEMHEADER __xdata * _sdcc_find_memheader(void __xdata * p)
             {
-              register MEMHEADER xdata * pthis;
-              register MEMHEADER xdata * cur_header;
+              register MEMHEADER __xdata * pthis;
+              register MEMHEADER __xdata * cur_header;
 
               if (!p)
                 return NULL;
-              pthis = (MEMHEADER xdata *) p;
+              pthis = (MEMHEADER __xdata *) p;
               pthis -= 1; //to start of header
               cur_header = _sdcc_first_memheader;
               _sdcc_prev_memheader = NULL;
@@ -139,7 +139,7 @@ free (void *p)
 
             void free (void * p)
             {
-              register MEMHEADER xdata * pthis;
+              register MEMHEADER __xdata * pthis;
 
               CRITICAL
               {

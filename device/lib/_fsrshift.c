@@ -24,9 +24,9 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	fs_rshift_a
 fs_rshift_a:
 	jz	00020$
@@ -94,8 +94,7 @@ fs_rshift_a:
 	djnz	r0, 00005$
 00020$:
 	ret
-	_endasm;
+	__endasm;
 }
 
 #endif
-

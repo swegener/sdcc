@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // char __fseq (float a, float b)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fseq
 ___fseq:
 	mov	r7, a
@@ -39,13 +39,10 @@ ___fseq:
 	xrl	a, #1
 	mov	dpl, a
 	ret
-	_endasm;
+	__endasm;
 }
 
 #else
-
-
-
 
 /*
 ** libgcc support for software floating point.
@@ -64,7 +61,6 @@ ___fseq:
 */
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
-
 
 union float_long
   {
@@ -87,4 +83,3 @@ __fseq (float a1, float a2)
 }
 
 #endif
-

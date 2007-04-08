@@ -67,7 +67,7 @@ _mulint (int a, int b)
       (char)(lsb_a*msb_b)<<8
   */
 
-  _asm
+  __asm
     mov r2,dph ; msb_a
     mov r3,dpl ; lsb_a
 
@@ -105,7 +105,7 @@ _mulint (int a, int b)
     mov dph,a
     mov dpl,r0
     ret
-  _endasm;
+  __endasm;
 }
 #pragma restore
 
@@ -114,20 +114,20 @@ _mulint (int a, int b)
 #pragma save
 #pragma less_pedantic
 int
-_mulint_dummy (void) _naked
+_mulint_dummy (void) __naked
 {
-	_asm
+	__asm
 
-	__mulint:
+__mulint:
 
-		.globl __mulint
+	.globl __mulint
 
 #if !defined(SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
 
 #if defined(SDCC_NOOVERLAY)
-		.area DSEG    (DATA)
+	.area DSEG    (DATA)
 #else
-		.area OSEG    (OVR,DATA)
+	.area OSEG    (OVR,DATA)
 #endif
 #if defined(SDCC_PARMS_IN_BANK1)
 	#define bl 	(b1_0)
@@ -135,70 +135,70 @@ _mulint_dummy (void) _naked
 #else
 	#define bl 	(__mulint_PARM_2)
 	#define bh 	(__mulint_PARM_2 + 1)
-	__mulint_PARM_2:
+__mulint_PARM_2:
 
-		.globl __mulint_PARM_2
+	.globl __mulint_PARM_2
 
-		.ds	2
+	.ds	2
 #endif
 
-		.area CSEG    (CODE)
+	.area CSEG    (CODE)
 
-		; globbered registers none
+	; globbered registers none
 
-		mov	a,dpl			;  1  al
-		mov	b,bl			;  2  bl
-		mul	ab			;  4  al * bl
-		xch	a,dpl			;  1  store low-byte of return value, fetch al
-		push	b			;  2
+	mov	a,dpl			;  1  al
+	mov	b,bl			;  2  bl
+	mul	ab			;  4  al * bl
+	xch	a,dpl			;  1  store low-byte of return value, fetch al
+	push	b			;  2
 
-		mov	b,bh			;  2  bh
-		mul	ab			;  4  al * bh
-		pop	b			;  2
-		add	a,b			;  1
-		xch	a,dph			;  1  ah -> acc
+	mov	b,bh			;  2  bh
+	mul	ab			;  4  al * bh
+	pop	b			;  2
+	add	a,b			;  1
+	xch	a,dph			;  1  ah -> acc
 
-		mov	b,bl			;  2  bl
-		mul	ab			;  4  ah * bl
-		add	a,dph			;  1
-		mov	dph,a			;  1
-		ret				;  2
-						; 30
+	mov	b,bl			;  2  bl
+	mul	ab			;  4  ah * bl
+	add	a,dph			;  1
+	mov	dph,a			;  1
+	ret				;  2
+					; 30
 
 #else // SDCC_STACK_AUTO
 
-		; globbered registers r0
+	; globbered registers r0
 
-		mov	a,#-2			;  1  return address 2 bytes
-		add	a,sp			;  1
-		mov	r0,a			;  1  r0 points to bh
+	mov	a,#-2			;  1  return address 2 bytes
+	add	a,sp			;  1
+	mov	r0,a			;  1  r0 points to bh
 
-		mov	a,@r0			;  1  bh
-		mov	b,dpl			;  2  al
-		mul	ab			;  4  al * bh
-		push	acc			;  2
+	mov	a,@r0			;  1  bh
+	mov	b,dpl			;  2  al
+	mul	ab			;  4  al * bh
+	push	acc			;  2
 
-		mov	b,dpl			;  2  al
-		dec	r0			;  1
-		mov	a,@r0			;  1  bl
-		mul	ab			;  4  al * bl
+	mov	b,dpl			;  2  al
+	dec	r0			;  1
+	mov	a,@r0			;  1  bl
+	mul	ab			;  4  al * bl
 
-		mov	dpl,a			;  1  low-byte of return-value
+	mov	dpl,a			;  1  low-byte of return-value
 
-		pop	acc			;  2
-		add	a,b			;  1
-		xch	a,dph			;  1  ah -> acc
+	pop	acc			;  2
+	add	a,b			;  1
+	xch	a,dph			;  1  ah -> acc
 
-		mov	b,@r0			;  2  bl
-		mul	ab			;  4  ah * bl
-		add	a,dph			;  1
-		mov	dph,a			;  1
+	mov	b,@r0			;  2  bl
+	mul	ab			;  4  ah * bl
+	add	a,dph			;  1
+	mov	dph,a			;  1
 
-		ret
+	ret
 
 #endif // SDCC_STACK_AUTO
 
-	_endasm ;
+	__endasm;
 }
 #pragma restore
 
@@ -213,11 +213,11 @@ int
 _mulint (int a, int b)
 {
 #if !defined(SDCC_STACK_AUTO) && (defined(SDCC_MODEL_LARGE) || defined(SDCC_ds390))	// still needed for large
-	union uu xdata *x;
-	union uu xdata *y;
+	union uu __xdata *x;
+	union uu __xdata *y;
 	union uu t;
-        x = (union uu xdata *)&a;
-        y = (union uu xdata *)&b;
+        x = (union uu __xdata *)&a;
+        y = (union uu __xdata *)&b;
 #else
 	register union uu *x;
 	register union uu *y;

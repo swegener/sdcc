@@ -23,10 +23,10 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-// float __fsdiv (float a, float b) reentrant
-static void dummy(void) _naked
+// float __fsdiv (float a, float b) __reentrant
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fsdiv
 ___fsdiv:
 	// extract the two inputs, placing them into:
@@ -231,13 +231,10 @@ ___fsdiv:
 
 	lcall	fs_normalize_a
 	ljmp	fs_zerocheck_return
-	_endasm;
+	__endasm;
 }
 
 #else
-
-
-
 
 /*
 ** libgcc support for software floating point.
@@ -256,7 +253,6 @@ ___fsdiv:
 */
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
-
 
 union float_long
   {
@@ -341,4 +337,3 @@ float __fsdiv (float a1, float a2)
 }
 
 #endif
-

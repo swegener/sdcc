@@ -44,102 +44,103 @@
 #if defined _DIVUINT_ASM_SMALL || defined _DIVUINT_ASM_SMALL_AUTO
 
 static void
-_divuint_dummy (void) _naked
+_divuint_dummy (void) __naked
 {
-	_asm
+	__asm
 
-		.globl __divuint
+	.globl __divuint
 
-	__divuint:
+__divuint:
 
-		#define count   r2
-		#define reste_l r3
-		#define reste_h r4
-		#define xl      dpl
-		#define xh      dph
+	#define count   r2
+	#define reste_l r3
+	#define reste_h r4
+	#define xl      dpl
+	#define xh      dph
 
 #if defined(SDCC_PARMS_IN_BANK1)
-		#define yl      (b1_0)
-		#define yh      (b1_1)
+	#define yl      (b1_0)
+	#define yh      (b1_1)
 #else // SDCC_PARMS_IN_BANK1
   #if defined(SDCC_STACK_AUTO)
 
-		.globl __divint
+	.globl __divint
 
-		mov	a,sp
-		add	a,#-2		; 2 bytes return address
-		mov	r0,a		; r0 points to yh
-		mov	a,@r0		; load yh
-		mov	r1,a
-		dec	r0
-		mov	a,@r0		; load yl
-		mov	r0,a
+	mov	a,sp
+	add	a,#-2		; 2 bytes return address
+	mov	r0,a		; r0 points to yh
+	mov	a,@r0		; load yh
+	mov	r1,a
+	dec	r0
+	mov	a,@r0		; load yl
+	mov	r0,a
 
-		#define yl      r0
-		#define yh      r1
+	#define yl      r0
+	#define yh      r1
 
-	__divint:			; entry point for __divsint
+__divint:			; entry point for __divsint
 
 
   #else // SDCC_STACK_AUTO
 
     #if defined(SDCC_NOOVERLAY)
-		.area DSEG    (DATA)
+	.area DSEG    (DATA)
     #else
-		.area OSEG    (OVR,DATA)
+	.area OSEG    (OVR,DATA)
     #endif
 
-		.globl __divuint_PARM_2
-		.globl __divsint_PARM_2
+	.globl __divuint_PARM_2
+	.globl __divsint_PARM_2
 
-	__divuint_PARM_2:
-	__divsint_PARM_2:
-		.ds	2
+__divuint_PARM_2:
+__divsint_PARM_2:
+	.ds	2
 
-		.area CSEG    (CODE)
+	.area CSEG    (CODE)
 
-		#define yl      (__divuint_PARM_2)
-		#define yh      (__divuint_PARM_2 + 1)
+	#define yl      (__divuint_PARM_2)
+	#define yh      (__divuint_PARM_2 + 1)
 
   #endif // SDCC_STACK_AUTO
 #endif // SDCC_PARMS_IN_BANK1
 
-		mov	count,#16
-		clr	a
-		mov	reste_l,a
-		mov	reste_h,a
+	mov	count,#16
+	clr	a
+	mov	reste_l,a
+	mov	reste_h,a
 
-	loop:	mov	a,xl		; x <<= 1
-		add	a,acc
-		mov	xl,a
-		mov	a,xh
-		rlc	a
-		mov	xh,a
+loop:
+	mov	a,xl		; x <<= 1
+	add	a,acc
+	mov	xl,a
+	mov	a,xh
+	rlc	a
+	mov	xh,a
 
-		mov	a,reste_l	; reste <<= 1
-		rlc	a		;   feed in carry
-		mov	reste_l,a
-		mov	a,reste_h
-		rlc	a
-		mov	reste_h,a
+	mov	a,reste_l	; reste <<= 1
+	rlc	a		;   feed in carry
+	mov	reste_l,a
+	mov	a,reste_h
+	rlc	a
+	mov	reste_h,a
 
-		mov	a,reste_l	; reste - y
-		subb	a,yl		; here carry is always clear, because
+	mov	a,reste_l	; reste - y
+	subb	a,yl		; here carry is always clear, because
 					; reste <<= 1 never overflows
-		mov	b,a
-		mov	a,reste_h
-		subb	a,yh
+	mov	b,a
+	mov	a,reste_h
+	subb	a,yh
 
-		jc	smaller		; reste >= y?
+	jc	smaller		; reste >= y?
 
-		mov	reste_h,a	; -> yes;  reste = reste - y;
-		mov	reste_l,b
-		orl	xl,#1
-	smaller:			; -> no
-		djnz	count,loop
-		ret
+	mov	reste_h,a	; -> yes;  reste = reste - y;
+	mov	reste_l,b
+	orl	xl,#1
+smaller:			; -> no
+	djnz	count,loop
+	ret
 
-	_endasm ;
+	__endasm;
 }
 
 #else  // defined _DIVUINT_ASM_SMALL || defined _DIVUINT_ASM_SMALL_AUTO

@@ -26,9 +26,9 @@
 
 #if defined(SDCC_USE_XSTACK)
 
-static void dummy (void) _naked
+static void dummy (void) __naked
 {
-	_asm
+	__asm
 
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'setjmp'
@@ -73,7 +73,7 @@ _setjmp:
 	mov	a,sp
 	lcall	__gptrput
 	inc	dptr
-;../../device/lib/_setjmp.c:187:*buf++ = *((unsigned char data *) SP  );
+;../../device/lib/_setjmp.c:187:*buf++ = *((unsigned char __data *) SP  );
 ;     genCast
 ;     genPointerGet
 ;     genNearPointerGet
@@ -83,7 +83,7 @@ _setjmp:
 	mov	a,@r0
 	lcall	__gptrput
 	inc	dptr
-;../../device/lib/_setjmp.c:188:*buf   = *((unsigned char data *)SP - 1);
+;../../device/lib/_setjmp.c:188:*buf   = *((unsigned char __data *)SP - 1);
 ;     genCast
 ;     genMinus
 ;     genMinusDec
@@ -146,7 +146,7 @@ _longjmp:
 	inc	dptr
 ;     genAssign
 	mov	r5,a
-;../../device/lib/_setjmp.c:197:*((unsigned char data *) lsp) = *buf++;
+;../../device/lib/_setjmp.c:197:*((unsigned char __data *) lsp) = *buf++;
 ;     genCast
 	mov	r0,a
 ;     genPointerGet
@@ -156,7 +156,7 @@ _longjmp:
 ;     genPointerSet
 ;     genNearPointerSet
 	mov	@r0,a
-;../../device/lib/_setjmp.c:198:*((unsigned char data *) lsp - 1) = *buf;
+;../../device/lib/_setjmp.c:198:*((unsigned char __data *) lsp - 1) = *buf;
 ;     genMinus
 ;     genMinusDec
 	dec	r0
@@ -176,14 +176,14 @@ _longjmp:
 ;     genRet
 	ret
 
-	_endasm;
+	__endasm;
 }
 
 #elif defined(SDCC_STACK_AUTO)
 
-static void dummy (void) _naked
+static void dummy (void) __naked
 {
-	_asm
+	__asm
 
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'setjmp'
@@ -217,7 +217,7 @@ _setjmp:
 	mov	a,sp
 	lcall	__gptrput
 	inc	dptr
-;../../device/lib/_setjmp.c:127:*buf++ = *((unsigned char data *) SP  );
+;../../device/lib/_setjmp.c:127:*buf++ = *((unsigned char __data *) SP  );
 ;     genCast
 	mov	r0,sp
 ;     genPointerGet
@@ -227,7 +227,7 @@ _setjmp:
 ;     genGenPointerSet
 	lcall	__gptrput
 	inc	dptr
-;../../device/lib/_setjmp.c:128:*buf++ = *((unsigned char data *)SP - 1);
+;../../device/lib/_setjmp.c:128:*buf++ = *((unsigned char __data *)SP - 1);
 ;     genCast
 ;     genMinus
 ;     genMinusDec
@@ -285,7 +285,7 @@ _longjmp:
 	inc	dptr
 ;     genAssign
 	mov	r5,a
-;../../device/lib/_setjmp.c:32:*((unsigned char data *) lsp) = *buf++;
+;../../device/lib/_setjmp.c:32:*((unsigned char __data *) lsp) = *buf++;
 ;     genCast
 	mov	r0,a
 ;     genPointerGet
@@ -295,7 +295,7 @@ _longjmp:
 ;     genPointerSet
 ;     genNearPointerSet
 	mov	@r0,a
-;../../device/lib/_setjmp.c:33:*((unsigned char data *) lsp - 1) = *buf;
+;../../device/lib/_setjmp.c:33:*((unsigned char __data *) lsp - 1) = *buf;
 ;     genCast
 ;     genMinus
 ;     genMinusDec
@@ -315,12 +315,12 @@ _longjmp:
 	mov	dpl,r3
 	ret
 
-	_endasm;
+	__endasm;
 }
 
 #else
 
-//extern unsigned char data bp;
+//extern unsigned char __data bp;
 
 int setjmp (jmp_buf buf)
 {
@@ -329,8 +329,8 @@ int setjmp (jmp_buf buf)
        and the return address */
 //    *buf++ = bp;
     *buf++ = SP;
-    *buf++ = *((unsigned char data *) SP  );
-    *buf   = *((unsigned char data *)SP - 1);
+    *buf++ = *((unsigned char __data *) SP  );
+    *buf   = *((unsigned char __data *)SP - 1);
     return 0;
 }
 
@@ -339,8 +339,8 @@ int longjmp (jmp_buf buf, int rv)
     unsigned char lsp;
 //    bp = *buf++;
     lsp = *buf++;
-    *((unsigned char data *) lsp) = *buf++;
-    *((unsigned char data *) lsp - 1) = *buf;
+    *((unsigned char __data *) lsp) = *buf++;
+    *((unsigned char __data *) lsp - 1) = *buf;
     SP = lsp;
     return rv;
 }

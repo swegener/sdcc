@@ -30,14 +30,14 @@
 #if 1
 
 void
-_gptrgetc (char *gptr) _naked
+_gptrgetc (char *gptr) __naked
 {
 /* This is the new version with pointers up to 16 bits.
    B cannot be trashed */
 
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;   save values passed
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
@@ -75,17 +75,17 @@ _gptrgetc (char *gptr) _naked
         ret												; 1
         												;===
         												;28 bytes
-     _endasm ;
+     __endasm;
 }
 
 #else
 
 void
-_gptrgetc (char *gptr) _naked
+_gptrgetc (char *gptr) __naked
 {
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;   save values passed
 	xch    a,r0
 	push   acc
@@ -136,7 +136,7 @@ _gptrgetc (char *gptr) _naked
         pop     acc
         xch     a,r0
         ret
-     _endasm ;
+     __endasm;
 
 }
 #endif

@@ -41,9 +41,9 @@
 #define RBUFLEN 8
 
 /* You might want to specify idata, pdata or xdata for the buffers */
-static unsigned char pdata rbuf[RBUFLEN], xbuf[XBUFLEN];
+static unsigned char __pdata rbuf[RBUFLEN], xbuf[XBUFLEN];
 static unsigned char rcnt, xcnt, rpos, xpos;
-static bit busy;
+static __bit busy;
 
 void ser_init (void)
 {
@@ -58,7 +58,7 @@ void ser_init (void)
    ES = 1;
 }
 
-void ser_handler (void) interrupt 4
+void ser_handler (void) __interrupt 4
 {
    if (RI) {
 	   RI = 0;

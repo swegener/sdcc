@@ -35,15 +35,15 @@
 
 #define NON_BLOCKING
 
-unsigned char xdata ser_txIndexIn;
-unsigned char xdata ser_txIndexOut;
-unsigned char xdata ser_rxIndexIn;
-unsigned char xdata ser_rxIndexOut;
+unsigned char __xdata ser_txIndexIn;
+unsigned char __xdata ser_txIndexOut;
+unsigned char __xdata ser_rxIndexIn;
+unsigned char __xdata ser_rxIndexOut;
 
-unsigned char xdata ser_txBuffer[0x100];
-unsigned char xdata ser_rxBuffer[0x100];
+unsigned char __xdata ser_txBuffer[0x100];
+unsigned char __xdata ser_rxBuffer[0x100];
 
-static bit ser_txBusy;
+static __bit ser_txBusy;
 
 void
 ser_init(void)
@@ -79,7 +79,7 @@ ser_init(void)
 }
 
 void
-ser_interrupt_handler(void) interrupt 4 using 1
+ser_interrupt_handler(void) __interrupt 4 __using 1
 {
   ES=0;
 

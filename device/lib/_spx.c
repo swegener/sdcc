@@ -23,5 +23,5 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-data unsigned char spx ;
-data unsigned char _page_no__;
+__data unsigned char spx ;
+__data unsigned char _page_no__;

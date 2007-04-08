@@ -4239,17 +4239,33 @@ ast2iCode (ast * tree,int lvl)
     case GETHBIT:
       {
         operand *op = geniCodeUnary (geniCodeRValue (left, FALSE), tree->opval.op);
-        setOperandType (op, UCHARTYPE);
+        if (!IS_BIT (operandType (op)))
+          setOperandType (op, UCHARTYPE);
         return op;
       }
     case GETABIT:
+      {
+        operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
+                                      geniCodeRValue (right, FALSE),
+                                      tree->opval.op);
+        if (!IS_BIT (operandType (op)))
+          setOperandType (op, UCHARTYPE);
+        return op;
+      }
     case GETBYTE:
+      {
+        operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
+                                      geniCodeRValue (right, FALSE),
+                                      tree->opval.op);
+        setOperandType (op, UCHARTYPE);
+        return op;
+      }
     case GETWORD:
       {
         operand *op = geniCodeBinary (geniCodeRValue (left, FALSE),
                                       geniCodeRValue (right, FALSE),
                                       tree->opval.op);
-        setOperandType (op, (tree->opval.op == GETWORD) ? UINTTYPE : UCHARTYPE);
+        setOperandType (op, UINTTYPE);
         return op;
       }
     case AND_OP:
@@ -4263,7 +4279,7 @@ ast2iCode (ast * tree,int lvl)
     case NE_OP:
       /* different compilers (even different gccs) evaluate
          the two calls in a different order. to get the same
-         result on all machines we've to specify a clear sequence.
+         result on all machines we have to specify a clear sequence.
       return geniCodeLogic (geniCodeRValue (left, FALSE),
                             geniCodeRValue (right, FALSE),
                             tree->opval.op);

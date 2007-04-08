@@ -23,9 +23,9 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 
 	.globl	fs_compare_uint32
 fs_compare_uint32:
@@ -86,8 +86,7 @@ b_not_neg_zero_cleanup_1:
 b_not_neg_zero:
 	ret
 
-	_endasm;
+	__endasm;
 }
 
 #endif
-

@@ -12,14 +12,14 @@
 #include "8052.h"
 
 
-static unsigned char xdata stx_index_in, srx_index_in, stx_index_out, srx_index_out;
-static unsigned char xdata stx_buffer[0x100];
-static unsigned char xdata srx_buffer[0x100];
+static unsigned char __xdata stx_index_in, srx_index_in, stx_index_out, srx_index_out;
+static unsigned char __xdata stx_buffer[0x100];
+static unsigned char __xdata srx_buffer[0x100];
 
-static bit work_flag_byte_arrived;
-static bit work_flag_buffer_transfered;
-static bit tx_serial_buffer_empty;
-static bit rx_serial_buffer_empty;
+static __bit work_flag_byte_arrived;
+static __bit work_flag_buffer_transfered;
+static __bit tx_serial_buffer_empty;
+static __bit rx_serial_buffer_empty;
 
 
 void serial_init(void)
@@ -41,7 +41,7 @@ void serial_init(void)
     ES=1;
 }
 
-void serial_interrupt_handler(void) interrupt 4 using 1
+void serial_interrupt_handler(void) __interrupt 4 __using 1
 {
     ES=0;
     if ( RI )

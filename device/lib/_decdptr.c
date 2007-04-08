@@ -29,20 +29,20 @@ _decdptr (char *gptr)
 {
 	gptr; /* hush the compiler */
 
-#ifdef SDCC_ds390    
-    	_asm
-        orl dps, #0xc0
-        inc dptr
-        anl dps, #0x3f
-        _endasm ;
+#ifdef SDCC_ds390
+	__asm
+	orl	dps, #0xc0
+	inc	dptr
+	anl	dps, #0x3f
+	__endasm;
 #else
-    	_asm
-		xch	a,dpl
-		jnz     00001$
-		dec	dph
+	__asm
+	xch	a,dpl
+	jnz     00001$
+	dec	dph
 00001$:
-		dec	a
-		xch	a,dpl
-	_endasm ;
-#endif    
+	dec	a
+	xch	a,dpl
+	__endasm;
+#endif
 }

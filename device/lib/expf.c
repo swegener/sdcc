@@ -33,15 +33,15 @@
 #include <float.h>
 
 // TODO: share with other temps
-static bit sign_bit;
-static data unsigned char expf_y[4];
-static data unsigned char n;
+static __bit sign_bit;
+static __data unsigned char expf_y[4];
+static __data unsigned char n;
 
 
 float expf(float x)
 {
 	x;
-	_asm
+	__asm
 	mov	c, acc.7
 	mov	_sign_bit, c	// remember sign
 	clr	acc.7		// and make input positive
@@ -234,15 +234,13 @@ exp_cordic_skip:
 	dec	sp
 expf_done:
 	clr	acc.7		// Result is always positive!
-	_endasm;
+	__endasm;
 #pragma less_pedantic
 }
 
-
-
-static void dummy1(void) _naked
+static void dummy1(void) __naked
 {
-	_asm
+	__asm
 	.globl	fs_lshift_a
 expf_scale_and_add:
 	push    ar0
@@ -270,12 +268,12 @@ expf_scale_and_add:
 	dec	sp
 	dec	sp
 	ret
-	_endasm;
+	__endasm;
 }
 
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	fs_lshift_a
 fs_lshift_a:
 	jz	fs_lshift_done
@@ -299,13 +297,10 @@ fs_lshift_loop:
 	pop	ar0
 fs_lshift_done:
 	ret
-	_endasm;
+	__endasm;
 }
 
-
-
 #else // not MATH_ASM_MCS51
-
 
 #define P0      0.2499999995E+0
 #define P1      0.4160288626E-2
@@ -369,4 +364,3 @@ float expf(const float x)
 }
 
 #endif
-

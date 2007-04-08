@@ -38,14 +38,14 @@ __sbit __at (0xF5) B_5;
  * location dpl. Therefore we choose return type void here: */
 #if defined DSDCC_MODEL_HUGE
 void
-_gptrget (char *gptr) _naked
+_gptrget (char *gptr) __naked
 {
 /* This is the banked version with pointers up to 23 bits.
    B cannot be trashed */
 
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -97,20 +97,20 @@ _gptrget (char *gptr) _naked
         ret                                             ; 1
                                                         ;===
                                                         ;44 bytes
-     _endasm ;
+     __endasm;
 }
 
 #elif defined DSDCC_MODEL_MEDIUM
 
 void
-_gptrget (char *gptr) _naked
+_gptrget (char *gptr) __naked
 {
 /* This is the non-banked version with pointers up to 15 bits.
    Assumes B is free to be used */
 
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -155,20 +155,20 @@ _gptrget (char *gptr) _naked
         ret                                             ; 1
                                                         ;===
                                                         ;35 bytes
-     _endasm ;
+     __endasm;
 }
 
 #elif 1
 
 void
-_gptrget (char *gptr) _naked
+_gptrget (char *gptr) __naked
 {
 /* This is the new version with pointers up to 16 bits.
    B cannot be trashed */
 
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -208,19 +208,19 @@ _gptrget (char *gptr) _naked
         ret                                             ; 1
                                                         ;===
                                                         ;27 bytes
-     _endasm ;
+     __endasm;
 }
 
 #else
 
 void
-_gptrget (char *gptr) _naked
+_gptrget (char *gptr) __naked
 {
 /* This is the old version with pointers up to 16 bits. */
 
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -281,7 +281,7 @@ _gptrget (char *gptr) _naked
         ret                                             ; 1
                                                         ;===
                                                         ;40 bytes
-     _endasm ;
+     __endasm;
 }
 #endif
 
@@ -297,7 +297,7 @@ _gptrgetWord (unsigned *gptr)
 /* This is the new version */
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -352,7 +352,7 @@ _gptrgetWord (unsigned *gptr)
         mov     r0,dph ; restore r0
         mov     dph,#0 ; restore dph
  00006$:
-    _endasm ;
+    __endasm;
 
 }
 
@@ -363,7 +363,7 @@ _gptrgetWord (unsigned *gptr)
 {
     gptr; /* hush the compiler */
 
-    _asm
+    __asm
     ;
     ;   depending on the pointer type acc. to SDCCsymt.h
     ;
@@ -431,7 +431,7 @@ _gptrgetWord (unsigned *gptr)
 00005$:
         pop ar0
 00006$:
-    _endasm ;
+    __endasm;
 
 }
 #endif

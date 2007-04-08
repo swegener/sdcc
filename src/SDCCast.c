@@ -2189,8 +2189,7 @@ getResultTypeFromType (sym_link *type)
     }
   if (IS_CHAR (type))
     return RESULT_TYPE_CHAR;
-  if (   IS_INT (type)
-      && !IS_LONG (type))
+  if (IS_INT (type) && !IS_LONG (type))
     return RESULT_TYPE_INT;
   return RESULT_TYPE_OTHER;
 }
@@ -6371,12 +6370,10 @@ createFunction (symbol * name, ast * body)
   ex = newNode (FUNCTION, ex, body);
   ex->values.args = FUNC_ARGS(name->type);
   ex->decorated=1;
-  if (options.dump_tree) PA(ex);
+  if (options.dump_tree)
+    PA(ex);
   if (fatalError)
-    {
-      werror (E_FUNC_NO_CODE, name->name);
-      goto skipall;
-    }
+    goto skipall;
 
   /* Do not generate code for inline functions unless extern also */
   if (FUNC_ISINLINE (name->type) && !IS_EXTERN (fetype))
@@ -6389,10 +6386,7 @@ createFunction (symbol * name, ast * body)
   name->generated = 1;
 
   if (fatalError)
-    {
-      werror (E_FUNC_NO_CODE, name->name);
-      goto skipall;
-    }
+    goto skipall;
 
   eBBlockFromiCode (piCode);
 

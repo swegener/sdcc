@@ -953,7 +953,7 @@ aopOp (operand * op, iCode * ic, bool result)
   /* if the type is a conditional */
   if (sym->regType == REG_CND)
     {
-      aop = op->aop = sym->aop = newAsmop (AOP_CRY);
+      sym->aop = op->aop = aop = newAsmop (AOP_CRY);
       aop->size = 0;
       return;
     }
@@ -975,7 +975,7 @@ aopOp (operand * op, iCode * ic, bool result)
       if (sym->accuse)
         {
           int i;
-          aop = op->aop = sym->aop = newAsmop (AOP_ACC);
+          sym->aop = op->aop = aop = newAsmop (AOP_ACC);
           aop->size = getSize (sym->type);
           for (i = 0; i < 2; i++)
             aop->aopu.aop_str[i] = accUse[i];
@@ -986,7 +986,7 @@ aopOp (operand * op, iCode * ic, bool result)
         {
           unsigned i;
 
-          aop = op->aop = sym->aop = newAsmop (AOP_STR);
+          sym->aop = op->aop = aop = newAsmop (AOP_STR);
           aop->size = getSize (sym->type);
           for (i = 0; i < fReturnSizeMCS51; i++)
             aop->aopu.aop_str[i] = fReturn[i];
@@ -1838,7 +1838,8 @@ outBitC (operand * result)
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      aopPut (result, "c", 0);
+      if (!OP_SYMBOL (result)->ruonly)
+        aopPut (result, "c", 0);
     }
   else
     {
@@ -4038,7 +4039,8 @@ genRet (iCode * ic)
 
   if (IS_BIT(_G.currentFunc->etype))
     {
-      toCarry (IC_LEFT (ic));
+      if (!OP_SYMBOL (IC_LEFT (ic))->ruonly)
+        toCarry (IC_LEFT (ic));
     }
   else
     {

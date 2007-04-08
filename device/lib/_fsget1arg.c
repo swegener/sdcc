@@ -23,10 +23,10 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
 	// input passed in a,b,dph,dpl
-	_asm
+	__asm
 	.globl	fsgetarg
 fsgetarg:
 	// extract the input, placing it into:
@@ -45,9 +45,7 @@ fsgetarg:
 	mov	exp_a, a
 	mov	r4, b
 	ret
-	_endasm;
+	__endasm;
 }
 
 #endif
-
-

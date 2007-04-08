@@ -24,9 +24,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // long __fs2slong (float x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fs2slong
 ___fs2slong:
 	lcall	fsgetarg
@@ -89,14 +89,14 @@ fs2slong_maxval_pos:
 	mov	b, a
 	mov	a, #0x7F
 	ret
-	_endasm;
+	__endasm;
 }
 
 #else
 
-
 /* convert float to signed long */
-signed long __fs2slong (float f) {
+signed long __fs2slong (float f)
+{
 
   if (!f)
     return 0;

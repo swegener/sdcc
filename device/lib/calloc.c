@@ -25,12 +25,12 @@
 //--------------------------------------------------------------------
 //calloc function implementation for embedded system
 //Non-ANSI keywords are C51 specific.
-// xdata - variable in external memory (just RAM)
+// __xdata - variable in external memory (just RAM)
 //--------------------------------------------------------------------
 
 #if _SDCC_MALLOC_TYPE_MLH
 
-#define xdata
+#define __xdata
 
 typedef struct _MEMHEADER MEMHEADER;
 
@@ -59,9 +59,9 @@ MEMHEADER
 
 #endif
 
-void xdata * calloc (size_t nmemb, size_t size)
+void __xdata * calloc (size_t nmemb, size_t size)
 {
-  register void xdata * ptr;
+  register void __xdata * ptr;
 
   ptr = malloc(nmemb * size);
   if (ptr)

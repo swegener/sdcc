@@ -55,7 +55,7 @@ unsigned char _sdcc_external_startup(void)
   // select default cpu speed
   CpuSpeed(CPU_SPEED);
 
-  _asm
+  __asm
     ; save the 24-bit return address
     pop ar2; msb
     pop ar1
@@ -73,39 +73,39 @@ unsigned char _sdcc_external_startup(void)
     push ar0; lsb
     push ar1
     push ar2; msb
-  _endasm;
+  __endasm;
 
   // Copy the Interrupt Vector Table (128 bytes) from 0x10000 to 0x100000
   // This isn't needed for older bootloaders than the 0515, but it won't harm
-  _asm
-  push dpx
-  push dph
-  push dpl
-  push dps
-  push b
-  push acc
-  mov dps,#0x00 ; make sure no autoincrement in progress
-  mov dptr,#0x10000 ; from
-  inc dps ; switch to alternate dptr
-  mov dptr,#0x100000 ; to
-  mov b,#0x80 ; count
+  __asm
+    push dpx
+    push dph
+    push dpl
+    push dps
+    push b
+    push acc
+    mov dps,#0x00 ; make sure no autoincrement in progress
+    mov dptr,#0x10000 ; from
+    inc dps ; switch to alternate dptr
+    mov dptr,#0x100000 ; to
+    mov b,#0x80 ; count
 
 _Startup390CopyIVT:
-  inc dps
-  movx a,@dptr
-  inc dptr
-  inc dps
-  movx @dptr,a
-  inc dptr
-  djnz b,_Startup390CopyIVT
+    inc dps
+    movx a,@dptr
+    inc dptr
+    inc dps
+    movx @dptr,a
+    inc dptr
+    djnz b,_Startup390CopyIVT
 
-  pop acc
-  pop b
-  pop dps
-  pop dpl
-  pop dph
-  pop dpx
-  _endasm;
+    pop acc
+    pop b
+    pop dps
+    pop dpl
+    pop dph
+    pop dpx
+  __endasm;
 
   // global interrupt enable, all masks cleared
   // let the Gods be with us :)
@@ -132,12 +132,12 @@ _Startup390CopyIVT:
 
 unsigned int cpuSpeed;
 
-void CpuSpeed(unsigned int speed) {
-
-  #if 0
+void CpuSpeed(unsigned int speed)
+{
+#if 0
   while (0 && (EXIF&0x04))
     ; // cpu operates from ring buffer
-  #endif
+#endif
   PMR = 0x80; // div4, CTM off, multiplier 2x
   switch (speed) 
     {
@@ -181,7 +181,7 @@ static volatile int receive0BufferTail=0;
 // no buffering for transmit
 static volatile char transmit0IsBusy=0;
 
-static data unsigned char serial0Buffered;
+static __data unsigned char serial0Buffered;
 
 /* Initialize serial0.
 
@@ -191,8 +191,8 @@ static data unsigned char serial0Buffered;
    If buffered!=0, characters received are buffered using an interrupt
 */
 
-void Serial0Init (unsigned long baud, unsigned char buffered) {
-  
+void Serial0Init (unsigned long baud, unsigned char buffered)
+{
   if (baud==0) {
     ES0=0; // disable interrupts
     SCON0 &= 0xef; // disable receiver
@@ -217,7 +217,7 @@ void Serial0Init (unsigned long baud, unsigned char buffered) {
   
   serial0Buffered=buffered;
  
- if (buffered) {
+  if (buffered) {
     RI_0=TI_0=0; // clear "pending" interrupts
     ES0 = 1; // enable serial channel 0 interrupt
   } else {
@@ -226,7 +226,8 @@ void Serial0Init (unsigned long baud, unsigned char buffered) {
   }
 }
 
-void Serial0Baud(unsigned long baud) {
+void Serial0Baud(unsigned long baud)
+{
   TR2=0; // stop timer
   baud=-((long)OSCILLATOR/(32*baud));
   TL2=RCAP2L= baud;
@@ -235,7 +236,8 @@ void Serial0Baud(unsigned long baud) {
   TR2=1; // start timer
 }  
 
-void Serial0IrqHandler (void) interrupt 4 {
+void Serial0IrqHandler (void) __interrupt 4
+{
   if (RI_0) {
     receive0Buffer[receive0BufferHead]=SBUF0;
     receive0BufferHead=(receive0BufferHead+1)&(S0RBS-1);
@@ -251,7 +253,8 @@ void Serial0IrqHandler (void) interrupt 4 {
   }
 }
 
-char Serial0CharArrived(void) {
+char Serial0CharArrived(void)
+{
   if (serial0Buffered) {
     if (receive0BufferHead!=receive0BufferTail)
       return receive0Buffer[receive0BufferTail];
@@ -296,13 +299,15 @@ char Serial0GetChar (void)
   return c;
 }
 
-void Serial0SendBreak() {
+void Serial0SendBreak()
+{
   P3 &= ~0x02;
   ClockMilliSecondsDelay(2);
   P3 |= 0x02;
 }
 
-void Serial0Flush() {
+void Serial0Flush()
+{
   ES0=0; // disable interrupts
   receive0BufferHead=receive0BufferTail=0;
   RI_0=0;
@@ -328,7 +333,7 @@ static volatile int receive1BufferTail=0;
 // no buffering for transmit
 static volatile char transmit1IsBusy=0;
 
-static data unsigned char serial1Buffered;
+static __data unsigned char serial1Buffered;
 
 /* Initialize serial1.
 
@@ -338,8 +343,8 @@ static data unsigned char serial1Buffered;
    If buffered!=0, characters received are buffered using an interrupt
 */
 
-void Serial1Init (unsigned long baud, unsigned char buffered) {
-  
+void Serial1Init (unsigned long baud, unsigned char buffered)
+{
   if (baud==0) {
     ES1=0; // disable interrupt
     SCON1 &= 0xef; // disable receiver
@@ -372,7 +377,8 @@ void Serial1Init (unsigned long baud, unsigned char buffered) {
   }
 }
 
-void Serial1Baud(unsigned long baud) {
+void Serial1Baud(unsigned long baud)
+{
   TR1=0; // stop timer
   baud=-((long)OSCILLATOR/(32*baud));
   TL1=TH1 = baud;
@@ -380,7 +386,8 @@ void Serial1Baud(unsigned long baud) {
   TR1=1; // start timer
 }  
 
-void Serial1IrqHandler (void) interrupt 7 {
+void Serial1IrqHandler (void) __interrupt 7
+{
   if (RI_1) {
     receive1Buffer[receive1BufferHead]=SBUF1;
     receive1BufferHead=(receive1BufferHead+1)&(S1RBS-1);
@@ -394,7 +401,8 @@ void Serial1IrqHandler (void) interrupt 7 {
   }
 }
 
-char Serial1CharArrived(void) {
+char Serial1CharArrived(void)
+{
   if (serial1Buffered) {
     if (receive1BufferHead!=receive1BufferTail)
       return receive1Buffer[receive1BufferTail];
@@ -439,13 +447,15 @@ char Serial1GetChar (void)
   return c;
 }
 
-void Serial1SendBreak() {
+void Serial1SendBreak()
+{
   P5 &= ~0x08;
   ClockMilliSecondsDelay(2);
   P5 |= 0x08;
 }
 
-void Serial1Flush() {
+void Serial1Flush()
+{
   ES1=0; // disable interrupts
   receive1BufferHead=receive1BufferTail=0;
   RI_1=0;
@@ -460,10 +470,11 @@ void Serial1Flush() {
 // now let's go for the clock stuff
 
 // these REALLY need to be in data space for the irq routine!
-static data unsigned long milliSeconds=0;
-static data unsigned int timer0ReloadValue;
+static __data unsigned long milliSeconds=0;
+static __data unsigned int timer0ReloadValue;
 
-void ClockInit() {
+void ClockInit()
+{
   unsigned long timerReloadValue=OSCILLATOR/1000;
 
   switch (cpuSpeed) {
@@ -489,16 +500,17 @@ void ClockInit() {
 // This needs to be SUPER fast. What we really want is:
 
 #if 0
-void junk_ClockIrqHandler (void) interrupt 10 {
+void junk_ClockIrqHandler (void) __interrupt 10
+{
   TL0=timer0ReloadValue&0xff;
   TH0=timer0ReloadValue>>8;
   milliSeconds++;
 }
 #else
 // but look at the code, and the pushes and pops, so:
-void ClockIrqHandler (void) interrupt 1 _naked
+void ClockIrqHandler (void) __interrupt 1 __naked
 {
-  _asm
+  __asm
     push acc
     push psw
     mov _TL0,_timer0ReloadValue
@@ -511,16 +523,17 @@ void ClockIrqHandler (void) interrupt 1 _naked
     inc _milliSeconds+2
     cjne a,_milliSeconds+2,_ClockIrqHandlerDone
     inc _milliSeconds+3
-   _ClockIrqHandlerDone:
+  _ClockIrqHandlerDone:
     pop psw
     pop acc
     reti
-  _endasm;
+  __endasm;
 }
 #endif
 
 // we can't just use milliSeconds
-unsigned long ClockTicks(void) {
+unsigned long ClockTicks(void)
+{
   unsigned long ms;
   ET0=0;
   ms=milliSeconds;
@@ -528,7 +541,8 @@ unsigned long ClockTicks(void) {
   return ms;
 }
 
-void ClockMilliSecondsDelay(unsigned long delay) {
+void ClockMilliSecondsDelay(unsigned long delay)
+{
   long ms=ClockTicks()+delay;
 
   while (ms>ClockTicks())
@@ -536,38 +550,38 @@ void ClockMilliSecondsDelay(unsigned long delay) {
 }
 
 // stolen from Kevin Vigor, works only for TINI at default speed
-void ClockMicroSecondsDelay(unsigned int delay) {
-   delay; /* shut compiler up. */
+void ClockMicroSecondsDelay(unsigned int delay)
+{
+  delay; /* shut compiler up. */
    
-   _asm
+  __asm
      
-   ; delay is in dpl/dph
-   mov	r0, dpl
-   mov  r1, dph
+    ; delay is in dpl/dph
+    mov	r0, dpl
+    mov  r1, dph
+
+    mov	a, r0
+    orl  a, r1			; quick out for zero case.
+    jz   _usDelayDone
    
-   mov	a, r0
-   orl  a, r1			; quick out for zero case.
-   jz   _usDelayDone
+    inc	r1
+    cjne r0, #0, _usDelayLoop
+    dec  r1
    
-   inc	r1
-   cjne r0, #0, _usDelayLoop
-   dec  r1
-   
-   _usDelayLoop:
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop				; 7 nops
-   djnz r0, _usDelayLoop	; 3 cycles x 1 = 3 cycles
-      				; 10 cycles per iter
+  _usDelayLoop:
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop				; 7 nops
+    djnz r0, _usDelayLoop	; 3 cycles x 1 = 3 cycles
+				; 10 cycles per iter
 				; we want 9.216, but more is better
-      				; than less.
-   djnz r1, _usDelayLoop	
-_usDelayDone:
+				; than less.
+    djnz r1, _usDelayLoop	
+  _usDelayDone:
    
-   _endasm;
-  
+  __endasm;
 }

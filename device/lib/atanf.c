@@ -37,7 +37,7 @@
 #define K3  1.7320508076 /* sqrt(3)   */
 
 #ifdef SDCC_mcs51
-   #define myconst code
+   #define myconst __code
 #else
    #define myconst const
 #endif
@@ -73,4 +73,3 @@ float atanf(const float x) _FLOAT_FUNC_REENTRANT
     if(x<0.0) r=-r;
     return r;
 }
-

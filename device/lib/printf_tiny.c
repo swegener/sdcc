@@ -69,11 +69,11 @@
 
 
 
-void printf_tiny(code char *fmt, ...) reentrant
+void printf_tiny(__code char *fmt, ...) __reentrant
 {
 	fmt;	/* suppress unreferenced variable warning */
 
-	_asm
+	__asm
 
 printf_begin:
 	mov	a, _bp		// r0 will point to va_args (stack)
@@ -285,9 +285,8 @@ printf_ret:
 
 
 printf_end:
-	_endasm;
+	__endasm;
 }
 
 
 #endif // defines compatible with printf_tiny
-

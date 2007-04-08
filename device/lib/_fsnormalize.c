@@ -24,9 +24,9 @@
 
 #ifdef FLOAT_ASM_MCS51
 
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	fs_normalize_a
 fs_normalize_a:
 #ifdef FLOAT_SHIFT_SPEEDUP
@@ -71,8 +71,7 @@ fs_normalize_a:
 	djnz	r0, 00005$
 00006$:
 	ret
-	_endasm;
+	__endasm;
 }
 
 #endif
-

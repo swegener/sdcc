@@ -23,9 +23,9 @@
 #ifdef FLOAT_ASM_MCS51
 
 // unsigned int __fs2uint (float x)
-static void dummy(void) _naked
+static void dummy(void) __naked
 {
-	_asm
+	__asm
 	.globl	___fs2uint
 ___fs2uint:
 	mov	r7, #142
@@ -33,20 +33,19 @@ ___fs2uint:
 	mov	dph, a
 	mov	dpl, b
 	ret
-	_endasm;
+	__endasm;
 }
 
 #else
 
-
 unsigned long __fs2ulong (float a1);
 
 /* convert float to unsigned int */
-unsigned int __fs2uint (float f) {
+unsigned int __fs2uint (float f)
+{
   unsigned long ul=__fs2ulong(f);
   if (ul>=UINT_MAX) return UINT_MAX;
   return ul;
 }
 
 #endif
-

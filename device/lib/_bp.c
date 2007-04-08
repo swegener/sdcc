@@ -23,4 +23,4 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-data unsigned char bp ;
+__data unsigned char bp ;

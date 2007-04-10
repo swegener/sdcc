@@ -1395,7 +1395,7 @@ createInterruptVect (struct dbuf_s *vBuf)
 char *iComments1 =
 {
   ";--------------------------------------------------------\n"
-  "; File Created by SDCC : FreeWare ANSI-C Compiler\n"};
+  "; File Created by SDCC : free open source ANSI-C Compiler\n"};
 
 char *iComments2 =
 {

@@ -1,9 +1,9 @@
-SDCC - a Freeware, retargettable, optimizing ANSI-C compiler
-------------------------------------------------------------
+SDCC - free open source, retargettable, optimizing ANSI-C compiler
+------------------------------------------------------------------
 $Id$
 
 
-Welcome to SDCC, a freeware, retargettable, optimizing ANSI C compiler
+Welcome to SDCC, free open source, retargettable, optimizing ANSI C compiler
 that supports a growing list of processors including the Intel mcs51
 family, the Zilog z80, the Maxim ds390 and the Motorola HC08.
 
@@ -78,7 +78,7 @@ SDCC includes code from:
 * Alan Baldwin      <baldwin AT shop-pdp.kent.edu>
    Initial version of ASXXXX and  ASLINK. 
 * John Hartman      <jhartman AT compuserve.com>
-   Porting ASXXX and ASLINK for 8051.
+   Porting ASXXXX and ASLINK for 8051.
 * Dmitry S. Obukhov <dso AT usa.net>
    malloc and serial I/O routines.
 * Pascal Felber

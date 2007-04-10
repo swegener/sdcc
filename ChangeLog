@@ -1,7 +1,9 @@
-2007-04-01 Borut Razem <borut.razem AT siol.net>
+2007-04-10 Borut Razem <borut.razem AT siol.net>
 
 	* doc/cdbfileformat.lyx, doc/sdccman.lyx, doc/test_suite_spec.lyx:
 	  LyX file format changed to 245
+	* doc/sdccman.lyx, doc/README.txt, sdc/SDCC.lex, src/SDCCglue.c:
+	  "FreeWare" replaced with "free open source"
 
 2007-04-10 Maarten Brock <sourceforge.brock AT dse.nl>
 

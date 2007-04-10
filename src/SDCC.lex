@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------
-  SDCC.lex - lexical analyser for use with sdcc ( a freeware compiler for
-  8/16 bit microcontrollers)
+  SDCC.lex - lexical analyser for use with sdcc (free open source
+  compiler for 8/16 bit microcontrollers)
   Written by : Sandeep Dutta . sandeep.dutta@usa.net (1997)
 
   This program is free software; you can redistribute it and/or modify it

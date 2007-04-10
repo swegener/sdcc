@@ -108,7 +108,7 @@ SDCC 2.6.5
 \size footnotesize
 
 \newline
-$Date$ 
+$Date$
 \newline
 $Revision$
 \end_layout
@@ -163,8 +163,8 @@ C
 \emph on
 C
 \emph default
-ompiler) is an open source, retargettable, optimizing ANSI-C compiler by
- 
+ompiler) is free open source, retargettable, optimizing ANSI-C compiler
+ by 
 \series bold
 Sandeep Dutta
 \series default

@@ -501,7 +501,11 @@ __sbit __at (0xFF) P7_7            ;
 #define PWM16             0x80    /* PCA0CPMn                            */
 #define PINRSF            0x01    /* RSTSRC                              */
 #define PORSF             0x02    /* RSTSRC                              */
+#define MCDRSF            0x04    /* RSTSRC                              */
+#define WDTRSF            0x08    /* RSTSRC                              */
 #define SWRSF             0x10    /* RSTSRC                              */
+#define C0RSEF            0x20    /* RSTSRC                              */
+#define CNVRSEF           0x40    /* RSTSRC                              */
 
 
 /* SFR PAGE DEFINITIONS */

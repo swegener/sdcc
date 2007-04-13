@@ -1,4 +1,4 @@
-#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.2 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -74,7 +74,7 @@ status collapsed
 
 \begin_layout Standard
 Two resp.
- three consecutive dashes simply result in a long resp.
+ three consecutive dashes would otherwise result in a long resp.
  extra long dash.
 \end_layout
 
@@ -108,7 +108,7 @@ SDCC 2.6.5
 \size footnotesize
 
 \newline
-$Date$
+$Date$ 
 \newline
 $Revision$
 \end_layout
@@ -163,7 +163,7 @@ C
 \emph on
 C
 \emph default
-ompiler) is free open source, retargettable, optimizing ANSI-C compiler
+ompiler) is a free open source, retargettable, optimizing ANSI-C compiler
  by 
 \series bold
 Sandeep Dutta
@@ -802,8 +802,9 @@ Compatibility
 \end_layout
 
 \begin_layout Standard
-This version has numerous bug fixes compared with the previous version.
- But we also introduced some incompatibilities with older versions.
+Newer versions have usually numerous bug fixes compared with the previous
+ version.
+ But we also sometimes introduce some incompatibilities with older versions.
  Not just for the fun of it, but to make the compiler more stable, efficient
  and ANSI compliant
 \begin_inset LatexCommand \index{ANSI-compliance}
@@ -817,6 +818,16 @@ This version has numerous bug fixes compared with the previous version.
 
  for ANSI-Compliance).
  
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Standard
+It would be fine to add to each item, in which version was it changed.
+\end_layout
+
+\end_inset
+
+
 \newline
 
 \end_layout
@@ -824,6 +835,13 @@ This version has numerous bug fixes compared with the previous version.
 \begin_layout Itemize
 short is now equivalent to int (16 bits), it used to be equivalent to char
  (8 bits) which is not ANSI compliant.
+ To maintain compatibility, old programs may be compiled using the --short-is-8b
+its commandline option (see 
+\begin_inset LatexCommand \vref{lyx:--short-is-8bits}
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Itemize
@@ -5579,6 +5597,21 @@ objdump
 
 \end_inset
 
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Standard
+hyperlinks needed
+\end_layout
+
+\end_inset
+
+ - see also section 
+\begin_inset LatexCommand \vref{sub:Postprocessing-the-Intel}
+
+\end_inset
+
 ).
  Both formats are documented in the documentation of srecord
 \begin_inset LatexCommand \index{srecord (bin, hex, ... tool)}
@@ -5686,12 +5719,13 @@ odule
 \emph on
 f
 \emph default
-ormat is commonly used by third party tools (debuggers
+ormat is a subformat of the OMF51 format and is commonly used by third party
+ tools (debuggers
 \begin_inset LatexCommand \index{Debugger}
 
 \end_inset
 
-, simulators, emulators)
+, simulators, emulators).
 \end_layout
 
 \begin_layout Itemize
@@ -5743,6 +5777,11 @@ Postprocessing the Intel Hex
 \end_inset
 
  file
+\begin_inset LatexCommand \label{sub:Postprocessing-the-Intel}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -6400,6 +6439,11 @@ Command Line Options
 \end_inset
 
 
+\begin_inset LatexCommand \label{sec:Command-Line-Options}
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -6558,7 +6602,7 @@ Processor Selection Options
 
 \end_inset
 
-.
+, which is based on AVR-port of the gcc compiler.
 \end_layout
 
 \begin_layout Standard
@@ -6699,7 +6743,7 @@ Preprocessor Options
 
 
 \series default
- The additional location where the pre processor will look for <..h> or 
+ The additional location where the preprocessor will look for <..h> or 
 \begin_inset Quotes eld
 \end_inset
 
@@ -6883,6 +6927,11 @@ Like `-dD' except that the macro arguments and contents are omitted.
 
 \series bold
 -pedantic-parse-number
+\begin_inset LatexCommand \index{pedantic}
+
+\end_inset
+
+
 \begin_inset LatexCommand \index{-pedantic-parse-number}
 
 \end_inset
@@ -6890,20 +6939,40 @@ Like `-dD' except that the macro arguments and contents are omitted.
 
 \size large
 \bar under
+
+\begin_inset LatexCommand \label{lyx:-pedantic-parse-number}
+
+\end_inset
+
  
 \series default
 \size default
 \bar default
-Pedentic parse numbers so that situations like 0xfe-LO_B(3) are parsed properly
+Pedantic parse numbers so that situations like 0xfe-LO_B(3) are parsed properly
  and the macro LO_B(3) gets expanded.
- See also #pragma pedantic_parse_number in section
+ See also #pragma pedantic_parse_number 
+\begin_inset LatexCommand \vpageref{ite:pedantic_parse_number}
+
+\end_inset
+
+ in section
 \begin_inset LatexCommand \ref{sec:Pragmas}
 
 \end_inset
 
  
 \emph on
-Note: this functionality is not in conformance with standard!
+Note: this functionality is not in conformance with 
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Standard
+which standard? C99? 
+\end_layout
+
+\end_inset
+
+standard!
 \end_layout
 
 \begin_layout List
@@ -8196,6 +8265,21 @@ status collapsed
 -model-flat24 option
 \emph default
 ).
+\series bold
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+--stack-8-bit - switches off the 10-bit mode
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout List
@@ -9042,16 +9126,21 @@ status collapsed
 
 \end_inset
 
- function1[,function2][,function3]....
+ 
+\begin_inset LatexCommand \label{lyx:--callee-saves-function1[,function2][,function3]...}
+
+\end_inset
+
+function1[,function2][,function3]....
 
 \series default
  The compiler by default uses a caller saves convention for register saving
  across function calls, however this can cause unnecessary register pushing
- & popping when calling small functions from larger functions.
+ and popping when calling small functions from larger functions.
  This option can be used to switch the register saving convention for the
  function names specified.
  The compiler will not save registers when calling these functions, no extra
- code will be generated at the entry & exit (function prologue
+ code will be generated at the entry and exit (function prologue
 \series bold
 
 \begin_inset LatexCommand \index{function prologue}
@@ -9060,7 +9149,7 @@ status collapsed
 
 
 \series default
- & epilogue
+ and epilogue
 \series bold
 
 \begin_inset LatexCommand \index{function epilogue}
@@ -9069,9 +9158,9 @@ status collapsed
 
 
 \series default
-) for these functions to save & restore the registers used by these functions,
- this can SUBSTANTIALLY reduce code & improve run time performance of the
- generated code.
+) for these functions to save and restore the registers used by these functions,
+ this can SUBSTANTIALLY reduce code and improve run time performance of
+ the generated code.
  In the future the compiler (with inter procedural analysis) will be able
  to determine the appropriate scheme to use for each function call.
  DO NOT use this option for built-in functions such as _mulint..., if this
@@ -9093,12 +9182,61 @@ status collapsed
 
 -callee-saves option string.
  Also see #pragma\InsetSpace ~
-callee_saves
+callee_saves 
 \begin_inset LatexCommand \index{\#pragma callee\_saves}
 
 \end_inset
 
+ 
+\begin_inset LatexCommand \vpageref{ite:callee_saves-function1[,function2[,function3...]]--}
+
+\end_inset
+
 .
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-all-callee-saves
+\begin_inset LatexCommand \index{-\/-all-callee-saves}
+
+\end_inset
+
+ 
+\series default
+Function of
+\series bold
+ 
+\series default
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-callee-saves will be applied to all functions by default.
 \end_layout
 
 \begin_layout List
@@ -9584,18 +9722,34 @@ status collapsed
 \end_inset
 
 -less-pedantic
+\begin_inset LatexCommand \index{pedantic}
+
+\end_inset
+
+
 \begin_inset LatexCommand \index{-\/-less-pedantic}
 
 \end_inset
 
 
 \series default
+
+\begin_inset LatexCommand \label{lyx:--less-pedantic}
+
+\end_inset
+
  Disable some of the more pedantic warnings
 \begin_inset LatexCommand \index{Warnings}
 
 \end_inset
 
- (jwk burps: please be more specific here, please!).
+.
+ For more details, see the less_pedantic pragma 
+\begin_inset LatexCommand \vpageref{ite:less_pedantic}
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout List
@@ -9959,15 +10113,38 @@ status collapsed
 
 
 \series default
- Permit '$' as an identifier character
+ Permit '$' as an identifier character-
 \end_layout
 
 \begin_layout List
 \labelwidthstring 00.00.0000
 
 \series bold
-more-pedantic
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-more-pedantic
 \series default
+
+\begin_inset LatexCommand \index{-\/-more-pedantic}
+
+\end_inset
+
+
+\begin_inset LatexCommand \index{pedantic}
+
+\end_inset
+
  Actually this is 
 \series bold
 \emph on
@@ -10058,6 +10235,44 @@ splint\InsetSpace ~
 /usr/local/share/sdcc/include/mcs51/\InsetSpace ~
 \InsetSpace ~
 myprogram.c
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-short-is-8bits
+\series default
+
+\begin_inset LatexCommand \index{-\/-short-is-8bits}
+
+\end_inset
+
+
+\begin_inset LatexCommand \label{lyx:--short-is-8bits}
+
+\end_inset
+
+ Treat short as 8-bit (for backward compatibility with older versions of
+ compiler - see section 
+\begin_inset LatexCommand \ref{sec:Compatibility-with-previous}
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -11691,7 +11906,7 @@ using
 
 
 \emph default
-) should be used in interrupt
+) should be used for example in interrupt
 \begin_inset LatexCommand \index{interrupt}
 
 \end_inset
@@ -15833,7 +16048,11 @@ to_buffer_asm()
 \begin_inset Quotes sld
 \end_inset
 
+
+\series bold
 _asm
+\series default
+
 \begin_inset Quotes srd
 \end_inset
 
@@ -15841,8 +16060,25 @@ _asm
 \begin_inset Quotes sld
 \end_inset
 
+
+\series bold
 _endasm;
+\series default
+
 \begin_inset Quotes srd
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Standard
+Note, that the single underscore form (_asm and _endasm) are not C99-compatible,
+ and for C-99 compatibility, the double-underscore form (__asm and __endasm)
+ has to be used.
+ The latter is also used in the library functions.
+\end_layout
+
 \end_inset
 
  to the beginning and the end of the function body:
@@ -16810,16 +17046,12 @@ Use of Labels within Inline Assembler
 SDCC allows the use of in-line assembler with a few restrictions regarding
  labels.
  In older versions of the compiler all labels defined within inline assembler
- code 
-\emph on
-had to be
-\emph default
- of the form 
+ code had to be of the form 
 \emph on
 nnnnn$
 \emph default
- where nnnn is a number less than 100 (which implies a limit of utmost 100
- inline assembler labels 
+ where nnnnn is a number less than 100 (which implies a limit of utmost
+ 100 inline assembler labels 
 \emph on
 per function
 \emph default
@@ -16882,7 +17114,7 @@ _endasm
 \end_layout
 
 \begin_layout Standard
-Inline assembler code cannot reference any C-Labels, however it can reference
+Inline assembler code cannot reference any C-labels, however it can reference
  labels
 \begin_inset LatexCommand \index{Labels}
 
@@ -17034,8 +17266,95 @@ and
 
 
 \emph default
- to pass the first parameter to a routine.
- The second parameter onwards is either allocated on the stack (for reentrant
+ to pass the first parameter to a function, and also to pass the return
+ value 
+\begin_inset LatexCommand \index{return value}
+
+\end_inset
+
+of function; according to the following scheme: one byte return value in
+ 
+\emph on
+DPL
+\emph default
+, two byte value in 
+\emph on
+DPL
+\emph default
+ (LSB) and 
+\emph on
+DPH
+\emph default
+ (MSB).
+ three byte values (generic pointers) in 
+\emph on
+DPH
+\emph default
+, 
+\emph on
+DPL
+\emph default
+ and 
+\emph on
+B
+\emph default
+, and four byte values in 
+\emph on
+DPH
+\emph default
+, 
+\emph on
+DPL
+\emph default
+,
+\emph on
+ B
+\emph default
+ and 
+\emph on
+ACC
+\emph default
+.
+ Generic pointers
+\begin_inset LatexCommand \index{generic pointer}
+
+\end_inset
+
+ contain type of accessed memory in 
+\emph on
+B
+\emph default
+: 
+\series bold
+0x00
+\series default
+ -- xdata/far, 
+\series bold
+0x40
+\series default
+ -- idata/near -- , 
+\series bold
+0x60
+\series default
+ -- pdata, 
+\series bold
+0x80
+\series default
+ -- code
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Standard
+This might not be the case of certain memory models (medium???)
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The second parameter onwards is either allocated on the stack (for reentrant
  routines or if -
 \begin_inset ERT
 status collapsed
@@ -17049,9 +17368,95 @@ status collapsed
 
 \end_inset
 
--stack-auto is used) or in data / xdata memory (depending on the memory
- model).
+-stack-auto is used) or in data/xdata memory (depending on the memory model).
  
+\end_layout
+
+\begin_layout Subsection
+Registers usage
+\end_layout
+
+\begin_layout Standard
+Unless the called function is declared as 
+\family typewriter
+_naked
+\family default
+
+\begin_inset LatexCommand \index{naked}
+
+\end_inset
+
+, or the -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-callee-saves
+\begin_inset LatexCommand \index{-\/-callee-saves}
+
+\end_inset
+
+/-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-all-callee-saves command line option or the corresponding callee_saves
+ pragma are used, the caller will save the registers (
+\emph on
+R0-R7
+\emph default
+) around the call, so the called function can destroy they content freely.
+\end_layout
+
+\begin_layout Standard
+If the called function is not declared as 
+\family typewriter
+_naked
+\family default
+, the caller will swap register banks around the call, if caller and callee
+ use different register banks (having them defined by the 
+\family typewriter
+_using
+\family default
+ modifier).
+ 
+\end_layout
+
+\begin_layout Standard
+The called function can also use 
+\emph on
+DPL
+\emph default
+, 
+\emph on
+DPH
+\emph default
+, 
+\emph on
+B
+\emph default
+ and 
+\emph on
+ACC
+\emph default
+ observing that they are used for parameter/return value passing.
 \end_layout
 
 \begin_layout Subsection
@@ -17240,53 +17645,25 @@ ret
 \end_layout
 
 \begin_layout Standard
-Note here that the return values
-\begin_inset LatexCommand \index{return value}
-
-\end_inset
-
- are placed in 'dpl' - One byte return value, 'dpl' LSB & 'dph' MSB for
- two byte values.
- 'dpl', 'dph' and 'b' for three byte values (generic pointers) and 'dpl','dph','
-b' & 'acc' for four byte values.
-\end_layout
-
-\begin_layout Standard
 The parameter naming convention is _<function_name>_PARM_<n>, where n is
  the parameter number starting from 1, and counting from the left.
  The first parameter is passed in 
-\begin_inset Quotes eld
-\end_inset
-
-dpl
-\begin_inset Quotes erd
-\end_inset
-
- for a one byte parameter, 
-\begin_inset Quotes eld
-\end_inset
-
-dptr
-\begin_inset Quotes erd
-\end_inset
-
- for two bytes, 
-\begin_inset Quotes eld
-\end_inset
-
-b,dptr
-\begin_inset Quotes erd
-\end_inset
-
- for three bytes and 
-\begin_inset Quotes eld
-\end_inset
-
-acc,b,dptr
-\begin_inset Quotes erd
-\end_inset
-
- for a four bytes parameter.
+\emph on
+DPH
+\emph default
+, 
+\emph on
+DPL
+\emph default
+, 
+\emph on
+B
+\emph default
+ and 
+\emph on
+ACC
+\emph default
+ according to the description above.
  The variable name for the second parameter will be _<function_name>_PARM_2.
 \newline
 
@@ -17339,27 +17716,29 @@ In this case
 
  onwards will be passed on the stack, the parameters are pushed from right
  to left i.e.
- after the call the leftmost parameter will be on the top of the stack.
+ before the call the second leftmost parameter will be on the top of the
+ stack (the leftmost parameter is passed in registers).
  Here is an example:
 \end_layout
 
 \begin_layout Verse
 
 \family typewriter
-extern int asm_func(unsigned char, unsigned char);
+extern int asm_func(unsigned char, unsigned char, unsigned char) reentrant;
 \newline
 
 \newline
-int c_func (unsigned char
- i, unsigned char j) reentrant 
+int
+ c_func (unsigned char i, unsigned char j, unsigned char k) reentrant 
 \newline
-{ 
+{
+ 
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-return asm_func(i,j); 
+return asm_func(i,j,k); 
 \newline
 } 
 \newline
@@ -17373,14 +17752,13 @@ int main()
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-return
- c_func(10,9); 
+return c_func(10,9,8); 
 \newline
 }
 \end_layout
 
 \begin_layout Standard
-The corresponding assembler routine is:
+The corresponding (unoptimized) assembler routine is:
 \end_layout
 
 \begin_layout Verse
@@ -17394,87 +17772,164 @@ _asm_func:
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-push  _bp 
+push\InsetSpace ~
+_bp 
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov _bp,sp 
+mov\InsetSpace ~
+\InsetSpace ~
+_bp,sp\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+;stack contains: _bp, return
+ address, second parameter, third parameter
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov r2,dpl
+mov\InsetSpace ~
+\InsetSpace ~
+r2,dpl
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov a,_bp 
+mov\InsetSpace ~
+\InsetSpace ~
+a,_bp
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-add
- a,#0xfd 
+add\InsetSpace ~
+\InsetSpace ~
+a,#0xfd\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+;calculate
+ pointer to the second parameter
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov r0,a 
+mov\InsetSpace ~
+\InsetSpace ~
+r0,a 
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-add  a,#0xfc ;?
+mov\InsetSpace ~
+\InsetSpace ~
+a,_bp 
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov  r1,a 
+add\InsetSpace ~
+\InsetSpace ~
+a,#0xfc\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+;calculate pointer
+ to the rightmost parameter
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov  a,@r0 
+mov\InsetSpace ~
+\InsetSpace ~
+r1,a 
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-add  a,r2 ;?
+mov\InsetSpace ~
+\InsetSpace ~
+a,@r0
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov  dpl,a
- 
+add\InsetSpace ~
+\InsetSpace ~
+a,@r1
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov  dph,#0x00 
+add\InsetSpace ~
+\InsetSpace ~
+a,r2\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+;calculate the
+ result (= sum of all three parameters)
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-mov  sp,_bp 
+mov\InsetSpace ~
+\InsetSpace ~
+dpl,a\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+;return value goes into dptr
+ (cast into int)
 \newline
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-pop  _bp 
+mov\InsetSpace ~
+\InsetSpace ~
+dph,#0x00 
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+mov\InsetSpace ~
+\InsetSpace ~
+sp,_bp 
+\newline
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+\InsetSpace ~
+pop\InsetSpace ~
+\InsetSpace ~
+_bp 
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -20353,7 +20808,22 @@ Pragmas
 \end_layout
 
 \begin_layout Standard
-SDCC supports the following #pragma directives:
+Pragmas are used to turn on and/or off certain compiler options.
+ Some of them are closely related to corresponding command-line options
+ (see section 
+\begin_inset LatexCommand \vref{sec:Command-Line-Options}
+
+\end_inset
+
+).
+\newline
+Pragmas should be placed before and/or after a function, placing pragmas
+ inside a function body could have unpredictable results.
+\newline
+
+\newline
+SDCC supports the
+ following #pragma directives:
 \end_layout
 
 \begin_layout Itemize
@@ -20406,9 +20876,14 @@ callee_saves
 
 \end_inset
 
- function1[,function2[,function3...]] - The compiler by default uses a caller
- saves convention for register saving across function calls, however this
- can cause unnecessary register pushing & popping
+ function1[,function2[,function3...]] 
+\begin_inset LatexCommand \label{ite:callee_saves-function1[,function2[,function3...]]--}
+
+\end_inset
+
+- The compiler by default uses a caller saves convention for register saving
+ across function calls, however this can cause unnecessary register pushing
+ and popping
 \begin_inset LatexCommand \index{push/pop}
 
 \end_inset
@@ -20417,9 +20892,9 @@ callee_saves
  This option can be used to switch off the register saving convention for
  the function names specified.
  The compiler will not save registers when calling these functions, extra
- code need to be manually inserted at the entry & exit for these functions
- to save & restore the registers used by these functions, this can SUBSTANTIALLY
- reduce code & improve run time performance of the generated code.
+ code need to be manually inserted at the entry and exit for these functions
+ to save and restore the registers used by these functions, this can SUBSTANTIAL
+LY reduce code and improve run time performance of the generated code.
  In the future the compiler (with inter procedural analysis) may be able
  to determine the appropriate scheme to use for each function call.
  If -
@@ -20435,8 +20910,12 @@ status collapsed
 
 \end_inset
 
--callee-saves command line option is used, the function names specified
- in #pragma\InsetSpace ~
+-callee-saves command line option is used (see page 
+\begin_inset LatexCommand \vpageref{lyx:--callee-saves-function1[,function2][,function3]...}
+
+\end_inset
+
+), the function names specified in #pragma\InsetSpace ~
 callee_saves
 \begin_inset LatexCommand \index{\#pragma callee\_saves}
 
@@ -20508,12 +20987,124 @@ none
 less_pedantic
 \series default
 
+\begin_inset LatexCommand \index{pedantic}
+
+\end_inset
+
+
 \begin_inset LatexCommand \index{\#pragma less\_pedantic}
 
 \end_inset
 
- - the compiler will not warn you anymore for obvious mistakes, you'r on
- your own now ;-(
+ 
+\begin_inset LatexCommand \label{ite:less_pedantic}
+
+\end_inset
+
+- the compiler will not warn you anymore for obvious mistakes, you'r on
+ your own now ;-( .
+ See also the command line option -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-less-pedantic 
+\begin_inset LatexCommand \vpageref{lyx:--less-pedantic}
+
+\end_inset
+
+.
+ 
+\newline
+More specifically, the following warnings will be disabled: 
+\shape italic
+comparison is always [true/false] due to limited range of data type
+\shape default
+ (94); 
+\shape italic
+overflow in implicit constant conversion
+\shape default
+ (158); [the (in)famous] 
+\shape italic
+conditional flow changed by optimizer: so said EVELYN the modified DOG
+\shape default
+ (110); 
+\shape italic
+function '[function name]' must return value
+\shape default
+ (59).
+ 
+\newline
+Furthermore, warnings of less importance (of PEDANTIC and INFO warning
+ level) are disabled, too, namely: 
+\shape italic
+constant value '[
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Standard
+dunno what comes here - this warning appears to be unused altogether
+\end_layout
+
+\end_inset
+
+]', out of range
+\shape default
+ (81); 
+\shape italic
+[left/right] shifting more than size of object changed to zero
+\shape default
+ (116); 
+\shape italic
+unreachable code
+\shape default
+ (126); 
+\shape italic
+integer overflow in expression
+\shape default
+ (165); 
+\shape italic
+unmatched #pragma save and #pragma restore
+\shape default
+ (170); 
+\shape italic
+comparison of 'signed char' with 'unsigned char' requires promotion to int
+\shape default
+ (185); 
+\shape italic
+ISO C90 does not support flexible array members
+\shape default
+ (187); 
+\shape italic
+extended stack by [number] bytes for compiler temp(s) :in function '[function\InsetSpace ~
+nam
+e]':\InsetSpace ~
+[
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Standard
+appears to be always blank - what was supposed to be here?
+\end_layout
+
+\end_inset
+
+]
+\shape default
+ (114); 
+\shape italic
+function '[function name]', # edges [number] , # nodes [number] , cyclomatic
+ complexity [number]
+\shape default
+ (121).
 \end_layout
 
 \begin_layout Itemize
@@ -20527,6 +21118,24 @@ disable_warning
 \end_inset
 
  - the compiler will not warn you anymore about warning number <nnnn>.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Itemize
+\begin_inset Quotes sld
+\end_inset
+
+For list of warnings and corresponding codes, see err_warn.txt
+\begin_inset Quotes srd
+\end_inset
+
+ This list should probably be part of the manual? See Patch #1697136 
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Itemize
@@ -20865,14 +21474,45 @@ The preprocessor SDCPP
 pedantic_parse_number
 \series default
 
+\begin_inset LatexCommand \index{pedantic}
+
+\end_inset
+
+
 \begin_inset LatexCommand \index{\#pragma pedantic\_parse\_number}
 
 \end_inset
 
- (+ | -) - Pedantic parse numbers so that situations like 0xfe-LO_B(3) are
- parsed properly and the macro LO_B(3) gets expanded.
+ (+ | -) 
+\begin_inset LatexCommand \label{ite:pedantic_parse_number}
+
+\end_inset
+
+- Pedantic parse numbers so that situations like 0xfe-LO_B(3) are parsed
+ properly and the macro LO_B(3) gets expanded.
  Default is off.
- Below is an example on how to use this pragma.
+ See also the -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-pedantic-parse-number command line option 
+\begin_inset LatexCommand \vpageref{lyx:-pedantic-parse-number}
+
+\end_inset
+
+.
+ 
+\newline
+Below is an example on how to use this pragma.
 
 \emph on
  Note: this functionality is not in conformance with standard!
@@ -21069,14 +21709,13 @@ _endasm;
 \end_layout
 
 \begin_layout Standard
-The pragma's are intended to be used to turn-on or off certain optimizations
- which might cause the compiler to generate extra stack / data space to
- store compiler generated temporary variables.
+Some of the pragmas are intended to be used to turn-on or off certain optimizati
+ons which might cause the compiler to generate extra stack and/or data space
+ to store compiler generated temporary variables.
  This usually happens in large functions.
  Pragma directives should be used as shown in the following example, they
- are used to control options & optimizations for a given function; pragmas
- should be placed before and/or after a function, placing pragma's inside
- a function body could have unpredictable results.
+ are used to control options and optimizations for a given function.
+ 
 \end_layout
 
 \begin_layout Verse
@@ -22631,32 +23270,6 @@ status collapsed
 \end_inset
 
 -all-callee-saves
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--all-callee-saves
-\begin_inset LatexCommand \index{PIC16!Options!-\/-all-callee-saves}
-
-\end_inset
-
- All function arguments are passed on stack by default.
- 
-\emph on
-There is no need to specify this in the command line.
 \end_layout
 
 \begin_layout List
@@ -26746,7 +27359,7 @@ status collapsed
 
 \end_inset
 
- ) on howto handle syntax extensions like __xdata, __at(), ...
+) on how to handle syntax extensions like __xdata, __at(), ...
  
 \end_layout
 

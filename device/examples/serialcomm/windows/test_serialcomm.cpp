@@ -10,12 +10,10 @@
 
 int main(int argc, char* argv[])
 {
-
 	HANDLE	hComPort;
+	char buf[128];
 
-	int ComPortNumber = 1;
-
-	hComPort = SerialInit("com1", 1200);  // 1200 Baud
+	hComPort = SerialInit("com1", 1200, 8, 1, 'N', 'N', 5000, 5000, 2, 128);
 
 	if( hComPort == 0) {
 		printf("\n\nError initializing %s!\n", "com1");
@@ -27,7 +25,7 @@ int main(int argc, char* argv[])
 //	sleep(5000);
 	
 	// read string from RS232
-	printf("\nString received: %s\n", SerialGets(&hComPort));
+	printf("\nString received: %s\n", SerialGets(buf, sizeof (buf) - 1, hComPort));
 
 	CloseHandle(hComPort);
 

@@ -1,27 +1,27 @@
-// Flow control flags
+#define TIMEOUT -1
+#define SERIAL_ERROR -8
+#define BREAK -16
 
-#define FC_DTRDSR       0x01
-#define FC_RTSCTS       0x02
-#define FC_XONXOFF      0x04
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// ascii definitions
+HANDLE SerialInit(char*, DWORD, int, int, char, char, int, int, int, int); 
 
-#define ASCII_BEL       0x07
-#define ASCII_BS        0x08
-#define ASCII_LF        0x0A
-#define ASCII_CR        0x0D
-#define ASCII_XON       0x11
-#define ASCII_XOFF      0x13
+int SerialGetc(HANDLE);
 
+int SerialPutc(HANDLE, char);
 
-HANDLE SerialInit(char*, int);
+char SerialGets(char*, int, HANDLE);
 
-char SerialGetc(HANDLE*);
+void SerialPuts(HANDLE, char*);
 
-void SerialPutc(HANDLE*, char);
+int SerialGetModemStatus(HANDLE, int);
 
-char* SerialGets(HANDLE*);
+void SerialClearRxBuffer(HANDLE);
 
-void SerialPuts(HANDLE*, char*);
+void SerialClose(HANDLE); 
 
-void sleep(int);
+#ifdef __cplusplus
+}
+#endif

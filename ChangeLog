@@ -2,6 +2,11 @@
 
 	* doc/sdccman.lyx: -pedantic-parse-number is not in conformance with
 	  C99 standard
+	* device/examples/serialcomm/windows/serial.[ch],
+	  device/examples/serialcomm/windows/test_serialcomm.cpp:
+	  updated by Bela Torok
+	* device/examples/serialcomm/windows/serialcomm.dsw,
+	  device/examples/serialcomm/windows/serialcomm.dsp: added
 
 2007-04-13 Jan Waclawek <wek AT efton.sk>
 

@@ -1,4 +1,4 @@
-#LyX 1.4.2 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -108,7 +108,7 @@ SDCC 2.6.5
 \size footnotesize
 
 \newline
-$Date$ 
+$Date::             $ 
 \newline
 $Revision$
 \end_layout
@@ -6962,17 +6962,7 @@ Pedantic parse numbers so that situations like 0xfe-LO_B(3) are parsed properly
 
  
 \emph on
-Note: this functionality is not in conformance with 
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Standard
-which standard? C99? 
-\end_layout
-
-\end_inset
-
-standard!
+Note: this functionality is not in conformance with C99 standard!
 \end_layout
 
 \begin_layout List
@@ -10113,7 +10103,7 @@ status collapsed
 
 
 \series default
- Permit '$' as an identifier character-
+ Permit '$' as an identifier character.
 \end_layout
 
 \begin_layout List

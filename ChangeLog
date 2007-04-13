@@ -1,7 +1,12 @@
+2007-04-13 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: -pedantic-parse-number is not in conformance with
+	  C99 standard
+
 2007-04-13 Jan Waclawek <wek AT efton.sk>
 
-        * doc/sdccman.lyx: additions and changes at various places
-          (submitted as #1697136).
+	* doc/sdccman.lyx: additions and changes at various places
+	  (submitted as #1697136).
 	  (svn commit by Frieder Ferlemann <Frieder.Ferlemann AT web.de>)
 
 2007-04-10 Borut Razem <borut.razem AT siol.net>

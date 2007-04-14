@@ -163,7 +163,7 @@ C
 \emph on
 C
 \emph default
-ompiler) is a free open source, retargettable, optimizing ANSI-C compiler
+ompiler) is free open source, retargettable, optimizing ANSI-C compiler
  by 
 \series bold
 Sandeep Dutta
@@ -676,13 +676,14 @@ status collapsed
 \newline
 
 \newline
-SDCC also comes with a companion source level debugger SDCDB, the debugger
- currently uses ucSim a freeware simulator for 8051 and other micro-controllers.<
+SDCC also comes with a companion source level debugger SDCDB.
+ The debugger currently uses ucSim, a free open source simulator for 8051
+ and other micro-controllers.
 \newline
 
 \newline
-
-The latest version can be downloaded from 
+The latest SDCC version can be downloaded from
+ 
 \begin_inset LatexCommand \url{http://sdcc.sourceforge.net/snap.php}
 
 \end_inset
@@ -730,11 +731,11 @@ freeware
 \emph default
 ; source code for all the sub-packages (pre-processor, assemblers, linkers
  etc) is distributed with the package.
- This documentation is maintained using a freeware word processor (LyX).
+ This documentation is maintained using a free open source word processor
+ (LyX).
 \newline
-This
- program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License
+This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License
 \begin_inset LatexCommand \index{GNU General Public License, GPL}
 
 \end_inset
@@ -5380,7 +5381,7 @@ S51
 
 \end_inset
 
- is a freeware, opensource simulator developed by Daniel Drotos.
+ is a free open source simulator developed by Daniel Drotos.
  The simulator is built as part of the build process.
  For more information visit Daniel's web site at: 
 \begin_inset LatexCommand \url{http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51}

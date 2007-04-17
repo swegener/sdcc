@@ -9657,7 +9657,7 @@ status collapsed
 
 \end_inset
 
--no-gen-comments
+-no-verbose-asm
 \begin_inset LatexCommand \index{-\/-no-gen-comments}
 
 \end_inset
@@ -22757,7 +22757,7 @@ status collapsed
 
 \end_inset
 
--debug-extra
+-debug-xtra
 \begin_inset LatexCommand \index{PIC14!Options!-\/-debug-extra}
 
 \end_inset

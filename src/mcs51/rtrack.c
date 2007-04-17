@@ -46,7 +46,7 @@
 #define DEBUG(x)
 //#define DEBUG(x) x
 
-#define D(x) do if (!options.noGenComments) {x;} while(0)
+#define D(x) do if (!options.noVerboseAsm) {x;} while(0)
 
 #define REGS8051_SET(idx,val) do{ \
                                   regs8051[idx].value = (val) & 0xff; \

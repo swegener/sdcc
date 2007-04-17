@@ -9657,14 +9657,14 @@ status collapsed
 
 \end_inset
 
--no-verbose-asm
+-verbose-asm
 \begin_inset LatexCommand \index{-\/-no-gen-comments}
 
 \end_inset
 
 
 \series default
- Will not include code generator comments in the generated files.
+ Include code generator comments in the generated asm files.
 \end_layout
 
 \begin_layout List

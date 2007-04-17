@@ -3,7 +3,7 @@
 	* doc/sdccman.lyx, src/SDCCmain.c, src/SDCCglobal.h, src/ds390/gen.c,
 	  src/hc08/gen.c, src/mcs51/gen.c, src/mcs51/rtrack.c:
 	  fixed #1493816: option --no-gen-comments: --no-gen-comments renamed
-	  to --fno-verbose-asm, to be gcc'ish
+	  to --fverbose-asm, to be gcc'ish
 
 2007-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
 

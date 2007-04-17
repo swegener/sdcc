@@ -28,7 +28,7 @@
 -------------------------------------------------------------------------*/
 
 /* Use the D macro for basic (unobtrusive) debugging messages */
-#define D(x) do if (!options.noVerboseAsm) {x;} while(0)
+#define D(x) do if (options.verboseAsm) {x;} while(0)
 /* Use the DD macro for detailed debugging messages */
 #define DD(x)
 //#define DD(x) x

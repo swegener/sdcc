@@ -26,7 +26,7 @@
 -------------------------------------------------------------------------*/
 
 //#define D(x)
-#define D(x) do if (!options.noVerboseAsm) {x;} while(0)
+#define D(x) do if (options.verboseAsm) {x;} while(0)
 
 #include <stdio.h>
 #include <stdlib.h>

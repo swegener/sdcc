@@ -5,10 +5,14 @@
 2007-04-17 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: fixed #1701874: Mac OSX references in SDCC manual
+	* device/lib/ds400/tinibios.c, device/lib/hc08/_divuint.c,
+	  device/lib/hc08/_divulong.c: replaced _asm and _endasm keywords
+	  with their double underscore equivalent
 
 2007-04-14 Borut Razem <borut.razem AT siol.net>
 
-	* doc/sdccman.lyx: some additional "freeware" replaced with "free open source"
+	* doc/sdccman.lyx: some additional "freeware" replaced with "free open
+	  source"
 
 2007-04-13 Borut Razem <borut.razem AT siol.net>
 

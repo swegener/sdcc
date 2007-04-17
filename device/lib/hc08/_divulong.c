@@ -44,140 +44,140 @@
 static void
 _divlong_dummy (void) _naked
 {
-	_asm
+  __asm
 
-		.globl __divulong
+    .globl __divulong
 
-	__divulong:
+  __divulong:
 
-		#define count   r2
+    #define count   r2
 
-		#define a0	dpl
-		#define a1	dph
-		#define a2	b
-		#define a3	r3
+    #define a0  dpl
+    #define a1  dph
+    #define a2  b
+    #define a3  r3
 
-		#define reste0	r4
-		#define reste1	r5
-		#define reste2	r6
-		#define reste3	r7
+    #define reste0  r4
+    #define reste1  r5
+    #define reste2  r6
+    #define reste3  r7
 #if !defined(SDCC_PARMS_IN_BANK1)
 
 #if defined(SDCC_NOOVERLAY)
-		.area DSEG    (DATA)
+    .area DSEG    (DATA)
 #else
-		.area OSEG    (OVR,DATA)
+    .area OSEG    (OVR,DATA)
 #endif
 
-		.globl __divulong_PARM_2
-		.globl __divslong_PARM_2
+    .globl __divulong_PARM_2
+    .globl __divslong_PARM_2
 
-	__divulong_PARM_2:
-	__divslong_PARM_2:
-		.ds	4
+  __divulong_PARM_2:
+  __divslong_PARM_2:
+    .ds 4
 
-		.area CSEG    (CODE)
+    .area CSEG    (CODE)
 
-		#define b0      (__divulong_PARM_2)
-		#define b1      (__divulong_PARM_2 + 1)
-		#define b2      (__divulong_PARM_2 + 2)
-		#define b3      (__divulong_PARM_2 + 3)
+    #define b0      (__divulong_PARM_2)
+    #define b1      (__divulong_PARM_2 + 1)
+    #define b2      (__divulong_PARM_2 + 2)
+    #define b3      (__divulong_PARM_2 + 3)
 #else
-		#define b0      (b1_0)
-		#define b1      (b1_1)
-		#define b2      (b1_2)
-		#define b3      (b1_3)
+    #define b0      (b1_0)
+    #define b1      (b1_1)
+    #define b2      (b1_2)
+    #define b3      (b1_3)
 #endif // !SDCC_PARMS_IN_BANK1
-					; parameter a comes in a, b, dph, dpl
-		mov	a3,a		; save parameter a3
+          ; parameter a comes in a, b, dph, dpl
+    mov a3,a    ; save parameter a3
 
-		mov	count,#32
-		clr	a
-		mov	reste0,a
-		mov	reste1,a
-		mov	reste2,a
-		mov	reste3,a
+    mov count,#32
+    clr a
+    mov reste0,a
+    mov reste1,a
+    mov reste2,a
+    mov reste3,a
 
-	; optimization  loop in lp0 until the first bit is shifted into rest
+  ; optimization  loop in lp0 until the first bit is shifted into rest
 
-	lp0:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
-		rlc	a
-		mov	a1,a
-		mov	a,a2
-		rlc	a
-		mov	a2,a
-		mov	a,a3
-		rlc	a
-		mov	a3,a
+  lp0:  mov a,a0    ; a <<= 1
+    add a,a0
+    mov a0,a
+    mov a,a1
+    rlc a
+    mov a1,a
+    mov a,a2
+    rlc a
+    mov a2,a
+    mov a,a3
+    rlc a
+    mov a3,a
 
-		jc	in_lp
-		djnz	count,lp0
+    jc  in_lp
+    djnz  count,lp0
 
-		sjmp	exit
+    sjmp  exit
 
-	loop:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
-		rlc	a
-		mov	a1,a
-		mov	a,a2
-		rlc	a
-		mov	a2,a
-		mov	a,a3
-		rlc	a
-		mov	a3,a
+  loop: mov a,a0    ; a <<= 1
+    add a,a0
+    mov a0,a
+    mov a,a1
+    rlc a
+    mov a1,a
+    mov a,a2
+    rlc a
+    mov a2,a
+    mov a,a3
+    rlc a
+    mov a3,a
 
-	in_lp:	mov	a,reste0	; reste <<= 1
-		rlc	a		;   feed in carry
-		mov	reste0,a
-		mov	a,reste1
-		rlc	a
-		mov	reste1,a
-		mov	a,reste2
-		rlc	a
-		mov	reste2,a
-		mov	a,reste3
-		rlc	a
-		mov	reste3,a
+  in_lp:  mov a,reste0  ; reste <<= 1
+    rlc a   ;   feed in carry
+    mov reste0,a
+    mov a,reste1
+    rlc a
+    mov reste1,a
+    mov a,reste2
+    rlc a
+    mov reste2,a
+    mov a,reste3
+    rlc a
+    mov reste3,a
 
-		mov	a,reste0	; reste - b
-		subb	a,b0		; carry is always clear here, because
-					; reste <<= 1 never overflows
-		mov	a,reste1
-		subb	a,b1
-		mov	a,reste2
-		subb	a,b2
-		mov	a,reste3
-		subb	a,b3
+    mov a,reste0  ; reste - b
+    subb  a,b0    ; carry is always clear here, because
+                  ; reste <<= 1 never overflows
+    mov a,reste1
+    subb  a,b1
+    mov a,reste2
+    subb  a,b2
+    mov a,reste3
+    subb  a,b3
 
-		jc	minus		; reste >= b?
+    jc  minus   ; reste >= b?
 
-					; -> yes;  reste -= b;
-		mov	a,reste0
-		subb	a,b0		; carry is always clear here (jc)
-		mov	reste0,a
-		mov	a,reste1
-		subb	a,b1
-		mov	reste1,a
-		mov	a,reste2
-		subb	a,b2
-		mov	reste2,a
-		mov	a,reste3
-		subb	a,b3
-		mov	reste3,a
+          ; -> yes;  reste -= b;
+    mov a,reste0
+    subb  a,b0    ; carry is always clear here (jc)
+    mov reste0,a
+    mov a,reste1
+    subb  a,b1
+    mov reste1,a
+    mov a,reste2
+    subb  a,b2
+    mov reste2,a
+    mov a,reste3
+    subb  a,b3
+    mov reste3,a
 
-		orl	a0,#1
+    orl a0,#1
 
-	minus:	djnz	count,loop	; -> no
+  minus:  djnz  count,loop  ; -> no
 
-	exit:	mov	a,a3		; prepare the return value
-		ret
+  exit: mov a,a3    ; prepare the return value
+    ret
 
-	_endasm ;
+  __endasm ;
 }
 
 #elif defined _DIVULONG_ASM_SMALL_AUTO
@@ -185,138 +185,138 @@ _divlong_dummy (void) _naked
 static void
 _divlong_dummy (void) _naked
 {
-	_asm
+  __asm
 
-		.globl __divulong
+    .globl __divulong
 
-	__divulong:
+  __divulong:
 
-		#define count   r2
+    #define count   r2
 
-		#define a0	dpl
-		#define a1	dph
-		#define a2	b
-		#define a3	r3
+    #define a0  dpl
+    #define a1  dph
+    #define a2  b
+    #define a3  r3
 
-		#define reste0	r4
-		#define reste1	r5
-		#define reste2	r6
-		#define reste3	r7
+    #define reste0  r4
+    #define reste1  r5
+    #define reste2  r6
+    #define reste3  r7
 
-		.globl __divlong	; entry point for __divslong
+    .globl __divlong  ; entry point for __divslong
 
-		#define b0	r1
+    #define b0  r1
 
-		ar0 = 0			; BUG register set is not considered
-		ar1 = 1
+    ar0 = 0     ; BUG register set is not considered
+    ar1 = 1
 
-					; parameter a comes in a, b, dph, dpl
-		mov	a3,a		; save parameter a3
+          ; parameter a comes in a, b, dph, dpl
+    mov a3,a    ; save parameter a3
 
-		mov	a,sp
-		add	a,#-2-3		; 2 bytes return address, 3 bytes param b
-		mov	r0,a		; r0 points to b0
+    mov a,sp
+    add a,#-2-3   ; 2 bytes return address, 3 bytes param b
+    mov r0,a    ; r0 points to b0
 
-	__divlong:			; entry point for __divslong
+  __divlong:      ; entry point for __divslong
 
-		mov	ar1,@r0		; load b0
-		inc	r0		; r0 points to b1
+    mov ar1,@r0   ; load b0
+    inc r0    ; r0 points to b1
 
-		mov	count,#32
-		clr	a
-		mov	reste0,a
-		mov	reste1,a
-		mov	reste2,a
-		mov	reste3,a
+    mov count,#32
+    clr a
+    mov reste0,a
+    mov reste1,a
+    mov reste2,a
+    mov reste3,a
 
-	; optimization  loop in lp0 until the first bit is shifted into rest
+  ; optimization  loop in lp0 until the first bit is shifted into rest
 
-	lp0:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
-		rlc	a
-		mov	a1,a
-		mov	a,a2
-		rlc	a
-		mov	a2,a
-		mov	a,a3
-		rlc	a
-		mov	a3,a
+  lp0:  mov a,a0    ; a <<= 1
+    add a,a0
+    mov a0,a
+    mov a,a1
+    rlc a
+    mov a1,a
+    mov a,a2
+    rlc a
+    mov a2,a
+    mov a,a3
+    rlc a
+    mov a3,a
 
-		jc	in_lp
-		djnz	count,lp0
+    jc  in_lp
+    djnz  count,lp0
 
-		sjmp	exit
+    sjmp  exit
 
-	loop:	mov	a,a0		; a <<= 1
-		add	a,a0
-		mov	a0,a
-		mov	a,a1
-		rlc	a
-		mov	a1,a
-		mov	a,a2
-		rlc	a
-		mov	a2,a
-		mov	a,a3
-		rlc	a
-		mov	a3,a
+  loop: mov a,a0    ; a <<= 1
+    add a,a0
+    mov a0,a
+    mov a,a1
+    rlc a
+    mov a1,a
+    mov a,a2
+    rlc a
+    mov a2,a
+    mov a,a3
+    rlc a
+    mov a3,a
 
-	in_lp:	mov	a,reste0	; reste <<= 1
-		rlc	a		;   feed in carry
-		mov	reste0,a
-		mov	a,reste1
-		rlc	a
-		mov	reste1,a
-		mov	a,reste2
-		rlc	a
-		mov	reste2,a
-		mov	a,reste3
-		rlc	a
-		mov	reste3,a
+  in_lp:  mov a,reste0  ; reste <<= 1
+    rlc a   ;   feed in carry
+    mov reste0,a
+    mov a,reste1
+    rlc a
+    mov reste1,a
+    mov a,reste2
+    rlc a
+    mov reste2,a
+    mov a,reste3
+    rlc a
+    mov reste3,a
 
-		mov	a,reste0	; reste - b
-		subb	a,b0		; carry is always clear here, because
-					; reste <<= 1 never overflows
-		mov	a,reste1
-		subb	a,@r0		; b1
-		mov	a,reste2
-		inc	r0
-		subb	a,@r0		; b2
-		mov	a,reste3
-		inc	r0
-		subb	a,@r0		; b3
-		dec	r0
-		dec	r0
+    mov a,reste0  ; reste - b
+    subb  a,b0    ; carry is always clear here, because
+          ; reste <<= 1 never overflows
+    mov a,reste1
+    subb  a,@r0   ; b1
+    mov a,reste2
+    inc r0
+    subb  a,@r0   ; b2
+    mov a,reste3
+    inc r0
+    subb  a,@r0   ; b3
+    dec r0
+    dec r0
 
-		jc	minus		; reste >= b?
+    jc  minus   ; reste >= b?
 
-					; -> yes;  reste -= b;
-		mov	a,reste0
-		subb	a,b0		; carry is always clear here (jc)
-		mov	reste0,a
-		mov	a,reste1
-		subb	a,@r0		; b1
-		mov	reste1,a
-		mov	a,reste2
-		inc	r0
-		subb	a,@r0		; b2
-		mov	reste2,a
-		mov	a,reste3
-		inc	r0
-		subb	a,@r0		; b3
-		mov	reste3,a
-		dec	r0
-		dec	r0
+          ; -> yes;  reste -= b;
+    mov a,reste0
+    subb  a,b0    ; carry is always clear here (jc)
+    mov reste0,a
+    mov a,reste1
+    subb  a,@r0   ; b1
+    mov reste1,a
+    mov a,reste2
+    inc r0
+    subb  a,@r0   ; b2
+    mov reste2,a
+    mov a,reste3
+    inc r0
+    subb  a,@r0   ; b3
+    mov reste3,a
+    dec r0
+    dec r0
 
-		orl	a0,#1
+    orl a0,#1
 
-	minus:	djnz	count,loop	; -> no
+  minus:  djnz  count,loop  ; -> no
 
-	exit:	mov	a,a3		; prepare the return value
-		ret
+  exit: mov a,a3    ; prepare the return value
+    ret
 
-	_endasm ;
+  __endasm ;
 }
 
 #else // _DIVULONG_ASM

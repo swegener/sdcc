@@ -954,7 +954,7 @@ aopOp (operand * op, iCode * ic, bool result)
   if (sym->regType == REG_CND)
     {
       sym->aop = op->aop = aop = newAsmop (AOP_CRY);
-      aop->size = 0;
+      aop->size = sym->ruonly ? 1 : 0;
       return;
     }
 
@@ -7460,7 +7460,7 @@ genXor (iCode * ic, iCode * ifx)
       // val = c
       if (size)
         outBitC (result);
-      // if(bit | ...)
+      // if(bit ^ ...)
       else if ((AOP_TYPE (result) == AOP_CRY) && ifx)
         genIfxJump (ifx, "c", left, right, result);
       goto release;

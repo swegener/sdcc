@@ -1,3 +1,7 @@
+2007-04-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (aopOp): set size to 1 for ruonly, fixes bug 1699455
+
 2007-04-17 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: fixed #1701874: Mac OSX references in SDCC manual

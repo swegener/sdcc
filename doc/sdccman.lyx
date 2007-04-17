@@ -9657,7 +9657,7 @@ status collapsed
 
 \end_inset
 
--verbose-asm
+-fverbose-asm
 \begin_inset LatexCommand \index{-\/-no-gen-comments}
 
 \end_inset

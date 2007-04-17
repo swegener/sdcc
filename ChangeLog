@@ -1,3 +1,7 @@
+2007-04-17 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx: fixed #1701874: Mac OSX references in SDCC manual
+
 2007-04-14 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: some additional "freeware" replaced with "free open source"

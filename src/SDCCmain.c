@@ -220,7 +220,7 @@ optionsTable[] = {
     { 0,    OPTION_NO_XINIT_OPT,    &options.noXinitOpt, "don't memcpy initialized xram from code"},
     { 0,    OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
     { 0,    OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
-    { 0,    OPTION_VERBOSE_ASM,   &options.verboseAsm, "don't include code generator comments"},
+    { 0,    OPTION_VERBOSE_ASM,     &options.verboseAsm, "include code generator comments"},
 #if !OPT_DISABLE_Z80 || !OPT_DISABLE_GBZ80
     { 0,    "--no-std-crt0", &options.no_std_crt0, "For the z80/gbz80 do not link default crt0.o"},
 #endif

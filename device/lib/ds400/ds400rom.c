@@ -31,12 +31,12 @@
 #include <ds400rom.h>
 
 // ROM globals, taken from startup400.a51
-data unsigned char at 0x68 DSS_wos_crit_count;
-data unsigned int at 0x6b DSS_timerReload;
-data unsigned char at 0x6d DSS_curr_pc[3];
-data unsigned char at 0x72 DSS_sched[3];
-data unsigned char at 0x74 DSS_ms_count[5];
-data unsigned char at 0x7b DSS_hb_chandle[5];
+__data unsigned char __at (0x68) DSS_wos_crit_count;
+__data unsigned int  __at (0x6b) DSS_timerReload;
+__data unsigned char __at (0x6d) DSS_curr_pc[3];
+__data unsigned char __at (0x72) DSS_sched[3];
+__data unsigned char __at (0x74) DSS_ms_count[5];
+__data unsigned char __at (0x7b) DSS_hb_chandle[5];
     
 // Register bank 3 equates.
 #define R0_B3     0x18
@@ -241,9 +241,9 @@ data unsigned char at 0x7b DSS_hb_chandle[5];
     
 
 // expects function number in R6_B3 (low byte) & R7_B3 (high byte)
-void _romcall(void) _naked
+void _romcall(void) __naked
 {
-_asm    
+__asm    
       push  dpx                               ; dptr0 preserved here
       push  dph
       push  dpl
@@ -286,13 +286,13 @@ _asm
       ret                                     ; this is not a ret, it is a call!
 	
       ; the called function ends with a ret which will return to our original caller.
-_endasm ;
+__endasm ;
 }
 
 // expects function number in R6_B3 (low byte) & R7_B3 (high byte)
-void _romredirect(void) _naked
+void _romredirect(void) __naked
 {
-_asm
+__asm
       push  dpx
       push  dph
       push  dpl
@@ -323,7 +323,7 @@ _asm
       ret                       ; this is not a ret, it is a call!
 
       ; the called function ends with a ret which will return to our original caller.
-_endasm;	
+__endasm;	
 }
 
 
@@ -343,14 +343,14 @@ _endasm;
 
 
 // init_rom: the ds400 ROM_INIT ROM function.
-unsigned char init_rom(void xdata *loMem,
-		       void xdata *hiMem) _naked
+unsigned char init_rom(void __xdata *loMem,
+		       void __xdata *hiMem) __naked
 {    
     // shut compiler up about unused parameters.
     loMem;
     hiMem;
     
-_asm
+__asm
 	; load params.
 	; loMem is already in DPTR.
 	mov	r2, dpx
@@ -367,14 +367,14 @@ _asm
 	; result is in acc, move to dpl for C convention.
 	mov	dpl, a
 	ret
-_endasm	;
+__endasm	;
 }
 
 // DSS_gettimemillis: note that the ROM actually returns 5 bytes of time,
 // we're discarding the high byte here.
-unsigned long task_gettimemillis_long(void) _naked
+unsigned long task_gettimemillis_long(void) __naked
 {
-_asm    
+__asm    
     ; no parameters to load. 
     ROMREDIRECT(ROMRT_GETTIMEMILLIS)
    ; results in r4 - r0, return in DPTR/B
@@ -383,18 +383,18 @@ _asm
    mov dpx, r2
    mov b, r3
    ret
-_endasm;
+__endasm;
 }
 
-unsigned char task_getthreadID(void) _naked
+unsigned char task_getthreadID(void) __naked
 {
-_asm    
+__asm    
     ; no parameters to load. 
     ROMREDIRECT(ROMRT_GETTHREADID)
    ; results in acc, return in dpl
    mov dpl, a
    ret
-_endasm;    
+__endasm;    
 }
 
 unsigned int task_gettickreload(void)

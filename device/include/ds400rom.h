@@ -8,7 +8,7 @@ extern unsigned char init_rom(void __xdata *loMem,
 
 extern unsigned long task_gettimemillis_long(void) __naked;
 
-extern unsigned char task_getthreadID(void) _naked;
+extern unsigned char task_getthreadID(void) __naked;
 
 /** Timer reload value for 14.746 MHz crystal. */
 #define RELOAD_14_746 0xfb33

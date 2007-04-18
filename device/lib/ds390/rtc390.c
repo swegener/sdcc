@@ -32,10 +32,10 @@
    range since the chip only uses CE3*
 */
 
-xdata at 0x310000 static volatile unsigned char rtc;
+__xdata __at (0x310000) static volatile unsigned char rtc;
 
 // this is the 64bit pattern that has to be recognized by the ds1315
-code unsigned char rtcMagic[8]={0xc5,0x3a,0xa3,0x5c,0xc5,0x3a,0xa3,0x5c};
+__code unsigned char rtcMagic[8]={0xc5,0x3a,0xa3,0x5c,0xc5,0x3a,0xa3,0x5c};
 
 #define BCDtoINT(x) (((x)&0x0f)+((x)>>4)*10)
 #define INTtoBCD(x) (((x)%10)+(((x)/10)<<4))

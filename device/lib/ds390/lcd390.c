@@ -41,13 +41,13 @@ static unsigned char lcdLinesStart[LCD_ROWS]={0, 0x40, 0x14, 0x54};
 
 //#define LCD_RW
 
-xdata at 0x380002 static unsigned char lcdIwr;
-xdata at 0x38000a static unsigned char lcdDwr;
+__xdata __at (0x380002) static unsigned char lcdIwr;
+__xdata __at (0x38000a) static unsigned char lcdDwr;
 
 #ifdef LCD_RW
 
-xdata at 0x380003 static unsigned char lcdIrd;
-xdata at 0x38000b static unsigned char lcdDrd;
+__xdata __at (0x380003) static unsigned char lcdIrd;
+__xdata __at (0x38000b) static unsigned char lcdDrd;
 
 #define LcdWait { while (lcdIrd&0x80) ; }
 
@@ -147,7 +147,7 @@ void LcdLPutString (unsigned int collumnRow, char *string) {
 // however they will :), so to be sure
 static char lcdPrintfBuffer[LCD_COLLUMNS*4];
 
-void LcdPrintf (const char *format, ...) reentrant {
+void LcdPrintf (const char *format, ...) __reentrant {
   va_list arg;
 
   va_start (arg, format);
@@ -158,7 +158,7 @@ void LcdPrintf (const char *format, ...) reentrant {
   va_end (arg);
 }
 
-void LcdLPrintf (unsigned int collumnRow, const char *format, ...) reentrant {
+void LcdLPrintf (unsigned int collumnRow, const char *format, ...) __reentrant {
   va_list arg;
 
   LcdGoto(collumnRow);

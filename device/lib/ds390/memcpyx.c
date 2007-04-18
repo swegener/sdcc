@@ -1,17 +1,17 @@
 #include <string.h>
 
-void xdata * memcpyx (
-	void xdata * dst,
-	void xdata * src,
+void __xdata * memcpyx (
+	void __xdata * dst,
+	void __xdata * src,
 	int count
-	) _naked
+	) __naked
 {
     /* Shut compiler up about unused parameters. */
     dst; src; count;
     
 /* AUTO_TOGGLE uses the '390 DPTS toggle bit. */    
 #define AUTO_TOGGLE    
-_asm
+__asm
     ; Destination is in DPTR. Save it on stack so we can return it at end.
     
     push dpx
@@ -88,6 +88,6 @@ _memcpy_done:
     pop dph
     pop dpx
     ret
-_endasm;    
+__endasm;    
     
 }

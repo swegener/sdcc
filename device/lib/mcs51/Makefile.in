@@ -16,7 +16,7 @@ CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(top_srcdir)/include
+CFLAGS = -I$(top_srcdir)/include --std-c89
 
 all: $(LIB)
 

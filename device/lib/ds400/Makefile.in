@@ -10,7 +10,7 @@ OBJECTS = tinibios.rel memcpyx.rel ds400rom.rel
 SOURCES = $(patsubst %.rel,%.c,$(OBJECTS))
 
 CPPFLAGS = -I$(srcdir)/../../include
-CFLAGS = -mds400 $(CPPFLAGS) $(VERBOSE)
+CFLAGS = -mds400 $(CPPFLAGS) $(VERBOSE) --std-c89
 
 all: $(OBJECTS) libds400.lib
 

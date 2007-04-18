@@ -1,3 +1,20 @@
+2007-04-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/ds400rom.h,
+	* device/lib/ds390/lcd390.c,
+	* device/lib/ds390/memcpyx.c,
+	* device/lib/ds390/rtc390.c,
+	* device/lib/ds400/ds400rom.c,
+	* device/lib/ds400/memcpyx.c,
+	* device/lib/hc08/_ret.c: more replacements of keywords with their
+	  double underscore equivalents
+	* device/lib/ds390/Makefile.in,
+	* device/lib/ds400/Makefile.in,
+	* device/lib/gbz80/Makefile.in,
+	* device/lib/hc08/Makefile.in,
+	* device/lib/mcs51/Makefile.in,
+	* device/lib/z80/Makefile.in: added --std-c89 to CFLAGS
+
 2007-04-17 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx, src/SDCCmain.c, src/SDCCglobal.h, src/ds390/gen.c,

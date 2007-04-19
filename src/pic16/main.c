@@ -31,6 +31,7 @@
 #include "SDCCutil.h"
 #include "glue.h"
 #include "pcode.h"
+#include "SDCCargs.h"
 #include "dbuf_string.h"
 
 
@@ -588,9 +589,6 @@ OPTION pic16_optionsTable[]= {
 
 
 #define ISOPT(str)	!strncmp(argv[ *i ], str, strlen(str) )
-
-extern char *getStringArg(const char *,  char **, int *, int);
-extern int getIntArg(const char *, char **, int *, int);
 
 static bool
 _pic16_parseOptions (int *pargc, char **argv, int *i)

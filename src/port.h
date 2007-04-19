@@ -67,10 +67,10 @@ typedef struct
 /** Unique id for this target */
     const int id;
 /** Target name used for -m */
-    const char *target;
+    const char * const target;
 
 /** Target name string, used for --help */
-    const char *target_name;
+    const char * const target_name;
 
 /** Specific processor for the given target family. specified by -p */
     char *processor;
@@ -167,25 +167,30 @@ typedef struct
 /** memory regions related stuff */
     struct
       {
-        const char *xstack_name;
-        const char *istack_name;
+        const char * const xstack_name;
+        const char * const istack_name;
+        /*
+         * The following 2 items can't be const pointers
+         * due to ugly implementation in z80 target;
+         * this should be fixed in src/z80/main.c (borutr)
+         */
         const char *code_name;
         const char *data_name;
-        const char *idata_name;
-        const char *pdata_name;
-        const char *xdata_name;
-        const char *bit_name;
-        const char *reg_name;
-        const char *static_name;
-        const char *overlay_name;
-        const char *post_static_name;
-        const char *home_name;
-        const char *xidata_name; // initialized xdata
-        const char *xinit_name; // a code copy of xidata
-        const char *const_name; // const data (code or not)
-        const char *cabs_name; // const absolute data (code or not)
-	const char *xabs_name; // absolute xdata/pdata
-	const char *iabs_name; // absolute idata/data
+        const char * const idata_name;
+        const char * const pdata_name;
+        const char * const xdata_name;
+        const char * const bit_name;
+        const char * const reg_name;
+        const char * const static_name;
+        const char * const overlay_name;
+        const char * const post_static_name;
+        const char * const home_name;
+        const char * const xidata_name; // initialized xdata
+        const char * const xinit_name; // a code copy of xidata
+        const char * const const_name; // const data (code or not)
+        const char * const cabs_name; // const absolute data (code or not)
+        const char * const xabs_name; // absolute xdata/pdata
+        const char * const iabs_name; // absolute idata/data
         struct memmap *default_local_map; // default location for auto vars
         struct memmap *default_globl_map; // default location for globl vars
         int code_ro;            /* code space read-only 1=yes */

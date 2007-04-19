@@ -585,8 +585,8 @@ setDefaultOptions (void)
   options.shortis8bits = 0;
   options.std_sdcc = 1;           /* enable SDCC language extensions */
   options.std_c99 = 0;            /* default to C89 until more C99 support */
-  options.code_seg = CODE_NAME;   /* default to CSEG for generated code */
-  options.const_seg = CONST_NAME; /* default to CONST for generated code */
+  options.code_seg = CODE_NAME ? Safe_strdup(CODE_NAME) : NULL; /* default to CSEG for generated code */
+  options.const_seg = CONST_NAME ? Safe_strdup(CONST_NAME) : NULL; /* default to CONST for generated code */
 
   options.stack10bit=0;
 
@@ -888,6 +888,12 @@ parseCmdLine (int argc, char **argv)
       if (i >= argc)
         break;
 
+      /* check port specific options before general ones */
+      if (port->parseOption (&argc, argv, &i) == TRUE)
+        {
+          continue;
+        }
+
       if (tryHandleUnsupportedOpt(argv, &i) == TRUE)
         {
           continue;
@@ -1157,6 +1163,7 @@ parseCmdLine (int argc, char **argv)
 
               dbuf_init (&segname, 16);
               dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CODE_SEG, argv, &i, argc));
+              if (options.code_seg) Safe_free(options.code_seg);
               options.code_seg = dbuf_detach (&segname);
               continue;
             }
@@ -1167,19 +1174,13 @@ parseCmdLine (int argc, char **argv)
 
               dbuf_init (&segname, 16);
               dbuf_printf (&segname, "%-8s(CODE)", getStringArg (OPTION_CONST_SEG, argv, &i, argc));
+              if (options.const_seg) Safe_free(options.const_seg);
               options.const_seg = dbuf_detach (&segname);
               continue;
             }
 
-          if (!port->parseOption (&argc, argv, &i))
-            {
-              werror (W_UNKNOWN_OPTION, argv[i]);
-              continue;
-            }
-          else
-            {
-              continue;
-            }
+          werror (W_UNKNOWN_OPTION, argv[i]);
+          continue;
         }
 
       /* if preceded by  '-' then option */
@@ -1342,23 +1343,19 @@ parseCmdLine (int argc, char **argv)
               break;
 
             default:
-              if (!port->parseOption (&argc, argv, &i))
-                werror (W_UNKNOWN_OPTION, argv[i]);
+              werror (W_UNKNOWN_OPTION, argv[i]);
             }
           continue;
         }
 
-      if (!port->parseOption (&argc, argv, &i))
+      /* no option must be a filename */
+      if (options.c1mode)
         {
-          /* no option must be a filename */
-          if (options.c1mode)
-            {
-              werror (W_NO_FILE_ARG_IN_C1, argv[i]);
-            }
-          else
-            {
-              processFile (argv[i]);
-            }
+          werror (W_NO_FILE_ARG_IN_C1, argv[i]);
+        }
+      else
+        {
+          processFile (argv[i]);
         }
     }
 

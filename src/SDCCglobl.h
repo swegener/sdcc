@@ -288,8 +288,8 @@ struct options
     int std_sdcc;               /* enable SDCC extensions to C */
     int dollars_in_ident;       /* zero means dollar signs are punctuation */
     int unsigned_char;          /* use unsigned for char without signed/unsigned modifier */
-    const char *code_seg;       /* segment name to use instead of CSEG */
-    const char *const_seg;      /* segment name to use instead of CONST */
+    char *code_seg;             /* segment name to use instead of CSEG */
+    char *const_seg;            /* segment name to use instead of CONST */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */

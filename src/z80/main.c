@@ -413,9 +413,9 @@ _parseOptions (int *pargc, char **argv, int *i)
         }
       else if (!strncmp (argv[*i], OPTION_ASM, sizeof (OPTION_ASM) - 1))
         {
-          char *asm = getStringArg (OPTION_ASM, argv, i, *pargc);
+          char *asmblr = getStringArg (OPTION_ASM, argv, i, *pargc);
 
-          if (!strcmp (asm, "rgbds"))
+          if (!strcmp (asmblr, "rgbds"))
             {
               asm_addTree (&_rgbds_gb);
               gbz80_port.assembler.cmd = _gbz80_rgbasmCmd;
@@ -424,12 +424,12 @@ _parseOptions (int *pargc, char **argv, int *i)
               _G.asmType = ASM_TYPE_RGBDS;
               return TRUE;
             }
-          else if (!strcmp (asm, "asxxxx"))
+          else if (!strcmp (asmblr, "asxxxx"))
             {
               _G.asmType = ASM_TYPE_ASXXXX;
               return TRUE;
             }
-          else if (!strcmp (asm, "isas"))
+          else if (!strcmp (asmblr, "isas"))
             {
               asm_addTree (&_isas_gb);
               /* Munge the function prefix */
@@ -437,7 +437,7 @@ _parseOptions (int *pargc, char **argv, int *i)
               _G.asmType = ASM_TYPE_ISAS;
               return TRUE;
             }
-          else if (!strcmp (asm, "z80asm"))
+          else if (!strcmp (asmblr, "z80asm"))
             {
               port->assembler.externGlobal = TRUE;
               asm_addTree (&_z80asm_z80);

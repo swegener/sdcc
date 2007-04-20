@@ -1,3 +1,7 @@
+2007-04-20 Borut Razem <borut.razem AT siol.net>
+
+	* src/z80/main.c: replaced reserved keyword asm with asmblr
+
 2007-04-19 Borut Razem <borut.razem AT siol.net>
 
 	* src/port.h: use const poiters to strings

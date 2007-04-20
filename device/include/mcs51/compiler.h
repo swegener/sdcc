@@ -114,7 +114,11 @@
 # define SBIT(name, addr, bit)  _sfrbit  name _at(addr+bit)
 # define SFR(name, addr)        _sfrbyte name _at(addr)
 # define SFRX(name, addr)       _xdat volatile unsigned char name _at(addr)
+#if _CC51 > 71
+# define SFR16(name, addr)      _sfrword _little name _at(addr)
+#else
 # define SFR16(name, addr)      /* not supported */
+#endif
 # define SFR16E(name, fulladdr) /* not supported */
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */

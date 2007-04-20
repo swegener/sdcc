@@ -1,3 +1,12 @@
+2007-04-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* as/mcs51/asmain.c (search_path_append, search_path_fopen): new, added,
+	  (main): added option -i,
+	  (asmbl, case S_INCL): use search_path_fopen,
+	  mostly from patch 1579668 by Peter Miller, thanks
+	* src/z80/main.c: fixed typo --callee-saves-bc
+	* device/include/mcs51/compiler.h: added sfrword for Tasking
+
 2007-04-20 Borut Razem <borut.razem AT siol.net>
 
 	* src/z80/main.c: replaced reserved keyword asm with asmblr

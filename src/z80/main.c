@@ -30,13 +30,13 @@
 #include "SDCCargs.h"
 #include "dbuf_string.h"
 
-#define OPTION_BO             "-bo"
-#define OPTION_BA             "-ba"
-#define OPTION_CODE_SEG       "--codeseg"
-#define OPTION_CONST_SEG      "--constseg"
-#define OPTION_CALLE_SAVES_BC "--calle-saves-bc"
-#define OPTION_PORTMODE       "--portmode="
-#define OPTION_ASM            "--asm="
+#define OPTION_BO              "-bo"
+#define OPTION_BA              "-ba"
+#define OPTION_CODE_SEG        "--codeseg"
+#define OPTION_CONST_SEG       "--constseg"
+#define OPTION_CALLEE_SAVES_BC "--callee-saves-bc"
+#define OPTION_PORTMODE        "--portmode="
+#define OPTION_ASM             "--asm="
 
 
 static char _z80_defaultRules[] =
@@ -55,21 +55,21 @@ Z80_OPTS z80_opts;
 
 static OPTION _z80_options[] =
   {
-    { 0, OPTION_CALLE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, OPTION_PORTMODE,       NULL,                    "Determine PORT I/O mode (z80/z180)" },
-    { 0, OPTION_ASM,            NULL,                    "Define assembler name (rgbds/asxxxx/isas/z80asm)" },
-    { 0, OPTION_CODE_SEG,       NULL,                    "<name> use this name for the code segment" },
-    { 0, OPTION_CONST_SEG,      NULL,                    "<name> use this name for the const segment" },
+    { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
+    { 0, OPTION_PORTMODE,        NULL,                    "Determine PORT I/O mode (z80/z180)" },
+    { 0, OPTION_ASM,             NULL,                    "Define assembler name (rgbds/asxxxx/isas/z80asm)" },
+    { 0, OPTION_CODE_SEG,        NULL,                    "<name> use this name for the code segment" },
+    { 0, OPTION_CONST_SEG,       NULL,                    "<name> use this name for the const segment" },
     { 0, NULL }
   };
 
 static OPTION _gbz80_options[] = 
   {
-    { 0, OPTION_BO,             NULL,                    "<num> use code bank <num>" },
-    { 0, OPTION_BA,             NULL,                    "<num> use data bank <num>" },
-    { 0, OPTION_CALLE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
-    { 0, OPTION_CODE_SEG,       NULL,                    "<name> use this name for the code segment"  },
-    { 0, OPTION_CONST_SEG,      NULL,                    "<name> use this name for the const segment" },
+    { 0, OPTION_BO,              NULL,                    "<num> use code bank <num>" },
+    { 0, OPTION_BA,              NULL,                    "<num> use data bank <num>" },
+    { 0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC" },
+    { 0, OPTION_CODE_SEG,        NULL,                    "<name> use this name for the code segment"  },
+    { 0, OPTION_CONST_SEG,       NULL,                    "<name> use this name for the const segment" },
     { 0, NULL }
   };
 

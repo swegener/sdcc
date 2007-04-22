@@ -1,3 +1,7 @@
+2007-04-23 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/_memset.c: assembler version for mcs51
+
 2007-04-22 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/listerr.c: program to create the list of errors and

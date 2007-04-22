@@ -1074,11 +1074,19 @@ addSymChain (symbol ** symHead)
 
       if (!sym->level && !(IS_SPEC(sym->etype) && IS_TYPEDEF(sym->etype)))
         checkDecl (sym, 0);
+      else
+        {
+          /* if this is an array without any dimension
+             then update the dimension from the initial value */
+          if (IS_ARRAY (sym->type) && !DCL_ELEM (sym->type))
+            DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
+        }
 
       /* if already exists in the symbol table then check if
-         one of them is an extern definition if yes then
-         then check if the type match, if the types match then
-         delete the current entry and add the new entry      */
+           one of them is an extern definition;
+         if yes then then check if the type match;
+         if the types match then delete the current entry and
+           add the new entry */
       if ((csym = findSymWithLevel (SymbolTab, sym)) &&
           csym->level == sym->level)
         {

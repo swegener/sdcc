@@ -1,3 +1,10 @@
+2007-04-22 Borut Razem <borut.razem AT siol.net>
+
+	* support/scripts/listerr.c: program to create the list of errors and
+	  warnings list from - added
+	* doc/sdccman.lyx: removed the note
+	  "For list of warnings and corresponding codes, see err_warn.txt"
+
 2007-04-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* as/mcs51/asmain.c (search_path_append, search_path_fopen): new, added,

@@ -21109,24 +21109,6 @@ disable_warning
 \end_inset
 
  - the compiler will not warn you anymore about warning number <nnnn>.
- 
-\begin_inset Note Note
-status open
-
-\begin_layout Itemize
-\begin_inset Quotes sld
-\end_inset
-
-For list of warnings and corresponding codes, see err_warn.txt
-\begin_inset Quotes srd
-\end_inset
-
- This list should probably be part of the manual? See Patch #1697136 
-\end_layout
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Itemize

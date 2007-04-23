@@ -1481,6 +1481,17 @@ parseCmdLine (int argc, char **argv)
 }
 
 /*-----------------------------------------------------------------*/
+/* finalizeOptions - finalize (post-process( options               */
+/*-----------------------------------------------------------------*/
+static void
+finalizeOptions (void)
+{
+  /* no peephole comments if not verbose asm */
+  if (!options.verboseAsm)
+    options.noPeepComments = 1;
+}
+
+/*-----------------------------------------------------------------*/
 /* linkEdit : - calls the linkage editor  with options             */
 /*-----------------------------------------------------------------*/
 static void
@@ -2433,7 +2444,12 @@ main (int argc, char **argv, char **envp)
      And the z80 port needs port->finaliseOptions(),
      even if we're only linking. */
   initMem ();
+
+  /* finalize target specific options */
   port->finaliseOptions ();
+
+  /* finalize common options */
+  finalizeOptions ();
 
   if (fullSrcFileName || options.c1mode)
     {

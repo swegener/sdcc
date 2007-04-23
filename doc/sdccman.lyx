@@ -9630,14 +9630,14 @@ status collapsed
 
 \end_inset
 
--no-peep-comments
-\begin_inset LatexCommand \index{-\/-no-peep-comments}
+-fverbose-asm
+\begin_inset LatexCommand \index{-\/-no-gen-comments}
 
 \end_inset
 
 
 \series default
- Will not include peep-hole comments in the generated files.
+ Include code generator and peep-hole comments in the generated asm files.
 \end_layout
 
 \begin_layout List
@@ -9657,14 +9657,15 @@ status collapsed
 
 \end_inset
 
--fverbose-asm
-\begin_inset LatexCommand \index{-\/-no-gen-comments}
+-no-peep-comments
+\begin_inset LatexCommand \index{-\/-no-peep-comments}
 
 \end_inset
 
 
 \series default
- Include code generator comments in the generated asm files.
+ Don't include peep-hole comments in the generated asm files even if --fverbose-
+asm option is specified.
 \end_layout
 
 \begin_layout List
@@ -10068,7 +10069,7 @@ status collapsed
 
 \InsetSpace ~
 <Name> The name to be used for the const
-\begin_inset LatexCommand \index{code}
+\begin_inset LatexCommand \index{const}
 
 \end_inset
 

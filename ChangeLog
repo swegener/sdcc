@@ -1,3 +1,12 @@
+2007-04-23 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx, src/SDCCmain.c:
+	  peep-hole comments are generated only if --fverbose-asm option is
+	  specified and --no-peep-comments is not, as proposed by Frieder.
+	* support/regression/Makefile.in: compile regression tests with
+	  --fverbose-asm option so one can "grep" whether a new (or an old)
+	  peephole is (still) applied; requested by Frieder.
+
 2007-04-23 Kevin Buettner <kevin AT buettner.to>
 
 	* device/include/pic/pic16f886.h,

@@ -154,7 +154,7 @@ INC_DIR = $(top_srcdir)/device/include
 # Path to SDCC
 SDCC = $(top_builddir)/bin/sdcc
 # Base flags.
-SDCCFLAGS += -DNO_VARARGS
+SDCCFLAGS += --fverbose-asm -DNO_VARARGS
 # Extension of object intermediate files
 OBJEXT = .o
 # Extension of files that can be run in the emulator

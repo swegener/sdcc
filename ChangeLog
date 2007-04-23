@@ -1,3 +1,8 @@
+2007-04-23 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic/libsdcc/idata.c: PAGESEL _main before going there,
+	  fixes #1704666
+
 2007-04-23 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/_memset.c: assembler version for mcs51
@@ -197,7 +202,7 @@
 
 2007-03-30 Raphael Neider <rneider AT web.de>
 
-	* src/pic/ralloc.c (isData): suppress garbage debug output4/1/2007 6:28PM
+	* src/pic/ralloc.c (isData): suppress garbage debug output
 
 2007-03-28 Borut Razem <borut.razem AT siol.net>
 
@@ -251,7 +256,7 @@
 	  (genFunction, genEndFunction): also save/restore FSR around interrupt
 	  handling code, removed lots of unused code
 	  (genDivOneByte): release acquired temp register
-	* src/pic/glue.c (pic14createInterruptVect): adadt to new signature
+	* src/pic/glue.c (pic14createInterruptVect): adapt to new signature
 	  of popGetExternal
 	* device/lib/pic/libsdcc/shadowregs.c: NEW, provide storage location
 	  for registers that need to be saved during interrupts (FSR, STATUS,

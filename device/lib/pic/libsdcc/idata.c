@@ -74,6 +74,7 @@ _sdcc_gsinit_startup(void)
 
     // call main after initialization
     __asm
+	PAGESEL _main
 	GOTO _main
     __endasm;
 }

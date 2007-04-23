@@ -1,4 +1,13 @@
-2007-04-23 Raphael Neider <rneider AT web.de>
+2007-04-23 Kevin Buettner <kevin AT buettner.to>
+
+	* device/include/pic/pic16f886.h,
+	* device/include/pic/pic16f887.h,
+	* device/lib/pic/libdev/pic16f886.c,
+	* device/lib/pic/libdev/pic16f887.c,
+	* device/include/pic/pic14devices.txt,
+	* device/lib/pic/libdev/devices.txt: Add 16f886 and 16f887.
+
+2007-04-23 Kevin Buettner <kevin AT buettner.to>
 
 	* device/lib/pic/libsdcc/idata.c: PAGESEL _main before going there,
 	  fixes #1704666

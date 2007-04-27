@@ -13,24 +13,38 @@
  radix  ->  Base of value (e.g.: 2 for binary, 10 for decimal, 16 for hex)
 ---------------------------------------------------------------------------*/
 
-#define NUMBER_OF_DIGITS 32
+/* "11110000111100001111000011110000" base 2 */
+/* "37777777777" base 8 */
+/* "4294967295" base 10 */
+#define NUMBER_OF_DIGITS 32	/* eventually adapt if base 2 not needed */
+
+#if NUMBER_OF_DIGITS < 32
+# warning _ltoa() and _ultoa() are not save for radix 2
+#endif
+
+#if defined (SDCC_mcs51) && defined (SDCC_MODEL_SMALL) && !defined (SDCC_STACK_AUTO)
+# define MEMSPACE_BUFFER __idata	/* eventually __pdata or __xdata */
+# pragma nogcse
+#else
+# define MEMSPACE_BUFFER 
+#endif
 
 void _ultoa(unsigned long value, char* string, unsigned char radix)
 {
-unsigned char index;
-char buffer[NUMBER_OF_DIGITS];  /* space for NUMBER_OF_DIGITS + '\0' */
-
-  index = NUMBER_OF_DIGITS;
+  char MEMSPACE_BUFFER buffer[NUMBER_OF_DIGITS];  /* no space for '\0' */
+  unsigned char index = NUMBER_OF_DIGITS;
 
   do {
-    buffer[--index] = '0' + (value % radix);
-    if ( buffer[index] > '9') buffer[index] += 'A' - '9' - 1;
+    unsigned char c = '0' + (value % radix);
+    if (c > '9') 
+       c += 'A' - '9' - 1;
+    buffer[--index] = c;
     value /= radix;
-  } while (value != 0);
+  } while (value);
 
   do {
-    *string++ = buffer[index++];
-  } while ( index < NUMBER_OF_DIGITS );
+    *string++ = buffer[index];
+  } while ( ++index != NUMBER_OF_DIGITS );
 
   *string = 0;  /* string terminator */
 }

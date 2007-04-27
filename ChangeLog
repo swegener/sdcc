@@ -1,3 +1,8 @@
+2007-03-27 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* device/lib/_ltoa.c: 36 bytes less __data mem. This really
+	  helps printf_small. 32 bytes more __idata mem.
+
 2007-04-27 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcode.c (addpCode2pBlock,LinkFlow,pBlockRemoveUnusedLabels):

@@ -2569,6 +2569,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
              there is resultType available */
           dtr = tree->right;
           break;
+        case SIZEOF:
+          /* don't allocate string if it is a sizeof argument */
+          ++noAlloc;
+          dtr = decorateType (tree->right, resultTypeProp);
+          --noAlloc;
+          break;
         default:
           dtr = decorateType (tree->right, resultTypeProp);
           break;
@@ -4257,6 +4263,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* change the type to a integer */
       {
         int size = getSize (tree->right->ftype);
+
         SNPRINTF(buffer, sizeof(buffer), "%d", size);
         if (!size && !IS_VOID(tree->right->ftype))
           werrorfl (tree->filename, tree->lineno, E_SIZEOF_INCOMPLETE_TYPE);
@@ -4266,6 +4273,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       tree->right = tree->left = NULL;
       TETYPE (tree) = getSpec (TTYPE (tree) =
                                tree->opval.val->type);
+
       return tree;
 
       /*------------------------------------------------------------------*/

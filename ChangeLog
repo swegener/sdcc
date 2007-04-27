@@ -1,3 +1,13 @@
+2007-04-27 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/pcode.c (pBlockRemoveUnusedLabels,pic16_pBlockAddInval,
+	  createReachingDefinitions,assignValnums,pic16_destructDF,
+	  pic16_createDF,pic16_vcg_dumpedges,pic16_vcg_dump_default):
+	  prevent NULL pointer dereferences
+	* device/lib/pic/libdev/pic16f886.c,
+	* device/lib/pic/libdev/pic16f887.c: svn mv'ed to disabled_* to
+	  prevent building them, gputils do not really support them yet
+
 2007-03-27 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/_ltoa.c: 36 bytes less __data mem. This really

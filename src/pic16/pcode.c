@@ -6724,7 +6724,7 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
 {
   pCode *pc; pCodeLabel *pcl;
 
-  if(!pb)
+  if(!pb || !pb->pcHead)
     return;
 
   for(pc = pb->pcHead; (pc=pic16_findNextInstruction(pc->next)) != NULL; ) {
@@ -10103,6 +10103,8 @@ static defmap_t *pic16_pBlockAddInval (pBlock *pb, symbol_t sym) {
   defmap_t *map;
   pCodeFlow *pcfl;
 
+  assert(pb);
+
   pcfl = PCI(pic16_findNextInstruction (pb->pcHead))->pcflow;
 
   /* find initial value (assigning pc == NULL) */
@@ -11301,6 +11303,8 @@ static void createReachingDefinitions (pBlock *pb) {
   set *todo;
   set *blacklist;
 
+  if (!pb) return;
+
   /* initialize out_vals to unique'fied defmaps per pCodeFlow */
   for (pc = pic16_findNextInstruction (pb->pcHead); pc; pc = pic16_findNextInstruction (pc->next)) {
     if (isPCFL(pc)) {
@@ -11810,6 +11814,8 @@ static void assignValnums (pCode *pc) {
 static void pic16_destructDF (pBlock *pb) {
   pCode *pc, *next;
 
+  if (!pb) return;
+
   /* remove old defmaps */
   pc = pic16_findNextInstruction (pb->pcHead);
   while (pc) {
@@ -11834,6 +11840,8 @@ static void pic16_destructDF (pBlock *pb) {
 /* Checks whether a pBlock contains ASMDIRs. */
 static int pic16_pBlockHasAsmdirs (pBlock *pb) {
   pCode *pc;
+
+  if (!pb) return 0;
 
   pc = pic16_findNextInstruction (pb->pcHead);
   while (pc) {
@@ -11921,6 +11929,8 @@ static int pic16_removeUnusedRegistersDF () {
 static void pic16_createDF (pBlock *pb) {
   pCode *pc, *next;
   int change=0;
+
+  if (!pb) return;
 
   //fprintf (stderr, "creating DF for pb %p (%s)\n", pb, pic16_pBlockGetFunctionName (pb));
 
@@ -12215,6 +12225,8 @@ static void pic16_vcg_dumpedges (pCode *pc, FILE *of) {
 static void pic16_vcg_dump (FILE *of, pBlock *pb) {
   pCode *pc;
 
+  if (!pb) return;
+
   /* check pBlock: do not analyze pBlocks with ASMDIRs (for now...) */
   if (pic16_pBlockHasAsmdirs (pb)) {
     //fprintf (stderr, "%s: pBlock contains ASMDIRs -- data flow analysis not performed!\n", __FUNCTION__);
@@ -12234,6 +12246,8 @@ static void pic16_vcg_dump_default (pBlock *pb) {
   FILE *of;
   char buf[BUF_SIZE];
   pCode *pc;
+
+  if (!pb) return;
 
   /* get function name */
   pc = pb->pcHead;

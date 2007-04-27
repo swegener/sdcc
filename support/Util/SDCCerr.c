@@ -187,7 +187,7 @@ struct
 { E_INIT_COUNT, ERROR_LEVEL_ERROR,
    "too many initializers" },
 { E_INIT_STRUCT, ERROR_LEVEL_ERROR,
-   "struct/union/array '%s' :initialization needs curly braces" },
+   "struct/union/array '%s': initialization needs curly braces" },
 { E_INIT_NON_ADDR, ERROR_LEVEL_ERROR,
    "non-address initialization expression" },
 { E_INT_DEFINED, ERROR_LEVEL_ERROR,

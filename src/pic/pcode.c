@@ -2550,7 +2550,7 @@ void pCodeReadCodeTable(void)
 void addpCode2pBlock(pBlock *pb, pCode *pc)
 {
 	
-	if(!pc)
+	if(!pb || !pc)
 		return;
 	
 	if(!pb->pcHead) {
@@ -4315,6 +4315,8 @@ void LinkFlow(pBlock *pb)
 	
 	//fprintf(stderr,"linkflow \n");
 	
+	if (!pb) return;
+	
 	for( pcflow = findNextpCode(pb->pcHead, PC_FLOW); 
 	pcflow != NULL;
 	pcflow = findNextpCode(pcflow->next, PC_FLOW) ) {
@@ -4887,7 +4889,7 @@ void pBlockRemoveUnusedLabels(pBlock *pb)
 {
 	pCode *pc; pCodeLabel *pcl;
 	
-	if(!pb)
+	if(!pb || !pb->pcHead)
 		return;
 	
 	for(pc = pb->pcHead; (pc=findNextInstruction(pc->next)) != NULL; ) {

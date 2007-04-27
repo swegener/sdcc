@@ -90,6 +90,7 @@ SRC = add.c \
       compare8.c \
       compare9.c \
       configword.c \
+      empty.c \
       for.c \
       inline.c \
       mult1.c \

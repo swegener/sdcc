@@ -1,3 +1,11 @@
+2007-04-27 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcode.c (addpCode2pBlock,LinkFlow,pBlockRemoveUnusedLabels):
+	  return early when pb or pb->pcHead is NULL (patch #1708427)
+	* src/regression/empty.c,
+	* src/regression/Makefile: added test with empty functions
+	* support/Util/SDCCerr.c: fixed typo in E_INIT_STRUCT message
+
 2007-04-27 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCast.c: fixed feature request

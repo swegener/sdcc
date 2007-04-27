@@ -1,6 +1,7 @@
 2007-04-27 Borut Razem <borut.razem AT siol.net>
 
-	* 
+	* src/SDCCast.c: fixed feature request
+	  #1547512: Redundant strings linked when using sizeof("abc")
 
 2007-04-23 Borut Razem <borut.razem AT siol.net>
 

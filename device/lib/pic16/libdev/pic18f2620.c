@@ -18,7 +18,7 @@
  * originally designed by
  *     Vangelis Rokas <vrokas AT otenet.gr>
  *
- * $Id:  $
+ * $Id$
  * 
  */
 

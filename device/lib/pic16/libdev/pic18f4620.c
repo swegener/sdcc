@@ -14,7 +14,7 @@
  *  Added based on existing PICs
  *      Gary Plumbridge <gary@phodex.net>
  * 
- * $Id:  $
+ * $Id$
  * 
  */
 

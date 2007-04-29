@@ -273,30 +273,28 @@ list2expr (initList * ilist)
 void
 resolveIvalSym (initList * ilist, sym_link * type)
 {
-  RESULT_TYPE resultType;
+  int is_ptr = IS_PTR (type);
+  RESULT_TYPE resultType = getResultTypeFromType (getSpec (type));
 
-  if (!ilist)
-    return;
-
-  if (ilist->type == INIT_NODE)
+  while (ilist)
     {
-      if (IS_PTR (type))
-        resultType = RESULT_TYPE_INT;
-      else
-        resultType = getResultTypeFromType (getSpec (type));
-      ilist->init.node = decorateType (resolveSymbols (ilist->init.node),
-                                       resultType);
-    }
+      if (ilist->type == INIT_NODE)
+        {
+          ilist->init.node = decorateType (resolveSymbols (ilist->init.node),
+            is_ptr ? RESULT_TYPE_INT : resultType);
+        }
+      else if (ilist->type == INIT_DEEP)
+        {
+          resolveIvalSym (ilist->init.deep, type);
+        }
 
-  if (ilist->type == INIT_DEEP)
-    resolveIvalSym (ilist->init.deep, type);
-
-  resolveIvalSym (ilist->next, type);
+      ilist = ilist->next;
+   }
 }
 
-/*-----------------------------------------------------------------*/
-/* symbolVal - creates a value for a symbol              */
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
+/* symbolVal - creates a value for a symbol                         */
+/*------------------------------------------------------------------*/
 value *
 symbolVal (symbol * sym)
 {

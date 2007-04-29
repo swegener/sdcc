@@ -1,6 +1,9 @@
 2007-04-29 Borut Razem <borut.razem AT siol.net>
 
 	* Fixed svn:eol-style and svn:keywords properties
+	* src/SDCCval.c: fixed bug
+	  #1592871: Segfault with "large" const arrays of characters
+	  replaced recursion with iteration
 
 2007-04-29 Maarten Brock <sourceforge.brock AT dse.nl>
 

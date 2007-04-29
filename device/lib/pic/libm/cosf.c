@@ -19,7 +19,7 @@
 /* Version 1.0 - Initial release */
 
 /*
-** $Id: cosf.c 3654 2005-01-24 10:38:53Z vrokas $
+** $Id$
 */
 
 #include <math.h>

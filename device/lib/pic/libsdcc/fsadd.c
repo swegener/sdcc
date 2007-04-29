@@ -15,7 +15,7 @@
 */
 
 /*
-** $Id: fsadd.c 3513 2004-10-01 14:49:51Z vrokas $
+** $Id$
 */
 
 #include <float.h>

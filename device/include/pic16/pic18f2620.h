@@ -19,7 +19,7 @@
  *     Vangelis Rokas <vrokas AT otenet.gr>
  * 
  * 
- * $Id:  $
+ * $Id$
  * 
  */
 

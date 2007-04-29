@@ -15,7 +15,7 @@
 */
 
 /*
-** $Id: fsgt.c 3513 2004-10-01 14:49:51Z vrokas $
+** $Id$
 */
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */

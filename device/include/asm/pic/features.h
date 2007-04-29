@@ -10,7 +10,7 @@
  * The GNU PIC Library is maintained by,
  * 	Vangelis Rokas <vrokas@otenet.gr>
  *
- * $Id: features.h 3714 2005-04-02 13:13:53Z vrokas $
+ * $Id$
  *
  */
 #ifndef __PIC14_ASM_FEATURES_H

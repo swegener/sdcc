@@ -1,3 +1,7 @@
+2007-04-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genRet): fixed bug 1707003
+
 2007-04-27 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/pcode.c (pBlockRemoveUnusedLabels,pic16_pBlockAddInval,

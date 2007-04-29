@@ -4039,7 +4039,7 @@ genRet (iCode * ic)
 
   if (IS_BIT(_G.currentFunc->etype))
     {
-      if (!OP_SYMBOL (IC_LEFT (ic))->ruonly)
+      if (!(IS_SYMOP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->ruonly))
         toCarry (IC_LEFT (ic));
     }
   else
@@ -5459,7 +5459,7 @@ genDiv (iCode * ic)
 
   D (emitcode (";", "genDiv"));
 
-  /* assign the amsops */
+  /* assign the asmops */
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
@@ -5978,7 +5978,7 @@ genCmpGt (iCode * ic, iCode * ifx)
   retype = getSpec (operandType (right));
   sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
            (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
-  /* assign the amsops */
+  /* assign the asmops */
   aopOp (result, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
@@ -6008,7 +6008,7 @@ genCmpLt (iCode * ic, iCode * ifx)
   retype = getSpec (operandType (right));
   sign = !((SPEC_USIGN (letype) && !(IS_CHAR (letype) && IS_LITERAL (letype))) ||
            (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
-  /* assign the amsops */
+  /* assign the asmops */
   aopOp (result, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
@@ -7374,6 +7374,7 @@ genXor (iCode * ic, iCode * ifx)
       right = left;
       left = tmp;
     }
+
   if (AOP_TYPE (right) == AOP_LIT)
     lit = (unsigned long) floatFromVal (AOP (right)->aopu.aop_lit);
 

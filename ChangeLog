@@ -4,6 +4,7 @@
 	* src/SDCCval.c: fixed bug
 	  #1592871: Segfault with "large" const arrays of characters
 	  replaced recursion with iteration
+	* Removed svn:executable property from non-executable files
 
 2007-04-29 Maarten Brock <sourceforge.brock AT dse.nl>
 

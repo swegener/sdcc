@@ -1,3 +1,9 @@
+2007-04-30 Borut Razem <borut.razem AT siol.net>
+
+	* doc/sdccman.lyx:
+	  fixed bug #1669175: Problem with space in output paths
+	  documented how to use paths with spaces for Windows users
+
 2007-04-29 Borut Razem <borut.razem AT siol.net>
 
 	* Fixed svn:eol-style and svn:keywords properties

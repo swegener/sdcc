@@ -9031,11 +9031,74 @@ status collapsed
 
  
 \series default
-The output path resp.
- file where everything will be placed.
+The output path where everything will be placed or the file name used for
+ all generated output files.
  If the parameter is a path, it must have a trailing slash (or backslash
  for the Windows binaries) to be recognized as a path.
+
+\emph on
  
+\emph default
+Note for Windows users: if the path contains spaces, it should be surrounded
+ by quotes.
+ The trailing backslash should be doubled in order to prevent escaping the
+ final quote, for example: 
+\emph on
+-o 
+\begin_inset Quotes sld
+\end_inset
+
+F:
+\backslash
+Projects
+\backslash
+test3
+\backslash
+output 1
+\backslash
+
+\backslash
+
+\begin_inset Quotes srd
+\end_inset
+
+
+\emph default
+ or put after the final quote, for example: 
+\emph on
+-o 
+\begin_inset Quotes sld
+\end_inset
+
+F:
+\backslash
+Projects
+\backslash
+test3
+\backslash
+output 1
+\begin_inset Quotes srd
+\end_inset
+
+
+\backslash
+
+\emph default
+.
+ The path using slashes for directory delimiters can be used too, for example:
+ 
+\emph on
+-o 
+\begin_inset Quotes sld
+\end_inset
+
+F:/Projects/test3/output 1/
+\begin_inset Quotes srd
+\end_inset
+
+
+\emph default
+.
 \end_layout
 
 \begin_layout List

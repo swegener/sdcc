@@ -335,10 +335,10 @@ PRINTFUNC (picJumpTable)
   dbuf_append_char (dbuf, '\t');
   dbuf_printf (dbuf, "%s\t", s);
   dbuf_printOperand (IC_JTCOND (ic), dbuf);
-  dbuf_append_char (dbuf, '\n');
   for (sym = setFirstItem (IC_JTLABELS (ic)); sym;
        sym = setNextItem (IC_JTLABELS (ic)))
-    dbuf_printf (dbuf, "\t\t\t%s\n", sym->name);
+    dbuf_printf (dbuf, "; %s", sym->name);
+  dbuf_append_char (dbuf, '\n');
 }
 
 PRINTFUNC (picGeneric)
@@ -429,9 +429,10 @@ PRINTFUNC (picIfx)
     dbuf_printf (dbuf, " == 0 goto %s($%d)\n", IC_FALSE (ic)->name, IC_FALSE (ic)->key);
   else
     {
-      dbuf_printf (dbuf, " != 0 goto %s($%d)\n", IC_TRUE (ic)->name, IC_TRUE (ic)->key);
+      dbuf_printf (dbuf, " != 0 goto %s($%d)", IC_TRUE (ic)->name, IC_TRUE (ic)->key);
       if (IC_FALSE (ic))
-        dbuf_printf (dbuf, "\tzzgoto %s\n", IC_FALSE (ic)->name);
+        dbuf_printf (dbuf, "; zzgoto %s\n", IC_FALSE (ic)->name);
+      dbuf_append_char (dbuf, '\n');
     }
 }
 
@@ -528,6 +529,8 @@ printiCChain (iCode * icChain, FILE * of)
           dbuf_init(&dbuf, 1024);
           icTab->iCodePrint (&dbuf, loop, icTab->printName);
           dbuf_write_and_destroy (&dbuf, of);
+          ////
+          fflush(of);
         }
     }
 }

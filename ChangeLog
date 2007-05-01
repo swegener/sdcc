@@ -1,3 +1,11 @@
+2007-05-01 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic/libdev/*.c
+	* device/include/pic/*.h: regenerated all device libs from updated
+	  .inc files
+	* support/scripts/inc2h.pl: documented usage, now uses strict to
+	  catch more bugs
+
 2007-04-30 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx:
@@ -96,7 +104,7 @@
 
 2007-04-19 Borut Razem <borut.razem AT siol.net>
 
-	* src/port.h: use const poiters to strings
+	* src/port.h: use const pointers to strings
 	* src/SDCCargs.h: declared getStringArg() and getIntArg()
 	* src/pic16/main.c: include SDCCargs.h
 	* src/SDCCglobl.h: code_seg and const_seg are not pointers to

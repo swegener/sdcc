@@ -7,9 +7,9 @@
  */
 #include <pic16f886.h>
 
-__data __at (INDF_ADDR) volatile char      INDF;
+__sfr  __at (INDF_ADDR)                    INDF;
 __sfr  __at (TMR0_ADDR)                    TMR0;
-__data __at (PCL_ADDR) volatile char       PCL;
+__sfr  __at (PCL_ADDR)                     PCL;
 __sfr  __at (STATUS_ADDR)                  STATUS;
 __sfr  __at (FSR_ADDR)                     FSR;
 __sfr  __at (PORTA_ADDR)                   PORTA;

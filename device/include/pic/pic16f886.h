@@ -148,9 +148,9 @@
 
 //----- Register Files------------------------------------------------------
 
-extern __data __at (INDF_ADDR) volatile char      INDF;
+extern __sfr  __at (INDF_ADDR)                    INDF;
 extern __sfr  __at (TMR0_ADDR)                    TMR0;
-extern __data __at (PCL_ADDR) volatile char       PCL;
+extern __sfr  __at (PCL_ADDR)                     PCL;
 extern __sfr  __at (STATUS_ADDR)                  STATUS;
 extern __sfr  __at (FSR_ADDR)                     FSR;
 extern __sfr  __at (PORTA_ADDR)                   PORTA;

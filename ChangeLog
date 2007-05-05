@@ -1,3 +1,9 @@
+2007-05-05 Borut Razem <borut.razem AT siol.net>
+
+	* device/lib/pic16/Makefile.common.in,
+	  device/lib/pic/Makefile.common.in, sim/ucsim/cmd.src/Makefile.in:
+	  removed bash dependencies
+
 2007-05-01 Borut Razem <borut.razem AT siol.net>
 
 	* src/SDCCicode.c:

@@ -53,7 +53,7 @@ else
 OBJECTS += newcmdposix.o
 endif
 
-DEVEL		= $(shell ( bash -c "test -e $(top_builddir)/devel && echo yes" ))
+DEVEL		= $(shell test -e $(top_builddir)/devel && echo yes)
 
 # Compiling entire program or any subproject
 # ------------------------------------------

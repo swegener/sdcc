@@ -2697,13 +2697,23 @@ genIpush (iCode * ic)
               char *l = aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE);
               wassert (l);
               emit2 ("ld a,(%s)", l);
+              emit2 ("push af");
             }
           else
             {
               l = aopGet (AOP (IC_LEFT (ic)), --offset, FALSE);
-              emit2 ("ld a,%s", l);
+              if (!strcmp(l, "b"))
+                emit2 ("push bc");
+              else if (!strcmp(l, "d"))
+                emit2 ("push de");
+              else if (!strcmp(l, "h"))
+                emit2 ("push hl");
+              else
+                {
+                  emit2 ("ld a,%s", l);
+                  emit2 ("push af");
+                }
             }
-          emit2 ("push af");
           emit2 ("inc sp");
           _G.stack.pushed++;
         }
@@ -3769,8 +3779,6 @@ genPlus (iCode * ic)
      of add then GOOD for ME */
   if (genPlusIncr (ic) == TRUE)
     goto release;
-
-  emitDebug ("; Can't optimise plus by inc, falling back to the normal way");
 
   size = getDataSize (IC_RESULT (ic));
 
@@ -5750,7 +5758,7 @@ shiftR2Left2Result (operand * left, int offl,
                     int shCount, int is_signed)
 {
   int size = 2;
-  symbol *tlbl, *tlbl1;
+  symbol *tlbl;
 
   movLeft2Result (left, offl, result, offr, 0);
   movLeft2Result (left, offl + 1, result, offr + 1, 0);
@@ -5761,10 +5769,10 @@ shiftR2Left2Result (operand * left, int offl,
   /*  if (AOP(result)->type == AOP_REG) { */
 
   tlbl = newiTempLabel (NULL);
-  tlbl1 = newiTempLabel (NULL);
 
   /* Left is already in result - so now do the shift */
-  if (shCount <= 4)
+  /* Optimizing for speed by default. */
+  if (!optimize.codeSize || shCount <= 2)
     {
       while (shCount--)
         {
@@ -5773,13 +5781,12 @@ shiftR2Left2Result (operand * left, int offl,
     }
   else
     {
-      emit2 ("ld a,!immedbyte+1", shCount);
-      emit2 ("!shortjp !tlabel", tlbl1->key + 100);
+      emit2 ("ld a,!immedbyte", shCount);
+
       emitLabel (tlbl->key + 100);
 
       emitRsh2 (AOP (result), size, is_signed);
 
-      emitLabel (tlbl1->key + 100);
       emit2 ("dec a");
       emit2 ("!shortjp NZ,!tlabel", tlbl->key + 100);
     }

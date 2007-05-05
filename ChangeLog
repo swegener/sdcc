@@ -1,3 +1,14 @@
+2007-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/port.h: added TARGET_MCS51_LIKE
+	* src/SDCCpeeph.c (labelIsUncondJump): new, added, other targets could
+	  take advantage of it too
+	* src/z80/gen.c (genIpush): push b, d or h directly instead of using a,
+	  (shiftR2Left2Result): Optimized: don't check shifting by 0
+	* src/z80/peeph-z80.def,
+	* src/z80/peeph.def: whole set of new rules by Philipp Krause with some
+	  modifications, see patch 1700823
+
 2007-05-05 Borut Razem <borut.razem AT siol.net>
 
 	* device/lib/pic16/Makefile.common.in,

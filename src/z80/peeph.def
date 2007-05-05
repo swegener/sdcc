@@ -1,37 +1,54 @@
-replace {
-	ld	(hl),(hl)
-} by {
-	ERROR - peephole - caught (hl),(hl)
-}
+// peeph.def - Common Z80 and gbz80 peephole rules
+//
+//
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2007
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 replace restart {
 	ld	%1,%1
 } by {
-	; peephole removed redundant load.
-}
+	; peephole 1 removed redundant load.
+} if notVolatile(%1)
 
 replace restart {
-	xor	a,a
-	or	a,%1
-	or	a,a
-	jp	%2,%3
+	ld	%1,%2
+	ld	%1,%3
 } by {
-	xor	a,a
-	or	a,%1
-	jp	%2,%3
-}
+	; peephole 2 removed dead load into %1
+	ld	%1,%3
+} if notVolatile(%1)
 
 replace restart {
-	jp	NZ,%1
+	jp	NC,%1
 	jp	%2
 %1:
-	jp	%3
-%2:
 } by {
-	jp	Z,%2
+	jp	C,%2
+	; peephole 3 removed jp by using inverse jump logic
 %1:
-	jp	%3
-%2:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	C,%1
+	jp	%2
+%1:
+} by {
+	jp	NC,%2
+	; peephole 4 removed jp by using inverse jump logic
+%1:
 } if labelRefCountChange(%1 -1)
 
 replace restart {
@@ -40,6 +57,7 @@ replace restart {
 %1:
 } by {
 	jp	Z,%2
+	; peephole 5 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -49,76 +67,67 @@ replace restart {
 %1:
 } by {
 	jp	NZ,%2
+	; peephole 6 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
 replace restart {
-	or	a,%1
-	or	a,a
+	jp	%5
 } by {
-	or	a,%1
-}
+	jp	%6
+	; peephole 7 redirected jump-to-jump at %5 by jump to %6
+} if labelIsUncondJump(), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
-	or	a,%1)
-	or	a,a
+	jp	%1,%5
 } by {
-	or	a,%1)
-}
+	jp	%1,%6
+	; peephole 8 redirected jump-to-jump at %5 by jump to %6
+} if labelIsUncondJump(), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
-	xor	a,a
-	or	a,%1
-	jp	NZ,%2
-	xor	a,a
-	or	a,%3
-	jp	Z,%2
+	ld	%2,%3
+	jp	%4
+%5:
+	ld	%2,%3
+%4:
 } by {
-	xor	a,a
-	or	a,%1
-	jp	NZ,%2
-	or	a,%3
-	jp	Z,%2
-}
-
-replace restart {
-	jp	NZ,%1
-	inc	%3)
-%1:
-	jp	%2
-} by {
-	jp	NZ,%2
-	inc	%3)
-%1:
-	jp	%2
-} if labelRefCountChange(%1 -1), labelRefCountChange(%2 1)
+	; peephole 9 removed jump and redundant load.
+%5:
+	ld	%2,%3
+%4:
+} if labelRefCountChange(%4 -1)
 
 replace restart {
 	xor	a,a
 	ld	a,#0x00
 } by {
 	xor	a,a
+	; peephole 10 removed redundant load of 0 into a.
 }
 
 replace {
-	ld	e,#0x00
-	ld	d,#0x00
+	ld	e,#0x%1
+	ld	d,#0x%2
 } by {
-	ld	de,#0x0000
+	ld	de,#0x%2%1
+	; peephole 11 combined constant loads into register pair.
 }
 
 replace {
-	ld	l,#0x00
-	ld	h,#0x00
+	ld	l,#0x%1
+	ld	h,#0x%2
 } by {
-	ld	hl,#0x0000
+	ld	hl,#0x%2%1
+	; peephole 12 combined constant loads into register pair.
 }
 
 replace {
-	ld	c,#0x00
-	ld	b,#0x00
+	ld	c,#0x%1
+	ld	b,#0x%2
 } by {
-	ld	bc,#0x0000
+	ld	bc,#0x%2%1
+	; peephole 13 combined constant loads into register pair.
 }
 
 replace restart {
@@ -126,105 +135,97 @@ replace restart {
 	ld	a,%1
 } by {
 	ld	%1,a
-} if notVolatile %1
+	; peephole 14 removed redundant load from %1 into a.
+} if notVolatile(%1)
+// This gives many false negatives and without the test no problems are encountered in the regression tests
+// Maybe we can try this after 2.7.0 release
 
 replace restart {
-	jp	%1,%2
-	jr	%3
-%2:
-	jp	%4
+	ld	a,%1
+	ld	%1,a
 } by {
-	jp	%1,%4
-	jr	%3
-%2:
-	jp	%4
-} if labelRefCountChange(%2 -1), labelRefCountChange(%4 1)
+	ld	a,%1
+	; peephole 15 removed redundant load from a into %1.
+} if notVolatile(%1)
+// This gives many false negatives and without the test no problems are encountered in the regression tests
+// Maybe we can try this after 2.7.0 release
 
-replace {
-	ld	l,e
-	ld	h,d
-	push	hl
-	ld	l,c
-	ld	h,b
-	push	hl
+replace restart {
+	ld	%2,%3
+	ld	a,%2
+	and	a,%1
+	ld	%2,%4
 } by {
-	push	de
-	push	bc
+	ld	a,%3
+	; peephole 16 moved %3 directly into a instead of going through %2.
+	and	a,%1
+	ld	%2,%4
+} if notVolatile(%2), operandsNotSame
+
+replace restart {
+	ld	%1,a
+	ld	a,%2
+	or	a,%1
+} by {
+	ld	%1,a
+	or	a,%2
+	; peephole 17 removed load by reordering or arguments.
+} if notVolatile(%1)
+
+replace restart {
+	ld	%1,a
+	xor	a,a
+	or	a,%1
+} by {
+	ld	%1,a
+	or	a,a
+	; peephole 18 used value still in a instead of loading it from %1.
 }
 
-replace {
-	and	a,#%1
+replace restart {
+	or	a,%1
 	or	a,a
 } by {
-	and	a,#%1
+	or	a,%1
+	; peephole 19 removed redundant or after or.
 }
 
-replace {
-	ld	b,l
-	ld	a,b
-	pop	bc
-	ld	b,a
+replace restart {
+	and	a,%1
+	or	a,a
 } by {
-	ld	a,l
-	pop	bc
-	ld	b,a
+	and	a,%1
+	; peephole 20 removed redundant or after and.
 }
 
-replace {
-	ld	d,l
-	ld	a,d
-	pop	de
-	ld	d,a
+replace restart {
+	xor	a,%1
+	or	a,a
 } by {
-	ld	a,l
-	pop	de
-	ld	d,a
+	xor	a,%1
+	; peephole 21 removed redundant or after xor.
 }
 
-replace {
-	ld	a,b
-	push	af
-	inc	sp
+replace restart {
+	ld	%1,a
+	and	a,%2
+	ld	%1,a
 } by {
-	push	bc
-	inc	sp
-}
+	; peephole 22 removed redundant load into %1.
+	and	a,%2
+	ld	%1,a
+} if notVolatile(%1)
 
 replace {
-	ld	a,d
-	push	af
-	inc	sp
+	ld	%1,%2
+	ld	a,%2
 } by {
-	push	de
-	inc	sp
-}
+	ld	a,%2
+	ld	%1,a
+	; peephole 23 load value in a first and use it next
+} if notVolatile(%1 %2)
 
-replace {
-	ld	a,%1
-	sub	a,#%2
-	jp	M,%3
-	ld	a,%1
-	sub	a,#%4
-	jp	P,%5
-} by {
-	ld	a,%1
-	cp	a,#%2
-	jp	M,%3
-	cp	a,#%4
-	jp	P,%5
-}
-
-replace {
-	ld	e,l
-	ld	d,h
-	ld	l,e
-	ld	h,d
-} by {
-	ld	e,l
-	ld	d,h
-}
-
-replace {
+replace restart {
 	ld	%1,%2
 	ld	%3,%4
 	ld	%2,%1
@@ -232,33 +233,252 @@ replace {
 } by {
 	ld	%1,%2
 	ld	%3,%4
+	; peephole 24 removed redundant load from %3%1 into %4%2
+} if notVolatile(%1 %2 %3 %4)
+
+replace restart {
+	ld	b,%1
+	ld	a,b
+	pop	bc
+} by {
+	ld	a,%1
+	; peephole 25 removed load into b
+	pop	bc
 }
 
-// From: Philipp Klaus Krause
+replace restart {
+	ld	c,%1
+	ld	a,c
+	pop	bc
+} by {
+	ld	a,%1
+	; peephole 26 removed load into c
+	pop	bc
+}
+
+replace restart {
+	ld	d,%1
+	ld	a,d
+	pop	de
+} by {
+	ld	a,%1
+	; peephole 27 removed load into d
+	pop	de
+}
+
+replace restart {
+	ld	e,%1
+	ld	a,e
+	pop	de
+} by {
+	ld	a,%1
+	; peephole 28 removed load into e
+	pop	de
+}
+
+replace restart {
+	ld	h,%1
+	ld	a,h
+	pop	hl
+} by {
+	ld	a,%1
+	; peephole 29 removed load into h
+	pop	hl
+}
+
+replace restart {
+	ld	l,%1
+	ld	a,l
+	pop	hl
+} by {
+	ld	a,%1
+	; peephole 30 removed load into l
+	pop	hl
+}
+
+replace restart {
+	ld	a,c
+	push	af
+	inc	sp
+	ld	a,#%2
+	push	af
+	inc	sp
+	call	%3
+} by {
+	ld	b,c
+	ld	c,#%2
+	push	bc
+	; peephole 31 moved and pushed arguments c and #%2 through bc instead of pushing them individually.
+	call	%3
+}
+
+replace restart {
+	ld	a,e
+	push	af
+	inc	sp
+	ld	a,#%2
+	push	af
+	inc	sp
+	call	%3
+} by {
+	ld	d,e
+	ld	e,#%2
+	push	de
+	; peephole 32 moved and pushed arguments e and #%2 through de instead of pushing them individually.
+	call	%3
+}
+
+replace restart {
+	ld	a,%1
+	sub	a,%2
+	jp	%3,%4
+	ld	a,%1
+} by {
+	ld	a,%1
+	cp	a,%2
+	jp	%3,%4
+	; peephole 33 removed load by replacing sub with cp
+	assert	a=%1
+} if notVolatile(%1)
+
+replace restart {
+	assert	a=%1
+	sub	a,%2
+	jp	%3,%4
+	ld	a,%1
+} by {
+	cp	a,#%2
+	jp	%3,%4
+	; peephole 34 removed load by replacing sub with cp
+	assert	a=%1
+}
+
+replace restart {
+	assert	a=%1
+} by {
+}
+
+replace restart {
+	sub	a,#0xFF
+	jp	Z,%1
+} by {
+	inc	a
+	; peephole 35 replaced sub a,#0xFF by inc a.
+	jp	Z,%1
+}
+
+replace restart {
+	sub	a,#0xFF
+	jp	NZ,%1
+} by {
+	inc	a
+	; peephole 36 replaced sub a,#0xFF by inc a.
+	jp	NZ,%1
+}
+
+replace restart {
+	ld	bc,#%1 + %2
+	ld	a,c
+	add	a,%3
+	ld	c,a
+	ld	a,b
+	adc	a,%4
+	ld	b,a
+} by {
+	ld	a,#<(%1 + %2)
+	add	a,%3
+	ld	c,a
+	ld	a,#>(%1 + %2)
+	; peephole 37 directly used (%1 + %2) in calculation instead of placing it in bc first.
+	adc	a,%4
+	ld	b,a
+}
+
+replace restart {
+	ld	de,#%1 + %2
+	ld	a,e
+	add	a,%3
+	ld	e,a
+	ld	a,d
+	adc	a,%4
+	ld	d,a
+} by {
+	ld	a,#<(%1 + %2)
+	add	a,%3
+	ld	e,a
+	ld	a,#>(%1 + %2)
+	; peephole 38 directly used (%1 + %2) in calculation instead of placing it in de first.
+	adc	a,%4
+	ld	d,a
+}
+
+replace restart {
+	rlca
+	ld	a,#0x00
+	rla
+} by {
+	rlca
+	and	a,#0x01
+	; peephole 39 replaced zero load, rla by and since rlca writes the same value to carry bit and least significant bit.
+}
+
+replace restart {
+	ld	%1,%2
+	push	%1
+	pop	%4
+	ld	%1,%3
+} by {
+	ld	%4,%2
+	; peephole 40 moved %2 directly into de instead of going through %1.
+	ld	%1,%3
+}
+
+replace restart {
+	add	a,#0x00
+	ld	%2,a
+	ld	a,%3
+	adc	a,%4
+} by {
+	; peephole 41 removed lower part of multibyte addition.
+	ld	%2,a
+	ld	a,%3
+	add	a,%4
+}
+
 replace restart {
 	ld	%1,a
 	ld	a,%2
 	add	a,%1
 	ld	%1,a
 } by {
-	; peephole removed loads by exploiting commutativity of addition.
+	; peephole 42 removed loads by exploiting commutativity of addition.
 	add	a,%2
 	ld	%1,a
-}
+} if notVolatile(%1)
 
-// From: Philipp Klaus Krause
 replace restart {
 	ld	%1,a
 	ld	a,%2
 	add	a,%1
 } by {
 	ld	%1, a
-	; peephole removed load by exploiting commutativity of addition.
-	add	a, %2
+	; peephole 43 removed load by exploiting commutativity of addition.
+	add	a,%2
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
+	or	a,%1
+	jp	NZ,%2
+	xor	a,a
+	or	a,%3
+} by {
+	or	a,%1
+	jp	NZ,%2
+	; peephole 44 removed redundant zeroing of a (which has just been tested to be #0x00).
+	or	a,%3
+}
+
+replace restart {
 	or	a,%1
 	jp	NZ,%2
 	ld	%3,#0x00
@@ -266,11 +486,10 @@ replace {
 	or	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 45 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
 	and	a,%1
 	jp	NZ,%2
 	ld	%3,#0x00
@@ -278,11 +497,10 @@ replace {
 	and	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 46 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
 	sub	a,%1
 	jp	NZ,%2
 	ld	%3,#0x00
@@ -290,11 +508,10 @@ replace {
 	sub	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 47 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
 	dec	a
 	jp	NZ,%1
 	ld	%2,#0x00
@@ -302,11 +519,10 @@ replace {
 	dec	a
 	jp	NZ,%1
 	ld	%2,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 48 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
 	or	a,%1
 	jp	NZ,%2
 	ld	a,%3
@@ -315,11 +531,10 @@ replace {
 	or	a,%1
 	jp	NZ,%2
 	or	a,%3
-	; peephole shortened or using a (which has just been tested to be #0x00).
+	; peephole 49 shortened or using a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
 	and	a,%1
 	jp	NZ,%2
 	ld	a,%3
@@ -328,11 +543,10 @@ replace {
 	and	a,%1
 	jp	NZ,%2
 	or	a,%3
-	; peephole shortened or using a (which has just been tested to be #0x00).
+	; peephole 50 shortened or using a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
 	sub	a,%1
 	jp	NZ,%2
 	ld	a,%3
@@ -341,11 +555,10 @@ replace {
 	sub	a,%1
 	jp	NZ,%2
 	or	a,%3
-	; peephole shortened or using a (which has just been tested to be #0x00).
+	; peephole 51 shortened or using a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace {
+replace restart {
 	dec	a
 	jp	NZ,%1
 	ld	a,%2
@@ -354,10 +567,9 @@ replace {
 	dec	a
 	jp	NZ,%1
 	or	a,%2
-	; peephole shortened or using a (which has just been tested to be #0x00).
+	; peephole 52 shortened or using a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
 replace restart {
 	or	a,%1
 	jp	NZ,%2
@@ -368,10 +580,9 @@ replace restart {
 	jp	NZ,%2
 	push	%3
 	ld	%4,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 53 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
 replace restart {
 	and	a,%1
 	jp	NZ,%2
@@ -382,10 +593,9 @@ replace restart {
 	jp	NZ,%2
 	push	%3
 	ld	%4,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 54 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
 replace restart {
 	sub	a,%1
 	jp	NZ,%2
@@ -396,10 +606,9 @@ replace restart {
 	jp	NZ,%2
 	push	%3
 	ld	%4,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 55 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
 replace restart {
 	dec	a
 	jp	NZ,%1
@@ -410,55 +619,87 @@ replace restart {
 	jp	NZ,%1
 	push	%2
 	ld	%3,a
-	; peephole replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 56 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
-// From: Philipp Klaus Krause
-replace restart{
-	jp	NZ,%1
-	or	a,%2
-	jp	Z,%3
-%1:
-	jp	%4
-%3:
-} by {
-	jp	NZ,%4
-	; peephole redirected jump
-	or	a,%2
-	jp	NZ,%4
-	; peephole redirected jump
-%3:
-} if labelRefCount(%1 1), labelRefCountChange(%1 -1), labelRefCountChange(%3 -1), labelRefCountChange(%4 1)
-
-// Should be one of the last ones. Opens the code to further peephole optimization.
-// From: Philipp Klaus Krause
 replace restart {
-%1:
+	ld	de,#%1 + %2
+	inc	de
+	inc	de
+	inc	de
 } by {
-	; peephole removed unused label %1.
-} if labelRefCount(%1 0)
+	ld	de,#%1 + %2 + 3
+	; peephole 57 moved triple increment of de to constant.
+}
 
-// From: Philipp Klaus Krause
-replace {
-	jp	Z,%5
+replace restart {
+	ld	de,#%1 + %2
+	inc	de
+	inc	de
 } by {
-	jr	Z,%5
-} if labelInRange()
+	ld	de,#%1 + %2 + 2
+	; peephole 58 moved double increment of de to constant.
+}
 
-replace {
-	jp	NZ,%5
+replace restart {
+	ld	de,#%1 + %2
+	inc	de
 } by {
-	jr	NZ,%5
-} if labelInRange()
+	ld	de,#%1 + %2 + 1
+	; peephole 59 moved increment of de to constant.
+}
 
-replace {
-	jp	C,%5
+replace restart {
+	ld	bc,#%1 + %2
+	inc	bc
+	inc	bc
+	inc	bc
 } by {
-	jr	C,%5
-} if labelInRange()
+	ld	bc,#%1 + %2 + 3
+	; peephole 60 moved triple increment of bc to constant.
+}
 
-replace {
-	jp	NC,%5
+replace restart {
+	ld	bc,#%1 + %2
+	inc	bc
+	inc	bc
 } by {
-	jr	NC,%5
-} if labelInRange()
+	ld	bc,#%1 + %2 + 2
+	; peephole 61 moved double increment of bc to constant.
+}
+
+replace restart {
+	ld	bc,#%1 + %2
+	inc	bc
+} by {
+	ld	bc,#%1 + %2 + 1
+	; peephole 62 moved increment of bc to constant.
+}
+
+replace restart {
+	ld	bc,#%1
+	ld	a,c
+	add	a,#0x%2
+	ld	c,a
+	ld	a,b
+	adc	a,#0x%3
+	ld	b,a
+} by {
+	ld	bc,#%1 + 0x%3%2
+	; peephole 63 moved addition of constant 0x%3%2 to bc to constant.
+}
+
+replace restart {
+	ld	bc,#%1 + %4
+	ld	a,c
+	add	a,#0x%2
+	ld	c,a
+	ld	a,b
+	adc	a,#0x%3
+	ld	b,a
+} by {
+	ld	bc,#%1 + %4 + 0x%3%2
+	; peephole 64 moved addition of constant 0x%3%2 to bc to constant.
+}
+
+

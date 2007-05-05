@@ -45,6 +45,7 @@ static struct
 
 static int hashSymbolName (const char *name);
 static void buildLabelRefCountHash (lineNode * head);
+static void bindVar (int key, char **s, hTab ** vtab);
 
 static bool matchLine (char *, char *, hTab **);
 
@@ -237,26 +238,32 @@ FBYNAME (labelIsReturnOnly)
     return FALSE;
 
   label = hTabItemWithKey (vars, 5);
-  if (!label) return FALSE;
+  if (!label)
+    return FALSE;
   len = strlen(label);
 
-  for(pl = currPl; pl; pl = pl->next) {
-        if (pl->line && !pl->isDebug && !pl->isComment &&
-          pl->isLabel) {
-                if (strncmp(pl->line, label, len) == 0) break; /* Found Label */
-                if (strlen(pl->line) != 7     || !ISCHARDIGIT(*(pl->line))   ||
-                  !ISCHARDIGIT(*(pl->line+1)) || !ISCHARDIGIT(*(pl->line+2)) ||
-                  !ISCHARDIGIT(*(pl->line+3)) || !ISCHARDIGIT(*(pl->line+4)) ||
-                  *(pl->line+5) != '$') {
-                        return FALSE; /* non-local label encountered */
-                }
+  for(pl = currPl; pl; pl = pl->next)
+    {
+      if (pl->line && !pl->isDebug && !pl->isComment && pl->isLabel)
+        {
+          if (strncmp(pl->line, label, len) == 0)
+            break; /* Found Label */
+          if (strlen(pl->line) != 7     || !ISCHARDIGIT(*(pl->line))   ||
+              !ISCHARDIGIT(*(pl->line+1)) || !ISCHARDIGIT(*(pl->line+2)) ||
+              !ISCHARDIGIT(*(pl->line+3)) || !ISCHARDIGIT(*(pl->line+4)) ||
+              *(pl->line+5) != '$')
+            {
+              return FALSE; /* non-local label encountered */
+            }
         }
-  }
-  if (!pl) return FALSE; /* did not find the label */
+    }
+  if (!pl)
+    return FALSE; /* did not find the label */
   pl = pl->next;
   while (pl && (pl->isDebug || pl->isComment))
     pl = pl->next;
-  if (!pl || !pl->line || pl->isDebug) return FALSE; /* next line not valid */
+  if (!pl || !pl->line || pl->isDebug)
+    return FALSE; /* next line not valid */
   p = pl->line;
   for (p = pl->line; *p && ISCHARSPACE(*p); p++)
           ;
@@ -264,8 +271,91 @@ FBYNAME (labelIsReturnOnly)
   retInst = "ret";
   if (TARGET_IS_HC08)
     retInst = "rts";
-  if (strcmp(p, retInst) == 0) return TRUE;
+  if (strcmp(p, retInst) == 0)
+    return TRUE;
   return FALSE;
+}
+
+
+/*-----------------------------------------------------------------*/
+/* labelIsUncondJump - Check if label %5 is followed by an         */
+/* unconditional jump and put the destination of that jump in %6   */
+/*-----------------------------------------------------------------*/
+FBYNAME (labelIsUncondJump)
+{
+  /* assumes that %5 pattern variable has the label name */
+  const char *label;
+  char *p, *q;
+  const lineNode *pl;
+  int len;
+  char * jpInst = NULL;
+
+  /* Don't optimize jumps in a jump table; a more generic test */
+  if (currPl->ic && currPl->ic->op == JUMPTABLE)
+    return FALSE;
+
+  label = hTabItemWithKey (vars, 5);
+  if (!label)
+    return FALSE;
+  len = strlen(label);
+
+  for (pl = currPl; pl; pl = pl->next)
+    {
+      if (pl->line && !pl->isDebug && !pl->isComment && pl->isLabel)
+        {
+          if (strncmp(pl->line, label, len) == 0)
+            break; /* Found Label */
+          if (strlen(pl->line) != 7       || !ISCHARDIGIT(*(pl->line))   ||
+              !ISCHARDIGIT(*(pl->line+1)) || !ISCHARDIGIT(*(pl->line+2)) ||
+              !ISCHARDIGIT(*(pl->line+3)) || !ISCHARDIGIT(*(pl->line+4)) ||
+              *(pl->line+5) != '$')
+            {
+              return FALSE; /* non-local label encountered */
+            }
+        }
+    }
+  if (!pl)
+    return FALSE; /* did not find the label */
+  pl = pl->next;
+  while (pl && (pl->isDebug || pl->isComment))
+    pl = pl->next;
+  if (!pl || !pl->line)
+    return FALSE; /* next line not valid */
+  p = pl->line;
+  while (*p && ISCHARSPACE(*p))
+    p++;
+
+  if (TARGET_MCS51_LIKE)
+    jpInst = "ljmp";
+  if (TARGET_IS_HC08)
+    jpInst = "jmp";
+  if (TARGET_Z80_LIKE)
+    jpInst = "jp";
+  len = strlen(jpInst);
+  if (strncmp(p, jpInst, len) != 0)
+    return FALSE; /* next line is no jump */
+  p += len;
+  while (*p && ISCHARSPACE(*p))
+    p++;
+
+  q = p;
+  while (*q && *q!=';')
+    q++;
+  while (q>p && ISCHARSPACE(*q))
+    q--;
+  len = q-p;
+  if (len == 0)
+    return FALSE; /* no destination? */
+  if (TARGET_Z80_LIKE)
+    {
+      while (q>p && *q!=',')
+        q--;
+      if (*q==',')
+        return FALSE; /* conditional jump */
+    }
+  /* now put the destination in %6 */
+  bindVar (6, &p, &vars);
+  return TRUE;
 }
 
 
@@ -946,7 +1036,7 @@ operandBaseName (const char *op)
 
 
 /*-------------------------------------------------------------------*/
-/* operandsNotRelated - returns true of the condition's operands are */
+/* operandsNotRelated - returns true if the condition's operands are */
 /* not related (taking into account register name aliases). N-way    */
 /* comparison performed between all operands.                        */
 /*-------------------------------------------------------------------*/
@@ -1091,6 +1181,9 @@ callFuncByName (char *fname,
       "labelIsReturnOnly", labelIsReturnOnly
     },
     {
+      "labelIsUncondJump", labelIsUncondJump
+    },
+    {
       "okToRemoveSLOC", okToRemoveSLOC
     },
     {
@@ -1170,8 +1263,7 @@ callFuncByName (char *fname,
         {
           if (strcmp (ftab[i].fname, funcName) == 0)
             {
-              rc = (*ftab[i].func) (vars, currPl, endPl, head,
-                                    funcArgs);
+              rc = (*ftab[i].func) (vars, currPl, endPl, head, funcArgs);
               break;
             }
         }
@@ -1596,8 +1688,7 @@ matchLine (char *s, char *d, hTab ** vars)
                   return FALSE;
             }
           else
-            /* variable not bound we need to
-               bind it */
+            /* variable not bound we need to bind it */
             bindVar (keyForVar (d + 1), &s, vars);
 
           /* in either case go past the variable */

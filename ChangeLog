@@ -8,6 +8,8 @@
 	* src/z80/peeph-z80.def,
 	* src/z80/peeph.def: whole set of new rules by Philipp Krause with some
 	  modifications, see patch 1700823
+	* src/mcs51/peep.c (): fixed bug 1712928
+	* support/regression/tests/bug1712928.c: new, added
 
 2007-05-05 Borut Razem <borut.razem AT siol.net>
 

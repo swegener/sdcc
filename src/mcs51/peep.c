@@ -216,7 +216,7 @@ isFunc (const lineNode *pl)
 
 /*-----------------------------------------------------------------*/
 /* isCallerSaveFunc - returns TRUE if it's a 'normal' function     */
-/* call and it's a 'caller save' (not 'callee save')               */
+/* call and it's a 'caller save' (not 'callee save' or 'naked')    */
 /*-----------------------------------------------------------------*/
 static bool
 isCallerSaveFunc (const lineNode *pl)
@@ -224,6 +224,8 @@ isCallerSaveFunc (const lineNode *pl)
   if (!isFunc (pl))
     return FALSE;
   if (FUNC_CALLEESAVES(OP_SYM_TYPE(IC_LEFT(pl->ic))))
+    return FALSE;
+  if (FUNC_ISNAKED(OP_SYM_TYPE(IC_LEFT(pl->ic))))
     return FALSE;
   return TRUE;
 }

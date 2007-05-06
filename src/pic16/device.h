@@ -101,7 +101,6 @@ typedef struct {
   unsigned long opt_flags;
   int gstack;
   unsigned int debgen;
-  int CATregs;
 } pic16_options_t;
 
 extern int xinst;

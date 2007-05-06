@@ -1,4 +1,4 @@
-#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.2 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -22529,33 +22529,92 @@ The PIC14 port
 \end_layout
 
 \begin_layout Standard
-The 14bit PIC
+The PIC14 port adds support for Microchip(TM)'s 14
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+,
+\end_layout
+
+\end_inset
+
+bit PIC
 \begin_inset LatexCommand \index{PIC14}
 
 \end_inset
 
- port still requires a major effort from the development community.
- However it can work for simple code.
- It passes its (smaller set of) regression tests
-\begin_inset LatexCommand \index{Regression test (PIC14)}
+ MCUs.
+ This port is not yet mature and still lacks many features.
+ However, it can work for simple code.
+\end_layout
 
-\end_inset
+\begin_layout Standard
+Currently supported devices include:
+\end_layout
 
- in the directory 
-\shape italic
-sdcc/src/regression
-\shape default
-.
+\begin_layout Standard
+12F: 629, 635, 675, 683
+\end_layout
+
+\begin_layout Standard
+16C: 432, 433
+\end_layout
+
+\begin_layout Standard
+16C: 554, 557, 558
+\end_layout
+
+\begin_layout Standard
+16C: 62, 620, 620a, 621, 621a, 622, 622a, 63a, 65b
+\end_layout
+
+\begin_layout Standard
+16C: 71, 710, 711, 715, 717, 72, 73b, 745, 74b, 765, 770, 771, 773, 774,
+ 781, 782
+\end_layout
+
+\begin_layout Standard
+16C: 925, 926
+\end_layout
+
+\begin_layout Standard
+16F: 627, 627a, 628, 628a, 630, 636, 639, 648a, 676, 684, 685, 687, 688,
+ 689, 690
+\end_layout
+
+\begin_layout Standard
+16F: 716, 72, 73, 737, 74, 76, 767, 77, 777, 785
+\end_layout
+
+\begin_layout Standard
+16F: 818, 819, 84, 84a, 87, 870, 871, 872, 873, 873a, 874, 874a, 876, 876a,
+ 877, 877a, 88
+\end_layout
+
+\begin_layout Standard
+16F: 913, 914, 916, 917
+\end_layout
+
+\begin_layout Standard
+An up-to-date list of currently supported devices can be obtained via 
+\family typewriter
+sdcc -mpic14 -phelp foo.c
+\family default
+ (foo.c must exist...).
 \end_layout
 
 \begin_layout Subsection
-C code and 14bit PIC code page
+PIC Code Pages
 \begin_inset LatexCommand \index{code page (pic14)}
 
 \end_inset
 
- and RAM banks
-\begin_inset LatexCommand \index{RAM bank (pic14)}
+ and Memory Banks
+\begin_inset LatexCommand \index{Memory bank (pic14)}
 
 \end_inset
 
@@ -22565,52 +22624,112 @@ C code and 14bit PIC code page
 \begin_layout Standard
 The linker organizes allocation for the code page and RAM banks.
  It does not have intimate knowledge of the code flow.
- It will put all the code section of a single asm file into a single code
+ It will put all the code section of a single .asm file into a single code
  page.
  In order to make use of multiple code pages, separate asm files must be
  used.
- The compiler treats all functions of a single C file as being in the same
- code page unless it is non static.
+ The compiler assigns all 
+\emph on
+static
+\emph default
+ functions of a single .c file into the same code page.
 \newline
 
 \newline
-To get the best follow these guide lines:
+To get the best results,
+ follow these guidelines:
 \end_layout
 
 \begin_layout Enumerate
 Make local functions static, as non static functions require code page selection
  overhead.
+\newline
+Due to the way sdcc handles functions, place called functions prior
+ to calling functions in the file wherever possible: Otherwise sdcc will
+ insert unneccessary pagesel directives around the call, believing that
+ the called function is externally defined.
 \end_layout
 
 \begin_layout Enumerate
 For devices that have multiple code pages it is more efficient to use the
- same number of files as pages, i.e.
- for the 16F877 use 4 separate files and i.e.
- for the 16F874 use 2 separate files.
+ same number of files as pages: Use up to 4 separate .c files for the 16F877,
+ but only 2 files for the 16F874.
  This way the linker can put the code for each file into different code
- pages and there's less page selection overhead.
+ pages and there will be less page selection overhead.
 \end_layout
 
 \begin_layout Enumerate
-And as for any 8 bit micro (especially for PIC 14 as they have a very simple
- instruction set), use 'unsigned char' whereever possible instead of 'int'.
+And as for any 8 bit micro (especially for PIC14 as they have a very simple
+ instruction set), use 'unsigned char' wherever possible instead of 'int'.
 \end_layout
 
 \begin_layout Subsection
-Creating a device include file 
+Adding New Devices to the Port 
 \end_layout
 
 \begin_layout Standard
-For generating a device include file
-\begin_inset LatexCommand \index{PIC14!Header files}
+Adding support for a new 14
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+,
+\end_layout
 
 \end_inset
 
- use the support perl script inc2h.pl kept in directory support/script.
+bit PIC MCU requires the following steps:
+\end_layout
+
+\begin_layout Enumerate
+Create a new device description.
+\newline
+Each device is described in two files: pic16f*.h
+ and pic16f*.c.
+ These files primarily define SFRs, structs to access their bits, and symbolic
+ configuration options.
+ Both files can be generated from gputils' .inc files using the perl script
+ 
+\family typewriter
+support/scripts/inc2h.pl
+\family default
+.
+ This file also contains further instructions on how to proceed.
+\end_layout
+
+\begin_layout Enumerate
+Copy the .h file into SDCC's include path and either add the .c file to your
+ project or copy it to 
+\family typewriter
+device/lib/pic/libdev
+\family default
+.
+ Afterwards, rebuild and install the libraries.
+\end_layout
+
+\begin_layout Enumerate
+Edit pic14devices.txt in SDCC's include path (
+\family typewriter
+device/include/pic/
+\family default
+ in the source tree or 
+\family typewriter
+/usr/local/share/sdcc/include/pic
+\family default
+ after installation).
+\newline
+You need to add a device specification here to make
+ the memory layout (code banks, RAM, aliased memory regions, ...) known to
+ the compiler.
+ Probably you can copy and modify an existing entry.
+ The file format is documented at the top of the file.
 \end_layout
 
 \begin_layout Subsection
-Interrupt code
+Interrupt Code
 \end_layout
 
 \begin_layout Standard
@@ -22639,7 +22758,7 @@ T0IF = 0; /* Clear timer interrupt */
 \end_layout
 
 \begin_layout Subsection
-Linking and assembling
+Linking and Assembling
 \end_layout
 
 \begin_layout Standard
@@ -22649,13 +22768,13 @@ For assembling you can use either GPUTILS'
 \end_inset
 
  gpasm.exe or MPLAB's mpasmwin.exe.
- GPUTILS is available from 
+ GPUTILS are available from 
 \begin_inset LatexCommand \url{http://sourceforge.net/projects/gputils}
 
 \end_inset
 
 .
- For linking you can use either GPUTIL's gplink or MPLAB's mplink.exe.
+ For linking you can use either GPUTILS' gplink or MPLAB's mplink.exe.
  If you use MPLAB and an interrupt function then the linker script file
  vectors section will need to be enlarged to link with mplink.
 \newline
@@ -22681,17 +22800,7 @@ Makefile
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcc -S -V -mpic14 -p16F877 $< 
-\newline
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-\InsetSpace ~
-gpasm -c $*.asm
+sdcc -V -mpic14 -p16f877 -c $< 
 \newline
 
 \newline
@@ -22705,8 +22814,8 @@ $(PRJ).hex: $(OBJS)
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-gplink
- -m -s $(PRJ).lkr -o $(PRJ).hex $(OBJS) libsdcc.lib
+gplink -m -s $(PRJ).lkr
+ -o $(PRJ).hex $(OBJS) libsdcc.lib
 \end_layout
 
 \begin_layout Standard
@@ -22730,7 +22839,7 @@ Makefile
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-sdcc -S -V -mpic14 -p16F877 $< 
+sdcc -S -V -mpic14 -p16f877 $< 
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -22767,7 +22876,7 @@ Please note that indentations within a
 \end_layout
 
 \begin_layout Subsection
-Command-line options
+Command-Line Options
 \end_layout
 
 \begin_layout Standard
@@ -22788,8 +22897,7 @@ status collapsed
 -help):
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -22811,8 +22919,7 @@ status collapsed
  emit debug info in assembly output
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -22834,8 +22941,7 @@ status collapsed
  disable (slightly faulty) optimization on pCode
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -22858,8 +22964,7 @@ status collapsed
  large shared databank to reduce BANKSEL overhead)
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -22882,7 +22987,33 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-The library
+Environment Variables
+\end_layout
+
+\begin_layout Standard
+The PIC14 port recognizes the following environment variables:
+\end_layout
+
+\begin_layout Description
+SDCC_PIC14_SPLIT_LOCALS If set and not empty, sdcc will allocate each temporary
+ register (the ones called r0xNNNN) in a section of its own.
+ By default (if this variable is unset), sdcc tries to cluster registers
+ in sections in order to reduce the BANKSEL overhead when accessing them.
+\end_layout
+
+\begin_layout Subsection
+The Library
+\end_layout
+
+\begin_layout Standard
+The PIC14 library currently only contains support routines required by the
+ compiler to implement multiplication, division, and floating point support.
+ No libc-like replacement is available at the moment, though many of the
+ common sdcc library sources (in 
+\family typewriter
+device/lib
+\family default
+) should also compile with the PIC14 port.
 \end_layout
 
 \begin_layout Subsubsection
@@ -22930,7 +23061,20 @@ XXX
 
 \begin_layout Standard
 This warning can usually be ignored due to the very good compatibility amongst
- 14 bit PIC
+ 14
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+,
+\end_layout
+
+\end_inset
+
+bit PIC
 \begin_inset LatexCommand \index{PIC14}
 
 \end_inset
@@ -22950,46 +23094,37 @@ device/lib/pic/Makefile
 \family default
  to reflect your device.
  This might even improve performance for smaller devices as unneccesary
- BANKSELs migth be removed.
+ BANKSELs might be removed.
 \end_layout
 
 \begin_layout Subsection
-Known bugs
+Known Bugs
 \end_layout
 
 \begin_layout Subsubsection
-initialized data
+Function arguments
 \end_layout
 
 \begin_layout Standard
-Currently, data can only be initialized if it resides in the source file
- together with 
-\emph on
-main()
-\emph default
-.
- Data in other source files will silently 
-\series bold
-not
-\series default
- be initialized.
-\family typewriter
+Functions with variable argument lists (like printf) are not yet supported.
+ Similarly, taking the argument of the first argument passed into a function
+ does not work: It is currently passed in WREG and has no address...
+\end_layout
+
+\begin_layout Subsubsection
+Regression tests fail
+\end_layout
+
+\begin_layout Standard
+Though the small subset of regression tests in src/regression passes, SDCC
+ regression test suite does not, indicating that there are still major bugs
+ in the port.
+ However, many smaller projects have successfully used SDCC in the past...
+\end_layout
+
+\begin_layout Standard
+
 \size footnotesize
-
-\begin_inset Marginal
-status collapsed
-
-\begin_layout Standard
-
-\series bold
-\InsetSpace ~
-!
-\end_layout
-
-\end_inset
-
-
-\family default
 
 \newpage
 
@@ -23022,245 +23157,27 @@ The PIC16
 \end_layout
 
 \begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="4" columns="6">
-<features>
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" width="0">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F242
+18F: 242, 248, 252, 258, 442, 448, 452, 458
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
 \begin_layout Standard
-18F248
+18F: 1220, 1320
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
 \begin_layout Standard
-18F252
+18F: 2220, 2221, 2320, 2321, 2331, 2431, 2455, 2525, 2550, 2620
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
 \begin_layout Standard
-18F258
+18F: 4220, 4221, 4320, 4321, 4331, 4431, 4455, 4520, 4525, 4550, 4620
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
 \begin_layout Standard
-18F442
+18F: 6520, 6620, 6680, 6720
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
 \begin_layout Standard
-18F448
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F452
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F458
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F1220
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F2220
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F2550
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F4331
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F4455
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F6520
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F6620
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F6680
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F6720
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F8520
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row topline="true" bottomline="true">
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F8620
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F8680
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-18F8720
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
+18F: 8520, 8620, 8680, 8720
 \end_layout
 
 \begin_layout Subsection
@@ -23273,8 +23190,7 @@ PIC16 port supports the standard command line arguments as supposed, with
  list:
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23309,8 +23225,7 @@ status collapsed
 -all-callee-saves
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23342,20 +23257,31 @@ Port Specific Options
 \end_layout
 
 \begin_layout Standard
-The port specific options appear after the global options in the sdcc --help
- output.
+The port specific options appear after the global options in the sdcc -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-help output.
 \end_layout
 
 \begin_layout Subsubsection
-General Options
+Code Generation Options
 \end_layout
 
 \begin_layout Standard
-General options enable certain port features and optimizations.
+These options influence the generated assembler code.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23370,7 +23296,7 @@ status collapsed
 \end_inset
 
 -pstack-model=[model] Used in conjuction with the command above.
- Defines the stack model to be used, valid stack models are : 
+ Defines the stack model to be used, valid stack models are:
 \end_layout
 
 \begin_deeper
@@ -23397,8 +23323,7 @@ large
 \end_layout
 
 \end_deeper
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23412,13 +23337,10 @@ status collapsed
 
 \end_inset
 
--preplace-udata-with=[kword] Replaces the default udata keyword for allocating
- unitialized data variables with [kword].
- Valid keywords are: "udata_acs", "udata_shr", "udata_ovr".
+-pno-banksel Do not generate BANKSEL assembler directives.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23432,76 +23354,15 @@ status collapsed
 
 \end_inset
 
--ivt-loc <nnnn> positions the Interrupt Vector Table at location <nnnn>.
- Useful for bootloaders.
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--asm= sets the full path and name of an external assembler to call.
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--link= sets the full path and name of an external linker to call.
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--mplab-comp MPLAB
-\begin_inset LatexCommand \index{PIC16!MPLAB}
-
-\end_inset
-
- compatibility option.
- Currently only suppresses special gpasm directives.
+-extended Enable extended instruction set/literal offset addressing mode.
+ Use with care!
 \end_layout
 
 \begin_layout Subsubsection
 Optimization Options
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23515,61 +23376,7 @@ status collapsed
 
 \end_inset
 
--optimize-goto Try to use (conditional) BRA instead of GOTO
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--optimize-cmp Try to optimize some compares.
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--optimize-df Analyze the dataflow of the generated code and improve it.
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--obanksel=nn Set optimization level for inserting BANKSELs.
+-obanksel=n Set optimization level for inserting BANKSELs.
 \newline
 
 \end_layout
@@ -23599,12 +23406,124 @@ Important: There might be problems if the linker script has data sections
 \end_layout
 
 \end_deeper
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-denable-peeps Force the usage of peepholes.
+ Use with care.
+\end_layout
+
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-optimize-goto Try to use (conditional) BRA instead of GOTO.
+\end_layout
+
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-optimize-cmp Try to optimize some compares.
+\end_layout
+
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-optimize-df Analyze the dataflow of the generated code and improve it.
+\end_layout
+
+\begin_layout Subsubsection
+Assembling Options
+\end_layout
+
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-asm= Sets the full path and name of an external assembler to call.
+\end_layout
+
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-mplab-comp MPLAB
+\begin_inset LatexCommand \index{PIC16!MPLAB}
+
+\end_inset
+
+ compatibility option.
+ Currently only suppresses special gpasm directives.
+\end_layout
+
 \begin_layout Subsubsection
 Linking Options
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23618,11 +23537,10 @@ status collapsed
 
 \end_inset
 
--nodefaultlibs do not link default libraries when linking
+-link= Sets the full path and name of an external linker to call.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23636,11 +23554,51 @@ status collapsed
 
 \end_inset
 
--no-crt Don't link the default run-time modules
+-preplace-udata-with=[kword] Replaces the default udata keyword for allocating
+ unitialized data variables with [kword].
+ Valid keywords are: "udata_acs", "udata_shr", "udata_ovr".
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-ivt-loc=n Place the interrupt vector table at address 
+\emph on
+n
+\emph default
+.
+ Useful for bootloaders.
+\end_layout
+
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nodefaultlibs Do not link default libraries when linking.
+\end_layout
+
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23657,6 +23615,23 @@ status collapsed
 -use-crt= Use a custom run-time module instead of the defaults.
 \end_layout
 
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-crt Don't link the default run-time modules
+\end_layout
+
 \begin_layout Subsubsection
 Debugging Options
 \end_layout
@@ -23665,8 +23640,7 @@ Debugging Options
 Debugging options enable extra debugging information in the output files.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23701,8 +23675,7 @@ status collapsed
 , but dumps more information.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23718,11 +23691,10 @@ status collapsed
 
 -debug-ralloc Force register allocator to dump <source>.d file with debugging
  information.
- <source> is the name of the file compiled.
+ <source> is the name of the file being compiled.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23739,8 +23711,7 @@ status collapsed
 -pcode-verbose Enable pcode debugging information in translation.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23754,12 +23725,10 @@ status collapsed
 
 \end_inset
 
--denable-peeps Force the usage of peepholes.
- Use with care.
+-calltree Dump call tree in .calltree file.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 -
 \begin_inset ERT
 status collapsed
@@ -23773,29 +23742,11 @@ status collapsed
 
 \end_inset
 
--gstack Trace push/pops for stack pointer overflow
-\end_layout
-
-\begin_layout List
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Standard
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--call-tree dump call tree in .calltree file
+-gstack Trace push/pops for stack pointer overflow.
 \end_layout
 
 \begin_layout Subsection
-Enviromental Variables
+Enviroment Variables
 \end_layout
 
 \begin_layout Standard
@@ -23809,26 +23760,24 @@ abled at will.
 Currently there is only two such variables available:
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
-OPTIMIZE_BITFIELD_POINTER_GET when this variable exists reading of structure
+\begin_layout Description
+OPTIMIZE_BITFIELD_POINTER_GET When this variable exists, reading of structure
  bitfields is optimized by directly loading FSR0 with the address of the
  bitfield structure.
  Normally SDCC will cast the bitfield structure to a bitfield pointer and
  then load FSR0.
- This step saves data ram and code space for functions that perform heavy
- use of bitfields.
- (ie.
- 80 bytes of code space are saved when compiling malloc.c with this option).
+ This step saves data ram and code space for functions that make heavy use
+ of bitfields.
+ (i.e., 80 bytes of code space are saved when compiling malloc.c with this
+ option).
  
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
-NO_REG_OPT do not perform pCode registers optimization.
+\begin_layout Description
+NO_REG_OPT Do not perform pCode registers optimization.
  This should be used for debugging purposes.
- In some where bugs in the pcode optimizer are found, users can benefit
- from temporarily disabling the optimizer until the bug is fixed.
+ If bugs in the pcode optimizer are found, users can benefit from temporarily
+ disabling the optimizer until the bug is fixed.
 \end_layout
 
 \begin_layout Subsection
@@ -24268,7 +24217,7 @@ Pragmas
 \end_layout
 
 \begin_layout Standard
-PIC16
+The PIC16
 \begin_inset LatexCommand \index{PIC16}
 
 \end_inset
@@ -24276,21 +24225,15 @@ PIC16
  port currently supports the following pragmas:
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 stack
 \begin_inset LatexCommand \index{PIC16!Pragmas!\#pragma stack}
 
 \end_inset
 
- pragma stack
-\begin_inset LatexCommand \index{PIC16!stack}
-
-\end_inset
-
- forces the code generator to initialize the stack & frame pointers at a
- specific address.
- This is an adhoc solution for cases where no STACK directive is available
+ This forces the code generator to initialize the stack & frame pointers
+ at a specific address.
+ This is an ad hoc solution for cases where no STACK directive is available
  in the linker script or gplink is not instructed to create a stack section.
 \newline
 The
@@ -24313,10 +24256,14 @@ The old format (ie.
 
 \newline
 The format is as follows:
+\newline
+
 \end_layout
 
 \begin_layout LyX-Code
 #pragma stack bottom_address [stack_size]
+\newline
+
 \end_layout
 
 \begin_layout Standard
@@ -24351,14 +24298,13 @@ If the stack_size field is omitted then a stack is created with the default
  with deep function nesting or excessive stack usage.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 code
 \begin_inset LatexCommand \index{PIC16!Pragmas!\#pragma code}
 
 \end_inset
 
- place a function symbol at static FLASH address
+ Force a function to a static FLASH address.
 \end_layout
 
 \begin_layout LyX-Code
@@ -24381,8 +24327,7 @@ Example:
 
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 library instructs the linker to use a library module.
 \newline
 Usage:
@@ -24632,10 +24577,9 @@ ignore
  keyword will reject all modules specified by the library pragma.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
-udata pragma udata instructs the compiler to emit code so that linker will
- place a variable at a specific memory bank
+\begin_layout Description
+udata The pragma udata instructs the compiler to emit code so that linker
+ will place a variable at a specific memory bank.
 \end_layout
 
 \begin_layout LyX-Code
@@ -24926,6 +24870,118 @@ make lib-io
 \end_layout
 
 \begin_layout Subsection
+Adding New Devices to the Port
+\end_layout
+
+\begin_layout Standard
+Adding support for a new 16
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+,
+\end_layout
+
+\end_inset
+
+bit PIC MCU requires the following steps:
+\end_layout
+
+\begin_layout Enumerate
+Create picDEVICE.c and picDEVICE.h from pDEVICE.inc using
+\newline
+
+\family typewriter
+perl /path/to/sdcc/support/scripts/inc2h-pic16.pl /path/to/gputils/header/pDEVICE.
+inc
+\end_layout
+
+\begin_layout Enumerate
+
+\family typewriter
+mv picDEVICE.h /path/to/sdcc/device/include/pic16
+\end_layout
+
+\begin_layout Enumerate
+
+\family typewriter
+mv picDEVICE.c /path/to/sdcc/device/lib/pic16/libdev
+\end_layout
+
+\begin_layout Enumerate
+Add DEVICE to 
+\family typewriter
+/path/to/sdcc/device/lib/pics.all
+\family default
+ (and 
+\family typewriter
+.build
+\family default
+).
+\newline
+Note: No 18f prefix here!
+\end_layout
+
+\begin_layout Enumerate
+Adjust 
+\family typewriter
+/path/to/sdcc/device/lib/pic16/libio/*.ignore
+\family default
+
+\newline
+Add your DEVICE if it does not compile in 
+\family typewriter
+adc
+\family default
+, 
+\family typewriter
+i2c
+\family default
+, or 
+\family typewriter
+usart
+\family default
+.
+\end_layout
+
+\begin_layout Enumerate
+Edit 
+\family typewriter
+/path/to/sdcc/device/include/pic16/pic18fregs.h
+\family default
+.
+ The file format is self-explanatory, just add
+\newline
+
+\family typewriter
+#elif defined(picDEVICE)
+\newline
+# include <picDEVICE.h>
+\family default
+
+\newline
+at the right place (keep it sorted).
+\end_layout
+
+\begin_layout Enumerate
+Edit 
+\family typewriter
+/path/to/sdcc/src/pic16/devices.inc
+\family default
+.
+ Copy and modify an existing entry and insert it at the correct place (keep
+ the file sorted).
+ The file is hardly documented, look at the entries for the 18f2221...
+\end_layout
+
+\begin_layout Enumerate
+Recompile SDCC, including the pic16 libraries.
+\end_layout
+
+\begin_layout Subsection
 Memory Models
 \end_layout
 
@@ -25089,13 +25145,11 @@ The stack
  FSR2.
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 FSR1 is assigned as stack pointer
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 FSR2 is assigned as frame pointer
 \end_layout
 
@@ -25279,8 +25333,7 @@ In addition to the standard SDCC function keywords, PIC16
  port makes available two more:
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 wparam
 \begin_inset LatexCommand \index{PIC16!wparam}
 
@@ -25318,8 +25371,7 @@ void func_wparam(int a) wparam
 }
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 shadowregs
 \begin_inset LatexCommand \index{PIC16!shadowregs}
 
@@ -26478,8 +26530,7 @@ In the libc library there exist the functions that are used to write to
  These are
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 _
 \begin_inset ERT
 status collapsed
@@ -26496,8 +26547,7 @@ status collapsed
 _stream_usart_putchar writes a character at the USART stream
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 _
 \begin_inset ERT
 status collapsed
@@ -26514,8 +26564,7 @@ status collapsed
 _stream_mssp_putchar writes a character at the MSSP stream
 \end_layout
 
-\begin_layout List
-\labelwidthstring 00.00.0000
+\begin_layout Description
 putchar dummy function.
  This writes a character to a user specified manner.
 \end_layout
@@ -26576,9 +26625,17 @@ void main(void)
 \end_layout
 
 \begin_layout LyX-Code
-    printf (¨This is a printf test
+    printf (
+\begin_inset Quotes sld
+\end_inset
+
+This is a printf test
 \backslash
-n¨);
+n
+\begin_inset Quotes srd
+\end_inset
+
+);
 \end_layout
 
 \begin_layout LyX-Code
@@ -27303,7 +27360,7 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Known bugs
+Known Bugs
 \end_layout
 
 \begin_layout Standard
@@ -32107,7 +32164,7 @@ make test-mcs51
 \end_layout
 
 \begin_layout Standard
-The 14bit pic port uses a different set of regression tests 
+The PIC14 port uses a different set of regression tests 
 \begin_inset LatexCommand \index{Regression test (PIC14)}
 
 \end_inset

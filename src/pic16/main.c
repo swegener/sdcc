@@ -529,7 +529,6 @@ _process_pragma(const char *s)
 #define NO_DEFLIBS	"--nodefaultlibs"
 #define MPLAB_COMPAT	"--mplab-comp"
 
-#define NL_OPT		"--nl="
 #define USE_CRT		"--use-crt="
 
 #define	OFMSG_LRSUPPORT	"--flr-support"
@@ -546,46 +545,43 @@ extern int pic16_debug_verbose;
 extern int pic16_ralloc_debug;
 extern int pic16_pcode_verbose;
 
-int pic16_fstack=0;
 int pic16_enable_peeps=0;
-int pic16_nl=0;			/* 0 for LF, 1 for CRLF */
 
 OPTION pic16_optionsTable[]= {
-	{ 0,	NO_DEFLIBS,		&pic16_options.nodefaultlibs,	"do not link default libraries when linking"},
-	{ 0,	"--pno-banksel",	&pic16_options.no_banksel,	"do not generate BANKSEL assembler directives"},
-	{ 0,	OPT_BANKSEL,		NULL,				"set banksel optimization level (default=0 no)"},
-//	{ 0,	"--pomit-config-words",	&pic16_options.omit_configw,	"omit the generation of configuration words"},
-//	{ 0,	"--pomit-ivt",		&pic16_options.omit_ivt,	"omit the generation of the Interrupt Vector Table"},
-//	{ 0,	"--pleave-reset-vector",&pic16_options.leave_reset,	"when omitting IVT leave RESET vector"},
+	/* code generation options */
 	{ 0,	STACK_MODEL,		NULL,				"use stack model 'small' (default) or 'large'"},
-
-	{ 0,	"--debug-xtra",		&pic16_debug_verbose,	"show more debug info in assembly output"},
-	{ 0,	"--debug-ralloc",	&pic16_ralloc_debug,	"dump register allocator debug file *.d"},
-	{ 0,	"--pcode-verbose",	&pic16_pcode_verbose,	"dump pcode related info"},
-		
-	{ 0,	REP_UDATA,	NULL,	"Place udata variables at another section: udata_acs, udata_ovr, udata_shr"},
-
-	{ 0,	ALT_ASM,	NULL,	"Use alternative assembler"},
-	{ 0,	ALT_LINK,	NULL,	"Use alternative linker"},
-
-	{ 0,	"--denable-peeps",	&pic16_enable_peeps,	"explicit enable of peepholes"},
-	{ 0,	IVT_LOC,	NULL,	"<nnnn> interrupt vector table location"},
-	{ 0,	"--calltree",		&pic16_options.dumpcalltree,	"dump call tree in .calltree file"},
-	{ 0,	MPLAB_COMPAT,		&pic16_mplab_comp,	"enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
-	{ 0,	"--fstack",		&pic16_fstack,		"enable stack optimizations"},
-	{ 0,	NL_OPT,		NULL,				"new line, \"lf\" or \"crlf\""},
-	{ 0,	USE_CRT,	NULL,	"use <crt-o> run-time initialization module"},
-	{ 0,	"--no-crt",	&pic16_options.no_crt,	"do not link any default run-time initialization module"},
-	{ 0,	"--gstack",	&pic16_options.gstack,	"trace stack pointer push/pop to overflow"},
-	{ 0,    OPTIMIZE_GOTO,  NULL,			"try to use (conditional) BRA instead of GOTO"},
-	{ 0,	OPTIMIZE_CMP,	NULL,			"try to optimize some compares"},
-	{ 0,	OPTIMIZE_DF,	NULL,			"thoroughly analyze data flow (memory and time intensive!)"},
-	{ 0,    "--num-func-alloc-regs", &pic16_options.CATregs, "dump number of temporary registers allocated for each function"},
 #if XINST
 	{ 'y',  "--extended",   &xinst, "enable Extended Instruction Set/Literal Offset Addressing mode"},
 #endif
+	{ 0,	"--pno-banksel",	&pic16_options.no_banksel,	"do not generate BANKSEL assembler directives"},
+
+	/* optimization options */
+	{ 0,	OPT_BANKSEL,		NULL,				"set banksel optimization level (default=0 no)"},
+	{ 0,	"--denable-peeps",	&pic16_enable_peeps,	"explicit enable of peepholes"},
+	{ 0,    OPTIMIZE_GOTO,  NULL,			"try to use (conditional) BRA instead of GOTO"},
+	{ 0,	OPTIMIZE_CMP,	NULL,			"try to optimize some compares"},
+	{ 0,	OPTIMIZE_DF,	NULL,			"thoroughly analyze data flow (memory and time intensive!)"},
+
+	/* assembling options */
+	{ 0,	ALT_ASM,	NULL,	"Use alternative assembler"},
+	{ 0,	MPLAB_COMPAT,		&pic16_mplab_comp,	"enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
+
+	/* linking options */
+	{ 0,	ALT_LINK,	NULL,	"Use alternative linker"},
+	{ 0,	REP_UDATA,	NULL,	"Place udata variables at another section: udata_acs, udata_ovr, udata_shr"},
+	{ 0,	IVT_LOC,	NULL,	"Set address of interrupt vector table."},
+	{ 0,	NO_DEFLIBS,		&pic16_options.nodefaultlibs,	"do not link default libraries when linking"},
+	{ 0,	USE_CRT,	NULL,	"use <crt-o> run-time initialization module"},
+	{ 0,	"--no-crt",	&pic16_options.no_crt,	"do not link any default run-time initialization module"},
+
+	/* debugging options */
+	{ 0,	"--debug-xtra",		&pic16_debug_verbose,	"show more debug info in assembly output"},
+	{ 0,	"--debug-ralloc",	&pic16_ralloc_debug,	"dump register allocator debug file *.d"},
+	{ 0,	"--pcode-verbose",	&pic16_pcode_verbose,	"dump pcode related info"},
+	{ 0,	"--calltree",		&pic16_options.dumpcalltree,	"dump call tree in .calltree file"},
+	{ 0,	"--gstack",	&pic16_options.gstack,	"trace stack pointer push/pop to overflow"},
 	{ 0,	NULL,		NULL,	NULL}
-	};
+};
 
 
 #define ISOPT(str)	!strncmp(argv[ *i ], str, strlen(str) )
@@ -646,19 +642,6 @@ _pic16_parseOptions (int *pargc, char **argv, int *i)
       return TRUE;
     }
 	
-    if(ISOPT(NL_OPT)) {
-      char *tmp;
-            
-        tmp = Safe_strdup( getStringArg(NL_OPT, argv, i, *pargc) );
-        if(!STRCASECMP(tmp, "lf"))pic16_nl = 0;
-        else if(!STRCASECMP(tmp, "crlf"))pic16_nl = 1;
-        else {
-          fprintf(stderr, "invalid termination character id\n");
-          exit(EXIT_FAILURE);
-        }
-        return TRUE;
-    }
-
     if(ISOPT(USE_CRT)) {
       pic16_options.no_crt = 0;
       pic16_options.crt_name = Safe_strdup( getStringArg(USE_CRT, argv, i, *pargc) );
@@ -934,7 +917,6 @@ _pic16_setDefaultOptions (void)
   pic16_options.ip_stack = 1;		/* set to 1 to enable ipop/ipush for stack */
   pic16_options.gstack = 0;
   pic16_options.debgen = 0;
-  pic16_options.CATregs = 0;
 }
 
 static const char *

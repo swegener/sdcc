@@ -1,3 +1,14 @@
+2007-05-06 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/device.h,
+	* src/pic16/main.h,
+	* src/pic16/main.c (pic16_optionsTable,_pic16_parseOptions,
+	  _pic16_setDefaultOptions): removed/reordered command-line args
+	* doc/sdccman.lyx: updated PIC14 and PIC16 documentation (supported
+	  devices, regrouped command line args, environment variables),
+	  clarified sone points, added sections on how to add devices to the
+	  PIC14/PIC16 ports
+
 2007-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/peeph.def: fixed bug in rule 2

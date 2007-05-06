@@ -1,3 +1,9 @@
+2007-05-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+
+	* support/regression/tests/regtrack.c: test was never executed
+	  because of the regression test being picky about white spaces.
+	* device/lib/mcs51/crtclear.asm: added comment
+
 2007-05-06 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic/Makefile.rules,
@@ -81,7 +87,7 @@
 	* device/lib/pic/libdev/pic16f887.c: svn mv'ed to disabled_* to
 	  prevent building them, gputils do not really support them yet
 
-2007-03-27 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
+2007-04-27 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* device/lib/_ltoa.c: 36 bytes less __data mem. This really
 	  helps printf_small. 32 bytes more __idata mem.

@@ -35,7 +35,7 @@
 
 __mcs51_genRAMCLEAR::
 	clr	a
-	mov	r0,#(l_IRAM-1)
+	mov	r0,#(l_IRAM-1)	; mov r0,a will do for most devices
 00004$:	mov	@r0,a
 	djnz	r0,00004$
 ;	_mcs51_genRAMCLEAR() end

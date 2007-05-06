@@ -20,6 +20,7 @@ static void
 foo(unsigned char which)
 {
   unsigned char i,k; // should be allocated to registers
+  volatile unsigned char m = 1;
 
   k = 2;
   do
@@ -79,6 +80,10 @@ foo(unsigned char which)
                   break;
         }
       } while(--i);
+      
+      if(!i)
+         k = m; // prepare to exit outer loop
+
   }while(--k);
 
 }
@@ -86,7 +91,8 @@ foo(unsigned char which)
 
 
 
-void testRegTrack(void)
+void 
+testRegTrack(void)
 {
   ASSERT(0==(char)memcmp(ta, tb, sizeof tb));
 

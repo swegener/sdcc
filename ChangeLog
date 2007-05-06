@@ -1,5 +1,11 @@
 2007-05-06 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic/Makefile.rules,
+	* device/lib/pic16/Makefile.rules: make sure *.ignore file exists,
+	  made "&> /dev/null" redirection sh-safe ("> /dev/null 2>&1")
+
+2007-05-06 Raphael Neider <rneider AT web.de>
+
 	* src/pic16/device.h,
 	* src/pic16/main.h,
 	* src/pic16/main.c (pic16_optionsTable,_pic16_parseOptions,

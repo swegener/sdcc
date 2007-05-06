@@ -60,7 +60,7 @@ endif
 ifneq (,$(strip $(SUBDIRS)))
 recurse : force
 	$(Q)+for DIR in $(SUBDIRS) ; do \
-		$(GREP) "^$${ARCH}$$" "$(srcdir)/$${DIR}.ignore" &> /dev/null || ( \
+		[ -f "$(srcdir)/$${DIR}.ignore" ] && $(GREP) "^$${ARCH}$$" "$(srcdir)/$${DIR}.ignore" > /dev/null 2>&1 || ( \
 			$(MKDIR) "$(top_builddir)/$(builddir)/$${DIR}"; \
 			$(MAKE) -C "$${DIR}" builddir="$(builddir)/$${DIR}" $(MAKECMDGOALS); \
 		) || exit 1; \

@@ -1,5 +1,9 @@
 2007-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/z80/peeph.def: fixed bug in rule 2
+
+2007-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/port.h: added TARGET_MCS51_LIKE
 	* src/SDCCpeeph.c (labelIsUncondJump): new, added, other targets could
 	  take advantage of it too

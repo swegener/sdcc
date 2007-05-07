@@ -158,7 +158,7 @@ _gptrget (char *gptr) __naked
      __endasm;
 }
 
-#elif 1
+#else
 
 void
 _gptrget (char *gptr) __naked
@@ -211,90 +211,15 @@ _gptrget (char *gptr) __naked
      __endasm;
 }
 
-#else
-
-void
-_gptrget (char *gptr) __naked
-{
-/* This is the old version with pointers up to 16 bits. */
-
-    gptr; /* hush the compiler */
-
-    __asm
-    ;
-    ;   depending on the pointer type acc. to SDCCsymt.h
-    ;
-        mov     a,b                                     ; 2
-        jz      00001$  ; 0 near                        ; 2
-        dec     a                                       ; 1
-        jz      00002$  ; 1 far                         ; 2
-        dec     a                                       ; 1
-        jz      00003$  ; 2 code                        ; 2
-        dec     a                                       ; 1
-        jz      00004$  ; 3 pdata                       ; 2
-        dec     a       ; 4 skip generic pointer        ; 1
-        dec     a                                       ; 1
-        jz      00001$  ; 5 idata                       ; 2
-    ;
-    ;   any other value for type
-    ;   return xFF
-        mov     a,#0xff                                 ; 2
-        ret                                             ; 1
-    ;
-    ;   Pointer to data space
-    ;
- 00001$:
-        push    ar0                                     ; 2
-        ;
-        mov     r0,dpl     ; use only low order address ; 2
-        mov     a,@r0                                   ; 1
-        ;
-        pop     ar0                                     ; 2
-        ;
-        ret                                             ; 1
-    ;
-    ;   pointer to xternal data
-    ;
- 00002$:
-        movx    a,@dptr                                 ; 1
-        ret                                             ; 1
-;
-;   pointer to code area
-;
- 00003$:
-        ; clr     a  is already 0
-        movc    a,@a+dptr                               ; 1
-        ret                                             ; 1
-;
-;   pointer to xternal stack or pdata
-;
- 00004$:
-#if USE_PDATA_PAGING_REGISTER
-        mov     dph,__XPAGE     ; __XPAGE (usually p2) holds high byte for pdata access
-        movx    a,@dptr
-#else
-        push    ar0                                     ; 2
-        mov     r0,dpl                                  ; 2
-        movx    a,@r0                                   ; 1
-        pop     ar0                                     ; 2
-#endif
-        ret                                             ; 1
-                                                        ;===
-                                                        ;40 bytes
-     __endasm;
-}
 #endif
 
 #ifdef SDCC_ds390
 /* the  return value is expected to be in acc/_ap, and not in the standard
  * location dpl/dph. Therefore we choose return type void here: */
 
-#if 1
-
 void
 _gptrgetWord (unsigned *gptr)
 {
-/* This is the new version */
     gptr; /* hush the compiler */
 
     __asm
@@ -352,88 +277,9 @@ _gptrgetWord (unsigned *gptr)
         mov     r0,dph ; restore r0
         mov     dph,#0 ; restore dph
  00006$:
+        xch     a,_ap
     __endasm;
 
 }
-
-#else
-
-void
-_gptrgetWord (unsigned *gptr)
-{
-    gptr; /* hush the compiler */
-
-    __asm
-    ;
-    ;   depending on the pointer type acc. to SDCCsymt.h
-    ;
-        mov     a,b
-        jz      00001$  ; 0 near
-        dec     a
-        jz      00002$  ; 1 far
-        dec     a
-        jz      00003$  ; 2 code
-        dec     a
-        jz      00004$  ; 3 pdata
-        dec     a       ; 4 skip generic pointer
-        dec     a
-        jz      00001$  ; 5 idata
-    ;
-    ;   any other value for type
-    ;   return xFF
-        mov     a,#0xff
-        sjmp    00006$
-    ;
-    ;   Pointer to data space
-    ;
- 00001$:
-        push    ar0
-        mov     r0,dpl     ; use only low order address
-        mov     _ap,@r0
-        inc     r0
-        mov     a,@r0
-        inc     dpl
-        sjmp    00005$
-    ;
-    ;   pointer to xternal data
-    ;
- 00002$:
-        movx    a,@dptr
-        mov     _ap,a
-        inc     dptr
-        movx    a,@dptr
-        sjmp    00006$
-;
-;   pointer to code area
-;
- 00003$:
-        ; clr     a  is already 0
-        movc    a,@a+dptr
-        mov     _ap,a
-        clr     a
-        inc     dptr
-        movc    a,@a+dptr
-        sjmp    00006$
-;
-;   pointer to xternal stack
-;
- 00004$:
-        push    ar0
-        mov     r0,dpl
-        movx    a,@r0
-        mov     _ap,a
-        inc     r0
-        movx    a,@r0
-        inc     dpl
-;
-;   restore and return
-;
-00005$:
-        pop ar0
-00006$:
-    __endasm;
-
-}
-#endif
 
 #endif

@@ -1,3 +1,11 @@
+2007-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_gptrput.c,
+	* device/lib/_gptrget.c: removed old code,
+	 (_gptrgetWord),
+	* src/ds390/gen.c (genGenPointerGet): fixed bug 1714204
+	* support/regression/tests/bug1714204.c: new, added
+
 2007-05-06 Frieder Ferlemann <Frieder.Ferlemann AT web.de>
 
 	* support/regression/tests/regtrack.c: test was never executed

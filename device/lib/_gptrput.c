@@ -133,7 +133,7 @@ _gptrput (char *gptr, char c) __naked
     __endasm;
 }
 
-#elif 1
+#else
 
 void
 _gptrput (char *gptr, char c) __naked
@@ -182,74 +182,9 @@ _gptrput (char *gptr, char c) __naked
     __endasm;
 }
 
-#else
-
-void
-_gptrput (char *gptr, char c) __naked
-{
-/* This is the old version with pointers up to 16 bits. */
-
-    gptr; c; /* hush the compiler */
-
-    __asm
-        ar0 = 0x00
-        push     acc                                    ; 2
-    ;
-    ;   depending on the pointer type acc. to SDCCsymt.h
-    ;
-        mov     a,b                                     ; 2
-        jz      00001$  ; 0 near                        ; 2
-        dec     a                                       ; 1
-        jz      00002$  ; 1 far                         ; 2
-        dec     a                                       ; 1
-        jz      00003$  ; 2 code                        ; 2
-        dec     a                                       ; 1
-        jz      00004$  ; 3 pdata                       ; 2
-        dec     a       ; 4 skip generic pointer        ; 1
-        dec     a                                       ; 1
-        jz      00001$  ; 5 idata                       ; 2
-
- 00003$:
-        pop     acc    ; do nothing                     ; 2
-        ret                                             ; 1
-;
-;       store into near space
-;
- 00001$:
-        pop     acc                                     ; 2
-        push    ar0                                     ; 2
-        mov     r0,dpl                                  ; 2
-        mov     @r0,a                                   ; 1
-        pop     ar0                                     ; 2
-        ret                                             ; 1
-
- 00002$:
-        pop     acc                                     ; 2
-        movx    @dptr,a                                 ; 1
-        ret                                             ; 1
-
- 00004$:
-#if USE_PDATA_PAGING_REGISTER
-        pop     acc
-        mov     dph,__XPAGE     ; __XPAGE (usually p2) holds high byte for pdata access
-        movx    @dptr,a
-#else
-        pop     acc                                     ; 2
-        push    ar0                                     ; 2
-        mov     r0,dpl                                  ; 2
-        movx    @r0,a                                   ; 1
-        pop     ar0                                     ; 2
-#endif
-        ret                                             ; 1
-                                                        ;===
-                                                        ;46 bytes
-    __endasm;
-}
 #endif
 
 #ifdef SDCC_ds390
-
-#if 1
 
 void
 _gptrputWord ()
@@ -304,69 +239,5 @@ _gptrputWord ()
  00016$:
     __endasm;
 }
-
-#else
-
-void
-_gptrputWord ()
-{
-    __asm
-        push     acc
-    ;
-    ;   depending on the pointer type acc. to SDCCsymt.h
-    ;
-        mov     a,b
-        jz      00011$  ; 0 near
-        dec     a
-        jz      00012$  ; 1 far
-        dec     a
-        jz      00013$  ; 2 code
-        dec     a
-        jz      00014$  ; 3 pdata
-        dec     a       ; 4 skip generic pointer
-        dec     a
-        jz      00011$  ; 5 idata
-        pop     acc
-        sjmp    00016$
-;
-;       store into near space
-;
- 00011$:
-        pop     acc
-        push    ar0
-        mov     r0,dpl
-        mov     @r0,_ap
-        inc     r0
-        mov     @r0,a
-        sjmp    00015$
-
- 00012$:
-        mov     a, _ap
-        movx    @dptr,a
-        inc     dptr
-        pop     acc
-        movx    @dptr,a
-        sjmp    00016$
-
- 00013$:
-        pop     acc    ; do nothing
-        sjmp    00016$
-
- 00014$:
-        pop     acc
-        push    ar0
-        mov     r0,dpl
-        xch     a,_ap
-        movx    @r0,a
-        inc     r0
-        xch     a,_ap
-        movx    @r0, a
- 00015$:
-        inc     dptr
-        pop     ar0
- 00016$:
-    __endasm;
-}
-#endif
 
 #endif

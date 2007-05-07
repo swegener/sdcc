@@ -9867,7 +9867,7 @@ genrshFour (operand * result, operand * left,
       _startLazyDPSEvaluation();
       if (shCount == 1)
         {
-            shiftRLong (left, MSB16, result, sign);
+          shiftRLong (left, MSB16, result, sign);
         }
       else if (shCount == 0)
         {
@@ -10997,8 +10997,8 @@ genGenPointerGet (operand * left,
                 // with the implementation of __gptrgetWord
                 // in device/lib/_gptrget.c
                 emitcode ("lcall", "__gptrgetWord");
-                aopPut (result, DP2_RESULT_REG, offset++);
                 aopPut (result, "a", offset++);
+                aopPut (result, DP2_RESULT_REG, offset++);
                 size--;
             }
             else

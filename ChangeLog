@@ -1,3 +1,10 @@
+2007-05-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/mcs51/crtxinit.asm: added disabled version for dual dptr
+	* device/include/mcs51/uPSD33xx.h: added sfr DPS as alias for DPTC
+	* support/regression/tests/longlit.c: modified to be tested at all and
+	  to pass the actual test
+
 2007-05-07 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/uPSD33xx.h: Added.
@@ -33,7 +40,7 @@
 	  clarified sone points, added sections on how to add devices to the
 	  PIC14/PIC16 ports
 
-2007-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+2007-05-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/peeph.def: fixed bug in rule 2
 

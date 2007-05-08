@@ -46,6 +46,7 @@ SFR(DPL,  0x82); // Data Pointer Low.
 SFR(DPH,  0x83); // Data Pointer High.
 
 SFR(DPTC, 0x85); // Data Pointer Control Register.
+SFR(DPS,  0x85); // Data Pointer Control Register alias for SDCC
     #define AT 0x40 //0:Manually Select Data Pointer / 1:Auto Toggle between DPTR0 and DPTR1
     #define DPSE0 0x01 // 0:DPTR0 Selected for use as DPTR / 1:DPTR1 Selected for use as DPTR
 
@@ -68,7 +69,7 @@ SFR(PCON, 0x87); // Power Control.
     #define TCLK1  0x04 //Transmit Clock Flag (UART1)
     #define PD     0x02 //Power-Down Mode Enable.
     #define IDL    0x01 //Idle Mode Enable.
-   
+
 SFR(TCON, 0x88); // Timer/Counter Control.
     SBIT(TF1, 0x88, 7); // Timer 1 overflow flag.
     SBIT(TR1, 0x88, 6); // Timer 1 run control flag.
@@ -78,7 +79,7 @@ SFR(TCON, 0x88); // Timer/Counter Control.
     SBIT(IT1, 0x88, 2); // Interrupt 1 type control bit.
     SBIT(IE0, 0x88, 1); // Interrupt 0 flag.
     SBIT(IT0, 0x88, 0); // Interrupt 0 type control bit.
-    
+
 SFR(TMOD, 0x89); // Timer/Counter Mode Control.
     #define GATE1 0x80 // External enable for timer 1.
     #define C_T1  0x40 // Timer or counter select for timer 1.
@@ -132,7 +133,7 @@ SFR(P1, 0x90); // Port 1
     SBIT(SPIRXD, 0x90, 5);
     SBIT(SPITXD, 0x90, 6);
     SBIT(SPISEL, 0x90, 7);
-    
+
 SFR(P3SFS, 0x91); // Port 3 Special Function Select Register
     #define P3SF7 0x80
     #define P3SF6 0x40
@@ -162,14 +163,14 @@ SFR(P4SFS1, 0x93); //Port 4 Special Function Select 1 Register.
     #define P4SF12 0x04
     #define P4SF11 0x02
     #define P4SF10 0x01
-    
+
 SFR(ADCPS, 0x94); // ADC pre-scaller?
     #define ADCCE  0x08 // ADC Conversion Reference Clock Enable.
     //ADC Reference Clock PreScaler. Only three Prescaler values are allowed:
     #define ADCPS2 0x02 // Resulting ADC clock is fOSC.
     #define ADCPS1 0x01 // Resulting ADC clock is fOSC/2.
     #define ADCPS0 0x00 // Resulting ADC clock is fOSC/4.
-    
+
 SFR(ADAT0, 0x95); // A/D result register (bits 0 to 7).
 SFR(ADAT1, 0x96); // A/D result register (bits 8 and 9).
 SFR(ACON,  0x97); // A/D control register.
@@ -181,7 +182,7 @@ SFR(ACON,  0x97); // A/D control register.
     #define ADS0   0x04 // Analog channel Select bit 1.
     #define ADST   0x02 // ADC Start Bit.
     #define ADSF   0x01 // ADC Status Bit.
-    
+
 SFR(SCON, 0x98); // For compatibity with legacy code
 SFR(SCON0, 0x98); // Serial Port UART0 Control Register
     SBIT(SM0, 0x98, 7); // Serial Port Mode Bit 0.
@@ -205,7 +206,7 @@ SFR(BUSCON, 0x9D); // Bus Control Register.
     #define RDW0  0x04 // RD Wait bit 1.
     #define CW1   0x02 // PSEN Wait bit 2.
     #define CW0   0x01 // PSEN Wait bit 1.
-    
+
 SFR(PCACL0,  0xA2); // The low 8 bits of PCA 0 16-bit counter.
 SFR(PCACH0,  0xA3); // The high 8 bits of PCA 0 16-bit counter.
 SFR(PCACON0, 0xA4); // PCA 0 Control Register.
@@ -222,14 +223,14 @@ SFR(IEA, 0xA7); // Interrupt Enable Addition Register.
     #define EI2C 0x02 // Enable I2C Interrupt.
 
 SFR(IE, 0xA8); // Interrupt Enable Register.
-    SBIT(EA,  0xA8, 7); // Global disable bit. 
+    SBIT(EA,  0xA8, 7); // Global disable bit.
     SBIT(ET2, 0xA8, 5); // Enable Timer 2 Interrupt.
     SBIT(ES0, 0xA8, 4); // Enable UART0 Interrupt.
     SBIT(ET1, 0xA8, 3); // Enable Timer 1 Interrupt.
     SBIT(EX1, 0xA8, 2); // Enable External Interrupt INT1.
     SBIT(ET0, 0xA8, 1); // Enable Timer 0 Interrupt.
     SBIT(EX0, 0xA8, 0); // Enable External Interrupt INT0.
-    
+
 SFR(TCMMODE0, 0xA9); // TCM 0 Mode.
 SFR(TCMMODE1, 0xAA); // TCM 1 Mode.
 SFR(TCMMODE2, 0xAB); // TCM 2 Mode.
@@ -245,7 +246,7 @@ SFR(TCMMODE5, 0xBF); // TCM 5 Mode.
     #define TOGGLE 0x04  // A match on the comparator results in a toggling output on CEXn pin.
     #define PWM1   0x02  // PWM mode bit 2.
     #define PWM0   0x01  // PWM mode bit 1.
-    
+
 SFR(CAPCOML0, 0xAC); // Capture/Compare register low of TCM 0.
 SFR(CAPCOMH0, 0xAD); // Capture/Compare register High of TCM 0.
 SFR(CAPCOML1, 0xAF); // Capture/Compare register low of TCM 1.
@@ -330,7 +331,7 @@ SFR(CCON0, 0xF9); // Clock Control Register.
     #define CPUPS2 0x04 // MCUCLK Pre-Scaler bit 3.
     #define CPUPS1 0x02 // MCUCLK Pre-Scaler bit 2.
     #define CPUPS0 0x01 // MCUCLK Pre-Scaler bit 1.
-    
+
 SFR(CCON2, 0xFB); // Pre-scaler value for PCA0.
     #define PCA0CE  0x10 // PCA0 Clock Enable.
     #define PCA0PS3 0x08 // PCA0 Pre-Scaler bit 4.
@@ -352,14 +353,14 @@ SFR(SPICLKD, 0xD2); // SPI Prescaler (Clock Divider) Register.
     #define DIV16  0x10
     #define DIV8   0x08
     #define DIV4   0x04
-    
+
 SFR(SPISTAT, 0xD3); // SPI Interface Status Register.
     #define BUSY   0x10 // SPI Busy.
     #define TEISF  0x08 // Transmission End Interrupt Source flag.
     #define RORISF 0x04 // Receive Overrun Interrupt Source flag.
     #define TISF   0x02 // Transfer Interrupt Source flag.
     #define RISF   0x01 // Receive Interrupt Source flag.
-    
+
 SFR(SPITDR, 0xD4); // SPI transmit data register.
 SFR(SPIRDR, 0xD5); // SPI receive data register.
 
@@ -370,7 +371,7 @@ SFR(SPICON0, 0xD6); // SPI Control Register 0.
     #define SSEL  0x08 // Slave Selection.
     #define FLSB  0x04 // First LSB.
     #define SPO   0x02 // Sampling Polarity.
-    
+
 SFR(SPICON1, 0xD7); // SPI Interface Control Register 1.
     #define TEIE  0x08 // Transmission End Interrupt Enable.
     #define RORIE 0x04 // Receive Overrun Interrupt Enable.

@@ -238,18 +238,19 @@ emitcode (const char *inst, const char *fmt,...)
       lbp++;
     }
 
-  if (lbp && *lbp)
+  if (lbp)
     {
       lineCurr = (lineCurr ?
                   connectLine (lineCurr, newLineNode (lb)) :
                   (lineHead = newLineNode (lb)));
+
+      lineCurr->isInline = _G.inLine;
+      lineCurr->isDebug = _G.debugLine;
+      lineCurr->ic = _G.current_iCode;
+      lineCurr->aln = ds390newAsmLineNode(_currentDPS);
+      lineCurr->isComment = (*lbp == ';');
     }
 
-  lineCurr->isInline = _G.inLine;
-  lineCurr->isDebug = _G.debugLine;
-  lineCurr->ic = _G.current_iCode;
-  lineCurr->aln = ds390newAsmLineNode(_currentDPS);
-  lineCurr->isComment = (*lbp == ';');
   va_end (ap);
 
   dbuf_destroy(&dbuf);
@@ -5633,7 +5634,7 @@ genDivbits (operand * left,
   char *l;
   bool pushedB;
 
-  D(emitcode (";     genDivbits",""));
+  D(emitcode (";", "genDivbits"));
 
   pushedB = pushB ();
 
@@ -5663,7 +5664,7 @@ genDivOneByte (operand * left,
   symbol *lbl;
   int size, offset;
 
-  D(emitcode (";     genDivOneByte",""));
+  D(emitcode (";", "genDivOneByte"));
 
   offset = 1;
   lUnsigned = SPEC_USIGN (getSpec (operandType (left)));
@@ -7142,10 +7143,10 @@ genAnd (iCode * ic, iCode * ifx)
   }
 
 #ifdef DEBUG_TYPE
-  emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Type res[%d] = l[%d]&r[%d]",
             AOP_TYPE (result),
             AOP_TYPE (left), AOP_TYPE (right));
-  emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Size res[%d] = l[%d]&r[%d]",
             AOP_SIZE (result),
             AOP_SIZE (left), AOP_SIZE (right));
 #endif
@@ -7577,10 +7578,10 @@ genOr (iCode * ic, iCode * ifx)
 
 
 #ifdef DEBUG_TYPE
-  emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Type res[%d] = l[%d]&r[%d]",
             AOP_TYPE (result),
             AOP_TYPE (left), AOP_TYPE (right));
-  emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Size res[%d] = l[%d]&r[%d]",
             AOP_SIZE (result),
             AOP_SIZE (left), AOP_SIZE (right));
 #endif
@@ -7968,10 +7969,10 @@ genXor (iCode * ic, iCode * ifx)
   }
 
 #ifdef DEBUG_TYPE
-  emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Type res[%d] = l[%d]&r[%d]",
             AOP_TYPE (result),
             AOP_TYPE (left), AOP_TYPE (right));
-  emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Size res[%d] = l[%d]&r[%d]",
             AOP_SIZE (result),
             AOP_SIZE (left), AOP_SIZE (right));
 #endif
@@ -8479,7 +8480,7 @@ genSwap (iCode * ic)
 {
   operand *left, *result;
 
-  D(emitcode (";     genSwap",""));
+  D(emitcode (";", "genSwap"));
 
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
@@ -10363,7 +10364,7 @@ genUnpackBits (operand * result, char *rname, int ptype)
   int blen;             /* bitfield length */
   int bstr;             /* bitfield starting bit within byte */
 
-  D(emitcode (";     genUnpackBits",""));
+  D(emitcode (";", "genUnpackBits"));
 
   etype = getSpec (operandType (result));
   rsize = getSize (operandType (result));
@@ -11120,7 +11121,7 @@ genPackBits (sym_link * etype,
   int litval;           /* source literal value (if AOP_LIT) */
   unsigned char mask;   /* bitmask within current byte */
 
-  D(emitcode (";     genPackBits",""));
+  D(emitcode (";", "genPackBits"));
 
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
@@ -14034,7 +14035,7 @@ genCritical (iCode *ic)
 static void
 genEndCritical (iCode *ic)
 {
-  D(emitcode(";     genEndCritical",""));
+  D(emitcode(";", "genEndCritical"));
 
   if (IC_RIGHT (ic))
     {
@@ -14222,14 +14223,14 @@ gen390Code (iCode * lic)
               debugFile->writeCLine (ic);
             }
           if (!options.noCcodeInAsm) {
-            emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno,
+            emitcode (";", "%s:%d: %s", ic->filename, ic->lineno,
                       printCLine(ic->filename, ic->lineno));
           }
           cln = ic->lineno;
         }
       if (options.iCodeInAsm) {
         char *iLine = printILine(ic);
-        emitcode("", ";ic:%d: %s", ic->key, iLine);
+        emitcode(";", "ic:%d: %s", ic->key, iLine);
         dbuf_free(iLine);
       }
       /* if the result is marked as

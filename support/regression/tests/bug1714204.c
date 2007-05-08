@@ -10,7 +10,7 @@ typedef struct {
 
 unsigned char i1, i2, i3;
 
-void test(TEST_TYPE *p1, TEST_TYPE *p2, TEST_TYPE *p3)
+void foo(TEST_TYPE *p1, TEST_TYPE *p2, TEST_TYPE *p3)
 {
 	if (p2->w[i2] > ++p3->w[i3])
 		p1->w[i1] = p2->w[i2] + p3->w[i3];
@@ -25,7 +25,7 @@ testBug(void)
 
 	i1 = i2 = i3 = 0;
 
-	test(&t1, &t2, &t3);
+	foo(&t1, &t2, &t3);
 
 	ASSERT (t1.w[0] == 1);
 }

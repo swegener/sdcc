@@ -1,3 +1,14 @@
+2007-05-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (emitcode): don't change properties of previous lines,
+	  (throughout): updated generating comments
+	* src/mcs51/gen.c (emitcode): don't change properties of previous lines,
+	  (throughout): updated generating comments
+	* src/SDCCpeeph.c (peepHole): continue searching at the first replaced
+	  rule instead of at the second, or it might skip lines when removing the
+	  complete match
+	* support/regression/tests/bug1714204.c: changed test to foo
+
 2007-05-08 Borut Razem <borut.razem AT siol.net>
 
 	* doc/sdccman.lyx: changed sdcc version to 2.7.0,

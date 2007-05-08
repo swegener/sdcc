@@ -181,19 +181,20 @@ emitcode (const char *inst, const char *fmt,...)
       lbp++;
     }
 
-  if (lbp && *lbp)
+  if (lbp)
     {
       rtrackUpdate (lbp);
 
       lineCurr = (lineCurr ?
                   connectLine (lineCurr, newLineNode (lb)) :
                   (lineHead = newLineNode (lb)));
+
+      lineCurr->isInline = _G.inLine;
+      lineCurr->isDebug = _G.debugLine;
+      lineCurr->ic = _G.current_iCode;
+      lineCurr->isComment = (*lbp==';');
     }
 
-  lineCurr->isInline = _G.inLine;
-  lineCurr->isDebug = _G.debugLine;
-  lineCurr->ic = _G.current_iCode;
-  lineCurr->isComment = (*lbp==';');
   va_end (ap);
 
   dbuf_destroy(&dbuf);
@@ -2669,9 +2670,9 @@ saveRBank (int bank, iCode * ic, bool pushPsw)
     }
 
   if (ic)
-  {
-    ic->bankSaved = 1;
-  }
+    {
+      ic->bankSaved = 1;
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -3405,7 +3406,7 @@ genFunction (iCode * ic)
                 }
             }
         }
-        else
+      else
         {
             /* This ISR uses a non-zero bank.
              *
@@ -3590,7 +3591,7 @@ genFunction (iCode * ic)
           int ofs;
 
           _G.current_iCode = ric;
-          D(emitcode (";     genReceive",""));
+          D(emitcode (";", "genReceive"));
           for (ofs=0; ofs < sym->recvSize; ofs++)
             {
               if (!strcmp (fReturn[ofs], "a"))
@@ -3615,7 +3616,7 @@ genFunction (iCode * ic)
           int ofs;
 
           _G.current_iCode = ric;
-          D(emitcode (";     genReceive",""));
+          D(emitcode (";", "genReceive"));
           for (ofs=0; ofs < sym->recvSize; ofs++)
             {
               emitcode ("mov", "%s,%s", rsym->regs[ofs]->name, fReturn[ofs]);
@@ -4514,7 +4515,7 @@ genPlus (iCode * ic)
        && (SPEC_ADDR (OP_SYM_ETYPE (op)) & 0xff) == 0
      )
     {
-      D(emitcode (";     genPlus aligned array",""));
+      D(emitcode (";", "genPlus aligned array"));
       aopPut (IC_RESULT (ic),
               aopGet (rightOp, 0, FALSE, FALSE),
               0);
@@ -4543,7 +4544,7 @@ genPlus (iCode * ic)
            skip_bytes++;
          }
        if (skip_bytes)
-         D(emitcode (";     genPlus shortcut",""));
+         D(emitcode (";", "genPlus shortcut"));
     }
 
   while (size--)
@@ -5214,7 +5215,7 @@ genDivbits (operand * left,
   char *l;
   bool pushedB;
 
-  D(emitcode (";     genDivbits",""));
+  D(emitcode (";", "genDivbits"));
 
   pushedB = pushB ();
 
@@ -5247,7 +5248,7 @@ genDivOneByte (operand * left,
   symbol *lbl;
   int size, offset;
 
-  D(emitcode (";     genDivOneByte",""));
+  D(emitcode (";", "genDivOneByte"));
 
   /* Why is it necessary that genDivOneByte() can return an int result?
      Have a look at:
@@ -6539,10 +6540,10 @@ genAnd (iCode * ic, iCode * ifx)
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);
 
 #ifdef DEBUG_TYPE
-  emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Type res[%d] = l[%d]&r[%d]",
             AOP_TYPE (result),
             AOP_TYPE (left), AOP_TYPE (right));
-  emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Size res[%d] = l[%d]&r[%d]",
             AOP_SIZE (result),
             AOP_SIZE (left), AOP_SIZE (right));
 #endif
@@ -6963,10 +6964,10 @@ genOr (iCode * ic, iCode * ifx)
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);
 
 #ifdef DEBUG_TYPE
-  emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Type res[%d] = l[%d]&r[%d]",
             AOP_TYPE (result),
             AOP_TYPE (left), AOP_TYPE (right));
-  emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Size res[%d] = l[%d]&r[%d]",
             AOP_SIZE (result),
             AOP_SIZE (left), AOP_SIZE (right));
 #endif
@@ -7340,10 +7341,10 @@ genXor (iCode * ic, iCode * ifx)
   aopOp ((result = IC_RESULT (ic)), ic, TRUE);
 
 #ifdef DEBUG_TYPE
-  emitcode ("", "; Type res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Type res[%d] = l[%d]&r[%d]",
             AOP_TYPE (result),
             AOP_TYPE (left), AOP_TYPE (right));
-  emitcode ("", "; Size res[%d] = l[%d]&r[%d]",
+  emitcode (";", "Size res[%d] = l[%d]&r[%d]",
             AOP_SIZE (result),
             AOP_SIZE (left), AOP_SIZE (right));
 #endif
@@ -7996,7 +7997,7 @@ genSwap (iCode * ic)
 {
   operand *left, *result;
 
-  D(emitcode (";     genSwap",""));
+  D(emitcode (";", "genSwap"));
 
   left = IC_LEFT (ic);
   result = IC_RESULT (ic);
@@ -9697,7 +9698,7 @@ genUnpackBits (operand * result, char *rname, int ptype, iCode *ifx)
   int bstr;             /* bitfield starting bit within byte */
   char buffer[10];
 
-  D(emitcode (";     genUnpackBits",""));
+  D(emitcode (";", "genUnpackBits"));
 
   etype = getSpec (operandType (result));
   rsize = getSize (operandType (result));
@@ -10087,7 +10088,7 @@ loadDptrFromOperand (operand *op, bool loadBToo)
               else
                 {
                   wassertl(FALSE, "need pointerCode");
-                  emitcode ("", "; mov b,???");
+                  emitcode (";", "mov b,???");
                   /* genPointerGet and genPointerSet originally did different
                   ** things for this case. Both seem wrong.
                   ** from genPointerGet:
@@ -10370,7 +10371,7 @@ genPackBits (sym_link * etype,
   int litval;           /* source literal value (if AOP_LIT) */
   unsigned char mask;   /* bitmask within current byte */
 
-  D(emitcode (";     genPackBits",""));
+  D(emitcode (";", "genPackBits"));
 
   blen = SPEC_BLEN (etype);
   bstr = SPEC_BSTR (etype);
@@ -10754,7 +10755,7 @@ genFarPointerSet (operand * right,
   sym_link *retype = getSpec (operandType (right));
   sym_link *letype = getSpec (operandType (result));
 
-  D(emitcode (";     genFarPointerSet",""));
+  D(emitcode (";", "genFarPointerSet"));
 
   aopOp (result, ic, FALSE);
   loadDptrFromOperand (result, FALSE);
@@ -11703,7 +11704,7 @@ genCritical (iCode *ic)
 static void
 genEndCritical (iCode *ic)
 {
-  D(emitcode(";     genEndCritical",""));
+  D(emitcode(";", "genEndCritical"));
 
   if (IC_RIGHT (ic))
     {
@@ -11768,7 +11769,7 @@ gen51Code (iCode * lic)
               debugFile->writeCLine (ic);
             }
           if (!options.noCcodeInAsm) {
-            emitcode ("", ";\t%s:%d: %s", ic->filename, ic->lineno,
+            emitcode (";", "%s:%d: %s", ic->filename, ic->lineno,
                       printCLine(ic->filename, ic->lineno));
           }
           cln = ic->lineno;
@@ -11776,7 +11777,7 @@ gen51Code (iCode * lic)
       #if 0
       if (ic->seqPoint && ic->seqPoint != cseq)
         {
-          emitcode ("", "; sequence point %d", ic->seqPoint);
+          emitcode (";", "sequence point %d", ic->seqPoint);
           cseq = ic->seqPoint;
         }
       #endif
@@ -11801,7 +11802,7 @@ gen51Code (iCode * lic)
         #endif
         }
         iLine = printILine(ic);
-        emitcode("", "; [%s] ic:%d: %s", regsInUse, ic->seq, iLine);
+        emitcode(";", "[%s] ic:%d: %s", regsInUse, ic->seq, iLine);
         dbuf_free(iLine);
       }
       /* if the result is marked as

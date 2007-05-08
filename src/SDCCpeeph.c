@@ -248,7 +248,7 @@ FBYNAME (labelIsReturnOnly)
         {
           if (strncmp(pl->line, label, len) == 0)
             break; /* Found Label */
-          if (strlen(pl->line) != 7     || !ISCHARDIGIT(*(pl->line))   ||
+          if (strlen(pl->line) != 7       || !ISCHARDIGIT(*(pl->line))   ||
               !ISCHARDIGIT(*(pl->line+1)) || !ISCHARDIGIT(*(pl->line+2)) ||
               !ISCHARDIGIT(*(pl->line+3)) || !ISCHARDIGIT(*(pl->line+4)) ||
               *(pl->line+5) != '$')
@@ -266,7 +266,7 @@ FBYNAME (labelIsReturnOnly)
     return FALSE; /* next line not valid */
   p = pl->line;
   for (p = pl->line; *p && ISCHARSPACE(*p); p++)
-          ;
+    ;
 
   retInst = "ret";
   if (TARGET_IS_HC08)
@@ -2264,7 +2264,7 @@ peepHole (lineNode ** pls)
   lineNode *spl;
   peepRule *pr;
   lineNode *mtail = NULL;
-  bool restart;
+  bool restart, replaced;
 
 #if !OPT_DISABLE_PIC || !OPT_DISABLE_PIC16
   /* The PIC port uses a different peep hole optimizer based on "pCode" */
@@ -2281,8 +2281,10 @@ peepHole (lineNode ** pls)
       /* for all rules */
       for (pr = rootRules; pr; pr = pr->next)
         {
-          for (spl = *pls; spl; spl = spl->next)
+          for (spl = *pls; spl; spl = replaced ? spl : spl->next)
             {
+              replaced = FALSE;
+
               /* if inline assembler then no peep hole */
               if (spl->isInline)
                 continue;
@@ -2299,10 +2301,15 @@ peepHole (lineNode ** pls)
               /* if it matches */
               if (matchRule (spl, &mtail, pr, *pls))
                 {
+                  /* restart at the replaced line */
+                  replaced = TRUE;
 
                   /* then replace */
                   if (spl == *pls)
-                    replaceRule (pls, mtail, pr);
+                    {
+                      replaceRule (pls, mtail, pr);
+                      spl = *pls;
+                    }
                   else
                     replaceRule (&spl, mtail, pr);
 

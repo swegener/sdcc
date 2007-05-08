@@ -1,3 +1,7 @@
+2007-05-07 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
+
+	* device/include/mcs51/uPSD33xx.h: Added.
+
 2007-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_gptrput.c,

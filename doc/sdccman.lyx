@@ -1,4 +1,4 @@
-#LyX 1.4.2 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -104,7 +104,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 2.6.5
+SDCC 2.7.0
 \size footnotesize
 
 \newline
@@ -8436,7 +8436,257 @@ status collapsed
 
  When linking, skip the standard crt0.o object file.
  You must provide your own crt0.o for your system when linking.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-portmode=
+\series default
+<Value>
+\begin_inset LatexCommand \index{Z80!Options!-\/-portmode=<Value>}
+
+\end_inset
+
+ Determinate PORT I/O mode (<Value> is z80 or z180).
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-asm=
+\series default
+<Value>
+\begin_inset LatexCommand \index{Z80!Options!-\/-asm=<Value>}
+
+\end_inset
+
+ Define assembler name (<Value> is rgbds, asxxxx, isas or z80asm).
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-codeseg
+\series default
+\InsetSpace ~
+<Value>
+\begin_inset LatexCommand \index{Z80!Options!-\/-codeseg <Value>}
+
+\end_inset
+
+ Use <Value> for the code segment name.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-constseg
+\series default
+\InsetSpace ~
+<Value>
+\begin_inset LatexCommand \index{Z80!Options!-\/-constseg <Value>}
+
+\end_inset
+
+ Use <Value> for the const segment name.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+GBZ80 Options
+\begin_inset LatexCommand \index{Options GBZ80}
+
+\end_inset
+
+
+\begin_inset LatexCommand \index{GBZ80}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-callee-saves-bc
+\series default
+
+\begin_inset LatexCommand \index{GBZ80!Options!-\/-callee-saves-bc}
+
+\end_inset
+
+
+\size large
+\emph on
  
+\size default
+\emph default
+Force a called function to always save BC.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-bo
+\series default
+\InsetSpace ~
+<Num>
+\begin_inset LatexCommand \index{GBZ80!Options!-bo <Num>}
+
+\end_inset
+
+ Use code bank <Num>.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-ba
+\series default
+\InsetSpace ~
+<Num>
+\begin_inset LatexCommand \index{GBZ80!Options!-ba <Num>}
+
+\end_inset
+
+ Use data bank <Num>.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-codeseg
+\series default
+\InsetSpace ~
+<Value>
+\begin_inset LatexCommand \index{GBZ80!Options!-\/-codeseg <Value>}
+
+\end_inset
+
+ Use <Value> for the code segment name.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-constseg
+\series default
+\InsetSpace ~
+<Value>
+\begin_inset LatexCommand \index{GBZ80!Options!-\/-constseg <Value>}
+
+\end_inset
+
+ Use <Value> for the const segment name.
 \end_layout
 
 \begin_layout Standard
@@ -39416,38 +39666,23 @@ Thanks to all the other volunteer developers who have helped with coding,
 \newline
 
 \emph on
-Also thanks to Sourceforge 
+Thanks to Sourceforge 
 \begin_inset LatexCommand \url{http://www.sf.net}
 
 \end_inset
 
  which has hosted the project since 1999 and donates significant download
- bandwidth and probably more than 
-\begin_inset ERT
-status collapsed
+ bandwidth.
+\emph default
 
-\begin_layout Standard
-
-$10^{13}$
-\end_layout
-
-\end_inset
-
-CPU cycles per day.
 \newline
- 
-\begin_inset Note Note
-status open
 
-\begin_layout Standard
-more than 10^13 is an estimate: on my Athlon 2800+ it takes about (0.5+6.5+20)
- minutes for (configure+make+regression test), and there is (i386, amd64,
- alpha, ppc64, (mingw32), sparc, Mac OS X).
- 
-\end_layout
+\newline
 
-\end_inset
-
+\emph on
+Also thanks to all SDCC Distributed Compile Farm members for donating CPU
+ cycles and bandwidth for snapshot builds.
+\newline
 
 \end_layout
 

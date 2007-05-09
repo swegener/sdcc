@@ -1,3 +1,7 @@
+2007-05-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/knownbugs.html: updated for release 2.7.0
+
 2007-05-09 Jesus Calvino-Fraga <jesusc at ece.ubc.ca>
 
 	* device/include/mcs51/uPSD33xx.h: Added patch by Jan Waclawek.

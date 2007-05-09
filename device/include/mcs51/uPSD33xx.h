@@ -452,4 +452,138 @@ SFR(B, 0xF0); // B Register
     SBIT(B_6, 0xF0, 6); // Register B bit 6.
     SBIT(B_7, 0xF0, 7); // Register B bit 7.
 
+// PSD registers definition - by Jan Waclawek - wek at efton dot sk - May 2007
+// all defines here are with PSD_ prefix to identify them as PSD-related
+//
+// Based on uPSD33xx datasheet (preliminary) - Jan 2005, Table 79 at pages 145/146
+// and subsequent text
+
+// requires to have PSD_CSIOP defined to the base address of the PSD IO area,
+//     as defined in PSDSoftExpress or CUPS
+#ifndef PSD_CSIOP
+#error PSD_CSIOP has to be #define-d (before #include-ing this file) to the base address of the PSD registers area, according to csiop setting in CUPS/PSDSoftExpress
+#else
+                                         //  -- Port A not available on 52-pin uPSD33xx devices
+SFRX(PSD_DATAIN_A,    PSD_CSIOP+0x00);   // MCU I/O Mode Port A Data In Register
+                                         //   reads 0 if pin is log.0, 1 if pin is log. 1
+                                         //   READ only
+SFRX(PSD_DATAOUT_A,   PSD_CSIOP+0x04);   // MCU I/O Mode Port A Data Out Register 
+                                         //   write 0 to set pin to log. 0, 1 to set pin to log. 1 
+                                         //   read back written value
+                                         //   reset default = 00
+SFRX(PSD_DIRECTION_A, PSD_CSIOP+0x06);   // MCU I/O Mode Port A Direction Register 
+                                         //   write 1 to set pin as output, 0 to set pin as input
+                                         //   read back written value
+                                         //   reset default = 00
+SFRX(PSD_DRIVE_A,     PSD_CSIOP+0x08);   // Select Open Drain or High Slew Rate for port A
+                                         //   PA0-PA3: write 0 to select standard push-pull CMOS output, 1 to select High Slew Rate push-pull CMOS output
+                                         //   PA4-PA7: write 0 to select standard push-pull CMOS output, 1 to select Open Drain output
+                                         //   reset default = 00
+SFRX(PSD_CONTROL_A,   PSD_CSIOP+0x02);   // Selects MCU I/O or Latched Address Out mode for port A
+                                         //   write 0 to select standard I/O pin, 1 to drive demultiplexed address signal on pin
+                                         //   read back written value
+                                         //   reset default = 00
+SFRX(PSD_OUTENABLE_A, PSD_CSIOP+0x0C);   // Read state of Output Enable Logic on each I/O port driver of Port A
+                                         //   1 - driver output is enabled, 0 - driver is off (high impedance)  
+                                         //   READ only
+
+                                         // -- for comment on individual registers, see above Port A
+SFRX(PSD_DATAIN_B,    PSD_CSIOP+0x01);   // MCU I/O Mode Port B Data In Register
+SFRX(PSD_DATAOUT_B,   PSD_CSIOP+0x05);   // MCU I/O Mode Port B Data Out Register 
+SFRX(PSD_DIRECTION_B, PSD_CSIOP+0x07);   // MCU I/O Mode Port B Direction Register 
+SFRX(PSD_DRIVE_B,     PSD_CSIOP+0x09);   // Select Open Drain or High Slew Rate for port B
+                                         // PB0-PB3: standard/High Slew Rate, PB4-PB7: standard/Open Drain
+SFRX(PSD_CONTROL_B,   PSD_CSIOP+0x03);   // Selects MCU I/O or Latched Address Out mode for port B
+SFRX(PSD_OUTENABLE_B, PSD_CSIOP+0x0D);   // Read state of Output Enable Logic on each I/O port driver of Port B
+
+                                         // -- for comment on individual registers, see above Port A
+                                         // only pins PC2, PC3, PC4, PC7 available; other bits in registers are undefined
+SFRX(PSD_DATAIN_C,    PSD_CSIOP+0x10);   // MCU I/O Mode Port C Data In Register
+SFRX(PSD_DATAOUT_C,   PSD_CSIOP+0x12);   // MCU I/O Mode Port C Data Out Register 
+SFRX(PSD_DIRECTION_C, PSD_CSIOP+0x14);   // MCU I/O Mode Port C Direction Register 
+SFRX(PSD_DRIVE_C,     PSD_CSIOP+0x16);   // Select Open Drain for port C
+SFRX(PSD_OUTENABLE_C, PSD_CSIOP+0x1A);   // Read state of Output Enable Logic on each I/O port driver of Port C
+
+                                         // -- for comment on individual registers, see above Port A
+                                         // only pins PD1, PD2 available (PD2 not available on 52-pin package); other bits in registers are undefined
+SFRX(PSD_DATAIN_D,    PSD_CSIOP+0x11);   // MCU I/O Mode Port D Data In Register
+SFRX(PSD_DATAOUT_D,   PSD_CSIOP+0x13);   // MCU I/O Mode Port D Data Out Register 
+SFRX(PSD_DIRECTION_D, PSD_CSIOP+0x15);   // MCU I/O Mode Port D Direction Register 
+SFRX(PSD_DRIVE_D,     PSD_CSIOP+0x17);   // Select High Slew Rate for port D
+SFRX(PSD_OUTENABLE_D, PSD_CSIOP+0x1B);   // Read state of Output Enable Logic on each I/O port driver of Port D
+
+SFRX(PSD_IMC_A,       PSD_CSIOP+0x0A);   // Read to obtain logic state of Input Macrocells connected to Port A
+                                         //   READ only
+SFRX(PSD_IMC_B,       PSD_CSIOP+0x0B);   // Read to obtain logic state of Input Macrocells connected to Port B
+SFRX(PSD_IMC_C,       PSD_CSIOP+0x18);   // Read to obtain logic state of Input Macrocells connected to Port C
+                                         //   only pins PC2, PC3, PC4, PC7 available; other bits in register are undefined
+SFRX(PSD_OMC_AB,      PSD_CSIOP+0x20);   // Read logic state of macrocells AB. Write to load macrocell AB flip-flops.
+SFRX(PSD_OMC_BC,      PSD_CSIOP+0x21);   // Read logic state of macrocells BC. Write to load macrocell BC flip-flops.
+SFRX(PSD_OMCMASK_AB,  PSD_CSIOP+0x22);   // Write to set mask for macrocell AB. 
+                                         //    1 blocks READs/WRITEs of OMF, 0 will pass OMF value
+                                         //    Read back written value.
+SFRX(PSD_OMCMASK_BC,  PSD_CSIOP+0x23);   // Write to set mask for macrocell BC.
+
+// -- all three Power Management Register are set to 00 after PowerUp, but unchanged during reset (/RST)
+SFRX(PSD_PMMR0,       PSD_CSIOP+0xB0);   // -- Power Management Register 0 - write/read
+// bit 0 unused and should be set to 0
+#define PSD_APD_ENA            0x02      // 0 - Automatic Power Down (APD) counter is disabled, 1 - APD enabled
+// bit 2 unused and should be set to 0
+#define PSD_TURBO_DISA         0x08      // 0 - PSD Turbo mode enabled, 1 - Turbo mode off, saving power
+#define PSD_BLOCK_CLKIN_PLD    0x10      // 0 - CLKIN to PLD not blocked, 1 - no CLKIN to PLD Input Bus, saving power
+#define PSD_BLOCK_CLKIN_OMC    0x20      // 0 - CLKIN to Output Macrocells not blocked, 1 - blocked, saving power
+// bits 6 and 7 unused and should be set to 0
+
+SFRX(PSD_PMMR2,       PSD_CSIOP+0xB4);   // -- Power Management Register 2 - write/read
+// bits 0 and 1 unused and should be set to 0
+#define PSD_BLOCK_WR_PLD       0x04      // 0 - /WR from 8032 to PLD Input Bus not blocked, 1 - blocked, saving power
+#define PSD_BLOCK_RD_PLD       0x08      // 0 - /RD from 8032 to PLD Input Bus not blocked, 1 - blocked, saving power
+#define PSD_BLOCK_PSEN_PLD     0x10      // 0 - /PSEN from 8032 to PLD Input Bus not blocked, 1 - blocked, saving power
+#define PSD_BLOCK_ALE_PLD      0x20      // 0 - ALE from 8032 to PLD Input Bus not blocked, 1 - blocked, saving power
+#define PSD_BLOCK_PC7_PDL      0x40      // 0 - input from Port C pin 7 to PLD Input Bus not blocked, 1 - blocked, saving power
+// bit 7 unused and should be set to 0
+
+SFRX(PSD_PMMR3,       PSD_CSIOP+0xC7);   // -- Power Management Register 3 - write/read
+// bit 0 unused and should be set to 0
+#define PSD_FORCE_PD           0x02      // 0 - APD counter, if enabled, will cause powerdown, 1 - powerdown will be entered immediately
+                                         //   - once set, cleared only by reset condition
+// bit 2 not defined by datasheet
+// bits 3 to 7 unused and should be set to 0
+
+SFRX(PSD_MAINPROTECT, PSD_CSIOP+0xC0);   // -- Main Flash Memory Protection Definition
+                                         //   bit 0 to bit 7 - sector 0 to sector 7 protection status
+                                         //      - 1 - flash sector write protected, 0 - not write protected
+                                         //   READ only
+SFRX(PSD_ALTPROTECT,  PSD_CSIOP+0xC2);   // -- Secondary Flash Memory Protection Definition
+                                         //   bit 0 to bit 3 - sector 0 to sector 3 protection status
+                                         //      - 1 - flash sector write protected, 0 - not write protected
+                                         //   bit 7 - Security Bit
+                                         //      - 1 - device is secured against external reading and writing, 0 - not secured
+                                         //   READ only
+
+SFRX(PSD_PAGE,        PSD_CSIOP+0xE0);   // -- Memory Page Register
+
+SFRX(PSD_VM,          PSD_CSIOP+0xE2);   // -- Memory Mapping Register
+                                         //   Places PSD Module memories into 8032 Program Address Space 
+                                         //   and/or 8032 XDATA Address Space
+                                         //   Default value of bits 0 to 4 is loaded from Non-Volatile 
+                                         //   setting as specified from PSDsoft Express upon any reset 
+                                         //   or power-up condition. The default value of these bits 
+                                         //   can be overridden by 8032 at run-time.
+#define PSD_VM_SRAM_CODE       0x01      // 0 - SRAM not accessible as CODE (/PSEN) memory, 1 - SRAM accessible as CODE memory
+#define PSD_VM_ALT_CODE        0x02      // 0 - secondary FLASH not accessible as CODE (/PSEN) memory, 1 - secondary FLASH accessible as CODE memory
+#define PSD_VM_MAIN_CODE       0x04      // 0 - primary FLASH not accessible as CODE (/PSEN) memory, 1 - primary FLASH accessible as CODE memory
+#define PSD_VM_ALT_XDATA       0x08      // 0 - secondary FLASH not accessible as XDATA (/RD/WR) memory, 1 - secondary FLASH accessible as XDATA memory
+#define PSD_VM_MAIN_XDATA      0x10      // 0 - primary FLASH not accessible as XDATA (/RD/WR) memory, 1 - primary FLASH accessible as XDATA memory
+// bits 5 and 6 unused
+#define PSD_VM_PIO_EN          0x80      // 0 - disable, 1- enable peripheral I/O mode on Port A
+
+// another terminology for FLASH - MAIN/ALTERNATIVE -> PRIMARY/SECONDARY
+#define PSD_VM_PRI_CODE   PSD_VM_MAIN_CODE
+#define PSD_VM_SEC_CODE   PSD_VM_ALT_CODE
+#define PSD_VM_PRI_XDATA  PSD_VM_MAIN_XDATA
+#define PSD_VM_SEC_XDATA  PSD_VM_ALT_XDATA
+
+#endif
+
 #endif //REG_UPSD33XX_H

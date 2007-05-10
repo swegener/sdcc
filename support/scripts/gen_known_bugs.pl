@@ -87,7 +87,7 @@ sub process_line($)
     elsif ($i == 2) {
       # remove text formatting from 'Open Date' field
       my $text = $_->as_text();
-      $text =~ s/^\W*\*//;
+      $text =~ s/^\W*\**\W//;
       $_->delete_content();
       $_->push_content($text);
     }

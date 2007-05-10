@@ -5954,6 +5954,10 @@ fixupInline (ast * tree, int level)
       sym->level = level;
       sym->block = currBlockno;
 
+      sym->reqv = NULL;
+      SYM_SPIL_LOC (sym) = NULL;
+      sym->key = 0;
+
       /* If the symbol is a label, we need to renumber it */
       if (sym->islbl)
         fixupInlineLabel (sym);
@@ -6023,6 +6027,9 @@ fixupInline (ast * tree, int level)
 static void
 inlineAddDecl (symbol * sym, ast * block, int addSymTab)
 {
+  sym->reqv = NULL;
+  SYM_SPIL_LOC (sym) = NULL;
+  sym->key = 0;
   if (block != NULL)
     {
       symbol **decl = &(block->values.sym);
@@ -6383,9 +6390,16 @@ createFunction (symbol * name, ast * body)
   if (fatalError)
     goto skipall;
 
-  /* Do not generate code for inline functions unless extern also */
+  /* Do not generate code for inline functions unless extern also. */
+#if 0
   if (FUNC_ISINLINE (name->type) && !IS_EXTERN (fetype))
     goto skipall;
+#else
+  /* Temporary hack: always generate code for static inline functions. */
+  /* Ideally static inline functions should only be generated if needed. */
+  if (FUNC_ISINLINE (name->type) && !IS_EXTERN (fetype) && !IS_STATIC (fetype))
+    goto skipall;
+#endif
 
   /* create the node & generate intermediate code */
   GcurMemmap = code;

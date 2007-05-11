@@ -1,3 +1,8 @@
+2007-05-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCpeeph.c (labelIsUncondJump): ignore identical labels for
+	  jumps to self, fixed bug 1717281
+
 2007-05-10 Borut Razem <borut.razem AT siol.net>
 
 	* support/scripts/gen_known_bugs.pl: cosmetic fix

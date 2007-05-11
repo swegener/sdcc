@@ -353,6 +353,8 @@ FBYNAME (labelIsUncondJump)
       if (*q==',')
         return FALSE; /* conditional jump */
     }
+  if (strcmp(p, q) == 0)
+    return FALSE; /* labels are equal */
   /* now put the destination in %6 */
   bindVar (6, &p, &vars);
   return TRUE;

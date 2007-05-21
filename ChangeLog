@@ -1,3 +1,7 @@
+2007-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/peeph.def (257.b): disabled to fix bug 1721024
+
 2007-05-21 Raphael Neider <rneider AT web.de>
 
 	* src/pic/pcoderegs.c (pCodeOptime2pCodes): fixed bogus optimization,

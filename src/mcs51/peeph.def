@@ -3851,16 +3851,17 @@ replace {
 	djnz	%1,%2
 } if notVolatile(%1)
 
-// unsigned char i=8; do{ } while(--i != 0);
-// this applies if i is kept in data memory
-replace {
-	dec	%1
-	mov	a,%1
-	jnz	%2
-} by {
-	;	Peephole 257.b	optimized decrement with compare
-	djnz	%1,%2
-} if notVolatile(%1), operandsNotRelated(%1 '@r0' '@r1')
+//// unsigned char i=8; do{ } while(--i != 0);
+//// this applies if i is kept in data memory
+// Disabled because together with 256.c it causes bug #1721024
+//replace {
+//	dec	%1
+//	mov	a,%1
+//	jnz	%2
+//} by {
+//	;	Peephole 257.b	optimized decrement with compare
+//	djnz	%1,%2
+//} if notVolatile(%1), operandsNotRelated(%1 '@r0' '@r1')
 
 
 // in_byte<<=1; if(in_bit) in_byte|=1;
@@ -4574,7 +4575,7 @@ replace restart {
 	pop	ar%1
 } by {
 	;	Peephole 300	pop ar%1 removed
-} if deadMove %1
+} if deadMove(%1)
 
 replace {
 	mov	r%1,%2

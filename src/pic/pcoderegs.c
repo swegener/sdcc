@@ -523,24 +523,27 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 	if (!isPCI(pc1) || !isPCI(pc2)) return 0;
 	if (PCI(pc1)->pcflow != PCI(pc2)->pcflow) return 0;
 	
-	if(pc2->seq < pc1->seq) {
+	if (pc2->seq < pc1->seq) {
 		pct1 = pc2;
 		pc2 = pc1;
 		pc1 = pct1;
 	}
 
 	/* disable this optimization for now -- it's buggy */
-	if(pic14_options.disable_df) return 0;
+	if (pic14_options.disable_df) return 0;
 	
 	//fprintf(stderr,"pCodeOptime2pCodes\n");
 	//pc1->print(stderr,pc1);
 	//pc2->print(stderr,pc2);
 
 	if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_MOVFW) ){
+	    /*
+	     * CLRF sets Z
+	     * MOVFW affects Z
+	     * MOVWF does not touch Z
+	     * MOVLW does not touch Z
+	     */
 		pCode *newpc;
-		int regUsed = 0;
-		int wUsed   = 0;
-		int wSaved  = 0;
 		/*
 		clrf  reg    ; pc1
 		stuff...
@@ -553,41 +556,25 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 		*/
 		DFPRINTF((stderr, "   optimising CLRF reg ... MOVF reg,W to ... MOVLW 0\n"));
 		pct2 = findNextInstruction(pc2->next);
-		
-		if(pct2 && PCI(pct2)->op == POC_MOVWF) {
-			wSaved = wUsed = 1; /* Maybe able to replace with clrf pc2->next->reg. */
-		} else {
-			wUsed = pCodeSearchCondition(pct2,PCC_W,1) != -1;
-		}
-		regUsed = regUsedinRange(pct2,0,reg);
-		if ((regUsed&&wUsed) || (pCodeSearchCondition(pct2,PCC_Z,0) != -1)) {
-			/* Do not optimise as exisiting code is required. */
-		} else {
-			/* Can optimise. */
-			if(regUsed) {
-				newpc = newpCode(POC_CLRF, PCI(pc1)->pcop);
-			} else if(wSaved && !wUsed) {
-				newpc = newpCode(POC_CLRF, PCI(pct2)->pcop);
-				pct2->destruct(pct2);
-			} else {
-				newpc = newpCode(POC_MOVLW, newpCodeOpLit(0));
-			}
+		if (pCodeSearchCondition(pct2, PCC_Z, 0) == -1) {
+			/* Z is definitely overwritten before use */
+			newpc = newpCode(POC_MOVLW, newpCodeOpLit(0));
 			
 			pCodeInsertAfter(pc2, newpc);
 			PCI(newpc)->pcflow = PCFL(pcfl_used);
 			newpc->seq = pc2->seq;
 			
 			//fprintf (stderr, "%s:%d(%s): Remove2pcodes (CLRF reg, ..., MOVF reg,W)\n", __FILE__, __LINE__, __FUNCTION__);
-			Remove2pcodes(pcfl_used, pc1, pc2, reg, can_free);
-			total_registers_saved++;  // debugging stats.
+			Remove2pcodes(pcfl_used, pc2, NULL, reg, 0);
+			//total_registers_saved++;  // debugging stats.
 		}
 	} else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){
 		DFPRINTF((stderr, "   optimising CLRF/IORFW\n"));
 		
 		pct2 = findNextInstruction(pc2->next);
 		
-		/* We must ensure that is destroyed before being read---IORLW must be performed unless this is proven. */
-		if(pCodeSearchCondition(pct2, PCC_Z,0) != -1) {
+		/* We must ensure that Z is destroyed before being read---IORLW must be performed unless this is proven. */
+		if (pCodeSearchCondition(pct2, PCC_Z, 0) != -1) {
 			pct2 = newpCode(POC_IORLW, newpCodeOpLit(0));
 			pct2->seq = pc2->seq;
 			PCI(pct2)->pcflow = PCFL(pcfl_used);

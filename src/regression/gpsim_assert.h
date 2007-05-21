@@ -34,6 +34,9 @@
   __endasm; \
   __asm \
   .direct "a", STRINGIFY(e) \
+  __endasm; \
+  __asm \
+  nop \
   __endasm;
 
 #define PASSED() \
@@ -42,6 +45,9 @@
   __endasm; \
   __asm \
   .direct "a", "\"PASSED\"" \
+  __endasm; \
+  __asm \
+  nop \
   __endasm;
 
 #define FAILED() \
@@ -49,7 +55,10 @@
   nop \
   __endasm; \
   __asm \
-  .direct "a", "\"FAILED\"" \
+  .direct "a", "\"===> FAILED\"" \
+  __endasm; \
+  __asm \
+  nop \
   __endasm;
 
 #endif

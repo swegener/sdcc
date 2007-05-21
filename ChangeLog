@@ -1,3 +1,11 @@
+2007-05-21 Raphael Neider <rneider AT web.de>
+
+	* src/pic/pcoderegs.c (pCodeOptime2pCodes): fixed bogus optimization,
+	  closes #1722392
+	* src/regression/gpsim_assert.h,
+	* src/regression/Makefile,
+	* src/regression/pcodeopt.c: regression test for the above fix
+
 2007-05-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCpeeph.c (labelIsUncondJump): ignore identical labels for

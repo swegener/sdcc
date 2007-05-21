@@ -52,7 +52,12 @@ Q ?= @ # be quiet
 CC = sdcc
 LINKER = gplink
 TARGETPIC = 16f877
-CFLAGS = -Wl,--map -I ../../device/include/pic -L ../../device/lib/pic/bin -mpic14 -pp$(TARGETPIC) -Wl,-q --no-pcode-opt
+TARGETPIC = 16f84
+CFLAGS = -mpic14 -p$(TARGETPIC)
+CFLAGS += -Wl,-q
+CFLAGS += -Wl,--map -I ../../device/include/pic
+CFLAGS += -L ../../device/lib/pic/bin
+#CFLAGS += --no-pcode-opt
 
 .SUFFIXES: .asm .c .cod .stc
 
@@ -96,6 +101,7 @@ SRC = add.c \
       mult1.c \
       nestfor.c \
       or1.c \
+      pcodeopt.c \
       pointer1.c \
       ptrarg.c \
       ptrfunc.c \

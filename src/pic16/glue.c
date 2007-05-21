@@ -391,7 +391,7 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
     goto wrong;
   
   /* try it the old way first */
-  if ((val = constExprValue (expr, FALSE)))
+  if (expr->etype && (val = constExprValue (expr, FALSE)))
     return val;
   
   /* ( ptr + constant ) */
@@ -422,7 +422,7 @@ value *pic16_initPointer (initList * ilist, sym_link *toType)
      a variable or address of an array element */
   if (IS_AST_OP (expr) && expr->opval.op == '&') {
     /* address of symbol */
-    if (IS_AST_SYM_VALUE (expr->left)) {
+    if (IS_AST_SYM_VALUE (expr->left) && expr->left->etype) {
       val = AST_VALUE (expr->left);
       val->type = newLink (DECLARATOR);
       if(SPEC_SCLS (expr->left->etype) == S_CODE) {

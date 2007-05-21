@@ -565,7 +565,8 @@ int pCodeOptime2pCodes(pCode *pc1, pCode *pc2, pCode *pcfl_used, regs *reg, int 
 			newpc->seq = pc2->seq;
 			
 			//fprintf (stderr, "%s:%d(%s): Remove2pcodes (CLRF reg, ..., MOVF reg,W)\n", __FILE__, __LINE__, __FUNCTION__);
-			Remove2pcodes(pcfl_used, pc2, NULL, reg, 0);
+			//Remove2pcodes(pcfl_used, pc2, NULL, reg, 0);
+			pc2->destruct(pc2);
 			//total_registers_saved++;  // debugging stats.
 		}
 	} else if((PCI(pc1)->op == POC_CLRF) && (PCI(pc2)->op == POC_IORFW) ){

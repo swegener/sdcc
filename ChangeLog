@@ -1,3 +1,9 @@
+2007-05-21 Raphael Neider <rneider AT web.de>
+
+	* src/pic16/glue.c (pic16_initPointer): avoid assertion, emit better
+	  error message instead
+	* src/pic/pcoderegs.c (pCodeOptime2pCodes): keep register state intact
+
 2007-05-21 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/peeph.def (257.b): disabled to fix bug 1721024

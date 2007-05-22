@@ -1,3 +1,7 @@
+2007-05-22 Borut Razem <borut.razem AT siol.net>
+
+	* doc/knownbugs.html: updated
+
 2007-05-21 Raphael Neider <rneider AT web.de>
 
 	* src/pic16/glue.c (pic16_initPointer): avoid assertion, emit better

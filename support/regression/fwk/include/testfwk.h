@@ -12,10 +12,13 @@ void __printf(const char *szFormat, ...);
 #endif
 
 #if defined(PORT_HOST) || defined(SDCC_z80) || defined(SDCC_gbz80)
+# define data
 # define idata
 # define pdata
 # define xdata
 # define code
+# define near
+# define far
 # define at(x)
 #endif
 
@@ -43,4 +46,4 @@ void __runSuite(void);
 
 #define UNUSED(_a)  if (_a) { }
 
-#endif
+#endif //__TESTFWK_H

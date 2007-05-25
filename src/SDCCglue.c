@@ -747,7 +747,7 @@ printIvalStruct (symbol * sym, sym_link * type,
 
   if (SPEC_STRUCT (type)->type == UNION) {
     printIval (sym, sflds->type, iloop, oBuf);
-    iloop = iloop->next;
+    iloop = iloop ? iloop->next : NULL;
   } else {
     for (; sflds; sflds = sflds->next, iloop = (iloop ? iloop->next : NULL)) {
       if (IS_BITFIELD(sflds->type)) {

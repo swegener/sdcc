@@ -17350,8 +17350,8 @@ Use of Labels within Inline Assembler
 \begin_layout Standard
 SDCC allows the use of in-line assembler with a few restrictions regarding
  labels.
- In older versions of the compiler all labels defined within inline assembler
- code had to be of the form 
+ All labels defined within inline assembler code have to be of the form
+ 
 \emph on
 nnnnn$
 \emph default
@@ -17364,6 +17364,33 @@ per function
 )
 \noun default
 .
+\begin_inset Foot
+status open
+
+\begin_layout Standard
+This is a slightly more stringent rule than absolutely necessary, but stays
+ always on the safe side.
+ Labels in the form of nnnnn$ are local labels in the assembler, locality
+ of which is confined within two labels of the standard form.
+ The compiler uses the same form for labels within a function (but starting
+ from nnnnn=00100); and places always a standard label at the beginning
+ of a function, thus limiting the locality of labels within the scope of
+ the function.
+ So, if the inline assembler part would be embedded into C-code, an improperly
+ placed non-local label in the assembler would break up the reference space
+ for labels created by the compiler for the C-code, leading to an assembling
+ error.
+\end_layout
+
+\begin_layout Standard
+The numeric part of local labels does not need to have 5 digits (although
+ this is the form of labels output by the compiler), any valid integer will
+ do.
+ Please refer to the assemblers documentation for further details.
+\end_layout
+
+\end_inset
+
  
 \end_layout
 
@@ -17459,7 +17486,7 @@ _asm
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-ljmp $0003 
+ljmp 0003$ 
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17478,6 +17505,21 @@ clabel:\InsetSpace ~
 \InsetSpace ~
 /* inline assembler cannot reference this
  label */ 
+\begin_inset Foot
+status open
+
+\begin_layout Standard
+Here, the C-label 
+\family typewriter
+clabel
+\family default
+ is translated by the compiler into a local label, so the locality of labels
+ within the function is not broken.
+\end_layout
+
+\end_inset
+
+
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17489,7 +17531,7 @@ _asm
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-$0003: ;label (can be referenced by inline assembler only)
+0003$: ;label (can be referenced by inline assembler only)
  
 \newline
 \InsetSpace ~

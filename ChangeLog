@@ -1,3 +1,16 @@
+2007-05-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: inserted footnotes about inline assembler labels,
+	  thanks Jan Waclawek
+	* src/mcs51/gen.c (aopPut): fixed part of bug 1723128 when result is
+	  AOP_CRY and ruonly
+	  (gencjneshort): optimized when left is AOP_DIR
+	* src/SDCCglue.c (printIvalStruct): fixed other part of bug 1723128 for
+	  initializing unions in a struct/array
+	* support/regression/fwk/include/testfwk.h: added defines for data, near
+	  and far for host and z80
+	* support/regression/tests/bug1723128.c: new, added
+
 2007-05-22 Borut Razem <borut.razem AT siol.net>
 
 	* doc/knownbugs.html: updated

@@ -66,6 +66,8 @@ static char *accUse[] =
 
 static unsigned short rbank = -1;
 
+#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
+
 #define REG_WITH_INDEX   mcs51_regWithIdx
 
 #define AOP(op) op->aop
@@ -1492,6 +1494,7 @@ aopPut (operand * result, const char *s, int offset)
   bool bvolatile = isOperandVolatile (result, FALSE);
   bool accuse = FALSE;
   asmop * aop = AOP (result);
+  const char *d = NULL;
 
   if (aop->size && offset > (aop->size - 1))
     {
@@ -1667,28 +1670,40 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_CRY:
-      /* if result no bit variable */
-      if (!aop->aopu.aop_dir)
-        {
-          assert (!strcmp (s, "c"));
-          /* inefficient: move carry into A and use jz/jnz */
-          emitcode ("clr", "a");
-          emitcode ("rlc", "a");
-          accuse = TRUE;
-        }
-      else if (s == zero)
-          emitcode ("clr", "%s", aop->aopu.aop_dir);
-      else if (s == one)
-          emitcode ("setb", "%s", aop->aopu.aop_dir);
-      else if (!strcmp (s, "c"))
-          emitcode ("mov", "%s,c", aop->aopu.aop_dir);
-      else if (strcmp (s, aop->aopu.aop_dir))
+      // destination is carry for return-use-only
+      d = (IS_OP_RUONLY (result)) ? "c" : aop->aopu.aop_dir;
+      // source is no literal and not in carry
+      if ((s != zero) && (s != one) && strcmp (s, "c"))
         {
           MOVA (s);
           /* set C, if a >= 1 */
           emitcode ("add", "a,#0xff");
-          emitcode ("mov", "%s,c", aop->aopu.aop_dir);
+          s = "c";
         }
+      // now source is zero, one or carry
+
+      /* if result no bit variable */
+      if (!d)
+        {
+          if (!strcmp (s, "c"))
+            {
+              /* inefficient: move carry into A and use jz/jnz */
+              emitcode ("clr", "a");
+              emitcode ("rlc", "a");
+              accuse = TRUE;
+            }
+          else
+            {
+              MOVA (s);
+              accuse = TRUE;
+            }
+        }
+      else if (s == zero)
+          emitcode ("clr", "%s", d);
+      else if (s == one)
+          emitcode ("setb", "%s", d);
+      else if (strcmp (s, d))
+          emitcode ("mov", "%s,c", d);
       break;
 
     case AOP_STR:
@@ -6034,8 +6049,9 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
   /* if the left side is a literal or
      if the right is in a pointer register and left
      is not */
-  if ((AOP_TYPE (left) == AOP_LIT) ||
+  if ((AOP_TYPE (left) == AOP_LIT)  ||
       (AOP_TYPE (left) == AOP_IMMD) ||
+      (AOP_TYPE (left) == AOP_DIR)  ||
       (IS_AOP_PREG (right) && !IS_AOP_PREG (left)))
     {
       operand *t = right;

@@ -1,3 +1,9 @@
+2007-05-26 Borut Razem <borut.razem AT siol.net>
+
+	* support/regression/tests/bug1057979.c, support/regression/tests/malloc.c,
+	  support/regression/fwk/include/testfwk.h: fixed compilation on Mac OS x
+	* docs/knownbugs.html: updated
+
 2007-05-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: inserted footnotes about inline assembler labels,

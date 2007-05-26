@@ -2,10 +2,10 @@
    bug1057979.c
 */
 
-#include <testfwk.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <testfwk.h>
 
 char s[12+1];
 

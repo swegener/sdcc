@@ -1,10 +1,10 @@
 /* Simple malloc tests.
  */
-#include <testfwk.h>
 #include <stdlib.h>
 #if defined(SDCC_pic16)
 #include <malloc.h>
 #endif
+#include <testfwk.h>
 
 #if defined(SDCC_pic16)
 xdata char heap[100];

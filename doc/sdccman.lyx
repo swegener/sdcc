@@ -1,4 +1,4 @@
-#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.3 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -12821,29 +12821,36 @@ status collapsed
 \end_inset
 
 ) are good places to look for such overlaps.
- Variables with an absolute address are 
-\emph on
-not
-\begin_inset Marginal
-status collapsed
-
-\begin_layout Standard
-
-\series bold
-\InsetSpace ~
-!
 \end_layout
 
-\end_inset
-
-
-\emph default
- initialized
+\begin_layout Standard
+If however you provide an initializer
 \begin_inset LatexCommand \index{Variable initialization}
 
 \end_inset
 
-.
+ actual memory allocation will take place and overlaps will be detected
+ by the linker.
+ E.g.:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+__code __at (0x7ff0) char Id[5] = 
+\begin_inset Quotes sld
+\end_inset
+
+SDCC
+\begin_inset Quotes srd
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Standard
+In the above example the variable Id will be located from 0x7ff0 to 0x7ff4
+ in code memory.
 \end_layout
 
 \begin_layout Standard
@@ -13196,7 +13203,7 @@ Parameters
 Automatic (local) variables and parameters to functions can either be placed
  on the stack or in data-space.
  The default action of the compiler is to place these variables in the internal
- RAM (for small model) or external RAM (for large model).
+ RAM (for small model) or external RAM (for medium or large model).
  This in fact makes them similar to 
 \emph on
 static
@@ -17531,8 +17538,7 @@ _asm
 \InsetSpace ~
 \InsetSpace ~
 \InsetSpace ~
-0003$: ;label (can be referenced by inline assembler only)
- 
+0003$: ;label (can be referenced by inline assembler only) 
 \newline
 \InsetSpace ~
 \InsetSpace ~
@@ -17613,8 +17619,8 @@ and
 
 
 \emph default
- to pass the first parameter to a function, and also to pass the return
- value 
+ to pass the first (non-bit) parameter to a function, and also to pass the
+ return value 
 \begin_inset LatexCommand \index{return value}
 
 \end_inset
@@ -17716,7 +17722,21 @@ status collapsed
 \end_inset
 
 -stack-auto is used) or in data/xdata memory (depending on the memory model).
- 
+\end_layout
+
+\begin_layout Standard
+Bit parameters are passed in a virtual register called 'bits' in bit-addressable
+ space for reentrant functions or allocated directly in bit memory otherwise.
+\end_layout
+
+\begin_layout Standard
+Functions (with two or more parameters or bit parameters) that are called
+ through function pointers
+\begin_inset LatexCommand \index{function pointers}
+
+\end_inset
+
+ must therefor be reentrant so the compiler knows how to pass the parameters.
 \end_layout
 
 \begin_layout Subsection
@@ -35929,7 +35949,7 @@ Old K&R style
 \family typewriter
 foo(i,j) /* this old style of function declarations */ 
 \newline
-int i,j; /* are valid
+int i,j; /* is valid
  in ANSI but not valid in SDCC */ 
 \newline
 { 
@@ -35946,7 +35966,24 @@ int i,j; /* are valid
 
 \end_deeper
 \begin_layout Itemize
-Most enhancements in C99 are not supported, f.e.:
+Most enhancements in C99 are not supported, e.g.:
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+for (
+\series bold
+int
+\series default
+ i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+But some have been added recently in SDCC 2.7.0.
+ They must be considered alpha quality however.
 \end_layout
 
 \begin_deeper
@@ -35961,21 +35998,19 @@ inline
 
 
 \series default
- int increment (int a) { return a+1; } /* is invalid in SDCC although allowed
- in C99.
- An empty define 
-\emph on
-#define inline
-\emph default
- can be used as a work around */
+ int increment (int a) { return a+1; } /* inlines the increment without
+ function call overhead */
 \newline
-
-\newline
-for (
+int * 
 \series bold
-int
+restrict
+\begin_inset LatexCommand \index{inline (not supported)}
+
+\end_inset
+
+
 \series default
- i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
+ p; /* accepted but ignored */
 \end_layout
 
 \end_deeper

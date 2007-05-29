@@ -1,3 +1,9 @@
+2007-05-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: documented initialization and allocation of absolute
+	  variables, bit parameter passing, the need for function pointers to be
+	  reentrant and alpha quality support of inline and retrict
+
 2007-05-26 Borut Razem <borut.razem AT siol.net>
 
 	* support/regression/tests/bug1057979.c, support/regression/tests/malloc.c,

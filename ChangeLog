@@ -1,3 +1,11 @@
+2007-05-31 Borut Razem <borut.razem AT siol.net>
+
+	* Small Device C Compiler 2.7.0 released
+	* .version, sdcc.spec, doc/sdccman.lyx, doc/INSTALL.txt:
+	  changed sdcc version to 2.7.1
+	* support/scripts/sdcc.nsi: added How to create WIN32 release
+	  setup.exe package
+
 2007-05-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: documented initialization and allocation of absolute

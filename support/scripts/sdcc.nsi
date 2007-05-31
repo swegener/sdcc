@@ -25,7 +25,7 @@
 
 # How to create WIN32 setup.exe
 #
-# - unpack WIN32 mingw daily snapshot sdcc-snapshot-i586-mingw32msvc-yyyymmdd.zip
+# - unpack WIN32 mingw daily snapshot sdcc-snapshot-i586-mingw32msvc-yyyymmdd-rrrr.zip
 #   to a clean directory (the option to create directories should be enabled).
 #   A sub directory sdcc is created (referenced as PKGDIR in continuation).
 # - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
@@ -33,12 +33,32 @@
 # - copy file COPYING from the sdcc Subversion snapshot to the PKGDIR directory,
 #   rename it to COPYING.TXT and convert file COPYING to DOS format:
 #   unix2dos COPYING.TXT
+# - copy readline5.dll to PKGDIR/bin/readline5.dll
 # - run NSIS installer from PKGDIR directory:
 #   "c:\Program Files\NSIS\makensis.exe" sdcc.nsi
 # - A setup file setup.exe is created in PKGDIR directory.
-#   Rename it to sdcc_yyyymmdd_setup.exe and upload it
+#   Rename it to sdcc-yyyymmdd-rrrr-setup.exe and upload it
 #   to sdcc download repository at sourceforge.net
 #
+#
+# How to create WIN32 release setup.exe package
+#
+# - unpack WIN32 mingw daily snapshot sdcc-snapshot-i586-mingw32msvc-yyyymmdd-rrrr.zip
+#   to a clean directory (the option to create directories should be enabled).
+#   A sub directory sdcc is created (referenced as PKGDIR in continuation).
+# - remove the PKGDIR/doc/README.TXT file
+# - unpack sdcc-doc-yyyymmdd-rrrr.zip to the PKGDIR/doc directory
+# - copy files sdcc/support/scripts/sdcc.ico and sdcc/support/scripts/sdcc.nsi
+#   (this file) from the sdcc Subversion snapshot to the PKGDIR directory
+# - copy file COPYING from the sdcc Subversion snapshot to the PKGDIR directory,
+#   rename it to COPYING.TXT and convert file COPYING to DOS format:
+#   unix2dos COPYING.TXT
+# - copy readline5.dll to PKGDIR/bin/readline5.dll
+# - run NSIS installer from PKGDIR directory:
+#   "c:\Program Files\NSIS\makensis.exe" -DFULL_DOC sdcc.nsi
+# - A setup file setup.exe is created in PKGDIR directory.
+#   Rename it to sdcc-x.x.x-setup.exe and upload it
+#   to sdcc download repository at sourceforge.net
 #
 # How to upload secc setup.exe tosourceforge.net
 #

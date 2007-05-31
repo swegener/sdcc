@@ -1,4 +1,4 @@
-#LyX 1.4.4 created this file. For more info see http://www.lyx.org/
+#LyX 1.4.3 created this file. For more info see http://www.lyx.org/
 \lyxformat 245
 \begin_document
 \begin_header
@@ -730,7 +730,7 @@ open source
 freeware
 \emph default
 ; source code for all the sub-packages (pre-processor, assemblers, linkers
- etc) is distributed with the package.
+ etc.) is distributed with the package.
  This documentation is maintained using a free open source word processor
  (LyX).
 \newline
@@ -836,8 +836,20 @@ It would be fine to add to each item, in which version was it changed.
 \begin_layout Itemize
 short is now equivalent to int (16 bits), it used to be equivalent to char
  (8 bits) which is not ANSI compliant.
- To maintain compatibility, old programs may be compiled using the --short-is-8b
-its commandline option (see 
+ To maintain compatibility, old programs may be compiled using the -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-short-is-8bits commandline option (see 
 \begin_inset LatexCommand \vref{lyx:--short-is-8bits}
 
 \end_inset
@@ -1404,7 +1416,25 @@ status collapsed
 
 \end_inset
 
--disable-pic-port Excludes the PIC port
+-disable-pic-port Excludes the PIC14 port
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-pic16-port Excludes the PIC16 port
 \end_layout
 
 \begin_layout List
@@ -1534,14 +1564,14 @@ status collapsed
 
 \end_inset
 
--help` and the man/info pages of `configure` for details.
+-help' and the man/info pages of `configure' for details.
 \newline
 
 \newline
 The names of the
  standard libraries STD_LIB, STD_INT_LIB, STD_LONG_LIB, STD_FP_LIB, STD_DS390_LI
 B, STD_XA51_LIB and the environment variables SDCC_DIR_NAME, SDCC_INCLUDE_NAME,
- SDCC_LIB_NAME are defined by `configure` too.
+ SDCC_LIB_NAME are defined by `configure' too.
  At the moment it's not possible to change the default settings (it was
  simply never required).
 \newline
@@ -2811,7 +2841,7 @@ model
 
 \begin_layout Standard
 \noindent
-The install paths can still be changed during `make install` with e.g.:
+The install paths can still be changed during `make install' with e.g.:
 \end_layout
 
 \begin_layout LyX-Code
@@ -4611,8 +4641,8 @@ This is not only usefull for building different binaries, e.g.
  generated files are not scattered between the source files.
  And the best thing is: if you want to change a file you can leave the original
  file untouched in the source directory.
- Simply copy it to the build directory, edit it, enter `make clean`, `rm
- Makefile.dep` and `make`.
+ Simply copy it to the build directory, edit it, enter `make clean', `rm
+ Makefile.dep' and `make'.
  
 \series bold
 make
@@ -8265,7 +8295,20 @@ status collapsed
 \labelwidthstring 00.00.0000
 
 \series bold
---stack-8-bit - switches off the 10-bit mode
+-
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-stack-8-bit - switches off the 10-bit mode
 \end_layout
 
 \end_inset
@@ -8306,7 +8349,7 @@ status collapsed
 \series bold
 -
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Standard
 
@@ -9404,7 +9447,41 @@ reentrant
  Parameters and Local Variables for more details.
  If this option is used all source files in the project should be compiled
  with this option.
- It automatically implies --int-long-reent and --float-reent.
+ It automatically implies -
+\series bold
+
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-int-long-reent and -
+\series bold
+
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-float-reent.
  
 \end_layout
 
@@ -9749,7 +9826,24 @@ status collapsed
  unsigned
 \family default
 .
- To set the signess for characters to unsigned, use the option --funsigned-char.
+ To set the signess for characters to unsigned, use the option -
+\series bold
+
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-funsigned-char.
  If this option is set and no signedness keyword (unsigned/signed) is given,
  a char will be signed.
  All other types are unaffected.
@@ -9977,8 +10071,24 @@ status collapsed
 
 
 \series default
- Don't include peep-hole comments in the generated asm files even if --fverbose-
-asm option is specified.
+ Don't include peep-hole comments in the generated asm files even if -
+\series bold
+
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-fverbose-asm option is specified.
 \end_layout
 
 \begin_layout List
@@ -10696,7 +10806,7 @@ status collapsed
 
 
 \series default
- Will create a dump of iCode's, after global subexpression elimination
+ Will create a dump of iCodes, after global subexpression elimination
 \begin_inset LatexCommand \index{Global subexpression elimination}
 
 \end_inset
@@ -10730,7 +10840,7 @@ status collapsed
 
 
 \series default
- Will create a dump of iCode's, after deadcode elimination
+ Will create a dump of iCodes, after deadcode elimination
 \begin_inset LatexCommand \index{Dead-code elimination}
 
 \end_inset
@@ -10767,7 +10877,7 @@ status collapsed
 \size large
  
 \size default
-Will create a dump of iCode's, after loop optimizations
+Will create a dump of iCodes, after loop optimizations
 \begin_inset LatexCommand \index{Loop optimization}
 
 \end_inset
@@ -10804,7 +10914,7 @@ status collapsed
 \size large
  
 \size default
-Will create a dump of iCode's, after live range analysis
+Will create a dump of iCodes, after live range analysis
 \begin_inset LatexCommand \index{Live range analysis}
 
 \end_inset
@@ -10873,7 +10983,7 @@ status collapsed
  
 \series default
 \bar default
-Will create a dump of iCode's, after register assignment
+Will create a dump of iCodes, after register assignment
 \begin_inset LatexCommand \index{Register assignment}
 
 \end_inset
@@ -10954,7 +11064,7 @@ Redirecting output on Windows Shells
 \end_layout
 
 \begin_layout Standard
-By default SDCC writes it's error messages to 
+By default SDCC writes its error messages to 
 \begin_inset Quotes sld
 \end_inset
 
@@ -15114,7 +15224,24 @@ The compiler triggers the linker to link certain initialization modules
 
  called crt<something>.
  Only the necessary ones are linked, for instance crtxstack.asm (GSINIT1,
- GSINIT5) is not linked unless the --xstack option is used.
+ GSINIT5) is not linked unless the -
+\series bold
+
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-xstack option is used.
  These modules are highly entangled by the use of special segments/areas,
  but a common layout is shown below:
 \end_layout
@@ -21368,7 +21495,7 @@ less_pedantic
 
 \end_inset
 
-- the compiler will not warn you anymore for obvious mistakes, you'r on
+- the compiler will not warn you anymore for obvious mistakes, you're on
  your own now ;-( .
  See also the command line option -
 \begin_inset ERT
@@ -22133,7 +22260,7 @@ int foo ()
 
 \begin_layout Standard
 The compiler will generate a warning message when extra space is allocated.
- It is strongly recommended that the save and restore pragma's be used when
+ It is strongly recommended that the save and restore pragmas be used when
  changing options for a function.
 \newline
 
@@ -22837,29 +22964,34 @@ The HC08 port passes the regression test suite (see section
 \end_layout
 
 \begin_layout Section
-The PIC14 port
-\end_layout
-
-\begin_layout Standard
-The PIC14 port adds support for Microchip(TM)'s 14
-\begin_inset ERT
-status open
-
-\begin_layout Standard
-
-
-\backslash
-,
-\end_layout
-
-\end_inset
-
-bit PIC
+The PIC14
 \begin_inset LatexCommand \index{PIC14}
 
 \end_inset
 
- MCUs.
+ port
+\end_layout
+
+\begin_layout Standard
+The PIC14 port adds support for Microchip
+\begin_inset LatexCommand \index{Microchip}
+
+\end_inset
+
+
+\begin_inset Formula $^{\text{TM}}$
+\end_inset
+
+ PIC
+\begin_inset LatexCommand \index{PIC14}
+
+\end_inset
+
+
+\begin_inset Formula $^{\text{TM}}$
+\end_inset
+
+ MCUs with 14 bit wide instructions.
  This port is not yet mature and still lacks many features.
  However, it can work for simple code.
 \end_layout
@@ -22972,7 +23104,7 @@ For devices that have multiple code pages it is more efficient to use the
 
 \begin_layout Enumerate
 And as for any 8 bit micro (especially for PIC14 as they have a very simple
- instruction set), use 'unsigned char' wherever possible instead of 'int'.
+ instruction set), use `unsigned char' wherever possible instead of `int'.
 \end_layout
 
 \begin_layout Subsection
@@ -23045,7 +23177,7 @@ Interrupt Code
 \end_layout
 
 \begin_layout Standard
-For the interrupt function, use the keyword '__interrupt'
+For the interrupt function, use the keyword `__interrupt'
 \begin_inset LatexCommand \index{PIC14!interrupt}
 
 \end_inset
@@ -23329,15 +23461,7 @@ device/lib
 \end_layout
 
 \begin_layout Subsubsection
-error: missing definition for symbol 
-\begin_inset Quotes sld
-\end_inset
-
-__gptrget1
-\begin_inset Quotes srd
-\end_inset
-
-
+error: missing definition for symbol ``__gptrget1''
 \end_layout
 
 \begin_layout Standard
@@ -23360,15 +23484,7 @@ libsdcc.lib
 \end_layout
 
 \begin_layout Subsubsection
-Processor mismatch in file 
-\begin_inset Quotes sld
-\end_inset
-
-XXX
-\begin_inset Quotes srd
-\end_inset
-
-.
+Processor mismatch in file ``XXX''.
 \end_layout
 
 \begin_layout Standard
@@ -23452,20 +23568,27 @@ The PIC16
 \end_layout
 
 \begin_layout Standard
-The PIC16
-\begin_inset LatexCommand \index{PIC16}
-
-\end_inset
-
- port is the portion of SDCC that is responsible to produce code for the
- Microchip
+The PIC16 port adds support for Microchip
 \begin_inset LatexCommand \index{Microchip}
 
 \end_inset
 
-(TM) microcontrollers with 16 bit core.
- Currently this family of microcontrollers contains the PIC18Fxxx and PIC18Fxxxx.
- Currently supported devices are:
+
+\begin_inset Formula $^{\text{TM}}$
+\end_inset
+
+ PIC
+\begin_inset LatexCommand \index{PIC}
+
+\end_inset
+
+
+\begin_inset Formula $^{\text{TM}}$
+\end_inset
+
+ MCUs with 16 bit wide instructions.
+ Currently this family of microcontrollers contains the PIC18Fxxx and PIC18Fxxxx
+; devices supported by the port include:
 \end_layout
 
 \begin_layout Standard
@@ -23477,11 +23600,13 @@ The PIC16
 \end_layout
 
 \begin_layout Standard
-18F: 2220, 2221, 2320, 2321, 2331, 2431, 2455, 2525, 2550, 2620
+18F: 2220, 2221, 2320, 2321, 2331, 2431, 2455, 24j10, 2525, 2550, 25j10,
+ 2620
 \end_layout
 
 \begin_layout Standard
-18F: 4220, 4221, 4320, 4321, 4331, 4431, 4455, 4520, 4525, 4550, 4620
+18F: 4220, 4221, 4320, 4321, 4331, 4431, 4455, 44j10, 4520, 4525, 4550,
+ 45j10, 4620
 \end_layout
 
 \begin_layout Standard
@@ -26093,7 +26218,7 @@ not
  Address of the specific interrupt.
  This is not a problem for the LOW priority interrupts, but it is a problem
  for the RESET and the HIGH priority interrupts because code may be written
- at the next interrupt´s vector address and cause undeterminate program
+ at the next interrupt's vector address and cause undeterminate program
  behaviour if that interrupt is raised.
 \begin_inset Foot
 status open
@@ -26111,7 +26236,7 @@ disabled
 \end_layout
 
 \begin_layout Enumerate
-when the ISR is small enough not to reach the next interrupt´s vector address.
+when the ISR is small enough not to reach the next interrupt's vector address.
 \end_layout
 
 \end_inset
@@ -26124,7 +26249,7 @@ when the ISR is small enough not to reach the next interrupt´s vector address.
 \emph on
 n
 \emph default
- is possible to be omitted.
+ may be omitted.
  This way a function is generated similar to an ISR, but it is not assigned
  to any interrupt.
 \end_layout
@@ -32248,7 +32373,24 @@ Subversion Source Code Repository
 The output of 
 \family sans
 \series bold
-sdcc --version
+sdcc -
+\family default
+
+\begin_inset ERT
+status open
+
+\begin_layout Standard
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\family sans
+-version
 \family default
 \series default
  or the filenames of the snapshot versions of SDCC include date and its

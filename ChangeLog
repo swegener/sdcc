@@ -1,3 +1,16 @@
+2007-06-01 Raphael Neider <rneider AT web.de>
+
+	* doc/sdccman.lyx: added --disable-pic16-port, fixed some `--' and
+	  quotation marks, clarified role of PIC14 vs. PIC16 ports
+	* src/pic16/devices.inc,
+	* device/include/pic16/pic18fregs.h,
+	* device/include/pic16/pic18f[24][45]j10.h,
+	* device/lib/pic16/pics.all,
+	* device/lib/pic16/libdev/pic18f[24][45]j10.c: added support for
+	  18f24j10, 18f25j10, 18f44j10, and 18f45j10
+	* device/lib/pic16/libio/{i2c,adc,usart}.ignore: do not build IO libs
+	  for new devices as they are not yet supported by gputils
+
 2007-05-31 Borut Razem <borut.razem AT siol.net>
 
 	* Small Device C Compiler 2.7.0 released

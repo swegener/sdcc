@@ -67,11 +67,17 @@
 #elif defined(pic18f2455)
 #  include <pic18f2455.h>
 
+#elif defined(pic18f24j10)
+#  include <pic18f24j10.h>
+
 #elif defined(pic18f2525)
 #  include <pic18f2620.h>   /* just a 2620 core with less flash */
 
 #elif defined(pic18f2550)
 #  include <pic18f2550.h>
+
+#elif defined(pic18f25j10)
+#  include <pic18f25j10.h>
 
 #elif defined(pic18f2620)
 #  include <pic18f2620.h>
@@ -97,6 +103,9 @@
 #elif defined(pic18f4455)
 #  include <pic18f4455.h>
 
+#elif defined(pic18f44j10)
+#  include <pic18f44j10.h>
+
 #elif defined(pic18f4520)
 #  include <pic18f4520.h>
 
@@ -105,6 +114,9 @@
 
 #elif defined(pic18f4550)
 #  include <pic18f4550.h>	/* Might use 2550.h */
+
+#elif defined(pic18f45j10)
+#  include <pic18f45j10.h>
 
 #elif defined(pic18f4620)
 #  include <pic18f4620.h>

@@ -15,7 +15,8 @@
 	  support/cpp2/opts.h, support/cpp2/output.h,
 	  support/cpp2/prefix.c, support/cpp2/sdcpp-opts.c,
 	  support/cpp2/sdcpp.dsp, support/cpp2/sdcpp.opt,
-	  support/cpp2/system.h, support/cpp2/version.c: modified
+	  support/cpp2/system.h, support/cpp2/version.c,
+	  support/cpp2/Makefile.in: modified
 	* support/cpp2/opts-common.c: added
 
 2007-06-01 Raphael Neider <rneider AT web.de>

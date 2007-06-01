@@ -332,7 +332,7 @@ xstrerror.o: $(LIBIBERTY_DIR)/xstrerror.c  $(CONFIG_H) $(LIBCPP_DEPS)
 ##########################
 # Sdcpp
 
-SDCC_OBJS = sdcpp.o sdcpp-opts.o c-ppoutput.o cppdefault.o prefix.o version.o opts.o options.o c-incpath.o
+SDCC_OBJS = sdcpp.o sdcpp-opts.o c-ppoutput.o cppdefault.o prefix.o version.o opts.o opts-common.o options.o c-incpath.o
 
 $(TARGET): $(SDCC_OBJS) $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS)
 	mkdir -p $(dir $@)
@@ -348,6 +348,8 @@ c-ppoutput.o: c-ppoutput.c $(CONFIG_H) $(SYSTEM_H)
 options.o: options.c $(CONFIG_H) $(LIBCPP_DEPS) options.h
 
 opts.o: opts.c $(CONFIG_H) $(LIBCPP_DEPS) options.h
+
+opts-common.o: opts.c $(CONFIG_H) $(LIBCPP_DEPS) options.h
 
 c-incpath.o: $(CONFIG_H) $(LIBCPP_DEPS) c-incpath.h
 

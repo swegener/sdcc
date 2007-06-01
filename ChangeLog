@@ -21,6 +21,9 @@
 	* device/lib/pic16/libdev/pic18f[24][45]j10.c: fixed svn atrributes
 	* device/lib/pic16/libdev/pic18f[24]5j10.c:
 	  search for included source file in local directory
+	* sim/ucsim/configure, sim/ucsim/configure.in:
+	  temporary solution to supress GCC 4.2.0 c++ warning:
+	  deprecated conversion from string constant to `char *'
 
 2007-06-01 Raphael Neider <rneider AT web.de>
 

@@ -222,6 +222,10 @@ imacros
 SDCPP Joined Separate
 -imacros <file>	Accept definition of macros in <file>
 
+imultilib
+C ObjC C++ ObjC++ Joined Separate
+-imultilib <dir> Set <dir> to be the multilib include subdirectory
+
 include
 SDCPP Joined Separate
 -include <file>	Include the contents of <file> before other files

@@ -241,6 +241,10 @@ SOURCE=.\options.c
 # End Source File
 # Begin Source File
 
+SOURCE=".\opts-common.c"
+# End Source File
+# Begin Source File
+
 SOURCE=.\opts.c
 # End Source File
 # Begin Source File
@@ -316,6 +320,14 @@ SOURCE=.\win32\dirent.h
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\libiberty\filenames.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\libiberty\hashtab.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\libiberty\obstack.h
 # End Source File
 # End Group
@@ -350,6 +362,10 @@ SOURCE=.\intl.h
 # Begin Source File
 
 SOURCE=.\libiberty.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\md5.h
 # End Source File
 # Begin Source File
 

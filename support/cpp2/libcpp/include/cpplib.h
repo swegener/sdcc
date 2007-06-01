@@ -51,7 +51,10 @@ struct _cpp_file;
 
    The first group, to CPP_LAST_EQ, can be immediately followed by an
    '='.  The lexer needs operators ending in '=', like ">>=", to be in
-   the same order as their counterparts without the '=', like ">>".  */
+   the same order as their counterparts without the '=', like ">>".
+
+   See the cpp_operator table optab in expr.c if you change the order or
+   add or remove anything in the first group.  */
 
 #define TTYPE_TABLE							\
   OP(EQ,		"=")						\
@@ -68,8 +71,6 @@ struct _cpp_file;
   OP(XOR,		"^")						\
   OP(RSHIFT,		">>")						\
   OP(LSHIFT,		"<<")						\
-  OP(MIN,		"<?")	/* extension */				\
-  OP(MAX,		">?")						\
 									\
   OP(COMPL,		"~")						\
   OP(AND_AND,		"&&")	/* logical */				\
@@ -97,8 +98,6 @@ struct _cpp_file;
   OP(XOR_EQ,		"^=")						\
   OP(RSHIFT_EQ,		">>=")						\
   OP(LSHIFT_EQ,		"<<=")						\
-  OP(MIN_EQ,		"<?=")	/* extension */				\
-  OP(MAX_EQ,		">?=")						\
   /* Digraphs together, beginning with CPP_FIRST_DIGRAPH.  */		\
   OP(HASH,		"#")	/* digraphs */				\
   OP(PASTE,		"##")						\
@@ -134,7 +133,8 @@ struct _cpp_file;
   TK(COMMENT,		LITERAL) /* Only if output comments.  */	\
 				 /* SPELL_LITERAL happens to DTRT.  */	\
   TK(MACRO_ARG,		NONE)	 /* Macro argument.  */			\
-  TK(PRAGMA,		NONE)	 /* Only if deferring pragmas */	\
+  TK(PRAGMA,		NONE)	 /* Only for deferred pragmas.  */	\
+  TK(PRAGMA_EOL,	NONE)	 /* End-of-line for deferred pragmas.  */ \
   TK(PADDING,		NONE)	 /* Whitespace for -E.	*/		\
 \
   /* SDCC _asm specific */						\
@@ -148,9 +148,9 @@ enum cpp_ttype
   N_TTYPES,
 
   /* Positions in the table.  */
-  CPP_LAST_EQ        = CPP_MAX,
+  CPP_LAST_EQ        = CPP_LSHIFT,
   CPP_FIRST_DIGRAPH  = CPP_HASH,
-  CPP_LAST_PUNCTUATOR= CPP_DOT_STAR,
+  CPP_LAST_PUNCTUATOR= CPP_ATSIGN,
   CPP_LAST_CPP_OP    = CPP_LESS_EQ
 };
 #undef OP
@@ -175,6 +175,8 @@ struct cpp_string GTY(())
 #define NAMED_OP	(1 << 4) /* C++ named operators.  */
 #define NO_EXPAND	(1 << 5) /* Do not macro-expand this token.  */
 #define BOL		(1 << 6) /* Token at beginning of line.  */
+#define PURE_ZERO	(1 << 7) /* Single 0 digit, used by the C++ frontend,
+				    set in c-lex.c.  */
 
 /* Specify which field, if any, of the cpp_token union is used.  */
 
@@ -183,6 +185,7 @@ enum cpp_token_fld_kind {
   CPP_TOKEN_FLD_SOURCE,
   CPP_TOKEN_FLD_STR,
   CPP_TOKEN_FLD_ARG_NO,
+  CPP_TOKEN_FLD_PRAGMA,
   CPP_TOKEN_FLD_NONE
 };
 
@@ -212,6 +215,9 @@ struct cpp_token GTY(())
 
     /* Argument no. for a CPP_MACRO_ARG.  */
     unsigned int GTY ((tag ("CPP_TOKEN_FLD_ARG_NO"))) arg_no;
+
+    /* Caller-supplied identifier for a CPP_PRAGMA.  */
+    unsigned int GTY ((tag ("CPP_TOKEN_FLD_PRAGMA"))) pragma;
   } GTY ((desc ("cpp_token_val_index (&%1)"))) val;
 };
 
@@ -452,10 +458,6 @@ struct cpp_options
   /* Nonzero means __STDC__ should have the value 0 in system headers.  */
   unsigned char stdc_0_in_system_headers;
 
-  /* True means return pragmas as tokens rather than processing
-     them directly. */
-  bool defer_pragmas;
-
   /* True means error callback should be used for diagnostics.  */
   bool client_diagnostic;
 };
@@ -572,7 +574,8 @@ enum builtin_type
   BT_INCLUDE_LEVEL,		/* `__INCLUDE_LEVEL__' */
   BT_TIME,			/* `__TIME__' */
   BT_STDC,			/* `__STDC__' */
-  BT_PRAGMA			/* `_Pragma' operator */
+  BT_PRAGMA,			/* `_Pragma' operator */
+  BT_TIMESTAMP			/* `__TIMESTAMP__' */
 };
 
 #define CPP_HASHNODE(HNODE)	((cpp_hashnode *) (HNODE))
@@ -691,7 +694,8 @@ extern unsigned char *cpp_spell_token (cpp_reader *, const cpp_token *,
 				       unsigned char *, bool);
 extern void cpp_register_pragma (cpp_reader *, const char *, const char *,
 				 void (*) (cpp_reader *), bool);
-extern void cpp_handle_deferred_pragma (cpp_reader *, const cpp_string *);
+extern void cpp_register_deferred_pragma (cpp_reader *, const char *,
+					  const char *, unsigned, bool, bool);
 extern int cpp_avoid_paste (cpp_reader *, const cpp_token *,
 			    const cpp_token *);
 extern const cpp_token *cpp_get_token (cpp_reader *);
@@ -763,6 +767,7 @@ struct cpp_num
 
 #define CPP_N_UNSIGNED	0x1000	/* Properties.  */
 #define CPP_N_IMAGINARY	0x2000
+#define CPP_N_DFLOAT	0x4000
 
 /* Classify a CPP_NUMBER token.  The return value is a combination of
    the flags from the above sets.  */

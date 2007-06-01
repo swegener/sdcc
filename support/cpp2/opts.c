@@ -1,5 +1,6 @@
 /* Command line option handling.
-   Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007
+   Free Software Foundation, Inc.
    Contributed by Neil Booth.
 
 This file is part of GCC.
@@ -16,8 +17,8 @@ for more details.
 
 You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.  */
+Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.  */
 
 #include "config.h"
 #include "system.h"
@@ -44,7 +45,6 @@ static const char undocumented_msg[] = N_("This switch lacks documentation");
 const char **in_fnames;
 unsigned num_in_fnames;
 
-static size_t find_opt (const char *, int);
 static int common_handle_option (size_t scode, const char *arg, int value);
 static unsigned int handle_option (const char **argv, unsigned int lang_mask);
 static char *write_langs (unsigned int lang_mask);
@@ -53,92 +53,8 @@ static void complain_wrong_lang (const char *, const struct cl_option *,
 static void handle_options (unsigned int, const char **, unsigned int);
 static void wrap_help (const char *help, const char *item, unsigned int);
 static void print_help (void);
-static void print_filtered_help (unsigned int flag);
+static void print_filtered_help (unsigned int);
 static unsigned int print_switch (const char *text, unsigned int indent);
-
-/* Perform a binary search to find which option the command-line INPUT
-   matches.  Returns its index in the option array, and N_OPTS
-   (cl_options_count) on failure.
-
-   This routine is quite subtle.  A normal binary search is not good
-   enough because some options can be suffixed with an argument, and
-   multiple sub-matches can occur, e.g. input of "-pedantic" matching
-   the initial substring of "-pedantic-errors".
-
-   A more complicated example is -gstabs.  It should match "-g" with
-   an argument of "stabs".  Suppose, however, that the number and list
-   of switches are such that the binary search tests "-gen-decls"
-   before having tested "-g".  This doesn't match, and as "-gen-decls"
-   is less than "-gstabs", it will become the lower bound of the
-   binary search range, and "-g" will never be seen.  To resolve this
-   issue, opts.sh makes "-gen-decls" point, via the back_chain member,
-   to "-g" so that failed searches that end between "-gen-decls" and
-   the lexicographically subsequent switch know to go back and see if
-   "-g" causes a match (which it does in this example).
-
-   This search is done in such a way that the longest match for the
-   front end in question wins.  If there is no match for the current
-   front end, the longest match for a different front end is returned
-   (or N_OPTS if none) and the caller emits an error message.  */
-static size_t
-find_opt (const char *input, int lang_mask)
-{
-  size_t mn, mx, md, opt_len;
-  size_t match_wrong_lang;
-  int comp;
-
-  mn = 0;
-  mx = cl_options_count;
-
-  /* Find mn such this lexicographical inequality holds:
-     cl_options[mn] <= input < cl_options[mn + 1].  */
-  while (mx - mn > 1)
-    {
-      md = (mn + mx) / 2;
-      opt_len = cl_options[md].opt_len;
-      comp = strncmp (input, cl_options[md].opt_text + 1, opt_len);
-
-      if (comp < 0)
-	mx = md;
-      else
-	mn = md;
-    }
-
-  /* This is the switch that is the best match but for a different
-     front end, or cl_options_count if there is no match at all.  */
-  match_wrong_lang = cl_options_count;
-
-  /* Backtrace the chain of possible matches, returning the longest
-     one, if any, that fits best.  With current GCC switches, this
-     loop executes at most twice.  */
-  do
-    {
-      const struct cl_option *opt = &cl_options[mn];
-
-      /* Is the input either an exact match or a prefix that takes a
-	 joined argument?  */
-      if (!strncmp (input, opt->opt_text + 1, opt->opt_len)
-	  && (input[opt->opt_len] == '\0' || (opt->flags & CL_JOINED)))
-	{
-	  /* If language is OK, return it.  */
-	  if (opt->flags & lang_mask)
-
-
-	  /* If we haven't remembered a prior match, remember this
-	     one.  Any prior match is necessarily better.  */
-	  if (match_wrong_lang == cl_options_count)
-	    match_wrong_lang = mn;
-	}
-
-      /* Try the next possibility.  This is cl_options_count if there
-	 are no more.  */
-      mn = opt->back_chain;
-    }
-  while (mn != cl_options_count);
-
-  /* Return the best wrong match, or cl_options_count if none.  */
-  return match_wrong_lang;
-}
 
 /* If ARG is a non-negative integer made up solely of digits, return its
    value, otherwise return -1.  */
@@ -168,7 +84,7 @@ write_langs (unsigned int mask)
     if (mask & (1U << n))
       len += strlen (lang_name) + 1;
 
-  result = xmalloc (len);
+  result = XNEWVEC (char, len);
   len = 0;
   for (n = 0; (lang_name = lang_names[n]) != 0; n++)
     if (mask & (1U << n))
@@ -224,7 +140,7 @@ handle_option (const char **argv, unsigned int lang_mask)
       /* Drop the "no-" from negative switches.  */
       size_t len = strlen (opt) - 3;
 
-      dup = xmalloc (len + 1);
+      dup = XNEWVEC (char, len + 1);
       dup[0] = '-';
       dup[1] = opt[1];
       memcpy (dup + 2, opt + 5, len - 2 + 1);
@@ -338,7 +254,7 @@ handle_option (const char **argv, unsigned int lang_mask)
       }
 
   if (option->flags & lang_mask)
-    if ((*lang_hooks.handle_option) (opt_index, arg, value) == 0)
+    if (lang_hooks.handle_option (opt_index, arg, value) == 0)
       result = 0;
 
   if (result && (option->flags & CL_COMMON))
@@ -356,7 +272,7 @@ handle_option (const char **argv, unsigned int lang_mask)
 }
 
 /* Handle FILENAME from the command line.  */
-void
+static void
 add_input_filename (const char *filename)
 {
   num_in_fnames++;

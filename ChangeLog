@@ -1,3 +1,23 @@
+2007-06-01 Borut Razem <borut.razem AT siol.net>
+
+	* SDCPP synchronized with GCC CPP release version 4.2.0,
+	  currently the latest release:
+	* support/cpp2/c-incpath.c, support/cpp2/c-incpath.h,
+	  support/cpp2/c-ppoutput.c, support/cpp2/cppdefault.c,
+	  support/cpp2/cppdefault.h, support/cpp2/except.h,
+	  support/cpp2/libcpp/directives.c, support/cpp2/libcpp/expr.c,
+	  support/cpp2/libcpp/files.c, support/cpp2/libcpp/include/cpplib.h,
+	  support/cpp2/libcpp/init.c, support/cpp2/libcpp/internal.h,
+	  support/cpp2/libcpp/lex.c, support/cpp2/libcpp/macro.c,
+	  support/cpp2/libcpp/mkdeps.c, support/cpp2/libiberty/getpwd.c,
+	  support/cpp2/libiberty/hashtab.c, support/cpp2/optc-gen.awk,
+	  support/cpp2/opth-gen.awk, support/cpp2/opts.c,
+	  support/cpp2/opts.h, support/cpp2/output.h,
+	  support/cpp2/prefix.c, support/cpp2/sdcpp-opts.c,
+	  support/cpp2/sdcpp.dsp, support/cpp2/sdcpp.opt,
+	  support/cpp2/system.h, support/cpp2/version.c: modified
+	* support/cpp2/opts-common.c: added
+
 2007-06-01 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic/libdev/pic12f683.c,

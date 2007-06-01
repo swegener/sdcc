@@ -61,6 +61,9 @@ static const char *deps_file;
 /* The prefix given by -iprefix, if any.  */
 static const char *iprefix;
 
+/* The multilib directory given by -imultilib, if any.  */
+static const char *imultilib;
+
 /* The system root, if any.  Overridden by -isysroot.  */
 static const char *sysroot = TARGET_SYSTEM_ROOT;
 
@@ -416,6 +419,10 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       iprefix = arg;
       break;
 
+    case OPT_imultilib:
+      imultilib = arg;
+      break;
+
     case OPT_iquote:
       add_path (xstrdup (arg), QUOTE, 0, true);
       break;
@@ -544,7 +551,7 @@ sdcpp_common_post_options (const char **pfilename)
 
   sanitize_cpp_opts ();
 
-  register_include_chains (parse_in, sysroot, iprefix,
+  register_include_chains (parse_in, sysroot, iprefix, imultilib,
 			   std_inc, 0, verbose);
 
   /* Open the output now.  We must do so even if flag_no_output is

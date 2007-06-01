@@ -42,8 +42,6 @@ struct macro_arg
 
 static int enter_macro_context (cpp_reader *, cpp_hashnode *);
 static int builtin_macro (cpp_reader *, cpp_hashnode *);
-static void push_token_context (cpp_reader *, cpp_hashnode *,
-				const cpp_token *, unsigned int);
 static void push_ptoken_context (cpp_reader *, cpp_hashnode *, _cpp_buff *,
 				 const cpp_token **, unsigned int);
 static _cpp_buff *collect_args (cpp_reader *, const cpp_hashnode *);
@@ -125,6 +123,44 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node)
 		 NODE_NAME (node));
       break;
 
+    case BT_TIMESTAMP:
+      {
+	cpp_buffer *pbuffer = cpp_get_buffer (pfile);
+	if (pbuffer->timestamp == NULL)
+	  {
+	    /* Initialize timestamp value of the assotiated file. */
+            struct _cpp_file *file = cpp_get_file (pbuffer);
+	    if (file)
+	      {
+    		/* Generate __TIMESTAMP__ string, that represents 
+		   the date and time of the last modification 
+		   of the current source file. The string constant 
+		   looks like "Sun Sep 16 01:03:52 1973".  */
+		struct tm *tb = NULL;
+		struct stat *st = _cpp_get_file_stat (file);
+		if (st)
+		  tb = localtime (&st->st_mtime);
+		if (tb)
+		  {
+		    char *str = asctime (tb);
+		    size_t len = strlen (str);
+		    unsigned char *buf = _cpp_unaligned_alloc (pfile, len + 2);
+		    buf[0] = '"';
+		    strcpy ((char *) buf + 1, str);
+		    buf[len] = '"';
+		    pbuffer->timestamp = buf;
+		  }
+		else
+		  {
+		    cpp_errno (pfile, CPP_DL_WARNING,
+			"could not determine file timestamp");
+		    pbuffer->timestamp = U"\"??? ??? ?? ??:??:?? ????\"";
+		  }
+	      }
+	  }
+	result = pbuffer->timestamp;
+      }
+      break;
     case BT_FILE:
     case BT_BASE_FILE:
       {
@@ -257,13 +293,6 @@ builtin_macro (cpp_reader *pfile, cpp_hashnode *node)
 	return 0;
 
       _cpp_do__Pragma (pfile);
-      if (pfile->directive_result.type == CPP_PRAGMA)
-	{
-	  cpp_token *tok = _cpp_temp_token (pfile);
-	  *tok = pfile->directive_result;
-	  push_token_context (pfile, NULL, tok, 1);
-	}
-
       return 1;
     }
 
@@ -278,7 +307,7 @@ builtin_macro (cpp_reader *pfile, cpp_hashnode *node)
 
   /* Set pfile->cur_token as required by _cpp_lex_direct.  */
   pfile->cur_token = _cpp_temp_token (pfile);
-  push_token_context (pfile, NULL, _cpp_lex_direct (pfile), 1);
+  _cpp_push_token_context (pfile, NULL, _cpp_lex_direct (pfile), 1);
   if (pfile->buffer->cur != pfile->buffer->rlimit)
     cpp_error (pfile, CPP_DL_ICE, "invalid built-in macro \"%s\"",
 	       NODE_NAME (node));
@@ -401,15 +430,14 @@ stringify_arg (cpp_reader *pfile, macro_arg *arg)
 static bool
 paste_tokens (cpp_reader *pfile, const cpp_token **plhs, const cpp_token *rhs)
 {
-  unsigned char *buf, *end;
+  unsigned char *buf, *end, *lhsend;
   const cpp_token *lhs;
   unsigned int len;
-  bool valid;
 
   lhs = *plhs;
   len = cpp_token_len (lhs) + cpp_token_len (rhs) + 1;
   buf = (unsigned char *) alloca (len);
-  end = cpp_spell_token (pfile, lhs, buf, false);
+  end = lhsend = cpp_spell_token (pfile, lhs, buf, false);
 
   /* Avoid comment headers, since they are still processed in stage 3.
      It is simpler to insert a space here, rather than modifying the
@@ -426,10 +454,22 @@ paste_tokens (cpp_reader *pfile, const cpp_token **plhs, const cpp_token *rhs)
   /* Set pfile->cur_token as required by _cpp_lex_direct.  */
   pfile->cur_token = _cpp_temp_token (pfile);
   *plhs = _cpp_lex_direct (pfile);
-  valid = pfile->buffer->cur == pfile->buffer->rlimit;
-  _cpp_pop_buffer (pfile);
+  if (pfile->buffer->cur != pfile->buffer->rlimit)
+    {
+      _cpp_pop_buffer (pfile);
+      _cpp_backup_tokens (pfile, 1);
+      *lhsend = '\0';
 
-  return valid;
+      /* Mandatory error for all apart from assembler.  */
+      if (CPP_OPTION (pfile, lang) != CLK_ASM)
+	cpp_error (pfile, CPP_DL_ERROR,
+	 "pasting \"%s\" and \"%s\" does not give a valid preprocessing token",
+		   buf, cpp_token_as_text (pfile, rhs));
+      return false;
+    }
+
+  _cpp_pop_buffer (pfile);
+  return true;
 }
 
 /* Handles an arbitrarily long sequence of ## operators, with initial
@@ -461,22 +501,12 @@ paste_all_tokens (cpp_reader *pfile, const cpp_token *lhs)
 	abort ();
 
       if (!paste_tokens (pfile, &lhs, rhs))
-	{
-	  _cpp_backup_tokens (pfile, 1);
-
-	  /* Mandatory error for all apart from assembler.  */
-	  if (CPP_OPTION (pfile, lang) != CLK_ASM)
-	    cpp_error (pfile, CPP_DL_ERROR,
-	 "pasting \"%s\" and \"%s\" does not give a valid preprocessing token",
-		       cpp_token_as_text (pfile, lhs),
-		       cpp_token_as_text (pfile, rhs));
-	  break;
-	}
+	break;
     }
   while (rhs->flags & PASTE_LEFT);
 
   /* Put the resulting token in its own context.  */
-  push_token_context (pfile, NULL, lhs, 1);
+  _cpp_push_token_context (pfile, NULL, lhs, 1);
 }
 
 /* Returns TRUE if the number of arguments ARGC supplied in an
@@ -690,7 +720,7 @@ funlike_invocation_p (cpp_reader *pfile, cpp_hashnode *node)
 	 too difficult.  We re-insert it in its own context.  */
       _cpp_backup_tokens (pfile, 1);
       if (padding)
-	push_token_context (pfile, NULL, padding, 1);
+	_cpp_push_token_context (pfile, NULL, padding, 1);
     }
 
   return NULL;
@@ -746,7 +776,7 @@ enter_macro_context (cpp_reader *pfile, cpp_hashnode *node)
       macro->used = 1;
 
       if (macro->paramc == 0)
-	push_token_context (pfile, node, macro->exp.tokens, macro->count);
+	_cpp_push_token_context (pfile, node, macro->exp.tokens, macro->count);
 
       return 1;
     }
@@ -939,8 +969,8 @@ push_ptoken_context (cpp_reader *pfile, cpp_hashnode *macro, _cpp_buff *buff,
 }
 
 /* Push a list of tokens.  */
-static void
-push_token_context (cpp_reader *pfile, cpp_hashnode *macro,
+void
+_cpp_push_token_context (cpp_reader *pfile, cpp_hashnode *macro,
 		    const cpp_token *first, unsigned int count)
 {
   cpp_context *context = next_context (pfile);
@@ -1151,7 +1181,7 @@ cpp_scan_nooutput (cpp_reader *pfile)
   pfile->state.prevent_expansion--;
 }
 
-/* Step back one (or more) tokens.  Can only step mack more than 1 if
+/* Step back one (or more) tokens.  Can only step back more than 1 if
    they are from the lexer, and not from macro expansion.  */
 void
 _cpp_backup_tokens (cpp_reader *pfile, unsigned int count)

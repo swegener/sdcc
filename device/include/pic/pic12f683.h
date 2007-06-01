@@ -95,6 +95,7 @@
 //       Revision History
 //
 //==========================================================================
+//1.01   01/05/07 GPIO Bits
 //1.00   12/09/03 Original
 
 //==========================================================================
@@ -432,6 +433,44 @@ extern volatile __EECON1_bits_t __at(EECON1_ADDR) EECON1_bits;
 #define WR                   EECON1_bits.WR
 #define WREN                 EECON1_bits.WREN
 #define WRERR                EECON1_bits.WRERR
+
+// ----- GPIO bits --------------------
+typedef union {
+  struct {
+    unsigned char GP0:1;
+    unsigned char GP1:1;
+    unsigned char GP2:1;
+    unsigned char GP3:1;
+    unsigned char GP4:1;
+    unsigned char GP5:1;
+    unsigned char :1;
+    unsigned char :1;
+  };
+  struct {
+    unsigned char GPIO0:1;
+    unsigned char GPIO1:1;
+    unsigned char GPIO2:1;
+    unsigned char GPIO3:1;
+    unsigned char GPIO4:1;
+    unsigned char GPIO5:1;
+    unsigned char :1;
+    unsigned char :1;
+  };
+} __GPIO_bits_t;
+extern volatile __GPIO_bits_t __at(GPIO_ADDR) GPIO_bits;
+
+#define GP0                  GPIO_bits.GP0
+#define GPIO0                GPIO_bits.GPIO0
+#define GP1                  GPIO_bits.GP1
+#define GPIO1                GPIO_bits.GPIO1
+#define GP2                  GPIO_bits.GP2
+#define GPIO2                GPIO_bits.GPIO2
+#define GP3                  GPIO_bits.GP3
+#define GPIO3                GPIO_bits.GPIO3
+#define GP4                  GPIO_bits.GP4
+#define GPIO4                GPIO_bits.GPIO4
+#define GP5                  GPIO_bits.GP5
+#define GPIO5                GPIO_bits.GPIO5
 
 // ----- INTCON bits --------------------
 typedef union {

@@ -56,6 +56,7 @@ volatile __CCP1CON_bits_t __at(CCP1CON_ADDR) CCP1CON_bits;
 volatile __CMCON0_bits_t __at(CMCON0_ADDR) CMCON0_bits;
 volatile __CMCON1_bits_t __at(CMCON1_ADDR) CMCON1_bits;
 volatile __EECON1_bits_t __at(EECON1_ADDR) EECON1_bits;
+volatile __GPIO_bits_t __at(GPIO_ADDR) GPIO_bits;
 volatile __INTCON_bits_t __at(INTCON_ADDR) INTCON_bits;
 volatile __IOC_bits_t __at(IOC_ADDR) IOC_bits;
 volatile __IOCA_bits_t __at(IOCA_ADDR) IOCA_bits;

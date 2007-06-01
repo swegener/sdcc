@@ -1,5 +1,10 @@
 2007-06-01 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic/libdev/pic12f683.c,
+	* device/include/pic/pic12f683.h: added GPIO bits
+
+2007-06-01 Raphael Neider <rneider AT web.de>
+
 	* doc/sdccman.lyx: added --disable-pic16-port, fixed some `--' and
 	  quotation marks, clarified role of PIC14 vs. PIC16 ports
 	* src/pic16/devices.inc,

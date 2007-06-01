@@ -18,6 +18,9 @@
 	  support/cpp2/system.h, support/cpp2/version.c,
 	  support/cpp2/Makefile.in: modified
 	* support/cpp2/opts-common.c: added
+	* device/lib/pic16/libdev/pic18f[24][45]j10.c: fixed svn atrributes
+	* device/lib/pic16/libdev/pic18f[24]5j10.c:
+	  search for included source file in local directory
 
 2007-06-01 Raphael Neider <rneider AT web.de>
 

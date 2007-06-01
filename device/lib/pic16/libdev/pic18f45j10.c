@@ -8,5 +8,4 @@
  * (c) 2007 by Raphael Neider <rneider AT web.de>
  */
 
-#include <pic18f44j10.c>
-
+#include "pic18f44j10.c"

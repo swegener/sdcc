@@ -2280,6 +2280,7 @@ resultTypePropagate (ast *tree, RESULT_TYPE resultType)
     {
       case AND_OP:
       case OR_OP:
+      case '!':
         return resultType;
       case '=':
       case '?':
@@ -4153,7 +4154,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       if (IS_LITERAL(RTYPE(tree))  &&
           floatFromVal (valFromType (RETYPE (tree))) == 0 &&
           tree->opval.op == EQ_OP &&
-          resultType == RESULT_TYPE_IFX)
+          (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BIT))
         {
           tree->opval.op = '!';
           tree->right = NULL;
@@ -4208,7 +4209,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      TTYPE (tree) = TETYPE (tree) = newBoolLink ();
+      TTYPE (tree) = TETYPE (tree) = (resultType == RESULT_TYPE_BIT) ? newBoolLink() :newCharLink();
 
       /* condition transformations */
       {
@@ -5757,8 +5758,8 @@ optimizeCompare (ast * root)
             root->right->opval.val : NULL);
 
   /* if left is a BITVAR in BITSPACE */
-  /* and right is a LITERAL then opt- */
-  /* imize else do nothing       */
+  /* and right is a LITERAL then     */
+  /* optimize else do nothing        */
   if (vleft && vright &&
       IS_BITVAR (vleft->etype) &&
       IN_BITSPACE (SPEC_OCLS (vleft->etype)) &&

@@ -2114,10 +2114,10 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
 
       /* Don't move an assignment out of a critical block */
       if (dic->op == CRITICAL)
-	{
-	  dic = NULL;
-	  break;
-	}
+        {
+          dic = NULL;
+          break;
+        }
 
       if (SKIP_IC2 (dic))
         continue;
@@ -2442,8 +2442,6 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
   return 0;
 }
 
-#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
-
 
 /*-----------------------------------------------------------------*/
 /* packRegsForOneuse : - will reduce some registers for single Use */
@@ -2521,25 +2519,25 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
     }
   else
     {
-  /* otherwise check that the definition does
-     not contain any symbols in far space */
-  if (isOperandInFarSpace (IC_LEFT (dic)) ||
-      isOperandInFarSpace (IC_RIGHT (dic)) ||
-      IS_OP_RUONLY (IC_LEFT (ic)) ||
-      IS_OP_RUONLY (IC_RIGHT (ic)))
-    {
-      return NULL;
-    }
+      /* otherwise check that the definition does
+         not contain any symbols in far space */
+      if (isOperandInFarSpace (IC_LEFT (dic)) ||
+          isOperandInFarSpace (IC_RIGHT (dic)) ||
+          IS_OP_RUONLY (IC_LEFT (ic)) ||
+          IS_OP_RUONLY (IC_RIGHT (ic)))
+        {
+          return NULL;
+        }
 
-  /* if pointer set then make sure the pointer
-     is one byte */
-  if (POINTER_SET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
-    return NULL;
+      /* if pointer set then make sure the pointer
+         is one byte */
+      if (POINTER_SET (dic) &&
+          !IS_DATA_PTR (aggrToPtr (operandType (IC_RESULT (dic)), FALSE)))
+        return NULL;
 
-  if (POINTER_GET (dic) &&
-      !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
-    return NULL;
+      if (POINTER_GET (dic) &&
+          !IS_DATA_PTR (aggrToPtr (operandType (IC_LEFT (dic)), FALSE)))
+        return NULL;
     }
 
   /* Make sure no overlapping liverange is already assigned to DPTR */
@@ -2770,7 +2768,7 @@ packRegsForAccUse (iCode * ic)
       getSize (aggrToPtr (operandType (IC_RESULT (uic)), FALSE)) > 1)
     return;
 
-  /* if the usage is not is an assignment
+  /* if the usage is not an assignment
      or an arithmetic / bitwise / shift operation then not */
   if (uic->op != '=' &&
       !IS_ARITHMETIC_OP (uic) &&
@@ -3050,8 +3048,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
       if (POINTER_SET (ic))
         OP_SYMBOL (IC_RESULT (ic))->uptr = 1;
 
-      if (POINTER_GET (ic) &&
-          IS_SYMOP(IC_LEFT (ic)))
+      if (POINTER_GET (ic) && IS_SYMOP(IC_LEFT (ic)))
         OP_SYMBOL (IC_LEFT (ic))->uptr = 1;
 
       if (!SKIP_IC2 (ic))
@@ -3259,7 +3256,7 @@ mcs51_assignRegisters (ebbIndex * ebbi)
     }
   else
     {
-  mcs51_nRegs = 8;
+      mcs51_nRegs = 8;
     }
   _G.allBitregs = findAllBitregs ();
 

@@ -1,3 +1,19 @@
+2007-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (outBitC, genRet): used IS_OP_RUONLY,
+	  (genNot, genXor): used toCarry, also fixes a bug for c = bit ^ val
+	* src/mcs51/ralloc.c: removed IS_OP_RUONLY + some cosmetic changes
+	* src/SDCCast.c (resultTypePropagate): propagate for '!',
+	  (decorateType): also optimize comparisons with RESULT_TYPE_BIT,
+	  bugfix: only use newBoolLink for bit result type
+	* src/SDCCicode.c (geniCodeLogic): added param tree,
+	  bugfix: use newBoolLink if tree is bit type, bug appears when ruonly,
+	  (geniCodeLogicAndOr): use IS_BIT,
+	  (geniCodeJumpTable, geniCodeSwitch): added NULL param to geniCodeLogic,
+	  (ast2iCode): added tree param to geniCodeLogic for comparisons
+	* src/SDCCsymt.h: added IS_OP_RUONLY and IS_OP_ACCUSE
+	* support/regression/tests/bug1723128.c: added test NotZero
+
 2007-06-01 Borut Razem <borut.razem AT siol.net>
 
 	* SDCPP synchronized with GCC CPP release version 4.2.0,
@@ -98,7 +114,7 @@
 	* src/regression/Makefile,
 	* src/regression/pcodeopt.c: regression test for the above fix
 
-2007-05-08 Maarten Brock <sourceforge.brock AT dse.nl>
+2007-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCpeeph.c (labelIsUncondJump): ignore identical labels for
 	  jumps to self, fixed bug 1717281

@@ -2038,7 +2038,7 @@ geniCodeCast (sym_link * type, operand * op, bool implicit)
 
   /* This seems very dangerous to me, since there are several */
   /* optimizations (for example, gcse) that don't notice the  */
-  /* cast hidden in this assignement and may simplify an      */
+  /* cast hidden in this assignment and may simplify an       */
   /* iCode to use the original (uncasted) operand.            */
   /* Unfortunately, other things break when this cast is      */
   /* made explicit. Need to fix this someday.                 */
@@ -2733,7 +2733,7 @@ geniCodePreDec (operand * op, bool lvalue)
 
 
 /*-----------------------------------------------------------------*/
-/* geniCodeBitwise - gen int code for bitWise  operators           */
+/* geniCodeBitwise - gen int code for bitWise operators            */
 /*-----------------------------------------------------------------*/
 operand *
 geniCodeBitwise (operand * left, operand * right,
@@ -2947,10 +2947,10 @@ geniCodeRightShift (operand * left, operand * right)
 /* geniCodeLogic- logic code                                       */
 /*-----------------------------------------------------------------*/
 static operand *
-geniCodeLogic (operand * left, operand * right, int op)
+geniCodeLogic (operand * left, operand * right, int op, ast *tree)
 {
   iCode *ic;
-  sym_link *ctype;
+  sym_link *ctype, *ttype;
   sym_link *rtype = operandType (right);
   sym_link *ltype = operandType (left);
 
@@ -3017,7 +3017,9 @@ geniCodeLogic (operand * left, operand * right, int op)
   ctype = usualBinaryConversions (&left, &right, RESULT_TYPE_BIT, 0);
 
   ic = newiCode (op, left, right);
-  IC_RESULT (ic) = newiTempOperand (newCharLink (), 1);
+  /* store 0 or 1 in result */
+  ttype = (tree && IS_BIT (tree->ftype)) ? newBoolLink() : newCharLink();
+  IC_RESULT (ic) = newiTempOperand (ttype, 1);
 
   /* if comparing float
      and not a '==' || '!=' || '&&' || '||' (these
@@ -3088,7 +3090,7 @@ geniCodeLogicAndOr (ast *tree, int lvl)
   ADDTOCHAIN (ic);
 
   /* store 0 or 1 in result */
-  type = (SPEC_NOUN(tree->ftype) == V_BIT) ? newBoolLink() : newCharLink();
+  type = (IS_BIT (tree->ftype)) ? newBoolLink() : newCharLink();
   result = newiTempOperand (type, 1);
 
   geniCodeLabel (falseLabel);
@@ -3761,13 +3763,13 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
          the condition is unsigned & minimum value is zero */
       if (!(min == 0 && IS_UNSIGNED (cetype)))
         {
-          boundary = geniCodeLogic (cond, operandFromLit (min), '<');
+          boundary = geniCodeLogic (cond, operandFromLit (min), '<', NULL);
           ic = newiCodeCondition (boundary, falseLabel, NULL);
           ADDTOCHAIN (ic);
         }
 
       /* now for upper bounds */
-      boundary = geniCodeLogic (cond, operandFromLit (max), '>');
+      boundary = geniCodeLogic (cond, operandFromLit (max), '>', NULL);
       ic = newiCodeCondition (boundary, falseLabel, NULL);
       ADDTOCHAIN (ic);
     }
@@ -3848,7 +3850,7 @@ geniCodeSwitch (ast * tree,int lvl)
 
       operand *compare = geniCodeLogic (cond,
                                         operandFromValue (caseVals),
-                                        EQ_OP);
+                                        EQ_OP, NULL);
 
       SNPRINTF (buffer, sizeof(buffer), "_case_%d_%d",
                tree->values.switchVals.swNum,
@@ -4293,7 +4295,7 @@ ast2iCode (ast * tree,int lvl)
         leftOp  = geniCodeRValue (left , FALSE);
         rightOp = geniCodeRValue (right, FALSE);
 
-        return geniCodeLogic (leftOp, rightOp, tree->opval.op);
+        return geniCodeLogic (leftOp, rightOp, tree->opval.op, tree);
       }
     case '?':
       return geniCodeConditional (tree,lvl);

@@ -156,7 +156,7 @@ typedef struct specifier
     unsigned b_signed:1;                /* just for sanity checks only*/
     unsigned b_static:1;                /* 1=static keyword found     */
     unsigned b_extern:1;                /* 1=extern found             */
-    unsigned b_inline:1;		/* inline function requested  */
+    unsigned b_inline:1;                /* inline function requested  */
     unsigned b_absadr:1;                /* absolute address specfied  */
     unsigned b_volatile:1;              /* is marked as volatile      */
     unsigned b_const:1;                 /* is a constant              */
@@ -329,7 +329,7 @@ typedef struct symbol
     struct iCode *fuse;                 /* furthest use */
     struct iCode *rematiCode;           /* rematerialise with which instruction */
     struct operand *reqv;               /* register equivalent of a local variable */
-    struct symbol *prereqv;             /* symbol before register equiv. substituion */
+    struct symbol *prereqv;             /* symbol before register equiv. substitution */
     struct symbol *psbase;              /* if pseudo symbol, the symbol it is based on */
     union
       {
@@ -367,6 +367,9 @@ extern sym_link *validateLink(sym_link  *l,
                                const char       *file,
                                unsigned         line);
 /* Easy Access Macros */
+#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
+#define IS_OP_ACCUSE(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->accuse)
+
 #define DCL_TYPE(l)  validateLink(l, "DCL_TYPE", #l, DECLARATOR, __FILE__, __LINE__)->select.d.dcl_type
 #define DCL_ELEM(l)  validateLink(l, "DCL_ELEM", #l, DECLARATOR, __FILE__, __LINE__)->select.d.num_elem
 #define DCL_PTR_CONST(l) validateLink(l, "DCL_PTR_CONST", #l, DECLARATOR, __FILE__, __LINE__)->select.d.ptr_const

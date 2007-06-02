@@ -66,8 +66,6 @@ static char *accUse[] =
 
 static unsigned short rbank = -1;
 
-#define IS_OP_RUONLY(x) (x && IS_SYMOP(x) && OP_SYMBOL(x)->ruonly)
-
 #define REG_WITH_INDEX   mcs51_regWithIdx
 
 #define AOP(op) op->aop
@@ -1854,7 +1852,7 @@ outBitC (operand * result)
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      if (!OP_SYMBOL (result)->ruonly)
+      if (!IS_OP_RUONLY (result))
         aopPut (result, "c", 0);
     }
   else
@@ -2008,7 +2006,7 @@ genNot (iCode * ic)
         }
       else
         {
-          emitcode ("mov", "c,%s", IC_LEFT (ic)->aop->aopu.aop_dir);
+          toCarry (IC_LEFT (ic));
           emitcode ("cpl", "c");
           outBitC (IC_RESULT (ic));
         }
@@ -4055,7 +4053,7 @@ genRet (iCode * ic)
 
   if (IS_BIT(_G.currentFunc->etype))
     {
-      if (!(IS_SYMOP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->ruonly))
+      if (!IS_OP_RUONLY (IC_LEFT (ic)))
         toCarry (IC_LEFT (ic));
     }
   else
@@ -7454,21 +7452,8 @@ genXor (iCode * ic, iCode * ifx)
             }
           else
             {
-              int sizer = AOP_SIZE (right);
               // c = bit ^ val
-              // if val>>1 != 0, result = 1
-              emitcode ("setb", "c");
-              while (sizer)
-                {
-                  MOVA (aopGet (right, sizer - 1, FALSE, FALSE));
-                  if (sizer == 1)
-                    // test the msb of the lsb
-                    emitcode ("anl", "a,#0xfe");
-                  emitcode ("jnz", "%05d$", tlbl->key + 100);
-                  sizer--;
-                }
-              // val = (0,1)
-              emitcode ("rrc", "a");
+              toCarry (right);
             }
           emitcode ("jnb", "%s,%05d$", AOP (left)->aopu.aop_dir, (tlbl->key + 100));
           emitcode ("cpl", "c");

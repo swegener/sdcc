@@ -34,7 +34,7 @@ clean:
 	$(RM) *.hex
 	$(RM) *.map
 
-include makefile.dep
+-include makefile.dep
 
 dep: makefile.dep
 

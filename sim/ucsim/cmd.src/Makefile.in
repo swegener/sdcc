@@ -96,7 +96,7 @@ dep: Makefile.dep
 Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
 	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(addprefix $(srcdir)/, $(OBJECTS:.o=.cc)) >Makefile.dep
 
-include Makefile.dep
+-include Makefile.dep
 include $(srcdir)/clean.mk
 
 cmdpars.cc: cmdpars.y

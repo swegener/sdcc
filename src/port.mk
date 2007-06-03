@@ -43,7 +43,7 @@ Makefile.dep: $(PREBUILD) Makefile $(SOURCES) $(SPECIAL)
 
 # don't include Makefile.dep for the listed targets:
 ifeq "$(findstring $(MAKECMDGOALS),clean distclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif
 
 include $(srcdir)/../port-clean.mk

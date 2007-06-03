@@ -34,7 +34,7 @@ Makefile.dep: $(SRC) $(srcdir)/*.h
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
                                    clean distclean mostlyclean realclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif
 
 # We need a '.stamp'-file in $(OBJDIR), because the time stamp

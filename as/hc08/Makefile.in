@@ -92,7 +92,7 @@ Makefile.dep: $(ASSOURCES) $(srcdir)/*.h $(top_builddir)/*.h $(top_srcdir)/*.h
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
                                    clean distclean mostlyclean realclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif
 include $(srcdir)/clean.mk
 

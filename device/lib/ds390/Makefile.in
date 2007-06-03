@@ -43,5 +43,5 @@ Makefile.dep: $(SOURCES)
 	done
 
 ifeq "$(findstring $(MAKECMDGOALS),clean distclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif

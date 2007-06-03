@@ -152,7 +152,7 @@ ifeq "$(findstring $(MAKECMDGOALS),uninstall uninstall_gui_api \
                                    checkconf \
                                    clean_local clean distclean_local \
                                    distclean mostlyclean realclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif
 include $(srcdir)/clean.mk
 

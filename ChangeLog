@@ -1,3 +1,8 @@
+2007-06-03 Borut Razem <borut.razem AT siol.net>
+
+	* */Makefile.in: removed annoying warning:
+	  Makefile:xx: Makefile.dep: No such file or directory
+
 2007-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (outBitC, genRet): used IS_OP_RUONLY,

@@ -101,7 +101,7 @@ dep: #Makefile.dep
 #Makefile.dep:
 #	$(CPP) $(CPPFLAGS) $(M_OR_MM) *.c >main.dep
 
-#include Makefile.dep
+#-include Makefile.dep
 include $(srcdir)/clean.mk
 
 # My rules

@@ -97,7 +97,7 @@ Makefile.dep: version.h $(SOURCES) $(SLIBSOURCES) $(SPECIAL)
 # don't include Makefile.dep for the listed targets:
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs checkconf \
                                    clean distclean mostlyclean realclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif
 include $(srcdir)/clean.mk
 

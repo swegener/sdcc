@@ -91,7 +91,7 @@ Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h $(srcdir)/*.hh
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall installcheck installdirs checkconf \
                                    clean distclean mostlyclean realclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif
 include $(srcdir)/clean.mk
 

@@ -405,7 +405,7 @@ Makefile.dep: $(SOURCES) $(INCDIR)/*.h $(PORTINCDIR)/*.h
 
 ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs checkconf \
                                    clean distclean mostlyclean realclean)" ""
-  include Makefile.dep
+  -include Makefile.dep
 endif
 include $(srcdir)/clean.mk
 

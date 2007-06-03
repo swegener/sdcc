@@ -76,7 +76,7 @@ dep: #main.dep
 #main.dep: *.c *.h
 #	$(CPP) $(CPPFLAGS) $(M_OR_MM) *.c >main.dep
 
-#include main.dep
+#-include main.dep
 include $(srcdir)/clean.mk
 
 # My rules

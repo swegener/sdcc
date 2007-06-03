@@ -102,7 +102,7 @@ dep: main.dep
 main.dep: $(ALL_SOURCES) *.h $(srcdir)/*.h
 	$(CXXCPP) $(CPPFLAGS) $(M_OR_MM) $(filter %.cc,$^) >main.dep
 
-include main.dep
+-include main.dep
 include $(srcdir)/clean.mk
 
 #parser.cc: parser.y

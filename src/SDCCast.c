@@ -3646,8 +3646,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* if left is another '!' */
-      if (tree->left->opval.op == '!')
+      if (IS_AST_NOT_OPER (tree->left))
         {
+          if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT))
+            {
+              /* remove double '!!X' by 'X' */
+              return tree->left->left;
+            }
           /* remove double '!!X' by 'X ? 1 : 0' */
           tree->opval.op = '?';
           tree->left  = tree->left->left;
@@ -4132,7 +4137,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           IS_LITERAL(RTYPE(tree))  &&
           ((int) floatFromVal (valFromType (RETYPE (tree)))) == 0)
         {
-          if (resultType == RESULT_TYPE_IFX)
+          if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BIT))
             {
               /* the parent is an ifx: */
               /* if (unsigned value) */

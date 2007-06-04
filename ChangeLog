@@ -1,3 +1,7 @@
+2007-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c(decorateType): better optimize '!!' and comparisons
+
 2007-06-04 Borut Razem <borut.razem AT siol.net>
 
 	* configure.in, configure, config_vc.awk: sdcc version number is now

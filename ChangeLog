@@ -4,6 +4,8 @@
 	  stored in configure.in; removed .version
 	* configure.in, configure, sdcc.spec, doc/sdccman.lyx, doc/sdccman.lyx,
 	  doc/INSTALL.txt: version bumped to 2.7.2
+	* sim/ucsim/configure.in, sim/ucsim/configure:
+	  use "read" to read from .version
 
 2007-06-03 Borut Razem <borut.razem AT siol.net>
 

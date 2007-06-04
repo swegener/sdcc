@@ -1970,7 +1970,7 @@ done
 { echo "$as_me:$LINENO: checking version of the package" >&5
 echo $ECHO_N "checking version of the package... $ECHO_C" >&6; }
 if test -f ${srcdir}/.version; then
-  VERSION=`cat ${srcdir}/.version`
+  { read VERSION; } < ${srcdir}/.version
   { echo "$as_me:$LINENO: result: $VERSION" >&5
 echo "${ECHO_T}$VERSION" >&6; }
 else

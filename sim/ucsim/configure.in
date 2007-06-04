@@ -8,7 +8,7 @@ AC_PROG_AWK
 
 AC_MSG_CHECKING(version of the package)
 if test -f ${srcdir}/.version; then
-  VERSION=`cat ${srcdir}/.version`
+  { read VERSION; } < ${srcdir}/.version
   AC_MSG_RESULT($VERSION)
 else
   VERSION="0.0.0"

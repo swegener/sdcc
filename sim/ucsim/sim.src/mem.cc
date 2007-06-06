@@ -54,7 +54,7 @@ static class cl_mem_error_registry mem_error_registry;
  *                                                3rd version of memory system
  */
 
-cl_memory::cl_memory(char *id, t_addr asize, int awidth):
+cl_memory::cl_memory(const char *id, t_addr asize, int awidth):
   cl_base()
 {
   size= asize;
@@ -696,7 +696,7 @@ cl_dummy_cell::set(t_mem val)
  *                                                                Address space
  */
 
-cl_address_space::cl_address_space(char *id,
+cl_address_space::cl_address_space(const char *id,
                                    t_addr astart, t_addr asize, int awidth):
   cl_memory(id, asize, awidth)
 {
@@ -1056,7 +1056,7 @@ cl_address_space_list::add(class cl_address_space *mem)
  *                                                                  Memory chip
  */
 
-cl_memory_chip::cl_memory_chip(char *id, int asize, int awidth, int initial):
+cl_memory_chip::cl_memory_chip(const char *id, int asize, int awidth, int initial):
   cl_memory(id, asize, awidth)
 {
   array= (t_mem *)malloc(size * sizeof(t_mem));
@@ -1313,7 +1313,7 @@ cl_decoder_list::cl_decoder_list(t_index alimit, t_index adelta, bool bychip):
   by_chip= bychip;
 }
 
-void *
+const void *
 cl_decoder_list::key_of(void *item)
 {
   class cl_address_decoder *d= (class cl_address_decoder *)item;
@@ -1324,9 +1324,9 @@ cl_decoder_list::key_of(void *item)
 }
 
 int
-cl_decoder_list::compare(void *key1, void *key2)
+cl_decoder_list::compare(const void *key1, const void *key2)
 {
-  t_addr k1= *((t_addr*)key1), k2= *((t_addr*)key2);
+  const t_addr k1= *(static_cast<const t_addr *>(key1)), k2= *(static_cast<const t_addr*>(key2));
   if (k1 == k2)
     return(0);
   else if (k1 > k2)

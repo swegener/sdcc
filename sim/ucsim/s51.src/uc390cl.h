@@ -46,10 +46,10 @@ public:
   //virtual t_addr get_mem_size (enum mem_class type);
 
   // manipulating memories
-  virtual t_mem read_mem (char *id/*enum mem_class type*/, t_addr addr);
-  virtual t_mem get_mem (char *id/*enum mem_class type*/, t_addr addr);
-  virtual void  write_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val);
-  virtual void  set_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val);
+  virtual t_mem read_mem (const char *id/*enum mem_class type*/, t_addr addr);
+  virtual t_mem get_mem (const char *id/*enum mem_class type*/, t_addr addr);
+  virtual void  write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val);
+  virtual void  set_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val);
 
   /* mods for dual-dptr */
   virtual int inst_inc_dptr(uchar code);

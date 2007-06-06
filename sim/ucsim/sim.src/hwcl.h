@@ -100,7 +100,7 @@ protected:
   class cl_list *partners;
   class cl_list *watched_cells;
 public:
-  cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, char *aid_string);
+  cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_string);
   virtual ~cl_hw(void);
 
   virtual void new_hw_adding(class cl_hw *new_hw);

@@ -52,7 +52,7 @@ class cl_list *cl_error_registry::registered_errors= NIL;
 /*
  */
 
-cl_error_class::cl_error_class(enum error_type typ, char *aname,
+cl_error_class::cl_error_class(enum error_type typ, const char *aname,
                                enum error_on_off be_on/* = ERROR_PARENT*/):
   cl_base()
 {
@@ -61,7 +61,7 @@ cl_error_class::cl_error_class(enum error_type typ, char *aname,
   set_name(aname, "not-known");
 }
 
-cl_error_class::cl_error_class(enum error_type typ, char *aname,
+cl_error_class::cl_error_class(enum error_type typ, const char *aname,
                                class cl_error_class *parent,
                                enum error_on_off be_on/* = ERROR_PARENT*/):
   cl_base()
@@ -109,7 +109,7 @@ cl_error_class::get_name(void)
   return(name);
 }*/
 
-char *
+const char *
 cl_error_class::get_type_name()
 {
   return(get_id_string(error_type_names, type, "untyped"));
@@ -172,7 +172,7 @@ cl_error::print(class cl_commander_base *c)
   c->dd_printf("%s\n", get_type_name());
 }
 
-char *
+const char *
 cl_error::get_type_name()
 {
   enum error_type type= get_type();

@@ -81,7 +81,7 @@ public:
 protected:
   t_addr dump_finished;
 public:
-  cl_memory(char *id, t_addr asize, int awidth);
+  cl_memory(const char *id, t_addr asize, int awidth);
   virtual ~cl_memory(void);
   virtual int init(void);
 
@@ -278,7 +278,7 @@ protected:
 public:
   class cl_decoder_list *decoders;
 public:
-  cl_address_space(char *id, t_addr astart, t_addr asize, int awidth);
+  cl_address_space(const char *id, t_addr astart, t_addr asize, int awidth);
   virtual ~cl_address_space(void);
 
   virtual bool is_address_space(void) { return(DD_TRUE); }
@@ -340,7 +340,7 @@ protected:
   t_mem *array;
   int init_value;
 public:
-  cl_memory_chip(char *id, int asize, int awidth, int initial= -1);
+  cl_memory_chip(const char *id, int asize, int awidth, int initial= -1);
   virtual ~cl_memory_chip(void);
   virtual int init(void);
 
@@ -395,8 +395,8 @@ protected:
 public:
   cl_decoder_list(t_index alimit, t_index adelta, bool bychip);
 
-  virtual void *key_of(void *item);
-  virtual int compare(void *key1, void *key2);
+  virtual const void *key_of(void *item);
+  virtual int compare(const void *key1, const void *key2);
 };
 
 

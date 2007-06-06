@@ -73,7 +73,7 @@ struct id_element error_type_names[]= {
 };
 
 
-char *warranty= 
+const char *warranty= 
 "                            NO WARRANTY\n"
 "\n"
 "  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY\n"
@@ -98,7 +98,7 @@ char *warranty=
 ;
 
 
-char *copying=
+const char *copying=
 "		    GNU GENERAL PUBLIC LICENSE\n"
 "		       Version 2, June 1991\n"
 "\n"

@@ -91,7 +91,7 @@ expression:
 	| expression PTOK_SLASH expression
 	  {
 	    if ($3 == 0)
-	      yyerror("Divide by zero");
+	      yyerror((char *)"Divide by zero");
 	    else
 	      $$= $1 / $3;
 	  }
@@ -110,7 +110,7 @@ address_of_expression:
 	  $$= $2.bit_address;
 	  if ($$ < 0)
 	    {
-	      yyerror("Bit has no address.");
+	      yyerror((char *)"Bit has no address.");
 	      $$= 0;
 	    }
 	}

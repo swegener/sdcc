@@ -192,7 +192,7 @@ cl_app::done(void)
  */
 
 static void
-print_help(char *name)
+print_help(const char *name)
 {
   printf("%s: %s\n", name, VERSIONSTR);
   printf("Usage: %s [-hHVvP] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
@@ -793,7 +793,7 @@ cl_app::mk_options(void)
 
 
 int
-cl_app::dd_printf(char *format, ...)
+cl_app::dd_printf(const char *format, ...)
 {
   va_list ap;
 
@@ -807,7 +807,7 @@ cl_app::dd_printf(char *format, ...)
 }
 
 int
-cl_app::debug(char *format, ...)
+cl_app::debug(const char *format, ...)
 {
   va_list ap;
 

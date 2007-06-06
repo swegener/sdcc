@@ -53,9 +53,9 @@ protected:
   //char *name;
   enum error_on_off on;
 public:
-  cl_error_class(enum error_type typ, char *aname,
+  cl_error_class(enum error_type typ, const char *aname,
                  enum error_on_off be_on= ERROR_PARENT);
-  cl_error_class(enum error_type typ, char *aname,
+  cl_error_class(enum error_type typ, const char *aname,
                  class cl_error_class *parent,
                  enum error_on_off be_on= ERROR_PARENT);
   
@@ -63,7 +63,7 @@ public:
   void set_on(enum error_on_off val);
   bool is_on(void);
   enum error_type get_type(void);
-  char *get_type_name(void);
+  const char *get_type_name(void);
   //char *get_name(void);
 };
 
@@ -71,11 +71,11 @@ class cl_error_registry
 {
 public:
   cl_error_registry(void);
-  class cl_error_class *find(char *type_name)
+  class cl_error_class *find(const char *type_name)
   {
     if (NIL == registered_errors)
       return NIL;
-    return static_cast<class cl_error_class *>(registered_errors->first_that(compare, static_cast<void *>(type_name)));
+    return static_cast<class cl_error_class *>(registered_errors->first_that(compare, type_name));
   }
   static class cl_list *get_list(void)
   {
@@ -93,9 +93,9 @@ protected:
 
 private:
   static class cl_list *registered_errors;
-  static int compare(void *obj1, void *obj2)
+  static int compare(void *obj1, const void *obj2)
   {
-    return (static_cast<class cl_base *>(obj1))->is_named(static_cast<char *>(obj2));
+    return (static_cast<class cl_base *>(obj1))->is_named(static_cast<const char *>(obj2));
   }
 };
 
@@ -120,7 +120,7 @@ public:
   virtual class cl_error_class *get_class(void) { return(classification); }
 
   virtual void print(class cl_commander_base *c);
-  virtual char *get_type_name();
+  virtual const char *get_type_name();
 };
 
 #endif

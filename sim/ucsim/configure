@@ -12503,10 +12503,6 @@ if test "$ucsim_cv_CXXpipe" = "yes"; then
   CXXFLAGS="$CXXFLAGS -pipe"
 fi
 
-# temporary solution to supress GCC 4.2.0 c++ warning:
-# deprecated conversion from string constant to `char *'
-CXXFLAGS="$CXXFLAGS -Wno-write-strings"
-
 PICOPT=""
 SHAREDLIB="no"
 

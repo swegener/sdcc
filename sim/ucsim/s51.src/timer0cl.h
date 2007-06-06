@@ -46,7 +46,7 @@ protected:
   t_addr addr_tl, addr_th;
   int mode, GATE, C_T, TR, INT, T_edge;
 public:
-  cl_timer0(class cl_uc *auc, int aid, char *aid_string);
+  cl_timer0(class cl_uc *auc, int aid, const char *aid_string);
   virtual int init(void);
 
   virtual void added_to_uc(void);

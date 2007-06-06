@@ -98,7 +98,7 @@ cl_hc08::reset(void)
 }
 
 
-char *
+const char *
 cl_hc08::id_string(void)
 {
   return("unspecified HC08");
@@ -177,9 +177,8 @@ int
 cl_hc08::inst_length(t_addr addr)
 {
   int len = 0;
-  char *s;
 
-  s = get_disasm_info(addr, &len, NULL, NULL);
+  get_disasm_info(addr, &len, NULL, NULL);
 
   return len;
 }
@@ -188,9 +187,8 @@ int
 cl_hc08::inst_branch(t_addr addr)
 {
   int b;
-  char *s;
 
-  s = get_disasm_info(addr, NULL, &b, NULL);
+  get_disasm_info(addr, NULL, &b, NULL);
 
   return b;
 }
@@ -202,13 +200,13 @@ cl_hc08::longest_inst(void)
 }
 
 
-char *
+const char *
 cl_hc08::get_disasm_info(t_addr addr,
                         int *ret_len,
                         int *ret_branch,
                         int *immed_offset)
 {
-  char *b = NULL;
+  const char *b = NULL;
   uint code;
   int len = 0;
   int immed_n = 0;
@@ -263,11 +261,12 @@ cl_hc08::get_disasm_info(t_addr addr,
   return b;
 }
 
-char *
+const char *
 cl_hc08::disass(t_addr addr, char *sep)
 {
   char work[256], temp[20];
-  char *buf, *p, *b, *t;
+  const char *b;
+  char *buf, *p, *t;
   int len = 0;
   int immed_offset = 0;
 
@@ -354,10 +353,10 @@ cl_hc08::disass(t_addr addr, char *sep)
     buf= (char *)malloc(6+strlen(p)+1);
   else
     buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, b= buf; *p != ' '; p++, b++)
-    *b= *p;
+  for (p= work, t= buf; *p != ' '; p++, t++)
+    *t= *p;
   p++;
-  *b= '\0';
+  *t= '\0';
   if (sep == NULL)
     {
       while (strlen(buf) < 6)

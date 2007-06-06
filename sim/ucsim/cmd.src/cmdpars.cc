@@ -726,7 +726,7 @@ do                                                              \
       YYGOTO(yybackup);                                            \
     }                                                           \
   else                                                          \
-    { YY_cl_ucsim_parser_ERROR ("syntax error: cannot back up"); YYERROR; }   \
+    { YY_cl_ucsim_parser_ERROR ((char *)"syntax error: cannot back up"); YYERROR; }   \
 while (0)
 
 #define YYTERROR        1
@@ -936,7 +936,7 @@ YYLABEL(yynewstate)
       /* Extend the stack our own way.  */
       if (yystacksize >= YYMAXDEPTH)
 	{
-	  YY_cl_ucsim_parser_ERROR("parser stack overflow");
+	  YY_cl_ucsim_parser_ERROR((char *)"parser stack overflow");
 	  __ALLOCA_return(2);
 	}
       yystacksize *= 2;
@@ -1161,7 +1161,7 @@ case 8:
 #line 92 "cmdpars.y"
 {
 	    if (yyvsp[0].number == 0)
-	      yyerror("Divide by zero");
+	      yyerror((char *)"Divide by zero");
 	    else
 	      yyval.number= yyvsp[-2].number / yyvsp[0].number;
 	  ;
@@ -1200,7 +1200,7 @@ case 16:
 	  yyval.number= yyvsp[0].bit.bit_address;
 	  if (yyval.number < 0)
 	    {
-	      yyerror("Bit has no address.");
+	      yyerror((char *)"Bit has no address.");
 	      yyval.number= 0;
 	    }
 	;
@@ -1323,11 +1323,11 @@ YYLABEL(yyerrlab)   /* here on detecting error */
 	      free(msg);
 	    }
 	  else
-	    YY_cl_ucsim_parser_ERROR ("parse error; also virtual memory exceeded");
+	    YY_cl_ucsim_parser_ERROR ((char *)"parse error; also virtual memory exceeded");
 	}
       else
 #endif /* YY_cl_ucsim_parser_ERROR_VERBOSE */
-	YY_cl_ucsim_parser_ERROR("parse error");
+	YY_cl_ucsim_parser_ERROR((char *)"parse error");
     }
 
   YYGOTO(yyerrlab1);

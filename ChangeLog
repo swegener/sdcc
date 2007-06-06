@@ -1,3 +1,10 @@
+2007-06-07 Borut Razem <borut.razem AT siol.net>
+
+	* sim/ucsim/*.*, sim/ucsim/configure, sim/ucsim/configure.in:
+	  permanent solution to suppress GCC 4.2.0 c++ warning:
+	  deprecated conversion from string constant to `char *'
+	  use 'const char *' where ever required
+
 2007-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCast.c(decorateType): better optimize '!!' and comparisons
@@ -56,7 +63,7 @@
 	* device/lib/pic16/libdev/pic18f[24]5j10.c:
 	  search for included source file in local directory
 	* sim/ucsim/configure, sim/ucsim/configure.in:
-	  temporary solution to supress GCC 4.2.0 c++ warning:
+	  temporary solution to suppress GCC 4.2.0 c++ warning:
 	  deprecated conversion from string constant to `char *'
 
 2007-06-01 Raphael Neider <rneider AT web.de>

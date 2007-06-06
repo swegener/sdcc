@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "types51.h"
 
 
-cl_timer2::cl_timer2(class cl_uc *auc, int aid, char *aid_string,
+cl_timer2::cl_timer2(class cl_uc *auc, int aid, const char *aid_string,
                      int afeatures):
   cl_timer0(auc, /*2*/aid, /*"timer2"*/aid_string)
 {

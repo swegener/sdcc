@@ -39,13 +39,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern int get_sub_opt(char **option, const char * const *tokens, char **valuep);
-extern char *get_id_string(struct id_element *ids, int id);
-extern char *get_id_string(struct id_element *ids, int id, char *def);
-extern int get_string_id(struct id_element *ids, char *str);
-extern int get_string_id(struct id_element *ids, char *str, int def);
-extern char *format_string(char *format, ...);
-extern char *object_name(class cl_base *o);
-extern char *case_string(enum letter_case lcase, char *str);
+extern const char *get_id_string(struct id_element *ids, int id);
+extern const char *get_id_string(struct id_element *ids, int id, const char *def);
+extern int get_string_id(struct id_element *ids, const char *str);
+extern int get_string_id(struct id_element *ids, const char *str, int def);
+extern char *format_string(const char *format, ...);
+extern const char *object_name(class cl_base *o);
+extern char *case_string(enum letter_case lcase, const char *str);
 
 
 #endif

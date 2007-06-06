@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "regs51.h"
 
 
-cl_timer1::cl_timer1(class cl_uc *auc, int aid, char *aid_string):
+cl_timer1::cl_timer1(class cl_uc *auc, int aid, const char *aid_string):
   cl_timer0(auc, aid, aid_string)
 {
   make_partner(HW_UART, 0);
@@ -63,7 +63,7 @@ cl_timer1::overflow(void)
 void
 cl_timer1::print_info(class cl_console_base *con)
 {
-  char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "stop" };
+  const char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "stop" };
   //int tmod= cell_tmod->get();
   int on;
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);

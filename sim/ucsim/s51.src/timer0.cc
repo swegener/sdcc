@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "types51.h"
 
 
-cl_timer0::cl_timer0(class cl_uc *auc, int aid, char *aid_string):
+cl_timer0::cl_timer0(class cl_uc *auc, int aid, const char *aid_string):
   cl_hw(auc, HW_TIMER, aid, aid_string)
 {
   cell_tmod= cell_tcon= 0;
@@ -372,7 +372,7 @@ cl_timer0::happen(class cl_hw *where, enum hw_event he, void *params)
 void
 cl_timer0::print_info(class cl_console_base *con)
 {
-  char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "2x8 bit" };
+  const char *modes[]= { "13 bit", "16 bit", "8 bit autoreload", "2x8 bit" };
   //t_mem tmod= cell_tmod->get();
   int on;
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);

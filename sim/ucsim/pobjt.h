@@ -37,7 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 typedef int	t_index;
-typedef int	(*match_func)(void *, void *);
+typedef int	(*match_func)(void *, const void *);
 typedef void	(*iterator_func)(void *, void *);
 
 #define max_list_size (0x10000/sizeof(void *))

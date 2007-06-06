@@ -66,7 +66,7 @@ cl_avr::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_avr::id_string(void)
 {
   return("unspecified AVR");
@@ -172,7 +172,8 @@ char *
 cl_avr::disass(t_addr addr, char *sep)
 {
   char work[256], temp[20];
-  char *buf, *p, *b, *t;
+  const char *b;
+  char *buf, *p, *t;
   uint code, data= 0;
   int i;
 
@@ -291,10 +292,10 @@ cl_avr::disass(t_addr addr, char *sep)
     buf= (char *)malloc(6+strlen(p)+1);
   else
     buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, b= buf; *p != ' '; p++, b++)
-    *b= *p;
+  for (p= work, t= buf; *p != ' '; p++, t++)
+    *t= *p;
   p++;
-  *b= '\0';
+  *t= '\0';
   if (sep == NULL)
     {
       while (strlen(buf) < 6)

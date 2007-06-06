@@ -57,7 +57,7 @@ class cl_uc *
 cl_sim51::mk_controller(void)
 {
   int i;
-  char *typ= NIL;
+  const char *typ= NIL;
   class cl_optref type_option(this);
 
   type_option.init();

@@ -72,7 +72,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *____________________________________________________________________________
  */
 
-cl_console::cl_console(char *fin, char *fout, class cl_app *the_app)
+cl_console::cl_console(const char *fin, const char *fout, class cl_app *the_app)
 {
   FILE *f;
 
@@ -181,7 +181,7 @@ cl_console::un_redirect(void)
 }
 
 int
-cl_console::cmd_do_print(char *format, va_list ap)
+cl_console::cmd_do_print(const char *format, va_list ap)
 {
   int ret;
   FILE *f = get_out();

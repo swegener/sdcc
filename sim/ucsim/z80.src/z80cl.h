@@ -46,7 +46,7 @@ public:
 public:
   cl_z80(class cl_sim *asim);
   virtual int init(void);
-  virtual char *id_string(void);
+  virtual const char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
@@ -56,12 +56,12 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
-  virtual char *disass(t_addr addr, char *sep);
+  virtual const char *disass(t_addr addr, char *sep);
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
 
-  virtual char * get_disasm_info(t_addr addr,
+  virtual const char *get_disasm_info(t_addr addr,
                         int *ret_len,
                         int *ret_branch,
                         int *immed_offset);

@@ -445,7 +445,7 @@ cl_uc390::clear_sfr(void)
 
 
 t_mem
-cl_uc390::read_mem(char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::read_mem(const char *id/*enum mem_class type*/, t_addr addr)
 {
 
   if (strcmp(/*type*/id,/* == */MEM_XRAM_ID)==0 &&
@@ -459,7 +459,7 @@ cl_uc390::read_mem(char *id/*enum mem_class type*/, t_addr addr)
 }
 
 t_mem
-cl_uc390::get_mem (char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
 {
   if (strcmp(/*type*/id/* == */,MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
@@ -472,7 +472,7 @@ cl_uc390::get_mem (char *id/*enum mem_class type*/, t_addr addr)
 }
 
 void
-cl_uc390::write_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val)
+cl_uc390::write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val)
 {
   if (strcmp(/*type ==*/id, MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
@@ -485,7 +485,7 @@ cl_uc390::write_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val)
 }
 
 void
-cl_uc390::set_mem (/*enum mem_class type*/char *id, t_addr addr, t_mem val)
+cl_uc390::set_mem (/*enum mem_class type*/const char *id, t_addr addr, t_mem val)
 {
   if (/*type == */strcmp(id,MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
@@ -1084,7 +1084,8 @@ char *
 cl_uc390::disass (t_addr addr, char *sep)
 {
   char work[256], temp[20], c[2];
-  char *buf, *p, *b, *t;
+  const char *b;
+  char *buf, *p, *t;
   t_mem code;
 
   if (! (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
@@ -1181,10 +1182,10 @@ cl_uc390::disass (t_addr addr, char *sep)
     buf = (char *) malloc (6 + strlen (p) + 1);
   else
     buf = (char *) malloc ((p - work) + strlen (sep) + strlen (p) + 1);
-  for (p = work, b = buf; *p != ' '; p++, b++)
-    *b = *p;
+  for (p = work, t = buf; *p != ' '; p++, t++)
+    *t = *p;
   p++;
-  *b = '\0';
+  *t = '\0';
   if (sep == NULL)
     while (strlen (buf) < 6)
       strcat (buf, " ");

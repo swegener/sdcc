@@ -113,7 +113,7 @@ public:
 
   virtual void redirect(char *fname, char *mode) = 0;
   virtual void un_redirect(void) = 0;
-  virtual int cmd_do_print(char *format, va_list ap) = 0;
+  virtual int cmd_do_print(const char *format, va_list ap) = 0;
   virtual bool is_tty(void) const = 0;
   virtual bool is_eof(void) const = 0;
   virtual int input_avail(void) = 0;
@@ -124,8 +124,8 @@ public:
   virtual int proc_input(class cl_cmdset *cmdset);
 
   void print_prompt(void);
-  int dd_printf(char *format, ...);
-  int debug(char *format, ...);
+  int dd_printf(const char *format, ...);
+  int debug(const char *format, ...);
   void print_bin(long data, int bits);
   void print_char_octal(char c);
 
@@ -168,12 +168,12 @@ public:
   void deactivate_console(class cl_console_base *console);
 
   void prompt(void);
-  int all_printf(char *format, ...);        // print to all consoles
-  int dd_printf(char *format, va_list ap);  // print to actual_console
-  int dd_printf(char *format, ...);         // print to actual_console
-  int debug(char *format, ...);             // print consoles with debug flag set
-  int debug(char *format, va_list ap);      // print consoles with debug flag set
-  int flag_printf(int iflags, char *format, ...);
+  int all_printf(const char *format, ...);        // print to all consoles
+  int dd_printf(const char *format, va_list ap);  // print to actual_console
+  int dd_printf(const char *format, ...);         // print to actual_console
+  int debug(const char *format, ...);             // print consoles with debug flag set
+  int debug(const char *format, va_list ap);      // print consoles with debug flag set
+  int flag_printf(int iflags, const char *format, ...);
   int input_avail_on_frozen(void);
   void exec_on(class cl_console_base *cons, char *file_name);
 

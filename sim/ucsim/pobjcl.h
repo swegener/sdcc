@@ -58,14 +58,14 @@ public:
   virtual ~cl_base(void);
 
   virtual int init(void);
-  virtual char *get_name(void) { return(name); }
-  virtual char *get_name(char *def);
+  virtual const char *get_name(void) { return(name); }
+  virtual const char *get_name(const char *def);
   virtual bool have_name(void) { return(name != 0); }
   virtual bool have_real_name(void) { return(name != 0 && *name != '\0'); }
-  char *set_name(char *new_name);
-  char *set_name(char *new_name, char *def_name);
-  bool is_named(char *the_name);
-  bool is_inamed(char *the_name);
+  const char *set_name(const char *new_name);
+  const char *set_name(const char *new_name, const char *def_name);
+  bool is_named(const char *the_name);
+  bool is_inamed(const char *the_name);
 
   class cl_base *get_parent(void) { return(parent); }
   int nuof_children(void);
@@ -118,7 +118,7 @@ protected:
   t_index	   Delta;
 
 public:
-  cl_list(t_index alimit, t_index adelta, char *aname);
+  cl_list(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_list(void);
 
 	  void	   *at(t_index index);
@@ -145,7 +145,7 @@ public:
   virtual t_index  add(class cl_base *item, class cl_base *parent);
   virtual void     push(void *item);
 
-	  void	   *first_that(match_func test, void *arg);
+	  void	   *first_that(match_func test, const void *arg);
 	  void	   *last_that(match_func test, void *arg);
 	  void	   for_each(iterator_func action, void *arg);
 
@@ -167,15 +167,15 @@ class cl_sorted_list: public cl_list
 public:
   bool		   Duplicates;
 public:
-  cl_sorted_list(t_index alimit, t_index adelta, char *aname);
+  cl_sorted_list(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_sorted_list(void);
   
-  virtual bool	   search(void *key, t_index& index);
+  virtual bool	   search(const void *key, t_index& index);
   virtual t_index  index_of(void *item);
   virtual t_index  add(void *item);
-  virtual void	   *key_of(void *item);
+  virtual const void *key_of(void *item);
 private:
-  virtual int	   compare(void *key1, void *key2)= 0;
+  virtual int	   compare(const void *key1, const void *key2)= 0;
 };
 
 
@@ -189,11 +189,11 @@ private:
 class cl_strings: public cl_sorted_list
 {
 public:
-  cl_strings(t_index alimit, t_index adelta, char *aname);
+  cl_strings(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_strings(void);
   
 private:
-  virtual int	   compare(void *key1, void *key2);
+  virtual int	   compare(const void *key1, const void *key2);
   virtual void	   free_item(void *item);
 };
 
@@ -208,12 +208,12 @@ private:
 class cl_ustrings: public cl_strings
 {
 public:
-  cl_ustrings(t_index alimit, t_index adelta, char *aname);
+  cl_ustrings(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_ustrings(void);
   
 private:
-  virtual int	   compare(void *key1, void *key2);
-  virtual bool	   search(void *key, t_index &index);
+  virtual int	   compare(const void *key1, const void *key2);
+  virtual bool	   search(const void *key, t_index &index);
 };
 
 

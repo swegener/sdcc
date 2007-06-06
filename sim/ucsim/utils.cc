@@ -67,7 +67,7 @@ get_sub_opt(char **option, const char * const *tokens, char **valuep)
 }
 
 
-char *
+const char *
 get_id_string(struct id_element *ids, int id)
 {
   int i= 0;
@@ -77,16 +77,16 @@ get_id_string(struct id_element *ids, int id)
   return(ids[i].id_string);
 }
 
-char *
-get_id_string(struct id_element *ids, int id, char *def)
+const char *
+get_id_string(struct id_element *ids, int id, const char *def)
 {
-  char *s= get_id_string(ids, id);
+  const char *s= get_id_string(ids, id);
 
   return(s?s:def);
 }
 
 int
-get_string_id(struct id_element *ids, char *str)
+get_string_id(struct id_element *ids, const char *str)
 {
   int i= 0;
 
@@ -96,7 +96,7 @@ get_string_id(struct id_element *ids, char *str)
 }
 
 int
-get_string_id(struct id_element *ids, char *str, int def)
+get_string_id(struct id_element *ids, const char *str, int def)
 {
   int i= 0;
 
@@ -110,7 +110,7 @@ extern "C" int vasprintf(char **strp, const  char *format, va_list ap);
 extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
 
 char *
-format_string(char *format, ...)
+format_string(const char *format, ...)
 {
   va_list ap;
 
@@ -135,10 +135,10 @@ format_string(char *format, ...)
 }
 
 
-char *
+const char *
 object_name(class cl_base *o)
 {
-  char *name= 0;
+  const char *name= 0;
 
   if (o)
     name= o->get_name();
@@ -149,7 +149,7 @@ object_name(class cl_base *o)
 
 
 char *
-case_string(enum letter_case lcase, char *str)
+case_string(enum letter_case lcase, const char *str)
 {
   char *p= strdup(str);
   char *s= p;
@@ -182,7 +182,7 @@ case_string(enum letter_case lcase, char *str)
   return(s);
 }
 
-/*char *
+/*const char *
 case_string(enum letter_case lcase, const char *str)
 {
   char *p= NIL;

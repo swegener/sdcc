@@ -88,7 +88,7 @@ public:
   cl_51core(int Itype, int Itech, class cl_sim *asim);
   virtual ~cl_51core(void);
   virtual int    init(void);
-  virtual char  *id_string(void);
+  virtual const char *id_string(void);
   virtual void mk_hw_elements(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
   //virtual class cl_m *mk_mem(enum mem_class type, char *class_name);

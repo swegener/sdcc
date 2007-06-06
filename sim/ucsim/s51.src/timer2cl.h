@@ -63,7 +63,7 @@ protected:
   class cl_memory_cell *cell_rcap2l, *cell_rcap2h, *cell_t2mod;
   bool bit_dcen, bit_t2oe, bit_t2ex;
 public:
-  cl_timer2(class cl_uc *auc, int aid, char *aid_string, int afeautres);
+  cl_timer2(class cl_uc *auc, int aid, const char *aid_string, int afeautres);
   virtual int init(void);
 
   virtual void added_to_uc(void);

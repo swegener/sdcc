@@ -62,8 +62,8 @@ public:
 protected:
   virtual void print_info(class cl_console_base *con);
 public:
-  virtual char *get_op_name(void);
-  virtual char *get_matching_name(void) { return("unknown"); }
+  virtual const char *get_op_name(void);
+  virtual const char *get_matching_name(void) { return("unknown"); }
   virtual bool sp_increased(void);
   virtual int data_size(void);
   virtual bool match(class cl_stack_op *op);
@@ -86,10 +86,10 @@ public:
                 t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
-  virtual char *get_op_name(void);
+  virtual const char *get_op_name(void);
   virtual void print_info(class cl_console_base *con);
 public:
-  virtual char *get_matching_name(void);
+  virtual const char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
   virtual bool match(class cl_stack_op *op);
 };
@@ -102,10 +102,10 @@ public:
                 t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
-  virtual char *get_op_name(void);
+  virtual const char *get_op_name(void);
   virtual void print_info(class cl_console_base *con);
 public:
-  virtual char *get_matching_name(void);
+  virtual const char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
   virtual bool match(class cl_stack_op *op);
 };
@@ -119,10 +119,10 @@ public:
   cl_stack_push(t_addr iPC, t_mem idata, t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
-  virtual char *get_op_name(void);
+  virtual const char *get_op_name(void);
   virtual void print_info(class cl_console_base *con);
 public:
-  virtual char *get_matching_name(void);
+  virtual const char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
   virtual bool match(class cl_stack_op *op);
 };
@@ -134,9 +134,9 @@ public:
   cl_stack_ret(t_addr iPC, t_addr iaddr, t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
-  virtual char *get_op_name(void);
+  virtual const char *get_op_name(void);
 public:
-  virtual char *get_matching_name(void);
+  virtual const char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
   virtual bool match(class cl_stack_op *op);
 };
@@ -148,9 +148,9 @@ public:
   cl_stack_iret(t_addr iPC, t_addr iaddr, t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
-  virtual char *get_op_name(void);
+  virtual const char *get_op_name(void);
 public:
-  virtual char *get_matching_name(void);
+  virtual const char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
   virtual bool match(class cl_stack_op *op);
 };
@@ -162,9 +162,9 @@ public:
   cl_stack_pop(t_addr iPC, t_mem idata, t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
-  virtual char *get_op_name(void);
+  virtual const char *get_op_name(void);
 public:
-  virtual char *get_matching_name(void);
+  virtual const char *get_matching_name(void);
   virtual enum stack_op get_matching_op(void);
   virtual bool match(class cl_stack_op *op);
 };

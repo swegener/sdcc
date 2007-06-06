@@ -46,7 +46,7 @@ cl_it_src::cl_it_src(uchar Iie_mask,
 		     uchar Isrc_mask,
 		     uint  Iaddr,
 		     bool  Iclr_bit,
-		     char  *Iname,
+		     const char  *Iname,
 		     int   apoll_priority):
   cl_base()
 {
@@ -99,7 +99,7 @@ cl_irqs::cl_irqs(t_index alimit, t_index adelta):
   Duplicates= DD_TRUE;
 }
 
-void *
+const void *
 cl_irqs::key_of(void *item)
 {
   class cl_it_src *itsrc= (class cl_it_src *)item;
@@ -107,13 +107,13 @@ cl_irqs::key_of(void *item)
 }
 
 int
-cl_irqs::compare(void *key1, void *key2)
+cl_irqs::compare(const void *key1, const void *key2)
 {
-  int *k1= (int*)key1, *k2= (int*)key2;
+  const int k1= *static_cast<const int *>(key1), k2= *static_cast<const int *>(key2);
 
-  if (*k1 == *k2)
+  if (k1 == k2)
     return(0);
-  else if (*k1 < *k2)
+  else if (k1 < k2)
     return(-1);
   return(1);
 }

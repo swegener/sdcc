@@ -123,11 +123,10 @@ cl_51core::init(void)
   return(0);
 }
 
-static char id_string_51[100];
-
-char *
+const char *
 cl_51core::id_string(void)
 {
+  static char id_string_51[100];
   int i;
 
   for (i= 0; cpus_51[i].type_str != NULL && cpus_51[i].type != type; i++) ;
@@ -319,7 +318,8 @@ char *
 cl_51core::disass(t_addr addr, char *sep)
 {
   char work[256], temp[20], c[2];
-  char *buf, *p, *b, *t;
+  const char *b;
+  char *buf, *p, *t;
   t_mem code= rom->get(addr);
 
   p= work;
@@ -409,10 +409,10 @@ cl_51core::disass(t_addr addr, char *sep)
     buf= (char *)malloc(6+strlen(p)+1);
   else
     buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, b= buf; *p != ' '; p++, b++)
-    *b= *p;
+  for (p= work, t= buf; *p != ' '; p++, t++)
+    *t= *p;
   p++;
-  *b= '\0';
+  *t= '\0';
   if (sep == NULL)
     {
       while (strlen(buf) < 6)

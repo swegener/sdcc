@@ -140,7 +140,7 @@ show_error_cmd_print_node(class cl_console_base *con,
   int i;
   for (i= 0; i < indent; i++)
     con->dd_printf(" ");
-  char *name= node->get_name("unknown");
+  const char *name= node->get_name("unknown");
   class cl_error_class *ec= dynamic_cast<class cl_error_class *>(node);
   char *str;
   con->dd_printf("%s: %s [%s/%s]\n",

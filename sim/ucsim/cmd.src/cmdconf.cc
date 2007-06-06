@@ -74,7 +74,7 @@ conf_objects_cmd_print_node(class cl_console_base *con,
   int i;
   for (i= 0; i < indent; i++)
     con->dd_printf(" ");
-  char *name= node->get_name("unknown");
+  const char *name= node->get_name("unknown");
   con->dd_printf("%s\n", name);
   class cl_base *c= node->first_child();
   while (c)

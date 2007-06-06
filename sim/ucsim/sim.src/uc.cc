@@ -62,7 +62,7 @@ static class cl_uc_error_registry uc_error_registry;
  * Clock counter
  */
 
-cl_ticker::cl_ticker(int adir, int in_isr, char *aname)
+cl_ticker::cl_ticker(int adir, int in_isr, const char *aname)
 {
   options= TICK_RUN;
   if (in_isr)
@@ -221,7 +221,7 @@ cl_uc::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_uc::id_string(void)
 {
   return("unknown microcontroller");
@@ -593,7 +593,7 @@ cmd->init();*/
  */
 
 t_mem
-cl_uc::read_mem(char *id, t_addr addr)
+cl_uc::read_mem(const char *id, t_addr addr)
 {
   class cl_address_space *m= address_space(id);
 
@@ -601,7 +601,7 @@ cl_uc::read_mem(char *id, t_addr addr)
 }
 
 t_mem
-cl_uc::get_mem(char *id, t_addr addr)
+cl_uc::get_mem(const char *id, t_addr addr)
 {
   class cl_address_space *m= address_space(id);
 
@@ -609,7 +609,7 @@ cl_uc::get_mem(char *id, t_addr addr)
 }
 
 void
-cl_uc::write_mem(char *id, t_addr addr, t_mem val)
+cl_uc::write_mem(const char *id, t_addr addr, t_mem val)
 {
   class cl_address_space *m= address_space(id);
 
@@ -618,7 +618,7 @@ cl_uc::write_mem(char *id, t_addr addr, t_mem val)
 }
 
 void
-cl_uc::set_mem(char *id, t_addr addr, t_mem val)
+cl_uc::set_mem(const char *id, t_addr addr, t_mem val)
 {
   class cl_address_space *m= address_space(id);
 
@@ -642,7 +642,7 @@ cl_uc::mem(enum mem_class type)
 */
 
 class cl_address_space *
-cl_uc::address_space(char *id)
+cl_uc::address_space(const char *id)
 {
   int i;
 
@@ -662,7 +662,7 @@ cl_uc::address_space(char *id)
 }
 
 class cl_memory *
-cl_uc::memory(char *id)
+cl_uc::memory(const char *id)
 {
   int i;
 
@@ -1029,7 +1029,7 @@ cl_uc::bit_tbl(void)
 }
 
 char *
-cl_uc::disass(t_addr addr, char *sep)
+cl_uc::disass(t_addr addr, const char *sep)
 {
   char *buf;
 

@@ -41,7 +41,7 @@ typedef TYPE_WORD	t_smem;		/* signed 16 bit memory */
 struct id_element
 {
   int id;
-  char *id_string;
+  const char *id_string;
 };
 
 enum error_type {
@@ -56,21 +56,21 @@ struct dis_entry
   uint  code, mask;
   char  branch;
   uchar length;
-  char  *mnemonic;
+  const char *mnemonic;
 };
 
 // table entry of SFR and BIT names
 struct name_entry
 {
-  int		cpu_type;
-  t_addr	addr;
-  char		*name;
+  int cpu_type;
+  t_addr addr;
+  const char *name;
 };
 
 
 struct cpu_entry
 {
-  char *type_str;
+  const char *type_str;
   int  type;
   int  technology;
 };

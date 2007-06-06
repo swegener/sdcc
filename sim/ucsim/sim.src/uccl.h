@@ -53,7 +53,7 @@ public:
   int dir;
   //char *name;
 
-  cl_ticker(int adir, int in_isr, char *aname);
+  cl_ticker(int adir, int in_isr, const char *aname);
   virtual ~cl_ticker(void);
   
   virtual int tick(int nr);
@@ -119,7 +119,7 @@ public:
   cl_uc(class cl_sim *asim);
   virtual ~cl_uc(void);
   virtual int init(void);
-  virtual char *id_string(void);
+  virtual const char *id_string(void);
   virtual void reset(void);
 
   // making objects
@@ -131,12 +131,12 @@ public:
   virtual void build_cmdset(class cl_cmdset *cmdset);
 
   // manipulating memories
-  virtual t_mem read_mem(char *id, t_addr addr);
-  virtual t_mem get_mem(char *id, t_addr addr);
-  virtual void write_mem(char *id, t_addr addr, t_mem val);
-  virtual void set_mem(char *id, t_addr addr, t_mem val);
-  virtual class cl_address_space *address_space(char *id);
-  virtual class cl_memory *memory(char *id);
+  virtual t_mem read_mem(const char *id, t_addr addr);
+  virtual t_mem get_mem(const char *id, t_addr addr);
+  virtual void write_mem(const char *id, t_addr addr, t_mem val);
+  virtual void set_mem(const char *id, t_addr addr, t_mem val);
+  virtual class cl_address_space *address_space(const char *id);
+  virtual class cl_memory *memory(const char *id);
 
   // file handling
   virtual long read_hex_file(const char *nam);
@@ -197,7 +197,7 @@ public:
   virtual void check_events(void);
 
   // disassembling and symbol recognition
-  virtual char *disass(t_addr addr, char *sep);
+  virtual char *disass(t_addr addr, const char *sep);
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);

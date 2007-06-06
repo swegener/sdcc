@@ -44,9 +44,9 @@ protected:
 
 public:
   cl_console(void) { in = out = rout = 0; }
-  cl_console(char *fin, char *fout, class cl_app *the_app);
+  cl_console(const char *fin, const char *fout, class cl_app *the_app);
   cl_console(FILE *fin, FILE *fout, class cl_app *the_app);
-  int cmd_do_print(char *format, va_list ap);
+  int cmd_do_print(const char *format, va_list ap);
 
   virtual ~cl_console(void);
   virtual class cl_console *clone_for_exec(char *fin);

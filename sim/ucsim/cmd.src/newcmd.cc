@@ -172,7 +172,7 @@ cl_console_base::print_prompt(void)
 }
 
 int
-cl_console_base::dd_printf(char *format, ...)
+cl_console_base::dd_printf(const char *format, ...)
 {
   va_list ap;
   int ret= 0;
@@ -185,7 +185,7 @@ cl_console_base::dd_printf(char *format, ...)
 }
 
 int
-cl_console_base::debug(char *format, ...)
+cl_console_base::debug(const char *format, ...)
 {
   if ((flags & CONS_DEBUG) == 0)
     return(0);
@@ -421,7 +421,7 @@ cl_commander_base::deactivate_console(class cl_console_base *console)
  */
 
 int
-cl_commander_base::all_printf(char *format, ...)
+cl_commander_base::all_printf(const char *format, ...)
 {
   va_list ap;
   int i, ret= 0;
@@ -454,7 +454,7 @@ cl_commander_base::prompt(void)
  */
 
 int
-cl_commander_base::dd_printf(char *format, va_list ap)
+cl_commander_base::dd_printf(const char *format, va_list ap)
 {
   int ret= 0;
   class cl_console_base *con;
@@ -479,7 +479,7 @@ cl_commander_base::dd_printf(char *format, va_list ap)
 }
 
 int
-cl_commander_base::dd_printf(char *format, ...)
+cl_commander_base::dd_printf(const char *format, ...)
 {
   va_list ap;
   int ret= 0;
@@ -496,7 +496,7 @@ cl_commander_base::dd_printf(char *format, ...)
  */
 
 int
-cl_commander_base::debug(char *format, ...)
+cl_commander_base::debug(const char *format, ...)
 {
   va_list ap;
   int i, ret= 0;
@@ -515,7 +515,7 @@ cl_commander_base::debug(char *format, ...)
 }
 
 int
-cl_commander_base::debug(char *format, va_list ap)
+cl_commander_base::debug(const char *format, va_list ap)
 {
   int i, ret= 0;
 
@@ -531,7 +531,7 @@ cl_commander_base::debug(char *format, va_list ap)
 }
 
 int
-cl_commander_base::flag_printf(int iflags, char *format, ...)
+cl_commander_base::flag_printf(int iflags, const char *format, ...)
 {
   va_list ap;
   int i, ret= 0;

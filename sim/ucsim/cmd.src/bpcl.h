@@ -48,10 +48,10 @@ COMMAND_TAIL;
 class cl_tbreak_cmd: public cl_break_cmd
 {
 public:
-  cl_tbreak_cmd(char *aname,
+  cl_tbreak_cmd(const char *aname,
                 int  can_rep,
-                char *short_hlp,
-                char *long_hlp):
+                const char *short_hlp,
+                const char *long_hlp):
     cl_break_cmd(aname, can_rep, short_hlp, long_hlp) {perm=brkDYNAMIC;}
 };
 

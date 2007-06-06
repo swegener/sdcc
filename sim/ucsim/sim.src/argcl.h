@@ -49,7 +49,7 @@ public:
 
 public:  
   cl_arg(long lv);
-  cl_arg(char *lv);
+  cl_arg(const char *lv);
   cl_arg(double fv);
   cl_arg(void *pv);
   virtual ~cl_arg(void);
@@ -102,7 +102,7 @@ public:
 public:
   cl_cmd_arg(/*class cl_uc *iuc,*/ long i): cl_arg(i)
   { /*uc= iuc;*/ interpreted_as_string= DD_FALSE; }
-  cl_cmd_arg(/*class cl_uc *iuc,*/ char *s): cl_arg(s)
+  cl_cmd_arg(/*class cl_uc *iuc,*/ const char *s): cl_arg(s)
   { /*uc= iuc;*/ interpreted_as_string= DD_FALSE; }
   virtual ~cl_cmd_arg(void);
 
@@ -133,7 +133,7 @@ public:
 class cl_cmd_sym_arg: public cl_cmd_arg
 {
 public:
-  cl_cmd_sym_arg(/*class cl_uc *iuc,*/ char *sym);
+  cl_cmd_sym_arg(/*class cl_uc *iuc,*/ const char *sym);
 
   virtual bool get_address(class cl_uc *uc, t_addr *addr);
   virtual bool get_bit_address(class cl_uc *uc, // input
@@ -149,7 +149,7 @@ public:
 class cl_cmd_str_arg: public cl_cmd_arg
 {
 public:
-  cl_cmd_str_arg(/*class cl_uc *iuc,*/ char *str);
+  cl_cmd_str_arg(/*class cl_uc *iuc,*/ const char *str);
 
   virtual int is_string(void) { return(1); }
   virtual bool as_number(void) { return(DD_FALSE); }

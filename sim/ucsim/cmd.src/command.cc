@@ -347,7 +347,7 @@ cl_cmdline::shift(void)
 int
 cl_cmdline::repeat(void)
 {
-  char *n;
+  const char *n;
   return((n= get_name()) &&
          *n == '\n');
 }
@@ -370,7 +370,7 @@ cl_cmdline::insert_param(int pos, class cl_cmd_arg *param)
 }
 
 bool
-cl_cmdline::syntax_match(class cl_uc *uc, char *syntax)
+cl_cmdline::syntax_match(class cl_uc *uc, const char *syntax)
 {
   if (!syntax)
     return(DD_FALSE);
@@ -383,7 +383,7 @@ cl_cmdline::syntax_match(class cl_uc *uc, char *syntax)
   if (!params->count)
     return(DD_FALSE);
   //printf("syntax %s?\n",syntax);
-  char *p= syntax;
+  const char *p= syntax;
   int iparam= 0;
   class cl_cmd_arg *parm= (class cl_cmd_arg *)(params->at(iparam));
   while (*p &&
@@ -511,10 +511,10 @@ cl_cmdline::set_data_list(class cl_cmd_arg *parm, int *iparm)
  */
 
 cl_cmd::cl_cmd(enum cmd_operate_on op_on,
-               char *aname,
+               const char *aname,
                int can_rep,
-               char *short_hlp,
-               char *long_hlp):
+               const char *short_hlp,
+               const char *long_hlp):
   cl_base()
 {
   operate_on= op_on;
@@ -536,21 +536,17 @@ cl_cmd::cl_cmd(enum cmd_operate_on op_on,
 cl_cmd::~cl_cmd(void)
 {
   delete names;
-  if (short_help)
-    free(short_help);
-  if (long_help)
-    free(long_help);
 }
 
 void
-cl_cmd::add_name(char *nam)
+cl_cmd::add_name(const char *nam)
 {
   if (nam)
     names->add(strdup(nam));
 }
 
 int
-cl_cmd::name_match(char *aname, int strict)
+cl_cmd::name_match(const char *aname, int strict)
 {
   int i;
   
@@ -715,7 +711,7 @@ cl_cmdset::get_cmd(class cl_cmdline *cmdline, bool accept_last)
 }
 
 class cl_cmd *
-cl_cmdset::get_cmd(char *cmd_name)
+cl_cmdset::get_cmd(const char *cmd_name)
 {
   int i;
 
@@ -767,10 +763,10 @@ cl_cmdset::replace(char *nam, class cl_cmd *cmd)
  *____________________________________________________________________________
  */
 
-cl_super_cmd::cl_super_cmd(char *aname,
+cl_super_cmd::cl_super_cmd(const char *aname,
                            int  can_rep,
-                           char *short_hlp,
-                           char *long_hlp,
+                           const char *short_hlp,
+                           const char *long_hlp,
                            class cl_cmdset *acommands):
   cl_cmd(operate_on_none, aname, can_rep, short_hlp, long_hlp)
 {

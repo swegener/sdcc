@@ -39,7 +39,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_timer1: public cl_timer0
 {
 public:
-  cl_timer1(class cl_uc *auc, int aid, char *aid_string);
+  cl_timer1(class cl_uc *auc, int aid, const char *aid_string);
   //virtual int init(void);
 
   //virtual void new_hw_added(class cl_hw *new_hw);

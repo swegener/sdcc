@@ -1,9 +1,12 @@
 2007-06-07 Borut Razem <borut.razem AT siol.net>
 
-	* sim/ucsim/*.*, sim/ucsim/configure, sim/ucsim/configure.in:
+	* sim/ucsim/*.[ch], sim/ucsim/configure, sim/ucsim/configure.in:
 	  permanent solution to suppress GCC 4.2.0 c++ warning:
 	  deprecated conversion from string constant to `char *'
 	  use 'const char *' where ever required
+	* support/regression/generate-cases.py: implemented more flexible rule
+	  for detection of testing functions, allowing white-spaces surrounding
+	  the function name and the 'void' parameter.
 
 2007-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
 

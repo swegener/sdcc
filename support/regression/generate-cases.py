@@ -156,7 +156,7 @@ class InstanceGenerator:
                     None
             else:
                 # Pull out any test function names
-                if re.search(r'^test\w+\(\w+\)', line) != None:
+                if re.search(r'^\W*test\w*\W*\(\W*void\W*\)', line) != None:
                     self.functions.append(line)
 
     def generate(self):

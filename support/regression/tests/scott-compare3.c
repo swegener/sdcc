@@ -142,7 +142,7 @@ void c_abcd(void)
 
   ASSERT(!(aint0 == 0x00cd));
 
-  ASSERT(!(aint0 == (unsigned int)0x1234abcdU));
+  ASSERT(aint0 == (unsigned short int)0x1234abcdU);
 
 }
 

@@ -7,6 +7,10 @@
 	* support/regression/generate-cases.py: implemented more flexible rule
 	  for detection of testing functions, allowing white-spaces surrounding
 	  the function name and the 'void' parameter.
+	* support/regression/tests/constantRange.c,
+	  support/regression/tests/scott-compare3.c: fixed failing regression
+	  tests, uncovered by implementation of more flexible rule for detection
+	  of testing functions
 
 2007-06-04 Maarten Brock <sourceforge.brock AT dse.nl>
 

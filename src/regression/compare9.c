@@ -1,5 +1,5 @@
 #include "gpsim_assert.h"
-#include "pic16f877.h"
+#include "picregs.h"
 // Signed comparisons of the form:  (variable<=LIT)
 //
 // This regression test exercises all of the boundary

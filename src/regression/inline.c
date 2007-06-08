@@ -1,5 +1,5 @@
 #include "gpsim_assert.h"
-#include "pic16f877.h"
+#include "picregs.h"
 
 #pragma preproc_asm -
 

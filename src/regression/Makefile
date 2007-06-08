@@ -51,15 +51,26 @@ Q ?= @ # be quiet
 
 CC = sdcc
 LINKER = gplink
+USE_PIC16 ?= 1
+ifeq ($(strip $(filter 1 yes,$(USE_PIC16))),)
 TARGETPIC = 16f877
 TARGETPIC = 16f84
 CFLAGS = -mpic14 -p$(TARGETPIC)
+DIR = pic
+else
+TARGETPIC = 18f452
+CFLAGS	= -mpic16 -p$(TARGETPIC)
+DIR = pic16
+endif
 CFLAGS += -Wl,-q
-CFLAGS += -Wl,--map -I ../../device/include/pic
-CFLAGS += -L ../../device/lib/pic/bin
+CFLAGS += -Wl,--map
+CFLAGS += -I ../../device/include/$(DIR)
+CFLAGS += -L ../../device/lib/$(DIR)/bin
 #CFLAGS += --no-pcode-opt
+#CFLAGS += -V
 
 .SUFFIXES: .asm .c .cod .stc
+.NOTPARALLEL:
 
 # Results of the test are placed here:
 LOGFILE = test.log

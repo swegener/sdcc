@@ -1,3 +1,11 @@
+2007-06-08 Raphael Neider <rneider AT web.de>
+
+	* src/regression/Makefile: suppress parallel builds, allow easy
+	  switching between pic14/pic16 ports
+	* src/regression/picregs.h: added pic14/16 header file switch
+	* src/regression/{compare7.c,compare8.c,compare9.c,compare10.c,
+	  inline.c,nestfor.c,string1.c}: include "picregs.h"
+
 2007-06-07 Borut Razem <borut.razem AT siol.net>
 
 	* sim/ucsim/*.[ch], sim/ucsim/configure, sim/ucsim/configure.in:

@@ -1,3 +1,9 @@
+2007-06-09 Borut Razem <borut.razem AT siol.net>
+
+	* src/z80/gen.c: fixed bug #1294691: nested ifs make compiler crash;
+	  removed unused swap_sense; removed outBitCLong, replaced with outBitC
+	* support/regression/tests/bug-1294691.c: added
+
 2007-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCmem.c (allocDefault): removed check sym->level==0 for SPEC_ABSA,

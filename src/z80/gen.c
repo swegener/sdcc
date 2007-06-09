@@ -2230,27 +2230,20 @@ outAcc (operand * result)
 /** Take the value in carry and put it into a register
  */
 void
-outBitCLong (operand * result, bool swap_sense)
+outBitC (operand * result)
 {
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      wassertl (0, "Tried to write carry to a bit");
+      if (!IS_OP_RUONLY (result))
+        aopPut (AOP (result), "c", 0);
     }
   else
     {
       emit2 ("ld a,!zero");
       emit2 ("rla");
-      if (swap_sense)
-        emit2 ("xor a,!immedbyte", 1);
       outAcc (result);
     }
-}
-
-void
-outBitC (operand * result)
-{
-  outBitCLong (result, FALSE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4570,7 +4563,6 @@ genCmp (operand * left, operand * right,
 {
   int size, offset = 0;
   unsigned long lit = 0L;
-  bool swap_sense = FALSE;
 
   /* if left & right are bit variables */
   if (AOP_TYPE (left) == AOP_CRY &&
@@ -4637,7 +4629,7 @@ genCmp (operand * left, operand * right,
                         }
                       if (ifx)
                         {
-                          genIfxJump (ifx, swap_sense ? "c" : "nc");
+                          genIfxJump (ifx, "nc");
                           return;
                         }
                     }
@@ -4663,7 +4655,7 @@ release:
           /* Shift the sign bit up into carry */
           emit2 ("rlca");
         }
-      outBitCLong (result, swap_sense);
+      outBitC (result);
     }
   else
     {
@@ -4677,16 +4669,16 @@ release:
               if (IS_GB)
                 {
                   emit2 ("rlca");
-                  genIfxJump (ifx, swap_sense ? "nc" : "c");
+                  genIfxJump (ifx, "c");
                 }
               else
                 {
-                  genIfxJump (ifx, swap_sense ? "p" : "m");
+                  genIfxJump (ifx, "m");
                 }
             }
           else
             {
-              genIfxJump (ifx, swap_sense ? "nc" : "c");
+              genIfxJump (ifx, "c");
             }
         }
       else
@@ -4696,7 +4688,7 @@ release:
               /* Shift the sign bit up into carry */
               emit2 ("rlca");
             }
-          outBitCLong (result, swap_sense);
+          outBitC (result);
         }
       /* leave the result in acc */
     }

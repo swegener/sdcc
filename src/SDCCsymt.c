@@ -1594,7 +1594,7 @@ checkSClass (symbol * sym, int isProto)
 
   /* automatic symbols cannot be given   */
   /* an absolute address ignore it      */
-  if (sym->level &&
+  if (sym->level && !IS_STATIC(sym->etype) &&
       SPEC_ABSA (sym->etype) &&
       (options.stackAuto || reentrant))
     {
@@ -2059,27 +2059,31 @@ compareType (sym_link * dest, sym_link * src)
               return compareType (dest->next, src->next);
             }
 
-          if (DCL_TYPE (src) == DCL_TYPE (dest)) {
-            if (IS_FUNC(src)) {
-              //checkFunction(src,dest);
+          if (DCL_TYPE (src) == DCL_TYPE (dest))
+            {
+              if (IS_FUNC(src))
+                {
+                  //checkFunction(src,dest);
+                }
+              return compareType (dest->next, src->next);
             }
-            return compareType (dest->next, src->next);
-          }
-          if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID(src->next)) {
-            return -1;
-          }
+          if (IS_PTR (dest) && IS_GENPTR (src) && IS_VOID(src->next))
+            {
+              return -1;
+            }
           if (IS_PTR (src) && 
               (IS_GENPTR (dest) ||
                ((DCL_TYPE(src) == POINTER) && (DCL_TYPE(dest) == IPOINTER))
              ))
             return -1;
-          if (IS_PTR (dest) && IS_ARRAY (src)) {
-            value *val=aggregateToPointer (valFromType(src));
-            int res=compareType (dest, val->type);
-            Safe_free(val->type);
-            Safe_free(val);
-            return res;
-          }
+          if (IS_PTR (dest) && IS_ARRAY (src))
+            {
+              value *val=aggregateToPointer (valFromType(src));
+              int res=compareType (dest, val->type);
+              Safe_free(val->type);
+              Safe_free(val);
+              return res;
+            }
           if (IS_PTR (dest) && IS_FUNC (dest->next) && IS_FUNC (src))
             return compareType (dest->next, src);
           return 0;

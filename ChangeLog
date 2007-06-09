@@ -1,3 +1,11 @@
+2007-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmem.c (allocDefault): removed check sym->level==0 for SPEC_ABSA,
+	  can also be static, fixes bug 1733438
+	* src/SDCCsymt.c (checkSClass): static local vars in reentrant funcs can
+	  have absolute address too
+	* support/regression/tests/absolute.c: added test for static absolute var
+
 2007-06-08 Raphael Neider <rneider AT web.de>
 
 	* src/regression/Makefile: suppress parallel builds, allow easy

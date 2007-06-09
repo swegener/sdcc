@@ -411,7 +411,7 @@ allocDefault (symbol * sym)
       if (sym->_isparm)
         return FALSE;
       /* if code change to constant */
-      if (sym->ival && (sym->level==0) && SPEC_ABSA (sym->etype))
+      if (sym->ival && SPEC_ABSA (sym->etype))
         {
           SPEC_OCLS(sym->etype) = c_abs;
         }
@@ -422,7 +422,7 @@ allocDefault (symbol * sym)
       break;
     case S_XDATA:
       /* absolute initialized global */
-      if (sym->ival && (sym->level==0) && SPEC_ABSA (sym->etype))
+      if (sym->ival && SPEC_ABSA (sym->etype))
         {
           SPEC_OCLS(sym->etype) = x_abs;
         }
@@ -438,7 +438,7 @@ allocDefault (symbol * sym)
       break;
     case S_DATA:
       /* absolute initialized global */
-      if (sym->ival && (sym->level==0) && SPEC_ABSA (sym->etype))
+      if (sym->ival && SPEC_ABSA (sym->etype))
         {
           SPEC_OCLS(sym->etype) = d_abs;
         }
@@ -449,7 +449,7 @@ allocDefault (symbol * sym)
       break;
     case S_IDATA:
       /* absolute initialized global */
-      if (sym->ival && (sym->level==0) && SPEC_ABSA (sym->etype))
+      if (sym->ival && SPEC_ABSA (sym->etype))
         {
           SPEC_OCLS(sym->etype) = i_abs;
         }

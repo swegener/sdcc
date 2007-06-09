@@ -1904,6 +1904,17 @@ computeType (sym_link * type1, sym_link * type2,
 
   switch (resultType)
     {
+      case RESULT_TYPE_IFX:
+        if (TARGET_IS_HC08)
+          break;
+        //fallthrough
+      case RESULT_TYPE_BIT:
+        if (op == ':')
+          {
+            SPEC_NOUN (reType) = V_BIT;
+            return rType;
+          }
+        break;
       case RESULT_TYPE_CHAR:
         if (IS_BITVAR (reType))
           {

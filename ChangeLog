@@ -1,3 +1,9 @@
+2007-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (decorateType): optimized '?' for equal operands
+	* src/SDCCicode.c (geniCodeConditional): optimization for bit result
+	  with literal operands
+
 2007-06-10 Borut Razem <borut.razem AT siol.net>
 
 	* as/link/z80/lklibr.c: fixed mingw build warning

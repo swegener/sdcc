@@ -3141,18 +3141,46 @@ geniCodeConditional (ast * tree,int lvl)
   iCode *ic;
   symbol *falseLabel = newiTempLabel (NULL);
   symbol *exitLabel = newiTempLabel (NULL);
-  operand *cond = ast2iCode (tree->left,lvl+1);
-  operand *true, *false, *result;
+  ast *astTrue  = tree->right->left;
+  ast *astFalse = tree->right->right;
+  operand *cond = ast2iCode (tree->left, lvl+1);
+  operand *result = newiTempOperand (tree->right->ftype, 0);
+  operand *opTrue, *opFalse;
 
-  ic = newiCodeCondition (geniCodeRValue (cond, FALSE),
-                          NULL, falseLabel);
+  if (IS_AST_LIT_VALUE (astTrue) && IS_AST_LIT_VALUE (astFalse))
+    {
+      double valTrue = AST_LIT_VALUE (astTrue);
+      double valFalse = AST_LIT_VALUE (astFalse);
+
+      if (IS_BIT (operandType (result)))
+        {
+          if ((valTrue != 0) && (valFalse == 0))
+            {
+              /* assign cond to result */
+              geniCodeAssign (result, geniCodeRValue (cond, FALSE), 0, 0);
+              return result;
+            }
+          else if ((valTrue == 0) && (valFalse != 0))
+            {
+              /* assign !cond to result */
+              result = geniCodeUnary (geniCodeRValue (cond, FALSE), '!');
+              return result;
+            }
+          else
+            {
+              /* they have the same boolean value, make them equal */
+              astFalse = astTrue;
+            }
+        }
+    }
+
+  ic = newiCodeCondition (geniCodeRValue (cond, FALSE), NULL, falseLabel);
   ADDTOCHAIN (ic);
 
-  true = ast2iCode (tree->right->left,lvl+1);
+  opTrue = ast2iCode (astTrue, lvl+1);
 
-  /* move the value to a new Operand */
-  result = newiTempOperand (tree->right->ftype, 0);
-  geniCodeAssign (result, geniCodeRValue (true, FALSE), 0, 0);
+  /* move the value to the new operand */
+  geniCodeAssign (result, geniCodeRValue (opTrue, FALSE), 0, 0);
 
   /* generate an unconditional goto */
   geniCodeGoto (exitLabel);
@@ -3160,8 +3188,8 @@ geniCodeConditional (ast * tree,int lvl)
   /* now for the right side */
   geniCodeLabel (falseLabel);
 
-  false = ast2iCode (tree->right->right,lvl+1);
-  geniCodeAssign (result, geniCodeRValue (false, FALSE), 0, 0);
+  opFalse = ast2iCode (astFalse, lvl+1);
+  geniCodeAssign (result, geniCodeRValue (opFalse, FALSE), 0, 0);
 
   /* create the exit label */
   geniCodeLabel (exitLabel);

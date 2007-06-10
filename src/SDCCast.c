@@ -4368,6 +4368,14 @@ decorateType (ast * tree, RESULT_TYPE resultType)
     case '?':
       /* the type is value of the colon operator (on the right) */
       assert (IS_COLON_OP (tree->right));
+
+      /* if they are equal then replace the tree */
+      if (!astHasVolatile (tree->right) &&
+          isAstEqual (tree->right->left, tree->right->right))
+        {
+          return decorateType (tree->right->left, resultTypeProp);
+        }
+
       /* if already known then replace the tree : optimizer will do it
          but faster to do it here */
       if (IS_LITERAL (LTYPE (tree)))

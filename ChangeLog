@@ -1,3 +1,8 @@
+2007-06-10 Borut Razem <borut.razem AT siol.net>
+
+	* as/link/z80/lklibr.c: fixed mingw build warning
+	  lklibr.c:575: warning: implicit declaration of function 'tolower'
+
 2007-06-09 Borut Razem <borut.razem AT siol.net>
 
 	* src/z80/gen.c: fixed bug #1294691: nested ifs make compiler crash;
